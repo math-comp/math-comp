@@ -1,0 +1,50 @@
+INSTALLATION PROCEDURE FOR THE MATHEMATICAL COMPONENTS LIBRARY
+--------------------------------------------------------------
+
+LINUX AND MAC
+=============
+
+0. Install opam.  Instructions at
+
+     http://opam.ocaml.org/doc/Install.html
+
+1. Be sure to have the Coq stable repository added to opam by typing
+
+     opam repo list
+
+   If it is not the case, type
+
+     opam repo add coq-stable https://github.com/coq/repo-stable.git
+
+2. To find all Mathematical Components libraries type
+
+     opam search coq:mathcomp
+
+3. To get more info about a package type (for example)
+
+     opam show coq:mathcomp:discrete
+
+4. To install the ones you need, type (for example)
+
+     opam install coq:mathcomp:discrete
+
+   To take advantage of parallel hardware one can add
+   the flag -j to specify how many concurrent jobs are
+   run, for example type
+
+     opam install -j2 coq:mathcomp:discrete
+
+5. To remove a package, type (for example)
+
+     opam remove coq:mathcomp:discrete
+
+WINDOWS
+=======
+
+0. Install Coq using the official Windows installer from
+
+    ...
+
+1. Download and install the all in one bundle
+
+    ...

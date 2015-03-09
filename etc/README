@@ -1,0 +1,40 @@
+          THE MATHEMATICAL COMPONENTS LIBRARY
+       ------------------------------------------
+
+
+DOCUMENTATION
+=============
+
+	The documentation of the ssreflect tactics, a brief
+        description of the mathematical components libraries
+	and a detailed list of the changes made in the releases
+        is available as an Inria Research Report at
+
+        	http://hal.inria.fr/inria-00258384 
+
+
+AVAILABILITY
+============
+
+	Ssreflect and the Mathematical Components library are available at:
+	http://ssr.msr-inria.inria.fr/
+
+
+THE DISCUSSION LIST
+===================
+
+	The ssreflect list (ssreflect@msr-inria.inria.fr) is meant to be
+        a standard way to discuss about the ssreflect extension and the
+        mathematical components library.
+
+	To subscribe visit: https://sympa.inria.fr/sympa/info/ssreflect
+
+LICENSING
+=========
+
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the CeCILL B FREE SOFTWARE LICENSE.
+
+        You should have received a copy of the CeCILL B License with this
+        Kit, in the file named "CeCILL-B".
+        If not, visit http://www.cecill.info    

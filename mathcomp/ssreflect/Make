@@ -6,3 +6,11 @@ ssreflect.v
 ssrfun.v
 ssrmatching.v
 ssrnat.v
+
+ssreflect.mllib
+ssrmatching.mli
+ssrmatching.ml4
+ssreflect.ml4
+
+-I .
+-R . mathcomp.ssreflect

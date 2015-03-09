@@ -1,3 +1,5 @@
+H=@
+
 ifeq "$(COQBIN)" ""
 COQBIN=$(dir $(shell which coqtop))/
 endif
@@ -13,21 +15,28 @@ endif
 OLD_MAKEFLAGS:=$(MAKEFLAGS)
 MAKEFLAGS+=-B
 
+.DEFAULT_GOAL := all
+
 %:
-	@[ -e Makefile.coq ] || $(call coqmakefile)
-	@[ Make -ot Makefile.coq ] || $(call coqmakefile)
-	@MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
-		-f Makefile.coq $*
+	$(H)[ -e Makefile.coq ] || $(call coqmakefile)
+# Override COQLIBS to find the "right" copy .ml files, otherwise
+# coq_makefile uses only the -R in COQLIBS and ignores the -I in
+# OCAMLLIBS to look for .ml files in order to generate .d files
+# via coqdep
+	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
+		-f Makefile.coq $* \
+		COQLIBS='-I . -R . mathcomp.ssreflect'
 
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
-	cp Make Make.coq;\
-	echo -I plugin/$(V)/src >> Make.coq;\
-	echo plugin/$(V)/src/ssreflect.mllib >> Make.coq;\
-	echo plugin/$(V)/src/ssrmatching.mli >> Make.coq;\
-	echo plugin/$(V)/src/ssrmatching.ml4 >> Make.coq;\
-	echo plugin/$(V)/src/ssreflect.ml4 >> Make.coq;\
-	$(COQBIN)/coq_makefile -f Make.coq -o Makefile.coq)
+	ln -sf plugin/$(V)/ssreflect.mllib .;\
+	ln -sf plugin/$(V)/ssrmatching.mli .;\
+	ln -sf plugin/$(V)/ssrmatching.ml4 .;\
+	ln -sf plugin/$(V)/ssreflect.ml4 .;\
+	$(COQBIN)/coq_makefile -f Make -o Makefile.coq)
 endef
 
-
+clean:
+	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
+		-f Makefile.coq clean
+	$(H)rm -f Makefile.coq

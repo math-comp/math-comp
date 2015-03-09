@@ -1,0 +1,9 @@
+*.d
+*.vo
+*.cm*
+*~
+*.glob
+*.aux
+*.a
+*.o
+Make*.coq
