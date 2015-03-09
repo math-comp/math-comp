@@ -4643,7 +4643,7 @@ END
 let simplintac occ rdx sim gl = 
   let simptac gl = 
     let sigma0, concl0, env0 = project gl, pf_concl gl, pf_env gl in
-    let simp env c _ = red_safe Tacred.simpl env sigma0 c in
+    let simp env c _ _ = red_safe Tacred.simpl env sigma0 c in
     Proofview.V82.of_tactic
       (convert_concl_no_check (eval_pattern env0 sigma0 concl0 rdx occ simp))
       gl in
@@ -4681,8 +4681,8 @@ let unfoldintac occ rdx t (kt,_) gl =
     let ise, u = mk_tpattern env0 sigma0 (ise,t) all_ok L2R t in
     let find_T, end_T =
       mk_tpattern_matcher ~raise_NoMatch:true sigma0 occ (ise,[u]) in
-    (fun env c h -> 
-      try find_T env c h (fun env c _ -> body env t c)
+    (fun env c _ h -> 
+      try find_T env c h (fun env c _ _ -> body env t c)
       with NoMatch when easy -> c
       | NoMatch | NoProgress -> errorstrm (str"No occurrence of "
         ++ pr_constr_pat t ++ spc() ++ str "in " ++ pr_constr c)),
@@ -4690,7 +4690,7 @@ let unfoldintac occ rdx t (kt,_) gl =
       | NoMatch when easy -> fake_pmatcher_end () 
       | NoMatch -> anomaly "unfoldintac")
   | _ -> 
-    (fun env (c as orig_c) h ->
+    (fun env (c as orig_c) _ h ->
       if const then
           let rec aux c = 
             match kind_of_term c with
@@ -4728,10 +4728,10 @@ let foldtac occ rdx ft gl =
     let ise, ut = mk_tpattern env0 sigma0 (ise,t) all_ok L2R ut in
     let find_T, end_T =
       mk_tpattern_matcher ~raise_NoMatch:true sigma0 occ (ise,[ut]) in
-    (fun env c h -> try find_T env c h (fun env t _ -> t) with NoMatch -> c),
+    (fun env c _ h -> try find_T env c h (fun env t _ _ -> t) with NoMatch ->c),
     (fun () -> try end_T () with NoMatch -> fake_pmatcher_end ())
   | _ -> 
-    (fun env c h -> try let sigma = unify_HO env sigma c t in fs sigma t
+    (fun env c _ h -> try let sigma = unify_HO env sigma c t in fs sigma t
     with _ -> errorstrm (str "fold pattern " ++ pr_constr_pat t ++ spc ()
       ++ str "does not match redex " ++ pr_constr_pat c)), 
     fake_pmatcher_end in
@@ -4896,7 +4896,7 @@ let closed0_check cl p gl =
   if closed0 cl then
     errorstrm (str"No occurrence of redex "++pf_pr_constr gl (project gl) p)
 
-let rwrxtac occ rdx_pat dir rule gl =
+let rwprocess_rule dir rule gl =
   let env = pf_env gl in
   let coq_prod = lz_coq_prod () in
   let is_setoid = ssr_is_setoid env in
@@ -4967,7 +4967,13 @@ let rwrxtac occ rdx_pat dir rule gl =
         in
     let sigma, r = rule in
     let t = Retyping.get_type_of env sigma r in
-    loop dir sigma r t [] 0 in
+    loop dir sigma r t [] 0
+  in
+    r_sigma, rules
+
+let rwrxtac occ rdx_pat dir rule gl =
+  let env = pf_env gl in
+  let r_sigma, rules = rwprocess_rule dir rule gl in
   let find_rule rdx =
     let rec rwtac = function
       | [] ->
@@ -4992,11 +4998,11 @@ let rwrxtac occ rdx_pat dir rule gl =
         sigma, pats @ [pat] in
       let rpats = List.fold_left (rpat env0 sigma0) (r_sigma,[]) rules in
       let find_R, end_R = mk_tpattern_matcher sigma0 occ ~upats_origin rpats in
-      find_R ~k:(fun _ _ h -> mkRel h), 
+      (fun e c _ i -> find_R ~k:(fun _ _ _ h -> mkRel h) e c i), 
       fun cl -> let rdx,d,r = end_R () in closed0_check cl rdx gl; (d,r),rdx
   | Some(_, (T e | X_In_T (_,e) | E_As_X_In_T (e,_,_) | E_In_X_In_T (e,_,_))) ->
       let r = ref None in
-      (fun env c h -> do_once r (fun () -> find_rule c, c); mkRel h),
+      (fun env c _ h -> do_once r (fun () -> find_rule c, c); mkRel h),
       (fun concl -> closed0_check concl e gl; assert_done r) in
   let concl = eval_pattern env0 sigma0 concl0 rdx_pat occ find_R in
   let (d, r), rdx = conclude concl in
@@ -5009,6 +5015,32 @@ let rwrxtac occ rdx_pat dir rule gl =
   prof_rwxrtac.profile (rwrxtac occ rdx_pat dir rule) gl
 ;;
 
+let ssrinstancesofrule ist dir arg gl =
+  let sigma0, env0, concl0 = project gl, pf_env gl, pf_concl gl in
+  let rule = interp_term ist gl arg in
+  let r_sigma, rules = rwprocess_rule dir rule gl in
+  let find, conclude =
+    let upats_origin = dir, snd rule in
+    let rpat env sigma0 (sigma, pats) (d, r, lhs, rhs) =
+      let sigma, pat =
+        mk_tpattern env sigma0 (sigma,r) (rw_progress rhs) d lhs in
+      sigma, pats @ [pat] in
+    let rpats = List.fold_left (rpat env0 sigma0) (r_sigma,[]) rules in
+    mk_tpattern_matcher ~all_instances:true ~raise_NoMatch:true sigma0 None ~upats_origin rpats in
+  let print env p c _ = ppnl (hov 1 (str"instance:" ++ spc() ++ pr_constr p ++ spc() ++ str "matches:" ++ spc() ++ pr_constr c)); c in
+  ppnl (str"BEGIN INSTANCES");
+  try
+    while true do
+      ignore(find env0 concl0 1 ~k:print)
+    done; raise NoMatch
+  with NoMatch -> ppnl (str"END INSTANCES"); tclIDTAC gl
+
+TACTIC EXTEND ssrinstofruleL2R
+| [ "ssrinstancesofruleL2R" ssrterm(arg) ] -> [ Proofview.V82.tactic (ssrinstancesofrule ist L2R arg) ]
+END
+TACTIC EXTEND ssrinstofruleR2L
+| [ "ssrinstancesofruleR2L" ssrterm(arg) ] -> [ Proofview.V82.tactic (ssrinstancesofrule ist R2L arg) ]
+END
 
 (* Resolve forward reference *)
 let _ = 

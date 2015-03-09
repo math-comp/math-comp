@@ -77,9 +77,9 @@ val interp_cpattern :
  *  to signal the complement of this set (i.e. {-1 3}) *)
 type occ = (bool * int list) option
 
-(** Substitution function. The [int] argument is the number of binders
-    traversed so far *)
-type subst = env -> constr -> int -> constr
+(** [subst e p t i]. [i] is the number of binders
+    traversed so far, [p] the term from the pattern, [t] the matched one *)
+type subst = env -> constr -> constr -> int -> constr
 
 (** [eval_pattern b env sigma t pat occ subst] maps [t] calling [subst] on every
     [occ] occurrence of [pat]. The [int] argument is the number of 
@@ -120,7 +120,7 @@ val pr_dir_side : ssrdir -> Pp.std_ppcmds
 (** a pattern for a term with wildcards *)
 type tpattern
 
-(** [mk_tpattern env sigma0 sigma_t ok p_origin dir p] compiles a term [t] 
+(** [mk_tpattern env sigma0 sigma_p ok p_origin dir t] compiles a term [t] 
     living in [env] [sigma] (an extension of [sigma0]) intro a [tpattern].
     The [tpattern] can hold a (proof) term [p] and a diction [dir]. The [ok]
     callback is used to filter occurrences.
@@ -161,6 +161,7 @@ type conclude =
     be passed to tune the [UserError] eventually raised (useful if the 
     pattern is coming from the LHS/RHS of an equation) *)
 val mk_tpattern_matcher :
+  ?all_instances:bool ->
   ?raise_NoMatch:bool ->
   ?upats_origin:ssrdir * constr ->
   evar_map -> occ -> evar_map * tpattern list ->
