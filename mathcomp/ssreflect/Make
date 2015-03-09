@@ -1,0 +1,8 @@
+all.v
+eqtype.v
+seq.v
+ssrbool.v
+ssreflect.v
+ssrfun.v
+ssrmatching.v
+ssrnat.v
