@@ -1,0 +1,21 @@
+all.v
+finalg.v
+fraction.v
+intdiv.v
+interval.v
+matrix.v
+mxalgebra.v
+mxpoly.v
+polydiv.v
+poly.v
+polyXY.v
+rat.v
+ring_quotient.v
+ssralg.v
+ssrint.v
+ssrnum.v
+vector.v
+zmodp.v
+cyclic.v
+
+-R . mathcomp.algebra
