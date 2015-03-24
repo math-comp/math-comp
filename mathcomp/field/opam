@@ -1,0 +1,12 @@
+opam-version: "1.2"
+name: "coq:mathcomp:field"
+version: "1.5"
+maintainer: "Ssreflect <ssreflect@msr-inria.inria.fr>"
+authors: "Ssreflect <ssreflect@msr-inria.inria.fr>"
+homepage: "http://ssr.msr-inria.inria.fr/"
+bug-reports: "ssreflect@msr-inria.inria.fr"
+license: "CeCILL-B"
+build: [ make "-j" "%{jobs}%" ] 
+install: [ make "install" ]
+remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/field'" ]
+depends: [ "coq:mathcomp:solvable" { = "1.5" } ]

@@ -1,0 +1,21 @@
+abelian.v
+all.v
+alt.v
+burnside_app.v
+center.v
+commutator.v
+extraspecial.v
+extremal.v
+finmodule.v
+frobenius.v
+gfunctor.v
+gseries.v
+hall.v
+jordanholder.v
+maximal.v
+nilpotent.v
+pgroup.v
+primitive_action.v
+sylow.v
+
+-R . mathcomp.solvable
