@@ -7,7 +7,6 @@ countalg.v
 cyclotomic.v
 falgebra.v
 fieldext.v
-finfield.v
 galois.v
 separable.v
 
