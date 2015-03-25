@@ -7,3 +7,4 @@ Require Export polyrcf.
 Require Export qe_rcf_th.
 Require Export qe_rcf.
 Require Export realalg.
+Require Export mxtens.
