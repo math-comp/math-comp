@@ -580,20 +580,35 @@ let basecuttac name c gl =
   let gl, _ = pf_e_type_of gl t in
   Proofview.V82.of_tactic (apply t) gl
 
+(* Let's play with the new proof engine API *)
+module PG = Proofview.Goal
+module TN = Tacticals.New
+let old_tac = Proofview.V82.tactic
+let new_tac = Proofview.V82.of_tactic
+
 (* we reduce head beta redexes *)
 let betared env = 
   Closure.create_clos_infos 
    (Closure.RedFlags.mkflags [Closure.RedFlags.fBETA])
     env
 ;;
-let introid name = tclTHEN (fun gl ->
+let rec fst_prod red tac = PG.enter begin fun gl ->
+  let concl = Evarutil.nf_evar (PG.sigma gl) (PG.concl (PG.assume gl)) in
+  match kind_of_term concl with
+  | Prod (id,_,tgt) | LetIn(id,_,_,tgt) -> tac id
+  | _ -> if red then TN.tclZEROMSG (str"No product even after head-reduction.")
+         else TN.tclTHEN (old_tac hnf_in_concl) (fst_prod true tac)
+end
+;;
+let introid ?(orig=ref Anonymous) name = tclTHEN (fun gl ->
    let g, env = pf_concl gl, pf_env gl in
    match kind_of_term g with
    | App (hd, _) when isLambda hd -> 
      let g = Closure.whd_val (betared env) (Closure.inject g) in
      Proofview.V82.of_tactic (convert_concl_no_check g) gl
    | _ -> tclIDTAC gl)
-  (Proofview.V82.of_tactic (intro_mustbe_force name))
+  (Proofview.V82.of_tactic
+    (fst_prod false (fun id -> orig := id; intro_mustbe_force name)))
 ;;
 
 
@@ -701,6 +716,11 @@ let has_wildcard_tag s =
   String.sub s (n - m') m' = wildcard_post &&
   skip_digits s m = n - m' - 2
 let _ = add_internal_name has_wildcard_tag
+
+let tmp_tag = "_the_"
+let tmp_post = "_tmp_"
+let mk_tmp_id i =
+  id_of_string (sprintf "%s%s%s" tmp_tag (String.ordinal i) tmp_post)
 
 let max_suffix m (t, j0 as tj0) id  =
   let s = string_of_id id in let n = String.length s - 1 in
@@ -2142,7 +2162,10 @@ let test_ssrslashnum strm =
   match Compat.get_tok (stream_nth 0 strm) with
   | Tok.KEYWORD "/" ->
       (match Compat.get_tok (stream_nth 1 strm) with
-      | Tok.INT _ -> ()
+      | Tok.INT _ ->
+         (match Compat.get_tok (stream_nth 2 strm) with
+         | Tok.KEYWORD "/" -> ()
+         | _ -> raise Stream.Failure)
       | _ -> raise Stream.Failure)
   | _ -> raise Stream.Failure
 
@@ -2513,12 +2536,15 @@ type ssripat =
   | IpatId of identifier
   | IpatWild
   | IpatCase of ssripats list
+  | IpatInj of ssripats list
   | IpatRw of ssrocc * ssrdir
   | IpatAll
   | IpatAnon
   | IpatView of ssrtermrep list
   | IpatNoop
   | IpatNewHidden of identifier list
+  | IpatFastMode
+  | IpatTmpId
 and ssripats = ssripat list
 
 let remove_loc = snd
@@ -2543,6 +2569,7 @@ let rec pr_ipat = function
   | IpatId id -> pr_id id
   | IpatSimpl (clr, sim) -> pr_clear mt clr ++ pr_simpl sim
   | IpatCase iorpat -> hov 1 (str "[" ++ pr_iorpat iorpat ++ str "]")
+  | IpatInj iorpat -> hov 1 (str "[=" ++ pr_iorpat iorpat ++ str "]")
   | IpatRw (occ, dir) -> pr_occ occ ++ pr_dir dir
   | IpatAll -> str "*"
   | IpatWild -> str "_"
@@ -2550,6 +2577,8 @@ let rec pr_ipat = function
   | IpatView v -> pr_view v
   | IpatNoop -> str "-"
   | IpatNewHidden l -> str "[:" ++ pr_list spc pr_id l ++ str "]"
+  | IpatFastMode -> str "^*"
+  | IpatTmpId -> str "+"
 and pr_iorpat iorpat = pr_list pr_bar pr_ipats iorpat
 and pr_ipats ipats = pr_list spc pr_ipat ipats
 
@@ -2563,6 +2592,7 @@ let intern_ipat ist ipat =
   let rec check_pat = function
   | IpatSimpl (clr, _) -> ignore (List.map (intern_hyp ist) clr)
   | IpatCase iorpat -> List.iter (List.iter check_pat) iorpat
+  | IpatInj iorpat -> List.iter (List.iter check_pat) iorpat
   | _ -> () in
   check_pat ipat; ipat
 
@@ -2600,6 +2630,7 @@ let rec interp_ipat ist gl =
     let clr' = List.fold_right add_hyps clr [] in
     check_hyps_uniq [] clr'; IpatSimpl (clr', sim)
   | IpatCase iorpat -> IpatCase (List.map (List.map interp) iorpat)
+  | IpatInj iorpat -> IpatInj (List.map (List.map interp) iorpat)
   | IpatNewHidden l ->
       IpatNewHidden
         (List.map (function
@@ -2624,8 +2655,11 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
   GLOBALIZED BY intern_ipats
   | [ "_" ] -> [ [IpatWild] ]
   | [ "*" ] -> [ [IpatAll] ]
+  | [ "^*" ] -> [ [IpatFastMode] ]
+  | [ "^" "*" ] -> [ [IpatFastMode] ]
   | [ ident(id) ] -> [ [IpatId id] ]
   | [ "?" ] -> [ [IpatAnon] ]
+  | [ "+" ] -> [ [IpatTmpId] ]
   | [ ssrsimpl_ne(sim) ] -> [ [IpatSimpl ([], sim)] ]
   | [ ssrdocc(occ) "->" ] -> [ match occ with
       | None, occ -> [IpatRw (occ, L2R)]
@@ -2651,6 +2685,7 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
   | [ "-/" integer(n) "/" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut n)] ]
   | [ ssrview(v) ] -> [ [IpatView v] ]
   | [ "[" ":" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
+  | [ "[:" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
 END
 
 ARGUMENT EXTEND ssripats TYPED AS ssripat PRINTED BY pr_ssripats
@@ -2768,6 +2803,8 @@ let pr_ssrintros _ _ _ = pr_intros mt
 ARGUMENT EXTEND ssrintros_ne TYPED AS ssripat
  PRINTED BY pr_ssrintros
   | [ "=>" ssripats_ne(pats) ] -> [ pats ]
+  | [ "=>" ">" ssripats_ne(pats) ] -> [ IpatFastMode :: pats ]
+  | [ "=>>" ssripats_ne(pats) ] -> [ IpatFastMode :: pats ]
 END
 
 ARGUMENT EXTEND ssrintros TYPED AS ssrintros_ne PRINTED BY pr_ssrintros
@@ -2832,8 +2869,8 @@ let perform_injection c gl =
 let simplest_newcase_ref = ref (fun t gl -> assert false)
 let simplest_newcase x gl = !simplest_newcase_ref x gl
 
-let ssrscasetac c gl = 
-  if is_injection_case c gl then perform_injection c gl
+let ssrscasetac force_inj c gl = 
+  if force_inj || is_injection_case c gl then perform_injection c gl
   else simplest_newcase c gl 
 
 let intro_all gl =
@@ -2844,6 +2881,37 @@ let rec intro_anon gl =
   try anontac (List.hd (fst (Term.decompose_prod_n_assum 1 (pf_concl gl)))) gl
   with err0 -> try tclTHEN red_in_concl intro_anon gl with _ -> raise err0
   (* with _ -> Errors.error "No product even after reduction" *)
+
+let rec fst_unused_prod red tac = PG.enter begin fun gl ->
+  let concl = Evarutil.nf_evar (PG.sigma gl) (PG.concl (PG.assume gl)) in
+  match kind_of_term concl with
+  | Prod (id,_,tgt) | LetIn(id,_,_,tgt) ->
+      if noccurn 1 tgt then tac id
+      else TN.tclTHEN (old_tac intro_anon) (fst_unused_prod false tac)
+  | _ -> if red then TN.tclZEROMSG (str"No product even after head-reduction.")
+         else TN.tclTHEN (old_tac hnf_in_concl) (fst_unused_prod true tac)
+end;;
+
+let introid_fast orig name = 
+  fst_unused_prod false (fun id -> orig := id; old_tac (introid name))
+let intro_anon_fast = fst_unused_prod false (fun _ -> old_tac intro_anon)
+
+let intro_anon ?(speed=`Slow) () =
+  if speed = `Slow then intro_anon else new_tac intro_anon_fast
+
+(* we reduce head beta redexes *)
+let introid ?(speed=`Slow) ?(orig=ref Anonymous) name =
+  if speed = `Slow then introid ~orig name
+  else tclTHEN (fun gl ->
+   let g, env = pf_concl gl, pf_env gl in
+   match kind_of_term g with
+   | App (hd, _) when isLambda hd -> 
+     let g = Closure.whd_val (betared env) (Closure.inject g) in
+     new_tac (convert_concl_no_check g) gl
+   | _ -> tclIDTAC gl)
+  (new_tac (introid_fast orig name))
+;;
+
 
 let with_top tac =
   tclTHENLIST [introid top_id; tac (mkVar top_id); clear [top_id]]
@@ -2930,6 +2998,14 @@ let ssrmkabs id gl =
 let ssrmkabstac ids =
   List.fold_right (fun id tac -> tclTHENFIRST (ssrmkabs id) tac) ids tclIDTAC
 
+let gentac_ref = ref (fun _ _ _ -> assert false)
+
+let rename_hd_prod orig_name_ref gl =
+  match kind_of_term (pf_concl gl) with
+  | Prod(_,src,tgt) ->
+      new_tac (convert_concl_no_check (mkProd (!orig_name_ref,src,tgt))) gl
+  | _ -> Errors.anomaly (str "gentac creates no product")
+
 (* introstac: for "move" and "clear", tclEQINTROS: for "case" and "elim" *)
 (* This block hides the spaghetti-code needed to implement the only two  *)
 (* tactics that should be used to process intro patters.                 *)
@@ -2940,10 +3016,22 @@ let ssrmkabstac ids =
 (* eventually renamed at runtime.                                        *)
 (* TODO: hide wild_ids in this block too *)
 let introstac, tclEQINTROS =
+  let tmp_ids = ref [] in
+  let new_tmp_id () =
+    let id = mk_tmp_id (1 + List.length !tmp_ids) in
+    let orig = ref Anonymous in
+    tmp_ids := (id, orig) :: !tmp_ids;
+    id, orig in
+  let dummy_ist = Geninterp.({ lfun = Id.Map.empty; extra = TacStore.empty }) in
+  let gen_tmps ?(ist=dummy_ist) gens gl =
+    tclTHENLIST (List.map (fun (id,orig_ref) ->
+      tclTHEN 
+        (!gentac_ref ist ((None,allocc),cpattern_of_id id))
+        (rename_hd_prod orig_ref)) gens) gl in
   let rec map_acc_k f k = function
     | [] -> (* tricky: we save wilds now, we get to_cler (aka k) later *)
       let clear_ww = clear_with_wilds !wild_ids in           
-      [fun gl -> clear_ww (hyps_ids (List.flatten (List.map (!) k))) gl]
+      [fun gl -> clear_ww (hyps_ids (List.flatten (List.map (!) (snd k)))) gl]
     | x :: xs -> let k, x = f k xs x in x :: map_acc_k f k xs in
   let rename force to_clr rest clr gl = 
     let hyps = pf_hyps gl in
@@ -2959,24 +3047,31 @@ let introstac, tclEQINTROS =
     else
       let () = to_clr := clr in
       tclIDTAC gl in
-  let rec ipattac ?ist k rest = function
-    | IpatWild -> k, introid (new_wild_id ())
-    | IpatCase iorpat -> k, tclIORPAT ?ist k (with_top ssrscasetac) iorpat
+  let rec ipattac ?ist (speed, clears as k) rest = function
+    | IpatWild -> k, introid ~speed (new_wild_id ())
+    | IpatTmpId ->
+        let id, orig = new_tmp_id () in
+        k, introid ~speed ~orig id
+    | IpatCase iorpat ->
+        k, tclIORPAT ?ist k (with_top (ssrscasetac false)) iorpat
+    | IpatInj iorpat -> k, tclIORPAT ?ist k (with_top (ssrscasetac true)) iorpat
     | IpatRw (occ, dir) -> k, with_top (!ipat_rewritetac occ dir)
-    | IpatId id -> k, introid id
+    | IpatId id -> k, introid ~speed id
     | IpatNewHidden idl -> k, ssrmkabstac idl
     | IpatSimpl (clr, sim) ->
       let to_clr = ref [] in
-      to_clr :: k, tclTHEN (rename false to_clr rest clr) (simpltac sim)
+      (speed, to_clr :: clears),
+      tclTHEN (rename false to_clr rest clr) (simpltac sim)
     | IpatAll -> k, intro_all
-    | IpatAnon -> k, intro_anon
-    | IpatNoop -> k, tclIDTAC
+    | IpatAnon -> k, intro_anon ~speed ()
+    | IpatNoop -> (`Slow,clears), tclIDTAC
+    | IpatFastMode -> (`Fast,clears), tclIDTAC
     | IpatView v -> match ist with
         | None -> anomaly "ipattac with no ist but view"
         | Some ist -> match rest with
             | (IpatCase _ | IpatRw _)::_ -> 
               let to_clr = ref [] in let top_id = ref top_id in
-              to_clr :: k, 
+              (speed, to_clr :: clears), 
               tclTHEN
                 (!move_top_with_view false top_id (false,v) ist)
                 (fun gl -> 
@@ -2989,21 +3084,26 @@ let introstac, tclEQINTROS =
   and ipatstac ?ist k ipats = 
     tclTHENLIST (map_acc_k (ipattac ?ist) k ipats) in
   let introstac ?ist ipats =
-    wild_ids := [];
-    let tac = ipatstac ?ist [] ipats in
-    tclTHENLIST [tac; clear_wilds !wild_ids] in
+    wild_ids := []; tmp_ids := [];
+    let tac = ipatstac ?ist (`Slow,[]) ipats in
+    tclTHENLIST
+      [tac; gen_tmps ?ist !tmp_ids;
+       clear_wilds (List.map fst !tmp_ids @ !wild_ids)] in
   let tclEQINTROS ?ist tac eqtac ipats =
-    wild_ids := [];
-    let rec split_itacs to_clr tac' = function
+    wild_ids := []; tmp_ids := [];
+    let rec split_itacs mode to_clr tac' = function
     | (IpatSimpl _ as spat) :: ipats' -> 
-      let to_clr, tac = ipattac ?ist to_clr ipats' spat in
-      split_itacs to_clr (tclTHEN tac' tac) ipats'
+      let (_,to_clr), tac = ipattac ?ist (mode,to_clr) ipats' spat in
+      split_itacs mode to_clr (tclTHEN tac' tac) ipats'
+    | IpatFastMode :: rest -> split_itacs `Fast to_clr tac' rest
     | IpatCase iorpat :: ipats' -> 
-        to_clr, tclIORPAT ?ist to_clr tac' iorpat, ipats'
-    | ipats' -> to_clr, tac', ipats' in
-    let to_clr, tac1, ipats' = split_itacs [] tac ipats in
-    let tac2 = ipatstac ?ist to_clr ipats' in
-    tclTHENLIST [tac1; eqtac; tac2; clear_wilds !wild_ids] in
+        to_clr, tclIORPAT ?ist (mode,to_clr) tac' iorpat, ipats', mode
+    | ipats' -> to_clr, tac', ipats', mode in
+    let to_clr, tac1, ipats', mode = split_itacs `Slow [] tac ipats in
+    let tac2 = ipatstac ?ist (mode,to_clr) ipats' in
+    tclTHENLIST
+      [tac1; eqtac; tac2; gen_tmps ?ist !tmp_ids;
+       clear_wilds (List.map fst !tmp_ids @ !wild_ids)] in
   introstac, tclEQINTROS
 ;;
 
@@ -3498,6 +3598,8 @@ let gentac ist gen gl =
   if conv
   then tclTHEN (Proofview.V82.of_tactic (convert_concl cl)) (cleartac clr) gl
   else genclrtac cl [c] clr gl
+
+let () = gentac_ref := gentac
 
 let pf_interp_gen ist gl to_ind gen =
   let _, _, a, b, c, ucst,gl = pf_interp_gen_aux ist gl to_ind gen in
@@ -4257,7 +4359,7 @@ let ssrcasetac ist (view, (eqid, (dgens, ipats))) =
 TACTIC EXTEND ssrcase
 | [ "case" ssrcasearg(arg) ssrclauses(clauses) ] ->
   [ Proofview.V82.tactic (tclCLAUSES ist (ssrcasetac ist arg) clauses) ]
-| [ "case" ] -> [ Proofview.V82.tactic (with_top ssrscasetac) ]
+| [ "case" ] -> [ Proofview.V82.tactic (with_top (ssrscasetac false)) ]
 END
 
 (** The "elim" tactic *)
@@ -4433,7 +4535,7 @@ let vmexacttac pf gl = exact_no_check (mkCast (pf, VMcast, pf_concl gl)) gl
 
 TACTIC EXTEND ssrexact
 | [ "exact" ssrexactarg(arg) ] -> [ Proofview.V82.tactic (tclBY (ssrapplytac ist arg)) ]
-| [ "exact" ] -> [ Proofview.V82.tactic (tclORELSE donetac (tclBY apply_top_tac)) ]
+| [ "exact" ] -> [ Proofview.V82.tactic (tclORELSE (donetac ~-1) (tclBY apply_top_tac)) ]
 | [ "exact" "<:" lconstr(pf) ] -> [ Proofview.V82.tactic (vmexacttac pf) ]
 END
 
