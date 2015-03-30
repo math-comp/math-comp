@@ -1,0 +1,11 @@
+all.v
+character.v
+classfun.v
+finfield.v
+inertia.v
+integral_char.v
+mxabelem.v
+mxrepresentation.v
+vcharacter.v
+
+-R . mathcomp.character
