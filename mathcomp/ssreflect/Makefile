@@ -4,12 +4,19 @@ ifeq "$(COQBIN)" ""
 COQBIN=$(dir $(shell which coqtop))/
 endif
 
-
-ifeq "$(shell $(COQBIN)/coqtop -v | head -1 | grep trunk | wc -l)" "1"
-V=trunk
-else
-V=$(shell $(COQBIN)/coqtop -v | head -1 | \
+BRANCH_coq = $(shell $(COQBIN)/coqtop -v | head -1 | \
   sed 's/.*version \([0-9]\.[0-9]\)[^ ]* .*/v\1/')
+
+HASH_coq = $(shell echo Quit. | $(COQBIN)/coqtop 2>&1 | \
+	   head -1 | sed 's/^.*(\([a-f0-9]*\).*/\1/')
+
+HASH_coq_v85beta1 = eaa3d0b15adf4eb11ffb00ab087746a5b15c4d5d
+
+
+ifeq "$(HASH_coq)" "$(HASH_coq_v85beta1)"
+V=v8.5beta1
+else
+V=$(BRANCH_coq)
 endif
 
 OLD_MAKEFLAGS:=$(MAKEFLAGS)
@@ -19,10 +26,7 @@ MAKEFLAGS+=-B
 
 %:
 	$(H)[ -e Makefile.coq ] || $(call coqmakefile)
-# Override COQLIBS to find the "right" copy .ml files, otherwise
-# coq_makefile uses only the -R in COQLIBS and ignores the -I in
-# OCAMLLIBS to look for .ml files in order to generate .d files
-# via coqdep
+	# Override COQDEP to find only the "right" copy .ml files
 	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
 		-f Makefile.coq $* \
 		COQDEP='$(COQBIN)/coqdep -exclude-dir plugin -c'
