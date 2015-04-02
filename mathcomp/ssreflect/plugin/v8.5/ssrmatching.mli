@@ -3,6 +3,7 @@
 open Genarg
 open Tacexpr
 open Environ
+open Tacmach
 open Evd
 open Proof_type
 open Term
@@ -60,7 +61,7 @@ val redex_of_pattern :
 (** [interp_rpattern ise gl rpat] "internalizes" and "interprets" [rpat]
     in the current [Ltac] interpretation signature [ise] and tactic input [gl]*)
 val interp_rpattern :
-  Tacinterp.interp_sign -> goal Tacmach.sigma ->
+  Tacinterp.interp_sign -> goal sigma ->
   rpattern ->
     pattern
 
@@ -68,7 +69,7 @@ val interp_rpattern :
     in the current [Ltac] interpretation signature [ise] and tactic input [gl].
     [ty] is an optional type for the redex of [cpat] *)
 val interp_cpattern :
-  Tacinterp.interp_sign -> goal Tacmach.sigma ->
+  Tacinterp.interp_sign -> goal sigma ->
   cpattern -> glob_constr_and_expr option ->
     pattern
 
@@ -76,9 +77,9 @@ val interp_cpattern :
  *  to signal the complement of this set (i.e. {-1 3}) *)
 type occ = (bool * int list) option
 
-(** [subst e p t i]. [i] is the number of binders
-    traversed so far, [p] the term from the pattern, [t] the matched one *)
-type subst = env -> constr -> constr -> int -> constr
+(** Substitution function. The [int] argument is the number of binders
+    traversed so far *)
+type subst = env -> constr -> int -> constr
 
 (** [eval_pattern b env sigma t pat occ subst] maps [t] calling [subst] on every
     [occ] occurrence of [pat]. The [int] argument is the number of 
@@ -119,7 +120,7 @@ val pr_dir_side : ssrdir -> Pp.std_ppcmds
 (** a pattern for a term with wildcards *)
 type tpattern
 
-(** [mk_tpattern env sigma0 sigma_p ok p_origin dir t] compiles a term [t] 
+(** [mk_tpattern env sigma0 sigma_t ok p_origin dir p] compiles a term [t] 
     living in [env] [sigma] (an extension of [sigma0]) intro a [tpattern].
     The [tpattern] can hold a (proof) term [p] and a diction [dir]. The [ok]
     callback is used to filter occurrences.
@@ -160,7 +161,6 @@ type conclude =
     be passed to tune the [UserError] eventually raised (useful if the 
     pattern is coming from the LHS/RHS of an equation) *)
 val mk_tpattern_matcher :
-  ?all_instances:bool ->
   ?raise_NoMatch:bool ->
   ?upats_origin:ssrdir * constr ->
   evar_map -> occ -> evar_map * tpattern list ->
@@ -192,8 +192,7 @@ val mk_tpattern_matcher :
 (* convenience shortcut: [pf_fill_occ_term gl occ (sigma,t)] returns
  * the conclusion of [gl] where [occ] occurrences of [t] have been replaced
  * by [Rel 1] and the instance of [t] *)
-val pf_fill_occ_term :
-  goal Tacmach.sigma -> occ -> evar_map * constr -> constr * constr
+val pf_fill_occ_term : goal sigma -> occ -> evar_map * constr -> constr * constr
 
 (* It may be handy to inject a simple term into the first form of cpattern *)
 val cpattern_of_term : char * glob_constr_and_expr -> cpattern
@@ -216,13 +215,13 @@ val assert_done : 'a option ref -> 'a
     In case of failure they raise [NoMatch] *)
 
 val unify_HO : env -> evar_map -> constr -> constr -> evar_map
-val pf_unify_HO : goal Tacmach.sigma -> constr -> constr -> goal Tacmach.sigma
+val pf_unify_HO : goal sigma -> constr -> constr -> goal sigma
 
 (** Some more low level functions needed to implement the full SSR language
     on top of the former APIs *)
 val tag_of_cpattern : cpattern -> char
 val loc_of_cpattern : cpattern -> Loc.t
-val id_of_cpattern : cpattern -> Names.variable option
+val id_of_pattern : pattern -> Names.variable option
 val is_wildcard : cpattern -> bool
 val cpattern_of_id : Names.variable -> cpattern
 val cpattern_of_id : Names.variable -> cpattern
