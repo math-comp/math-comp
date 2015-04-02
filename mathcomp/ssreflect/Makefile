@@ -25,7 +25,7 @@ MAKEFLAGS+=-B
 # via coqdep
 	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
 		-f Makefile.coq $* \
-		COQLIBS='-I . -R . mathcomp.ssreflect'
+		COQDEP='$(COQBIN)/coqdep -exclude-dir plugin -c'
 
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
