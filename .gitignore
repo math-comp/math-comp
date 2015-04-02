@@ -7,3 +7,8 @@
 *.a
 *.o
 Make*.coq
+Make*.coq.bak
+mathcomp/ssreflect/ssreflect.ml4
+mathcomp/ssreflect/ssrmatching.ml4
+mathcomp/ssreflect/ssrmatching.mli
+mathcomp/ssreflect/ssreflect.mllib
