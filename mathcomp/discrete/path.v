@@ -1,5 +1,5 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-(*v8.5 From mathcomp.ssreflect  *)
+(*v8.5 From mathcomp.ssreflect   *)
 Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 
 (******************************************************************************)
