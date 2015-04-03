@@ -1,6 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq choice fintype.
-Require Import finfun bigop.
+(*v8.5 From mathcomp.ssreflect  *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+Require Import bigop choice fintype div finfun.
 
 (******************************************************************************)
 (* This file defines a type for sets over a finite Type, similar to the type  *)

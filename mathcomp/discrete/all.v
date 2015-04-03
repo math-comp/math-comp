@@ -1,4 +1,3 @@
-Require Export mathcomp.ssreflect.all.
 Require Export choice.
 Require Export path.
 Require Export div.

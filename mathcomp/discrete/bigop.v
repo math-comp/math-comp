@@ -1,6 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div fintype.
-Require Import tuple finfun.
+(*v8.5 From mathcomp.ssreflect  *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+Require Import  path div fintype tuple finfun.
 
 (******************************************************************************)
 (* This file provides a generic definition for iterating an operator over a   *)

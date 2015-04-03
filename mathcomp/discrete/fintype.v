@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+(*v8.5 From mathcomp.ssreflect  *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+Require Import choice.
 
 (******************************************************************************)
 (*    The Finite interface describes Types with finitely many elements,       *)

@@ -1,6 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path div.
-Require Import fintype tuple finfun bigop prime finset.
+(*v8.5 From mathcomp.ssreflect  *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+Require Import  path div fintype tuple finfun bigop prime finset.
 
 (******************************************************************************)
 (* This files contains the definition of:                                     *)

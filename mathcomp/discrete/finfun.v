@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
+(*v8.5 From mathcomp.ssreflect  *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+Require Import choice fintype tuple.
 
 (******************************************************************************)
 (* This file implements a type for functions with a finite domain:            *)
