@@ -4,11 +4,9 @@ ifeq "$(COQBIN)" ""
 COQBIN=$(dir $(shell which coqtop))/
 endif
 
-BRANCH_coq = $(shell $(COQBIN)/coqtop -v | head -1 | \
-  sed 's/.*version \([0-9]\.[0-9]\)[^ ]* .*/v\1/')
+BRANCH_coq = $(shell $(COQBIN)/coqtop -v | head -1 | sed 's/.*version \([0-9]\.[0-9]\)[^ ]* .*/v\1/')
 
-HASH_coq = $(shell echo Quit. | $(COQBIN)/coqtop 2>&1 | \
-	   head -1 | sed 's/^.*(\([a-f0-9]*\).*/\1/')
+HASH_coq = $(shell echo Quit. | $(COQBIN)/coqtop 2>&1 | head -1 | sed 's/^.*(\([a-f0-9]*\)).*/\1/' )
 
 HASH_coq_v85beta1 = eaa3d0b15adf4eb11ffb00ab087746a5b15c4d5d
 
