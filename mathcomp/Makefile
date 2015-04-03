@@ -6,7 +6,7 @@ export COQPATH=$(PWD)/..
 all: ssreflect algebra fingroup odd_order solvable field character discrete real_closed ssrtest
 	$(MAKE) -C $@
 
-ssrefect:
+ssreflect:
 	$(MAKE) -C $@
 
 algebra: fingroup
