@@ -1,6 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-Require Import fintype finfun bigop ssralg ssrnum poly.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import choice fintype finfun bigop.
+Require Import ssralg ssrnum poly.
+
 Import GRing.Theory Num.Theory.
 
 (******************************************************************************)

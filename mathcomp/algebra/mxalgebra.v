@@ -1,7 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div choice fintype.
-Require Import finfun bigop prime binomial ssralg finset fingroup finalg.
-Require Import perm zmodp matrix.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import div choice fintype finfun bigop prime binomial finset.
+(*v8.5 From mathcomp.fingroup *)
+Require Import fingroup perm.
+Require Import ssralg finalg zmodp matrix.
 
 (*****************************************************************************)
 (* In this file we develop the rank and row space theory of matrices, based  *)

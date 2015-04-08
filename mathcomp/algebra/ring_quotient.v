@@ -1,7 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import eqtype choice ssreflect ssrbool ssrnat ssrfun seq.
-Require Import ssralg generic_quotient.
-
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool ssrnat eqtype seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import choice generic_quotient.
+Require Import ssralg.
 
 (******************************************************************************)
 (*          This file describes quotients of algebraic structures.            *)

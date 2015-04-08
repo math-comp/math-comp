@@ -1,6 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq choice fintype.
-Require Import finfun bigop prime binomial.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import div choice fintype finfun bigop prime binomial.
 
 (******************************************************************************)
 (*   The algebraic part of the Algebraic Hierarchy, as described in           *)

@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
-Require Import bigop ssralg div ssrnum ssrint.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import div choice fintype bigop.
+Require Import ssralg ssrnum ssrint.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)

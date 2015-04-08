@@ -1,6 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-Require Import fintype bigop finset prime fingroup ssralg finalg.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import  div fintype bigop finset prime.
+(*v8.5 From mathcomp.fingroup *)
+Require Import fingroup.
+Require Import ssralg finalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)

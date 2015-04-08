@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
-Require Import bigop ssralg poly.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import bigop choice fintype.
+Require Import ssralg poly.
 
 (******************************************************************************)
 (* This file provides a library for the basic theory of Euclidean and pseudo- *)

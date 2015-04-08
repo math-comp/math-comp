@@ -1,7 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq div fintype.
-Require Import tuple finfun bigop fingroup perm ssralg zmodp matrix mxalgebra.
-Require Import poly polydiv mxpoly binomial.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import choice div fintype tuple finfun bigop binomial.
+(*v8.5 From mathcomp.fingroup *)
+Require Import fingroup perm.
+Require Import ssralg zmodp matrix mxalgebra poly polydiv mxpoly.
 
 (******************************************************************************)
 (* This file provides additional primitives and theory for bivariate          *)

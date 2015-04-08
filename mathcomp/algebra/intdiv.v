@@ -1,7 +1,12 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype tuple finfun bigop prime ssralg poly ssrnum ssrint rat.
-Require Import polydiv finalg perm zmodp matrix mxalgebra vector.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import path div choice fintype tuple finfun bigop prime.
+(*v8.5 From mathcomp.fingroup *)
+Require Import perm.
+Require Import ssralg poly ssrnum ssrint rat.
+Require Import polydiv finalg zmodp matrix mxalgebra vector.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)

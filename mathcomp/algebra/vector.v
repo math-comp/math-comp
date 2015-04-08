@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype bigop.
-Require Import finfun tuple ssralg matrix mxalgebra zmodp.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import choice fintype bigop finfun tuple.
+Require Import ssralg matrix mxalgebra zmodp.
 
 (******************************************************************************)
 (*  * Finite dimensional vector spaces                                        *)
