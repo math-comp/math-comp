@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice fintype finfun.
-Require Import bigop finset fingroup.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import choice fintype finfun bigop finset.
+Require Import fingroup.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)

@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path choice fintype.
-Require Import tuple finfun bigop finset binomial fingroup.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import path choice fintype tuple finfun bigop finset binomial.
+Require Import fingroup.
 
 (******************************************************************************)
 (* This file contains the definition and properties associated to the group   *)

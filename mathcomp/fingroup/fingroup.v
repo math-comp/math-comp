@@ -1,6 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice fintype.
-Require Import div path bigop prime finset.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import  choice fintype div path bigop prime finset.
 
 (******************************************************************************)
 (* This file defines the main interface for finite groups :                   *)

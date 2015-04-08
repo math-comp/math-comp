@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div choice.
-Require Import fintype prime finset fingroup morphism automorphism.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import div choice fintype prime finset.
+Require Import fingroup morphism automorphism.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)

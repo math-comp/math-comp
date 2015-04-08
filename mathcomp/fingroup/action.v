@@ -1,6 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq fintype.
-Require Import bigop finset fingroup morphism perm automorphism quotient.
+(*v8.5 From mathcomp.ssreflect *)
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+(*v8.5 From mathcomp.discrete *)
+Require Import div fintype bigop finset.
+Require Import fingroup morphism perm automorphism quotient.
 
 (******************************************************************************)
 (* Group action: orbits, stabilisers, transitivity.                           *)
