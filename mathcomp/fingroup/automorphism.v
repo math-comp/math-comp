@@ -1,7 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-(*v8.5 From mathcomp.ssreflect *)
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
 Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
-(*v8.5 From mathcomp.discrete *)
+From mathcomp.discrete
 Require Import fintype finset.
 Require Import fingroup perm morphism.
 

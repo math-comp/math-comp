@@ -1,9 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-(*v8.5 From mathcomp.ssreflect *)
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
 Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-(*v8.5 From mathcomp.discrete *)
+From mathcomp.discrete
 Require Import div choice fintype bigop finset.
-(*v8.5 From mathcomp.fingroup *)
+From mathcomp.fingroup
 Require Import fingroup.
 Require Import ssralg zmodp poly.
 

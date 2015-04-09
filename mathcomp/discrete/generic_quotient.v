@@ -1,6 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 (* -*- coding : utf-8 -*- *)
-(*v8.5 From mathcomp.ssreflect   *)
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect  
 Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 Require Import choice fintype.
 

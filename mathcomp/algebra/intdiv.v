@@ -1,9 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-(*v8.5 From mathcomp.ssreflect *)
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
 Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-(*v8.5 From mathcomp.discrete *)
+From mathcomp.discrete
 Require Import path div choice fintype tuple finfun bigop prime.
-(*v8.5 From mathcomp.fingroup *)
+From mathcomp.fingroup
 Require Import perm.
 Require Import ssralg poly ssrnum ssrint rat.
 Require Import polydiv finalg zmodp matrix mxalgebra vector.
