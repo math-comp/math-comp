@@ -48,6 +48,9 @@ open Extraargs
 open Ppconstr
 open Printer
 
+open Compat
+open Tok
+
 open Ssrmatching
 
 (** look up a name in the ssreflect internals module *)
@@ -870,7 +873,7 @@ let pf_abs_evars_pirrel gl (sigma, c0) =
   let evplist = 
     let depev = List.fold_left (fun evs (_,(_,t,_)) -> 
         Intset.union evs (Evarutil.evars_of_term t)) Intset.empty evlist in
-    List.filter (fun i,(_,_,b) -> b && Intset.mem i depev) evlist in
+    List.filter (fun (i,(_,_,b)) -> b && Intset.mem i depev) evlist in
   let evlist, evplist, sigma = 
     if evplist = [] then evlist, [], sigma else
     List.fold_left (fun (ev, evp, sigma) (i, (_,t,_) as p) ->
@@ -1844,14 +1847,6 @@ let input_ssrtermkind strm = match Compat.get_tok (stream_nth 0 strm) with
 
 let ssrtermkind = Gram.Entry.of_parser "ssrtermkind" input_ssrtermkind
 
-let id_of_Cterm t = match id_of_cpattern t with
-  | Some x -> x
-  | None -> loc_error (loc_of_cpattern t) "Only identifiers are allowed here"
-let ssrhyp_of_ssrterm = function
-  | k, (_, Some c) as o ->
-     SsrHyp (constr_loc c, id_of_Cterm (cpattern_of_term o)), String.make 1 k
-  | _, (_, None) -> assert false
-
 (* terms *)
 let pr_ssrterm _ _ _ = pr_term
 let pf_intern_term ist gl (_, c) = glob_constr ist (project gl) (pf_env gl) c
@@ -2017,7 +2012,7 @@ let check_wgen_uniq gens =
   check [] ids
 
 let pf_clauseids gl gens clseq =
-  let keep_clears = List.map (fun x, _ -> x, None) in
+  let keep_clears = List.map (fun (x, _) -> x, None) in
   if gens <> [] then (check_wgen_uniq gens; gens) else
   if clseq <> InAll && clseq <> InAllHyps then keep_clears gens else
   Util.error "assumptions should be named explicitly"
@@ -3147,7 +3142,7 @@ let check_seqtacarg dir arg = match snd arg, dir with
     loc_error loc "expected \"first\""
   | _, _ -> arg
 
-let ssrorelse = Gram.Entry.create "ssrorelse"
+let ssrorelse = Gram.entry_create "ssrorelse"
 GEXTEND Gram
   GLOBAL: ssrorelse ssrseqarg;
   ssrseqidx: [
@@ -3666,10 +3661,11 @@ ARGUMENT EXTEND ssrmovearg TYPED AS ssrarg PRINTED BY pr_ssrarg
 END
 
 let viewmovetac_aux clear name_ref (_, vl as v) _ gen ist gl =
-  let cl, c, clr = pf_interp_gen ist gl false gen in
+  let cl, c, clr, gen_pat =
+    let _, gen_pat, a, b, c = pf_interp_gen_aux ist gl false gen in a, b, c, gen_pat in
   let cl, c = if vl = [] then cl, c else pf_with_view ist gl v cl c in
   let clr = if clear then clr else [] in
-  name_ref := (match id_of_cpattern (snd gen) with Some id -> id | _ -> top_id);
+  name_ref := (match id_of_pattern gen_pat with Some id -> id | _ -> top_id);
   genclrtac cl [c] clr gl
 
 let () = move_top_with_view := 
@@ -5656,7 +5652,8 @@ let ssrabstract ctx gens (*last*) gl =
     let fire gl t = Reductionops.nf_evar (project gl) t in
     let abstract = mkSsrConst "abstract" in
     let abstract_key = mkSsrConst "abstract_key" in
-    let id = mkVar (Option.get (id_of_cpattern cid)) in
+    let cid_interpreted = interp_cpattern ist gl cid None in
+    let id = mkVar (Option.get (id_of_pattern cid_interpreted)) in
     let args_id = examine_abstract id gl in
     let abstract_n = args_id.(1) in
     let abstract_proof = pf_find_abstract_proof true gl abstract_n in 
@@ -5697,7 +5694,7 @@ let ssrabstract ctx gens (*last*) gl =
   in
   let introback ist (gens, _) =
     introstac ~ist
-      (List.map (fun (_,cp) -> match id_of_cpattern cp with
+      (List.map (fun (_,cp) -> match id_of_pattern (interp_cpattern ist gl cp None) with
         | None -> IpatAnon
         | Some id -> IpatId id)
         (List.tl (List.hd gens))) in
@@ -5949,9 +5946,6 @@ END
 
 (** Canonical Structure alias *)
 
-let def_body : Vernacexpr.definition_expr Gram.Entry.e = Obj.magic
-   (Grammar.Entry.find (Obj.magic gallina_ext) "vernac:def_body") in
-
 GEXTEND Gram
   GLOBAL: gallina_ext;
 
@@ -5962,7 +5956,7 @@ GEXTEND Gram
       | IDENT "Canonical"; ntn = Prim.by_notation ->
 	  Vernacexpr.VernacCanonical (ByNotation ntn)
       | IDENT "Canonical"; qid = Constr.global;
-          d = def_body ->
+          d = G_vernac.def_body ->
           let s = coerce_reference_to_id qid in
 	  Vernacexpr.VernacDefinition
 	    ((Decl_kinds.Global,Decl_kinds.CanonicalStructure),
