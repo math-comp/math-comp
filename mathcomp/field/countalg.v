@@ -1,8 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
-Require Import bigop ssralg finalg zmodp matrix mxalgebra.
-Require Import poly polydiv mxpoly generic_quotient ring_quotient closed_field.
-Require Import ssrint rat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import choice fintype bigop generic_quotient.
+From mathcomp.algebra
+Require Import ssralg finalg zmodp matrix mxalgebra poly polydiv mxpoly.
+From mathcomp.algebra
+Require Import ring_quotient ssrint rat mxpoly polyXY.
+Require Import closed_field.
 
 (*****************************************************************************)
 (* This file clones part of ssralg hierachy for countable types; it does not *)
@@ -794,10 +800,7 @@ Export Zmodule.Exports Ring.Exports ComRing.Exports UnitRing.Exports.
 Export ComUnitRing.Exports IntegralDomain.Exports.
 Export Field.Exports DecidableField.Exports ClosedField.Exports.
 
-Require Import poly polydiv generic_quotient ring_quotient.
-Require Import mxpoly polyXY.
 Import GRing.Theory.
-Require Import closed_field.
 
 Canonical Zp_countZmodType m := [countZmodType of 'I_m.+1].
 Canonical Zp_countRingType m := [countRingType of 'I_m.+2].

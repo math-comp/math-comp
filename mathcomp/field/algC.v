@@ -1,8 +1,12 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice div fintype.
-Require Import path bigop finset prime ssralg poly polydiv mxpoly.
-Require Import generic_quotient countalg ssrnum ssrint rat intdiv.
-Require Import algebraics_fundamentals.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype bigop finset prime generic_quotient.
+From mathcomp.algebra
+Require Import ssralg poly polydiv mxpoly ssrnum ssrint rat intdiv.
+Require Import countalg algebraics_fundamentals.
 
 (******************************************************************************)
 (* This file provides an axiomatic construction of the algebraic numbers.     *)

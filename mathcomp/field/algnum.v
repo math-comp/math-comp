@@ -1,8 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype tuple finfun bigop prime ssralg finalg zmodp poly.
-Require Import ssrnum ssrint rat polydiv intdiv algC matrix mxalgebra mxpoly.
-Require Import vector falgebra fieldext separable galois cyclotomic.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype tuple finfun bigop prime.
+From mathcomp.algebra
+Require Import ssralg finalg zmodp poly ssrnum ssrint rat polydiv intdiv.
+From mathcomp.algebra
+Require Import matrix mxalgebra mxpoly vector.
+Require Import algC falgebra fieldext separable galois cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)

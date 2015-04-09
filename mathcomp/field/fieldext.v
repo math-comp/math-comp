@@ -1,7 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div choice fintype.
-Require Import tuple finfun bigop ssralg finalg zmodp matrix vector falgebra.
-Require Import poly polydiv mxpoly generic_quotient.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import div choice fintype tuple finfun bigop generic_quotient.
+From mathcomp.algebra
+Require Import ssralg finalg zmodp matrix vector poly polydiv mxpoly.
+Require Import falgebra.
+
+
 
 (******************************************************************************)
 (*  * Finite dimensional field extentions                                     *)

@@ -1,8 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div choice fintype.
-Require Import tuple finfun bigop finset prime binomial ssralg poly polydiv.
-Require Import fingroup perm morphism quotient gproduct finalg zmodp cyclic.
-Require Import matrix mxalgebra mxpoly polyXY vector falgebra fieldext.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import div choice fintype tuple finfun bigop prime finset binomial.
+From mathcomp.fingroup
+Require Import fingroup morphism perm  quotient action gproduct.
+From mathcomp.algebra
+Require Import ssralg poly polydiv finalg zmodp cyclic matrix mxalgebra mxpoly.
+From mathcomp.algebra
+Require Import matrix mxalgebra mxpoly polyXY vector.
+Require Import falgebra fieldext.
 
 (******************************************************************************)
 (* This file provides a theory of separable and inseparable field extensions. *)

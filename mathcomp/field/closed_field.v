@@ -1,6 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-Require Import bigop ssralg poly polydiv.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import bigop.
+From mathcomp.algebra
+Require Import ssralg poly polydiv.
 
 (******************************************************************************)
 (*   A proof that algebraically closed field enjoy quantifier elimination,    *)
