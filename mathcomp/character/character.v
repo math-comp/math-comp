@@ -1,10 +1,20 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype tuple finfun bigop prime ssralg poly finset gproduct.
-Require Import fingroup morphism perm automorphism quotient finalg action.
-Require Import zmodp commutator cyclic center pgroup nilpotent sylow abelian.
-Require Import matrix mxalgebra mxpoly mxrepresentation vector ssrnum algC.
-Require Import classfun.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype tuple finfun bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism quotient action gproduct.
+From mathcomp.algebra
+Require Import ssralg poly finalg zmodp cyclic.
+From mathcomp.algebra
+Require Import matrix mxalgebra mxpoly vector ssrnum.
+From mathcomp.solvable
+Require Import commutator center pgroup nilpotent sylow abelian.
+From mathcomp.field
+Require Import algC.
+Require Import mxrepresentation classfun.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

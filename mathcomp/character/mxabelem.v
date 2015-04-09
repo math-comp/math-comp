@@ -1,9 +1,18 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype tuple finfun bigop prime ssralg poly finset.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype tuple finfun bigop prime finset.
+From mathcomp.fingroup
 Require Import fingroup morphism perm automorphism quotient gproduct action.
-Require Import finalg zmodp commutator cyclic center pgroup gseries nilpotent.
-Require Import sylow maximal abelian matrix mxalgebra mxrepresentation.
+From mathcomp.algebra
+Require Import ssralg poly finalg zmodp cyclic matrix mxalgebra.
+From mathcomp.solvable
+Require Import commutator center pgroup gseries nilpotent.
+From mathcomp.solvable
+Require Import sylow maximal abelian.
+Require Import mxrepresentation.
 
 (******************************************************************************)
 (*   This file completes the theory developed in mxrepresentation.v with the  *)

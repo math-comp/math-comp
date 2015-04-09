@@ -1,9 +1,17 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype tuple finfun bigop prime ssralg poly finset.
-Require Import fingroup morphism perm automorphism quotient finalg action.
-Require Import gproduct zmodp commutator cyclic center pgroup sylow frobenius.
-Require Import vector ssrnum ssrint intdiv algC algnum.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype tuple finfun bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism quotient action gproduct.
+From mathcomp.algebra
+Require Import ssralg poly finalg zmodp cyclic vector ssrnum ssrint intdiv.
+From mathcomp.solvable
+Require Import sylow pgroup center frobenius.
+From mathcomp.field
+Require Import algnum algC.
 Require Import classfun character integral_char.
 
 Set Implicit Arguments.

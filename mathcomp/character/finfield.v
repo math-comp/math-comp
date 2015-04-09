@@ -1,9 +1,23 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype div.
-Require Import tuple bigop prime finset fingroup ssralg poly polydiv.
-Require Import morphism action finalg zmodp cyclic center pgroup abelian.
-Require Import matrix mxabelem vector falgebra fieldext separable galois.
-Require ssrnum ssrint algC cyclotomic.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import div choice fintype tuple bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism action.
+From mathcomp.algebra
+Require Import ssralg poly polydiv finalg zmodp cyclic.
+From mathcomp.algebra
+Require Import matrix vector.
+From mathcomp.solvable
+Require Import center pgroup abelian.
+From mathcomp.field
+Require Import falgebra fieldext separable galois.
+Require Import mxabelem.
+
+From mathcomp.algebra Require ssrnum ssrint.
+From mathcomp.field Require algC cyclotomic.
 
 (******************************************************************************)
 (*  Additional constructions and results on finite fields.                    *)

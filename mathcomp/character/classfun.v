@@ -1,9 +1,17 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype tuple finfun bigop prime ssralg poly finset.
-Require Import fingroup morphism perm automorphism quotient finalg action.
-Require Import gproduct zmodp commutator cyclic center pgroup sylow.
-Require Import matrix vector falgebra ssrnum algC algnum.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype tuple finfun bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism quotient action gproduct.
+From mathcomp.algebra
+Require Import ssralg poly finalg zmodp cyclic vector ssrnum matrix vector.
+From mathcomp.solvable
+Require Import commutator center pgroup sylow.
+From mathcomp.field
+Require Import falgebra algC algnum.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)
