@@ -1,7 +1,13 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path fintype bigop.
-Require Import finset fingroup morphism automorphism quotient action.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype bigop finset.
+From mathcomp.fingroup
+Require Import fingroup morphism automorphism quotient action.
 Require Import commutator center.
+
 (******************************************************************************)
 (*           H <|<| G   <=> H is subnormal in G, i.e., H <| ... <| G.         *)
 (* invariant_factor A H G <=> A normalises both H and G, and H <| G.          *)

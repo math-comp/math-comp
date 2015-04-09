@@ -1,6 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path choice fintype.
-Require Import bigop finset fingroup morphism automorphism quotient action.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype tuple finfun bigop finset.
+From mathcomp.fingroup
+Require Import fingroup morphism automorphism quotient action.
 Require Import gseries.
 
 (******************************************************************************)

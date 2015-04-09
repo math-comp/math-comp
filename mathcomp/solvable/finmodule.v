@@ -1,7 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
-Require Import fintype bigop ssralg finset fingroup morphism perm.
-Require Import finalg action gproduct commutator cyclic.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism perm action gproduct.
+From mathcomp.algebra
+Require Import ssralg finalg cyclic.
+Require Import commutator.
 
 (******************************************************************************)
 (*  This file regroups constructions and results that are based on the most   *)

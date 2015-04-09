@@ -1,6 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div fintype finset.
-Require Import prime fingroup morphism automorphism quotient action gproduct.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype finset bigop prime.
+From mathcomp.fingroup
+Require Import fingroup morphism automorphism quotient action gproduct.
 Require Import commutator center pgroup finmodule nilpotent sylow.
 Require Import abelian maximal.
 

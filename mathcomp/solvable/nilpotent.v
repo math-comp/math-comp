@@ -1,7 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path fintype div.
-Require Import bigop prime finset fingroup morphism automorphism quotient.
-Require Import commutator gproduct gfunctor center gseries cyclic.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path fintype div bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism automorphism quotient gproduct.
+From mathcomp.algebra
+Require Import cyclic.
+Require Import commutator gfunctor center gseries.
 
 (******************************************************************************)
 (*   This file defines nilpotent and solvable groups, and give some of their  *)

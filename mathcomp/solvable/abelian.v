@@ -1,8 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div fintype.
-Require Import finfun bigop finset prime binomial fingroup morphism perm.
-Require Import automorphism action quotient gfunctor gproduct zmodp cyclic.
-Require Import pgroup gseries nilpotent sylow.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div fintype finfun bigop finset prime binomial.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism action quotient gproduct.
+From mathcomp.algebra
+Require Import cyclic zmodp.
+Require Import gfunctor pgroup gseries nilpotent sylow.
 
 (******************************************************************************)
 (* Constructions based on abelian groups and their structure, with some       *)

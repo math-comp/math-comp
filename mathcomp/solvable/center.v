@@ -1,7 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div fintype bigop.
-Require Import finset fingroup morphism perm automorphism quotient action.
-Require Import gproduct gfunctor cyclic.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div fintype bigop finset.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism quotient action gproduct.
+From mathcomp.algebra
+Require Import cyclic.
+Require Import gfunctor.
 
 (******************************************************************************)
 (* Definition of the center of a group and of external central products:      *)

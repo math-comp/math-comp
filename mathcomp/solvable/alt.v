@@ -1,7 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div fintype tuple.
-Require Import tuple bigop prime finset fingroup morphism perm automorphism.
-Require Import quotient action cyclic pgroup gseries sylow primitive_action.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import div fintype tuple finfun bigop prime finset.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism quotient action.
+From mathcomp.algebra
+Require Import cyclic.
+Require Import pgroup gseries sylow primitive_action.
 
 (******************************************************************************)
 (*  Definitions of the symmetric and alternate groups, and some properties.   *)

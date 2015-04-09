@@ -1,5 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype bigop finset.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
+From mathcomp.discrete
+Require Import fintype bigop finset.
+From mathcomp.fingroup
 Require Import fingroup morphism automorphism quotient gproduct.
 
 (******************************************************************************)

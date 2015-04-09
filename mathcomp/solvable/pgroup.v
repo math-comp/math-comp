@@ -1,7 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
-Require Import fintype bigop finset prime fingroup morphism.
-Require Import gfunctor automorphism quotient action gproduct cyclic.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import div fintype bigop finset prime.
+From mathcomp.fingroup
+Require Import fingroup morphism automorphism quotient action gproduct.
+From mathcomp.algebra
+Require Import cyclic.
+Require Import gfunctor.
 
 (******************************************************************************)
 (* Standard group notions and constructions based on the prime decomposition  *)

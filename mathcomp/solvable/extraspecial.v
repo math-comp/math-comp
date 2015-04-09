@@ -1,9 +1,17 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div choice fintype.
-Require Import bigop finset prime binomial fingroup morphism perm automorphism.
-Require Import presentation quotient action commutator gproduct gfunctor.
-Require Import ssralg finalg zmodp cyclic pgroup center gseries.
-Require Import nilpotent sylow abelian finmodule matrix maximal extremal.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import path div choice fintype bigop finset prime binomial.
+From mathcomp.fingroup
+Require Import fingroup morphism perm automorphism quotient action gproduct.
+From mathcomp.fingroup
+Require Import presentation.
+From mathcomp.algebra
+Require Import ssralg finalg zmodp matrix cyclic.
+Require Import pgroup center gseries commutator gfunctor.
+Require Import nilpotent sylow abelian finmodule maximal extremal.
 
 (******************************************************************************)
 (* This file contains the fine structure thorems for extraspecial p-groups.   *)

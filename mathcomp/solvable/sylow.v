@@ -1,7 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div fintype prime.
-Require Import bigop finset fingroup morphism automorphism quotient action.
-Require Import cyclic gproduct commutator pgroup center nilpotent.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp.ssreflect
+Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp.discrete
+Require Import div fintype finset bigop prime.
+From mathcomp.fingroup
+Require Import fingroup morphism automorphism quotient action gproduct.
+From mathcomp.algebra
+Require Import ssralg poly ssrnum ssrint rat.
+From mathcomp.algebra
+Require Import polydiv finalg zmodp matrix mxalgebra vector cyclic.
+Require Import commutator pgroup center nilpotent.
 
 (******************************************************************************)
 (*   The Sylow theorem and its consequences, including the Frattini argument, *)
