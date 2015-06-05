@@ -2198,8 +2198,16 @@ END
 
 (* We must avoid zeta-converting any "let"s created by the "in" tactical. *)
 
+let tacred_simpl gl =
+  let simpl_expr =
+    Genredexpr.(
+      Simpl(Redops.make_red_flag[FBeta;FIota;FZeta;FDeltaBut []],None)) in
+  let esimpl, _ = Redexpr.reduction_of_red_expr (pf_env gl) simpl_expr in
+  let simpl env sigma c = snd (esimpl env sigma c) in
+  simpl
+
 let safe_simpltac gl =
-  let cl' = red_safe Tacred.simpl (pf_env gl) (project gl) (pf_concl gl) in
+  let cl' = red_safe (tacred_simpl gl) (pf_env gl) (project gl) (pf_concl gl) in
   Proofview.V82.of_tactic (convert_concl_no_check cl') gl
 
 let simpltac = function
@@ -4811,7 +4819,7 @@ END
 let simplintac occ rdx sim gl = 
   let simptac gl = 
     let sigma0, concl0, env0 = project gl, pf_concl gl, pf_env gl in
-    let simp env c _ _ = red_safe Tacred.simpl env sigma0 c in
+    let simp env c _ _ = red_safe (tacred_simpl gl) env sigma0 c in
     Proofview.V82.of_tactic
       (convert_concl_no_check (eval_pattern env0 sigma0 concl0 rdx occ simp))
       gl in
