@@ -148,6 +148,9 @@ Definition abstract (statement : Type) (id : nat) (lock : abstract_lock) :=
 Notation "<hidden n >" := (abstract _ n _).
 Notation "T (* n *)" := (abstract T n abstract_key).
 
+(* Constants for tactic-views *)
+Inductive external_view : Type := tactic_view of Type.
+
 (* Syntax for referring to canonical structures:                              *)
 (*      [the struct_type of proj_val by proj_fun]                             *)
 (* This form denotes the Canonical instance s of the Structure type           *)

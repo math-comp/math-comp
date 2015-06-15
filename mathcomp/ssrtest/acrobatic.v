@@ -7,6 +7,12 @@ Qed.
 
 Lemma test2 : forall (x y : nat) (e : x = y), e = e -> True.
 Proof.
-move=> + y + _ =>>  def_x; exact: I.
+move=> + y + _ =>>  def_x.
+Check (def_x : _ = y).
+by [].
 Qed.
 
+Lemma test3 : forall x y : nat, x = y -> forall z : nat, y == z -> x = z.
+Proof.
+by move=>> -> /eqP.
+Qed.

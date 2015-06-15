@@ -1254,7 +1254,7 @@ ARGUMENT EXTEND ssrpatternarg
 END
   
 let pf_merge_uc uc gl =
-  re_sig (sig_it gl) (Evd.merge_universe_context (project gl) uc)
+  re_sig (sig_it gl) (Evd.merge_universe_context (Refiner.project gl) uc)
 
 let pf_unsafe_merge_uc uc gl =
   re_sig (sig_it gl) (Evd.set_universe_context (project gl) uc)

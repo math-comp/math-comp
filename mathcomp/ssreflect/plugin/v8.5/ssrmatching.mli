@@ -227,7 +227,7 @@ val is_wildcard : cpattern -> bool
 val cpattern_of_id : Names.variable -> cpattern
 val cpattern_of_id : Names.variable -> cpattern
 val pr_constr_pat : constr -> Pp.std_ppcmds
-val pf_merge_uc : Evd.evar_universe_context -> goal Evd.sigma -> goal Evd.sigma
+val pf_merge_uc : Evd.evar_universe_context -> 'a Evd.sigma -> 'a Evd.sigma
 val pf_unsafe_merge_uc : Evd.evar_universe_context -> goal Evd.sigma -> goal Evd.sigma
 
 (* One can also "Set SsrMatchingDebug" from a .v *)

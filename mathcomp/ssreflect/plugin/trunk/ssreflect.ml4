@@ -589,31 +589,76 @@ module TN = Tacticals.New
 let old_tac = Proofview.V82.tactic
 let new_tac = Proofview.V82.of_tactic
 
-(* we reduce head beta redexes *)
-let betared env = 
-  Closure.create_clos_infos 
-   (Closure.RedFlags.mkflags [Closure.RedFlags.fBETA])
-    env
-;;
-let rec fst_prod red tac = PG.enter begin fun gl ->
-  let concl = Evarutil.nf_evar (PG.sigma gl) (PG.concl (PG.assume gl)) in
-  match kind_of_term concl with
-  | Prod (id,_,tgt) | LetIn(id,_,_,tgt) -> tac id
-  | _ -> if red then TN.tclZEROMSG (str"No product even after head-reduction.")
-         else TN.tclTHEN (old_tac hnf_in_concl) (fst_prod true tac)
-end
-;;
-let introid ?(orig=ref Anonymous) name = tclTHEN (fun gl ->
-   let g, env = pf_concl gl, pf_env gl in
-   match kind_of_term g with
-   | App (hd, _) when isLambda hd -> 
-     let g = Closure.whd_val (betared env) (Closure.inject g) in
-     Proofview.V82.of_tactic (convert_concl_no_check g) gl
-   | _ -> tclIDTAC gl)
-  (Proofview.V82.of_tactic
-    (fst_prod false (fun id -> orig := id; intro_mustbe_force name)))
-;;
+module PT = Proof_type
+type 'a tac_a = (PT.goal * 'a) sigma -> (PT.goal * 'a) list sigma
 
+let push_ctx  a gl = re_sig (sig_it gl, a) (Refiner.project gl)
+let push_ctxs a gl =
+  re_sig (List.map (fun x -> x,a) (sig_it gl)) (Refiner.project gl)
+let pull_ctx gl = let g, a = sig_it gl in re_sig g (Refiner.project gl), a
+let pull_ctxs gl = let g, a = List.split (sig_it gl) in re_sig g (Refiner.project gl), a
+
+let with_ctx f gl =
+  let gl, ctx = pull_ctx gl in
+  let rc, ctx = f ctx in
+  rc, push_ctx ctx gl
+let without_ctx f gl =
+  let gl, _ctx = pull_ctx gl in
+  f gl
+let tac_ctx t gl =
+  let gl, a = pull_ctx gl in
+  let gl = t gl in
+  push_ctxs a gl
+
+let tclTHEN_ia t1 t2 gl =
+  let gal = t1 gl in
+  let goals, sigma = sig_it gal, Refiner.project gal in
+  let _, opened, sigma =
+    List.fold_left (fun (i,opened,sigma) g ->
+      let gl = t2 i (re_sig g sigma) in
+      i+1, sig_it gl :: opened, Refiner.project gl)
+      (1,[],sigma) goals in
+  re_sig (List.flatten (List.rev opened)) sigma
+
+let tclTHEN_a t1 t2 gl = tclTHEN_ia t1 (fun _ -> t2) gl
+
+let tclTHENS_a t1 tl gl = tclTHEN_ia t1
+  (fun i -> List.nth tl (i-1)) gl
+
+let rec tclTHENLIST_a = function
+  | [] -> tac_ctx tclIDTAC
+  | t1::tacl -> tclTHEN_a t1 (tclTHENLIST_a tacl)
+
+(* like  tclTHEN_i but passes to the tac "i of n" and not just i *)
+let tclTHEN_i_max tac taci gl =
+  let maxi = ref 0 in
+  tclTHEN_ia (tclTHEN_ia tac (fun i -> maxi := max i !maxi; tac_ctx tclIDTAC))
+    (fun i gl -> taci i !maxi gl) gl
+
+let tac_on_all (gl : (Proof_type.goal * 'a) list sigma) (tac : 'a tac_a) =
+  let goals = sig_it gl in
+  let opened, sigma =
+    List.fold_left (fun (opened,sigma) g ->
+      let gl = tac (re_sig g sigma) in
+      sig_it gl :: opened, Refiner.project gl)
+      ([],Refiner.project gl) goals in
+  re_sig (List.flatten (List.rev opened)) sigma
+
+(* Used to thread data between intro patterns at run time *)
+type tac_ctx = {
+  tmp_ids : (Id.t * name ref) list;
+  wild_ids : Id.t list;
+  delayed_clears : Id.t list;
+  speed : [ `Slow | `Fast ]
+}
+
+let new_ctx () =
+  { tmp_ids = []; wild_ids = []; delayed_clears = []; speed = `Slow }
+
+let with_fresh_ctx t gl =
+  let gl = push_ctx (new_ctx()) gl in
+  let gl = t gl in
+  fst (pull_ctxs gl)
 
 (** Name generation {{{ *******************************************************)
 
@@ -757,6 +802,86 @@ let mk_anon_id t gl =
     (s.[i] <- Char.chr (Char.code s.[i] + 1); s) in
   id_of_string (loop (n - 1))
   
+(* }}} *)
+
+(* Temporary names, + intro pattern *)
+let new_tmp_id ctx =
+  let id = mk_tmp_id (1 + List.length ctx.tmp_ids) in
+  let orig = ref Anonymous in
+  (id, orig), { ctx with tmp_ids = (id, orig) :: ctx.tmp_ids }
+;;
+
+type ssrhyp = SsrHyp of loc * identifier
+let gentac_ref = ref (fun _ _ _ -> assert false)
+
+let rename_hd_prod orig_name_ref gl =
+  match kind_of_term (pf_concl gl) with
+  | Prod(_,src,tgt) ->
+      new_tac (convert_concl_no_check (mkProd (!orig_name_ref,src,tgt))) gl
+  | _ -> Errors.anomaly (str "gentac creates no product")
+
+let gen_tmp_ids
+  ?(ist=Geninterp.({ lfun = Id.Map.empty; extra = TacStore.empty })) gl
+=
+  let gl, ctx = pull_ctx gl in
+  push_ctxs ctx
+    (tclTHENLIST
+      (List.map (fun (id,orig_ref) ->
+        tclTHEN 
+        (!gentac_ref ist ((None,Some(false,[])),cpattern_of_id id))
+        (rename_hd_prod orig_ref))
+      ctx.tmp_ids) gl)
+;;
+
+(* wildcard names *)
+let new_wild_id ctx =
+  let i = 1 + List.length ctx.wild_ids in
+  let id = mk_wildcard_id i in
+  id, { ctx with wild_ids = id :: ctx.wild_ids }
+
+let clear_wilds wilds gl =
+  clear (List.filter (fun id -> List.mem id wilds) (pf_ids_of_hyps gl)) gl
+
+let clear_with_wilds wilds clr0 gl =
+  let extend_clr clr (id, _, _ as nd) =
+    if List.mem id clr || not (List.mem id wilds) then clr else
+    let vars = global_vars_set_of_decl (pf_env gl) nd in
+    let occurs id' = Idset.mem id' vars in
+    if List.exists occurs clr then id :: clr else clr in
+  clear (Context.fold_named_context_reverse extend_clr ~init:clr0 (pf_hyps gl)) gl
+
+let clear_wilds_and_tmp_and_delayed_ids gl =
+  let _, ctx = pull_ctx gl in
+  tac_ctx
+   (tclTHEN
+    (clear_with_wilds ctx.wild_ids ctx.delayed_clears)
+    (clear_wilds (List.map fst ctx.tmp_ids @ ctx.wild_ids))) gl
+
+(* we reduce head beta redexes *)
+let betared env = 
+  Closure.create_clos_infos 
+   (Closure.RedFlags.mkflags [Closure.RedFlags.fBETA])
+    env
+;;
+let rec fst_prod red tac = PG.enter begin fun gl ->
+  let concl = Evarutil.nf_evar (PG.sigma gl) (PG.concl (PG.assume gl)) in
+  match kind_of_term concl with
+  | Prod (id,_,tgt) | LetIn(id,_,_,tgt) -> tac id
+  | _ -> if red then TN.tclZEROMSG (str"No product even after head-reduction.")
+         else TN.tclTHEN (old_tac hnf_in_concl) (fst_prod true tac)
+end
+;;
+let introid ?(orig=ref Anonymous) name = tclTHEN (fun gl ->
+   let g, env = pf_concl gl, pf_env gl in
+   match kind_of_term g with
+   | App (hd, _) when isLambda hd -> 
+     let g = Closure.whd_val (betared env) (Closure.inject g) in
+     Proofview.V82.of_tactic (convert_concl_no_check g) gl
+   | _ -> tclIDTAC gl)
+  (Proofview.V82.of_tactic
+    (fst_prod false (fun id -> orig := id; intro_mustbe_force name)))
+;;
+
 (* We must not anonymize context names discharged by the "in" tactical. *)
 
 let ssr_anon_hyp = "Hyp"
@@ -775,7 +900,6 @@ let rec constr_name c = match kind_of_term c with
   | App (c', _) -> constr_name c'
   | _ -> Anonymous
 
-(* }}} *)
 
 (** Open term to lambda-term coercion  {{{ ************************************)
 
@@ -1759,7 +1883,6 @@ END
 (* idents that match global/section constants, since this would lead to    *)
 (* fragile Ltac scripts.                                                   *)
 
-type ssrhyp = SsrHyp of loc * identifier
 
 let hyp_id (SsrHyp (_, id)) = id
 let pr_hyp (SsrHyp (_, id)) = pr_id id
@@ -1833,6 +1956,10 @@ let rec check_hyps_uniq ids = function
 let check_hyp_exists hyps (SsrHyp(_, id)) =
   try ignore(Context.lookup_named id hyps)
   with Not_found -> errorstrm (str"No assumption is named " ++ pr_id id)
+
+let test_hypname_exists hyps id =
+  try ignore(Context.lookup_named id hyps); true
+  with Not_found -> false
 
 let interp_hyps ist gl ghyps =
   let hyps = List.map snd (List.map (interp_hyp ist gl) ghyps) in
@@ -2490,70 +2617,19 @@ GEXTEND Gram
                     (mk_term ' ' c) :: w ]];
 END
 
-(* There are two ways of "applying" a view to term:            *)
-(*  1- using a view hint if the view is an instance of some    *)
-(*     (reflection) inductive predicate.                       *)
-(*  2- applying the view if it coerces to a function, adding   *)
-(*     implicit arguments.                                     *)
-(* They require guessing the view hints and the number of      *)
-(* implicits, respectively, which we do by brute force.        *)
-
-let view_error s gv =
-  errorstrm (str ("Cannot " ^ s ^ " view ") ++ pr_term gv)
-
-let interp_view ist si env sigma gv rid =
-  match intern_term ist sigma env gv with
-  | GApp (loc, GHole _, rargs) ->
-    let rv = GApp (loc, rid, rargs) in
-    snd (interp_open_constr ist (re_sig si sigma) (rv, None))
-  | rv ->
-  let interp rc rargs =
-    interp_open_constr ist (re_sig si sigma) (mkRApp rc rargs, None) in
-  let rec simple_view rargs n =
-    if n < 0 then view_error "use" gv else
-    try interp rv rargs with _ -> simple_view (mkRHole :: rargs) (n - 1) in
-  let view_nbimps = interp_view_nbimps ist (re_sig si sigma) rv in
-  let view_args = [mkRApp rv (mkRHoles view_nbimps); rid] in
-  let rec view_with = function
-  | [] -> simple_view [rid] (interp_nbargs ist (re_sig si sigma) rv)
-  | hint :: hints -> try interp hint view_args with _ -> view_with hints in
-  snd (view_with (if view_nbimps < 0 then [] else viewtab.(0)))
-
-let top_id = mk_internal_id "top assumption"
-
-let with_view ist si env gl0 c name cl prune =
-  let c2r ist x = { ist with lfun =
-    Id.Map.add top_id (Value.of_constr x) ist.lfun } in
-  let rec loop (sigma, c') = function
-  | f :: view ->
-      let rid, ist = match kind_of_term c' with
-        | Var id -> mkRVar id, ist
-        | _ -> mkRltacVar top_id, c2r ist c' in
-      loop (interp_view ist si env sigma f rid) view
-  | [] ->
-      let sigma = Typeclasses.resolve_typeclasses ~fail:false env sigma in
-      let c' = Reductionops.nf_evar sigma c' in
-      let n, c', _, ucst = pf_abs_evars gl0 (sigma, c') in
-      let c' = if not prune then c' else pf_abs_cterm gl0 n c' in
-      let gl0 = pf_merge_uc ucst gl0 in
-      let gl0, ap = pf_abs_prod name gl0 c' (prod_applist cl [c]) in
-      ap, c', pf_merge_uc_of sigma gl0
-  in loop
-
-let pf_with_view ist gl (prune, view) cl c =
-  let env, sigma, si = pf_env gl, project gl, sig_it gl in
-  with_view ist si env gl c (constr_name c) cl prune (sigma, c) view
 (* }}} *)
  
 (** Extended intro patterns {{{ ***********************************************)
 
 type ssrtermrep = char * glob_constr_and_expr
+type seed = [ `Id of Id.t * [`Pre | `Post] | `Anon | `Wild ]
 type ssripat =
   | IpatSimpl of ssrclear * ssrsimpl
   | IpatId of identifier
   | IpatWild
-  | IpatCase of ssripats list
-  | IpatInj of ssripats list
+  | IpatCase of [ `Regular of ssripatss
+                | `Block of ssripatss * seed * ssripatss ]
+  | IpatInj of ssripatss
   | IpatRw of ssrocc * ssrdir
   | IpatAll
   | IpatAnon
@@ -2562,7 +2638,9 @@ type ssripat =
   | IpatNewHidden of identifier list
   | IpatFastMode
   | IpatTmpId
+  | IpatSeed of seed
 and ssripats = ssripat list
+and ssripatss = ssripats list
 
 let remove_loc = snd
 
@@ -2570,22 +2648,27 @@ let rec ipat_of_intro_pattern = function
   | IntroNaming (IntroIdentifier id) -> IpatId id
   | IntroAction IntroWildcard -> IpatWild
   | IntroAction (IntroOrAndPattern iorpat) ->
-    IpatCase 
+    IpatCase (`Regular
       (List.map (List.map ipat_of_intro_pattern) 
-	 (List.map (List.map remove_loc) iorpat))
+	 (List.map (List.map remove_loc) iorpat)))
   | IntroNaming IntroAnonymous -> IpatAnon
   | IntroAction (IntroRewrite b) -> IpatRw (allocc, if b then L2R else R2L)
   | IntroNaming (IntroFresh id) -> IpatAnon
   | IntroAction (IntroApplyOn _) -> (* to do *) Errors.error "TO DO"
   | IntroAction (IntroInjection ips) ->
-      IpatCase [List.map ipat_of_intro_pattern (List.map remove_loc ips)]
+      IpatInj [List.map ipat_of_intro_pattern (List.map remove_loc ips)]
   | IntroForthcoming _ -> (* Unable to determine which kind of ipat interp_introid could return [HH] *)
       assert false
 
 let rec pr_ipat = function
   | IpatId id -> pr_id id
   | IpatSimpl (clr, sim) -> pr_clear mt clr ++ pr_simpl sim
-  | IpatCase iorpat -> hov 1 (str "[" ++ pr_iorpat iorpat ++ str "]")
+  | IpatCase (`Regular iorpat) -> hov 1 (str "[" ++ pr_iorpat iorpat ++ str "]")
+  | IpatCase (`Block(before,seed,after)) ->
+       hov 1 (str "[" ++ pr_iorpat before
+                      ++ pr_seed before seed
+                      ++ pr_iorpat after ++ str "]")
+  | IpatSeed s -> pr_seed [] s
   | IpatInj iorpat -> hov 1 (str "[=" ++ pr_iorpat iorpat ++ str "]")
   | IpatRw (occ, dir) -> pr_occ occ ++ pr_dir dir
   | IpatAll -> str "*"
@@ -2598,6 +2681,12 @@ let rec pr_ipat = function
   | IpatTmpId -> str "+"
 and pr_iorpat iorpat = pr_list pr_bar pr_ipats iorpat
 and pr_ipats ipats = pr_list spc pr_ipat ipats
+and pr_seed before seed =
+  (if before <> [] then str"|" else str"") ++
+  match seed with
+  | `Id(id,side) -> str"^" ++ str(if side = `Post then "~" else "") ++ pr_id id
+  | `Anon -> str "^ ? "
+  | `Wild -> str "^ _ "
 
 let wit_ssripatrep = add_genarg "ssripatrep" pr_ipat
 
@@ -2608,7 +2697,9 @@ let pr_ssriorpat _ _ _ = pr_iorpat
 let intern_ipat ist ipat =
   let rec check_pat = function
   | IpatSimpl (clr, _) -> ignore (List.map (intern_hyp ist) clr)
-  | IpatCase iorpat -> List.iter (List.iter check_pat) iorpat
+  | IpatCase (`Regular iorpat) -> List.iter (List.iter check_pat) iorpat
+  | IpatCase (`Block (before,_,after)) ->
+       List.iter (List.iter check_pat) (before @ after)
   | IpatInj iorpat -> List.iter (List.iter check_pat) iorpat
   | _ -> () in
   check_pat ipat; ipat
@@ -2637,6 +2728,12 @@ let rec add_intro_pattern_hyps (loc, ipat) hyps = match ipat with
 
 let rec interp_ipat ist gl =
   let ltacvar id = Id.Map.mem id ist.lfun in
+  let interp_seed = function
+    | (`Anon | `Wild) as x -> x
+    | `Id(id,side) ->
+        match interp_introid ist gl id with
+        | IntroNaming (IntroIdentifier id) -> `Id(id,side)
+        | _ -> `Id(Id.of_string "_",`Pre) in
   let rec interp = function
   | IpatId id when ltacvar id ->
     ipat_of_intro_pattern (interp_introid ist gl id)
@@ -2646,7 +2743,14 @@ let rec interp_ipat ist gl =
       add_intro_pattern_hyps (loc, (interp_introid ist gl id)) hyps in
     let clr' = List.fold_right add_hyps clr [] in
     check_hyps_uniq [] clr'; IpatSimpl (clr', sim)
-  | IpatCase iorpat -> IpatCase (List.map (List.map interp) iorpat)
+  | IpatCase(`Regular iorpat) ->
+      IpatCase(`Regular(List.map (List.map interp) iorpat))
+  | IpatCase(`Block (before,seed,after)) ->
+      let before = List.map (List.map interp) before in
+      let seed = interp_seed seed in
+      let after = List.map (List.map interp) after in
+      IpatCase(`Block (before,seed,after))
+  | IpatSeed s -> IpatSeed (interp_seed s)
   | IpatInj iorpat -> IpatInj (List.map (List.map interp) iorpat)
   | IpatNewHidden l ->
       IpatNewHidden
@@ -2674,6 +2778,13 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
   | [ "*" ] -> [ [IpatAll] ]
   | [ "^*" ] -> [ [IpatFastMode] ]
   | [ "^" "*" ] -> [ [IpatFastMode] ]
+  | [ "^" "_" ] -> [ [IpatSeed `Wild] ]
+  | [ "^_" ] -> [ [IpatSeed `Wild] ]
+  | [ "^" "?" ] -> [ [IpatSeed `Anon] ]
+  | [ "^?" ] -> [ [IpatSeed `Anon] ]
+  | [ "^" ident(id) ] -> [ [IpatSeed (`Id(id,`Pre))] ]
+  | [ "^" "~" ident(id) ] -> [ [IpatSeed (`Id(id,`Post))] ]
+  | [ "^~" ident(id) ] -> [ [IpatSeed (`Id(id,`Post))] ]
   | [ ident(id) ] -> [ [IpatId id] ]
   | [ "?" ] -> [ [IpatAnon] ]
   | [ "+" ] -> [ [IpatTmpId] ]
@@ -2732,12 +2843,46 @@ let reject_ssrhid strm =
 let test_nohidden = Gram.Entry.of_parser "test_ssrhid" reject_ssrhid
 
 ARGUMENT EXTEND ssrcpat TYPED AS ssripatrep PRINTED BY pr_ssripat
-  | [ "YouShouldNotTypeThis" ssriorpat(x) ] -> [ IpatCase x ]
+  | [ "YouShouldNotTypeThis" ssriorpat(x) ] -> [ IpatCase(`Regular x) ]
 END
+
+let understand_case_type ior =
+  let rec aux before = function
+    | [] -> `Regular (List.rev before)
+    | [IpatSeed seed] :: rest -> `Block(List.rev before, seed, rest)
+    | ips :: rest -> aux (ips :: before) rest
+  in
+    aux [] ior
+
+let rec check_no_inner_seed loc seen = function
+  | [] -> ()
+  | x :: xs ->
+     let in_x = List.exists (function IpatSeed _ -> true | _ -> false) x in
+     if seen && in_x then
+        Errors.user_err_loc (loc, "ssreflect",
+            strbrk "Only one block ipat per elimination is allowed")
+     else if List.length x < 2 ||
+        List.for_all (function
+          | IpatSeed _ -> false
+          | IpatInj l | IpatCase (`Regular l) ->
+              check_no_inner_seed loc false l; true
+          | IpatCase (`Block(before,_,after)) ->
+              check_no_inner_seed loc false before;
+              check_no_inner_seed loc false after; true
+          | _ -> true) x
+     then check_no_inner_seed loc (seen || in_x) xs
+     else Errors.user_err_loc (loc, "ssreflect",
+            strbrk "Mixing block and regular ipat is forbidden")
 
 GEXTEND Gram
   GLOBAL: ssrcpat;
-  ssrcpat: [[ test_nohidden; "["; iorpat = ssriorpat; "]" -> IpatCase iorpat ]];
+  ssrcpat: [
+   [ test_nohidden; "["; iorpat = ssriorpat; "]" ->
+      check_no_inner_seed !@loc false iorpat;
+      IpatCase (understand_case_type iorpat)
+   | test_nohidden; "[="; iorpat = ssriorpat; "]" ->
+      check_no_inner_seed !@loc false iorpat;
+      IpatInj iorpat ]];
 END
 
 GEXTEND Gram
@@ -2829,6 +2974,108 @@ ARGUMENT EXTEND ssrintros TYPED AS ssrintros_ne PRINTED BY pr_ssrintros
   | [ ] -> [ [] ]
 END
 
+(* There are two ways of "applying" a view to term:            *)
+(*  1- using a view hint if the view is an instance of some    *)
+(*     (reflection) inductive predicate.                       *)
+(*  2- applying the view if it coerces to a function, adding   *)
+(*     implicit arguments.                                     *)
+(* They require guessing the view hints and the number of      *)
+(* implicits, respectively, which we do by brute force.        *)
+
+let view_error s gv =
+  errorstrm (str ("Cannot " ^ s ^ " view ") ++ pr_term gv)
+
+(* let tclINTROS = ref (fun _ _ _ -> assert false) *)
+
+let interp_view ist si env sigma gv v rid =
+  match v with
+  | GApp (loc, GHole _, rargs) ->
+    let rv = GApp (loc, rid, rargs) in
+    snd (interp_open_constr ist (re_sig si sigma) (rv, None))
+  | rv ->
+  let interp rc rargs =
+    interp_open_constr ist (re_sig si sigma) (mkRApp rc rargs, None) in
+  let rec simple_view rargs n =
+    if n < 0 then view_error "use" gv else
+    try interp rv rargs with _ -> simple_view (mkRHole :: rargs) (n - 1) in
+  let view_nbimps = interp_view_nbimps ist (re_sig si sigma) rv in
+  let view_args = [mkRApp rv (mkRHoles view_nbimps); rid] in
+  let rec view_with = function
+  | [] -> simple_view [rid] (interp_nbargs ist (re_sig si sigma) rv)
+  | hint :: hints -> try interp hint view_args with _ -> view_with hints in
+  snd (view_with (if view_nbimps < 0 then [] else viewtab.(0)))
+
+let top_id = mk_internal_id "top assumption"
+
+let tclEQINTROSviewtac_ref = ref (fun ~ist ~next -> assert false)
+
+let with_view ist ~next si env (gl0 : (Proof_type.goal * tac_ctx) Evd.sigma) c name cl prune (conclude : constr -> constr -> tac_ctx tac_a) clr =
+  let c2r ist x = { ist with lfun =
+    Id.Map.add top_id (Value.of_constr x) ist.lfun } in
+  let terminate (sigma, c') =
+    let sigma = Typeclasses.resolve_typeclasses ~fail:false env sigma in
+    let c' = Reductionops.nf_evar sigma c' in
+    let n, c', _, ucst = without_ctx pf_abs_evars gl0 (sigma, c') in
+    let c' = if not prune then c' else without_ctx pf_abs_cterm gl0 n c' in
+    let gl0 = pf_merge_uc ucst gl0 in
+    let gl0, ap =
+      let gl0, ctx = pull_ctx gl0 in
+      let gl0, ap = pf_abs_prod name gl0 c' (prod_applist cl [c]) in
+      push_ctx ctx gl0, ap in
+    let gl0 = pf_merge_uc_of sigma gl0 in
+    ap, c', gl0 in
+  let rec loop (sigma, c') = function
+  | [] ->
+      let ap, c', gl = terminate (sigma, c') in
+      ap, c', conclude ap c' gl
+  | f :: view ->
+      let ist, rid =
+        match kind_of_term c' with
+        | Var id -> ist,mkRVar id
+        | _ -> c2r ist c',mkRltacVar top_id in
+      let v = intern_term ist sigma env f in
+      let tactic_view = mkSsrRef "tactic_view" in
+      match v with
+      | GApp (loc, GRef (_,box,None), [GHole (_,_,_, Some tac)])
+       when has_type tac (glbwit Constrarg.wit_tactic) &&
+            eq_gr box tactic_view -> begin
+        let tac = out_gen (glbwit Constrarg.wit_tactic) tac in
+        match tac with
+        | TacLetIn (false,binds,TacArg(l0,TacCall(l,k,args))) ->
+            let ap, c', gl = terminate (sigma, c') in
+            let wid, gl = with_ctx new_wild_id gl in
+            let argid = ArgVar(dummy_loc,wid) in
+            let tac =
+              TacLetIn (false,binds, 
+                TacArg(l0,TacCall(l,k,args @ [ Reference argid ]))) in
+            let tac = tac_ctx (ssrevaltac ist tac) in
+            let tac = tclTHENLIST_a [
+                tac_ctx (apply_type ap [c']);
+                tac_ctx (introid wid);
+                (!tclEQINTROSviewtac_ref ~ist ~next tac (tac_ctx tclIDTAC));
+                (tac_ctx (clear (hyps_ids clr))) ] in
+            let tac_check _ max gl =
+              if view <> [] then Errors.error "No view can follow a tactic-view"
+              else tac_ctx tclIDTAC gl in
+            ap,c',tclTHEN_i_max tac tac_check gl
+        | _ -> Errors.error "Only simple tactic call allowed as tactic-view" end
+      | _ -> loop (interp_view ist si env sigma f v rid) view
+  in loop
+
+let pfa_with_view ist ?(next=ref []) (prune, view) cl c conclude clr gl =
+  let env, sigma, si =
+    without_ctx pf_env gl, Refiner.project gl, without_ctx sig_it gl in
+  with_view
+    ist ~next si env gl c (constr_name c) cl prune conclude clr (sigma, c) view 
+
+let pf_with_view_linear ist gl v cl c =
+  let x,y,gl =
+    pfa_with_view ist v cl c (fun _ _ -> tac_ctx tclIDTAC) []
+      (push_ctx (new_ctx ()) gl) in
+  let gl, _ = pull_ctxs gl in
+  assert(List.length (sig_it gl) = 1);
+  x,y,re_sig (List.hd (sig_it gl)) (Refiner.project gl)
+
 let injecteq_id = mk_internal_id "injection equation"
 
 let pf_nb_prod gl = nb_prod (pf_concl gl)
@@ -2883,12 +3130,12 @@ let perform_injection c gl =
   let injtac = tclTHEN (introid id) (injectidl2rtac id id_with_ebind) in 
   tclTHENLAST (Proofview.V82.of_tactic (apply (compose_lam dc cl1))) injtac gl  
 
-let simplest_newcase_ref = ref (fun t gl -> assert false)
-let simplest_newcase x gl = !simplest_newcase_ref x gl
+let simplest_newcase_ref = ref (fun ?ind t gl -> assert false)
+let simplest_newcase ?ind x gl = !simplest_newcase_ref ?ind x gl
 
-let ssrscasetac force_inj c gl = 
+let ssrscasetac ?ind force_inj c gl = 
   if force_inj || is_injection_case c gl then perform_injection c gl
-  else simplest_newcase c gl 
+  else simplest_newcase ?ind c gl 
 
 let intro_all gl =
   let dc, _ = Term.decompose_prod_assum (pf_concl gl) in
@@ -2916,6 +3163,9 @@ let intro_anon_fast = fst_unused_prod false (fun _ -> old_tac intro_anon)
 let intro_anon ?(speed=`Slow) () =
   if speed = `Slow then intro_anon else new_tac intro_anon_fast
 
+let intro_anon_a gl =
+  tac_ctx (intro_anon ~speed:(snd (pull_ctx gl)).speed ()) gl
+
 (* we reduce head beta redexes *)
 let introid ?(speed=`Slow) ?(orig=ref Anonymous) name =
   if speed = `Slow then introid ~orig name
@@ -2929,36 +3179,26 @@ let introid ?(speed=`Slow) ?(orig=ref Anonymous) name =
   (new_tac (introid_fast orig name))
 ;;
 
+let introid_a ?orig name gl =
+  tac_ctx (introid ~speed:(snd (pull_ctx gl)).speed ?orig name) gl
 
-let with_top tac =
-  tclTHENLIST [introid top_id; tac (mkVar top_id); clear [top_id]]
+let speed_to_next_NDP gl =
+  match (snd (pull_ctx gl)).speed with
+  | `Slow -> tac_ctx tclIDTAC gl
+  | `Fast ->
+       tac_ctx (new_tac (fst_unused_prod false (fun _ -> old_tac tclIDTAC))) gl
 
-let rec mapLR f = function [] -> [] | x :: s -> let y = f x in y :: mapLR f s
-
-let wild_ids = ref []
-
-let new_wild_id () =
-  let i = 1 + List.length !wild_ids in
-  let id = mk_wildcard_id i in
-  wild_ids := id :: !wild_ids;
-  id
-
-let clear_wilds wilds gl =
-  clear (List.filter (fun id -> List.mem id wilds) (pf_ids_of_hyps gl)) gl
-
-let clear_with_wilds wilds clr0 gl =
-  let extend_clr clr (id, _, _ as nd) =
-    if List.mem id clr || not (List.mem id wilds) then clr else
-    let vars = global_vars_set_of_decl (pf_env gl) nd in
-    let occurs id' = Idset.mem id' vars in
-    if List.exists occurs clr then id :: clr else clr in
-  clear (Context.fold_named_context_reverse extend_clr ~init:clr0 (pf_hyps gl)) gl
+let with_top tac gl =
+  let speed = (snd (pull_ctx gl)).speed in
+  tac_ctx
+    (tclTHENLIST [ introid ~speed top_id; tac (mkVar top_id); clear [top_id]])
+    gl
 
 let tclTHENS_nonstrict tac tacl taclname gl =
   let tacres = tac gl in
   let n_gls = List.length (sig_it tacres) in
   let n_tac = List.length tacl in
-  if n_gls = n_tac then tclTHENS (fun _ -> tacres) tacl gl else
+  if n_gls = n_tac then tclTHENS_a (fun _ -> tacres) tacl gl else
   if n_gls = 0 then tacres else
   let pr_only n1 n2 = if n1 < n2 then str "only " else mt () in
   let pr_nb n1 n2 name =
@@ -2974,11 +3214,12 @@ let rec is_name_in_ipats name = function
       List.exists (function SsrHyp(_,id) -> id = name) clr 
       || is_name_in_ipats name tl
   | IpatId id :: tl -> id = name || is_name_in_ipats name tl
-  | IpatCase l :: tl -> is_name_in_ipats name (List.flatten l @ tl)
+  | IpatCase(`Regular l) :: tl -> is_name_in_ipats name (List.flatten l @ tl)
+  | IpatCase(`Block _) :: _ -> true
   | _ :: tl -> is_name_in_ipats name tl
   | [] -> false
 
-let move_top_with_view = ref (fun _ -> assert false)
+let move_top_with_view = ref (fun ~next -> assert false)
 
 let rec nat_of_n n =
   if n = 0 then mkConstruct path_of_O
@@ -3025,14 +3266,6 @@ let ssrmkabs id gl =
 let ssrmkabstac ids =
   List.fold_right (fun id tac -> tclTHENFIRST (ssrmkabs id) tac) ids tclIDTAC
 
-let gentac_ref = ref (fun _ _ _ -> assert false)
-
-let rename_hd_prod orig_name_ref gl =
-  match kind_of_term (pf_concl gl) with
-  | Prod(_,src,tgt) ->
-      new_tac (convert_concl_no_check (mkProd (!orig_name_ref,src,tgt))) gl
-  | _ -> Errors.anomaly (str "gentac creates no product")
-
 (* introstac: for "move" and "clear", tclEQINTROS: for "case" and "elim" *)
 (* This block hides the spaghetti-code needed to implement the only two  *)
 (* tactics that should be used to process intro patters.                 *)
@@ -3041,98 +3274,195 @@ let rename_hd_prod orig_name_ref gl =
 (* imperativestructure so that outer renamigs are inherited by inner     *)
 (* ipts and that the cler performed at the end of ipatstac clears hyps   *)
 (* eventually renamed at runtime.                                        *)
-(* TODO: hide wild_ids in this block too *)
-let introstac, tclEQINTROS =
-  let tmp_ids = ref [] in
-  let new_tmp_id () =
-    let id = mk_tmp_id (1 + List.length !tmp_ids) in
-    let orig = ref Anonymous in
-    tmp_ids := (id, orig) :: !tmp_ids;
-    id, orig in
-  let dummy_ist = Geninterp.({ lfun = Id.Map.empty; extra = TacStore.empty }) in
-  let gen_tmps ?(ist=dummy_ist) gens gl =
-    tclTHENLIST (List.map (fun (id,orig_ref) ->
-      tclTHEN 
-        (!gentac_ref ist ((None,allocc),cpattern_of_id id))
-        (rename_hd_prod orig_ref)) gens) gl in
-  let rec map_acc_k f k = function
-    | [] -> (* tricky: we save wilds now, we get to_cler (aka k) later *)
-      let clear_ww = clear_with_wilds !wild_ids in           
-      [fun gl -> clear_ww (hyps_ids (List.flatten (List.map (!) (snd k)))) gl]
-    | x :: xs -> let k, x = f k xs x in x :: map_acc_k f k xs in
-  let rename force to_clr rest clr gl = 
-    let hyps = pf_hyps gl in
-    pp(lazy(str"rename " ++ pr_clear spc clr));
-    let () = if not force then List.iter (check_hyp_exists hyps) clr in
-    if List.exists (fun x -> force || is_name_in_ipats (hyp_id x) rest) clr then
-      let ren_clr, ren = 
-        List.split (List.map (fun x -> let x = hyp_id x in
-          let x' = mk_anon_id (string_of_id x) gl in
-          SsrHyp (dummy_loc, x'), (x, x')) clr) in
-      let () = to_clr := ren_clr in
-      Proofview.V82.of_tactic (rename_hyp ren) gl 
-    else
-      let () = to_clr := clr in
-      tclIDTAC gl in
-  let rec ipattac ?ist (speed, clears as k) rest = function
-    | IpatWild -> k, introid ~speed (new_wild_id ())
+
+let delayed_clear force rest clr gl = 
+  let gl, ctx = pull_ctx gl in
+  let hyps = pf_hyps gl in
+  let () = if not force then List.iter (check_hyp_exists hyps) clr in
+  if List.exists (fun x -> force || is_name_in_ipats (hyp_id x) rest) clr then
+    let ren_clr, ren = 
+      List.split (List.map (fun x ->
+        let x = hyp_id x in
+        let x' = mk_anon_id (string_of_id x) gl in
+        x', (x, x')) clr) in
+    let ctx = { ctx with delayed_clears = ren_clr @ ctx.delayed_clears } in
+    let gl = push_ctx ctx gl in
+    tac_ctx (Proofview.V82.of_tactic (rename_hyp ren)) gl 
+  else
+    let ctx = { ctx with delayed_clears = hyps_ids clr @ ctx.delayed_clears } in
+    let gl = push_ctx ctx gl in
+    tac_ctx tclIDTAC gl
+      
+
+type block_names = (int * Term.types array) option
+
+let (introstac : ?ist:Tacinterp.interp_sign -> ssripats -> Proof_type.tactic),
+    (tclEQINTROS : ?ind:block_names ref -> ?ist:Tacinterp.interp_sign ->
+                     Proof_type.tactic -> Proof_type.tactic -> ssripats ->
+                      Proof_type.tactic),
+    (tclEQINTROSviewtac : ist:Tacinterp.interp_sign -> next:ssripats ref ->
+                            tac_ctx tac_a -> tac_ctx tac_a -> tac_ctx tac_a)
+=
+
+  let rec ipattac ?ist ~next p : tac_ctx tac_a = fun gl ->
+    pp(lazy(str"ipattac: " ++ pr_ipat p));
+    match p with
+    | IpatSeed _ -> Errors.anomaly(str"IpatSeed is to be used for parsing only")
+    | IpatWild ->
+        let id, gl = with_ctx new_wild_id gl in
+        introid_a id gl
     | IpatTmpId ->
-        let id, orig = new_tmp_id () in
-        k, introid ~speed ~orig id
-    | IpatCase iorpat ->
-        k, tclIORPAT ?ist k (with_top (ssrscasetac false)) iorpat
-    | IpatInj iorpat -> k, tclIORPAT ?ist k (with_top (ssrscasetac true)) iorpat
-    | IpatRw (occ, dir) -> k, with_top (!ipat_rewritetac occ dir)
-    | IpatId id -> k, introid ~speed id
-    | IpatNewHidden idl -> k, ssrmkabstac idl
+        let (id, orig), gl = with_ctx new_tmp_id gl in
+        introid_a ~orig id gl
+    | IpatCase(`Regular iorpat) ->
+        tclIORPAT ?ist (with_top (ssrscasetac false)) iorpat gl
+    | IpatCase(`Block (before,(id_side),after)) ->
+        let ind = ref None in
+        tclTHEN_i_max
+          (with_top (ssrscasetac ~ind false))
+          (block_intro ?ist ~ind id_side
+            (List.map (ipatstac ?ist) before)
+            (List.map (ipatstac ?ist)  after)) gl
+    | IpatInj iorpat ->
+        tclIORPAT ?ist (with_top (ssrscasetac true)) iorpat gl
+    | IpatRw (occ, dir) ->
+        with_top (!ipat_rewritetac occ dir) gl
+    | IpatId id -> introid_a id gl
+    | IpatNewHidden idl -> tac_ctx (ssrmkabstac idl) gl
     | IpatSimpl (clr, sim) ->
-      let to_clr = ref [] in
-      (speed, to_clr :: clears),
-      tclTHEN (rename false to_clr rest clr) (simpltac sim)
-    | IpatAll -> k, intro_all
-    | IpatAnon -> k, intro_anon ~speed ()
-    | IpatNoop -> (`Slow,clears), tclIDTAC
-    | IpatFastMode -> (`Fast,clears), tclIDTAC
-    | IpatView v -> match ist with
-        | None -> anomaly "ipattac with no ist but view"
-        | Some ist -> match rest with
-            | (IpatCase _ | IpatRw _)::_ -> 
-              let to_clr = ref [] in let top_id = ref top_id in
-              (speed, to_clr :: clears), 
-              tclTHEN
-                (!move_top_with_view false top_id (false,v) ist)
-                (fun gl -> 
-                  rename true to_clr rest [SsrHyp (dummy_loc, !top_id)]gl)
-            | _ -> k, !move_top_with_view true (ref top_id) (true,v) ist
-  and tclIORPAT ?ist k tac = function
-    | [[]] -> tac
-    | orp -> 
-       tclTHENS_nonstrict tac (mapLR (ipatstac ?ist k) orp) "intro pattern"
-  and ipatstac ?ist k ipats = 
-    tclTHENLIST (map_acc_k (ipattac ?ist) k ipats) in
-  let introstac ?ist ipats =
-    wild_ids := []; tmp_ids := [];
-    let tac = ipatstac ?ist (`Slow,[]) ipats in
-    tclTHENLIST
-      [tac; gen_tmps ?ist !tmp_ids;
-       clear_wilds (List.map fst !tmp_ids @ !wild_ids)] in
-  let tclEQINTROS ?ist tac eqtac ipats =
-    wild_ids := []; tmp_ids := [];
-    let rec split_itacs mode to_clr tac' = function
-    | (IpatSimpl _ as spat) :: ipats' -> 
-      let (_,to_clr), tac = ipattac ?ist (mode,to_clr) ipats' spat in
-      split_itacs mode to_clr (tclTHEN tac' tac) ipats'
-    | IpatFastMode :: rest -> split_itacs `Fast to_clr tac' rest
-    | IpatCase iorpat :: ipats' -> 
-        to_clr, tclIORPAT ?ist (mode,to_clr) tac' iorpat, ipats', mode
-    | ipats' -> to_clr, tac', ipats', mode in
-    let to_clr, tac1, ipats', mode = split_itacs `Slow [] tac ipats in
-    let tac2 = ipatstac ?ist (mode,to_clr) ipats' in
-    tclTHENLIST
-      [tac1; eqtac; tac2; gen_tmps ?ist !tmp_ids;
-       clear_wilds (List.map fst !tmp_ids @ !wild_ids)] in
-  introstac, tclEQINTROS
+        tclTHEN_a (delayed_clear false !next clr) (tac_ctx (simpltac sim)) gl
+    | IpatAll -> tac_ctx intro_all gl
+    | IpatAnon -> intro_anon_a gl
+    | IpatNoop ->
+        let gl, ctx = pull_ctx gl in
+        let gl = push_ctx { ctx with speed = `Slow } gl in
+        tac_ctx tclIDTAC gl
+    | IpatFastMode ->
+        let gl, ctx = pull_ctx gl in
+        let gl = push_ctx { ctx with speed = `Fast } gl in
+        tac_ctx tclIDTAC gl
+    | IpatView v ->
+        let ist =
+          match ist with Some x -> x | _ -> anomaly "ipat: view with no ist" in
+        let next_keeps =
+          match !next with (IpatCase _ | IpatRw _)::_ -> false | _ -> true in
+        let top_id = ref top_id in
+        tclTHENLIST_a [
+          speed_to_next_NDP;
+          (!move_top_with_view ~next next_keeps top_id (next_keeps,v) ist);
+          (fun gl ->
+             let hyps = without_ctx pf_hyps gl in
+             if not next_keeps && test_hypname_exists hyps !top_id then
+               delayed_clear true !next [SsrHyp (dummy_loc,!top_id)] gl
+             else tac_ctx tclIDTAC gl)]
+        gl
+             
+  and block_intro ?ist ~ind prefix_side before after nth max gl =
+    let nparams, ktypes =
+      match !ind with
+      | Some x -> x
+      | None -> Errors.anomaly (str "block_intro with no ind info") in
+    let n_before = List.length before in
+    let n_after = List.length after in
+    let n_ks = Array.length ktypes in
+    if max <> n_before + n_after + n_ks then
+      let n_gls = max in
+      let pr_only n1 n2 = if n1 < n2 then str "only " else mt () in
+      let pr_nb n1 n2 name =
+        pr_only n1 n2 ++ int n1 ++ str (" "^String.plural n1 name) in
+      errorstrm (pr_nb (n_before + n_ks + n_after) n_gls "intro pattern"
+        ++ spc () ++ str "for "
+        ++ pr_nb n_gls (n_before + n_ks + n_after) "subgoal")
+    else
+    let ipat_of_name name =
+      match prefix_side, name with
+      | `Anon, _ -> IpatAnon
+      | `Wild, _ -> IpatWild
+      | _, Anonymous -> IpatAnon
+      | `Id(prefix,side), Name id ->
+          let id = Id.to_string id in
+          match side with
+          | `Pre -> IpatId (Id.of_string (Id.to_string prefix ^ id))
+          | `Post -> IpatId (Id.of_string (id ^ Id.to_string prefix)) in
+    let rec ipat_of_ty n t =
+      match kind_of_type t with
+      | CastType(t,_) ->  ipat_of_ty n t
+      | ProdType(name,_,tgt) | LetInType(name,_,_,tgt) ->
+          (if n<= 0 then [ipat_of_name name] else []) @
+          ipat_of_ty (n-1) tgt
+      | AtomicType _ | SortType _ -> [] in
+    if nth <= n_before then
+      List.nth before (nth-1) gl
+    else if nth > n_before && nth <= n_before + n_ks then
+      let ktype = ktypes.(nth - 1 - n_before) in
+      let ipats = ipat_of_ty nparams ktype in
+      pp(lazy(str"=> "++pr_ipats ipats++str" on "++
+        pr_constr (without_ctx pf_concl gl)));
+      let gl = let gl,ctx = pull_ctx gl in push_ctx {ctx with speed=`Slow} gl in
+      ipatstac ?ist ipats gl
+    else
+      List.nth after (nth - 1 - n_before - n_ks) gl
+
+  and tclIORPAT ?ist tac = function
+  | [[]] -> tac
+  | orp -> tclTHENS_nonstrict tac (List.map (ipatstac ?ist) orp) "intro pattern"
+
+  and ipatstac ?ist ipats gl =
+    let rec aux ipats gl =
+      match ipats with
+      | [] -> tac_ctx tclIDTAC gl
+      | p :: ps ->
+          let next = ref ps in
+          let gl = ipattac ?ist ~next p gl in
+          tac_on_all gl (aux !next)
+    in
+      aux ipats gl
+  in
+
+  let rec split_itacs ?ist ~ind tac' = function
+    | (IpatSimpl _ as spat) :: ipats' -> (* FIXME block *)
+        let tac = ipattac ?ist ~next:(ref ipats') spat in
+        split_itacs ?ist ~ind (tclTHEN_a tac' tac) ipats'
+    | IpatCase (`Regular iorpat) :: ipats' -> 
+        tclIORPAT ?ist tac' iorpat, ipats'
+    | IpatCase (`Block(before,id_side,after)) :: ipats' ->
+        tclTHEN_i_max tac'
+          (block_intro ?ist ~ind id_side
+            (List.map (ipatstac ?ist) before)
+            (List.map (ipatstac ?ist)  after)),
+        ipats'
+    | ipats' -> tac', ipats' in
+
+  let combine_tacs tac eqtac ipats ?ist ~ind gl =
+    let tac1, ipats' = split_itacs ?ist ~ind tac ipats in
+    let tac2 = ipatstac ?ist ipats' in
+    tclTHENLIST_a [ tac1; eqtac; tac2 ] gl in
+ 
+  (* Exported code *) 
+  let introstac ?ist ipats gl =
+    with_fresh_ctx (tclTHENLIST_a [
+      ipatstac ?ist ipats;
+      gen_tmp_ids ?ist;
+      clear_wilds_and_tmp_and_delayed_ids
+    ]) gl in
+  
+  let tclEQINTROS ?(ind=ref None) ?ist tac eqtac ipats gl =
+    with_fresh_ctx (tclTHENLIST_a [
+      combine_tacs (tac_ctx tac) (tac_ctx eqtac) ipats ?ist ~ind;
+      gen_tmp_ids ?ist;
+      clear_wilds_and_tmp_and_delayed_ids;
+    ]) gl in
+
+  let tclEQINTROSviewtac ~ist ~next tac eqtac gl =
+    let tac1, ipats' = (* TODO: pass ind via lets in concl *)
+      split_itacs ~ist ~ind:(ref None) tac !next in
+    next := ipats';
+    tclTHENLIST_a [ tac1; eqtac ] gl in (* FIXME *)
+
+  introstac, tclEQINTROS, tclEQINTROSviewtac
 ;;
+
+let () = tclEQINTROSviewtac_ref := tclEQINTROSviewtac
 
 let rec eqmoveipats eqpat = function
   | (IpatSimpl _ as ipat) :: ipats -> ipat :: eqmoveipats eqpat ipats
@@ -3140,8 +3470,9 @@ let rec eqmoveipats eqpat = function
    | ipat :: ipats -> ipat :: eqpat :: ipats
 
 (* General case *)
-let tclINTROS ist tac ipats = 
-  tclEQINTROS ~ist (tac ist) tclIDTAC ipats
+let tclINTROS = ref (fun _ _ _ -> assert false)
+let () = tclINTROS := (fun ist t ip -> tclEQINTROS ~ist (t ist) tclIDTAC ip)
+let tclINTROS = !tclINTROS
 
 (** The "=>" tactical *)
 
@@ -3702,6 +4033,15 @@ let with_defective maintac deps clr ist gl =
   let top_gen = mkclr clr, cpattern_of_id top_id in
   tclTHEN (introid top_id) (maintac deps top_gen ist) gl
 
+let with_defective_a maintac deps clr ist gl =
+  let top_id =
+    match kind_of_type (without_ctx pf_concl gl) with
+    | ProdType (Name id, _, _)
+      when has_discharged_tag (string_of_id id) -> id
+    | _ -> top_id in
+  let top_gen = mkclr clr, cpattern_of_id top_id in
+  tclTHEN_a (tac_ctx (introid top_id)) (maintac deps top_gen ist) gl
+
 let with_dgens (gensl, clr) maintac ist = match gensl with
   | [deps; []] -> with_defective maintac deps clr ist
   | [deps; gen :: gens] ->
@@ -3864,20 +4204,31 @@ ARGUMENT EXTEND ssrmovearg TYPED AS ssrarg PRINTED BY pr_ssrarg
 | [ ssrarg(arg) ] -> [ check_movearg arg ]
 END
 
-let viewmovetac_aux clear name_ref (_, vl as v) _ gen ist gl =
+let viewmovetac_aux ?(next=ref []) clear name_ref (_, vl as v) _ gen ist gl =
   let cl, c, clr, gl, gen_pat =
+    let gl, ctx = pull_ctx gl in
     let _, gen_pat, a, b, c, ucst, gl = pf_interp_gen_aux ist gl false gen in
-    a, b ,c, pf_merge_uc ucst gl, gen_pat in
-  let cl, c, gl = if vl = [] then cl, c, gl else pf_with_view ist gl v cl c in
+    a, b ,c, push_ctx ctx (pf_merge_uc ucst gl), gen_pat in
   let clr = if clear then clr else [] in
   name_ref := (match id_of_pattern gen_pat with Some id -> id | _ -> top_id);
-  genclrtac cl [c] clr gl
+  let clr = if clear then clr else [] in
+  if vl = [] then tac_ctx (genclrtac cl [c] clr) gl
+  else
+    let _, _, gl =
+      pfa_with_view ist ~next v cl c
+        (fun cl c -> tac_ctx (genclrtac cl [c] clr)) clr gl in
+      gl
 
 let () = move_top_with_view := 
-   (fun c r v -> with_defective (viewmovetac_aux c r v) [] [])
+   (fun ~next c r v ->
+      with_defective_a (viewmovetac_aux ~next c r v) [] [])
 
-let viewmovetac v deps gen ist gl = 
-  viewmovetac_aux true (ref top_id) v deps gen ist gl
+let viewmovetac ?next v deps gen ist gl = 
+ with_fresh_ctx
+   (tclTHEN_a
+     (viewmovetac_aux ?next true (ref top_id) v deps gen ist)
+      clear_wilds_and_tmp_and_delayed_ids)
+     gl
 
 let eqmovetac _ gen ist gl =
   let cl, c, _, gl = pf_interp_gen ist gl false gen in pushmoveeqtac cl c gl
@@ -3888,8 +4239,9 @@ let movehnftac gl = match kind_of_term (pf_concl gl) with
 
 let ssrmovetac ist = function
   | _::_ as view, (_, (dgens, ipats)) ->
-    let dgentac = with_dgens dgens (viewmovetac (true, view)) ist in
-    tclTHEN dgentac (introstac ~ist ipats)
+    let next = ref ipats in
+    let dgentac = with_dgens dgens (viewmovetac ~next (true, view)) ist in
+    tclTHEN dgentac (fun gl -> introstac ~ist !next gl)
   | _, (Some pat, (dgens, ipats)) ->
     let dgentac = with_dgens dgens eqmovetac ist in
     tclTHEN dgentac (introstac ~ist (eqmoveipats pat ipats))
@@ -3914,7 +4266,7 @@ END
 let analyze_eliminator elimty env sigma =
   let rec loop ctx t = match kind_of_type t with
   | AtomicType (hd, args) when isRel hd -> 
-    ctx, destRel hd, not (noccurn 1 t), Array.length args
+    ctx, destRel hd, not (noccurn 1 t), Array.length args, t
   | CastType (t, _) -> loop ctx t
   | ProdType (x, ty, t) -> loop ((x,None,ty) :: ctx) t
   | LetInType (x,b,ty,t) -> loop ((x,Some b,ty) :: ctx) (subst1 b t)
@@ -3925,7 +4277,7 @@ let analyze_eliminator elimty env sigma =
       errorstrm (str"The eliminator has the wrong shape."++spc()++
       str"A (applied) bound variable was expected as the conclusion of "++
       str"the eliminator's"++Pp.cut()++str"type:"++spc()++pr_constr elimty) in
-  let ctx, pred_id, elim_is_dep, n_pred_args = loop [] elimty in
+  let ctx, pred_id, elim_is_dep, n_pred_args, concl = loop [] elimty in
   let n_elim_args = rel_context_nhyps ctx in
   let is_rec_elim = 
      let count_occurn n term =
@@ -3940,7 +4292,8 @@ let analyze_eliminator elimty env sigma =
        (fun i (_,rd) -> pred_id <= i || not (occurr2 (pred_id - i) rd))
        1 (assums_of_rel_context ctx))
   in
-  n_elim_args - pred_id, n_elim_args, is_rec_elim, elim_is_dep, n_pred_args
+  n_elim_args - pred_id, n_elim_args, is_rec_elim, elim_is_dep, n_pred_args,
+  (ctx,concl)
   
 (* TASSI: This version of unprotects inlines the unfold tactic definition, 
  * since we don't want to wipe out let-ins, and it seems there is no flag
@@ -4019,6 +4372,19 @@ let pf_fresh_inductive_instance ind gl =
   let sigma, indu = Evd.fresh_inductive_instance env sigma ind in
   indu, re_sig it sigma
 
+let subgoals_tys (relctx, concl) =
+  let rec aux cur_depth acc = function
+    | (_,_,ty) :: rest ->
+        if noccurn cur_depth concl &&
+           List.for_all_i (fun i -> function
+             | _,None, t -> noccurn i t
+             | _,Some b, t -> noccurn i t && noccurn i b) 1 rest
+        then aux (cur_depth - 1) (ty :: acc) rest
+        else aux (cur_depth - 1) acc rest
+    | [] -> Array.of_list (List.rev acc)
+  in
+    aux (List.length relctx) [] (List.rev relctx)
+
 (** The "case" and "elim" tactic *)
 
 (* A case without explicit dependent terms but with both a view and an    *)
@@ -4037,7 +4403,7 @@ let pf_fresh_inductive_instance ind gl =
  *    generalize the equality in case eqid is not None
  * 4. build the tactic handle intructions and clears as required in ipats and
  *    by eqid *)
-let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
+let ssrelim ?(ind=ref None) ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
   (* some sanity checks *)
   let oc, orig_clr, occ, c_gen, gl = match what with
   | `EConstr(_,_,t) when isEvar t ->
@@ -4093,8 +4459,9 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
     match elim with
     | Some elim ->
       let gl, elimty = pf_e_type_of gl elim in
-      let pred_id, n_elim_args, is_rec, elim_is_dep, n_pred_args =
+      let pred_id, n_elim_args, is_rec, elim_is_dep, n_pred_args,ctx_concl =
         analyze_eliminator elimty env (project gl) in
+      ind := Some (0, subgoals_tys ctx_concl);
       let elim, elimty, elim_args, gl =
         pf_saturate ~beta:is_case gl elim ~ty:elimty n_elim_args in
       let pred = List.assoc pred_id elim_args in
@@ -4110,12 +4477,12 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
     | None ->
       let c = Option.get oc in let gl, c_ty = pf_type_of gl c in
-      let ((kn, i) as ind, _ as indu), unfolded_c_ty =
+      let ((kn, i), _ as indu), unfolded_c_ty =
         pf_reduce_to_quantified_ind gl c_ty in
       let sort = elimination_sort_of_goal gl in
       let gl, elim =
         if not is_case then
-          let t, gl = pf_fresh_global (Indrec.lookup_eliminator ind sort) gl in
+          let t,gl= pf_fresh_global (Indrec.lookup_eliminator (kn,i) sort) gl in
           gl, t
         else
           pf_eapply (fun env sigma () ->
@@ -4124,8 +4491,13 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
             let sigma = Sigma.to_evar_map sigma in
             (sigma, ind)) gl () in
       let gl, elimty = pf_type_of gl elim in
-      let pred_id,n_elim_args,is_rec,elim_is_dep,n_pred_args =
+      let pred_id,n_elim_args,is_rec,elim_is_dep,n_pred_args,ctx_concl =
         analyze_eliminator elimty env (project gl) in
+      if is_case then
+       let mind,indb = Inductive.lookup_mind_specif env (kn,i) in
+       ind := Some(mind.Declarations.mind_nparams,indb.Declarations.mind_nf_lc);
+      else
+       ind := Some (0, subgoals_tys ctx_concl);
       let rctx = fst (decompose_prod_assum unfolded_c_ty) in
       let n_c_args = rel_context_length rctx in
       let c, c_ty, t_args, gl = pf_saturate gl c ~ty:c_ty n_c_args in
@@ -4354,13 +4726,13 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
         tclTHENLIST [gen_eq_tac; intro_lhs; introid ipat]
       | _ -> tclIDTAC in
     let unprot = if eqid <> None && is_rec then unprotecttac else tclIDTAC in
-    tclEQINTROS ?ist elim_tac (tclTHENLIST [intro_eq; unprot]) ipats gl
+    tclEQINTROS ~ind ?ist elim_tac (tclTHENLIST [intro_eq; unprot]) ipats gl
   in
   tclTHENLIST [gen_eq_tac; elim_intro_tac] orig_gl
 ;;
 
 let simplest_newelim x= ssrelim ~is_case:false [] (`EConstr ([],None,x)) None []
-let simplest_newcase x= ssrelim ~is_case:true [] (`EConstr ([],None,x)) None []
+let simplest_newcase ?ind x= ssrelim ?ind ~is_case:true [] (`EConstr ([],None,x)) None []
 let _ = simplest_newcase_ref := simplest_newcase
 
 let check_casearg = function
@@ -4376,8 +4748,8 @@ let ssrcasetac ist (view, (eqid, (dgens, ipats))) =
   let ndefectcasetac view eqid ipats deps ((_, occ), _ as gen) ist gl =
     let simple = (eqid = None && deps = [] && occ = None) in
     let cl, c, clr, gl = pf_interp_gen ist gl true gen in
-    let _, vc, gl =
-      if view = [] then c, c, gl else pf_with_view ist gl (false, view) cl c in
+    let _,vc, gl =
+      if view = [] then c,c, gl else pf_with_view_linear ist gl (false, view) cl c in
     if simple && is_injection_case vc gl then
       tclTHENLIST [perform_injection vc; cleartac clr; introstac ~ist ipats] gl
     else 
@@ -4391,8 +4763,8 @@ let ssrcasetac ist (view, (eqid, (dgens, ipats))) =
 
 TACTIC EXTEND ssrcase
 | [ "case" ssrcasearg(arg) ssrclauses(clauses) ] ->
-  [ Proofview.V82.tactic (tclCLAUSES ist (ssrcasetac ist arg) clauses) ]
-| [ "case" ] -> [ Proofview.V82.tactic (with_top (ssrscasetac false)) ]
+  [ old_tac (tclCLAUSES ist (ssrcasetac ist arg) clauses) ]
+| [ "case" ] -> [ old_tac (with_fresh_ctx (with_top (ssrscasetac false))) ]
 END
 
 (** The "elim" tactic *)
@@ -4411,8 +4783,8 @@ let ssrelimtac ist (view, (eqid, (dgens, ipats))) =
 
 TACTIC EXTEND ssrelim
 | [ "elim" ssrarg(arg) ssrclauses(clauses) ] ->
-  [ Proofview.V82.tactic (tclCLAUSES ist (ssrelimtac ist arg) clauses) ]
-| [ "elim" ] -> [ Proofview.V82.tactic (with_top simplest_newelim) ]
+  [ old_tac (tclCLAUSES ist (ssrelimtac ist arg) clauses) ]
+| [ "elim" ] -> [ old_tac (with_fresh_ctx (with_top simplest_newelim)) ]
 END
 
 (** 6. Backward chaining tactics: apply, exact, congr. *)
