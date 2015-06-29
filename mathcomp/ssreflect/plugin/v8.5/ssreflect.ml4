@@ -2378,10 +2378,11 @@ let rec pr_ipat = function
   | IpatView v -> pr_view v
   | IpatNoop -> str "-"
   | IpatNewHidden l -> str "[:" ++ pr_list spc pr_id l ++ str "]"
-  | IpatFastMode -> str "^*"
+  | IpatFastMode -> str ">"
   | IpatTmpId -> str "+"
+and pr_space_notFM = function IpatFastMode :: _ -> str"" | _ -> str" "
 and pr_iorpat iorpat = pr_list pr_bar pr_ipats iorpat
-and pr_ipats ipats = pr_list spc pr_ipat ipats
+and pr_ipats ipats = pr_space_notFM ipats ++ pr_list spc pr_ipat ipats
 and pr_seed before seed =
   (if before <> [] then str"|" else str"") ++
   match seed with
@@ -2477,7 +2478,6 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
   GLOBALIZED BY intern_ipats
   | [ "_" ] -> [ [IpatWild] ]
   | [ "*" ] -> [ [IpatAll] ]
-  | [ "^*" ] -> [ [IpatFastMode] ]
   | [ "^" "*" ] -> [ [IpatFastMode] ]
   | [ "^" "_" ] -> [ [IpatSeed `Wild] ]
   | [ "^_" ] -> [ [IpatSeed `Wild] ]
@@ -2661,7 +2661,7 @@ END
 type ssrintros = ssripats
 
 let pr_intros sep intrs =
-  if intrs = [] then mt() else sep () ++ str "=> " ++ pr_ipats intrs
+  if intrs = [] then mt() else sep () ++ str "=>" ++ pr_ipats intrs
 let pr_ssrintros _ _ _ = pr_intros mt
 
 ARGUMENT EXTEND ssrintros_ne TYPED AS ssripat
@@ -3014,10 +3014,7 @@ let (introstac : ?ist:Tacinterp.interp_sign -> ssripats -> Proof_type.tactic),
         tclTHEN_a (delayed_clear false !next clr) (tac_ctx (simpltac sim)) gl
     | IpatAll -> tac_ctx intro_all gl
     | IpatAnon -> intro_anon_a gl
-    | IpatNoop ->
-        let gl, ctx = pull_ctx gl in
-        let gl = push_ctx { ctx with speed = `Slow } gl in
-        tac_ctx tclIDTAC gl
+    | IpatNoop -> tac_ctx tclIDTAC gl
     | IpatFastMode ->
         let gl, ctx = pull_ctx gl in
         let gl = push_ctx { ctx with speed = `Fast } gl in
