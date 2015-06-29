@@ -110,7 +110,7 @@ val pr_rwdir : ssrdir -> Pp.std_ppcmds
 val dir_org : ssrdir -> int
 
 (* /=, // *)
-type ssrsimpl = Simpl | Cut of int | SimplCut of int | Nop
+type ssrsimpl = Simpl of int | Cut of int | SimplCut of int * int | Nop
 
 val ssrsimpl : ssrsimpl Pcoq.Gram.entry
 val ssrsimpl_ne : ssrsimpl Pcoq.Gram.entry
@@ -118,7 +118,6 @@ val wit_ssrsimpl : (ssrsimpl,ssrsimpl,ssrsimpl) genarg_type
 val wit_ssrsimpl_ne : (ssrsimpl,ssrsimpl,ssrsimpl) genarg_type
 
 val pr_simpl : ssrsimpl -> Pp.std_ppcmds
-val test_ssrslashnum : unit Pcoq.Gram.entry (* REMOVE *)
 val test_not_ssrslashnum : unit Pcoq.Gram.entry (* REMOVE *)
 
 (* {H G} *)

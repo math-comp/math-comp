@@ -241,56 +241,103 @@ let dir_org = function L2R -> 1 | R2L -> 2
 
 (** Simpl switch *)
 
-type ssrsimpl = Simpl | Cut of int | SimplCut of int | Nop
+type ssrsimpl = Simpl of int | Cut of int | SimplCut of int * int | Nop
 
 let pr_simpl = function
-  | Simpl -> str "/="
+  | Simpl -1 -> str "/="
   | Cut -1 -> str "//"
+  | Simpl n -> str "/" ++ int n ++ str "="
   | Cut n -> str "/" ++ int n ++ str"/"
-  | SimplCut -1 -> str "//="
-  | SimplCut n -> str "/" ++ int n ++ str"/="
+  | SimplCut (-1,-1) -> str "//="
+  | SimplCut (n,-1) -> str "/" ++ int n ++ str "/="
+  | SimplCut (-1,n) -> str "//" ++ int n ++ str "="
+  | SimplCut (n,m) -> str "/" ++ int n ++ str "/" ++ int m ++ str "="
   | Nop -> mt ()
 
 let pr_ssrsimpl _ _ _ = pr_simpl
 
 let wit_ssrsimplrep = add_genarg "ssrsimplrep" pr_simpl
 
-let test_ssrslashnum strm =
+let test_ssrslashnum b1 b2 strm =
   match Compat.get_tok (Util.stream_nth 0 strm) with
   | Tok.KEYWORD "/" ->
       (match Compat.get_tok (Util.stream_nth 1 strm) with
-      | Tok.INT _ ->
+      | Tok.INT _ when b1 ->
          (match Compat.get_tok (Util.stream_nth 2 strm) with
-         | Tok.KEYWORD "/" -> ()
+         | Tok.KEYWORD "=" | Tok.KEYWORD "/=" when not b2 -> ()
+         | Tok.KEYWORD "/" ->
+             if not b2 then () else begin
+               match Compat.get_tok (Util.stream_nth 3 strm) with
+               | Tok.INT _ -> ()
+               | _ -> raise Stream.Failure
+             end
          | _ -> raise Stream.Failure)
+      | Tok.KEYWORD "/" when not b1 ->
+         (match Compat.get_tok (Util.stream_nth 2 strm) with
+         | Tok.KEYWORD "=" when not b2 -> ()
+         | Tok.INT _ when b2 ->
+           (match Compat.get_tok (Util.stream_nth 3 strm) with
+           | Tok.KEYWORD "=" -> ()
+           | _ -> raise Stream.Failure)
+         | _ when not b2 -> ()
+         | _ -> raise Stream.Failure)
+      | Tok.KEYWORD "=" when not b1 && not b2 -> ()
       | _ -> raise Stream.Failure)
+  | Tok.KEYWORD "//" when not b1 ->
+         (match Compat.get_tok (Util.stream_nth 1 strm) with
+         | Tok.KEYWORD "=" when not b2 -> ()
+         | Tok.INT _ when b2 ->
+           (match Compat.get_tok (Util.stream_nth 2 strm) with
+           | Tok.KEYWORD "=" -> ()
+           | _ -> raise Stream.Failure)
+         | _ when not b2 -> ()
+         | _ -> raise Stream.Failure)
   | _ -> raise Stream.Failure
+
+let test_ssrslashnum10 = test_ssrslashnum true false
+let test_ssrslashnum11 = test_ssrslashnum true true
+let test_ssrslashnum01 = test_ssrslashnum false true
+let test_ssrslashnum00 = test_ssrslashnum false false
 
 let negate_parser f x =
   let rc = try Some (f x) with Stream.Failure -> None in
   match rc with
   | None -> ()
   | Some _ -> raise Stream.Failure 
+
 let test_not_ssrslashnum =
   Pcoq.Gram.Entry.of_parser
-    "test_not_ssrslashnum" (negate_parser test_ssrslashnum)
-let test_ssrslashnum =
-  Pcoq.Gram.Entry.of_parser "test_ssrslashnum" test_ssrslashnum
+    "test_not_ssrslashnum" (negate_parser test_ssrslashnum10)
+let test_ssrslashnum00 =
+  Pcoq.Gram.Entry.of_parser "test_ssrslashnum01" test_ssrslashnum00
+let test_ssrslashnum10 =
+  Pcoq.Gram.Entry.of_parser "test_ssrslashnum10" test_ssrslashnum10
+let test_ssrslashnum11 =
+  Pcoq.Gram.Entry.of_parser "test_ssrslashnum11" test_ssrslashnum11
+let test_ssrslashnum01 =
+  Pcoq.Gram.Entry.of_parser "test_ssrslashnum01" test_ssrslashnum01
+
 
 ARGUMENT EXTEND ssrsimpl_ne TYPED AS ssrsimplrep PRINTED BY pr_ssrsimpl
-| [ "/=" ] -> [ Simpl ]
-| [ "//" ] -> [ Cut ~-1 ]
-| [ "//=" ] -> [ SimplCut ~-1 ]
+| [ "//=" ] -> [ SimplCut (~-1,~-1) ]
+| [ "/=" ] -> [ Simpl ~-1 ]
 END
 
-Pcoq.(
+Pcoq.(Prim.(
 GEXTEND Gram
   GLOBAL: ssrsimpl_ne;
   ssrsimpl_ne: [
-    [ test_ssrslashnum; "/"; n = Prim.natural; "/" -> Cut n 
-    | test_ssrslashnum; "/"; n = Prim.natural; "/=" -> SimplCut n ]];
+    [ test_ssrslashnum11; "/"; n = natural; "/"; m = natural; "=" -> SimplCut(n,m)
+    | test_ssrslashnum10; "/"; n = natural; "/" -> Cut n 
+    | test_ssrslashnum10; "/"; n = natural; "=" -> Simpl n 
+    | test_ssrslashnum10; "/"; n = natural; "/=" -> SimplCut (n,~-1) 
+    | test_ssrslashnum10; "/"; n = natural; "/"; "=" -> SimplCut (n,~-1) 
+    | test_ssrslashnum01; "//"; m = natural; "=" -> SimplCut (~-1,m)
+    | test_ssrslashnum00; "//" -> Cut ~-1
+    ]];
+
 END
-)
+))
 
 ARGUMENT EXTEND ssrsimpl TYPED AS ssrsimplrep PRINTED BY pr_ssrsimpl
 | [ ssrsimpl_ne(sim) ] -> [ sim ]

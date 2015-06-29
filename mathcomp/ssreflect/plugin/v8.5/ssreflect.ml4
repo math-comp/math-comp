@@ -1601,8 +1601,8 @@ END
 (* to allow for user extensions. "ssrautoprop" defaults to   *)
 (* trivial.                                                  *)
 
-let donetac n gl =
-  let name = if n = -1 then "done" else ("ssrdone" ^ string_of_int n) in
+let ssr_n_tac seed n gl =
+  let name = if n = -1 then seed else ("ssr" ^ seed ^ string_of_int n) in
   let fail msg = Pp.msg_error (str msg); Errors.error msg in
   let tacname = 
     try Nametab.locate_tactic (qualid_of_ident (id_of_string name))
@@ -1612,6 +1612,8 @@ let donetac n gl =
       else fail ("The tactic "^name^" was not found") in
   let tacexpr = dummy_loc, Tacexpr.Reference (ArgArg (dummy_loc, tacname)) in
   Proofview.V82.of_tactic (eval_tactic (Tacexpr.TacArg tacexpr)) gl
+
+let donetac n gl = ssr_n_tac "done" n gl
 
 let ssrautoprop gl =
   try 
@@ -2072,14 +2074,17 @@ let tacred_simpl gl =
   let simpl env sigma c = snd (esimpl env sigma c) in
   simpl
 
-let safe_simpltac gl =
-  let cl' = red_safe (tacred_simpl gl) (pf_env gl) (project gl) (pf_concl gl) in
-  Proofview.V82.of_tactic (convert_concl_no_check cl') gl
+let safe_simpltac n gl =
+  if n = ~-1 then
+    let cl= red_safe (tacred_simpl gl) (pf_env gl) (project gl) (pf_concl gl) in
+    Proofview.V82.of_tactic (convert_concl_no_check cl) gl
+  else
+    ssr_n_tac "simpl" n gl
 
 let simpltac = function
-  | Simpl -> safe_simpltac
+  | Simpl n -> safe_simpltac n
   | Cut n -> tclTRY (donetac n)
-  | SimplCut n -> tclTHEN safe_simpltac (tclTRY (donetac n))
+  | SimplCut (n,m) -> tclTHEN (safe_simpltac m) (tclTRY (donetac n))
   | Nop -> tclIDTAC
 
 (** Indexes *)
@@ -2497,16 +2502,17 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
   | [ "->" ] -> [ [IpatRw (allocc, L2R)] ]
   | [ "<-" ] -> [ [IpatRw (allocc, R2L)] ]
   | [ "-" ] -> [ [IpatNoop] ]
-  | [ "-/" "=" ] -> [ [IpatNoop;IpatSimpl([],Simpl)] ]
-  | [ "-/=" ] -> [ [IpatNoop;IpatSimpl([],Simpl)] ]
+  | [ "-/" "=" ] -> [ [IpatNoop;IpatSimpl([],Simpl ~-1)] ]
+  | [ "-/=" ] -> [ [IpatNoop;IpatSimpl([],Simpl ~-1)] ]
   | [ "-/" "/" ] -> [ [IpatNoop;IpatSimpl([],Cut ~-1)] ]
   | [ "-//" ] -> [ [IpatNoop;IpatSimpl([],Cut ~-1)] ]
-  | [ "-/"  integer(n)"/" ] -> [ [IpatNoop;IpatSimpl([],Cut n)] ]
-  | [ "-/" "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut ~-1)] ]
-  | [ "-//" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut ~-1)] ]
-  | [ "-//=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut ~-1)] ]
-  | [ "-/" integer(n) "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut n)] ]
-  | [ "-/" integer(n) "/" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut n)] ]
+  | [ "-/" integer(n) "/" ] -> [ [IpatNoop;IpatSimpl([],Cut n)] ]
+  | [ "-/" "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (~-1,~-1))] ]
+  | [ "-//" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (~-1,~-1))] ]
+  | [ "-//=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (~-1,~-1))] ]
+  | [ "-/" integer(n) "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (n,~-1))] ]
+  | [ "-/" integer(n) "/" integer (m) "=" ] ->
+      [ [IpatNoop;IpatSimpl([],SimplCut(n,m))] ]
   | [ ssrview(v) ] -> [ [IpatView v] ]
   | [ "[" ":" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
   | [ "[:" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
@@ -4879,15 +4885,17 @@ ARGUMENT EXTEND ssrrwarg
 END
 
 let simplintac occ rdx sim gl = 
-  let simptac gl = 
+  let simptac m gl =
+    if m <> ~-1 then
+      Errors.error "Localized custom simpl tactic not supported";
     let sigma0, concl0, env0 = project gl, pf_concl gl, pf_env gl in
     let simp env c _ _ = red_safe (tacred_simpl gl) env sigma0 c in
     Proofview.V82.of_tactic
       (convert_concl_no_check (eval_pattern env0 sigma0 concl0 rdx occ simp))
       gl in
   match sim with
-  | Simpl -> simptac gl
-  | SimplCut n -> tclTHEN simptac (tclTRY (donetac n)) gl
+  | Simpl m -> simptac m gl
+  | SimplCut (n,m) -> tclTHEN (simptac m) (tclTRY (donetac n)) gl
   | _ -> simpltac sim gl
 
 let rec get_evalref c =  match kind_of_term c with
