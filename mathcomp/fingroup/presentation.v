@@ -1,9 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import fintype finset.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq fintype finset.
+From mathcomp
 Require Import fingroup morphism.
 
 (******************************************************************************)
@@ -187,7 +186,7 @@ Implicit Types gT rT : finGroupType.
 Import Presentation.
 
 Lemma isoGrp_hom gT (G : {group gT}) p : G \isog Grp p -> G \homg Grp p.
-Proof. by move <-; exact: homg_refl. Qed.
+Proof. by move <-; apply: homg_refl. Qed.
 
 Lemma isoGrpP gT (G : {group gT}) p rT (H : {group rT}) :
   G \isog Grp p -> reflect (#|H| = #|G| /\ H \homg Grp p) (H \isog G).
@@ -216,7 +215,7 @@ have and_relE xT x1 x2 r: @and_rel xT x1 x2 r = (x1 == x2) && r :> bool.
   by case: r => //=; rewrite andbT.
 have rsatG e f: all (mem G) e -> rel e f NoRel -> rel (map h e) f NoRel.
   move=> Ge; have: NoRel -> NoRel by []; move: NoRel {2 4}NoRel.
-  elim: f => [x1 x2 | f1 IH1 f2 IH2] r hr IHr; last by apply: IH1; exact: IH2.
+  elim: f => [x1 x2 | f1 IH1 f2 IH2] r hr IHr; last by apply: IH1; apply: IH2.
   by rewrite !and_relE !evalG //; case/andP; move/eqP->; rewrite eqxx.
 set s := env1; set vT := gT : finType in s *.
 set s' := env1; set vT' := rT : finType in s' *.
@@ -239,19 +238,19 @@ Qed.
 Lemma eq_homGrp gT rT (G : {group gT}) (H : {group rT}) p :
   G \isog H -> (G \homg Grp p) = (H \homg Grp p).
 Proof.
-by rewrite isogEhom => /andP[homGH homHG]; apply/idP/idP; exact: homGrp_trans.
+by rewrite isogEhom => /andP[homGH homHG]; apply/idP/idP; apply: homGrp_trans.
 Qed.
 
 Lemma isoGrp_trans gT rT (G : {group gT}) (H : {group rT}) p :
   G \isog H -> H \isog Grp p -> G \isog Grp p.
-Proof. by move=> isoGH isoHp kT K; rewrite -isoHp; exact: eq_homgr. Qed.
+Proof. by move=> isoGH isoHp kT K; rewrite -isoHp; apply: eq_homgr. Qed.
 
 Lemma intro_isoGrp gT (G : {group gT}) p :
     G \homg Grp p -> (forall rT (H : {group rT}), H \homg Grp p -> H \homg G) ->
   G \isog Grp p.
 Proof.
 move=> homGp freeG rT H.
-by apply/idP/idP=> [homHp|]; [exact: homGrp_trans homGp | exact: freeG].
+by apply/idP/idP=> [homHp|]; [apply: homGrp_trans homGp | apply: freeG].
 Qed.
 
 End PresentationTheory.

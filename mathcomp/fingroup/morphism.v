@@ -1,10 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import choice fintype finfun bigop finset.
-Require Import fingroup.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq choice fintype finfun.
+From mathcomp
+Require Import bigop finset fingroup.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)
@@ -19,50 +18,50 @@ Require Import fingroup.
 (*            idm D == the identity morphism with domain D, or more precisely *)
 (*                     the identity function, but with a canonical            *)
 (*                     {morphism G -> gT} structure.                          *)
-(*          trivm D == the trivial morphism with domain D                     *)
+(*          trivm D == the trivial morphism with domain D.                    *)
 (* If f has a {morphism D >-> rT} structure                                   *)
-(*           'dom f == D                                                      *)
-(*           f @* A == the image of A by f, where f is defined                *)
+(*           'dom f == D, the domain of f.                                    *)
+(*           f @* A == the image of A by f, where f is defined.               *)
 (*                  := f @: (D :&: A)                                         *)
-(*        f @*^-1 R == the pre-image of R by f, where f is defined            *)
+(*        f @*^-1 R == the pre-image of R by f, where f is defined.           *)
 (*                  :=  D :&: f @^-1: R                                       *)
-(*           'ker f == the kernel of f                                        *)
-(*                  :=  f @^-1: 1                                             *)
-(*         'ker_G f == the kernel of f restricted to G                        *)
+(*           'ker f == the kernel of f.                                       *)
+(*                  :=  f @*^-1 1                                             *)
+(*         'ker_G f == the kernel of f restricted to G.                       *)
 (*                  :=  G :&: 'ker f (this is a pure notation)                *)
-(*          'injm f <=> f injective on D                                      *)
+(*          'injm f <=> f injective on D.                                     *)
 (*                  <-> ker f \subset 1 (this is a pure notation)             *)
 (*        invm injf == the inverse morphism of f, with domain f @* D, when f  *)
-(*                     is injective (injf : 'injm f)                          *)
+(*                     is injective (injf : 'injm f).                         *)
 (*    restrm f sDom == the restriction of f to a subset A of D, given         *)
 (*                     (sDom : A \subset D); restrm f sDom is transparently   *)
 (*                     identical to f; the restrmP and domP lemmas provide    *)
 (*                     opaque restrictions.                                   *)
 (*     invm f infj  == the inverse morphism for an injective f, with domain   *)
-(*                     f @* D, given (injf : 'injm f)                         *)
+(*                     f @* D, given (injf : 'injm f).                        *)
 (*                                                                            *)
-(*      G \isog H  <=> G and H are isomorphic as groups                       *)
-(*       H \homg G <=> H is a homomorphic image of G                          *)
-(*      isom G H f <=> f maps G isomorphically to H, provided D contains G    *)
-(*                 <-> f @: G^# == H^#                                        *)
+(*      G \isog H  <=> G and H are isomorphic as groups.                      *)
+(*       H \homg G <=> H is a homomorphic image of G.                         *)
+(*      isom G H f <=> f maps G isomorphically to H, provided D contains G.   *)
+(*                  := f @: G^# == H^#                                        *)
 (*                                                                            *)
 (* If, moreover, g : {morphism G >-> gT} with G : {group aT},                 *)
 (*  factm sKer sDom == the (natural) factor morphism mapping f @* G to g @* G *)
-(*                     given sDom : G \subset D, sKer : 'ker f \subset 'ker g *)
+(*                     with sDom : G \subset D, sKer : 'ker f \subset 'ker g. *)
 (*    ifactm injf g == the (natural) factor morphism mapping f @* G to g @* G *)
 (*                     when f is injective (injf : 'injm f); here g must      *)
-(*                     be an actual morphism structure, not its function      *)
+(*                     denote an actual morphism structure, not its function  *)
 (*                     projection.                                            *)
 (*                                                                            *)
 (* If g has a {morphism G >-> aT} structure for any G : {group gT}, then      *)
-(*           f \o g has a canonical {morphism g @*^-1 D >-> rT} structure     *)
+(*           f \o g has a canonical {morphism g @*^-1 D >-> rT} structure.    *)
 (*                                                                            *)
 (* Finally, for an arbitrary function f : aT -> rT                            *)
 (*     morphic D f <=> f preserves group multiplication in D, i.e.,           *)
-(*                     f (x * y) = (f x) * (f y) for all x, y in D            *)
+(*                     f (x * y) = (f x) * (f y) for all x, y in D.           *)
 (*        morphm fM == a function identical to f, but with a canonical        *)
-(*                     {morphism D >-> rT} structure, given fM : morphic D f  *)
-(*      misom D C f <=> f maps D isomorphically to C                          *)
+(*                     {morphism D >-> rT} structure, given fM : morphic D f. *)
+(*      misom D C f <=> f is a morphism that maps D isomorphically to C.      *)
 (*                  := morphic D f && isom D C f                              *)
 (******************************************************************************)
 
@@ -83,10 +82,10 @@ Structure morphism (D : {set aT}) : Type := Morphism {
   _ : {in D &, {morph mfun : x y / x * y}}
 }.
 
-(* We give the most 'lightweight' possible specification to define morphisms:*)
-(* local congruence with the group law of aT. We then provide the properties *)
-(* for the 'textbook' notion of morphism, when the required structures are   *)
-(* available (e.g. its domain is a group).                                   *)
+(* We give the 'lightest' possible specification to define morphisms: local   *)
+(* congruence, in D, with the group law of aT. We then provide the properties *)
+(* for the 'textbook' notion of morphism, when the required structures are    *)
+(* available (e.g. its domain is a group).                                    *)
 
 Definition morphism_for D of phant rT := morphism D.
 
@@ -106,7 +105,7 @@ by exists z; first apply/setIP.
 Qed.
 
 Lemma morphpreP : reflect (x \in D /\ f x \in R) (x \in D :&: f @^-1: R).
-Proof. rewrite !inE; exact: andP. Qed.
+Proof. by rewrite !inE; apply: andP. Qed.
 
 End MorphismStructure.
 
@@ -122,7 +121,7 @@ Implicit Arguments morphimP [aT rT D A f y].
 Implicit Arguments morphpreP [aT rT D R f x].
 Prenex Implicits morphimP morphpreP.
 
-(* domain, image, preimage, kernel, using phantom types to infer the domain *)
+(* Domain, image, preimage, kernel, using phantom types to infer the domain. *)
 
 Section MorphismOps1.
 
@@ -206,7 +205,7 @@ Qed.
 Lemma morphR : {in D &, {morph f : x y / [~ x, y]}}.
 Proof. by move=> * /=; rewrite morphM ?(groupV, groupJ) // morphJ ?morphV. Qed.
 
-(* morphic image,preimage properties w.r.t. set-theoretic operations *)
+(* Morphic image, preimage properties w.r.t. set-theoretic operations. *)
 
 Lemma morphimE A : f @* A = f @: (D :&: A). Proof. by []. Qed.
 Lemma morphpreE R : f @*^-1 R = D :&: f @^-1: R. Proof. by []. Qed.
@@ -237,7 +236,7 @@ Lemma mem_morphim A x : x \in D -> x \in A -> f x \in f @* A.
 Proof. by move=> Dx Ax; apply/morphimP; exists x. Qed.
 
 Lemma mem_morphpre R x : x \in D -> f x \in R -> x \in f @*^-1 R.
-Proof. by move=> Dx Rfx; exact/morphpreP. Qed.
+Proof. by move=> Dx Rfx; apply/morphpreP. Qed.
 
 Lemma morphimS A B : A \subset B -> f @* A \subset f @* B.
 Proof. by move=> sAB; rewrite imsetS ?setIS. Qed.
@@ -270,7 +269,7 @@ Lemma morphim_eq0 A : A \subset D -> (f @* A == set0) = (A == set0).
 Proof. by rewrite imset_eq0 => /setIidPr->. Qed.
 
 Lemma morphim_set1 x : x \in D -> f @* [set x] = [set f x].
-Proof. by rewrite /morphim -sub1set => /setIidPr->; exact: imset_set1. Qed.
+Proof. by rewrite /morphim -sub1set => /setIidPr->; apply: imset_set1. Qed.
 
 Lemma morphim1 : f @* 1 = 1.
 Proof. by rewrite morphim_set1 ?morph1. Qed.
@@ -373,13 +372,13 @@ Proof. by apply/setP=> x; rewrite !inE; case: (x \in D). Qed.
 (* kernel, domain properties *)
 
 Lemma kerP x : x \in D -> reflect (f x = 1) (x \in 'ker f).
-Proof. move=> Dx; rewrite 2!inE Dx; exact: set1P. Qed.
+Proof. by move=> Dx; rewrite 2!inE Dx; apply: set1P. Qed.
 
 Lemma dom_ker : {subset 'ker f <= D}.
 Proof. by move=> x /morphpreP[]. Qed.
 
 Lemma mker x : x \in 'ker f -> f x = 1.
-Proof. by move=> Kx; apply/kerP=> //; exact: dom_ker. Qed.
+Proof. by move=> Kx; apply/kerP=> //; apply: dom_ker. Qed.
 
 Lemma mkerl x y : x \in 'ker f -> y \in D -> f (x * y) = f y.
 Proof. by move=> Kx Dy; rewrite morphM // ?(dom_ker, mker Kx, mul1g). Qed.
@@ -391,12 +390,12 @@ Lemma rcoset_kerP x y :
   x \in D -> y \in D -> reflect (f x = f y) (x \in 'ker f :* y).
 Proof.
 move=> Dx Dy; rewrite mem_rcoset !inE groupM ?morphM ?groupV //=.
-rewrite morphV // -eq_mulgV1; exact: eqP.
+by rewrite morphV // -eq_mulgV1; apply: eqP.
 Qed.
 
 Lemma ker_rcoset x y :
   x \in D -> y \in D -> f x = f y -> exists2 z, z \in 'ker f & x = z * y.
-Proof. move=> Dx Dy eqfxy; apply/rcosetP; exact/rcoset_kerP. Qed.
+Proof. by move=> Dx Dy eqfxy; apply/rcosetP; apply/rcoset_kerP. Qed.
 
 Lemma ker_norm : D \subset 'N('ker f).
 Proof.
@@ -513,7 +512,7 @@ Lemma sub_morphim_pre A R :
   A \subset D -> (f @* A \subset R) = (A \subset f @*^-1 R).
 Proof.
 move=> sAD; rewrite -morphpreSK (morphimS, morphimK) //.
-apply/idP/idP; first by apply: subset_trans; exact: mulG_subr.
+apply/idP/idP; first by apply: subset_trans; apply: mulG_subr.
 by move/(mulgS ('ker f)); rewrite -morphpreMl ?(sub1G, mul1g).
 Qed.
 
@@ -625,7 +624,7 @@ Qed.
 
 Lemma morphim_norms A B : A \subset 'N(B) -> f @* A \subset 'N(f @* B).
 Proof.
-by move=> nBA; apply: subset_trans (morphim_norm B); exact: morphimS.
+by move=> nBA; apply: subset_trans (morphim_norm B); apply: morphimS.
 Qed.
 
 Lemma morphim_subnorm A B : f @* 'N_A(B) \subset 'N_(f @* A)(f @* B).
@@ -639,7 +638,7 @@ Proof. by move=> Dx; rewrite -(morphim_set1 Dx) morphim_norm. Qed.
 
 Lemma morphim_cent1s A x : x \in D -> A \subset 'C[x] -> f @* A \subset 'C[f x].
 Proof.
-by move=> Dx cAx; apply: subset_trans (morphim_cent1 Dx); exact: morphimS.
+by move=> Dx cAx; apply: subset_trans (morphim_cent1 Dx); apply: morphimS.
 Qed.
 
 Lemma morphim_subcent1 A x : x \in D -> f @* 'C_A[x] \subset 'C_(f @* A)[f x].
@@ -648,12 +647,12 @@ Proof. by move=> Dx; rewrite -(morphim_set1 Dx) morphim_subnorm. Qed.
 Lemma morphim_cent A : f @* 'C(A) \subset 'C(f @* A).
 Proof.
 apply/bigcapsP=> fx; case/morphimP=> x Dx Ax ->{fx}.
-by apply: subset_trans (morphim_cent1 Dx); apply: morphimS; exact: bigcap_inf.
+by apply: subset_trans (morphim_cent1 Dx); apply: morphimS; apply: bigcap_inf.
 Qed.
 
 Lemma morphim_cents A B : A \subset 'C(B) -> f @* A \subset 'C(f @* B).
 Proof.
-by move=> cBA; apply: subset_trans (morphim_cent B); exact: morphimS.
+by move=> cBA; apply: subset_trans (morphim_cent B); apply: morphimS.
 Qed.
 
 Lemma morphim_subcent A B : f @* 'C_A(B) \subset 'C_(f @* A)(f @* B).
@@ -670,7 +669,7 @@ Qed.
 
 Lemma morphpre_norms R S : R \subset 'N(S) -> f @*^-1 R \subset 'N(f @*^-1 S).
 Proof.
-by move=> nSR; apply: subset_trans (morphpre_norm S); exact: morphpreS.
+by move=> nSR; apply: subset_trans (morphpre_norm S); apply: morphpreS.
 Qed.
 
 Lemma morphpre_normal R S :
@@ -728,7 +727,7 @@ Proof. by move=> sRfD; move/morphim_cents; rewrite morphpreK. Qed.
 
 Lemma morphpre_subcent R A : 'C_(f @*^-1 R)(A) \subset f @*^-1 'C_R(f @* A).
 Proof.
-by rewrite -morphpreIdom -setIA setICA morphpreI setIS //; exact: morphpre_cent.
+by rewrite -morphpreIdom -setIA setICA morphpreI setIS //; apply: morphpre_cent.
 Qed.
 
 (* local injectivity properties *)
@@ -892,7 +891,7 @@ Lemma injm_idm G : 'injm (idm G).
 Proof. by apply/injmP=> x y _ _. Qed.
 
 Lemma ker_idm G : 'ker (idm G) = 1.
-Proof. by apply/trivgP; exact: injm_idm. Qed.
+Proof. by apply/trivgP; apply: injm_idm. Qed.
 
 Lemma morphim_idm A B : B \subset A -> idm A @* B = B.
 Proof.
@@ -1194,7 +1193,7 @@ Proof. by rewrite ker_ifactm => /trivgP->; rewrite morphim1. Qed.
 
 End InjFactm.
 
-(* Reflected (boolean) form of morphism and isomorphism properties *)
+(* Reflected (boolean) form of morphism and isomorphism properties. *)
 
 Section ReflectProp.
 
@@ -1204,7 +1203,7 @@ Section Defs.
 
 Variables (A : {set aT}) (B : {set rT}).
 
-(* morphic is the morphM property of morphisms seen through morphicP *)
+(* morphic is the morphM property of morphisms seen through morphicP. *)
 Definition morphic (f : aT -> rT) :=
   [forall u in [predX A & A], f (u.1 * u.2) == f u.1 * f u.2].
 
@@ -1240,14 +1239,14 @@ Lemma misom_isog f : misom f -> isog.
 Proof.
 case/andP=> fM iso_f; apply/existsP; exists (finfun f).
 apply/andP; split; last by rewrite /misom /isom !(eq_imset _ (ffunE f)).
-apply/forallP=> u; rewrite !ffunE; exact: forallP fM u.
+by apply/forallP=> u; rewrite !ffunE; apply: forallP fM u.
 Qed.
 
 Lemma isom_isog (D : {group aT}) (f : {morphism D >-> rT}) :
   A \subset D -> isom f -> isog.
 Proof.
 move=> sAD isof; apply: (@misom_isog f); rewrite /misom isof andbT.
-apply/morphicP; exact: (sub_in2 (subsetP sAD) (morphM f)).
+by apply/morphicP; apply: (sub_in2 (subsetP sAD) (morphM f)).
 Qed.
 
 Lemma isog_isom : isog -> {f : {morphism A >-> rT} | isom f}.
@@ -1313,7 +1312,7 @@ by rewrite subDset setUC subsetU ?sAG.
 Qed.
 
 Lemma sub_isog (A : {set aT}) : A \subset G -> 'injm f -> isog A (f @* A).
-Proof. by move=> sAG injf; apply: (isom_isog f sAG); exact: sub_isom. Qed.
+Proof. by move=> sAG injf; apply: (isom_isog f sAG); apply: sub_isom. Qed.
 
 Lemma restr_isom_to (A : {set aT}) (C R : {group rT}) (sAG : A \subset G) :
    f @* A = C -> isom G R f -> isom A C (restrm sAG f).
@@ -1349,7 +1348,7 @@ Proof. exact: sub_isom (im_idm G) (injm_idm G). Qed.
 Lemma isog_refl : G \isog G. Proof. exact: isom_isog idm_isom. Qed.
 
 Lemma card_isog : G \isog H -> #|G| = #|H|.
-Proof. case/isogP=> f injf <-; apply: isom_card (f) _; exact/isomP. Qed.
+Proof. by case/isogP=> f injf <-; apply: isom_card (f) _; apply/isomP. Qed.
 
 Lemma isog_abelian :  G \isog H -> abelian G = abelian H.
 Proof. by case/isogP=> f injf <-; rewrite injm_abelian. Qed.
@@ -1358,7 +1357,7 @@ Lemma trivial_isog : G :=: 1 -> H :=: 1 -> G \isog H.
 Proof.
 move=> -> ->; apply/isogP.
 exists [morphism of @trivm gT hT 1]; rewrite /= ?morphim1 //.
-rewrite ker_trivm; exact: subxx.
+by rewrite ker_trivm; apply: subxx.
 Qed.
 
 Lemma isog_eq1 : G \isog H -> (G :==: 1) = (H :==: 1).
@@ -1393,7 +1392,7 @@ Variables gT hT kT : finGroupType.
 Variables (G : {group gT}) (H : {group hT}) (K : {group kT}).
 
 Lemma isog_sym : (G \isog H) = (H \isog G).
-Proof. apply/idP/idP; exact: isog_symr. Qed.
+Proof. by apply/idP/idP; apply: isog_symr. Qed.
 
 Lemma isog_transl : G \isog H -> (G \isog K) = (H \isog K).
 Proof.
@@ -1467,14 +1466,14 @@ Qed.
 Lemma eq_homgl gT aT rT (G : {group gT}) (H : {group aT}) (K : {group rT}) :
   G \isog H -> homg G K = homg H K.
 Proof.
-by rewrite isogEhom => /andP[homGH homHG]; apply/idP/idP; exact: homg_trans.
+by rewrite isogEhom => /andP[homGH homHG]; apply/idP/idP; apply: homg_trans.
 Qed.
 
 Lemma eq_homgr gT rT aT (G : {group gT}) (H : {group rT}) (K : {group aT}) :
   G \isog H -> homg K G = homg K H.
 Proof.
 rewrite isogEhom => /andP[homGH homHG].
-by apply/idP/idP=> homK; exact: homg_trans homK _.
+by apply/idP/idP=> homK; apply: homg_trans homK _.
 Qed.
 
 End Homg.
@@ -1495,10 +1494,10 @@ Canonical sgval_morphism := Morphism (@sgvalM _ G).
 Canonical subg_morphism := Morphism (@subgM _ G).
 
 Lemma injm_sgval : 'injm sgval.
-Proof. apply/injmP; apply: in2W; exact: subg_inj. Qed.
+Proof. by apply/injmP; apply: in2W; apply: subg_inj. Qed.
 
 Lemma injm_subg : 'injm (subg G).
-Proof. apply/injmP; exact: can_in_inj (@subgK _ _). Qed.
+Proof. by apply/injmP; apply: can_in_inj (@subgK _ _). Qed.
 Hint Resolve injm_sgval injm_subg.
 
 Lemma ker_sgval : 'ker sgval = 1. Proof. exact/trivgP. Qed.
@@ -1511,7 +1510,7 @@ by apply/subsetP=> u _; rewrite -(sgvalK u) mem_imset ?subgP.
 Qed.
 
 Lemma sgval_sub A : sgval @* A \subset G.
-Proof. apply/subsetP=> x; case/imsetP=> u _ ->; exact: subgP. Qed.
+Proof. by apply/subsetP=> x; case/imsetP=> u _ ->; apply: subgP. Qed.
 
 Lemma sgvalmK A : subg G @* (sgval @* A) = A.
 Proof.

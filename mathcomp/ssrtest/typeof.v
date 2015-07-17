@@ -1,4 +1,5 @@
-Require Import ssreflect.
+Require Import mathcomp.ssreflect.ssreflect.
+
 Ltac mycut x :=
   let tx := type of x in
   cut tx.

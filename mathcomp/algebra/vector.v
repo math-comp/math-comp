@@ -1,10 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import choice fintype bigop finfun tuple.
-Require Import ssralg matrix mxalgebra zmodp.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype bigop.
+From mathcomp
+Require Import finfun tuple ssralg matrix mxalgebra zmodp.
 
 (******************************************************************************)
 (*  * Finite dimensional vector spaces                                        *)
@@ -648,7 +647,7 @@ Proof. by rewrite memv_cap; apply: andP. Qed.
 
 Lemma vspace_modl U V W : (U <= W -> U + (V :&: W) = (U + V) :&: W)%VS.
 Proof.
-by move=> sUV; apply/vs2mxP; rewrite !(vs2mxD, vs2mxI); exact/eqmxP/matrix_modl.
+by move=> sUV; apply/vs2mxP; rewrite !(vs2mxD, vs2mxI); apply/eqmxP/matrix_modl.
 Qed.
 
 Lemma vspace_modr  U V W : (W <= U -> (U :&: V) + W = U :&: (V + W))%VS.
@@ -1919,7 +1918,7 @@ Canonical vsproj_unlockable := [unlockable fun vsproj].
 Lemma vsprojK : {in U, cancel vsproj vsval}.
 Proof. by rewrite unlock; apply: projv_id. Qed.
 Lemma vsvalK : cancel vsval vsproj.
-Proof. by move=> w; exact/val_inj/vsprojK/subvsP. Qed.
+Proof. by move=> w; apply/val_inj/vsprojK/subvsP. Qed.
 
 Lemma vsproj_is_linear : linear vsproj.
 Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.

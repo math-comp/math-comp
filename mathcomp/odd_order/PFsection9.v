@@ -1,13 +1,24 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime binomial ssralg poly finset.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action finalg zmodp.
+From mathcomp
 Require Import gfunctor gproduct cyclic commutator center gseries nilpotent.
+From mathcomp
 Require Import pgroup sylow hall abelian maximal frobenius.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem vector.
+From mathcomp
 Require Import BGsection1 BGsection3 BGsection7 BGsection15 BGsection16.
+From mathcomp
 Require Import algC classfun character inertia vcharacter.
+From mathcomp
 Require Import PFsection1 PFsection2 PFsection3 PFsection4.
+From mathcomp
 Require Import PFsection5 PFsection6 PFsection8.
 
 (******************************************************************************)
@@ -245,14 +256,11 @@ have nsH0C: H0C <| M.
   rewrite -quotientYK // -{1}(quotientGK nsH0H) morphpre_norms //= [C]unlock.
   by rewrite cents_norm // centsC -quotient_astabQ quotientS ?subsetIr.
 split=> //; first by rewrite /= -{1}(joing_idPl sH0H) -joingA normalY ?gFnormal.
-  rewrite normalY // /normal (subset_trans (der_sub 1 U)) //=.
-  rewrite -{1}defM sdprodEY //= -defHU sdprodEY //=.
-  rewrite !join_subG gFnorm cents_norm 1?centsC //=.
-  by rewrite (char_norm_trans (der_char _ _)).
-suffices ->: H0C' :=: H0 <*> H0C^`(1).
-  by rewrite normalY ?(char_normal_trans (der_char _ _)).
-rewrite /= -?quotientYK ?(subset_trans (der_sub _ _)) ?subsetIl //=.
-by rewrite !quotient_der ?cosetpreK ?subsetIl.
+  rewrite normalY // /normal gFsub_trans //=.
+  rewrite -defM sdprodEY //= -defHU sdprodEY //=.
+  by rewrite !join_subG gFnorm cents_norm ?gFnorm_trans // centsC.
+suffices ->: H0C' :=: H0 <*> H0C^`(1) by rewrite normalY ?gFnormal_trans.
+by rewrite /= -!quotientYK ?gFsub_trans ?quotient_der ?subsetIl //= cosetpreK.
 Qed.
 Local Notation nsH0xx_M := Ptype_Fcore_extensions_normal.
 
@@ -537,9 +545,9 @@ have{cEE} [F [outF [inF outFK inFK] E_F]]:
   have outK: cancel outF inF by move=> a; apply: outI; rewrite inK ?E_F.
   pose one := inF 1%R; pose mul a b := inF (outF a * outF b)%R.
   have outM: {morph outF: a b / mul a b >-> a * b}%R.
-    by move=> a b; rewrite inK //; apply: envelop_mxM; exact: E_F.
+    by move=> a b; rewrite inK //; apply: envelop_mxM; apply: E_F.
   have out0: outF 0%R = 0%R by apply: raddf0.
-  have out1: outF one = 1%R by rewrite inK //; exact: envelop_mx1.
+  have out1: outF one = 1%R by rewrite inK //; apply: envelop_mx1.
   have nzFone: one != 0%R by rewrite -(inj_eq outI) out1 out0 oner_eq0.
   have mulA: associative mul by move=> *; apply: outI; rewrite !{1}outM mulrA.
   have mulC: commutative mul.
@@ -589,7 +597,7 @@ have inj_phi': injective phi'.
   move=> a b /rVabelem_inj eq_sab; apply: contraNeq nz_sb.
   rewrite -[sb]mulmx1 idmxE -(rmorph1 outF) -subr_eq0 => /divff <-.
   by rewrite rmorphM mulmxA !raddfB /= eq_sab subrr mul0mx.
-have injm_phi': 'injm (Morphism phi'D) by apply/injmP; exact: in2W.
+have injm_phi': 'injm (Morphism phi'D) by apply/injmP; apply: in2W.
 have Dphi: 'dom (invm injm_phi') = Hbar.
   apply/setP=> h; apply/morphimP/idP=> [[a _ _ ->] // | Hh].
   have /cyclic_mxP[A E_A def_h]: (outHb h <= cyclic_mx rU sb)%MS.
@@ -598,7 +606,7 @@ have Dphi: 'dom (invm injm_phi') = Hbar.
 have [phi [def_phi Kphi _ im_phi]] := domP _ Dphi.
 have{Kphi} inj_phi: 'injm phi by rewrite Kphi injm_invm.
 have{im_phi} im_phi: phi @* Hbar = setT by rewrite im_phi -Dphi im_invm.
-have phiK: {in Hbar, cancel phi phi'} by rewrite def_phi -Dphi; exact: invmK.
+have phiK: {in Hbar, cancel phi phi'} by rewrite def_phi -Dphi; apply: invmK.
 have{def_phi Dphi injm_phi'} phi'K: cancel phi' phi.
   by move=> a; rewrite def_phi /= invmE ?inE.
 have phi'1: phi' 1%R = s by rewrite /phi' rmorph1 mulmx1 [inHb _]abelem_rV_K.
@@ -704,15 +712,15 @@ exists F.
     move=> fRM; suff <-: map_poly (RMorphism fRM) P = P by apply: rmorph_root.
     apply/polyP=> i; rewrite coef_map.
     have [/(nth_default _)-> | lt_i_P] := leqP (size P) i; first exact: rmorph0.
-    by have /cycleP[n ->] := all_nthP 0%R nP i lt_i_P; exact: rmorph_nat.
+    by have /cycleP[n ->] := all_nthP 0%R nP i lt_i_P; apply: rmorph_nat.
   apply: (iffP morphimP) => [[w _ Ww ->] | alphaRM]; first exact: etaRM.
   suffices /setP/(_ (alpha r)): [set (eta w) r | w in W1] = [set t | root P t].
     rewrite inE fPr0 // => /imsetP[w Ww def_wr]; exists w => //.
-    by apply: prim_r => //; exact: etaRM.
+    by apply: prim_r => //; apply: etaRM.
   apply/eqP; rewrite eqEcard; apply/andP; split.
-    by apply/subsetP=> _ /imsetP[w Ww ->]; rewrite inE fPr0 //; exact: etaRM.
+    by apply/subsetP=> _ /imsetP[w Ww ->]; rewrite inE fPr0 //; apply: etaRM.
   rewrite (@cardsE F) card_in_imset // => w1 w2 Ww1 Ww2 /= /prim_r eq_w12.
-  by apply: (injmP inj_eta) => //; apply: eq_w12; exact: etaRM.
+  by apply: (injmP inj_eta) => //; apply: eq_w12; apply: etaRM.
 have isoUb: isog Ubar (psi @* U) by rewrite /Ubar -Kpsi first_isog.
 pose unF := [set in_uF a | a in nF^#].
 have unF_E: {in nF^#, cancel in_uF val} by move=> a /setD1P[/in_uF_E].
@@ -780,13 +788,11 @@ have nb_redM K:
     case/seqIndP=> s /setDP[kerK ker'H] Dphi; rewrite !inE in kerK ker'H.
     pose s1 := quo_Iirr K s; have Ds: s = mod_Iirr s1 by rewrite quo_IirrK.
     rewrite {phi}Dphi Ds mod_IirrE ?cfIndMod // in kerK ker'H red_phi *.
-    have [[j Ds1] | [/idPn[]]] := prTIres_irr_cases ptiWMb s1.
-      rewrite Ds1 cfInd_prTIres -/(muK j) in ker'H *; exists j => //.
-      by apply: contraNneq ker'H => ->; rewrite prTIres0 rmorph1 cfker_cfun1.
-    by apply: contra red_phi => /cfMod_irr/= ->.
-  have red_j: redM (muK j).
-    apply: contra (prTIred_not_irr ptiWMb j) => /(cfQuo_irr nsKM).
-    by rewrite cfker_mod ?cfModK // => ->.
+    have{red_phi} red_s1: 'Ind 'chi_s1 \notin irr (M / K) by rewrite -cfMod_irr.
+    have [[j Ds1] | [/idPn//]] := prTIres_irr_cases ptiWMb s1.
+    rewrite Ds1 cfInd_prTIres -/(muK j) in ker'H *; exists j => //.
+    by apply: contraNneq ker'H => ->; rewrite prTIres0 rmorph1 cfker_cfun1.
+  have red_j: redM (muK j) by rewrite /redM /= cfMod_irr // prTIred_not_irr.
   have [s DmuKj]: exists s, muK j = 'Ind[M, HU] 'chi_s.
     exists (mod_Iirr (primeTI_Ires ptiWMb j)).
     by rewrite mod_IirrE // cfIndMod // cfInd_prTIres.
@@ -901,7 +907,7 @@ have Dtheta f: {in W1bar & H1, forall w xb, theta f (xb ^ w) = 'chi_(f w) xb}.
   transitivity ('Res[H1 :^ w] ('Res[Hbar] (theta f)) (xb ^ w)); last first.
     by rewrite cfDprodlK cfBigdprodKabelian // isom_IirrE cfIsomE.
   by rewrite cfResRes ?sH1wH // cfResE ?memJ_conjg ?(subset_trans (sH1wH w _)).
-have lin_theta f: theta f \is a linear_char by apply: cfDprodl_lin_char.
+have lin_theta f: theta f \is a linear_char by rewrite cfDprodl_lin_char.
 pose Ftheta := pffun_on (0 : Iirr H1) W1bar (predC1 0).
 have inj_theta: {in Ftheta &, injective theta}.
   move=> f1 f2 /pffun_onP[/supportP W1f1 _] /pffun_onP[/supportP W1f2 _] eq_f12.
@@ -1199,7 +1205,7 @@ have ->: #|Mtheta| = (#|Xtheta| * a)%N.
   by rewrite cfConjgMod_norm ?(subsetP _ _ Uyb) // quotient_norms ?gFnorm.
 rewrite leq_pmul2r ?indexg_gt0 // cardE -(size_map (fun s => 'Ind[M] 'chi_s)).
 have kerH1c s: s \in Xtheta -> H1c \subset (cfker 'chi_s / H0)%g.
-  case/imsetP=> r Mr ->; have [i j _ _ Dr] := imset2P Mr.
+  case/imsetP=> r Mr {s}->; have [i j _ _ Dr] := imset2P Mr.
   rewrite -(setIidPr (normal_sub nsH1cHCH1)) -morphim_setIpre quotientS //.
   rewrite cfIirrE ?irr_Xtheta ?sub_cfker_Ind_irr //; last first.
     by rewrite normsI ?normal_norm // -(quotientGK nsH0_HU) cosetpre_normal.
@@ -1328,7 +1334,7 @@ have Part_a': part_a'.
     rewrite inE Ds sub_cfker_Ind_irr // in KsH0C'.
     by rewrite (subset_trans sHUM) ?normal_norm.
   rewrite lin_irr_der1 (subset_trans _ KrH0C') //= (norm_joinEr nH0C').
-  rewrite -quotientSK ?(subset_trans (der_sub 1 _)) ?quotient_der //= -/C.
+  rewrite -quotientSK ?gFsub_trans ?quotient_der //= -/C.
   by rewrite -(der_dprod 1 defHCbar) (derG1P abHbar) dprod1g.
 split=> // [s /Part_a[r ->] | | {Part_a' part_a'}red_H0C'].
 - by rewrite Du cfInd1 // dvdC_mulr // Cint_Cnat ?Cnat_irr1.
@@ -1632,14 +1638,14 @@ without loss [[eqS12 irrS1 H0C_S1] [Da_p defC] [S3qu ne_qa_qu] [oS1 oS1ua]]:
     exists chi => //; have /hasP[xi S1xi _]: has predT S1 by rewrite has_predT.
     have xi1: xi 1%g = (q * a)%:R.
       by rewrite mem_filter in S1xi; have [/eqP] := andP S1xi.
-    apply: ((extend_coherent scohS0) _ xi) => //; first by rewrite S0chi sS12.
+    apply: (extend_coherent scohS0 _ (sS12 _ S1xi)) => //.
     split=> //; last by rewrite mulrAC xi1 -natrM mulnA.
     rewrite xi1 Dchi1 irr1_degree -natrM dvdC_nat dvdn_pmul2l ?cardG_gt0 //.
     rewrite -dvdC_nat /= !nCdivE -irr1_degree a_dv_XH0 //.
     by rewrite (subsetP (Iirr_kerDS _ _ _) _ X0C's) ?joing_subl.
   have lb1S2 := lerif_trans lb12 (lerif_trans lb23 (lerif_trans lb3S1' lbS1'2)).
   rewrite ltr_neqAle !(lerif_trans lb01 lb1S2) andbT has_predC !negbK.
-  case/and5P=> /eqP chi1qu /eqP Da_p /eqP defC /eqP sz_S1' /allP sS21'.
+  case/and5P=> /eqP-chi1qu /eqP-Da_p /eqP-defC /eqP-sz_S1' /allP/=sS21'.
   have defS1': S1' = S1.
     apply/eqP; rewrite -(geq_leqif (size_subseq_leqif (filter_subseq _ S1))).
     by rewrite uniq_leq_size // => psi /sS12/sS21'.
@@ -2112,9 +2118,8 @@ have [Gamma [S4_Gamma normGamma [b Dbeta]]]:
       by have [_ _ ->] := sS10.
     rewrite Dbeta -Dtau3 //; apply: contraNneq => ->.
     rewrite add0r raddfB cfdotBr !(orthoPl oG'4) ?map_f ?subr0 //.
-    rewrite mem_filter /= negbK /= S3lam1s irr_aut.
-    move: S4lam1; rewrite mem_filter /= negbK /= -andbA => /and3P[-> H0Clam1 _].
-    by rewrite cfAut_seqInd.
+    move: S4lam1; rewrite ![_ \in S4]mem_filter /= !negbK /= cfAut_irr S3lam1s.
+    by case/andP=> /andP[-> /cfAut_seqInd->].
   have ubG: '[G] + (b ^+ 2 - b) * (u %/ a).*2%:R + '[Delta] = 1.
     apply: (addrI ((u %/ a) ^ 2)%:R); transitivity '[beta^\tau].
       rewrite -!addrA addrCA Dbeta cfnormDd; last first.

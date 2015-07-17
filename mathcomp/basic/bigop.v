@@ -1,19 +1,24 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect  
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-Require Import  path div fintype tuple finfun.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div fintype.
+From mathcomp
+Require Import tuple finfun.
 
 (******************************************************************************)
 (* This file provides a generic definition for iterating an operator over a   *)
-(* set of indices (reducebig); this big operator is parametrized by the       *)
-(* return type (R), the type of indices (I), the operator (op), the default   *)
-(* value on empty lists (idx), the range of indices (r), the filter applied   *)
-(* on this range (P) and the expression we are iterating (F). The definition  *)
-(* is not to be used directly, but via the wide range of notations provided   *)
-(* and which allows a natural use of big operators.                           *)
+(* set of indices (bigop); this big operator is parametrized by the return    *)
+(* type (R), the type of indices (I), the operator (op), the default value on *)
+(* empty lists (idx), the range of indices (r), the filter applied on this    *)
+(* range (P) and the expression we are iterating (F). The definition is not   *)
+(* to be used directly, but via the wide range of notations provided and      *)
+(* and which support a natural use of big operators.                          *)
+(*   To improve performance of the Coq typechecker on large expressions, the  *)
+(* bigop constant is OPAQUE. It can however be unlocked to reveal the         *)
+(* transparent constant reducebig, to let Coq expand summation on an explicit *)
+(* sequence with an explicit test.                                            *)
 (*   The lemmas can be classified according to the operator being iterated:   *)
-(*  1. results independent of the operator: extensionality with respect to    *)
+(*  1. Results independent of the operator: extensionality with respect to    *)
 (*     the range of indices, to the filtering predicate or to the expression  *)
 (*     being iterated; reindexing, widening or narrowing of the range of      *)
 (*     indices; we provide lemmas for the special cases where indices are     *)
@@ -21,7 +26,7 @@ Require Import  path div fintype tuple finfun.
 (*     several "functional" induction principles that can be used with the    *)
 (*     ssreflect 1.3 "elim" tactic to do induction over the index range for   *)
 (*     up to 3 bigops simultaneously.                                         *)
-(*  2. results depending on the properties of the operator:                   *)
+(*  2. Results depending on the properties of the operator:                   *)
 (*     We distinguish: monoid laws (op is associative, idx is an identity     *)
 (*     element), abelian monoid laws (op is also commutative), and laws with  *)
 (*     a distributive operation (semi-rings). Examples of such results are    *)
@@ -34,13 +39,13 @@ Require Import  path div fintype tuple finfun.
 (* - <bigop> is one of \big[op/idx], \sum, \prod, or \max (see below).        *)
 (* - <general_term> can be any expression.                                    *)
 (* - <range> binds an index variable in <general_term>; <range> is one of     *)
-(*    (i <- s)     i ranges over the sequence s                               *)
-(*    (m <= i < n) i ranges over the nat interval m, m.+1, ..., n.-1          *)
-(*    (i < n)      i ranges over the (finite) type 'I_n (i.e., ordinal n)     *)
-(*    (i : T)      i ranges over the finite type T                            *)
-(*    i or (i)     i ranges over its (inferred) finite type                   *)
+(*    (i <- s)     i ranges over the sequence s.                              *)
+(*    (m <= i < n) i ranges over the nat interval m, m+1, ..., n-1.           *)
+(*    (i < n)      i ranges over the (finite) type 'I_n (i.e., ordinal n).    *)
+(*    (i : T)      i ranges over the finite type T.                           *)
+(*    i or (i)     i ranges over its (inferred) finite type.                  *)
 (*    (i in A)     i ranges over the elements that satisfy the collective     *)
-(*                 predicate A (the domain of A must be a finite type)        *)
+(*                 predicate A (the domain of A must be a finite type).       *)
 (*    (i <- s | <condition>) limits the range to the i for which <condition>  *)
 (*                 holds. <condition> can be any expression that coerces to   *)
 (*                 bool, and may mention the bound index i. All six kinds of  *)
@@ -54,13 +59,13 @@ Require Import  path div fintype tuple finfun.
 (*   natural numbers with addition, multiplication and maximum (and their     *)
 (*   corresponding neutral elements), respectively.                           *)
 (* - The "\sum" and "\prod" reserved notations are overloaded in ssralg in    *)
-(*   the %R scope, in mxalgebra, vector & falgebra in the %MS and %VS scopes; *)
-(*   "\prod" is also overloaded in fingroup, the %g and %G scopes.            *)
+(*   the %R scope; in mxalgebra, vector & falgebra in the %MS and %VS scopes; *)
+(*   "\prod" is also overloaded in fingroup, in the %g and %G scopes.         *)
 (* - We reserve "\bigcup" and "\bigcap" notations for iterated union and      *)
 (*   intersection (of sets, groups, vector spaces, etc).                      *)
 (******************************************************************************)
 (* Tips for using lemmas in this file:                                        *)
-(* to apply a lemma for a specific operator: if no special property is        *)
+(* To apply a lemma for a specific operator: if no special property is        *)
 (* required for the operator, simply apply the lemma; if the lemma needs      *)
 (* certain properties for the operator, make sure the appropriate Canonical   *)
 (* instances are declared.                                                    *)
@@ -689,7 +694,7 @@ Lemma big_rec3 I r (P : pred I) F1 F2 F3
   K (\big[op1/id1]_(i <- r | P i) F1 i)
     (\big[op2/id2]_(i <- r | P i) F2 i)
     (\big[op3/id3]_(i <- r | P i) F3 i).
-Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; exact: K_F. Qed.
+Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: K_F. Qed.
 
 Hypothesis Kop : forall x1 x2 x3 y1 y2 y3,
   K x1 x2 x3 -> K y1 y2 y3-> K (op1 x1 y1) (op2 x2 y2) (op3 x3 y3).
@@ -698,7 +703,7 @@ Lemma big_ind3 I r (P : pred I) F1 F2 F3
   K (\big[op1/id1]_(i <- r | P i) F1 i)
     (\big[op2/id2]_(i <- r | P i) F2 i)
     (\big[op3/id3]_(i <- r | P i) F3 i).
-Proof. by apply: big_rec3 => i x1 x2 x3 /K_F; exact: Kop. Qed.
+Proof. by apply: big_rec3 => i x1 x2 x3 /K_F; apply: Kop. Qed.
 
 End Elim3.
 
@@ -717,13 +722,13 @@ Lemma big_rec2 I r (P : pred I) F1 F2
     (K_F : forall i y1 y2, P i -> K y1 y2 ->
        K (op1 (F1 i) y1) (op2 (F2 i) y2)) :
   K (\big[op1/id1]_(i <- r | P i) F1 i) (\big[op2/id2]_(i <- r | P i) F2 i).
-Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; exact: K_F. Qed.
+Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: K_F. Qed.
 
 Hypothesis Kop : forall x1 x2 y1 y2,
   K x1 x2 -> K y1 y2 -> K (op1 x1 y1) (op2 x2 y2).
 Lemma big_ind2 I r (P : pred I) F1 F2 (K_F : forall i, P i -> K (F1 i) (F2 i)) :
   K (\big[op1/id1]_(i <- r | P i) F1 i) (\big[op2/id2]_(i <- r | P i) F2 i).
-Proof. by apply: big_rec2 => i x1 x2 /K_F; exact: Kop. Qed.
+Proof. by apply: big_rec2 => i x1 x2 /K_F; apply: Kop. Qed.
 
 Hypotheses (f_op : {morph f : x y / op2 x y >-> op1 x y}) (f_id : f id2 = id1).
 Lemma big_morph I r (P : pred I) F :
@@ -746,12 +751,12 @@ Hypothesis Kid : K idx.
 Lemma big_rec I r (P : pred I) F
     (Kop : forall i x, P i -> K x -> K (op (F i) x)) :
   K (\big[op/idx]_(i <- r | P i) F i).
-Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; exact: Kop. Qed.
+Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: Kop. Qed.
 
 Hypothesis Kop : forall x y, K x -> K y -> K (op x y).
 Lemma big_ind I r (P : pred I) F (K_F : forall i, P i -> K (F i)) :
   K (\big[op/idx]_(i <- r | P i) F i).
-Proof. by apply: big_rec => // i x /K_F /Kop; exact. Qed.
+Proof. by apply: big_rec => // i x /K_F /Kop; apply. Qed.
 
 Hypothesis Kop' : forall x y, K x -> K y -> op x y = op' x y.
 Lemma eq_big_op I r (P : pred I) F (K_F : forall i, P i -> K (F i)) :
@@ -789,7 +794,7 @@ Lemma big_filter_cond r (P1 P2 : pred I) F :
      = \big[op/idx]_(i <- r | P1 i && P2 i) F i.
 Proof.
 rewrite -big_filter -(big_filter r); congr bigop.
-rewrite -filter_predI; apply: eq_filter => i; exact: andbC.
+by rewrite -filter_predI; apply: eq_filter => i; apply: andbC.
 Qed.
 
 Lemma eq_bigl r (P1 P2 : pred I) F :
@@ -801,7 +806,7 @@ Proof. by move=> eqP12; rewrite -!(big_filter r) (eq_filter eqP12). Qed.
 Lemma big_andbC r (P Q : pred I) F :
   \big[op/idx]_(i <- r | P i && Q i) F i
     = \big[op/idx]_(i <- r | Q i && P i) F i.
-Proof. by apply: eq_bigl => i; exact: andbC. Qed.
+Proof. by apply: eq_bigl => i; apply: andbC. Qed.
 
 Lemma eq_bigr r (P : pred I) F1 F2 : (forall i, P i -> F1 i = F2 i) ->
   \big[op/idx]_(i <- r | P i) F1 i = \big[op/idx]_(i <- r | P i) F2 i.
@@ -815,7 +820,7 @@ Proof. by move/eq_bigl <-; move/eq_bigr->. Qed.
 Lemma congr_big r1 r2 (P1 P2 : pred I) F1 F2 :
     r1 = r2 -> P1 =1 P2 -> (forall i, P1 i -> F1 i = F2 i) ->
   \big[op/idx]_(i <- r1 | P1 i) F1 i = \big[op/idx]_(i <- r2 | P2 i) F2 i.
-Proof. by move=> <-{r2}; exact: eq_big. Qed.
+Proof. by move=> <-{r2}; apply: eq_big. Qed.
 
 Lemma big_nil (P : pred I) F : \big[op/idx]_(i <- [::] | P i) F i = idx.
 Proof. by rewrite unlock. Qed.
@@ -846,7 +851,7 @@ Proof. by rewrite big_hasC // has_pred0. Qed.
 
 Lemma big_pred0 r (P : pred I) F :
   P =1 xpred0 -> \big[op/idx]_(i <- r | P i) F i = idx.
-Proof. by move/eq_bigl->; exact: big_pred0_eq. Qed.
+Proof. by move/eq_bigl->; apply: big_pred0_eq. Qed.
 
 Lemma big_cat_nested r1 r2 (P : pred I) F :
     let x := \big[op/idx]_(i <- r2 | P i) F i in
@@ -911,8 +916,8 @@ Lemma congr_big_nat m1 n1 m2 n2 P1 P2 F1 F2 :
 Proof.
 move=> <- <- eqP12 eqF12; rewrite big_seq_cond (big_seq_cond _ P2).
 apply: eq_big => i; rewrite ?inE /= !mem_index_iota.
-  by apply: andb_id2l; exact: eqP12.
-by rewrite andbC; exact: eqF12.
+  by apply: andb_id2l; apply: eqP12.
+by rewrite andbC; apply: eqF12.
 Qed.
 
 Lemma eq_big_nat m n F1 F2 :
@@ -934,7 +939,7 @@ Qed.
 Lemma big_ltn m n F :
      m < n ->
   \big[op/idx]_(m <= i < n) F i = op (F m) (\big[op/idx]_(m.+1 <= i < n) F i).
-Proof. move=> lt_mn; exact: big_ltn_cond. Qed.
+Proof. by move=> lt_mn; apply: big_ltn_cond. Qed.
 
 Lemma big_addn m n a (P : pred nat) F :
   \big[op/idx]_(m + a <= i < n | P i) F i =
@@ -984,7 +989,7 @@ Proof. by move/big_nat_widen=> len12; rewrite -big_mkord len12 big_mkord. Qed.
 Lemma big_ord_widen n1 n2 (F : nat -> R) :
     n1 <= n2 ->
   \big[op/idx]_(i < n1) F i = \big[op/idx]_(i < n2 | i < n1) F i.
-Proof. by move=> le_n12; exact: (big_ord_widen_cond (predT)). Qed.
+Proof. by move=> le_n12; apply: (big_ord_widen_cond (predT)). Qed.
 
 Lemma big_ord_widen_leq n1 n2 (P : pred 'I_(n1.+1)) F :
     n1 < n2 ->
@@ -1047,7 +1052,7 @@ Proof. exact: (big_ord_narrow_cond (predT)). Qed.
 Lemma big_ord_narrow_leq n1 n2 F (le_n12 : n1 <= n2) :
     let w := @widen_ord n1.+1 n2.+1 le_n12 in
   \big[op/idx]_(i < n2.+1 | i <= n1) F i = \big[op/idx]_(i < n1.+1) F (w i).
-Proof.  exact: (big_ord_narrow_cond_leq (predT)). Qed.
+Proof. exact: (big_ord_narrow_cond_leq (predT)). Qed.
 
 Lemma big_ord_recl n F :
   \big[op/idx]_(i < n.+1) F i =
@@ -1115,12 +1120,12 @@ Qed.
 
 Lemma big1_eq I r (P : pred I) : \big[*%M/1]_(i <- r | P i) 1 = 1.
 Proof.
-by rewrite big_const_seq; elim: (count _ _) => //= n ->; exact: mul1m.
+by rewrite big_const_seq; elim: (count _ _) => //= n ->; apply: mul1m.
 Qed.
 
 Lemma big1 I r (P : pred I) F :
   (forall i, P i -> F i = 1) -> \big[*%M/1]_(i <- r | P i) F i = 1.
-Proof. by move/(eq_bigr _)->; exact: big1_eq. Qed.
+Proof. by move/(eq_bigr _)->; apply: big1_eq. Qed.
 
 Lemma big1_seq (I : eqType) r (P : pred I) F :
     (forall i, P i && (i \in r) -> F i = 1) ->
@@ -1159,7 +1164,7 @@ Proof. by rewrite -big_filter filter_index_enum enum1 big_seq1. Qed.
 
 Lemma big_pred1 (I : finType) i (P : pred I) F :
   P =1 pred1 i -> \big[*%M/1]_(j | P j) F j = F i.
-Proof. by move/(eq_bigl _ _)->; exact: big_pred1_eq. Qed.
+Proof. by move/(eq_bigl _ _)->; apply: big_pred1_eq. Qed.
 
 Lemma big_cat_nat n m p (P : pred nat) F : m <= n -> n <= p ->
   \big[*%M/1]_(m <= i < p | P i) F i =
@@ -1233,7 +1238,7 @@ elim: r1 r2 => [|i r1 IHr1] r2 eq_r12.
 have r2i: i \in r2 by rewrite -has_pred1 has_count -eq_r12 /= eqxx.
 case/splitPr: r2 / r2i => [r3 r4] in eq_r12 *; rewrite big_cat /= !big_cons.
 rewrite mulmCA; congr (_ * _); rewrite -big_cat; apply: IHr1 => a.
-move/(_ a): eq_r12; rewrite !count_cat /= addnCA; exact: addnI.
+by move/(_ a): eq_r12; rewrite !count_cat /= addnCA; apply: addnI.
 Qed.
 
 Lemma big_uniq (I : finType) (r : seq I) F :
@@ -1371,7 +1376,7 @@ Implicit Arguments reindex [I J P F].
 
 Lemma reindex_inj (I : finType) (h : I -> I) (P : pred I) F :
   injective h -> \big[*%M/1]_(i | P i) F i = \big[*%M/1]_(j | P (h j)) F (h j).
-Proof. move=> injh; exact: reindex (onW_bij _ (injF_bij injh)). Qed.
+Proof. by move=> injh; apply: reindex (onW_bij _ (injF_bij injh)). Qed.
 Implicit Arguments reindex_inj [I h P F].
 
 Lemma big_nat_rev m n P F :
@@ -1414,7 +1419,7 @@ rewrite (eq_bigr _ _ _ (fun _ _ => big_tnth _ _ rI _ _)) (big_tnth _ _ rJ).
 rewrite (eq_bigr _ _ _ (fun _ _ => (big_tnth _ _ rJ _ _))) big_tnth.
 rewrite !pair_big_dep (reindex_onto (p _ _) (p _ _)) => [|[]] //=.
 apply: eq_big => [] [j i] //=; symmetry; rewrite eqxx andbT andb_idl //.
-by case/andP; exact: PQxQ.
+by case/andP; apply: PQxQ.
 Qed.
 Implicit Arguments exchange_big_dep [I J rI rJ P Q F].
 
@@ -1522,11 +1527,11 @@ Notation Local "x + y" := (plus x y).
 
 Lemma big_distrl I r a (P : pred I) F :
   \big[+%M/0]_(i <- r | P i) F i * a = \big[+%M/0]_(i <- r | P i) (F i * a).
-Proof. by rewrite (big_endo ( *%M^~ a)) ?mul0m // => x y; exact: mulm_addl. Qed.
+Proof. by rewrite (big_endo ( *%M^~ a)) ?mul0m // => x y; apply: mulm_addl. Qed.
 
 Lemma big_distrr I r a (P : pred I) F :
   a * \big[+%M/0]_(i <- r | P i) F i = \big[+%M/0]_(i <- r | P i) (a * F i).
-Proof. by rewrite big_endo ?mulm0 // => x y; exact: mulm_addr. Qed.
+Proof. by rewrite big_endo ?mulm0 // => x y; apply: mulm_addr. Qed.
 
 Lemma big_distrlr I J rI rJ (pI : pred I) (pJ : pred J) F G :
   (\big[+%M/0]_(i <- rI | pI i) F i) * (\big[+%M/0]_(j <- rJ | pJ j) G j)
@@ -1542,11 +1547,11 @@ rewrite -big_filter filter_index_enum; set r := enum P; symmetry.
 transitivity (\big[+%M/0]_(f in Pf r) \big[*%M/1]_(i <- r) F i (f i)).
   apply: eq_big => f; last by rewrite -big_filter filter_index_enum.
   by apply: eq_forallb => i; rewrite /= mem_enum.
-have: uniq r by exact: enum_uniq.
+have: uniq r by apply: enum_uniq.
 elim: {P}r => /= [_ | i r IHr].
   rewrite (big_pred1 [ffun => j0]) ?big_nil //= => f.
   apply/familyP/eqP=> /= [Df |->{f} i]; last by rewrite ffunE !inE.
-  by apply/ffunP=> i; rewrite ffunE; exact/eqP/Df.
+  by apply/ffunP=> i; rewrite ffunE; apply/eqP/Df.
 case/andP=> /negbTE nri; rewrite big_cons big_distrl => {IHr}/IHr <-.
 rewrite (partition_big (fun f : fIJ => f i) (Q i)) => [|f]; last first.
   by move/familyP/(_ i); rewrite /= inE /= eqxx.
@@ -1595,7 +1600,7 @@ Proof. exact: bigA_distr_big_dep. Qed.
 Lemma bigA_distr_bigA (I J : finType) F :
   \big[*%M/1]_(i : I) \big[+%M/0]_(j : J) F i j
     = \big[+%M/0]_(f : {ffun I -> J}) \big[*%M/1]_i F i (f i).
-Proof. by rewrite bigA_distr_big; apply: eq_bigl => ?; exact/familyP. Qed.
+Proof. by rewrite bigA_distr_big; apply: eq_bigl => ?; apply/familyP. Qed.
 
 End Distributivity.
 
@@ -1677,13 +1682,13 @@ Lemma leqif_sum (I : finType) (P C : pred I) (E1 E2 : I -> nat) :
   \sum_(i | P i) E1 i <= \sum_(i | P i) E2 i ?= iff [forall (i | P i), C i].
 Proof.
 move=> leE12; rewrite -big_andE.
-by elim/big_rec3: _ => // i Ci m1 m2 /leE12; exact: leqif_add.
+by elim/big_rec3: _ => // i Ci m1 m2 /leE12; apply: leqif_add.
 Qed.
 
 Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i) ->
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
-Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; exact: leq_add. Qed.
+Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
 
 Lemma sum_nat_eq0 (I : finType) (P : pred I) (E : I -> nat) :
   (\sum_(i | P i) E i == 0)%N = [forall (i | P i), E i == 0%N].
@@ -1695,7 +1700,7 @@ Proof. by move=> Fpos; elim/big_ind: _ => // n1 n2; rewrite muln_gt0 => ->. Qed.
 
 Lemma prodn_gt0 I r (P : pred I) F :
   (forall i, 0 < F i) -> 0 < \prod_(i <- r | P i) F i.
-Proof. move=> Fpos; exact: prodn_cond_gt0. Qed.
+Proof. by move=> Fpos; apply: prodn_cond_gt0. Qed.
 
 Lemma leq_bigmax_cond (I : finType) (P : pred I) F i0 :
   P i0 -> F i0 <= \max_(i | P i) F i.
@@ -1710,20 +1715,20 @@ Lemma bigmax_leqP (I : finType) (P : pred I) m F :
   reflect (forall i, P i -> F i <= m) (\max_(i | P i) F i <= m).
 Proof.
 apply: (iffP idP) => leFm => [i Pi|].
-  by apply: leq_trans leFm; exact: leq_bigmax_cond.
+  by apply: leq_trans leFm; apply: leq_bigmax_cond.
 by elim/big_ind: _ => // m1 m2; rewrite geq_max => ->.
 Qed.
 
 Lemma bigmax_sup (I : finType) i0 (P : pred I) m F :
   P i0 -> m <= F i0 -> m <= \max_(i | P i) F i.
-Proof. by move=> Pi0 le_m_Fi0; exact: leq_trans (leq_bigmax_cond i0 Pi0). Qed.
+Proof. by move=> Pi0 le_m_Fi0; apply: leq_trans (leq_bigmax_cond i0 Pi0). Qed.
 Implicit Arguments bigmax_sup [I P m F].
 
 Lemma bigmax_eq_arg (I : finType) i0 (P : pred I) F :
   P i0 -> \max_(i | P i) F i = F [arg max_(i > i0 | P i) F i].
 Proof.
 move=> Pi0; case: arg_maxP => //= i Pi maxFi.
-by apply/eqP; rewrite eqn_leq leq_bigmax_cond // andbT; exact/bigmax_leqP.
+by apply/eqP; rewrite eqn_leq leq_bigmax_cond // andbT; apply/bigmax_leqP.
 Qed.
 Implicit Arguments bigmax_eq_arg [I P F].
 
@@ -1731,7 +1736,7 @@ Lemma eq_bigmax_cond (I : finType) (A : pred I) F :
   #|A| > 0 -> {i0 | i0 \in A & \max_(i in A) F i = F i0}.
 Proof.
 case: (pickP A) => [i0 Ai0 _ | ]; last by move/eq_card0->.
-by exists [arg max_(i > i0 in A) F i]; [case: arg_maxP | exact: bigmax_eq_arg].
+by exists [arg max_(i > i0 in A) F i]; [case: arg_maxP | apply: bigmax_eq_arg].
 Qed.
 
 Lemma eq_bigmax (I : finType) F : #|I| > 0 -> {i0 : I | \max_i F i = F i0}.

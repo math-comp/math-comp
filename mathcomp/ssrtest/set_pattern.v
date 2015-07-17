@@ -1,4 +1,6 @@
-Require Import ssreflect.
+Require Import mathcomp.ssreflect.ssreflect.
+
+Axiom daemon : False. Ltac myadmit := case: daemon.
 
 Ltac T1 x := match goal with |- _ => set t := (x in X in _ = X) end.
 Ltac T2 x := first [set t := (x in RHS)].
@@ -6,6 +8,7 @@ Ltac T3 x := first [set t := (x in Y in _ = Y)|idtac].
 Ltac T4 x := set t := (x in RHS);idtac.
 Ltac T5 x := match goal with |- _ => set t := (x in RHS) | |- _ => idtac end.
 
+From mathcomp
 Require Import ssrbool ssrnat.
 
 Lemma foo x y : x.+1 = y + x.+1.
@@ -31,7 +34,7 @@ rewrite [RHS]addnC.
   match goal with |- x.+1 = x.+1 + y => rewrite -[RHS]addnC end.
 rewrite -[in RHS](@subnK 1 x.+1) //.
   match goal with |- x.+1 = y + (x.+1 - 1 + 1) => rewrite subnK // end.
-have H : x.+1 = y by admit.
+have H : x.+1 = y by myadmit.
 set t := _.+1 in H |- *.
   match goal with H : t = y |- t = y + t => rewrite /t {t} in H * end.
 set t := (_.+1 in X in _ + X) in H |- *.

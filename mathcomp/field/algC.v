@@ -1,12 +1,13 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype bigop finset prime generic_quotient.
-From mathcomp.algebra
-Require Import ssralg poly polydiv mxpoly ssrnum ssrint rat intdiv.
-Require Import countalg algebraics_fundamentals.
+From mathcomp
+Require Import ssrbool ssrfun ssrnat eqtype seq choice div fintype.
+From mathcomp
+Require Import path bigop finset prime ssralg poly polydiv mxpoly.
+From mathcomp
+Require Import generic_quotient countalg ssrnum ssrint rat intdiv.
+From mathcomp
+Require Import algebraics_fundamentals.
 
 (******************************************************************************)
 (* This file provides an axiomatic construction of the algebraic numbers.     *)
@@ -69,7 +70,7 @@ have nz2: 2%:R != 0 :> L.
   apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
     by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
-  have{char2} char2: 2 \in [char L] by exact/eqP.
+  have{char2} char2: 2 \in [char L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
     rewrite fmorph_div rmorphD conjK -{1}[conj e](addNKr e) mulrDl.
@@ -1082,7 +1083,7 @@ Proof. by move/(rootCX 0)/(_ ler01). Qed.
 
 Lemma rootCpX n x k : (k > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
 Proof.
-by case: n => [|n] k_gt0; [rewrite !root0C expr0n gtn_eqF | exact: rootCX].
+by case: n => [|n] k_gt0; [rewrite !root0C expr0n gtn_eqF | apply: rootCX].
 Qed.
 
 Lemma rootCV n x : (n > 0)%N -> 0 <= x -> n.-root x^-1 = (n.-root x)^-1.
@@ -1253,7 +1254,7 @@ Lemma normC_sum_upper (I : finType) (P : pred I) (F G : I -> algC) :
    forall i, P i -> F i = G i.
 Proof.
 set sumF := \sum_(i | _) _; set sumG := \sum_(i | _) _ => leFG eq_sumFG.
-have posG i: P i -> 0 <= G i by move/leFG; apply: ler_trans; exact: normr_ge0.
+have posG i: P i -> 0 <= G i by move/leFG; apply: ler_trans; apply: normr_ge0.
 have norm_sumG: `|sumG| = sumG by rewrite ger0_norm ?sumr_ge0.
 have norm_sumF: `|sumF| = \sum_(i | P i) `|F i|.
   apply/eqP; rewrite eqr_le ler_norm_sum eq_sumFG norm_sumG -subr_ge0 -sumrB.
@@ -1655,7 +1656,9 @@ Proof. by rewrite !(addrC x) eqCmodDr. Qed.
 
 Lemma eqCmodD e x1 x2 y1 y2 :
   (x1 == x2 %[mod e] -> y1 == y2 %[mod e] -> x1 + y1 == x2 + y2 %[mod e])%C.
-Proof. rewrite -(eqCmodDl e x2 y1) -(eqCmodDr e y1); exact: eqCmod_trans. Qed.
+Proof.
+by rewrite -(eqCmodDl e x2 y1) -(eqCmodDr e y1); apply: eqCmod_trans.
+Qed.
 
 Lemma eqCmod_nat (e m n : nat) : (m == n %[mod e])%C = (m == n %[mod e]).
 Proof.
@@ -1832,7 +1835,7 @@ Section AutLmodC.
 Variables (U V : lmodType algC) (f : {additive U -> V}).
 
 Lemma raddfZ_Cnat a u : a \in Cnat -> f (a *: u) = a *: f u. 
-Proof. by case/CnatP=> n ->; exact: raddfZnat. Qed.
+Proof. by case/CnatP=> n ->; apply: raddfZnat. Qed.
 
 Lemma raddfZ_Cint a u : a \in Cint -> f (a *: u) = a *: f u. 
 Proof. by case/CintP=> m ->; rewrite !scaler_int raddfMz. Qed.

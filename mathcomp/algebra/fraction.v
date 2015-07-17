@@ -1,10 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice tuple bigop generic_quotient.
-Require Import ssralg poly polydiv.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat div seq choice tuple.
+From mathcomp
+Require Import bigop ssralg poly polydiv generic_quotient.
 
 (* This file builds the field of fraction of any integral domain. *)
 (* The main result of this file is the existence of the field *)

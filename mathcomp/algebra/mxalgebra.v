@@ -1,12 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype finfun bigop prime binomial finset.
-From mathcomp.fingroup
-Require Import fingroup perm.
-Require Import ssralg finalg zmodp matrix.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import finfun bigop prime binomial ssralg finset fingroup finalg.
+From mathcomp
+Require Import perm zmodp matrix.
 
 (*****************************************************************************)
 (* In this file we develop the rank and row space theory of matrices, based  *)
@@ -440,7 +439,7 @@ Proof.
 set MN := M *m N; set rMN := \rank _.
 pose L : 'M_(rMN, m) := pid_mx rMN *m invmx (col_ebase MN).
 pose U : 'M_(n, rMN) := invmx (row_ebase MN) *m pid_mx rMN.
-suffices: L *m M *m (N *m U) = 1%:M by exact: mulmx1_min.
+suffices: L *m M *m (N *m U) = 1%:M by apply: mulmx1_min.
 rewrite mulmxA -(mulmxA L) -[M *m N]mulmx_ebase -/MN.
 by rewrite !mulmxA mulmxKV // mulmxK // !pid_mx_id /rMN ?pid_mx_1.
 Qed.
@@ -531,14 +530,14 @@ Proof. by case/submxP=> D ->; rewrite mulmxA submxMl. Qed.
 Lemma submx_trans m1 m2 m3 n
                  (A : 'M_(m1, n)) (B : 'M_(m2, n)) (C : 'M_(m3, n)) :
   (A <= B -> B <= C -> A <= C)%MS.
-Proof. by case/submxP=> D ->{A}; exact: mulmx_sub. Qed.
+Proof. by case/submxP=> D ->{A}; apply: mulmx_sub. Qed.
 
 Lemma ltmx_sub_trans m1 m2 m3 n
                      (A : 'M_(m1, n)) (B : 'M_(m2, n)) (C : 'M_(m3, n)) :
   (A < B)%MS -> (B <= C)%MS -> (A < C)%MS.
 Proof.
 case/andP=> sAB ltAB sBC; rewrite ltmxE (submx_trans sAB) //.
-by apply: contra ltAB; exact: submx_trans.
+by apply: contra ltAB; apply: submx_trans.
 Qed.
 
 Lemma sub_ltmx_trans m1 m2 m3 n
@@ -546,11 +545,11 @@ Lemma sub_ltmx_trans m1 m2 m3 n
   (A <= B)%MS -> (B < C)%MS -> (A < C)%MS.
 Proof.
 move=> sAB /andP[sBC ltBC]; rewrite ltmxE (submx_trans sAB) //.
-by apply: contra ltBC => sCA; exact: submx_trans sAB.
+by apply: contra ltBC => sCA; apply: submx_trans sAB.
 Qed.
 
 Lemma ltmx_trans m n : transitive (@ltmx m m n).
-Proof. by move=> A B C; move/ltmxW; exact: sub_ltmx_trans. Qed.
+Proof. by move=> A B C; move/ltmxW; apply: sub_ltmx_trans. Qed.
 
 Lemma ltmx_irrefl m n : irreflexive (@ltmx m m n).
 Proof. by move=> A; rewrite /ltmx submx_refl andbF. Qed.
@@ -563,7 +562,7 @@ Lemma submx0null m1 m2 n (A : 'M[F]_(m1, n)) :
 Proof. by case/submxP=> D; rewrite mulmx0. Qed.
 
 Lemma submx0 m n (A : 'M_(m, n)) : (A <= (0 : 'M_n))%MS = (A == 0).
-Proof. by apply/idP/eqP=> [|->]; [exact: submx0null | exact: sub0mx]. Qed.
+Proof. by apply/idP/eqP=> [|->]; [apply: submx0null | apply: sub0mx]. Qed.
 
 Lemma lt0mx m n (A : 'M_(m, n)) : ((0 : 'M_n) < A)%MS = (A != 0).
 Proof. by rewrite /ltmx sub0mx submx0. Qed.
@@ -572,7 +571,7 @@ Lemma ltmx0 m n (A : 'M[F]_(m, n)) : (A < (0 : 'M_n))%MS = false.
 Proof. by rewrite /ltmx sub0mx andbF. Qed.
 
 Lemma eqmx0P m n (A : 'M_(m, n)) : reflect (A = 0) (A == (0 : 'M_n))%MS.
-Proof. by rewrite submx0 sub0mx andbT; exact: eqP. Qed.
+Proof. by rewrite submx0 sub0mx andbT; apply: eqP. Qed.
 
 Lemma eqmx_eq0 m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (A :=: B)%MS -> (A == 0) = (B == 0).
@@ -588,7 +587,7 @@ Lemma summx_sub m1 m2 n (B : 'M_(m2, n))
                 I (r : seq I) (P : pred I) (A_ : I -> 'M_(m1, n)) :
   (forall i, P i -> A_ i <= B)%MS -> ((\sum_(i <- r | P i) A_ i)%R <= B)%MS.
 Proof.
-move=> leAB; elim/big_ind: _ => // [|A1 A2]; [exact: sub0mx | exact: addmx_sub].
+by move=> leAB; elim/big_ind: _ => // [|C D]; [apply/sub0mx | apply/addmx_sub].
 Qed.
 
 Lemma scalemx_sub m1 m2 n a (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -608,7 +607,7 @@ Lemma row_subP m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (forall i, row i A <= B)%MS (A <= B)%MS.
 Proof.
 apply: (iffP idP) => [sAB i|sAB].
-  by apply: submx_trans sAB; exact: row_sub.
+  by apply: submx_trans sAB; apply: row_sub.
 rewrite submxE; apply/eqP/row_matrixP=> i; apply/eqP.
 by rewrite row_mul row0 -submxE.
 Qed.
@@ -624,7 +623,7 @@ Implicit Arguments rV_subP [m1 m2 n A B].
 
 Lemma row_subPn m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (exists i, ~~ (row i A <= B)%MS) (~~ (A <= B)%MS).
-Proof. by rewrite (sameP row_subP forallP) negb_forall; exact: existsP. Qed.
+Proof. by rewrite (sameP row_subP forallP) negb_forall; apply: existsP. Qed.
 
 Lemma sub_rVP n (u v : 'rV_n) : reflect (exists a, u = a *: v) (u <= v)%MS.
 Proof.
@@ -636,14 +635,14 @@ Qed.
 Lemma rank_rV n (v : 'rV_n) : \rank v = (v != 0).
 Proof.
 case: eqP => [-> | nz_v]; first by rewrite mxrank0.
-by apply/eqP; rewrite eqn_leq rank_leq_row lt0n mxrank_eq0; exact/eqP.
+by apply/eqP; rewrite eqn_leq rank_leq_row lt0n mxrank_eq0; apply/eqP.
 Qed.
 
 Lemma rowV0Pn m n (A : 'M_(m, n)) :
   reflect (exists2 v : 'rV_n, v <= A & v != 0)%MS (A != 0).
 Proof.
 rewrite -submx0; apply: (iffP idP) => [| [v svA]]; last first.
-  by rewrite -submx0; exact: contra (submx_trans _).
+  by rewrite -submx0; apply: contra (submx_trans _).
 by case/row_subPn=> i; rewrite submx0; exists (row i A); rewrite ?row_sub.
 Qed.
 
@@ -651,7 +650,7 @@ Lemma rowV0P m n (A : 'M_(m, n)) :
   reflect (forall v : 'rV_n, v <= A -> v = 0)%MS (A == 0).
 Proof.
 rewrite -[A == 0]negbK; case: rowV0Pn => IH.
-  by right; case: IH => v svA nzv IH; case/eqP: nzv; exact: IH.
+  by right; case: IH => v svA nzv IH; case/eqP: nzv; apply: IH.
 by left=> v svA; apply/eqP; apply/idPn=> nzv; case: IH; exists v.
 Qed.
 
@@ -703,7 +702,7 @@ Lemma mxrank_unit n (A : 'M_n) : A \in unitmx -> \rank A = n.
 Proof. by rewrite -row_full_unit =>/eqnP. Qed.
 
 Lemma mxrank1 n : \rank (1%:M : 'M_n) = n.
-Proof. by apply: mxrank_unit; exact: unitmx1. Qed.
+Proof. by apply: mxrank_unit; apply: unitmx1. Qed.
 
 Lemma mxrank_delta m n i j : \rank (delta_mx i j : 'M_(m, n)) = 1%N.
 Proof.
@@ -736,8 +735,8 @@ Lemma eqmxP m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
 Proof.
 apply: (iffP andP) => [[sAB sBA] | eqAB]; last by rewrite !eqAB.
 split=> [|m3 C]; first by apply/eqP; rewrite eqn_leq !mxrankS.
-split; first by apply/idP/idP; exact: submx_trans.
-by apply/idP/idP=> sC; exact: submx_trans sC _.
+split; first by apply/idP/idP; apply: submx_trans.
+by apply/idP/idP=> sC; apply: submx_trans sC _.
 Qed.
 Implicit Arguments eqmxP [m1 m2 n A B].
 
@@ -872,7 +871,7 @@ by rewrite qidmx_eq1 row_full_unit unitmx1 => /eqP.
 Qed.
 
 Lemma genmx_id m n (A : 'M_(m, n)) : (<<<<A>>>> = <<A>>)%MS.
-Proof. by apply: eq_genmx; exact: genmxE. Qed.
+Proof. by apply: eq_genmx; apply: genmxE. Qed.
 
 Lemma row_base_free m n (A : 'M_(m, n)) : row_free (row_base A).
 Proof. by apply/eqnP; rewrite eq_row_base. Qed.
@@ -899,7 +898,7 @@ Qed.
 
 Lemma mxrank_leqif_eq m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (A <= B)%MS -> \rank A <= \rank B ?= iff (A == B)%MS.
-Proof. by move=> sAB; rewrite sAB; exact: mxrank_leqif_sup. Qed.
+Proof. by move=> sAB; rewrite sAB; apply: mxrank_leqif_sup. Qed.
 
 Lemma ltmxErank m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (A < B)%MS = (A <= B)%MS && (\rank A < \rank B).
@@ -1044,7 +1043,7 @@ Qed.
 
 Lemma addsmx_addKr n m1 m2 (A B : 'M_(m1, n)) (C : 'M_(m2, n)) :
   (B <= C)%MS -> ((A + B)%R + C :=: A + C)%MS.
-Proof. by rewrite -!(addsmxC C) addrC; exact: addsmx_addKl. Qed.
+Proof. by rewrite -!(addsmxC C) addrC; apply: addsmx_addKl. Qed.
 
 Lemma adds_eqmx m1 m2 m3 m4 n (A : 'M_(m1, n)) (B : 'M_(m2, n))
                               (C : 'M_(m3, n)) (D : 'M_(m4, n)) :
@@ -1114,7 +1113,7 @@ Lemma sub_sumsmxP P m n (A : 'M_(m, n)) (B_ : I -> 'M_n) :
           (A <= \sum_(i | P i) B_ i)%MS.
 Proof.
 apply: (iffP idP) => [| [u_ ->]]; last first.
-  by apply: summx_sub_sums => i _; exact: submxMl. 
+  by apply: summx_sub_sums => i _; apply: submxMl. 
 elim: {P}_.+1 {-2}P A (ltnSn #|P|) => // b IHb P A.
 case: (pickP P) => [i Pi | P0 _]; last first.
   rewrite big_pred0 //; move/submx0null->.
@@ -1137,7 +1136,7 @@ Qed.
 Lemma sumsmxMr P n (A_ : I -> 'M[F]_n) (B : 'M_n) :
   ((\sum_(i | P i) A_ i)%MS *m B :=: \sum_(i | P i) (A_ i *m B))%MS.
 Proof.
-by apply: eqmx_trans (sumsmxMr_gen _ _ _) (eqmx_sums _) => i _; exact: genmxE.
+by apply: eqmx_trans (sumsmxMr_gen _ _ _) (eqmx_sums _) => i _; apply: genmxE.
 Qed.
 
 Lemma rank_pid_mx m n r : r <= m -> r <= n -> \rank (pid_mx r : 'M_(m, n)) = r.
@@ -1194,7 +1193,7 @@ Lemma mulmx0_rank_max m n p (A : 'M_(m, n)) (B : 'M_(n, p)) :
   A *m B = 0 -> \rank A + \rank B <= n.
 Proof.
 move=> AB0; rewrite -{3}(subnK (rank_leq_row B)) leq_add2r.
-rewrite -mxrank_ker mxrankS //; exact/sub_kermxP.
+by rewrite -mxrank_ker mxrankS //; apply/sub_kermxP.
 Qed.
 
 Lemma mxrank_Frobenius m n p q (A : 'M_(m, n)) B (C : 'M_(p, q)) :
@@ -1261,14 +1260,14 @@ move=> eqABid /eqmxP eqAB.
 have{eqABid eqAB} eqAB: equivmx A (qidmx A) =1 equivmx B (qidmx B).
   by move=> C; rewrite /equivmx eqABid !eqAB.
 rewrite {1}/capmx_norm (eq_choose eqAB).
-by apply: choose_id; first rewrite -eqAB; exact: capmx_witnessP.
+by apply: choose_id; first rewrite -eqAB; apply: capmx_witnessP.
 Qed.
 
 Let capmx_nopP m n (A : 'M_(m, n)) : equivmx_spec A (qidmx A) (capmx_nop A).
 Proof.
 rewrite /capmx_nop; case: (eqVneq m n) => [-> | ne_mn] in A *.
   by rewrite conform_mx_id.
-rewrite nonconform_mx ?ne_mn //; exact: capmx_normP.
+by rewrite nonconform_mx ?ne_mn //; apply: capmx_normP.
 Qed.
 
 Let sub_qidmx m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -1340,7 +1339,7 @@ Qed.
 
 Lemma capmx_idPl n m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (A :&: B :=: A)%MS (A <= B)%MS.
-Proof. by rewrite capmxC; exact: capmx_idPr. Qed.
+Proof. by rewrite capmxC; apply: capmx_idPr. Qed.
 
 Lemma capmxS m1 m2 m3 m4 n (A : 'M_(m1, n)) (B : 'M_(m2, n))
                            (C : 'M_(m3, n)) (D : 'M_(m4, n)) :
@@ -1449,7 +1448,7 @@ Qed.
 
 Lemma matrix_modr m1 m2 m3 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) (C : 'M_(m3, n)) :
   (C <= A -> (A :&: B) + C :=: A :&: (B + C))%MS.
-Proof. by rewrite !(capmxC A) -!(addsmxC C); exact: matrix_modl. Qed.
+Proof. by rewrite !(capmxC A) -!(addsmxC C); apply: matrix_modl. Qed.
 
 Lemma capmx_compl m n (A : 'M_(m, n)) : (A :&: A^C)%MS = 0.
 Proof.
@@ -1477,7 +1476,7 @@ Lemma mxrank_injP m n p (A : 'M_(m, n)) (f : 'M_(n, p)) :
   reflect (\rank (A *m f) = \rank A) ((A :&: kermx f)%MS == 0).
 Proof.
 rewrite -mxrank_eq0 -(eqn_add2l (\rank (A *m f))).
-by rewrite mxrank_mul_ker addn0 eq_sym; exact: eqP.
+by rewrite mxrank_mul_ker addn0 eq_sym; apply: eqP.
 Qed.
 
 Lemma mxrank_disjoint_sum m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -1828,7 +1827,7 @@ Qed.
 
 Lemma mxdirect_addsP (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (A :&: B = 0)%MS (mxdirect (A + B)).
-Proof. by rewrite mxdirect_addsE !mxdirect_trivial; exact: eqP. Qed.
+Proof. by rewrite mxdirect_addsE !mxdirect_trivial; apply: eqP. Qed.
 
 End BinaryDirect.
 
@@ -1870,7 +1869,7 @@ Lemma mxdirect_sumsE (S_ : I -> mxsum_expr n n) (xunwrap := unwrap) :
 Proof.
 apply: (iffP (mxdirect_sums_recP _)) => [dxS | [dxS_ dxS] i Pi].
   by do [split; last apply/mxdirect_sumsP] => i; case/dxS.
-by split; [exact: dxS_ | exact: mxdirect_sumsP Pi].
+by split; [apply: dxS_ | apply: mxdirect_sumsP Pi].
 Qed.
 
 End NaryDirect.
@@ -1937,7 +1936,7 @@ Lemma eigenspaceP a m (W : 'M_(m, n)) :
   reflect (W *m g = a *: W) (W <= eigenspace a)%MS.
 Proof.
 rewrite (sameP (sub_kermxP _ _) eqP).
-by rewrite mulmxBr subr_eq0 mul_mx_scalar; exact: eqP.
+by rewrite mulmxBr subr_eq0 mul_mx_scalar; apply: eqP.
 Qed.
 
 Lemma eigenvalueP a :
@@ -1961,7 +1960,7 @@ have nz_aij: a_ i - a_ j != 0.
 case: (sub_dsumsmx dxVi' (sub0mx 1 _)) => C _ _ uniqC.
 rewrite -(eqmx_eq0 (eqmx_scale _ nz_aij)).
 rewrite (uniqC (fun k => (a_ i - a_ k) *: u k)) => // [|k Pi'k|].
-- by rewrite -(uniqC (fun _ => 0)) ?big1 // => k Pi'k; exact: sub0mx.
+- by rewrite -(uniqC (fun _ => 0)) ?big1 // => k Pi'k; apply: sub0mx.
 - by rewrite scalemx_sub ?Vi'u.
 rewrite -{1}(subrr (v *m g)) {1}def_vg def_v scaler_sumr mulmx_suml -sumrB.
 by apply: eq_bigr => k /Vi'u/eigenspaceP->; rewrite scalerBl.
@@ -2220,7 +2219,7 @@ Lemma memmx_subP m1 m2 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) :
   reflect (forall A, A \in R1 -> A \in R2) (R1 <= R2)%MS.
 Proof.
 apply: (iffP idP) => [sR12 A R1_A | sR12]; first exact: submx_trans sR12.
-by apply/rV_subP=> vA; rewrite -(vec_mxK vA); exact: sR12.
+by apply/rV_subP=> vA; rewrite -(vec_mxK vA); apply: sR12.
 Qed.
 Implicit Arguments memmx_subP [m1 m2 n R1 R2].
 
@@ -2270,7 +2269,7 @@ rewrite -{2}rankS (ltn_leqif (mxrank_leqif_sup sSR)).
 apply: (iffP idP) => [/row_subPn[i] | [A sAR]].
   rewrite -[row i R]vec_mxK memmx1; set A := vec_mx _ => nsA.
   by exists A; rewrite // vec_mxK row_sub.
-by rewrite -memmx1; apply: contra; exact: submx_trans.
+by rewrite -memmx1; apply/contra/submx_trans.
 Qed.
 
 Definition mulsmx m1 m2 n (R1 : 'A[F]_(m1, n)) (R2 : 'A_(m2, n)) :=
@@ -2313,7 +2312,7 @@ Lemma mulsmxS m1 m2 m3 m4 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n))
   (R1 <= R3 -> R2 <= R4 -> R1 * R2 <= R3 * R4)%MS.
 Proof.
 move=> sR13 sR24; apply/mulsmx_subP=> A1 A2 R_A1 R_A2.
-by apply: mem_mulsmx; [exact: submx_trans sR13 | exact: submx_trans sR24].
+by apply: mem_mulsmx; [apply: submx_trans sR13 | apply: submx_trans sR24].
 Qed.
 
 Lemma muls_eqmx m1 m2 m3 m4 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n))
@@ -2481,7 +2480,7 @@ Qed.
 Implicit Arguments cent_mxP [m n B R].
 
 Lemma scalar_mx_cent m n a (R : 'A_(m, n)) : (a%:M \in 'C(R))%MS.
-Proof. by apply/cent_mxP=> A _; exact: scalar_mxC. Qed.
+Proof. by apply/cent_mxP=> A _; apply: scalar_mxC. Qed.
 
 Lemma center_mx_sub m n (R : 'A_(m, n)) : ('Z(R) <= R)%MS.
 Proof. exact: capmxSl. Qed.
@@ -2762,7 +2761,7 @@ by rewrite map_mx_sub ? map_mxM.
 Qed.
 
 Lemma map_center_mx m n (E : 'A_(m, n)) : (('Z(E))^f :=: 'Z(E^f))%MS.
-Proof. by rewrite /center_mx -map_cent_mx; exact: map_capmx. Qed.
+Proof. by rewrite /center_mx -map_cent_mx; apply: map_capmx. Qed.
 
 End MapMatrixSpaces.
 

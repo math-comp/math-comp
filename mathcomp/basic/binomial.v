@@ -1,19 +1,20 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect  
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-Require Import  path div fintype tuple finfun bigop prime finset.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq path div.
+From mathcomp
+Require Import fintype tuple finfun bigop prime finset.
 
 (******************************************************************************)
 (* This files contains the definition of:                                     *)
+(*   'C(n, m) == the binomial coeficient n choose m.                          *)
 (*     n ^_ m == the falling (or lower) factorial of n with m terms, i.e.,    *)
-(*               the product n * (n - 1) * ... * (n - m + 1)                  *)
-(*               Note that n ^_ m = 0 if m > n.                               *)
-(*   'C(n, m) == the binomial coeficient n choose m                           *)
-(*            := n ^_ m %/ fact m                                             *)
+(*               the product n * (n - 1) * ... * (n - m + 1).                 *)
+(*               Note that n ^_ m = 0 if m > n, and 'C(n, m) = n ^_ m %/ m/!. *)
 (*                                                                            *)
-(* In additions to the properties of these functions, triangular_sum, Wilson  *)
-(* and Pascal are examples of how to manipulate expressions with bigops.      *)
+(* In additions to the properties of these functions, we prove a few seminal  *)
+(* results such as triangular_sum, Wilson and Pascal; their proofs are good   *)
+(* examples of how to manipulate expressions with bigops.                     *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -55,7 +56,7 @@ have dFact n: 0 < n -> (n.-1)`! = \prod_(0 <= i < n | i != 0) i.
   by rewrite all_predC has_pred1 mem_iota.
 move=> lt1p; have p_gt0 := ltnW lt1p.
 apply/idP/idP=> [pr_p | dv_pF]; last first.
-  apply/primeP; split=> // d dv_dp; have: d <= p by exact: dvdn_leq.
+  apply/primeP; split=> // d dv_dp; have: d <= p by apply: dvdn_leq.
   rewrite orbC leq_eqVlt => /orP[-> // | ltdp].
   have:= dvdn_trans dv_dp dv_pF; rewrite dFact // big_mkord.
   rewrite (bigD1 (Ordinal ltdp)) /=; last by rewrite -lt0n (dvdn_gt0 p_gt0).
@@ -65,7 +66,7 @@ have ltp1p: p.-1 < p by [rewrite prednK]; pose Fpn1 := Ordinal ltp1p.
 case eqF1n1: (Fp1 == Fpn1); first by rewrite -{1}[p]prednK -1?((1 =P p.-1) _).
 have toFpP m: m %% p < p by rewrite ltn_mod.
 pose toFp := Ordinal (toFpP _); pose mFp (i j : 'I_p) := toFp (i * j).
-have Fp_mod (i : 'I_p) : i %% p = i by exact: modn_small.
+have Fp_mod (i : 'I_p) : i %% p = i by apply: modn_small.
 have mFpA: associative mFp.
   by move=> i j k; apply: val_inj; rewrite /= modnMml modnMmr mulnA.
 have mFpC: commutative mFp by move=> i j; apply: val_inj; rewrite /= mulnC.
@@ -358,7 +359,7 @@ Lemma card_inj_ffuns_on D T (R : pred T) :
 Proof.
 rewrite -card_uniq_tuples.
 have bijFF: {on (_ : pred _), bijective (@Finfun D T)}.
-  by exists val => // x _; exact: val_inj.
+  by exists val => // x _; apply: val_inj.
 rewrite -(on_card_preimset (bijFF _)); apply: eq_card => t.
 rewrite !inE -(codom_ffun (Finfun t)); congr (_ && _); apply: negb_inj.
 by rewrite -has_predC has_map enumT has_filter -size_eq0 -cardE.
@@ -371,17 +372,24 @@ rewrite -card_inj_ffuns_on; apply: eq_card => f.
 by rewrite 2!inE; case: ffun_onP => // [].
 Qed.
 
-Lemma card_draws T k : #|[set A : {set T} | #|A| == k]| = 'C(#|T|, k).
+Lemma cards_draws T (B : {set T}) k :
+  #|[set A : {set T} | A \subset B & #|A| == k]| = 'C(#|B|, k).
 Proof.
-have [ltTk | lekT] := ltnP #|T| k.
+have [ltTk | lekT] := ltnP #|B| k.
   rewrite bin_small // eq_card0 // => A.
-  by rewrite inE eqn_leq andbC leqNgt (leq_ltn_trans (max_card _)).
+  rewrite inE eqn_leq [k <= _]leqNgt.
+  have [AsubB /=|//] := boolP (A \subset B).
+  by rewrite (leq_ltn_trans (subset_leq_card AsubB)) ?andbF.
 apply/eqP; rewrite -(eqn_pmul2r (fact_gt0 k)) bin_ffact // eq_sym.
-rewrite -sum_nat_dep_const -{1 3}(card_ord k) -card_inj_ffuns -sum1dep_card.
+rewrite -sum_nat_dep_const -{1 3}(card_ord k).
+rewrite -card_inj_ffuns_on -sum1dep_card.
 pose imIk (f : {ffun 'I_k -> T}) := f @: 'I_k.
-rewrite (partition_big imIk (fun A => #|A| == k)) /= => [|f]; last first.
-  by move/injectiveP=> inj_f; rewrite card_imset ?card_ord.
-apply/eqP; apply: eq_bigr => A /eqP cardAk.
+rewrite (partition_big imIk (fun A => (A \subset B) && (#|A| == k))) /=
+  => [|f]; last first.
+  move=> /andP [/ffun_onP f_ffun /injectiveP inj_f].
+  rewrite card_imset ?card_ord // eqxx andbT.
+  by apply/subsetP => x /imsetP [i _ ->]; rewrite f_ffun.
+apply/eqP; apply: eq_bigr => A /andP [AsubB /eqP cardAk].
 have [f0 inj_f0 im_f0]: exists2 f, injective f & f @: 'I_k = A.
   rewrite -cardAk; exists enum_val; first exact: enum_val_inj.
   apply/setP=> a; apply/imsetP/idP=> [[i _ ->] | Aa]; first exact: enum_valP.
@@ -392,18 +400,27 @@ rewrite (reindex (fun p : {ffun _} => [ffun i => f0 (p i)])) /=; last first.
     apply/ffunP=> i; rewrite ffunE /ff0'; case: pickP => [j | /(_ (p i))].
       by rewrite ffunE (inj_eq inj_f0) => /eqP.
     by rewrite ffunE eqxx.
-  rewrite -im_f0 => /andP[/injectiveP injf /eqP im_f].
+  rewrite -im_f0 => /andP[/andP[/ffun_onP f_ffun /injectiveP injf] /eqP im_f].
   apply/ffunP=> i; rewrite !ffunE /ff0'; case: pickP => [y /eqP //|].
   have /imsetP[j _ eq_f0j_fi]: f i \in f0 @: 'I_k by rewrite -im_f mem_imset.
   by move/(_ j)=> /eqP[].
 rewrite -ffactnn -card_inj_ffuns -sum1dep_card; apply: eq_bigl => p.
-apply/andP/injectiveP=> [[/injectiveP inj_f0p _] i j eq_pij | inj_p].
+rewrite -andbA.
+apply/and3P/injectiveP=> [[_ /injectiveP inj_f0p _] i j eq_pij | inj_p].
   by apply: inj_f0p; rewrite !ffunE eq_pij.
 set f := finfun _.
-have injf: injective f by move=> i j; rewrite !ffunE => /inj_f0; exact: inj_p.
-split; first exact/injectiveP.
-rewrite eqEcard card_imset // cardAk card_ord leqnn andbT -im_f0.
-by apply/subsetP=> x /imsetP[i _ ->]; rewrite ffunE mem_imset.
+have injf: injective f by move=> i j; rewrite !ffunE => /inj_f0; apply: inj_p.
+have imIkf : imIk f == A.
+  rewrite eqEcard card_imset // cardAk card_ord leqnn andbT -im_f0.
+  by apply/subsetP=> x /imsetP[i _ ->]; rewrite ffunE mem_imset.
+split; [|exact/injectiveP|exact: imIkf].
+apply/ffun_onP => x; apply: (subsetP AsubB).
+by rewrite -(eqP imIkf) mem_imset.
+Qed.
+
+Lemma card_draws T k : #|[set A : {set T} | #|A| == k]| = 'C(#|T|, k).
+Proof.
+by rewrite -cardsT -cards_draws; apply: eq_card => A; rewrite !inE subsetT.
 Qed.
 
 Lemma card_ltn_sorted_tuples m n :

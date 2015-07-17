@@ -1,4 +1,7 @@
-Require Import ssreflect ssrbool.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool.
+Axiom daemon : False. Ltac myadmit := case: daemon.
 
 Lemma v : True -> bool -> bool. Proof. by []. Qed.
 
@@ -16,8 +19,8 @@ have - -> : a = (id a) by [].
 have --> : a = (id a) by [].
 have - - _ : a = (id a) by [].
 have -{1}-> : a = (id a) by [].
-  by admit.
+  by myadmit.
 move: a.
 case: b => -[] //.
-by admit.
+by myadmit.
 Qed.

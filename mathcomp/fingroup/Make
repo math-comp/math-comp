@@ -1,5 +1,5 @@
 action.v
-all.v
+all_fingroup.v
 automorphism.v
 fingroup.v
 gproduct.v

@@ -9,4 +9,4 @@ license: "CeCILL-B"
 build: [ make "-j" "%{jobs}%" ] 
 install: [ make "install" ]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/ssreflect'" ]
-depends: [ "coq" { ( >= "8.4pl4" & < "8.5" ) | ( = "8.5beta1" ) } ]
+depends: [ "coq" { ( >= "8.4pl4" & < "8.5" ) | ( = "8.5.dev" ) } ]

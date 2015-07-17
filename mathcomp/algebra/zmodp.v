@@ -1,12 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import  div fintype bigop finset prime.
-From mathcomp.fingroup
-Require Import fingroup.
-Require Import ssralg finalg.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp
+Require Import fintype bigop finset prime fingroup ssralg finalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)
@@ -170,7 +167,7 @@ Lemma Zp_expg x n : x ^+ n = inZp (x * n).
 Proof. exact: Zp_mulrn. Qed.
 
 Lemma Zp1_expgz x : Zp1 ^+ x = x.
-Proof. by rewrite Zp_expg; exact: Zp_mul1z. Qed.
+Proof. by rewrite Zp_expg; apply: Zp_mul1z. Qed.
 
 Lemma Zp_cycle : setT = <[Zp1]>.
 Proof. by apply/setP=> x; rewrite -[x]Zp1_expgz inE groupX ?mem_gen ?set11. Qed.
@@ -185,13 +182,13 @@ Implicit Arguments Zp1 [[p']].
 Implicit Arguments inZp [[p']].
 
 Lemma ord1 : all_equal_to (0 : 'I_1).
-Proof. by case=> [[] // ?]; exact: val_inj. Qed.
+Proof. by case=> [[] // ?]; apply: val_inj. Qed.
 
 Lemma lshift0 m n : lshift m (0 : 'I_n.+1) = (0 : 'I_(n + m).+1).
 Proof. exact: val_inj. Qed.
 
 Lemma rshift1 n : @rshift 1 n =1 lift (0 : 'I_n.+1).
-Proof. by move=> i; exact: val_inj. Qed.
+Proof. by move=> i; apply: val_inj. Qed.
 
 Lemma split1 n i :
   split (i : 'I_(1 + n)) = oapp (@inr _ _) (inl _ 0) (unlift 0 i).
@@ -286,7 +283,7 @@ by move=> p_gt1; rewrite qualifE /= val_Zp_nat ?Zp_cast ?coprime_modr.
 Qed.
 
 Lemma Zp_group_set : group_set Zp.
-Proof. rewrite /Zp; case: (p > 1); exact: groupP. Qed.
+Proof. by rewrite /Zp; case: (p > 1); apply: groupP. Qed.
 Canonical Zp_group := Group Zp_group_set.
 
 Lemma card_Zp : p > 0 -> #|Zp| = p.
@@ -307,7 +304,7 @@ by rewrite totient_count_coprime big_mkord.
 Qed.
 
 Lemma units_Zp_abelian : abelian units_Zp.
-Proof. apply/centsP=> u _ v _; exact: unit_Zp_mulgC. Qed.
+Proof. by apply/centsP=> u _ v _; apply: unit_Zp_mulgC. Qed.
 
 End Groups.
 

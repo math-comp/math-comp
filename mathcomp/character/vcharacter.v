@@ -1,17 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm automorphism quotient action gproduct.
-From mathcomp.algebra
-Require Import ssralg poly finalg zmodp cyclic vector ssrnum ssrint intdiv.
-From mathcomp.solvable
-Require Import sylow pgroup center frobenius.
-From mathcomp.field
-Require Import algnum algC.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
+Require Import fintype tuple finfun bigop prime ssralg poly finset.
+From mathcomp
+Require Import fingroup morphism perm automorphism quotient finalg action.
+From mathcomp
+Require Import gproduct zmodp commutator cyclic center pgroup sylow frobenius.
+From mathcomp
+Require Import vector ssrnum ssrint intdiv algC algnum.
+From mathcomp
 Require Import classfun character integral_char.
 
 Set Implicit Arguments.
@@ -195,11 +194,11 @@ Qed.
 
 Lemma zchar_subseq S1 S2 A :
   subseq S1 S2 -> {subset 'Z[S1, A] <= 'Z[S2, A]}.
-Proof. move=> sS12; exact: zchar_subset (mem_subseq sS12). Qed.
+Proof. by move/mem_subseq; apply: zchar_subset. Qed.
 
 Lemma zchar_filter S A (p : pred 'CF(G)) :
   {subset 'Z[filter p S, A] <= 'Z[S, A]}.
-Proof. by apply: zchar_subset=> f; rewrite mem_filter => /andP[]. Qed.
+Proof. by apply: zchar_subset=> f; apply/mem_subseq/filter_subseq. Qed.
 
 End Zchar.
 
@@ -297,7 +296,7 @@ Hypotheses (Inu : {in 'Z[S] &, isometry nu}) (oSS : pairwise_orthogonal S).
 
 Let freeS := orthogonal_free oSS.
 Let uniqS : uniq S := free_uniq freeS.
-Let Z_S : {subset S <= 'Z[S]}. Proof. by move=> phi; exact: mem_zchar. Qed.
+Let Z_S : {subset S <= 'Z[S]}. Proof. by move=> phi; apply: mem_zchar. Qed.
 Let notS0 : 0 \notin S. Proof. by case/andP: oSS. Qed.
 Let dotSS := proj2 (pairwise_orthogonalP oSS).
 
@@ -311,7 +310,7 @@ have notSnu0: 0 \notin map nu S.
   by rewrite -cfnorm_eq0 Inu ?Z_S // cfnorm_eq0 => /eqP <-.
 apply/pairwise_orthogonalP; split; first by rewrite /= notSnu0 map_inj_in_uniq.
 move=>_ _ /mapP[phi Sphi ->] /mapP[psi Spsi ->].
-by rewrite (inj_in_eq inj_nu) // Inu ?Z_S //; exact: dotSS.
+by rewrite (inj_in_eq inj_nu) // Inu ?Z_S //; apply: dotSS.
 Qed.
 
 Lemma cfproj_sum_orthogonal P z phi :
@@ -410,7 +409,7 @@ Lemma cfnorm_orthonormal S :
   orthonormal S -> '[\sum_(xi <- S) xi] = (size S)%:R.
 Proof. exact: cfnorm_map_orthonormal. Qed.
 
-Lemma zchar_orthonormalP S :
+Lemma vchar_orthonormalP S :
     {subset S <= 'Z[irr G]} ->
   reflect (exists I : {set Iirr G}, exists b : Iirr G -> bool,
            perm_eq S [seq (-1) ^+ b i *: 'chi_i | i in I])
@@ -457,7 +456,7 @@ Lemma vchar_norm1P phi :
 Proof.
 move=> Zphi phiN1.
 have: orthonormal phi by rewrite /orthonormal/= phiN1 eqxx.
-case/zchar_orthonormalP=> [xi /predU1P[->|] // | I [b def_phi]].
+case/vchar_orthonormalP=> [xi /predU1P[->|] // | I [b def_phi]].
 have: phi \in (phi : seq _) := mem_head _ _.
 by rewrite (perm_eq_mem def_phi) => /mapP[i _ ->]; exists (b i), i.
 Qed.
@@ -484,7 +483,7 @@ have orthS: orthonormal S.
   rewrite (leq_exp2r _ 1) // -ltnS -(@ltn_exp2r _ _ 2) //.
   apply: leq_ltn_trans lt_n_4; rewrite -leC_nat -def_n natrX.
   rewrite cfdot_sum_irr (bigD1 i) //= -normCK def_m addrC -subr_ge0 addrK.
-  by rewrite sumr_ge0 // => ? _; exact: mul_conjC_ge0.
+  by rewrite sumr_ge0 // => ? _; apply: mul_conjC_ge0.
 have <-: size S = n.
   by apply/eqP; rewrite -eqC_nat -def_n def_phi cfnorm_orthonormal.
 exists (in_tuple S); split=> // _ /mapP[i _ ->].
@@ -535,24 +534,14 @@ by rewrite linearZ scale_zchar ?Z_T // -defT map_f ?mem_nth.
 Qed.
 
 Lemma Zisometry_of_iso f :
-    pairwise_orthogonal S -> {in S, isometry f, to 'Z[irr G]} ->
+    free S -> {in S, isometry f, to 'Z[irr G]} ->
   {tau : {linear 'CF(L) -> 'CF(G)} | {in S, tau =1 f}
        & {in 'Z[S], isometry tau, to 'Z[irr G]}}.
 Proof.
-move=> oS [If Zf]; have [/=/andP[S'0 uS] oSS] := pairwise_orthogonalP oS.
-have injf: {in S &, injective f}.
-  move=> xi1 xi2 Sxi1 Sxi2 /=/(congr1 (cfdot (f xi1)))/eqP; rewrite !If //.
-  by apply: contraTeq => /oSS-> //; rewrite cfnorm_eq0 (memPn S'0).
-have{injf} oSf: pairwise_orthogonal (map f S).
-  apply/pairwise_orthogonalP; split=> /=.
-    rewrite map_inj_in_uniq // uS (contra _ S'0) // => /mapP[chi Schi /eqP].
-    by rewrite eq_sym -cfnorm_eq0 If // cfnorm_eq0 => /eqP <-.
-  move=> _ _ /mapP[xi1 Xxi1 ->] /mapP[xi2 Xxi2 ->].
-  by rewrite If ?(inj_in_eq injf) // => /oSS->.
-have{If} nSf: map cfnorm (map f S) = map cfnorm S.
-  by rewrite -map_comp; apply/eq_in_map=> xi Sxi; rewrite /= If.
-have{Zf} ZSf: {subset map f S <= 'Z[irr G]} by move=> _ /mapP[xi /Zf Zfxi ->].
-by have [tau /eq_in_map] := Zisometry_of_cfnorm oS oSf nSf ZSf; exists tau.
+move=> freeS [If Zf]; have [tau Dtau Itau] := isometry_of_free freeS If.
+exists tau => //; split; first by apply: sub_in2 Itau; apply: zchar_span.
+move=> _ /zchar_nth_expansion[a Za ->]; rewrite linear_sum rpred_sum // => i _.
+by rewrite linearZ rpredZ_Cint ?Dtau ?Zf ?mem_nth.
 Qed.
 
 Lemma Zisometry_inj A nu :
@@ -584,7 +573,7 @@ by rewrite cfAutZ_Cint // scale_zchar // mem_zchar ?SuS ?mem_nth.
 Qed.
 
 Lemma cfAut_vchar A psi : psi \in 'Z[irr G, A] -> psi^u \in 'Z[irr G, A].
-Proof. by apply: cfAut_zchar; exact: irr_aut_closed. Qed.
+Proof. by apply: cfAut_zchar; apply: irr_aut_closed. Qed.
 
 Lemma sub_aut_zchar S A psi :
    {subset S <= 'Z[irr G]} -> psi \in 'Z[S, A] -> psi^u \in 'Z[S, A] ->
@@ -797,11 +786,9 @@ Proof. by rewrite /dchi scale1r irr0. Qed.
 Lemma dirr_dchi i : dchi i \in dirr G.
 Proof. by apply/dirrP; exists i.1; exists i.2. Qed.
 
-Lemma dIrrP (phi : 'CF(G)) : 
-  reflect (exists i , phi = dchi i) (phi \in dirr G).
+Lemma dIrrP phi : reflect (exists i, phi = dchi i) (phi \in dirr G).
 Proof.
-by apply: (iffP idP)=> [/dirrP [b [i ->]]| [i ->]]; 
-      [exists (b, i) | exact: dirr_dchi].
+by apply: (iffP idP)=> [/dirrP[b]|] [i ->]; [exists (b, i) | apply: dirr_dchi].
 Qed.
 
 Lemma dchi_ndirrE (i : dIirr G) : dchi (ndirr i) = - dchi i.
@@ -840,7 +827,7 @@ Qed.
 
 Lemma dirr_dIirrE J (f : J -> 'CF(G)) :
   (forall j, f j \in dirr G) -> forall j, dchi (dirr_dIirr f j) = f j.
-Proof. by move=> dirrGf j; exact: (@dirr_dIirrPE _ _ xpredT). Qed.
+Proof. by move=> dirrGf j; apply: (@dirr_dIirrPE _ _ xpredT). Qed.
 
 Definition dirr_constt (B : {set gT}) (phi: 'CF(B)) : {set (dIirr B)} :=  
   [set i | 0 < '[phi, dchi i]].
@@ -909,7 +896,7 @@ Proof.
   move=> PiZ; rewrite [X in X = _]cfun_sum_constt. *)
 move=> PiZ; rewrite {1}[phi]cfun_sum_constt.
 rewrite (reindex (to_dirr phi))=> [/= |]; last first.
-  by exists (@of_irr _)=> //; exact: of_irrK .
+  by exists (@of_irr _)=> //; apply: of_irrK .
 by apply: eq_big=> i; rewrite ?irr_constt_to_dirr // cfdot_todirrE.
 Qed.
 

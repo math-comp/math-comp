@@ -1,11 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import choice fintype finfun bigop.
-Require Import ssralg ssrnum poly.
-
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat choice seq.
+From mathcomp
+Require Import fintype finfun bigop ssralg ssrnum poly.
 Import GRing.Theory Num.Theory.
 
 (******************************************************************************)
@@ -594,11 +592,11 @@ Proof. by rewrite -scalezrE scaler_nat. Qed.
 
 Lemma mulrz_sumr : forall x I r (P : pred I) F,
   x *~ (\sum_(i <- r | P i) F i) = \sum_(i <- r | P i) x *~ F i.
-Proof. by rewrite -/M^z; exact: scaler_suml. Qed.
+Proof. by rewrite -/M^z; apply: scaler_suml. Qed.
 
 Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
-Proof. by rewrite -/M^z; exact: scaler_sumr. Qed.
+Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
 
 Canonical intmul_additive x := Additive (@mulrzBr x).
 
@@ -1751,7 +1749,7 @@ Canonical Znat_keyd := KeyedQualifier Znat_key.
 Lemma Znat_def n : (n \is a Znat) = (0 <= n). Proof. by []. Qed.
 
 Lemma Znat_semiring_closed : semiring_closed Znat.
-Proof. by do 2?split => //; [exact: addr_ge0 | exact: mulr_ge0]. Qed.
+Proof. by do 2?split => //; [apply: addr_ge0 | apply: mulr_ge0]. Qed.
 Canonical Znat_addrPred := AddrPred Znat_semiring_closed.
 Canonical Znat_mulrPred := MulrPred Znat_semiring_closed.
 Canonical Znat_semiringPred := SemiringPred Znat_semiring_closed.

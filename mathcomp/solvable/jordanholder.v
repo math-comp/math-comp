@@ -1,11 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop finset.
-From mathcomp.fingroup
-Require Import fingroup morphism automorphism quotient action.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq path choice fintype.
+From mathcomp
+Require Import bigop finset fingroup morphism automorphism quotient action.
+From mathcomp
 Require Import gseries.
 
 (******************************************************************************)
@@ -113,7 +112,7 @@ Qed.
 Lemma section_repr_isog s1 s2 :
   s1 \isog s2 -> section_repr s1 = section_repr s2.
 Proof.
-by move=> iso12; congr (odflt _ _); apply: eq_pick => s; exact: isog_transr.
+by move=> iso12; congr (odflt _ _); apply: eq_pick => s; apply: isog_transr.
 Qed.
 
 Definition mkfactors (G : {group gT}) (s : seq {group gT}) :=
@@ -167,7 +166,7 @@ have [-> | ntG] := eqVneq G 1%G; first by exists [::]; rewrite /comps eqxx.
 have [N maxN] := ex_maxnormal_ntrivg ntG.
 have [|s /andP[ls cs]] := IHn N.
   by rewrite -ltnS (leq_trans _ cG) // proper_card // (maxnormal_proper maxN).
-by exists (N :: s); exact/and3P.
+by exists (N :: s); apply/and3P.
 Qed.
 
 (******************************************************************************)
@@ -234,7 +233,7 @@ have i3 : perm_eq fG1 fG2.
   rewrite -(@section_repr_isog _ (mkSec _ _) (mkSec _ _) iso2).
   exact: perm_eq_refl.
 apply: (perm_eq_trans i1); apply: (perm_eq_trans i3); rewrite perm_eq_sym.
-apply: perm_eq_trans i2; exact: perm_eq_refl.
+by apply: perm_eq_trans i2; apply: perm_eq_refl.
 Qed.
 
 End CompositionSeries.
@@ -361,7 +360,7 @@ by move/maxgroupp; case/andP; rewrite properE; move/normal_sub->; case/andP.
 Qed.
 
 Lemma maxainv_sub : maxainv K N -> N \subset K.
-Proof. move=> h; apply: proper_sub; exact: maxainv_proper. Qed.
+Proof. by move=> h; apply: proper_sub; apply: maxainv_proper. Qed.
 
 Lemma maxainv_ainvar : maxainv K N -> A \subset 'N(N | to).
 Proof. by move/maxgroupp; case/and3P. Qed.
@@ -557,7 +556,7 @@ have nKQ1 : K <| N2 / N1.
 have sqA : qact_dom to N1 \subset A.
   by apply/subsetP=> t; rewrite qact_domE // inE; case/andP.
 have nNN2 : (N2 :&: N1) <| N2.
-  rewrite /normal subsetIl; apply: normsI => //; exact: normG.
+  by rewrite /normal subsetIl; apply: normsI => //; apply: normG.
 have aKQ1 : [acts qact_dom to N1, on K | to / N1].
   pose H':= coset (N2 :&: N1)@*^-1 H.
   have eHH' : H :=: H' / (N2 :&: N1) by rewrite cosetpreK.
@@ -653,7 +652,7 @@ have i1 : perm_eq (mksrepr G N1 :: mkfactors N1 st1)
   apply: Hi=> //; rewrite /acomps ?lst1 //= lsN csN andbT /=.
   apply: asimple_quo_maxainv=> //; first by apply: subIset; rewrite sN1D.
   apply: asimpleI => //.
-    apply: subset_trans (normal_norm nN2G); exact: normal_sub.
+    by apply: subset_trans (normal_norm nN2G); apply: normal_sub.
   rewrite -quotientMidl (maxainvM _ _ maxN_2) //.
     by apply: maxainv_asimple_quo.
   by move=> e; apply: neN12.
@@ -664,7 +663,7 @@ have i2 : perm_eq (mksrepr G N2 :: mkfactors N2 st2)
   apply: asimple_quo_maxainv=> //; first by apply: subIset; rewrite sN1D.
   have e : N1 :&: N2 :=: N2 :&: N1 by rewrite setIC.
   rewrite (group_inj (setIC N1 N2)); apply: asimpleI => //.
-    apply: subset_trans (normal_norm nN1G); exact: normal_sub.
+    by apply: subset_trans (normal_norm nN1G); apply: normal_sub.
   rewrite -quotientMidl (maxainvM _ _ maxN_1) //.
   exact: maxainv_asimple_quo.
 pose fG1 := [:: mksrepr G N1, mksrepr N1 N & mkfactors N sN].
@@ -675,7 +674,7 @@ have i3 : perm_eq fG1 fG2.
   rewrite -(@section_repr_isog _ (mkSec _ _) (mkSec _ _) iso2).
   exact: perm_eq_refl.
 apply: (perm_eq_trans i1); apply: (perm_eq_trans i3); rewrite perm_eq_sym.
-apply: perm_eq_trans i2; exact: perm_eq_refl.
+by apply: perm_eq_trans i2; apply: perm_eq_refl.
 Qed.
 
 End StrongJordanHolder.

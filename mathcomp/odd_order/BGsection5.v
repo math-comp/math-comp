@@ -1,8 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp
 Require Import fintype finset prime fingroup morphism perm automorphism action.
+From mathcomp
 Require Import quotient cyclic gfunctor pgroup gproduct center commutator.
+From mathcomp
 Require Import gseries nilpotent sylow abelian maximal hall.
+From mathcomp
 Require Import BGsection1 BGsection4.
 
 (******************************************************************************)
@@ -121,7 +127,7 @@ have [B Ep3B nBR]: exists2 B, B \in 'E_p^3(R) & R \subset 'N(B).
   have [sCR _] := andP nsCR; have pC: p.-group C := pgroupS sCR pR.
   have{pC cCC} abelC1: p.-abelem 'Ohm_1(C) := Ohm1_abelem pC cCC.
   have dimC1: 3 <= logn p #|'Ohm_1(C)| by rewrite -rank_abelem // rank_Ohm1.
-  have nsC1R: 'Ohm_1(C) <| R := char_normal_trans (Ohm_char 1 _) nsCR.
+  have nsC1R: 'Ohm_1(C) <| R := gFnormal_trans _ nsCR.
   have [B [sBC1 nsBR oB]] := normal_pgroup pR nsC1R dimC1.
   have [sBR nBR] := andP nsBR; exists B => //; apply/pnElemP.
   by rewrite oB pfactorK // (abelemS sBC1).
@@ -157,26 +163,18 @@ Let T := 'C_R(W).
 Let ntZ : Z != 1.
 Proof. by rewrite Ohm1_eq1 (center_nil_eq1 (pgroup_nil pR)). Qed.
 
-Let sZR : Z \subset R. 
-Proof. exact: subset_trans (Ohm_sub 1 _) (center_sub R). Qed.
+Let sZR : Z \subset R. Proof. by rewrite !gFsub_trans. Qed.
 
 Let abelZ : p.-abelem (Z). 
 Proof. by rewrite (Ohm1_abelem (pgroupS _ pR)) ?center_sub ?center_abelian. Qed.
 
-Let pZ : p.-group Z.
-Proof. exact: abelem_pgroup abelZ. Qed.
+Let pZ : p.-group Z. Proof. exact: abelem_pgroup abelZ. Qed.
 
 Let defCRZ : 'C_R(Z) = R.
-Proof.
-apply/eqP; rewrite eqEsubset subsetIl subsetIidl centsC.
-by rewrite (subset_trans (Ohm_sub 1 _)) ?subsetIr.
-Qed.
+Proof. by apply/setIidPl; rewrite centsC gFsub_trans ?subsetIr. Qed.
 
-Let sWR : W \subset R. 
-Proof. exact: subset_trans (Ohm_sub 1 _) (ucn_sub 2 R). Qed.
-
-Let nWR : R \subset 'N(W). 
-Proof. exact: char_norm_trans (Ohm_char 1 _) (char_norm (ucn_char 2 R)). Qed.
+Let sWR : W \subset R. Proof. exact/gFsub_trans/gFsub. Qed.
+Let nWR : R \subset 'N(W). Proof. exact/gFnorm_trans/gFnorm. Qed.
 
 (* This is B & G, Lemma 5.2. *)
 Lemma Ohm1_ucn_p2maxElem E :
@@ -188,7 +186,7 @@ Proof.
 case/setIP=> Ep2E maxE; have defCRE1 := Ohm1_cent_max maxE pR.
 have [[sER abelE dimE] oE] := (pnElemP Ep2E, card_pnElem Ep2E).
 have [[sZR_R nZR_R] [pE _ eE]] := (andP (center_normal R), and3P abelE).
-have{nZR_R} nZR: R \subset 'N(Z) := char_norm_trans (Ohm_char 1 _) nZR_R.
+have{nZR_R} nZR: R \subset 'N(Z) := gFnorm_trans _ nZR_R.
 have{sZR_R} [pZR pW] := (pgroupS sZR_R pR, pgroupS sWR pR).
 have sZE: Z \subset E by rewrite -defCRE1 OhmS ?setIS // centS.
 have rCRE : 'r_p('C_R(E)) = 2 by rewrite -p_rank_Ohm1 defCRE1 p_rank_abelem.
@@ -228,8 +226,7 @@ have dimW: logn p #|W| = 2.
   by rewrite -divgS // logn_div ?cardSg // subn_gt0 properG_ltn_log.
 have abelW: p.-abelem W.
   by rewrite (abelem_Ohm1 (pgroupS _ pR)) ?(p2group_abelian pW) ?dimW ?ucn_sub.
-have charT: T \char R.
-  by rewrite subcent_char ?char_refl //= (char_trans (Ohm_char 1 _)) ?ucn_char.
+have charT: T \char R by rewrite subcent_char ?char_refl ?gFchar_trans.
 rewrite 2!inE sWR abelW dimW; do 2?split => //.
   by apply: contra (proper_subn ltZW); rewrite -defZ !subsetI subxx sER centsC.
 apply/prime_nt_dvdP=> //.
@@ -281,7 +278,7 @@ have defST: S * T = R.
 have cRRb: abelian (R / T) by rewrite -defST quotientMidr quotient_abelian.
 have sR'T: R^`(1) \subset T by rewrite der1_min ?char_norm. 
 have TI_SR': S :&: R^`(1) :=: 1.
-  by rewrite prime_TIg ?oS // (contra _ not_sST) //; move/subset_trans->.
+  by rewrite prime_TIg ?oS // (contra _ not_sST) // => /subset_trans->.
 have defCRS : S \x 'C_T(S) = 'C_R(S).
   rewrite (dprodE _ _) ?subsetIr //= -/T; last by rewrite setIA tiST setI1g.
   rewrite -{1}(center_idP cSS) subcent_TImulg ?defST //.
@@ -459,7 +456,7 @@ have cycLb: cyclic (L / K) by rewrite prime_cyclic ?oLb.
 rewrite -(quotientSGK _ sKCX) // quotientGI // subsetI quotientS //= -/K.
 have actsXK: [acts X, on K | toX] by rewrite acts_ract subxx acts_char.
 rewrite ext_coprime_quotient_cent ?(pnat_coprime pK p'X) ?(pgroup_sol pK) //.
-have actsAL : {acts A, on group L | [Aut R]} by exact: gacts_char.
+have actsAL : {acts A, on group L | [Aut R]} by apply: gacts_char.
 have sAD: A \subset qact_dom <[actsAL]> [~: L, R].
   by rewrite qact_domE // acts_actby subxx (setIidPr sKL) acts_char.
 suffices cLbX: X \subset 'C(L / K | <[actsAL]> / _).
@@ -505,7 +502,7 @@ wlog Gp'1: gT G S oddG nnS solG sylS rS pl1G / 'O_p^'(G) = 1.
   have isoS := isog_symr (quotient_isog nKS tiKS).
   rewrite (isog_narrow p isoS) {isoS}(isog_rank isoS) quotient_pHall //.
   rewrite plength1_quo // trivg_pcore_quotient indexg1 /= -quotient_der //.
-  by rewrite card_quotient //= -/K -(card_isog (quotient1_isog _)); exact.
+  by rewrite card_quotient //= -/K -(card_isog (quotient1_isog _)); apply.
 rewrite Gp'1 indexg1 -(card_isog (quotient1_isog _)) -pgroupE.
 have [sSG pS _] := and3P sylS; have oddS: odd #|S| := oddSg sSG oddG.
 have ntS: S :!=: 1 by rewrite -rank_gt0 (leq_trans _ rS).
@@ -522,13 +519,13 @@ have{defS} pKfA: p.-group ('ker fA).
   by rewrite -defS -Fitting_eq_pcore ?cent_sub_Fitting.
 split=> [|q].
   rewrite -(pmorphim_pgroup pKfA) ?der_sub // morphim_der //.
-  by rewrite (pgroupS (der1_min (char_norm _) cAbAb)) ?pcore_pgroup ?pcore_char.
-rewrite mem_primes; case/and3P=> q_pr _; case/Cauchy=> // x Gx ox.
+  by rewrite (pgroupS (der1_min _ cAbAb)) ?pcore_pgroup ?gFnorm.
+rewrite mem_primes => /and3P[q_pr _ /Cauchy[] // x Gx ox].
 rewrite leq_eqVlt -implyNb; apply/implyP=> p'q; rewrite -(ltn_predK p_gt1) ltnS.
 have ofAx: #[fA x] = q.
   apply/prime_nt_dvdP=> //; last by rewrite -ox morph_order.
   rewrite order_eq1; apply: contraNneq p'q => fAx1.
-  by apply: (pgroupP pKfA); rewrite // -ox order_dvdG //; exact/kerP.
+  by apply: (pgroupP pKfA); rewrite // -ox order_dvdG //; apply/kerP.
 have p'fAx: p^'.-elt (fA x) by rewrite /p_elt ofAx pnatE.
 by rewrite -ofAx dvdn_leq ?p'A_dv_p1 ?mem_morphim // -(subnKC p_gt1).
 Qed.

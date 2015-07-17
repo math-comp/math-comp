@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div.
+From mathcomp
 Require Import fintype bigop prime binomial finset ssralg fingroup finalg.
-Require Import morphism perm automorphism quotient action commutator gproduct.
-Require Import zmodp cyclic center pgroup gseries nilpotent sylow finalg.
-Require Import finmodule abelian frobenius maximal extremal hall finmodule.
+From mathcomp
+Require Import morphism perm automorphism quotient action gfunctor commutator.
+From mathcomp
+Require Import gproduct zmodp cyclic center pgroup gseries nilpotent sylow.
+From mathcomp
+Require Import finalg finmodule abelian frobenius maximal extremal hall.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem BGsection1.
 
 (******************************************************************************)
@@ -36,12 +43,12 @@ have [-> | ntA] := eqsVneq A 1.
   by exists set0 => [|B]; rewrite ?big_set0 ?inE.
 have [p_pr _ _] := pgroup_pdiv pA ntA; have p_gt1 := prime_gt1 p_pr.
 case: n1 => [|n] in eA; first by rewrite trivg_exponent eA in ntA.
-have nA1X: X \subset 'N('Ohm_1(A)) := char_norm_trans (Ohm_char 1 A) nAX.
+have nA1X: X \subset 'N('Ohm_1(A)) := gFnorm_trans _ nAX.
 have sAnA1: 'Mho^n(A) \subset 'Ohm_1(A).
   rewrite (MhoE n pA) (OhmE 1 pA) genS //.
-  apply/subsetP=> xpn; case/imsetP=> x Ax ->{xpn}; rewrite !inE groupX //.
+  apply/subsetP=> _ /imsetP[x Ax ->]; rewrite !inE groupX //.
   by rewrite -expgM -expnSr -eA -order_dvdn dvdn_exponent.
-have nAnX: X \subset 'N('Mho^n(A)) := char_norm_trans (Mho_char n A) nAX.
+have nAnX: X \subset 'N('Mho^n(A)) := gFnorm_trans _ nAX.
 have [B minB sBAn]: {B : {group gT} | minnormal B X & B \subset 'Mho^n(A)}.
   apply: mingroup_exists; rewrite nAnX andbT; apply/trivgPn.
   have [x Ax ox] := exponent_witness (abelian_nil cAA).
@@ -49,7 +56,7 @@ have [B minB sBAn]: {B : {group gT} | minnormal B X & B \subset 'Mho^n(A)}.
   by rewrite -order_dvdn -ox eA dvdn_Pexp2l ?ltnn.
 have abelA1: p.-abelem 'Ohm_1(A) by rewrite Ohm1_abelem.
 have sBA1: B \subset 'Ohm_1(A) := subset_trans sBAn sAnA1.
-case/mingroupP: minB; case/andP=> ntB nBX minB.
+have{minB} [/andP[ntB nBX] minB] := mingroupP minB.
 have{nBX sBA1} [U defA1 nUX] := Maschke_abelem abelA1 p'X sBA1 nA1X nBX.
 have [_ mulBU _ tiBU] := dprodP defA1; have{mulBU} [_ sUA1] := mulG_sub mulBU.
 have sUA: U \subset A := subset_trans sUA1 (Ohm_sub 1 _).
@@ -73,14 +80,14 @@ have [U1 | {defA1 minB}ntU] := eqsVneq U 1.
   have im_g: g @* (A / 'Phi(A)) = B by rewrite def_g // defA1 OhmMho subn1.
   have defAb: A / 'Phi(A) = g @*^-1 B by rewrite -im_g injmK.
   have nsPhiA: 'Phi(A) <| A := Phi_normal A.
-  have nPhiX: X \subset 'N('Phi(A)) := char_norm_trans (Phi_char A) nAX.
+  have nPhiX: X \subset 'N('Phi(A)) := gFnorm_trans _ nAX.
   rewrite defAb; apply/mingroupP; split=> [|Hb].
     by rewrite -(morphim_injm_eq1 injg) ?morphpreK /= -?defAb ?im_g ?ntB ?actsQ.
   case/andP=> ntHb actsXHb /= sgHbB; have [sHbA _] := subsetIP sgHbB.
   rewrite -sub_morphim_pre // in sgHbB; rewrite -(minB _ _ sgHbB) ?injmK //.
   rewrite morphim_injm_eq1 // {}ntHb {actsXHb}(subset_trans actsXHb) //=.
   have{sHbA} [H defHb sPhiH sHA] := inv_quotientS nsPhiA sHbA.
-  rewrite defHb def_g // (char_norm_trans (Mho_char n H)) //.
+  rewrite defHb def_g // gFnorm_trans //=.
   by rewrite astabsQ ?subsetIr ?(normalS sPhiH sHA).
 have nsUA: U <| A by rewrite -sub_abelian_normal.
 have nUA: A \subset 'N(U) by case/andP: nsUA.
@@ -114,7 +121,7 @@ have nsUK: U <| K := normalS sUK sKA nsUA; have [_ nUK] := andP nsUK.
 have nKX: X \subset 'N(K).
   by rewrite -(quotientSGK nUX) ?normsG ?quotient_normG // -defKu.
 pose K1 := 'Mho^1(K); have nsK1K: K1 <| K := Mho_normal 1 K.
-have nXKb: X / K1 \subset 'N(K / K1) by exact: quotient_norms.
+have nXKb: X / K1 \subset 'N(K / K1) by apply: quotient_norms.
 pose K'u := \big[dprod/1]_(Bu in S :\ Ku) Bu.
 have{S_Ku} defAu_K: K / U \x K'u = A / U by rewrite -defKu -big_setD1.
 have [[_ Pu _ defK'u]] := dprodP defAu_K; rewrite defK'u => mulKPu _ tiKPu.
@@ -146,7 +153,7 @@ have tiUK1: U :&: K1 = 1.
 have [Db defKb nDXb] := Maschke_abelem abelKb p'Xb sUKb nXKb nUXb.
 have [_ mulUDb _ tiUDb] := dprodP defKb; have [_ sDKb] := mulG_sub mulUDb.
 have [D defDb sK1D sDK] := inv_quotientS (Mho_normal 1 K) sDKb.
-have nK1X: X \subset 'N(K1) := char_norm_trans (Mho_char 1 K) nKX.
+have nK1X: X \subset 'N(K1) := gFnorm_trans _ nKX.
 have [cDU [sK1K nK1K]] := (centSS sUK sDK cKK, andP nsK1K).
 have nDX: X \subset 'N(D).
   rewrite -(quotientSGK nK1X) ?normsG // quotient_normG ?(normalS _ sDK) //.
@@ -185,7 +192,7 @@ case/setU1P=> [-> {B S simS} | ]; last exact: simS.
 have [[pD cDD] nUD] := (pgroupS sDA pA, abelianS sDA cAA, subset_trans sDA nUA).
 have isoD: D \isog Ku by rewrite defKu -mulUD quotientMidl quotient_isog.
 rewrite {isoD}(isog_homocyclic isoD); split=> //.
-have nPhiDX: X \subset 'N('Phi(D)) := char_norm_trans (Phi_char D) nDX.
+have nPhiDX: X \subset 'N('Phi(D)) := gFnorm_trans _ nDX.
 have [f [injf im_f act_f]]:
   exists f : {morphism D / 'Phi(D) >-> coset_of 'Phi(Ku)},
     [/\ 'injm f, f @* (D / 'Phi(D)) = Ku / 'Phi(Ku)
@@ -205,17 +212,17 @@ have [f [injf im_f act_f]]:
   - by rewrite (subsetP (morphim_norm _ _)) ?mem_morphim.
   rewrite morphim_restrm  (setIidPr (Phi_sub _)).
   by rewrite (subsetP (morphim_norm _ _)) ?mem_quotient.
-apply/mingroupP; split=> [|Y].
-  rewrite -subG1 quotient_sub1 ?(normal_norm (Phi_normal _)) //.
+apply/mingroupP; split=> [|Y /andP[ntY actsXY] sYD].
+  rewrite -subG1 quotient_sub1 ?gFnorm //.
   by rewrite proper_subn ?Phi_proper // actsQ.
-case/andP=> ntY actsXY sYD; have{minKu} [_ minKu] := mingroupP minKu.
+have{minKu} [_ minKu] := mingroupP minKu.
 apply: (injm_morphim_inj injf); rewrite // im_f.
 apply: minKu; last by rewrite /= -im_f morphimS.
 rewrite morphim_injm_eq1 // ntY.
-apply/subsetP=> xb; case/morphimP=> x Nx Xx ->{xb}.
+apply/subsetP=> _ /morphimP[x Nx Xx ->].
 rewrite 2!inE /= qact_domE ?subsetT // astabsJ.
-rewrite (subsetP (char_norm_trans (Phi_char _) nKuX)) ?mem_quotient //=.
-apply/subsetP=> fy; case/morphimP=> y Dy Yy ->{fy}.
+rewrite (subsetP (gFnorm_trans _ nKuX)) ?mem_quotient //=.
+apply/subsetP=> _ /morphimP[y Dy Yy ->].
 by rewrite inE /= -act_f // morphimEsub // mem_imset // (acts_act actsXY).
 Qed.
 
@@ -243,7 +250,7 @@ have [wT [fL injL [fX injX fJ]]]: exists wT : finGroupType,
   {in setT & G, morph_act MR_G 'J fL fX}.
 - exists (sdprod_groupType MR_G).
   exists (sdpair1_morphism MR_G); first exact: injm_sdpair1.
-  by exists (sdpair2_morphism MR_G); [exact: injm_sdpair2 | exact: sdpair_act].
+  by exists (sdpair2_morphism MR_G); [apply: injm_sdpair2 | apply: sdpair_act].
 move imfL: (fL @* [set: _])%G => L; move imfX: (fX @* G)%G => X.
 have cLL: abelian L by rewrite -imfL morphim_abelian // zmod_abelian.
 have pL: p.-group L.
@@ -327,7 +334,7 @@ have simS: forall U, U \in S -> mxsimple aG (gMx U).
     rewrite -trivg_rowg -subG1 (subset_trans s_U2_1) //.
     rewrite -(morphim_ker (Morphism gM)) morphimS // kerg.
     by rewrite subIset ?(PhiS pL) ?orbT.
-  rewrite actsQ //; first by rewrite (char_norm_trans (Phi_char U)).
+  rewrite actsQ //; first by rewrite gFnorm_trans.
   rewrite normsI //; apply/subsetP=> x Xx; rewrite inE.
   apply/subsetP=> _ /imsetP[u g'U2u ->].
   have [Lu U2gu] := morphpreP g'U2u; rewrite mem_rowg in U2gu.
@@ -353,12 +360,12 @@ have Fp'G: [char 'F_p]^'.-group G.
 have [VK [modVK defVK]] := rsim_regular_submod mx_irrV Fp'G.
 have [U S_U isoUV]: {U | U \in S & mx_iso (regular_repr _ G) (gMx U) VK}.
   apply: hom_mxsemisimple_iso (scalar_mx_hom _ 1 _) _ => [|U S_U _|]; auto.
-    by apply/(submod_mx_irr modVK); exact: (mx_rsim_irr defVK).
+    by apply/(submod_mx_irr modVK); apply: (mx_rsim_irr defVK).
   by rewrite mulmx1 sumS submx1.
 have simU := simS U S_U; have [modU _ _] := simU.
 pose rV := abelem_repr abelV ntV nVG.
 have{VK modVK defVK isoUV} [h dimU h_free hJ]: mx_rsim (submod_repr modU) rV.
-  by apply: mx_rsim_trans (mx_rsim_sym defVK); exact/mx_rsim_iso.
+  by apply: mx_rsim_trans (mx_rsim_sym defVK); apply/mx_rsim_iso.
 have sUL : U \subset L.
   by move: defL; rewrite (big_setD1 U) //= => /dprodP[[_ U1 _ ->] /mulG_sub[]].
 pose W := [set: 'rV['Z_(p ^ m)](V)]%G.
@@ -574,7 +581,7 @@ have{tiRCW} rCW : 'r('C_W(Ai1)) = rC i.
   suffices /card_isog ->: 'C_V(A i) \isog 'C_W(Ai1) / 'Mho^1(W).
     by rewrite card_quotient // subIset // normal_norm ?Mho_normal.
   rewrite coprime_quotient_cent ?Mho_sub ?abelian_sol //= -/Ai1; last first.
-    by rewrite (subset_trans sAiG1) // (char_norm_trans _ nWG1) ?Mho_char.
+    by rewrite (subset_trans sAiG1) // gFnorm_trans.
   have ->: A i :=: fG @* Ai1.
     by rewrite /Ai1 morphim_invmE morphpreK // im_restrm imfG1.
   rewrite -imfW morphim_restrm (setIidPr sAiG1).

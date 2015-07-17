@@ -1,12 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import choice fintype finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm action.
-Require Import ssralg.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+From mathcomp
+Require Import ssralg finset fingroup morphism perm action.
 
 (*****************************************************************************)
 (* This file clones the entire ssralg hierachy for finite types; this allows *)
@@ -155,7 +152,7 @@ Lemma zmodMgE x y : (x * y)%g = x + y.   Proof. by []. Qed.
 Lemma zmodXgE n x : (x ^+ n)%g = x *+ n. Proof. by []. Qed.
 Lemma zmod_mulgC x y : commute x y.      Proof. exact: GRing.addrC. Qed.
 Lemma zmod_abelian (A : {set U}) : abelian A.
-Proof. by apply/centsP=> x _ y _; exact: zmod_mulgC. Qed.
+Proof. by apply/centsP=> x _ y _; apply: zmod_mulgC. Qed.
 
 End AdditiveGroup.
 
@@ -447,11 +444,11 @@ Lemma unit_mul_proof u v : val u * val v \is a GRing.unit.
 Proof. by rewrite (GRing.unitrMr _ (valP u)) ?(valP v). Qed.
 Definition unit_mul u v := Unit phR (unit_mul_proof u v).
 Lemma unit_muluA : associative unit_mul.
-Proof. move=> u v w; apply: val_inj; exact: GRing.mulrA. Qed.
+Proof. by move=> u v w; apply: val_inj; apply: GRing.mulrA. Qed.
 Lemma unit_mul1u : left_id unit1 unit_mul.
-Proof. move=> u; apply: val_inj; exact: GRing.mul1r. Qed.
+Proof. by move=> u; apply: val_inj; apply: GRing.mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
-Proof. move=> u; apply: val_inj; exact: GRing.mulVr (valP u). Qed.
+Proof. by move=> u; apply: val_inj; apply: GRing.mulVr (valP u). Qed.
 
 Definition unit_GroupMixin := FinGroup.Mixin unit_muluA unit_mul1u unit_mulVu.
 Canonical unit_baseFinGroupType :=
@@ -829,12 +826,12 @@ Lemma decidable : GRing.DecidableField.axiom sat.
 Proof.
 move=> e f; elim: f e;
   try by move=> f1 IH1 f2 IH2 e /=; case IH1; case IH2; constructor; tauto.
-- by move=> b e; exact: idP.
-- by move=> t1 t2 e; exact: eqP.
-- by move=> t e; exact: idP.
+- by move=> b e; apply: idP.
+- by move=> t1 t2 e; apply: eqP.
+- by move=> t e; apply: idP.
 - by move=> f IH e /=; case: IH; constructor.
-- by move=> i f IH e; apply: (iffP existsP) => [] [x fx]; exists x; exact/IH.
-by move=> i f IH e; apply: (iffP forallP) => f_ x; exact/IH.
+- by move=> i f IH e; apply: (iffP existsP) => [] [x fx]; exists x; apply/IH.
+by move=> i f IH e; apply: (iffP forallP) => f_ x; apply/IH.
 Qed.
 
 Definition DecidableFieldMixin := DecFieldMixin decidable.

@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool.
 
 (******************************************************************************)
 (* This file defines two "base" combinatorial interfaces:                     *)
@@ -240,7 +242,7 @@ by case: y /; case: _ / (proj x _).
 Qed.
 
 Corollary eq_axiomK (T : eqType) (x : T) : all_equal_to (erefl x).
-Proof. move=> eq_x_x; exact: eq_irrelevance. Qed.
+Proof. by move=> eq_x_x; apply: eq_irrelevance. Qed.
 
 (* We use the module system to circumvent a silly limitation that  *)
 (* forbids using the same constant to coerce to different targets. *)
@@ -312,15 +314,15 @@ Definition predU1 (a1 : T) p := SimplPred (xpredU1 a1 p).
 Definition predC1 (a1 : T) := SimplPred (xpredC1 a1).
 Definition predD1 p (a1 : T) := SimplPred (xpredD1 p a1).
 
-Lemma pred1E : pred1 =2 eq_op. Proof. move=> x y; exact: eq_sym. Qed.
+Lemma pred1E : pred1 =2 eq_op. Proof. by move=> x y; apply: eq_sym. Qed.
 
 Variables (T2 : eqType) (x y : T) (z u : T2) (b : bool).
 
 Lemma predU1P : reflect (x = y \/ b) ((x == y) || b).
-Proof. apply: (iffP orP) => [] []; by [right | move/eqP; left]. Qed.
+Proof. by apply: (iffP orP); do [case=> [/eqP|]; [left | right]]. Qed.
 
 Lemma pred2P : reflect (x = y \/ z = u) ((x == y) || (z == u)).
-Proof. by apply: (iffP orP) => [] [] /eqP; by [left | right]. Qed.
+Proof. by apply: (iffP orP); do [case=> /eqP; [left | right]]. Qed.
 
 Lemma predD1P : reflect (x <> y /\ b) ((x != y) && b).
 Proof. by apply: (iffP andP)=> [] [] // /eqP. Qed.
@@ -355,24 +357,24 @@ Section Exo.
 Variables (aT rT : eqType) (D : pred aT) (f : aT -> rT) (g : rT -> aT).
 
 Lemma inj_eq : injective f -> forall x y, (f x == f y) = (x == y).
-Proof. by move=> inj_f x y; apply/eqP/eqP=> [|-> //]; exact: inj_f. Qed.
+Proof. by move=> inj_f x y; apply/eqP/eqP=> [|-> //]; apply: inj_f. Qed.
 
 Lemma can_eq : cancel f g -> forall x y, (f x == f y) = (x == y).
-Proof. move/can_inj; exact: inj_eq. Qed.
+Proof. by move/can_inj; apply: inj_eq. Qed.
 
 Lemma bij_eq : bijective f -> forall x y, (f x == f y) = (x == y).
-Proof. move/bij_inj; apply: inj_eq. Qed.
+Proof. by move/bij_inj; apply: inj_eq. Qed.
 
 Lemma can2_eq : cancel f g -> cancel g f -> forall x y, (f x == y) = (x == g y).
-Proof. by move=> fK gK x y; rewrite -{1}[y]gK; exact: can_eq. Qed.
+Proof. by move=> fK gK x y; rewrite -{1}[y]gK; apply: can_eq. Qed.
 
 Lemma inj_in_eq :
   {in D &, injective f} -> {in D &, forall x y, (f x == f y) = (x == y)}.
-Proof. by move=> inj_f x y Dx Dy; apply/eqP/eqP=> [|-> //]; exact: inj_f. Qed.
+Proof. by move=> inj_f x y Dx Dy; apply/eqP/eqP=> [|-> //]; apply: inj_f. Qed.
 
 Lemma can_in_eq :
   {in D, cancel f g} -> {in D &, forall x y, (f x == f y) = (x == y)}.
-Proof. by move/can_in_inj; exact: inj_in_eq. Qed.
+Proof. by move/can_in_inj; apply: inj_in_eq. Qed.
 
 End Exo.
 
@@ -383,7 +385,7 @@ Variable T : eqType.
 Definition frel f := [rel x y : T | f x == y].
 
 Lemma inv_eq f : involutive f -> forall x y : T, (f x == y) = (x == f y).
-Proof. by move=> fK; exact: can2_eq. Qed.
+Proof. by move=> fK; apply: can2_eq. Qed.
 
 Lemma eq_frel f f' : f =1 f' -> frel f =2 frel f'.
 Proof. by move=> eq_f x y; rewrite /= eq_f. Qed.
@@ -404,7 +406,7 @@ Lemma invariant_comp : subpred (invariant f k) (invariant f (h \o k)).
 Proof. by move=> x eq_kfx; rewrite /= (eqP eq_kfx). Qed.
 
 Lemma invariant_inj : injective h -> invariant f (h \o k) =1 invariant f k.
-Proof. move=> inj_h x; exact: (inj_eq inj_h). Qed.
+Proof. by move=> inj_h x; apply: (inj_eq inj_h). Qed.
 
 End EqFun.
 
@@ -467,7 +469,7 @@ Hypothesis Hcompare : comparable.
 Definition compareb x y : bool := Hcompare x y.
 
 Lemma compareP : Equality.axiom compareb.
-Proof. by move=> x y; exact: sumboolP. Qed.
+Proof. by move=> x y; apply: sumboolP. Qed.
 
 Definition comparableClass := EqMixin compareP.
 
@@ -517,14 +519,13 @@ CoInductive insub_spec x : option sT -> Type :=
 
 Lemma insubP x : insub_spec x (insub x).
 Proof.
-by rewrite /insub; case: {-}_ / idP; [left; rewrite ?SubK | right; exact/negP].
+by rewrite /insub; case: {-}_ / idP; [left; rewrite ?SubK | right; apply/negP].
 Qed.
 
 Lemma insubT x Px : insub x = Some (Sub x Px).
 Proof.
-case: insubP; last by case/negP.
-case/SubP=> y Py _ def_x; rewrite -def_x SubK in Px *.
-congr (Some (Sub _ _)); exact: bool_irrelevance.
+do [case: insubP => [/SubP[y Py] _ <- | /negP// ]; rewrite SubK]  in Px *.
+by rewrite (bool_irrelevance Px Py).
 Qed.
 
 Lemma insubF x : P x = false -> insub x = None.
@@ -543,7 +544,7 @@ Lemma valP (u : sT) : P (val u).
 Proof. by case/SubP: u => x Px; rewrite SubK. Qed.
 
 Lemma valK : pcancel (@val _) insub.
-Proof. case/SubP=> x Px; rewrite SubK; exact: insubT. Qed.
+Proof. by case/SubP=> x Px; rewrite SubK; apply: insubT. Qed.
 
 Lemma val_inj : injective (@val sT).
 Proof. exact: pcan_inj valK. Qed.
@@ -624,7 +625,7 @@ Implicit Arguments innew [T nT].
 Prenex Implicits innew.
 
 Lemma innew_val T nT : cancel val (@innew T nT).
-Proof. by move=> u; apply: val_inj; exact: SubK. Qed.
+Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
 
 (* Prenex Implicits and renaming. *)
 Notation sval := (@proj1_sig _ _).
@@ -680,7 +681,7 @@ Section TransferEqType.
 Variables (T : Type) (eT : eqType) (f : T -> eT).
 
 Lemma inj_eqAxiom : injective f -> Equality.axiom (fun x y => f x == f y).
-Proof. by move=> f_inj x y; apply: (iffP eqP) => [|-> //]; exact: f_inj. Qed.
+Proof. by move=> f_inj x y; apply: (iffP eqP) => [|-> //]; apply: f_inj. Qed.
 
 Definition InjEqMixin f_inj := EqMixin (inj_eqAxiom f_inj).
 

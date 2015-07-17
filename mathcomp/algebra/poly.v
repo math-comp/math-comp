@@ -1,11 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype bigop binomial.
-Require Import ssralg.
-
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import bigop ssralg binomial.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
@@ -195,7 +193,7 @@ Proof.
 split=> [eq_pq | -> //]; apply: poly_inj.
 without loss lt_pq: p q eq_pq / size p < size q.
   move=> IH; case: (ltngtP (size p) (size q)); try by move/IH->.
-  move/(@eq_from_nth _ 0); exact.
+  by move/(@eq_from_nth _ 0); apply.
 case: q => q nz_q /= in lt_pq eq_pq *; case/eqP: nz_q.
 by rewrite (last_nth 0) -(subnKC lt_pq) /= -eq_pq nth_default ?leq_addr.
 Qed.
@@ -236,7 +234,7 @@ by rewrite !polyseqC !eqxx nz_c.
 Qed.
 
 Lemma polyseqK p : Poly p = p.
-Proof. by apply: poly_inj; exact: PolyK (valP p). Qed.
+Proof. by apply: poly_inj; apply: PolyK (valP p). Qed.
 
 Lemma size_Poly s : size (Poly s) <= size s.
 Proof.
@@ -364,7 +362,7 @@ Lemma nil_poly p : nilp p = (p == 0).
 Proof. exact: size_poly_eq0. Qed.
 
 Lemma poly0Vpos p : {p = 0} + {size p > 0}.
-Proof. by rewrite lt0n size_poly_eq0; exact: eqVneq. Qed.
+Proof. by rewrite lt0n size_poly_eq0; apply: eqVneq. Qed.
 
 Lemma polySpred p : p != 0 -> size p = (size p).-1.+1.
 Proof. by rewrite -size_poly_eq0 -lt0n => /prednK. Qed.
@@ -612,7 +610,7 @@ Lemma polyC_mul : {morph polyC : a b / a * b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefCM !coefC ?simp. Qed.
 
 Fact polyC_multiplicative : multiplicative polyC.
-Proof. by split; first exact: polyC_mul. Qed.
+Proof. by split; first apply: polyC_mul. Qed.
 Canonical polyC_rmorphism := AddRMorphism polyC_multiplicative.
 
 Lemma polyC_exp n : {morph polyC : c / c ^+ n}.
@@ -744,7 +742,7 @@ Lemma poly_ind (K : {poly R} -> Type) :
   K 0 -> (forall p c, K p -> K (p * 'X + c%:P)) -> (forall p, K p).
 Proof.
 move=> K0 Kcons p; rewrite -[p]polyseqK.
-elim: {p}(p : seq R) => //= p c IHp; rewrite cons_poly_def; exact: Kcons.
+by elim: {p}(p : seq R) => //= p c IHp; rewrite cons_poly_def; apply: Kcons.
 Qed.
 
 Lemma polyseqXsubC a : 'X - a%:P = [:: - a; 1] :> seq R.
@@ -804,7 +802,7 @@ Lemma size_polyXn n : size 'X^n = n.+1.
 Proof. by rewrite polyseqXn size_rcons size_nseq. Qed.
 
 Lemma commr_polyXn p n : GRing.comm p 'X^n.
-Proof. by apply: commrX; exact: commr_polyX. Qed.
+Proof. by apply: commrX; apply: commr_polyX. Qed.
 
 Lemma lead_coefXn n : lead_coef 'X^n = 1.
 Proof. by rewrite /lead_coef nth_last polyseqXn last_rcons. Qed.
@@ -848,7 +846,7 @@ Lemma monicX : 'X \is monic. Proof. exact/eqP/lead_coefX. Qed.
 Lemma monicXn n : 'X^n \is monic. Proof. exact/eqP/lead_coefXn. Qed.
 
 Lemma monic_neq0 p : p \is monic -> p != 0.
-Proof. by rewrite -lead_coef_eq0 => /eqP->; exact: oner_neq0. Qed.
+Proof. by rewrite -lead_coef_eq0 => /eqP->; apply: oner_neq0. Qed.
 
 Lemma lead_coef_monicM p q : p \is monic -> lead_coef (p * q) = lead_coef q.
 Proof.
@@ -898,7 +896,7 @@ Proof. exact/eqP/lead_coefXsubC. Qed.
 
 Lemma monic_prod_XsubC I rI (P : pred I) (F : I -> R) :
   \prod_(i <- rI | P i) ('X - (F i)%:P) \is monic.
-Proof. by apply: monic_prod => i _; exact: monicXsubC. Qed.
+Proof. by apply: monic_prod => i _; apply: monicXsubC. Qed.
 
 Lemma size_prod_XsubC I rI (F : I -> R) :
   size (\prod_(i <- rI) ('X - (F i)%:P)) = (size rI).+1.
@@ -968,7 +966,7 @@ Qed.
 
 Lemma monic_comreg p :
   p \is monic -> GRing.comm p (lead_coef p)%:P /\ GRing.rreg (lead_coef p).
-Proof. by move/monicP->; split; [exact: commr1 | exact: rreg1]. Qed.
+Proof. by move/monicP->; split; [apply: commr1 | apply: rreg1]. Qed.
 
 (* Horner evaluation of polynomials *)
 Implicit Types s rs : seq R.
@@ -1191,7 +1189,7 @@ by rewrite /root_of_unity rootE hornerD hornerN hornerXn hornerC subr_eq0.
 Qed.
 
 Lemma unity_rootP n z : reflect (z ^+ n = 1) (n.-unity_root z).
-Proof. by rewrite unity_rootE; exact: eqP. Qed.
+Proof. by rewrite unity_rootE; apply: eqP. Qed.
 
 Definition primitive_root_of_unity n z :=
   (n > 0) && [forall i : 'I_n, i.+1.-unity_root z == (i.+1 == n)].
@@ -1257,7 +1255,7 @@ set q := (n %/ d)%N; rewrite /q.-primitive_root ltn_divRL // n_gt0.
 apply/forallP=> i; rewrite unity_rootE -exprM -prim_order_dvd.
 rewrite -(divnK d_dv_n) -/q -(divnK d_dv_k) mulnAC dvdn_pmul2r //.
 apply/eqP; apply/idP/idP=> [|/eqP->]; last by rewrite dvdn_mull.
-rewrite Gauss_dvdr; first by rewrite eqn_leq ltn_ord; exact: dvdn_leq.
+rewrite Gauss_dvdr; first by rewrite eqn_leq ltn_ord; apply: dvdn_leq.
 by rewrite /coprime gcdnC -(eqn_pmul2r d_gt0) mul1n muln_gcdl !divnK.
 Qed.
 
@@ -1326,7 +1324,7 @@ by rewrite qualifE polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
 Qed.
 
 Fact polyOver_addr_closed : addr_closed (polyOver kS).
-Proof. 
+Proof.
 split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
@@ -1356,7 +1354,7 @@ Canonical polyOver_semiringPred := SemiringPred polyOver_mulr_closed.
 
 Lemma polyOverZ : {in kS & polyOver kS, forall c p, c *: p \is a polyOver kS}.
 Proof.
-by move=> c p Sc /polyOverP Sp; apply/polyOverP=> i; rewrite coefZ rpredM ?Sp. 
+by move=> c p Sc /polyOverP Sp; apply/polyOverP=> i; rewrite coefZ rpredM ?Sp.
 Qed.
 
 Lemma polyOverX : 'X \in polyOver kS.
@@ -1461,7 +1459,7 @@ by rewrite deriv_mulC IHp !mulrDl -!mulrA !commr_polyX !addrA.
 Qed.
 
 Definition derivE := Eval lazy beta delta [morphism_2 morphism_1] in
-  (derivZ, deriv_mulC, derivC, derivX, derivMXaddC, derivXsubC, derivM, derivB, 
+  (derivZ, deriv_mulC, derivC, derivX, derivMXaddC, derivXsubC, derivM, derivB,
    derivD, derivN, derivXn, derivM, derivMn).
 
 (* Iterated derivative. *)
@@ -1544,7 +1542,7 @@ by apply: leq_trans le_p_n _; apply leq_addr.
 Qed.
 
 Lemma lt_size_deriv (p : {poly R}) : p != 0 -> size p^`() < size p.
-Proof. by move=> /polySpred->; exact: size_poly. Qed.
+Proof. by move=> /polySpred->; apply: size_poly. Qed.
 
 (* A normalising version of derivation to get the division by n! in Taylor *)
 
@@ -2035,10 +2033,10 @@ Canonical polynomial_algType :=
   Eval hnf in [algType R of polynomial R for poly_algType].
 
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
-Proof. by rewrite hornerM_comm //; exact: mulrC. Qed.
+Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
 
 Lemma horner_exp p x n : (p ^+ n).[x] = p.[x] ^+ n.
-Proof. by rewrite horner_exp_comm //; exact: mulrC. Qed.
+Proof. by rewrite horner_exp_comm //; apply: mulrC. Qed.
 
 Lemma horner_prod I r (P : pred I) (F : I -> {poly R}) x :
   (\prod_(i <- r | P i) F i).[x] = \prod_(i <- r | P i) (F i).[x].
@@ -2053,7 +2051,7 @@ Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
 
 Fact horner_eval_is_lrmorphism x : lrmorphism_for *%R (horner_eval x).
 Proof.
-have cxid: commr_rmorph idfun x by exact: mulrC.
+have cxid: commr_rmorph idfun x by apply: mulrC.
 have evalE : horner_eval x =1 horner_morph cxid.
   by move=> p; congr _.[x]; rewrite map_poly_id.
 split=> [|c p]; last by rewrite !evalE /= -linearZ.
@@ -2067,7 +2065,7 @@ Canonical horner_eval_lrmorphism x := [lrmorphism of horner_eval x].
 Fact comp_poly_multiplicative q : multiplicative (comp_poly q).
 Proof.
 split=> [p1 p2|]; last by rewrite comp_polyC.
-by rewrite /comp_poly rmorphM hornerM_comm //; exact: mulrC.
+by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
 Qed.
 Canonical comp_poly_rmorphism q := AddRMorphism (comp_poly_multiplicative q).
 Canonical comp_poly_lrmorphism q := [lrmorphism of comp_poly q].
@@ -2281,6 +2279,19 @@ rewrite coefZ (nth_default 0 (leq_trans _ le_qp_i)) ?mulr0 //=.
 by rewrite polySpred ?expf_neq0 // !size_exp -(subnKC q_gt1) ltn_pmul2l.
 Qed.
 
+Theorem max_poly_roots p rs :
+  p != 0 -> all (root p) rs -> uniq rs -> size rs < size p.
+Proof.
+elim: rs p => [p pn0 _ _ | r rs ihrs p pn0] /=; first by rewrite size_poly_gt0.
+case/andP => rpr arrs /andP [rnrs urs]; case/factor_theorem: rpr => q epq.
+case: (altP (q =P 0)) => [q0 | ?]; first by move: pn0; rewrite epq q0 mul0r eqxx.
+have -> : size p = (size q).+1.
+   by rewrite epq size_Mmonic ?monicXsubC // size_XsubC addnC.
+suff /eq_in_all h : {in rs, root q =1 root p} by apply: ihrs => //; rewrite h.
+move=> x xrs; rewrite epq rootM root_XsubC orbC; case: (altP (x =P r)) => // exr.
+by move: rnrs; rewrite -exr xrs.
+Qed.
+
 End PolynomialIdomain.
 
 Section MapFieldPoly.
@@ -2399,10 +2410,6 @@ Proof.
 elim: rs => //= r rs ->; congr (_ && _); rewrite -has_pred1 -all_predC.
 by apply: eq_all => t; rewrite /diff_roots mulrC eqxx unitfE subr_eq0.
 Qed.
-
-Theorem max_poly_roots p rs :
-  p != 0 -> all (root p) rs -> uniq rs -> size rs < size p.
-Proof. by rewrite -uniq_rootsE; exact: max_ring_poly_roots. Qed.
 
 Section UnityRoots.
 

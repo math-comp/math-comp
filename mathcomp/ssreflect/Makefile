@@ -17,6 +17,12 @@ else
 V=$(BRANCH_coq)
 endif
 
+ifeq "$V" "v8.4"
+COQDEP=../../etc/utils/ssrcoqdep
+else
+COQDEP=$(COQBIN)/coqdep
+endif
+
 OLD_MAKEFLAGS:=$(MAKEFLAGS)
 MAKEFLAGS+=-B
 
@@ -27,7 +33,7 @@ MAKEFLAGS+=-B
 	# Override COQDEP to find only the "right" copy .ml files
 	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
 		-f Makefile.coq $* \
-		COQDEP='$(COQBIN)/coqdep -exclude-dir plugin -c'
+		COQDEP='$(COQDEP) -exclude-dir plugin -c'
 
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\

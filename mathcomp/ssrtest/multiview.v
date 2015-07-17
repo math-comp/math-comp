@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrnat.
 
 Goal forall m n p, n <= p -> m <= n -> m <= p.
 by move=> m n p le_n_p /leq_trans; apply.
@@ -45,6 +47,7 @@ Lemma test7:  forall A B, (A -> B) -> A -> B.
 move=> A B A_to_B a; apply A_to_B in a; exact: a.
 Qed.
 
+From mathcomp
 Require Import ssrfun eqtype ssrnat div seq choice fintype finfun finset.
 
 Lemma test8 (T : finType) (A B : {set T}) x (Ax : x \in A) (_ : B = A) : x \in B.

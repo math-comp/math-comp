@@ -1,5 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq.
+From mathcomp
 Require Import fintype.
 
 Lemma test15: forall (y : nat) (x : 'I_2), y < 1 -> val x = y -> Some x = insub y.

@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun.
 
 (******************************************************************************)
 (* A theory of boolean predicates and operators. A large part of this file is *)
@@ -37,15 +39,27 @@ Require Import ssreflect ssrfun.
 (*                            boolP my_formula generates two subgoals with    *)
 (*                            assumtions my_formula and ~~ myformula. As      *)
 (*                            with altP, my_formula must be an application.   *)
-(*              unless C P <-> hP : P may be assumed when proving P.          *)
-(*                         := (P -> C) -> C (Pierce's law).                   *)
-(*                            This is slightly weaker but easier to use than  *)
-(*                            P \/ C when P C : Prop.                         *)
-(*           classically P <-> hP : P can be assumed when proving is_true b   *)
+(*            \unless C, P <-> we can assume property P when a something that *)
+(*                            holds under condition C (such as C itself).     *)
+(*                         := forall G : Prop, (C -> G) -> (P -> G) -> G.     *)
+(*                            This is just C \/ P or rather its impredicative *)
+(*                            encoding, whose usage better fits the above     *)
+(*                            description: given a lemma UCP whose conclusion *)
+(*                            is \unless C, P we can assume P by writing:     *)
+(*                              wlog hP: / P by apply/UCP; (prove C -> goal). *)
+(*                           or even apply: UCP id _ => hP if the goal is C.  *)
+(*           classically P <-> we can assume P when proving is_true b.        *)
 (*                         := forall b : bool, (P -> b) -> b.                 *)
 (*                            This is equivalent to ~ (~ P) when P : Prop.    *)
+(*             implies P Q == wrapper coinductive type that coerces to P -> Q *)
+(*                            and can be used as a P -> Q view unambigously.  *)
+(*                            Useful to avoid spurious insertion of <-> views *)
+(*                            when Q is a conjunction of foralls, as in Lemma *)
+(*                            all_and2 below; conversely, avoids confusion in *)
+(*                            apply views for impredicative properties, such  *)
+(*                            as \unless C, P. Also supports contrapositives. *)
 (*                  a && b == the boolean conjunction of a and b.             *)
-(*                  a || b == then boolean disjunction of a and b.            *)
+(*                  a || b == the boolean disjunction of a and b.             *)
 (*                 a ==> b == the boolean implication of b by a.              *)
 (*                    ~~ a == the boolean negation of a.                      *)
 (*                 a (+) b == the boolean exclusive or (or sum) of a and b.   *)
@@ -507,10 +521,10 @@ Lemma elimTFn : b = c -> if c then ~ P else P.
 Proof. by move <-; apply: (elimNTF Hb); case b. Qed.
 
 Lemma equivPifn : (Q -> P) -> (P -> Q) -> if b then ~ Q else Q.
-Proof. rewrite -if_neg; exact: equivPif. Qed.
+Proof. by rewrite -if_neg; apply: equivPif. Qed.
 
 Lemma xorPifn : Q \/ P -> ~ (Q /\ P) -> if b then Q else ~ Q.
-Proof. rewrite -if_neg; exact: xorPif. Qed.
+Proof. by rewrite -if_neg; apply: xorPif. Qed.
 
 End ReflectNegCore.
 
@@ -541,7 +555,7 @@ Lemma iffP : (P -> Q) -> (Q -> P) -> reflect Q b.
 Proof. by case: Pb; constructor; auto. Qed.
 
 Lemma equivP : (P <-> Q) -> reflect Q b.
-Proof. by case; exact: iffP. Qed.
+Proof. by case; apply: iffP. Qed.
 
 Lemma sumboolP (decQ : decidable Q) : reflect Q decQ.
 Proof. by case: decQ; constructor. Qed.
@@ -550,16 +564,16 @@ Lemma appP : reflect Q b -> P -> Q.
 Proof. by move=> Qb; move/introT; case: Qb. Qed.
 
 Lemma sameP : reflect P c -> b = c.
-Proof. case; [exact: introT | exact: introF]. Qed.
+Proof. by case; [apply: introT | apply: introF]. Qed.
 
 Lemma decPcases : if b then P else ~ P. Proof. by case Pb. Qed.
 
 Definition decP : decidable P. by case: b decPcases; [left | right]. Defined.
 
-Lemma rwP : P <-> b. Proof. by split; [exact: introT | exact: elimT]. Qed.
+Lemma rwP : P <-> b. Proof. by split; [apply: introT | apply: elimT]. Qed.
 
 Lemma rwP2 : reflect Q b -> (P <-> Q).
-Proof. by move=> Qb; split=> ?; [exact: appP | apply: elimT; case: Qb]. Qed.
+Proof. by move=> Qb; split=> ?; [apply: appP | apply: elimT; case: Qb]. Qed.
 
 (*  Predicate family to reflect excluded middle in bool.                      *)
 CoInductive alt_spec : bool -> Type :=
@@ -580,50 +594,75 @@ Hint View for apply// equivPif|3 xorPif|3 equivPifn|3 xorPifn|3.
 (* Allow the direct application of a reflection lemma to a boolean assertion. *)
 Coercion elimT : reflect >-> Funclass.
 
-(* Pierce's law, a weak form of classical reasoning. *)
-Definition unless condition property := (property -> condition) -> condition.
+CoInductive implies P Q := Implies of P -> Q.
+Lemma impliesP P Q : implies P Q -> P -> Q. Proof. by case. Qed.
+Lemma impliesPn (P Q : Prop) : implies P Q -> ~ Q -> ~ P.
+Proof. by case=> iP ? /iP. Qed.
+Coercion impliesP : implies >-> Funclass.
+Hint View for move/ impliesPn|2 impliesP|2.
+Hint View for apply/ impliesPn|2 impliesP|2.
 
-Lemma bind_unless C P {Q} : unless C P -> unless (unless C Q) P.
-Proof. by move=> haveP suffPQ suffQ; apply: haveP => /suffPQ; exact. Qed.
+(* Impredicative or, which can emulate a classical not-implies. *)
+Definition unless condition property : Prop :=
+ forall goal : Prop, (condition -> goal) -> (property -> goal) -> goal.
 
-Lemma unless_contra b C : (~~ b -> C) -> unless C b.
-Proof. by case: b => [_ haveC | haveC _]; exact: haveC. Qed.
+Notation "\unless C , P" := (unless C P)
+  (at level 200, C at level 100,
+   format "'[' \unless  C , '/ '  P ']'") : type_scope.
+
+Lemma unlessL C P : implies C (\unless C, P).
+Proof. by split=> hC G /(_ hC). Qed.
+
+Lemma unlessR C P : implies P (\unless C, P).
+Proof. by split=> hP G _ /(_ hP). Qed.
+
+Lemma unless_sym C P : implies (\unless C, P) (\unless P, C).
+Proof. by split; apply; [apply/unlessR | apply/unlessL]. Qed.
+
+Lemma unlessP (C P : Prop) : (\unless C, P) <-> C \/ P.
+Proof. by split=> [|[/unlessL | /unlessR]]; apply; [left | right]. Qed.
+
+Lemma bind_unless C P {Q} : implies (\unless C, P) (\unless (\unless C, Q), P).
+Proof. by split; apply=> [hC|hP]; [apply/unlessL/unlessL | apply/unlessR]. Qed.
+
+Lemma unless_contra b C : implies (~~ b -> C) (\unless C, b).
+Proof. by split; case: b => [_ | hC]; [apply/unlessR | apply/unlessL/hC]. Qed.
 
 (* Classical reasoning becomes directly accessible for any bool subgoal.      *)
 (* Note that we cannot use "unless" here for lack of universe polymorphism.   *)
 Definition classically P : Prop := forall b : bool, (P -> b) -> b.
 
-Lemma classicP : forall P : Prop, classically P <-> ~ ~ P.
+Lemma classicP (P : Prop) : classically P <-> ~ ~ P.
 Proof.
-move=> P; split=> [cP nP | nnP [] // nP]; last by case nnP; move/nP.
+split=> [cP nP | nnP [] // nP]; last by case nnP; move/nP.
 by have: P -> false; [move/nP | move/cP].
 Qed.
 
-Lemma classic_bind : forall P Q,
-  (P -> classically Q) -> (classically P -> classically Q).
-Proof. by move=> P Q IH IH_P b IH_Q; apply: IH_P; move/IH; exact. Qed.
+Lemma classicW P : P -> classically P. Proof. by move=> hP _ ->. Qed.
 
-Lemma classic_EM : forall P, classically (decidable P).
+Lemma classic_bind P Q : (P -> classically Q) -> classically P -> classically Q.
+Proof. by move=> iPQ cP b /iPQ-/cP. Qed.
+
+Lemma classic_EM P : classically (decidable P).
 Proof.
-by move=> P [] // IH; apply IH; right => ?; apply: notF (IH _); left.
+by case=> // undecP; apply/undecP; right=> notP; apply/notF/undecP; left.
 Qed.
 
-Lemma classic_imply : forall P Q, (P -> classically Q) -> classically (P -> Q).
+Lemma classic_pick T P : classically ({x : T | P x} + (forall x, ~ P x)).
 Proof.
-move=> P Q IH [] // notPQ; apply notPQ; move/IH=> hQ; case: notF.
-by apply: hQ => hQ; case: notF; exact: notPQ.
+case=> // undecP; apply/undecP; right=> x Px.
+by apply/notF/undecP; left; exists x.
 Qed.
 
-Lemma classic_pick : forall T P,
-  classically ({x : T | P x} + (forall x, ~ P x)).
+Lemma classic_imply P Q : (P -> classically Q) -> classically (P -> Q).
 Proof.
-move=> T P [] // IH; apply IH; right=> x Px; case: notF.
-by apply: IH; left; exists x.
+move=> iPQ []// notPQ; apply/notPQ=> /iPQ-cQ.
+by case: notF; apply: cQ => hQ; apply: notPQ.
 Qed.
 
 (* List notations for wider connectives; the Prop connectives have a fixed    *)
 (* width so as to avoid iterated destruction (we go up to width 5 for /\, and *)
-(* width 4 for or. The bool connectives have arbitrary widths, but denote     *)
+(* width 4 for or). The bool connectives have arbitrary widths, but denote    *)
 (* expressions that associate to the RIGHT. This is consistent with the right *)
 (* associativity of list expressions and thus more convenient in most proofs. *)
 
@@ -665,22 +704,27 @@ Section AllAnd.
 Variables (T : Type) (P1 P2 P3 P4 P5 : T -> Prop).
 Local Notation a P := (forall x, P x).
 
-Lemma all_and2 (hP : forall x, [/\ P1 x & P2 x]) : [/\ a P1 & a P2].
-Proof. by split=> x; case: (hP x). Qed.
+Lemma all_and2 : implies (forall x, [/\ P1 x & P2 x]) [/\ a P1 & a P2].
+Proof. by split=> haveP; split=> x; case: (haveP x). Qed.
 
-Lemma all_and3 (hP : forall x, [/\ P1 x, P2 x & P3 x]) :
-  [/\ a P1, a P2 & a P3].
-Proof. by split=> x; case: (hP x). Qed.
+Lemma all_and3 : implies (forall x, [/\ P1 x, P2 x & P3 x])
+                         [/\ a P1, a P2 & a P3].
+Proof. by split=> haveP; split=> x; case: (haveP x). Qed.
 
-Lemma all_and4 (hP : forall x, [/\ P1 x, P2 x, P3 x & P4 x]) :
-  [/\ a P1, a P2, a P3 & a P4].
-Proof. by split=> x; case: (hP x). Qed.
+Lemma all_and4 : implies (forall x, [/\ P1 x, P2 x, P3 x & P4 x])
+                         [/\ a P1, a P2, a P3 & a P4].
+Proof. by split=> haveP; split=> x; case: (haveP x). Qed.
 
-Lemma all_and5 (hP : forall x, [/\ P1 x, P2 x, P3 x, P4 x & P5 x]) :
-  [/\ a P1, a P2, a P3, a P4 & a P5].
-Proof. by split=> x; case: (hP x). Qed.
+Lemma all_and5 : implies (forall x, [/\ P1 x, P2 x, P3 x, P4 x & P5 x])
+                         [/\ a P1, a P2, a P3, a P4 & a P5].
+Proof. by split=> haveP; split=> x; case: (haveP x). Qed.
 
 End AllAnd.
+
+Implicit Arguments all_and2 [[T] [P1] [P2]].
+Implicit Arguments all_and3 [[T] [P1] [P2] [P3]].
+Implicit Arguments all_and4 [[T] [P1] [P2] [P3] [P4]].
+Implicit Arguments all_and5 [[T] [P1] [P2] [P3] [P4] [P5]].
 
 Lemma pair_andP P Q : P /\ Q <-> P * Q. Proof. by split; case. Qed.
 
@@ -1423,7 +1467,7 @@ Definition antisymmetric := forall x y, R x y && R y x -> x = y.
 Definition pre_symmetric := forall x y, R x y -> R y x.
 
 Lemma symmetric_from_pre : pre_symmetric -> symmetric.
-Proof. move=> symR x y; apply/idP/idP; exact: symR. Qed.
+Proof. by move=> symR x y; apply/idP/idP; apply: symR. Qed.
   
 Definition reflexive := forall x, R x x.
 Definition irreflexive := forall x, R x x = false.
@@ -1457,7 +1501,7 @@ Qed.
 End RelationProperties.
 
 Lemma rev_trans T (R : rel T) : transitive R -> transitive (fun x y => R y x).
-Proof. by move=> trR x y z Ryx Rzy; exact: trR Rzy Ryx. Qed.
+Proof. by move=> trR x y z Ryx Rzy; apply: trR Rzy Ryx. Qed.
 
 (* Property localization *)
 
@@ -1608,14 +1652,14 @@ Lemma in3T : {in T1 & T2 & T3, {all3 P3}} -> {all3 P3}.
 Proof. by move=> ? ?; auto. Qed.
 
 Lemma sub_in1 (Ph : ph {all1 P1}) : prop_in1 d1' Ph -> prop_in1 d1 Ph.
-Proof. move=> allP x /sub1; exact: allP. Qed.
+Proof. by move=> allP x /sub1; apply: allP. Qed.
 
 Lemma sub_in11 (Ph : ph {all2 P2}) : prop_in11 d1' d2' Ph -> prop_in11 d1 d2 Ph.
-Proof. move=> allP x1 x2 /sub1 d1x1 /sub2; exact: allP. Qed.
+Proof. by move=> allP x1 x2 /sub1 d1x1 /sub2; apply: allP. Qed.
 
 Lemma sub_in111 (Ph : ph {all3 P3}) :
   prop_in111 d1' d2' d3' Ph -> prop_in111 d1 d2 d3 Ph.
-Proof. by move=> allP x1 x2 x3 /sub1 d1x1 /sub2 d2x2 /sub3; exact: allP. Qed.
+Proof. by move=> allP x1 x2 x3 /sub1 d1x1 /sub2 d2x2 /sub3; apply: allP. Qed.
 
 Let allQ1 f'' := {all1 Q1 f''}.
 Let allQ1l f'' h' := {all1 Q1l f'' h'}.
@@ -1637,15 +1681,15 @@ Proof. by move=> ? ?; auto. Qed.
 
 Lemma subon1 (Phf : ph (allQ1 f)) (Ph : ph (allQ1 f)) :
   prop_on1 d2' Phf Ph -> prop_on1 d2 Phf Ph.
-Proof. by move=> allQ x /sub2; exact: allQ. Qed.
+Proof. by move=> allQ x /sub2; apply: allQ. Qed.
 
 Lemma subon1l (Phf : ph (allQ1l f)) (Ph : ph (allQ1l f h)) :
   prop_on1 d2' Phf Ph -> prop_on1 d2 Phf Ph.
-Proof. by move=> allQ x /sub2; exact: allQ. Qed.
+Proof. by move=> allQ x /sub2; apply: allQ. Qed.
 
 Lemma subon2 (Phf : ph (allQ2 f)) (Ph : ph (allQ2 f)) :
   prop_on2 d2' Phf Ph -> prop_on2 d2 Phf Ph.
-Proof. by move=> allQ x y /sub2=> d2fx /sub2; exact: allQ. Qed.
+Proof. by move=> allQ x y /sub2=> d2fx /sub2; apply: allQ. Qed.
 
 Lemma can_in_inj : {in D1, cancel f g} -> {in D1 &, injective f}.
 Proof. by move=> fK x y /fK{2}<- /fK{2}<- ->. Qed.
@@ -1680,40 +1724,40 @@ Proof. by case=> g' fK g'K; exists g' => * ? *; auto. Qed.
 Lemma sub_in_bij (D1' : pred T1) :
   {subset D1 <= D1'} -> {in D1', bijective f} -> {in D1, bijective f}.
 Proof.
-by move=> subD [g' fK g'K]; exists g' => x; move/subD; [exact: fK | exact: g'K].
+by move=> subD [g' fK g'K]; exists g' => x; move/subD; [apply: fK | apply: g'K].
 Qed.
 
 Lemma subon_bij (D2' : pred T2) :
   {subset D2 <= D2'} -> {on D2', bijective f} -> {on D2, bijective f}.
 Proof.
-by move=> subD [g' fK g'K]; exists g' => x; move/subD; [exact: fK | exact: g'K].
+by move=> subD [g' fK g'K]; exists g' => x; move/subD; [apply: fK | apply: g'K].
 Qed.
 
 End LocalGlobal.
 
 Lemma sub_in2 T d d' (P : T -> T -> Prop) :
   sub_mem d d' -> forall Ph : ph {all2 P}, prop_in2 d' Ph -> prop_in2 d Ph.
-Proof. by move=> /= sub_dd'; exact: sub_in11. Qed.
+Proof. by move=> /= sub_dd'; apply: sub_in11. Qed.
 
 Lemma sub_in3 T d d' (P : T -> T -> T -> Prop) :
   sub_mem d d' -> forall Ph : ph {all3 P}, prop_in3 d' Ph -> prop_in3 d Ph.
-Proof. by move=> /= sub_dd'; exact: sub_in111. Qed.
+Proof. by move=> /= sub_dd'; apply: sub_in111. Qed.
 
 Lemma sub_in12 T1 T d1 d1' d d' (P : T1 -> T -> T -> Prop) :
   sub_mem d1 d1' -> sub_mem d d' ->
   forall Ph : ph {all3 P}, prop_in12 d1' d' Ph -> prop_in12 d1 d Ph.
-Proof. by move=> /= sub1 sub; exact: sub_in111. Qed.
+Proof. by move=> /= sub1 sub; apply: sub_in111. Qed.
 
 Lemma sub_in21 T T3 d d' d3 d3' (P : T -> T -> T3 -> Prop) :
   sub_mem d d' -> sub_mem d3 d3' ->
   forall Ph : ph {all3 P}, prop_in21 d' d3' Ph -> prop_in21 d d3 Ph.
-Proof. by move=> /= sub sub3; exact: sub_in111. Qed.
+Proof. by move=> /= sub sub3; apply: sub_in111. Qed.
 
 Lemma equivalence_relP_in T (R : rel T) (A : pred T) :
   {in A & &, equivalence_rel R}
    <-> {in A, reflexive R} /\ {in A &, forall x y, R x y -> {in A, R x =1 R y}}.
 Proof.
-split=> [eqiR | [Rxx trR] x y z *]; last by split=> [|/trR-> //]; exact: Rxx.
+split=> [eqiR | [Rxx trR] x y z *]; last by split=> [|/trR-> //]; apply: Rxx.
 by split=> [x Ax|x y Ax Ay Rxy z Az]; [rewrite (eqiR x x) | rewrite (eqiR x y)].
 Qed.
 

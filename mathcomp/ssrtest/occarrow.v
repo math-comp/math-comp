@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect eqtype ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import eqtype ssrnat.
 
 Lemma test1 : forall n m : nat, n = m -> m * m + n * n = n * n + n * n.
 move=> n m E; have [{2}-> _] : n * n = m * n /\ True by move: E => {1}<-.

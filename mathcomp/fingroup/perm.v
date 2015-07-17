@@ -1,10 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path choice fintype tuple finfun bigop finset binomial.
-Require Import fingroup.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq path choice fintype.
+From mathcomp
+Require Import tuple finfun bigop finset binomial fingroup.
 
 (******************************************************************************)
 (* This file contains the definition and properties associated to the group   *)
@@ -15,14 +14,14 @@ Require Import fingroup.
 (*         'S_n == the set of all permutations of 'I_n, i.e., of {0,.., n-1}  *)
 (*  perm_on A u == u is a permutation with support A, i.e., u only displaces  *)
 (*                 elements of A (u x != x implies x \in A).                  *)
-(*    tperm x y == the transposition of x, y                                  *)
-(*    aperm x s == the image of x under the action of the permutation s       *)
+(*    tperm x y == the transposition of x, y.                                 *)
+(*    aperm x s == the image of x under the action of the permutation s.      *)
 (*              := s x                                                        *)
 (*   pcycle s x == the set of all elements that are in the same cycle of the  *)
-(*                 permutation s as x, i.e., {x, s x, (s ^+ 2) x, ...}        *)
-(*    pcycles s == the set of all the cycles of the permutation s             *)
-(*   (s : bool) == s is an odd permutation (the coercion is called odd_perm)  *)
-(*      dpair u == u is a pair (x, y) of distinct objects (i.e., x != y)      *)
+(*                 permutation s as x, i.e., {x, s x, (s ^+ 2) x, ...}.       *)
+(*    pcycles s == the set of all the cycles of the permutation s.            *)
+(*   (s : bool) == s is an odd permutation (the coercion is called odd_perm). *)
+(*      dpair u == u is a pair (x, y) of distinct objects (i.e., x != y).     *)
 (* lift_perm i j s == the permutation obtained by lifting s : 'S_n.-1 over    *)
 (*                 (i |-> j), that maps i to j and lift i k to lift j (s k).  *)
 (* Canonical structures are defined allowing permutations to be an eqType,    *)
@@ -117,7 +116,7 @@ Variable T : finType.
 Implicit Types (x y : T) (s t : {perm T}) (S : {set T}).
 
 Lemma permP s t : s =1 t <-> s = t.
-Proof. by split=> [| -> //]; rewrite unlock => eq_sv; exact/val_inj/ffunP. Qed.
+Proof. by split=> [| -> //]; rewrite unlock => eq_sv; apply/val_inj/ffunP. Qed.
 
 Lemma pvalE s : pval s = s :> (T -> T).
 Proof. by rewrite [@fun_of_perm]unlock. Qed.
@@ -126,7 +125,7 @@ Lemma permE f f_inj : @perm T f f_inj =1 f.
 Proof. by move=> x; rewrite -pvalE [@perm]unlock ffunE. Qed.
 
 Lemma perm_inj s : injective s.
-Proof. by rewrite -!pvalE; exact: (injectiveP _ (valP s)). Qed.
+Proof. by rewrite -!pvalE; apply: (injectiveP _ (valP s)). Qed.
 
 Implicit Arguments perm_inj [].
 Hint Resolve perm_inj.
@@ -204,7 +203,7 @@ by have [-> /tH | /sH] := eqVneq (s x) x.
 Qed.
 
 Lemma out_perm S u x : perm_on S u -> x \notin S -> u x = x.
-Proof. by move=> uS; exact: contraNeq (subsetP uS x). Qed.
+Proof. by move=> uS; apply: contraNeq (subsetP uS x). Qed.
 
 Lemma im_perm_on u S : perm_on S u -> u @: S = S.
 Proof.
@@ -265,11 +264,11 @@ pose fA s : ffA := [ffun u => s (val u)].
 rewrite -!sum1dep_card -sum1_card (reindex_onto fA pfT) => [|f].
   apply: eq_bigl => p; rewrite andbC; apply/idP/and3P=> [onA | []]; first split.
   - apply/eqP; suffices fTAp: fT (fA p) = pval p.
-      by apply/permP=> x; rewrite -!pvalE insubdK fTAp //; exact: (valP p).
+      by apply/permP=> x; rewrite -!pvalE insubdK fTAp //; apply: (valP p).
     apply/ffunP=> x; rewrite ffunE pvalE.
     by case: insubP => [u _ <- | /out_perm->] //=; rewrite ffunE.
   - by apply/forallP=> [[x Ax]]; rewrite ffunE /= perm_closed.
-  - by apply/injectiveP=> u v; rewrite !ffunE => /perm_inj; exact: val_inj.
+  - by apply/injectiveP=> u v; rewrite !ffunE => /perm_inj; apply: val_inj.
   move/eqP=> <- _ _; apply/subsetP=> x; rewrite !inE -pvalE val_insubd fun_if.
   by rewrite if_arg ffunE; case: insubP; rewrite // pvalE perm1 if_same eqxx.
 case/andP=> /forallP-onA /injectiveP-f_inj.
@@ -393,7 +392,7 @@ have lt_xf a b u n : n < xf a b u -> ~~ pred2 a b ((u ^+ n.+1) a).
   by rewrite permX iterSr nth_traject // (leq_trans lt_n).
 pose t a b u := tperm a b * u.
 have tC a b u : t a b u = t b a u by rewrite /t tpermC.
-have tK a b: involutive (t a b) by move=> u; exact: tpermKg.
+have tK a b: involutive (t a b) by move=> u; apply: tpermKg.
 have tXC a b u n: n <= xf a b u -> (t a b u ^+ n.+1) b = (u ^+ n.+1) a.
   elim: n => [|n IHn] lt_n_f; first by rewrite permM tpermR.
   rewrite !(expgSr _ n.+1) !permM {}IHn 1?ltnW //; congr (u _).
@@ -408,7 +407,7 @@ have eq_xf a b u: pred2 a b ((u ^+ (xf a b u).+1) a).
 have xfC a b u: xf b a (t a b u) = xf a b u.
   without loss lt_a: a b u / xf b a (t a b u) < xf a b u.
     move=> IHab; set m := xf b a _; set n := xf a b u.
-    by case: (ltngtP m n) => // ltx; [exact: IHab | rewrite -[m]IHab tC tK].
+    by case: (ltngtP m n) => // ltx; [apply: IHab | rewrite -[m]IHab tC tK].
   by move/lt_xf: (lt_a); rewrite -(tXC a b) 1?ltnW //= orbC [_ || _]eq_xf.
 pose ts := t x y s; rewrite /= -[_ * s]/ts.
 pose dp u := #|pcycles u :\ pcycle u y :\ pcycle u x|.
@@ -428,8 +427,8 @@ rewrite -/(dp s) !addnA !eq_pcycle_mem andbT; congr (_ + _); last first.
       by rewrite /aperm exp_id mem_pcycle.
     by rewrite /aperm -exp_id mem_pcycle.
   elim: n => // n IHn; rewrite !expgSr !permM {}IHn tpermD //.
-    apply: contraNneq sxz => ->; exact: mem_pcycle.
-  apply: contraNneq syz => ->; exact: mem_pcycle.
+    by apply: contraNneq sxz => ->; apply: mem_pcycle.
+  by apply: contraNneq syz => ->; apply: mem_pcycle.
 case: eqP {dp} => [<- | ne_xy]; first by rewrite /t tperm1 mul1g pcycle_id.
 suff ->: (x \in pcycle (t x y s) y) = (x \notin pcycle s y) by case: (x \in _).
 without loss xf_x: s x y ne_xy / (s ^+ (xf x y s).+1) x = x.
@@ -556,13 +555,13 @@ congr (_ (+) _); last first.
   congr (_ (+) _); transitivity (tperm (lift j t.1) (lift j t.2)); last first.
     by rewrite odd_tperm (inj_eq (@lift_inj _ _)).
   congr odd_perm; apply/permP=> k; case: (unliftP j k) => [k'|] ->.
-    rewrite lift_perm_lift inj_tperm //; exact: lift_inj.
+    by rewrite lift_perm_lift inj_tperm //; apply: lift_inj.
   by rewrite lift_perm_id tpermD // eq_sym neq_lift.
 suff{i j s} odd_lift0 (k : 'I_n.+1): lift_perm ord0 k 1 = odd k :> bool.
   rewrite -!odd_lift0 -{2}invg1 -lift_permV odd_permV -odd_permM.
   by rewrite lift_permM mulg1.
 elim: {k}(k : nat) {1 3}k (erefl (k : nat)) => [|m IHm] k def_k.
-  rewrite (_ : k = ord0) ?lift_perm1 ?odd_perm1 //; exact: val_inj.
+  by rewrite (_ : k = ord0) ?lift_perm1 ?odd_perm1 //; apply: val_inj.
 have le_mn: m < n.+1 by [rewrite -def_k ltnW]; pose j := Ordinal le_mn.
 rewrite -(mulg1 1)%g -(lift_permM _ j) odd_permM {}IHm // addbC.
 rewrite (_ : _ 1 = tperm j k); first by rewrite odd_tperm neq_ltn def_k leqnn.

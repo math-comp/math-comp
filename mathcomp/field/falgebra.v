@@ -1,11 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop.
-From mathcomp.algebra
-Require Import ssralg finalg zmodp matrix vector poly.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq path choice fintype.
+From mathcomp
+Require Import div tuple finfun bigop ssralg finalg zmodp matrix vector poly.
 
 (******************************************************************************)
 (* Finite dimensional free algebras, usually known as F-algebras.             *)

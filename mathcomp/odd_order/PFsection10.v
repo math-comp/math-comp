@@ -1,13 +1,24 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg poly finset center.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action finalg zmodp.
+From mathcomp
 Require Import gfunctor gproduct cyclic commutator gseries nilpotent pgroup.
+From mathcomp
 Require Import sylow hall abelian maximal frobenius.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem vector.
+From mathcomp
 Require Import BGsection1 BGsection3 BGsection7 BGsection15 BGsection16.
+From mathcomp
 Require Import ssrnum algC classfun character integral_char inertia vcharacter.
+From mathcomp
 Require Import PFsection1 PFsection2 PFsection3 PFsection4.
+From mathcomp
 Require Import PFsection5 PFsection6 PFsection7 PFsection8 PFsection9.
 
 (******************************************************************************)
@@ -163,7 +174,7 @@ Lemma FTtypeP_ref_irr :
 Proof.
 have [_ /has_nonprincipal_irr[s nz_s] _ _ _] := Frobenius_context frobMbar.
 exists ('Ind 'chi_s %% M'')%CF; split.
-- exact/cfMod_irr/(irr_induced_Frobenius_ker (FrobeniusWker frobMbar)).
+- by rewrite cfMod_irr ?irr_induced_Frobenius_ker ?(FrobeniusWker frobMbar).
 - by rewrite -cfIndMod ?normal_sub // -mod_IirrE // mem_calS mod_Iirr_eq0.
 rewrite -cfIndMod ?cfInd1 ?normal_sub // -(index_sdprod defM) cfMod1.
 by rewrite lin_char1 ?mulr1 //; apply/char_abelianP/sub_der1_abelian.
@@ -706,8 +717,9 @@ have lb_rho: 1 - w1%:R / #|M'|%:R <= '[rho chi].
   rewrite -leC_nat in lb_M'bar; apply: ler_trans lb_M'bar _.
   rewrite ler_subr_addl -mulrS prednK ?cardG_gt0 // leC_nat.
   by rewrite dvdn_leq ?dvdn_quotient.
-have{lb_rho ub_rho}: 1 - #|G1|%:R/ #|G|%:R - w1%:R^-1 < w1%:R / #|M'|%:R :> algC.
-  rewrite -addrA -opprD ltr_subl_addr -ltr_subl_addl.
+have{lb_rho ub_rho}:
+  1 - #|G1|%:R / #|G|%:R - w1%:R^-1 < w1%:R / #|M'|%:R :> algC.
+- rewrite -addrA -opprD ltr_subl_addr -ltr_subl_addl.
   apply: ler_lt_trans (ler_trans lb_rho ub_rho) _; rewrite addrC ltr_add2l.
   rewrite ltr_pdivr_mulr ?gt0CG // mulrC -(sdprod_card defM) natrM.
   by rewrite mulfK ?neq0CG // defA ltC_nat (cardsD1 1%g M') group1.
@@ -882,20 +894,22 @@ suffices [tau1]: coherent calS M^# tau by case/FTtype345_noncoherence_main.
 have [[_ U_M_1] MtypeV] := compl_of_typeV maxM MtypeP Mtype5.
 have [_ [_ _ _ defH] _ [_ _ _ sW2H' _] _] := MtypeP.
 have{U_M_1 defH} defMF: M`_\F = H by rewrite /= -defH U_M_1 sdprodg1.
-have nilH: nilpotent `H by rewrite -defMF Fcore_nil.
-have scohS := subset_subcoherent scohS0 sSS0.
-have [|//|[[_]]] := (non_coherent_chief nsM'M (nilpotent_sol nilH) scohS) 1%G.
-  split; rewrite ?mFT_odd ?normal1 ?sub1G ?quotient_nil //.
-  by rewrite joingG1 (FrobeniusWker frobMbar).
-rewrite /= joingG1 -(index_sdprod defM) /= -/w1 -[H^`(1)%g]/`H' => ubHbar [p[]].
-rewrite -(isog_abelian (quotient1_isog H)) -(isog_pgroup p (quotient1_isog H)).
-rewrite subn1 => pH not_cHH /negP not_w1_dv_p'1.
+have nilH := Fcore_nil M; rewrite defMF -/w1 in MtypeV nilH.
+without loss [p [pH not_cHH ubHbar not_w1_dv_p1]]: / exists p : nat,
+  [/\ p.-group H, ~~ abelian H, #|H : H'| <= 4 * w1 ^ 2 + 1 & ~ w1 %| p.-1]%N.
+- have [isoH1 solH] := (quotient1_isog H, nilpotent_sol nilH).
+  have /non_coherent_chief-IHcoh := subset_subcoherent scohS0 sSS0.
+  apply: IHcoh (fun coh _ => coh) _ => // [|[[_ ubH] [p [pH ab'H] /negP-dv'p]]].
+    split; rewrite ?mFT_odd ?normal1 ?sub1G ?quotient_nil //.
+    by rewrite joingG1 (FrobeniusWker frobMbar).
+  apply; exists p; rewrite (isog_abelian isoH1) (isog_pgroup p isoH1) -subn1.
+  by rewrite /= joingG1 -(index_sdprod defM) in ubH dv'p.
 have ntH: H :!=: 1%g by apply: contraNneq not_cHH => ->; apply: abelian1.
 have [sH'H nH'H] := andP nsM''M'; have sW2H := subset_trans sW2H' sH'H.
 have def_w2: w2 = p by apply/eqP; have:= pgroupS sW2H pH; rewrite pgroupE pnatE.
-have [p_pr _ [e oH]] := pgroup_pdiv pH ntH.
-rewrite -/w1 /= defMF oH pi_of_exp {e oH}// /pi_of primes_prime // in MtypeV.
-have [tiHG | [_ /predU1P[->[]|]]// | [_ /predU1P[->|//] [oH w1p1 _]]] := MtypeV.
+have piHp q: q \in \pi(H) -> q = p.
+  by rewrite /= -(part_pnat_id pH) pi_of_part // => /andP[_ /eqnP].
+have [tiHG | [_ /piHp-> []//] | [_ /piHp-> [oH w1_dv_p1 _]]] := MtypeV.
   suffices [tau1 [Itau1 Dtau1]]: coherent (seqIndD H M H 1) M^# 'Ind[G].
     exists tau1; split=> // phi Sphi; rewrite {}Dtau1 //.
     rewrite zcharD1_seqInd // -subG1 -setD_eq0 -defA in Sphi tiHG ntH.
@@ -903,8 +917,8 @@ have [tiHG | [_ /predU1P[->[]|]]// | [_ /predU1P[->|//] [oH w1p1 _]]] := MtypeV.
   apply: (@Sibley_coherence _ [set:_] M H W1); first by rewrite mFT_odd.
   right; exists W2 => //; exists 'A0(M), W, defW.
   by rewrite -defA -{2}(group_inj defMs).
-rewrite pcore_pgroup_id // in oH.
-have esH: extraspecial H.
+have [p_pr _ _] := pgroup_pdiv pH ntH; rewrite (pcore_pgroup_id pH) in oH.
+have{not_cHH} esH: extraspecial H.
   by apply: (p3group_extraspecial pH); rewrite // oH pfactorK.
 have oH': #|H'| = p.
   by rewrite -(card_center_extraspecial pH esH); have [[_ <-]] := esH.

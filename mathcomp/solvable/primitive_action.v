@@ -1,12 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div fintype tuple finset.
-From mathcomp.fingroup
-Require Import fingroup action.
-Require Import gseries.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat.
+From mathcomp
+Require Import div seq fintype tuple finset.
+From mathcomp
+Require Import fingroup action gseries.
 
 (******************************************************************************)
 (* n-transitive and primitive actions:                                        *)
@@ -65,7 +64,7 @@ move=> Sx trG; rewrite /primitive trG negb_exists.
 apply/forallP/maximal_eqP=> /= [primG | [_ maxCx] Q].
   split=> [|H sCH sHG]; first exact: subsetIl.
   pose X := orbit to H x; pose Q := orbit (to^*)%act G X.
-  have Xx: x \in X by exact: orbit_refl.
+  have Xx: x \in X by apply: orbit_refl.
   have defH: 'N_(G)(X | to) = H.
     have trH: [transitive H, on X | to] by apply/imsetP; exists x.
     have sHN: H \subset 'N_G(X | to) by rewrite subsetI sHG atrans_acts.
@@ -79,13 +78,13 @@ apply/forallP/maximal_eqP=> /= [primG | [_ maxCx] Q].
   - rewrite card_orbit astab1_set defH -(@ltn_pmul2l #|H|) ?Lagrange // muln1.
     rewrite oHG -(@ltn_pmul2l #|H|) ?Lagrange // -(card_orbit_stab to G x).
     by rewrite -(atransP trG x Sx) mulnC card_orbit ltn_pmul2r.
-  - by apply/actsP=> a Ga Y; apply: orbit_transr; exact: mem_orbit.
+  - by apply/actsP=> a Ga Y; apply/orbit_transl/mem_orbit.
   apply/and3P; split; last 1 first.
   - rewrite orbit_sym; apply/imsetP=> [[a _]] /= defX.
     by rewrite defX /setact imset0 inE in Xx.
   - apply/eqP/setP=> y; apply/bigcupP/idP=> [[_ /imsetP[a Ga ->]] | Sy].
       case/imsetP=> _ /imsetP[b Hb ->] ->.
-      by rewrite !(actsP (atrans_acts trG)) //; exact: subsetP Hb.
+      by rewrite !(actsP (atrans_acts trG)) //; apply: subsetP Hb.
     case: (atransP2 trG Sx Sy) => a Ga ->.
     by exists ((to^*)%act X a); apply: mem_imset; rewrite // orbit_refl.
   apply/trivIsetP=> _ _ /imsetP[a Ga ->] /imsetP[b Gb ->].
@@ -179,7 +178,7 @@ Lemma n_act_dtuple t a :
 Proof.
 move/astabsP=> toSa /dtuple_onP[t_inj St]; apply/dtuple_onP.
 split=> [i j | i]; rewrite !tnth_map ?[_ \in S]toSa //.
-by move/act_inj; exact: t_inj.
+by move/act_inj; apply: t_inj.
 Qed.
 
 End NTransitive.
@@ -202,7 +201,7 @@ Variables (gT : finGroupType) (sT : finType).
 Variables (to : {action gT &-> sT}) (G : {group gT}) (S : {set sT}).
 
 Lemma card_uniq_tuple n (t : n.-tuple sT) : uniq t -> #|t| = n.
-Proof. by move/card_uniqP->; exact: size_tuple. Qed.
+Proof. by move/card_uniqP->; apply: size_tuple. Qed.
 
 Lemma n_act0 (t : 0.-tuple sT) a : n_act to t a = [tuple].
 Proof. exact: tuple0. Qed.
@@ -223,7 +222,7 @@ Qed.
 
 Lemma dtuple_on_subset n (S1 S2 : {set sT}) t :
   S1 \subset S2 -> t \in n.-dtuple(S1) -> t \in n.-dtuple(S2).
-Proof. by move=> sS12; rewrite !inE => /andP[-> /subset_trans]; exact. Qed.
+Proof. by move=> sS12; rewrite !inE => /andP[-> /subset_trans]; apply. Qed.
 
 Lemma n_act_add n x (t : n.-tuple sT) a :
   n_act to [tuple of x :: t] a = [tuple of to x a :: n_act to t a].
@@ -254,7 +253,7 @@ case/and3P=> Sx ntx dt; set xt := [tuple of _] => tr_xt.
 apply/imsetP; exists t => //.
 apply/setP=> u; apply/idP/imsetP=> [du | [a Ga ->{u}]].
   case: (ext_t u du) => y; rewrite tr_xt.
-  by case/imsetP=> a Ga [_ def_u]; exists a => //; exact: val_inj.
+  by case/imsetP=> a Ga [_ def_u]; exists a => //; apply: val_inj.
 have: n_act to xt a \in dtuple_on _ S by rewrite tr_xt mem_imset.
 by rewrite n_act_add dtuple_on_add; case/and3P.
 Qed.
@@ -267,14 +266,14 @@ have trdom1 x: ([tuple x] \in 1.-dtuple(S)) = (x \in S).
 move=> m_gt0 /(ntransitive_weak m_gt0) {m m_gt0}.
 case/imsetP; case/tupleP=> x t0; rewrite {t0}(tuple0 t0) trdom1 => Sx trx.
 apply/imsetP; exists x => //; apply/setP=> y; rewrite -trdom1 trx.
-apply/imsetP/imsetP=> [[a ? [->]]|[a ? ->]]; exists a => //; exact: val_inj.
+by apply/imsetP/imsetP=> [[a ? [->]]|[a ? ->]]; exists a => //; apply: val_inj.
 Qed.
 
 Lemma ntransitive_primitive m :
   1 < m -> [transitive^m G, on S | to] -> [primitive G, on S | to].
 Proof.
 move=> lt1m /(ntransitive_weak lt1m) {m lt1m}tr2G.
-have trG: [transitive G, on S | to] by exact: ntransitive1 tr2G.
+have trG: [transitive G, on S | to] by apply: ntransitive1 tr2G.
 have [x Sx _]:= imsetP trG; rewrite (trans_prim_astab Sx trG).
 apply/maximal_eqP; split=> [|H]; first exact: subsetIl; rewrite subEproper.
 case/predU1P; first by [left]; case/andP=> sCH /subsetPn[a Ha nCa] sHG.
@@ -287,7 +286,7 @@ rewrite eqEsubset acts_sub_orbit // Sy andbT; apply/subsetP=> z Sz.
 have [-> | zx] := eqVneq z x; first by rewrite orbit_sym mem_orbit.
 pose ty := [tuple y; x]; pose tz := [tuple z; x].
 have [Sty Stz]: ty \in 2.-dtuple(S) /\ tz \in 2.-dtuple(S).
-  rewrite !inE !memtE !subset_all /= !mem_seq1 !andbT; split; exact/and3P.
+  by rewrite !inE !memtE !subset_all /= !mem_seq1 !andbT; split; apply/and3P.
 case: (atransP2 tr2G Sty Stz) => b Gb [->] /esym/astab1P cxb.
 by rewrite mem_orbit // (subsetP sCH) // inE Gb.
 Qed.
@@ -310,12 +309,12 @@ case/and3P=> Sx1 nt1x1 dt1 trt1; have Gtr1 := ntransitive1 (ltn0Sn _) Gtr.
 case: (atransP2 Gtr1 Sx1 Sx) => // a Ga x1ax.
 pose t := n_act to t1 a.
 have dxt: [tuple of x :: t] \in m.+1.-dtuple(S).
-  rewrite trt1 x1ax; apply/imsetP; exists a => //; exact: val_inj.
+  by rewrite trt1 x1ax; apply/imsetP; exists a => //; apply: val_inj.
 apply/imsetP; exists t; first by rewrite dtuple_on_add_D1 Sx in dxt.
 apply/setP=> t2; apply/idP/imsetP => [dt2|[b]].
   have: [tuple of x :: t2] \in dtuple_on _ S by rewrite dtuple_on_add_D1 Sx.
   case/(atransP2 Gtr dxt)=> b Gb [xbx tbt2].
-  exists b; [rewrite inE Gb; exact/astab1P | exact: val_inj].
+  by exists b; [rewrite inE Gb; apply/astab1P | apply: val_inj].
 case/setIP=> Gb /astab1P xbx ->{t2}.
 rewrite n_act_dtuple //; last by rewrite dtuple_on_add_D1 Sx in dxt.
 apply/astabsP=> y; rewrite !inE -{1}xbx (inj_eq (act_inj _ _)).

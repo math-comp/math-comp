@@ -1,5 +1,5 @@
 opam-version: "1.2"
-name: "coq:mathcomp:discrete"
+name: "coq:mathcomp:basic"
 version: "1.5"
 maintainer: "Ssreflect <ssreflect@msr-inria.inria.fr>"
 authors: "Ssreflect <ssreflect@msr-inria.inria.fr>"
@@ -8,5 +8,5 @@ bug-reports: "ssreflect@msr-inria.inria.fr"
 license: "CeCILL-B"
 build: [ make "-j" "%{jobs}%" ] 
 install: [ make "install" ]
-remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/discrete'" ]
+remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/basic'" ]
 depends: [ "coq:mathcomp:ssreflect" { = "1.5" } ]

@@ -1,8 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+From mathcomp
 Require Import finfun path matrix.
+From mathcomp
 Require Import bigop ssralg poly polydiv ssrnum zmodp div ssrint.
+From mathcomp
 Require Import polyorder polyrcf interval polyXY.
+From mathcomp
 Require Import qe_rcf_th ordered_qelim mxtens.
 
 Set Implicit Arguments.
@@ -13,6 +19,20 @@ Import GRing.Theory Num.Theory.
 
 Local Open Scope nat_scope.
 Local Open Scope ring_scope.
+
+Definition grab (X Y : Type) (pattern : Y -> Prop) (P : Prop -> Prop) 
+           (y : X) (f : X -> Y) :
+           (let F := f in P (forall x, y = x -> pattern (F x)))
+           -> P (forall x : X, y = x -> pattern (f x)) := id.
+
+Definition grab_eq X Y u := @grab X Y (fun v => u = v :> Y).
+
+Tactic Notation "grab_eq" ident(f) open_constr(PAT1) :=
+  let Edef := fresh "Edef" in
+  let E := fresh "E" in
+  move Edef: PAT1 => E;
+  move: E Edef;
+  elim/grab_eq: _ => f _ <-.
 
 Import ord.
 
@@ -599,8 +619,7 @@ Lemma eval_SeqPInfty e ps k k' :
   = k' (map lead_coef (map (eval_poly e) ps)).
 Proof.
 elim: ps k k' => [|p ps ihps] k k' Pk /=; first by rewrite Pk.
-rewrite (eval_LeadCoef (fun lp =>
-  k' (lp :: [seq lead_coef i |i  <- [seq eval_poly e i | i <- ps]]))) => // lp.
+set X := lead_coef _; grab_eq k'' X; apply: (eval_LeadCoef k'') => lp {X}.
 rewrite (ihps _ (fun ps => k' (eval e lp :: ps))) => //= lps.
 by rewrite Pk.
 Qed.
@@ -615,13 +634,9 @@ Lemma eval_SeqMInfty e ps k k' :
             (map (eval_poly e) ps)).
 Proof.
 elim: ps k k' => [|p ps ihps] k k' Pk /=; first by rewrite Pk.
-rewrite (eval_LeadCoef (fun lp =>
-  k' ((-1) ^+ (~~ odd (size (eval_poly e p))) * lp
-       ::  [seq (-1) ^+ (~~ odd (size p)) * lead_coef p
-            | p : {poly _} <- [seq eval_poly e i | i <- ps]]))) => // lp.
-rewrite eval_Size /= (ihps _ (fun ps =>
- k' (((-1) ^+ (~~ odd (size (eval_poly e p))) * eval e lp) :: ps))) => //= lps.
-by rewrite Pk.
+set X := lead_coef _; grab_eq k'' X; apply: eval_LeadCoef => lp {X}.
+rewrite eval_Size /= /k'' {k''}.
+by set X := map _ _; grab_eq k'' X; apply: ihps => {X} lps; rewrite Pk.
 Qed.
 
 Implicit Arguments eval_SeqMInfty [e ps k].
@@ -659,18 +674,10 @@ Lemma eval_Rediv_rec_loop e q sq cq c qq r n k k'
 Proof.
 move=> Pk; elim: n c qq r k Pk @d=> [|n ihn] c qq r k Pk /=.
   rewrite eval_Size /=; have [//=|gtq] := ltnP.
-  rewrite (eval_LeadCoef (fun lr =>
-    let m := lr *: 'X^(size (eval_poly e r) - sq) in
-    let qq1 := (eval_poly e qq) * (eval e cq)%:P + m in
-    let r1 := (eval_poly e r) * (eval e cq)%:P - m * (eval_poly e q) in
-      k' (c.+1, qq1, r1))) //.
-   by move=> x /=; rewrite Pk /= !eval_OpPoly /= !mul_polyC.
+  set X := lead_coef _; grab_eq k'' X; apply: eval_LeadCoef => {X}.
+  by move=> x /=; rewrite Pk /= !eval_OpPoly /= !mul_polyC.
 rewrite eval_Size /=; have [//=|gtq] := ltnP.
-rewrite (eval_LeadCoef (fun lr =>
-  let m := lr *: 'X^(size (eval_poly e r) - sq) in
-  let qq1 := (eval_poly e qq) * (eval e cq)%:P + m in
-  let r1 := (eval_poly e r) * (eval e cq)%:P - m * (eval_poly e q) in
-    k' (redivp_rec_loop (eval_poly e q) sq (eval e cq) c.+1 qq1 r1 n))) //=.
+set X := lead_coef _; grab_eq k'' X; apply: eval_LeadCoef => {X}.
 by move=> x; rewrite ihn // !eval_OpPoly /= !mul_polyC.
 Qed.
 
@@ -988,7 +995,8 @@ End ProjCorrect.
 (* Section Example. *)
 (* no chances it computes *)
 
-(* Require Import rat. *)
+(* From mathcomp
+Require Import rat. *)
 
 (* Eval vm_compute in (54%:R / 289%:R + 2%:R^-1 :rat). *)
 

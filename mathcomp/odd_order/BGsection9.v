@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div fintype path.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div fintype path.
+From mathcomp
 Require Import finset prime fingroup action automorphism quotient cyclic.
+From mathcomp
 Require Import gproduct gfunctor pgroup center commutator gseries nilpotent.
+From mathcomp
 Require Import sylow abelian maximal hall.
+From mathcomp
 Require Import BGsection1 BGsection4 BGsection5 BGsection6.
+From mathcomp
 Require Import BGsection7 BGsection8.
 
 (******************************************************************************)
@@ -46,7 +53,7 @@ have sHp'M: 'O_p^'(H) \subset M.
   apply: subset_trans snbBp'_M; rewrite (bigcup_max 'O_p^'(H)%G) // inE -andbA.
   by rewrite subsetT pcore_pgroup (subset_trans sBH) ?gFnorm.
 have{snbBp'_M} defMp': <<\bigcup_(K in |/|_G(P; p^')) K>> = 'O_p^'(M).
-  have nMp'M: M \subset 'N('O_p^'(M)) by exact: gFnorm.
+  have nMp'M: M \subset 'N('O_p^'(M)) by apply: gFnorm.
   have nMp'P := subset_trans sPM nMp'M.
   apply/eqP; rewrite eqEsubset gen_subG sub_gen ?andbT; last first.
     by rewrite (bigcup_max 'O_p^'(M)%G) // inE -andbA subsetT pcore_pgroup.
@@ -70,9 +77,8 @@ have{defMp'} sNPM: 'N(P) \subset M.
   have [Mp'1 | ntMp'] := eqVneq 'O_p^'(M) 1.
     have nsZLP: 'Z('L(P)) <| M.
       by apply: Puig_center_normal Mp'1 => //; apply: mFT_odd.
-    rewrite -(mmax_normal maxM nsZLP).
-      exact: char_norm_trans (center_Puig_char P) _.
-    apply: contraNneq ntR => /(trivg_center_Puig_pgroup pP) P1.
+    rewrite -(mmax_normal maxM nsZLP) ?gFnorm_trans //.
+    apply: contraNneq ntR => /(trivg_center_Puig_pgroup pP)-P1.
     by rewrite -subG1 -P1.
   rewrite -(mmax_normal maxM (pcore_normal _ _) ntMp') /= -defMp' norms_gen //.
   apply/subsetP=> x nPx; rewrite inE sub_conjg; apply/bigcupsP=> K.
@@ -222,7 +228,7 @@ have pP := pHall_pgroup sylP; have pA := pgroupS sAP pP.
 have ntA: A :!=: 1 by rewrite -rank_gt0 -(subnKC Age3).
 have [p_pr _ [e oA]] := pgroup_pdiv pA ntA.
 have{e oA} def_piA: \pi(A) =i (p : nat_pred).
-  by rewrite /= oA pi_of_exp //; exact: pi_of_prime.
+  by rewrite /= oA pi_of_exp //; apply: pi_of_prime.
 have FmCAp_le2 M: M \in 'M('C(A)) -> 'r_p('F(M)) <= 2.
   case/setIdP=> maxM cCAM; rewrite leqNgt; apply: contra uA' => Fge3.
   exact: (any_rank3_Fitting_Uniqueness maxM Fge3).
@@ -278,7 +284,7 @@ have sNP_mCA M: M \in 'M('C(A)) -> 'N(P) \subset M.
     have [y cRy [defQx]] := atransP2 trCRq' maxQ maxQx.
     rewrite -(mulgKV y x) groupMr.
       by rewrite (subsetP sNQ_M) // inE conjsgM defQx conjsgK.
-    apply: subsetP cRy; apply: (subset_trans (pcore_sub _ _)).
+    apply: subsetP cRy; apply: gFsub_trans.
     exact: subset_trans (centS _) sCAM.
   have sNA_M: 'N(A) \subset M.
     by rewrite sNR_M // subsetI sAP (subset_trans cAA).
@@ -304,8 +310,7 @@ have uNP0_mCA M: M \in 'M('C(A)) -> 'M('N(P0)) = [set M].
   have cDP0: P0 \subset 'C(D).
     have sA1A := Ohm_sub 1 A.
     have nDA1: 'Ohm_1(A) \subset 'N(D).
-      apply: subset_trans sA1A (subset_trans sAM (char_norm _)).
-      exact: char_trans (pcore_char _ _) (Fitting_char _).
+      by rewrite !gFnorm_trans // gFsub_trans // normsG.
     have abelA1: p.-abelem 'Ohm_1(A) by rewrite Ohm1_abelem.
     have dimA1ge3: logn p #|'Ohm_1(A)| >= 3.
       by rewrite -(rank_abelem abelA1) rank_Ohm1.
@@ -348,7 +353,7 @@ have uNP0_mCA M: M \in 'M('C(A)) -> 'M('N(P0)) = [set M].
       rewrite -(def_uniq_mmax uE maxM (subset_trans sEF (Fitting_sub _))).
       by rewrite inE maxL.
     have cDL_P0: P0 \subset 'C(D :&: L).
-      have nsDM: D <| M:= char_normal_trans (pcore_char _ _) (Fitting_normal M).
+      have nsDM: D <| M by rewrite !gFnormal_trans.
       have{nsDM} [sDM nDM] := andP nsDM.
       have sDL:  D :&: L \subset L :&: M by rewrite setIC setIS.
       have nsDL: D :&: L <| L :&: M by rewrite /normal sDL setIC normsIG.
@@ -388,7 +393,7 @@ have uNP0_mCA M: M \in 'M('C(A)) -> 'M('N(P0)) = [set M].
   rewrite (mmax_normal maxM) ?mmax_sup_id //.
   have sNP_M := sNP_mCA M mCA_M; have sPM := subset_trans (normG P) sNP_M.
   rewrite /normal comm_subG //= -/P0.
-  have nFP: P \subset 'N(F) by rewrite (subset_trans _ (gFnorm _ _)).
+  have nFP: P \subset 'N(F) by apply: subset_trans (gFnorm _ _).
   have <-: F <*> P * 'N_M(P) = M.
     apply: Frattini_arg (pHall_subl (joing_subr _ _) (subsetT _) sylP).
     rewrite -(quotientGK (Fitting_normal M)) /= norm_joinEr //= -/F.

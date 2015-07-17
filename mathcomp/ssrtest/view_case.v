@@ -1,4 +1,6 @@
-Require Import ssreflect ssrbool ssrnat eqtype seq fintype zmodp.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrnat eqtype seq fintype zmodp.
 
 Axiom P : forall T, seq T -> Prop.
 

@@ -1,10 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool ssrnat eqtype seq.
-From mathcomp.discrete
-Require Import choice generic_quotient.
-Require Import ssralg.
+From mathcomp
+Require Import eqtype choice ssreflect ssrbool ssrnat ssrfun seq.
+From mathcomp
+Require Import ssralg generic_quotient.
+
 
 (******************************************************************************)
 (*          This file describes quotients of algebraic structures.            *)
@@ -47,15 +46,15 @@ Require Import ssralg.
 (*                               right, prime ideal of the ring R.            *)
 (*                                                                            *)
 (* The formalization of ideals features the following constructions:          *)
-(*       nontrivial_ideal S == the  collective predicate (S : pred R) on the  *)
+(*       proper_ideal S == the  collective predicate (S : pred R) on the      *)
 (*                             ring R is stable by the ring product and does  *)
 (*                             contain R's one.                               *)
 (*   prime_idealr_closed S  := u * v \in S -> (u \in S) || (v \in S)          *)
 (*          idealr_closed S == the collective predicate (S : pred R) on the   *)
 (*                             ring  R  represents  a  (right) ideal.  This   *)
-(*                             implies its being a nontrivial_ideal.          *)
+(*                             implies its being a proper_ideal.              *)
 (*                                                                            *)
-(*           MkIdeal idealS == packs   idealS : nontrivial_ideal S   into  an *)
+(*           MkIdeal idealS == packs   idealS : proper_ideal S   into  an     *)
 (*                             idealr S  interface structure  associating the *)
 (*                             idealr_closed   property   to  the   canonical *)
 (*                             pred_key S  (see ssrbool), which  must already *)
@@ -428,7 +427,7 @@ Notation UnitRingQuotMixin Q mU mV :=
 
 Section IdealDef.
 
-Definition nontrivial_ideal (R : ringType) (S : predPredType R) : Prop :=
+Definition proper_ideal (R : ringType) (S : predPredType R) : Prop :=
   1 \notin S /\ forall a, {in S, forall u, a * u \in S}.
 
 Definition prime_idealr_closed (R : ringType) (S : predPredType R) : Prop :=
@@ -437,18 +436,18 @@ Definition prime_idealr_closed (R : ringType) (S : predPredType R) : Prop :=
 Definition idealr_closed (R : ringType) (S : predPredType R) :=
   [/\ 0 \in S, 1 \notin S & forall a, {in S &, forall u v, a * u + v \in S}].
 
-Lemma idealr_closed_nontrivial R S : @idealr_closed R S -> nontrivial_ideal S.
+Lemma idealr_closed_nontrivial R S : @idealr_closed R S -> proper_ideal S.
 Proof. by case=> S0 S1 hS; split => // a x xS; rewrite -[_ * _]addr0 hS. Qed.
 
 Lemma idealr_closedB R S : @idealr_closed R S -> zmod_closed S.
 Proof. by case=> S0 _ hS; split=> // x y xS yS; rewrite -mulN1r addrC hS. Qed.
 
 Coercion idealr_closedB : idealr_closed >-> zmod_closed.
-Coercion idealr_closed_nontrivial : idealr_closed >-> nontrivial_ideal.
+Coercion idealr_closed_nontrivial : idealr_closed >-> proper_ideal.
 
 Structure idealr (R : ringType) (S : predPredType R) := MkIdeal {
   idealr_zmod :> zmodPred S;
-  _ : nontrivial_ideal S
+  _ : proper_ideal S
 }.
 
 Structure prime_idealr (R : ringType) (S : predPredType R) := MkPrimeIdeal {
@@ -457,7 +456,7 @@ Structure prime_idealr (R : ringType) (S : predPredType R) := MkPrimeIdeal {
 }.
 
 Definition Idealr (R : ringType) (I : predPredType R) (zmodI : zmodPred I)
-            (kI : keyed_pred zmodI) : nontrivial_ideal I -> idealr I.
+            (kI : keyed_pred zmodI) : proper_ideal I -> idealr I.
 Proof. by move=> kI1; split => //. Qed.
 
 Section IdealTheory.

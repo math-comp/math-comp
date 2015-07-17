@@ -1,6 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div choice fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq div choice fintype.
+From mathcomp
 Require Import bigop ssralg finset fingroup zmodp.
+From mathcomp
 Require Import poly ssrnum.
 
 
@@ -360,7 +364,7 @@ split=> t1.
   set tr := _ m.
   suffices: all (@rterm R) (tr.1 :: tr.2)%PAIR.
     case: tr => {t1} t1 r /= /andP[t1_r].
-    by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; exact: IHr.
+    by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; apply: IHr.
   have: all (@rterm R) [::] by [].
   rewrite {}/tr; elim: t1 [::] => //=.
   + move=> t1 IHt1 t2 IHt2 r.
@@ -379,7 +383,7 @@ split=> t1.
 - rewrite /lt0_rform; move: (ub_var t1) => m; set tr := _ m.
   suffices: all (@rterm R) (tr.1 :: tr.2)%PAIR.
     case: tr => {t1} t1 r /= /andP[t1_r].
-    by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; exact: IHr.
+    by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; apply: IHr.
   have: all (@rterm R) [::] by [].
   rewrite {}/tr; elim: t1 [::] => //=.
   + move=> t1 IHt1 t2 IHt2 r.
@@ -398,7 +402,7 @@ split=> t1.
 - rewrite /leq0_rform; move: (ub_var t1) => m; set tr := _ m.
   suffices: all (@rterm R) (tr.1 :: tr.2)%PAIR.
     case: tr => {t1} t1 r /= /andP[t1_r].
-    by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; exact: IHr.
+    by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; apply: IHr.
   have: all (@rterm R) [::] by [].
   rewrite {}/tr; elim: t1 [::] => //=.
   + move=> t1 IHt1 t2 IHt2 r.
@@ -430,11 +434,11 @@ suffices{e f} [equal0_equiv lt0_equiv le0_equiv]:
     by split; [move/equal0_equiv/eqP | move/eqP/equal0_equiv].
   + by move=> t1 t2 e; split; move/lt0_equiv.
   + by move=> t1 t2 e; split; move/le0_equiv.
-  + move=> t1 e; rewrite unitrE; exact: equal0_equiv.
-  + move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
-  + move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
-  + move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
-  + move=> f1 IHf1 e; move: (IHf1 e); tauto.
+  + by move=> t1 e; rewrite unitrE; apply: equal0_equiv.
+  + by move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
+  + by move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
+  + by move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
+  + by move=> f1 IHf1 e; move: (IHf1 e); tauto.
   + by move=> n f1 IHf1 e; split=> [] [x] /IHf1; exists x.
   + by move=> n f1 IHf1 e; split=> Hx x; apply/IHf1.
 suffices h e t1 t2 :
@@ -443,7 +447,7 @@ suffices h e t1 t2 :
     holds e (leq0_rform (t1 - t2)) <-> (eval e t1 <= eval e t2)].
   by split => e t1 t2; case: (h e t1 t2).
 rewrite -{1}(add0r (eval e t2)) -(can2_eq (subrK _) (addrK _)).
-rewrite -subr_lt0 -subr_le0 -/(eval e (t1 - t2)); move: (t1 - t2)%T => {t1 t2} t.
+rewrite -subr_lt0 -subr_le0 -/(eval e (t1 - t2)); move: {t1 t2}(t1 - t2)%T => t.
 have sub_var_tsubst s t0: (s.1%PAIR >= ub_var t0)%N -> tsubst t0 s = t0.
   elim: t0 {t} => //=.
   - by move=> n; case: ltngtP.
@@ -586,8 +590,8 @@ Definition qf_eval e := fix loop (f : formula R) : bool :=
 (* qf_eval is equivalent to holds *)
 Lemma qf_evalP e f : qf_form f -> reflect (holds e f) (qf_eval e f).
 Proof.
-elim: f => //=; try by move=> *; exact: idP.
-- move=> t1 t2 _; exact: eqP.
+elim: f => //=; try by move=> *; apply: idP.
+- by move=> t1 t2 _; apply: eqP.
 - move=> f1 IHf1 f2 IHf2 /= /andP[/IHf1[] f1T]; last by right; case.
   by case/IHf2; [left | right; case].
 - move=> f1 IHf1 f2 IHf2 /= /andP[/IHf1[] f1F]; first by do 2 left.
@@ -704,7 +708,7 @@ Lemma qf_to_dnf_rterm f b : rformula f -> all dnf_rterm (qf_to_odnf f b).
 Proof.
 set ok := all dnf_rterm.
 have cat_ok bcs1 bcs2: ok bcs1 -> ok bcs2 -> ok (bcs1 ++ bcs2).
-  by move=> ok1 ok2; rewrite [ok _]all_cat; exact/andP.
+  by move=> ok1 ok2; rewrite [ok _]all_cat; apply/andP.
 have and_ok bcs1 bcs2: ok bcs1 -> ok bcs2 -> ok (and_odnf bcs1 bcs2).
   rewrite /and_odnf unlock; elim: bcs1 => //= cl1 bcs1 IH1; rewrite -andbA.
   case/and3P=> ok11 ok12 ok1 ok2; rewrite cat_ok ?{}IH1 {bcs1 ok1}//.
@@ -1120,7 +1124,7 @@ suffices or_wf fs : let ofs := foldr Or False fs in
 - apply: or_wf.
   suffices map_proj_wf bcs: let mbcs := map (proj n) bcs in
     all dnf_rterm bcs -> all qf_form mbcs && all rformula mbcs.
-    by apply: map_proj_wf; exact: qf_to_dnf_rterm.
+    by apply: map_proj_wf; apply: qf_to_dnf_rterm.
   elim: bcs => [|bc bcs ihb] bcsr //= /andP[rbc rbcs].
   by rewrite andbAC andbA wf_QE_proj //= andbC ihb.
 elim: fs => //= g gs ihg; rewrite -andbA => /and4P[-> qgs -> rgs] /=.
@@ -1137,7 +1141,7 @@ have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   apply: (@iffP (rc e0 n0 (odnf_to_oform bcs))); last first.
   - by case=> x; rewrite -qf_to_dnfP //; exists x.
   - by case=> x; rewrite qf_to_dnfP //; exists x.
-  have: all dnf_rterm bcs by case/andP: cf => _; exact: qf_to_dnf_rterm.
+  have: all dnf_rterm bcs by case/andP: cf => _; apply: qf_to_dnf_rterm.
   elim: {f0 cf}bcs => [|bc bcs IHbcs] /=; first by right; case.
   case/andP=> r_bc /IHbcs {IHbcs}bcsP.
   have f_qf := dnf_to_form_qf [:: bc].
@@ -1149,10 +1153,10 @@ have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   case/orP => [bc_x|]; last by exists x.
   by case: no_x; exists x; apply/(qf_evalP _ f_qf); rewrite /= bc_x.
 elim: f e => //.
-- move=> b e _; exact: idP.
-- move=> t1 t2 e _; exact: eqP.
-- move=> t1 t2 e _; exact: idP.
-- move=> t1 t2 e _; exact: idP.
+- by move=> b e _; apply: idP.
+- by move=> t1 t2 e _; apply: eqP.
+- by move=> t1 t2 e _; apply: idP.
+- by move=> t1 t2 e _; apply: idP.
 - move=> f1 IH1 f2 IH2 e /= /andP[/IH1[] f1e]; last by right; case.
   by case/IH2; [left | right; case].
 - move=> f1 IH1 f2 IH2 e /= /andP[/IH1[] f1e]; first by do 2!left.
@@ -1161,7 +1165,7 @@ elim: f e => //.
   by case/IH2; [left | right; move/(_ f1e)].
 - by move=> f IHf e /= /IHf[]; [right | left].
 - move=> n f IHf e /= rf; have rqf := quantifier_elim_wf rf.
-  by apply: (iffP (auxP _ _ _ rqf)) => [] [x]; exists x; exact/IHf.
+  by apply: (iffP (auxP _ _ _ rqf)) => [] [x]; exists x; apply/IHf.
 move=> n f IHf e /= rf; have rqf := quantifier_elim_wf rf.
 case: auxP => // [f_x|no_x]; first by right=> no_x; case: f_x => x /IHf[].
 by left=> x; apply/IHf=> //; apply/idPn=> f_x; case: no_x; exists x.

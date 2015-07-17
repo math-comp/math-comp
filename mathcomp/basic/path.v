@@ -1,7 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect  
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq.
 
 (******************************************************************************)
 (*    The basic theory of paths over an eqType; this file is essentially a    *)
@@ -119,7 +119,7 @@ Lemma pathP x p x0 :
 Proof.
 elim: p x => [|y p IHp] x /=; first by left.
 apply: (iffP andP) => [[e_xy /IHp e_p [] //] | e_p].
-by split; [exact: (e_p 0) | apply/(IHp y) => i; exact: e_p i.+1].
+by split; [apply: (e_p 0) | apply/(IHp y) => i; apply: e_p i.+1].
 Qed.
 
 Definition cycle p := if p is x :: p' then path x (rcons p' x) else true.
@@ -144,7 +144,7 @@ Lemma eq_path e e' : e =2 e' -> path e =2 path e'.
 Proof. by move=> ee' x p; elim: p x => //= y p IHp x; rewrite ee' IHp. Qed.
 
 Lemma eq_cycle e e' : e =2 e' -> cycle e =1 cycle e'.
-Proof. by move=> ee' [|x p] //=; exact: eq_path. Qed.
+Proof. by move=> ee' [|x p] //=; apply: eq_path. Qed.
 
 Lemma sub_path e e' : subrel e e' -> forall x p, path e x p -> path e' x p.
 Proof. by move=> ee' x p; elim: p x => //= y p IHp x /andP[/ee'-> /IHp]. Qed.
@@ -182,7 +182,7 @@ CoInductive splitl x1 x : seq T -> Type :=
 Lemma splitPl x1 p x : x \in x1 :: p -> splitl x1 x p.
 Proof.
 rewrite inE; case: eqP => [->| _ /splitP[]]; first by rewrite -(cat0s p).
-by split; exact: last_rcons.
+by split; apply: last_rcons.
 Qed.
 
 CoInductive splitr x : seq T -> Type :=
@@ -214,7 +214,7 @@ Lemma next_nth p x :
 Proof.
 case: p => //= y0 p. 
 elim: p {2 3 5}y0 => [|y' p IHp] y /=; rewrite (eq_sym y) inE;
-  by case: ifP => // _; exact: IHp.
+  by case: ifP => // _; apply: IHp.
 Qed.
 
 Lemma prev_nth p x :
@@ -224,7 +224,7 @@ Lemma prev_nth p x :
 Proof.
 case: p => //= y0 p; rewrite inE orbC.
 elim: p {2 5}y0 => [|y' p IHp] y; rewrite /= ?inE // (eq_sym y').
-by case: ifP => // _; exact: IHp.
+by case: ifP => // _; apply: IHp.
 Qed.
 
 Lemma mem_next p x : (next p x \in p) = (x \in p).
@@ -361,13 +361,13 @@ CoInductive shorten_spec x p : T -> seq T -> Type :=
 
 Lemma shortenP x p : path e x p -> shorten_spec x p (last x p) (shorten x p).
 Proof.
-move=> e_p; have: x \in x :: p by exact: mem_head.
+move=> e_p; have: x \in x :: p by apply: mem_head.
 elim: p x {1 3 5}x e_p => [|y2 p IHp] x y1.
   by rewrite mem_seq1 => _ /eqP->.
 rewrite inE orbC /= => /andP[ey12 /IHp {IHp}IHp].
 case: ifPn => [y2p_x _ | not_y2p_x /eqP def_x].
   have [p' e_p' Up' p'p] := IHp _ y2p_x.
-  by split=> // y /p'p; exact: predU1r.
+  by split=> // y /p'p; apply: predU1r.
 have [p' e_p' Up' p'p] := IHp y2 (mem_head y2 p).
 have{p'p} p'p z: z \in y2 :: p' -> z \in y2 :: p.
   by rewrite !inE; case: (z == y2) => // /p'p.
@@ -392,7 +392,7 @@ Proof. by case: s => //= y s /andP[]. Qed.
 
 Lemma path_min_sorted x s :
   {in s, forall y, leT x y} -> path leT x s = sorted s.
-Proof. by case: s => //= y s -> //; exact: mem_head. Qed.
+Proof. by case: s => //= y s -> //; apply: mem_head. Qed.
 
 Section Transitive.
 
@@ -448,8 +448,8 @@ Lemma eq_sorted_irr : irreflexive leT ->
 Proof.
 move=> leT_irr s1 s2 s1_sort s2_sort eq_s12.
 have: antisymmetric leT.
-  by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); exact: leT_tr ltnm.
-by move/eq_sorted; apply=> //; apply: uniq_perm_eq => //; exact: sorted_uniq.
+  by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); apply: leT_tr ltnm.
+by move/eq_sorted; apply=> //; apply: uniq_perm_eq => //; apply: sorted_uniq.
 Qed.
 
 End Transitive.
@@ -525,10 +525,10 @@ have: sorted s -> sorted (merge_sort_pop s ss).
   exact: IHss ord_ss _ (merge_sorted ord_s ord_s2).
 case: s => [|x1 [|x2 s _]]; try by auto.
 move/ltnW/IHn; apply=> {n IHn s}; set s1 := if _ then _ else _.
-have: sorted s1 by exact: (@merge_sorted [::x2] [::x1]).
+have: sorted s1 by apply: (@merge_sorted [::x2] [::x1]).
 elim: ss {x1 x2}s1 allss => /= [|s2 ss IHss] s1; first by rewrite andbT.
 case/andP=> ord_s2 ord_ss ord_s1.
-by case: {1}s2=> /= [|_ _]; [rewrite ord_s1 | exact: IHss (merge_sorted _ _)].
+by case: {1}s2=> /= [|_ _]; [rewrite ord_s1 | apply: IHss (merge_sorted _ _)].
 Qed.
 
 Lemma perm_sort s : perm_eql (sort s) s.
@@ -579,7 +579,7 @@ case: s => //= n s; elim: s n => //= m s IHs n.
 rewrite inE ltn_neqAle negb_or IHs -!andbA.
 case sn: (n \in s); last do !bool_congr.
 rewrite andbF; apply/and5P=> [[ne_nm lenm _ _ le_ms]]; case/negP: ne_nm.
-rewrite eqn_leq lenm; exact: (allP (order_path_min leq_trans le_ms)).
+by rewrite eqn_leq lenm; apply: (allP (order_path_min leq_trans le_ms)).
 Qed.
 
 Lemma iota_sorted i n : sorted leq (iota i n).
@@ -622,7 +622,7 @@ Lemma nth_traject i n : i < n -> forall x, nth x (traject x n) i = iter i f x.
 Proof.
 elim: n => // n IHn; rewrite ltnS leq_eqVlt => le_i_n x.
 rewrite trajectSr nth_rcons size_traject.
-case: ltngtP le_i_n => [? _||->] //; exact: IHn.
+by case: ltngtP le_i_n => [? _||->] //; apply: IHn.
 Qed.
 
 End Trajectory.
@@ -729,7 +729,7 @@ Qed.
 Lemma cycle_prev : cycle (fun x y => x == prev p y) p.
 Proof.
 apply: etrans cycle_next; symmetry; case def_p: p => [|x q] //.
-apply: eq_path; rewrite -def_p; exact (can2_eq prev_next next_prev).
+by apply: eq_path; rewrite -def_p; apply: (can2_eq prev_next next_prev).
 Qed.
 
 Lemma cycle_from_next : (forall x, x \in p -> e x (next p x)) -> cycle e p.

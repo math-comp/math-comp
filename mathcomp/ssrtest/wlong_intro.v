@@ -1,4 +1,6 @@
-Require Import ssreflect ssrbool ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrnat.
 
 Goal (forall x y : nat, True).
 move=> x y.

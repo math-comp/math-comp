@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp
 Require Import fintype bigop prime finset ssralg fingroup morphism.
+From mathcomp
 Require Import automorphism quotient gfunctor commutator zmodp center pgroup.
+From mathcomp
 Require Import sylow gseries nilpotent abelian maximal.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem.
+From mathcomp
 Require Import BGsection1 BGsection2.
 
 (******************************************************************************)
@@ -72,7 +79,7 @@ have [sQG qQ]: Q \subset G /\ q.-group Q by case/and3P: sylQ.
 have{qQ p'q} p'Q: p^'.-group Q by apply: sub_in_pnat qQ => q' _ /eqnP->.
 have{q q_pr sylQ qGc} ncEQ: ~~ (Q \subset 'C(E)).
   apply: contraL qGc => cEQ; rewrite -p'natE // -partn_eq1 //.
-  have nCQ: Q \subset 'N('C(E)) by exact: subset_trans (normG _).
+  have nCQ: Q \subset 'N('C(E)) by apply: subset_trans (normG _).
   have sylQc: q.-Sylow(G / 'C(E)) (Q / 'C(E)) by rewrite morphim_pSylow.
   by rewrite -(card_Hall sylQc) -trivg_card1 (sameP eqP trivgP) quotient_sub1.
 have solE: solvable E := pgroup_sol pE.
@@ -145,13 +152,13 @@ have cAG: centgmx rG A.
   rewrite 2!(mulmxDl _ 1 A) 2!(mulmxDr A _ 1) !mulmx1 !mul1mx.
   rewrite !(inj_eq (addIr A)) ![_ *m A]mulmxDr ![A *m _]mulmxDl.
   by rewrite -!mulmxA Ax2 Ay2 !mulmx0 !mulmxA Ax2 Ay2 !mul0mx !addr0 !add0r.
-have irrG: mx_irreducible rG by exact/abelem_mx_irrP.
+have irrG: mx_irreducible rG by apply/abelem_mx_irrP.
 pose rAG := gen_repr irrG cAG; pose inFA := in_gen irrG cAG.
 pose valFA := @val_gen _ _ _ _ _ _ irrG cAG.
 set dA := gen_dim A in rAG inFA valFA.
 rewrite -(rker_abelem abelE ntE nEG) -/rG -(rker_gen irrG cAG) -/rAG.
 have dA_gt0: dA > 0 by rewrite (gen_dim_gt0 irrG cAG).
-have irrAG: mx_irreducible rAG by exact: gen_mx_irr.
+have irrAG: mx_irreducible rAG by apply: gen_mx_irr.
 have: dA <= 2.
   case Ax0: (Ax == 0).
     by rewrite subr_eq0 in Ax0; case/eqP: ncxy; rewrite (eqP Ax0) mulmx1 mul1mx.
@@ -226,14 +233,14 @@ Proof.
 set Q := 'O_p(G) => p'G1 sCQ_P. 
 have sPQ: P \subset Q by rewrite pcore_max.
 have defQ: 'O_{p^', p}(G) = Q by rewrite pseries_pop2.
-have pQ: p.-group Q by exact: pcore_pgroup.
+have pQ: p.-group Q by apply: pcore_pgroup.
 have sCQ: 'C_G(Q) \subset Q.
   by rewrite -{2}defQ solvable_p_constrained //= defQ /pHall pQ indexgg subxx.
 have pC: p.-group C.
   apply/pgroupP=> q q_pr; case/Cauchy=> // u Cu q_u; apply/idPn=> p'q.
   suff cQu: u \in 'C_G(Q).
     case/negP: p'q; have{q_u}: q %| #[u] by rewrite q_u.
-    by apply: pnatP q q_pr => //; apply: mem_p_elt pQ _; exact: (subsetP sCQ).
+    by apply: pnatP q q_pr => //; apply: mem_p_elt pQ _; apply: (subsetP sCQ).
   have [Gu cPu] := setIP Cu; rewrite inE Gu /= -cycle_subG.
   rewrite coprime_nil_faithful_cent_stab ?(pgroup_nil pQ) //= -/C -/Q.
   - by rewrite cycle_subG; apply: subsetP Gu; rewrite normal_norm ?pcore_normal.
@@ -262,7 +269,7 @@ Lemma Puig_char G : 'L(G) \char G.
 Proof. exact: gFchar. Qed.
 
 Lemma center_Puig_char G : 'Z('L(G)) \char G.
-Proof. exact: char_trans (center_char _) (Puig_char _). Qed.
+Proof. by rewrite !gFchar_trans. Qed.
 
 (* This is B & G, Lemma B.1(a). *)
 Lemma Puig_succS G D E : D \subset E -> 'L_[G](E) \subset 'L_[G](D).
@@ -408,7 +415,7 @@ have sCT_L: 'C_T('L_{k.*2.+1}(T)) \subset 'L_{k.*2.+1}(T).
 have{sCT_L} sLT: 'L_{k.*2.+2}(S) \subset T.
   apply: odd_abelian_gen_constrained sCT_L => //.
   - exact: pgroupS (Puig_at_sub _ _) pT.
-  - by apply: char_normal_trans nsTG; apply: gFchar.
+  - exact: gFnormal_trans nsTG.
   - exact: sL_ sSG.
   by rewrite norm_abgen_pgroup // (pgroupS _ pS) ?Puig_at_sub.
 have sL2: 'L_{k.*2.+2}(S) \subset 'L_{k.*2.+2}(T) by apply: Puig_max.
@@ -423,17 +430,17 @@ Let L := 'L(S).
 Theorem Puig_center_normal : 'Z(L) <| G.
 Proof.
 have [sLiST sLTS] := pcore_Sylow_Puig_sub.
-have sLiLT: 'L_*(T) \subset 'L(T) by exact: Puig_sub_even_odd.
+have sLiLT: 'L_*(T) \subset 'L(T) by apply: Puig_sub_even_odd.
 have sZY: 'Z(L) \subset Y.
   rewrite subsetI andbC subIset ?centS ?orbT //=.
   suffices: 'C_S('L_*(S)) \subset 'L(T).
     by apply: subset_trans; rewrite setISS ?Puig_sub ?centS ?Puig_sub_even_odd.
   apply: subset_trans (subset_trans sLiST sLiLT).
   by apply: sub_cent_Puig_at pS; rewrite double_gt0.
-have chY: Y \char G := char_trans (center_Puig_char _) (pcore_char _ _).
+have chY: Y \char G by rewrite !gFchar_trans.
 have nsCY_G: 'C_G(Y) <| G by rewrite char_normal 1?subcent_char ?char_refl.
 have [C defC sCY_C nsCG] := inv_quotientN nsCY_G (pcore_normal p _).
-have sLG: L \subset G by rewrite (subset_trans _ (pHall_sub sylS)) ?Puig_sub.
+have sLG: L \subset G by rewrite gFsub_trans ?(pHall_sub sylS).
 have nsL_nCS: L <| 'N_G(C :&: S).
   have sYLiS: Y \subset 'L_*(S).
     rewrite abelian_norm_Puig ?double_gt0 ?center_abelian //.
@@ -446,8 +453,8 @@ have nsL_nCS: L <| 'N_G(C :&: S).
     rewrite odd_abelian_gen_stable ?char_normal ?norm_abgen_pgroup //.
       by rewrite (pgroupS _ pT) ?subIset // Puig_sub.
     by rewrite (pgroupS _ pS) ?Puig_sub.
-  rewrite -[L](sub_Puig_eq _ sLCS) ?subsetIr //.
-  by rewrite (char_normal_trans (Puig_char _)) ?normalSG // subIset // sSG orbT.
+  rewrite -[L](sub_Puig_eq _ sLCS) ?subsetIr // gFnormal_trans ?normalSG //.
+  by rewrite subIset // sSG orbT.
 have sylCS: p.-Sylow(C) (C :&: S) := Sylow_setI_normal nsCG sylS.
 have{defC} defC: 'C_G(Y) * (C :&: S) = C.
   apply/eqP; rewrite eqEsubset mulG_subG sCY_C subsetIl /=.
@@ -461,7 +468,7 @@ have defG: 'C_G(Y) * 'N_G(C :&: S) = G.
   have sCS_N: C :&: S \subset 'N_G(C :&: S).
     by rewrite subsetI normG subIset // sSG orbT.
   by rewrite -(mulSGid sCS_N) mulgA defC (Frattini_arg _ sylCS).
-have nsZ_N: 'Z(L) <| 'N_G(C :&: S) := char_normal_trans (center_char _) nsL_nCS.
+have nsZ_N: 'Z(L) <| 'N_G(C :&: S) := gFnormal_trans _ nsL_nCS.
 rewrite /normal subIset ?sLG //= -{1}defG mulG_subG /=.
 rewrite cents_norm ?normal_norm // centsC.
 by rewrite (subset_trans sZY) // centsC subsetIr.
@@ -487,7 +494,7 @@ have def_Zq: Z / D = 'Z('L(S / D)).
   rewrite -!(injmF _ injf) ?Puig_sub //= morphim_restrm.
   by rewrite (setIidPr _) // subIset ?Puig_sub.
 have{def_Zq} nZq: Z / D <| G / D.
-  have sylSq: p.-Sylow(G / D) (S / D) by exact: morphim_pHall.
+  have sylSq: p.-Sylow(G / D) (S / D) by apply: morphim_pHall.
   rewrite def_Zq (Puig_center_normal _ _ sylSq) ?quotient_odd ?quotient_sol //.
   exact: trivg_pcore_quotient.
 have sZS: Z \subset S by rewrite subIset ?Puig_sub.

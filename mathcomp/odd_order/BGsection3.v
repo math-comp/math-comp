@@ -1,10 +1,18 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div.
+From mathcomp
 Require Import fintype tuple bigop prime binomial finset ssralg fingroup finalg.
+From mathcomp
 Require Import morphism perm automorphism quotient action commutator gproduct.
+From mathcomp
 Require Import zmodp cyclic gfunctor center pgroup gseries nilpotent sylow.
+From mathcomp
 Require Import finmodule abelian frobenius maximal extremal hall.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem wielandt_fixpoint.
+From mathcomp
 Require Import BGsection1 BGsection2.
 
 (******************************************************************************)
@@ -241,8 +249,8 @@ without loss{m IHm leGm} [ffulG cycZ]: / rker rG = 1 /\ cyclic 'Z(G).
   have [N1 _ | ntN] := eqVneq N 1.
     apply: IH; split.
       by apply/trivgP; rewrite -N1 /N rker_submod rstabS ?submx1.
-    have: mx_irreducible (submod_repr modM) by exact/submod_mx_irr.
-    by apply: mx_faithful_irr_center_cyclic; exact/trivgP.
+    have: mx_irreducible (submod_repr modM) by apply/submod_mx_irr.
+    by apply: mx_faithful_irr_center_cyclic; apply/trivgP.
   have tiRN: R :&: N = 1.
     by apply: prime_TIg; rewrite //= rker_submod rfix_mx_rstabC // regR submx0.
   have nsNG: N <| G := rker_normal _; have [sNG nNG] := andP nsNG.
@@ -261,7 +269,7 @@ without loss{m IHm leGm} [ffulG cycZ]: / rker rG = 1 /\ cyclic 'Z(G).
   rewrite (sameP commG1P trivgP).
   apply: subset_trans (kquo_mx_faithful (submod_repr modM)).
   rewrite IHm ?quotient_sol ?coprime_morph ?morphim_odd ?quotient_pgroup //.
-  - apply: leq_trans leGm; exact: ltn_quotient.
+  - by apply: leq_trans leGm; apply: ltn_quotient.
   - by rewrite card_quotient // -indexgI tiRN indexg1.
   apply/eqP; rewrite -submx0 rfix_quo // rfix_submod //.
   by rewrite regR capmx0 linear0 sub0mx.
@@ -280,7 +288,7 @@ case cKK: (abelian K).
   by apply/Frobenius_semiregularP; rewrite // -cardG_gt1 prime_gt1.
 have [spK defZK]: special K /\ 'C_K(R) = 'Z(K).
   apply: (abelian_charsimple_special qK) => //.
-  apply/bigcupsP=> H; case/andP=> chHK cHH.
+  apply/bigcupsP=> H /andP[chHK cHH].
   have:= char_sub chHK; rewrite subEproper.
   case/predU1P=> [eqHK | ltHK]; first by rewrite eqHK cKK in cHH.
   have nHR: R \subset 'N(H) := char_norm_trans chHK nKR.
@@ -352,7 +360,7 @@ case: (eqVneq (rker rG) 1) => [ffulG | ntC]; last first.
   set C := rker rG in ntC *; have nsCG: C <| G := rker_normal rG.
   have [sCG nCG] := andP nsCG.
   have nCK := subset_trans sKG nCG; have nCR := subset_trans sRG nCG.
-  case sKC: (K \subset C); first exact: subset_trans (der_sub _ _) _.
+  case sKC: (K \subset C); first exact: gFsub_trans.
   have sCK: C \subset K.
     by rewrite proper_sub // (Frobenius_normal_proper_ker frobG) ?sKC.
   have frobGq: [Frobenius G / C = (K / C) ><| (R / C)].
@@ -368,7 +376,7 @@ case: (eqVneq (rker rG) 1) => [ffulG | ntC]; last first.
     by rewrite cycle_id -cycle_eq1 -defRq ntRq.
   - move=> Hq; rewrite -(group_inj (cosetpreK Hq)).
     by apply: quotient_splitting_field; rewrite ?subsetIl.
-  by apply: leq_trans leKm; exact: ltn_quotient.
+  by apply: leq_trans leKm; apply: ltn_quotient.
 have ltK_abelian (N : {group gT}): R \subset 'N(N) -> N \proper K -> abelian N.
   move=> nNR ltNK; have [sNK _] := andP ltNK; apply/commG1P/trivgP.
   rewrite -(setIidPr (sub1G (N <*> R))) /= -ffulG; set G1 := N <*> R.
@@ -378,10 +386,9 @@ have ltK_abelian (N : {group gT}): R \subset 'N(N) -> N \proper K -> abelian N.
   rewrite -(rker_subg _ sG1).
   apply: IHm defG1 _; rewrite ?(solvableS sG1) ?(pgroupS sG1) //.
     by apply/trivgP; rewrite -regR setSI.
-  by apply: leq_trans leKm; exact: proper_card.
+  by apply: leq_trans leKm; apply: proper_card.
 have cK'K': abelian K^`(1).
-  apply: ltK_abelian; first exact: char_norm_trans (der_char _ _) nKR.
-  exact: (sol_der1_proper solK).
+  exact: ltK_abelian (gFnorm_trans _ nKR) (sol_der1_proper solK _ ntK).
 pose fixG := rfix_mx rG; pose NRmod N (U : 'M_n) := N <*> R \subset rstabs rG U.
 have dx_modK_rfix (N : {group gT}) U V:
     N \subset K -> R \subset 'N(N) -> NRmod N U -> NRmod N V ->
@@ -408,17 +415,17 @@ have redG := mx_Maschke rG F'G.
 wlog [U simU nfixU]: / exists2 U, mxsimple rG U & ~~ (U <= fixG K)%MS.
   move=> IH; wlog [I U /= simU sumU _]: / mxsemisimple rG 1%:M.
     exact: (mx_reducible_semisimple (mxmodule1 _) redG).
-  case: (pickP (fun i => ~~ (U i <= fixG K))%MS) => [i nfixU | fixK].
+  have [i nfixU | fixK] := pickP (fun i => ~~ (U i <= fixG K)%MS).
     by apply: IH; exists (U i).
-  apply: (subset_trans (der_sub _ _)); rewrite rfix_mx_rstabC // -sumU.
+  rewrite gFsub_trans // rfix_mx_rstabC // -sumU.
   by apply/sumsmx_subP=> i _; apply/idPn; rewrite fixK.
 have [modU ntU minU] := simU; pose rU := submod_repr modU.
-have irrU: mx_irreducible rU by exact/submod_mx_irr.
+have irrU: mx_irreducible rU by apply/submod_mx_irr.
 have [W modW sumUW dxUW] := redG U modU (submx1 U).
 have cWK: (W <= fixG K)%MS.
   have:= dx_modK_rfix _ _ _ (subxx _) nKR _ _ dxUW.
-  by rewrite /NRmod /= norm_joinEr // defKR (negPf nfixU); exact.
-have nsK'G: K^`(1) <| G by exact: char_normal_trans (der_char _ _) nsKG.
+  by rewrite /NRmod /= norm_joinEr // defKR (negPf nfixU); apply.
+have nsK'G: K^`(1) <| G by rewrite gFnormal_trans.
 have [sK'G nK'G] := andP nsK'G.
 suffices nregK'U: (rfix_mx rU K^`(1))%MS != 0.
   rewrite rfix_mx_rstabC ?normal_sub // -sumUW addsmx_sub andbC.
@@ -427,27 +434,26 @@ suffices nregK'U: (rfix_mx rU K^`(1))%MS != 0.
   apply: contra nregK'U => cUK'; rewrite (eqmx_eq0 (rfix_submod _ _)) //.
   by rewrite (eqP cUK') linear0.
 pose rK := subg_repr rU (normal_sub nsKG); set p := #|R| in p_pr.
-wlog sK: / socleType rK by exact: socle_exists.
+wlog sK: / socleType rK by apply: socle_exists.
 have [i _ def_sK]: exists2 i, i \in setT & [set: sK] = orbit 'Cl G i.
-  by apply/imsetP; exact: Clifford_atrans.
+  exact/imsetP/Clifford_atrans.
 have card_sK: #|[set: sK]| =  #|G : 'C[i | 'Cl]|.
   by rewrite def_sK card_orbit_in ?indexgI.
 have ciK: K \subset 'C[i | 'Cl].
   apply: subset_trans (astabS _ (subsetT _)).
-  by apply: subset_trans (Clifford_astab _); exact: joing_subl.
+  by apply: subset_trans (Clifford_astab _); apply: joing_subl.
 pose M := socle_base i; have simM: mxsimple rK M := socle_simple i.
 have [sKp | sK1 {ciK card_sK}]: #|[set: sK]| = p \/ #|[set: sK]| = 1%N.
 - apply/pred2P; rewrite orbC card_sK; case/primeP: p_pr => _; apply.
   by rewrite (_ : p = #|G : K|) ?indexgS // -divgS // -(sdprod_card defG) mulKn.
 - have{def_sK} def_sK: [set: sK] = orbit 'Cl R i.
-    apply/eqP; rewrite eq_sym -subTset def_sK.
-    apply/subsetP=> i_yz; case/imsetP=> yz; rewrite -{1}defKR.
-    case/imset2P=> y z; move/(subsetP ciK); rewrite !inE sub1set inE.
-    case/andP=> Gy; move/eqP=> ciy Rz -> ->{yz i_yz}.
+    apply/eqP; rewrite eq_sym -subTset def_sK -[G in orbit _ G i]defKR.
+    apply/subsetP=> _ /imsetP[_ /imset2P[y z /(subsetP ciK)ciy Rz ->] ->].
+    rewrite !(inE, sub1set) in ciy; have{ciy}[Gy /eqP-ciy]:= andP ciy.
     by rewrite actMin ?(subsetP sRG z Rz) // ciy mem_orbit.
   have inj_i: {in R &, injective ('Cl%act i)}.
-    apply/dinjectiveP; apply/card_uniqP; rewrite size_map -cardE -/p.
-    by rewrite -sKp def_sK /orbit Imset.imsetE cardsE.
+    apply/dinjectiveP/card_uniqP; rewrite size_map -cardE -/p.
+    by rewrite -sKp def_sK /orbit [in _ @: _]unlock cardsE.
   pose sM := (\sum_(y in R) M *m rU y)%MS.
   have dxM: mxdirect sM.
     apply/mxdirect_sumsP=> y Ry; have Gy := subsetP sRG y Ry.
@@ -482,9 +488,9 @@ have{sK i M simM sK1 def_sK} irrK: mx_irreducible rK.
   apply: (mx_irr_prime_index closF irrU cycGq simM) => x Gx /=.
   apply: (component_mx_iso simM); first exact: Clifford_simple.
   have jP: component_mx rK (M *m rU x) \in socle_enum sK.
-    by apply: component_socle; exact: Clifford_simple.
+    exact/component_socle/Clifford_simple.
   pose j := PackSocle jP; apply: submx_trans (_ : j <= _)%MS.
-    by rewrite PackSocleK component_mx_id //; exact: Clifford_simple.
+    by rewrite PackSocleK component_mx_id //; apply: Clifford_simple.
   have def_i: [set i] == [set: sK] by rewrite eqEcard subsetT cards1 sK1.
   by rewrite ((j =P i) _) // -in_set1 (eqP def_i) inE.
 pose G' := K^`(1) <*> R.
@@ -518,7 +524,7 @@ have irrK'K: mx_absolutely_irreducible rK'K.
     exact: atrans_dvd_in (Clifford_atrans _ _).
   have nsK'G': K^`(1) <| G' := normalS (joing_subl _ _) sG'G nsK'G.
   pose rK'G' := subg_repr rG' (normal_sub nsK'G').
-  wlog sK'G': / socleType rK'G' by exact: socle_exists.
+  wlog sK'G': / socleType rK'G' by apply: socle_exists.
   have coKp: coprime #|K| p := Frobenius_coprime frobG.
   have nK'R := subset_trans sRG nK'G.
   have sK'_dv_p: #|[set: sK'G']| %| p.
@@ -549,9 +555,9 @@ have irrK'K: mx_absolutely_irreducible rK'K.
   apply closF; apply: (mx_irr_prime_index closF irrG' cycGq simM) => x K'x /=.
   apply: (component_mx_iso simM); first exact: Clifford_simple.
   have jP: component_mx rK'G' (M *m rG' x) \in socle_enum sK'G'.
-    by apply: component_socle; exact: Clifford_simple.
+    exact/component_socle/Clifford_simple.
   pose j := PackSocle jP; apply: submx_trans (_ : j <= _)%MS.
-    by rewrite PackSocleK component_mx_id //; exact: Clifford_simple.
+    by rewrite PackSocleK component_mx_id //; apply: Clifford_simple.
   by rewrite ((j =P i) _) // -in_set1 -def_i inE.
 have linU: \rank U = 1%N by apply/eqP; rewrite abelian_abs_irr in irrK'K.
 case: irrU => _ nz1 _; apply: contra nz1; move/eqP=> fix0.
@@ -620,12 +626,12 @@ have{n leGn IHn tiHR} IHquo (X : {group gT}):
   rewrite -defHR quotientE morphimR // -!quotientE.
   have ltGbn: #|G / X| < n.
     exact: leq_trans (ltn_quotient ntX (subset_trans sXH sHG)) _.
-  have defGb: (H / X) ><| (R / X) = G / X by exact: quotient_coprime_sdprod.
+  have defGb: (H / X) ><| (R / X) = G / X by apply: quotient_coprime_sdprod.
   have pr_R0b: prime #|R0 / X|.
     have tiXR0: X :&: R0 = 1 by apply/trivgP; rewrite -tiHR setISS.
     by rewrite card_quotient // -indexgI setIC tiXR0 indexg1 oR0.
-  have solGb: solvable (G / X) by exact: quotient_sol.
-  have coHRb: coprime #|H / X| #|R / X| by exact: coprime_morph.
+  have solGb: solvable (G / X) by apply: quotient_sol.
+  have coHRb: coprime #|H / X| #|R / X| by apply: coprime_morph.
   apply: IHn defGb coHRb _ pr_R0b _; rewrite ?quotientS ?quotient_odd //.
   by rewrite -coprime_quotient_cent ?(coprimegS sR0R) // morphim_Zgroup.
 without loss Op'H: / 'O_p^'(H) = 1.
@@ -633,10 +639,10 @@ without loss Op'H: / 'O_p^'(H) = 1.
   suffices: p.-length_1 (H / 'O_p^'(H)).
     by rewrite p'quo_plength1 ?pcore_normal ?pcore_pgroup.
   apply: IHquo => //; first by rewrite normal_sub ?pcore_normal.
-  by rewrite normal_norm // (char_normal_trans (pcore_char _ _)).
+  by rewrite normal_norm // gFnormal_trans.
 move defV: 'F(H)%G => V.
 have charV: V \char H by rewrite -defV Fitting_char.
-have [sVH nVH]: V \subset H /\ H \subset 'N(V) := andP (char_normal charV).
+have /andP[sVH nVH]: V <| H := char_normal charV.
 have nsVG: V <| G := char_normal_trans charV nsHG.
 have [_ nVG] := andP nsVG; have nVR: R \subset 'N(V) := subset_trans sRG nVG.
 without loss ntV: / V :!=: 1.
@@ -650,7 +656,7 @@ have p'r: r != p.
   by rewrite -oR0 (coprimegS sR0R) // (coprimeSg sVH).
 without loss{charV} abelV: / p.-abelem V; last have [_ cVV eV] := and3P abelV.
   move/implyP; rewrite implybE -trivg_Phi //; case/orP=> // ntPhi.
-  have charPhi: 'Phi(V) \char H := char_trans (Phi_char _) charV.
+  have charPhi: 'Phi(V) \char H := gFchar_trans _ charV.
   have nsPhiH := char_normal charPhi; have [sPhiH nPhiH] := andP nsPhiH.
   have{charPhi} nPhiG: G \subset 'N('Phi(V)):= char_norm_trans charPhi nHG.
   rewrite -(pquo_plength1 nsPhiH) 1?IHquo ?(pgroupS (Phi_sub _)) //.
@@ -683,8 +689,7 @@ without loss{IHquo} indecomposableV: / forall U W,
   have [nsUH nsWH]: U <| H /\ W <| H.
     by rewrite /normal !(subset_trans sHG) ?andbT.
   by rewrite -(quo2_plength1 _ nsUH nsWH) ?tiUW ?IHquo.
-have nsFb: 'F(H / V) <| G / V.
-  exact: char_normal_trans (Fitting_char _) (morphim_normal _ _).
+have nsFb: 'F(H / V) <| G / V by rewrite gFnormal_trans ?quotient_normal.
 have{nsVG nsFb} [/= U defU sVU nsUG] := inv_quotientN nsVG nsFb.
 have{nsUG} [sUG nUG] := andP nsUG.
 have [solU nVU] := (solvableS sUG solG, subset_trans sUG nVG).
@@ -717,23 +722,23 @@ have coKP: coprime #|K| #|P| by rewrite coprime_sym (pnat_coprime pP).
 have{sylP} sylVP: p.-Sylow(H) (V <*> P).
   rewrite pHallE /= norm_joinEr ?mul_subG //= -defH -!LagrangeMl.
   rewrite partnM // part_pnat_id // -!card_quotient //.
-  by apply/eqP; congr (_ * _)%N; apply: card_Hall; exact: quotient_pHall.
+  by apply/eqP; congr (_ * _)%N; apply: card_Hall; apply: quotient_pHall.
 have [trKP | {sylV sVU nVU}ntKP] := eqVneq [~: K, P] 1.
   suffices sylVH: p.-Sylow(H) V.
     rewrite p_elt_gen_length1 // (_ : p_elt_gen p H = V).
       rewrite /pHall pcore_sub pcore_pgroup /= pnatNK.
-      by apply: pnat_dvd pV; exact: dvdn_indexg.
+      by apply: pnat_dvd pV; apply: dvdn_indexg.
     rewrite -(genGid V) -(setIidPr sVH); congr <<_>>; apply/setP=> x.
     rewrite !inE; apply: andb_id2l => Hx.
     by rewrite (mem_normal_Hall sylVH) /normal ?sVH.
   suffices sPV: P \subset V by rewrite -(joing_idPl sPV).
-  suffices sPU: P \subset U by rewrite (sub_normal_Hall sylV) //; exact/andP.
+  suffices sPU: P \subset U by rewrite (sub_normal_Hall sylV) //; apply/andP.
   have cUPb: P / V \subset 'C_(H / V)(U / V).
     rewrite subsetI morphimS // -mulVK quotientMidl quotient_cents2r //.
     by rewrite commGC trKP sub1G.
   rewrite -(quotientSGK nVP sVU) (subset_trans cUPb) //.
   by rewrite -defU cent_sub_Fitting ?quotient_sol.
-have{sylVP} dxV: [~: V, K] \x 'C_V(K) = V by exact: coprime_abelian_cent_dprod.
+have{sylVP} dxV: [~: V, K] \x 'C_V(K) = V by apply: coprime_abelian_cent_dprod.
 have tiVsub_VcK: 'C_V(K) = 1 \/ 'C_V(K) = V.
   apply: (indecomposableV _  [~: V, K]); first by rewrite dprodC.
   rewrite -mulHR -defH -mulgA mul_subG // subsetI.
@@ -777,7 +782,7 @@ have nKR0: R0 \subset 'N(K) := subset_trans sR0R nKR.
 have mulKR0: K * R0 = K <*> R0 by rewrite norm_joinEr.
 have sKR0_G : K <*> R0 \subset G by rewrite -mulKR0 -mulHR mulgSS.
 have nV_KR0: K <*> R0 \subset 'N(V) := subset_trans sKR0_G nVG.
-have solKR0: solvable (K <*> R0) by exact: solvableS solG.
+have solKR0: solvable (K <*> R0) by apply: solvableS solG.
 have coKR0: coprime #|K| #|R0| by rewrite (coprimeSg sKH) ?(coprimegS sR0R).
 have r'K: r^'.-group K.
   by rewrite /pgroup p'natE -?prime_coprime // coprime_sym -oR0.
@@ -790,7 +795,7 @@ have tiKR0cV: 'C_(K <*> R0)(V) = 1.
   suff defC: C == R0 by rewrite -(eqP defC) (subset_trans (joing_subl K R0)).
   have sC_R0: C \subset R0.
     rewrite -[C](coprime_mulG_setI_norm mulKR0) ?norms_cent //= tiKcV mul1g.
-    exact: subsetIl.
+    apply: subsetIl.
   rewrite eqEsubset sC_R0; apply: contraR ntC => not_sR0C.
   by rewrite -(setIidPr sC_R0) prime_TIg ?oR0.
 have{nKR0 mulKR0 sKR0_G solKR0 nV_KR0} oCVR0: #|'C_V(R0)| = p.
@@ -801,7 +806,7 @@ have{nKR0 mulKR0 sKR0_G solKR0 nV_KR0} oCVR0: #|'C_V(R0)| = p.
     apply: odd_prime_sdprod_abelem_cent1 abelV nV_KR0 _ _; rewrite // ?oR0 //=.
     by rewrite -mulKR0 pgroupM p'K /pgroup oR0 pnatE.
   have [x defC]: exists x, 'C_V(R0) = <[x]>.
-    have ZgrC: Zgroup 'C_V(R0) by apply: ZgroupS ZgrCHR0; exact: setSI.
+    have ZgrC: Zgroup 'C_V(R0) by apply: ZgroupS ZgrCHR0; apply: setSI.
     apply/cyclicP; apply: (forall_inP ZgrC); apply/SylowP; exists p => //.
     by rewrite /pHall subxx indexgg (pgroupS (subsetIl V _)).
   rewrite defC; apply: nt_prime_order => //; last by rewrite -cycle_eq1 -defC.
@@ -835,15 +840,14 @@ have{IHsub nVH} IHsub: forall X : {group gT},
     by rewrite 2?normsY ?nXR0 ?(subset_trans sR0R) // (subset_trans sRG).
   have Op'H0: 'O_p^'(H0) = 1.
     have [sOp' nOp'] := andP (pcore_normal _ _ : 'O_p^'(H0) <| H0).
-    have p'Op': p^'.-group 'O_p^'(H0) by exact: pcore_pgroup.
+    have p'Op': p^'.-group 'O_p^'(H0) by apply: pcore_pgroup.
     apply: card1_trivg (pnat_1 (pgroupS _ pV) p'Op').
     rewrite -scVH subsetI (subset_trans sOp') //= centsC; apply/setIidPl.
     rewrite -coprime_norm_cent ?(pnat_coprime pV p'Op') //.
       by rewrite (setIidPl (subset_trans _ nOp')) // /H0 -joingA joing_subl.
     exact: subset_trans (subset_trans sH0H nVH).
   have Op'HR0: 'O_p^'([~: H0, R0]) = 1.
-    apply/trivgP; rewrite -Op'H0 pcore_max ?pcore_pgroup //.
-    apply: char_normal_trans (pcore_char _ _) _.
+    apply/trivgP; rewrite -Op'H0 pcore_max ?pcore_pgroup // gFnormal_trans //.
     by rewrite /(_ <| _) commg_norml andbT commg_subl.
   have{ltG0G IHsub} p1_HR0: p.-length_1 [~: H0, R0].
     by apply: IHsub ltG0G => //=; rewrite mul_subG ?normG.
@@ -854,8 +858,7 @@ have{IHsub nVH} IHsub: forall X : {group gT},
     by rewrite -{1}((_ :=P: _) p1_HR0) (quotient_pseries [::_;_]) pcore_pgroup.
   apply/trivgP; have <-: K :&: 'O_p([~: H0, R0]) = 1.
     by rewrite setIC coprime_TIg // (pnat_coprime (pcore_pgroup p _)).
-  rewrite commg_subI // subsetI ?sPOpHR0 ?sXK //=.
-  by rewrite (char_norm_trans (pcore_char _ _)) // normsRl.
+  by rewrite commg_subI // subsetI ?sPOpHR0 ?sXK //= gFnorm_trans // normsRl.
 have{defH sR0R} [defH defR0]: V * K * P = H /\ R0 :=: R.
   suffices: (V * K * P == H) && (R0 :==: R) by do 2!case: eqP => // ->.
   apply: contraR ntKP; rewrite -subG1 !eqEcard sR0R ?mul_subG //= negb_and.
@@ -901,23 +904,23 @@ have{scKH} tiPRcK: 'C_(P <*> R)(K) = 1.
 have [K1 | ntK]:= eqsVneq K 1; first by rewrite K1 comm1G eqxx in ntKR.
 have [K1 | [q q_pr q_dv_K]] := trivgVpdiv K; first by case/eqP: ntK.
 have q_gt1 := prime_gt1 q_pr.
-have p'q: q != p by exact: (pgroupP p'K).
-have{r'K} q'r: r != q by rewrite eq_sym; exact: (pgroupP r'K).
+have p'q: q != p by apply: (pgroupP p'K).
+have{r'K} q'r: r != q by rewrite eq_sym; apply: (pgroupP r'K).
 have{defK} qK: q.-group K.
   have{defK} nilK: nilpotent K by rewrite -defK Fitting_nil.
   have{nilK} [_ defK _ _] := dprodP (nilpotent_pcoreC q nilK).
   have{IHsub} IHpi: forall pi, 'O_pi(K) = K \/ 'O_pi(K) \subset 'C(P).
     move=> pi; apply: IHsub (pcore_sub _ _).
-    by apply: char_norm_trans (pcore_char _ _) _; rewrite join_subG nKP.
+    by rewrite gFnorm_trans // join_subG nKP.
   case: (IHpi q) => [<-| cPKq]; first exact: pcore_pgroup.
   case/eqP: ntKP; apply/commG1P; rewrite -{}defK mul_subG //.
   case: (IHpi q^') => // defK; case/idPn: q_dv_K.
-  rewrite -p'natE // -defK; exact: pcore_pgroup.
+  by rewrite -p'natE // -defK; apply: pcore_pgroup.
 pose K' := K^`(1); have charK': K' \char K := der_char 1 K.
 have nsK'K: K' <| K := der_normal 1 K; have [sK'K nK'K] := andP nsK'K.
 have nK'PR: P <*> R \subset 'N(K') := char_norm_trans charK' nKPR.
 have iK'K: 'C_(P <*> R / K')(K / K') = 1 -> #|K / K'| > q ^ 2.
-  have qKb: q.-group (K / K') by exact: morphim_pgroup qK.
+  have qKb: q.-group (K / K') by apply: morphim_pgroup qK.
   rewrite ltnNge => trCK'; apply: contra ntKP => Kq_le_q2.
   suffices sPR_K': [~: P, R] \subset K'.
     rewrite -defP -(setIidPl sPR_K') coprime_TIg ?commG1 //.
@@ -925,13 +928,13 @@ have iK'K: 'C_(P <*> R / K')(K / K') = 1 -> #|K / K'| > q ^ 2.
   rewrite -quotient_cents2 ?(char_norm_trans charK') //.
   suffices cPRbPrb: abelian (P <*> R / K').
     by rewrite (sub_abelian_cent2 cPRbPrb) ?quotientS ?joing_subl ?joing_subr.
-  have nKbPR: P <*> R / K' \subset 'N(K / K') by exact: quotient_norms.
+  have nKbPR: P <*> R / K' \subset 'N(K / K') by apply: quotient_norms.
   case cycK: (cyclic (K / K')).
     rewrite (isog_abelian (quotient1_isog _)) -trCK' -ker_conj_aut.
     rewrite (isog_abelian (first_isog_loc _ _)) //.
     by rewrite (abelianS (Aut_conj_aut _ _)) ?Aut_cyclic_abelian.
   have{cycK} [oKb abelKb]: #|K / K'| = (q ^ 2)%N /\ q.-abelem (K / K').
-    have sKb1: 'Ohm_1(K / K') \subset K / K' by exact: Ohm_sub.
+    have sKb1: 'Ohm_1(K / K') \subset K / K' by apply: Ohm_sub.
     have cKbKb: abelian (K / K') by rewrite sub_der1_abelian.
     have: #|'Ohm_1(K / K')| >= q ^ 2.
       rewrite (card_pgroup (pgroupS sKb1 qKb)) leq_exp2l // ltnNge.
@@ -949,8 +952,8 @@ have iK'K: 'C_(P <*> R / K')(K / K') = 1 -> #|K / K'| > q ^ 2.
   by rewrite /pgroup (pi_pnat rR) // (pi_pnat pP) // !inE eq_sym.
 case cKK: (abelian K); last first.
   have [|[dPhiK dK'] dCKP] := abelian_charsimple_special qK coKP defKP.
-    apply/bigcupsP=> L; case/andP=> charL; have sLK := char_sub charL. 
-    by case/IHsub: sLK cKK => // [|-> -> //]; exact: (char_norm_trans charL).
+    apply/bigcupsP=> L /andP[charL]; have sLK := char_sub charL. 
+    by case/IHsub: sLK cKK => // [|-> -> //]; apply: char_norm_trans charL _.
   have eK: exponent K %| q.
     have oddK: odd #|K| := oddSg sKG oddG.
     have [Q [charQ _ _ eQ qCKQ]] := critical_odd qK oddK ntK; rewrite -eQ.
@@ -1002,7 +1005,7 @@ case cKK: (abelian K); last first.
     have [x defCKR]: exists x, 'C_K(R) = <[x]>.
       have ZgrCKR: Zgroup 'C_K(R) := ZgroupS (setSI _ sKH) ZgrCHR.
       have qCKR: q.-group 'C_K(R) by rewrite (pgroupS (subsetIl K _)).
-      by apply/cyclicP; exact: nil_Zgroup_cyclic (pgroup_nil qCKR).
+      by apply/cyclicP; apply: nil_Zgroup_cyclic (pgroup_nil qCKR).
     have Kx: x \in K by rewrite -cycle_subG -defCKR subsetIl.
     rewrite defCKR cycle_subG in not_sCKR_K' *.
     exact: nt_prime_order (exponentP eK x Kx) (group1_contra not_sCKR_K').
@@ -1044,7 +1047,7 @@ case cKK: (abelian K); last first.
     rewrite -divgS // -{1}(coprime_cent_prod nKR) // TI_cardMg ?mulKn //.
     by rewrite setIA (setIidPl sKR_K).
   have sKRx_K: [~: K, R] :^ x \subset K by rewrite -{2}(normsP nKP x Px) conjSg.
-  have nKR_K: K \subset 'N([~: K, R]) by exact: commg_norml.
+  have nKR_K: K \subset 'N([~: K, R]) by apply: commg_norml.
   have mulKR_Krx: [~: K, R] * [~: K, R] :^ x = K.
     have maxKR: maximal [~: K, R] K by rewrite p_index_maximal ?iKR.
     apply: mulg_normal_maximal; rewrite ?(p_maximal_normal qK) //.
@@ -1059,12 +1062,11 @@ case cKK: (abelian K); last first.
   by rewrite mulKR_Krx mulnAC leq_pmul2l ?muln_gt0 ?cardG_gt0 ?subset_leq_card.
 have tiKcP: 'C_K(P) = 1 by rewrite -defKP coprime_abel_cent_TI.
 have{IHsub} abelK: q.-abelem K.
-  have [|cPK1] := IHsub _ (char_norm_trans (Ohm_char 1 K) nKPR) (Ohm_sub 1 K).
-    by move/abelem_Ohm1P->.
+  have [/abelem_Ohm1P->//|cPK1] := IHsub _ (gFnorm_trans _ nKPR) (Ohm_sub 1 K).
   rewrite -(setIid K) TI_Ohm1 ?eqxx // in ntK.
   by apply/eqP; rewrite -subG1 -tiKcP setIS.
 have{K' iK'K charK' nsK'K sK'K nK'K nK'PR} oKq2: q ^ 2 < #|K|.
-  have K'1: K' :=: 1 by exact/commG1P.
+  have K'1: K' :=: 1 by apply/commG1P.
   rewrite -indexg1 -K'1 -card_quotient ?normal_norm // iK'K // K'1.
   by rewrite -injm_subcent ?coset1_injm ?norms1 //= tiPRcK morphim1.
 pose S := [set Vi : {group gT} | 'C_V('C_K(Vi)) == Vi & maximal 'C_K(Vi) K].
@@ -1174,7 +1176,7 @@ have [cSR | not_cSR] := boolP (R \subset 'C(S | 'JG)).
     rewrite join_subG (subset_trans sRnSV) /= ?bigcap_inf // andbT -defP.
     apply: (subset_trans (commgS P sRnSV)).
     have:= subset_trans (joing_subl P R) sPRnSV; rewrite -commg_subr /=.
-    move/subset_trans; apply; exact: bigcap_inf.
+    by move/subset_trans; apply; apply: bigcap_inf.
   rewrite -afixJG; move/orbit1P => -> allV1.
   have defV1: V1 = V by apply: group_inj; rewrite /= -defV allV1 big_set1.
   case/idPn: oKq2; rewrite -(Lagrange (subsetIl K 'C(V1))).
@@ -1232,7 +1234,7 @@ have nVjR Vj: Vj \in S :\: D -> 'C_K(Vj) = [~: K, R].
     have iKj: #|K : Kj| = q by rewrite (p_maximal_index qK (maxSK Vj Sj)).
     have dxKR: [~: K, R] \x 'C_K(R) = K by rewrite coprime_abelian_cent_dprod.
     have{dxKR} [_ defKR _ tiKRcR] := dprodP dxKR.
-    have Z_CK: Zgroup 'C_K(R) by apply: ZgroupS ZgrCHR; exact: setSI.
+    have Z_CK: Zgroup 'C_K(R) by apply: ZgroupS ZgrCHR; apply: setSI.
     have abelCKR: q.-abelem 'C_K(R) := abelemS (subsetIl _ _) abelK.
     have [qCKR _] := andP abelCKR.
     apply/eqP; rewrite eq_sym eqEcard sKRVj -(leq_pmul2r (ltnW q_gt1)).
@@ -1250,9 +1252,9 @@ have nVjR Vj: Vj \in S :\: D -> 'C_K(Vj) = [~: K, R].
     by rewrite (actsP actsR) //= S1 mem_imset.
   rewrite (subset_trans sCVj) // class_supportEr -(bigdprodWY defU) genS //.
   apply/bigcupsP=> x Rx; rewrite (bigcup_max (Vj :^ x)%G) // inE.
-  by rewrite (actsP actsR) // Sj andbT (orbit_transr _ (mem_orbit 'JG Vj Rx)).
+  by rewrite (actsP actsR) // Sj andbT (orbit_transl _ (mem_orbit 'JG Vj Rx)).
 have sDS: D \subset S.
-  by rewrite acts_sub_orbit //; apply: subset_trans actsPR; exact: joing_subr.
+  by rewrite acts_sub_orbit //; apply: subset_trans actsPR; apply: joing_subr.
 have [eqDS | ltDS] := eqVproper sDS.
   have [fix0 | [Vj cVjP]] := set_0Vmem 'Fix_(S | 'JG)(P).
     case/negP: p'r; rewrite eq_sym -dvdn_prime2 // -oD eqDS /dvdn.
@@ -1282,7 +1284,7 @@ move=> defG solG R_pr regR.
 elim: {K}_.+1 {-2}K (ltnSn #|K|) => // m IHm K leKm in G defG solG regR *.
 have [nsKG sRG defKR nKR tiKR] := sdprod_context defG.
 have [sKG nKG] := andP nsKG.
-wlog ntK: / K :!=: 1 by case: eqP => [-> _ | _ ->] //; exact: nilpotent1.
+wlog ntK: / K :!=: 1 by case: eqP => [-> _ | _ ->] //; apply: nilpotent1.
 have [L maxL _]: {L : {group gT} | maxnormal L K G & [1] \subset L}.
   by apply: maxgroup_exists; rewrite proper1G ntK norms1.
 have [ltLK nLG]:= andP (maxgroupp maxL); have [sLK not_sKL]:= andP ltLK.
@@ -1393,7 +1395,7 @@ have nsFK := char_normal chF; have [sFK nFK] := andP nsFK.
 pose KqF := K / 'F(K); have solK := solvableS sKG solG.
 without loss [p p_pr pKqF]: / exists2 p, prime p & p.-group KqF.
   move=> IHp;  apply: wlog_neg => IH_KR; rewrite -quotient_cents2 //= -/KqF.
-  set Rq := R / 'F(K); have nKRq: Rq \subset 'N(KqF) by exact: quotient_norms.
+  set Rq := R / 'F(K); have nKRq: Rq \subset 'N(KqF) by apply: quotient_norms.
   rewrite centsC.
   apply: subset_trans (coprime_cent_Fitting nKRq _ _); last first.
   - exact: quotient_sol.
@@ -1409,7 +1411,7 @@ without loss [p p_pr pKqF]: / exists2 p, prime p & p.-group KqF.
     by apply: char_from_quotient nsFP (Fitting_char _) _; rewrite -defPq.
   have defFP: 'F(P) = 'F(K).
     apply/eqP; rewrite eqEsubset !Fitting_max ?Fitting_nil //.
-    by rewrite char_normal ?(char_trans (Fitting_char _)).
+    by rewrite char_normal ?gFchar_trans.
   have coPR := coprimeSg sPK coKR.
   have nPR: R \subset 'N(P) := char_norm_trans chP nKR.
   pose G1 := P <*> R.
@@ -1504,7 +1506,7 @@ rewrite quotient_cents2 ?norms_cent ?nW_ //= commGC.
 pose Hv := (P / V) <*> (R / V).
 have sHGv: Hv \subset G / V by rewrite join_subG !quotientS.
 have solHv: solvable Hv := solvableS sHGv (quotient_sol V solG).
-have sPHv: P / V \subset Hv by exact: joing_subl.
+have sPHv: P / V \subset Hv by apply: joing_subl.
 have nPRv: R / V \subset 'N(P / V) := quotient_norms _ nPR.
 have coPRv: coprime #|P / V| #|R / V| := coprime_morph _ (coprimeSg sPK coKR).
 apply: subset_trans (subsetIr (P / V) _).
@@ -1639,7 +1641,7 @@ have nRqP: P \subset 'N('O_q(R)) by rewrite (subset_trans sPR) ?gFnorm.
 rewrite centsC (coprime_odd_faithful_Ohm1 qRq) ?(oddSg sRqR) //.
 apply: sub_abelian_cent2 (joing_subl _ _) (joing_subr _ _) => /=.
 set PQ := P <*> _; have oPQ: #|PQ| = (p * q)%N.
-  rewrite /PQ norm_joinEl ?(char_norm_trans (Ohm_char 1 _)) //.
+  rewrite /PQ norm_joinEl 1?gFnorm_trans //.
   rewrite coprime_cardMg 1?coprime_sym ?(coprimeSg (Ohm_sub 1 _)) // -/p.
   by congr (p * _)%N; apply: Ohm1_cyclic_pgroup_prime => /=.
 have sPQ_R: PQ \subset R by rewrite join_subG sPR (subset_trans (Ohm_sub 1 _)).
@@ -1813,18 +1815,16 @@ have cMK': K^`(1) / V \subset 'C_(K / V)(M / V).
   - move=> Vx; case/setD1P=> ntVx; case/morphimP=> x nVx Rx defVx.
     rewrite defVx /= -cent_cycle -quotient_cycle //; congr 'C__(_ / V).
     apply/eqP; rewrite eqEsubset cycle_subG Rx /=.
-    apply: contraR ntVx; move/(prime_TIg Rpr); move/trivgP.
-    rewrite defVx /= (setIidPr _) cycle_subG //; move/set1P->.
-    by rewrite morph1.
+    apply: contraR ntVx => /(prime_TIg Rpr)/trivgP.
+    by rewrite defVx /= (setIidPr _) cycle_subG // => /set1P->; rewrite morph1.
   - rewrite -coprime_norm_quotient_cent ?(coprimegS sKG) ?(subset_trans sKG) //.
     by rewrite tcKM quotient1.
   move=> _ _ -> //; rewrite -coprime_quotient_cent ?quotient_cyclic //.
   by rewrite (coprimegS sRG).
-rewrite !subsetI in cVK' cMK' *.
-case/andP: cVK' => sK'K cVK'; case/andP: cMK' => _ cMVK'; rewrite sK'K.
+have{cVK' cMK'} [[sK'K cVK'] [_ cMVK']] := (subsetIP cVK', subsetIP cMK').
 have sK'G: K^`(1) \subset G by rewrite (subset_trans sK'K) ?proper_sub.
 have coMK': coprime #|M| #|K^`(1)| := coprimegS sK'G coMG.
-rewrite (stable_factor_cent cVK') // /stable_factor /normal sVM nVM !andbT.
+rewrite subsetI sK'K (stable_factor_cent cVK') //; apply/and3P; split=> //.
 by rewrite commGC -quotient_cents2 // (subset_trans sK'G).
 Qed.
 

@@ -1,4 +1,6 @@
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat.
 
 Lemma ltn_leq_trans : forall n m p : nat, m < n -> n <= p -> m < p.
 move=> n m p Hmn Hnp; rewrite -ltnS.

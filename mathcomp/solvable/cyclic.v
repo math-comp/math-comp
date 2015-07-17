@@ -1,12 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div fintype bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm automorphism quotient gproduct.
-Require Import ssralg finalg zmodp poly.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div fintype bigop.
+From mathcomp
+Require Import prime finset fingroup morphism perm automorphism quotient.
+From mathcomp
+Require Import gproduct ssralg finalg zmodp poly.
 
 (******************************************************************************)
 (*  Properties of cyclic groups.                                              *)
@@ -118,7 +117,7 @@ End Zpm.
 (***********************************************************************)
 
 Lemma cyclic_abelian A : cyclic A -> abelian A.
-Proof. by case/cyclicP=> a ->; exact: cycle_abelian. Qed.
+Proof. by case/cyclicP=> a ->; apply: cycle_abelian. Qed.
 
 Lemma cycleMsub a b :
   commute a b -> coprime #[a] #[b] -> <[a]> \subset <[a * b]>.
@@ -142,7 +141,7 @@ Lemma cyclicM A B :
   cyclic (A * B).
 Proof.
 move=> /cyclicP[a ->] /cyclicP[b ->]; rewrite cent_cycle cycle_subG => cab coab.
-by rewrite -cycleM ?cycle_cyclic //; exact/esym/cent1P.
+by rewrite -cycleM ?cycle_cyclic //; apply/esym/cent1P.
 Qed.
 
 Lemma cyclicY K H :
@@ -158,7 +157,7 @@ Lemma order_dvdn a n : #[a] %| n = (a ^+ n == 1).
 Proof. by rewrite (eq_expg_mod_order a n 0) mod0n. Qed.
 
 Lemma order_inf a n : a ^+ n.+1 == 1 -> #[a] <= n.+1.
-Proof. by rewrite -order_dvdn; exact: dvdn_leq. Qed.
+Proof. by rewrite -order_dvdn; apply: dvdn_leq. Qed.
 
 Lemma order_dvdG G a : a \in G -> #[a] %| #|G|.
 Proof. by move=> Ga; apply: cardSg; rewrite cycle_subG. Qed.
@@ -193,7 +192,7 @@ by rewrite order_dvdn xp.
 Qed.
 
 Lemma orderXdvd a n : #[a ^+ n] %| #[a].
-Proof. by apply: order_dvdG; exact: mem_cycle. Qed.
+Proof. by apply: order_dvdG; apply: mem_cycle. Qed.
 
 Lemma orderXgcd a n : #[a ^+ n] = #[a] %/ gcdn #[a] n.
 Proof.
@@ -282,7 +281,7 @@ Lemma generator_cycle a : generator <[a]> a.
 Proof. exact: eqxx. Qed.
 
 Lemma cycle_generator a x : generator <[a]> x -> x \in <[a]>.
-Proof. by move/(<[a]> =P _)->; exact: cycle_id. Qed.
+Proof. by move/(<[a]> =P _)->; apply: cycle_id. Qed.
 
 Lemma generator_order a b : generator <[a]> b -> #[a] = #[b].
 Proof. by rewrite /order => /(<[a]> =P _)->. Qed.
@@ -374,7 +373,7 @@ Qed.
 Lemma cycle_subgroup_char a (H : {group gT}) : H \subset <[a]> -> H \char <[a]>.
 Proof.
 move=> sHa; apply: lone_subgroup_char => // J sJa isoJH.
-have dvHa: #|H| %| #[a] by exact: cardSg.
+have dvHa: #|H| %| #[a] by apply: cardSg.
 have{dvHa} /setP Huniq := esym (cycle_sub_group dvHa).
 move: (Huniq H) (Huniq J); rewrite !inE /=.
 by rewrite sHa sJa (card_isog isoJH) eqxx => /eqP<- /eqP<-.
@@ -433,7 +432,7 @@ Lemma cardSg_cyclic G H K :
 Proof.
 move=> cycG sHG sKG; apply/idP/idP; last exact: cardSg.
 case/cyclicP: (cyclicS sKG cycG) => x defK; rewrite {K}defK in sKG *.
-case/dvdnP=> k ox; suffices ->: H :=: <[x ^+ k]> by exact: cycleX.
+case/dvdnP=> k ox; suffices ->: H :=: <[x ^+ k]> by apply: cycleX.
 apply/eqP; rewrite (eq_subG_cyclic cycG) ?(subset_trans (cycleX _ _)) //.
 rewrite -orderE orderXdiv orderE ox ?dvdn_mulr ?mulKn //.
 by have:= order_gt0 x; rewrite orderE ox; case k.
@@ -496,7 +495,7 @@ Lemma injm_cyclic G H (f : {morphism G >-> rT}) :
   'injm f -> H \subset G -> cyclic (f @* H) = cyclic H.
 Proof.
 move=> injf sHG; apply/idP/idP; last exact: morphim_cyclic.
-rewrite -{2}(morphim_invm injf sHG); exact: morphim_cyclic.
+by rewrite -{2}(morphim_invm injf sHG); apply: morphim_cyclic.
 Qed.
 
 Lemma isog_cyclic G M : G \isog M -> cyclic G = cyclic M.
@@ -516,7 +515,7 @@ Lemma injm_generator G H (f : {morphism G >-> rT}) x :
 Proof.
 move=> injf Gx sHG; apply/idP/idP; last exact: morph_generator.
 rewrite -{2}(morphim_invm injf sHG) -{2}(invmE injf Gx).
-by apply: morph_generator; exact: mem_morphim.
+by apply: morph_generator; apply: mem_morphim.
 Qed.
 
 End IsoCyclic.
@@ -577,7 +576,7 @@ Definition cyclem of gT := fun x : gT => x ^+ n.
 
 Lemma cyclemM : {in <[a]> & , {morph cyclem a : x y / x * y}}.
 Proof.
-by move=> x y ax ay; apply: expgMn; exact: (centsP (cycle_abelian a)).
+by move=> x y ax ay; apply: expgMn; apply: (centsP (cycle_abelian a)).
 Qed.
 
 Canonical cyclem_morphism := Morphism cyclemM.
@@ -647,7 +646,7 @@ have a_fa: <[a]> = <[f a]>.
 have def_n: a ^+ n = f a.
   by rewrite -/(Zpm n) invmK // im_Zpm a_fa cycle_id.
 have co_a_n: coprime #[a].-2.+2 n.
-  by rewrite {1}Zp_cast ?order_gt1 // -generator_coprime def_n; exact/eqP.
+  by rewrite {1}Zp_cast ?order_gt1 // -generator_coprime def_n; apply/eqP.
 exists (FinRing.unit 'Z_#[a] co_a_n); rewrite ?inE //.
 apply: eq_Aut (Af) (Aut_aut _ _) _ => x ax.
 rewrite autE //= /cyclem; case/cycleP: ax => k ->{x}.
@@ -669,7 +668,7 @@ have [lea1 | lt1a] := leqP #[a] 1.
   rewrite /order card_le1_trivg // cards1 (@eq_card1 _ 1) // => x.
   by rewrite !inE -cycle_eq1 eq_sym.
 rewrite -(card_injm (injm_invm (injm_Zpm a))) /= ?im_Zpm; last first.
-  by apply/subsetP=> x; rewrite inE; exact: cycle_generator.
+  by apply/subsetP=> x; rewrite inE; apply: cycle_generator.
 rewrite -card_units_Zp // cardsE card_sub morphim_invmE; apply: eq_card => /= d.
 by rewrite !inE /= qualifE /= /Zp lt1a inE /= generator_coprime {1}Zp_cast.
 Qed.
@@ -682,10 +681,10 @@ End CycleAutomorphism.
 Variable G : {group gT}.
 
 Lemma Aut_cyclic_abelian : cyclic G -> abelian (Aut G).
-Proof. by case/cyclicP=> x ->; exact: Aut_cycle_abelian. Qed.
+Proof. by case/cyclicP=> x ->; apply: Aut_cycle_abelian. Qed.
 
 Lemma card_Aut_cyclic : cyclic G -> #|Aut G| = totient #|G|.
-Proof. by case/cyclicP=> x ->; exact: card_Aut_cycle. Qed.
+Proof. by case/cyclicP=> x ->; apply: card_Aut_cycle. Qed.
 
 Lemma sum_ncycle_totient :
   \sum_(d < #|G|.+1) #|[set <[x]> | x in G & #[x] == d]| * totient d = #|G|.
@@ -765,13 +764,13 @@ apply/eqP; rewrite eq_sym eqEcard -[#|_|]/n yn leqnn andbT cycle_subG /=.
 suff{y Gy yn} ->: <[x]> = G :&: [set z | #[z] %| n] by rewrite !inE Gy yn /=.
 apply/eqP; rewrite eqEcard subsetI cycle_subG {}Gx /= cardE; set rs := enum _.
 apply/andP; split; first by apply/subsetP=> y xy; rewrite inE order_dvdG.
-pose P : {poly R} := ('X^n - 1)%R; have n_gt0: n > 0 by exact: order_gt0.
+pose P : {poly R} := ('X^n - 1)%R; have n_gt0: n > 0 by apply: order_gt0.
 have szP: size P = n.+1 by rewrite size_addl size_polyXn ?size_opp ?size_poly1.
 rewrite -ltnS -szP -(size_map f) max_ring_poly_roots -?size_poly_eq0 ?{}szP //.
   apply/allP=> fy /mapP[y]; rewrite mem_enum !inE order_dvdn => /andP[Gy].
   move/eqP=> yn1 ->{fy}; apply/eqP.
   by rewrite !(hornerE, hornerXn) -fX // yn1 f1 subrr.
-have: uniq rs by exact: enum_uniq.
+have: uniq rs by apply: enum_uniq.
 have: all (mem G) rs by apply/allP=> y; rewrite mem_enum; case/setIP.
 elim: rs => //= y rs IHrs /andP[Gy Grs] /andP[y_rs]; rewrite andbC.
 move/IHrs=> -> {IHrs}//; apply/allP=> _ /mapP[z rs_z ->].
@@ -786,7 +785,7 @@ Lemma field_mul_group_cyclic (F : fieldType) (f : gT -> F) :
     {in G, forall x, f x = 1%R <-> x = 1} ->
   cyclic G.
 Proof.
-move=> fM f1P; have f1 : f 1 = 1%R by exact/f1P.
+move=> fM f1P; have f1 : f 1 = 1%R by apply/f1P.
 apply: (div_ring_mul_group_cyclic f1 fM) => [x|].
   case/setD1P=> x1 Gx; rewrite unitfE; apply: contra x1.
   by rewrite subr_eq0 => /eqP/f1P->.
@@ -801,7 +800,7 @@ Lemma field_unit_group_cyclic (F : finFieldType) (G : {group {unit F}}) :
   cyclic G.
 Proof.
 apply: field_mul_group_cyclic FinRing.uval _ _ => // u _.
-by split=> /eqP ?; exact/eqP.
+by split=> /eqP ?; apply/eqP.
 Qed.
 
 Section PrimitiveRoots.
@@ -832,7 +831,7 @@ pose sgT := BaseFinGroupType _ (FinGroup.Mixin sG_Ag sG_1g sG_Vg).
 pose gT := @FinGroupType sgT sG_Vg.
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
-  by split=> [ri1 | ->]; first exact: val_inj.
+  by split=> [ri1 | ->]; first apply: val_inj.
 apply/hasP; exists (r x); first exact: (valP x).
 have [m prim_x dvdmn] := prim_order_exists n_gt0 (rn1 x).
 rewrite -((m =P n) _) // eqn_dvd {}dvdmn -sz_rs -(card_seq_sub Urs) -cardsT.

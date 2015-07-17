@@ -1,10 +1,18 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div path fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div path fintype.
+From mathcomp
 Require Import bigop finset prime fingroup morphism perm automorphism quotient.
+From mathcomp
 Require Import action gproduct gfunctor pgroup cyclic center commutator.
+From mathcomp
 Require Import gseries nilpotent sylow abelian maximal hall frobenius.
+From mathcomp
 Require Import BGsection1 BGsection2 BGsection3 BGsection4 BGsection5.
+From mathcomp
 Require Import BGsection6 BGsection7 BGsection9 BGsection10 BGsection12.
+From mathcomp
 Require Import BGsection13 BGsection14 BGsection15.
 
 (******************************************************************************)
@@ -175,7 +183,7 @@ Proof. by rewrite /FTtype; do 4!case: ifP => // _. Qed.
 
 Definition FTcore M := if 0 < FTtype M <= 2 then M`_\F else M^`(1).
 Fact FTcore_is_group M : group_set (FTcore M).
-Proof. rewrite /FTcore; case: ifP => _; exact: groupP. Qed.
+Proof. by rewrite [group_set _]fun_if !groupP if_same. Qed.
 Canonical Structure FTcore_group M := Group (FTcore_is_group M).
 
 Definition FTsupport1 M := (FTcore M)^#.
@@ -617,7 +625,7 @@ split.
   have{sylS} sylS := subHall_Sylow hallU sk'p sylS.
   have [[sSM pS _] [/= s'p _]] := (and3P sylS, norP sk'p).
   rewrite (sigma'_nil_abelian maxM) ?(pi_pgroup pS) ?(pgroup_nil pS) //.
-  rewrite (rank_Sylow sylS) leqNgt (contra _ s'p) //; exact: alpha_sub_sigma.
+  by rewrite (rank_Sylow sylS) leqNgt (contra _ s'p) //; apply: alpha_sub_sigma.
 - have [_ _ _ cUA_UA _] := kappa_structure maxM complU.
   apply: abelianS cUA_UA; rewrite genS // -big_distrr ?setIS -?def_FTcore //=.
   by apply/bigcupsP=> x A1x; rewrite (bigcup_max x) // setDE setIAC subsetIr.
@@ -770,7 +778,7 @@ split; last 1 first.
   rewrite -[Z](defCK _ K1ya) inE groupJ // cent1C -consttJ groupX ?cent1id //.
   by rewrite (contra (mem_p_elt su'K)) ?(contra (mem_p_elt suKs)) ?p_eltJ.
 rewrite (trivg_kappa_compl maxM complU) => notP1maxM.
-have P2maxM: M \in 'M_'P2 by exact/setDP.
+have P2maxM: M \in 'M_'P2 by apply/setDP.
 split; first by have [_ _ _ _ []] := Ptype_structure PmaxM hallK.
   apply: contraR notP1maxM; case/nonTI_Fitting_facts=> //.
   by case/setUP=> //; case/idPn; case/setDP: PmaxM.
@@ -1070,7 +1078,7 @@ have [K1 | ntK] := eqsVneq K 1.
     by have [_] := kappa_compl_context maxM complU; rewrite defH K1 sdprodg1.
   exists U; split.
     have [_ _ _ cU1U1 exU0] := kappa_structure maxM complU.
-    split=> //; last by rewrite -/Ms -defH in exU0; exact: exU0.
+    split=> //; last by rewrite -/Ms -defH in exU0; apply: exU0.
     exists [group of <<\bigcup_(x in (M`_\sigma)^#) 'C_U[x]>>].
     split=> //= [|x Hx]; last by rewrite sub_gen //= -/Ms -defH (bigcup_max x).
     rewrite -big_distrr /= /normal gen_subG subsetIl.
@@ -1093,7 +1101,7 @@ have [K1 | ntK] := eqsVneq K 1.
     have [_ <- nHU tiHU] := sdprodP defM.
     by rewrite quotientMidl -(exponent_isog (quotient_isog _ _)).
   have sylP: p.-Sylow(H) P := nilpotent_pcore_Hall _ (Fcore_nil M).
-  have ntP: P != 1 by apply: contraNneq not_cPP => ->; exact: abelian1.
+  have ntP: P != 1 by apply: contraNneq not_cPP => ->; apply: abelian1.
   by exists p; rewrite // -p_rank_gt0 -(rank_Sylow sylP) rank_gt0.
 have PmaxM: M \in 'M_'P by rewrite inE -(trivg_kappa maxM hallK) ntK.
 have [Mstar _ [_ _ _ [cycW _ _ _ _]]] := Ptype_embedding PmaxM hallK.
@@ -1131,7 +1139,7 @@ have [Ueq1 | ntU] := eqsVneq U 1; last first.
     apply/eqP; rewrite eqEsubset (Fcore_max hallH_M') ?Fcore_nil // andbT.
     rewrite (Fcore_max (subHall_Hall hallM' _ (Fcore_Hall _))) ?Fcore_nil //.
       by move=> p piM'Fp; apply: pnatPpi k'M' (piSg (Fcore_sub _) piM'Fp).
-    exact: char_normal_trans (Fcore_char _) nsM'M.
+    exact: gFnormal_trans nsM'M.
   exists U _ K _ defW; split=> //; split; first by rewrite defM'F.
     by exists U; split=> // x _; apply: subsetIl.
   have [_ _ _ _ /(_ ntU)] := kappa_structure maxM complU.
@@ -1165,7 +1173,7 @@ have [_ _ _ _] := nonTI_Fitting_structure maxM notMy ntX.
 case=> [[] | [_]]; first by case/idPn; case/setDP: PmaxM.
 move: #|_| => p; set P := 'O_p(H); rewrite /= -/H => not_cPP cycHp'.
 have sylP: p.-Sylow(H) P := nilpotent_pcore_Hall _ (Fcore_nil M).
-have ntP: P != 1 by apply: contraNneq not_cPP => ->; exact: abelian1.
+have ntP: P != 1 by apply: contraNneq not_cPP => ->; apply: abelian1.
 have piHp: p \in \pi(H) by rewrite -p_rank_gt0 -(rank_Sylow sylP) rank_gt0.
 have defH: H = Ms by apply/eqP; rewrite defY1 Y1.
 rewrite -defMs -defH in defM; have [_ <- nHU tiHU] := sdprodP defM.
@@ -1200,7 +1208,7 @@ split=> [H x a hallH nilH Hx|].
 have [allFM | ] := boolP (('M : {set {group gT}}) \subset 'M_'F).
   by left=> M maxM; rewrite -FTtype_Fmax // (subsetP allFM).
 case/subsetPn=> S maxS notFmaxS; right.
-have PmaxS: S \in 'M_'P by exact/setDP.
+have PmaxS: S \in 'M_'P by apply/setDP.
 have [[U W1] /= complU] := kappa_witness maxS; have [_ hallW1 _] := complU.
 have ntW1: W1 :!=: 1 by rewrite (trivg_kappa maxS).
 have [[_ [_]]] := BGsummaryC maxS complU ntW1; set W2 := 'C_(_)(W1) => ntW2 _.
@@ -1263,7 +1271,7 @@ without loss {defX} ->: X / X = 'A0(M).
   set D0 := finset _ => [[sD0A1 tameA0 signD0]] D.
   have sDD0: D \subset D0 by rewrite /D /D0 !setIdE setSI.
   split=> [|x Ax a Axa|x Dx]; first exact: subset_trans sDD0 sD0A1.
-    by apply: tameA0; exact: (subsetP sAA0).
+    by apply: tameA0; apply: (subsetP sAA0).
   have [/= -> -> [-> coA0L -> -> frobL]] := signD0 x (subsetP sDD0 x Dx).
   by do 2![split=> //] => y Ay; rewrite coA0L // (subsetP sAA0).
 move=> {X} D; pose Ms := M`_\sigma.
@@ -1291,7 +1299,7 @@ have tiA0 x a: x \in 'A0(M) :\: 'A1(M) -> x ^ a \in 'A0(M) -> a \in M.
 have sDA1: D \subset 'A1(M).
   apply/subsetPn=> [[x /setIdP[A0x not_sCxM] notA1x]].
   case/subsetP: not_sCxM => a cxa.
-  by apply: (tiA0 x); [exact/setDP | rewrite /conjg -(cent1P cxa) mulKg].
+  by apply: (tiA0 x); [apply/setDP | rewrite /conjg -(cent1P cxa) mulKg].
 have sDMs1: D \subset Ms^# by rewrite /Ms -def_FTcore.
 have [tameMs _ signM PsignM] := BGsummaryD maxM.
 split=> // [x A0x a A0xa|x Dx].
@@ -1318,7 +1326,7 @@ have MSx_gt1: #|'M_\sigma[x]| > 1.
   by apply: contra not_sCxM; move/cent1_sub_uniq_sigma_mmax->.
 have [FmaxM t2'M]: M \in 'M_'F /\ \tau2(M)^'.-group M.
   apply: (non_disjoint_signalizer_Frobenius ell1x MSx_gt1 SMxM).
-  by apply: contra not_sNx'CMy; exact: pgroupS (subsetIl _ _).
+  by apply: contra not_sNx'CMy; apply: pgroupS (subsetIl _ _).
 have defA0: 'A0(M) = Ms^#.
   rewrite FTsupp0_type1; last by rewrite -FTtype_Fmax. 
   rewrite /'A(M) /'A1(M) -FTtype_Fmax // FmaxM def_FTcore //= -/Ms.

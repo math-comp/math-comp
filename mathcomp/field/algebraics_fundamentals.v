@@ -1,18 +1,15 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div path choice fintype tuple bigop finset prime.
-From mathcomp.fingroup
-Require Import fingroup.
-From mathcomp.algebra
-Require Import ssralg poly polydiv mxpoly finalg zmodp cyclic.
-From mathcomp.algebra
-Require Import ssrnum ssrint rat intdiv vector.
-From mathcomp.solvable
-Require Import pgroup sylow.
-Require Import countalg falgebra fieldext separable galois.
+From mathcomp
+Require Import ssrbool ssrfun ssrnat eqtype seq choice div fintype.
+From mathcomp
+Require Import path tuple bigop finset prime ssralg poly polydiv mxpoly.
+From mathcomp
+Require Import countalg ssrnum ssrint rat intdiv.
+From mathcomp
+Require Import fingroup finalg zmodp cyclic pgroup sylow.
+From mathcomp
+Require Import vector falgebra fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)

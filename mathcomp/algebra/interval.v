@@ -1,12 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype bigop finset.
-From mathcomp.fingroup
-Require Import fingroup.
-Require Import ssralg zmodp ssrint ssrnum.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import bigop ssralg finset fingroup zmodp ssrint ssrnum.
 
 (*****************************************************************************)
 (* This file provide support for intervals in numerical and real domains.    *)
@@ -31,8 +28,8 @@ Require Import ssralg zmodp ssrint ssrnum.
 (* when R is a real domain: we could provide a specific theory for this      *)
 (* important case.                                                           *)
 (*                                                                           *)
-(* See also "Formal proofs in real algebraic geometry: from ordered fields   *)
-(* to quantifier elimination", LMCS journal, 2012                            *)
+(* See also ``Formal proofs in real algebraic geometry: from ordered fields  *)
+(* to quantifier elimination'', LMCS journal, 2012                           *)
 (* by Cyril Cohen and Assia Mahboubi                                         *)
 (*                                                                           *)
 (* And "Formalized algebraic numbers: construction and first-order theory"   *)
@@ -148,10 +145,10 @@ Lemma lersifxx x b: (x <= x ?< if b) = ~~ b.
 Proof. by case: b; rewrite /= lterr. Qed.
 
 Lemma lersif_trans x y z b1 b2 :
-  x <= y ?< if b1 -> y <= z ?< if b2 ->  x <= z ?< if b1 || b2.
+  x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
 Proof.
-move: b1 b2 => [] [] //=;
-by [exact: ler_trans|exact: ler_lt_trans|exact: ltr_le_trans|exact: ltr_trans].
+case: b1; first by case: b2; [apply: ltr_trans | apply: ltr_le_trans].
+by case: b2; [apply: ler_lt_trans | apply: ler_trans].
 Qed.
 
 Lemma lersifW b x y : x <= y ?< if b -> x <= y.

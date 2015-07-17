@@ -1,14 +1,13 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import choice fintype bigop generic_quotient.
-From mathcomp.algebra
-Require Import ssralg finalg zmodp matrix mxalgebra poly polydiv mxpoly.
-From mathcomp.algebra
-Require Import ring_quotient ssrint rat mxpoly polyXY.
-Require Import closed_field.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+From mathcomp
+Require Import bigop ssralg finalg zmodp matrix mxalgebra.
+From mathcomp
+Require Import poly polydiv mxpoly generic_quotient ring_quotient closed_field.
+From mathcomp
+Require Import ssrint rat.
 
 (*****************************************************************************)
 (* This file clones part of ssralg hierachy for countable types; it does not *)
@@ -800,7 +799,13 @@ Export Zmodule.Exports Ring.Exports ComRing.Exports UnitRing.Exports.
 Export ComUnitRing.Exports IntegralDomain.Exports.
 Export Field.Exports DecidableField.Exports ClosedField.Exports.
 
+From mathcomp
+Require Import poly polydiv generic_quotient ring_quotient.
+From mathcomp
+Require Import mxpoly polyXY.
 Import GRing.Theory.
+From mathcomp
+Require Import closed_field.
 
 Canonical Zp_countZmodType m := [countZmodType of 'I_m.+1].
 Canonical Zp_countRingType m := [countRingType of 'I_m.+2].
@@ -915,7 +920,7 @@ have EmulV: GRing.Field.axiom Einv.
     by rewrite piE -{1}[z]reprK -Quotient.idealrBE subr0 in nz_z.
   apply/eqP; case: sig_eqW => {ex_uv} [uv uv1]; set i := _.+1 in uv1 *.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
-  by rewrite -uv1 opprD addNKr -mulNr; apply/memI; exists i; exact: dvdp_mull.
+  by rewrite -uv1 opprD addNKr -mulNr; apply/memI; exists i; apply: dvdp_mull.
 pose EringU := [comUnitRingType of UnitRingType _ (FieldUnitMixin EmulV Einv0)].
 have Eunitf := @FieldMixin _ _ EmulV Einv0.
 pose Efield := FieldType (IdomainType EringU (FieldIdomainMixin Eunitf)) Eunitf.

@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool.
 
 Lemma test b : b || ~~b.
 wlog _ : b / b = true.

@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool eqtype ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool eqtype ssrnat.
 
 Lemma test1 : forall a b : nat, a == b -> a == 0 -> b == 0.
 Proof. move=> a b Eab Eac; congr (_ == 0) : Eac; exact: eqP Eab. Qed.

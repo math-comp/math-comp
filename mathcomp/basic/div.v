@@ -1,22 +1,23 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect  
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq.
 
 (******************************************************************************)
 (* This file deals with divisibility for natural numbers.                     *)
 (* It contains the definitions of:                                            *)
 (*      edivn m d   == the pair composed of the quotient and remainder        *)
 (*                     of the Euclidean division of m by d.                   *)
-(*          m %/ d  == quotient of m by d.                                    *)
-(*          m %% d  == remainder of m by d.                                   *)
+(*          m %/ d  == quotient of the Euclidean division of m by d.          *)
+(*          m %% d  == remainder of the Euclidean division of m by d.         *)
 (*  m = n %[mod d]  <-> m equals n modulo d.                                  *)
 (*  m == n %[mod d] <=> m equals n modulo d (boolean version).                *)
 (*  m <> n %[mod d] <-> m differs from n modulo d.                            *)
 (*  m != n %[mod d] <=> m differs from n modulo d (boolean version).          *)
 (*           d %| m <=> d divides m.                                          *)
 (*         gcdn m n == the GCD of m and n.                                    *)
-(*        egcdn m n == the extended GCD of m and n.                           *)
+(*        egcdn m n == the extended GCD (Bezout coefficient pair) of m and n. *)
+(*                     If egcdn m n = (u, v), then gcdn m n = m * u - n * v.  *)
 (*         lcmn m n == the LCM of m and n.                                    *)
 (*      coprime m n <=> m and n are coprime (:= gcdn m n == 1).               *)
 (*  chinese m n r s == witness of the chinese remainder theorem.              *)
@@ -44,12 +45,12 @@ rewrite -{1}[m]/(0 * d + m) /edivn; case: d => //= d.
 elim: m {-2}m 0 (leqnn m) => [|n IHn] [|m] q //= le_mn.
 have le_m'n: m - d <= n by rewrite (leq_trans (leq_subr d m)).
 rewrite subn_if_gt; case: ltnP => [// | le_dm].
-by rewrite -{1}(subnKC le_dm) -addSn addnA -mulSnr; exact: IHn.
+by rewrite -{1}(subnKC le_dm) -addSn addnA -mulSnr; apply: IHn.
 Qed.
 
 Lemma edivn_eq d q r : r < d -> edivn (q * d + r) d = (q, r).
 Proof.
-move=> lt_rd; have d_gt0: 0 < d by exact: leq_trans lt_rd.
+move=> lt_rd; have d_gt0: 0 < d by apply: leq_trans lt_rd.
 case: edivnP lt_rd => q' r'; rewrite d_gt0 /=.
 wlog: q q' r r' / q <= q' by case/orP: (leq_total q q'); last symmetry; eauto.
 rewrite leq_eqVlt; case/predU1P => [-> /addnI-> |] //=.
@@ -78,7 +79,7 @@ Proof.
 case: d => //= d; rewrite /modn /edivn /=.
 elim: m {-2}m 0 (leqnn m) => [|n IHn] [|m] q //=.
 rewrite ltnS !subn_if_gt; case: (d <= m) => // le_mn.
-by apply: IHn; apply: leq_trans le_mn; exact: leq_subr.
+by apply: IHn; apply: leq_trans le_mn; apply: leq_subr.
 Qed.
 
 Lemma edivn_def m d : edivn m d = (m %/ d, m %% d).
@@ -334,7 +335,7 @@ by move=> /dvdnP[q1 ->] /dvdnP[q2 ->]; rewrite mulnCA -mulnA 2?dvdn_mull.
 Qed.
 
 Lemma dvdn_trans n d m : d %| n -> n %| m -> d %| m.
-Proof. by move=> d_dv_n /dvdnP[n1 ->]; exact: dvdn_mull. Qed.
+Proof. by move=> d_dv_n /dvdnP[n1 ->]; apply: dvdn_mull. Qed.
 
 Lemma dvdn_eq d m : (d %| m) = (m %/ d * d == m).
 Proof.
@@ -433,7 +434,7 @@ Lemma dvdn_addr m d n : d %| m -> (d %| m + n) = (d %| n).
 Proof. by case/dvdnP=> q ->; rewrite /dvdn modnMDl. Qed.
 
 Lemma dvdn_addl n d m : d %| n -> (d %| m + n) = (d %| m).
-Proof. by rewrite addnC; exact: dvdn_addr. Qed.
+Proof. by rewrite addnC; apply: dvdn_addr. Qed.
 
 Lemma dvdn_add d m n : d %| m -> d %| n -> d %| m + n.
 Proof. by move/dvdn_addr->. Qed.
@@ -520,7 +521,7 @@ Proof. by rewrite gcdnC dvdn_gcdr. Qed.
 
 Lemma gcdn_gt0 m n : (0 < gcdn m n) = (0 < m) || (0 < n).
 Proof.
-by case: m n => [|m] [|n] //; apply: (@dvdn_gt0 _ m.+1) => //; exact: dvdn_gcdl.
+by case: m n => [|m] [|n] //; apply: (@dvdn_gt0 _ m.+1) => //; apply: dvdn_gcdl.
 Qed.
 
 Lemma gcdnMDl k m n : gcdn m (k * m + n) = gcdn m n.
@@ -628,7 +629,7 @@ by rewrite -{1}[kn]muln1 leq_mul2l gcdn_gt0 m_gt0 orbT.
 Qed.
 
 Lemma Bezoutr m n : n > 0 -> {a | a < n & n %| gcdn m n + a * m}.
-Proof. by rewrite gcdnC; exact: Bezoutl. Qed.
+Proof. by rewrite gcdnC; apply: Bezoutl. Qed.
 
 (* Back to the gcd. *)
 
@@ -687,7 +688,7 @@ Definition lcmn m n := m * n %/ gcdn m n.
 Lemma lcmnC : commutative lcmn.
 Proof. by move=> m n; rewrite /lcmn mulnC gcdnC. Qed.
 
-Lemma lcm0n : left_zero 0 lcmn.  Proof. by move=> n; exact: div0n. Qed.
+Lemma lcm0n : left_zero 0 lcmn.  Proof. by move=> n; apply: div0n. Qed.
 Lemma lcmn0 : right_zero 0 lcmn. Proof. by move=> n; rewrite lcmnC lcm0n. Qed.
 
 Lemma lcm1n : left_id 1 lcmn.
@@ -866,13 +867,13 @@ Lemma coprime_expl k m n : coprime m n -> coprime (m ^ k) n.
 Proof. by case: k => [|k] co_pm; rewrite ?coprime1n // coprime_pexpl. Qed.
 
 Lemma coprime_expr k m n : coprime m n -> coprime m (n ^ k).
-Proof. by rewrite !(coprime_sym m); exact: coprime_expl. Qed.
+Proof. by rewrite !(coprime_sym m); apply: coprime_expl. Qed.
 
 Lemma coprime_dvdl m n p : m %| n -> coprime n p -> coprime m p.
 Proof. by case/dvdnP=> d ->; rewrite coprime_mull => /andP[]. Qed.
 
 Lemma coprime_dvdr m n p : m %| n -> coprime p n -> coprime p m.
-Proof. by rewrite !(coprime_sym p); exact: coprime_dvdl. Qed.
+Proof. by rewrite !(coprime_sym p); apply: coprime_dvdl. Qed.
 
 Lemma coprime_egcdn n m : n > 0 -> coprime (egcdn n m).1 (egcdn n m).2.
 Proof.

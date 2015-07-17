@@ -1,10 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype bigop finset.
-Require Import fingroup morphism quotient action.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import bigop finset fingroup morphism quotient action.
 
 (******************************************************************************)
 (*  Partial, semidirect, central, and direct products.                        *)
@@ -19,7 +18,7 @@ Require Import fingroup morphism quotient action.
 (*      [splits G, over K] == [complements to K in G] is not empty.           *)
 (*             remgr A B x == the right remainder in B of x mod A, i.e.,      *)
 (*                            some element of (A :* x) :&: B.                 *)
-(*             divgr A B x == the "quotient" in B of x by A: for all x,       *)
+(*             divgr A B x == the "division" in B of x by A: for all x,       *)
 (*                            x = divgr A B x * remgr A B x.                  *)
 (* ++ External products :                                                     *)
 (* pairg1, pair1g == the isomorphisms aT1 -> aT1 * aT2, aT2 -> aT1 * aT2.     *)
@@ -179,7 +178,7 @@ Proof. by case/pprodP=> [[K H -> ->] <- /norm_joinEr]. Qed.
 Lemma pprodJ A B x : pprod A B :^ x = pprod (A :^ x) (B :^ x).
 Proof.
 rewrite /pprod !conjsg_eq1 !group_setJ normJ conjSg -conjsMg.
-by do 3?case: ifP => // _; exact: conj0g.
+by do 3?case: ifP => // _; apply: conj0g.
 Qed.
 
 (* Properties of the remainders *)
@@ -223,7 +222,7 @@ Lemma remgr_id x : x \in H -> remgr K H x = x.
 Proof.
 move=> Hx; apply/eqP; rewrite eq_mulgV1 (sameP eqP set1gP) -tiKH inE.
 rewrite -mem_rcoset groupMr ?groupV // -in_setI remgrP.
-by apply: subsetP Hx; exact: mulG_subr.
+by apply: subsetP Hx; apply: mulG_subr.
 Qed.
 
 Lemma remgrMid x y : x \in K -> y \in H -> remgr K H (x * y) = y.
@@ -326,7 +325,7 @@ Proof. by move/sdprodWpp/pprodWY. Qed.
 Lemma sdprodJ A B x : (A ><| B) :^ x = A :^ x ><| B :^ x.
 Proof.
 rewrite /sdprod -conjIg sub_conjg conjs1g -pprodJ.
-by case: ifP => _ //; exact: imset0.
+by case: ifP => _ //; apply: imset0.
 Qed.
 
 Lemma sdprod_context G K H : K ><| H = G ->
@@ -337,7 +336,7 @@ by rewrite /normal mulG_subl mulG_subr mulG_subG normG.
 Qed.
 
 Lemma sdprod_compl G K H : K ><| H = G -> H \in [complements to K in G].
-Proof. by case/sdprodP=> _ mulKH _ tiKH; exact/complP. Qed.
+Proof. by case/sdprodP=> _ mulKH _ tiKH; apply/complP. Qed.
 
 Lemma sdprod_normal_complP G K H :
   K <| G -> reflect (K ><| H = G) (K \in [complements to H in G]).
@@ -504,7 +503,7 @@ Proof. by move/cprodWpp/pprodWY. Qed.
 
 Lemma cprodJ A B x : (A \* B) :^ x = A :^ x \* B :^ x.
 Proof.
-by rewrite /cprod centJ conjSg -pprodJ; case: ifP => _ //; exact: imset0.
+by rewrite /cprod centJ conjSg -pprodJ; case: ifP => _ //; apply: imset0.
 Qed.
 
 Lemma cprod_normal2 A B G : A \* B = G -> A <| G /\ B <| G.
@@ -587,7 +586,7 @@ Qed.
 
 Lemma cprod_modr A B G H :
   A \* B = G -> B \subset H -> (H :&: A) \* B = H :&: G.
-Proof. by rewrite -!(cprodC B) !(setIC H); exact: cprod_modl. Qed.
+Proof. by rewrite -!(cprodC B) !(setIC H); apply: cprod_modl. Qed.
 
 Lemma bigcprodYP (I : finType) (P : pred I) (H : I -> {group gT}) :
   reflect (forall i j, P i -> P j -> i != j -> H i \subset 'C(H j))
@@ -692,12 +691,12 @@ Proof. by move/dprodWsd/sdprodWY. Qed.
 
 Lemma cprod_card_dprod G A B :
   A \* B = G -> #|A| * #|B| <= #|G| -> A \x B = G.
-Proof. by case/cprodP=> [[K H -> ->] <- cKH] /cardMg_TI; exact: dprodE. Qed.
+Proof. by case/cprodP=> [[K H -> ->] <- cKH] /cardMg_TI; apply: dprodE. Qed.
 
 Lemma dprodJ A B x : (A \x B) :^ x = A :^ x \x B :^ x.
 Proof.
 rewrite /dprod -conjIg sub_conjg conjs1g -cprodJ.
-by case: ifP => _ //; exact: imset0.
+by case: ifP => _ //; apply: imset0.
 Qed.
 
 Lemma dprod_normal2 A B G : A \x B = G -> A <| G /\ B <| G.
@@ -754,11 +753,11 @@ Qed.
 
 Lemma bigdprodW I (r : seq I) P F G :
   \big[dprod/1]_(i <- r | P i) F i = G -> \prod_(i <- r | P i) F i = G.
-Proof. by move/bigdprodWcp; exact: bigcprodW. Qed.
+Proof. by move/bigdprodWcp; apply: bigcprodW. Qed.
 
 Lemma bigdprodWY I (r : seq I) P F G :
   \big[dprod/1]_(i <- r | P i) F i = G -> << \bigcup_(i <- r | P i) F i >> = G.
-Proof. by move/bigdprodWcp; exact: bigcprodWY. Qed.
+Proof. by move/bigdprodWcp; apply: bigcprodWY. Qed.
 
 Lemma bigdprodYP (I : finType) (P : pred I) (F : I -> {group gT}) :
   reflect (forall i, P i ->
@@ -787,13 +786,13 @@ Qed.
 
 Lemma dprod_modr A B G H :
   A \x B = G -> B \subset H -> (H :&: A) \x B = H :&: G.
-Proof. by rewrite -!(dprodC B) !(setIC H); exact: dprod_modl. Qed.
+Proof. by rewrite -!(dprodC B) !(setIC H); apply: dprod_modl. Qed.
 
 Lemma subcent_dprod B C G A :
    B \x C = G -> A \subset 'N(B) :&: 'N(C) -> 'C_B(A) \x 'C_C(A) = 'C_G(A).
 Proof.
 move=> defG; have [_ _ cBC _] := dprodP defG; move: defG.
-by rewrite !dprodEsd 1?(centSS _ _ cBC) ?subsetIl //; exact: subcent_sdprod.
+by rewrite !dprodEsd 1?(centSS _ _ cBC) ?subsetIl //; apply: subcent_sdprod.
 Qed.
 
 Lemma dprod_card A B G : A \x B = G -> (#|A| * #|B|)%N = #|G|.
@@ -895,7 +894,7 @@ Lemma morphim_coprime_sdprod :
   K ><| H = G -> coprime #|K| #|H| -> f @* K ><| f @* H = f @* G.
 Proof.
 rewrite /sdprod => defG coHK; move: defG.
-by rewrite !coprime_TIg ?coprime_morph // !subxx; exact: morphim_pprod.
+by rewrite !coprime_TIg ?coprime_morph // !subxx; apply: morphim_pprod.
 Qed.
 
 Lemma injm_sdprod : 'injm f -> K ><| H = G -> f @* K ><| f @* H = f @* G.
@@ -920,7 +919,7 @@ Lemma morphim_coprime_dprod :
   K \x H = G -> coprime #|K| #|H| -> f @* K \x f @* H = f @* G.
 Proof.
 rewrite /dprod => defG coHK; move: defG.
-by rewrite !coprime_TIg ?coprime_morph // !subxx; exact: morphim_cprod.
+by rewrite !coprime_TIg ?coprime_morph // !subxx; apply: morphim_cprod.
 Qed.
 
 End OneProd.
@@ -990,13 +989,13 @@ Definition extprod_mulg (x y : gT1 * gT2) := (x.1 * y.1, x.2 * y.2).
 Definition extprod_invg (x : gT1 * gT2) := (x.1^-1, x.2^-1).
 
 Lemma extprod_mul1g : left_id (1, 1) extprod_mulg.
-Proof. case=> x1 x2; congr (_, _); exact: mul1g. Qed.
+Proof. by case=> x1 x2; congr (_, _); apply: mul1g. Qed.
 
 Lemma extprod_mulVg : left_inverse (1, 1) extprod_invg extprod_mulg.
-Proof. by move=> x; congr (_, _); exact: mulVg. Qed.
+Proof. by move=> x; congr (_, _); apply: mulVg. Qed.
 
 Lemma extprod_mulgA : associative extprod_mulg.
-Proof. by move=> x y z; congr (_, _); exact: mulgA. Qed.
+Proof. by move=> x y z; congr (_, _); apply: mulgA. Qed.
 
 Definition extprod_groupMixin :=
   Eval hnf in FinGroup.Mixin extprod_mulgA extprod_mul1g extprod_mulVg.
@@ -1037,10 +1036,10 @@ Canonical fst_morphism := @Morphism _ _ setT _ (in2W fst_morphM).
 Canonical snd_morphism := @Morphism _ _ setT _ (in2W snd_morphM). 
 
 Lemma injm_pair1g : 'injm pair1g.
-Proof. by apply/subsetP=> x /morphpreP[_ /set1P[->]]; exact: set11. Qed.
+Proof. by apply/subsetP=> x /morphpreP[_ /set1P[->]]; apply: set11. Qed.
 
 Lemma injm_pairg1 : 'injm pairg1.
-Proof. by apply/subsetP=> x /morphpreP[_ /set1P[->]]; exact: set11. Qed.
+Proof. by apply/subsetP=> x /morphpreP[_ /set1P[->]]; apply: set11. Qed.
 
 Lemma morphim_pairg1 (H1 : {set gT1}) : pairg1 @* H1 = setX H1 1.
 Proof. by rewrite -imset2_pair imset2_set1r morphimEsub ?subsetT. Qed.
@@ -1453,7 +1452,7 @@ Lemma morphim_sdprodm A B :
   A \subset H -> B \subset K -> sdprodm @* (A * B) = fH @* A * fK @* B.
 Proof.
 move=> sAH sBK; rewrite morphim_restrm /= (setIidPr _) ?morphim_pprodm //.
-case/sdprodP: eqHK_G => _ <- _ _; exact: mulgSS.
+by case/sdprodP: eqHK_G => _ <- _ _; apply: mulgSS.
 Qed.
 
 Lemma im_sdprodm : sdprodm @* G = fH @* H * fK @* K.
@@ -1523,7 +1522,7 @@ Lemma morphim_cprodm A B :
   A \subset H -> B \subset K -> cprodm @* (A * B) = fH @* A * fK @* B.
 Proof.
 move=> sAH sBK; rewrite morphim_restrm /= (setIidPr _) ?morphim_pprodm //.
-case/cprodP: eqHK_G => _ <- _; exact: mulgSS.
+by case/cprodP: eqHK_G => _ <- _; apply: mulgSS.
 Qed.
 
 Lemma im_cprodm : cprodm @* G = fH @* H * fK @* K.
@@ -1690,7 +1689,7 @@ apply: (iffP misomP) => [[pM /isomP[injf /= <-]] | ].
   have sH1H: setX H1 1 \subset setX H1 H2 by rewrite setXS ?sub1G.
   have sH2H: setX 1 H2 \subset setX H1 H2 by rewrite setXS ?sub1G.
   rewrite morphim1 injm_cent ?injmI //= subsetI => /andP[_].
-  by rewrite !morphimEsub //= !imset_mulgm mulg1 mul1g; exact: dprodE.
+  by rewrite !morphimEsub //= !imset_mulgm mulg1 mul1g; apply: dprodE.
 case/dprodP=> _ defG cH12 trH12.
 have fM: morphic (setX H1 H2) mulgm.
   apply/morphicP=> [[x1 x2] [y1 y2] /setXP[_ Hx2] /setXP[Hy1 _]].

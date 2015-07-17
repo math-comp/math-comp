@@ -1,14 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div fintype bigop finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm automorphism quotient action gproduct.
-From mathcomp.algebra
-Require Import cyclic.
-Require Import gfunctor.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div fintype bigop.
+From mathcomp
+Require Import finset fingroup morphism perm automorphism quotient action.
+From mathcomp
+Require Import gproduct gfunctor cyclic.
 
 (******************************************************************************)
 (* Definition of the center of a group and of external central products:      *)
@@ -63,7 +60,7 @@ Notation "''Z' ( A )" := (center A) : group_scope.
 Notation "''Z' ( H )" := (center_group H) : Group_scope.
 
 Lemma morphim_center : GFunctor.pcontinuous center.
-Proof. move=> gT rT G D f; exact: morphim_subcent. Qed.
+Proof. by move=> gT rT G D f; apply: morphim_subcent. Qed.
 
 Canonical center_igFun := [igFun by fun _ _ => subsetIl _ _ & morphim_center].
 Canonical center_gFun := [gFun by morphim_center].
@@ -103,8 +100,8 @@ Proof. exact: subcentP. Qed.
 Lemma center_sub A : 'Z(A) \subset A.
 Proof. exact: subsetIl. Qed.
 
-Lemma center1 : 'Z(1) = [1 gT].
-Proof. by apply/eqP; rewrite eqEsubset center_sub sub1G. Qed.
+Lemma center1 : 'Z(1) = 1 :> {set gT}. 
+Proof. exact: gF1. Qed.
 
 Lemma centerC A : {in A, centralised 'Z(A)}.
 Proof. by apply/centsP; rewrite centsC subsetIr. Qed.
@@ -137,13 +134,13 @@ by apply: (iffP cent1P) => [|[]].
 Qed.
 
 Lemma subcent1_id x G : x \in G -> x \in 'C_G[x].
-Proof. move=> Gx; rewrite inE Gx; exact/cent1P. Qed.
+Proof. by move=> Gx; rewrite inE Gx; apply/cent1P. Qed.
 
 Lemma subcent1_sub x G : 'C_G[x] \subset G.
 Proof. exact: subsetIl. Qed.
 
 Lemma subcent1C x y G : x \in G -> y \in 'C_G[x] -> x \in 'C_G[y].
-Proof. by move=> Gx /subcent1P[_ cxy]; exact/subcent1P. Qed.
+Proof. by move=> Gx /subcent1P[_ cxy]; apply/subcent1P. Qed.
 
 Lemma subcent1_cycle_sub x G : x \in G -> <[x]> \subset 'C_G[x].
 Proof. by move=> Gx; rewrite cycle_subG ?subcent1_id. Qed.
@@ -171,9 +168,9 @@ Lemma cyclic_factor_abelian H G :
   H \subset 'Z(G) -> cyclic (G / H) -> abelian G.
 Proof.
 move=> sHZ cycGH; apply: cyclic_center_factor_abelian.
-have nG: G \subset 'N(_) := normal_norm (sub_center_normal _).
-have [f <-]:= homgP (homg_quotientS (nG _ sHZ) (nG _ (subxx _)) sHZ).
-exact: morphim_cyclic.
+have /andP[_ nHG]: H <| G := sub_center_normal sHZ.
+have [f <-]:= homgP (homg_quotientS nHG (gFnorm _ G) sHZ).
+exact: morphim_cyclic cycGH.
 Qed.
 
 Section Injm.
@@ -293,7 +290,7 @@ Let kerHK := ker_cprod_by isoZ.
 
 Let injgz : 'injm gz. Proof. by case/isomP: isoZ. Qed.
 Let gzZ : gz @* 'Z(H) = 'Z(K). Proof. by case/isomP: isoZ. Qed.
-Let gzZchar : gz @* 'Z(H) \char 'Z(K). Proof. by rewrite gzZ char_refl. Qed.
+Let gzZchar : gz @* 'Z(H) \char 'Z(K). Proof. by rewrite gzZ. Qed.
 Let sgzZZ : gz @* 'Z(H) \subset 'Z(K) := char_sub gzZchar.
 Let sZH := center_sub H.
 Let sZK := center_sub K.
@@ -557,7 +554,7 @@ by split=> //; apply/isomP; rewrite ker_f' injm_invm im_f' -fC im_invm.
 Qed.
 
 Lemma isog_cprod_by : G \isog C.
-Proof. by have [f [isoG _ _]] := cprod_by_uniq; exact: isom_isog isoG. Qed.
+Proof. by have [f [isoG _ _]] := cprod_by_uniq; apply: isom_isog isoG. Qed.
 
 End Isomorphism.
 
@@ -651,7 +648,7 @@ Lemma Aut_ncprod_full n :
 Proof.
 move=> AutZinG; elim: n => [|n IHn].
   by rewrite center_ncprod0; apply/Aut_sub_fullP=> // g injg gG0; exists g.
-by case: ncprodS => gz isoZ; exact: Aut_cprod_by_full.
+by case: ncprodS => gz isoZ; apply: Aut_cprod_by_full.
 Qed.
 
 End IterCprod.

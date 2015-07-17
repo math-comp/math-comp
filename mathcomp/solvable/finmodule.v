@@ -1,14 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm action gproduct.
-From mathcomp.algebra
-Require Import ssralg finalg cyclic.
-Require Import commutator.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
+Require Import fintype bigop ssralg finset fingroup morphism perm.
+From mathcomp
+Require Import finalg action gproduct commutator cyclic.
 
 (******************************************************************************)
 (*  This file regroups constructions and results that are based on the most   *)
@@ -17,7 +14,7 @@ Require Import commutator.
 (* splitting and transitivity theorem, from which we will later derive the    *)
 (* Schur-Zassenhaus theorem and the elementary abelian special case of        *)
 (* Maschke's theorem, the coprime abelian centraliser/commutator trivial      *)
-(* intersection theorem, from which we will derive that p-groups under coprime*)
+(* intersection theorem, which is used to show that p-groups under coprime    *)
 (* action factor into special groups, and the construction of the transfer    *)
 (* homomorphism and its expansion relative to a cycle, from which we derive   *)
 (* the Higman Focal Subgroup and the Burnside Normal Complement theorems.     *)
@@ -26,7 +23,7 @@ Require Import commutator.
 (* needed much outside this file, which contains all the results that exploit *)
 (* this construction.                                                         *)
 (*   FiniteModule defines the Z[N(A)]-module associated with a finite abelian *)
-(* abelian group A, given a proof abelA : abelian A) :                        *)
+(* abelian group A, given a proof (abelA : abelian A) :                       *)
 (*  fmod_of abelA == the type of elements of the module (similar to but       *)
 (*                   distinct from [subg A]).                                 *)
 (*   fmod abelA x == the injection of x into fmod_of abelA if x \in A, else 0 *)
@@ -95,16 +92,16 @@ Definition fmod_opp u := sub2f u^-1.
 Definition fmod_add u v := sub2f (u * v).
 
 Fact fmod_add0r : left_id (sub2f 1) fmod_add.
-Proof. move=> u; apply: val_inj; exact: mul1g. Qed.
+Proof. by move=> u; apply: val_inj; apply: mul1g. Qed.
 
 Fact fmod_addrA : associative fmod_add.
-Proof. move=> u v w; apply: val_inj; exact: mulgA. Qed.
+Proof. by move=> u v w; apply: val_inj; apply: mulgA. Qed.
 
 Fact fmod_addNr : left_inverse (sub2f 1) fmod_opp fmod_add.
-Proof. move=> u; apply: val_inj; exact: mulVg. Qed.
+Proof. by move=> u; apply: val_inj; apply: mulVg. Qed.
 
 Fact fmod_addrC : commutative fmod_add.
-Proof. case=> x Ax [y Ay]; apply: val_inj; exact: (centsP abelA). Qed.
+Proof. by case=> x Ax [y Ay]; apply: val_inj; apply: (centsP abelA). Qed.
 
 Definition fmod_zmodMixin := 
   ZmodMixin fmod_addrA fmod_addrC fmod_add0r fmod_addNr.
@@ -149,7 +146,7 @@ Qed.
 
 Lemma injm_fmod : 'injm fmod.
 Proof. 
-apply/injmP=> x y Ax Ay []; move/val_inj; exact: (injmP (injm_subg A)).
+by apply/injmP=> x y Ax Ay []; move/val_inj; apply: (injmP (injm_subg A)).
 Qed.
 
 Notation "u ^@ x" := (actr u x) : ring_scope.
@@ -275,9 +272,9 @@ have PpP x: pP x \in P by rewrite -mem_rcoset rcoset_repr rcoset_refl.
 have rPmul x y: x \in P -> rP (x * y) = rP y.
   by move=> Px; rewrite /rP rcosetM rcoset_id.
 pose pQ x := remgr H Q x; pose rH x := pQ (pP x) * rP x.
-have pQhq: {in H & Q, forall h q, pQ (h * q) = q} by exact: remgrMid.
+have pQhq: {in H & Q, forall h q, pQ (h * q) = q} by apply: remgrMid.
 have pQmul: {in P &, {morph pQ : x y / x * y}}.
-  apply: remgrM; [exact/complP | exact: normalS (nsHG)].
+  by apply: remgrM; [apply/complP | apply: normalS (nsHG)].
 have HrH x: rH x \in H :* x.
   by rewrite rcoset_sym mem_rcoset invMg mulgA mem_divgr // eqHQ PpP.
 have GrH x: x \in G -> rH x \in G.
@@ -292,7 +289,7 @@ pose nu y := (\sum_(Px in rcosets P G) mu (repr Px) y)%R.
 have rHmul: {in G &, forall x y, rH (x * y) = rH x * rH y * val (mu x y)}.
   move=> x y Gx Gy; rewrite /= fmodK ?mulKVg // -mem_lcoset lcoset_sym.
   rewrite -norm_rlcoset; last by rewrite nHG ?GrH ?groupM.
-  by rewrite (rcoset_transl (HrH _)) -rcoset_mul ?nHG ?GrH // mem_mulg.
+  by rewrite (rcoset_eqP (HrH _)) -rcoset_mul ?nHG ?GrH // mem_mulg.
 have actrH a x: x \in G -> (a ^@ rH x = a ^@ x)%R.
   move=> Gx; apply: val_inj; rewrite /= !fmvalJ ?nHG ?GrH //.
   case/rcosetP: (HrH x) => b /(fmodK abelH) <- ->; rewrite conjgM.
@@ -338,7 +335,7 @@ exists (Morphism fM @* G)%G; apply/complP; split.
   apply/trivgP/subsetP=> x /setIP[Hx /morphimP[y _ Gy eq_x]].
   apply/set1P; move: Hx; rewrite {x}eq_x /= groupMr ?subgP //.
   rewrite -{1}(mulgKV y (rH y)) groupMl -?mem_rcoset // => Hy.
-  by rewrite -(mulg1 y) /f nu_Hmul // rH_Hmul //; exact: (morph1 (Morphism fM)).
+  by rewrite -(mulg1 y) /f nu_Hmul // rH_Hmul //; apply: (morph1 (Morphism fM)).
 apply/setP=> x; apply/mulsgP/idP=> [[h y Hh fy ->{x}] | Gx].
   rewrite groupMl; last exact: (subsetP sHG).
   case/morphimP: fy => z _ Gz ->{h Hh y}.
@@ -519,7 +516,7 @@ have HGgHzg: Hzg \in HG :* <[g]>.
   by rewrite mem_mulg ?set11 // -rcosetE mem_imset.
 have Hzg_x: x \in Hzg by rewrite (repr_mem_pblock trX).
 exists x; first by rewrite (repr_mem_transversal trX).
-case/mulsgP: Hzg_x => y u /rcoset_transl <- /(orbit_act 'Rs) <- -> /=.
+case/mulsgP: Hzg_x => y u /rcoset_eqP <- /(orbit_act 'Rs) <- -> /=.
 by rewrite rcosetE -rcosetM.
 Qed.
 
@@ -543,7 +540,7 @@ pose pcyc x := pcycle (actperm 'Rs g) (H :* x).
 pose traj x := traject (actperm 'Rs g) (H :* x) #|pcyc x|.
 have Hgr_eq x: H_g_rcosets x = pcyc x.
   by rewrite /H_g_rcosets -orbitRs -pcycle_actperm ?inE.
-have pcyc_eq x: pcyc x =i traj x by exact: pcycle_traject.
+have pcyc_eq x: pcyc x =i traj x by apply: pcycle_traject.
 have uniq_traj x: uniq (traj x) by apply: uniq_traject_pcycle.
 have n_eq x: n_ x = #|pcyc x| by rewrite -Hgr_eq.
 have size_traj x: size (traj x) = n_ x by rewrite n_eq size_traject.
@@ -572,7 +569,7 @@ have trY: is_transversal Y HG G.
     by rewrite -[x](mulgK (g ^+ i)) mem_mulg ?rcoset_refl // groupV mem_cycle.
   apply/set1P; rewrite /y eq_xx'; congr (_ * _ ^+ _) => //; apply/eqP.
   rewrite -(@nth_uniq _ (H :* x) (traj x)) ?size_traj // ?eq_xx' //.
-  by rewrite !nth_traj ?(rcoset_transl Hy_x'gj) // -eq_xx'.
+  by rewrite !nth_traj ?(rcoset_eqP Hy_x'gj) // -eq_xx'.
 have rYE x i : x \in X -> i < n_ x -> rY (H :* x :* g ^+ i) = x * g ^+ i.
   move=> Xx lt_i_x; rewrite -rcosetM; apply: (canLR_in (pblockK trY 1)).
     by apply/bigcupP; exists x => //; apply/imsetP; exists (Ordinal lt_i_x).

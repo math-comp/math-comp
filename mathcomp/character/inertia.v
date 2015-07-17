@@ -1,20 +1,17 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm automorphism quotient action gproduct.
-From mathcomp.algebra
-Require Import ssralg ssrnum zmodp cyclic matrix mxalgebra vector.
-From mathcomp.solvable
-Require Import center commutator gseries nilpotent pgroup sylow maximal.
-From mathcomp.solvable
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq path choice div.
+From mathcomp
+Require Import fintype tuple finfun bigop prime ssralg ssrnum finset fingroup.
+From mathcomp
+Require Import morphism perm automorphism quotient action zmodp cyclic center.
+From mathcomp
+Require Import gproduct commutator gseries nilpotent pgroup sylow maximal.
+From mathcomp
 Require Import frobenius.
-From mathcomp.field
-Require Import algC.
-Require Import mxrepresentation classfun character.
+From mathcomp
+Require Import matrix mxalgebra mxrepresentation vector algC classfun character.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -105,7 +102,7 @@ Qed.
 (* Isaacs' 6.1.b *)
 Lemma cfConjgM L phi :
   G <| L -> {in L &, forall y z, phi ^ (y * z) = (phi ^ y) ^ z}%CF.
-Proof. by case/andP=> _ /subsetP nGL; exact: sub_in2 (cfConjgMnorm phi). Qed.
+Proof. by case/andP=> _ /subsetP nGL; apply: sub_in2 (cfConjgMnorm phi). Qed.
 
 Lemma cfConjgJ1 phi : (phi ^ 1)%CF = phi.
 Proof. by apply/cfunP=> x; rewrite cfConjgE ?group1 // invg1 conjg1. Qed.
@@ -403,7 +400,7 @@ apply: (iffP imageP) => [[_ /rcosetsP[y Ay ->] ->] | [y Ay ->]].
   by case: repr_rcosetP => z /setIdP[Az _]; exists (z * y)%g; rewrite ?groupM.
 without loss nHy: y Ay / y \in 'N(H).
   have [nHy | /cfConjgEout->] := boolP (y \in 'N(H)); first exact.
-  by move/(_ 1%g); rewrite !group1 !cfConjgJ1; exact.
+  by move/(_ 1%g); rewrite !group1 !cfConjgJ1; apply.
 exists ('I_A[phi] :* y); first by rewrite -rcosetE mem_imset.
 case: repr_rcosetP => z /setIP[_ /setIdP[nHz /eqP Tz]].
 by rewrite cfConjgMnorm ?Tz.
@@ -414,25 +411,25 @@ Proof.
 move=> xi; apply/cfclassP/cfclassP=> [[x /setIP[Gx _] ->] | [x Gx ->]].
   by exists x.
 have [Nx | /cfConjgEout-> //] := boolP (x \in 'N(H)).
-  by exists x; first exact/setIP.
+  by exists x; first apply/setIP.
 by exists 1%g; rewrite ?group1 ?cfConjgJ1.
 Qed.
 
 Lemma cfclass_refl phi : phi \in (phi ^: G)%CF.
 Proof. by apply/cfclassP; exists 1%g => //; rewrite cfConjgJ1. Qed.
 
-Lemma cfclass_transl phi psi :
+Lemma cfclass_transr phi psi :
   (psi \in phi ^: G)%CF -> (phi ^: G =i psi ^: G)%CF.
 Proof.
 rewrite -cfclassInorm; case/cfclassP=> x Gx -> xi; rewrite -!cfclassInorm.
-have nHN: {subset 'N_G(H) <= 'N(H)} by apply/subsetP; exact: subsetIr.
+have nHN: {subset 'N_G(H) <= 'N(H)} by apply/subsetP; apply: subsetIr.
 apply/cfclassP/cfclassP=> [[y Gy ->] | [y Gy ->]].
   by exists (x^-1 * y)%g; rewrite -?cfConjgMnorm ?groupM ?groupV ?nHN // mulKVg.
 by exists (x * y)%g; rewrite -?cfConjgMnorm ?groupM ?nHN.
 Qed.
 
 Lemma cfclass_sym phi psi : (psi \in phi ^: G)%CF = (phi \in psi ^: G)%CF.
-Proof. by apply/idP/idP=> /cfclass_transl <-; exact: cfclass_refl. Qed.
+Proof. by apply/idP/idP=> /cfclass_transr <-; apply: cfclass_refl. Qed.
 
 Lemma cfclass_uniq phi : H <| G -> uniq (phi ^: G)%CF.
 Proof.
@@ -440,7 +437,7 @@ move=> nsHG; rewrite map_inj_in_uniq ?enum_uniq // => Ty Tz; rewrite !mem_enum.
 move=> {Ty}/rcosetsP[y Gy ->] {Tz}/rcosetsP[z Gz ->] /eqP.
 case: repr_rcosetP => u Iphi_u; case: repr_rcosetP => v Iphi_v.
 have [[Gu _] [Gv _]] := (setIdP Iphi_u, setIdP Iphi_v).
-rewrite cfConjg_eqE ?groupM // => /rcoset_transl.
+rewrite cfConjg_eqE ?groupM // => /rcoset_eqP.
 by rewrite !rcosetM (rcoset_id Iphi_v) (rcoset_id Iphi_u).
 Qed.
 
@@ -466,7 +463,7 @@ Lemma eq_cfclass_IirrE i j :
   (cfclass_Iirr G j == cfclass_Iirr G i) = (j \in cfclass_Iirr G i).
 Proof.
 apply/eqP/idP=> [<- | iGj]; first by rewrite cfclass_IirrE cfclass_refl.
-by apply/setP=> k; rewrite !cfclass_IirrE in iGj *; apply/esym/cfclass_transl.
+by apply/setP=> k; rewrite !cfclass_IirrE in iGj *; apply/esym/cfclass_transr.
 Qed.
 
 Lemma im_cfclass_Iirr i :
@@ -1581,7 +1578,7 @@ apply: contraR => notKx; apply/cards1P; exists 1%g; apply/esym/eqP.
 rewrite eqEsubset !(sub1set, inE) classes1 /= conjs1g eqxx /=.
 apply/subsetP=> _ /setIP[/imsetP[y Ky ->] /afix1P /= cyKx].
 have /imsetP[z Kz def_yx]: y ^ x \in y ^: K.
-  by rewrite -cyKx; apply: mem_imset; exact: class_refl.
+  by rewrite -cyKx; apply: mem_imset; apply: class_refl.
 rewrite inE classG_eq1; apply: contraR notKx => nty.
 rewrite -(groupMr x (groupVr Kz)).
 apply: (subsetP (regK y _)); first exact/setD1P.
@@ -1606,7 +1603,7 @@ Proof.
 have [_ _ nsKG _] := Frobenius_kerP frobGK; have [sKG nKG] := andP nsKG.
 apply: (iffP idP) => [not_chijK1 | [i nzi ->]]; last first.
   by rewrite cfker_Ind_irr ?sub_gcore // subGcfker.
-have /neq0_has_constt[i chijKi]: 'Res[K] 'chi_j != 0 by exact: Res_irr_neq0.
+have /neq0_has_constt[i chijKi]: 'Res[K] 'chi_j != 0 by apply: Res_irr_neq0.
 have nz_i: i != 0.
   by apply: contraNneq not_chijK1 => i0; rewrite constt0_Res_cfker // -i0.
 have /irrP[k def_chik] := irr_induced_Frobenius_ker nz_i. 

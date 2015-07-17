@@ -1,8 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect  
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-Require Import choice.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice.
 
 (******************************************************************************)
 (*    The Finite interface describes Types with finitely many elements,       *)
@@ -20,7 +19,7 @@ Require Import choice.
 (*    We define the following interfaces and structures:                      *)
 (*         finType == the packed class type of the Finite interface.          *)
 (*       FinType m == the packed class for the Finite mixin m.                *)
-(*  Finite.axiom e == every x : T occurs exactly once in e : seq T.           *)
+(*  Finite.axiom e <-> every x : T occurs exactly once in e : seq T.          *)
 (*   FinMixin ax_e == the Finite mixin for T, encapsulating                   *)
 (*                    ax_e : Finite.axiom e for some e : seq T.               *)
 (*  UniqFinMixin uniq_e total_e == an alternative mixin constructor that uses *)
@@ -37,12 +36,15 @@ Require Import choice.
 (* [finMixin of T by <:] == a finType structure for T, when T has a subType   *)
 (*                   structure over an existing finType.                      *)
 (*   We define or propagate the finType structure appropriately for all basic *)
-(* basic types : unit, bool, option, prod, sum, sig and sigT. We also define  *)
-(* a generic type constructor for finite subtypes based on an explicit        *)
+(* types : unit, bool, option, prod, sum, sig and sigT. We also define a      *)
+(* generic type constructor for finite subtypes based on an explicit          *)
 (* enumeration:                                                               *)
-(*        seq_sub s == the subType of all x \in s, where s : seq T and T has  *)
-(*                     a choiceType structure; the seq_sub s type has a       *)
-(*                     canonical finType structure.                           *)
+(*          seq_sub s == the subType of all x \in s, where s : seq T for some *)
+(*                       eqType T; seq_sub s has a canonical finType instance *)
+(*                       when T is a choiceType.                              *)
+(*   adhoc_seq_sub_choiceType s, adhoc_seq_sub_finType s ==                   *)
+(*                       non-canonical instances for seq_sub s, s : seq T,    *)
+(*                       which can be used when T is not a choiceType.        *)
 (* Bounded integers are supported by the following type and operations:       *)
 (*    'I_n, ordinal n == the finite subType of integers i < n, whose          *)
 (*                       enumeration is {0, ..., n.-1}. 'I_n coerces to nat,  *)
@@ -487,14 +489,14 @@ CoInductive pick_spec : option T -> Type :=
 Lemma pickP : pick_spec (pick P).
 Proof.
 rewrite /pick; case: (enum _) (mem_enum P) => [|x s] Pxs /=.
-  by right; exact: fsym.
+  by right; apply: fsym.
 by left; rewrite -[P _]Pxs mem_head.
 Qed.
 
 End EnumPick.
 
 Lemma eq_enum P Q : P =i Q -> enum P = enum Q.
-Proof. move=> eqPQ; exact: eq_filter. Qed.
+Proof. by move=> eqPQ; apply: eq_filter. Qed.
 
 Lemma eq_pick P Q : P =1 Q -> pick P = pick Q.
 Proof. by move=> eqPQ; rewrite /pick (eq_enum eqPQ). Qed.
@@ -506,7 +508,7 @@ Lemma eq_card A B : A =i B -> #|A| = #|B|.
 Proof. by move=>eqAB; rewrite !cardE (eq_enum eqAB). Qed.
 
 Lemma eq_card_trans A B n : #|A| = n -> B =i A -> #|B| = n.
-Proof. move <-; exact: eq_card. Qed.
+Proof. by move <-; apply: eq_card. Qed.
 
 Lemma card0 : #|@pred0 T| = 0. Proof. by rewrite cardE enum0. Qed.
 
@@ -567,12 +569,12 @@ Proof. by rewrite -(cardC A) leq_addr. Qed.
 Lemma card_size s : #|s| <= size s.
 Proof.
 elim: s => [|x s IHs] /=; first by rewrite card0.
-rewrite cardU1 /=; case: (~~ _) => //; exact: leqW.
+by rewrite cardU1 /=; case: (~~ _) => //; apply: leqW.
 Qed.
 
 Lemma card_uniqP s : reflect (#|s| = size s) (uniq s).
 Proof.
-elim: s => [|x s IHs]; first by left; exact card0.
+elim: s => [|x s IHs]; first by left; apply: card0.
 rewrite cardU1 /= /addn; case: {+}(x \in s) => /=.
   by right=> card_Ssz; have:= card_size s; rewrite card_Ssz ltnn.
 by apply: (iffP IHs) => [<-| [<-]].
@@ -582,7 +584,7 @@ Lemma card0_eq A : #|A| = 0 -> A =i pred0.
 Proof. by move=> A0 x; apply/idP => Ax; rewrite (cardD1 x) Ax in A0. Qed.
 
 Lemma pred0P P : reflect (P =1 pred0) (pred0b P).
-Proof. apply: (iffP eqP); [exact: card0_eq | exact: eq_card0]. Qed.
+Proof. by apply: (iffP eqP); [apply: card0_eq | apply: eq_card0]. Qed.
 
 Lemma pred0Pn P : reflect (exists x, P x) (~~ pred0b P).
 Proof.
@@ -592,7 +594,7 @@ by rewrite -lt0n eq_card0 //; right=> [[x]]; rewrite P0.
 Qed.
 
 Lemma card_gt0P A : reflect (exists i, i \in A) (#|A| > 0).
-Proof. rewrite lt0n; exact: pred0Pn. Qed.
+Proof. by rewrite lt0n; apply: pred0Pn. Qed.
 
 Lemma subsetE A B : (A \subset B) = pred0b [predD A & B].
 Proof. by rewrite unlock. Qed.
@@ -601,7 +603,7 @@ Lemma subsetP A B : reflect {subset A <= B} (A \subset B).
 Proof.
 rewrite unlock; apply: (iffP (pred0P _)) => [AB0 x | sAB x /=].
   by apply/implyP; apply/idPn; rewrite negb_imply andbC [_ && _]AB0.
-by rewrite andbC -negb_imply; apply/negbF/implyP; exact: sAB.
+by rewrite andbC -negb_imply; apply/negbF/implyP; apply: sAB.
 Qed.
 
 Lemma subsetPn A B :
@@ -616,7 +618,7 @@ Lemma subset_leq_card A B : A \subset B -> #|A| <= #|B|.
 Proof.
 move=> sAB.
 rewrite -(cardID A B) [#|predI _ _|](@eq_card _ A) ?leq_addr //= => x.
-rewrite !inE andbC; case Ax: (x \in A) => //; exact: subsetP Ax.
+by rewrite !inE andbC; case Ax: (x \in A) => //; apply: subsetP Ax.
 Qed.
 
 Lemma subxx_hint (mA : mem_pred T) : subset mA mA.
@@ -649,10 +651,10 @@ Lemma subset_predT A : A \subset T.
 Proof. by apply/subsetP. Qed.
 
 Lemma predT_subset A : T \subset A -> forall x, x \in A.
-Proof. move/subsetP=> allA x; exact: allA. Qed.
+Proof. by move/subsetP=> allA x; apply: allA. Qed.
 
 Lemma subset_pred1 A x : (pred1 x \subset A) = (x \in A).
-Proof. by apply/subsetP/idP=> [-> // | Ax y /eqP-> //]; exact: eqxx. Qed.
+Proof. by apply/subsetP/idP=> [-> // | Ax y /eqP-> //]; apply: eqxx. Qed.
 
 Lemma subset_eqP A B : reflect (A =i B) ((A \subset B) && (B \subset A)).
 Proof.
@@ -678,11 +680,11 @@ Qed.
 
 Lemma subset_trans A B C : A \subset B -> B \subset C -> A \subset C.
 Proof.
-by move/subsetP=> sAB /subsetP=> sBC; apply/subsetP=> x /sAB; exact: sBC.
+by move/subsetP=> sAB /subsetP=> sBC; apply/subsetP=> x /sAB; apply: sBC.
 Qed.
 
 Lemma subset_all s A : (s \subset A) = all (mem A) s.
-Proof. by exact (sameP (subsetP _ _) allP). Qed.
+Proof. exact: (sameP (subsetP _ _) allP). Qed.
 
 Lemma properE A B : A \proper B = (A \subset B) && ~~(B \subset A).
 Proof. by []. Qed.
@@ -703,7 +705,7 @@ Lemma proper_trans A B C : A \proper B -> B \proper C -> A \proper C.
 Proof.
 case/properP=> sAB [x Bx nAx] /properP[sBC [y Cy nBy]].
 rewrite properE (subset_trans sAB) //=; apply/subsetPn; exists y => //.
-by apply: contra nBy; exact: subsetP.
+by apply: contra nBy; apply: subsetP.
 Qed.
 
 Lemma proper_sub_trans A B C : A \proper B -> B \subset C -> A \proper C.
@@ -715,7 +717,7 @@ Qed.
 Lemma sub_proper_trans A B C : A \subset B -> B \proper C -> A \proper C.
 Proof.
 move=> sAB /properP[sBC [x Cx nBx]]; rewrite properE (subset_trans sAB) //.
-by apply/subsetPn; exists x => //; apply: contra nBx; exact: subsetP.
+by apply/subsetPn; exists x => //; apply: contra nBx; apply: subsetP.
 Qed.
 
 Lemma proper_card A B : A \proper B -> #|A| < #|B|.
@@ -743,7 +745,7 @@ by rewrite (eq_subset eAB).
 Qed.
 
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
-Proof. by congr (_ == 0); apply: eq_card => x; exact: andbC. Qed.
+Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
 Lemma eq_disjoint A1 A2 : A1 =i A2 -> disjoint (mem A1) =1 disjoint (mem A2).
 Proof.
@@ -766,13 +768,13 @@ Qed.
 
 Lemma disjoint_trans A B C :
    A \subset B -> [disjoint B & C] -> [disjoint A & C].
-Proof. by rewrite 2!disjoint_subset; exact: subset_trans. Qed.
+Proof. by rewrite 2!disjoint_subset; apply: subset_trans. Qed.
 
 Lemma disjoint0 A : [disjoint pred0 & A].
 Proof. exact/pred0P. Qed.
 
 Lemma eq_disjoint0 A B : A =i pred0 -> [disjoint A & B].
-Proof. by move/eq_disjoint->; exact: disjoint0. Qed.
+Proof. by move/eq_disjoint->; apply: disjoint0. Qed.
 
 Lemma disjoint1 x A : [disjoint pred1 x & A] = (x \notin A).
 Proof.
@@ -783,7 +785,7 @@ Qed.
 
 Lemma eq_disjoint1 x A B :
   A =i pred1 x ->  [disjoint A & B] = (x \notin B).
-Proof. by move/eq_disjoint->; exact: disjoint1. Qed.
+Proof. by move/eq_disjoint->; apply: disjoint1. Qed.
 
 Lemma disjointU A B C :
   [disjoint predU A B & C] = [disjoint A & C] && [disjoint B & C].
@@ -944,7 +946,7 @@ Hypothesis Pi0 : P i0.
 Let FP n := [exists (i | P i), F i == n].
 Let FP_F i : P i -> FP (F i).
 Proof. by move=> Pi; apply/existsP; exists i; rewrite Pi /=. Qed.
-Let exFP : exists n, FP n. Proof. by exists (F i0); exact: FP_F. Qed.
+Let exFP : exists n, FP n. Proof. by exists (F i0); apply: FP_F. Qed.
 
 Lemma arg_minP : extremum_spec leq arg_min.
 Proof.
@@ -1036,7 +1038,7 @@ Proof.
 rewrite -[dinjectiveb D]negbK.
 case: dinjectivePn=> [noinjf | injf]; constructor.
   case: noinjf => x Dx [y /andP[neqxy /= Dy] eqfxy] injf.
-  by case/eqP: neqxy; exact: injf.
+  by case/eqP: neqxy; apply: injf.
 move=> x y Dx Dy /= eqfxy; apply/eqP; apply/idPn=> nxy; case: injf.
 by exists x => //; exists y => //=; rewrite inE /= eq_sym nxy.
 Qed.
@@ -1049,7 +1051,7 @@ apply: (iffP (dinjectivePn _)) => [[x _ [y nxy eqfxy]] | [x [y nxy eqfxy]]];
 Qed.
 
 Lemma injectiveP : reflect (injective f) injectiveb.
-Proof. apply: (iffP (dinjectiveP _)) => injf x y => [|_ _]; exact: injf. Qed.
+Proof. by apply: (iffP (dinjectiveP _)) => injf x y => [|_ _]; apply: injf. Qed.
 
 End Injectiveb.
 
@@ -1117,7 +1119,7 @@ Proof. exact: s2valP (iinv_proof fAy). Qed.
 Lemma in_iinv_f A : {in A &, injective f} ->
   forall x fAfx, x \in A -> @iinv A (f x) fAfx = x.
 Proof.
-move=> injf x fAfx Ax; apply: injf => //; [exact: mem_iinv | exact: f_iinv].
+by move=> injf x fAfx Ax; apply: injf => //; [apply: mem_iinv | apply: f_iinv].
 Qed.
 
 Lemma preim_iinv A B y fAy : preim f B (@iinv A y fAy) = B y.
@@ -1127,10 +1129,10 @@ Lemma image_f A x : x \in A -> f x \in image f A.
 Proof. by move=> Ax; apply/imageP; exists x. Qed.
 
 Lemma codom_f x : f x \in codom f.
-Proof. by exact: image_f. Qed.
+Proof. by apply: image_f. Qed.
 
 Lemma image_codom A : {subset image f A <= codom f}.
-Proof. by move=> _ /imageP[x _ ->]; exact: codom_f. Qed.
+Proof. by move=> _ /imageP[x _ ->]; apply: codom_f. Qed.
 
 Lemma image_pred0 : image f pred0 =i pred0.
 Proof. by move=> x; rewrite /image_mem /= enum0. Qed.
@@ -1150,7 +1152,7 @@ Lemma image_iinv A y (fTy : y \in codom f) :
 Proof. by rewrite -mem_image ?f_iinv. Qed.
 
 Lemma iinv_f x fTfx : @iinv T (f x) fTfx = x.
-Proof. by apply: in_iinv_f; first exact: in2W. Qed.
+Proof. by apply: in_iinv_f; first apply: in2W. Qed.
 
 Lemma image_pre (B : pred T') : image f [preim f of B] =i [predI B & codom f].
 Proof. by move=> y; rewrite /image_mem -filter_map /= mem_filter -enumT. Qed.
@@ -1174,7 +1176,7 @@ Fixpoint preim_seq s :=
 Lemma map_preim (s : seq T') : {subset s <= codom f} -> map f (preim_seq s) = s.
 Proof.
 elim: s => //= y s IHs; case: pickP => [x /eqP fx_y | nfTy] fTs.
-  by rewrite /= fx_y IHs // => z s_z; apply: fTs; exact: predU1r.
+  by rewrite /= fx_y IHs // => z s_z; apply: fTs; apply: predU1r.
 by case/imageP: (fTs y (mem_head y s)) => x _ fx_y; case/eqP: (nfTy x).
 Qed.
 
@@ -1202,7 +1204,7 @@ Proof. by rewrite (cardE A) -(size_map f) card_size. Qed.
 Lemma card_in_image A : {in A &, injective f} -> #|image f A| = #|A|.
 Proof.
 move=> injf; rewrite (cardE A) -(size_map f); apply/card_uniqP.
-rewrite map_inj_in_uniq ?enum_uniq // => x y; rewrite !mem_enum; exact: injf.
+by rewrite map_inj_in_uniq ?enum_uniq // => x y; rewrite !mem_enum; apply: injf.
 Qed.
 
 Lemma image_injP A : reflect {in A &, injective f} (#|image f A| == #|A|).
@@ -1214,7 +1216,7 @@ Qed.
 Hypothesis injf : injective f.
 
 Lemma card_image A : #|image f A| = #|A|.
-Proof. apply: card_in_image; exact: in2W. Qed.
+Proof. by apply: card_in_image; apply: in2W. Qed.
 
 Lemma card_codom : #|codom f| = #|T|.
 Proof. exact: card_image. Qed.
@@ -1249,8 +1251,8 @@ Hypothesis injf : injective f.
 
 Lemma injF_onto y : y \in codom f. Proof. exact: inj_card_onto. Qed.
 Definition invF y := iinv (injF_onto y).
-Lemma invF_f : cancel f invF. Proof. by move=> x; exact: iinv_f. Qed.
-Lemma f_invF : cancel invF f. Proof. by move=> y; exact: f_iinv. Qed.
+Lemma invF_f : cancel f invF. Proof. by move=> x; apply: iinv_f. Qed.
+Lemma f_invF : cancel invF f. Proof. by move=> y; apply: f_iinv. Qed.
 Lemma injF_bij : bijective f. Proof. exact: inj_card_bij. Qed.
 
 End Inv.
@@ -1295,56 +1297,6 @@ Qed.
 End EqImage.
 
 (* Standard finTypes *)
-
-Section SeqFinType.
-
-Variables (T : eqType) (s : seq T).
-
-Record seq_sub : Type := SeqSub {ssval : T; ssvalP : in_mem ssval (@mem T _ s)}.
-
-Canonical seq_sub_subType := Eval hnf in [subType for ssval].
-Definition seq_sub_eqMixin := Eval hnf in [eqMixin of seq_sub by <:].
-Canonical seq_sub_eqType := Eval hnf in EqType seq_sub seq_sub_eqMixin.
-
-Definition seq_sub_enum : seq seq_sub := undup (pmap insub s).
-
-Lemma mem_seq_sub_enum x : x \in seq_sub_enum.
-Proof. by rewrite mem_undup mem_pmap -valK map_f ?ssvalP. Qed.
-
-Lemma val_seq_sub_enum : uniq s -> map val seq_sub_enum = s.
-Proof.
-move=> Us; rewrite /seq_sub_enum undup_id ?pmap_sub_uniq //.
-rewrite (pmap_filter (@insubK _ _ _)); apply/all_filterP.
-by apply/allP => x; rewrite isSome_insub.
-Qed.
-
-Definition seq_sub_pickle x := index x seq_sub_enum.
-Definition seq_sub_unpickle n := nth None (map some seq_sub_enum) n.
-Lemma seq_sub_pickleK : pcancel seq_sub_pickle seq_sub_unpickle.
-Proof.
-rewrite /seq_sub_unpickle => x.
-by rewrite (nth_map x) ?nth_index ?index_mem ?mem_seq_sub_enum.
-Qed.
-
-Definition seq_sub_choiceMixin := PcanChoiceMixin seq_sub_pickleK.
-Canonical seq_sub_choiceType :=
-  Eval hnf in ChoiceType seq_sub seq_sub_choiceMixin.
-
-Definition seq_sub_countMixin := CountMixin seq_sub_pickleK.
-Canonical seq_sub_countType := Eval hnf in CountType seq_sub seq_sub_countMixin.
-
-Definition seq_sub_finMixin :=
-  Eval hnf in UniqFinMixin (undup_uniq _) mem_seq_sub_enum.
-Canonical seq_sub_finType := Eval hnf in FinType seq_sub seq_sub_finMixin.
-
-Lemma card_seq_sub : uniq s -> #|{:seq_sub}| = size s.
-Proof.
-by move=> Us; rewrite cardE enumT -(size_map val) unlock val_seq_sub_enum.
-Qed.
-
-End SeqFinType.
-
-Canonical seq_sub_subCountType (T : choiceType) (s : seq T) := Eval hnf in [subCountType of (seq_sub s)].
 
 Lemma unit_enumP : Finite.axiom [::tt]. Proof. by case. Qed.
 Definition unit_finMixin := Eval hnf in FinMixin unit_enumP.
@@ -1428,9 +1380,6 @@ End SubFinType.
 Notation "[ 'subFinType' 'of' T ]" := (@pack_subFinType _ _ T _ _ _ id _ _ id)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
-Canonical seq_sub_subFinType (T : choiceType) s :=
-  Eval hnf in [subFinType of @seq_sub T s].
-
 Section FinTypeForSub.
 
 Variables (T : finType) (P : pred T) (sT : subCountType P).
@@ -1446,7 +1395,7 @@ Proof. by rewrite pmap_sub_uniq // -enumT enum_uniq. Qed.
 Lemma val_sub_enum : map val sub_enum = enum P.
 Proof.
 rewrite pmap_filter; last exact: insubK.
-by apply: eq_filter => x; exact: isSome_insub.
+by apply: eq_filter => x; apply: isSome_insub.
 Qed.
 
 (* We can't declare a canonical structure here because we've already *)
@@ -1503,6 +1452,73 @@ Lemma card_sig : #|{: {x | P x}}| = #|[pred x | P x]|.
 Proof. exact: card_sub. Qed.
 
 End CardSig.
+
+(* Subtype for an explicit enumeration. *)
+Section SeqSubType.
+
+Variables (T : eqType) (s : seq T).
+
+Record seq_sub : Type := SeqSub {ssval : T; ssvalP : in_mem ssval (@mem T _ s)}.
+
+Canonical seq_sub_subType := Eval hnf in [subType for ssval].
+Definition seq_sub_eqMixin := Eval hnf in [eqMixin of seq_sub by <:].
+Canonical seq_sub_eqType := Eval hnf in EqType seq_sub seq_sub_eqMixin.
+
+Definition seq_sub_enum : seq seq_sub := undup (pmap insub s).
+
+Lemma mem_seq_sub_enum x : x \in seq_sub_enum.
+Proof. by rewrite mem_undup mem_pmap -valK map_f ?ssvalP. Qed.
+
+Lemma val_seq_sub_enum : uniq s -> map val seq_sub_enum = s.
+Proof.
+move=> Us; rewrite /seq_sub_enum undup_id ?pmap_sub_uniq //.
+rewrite (pmap_filter (@insubK _ _ _)); apply/all_filterP.
+by apply/allP => x; rewrite isSome_insub.
+Qed.
+
+Definition seq_sub_pickle x := index x seq_sub_enum.
+Definition seq_sub_unpickle n := nth None (map some seq_sub_enum) n.
+Lemma seq_sub_pickleK : pcancel seq_sub_pickle seq_sub_unpickle.
+Proof.
+rewrite /seq_sub_unpickle => x.
+by rewrite (nth_map x) ?nth_index ?index_mem ?mem_seq_sub_enum.
+Qed.
+
+Definition seq_sub_countMixin := CountMixin seq_sub_pickleK.
+Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
+Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
+Definition seq_sub_finMixin := Finite.Mixin seq_sub_countMixin seq_sub_axiom.
+
+(* Beware: these are not the canonical instances, as they are not consistent  *)
+(* the generic sub_choiceType canonical instance.                             *)
+Definition adhoc_seq_sub_choiceMixin := PcanChoiceMixin seq_sub_pickleK.
+Definition adhoc_seq_sub_choiceType :=
+  Eval hnf in ChoiceType seq_sub adhoc_seq_sub_choiceMixin.
+Definition adhoc_seq_sub_finType :=
+  [finType of seq_sub for FinType adhoc_seq_sub_choiceType seq_sub_finMixin].
+
+End SeqSubType.
+
+Section SeqFinType.
+
+Variables (T : choiceType) (s : seq T).
+Local Notation sT := (seq_sub s).
+
+Definition seq_sub_choiceMixin := [choiceMixin of sT by <:].
+Canonical seq_sub_choiceType := Eval hnf in ChoiceType sT seq_sub_choiceMixin.
+
+Canonical seq_sub_countType := Eval hnf in CountType sT (seq_sub_countMixin s).
+Canonical seq_sub_subCountType := Eval hnf in [subCountType of sT].
+Canonical seq_sub_finType := Eval hnf in FinType sT (seq_sub_finMixin s).
+Canonical seq_sub_subFinType := Eval hnf in [subFinType of sT].
+
+Lemma card_seq_sub : uniq s -> #|{:sT}| = size s.
+Proof.
+by move=> Us; rewrite cardE enumT -(size_map val) unlock val_seq_sub_enum.
+Qed.
+
+End SeqFinType.
+
 
 (**********************************************************************)
 (*                                                                    *)
@@ -1577,7 +1593,7 @@ by move=> ?; rewrite -(nth_map _ 0) (size_enum_ord, val_enum_ord) // nth_iota.
 Qed.
 
 Lemma nth_ord_enum (i0 i : 'I_n) : nth i0 (enum 'I_n) i = i.
-Proof. apply: val_inj; exact: nth_enum_ord. Qed.
+Proof. by apply: val_inj; apply: nth_enum_ord. Qed.
 
 Lemma index_enum_ord (i : 'I_n) : index i (enum 'I_n) = i.
 Proof.
@@ -1604,11 +1620,11 @@ Proof. exact: val_inj. Qed.
 
 Lemma cast_ordK n1 n2 eq_n :
   cancel (@cast_ord n1 n2 eq_n) (cast_ord (esym eq_n)).
-Proof. by move=> i; exact: val_inj. Qed.
+Proof. by move=> i; apply: val_inj. Qed.
 
 Lemma cast_ordKV n1 n2 eq_n :
   cancel (cast_ord (esym eq_n)) (@cast_ord n1 n2 eq_n).
-Proof. by move=> i; exact: val_inj. Qed.
+Proof. by move=> i; apply: val_inj. Qed.
 
 Lemma cast_ord_inj n1 n2 eq_n : injective (@cast_ord n1 n2 eq_n).
 Proof. exact: can_inj (cast_ordK eq_n). Qed.
@@ -1836,7 +1852,7 @@ Lemma unliftP n (h i : 'I_n) : unlift_spec h i (unlift h i).
 Proof.
 rewrite /unlift; case: insubP => [u nhi | ] def_i /=; constructor.
   by apply: val_inj; rewrite /= def_i unbumpK.
-by rewrite negbK in def_i; exact/eqP.
+by rewrite negbK in def_i; apply/eqP.
 Qed.
 
 Lemma neq_lift n (h : 'I_n) i : h != lift h i.
@@ -1866,7 +1882,7 @@ Qed.
 (* Shifting and splitting indices, for cutting and pasting arrays *)
 
 Lemma lshift_subproof m n (i : 'I_m) : i < m + n.
-Proof. by apply: leq_trans (valP i) _; exact: leq_addr. Qed.
+Proof. by apply: leq_trans (valP i) _; apply: leq_addr. Qed.
 
 Lemma rshift_subproof m n (i : 'I_n) : m + i < m + n.
 Proof. by rewrite ltn_add2l. Qed.

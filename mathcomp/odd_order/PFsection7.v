@@ -1,10 +1,18 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg poly finset center.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action zmodp.
+From mathcomp
 Require Import gfunctor gproduct cyclic pgroup commutator nilpotent frobenius.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation BGsection3 vector.
+From mathcomp
 Require Import ssrnum algC classfun character inertia vcharacter.
+From mathcomp
 Require Import PFsection1 PFsection2 PFsection4 PFsection5 PFsection6.
 
 (******************************************************************************)
@@ -149,7 +157,7 @@ Qed.
 (* This is the norm expansion embedded in Peterfalvi (7.3). *)
 Lemma cfnormE_invDade chi :
   '[chi^\rho] = #|L|%:R^-1 * (\sum_(a in A) `|chi^\rho a| ^+ 2).
-Proof. by apply: cfnormE; exact: invDade_on. Qed.
+Proof. by apply: cfnormE; apply: invDade_on. Qed.
 
 End InverseDade.
 
@@ -365,7 +373,7 @@ have nz_phi1: phi 1%g != 0 by rewrite (seqInd1_neq0 nsHL Sphi).
 have NatS1e xi (Sxi : xi \in calS) := dvd_index_seqInd1 nsHL Sxi.
 have oS1: {in calS, forall psi, '[psi, 1] = 0} by apply: seqInd_ortho_1.
 have oS1H: {in calS, forall psi, '[psi, Ind1H] = 0} by apply: seqInd_ortho_Ind1.
-have InuS: {in calS &, isometry nu} by apply: sub_in2 Inu; exact: seqInd_zcharW.
+have InuS: {in calS &, isometry nu} by apply: sub_in2 Inu; apply: seqInd_zcharW.
 have ZnuS xi (Sxi : xi \in calS) := Znu xi (seqInd_zcharW  Sxi).
 have S_Se xi (Sxi : xi \in calS) := seqInd_sub_lin_vchar nsHL Szeta zeta1 Sxi.
 have oSnu1: orthogonal calSnu 1%CF.
@@ -675,7 +683,7 @@ have /fin_all_exists[r lin_r] i: exists r, 'chi_r \in S i /\ 'chi_r 1%g = e_ i.
   have [xi Sxi lin_xi] := exists_linInd (nsHL i) solHi lt1Hi (normal1 _).
   by have /irrP[r def_xi] := irrS i xi Sxi; exists r; rewrite -def_xi.
 have{lin_r} [Sr r1] := all_and2 lin_r.
-have ntS i: (size (S i) > 1)%N by apply: seqInd_nontrivial (mem_irr _) (Sr i).
+have ntS i: (size (S i) > 1)%N by apply: seqInd_nontrivial (Sr i).
 have /fin_all_exists[nu cohS] i: coherent (S i) (L i)^# 'Ind[G, L i].
   have [[[frobLi tiAiL] sLiG] oddLi] := (frobL i, normedTI_A i, sLG i, oddL i).
   have [defLi ntHi ntEi _ _] := Frobenius_context frobLi.
@@ -797,8 +805,8 @@ rewrite ler_wpmul2r ?cfnorm_ge0 // (@ler_trans _ 1) //.
   by rewrite -{2}(mulVf (nzh i)) ler_wpmul2l ?invr_ge0 ?ler0n ?min_i1.
 rewrite mulrC -normCK expr_ge1 ?normr_ge0 // norm_Cint_ge1 //.
   rewrite Cint_cfdot_vchar ?Znu ?seqInd_zcharW ?Sr //.
-suffices /orP: c i i1 != 0 \/ c i1 i != 0 by rewrite ci1_0.
-apply: Dade_sub_lin_nonorthogonal; rewrite ?mem_irr ?Sr ?r1 //; try exact: cohS.
+suffices []: c i i1 != 0 \/ c i1 i != 0 by rewrite ?ci1_0.
+apply/Dade_sub_lin_nonorthogonal; rewrite ?mem_irr ?Sr ?r1 //; try exact: cohS.
 exact: disjoint_Atau.
 Qed.
 

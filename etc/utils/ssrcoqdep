@@ -1,0 +1,27 @@
+#!/bin/bash
+
+args="$@"
+echo "calling coqdep on $args" 1>&2
+
+mkdir bkpcoqdep
+
+while [[ $# > 0 ]]
+do
+key="$1"
+
+case $key in
+    *.v)
+        cp $key bkpcoqdep/$key
+	sed "s/^From.*//" -i $key
+    ;;
+    *)
+    ;;
+esac
+shift
+done
+
+COQBIN="$(dirname $(which coqtop))/"
+$COQBIN/coqdep $args
+
+mv bkpcoqdep/* .
+rmdir bkpcoqdep

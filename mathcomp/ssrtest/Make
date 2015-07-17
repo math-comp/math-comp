@@ -1,22 +1,20 @@
--R ../theories Ssreflect
--I ../src/
 absevarprop.v
-binders.v
 binders_of.v
+binders.v
 caseview.v
 congr.v
 deferclear.v
 dependent_type_err.v
-elim.v
 elim2.v
 elim_pattern.v
+elim.v
 first_n.v
-gen_pattern.v
 gen_have.v
+gen_pattern.v
 havesuff.v
-have_view_idiom.v
 have_TC.v
 have_transp.v
+have_view_idiom.v
 if_isnt.v
 indetLHS.v
 intro_beta.v
@@ -33,12 +31,14 @@ set_lamda.v
 set_pattern.v
 ssrsyntax1.v
 ssrsyntax2.v
-testmx.v
 tc.v
+testmx.v
 typeof.v
 unkeyed.v
 view_case.v
 wlogletin.v
-wlong_intro.v
 wlog_suff.v
+wlong_intro.v
 
+-R ../theories Ssreflect
+-I ../src/

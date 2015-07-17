@@ -6055,7 +6055,7 @@ GEXTEND Gram
     [[ IDENT "From"; ns = Constr.global;
        IDENT "Require"; export = ssr_export_token;
        qidl = LIST1 Constr.global ->
-       let qidl = List.map (join_reference ns) qidl in
+(*        let qidl = List.map (join_reference ns) qidl in *)
        Vernacexpr.VernacRequire (export, None, qidl)
   ]];
 END

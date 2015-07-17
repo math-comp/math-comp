@@ -1,5 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype bigop.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype bigop.
+From mathcomp
 Require Import finfun tuple ssralg matrix zmodp vector.
 
 Set Implicit Arguments.

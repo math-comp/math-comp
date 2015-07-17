@@ -1,5 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice fintype finfun.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq choice fintype finfun.
+From mathcomp
 Require Import bigop finset ssralg fingroup zmodp matrix vector falgebra.
 
 (*****************************************************************************)
@@ -213,7 +216,7 @@ case/memv_sumP: Hu => u_ Hu ->; rewrite big_distrl /=.
 apply: memv_suml=> i Hi.
 case/memv_sumP: Hv => v_ Hv ->; rewrite big_distrr /=.
 apply: memv_suml=> j Hj.
-rewrite /gvspace (bigD1 (i*j)%g) /=; last by exact: groupM.
+rewrite /gvspace (bigD1 (i*j)%g) /=; last by apply: groupM.
 apply: subv_trans (addvSl _ _).
 case/vlineP: (Hu _ Hi)=> k ->; case/vlineP: (Hv _ Hj)=> l ->.
 apply/vlineP; exists (k * l).

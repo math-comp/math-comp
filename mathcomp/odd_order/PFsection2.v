@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg poly finset center.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action zmodp.
+From mathcomp
 Require Import gfunctor gproduct cyclic pgroup frobenius ssrnum.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation vector algC classfun character.
+From mathcomp
 Require Import inertia vcharacter PFsection1.
 
 (******************************************************************************)
@@ -55,7 +62,7 @@ Lemma partition_cent_rcoset (H : {group gT}) g (C := 'C_H[g]) (Cg := C :* g) :
   partition (Cg :^: H) (H :* g) /\ #|Cg :^: H| = #|H : C|.
 Proof.
 move=> nHg coHg; pose pi := \pi(#[g]).
-have notCg0: Cg != set0 by apply/set0Pn; exists g; exact: rcoset_refl.
+have notCg0: Cg != set0 by apply/set0Pn; exists g; apply: rcoset_refl.
 have id_pi: {in Cg, forall u, u.`_ pi = g}.
   move=> _ /rcosetP[u /setIP[Hu cgu] ->]; rewrite consttM; last exact/cent1P.
   rewrite (constt_p_elt (pgroup_pi _)) (constt1P _) ?mul1g //.
@@ -238,7 +245,7 @@ Qed.
 
 Lemma Dade_support_norm : G \subset 'N(Atau).
 Proof.
-by rewrite norms_bigcup //; apply/bigcapsP=> a _; exact: class_support_norm.
+by rewrite norms_bigcup //; apply/bigcapsP=> a _; apply: class_support_norm.
 Qed.
 
 Lemma Dade_support_normal : Atau <| G.
@@ -253,7 +260,7 @@ Fact Dade_subproof (alpha : 'CF(L)) :
 Proof.
 rewrite genGid; apply: intro_class_fun => [x y Gx Gy | x notGx].
   congr (oapp _ _); apply: eq_pick => a; rewrite memJ_norm //.
-  apply: subsetP Gy; exact: class_support_norm.
+  by apply: subsetP Gy; apply: class_support_norm.
 case: pickP => // a /andP[Aa Ha_u].
 by rewrite (subsetP Dade_support_sub) // in notGx; apply/bigcupP; exists a.
 Qed.
@@ -355,9 +362,9 @@ have {1}<-: cover P_A = A.
   by exists (a ^: L); rewrite ?class_refl // -rLid; do 2!apply: mem_imset.
 have [tiP_A injFA]: trivIset P_A /\ {in T &, injective (class^~ L)}.
   apply: trivIimset => [_ _ /imsetP[a Aa ->] /imsetP[b Ab ->] |]; last first.
-    by apply/imsetP=> [[a _ /esym/eqP/set0Pn[]]]; exists a; exact: class_refl.
+    by apply/imsetP=> [[a _ /esym/eqP/set0Pn[]]]; exists a; apply: class_refl.
   rewrite !rLid; apply: contraR => /pred0Pn[c /andP[/=]].
-  by do 2!move/class_transr <-.
+  by do 2!move/class_eqP <-.
 rewrite big_trivIset //= big_imset {P_A tiP_A injFA}//=.
 apply: canRL (mulKf (neq0CG G)) _; rewrite mulrA big_distrr /=.
 apply: eq_bigr => a /sTA=> {T sTA}Aa.
@@ -446,7 +453,7 @@ Fact Dade_restrM B : {in 'M(B) &, {morph Dade_restrm B : x y / x * y}%g}.
 Proof.
 rewrite /Dade_restrm; case: ifP => calP_B; last exact: morphM.
 have defM := Dade_set_sdprod calP_B; have [nsHM _ _ _ _] := sdprod_context defM.
-by apply: remgrM; first exact: sdprod_compl.
+by apply: remgrM; first apply: sdprod_compl.
 Qed.
 Canonical Dade_restr_morphism B := Morphism (@Dade_restrM B).
 Definition Dade_cfun_restriction B :=
@@ -573,7 +580,7 @@ rewrite big1 ?add0r => [|x /andP[calAx not_nBaLx]]; last first.
   apply: supp_aBgP => //; apply: contra not_nBaLx.
   set b := fBg x => /andP[Ab Hb_g]; have [Gx MBx] := setIdP calAx.
   rewrite inE mem_remgr ?mulHNB //; apply/imsetP/Dade_support1_TI => //.
-  by apply/pred0Pn; exists g; exact/andP.
+  by apply/pred0Pn; exists g; apply/andP.
 rewrite (partition_big fBg (mem nBaL)) /= => [|x]; last by case/andP.
 apply: eq_bigr => b; case/setIP=> Nb aLb; rewrite mulr_natr -sumr_const.
 apply: eq_big => x; rewrite ![x \in _]inE -!andbA.
@@ -581,7 +588,7 @@ apply: eq_big => x; rewrite ![x \in _]inE -!andbA.
     by rewrite mem_rcoset mem_divgr ?mulHNB.
   suffices ->: fBg x = b.
     by rewrite inE Nb (subsetP _ _ HBb_gx) // -mulHNB mulgS ?sub1set.
-  by rewrite /fBg; have [h Hh ->] := rcosetP HBb_gx; exact: remgrMid.
+  by rewrite /fBg; have [h Hh ->] := rcosetP HBb_gx; apply: remgrMid.
 move/and4P=> [_ Mgx _ /eqP def_fx].
 rewrite rDadeE // Mgx -/(fBg x) def_fx; case/imsetP: aLb => y Ly ->.
 by rewrite cfunJ // (subsetP sAL).
@@ -605,9 +612,9 @@ transitivity (- (\sum_(B in calP) n1 B * aa1 B)); last first.
     by move=> _ /imsetP[x Lx ->]; rewrite dBJ.
   have dB: B \in calP := dB1L B B1L_B.
   rewrite (eq_bigl (mem (B :^: L))) => [|B2 /=]; last first.
-    apply/andP/idP=> [[_ /eqP <-] | /(orbit_trans B1L_B) B1L_B2].
+    apply/andP/idP=> [[_ /eqP <-] | /orbit_trans/(_ B1L_B)-B1L_B2].
       by rewrite orbit_sym (mem_repr B2) ?orbit_refl.
-    by rewrite [B2 :^: L](orbit_transl B1L_B2) -defB dB1L.
+    by rewrite [B2 :^: L](orbit_eqP B1L_B2) -defB dB1L.
   rewrite (eq_bigr (fun _ => n1 B * aa1 B)) => [|_ /imsetP[x Lx ->]].
     rewrite cfunE sumr_const -mulr_natr mulrAC card_orbit astab1Js divfK //.
     by rewrite pnatr_eq0 -lt0n indexg_gt0.
@@ -660,7 +667,7 @@ rewrite (bigID [pred B : {set gT} | a \in B]) /= mulrDl addrA.
 apply: canRL (subrK _) _; rewrite -mulNr -sumrN; congr (_ + _ * _).
 symmetry.
 rewrite (reindex_onto (fun B => a |: B) (fun B => B :\ a)) /=; last first.
-  by move=> B; case/andP=> _; exact: setD1K.
+  by move=> B; case/andP=> _; apply: setD1K.
 symmetry; apply: eq_big => B.
   rewrite setU11 andbT -!andbA; apply/and3P/and3P; case.
     do 2![case/setIdP] => sBA ntB /setIP[La nBa] _ notBa.
@@ -672,7 +679,7 @@ symmetry; apply: eq_big => B.
   rewrite eq_sym eqEcard subsetUl cards1 (cardsD1 a) setU11 ltnS leqn0 /=.
   rewrite cards_eq0 => notB0 /eqP defB.
   have notBa: a \notin B by rewrite -defB setD11.
-  split=> //; last by apply: contraNneq notBa => ->; exact: set11.
+  split=> //; last by apply: contraNneq notBa => ->; apply: set11.
   rewrite !inE sBA La -{1 3}defB notB0 subsetD1 sBa_aB.
   by rewrite mem_conjg /(a ^ _) invgK mulgA mulgK.
 do 2![case/andP] => /setIdP[dB Na] _ notBa.
@@ -728,7 +735,7 @@ Qed.
 (* This summarizes Peterfalvi (2.6). *)
 Lemma Dade_Zisometry : {in 'Z[irr L, A], isometry Dade, to 'Z[irr G, G^#]}.
 Proof.
-split; first by apply: sub_in2 Dade_isometry; exact: zchar_on.
+split; first by apply: sub_in2 Dade_isometry; apply: zchar_on.
 by move=> phi Zphi; rewrite /= zchar_split Dade_vchar ?Dade_cfun.
 Qed.
 
@@ -747,7 +754,7 @@ Proof.
 have [/andP[sAL nAL] notA_1 sLG conjAG [H defCa coHL]] := ddA.
 have nsA1L: A1 <| L by rewrite /normal (subset_trans sA1A).
 split; rewrite ?(contra (@ssA1A _)) //; first exact: sub_in2 conjAG.
-by exists H; [exact: sub_in1 defCa | exact: sub_in2 coHL].
+by exists H; [apply: sub_in1 defCa | apply: sub_in2 coHL].
 Qed.
 Local Notation ddA1 := restr_Dade_hyp.
 

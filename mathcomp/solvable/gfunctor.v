@@ -1,10 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
-From mathcomp.discrete
-Require Import fintype bigop finset.
-From mathcomp.fingroup
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat fintype bigop finset.
+From mathcomp
 Require Import fingroup morphism automorphism quotient gproduct.
 
 (******************************************************************************)
@@ -121,7 +119,7 @@ Definition iso_continuous :=
    'injm phi -> phi @* F G \subset F (phi @* G).
 
 Lemma continuous_is_iso_continuous : continuous -> iso_continuous.
-Proof. by move=> Fcont gT hT G phi inj_phi; exact: Fcont. Qed.
+Proof. by move=> Fcont gT hT G phi inj_phi; apply: Fcont. Qed.
 
 (* Functoriality on Grp with partial morphisms. *)
 Definition pcontinuous :=
@@ -129,7 +127,7 @@ Definition pcontinuous :=
     phi @* F G \subset F (phi @* G).
 
 Lemma pcontinuous_is_continuous : pcontinuous -> continuous.
-Proof. by move=> Fcont gT hT G; exact: Fcont. Qed.
+Proof. by move=> Fcont gT hT G; apply: Fcont. Qed.
 
 (* Heredity with respect to inclusion *)
 Definition hereditary :=
@@ -269,6 +267,10 @@ Variable F : GFunctor.iso_map.
 Lemma gFsub gT (G : {group gT}) : F gT G \subset G.
 Proof. by case: F gT G. Qed.
 
+Lemma gFsub_trans gT (G : {group gT}) (A : pred_class) :
+  G \subset A -> F gT G \subset A.
+Proof. exact/subset_trans/gFsub. Qed.
+
 Lemma gF1 gT : F gT 1 = 1. Proof. exact/trivgP/gFsub. Qed.
 
 Lemma gFiso_cont : GFunctor.iso_continuous F.
@@ -282,32 +284,44 @@ by rewrite -morphimEsub ?gFsub ?gFiso_cont ?injm_autm.
 Qed.
 
 Lemma gFnorm gT (G : {group gT}) : G \subset 'N(F gT G).
-Proof. by rewrite char_norm ?gFchar. Qed.
+Proof. exact/char_norm/gFchar. Qed.
+
+Lemma gFnorms gT (G : {group gT}) : 'N(G) \subset 'N(F gT G).
+Proof. exact/char_norms/gFchar. Qed.
 
 Lemma gFnormal gT (G : {group gT}) : F gT G <| G.
-Proof. by rewrite char_normal ?gFchar. Qed.
+Proof. exact/char_normal/gFchar. Qed.
+
+Lemma gFchar_trans gT (G H : {group gT}) : H \char G -> F gT H \char G.
+Proof. exact/char_trans/gFchar. Qed.
+
+Lemma gFnormal_trans gT (G H : {group gT}) : H <| G -> F gT H <| G.
+Proof. exact/char_normal_trans/gFchar. Qed.
+
+Lemma gFnorm_trans gT (A : pred_class) (G : {group gT}) :
+  A \subset 'N(G) -> A \subset 'N(F gT G).
+Proof. by move/subset_trans/(_ (gFnorms G)). Qed.
 
 Lemma injmF_sub gT rT (G D : {group gT}) (f : {morphism D >-> rT}) :
   'injm f -> G \subset D -> f @* (F gT G) \subset F rT (f @* G).
 Proof.
-move=> injf sGD; apply/eqP; rewrite -(setIidPr (gFsub G)).
-by rewrite-{3}(setIid G) -!(morphim_restrm sGD) gFiso_cont // injm_restrm.
+move=> injf sGD; have:= gFiso_cont (injm_restrm sGD injf).
+by rewrite im_restrm morphim_restrm (setIidPr _) ?gFsub.
 Qed.
 
 Lemma injmF gT rT (G D : {group gT}) (f : {morphism D >-> rT}) :
   'injm f -> G \subset D -> f @* (F gT G) = F rT (f @* G).
 Proof.
-move=> injf sGD; apply/eqP; rewrite eqEsubset injmF_sub //=.
-rewrite -{2}(morphim_invm injf sGD) -[f @* F _ _](morphpre_invm injf).
-have Fsubs := subset_trans (gFsub _).
-by rewrite -sub_morphim_pre (injmF_sub, Fsubs) ?morphimS ?injm_invm.
+move=> injf sGD; have [sfGD injf'] := (morphimS f sGD, injm_invm injf).
+apply/esym/eqP; rewrite eqEsubset -(injmSK injf') ?gFsub_trans //.
+by rewrite !(subset_trans (injmF_sub _ _)) ?morphim_invm // gFsub_trans.
 Qed.
 
 Lemma gFisom gT rT (G D : {group gT}) R (f : {morphism D >-> rT}) :
   G \subset D -> isom G (gval R) f -> isom (F gT G) (F rT R) f.
 Proof.
-case/(restrmP f)=> g [gf _ _ _]; rewrite -{f}gf.
-by case/isomP=> injg <-; rewrite sub_isom ?gFsub ?injmF.
+case/(restrmP f)=> g [gf _ _ _]; rewrite -{f}gf => /isomP[injg <-].
+by rewrite sub_isom ?gFsub ?injmF.
 Qed.
 
 Lemma gFisog gT rT (G : {group gT}) (R : {group rT}) :
@@ -440,7 +454,7 @@ Section Composition.
 Variables (F1 : GFunctor.mono_map) (F2 : GFunctor.map).
 
 Lemma gFcomp_closed : GFunctor.closed (F1 \o F2).
-Proof. by move=> gT G; rewrite (subset_trans (gFsub _ _)) ?gFsub. Qed.
+Proof. by move=> gT G; rewrite !gFsub_trans. Qed.
 
 Lemma gFcomp_cont : GFunctor.continuous (F1 \o F2).
 Proof.

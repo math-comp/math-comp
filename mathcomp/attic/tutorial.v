@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq.
 
 
 Section HilbertSaxiom.
@@ -26,7 +28,7 @@ Qed.
 Check (hAiB hA).
 
 Lemma HilbertS3 : C.
-Proof. by apply: hAiBiC; last exact: hAiB. Qed.
+Proof. by apply: hAiBiC; last apply: hAiB. Qed.
 
 Lemma HilbertS4 : C.
 Proof. exact:  (hAiBiC _ (hAiB _)). Qed.
@@ -226,12 +228,12 @@ move=> m [|d] //=; rewrite -{1}[m]/(0 * d.+1 + m).
 elim: m {-2}m 0 (leqnn m) => [|n IHn] [|m] q //=; rewrite ltnS => le_mn.
 rewrite subn_if_gt; case: ltnP => // le_dm.
 rewrite -{1}(subnKC le_dm) -addSn addnA -mulSnr; apply: IHn.
-apply: leq_trans le_mn; exact: leq_subr.
+by apply: leq_trans le_mn; apply: leq_subr.
 Qed.
 
 Lemma edivn_eq : forall d q r, r < d -> edivn (q * d + r) d = (q, r).
 Proof.
-move=> d q r lt_rd; have d_gt0: 0 < d by exact: leq_trans lt_rd.
+move=> d q r lt_rd; have d_gt0: 0 < d by apply: leq_trans lt_rd.
 case: edivnP lt_rd => q' r'; rewrite d_gt0 /=.
 wlog: q q' r r' / q <= q' by case (ltnP q q'); last symmetry; eauto.
 rewrite leq_eqVlt; case: eqP => [-> _|_] /=; first by move/addnI->.
@@ -254,7 +256,7 @@ move=> m [|d] //=; rewrite -{1}[m]/(0 * d.+1 + m).
 elim: m {-2}m 0 (leqnn m) => [|n IHn] [|m] q //=; rewrite ltnS => le_mn.
 rewrite subn_if_gt; case: ltnP => // le_dm.
 rewrite -{1}(subnKC le_dm) -addSn addnA -mulSnr; apply: IHn.
-apply: leq_trans le_mn; exact: leq_subr.
+by apply: leq_trans le_mn; apply: leq_subr.
 Qed.
 
 Lemma edivnP_right : forall m d, edivn_spec_right m d (edivn m d).
@@ -263,12 +265,12 @@ move=> m [|d] //=; rewrite -{1}[m]/(0 * d.+1 + m).
 elim: m {-2}m 0 (leqnn m) => [|n IHn] [|m] q //=; rewrite ltnS => le_mn.
 rewrite subn_if_gt; case: ltnP => // le_dm.
 rewrite -{1}(subnKC le_dm) -addSn addnA -mulSnr; apply: IHn.
-apply: leq_trans le_mn; exact: leq_subr.
+by apply: leq_trans le_mn; apply: leq_subr.
 Qed.
 
 Lemma edivn_eq_right : forall d q r, r < d -> edivn (q * d + r) d = (q, r).
 Proof.
-move=> d q r lt_rd; have d_gt0: 0 < d by exact: leq_trans lt_rd.
+move=> d q r lt_rd; have d_gt0: 0 < d by apply: leq_trans lt_rd.
 set m := q * d + r; have: m = q * d + r by [].
 set d' := d; have: d' = d by [].
 case: (edivnP_right m d') => {m d'} m d' q' r' -> lt_r'd' d'd q'd'r'.
@@ -282,7 +284,7 @@ Qed.
 
 Lemma edivn_eq_left : forall d q r, r < d -> edivn (q * d + r) d = (q, r).
 Proof.
-move=> d q r lt_rd; have d_gt0: 0 < d by exact: leq_trans lt_rd.
+move=> d q r lt_rd; have d_gt0: 0 < d by apply: leq_trans lt_rd.
 case: (edivnP_left (q * d + r) d) lt_rd; rewrite d_gt0 /=.
 set q':= (edivn (q * d + r) d).1; set r':= (edivn (q * d + r) d).2.
 rewrite (surjective_pairing (edivn (q * d + r) d)) -/q' -/r'.

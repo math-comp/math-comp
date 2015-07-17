@@ -1,5 +1,6 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect.
+Require Import mathcomp.ssreflect.ssreflect.
+
 
 (******************************************************************************)
 (* This file contains the basic definitions and notations for working with    *)
@@ -719,7 +720,7 @@ Lemma pcan_inj g : pcancel g -> injective.
 Proof. by move=> fK x y /(congr1 g); rewrite !fK => [[]]. Qed.
 
 Lemma can_inj g : cancel g -> injective.
-Proof. by move/can_pcan; exact: pcan_inj. Qed.
+Proof. by move/can_pcan; apply: pcan_inj. Qed.
 
 Lemma canLR g x y : cancel g -> x = f y -> g x = y.
 Proof. by move=> fK ->. Qed.
@@ -746,10 +747,10 @@ Lemma inj_id : injective (@id A).
 Proof. by []. Qed.
 
 Lemma inj_can_sym f' : cancel f f' -> injective f' -> cancel f' f.
-Proof. move=> fK injf' x; exact: injf'. Qed.
+Proof. by move=> fK injf' x; apply: injf'. Qed.
 
 Lemma inj_comp : injective f -> injective h -> injective (f \o h).
-Proof. move=> injf injh x y /injf; exact: injh. Qed.
+Proof. by move=> injf injh x y /injf; apply: injh. Qed.
 
 Lemma can_comp f' h' : cancel f f' -> cancel h h' -> cancel (f \o h) (h' \o f').
 Proof. by move=> fK hK x; rewrite /= fK hK. Qed.
@@ -759,7 +760,7 @@ Lemma pcan_pcomp f' h' :
 Proof. by move=> fK hK x; rewrite /pcomp fK /= hK. Qed.
 
 Lemma eq_inj : injective f -> f =1 g -> injective g.
-Proof. by move=> injf eqfg x y; rewrite -2!eqfg; exact: injf. Qed.
+Proof. by move=> injf eqfg x y; rewrite -2!eqfg; apply: injf. Qed.
 
 Lemma eq_can f' g' : cancel f f' -> f =1 g -> f' =1 g' -> cancel g g'.
 Proof. by move=> fK eqfg eqfg' x; rewrite -eqfg -eqfg'. Qed.

@@ -1,12 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import  div choice fintype finfun bigop prime binomial finset.
-From mathcomp.fingroup
-Require Import fingroup perm.
-Require Import ssralg finalg zmodp.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import finfun bigop prime binomial ssralg finset fingroup finalg.
+From mathcomp
+Require Import perm zmodp.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
@@ -229,7 +228,7 @@ Proof. by move=> i j; rewrite unlock /fun_of_matrix /= ffunE. Qed.
 Lemma matrixP (A B : matrix) : A =2 B <-> A = B.
 Proof.
 rewrite /fun_of_matrix; split=> [/= eqAB | -> //].
-by apply/val_inj/ffunP=> [[i j]]; exact: eqAB.
+by apply/val_inj/ffunP=> [[i j]]; apply: eqAB.
 Qed.
 
 End MatrixDef.
@@ -573,7 +572,7 @@ Proof. by apply/matrixP=> i j; rewrite mxE row_mxEr. Qed.
 Lemma hsubmxK A : row_mx (lsubmx A) (rsubmx A) = A.
 Proof.
 apply/matrixP=> i j; rewrite !mxE.
-case: splitP => k Dk //=; rewrite !mxE //=; congr (A _ _); exact: val_inj.
+by case: splitP => k Dk //=; rewrite !mxE //=; congr (A _ _); apply: val_inj.
 Qed.
 
 Lemma col_mxEu A1 A2 i j : col_mx A1 A2 (lshift m2 i) j = A1 i j.
@@ -1960,7 +1959,7 @@ Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
 Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx n).
-Proof. by split=> //; exact: scalar_mxM. Qed.
+Proof. by split=> //; apply: scalar_mxM. Qed.
 Canonical scalar_mx_rmorphism := AddRMorphism scalar_mx_is_multiplicative.
 
 End MatrixRing.
@@ -2120,7 +2119,7 @@ Proof. by rewrite map_mx_sub map_mx1 map_pid_mx. Qed.
 
 Lemma map_mx_is_multiplicative n' (n := n'.+1) :
   multiplicative ((map_mx f) n n).
-Proof. by split; [exact: map_mxM | exact: map_mx1]. Qed.
+Proof. by split; [apply: map_mxM | apply: map_mx1]. Qed.
 
 Canonical map_mx_rmorphism n' := AddRMorphism (map_mx_is_multiplicative n').
 
@@ -2321,7 +2320,7 @@ transitivity (\sum_(f : F) \sum_(s : 'S_n) (-1) ^+ s * \prod_i AB s i (f i)).
 rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [|f Uf].
   rewrite (reindex (@pval _)) /=; last first.
     pose in_Sn := insubd (1%g : 'S_n).
-    by exists in_Sn => /= f Uf; first apply: val_inj; exact: insubdK.
+    by exists in_Sn => /= f Uf; first apply: val_inj; apply: insubdK.
   apply: eq_big => /= [s | s _]; rewrite ?(valP s) // big_distrr /=.
   rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
   rewrite big_split /= mulrA mulrCA mulrA mulrCA mulrA.
@@ -2766,13 +2765,13 @@ Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Lemma map_mx_inj m n : injective ((map_mx f) m n).
 Proof.
 move=> A B eq_AB; apply/matrixP=> i j.
-by move/matrixP/(_ i j): eq_AB; rewrite !mxE; exact: fmorph_inj.
+by move/matrixP/(_ i j): eq_AB; rewrite !mxE; apply: fmorph_inj.
 Qed.
 
 Lemma map_mx_is_scalar n (A : 'M_n) : is_scalar_mx A^f = is_scalar_mx A.
 Proof.
 rewrite /is_scalar_mx; case: (insub _) => // i.
-by rewrite mxE -map_scalar_mx inj_eq //; exact: map_mx_inj.
+by rewrite mxE -map_scalar_mx inj_eq //; apply: map_mx_inj.
 Qed.
 
 Lemma map_unitmx n (A : 'M_n) : (A^f \in unitmx) = (A \in unitmx).
@@ -2829,7 +2828,7 @@ Proof.
 elim: n => [|n IHn] /= in A *; first exact: is_perm_mx1.
 set A' := _ - _; move/(_ A'): IHn; case: cormen_lup => [[P L U]] {A'}/=.
 rewrite (is_perm_mxMr _ (perm_mx_is_perm _ _)).
-case/is_perm_mxP => s ->; exact: lift0_mx_is_perm.
+by case/is_perm_mxP => s ->; apply: lift0_mx_is_perm.
 Qed.
 
 Lemma cormen_lup_correct n (A : 'M_n.+1) :
@@ -2861,7 +2860,7 @@ Proof.
 elim: n => [|n IHn] /= in A i j *; first by rewrite [i]ord1 [j]ord1 mxE.
 set A' := _ - _; move/(_ A'): IHn; case: cormen_lup => [[P L U]] {A'}/= Ll.
 rewrite !mxE split1; case: unliftP => [i'|] -> /=; rewrite !mxE split1.
-  by case: unliftP => [j'|] -> //; exact: Ll.
+  by case: unliftP => [j'|] -> //; apply: Ll.
 by case: unliftP => [j'|] ->; rewrite /= mxE.
 Qed.
 
@@ -2871,7 +2870,7 @@ Proof.
 elim: n => [|n IHn] /= in A i j *; first by rewrite [i]ord1.
 set A' := _ - _; move/(_ A'): IHn; case: cormen_lup => [[P L U]] {A'}/= Uu.
 rewrite !mxE split1; case: unliftP => [i'|] -> //=; rewrite !mxE split1.
-by case: unliftP => [j'|] ->; [exact: Uu | rewrite /= mxE].
+by case: unliftP => [j'|] ->; [apply: Uu | rewrite /= mxE].
 Qed.
 
 End CormenLUP.

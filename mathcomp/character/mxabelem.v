@@ -1,18 +1,15 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop prime finset.
-From mathcomp.fingroup
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
+Require Import fintype tuple finfun bigop prime ssralg poly finset.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient gproduct action.
-From mathcomp.algebra
-Require Import ssralg poly finalg zmodp cyclic matrix mxalgebra.
-From mathcomp.solvable
-Require Import commutator center pgroup gseries nilpotent.
-From mathcomp.solvable
-Require Import sylow maximal abelian.
-Require Import mxrepresentation.
+From mathcomp
+Require Import finalg zmodp commutator cyclic center pgroup gseries nilpotent.
+From mathcomp
+Require Import sylow maximal abelian matrix mxalgebra mxrepresentation.
 
 (******************************************************************************)
 (*   This file completes the theory developed in mxrepresentation.v with the  *)
@@ -145,7 +142,7 @@ Proof. by rewrite inE. Qed.
 
 Fact rowg_group_set m A : group_set (@rowg m A).
 Proof.
-by apply/group_setP; split=> [|u v]; rewrite !inE ?sub0mx //; exact: addmx_sub.
+by apply/group_setP; split=> [|u v]; rewrite !inE ?sub0mx //; apply: addmx_sub.
 Qed.
 Canonical rowg_group m A := Group (@rowg_group_set m A).
 
@@ -157,7 +154,7 @@ Lemma rowgS m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
 Proof.
 apply/subsetP/idP=> sAB => [| u].
   by apply/row_subP=> i; have:= sAB (row i A); rewrite !inE row_sub => ->.
-by rewrite !inE => suA; exact: submx_trans sAB.
+by rewrite !inE => suA; apply: submx_trans sAB.
 Qed.
 
 Lemma eq_rowg m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -214,8 +211,8 @@ Proof. by apply/eqP; rewrite -submx0 -(rowg0 0) rowgK sub0mx. Qed.
 
 Lemma rowg_mx_eq0 (L : {group rVn}) : (rowg_mx L == 0) = (L :==: 1%g).
 Proof.
-rewrite -trivg_rowg; apply/idP/idP=> [|/eqP->]; last by rewrite rowg_mx1 rowg0.
-by rewrite !(sameP eqP trivgP); apply: subset_trans; exact: sub_rowg_mx.
+rewrite -trivg_rowg; apply/idP/eqP=> [|->]; last by rewrite rowg_mx1 rowg0.
+exact/contraTeq/subG1_contra/sub_rowg_mx.
 Qed.
 
 Lemma rowgI m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -312,7 +309,7 @@ Lemma astabs_rowg_repr m (A : 'M_(m, n)) : 'N(rowg A | 'MR rG) = rstabs rG A.
 Proof.
 apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
 apply/subsetP/idP=> nAx => [|u]; last first.
-  rewrite !inE mx_repr_actE // => Au; exact: (submx_trans (submxMr _ Au)).
+  by rewrite !inE mx_repr_actE // => Au; apply: (submx_trans (submxMr _ Au)).
 apply/row_subP=> i; move/implyP: (nAx (row i A)).
 by rewrite !inE row_sub mx_repr_actE //= row_mul.
 Qed.
@@ -449,13 +446,13 @@ Variables p n : nat.
 Local Notation rVn := 'rV['F_p]_n.
 
 Lemma rowg_mxK (L : {group rVn}) : rowg (rowg_mx L) = L.
-Proof. by apply: stable_rowg_mxK; exact: mx_Fp_stable. Qed.
+Proof. by apply: stable_rowg_mxK; apply: mx_Fp_stable. Qed.
 
 Lemma rowg_mxSK (L : {set rVn}) (M : {group rVn}) :
   (rowg_mx L <= rowg_mx M)%MS = (L \subset M).
 Proof.
 apply/idP/idP; last exact: rowg_mxS.
-by rewrite -rowgS rowg_mxK; apply: subset_trans; exact: sub_rowg_mx.
+by rewrite -rowgS rowg_mxK; apply/subset_trans/sub_rowg_mx.
 Qed.
 
 Lemma mxrank_rowg (L : {group rVn}) :
@@ -508,7 +505,7 @@ Proof. by case/misomP: (xchooseP ab_rV_P). Qed.
 Lemma abelem_rV_injm : 'injm ErV. Proof. by case/isomP: abelem_rV_isom. Qed.
 
 Lemma abelem_rV_inj : {in E &, injective ErV}.
-Proof. by apply/injmP; exact: abelem_rV_injm. Qed.
+Proof. by apply/injmP; apply: abelem_rV_injm. Qed.
 
 Lemma im_abelem_rV : ErV @* E = setT. Proof. by case/isomP: abelem_rV_isom. Qed.
 
@@ -701,7 +698,7 @@ Qed.
 
 Lemma abelem_mx_irrP : reflect (mx_irreducible rG) (minnormal E G).
 Proof.
-by rewrite -[E in minnormal E G]im_rVabelem -rowg1; exact: mxsimple_abelemP.
+by rewrite -[E in minnormal E G]im_rVabelem -rowg1; apply: mxsimple_abelemP.
 Qed.
 
 Lemma rfix_abelem (H : {set gT}) :
@@ -850,7 +847,7 @@ Let p_gt1 := prime_gt1 p_pr.
 Let oZp := card_center_extraspecial pS esS.
 
 Let modIp' (i : 'I_p.-1) : (i.+1 %% p = i.+1)%N.
-Proof. by case: i => i; rewrite /= -ltnS prednK //; exact: modn_small. Qed.
+Proof. by case: i => i; rewrite /= -ltnS prednK //; apply: modn_small. Qed.
 
 (* This is Aschbacher (34.9), parts (1)-(4). *)
 Theorem extraspecial_repr_structure (sS : irrType F S) :
@@ -873,7 +870,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
   pose Zcl := classes S ::&: 'Z(S).
   have cardZcl: #|Zcl| = p.
     transitivity #|[set [set z] | z in 'Z(S)]|; last first.
-      by rewrite card_imset //; exact: set1_inj.
+      by rewrite card_imset //; apply: set1_inj.
     apply: eq_card => zS; apply/setIdP/imsetP=> [[] | [z]].
       case/imsetP=> z Sz ->{zS} szSZ.
       have Zz: z \in 'Z(S) by rewrite (subsetP szSZ) ?class_refl.
@@ -900,7 +897,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     apply: contra notZxS => Zxy; rewrite -{1}(lcoset_id Sy) class_lcoset.
     rewrite ((_ ^: _ =P [set x ^ y])%g _) ?sub1set // eq_sym eqEcard.
     rewrite sub1set class_refl cards1 -index_cent1 (setIidPl _) ?indexgg //.
-    by rewrite sub_cent1; apply: subsetP Zxy; exact: subsetIr.
+    by rewrite sub_cent1; apply: subsetP Zxy; apply: subsetIr.
   rewrite sum_nat_dep_const mulnC eqn_pmul2l //; move/eqP <-.
   rewrite addSnnS prednK // -cardZcl -[card _](cardsID Zcl) /= addnC.
   by congr (_ + _)%N; apply: eq_card => t; rewrite !inE andbC // andbAC andbb.
@@ -954,11 +951,10 @@ have alpha_i_z i: ((alpha ^+ ephi i) z = z ^+ i.+1)%g.
   by rewrite autE ?cycle_id //= val_Zp_nat ozp ?modIp'.
 have rphiP i: S :==: autm (groupX (ephi i) Aut_alpha) @* S by rewrite im_autm.
 pose rphi i := morphim_repr (eqg_repr phi (rphiP i)) (subxx S).
-have rphi_irr i: mx_irreducible (rphi i).
-  by apply/morphim_mx_irr; exact/eqg_mx_irr.
+have rphi_irr i: mx_irreducible (rphi i) by apply/morphim_mx_irr/eqg_mx_irr.
 have rphi_fful i: mx_faithful (rphi i).
   rewrite /mx_faithful rker_morphim rker_eqg.
-  by rewrite (trivgP (fful_nlin _ nlin_i0)) morphpreIdom; exact: injm_autm.
+  by rewrite (trivgP (fful_nlin _ nlin_i0)) morphpreIdom; apply: injm_autm.
 have rphi_z i: rphi i z = (w ^+ i.+1)%:M.
   by rewrite /rphi [phi]lock /= /morphim_mx autmE alpha_i_z -lock phi_ze.
 pose iphi i := irr_comp sS (rphi i); pose phi_ i := irr_repr (iphi i).
@@ -1021,7 +1017,7 @@ suffices IH V: mxsimple rS V -> mx_iso rZ U V ->
 - split=> [|/= V simV isoUV].
     by case/andP: (IH U simU (mx_iso_refl _ _)) => /eqP.
   by case/andP: (IH V simV isoUV) => _ /(mxsimple_isoP simU).
-move=> simV isoUV; wlog sS: / irrType F S by exact: socle_exists.
+move=> simV isoUV; wlog sS: / irrType F S by apply: socle_exists.
 have [[_ defS'] prZ] := esS.
 have{prZ} ntZ: 'Z(S) :!=: 1%g by case: eqP prZ => // ->; rewrite cards1.
 have [_ [iphi]] := extraspecial_repr_structure sS.
@@ -1030,13 +1026,13 @@ have [modU nzU _]:= simU; pose rU := submod_repr modU.
 have nlinU: \rank U != 1%N.
   apply/eqP=> /(rker_linear rU); apply/negP; rewrite /rker rstab_submod.
   by rewrite (eqmx_rstab _ (val_submod1 _)) (eqP ffulU) defS' subG1.
-have irrU: mx_irreducible rU by exact/submod_mx_irr.
+have irrU: mx_irreducible rU by apply/submod_mx_irr.
 have rsimU := rsim_irr_comp sS F'S irrU.
 set iU := irr_comp sS rU in rsimU; have [_ degU _ _]:= rsimU.
 have phiUP: iU \in codom iphi by rewrite im_phi !inE -degU.
 rewrite degU -(f_iinv phiUP) dim_phi eqxx /=; apply/(mxsimple_isoP simU).
 have [modV _ _]:= simV; pose rV := submod_repr modV.
-have irrV: mx_irreducible rV by exact/submod_mx_irr.
+have irrV: mx_irreducible rV by apply/submod_mx_irr.
 have rsimV := rsim_irr_comp sS F'S irrV.
 set iV := irr_comp sS rV in rsimV; have [_ degV _ _]:= rsimV.
 have phiVP: iV \in codom iphi by rewrite im_phi !inE -degV -(mxrank_iso isoUV).
@@ -1045,7 +1041,7 @@ have [z Zz ntz]:= trivgPn _ ntZ.
 have [|w prim_w phi_z] := phiZ z; first by rewrite 2!inE ntz.
 suffices eqjUV: jU == jV.
   apply/(mx_rsim_iso modU modV); apply: mx_rsim_trans rsimU _.
-  by rewrite -(f_iinv phiUP) -/jU (eqP eqjUV) f_iinv; exact: mx_rsim_sym.
+  by rewrite -(f_iinv phiUP) -/jU (eqP eqjUV) f_iinv; apply: mx_rsim_sym.
 have rsimUV: mx_rsim (subg_repr (phi jU) sZS) (subg_repr (phi jV) sZS).
   have [bU _ bUfree bUhom] := mx_rsim_sym rsimU.
   have [bV _ bVfree bVhom] := rsimV.

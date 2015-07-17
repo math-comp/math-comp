@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg finset fingroup morphism.
-Require Import perm automorphism quotient action zmodp center commutator.
+From mathcomp
+Require Import perm automorphism quotient action zmodp finalg center commutator.
+From mathcomp
 Require Import poly cyclic pgroup nilpotent matrix mxalgebra mxrepresentation.
+From mathcomp
 Require Import vector falgebra fieldext ssrnum algC rat algnum galois.
+From mathcomp
 Require Import classfun character inertia integral_char vcharacter.
 Require ssrint.
 
@@ -28,110 +35,54 @@ Variable gT : finGroupType.
 Lemma odd_eq_conj_irr1 (G : {group gT}) t :
   odd #|G| -> (('chi[G]_t)^*%CF == 'chi_t) = ('chi_t == 1).
 Proof.
-move=> OG; apply/eqP/eqP=> [Ht | ->]; last exact: cfConjC_cfun1.
-pose a := (@Zp1 1).
-have Aito:
-    is_action <[a]> (fun (t : Iirr G) v => if v == a then conjC_Iirr t else t).
-  split=> [[[|[]]] //= _  t1 t2 Hj |j [[|[]]] // HH1 [[|[]]] // HH2 ] //=.
-    by apply: (inv_inj (@conjC_IirrK _ _)).
-  by rewrite conjC_IirrK.
-pose ito := Action Aito.
-have Acto:
-    is_action <[a]> (fun (c : {set gT}) v => if v == a then c^-1%g else c).
-  split=> [[[|[]]] //= _  t1 t2 Hj |j [[|[]]] // HH1 [[|[]]] // HH2 ] //=.
-    by rewrite -[t1]invgK Hj invgK.
-  by rewrite invgK.
-pose cto := Action Acto.
-have F1: [acts <[a]>, on (classes G) | cto].
-  apply/subsetP=> j Hj.
-  rewrite !inE Hj; apply/subsetP=> u.
-  case/imsetP=> g GiG ->.
-  by rewrite inE /=; case: (_ == _) => //;
-     rewrite -?classVg mem_classes // ?groupV.
-have F2 u x y: x \in G -> y \in cto (x ^: G) a -> 'chi_u x = 'chi_(ito u a) y.
-  rewrite mem_invg -{2}[y]invgK => Gx {y}/imsetP[y Gy ->].
+rewrite -coprimen2 => oddG; pose A := <[1 : 'Z_2]>.
+have Z2P (a : 'Z_2): a = 0 \/ a = 1 by apply/pred2P; case: a => -[|[]].
+pose Ito (t : Iirr G) := [fun a : 'Z_2 => iter a (@conjC_Iirr _ G) t].
+pose Cto (C : {set gT}) := [fun a : 'Z_2 => iter a invg C].
+have IactP: is_action A Ito.
+  split=> [|i /Z2P[]->] /Z2P[]-> //=; last by rewrite conjC_IirrK.
+  exact/inv_inj/conjC_IirrK.
+have CactP: is_action A Cto.
+  by split=> [|C /Z2P[]->] /Z2P[]-> //=; [apply: invg_inj | rewrite invgK].
+pose Iact := Action IactP; pose Cact := Action CactP.
+have n_cG_A: [acts A, on classes G | Cact].
+  rewrite cycle_subG !inE cycle_id; apply/subsetP=> _ /imsetP[x Gx ->].
+  by rewrite !inE /= -classVg mem_classes ?groupV.
+transitivity (t \in [set 0]); last by rewrite inE irr_eq1.
+suffices{t} /eqP->: [set 0] == 'Fix_Iact[1].
+  by rewrite !inE sub1set inE -(inj_eq irr_inj) conjC_IirrE.
+rewrite eqEcard !(sub1set, inE) conjC_Iirr_eq0 eqxx /=.
+rewrite (card_afix_irr_classes (cycle_id _) n_cG_A) => [|i x xy Gx]; last first.
+  rewrite inE => {xy}/imsetP[y Gy /(canRL invgK)->].
   by rewrite -conjVg cfunJ {y Gy}//= conjC_IirrE cfunE -irr_inv invgK.
-have F3: forall c, c \in classes G -> c^-1%g = c -> c = 1%g.
-  move=> c; case/imsetP => g GiG ->; rewrite -classVg => Hg.
-  move: (class_refl G g^-1); rewrite Hg; case/imsetP=> x XiG Hx.
-  have F4: (x ^+ 2)%g \in 'C_G[g].
-    apply/subcent1P; split; rewrite ?groupM //.
-    apply: (mulgI (x * x * g)^-1)%g.
-    rewrite mulVg !invMg Hx conjgE !mulgA mulgK.
-    rewrite -[(_ * g * x)%g]mulgA -[(_ * (g * _))%g]mulgA -conjgE.
-    by rewrite -Hx mulgK mulVg.
-  have F5 : x \in 'C_G[g].
-    suff->: (x = (x ^+ 2) ^+ (#|G| %/2).+1)%g by apply: groupX.
-    rewrite -expgM -[(_%/_).+1]addn1 mulnDr muln1 -{3}addn1 addnA.
-    move: (modn2 #|G|); rewrite {1}OG /= => HH; rewrite -{3}HH.
-    rewrite [(2 * _)%N]mulnC -divn_eq expgD expg1.
-    by move: (order_dvdG XiG); rewrite order_dvdn; move/eqP->; rewrite mul1g.
-  move: Hx; rewrite conjgE; case/subcent1P: F5=> _ ->.
-  rewrite mulgA mulVg mul1g => HH.
-  have F6: (g ^+ 2 == 1)%g by rewrite expgS -{1}HH expg1 mulVg.
-  suff: #[g] == 1%N by rewrite order_eq1; move/eqP->; apply: class1G.
-  move: F6 (order_gt0 g) (order_dvdG GiG); rewrite -order_dvdn.
-  move/(dvdn_leq (isT : (0 < 2)%N)); case: #[_]=> // [[|[]]] //.
-  by rewrite dvdn2 OG.
-apply/eqP; case: (boolP (t == 0))=> // Hd.
-  by move/eqP: Hd->; rewrite irr0.
-have:= card_afix_irr_classes (cycle_id a) F1 F2.
-have->: #|'Fix_(classes G | cto)[a]| = 1%N.
-  apply: (@eq_card1 _ 1%g)=> c; apply/idP/idP; rewrite !inE.
-    case/andP=> GiG HH; apply/eqP; apply: F3=> //; apply/eqP.
-    by move/subsetP: HH; move/(_ a); rewrite !inE eqxx; apply.
-  move/eqP->; rewrite classes1.
-  apply/subsetP=> b; rewrite !inE; move/eqP=> -> /=.
-  by rewrite invg1.
-rewrite (cardD1 (0 : Iirr _)).
-have->: 0 \in 'Fix_ito[a].
-  apply/afixP=> b; rewrite !inE; move/eqP->; rewrite /=.
-  apply: irr_inj; apply/cfunP=> g.
-  by rewrite conjC_IirrE cfConjCE irr0 cfun1E conjC_nat.
-rewrite (cardD1 t) //.
-suff->: t \in [predD1 'Fix_ito[a] & 0] by [].
-rewrite inE /= Hd.
-apply/afixP=> b; rewrite !inE; move/eqP->; rewrite /=.
-apply: irr_inj; apply/cfunP=> g.
-by rewrite conjC_IirrE Ht.
+have ->: #|[set 0 : Iirr G]| = #|[1 {set gT}]| by rewrite !cards1.
+apply/subset_leq_card/subsetP=> _ /setIdP[/imsetP[x Gx ->] /afix1P-DxGV].
+have /imsetP[y Gy DxV]: x^-1%g \in x ^: G by rewrite -DxGV memV_invg class_refl.
+have{Gy} cxy: y \in 'C[x].
+  suffices cxy2: (y ^+ 2)%g \in 'C[x] by rewrite -(expgK oddG Gy) groupX.
+  by rewrite cent1C cent1E conjgC conjgM -DxV conjVg -DxV invgK.
+rewrite inE classG_eq1 -in_set1 -(expgK oddG Gx) groupX // inE.
+by rewrite -eq_invg_mul DxV conjgE -(cent1P cxy) mulKg.
 Qed.
 
 Variables G H : {group gT}.
 
 (* This is Peterfalvi (1.2). *)
-Lemma not_in_ker_char0 t g : g \in G ->
+Lemma irr_reg_off_ker_0 t g : g \in G ->
   H <| G -> ~~ (H \subset cfker 'chi[G]_t) -> 'C_H[g] = 1%g -> 'chi_t g = 0.
 Proof.
-move=> GiG HnG nHsC CH1.
-have: (#|'C_G[g]| <= #|'C_(G/H)[coset H g]|)%N.
-  suff->: #|'C_G[g]| = #|'C_G[g] / H|%G.
-    by apply: (subset_leq_card (quotient_subcent1 H G g)).
-  apply: card_isog.
-  apply: isog_trans (second_isog _); last first.
-    apply: subset_trans (normal_norm HnG).
-    by apply: subcent1_sub.
-  suff->: H :&: 'C_G[g] = 1%g by exact: quotient1_isog.
-    rewrite -CH1.
-    apply/setP=> h; rewrite inE.
-    apply/andP/subcent1P; case=> H1 H2; split=> //.
-      by move/subcent1P: H2; case.
-    apply/subcent1P; split=> //.
-    by apply: (subsetP (normal_sub HnG)).
-have F1: coset H g \in (G / H)%g by exact: mem_quotient.
-rewrite -leC_nat.
-have:= second_orthogonality_relation g GiG.
-rewrite mulrb class_refl => <-.
-have:= second_orthogonality_relation (coset H g) F1.
-rewrite mulrb class_refl => <-; rewrite -!(eq_bigr _ (fun _ _ => normCK _)).
-rewrite sum_norm_irr_quo // (bigID (fun i => H \subset cfker 'chi_i)) //=.
-set S := \sum_(i | ~~ _) _; set S' := \sum_(i | _) _ => HH.
-have /eqP F2: S == 0.
-  rewrite eqr_le -(ler_add2l S') addr0 HH /=.
-  by apply: sumr_ge0 => j _; rewrite mulr_ge0 ?normr_ge0.
-apply/eqP; have: `|'chi_t g| ^+ 2 == 0.
-  apply/eqP; apply: (psumr_eq0P _ F2) nHsC => j _.
-  by rewrite mulr_ge0 ?normr_ge0.
-by rewrite mulf_eq0 orbb normr_eq0.
+pose kerH i := H \subset cfker 'chi[G]_i => Gg nsHG kerH't regHg; apply/eqP.
+pose sum_norm2 x := \sum_i `|'chi_i x| ^+ 2.
+have norm2_ge0 a: 0 <= `|a| ^+ 2 :> algC by rewrite exprn_ge0 ?normr_ge0.
+have{regHg}: sum_norm2 gT G g <= sum_norm2 _ (G / H)%G (coset H g).
+  rewrite ![sum_norm2 _ _ _](eq_bigr _ (fun _ _ => normCK _)).
+  rewrite !second_orthogonality_relation ?mem_quotient // !class_refl ler_nat.
+  suffices /card_isog->: 'C_G[g] \isog 'C_G[g] / H.
+    exact/subset_leq_card/quotient_subcent1.
+  by apply/quotient_isog; rewrite ?subIset 1?normal_norm // setICA regHg setIg1.
+rewrite /sum_norm2 (bigID kerH) ?sum_norm_irr_quo //= -ler_subr_addl subrr.
+rewrite ler_eqVlt psumr_eq0 ?ler_gtF ?sumr_ge0 // orbF => /allP/(_ t)/implyP.
+by rewrite mem_index_enum kerH't expf_eq0 normr_eq0.
 Qed.
 
 (* This is Peterfalvi (1.3)(a). *)
@@ -247,13 +198,13 @@ Proof.
 case: m Chi => [|[|m]] // Chi _ irrChi Chifree Chi1 ChiCF [iso_tau Ztau].
 rewrite -(tnth_nth 0 _ 0); set chi := tnth Chi.
 have chiE i: chi i = Chi`_i by rewrite -tnth_nth.
-have inChi i: chi i \in Chi by exact: mem_tnth.
-have{irrChi} irrChi i: chi i \in irr H by exact: irrChi.
+have inChi i: chi i \in Chi by apply: mem_tnth.
+have{irrChi} irrChi i: chi i \in irr H by apply: irrChi.
 have eq_chi i j: (chi i == chi j) = (i == j).
   by rewrite /chi !(tnth_nth 0) nth_uniq ?size_tuple ?free_uniq.
 have dot_chi i j: '[chi i, chi j] = (i == j)%:R.
   rewrite -eq_chi; have [/irrP[{i}i ->] /irrP[{j}j ->]] := (irrChi i,irrChi j).
-  by rewrite cfdot_irr inj_eq //; exact: irr_inj.
+  by rewrite cfdot_irr inj_eq //; apply: irr_inj.
 pose F i j := chi i - chi j.
 have DF i j : F i j =  F i 0 - F j 0 by rewrite /F opprB addrA subrK.
 have ZF i j: F i j \in 'Z[Chi, L].
@@ -371,7 +322,7 @@ Lemma cfclass_Ind_irrP i j :
 Proof.
 move=> nsHG; have [sHG _] := andP nsHG.
 case: ifP (cfclass_Ind_cases j i nsHG) => [|_ Oji]; first by left.
-right=> eq_chijG; have /negP[]: 'Ind[G] 'chi_i != 0 by exact: Ind_irr_neq0.
+right=> eq_chijG; have /negP[]: 'Ind[G] 'chi_i != 0 by apply: Ind_irr_neq0.
 by rewrite -cfnorm_eq0 {1}eq_chijG Oji.
 Qed.
 
@@ -611,7 +562,7 @@ have CIr: i \in irr_constt ('Ind[G] 'chi_i1).
   by rewrite inE /= -Frobenius_reciprocity /= cfdotC conjC_eq0.
 have BsKi : B \subset cfker 'chi_i1.
   suff BsKri: B \subset cfker ('Res[C] 'chi_i).
-    by apply: (subset_trans BsKri); exact: (cfker_constt _ Hi1).
+    by apply: (subset_trans BsKri); apply: (cfker_constt _ Hi1).
   apply/subsetP=> g GiG.
   have F: g \in C by rewrite (subsetP (subset_trans BsD _)).
   rewrite cfkerEchar // inE F !cfResE //.

@@ -1,12 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype tuple finfun bigop finset.
-From mathcomp.fingroup
-Require Import fingroup action perm.
-Require Import primitive_action.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import tuple finfun bigop finset fingroup action perm primitive_action.
 
 (*   Application of the Burside formula to count the number of distinct       *)
 (* colorings of the vertices of a square and a cube.                          *)
@@ -120,7 +117,7 @@ Qed.
 Lemma rot_r1 : forall r, is_rot r -> r = r1 ^+ (r c0).
 Proof.
 move=> r hr;apply: rot_eq_c0 => //;apply/eqP.
-   by symmetry; exact: commuteX.
+   by symmetry; apply: commuteX.
 by case: (r c0); do 4?case => //=; rewrite ?permM !permE  /=.
 Qed.
 
@@ -304,12 +301,12 @@ Definition square_coloring_number4 := #|orbit to rotations @: setT|.
 Definition square_coloring_number8 := #|orbit to isometries @: setT|.
 
 Lemma Fid : 'Fix_to(1) = setT.
-Proof. apply/setP=> x /=; rewrite in_setT; apply/afix1P; exact: act1. Qed.
+Proof. by apply/setP=> x /=; rewrite in_setT; apply/afix1P; apply: act1. Qed.
 
 Lemma card_Fid : #|'Fix_to(1)| = (n ^ 4)%N.
 Proof.
 rewrite -[4]card_ord -[n]card_ord -card_ffun_on Fid cardsE.
-by symmetry; apply: eq_card => f; exact/ffun_onP.
+by symmetry; apply: eq_card => f; apply/ffun_onP.
 Qed.
 
 Definition coin0 (sc : col_squares) : colors := sc c0.
@@ -691,7 +688,7 @@ Qed.
 Definition sop (p : {perm cube}) : seq cube := val (val (val p)).
 
 Lemma sop_inj : injective sop.
-Proof. do 2!apply: (inj_comp val_inj); exact: val_inj. Qed.
+Proof. by do 2!apply: (inj_comp val_inj); apply: val_inj. Qed.
 
 Definition prod_tuple (t1 t2 : seq cube) :=
   map (fun n : 'I_6 => nth F0 t2 n) t1.
@@ -728,7 +725,7 @@ Definition seq_iso_L := [::
 Lemma seqs1 : forall f injf, sop (@perm _ f injf) = map f ecubes.
 Proof.
 move=> f ?; rewrite ecubes_def /sop /= -codom_ffun pvalE.
-apply: eq_codom; exact: permE.
+by apply: eq_codom; apply: permE.
 Qed.
 
 Lemma Lcorrect : seq_iso_L == map sop [:: id3; s05; s14; s23; r05; r14; r23;
@@ -741,7 +738,7 @@ Proof. by move=> p; rewrite /= !inE /= -!(eq_sym p). Qed.
 
 Lemma L_iso : forall p, (p \in dir_iso3) = (sop p \in seq_iso_L).
 Proof.
-move=> p; rewrite (eqP Lcorrect) mem_map ?iso0_1 //; exact: sop_inj.
+by move=> p; rewrite (eqP Lcorrect) mem_map ?iso0_1 //; apply: sop_inj.
 Qed.
 
 Lemma stable : forall x y,
@@ -831,7 +828,7 @@ Canonical iso_group3 := Group group_set_iso3.
 Lemma group_set_diso3 : group_set  dir_iso3.
 Proof.
 apply/group_setP;split;first by   rewrite inE eqxx /=.
-by exact:stable.
+by apply:stable.
 Qed.
 Canonical diso_group3 := Group group_set_diso3.
 
@@ -862,8 +859,8 @@ have -> : s3 = r05 * r14 * r05 by iso_tac.
 have -> : s4 = r05 * r14  * r14 * r14 * r05 by iso_tac.
 have -> : s5 = r14  * r05 * r05 by iso_tac.
 have -> : s6 = r05 * r05 * r14 by iso_tac.
-do ?case/predU1P=> [<-|]; first exact: group1; last (move/eqP => <-);
-   by rewrite ?groupMl ?mem_gen // !inE eqxx ?orbT.
+by do ?case/predU1P=> [<-|]; first exact: group1; last (move/eqP => <-);
+   rewrite ?groupMl ?mem_gen // !inE eqxx ?orbT.
 Qed.
 
 Notation col_cubes := {ffun cube -> colors}.
@@ -887,7 +884,7 @@ Proof. by apply/setP=> x /=; rewrite (sameP afix1P eqP) !inE act1 eqxx. Qed.
 Lemma card_Fid3 : #|'Fix_to_g[1]| = (n ^ 6)%N.
 Proof.
 rewrite -[6]card_ord -[n]card_ord -card_ffun_on Fid3 cardsT.
-by symmetry; apply: eq_card => ff; exact/ffun_onP.
+by symmetry; apply: eq_card => ff; apply/ffun_onP.
 Qed.
 
 Definition col0 (sc : col_cubes) : colors := sc F0.

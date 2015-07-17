@@ -1,13 +1,24 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg poly finset center.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action finalg zmodp.
+From mathcomp
 Require Import gfunctor gproduct cyclic commutator gseries nilpotent pgroup.
+From mathcomp
 Require Import sylow hall abelian maximal frobenius.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem vector.
+From mathcomp
 Require Import BGsection1 BGsection3 BGsection7 BGsection15 BGsection16.
+From mathcomp
 Require Import ssrnum ssrint algC classfun character inertia vcharacter.
+From mathcomp
 Require Import PFsection1 PFsection2 PFsection3 PFsection4 PFsection5.
+From mathcomp
 Require Import PFsection6 PFsection7 PFsection8 PFsection9 PFsection10.
 
 (******************************************************************************)
@@ -180,10 +191,10 @@ Let nH0M: M \subset 'N(H0).
 Proof. by have /andP[/maxgroupp/andP[]] := chiefH0. Qed.
 
 Let nsH0H : H0 <| H.
-Proof. by rewrite /normal sH0H (subset_trans (Fcore_sub _)). Qed.
+Proof. by rewrite /normal sH0H gFsub_trans. Qed.
 
 Let nsH0C_M : H0C <| M.
-Proof. by rewrite !normalY ?gFnormal /normal ?(subset_trans sH0H) ?gFsub. Qed.
+Proof. by rewrite normalY // /normal ?(subset_trans sH0H) ?gFsub. Qed.
 
 Let defH0C : H0 \x C = H0C.
 Proof.
@@ -206,7 +217,7 @@ have nH0_C := subset_trans sCM nH0M.
 have sH0C_HC: H0C \subset HC by apply: genS (setSU _ _).
 have defF: HC :=: 'F(M) by have [/dprodWY] := typeP_context MtypeP.
 have{defF} nilHC: nilpotent (HC / 1) by rewrite defF quotient_nil ?Fitting_nil.
-have /bounded_seqIndD_coherent-bounded_coh1 := scoh1.
+have /bounded_seqIndD_coherence-bounded_coh1 := scoh1.
 apply: bounded_coh1 nilHC cohH0C _; rewrite ?sub1G ?normal1 //.
 have[_ _ /= oHbar] := Ptype_Fcore_factor_facts maxM MtypeP notMtype5.
 rewrite -(index_sdprod defM) -divgS // -(dprod_card defHC) -(dprod_card defH0C).
@@ -220,17 +231,15 @@ Lemma bounded_proper_coherent H1 :
     (#|HU : H1| <= 2 * q * #|U : C| + 1)%N.
 Proof.
 move=> nsH1_M psH1_M' cohH1; have [nsHHU _ _ _ _] := sdprod_context defHU.
-rewrite -leC_nat natrD -ler_subl_addr.
-have ->: (2 * q * #|U : C|)%:R = 2%:R * #|M : HC|%:R * sqrtC #|HC : HC|%:R.
-  rewrite indexgg sqrtC1 mulr1 -mulnA natrM; congr (_ * _%:R).
-  apply/eqP; rewrite // -(eqn_pmul2l (cardG_gt0 HC)) Lagrange ?normal_sub //.
-  rewrite mulnCA -(dprod_card defHC) -mulnA (Lagrange (subsetIl _ _)).
-  by rewrite -(sdprod_card defM) -(sdprod_card defHU) mulnC.
-have ns_M: [/\ H1 <| M, H0C <| M, HC <| M & HC <| M] by [].
-case: (coherent_seqIndD_bound _ _ scoh1 ns_M) FTtype34_noncoherence => //.
-suffices /center_idP->: abelian (HC / H0C) by rewrite genS ?setSU. 
-suffices /isog_abelian->: HC / H0C \isog H / H0 by apply: abelem_abelian p _ _.
-by rewrite /= (joingC H0) isog_sym quotient_sdprodr_isog ?(dprodWsdC defHC).
+suffices: #|HU : H1|%:R - 1 <= 2%:R * #|M : HC|%:R * sqrtC #|HC : HC|%:R.
+  rewrite  indexgg sqrtC1 mulr1 -leC_nat natrD -ler_subl_addr -mulnA natrM.
+  congr (_ <= _ * _%:R); apply/eqP; rewrite -(eqn_pmul2l (cardG_gt0 HC)).
+  rewrite Lagrange ?normal_sub // mulnCA -(dprod_card defHC) -mulnA mulnC.
+  by rewrite Lagrange ?subsetIl // (sdprod_card defHU) (sdprod_card defM).
+apply/negP/(coherent_seqIndD_bound _ _ scoh1 _ _ _ FTtype34_noncoherence) => //.
+suffices /center_idP->: abelian (HC / H0C) by rewrite genS ?setSU.
+suffices /isog_abelian<-: Hbar \isog HC / H0C by apply: abelem_abelian abelHbar.
+by rewrite /= [`H0C]joingC quotient_sdprodr_isog ?(dprodWsdC defHC).
 Qed.
 
 (* This is Peterfalvi (11.5). *)
@@ -295,8 +304,8 @@ have{isomHU} defC: C :=: U'.
   by rewrite (dprodW defHC) -defM'' -quotient_der // -mulHU mul_subG ?normG.
 have{coH_UW1} defH0: H0 :=: H'.
   pose Hhat := (H / H')%g; pose Uhat := (U / H')%g; pose HUhat := (HU / H')%g.
-  have nH'H: H \subset 'N(H') := gFnorm _ _.
-  have nH'U: U \subset 'N(H') := char_norm_trans (der_char _ _) nHU.
+  have nH'H: H \subset 'N(H') by apply: gFnorm.
+  have nH'U: U \subset 'N(H') by apply: gFnorm_trans.
   apply/eqP; rewrite eqEsubset andbC.
   rewrite der1_min ?(abelem_abelian abelHbar) ?normal_norm //=.
   rewrite -quotient_sub1 /= -/H'; last exact: subset_trans sH0H nH'H.
@@ -342,7 +351,7 @@ suffices defRHpU: R \x ('O_p(H) <*> U) = HU.
 rewrite -(sdprodWY defHU) -[in RHS](dprodWY defRHp) -joingA.
 have [_ _ cRHp tiRHp] := dprodP defRHp.
 rewrite dprodEY //= -/R; first by rewrite join_subG cRHp centsC.
-rewrite joingC (norm_joinEl (char_norm_trans (pcore_char p H) nHU)).
+rewrite joingC norm_joinEl 1?gFnorm_trans //.
 by rewrite -(setIidPl sRH) -setIA -group_modr ?gFsub // tiHU mul1g.
 Qed.
 
@@ -441,7 +450,7 @@ have{pHhat} gal'M: ~~ typeP_Galois MtypeP.
   rewrite minUHbar //= -/Hbar -?fHhat 1?morphim_injm_eq1 ?morphimS // -subG1.
   rewrite quotient_sub1 ?(normal_norm nsH0hatZ) // not_esHhat -['Z(_)]cosetpreK.
   rewrite im_f ?sub_cosetpre_quo // quotient_norms ?norm_quotient_pre //.
-  by rewrite (char_norm_trans (center_char _)) ?quotient_norms.
+  by rewrite gFnorm_trans ?quotient_norms.
 have [H1 []] := typeP_Galois_Pn maxM notMtype5 gal'M.
 rewrite def_p => oH1 nH1Ubar _ /bigdprodWY-defHbar _.
 have /cyclicP[xbar defH1]: cyclic H1 by rewrite prime_cyclic ?oH1.
@@ -1081,7 +1090,7 @@ have bridgeS1: {in S1, forall zeta, eq_proj_eta (tau (bridge0 zeta)) eta0row}.
     rewrite -Dtau1 ?zcharD1_seqInd //.
     rewrite cfdot_suml big_map big1_seq // => _ /(cycTIirrP defW)[i [j ->]].
     apply/eqP; rewrite cfdotC fmorph_eq0 cfdotZr raddfB cfdotBl.
-    by rewrite !o_tau1_eta ?cfAut_seqInd ?irr_aut // subrr mulr0.
+    by rewrite !o_tau1_eta ?cfAut_seqInd ?cfAut_irr // subrr mulr0.
   have a2_ge0 i j: 0 <= a_ i j ^+ 2 by rewrite -realEsqr Creal_Cint.
   have a11_0: a11 = 0.
     have: ('[X] < (2 * q.-1)%:R).

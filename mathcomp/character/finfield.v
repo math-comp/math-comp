@@ -1,23 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype tuple bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism action.
-From mathcomp.algebra
-Require Import ssralg poly polydiv finalg zmodp cyclic.
-From mathcomp.algebra
-Require Import matrix vector.
-From mathcomp.solvable
-Require Import center pgroup abelian.
-From mathcomp.field
-Require Import falgebra fieldext separable galois.
-Require Import mxabelem.
-
-From mathcomp.algebra Require ssrnum ssrint.
-From mathcomp.field Require algC cyclotomic.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype div.
+From mathcomp
+Require Import tuple bigop prime finset fingroup ssralg poly polydiv.
+From mathcomp
+Require Import morphism action finalg zmodp cyclic center pgroup abelian.
+From mathcomp
+Require Import matrix mxabelem vector falgebra fieldext separable galois.
+Require ssrnum ssrint algC cyclotomic.
 
 (******************************************************************************)
 (*  Additional constructions and results on finite fields.                    *)
@@ -498,7 +489,7 @@ have [p p_pr charRp]: exists2 p, prime p & p \in [char R].
   rewrite big_seq; elim/big_rec: _ => [|[p m] /= n]; first by rewrite oner_eq0.
   case/mem_prime_decomp=> p_pr _ _ IHn.
   elim: m => [|m IHm]; rewrite ?mul1n {IHn}// expnS -mulnA natrM.
-  by case/eqP/domR/orP=> //; exists p; last exact/andP.
+  by case/eqP/domR/orP=> //; exists p; last apply/andP.
 pose Rp := PrimeCharType charRp; pose L : {vspace Rp} := fullv.
 pose G := [set: {unit R}]; pose ofG : {unit R} -> Rp := val.
 pose projG (E : {vspace Rp}) := [preim ofG of E].

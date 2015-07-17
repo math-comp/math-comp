@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg poly finset fingroup.
+From mathcomp
 Require Import morphism perm automorphism quotient action gfunctor gproduct.
+From mathcomp
 Require Import center commutator zmodp cyclic pgroup nilpotent hall frobenius.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation vector ssrnum algC classfun.
+From mathcomp
 Require Import character inertia vcharacter PFsection1 PFsection2 PFsection3.
 
 (******************************************************************************)
@@ -649,7 +656,7 @@ rewrite (card_afix_irr_classes Lz actsL_KK) => [|k x y Kx /=]; last first.
 apply: leq_trans (subset_leq_card _) (leq_imset_card (class^~ K) _).
 apply/subsetP=> _ /setIP[/imsetP[x Kx ->] /afix1P/normP nxKz].
 suffices{Kx} /pred0Pn[t /setIP[xKt czt]]: #|'C_(x ^: K)[z]| != 0%N.
-  rewrite -(class_transr xKt); apply: mem_imset; have [y Ky Dt] := imsetP xKt.
+  rewrite -(class_eqP xKt); apply: mem_imset; have [y Ky Dt] := imsetP xKt.
   by rewrite -(@prKW1 z) ?(czt, inE) ?ntz // Dt groupJ.
 have{coKp}: ~~ (p %| #|K|) by rewrite -prime_coprime // coprime_sym.
 apply: contraNneq => /(congr1 (modn^~ p))/eqP; rewrite mod0n.
@@ -776,7 +783,7 @@ Lemma prDade_irr_on k :
 Proof.
 move=> kerH'i; apply/cfun_onP=> g; rewrite !inE => /norP[ntg A'g].
 have [Kg | /cfun0-> //] := boolP (g \in K).
-apply: not_in_ker_char0 (normalS _ _ nsHL) kerH'i _ => //.
+apply: irr_reg_off_ker_0 (normalS _ _ nsHL) kerH'i _ => //.
 apply/trivgP/subsetP=> h /setIP[Hh cgh]; apply: contraR A'g => nth.
 apply/(subsetP sIH_A)/bigcupP; exists h; first exact/setDP.
 by rewrite 3!inE ntg Kg cent1C.
@@ -894,7 +901,7 @@ Qed.
 (* in part (a).                                                               *)
 Theorem uniform_prTIred_coherent k (calT := uniform_prTIred_seq ptiWL k) :
     k != 0 ->
-  (*a*) [/\ pairwise_orthogonal calT, ~~ has cfReal calT, conjC_closed calT,
+  (*a*) [/\ pairwise_orthogonal calT, ~~ has cfReal calT, cfConjC_closed calT,
             'Z[calT, L^#] =i 'Z[calT, A]
           & exists2 psi, psi != 0 & psi \in 'Z[calT, A]]
   (*b*) /\ (exists2 tau1 : {linear 'CF(L) -> 'CF(G)},
@@ -903,7 +910,7 @@ Theorem uniform_prTIred_coherent k (calT := uniform_prTIred_seq ptiWL k) :
         /\ {in 'Z[calT, L^#], tau1 =1 tau}).
 Proof.
 have uniqT: uniq calT by apply/dinjectiveP; apply: in2W; apply: prTIred_inj.
-have sTmu: {subset calT <= codom mu_} by exact: image_codom.
+have sTmu: {subset calT <= codom mu_} by apply: image_codom.
 have oo_mu: pairwise_orthogonal (codom mu_).
   apply/pairwise_orthogonalP; split=> [|_ _ /codomP[j1 ->] /codomP[j2 ->]].
     apply/andP; split; last by apply/injectiveP; apply: prTIred_inj.
@@ -911,7 +918,7 @@ have oo_mu: pairwise_orthogonal (codom mu_).
   by rewrite cfdot_prTIred; case: (j1 =P j2) => // -> /eqP.
 have real'T: ~~ has cfReal calT.
   by apply/hasPn=> _ /imageP[j /andP[nzj _] ->]; apply: prTIred_not_real.
-have ccT: conjC_closed calT.
+have ccT: cfConjC_closed calT.
   move=> _ /imageP[j Tj ->]; rewrite -prTIred_aut image_f // inE aut_Iirr_eq0.
   by rewrite prTIred_aut cfunE conj_Cnat ?Cnat_char1 ?prTIred_char.
 have TonA: 'Z[calT, L^#] =i 'Z[calT, A].
@@ -938,7 +945,7 @@ have iso_f1: {in codom mu_, isometry f1, to 'Z[irr G]}.
   rewrite !f1mu cfdotZl cfdotZr rmorph_sign signrMK !cfdot_suml.
   apply: eq_bigr => i1 _; rewrite !cfdot_sumr; apply: eq_bigr => i2 _.
   by rewrite cfdot_cycTIiso cfdot_prTIirr.
-have [tau1 Dtau1 Itau1] := Zisometry_of_iso oo_mu iso_f1.
+have [tau1 Dtau1 Itau1] := Zisometry_of_iso (orthogonal_free oo_mu) iso_f1.
 exists tau1 => [j|]; first by rewrite Dtau1 ?codom_f ?f1mu.
 split=> [|psi]; first by apply: sub_iso_to Itau1 => //; apply: zchar_subset.
 rewrite zcharD1E => /andP[/zchar_expansion[//|z _ Dpsi] /eqP psi1_0].

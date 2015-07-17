@@ -1,14 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
-From mathcomp.discrete
-Require Import div fintype bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm action quotient gproduct.
-From mathcomp.algebra
-Require Import cyclic.
-Require Import center pgroup nilpotent sylow hall abelian.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat div fintype bigop prime.
+From mathcomp
+Require Import finset fingroup morphism perm action quotient gproduct.
+From mathcomp
+Require Import cyclic center pgroup nilpotent sylow hall abelian.
 
 (******************************************************************************)
 (*  Definition of Frobenius groups, some basic results, and the Frobenius     *)
@@ -19,8 +16,7 @@ Require Import center pgroup nilpotent sylow hall abelian.
 (*       condition.                                                           *)
 (*    semiprime K H <->                                                       *)
 (*       the internal action of H on K is "prime", i.e., an element of K that *)
-(*       centralises a nontrivial element of H must actually centralise all   *)
-(*       of H.                                                                *)
+(*       centralises a nontrivial element of H must centralise all of H.      *)
 (*    normedTI A G L <=>                                                      *)
 (*       A is nonempty, strictly disjoint from its conjugates in G, and has   *)
 (*       normaliser L in G.                                                   *)
@@ -36,8 +32,8 @@ Require Import center pgroup nilpotent sylow hall abelian.
 (*       G is (isomorphic to) a Frobenius group with complement H; same as    *)
 (*       above, but without the semi-direct product. The proof that this form *)
 (*       is equivalent to the above (i.e., the existence of Frobenius         *)
-(*       kernels) requires chareacter theory and will only be proved in the   *)
-(*       vcharacter module.                                                   *)
+(*       kernels) requires character theory and will only be proved in the    *)
+(*       vcharacter.v file.                                                   *)
 (*    [Frobenius G] <=> G is a Frobenius group.                               *)
 (*    Frobenius_action G H S to <->                                           *)
 (*       The action to of G on S defines an isomorphism of G with a           *)
@@ -306,7 +302,7 @@ Lemma Frobenius_actionP G H :
 Proof.
 apply: (iffP andP) => [[neqHG] | [sT S to [ffulG transG regG ntH [u Su defH]]]].
   case/normedTI_P=> nzH /subsetIP[sHG _] tiHG.
-  suffices: Frobenius_action G H (rcosets H G) 'Rs by exact: HasFrobeniusAction.
+  suffices: Frobenius_action G H (rcosets H G) 'Rs by apply: HasFrobeniusAction.
   pose Hfix x := 'Fix_(rcosets H G | 'Rs)[x].
   have regG: {in G^#, forall x, #|Hfix x| <= 1}.
     move=> x /setD1P[ntx Gx].
@@ -314,12 +310,12 @@ apply: (iffP andP) => [[neqHG] | [sT S to [ffulG transG regG ntH [u Su defH]]]].
     rewrite -(cards1 Hy) => /setIP[/imsetP[y Gy ->{Hy}] cHyx].
     apply/subset_leq_card/subsetP=> _ /setIP[/imsetP[z Gz ->] cHzx].
     rewrite -!sub_astab1 !astab1_act !sub1set astab1Rs in cHyx cHzx *.
-    rewrite !rcosetE; apply/set1P/rcoset_transl; rewrite mem_rcoset.
+    rewrite !rcosetE; apply/set1P/rcoset_eqP; rewrite mem_rcoset.
     apply: tiHG; [by rewrite !in_group | apply/pred0Pn; exists (x ^ y^-1)].
     by rewrite conjD1g !inE conjg_eq1 ntx -mem_conjg cHyx conjsgM memJ_conjg.
   have ntH: H :!=: 1 by rewrite -subG1 -setD_eq0.
   split=> //; first 1 last; first exact: transRs_rcosets.
-    by exists (H : {set gT}); rewrite ?orbit_refl // astab1Rs (setIidPr sHG).
+    by exists (val H); rewrite ?orbit_refl // astab1Rs (setIidPr sHG).
   apply/subsetP=> y /setIP[Gy cHy]; apply: contraR neqHG => nt_y.
   rewrite (index1g sHG) //; apply/eqP; rewrite eqn_leq indexg_gt0 andbT.
   apply: leq_trans (regG y _); last by rewrite setDE 2!inE Gy nt_y /=.
@@ -351,7 +347,7 @@ Lemma FrobeniusWcompl : [Frobenius G with complement H].
 Proof. by case/andP: frobG. Qed.
 
 Lemma FrobeniusW : [Frobenius G].
-Proof. by apply/existsP; exists H; exact: FrobeniusWcompl. Qed.
+Proof. by apply/existsP; exists H; apply: FrobeniusWcompl. Qed.
 
 Lemma Frobenius_context :
   [/\ K ><| H = G, K :!=: 1, H :!=: 1, K \proper G & H \proper G].
@@ -408,7 +404,7 @@ by rewrite inE (subsetP (Frobenius_cent1_ker K1y)) // inE cent1C (subsetP sHG).
 Qed.
 
 Lemma Frobenius_reg_compl : semiregular H K.
-Proof. by apply: semiregular_sym; exact: Frobenius_reg_ker. Qed.
+Proof. by apply: semiregular_sym; apply: Frobenius_reg_ker. Qed.
 
 Lemma Frobenius_dvd_ker1 : #|H| %| #|K|.-1.
 Proof.
@@ -490,11 +486,11 @@ Qed.
 
 Lemma Frobenius_ker_dvd_ker1 G K :
   [Frobenius G with kernel K] -> #|G : K| %| #|K|.-1.
-Proof. case/existsP=> H; exact: Frobenius_index_dvd_ker1. Qed.
+Proof. by case/existsP=> H; apply: Frobenius_index_dvd_ker1. Qed.
 
 Lemma Frobenius_ker_coprime G K :
   [Frobenius G with kernel K] -> coprime #|K| #|G : K|.
-Proof. case/existsP=> H; exact: Frobenius_index_coprime. Qed.
+Proof. by case/existsP=> H; apply: Frobenius_index_coprime. Qed.
 
 Lemma Frobenius_semiregularP G K H :
     K ><| H = G -> K :!=: 1 -> H :!=: 1 ->
@@ -547,7 +543,7 @@ move=> ntH1 sH1H frobG; have [defG ntK _ _ _] := Frobenius_context frobG.
 apply/Frobenius_semiregularP=> //.
   have [_ _ /(subset_trans sH1H) nH1K tiHK] := sdprodP defG.
   by rewrite sdprodEY //; apply/trivgP; rewrite -tiHK setIS.
-by apply: sub_in1 (Frobenius_reg_ker frobG); exact/subsetP/setSD.
+by apply: sub_in1 (Frobenius_reg_ker frobG); apply/subsetP/setSD.
 Qed.
 
 Lemma Frobenius_kerP G K :
@@ -557,7 +553,7 @@ Lemma Frobenius_kerP G K :
 Proof.
 apply: (iffP existsP) => [[H frobG] | [ntK ltKG nsKG regK]].
   have [/sdprod_context[nsKG _ _ _ _] ntK _ ltKG _] := Frobenius_context frobG.
-  by split=> //; exact: Frobenius_cent1_ker frobG.
+  by split=> //; apply: Frobenius_cent1_ker frobG.
 have /andP[sKG nKG] := nsKG.
 have hallK: Hall G K.
   rewrite /Hall sKG //= coprime_sym coprime_pi' //.
@@ -568,7 +564,7 @@ have hallK: Hall G K.
   have /trivgPn[z]: P :&: K :&: 'Z(P) != 1.
     by rewrite meet_center_nil ?(pgroup_nil pP) ?(normalGI sPG nsKG).
   rewrite !inE -andbA -sub_cent1=> /and4P[_ Kz _ cPz] ntz.
-  by apply: subset_trans (regK z _); [exact/subsetIP | exact/setD1P].
+  by apply: subset_trans (regK z _); [apply/subsetIP | apply/setD1P].
 have /splitsP[H /complP[tiKH defG]] := SchurZassenhaus_split hallK nsKG.
 have [_ sHG] := mulG_sub defG; have nKH := subset_trans sHG nKG. 
 exists H; apply/Frobenius_semiregularP; rewrite ?sdprodE //.
@@ -604,7 +600,7 @@ Proof.
 move=> defG FrobG.
 have partG: partition (gval K |: (H^# :^: K)) G.
   apply: Frobenius_partition; apply/andP; rewrite defG; split=> //.
-  by apply/Frobenius_actionP; exact: HasFrobeniusAction FrobG.
+  by apply/Frobenius_actionP; apply: HasFrobeniusAction FrobG.
 have{FrobG} [ffulG transG regG ntH [u Su defH]]:= FrobG.
 apply/setP=> x; rewrite !inE; have [-> | ntx] := altP eqP; first exact: group1. 
 rewrite /= -(cover_partition partG) /cover.
@@ -677,7 +673,8 @@ Qed.
 Lemma injm_Frobenius_ker K sGD injf : 
   [Frobenius G with kernel K] -> [Frobenius f @* G with kernel f @* K].
 Proof.
-case/existsP=> H frobG; apply/existsP; exists (f @* H)%G; exact: injm_Frobenius.
+case/existsP=> H frobG; apply/existsP.
+by exists (f @* H)%G; apply: injm_Frobenius.
 Qed.
 
 Lemma injm_Frobenius_group sGD injf : [Frobenius G] -> [Frobenius f @* G].
@@ -698,7 +695,7 @@ rewrite ltnS oG mulnK // => leqm.
 have:= q_gt0; rewrite leq_eqVlt => /predU1P[q1 | lt1q].
   rewrite -(mul1n n) q1 -oG (setIidPl _) //.
   by apply/subsetP=> x Gx; rewrite inE -order_dvdn order_dvdG.
-pose p := pdiv q; have pr_p: prime p by exact: pdiv_prime.
+pose p := pdiv q; have pr_p: prime p by apply: pdiv_prime.
 have lt1p: 1 < p := prime_gt1 pr_p; have p_gt0 := ltnW lt1p.
 have{leqm} lt_qp_mq: q %/ p < mq by apply: leq_trans leqm; rewrite ltn_Pdiv.
 have: n %| #|'Ldiv_(p * n)(G)|.

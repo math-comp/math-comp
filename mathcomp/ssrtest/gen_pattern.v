@@ -1,4 +1,6 @@
-Require Import ssreflect ssrbool ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrnat.
 
 Notation "( a 'in' c )" := (a + c) (only parsing) : myscope.
 Delimit Scope myscope with myscope.

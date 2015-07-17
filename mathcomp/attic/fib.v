@@ -1,5 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+From mathcomp
 Require Import bigop div prime finfun tuple ssralg zmodp matrix binomial.
 
 (*****************************************************************************)
@@ -106,7 +109,7 @@ Proof.
 move=> m n; elim: n=> [|[|n] IH]; first by case: m.
   by case: m{IH}=> [|[]].
 rewrite fibSS leq_eqVlt; case/orP=>[|Hm]; first by move/eqP->.
-by apply: (leq_trans (IH _)) => //; exact: leq_addr.
+by apply: (leq_trans (IH _)) => //; apply: leq_addr.
 Qed.
 
 Lemma fib_eq1 : forall n, (fib n == 1) = ((n == 1) || (n == 2)).
@@ -119,7 +122,7 @@ Lemma fib_eq : forall m n,
   (fib m == fib n) = [|| m == n, (m == 1) && (n == 2) | (m == 2) && (n == 1)].
 Proof.
 move=> m n; wlog: m n/ m <= n=> [HH|].
-  case/orP: (leq_total m n)=> Hm; first by exact: HH.
+  case/orP: (leq_total m n)=> Hm; first by apply: HH.
   by rewrite eq_sym HH // eq_sym ![(_ == 1) && _]andbC [(_ && _) || _] orbC.
 rewrite leq_eqVlt; case/orP=>[|]; first by move/eqP->; rewrite !eqxx.
 case: m=> [|[|m]] Hm.
@@ -170,8 +173,8 @@ Qed.
 Lemma gcdn_fib: forall m n, gcdn (fib m) (fib n) = fib (gcdn m n).
 Proof.
 move=> m n; apply: gcdn_def.
-- by apply: dvdn_fib; exact: dvdn_gcdl.
-- by apply: dvdn_fib; exact: dvdn_gcdr.
+- by apply: dvdn_fib; apply: dvdn_gcdl.
+- by apply: dvdn_fib; apply: dvdn_gcdr.
 move=> d' Hdm Hdn.
 case: m Hdm=> [|m Hdm]; first by rewrite gcdnE eqxx.
 have F: 0 < m.+1 by [].

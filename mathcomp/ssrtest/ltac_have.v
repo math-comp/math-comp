@@ -1,4 +1,6 @@
-Require Import ssreflect ssrbool ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrnat.
 
 Ltac SUFF1 h t := suff h x (p := x < 0) : t.
 Ltac SUFF2 h t := suff h x (p := x < 0) : t by apply h.

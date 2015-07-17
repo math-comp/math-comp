@@ -1,8 +1,14 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div fintype finset.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq div fintype finset.
+From mathcomp
 Require Import prime fingroup morphism automorphism quotient gproduct gfunctor.
+From mathcomp
 Require Import cyclic center commutator pgroup nilpotent sylow abelian hall.
+From mathcomp
 Require Import maximal.
+From mathcomp
 Require Import BGsection1 BGappendixAB.
 
 (******************************************************************************)
@@ -51,8 +57,8 @@ Theorem Puig_center_p'core_normal p G S :
   odd #|G| -> solvable G -> p.-Sylow(G) S -> 'O_p^'(G) * 'Z('L(S)) <| G.
 Proof.
 move=> oddG solG sylS; rewrite -{2}(Puig_factorisation _ _ sylS) //.
-have sZL_G := subset_trans (char_sub (center_Puig_char S)) (pHall_sub sylS).
-rewrite -!quotientK ?(subset_trans _ (gFnorm _ _)) ?subsetIl //.
+have sZL_G: 'Z('L(S)) \subset G by rewrite !gFsub_trans ?(pHall_sub sylS).
+rewrite -!quotientK ?(subset_trans sZL_G) ?subIset ?gFnorm //=.
 by rewrite cosetpre_normal quotient_normal // normalSG.
 Qed.
 
@@ -68,7 +74,7 @@ Lemma coprime_der1_sdprod K H G :
 Proof.
 case/sdprodP=> _ defG nKH tiKH coKH solK sKG'.
 set K' := K^`(1); have [sK'K nK'K] := andP (der_normal 1 K : K' <| K).
-have nK'H: H \subset 'N(K') := char_norm_trans (der_char 1 K) nKH.
+have nK'H: H \subset 'N(K') := gFnorm_trans _ nKH.
 set R := [~: K, H]; have sRK: R \subset K by rewrite commg_subl.
 have [nRK nRH] := joing_subP (commg_norm K H : K <*> H \subset 'N(R)). 
 have sKbK'H': K / R \subset (K / R)^`(1) * (H / R)^`(1).
@@ -98,7 +104,7 @@ Lemma prime_nil_der1_factor G :
 Proof.
 move=> nilG' /=; set G' := G^`(1); set p := #|G / G'| => p_pr.
 have nsG'G: G' <| G := der_normal 1 G; have [sG'G nG'G] := andP nsG'G.
-have nsG'p'G: 'O_p^'(G') <| G := char_normal_trans (pcore_char _ _) nsG'G.
+have nsG'p'G: 'O_p^'(G') <| G := gFnormal_trans _ nsG'G.
 have nG'p'G := normal_norm nsG'p'G; have solG' := nilpotent_sol nilG'.
 have{nilG'} pGb: p.-group (G / 'O_p^'(G')).
   rewrite /pgroup card_quotient -?(Lagrange_index sG'G (pcore_sub _ _)) //=.
@@ -183,7 +189,7 @@ apply/eqP; rewrite eqEsubset mul_subG ?setISS ?cent_sub //=.
 apply/subsetP=> g /setIP[Gg /normP nHg].
 have [|c Cc [u Uu defg]] := pprod_trans_coprime Gg; first by rewrite nHg.
 rewrite defg mem_mulg // !inE Uu -{2}nHg defg conjsgM conjSg (normP _) //=.
-by case/setIP: Cc => _; exact: (subsetP (cent_sub H)).
+by case/setIP: Cc => _; apply: (subsetP (cent_sub H)).
 Qed.
 
 End PprodSubCoprime.
@@ -194,10 +200,10 @@ Variables (p : nat) (G S : {group gT}).
 Hypotheses (sylS : p.-Sylow(G) S) (pl1G : p.-length_1 G).
 Let K := 'O_p^'(G).
 Let sSG : S \subset G. Proof. by case/andP: sylS. Qed.
-Let nsKG : K <| G. Proof. exact: pcore_normal. Qed.
+Let nsKG : K <| G. Proof. apply: pcore_normal. Qed.
 Let sKG : K \subset G. Proof. by case/andP: nsKG. Qed.
 Let nKG : G \subset 'N(K). Proof. by case/andP: nsKG. Qed.
-Let nKS : S \subset 'N(K). Proof. exact: subset_trans sSG nKG. Qed.
+Let nKS : S \subset 'N(K). Proof. apply: subset_trans sSG nKG. Qed.
 Let coKS : coprime #|K| #|S|.
 Proof. exact: p'nat_coprime (pcore_pgroup _ G) (pHall_pgroup sylS). Qed.
 Let sSN : S \subset 'N_G(S). Proof. by rewrite subsetI sSG normG. Qed.

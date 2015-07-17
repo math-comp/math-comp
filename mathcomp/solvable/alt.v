@@ -1,14 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div fintype tuple finfun bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm automorphism quotient action.
-From mathcomp.algebra
-Require Import cyclic.
-Require Import pgroup gseries sylow primitive_action.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div fintype tuple.
+From mathcomp
+Require Import tuple bigop prime finset fingroup morphism perm automorphism.
+From mathcomp
+Require Import quotient action cyclic pgroup gseries sylow primitive_action.
 
 (******************************************************************************)
 (*  Definitions of the symmetric and alternate groups, and some properties.   *)
@@ -189,10 +186,10 @@ have FF (H : {group {perm T}}): H <| 'Alt_T -> H :<>: 1 -> 20 %| #|H|.
 - move=> Hh1 Hh3.
   have [x _]: exists x, x \in T by apply/existsP/eqP; rewrite oT.
   have F2 := Alt_trans T; rewrite oT /= in F2.
-  have F3: [transitive 'Alt_T, on setT | 'P] by exact: ntransitive1 F2.
-  have F4: [primitive 'Alt_T, on setT | 'P] by exact: ntransitive_primitive F2.
+  have F3: [transitive 'Alt_T, on setT | 'P] by apply: ntransitive1 F2.
+  have F4: [primitive 'Alt_T, on setT | 'P] by apply: ntransitive_primitive F2.
   case: (prim_trans_norm F4 Hh1) => F5.
-    case: Hh3; apply/trivgP; exact: subset_trans F5 (aperm_faithful _).
+    by case: Hh3; apply/trivgP; apply: subset_trans F5 (aperm_faithful _).
   have F6: 5 %| #|H| by rewrite -oT -cardsT (atrans_dvd F5).
   have F7: 4 %| #|H|.
     have F7: #|[set~ x]| = 4 by rewrite cardsC1 oT.
@@ -206,10 +203,10 @@ have FF (H : {group {perm T}}): H <| 'Alt_T -> H :<>: 1 -> 20 %| #|H|.
       exact: ntransitive1 F9.
     have F11: [primitive Gx, on [set~ x] | 'P].
       exact: ntransitive_primitive F9.
-    have F12: K \subset Gx by apply: setSI; exact: normal_sub.
+    have F12: K \subset Gx by apply: setSI; apply: normal_sub.
     have F13: K <| Gx by rewrite /(K <| _) F12 normsIG // normal_norm.
     case: (prim_trans_norm F11 F13) => Ksub; last first.
-      apply: dvdn_trans (cardSg F8); rewrite -F7; exact: atrans_dvd Ksub.
+      by apply: dvdn_trans (cardSg F8); rewrite -F7; apply: atrans_dvd Ksub.
     have F14: [faithful Gx, on [set~ x] | 'P].
       apply/subsetP=> g; do 2![case/setIP] => Altg cgx cgx'.
       apply: (subsetP (aperm_faithful 'Alt_T)).
@@ -293,7 +290,7 @@ Lemma rfd_funP (p : {perm T}) (u : T') :
   let p1 := if p x == x then p else 1 in p1 (val u) != x.
 Proof.
 case: (p x =P x) => /= [pxx|_]; last by rewrite perm1 (valP u).
-by rewrite -{2}pxx (inj_eq (@perm_inj _ p)); exact: (valP u).
+by rewrite -{2}pxx (inj_eq (@perm_inj _ p)); apply: (valP u).
 Qed.
 
 Definition rfd_fun p := [fun u => Sub ((_ : {perm T}) _) (rfd_funP p u) : T'].
@@ -366,7 +363,7 @@ have Hcp1: #|[set x | p1 x != x]| <= n.
   by move: Hp; rewrite (cardD1 x1) inE Hx1.
 have ->: p = p1 * tperm x1 (p x1) by rewrite -mulgA tperm2 mulg1.
 rewrite odd_permM odd_tperm eq_sym Hx1 morphM; last 2 first.
-- by rewrite 2!inE; exact/astab1P.
+- by rewrite 2!inE; apply/astab1P.
 - by rewrite 2!inE; apply/astab1P; rewrite -{1}Hpx /= /aperm -permM.
 rewrite odd_permM Hrec //=; congr (_ (+) _).
 pose x2 : T' := Sub x1 nx1x; pose px2 : T' := Sub (p x1) npx1x.
@@ -441,7 +438,7 @@ have F11: [primitive Gx, on [set~ x] | 'P].
 have F12: K \subset Gx by rewrite setSI // normal_sub.
 have F13: K <| Gx by apply/andP; rewrite normsIG.
 have:= prim_trans_norm F11; case/(_ K) => //= => Ksub; last first.
-  have F14: Gx * H = 'Alt_T by exact/(subgroup_transitiveP _ _ F3).
+  have F14: Gx * H = 'Alt_T by apply/(subgroup_transitiveP _ _ F3).
   have: simple Gx.
     by rewrite (isog_simple (rfd_iso x)) Hrec //= card_sig cardC1 Hde.
   case/simpleP=> _ simGx; case/simGx: F13 => /= HH2.
@@ -470,7 +467,7 @@ have Hreg g z: g \in H -> g z = z -> g = 1.
   by rewrite memJ_norm ?(subsetP nH).
 clear K F8 F12 F13 Ksub F14.
 have Hcard: 5 < #|H|.
-  apply: (leq_trans oT); apply dvdn_leq; first by exact: cardG_gt0.
+  apply: (leq_trans oT); apply dvdn_leq; first by apply: cardG_gt0.
   by rewrite -cardsT (atrans_dvd F5).
 case Eh: (pred0b [predD1 H & 1]).
   by move: Hcard; rewrite /pred0b in Eh; rewrite (cardD1 1) group1 (eqP Eh).
@@ -491,7 +488,7 @@ case diff_gx_hx: (g x == h x).
   by rewrite permM -(eqP diff_gx_hx) -permM mulgV perm1.
 case diff_hgx_x: ((h * g) x == x).
   case/negP: diff_h1_g; apply/eqP; apply: (mulgI h); rewrite !gsimp.
-  by apply: (Hreg _ x); [exact: groupM | apply/eqP].
+  by apply: (Hreg _ x); [apply: groupM | apply/eqP].
 case diff_hgx_hx: ((h * g) x == h x).
   case/negP: diff_1_g; apply/eqP.
   by apply: (Hreg _ (h x)) => //; apply/eqP; rewrite -permM.

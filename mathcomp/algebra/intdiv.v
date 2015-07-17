@@ -1,13 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop prime.
-From mathcomp.fingroup
-Require Import perm.
-Require Import ssralg poly ssrnum ssrint rat.
-Require Import polydiv finalg zmodp matrix mxalgebra vector.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
+Require Import fintype tuple finfun bigop prime ssralg poly ssrnum ssrint rat.
+From mathcomp
+Require Import polydiv finalg perm zmodp matrix mxalgebra vector.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)
@@ -489,7 +487,7 @@ have [-> | m_gt0] := posnP m; first by rewrite modz0.
 case: n => n; first by rewrite modz_nat gcdn_modr.
 rewrite modNz_nat // NegzE abszN {2}(divn_eq n m) -addnS gcdnMDl.
 rewrite -addrA -opprD -intS /=; set m1 := _.+1.
-have le_m1m: (m1 <= m)%N by exact: ltn_pmod.
+have le_m1m: (m1 <= m)%N by apply: ltn_pmod.
 by rewrite subzn // !(gcdnC m) -{2 3}(subnK le_m1m) gcdnDl gcdnDr gcdnC.
 Qed.
 
@@ -851,13 +849,13 @@ Qed.
 Local Notation pZtoQ := (map_poly (intr : int -> rat)).
 
 Lemma size_rat_int_poly p : size (pZtoQ p) = size p.
-Proof. by apply: size_map_inj_poly; first exact: intr_inj. Qed.
+Proof. by apply: size_map_inj_poly; first apply: intr_inj. Qed.
 
 Lemma rat_poly_scale (p : {poly rat}) :
   {q : {poly int} & {a | a != 0 & p = a%:~R^-1 *: pZtoQ q}}.
 Proof.
 pose a := \prod_(i < size p) denq p`_i.
-have nz_a: a != 0 by apply/prodf_neq0=> i _; exact: denq_neq0.
+have nz_a: a != 0 by apply/prodf_neq0=> i _; apply: denq_neq0.
 exists (map_poly numq (a%:~R *: p)), a => //.
 apply: canRL (scalerK _) _; rewrite ?intr_eq0 //.
 apply/polyP=> i; rewrite !(coefZ, coef_map_id0) // numqK // Qint_def mulrC.
@@ -927,7 +925,7 @@ wlog [j a'Mij]: m n M i Da le_mn / {j | ~~ (a %| M i j)%Z}; last first.
   have{leA} ltA: (`|b| < A)%N.
     rewrite -ltnS (leq_trans _ leA) // ltnS ltn_neqAle andbC.
     rewrite dvdn_leq ?absz_gt0 ? dvdn_gcdl //=.
-    by rewrite (contraNneq _ a'Mij) ?dvdzE // => <-; exact: dvdn_gcdr.
+    by rewrite (contraNneq _ a'Mij) ?dvdzE // => <-; apply: dvdn_gcdr.
   pose t2 := [fun j : 'I_2 => [tuple _; _]`_j : int]; pose a1 := M i 1.
   pose Uul := \matrix_(k, j) t2 (t2 u (- (a1 %/ b)%Z) j) (t2 v (a %/ b)%Z j) k.
   pose U : 'M_(2 + n) := block_mx Uul 0 0 1%:M; pose M1 := M *m U.
@@ -995,7 +993,7 @@ exists (block_mx 1 0 Ml L).
 exists (block_mx 1 Mu 0 R).
   by rewrite unitmxE det_ublock det_scalar1 mul1r.
 exists (1 :: d); set D1 := \matrix_(i, j) _ in dM1.
-  by rewrite /= path_min_sorted // => g _; exact: dvd1n.
+  by rewrite /= path_min_sorted // => g _; apply: dvd1n.
 rewrite [D in _ *m D *m _](_ : _ = block_mx 1 0 0 D1); last first.
   by apply/matrixP=> i j; do 3?[rewrite ?mxE ?ord1 //=; case: splitP => ? ->].
 rewrite !mulmx_block !(mul0mx, mulmx0, addr0) !mulmx1 add0r mul1mx -Da -dM1.
@@ -1023,7 +1021,7 @@ have [K kerK]: {K : 'M_(k, m) | map_mx intr K == kermx S}%MS.
     apply/matrixP=> i j; rewrite 3!mxE mulrC [d](bigD1 (i, j)) // rmorphM mulrA.
     by rewrite -numqE -rmorphM numq_int.
   suffices nz_d: d%:Q != 0 by rewrite !eqmx_scale // !eq_row_base andbb.
-  by rewrite intr_eq0; apply/prodf_neq0 => i _; exact: denq_neq0.
+  by rewrite intr_eq0; apply/prodf_neq0 => i _; apply: denq_neq0.
 have [L _ [G uG [D _ defK]]] := int_Smith_normal_form K.
 pose Gud := castmx (Dm, Em) G; pose G'lr := castmx (Em, Dm) (invmx G).
 have{K L D defK kerK} kerGu: map_mx intr (usubmx Gud) *m S = 0.
@@ -1046,7 +1044,7 @@ have{K L D defK kerK} kerGu: map_mx intr (usubmx Gud) *m S = 0.
   by rewrite -{2}[Gud]vsubmxK map_col_mx mul_row_col mul0mx addr0.
 pose T := map_mx intr (dsubmx Gud) *m S.
 have{kerGu} defS: map_mx intr (rsubmx G'lr) *m T = S.
-  have: G'lr *m Gud = 1%:M by rewrite /G'lr /Gud; case: _ / (Dm); exact: mulVmx.
+  have: G'lr *m Gud = 1%:M by rewrite /G'lr /Gud; case: _ / (Dm); apply: mulVmx.
   rewrite -{1}[G'lr]hsubmxK -[Gud]vsubmxK mulmxA mul_row_col -map_mxM.
   move/(canRL (addKr _))->; rewrite -mulNmx raddfD /= map_mx1 map_mxM /=.
   by rewrite mulmxDl -mulmxA kerGu mulmx0 add0r mul1mx.

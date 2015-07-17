@@ -1,16 +1,30 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime binomial ssralg poly finset.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action finalg zmodp.
+From mathcomp
 Require Import gfunctor gproduct center cyclic commutator gseries nilpotent.
+From mathcomp
 Require Import pgroup sylow hall abelian maximal frobenius.
+From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem vector.
+From mathcomp
 Require Import BGsection1 BGsection3 BGsection7.
+From mathcomp
 Require Import BGsection14 BGsection15 BGsection16.
+From mathcomp
 Require Import ssrnum rat algC cyclotomic algnum.
+From mathcomp
 Require Import classfun character integral_char inertia vcharacter.
+From mathcomp
 Require Import PFsection1 PFsection2 PFsection3 PFsection4.
+From mathcomp
 Require Import PFsection5 PFsection6 PFsection7 PFsection8 PFsection9.
+From mathcomp
 Require Import PFsection10 PFsection11 PFsection12.
 
 (******************************************************************************)
@@ -168,7 +182,7 @@ Lemma Ptype_Fcore_kernel_trivial : H0 :=: 1%g.
 Proof.
 have [/type2facts[_ oP _]| /type34ker1[]//] := boolP (FTtype S == 2).
 have [/and3P[]] := Ptype_Fcore_kernel_exists maxS StypeP notStype5.
-case/maxgroupp/andP=> /proper_sub sH0P nH0S /subset_trans/(_ nH0S)nH0P _ _.
+case/maxgroupp/andP=> /proper_sub-sH0P nH0S /subset_trans/(_ nH0S)nH0P _ _.
 apply: card1_trivg; rewrite -(divg_indexS sH0P) -card_quotient //.
 have [_ _ ->] := Ptype_Fcore_factor_facts maxS StypeP notStype5.
 by rewrite pHbar_p -{}oP divnn ?cardG_gt0.
@@ -469,7 +483,7 @@ have Hzeta0 := sS1H _ S1zeta0.
 have dH_1 zeta: zeta \in calH -> (zeta - zeta0) 1%g == 0.
   by move=> Tzeta; rewrite 2!cfunE !calHuq // subrr eqxx.
 have H1dzeta zeta: zeta \in calH -> zeta - zeta0 \in 'CF(S, H^#).
-  have HonH: {subset calH <= 'CF(S, H)} by exact: seqInd_on.
+  have HonH: {subset calH <= 'CF(S, H)} by apply: seqInd_on.
   by move=> Hzeta; rewrite cfun_onD1 rpredB ?HonH ?dH_1.
 pose calH1 := rem zeta1 (rem zeta0 (filter [mem calS1] calH)).
 pose calH2 := filter [predC calS1] calH.
@@ -1533,10 +1547,9 @@ have ->: 'N(W2) = 'N_S(W2).
 rewrite -{1}(sdprodW defS) setIC -group_modr ?cents_norm 1?centsC //=.
 rewrite mulG_subG joing_subr /= -(sdprodW defPU) setIC.
 rewrite -group_modl ?cents_norm //= mulG_subG joing_subl /= andbT.
-set K := 'N_U(W2).
-have nPKW1: K <*> W1 \subset 'N(P).
-  rewrite (subset_trans _ (gFnorm _ _)) // -(sdprodWY defS) genS ?setSU //.
-  by rewrite subIset ?sUPU.
+set K := 'N_U(W2); have sKPU: K \subset PU by rewrite subIset ?sUPU.
+have{sKPU} nPKW1: K <*> W1 \subset 'N(P).
+  by rewrite gFnorm_trans ?normsG // -(sdprodWY defS) genS ?setSU.
 have nW2KW1: K <*> W1 \subset 'N(W2).
   by rewrite join_subG subsetIr cents_norm // centsC.
 have coPKW1: coprime #|P| #|K <*> W1|.
@@ -2076,7 +2089,7 @@ have RealGammaL: cfReal GammaL.
   rewrite rmorphB /= cfAutInd rmorph1 addrC opprB addrA subrK.
   by rewrite (cfConjC_Dade_coherent cohL) ?mFT_odd // -raddfB Dtau1 // ZsubL.
 have:= Dade_Ind1_sub_lin cohL _ irr_phi Lphi; rewrite -/betaL -/tauL -/calL.
-rewrite (seqInd_nontrivial _ _ _ irr_phi) ?odd_Frobenius_index_ler ?mFT_odd //.
+rewrite (seqInd_nontrivial _ _ _ Lphi) ?odd_Frobenius_index_ler ?mFT_odd //.
 case=> // -[o_tauL_1 o_betaL_1 ZbetaL] ub_betaL _.
 have{o_tauL_1 o_betaL_1} o_GaL_1: '[GammaL, 1] = 0.
   by rewrite !cfdotBl cfnorm1 o_betaL_1 (orthoPr o_tauL_1) ?map_f ?subr0 ?subrr.

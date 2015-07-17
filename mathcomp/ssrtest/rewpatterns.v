@@ -1,6 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat.
 
 Lemma test1 : forall x y (f : nat -> nat), f (x + y).+1 = f (y + x.+1).
 by move=> x y f; rewrite [_.+1](addnC x.+1).
@@ -89,18 +91,16 @@ rewrite [x.+1 + y as X in f X _]addnC.
 match goal with |- (x + y).+1 + f (y + x.+1) (z + (y + x.+1)) = 0 + (0 + 0) => idtac end.
 Admitted.
 
+From mathcomp
 Require Import fintype ssrnat finset fingroup gproduct.
 
 Goal (forall (gT : finGroupType) (G H: {set gT}) (Z : {group gT}), G = Z).
 move=> gT G H K. suff: G \x H = K. case/dprodP=> {G H} [[G H -> -> defK _ _]].
-admit.
-admit.
-Qed.
+Admitted.
 
 Goal (exists x : 'I_3, x > 0).
 apply: (ex_intro _ (@Ordinal _ 2 _)).
-admit.
-Qed.
+Admitted.
 
 Goal (forall y, 1 < y < 2 -> exists x : 'I_3, x > 0).
 move=> y; case/andP=> y_gt1 y_lt2; apply: (ex_intro _ (@Ordinal _ y _)).
@@ -111,8 +111,7 @@ Qed.
 Goal (forall x y : nat, forall P : nat -> Prop, x = y -> True).
 move=> x y P E.
 have: P x -> P y by suff: x = y by move=> ?; congr (P _).
-by admit.
-Qed.
+Admitted.
 
 Goal forall a : bool, a -> true && a || false && a.
 by move=> a ?; rewrite [true && _]/= [_ && a]/= orbC [_ || _]//=.

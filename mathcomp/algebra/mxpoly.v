@@ -1,12 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div fintype tuple finfun bigop.
-From mathcomp.fingroup
-Require Import fingroup perm.
-Require Import ssralg zmodp matrix mxalgebra poly polydiv.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq div fintype tuple.
+From mathcomp
+Require Import finfun bigop fingroup perm ssralg zmodp matrix mxalgebra.
+From mathcomp
+Require Import poly polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)
@@ -384,7 +383,7 @@ pose Msize (A : M_RX) := \max_i \max_j size (A i j).
 pose phi (A : M_RX) := \poly_(k < Msize A) \matrix_(i, j) (A i j)`_k.
 have coef_phi A i j k: (phi A)`_k i j = (A i j)`_k.
   rewrite coef_poly; case: (ltnP k _) => le_m_k; rewrite mxE // nth_default //.
-  apply: leq_trans (leq_trans (leq_bigmax i) le_m_k); exact: (leq_bigmax j).
+  by apply: leq_trans (leq_trans (leq_bigmax i) le_m_k); apply: (leq_bigmax j).
 have phi_is_rmorphism : rmorphism phi.
   do 2?[split=> [A B|]]; apply/polyP=> k; apply/matrixP=> i j; last 1 first.
   - rewrite coef_phi mxE coefMn !coefC.
@@ -496,7 +495,7 @@ Qed.
 
 Lemma minpoly_mx_ring : mxring Ad.
 Proof.
-apply/andP; split; first by apply/mulsmx_subP; exact: minpoly_mxM.
+apply/andP; split; first by apply/mulsmx_subP; apply: minpoly_mxM.
 apply/mxring_idP; exists 1%:M; split=> *; rewrite ?mulmx1 ?mul1mx //.
   by rewrite -mxrank_eq0 mxrank1.
 exact: minpoly_mx1.
@@ -562,7 +561,7 @@ by rewrite -rmorphM horner_mx_C -rmorphD /= scalar_mx_is_scalar.
 Qed.
 
 Lemma mxminpoly_dvd_char : p_A %| char_poly A.
-Proof. by apply: mxminpoly_min; exact: Cayley_Hamilton. Qed.
+Proof. by apply: mxminpoly_min; apply: Cayley_Hamilton. Qed.
 
 Lemma eigenvalue_root_min a : eigenvalue A a = root p_A a.
 Proof.
@@ -784,7 +783,7 @@ have{mon_p pw0 intRp intRq}: genI S.
   split; set S1 := _ ++ _; first exists p.
     split=> // i; rewrite -[p]coefK coef_poly; case: ifP => // lt_i_p.
     by apply: genS; rewrite mem_cat orbC mem_nth.
-  have: all (mem S1) S1 by exact/allP.
+  have: all (mem S1) S1 by apply/allP.
   elim: {-1}S1 => //= y S2 IH /andP[S1y S12]; split; last exact: IH.
   have{q S S1 IH S1y S12 intRp intRq} [q mon_q qx0]: integralOver RtoK y.
     by move: S1y; rewrite mem_cat => /orP[]; [apply: intRq | apply: intRp].

@@ -1,6 +1,10 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype fintype finfun finset ssralg.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype fintype finfun finset ssralg.
+From mathcomp
 Require Import bigop seq tuple choice ssrnat prime ssralg fingroup pgroup.
+From mathcomp
 Require Import zmodp matrix vector falgebra galgebra.
 
 (*****************************************************************************)
@@ -103,7 +107,7 @@ Implicit Types v w: M.
 Implicit Types c: F.
 
 Lemma rmulD x: {morph (rmul^~ x): v1 v2 / v1 + v2}.
-Proof. move=> *; exact: linearD. Qed.
+Proof. by move=> *; apply: linearD. Qed.
 
 Lemma rmul_linear_proof : forall  v, linear (rmul v).
 Proof. by rewrite /rmul /rmorph; case: M => s [] b []. Qed.
@@ -113,10 +117,10 @@ Lemma rmulA v x y: v :* (x * y) = (v :* x) :* y.
 Proof. exact: AModuleType.action_morph. Qed.
 
 Lemma rmulZ : forall c v x, (c *: v) :* x = c *: (v :* x).
-Proof. move=> c v x; exact: linearZZ. Qed.
+Proof. by move=> c v x; apply: linearZZ. Qed.
 
 Lemma rmul0 : left_zero 0 rmul.
-Proof. move=> x; exact: linear0. Qed.
+Proof. by move=> x; apply: linear0. Qed.
 
 Lemma rmul1 : forall v , v :* 1 = v.
 Proof. by rewrite /rmul /rmorph; case: M => s [] b []. Qed.
@@ -154,7 +158,7 @@ Lemma eprodvP : forall vs1 ws vs2,
 Proof.
 move=> vs1 ws vs2; apply: (iffP idP).
   move=> Hs a b Ha Hb.
-  by apply: subv_trans Hs; exact: memv_eprod.
+  by apply: subv_trans Hs; apply: memv_eprod.
 move=> Ha; apply/subvP=> v.
 move/coord_span->; apply: memv_suml=> i _ /=.
 apply: memvZ.
@@ -210,8 +214,8 @@ move=> vs1 vs2 ws; apply subv_anti; apply/andP; split.
   by rewrite rmulD; apply: memv_add; apply: memv_eprod.
 apply/subvP=> v;  case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
 apply: memvD.
-  move: v1 Hv1; apply/subvP; apply: eprodvSl; exact: addvSl.
-move: v2 Hv2; apply/subvP; apply: eprodvSl; exact: addvSr.
+  by move: v1 Hv1; apply/subvP; apply: eprodvSl; apply: addvSl.
+by move: v2 Hv2; apply/subvP; apply: eprodvSl; apply: addvSr.
 Qed.
 
 Lemma eprodv_sumr vs ws1 ws2 : (vs :* (ws1 + ws2) = vs :* ws1 + vs :* ws2)%VS.
@@ -221,8 +225,8 @@ apply subv_anti; apply/andP; split.
   by rewrite linearD; apply: memv_add; apply: memv_eprod.
 apply/subvP=> v;  case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
 apply: memvD.
-  move: v1 Hv1; apply/subvP; apply: eprodvSr; exact: addvSl.
-move: v2 Hv2; apply/subvP; apply: eprodvSr; exact: addvSr.
+  by move: v1 Hv1; apply/subvP; apply: eprodvSr; apply: addvSl.
+by move: v2 Hv2; apply/subvP; apply: eprodvSr; apply: addvSr.
 Qed.
 
 Definition modv (vs: {vspace M}) (al: {aspace A}) :=
@@ -235,7 +239,7 @@ Lemma modv1 : forall vs, modv vs (aspace1 A).
 Proof. by move=> vs; rewrite /modv eprodv1 subvv. Qed.
 
 Lemma modfv : forall al, modv fullv al.
-Proof. by move=> al; exact: subvf. Qed.
+Proof. by move=> al; apply: subvf. Qed.
 
 Lemma memv_mod_mul : forall ms al m a, 
   modv ms al -> m \in ms -> a \in al -> m :* a \in ms.
@@ -273,7 +277,7 @@ Definition completely_reducible ms al :=
 Lemma completely_reducible0 : forall al, completely_reducible 0 al.
 Proof.
 move=> al ms1 Hms1; rewrite subv0; move/eqP->.
-by exists 0%VS; split; [exact: mod0v | exact: cap0v | exact: add0v].
+by exists 0%VS; split; [apply: mod0v | apply: cap0v | apply: add0v].
 Qed.
 
 End AModuleDef.
@@ -394,22 +398,22 @@ have If: limg f = ms1.
     by apply/subvP=> v Hv; rewrite -(Himf _ Hv) memv_img // memvf.
   apply/subvP=> i; case/memv_imgP=> x _ ->.
   rewrite !lfunE memvZ //= sum_lfunE memv_suml=> // j Hj.
-  rewrite lfunE /= lfunE (memv_mod_mul Hms1) //; first by exact: memv_proj.
+  rewrite lfunE /= lfunE (memv_mod_mul Hms1) //; first by apply: memv_proj.
   by rewrite memvE /= /gvspace (bigD1 (j^-1)%g) ?addvSl // groupV.
 exists (ms :&: lker f)%VS; split.
-  - apply: modv_ker=> //; apply/modfP=> *; exact: Cf.
+  - by apply: modv_ker=> //; apply/modfP=> *; apply: Cf.
   apply/eqP; rewrite -subv0; apply/subvP=> v; rewrite memv0.
   rewrite !memv_cap; case/andP=> Hv1; case/andP=> Hv2 Hv3.
   by move: Hv3; rewrite memv_ker  Himf.
-apply: subv_anti; rewrite  subv_add Hsub capvSl.
+apply: subv_anti; rewrite subv_add Hsub capvSl.
 apply/subvP=> v Hv.
 have->: v = f v + (v - f v) by rewrite addrC -addrA addNr addr0.
 apply: memv_add; first by rewrite -If memv_img // memvf.
 rewrite memv_cap; apply/andP; split.
   apply: memvB=> //; apply: subv_trans Hsub.
-  by rewrite -If; apply: memv_img; exact: memvf.
+  by rewrite -If; apply: memv_img; apply: memvf.
 rewrite memv_ker linearB /= (Himf (f v)) ?subrr // /in_mem /= -If.
-by apply: memv_img; exact: memvf. 
+by apply: memv_img; apply: memvf. 
 Qed.
 
 End ModuleRepresentation.

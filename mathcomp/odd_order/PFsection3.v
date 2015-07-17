@@ -1,11 +1,20 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
 Require Import fintype tuple finfun bigop prime ssralg matrix poly finset.
+From mathcomp
 Require Import fingroup morphism perm automorphism quotient action finalg zmodp.
+From mathcomp
 Require Import gfunctor center gproduct cyclic pgroup abelian frobenius.
+From mathcomp
 Require Import mxalgebra mxrepresentation vector falgebra fieldext galois.
+From mathcomp
 Require Import ssrnum rat algC algnum classfun character.
+From mathcomp
 Require Import integral_char inertia vcharacter.
+From mathcomp
 Require Import PFsection1 PFsection2.
 
 (******************************************************************************)
@@ -634,7 +643,7 @@ Proof. by case: set_cl => th1 [Uth /Uth]. Qed.
 
 Lemma unsat_wlog_cases th1 th2 :
   (unsat th1 -> unsat th2) -> unsat th1 -> (true /\ unsat th1) /\ unsat th2.
-Proof. by move=> Uth2 Uth1; split; last exact: Uth2. Qed.
+Proof. by move=> Uth2 Uth1; split; last apply: Uth2. Qed.
 
 (* Extend the orthonormal basis *)
 

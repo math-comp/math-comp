@@ -1,11 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import bigop.
-From mathcomp.algebra
-Require Import ssralg poly polydiv.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq.
+From mathcomp
+Require Import bigop ssralg poly polydiv.
 
 (******************************************************************************)
 (*   A proof that algebraically closed field enjoy quantifier elimination,    *)
@@ -313,7 +311,7 @@ Lemma redivpT_qf (p : polyF) (k : nat * polyF * polyF -> formula F) (q : polyF) 
 Proof.
 move=> kP rp rq; rewrite /redivpT; apply: isnull_qf=> // [[]]; first exact: kP.
 apply: sizeT_qf => // sq; apply: sizeT_qf=> // sp.
-apply: lead_coefT_qf=> // lq rlq; exact: redivp_rec_loopT_qf.
+by apply: lead_coefT_qf=> // lq rlq; apply: redivp_rec_loopT_qf.
 Qed.
 
 Definition rmodpT (p : polyF) (k : polyF -> fF) (q : polyF) : fF :=
@@ -603,7 +601,7 @@ rewrite -!map_comp.
     \big[(@gcdp F)/0]_(j <- l) P j %= \big[(@rgcdp F)/0]_(j <- l) P j.
     elim: l => [| u l ihl] /=; first by rewrite !big_nil eqpxx.
     rewrite !big_cons; move: ihl; move/(eqp_gcdr (P u)) => h.
-    apply: eqp_trans h _; rewrite eqp_sym; exact: eqp_rgcd_gcd.
+    by apply: eqp_trans h _; rewrite eqp_sym; apply: eqp_rgcd_gcd.
 case g0: (\big[(@rgcdp F)/0%:P]_(j <- map (eval_poly e \o abstrX i) ps) j == 0).
   rewrite (eqP g0) rgdcop0.
   case m0 : (_ == 0)=> //=; rewrite ?(size_poly1,size_poly0) //=.

@@ -1,9 +1,16 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div path fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div path fintype.
+From mathcomp
 Require Import bigop finset prime fingroup morphism perm automorphism quotient.
+From mathcomp
 Require Import action gproduct gfunctor pgroup cyclic center commutator.
+From mathcomp
 Require Import gseries nilpotent sylow abelian maximal hall frobenius.
+From mathcomp
 Require Import BGsection1 BGsection3 BGsection4 BGsection5 BGsection6.
+From mathcomp
 Require Import BGsection7 BGsection9 BGsection10 BGsection12.
 
 (******************************************************************************)
@@ -54,9 +61,9 @@ have nsHbH: H`_\beta <| H := pcore_normal _ _; have [_ nHbH] := andP nsHbH.
 have sYH := subset_trans sYH' (der_sub 1 H); have nHbY := subset_trans sYH nHbH.
 have nsHbY_H: H`_\beta <*> Y <| H.
   rewrite -{2}(quotientGK nsHbH) -quotientYK ?cosetpre_normal //.
-  rewrite (char_normal_trans _ (der_normal 1 _)) //= -quotient_der //.
-  rewrite (nilpotent_Hall_pcore _ (quotient_pHall nHbY sylY)) ?pcore_char //.
-  exact: Mbeta_quo_nil.
+  have ->: Y / H`_\beta = 'O_q(H^`(1) / H`_\beta).
+     by apply: nilpotent_Hall_pcore; rewrite ?Mbeta_quo_nil ?quotient_pHall.
+  by rewrite quotient_der ?gFnormal_trans.
 have sYNY: Y \subset 'N_H(Y) by rewrite subsetI sYH normG.
 have{nsHbY_H} defH: H`_\beta * 'N_H(Y) = H.
   rewrite -(mulSGid sYNY) mulgA -(norm_joinEr nHbY).
@@ -102,10 +109,10 @@ split=> // [P sPMH pP | t1Mp]; last first.
 have nsHaH: H`_\alpha <| H := pcore_normal _ _; have [_ nHaH] := andP nsHaH.
 have [sPM sPH] := subsetIP sPMH; have nHaS := subset_trans sSH nHaH.
 have nsHaS_H: H`_\alpha <*> S <| H.
-  rewrite -{2}(quotientGK nsHaH) -quotientYK ?cosetpre_normal //.
-  rewrite (char_normal_trans _ (der_normal 1 _)) //= -quotient_der //.
-  rewrite (nilpotent_Hall_pcore _ (quotient_pHall nHaS sylS_H')) ?pcore_char //.
-  exact: Malpha_quo_nil.
+  rewrite -[H in _ <| H](quotientGK nsHaH) -quotientYK ?cosetpre_normal //.
+  have ->: S / H`_\alpha = 'O_p(H^`(1) / H`_\alpha).
+    by apply: nilpotent_Hall_pcore; rewrite ?Malpha_quo_nil ?quotient_pHall.
+  by rewrite quotient_der ?gFnormal_trans.
 have [sHaS_H nHaS_H] := andP nsHaS_H.
 have sP_HaS: P \subset H`_\alpha <*> S.
   have [x Hx sPSx] := Sylow_subJ sylS sPH pP; apply: subset_trans sPSx _.
@@ -246,7 +253,7 @@ have [[sPE abelP dimP] [sRE abelR dimR]] := (pnElemP EpP, pnElemP ErR).
 have [sPM sRM] := (subset_trans sPE sEM, subset_trans sRE sEM).
 have [[pP cPP _] [rR _]] := (and3P abelP, andP abelR).
 have coCR: coprime #|C| #|R| := coprimeSg sCMs (coprimegS sRE coMsE).
-have ntP: P :!=: 1 by exact: nt_pnElem EpP _.
+have ntP: P :!=: 1 by apply: nt_pnElem EpP _.
 pose ST := [set S | Sylow C (gval S) & R \subset 'N(S)].
 have sST_CP S: S \in ST -> S \subset C by case/setIdP=> /SylowP[q _ /andP[]].
 rewrite -{sST_CP}[C](Sylow_transversal_gen sST_CP)  => [|q _]; last first.
@@ -349,7 +356,7 @@ have{abelR dimR} ErR: R \in 'E_r^1('C_E(P)).
   rewrite !inE abelR dimR (subset_trans sRE1) // subsetI sE1E.
   by rewrite sub_abelian_cent ?cyclic_abelian.
 rewrite centsC (subset_trans (cent_tau1Elem_Msigma t1p EpP ErR)) //.
-have [y defR]: exists y, R :=: <[y]> by apply/cyclicP; exact: cyclicS cycS.
+have [y defR]: exists y, R :=: <[y]> by apply/cyclicP; apply: cyclicS cycS.
 have sylS_E: r.-Sylow(E) S.
   apply: subHall_Sylow hallE1 (pnatPpi t1E1 _) (sylS).
   by rewrite -p_rank_gt0 -(rank_Sylow sylS) rank_gt0.
@@ -676,9 +683,8 @@ suffices sXL: X \subset L.
     rewrite coprime_TIg // coprime_morphl // (coprimeSg (subsetIl _ _)) //.
     exact: pnat_coprime (pcore_pgroup _ _) (pi_pnat (pcore_pgroup _ _) _).
   rewrite commg_subI // subsetI.
-    rewrite quotientS; last by rewrite subsetI sXMb.
-    rewrite (char_norm_trans (pcore_char _ _)) ?quotient_norms //.
-    by rewrite (subset_trans sXL) ?der_norm.
+    rewrite quotientS /=; last by rewrite subsetI sXMb.
+    by rewrite quotient_der ?gFnorm_trans ?normsG ?quotientS.
   rewrite (sub_Hall_pcore (nilpotent_pcore_Hall _ (Mbeta_quo_nil _))) //.
     rewrite quotient_pgroup ?quotient_norms //.
     by rewrite normsI ?(subset_trans sQM nMbM) ?normsG.
@@ -696,10 +702,10 @@ have defM: M`_\beta * 'N_M(Q) = M.
   have nMbQ := subset_trans sQM nMbM.
   have nsMbQ_M: M`_\beta <*> Q <| M.
     rewrite -{2}(quotientGK nsMbM) -quotientYK ?cosetpre_normal //.
-    rewrite (eq_Hall_pcore (nilpotent_pcore_Hall q (Mbeta_quo_nil _))) //.
-      apply: char_normal_trans (pcore_char _ _) (quotient_normal _ _).
-      exact: der_normal.
-    rewrite quotient_pHall // (pHall_subl _ (der_sub 1 M) sylQ) //.
+    suffices ->: Q / M`_\beta = 'O_q(M^`(1) / M`_\beta).
+      by rewrite quotient_der ?nMbM ?gFnormal_trans.
+    apply: nilpotent_Hall_pcore; first exact: Mbeta_quo_nil.
+    rewrite quotient_pHall // (pHall_subl _ _ sylQ) ?gFsub //.
     by rewrite -defQ commgSS // (subset_trans nUP).
   have sylQ_MbQ := pHall_subl (joing_subr _ Q) (normal_sub nsMbQ_M) sylQ.
   rewrite -{3}(Frattini_arg nsMbQ_M sylQ_MbQ) /= norm_joinEr // -mulgA.
@@ -727,7 +733,7 @@ have{not_pM'} [R ErR nQR]: exists2 R, R \in 'E_r^1('C_M(P)) & R \subset 'N(Q).
     rewrite pHallE sSK /= -/K -(setIidPr sKM) -defM -group_modl // setIAC.
     rewrite (setIidPr sKM) -LagrangeMr partnM // -(card_Hall sylS).
     rewrite part_p'nat ?mul1n 1?(pnat_dvd (dvdn_indexg _ _)) //.
-    by apply: (pi_p'nat bMb); apply: contra sM'r; exact: beta_sub_sigma.
+    by apply: (pi_p'nat bMb); apply: contra sM'r; apply: beta_sub_sigma.
   have rC: 'r_r('C_M(P)) > 0 by rewrite p_rank_gt0 (piSg _ piHr) // subsetI sHM.
   have{rC} [R ErR] := p_rank_geP rC; have [sRcMP abelR _] := pnElemP ErR.
   have{sRcMP abelR} [[sRM cPR] [rR _]] := (subsetIP sRcMP, andP abelR).
@@ -774,7 +780,7 @@ without loss sylS_L: L maxL sLq notMGL / q.-Sylow(L) S.
   have [T sylT] := Sylow_exists q L; have sylT_G := sigma_Sylow_G maxL sLq sylT.
   have [x Gx ->] := Sylow_trans sylT_G (sigma_Sylow_G maxM sMq sylS_M).
   case/(_ (L :^ x)%G); rewrite ?mmaxJ ?sigmaJ ?pHallJ2 //.
-  by rewrite (orbit_transr _ (mem_orbit 'Js L Gx)).
+  by rewrite (orbit_transl _ (mem_orbit 'Js L Gx)).
 have [[sSL _] [[E1 hallE1] [E3 hallE3]]] := (andP sylS_L, ex_tau13_compl hallE).
 have [E2 hallE2 complEi] := ex_tau2_compl hallE hallE1 hallE3.
 have E2_1: E2 :==: 1.
@@ -1104,7 +1110,7 @@ have defP: 'C_A(Q) = P.
   rewrite (card_pgroup (pgroupS _ pA)) ?subsetIl // (card_pgroup pP) dimP.
   rewrite leq_exp2l ?prime_gt1 ?(pnElem_prime EpP) //.
   by rewrite -ltnS -dimA properG_ltn_log // /proper subsetIl subsetIidl.
-have EqFQ: Q \in 'E_q^1(F) by exact/pnElemP.
+have EqFQ: Q \in 'E_q^1(F) by apply/pnElemP.
 have regQLs: 'C_(L`_\sigma)(Q) = 1.
   by rewrite (tau12_regular maxL hallF t1Lq EqFQ t2Lp Ep2A) // defP.
 have ntAQ: [~: A, Q] != 1 by rewrite (sameP eqP commG1P).

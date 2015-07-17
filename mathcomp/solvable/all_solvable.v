@@ -3,6 +3,7 @@ Require Export alt.
 Require Export burnside_app.
 Require Export center.
 Require Export commutator.
+Require Export cyclic.
 Require Export extraspecial.
 Require Export extremal.
 Require Export finmodule.

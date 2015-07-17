@@ -1,19 +1,18 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype tuple finfun bigop prime finset.
-From mathcomp.fingroup
-Require Import fingroup morphism perm automorphism quotient action gproduct.
-From mathcomp.algebra
-Require Import ssralg poly polydiv finalg zmodp cyclic matrix mxalgebra mxpoly.
-From mathcomp.solvable
-Require Import commutator center pgroup sylow gseries nilpotent abelian.
-From mathcomp.algebra
-Require Import ssrnum ssrint polydiv rat matrix mxalgebra intdiv mxpoly vector.
-From mathcomp.field
-Require Import fieldext separable galois algC cyclotomic algnum falgebra.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+From mathcomp
+Require Import fintype tuple finfun bigop prime ssralg poly finset.
+From mathcomp
+Require Import fingroup morphism perm automorphism quotient action finalg zmodp.
+From mathcomp
+Require Import commutator cyclic center pgroup sylow gseries nilpotent abelian.
+From mathcomp
+Require Import ssrnum ssrint polydiv rat matrix mxalgebra intdiv mxpoly.
+From mathcomp
+Require Import vector falgebra fieldext separable galois algC cyclotomic algnum.
+From mathcomp
 Require Import mxrepresentation classfun character.
 
 (******************************************************************************)
@@ -31,7 +30,7 @@ Require Import mxrepresentation classfun character.
 (*   gring_classM_coef_set A B z == the set of all (x, y) in setX A B such    *)
 (*            that x * y = z; if A and B are respectively the ith and jth     *)
 (*            conjugacy class of G, and z is in the kth conjugacy class, then *)
-(*            gring_classM_coef i j k is exactly the cadinal of this set.     *)
+(*            gring_classM_coef i j k is exactly the cardinal of this set.    *)
 (*  'omega_i[A] == the mode of 'chi[G]_i on (A \in 'Z(group_ring algC G))%MS, *)
 (*            i.e., the z such that gring_op 'Chi_i A  = z%:M.                *)
 (******************************************************************************)
@@ -73,7 +72,7 @@ exists (SplittingFieldType _ _ Qn_ax).
   apply: separable_Xn_sub_1; rewrite -(fmorph_eq0 QnC) rmorph_nat.
   by rewrite pnatr_eq0 -lt0n cardG_gt0.
 exists QnC => [// nuQn|].
-  by exact: (extend_algC_subfield_aut QnC [rmorphism of nuQn]).
+  by apply: (extend_algC_subfield_aut QnC [rmorphism of nuQn]).
 rewrite span_seq1 in genQn.
 exists w => // hT H phi Nphi x x_dv_n.
 apply: sig_eqW; have [rH ->] := char_reprP Nphi.
@@ -146,7 +145,7 @@ rewrite scaler_sumr; apply: eq_bigr => g Kk_g; rewrite scaler_nat.
 rewrite (set_gring_classM_coef _ _ Kk_g) -sumr_const; apply: eq_big => [] [x y].
   rewrite !inE /= dKi dKj /h1 /h2 /=; apply: andb_id2r => /eqP ->.
   have /imsetP[zk Gzk dKk] := enum_valP k; rewrite dKk in Kk_g.
-  by rewrite (class_transr Kk_g) -dKk enum_valK_in eqxx andbT.
+  by rewrite (class_eqP Kk_g) -dKk enum_valK_in eqxx andbT.
 by rewrite /h2 /= => /andP[_ /eqP->].
 Qed.
 
@@ -179,7 +178,7 @@ exact/unity_rootP.
 Qed.
 
 Lemma Aint_irr i x : 'chi[G]_i x \in Aint.
-Proof. by apply: Aint_char; exact: irr_char. Qed.
+Proof. exact/Aint_char/irr_char. Qed.
 
 Local Notation R_G := (group_ring algCfield G).
 Local Notation a := gring_classM_coef.
@@ -240,9 +239,9 @@ Qed.
 Lemma Aint_gring_mode_class_sum k : 'omega_i['K_k] \in Aint.
 Proof.
 move: k; pose X := [tuple 'omega_i['K_k] | k < #|classes G| ].
-have memX k: 'omega_i['K_k] \in X by apply: map_f; exact: mem_enum.
+have memX k: 'omega_i['K_k] \in X by apply: image_f.
 have S_P := Cint_spanP X; set S := Cint_span X in S_P.
-have S_X: {subset X <= S} by exact: mem_Cint_span.
+have S_X: {subset X <= S} by apply: mem_Cint_span.
 have S_1: 1 \in S.
   apply: S_X; apply/codomP; exists (enum_rank_in (classes1 G) 1%g).
   rewrite (@gring_mode_class_sum_eq _ 1%g) ?enum_rankK_in ?classes1 //.
@@ -383,7 +382,7 @@ rewrite ltnS => leGn piGle2; have [simpleG | ] := boolP (simple G); last first.
     exact: solvable1.
   rewrite [N == G]eqEproper sNG eqbF_neg !negbK => ltNG /and3P[grN].
   case/isgroupP: grN => {N}N -> in sNG ltNG *; rewrite /= genGid => ntN nNG.
-  have nsNG: N <| G by exact/andP.
+  have nsNG: N <| G by apply/andP.
   have dv_le_pi m: (m %| #|G| -> size (primes m) <= 2)%N.
     move=> m_dv_G; apply: leq_trans piGle2.
     by rewrite uniq_leq_size ?primes_uniq //; apply: pi_of_dvd.
@@ -498,7 +497,7 @@ move=> a /= Kg1 Kg2 Kg; rewrite mulrAC; apply: canRL (mulfK (neq0CG G)) _.
 transitivity (\sum_j (#|G| * a j)%:R *+ (j == k) : algC).
   by rewrite (bigD1 k) //= eqxx -natrM mulnC big1 ?addr0 // => j /negPf->.
 have defK (j : 'I_#|classes G|) x: x \in enum_val j -> enum_val j = x ^: G.
-  by have /imsetP[y Gy ->] := enum_valP j => /class_transr.
+  by have /imsetP[y Gy ->] := enum_valP j => /class_eqP.
 have Gg: g \in G.
   by case/imsetP: (enum_valP k) Kg => x Gx -> /imsetP[y Gy ->]; apply: groupJ.
 transitivity (\sum_j \sum_i 'omega_i['K_j] * 'chi_i 1%g * ('chi_i g)^* *+ a j).
@@ -680,7 +679,7 @@ have{Qpi1} Zpi1: pi1 \in Cint.
 have{pi1 Zpi1} pi2_ge1: 1 <= pi2.
   have ->: pi2 = `|pi1| ^+ 2.
     by rewrite (big_morph Num.norm (@normrM _) (@normr1 _)) -prodrXl.
-  by rewrite Cint_normK // sqr_Cint_ge1 //; exact/prodf_neq0.
+  by rewrite Cint_normK // sqr_Cint_ge1 //; apply/prodf_neq0.
 have Sgt0: (#|S| > 0)%N by rewrite (cardD1 g) [g \in S]Sg.
 rewrite -mulr_natr -ler_pdivl_mulr ?ltr0n //.
 have n2chi_ge0 s: s \in S -> 0 <= `|chi s| ^+ 2 by rewrite exprn_ge0 ?normr_ge0.
@@ -693,7 +692,7 @@ Theorem nonlinear_irr_vanish gT (G : {group gT}) i :
   'chi[G]_i 1%g > 1 -> exists2 x, x \in G & 'chi_i x = 0.
 Proof.
 move=> chi1gt1; apply/exists_eq_inP; apply: contraFT (ltr_geF chi1gt1).
-rewrite negb_exists_in => /forall_inP nz_chi.
+rewrite negb_exists_in => /forall_inP-nz_chi.
 rewrite -(norm_Cnat (Cnat_irr1 i)) -(@expr_le1 _ 2) ?normr_ge0 //.
 rewrite -(ler_add2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
 rewrite (cfnormE (cfun_onG _)) mulVKf ?neq0CG // (big_setD1 1%g) //=.

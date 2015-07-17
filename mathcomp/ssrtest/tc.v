@@ -1,4 +1,5 @@
-Require Import ssreflect.
+Require Import mathcomp.ssreflect.ssreflect.
+
 
 Class foo (A : Type) : Type := mkFoo { val : A }.
 Instance foo_pair {A B} {f1 : foo A} {f2 : foo B} : foo (A * B) | 2 :=

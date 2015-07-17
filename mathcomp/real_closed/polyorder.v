@@ -1,5 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+From mathcomp
 Require Import ssralg poly ssrnum zmodp polydiv interval.
 
 Import GRing.Theory.
@@ -207,7 +210,7 @@ move=> hn.
 case p0: (p == 0); first by rewrite (eqP p0) div0p mu0 sub0n.
 case: (@mu_spec p x); rewrite ?p0 // => q hq hp.
 rewrite {1}hp -{1}(subnK hn) exprD mulrA.
-rewrite Pdiv.IdomainMonic.mulpK; last by apply: monic_exp; exact: monicXsubC.
+rewrite Pdiv.IdomainMonic.mulpK; last by apply: monic_exp; apply: monicXsubC.
 rewrite mu_mul ?mulf_eq0 ?expf_eq0 ?polyXsubC_eq0 ?andbF ?orbF; last first.
   by apply: contra hq; move/eqP->; rewrite root0.
 by rewrite mu_exp muNroot // add0n mu_XsubC mul1n.

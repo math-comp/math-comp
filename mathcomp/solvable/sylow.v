@@ -1,16 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div fintype finset bigop prime.
-From mathcomp.fingroup
-Require Import fingroup morphism automorphism quotient action gproduct.
-From mathcomp.algebra
-Require Import ssralg poly ssrnum ssrint rat.
-From mathcomp.algebra
-Require Import polydiv finalg zmodp matrix mxalgebra vector cyclic.
-Require Import commutator pgroup center nilpotent.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div fintype prime.
+From mathcomp
+Require Import bigop finset fingroup morphism automorphism quotient action.
+From mathcomp
+Require Import cyclic gproduct gfunctor commutator pgroup center nilpotent.
 
 (******************************************************************************)
 (*   The Sylow theorem and its consequences, including the Frattini argument, *)
@@ -68,11 +63,11 @@ Lemma pcore_sub_astab_irr G M :
   'O_p(G) \subset 'C_G(M | to).
 Proof.
 move=> pM sMR /mingroupP[/andP[ntM nMG] minM].
-have [sGpG nGpG]:= andP (pcore_normal p G).
-have sGD := acts_dom nMG; have sGpD := subset_trans sGpG sGD.
+have /andP[sGpG nGpG]: 'O_p(G) <| G := gFnormal _ G.
+have sGD := acts_dom nMG; have sGpD: 'O_p(G) \subset D := gFsub_trans _ sGD.
 rewrite subsetI sGpG -gacentC //=; apply/setIidPl; apply: minM (subsetIl _ _).
 rewrite nontrivial_gacent_pgroup ?pcore_pgroup //=; last first.
-  by split; rewrite ?(subset_trans sGpG).
+  by split; rewrite ?gFsub_trans.
 by apply: subset_trans (acts_subnorm_subgacent sGpD nMG); rewrite subsetI subxx.
 Qed.
 
@@ -108,7 +103,7 @@ have S_pG P: P \in S -> P \subset G /\ p.-group P.
 have SmaxN P Q: Q \in S -> Q \subset 'N(P) -> maxp 'N_G(P) Q.
   rewrite inE => /maxgroupP[/andP[sQG pQ] maxQ] nPQ.
   apply/maxgroupP; rewrite /psubgroup subsetI sQG nPQ.
-  by split=> // R; rewrite subsetI -andbA andbCA => /andP[_]; exact: maxQ.
+  by split=> // R; rewrite subsetI -andbA andbCA => /andP[_]; apply: maxQ.
 have nrmG P: P \subset G -> P <| 'N_G(P).
   by move=> sPG; rewrite /normal subsetIr subsetI sPG normG.
 have sylS P: P \in S -> p.-Sylow('N_G(P)) P.
@@ -123,7 +118,7 @@ have{defCS} oG_mod: {in S &, forall P Q, #|oG P| = (Q \in oG P) %[mod p]}.
   move=> P Q S_P S_Q; have [sQG pQ] := S_pG _ S_Q.
   have soP_S: oG P \subset S by rewrite acts_sub_orbit.
   have /pgroup_fix_mod-> //: [acts Q, on oG P | 'JG].
-    apply/actsP=> x /(subsetP sQG) Gx R; apply: orbit_transr.
+    apply/actsP=> x /(subsetP sQG) Gx R; apply: orbit_transl.
     exact: mem_orbit.
   rewrite -{1}(setIidPl soP_S) -setIA defCS // (cardsD1 Q) setDE.
   by rewrite -setIA setICr setI0 cards0 addn0 inE set11 andbT.
@@ -206,7 +201,7 @@ Lemma card_Syl P : p.-Sylow(G) P -> #|'Syl_p(G)| = #|G : 'N_G(P)|.
 Proof. by case: Sylow's_theorem P. Qed.
 
 Lemma card_Syl_dvd : #|'Syl_p(G)| %| #|G|.
-Proof. by case Sylow_exists => P /card_Syl->; exact: dvdn_indexg. Qed.
+Proof. by case Sylow_exists => P /card_Syl->; apply: dvdn_indexg. Qed.
 
 Lemma card_Syl_mod : prime p -> #|'Syl_p(G)| %% p = 1%N.
 Proof. by case Sylow's_theorem. Qed.
@@ -262,13 +257,13 @@ Qed.
 Lemma p2group_abelian P : p.-group P -> logn p #|P| <= 2 -> abelian P.
 Proof.
 move=> pP lePp2; pose Z := 'Z(P); have sZP: Z \subset P := center_sub P.
-case: (eqVneq Z 1); first by move/(trivg_center_pgroup pP)->; exact: abelian1.
+case: (eqVneq Z 1); first by move/(trivg_center_pgroup pP)->; apply: abelian1.
 case/(pgroup_pdiv (pgroupS sZP pP)) => p_pr _ [k oZ].
 apply: cyclic_center_factor_abelian.
-case: (eqVneq (P / Z) 1) => [-> |]; first exact: cyclic1.
+have [->|] := eqVneq (P / Z) 1; first exact: cyclic1.
 have pPq := quotient_pgroup 'Z(P) pP; case/(pgroup_pdiv pPq) => _ _ [j oPq].
 rewrite prime_cyclic // oPq; case: j oPq lePp2 => //= j.
-rewrite card_quotient ?gfunctor.gFnorm //.
+rewrite card_quotient ?gFnorm //.
 by rewrite -(Lagrange sZP) lognM // => ->; rewrite oZ !pfactorK ?addnS.
 Qed.
 
@@ -343,7 +338,7 @@ Proof.
 move=> defG nHG coKR; apply/eqP; rewrite eqEcard mulG_subG /= -defG.
 rewrite !setSI ?mulG_subl ?mulG_subr //=.
 rewrite coprime_cardMg ?(coKR, coprimeSg (subsetIl _ _), coprime_sym) //=.
-pose pi := \pi(K); have piK: pi.-group K by exact: pgroup_pi.
+pose pi := \pi(K); have piK: pi.-group K by apply: pgroup_pi.
 have pi'R: pi^'.-group R by rewrite /pgroup -coprime_pi' /=.
 have [hallK hallR] := coprime_mulpG_Hall defG piK pi'R.
 have nsHG: H :&: G <| G by rewrite /normal subsetIr normsI ?normG.
@@ -372,7 +367,7 @@ by rewrite ltn_Pdiv // ltnNge -trivg_card_le1.
 Qed.
 
 Lemma pgroup_sol p P : p.-group P -> solvable P.
-Proof. by move/pgroup_nil; exact: nilpotent_sol. Qed.
+Proof. by move/pgroup_nil; apply: nilpotent_sol. Qed.
 
 Lemma small_nil_class G : nil_class G <= 5 -> nilpotent G.
 Proof.
@@ -404,10 +399,10 @@ have nHN: H <| 'N_G(H) by rewrite normal_subnorm.
 have{maxH} hallH: pi.-Hall('N_G(H)) H.
   apply: normal_max_pgroup_Hall => //; apply/maxgroupP.
   rewrite /psubgroup normal_sub // piH; split=> // K.
-  by rewrite subsetI -andbA andbCA => /andP[_]; exact: maxH.
-rewrite /normal sHG; apply/setIidPl; symmetry.
-apply: nilpotent_sub_norm; rewrite ?subsetIl ?setIS //=.
-by rewrite char_norms // -{1}(normal_Hall_pcore hallH) // pcore_char.
+  by rewrite subsetI -andbA andbCA => /andP[_ /maxH].
+rewrite /normal sHG; apply/setIidPl/esym.
+apply: nilpotent_sub_norm; rewrite ?subsetIl ?setIS //= char_norms //.
+by congr (_ \char _): (pcore_char pi 'N_G(H)); apply: normal_Hall_pcore.
 Qed.
 
 Lemma nilpotent_Hall_pcore pi G H :
@@ -430,12 +425,12 @@ Qed.
 Lemma nilpotent_pcoreC pi G : nilpotent G -> 'O_pi(G) \x 'O_pi^'(G) = G.
 Proof.
 move=> nilG; have trO: 'O_pi(G) :&: 'O_pi^'(G) = 1.
-  by apply: coprime_TIg; apply: (@pnat_coprime pi); exact: pcore_pgroup.
+  by apply: coprime_TIg; apply: (@pnat_coprime pi); apply: pcore_pgroup.
 rewrite dprodE //.
   apply/eqP; rewrite eqEcard mul_subG ?pcore_sub // (TI_cardMg trO).
   by rewrite !(card_Hall (nilpotent_pcore_Hall _ _)) // partnC ?leqnn.
 rewrite (sameP commG1P trivgP) -trO subsetI commg_subl commg_subr.
-by rewrite !(subset_trans (pcore_sub _ _)) ?normal_norm ?pcore_normal.
+by rewrite !gFsub_trans ?gFnorm.
 Qed.
 
 Lemma sub_nilpotent_cent2 H K G :
@@ -485,7 +480,7 @@ elim: c => // c IHc in gT P def_c pP *; set e := logn p _.
 have nilP := pgroup_nil pP; have sZP := center_sub P.
 have [e_le2 | e_gt2] := leqP e 2.
   by rewrite -def_c leq_max nil_class1 (p2group_abelian pP).
-have pPq: p.-group (P / 'Z(P)) by exact: quotient_pgroup.
+have pPq: p.-group (P / 'Z(P)) by apply: quotient_pgroup.
 rewrite -(subnKC e_gt2) ltnS (leq_trans (IHc _ _ _ pPq)) //.
   by rewrite nil_class_quotient_center ?def_c.
 rewrite geq_max /= -add1n -leq_subLR -subn1 -subnDA -subSS leq_sub2r //.
@@ -534,7 +529,7 @@ have /cyclicP[x' def_p']: cyclic 'O_p^'(G).
   by have:= pcore_pgroup p^' G; rewrite def_p' /pgroup p'natE ?pG.
 apply/cyclicP; exists (x * x'); rewrite -{}defG def_p def_p' cycleM //.
   by red; rewrite -(centsP Cpp') // (def_p, def_p') cycle_id.
-rewrite /order -def_p -def_p' (@pnat_coprime p) //; exact: pcore_pgroup.
+by rewrite /order -def_p -def_p' (@pnat_coprime p) //; apply: pcore_pgroup.
 Qed.
 
 End Zgroups.
@@ -582,8 +577,8 @@ have{pE} pE: {in E &, forall x1 x2, p.-group <<[set x1; x2]>>}.
   rewrite -(mulgKV y1 y2) conjgM -2!conjg_set1 -conjUg genJ pgroupJ.
   by rewrite pE // groupMl ?groupV.
 have sEG: <<E>> \subset G by rewrite gen_subG class_subG.
-have nEG: G \subset 'N(E) by exact: class_norm.
-have Ex: x \in E by exact: class_refl.
+have nEG: G \subset 'N(E) by apply: class_norm.
+have Ex: x \in E by apply: class_refl.
 have [P Px sylP]: exists2 P : {group gT}, x \in P & p.-Sylow(<<E>>) P.
   have sxxE: <<[set x; x]>> \subset <<E>> by rewrite genS // setUid sub1set.
   have{sxxE} [P sylP sxxP] := Sylow_superset sxxE (pE _ _ Ex Ex).
@@ -600,14 +595,14 @@ have{Ex Px}: P_D [set x].
 case/(@maxset_exists _ P_D)=> D /maxsetP[]; rewrite {P_yD P_D}/=.
 rewrite subsetI sub1set -andbA => /and3P[sDP sDE /existsP[y0]].
 set B := _ |: D; rewrite inE -andbA => /and3P[Py0 Ey0 pB] maxD Dx.
-have sDgE: D \subset <<E>> by exact: sub_gen.
-have sDG: D \subset G by exact: subset_trans sEG.
+have sDgE: D \subset <<E>> by apply: sub_gen.
+have sDG: D \subset G by apply: subset_trans sEG.
 have sBE: B \subset E by rewrite subUset sub1set Ey0.
-have sBG: <<B>> \subset G by exact: subset_trans (genS _) sEG.
+have sBG: <<B>> \subset G by apply: subset_trans (genS _) sEG.
 have sDB: D \subset B by rewrite subsetUr.
 have defD: D :=: P :&: <<B>> :&: E.
   apply/eqP; rewrite eqEsubset ?subsetI sDP sDE sub_gen //=.
-  apply/setUidPl; apply: maxD; last exact: subsetUl.
+  apply/setUidPl; apply: maxD; last apply: subsetUl.
   rewrite subUset subsetI sDP sDE setIAC subsetIl.
   apply/existsP; exists y0; rewrite inE Py0 Ey0 /= setUA -/B.
   by rewrite -[<<_>>]joing_idl joingE setKI genGid.
@@ -645,7 +640,7 @@ have [y1 Ny1 Py1]: exists2 y1, y1 \in 'N_E(D) & y1 \notin P.
 have [y2 Ny2 Dy2]: exists2 y2, y2 \in 'N_(P :&: E)(D) & y2 \notin D.
   case sNN: ('N_P('N_P(D)) \subset 'N_P(D)).
     have [z /= Ez sEzP] := Sylow_Jsub sylP (genS sBE) pB.
-    have Gz: z \in G by exact: subsetP Ez.
+    have Gz: z \in G by apply: subsetP Ez.
     have /subsetPn[y Bzy Dy]: ~~ (B :^ z \subset D).
       apply/negP; move/subset_leq_card; rewrite cardJg cardsU1.
       by rewrite {1}defD 2!inE (negPf Py0) ltnn.
@@ -657,7 +652,7 @@ have [y2 Ny2 Dy2]: exists2 y2, y2 \in 'N_(P :&: E)(D) & y2 \notin D.
   case/subsetPn=> y Dzy Dy; exists y => //; apply: subsetP Dzy.
   rewrite -setIA setICA subsetI sub_conjg (normsP nEG) ?groupV //.
     by rewrite sDE -(normP NNz); rewrite conjSg subsetI sDP.
-  apply: subsetP Pz; exact: (subset_trans (pHall_sub sylP)).
+  by apply: subsetP Pz; apply: (subset_trans (pHall_sub sylP)).
 suff{Dy2} Dy2D: y2 |: D = D by rewrite -Dy2D setU11 in Dy2.
 apply: maxD; last by rewrite subsetUr.
 case/setIP: Ny2 => PEy2 Ny2; case/setIP: Ny1 => Ey1 Ny1.

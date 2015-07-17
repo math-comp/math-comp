@@ -1,12 +1,12 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect   
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)
-(*   choiceType == interface for types with a choice operator                 *)
-(*    countType == interface for countable types                              *)
+(*   choiceType == interface for types with a choice operator.                *)
+(*    countType == interface for countable types (implies choiceType).        *)
 (* subCountType == interface for types that are both subType and countType.   *)
 (*  xchoose exP == a standard x such that P x, given exP : exists x : T, P x  *)
 (*                 when T is a choiceType. The choice depends only on the     *)
@@ -35,10 +35,14 @@ Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*    CanCountMixin fK == Count mixin for T, given f : T -> cT, g and         *)
 (*                        fK : cancel f g.                                    *)
 (*      GenTree.tree T == generic n-ary tree type with nat-labeled nodes and  *)
-(*                        T-labeled nodes. It is equipped with canonical      *)
-(*                        eqType, choiceType, and countType instances, and so *)
-(*                        can be used to similarly equip simple datatypes     *)
-(*                        by using the mixins above.                          *)
+(*                        T-labeled leaves, for example GenTree.Leaf (x : T), *)
+(*                        GenTree.Node 5 [:: t; t']. GenTree.tree is equipped *)
+(*                        with canonical eqType, choiceType, and countType    *)
+(*                        instances, and so simple datatypes can be similarly *)
+(*                        equipped by encoding into GenTree.tree and using    *)
+(*                        the mixins above.                                   *)
+(*        CodeSeq.code == bijection from seq nat to nat.                      *)
+(*      CodeSeq.decode == bijection inverse to CodeSeq.code.                  *)
 (* In addition to the lemmas relevant to these definitions, this file also    *)
 (* contains definitions of a Canonical choiceType and countType instances for *)
 (* all basic datatypes (e.g., nat, bool, subTypes, pairs, sums, etc.).        *)
@@ -48,7 +52,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-(* Technical definitions about coding and decoding of nat sequances, which    *)
+(* Technical definitions about coding and decoding of nat sequences, which    *)
 (* are used below to define various Canonical instances of the choice and     *)
 (* countable interfaces.                                                      *)
 
@@ -212,18 +216,18 @@ Canonical tree_eqType (T : eqType) := EqType (GenTree.tree T) (tree_eqMixin T).
 (* these functions, for instance. Internally, the interfaces provides a       *)
 (* subtly stronger operation, Choice.InternalTheory.find, which performs a    *)
 (* limited search using an integer parameter only rather than a full value as *)
-(* [x]choose does. This is not a restriction in the constructive setting      *)
-(* (where all types are concrete and hence countable). In the case of         *)
-(* axiomatizations, like for the Coq reals library, postulating a suitable    *)
+(* [x]choose does. This is not a restriction in a constructive theory, where  *)
+(* all types are concrete and hence countable. In the case of an axiomatic    *)
+(* theory, such as that of the Coq reals library, postulating a suitable      *)
 (* axiom of choice suppresses the need for guidance. Nevertheless this        *)
 (* operation is just what is needed to make the Choice interface compose.     *)
 (*   The Countable interface provides three functions; for T : countType we   *)
-(* geth pickle : T -> nat, and unpickle, pickle_inv : nat -> option T.        *)
+(* get pickle : T -> nat, and unpickle, pickle_inv : nat -> option T.         *)
 (* The functions provide an effective embedding of T in nat: unpickle is a    *)
 (* left inverse to pickle, which satisfies pcancel pickle unpickle, i.e.,     *)
 (* unpickle \o pickle =1 some; pickle_inv is a more precise inverse for which *)
 (* we also have ocancel pickle_inv pickle. Both unpickle and pickle need to   *)
-(* partial functions, to allow for possibly empty types such as {x | P x}.    *)
+(* be partial functions to allow for possibly empty types such as {x | P x}.  *)
 (*   The names of these functions underline the correspondence with the       *)
 (* notion of "Serializable" types in programming languages.                   *)
 (*   Finally, we need to provide a join class to let type inference unify     *)
@@ -332,12 +336,12 @@ by rewrite eqn_leq minQn ?minPm.
 Qed.
 
 Lemma sigW P : (exists x, P x) -> {x | P x}.
-Proof. by move=> exP; exists (xchoose exP); exact: xchooseP. Qed.
+Proof. by move=> exP; exists (xchoose exP); apply: xchooseP. Qed.
 
 Lemma sig2W P Q : (exists2 x, P x & Q x) -> {x | P x & Q x}.
 Proof.
 move=> exPQ; have [|x /andP[]] := @sigW (predI P Q); last by exists x.
-by have [x Px Qx] := exPQ; exists x; exact/andP.
+by have [x Px Qx] := exPQ; exists x; apply/andP.
 Qed.
 
 Lemma sig_eqW (vT : eqType) (lhs rhs : T -> vT) :
@@ -363,13 +367,13 @@ Lemma chooseP P x0 : P x0 -> P (choose P x0).
 Proof. by move=> Px0; rewrite /choose insubT xchooseP. Qed.
 
 Lemma choose_id P x0 y0 : P x0 -> P y0 -> choose P x0 = choose P y0.
-Proof. by move=> Px0 Py0; rewrite /choose !insubT /=; exact: eq_xchoose. Qed.
+Proof. by move=> Px0 Py0; rewrite /choose !insubT /=; apply: eq_xchoose. Qed.
 
 Lemma eq_choose P Q : P =1 Q -> choose P =1 choose Q.
 Proof.
 rewrite /choose => eqPQ x0.
 do [case: insubP; rewrite eqPQ] => [[x Px] Qx0 _| ?]; last by rewrite insubN.
-by rewrite insubT; exact: eq_xchoose.
+by rewrite insubT; apply: eq_xchoose.
 Qed.
 
 Section CanChoice.

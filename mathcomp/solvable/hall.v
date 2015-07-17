@@ -1,12 +1,12 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype finset bigop prime.
-From mathcomp.fingroup
-Require Import fingroup morphism automorphism quotient action gproduct.
-Require Import commutator center pgroup finmodule nilpotent sylow.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq div fintype finset.
+From mathcomp
+Require Import prime fingroup morphism automorphism quotient action gproduct.
+From mathcomp
+Require Import gfunctor commutator center pgroup finmodule nilpotent sylow.
+From mathcomp
 Require Import abelian maximal.
 
 (*****************************************************************************)
@@ -41,7 +41,7 @@ have [-> | [p pr_p pH]] := trivgVpdiv H.
 have [P sylP] := Sylow_exists p H.
 case nPG: (P <| G); last first.
   pose N := ('N_G(P))%G; have sNG: N \subset G by rewrite subsetIl.
-  have eqHN_G: H * N = G by exact: Frattini_arg sylP.
+  have eqHN_G: H * N = G by apply: Frattini_arg sylP.
   pose H' := (H :&: N)%G.
   have nsH'N: H' <| N.
     by rewrite /normal subsetIr normsI ?normG ?(subset_trans sNG).
@@ -50,7 +50,7 @@ case nPG: (P <| G); last first.
     by rewrite -mul_cardG (mulnC #|H'|) divnMl // cardG_gt0.
   have hallH': Hall N H'.
     rewrite /Hall -divgS subsetIr //= -eq_iH.
-    by case/andP: hallH => _; apply: coprimeSg; exact: subsetIl.
+    by case/andP: hallH => _; apply: coprimeSg; apply: subsetIl.
   have: [splits N, over H'].
     apply: IHn hallH' nsH'N; apply: {n}leq_trans Gn.
     rewrite proper_card // properEneq sNG andbT; apply/eqP=> eqNG.
@@ -61,12 +61,12 @@ case nPG: (P <| G); last first.
     by rewrite /= -(setIidPr sKN) setIA tiKN.
   by rewrite eqEsubset -eqHN_G mulgS // -eqH'K mulGS mulSg ?subsetIl.
 pose Z := 'Z(P); pose Gbar := G / Z; pose Hbar := H / Z.
-have sZP: Z \subset P by exact: center_sub.
-have sZH: Z \subset H by exact: subset_trans (pHall_sub sylP).
-have sZG: Z \subset G by exact: subset_trans sHG.
-have nZG: Z <| G by apply: char_normal_trans nPG; exact: center_char.
-have nZH: Z <| H by exact: normalS nZG.
-have nHGbar: Hbar <| Gbar by exact: morphim_normal.
+have sZP: Z \subset P by apply: center_sub.
+have sZH: Z \subset H by apply: subset_trans (pHall_sub sylP).
+have sZG: Z \subset G by apply: subset_trans sHG.
+have nZG: Z <| G by apply: gFnormal_trans nPG.
+have nZH: Z <| H by apply: normalS nZG.
+have nHGbar: Hbar <| Gbar by apply: morphim_normal.
 have hallHbar: Hall Gbar Hbar by apply: morphim_Hall (normal_norm _) _.
 have: [splits Gbar, over Hbar].
   apply: IHn => //; apply: {n}leq_trans Gn; rewrite ltn_quotient //.
@@ -76,7 +76,7 @@ have: [splits Gbar, over Hbar].
 case/splitsP=> Kbar /complP[tiHKbar eqHKbar].
 have: Kbar \subset Gbar by rewrite -eqHKbar mulG_subr.
 case/inv_quotientS=> //= ZK quoZK sZZK sZKG.
-have nZZK: Z <| ZK by exact: normalS nZG.
+have nZZK: Z <| ZK by apply: normalS nZG.
 have cardZK: #|ZK| = (#|Z| * #|G : H|)%N.
   rewrite -(Lagrange sZZK); congr (_ * _)%N.
   rewrite -card_quotient -?quoZK; last by case/andP: nZZK.
@@ -86,7 +86,7 @@ have cardZK: #|ZK| = (#|Z| * #|G : H|)%N.
 have: [splits ZK, over Z].
   rewrite (Gaschutz_split nZZK _ sZZK) ?center_abelian //; last first.
     rewrite -divgS // cardZK mulKn ?cardG_gt0 //.
-    by case/andP: hallH => _; exact: coprimeSg.
+    by case/andP: hallH => _; apply: coprimeSg.
   by apply/splitsP; exists 1%G; rewrite inE -subG1 subsetIr mulg1 eqxx.
 case/splitsP=> K /complP[tiZK eqZK].
 have sKZK: K \subset ZK by rewrite -(mul1g K) -eqZK mulSg ?sub1G.
@@ -111,8 +111,8 @@ rewrite ltnS => leHn solH nHK; have [-> | ] := eqsVneq H 1.
   by apply/eqP; rewrite conjsg1 eqEcard sK1K eqK1K /=.
 pose G := (H <*> K)%G.
 have defG: G :=: H * K by rewrite -normC // -norm_joinEl // joingC.
-have sHG: H \subset G by exact: joing_subl.
-have sKG: K \subset G by exact: joing_subr.
+have sHG: H \subset G by apply: joing_subl.
+have sKG: K \subset G by apply: joing_subr.
 have nsHG: H <| G by rewrite /(H <| G) sHG join_subG normG.
 case/(solvable_norm_abelem solH nsHG)=> M [sMH nsMG ntM] /and3P[_ abelM _].
 have [sMG nMG] := andP nsMG; rewrite -defG => sK1G coHK oK1K.
@@ -134,7 +134,7 @@ case/morphimP=> x nMx Hx ->{xb} eqK1Kx; pose K2 := (K :^ x)%G.
 have{eqK1Kx} eqK12: K1 / M = K2 / M by rewrite quotientJ.
 suff [y My ->]: exists2 y, y \in M & K1 :=: K2 :^ y.
   by exists (x * y); [rewrite groupMl // (subsetP sMH) | rewrite conjsgM].
-have nMK1: K1 \subset 'N(M) by exact: nMsG.
+have nMK1: K1 \subset 'N(M) by apply: nMsG.
 have defMK: M * K1 = M <*> K1 by rewrite -normC // -norm_joinEl // joingC.
 have sMKM: M \subset M <*> K1 by rewrite joing_subl.
 have nMKM: M <| M <*> K1 by rewrite normalYl.
@@ -243,7 +243,7 @@ have{transHb} transH (K : {group gT}):
   have: y \in coset M y by rewrite val_coset (subsetP nMK, rcoset_refl).
   have: coset M y \in (H :^ x) / M.
     rewrite /quotient morphimJ //=.
-    rewrite def_x def_H in sKHxb; apply: (subsetP sKHxb); exact: mem_quotient.
+    by rewrite def_x def_H in sKHxb; apply/(subsetP sKHxb)/mem_quotient.
   case/morphimP=> z Nz Hxz ->.
   rewrite val_coset //; case/rcosetP=> t Mt ->; rewrite groupMl //.
   by rewrite mem_conjg (subsetP sMH) // -mem_conjg (normP Nx).
@@ -256,7 +256,7 @@ have [pi_p | pi'p] := boolP (p \in pi).
 have [ltHG | leGH {n IHn leGn transH}] := ltnP #|H| #|G|.
   case: (IHn _ H (leq_trans ltHG leGn)) => [|H1]; first exact: solvableS solG.
   case/and3P=> sH1H piH1 pi'H1' transH1.
-  have sH1G: H1 \subset G by exact: subset_trans sHG.
+  have sH1G: H1 \subset G by apply: subset_trans sHG.
   exists H1 => [|K sKG piK].
     apply/and3P; split => //.
     rewrite -divgS // -(Lagrange sHG) -(Lagrange sH1H) -mulnA.
@@ -283,7 +283,7 @@ have nMK: K \subset 'N(M) by apply: subset_trans sKG nMG.
 have defG1: M * K = G1 by rewrite -normC -?norm_joinEl.
 have sK1G1: K1 \subset M * K by rewrite defG1 subsetIr.
 have coMK: coprime #|M| #|K|.
-  by rewrite coprime_sym (pnat_coprime piK) //; exact: (pHall_pgroup hallM).
+  by rewrite coprime_sym (pnat_coprime piK) //; apply: (pHall_pgroup hallM).
 case: (SchurZassenhaus_trans_sol _ nMK sK1G1 coMK) => [||x Mx defK1].
 - exact: solvableS solG.
 - apply/eqP; rewrite -(eqn_pmul2l (cardG_gt0 M)) -TI_cardMg //; last first.
@@ -389,7 +389,7 @@ pose N := 'N_(A <*> G)(H)%G.
 have nGN: N \subset 'N(G) by rewrite subIset ?nG_AG.
 have nGN_N: G :&: N <| N by rewrite /(_ <| N) subsetIr normsI ?normG.
 have NG_AG: G * N = A <*> G.
-  by apply: Hall_Frattini_arg hallH => //; exact/andP.
+  by apply: Hall_Frattini_arg hallH => //; apply/andP.
 have iGN_A: #|N| %/ #|G :&: N| = #|A|.
   rewrite setIC divgI -card_quotient // -quotientMidl NG_AG.
   rewrite card_quotient -?divgS //= norm_joinEl //.
@@ -426,14 +426,14 @@ have nGN_N: G :&: N <| N.
   apply/normalP; rewrite subsetIr; split=> // y Ny.
   by rewrite conjIg (normP _) // (subsetP nGN, conjGid).
 have NG_AG : G * N = A <*> G.
-  by apply: Hall_Frattini_arg hallH => //; exact/andP.
+  by apply: Hall_Frattini_arg hallH => //; apply/andP.
 have iGN_A: #|N : G :&: N| = #|A|.
   rewrite -card_quotient //; last by case/andP: nGN_N.
   rewrite (card_isog (second_isog nGN)) /= -quotientMidr (normC nGN) NG_AG.
   rewrite card_quotient // -divgS //= joingC norm_joinEr //.
   by rewrite coprime_cardMg // mulnC mulnK.
-have solGN: solvable (G :&: N) by apply: solvableS solG; exact: subsetIl.
-have oAxA: #|A :^ x^-1| = #|A| by exact: cardJg.
+have solGN: solvable (G :&: N) by apply: solvableS solG; apply: subsetIl.
+have oAxA: #|A :^ x^-1| = #|A| by apply: cardJg.
 have sAN: A \subset N by rewrite subsetI -{1}genGid genS // subsetUl.
 have nGNA: A \subset 'N(G :&: N).
   by apply/normsP=> y ?; rewrite conjIg (normsP nGA) ?(conjGid, subsetP sAN).
@@ -471,7 +471,7 @@ apply/eqP; rewrite eqEsubset subsetI morphimS ?subsetIl //=.
 rewrite (subset_trans _ (morphim_cent _ _)) ?morphimS ?subsetIr //=.
 apply/subsetP=> _ /setIP[/morphimP[x Nx Gx ->] cAHx].
 have{cAHx} cAxR y: y \in A -> [~ x, y] \in R.
-  move=> Ay; have Ny: y \in 'N(H) by exact: subsetP Ay.
+  move=> Ay; have Ny: y \in 'N(H) by apply: subsetP Ay.
   rewrite inE mem_commg // andbT coset_idr ?groupR // morphR //=.
   by apply/eqP; apply/commgP; apply: (centP cAHx); rewrite mem_quotient.
 have AxRA: A :^ x \subset R * A.
@@ -566,11 +566,11 @@ have defG: G :=: K * H.
   rewrite -{1}(mulGid G) mulgSS //= (card_Hall hallH) (card_Hall hallK).
   by rewrite mulnC partnC.
 have sGA_H: [~: G, A] \subset H.
-  rewrite gen_subG defG; apply/subsetP=> xya; case/imset2P=> xy a.
-  case/imset2P=> x y Kx Hy -> Aa -> {xya xy}.
+  rewrite gen_subG defG.
+  apply/subsetP=> _ /imset2P[_ a /imset2P[x y Kx Hy ->] Aa ->].
   rewrite commMgJ (([~ x, a] =P 1) _) ?(conj1g, mul1g).
     by rewrite groupMl ?groupV // memJ_norm ?(subsetP nHA).
-  rewrite subsetI sKG in cKA; apply/commgP; exact: (centsP cKA).
+  by rewrite subsetI sKG in cKA; apply/commgP/(centsP cKA).
 apply: pcore_max; last first.
   by rewrite /(_ <| G) /=  commg_norml commGC commg_subr nGA.
 by case/and3P: hallH => _ piH _; apply: pgroupS piH.
@@ -592,11 +592,11 @@ have [G1 | ntG] := eqsVneq G 1.
 have sG_AG: G \subset A <*> G by rewrite joing_subr.
 have sA_AG: A \subset A <*> G by rewrite joing_subl.
 have nG_AG: A <*> G \subset 'N(G) by rewrite join_subG nGA normG.
-have nsG_AG: G <| A <*> G by exact/andP.
+have nsG_AG: G <| A <*> G by apply/andP.
 case: (solvable_norm_abelem solG nsG_AG) => // M [sMG nsMAG ntM].
 have{nsMAG} [nMA nMG]: A \subset 'N(M) /\ G \subset 'N(M).
   by apply/andP; rewrite -join_subG normal_norm.
-have nMX: X \subset 'N(M) by exact: subset_trans nMG.
+have nMX: X \subset 'N(M) by apply: subset_trans nMG.
 case/is_abelemP=> p pr_p; case/and3P=> pM cMM _.
 have: #|G / M| < n by rewrite (leq_trans (ltn_quotient _ _)).
 move/(IHn _ (A / M)%G _ (X / M)%G); rewrite !(quotient_norms, quotientS) //.
@@ -609,7 +609,7 @@ have{pi'Hq' sHGq} pi'HM': pi^'.-nat #|G : HM|.
   move: pi'Hq'; rewrite -!divgS // defHM !card_quotient //.
   by rewrite -(divnMl (cardG_gt0 M)) !Lagrange.
 have{nHAq} nHMA: A \subset 'N(HM).
-  by rewrite -(quotientSGK nMA) ?normsG ?quotient_normG -?defHM //; exact/andP.
+  by rewrite -(quotientSGK nMA) ?normsG ?quotient_normG -?defHM //; apply/andP.
 case/orP: (orbN (p \in pi)) => pi_p.
   exists HM; split=> //; apply/and3P; split; rewrite /pgroup //.
   by rewrite -(Lagrange sMHM) pnat_mul -card_quotient // -defHM (pi_pnat pM).
@@ -618,7 +618,7 @@ case: (ltnP #|HM| #|G|) => [ltHG | leGHM {n IHn leGn}].
   - exact: coprimeSg coGA.
   - exact: solvableS solG.
   case/and3P: hallH => sHHM piH pi'H'.
-  have sHG: H \subset G by exact: subset_trans sHMG.
+  have sHG: H \subset G by apply: subset_trans sHMG.
   exists H; split=> //; apply/and3P; split=> //.
   rewrite -divgS // -(Lagrange sHMG) -(Lagrange sHHM) -mulnA mulKn //.
   by rewrite pnat_mul pi'H'.
@@ -640,7 +640,7 @@ have hallX: pi.-Hall(XM) X.
 have sXMG: XM \subset G by rewrite join_subG sXG.
 have hallY: pi.-Hall(XM) Y.
   have sYXM: Y \subset XM by rewrite subsetIr.
-  have piY: pi.-group Y by apply: pgroupS piH; exact: subsetIl.
+  have piY: pi.-group Y by apply: pgroupS piH; apply: subsetIl.
   rewrite /pHall sYXM piY -divgS // -(_ : Y * M = XM).
     by rewrite coprime_cardMg ?co_pi_M // mulKn //.
   rewrite /= setIC group_modr ?joing_subr //=; apply/setIidPl.
@@ -746,7 +746,7 @@ Proof.
 move=> sHG nHA coHA solH; pose N := 'N_G(H).
 have nsHN: H <| N by rewrite normal_subnorm.
 have [sHN nHn] := andP nsHN.
-have sNG: N \subset G by exact: subsetIl.
+have sNG: N \subset G by apply: subsetIl.
 have nNA: {acts A, on group N | to}.
   split; rewrite // actsEsd // injm_subnorm ?injm_sdpair1 //=.
   by rewrite normsI ?norms_norm ?im_sdpair_norm -?actsEsd.
@@ -882,12 +882,12 @@ Lemma sol_coprime_Sylow_subset A G X :
 Proof.
 move=> nGA coGA solA sXG pX nXA.
 pose nAp (Q : {group gT}) := [&& p.-group Q, Q \subset G & A \subset 'N(Q)].
-have: nAp X by exact/and3P.
+have: nAp X by apply/and3P.
 case/maxgroup_exists=> R; case/maxgroupP; case/and3P=> pR sRG nRA maxR sXR.
 have [P sylP sRP]:= Sylow_superset sRG pR.
 suffices defP: P :=: R by exists P; rewrite sylP defP.
 case/and3P: sylP => sPG pP _; apply: (nilpotent_sub_norm (pgroup_nil pP)) => //.
-pose N := 'N_G(R); have{sPG} sPN_N: 'N_P(R) \subset N by exact: setSI.
+pose N := 'N_G(R); have{sPG} sPN_N: 'N_P(R) \subset N by apply: setSI.
 apply: norm_sub_max_pgroup (pgroupS (subsetIl _ _) pP) sPN_N (subsetIr _ _).
 have nNA: A \subset 'N(N) by rewrite normsI ?norms_norm.
 have coNA: coprime #|N| #|A| by apply: coprimeSg coGA; rewrite subsetIl.

@@ -1,37 +1,44 @@
+H=@
 
-.PHONY: ssreflect algebra fingroup all odd_order solvable field character discrete real_closed ssrtest
+ifeq "$(COQBIN)" ""
+COQBIN=$(dir $(shell which coqtop))/
+endif
 
-export COQPATH=$(PWD)/..
+BRANCH_coq = $(shell $(COQBIN)/coqtop -v | head -1 | sed 's/.*version \([0-9]\.[0-9]\)[^ ]* .*/v\1/')
 
-all: ssreflect algebra fingroup odd_order solvable field character discrete real_closed ssrtest
-	$(MAKE) -C $@
+HASH_coq = $(shell echo Quit. | $(COQBIN)/coqtop 2>&1 | head -1 | sed 's/^.*(\([a-f0-9]*\)).*/\1/' )
 
-ssreflect:
-	$(MAKE) -C $@
+HASH_coq_v85beta1 = eaa3d0b15adf4eb11ffb00ab087746a5b15c4d5d
 
-algebra: fingroup
-	$(MAKE) -C $@
 
-fingroup: discrete
-	$(MAKE) -C $@
+ifeq "$(HASH_coq)" "$(HASH_coq_v85beta1)"
+V=v8.5beta1
+else
+V=$(BRANCH_coq)
+endif
 
-odd_order: field
-	$(MAKE) -C $@
+OLD_MAKEFLAGS:=$(MAKEFLAGS)
+MAKEFLAGS+=-B
 
-solvable: algebra
-	$(MAKE) -C $@
+.DEFAULT_GOAL := all
 
-field: solvable
-	$(MAKE) -C $@
+%:
+	$(H)[ -e Makefile.coq ] || $(call coqmakefile)
+	# Override COQDEP to find only the "right" copy of .ml files
+	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
+		-f Makefile.coq $* \
+		COQDEP='$(COQBIN)/coqdep -exclude-dir "plugin" -c'
 
-character: field
-	$(MAKE) -C $@
+define coqmakefile
+	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
+	ln -sf ssreflect/plugin/$(V)/ssreflect.mllib .;\
+	ln -sf ssreflect/plugin/$(V)/ssrmatching.mli .;\
+	ln -sf ssreflect/plugin/$(V)/ssrmatching.ml4 .;\
+	ln -sf ssreflect/plugin/$(V)/ssreflect.ml4 .;\
+	$(COQBIN)/coq_makefile -f Make -o Makefile.coq)
+endef
 
-discrete: ssreflect
-	$(MAKE) -C $@
-
-real_closed: algebra
-	$(MAKE) -C $@
-
-ssrtest: algebra
-	$(MAKE) -C $@
+clean:
+	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
+		-f Makefile.coq clean
+	$(H)rm -f Makefile.coq

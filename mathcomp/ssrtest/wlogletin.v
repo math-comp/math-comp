@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect eqtype ssrbool.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import eqtype ssrbool.
 
 Variable T : Type.
 Variables P : T -> Prop.

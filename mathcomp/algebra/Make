@@ -1,4 +1,4 @@
-all.v
+all_algebra.v
 finalg.v
 fraction.v
 intdiv.v
@@ -16,6 +16,5 @@ ssrint.v
 ssrnum.v
 vector.v
 zmodp.v
-cyclic.v
 
 -R . mathcomp.algebra

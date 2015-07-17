@@ -1,7 +1,12 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+From mathcomp
 Require Import bigop ssralg ssrnum ssrint rat poly polydiv polyorder.
+From mathcomp
 Require Import perm matrix mxpoly polyXY binomial generic_quotient.
+From mathcomp
 Require Import cauchyreals separable zmodp bigenough.
 
 (*************************************************************************)
@@ -1520,7 +1525,8 @@ End RatRealAlg.
 
 Canonical RatRealAlg.realalg_countType.
 
-(* Require Import countalg. *)
+(* From mathcomp
+Require Import countalg. *)
 (* Canonical realalg_countZmodType := [countZmodType of realalg]. *)
 (* Canonical realalg_countRingType := [countRingType of realalg]. *)
 (* Canonical realalg_countComRingType := [countComRingType of realalg]. *)

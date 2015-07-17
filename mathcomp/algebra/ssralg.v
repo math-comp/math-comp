@@ -1,9 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype finfun bigop prime binomial.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat div seq choice fintype.
+From mathcomp
+Require Import finfun bigop prime binomial.
 
 (******************************************************************************)
 (*   The algebraic part of the Algebraic Hierarchy, as described in           *)
@@ -703,12 +703,18 @@ Proof. by move=> x y; rewrite -addrA addrN addr0. Qed.
 Lemma addrNK : @rev_right_loop V V -%R +%R.
 Proof. by move=> x y; rewrite -addrA addNr addr0. Qed.
 Definition subrK := addrNK.
+Lemma subKr x : involutive (fun y => x - y).
+Proof. by move=> y; apply: (canLR (addrK _)); rewrite addrC subrK. Qed.
 Lemma addrI : @right_injective V V V +%R.
-Proof. move=> x; exact: can_inj (addKr x). Qed.
+Proof. by move=> x; apply: can_inj (addKr x). Qed.
 Lemma addIr : @left_injective V V V +%R.
-Proof. move=> y; exact: can_inj (addrK y). Qed.
+Proof. by move=> y; apply: can_inj (addrK y). Qed.
+Lemma subrI : right_injective (fun x y => x - y).
+Proof. by move=> x; apply: can_inj (subKr x). Qed.
+Lemma subIr : left_injective (fun x y => x - y).
+Proof. by move=> y; apply: addIr. Qed.
 Lemma opprK : @involutive V -%R.
-Proof. by move=> x; apply: (@addIr (- x)); rewrite addNr addrN. Qed.
+Proof. by move=> x; apply: (@subIr x); rewrite addNr addrN. Qed.
 Lemma oppr_inj : @injective V V -%R.
 Proof. exact: inv_inj opprK. Qed.
 Lemma oppr0 : -0 = 0 :> V.
@@ -719,13 +725,14 @@ Proof. by rewrite (inv_eq opprK) oppr0. Qed.
 Lemma subr0 x : x - 0 = x. Proof. by rewrite oppr0 addr0. Qed.
 Lemma sub0r x : 0 - x = - x. Proof. by rewrite add0r. Qed.
 
-Lemma opprD : {morph -%R: x y / x + y : V}.
-Proof.
-by move=> x y; apply: (@addrI (x + y)); rewrite addrA subrr addrAC addrK subrr.
-Qed.
-
 Lemma opprB x y : - (x - y) = y - x.
-Proof. by rewrite opprD addrC opprK. Qed.
+Proof. by apply: (canRL (addrK x)); rewrite addrC subKr. Qed.
+
+Lemma opprD : {morph -%R: x y / x + y : V}.
+Proof. by move=> x y; rewrite -[y in LHS]opprK opprB addrC. Qed.
+
+Lemma subr0_eq x y : x - y = 0 -> x = y.
+Proof. by rewrite -(subrr y) => /addIr. Qed.
 
 Lemma subr_eq x y z : (x - z == y) = (x == y + z).
 Proof. exact: can2_eq (subrK z) (addrK z) x y. Qed.
@@ -734,7 +741,7 @@ Lemma subr_eq0 x y : (x - y == 0) = (x == y).
 Proof. by rewrite subr_eq add0r. Qed.
 
 Lemma addr_eq0 x y : (x + y == 0) = (x == - y).
-Proof. by rewrite -[x == _]subr_eq0 opprK. Qed.
+Proof. by rewrite -[y in LHS]opprK subr_eq0. Qed.
 
 Lemma eqr_opp x y : (- x == - y) = (x == y).
 Proof. exact: can_eq opprK x y. Qed.
@@ -1054,7 +1061,7 @@ Lemma commrN x y : comm x y -> comm x (- y).
 Proof. by move=> com_xy; rewrite /comm mulrN com_xy mulNr. Qed.
 
 Lemma commrN1 x : comm x (-1).
-Proof. apply: commrN; exact: commr1. Qed.
+Proof. exact/commrN/commr1. Qed.
 
 Lemma commrD x y z : comm x y -> comm x z -> comm x (y + z).
 Proof. by rewrite /comm mulrDl mulrDr => -> ->. Qed.
@@ -1069,7 +1076,7 @@ Lemma commrM x y z : comm x y -> comm x z -> comm x (y * z).
 Proof. by move=> com_xy; rewrite /comm mulrA com_xy -!mulrA => ->. Qed.
 
 Lemma commr_nat x n : comm x n%:R.
-Proof. by apply: commrMn; exact: commr1. Qed.
+Proof. exact/commrMn/commr1. Qed.
 
 Lemma commrX x y n : comm x y -> comm x (y ^+ n).
 Proof.
@@ -1096,7 +1103,7 @@ Qed.
 Lemma exprM x m n : x ^+ (m * n) = x ^+ m ^+ n.
 Proof.
 elim: m => [|m IHm]; first by rewrite expr1n.
-by rewrite mulSn exprD IHm exprS exprMn_comm //; exact: commrX.
+by rewrite mulSn exprD IHm exprS exprMn_comm //; apply: commrX.
 Qed.
 
 Lemma exprAC x m n : (x ^+ m) ^+ n = (x ^+ n) ^+ m.
@@ -1178,7 +1185,7 @@ Proof. by move=> reg_x reg_y z t; rewrite -!mulrA => /reg_x/reg_y. Qed.
 
 Lemma lregX x n : lreg x -> lreg (x ^+ n).
 Proof.
-by move=> reg_x; elim: n => [|n]; [exact: lreg1 | rewrite exprS; exact: lregM].
+by move=> reg_x; elim: n => [|n]; [apply: lreg1 | rewrite exprS; apply: lregM].
 Qed.
 
 Lemma lreg_sign n : lreg ((-1) ^+ n : R).
@@ -1320,14 +1327,14 @@ Qed.
 Lemma Frobenius_autMn x n : (x *+ n)^f = x^f *+ n.
 Proof.
 elim: n => [|n IHn]; first exact: Frobenius_aut0.
-rewrite !mulrS Frobenius_autD_comm ?IHn //; exact: commrMn.
+by rewrite !mulrS Frobenius_autD_comm ?IHn //; apply: commrMn.
 Qed.
 
 Lemma Frobenius_aut_nat n : (n%:R)^f = n%:R.
 Proof. by rewrite Frobenius_autMn Frobenius_aut1. Qed.
 
 Lemma Frobenius_autM_comm x y : comm x y -> (x * y)^f = x^f * y^f.
-Proof. by exact: exprMn_comm. Qed.
+Proof. exact: exprMn_comm. Qed.
 
 Lemma Frobenius_autX x n : (x ^+ n)^f = x^f ^+ n.
 Proof. by rewrite !fE -!exprM mulnC. Qed.
@@ -1445,7 +1452,7 @@ Lemma rreg1 : rreg (1 : R).
 Proof. exact: (@lreg1 Rc). Qed.
 
 Lemma rregM x y : rreg x -> rreg y -> rreg (x * y).
-Proof. by move=> reg_x reg_y; exact: (@lregM Rc). Qed.
+Proof. by move=> reg_x reg_y; apply: (@lregM Rc). Qed.
 
 Lemma revrX x n : (x : Rc) ^+ n = (x : R) ^+ n.
 Proof. by elim: n => // n IHn; rewrite exprS exprSr IHn. Qed.
@@ -2415,7 +2422,7 @@ Lemma lrmorphismP : lrmorphism f. Proof. exact: LRMorphism.class. Qed.
 
 Lemma can2_lrmorphism f' : cancel f f' -> cancel f' f -> lrmorphism f'.
 Proof.
-move=> fK f'K; split; [exact: (can2_rmorphism fK) | exact: (can2_linear fK)].
+by move=> fK f'K; split; [apply: (can2_rmorphism fK) | apply: (can2_linear fK)].
 Qed.
 
 Lemma bij_lrmorphism :
@@ -2496,7 +2503,7 @@ Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
 
 Lemma exprMn n : {morph (fun x => x ^+ n) : x y / x * y}.
-Proof. move=> x y; apply: exprMn_comm; exact: mulrC. Qed.
+Proof. by move=> x y; apply: exprMn_comm; apply: mulrC. Qed.
 
 Lemma prodrXl n I r (P : pred I) (F : I -> R) :
   \prod_(i <- r | P i) F i ^+ n = (\prod_(i <- r | P i) F i) ^+ n.
@@ -2508,16 +2515,16 @@ Proof. exact: big_undup_iterop_count.  Qed.
 
 Lemma exprDn x y n :
   (x + y) ^+ n = \sum_(i < n.+1) (x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
-Proof. by rewrite exprDn_comm //; exact: mulrC. Qed.
+Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
 
 Lemma exprBn x y n :
   (x - y) ^+ n =
      \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
-Proof. by rewrite exprBn_comm //; exact: mulrC. Qed.
+Proof. by rewrite exprBn_comm //; apply: mulrC. Qed.
 
 Lemma subrXX x y n :
   x ^+ n - y ^+ n = (x - y) * (\sum_(i < n) x ^+ (n.-1 - i) * y ^+ i).
-Proof. by rewrite -subrXX_comm //; exact: mulrC. Qed.
+Proof. by rewrite -subrXX_comm //; apply: mulrC. Qed.
 
 Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
 Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
@@ -2810,10 +2817,10 @@ Proof. by move=> x Ux y; rewrite -mulrA mulVr ?mulr1. Qed.
 Definition divrK := mulrVK.
 
 Lemma mulrI : {in @unit R, right_injective *%R}.
-Proof. by move=> x Ux; exact: can_inj (mulKr Ux). Qed.
+Proof. by move=> x Ux; apply: can_inj (mulKr Ux). Qed.
 
 Lemma mulIr : {in @unit R, left_injective *%R}.
-Proof. by move=> x Ux; exact: can_inj (mulrK Ux). Qed.
+Proof. by move=> x Ux; apply: can_inj (mulrK Ux). Qed.
 
 (* Due to noncommutativity, fractions are inverted. *)
 Lemma telescope_prodr n m (f : nat -> R) :
@@ -2868,10 +2875,14 @@ Proof.
 by rewrite dvdn_eq => /eqP def_m unit_d; rewrite -{2}def_m natrM mulrK.
 Qed.
 
+Lemma divrI : {in unit, right_injective (fun x y => x / y)}.
+Proof. by move=> x /mulrI/inj_comp; apply; apply: invr_inj. Qed.
+
+Lemma divIr : {in unit, left_injective (fun x y => x / y)}.
+Proof. by move=> x; rewrite -unitrV => /mulIr. Qed.
+
 Lemma unitr0 : (0 \is a @unit R) = false.
-Proof.
-by apply/unitrP=> [[x [_]]]; apply/eqP; rewrite mul0r eq_sym oner_neq0.
-Qed.
+Proof. by apply/unitrP=> [[x [_ /esym/eqP]]]; rewrite mul0r oner_eq0. Qed.
 
 Lemma invr0 : 0^-1 = 0 :> R.
 Proof. by rewrite invr_out ?unitr0. Qed.
@@ -3031,7 +3042,7 @@ Fact mulC_mulrV : {in unit, right_inverse 1 inv *%R}.
 Proof. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
 
 Fact mulC_unitP x y : y * x = 1 /\ x * y = 1 -> unit x.
-Proof. case=> yx _; exact: unitPl yx. Qed.
+Proof. by case=> yx _; apply: unitPl yx. Qed.
 
 Definition Mixin := UnitRingMixin mulVx mulC_mulrV mulC_unitP.
 
@@ -3175,12 +3186,15 @@ Variable R : comUnitRingType.
 Implicit Types x y : R.
 
 Lemma unitrM x y : (x * y \in unit) = (x \in unit) && (y \in unit).
-Proof. by apply: unitrM_comm; exact: mulrC. Qed.
+Proof. by apply: unitrM_comm; apply: mulrC. Qed.
 
 Lemma unitrPr x : reflect (exists y, x * y = 1) (x \in unit).
 Proof.
 by apply: (iffP (unitrP x)) => [[y []] | [y]]; exists y; rewrite // mulrC.
 Qed.
+
+Lemma divKr x : x \is a unit -> {in unit, involutive (fun y => x / y)}.
+Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 
 Lemma expr_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
 Proof. by rewrite exprMn exprVn. Qed.
@@ -3485,7 +3499,7 @@ Proof. by case: rpred0D. Qed.
 
 Lemma rpred_sum I r (P : pred I) F :
   (forall i, P i -> F i \in kS) -> \sum_(i <- r | P i) F i \in kS.
-Proof. by move=> IH; elim/big_ind: _; [exact: rpred0 | exact: rpredD |]. Qed.
+Proof. by move=> IH; elim/big_ind: _; [apply: rpred0 | apply: rpredD |]. Qed.
 
 Lemma rpredMn n : {in kS, forall u, u *+ n \in kS}.
 Proof. by move=> u Su; rewrite -(card_ord n) -sumr_const rpred_sum. Qed.
@@ -3558,7 +3572,7 @@ Proof. by case: rpred1M. Qed.
 
 Lemma rpred_prod I r (P : pred I) F :
   (forall i, P i -> F i \in kS) -> \prod_(i <- r | P i) F i \in kS.
-Proof. by move=> IH; elim/big_ind: _; [exact: rpred1 | exact: rpredM |]. Qed.
+Proof. by move=> IH; elim/big_ind: _; [apply: rpred1 | apply: rpredM |]. Qed.
 
 Lemma rpredX n : {in kS, forall u, u ^+ n \in kS}.
 Proof. by move=> u Su; rewrite -(card_ord n) -prodr_const rpred_prod. Qed.
@@ -3952,7 +3966,7 @@ suffices eq0_ring t1: rformula (eq0_rform t1) by elim: f => //= => f1 ->.
 rewrite /eq0_rform; move: (ub_var t1) => m; set tr := _ m.
 suffices: all rterm (tr.1 :: tr.2).
   case: tr => {t1} t1 r /= /andP[t1_r].
-  by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; exact: IHr.
+  by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; apply: IHr.
 have: all rterm [::] by [].
 rewrite {}/tr; elim: t1 [::] => //=.
 - move=> t1 IHt1 t2 IHt2 r.
@@ -3978,11 +3992,11 @@ suffices{e f} equal0_equiv e t1 t2:
 - elim: f e => /=; try tauto.
   + move=> t1 t2 e.
     by split; [move/equal0_equiv/eqP | move/eqP/equal0_equiv].
-  + move=> t1 e; rewrite unitrE; exact: equal0_equiv.
-  + move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
-  + move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
-  + move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
-  + move=> f1 IHf1 e; move: (IHf1 e); tauto.
+  + by move=> t1 e; rewrite unitrE; apply: equal0_equiv.
+  + by move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
+  + by move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
+  + by move=> f1 IHf1 f2 IHf2 e; move: (IHf1 e) (IHf2 e); tauto.
+  + by move=> f1 IHf1 e; move: (IHf1 e); tauto.
   + by move=> n f1 IHf1 e; split=> [] [x] /IHf1; exists x.
   + by move=> n f1 IHf1 e; split=> Hx x; apply/IHf1.
 rewrite -(add0r (eval e t2)) -(can2_eq (subrK _) (addrK _)).
@@ -4086,8 +4100,8 @@ Definition qf_eval e := fix loop (f : formula R) : bool :=
 (* qf_eval is equivalent to holds *)
 Lemma qf_evalP e f : qf_form f -> reflect (holds e f) (qf_eval e f).
 Proof.
-elim: f => //=; try by move=> *; exact: idP.
-- move=> t1 t2 _; exact: eqP.
+elim: f => //=; try by move=> *; apply: idP.
+- by move=> t1 t2 _; apply: eqP.
 - move=> f1 IHf1 f2 IHf2 /= /andP[/IHf1[] f1T]; last by right; case.
   by case/IHf2; [left | right; case].
 - move=> f1 IHf1 f2 IHf2 /= /andP[/IHf1[] f1F]; first by do 2 left.
@@ -4183,7 +4197,7 @@ Lemma qf_to_dnf_rterm f b : rformula f -> all dnf_rterm (qf_to_dnf f b).
 Proof.
 set ok := all dnf_rterm.
 have cat_ok bcs1 bcs2: ok bcs1 -> ok bcs2 -> ok (bcs1 ++ bcs2).
-  by move=> ok1 ok2; rewrite [ok _]all_cat; exact/andP.
+  by move=> ok1 ok2; rewrite [ok _]all_cat; apply/andP.
 have and_ok bcs1 bcs2: ok bcs1 -> ok bcs2 -> ok (and_dnf bcs1 bcs2).
   rewrite /and_dnf unlock; elim: bcs1 => //= cl1 bcs1 IH1; rewrite -andbA.
   case/and3P=> ok11 ok12 ok1 ok2; rewrite cat_ok ?{}IH1 {bcs1 ok1}//.
@@ -4283,7 +4297,7 @@ Lemma foldForallP I e :
     <-> holds e (foldr Forall f I).
 Proof.
 elim: I e => /= [|i I IHi] e.
-  by split=> [|f_e e' eq_e]; [exact | apply: eq_holds f_e => i; rewrite eq_e].
+  by split=> [|f_e e' eq_e]; [apply | apply: eq_holds f_e => i; rewrite eq_e].
 split=> [f_e' x | f_e e' eq_e]; first set e_x := set_nth 0 e i x.
   apply/IHi=> e' eq_e; apply: f_e' => j.
   by have:= eq_e j; rewrite nth_set_nth /= !inE; case: eqP.
@@ -4387,12 +4401,12 @@ Lemma prodf_seq_eq0 I r (P : pred I) (F : I -> R) :
 Proof. by rewrite (big_morph _ mulf_eq0 (oner_eq0 _)) big_has_cond. Qed.
 
 Lemma mulf_neq0 x y : x != 0 -> y != 0 -> x * y != 0.
-Proof. move=> x0 y0; rewrite mulf_eq0; exact/norP. Qed.
+Proof. by move=> x0 y0; rewrite mulf_eq0; apply/norP. Qed.
 
 Lemma prodf_neq0 (I : finType) (P : pred I) (F : I -> R) :
   reflect (forall i, P i -> (F i != 0)) (\prod_(i | P i) F i != 0).
 Proof.
-by rewrite (sameP (prodf_eq0 _ _) exists_inP) negb_exists_in; exact: forall_inP.
+by rewrite (sameP (prodf_eq0 _ _) exists_inP) negb_exists_in; apply: forall_inP.
 Qed.
 
 Lemma prodf_seq_neq0 I r (P : pred I) (F : I -> R) :
@@ -4450,13 +4464,18 @@ Proof. by rewrite -subr_eq0 subr_sqr mulf_eq0 subr_eq0 addr_eq0. Qed.
 
 Lemma mulfI x : x != 0 -> injective ( *%R x).
 Proof.
-move=> nz_x y z; rewrite -[x * z]add0r; move/(canLR (addrK _))/eqP.
-rewrite -mulrN -mulrDr mulf_eq0 (negbTE nz_x) /=.
-by move/eqP/(canRL (subrK _)); rewrite add0r.
+move=> nz_x y z; apply: contra_eq => neq_yz.
+by rewrite -subr_eq0 -mulrBr mulf_neq0 ?subr_eq0.
 Qed.
 
 Lemma mulIf x : x != 0 -> injective ( *%R^~ x).
-Proof. by move=> nz_x y z; rewrite -!(mulrC x); exact: mulfI. Qed.
+Proof. by move=> nz_x y z; rewrite -!(mulrC x); apply: mulfI. Qed.
+
+Lemma divfI x : x != 0 -> injective (fun y => x / y).
+Proof. by move/mulfI/inj_comp; apply; apply: invr_inj. Qed.
+
+Lemma divIf y : y != 0 -> injective (fun x => x / y).
+Proof. by rewrite -invr_eq0; apply: mulIf. Qed.
 
 Lemma sqrf_eq1 x : (x ^+ 2 == 1) = (x == 1) || (x == -1).
 Proof. by rewrite -subr_eq0 subr_sqr_1 mulf_eq0 subr_eq0 addr_eq0. Qed.
@@ -4589,18 +4608,18 @@ Lemma unitfE x : (x \in unit) = (x != 0).
 Proof. by apply/idP/idP=> [/(memPn _)-> | /fieldP]; rewrite ?unitr0. Qed.
 
 Lemma mulVf x : x != 0 -> x^-1 * x = 1.
-Proof. by rewrite -unitfE; exact: mulVr. Qed.
+Proof. by rewrite -unitfE; apply: mulVr. Qed.
 Lemma divff x : x != 0 -> x / x = 1.
-Proof. by rewrite -unitfE; exact: divrr. Qed.
+Proof. by rewrite -unitfE; apply: divrr. Qed.
 Definition mulfV := divff.
 Lemma mulKf x : x != 0 -> cancel ( *%R x) ( *%R x^-1).
-Proof. by rewrite -unitfE; exact: mulKr. Qed.
+Proof. by rewrite -unitfE; apply: mulKr. Qed.
 Lemma mulVKf x : x != 0 -> cancel ( *%R x^-1) ( *%R x).
-Proof. by rewrite -unitfE; exact: mulVKr. Qed.
+Proof. by rewrite -unitfE; apply: mulVKr. Qed.
 Lemma mulfK x : x != 0 -> cancel ( *%R^~ x) ( *%R^~ x^-1).
-Proof. by rewrite -unitfE; exact: mulrK. Qed.
+Proof. by rewrite -unitfE; apply: mulrK. Qed.
 Lemma mulfVK x : x != 0 -> cancel ( *%R^~ x^-1) ( *%R^~ x).
-Proof. by rewrite -unitfE; exact: divrK. Qed.
+Proof. by rewrite -unitfE; apply: divrK. Qed.
 Definition divfK := mulfVK.
 
 Lemma invfM : {morph @inv F : x y / x * y}.
@@ -4612,6 +4631,9 @@ Qed.
 
 Lemma invf_div x y : (x / y)^-1 = y / x.
 Proof. by rewrite invfM invrK mulrC. Qed.
+
+Lemma divKf x : x != 0 -> involutive (fun y => x / y).
+Proof. by move=> nz_x y; rewrite invf_div mulrC divfK. Qed.
 
 Lemma expfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof.
@@ -4687,7 +4709,7 @@ Variables (R : unitRingType) (f : {rmorphism F -> R}).
 Lemma fmorph_unit x : (f x \in unit) = (x != 0).
 Proof.
 have [-> |] := altP (x =P _); first by rewrite rmorph0 unitr0.
-by rewrite -unitfE; exact: rmorph_unit.
+by rewrite -unitfE; apply: rmorph_unit.
 Qed.
 
 Lemma fmorphV : {morph f: x / x^-1}.
@@ -4712,10 +4734,10 @@ Lemma scalerK a : a != 0 -> cancel ( *:%R a : V -> V) ( *:%R a^-1).
 Proof. by move=> nz_a v; rewrite scalerA mulVf // scale1r. Qed.
 
 Lemma scalerKV a : a != 0 -> cancel ( *:%R a^-1 : V -> V) ( *:%R a).
-Proof. by rewrite -invr_eq0 -{3}[a]invrK; exact: scalerK. Qed.
+Proof. by rewrite -invr_eq0 -{3}[a]invrK; apply: scalerK. Qed.
 
 Lemma scalerI a : a != 0 -> injective ( *:%R a : V -> V).
-Proof. move=> nz_a; exact: can_inj (scalerK nz_a). Qed.
+Proof. by move=> nz_a; apply: can_inj (scalerK nz_a). Qed.
 
 Lemma scaler_eq0 a v : (a *: v == 0) = (a == 0) || (v == 0).
 Proof.
@@ -4740,16 +4762,16 @@ Section Predicates.
 Context (S : pred_class) (divS : @divrPred F S) (kS : keyed_pred divS).
 
 Lemma fpredMl x y : x \in kS -> x != 0 -> (x * y \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; exact: rpredMl. Qed.
+Proof. by rewrite -!unitfE; apply: rpredMl. Qed.
 
 Lemma fpredMr x y : x \in kS -> x != 0 -> (y * x \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; exact: rpredMr. Qed.
+Proof. by rewrite -!unitfE; apply: rpredMr. Qed.
 
 Lemma fpred_divl x y : x \in kS -> x != 0 -> (x / y \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; exact: rpred_divl. Qed.
+Proof. by rewrite -!unitfE; apply: rpred_divl. Qed.
 
 Lemma fpred_divr x y : x \in kS -> x != 0 -> (y / x \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; exact: rpred_divr. Qed.
+Proof. by rewrite -!unitfE; apply: rpred_divr. Qed.
 
 End Predicates.
 
@@ -4943,7 +4965,7 @@ suffices or_wf fs : let ofs := foldr Or False fs in
 - apply: or_wf.
   suffices map_proj_wf bcs: let mbcs := map (proj n) bcs in
     all dnf_rterm bcs -> all (@qf_form _) mbcs && all (@rformula _) mbcs.
-    by apply: map_proj_wf; exact: qf_to_dnf_rterm.
+    by apply: map_proj_wf; apply: qf_to_dnf_rterm.
   elim: bcs => [|bc bcs ihb] bcsr //= /andP[rbc rbcs].
   by rewrite andbAC andbA wf_proj //= andbC ihb.
 elim: fs => //= g gs ihg; rewrite -andbA => /and4P[-> qgs -> rgs] /=.
@@ -4960,7 +4982,7 @@ have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   apply: (@iffP (rc e0 n0 (dnf_to_form bcs))); last first.
   - by case=> x; rewrite -qf_to_dnfP //; exists x.
   - by case=> x; rewrite qf_to_dnfP //; exists x.
-  have: all dnf_rterm bcs by case/andP: cf => _; exact: qf_to_dnf_rterm.
+  have: all dnf_rterm bcs by case/andP: cf => _; apply: qf_to_dnf_rterm.
   elim: {f0 cf}bcs => [|bc bcs IHbcs] /=; first by right; case.
   case/andP=> r_bc /IHbcs {IHbcs}bcsP.
   have f_qf := dnf_to_form_qf [:: bc].
@@ -4972,8 +4994,8 @@ have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   case/orP => [bc_x|]; last by exists x.
   by case: no_x; exists x; apply/(qf_evalP _ f_qf); rewrite /= bc_x.
 elim: f e => //.
-- move=> b e _; exact: idP.
-- move=> t1 t2 e _; exact: eqP.
+- by move=> b e _; apply: idP.
+- by move=> t1 t2 e _; apply: eqP.
 - move=> f1 IH1 f2 IH2 e /= /andP[/IH1[] f1e]; last by right; case.
   by case/IH2; [left | right; case].
 - move=> f1 IH1 f2 IH2 e /= /andP[/IH1[] f1e]; first by do 2!left.
@@ -4982,7 +5004,7 @@ elim: f e => //.
   by case/IH2; [left | right; move/(_ f1e)].
 - by move=> f IHf e /= /IHf[]; [right | left].
 - move=> n f IHf e /= rf; have rqf := quantifier_elim_wf rf.
-  by apply: (iffP (auxP _ _ _ rqf)) => [] [x]; exists x; exact/IHf.
+  by apply: (iffP (auxP _ _ _ rqf)) => [] [x]; exists x; apply/IHf.
 move=> n f IHf e /= rf; have rqf := quantifier_elim_wf rf.
 case: auxP => // [f_x|no_x]; first by right=> no_x; case: f_x => x /IHf[].
 by left=> x; apply/IHf=> //; apply/idPn=> f_x; case: no_x; exists x.
@@ -5299,10 +5321,15 @@ Definition addNKr := addNKr.
 Definition addrK := addrK.
 Definition addrNK := addrNK.
 Definition subrK := subrK.
+Definition subKr := subKr.
 Definition addrI := @addrI.
 Definition addIr := @addIr.
+Definition subrI := @subrI.
+Definition subIr := @subIr.
 Implicit Arguments addrI [[V] x1 x2].
 Implicit Arguments addIr [[V] x1 x2].
+Implicit Arguments subrI [[V] x1 x2].
+Implicit Arguments subIr [[V] x1 x2].
 Definition opprK := opprK.
 Definition oppr_inj := @oppr_inj.
 Implicit Arguments oppr_inj [[V] x1 x2].
@@ -5313,6 +5340,7 @@ Definition opprB := opprB.
 Definition subr0 := subr0.
 Definition sub0r := sub0r.
 Definition subr_eq := subr_eq.
+Definition subr0_eq := subr0_eq.
 Definition subr_eq0 := subr_eq0.
 Definition addr_eq0 := addr_eq0.
 Definition eqr_opp := eqr_opp.
@@ -5480,6 +5508,8 @@ Definition mulrVK := mulrVK.
 Definition divrK := divrK.
 Definition mulrI := mulrI.
 Definition mulIr := mulIr.
+Definition divrI := divrI.
+Definition divIr := divIr.
 Definition telescope_prodr := telescope_prodr.
 Definition commrV := commrV.
 Definition unitrE := unitrE.
@@ -5554,6 +5584,7 @@ Definition holds_fsubst := holds_fsubst.
 Definition unitrM := unitrM.
 Definition unitrPr {R x} := @unitrPr R x.
 Definition expr_div_n := expr_div_n.
+Definition divKr := divKr.
 Definition mulf_eq0 := mulf_eq0.
 Definition prodf_eq0 := prodf_eq0.
 Definition prodf_seq_eq0 := prodf_seq_eq0.
@@ -5570,6 +5601,8 @@ Definition charf0P := charf0P.
 Definition eqf_sqr := eqf_sqr.
 Definition mulfI := mulfI.
 Definition mulIf := mulIf.
+Definition divfI := divfI.
+Definition divIf := divIf.
 Definition sqrf_eq1 := sqrf_eq1.
 Definition expfS_eq1 := expfS_eq1.
 Definition fieldP := fieldP.
@@ -5582,6 +5615,7 @@ Definition mulVKf := mulVKf.
 Definition mulfK := mulfK.
 Definition mulfVK := mulfVK.
 Definition divfK := divfK.
+Definition divKf := divKf.
 Definition invfM := invfM.
 Definition invf_div := invf_div.
 Definition expfB_cond := expfB_cond.

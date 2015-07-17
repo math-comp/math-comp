@@ -1,13 +1,11 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import path div choice fintype bigop finset.
-From mathcomp.fingroup
-Require Import fingroup morphism automorphism quotient action.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq path fintype bigop.
+From mathcomp
+Require Import finset fingroup morphism automorphism quotient action.
+From mathcomp
 Require Import commutator center.
-
 (******************************************************************************)
 (*           H <|<| G   <=> H is subnormal in G, i.e., H <| ... <| G.         *)
 (* invariant_factor A H G <=> A normalises both H and G, and H <| G.          *)
@@ -173,7 +171,7 @@ Lemma invariant_subnormal A G H :
 Proof.
 move=> nGA nHA /andP[]; move: #|G| => m.
 elim: m => [|m IHm] in G nGA * => sHG.
-  by rewrite eq_sym; exists [::]; last exact/eqP.
+  by rewrite eq_sym; exists [::]; last apply/eqP.
 rewrite iterSr; set K := <<_>>.
 have nKA: A \subset 'N(K) by rewrite norms_gen ?norms_class_support.
 have sHK: H \subset K by rewrite sub_gen ?sub_class_support.
@@ -297,7 +295,7 @@ apply/maxgroupP/maxgroupP; rewrite morphpre_proper //= => [] [ltMG maxM].
 split=> // H ltHG sMH.
 have dH: H \subset D := subset_trans (proper_sub ltHG) (subsetIl D _).
 have defH: f @*^-1 (f @* H) = H.
-  by apply: morphimGK dH; apply: subset_trans sMH; exact: ker_sub_pre.
+  by apply: morphimGK dH; apply: subset_trans sMH; apply: ker_sub_pre.
 rewrite -defH morphpre_proper ?morphimS // in ltHG.
 by rewrite -defH [f @* H]maxM // -(morphpreK dM) morphimS.
 Qed.
@@ -391,12 +389,12 @@ Qed.
 
 Lemma maxnormal_proper A B C : maxnormal A B C -> A \proper B.
 Proof.
-by case/maxsetP=> /and3P[gA pAB _] _; exact: (sub_proper_trans (subset_gen A)).
+by case/maxsetP=> /and3P[gA pAB _] _; apply: (sub_proper_trans (subset_gen A)).
 Qed.
 
 Lemma maxnormal_sub A B C : maxnormal A B C -> A \subset B.
 Proof.
-by move=> maxA; rewrite proper_sub //; exact: (maxnormal_proper maxA).
+by move=> maxA; rewrite proper_sub //; apply: (maxnormal_proper maxA).
 Qed.
 
 Lemma ex_maxnormal_ntrivg G : G :!=: 1-> {N : {group gT} | maxnormal N G G}.
@@ -416,7 +414,7 @@ wlog suffices: H K {maxH} maxK nsHG nsKG cHK ltHK_G / H \subset K.
   by move=> IH; rewrite eqEsubset !IH // -cHK.
 have{maxK} /maxgroupP[_ maxK] := maxK.
 apply/joing_idPr/maxK; rewrite ?joing_subr //= comm_joingE //.
-by rewrite properEneq ltHK_G; exact: normalM.
+by rewrite properEneq ltHK_G; apply: normalM.
 Qed.
 
 Lemma maxnormal_minnormal G L M :
@@ -425,7 +423,7 @@ Lemma maxnormal_minnormal G L M :
 Proof.
 move=> nMG nGL /maxgroupP[/andP[/andP[sMG ltMG] nML] maxM]; apply/mingroupP.
 rewrite -subG1 quotient_sub1 ?ltMG ?quotient_norms //.
-split=> // Hb /andP[ntHb nHbL]; have nsMG: M <| G by exact/andP.
+split=> // Hb /andP[ntHb nHbL]; have nsMG: M <| G by apply/andP.
 case/inv_quotientS=> // H defHb sMH sHG; rewrite defHb; congr (_ / M).
 apply/eqP; rewrite eqEproper sHG /=; apply: contra ntHb => ltHG.
 have nsMH: M <| H := normalS sMH sHG nsMG.
@@ -458,14 +456,14 @@ apply: (iffP mingroupP); rewrite normG andbT => [[ntG simG]].
   split=> // N /andP[sNG nNG].
   by case: (eqsVneq N 1) => [|ntN]; [left | right; apply: simG; rewrite ?ntN].
 split=> // N /andP[ntN nNG] sNG.
-by case: (simG N) ntN => // [|->]; [exact/andP | case/eqP].
+by case: (simG N) ntN => // [|->]; [apply/andP | case/eqP].
 Qed.
 
 Lemma quotient_simple gT (G H : {group gT}) :
   H <| G -> simple (G / H) = maxnormal H G G.
 Proof.
 move=> nsHG; have nGH := normal_norm nsHG.
-by apply/idP/idP; [exact: minnormal_maxnormal | exact: maxnormal_minnormal].
+by apply/idP/idP; [apply: minnormal_maxnormal | apply: maxnormal_minnormal].
 Qed.
 
 Lemma isog_simple gT rT (G : {group gT}) (M : {group rT}) :
@@ -496,7 +494,7 @@ Lemma chief_factor_minnormal G V U :
   chief_factor G V U -> minnormal (U / V) (G / V).
 Proof.
 case/andP=> maxV /andP[sUG nUG]; apply: maxnormal_minnormal => //.
-by have /andP[_ nVG] := maxgroupp maxV; exact: subset_trans sUG nVG.
+by have /andP[_ nVG] := maxgroupp maxV; apply: subset_trans sUG nVG.
 Qed.
 
 Lemma acts_irrQ G U V :
@@ -527,7 +525,7 @@ have /andP[ltVU nVG] := maxgroupp maxV.
 have [||s ch_s defV] := IHm V; first exact: leq_trans (proper_card ltVU) _.
   by rewrite /normal (subset_trans (proper_sub ltVU) (normal_sub nsUG)).
 exists (rcons s U); last by rewrite last_rcons.
-by rewrite rcons_path defV /= ch_s /chief_factor; exact/and3P.
+by rewrite rcons_path defV /= ch_s /chief_factor; apply/and3P.
 Qed.
 
 End Chiefs.

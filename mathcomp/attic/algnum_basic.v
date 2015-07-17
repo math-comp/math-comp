@@ -1,7 +1,12 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype tuple div.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype tuple div.
+From mathcomp
 Require Import bigop prime finset fingroup ssralg finalg zmodp abelian.
+From mathcomp
 Require Import matrix vector falgebra finfield action poly ssrint cyclotomic.
+From mathcomp
 Require Import fieldext mxalgebra mxpoly.
 
 (************************************************************************************************)
@@ -120,7 +125,7 @@ Qed.
 Lemma int_clos_incl a : a \in A -> integral a.
 Proof.
 move=> ainA; exists ('X - a%:P); rewrite monicXsubC root_XsubC.
-rewrite polyOverXsubC => //; by exact Asubr.
+rewrite polyOverXsubC => //; by apply Asubr.
 Qed.
 
 Lemma intPl (I : eqType) G (r : seq I) l : has (fun x => G x != 0) r ->
@@ -156,7 +161,7 @@ have rs : size r = n.-1 by rewrite /r size_takel // size_opp leq_pred.
 exists r; split.
   apply/eqP => /nilP; rewrite /nilp /r size_takel; last by rewrite size_opp leq_pred.
   by rewrite -subn1 subn_eq0 leqNgt ps.
-  have : - p \is a polyOver A by rewrite rpredN //; exact Asubr.
+  have : - p \is a polyOver A by rewrite rpredN //; apply Asubr.
   by move => /allP-popA; apply/allP => x /mem_take /popA.
 move: pr => /rootP; rewrite horner_coef -(prednK (n := size p)); last by rewrite ltnW.
 rewrite big_ord_recr /= rs; have := monicP pm; rewrite /lead_coef => ->; rewrite mul1r => /eqP.
@@ -283,9 +288,9 @@ pose Y := map_tuple finv Xdual; exists Y => Und Xb.
 have Ydef (i : 'I_m) : Y`_i = finv Xdual`_i by rewrite -!tnth_nth tnth_map.
 have XiU (i : 'I_m) : X`_i \in U by apply/(basis_mem Xb)/mem_nth; rewrite size_tuple.
 have Xii (i : 'I_m) : coord X i X`_i = 1%:R.
-  by rewrite coord_free ?eqxx //; exact (basis_free Xb).
+  by rewrite coord_free ?eqxx //; apply (basis_free Xb).
 have Xij (i j : 'I_m) : j != i -> coord X i X`_j = 0%:R.
-  by rewrite coord_free; [move => /negbTE -> | exact (basis_free Xb)].
+  by rewrite coord_free; [move => /negbTE -> | apply (basis_free Xb)].
 have Xdualb : basis_of fullv Xdual.
   suffices Xdualf : free Xdual.
     rewrite /basis_of Xdualf andbC /= -dimv_leqif_eq ?subvf // eq_sym HomVdim.
@@ -326,7 +331,7 @@ Hypothesis Und : ndeg tr U.
 Hypothesis Xb : basis_of U X.
 
 Lemma dualb_basis : basis_of U dual_basis.
-Proof. have [Yb _] := svalP dual_basis_def Und Xb; exact Yb. Qed.
+Proof. by have [Yb _] := svalP dual_basis_def Und Xb; apply Yb. Qed.
 
 Lemma dualb_orth :
   forall (i : 'I_m), tr X`_i dual_basis`_i = 1 /\
@@ -433,7 +438,7 @@ suffices FisK (F : fieldType) (L0 : fieldExtType F) (A : pred L0) (L : {subfield
   by apply/eqP/XfL0; rewrite -{3}kS => {i}; apply/eq_bigr => i _; rewrite -[RHS]mulr_algl kk'.
 move => Asubr Aint Apid Afrac1 Lnd; pose n := \dim L; have Amulr : mulr_closed A := Asubr.
 have [A0 _] : zmod_closed A := Asubr; have [Asub1 _] := Afrac1.
-have AsubL : {subset A <= L} by move => a /Asub1; exact (subvP (sub1v L) a).
+have AsubL : {subset A <= L} by move => a /Asub1; apply (subvP (sub1v L) a).
 have [b1 [b1B b1H]] : exists (b1 : n.-tuple L0), [/\ basis_of L b1 &
   forall i : 'I_n, integral A b1`_i].
   pose b0 := vbasis L; have [f /all_and3-[fH0 fHa fHi]] := frac_field_alg_int Asubr Afrac1.

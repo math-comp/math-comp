@@ -1,5 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat seq.
+Axiom daemon : False. Ltac myadmit := case: daemon.
 
 (* Ltac debugging feature: recursive elim + eq generation *)
 Lemma testL1 : forall A (s : seq A), s = s.
@@ -154,18 +157,19 @@ Proof.
 move=> cf0 cf1 t; split => [] Ecf.
   elim: Ecf.
     match goal with |- forall cf2 cf3 : T, tr cf2 = cf3 -> 
-      execr cf2 cf3 [::] => admit | _ => fail end.
+      execr cf2 cf3 [::] => myadmit | _ => fail end.
   match goal with |- forall (cf2 cf3 cf4 : T) (t0 : seq T),
    tr cf2 = cf4 -> exec cf4 cf3 t0 -> execr cf4 cf3 t0 -> 
-   execr cf2 cf3 (cf4 :: t0) => admit | _ => fail end.
+   execr cf2 cf3 (cf4 :: t0) => myadmit | _ => fail end.
 elim: Ecf.
   match goal with |- forall cf2 : T, 
-    tr cf0 = cf2 -> exec cf0 cf2 [::] => admit | _ => fail end.
+    tr cf0 = cf2 -> exec cf0 cf2 [::] => myadmit | _ => fail end.
 match goal with |- forall (cf2 cf3 : T) (t0 : seq T),
  execr cf0 cf3 t0 -> exec cf0 cf3 t0 -> tr cf3 = cf2 -> 
- exec cf0 cf2 (t0 ++ [:: cf3]) => admit | _ => fail end.
+ exec cf0 cf2 (t0 ++ [:: cf3]) => myadmit | _ => fail end.
 Qed.
 
+From mathcomp
 Require Import seq div prime bigop.
 
 Lemma mem_primes : forall p n,

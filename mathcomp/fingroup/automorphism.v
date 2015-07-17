@@ -1,9 +1,8 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
-From mathcomp.discrete
-Require Import fintype finset.
+From mathcomp
+Require Import ssrbool ssrfun eqtype ssrnat fintype finset.
+From mathcomp
 Require Import fingroup perm morphism.
 
 (******************************************************************************)
@@ -13,7 +12,7 @@ Require Import fingroup perm morphism.
 (* are permutations of type {perm gT} contained in Aut G : {set {perm gT}}.   *)
 (* This lets us use the finGroupType of {perm gT}. Note also that while       *)
 (* morphisms on G are undefined outside G, automorphisms have their support   *)
-(* in G, i.e., they are the identity ouside G.                                *)
+(* in G, i.e., they are the identity outside G.                               *)
 (* Definitions:                                                               *)
 (*    Aut G (or [Aut G]) == the automorphism group of G.                      *)
 (*             [Aut G]%G == the group structure for Aut G.                    *)
@@ -55,7 +54,7 @@ Lemma Aut_morphic A a : a \in Aut A -> morphic A a.
 Proof. by case/setIdP. Qed.
 
 Lemma out_Aut A a x : a \in Aut A -> x \notin A -> a x = x.
-Proof. by case/setIdP=> Aa _; exact: out_perm. Qed.
+Proof. by case/setIdP=> Aa _; apply: out_perm. Qed.
 
 Lemma eq_Aut A : {in Aut A &, forall a b, {in A, a =1 b} -> a = b}.
 Proof.
@@ -91,7 +90,7 @@ Notation f := (autm AutGa).
 Notation fE := (autmE AutGa).
 
 Lemma injm_autm : 'injm f.
-Proof. apply/injmP; apply: in2W; exact: perm_inj. Qed.
+Proof. by apply/injmP; apply: in2W; apply: perm_inj. Qed.
 
 Lemma ker_autm : 'ker f = 1. Proof. by move/trivgP: injm_autm. Qed.
 
@@ -102,7 +101,7 @@ by have:= AutGa; rewrite inE => /andP[/perm_closed <-]; rewrite permKV.
 Qed.
 
 Lemma Aut_closed x : x \in G -> a x \in G.
-Proof. by move=> Gx; rewrite -im_autm; exact: mem_morphim. Qed.
+Proof. by move=> Gx; rewrite -im_autm; apply: mem_morphim. Qed.
 
 End AutGroup.
 
@@ -165,13 +164,13 @@ Lemma morphim_fixP A : A \subset G -> reflect (f @* A = A) (f @* A \subset A).
 Proof.
 rewrite /morphim => sAG; have:= eqEcard (f @: A) A.
 rewrite (setIidPr sAG) card_in_imset ?leqnn ?andbT  => [<-|]; first exact: eqP.
-move/injmP: injf; apply: sub_in2; exact/subsetP.
+by move/injmP: injf; apply: sub_in2; apply/subsetP.
 Qed.
 
 Hypothesis Gf : f @* G = G.
 
 Lemma aut_closed : f @: G \subset G.
-Proof. by rewrite -morphimEdom; exact/morphim_fixP. Qed.
+Proof. by rewrite -morphimEdom; apply/morphim_fixP. Qed.
 
 Definition aut := perm_in (injmP injf) aut_closed.
 
@@ -187,7 +186,7 @@ Proof. by rewrite inE morphic_aut perm_in_on. Qed.
 Lemma imset_autE A : A \subset G -> aut @: A = f @* A.
 Proof.
 move=> sAG; rewrite /morphim (setIidPr sAG).
-apply: eq_in_imset; apply: sub_in1 autE; exact/subsetP.
+by apply: eq_in_imset; apply: sub_in1 autE; apply/subsetP.
 Qed.
 
 Lemma preim_autE A : A \subset G -> aut @^-1: A = f @*^-1 A.
@@ -259,7 +258,7 @@ Let domG := subsetP sGD.
 Lemma im_Aut_isom : Aut_isom injf sGD @* Aut G = Aut (f @* G).
 Proof.
 apply/eqP; rewrite eqEcard; apply/andP; split.
-  by apply/subsetP=> _ /morphimP[a _ AutGa ->]; exact: Aut_Aut_isom.
+  by apply/subsetP=> _ /morphimP[a _ AutGa ->]; apply: Aut_Aut_isom.
 have inj_isom' := injm_Aut_isom (injm_invm injf) (morphimS _ sGD).
 rewrite card_injm ?injm_Aut_isom // -(card_injm inj_isom') ?subset_leq_card //.
 apply/subsetP=> a /morphimP[a' _ AutfGa' def_a].
@@ -267,7 +266,7 @@ by rewrite -(morphim_invm injf sGD) def_a Aut_Aut_isom.
 Qed.
 
 Lemma Aut_isomP : isom (Aut G) (Aut (f @* G)) (Aut_isom injf sGD).
-Proof. by apply/isomP; split; [exact: injm_Aut_isom | exact: im_Aut_isom]. Qed.
+Proof. by apply/isomP; split; [apply: injm_Aut_isom | apply: im_Aut_isom]. Qed.
 
 Lemma injm_Aut : Aut (f @* G) \isog Aut G.
 Proof. by rewrite isog_sym (isom_isog _ _ Aut_isomP). Qed.
@@ -294,7 +293,7 @@ Proof. by []. Qed.
 Variable G : {group gT}.
 
 Lemma injm_conj x : 'injm (conjgm G x).
-Proof. by apply/injmP; apply: in2W; exact: conjg_inj. Qed.
+Proof. by apply/injmP; apply: in2W; apply: conjg_inj. Qed.
 
 Lemma conj_isom x : isom G (G :^ x) (conjgm G x).
 Proof. by apply/isomP; rewrite morphim_conj setIid injm_conj. Qed.
@@ -303,7 +302,7 @@ Lemma conj_isog x : G \isog G :^ x.
 Proof. exact: isom_isog (conj_isom x). Qed.
 
 Lemma norm_conjg_im x : x \in 'N(G) -> conjgm G x @* G = G.
-Proof. by rewrite morphimEdom; exact: normP. Qed.
+Proof. by rewrite morphimEdom; apply: normP. Qed.
 
 Lemma norm_conj_isom x : x \in 'N(G) -> isom G G (conjgm G x).
 Proof. by move/norm_conjg_im/restr_isom_to/(_ (conj_isom x))->. Qed.
@@ -314,7 +313,7 @@ Lemma norm_conj_autE : {in 'N(G) & G, forall x y, conj_aut x y = y ^ x}.
 Proof. by move=> x y nGx Gy; rewrite /= autE //= subgK. Qed.
 
 Lemma conj_autE : {in G &, forall x y, conj_aut x y = y ^ x}.
-Proof. by apply: sub_in11 norm_conj_autE => //; exact: subsetP (normG G). Qed.
+Proof. by apply: sub_in11 norm_conj_autE => //; apply: subsetP (normG G). Qed.
 
 Lemma conj_aut_morphM : {in 'N(G) &, {morph conj_aut : x y / x * y}}.
 Proof.
@@ -336,7 +335,7 @@ by rewrite perm1 norm_conj_autE // conjgE -cGx ?mulKg.
 Qed.
 
 Lemma Aut_conj_aut A : conj_aut @* A \subset Aut G.
-Proof. by apply/subsetP=> _ /imsetP[x _ ->]; exact: Aut_aut. Qed.
+Proof. by apply/subsetP=> _ /imsetP[x _ ->]; apply: Aut_aut. Qed.
 
 End ConjugationMorphism.
 
@@ -359,17 +358,13 @@ Definition characteristic A B :=
 Infix "\char" := characteristic.
 
 Lemma charP H G :
-  reflect [/\ H \subset G
-            & forall f : {morphism G >-> gT},
-               'injm f -> f @* G = G -> f @* H = H]
-          (H \char G).
+  let fixH (f : {morphism G >-> gT}) := 'injm f -> f @* G = G -> f @* H = H in
+  reflect [/\ H \subset G & forall f, fixH f] (H \char G).
 Proof.
-apply: (iffP andP) => [] [sHG chHG]; split=> //.
-  move=> f injf Gf; apply/morphim_fixP=> //.
-  by have:= forallP chHG (aut injf Gf); rewrite Aut_aut imset_autE.
-apply/forall_inP=> f Af; have injf := injm_autm Af.
-move/(morphim_fixP injf _ sHG): (chHG _ injf (im_autm Af)).
-by rewrite /morphim (setIidPr _).
+do [apply: (iffP andP) => -[sHG chHG]; split] => // [f injf Gf|].
+  by apply/morphim_fixP; rewrite // -imset_autE ?(forall_inP chHG) ?Aut_aut.
+apply/forall_inP=> f Af; rewrite -(autmE Af) -morphimEsub //.
+by rewrite chHG ?injm_autm ?im_autm.
 Qed.
 
 (* Characteristic subgroup properties : composition, relational properties *)
@@ -385,13 +380,13 @@ Proof.
 case/charP=> sKH chKH; case/charP=> sHG chHG.
 apply/charP; split=> [|f injf Gf]; first exact: subset_trans sHG.
 rewrite -{1}(setIidPr sKH) -(morphim_restrm sHG) chKH //.
-  rewrite ker_restrm; move/trivgP: injf => ->; exact: subsetIr.
+  by rewrite ker_restrm; move/trivgP: injf => ->; apply: subsetIr.
 by rewrite morphim_restrm setIid chHG.
 Qed.
 
 Lemma char_norms H G : H \char G -> 'N(G) \subset 'N(H).
 Proof.
-case/charP=> sHG chHG; apply/normsP=> x /normP Nx.
+case/charP=> sHG chHG; apply/normsP=> x /normP-Nx.
 have:= chHG [morphism of conjgm G x] => /=.
 by rewrite !morphimEsub //=; apply; rewrite // injm_conj.
 Qed.
@@ -400,7 +395,7 @@ Lemma char_sub A B : A \char B -> A \subset B.
 Proof. by case/andP. Qed.
 
 Lemma char_norm_trans H G A : H \char G -> A \subset 'N(G) -> A \subset 'N(H).
-Proof. by move/char_norms=> nHnG nGA; exact: subset_trans nHnG. Qed.
+Proof. by move/char_norms=> nHnG nGA; apply: subset_trans nHnG. Qed.
 
 Lemma char_normal_trans H G K : K \char H -> H <| G -> K <| G.
 Proof.
@@ -418,10 +413,10 @@ Lemma charI G H K : H \char G -> K \char G -> H :&: K \char G.
 Proof.
 case/charP=> sHG chHG; case/charP=> _ chKG.
 apply/charP; split=> [|f injf Gf]; first by rewrite subIset // sHG.
-rewrite morphimGI ?(chHG, chKG) //; exact: subset_trans (sub1G H).
+by rewrite morphimGI ?(chHG, chKG) //; apply: subset_trans (sub1G H).
 Qed.
 
-Lemma charMgen G H K : H \char G -> K \char G -> H <*> K \char G.
+Lemma charY G H K : H \char G -> K \char G -> H <*> K \char G.
 Proof.
 case/charP=> sHG chHG; case/charP=> sKG chKG.
 apply/charP; split=> [|f injf Gf]; first by rewrite gen_subG subUset sHG.
@@ -430,7 +425,7 @@ Qed.
 
 Lemma charM G H K : H \char G -> K \char G -> H * K \char G.
 Proof.
-move=> chHG chKG; rewrite -norm_joinEl ?charMgen //.
+move=> chHG chKG; rewrite -norm_joinEl ?charY //.
 exact: subset_trans (char_sub chHG) (char_norm chKG).
 Qed.
 
@@ -440,7 +435,7 @@ Lemma lone_subgroup_char G H :
 Proof.
 move=> sHG Huniq; apply/charP; split=> // f injf Gf; apply/eqP.
 have{injf} injf: {in H &, injective f}.
-  by move/injmP: injf; apply: sub_in2; exact/subsetP.
+  by move/injmP: injf; apply: sub_in2; apply/subsetP.
 have fH: f @* H = f @: H by rewrite /morphim (setIidPr sHG).
 rewrite eqEcard {2}fH card_in_imset ?{}Huniq //=.
   by rewrite -{3}Gf morphimS.
@@ -453,6 +448,7 @@ End Characteristicity.
 
 Arguments Scope characteristic [_ group_scope group_scope].
 Notation "H \char G" := (characteristic H G) : group_scope.
+Hint Resolve char_refl.
 
 Section InjmChar.
 

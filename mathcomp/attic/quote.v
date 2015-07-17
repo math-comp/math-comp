@@ -1,5 +1,7 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -99,10 +101,10 @@ Lemma interp_wf_eval : forall y0 e t y,
   interp e t = Some y -> wf t /\ eval y0 e t = y.
 Proof.
 move=> y0 e t; elim/term_ind': t => [i|s a IHa] y /=.
-  by elim: i e => [|i IHi] [|z e] //=; [case | elim: i {IHi} | exact: IHi].
+  by elim: i e => [|i IHi] [|z e] //=; [case | elim: i {IHi} | apply: IHi].
 case: symop => /= n x1.
 elim: n x1 a IHa => [|n IHn] x1 [|f a] //=; first by move=> _  [].
-case: (interp e f) => //= x []; case/(_ x)=> // -> ->; exact: IHn.
+by case: (interp e f) => //= x []; case/(_ x)=> // -> ->; apply: IHn.
 Qed.
 
 Definition var_val := @id T.
@@ -128,7 +130,7 @@ Canonical Structure var_form i x P s := Form (@var_form_subproof i x P s).
 
 Lemma op_form_subproof : forall e t tP (f : form e t tP) x,
   x = @fval e t tP f -> interp e t = Some (op_val x).
-Proof. by move=> e t tP f _ ->; exact: formP. Qed.
+Proof. by move=> e t tP f _ ->; apply: formP. Qed.
 
 Canonical Structure op_form e t tP f x :=
   Form (@op_form_subproof e t tP f x).
@@ -199,7 +201,7 @@ Lemma simp_form : forall e t y ptP,
       (@postProp_statement (close (Env e) /\ simp e t = Some y) ptP),
   fval f = y.
 Proof.
-move=> e t y [tP [_ def_y]] [x /= def_x]; apply: simpP def_y; exact: def_x.
+by move=> e t y [tP [_ def_y]] [x /= def_x]; apply: simpP def_y; apply: def_x.
 Qed.
 
 End GenSimp.
@@ -360,6 +362,6 @@ Time rewrite bsimp.
 Time rewrite !bsimp.
 by [].
 Qed.
-Print try_bsimp.
+
 
 

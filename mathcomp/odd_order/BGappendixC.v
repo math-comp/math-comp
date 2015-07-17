@@ -1,9 +1,18 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved.        *)
-Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq div fintype.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import ssrbool ssrfun eqtype choice ssrnat seq div fintype.
+From mathcomp
 Require Import tuple finfun bigop ssralg finset prime binomial poly polydiv.
+From mathcomp
 Require Import fingroup morphism quotient automorphism action finalg zmodp.
-Require Import gproduct cyclic commutator pgroup abelian frobenius BGsection1.
+From mathcomp
+Require Import gfunctor gproduct cyclic commutator pgroup abelian frobenius.
+From mathcomp
+Require Import BGsection1.
+From mathcomp
 Require Import matrix mxalgebra mxabelem vector falgebra fieldext galois.
+From mathcomp
 Require Import finfield ssrnum algC classfun character integral_char inertia.
 
 Set Implicit Arguments.
@@ -147,7 +156,7 @@ Proof. by rewrite cyclic_abelian // -(injm_cyclic inj_sigmaU) ?cycFU. Qed.
 (* This is B & G, Appendix C, Remark VII. *)
 Let im_psi (x : F) : (x \in psi @: U) = (Nm x == 1).
 Proof.
-have /cyclicP[u0 defFU]: cyclic [set: {unit F}] by exact: cycFU.
+have /cyclicP[u0 defFU]: cyclic [set: {unit F}] by apply: cycFU.
 have o_u0: #[u0] = (p ^ q).-1 by rewrite orderE -defFU card_finField_unit oF.
 have ->: psi @: U = uval @: (sigmaU @* U) by rewrite morphimEdom -imset_comp.
 have /set1P[->]: (sigmaU @* U)%G \in [set <[u0 ^+ (#[u0] %/ nU)]>%G].
@@ -528,7 +537,7 @@ have{nHt1} nHP1: P1 \subset 'N(H).
   by apply/trivgPn; exists t1; rewrite // inE P1t1.
 have{nHP1} nPP1: P1 \subset 'N(P).
   have /Hall_pi hallP: Hall H P by apply: Frobenius_ker_Hall frobH.
-  by rewrite -(normal_Hall_pcore hallP nsPH) (char_norm_trans (pcore_char _ _)).
+  by rewrite -(normal_Hall_pcore hallP nsPH) gFnorm_trans.
 have sylP0: p.-Sylow(Q <*> P0) P0.
   rewrite /pHall -divgS joing_subr ?(pgroupS sP0P) //=.
   by rewrite norm_joinEr // coprime_cardMg ?(coprimegS sP0P) ?mulnK.
@@ -552,7 +561,7 @@ Fact BGappendixC3_Ediv : E = [set x^-1 | x in E]%R.
 Proof.
 suffices sEV_E: [set x^-1 | x in E]%R \subset E.
   by apply/esym/eqP; rewrite eqEcard sEV_E card_imset //=; apply: invr_inj.
-have /mulG_sub[/(subset_trans sP0P)/subsetP sP0H /subsetP sUH] := sdprodW defH.
+have /mulG_sub[/(subset_trans sP0P)/subsetP-sP0H /subsetP-sUH] := sdprodW defH.
 have Hs := sP0H s P0s; have P1t: t \in P1 by rewrite memJ_conjg.
 have nUP1 t1: t1 \in P1 -> U :^ t1 = U by move/(subsetP nUP0y)/normP.
 have nUtn n u: u \in U -> u ^ (t ^+ n) \in U.

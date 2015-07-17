@@ -1,12 +1,9 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp.ssreflect
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-From mathcomp.discrete
-Require Import div choice fintype bigop finset.
-From mathcomp.fingroup
-Require Import fingroup.
-Require Import ssralg zmodp poly.
+From mathcomp
+Require Import ssrfun ssrbool eqtype ssrnat seq div choice fintype.
+From mathcomp
+Require Import bigop ssralg finset fingroup zmodp poly.
 
 (******************************************************************************)
 (*                                                                            *)
@@ -873,7 +870,7 @@ Canonical nneg_mulrPred := MulrPred nneg_divr_closed.
 Canonical nneg_divrPred := DivrPred nneg_divr_closed.
 
 Fact nneg_addr_closed : addr_closed (@nneg R).
-Proof. by split; [exact: lerr | exact: addr_ge0]. Qed.
+Proof. by split; [apply: lerr | apply: addr_ge0]. Qed.
 Canonical nneg_addrPred := AddrPred nneg_addr_closed.
 Canonical nneg_semiringPred := SemiringPred nneg_divr_closed.
 
@@ -1019,8 +1016,8 @@ Lemma le0r x : (0 <= x) = (x == 0) || (0 < x). Proof. exact: le0r. Qed.
 Lemma lt0r_neq0 (x : R) : 0 < x  -> x != 0.
 Proof. by rewrite lt0r; case/andP. Qed.
 
-Lemma ltr0_neq0 (x : R) : 0 < x  -> x != 0.
-Proof. by rewrite lt0r; case/andP. Qed.
+Lemma ltr0_neq0 (x : R) : x < 0  -> x != 0.
+Proof. by rewrite ltr_neqAle; case/andP. Qed.
 
 Lemma gtr_eqF x y : y < x -> x == y = false.
 Proof. by rewrite ltr_def; case/andP; move/negPf=> ->. Qed.
@@ -1037,7 +1034,7 @@ by rewrite !le0r mulf_eq0; case: eqP => // [-> /negPf[] | _ /pmulr_rgt0->].
 Qed.
 
 (* Integer comparisons and characteristic 0. *)
-Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed. 
+Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. exact: ltr01. Qed.
 Lemma ler0n n : 0 <= n%:R :> R. Proof. by rewrite -nnegrE rpred_nat. Qed.
 Hint Resolve ler01 ltr01 ler0n.
@@ -2163,19 +2160,23 @@ elim/big_rec2: _ => // i x2 x1 /leE12/andP[le0Ei leEi12] [x1ge0 le_x12].
 by rewrite mulr_ge0 // ler_pmul.
 Qed.
 
-Lemma ltr_prod (E1 E2 : nat -> R) (n m : nat) :
+Lemma ltr_prod I r (P : pred I) (E1 E2 : I -> R) :
+    has P r -> (forall i, P i -> 0 <= E1 i < E2 i) ->
+  \prod_(i <- r | P i) E1 i < \prod_(i <- r | P i) E2 i.
+Proof.
+elim: r => //= i r IHr; rewrite !big_cons; case: ifP => {IHr}// Pi _ ltE12.
+have /andP[le0E1i ltE12i] := ltE12 i Pi; set E2r := \prod_(j <- r | P j) E2 j.
+apply: ler_lt_trans (_ : E1 i * E2r < E2 i * E2r).
+  by rewrite ler_wpmul2l ?ler_prod // => j /ltE12/andP[-> /ltrW].
+by rewrite ltr_pmul2r ?prodr_gt0 // => j /ltE12/andP[le0E1j /ler_lt_trans->].
+Qed.
+
+Lemma ltr_prod_nat (E1 E2 : nat -> R) (n m : nat) :
    (m < n)%N -> (forall i, (m <= i < n)%N -> 0 <= E1 i < E2 i) ->
   \prod_(m <= i < n) E1 i < \prod_(m <= i < n) E2 i.
 Proof.
-elim: n m => // n ihn m; rewrite ltnS leq_eqVlt; case/orP => [/eqP -> | ltnm hE].
-  by move/(_ n) => /andb_idr; rewrite !big_nat1 leqnn ltnSn /=; case/andP.
-rewrite big_nat_recr ?[X in _ < X]big_nat_recr ?(ltnW ltnm) //=.
-move/andb_idr: (hE n); rewrite leqnn ltnW //=; case/andP => h1n h12n.
-rewrite big_nat_cond [X in _ < X * _]big_nat_cond; apply: ltr_pmul => //=.
-- apply: prodr_ge0 => i; rewrite andbT; case/andP=> hm hn. 
-  by move/andb_idr: (hE i); rewrite hm /= ltnS ltnW //=; case/andP.
-rewrite -!big_nat_cond; apply: ihn => // i /andP [hm hn]; apply: hE.
-by rewrite hm ltnW.
+move=> lt_mn ltE12; rewrite !big_nat ltr_prod {ltE12}//.
+by apply/hasP; exists m; rewrite ?mem_index_iota leqnn.
 Qed.
 
 (* real of mul *)
@@ -2981,7 +2982,7 @@ by move=> xR; rewrite ger0_def eq_sym; apply: lerif_eq; rewrite real_ler_norm.
 Qed.
 
 Lemma lerif_pmul x1 x2 y1 y2 C1 C2 :
-    0 <= x1 -> 0 <= x2 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 -> 
+    0 <= x1 -> 0 <= x2 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 * x2 <= y1 * y2 ?= iff (y1 * y2 == 0) || C1 && C2.
 Proof.
 move=> x1_ge0 x2_ge0 le_xy1 le_xy2; have [y_0 | ] := altP (_ =P 0).
@@ -2998,7 +2999,7 @@ by apply: lerif_trans; rewrite (mono_lerif _ (ler_pmul2r _)) // ltr_def x2nz.
 Qed.
 
 Lemma lerif_nmul x1 x2 y1 y2 C1 C2 :
-    y1 <= 0 -> y2 <= 0 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 -> 
+    y1 <= 0 -> y2 <= 0 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   y1 * y2 <= x1 * x2 ?= iff (x1 * x2 == 0) || C1 && C2.
 Proof.
 rewrite -!oppr_ge0 -mulrNN -[x1 * x2]mulrNN => y1le0 y2le0 le_xy1 le_xy2.
@@ -3082,7 +3083,7 @@ rewrite prodrMn exprMn_n -/n' ler_pmuln2r ?expn_gt0; last by case: (n').
 have ->: \prod_(k in A') E' k = E' j * pi.
   by rewrite (bigD1 j) //=; congr *%R; apply: eq_bigr => k /andP[_ /negPf->].
 rewrite -(ler_pmul2l mu_gt0) -exprS -Dn mulrA; apply: ltr_le_trans.
-rewrite ltr_pmul2r //= eqxx -addrA mulrDr mulrC -ltr_subl_addl -mulrBl. 
+rewrite ltr_pmul2r //= eqxx -addrA mulrDr mulrC -ltr_subl_addl -mulrBl.
 by rewrite mulrC ltr_pmul2r ?subr_gt0.
 Qed.
 

@@ -1,4 +1,7 @@
-Require Import ssreflect eqtype ssrbool ssrnat seq div fintype finfun path bigop.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp
+Require Import eqtype ssrbool ssrnat seq div fintype finfun path bigop.
+Axiom daemon : False. Ltac myadmit := case: daemon.
 
 Lemma big_load R (K K' : R -> Type) idx op I r (P : pred I) F :
   let s := \big[op/idx]_(i <- r | P i) F i in
@@ -13,9 +16,9 @@ Variables (idx : R) (op op' : R -> R -> R).
 
 Hypothesis Kid : K idx.
 
-Ltac ASSERT1 := match goal with |- (K idx) => admit end.
+Ltac ASSERT1 := match goal with |- (K idx) => myadmit end.
 Ltac ASSERT2 K := match goal with |- (forall x1 : R, R -> 
-    forall y1 : R, R -> K x1 -> K y1 -> K (op x1 y1)) => admit end.
+    forall y1 : R, R -> K x1 -> K y1 -> K (op x1 y1)) => myadmit end.
 
 
 Lemma big_rec I r (P : pred I) F
@@ -23,13 +26,13 @@ Lemma big_rec I r (P : pred I) F
   K (\big[op/idx]_(i <- r | P i) F i).
 Proof.
 elim/big_ind2: {-}_.
-  ASSERT1. ASSERT2 K. match goal with |- (forall i : I, is_true (P i) -> K (F i)) => admit end. Undo 4.
+  ASSERT1. ASSERT2 K. match goal with |- (forall i : I, is_true (P i) -> K (F i)) => myadmit end. Undo 4.
 elim/big_ind2: _ / {-}_.
-  ASSERT1. ASSERT2 K. match goal with |- (forall i : I, is_true (P i) -> K (F i)) => admit end. Undo 4.
+  ASSERT1. ASSERT2 K. match goal with |- (forall i : I, is_true (P i) -> K (F i)) => myadmit end. Undo 4.
 
 elim/big_rec2: (\big[op/idx]_(i <- r | P i) op idx (F i))
   / (\big[op/idx]_(i <- r | P i) F i).
-  ASSERT1. match goal with |- (forall i : I, R -> forall y2 : R, is_true (P i) -> K y2 -> K (op (F i) y2)) => admit end. Undo 3.
+  ASSERT1. match goal with |- (forall i : I, R -> forall y2 : R, is_true (P i) -> K y2 -> K (op (F i) y2)) => myadmit end. Undo 3.
 
 elim/(big_load (phantom R)): _.
   Undo.
