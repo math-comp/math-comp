@@ -1025,6 +1025,10 @@ let interp_pattern ist gl red redty =
 let interp_cpattern ist gl red redty = interp_pattern ist gl (T red) redty;;
 let interp_rpattern ist gl red = interp_pattern ist gl red None;;
 
+let id_of_pattern = function
+  | _, T t -> (match kind_of_term t with Var id -> Some id | _ -> None)
+  | _ -> None
+
 (* The full occurrence set *)
 let noindex = Some(false,[])
 

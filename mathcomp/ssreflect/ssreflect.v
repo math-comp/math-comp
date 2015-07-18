@@ -1,6 +1,6 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
 Require Import Bool. (* For bool_scope delimiter 'bool'. *)
-Require Import mathcomp.ssreflect.ssrmatching.
+Require Import ssrmatching.
 Declare ML Module "ssreflect".
 Set SsrAstVersion.
 

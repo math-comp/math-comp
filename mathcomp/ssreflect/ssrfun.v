@@ -1,6 +1,5 @@
 (* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
-Require Import mathcomp.ssreflect.ssreflect.
-
+Require Import ssreflect.
 
 (******************************************************************************)
 (* This file contains the basic definitions and notations for working with    *)
