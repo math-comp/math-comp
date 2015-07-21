@@ -162,6 +162,8 @@ let loc_ofCG = function
 let mk_term k c = k, (mkRHole, Some c)
 let mk_lterm = mk_term ' '
 
+let pf_type_of gl t = let sigma, ty = pf_type_of gl t in re_sig (sig_it gl)  sigma, ty
+
 (* }}} *)
 
 (** Profiling {{{ *************************************************************)
@@ -357,7 +359,7 @@ let pf_unif_HO gl sigma pt p c =
 let unify_HO env sigma0 t1 t2 =
   let sigma = unif_HO env sigma0 t1 t2 in
   let sigma, uc, _ = unif_end env sigma0 sigma t2 (fun _ -> true) in
-  Evd.merge_universe_context sigma uc
+  Evd.set_universe_context sigma uc
 
 let pf_unify_HO gl t1 t2 =
   let env, sigma0, si = pf_env gl, project gl, sig_it gl in
@@ -1218,13 +1220,16 @@ END
 let pf_merge_uc uc gl =
   re_sig (sig_it gl) (Evd.merge_universe_context (project gl) uc)
 
+let pf_unsafe_merge_uc uc gl =
+  re_sig (sig_it gl) (Evd.set_universe_context (project gl) uc)
+
 let ssrpatterntac ist arg gl =
   let pat = interp_rpattern ist gl arg in
   let sigma0 = project gl in
   let concl0 = pf_concl gl in
   let (t, uc), concl_x =
     fill_occ_pattern (Global.env()) sigma0 concl0 pat noindex 1 in
-  let tty = pf_type_of gl t in
+  let gl, tty = pf_type_of gl t in
   let concl = mkLetIn (Name (id_of_string "toto"), t, tty, concl_x) in
   Proofview.V82.of_tactic (convert_concl concl DEFAULTcast) gl
 
