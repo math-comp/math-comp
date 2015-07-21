@@ -1,12 +1,16 @@
 opam-version: "1.2"
 name: "coq:mathcomp:odd_order"
-version: "1.5"
-maintainer: "Ssreflect <ssreflect@msr-inria.inria.fr>"
-authors: "Ssreflect <ssreflect@msr-inria.inria.fr>"
+version: "dev"
+maintainer: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
+authors: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 homepage: "http://ssr.msr-inria.inria.fr/"
-bug-reports: "ssreflect@msr-inria.inria.fr"
+bug-reports: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 license: "CeCILL-B"
-build: [ make "-j" "%{jobs}%" ] 
+
+build: [ make "-j" "%{jobs}%" ]
 install: [ make "install" ]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/odd_order'" ]
-depends: [ "coq:mathcomp:character" { = "1.5" } ]
+depends: [ "coq:mathcomp:character" { = "dev" } ]
+
+tags: [ "keyword:Feit Thompson theorem" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" ]
+authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]
