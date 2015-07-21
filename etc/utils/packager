@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+set -x
+
+for pkg in algebra basic field character fingroup odd_order real_closed solvable ssreflect
+do
+pkgdir="$(git root)/extra-dev/packages/coq:mathcomp:$pkg/coq:mathcomp:$pkg.dev"
+mkdir -p $pkgdir
+cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
+sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
+done
+
