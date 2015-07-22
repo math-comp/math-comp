@@ -992,7 +992,8 @@ let interp_pattern ist gl red redty =
       aux [] (Evarutil.nf_evar sigma rp) in
     let sigma = 
       List.fold_left (fun sigma e ->
-        if Evd.is_defined sigma e then sigma else (* clear may be recursiv *)
+        if Evd.is_defined sigma e then sigma else (* clear may be recursive *)
+        if Option.is_empty !to_clean then sigma else
         let name = Option.get !to_clean in
         pp(lazy(pr_id name));
         try snd(Logic.prim_refiner (Proof_type.Thin [name]) sigma e)
