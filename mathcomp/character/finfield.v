@@ -8,6 +8,7 @@ From mathcomp
 Require Import morphism action finalg zmodp cyclic center pgroup abelian.
 From mathcomp
 Require Import matrix mxabelem vector falgebra fieldext separable galois.
+From mathcomp
 Require ssrnum ssrint algC cyclotomic.
 
 (******************************************************************************)
