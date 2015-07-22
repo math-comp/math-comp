@@ -10,5 +10,6 @@ mkdir -p $pkgdir
 cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
 cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
 sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
+echo "git: \"https://github.com/math-comp/math-comp.git\"" > $pkgdir/url
 
 done
