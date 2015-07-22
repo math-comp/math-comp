@@ -1,0 +1,7 @@
+Mathematical Components Library on real closed fields
+
+This library contains definitions and theorems about real closed
+fields, with a construction of the real closure and the algebraic
+closure (including a proof of the fundamental theorem of algebra). It
+also contains a proof of decidability of the first order theory of
+real closed field, through quantifier elimination.
