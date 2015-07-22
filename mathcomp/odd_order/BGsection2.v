@@ -11,6 +11,7 @@ From mathcomp
 Require Import ssralg finalg zmodp cyclic center pgroup gseries nilpotent.
 From mathcomp
 Require Import sylow abelian maximal hall.
+From mathcomp
 Require poly ssrint.
 From mathcomp
 Require Import matrix mxalgebra mxrepresentation mxabelem.
