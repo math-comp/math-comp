@@ -1,0 +1,9 @@
+define coqmakefile
+	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
+	ln -sf plugin/$(V)/ssreflect.mllib .;\
+	ln -sf plugin/$(V)/ssrmatching.mli .;\
+	ln -sf plugin/$(V)/ssrmatching.ml4 .;\
+	ln -sf plugin/$(V)/ssreflect.ml4 .;\
+	$(COQBIN)coq_makefile -f Make -o Makefile.coq)
+endef
+
