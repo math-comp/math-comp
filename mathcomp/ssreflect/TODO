@@ -1,0 +1,30 @@
+Things to be coded/evaluated
+============================
+
+- is [^ _ ] useful (drops a block)
+- empty [^ ] is like *
+- rewrite: check no evar is really instantiated by comparing evarmaps
+- apply: be sure evars can be instantiated
+- /tac[^ foo ], call tac with extra arg (define a simple protocol for
+  tac view followed by block-ipat
+- add in tactical to have
+- allow pattern [F i in bla] when F is used under a binder, like in
+  [F i in \sum_(i \in A) F i] that behaves as [F in \sum_(i \in A) F i]
+  i can be used in [e(i) as F i in ..].
+- set f x := t[x].  with a syntax similar to wlog
+- special case to set under a binder:  set f (val i) := (F i in ... F i).
+  to synthesize the good f in the 'I_n case (outside L_\lambda) for bigop
+  lemmas
+- more flexible encoding of contextual patterns:
+  [F i in T] can be coded as fun op i => ( _ : fun (F : _ i) => T[op,F])
+  - to let one do: rewrite [RHS leq]rule.
+  - to recognize args like op (beta reduced)
+                  and like i (skipped/passed in set?)
+- patterns for anon case/rewrite: {[p]}->    {()}{()}[]
+- lean's calc mode:
+    calc my_eq : a = b by foo.
+    then : ... < d     by bla.
+    then save_this : ... = f by bla.
+    have final : a < f.
+  Understand how to parse ... also one may use _ but then
+  "_ < x" unfolds to "S _ <= x" and you may be mistaken.

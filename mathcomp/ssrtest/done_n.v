@@ -1,3 +1,5 @@
+(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* Distributed under the terms of CeCILL-B.                                  *)
 Require Import ssreflect.
 
 Axiom oops : 3=4.
