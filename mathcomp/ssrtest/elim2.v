@@ -1,3 +1,5 @@
+(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import eqtype ssrbool ssrnat seq div fintype finfun path bigop.

@@ -1,4 +1,5 @@
-(* (c) Copyright Microsoft Corporation and Inria. All rights reserved. *)
+(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* Distributed under the terms of CeCILL-B.                                  *)
 Require Prelude ssreflect ssrbool ssrfun eqtype ssrnat fintype finset fingroup.
 Require morphism quotient action gfunctor gproduct commutator gseries nilpotent.
 Require PFsection14.
