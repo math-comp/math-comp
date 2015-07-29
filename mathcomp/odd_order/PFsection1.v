@@ -13,6 +13,7 @@ From mathcomp
 Require Import vector falgebra fieldext ssrnum algC rat algnum galois.
 From mathcomp
 Require Import classfun character inertia integral_char vcharacter.
+From mathcomp
 Require ssrint.
 
 (******************************************************************************)

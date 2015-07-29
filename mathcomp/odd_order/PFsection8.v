@@ -17,6 +17,7 @@ From mathcomp
 Require Import BGsection1 BGsection3 BGsection7 BGsection10.
 From mathcomp
 Require Import BGsection14 BGsection15 BGsection16.
+From mathcomp
 Require ssrnum.
 From mathcomp
 Require Import algC classfun character inertia vcharacter.
