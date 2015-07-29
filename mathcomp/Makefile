@@ -7,7 +7,7 @@ endif
 # this sets variable V
 include ssreflect/Makefile.detect-coq-version
 # this defined coqmakefile
-include Makefile.coq-makefile
+include ssreflect/Makefile.coq-makefile
 
 ifeq "$V" "v8.4"
 COQDEP=../etc/utils/ssrcoqdep
