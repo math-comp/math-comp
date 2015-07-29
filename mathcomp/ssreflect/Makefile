@@ -21,7 +21,7 @@ MAKEFLAGS+=-B
 .DEFAULT_GOAL := all
 
 %:
-	$(H)[ -e Makefile.coq ] || $(call coqmakefile)
+	$(H)[ -e Makefile.coq ] || $(call coqmakefile,.)
 	# Override COQDEP to find only the "right" copy .ml files
 	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
 		-f Makefile.coq $* \
