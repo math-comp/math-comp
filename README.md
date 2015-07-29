@@ -65,11 +65,11 @@ standard Coq repositories.
 
 For each package, pin the `opam` file:
 ```
-opam pin -n add coq:mathcomp:ssreflect ssreflect
+opam pin -n add ssreflect
 ```
 This can be achieved in one go as follows:
 ```
-for P in */opam; do opam pin -n add coq:mathcomp:${P%%/opam} ${P%%/opam}; done
+for P in */opam; do opam pin -n add ${P%%/opam}; done
 ```
 
 Then you can use `opam install` to compile and install any package.
