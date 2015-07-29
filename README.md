@@ -1,34 +1,34 @@
 # The Mathematical Components repository
 
 This repository holds the Mathematical Components Library for the Coq system:
-and extensive body of mathematics formalized in the Coq/SSReflect language.
+an extensive body of mathematics formalized in the Coq/SSReflect language.
 
 It also contains the proof of the Odd Order Theorem, that builds on top
-of the Mathematical Components library.
+of the Mathematical Components Library.
 
 # Layout and compilation of the library
 
-The library is divided into packages that group together related
-files and that define a distribution and compilation unit.
+The library is divided into packages which group together related
+files. Each package defines a distribution and compilation unit.
 
 Packages can be compiled using the traditional `make` utility or
 the more recent `OPAM` one.
 
-We provide a convenience root Makefile to compile all packages
+We provide a convenience root Makefile in order to compile all packages
 at once using `make`.  This is the simplest option.
 
-We provide `opam` files to compile each package using `OPAM`.
-Note that `OPAM` packages for the Mathematical Components library
-are available in the standard repositories of Coq related packages
-under the `coq:mathcmop:` name space.  If you are just interested
+We also provide `opam` files to compile each package using `OPAM`.
+Note that the `OPAM` packages for the Mathematical Components library
+are available in the standard Coq `OPAM` repositories,
+under the `coq:mathcmop:` name space.  If you are only interested
 in installing a Mathematical Components package via `OPAM`, follow
-the standard instructions on the Coq website.
+the standard instructions available on the Coq website.
 
 ## Compilation and installation with make
 
 The instructions assume you are in the `mathcomp` directory and that
 you have a supported version of Coq.
-The list of Coq versions that a known to work can be obtained with:
+The list of Coq versions that are known to work can be obtained with:
 ```
 ls ssreflect/plugin/
 ```
@@ -55,7 +55,7 @@ coqide basic/div.v
 Note that you may need to enable `_CoqProject` processing in your
 editor (e.g. the default for CoqIDE is to ignore it).
 
-To install the compiled library, just type `make install`.
+To install the compiled library, just execute `make install`.
 
 ## Compilation and installation with OPAM
 
