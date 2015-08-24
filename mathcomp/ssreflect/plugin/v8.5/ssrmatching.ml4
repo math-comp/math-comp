@@ -537,8 +537,8 @@ let filter_upat i0 f n u fpats =
   let na = Array.length u.up_a in
   if n < na then fpats else
   let np = match u.up_k with
-  | KpatConst when Term.eq_constr u.up_f f -> na
-  | KpatFixed when Term.eq_constr u.up_f f -> na 
+  | KpatConst when Term.eq_constr_nounivs u.up_f f -> na
+  | KpatFixed when Term.eq_constr_nounivs u.up_f f -> na
   | KpatEvar k when isEvar_k k f -> na
   | KpatLet when isLetIn f -> na
   | KpatLam when isLambda f -> na
@@ -554,8 +554,8 @@ let filter_upat_FO i0 f n u fpats =
   let np = nb_args u.up_FO in
   if n < np then fpats else
   let ok = match u.up_k with
-  | KpatConst -> Term.eq_constr u.up_f f 
-  | KpatFixed -> Term.eq_constr u.up_f f 
+  | KpatConst -> Term.eq_constr_nounivs u.up_f f
+  | KpatFixed -> Term.eq_constr_nounivs u.up_f f
   | KpatEvar k -> isEvar_k k f
   | KpatLet -> isLetIn f
   | KpatLam -> isLambda f
