@@ -20,7 +20,7 @@ at once using `make`.  This is the simplest option.
 We also provide `opam` files to compile each package using `OPAM`.
 Note that the `OPAM` packages for the Mathematical Components library
 are available in the standard Coq `OPAM` repositories,
-under the `coq:mathcmop:` name space.  If you are only interested
+under the `coq:mathcomp:` name space.  If you are only interested
 in installing a Mathematical Components package via `OPAM`, follow
 the standard instructions available on the Coq website.
 
