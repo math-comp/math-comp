@@ -3381,7 +3381,7 @@ let saturate ?(beta=false) ?(bi_types=false) env sigma c ?(ty=Retyping.get_type_
         (Reductionops.whd_betadeltaiota env sigma) ty in
       match kind_of_type ty with
       | ProdType _ -> loop ty args sigma n
-      | _ -> anomaly "saturate did not find enough products"
+      | _ -> raise NotEnoughProducts
   in
    loop ty [] sigma m
 
@@ -3904,7 +3904,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
   | _ -> false in
   let match_pat env p occ h cl = 
     let sigma0 = project orig_gl in
-    pp(lazy(str"matching: " ++ pp_pattern p));
+    pp(lazy(str"matching: " ++ pr_occ occ ++ pp_pattern p));
     let (c,ucst), cl =
       fill_occ_pattern ~raise_NoMatch:true env sigma0 cl p occ h in
     pp(lazy(str"     got: " ++ pr_constr c));
@@ -3924,6 +3924,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
        with e when Errors.noncritical e -> p in
   (* finds the eliminator applies it to evars and c saturated as needed  *)
   (* obtaining "elim ??? (c ???)". pred is the higher order evar         *)
+  (* cty is None when the user writes _ (hence we can't make a pattern *)
   let cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl =
     match elim with
     | Some elim ->
@@ -3934,7 +3935,15 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
         pf_saturate ~beta:is_case gl elim ~ty:elimty n_elim_args in
       let pred = List.assoc pred_id elim_args in
       let elimty = Reductionops.whd_betadeltaiota env (project gl) elimty in
-      None, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
+      let cty, gl =
+        if Option.is_empty oc then None, gl
+        else
+          let c = Option.get oc in let gl, c_ty = pf_type_of gl c in
+          let pc = match c_gen with
+            | Some p -> interp_cpattern (Option.get ist) orig_gl p None 
+            | _ -> mkTpat gl c in
+          Some(c, c_ty, pc), gl in
+      cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
     | None ->
       let c = Option.get oc in let gl, c_ty = pf_type_of gl c in
       let ((kn, i) as ind, _ as indu), unfolded_c_ty =
@@ -3964,7 +3973,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
   in
   pp(lazy(str"elim= "++ pr_constr_pat elim));
-  pp(lazy(str"elimty= "++ pr_constr elimty));
+  pp(lazy(str"elimty= "++ pr_constr_pat elimty));
   let inf_deps_r = match kind_of_type elimty with
     | AtomicType (_, args) -> List.rev (Array.to_list args)
     | _ -> assert false in
@@ -3973,11 +3982,17 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       let c, c_ty, _, gl = pf_saturate gl c ~ty:c_ty n in
       let gl' = f c c_ty gl in
       Some (c, c_ty, gl, gl')
-    with NotEnoughProducts -> None | _ -> loop (n+1) in loop 0 in
-  let elim_is_dep, gl = match cty with
-    | None -> true, gl
+    with
+    | NotEnoughProducts -> None
+    | e when Errors.noncritical e -> loop (n+1) in loop 0 in
+  (* Here we try to understand if the main pattern/term the user gave is
+   * the first pattern to be matched (i.e. if elimty ends in P t1 .. tn,
+   * weather tn is the t the user wrote in 'elim: t' *)
+  let c_is_head_p, gl = match cty with
+    | None -> true, gl  (* The user wrote elim: _ *)
     | Some (c, c_ty, _) ->
     let res = 
+      (* we try to see if c unifies with the last arg of elim *)
       if elim_is_dep then None else
       let arg = List.assoc (n_elim_args - 1) elim_args in
       let gl, arg_ty = pf_type_of gl arg in
@@ -3988,21 +4003,22 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
     match res with
     | Some x -> x
     | None ->
+      (* we try to see if c unifies with the last inferred pattern *)
       let inf_arg = List.hd inf_deps_r in
       let gl, inf_arg_ty = pf_type_of gl inf_arg in
       match saturate_until gl c c_ty (fun _ c_ty gl ->
               pf_unify_HO gl c_ty inf_arg_ty) with
       | Some (c, _, _,gl) -> true, gl
       | None ->
-	errorstrm (str"Unable to apply the eliminator to the term"++
-      spc()++pr_constr c++spc()++str"or to unify it's type with"++
-      pr_constr inf_arg_ty) in
-  pp(lazy(str"elim_is_dep= " ++ bool elim_is_dep));
+        errorstrm (str"Unable to apply the eliminator to the term"++
+          spc()++pr_constr c++spc()++str"or to unify it's type with"++
+          pr_constr inf_arg_ty) in
+  pp(lazy(str"c_is_head_p= " ++ bool c_is_head_p));
   let gl, predty = pf_type_of gl pred in
   (* Patterns for the inductive types indexes to be bound in pred are computed
    * looking at the ones provided by the user and the inferred ones looking at
    * the type of the elimination principle *)
-  let pp_pat (_,p,_,_) = pp_pattern p in
+  let pp_pat (_,p,_,occ) = pr_occ occ ++ pp_pattern p in
   let pp_inf_pat gl (_,_,t,_) = pr_constr_pat (fire_subst gl t) in
   let patterns, clr, gl =
     let rec loop patterns clr i = function
@@ -4018,12 +4034,12 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
           loop (patterns @ [i, p, inf_t, occ]) 
             (clr_t @ clr) (i+1) (deps, inf_deps)
       | [], c :: inf_deps -> 
-          pp(lazy(str"adding inferred pattern " ++ pr_constr_pat c));
+          pp(lazy(str"adding inf pattern " ++ pr_constr_pat c));
           loop (patterns @ [i, mkTpat gl c, c, allocc]) 
             clr (i+1) ([], inf_deps)
       | _::_, [] -> errorstrm (str "Too many dependent abstractions") in
-    let deps, head_p, inf_deps_r = match what, elim_is_dep, cty with
-    | `EConstr _, _, None -> anomaly "Simple welim with no term"
+    let deps, head_p, inf_deps_r = match what, c_is_head_p, cty with
+    | `EConstr _, _, None -> anomaly "Simple elim with no term"
     | _, false, _ -> deps, [], inf_deps_r
     | `EGen gen, true, None -> deps @ [gen], [], inf_deps_r
     | _, true, Some (c, _, pc) ->
@@ -4083,7 +4099,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
           let erefl, gl = mkRefl t c gl in
           let erefl = fire_subst gl erefl in
           apply_type new_concl [erefl], gl in
-        let rel = k + if elim_is_dep then 1 else 0 in
+        let rel = k + if c_is_head_p then 1 else 0 in
         let src, gl = mkProt mkProp (mkApp (eq,[|t; c; mkRel rel|])) gl in
         let concl = mkArrow src (lift 1 concl) in
         let clr = if deps <> [] then clr else [] in

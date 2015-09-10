@@ -776,7 +776,7 @@ let rec uniquize = function
   let sigma, _, ({up_f = pf; up_a = pa} as u) =
     if all_instances then assert_done_multires upat_that_matched
     else List.hd (snd(assert_done upat_that_matched)) in
-  pp(lazy(str"sigma@tmatch=" ++ pr_evar_map None sigma));
+(*   pp(lazy(str"sigma@tmatch=" ++ pr_evar_map None sigma)); *)
   if !skip_occ then ((*ignore(k env u.up_t 0);*) c) else
   let match_EQ = match_EQ env sigma u in
   let pn = Array.length pa in
@@ -846,7 +846,7 @@ let pr_pattern_aux pr_constr = function
   | E_As_X_In_T (e,x,t) ->
       pr_constr e ++ str " as " ++ pr_constr x ++ str " in " ++ pr_constr t
 let pp_pattern (sigma, p) =
-  pr_pattern_aux (fun t -> pr_constr (pi3 (nf_open_term sigma sigma t))) p
+  pr_pattern_aux (fun t -> pr_constr_pat (pi3 (nf_open_term sigma sigma t))) p
 let pr_cpattern = pr_term
 let pr_rpattern _ _ _ = pr_pattern
 
@@ -1192,9 +1192,13 @@ let redex_of_pattern ?(resolve_typeclasses=false) env (sigma, p) =
   Reductionops.nf_evar sigma e, Evd.evar_universe_context sigma
 
 let fill_occ_pattern ?raise_NoMatch env sigma cl pat occ h =
-  let find_R, conclude = let r = ref None in
-    (fun env c _ h' -> do_once r (fun () -> c, Evd.empty_evar_universe_context);
-                     mkRel (h'+h-1)),
+  let do_make_rel, occ =
+    if occ = Some(true,[]) then false, Some(false,[1]) else true, occ in
+  let find_R, conclude =
+    let r = ref None in
+    (fun env c _ h' ->
+       do_once r (fun () -> c, Evd.empty_evar_universe_context);
+       if do_make_rel then mkRel (h'+h-1) else c),
     (fun _ -> if !r = None then redex_of_pattern env pat else assert_done r) in
   let cl = eval_pattern ?raise_NoMatch env sigma cl (Some pat) occ find_R in
   let e = conclude cl in
