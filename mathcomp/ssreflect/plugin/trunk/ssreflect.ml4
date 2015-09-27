@@ -6081,7 +6081,7 @@ GEXTEND Gram
           let s = coerce_reference_to_id qid in
 	  Vernacexpr.VernacDefinition
 	    ((Some Decl_kinds.Global,Decl_kinds.CanonicalStructure),
-             (dummy_loc,s),(d  ))
+             ((dummy_loc,s),None),(d  ))
   ]];
 END
 
