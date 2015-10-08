@@ -866,22 +866,22 @@ Let w2 := #|W2|.
 
 Lemma cyclicTIirrC (xdefW : W2 \x W1 = W) i j :
   cyclicTIirr xdefW j i = w_ i j.
-Proof. by rewrite (dprod_IirrC xdefW defW). Qed.
+Proof using defW. by rewrite (dprod_IirrC xdefW defW). Qed.
 
 Lemma cycTIirrP chi : chi \in irr W -> {i : Iirr W1 & {j | chi = w_ i j}}.
-Proof.
+Proof using defW.
 case/irrP/sig_eqW=> k ->{chi}.
 by have /codomP/sig_eqW[[i j] ->] := dprod_Iirr_onto defW k; exists i, j.
 Qed.
 
 Lemma cycTIirr_aut u i j : w_ (aut_Iirr u i) (aut_Iirr u j) = cfAut u (w_ i j).
-Proof. by rewrite /w_ !dprod_IirrE cfAutDprod !aut_IirrE. Qed.
+Proof using defW. by rewrite /w_ !dprod_IirrE cfAutDprod !aut_IirrE. Qed.
 
-Let sW1W : W1 \subset W. Proof. by have /mulG_sub[] := dprodW defW. Qed.
-Let sW2W : W2 \subset W. Proof. by have /mulG_sub[] := dprodW defW. Qed.
+Let sW1W : W1 \subset W. Proof using defW. by have /mulG_sub[] := dprodW defW. Qed.
+Let sW2W : W2 \subset W. Proof using defW. by have /mulG_sub[] := dprodW defW. Qed.
 
 Lemma card_cycTIset : #|V| = (w1.-1 * w2.-1)%N.
-Proof.
+Proof using sW2W sW1W.
 have [_ _ _ tiW12] := dprodP defW.
 rewrite cardsD (setIidPr _) ?subUset ?sW1W // cardsU {}tiW12 cards1.
 rewrite -(dprod_card defW) -addnBA // -!subn1 -/w1 -/w2 subnDA.
@@ -891,20 +891,20 @@ Qed.
 Definition cfCyclicTIset i j := cfDprod defW (1 - 'chi_i) (1 - 'chi_j).
 Local Notation alpha_ := cfCyclicTIset.
 
-Lemma cycTIirr00 : w_ 0 0 = 1. Proof. by rewrite /w_ dprod_Iirr0 irr0. Qed.
+Lemma cycTIirr00 : w_ 0 0 = 1. Proof using defW. by rewrite /w_ dprod_Iirr0 irr0. Qed.
 Local Notation w_00 := cycTIirr00.
 
 Lemma cycTIirr_split i j : w_ i j = w_ i 0 * w_ 0 j.
-Proof. by rewrite /w_ !dprod_IirrE !irr0 cfDprod_split. Qed.
+Proof using defW. by rewrite /w_ !dprod_IirrE !irr0 cfDprod_split. Qed.
 
 Lemma cfker_cycTIl j : W1 \subset cfker (w_ 0 j).
-Proof. by rewrite /w_ dprod_IirrE irr0 cfDprod_cfun1l cfker_sdprod. Qed.
+Proof using defW. by rewrite /w_ dprod_IirrE irr0 cfDprod_cfun1l cfker_sdprod. Qed.
 
 Lemma cfker_cycTIr i : W2 \subset cfker (w_ i 0).
-Proof. by rewrite /w_ dprod_IirrE irr0 cfDprod_cfun1r cfker_sdprod. Qed.
+Proof using defW. by rewrite /w_ dprod_IirrE irr0 cfDprod_cfun1r cfker_sdprod. Qed.
 
 Let cfdot_w i1 j1 i2 j2 : '[w_ i1 j1, w_ i2 j2] = ((i1 == i2) && (j1 == j2))%:R.
-Proof. exact: cfdot_dprod_irr. Qed.
+Proof using defW. exact: cfdot_dprod_irr. Qed.
 
 Lemma cfCycTI_E i j : alpha_ i j = 1 - w_ i 0 - w_ 0 j + w_ i j.
 Proof.
@@ -957,57 +957,57 @@ Qed.
 
 Hypothesis ctiW : cyclicTI_hypothesis G defW.
 
-Let cycW : cyclic W. Proof. by case: ctiW. Qed.
-Let oddW : odd #|W|. Proof. by case: ctiW. Qed.
-Let tiV : normedTI V G W. Proof. by case: ctiW. Qed.
-Let ntV : V != set0. Proof. by case/andP: tiV. Qed.
+Let cycW : cyclic W. Proof using ctiW. by case: ctiW. Qed.
+Let oddW : odd #|W|. Proof using ctiW. by case: ctiW. Qed.
+Let tiV : normedTI V G W. Proof using ctiW. by case: ctiW. Qed.
+Let ntV : V != set0. Proof using tiV. by case/andP: tiV. Qed.
 
 Lemma cyclicTIhyp_sym (xdefW : W2 \x W1 = W) : cyclicTI_hypothesis G xdefW.
-Proof. by split; rewrite // /cyclicTIset setUC. Qed.
+Proof using cycW oddW tiV. by split; rewrite // /cyclicTIset setUC. Qed.
 
-Let cycW1 : cyclic W1. Proof. exact: cyclicS cycW. Qed.
-Let cycW2 : cyclic W2. Proof. exact: cyclicS cycW. Qed.
-Let coW12 : coprime w1 w2. Proof. by rewrite -(cyclic_dprod defW). Qed.
+Let cycW1 : cyclic W1. Proof using cycW sW1W. exact: cyclicS cycW. Qed.
+Let cycW2 : cyclic W2. Proof using cycW sW2W. exact: cyclicS cycW. Qed.
+Let coW12 : coprime w1 w2. Proof using cycW1 cycW2. by rewrite -(cyclic_dprod defW). Qed.
 
-Let Wlin k : 'chi[W]_k \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let W1lin i : 'chi[W1]_i \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let W2lin i : 'chi[W2]_i \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let w_lin i j : w_ i j \is a linear_char. Proof. exact: Wlin. Qed.
+Let Wlin k : 'chi[W]_k \is a linear_char. Proof using cycW. exact/irr_cyclic_lin. Qed.
+Let W1lin i : 'chi[W1]_i \is a linear_char. Proof using cycW1. exact/irr_cyclic_lin. Qed.
+Let W2lin i : 'chi[W2]_i \is a linear_char. Proof using cycW2. exact/irr_cyclic_lin. Qed.
+Let w_lin i j : w_ i j \is a linear_char. Proof using Wlin. exact: Wlin. Qed.
 
-Let nirrW1 : #|Iirr W1| = w1. Proof. exact: card_Iirr_cyclic. Qed.
-Let nirrW2 : #|Iirr W2| = w2. Proof. exact: card_Iirr_cyclic. Qed.
-Let NirrW1 : Nirr W1 = w1. Proof. by rewrite -nirrW1 card_ord. Qed.
-Let NirrW2 : Nirr W2 = w2. Proof. by rewrite -nirrW2 card_ord. Qed.
+Let nirrW1 : #|Iirr W1| = w1. Proof using cycW1. exact: card_Iirr_cyclic. Qed.
+Let nirrW2 : #|Iirr W2| = w2. Proof using cycW2. exact: card_Iirr_cyclic. Qed.
+Let NirrW1 : Nirr W1 = w1. Proof using nirrW1. by rewrite -nirrW1 card_ord. Qed.
+Let NirrW2 : Nirr W2 = w2. Proof using nirrW2. by rewrite -nirrW2 card_ord. Qed.
 
 Lemma cycTI_nontrivial : W1 :!=: 1%g /\ W2 :!=: 1%g.
-Proof.
+Proof using ntV sW1W sW2W.
 apply/andP; rewrite -!cardG_gt1 -!(subn_gt0 1) !subn1 -muln_gt0.
 by rewrite -card_cycTIset card_gt0.
 Qed.
 
-Let ntW1 : W1 :!=: 1%g. Proof. by case: cycTI_nontrivial. Qed.
-Let ntW2 : W2 :!=: 1%g. Proof. by case: cycTI_nontrivial. Qed.
-Let oddW1 : odd w1. Proof. exact: oddSg oddW. Qed.
-Let oddW2 : odd w2. Proof. exact: oddSg oddW. Qed.
-Let w1gt2 : (2 < w1)%N. Proof. by rewrite odd_gt2 ?cardG_gt1. Qed.
-Let w2gt2 : (2 < w2)%N. Proof. by rewrite odd_gt2 ?cardG_gt1. Qed.
+Let ntW1 : W1 :!=: 1%g. Proof using ntV sW1W sW2W w2. by case: cycTI_nontrivial. Qed.
+Let ntW2 : W2 :!=: 1%g. Proof using ntV sW1W sW2W w1. by case: cycTI_nontrivial. Qed.
+Let oddW1 : odd w1. Proof using oddW sW1W. exact: oddSg oddW. Qed.
+Let oddW2 : odd w2. Proof using oddW sW2W. exact: oddSg oddW. Qed.
+Let w1gt2 : (2 < w1)%N. Proof using ntW1 oddW1. by rewrite odd_gt2 ?cardG_gt1. Qed.
+Let w2gt2 : (2 < w2)%N. Proof using ntW2 oddW2. by rewrite odd_gt2 ?cardG_gt1. Qed.
 
 Let neq_w12 : w1 != w2.
-Proof.
+Proof using coW12 w2gt2.
 by apply: contraTneq coW12 => ->; rewrite /coprime gcdnn -(subnKC w2gt2).
 Qed.
 
-Let cWW : abelian W. Proof. exact: cyclic_abelian. Qed.
-Let nsVW : V <| W. Proof. by rewrite -sub_abelian_normal ?subsetDl. Qed.
-Let sWG : W \subset G. Proof. by have [_ /subsetIP[]] := normedTI_P tiV. Qed.
-Let sVG : V \subset G^#. Proof. by rewrite setDSS ?subsetU ?sub1G. Qed.
+Let cWW : abelian W. Proof using cycW. exact: cyclic_abelian. Qed.
+Let nsVW : V <| W. Proof using cWW. by rewrite -sub_abelian_normal ?subsetDl. Qed.
+Let sWG : W \subset G. Proof using tiV. by have [_ /subsetIP[]] := normedTI_P tiV. Qed.
+Let sVG : V \subset G^#. Proof using sWG. by rewrite setDSS ?subsetU ?sub1G. Qed.
 
 Let alpha1 i j : alpha_ i j 1%g = 0.
-Proof. by rewrite cfDprod1 !cfunE cfun11 lin_char1 // subrr mul0r. Qed.
+Proof using W1lin. by rewrite cfDprod1 !cfunE cfun11 lin_char1 // subrr mul0r. Qed.
 
 (* This first part of Peterfalvi (3.4) will be used in (4.10) and (13.9). *)
 Lemma cfCycTI_on i j : alpha_ i j \in 'CF(W, V).
-Proof.
+Proof using W1lin W2lin.
 apply/cfun_onP=> x; rewrite !inE negb_and negbK orbC.
 case/or3P => [/cfun0->// | W1x | W2x].
   by rewrite -[x]mulg1 cfDprodE // !cfunE cfun11 lin_char1 ?subrr ?mulr0.
@@ -1016,7 +1016,7 @@ Qed.
 
 (* This is Peterfalvi (3.4). *)
 Lemma cfCycTIbase_basis : basis_of 'CF(W, V) cfWVbase.
-Proof.
+Proof using W1lin W2lin cWW nirrW1 nirrW2.
 rewrite basisEfree cfCycTIbase_free /=.
 have ->: \dim 'CF(W, V) = #|V| by rewrite dim_cfun_on_abelian ?subsetDl.
 rewrite size_tuple cardsX !cardsC1 nirrW1 nirrW2 -card_cycTIset leqnn andbT.
@@ -1274,7 +1274,7 @@ Lemma cyclicTIiso_basis_exists :
        forall i j, i != 0 -> j != 0 -> 
          'Ind (alpha_ i j) = 1 - xi_ i 0 - xi_ 0 j + xi_ i j
      & forall i1 j1 i2 j2, '[xi_ i1 j1, xi_ i2 j2] = ((i1, j1) == (i2, j2))%:R].
-Proof.
+Proof using NirrW1 NirrW2 W1lin W2lin neq_w12 sVG w1gt2.
 (* Instantiate the abstract theory vertically and horizontally. *)
 pose beta i j : 'CF(G) := 'Ind[G] (alpha_ i j) - 1.
 have Zbeta i j: beta i j \in 'Z[irr G].
@@ -1376,7 +1376,7 @@ Theorem cyclicTIiso_exists :
   {sigma : 'Hom(cfun_vectType W, cfun_vectType G) |
     [/\ {in 'Z[irr W], isometry sigma, to 'Z[irr G]}, sigma 1 = 1
       & {in 'CF(W, V), forall phi : 'CF(W), sigma phi = 'Ind[G] phi}]}.
-Proof.
+Proof using NirrW1 NirrW2 W1lin W2lin cWW cfdot_alpha_1 cfdot_alpha_w neq_w12 sVG w1gt2.
 pose sigmaVP f := ('CF(W, V) <= lker (linfun f - linfun 'Ind[G]))%VS.
 pose sigmaP f := [&& orthonormal (map f (irr W)), f 1 == 1 & sigmaVP f].
 pose sigma_base f := [seq (dchi (f k) : 'CF(G)) | k : Iirr W].
@@ -1435,30 +1435,30 @@ by rewrite !linearZ !cfdotZl !cfdotZr /= Isigma ?irr_vchar.
 Qed.
 
 Lemma cycTIiso_vchar i j : eta_ i j \in 'Z[irr G].
-Proof. by rewrite Zsigma ?irr_vchar. Qed.
+Proof using Zsigma. by rewrite Zsigma ?irr_vchar. Qed.
 
 Lemma cfdot_cycTIiso i1 i2 j1 j2 : 
   '[eta_ i1 j1, eta_ i2 j2] = ((i1 == i2) && (j1 == j2))%:R.
-Proof. by rewrite cycTIisometry. Qed.
+Proof using Isigma. by rewrite cycTIisometry. Qed.
 
 Lemma cfnorm_cycTIiso i j : '[eta_ i j] = 1.
-Proof. by rewrite cycTIisometry cfnorm_irr. Qed.
+Proof using Isigma. by rewrite cycTIisometry cfnorm_irr. Qed.
 
 Lemma cycTIiso_dirr i j : eta_ i j \in dirr G.
-Proof. by rewrite dirrE cycTIiso_vchar /= cfnorm_cycTIiso. Qed.
+Proof using Zsigma Isigma. by rewrite dirrE cycTIiso_vchar /= cfnorm_cycTIiso. Qed.
 
 Lemma cycTIiso_orthonormal : orthonormal im_sigma.
-Proof. by rewrite map_orthonormal ?irr_orthonormal. Qed.
+Proof using Isigma. by rewrite map_orthonormal ?irr_orthonormal. Qed.
 
 Lemma cycTIiso_eqE i1 i2 j1 j2 :
   (eta_ i1 j1 == eta_ i2 j2) = ((i1 == i2) && (j1 == j2)).
-Proof.
+Proof using Isigma.
 have /inj_in_eq-> := Zisometry_inj Isigma; try exact: irr_vchar.
 by rewrite (inj_eq irr_inj) (inj_eq (dprod_Iirr_inj _)).
 Qed.
 
 Lemma cycTIiso_neqN i1 i2 j1 j2 : (eta_ i1 j1 == - eta_ i2 j2) = false.
-Proof.
+Proof using Isigma.
 rewrite -addr_eq0; apply/eqP=> /(congr1 (cfdot (eta_ i1 j1)))/eqP.
 by rewrite cfdot0r cfdotDr !cfdot_cycTIiso !eqxx -mulrS pnatr_eq0.
 Qed.
@@ -1492,14 +1492,14 @@ Proof. by case: sigma_Res_V. Qed.
 (* This is Peterfalvi, Theorem (3.2)(e). *)
 Theorem ortho_cycTIiso_vanish (psi : 'CF(G)) : 
   orthogonal psi im_sigma -> {in V, forall x, psi x = 0}.
-Proof. by case: sigma_Res_V psi. Qed.
+Proof using sigma_Res_V. by case: sigma_Res_V psi. Qed.
 
 (* This is PeterFalvi (3.7). *)
 Lemma cycTIiso_cfdot_exchange (psi : 'CF(G)) i1 i2 j1 j2 :
     {in V, forall x, psi x = 0} -> 
   '[psi, eta_ i1 j1] + '[psi, eta_ i2 j2]
      = '[psi, eta_ i1 j2] + '[psi, eta_ i2 j1].
-Proof.
+Proof using NirrW1 NirrW2 W1lin W2lin cWW cfdot_alpha_1 cfdot_alpha_w neq_w12 sVG w1gt2.
 move=> psiV_0; pose phi : 'CF(W) := w_ i1 j1 + w_ i2 j2 - w_ i1 j2 - w_ i2 j1.
 have Vphi: phi \in 'CF(W, V).
   apply/cfun_onP=> g; rewrite inE negb_and negbK !inE orbC.
@@ -1674,7 +1674,7 @@ Lemma eq_signed_sub_cTIiso phi e i j1 j2 :
     let rho := (-1) ^+ e *: (eta_ i j1 - eta_ i j2) in
     phi \in 'Z[irr G] -> '[phi] = 2%:R -> j1 != j2 ->
   {in V, phi =1 rho} -> phi = rho.
-Proof.
+Proof using Zsigma Isigma.
 set rho := _ - _; move: phi => phi0 /= Zphi0 n2phi0 neq_j12 eq_phi_rho.
 pose phi := (-1) ^+ e *: phi0; pose psi := phi - rho.
 have{eq_phi_rho} psiV0 z: z \in V -> psi z = 0.
@@ -1782,7 +1782,7 @@ Let w := 'chi_iw.
 Let a := #[w]%CF.
 
 Let Zsigw : sigma w \in 'Z[irr G].
-Proof. by have [_ -> //] := cycTI_Zisometry; apply: irr_vchar. Qed.
+Proof using iw. by have [_ -> //] := cycTI_Zisometry; apply: irr_vchar. Qed.
 
 Let lin_w: w \is a linear_char := Wlin iw.
 
@@ -1791,7 +1791,7 @@ Lemma cycTIiso_aut_exists k :
     coprime k a ->
   [/\ exists u, sigma (w ^+ k) = cfAut u (sigma w)
     & forall x, coprime #[x] a -> sigma (w ^+ k) x = sigma w x].
-Proof.
+Proof using Zsigw lin_w.
 case/(make_pi_cfAut G)=> u Du_a Du_a'.
 suffices Dwk: sigma (w ^+ k) = cfAut u (sigma w).
   by split=> [|x co_x_a]; [exists u | rewrite Dwk Du_a'].
@@ -1805,7 +1805,7 @@ Qed.
 
 (* This is Peterfalvi (3.9)(c). *)
 Lemma Cint_cycTIiso_coprime x : coprime #[x] a -> sigma w x \in Cint.
-Proof.
+Proof using Zsigw lin_w.
 move=> co_x_a; apply: Cint_rat_Aint (Aint_vchar _ Zsigw).
 have [Qb galQb [QbC AutQbC [w_b genQb memQb]]] := group_num_field_exists <[x]>.
 have{memQb} [wx Dwx]: exists wx, sigma w x = QbC wx.

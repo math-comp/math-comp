@@ -529,18 +529,18 @@ Variable (a1 a2 : pred T).
 Hypothesis s12 : subpred a1 a2.
 
 Lemma sub_find s : find a2 s <= find a1 s.
-Proof. by elim: s => //= x s IHs; case: ifP => // /(contraFF (@s12 x))->. Qed.
+Proof using s12. by elim: s => //= x s IHs; case: ifP => // /(contraFF (@s12 x))->. Qed.
 
 Lemma sub_has s : has a1 s -> has a2 s.
-Proof. by rewrite !has_find; apply: leq_ltn_trans (sub_find s). Qed.
+Proof using s12. by rewrite !has_find; apply: leq_ltn_trans (sub_find s). Qed.
 
 Lemma sub_count s : count a1 s <= count a2 s.
-Proof.
+Proof using s12.
 by elim: s => //= x s; apply: leq_add; case a1x: (a1 x); rewrite // s12.
 Qed.
 
 Lemma sub_all s : all a1 s -> all a2 s.
-Proof.
+Proof using s12.
 by rewrite !all_count !eqn_leq !count_size => /leq_trans-> //; apply: sub_count.
 Qed.
 
@@ -1090,7 +1090,7 @@ Proof. exact: all_pred1_constant (all_pred1_nseq x n). Qed.
 
 (* Uses x0 *)
 Lemma constantP s : reflect (exists x, s = nseq (size s) x) (constant s).
-Proof.
+Proof using x0.
 apply: (iffP idP) => [| [x ->]]; last exact: constant_nseq.
 case: s => [|x s] /=; first by exists x0.
 by move/all_pred1P=> def_s; exists x; rewrite -def_s.
@@ -2030,13 +2030,13 @@ Proof. by move/perm_eqP=> Est; apply/perm_eqP=> a; rewrite !count_map Est. Qed.
 Hypothesis Hf : injective f.
 
 Lemma mem_map s x : (f x \in map f s) = (x \in s).
-Proof. by apply/mapP/idP=> [[y Hy /Hf->] //|]; exists x. Qed.
+Proof using Hf. by apply/mapP/idP=> [[y Hy /Hf->] //|]; exists x. Qed.
 
 Lemma index_map s x : index (f x) (map f s) = index x s.
-Proof. by rewrite /index; elim: s => //= y s IHs; rewrite (inj_eq Hf) IHs. Qed.
+Proof using Hf. by rewrite /index; elim: s => //= y s IHs; rewrite (inj_eq Hf) IHs. Qed.
 
 Lemma map_inj_uniq s : uniq (map f s) = uniq s.
-Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
+Proof using Hf. by apply: map_inj_in_uniq; apply: in2W. Qed.
 
 End EqMap.
 
@@ -2104,7 +2104,7 @@ Proof. by elim: s => //= x s; case fx: (f x) => //= [u] <-; congr (_ :: _). Qed.
 Hypothesis fK : ocancel f g.
 
 Lemma pmap_filter s : map g (pmap s) = filter [eta f] s.
-Proof. by elim: s => //= x s <-; rewrite -{3}(fK x); case: (f _). Qed.
+Proof using fK. by elim: s => //= x s <-; rewrite -{3}(fK x); case: (f _). Qed.
 
 End Pmap.
 
@@ -2121,12 +2121,12 @@ Proof. by elim: s => //= x s IHs; rewrite in_cons -IHs; case: (f x). Qed.
 Hypothesis fK : ocancel f g.
 
 Lemma can2_mem_pmap : pcancel g f -> forall s u, (u \in pmap f s) = (g u \in s).
-Proof.
+Proof using fK.
 by move=> gK s u; rewrite -(mem_map (pcan_inj gK)) pmap_filter // mem_filter gK.
 Qed.
 
 Lemma pmap_uniq s : uniq s -> uniq (pmap f s).
-Proof.
+Proof using fK.
 by move/(filter_uniq [eta f]); rewrite -(pmap_filter fK); apply: map_uniq.
 Qed.
 

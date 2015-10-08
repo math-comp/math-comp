@@ -307,7 +307,7 @@ Definition char_poly := \det char_poly_mx.
 
 Let diagA := [seq A i i | i : 'I_n].
 Let size_diagA : size diagA = n.
-Proof. by rewrite size_image card_ord. Qed.
+Proof using A. by rewrite size_image card_ord. Qed.
 
 Let split_diagA :
   exists2 q, \prod_(x <- diagA) ('X - x%:P) + q = char_poly & size q <= n.-1.

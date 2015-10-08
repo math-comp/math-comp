@@ -976,16 +976,16 @@ Variable xi : 'CF(G).
 Hypothesis CFxi : xi \is a linear_char.
 
 Lemma lin_char1: xi 1%g = 1.
-Proof. by case/andP: CFxi => _ /eqP. Qed.
+Proof using All. by case/andP: CFxi => _ /eqP. Qed.
 
 Lemma lin_charW : xi \is a character.
-Proof. by case/andP: CFxi. Qed.
+Proof using All. by case/andP: CFxi. Qed.
 
 Lemma cfun1_lin_char : (1 : 'CF(G)) \is a linear_char.
 Proof. by rewrite qualifE cfun1_char /= cfun11. Qed.
 
 Lemma lin_charM : {in G &, {morph xi : x y / (x * y)%g >-> x * y}}.
-Proof.
+Proof using All.
 move=> x y Gx Gy; case/andP: CFxi => /char_reprP[[n rG] -> /=].
 rewrite cfRepr1 pnatr_eq1 => /eqP n1; rewrite {n}n1 in rG *.
 rewrite !cfunE Gx Gy groupM //= !mulr1n repr_mxM //.
@@ -995,64 +995,64 @@ Qed.
 Lemma lin_char_prod I r (P : pred I) (x : I -> gT) :
     (forall i, P i -> x i \in G) ->
   xi (\prod_(i <- r | P i) x i)%g = \prod_(i <- r | P i) xi (x i).
-Proof.
+Proof using All.
 move=> Gx; elim/(big_load (fun y => y \in G)): _.
 elim/big_rec2: _ => [|i a y Pi [Gy <-]]; first by rewrite lin_char1.
 by rewrite groupM ?lin_charM ?Gx.
 Qed.
 
 Let xiMV x : x \in G -> xi x * xi (x^-1)%g = 1.
-Proof. by move=> Gx; rewrite -lin_charM ?groupV // mulgV lin_char1. Qed.
+Proof using All. by move=> Gx; rewrite -lin_charM ?groupV // mulgV lin_char1. Qed.
 
 Lemma lin_char_neq0 x : x \in G -> xi x != 0.
-Proof.
+Proof using All.
 by move/xiMV/(congr1 (predC1 0)); rewrite /= oner_eq0 mulf_eq0 => /norP[].
 Qed.
 
 Lemma lin_charV x : x \in G -> xi x^-1%g = (xi x)^-1.
-Proof. by move=> Gx; rewrite -[_^-1]mulr1 -(xiMV Gx) mulKf ?lin_char_neq0. Qed.
+Proof using All. by move=> Gx; rewrite -[_^-1]mulr1 -(xiMV Gx) mulKf ?lin_char_neq0. Qed.
 
 Lemma lin_charX x n : x \in G -> xi (x ^+ n)%g = xi x ^+ n.
-Proof.
+Proof using CFxi.
 move=> Gx; elim: n => [|n IHn]; first exact: lin_char1.
 by rewrite expgS exprS lin_charM ?groupX ?IHn.
 Qed.
 
 Lemma lin_char_unity_root x : x \in G -> xi x ^+ #[x] = 1.
-Proof. by move=> Gx; rewrite -lin_charX // expg_order lin_char1. Qed.
+Proof using CFxi. by move=> Gx; rewrite -lin_charX // expg_order lin_char1. Qed.
 
 Lemma normC_lin_char x : x \in G -> `|xi x| = 1.
-Proof.
+Proof using CFxi.
 move=> Gx; apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) ?normr_ge0 //.
 by rewrite -normrX // lin_char_unity_root ?normr1.
 Qed.
 
 Lemma lin_charV_conj x : x \in G -> xi x^-1%g = (xi x)^*.
-Proof.
+Proof using All.
 move=> Gx; rewrite lin_charV // invC_norm mulrC normC_lin_char //.
 by rewrite expr1n divr1.
 Qed.
 
 Lemma lin_char_irr : xi \in irr G.
-Proof.
+Proof using CFxi.
 case/andP: CFxi => /char_reprP[rG ->]; rewrite cfRepr1 pnatr_eq1 => /eqP n1.
 by apply/irr_reprP; exists rG => //; apply/mx_abs_irrW/linear_mx_abs_irr.
 Qed.
 
 Lemma mul_conjC_lin_char : xi * xi^*%CF = 1.
-Proof.
+Proof using CFxi.
 apply/cfun_inP=> x Gx.
 by rewrite !cfunE cfun1E Gx -normCK normC_lin_char ?expr1n.
 Qed.
 
 Lemma lin_char_unitr : xi \in GRing.unit.
-Proof. by apply/unitrPr; exists xi^*%CF; apply: mul_conjC_lin_char. Qed.
+Proof using CFxi. by apply/unitrPr; exists xi^*%CF; apply: mul_conjC_lin_char. Qed.
 
 Lemma invr_lin_char : xi^-1 = xi^*%CF.
-Proof. by rewrite -[_^-1]mulr1 -mul_conjC_lin_char mulKr ?lin_char_unitr. Qed.
+Proof using CFxi. by rewrite -[_^-1]mulr1 -mul_conjC_lin_char mulKr ?lin_char_unitr. Qed.
 
 Lemma fful_lin_char_inj : cfaithful xi -> {in G &, injective xi}.
-Proof.
+Proof using CFxi.
 move=> fful_phi x y Gx Gy xi_xy; apply/eqP; rewrite eq_mulgV1 -in_set1.
 rewrite (subsetP fful_phi) // inE groupM ?groupV //=; apply/forallP=> z.
 have [Gz | G'z] := boolP (z \in G); last by rewrite !cfun0 ?groupMl ?groupV.
@@ -1642,17 +1642,17 @@ Section KerLin.
 
 Variable xi : 'CF(G).
 Hypothesis lin_xi : xi \is a linear_char.
-Let Nxi: xi \is a character. Proof. by have [] := andP lin_xi. Qed.
+Let Nxi: xi \is a character. Proof using All. by have [] := andP lin_xi. Qed.
 
 Lemma lin_char_der1 : G^`(1)%g \subset cfker xi.
-Proof.
+Proof using Nxi.
 rewrite gen_subG /=; apply/subsetP=> _ /imset2P[x y Gx Gy ->].
 rewrite cfkerEchar // inE groupR //= !lin_charM ?lin_charV ?in_group //.
 by rewrite mulrCA mulKf ?mulVf ?lin_char_neq0 // lin_char1.
 Qed.
 
 Lemma cforder_lin_char : #[xi]%CF = exponent (G / cfker xi)%g.
-Proof.
+Proof using Nxi.
 apply/eqP; rewrite eqn_dvd; apply/andP; split.
   apply/dvdn_cforderP=> x Gx; rewrite -lin_charX // -cfQuoEker ?groupX //.
   rewrite morphX ?(subsetP (cfker_norm xi)) //= expg_exponent ?mem_quotient //.
@@ -1664,12 +1664,12 @@ by rewrite lin_charX ?lin_char1 // (dvdn_cforderP _ _ _).
 Qed.
 
 Lemma cforder_lin_char_dvdG : #[xi]%CF %| #|G|.
-Proof.
+Proof using Nxi.
 by rewrite cforder_lin_char (dvdn_trans (exponent_dvdn _)) ?dvdn_morphim.
 Qed.
 
 Lemma cforder_lin_char_gt0 : (0 < #[xi]%CF)%N.
-Proof. by rewrite cforder_lin_char exponent_gt0. Qed.
+Proof using Nxi. by rewrite cforder_lin_char exponent_gt0. Qed.
 
 End KerLin.
 
@@ -1820,15 +1820,15 @@ Proof. by rewrite /morph_Iirr irr0 rmorph1 -irr0 irrK. Qed.
 Hypothesis sGD : G \subset D.
 
 Lemma morph_IirrE i : 'chi_(morph_Iirr i) = cfMorph 'chi_i.
-Proof. by rewrite cfIirrE ?cfMorph_irr ?mem_irr. Qed.
+Proof using sGD. by rewrite cfIirrE ?cfMorph_irr ?mem_irr. Qed.
 
 Lemma morph_Iirr_inj : injective morph_Iirr.
-Proof.
+Proof using sGD.
 by move=> i j eq_ij; apply/irr_inj/cfMorph_inj; rewrite // -!morph_IirrE eq_ij.
 Qed.
 
 Lemma morph_Iirr_eq0 i : (morph_Iirr i == 0) = (i == 0).
-Proof. by rewrite -!irr_eq1 morph_IirrE cfMorph_eq1. Qed.
+Proof using sGD. by rewrite -!irr_eq1 morph_IirrE cfMorph_eq1. Qed.
 
 End Morphim.
 
@@ -1889,7 +1889,7 @@ Section Sdprod.
 
 Variables (gT : finGroupType) (K H G : {group gT}).
 Hypothesis defG : K ><| H = G.
-Let nKG: G \subset 'N(K). Proof. by have [/andP[]] := sdprod_context defG. Qed.
+Let nKG: G \subset 'N(K). Proof using All. by have [/andP[]] := sdprod_context defG. Qed.
 
 Lemma cfSdprod_char chi :
  (cfSdprod defG chi \is a character) = (chi \is a character).
@@ -1921,14 +1921,14 @@ Proof. by apply/eqP; rewrite sdprod_Iirr_eq0. Qed.
 
 Lemma Res_sdprod_irr phi :
   K \subset cfker phi -> phi \in irr G -> 'Res phi \in irr H.
-Proof.
+Proof using defG.
 move=> kerK /irrP[i Dphi]; rewrite irrEchar -(cfSdprod_iso defG).
 by rewrite cfRes_sdprodK // Dphi cfnorm_irr cfRes_char ?irr_char /=.
 Qed.
 
 Lemma sdprod_Res_IirrE i :
   K \subset cfker 'chi[G]_i -> 'chi_(Res_Iirr H i) = 'Res 'chi_i.
-Proof. by move=> kerK; rewrite cfIirrE ?Res_sdprod_irr ?mem_irr. Qed.
+Proof using defG. by move=> kerK; rewrite cfIirrE ?Res_sdprod_irr ?mem_irr. Qed.
 
 Lemma sdprod_Res_IirrK i :
   K \subset cfker 'chi_i -> sdprod_Iirr (Res_Iirr H i) = i.
@@ -2103,7 +2103,7 @@ Variables (A : I -> {group gT}) (G : {group gT}).
 Hypothesis defG : \big[dprod/1%g]_(i | P i) A i = G.
 
 Let sAG i : P i -> A i \subset G.
-Proof. by move=> Pi; rewrite -(bigdprodWY defG) (bigD1 i) ?joing_subl. Qed.
+Proof using All. by move=> Pi; rewrite -(bigdprodWY defG) (bigD1 i) ?joing_subl. Qed.
 
 Lemma cfBigdprodi_char i (phi : 'CF(A i)) :
   phi \is a character -> cfBigdprodi defG phi \is a character.

@@ -132,15 +132,15 @@ Section PprodSubCoprime.
 Variables K U H G : {group gT}.
 Hypotheses (defG : K * U = G) (nsKG : K <| G).
 Hypotheses (sHU : H \subset U) (coKH : coprime #|K| #|H|).
-Let nKG : G \subset 'N(K). Proof. by case/andP: nsKG. Qed.
-Let sKG : K \subset G. Proof. by case/mulG_sub: defG. Qed.
-Let sUG : U \subset G. Proof. by case/mulG_sub: defG. Qed.
-Let nKU : U \subset 'N(K). Proof. exact: subset_trans sUG nKG. Qed.
-Let nKH : H \subset 'N(K). Proof. exact: subset_trans sHU nKU. Qed.
+Let nKG : G \subset 'N(K). Proof using nsKG. by case/andP: nsKG. Qed.
+Let sKG : K \subset G. Proof using defG. by case/mulG_sub: defG. Qed.
+Let sUG : U \subset G. Proof using defG. by case/mulG_sub: defG. Qed.
+Let nKU : U \subset 'N(K). Proof using nKG sUG. exact: subset_trans sUG nKG. Qed.
+Let nKH : H \subset 'N(K). Proof using nKU sHU. exact: subset_trans sHU nKU. Qed.
 
 (* This is B & G, Lemma 6.5(a); note that we do not assume solvability. *)
 Lemma pprod_focal_coprime : H :&: G^`(1) = H :&: U^`(1).
-Proof.
+Proof using coKH nKU sHU.
 set G' :=  G^`(1); set U' := U^`(1).
 have [sU'U nU'U] := andP (der_normal 1 U : U' <| U).
 have{nU'U} nU_U': U :&: _ \subset 'N(U') by move=> A; rewrite subIset ?nU'U.
@@ -162,7 +162,7 @@ Hypothesis solG : solvable G.
 Lemma pprod_trans_coprime g :
     g \in G -> H :^ g \subset U ->
   exists2 c, c \in 'C_K(H) & exists2 u, u \in U & g = c * u.
-Proof.
+Proof using coKH nKH solG.
 rewrite -{1}defG => /mulsgP[k u Kk Uu defg] sHgU.
 have [sK_KH sH_KH] := joing_sub (erefl (K <*> H)).
 have hallH: \pi(H).-Hall(K <*> H :&: U) H.
@@ -185,7 +185,7 @@ Qed.
 
 (* This is B & G, Lemma 6.5(b). *)
 Lemma pprod_norm_coprime_prod : 'C_K(H) * 'N_U(H) = 'N_G(H).
-Proof.
+Proof using All.
 apply/eqP; rewrite eqEsubset mul_subG ?setISS ?cent_sub //=.
 apply/subsetP=> g /setIP[Gg /normP nHg].
 have [|c Cc [u Uu defg]] := pprod_trans_coprime Gg; first by rewrite nHg.
@@ -200,33 +200,33 @@ Section Plength1Prod.
 Variables (p : nat) (G S : {group gT}).
 Hypotheses (sylS : p.-Sylow(G) S) (pl1G : p.-length_1 G).
 Let K := 'O_p^'(G).
-Let sSG : S \subset G. Proof. by case/andP: sylS. Qed.
-Let nsKG : K <| G. Proof. apply: pcore_normal. Qed.
-Let sKG : K \subset G. Proof. by case/andP: nsKG. Qed.
-Let nKG : G \subset 'N(K). Proof. by case/andP: nsKG. Qed.
-Let nKS : S \subset 'N(K). Proof. apply: subset_trans sSG nKG. Qed.
+Let sSG : S \subset G. Proof using sylS. by case/andP: sylS. Qed.
+Let nsKG : K <| G. Proof using p. apply: pcore_normal. Qed.
+Let sKG : K \subset G. Proof using nsKG. by case/andP: nsKG. Qed.
+Let nKG : G \subset 'N(K). Proof using nsKG. by case/andP: nsKG. Qed.
+Let nKS : S \subset 'N(K). Proof using nKG sSG. apply: subset_trans sSG nKG. Qed.
 Let coKS : coprime #|K| #|S|.
-Proof. exact: p'nat_coprime (pcore_pgroup _ G) (pHall_pgroup sylS). Qed.
-Let sSN : S \subset 'N_G(S). Proof. by rewrite subsetI sSG normG. Qed.
+Proof using sylS. exact: p'nat_coprime (pcore_pgroup _ G) (pHall_pgroup sylS). Qed.
+Let sSN : S \subset 'N_G(S). Proof using sSG. by rewrite subsetI sSG normG. Qed.
 
 Let sylGbp : p.-Sylow(G / K) 'O_p(G / K).
-Proof. by rewrite -plength1_pcore_quo_Sylow. Qed.
+Proof using pl1G. by rewrite -plength1_pcore_quo_Sylow. Qed.
 
 (* This is B & G, Lemma 6.6(a1); note that we do not assume solvability. *)
 Lemma plength1_Sylow_prod : K * S = 'O_{p^',p}(G).
-Proof.
+Proof using nKS sylGbp.
 by rewrite -quotientK 1?(eq_Hall_pcore sylGbp) ?quotient_pHall //= /K -pseries1.
 Qed.
 
 Let sylS_Gp'p : p.-Sylow('O_{p^',p}(G)) S.
-Proof.
+Proof using nKS sylGbp.
 have [_ sSGp'p] := mulG_sub plength1_Sylow_prod.
 exact: pHall_subl sSGp'p (pseries_sub _ _) sylS.
 Qed.
 
 (* This is B & G, Lemma 6.6(a2); note that we do not assume solvability. *)
 Lemma plength1_Frattini : K * 'N_G(S) = G.
-Proof.
+Proof using sSN sylS_Gp'p.
 rewrite -{2}(Frattini_arg _ sylS_Gp'p) ?pseries_normal //= -plength1_Sylow_prod.
 by rewrite -mulgA [S * _]mulSGid // subsetI sSG normG.
 Qed.
@@ -234,7 +234,7 @@ Local Notation defG := plength1_Frattini.
 
 (* This is B & G, Lemma 6.6(b); note that we do not assume solvability. *)
 Lemma plength1_Sylow_sub_der1 : S \subset G^`(1) -> S \subset ('N_G(S))^`(1).
-Proof.
+Proof using coKS sSN sylS_Gp'p.
 by move/setIidPl=> sSG'; apply/setIidPl; rewrite -(pprod_focal_coprime defG).
 Qed.
 
@@ -244,7 +244,7 @@ Hypothesis solG : solvable G.
 Lemma plength1_Sylow_trans (Y : {set gT}) g :
     Y \subset S -> g \in G -> Y :^ g \subset S -> 
   exists2 c, c \in 'C_G(Y) & exists2 u, u \in 'N_G(S) & g = c * u.
-Proof.
+Proof using All.
 rewrite -gen_subG -(gen_subG (Y :^ g)) genJ => sYS Gg sYgS.
 have coKY := coprimegS sYS coKS.
 have [sYN sYgN] := (subset_trans sYS sSN, subset_trans sYgS sSN).
@@ -256,7 +256,7 @@ Qed.
 Lemma plength1_Sylow_Jsub (Q : {group gT}) : 
     Q \subset G -> p.-group Q ->
   exists2 x, x \in 'C_G(Q :&: S) & Q :^ x \subset S. 
-Proof.
+Proof using coKS sylS_Gp'p.
 move=> sQG pQ; have sQ_Gp'p: Q \subset 'O_{p^',p}(G).
   rewrite -sub_quotient_pre /= pcore_mod1 ?(subset_trans sQG) //.
   by rewrite (sub_Hall_pcore sylGbp) ?quotientS ?quotient_pgroup.

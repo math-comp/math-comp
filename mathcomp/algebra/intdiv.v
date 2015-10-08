@@ -641,7 +641,7 @@ Hypothesis co_m12 : coprimez m1 m2.
 
 Lemma zchinese_remainder x y :
   (x == y %[mod m1 * m2])%Z = (x == y %[mod m1])%Z && (x == y %[mod m2])%Z.
-Proof. by rewrite !eqz_mod_dvd Gauss_dvdz. Qed.
+Proof using All. by rewrite !eqz_mod_dvd Gauss_dvdz. Qed.
 
 (***********************************************************************)
 (*   A function that solves the chinese remainder problem              *)
@@ -651,21 +651,21 @@ Definition zchinese r1 r2 :=
   r1 * m2 * (egcdz m1 m2).2 + r2 * m1 * (egcdz m1 m2).1.
 
 Lemma zchinese_modl r1 r2 : (zchinese r1 r2 = r1 %[mod m1])%Z.
-Proof.
+Proof using All.
 rewrite /zchinese; have [u v /= Duv _] := egcdzP m1 m2.
 rewrite -{2}[r1]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
 by rewrite mulrDr mulrAC addrC (mulrAC r2) !mulrA !modzMDl.
 Qed.
 
 Lemma zchinese_modr r1 r2 : (zchinese r1 r2 = r2 %[mod m2])%Z.
-Proof.
+Proof using All.
 rewrite /zchinese; have [u v /= Duv _] := egcdzP m1 m2.
 rewrite -{2}[r2]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
 by rewrite mulrAC modzMDl mulrAC addrC mulrDr !mulrA modzMDl.
 Qed.
 
 Lemma zchinese_mod x : (x = zchinese (x %% m1)%Z (x %% m2)%Z %[mod m1 * m2])%Z.
-Proof.
+Proof using All.
 apply/eqP; rewrite zchinese_remainder //.
 by rewrite zchinese_modl zchinese_modr !modz_mod !eqxx.
 Qed.

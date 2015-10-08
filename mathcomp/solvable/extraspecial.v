@@ -118,7 +118,7 @@ Local Notation gtype := Pextraspecial.gtype.
 Local Notation actp := (Pextraspecial.groupAction p).
 
 Lemma card_pX1p2 : #|p^{1+2}| = (p ^ 3)%N.
-Proof.
+Proof using p_gt1.
 rewrite [@gtype _]unlock -(sdprod_card (sdprod_sdpair _)).
 rewrite !card_injm ?injm_sdpair1 ?injm_sdpair2 // !cardsT card_prod card_ord.
 by rewrite -mulnA Zp_cast.
@@ -126,7 +126,7 @@ Qed.
 
 Lemma Grp_pX1p2 :
   p^{1+2} \isog Grp (x : y : (x ^+ p, y ^+ p, [~ x, y, x], [~ x, y, y])).
-Proof.
+Proof using p_gt1.
 rewrite [@gtype _]unlock ; apply: intro_isoGrp => [|rT H].
   apply/existsP; pose x := sdpair1 actp (0, 1)%R; pose y := sdpair2 actp 1%R.
   exists (x, y); rewrite /= !xpair_eqE; set z := [~ x, y]; set G := _ <*> _.
@@ -186,11 +186,11 @@ by exists 1%R; rewrite ?inE.
 Qed.
 
 Lemma pX1p2_pgroup : p.-group p^{1+2}.
-Proof. by rewrite /pgroup card_pX1p2 pnat_exp pnat_id. Qed.
+Proof using p_gt1. by rewrite /pgroup card_pX1p2 pnat_exp pnat_id. Qed.
 
 (* This is part of the existence half of Aschbacher ex. (8.7)(1) *)
 Lemma pX1p2_extraspecial : extraspecial p^{1+2}.
-Proof.
+Proof using All.
 apply: (p3group_extraspecial pX1p2_pgroup); last first.
   by rewrite card_pX1p2 pfactorK.
 case/existsP: (isoGrp_hom Grp_pX1p2) card_pX1p2 => [[x y]] /=.
@@ -204,7 +204,7 @@ Qed.
 
 (* This is part of the existence half of Aschbacher ex. (8.7)(1) *)
 Lemma exponent_pX1p2 : odd p -> exponent p^{1+2} %| p.
-Proof.
+Proof using All.
 move=> p_odd; have pG := pX1p2_pgroup.
 have ->: p^{1+2} = 'Ohm_1(p^{1+2}).
   apply/eqP; rewrite eqEsubset Ohm_sub andbT (OhmE 1 pG).
@@ -218,7 +218,7 @@ Qed.
 (* This is the uniqueness half of Aschbacher ex. (8.7)(1) *)
 Lemma isog_pX1p2 (gT : finGroupType) (G : {group gT}) :
   extraspecial G -> exponent G %| p -> #|G| = (p ^ 3)%N -> G \isog p^{1+2}.
-Proof.
+Proof using All.
 move=> esG expGp oG; apply/(isoGrpP _ Grp_pX1p2).
 rewrite card_pX1p2; split=> //.
 have pG: p.-group G by rewrite /pgroup oG pnat_exp pnat_id.

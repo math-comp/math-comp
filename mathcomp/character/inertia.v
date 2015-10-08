@@ -633,10 +633,10 @@ Section MoreInertia.
 Variables (gT : finGroupType) (G H : {group gT}) (i : Iirr H).
 Let T := 'I_G['chi_i].
 
-Lemma inertia_id : 'I_T['chi_i] = T. Proof. by rewrite -setIA setIid. Qed.
+Lemma inertia_id : 'I_T['chi_i] = T. Proof using G. by rewrite -setIA setIid. Qed.
 
 Lemma cfclass_inertia : ('chi[H]_i ^: T)%CF = [:: 'chi_i].
-Proof.
+Proof using G.
 rewrite /cfclass inertia_id rcosets_id /(image _ _) enum_set1 /=.
 by rewrite repr_group cfConjgJ1.
 Qed.
@@ -683,7 +683,7 @@ Hypotheses (eq_hg : {in H, h =1 g}) (sHG : H \subset G).
 (* This does not depend on the (isoG : isom G R g) assumption. *)
 Lemma cfConjgIsom phi y :
   y \in G -> y \in 'N(H) -> (cfIsom isoH phi ^ g y)%CF = cfIsom isoH (phi ^ y).
-Proof.
+Proof using sHG eq_hg.
 move=> Gy nHy; have [_ defS] := isomP isoH.
 rewrite morphimEdom (eq_in_imset eq_hg) -morphimEsub // in defS.
 apply/cfun_inP=> gx; rewrite -{1}defS => /morphimP[x Gx Hx ->] {gx}.
@@ -692,7 +692,7 @@ by rewrite -morphV -?morphJ -?eq_hg ?cfIsomE ?cfConjgE ?memJ_norm ?groupV.
 Qed.
 
 Lemma inertia_isom phi : 'I_R[cfIsom isoH phi] = g @* 'I_G[phi].
-Proof.
+Proof using sHG eq_hg isoG.
 have [[_ defS] [injg <-]] := (isomP isoH, isomP isoG).
 rewrite morphimEdom (eq_in_imset eq_hg) -morphimEsub // in defS.
 rewrite /inertia !setIdE morphimIdom setIA -{1}defS -injm_norm ?injmI //.
@@ -848,7 +848,7 @@ Hypothesis nAy: forall i, P i -> y \in 'N(A i).
 
 Lemma cfConjgBigdprodi i (phi : 'CF(A i)) :
    (cfBigdprodi defG phi ^ y = cfBigdprodi defG (phi ^ y))%CF.
-Proof.
+Proof using nAy.
 rewrite cfConjgDprodl; try by case: ifP => [/nAy// | _]; rewrite norm1 inE.
   congr (cfDprodl _ _); case: ifP => [Pi | _].
     by rewrite cfConjgRes_norm ?nAy.
@@ -859,7 +859,7 @@ Qed.
 
 Lemma cfConjgBigdprod phi :
   (cfBigdprod defG phi ^ y = cfBigdprod defG (fun i => phi i ^ y))%CF.
-Proof.
+Proof using nAy.
 by rewrite rmorph_prod /=; apply: eq_bigr => i _; apply: cfConjgBigdprodi.
 Qed.
 
@@ -872,14 +872,14 @@ Hypothesis nAL : forall i, P i -> L \subset 'N(A i).
 
 Lemma inertia_bigdprodi i (phi : 'CF(A i)) :
   P i -> 'I_L[cfBigdprodi defG phi] = 'I_L[phi].
-Proof.
+Proof using nAL.
 move=> Pi; rewrite inertia_dprodl ?Pi ?cfRes_id ?nAL //.
 by apply/norms_gen/norms_bigcup/bigcapsP=> j /andP[/nAL].
 Qed.
 
 Lemma inertia_bigdprod phi (Phi := cfBigdprod defG phi) :
   Phi 1%g != 0 -> 'I_L[Phi] = L :&: \bigcap_(i | P i) 'I_L[phi i].
-Proof.
+Proof using nAL.
 move=> nz_Phi; apply/eqP; rewrite eqEsubset; apply/andP; split.
   rewrite subsetI Inertia_sub; apply/bigcapsP=> i Pi.
   have [] := cfBigdprodK nz_Phi Pi; move: (_ / _) => a nz_a <-.
@@ -893,7 +893,7 @@ Qed.
 
 Lemma inertia_bigdprod_irr Iphi (phi := fun i => 'chi_(Iphi i)) :
   'I_L[cfBigdprod defG phi] = L :&: \bigcap_(i | P i) 'I_L[phi i].
-Proof.
+Proof using nAL.
 rewrite inertia_bigdprod // -[cfBigdprod _ _]cfIirrE ?irr1_neq0 //.
 by apply: cfBigdprod_irr => i _; apply: mem_irr.
 Qed.
@@ -925,7 +925,7 @@ Theorem constt_Inertia_bijection :
              [predI irr_constt ('Res chi) & calA] =i pred1 s}
    & (*d*) {in calA, forall s (psi := 'chi_s) (chi := 'Ind[G] psi),
              '['Res psi, theta] = '['Res chi, theta]}].
-Proof.
+Proof using nsHG.
 have [sHG sTG]: H \subset G /\ T \subset G by rewrite subsetIl normal_sub.
 have nsHT : H <| T := normal_Inertia theta sHG; have sHT := normal_sub nsHT.
 have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
@@ -1004,11 +1004,11 @@ Definition mul_Iirr b := cfIirr ('chi_b * chi).
 Definition mul_mod_Iirr (b : Iirr (G / N)) := mul_Iirr (mod_Iirr b).
 
 Hypotheses (nsNG : N <| G) (cNt : 'Res[N] chi = theta).
-Let sNG : N \subset G. Proof. exact: normal_sub. Qed.
-Let nNG : G \subset 'N(N). Proof. exact: normal_norm. Qed.
+Let sNG : N \subset G. Proof using nsNG. exact: normal_sub. Qed.
+Let nNG : G \subset 'N(N). Proof using nsNG. exact: normal_norm. Qed.
 
 Lemma extendible_irr_invariant : G \subset 'I[theta].
-Proof.
+Proof using All.
 apply/subsetP=> y Gy; have nNy := subsetP nNG y Gy.
 rewrite inE nNy; apply/eqP/cfun_inP=> x Nx; rewrite cfConjgE // -cNt.
 by rewrite !cfResE ?memJ_norm ?cfunJ ?groupV.
@@ -1023,7 +1023,7 @@ Theorem constt_Ind_mul_ext f (phi := 'chi_f) (psi := phi * theta) :
       {in calS &, injective mul_Iirr},
       irr_constt ('Ind psi) =i [seq mul_Iirr b | b in calS]
     & 'Ind psi = \sum_(b in calS) '['Ind phi, 'chi_b] *: 'chi_(mul_Iirr b)].
-Proof.
+Proof using All.
 move=> IGphi irr_psi calS.
 have IGpsi: G \subset 'I[psi].
   by rewrite (subset_trans _ (inertia_mul _ _)) // subsetI IGphi.
@@ -1076,7 +1076,7 @@ Corollary constt_Ind_ext :
       injective mul_mod_Iirr,
       irr_constt ('Ind theta) =i codom mul_mod_Iirr
     & 'Ind theta = \sum_b 'chi_b 1%g *: 'chi_(mul_mod_Iirr b)].
-Proof.
+Proof using All.
 have IHchi0: G \subset 'I['chi[N]_0] by rewrite inertia_irr0.
 have [] := constt_Ind_mul_ext IHchi0; rewrite irr0 ?mul1r ?mem_irr //.
 set psiG := 'Ind 1 => irrMchi injMchi constt_theta {2}->.
@@ -1553,7 +1553,7 @@ Hypothesis frobGK : [Frobenius G with kernel K].
 
 (* This is Isaacs, Theorem 6.34(a1). *)
 Theorem inertia_Frobenius_ker i : i != 0 -> 'I_G['chi[K]_i] = K.
-Proof.
+Proof using All.
 have [_ _ nsKG regK] := Frobenius_kerP frobGK; have [sKG nKG] := andP nsKG.
 move=> nzi; apply/eqP; rewrite eqEsubset sub_Inertia // andbT.
 apply/subsetP=> x /setIP[Gx /setIdP[nKx /eqP x_stab_i]].
@@ -1589,7 +1589,7 @@ Qed.
 
 (* This is Isaacs, Theorem 6.34(a2) *)
 Theorem irr_induced_Frobenius_ker i : i != 0 -> 'Ind[G, K] 'chi_i \in irr G.
-Proof.
+Proof using All.
 move/inertia_Frobenius_ker/group_inj=> defK.
 have [_ _ nsKG _] := Frobenius_kerP frobGK.
 have [] := constt_Inertia_bijection i nsKG; rewrite defK cfInd_id => -> //.
@@ -1600,7 +1600,7 @@ Qed.
 Theorem Frobenius_Ind_irrP j :
   reflect (exists2 i, i != 0 & 'chi_j = 'Ind[G, K] 'chi_i)
           (~~ (K \subset cfker 'chi_j)).
-Proof.
+Proof using All.
 have [_ _ nsKG _] := Frobenius_kerP frobGK; have [sKG nKG] := andP nsKG.
 apply: (iffP idP) => [not_chijK1 | [i nzi ->]]; last first.
   by rewrite cfker_Ind_irr ?sub_gcore // subGcfker.

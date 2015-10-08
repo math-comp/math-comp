@@ -468,25 +468,25 @@ Variables (p : nat) (gT : finGroupType) (E : {group gT}).
 Hypotheses (abelE : p.-abelem E) (ntE : E :!=: 1%g).
 
 Let pE : p.-group E := abelem_pgroup abelE.
-Let p_pr : prime p. Proof. by have [] := pgroup_pdiv pE ntE. Qed.
+Let p_pr : prime p. Proof using All. by have [] := pgroup_pdiv pE ntE. Qed.
 
 Local Notation n' := (abelem_dim' (gval E)).
 Local Notation n := n'.+1.
 Local Notation rVn := 'rV['F_p](gval E).
 
 Lemma dim_abelemE : n = logn p #|E|.
-Proof.
+Proof using All.
 rewrite /n'; have [_ _ [k ->]] :=  pgroup_pdiv pE ntE.
 by rewrite /pdiv primes_exp ?primes_prime // pfactorK.
 Qed.
 
 Lemma card_abelem_rV : #|rVn| = #|E|.
-Proof.
+Proof using All.
 by rewrite dim_abelemE card_matrix mul1n card_Fp // -p_part part_pnat_id.
 Qed.
 
 Lemma isog_abelem_rV : E \isog [set: rVn].
-Proof.
+Proof using All.
 by rewrite (isog_abelem_card _ abelE) cardsT card_abelem_rV mx_Fp_abelem /=.
 Qed.
 
@@ -596,7 +596,7 @@ Hypothesis nEG : G \subset 'N(E).
 Local Notation r := (abelem_mx nEG).
 
 Fact abelem_mx_linear_proof g : linear (abelem_mx_fun g).
-Proof.
+Proof using nEG.
 rewrite /abelem_mx_fun; case: g => x /= /(subsetP nEG) Nx /= m u v.
 rewrite rVabelemD rVabelemZ conjMg conjXg.
 by rewrite abelem_rV_M ?abelem_rV_X ?groupX ?memJ_norm // natr_Zp.
@@ -619,16 +619,16 @@ Canonical abelem_repr := MxRepresentation abelem_mx_repr.
 Let rG := abelem_repr.
 
 Lemma rVabelemJ v x : x \in G -> rV_E (v *m rG x) = (rV_E v) ^ x.
-Proof. exact: rVabelemJmx. Qed.
+Proof using rVabelemJmx. exact: rVabelemJmx. Qed.
 
 Lemma abelem_rV_J : {in E & G, forall x y, ErV (x ^ y) = ErV x *m rG y}.
-Proof.
+Proof using rVabelemJmx.
 by move=> x y Ex Gy; rewrite -{1}(abelem_rV_K Ex) -rVabelemJ ?rVabelemK.
 Qed.
 
 Lemma abelem_rowgJ m (A : 'M_(m, n)) x :
   x \in G -> rV_E @* rowg (A *m rG x) = (rV_E @* rowg A) :^ x.
-Proof.
+Proof using rVabelemJmx.
 move=> Gx; apply: (canRL (conjsgKV _)); apply/setP=> y.
 rewrite mem_conjgV !morphim_invmE !inE memJ_norm ?(subsetP nEG) //=.
 apply: andb_id2l => Ey; rewrite abelem_rV_J //.
@@ -637,13 +637,13 @@ Qed.
 
 Lemma rV_abelem_sJ (L : {group gT}) x :
   x \in G -> L \subset E -> ErV @* (L :^ x) = rowg (rowg_mx (ErV @* L) *m rG x).
-Proof.
+Proof using rVabelemJmx.
 move=> Gx sLE; apply: rVabelem_minj; rewrite abelem_rowgJ //.
 by rewrite rowg_mxK !morphim_invm // -(normsP nEG x Gx) conjSg.
 Qed.
 
 Lemma rstab_abelem m (A : 'M_(m, n)) : rstab rG A = 'C_G(rV_E @* rowg A).
-Proof.
+Proof using rVabelemJmx.
 apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
 apply/eqP/centP=> cAx => [_ /morphimP[u _ Au ->]|].
   move: Au; rewrite inE => /submxP[u' ->] {u}.
@@ -653,26 +653,26 @@ by rewrite row_mul rVabelemJ // /conjg -cAx ?mulKg ?mem_morphim // inE row_sub.
 Qed.
 
 Lemma rstabs_abelem m (A : 'M_(m, n)) : rstabs rG A = 'N_G(rV_E @* rowg A).
-Proof.
+Proof using rVabelemJmx.
 apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
 by rewrite -rowgS -rVabelemS abelem_rowgJ.
 Qed.
 
 Lemma rstabs_abelemG (L : {group gT}) :
   L \subset E -> rstabs rG (rowg_mx (ErV @* L)) = 'N_G(L).
-Proof. by move=> sLE; rewrite rstabs_abelem rowg_mxK morphim_invm. Qed.
+Proof using rVabelemJmx. by move=> sLE; rewrite rstabs_abelem rowg_mxK morphim_invm. Qed.
 
 Lemma mxmodule_abelem m (U : 'M['F_p]_(m, n)) :
   mxmodule rG U = (G \subset 'N(rV_E @* rowg U)).
-Proof. by rewrite -subsetIidl -rstabs_abelem. Qed.
+Proof using rVabelemJmx. by rewrite -subsetIidl -rstabs_abelem. Qed.
 
 Lemma mxmodule_abelemG (L : {group gT}) :
   L \subset E -> mxmodule rG (rowg_mx (ErV @* L)) = (G \subset 'N(L)).
-Proof. by move=> sLE; rewrite -subsetIidl -rstabs_abelemG. Qed.
+Proof using rVabelemJmx. by move=> sLE; rewrite -subsetIidl -rstabs_abelemG. Qed.
 
 Lemma mxsimple_abelemP (U : 'M['F_p]_n) :
   reflect (mxsimple rG U) (minnormal (rV_E @* rowg U) G).
-Proof.
+Proof using rVabelemJmx.
 apply: (iffP mingroupP) => [[/andP[ntU modU] minU] | [modU ntU minU]].
   split=> [||V modV sVU ntV]; first by rewrite mxmodule_abelem.
     by apply: contraNneq ntU => ->; rewrite /= rowg0 morphim1.
@@ -692,19 +692,19 @@ Qed.
 
 Lemma mxsimple_abelemGP (L : {group gT}) :
   L \subset E -> reflect (mxsimple rG (rowg_mx (ErV @* L))) (minnormal L G).
-Proof.
+Proof using rVabelemJmx.
 move/abelem_rV_mK=> {2}<-; rewrite -{2}[_ @* L]rowg_mxK.
 exact: mxsimple_abelemP.
 Qed.
 
 Lemma abelem_mx_irrP : reflect (mx_irreducible rG) (minnormal E G).
-Proof.
+Proof using rVabelemJmx.
 by rewrite -[E in minnormal E G]im_rVabelem -rowg1; apply: mxsimple_abelemP.
 Qed.
 
 Lemma rfix_abelem (H : {set gT}) :
   H \subset G -> (rfix_mx rG H :=: rowg_mx (ErV @* 'C_E(H)%g))%MS.
-Proof.
+Proof using rVabelemJmx.
 move/subsetP=> sHG; apply/eqmxP/andP; split.
   rewrite -rowgS rowg_mxK -sub_rVabelem_im // subsetI sub_rVabelem /=.
   apply/centsP=> y /morphimP[v _]; rewrite inE => cGv ->{y} x Gx.
@@ -715,10 +715,10 @@ by rewrite -abelem_rV_J ?sHG // conjgE (centP cHz) ?mulKg.
 Qed.
 
 Lemma rker_abelem : rker rG = 'C_G(E).
-Proof. by rewrite /rker rstab_abelem rowg1 im_rVabelem. Qed.
+Proof using rVabelemJmx. by rewrite /rker rstab_abelem rowg1 im_rVabelem. Qed.
 
 Lemma abelem_mx_faithful : 'C_G(E) = 1%g -> mx_faithful rG.
-Proof. by rewrite /mx_faithful rker_abelem => ->. Qed.
+Proof using rVabelemJmx. by rewrite /mx_faithful rker_abelem => ->. Qed.
 
 End OneGroup.
 
@@ -768,7 +768,7 @@ Implicit Types G H : {group gT}.
 (* This is Gorenstein, Lemma 2.6.3. *)
 Lemma rfix_pgroup_char G H n (rG : mx_representation F G n) :
   n > 0 -> p.-group H -> H \subset G -> rfix_mx rG H != 0.
-Proof.
+Proof using charFp.
 move=> n_gt0 pH sHG; rewrite -(rfix_subg rG sHG).
 move: {2}_.+1 (ltnSn (n + #|H|)) {rG G sHG}(subg_repr _ _) => m.
 elim: m gT H pH => // m IHm gT' G pG in n n_gt0 *; rewrite ltnS => le_nG_m rG.
@@ -811,7 +811,7 @@ Qed.
 Variables (G : {group gT}) (n : nat) (rG : mx_representation F G n).
 
 Lemma pcore_sub_rstab_mxsimple M : mxsimple rG M -> 'O_p(G) \subset rstab rG M.
-Proof.
+Proof using charFp.
 case=> modM nzM simM; have sGpG := pcore_sub p G.
 rewrite rfix_mx_rstabC //; set U := rfix_mx _ _.
 have:= simM (M :&: U)%MS; rewrite sub_capmx submx_refl.
@@ -823,12 +823,12 @@ by rewrite lt0n mxrank_eq0.
 Qed.
 
 Lemma pcore_sub_rker_mx_irr : mx_irreducible rG -> 'O_p(G) \subset rker rG.
-Proof. exact: pcore_sub_rstab_mxsimple. Qed.
+Proof using charFp. exact: pcore_sub_rstab_mxsimple. Qed.
 
 (* This is Gorenstein, Lemma 3.1.3. *)
 Lemma pcore_faithful_mx_irr :
   mx_irreducible rG -> mx_faithful rG -> 'O_p(G) = 1%g.
-Proof.
+Proof using charFp.
 move=> irrG ffulG; apply/trivgP; apply: subset_trans ffulG.
 exact: pcore_sub_rstab_mxsimple.
 Qed.
@@ -848,7 +848,7 @@ Let p_gt1 := prime_gt1 p_pr.
 Let oZp := card_center_extraspecial pS esS.
 
 Let modIp' (i : 'I_p.-1) : (i.+1 %% p = i.+1)%N.
-Proof. by case: i => i; rewrite /= -ltnS prednK //; apply: modn_small. Qed.
+Proof using p_gt0. by case: i => i; rewrite /= -ltnS prednK //; apply: modn_small. Qed.
 
 (* This is Aschbacher (34.9), parts (1)-(4). *)
 Theorem extraspecial_repr_structure (sS : irrType F S) :
@@ -862,7 +862,7 @@ Theorem extraspecial_repr_structure (sS : irrType F S) :
                        & forall i, phi i z = (w ^+ i.+1)%:M
           & forall i, irr_degree (iphi i) = (p ^ n)%N]
     & #|sS| = (p ^ n.*2 + p.-1)%N].            
-Proof.
+Proof using All.
 have [[defPhiS defS'] prZ] := esS; set linS := linear_irr sS.
 have nb_lin: #|linS| = (p ^ n.*2)%N.
   rewrite card_linear_irr // -divgS ?der_sub //=.
@@ -1012,7 +1012,7 @@ Let rZ := subg_repr rS sZS.
 Lemma faithful_repr_extraspecial :
  \rank U = (p ^ n)%N /\
    (forall V, mxsimple rS V -> mx_iso rZ U V -> mx_iso rS U V).
-Proof.
+Proof using F'S ffulU modIp' oSpn oZp p_gt1 simU splitF.
 suffices IH V: mxsimple rS V -> mx_iso rZ U V ->
   [&& \rank U == (p ^ n)%N & mxsimple_iso rS U V].
 - split=> [|/= V simV isoUV].

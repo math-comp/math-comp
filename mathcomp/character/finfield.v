@@ -288,7 +288,7 @@ Canonical primeChar_baseGroupType := [baseFinGroupType of R for +%R].
 Canonical primeChar_groupType := [finGroupType of R for +%R].
 Canonical primeChar_finRingType := [finRingType of R].
 
-Let pr_p : prime p. Proof. exact: charf_prime charRp. Qed.
+Let pr_p : prime p. Proof using All. exact: charf_prime charRp. Qed.
 
 Lemma primeChar_abelem : p.-abelem [set: R].
 Proof.
@@ -473,17 +473,17 @@ Hypothesis domR : GRing.IntegralDomain.axiom R.
 Implicit Types x y : R.
 
 Let lregR x : x != 0 -> GRing.lreg x.  
-Proof. by move=> xnz; apply: mulrI0_lreg => y /domR/orP[/idPn | /eqP]. Qed.
+Proof using All. by move=> xnz; apply: mulrI0_lreg => y /domR/orP[/idPn | /eqP]. Qed.
 
 Lemma finDomain_field : GRing.Field.mixin_of R. 
-Proof.
+Proof using All.
 move=> x /lregR-regx; apply/unitrP; exists (invF regx 1).
 by split; first apply: (regx); rewrite ?mulrA f_invF // mulr1 mul1r.
 Qed.
 
 (* This is Witt's proof of Wedderburn's little theorem. *)
 Theorem finDomain_mulrC : @commutative R R *%R.
-Proof.
+Proof using All.
 have fieldR := finDomain_field.
 have [p p_pr charRp]: exists2 p, prime p & p \in [char R].
   have [e /prod_prime_decomp->]: {e | (e > 0)%N & e%:R == 0 :> R}.

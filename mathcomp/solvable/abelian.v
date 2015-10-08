@@ -972,10 +972,10 @@ Hypotheses (injf : 'injm f) (sGD : G \subset D).
 Let defG : invm injf @* (f @* G) = G := morphim_invm injf sGD.
 
 Lemma exponent_injm : exponent (f @* G) = exponent G.
-Proof. by apply/eqP; rewrite eqn_dvd -{3}defG !exponent_morphim. Qed.
+Proof using All. by apply/eqP; rewrite eqn_dvd -{3}defG !exponent_morphim. Qed.
 
 Lemma injm_Ldiv n A : f @* 'Ldiv_n(A) = 'Ldiv_n(f @* A).
-Proof.
+Proof using injf.
 apply/eqP; rewrite eqEsubset morphim_Ldiv.
 rewrite -[f @* 'Ldiv_n(A)](morphpre_invm injf).
 rewrite -sub_morphim_pre; last by rewrite subIset ?morphim_sub.
@@ -984,29 +984,29 @@ by rewrite sub_morphim_pre ?morphim_sub // morphpre_invm.
 Qed.
 
 Lemma injm_abelem p : p.-abelem (f @* G) = p.-abelem G.
-Proof. by apply/idP/idP; first rewrite -{2}defG; apply: morphim_abelem. Qed.
+Proof using All. by apply/idP/idP; first rewrite -{2}defG; apply: morphim_abelem. Qed.
 
 Lemma injm_pElem p (E : {group aT}) :
   E \subset D -> ((f @* E)%G \in 'E_p(f @* G)) = (E \in 'E_p(G)).
-Proof.
+Proof using All.
 move=> sED; apply/idP/idP=> EpE; last exact: morphim_pElem.
 by rewrite -defG -(group_inj (morphim_invm injf sED)) morphim_pElem.
 Qed.
 
 Lemma injm_pnElem p n (E : {group aT}) :
   E \subset D -> ((f @* E)%G \in 'E_p^n(f @* G)) = (E \in 'E_p^n(G)).
-Proof. by move=> sED; rewrite inE injm_pElem // card_injm ?inE. Qed.
+Proof using All. by move=> sED; rewrite inE injm_pElem // card_injm ?inE. Qed.
 
 Lemma injm_nElem n (E : {group aT}) :
   E \subset D -> ((f @* E)%G \in 'E^n(f @* G)) = (E \in 'E^n(G)).
-Proof.
+Proof using All.
 move=> sED; apply/nElemP/nElemP=> [] [p EpE];
  by exists p; rewrite injm_pnElem in EpE *.
 Qed.
 
 Lemma injm_pmaxElem p (E : {group aT}) :
   E \subset D -> ((f @* E)%G \in 'E*_p(f @* G)) = (E \in 'E*_p(G)).
-Proof.
+Proof using All.
 move=> sED; have defE := morphim_invm injf sED.
 apply/pmaxElemP/pmaxElemP=> [] [EpE maxE].
   split=> [|H EpH sEH]; first by rewrite injm_pElem in EpE.
@@ -1020,10 +1020,10 @@ by rewrite -injm_pElem ?subsetIl // (group_inj (morphpreK sfHD)).
 Qed.
 
 Lemma injm_grank : 'm(f @* G) = 'm(G).
-Proof. by apply/eqP; rewrite eqn_leq -{3}defG !morphim_grank ?morphimS. Qed.
+Proof using All. by apply/eqP; rewrite eqn_leq -{3}defG !morphim_grank ?morphimS. Qed.
 
 Lemma injm_p_rank p : 'r_p(f @* G) = 'r_p(G).
-Proof.
+Proof using All.
 apply/eqP; rewrite eqn_leq; apply/andP; split.
   have [fE] := p_rank_witness p (f @* G); move: 'r_p(_) => n Ep_fE.
   apply/p_rank_geP; exists (f @*^-1 fE)%G.
@@ -1035,7 +1035,7 @@ by case/pnElemP: EpE => sEG _ _; rewrite (subset_trans sEG).
 Qed.
 
 Lemma injm_rank : 'r(f @* G) = 'r(G).
-Proof.
+Proof using All.
 apply/eqP; rewrite eqn_leq; apply/andP; split.
   by have [p _ ->] := rank_witness (f @* G); rewrite injm_p_rank p_rank_le_rank.
 by have [p _ ->] := rank_witness G; rewrite -injm_p_rank p_rank_le_rank.
@@ -1049,19 +1049,19 @@ Variables (aT rT : finGroupType) (G : {group aT}) (H : {group rT}).
 Hypothesis isoGH : G \isog H.
 
 Lemma exponent_isog : exponent G = exponent H.
-Proof. by case/isogP: isoGH => f injf <-; rewrite exponent_injm. Qed.
+Proof using All. by case/isogP: isoGH => f injf <-; rewrite exponent_injm. Qed.
 
 Lemma isog_abelem p : p.-abelem G = p.-abelem H.
-Proof. by case/isogP: isoGH => f injf <-; rewrite injm_abelem. Qed.
+Proof using All. by case/isogP: isoGH => f injf <-; rewrite injm_abelem. Qed.
 
 Lemma isog_grank : 'm(G) = 'm(H).
-Proof. by case/isogP: isoGH => f injf <-; rewrite injm_grank. Qed.
+Proof using All. by case/isogP: isoGH => f injf <-; rewrite injm_grank. Qed.
 
 Lemma isog_p_rank p : 'r_p(G) = 'r_p(H).
-Proof. by case/isogP: isoGH => f injf <-; rewrite injm_p_rank. Qed.
+Proof using All. by case/isogP: isoGH => f injf <-; rewrite injm_p_rank. Qed.
 
 Lemma isog_rank : 'r(G) = 'r(H).
-Proof. by case/isogP: isoGH => f injf <-; rewrite injm_rank. Qed.
+Proof using All. by case/isogP: isoGH => f injf <-; rewrite injm_rank. Qed.
 
 End IsogAbelem.
 
@@ -2155,10 +2155,10 @@ Variables (gT : finGroupType) (p : nat) (G H : {group gT}).
 Hypothesis cGG : abelian G.
 
 Lemma quotient_rank_abelian : 'r(G / H) <= 'r(G).
-Proof. exact: morphim_rank_abelian. Qed.
+Proof using cGG. exact: morphim_rank_abelian. Qed.
 
 Lemma quotient_p_rank_abelian : 'r_p(G / H) <= 'r_p(G).
-Proof. exact: morphim_p_rank_abelian. Qed.
+Proof using cGG. exact: morphim_p_rank_abelian. Qed.
 
 End QuotientRank.
 

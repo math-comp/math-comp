@@ -1050,7 +1050,7 @@ Qed.
 
 Lemma wf_QE_proj i : forall bc (bc_i := proj i bc),
   dnf_rterm bc -> qf_form bc_i && rformula bc_i.
-Proof.
+Proof using All.
 case=> leq lneql llt lle /= hdnf; move: (hdnf).
 rewrite /dnf_rterm /=; case/and4P=> req rneq rlt rle; rewrite /proj; apply/andP.
 move: (dnf_rterm_subproof hdnf).
@@ -1067,7 +1067,7 @@ Hypothesis valid_QE_wproj :
 Lemma valid_QE_proj e i : forall bc (bc_i := proj i bc)
   (ex_i_bc := ('exists 'X_i, odnf_to_oform [:: bc])%oT),
   dnf_rterm bc -> reflect (holds e ex_i_bc) (qf_eval e (proj i bc)).
-Proof.
+Proof using valid_QE_wproj.
 move=> bc; rewrite /dnf_rterm => hdnf; rewrite /proj; apply: (equivP idP).
 have -> : holds e ('exists 'X_i, odnf_to_oform [:: bc]) <->
           (exists x : R, holds (set_nth 0 e i x)
@@ -1109,7 +1109,7 @@ Fixpoint quantifier_elim f :=
 
 Lemma quantifier_elim_wf f :
   let qf := quantifier_elim f in rformula f -> qf_form qf && rformula qf.
-Proof.
+Proof using wf_QE_wproj.
 suffices aux_wf f0 n : let qf := elim_aux f0 n in
   rformula f0 -> qf_form qf && rformula qf.
 - by elim: f => //=; do ?[  move=> f1 IH1 f2 IH2;
@@ -1134,7 +1134,7 @@ Qed.
 
 Lemma quantifier_elim_rformP e f :
   rformula f -> reflect (holds e f) (qf_eval e (quantifier_elim f)).
-Proof.
+Proof using valid_QE_wproj wf_QE_wproj.
 pose rc e n f := exists x, qf_eval (set_nth 0 e n x) f.
 have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   reflect (rc e0 n0 f0) (qf_eval e0 (elim_aux f0 n0)).
@@ -1175,7 +1175,7 @@ Qed.
 Definition proj_sat e f := qf_eval e (quantifier_elim (to_rform f)).
 
 Lemma proj_satP :   forall e f, reflect (holds e f) (proj_sat e f).
-Proof.
+Proof using valid_QE_wproj wf_QE_wproj.
 move=> e f; have fP := quantifier_elim_rformP e (to_rform_rformula f).
 by apply: (iffP fP); move/to_rformP.
 Qed.

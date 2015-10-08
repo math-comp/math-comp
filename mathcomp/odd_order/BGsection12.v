@@ -87,14 +87,14 @@ Lemma tau3'2 : {subset \tau2(M) <= \tau3(M)^'}.
 Proof. by move=> p; rewrite !inE; case/andP=> ->; move/eqP->. Qed.
 
 Lemma ex_sigma_compl : exists F : {group gT}, \sigma(M)^'.-Hall(M) F.
-Proof. exact: Hall_exists (mmax_sol maxM). Qed.
+Proof using maxM. exact: Hall_exists (mmax_sol maxM). Qed.
 
 Let s'E : \sigma(M)^'.-group E := pHall_pgroup hallE.
 Let sEM : E \subset M := pHall_sub hallE.
 
 (* For added convenience, this lemma does NOT depend on the maxM assumption. *)
 Lemma sigma_compl_sol : solvable E.
-Proof.
+Proof using s'E sEM.
 have [-> | [p p_pr pE]] := trivgVpdiv E; first exact: solvable1.
 rewrite (solvableS sEM) // mFT_sol // properT.
 apply: contraNneq (pgroupP s'E p p_pr pE) => ->.
@@ -105,12 +105,12 @@ Let solE := sigma_compl_sol.
 
 Let exHallE pi := exists Ei : {group gT}, pi.-Hall(E) Ei.
 Lemma ex_tau13_compl : exHallE \tau1(M) /\ exHallE \tau3(M).
-Proof. by split; apply: Hall_exists. Qed.
+Proof using solE. by split; apply: Hall_exists. Qed.
 
 Lemma ex_tau2_compl E1 E3 :
     \tau1(M).-Hall(E) E1 -> \tau3(M).-Hall(E) E3 ->
   exists2 E2 : {group gT}, \tau2(M).-Hall(E) E2 & sigma_complement M E E1 E2 E3.
-Proof.
+Proof using solE.
 move=> hallE1 hallE3; have [sE1E t1E1 _] := and3P hallE1.
 pose tau12 := [predU \tau1(M) & \tau2(M)].
 have t12E1: tau12.-group E1 by apply: sub_pgroup t1E1 => p t1p; apply/orP; left.
@@ -131,14 +131,14 @@ by apply: contraLR (pnatPpi t12E21 t12p) => t2'p; apply/norP.
 Qed.
 
 Lemma coprime_sigma_compl : coprime #|M`_\sigma| #|E|.
-Proof. exact: pnat_coprime (pcore_pgroup _ _) (pHall_pgroup hallE). Qed.
+Proof using hallE. exact: pnat_coprime (pcore_pgroup _ _) (pHall_pgroup hallE). Qed.
 Let coMsE := coprime_sigma_compl.
 
 Lemma pi_sigma_compl : \pi(E) =i [predD \pi(M) & \sigma(M)].
-Proof. by move=> p; rewrite /= (card_Hall hallE) pi_of_part // !inE andbC. Qed.
+Proof using hallE. by move=> p; rewrite /= (card_Hall hallE) pi_of_part // !inE andbC. Qed.
 
 Lemma sdprod_sigma : M`_\sigma ><| E = M.
-Proof.
+Proof using coMsE maxM sEM.
 rewrite sdprodE ?coprime_TIg ?(subset_trans sEM) ?gFnorm //.
 apply/eqP; rewrite eqEcard mul_subG ?pcore_sub ?coprime_cardMg //=.
 by rewrite (card_Hall (Msigma_Hall maxM)) (card_Hall hallE) partnC.
@@ -147,7 +147,7 @@ Qed.
 (* The preliminary remarks in the introduction of B & G, section 12. *)
 
 Remark der1_sigma_compl : M^`(1) :&: E = E^`(1).
-Proof.
+Proof using coMsE maxM sEM.
 have [nsMsM _ defM _ _] := sdprod_context sdprod_sigma.
 by rewrite setIC (pprod_focal_coprime defM _ (subxx E)) ?(setIidPr _) ?der_sub.
 Qed.
@@ -155,7 +155,7 @@ Qed.
 Remark partition_pi_mmax p :
   (p \in \pi(M)) =
      [|| p \in \tau1(M), p \in \tau2(M), p \in \tau3(M) | p \in \sigma(M)].
-Proof.
+Proof using maxM.
 symmetry; rewrite 2!orbA -!andb_orr orbAC -andb_orr orNb andbT.
 rewrite orb_andl orNb /= -(orb_idl ((alpha_sub_sigma maxM) p)) orbA orbC -orbA.
 rewrite !(eq_sym 'r_p(M)) -!leq_eqVlt p_rank_gt0 orb_idl //.
@@ -164,13 +164,13 @@ Qed.
 
 Remark partition_pi_sigma_compl p :
   (p \in \pi(E)) = [|| p \in \tau1(M), p \in \tau2(M) | p \in \tau3(M)].
-Proof.
+Proof using hallE maxM.
 rewrite pi_sigma_compl inE /= partition_pi_mmax !andb_orr /=.
 by rewrite andNb orbF !(andbb, andbA) -2!andbA.
 Qed.
 
 Remark tau2E p : (p \in \tau2(M)) = (p \in \pi(E)) && ('r_p(E) == 2).
-Proof.
+Proof using s'E.
 have [P sylP] := Sylow_exists p E.
 rewrite -(andb_idl (pnatPpi s'E)) -p_rank_gt0 -andbA; apply: andb_id2l => s'p.
 have sylP_M := subHall_Sylow hallE s'p sylP.
@@ -178,7 +178,7 @@ by rewrite -(p_rank_Sylow sylP_M) (p_rank_Sylow sylP); case: posnP => // ->.
 Qed.
 
 Remark tau3E p : (p \in \tau3(M)) = (p \in \pi(E^`(1))) && ('r_p(E) == 1%N).
-Proof.
+Proof using coMsE maxM sEM.
 have [P sylP] := Sylow_exists p E.
 have hallE': \sigma(M)^'.-Hall(M^`(1)) E^`(1).
   by rewrite -der1_sigma_compl setIC (Hall_setI_normal _ hallE) ?der_normal.
@@ -192,7 +192,7 @@ Qed.
 
 Remark tau1E p :
   (p \in \tau1(M)) = [&& p \in \pi(E), p \notin \pi(E^`(1)) & 'r_p(E) == 1%N].
-Proof.
+Proof using coMsE maxM s'E sEM.
 rewrite partition_pi_sigma_compl; apply/idP/idP=> [t1p|].
   have [s'p rpM _] := and3P t1p; have [P sylP] := Sylow_exists p E.
   have:= tau3'1 t1p; rewrite t1p /= inE /= tau3E -(p_rank_Sylow sylP).
@@ -204,7 +204,7 @@ Qed.
 (* Generate a rank 2 elementary abelian tau2 subgroup in a given complement.  *)
 Lemma ex_tau2Elem p :
   p \in \tau2(M) -> exists2 A, A \in 'E_p^2(E) & A \in 'E_p^2(M).
-Proof.
+Proof using s'E sEM.
 move=> t2p; have [A Ep2A] := p_rank_witness p E.
 have <-: 'r_p(E) = 2 by apply/eqP; move: t2p; rewrite tau2E; case/andP.
 by exists A; rewrite // (subsetP (pnElemS p _ sEM)).
@@ -213,7 +213,7 @@ Qed.
 (* A converse to the above Lemma: if E has an elementary abelian subgroup of  *)
 (* order p^2, then p must be in tau2.                                         *)
 Lemma sigma'2Elem_tau2 p A : A \in 'E_p^2(E) -> p \in \tau2(M).
-Proof.
+Proof using maxM sEM.
 move=> Ep2A; have rE: 'r_p(E) > 1 by apply/p_rank_geP; exists A.
 have: p \in \pi(E) by rewrite -p_rank_gt0 ltnW.
 rewrite partition_pi_sigma_compl orbCA => /orP[] //.
@@ -222,7 +222,7 @@ Qed.
 
 (* This is B & G, Lemma 12.1(a). *)
 Lemma der1_sigma_compl_nil : nilpotent E^`(1).
-Proof.
+Proof using coMsE maxM sEM.
 have sE'E := der_sub 1 E.
 have nMaE: E \subset 'N(M`_\alpha) by rewrite (subset_trans sEM) ?gFnorm.
 have tiMaE':  M`_\alpha :&: E^`(1) = 1.
@@ -234,7 +234,7 @@ Qed.
 (* This is B & G, Lemma 12.1(g). *)
 Lemma tau2_not_beta p :
   p \in \tau2(M) -> p \notin \beta(G) /\ {subset 'E_p^2(M) <= 'E*_p(G)}. 
-Proof.
+Proof using maxM.
 case/andP=> s'p /eqP rpM; split; first exact: sigma'_rank2_beta' rpM.
 by apply/subsetP; apply: sigma'_rank2_max.
 Qed.

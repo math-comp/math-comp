@@ -134,7 +134,7 @@ Lemma seqIndP phi :
 Proof. by rewrite mem_undup; apply: imageP. Qed.
 
 Lemma seqInd_on : {subset S <= 'CF(L, K)}.
-Proof. by move=> _ /seqIndP[i _ ->]; apply: cfInd_normal. Qed.
+Proof using nsKL. by move=> _ /seqIndP[i _ ->]; apply: cfInd_normal. Qed.
 
 Lemma seqInd_char : {subset S <= character}.
 Proof. by move=> _ /seqIndP[i _ ->]; rewrite cfInd_char ?irr_char. Qed.
@@ -146,53 +146,53 @@ Lemma Cint_seqInd1 phi : phi \in S -> phi 1%g \in Cint.
 Proof. by rewrite CintE; move/Cnat_seqInd1->. Qed.
 
 Lemma seqInd_neq0 psi : psi \in S -> psi != 0.
-Proof. by move=> /seqIndP[i _ ->]; apply: Ind_irr_neq0. Qed.
+Proof using sKL. by move=> /seqIndP[i _ ->]; apply: Ind_irr_neq0. Qed.
 
 Lemma seqInd1_neq0 psi : psi \in S -> psi 1%g != 0.
-Proof. by move=> Spsi; rewrite char1_eq0 ?seqInd_char ?seqInd_neq0. Qed.
+Proof using sKL. by move=> Spsi; rewrite char1_eq0 ?seqInd_char ?seqInd_neq0. Qed.
 
 Lemma cfnorm_seqInd_neq0 psi : psi \in S -> '[psi] != 0.
-Proof. by move/seqInd_neq0; rewrite cfnorm_eq0. Qed.
+Proof using sKL. by move/seqInd_neq0; rewrite cfnorm_eq0. Qed.
 
 Lemma seqInd_ortho : {in S &, forall phi psi, phi != psi -> '[phi, psi] = 0}.
-Proof.
+Proof using nsKL.
 move=> _ _ /seqIndP[i _ ->] /seqIndP[j _ ->].
 by case: ifP (cfclass_Ind_cases i j nsKL) => // _ -> /eqP.
 Qed.
 
 Lemma seqInd_orthogonal : pairwise_orthogonal S.
-Proof.
+Proof using sKL.
 apply/pairwise_orthogonalP; split; last exact: seqInd_ortho.
 by rewrite /= undup_uniq andbT; move/memPn: seqInd_neq0.
 Qed.
 
 Lemma seqInd_free : free S.
-Proof. exact: (orthogonal_free seqInd_orthogonal). Qed.
+Proof using sKL. exact: (orthogonal_free seqInd_orthogonal). Qed.
 
 Lemma seqInd_zcharW : {subset S <= 'Z[S]}.
 Proof. by move=> phi Sphi; rewrite mem_zchar ?seqInd_free. Qed.
 
 Lemma seqInd_zchar : {subset S <= 'Z[S, K]}.
-Proof. by move=> phi Sphi; rewrite zchar_split seqInd_zcharW ?seqInd_on. Qed.
+Proof using nsKL. by move=> phi Sphi; rewrite zchar_split seqInd_zcharW ?seqInd_on. Qed.
 
 Lemma seqInd_vcharW : {subset S <= 'Z[irr L]}.
 Proof. by move=> phi Sphi; rewrite char_vchar ?seqInd_char. Qed.
 
 Lemma seqInd_vchar : {subset S <= 'Z[irr L, K]}.
-Proof. by move=> phi Sphi; rewrite zchar_split seqInd_vcharW ?seqInd_on. Qed.
+Proof using nsKL. by move=> phi Sphi; rewrite zchar_split seqInd_vcharW ?seqInd_on. Qed.
 
 Lemma zcharD1_seqInd : 'Z[S, L^#] =i 'Z[S, K^#].
-Proof.
+Proof using nsKL.
 move=> phi; rewrite zcharD1E (zchar_split _ K^#) cfun_onD1.
 by apply: andb_id2l => /(zchar_trans_on seqInd_zchar)/zchar_on->.
 Qed.
 
 Lemma zcharD1_seqInd_on : {subset 'Z[S, L^#] <= 'CF(L, K^#)}.
-Proof. by move=> phi; rewrite zcharD1_seqInd => /zchar_on. Qed.
+Proof using nsKL. by move=> phi; rewrite zcharD1_seqInd => /zchar_on. Qed.
 
 Lemma zcharD1_seqInd_Dade A :
   1%g \notin A -> {subset S <= 'CF(L, 1%g |: A)} -> 'Z[S, L^#] =i 'Z[S, A].
-Proof.
+Proof using sKL.
 move=> notA1 A_S phi; rewrite zcharD1E (zchar_split _ A).
 apply/andb_id2l=> ZSphi; apply/idP/idP=> [phi10 | /cfun_on0-> //].
 rewrite -(setU1K notA1) cfun_onD1 {}phi10 andbT.
@@ -201,25 +201,25 @@ by rewrite big_seq memv_suml // => xi /A_S/memvZ.
 Qed.
 
 Lemma dvd_index_seqInd1 phi : phi \in S -> phi 1%g / e \in Cnat.
-Proof.
+Proof using sKL.
 by case/seqIndP=> i _ ->; rewrite cfInd1 // mulrC mulKf ?Cnat_irr1.
 Qed.
 
 Lemma sub_seqInd_zchar phi psi :
   phi \in S -> psi \in S -> psi 1%g *: phi - phi 1%g *: psi \in 'Z[S, K^#].
-Proof.
+Proof using nsKL.
 move=> Sphi Spsi; rewrite zcharD1 !cfunE mulrC subrr eqxx.
 by rewrite rpredB ?scale_zchar ?Cint_seqInd1 ?seqInd_zchar.
 Qed.
 
 Lemma sub_seqInd_on phi psi :
   phi \in S -> psi \in S -> psi 1%g *: phi - phi 1%g *: psi \in 'CF(L, K^#).
-Proof. by move=> Sphi Spsi; apply: zchar_on (sub_seqInd_zchar Sphi Spsi). Qed.
+Proof using nsKL. by move=> Sphi Spsi; apply: zchar_on (sub_seqInd_zchar Sphi Spsi). Qed.
 
 Lemma size_irr_subseq_seqInd S1 :
     subseq S1 S -> {subset S1 <= irr L} ->
   (#|L : K| * size S1 = #|[set i | 'Ind 'chi[K]_i \in S1]|)%N.
-Proof.
+Proof using nsKL.
 move=> sS1S irrS1; have uniqS1: uniq S1 := subseq_uniq sS1S seqInd_uniq.
 rewrite (card_imset_Ind_irr nsKL) => [|i|i y]; first 1 last.
 - by rewrite inE => /irrS1.
@@ -239,25 +239,25 @@ Variable xi : 'CF(L).
 Hypotheses (Sxi : xi \in S) (xi1 : xi 1%g = e).
 
 Lemma cfInd1_sub_lin_vchar : 'Ind[L, K] 1 - xi \in 'Z[irr L, K^#].
-Proof.
+Proof using Sxi sKL xi1.
 rewrite zcharD1 !cfunE xi1 cfInd1 // cfun11 mulr1 subrr eqxx andbT.
 rewrite rpredB ?(seqInd_vchar Sxi) // zchar_split cfInd_normal ?char_vchar //.
 by rewrite cfInd_char ?cfun1_char.
 Qed.
 
 Lemma cfInd1_sub_lin_on : 'Ind[L, K] 1 - xi \in 'CF(L, K^#).
-Proof. exact: zchar_on cfInd1_sub_lin_vchar. Qed.
+Proof using Sxi sKL xi1. exact: zchar_on cfInd1_sub_lin_vchar. Qed.
 
 Lemma seqInd_sub_lin_vchar :
   {in S, forall phi : 'CF(L), phi - (phi 1%g / e) *: xi \in 'Z[S, K^#]}.
-Proof.
+Proof using Sxi sKL xi1.
 move=> phi Sphi; rewrite /= zcharD1 !cfunE xi1 divfK // subrr eqxx.
 by rewrite rpredB ?scale_zchar ?seqInd_zchar // CintE dvd_index_seqInd1.
 Qed.
 
 Lemma seqInd_sub_lin_on :
   {in S, forall phi : 'CF(L), phi - (phi 1%g / e) *: xi \in 'CF(L, K^#)}.
-Proof. by move=> phi /seqInd_sub_lin_vchar/zchar_on. Qed.
+Proof using Sxi sKL xi1. by move=> phi /seqInd_sub_lin_vchar/zchar_on. Qed.
 
 End Beta.
 
@@ -294,7 +294,7 @@ Proof. by rewrite /seqIndD Iirr_kerDY. Qed.
 
 Lemma mem_seqInd H M i :
   H <| L -> M <| L -> ('Ind 'chi_i \in seqIndD H M) = (i \in Iirr_kerD H M).
-Proof.
+Proof using nsKL.
 move=> nsHL nsML; apply/seqIndP/idP=> [[j Xj] | Xi]; last by exists i.
 case/cfclass_Ind_irrP/cfclassP=> // y Ly; rewrite -conjg_IirrE => /irr_inj->.
 by rewrite inE !Iirr_ker_conjg -?in_setD ?(subsetP _ y Ly) ?normal_norm.
@@ -308,14 +308,14 @@ by apply: (iffP seqIndP) => [] [i nzi ->];
 Qed.
 
 Lemma seqIndC1_filter : seqIndD K 1 = filter (predC1 ('Ind[L, K] 1)) seqIndT.
-Proof.
+Proof using nsKL.
 rewrite filter_undup filter_map (eq_enum (in_set _)) enumT.
 congr (undup (map _ _)); apply: eq_filter => i /=.
 by rewrite mem_Iirr_ker1 cfInd_irr_eq1.
 Qed.
 
 Lemma seqIndC1_rem : seqIndD K 1 = rem ('Ind[L, K] 1) seqIndT.
-Proof. by rewrite rem_filter ?seqIndC1_filter ?undup_uniq. Qed.
+Proof using nsKL. by rewrite rem_filter ?seqIndC1_filter ?undup_uniq. Qed.
 
 Section SeqIndD.
 
@@ -337,7 +337,7 @@ Qed.
 
 Lemma seqInd_sub_aut_zchar u :
   {in S, forall phi, phi - cfAut u phi \in 'Z[S, K^#]}.
-Proof.
+Proof using nsKL.
 move=> phi Sphi /=; rewrite sub_aut_zchar ?seqInd_zchar ?cfAut_seqInd //.
 exact: seqInd_vcharW.
 Qed.
@@ -354,22 +354,22 @@ Qed.
 Hypothesis sHK : H \subset K.
 
 Lemma seqInd_sub : {subset S <= seqIndD K 1}.
-Proof. by apply: seqIndS; apply: Iirr_kerDS (sub1G M) sHK. Qed.
+Proof using sHK. by apply: seqIndS; apply: Iirr_kerDS (sub1G M) sHK. Qed.
 
 Lemma seqInd_ortho_Ind1 : {in S, forall phi, '[phi, 'Ind[L, K] 1] = 0}.
-Proof.
+Proof using sHK nsKL.
 move=> _ /seqInd_sub/seqIndC1P[i nzi ->].
 by rewrite -irr0 not_cfclass_Ind_ortho // irr0 cfclass1 // inE irr_eq1.
 Qed.
 
 Lemma seqInd_ortho_cfuni : {in S, forall phi, '[phi, '1_K] = 0}.
-Proof.
+Proof using nsKL sHK.
 move=> phi /seqInd_ortho_Ind1/eqP; apply: contraTeq => not_o_phi_1K.
 by rewrite cfInd_cfun1 // cfdotZr rmorph_nat mulf_neq0.
 Qed.
 
 Lemma seqInd_ortho_1 : {in S, forall phi, '[phi, 1] = 0}.
-Proof.
+Proof using sHK.
 move=> _ /seqInd_sub/seqIndC1P[i nzi ->].
 by rewrite -cfdot_Res_r cfRes_cfun1 // -irr0 cfdot_irr (negbTE nzi).
 Qed.
@@ -377,7 +377,7 @@ Qed.
 Lemma sum_seqIndD_square :
     H <| L -> M <| L -> M \subset H ->
   \sum_(phi <- S) phi 1%g ^+ 2 / '[phi] = #|L : H|%:R * (#|H : M|%:R - 1).
-Proof.
+Proof using sHK sKL.
 move=> nsHL nsML sMH; rewrite -(Lagrange_index sKL sHK) natrM -/e -mulrA.
 rewrite -sum_Iirr_kerD_square ?(normalS _ sKL) ?(subset_trans sMH) //.
 pose h i := @Ordinal (size S).+1 _ (index_size ('Ind 'chi[K]_i) S).
@@ -398,21 +398,21 @@ Section Odd.
 Hypothesis oddL : odd #|L|.
 
 Lemma seqInd_conjC_ortho : {in S, forall phi, '[phi, phi^*] = 0}.
-Proof.
+Proof using oddL sHK nsKL.
 by move=> _  /seqInd_sub/seqIndC1P[i nzi ->]; apply: odd_induced_orthogonal.
 Qed.
 
 Lemma seqInd_conjC_neq : {in S, forall phi, phi^* != phi}%CF.
-Proof.
+Proof using oddL sHK sKL.
 move=> phi Sphi; apply: contraNneq (cfnorm_seqInd_neq0 Sphi) => {2}<-.
 by rewrite seqInd_conjC_ortho.
 Qed.
 
 Lemma seqInd_notReal : ~~ has cfReal S.
-Proof. exact/hasPn/seqInd_conjC_neq. Qed.
+Proof using oddL sHK sKL. exact/hasPn/seqInd_conjC_neq. Qed.
 
 Lemma seqInd_nontrivial chi : chi \in S -> (1 < size S)%N.
-Proof.
+Proof using oddL sHK sKL.
 move=> Schi; pose S2 := chi^*%CF :: chi.
 have: {subset S2 <= S} by apply/allP/and3P; rewrite /= cfAut_seqInd.
 by apply: uniq_leq_size; rewrite /= inE seqInd_conjC_neq.
@@ -422,12 +422,12 @@ Variable chi : 'CF(L).
 Hypotheses (irr_chi : chi \in irr L) (Schi : chi \in S).
 
 Lemma seqInd_conjC_ortho2 : orthonormal (chi :: chi^*)%CF.
-Proof.
+Proof using Schi irr_chi nsKL oddL sHK.
 by rewrite /orthonormal/= cfnorm_conjC irrWnorm ?seqInd_conjC_ortho ?eqxx.
 Qed.
 
 Lemma seqInd_nontrivial_irr : (#|[set i | 'chi_i \in S]| > 1)%N.
-Proof.
+Proof using Schi irr_chi oddL sHK sKL.
 have /irrP[i Dchi] := irr_chi; rewrite (cardsD1 i) (cardsD1 (conjC_Iirr i)).
 rewrite !inE -(inj_eq irr_inj) conjC_IirrE -Dchi seqInd_conjC_neq //.
 by rewrite cfAut_seqInd Schi.
@@ -439,7 +439,7 @@ End SeqIndD.
 
 Lemma sum_seqIndC1_square :
   \sum_(phi <- seqIndD K 1) phi 1%g ^+ 2 / '[phi] = e * (#|K|%:R - 1).
-Proof. by rewrite sum_seqIndD_square ?normal1 ?sub1G // indexg1. Qed.
+Proof using sKL. by rewrite sum_seqIndD_square ?normal1 ?sub1G // indexg1. Qed.
 
 End InducedIrrs.
 
@@ -846,7 +846,7 @@ by rewrite raddf0 rpred0.
 Qed.
 
 Lemma subset_subcoherent S1 : cfConjC_subset S1 S -> subcoherent S1 tau R.
-Proof.
+Proof using All.
 case=> uS1 sS1 ccS1; have [[N_S nrS _] Itau oS defR oR] := cohS.
 split; last 1 [exact: sub_in1 defR | exact: sub_in2 oR].
 - split=> // [xi /sS1/N_S// | ].
@@ -857,7 +857,7 @@ Qed.
 
 Lemma subset_ortho_subcoherent S1 chi :
   {subset S1 <= S} -> chi \in S -> chi \notin S1 -> orthogonal S1 chi.
-Proof.
+Proof using All.
 move=> sS1S Schi S1'chi; apply/orthoPr=> phi S1phi; have Sphi := sS1S _ S1phi.
 have [_ _ /pairwise_orthogonalP[_ -> //]] := cohS.
 by apply: contraNneq S1'chi => <-.
@@ -867,7 +867,7 @@ Lemma subcoherent_split chi beta :
     chi \in S -> beta \in 'Z[irr G] ->
   exists2 X, X \in 'Z[R chi]
         & exists Y, [/\ beta = X - Y, '[X, Y] = 0 & orthogonal Y (R chi)].
-Proof.
+Proof using All.
 move=> Schi Zbeta; have [_ _ _ /(_ _ Schi)[ZR oRR _] _] := cohS.
 have [X RX [Y [defXY oXY oYR]]] := orthogonal_split (R chi) beta.
 exists X; last first.
@@ -891,7 +891,7 @@ Lemma subcoherent_norm chi psi (tau1 : {additive 'CF(L) -> 'CF(G)}) X Y :
    & (*b*) '[psi] <= '[Y] ->
            [/\ '[X] = '[chi], '[Y] = '[psi]
              & exists2 E, subseq E (R chi) & X = \sum_(xi <- E) xi]].
-Proof.
+Proof using All.
 case=> Schi Zpsi /and3P[/andP[/eqP-ochi_psi _] /andP[/eqP-ochic_psi _] _] S0.
 move=> [Itau1 Ztau1] tau1dchi [defXY oXY oYR].
 have [[ZS nrS ccS] [tS Zt] oS /(_ _ Schi)[ZR o1R tau_dchi] _] := cohS.
@@ -938,7 +938,7 @@ Lemma coherent_sum_subseq chi (tau1 : {additive 'CF(L) -> 'CF(G)}) :
     {in 'Z[chi :: chi^*%CF], isometry tau1, to 'Z[irr G]} ->
     tau1 (chi - chi^*%CF) = tau (chi - chi^*%CF) ->
   exists2 E, subseq E (R chi) & tau1 chi = \sum_(a <- E) a.
-Proof.
+Proof using All.
 set S1 := chi :: _ => Schi [iso_t1 Zt1] t1cc'.
 have freeS1: free S1.
   have [[_ nrS ccS] _ oS _ _] := cohS.
@@ -961,7 +961,7 @@ Qed.
 Corollary mem_coherent_sum_subseq S1 chi (tau1 : {additive 'CF(L) -> 'CF(G)}) :
     cfConjC_subset S1 S -> coherent_with S1 L^# tau tau1 -> chi \in S1 ->
   exists2 E, subseq E (R chi) & tau1 chi = \sum_(a <- E) a.
-Proof.
+Proof using All.
 move=> uccS1 [Itau1 Dtau1] S1chi; have [uS1 sS1S ccS1] := uccS1.
 have S1chi_s: chi^*%CF \in S1 by apply: ccS1.
 apply: coherent_sum_subseq; first exact: sS1S.
@@ -975,7 +975,7 @@ Corollary coherent_ortho_supp S1 chi (tau1 : {additive 'CF(L) -> 'CF(G)}) :
     cfConjC_subset S1 S -> coherent_with S1 L^# tau tau1 ->
     chi \in S -> chi \notin S1 -> 
   orthogonal (map tau1 S1) (R chi).
-Proof.
+Proof using All.
 move=> uccS1 cohS1 Schi S1'chi; have [uS1 sS1S ccS1] := uccS1.
 apply/orthogonalP=> _ mu /mapP[phi S1phi ->] Rmu; have Sphi := sS1S _ S1phi.
 have [e /mem_subseq Re ->] := mem_coherent_sum_subseq uccS1 cohS1 S1phi.
@@ -991,7 +991,7 @@ Corollary coherent_ortho S1 S2 (tau1 tau2 : {additive 'CF(L) -> 'CF(G)}) :
     cfConjC_subset S2 S -> coherent_with S2 L^# tau tau2 ->
     {subset S2 <= [predC S1]} ->
   orthogonal (map tau1 S1) (map tau2 S2).
-Proof.
+Proof using All.
 move=> uccS1 cohS1 uccS2 cohS2 S1'2; have [_ sS2S _] := uccS2.
 apply/orthogonalP=> mu _ S1mu /mapP[phi S2phi ->].
 have [e /mem_subseq Re ->] := mem_coherent_sum_subseq uccS2 cohS2 S2phi.
@@ -1007,7 +1007,7 @@ Lemma bridge_coherent S1 S2 (tau1 tau2 : {additive 'CF(L) -> 'CF(G)}) chi phi :
     [/\ chi \in S1, phi \in 'Z[S2] & chi - phi \in 'CF(L, L^#)] ->
     tau (chi - phi) = tau1 chi - tau2 phi ->
   coherent (S1 ++ S2) L^# tau.
-Proof.
+Proof using All.
 move=> uccS1 cohS1 uccS2 cohS2 S1'2 [S1chi S2phi chi1_phi] tau_chi_phi.
 do [rewrite cfunD1E !cfunE subr_eq0 => /eqP] in chi1_phi.
 have [[uS1 sS1S _] [uS2 sS2S _]] := (uccS1, uccS2).
@@ -1064,7 +1064,7 @@ Lemma extend_coherent_with S1 (tau1 : {additive 'CF(L) -> 'CF(G)}) chi phi a X :
     [/\ a \in Cint, chi 1%g = a * phi 1%g & '[X, a *: tau1 phi] = 0] ->
     tau (chi - a *: phi) = X - a *: tau1 phi ->
   coherent (chi :: chi^*%CF :: S1) L^# tau.
-Proof.
+Proof using All.
 set beta := _ - _ => sS10 cohS1 [S1phi Schi S1'chi] [Za chi1 oXaphi] tau_beta.
 have [[uS1 sS1S ccS1] [[Itau1 Ztau1] _]] := (sS10, cohS1).
 have [[N_S nrS ccS] ZItau _ R_P _] := cohS; have [Itau Ztau] := ZItau.
@@ -1129,7 +1129,7 @@ Lemma extend_coherent S1 xi1 chi :
         (*b*) (xi1 1%g %| chi 1%g)%C
       & (*c*) 2%:R * chi 1%g * xi1 1%g < \sum_(xi <- S1) xi 1%g ^+ 2 / '[xi]] ->
   coherent (chi :: chi^*%CF :: S1) L^# tau.
-Proof.
+Proof using All.
 move=> ccsS1S S1xi1 Schi notS1chi [[tau1 cohS1] xi1_dv_chi1 ub_chi1].
 have [[uS1 sS1S ccS1] [[Itau1 Ztau1] Dtau1]] := (ccsS1S, cohS1).
 have{xi1_dv_chi1} [a Za chi1] := dvdCP _ _ xi1_dv_chi1.
@@ -1233,7 +1233,7 @@ Qed.
 (* to enable (repeated) application of (5.6), as in seqIndD_irr_coherence.    *)
 Lemma uniform_degree_coherence :
   constant [seq chi 1%g | chi : 'CF(L) <- S] -> coherent S L^# tau.
-Proof.
+Proof using All.
 case defS: {1}S => /= [|chi1 S1] szS; first by rewrite defS; apply nil_coherent.
 have{szS} unifS xi: xi \in S -> xi 1%g = chi1 1%g.
   by rewrite defS => /predU1P[-> // | S'xi]; apply/eqP/(allP szS)/map_f.

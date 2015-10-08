@@ -263,7 +263,7 @@ Implicit Types a b : fmod_of abelH.
 Local Notation fmod := (fmod abelH).
 
 Theorem Gaschutz_split : [splits G, over H] = [splits P, over H].
-Proof.
+Proof using abelH coHiPG nHG sHG sHP sPG.
 apply/splitsP/splitsP=> [[K /complP[tiHK eqHK]] | [Q /complP[tiHQ eqHQ]]].
   exists (K :&: P)%G; rewrite inE setICA (setIidPl sHP) setIC tiHK eqxx.
   by rewrite group_modl // eqHK (sameP eqP setIidPr).
@@ -349,7 +349,7 @@ Qed.
 
 Theorem Gaschutz_transitive : {in [complements to H in G] &,
   forall K L,  K :&: P = L :&: P -> exists2 x, x \in H & L :=: K :^ x}.
-Proof.
+Proof using abelH coHiPG nHG sHP sPG.
 move=> K L /=; set Q := K :&: P => /complP[tiHK eqHK] cpHL QeqLP.
 have [trHL eqHL] := complP cpHL.
 pose nu x := fmod (divgr H L x^-1).
@@ -471,7 +471,7 @@ Section FactorTransfer.
 Variable g : gT.
 Hypothesis Gg : g \in G.
 
-Let sgG : <[g]> \subset G. Proof. by rewrite cycle_subG. Qed.
+Let sgG : <[g]> \subset G. Proof using Gg. by rewrite cycle_subG. Qed.
 Let H_g_rcosets x : {set {set gT}} := rcosets (H :* x) <[g]>.
 Let n_ x := #|<[g]> : H :* x|.
 
@@ -486,11 +486,11 @@ Let HGg : {set {set {set gT}}} := orbit 'Rs <[g]> @: HG.
 
 Let partHG : partition HG G := rcosets_partition sHG.
 Let actsgHG : [acts <[g]>, on HG | 'Rs].
-Proof. exact: subset_trans sgG (actsRs_rcosets H G). Qed.
+Proof using sgG. exact: subset_trans sgG (actsRs_rcosets H G). Qed.
 Let partHGg : partition HGg HG := orbit_partition actsgHG.
 
 Let injHGg : {in HGg &, injective cover}.
-Proof. by have [] := partition_partition partHG partHGg. Qed.
+Proof using partHG partHGg. by have [] := partition_partition partHG partHGg. Qed.
 
 Let defHGg : HG :* <[g]> = cover @: HGg.
 Proof.
@@ -499,15 +499,15 @@ by rewrite cover_imset -curry_imset2r.
 Qed.
 
 Lemma rcosets_cycle_partition : partition (HG :* <[g]>) G.
-Proof. by rewrite defHGg; have [] := partition_partition partHG partHGg. Qed.
+Proof using partHG partHGg. by rewrite defHGg; have [] := partition_partition partHG partHGg. Qed.
 
 Variable X : {set gT}.
 Hypothesis trX : is_transversal X (HG :* <[g]>) G.
 
-Let sXG : {subset X <= G}. Proof. exact/subsetP/(transversal_sub trX). Qed.
+Let sXG : {subset X <= G}. Proof using trX. exact/subsetP/(transversal_sub trX). Qed.
 
 Lemma rcosets_cycle_transversal : H_g_rcosets @: X = HGg.
-Proof.
+Proof using sXG.
 have sHXgHGg x: x \in X -> H_g_rcosets x \in HGg.
   by move/sXG=> Gx; apply: mem_imset; rewrite -rcosetE mem_imset.
 apply/setP=> Hxg; apply/imsetP/idP=> [[x /sHXgHGg HGgHxg -> //] | HGgHxg].
@@ -524,17 +524,17 @@ Qed.
 Local Notation defHgX := rcosets_cycle_transversal.
 
 Let injHg: {in X &, injective H_g_rcosets}.
-Proof.
+Proof using defHGg injHGg sXG.
 apply/imset_injP; rewrite defHgX (card_transversal trX) defHGg.
 by rewrite (card_in_imset injHGg).
 Qed.
 
 Lemma sum_index_rcosets_cycle : (\sum_(x in X) n_ x)%N = #|G : H|.
-Proof. by rewrite [#|G : H|](card_partition partHGg) -defHgX big_imset. Qed.
+Proof using injHg. by rewrite [#|G : H|](card_partition partHGg) -defHgX big_imset. Qed.
 
 Lemma transfer_cycle_expansion :
    transfer g = \sum_(x in X) fmalpha ((g ^+ n_ x) ^ x^-1).
-Proof.
+Proof using injHGg sXG.
 pose Y := \bigcup_(x in X) [set x * g ^+ i | i : 'I_(n_ x)].
 pose rY := transversal_repr 1 Y.
 pose pcyc x := pcycle (actperm 'Rs g) (H :* x).

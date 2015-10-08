@@ -779,16 +779,16 @@ CoInductive bijective : Prop := Bijective g of cancel f g & cancel g f.
 Hypothesis bijf : bijective.
 
 Lemma bij_inj : injective f.
-Proof. by case: bijf => g fK _; apply: can_inj fK. Qed.
+Proof using All. by case: bijf => g fK _; apply: can_inj fK. Qed.
 
 Lemma bij_can_sym f' : cancel f' f <-> cancel f f'.
-Proof.
+Proof using All.
 split=> fK; first exact: inj_can_sym fK bij_inj.
 by case: bijf => h _ hK x; rewrite -[x]hK fK.
 Qed.
 
 Lemma bij_can_eq f' f'' : cancel f f' -> cancel f f'' -> f' =1 f''.
-Proof.
+Proof using All.
 by move=> fK fK'; apply: (inj_can_eq _ bij_inj); apply/bij_can_sym.
 Qed.
 
@@ -819,8 +819,8 @@ Definition involutive := cancel f f.
 
 Hypothesis Hf : involutive.
 
-Lemma inv_inj : injective f. Proof. exact: can_inj Hf. Qed.
-Lemma inv_bij : bijective f. Proof. by exists f. Qed.
+Lemma inv_inj : injective f. Proof using Hf. exact: can_inj Hf. Qed.
+Lemma inv_bij : bijective f. Proof using Hf. by exists f. Qed.
 
 End Involutions.
 

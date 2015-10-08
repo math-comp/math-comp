@@ -49,10 +49,10 @@ Local Notation "alpha ^\tau" := (Dade ddA alpha).
 Local Notation Atau := (Dade_support ddA).
 Local Notation H := (Dade_signalizer ddA).
 
-Let nsAL : A <| L. Proof. by have [] := ddA. Qed.
-Let sAL : A \subset L. Proof. exact: normal_sub nsAL. Qed.
-Let nAL : L \subset 'N(A). Proof. exact: normal_norm nsAL. Qed.
-Let sLG : L \subset G. Proof. by have [] := ddA. Qed.
+Let nsAL : A <| L. Proof using ddA. by have [] := ddA. Qed.
+Let sAL : A \subset L. Proof using All. exact: normal_sub nsAL. Qed.
+Let nAL : L \subset 'N(A). Proof using nsAL. exact: normal_norm nsAL. Qed.
+Let sLG : L \subset G. Proof using ddA. by have [] := ddA. Qed.
 
 (* This is the Definition embedded in Peterfalvi, Hypothesis (7.1). *)
 Fact invDade_subproof (chi : 'CF(G)) :
@@ -179,7 +179,7 @@ Lemma Dade_cover_inequality (chi : 'CF(G)) (G0 := G :\: \bigcup_i Atau i) :
     '[chi] = 1 ->
   #|G|%:R^-1 * (\sum_(g in G0) `|chi g| ^+ 2 - #|G0|%:R)
     + \sum_i ('[chi^\rho]_(L i) - #|A i|%:R / #|L i|%:R) <= 0.
-Proof.
+Proof using All.
 move=> Nchi1; set vG := _^-1; rewrite sumrB /= addrCA mulrBr -addrA.
 pose F (xi : 'CF(G)) (B : {set gT}) := vG * \sum_(g in B) `|xi g| ^+ 2.
 have sumF xi: F xi G0 + \sum_i F xi (Atau i) = '[xi].
@@ -244,9 +244,9 @@ Let uniqS : uniq calS := seqInd_uniq _ _.
 Let h := #|H|%:R : algC.
 Let e := #|L : H|%:R : algC.
 
-Let nsAL : A <| L. Proof. by have [] := ddA. Qed.
-Let sLG : L \subset G. Proof. by have [] := ddA. Qed.
-Let nsHL : H <| L. Proof. by rewrite -normalD1. Qed.
+Let nsAL : A <| L. Proof using ddA. by have [] := ddA. Qed.
+Let sLG : L \subset G. Proof using ddA. by have [] := ddA. Qed.
+Let nsHL : H <| L. Proof using nsAL. by rewrite -normalD1. Qed.
 Let sHL := normal_sub nsHL.
 Let nHL := normal_norm nsHL.
 
@@ -254,7 +254,7 @@ Let nzh : h != 0 := neq0CG H.
 Let nze : e != 0 := neq0CiG L H.
 Let nzL : #|L|%:R != 0 := neq0CG L.
 
-Let eh : e * h = #|L|%:R. Proof. by rewrite -natrM mulnC Lagrange. Qed.
+Let eh : e * h = #|L|%:R. Proof using sHL. by rewrite -natrM mulnC Lagrange. Qed.
 
 Section InvDadeSeqInd.
 
@@ -506,7 +506,7 @@ Import ssrint.
 Lemma cfdot_real_vchar_even phi psi :
     phi \in 'Z[irr G] /\ cfReal phi  -> psi \in 'Z[irr G] /\ cfReal psi ->
   (2 %| '[phi, psi])%C = (2 %| '[phi, 1])%C || (2 %| '[psi, 1])%C.
-Proof.
+Proof using All.
 move=> [Zphi Rphi] [Zpsi Rpsi]; rewrite cfdot_vchar_r // (bigD1 (0 : 'I__)) //=.
 rewrite addrC -irr0 (bigID [pred i | conjC_Iirr i < i]%N) /=.
 set a1 := \sum_(i | _) _; set a2 := \sum_(i | _) _; suffices ->: a1 = a2.
@@ -540,13 +540,13 @@ Let tau2 := Dade ddA2.
 Hypothesis disjointA : [disjoint Atau1 & Atau2].
 
 Lemma disjoint_Dade_ortho phi psi : '[tau1 phi, tau2 psi] = 0.
-Proof.
+Proof using disjointA.
 rewrite (cfdot_complement (Dade_cfunS _ _)) ?(cfun_onS _ (Dade_cfunS _ _)) //.
 by rewrite subsetD disjoint_sym Dade_support_sub.
 Qed.
 
 Let odd_Dade_context L H : Dade_hypothesis G L H^# -> H <| L /\ odd #|L|.
-Proof. by case=> nsAL sLG _ _ _; rewrite -normalD1 (oddSg sLG). Qed.
+Proof using oddG. by case=> nsAL sLG _ _ _; rewrite -normalD1 (oddSg sLG). Qed.
 
 (* This lemma encapsulates uses of lemma (4.1) in sections 7 and 14. *)
 Lemma disjoint_coherent_ortho nu1 nu2 chi1 chi2 :
@@ -554,7 +554,7 @@ Lemma disjoint_coherent_ortho nu1 nu2 chi1 chi2 :
     let S2 := seqIndD H2 L2 H2 1 in coherent_with S2 L2^# tau2 nu2 ->
     chi1 \in irr L1 -> chi1 \in S1 -> chi2 \in irr L2 -> chi2 \in S2 -> 
   '[nu1 chi1, nu2 chi2] = 0.
-Proof.
+Proof using disjointA odd_Dade_context.
 move=> S1 cohS1 S2 cohS2 /irrP[i1 ->] Schi1 /irrP[i2 ->] Schi2.
 have [[nsHL1 oddL1] [[Inu1 Znu1] nu1tau]] := (odd_Dade_context ddA1, cohS1).
 have [[nsHL2 oddL2] [[Inu2 Znu2] nu2tau]] := (odd_Dade_context ddA2, cohS2).
@@ -580,7 +580,7 @@ Lemma Dade_sub_lin_nonorthogonal nu1 nu2 zeta1 zeta2 :
     zeta1 \in irr L1 -> zeta1 \in S1 -> zeta1 1%g = #|L1 : H1|%:R ->
     zeta2 \in irr L2 -> zeta2 \in S2 -> zeta2 1%g = #|L2 : H2|%:R ->
   '[beta ddA1 zeta1, nu2 zeta2] != 0 \/ '[beta ddA2 zeta2, nu1 zeta1] != 0.
-Proof.
+Proof using disjointA odd_Dade_context.
 move=> S1 cohS1 S2 cohS2 irr_zeta1 Szeta1 zeta1_1 irr_zeta2 Szeta2 zeta2_1.
 apply/nandP; pose Delta ddA nu zeta := beta ddA zeta + nu zeta.
 have Delta_context L H (A := H^#) ddA (tau := Dade ddA) nu zeta :
@@ -643,7 +643,7 @@ Hypothesis k_ge2: (k >= 2)%N.
 
 (* A numerical fact that is used in both (7.10) and (7.11) *)
 Let e_bounds i : 1 < e_ i /\ e_ i <= (h_ i - 1) / 2%:R.
-Proof.
+Proof using frobeniusL_G oddG.
 have [/oddSg/(_ oddG)oddL _ frobL] := frobeniusL_G i.
 rewrite ltr1n odd_Frobenius_index_ler ?(FrobeniusWker frobL) //.
 by have [/index_sdprod <-] := Frobenius_context frobL; rewrite cardG_gt1.
@@ -653,7 +653,7 @@ Qed.
 Lemma coherent_Frobenius_bound : exists i, let e := e_ i in let h := h_ i in
   (e - 1) * ((h - 2%:R * e - 1) / (e * h) + 2%:R / (h * (h + 2%:R)))
      <= (#|G0|%:R - 1) / #|G|%:R.
-Proof.
+Proof using card_coprime e_bounds k_ge2 normedTI_A.
 have [sLG solL frobL] := all_and3 frobeniusL_G.
 have oddL i := oddSg (sLG i) oddG.
 have /all_and2[nsHL ntH] i: H i <| L i /\ H i :!=: 1%g.
@@ -813,7 +813,7 @@ Qed.
 
 (* This is Peterfalvi (7.11). *)
 Theorem no_coherent_Frobenius_partition : G0 != 1%G.
-Proof.
+Proof using card_coprime e_bounds k_ge2 normedTI_A.
 have [i] := coherent_Frobenius_bound; apply: contraTneq => ->.
 have [] := e_bounds i; set e := e_ i; set h := h_ i => e_gt1 le_e_h2.
 rewrite cards1 subrr mul0r ltr_geF // pmulr_rgt0 ?subr_gt0 // ltr_paddl //.

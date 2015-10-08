@@ -791,7 +791,7 @@ Section Pquotient.
 Variables (pi : nat_pred) (gT : finGroupType) (p : nat) (G H K : {group gT}).
 Hypothesis piK : pi.-group K.
 
-Lemma quotient_pgroup : pi.-group (K / H). Proof. exact: morphim_pgroup. Qed.
+Lemma quotient_pgroup : pi.-group (K / H). Proof using piK. exact: morphim_pgroup. Qed.
 
 Lemma quotient_pHall :
   K \subset 'N(H) -> pi.-Hall(G) K -> pi.-Hall(G / H) (K / H).
@@ -800,11 +800,11 @@ Proof. exact: morphim_pHall. Qed.
 Lemma quotient_odd : odd #|K| -> odd #|K / H|. Proof. exact: morphim_odd. Qed.
 
 Lemma pquotient_pgroup : G \subset 'N(K) -> pi.-group (G / K) = pi.-group G.
-Proof. by move=> nKG; rewrite pmorphim_pgroup ?ker_coset. Qed.
+Proof using piK. by move=> nKG; rewrite pmorphim_pgroup ?ker_coset. Qed.
 
 Lemma pquotient_pHall :
   K <| G -> K <| H -> pi.-Hall(G / K) (H / K) = pi.-Hall(G) H.
-Proof.
+Proof using piK.
 case/andP=> sKG nKG; case/andP=> sKH nKH.
 by rewrite pmorphim_pHall // ker_coset /psubgroup subsetI sKH sKG.
 Qed.
@@ -828,7 +828,7 @@ Hypothesis nCG : G \subset 'N(C).
 
 Lemma logn_quotient_cent_cyclic_pgroup : 
   p.-group C -> cyclic C -> logn p #|G / 'C_G(C)| <= (logn p #|C|).-1.
-Proof.
+Proof using nCG.
 move=> pC cycC; have [-> | ntC] := eqsVneq C 1.
   by rewrite cent1T setIT trivg_quotient cards1 logn1.
 have [p_pr _ [e oC]] := pgroup_pdiv pC ntC.
@@ -840,7 +840,7 @@ Qed.
 
 Lemma p'group_quotient_cent_prime :
   prime p -> #|C| %| p -> p^'.-group (G / 'C_G(C)).
-Proof.
+Proof using nCG.
 move=> p_pr pC; have pgC: p.-group C := pnat_dvd pC (pnat_id p_pr).
 have [_ dv_p] := primeP p_pr; case/pred2P: {dv_p pC}(dv_p _ pC) => [|pC].
   by move/card1_trivg->; rewrite cent1T setIT trivg_quotient pgroup1.
@@ -1312,21 +1312,21 @@ Hypothesis injf : 'injm f.
 Implicit Types (A : {set aT}) (G H : {group aT}).
 
 Lemma injm_pgroup pi A : A \subset D -> pi.-group (f @* A) = pi.-group A.
-Proof. by move=> sAD; rewrite /pgroup card_injm. Qed.
+Proof using All. by move=> sAD; rewrite /pgroup card_injm. Qed.
 
 Lemma injm_pelt pi x : x \in D -> pi.-elt (f x) = pi.-elt x.
-Proof. by move=> Dx; rewrite /p_elt order_injm. Qed.
+Proof using All. by move=> Dx; rewrite /p_elt order_injm. Qed.
 
 Lemma injm_pHall pi G H :
   G \subset D -> H \subset D -> pi.-Hall(f @* G) (f @* H) = pi.-Hall(G) H.
-Proof. by move=> sGD sGH; rewrite !pHallE injmSK ?card_injm. Qed.
+Proof using All. by move=> sGD sGH; rewrite !pHallE injmSK ?card_injm. Qed.
 
 Lemma injm_pcore pi G : G \subset D -> f @* 'O_pi(G) = 'O_pi(f @* G).
-Proof. exact: injmF. Qed.
+Proof using All. exact: injmF. Qed.
 
 Lemma injm_pseries pis G :
   G \subset D -> f @* pseries pis G = pseries pis (f @* G).
-Proof. exact: injmF. Qed.
+Proof using All. exact: injmF. Qed.
 
 End Injm.
 

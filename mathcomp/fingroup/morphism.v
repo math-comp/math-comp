@@ -749,65 +749,65 @@ Section Injective.
 Hypothesis injf : 'injm f.
 
 Lemma ker_injm : 'ker f = 1.
-Proof. exact/trivgP. Qed.
+Proof using All. exact/trivgP. Qed.
 
 Lemma injmK A : A \subset D -> f @*^-1 (f @* A) = A.
-Proof. by move=> sAD; rewrite morphimK // ker_injm // mul1g. Qed.
+Proof using All. by move=> sAD; rewrite morphimK // ker_injm // mul1g. Qed.
 
 Lemma injm_morphim_inj A B :
   A \subset D -> B \subset D -> f @* A = f @* B -> A = B.
-Proof. by move=> sAD sBD eqAB; rewrite -(injmK sAD) eqAB injmK. Qed.
+Proof using All. by move=> sAD sBD eqAB; rewrite -(injmK sAD) eqAB injmK. Qed.
 
 Lemma card_injm A : A \subset D -> #|f @* A| = #|A|.
-Proof.
+Proof using All.
 move=> sAD; rewrite morphimEsub // card_in_imset //.
 exact: (sub_in2 (subsetP sAD) (injmP injf)).
 Qed.
 
 Lemma order_injm x : x \in D -> #[f x] = #[x].
-Proof.
+Proof using All.
 by move=> Dx; rewrite orderE -morphim_cycle // card_injm ?cycle_subG.
 Qed.
 
 Lemma injm1 x : x \in D -> f x = 1 -> x = 1.
-Proof. by move=> Dx; move/(kerP Dx); rewrite ker_injm; move/set1P. Qed.
+Proof using All. by move=> Dx; move/(kerP Dx); rewrite ker_injm; move/set1P. Qed.
 
 Lemma morph_injm_eq1 x : x \in D -> (f x == 1) = (x == 1).
-Proof. by move=> Dx; rewrite -morph1 (inj_in_eq (injmP injf)) ?group1. Qed.
+Proof using All. by move=> Dx; rewrite -morph1 (inj_in_eq (injmP injf)) ?group1. Qed.
 
 Lemma injmSK A B :
   A \subset D -> (f @* A \subset f @* B) = (A \subset B).
-Proof. by move=> sAD; rewrite morphimSK // ker_injm mul1g. Qed.
+Proof using All. by move=> sAD; rewrite morphimSK // ker_injm mul1g. Qed.
 
 Lemma sub_morphpre_injm R A :
     A \subset D -> R \subset f @* D ->
   (f @*^-1 R \subset A) = (R \subset f @* A).
-Proof. by move=> sAD sRfD; rewrite -morphpreSK ?injmK. Qed.
+Proof using All. by move=> sAD sRfD; rewrite -morphpreSK ?injmK. Qed.
 
 Lemma injm_eq A B : A \subset D -> B \subset D -> (f @* A == f @* B) = (A == B).
-Proof. by move=> sAD sBD; rewrite !eqEsubset !injmSK. Qed.
+Proof using All. by move=> sAD sBD; rewrite !eqEsubset !injmSK. Qed.
 
 Lemma morphim_injm_eq1 A : A \subset D -> (f @* A == 1) = (A == 1).
-Proof. by move=> sAD; rewrite -morphim1 injm_eq ?sub1G. Qed.
+Proof using All. by move=> sAD; rewrite -morphim1 injm_eq ?sub1G. Qed.
 
 Lemma injmI A B : f @* (A :&: B) = f @* A :&: f @* B.
-Proof.
+Proof using All.
 rewrite -morphimIdom setIIr -4!(injmK (subsetIl D _), =^~ morphimIdom).
 by rewrite -morphpreI morphpreK // subIset ?morphim_sub.
 Qed.
 
 Lemma injmD1 A : f @* A^# = (f @* A)^#.
-Proof. by have:= morphimDG A injf; rewrite morphim1. Qed.
+Proof using All. by have:= morphimDG A injf; rewrite morphim1. Qed.
 
 Lemma nclasses_injm A : A \subset D -> #|classes (f @* A)| = #|classes A|.
-Proof.
+Proof using All.
 move=> sAD; rewrite classes_morphim // card_in_imset //.
 move=> _ _ /imsetP[x Ax ->] /imsetP[y Ay ->].
 by apply: injm_morphim_inj; rewrite // class_subG ?(subsetP sAD).
 Qed.
 
 Lemma injm_norm A : A \subset D -> f @* 'N(A) = 'N_(f @* D)(f @* A).
-Proof.
+Proof using All.
 move=> sAD; apply/eqP; rewrite -morphimIdom eqEsubset morphim_subnorm.
 rewrite -sub_morphpre_injm ?subsetIl // morphpreI injmK // setIS //.
 by rewrite -{2}(injmK sAD) morphpre_norm.
@@ -815,23 +815,23 @@ Qed.
 
 Lemma injm_norms A B :
   A \subset D -> B \subset D -> (f @* A \subset 'N(f @* B)) = (A \subset 'N(B)).
-Proof. by move=> sAD sBD; rewrite -injmSK // injm_norm // subsetI morphimS. Qed.
+Proof using All. by move=> sAD sBD; rewrite -injmSK // injm_norm // subsetI morphimS. Qed.
 
 Lemma injm_normal A B :
   A \subset D -> B \subset D -> (f @* A <| f @* B) = (A <| B).
-Proof. by move=> sAD sBD; rewrite /normal injmSK ?injm_norms. Qed.
+Proof using All. by move=> sAD sBD; rewrite /normal injmSK ?injm_norms. Qed.
 
 Lemma injm_subnorm A B : B \subset D -> f @* 'N_A(B) = 'N_(f @* A)(f @* B).
-Proof. by move=> sBD; rewrite injmI injm_norm // setICA setIA morphimIim. Qed.
+Proof using All. by move=> sBD; rewrite injmI injm_norm // setICA setIA morphimIim. Qed.
 
 Lemma injm_cent1 x : x \in D -> f @* 'C[x] = 'C_(f @* D)[f x].
-Proof. by move=> Dx; rewrite injm_norm ?morphim_set1 ?sub1set. Qed.
+Proof using All. by move=> Dx; rewrite injm_norm ?morphim_set1 ?sub1set. Qed.
 
 Lemma injm_subcent1 A x : x \in D -> f @* 'C_A[x] = 'C_(f @* A)[f x].
-Proof. by move=> Dx; rewrite injm_subnorm ?morphim_set1 ?sub1set. Qed.
+Proof using All. by move=> Dx; rewrite injm_subnorm ?morphim_set1 ?sub1set. Qed.
 
 Lemma injm_cent A : A \subset D -> f @* 'C(A) = 'C_(f @* D)(f @* A).
-Proof.
+Proof using All.
 move=> sAD; apply/eqP; rewrite -morphimIdom eqEsubset morphim_subcent.
 apply/subsetP=> fx; case/setIP; case/morphimP=> x Dx _ ->{fx} cAfx.
 rewrite mem_morphim // inE Dx -sub1set centsC cent_set1 -injmSK //.
@@ -840,13 +840,13 @@ Qed.
 
 Lemma injm_cents A B :
   A \subset D -> B \subset D -> (f @* A \subset 'C(f @* B)) = (A \subset 'C(B)).
-Proof. by move=> sAD sBD; rewrite -injmSK // injm_cent // subsetI morphimS. Qed.
+Proof using All. by move=> sAD sBD; rewrite -injmSK // injm_cent // subsetI morphimS. Qed.
 
 Lemma injm_subcent A B : B \subset D -> f @* 'C_A(B) = 'C_(f @* A)(f @* B).
-Proof. by move=> sBD; rewrite injmI injm_cent // setICA setIA morphimIim. Qed.
+Proof using All. by move=> sBD; rewrite injmI injm_cent // setICA setIA morphimIim. Qed.
 
 Lemma injm_abelian A : A \subset D -> abelian (f @* A) = abelian A.
-Proof.
+Proof using All.
 by move=> sAD; rewrite /abelian -subsetIidl -injm_subcent // injmSK ?subsetIidl.
 Qed.
 
@@ -1112,7 +1112,7 @@ Variables (G : {group aT}) (f : {morphism G >-> rT}).
 Hypothesis injf : 'injm f.
 
 Lemma invm_subker : 'ker f \subset 'ker (idm G).
-Proof. by rewrite ker_idm. Qed.
+Proof using All. by rewrite ker_idm. Qed.
 
 Definition invm := factm invm_subker (subxx _).
 
@@ -1138,7 +1138,7 @@ Qed.
 
 Lemma injm_proper A B :
   A \subset G -> B \subset G -> (f @* A \proper f @* B) = (A \proper B).
-Proof.
+Proof using All.
 move=> dA dB; rewrite -morphpre_invm -(morphpre_invm B).
 by rewrite morphpre_proper ?morphim_invm.
 Qed.
@@ -1289,11 +1289,11 @@ Qed.
 Variable f : {morphism G >-> rT}.
 Hypothesis isoGH : isom G H f.
 
-Lemma isom_inj : 'injm f. Proof. by have /isomP[] := isoGH. Qed.
-Lemma isom_im : f @* G = H. Proof. by have /isomP[] := isoGH. Qed.
+Lemma isom_inj : 'injm f. Proof using All. by have /isomP[] := isoGH. Qed.
+Lemma isom_im : f @* G = H. Proof using All. by have /isomP[] := isoGH. Qed.
 Lemma isom_card : #|G| = #|H|.
-Proof. by rewrite -isom_im card_injm ?isom_inj. Qed.
-Lemma isom_sub_im : H \subset f @* G. Proof. by rewrite isom_im. Qed.
+Proof using All. by rewrite -isom_im card_injm ?isom_inj. Qed.
+Lemma isom_sub_im : H \subset f @* G. Proof using All. by rewrite isom_im. Qed.
 Definition isom_inv := restrm isom_sub_im (invm isom_inj).
 
 End Main.

@@ -143,7 +143,7 @@ by rewrite negb_imply (p_rank_Sylow sylP) => /andP[].
 Qed.
 
 Remark alpha_sub_sigma : {subset \alpha(M) <= \sigma(M)}.
-Proof.
+Proof using All.
 move=> p a_p; have [P sylP] := Sylow_exists p M; have [sPM pP _ ] := and3P sylP.
 have{a_p} rP: 2 < 'r(P) by rewrite (rank_Sylow sylP).
 apply/exists_inP; exists P; rewrite ?uniq_mmax_norm_sub //.
@@ -151,16 +151,16 @@ exact: def_uniq_mmax (rank3_Uniqueness (mFT_pgroup_proper pP) rP) maxM sPM.
 Qed.
 
 Remark beta_sub_sigma : {subset \beta(M) <= \sigma(M)}.
-Proof. by move=> p; move/beta_sub_alpha; apply: alpha_sub_sigma. Qed.
+Proof using All. by move=> p; move/beta_sub_alpha; apply: alpha_sub_sigma. Qed.
 
 Remark Mbeta_sub_Malpha : M`_\beta \subset M`_\alpha.
 Proof. exact: sub_pcore beta_sub_alpha. Qed.
 
 Remark Malpha_sub_Msigma : M`_\alpha \subset M`_\sigma.
-Proof. exact: sub_pcore alpha_sub_sigma. Qed.
+Proof using All. exact: sub_pcore alpha_sub_sigma. Qed.
 
 Remark Mbeta_sub_Msigma : M`_\beta \subset M`_\sigma.
-Proof. exact: sub_pcore beta_sub_sigma. Qed.
+Proof using All. exact: sub_pcore beta_sub_sigma. Qed.
 
 (* This is the first part of the remark just above B & G, Theorem 10.1. *)
 Remark norm_sigma_Sylow p P :
@@ -172,32 +172,32 @@ Qed.
 
 (* This is the second part of the remark just above B & G, Theorem 10.1. *)
 Remark sigma_Sylow_G p P : p \in \sigma(M) -> p.-Sylow(M) P -> p.-Sylow(G) P.
-Proof.
+Proof using All.
 move=> sMp sylP; apply: (mmax_sigma_Sylow maxM) => //.
 exact: norm_sigma_Sylow sMp sylP.
 Qed.
 
 Lemma sigma_Sylow_neq1 p P : p \in \sigma(M) -> p.-Sylow(M) P -> P :!=: 1.
-Proof.
+Proof using All.
 move=> sMp /(norm_sigma_Sylow sMp); apply: contraTneq => ->.
 by rewrite norm1 subTset -properT mmax_proper.
 Qed.
 
 Lemma sigma_sub_pi : {subset \sigma(M) <= \pi(M)}.
-Proof.
+Proof using All.
 move=> p sMp; have [P sylP]:= Sylow_exists p M.
 by rewrite -p_rank_gt0 -(rank_Sylow sylP) rank_gt0 (sigma_Sylow_neq1 sMp sylP).
 Qed.
 
 Lemma predI_sigma_alpha : [predI \sigma(M) & \alpha(G)] =i \alpha(M).
-Proof.
+Proof using All.
 move=> p; rewrite inE /= -(andb_idl (@alpha_sub_sigma p)).
 apply: andb_id2l => sMp; have [P sylP] := Sylow_exists p M.
 by rewrite !inE -(rank_Sylow sylP) -(rank_Sylow (sigma_Sylow_G sMp sylP)).
 Qed.
 
 Lemma predI_sigma_beta : [predI \sigma(M) & \beta(G)] =i \beta(M).
-Proof.
+Proof using All.
 move=> p; rewrite inE /= -(andb_idl (@beta_sub_sigma p)).
 apply: andb_id2l => sMp; apply/idP/forall_inP=> [bGp P sylP | nnSylM].
   exact: forall_inP bGp P (sigma_Sylow_G sMp sylP).
@@ -332,7 +332,7 @@ Let solM := mmax_sol maxM.
 
 Let aMa : \alpha(M).-group (M`_\alpha). Proof. exact: pcore_pgroup. Qed.
 Let nsMaM : M`_\alpha <| M. Proof. exact: pcore_normal. Qed.
-Let sMaMs : M`_\alpha \subset M`_\sigma. Proof. exact: Malpha_sub_Msigma. Qed.
+Let sMaMs : M`_\alpha \subset M`_\sigma. Proof using maxM. exact: Malpha_sub_Msigma. Qed.
 
 Let F := 'F(M / M`_\alpha).
 Let nsFMa : F <| M / M`_\alpha. Proof. exact: Fitting_normal. Qed.
@@ -344,7 +344,7 @@ by rewrite trivg_pcore_quotient (trivgP (Fitting_sub 1)) dprod1g pcore_pgroup.
 Qed.
 
 Let Malpha_quo_sub_Fitting : M^`(1) / M`_\alpha \subset F.
-Proof.
+Proof using solM.
 have [/= K defF sMaK nsKM] := inv_quotientN nsMaM nsFMa; rewrite -/F in defF.
 have [sKM _] := andP nsKM; have nsMaK: M`_\alpha <| K := normalS sMaK sKM nsMaM.
 have [[_ nMaK] [_ nMaM]] := (andP nsMaK, andP nsMaM).
@@ -364,7 +364,7 @@ by rewrite quotient_der // rank2_der1_sub_Fitting ?mFT_quo_odd ?quotient_sol.
 Qed.
 
 Let sigma_Hall_sub_der1 H : \sigma(M).-Hall(M) H -> H \subset M^`(1).
-Proof.
+Proof using maxM.
 move=> hallH; have [sHM sH _] := and3P hallH.
 rewrite -(Sylow_gen H) gen_subG; apply/bigcupsP=> P /SylowP[p p_pr sylP].
 have [-> | ntP] := eqsVneq P 1; first by rewrite sub1G.
@@ -389,7 +389,7 @@ Qed.
 
 (* This is B & G, Theorem 10.2(a1). *) 
 Theorem Malpha_Hall : \alpha(M).-Hall(M) M`_\alpha.
-Proof.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1.
 have [H hallH] := Hall_exists \sigma(M) solM; have [sHM sH _] := and3P hallH.
 rewrite (subHall_Hall hallH (alpha_sub_sigma maxM)) // /pHall pcore_pgroup /=.
 rewrite -(card_quotient (subset_trans sHM (normal_norm nsMaM))) -pgroupE.
@@ -399,7 +399,7 @@ Qed.
 
 (* This is B & G, Theorem 10.2(b1). *) 
 Theorem Msigma_Hall : \sigma(M).-Hall(M) M`_\sigma.
-Proof. 
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1. 
 have [H hallH] := Hall_exists \sigma(M) solM; have [sHM sH _] := and3P hallH.
 rewrite /M`_\sigma (normal_Hall_pcore hallH) // -(quotientGK nsMaM).
 rewrite -(quotientGK (normalS _ sHM nsMaM)) ?cosetpre_normal //; last first.
@@ -413,14 +413,14 @@ exact: char_normal_trans (pcore_char _ _) nsFMa.
 Qed.
 
 Lemma pi_Msigma : \pi(M`_\sigma) =i \sigma(M).
-Proof.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1.
 move=> p; apply/idP/idP=> [|s_p /=]; first exact: pnatPpi (pcore_pgroup _ _).
 by rewrite (card_Hall Msigma_Hall) pi_of_part // inE /= sigma_sub_pi.
 Qed.
 
 (* This is B & G, Theorem 10.2(b2). *) 
 Theorem Msigma_Hall_G : \sigma(M).-Hall(G) M`_\sigma.
-Proof. 
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1. 
 rewrite pHallE subsetT /= eqn_dvd {1}(card_Hall Msigma_Hall).
 rewrite partn_dvd ?cardG_gt0 ?cardSg ?subsetT //=.
 apply/dvdn_partP; rewrite ?part_gt0 // => p.
@@ -433,18 +433,18 @@ Qed.
 
 (* This is B & G, Theorem 10.2(a2). *) 
 Theorem Malpha_Hall_G : \alpha(M).-Hall(G) M`_\alpha.
-Proof.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1.
 apply: subHall_Hall Msigma_Hall_G (alpha_sub_sigma maxM) _.
 exact: pHall_subl sMaMs (pcore_sub _ _) Malpha_Hall.
 Qed.
 
 (* This is B & G, Theorem 10.2(c). *)
 Theorem Msigma_der1 : M`_\sigma \subset M^`(1).
-Proof. exact: sigma_Hall_sub_der1 Msigma_Hall. Qed.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1. exact: sigma_Hall_sub_der1 Msigma_Hall. Qed.
 
 (* This is B & G, Theorem 10.2(d1). *)
 Theorem Malpha_quo_rank2 : 'r(M / M`_\alpha) <= 2.
-Proof.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1.
 have [p p_pr ->] := rank_witness (M / M`_\alpha).
 have [P sylP] := Sylow_exists p M; have [sPM pP _] := and3P sylP.
 have nMaP := subset_trans sPM (normal_norm nsMaM).
@@ -457,11 +457,11 @@ Qed.
 
 (* This is B & G, Theorem 10.2(d2). *)
 Theorem Malpha_quo_nil : nilpotent (M^`(1) / M`_\alpha).
-Proof. exact: nilpotentS Malpha_quo_sub_Fitting (Fitting_nil _). Qed.
+Proof using Malpha_quo_sub_Fitting. exact: nilpotentS Malpha_quo_sub_Fitting (Fitting_nil _). Qed.
 
 (* This is B & G, Theorem 10.2(e). *)
 Theorem Msigma_neq1 : M`_\sigma :!=: 1.
-Proof.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1.
 without loss Ma1: / M`_\alpha = 1.
   by case: eqP => // Ms1 -> //; apply/trivgP; rewrite -Ms1 Malpha_sub_Msigma.
 have{Ma1} rFM: 'r('F(M)) <= 2.
@@ -480,7 +480,7 @@ Qed.
 Theorem cent_alpha'_uniq X :
      X \subset M -> \alpha(M)^'.-group X -> 'r('C_(M`_\alpha)(X)) >= 2 ->
   'C_M(X)%G \in 'U.
-Proof.
+Proof using Malpha_quo_sub_Fitting ltMG sMaMs sigma_Hall_sub_der1.
 have ltM_G := sub_proper_trans (subsetIl M _) ltMG.
 move=> sXM a'X; have [p p_pr -> rCX] := rank_witness 'C_(M`_\alpha)(X).
 have{rCX} [B EpB] := p_rank_geP rCX; have{EpB} [sBCX abelB dimB] := pnElemP EpB.
@@ -516,7 +516,7 @@ Variable p : nat.
 (* This is B & G, Lemma 10.4(a). *)
 (* We omit the redundant assumption p \in \pi(M). *)
 Lemma der1_quo_sigma' : p %| #|M / M^`(1)| -> p \in \sigma(M)^'.
-Proof.
+Proof using Malpha_quo_sub_Fitting sMaMs sigma_Hall_sub_der1.
 apply: contraL => /= s_p; have piMp := sigma_sub_pi maxM s_p.
 have p_pr: prime p by move: piMp; rewrite mem_primes; case/andP.
 rewrite -p'natE ?(pi'_p'nat _ s_p) // -pgroupE -partG_eq1.
@@ -534,7 +534,7 @@ Lemma cent1_sigma'_Zgroup P :
     p.-Sylow(M) P -> P :!=: 1 ->
   exists x,
     [/\ x \in 'Ohm_1('Z(P))^#, 'M('C[x]) != [set M] & Zgroup 'C_(M`_\alpha)[x]].
-Proof.
+Proof using Malpha_quo_sub_Fitting ltMG s'p sMaMs sigma_Hall_sub_der1.
 move=> sylP ntP; have [sPM pP _] := and3P sylP; have nilP := pgroup_nil pP.
 set T := 'Ohm_1('Z(P)); have charT: T \char P by rewrite !gFchar_trans.
 suffices [x Tx not_uCx]: exists2 x, x \in T^# & 'M('C[x]) != [set M].
@@ -559,7 +559,7 @@ Qed.
 (* This is B & G, Lemma 10.4(c), part 1. *)
 (* The redundant assumption p \in \pi(M) is omitted. *)
 Lemma sigma'_rank2_max : 'r_p(M) = 2 -> 'E_p^2(M) \subset 'E*_p(G).
-Proof.
+Proof using s'p maxM.
 move=> rpM; apply: contraR s'p => /subsetPn[A Ep2A not_maxA].
 have{Ep2A} [sAM abelA dimA] := pnElemP Ep2A; have [pA _ _] := and3P abelA.
 have [P sylP sAP] := Sylow_superset sAM pA; have [_ pP _] := and3P sylP.
@@ -571,7 +571,7 @@ Qed.
 (* This is B & G, Lemma 10.4(c), part 2 *)
 (* The redundant assumption p \in \pi(M) is omitted. *)
 Lemma sigma'_rank2_beta' : 'r_p(M) = 2 -> p \notin \beta(G).
-Proof.
+Proof using s'p maxM.
 move=> rpM; rewrite -[p \in _]negb_exists_in negbK; apply/exists_inP.
 have [A Ep2A]: exists A, A \in 'E_p^2(M) by apply/p_rank_geP; rewrite rpM.
 have [_ abelA dimA] := pnElemP Ep2A; have [pA _] := andP abelA.
@@ -584,7 +584,7 @@ Qed.
 (* This is B & G, Lemma 10.5, part 1; the condition on X has been weakened,   *)
 (* because the proof of Lemma 12.2(a) requires the stronger result.           *)
 Lemma sigma'_norm_mmax_rank2 X : p.-group X -> 'N(X) \subset M -> 'r_p(M) = 2.
-Proof.
+Proof using s'p maxM.
 move=> pX sNX_M; have sXM: X \subset M := subset_trans (normG X) sNX_M.
 have [P sylP sXP] := Sylow_superset sXM pX; have [sPM pP _] := and3P sylP.
 apply: contraNeq s'p; case: ltngtP => // rM _; last exact: alpha_sub_sigma.
@@ -598,7 +598,7 @@ Qed.
 Lemma sigma'1Elem_sub_p2Elem X :
     X \in 'E_p^1(G) -> 'N(X) \subset M -> 
   exists2 A, A \in 'E_p^2(G) & X \subset A.
-Proof.
+Proof using s'p maxM.
 move=> EpX sNXM; have sXM := subset_trans (normG X) sNXM.
 have [[_ abelX dimX] p_pr] := (pnElemP EpX, pnElem_prime EpX).
 have pX := abelem_pgroup abelX; have rpM2 := sigma'_norm_mmax_rank2 pX sNXM.
@@ -674,7 +674,7 @@ Let pP : p.-group P := pHall_pgroup sylP_G.
 (* This is an B & G, Corollary 10.7(a), second part (which does not depend on *)
 (* a particular complement).                                                  *)
 Corollary mFT_Sylow_der1 : P \subset 'N(P)^`(1).
-Proof.
+Proof using pP.
 have [-> | ntP] := eqsVneq P 1; first exact: sub1G.
 have ltNG: 'N(P) \proper G := mFT_norm_proper ntP (mFT_pgroup_proper pP).
 have [M /setIdP[/= maxM sNM]] := mmax_exists ltNG.
@@ -689,7 +689,7 @@ Qed.
 
 (* This is B & G, Corollary 10.7(a), first part. *)
 Corollary mFT_Sylow_sdprod_commg V : P ><| V = 'N(P) -> [~: P, V] = P.
-Proof.
+Proof using pP.
 move=> defV; have sPN' := mFT_Sylow_der1.
 have sylP := pHall_subl (normG P) (subsetT 'N(P)) sylP_G.
 have [|//] := coprime_der1_sdprod defV _ (pgroup_sol pP) sPN'.
@@ -701,7 +701,7 @@ Corollary mFT_rank2_Sylow_cprod :
     'r(P) < 3 -> ~~ abelian P ->
   exists2 S, [/\ ~~ abelian (gval S), logn p #|S| = 3 & exponent S %| p]
   & exists2 C, cyclic (gval C) & S \* C = P /\ 'Ohm_1(C) = 'Z(S).
-Proof.
+Proof using pP.
 move=> rP not_cPP; have sylP := pHall_subl (normG P) (subsetT 'N(P)) sylP_G.
 have ntP: P :!=: 1 by apply: contraNneq not_cPP => ->; apply: abelian1.
 have ltNG: 'N(P) \proper G := mFT_norm_proper ntP (mFT_pgroup_proper pP).
@@ -719,7 +719,7 @@ Qed.
 (* This is B & G, Corollary 10.7(c). *)
 Corollary mFT_sub_Sylow_trans : forall Q x,
   Q \subset P -> Q :^ x \subset P -> exists2 y, y \in 'N(P) & Q :^ x = Q :^ y.
-Proof.
+Proof using pP.
 move=> Q x; have [-> /trivgP-> /trivgP-> | ntP sQP sQxP] := eqsVneq P 1.
   by exists 1; rewrite ?group1 ?conjs1g.
 have ltNG: 'N(P) \proper G := mFT_norm_proper ntP (mFT_pgroup_proper pP).
@@ -739,7 +739,7 @@ Qed.
 
 (* This is B & G, Corollary 10.7(d). *)
 Corollary mFT_subnorm_Sylow Q : Q \subset P -> p.-Sylow('N(Q)) 'N_P(Q).
-Proof.
+Proof using pP.
 move=> sQP; have pQ := pgroupS sQP pP.
 have [S /= sylS] := Sylow_exists p 'N(Q); have [sNS pS _] := and3P sylS.
 have sQS: Q \subset S := normal_sub_max_pgroup (Hall_max sylS) pQ (normalG Q).
@@ -756,7 +756,7 @@ Qed.
 (* This is B & G, Corollary 10.7(e). *)
 Corollary mFT_Sylow_normalS Q R :
   p.-group R -> Q \subset P :&: R -> Q <| 'N(P) -> Q <| 'N(R).
-Proof.
+Proof using pP.
 move=> pR /subsetIP[sQP sQR] /andP[nQP nQ_NP].
 have [x _ sRxP] := Sylow_Jsub sylP_G (subsetT R) pR.
 rewrite /normal normsG //; apply/subsetP=> y nRy.
@@ -786,7 +786,7 @@ Let nsMsM : M`_\sigma <| M := pcore_normal _ M.
 Let sMsM' : M`_\sigma \subset M^`(1) := Msigma_der1 maxM.
 
 Lemma Mbeta_der1 : M`_\beta \subset M^`(1).
-Proof. exact: subset_trans sMbMs sMsM'. Qed.
+Proof using sMbMs sMsM'. exact: subset_trans sMbMs sMsM'. Qed.
 
 Let sM'M : M^`(1) \subset M := der_sub 1 M.
 Let nsMsM' : M`_\sigma <| M^`(1) := normalS sMsM' sM'M nsMsM.
@@ -799,7 +799,7 @@ Lemma beta_max_pdiv p :
   [/\ p^'.-Hall(M^`(1)) 'O_p^'(M^`(1)),
       p^'.-Hall(M`_\sigma) 'O_p^'(M`_\sigma)
     & forall q, q \in \pi(M / 'O_p^'(M)) -> q <= p].
-Proof.
+Proof using ltMG nsMsM' solM.
 rewrite !inE -negb_exists_in negbK => /exists_inP[P sylP nnP].
 have [|ncM' p_max] := narrow_der1_complement_max_pdiv (mFT_odd M) solM sylP nnP.
   by rewrite mFT_proper_plength1 ?implybT.
@@ -808,7 +808,7 @@ Qed.
 
 (* This is B & G, Lemma 10.8(a), first part. *)
 Lemma Mbeta_Hall : \beta(M).-Hall(M) M`_\beta.
-Proof.
+Proof using hallMs ltMG nsMsM' sMbMs solM.
 have [H hallH] := Hall_exists \beta(M) solM; have [sHM bH _]:= and3P hallH.
 rewrite [M`_\beta](sub_pHall hallH) ?pcore_pgroup ?pcore_sub //=.
 rewrite -(setIidPl sMbMs) pcore_setI_normal ?pcore_normal //.
@@ -821,7 +821,7 @@ Qed.
 
 (* This is B & G, Lemma 10.8(a), second part. *)
 Lemma Mbeta_Hall_G : \beta(M).-Hall(G) M`_\beta.
-Proof.
+Proof using hallMs ltMG nsMsM' sMbMs solM.
 apply: (subHall_Hall (Msigma_Hall_G maxM) (beta_sub_sigma maxM)).
 exact: pHall_subl sMbMs (pcore_sub _ _) Mbeta_Hall.
 Qed.
@@ -830,7 +830,7 @@ Qed.
 (* later in the proof (e.g., Corollary 10.9a below, and Lemma 12.11), and is  *)
 (* proved as an intermediate step of the proof of of 12.8(b).                 *)
 Lemma Mbeta_quo_nil : nilpotent (M^`(1) / M`_\beta).
-Proof.
+Proof using All.
 have /and3P[_ bMb b'M'Mb] := pHall_subl Mbeta_der1 sM'M Mbeta_Hall.
 apply: nilpotentS (Fitting_nil (M^`(1) / M`_\beta)) => /=.
 rewrite -{1}[_ / _]Sylow_gen gen_subG.
@@ -848,7 +848,7 @@ Qed.
 (* This is B & G, Lemma 10.8(b), generalized to arbitrary beta'-subgroups of  *)
 (* M^`(1) (which includes Hall beta'-subgroups of M^`(1) and M`_\beta).       *)
 Lemma beta'_der1_nil H : \beta(M)^'.-group H -> H \subset M^`(1) -> nilpotent H.
-Proof.
+Proof using All.
 move=> b'H sHM'; have [_ bMb _] := and3P Mbeta_Hall.
 have{b'H} tiMbH: M`_\beta :&: H = 1 := coprime_TIg (pnat_coprime bMb b'H).
 rewrite {tiMbH}(isog_nil (quotient_isog (subset_trans sHM' nMbM') tiMbH)).
@@ -863,7 +863,7 @@ Corollary beta'_cent_Sylow p q X :
       (*a2*) p \in \alpha(M) -> 'C_M(X)%G \in 'U
     & (*a3*) q.-Sylow(M^`(1)) X -> 
           exists2 P, p.-Sylow(M^`(1)) (gval P) & P \subset 'N_M(X)^`(1)].
-Proof.
+Proof using All.
 move=> b'p b'q qX q'p_sXM'; pose pq : nat_pred := pred2 p q.
 have [q'p sXM]: p \in q^' /\ X \subset M.
   case/orP: q'p_sXM' => /andP[q'p /subset_trans-> //].
@@ -958,7 +958,7 @@ Qed.
 Corollary nonuniq_norm_Sylow_pprod p H S :
     H \in 'M -> H :!=: M -> p.-Sylow(G) S -> 'N(S) \subset H :&: M -> 
   M`_\beta * (H :&: M) = M /\ \alpha(M) =i \beta(M).
-Proof.
+Proof using All.
 move=> maxH neqHM sylS_G sN_HM; have [sNH sNM] := subsetIP sN_HM.
 have [sSM sSH] := (subset_trans (normG S) sNM, subset_trans (normG S) sNH).
 have [sylS pS] := (pHall_subl sSM (subsetT M) sylS_G, pHall_pgroup sylS_G).
@@ -1056,7 +1056,7 @@ Local Notation sigma' := \sigma(gval M)^'.
 
 (* This is B & G, Proposition 10.11(a). *)
 Proposition sigma'_not_uniq K : K \subset M -> sigma'.-group K -> K \notin 'U.
-Proof.
+Proof using solM.
 move=> sKM sg'K; have [E hallE sKE] := Hall_superset solM sKM sg'K.
 have [sEM sg'E _] := and3P hallE.
 have rEle2: 'r(E) <= 2.
@@ -1082,7 +1082,7 @@ Qed.
 (* This is B & G, Proposition 10.11(b). *)
 Proposition sub'cent_sigma_rank1 K :
   K \subset M -> sigma'.-group K -> 'r('C_K(M`_\sigma)) <= 1.
-Proof.
+Proof using hallMs solM.
 move=> sKM sg'K; rewrite leqNgt; apply/rank_geP=> [[A /nElemP[p Ep2A]]].
 have p_pr := pnElem_prime Ep2A.
 have [sACKMs abelA dimA] := pnElemP Ep2A; rewrite subsetI centsC in sACKMs.
@@ -1141,7 +1141,7 @@ Qed.
 (* This is B & G, Proposition 10.11(c). *)
 Proposition sub'cent_sigma_cyclic K (Y := 'C_K(M`_\sigma) :&: M^`(1)) :
   K \subset M -> sigma'.-group K -> cyclic Y /\ Y <| M.
-Proof.
+Proof using hallMs solM.
 move=> sKM sg'K; pose Z := 'O_sigma'('F(M)).
 have nsZM: Z <| M by rewrite !gFnormal_trans.
 have [sZM nZM] := andP nsZM; have Fnil := Fitting_nil M.
@@ -1172,7 +1172,7 @@ Proposition commG_sigma'_1Elem_cyclic p K P (K0 := [~: K, P]) :
     K \subset M -> sigma'.-group K -> p \in sigma' -> P \in 'E_p^1('N_M(K)) ->
     'C_(M`_\sigma)(P) = 1 -> p^'.-group K -> abelian K ->
   [/\ K0 \subset 'C(M`_\sigma), cyclic K0 & K0 <| M].
-Proof.
+Proof using hallMs solM.
 move=> sKM sg'K sg'p EpP regP p'K cKK.
 have nK0P: P \subset 'N(K0) := commg_normr P K.
 have p_pr := pnElem_prime EpP; have [sPMN _ oP] := pnElemPcard EpP.

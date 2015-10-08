@@ -532,14 +532,14 @@ Variables (a b : R).
 Hypothesis der_pos : forall x, x \in `]a, b[ ->  (p^`()).[x] > 0.
 
 Lemma derp0r : 0 <= p.[a] -> forall x, x \in `]a, b] -> p.[x] > 0.
-Proof.
+Proof using All.
 move=> pa0 x; case/itv_dec=> ax xb; case: (mvt p ax) => c acx.
 move/(canRL (@subrK _ _))->; rewrite ltr_paddr //.
 by rewrite pmulr_rgt0 ?subr_gt0 // der_pos //; apply: subitvPr acx.
 Qed.
 
 Lemma derppr : 0 < p.[a] -> forall x, x \in `[a, b] -> p.[x] > 0.
-Proof.
+Proof using All.
 move=> pa0 x hx; case exa: (x == a); first by rewrite (eqP exa).
 case: (@mvt a x p); first by rewrite ltr_def exa (itvP hx).
 move=> c hc; move/eqP; rewrite subr_eq; move/eqP->; rewrite ltr_spsaddr //.
@@ -548,7 +548,7 @@ by rewrite der_pos // (subitvPr _ hc) //=  ?(itvP hx).
 Qed.
 
 Lemma derp0l : p.[b] <= 0 -> forall x, x \in `[a, b[ -> p.[x] < 0.
-Proof.
+Proof using All.
 move=> pb0 x hx; rewrite -oppr_gte0 /=.
 case: (@mvt x b p)=> //; first by rewrite (itvP hx).
 move=> c hc; move/(canRL (@addKr _ _))->; rewrite ltr_spaddr ?oppr_ge0 //.
@@ -557,7 +557,7 @@ by rewrite der_pos // (subitvPl _ hc) //= (itvP hx).
 Qed.
 
 Lemma derpnl : p.[b] < 0 -> forall x, x \in `[a, b] -> p.[x] < 0.
-Proof.
+Proof using All.
 move=> pbn x hx; case xb: (b == x) pbn; first by rewrite -(eqP xb).
 case: (@mvt x b p); first by rewrite ltr_def xb ?(itvP hx).
 move=> y hy; move/eqP; rewrite subr_eq; move/eqP->.
@@ -581,44 +581,44 @@ Local Notation sp'c := (sgr p^`().[c]).
 Local Notation q := (sp'c *: p).
 
 Fact derq_pos x : x \in `]a, b[ -> (q^`()).[x] > 0.
-Proof.
+Proof using All.
 move=> hx; rewrite derivZ hornerZ -sgr_cp0.
 rewrite sgrM sgr_id mulr_sg_eq1 derp_neq0 //=.
 by apply/eqP; apply: (@polyrN0_itv `]a, b[).
 Qed.
 
 Fact sgp x : sgr p.[x] = sp'c * sgr q.[x].
-Proof.
+Proof using All.
 by rewrite hornerZ sgr_smul mulrA -expr2 sqr_sg derp_neq0 ?mul1r.
 Qed.
 
 Fact hsgp x : 0 < q.[x] -> sgr p.[x] = sp'c.
-Proof. by rewrite -sgr_cp0 sgp => /eqP->; rewrite mulr1. Qed.
+Proof using All. by rewrite -sgr_cp0 sgp => /eqP->; rewrite mulr1. Qed.
 
 Fact hsgpN x : q.[x] < 0 -> sgr p.[x] = - sp'c.
-Proof. by rewrite -sgr_cp0 sgp => /eqP->; rewrite mulrN1. Qed.
+Proof using All. by rewrite -sgr_cp0 sgp => /eqP->; rewrite mulrN1. Qed.
 
 Lemma ders0r : p.[a] = 0 -> forall x, x \in `]a, b] -> sgr p.[x] = sp'c.
-Proof.
+Proof using All.
 move=> pa0 x hx; rewrite hsgp // (@derp0r _ a b) //; first exact: derq_pos.
 by rewrite hornerZ pa0 mulr0.
 Qed.
 
 Lemma derspr : sgr p.[a] = sp'c -> forall x, x \in `[a, b] -> sgr p.[x] = sp'c.
-Proof.
+Proof using All.
 move=> spa x hx; rewrite hsgp // (@derppr _ a b) //; first exact: derq_pos.
 by rewrite -sgr_cp0 hornerZ sgrM sgr_id spa -expr2 sqr_sg derp_neq0.
 Qed.
 
 Lemma ders0l : p.[b] = 0 -> forall x, x \in `[a, b[ -> sgr p.[x] = -sp'c.
-Proof.
+Proof using All.
 move=> pa0 x hx; rewrite hsgpN // (@derp0l _ a b) //; first exact: derq_pos.
 by rewrite hornerZ pa0 mulr0.
 Qed.
 
 Lemma derspl :
   sgr p.[b] = -sp'c -> forall x, x \in `[a, b] -> sgr p.[x] = -sp'c.
-Proof.
+Proof using All.
 move=> spb x hx; rewrite hsgpN // (@derpnl _ a b) //; first exact: derq_pos.
 by rewrite -sgr_cp0 hornerZ sgr_smul spb mulrN -expr2 sqr_sg derp_neq0.
 Qed.
@@ -639,7 +639,7 @@ Lemma derp_root : a <= b -> 0 \in `]p.[a], p.[b][ ->
       p.[r] = 0,
       r \in `]a, b[ &
       forall x, x \in `]r, b] -> p.[x] > 0] }.
-Proof.
+Proof using All.
 move=> leab hpab.
 have /eqP hs : sgr p.[a] * sgr p.[b] == -1.
   by rewrite -sgrM sgr_cp0 pmulr_llt0 ?(itvP hpab).

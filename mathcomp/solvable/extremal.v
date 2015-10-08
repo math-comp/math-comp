@@ -102,7 +102,7 @@ Definition gtype := locked_with gtype_key (sdprod_groupType gact).
 Hypotheses (p_gt1 : p > 1) (q_gt1 : q > 1).
 
 Lemma card : #|[set: gtype]| = (p * q)%N.
-Proof.
+Proof using q_gt1 p_gt1.
 rewrite [gtype]unlock -(sdprod_card (sdprod_sdpair _)).
 rewrite !card_injm ?injm_sdpair1 ?injm_sdpair2 //.
 by rewrite mulnC -!orderE !order_Zp1 !Zp_cast.
@@ -110,7 +110,7 @@ Qed.
 
 Lemma Grp : (exists s, [/\ s \in Aut B, #[s] %| p & s b = b ^+ e]) ->
   [set: gtype] \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ e)).
-Proof.
+Proof using q_gt1 p_gt1.
 rewrite [gtype]unlock => [[s [AutBs dvd_s_p sb]]].
 have memB: _ \in B by move=> c; rewrite -Zp_cycle inE.
 have Aa: a \in <[a]> by rewrite !cycle_id.
@@ -425,20 +425,20 @@ Hypotheses (p_pr : prime p) (n_gt2 : n > 2).
 Let p_gt1 := prime_gt1 p_pr.
 Let p_gt0 := ltnW p_gt1.
 Let def_n := esym (subnKC n_gt2).
-Let def_p : pdiv m = p. Proof. by rewrite /m def_n pdiv_pfactor. Qed.
-Let def_q : m %/ p = q. Proof. by rewrite /m /q def_n expnS mulKn. Qed.
-Let def_r : q %/ p = r. Proof. by rewrite /r /q def_n expnS mulKn. Qed.
-Let ltqm : q < m. Proof. by rewrite ltn_exp2l // def_n. Qed.
-Let ltrq : r < q. Proof. by rewrite ltn_exp2l // def_n. Qed.
-Let r_gt0 : 0 < r. Proof. by rewrite expn_gt0 ?p_gt0. Qed.
-Let q_gt1 : q > 1. Proof. exact: leq_ltn_trans r_gt0 ltrq. Qed.
+Let def_p : pdiv m = p. Proof using def_n p_pr. by rewrite /m def_n pdiv_pfactor. Qed.
+Let def_q : m %/ p = q. Proof using def_n p_gt0. by rewrite /m /q def_n expnS mulKn. Qed.
+Let def_r : q %/ p = r. Proof using def_n p_gt0. by rewrite /r /q def_n expnS mulKn. Qed.
+Let ltqm : q < m. Proof using def_n p_gt1. by rewrite ltn_exp2l // def_n. Qed.
+Let ltrq : r < q. Proof using def_n p_gt1. by rewrite ltn_exp2l // def_n. Qed.
+Let r_gt0 : 0 < r. Proof using n p_gt0. by rewrite expn_gt0 ?p_gt0. Qed.
+Let q_gt1 : q > 1. Proof using ltrq r_gt0. exact: leq_ltn_trans r_gt0 ltrq. Qed.
 
 Lemma card_modular_group : #|'Mod_(p ^ n)| = (p ^ n)%N.
-Proof. by rewrite Extremal.card def_p ?def_q // -expnS def_n. Qed.
+Proof using def_p def_q q_gt1. by rewrite Extremal.card def_p ?def_q // -expnS def_n. Qed.
 
 Lemma Grp_modular_group :
   'Mod_(p ^ n) \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ r.+1)).
-Proof.
+Proof using def_p def_q def_r q_gt1.
 rewrite /modular_gtype def_p def_q def_r; apply: Extremal.Grp => //.
 set B := <[_]>; have Bb: Zp1 \in B by apply: cycle_id.
 have oB: #|B| = q by rewrite -orderE order_Zp1 Zp_cast.
@@ -462,7 +462,7 @@ Definition modular_group_generators gT (xy : gT * gT) :=
 Lemma generators_modular_group gT (G : {group gT}) :
     G \isog 'Mod_m ->
   exists2 xy, extremal_generators G p n xy & modular_group_generators xy.
-Proof.
+Proof using All.
 case/(isoGrpP _ Grp_modular_group); rewrite card_modular_group // -/m => oG.
 case/existsP=> -[x y] /= /eqP[defG xq yp xy].
 rewrite norm_joinEr ?norms_cycle ?xy ?mem_cycle // in defG.
@@ -498,7 +498,7 @@ Lemma modular_group_structure gT (G : {group gT}) x y :
       forall k, 0 < k < n.-1 ->
          <[x ^+ (p ^ (n - k.+1))]> \x <[y]> = 'Ohm_k(G)
       /\ #|'Ohm_k(G)| = (p ^ k.+1)%N].
-Proof.
+Proof using def_r r_gt0.
 move=> genG isoG [oy xy] X.
 have [oG Gx ox /setDP[Gy notXy]] := genG; rewrite -/m -/q in ox oG.
 have [pG _ nsXG defXY nXY] := extremal_generators_facts p_pr genG.
@@ -607,12 +607,12 @@ Hypothesis q_gt1 : q > 1.
 Let m := q.*2.
 
 Let def2 : pdiv m = 2.
-Proof.
+Proof using q_gt1.
 apply/eqP; rewrite /m -mul2n eqn_leq pdiv_min_dvd ?dvdn_mulr //.
 by rewrite prime_gt1 // pdiv_prime // (@leq_pmul2l 2 1) ltnW.
 Qed.
 
-Let def_q : m %/ pdiv m = q. Proof. by rewrite def2 divn2 half_double. Qed.
+Let def_q : m %/ pdiv m = q. Proof using All. by rewrite def2 divn2 half_double. Qed.
 
 Section Dihedral_extension.
 
@@ -621,10 +621,10 @@ Hypotheses (p_gt1 : p > 1) (even_p : 2 %| p).
 Local Notation ED := [set: gsort (Extremal.gtype q p q.-1)].
 
 Lemma card_ext_dihedral : #|ED| = (p./2 * m)%N.
-Proof. by rewrite Extremal.card // /m -mul2n -divn2 mulnA divnK. Qed.
+Proof using even_p p_gt1 q_gt1. by rewrite Extremal.card // /m -mul2n -divn2 mulnA divnK. Qed.
 
 Lemma Grp_ext_dihedral : ED \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x^-1)).
-Proof.
+Proof using even_p p_gt1 q_gt1.
 suffices isoED: ED \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ q.-1)).
   move=> gT G; rewrite isoED.
   apply: eq_existsb => [[x y]] /=; rewrite !xpair_eqE.
@@ -642,13 +642,13 @@ Qed.
 End Dihedral_extension.
 
 Lemma card_dihedral : #|'D_m| = m.
-Proof. by rewrite /('D_m)%type def_q card_ext_dihedral ?mul1n. Qed.
+Proof using All. by rewrite /('D_m)%type def_q card_ext_dihedral ?mul1n. Qed.
 
 Lemma Grp_dihedral : 'D_m \isog Grp (x : y : (x ^+ q, y ^+ 2, x ^ y = x^-1)).
-Proof. by rewrite /('D_m)%type def_q; apply: Grp_ext_dihedral. Qed.
+Proof using All. by rewrite /('D_m)%type def_q; apply: Grp_ext_dihedral. Qed.
 
 Lemma Grp'_dihedral : 'D_m \isog Grp (x : y : (x ^+ 2, y ^+ 2, (x * y) ^+ q)).
-Proof.
+Proof using All.
 move=> gT G; rewrite Grp_dihedral; apply/existsP/existsP=> [] [[x y]] /=.
   case/eqP=> <- xq1 y2 xy; exists (x * y, y); rewrite !xpair_eqE /= eqEsubset.
   rewrite !join_subG !joing_subr !cycle_subG -{3}(mulgK y x) /=.
@@ -740,7 +740,7 @@ Let q := (2 ^ n.-1)%N.
 Let r := (2 ^ n.-2)%N.
 Let GrpQ := 'Q_m \isog Grp (x : y : (x ^+ q, y ^+ 2 = x ^+ r, x ^ y = x^-1)).
 Let defQ :  #|'Q_m| = m /\ GrpQ.
-Proof.
+Proof using n_gt2.
 have q_gt1 : q > 1 by rewrite (ltn_exp2l 0) // -(subnKC n_gt2).
 have def_m : (2 * q)%N = m by rewrite -expnS (ltn_predK n_gt2).
 have def_q : m %/ pdiv m = q
@@ -838,8 +838,8 @@ rewrite -{2}defB morphim_sdprodm // !morphim_cycle ?cycle_id //= !eltm_id.
 by rewrite -norm_joinEr // norms_cycle xy groupV cycle_id.
 Qed.
 
-Lemma card_quaternion : #|'Q_m| = m. Proof. by case defQ. Qed.
-Lemma Grp_quaternion : GrpQ. Proof. by case defQ. Qed.
+Lemma card_quaternion : #|'Q_m| = m. Proof using All. by case defQ. Qed.
+Lemma Grp_quaternion : GrpQ. Proof using All. by case defQ. Qed.
 
 End Quaternion.
 
@@ -852,9 +852,9 @@ Implicit Type H : {group gT}.
 
 Let m := (2 ^ n)%N.
 Let q := (2 ^ n.-1)%N.
-Let q_gt0: q > 0. Proof. by rewrite expn_gt0. Qed.
+Let q_gt0: q > 0. Proof using n. by rewrite expn_gt0. Qed.
 Let r := (2 ^ n.-2)%N.
-Let r_gt0: r > 0. Proof. by rewrite expn_gt0. Qed.
+Let r_gt0: r > 0. Proof using n. by rewrite expn_gt0. Qed.
 
 Let def2qr : n > 1 -> [/\ 2 * q = m, 2 * r = q, q < m & r < q]%N.
 Proof. by rewrite /q /m /r; move/subnKC=> <-; rewrite !ltn_exp2l ?expnS. Qed.

@@ -79,48 +79,48 @@ Local Notation "` 'M''" := `M^`(1) (at level 0) : group_scope.
 Local Notation M'' := M^`(2)%G.
 Local Notation "` 'M'''" := `M^`(2) (at level 0) : group_scope.
 
-Let defM : M' ><| W1 = M. Proof. by have [[]] := MtypeP. Qed.
+Let defM : M' ><| W1 = M. Proof using MtypeP. by have [[]] := MtypeP. Qed.
 Let nsM''M' : M'' <| M'. Proof. exact: (der_normal 1 M'). Qed.
 Let nsM'M : M' <| M. Proof. exact: (der_normal 1 M). Qed.
 Let sM'M : M' \subset M. Proof. exact: der_sub. Qed.
 Let nsM''M : M'' <| M. Proof. exact: der_normal 2 M. Qed.
 
-Let notMtype1 : FTtype M != 1%N. Proof. exact: FTtypeP_neq1 MtypeP. Qed.
+Let notMtype1 : FTtype M != 1%N. Proof using MtypeP maxM. exact: FTtypeP_neq1 MtypeP. Qed.
 Let typeMgt2 : FTtype M > 2.
-Proof. by move: (FTtype M) (FTtype_range M) notMtype1 notMtype2=> [|[|[]]]. Qed.
+Proof using notMtype1 notMtype2. by move: (FTtype M) (FTtype_range M) notMtype1 notMtype2=> [|[|[]]]. Qed.
 
-Let defA1 : 'A1(M) = M'^#. Proof. by rewrite /= -FTcore_eq_der1. Qed.
-Let defA : 'A(M) = M'^#. Proof. by rewrite FTsupp_eq1 ?defA1. Qed.
+Let defA1 : 'A1(M) = M'^#. Proof using typeMgt2. by rewrite /= -FTcore_eq_der1. Qed.
+Let defA : 'A(M) = M'^#. Proof using defA1. by rewrite FTsupp_eq1 ?defA1. Qed.
 Let defA0 : 'A0(M) = M'^# :|: class_support V M.
-Proof. by rewrite -defA (FTtypeP_supp0_def _ MtypeP). Qed.
-Let defMs : M`_\s :=: M'. Proof. exact: FTcore_type_gt2. Qed.
+Proof using defA. by rewrite -defA (FTtypeP_supp0_def _ MtypeP). Qed.
+Let defMs : M`_\s :=: M'. Proof using typeMgt2. exact: FTcore_type_gt2. Qed.
 
 Let pddM := FT_prDade_hyp maxM MtypeP.
 Let ptiWM : primeTI_hypothesis M M' defW := FT_primeTI_hyp MtypeP.
 Let ctiWG : cyclicTI_hypothesis G defW := pddM.
 Let ctiWM : cyclicTI_hypothesis M defW := prime_cycTIhyp ptiWM.
 
-Let ntW1 : W1 :!=: 1. Proof. by have [[]] := MtypeP. Qed.
-Let ntW2 : W2 :!=: 1. Proof. by have [_ _ _ []] := MtypeP. Qed.
-Let cycW1 : cyclic W1. Proof. by have [[]] := MtypeP. Qed.
-Let cycW2 : cyclic W2. Proof. by have [_ _ _ []] := MtypeP. Qed.
+Let ntW1 : W1 :!=: 1. Proof using MtypeP. by have [[]] := MtypeP. Qed.
+Let ntW2 : W2 :!=: 1. Proof using MtypeP. by have [_ _ _ []] := MtypeP. Qed.
+Let cycW1 : cyclic W1. Proof using MtypeP. by have [[]] := MtypeP. Qed.
+Let cycW2 : cyclic W2. Proof using MtypeP. by have [_ _ _ []] := MtypeP. Qed.
 
 Let w1 := #|W1|.
 Let w2 := #|W2|.
-Let nirrW1 : #|Iirr W1| = w1. Proof. by rewrite card_Iirr_cyclic. Qed.
-Let nirrW2 : #|Iirr W2| = w2. Proof. by rewrite card_Iirr_cyclic. Qed.
-Let NirrW1 : Nirr W1 = w1. Proof. by rewrite -nirrW1 card_ord. Qed.
-Let NirrW2 : Nirr W2 = w2. Proof. by rewrite -nirrW2 card_ord. Qed.
+Let nirrW1 : #|Iirr W1| = w1. Proof using cycW1. by rewrite card_Iirr_cyclic. Qed.
+Let nirrW2 : #|Iirr W2| = w2. Proof using cycW2. by rewrite card_Iirr_cyclic. Qed.
+Let NirrW1 : Nirr W1 = w1. Proof using nirrW1. by rewrite -nirrW1 card_ord. Qed.
+Let NirrW2 : Nirr W2 = w2. Proof using nirrW2. by rewrite -nirrW2 card_ord. Qed.
 
-Let w1gt2 : w1 > 2. Proof. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
-Let w2gt2 : w2 > 2. Proof. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
+Let w1gt2 : w1 > 2. Proof using ntW1. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
+Let w2gt2 : w2 > 2. Proof using ntW2. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
 
 Let coM'w1 : coprime #|M'| w1.
-Proof. by rewrite (coprime_sdprod_Hall_r defM); have [[]] := MtypeP. Qed.
+Proof using defM. by rewrite (coprime_sdprod_Hall_r defM); have [[]] := MtypeP. Qed.
 
 (* This is used both in (10.2) and (10.8). *)
 Let frobMbar : [Frobenius M / M'' = (M' / M'') ><| (W1 / M'')].
-Proof.
+Proof using coM'w1 maxM ntW1 ntW2.
 have [[_ hallW1 _ _] _ _ [_ _ _ sW2M'' regM'W1 ] _] := MtypeP.
 apply: Frobenius_coprime_quotient => //.
 split=> [|w /regM'W1-> //]; apply: (sol_der1_proper (mmax_sol maxM)) => //.
@@ -147,11 +147,11 @@ Local Notation "chi ^\tau" := (tau chi).
 Let calS0 := seqIndD M' M M`_\s 1.
 Let rmR := FTtypeP_coh_base maxM MtypeP.
 Let scohS0 : subcoherent calS0 tau rmR.
-Proof. exact: FTtypeP_subcoherent MtypeP. Qed.
+Proof using MtypeP. exact: FTtypeP_subcoherent MtypeP. Qed.
 
 Let calS := seqIndD M' M M' 1.
 Let sSS0 : cfConjC_subset calS calS0.
-Proof. by apply: seqInd_conjC_subset1; rewrite /= ?defMs. Qed.
+Proof using defMs. by apply: seqInd_conjC_subset1; rewrite /= ?defMs. Qed.
 
 Let mem_calS s : ('Ind 'chi[M']_s \in calS) = (s != 0).
 Proof.
@@ -160,19 +160,19 @@ by rewrite !inE sub1G subGcfker andbT.
 Qed.
 
 Let calSmu j : j != 0 -> mu_ j \in calS.
-Proof.
+Proof using ptiWM.
 move=> nz_j; rewrite -[mu_ j]cfInd_prTIres mem_calS -irr_eq1.
 by rewrite -(prTIres0 ptiWM) (inj_eq irr_inj) (inj_eq (prTIres_inj _)).
 Qed.
 
 Let tauM' : {subset 'Z[calS, M'^#] <= 'CF(M, 'A0(M))}.
-Proof. by rewrite defA0 => phi /zchar_on/(cfun_onS (subsetUl _ _))->. Qed.
+Proof using defA0. by rewrite defA0 => phi /zchar_on/(cfun_onS (subsetUl _ _))->. Qed.
 
 (* This is Peterfalvi (10.2). *)
 (* Note that this result is also valid for type II groups. *)
 Lemma FTtypeP_ref_irr :
   {zeta | [/\ zeta \in irr M, zeta \in calS & zeta 1%g = w1%:R]}.
-Proof.
+Proof using frobMbar.
 have [_ /has_nonprincipal_irr[s nz_s] _ _ _] := Frobenius_context frobMbar.
 exists ('Ind 'chi_s %% M'')%CF; split.
 - by rewrite cfMod_irr ?irr_induced_Frobenius_ker ?(FrobeniusWker frobMbar).
@@ -183,7 +183,7 @@ Qed.
 
 (* This is Peterfalvi (10.3), first assertion. *)
 Lemma FTtype345_core_prime : prime w2.
-Proof.
+Proof using MtypeP maxM notMtype2.
 have [S pairMS [xdefW [U StypeP]]] := FTtypeP_pair_witness maxM MtypeP.
 have [[_ _ maxS] _] := pairMS; rewrite {1}(negPf notMtype2) /= => Stype2 _ _.
 by have [[]] := compl_of_typeII maxS StypeP Stype2.
@@ -203,7 +203,7 @@ Lemma FTtype345_constants :
     forall j, j != 0 -> delta_ j = delta,
       (d > 1)%N
     & n \in Cnat].
-Proof.
+Proof using pddM w2_pr.
 have nz_j1 : #1 != 0 :> Iirr W2 by rewrite Iirr1_neq0.
 have invj j: j != 0 -> mu2_ 0 j 1%g = d%:R /\ delta_ j = delta.
   move=> nz_j; have [k co_k_j1 Dj] := cfExp_prime_transitive w2_pr nz_j1 nz_j.
@@ -229,7 +229,7 @@ Qed.
 
 Let o_mu2_irr zeta i j :
   zeta \in calS -> zeta \in irr M -> '[mu2_ i j, zeta] = 0.
-Proof.
+Proof using ptiWM.
 case/seqIndP=> s _ -> irr_sM; rewrite -cfdot_Res_l cfRes_prTIirr cfdot_irr.
 rewrite (negPf (contraNneq _ (prTIred_not_irr ptiWM j))) // => Ds.
 by rewrite -cfInd_prTIres Ds.
@@ -238,7 +238,7 @@ Qed.
 Let ZmuBzeta zeta j :
     zeta \in calS -> zeta 1%g = w1%:R -> j != 0 ->
   mu_ j - d%:R *: zeta \in 'Z[calS, M'^#].
-Proof.
+Proof using pddM w2_pr.
 move=> Szeta zeta1w1 nz_j; have [mu1 _ _ _] := FTtype345_constants.
 rewrite -[d%:R](mulKf (neq0CiG M M')) mulrC -(mu1 0 j nz_j).
 rewrite -(cfResE _ sM'M) // cfRes_prTIirr -cfInd1 // cfInd_prTIres.
@@ -247,7 +247,7 @@ Qed.
 
 Let mu0Bzeta_on zeta :
   zeta \in calS -> zeta 1%g = w1%:R -> mu_ 0 - zeta \in 'CF(M, 'A(M)).
-Proof.
+Proof using defA ptiWM.
 move/seqInd_on=> M'zeta zeta1w1; rewrite [mu_ 0]prTIred0 defA cfun_onD1.
 rewrite !cfunE zeta1w1 cfuniE // group1 mulr1 subrr rpredB ?M'zeta //=.
 by rewrite rpredZ ?cfuni_on.
@@ -259,10 +259,10 @@ Variable zeta : 'CF(M).
 Hypotheses (irr_zeta : zeta \in irr M) (Szeta : zeta \in calS).
 Hypothesis (zeta1w1 : zeta 1%g = w1%:R).
 
-Let o_mu2_zeta i j : '[mu2_ i j, zeta] = 0. Proof. exact: o_mu2_irr. Qed.
+Let o_mu2_zeta i j : '[mu2_ i j, zeta] = 0. Proof using Szeta irr_zeta o_mu2_irr. exact: o_mu2_irr. Qed.
 
 Let o_mu_zeta j : '[mu_ j, zeta] = 0.
-Proof. by rewrite cfdot_suml big1 // => i _; apply: o_mu2_zeta. Qed.
+Proof using o_mu2_zeta. by rewrite cfdot_suml big1 // => i _; apply: o_mu2_zeta. Qed.
 
 Definition FTtype345_bridge i j :=  mu2_ i j - delta *: mu2_ i 0 - n *: zeta.
 Local Notation alpha_ := FTtype345_bridge.
@@ -270,7 +270,7 @@ Local Notation alpha_ := FTtype345_bridge.
 (* This is the first part of Peterfalvi (10.5), which does not depend on the  *)
 (* coherence assumption that will ultimately be refuted by (10.8).            *)
 Lemma supp_FTtype345_bridge i j : j != 0 -> alpha_ i j \in 'CF(M, 'A0(M)).
-Proof.
+Proof using Szeta defA pddM w2_pr zeta1w1.
 move=> nz_j; have [Dd Ddelta _ _] := FTtype345_constants.
 have Dmu2 := prTIirr_id pddM.
 have W1a0 x: x \in W1 -> alpha_ i j x = 0.
@@ -302,7 +302,7 @@ Qed.
 Local Notation alpha_on := supp_FTtype345_bridge.
 
 Lemma vchar_FTtype345_bridge i j : alpha_ i j \in 'Z[irr M].
-Proof.
+Proof using irr_zeta pddM w2_pr.
 have [_ _ _ Nn] := FTtype345_constants.
 by rewrite !rpredB ?rpredZsign ?rpredZ_Cnat ?irr_vchar ?mem_zchar.
 Qed.
@@ -311,7 +311,7 @@ Local Hint Resolve Zalpha.
 
 Lemma vchar_Dade_FTtype345_bridge i j :
   j != 0 -> (alpha_ i j)^\tau \in 'Z[irr G].
-Proof. by move=> nz_j; rewrite Dade_vchar // zchar_split Zalpha alpha_on. Qed.
+Proof using Szeta defA irr_zeta w2_pr zeta1w1. by move=> nz_j; rewrite Dade_vchar // zchar_split Zalpha alpha_on. Qed.
 Local Notation Zalpha_tau := vchar_Dade_FTtype345_bridge.
 
 (* This covers the last paragraph in the proof of (10.5); it's isolated here  *)
@@ -319,7 +319,7 @@ Local Notation Zalpha_tau := vchar_Dade_FTtype345_bridge.
 
 Lemma norm_FTtype345_bridge i j :
   j != 0 -> '[(alpha_ i j)^\tau] = 2%:R + n ^+ 2.
-Proof.
+Proof using defA o_mu2_zeta w2_pr zeta1w1.
 move=> nz_j; rewrite Dade_isometry ?alpha_on // cfnormBd ?cfnormZ; last first.
   by rewrite cfdotZr cfdotBl cfdotZl !o_mu2_zeta !(mulr0, subr0).
 have [_ _ _ /Cnat_ge0 n_ge0] := FTtype345_constants.
@@ -336,7 +336,7 @@ Lemma FTtype345_bridge_coherence calS1 tau1 i j X Y :
      cfConjC_subset calS1 calS0 -> {subset calS1 <= irr M} ->
      j != 0 -> Y \in 'Z[map tau1 calS1] -> '[Y, X] = 0 -> '[Y] = n ^+ 2 ->
   X = delta *: (eta_ i j - eta_ i 0).
-Proof.
+Proof using defA0 o_mu2_zeta w2_pr zeta1w1.
 move=> cohS1 Dalpha sS10 irrS1 nz_j S1_Y oYX nY_n2.
 have [[_ Ddelta _ Nn] [[Itau1 Ztau1] _]] := (FTtype345_constants, cohS1).
 have [|z Zz defY] := zchar_expansion _ S1_Y.
@@ -367,7 +367,7 @@ Let def_tau_alpha calS1 tau1 i j :
      coherent_with calS1 M^# tau tau1 -> cfConjC_subset calS1 calS0 ->
      j != 0 -> zeta \in calS1 -> '[(alpha_ i j)^\tau, tau1 zeta] = - n ->
   (alpha_ i j)^\tau = delta *: (eta_ i j - eta_ i 0) - n *: tau1 zeta.
-Proof.
+Proof using defA0 o_mu2_zeta w2_pr zeta1w1.
 move=> cohS1 [_ sS10 ccS1] nz_j S1zeta alpha_zeta_n.
 have [[_ _ _ Nn] [[Itau1 _] _]] := (FTtype345_constants, cohS1).
 set Y := - (n *: _); apply: canRL (addrK _) _; set X := _ + _.
@@ -398,17 +398,17 @@ Local Notation "mu ^\tau1" := (tau1 mu%CF)
   (at level 2, format "mu ^\tau1") : ring_scope.
 
 Let Dtau1 : {in 'Z[calS, M'^#], tau1 =1 tau}.
-Proof. by case: cohS => _; apply: sub_in1; apply: zchar_onS; apply: setSD. Qed.
+Proof using cohS. by case: cohS => _; apply: sub_in1; apply: zchar_onS; apply: setSD. Qed.
 
 Let o_zeta_s: '[zeta, zeta^*] = 0.
-Proof. by rewrite (seqInd_conjC_ortho _ _ _ Szeta) ?mFT_odd /= ?defMs. Qed.
+Proof using Szeta. by rewrite (seqInd_conjC_ortho _ _ _ Szeta) ?mFT_odd /= ?defMs. Qed.
 
 Import ssrint rat.
 
 (* This is the second part of Peterfalvi (10.5). *)
 Let tau_alpha i j : j != 0 ->
   (alpha_ i j)^\tau = delta *: (eta_ i j - eta_ i 0) - n *: zeta^\tau1.
-Proof.
+Proof using Dtau1 ZmuBzeta def_tau_alpha o_mu_zeta o_zeta_s sSS0 tauM'.
 move=> nz_j; set al_ij := alpha_ i j; have [[Itau1 Ztau1] _] := cohS.
 have [mu1 Ddelta d_gt1 Nn] := FTtype345_constants.
 pose a := '[al_ij^\tau, zeta^\tau1] + n.
@@ -472,7 +472,7 @@ Qed.
 
 (* This is the first part of Peterfalvi (10.6)(a). *)
 Let tau1mu j : j != 0 -> (mu_ j)^\tau1 = delta *: \sum_i eta_ i j.
-Proof.
+Proof using tau_alpha.
 move=> nz_j; have [[[Itau1 _] _] Smu_j] := (cohS, calSmu nz_j).
 have eta_mu i: '[delta *: (eta_ i j - eta_ i 0), (mu_ j)^\tau1] = 1.
   have Szeta_s: zeta^*%CF \in calS by rewrite cfAut_seqInd.
@@ -500,7 +500,7 @@ Qed.
 
 (* This is the second part of Peterfalvi (10.6)(a). *)
 Let tau1mu0 : (mu_ 0 - zeta)^\tau = \sum_i eta_ i 0 - zeta^\tau1.
-Proof.
+Proof using nirrW1 tau1mu.
 have [j nz_j] := has_nonprincipal_irr ntW2.
 have sum_al: \sum_i alpha_ i j = mu_ j - d%:R *: zeta - delta *: (mu_ 0 - zeta).
   rewrite scalerBr opprD addrACA scaler_sumr !sumrB sumr_const; congr (_ + _).
@@ -518,7 +518,7 @@ Qed.
 (* This is Peterfalvi (10.6)(b). *)
 Let zeta_tau1_coprime g :
   g \notin 'A~(M) -> coprime #[g] w1 -> `|zeta^\tau1 g| >= 1.
-Proof.
+Proof using mu0Bzeta_on tau1mu0.
 move=> notAg co_g_w1; have Amu0zeta := mu0Bzeta_on Szeta zeta1w1.
 have mu0_zeta_g: (mu_ 0 - zeta)^\tau g = 0.
   have [ | ] := boolP (g \in 'A0~(M)); rewrite -FT_Dade0_supportE; last first.
@@ -554,7 +554,7 @@ Qed.
 (* This is Peterfalvi (10.7). *)
 Let Frob_der1_type2 S :
   S \in 'M -> FTtype S == 2 -> [Frobenius S^`(1) with kernel S`_\F].
-Proof.
+Proof using Szeta ZmuBzeta cohS defA1 irr_zeta sSS0 sigma zeta1w1.
 move: S => L maxL /eqP Ltype2.
 have [S pairMS [xdefW [U StypeP]]] := FTtypeP_pair_witness maxM MtypeP.
 have [[_ _ maxS] _] := pairMS; rewrite {1}(negPf notMtype2) /= => Stype2 _.
@@ -674,7 +674,7 @@ Qed.
 (* This is the bulk of the proof of Peterfalvi (10.8); however the result     *)
 (* will be restated below to avoid the quantification on zeta and tau1.       *)
 Lemma FTtype345_noncoherence_main : False.
-Proof.
+Proof using Frob_der1_type2 frobMbar nsM''M' zeta_tau1_coprime.
 have [S pairMS [xdefW [U StypeP]]] := FTtypeP_pair_witness maxM MtypeP.
 have [[_ _ maxS] _] := pairMS; rewrite {1}(negPf notMtype2) /= => Stype2 _ _.
 pose H := (S`_\F)%G; pose HU := (S^`(1))%G.
@@ -804,7 +804,7 @@ Lemma FTtype345_Dade_bridge0 :
   {chi | [/\ (mu_ 0 - zeta)^\tau = \sum_i eta_ i 0 - chi,
              chi \in 'Z[irr G], '[chi] = 1
            & forall i j, '[chi, eta_ i j] = 0]}.
-Proof.
+Proof using ctiWG defA0 mu0Bzeta_on nirrW1 nirrW2 ntW1 o_mu_zeta zeta1w1.
 move=> w1_lt_w2; set psi := mu_ 0 - zeta; pose Wsig := map sigma (irr W).
 have [X wsigX [chi [DpsiG _ o_chiW]]] := orthogonal_split Wsig psi^\tau.
 exists (- chi); rewrite opprK rpredN cfnormN.
@@ -889,7 +889,7 @@ Local Notation "` 'H''" := `M'' (at level 0) : group_scope.
 (* (10.8), it will be restated below in order to remove dependencies on zeta, *)
 (* U_M and W1.                                                                *)
 Lemma FTtype5_exclusion_main : FTtype M != 5.
-Proof.
+Proof using ZmuBzeta def_tau_alpha frobMbar mu0Bzeta_on nirrW1 nirrW2 o_mu_zeta sSS0 tauM' w1gt2 w2gt2.
 apply/negP=> Mtype5.
 suffices [tau1]: coherent calS M^# tau by case/FTtype345_noncoherence_main.
 have [[_ U_M_1] MtypeV] := compl_of_typeV maxM MtypeP Mtype5.

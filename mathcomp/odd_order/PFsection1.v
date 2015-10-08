@@ -452,12 +452,12 @@ Let e_ t := '['Ind theta, 'chi[T]_t].
 
 Hypothesis nsHG: H <| G.
 (* begin hide *)
-Let sHG : H \subset G. Proof. exact: normal_sub. Qed.
-Let nHG : G \subset 'N(H). Proof. exact: normal_norm. Qed.
-Let nsHT : H <| T. Proof. exact: normal_Inertia. Qed.
-Let sHT : H \subset T. Proof. exact: normal_sub. Qed.
-Let nHT : T \subset 'N(H). Proof. exact: normal_norm. Qed.
-Let sTG : T \subset G. Proof. exact: subsetIl. Qed.
+Let sHG : H \subset G. Proof using nsHG. exact: normal_sub. Qed.
+Let nHG : G \subset 'N(H). Proof using nsHG. exact: normal_norm. Qed.
+Let nsHT : H <| T. Proof using sHG nsHG. exact: normal_Inertia. Qed.
+Let sHT : H \subset T. Proof using nsHT. exact: normal_sub. Qed.
+Let nHT : T \subset 'N(H). Proof using nsHT. exact: normal_norm. Qed.
+Let sTG : T \subset G. Proof using theta. exact: subsetIl. Qed.
 (* end hide *)
 
 (* This is Peterfalvi (1.7)(a). *)
@@ -467,7 +467,7 @@ Lemma cfInd_sum_Inertia :
       {in calA &, injective AtoB},
       AtoB @: calA =i calB
     & 'Ind[G] theta = \sum_(t in calA) e_ t *: 'Ind 'chi_t].
-Proof.
+Proof using sHT sTG.
 have [AtoBirr AtoBinj defB _ _] := constt_Inertia_bijection s nsHG.
 split=> // [i Ai|]; first exact/cfIirrE/AtoBirr.
 rewrite -(cfIndInd _ sTG sHT) {1}['Ind theta]cfun_sum_constt linear_sum.
@@ -482,7 +482,7 @@ Lemma cfInd_central_Inertia :
            & [/\ 'Ind[G] theta = e *: \sum_(j in calB) 'chi_j,
                  #|calB|%:R = #|T : H|%:R / e ^+ 2
                & {in calB, forall i, 'chi_i 1%g = #|G : T|%:R * e * theta 1%g}].
-Proof.
+Proof using AtoB abTbar nHT sHT sTG.
 have [t1 At1] := constt_cfInd_irr s sHT; pose psi1 := 'chi_t1.
 pose e := '['Ind theta, psi1].
 have NthT: 'Ind[T] theta \is a character by rewrite cfInd_char ?irr_char.
@@ -532,7 +532,7 @@ Lemma cfInd_Hall_central_Inertia :
      Hall T H ->
   [/\ 'Ind[G] theta = \sum_(i in calB) 'chi_i, #|calB| = #|T : H| 
     & {in calB, forall i, 'chi_i 1%g = #|G : T|%:R * theta 1%g}].
-Proof.
+Proof using AtoB abTbar calA e_ nHT sHT sTG.
 case/andP=> _ hallH; have [e [_ _ De]] := cfInd_central_Inertia.
 suffices ->: e = 1.
   by case=> -> /eqP; rewrite scale1r expr1n divr1 mulr1 eqC_nat => /eqP.
@@ -703,7 +703,7 @@ Local Notation e := (1 - eps).
 (* This is Peterfalvi (1.10) (a). *)
 Lemma vchar_ker_mod_prim : {in G & G & 'Z[irr G], forall x y (chi : 'CF(G)),
   #[x] = p -> y \in 'C[x] -> chi (x * y)%g == chi y %[mod e]}%A.
-Proof.
+Proof using pr_eps.
 move=> x y chi Gx Gy Zchi ox cxy; pose X := <<[set x; y]>>%G.
 have [Xx Xy]: x \in X /\ y \in X by apply/andP; rewrite -!sub1set -join_subG.
 have sXG: X \subset G by rewrite join_subG !sub1set Gx.
@@ -727,7 +727,7 @@ Qed.
 (* This is Peterfalvi (1.10)(b); the primality condition is only needed here. *)
 Lemma int_eqAmod_prime_prim n :
   prime p -> n \in Cint -> (n == 0 %[mod e])%A -> (p %| n)%C.
-Proof.
+Proof using Type*.
 move=> p_pr Zn; rewrite /eqAmod unfold_in subr0.
 have p_gt0 := prime_gt0 p_pr.
 case: ifPn => [_ /eqP->// | nz_e e_dv_n].

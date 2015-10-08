@@ -193,7 +193,7 @@ Lemma large_field_PET q :
     root (q ^ iota) y -> separable_poly q ->
   exists2 r, r != 0
   & forall t (z := iota t * y - x), ~~ root r (iota t) -> inFz z x /\ inFz z y.
-Proof.
+Proof using nz_p px_0.
 move=> qy_0 sep_q; have nz_q := separable_poly_neq0 sep_q.
 have /factor_theorem[q0 Dq] := qy_0.
 set p1 := p ^ iota \Po ('X + x%:P); set q1 := q0 \Po ('X + y%:P).
@@ -250,7 +250,7 @@ Qed.
 Lemma char0_PET (q : {poly F}) :
     q != 0 -> root (q ^ iota) y -> [char F] =i pred0 ->
   exists n, let z := y *+ n - x in inFz z x /\ inFz z y.
-Proof.
+Proof using nz_p px_0.
 move=> nz_q qy_0 /charf0P charF0.
 without loss{nz_q} sep_q: q qy_0 / separable_poly q.
   move=> IHq; apply: IHq (make_separable nz_q).
@@ -297,7 +297,7 @@ Definition Derivation (s := vbasis K) : bool :=
 Hypothesis derD : Derivation.
 
 Lemma Derivation_mul : {in K &, forall u v, D (u * v) = D u * v + u * D v}.
-Proof.
+Proof using All.
 move=> u v /coord_vbasis-> /coord_vbasis->.
 rewrite !(mulr_sumr, linear_sum) -big_split; apply: eq_bigr => /= j _.
 rewrite !mulr_suml linear_sum -big_split; apply: eq_bigr => /= i _.
@@ -307,7 +307,7 @@ Qed.
 
 Lemma Derivation_mul_poly (Dp := map_poly D) :
   {in polyOver K &, forall p q, Dp (p * q) = Dp p * q + p * Dp q}.
-Proof.
+Proof using All.
 move=> p q Kp Kq; apply/polyP=> i; rewrite {}/Dp coefD coef_map /= !coefM.
 rewrite linear_sum -big_split; apply: eq_bigr => /= j _.
 by rewrite !{1}coef_map Derivation_mul ?(polyOverP _).
@@ -327,16 +327,16 @@ Variables (E : {subfield L}) (D : 'End(L)).
 Hypothesis derD : Derivation E D.
 
 Lemma Derivation1 : D 1 = 0.
-Proof.
+Proof using All.
 apply: (addIr (D (1 * 1))); rewrite add0r {1}mul1r.
 by rewrite (Derivation_mul derD) ?mem1v // mulr1 mul1r.
 Qed.
 
 Lemma Derivation_scalar x : x \in 1%VS -> D x = 0.
-Proof. by case/vlineP=> y ->; rewrite linearZ /= Derivation1 scaler0. Qed.
+Proof using All. by case/vlineP=> y ->; rewrite linearZ /= Derivation1 scaler0. Qed.
 
 Lemma Derivation_exp x m : x \in E -> D (x ^+ m) = x ^+ m.-1 *+ m * D x.
-Proof.
+Proof using All.
 move=> Ex; case: m; first by rewrite expr0 mulr0n mul0r Derivation1.
 elim=> [|m IHm]; first by rewrite mul1r.
 rewrite exprS (Derivation_mul derD) //; last by apply: rpredX.
@@ -346,7 +346,7 @@ Qed.
 Lemma Derivation_horner p x :
     p \is a polyOver E -> x \in E ->
   D p.[x] = (map_poly D p).[x] + p^`().[x] * D x.
-Proof.
+Proof using All.
 move=> Ep Ex; elim/poly_ind: p Ep => [|p c IHp] /polyOverP EpXc.
   by rewrite !(raddf0, horner0) mul0r add0r.
 have Ep: p \is a polyOver E.
@@ -483,7 +483,7 @@ Qed.
 Lemma extendDerivation_horner p :
     p \is a polyOver K -> separable_element K x ->
   extendDerivation K p.[x] = (map_poly D p).[x] + p^`().[x] * Dx K.
-Proof.
+Proof using derD.
 move=> Kp sepKx; have:= separable_root_der; rewrite {}sepKx /= => nz_pKx'x.
 rewrite {-1}(divp_eq p (minPoly K x)) lfunE /= Fadjoin_poly_mod // raddfD /=.
 rewrite {1}(Derivation_mul_poly derD) ?divp_polyOver ?minPolyOver //.
@@ -494,7 +494,7 @@ Qed.
 
 Lemma extendDerivationP :
   separable_element K x -> Derivation <<K; x>> (extendDerivation K).
-Proof.
+Proof using derD.
 move=> sep; apply/allP=> u /vbasis_mem Hu; apply/allP=> v /vbasis_mem Hv.
 apply/eqP.
 rewrite -(Fadjoin_poly_eq Hu) -(Fadjoin_poly_eq Hv) -hornerM.
@@ -697,7 +697,7 @@ Variable N : nat.
 Let K_is_large := exists s, [/\ uniq s, {subset s <= K} & N < size s].
 
 Let cyclic_or_large (z : L) : z != 0 -> K_is_large \/ exists a, z ^+ a.+1 = 1.
-Proof.
+Proof using K N.
 move=> nz_z; pose d := adjoin_degree K z.
 pose h0 (i : 'I_(N ^ d).+1) (j : 'I_d) := (Fadjoin_poly K z (z ^+ i))`_j.
 pose s := undup [seq h0 i j | i <- enum 'I_(N ^ d).+1, j <- enum 'I_d].
@@ -721,7 +721,7 @@ by exists (i2 - i1.+1)%N; rewrite subnSK ?expfB // eq_zi12 divff ?expf_neq0.
 Qed.
 
 Lemma finite_PET : K_is_large \/ exists z, (<< <<K; y>>; x>> = <<K; z>>)%VS.
-Proof.
+Proof using cyclic_or_large.
 have [-> | /cyclic_or_large[|[a Dxa]]] := eqVneq x 0; first 2 [by left].
   by rewrite addv0 subfield_closed; right; exists y.
 have [-> | /cyclic_or_large[|[b Dyb]]] := eqVneq y 0; first 2 [by left].
@@ -759,7 +759,7 @@ End FiniteCase.
 Hypothesis sepKy : separable_element K y.
 
 Lemma Primitive_Element_Theorem : exists z, (<< <<K; y>>; x>> = <<K; z>>)%VS.
-Proof.
+Proof using sepKy.
 have /polyOver_subvs[p Dp]: minPoly K x \is a polyOver K := minPolyOver K x.
 have nz_pKx: minPoly K x != 0 by rewrite monic_neq0 ?monic_minPoly.
 have{nz_pKx} nz_p: p != 0 by rewrite Dp map_poly_eq0 in nz_pKx.
@@ -786,7 +786,7 @@ by rewrite subvP_adjoin // rpredM ?memv_adjoin ?subvP_adjoin.
 Qed.
 
 Lemma adjoin_separable : separable_element <<K; y>> x -> separable_element K x.
-Proof.
+Proof using sepKy.
 have /Derivation_separableP derKy := sepKy => /Derivation_separableP derKy_x.
 have [z defKz] := Primitive_Element_Theorem.
 suffices /adjoin_separableP: separable_element K z.

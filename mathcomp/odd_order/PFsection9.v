@@ -73,22 +73,22 @@ Local Notation "` 'U''" := `U^`(1) (at level 0) : group_scope.
 
 Let q := #|W1|.
 
-Let defM : HU ><| W1 = M. Proof. by have [[]] := MtypeP. Qed.
-Let defHU : H ><| U = HU. Proof. by have [_ []] := MtypeP. Qed.
-Let nUW1 : W1 \subset 'N(U). Proof. by have [_ []] := MtypeP. Qed.
-Let cHU' : U' \subset 'C(H). Proof. by have [_ []] := typeP_context MtypeP. Qed.
+Let defM : HU ><| W1 = M. Proof using MtypeP. by have [[]] := MtypeP. Qed.
+Let defHU : H ><| U = HU. Proof using MtypeP. by have [_ []] := MtypeP. Qed.
+Let nUW1 : W1 \subset 'N(U). Proof using MtypeP. by have [_ []] := MtypeP. Qed.
+Let cHU' : U' \subset 'C(H). Proof using MtypeP. by have [_ []] := typeP_context MtypeP. Qed.
 
-Let notMtype1 : FTtype M != 1%N. Proof. exact: FTtypeP_neq1 MtypeP. Qed.
+Let notMtype1 : FTtype M != 1%N. Proof using MtypeP maxM. exact: FTtypeP_neq1 MtypeP. Qed.
 
 Local Notation Mtype24 := (compl_of_typeII_IV maxM MtypeP notMtype5).
-Let ntU : U :!=: 1. Proof. by have [] := Mtype24. Qed.
-Let pr_q : prime q. Proof. by have [] := Mtype24. Qed.
-Let ntW2 : W2 :!=: 1. Proof. by have [_ _ _ []] := MtypeP. Qed.
-Let sW2H : W2 \subset H. Proof. by have [_ _ _ []] := MtypeP. Qed.
-Let defW2 : 'C_H(W1) = W2. Proof. exact: typeP_cent_core_compl MtypeP. Qed.
+Let ntU : U :!=: 1. Proof using MtypeP maxM notMtype5. by have [] := Mtype24. Qed.
+Let pr_q : prime q. Proof using MtypeP maxM notMtype5. by have [] := Mtype24. Qed.
+Let ntW2 : W2 :!=: 1. Proof using MtypeP. by have [_ _ _ []] := MtypeP. Qed.
+Let sW2H : W2 \subset H. Proof using MtypeP. by have [_ _ _ []] := MtypeP. Qed.
+Let defW2 : 'C_H(W1) = W2. Proof using MtypeP. exact: typeP_cent_core_compl MtypeP. Qed.
 
 Lemma Ptype_Fcore_sdprod : H ><| (U <*> W1) = M.
-Proof.
+Proof using defHU defM nUW1.
 have [_ /= sW1M mulHUW1 _ tiHUW1] := sdprod_context defM. 
 have [/= /andP[sHHU _] sUHU mulHU nHU tiHU] := sdprod_context defHU.
 rewrite sdprodE /= norm_joinEr // ?mulgA ?mulHU //.
@@ -99,18 +99,18 @@ Qed.
 Local Notation defHUW1 := Ptype_Fcore_sdprod.
 
 Lemma Ptype_Fcore_coprime : coprime #|H| #|U <*> W1|.
-Proof.
+Proof using defHU defM nUW1.
 by rewrite (coprime_sdprod_Hall_l defHUW1) ?(pHall_Hall (Fcore_Hall M)).
 Qed.
 Let coH_UW1 := Ptype_Fcore_coprime.
 Let coHU : coprime #|H| #|U|.
-Proof. exact: coprimegS (joing_subl U W1) coH_UW1. Qed.
+Proof using coH_UW1. exact: coprimegS (joing_subl U W1) coH_UW1. Qed.
 
 Let not_cHU : ~~ (U \subset 'C(H)).
-Proof. by have [_ [_ ->]] := typeP_context MtypeP. Qed.
+Proof using ntU. by have [_ [_ ->]] := typeP_context MtypeP. Qed.
 
 Lemma Ptype_compl_Frobenius : [Frobenius U <*> W1 = U ><| W1].
-Proof.
+Proof using defHU defM nUW1 ntU sW2H.
 have [[_ _ ntW1 _] _ _ [_ _ _ _ prHU_W1] _] := MtypeP.
 have [[_ _ _ tiHUW1] [_ sUHU _ _ tiHU]] := (sdprodP defM, sdprod_context defHU).
 apply/Frobenius_semiregularP=> // [|x /prHU_W1 defCx].
@@ -126,7 +126,7 @@ Let solH : solvable H. Proof. exact: nilpotent_sol. Qed.
 Lemma typeII_IV_core (p := #|W2|) :
   if FTtype M == 2 then 'C_H(U) = 1 /\ #|H| = (#|W2| ^ q)%N
   else [/\ prime p, 'C_H(U <*> W1) = 1 & #|H| = (p ^ q * #|'C_H(U)|)%N].
-Proof.
+Proof using coH_UW1 defW2 not_cHU sW2H.
 have [_ _ nHUW1 _] := sdprodP defHUW1.
 have /= [oH _ oH1] := Frobenius_Wielandt_fixpoint frobUW1 nHUW1 coH_UW1 solH.
 have [Mtype2 {oH}| notMtype2 {oH1}] := boolP (FTtype M == 2).
@@ -159,7 +159,7 @@ Let p := pdiv #|Hbar|.
 
 (* This corresponds to Peterfalvi (9.4). *)
 Lemma Ptype_Fcore_kernel_exists : chief_factor M H0 H /\ 'C_H(U) \subset H0.
-Proof.
+Proof using defHU defM nUW1 not_cHU.
 pose S := <<class_support 'C_H(U) H>> .
 suffices [H1 maxH sCH1]: {H1 : {group gT} | maxnormal H1 H M & S \subset H1}.
   apply/andP; rewrite /H0 /Ptype_Fcore_kernel; case: pickP => // /(_ H1)/idP[].
@@ -174,22 +174,22 @@ by rewrite normsI ?norms_cent // join_subG normG.
 Qed.
 
 Let chiefH0 : chief_factor M H0 H.
-Proof. by have [] := Ptype_Fcore_kernel_exists. Qed.
+Proof using defHU defM nUW1 not_cHU. by have [] := Ptype_Fcore_kernel_exists. Qed.
 Let ltH0H : H0 \proper H.
-Proof. by case/andP: chiefH0 => /maxgroupp/andP[]. Qed.
+Proof using chiefH0. by case/andP: chiefH0 => /maxgroupp/andP[]. Qed.
 Let nH0M : M \subset 'N(H0).
-Proof. by case/andP: chiefH0 => /maxgroupp/andP[]. Qed.
-Let sH0H : H0 \subset H. Proof. exact: proper_sub ltH0H. Qed.
-Let nsH0M : H0 <| M. Proof. by rewrite /normal (subset_trans sH0H) ?gFsub. Qed.
-Let nsH0H : H0 <| H. Proof. by rewrite (normalS _ (Fcore_sub _)). Qed.
+Proof using chiefH0. by case/andP: chiefH0 => /maxgroupp/andP[]. Qed.
+Let sH0H : H0 \subset H. Proof using ltH0H. exact: proper_sub ltH0H. Qed.
+Let nsH0M : H0 <| M. Proof using nH0M sH0H. by rewrite /normal (subset_trans sH0H) ?gFsub. Qed.
+Let nsH0H : H0 <| H. Proof using nsH0M. by rewrite (normalS _ (Fcore_sub _)). Qed.
 Let minHbar : minnormal Hbar (M / H0).
-Proof. exact: chief_factor_minnormal. Qed.
-Let ntHbar : Hbar :!=: 1. Proof. by case/mingroupp/andP: minHbar. Qed.
+Proof using chiefH0. exact: chief_factor_minnormal. Qed.
+Let ntHbar : Hbar :!=: 1. Proof using minHbar. by case/mingroupp/andP: minHbar. Qed.
 Let solHbar: solvable Hbar. Proof. by rewrite quotient_sol. Qed.
 Let abelHbar : p.-abelem Hbar.
-Proof. by have [] := minnormal_solvable minHbar _ solHbar. Qed.
-Let p_pr : prime p. Proof. by have [/pgroup_pdiv[]] := and3P abelHbar. Qed.
-Let abHbar : abelian Hbar. Proof. exact: abelem_abelian abelHbar. Qed.
+Proof using minHbar solHbar. by have [] := minnormal_solvable minHbar _ solHbar. Qed.
+Let p_pr : prime p. Proof using abelHbar ntHbar. by have [/pgroup_pdiv[]] := and3P abelHbar. Qed.
+Let abHbar : abelian Hbar. Proof using abelHbar. exact: abelem_abelian abelHbar. Qed.
 
 (* This is Peterfalvi, Hypothesis (9.5). *)
 Fact Ptype_Fcompl_kernel_key : unit. Proof. by []. Qed.
@@ -224,7 +224,7 @@ Local Notation H0C' := (`H0 <*> `C^`(1)%g)%G.
 Local Notation "` 'H0C''" := (`H0 <*> `C^`(1)) (at level 0) : group_scope.
 
 Let defW2bar : W2bar :=: W2 / H0.
-Proof.
+Proof using coH_UW1 defW2 nH0M sH0H.
 rewrite -defW2 coprime_quotient_cent ?(subset_trans _ nH0M) //.
   by have [_ /mulG_sub[]] := sdprodP defM.
 exact: coprimegS (joing_subr _ _) coH_UW1.
@@ -233,7 +233,7 @@ Qed.
 Let sCU : C \subset U. Proof. by rewrite [C]unlock subsetIl. Qed.
 
 Let nsCUW1 : C <| U <*> W1.
-Proof.
+Proof using nH0M.
 have [_ sUW1M _ nHUW1 _] := sdprod_context defHUW1.
 rewrite /normal [C]unlock subIset ?joing_subl // normsI //.
   by rewrite join_subG normG.
@@ -243,7 +243,7 @@ Qed.
 
 Lemma Ptype_Fcore_extensions_normal :
   [/\ H0C <| M, HC <| M, H0U' <| M & H0C' <| M].
-Proof.
+Proof using nsCUW1 nsH0H.
 have [nsHUM sW1M /mulG_sub[sHUM _] nHUW1 tiHUW1] := sdprod_context defM.
 have [nsHHU sUHU /mulG_sub[sHHU _] nHU tiHU] := sdprod_context defHU.
 have [sHM sUM] := (subset_trans sHHU sHUM, subset_trans sUHU sHUM).
@@ -266,7 +266,7 @@ Qed.
 Local Notation nsH0xx_M := Ptype_Fcore_extensions_normal.
 
 Let Du : u = #|HU : HC|.
-Proof.
+Proof using nsCUW1.
 have nCU := subset_trans (joing_subl U W1) (normal_norm nsCUW1).
 by rewrite -(index_sdprodr defHU) -?card_quotient.
 Qed.
@@ -274,7 +274,7 @@ Qed.
 (* This is Peterfalvi (9.6). *)
 Lemma Ptype_Fcore_factor_facts :
   [/\ C :!=: U, #|W2bar| = p & #|Hbar| = p ^ q]%N.
-Proof.
+Proof using abelHbar defW2bar ntHbar.
 have [defUW1 _ ntW1 _ _] := Frobenius_context Ptype_compl_Frobenius.
 have coHW1: coprime #|H| #|W1| := coprimegS (joing_subr U W1) coH_UW1.
 have [_ sUW1M _ nHUW1 _] := sdprod_context defHUW1.
@@ -305,7 +305,7 @@ by rewrite trivg_card1 oHbar W2bar1 exp1n.
 Qed.
 
 Lemma def_Ptype_factor_prime : prime #|W2| -> p = #|W2|.
-Proof.
+Proof using coHU defW2bar p_pr q sW2H.
 move=> prW2; suffices: p \in \pi(W2) by rewrite !(primes_prime, inE) // => /eqP.
 rewrite mem_primes p_pr cardG_gt0; have [_ <- _] := Ptype_Fcore_factor_facts.
 by rewrite defW2bar dvdn_quotient.
@@ -313,12 +313,12 @@ Qed.
 
 (* The first assertion of (9.4)(b) (the rest is subsumed by (9.6)). *)
 Lemma typeIII_IV_core_prime : FTtype M != 2 -> p = #|W2|.
-Proof.
+Proof using coHU defW2bar p_pr q sW2H.
 by have:= typeII_IV_core => /=; case: ifP => // _ [/def_Ptype_factor_prime].
 Qed.
 
 Let frobUW1c : [Frobenius U <*> W1 / C = Ubar ><| W1 / C].
-Proof.
+Proof using abelHbar defW2bar nsCUW1 ntHbar.
 apply: Frobenius_quotient frobUW1 _ nsCUW1 _.
   by apply: nilpotent_sol; have [_ []] := MtypeP.
 by have [] := Ptype_Fcore_factor_facts; rewrite eqEsubset sCU.
@@ -335,7 +335,7 @@ Lemma typeP_Galois_Pn :
       & let a := #|U : 'C_U(H1 | 'Q)| in
         [/\ a > 1, a %| p.-1, cyclic (U / 'C_U(H1 | 'Q))
           & exists V : {group 'rV['Z_a]_q.-1}, Ubar \isog V]]}.
-Proof.
+Proof using abHbar frobUW1c nsH0H p_pr pr_q.
 have [_ sUW1M defHUW1 nHUW1 _] := sdprod_context defHUW1.
 have [nHU nHW1] := joing_subP nHUW1.
 have nH0UW1 := subset_trans sUW1M nH0M; have [nH0U nH0W1] := joing_subP nH0UW1.
@@ -512,7 +512,7 @@ Lemma typeP_Galois_P :
    & 'ker psi = C /\ {in Hbar & U, morph_act 'Q 'U phi psi}}
    & [/\ #|F| = (p ^ q)%N, isom Hbar [set: F] phi & phi @* W2bar = <[1%R : F]>]}
    & [/\ cyclic Ubar, coprime u p.-1 & u %| (p ^ q).-1 %/ p.-1]}.
-Proof.
+Proof using frobUW1c nsH0H p_pr pr_q.
 move=> irrU; have [_ sUW1M _ /joing_subP[nHU nHW1] _] := sdprod_context defHUW1.
 have [nHbU nHbW1] := (quotient_norms H0 nHU, quotient_norms H0 nHW1).
 have{sUW1M} /joing_subP[nH0U nH0W1] := subset_trans sUW1M nH0M.
@@ -764,7 +764,7 @@ Let mu_ := filter redM (S_ H0).
 
 (* This subproof is shared between (9.8)(b) and (9.9)(b). *)
 Let nb_redM_H0 : size mu_ = p.-1 /\ {subset mu_ <= S_ H0C}.
-Proof.
+Proof using defW2bar nsCUW1 nsH0H p_pr.
 have pddM := FT_prDade_hypF maxM MtypeP; pose ptiWM := prDade_prTI pddM.
 have [nsHUM sW1M /mulG_sub[sHUM _] nHUW1 tiHUW1] := sdprod_context defM.
 have [nsHHU sUHU /mulG_sub[sHHU _] nHU tiHU] := sdprod_context defHU.
@@ -1247,7 +1247,7 @@ Lemma typeP_Galois_characters (is_Galois : typeP_Galois) :
     & (*c*) all redM (S_ H0C') ->
             [/\ C :=: 1%g, u = (p ^ q).-1 %/ p.-1
               & [Frobenius HU / H0 = Hbar ><| (U / H0)]]].
-Proof.
+Proof using Du abHbar frobUW1c nb_redM_H0 pr_q.
 have [F [phi [psi _ [Kpsi phiJ]]]] := typeP_Galois_P is_Galois.
 case=> [oF /isomP[inj_phi im_phi] phiW2] [cycUbar co_u_p1 u_dv_pq1].
 have [nsHUM sW1M /mulG_sub[sHUM _] nHUW1 tiHUW1] := sdprod_context defM.
@@ -1408,7 +1408,7 @@ Lemma typeP_reducible_core_Ind (ptiWM := FT_primeTI_hyp MtypeP) :
   [/\ size mu_ = p.-1, has predT mu_,
       {subset mu_ <= [seq primeTIred ptiWM j | j in predC1 0]}
     & {in mu_, forall mu_j, isIndHC mu_j}].
-Proof.
+Proof using Du abHbar frobUW1c nb_redM_H0 pr_q.
 have [[sz_mu _] /mulG_sub[sHHU _]] := (nb_redM_H0, sdprodW defHU).
 rewrite has_predT sz_mu -subn1 subn_gt0 prime_gt1 //; split=> // [mu_j|].
   rewrite mem_filter => /andP[red_chi /seqIndP[s /setDP[_ kerH's] Dchi]].
@@ -1426,7 +1426,7 @@ Lemma typeP_reducible_core_cases :
   + [/\ typeP_Galois, [Frobenius HU / H0 = Hbar ><| (U / H0)],
         cyclic U, #|U| = (p ^ q).-1 %/ p.-1
       & FTtype M == 2 -> [Frobenius HU = H ><| U]].
-Proof.
+Proof using Du abHbar frobUW1c nb_redM_H0 pr_q.
 have [GalM | Gal'M] := boolP typeP_Galois; last first.
   pose eqInHCb nu r := ('chi_r \is a linear_char) && (nu == 'Ind[M, HC] 'chi_r).
   pose isIndHCb (nu : 'CF(M)) :=
@@ -1466,7 +1466,7 @@ Import ssrint.
 (* in a slightly different argument, but the inference is nontrivial in       *)
 (* either case.                                                               *)
 Lemma Ptype_core_coherence : coherent (S_ H0C') M^# tau.
-Proof.
+Proof using Du abHbar frobUW1c nb_redM_H0 pr_q.
 have [nsHUM sW1M /mulG_sub[sHUM _] nHUW1 tiHUW1] := sdprod_context defM.
 have [nsHHU sUHU /mulG_sub[sHHU _] nHU tiHU] := sdprod_context defHU.
 have nsCU: C <| U := normalS sCU (joing_subl _ _) nsCUW1.

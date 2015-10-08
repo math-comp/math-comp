@@ -780,24 +780,24 @@ Variables (Adl : 'M[R]_(m2, n1)) (Adr : 'M[R]_(m2, n2)).
 Let A := block_mx Aul Aur Adl Adr.
 
 Lemma block_mxEul i j : A (lshift m2 i) (lshift n2 j) = Aul i j.
-Proof. by rewrite col_mxEu row_mxEl. Qed.
+Proof using Adl Adr Aur. by rewrite col_mxEu row_mxEl. Qed.
 Lemma block_mxKul : ulsubmx A = Aul.
-Proof. by rewrite /ulsubmx col_mxKu row_mxKl. Qed.
+Proof using Adl Adr Aur. by rewrite /ulsubmx col_mxKu row_mxKl. Qed.
 
 Lemma block_mxEur i j : A (lshift m2 i) (rshift n1 j) = Aur i j.
-Proof. by rewrite col_mxEu row_mxEr. Qed.
+Proof using Adl Adr Aul. by rewrite col_mxEu row_mxEr. Qed.
 Lemma block_mxKur : ursubmx A = Aur.
-Proof. by rewrite /ursubmx col_mxKu row_mxKr. Qed.
+Proof using Adl Adr Aul. by rewrite /ursubmx col_mxKu row_mxKr. Qed.
 
 Lemma block_mxEdl i j : A (rshift m1 i) (lshift n2 j) = Adl i j.
-Proof. by rewrite col_mxEd row_mxEl. Qed.
+Proof using Adr Aul Aur. by rewrite col_mxEd row_mxEl. Qed.
 Lemma block_mxKdl : dlsubmx A = Adl.
-Proof. by rewrite /dlsubmx col_mxKd row_mxKl. Qed.
+Proof using Adr Aul Aur. by rewrite /dlsubmx col_mxKd row_mxKl. Qed.
 
 Lemma block_mxEdr i j : A (rshift m1 i) (rshift n1 j) = Adr i j.
-Proof. by rewrite col_mxEd row_mxEr. Qed.
+Proof using Adl Aul Aur. by rewrite col_mxEd row_mxEr. Qed.
 Lemma block_mxKdr : drsubmx A = Adr.
-Proof. by rewrite /drsubmx col_mxKd row_mxKr. Qed.
+Proof using Adl Aul Aur. by rewrite /drsubmx col_mxKd row_mxKr. Qed.
 
 Lemma block_mxEv : A = col_mx (row_mx Aul Aur) (row_mx Adl Adr).
 Proof. by []. Qed.

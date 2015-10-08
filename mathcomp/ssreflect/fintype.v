@@ -185,7 +185,7 @@ Definition count_enum := pmap (@pickle_inv T) (iota 0 n).
 Hypothesis ubT : forall x : T, pickle x < n.
 
 Lemma count_enumP : axiom count_enum.
-Proof.
+Proof using ubT.
 apply: uniq_enumP (pmap_uniq (@pickle_invK T) (iota_uniq _ _)) _ => x.
 by rewrite mem_pmap -pickleK_inv map_f // mem_iota ubT.
 Qed.
@@ -841,10 +841,10 @@ Variables (T : finType) (P : pred T) (PP : T -> Prop).
 Hypothesis viewP : forall x, reflect (PP x) (P x).
 
 Lemma existsPP : reflect (exists x, PP x) [exists x, P x].
-Proof. by apply: (iffP pred0Pn) => -[x /viewP]; exists x. Qed.
+Proof using All. by apply: (iffP pred0Pn) => -[x /viewP]; exists x. Qed.
 
 Lemma forallPP : reflect (forall x, PP x) [forall x, P x].
-Proof. by apply: (iffP pred0P) => /= allP x; have /viewP//=-> := allP x. Qed.
+Proof using All. by apply: (iffP pred0P) => /= allP x; have /viewP//=-> := allP x. Qed.
 
 End QuantifierCombinators.
 
@@ -947,10 +947,10 @@ Hypothesis Pi0 : P i0.
 Let FP n := [exists (i | P i), F i == n].
 Let FP_F i : P i -> FP (F i).
 Proof. by move=> Pi; apply/existsP; exists i; rewrite Pi /=. Qed.
-Let exFP : exists n, FP n. Proof. by exists (F i0); apply: FP_F. Qed.
+Let exFP : exists n, FP n. Proof using FP_F Pi0. by exists (F i0); apply: FP_F. Qed.
 
 Lemma arg_minP : extremum_spec leq arg_min.
-Proof.
+Proof using exFP.
 rewrite /arg_min; case: pickP => [i /andP[Pi /forallP/= min_i] | no_i].
   by split=> // j; apply/implyP.
 case/ex_minnP: exFP => n ex_i min_i; case/pred0P: ex_i => i /=.
@@ -959,7 +959,7 @@ by apply/forall_inP=> j Pj; rewrite def_n min_i ?FP_F.
 Qed.
 
 Lemma arg_maxP : extremum_spec geq arg_max.
-Proof.
+Proof using exFP.
 rewrite /arg_max; case: pickP => [i /andP[Pi /forall_inP/= max_i] | no_i].
   by split=> // j; apply/implyP.
 have (n): FP n -> n <= foldr maxn 0 (map F (enum P)).
@@ -1143,29 +1143,29 @@ Section Injective.
 Hypothesis injf : injective f.
 
 Lemma mem_image A x : (f x \in image f A) = (x \in A).
-Proof. by rewrite mem_map ?mem_enum. Qed.
+Proof using All. by rewrite mem_map ?mem_enum. Qed.
 
 Lemma pre_image A : [preim f of image f A] =i A.
-Proof. by move=> x; rewrite inE /= mem_image. Qed.
+Proof using All. by move=> x; rewrite inE /= mem_image. Qed.
 
 Lemma image_iinv A y (fTy : y \in codom f) :
   (y \in image f A) = (iinv fTy \in A).
-Proof. by rewrite -mem_image ?f_iinv. Qed.
+Proof using All. by rewrite -mem_image ?f_iinv. Qed.
 
 Lemma iinv_f x fTfx : @iinv T (f x) fTfx = x.
-Proof. by apply: in_iinv_f; first apply: in2W. Qed.
+Proof using All. by apply: in_iinv_f; first apply: in2W. Qed.
 
 Lemma image_pre (B : pred T') : image f [preim f of B] =i [predI B & codom f].
 Proof. by move=> y; rewrite /image_mem -filter_map /= mem_filter -enumT. Qed.
 
 Lemma bij_on_codom (x0 : T) : {on [pred y in codom f], bijective f}.
-Proof.
+Proof using All.
 pose g y := iinv (valP (insigd (codom_f x0) y)).
 by exists g => [x fAfx | y fAy]; first apply: injf; rewrite f_iinv insubdK.
 Qed.
 
 Lemma bij_on_image A (x0 : T) : {on [pred y in image f A], bijective f}.
-Proof. exact: subon_bij (@image_codom A) (bij_on_codom x0). Qed.
+Proof using All. exact: subon_bij (@image_codom A) (bij_on_codom x0). Qed.
 
 End Injective.
 
@@ -1217,13 +1217,13 @@ Qed.
 Hypothesis injf : injective f.
 
 Lemma card_image A : #|image f A| = #|A|.
-Proof. by apply: card_in_image; apply: in2W. Qed.
+Proof using All. by apply: card_in_image; apply: in2W. Qed.
 
 Lemma card_codom : #|codom f| = #|T|.
-Proof. exact: card_image. Qed.
+Proof using All. exact: card_image. Qed.
 
 Lemma card_preim (B : pred T') : #|[preim f of B]| = #|[predI codom f & B]|.
-Proof.
+Proof using All.
 rewrite -card_image /=; apply: eq_card => y.
 by rewrite [y \in _]image_pre !inE andbC.
 Qed.
@@ -1231,10 +1231,10 @@ Qed.
 Hypothesis card_range : #|T| = #|T'|.
 
 Lemma inj_card_onto y : y \in codom f.
-Proof. by move: y; apply/subset_cardP; rewrite ?card_codom ?subset_predT. Qed.
+Proof using All. by move: y; apply/subset_cardP; rewrite ?card_codom ?subset_predT. Qed.
 
 Lemma inj_card_bij :  bijective f.
-Proof.
+Proof using All.
 by exists (fun y => iinv (inj_card_onto y)) => y; rewrite ?iinv_f ?f_iinv.
 Qed.
 
@@ -1250,27 +1250,27 @@ Section Inv.
 
 Hypothesis injf : injective f.
 
-Lemma injF_onto y : y \in codom f. Proof. exact: inj_card_onto. Qed.
+Lemma injF_onto y : y \in codom f. Proof using injf. exact: inj_card_onto. Qed.
 Definition invF y := iinv (injF_onto y).
 Lemma invF_f : cancel f invF. Proof. by move=> x; apply: iinv_f. Qed.
 Lemma f_invF : cancel invF f. Proof. by move=> y; apply: f_iinv. Qed.
-Lemma injF_bij : bijective f. Proof. exact: inj_card_bij. Qed.
+Lemma injF_bij : bijective f. Proof using injf. exact: inj_card_bij. Qed.
 
 End Inv.
 
 Hypothesis fK : cancel f g.
 
 Lemma canF_sym : cancel g f.
-Proof. exact/(bij_can_sym (injF_bij (can_inj fK))). Qed.
+Proof using fK. exact/(bij_can_sym (injF_bij (can_inj fK))). Qed.
 
 Lemma canF_LR x y : x = g y -> f x = y.
-Proof. exact: canLR canF_sym. Qed.
+Proof using fK. exact: canLR canF_sym. Qed.
 
 Lemma canF_RL x y : g x = y -> x = f y.
-Proof. exact: canRL canF_sym. Qed.
+Proof using fK. exact: canRL canF_sym. Qed.
 
 Lemma canF_eq x y : (f x == y) = (x == g y).
-Proof. exact: (can2_eq fK canF_sym). Qed.
+Proof using fK. exact: (can2_eq fK canF_sym). Qed.
 
 Lemma canF_invF : g =1 invF (can_inj fK).
 Proof. by move=> y; apply: (canLR fK); rewrite f_invF. Qed.

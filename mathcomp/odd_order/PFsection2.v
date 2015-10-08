@@ -121,20 +121,20 @@ Proof. by have /andP[/subsetIP[]] := nsHC a. Qed.
 Lemma Dade_signalizer_cent a : H a \subset 'C[a].
 Proof. by have /andP[/subsetIP[]] := nsHC a. Qed.
 
-Let nsAL : A <| L. Proof. by have [->] := ddA. Qed.
-Let sAL : A \subset L. Proof. exact: normal_sub nsAL. Qed.
-Let nAL : L \subset 'N(A). Proof. exact: normal_norm nsAL. Qed.
-Let sLG : L \subset G. Proof. by have [_ ->] := ddA. Qed.
-Let notA1 : 1%g \notin A. Proof. by have [_ _ ->] := ddA. Qed.
+Let nsAL : A <| L. Proof using ddA. by have [->] := ddA. Qed.
+Let sAL : A \subset L. Proof using nsAL. exact: normal_sub nsAL. Qed.
+Let nAL : L \subset 'N(A). Proof using nsAL. exact: normal_norm nsAL. Qed.
+Let sLG : L \subset G. Proof using ddA. by have [_ ->] := ddA. Qed.
+Let notA1 : 1%g \notin A. Proof using ddA. by have [_ _ ->] := ddA. Qed.
 Let conjAG : {in A &, forall x, {subset x ^: G <= x ^: L}}.
-Proof. by have [_ _ _ ? _] := ddA. Qed.
+Proof using ddA. by have [_ _ _ ? _] := ddA. Qed.
 Let sHG := Dade_signalizer_sub.
 Let cHA := Dade_signalizer_cent.
 Let notHa0 a : H a :* a :!=: set0.
 Proof. by rewrite -cards_eq0 -lt0n card_rcoset cardG_gt0. Qed.
 
 Let HallCL a : a \in A -> pi.-Hall('C_G[a]) 'C_L[a].
-Proof.
+Proof using ddA.
 move=> Aa; have [_ _ _ _ [H1 /(_ a Aa)/sdprodP[_ defCa _ _] coH1L]] := ddA.
 have [|//] := coprime_mulGp_Hall defCa _ (piCL Aa).
 apply: sub_pgroup (pgroup_pi _) => p; apply: contraL => /exists_inP[b Ab].
@@ -538,7 +538,7 @@ Lemma Dade_Ind_expansion B g :
        ('Ind[G, 'M(B)] 'aa_B) g =
           (aa a / #|'M(B)|%:R) *
                \sum_(b in 'N_L(B) :&: a ^: L) #|calA g ('H(B) :* b)|%:R}].
-Proof.
+Proof using CFaa.
 move=> dB; set LHS := 'Ind _ g.
 have defMB := Dade_set_sdprod dB; have [_ mulHNB nHNB tiHNB] := sdprodP defMB.
 have [sHMB sNMB] := mulG_sub mulHNB.
@@ -598,7 +598,7 @@ Qed.
 (* This is Peterfalvi (2.10) *)
 Lemma Dade_expansion :
   aa^\tau = - \sum_(B in calB) (- 1) ^+ #|B| *: 'Ind[G, 'M(B)] 'aa_B.
-Proof.
+Proof using CFaa.
 apply/cfunP=> g; rewrite !cfunElock sum_cfunE.
 pose n1 (B : {set gT}) : algC := (-1) ^+ #|B| / #|L : 'N_L(B)|%:R.
 pose aa1 B := ('Ind[G, 'M(B)] 'aa_B) g.
@@ -751,7 +751,7 @@ Let ssA1A := subsetP sA1A.
 
 (* This is Peterfalvi (2.11), first part. *)
 Lemma restr_Dade_hyp : Dade_hypothesis G L A1.
-Proof.
+Proof using All.
 have [/andP[sAL nAL] notA_1 sLG conjAG [H defCa coHL]] := ddA.
 have nsA1L: A1 <| L by rewrite /normal (subset_trans sA1A).
 split; rewrite ?(contra (@ssA1A _)) //; first exact: sub_in2 conjAG.
@@ -798,7 +798,7 @@ Hypotheses (tiAG : normedTI A G L) (sAG1 : A \subset G^#).
 
 (* This is the existence part of Peterfalvi (2.3). *)
 Lemma normedTI_Dade : Dade_hypothesis G L A.
-Proof.
+Proof using All.
 have [[sAG notA1] [_ _ /eqP defL]] := (subsetD1P sAG1, and3P tiAG).
 have [_ sLG tiAG_L] := normedTI_memJ_P tiAG.
 split=> // [|a b Aa Ab /imsetP[x Gx def_b]|].
@@ -814,17 +814,17 @@ Let def_ddA := Dade_Ind normedTI_Dade tiAG.
 (* This is the identity part of Isaacs, Lemma 7.7. *)
 Lemma normedTI_Ind_id1 :
   {in 'CF(L, A) & 1%g |: A, forall alpha, 'Ind[G] alpha =1 alpha}.
-Proof. by move=> aa a CFaa A1a; rewrite /= -def_ddA // Dade_id1. Qed.
+Proof using All. by move=> aa a CFaa A1a; rewrite /= -def_ddA // Dade_id1. Qed.
 
 (* A more restricted, but more useful form. *)
 Lemma normedTI_Ind_id :
   {in 'CF(L, A) & A, forall alpha, 'Ind[G] alpha =1 alpha}.
-Proof. by apply: sub_in11 normedTI_Ind_id1 => //; apply/subsetP/subsetUr. Qed.
+Proof using All. by apply: sub_in11 normedTI_Ind_id1 => //; apply/subsetP/subsetUr. Qed.
 
 (* This is the isometry part of Isaacs, Lemma 7.7. *)
 (* The statement in Isaacs is slightly more general in that it allows for     *)
 (* beta \in 'CF(L, 1%g |: A); this appears to be more cumbersome than useful. *)
 Lemma normedTI_isometry : {in 'CF(L, A) &, isometry 'Ind[G]}.
-Proof. by move=> aa bb CFaa CFbb; rewrite /= -!def_ddA // Dade_isometry. Qed.
+Proof using All. by move=> aa bb CFaa CFbb; rewrite /= -!def_ddA // Dade_isometry. Qed.
 
 End NormedTI.

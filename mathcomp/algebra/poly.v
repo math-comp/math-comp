@@ -1217,20 +1217,20 @@ Section OnePrimitive.
 Variables (n : nat) (z : R).
 Hypothesis prim_z : n.-primitive_root z.
 
-Lemma prim_order_gt0 : n > 0. Proof. by case/andP: prim_z. Qed.
+Lemma prim_order_gt0 : n > 0. Proof using All. by case/andP: prim_z. Qed.
 Let n_gt0 := prim_order_gt0.
 
 Lemma prim_expr_order : z ^+ n = 1.
-Proof.
+Proof using All.
 case/andP: prim_z => _; rewrite -(prednK n_gt0) => /forallP/(_ ord_max).
 by rewrite unity_rootE eqxx eqb_id => /eqP.
 Qed.
 
 Lemma prim_expr_mod i : z ^+ (i %% n) = z ^+ i.
-Proof. exact: expr_mod prim_expr_order. Qed.
+Proof using All. exact: expr_mod prim_expr_order. Qed.
 
 Lemma prim_order_dvd i : (n %| i) = (z ^+ i == 1).
-Proof.
+Proof using All.
 move: n_gt0; rewrite -prim_expr_mod /dvdn -(ltn_mod i).
 case: {i}(i %% n)%N => [|i] lt_i; first by rewrite !eqxx.
 case/andP: prim_z => _ /forallP/(_ (Ordinal (ltnW lt_i))).
@@ -1238,7 +1238,7 @@ by move/eqP; rewrite unity_rootE eqn_leq andbC leqNgt lt_i.
 Qed.
 
 Lemma eq_prim_root_expr i j : (z ^+ i == z ^+ j) = (i == j %[mod n]).
-Proof.
+Proof using All.
 wlog le_ji: i j / j <= i.
   move=> IH; case: (leqP j i); last move/ltnW; move/IH=> //.
   by rewrite eq_sym (eq_sym (j %% n)%N).
@@ -1249,7 +1249,7 @@ by rewrite subnK ?prim_expr_order ?mul1r // ltnW ?ltn_mod.
 Qed.
 
 Lemma exp_prim_root k : (n %/ gcdn k n).-primitive_root (z ^+ k).
-Proof.
+Proof using All.
 set d := gcdn k n; have d_gt0: (0 < d)%N by rewrite gcdn_gt0 orbC n_gt0.
 have [d_dv_k d_dv_n]: (d %| k /\ d %| n)%N by rewrite dvdn_gcdl dvdn_gcdr.
 set q := (n %/ d)%N; rewrite /q.-primitive_root ltn_divRL // n_gt0.
@@ -1261,7 +1261,7 @@ by rewrite /coprime gcdnC -(eqn_pmul2r d_gt0) mul1n muln_gcdl !divnK.
 Qed.
 
 Lemma dvdn_prim_root m : (m %| n)%N -> m.-primitive_root (z ^+ (n %/ m)).
-Proof.
+Proof using All.
 set k := (n %/ m)%N => m_dv_n; rewrite -{1}(mulKn m n_gt0) -divnA // -/k.
 by rewrite -{1}(@gcdn_idPl k n _) ?exp_prim_root // -(divnK m_dv_n) dvdn_mulr.
 Qed.
@@ -1754,19 +1754,19 @@ Qed.
 Hypotheses (inj_f : injective f) (f_0 : f 0 = 0).
 
 Lemma size_map_inj_poly p : size p^f = size p.
-Proof.
+Proof using Type*.
 have [-> | nz_p] := eqVneq p 0; first by rewrite map_poly0 !size_poly0.
 by rewrite size_map_poly_id0 // -f_0 (inj_eq inj_f) lead_coef_eq0.
 Qed.
 
 Lemma map_inj_poly : injective (map_poly f).
-Proof.
+Proof using Type*.
 move=> p q /polyP eq_pq; apply/polyP=> i; apply: inj_f.
 by rewrite -!coef_map_id0 ?eq_pq.
 Qed.
 
 Lemma lead_coef_map_inj p : lead_coef p^f = f (lead_coef p).
-Proof. by rewrite !lead_coefE size_map_inj_poly coef_map_id0. Qed.
+Proof using Type*. by rewrite !lead_coefE size_map_inj_poly coef_map_id0. Qed.
 
 End Combinatorial.
 
@@ -2441,7 +2441,7 @@ Hypothesis prim_z : n.-primitive_root z.
 Let zn := [seq z ^+ i | i <- index_iota 0 n].
 
 Lemma factor_Xn_sub_1 : \prod_(0 <= i < n) ('X - (z ^+ i)%:P) = 'X^n - 1.
-Proof.
+Proof using prim_z.
 transitivity (\prod_(w <- zn) ('X - w%:P)); first by rewrite big_map.
 have n_gt0: n > 0 := prim_order_gt0 prim_z.
 rewrite (@all_roots_prod_XsubC _ ('X^n - 1) zn); first 1 last.
@@ -2455,7 +2455,7 @@ by rewrite (monicP (monic_Xn_sub_1 F n_gt0)) scale1r.
 Qed.
 
 Lemma prim_rootP x : x ^+ n = 1 -> {i : 'I_n | x = z ^+ i}.
-Proof.
+Proof using prim_z.
 move=> xn1; pose logx := [pred i : 'I_n | x == z ^+ i].
 case: (pickP logx) => [i /eqP-> | no_i]; first by exists i.
 case: notF; suffices{no_i}: x \in zn.
@@ -2549,7 +2549,7 @@ Hypothesis closedF : GRing.ClosedField.axiom F.
 Implicit Type p : {poly F}.
 
 Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1%N).
-Proof.
+Proof using All.
 have [-> | nz_p] := eqVneq p 0.
   by rewrite size_poly0; left; exists 0; rewrite root0.
 rewrite neq_ltn {1}polySpred //=.
@@ -2562,7 +2562,7 @@ by rewrite -!mulrA mulrCA mulNr mulVKf ?subrr ?lead_coef_eq0.
 Qed.
 
 Lemma closed_nonrootP p : reflect (exists x, ~~ root p x) (p != 0).
-Proof.
+Proof using All.
 apply: (iffP idP) => [nz_p | [x]]; last first.
   by apply: contraNneq => ->; apply: root0.
 have [[x /rootP p1x0]|] := altP (closed_rootP (p - 1)).

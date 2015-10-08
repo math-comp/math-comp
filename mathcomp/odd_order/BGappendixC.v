@@ -57,10 +57,10 @@ Let Fpq : {vspace F} := fullv.
 Let Fp : {vspace F} := 1%VS.
 
 Hypothesis oF : #|F| = (p ^ q)%N.
-Let oF_p : #|'F_p| = p. Proof. exact: card_Fp. Qed.
-Let oFp : #|Fp| = p. Proof. by rewrite card_vspace1. Qed.
-Let oFpq : #|Fpq| = (p ^ q)%N. Proof. by rewrite card_vspacef. Qed.
-Let dimFpq : \dim Fpq = q. Proof. by rewrite primeChar_dimf oF pfactorK. Qed.
+Let oF_p : #|'F_p| = p. Proof using pr_p. exact: card_Fp. Qed.
+Let oFp : #|Fp| = p. Proof using oF_p. by rewrite card_vspace1. Qed.
+Let oFpq : #|Fpq| = (p ^ q)%N. Proof using oF. by rewrite card_vspacef. Qed.
+Let dimFpq : \dim Fpq = q. Proof using oF pr_p. by rewrite primeChar_dimf oF pfactorK. Qed.
 
 Variables (sigma : {morphism P >-> F}) (sigmaU : {morphism U >-> {unit F}}).
 Hypotheses (inj_sigma : 'injm sigma) (inj_sigmaU : 'injm sigmaU).
@@ -70,14 +70,14 @@ Hypotheses (sP0P : P0 \subset P) (sigma_s : sigma s = 1) (defP0 : <[s]> = P0).
 
 Let psi u : F := val (sigmaU u).
 Let inj_psi : {in U &, injective psi}.
-Proof. by move=> u v Uu Uv /val_inj/(injmP inj_sigmaU)->. Qed.
+Proof using inj_sigmaU. by move=> u v Uu Uv /val_inj/(injmP inj_sigmaU)->. Qed.
 
 Hypothesis sigmaJ : {in P & U, forall x u, sigma (x ^ u) = sigma x * psi u}.
 
-Let Ps : s \in P. Proof. by rewrite -cycle_subG defP0. Qed.
-Let P0s : s \in P0. Proof. by rewrite -defP0 cycle_id. Qed.
+Let Ps : s \in P. Proof using defP0 sP0P. by rewrite -cycle_subG defP0. Qed.
+Let P0s : s \in P0. Proof using defP0. by rewrite -defP0 cycle_id. Qed.
 
-Let nz_psi u : psi u != 0. Proof. by rewrite -unitfE (valP (sigmaU u)). Qed.
+Let nz_psi u : psi u != 0. Proof using sigmaU. by rewrite -unitfE (valP (sigmaU u)). Qed.
 
 Let sigma1 : sigma 1%g = 0. Proof. exact: morph1. Qed.
 Let sigmaM : {in P &, {morph sigma : x1 x2 / (x1 * x2)%g >-> x1 + x2}}.
@@ -87,42 +87,42 @@ Proof. exact: morphV. Qed.
 Let sigmaX n : {in P, {morph sigma : x / (x ^+ n)%g >-> x *+ n}}.
 Proof. exact: morphX. Qed.
 
-Let psi1 : psi 1%g = 1. Proof. by rewrite /psi morph1. Qed.
+Let psi1 : psi 1%g = 1. Proof using sigmaU. by rewrite /psi morph1. Qed.
 Let psiM : {in U &, {morph psi : u1 u2 / (u1 * u2)%g >-> u1 * u2}}.
-Proof. by move=> u1 u2 Uu1 Uu2; rewrite /psi morphM. Qed.
+Proof using sigmaU. by move=> u1 u2 Uu1 Uu2; rewrite /psi morphM. Qed.
 Let psiV : {in U, {morph psi : u / u^-1%g >-> u^-1}}.
-Proof. by move=> u Uu; rewrite /psi morphV. Qed.
+Proof using sigmaU. by move=> u Uu; rewrite /psi morphV. Qed.
 Let psiX n : {in U, {morph psi : u / (u ^+ n)%g >-> u ^+ n}}.
-Proof. by move=> u Uu; rewrite /psi morphX // val_unitX. Qed.
+Proof using sigmaU. by move=> u Uu; rewrite /psi morphX // val_unitX. Qed.
 
 Let sigmaE := (sigma1, sigma_s, mulr1, mul1r,
                (sigmaJ, sigmaX, sigmaM, sigmaV), (psi1, psiX, psiM, psiV)).
 
 Let psiE u : u \in U -> psi u = sigma (s ^ u).
-Proof. by move=> Uu; rewrite !sigmaE. Qed.
+Proof using Ps sigmaJ sigma_s. by move=> Uu; rewrite !sigmaE. Qed.
 
-Let nPU : U \subset 'N(P). Proof. by have [] := sdprodP defH. Qed.
+Let nPU : U \subset 'N(P). Proof using defH. by have [] := sdprodP defH. Qed.
 Let memJ_P : {in P & U, forall x u, x ^ u \in P}.
-Proof. by move=> x u Px Uu; rewrite /= memJ_norm ?(subsetP nPU). Qed.
+Proof using nPU. by move=> x u Px Uu; rewrite /= memJ_norm ?(subsetP nPU). Qed.
 Let in_PU := (memJ_P, in_group).
 
 Let sigmaP0 : sigma @* P0 =i Fp.
-Proof.
+Proof using Ps sigma_s.
 rewrite -defP0 morphim_cycle // sigma_s => x.
 apply/cycleP/vlineP=> [] [n ->]; first by exists n%:R; rewrite scaler_nat.
 by exists (val n); rewrite -{1}[n]natr_Zp -in_algE rmorph_nat zmodXgE.
 Qed.
 
 Let nt_s : s != 1%g.
-Proof. by rewrite -(morph_injm_eq1 inj_sigma) // sigmaE oner_eq0. Qed.
+Proof using Ps inj_sigma sigmaE. by rewrite -(morph_injm_eq1 inj_sigma) // sigmaE oner_eq0. Qed.
 
-Let p_gt0 : (0 < p)%N. Proof. exact: prime_gt0. Qed.
-Let q_gt0 : (0 < q)%N. Proof. exact: prime_gt0. Qed.
-Let p1_gt0 : (0 < p.-1)%N. Proof. by rewrite -subn1 subn_gt0 prime_gt1. Qed.
+Let p_gt0 : (0 < p)%N. Proof using pr_p. exact: prime_gt0. Qed.
+Let q_gt0 : (0 < q)%N. Proof using pr_q. exact: prime_gt0. Qed.
+Let p1_gt0 : (0 < p.-1)%N. Proof using pr_p. by rewrite -subn1 subn_gt0 prime_gt1. Qed.
 
 (* This is B & G, Appendix C, Remark I. *)
 Let not_dvd_q_p1 : ~~ (q %| p.-1)%N.
-Proof.
+Proof using coUp1 p1_gt0 p_gt0 pr_q.
 rewrite -prime_coprime // -[q]card_ord -sum1_card -coprime_modl -modn_summ.
 have:= coUp1; rewrite /nU predn_exp mulKn //= -coprime_modl -modn_summ.
 congr (coprime (_ %% _) _); apply: eq_bigr => i _.
@@ -131,20 +131,20 @@ Qed.
 
 (* This is the first assertion of B & G, Appendix C, Remark V. *)
 Let odd_p : odd p.
-Proof.
+Proof using ltqp pr_p pr_q.
 by apply: contraLR ltqp => /prime_oddPn-> //; rewrite -leqNgt prime_gt1.
 Qed.
 
 (* This is the second assertion of B & G, Appendix C, Remark V. *)
 Let odd_q : odd q.
-Proof.
+Proof using not_dvd_q_p1 odd_p.
 apply: contraR not_dvd_q_p1 => /prime_oddPn-> //.
 by rewrite -subn1 dvdn2 odd_sub ?odd_p.
 Qed.
 
-Let qgt2 : (2 < q)%N. Proof. by rewrite odd_prime_gt2. Qed.
-Let pgt4 : (4 < p)%N. Proof. by rewrite odd_geq ?(leq_ltn_trans qgt2). Qed.
-Let qgt1 : (1 < q)%N. Proof. exact: ltnW. Qed.
+Let qgt2 : (2 < q)%N. Proof using odd_q. by rewrite odd_prime_gt2. Qed.
+Let pgt4 : (4 < p)%N. Proof using qgt2. by rewrite odd_geq ?(leq_ltn_trans qgt2). Qed.
+Let qgt1 : (1 < q)%N. Proof using qgt2. exact: ltnW. Qed.
 
 Local Notation Nm := (galNorm Fp Fpq).
 Local Notation uval := (@FinRing.uval _).
@@ -152,11 +152,11 @@ Local Notation uval := (@FinRing.uval _).
 Let cycFU (FU : {group {unit F}}) : cyclic FU.
 Proof. exact: field_unit_group_cyclic. Qed.
 Let cUU : abelian U.
-Proof. by rewrite cyclic_abelian // -(injm_cyclic inj_sigmaU) ?cycFU. Qed.
+Proof using cycFU inj_sigmaU. by rewrite cyclic_abelian // -(injm_cyclic inj_sigmaU) ?cycFU. Qed.
 
 (* This is B & G, Appendix C, Remark VII. *)
 Let im_psi (x : F) : (x \in psi @: U) = (Nm x == 1).
-Proof.
+Proof using inj_sigmaU oF oF_p oU.
 have /cyclicP[u0 defFU]: cyclic [set: {unit F}] by apply: cycFU.
 have o_u0: #[u0] = (p ^ q).-1 by rewrite orderE -defFU card_finField_unit oF.
 have ->: psi @: U = uval @: (sigmaU @* U) by rewrite morphimEdom -imset_comp.
@@ -180,7 +180,7 @@ Qed.
 
 (* This is B & G, Appendix C, Remark VIII. *)
 Let defFU : sigmaU @* U \x [set u | uval u \in Fp] = [set: {unit F}].
-Proof.
+Proof using coUp1 inj_sigmaU oF oF_p oU.
 have fP v: in_alg F (uval v) \is a GRing.unit by rewrite rmorph_unit ?(valP v).
 pose f (v : {unit 'F_p}) := FinRing.unit F (fP v).
 have fM: {in setT &, {morph f: v1 v2 / (v1 * v2)%g}}.
@@ -205,7 +205,7 @@ Qed.
 
 (* This is B & G, Appendix C, Remark IX. *)
 Let frobH : [Frobenius H = P ><| U].
-Proof.
+Proof using im_sigma inj_sigma inj_sigmaU memJ_P oU pr_p q_gt0 sigmaE.
 apply/Frobenius_semiregularP=> // [||u /setD1P[ntu Uu]].
 - by rewrite -(morphim_injm_eq1 inj_sigma) // im_sigma finRing_nontrivial.
 - rewrite -cardG_gt1 oU ltn_divRL ?dvdn_pred_predX // mul1n -!subn1.
@@ -218,21 +218,21 @@ Qed.
 
 (* From the abelQ assumption of Peterfalvi, Theorem (14.2) to the assumptions *)
 (* of part (B) of the assumptions of Theorem C.                               *)
-Let p'q : q != p. Proof. by rewrite ltn_eqF. Qed.
-Let cQQ : abelian Q. Proof. exact: abelem_abelian abelQ. Qed.
-Let p'Q : p^'.-group Q. Proof. exact: pi_pgroup (abelem_pgroup abelQ) _. Qed.
+Let p'q : q != p. Proof using ltqp. by rewrite ltn_eqF. Qed.
+Let cQQ : abelian Q. Proof using abelQ. exact: abelem_abelian abelQ. Qed.
+Let p'Q : p^'.-group Q. Proof using abelQ p'q. exact: pi_pgroup (abelem_pgroup abelQ) _. Qed.
 
-Let pP : p.-group P. Proof. by rewrite /pgroup oP pnat_exp ?pnat_id. Qed.
-Let coQP : coprime #|Q| #|P|. Proof. exact: p'nat_coprime p'Q pP. Qed.
-Let sQP0Q : [~: Q, P0] \subset Q. Proof. by rewrite commg_subl. Qed.
+Let pP : p.-group P. Proof using oP pr_p. by rewrite /pgroup oP pnat_exp ?pnat_id. Qed.
+Let coQP : coprime #|Q| #|P|. Proof using p'Q pP. exact: p'nat_coprime p'Q pP. Qed.
+Let sQP0Q : [~: Q, P0] \subset Q. Proof using nQP0. by rewrite commg_subl. Qed.
 
 (* This is B & G, Appendix C, Remark X. *)
 Let defQ : 'C_Q(P0) \x [~: Q, P0] = Q.
-Proof. by rewrite dprodC coprime_abelian_cent_dprod // (coprimegS sP0P). Qed.
+Proof using cQQ coQP nQP0 sP0P. by rewrite dprodC coprime_abelian_cent_dprod // (coprimegS sP0P). Qed.
 
 (* This is B & G, Appendix C, Remark XI. *)
 Let nU_P0QP0 : exists2 y, y \in [~: Q, P0] & P0 :^ y \subset 'N(U).
-Proof.
+Proof using defQ nU_P0Q.
 have [_ /(mem_dprod defQ)[z [y [/setIP[_ cP0z] QP0y -> _]]]] := nU_P0Q.
 by rewrite conjsgM (normsP (cent_sub P0)) //; exists y.
 Qed.
@@ -244,7 +244,7 @@ Proof. by rewrite !inE -addrA subrr addr0 galNorm1 eqxx. Qed.
 
 (* This is B & G, Appendix C, Lemma C.1. *)
 Let Einv_gt1_le_pq : E = [set x^-1 | x in E] -> (1 < #|E|)%N -> (p <= q)%N.
-Proof.
+Proof using dimFpq oFp q_gt0.
 rewrite (cardsD1 1) E_1 ltnS card_gt0 => Einv /set0Pn[/= a /setD1P[not_a1 Ea]].
 pose tau (x : F) := (2%:R - x)^-1.
 have Etau x: x \in E -> tau x \in E.
@@ -284,7 +284,7 @@ Qed.
 
 (* This is B & G, Appendix C, Lemma C.2. *)
 Let E_gt1 : (1 < #|E|)%N.
-Proof.
+Proof using cUU dimFpq frobH im_psi inj_psi oP pgt4 psiE qgt1 sigmaE.
 have [q_gt4 | q_le4] := ltnP 4 q.
   pose inK x := enum_rank_in (classes1 H) (x ^: H).
   have inK_E x: x \in H -> enum_val (inK x) = x ^: H.
@@ -456,7 +456,7 @@ Import GroupScope.
 
 Variables y : gT.
 Hypotheses (QP0y : y \in [~: Q, P0]) (nUP0y : P0 :^ y \subset 'N(U)).
-Let Qy : y \in Q. Proof. by rewrite (subsetP sQP0Q). Qed.
+Let Qy : y \in Q. Proof using QP0y sQP0Q. by rewrite (subsetP sQP0Q). Qed.
 
 Let t := s ^ y.
 Let P1 := P0 :^ y.
@@ -466,7 +466,7 @@ Let splitH x :
      x \in H ->
   exists2 u, u \in U & exists2 v, v \in U & exists2 s1, s1 \in P0
   & x = u * s1 * v.
-Proof.
+Proof using P0s Ps defFU inj_sigma memJ_P sigmaE.
 case/(mem_sdprod defH) => z [v [Pz Uv -> _]].
 have [-> | nt_z] := eqVneq z 1.
   by exists 1 => //; exists v => //; exists 1; rewrite ?mulg1.
@@ -485,7 +485,7 @@ Qed.
 Let not_splitU s1 s2 u :
   s1 \in P0 -> s2 \in P0 -> u \in U -> s1 * u * s2 \in U ->
   (s1 == 1) && (s2 == 1) || (u == 1) && (s1 * s2 == 1).
-Proof.
+Proof using defFU inj_sigma memJ_P sigmaE sigmaP0.
 move=> P0s1 P0s2 Uu; have [_ _ _ tiPU] := sdprodP defH.
 have [Ps1 Ps2]: s1 \in P /\ s2 \in P by rewrite !(subsetP sP0P).
 have [-> | nt_s1 /=] := altP (s1 =P 1).
@@ -504,7 +504,7 @@ Qed.
 
 (* This is B & G, Appendix C, Lemma C.3, Step 3. *)
 Let tiH_P1 t1 : t1 \in P1^# -> H :&: H :^ t1 = U.
-Proof.
+Proof using Qy coQP defFU frobH nUP0y oFp sigmaP0 sigmaE.
 case/setD1P=>[nt_t1 P1t1]; set X := H :&: _.
 have [nsPH sUH _ _ tiPU] := sdprod_context defH.
 have sUX: U \subset X.
@@ -559,7 +559,7 @@ Qed.
 
 (* This is B & G, Appendix C, Lemma C.3, Step 4. *)
 Fact BGappendixC3_Ediv : E = [set x^-1 | x in E]%R.
-Proof.
+Proof using cUU defQ im_psi not_splitU nt_s odd_p p_gt0 sigmaE splitH t tiH_P1.
 suffices sEV_E: [set x^-1 | x in E]%R \subset E.
   by apply/esym/eqP; rewrite eqEcard sEV_E card_imset //=; apply: invr_inj.
 have /mulG_sub[/(subset_trans sP0P)/subsetP-sP0H /subsetP-sUH] := sdprodW defH.
@@ -733,7 +733,7 @@ Qed.
 End AppendixC3.
 
 Fact BGappendixC_inner_subproof : (p <= q)%N.
-Proof.
+Proof using E_gt1 Einv_gt1_le_pq P0s defFU nU_P0QP0 nt_s psiM psiV psiX sQP0Q sigmaP0.
 have [y QP0y nUP0y] := nU_P0QP0.
 by apply: Einv_gt1_le_pq E_gt1; apply: BGappendixC3_Ediv nUP0y.
 Qed.
@@ -742,7 +742,7 @@ End ExpandHypotheses.
 
 (* This is B & G, Appendix C, Theorem C. *)
 Theorem prime_dim_normed_finField : (p <= q)%N.
-Proof.
+Proof using All.
 apply: wlog_neg; rewrite -ltnNge => ltqp.
 have [F sigma /isomP[inj_sigma im_sigma] defP0] := fieldH.
 case=> sigmaU inj_sigmaU sigmaJ.

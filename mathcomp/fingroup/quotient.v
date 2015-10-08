@@ -574,7 +574,7 @@ CoInductive inv_quotient_spec (P : pred {group gT}) : Prop :=
 
 Lemma inv_quotientS :
   Kbar \subset G / H -> inv_quotient_spec (fun K => K \subset G).
-Proof.
+Proof using nHG.
 case/andP: nHG => sHG nHG' sKbarG.
 have sKdH: Kbar \subset 'N(H) / H by rewrite (subset_trans sKbarG) ?morphimS.
 exists (coset H @*^-1 Kbar)%G; first by rewrite cosetpreK.
@@ -583,7 +583,7 @@ by rewrite sub_cosetpre_quo.
 Qed.
 
 Lemma inv_quotientN : Kbar <| G / H -> inv_quotient_spec (fun K => K <| G).
-Proof.
+Proof using nHG.
 move=> nKbar; case/inv_quotientS: (normal_sub nKbar) => K defKbar sHK sKG.
 exists K => //; rewrite defKbar -cosetpre_normal !quotientGK // in nKbar.
 exact: normalS nHG.
@@ -616,10 +616,10 @@ Variables (G : {group gT}).
 Hypotheses (nHG : G \subset 'N(H)) (tiHG : H :&: G = 1).
 
 Lemma quotient_isom : isom G (G / H) (restrm nHG (coset H)).
-Proof. by apply/isomP; rewrite ker_restrm setIC ker_coset tiHG im_restrm. Qed.
+Proof using tiHG. by apply/isomP; rewrite ker_restrm setIC ker_coset tiHG im_restrm. Qed.
 
 Lemma quotient_isog : isog G (G / H).
-Proof. exact: isom_isog quotient_isom. Qed.
+Proof using All. exact: isom_isog quotient_isom. Qed.
 
 End Injective.
 
@@ -656,7 +656,7 @@ Let nfHfG : f @* G \subset 'N(f @* H) := morphim_norms f nHG.
 Notation fH := (coset (f @* H) \o f).
 
 Lemma quotm_dom_proof : G \subset 'dom fH.
-Proof. by rewrite -sub_morphim_pre. Qed.
+Proof using nfHfG. by rewrite -sub_morphim_pre. Qed.
 
 Notation fH_G := (restrm quotm_dom_proof fH).
 
@@ -698,11 +698,11 @@ Variables (gT : finGroupType) (G H : {group gT}).
 
 Hypothesis (eqGH : G :=: H).
 
-Lemma im_qisom_proof : 'N(H) \subset 'N(G). Proof. by rewrite eqGH. Qed.
+Lemma im_qisom_proof : 'N(H) \subset 'N(G). Proof using All. by rewrite eqGH. Qed.
 Lemma qisom_ker_proof : 'ker (coset G) \subset 'ker (coset H).
-Proof. by rewrite eqGH. Qed.
+Proof using All. by rewrite eqGH. Qed.
 Lemma qisom_restr_proof : setT \subset 'N(H) / G.
-Proof. by rewrite eqGH im_quotient. Qed.
+Proof using All. by rewrite eqGH im_quotient. Qed.
 
 Definition qisom :=
   restrm qisom_restr_proof (factm qisom_ker_proof im_qisom_proof).
@@ -739,7 +739,7 @@ Lemma qisom_isom : isom setT setT qisom.
 Proof. by apply/isomP; rewrite injm_qisom im_qisom. Qed.
 
 Lemma qisom_isog : [set: coset_of G] \isog [set: coset_of H].
-Proof. exact: isom_isog qisom_isom. Qed.
+Proof using All. exact: isom_isog qisom_isom. Qed.
 
 Lemma qisom_inj : injective qisom.
 Proof. by move=> x y; apply: (injmP injm_qisom); rewrite inE. Qed.
@@ -778,14 +778,14 @@ Qed.
 
 Lemma first_isom_loc : {g : {morphism H / 'ker_H f >-> rT} |
  'injm g & forall A : {set aT}, A \subset H -> g @* (A / 'ker_H f) = f @* A}.
-Proof.
+Proof using sHG.
 case: (first_isom (restrm_morphism sHG f)).
 rewrite ker_restrm => g injg im_g; exists g => // A sAH.
 by rewrite im_g morphim_restrm (setIidPr sAH).
 Qed.
 
 Lemma first_isog_loc : (H / 'ker_H f) \isog (f @* H).
-Proof.
+Proof using sHG.
 by case: first_isom_loc => g injg im_g; apply/isogP; exists g; rewrite ?im_g.
 Qed.
 
@@ -799,16 +799,16 @@ Hypothesis nKH : H \subset 'N(K).
 
 Lemma second_isom : {f : {morphism H / (K :&: H) >-> coset_of K} |
   'injm f & forall A : {set gT}, A \subset H -> f @* (A / (K :&: H)) = A / K}.
-Proof.
+Proof using nKH.
 have ->: K :&: H = 'ker_H (coset K) by rewrite ker_coset setIC.
 exact: first_isom_loc.
 Qed.
 
 Lemma second_isog : H / (K :&: H) \isog H / K.
-Proof. by rewrite setIC -{1 3}(ker_coset K); apply: first_isog_loc. Qed.
+Proof using nKH. by rewrite setIC -{1 3}(ker_coset K); apply: first_isog_loc. Qed.
 
 Lemma weak_second_isog : H / (K :&: H) \isog H * K / K.
-Proof. by rewrite quotientMidr; apply: second_isog. Qed.
+Proof using nKH. by rewrite quotientMidr; apply: second_isog. Qed.
 
 End SecondIsomorphism.
 
@@ -833,7 +833,7 @@ Hypothesis snKG : K <| G.
 
 Theorem third_isom : {f : {morphism (G / H) / (K / H) >-> coset_of K} | 'injm f
    & forall A : {set gT}, A \subset G -> f @* (A / H / (K / H)) = A / K}.
-Proof.
+Proof using All.
 have [[sKG nKG] [sHG nHG]] := (andP snKG, andP snHG).
 have sHker: 'ker (coset H) \subset 'ker (restrm nKG (coset K)).
   by rewrite ker_restrm !ker_coset subsetI sHG.
@@ -844,7 +844,7 @@ by rewrite morphim_factm morphim_restrm (setIidPr sAG).
 Qed.
 
 Theorem third_isog : (G / H / (K / H)) \isog (G / K).
-Proof.
+Proof using All.
 by case: third_isom => f inj_f im_f; apply/isogP; exists f; rewrite ?im_f.
 Qed.
 

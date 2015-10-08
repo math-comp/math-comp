@@ -78,7 +78,7 @@ Structure minSimpleOddGroupType := MinSimpleOddGroupType {
 Hypothesis IH_FT : minSimpleOddGroupType -> False.
 
 Lemma minSimpleOdd_ind gT (G : {group gT}) : odd #|G| -> solvable G.
-Proof.
+Proof using All.
 move: {2}_.+1 (ltnSn #|G|) => n.
 elim: n => // n IHn in gT G *; rewrite ltnS => leGn oddG.
 have oG: #|[subg G]| = #|G| by rewrite (card_isog (isog_subg G)).
@@ -96,7 +96,7 @@ Qed.
 
 Lemma minSimpleOdd_prime gT (G : {group gT}) :
   odd #|G| -> simple G -> prime #|G|.
-Proof. by move/minSimpleOdd_ind; apply: simple_sol_prime. Qed.
+Proof using All. by move/minSimpleOdd_ind; apply: simple_sol_prime. Qed.
 
 End InitialReduction.
 
@@ -454,11 +454,11 @@ Hypotheses (cstrA : normed_constrained A) (pi'q : q \notin pi).
 
 Let hyp71 H R :
   A \subset H -> H \proper G -> R \in |/|_H(A; pi^') -> R \subset 'O_pi^'(H).
-Proof. by case: cstrA H R. Qed.
+Proof using cstrA. by case: cstrA H R. Qed.
 
 (* This is the observation between B & G, Hypothesis 7.1 and Lemma 7.1. *)
 Remark normed_constrained_Hall : pi^'.-Hall('C(A)) K.
-Proof.
+Proof using hyp71.
 have [_ ntA prA _] := cstrA; rewrite -[setT]/G in prA.
 rewrite /pHall pcore_pgroup pcore_sub pnatNK /=.
 rewrite -card_quotient ?gFnorm //= -/K.
@@ -493,7 +493,7 @@ Lemma normed_constrained_meet_trans Q1 Q2 H :
     A \subset H -> H \proper G -> Q1 \in |/|*(A; q) -> Q2 \in |/|*(A; q) ->
     Q1 :&: H != 1 -> Q2 :&: H != 1 ->
   exists2 k, k \in K & Q2 :=: Q1 :^ k.
-Proof.
+Proof using hallK pi'q.
 move: {2}_.+1 (ltnSn (#|G| - #|Q1 :&: Q2|)) => m.
 elim: m => // m IHm in H Q1 Q2 * => geQ12m sAH prHG maxQ1 maxQ2 ntHQ1 ntHQ2.
 have:= maxQ1; rewrite inE => /maxgroupP[/andP[qQ1 nQ1A] maxQ1P].
@@ -559,7 +559,7 @@ Qed.
 (* This is B & G, Theorem 7.2. *)
 Theorem normed_constrained_rank3_trans :
   'r('Z(A)) >= 3 -> [transitive K, on |/|*(A; q) | 'JG].
-Proof.
+Proof using hallK pi'q.
 case/rank_geP=> B /nElemP[p]; rewrite !inE subsetI -2!andbA.
 case/and4P=> sBA cAB abelB mB3; have [_ cBB _] := and3P abelB.
 have q'B: forall Q, q.-group Q -> coprime #|Q| #|B|.
@@ -602,7 +602,7 @@ Qed.
 (* This is B & G, Theorem 7.3. *)
 Theorem normed_constrained_rank2_trans :
   q %| #|'C(A)| -> 'r('Z(A)) >= 2 -> [transitive K, on |/|*(A; q) | 'JG].
-Proof.
+Proof using hallK pi'q.
 move=> qC /rank_geP[B /nElemP[p /setIdP[/setIdP[/subsetIP[sBA cAB] abelB] oB]]].
 have [_ cBB _] := and3P abelB.
 have{abelB oB} ncycB: ~~ cyclic B by rewrite (abelem_cyclic abelB) (eqP oB).
@@ -645,7 +645,7 @@ Theorem normed_trans_superset P :
      |/|*(P; q) \subset |/|*(A; q)
    & {in |/|*(P; q), forall Q, P :&: 'N(P)^`(1) \subset 'N(Q)^`(1)
                             /\ 'N(P) = 'C_K(P) * 'N_('N(P))(Q)}].
-Proof.
+Proof using hallK pi'q.
 move=> snAP piP trnK; set KP := 'O_pi^'('C(P)).
 have defK B: A \subset B -> 'C_K(B) = 'O_pi^'('C(B)).
   move=> sAB; apply/eqP; rewrite eqEsubset {1}setIC pcoreS ?centS // subsetI.

@@ -490,22 +490,22 @@ Variables (P Q : Prop) (b c : bool).
 Hypothesis Hb : reflect P b.
 
 Lemma introNTF : (if c then ~ P else P) -> ~~ b = c.
-Proof. by case c; case Hb. Qed.
+Proof using Hb. by case c; case Hb. Qed.
 
 Lemma introTF : (if c then P else ~ P) -> b = c.
-Proof. by case c; case Hb. Qed.
+Proof using Hb. by case c; case Hb. Qed.
 
 Lemma elimNTF : ~~ b = c -> if c then ~ P else P.
-Proof. by move <-; case Hb. Qed.
+Proof using Hb. by move <-; case Hb. Qed.
 
 Lemma elimTF : b = c -> if c then P else ~ P.
-Proof. by move <-; case Hb. Qed.
+Proof using Hb. by move <-; case Hb. Qed.
 
 Lemma equivPif : (Q -> P) -> (P -> Q) -> if b then Q else ~ Q.
-Proof. by case Hb; auto. Qed.
+Proof using Hb. by case Hb; auto. Qed.
 
 Lemma xorPif : Q \/ P -> ~ (Q /\ P) -> if b then ~ Q else Q.
-Proof. by case Hb => [? _ H ? | ? H _]; case: H. Qed.
+Proof using Hb. by case Hb => [? _ H ? | ? H _]; case: H. Qed.
 
 End ReflectCore.
 
@@ -516,16 +516,16 @@ Variables (P Q : Prop) (b c : bool).
 Hypothesis Hb : reflect P (~~ b).
 
 Lemma introTFn : (if c then ~ P else P) -> b = c.
-Proof. by move/(introNTF Hb) <-; case b. Qed.
+Proof using Hb. by move/(introNTF Hb) <-; case b. Qed.
 
 Lemma elimTFn : b = c -> if c then ~ P else P.
-Proof. by move <-; apply: (elimNTF Hb); case b. Qed.
+Proof using Hb. by move <-; apply: (elimNTF Hb); case b. Qed.
 
 Lemma equivPifn : (Q -> P) -> (P -> Q) -> if b then ~ Q else Q.
-Proof. by rewrite -if_neg; apply: equivPif. Qed.
+Proof using Hb. by rewrite -if_neg; apply: equivPif. Qed.
 
 Lemma xorPifn : Q \/ P -> ~ (Q /\ P) -> if b then Q else ~ Q.
-Proof. by rewrite -if_neg; apply: xorPif. Qed.
+Proof using Hb. by rewrite -if_neg; apply: xorPif. Qed.
 
 End ReflectNegCore.
 
@@ -535,46 +535,46 @@ Section Reflect.
 Variables (P Q : Prop) (b b' c : bool).
 Hypotheses (Pb : reflect P b) (Pb' : reflect P (~~ b')).
 
-Lemma introT  : P -> b.            Proof. exact: introTF true _. Qed.
-Lemma introF  : ~ P -> b = false.  Proof. exact: introTF false _. Qed.
-Lemma introN  : ~ P -> ~~ b.       Proof. exact: introNTF true _. Qed.
-Lemma introNf : P -> ~~ b = false. Proof. exact: introNTF false _. Qed.
-Lemma introTn : ~ P -> b'.         Proof. exact: introTFn true _. Qed.
-Lemma introFn : P -> b' = false.   Proof. exact: introTFn false _. Qed.
+Lemma introT  : P -> b.            Proof using Pb. exact: introTF true _. Qed.
+Lemma introF  : ~ P -> b = false.  Proof using Pb. exact: introTF false _. Qed.
+Lemma introN  : ~ P -> ~~ b.       Proof using Pb. exact: introNTF true _. Qed.
+Lemma introNf : P -> ~~ b = false. Proof using Pb. exact: introNTF false _. Qed.
+Lemma introTn : ~ P -> b'.         Proof using Pb'. exact: introTFn true _. Qed.
+Lemma introFn : P -> b' = false.   Proof using Pb'. exact: introTFn false _. Qed.
 
-Lemma elimT  : b -> P.             Proof. exact: elimTF true _. Qed.
-Lemma elimF  : b = false -> ~ P.   Proof. exact: elimTF false _. Qed.
-Lemma elimN  : ~~ b -> ~P.         Proof. exact: elimNTF true _. Qed.
-Lemma elimNf : ~~ b = false -> P.  Proof. exact: elimNTF false _. Qed.
-Lemma elimTn : b' -> ~ P.          Proof. exact: elimTFn true _. Qed.
-Lemma elimFn : b' = false -> P.    Proof. exact: elimTFn false _. Qed.
+Lemma elimT  : b -> P.             Proof using Pb. exact: elimTF true _. Qed.
+Lemma elimF  : b = false -> ~ P.   Proof using Pb. exact: elimTF false _. Qed.
+Lemma elimN  : ~~ b -> ~P.         Proof using Pb. exact: elimNTF true _. Qed.
+Lemma elimNf : ~~ b = false -> P.  Proof using Pb. exact: elimNTF false _. Qed.
+Lemma elimTn : b' -> ~ P.          Proof using Pb'. exact: elimTFn true _. Qed.
+Lemma elimFn : b' = false -> P.    Proof using Pb'. exact: elimTFn false _. Qed.
 
 Lemma introP : (b -> Q) -> (~~ b -> ~ Q) -> reflect Q b.
 Proof. by case b; constructor; auto. Qed.
 
 Lemma iffP : (P -> Q) -> (Q -> P) -> reflect Q b.
-Proof. by case: Pb; constructor; auto. Qed.
+Proof using Pb. by case: Pb; constructor; auto. Qed.
 
 Lemma equivP : (P <-> Q) -> reflect Q b.
-Proof. by case; apply: iffP. Qed.
+Proof using Pb. by case; apply: iffP. Qed.
 
 Lemma sumboolP (decQ : decidable Q) : reflect Q decQ.
 Proof. by case: decQ; constructor. Qed.
 
 Lemma appP : reflect Q b -> P -> Q.
-Proof. by move=> Qb; move/introT; case: Qb. Qed.
+Proof using Pb. by move=> Qb; move/introT; case: Qb. Qed.
 
 Lemma sameP : reflect P c -> b = c.
-Proof. by case; [apply: introT | apply: introF]. Qed.
+Proof using Pb. by case; [apply: introT | apply: introF]. Qed.
 
-Lemma decPcases : if b then P else ~ P. Proof. by case Pb. Qed.
+Lemma decPcases : if b then P else ~ P. Proof using Pb. by case Pb. Qed.
 
 Definition decP : decidable P. by case: b decPcases; [left | right]. Defined.
 
-Lemma rwP : P <-> b. Proof. by split; [apply: introT | apply: elimT]. Qed.
+Lemma rwP : P <-> b. Proof using Pb. by split; [apply: introT | apply: elimT]. Qed.
 
 Lemma rwP2 : reflect Q b -> (P <-> Q).
-Proof. by move=> Qb; split=> ?; [apply: appP | apply: elimT; case: Qb]. Qed.
+Proof using Pb. by move=> Qb; split=> ?; [apply: appP | apply: elimT; case: Qb]. Qed.
 
 (*  Predicate family to reflect excluded middle in bool.                      *)
 CoInductive alt_spec : bool -> Type :=
@@ -582,7 +582,7 @@ CoInductive alt_spec : bool -> Type :=
   | AltFalse of ~~ b : alt_spec false.
 
 Lemma altP : alt_spec b.
-Proof. by case def_b: b / Pb; constructor; rewrite ?def_b. Qed.
+Proof using Pb. by case def_b: b / Pb; constructor; rewrite ?def_b. Qed.
 
 End Reflect.
 
@@ -1481,10 +1481,10 @@ Section PER.
 Hypotheses (symR : symmetric) (trR : transitive).
 
 Lemma sym_left_transitive : left_transitive.
-Proof. by move=> x y Rxy z; apply/idP/idP; apply: trR; rewrite // symR. Qed.
+Proof using All. by move=> x y Rxy z; apply/idP/idP; apply: trR; rewrite // symR. Qed.
 
 Lemma sym_right_transitive : right_transitive.
-Proof. by move=> x y /sym_left_transitive Rxy z; rewrite !(symR z) Rxy. Qed.
+Proof using All. by move=> x y /sym_left_transitive Rxy z; rewrite !(symR z) Rxy. Qed.
 
 End PER.
 
@@ -1653,14 +1653,14 @@ Lemma in3T : {in T1 & T2 & T3, {all3 P3}} -> {all3 P3}.
 Proof. by move=> ? ?; auto. Qed.
 
 Lemma sub_in1 (Ph : ph {all1 P1}) : prop_in1 d1' Ph -> prop_in1 d1 Ph.
-Proof. by move=> allP x /sub1; apply: allP. Qed.
+Proof using sub1. by move=> allP x /sub1; apply: allP. Qed.
 
 Lemma sub_in11 (Ph : ph {all2 P2}) : prop_in11 d1' d2' Ph -> prop_in11 d1 d2 Ph.
-Proof. by move=> allP x1 x2 /sub1 d1x1 /sub2; apply: allP. Qed.
+Proof using sub2 sub1. by move=> allP x1 x2 /sub1 d1x1 /sub2; apply: allP. Qed.
 
 Lemma sub_in111 (Ph : ph {all3 P3}) :
   prop_in111 d1' d2' d3' Ph -> prop_in111 d1 d2 d3 Ph.
-Proof. by move=> allP x1 x2 x3 /sub1 d1x1 /sub2 d2x2 /sub3; apply: allP. Qed.
+Proof using sub3 sub2 sub1. by move=> allP x1 x2 x3 /sub1 d1x1 /sub2 d2x2 /sub3; apply: allP. Qed.
 
 Let allQ1 f'' := {all1 Q1 f''}.
 Let allQ1l f'' h' := {all1 Q1l f'' h'}.
@@ -1682,15 +1682,15 @@ Proof. by move=> ? ?; auto. Qed.
 
 Lemma subon1 (Phf : ph (allQ1 f)) (Ph : ph (allQ1 f)) :
   prop_on1 d2' Phf Ph -> prop_on1 d2 Phf Ph.
-Proof. by move=> allQ x /sub2; apply: allQ. Qed.
+Proof using sub2. by move=> allQ x /sub2; apply: allQ. Qed.
 
 Lemma subon1l (Phf : ph (allQ1l f)) (Ph : ph (allQ1l f h)) :
   prop_on1 d2' Phf Ph -> prop_on1 d2 Phf Ph.
-Proof. by move=> allQ x /sub2; apply: allQ. Qed.
+Proof using sub2. by move=> allQ x /sub2; apply: allQ. Qed.
 
 Lemma subon2 (Phf : ph (allQ2 f)) (Ph : ph (allQ2 f)) :
   prop_on2 d2' Phf Ph -> prop_on2 d2 Phf Ph.
-Proof. by move=> allQ x y /sub2=> d2fx /sub2; apply: allQ. Qed.
+Proof using sub2. by move=> allQ x y /sub2=> d2fx /sub2; apply: allQ. Qed.
 
 Lemma can_in_inj : {in D1, cancel f g} -> {in D1 &, injective f}.
 Proof. by move=> fK x y /fK{2}<- /fK{2}<- ->. Qed.
@@ -1778,31 +1778,31 @@ Hypothesis fgK : cancel g f.
 
 Lemma homoRL :
   {homo f : x y / aR x y >-> rR x y} -> forall x y, aR (g x) y -> rR x (f y).
-Proof. by move=> Hf x y /Hf; rewrite fgK. Qed.
+Proof using fgK. by move=> Hf x y /Hf; rewrite fgK. Qed.
 
 Lemma homoLR :
   {homo f : x y / aR x y >-> rR x y} -> forall x y, aR x (g y) -> rR (f x) y.
-Proof. by move=> Hf x y /Hf; rewrite fgK. Qed.
+Proof using fgK. by move=> Hf x y /Hf; rewrite fgK. Qed.
 
 Lemma homo_mono :
     {homo f : x y / aR x y >-> rR x y} -> {homo g : x y / rR x y >-> aR x y} ->
   {mono g : x y / rR x y >-> aR x y}.
-Proof.
+Proof using fgK.
 move=> mf mg x y; case: (boolP (rR _ _))=> [/mg //|].
 by apply: contraNF=> /mf; rewrite !fgK.
 Qed.
 
 Lemma monoLR :
   {mono f : x y / aR x y >-> rR x y} -> forall x y, rR (f x) y = aR x (g y).
-Proof. by move=> mf x y; rewrite -{1}[y]fgK mf. Qed.
+Proof using fgK. by move=> mf x y; rewrite -{1}[y]fgK mf. Qed.
 
 Lemma monoRL :
   {mono f : x y / aR x y >-> rR x y} -> forall x y, rR x (f y) = aR (g x) y.
-Proof. by move=> mf x y; rewrite -{1}[x]fgK mf. Qed.
+Proof using fgK. by move=> mf x y; rewrite -{1}[x]fgK mf. Qed.
 
 Lemma can_mono :
   {mono f : x y / aR x y >-> rR x y} -> {mono g : x y / rR x y >-> aR x y}.
-Proof. by move=> mf x y /=; rewrite -mf !fgK. Qed.
+Proof using fgK. by move=> mf x y /=; rewrite -mf !fgK. Qed.
 
 End MonoHomoMorphismTheory.
 
@@ -1829,18 +1829,18 @@ Hypothesis fgK_on : {on aD, cancel g & f}.
 Lemma homoRL_in :
     {in aD &, {homo f : x y / aR x y >-> rR x y}} ->
   {in rD & aD, forall x y, aR (g x) y -> rR x (f y)}.
-Proof. by move=> Hf x y hx hy /Hf; rewrite fgK_on //; apply. Qed.
+Proof using fgK_on. by move=> Hf x y hx hy /Hf; rewrite fgK_on //; apply. Qed.
 
 Lemma homoLR_in :
     {in aD &, {homo f : x y / aR x y >-> rR x y}} ->
   {in aD & rD, forall x y, aR x (g y) -> rR (f x) y}.
-Proof. by move=> Hf x y hx hy /Hf; rewrite fgK_on //; apply. Qed.
+Proof using fgK_on. by move=> Hf x y hx hy /Hf; rewrite fgK_on //; apply. Qed.
 
 Lemma homo_mono_in :
     {in aD &, {homo f : x y / aR x y >-> rR x y}} ->
     {in rD &, {homo g : x y / rR x y >-> aR x y}} ->
   {in rD &, {mono g : x y / rR x y >-> aR x y}}.
-Proof.
+Proof using fgK_on.
 move=> mf mg x y hx hy; case: (boolP (rR _ _))=> [/mg //|]; first exact.
 by apply: contraNF=> /mf; rewrite !fgK_on //; apply.
 Qed.
@@ -1848,16 +1848,16 @@ Qed.
 Lemma monoLR_in :
     {in aD &, {mono f : x y / aR x y >-> rR x y}} ->
   {in aD & rD, forall x y, rR (f x) y = aR x (g y)}.
-Proof. by move=> mf x y hx hy; rewrite -{1}[y]fgK_on // mf. Qed.
+Proof using fgK_on. by move=> mf x y hx hy; rewrite -{1}[y]fgK_on // mf. Qed.
 
 Lemma monoRL_in :
     {in aD &, {mono f : x y / aR x y >-> rR x y}} ->
   {in rD & aD, forall x y, rR x (f y) = aR (g x) y}.
-Proof. by move=> mf x y hx hy; rewrite -{1}[x]fgK_on // mf. Qed.
+Proof using fgK_on. by move=> mf x y hx hy; rewrite -{1}[x]fgK_on // mf. Qed.
 
 Lemma can_mono_in :
     {in aD &, {mono f : x y / aR x y >-> rR x y}} ->
   {in rD &, {mono g : x y / rR x y >-> aR x y}}.
-Proof. by move=> mf x y hx hy /=; rewrite -mf // !fgK_on. Qed.
+Proof using fgK_on. by move=> mf x y hx hy /=; rewrite -mf // !fgK_on. Qed.
 
 End MonoHomoMorphismTheory_in.

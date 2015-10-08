@@ -199,7 +199,7 @@ Variable i : Iirr G.
 
 Let n := irr_degree (socle_of_Iirr i).
 Let mxZn_inj: injective (@scalar_mx algCfield n).
-Proof. by rewrite -[n]prednK ?irr_degree_gt0 //; apply: fmorph_inj. Qed.
+Proof using i. by rewrite -[n]prednK ?irr_degree_gt0 //; apply: fmorph_inj. Qed.
 
 Lemma cfRepr_gring_center n1 (rG : mx_representation algCfield G n1) A :
   cfRepr rG = 'chi_i -> (A \in 'Z(R_G))%MS -> gring_op rG A = 'omega_i[A]%:M.

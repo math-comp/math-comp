@@ -98,7 +98,7 @@ Let w_ i j := cyclicTIirr defW i j.
 (* show that 1/uq and 1/vp are less that 1/2q^2 (so Wn is either W1 or W2).   *)
 Lemma FTtypeP_complV_ltr (Wn : {group gT}) :
   (#|Wn| <= q)%N -> (u * q)%:R^-1 < (2 * #|Wn| ^ 2)%:R^-1 :> algC.
-Proof.
+Proof using StypeP maxS.
 move=> leWn_q; rewrite !natrM ltf_pinv ?rpredM ?qualifE ?gt0CG ?ltr0n //.
 rewrite -!natrM ltr_nat (@leq_ltn_trans (2 * q ^ 2)) ?mulnA ?leq_mul // mul2n.
 have: [Frobenius U <*> W1 = U ><| W1] by have [[]] := FTtypeP_facts maxS StypeP.
@@ -109,7 +109,7 @@ Qed.
 (* coprime to pq.                                                             *)
 Lemma coprime_typeP_Galois_core g :
   typeP_Galois StypeP -> g \notin ccG W^# -> g \notin ccG P^# -> coprime #[g] p.
-Proof.
+Proof using maxS.
 move=> galS W'g; apply: contraR => p_g.
 have ntg: g != 1%g by apply: contraNneq p_g => ->; rewrite order1 coprime1n.
 have [pr_q pr_p]: prime q /\ prime p := FTtypeP_primes maxS StypeP.
@@ -164,7 +164,7 @@ Hypothesis Stype2 : FTtype S == 2.
 
 (* This is used to bound #|ccG P^#| and #|ccG Q^#| in the proof of (14.11.4). *)
 Lemma FTtype2_cc_core_ler : #|G|%:R^-1 * #|ccG P^#|%:R <= (u * q)%:R^-1 :> algC.
-Proof.
+Proof using Stype2 StypeP maxS.
 have ->: (u * q)%:R^-1 = #|S|%:R^-1 * #|P|%:R :> algC.
   have [[_ _ _ /sdprod_card <-] [_ _ _ /sdprod_card <-] _ _ _] := StypeP.
   by rewrite mulrC -mulnA [in RHS]natrM invfM mulVKf ?neq0CG.
@@ -183,7 +183,7 @@ Lemma FTtype2_support_coherence :
   [/\ e = (p * q)%N
     & exists nb, exists2 chi, chi = tau1L phi \/ chi = - tau1L phi^*%CF
     & tauL betaL = \sum_ij (-1)^+ nb ij *: sigma 'chi_ij - chi].
-Proof.
+Proof using Lphi Stype2 cohL ctiWG maxNU_L pddT phi1 w_.
 move=> ub_u ub_v; have nsHL : H <| L := gFnormal _ _.
 have pairST := of_typeP_pair maxS StypeP maxT TtypeP.
 have [//|frobL sUH defL] := FTtypeII_support_facts maxS StypeP _ pairST maxNU_L.
@@ -323,13 +323,13 @@ Let irrL := FTtype1_Ind_irr maxL Ltype1.
 Let irrM := FTtype1_Ind_irr maxM Mtype1.
 
 Lemma disjoint_Dade_FTtype1 : [disjoint Dade_support ddM & Dade_support ddL].
-Proof.
+Proof using not_MG_L Mtype1 Ltype1.
 by rewrite !FT_DadeF_supportE -!FTsupp1_type1 ?FT_Dade1_support_disjoint.
 Qed.
 Let TItauML := disjoint_Dade_FTtype1.
 
 Lemma coherent_FTtype1_ortho : orthogonal (map tau1M calM) (map tau1L calL).
-Proof.
+Proof using TItauML cohL cohM irrL irrM.
 apply/orthogonalP=> _ _ /mapP[xiM Mxi ->] /mapP[xiL Lxi ->].
 have [irrLxi irrMxi] := (irrL Lxi, irrM Mxi).
 exact: (disjoint_coherent_ortho (mFT_odd _) _ cohM cohL).
@@ -338,7 +338,7 @@ Let oML := coherent_FTtype1_ortho.
 
 (* This is the inequality used in both branches of (14.14). *)
 Lemma coherent_FTtype1_core_ltr : a != 0 -> #|K|.-1%:R / v <= u - 1.
-Proof.
+Proof using Lphi Mpsi betaL oML phi1 psi1.
 have [nsHL nsKM]: H <| L /\ K <| M by rewrite !gFnormal.
 have [irr_phi irr_psi] := (irrL Lphi, irrM Mpsi).
 have frobL: [Frobenius L with kernel H] := FTtype1_Frobenius maxL Ltype1.
@@ -404,14 +404,14 @@ Local Notation QV := T^`(1)%G.
 Local Notation "` 'QV'" := `T^`(1) (at level 0) : group_scope.
 Local Notation "` 'V'" := (gval V) (at level 0, only parsing) : group_scope.
 
-Let defS : PU ><| W1 = S. Proof. by have [[]] := StypeP. Qed.
-Let defPU : P ><| U = PU. Proof. by have [_ []] := StypeP. Qed.
+Let defS : PU ><| W1 = S. Proof using StypeP. by have [[]] := StypeP. Qed.
+Let defPU : P ><| U = PU. Proof using StypeP. by have [_ []] := StypeP. Qed.
 
-Let defT : QV ><| W2 = T. Proof. by have [[]] := TtypeP. Qed.
-Let defQV : Q ><| V = QV. Proof. by have [_ []] := TtypeP. Qed.
+Let defT : QV ><| W2 = T. Proof using TtypeP. by have [[]] := TtypeP. Qed.
+Let defQV : Q ><| V = QV. Proof using TtypeP. by have [_ []] := TtypeP. Qed.
 
-Let notStype1 : FTtype S != 1%N. Proof. exact: FTtypeP_neq1 StypeP. Qed.
-Let notStype5 : FTtype S != 5%N. Proof. exact: FTtype5_exclusion maxS. Qed.
+Let notStype1 : FTtype S != 1%N. Proof using StypeP maxS. exact: FTtypeP_neq1 StypeP. Qed.
+Let notStype5 : FTtype S != 5%N. Proof using maxS. exact: FTtype5_exclusion maxS. Qed.
 
 Let pddS := FT_prDade_hypF maxS StypeP.
 Let ptiWS : primeTI_hypothesis S PU defW := FT_primeTI_hyp StypeP.
@@ -420,10 +420,10 @@ Let ctiWG : cyclicTI_hypothesis G defW := pddS.
 Let pddT := FT_prDade_hypF maxT TtypeP.
 Let ptiWT : primeTI_hypothesis T QV xdefW := FT_primeTI_hyp TtypeP.
 
-Let ntW1 : W1 :!=: 1. Proof. by have [[]] := StypeP. Qed.
-Let ntW2 : W2 :!=: 1. Proof. by have [_ _ _ []] := StypeP. Qed.
-Let cycW1 : cyclic W1. Proof. by have [[]] := StypeP. Qed.
-Let cycW2 : cyclic W2. Proof. by have [_ _ _ []] := StypeP. Qed.
+Let ntW1 : W1 :!=: 1. Proof using StypeP. by have [[]] := StypeP. Qed.
+Let ntW2 : W2 :!=: 1. Proof using StypeP. by have [_ _ _ []] := StypeP. Qed.
+Let cycW1 : cyclic W1. Proof using StypeP. by have [[]] := StypeP. Qed.
+Let cycW2 : cyclic W2. Proof using StypeP. by have [_ _ _ []] := StypeP. Qed.
 
 Let p := #|W2|.
 Let q := #|W1|.
@@ -432,21 +432,21 @@ Let v := #|V|.
 Let nU := (p ^ q).-1 %/ p.-1.
 Let nV := (q ^ p).-1 %/ q.-1.
 
-Let pr_p : prime p. Proof. by have [] := FTtypeP_primes maxS StypeP. Qed.
-Let pr_q : prime q. Proof. by have [] := FTtypeP_primes maxS StypeP. Qed.
+Let pr_p : prime p. Proof using StypeP maxS. by have [] := FTtypeP_primes maxS StypeP. Qed.
+Let pr_q : prime q. Proof using StypeP maxS. by have [] := FTtypeP_primes maxS StypeP. Qed.
 
 Local Open Scope ring_scope.
 
-Let qgt2 : (q > 2)%N. Proof. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
-Let pgt2 : (p > 2)%N. Proof. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
+Let qgt2 : (q > 2)%N. Proof using ntW1. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
+Let pgt2 : (p > 2)%N. Proof using ntW2. by rewrite odd_gt2 ?mFT_odd ?cardG_gt1. Qed.
 
 Let coPUq : coprime #|PU| q.
-Proof. by rewrite (coprime_sdprod_Hall_r defS); have [[]] := StypeP. Qed.
+Proof using defS. by rewrite (coprime_sdprod_Hall_r defS); have [[]] := StypeP. Qed.
 
-Let nirrW1 : #|Iirr W1| = q. Proof. by rewrite card_Iirr_cyclic. Qed.
-Let nirrW2 : #|Iirr W2| = p. Proof. by rewrite card_Iirr_cyclic. Qed.
-Let NirrW1 : Nirr W1 = q. Proof. by rewrite -nirrW1 card_ord. Qed.
-Let NirrW2 : Nirr W2 = p. Proof. by rewrite -nirrW2 card_ord. Qed.
+Let nirrW1 : #|Iirr W1| = q. Proof using cycW1. by rewrite card_Iirr_cyclic. Qed.
+Let nirrW2 : #|Iirr W2| = p. Proof using cycW2. by rewrite card_Iirr_cyclic. Qed.
+Let NirrW1 : Nirr W1 = q. Proof using nirrW1. by rewrite -nirrW1 card_ord. Qed.
+Let NirrW2 : Nirr W2 = p. Proof using nirrW2. by rewrite -nirrW2 card_ord. Qed.
 
 Let sigma := (cyclicTIiso ctiWG).
 Let w_ i j := (cyclicTIirr defW i j).
@@ -467,11 +467,11 @@ Local Notation tauT := (FT_Dade0 maxT).
 Let calS0 := seqIndD PU S S`_\s 1.
 Let rmR_S := FTtypeP_coh_base maxS StypeP.
 Let scohS0 : subcoherent calS0 tauS rmR_S.
-Proof. exact: FTtypeP_subcoherent StypeP. Qed.
+Proof using StypeP. exact: FTtypeP_subcoherent StypeP. Qed.
 
 Let calS := seqIndD PU S P 1.
 Let sSS0 : cfConjC_subset calS calS0.
-Proof. exact/seqInd_conjC_subset1/Fcore_sub_FTcore. Qed.
+Proof using maxS. exact/seqInd_conjC_subset1/Fcore_sub_FTcore. Qed.
 
 Let calT := seqIndD QV T Q 1.
 
@@ -489,7 +489,7 @@ Theorem no_full_FT_Galois_structure :
                [/\ #|P| = (p ^ q)%N, #|U| = nU & coprime nU p.-1]
     & (*b*) [/\ q.-abelem Q, W2 \subset 'N(Q)
               & exists2 y, y \in Q & W2 :^ y \subset 'N(U)]].
-Proof.
+Proof using defPU ltqp pr_p pr_q.
 case=> [[Fpq [oP oU coUp1]] [abelQ nQW2 nU_W2Q]].
 have /idPn[] := ltqp; rewrite -leqNgt.
 exact: (prime_dim_normed_finField _ _ _ defPU) nU_W2Q.
@@ -497,7 +497,7 @@ Qed.
 
 (* Justification for Hypothesis (14.3). *)
 Fact FTtypeP_max_typeII : FTtype S == 2.
-Proof. by have [[_ ->]] := FTtypeP_facts maxS StypeP. Qed.
+Proof using StypeP ltqp maxS. by have [[_ ->]] := FTtypeP_facts maxS StypeP. Qed.
 Let Stype2 := FTtypeP_max_typeII.
 
 (* These correspond to Peterfalvi, Hypothesis (14.3). *)
@@ -515,7 +515,7 @@ Hypotheses (frobL : [Frobenius L with kernel H]) (Ltype1 : FTtype L == 1%N).
 Let calL := seqIndD H L H 1.
 Local Notation tauL := (FT_DadeF maxL).
 Let nsHL : H <| L. Proof. exact: gFnormal. Qed.
-Let irrL : {subset calL <= irr L}. Proof. exact: FTtype1_Ind_irr. Qed.
+Let irrL : {subset calL <= irr L}. Proof using Ltype1 maxL. exact: FTtype1_Ind_irr. Qed.
 
 Hypothesis cohL : coherent_with calL L^# tauL tau1L.
 Hypotheses (Lphi : phi \in calL) (phi1 : phi 1%g = #|L : H|%:R).
@@ -526,21 +526,21 @@ Let betaL := 'Ind[L, H] 1 - phi.
 
 (* This is the first assertion of Peterfalvi (14.4). *)
 Let galT : typeP_Galois TtypeP.
-Proof.
+Proof using ltqp maxT qgt2.
 apply: contraLR ltqp => /(FTtypeP_nonGalois_facts maxT)[].
 by rewrite -/p -leqNgt => ->.
 Qed.
 
 (* This is the second assertion of Peterfalvi (14.4). *)
 Let oV : v = nV.
-Proof.
+Proof using galT pgt2.
 rewrite /v (card_FTtypeP_Galois_compl maxT galT) -/nV.
 by rewrite !modn_small ?gtn_eqF // ltnW.
 Qed.
 
 (* This is Peterfalvi (14.5). *)
 Let defL : exists2 y, y \in Q & H ><| (W1 <*> W2 :^ y) = L.
-Proof.
+Proof using Lphi Ltype1 Stype2 cohL defPU defS maxNU_L pairST phi1 sNUL sUH.
 have [//|_ _ []// defL] := FTtypeII_support_facts maxS StypeP _ pairST maxNU_L.
 have [_ _ /negP[]] := compl_of_typeII maxS StypeP Stype2.
 have [_ _ _] := FTtypeI_bridge_facts maxS StypeP Ltype1 cohL Lphi phi1.
@@ -554,7 +554,7 @@ by rewrite -(sdprodW defPU) defH mulG_subr.
 Qed.
 
 Let indexLH : #|L : H| = (p * q)%N.
-Proof.
+Proof using TtypeP defL maxT.
 have [y Qy /index_sdprod <-] := defL; rewrite (dprod_card xdefW).
 suffices /normP <-: y \in 'N(W1) by rewrite -conjYg cardJg (dprodWY defW).
 have cQQ: abelian Q by have [_ [/and3P[]]] := FTtypeP_facts _ TtypeP.
@@ -563,7 +563,7 @@ Qed.
 
 (* This is Peterfalvi (14.6). *)
 Let galS : typeP_Galois StypeP.
-Proof.
+Proof using defL frobL notStype5 pr_p.
 apply/idPn=> gal'S; have [q3 oU] := FTtypeP_nonGalois_facts maxS gal'S.
 have [H1 [_ _ _ _]] := typeP_Galois_Pn maxS (FTtype5_exclusion maxS) gal'S.
 rewrite def_Ptype_factor_prime // Ptype_Fcompl_kernel_trivial // -/p q3 /=.
@@ -641,7 +641,7 @@ Qed.
 
 (* This is Peterfalvi (14.7). *)
 Let not_charUH : ~~ (U \char H).
-Proof.
+Proof using TtypeP galS maxT nU pr_q qgt2.
 have [y Qy defLy] := defL; have [_ _ /joing_subP[_ nHW2y] _] := sdprodP defLy.
 apply/negP=> chUH; have nUW2y := char_norm_trans chUH nHW2y.
 case: no_full_FT_Galois_structure; split; last first.
@@ -684,7 +684,7 @@ Qed.
 (* In order to avoid the use of real analysis and logarithms we bound the     *)
 (* binomial expansion of n.+1 ^ q.+1 directly.                                *)
 Let qp1_gt_pq1 : (q ^ p.+1 > p ^ q.+1)%N.
-Proof.
+Proof using ltqp qgt2.
 have: (4 < p)%N by rewrite odd_geq ?mFT_odd ?(leq_trans _ ltqp).
 elim: p ltqp => // n IHn; rewrite !ltnS => ngeq.
 rewrite leq_eqVlt => /predU1P[/esym n4 | ngt4].
@@ -714,7 +714,7 @@ Qed.
 
 (* This is Peterfalvi (14.8)(b). *)
 Let v1p_gt_u1q : (v.-1 %/ p > u.-1 %/ q)%N.
-Proof.
+Proof using nU oV pr_p pr_q qp1_gt_pq1.
 have ub_u: (u.-1 <= nU - 1)%N.
   rewrite -subn1 leq_sub2r //; have [_ _] := FTtypeP_facts maxS StypeP.
   by rewrite (FTtypeP_reg_Fcore maxS StypeP) indexg1.
@@ -732,14 +732,14 @@ Qed.
 Let calT0 := seqIndD QV T T`_\s 1.
 Let rmR_T := FTtypeP_coh_base maxT TtypeP.
 Let scohT0 : subcoherent calT0 tauT rmR_T.
-Proof. exact: FTtypeP_subcoherent. Qed.
+Proof using TtypeP. exact: FTtypeP_subcoherent. Qed.
 
 Let sTT0 : cfConjC_subset calS calS0.
-Proof. exact/seqInd_conjC_subset1/Fcore_sub_FTcore. Qed.
+Proof using maxS. exact/seqInd_conjC_subset1/Fcore_sub_FTcore. Qed.
 
 (* This is Peterfalvi (14.9). *)
 Lemma FTtypeP_min_typeII : FTtype T == 2.
-Proof.
+Proof using betaS defQV defT nu_ pddT scohT0 sigma v1p_gt_u1q w_.
 apply: contraLR v1p_gt_u1q => notTtype2; rewrite -leqNgt -leC_nat.
 have [o_betaT0_eta _ [Ttype3 _]] := FTtype34_structure maxT TtypeP notTtype2.
 have Ttype_gt2: (2 < FTtype T)%N by rewrite (eqP Ttype3).
@@ -877,21 +877,21 @@ Hypotheses (frobM : [Frobenius M with kernel K]) (Mtype1 : FTtype M == 1%N).
 Let calM := seqIndD K M K 1.
 Local Notation tauM := (FT_DadeF maxM).
 Let nsKM : K <| M. Proof. exact: gFnormal. Qed.
-Let irrM : {subset calM <= irr M}. Proof. exact: FTtype1_Ind_irr. Qed.
+Let irrM : {subset calM <= irr M}. Proof using Mtype1 maxM. exact: FTtype1_Ind_irr. Qed.
 
 Hypothesis cohM : coherent_with calM M^# tauM tau1M.
 Hypotheses (Mpsi : psi \in calM) (psi1 : psi 1%g = #|M : K|%:R).
 
 Let betaM := 'Ind[M, K] 1 - psi.
 
-Let pairTS : typeP_pair T S xdefW. Proof. exact: typeP_pair_sym pairST. Qed.
+Let pairTS : typeP_pair T S xdefW. Proof using pairST. exact: typeP_pair_sym pairST. Qed.
 
 Let pq : algC := (p * q)%:R.
 Let h := #|H|.
 
 (* This is the first (and main) part of Peterfalvi (14.11). *)
 Let defK : `K = V.
-Proof.
+Proof using Mpsi Ttype2 betaM cohM frobM galS irrM maxNV_M pairTS pq psi1 sNVM.
 pose e := #|M : K|; pose k := #|K|; apply: contraTeq isT => notKV.
 have [_ sVK defM] := FTtypeII_support_facts maxT TtypeP Ttype2 pairTS maxNV_M.
 have ltVK: V \proper K by rewrite properEneq eq_sym notKV.
@@ -1043,7 +1043,7 @@ Qed.
 
 (* This is the first part of Peterfalvi (14.11). *)
 Let indexMK : #|M : K| = (p * q)%N.
-Proof.
+Proof using defK.
 have [_ _ [defM|]] := FTtypeII_support_facts maxT TtypeP Ttype2 pairTS maxNV_M.
   have:= Ttype2; rewrite (mmax_max maxM (mmax_proper maxT)) ?(eqP Mtype1) //.
   rewrite -(sdprodW (Ptype_Fcore_sdprod TtypeP)) -defK (sdprodWY defM).
@@ -1057,7 +1057,7 @@ Qed.
 (* This is Peterfalvi (14.12), and also (14.13) since we have already proved  *)
 (* the negation of Theorem (14.2).                                            *)
 Let not_MG_L : (L : {set gT}) \notin M :^: G.
-Proof.
+Proof using defK not_charUH.
 rewrite orbit_sym; apply: contra not_charUH => /imsetP[z _ /= defLz].
 rewrite sub_cyclic_char // -(cyclicJ _ z) -FcoreJ -defLz defK.
 have [_ _ [cycV _ _]] := typeP_Galois_P maxT (FTtype5_exclusion maxT) galT.
@@ -1069,7 +1069,7 @@ Qed.
 Let LM_cases :
     '[tauM betaM, tau1L phi] != 0 /\ h.-1%:R / pq <= pq - 1
  \/ '[tauL betaL, tau1M psi] != 0 /\ q = 3 /\ p = 5.
-Proof.
+Proof using indexLH indexMK irrL not_MG_L.
 have [irr_phi irr_psi] := (irrL Lphi, irrM Mpsi).
 have:= Dade_sub_lin_nonorthogonal (mFT_odd _) _ cohM cohL _ Mpsi _ _ Lphi.
 rewrite -/betaL -/betaM disjoint_Dade_FTtype1 //.
@@ -1107,7 +1107,7 @@ Qed.
 
 (* This is Peterfalvi (14.15). *)
 Let oU : u = nU.
-Proof.
+Proof using LM_cases.
 case: ifP (card_FTtypeP_Galois_compl maxS galS) => // p1modq oU.
 pose x := #|H : U|; rewrite -/u -/nU -/p -/q in p1modq oU.
 have DnU: (q * u)%N = nU.
@@ -1173,7 +1173,7 @@ Qed.
 
 (* This is Peterfalvi (14.16), the last step towards the final contradiction. *)
 Let defH : `H = U.
-Proof.
+Proof using oU.
 pose x := #|H : U|; have oH: h = (u * x)%N by rewrite Lagrange.
 apply/eqP/idPn; rewrite eqEsubset sUH andbT -indexg_gt1 -/x => xgt1.
 have hmodpq: h = 1 %[mod p * q].
@@ -1217,7 +1217,7 @@ by rewrite cfdotNl opprK add0r (orthogonalP oLM) ?map_f // cfAut_seqInd.
 Qed.
 
 Lemma FTtype2_exclusion : False.
-Proof. by have /negP[] := not_charUH; rewrite /= defH char_refl. Qed.
+Proof using defH. by have /negP[] := not_charUH; rewrite /= defH char_refl. Qed.
 
 End Fourteen.
 

@@ -911,7 +911,7 @@ Hypothesis co_m12 : coprime m1 m2.
 
 Lemma chinese_remainder x y :
   (x == y %[mod m1 * m2]) = (x == y %[mod m1]) && (x == y %[mod m2]).
-Proof.
+Proof using All.
 wlog le_yx : x y / y <= x; last by rewrite !eqn_mod_dvd // Gauss_dvd.
 by case/orP: (leq_total y x); last rewrite !(eq_sym (x %% _)); auto.
 Qed.
@@ -924,7 +924,7 @@ Definition chinese r1 r2 :=
   r1 * m2 * (egcdn m2 m1).1 + r2 * m1 * (egcdn m1 m2).1.
 
 Lemma chinese_modl r1 r2 : chinese r1 r2 = r1 %[mod m1].
-Proof.
+Proof using All.
 rewrite /chinese; case: (posnP m2) co_m12 => [-> /eqnP | m2_gt0 _].
   by rewrite gcdn0 => ->; rewrite !modn1.
 case: egcdnP => // k2 k1 def_m1 _.
@@ -933,7 +933,7 @@ by rewrite addnAC (mulnAC _ m1) -mulnDl modnMDl.
 Qed.
 
 Lemma chinese_modr r1 r2 : chinese r1 r2 = r2 %[mod m2].
-Proof.
+Proof using All.
 rewrite /chinese; case: (posnP m1) co_m12 => [-> /eqnP | m1_gt0 _].
   by rewrite gcd0n => ->; rewrite !modn1.
 case: (egcdnP m2) => // k1 k2 def_m2 _.
@@ -942,7 +942,7 @@ by rewrite addnAC (mulnAC _ m2) -mulnDl modnMDl.
 Qed.
 
 Lemma chinese_mod x : x = chinese (x %% m1) (x %% m2) %[mod m1 * m2].
-Proof.
+Proof using All.
 apply/eqP; rewrite chinese_remainder //.
 by rewrite chinese_modl chinese_modr !modn_mod !eqxx.
 Qed.

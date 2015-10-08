@@ -268,11 +268,11 @@ Hypothesis pi_h : forall (x : T), \pi_qU (h x) = hq (\pi_qT x).
 Variables (a b : T) (x : equal_to (\pi_qT a)) (y : equal_to (\pi_qT b)).
 
 (* Internal Lemmmas : do not use directly *)
-Lemma pi_morph1 : \pi (f a) = fq (equal_val x). Proof. by rewrite !piE. Qed.
-Lemma pi_morph2 : \pi (g a b) = gq (equal_val x) (equal_val y). Proof. by rewrite !piE. Qed.
-Lemma pi_mono1 : p a = pq (equal_val x). Proof. by rewrite !piE. Qed.
-Lemma pi_mono2 : r a b = rq (equal_val x) (equal_val y). Proof. by rewrite !piE. Qed.
-Lemma pi_morph11 : \pi (h a) = hq (equal_val x). Proof. by rewrite !piE. Qed.
+Lemma pi_morph1 : \pi (f a) = fq (equal_val x). Proof using pi_f. by rewrite !piE. Qed.
+Lemma pi_morph2 : \pi (g a b) = gq (equal_val x) (equal_val y). Proof using pi_g. by rewrite !piE. Qed.
+Lemma pi_mono1 : p a = pq (equal_val x). Proof using pi_p. by rewrite !piE. Qed.
+Lemma pi_mono2 : r a b = rq (equal_val x) (equal_val y). Proof using pi_r. by rewrite !piE. Qed.
+Lemma pi_morph11 : \pi (h a) = hq (equal_val x). Proof using pi_h. by rewrite !piE. Qed.
 
 End Morphism.
 

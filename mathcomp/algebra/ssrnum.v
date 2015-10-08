@@ -4107,38 +4107,38 @@ Hypothesis normN: forall x, `|- x| = `|x|.
 Hypothesis ge0_norm : forall x, 0 <= x -> `|x| = x.
 Hypothesis lt_def : forall x y, (x < y) = (y != x) && (x <= y).
 
-Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
+Let le0N x : (0 <= - x) = (x <= 0). Proof using sub_ge0. by rewrite -sub0r sub_ge0. Qed.
 Let leN_total x : 0 <= x \/ 0 <= - x.
-Proof. by apply/orP; rewrite le0N le0_total. Qed.
+Proof using le0N le0_total. by apply/orP; rewrite le0N le0_total. Qed.
 
-Let le00 : (0 <= 0). Proof. by have:= le0_total 0; rewrite orbb. Qed.
+Let le00 : (0 <= 0). Proof using le0_total. by have:= le0_total 0; rewrite orbb. Qed.
 Let le01 : (0 <= 1).
-Proof.
+Proof using le0N le0_mul le0_total.
 by case/orP: (le0_total 1)=> // ?; rewrite -[1]mul1r -mulrNN le0_mul ?le0N.
 Qed.
 
 Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
-Proof.
+Proof using le0N le0_add le0_anti lt_def.
 rewrite !lt_def => /andP[x_neq0 l0x] /andP[y_neq0 l0y]; rewrite le0_add //.
 rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
 by rewrite [x]le0_anti // hxy -le0N opprK.
 Qed.
 
 Fact eq0_norm x : `|x| = 0 -> x = 0.
-Proof.
+Proof using ge0_norm leN_total normN.
 case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
 by rewrite -[x]opprK -Dnx normN nx0 oppr0.
 Qed.
 
 Fact le_def x y : (x <= y) = (`|y - x| == y - x).
-Proof.
+Proof using ge0_norm leN_total normN.
 wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
 rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
 by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
 Qed.
 
 Fact normM : {morph norm : x y / x * y}.
-Proof.
+Proof using ge0_norm le0_mul leN_total normN.
 move=> x y /=; wlog x_ge0 : x / 0 <= x.
   by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
 wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
@@ -4146,7 +4146,7 @@ by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
 Qed.
 
 Fact le_normD x y : `|x + y| <= `|x| + `|y|.
-Proof.
+Proof using ge0_norm le00 le0_add leN_total normN.
 wlog x_ge0 : x y / 0 <= x.
   by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
 rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
@@ -4157,7 +4157,7 @@ by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
 Qed.
 
 Lemma le_total x y : (x <= y) || (y <= x).
-Proof. by rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
+Proof using le0N le0_total. by rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
 Definition Le :=
   Mixin le_normD lt0_add eq0_norm (in2W le_total) normM le_def lt_def.
@@ -4180,31 +4180,31 @@ Hypothesis ge0_norm : forall x, 0 <= x -> `|x| = x.
 Hypothesis le_def : forall x y, (x <= y) = (y == x) || (x < y).
 
 Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
-Proof.
+Proof using le_def lt0_add.
 rewrite !le_def => /predU1P[->|x_gt0]; first by rewrite add0r.
 by case/predU1P=> [->|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
 Qed.
 
 Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
-Proof.
+Proof using le_def lt0_mul.
 rewrite !le_def => /predU1P[->|x_gt0]; first by rewrite mul0r eqxx.
 by case/predU1P=> [->|y_gt0]; rewrite ?mulr0 ?eqxx // orbC lt0_mul.
 Qed.
 
 Fact le0_anti x : 0 <= x -> x <= 0 -> x = 0.
-Proof. by rewrite !le_def => /predU1P[] // /lt0_ngt0/negPf-> /predU1P[]. Qed.
+Proof using le_def lt0_ngt0. by rewrite !le_def => /predU1P[] // /lt0_ngt0/negPf-> /predU1P[]. Qed.
 
 Fact sub_ge0  x y : (0 <= y - x) = (x <= y).
-Proof. by rewrite !le_def subr_eq0 sub_gt0. Qed.
+Proof using le_def sub_gt0. by rewrite !le_def subr_eq0 sub_gt0. Qed.
 
 Fact lt_def x y : (x < y) = (y != x) && (x <= y).
-Proof.
+Proof using le_def sub_gt0 lt0_ngt0.
 rewrite le_def; case: eqP => //= ->; rewrite -sub_gt0 subrr.
 by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
 Qed.
 
 Fact le0_total x : (0 <= x) || (x <= 0).
-Proof. by rewrite !le_def [0 == _]eq_sym; have [|/lt0_total] := altP eqP. Qed.
+Proof using le_def lt0_total. by rewrite !le_def [0 == _]eq_sym; have [|/lt0_total] := altP eqP. Qed.
 
 Definition Lt :=
   Le le0_add le0_mul le0_anti sub_ge0 le0_total normN ge0_norm lt_def.

@@ -268,13 +268,13 @@ Infix "*" := mul.
 Notation "x ^-1" := (inv x).
 
 Lemma mk_invgK : involutive inv.
-Proof.
+Proof using All.
 have mulV21 x: x^-1^-1 * 1 = x by rewrite -(mulV x) mulA mulV mul1.
 by move=> x; rewrite -[_ ^-1]mulV21 -(mul1 1) mulA !mulV21.
 Qed.
 
 Lemma mk_invMg : {morph inv : x y / x * y >-> y * x}.
-Proof.
+Proof using All.
 have mulxV x: x * x^-1 = 1 by rewrite -{1}[x]mk_invgK mulV.
 move=> x y /=; rewrite -[y^-1 * _]mul1 -(mulV (x * y)) -2!mulA (mulA y).
 by rewrite mulxV mul1 mulxV -(mulxV (x * y)) mulA mulV mul1.
@@ -2628,37 +2628,37 @@ Variables (A B C D : {set gT}).
 Hypotheses (nBA : A \subset 'N(B)) (nCA : A \subset 'N(C)).
 
 Lemma norms_gen : A \subset 'N(<<B>>).
-Proof. exact: subset_trans nBA (norm_gen B). Qed.
+Proof using nBA. exact: subset_trans nBA (norm_gen B). Qed.
 
 Lemma norms_norm : A \subset 'N('N(B)).
-Proof. by apply/normsP=> x Ax; rewrite -normJ (normsP nBA). Qed.
+Proof using nBA. by apply/normsP=> x Ax; rewrite -normJ (normsP nBA). Qed.
 
 Lemma normsI : A \subset 'N(B :&: C).
-Proof. by apply/normsP=> x Ax; rewrite conjIg !(normsP _ x Ax). Qed.
+Proof using nCA nBA. by apply/normsP=> x Ax; rewrite conjIg !(normsP _ x Ax). Qed.
 
 Lemma normsU : A \subset 'N(B :|: C).
-Proof. by apply/normsP=> x Ax; rewrite conjUg !(normsP _ x Ax). Qed.
+Proof using nCA nBA. by apply/normsP=> x Ax; rewrite conjUg !(normsP _ x Ax). Qed.
 
 Lemma normsIs : B \subset 'N(D) -> A :&: B \subset 'N(C :&: D).
-Proof.
+Proof using nCA.
 move/normsP=> nDB; apply/normsP=> x; case/setIP=> Ax Bx.
 by rewrite conjIg (normsP nCA) ?nDB.
 Qed.
 
 Lemma normsD : A \subset 'N(B :\: C).
-Proof. by apply/normsP=> x Ax; rewrite conjDg !(normsP _ x Ax). Qed.
+Proof using nCA nBA. by apply/normsP=> x Ax; rewrite conjDg !(normsP _ x Ax). Qed.
 
 Lemma normsM : A \subset 'N(B * C).
-Proof. by apply/normsP=> x Ax; rewrite conjsMg !(normsP _ x Ax). Qed.
+Proof using nCA nBA. by apply/normsP=> x Ax; rewrite conjsMg !(normsP _ x Ax). Qed.
 
 Lemma normsY : A \subset 'N(B <*> C).
-Proof. by apply/normsP=> x Ax; rewrite -genJ conjUg !(normsP _ x Ax). Qed.
+Proof using nCA nBA. by apply/normsP=> x Ax; rewrite -genJ conjUg !(normsP _ x Ax). Qed.
 
 Lemma normsR : A \subset 'N([~: B, C]).
-Proof. by apply/normsP=> x Ax; rewrite conjsRg !(normsP _ x Ax). Qed.
+Proof using nCA nBA. by apply/normsP=> x Ax; rewrite conjsRg !(normsP _ x Ax). Qed.
 
 Lemma norms_class_support : A \subset 'N(class_support B C).
-Proof.
+Proof using nCA nBA.
 apply/subsetP=> x Ax; rewrite inE sub_conjg class_supportEr.
 apply/bigcupsP=> y Cy; rewrite -sub_conjg -conjsgM conjgC conjsgM.
 by rewrite  (normsP nBA) // bigcup_sup ?memJ_norm ?(subsetP nCA).
@@ -2970,16 +2970,16 @@ Variable A B C : {set gT}.
 Hypothesis cAA : abelian A.
 
 Lemma sub_abelian_cent : C \subset A -> A \subset 'C(C).
-Proof. by move=> sCA; rewrite centsC (subset_trans sCA). Qed.
+Proof using cAA. by move=> sCA; rewrite centsC (subset_trans sCA). Qed.
 
 Lemma sub_abelian_cent2 : B \subset A -> C \subset A -> B \subset 'C(C).
-Proof. by move=> sBA; move/sub_abelian_cent; apply: subset_trans. Qed.
+Proof using cAA. by move=> sBA; move/sub_abelian_cent; apply: subset_trans. Qed.
 
 Lemma sub_abelian_norm : C \subset A -> A \subset 'N(C).
-Proof. by move=> sCA; rewrite cents_norm ?sub_abelian_cent. Qed.
+Proof using cAA. by move=> sCA; rewrite cents_norm ?sub_abelian_cent. Qed.
 
 Lemma sub_abelian_normal : (C \subset A) = (C <| A).
-Proof.
+Proof using cAA.
 by rewrite /normal; case sHG: (C \subset A); rewrite // sub_abelian_norm.
 Qed.
 
@@ -3063,14 +3063,14 @@ Lemma mingroupp : mingroup G -> gP G. Proof. by case/mingroupP. Qed.
 Hypothesis gPG : gP G.
 
 Lemma maxgroup_exists : {H : {group gT} | maxgroup H & G \subset H}.
-Proof.
+Proof using gPG.
 have [A maxA sGA]: {A | maxgroup A & G \subset A}.
   by apply: maxset_exists; rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (maxsetp maxA).
 Qed.
 
 Lemma mingroup_exists : {H : {group gT} | mingroup H & H \subset G}.
-Proof.
+Proof using gPG.
 have [A maxA sGA]: {A | mingroup A & A \subset G}.
   by apply: minset_exists; rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (minsetp maxA).

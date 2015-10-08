@@ -168,7 +168,7 @@ Variables (aT : finGroupType) (rT : Type) (to : rT -> aT -> rT).
 Hypotheses (to1 : to^~ 1 =1 id) (toM : forall x, act_morph to x).
 
 Lemma is_total_action : is_action setT to.
-Proof.
+Proof using All.
 split=> [a | x a b _ _] /=; last by rewrite toM.
 by apply: can_inj (to^~ a^-1) _ => x; rewrite -toM ?mulgV.
 Qed.
@@ -445,13 +445,13 @@ Lemma astabsD : 'N(S | to) :&: 'N(T | to) \subset 'N(S :\: T| to).
 Proof. by rewrite setDE -(astabsC T) astabsI. Qed.
 
 Lemma actsI : [acts A, on S :&: T | to].
-Proof. by apply: subset_trans (astabsI S T); rewrite subsetI AactS. Qed.
+Proof using All. by apply: subset_trans (astabsI S T); rewrite subsetI AactS. Qed.
 
 Lemma actsU : [acts A, on S :|: T | to].
-Proof. by apply: subset_trans astabsU; rewrite subsetI AactS. Qed.
+Proof using All. by apply: subset_trans astabsU; rewrite subsetI AactS. Qed.
 
 Lemma actsD : [acts A, on S :\: T | to].
-Proof. by apply: subset_trans astabsD; rewrite subsetI AactS. Qed.
+Proof using All. by apply: subset_trans astabsD; rewrite subsetI AactS. Qed.
 
 End ActsSetop.
 
@@ -747,14 +747,14 @@ Hypothesis sGD : G \subset D.
 Let ssGD := subsetP sGD.
 
 Lemma amove_act a : a \in G -> amove to G x (to x a) = 'C_G[x | to] :* a.
-Proof.
+Proof using ssGD.
 move=> Ga; apply/setP=> b; have Da := ssGD Ga.
 rewrite mem_rcoset !(inE, sub1set) !groupMr ?groupV //.
 by case Gb: (b \in G); rewrite //= actMin ?groupV ?ssGD ?(canF_eq (actKVin Da)).
 Qed.
 
 Lemma amove_orbit : amove to G x @: orbit to G x = rcosets 'C_G[x | to] G.
-Proof.
+Proof using ssGD.
 apply/setP => Ha; apply/imsetP/rcosetsP=> [[y] | [a Ga ->]].
   by case/imsetP=> b Gb -> ->{Ha y}; exists b => //; rewrite amove_act.
 by rewrite -amove_act //; exists (to x a); first apply: mem_orbit.
@@ -762,7 +762,7 @@ Qed.
 
 Lemma amoveK :
   {in orbit to G x, cancel (amove to G x) (fun Ca => to x (repr Ca))}.
-Proof.
+Proof using ssGD.
 move=> _ /orbitP[a Ga <-]; rewrite amove_act //= -[G :&: _]/(gval _).
 case: repr_rcosetP => b; rewrite !(inE, sub1set)=> /and3P[Gb _ xbx].
 by rewrite actMin ?ssGD ?(eqP xbx).
@@ -770,14 +770,14 @@ Qed.
 
 Lemma orbit_stabilizer :
   orbit to G x = [set to x (repr Ca) | Ca in rcosets 'C_G[x | to] G].
-Proof.
+Proof using ssGD.
 rewrite -amove_orbit -imset_comp /=; apply/setP=> z.
 by apply/idP/imsetP=> [xGz | [y xGy ->]]; first exists z; rewrite /= ?amoveK.
 Qed.
 
 Lemma act_reprK :
   {in rcosets 'C_G[x | to] G, cancel (to x \o repr) (amove to G x)}.
-Proof.
+Proof using ssGD.
 move=> _ /rcosetsP[a Ga ->] /=; rewrite amove_act ?rcoset_repr //.
 rewrite -[G :&: _]/(gval _); case: repr_rcosetP => b /setIP[Gb _].
 exact: groupM.
@@ -1428,10 +1428,10 @@ Variable S : {set rT}.
 Hypothesis cSH : H \subset 'C(S | to).
 
 Let fixSH : S \subset 'Fix_to(D :&: H).
-Proof. by rewrite -astabCin ?subsetIl // subIset ?cSH ?orbT. Qed.
+Proof using cSH. by rewrite -astabCin ?subsetIl // subIset ?cSH ?orbT. Qed.
 
 Lemma astabs_mod : 'N(S | mod_action) = 'N(S | to) / H.
-Proof.
+Proof using fixSH.
 apply/setP=> Ha; apply/idP/morphimP=> [nSa | [a nHa nSa ->]].
   case/morphimP: (astabs_dom nSa) => a nHa Da defHa.
   exists a => //; rewrite !inE Da; apply/subsetP=> x Sx; rewrite !inE.
@@ -1441,7 +1441,7 @@ by rewrite !inE /= modactE ?(astabs_act x nSa) ?(subsetP fixSH).
 Qed.
 
 Lemma astab_mod : 'C(S | mod_action) = 'C(S | to) / H.
-Proof.
+Proof using fixSH.
 apply/setP=> Ha; apply/idP/morphimP=> [cSa | [a nHa cSa ->]].
   case/morphimP: (astab_dom cSa) => a nHa Da defHa.
   exists a => //; rewrite !inE Da; apply/subsetP=> x Sx; rewrite !inE.
@@ -1703,7 +1703,7 @@ Variables G H : {group gT}.
 Hypothesis sHG: H \subset G.
 
 Lemma Aut_restr_perm a : a \in Aut G -> restr_perm H a \in Aut H.
-Proof.
+Proof using sHG.
 move=> AutGa.
 case nHa: (a \in 'N(H | 'P)); last by rewrite triv_restr_perm ?nHa ?group1.
 rewrite inE restr_perm_on; apply/morphicP=> x y Hx Hy /=.
@@ -1711,7 +1711,7 @@ by rewrite !restr_permE ?groupM // -(autmE AutGa) morphM ?(subsetP sHG).
 Qed.
 
 Lemma restr_perm_Aut : restr_perm H @* Aut G \subset Aut H.
-Proof.
+Proof using sHG.
 by apply/subsetP=> a'; case/morphimP=> a _ AutGa ->{a'}; apply: Aut_restr_perm.
 Qed.
 
@@ -1726,7 +1726,7 @@ Lemma Aut_sub_fullP :
              exists g : {morphism G >-> gT},
              [/\ 'injm g, g @* G = G & {in H, g =1 h}])
           (Aut_in (Aut G) H \isog Aut H).
-Proof.
+Proof using sHG.
 rewrite (isog_transl _ Aut_in_isog) /=; set rG := _ @* _.
 apply: (iffP idP) => [iso_rG h injh hH| AutHinG].
   have: aut injh hH \in rG; last case/morphimP=> g nHg AutGg def_g.
@@ -1762,7 +1762,7 @@ Local Notation infH := (restr_perm (f @* H)).
 
 Lemma astabs_Aut_isom a :
   a \in Aut G -> (fGisom a \in 'N(f @* H | 'P)) = (a \in 'N(H | 'P)).
-Proof.
+Proof using sHD.
 move=> AutGa; rewrite !inE sub_morphim_pre // subsetI sHD /= /aperm.
 rewrite !(sameP setIidPl eqP) !eqEsubset !subsetIl; apply: eq_subset_r => x.
 rewrite !inE; apply: andb_id2l => Hx; have Gx: x \in G := subsetP sHG x Hx.
@@ -1771,7 +1771,7 @@ by rewrite Aut_isomE // -!sub1set -morphim_set1 // injmSK ?sub1set.
 Qed.
 
 Lemma isom_restr_perm a : a \in Aut G -> fHisom (inH a) = infH (fGisom a).
-Proof.
+Proof using sHG.
 move=> AutGa; case nHa: (a \in 'N(H | 'P)); last first.
   by rewrite !triv_restr_perm ?astabs_Aut_isom ?nHa ?morph1.
 apply: (eq_Aut (Aut_Aut_isom injf sHD _)) => [|fx Hfx /=].
@@ -1782,7 +1782,7 @@ by rewrite !restr_permE ?astabs_Aut_isom // def_fx Aut_isomE.
 Qed.
 
 Lemma restr_perm_isom : isom (inH @* Aut G) (infH @* Aut (f @* G)) fHisom.
-Proof.
+Proof using sGD sHG.
 apply: sub_isom; rewrite ?restr_perm_Aut ?injm_Aut_isom //=.
 rewrite -(im_Aut_isom injf sGD) -!morphim_comp.
 apply: eq_in_morphim; last exact: isom_restr_perm.
@@ -1792,7 +1792,7 @@ by symmetry; rewrite inE AutGa inE astabs_Aut_isom.
 Qed.
 
 Lemma injm_Aut_sub : Aut_in (Aut (f @* G)) (f @* H) \isog Aut_in (Aut G) H.
-Proof.
+Proof using All.
 do 2!rewrite isog_sym (isog_transl _ (Aut_in_isog _ _)).
 by rewrite isog_sym (isom_isog _ _ restr_perm_isom) // restr_perm_Aut.
 Qed.
@@ -1800,7 +1800,7 @@ Qed.
 Lemma injm_Aut_full :
   (Aut_in (Aut (f @* G)) (f @* H) \isog Aut (f @* H))
       = (Aut_in (Aut G) H \isog Aut H).
-Proof.
+Proof using All.
 by rewrite (isog_transl _ injm_Aut_sub) (isog_transr _ (injm_Aut injf sHD)).
 Qed.
 
@@ -1918,16 +1918,16 @@ Proof. by rewrite -setIIr -afixU -setIUr. Qed.
 Hypotheses (Da : a \in D) (sAD : A \subset D) (sSR : S \subset R).
 
 Lemma gacentE : 'C_(|to)(A) = 'Fix_(R | to)(A).
-Proof. by rewrite -{2}(setIidPr sAD). Qed.
+Proof using sAD. by rewrite -{2}(setIidPr sAD). Qed.
 
 Lemma gacent1E : 'C_(|to)[a] = 'Fix_(R | to)[a].
-Proof. by rewrite /gacent [D :&: _](setIidPr _) ?sub1set. Qed.
+Proof using Da. by rewrite /gacent [D :&: _](setIidPr _) ?sub1set. Qed.
 
 Lemma subgacentE : 'C_(S | to)(A) = 'Fix_(S | to)(A).
-Proof. by rewrite gacentE setIA (setIidPl sSR). Qed.
+Proof using sSR sAD. by rewrite gacentE setIA (setIidPl sSR). Qed.
 
 Lemma subgacent1E : 'C_(S | to)[a] = 'Fix_(S | to)[a].
-Proof. by rewrite gacent1E setIA (setIidPl sSR). Qed.
+Proof using sSR Da. by rewrite gacent1E setIA (setIidPl sSR). Qed.
 
 End RawGroupAction.
 
@@ -2315,7 +2315,7 @@ Hypotheses (sSR : S \subset R) (sAD1 : A \subset D1).
 Hypothesis hfJ : {in S & D1, morph_act to1 to2 h f}.
 
 Lemma morph_astabs : f @* 'N(S | to1) = 'N(h @: S | to2).
-Proof.
+Proof using actsDR defD2 hfJ injh sSR.
 apply/setP=> fx; apply/morphimP/idP=> [[x D1x nSx ->] | nSx].
   rewrite 2!inE -{1}defD2 mem_morphim //=; apply/subsetP=> _ /imsetP[u Su ->].
   by rewrite inE -hfJ ?mem_imset // (astabs_act _ nSx).
@@ -2328,7 +2328,7 @@ by rewrite inE def_u' ?actsDR ?(subsetP sSR).
 Qed.
 
 Lemma morph_astab : f @* 'C(S | to1) = 'C(h @: S | to2).
-Proof.
+Proof using actsDR defD2 hfJ injh sSR.
 apply/setP=> fx; apply/morphimP/idP=> [[x D1x cSx ->] | cSx].
   rewrite 2!inE -{1}defD2 mem_morphim //=; apply/subsetP=> _ /imsetP[u Su ->].
   by rewrite inE -hfJ // (astab_act cSx).
@@ -2340,7 +2340,7 @@ by rewrite -def_fx (astab_act cSx) ?mem_imset.
 Qed.
 
 Lemma morph_afix : h @: 'Fix_(S | to1)(A) = 'Fix_(h @: S | to2)(f @* A).
-Proof.
+Proof using actsDR hfJ injh sAD1 sSR.
 apply/setP=> hu; apply/imsetP/setIP=> [[u /setIP[Su cAu] ->]|].
   split; first by rewrite mem_imset.
   by apply/afixP=> _ /morphimP[x D1x Ax ->]; rewrite -hfJ ?(afixP cAu).
@@ -2363,7 +2363,7 @@ Hypothesis hfJ : {in R1 & D1, morph_act to1 to2 h f}.
 Implicit Types (A : {set aT1}) (S : {set rT1}) (M : {group rT1}).
 
 Lemma morph_gastabs S : S \subset R1 -> f @* 'N(S | to1) = 'N(h @* S | to2).
-Proof.
+Proof using All.
 have [[_ defD2] [injh _]] := (isomP iso_f, isomP iso_h).
 move=> sSR1; rewrite (morphimEsub _ sSR1).
 apply: (morph_astabs (gact_stable to1) (injmP injh)) => // u x.
@@ -2371,7 +2371,7 @@ by move/(subsetP sSR1); apply: hfJ.
 Qed.
 
 Lemma morph_gastab S : S \subset R1 -> f @* 'C(S | to1) = 'C(h @* S | to2).
-Proof.
+Proof using All.
 have [[_ defD2] [injh _]] := (isomP iso_f, isomP iso_h).
 move=> sSR1; rewrite (morphimEsub _ sSR1).
 apply: (morph_astab (gact_stable to1) (injmP injh)) => // u x.
@@ -2379,7 +2379,7 @@ by move/(subsetP sSR1); apply: hfJ.
 Qed.
 
 Lemma morph_gacent A : A \subset D1 -> h @* 'C_(|to1)(A) = 'C_(|to2)(f @* A).
-Proof.
+Proof using All.
 have [[_ defD2] [injh defR2]] := (isomP iso_f, isomP iso_h).
 move=> sAD1; rewrite !gacentE //; last by rewrite -defD2 morphimS.
 rewrite morphimEsub ?subsetIl // -{1}defR2 morphimEdom.
@@ -2389,7 +2389,7 @@ Qed.
 Lemma morph_gact_irr A M :
     A \subset D1 -> M \subset R1 -> 
   acts_irreducibly (f @* A) (h @* M) to2 = acts_irreducibly A M to1.
-Proof.
+Proof using All.
 move=> sAD1 sMR1.
 have [[injf defD2] [injh defR2]] := (isomP iso_f, isomP iso_h).
 have h_eq1 := morphim_injm_eq1 injh.

@@ -393,10 +393,10 @@ Variables (D : {group aT}) (f : {morphism D >-> rT}) (x : aT).
 Hypothesis Dx : x \in D.
 
 Lemma morph_order : #[f x] %| #[x].
-Proof. by rewrite order_dvdn -morphX // expg_order morph1. Qed.
+Proof using Dx. by rewrite order_dvdn -morphX // expg_order morph1. Qed.
 
 Lemma morph_generator A : generator A x -> generator (f @* A) (f x).
-Proof. by move/(A =P _)->; rewrite /generator morphim_cycle. Qed.
+Proof using Dx. by move/(A =P _)->; rewrite /generator morphim_cycle. Qed.
 
 End MorphicImage.
 

@@ -48,7 +48,7 @@ Lemma Msigma_setI_mmax_central p H :
            P \subset 'C(M`_\sigma :&: H),
      (*b*) p \notin \tau2(H)
    & (*c*) p \in \tau1(M) -> p \in \beta(G)].
-Proof.
+Proof using hallE maxM.
 move=> maxH piEp piHp t1H'p; set R := [~: _, _] => ntR notMGH.
 have [q sMq piH'q]: exists2 q, q \in \sigma(M) & q \in \pi(H^`(1)).
   pose q := pdiv #|R|; have q_pr: prime q by rewrite pdiv_prime ?cardG_gt1.
@@ -138,7 +138,7 @@ Corollary cent_norm_tau13_mmax p P H :
            X \subset 'C(M`_\sigma :&: H)
    & (*c*) [~: M`_\sigma :&: H, M :&: H] != 1 ->
            p \in \sigma(H) /\ (p \in \tau1(M) -> p \in \beta(H))].
-Proof.
+Proof using maxM sEM.
 move=> t13Mp sPM pP /setIdP[maxH sNP_H].
 have ntP: P :!=: 1.
   by apply: contraTneq sNP_H => ->; rewrite norm1 proper_subn ?mmax_proper.
@@ -173,7 +173,7 @@ Qed.
 (* This is B & G, Corollary 13.3(a). *)
 Lemma cyclic_primact_Msigma p P :
   p.-Sylow(E) P -> cyclic P -> semiprime M`_\sigma P.
-Proof.
+Proof using maxM sEM.
 move=> sylP cycP x /setD1P[]; rewrite -cycle_eq1 -cycle_subG => ntX sXP.
 have [sPE pP _] := and3P sylP; rewrite -cent_cycle.
 have sPM := subset_trans sPE sEM; have sXM := subset_trans sXP sPM.
@@ -195,7 +195,7 @@ Qed.
 (* This is B & G, Corollary 13.3(b). *)
 Corollary tau3_primact_Msigma E3 :
   \tau3(M).-Hall(E) E3 -> semiprime M`_\sigma E3.
-Proof.
+Proof using maxM sEM.
 move=> hallE3 x /setD1P[]; rewrite -cycle_eq1 -cycle_subG => ntX sXE3.
 have [sE3E t3E3 _] := and3P hallE3; rewrite -cent_cycle.
 have [[E1 hallE1] _] := ex_tau13_compl hallE.
@@ -235,7 +235,7 @@ Qed.
 Theorem cent_tau1Elem_Msigma p r P R (Ms := M`_\sigma) :
     p \in \tau1(M) -> P \in 'E_p^1(E) -> R \in 'E_r^1('C_E(P)) ->
   'C_Ms(P) \subset 'C_Ms(R).
-Proof.
+Proof using All.
 have /andP[sMsM nMsM]: Ms <| M := pcore_normal _ M.
 have coMsE: coprime #|Ms| #|E| := coprime_sigma_compl hallE.
 pose Ma := M`_\alpha; have sMaMs: Ma \subset Ms := Malpha_sub_Msigma maxM.
@@ -335,7 +335,7 @@ Qed.
 
 (* This is B & G, Theorem 13.5. *)
 Theorem tau1_primact_Msigma E1 : \tau1(M).-Hall(E) E1 -> semiprime M`_\sigma E1.
-Proof.
+Proof using All.
 move=> hallE1 x /setD1P[]; rewrite -cycle_eq1 -cycle_subG => ntX sXE1.
 rewrite -cent_cycle; have [sE1E t1E1 _] := and3P hallE1.
 have [_ [E3 hallE3]] := ex_tau13_compl hallE.
@@ -374,7 +374,7 @@ Lemma cent_cent_Msigma_tau1_uniq E1 P q X (Ms := M`_\sigma) :
     \tau1(M).-Hall(E) E1 -> P \subset E1 -> P :!=: 1 ->
      X \in 'E_q^1('C_Ms(P)) ->
  'M('C(X)) = [set M] /\ (forall S, q.-Sylow(Ms) S -> 'M(S) = [set M]).
-Proof.
+Proof using All.
 move=> hallE1 sPE1 ntP EqX; have [sE1E t1E1 _] := and3P hallE1.
 rewrite (cent_semiprime (tau1_primact_Msigma hallE1)) //= -/Ms in EqX.
 have{P ntP sPE1} ntE1 := subG1_contra sPE1 ntP.

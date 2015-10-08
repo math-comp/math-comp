@@ -403,13 +403,13 @@ Variable (T : Type) (zero one : T) (mul add : T -> T -> T) (inv : T -> T).
 Hypothesis mulC : commutative mul.
 
 Lemma mulC_id : left_id one mul -> right_id one mul.
-Proof. by move=>  mul1x x; rewrite mulC. Qed.
+Proof using mulC. by move=>  mul1x x; rewrite mulC. Qed.
 
 Lemma mulC_zero : left_zero zero mul -> right_zero zero mul.
-Proof. by move=> mul0x x; rewrite mulC. Qed.
+Proof using mulC. by move=> mul0x x; rewrite mulC. Qed.
 
 Lemma mulC_dist : left_distributive mul add -> right_distributive mul add.
-Proof. by move=> mul_addl x y z; rewrite !(mulC x). Qed.
+Proof using mulC. by move=> mul_addl x y z; rewrite !(mulC x). Qed.
 
 End CommutativeAxioms.
 
@@ -695,7 +695,7 @@ Lemma big_rec3 I r (P : pred I) F1 F2 F3
   K (\big[op1/id1]_(i <- r | P i) F1 i)
     (\big[op2/id2]_(i <- r | P i) F2 i)
     (\big[op3/id3]_(i <- r | P i) F3 i).
-Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: K_F. Qed.
+Proof using Kid. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: K_F. Qed.
 
 Hypothesis Kop : forall x1 x2 x3 y1 y2 y3,
   K x1 x2 x3 -> K y1 y2 y3-> K (op1 x1 y1) (op2 x2 y2) (op3 x3 y3).
@@ -704,7 +704,7 @@ Lemma big_ind3 I r (P : pred I) F1 F2 F3
   K (\big[op1/id1]_(i <- r | P i) F1 i)
     (\big[op2/id2]_(i <- r | P i) F2 i)
     (\big[op3/id3]_(i <- r | P i) F3 i).
-Proof. by apply: big_rec3 => i x1 x2 x3 /K_F; apply: Kop. Qed.
+Proof using All. by apply: big_rec3 => i x1 x2 x3 /K_F; apply: Kop. Qed.
 
 End Elim3.
 
@@ -723,18 +723,18 @@ Lemma big_rec2 I r (P : pred I) F1 F2
     (K_F : forall i y1 y2, P i -> K y1 y2 ->
        K (op1 (F1 i) y1) (op2 (F2 i) y2)) :
   K (\big[op1/id1]_(i <- r | P i) F1 i) (\big[op2/id2]_(i <- r | P i) F2 i).
-Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: K_F. Qed.
+Proof using Kid. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: K_F. Qed.
 
 Hypothesis Kop : forall x1 x2 y1 y2,
   K x1 x2 -> K y1 y2 -> K (op1 x1 y1) (op2 x2 y2).
 Lemma big_ind2 I r (P : pred I) F1 F2 (K_F : forall i, P i -> K (F1 i) (F2 i)) :
   K (\big[op1/id1]_(i <- r | P i) F1 i) (\big[op2/id2]_(i <- r | P i) F2 i).
-Proof. by apply: big_rec2 => i x1 x2 /K_F; apply: Kop. Qed.
+Proof using Kop Kid. by apply: big_rec2 => i x1 x2 /K_F; apply: Kop. Qed.
 
 Hypotheses (f_op : {morph f : x y / op2 x y >-> op1 x y}) (f_id : f id2 = id1).
 Lemma big_morph I r (P : pred I) F :
   f (\big[op2/id2]_(i <- r | P i) F i) = \big[op1/id1]_(i <- r | P i) f (F i).
-Proof. by rewrite unlock; elim: r => //= i r <-; rewrite -f_op -fun_if. Qed.
+Proof using f_id f_op. by rewrite unlock; elim: r => //= i r <-; rewrite -f_op -fun_if. Qed.
 
 End Elim2.
 
@@ -752,24 +752,24 @@ Hypothesis Kid : K idx.
 Lemma big_rec I r (P : pred I) F
     (Kop : forall i x, P i -> K x -> K (op (F i) x)) :
   K (\big[op/idx]_(i <- r | P i) F i).
-Proof. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: Kop. Qed.
+Proof using Kid. by rewrite unlock; elim: r => //= i r; case: ifP => //; apply: Kop. Qed.
 
 Hypothesis Kop : forall x y, K x -> K y -> K (op x y).
 Lemma big_ind I r (P : pred I) F (K_F : forall i, P i -> K (F i)) :
   K (\big[op/idx]_(i <- r | P i) F i).
-Proof. by apply: big_rec => // i x /K_F /Kop; apply. Qed.
+Proof using Kop Kid. by apply: big_rec => // i x /K_F /Kop; apply. Qed.
 
 Hypothesis Kop' : forall x y, K x -> K y -> op x y = op' x y.
 Lemma eq_big_op I r (P : pred I) F (K_F : forall i, P i -> K (F i)) :
   \big[op/idx]_(i <- r | P i) F i = \big[op'/idx]_(i <- r | P i) F i.
-Proof.
+Proof using Kop' Kop Kid.
 by elim/(big_load K): _; elim/big_rec2: _ => // i _ y Pi [Ky <-]; auto.
 Qed.
 
 Hypotheses (fM : {morph f : x y / op x y}) (f_id : f idx = idx).
 Lemma big_endo I r (P : pred I) F :
   f (\big[op/idx]_(i <- r | P i) F i) = \big[op/idx]_(i <- r | P i) f (F i).
-Proof. exact: big_morph. Qed.
+Proof using f_id fM. exact: big_morph. Qed.
 
 End Elim1.
 

@@ -1641,27 +1641,27 @@ Variables (K : fieldType) (vT : vectType K) (f : 'End(vT)).
 Hypothesis kerf0 : lker f == 0%VS.
 
 Lemma lker0_limgf : limg f = fullv.
-Proof.
+Proof using All.
 by apply/eqP; rewrite eqEdim subvf limg_dim_eq //= (eqP kerf0) capv0.
 Qed.
 
 Lemma lker0_lfunVK : cancel f^-1%VF f.
-Proof. by move=> u; rewrite limg_lfunVK // lker0_limgf memvf. Qed.
+Proof using All. by move=> u; rewrite limg_lfunVK // lker0_limgf memvf. Qed.
 
 Lemma lker0_compfV : (f \o f^-1 = \1)%VF.
-Proof. by apply/lfunP=> u; rewrite !lfunE /= lker0_lfunVK. Qed.
+Proof using All. by apply/lfunP=> u; rewrite !lfunE /= lker0_lfunVK. Qed.
 
 Lemma lker0_compVKf aT g : (f \o (f^-1 \o g))%VF = g :> 'Hom(aT, vT).
-Proof. by rewrite comp_lfunA lker0_compfV comp_lfun1l. Qed.
+Proof using All. by rewrite comp_lfunA lker0_compfV comp_lfun1l. Qed.
 
 Lemma lker0_compKf aT g : (f^-1 \o (f \o g))%VF = g :> 'Hom(aT, vT).
-Proof. by rewrite comp_lfunA lker0_compVf ?comp_lfun1l. Qed.
+Proof using All. by rewrite comp_lfunA lker0_compVf ?comp_lfun1l. Qed.
 
 Lemma lker0_compfK rT h : ((h \o f) \o f^-1)%VF = h :> 'Hom(vT, rT).
-Proof. by rewrite -comp_lfunA lker0_compfV comp_lfun1r. Qed.
+Proof using All. by rewrite -comp_lfunA lker0_compfV comp_lfun1r. Qed.
 
 Lemma lker0_compfVK rT h : ((h \o f^-1) \o f)%VF = h :> 'Hom(vT, rT).
-Proof. by rewrite -comp_lfunA lker0_compVf ?comp_lfun1r. Qed.
+Proof using All. by rewrite -comp_lfunA lker0_compVf ?comp_lfun1r. Qed.
 
 End LinAut.
 
@@ -1730,7 +1730,7 @@ Variables (R : comRingType) (vT : vectType R).
 Hypothesis vT_proper : Vector.dim vT > 0.
 
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
-Proof.
+Proof using All.
 apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
 by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0.
 Qed.

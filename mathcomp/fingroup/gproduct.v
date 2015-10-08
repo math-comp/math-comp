@@ -220,17 +220,17 @@ Variables K H : {group gT}.
 Hypothesis tiKH : K :&: H = 1.
 
 Lemma remgr_id x : x \in H -> remgr K H x = x.
-Proof.
+Proof using All.
 move=> Hx; apply/eqP; rewrite eq_mulgV1 (sameP eqP set1gP) -tiKH inE.
 rewrite -mem_rcoset groupMr ?groupV // -in_setI remgrP.
 by apply: subsetP Hx; apply: mulG_subr.
 Qed.
 
 Lemma remgrMid x y : x \in K -> y \in H -> remgr K H (x * y) = y.
-Proof. by move=> Kx Hy; rewrite remgrMl ?remgr_id. Qed.
+Proof using All. by move=> Kx Hy; rewrite remgrMl ?remgr_id. Qed.
 
 Lemma divgrMid x y : x \in K -> y \in H -> divgr K H (x * y) = x.
-Proof. by move=> Kx Hy; rewrite /divgr remgrMid ?mulgK. Qed.
+Proof using All. by move=> Kx Hy; rewrite /divgr remgrMid ?mulgK. Qed.
 
 End DisjointRem.
 
@@ -272,7 +272,7 @@ Variables K H G : {group gT}.
 Hypothesis complH_K : H \in [complements to K in G].
 
 Lemma remgrM : K <| G -> {in G &, {morph remgr K H : x y / x * y}}.
-Proof.
+Proof using All.
 case/normalP=> _; case/complP: complH_K => tiKH <- nK_KH x y KHx KHy.
 rewrite {1}(divgr_eq K H y) mulgA (conjgCV x) {2}(divgr_eq K H x) -2!mulgA.
 rewrite mulgA remgrMid //; last by rewrite groupMl mem_remgr.
@@ -280,7 +280,7 @@ by rewrite groupMl !(=^~ mem_conjg, nK_KH, mem_divgr).
 Qed.
 
 Lemma divgrM : H \subset 'C(K) -> {in G &, {morph divgr K H : x y / x * y}}.
-Proof.
+Proof using All.
 move=> cKH; have /complP[_ defG] := complH_K.
 have nsKG: K <| G by rewrite -defG -cent_joinEr // normalYl cents_norm.
 move=> x y Gx Gy; rewrite {1}/divgr remgrM // invMg -!mulgA (mulgA y).
@@ -886,39 +886,39 @@ Variables G H K : {group gT}.
 Hypothesis sGD : G \subset D.
 
 Lemma morphim_pprod : pprod K H = G -> pprod (f @* K) (f @* H) = f @* G.
-Proof.
+Proof using sGD.
 case/pprodP=> _ defG mKH; rewrite pprodE ?morphim_norms //.
 by rewrite -morphimMl ?(subset_trans _ sGD) -?defG // mulG_subl.
 Qed.
 
 Lemma morphim_coprime_sdprod :
   K ><| H = G -> coprime #|K| #|H| -> f @* K ><| f @* H = f @* G.
-Proof.
+Proof using sGD.
 rewrite /sdprod => defG coHK; move: defG.
 by rewrite !coprime_TIg ?coprime_morph // !subxx; apply: morphim_pprod.
 Qed.
 
 Lemma injm_sdprod : 'injm f -> K ><| H = G -> f @* K ><| f @* H = f @* G.
-Proof.
+Proof using sGD.
 move=> inj_f; case/sdprodP=> _ defG nKH tiKH.
 by rewrite /sdprod -injmI // tiKH morphim1 subxx morphim_pprod // pprodE.
 Qed.
 
 Lemma morphim_cprod : K \* H = G -> f @* K \* f @* H = f @* G.
-Proof.
+Proof using sGD.
 case/cprodP=> _ defG cKH; rewrite /cprod morphim_cents // morphim_pprod //.
 by rewrite pprodE // cents_norm // centsC.
 Qed.
 
 Lemma injm_dprod : 'injm f -> K \x H = G -> f @* K \x f @* H = f @* G.
-Proof.
+Proof using sGD.
 move=> inj_f; case/dprodP=> _ defG cHK tiKH.
 by rewrite /dprod -injmI // tiKH morphim1 subxx morphim_cprod // cprodE.
 Qed.
 
 Lemma morphim_coprime_dprod :
   K \x H = G -> coprime #|K| #|H| -> f @* K \x f @* H = f @* G.
-Proof.
+Proof using sGD.
 rewrite /dprod => defG coHK; move: defG.
 by rewrite !coprime_TIg ?coprime_morph // !subxx; apply: morphim_cprod.
 Qed.
@@ -967,18 +967,18 @@ Variables (gT : finGroupType) (G K H M : {group gT}).
 Hypothesis nMG: G \subset 'N(M).
 
 Lemma quotient_pprod : pprod K H = G -> pprod (K / M) (H / M) = G / M.
-Proof. exact: morphim_pprod. Qed.
+Proof using nMG. exact: morphim_pprod. Qed.
 
 Lemma quotient_coprime_sdprod :
   K ><| H = G -> coprime #|K| #|H| -> (K / M) ><| (H / M) = G / M.
-Proof. exact: morphim_coprime_sdprod. Qed.
+Proof using nMG. exact: morphim_coprime_sdprod. Qed.
 
 Lemma quotient_cprod : K \* H = G -> (K / M) \* (H / M) = G / M.
-Proof. exact: morphim_cprod. Qed.
+Proof using nMG. exact: morphim_cprod. Qed.
 
 Lemma quotient_coprime_dprod :
   K \x H = G -> coprime #|K| #|H| -> (K / M) \x (H / M) = G / M.
-Proof. exact: morphim_coprime_dprod. Qed.
+Proof using nMG. exact: morphim_coprime_dprod. Qed.
 
 End QuotientInternalProd.
 
@@ -1284,7 +1284,7 @@ Qed.
 Hypotheses (sAD : A \subset D) (sGR : G \subset R).
 
 Lemma astabEsd : 'C(G | to) = sdpair2 @*^-1 'C(sdpair1 @* G).
-Proof.
+Proof using sGR.
 have ssGR := subsetP sGR; apply/setP=> a; apply/idP/idP=> [cGa|].
   rewrite mem_morphpre ?(astab_dom cGa) //.
   apply/centP=> _ /morphimP[x Rx Gx ->]; symmetry.
@@ -1295,7 +1295,7 @@ by rewrite sdpair_act ?ssGR // /conjg -(centP cGa) ?mulKg ?mem_morphim ?ssGR.
 Qed.
 
 Lemma astabsEsd : 'N(G | to) = sdpair2 @*^-1 'N(sdpair1 @* G).
-Proof.
+Proof using sGR.
 apply/setP=> a; apply/idP/idP=> [nGa|].
   have Da := astabs_dom nGa; rewrite mem_morphpre // inE sub_conjg.
   apply/subsetP=> _ /morphimP[x Rx Gx ->].
@@ -1307,7 +1307,7 @@ by rewrite sdpair_act ?memJ_norm ?mem_morphim.
 Qed.
 
 Lemma actsEsd : [acts A, on G | to] = (sdpair2 @* A \subset 'N(sdpair1 @* G)).
-Proof. by rewrite sub_morphim_pre -?astabsEsd. Qed.
+Proof using sGR sAD. by rewrite sub_morphim_pre -?astabsEsd. Qed.
 
 End ExternalSDirProd.
 
@@ -1425,13 +1425,13 @@ Hypothesis eqHK_G : H ><| K = G.
 Hypothesis actf : {in H & K, morph_act 'J 'J fH fK}.
 
 Lemma sdprodm_norm : K \subset 'N(H).
-Proof. by case/sdprodP: eqHK_G. Qed.
+Proof using eqHK_G. by case/sdprodP: eqHK_G. Qed.
 
 Lemma sdprodm_sub : G \subset H <*> K.
-Proof. by case/sdprodP: eqHK_G => _ <- nHK _; rewrite norm_joinEr. Qed.
+Proof using eqHK_G. by case/sdprodP: eqHK_G => _ <- nHK _; rewrite norm_joinEr. Qed.
 
 Lemma sdprodm_eqf : {in H :&: K, fH =1 fK}.
-Proof.
+Proof using eqHK_G.
 by case/sdprodP: eqHK_G => _ _ _ -> _ /set1P->; rewrite !morph1.
 Qed.
 
@@ -1495,13 +1495,13 @@ Hypothesis cfHK : fK @* K \subset 'C(fH @* H).
 Hypothesis eqfHK : {in H :&: K, fH =1 fK}.
 
 Lemma cprodm_norm : K \subset 'N(H).
-Proof. by rewrite cents_norm //; case/cprodP: eqHK_G. Qed.
+Proof using eqHK_G. by rewrite cents_norm //; case/cprodP: eqHK_G. Qed.
 
 Lemma cprodm_sub : G \subset H <*> K.
-Proof. by case/cprodP: eqHK_G => _ <- cHK; rewrite cent_joinEr. Qed.
+Proof using eqHK_G. by case/cprodP: eqHK_G => _ <- cHK; rewrite cent_joinEr. Qed.
 
 Lemma cprodm_actf : {in H & K, morph_act 'J 'J fH fK}.
-Proof.
+Proof using cfHK eqHK_G.
 case/cprodP: eqHK_G => _ _ cHK a b Ha Kb /=.
 by rewrite /conjg -(centsP cHK b) // -(centsP cfHK (fK b)) ?mulKg ?mem_morphim.
 Qed.
@@ -1563,12 +1563,12 @@ Hypothesis eqHK_G : H \x K = G.
 Hypothesis cfHK : fK @* K \subset 'C(fH @* H).
 
 Lemma dprodm_cprod : H \* K = G.
-Proof.
+Proof using eqHK_G.
 by rewrite -eqHK_G /dprod; case/dprodP: eqHK_G => _ _ _ ->; rewrite subxx.
 Qed.
 
 Lemma dprodm_eqf : {in H :&: K, fH =1 fK}.
-Proof. by case/dprodP: eqHK_G => _ _ _ -> _ /set1P->; rewrite !morph1. Qed.
+Proof using eqHK_G. by case/dprodP: eqHK_G => _ _ _ -> _ /set1P->; rewrite !morph1. Qed.
 
 Definition dprodm := cprodm dprodm_cprod cfHK dprodm_eqf.
 
@@ -1650,7 +1650,7 @@ Lemma im_sdprodm2 : gK @* DgK = fK @* K.
 Proof. by rewrite morphim_restrm setIid morphim_comp im_invm. Qed.
 
 Lemma xsdprodm_act : {in DgH & DgK, morph_act 'J 'J gH gK}.
-Proof.
+Proof using actf.
 move=> fh fk; case/morphimP=> h _ Hh ->{fh}; case/morphimP=> k _ Kk ->{fk}.
 by rewrite /= -sdpair_act // /restrm /= !invmE ?actf ?gact_stable.
 Qed.

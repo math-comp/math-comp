@@ -64,7 +64,7 @@ Let calI := [seq 'chi_i | i in calX].
 
 (* This does not actually use the Ltype1 assumption. *)
 Lemma FTtype1_ref_irr : exists2 phi, phi \in calS & phi 1%g = #|L : H|%:R.
-Proof.
+Proof using maxL.
 have solH: solvable H := nilpotent_sol (Fcore_nil L).
 by apply: exists_linInd; rewrite ?normal1 // proper1G mmax_Fcore_neq1.
 Qed.
@@ -109,7 +109,7 @@ Lemma FTtype1_seqInd_facts chi :
   [/\ chi = \sum_(i in S_ chi) 'chi_i,
       constant [seq 'chi_i 1%g | i in S_ chi]
     & {in S_ chi, forall i, 'chi_i \in 'CF(L, 1%g |: 'A(L))}].
-Proof.
+Proof using Ltype1 maxL.
 move=> calS_chi; have [t nz_t Dchi] := seqIndC1P calS_chi.
 pose T := 'I_L['chi_t]%g.
 have sTL: T \subset L by apply: Inertia_sub.
@@ -142,7 +142,7 @@ Qed.
 (* This is Peterfalvi (12.2)(a), second part. *)
 Lemma FTtype1_irr_isometry :
   {in 'Z[calI, L^#], isometry tau, to 'Z[irr G, G^#]}.
-Proof.
+Proof using Ltype1 maxL.
 apply: (sub_iso_to _ _ (Dade_Zisometry _)) => // phi.
 rewrite zcharD1E => /andP[S_phi phi1_0].
 have /subsetD1P[_ /setU1K <-] := FTsupp_sub L; rewrite zcharD1 {}phi1_0 andbT.
@@ -152,7 +152,7 @@ Qed.
 
 Lemma FTtype1_irr_subcoherent : 
   {R : 'CF(L) -> seq 'CF(G) | subcoherent calI tau R}.
-Proof.
+Proof using Ltype1 maxL.
 apply: irr_subcoherent; last exact: FTtype1_irr_isometry.
   have UcalI: uniq calI by apply/dinjectiveP; apply: in2W irr_inj.
   split=> // _ /imageP[i Ii ->]; rewrite !inE in Ii; first exact: mem_irr.
@@ -338,7 +338,7 @@ Let S_ (chi : 'CF(L)) := [set i in irr_constt chi].
 Lemma FTtype1_ortho_constant (psi : 'CF(G)) x : 
     {in calS, forall phi, orthogonal psi (R phi)} -> x \in L :\: H ->
   {in x *: H, forall y, psi y = psi x}%g.
-Proof. 
+Proof using S_. 
 move=> opsiR /setDP[Lx H'x]; pose Rpsi := 'Res[L] psi.
 have nsHL: H <| L := gFnormal _ _; have [sHL _] := andP nsHL.
 have [U [[[_ _ sdHU] [U1 inertU1] _] _]] := FTtypeP 1 maxL Ltype1.
@@ -428,7 +428,7 @@ Qed.
 Lemma FtypeI_invDade_ortho_constant (psi : 'CF(G)) : 
     {in calS, forall phi, orthogonal psi (R phi)} ->
   {in H :\: H' &, forall x y, rho psi x = rho psi y}.
-Proof.
+Proof using Ltype1 maxL.
 have [nsH'H nsHL]: H' <| H /\ H <| L by rewrite !gFnormal.
 have [[sH'H _] [sHL _]] := (andP nsH'H, andP nsHL).
 case: (Rgen _ _) @R => /= rR [scohS _ _] opsiR; set rpsi := rho psi.
@@ -499,14 +499,14 @@ End Twelve_4_5.
 Hypothesis frobL : [Frobenius L with kernel H].
   
 Lemma FT_Frobenius_type1 : FTtype L == 1%N.
-Proof.
+Proof using frobL maxL.
 have [E /Frobenius_of_typeF LtypeF] := existsP frobL.
 by apply/idPn=> /FTtypeP_witness[]// _ _ _ _ _ /typePF_exclusion/(_ E).
 Qed.
 Let Ltype1 := FT_Frobenius_type1.
 
 Lemma FTsupp_Frobenius : 'A(L) = H^#.
-Proof.
+Proof using Ltype1.
 apply/eqP; rewrite eqEsubset Fcore_sub_FTsupp // andbT.
 apply/bigcupsP=> y; rewrite Ltype1 FTsupp1_type1 //= => H1y.
 by rewrite setSD //; have [_ _ _ ->] := Frobenius_kerP frobL.
@@ -514,7 +514,7 @@ Qed.
 
 (* This is Peterfalvi (12.6). *)
 Lemma FT_Frobenius_coherence : {subset calS <= irr L} /\ coherent calS L^# tau.
-Proof.
+Proof using Ltype1.
 have irrS: {subset calS <= irr L}.
   by move=> _ /seqIndC1P[s nz_s ->]; apply: irr_induced_Frobenius_ker.
 split=> //; have [U [MtypeF MtypeI]] := FTtypeP 1 maxL Ltype1.
@@ -569,7 +569,7 @@ Lemma non_Frobenius_FTtype1_witness :
     & exists2 L, L \in 'M /\ P0 \subset L`_\s
     & exists2 x, x \in 'Ohm_1(P0)^#
     & [/\ ~~ ('C_K[x] \subset K'), 'N(<[x]>) \subset M & ~~ ('C[x] \subset L)]].
-Proof.
+Proof using Mtype1 maxM p'K prankM sylP0.
 have ntK: K :!=: 1%g := mmax_Fcore_neq1 maxM; have [sP0M pP0 _] := and3P sylP0.
 have hallK: \pi(K).-Hall(M) K := Fcore_Hall M.
 have K'p: p \notin \pi(K) by rewrite -p'groupEpi.
@@ -642,7 +642,7 @@ Let nsHL : H <| L. Proof. exact: gFnormal. Qed.
 
 (* This is Peterfalvi (12.10). *)
 Let frobL : [Frobenius L with kernel H].
-Proof.
+Proof using IHp P0_1s_x abP0 maxL not_sCxL prankP0 sP0_Ls sylP0.
 have [sP0M pP0 _] := and3P sylP0.
 have [ntx /(subsetP (Ohm_sub 1 _))P0x] := setD1P P0_1s_x.
 have [Ltype1 | notLtype1] := boolP (FTtype L == 1)%N; last first.
@@ -722,13 +722,13 @@ apply: dvdn_trans (Frobenius_dvd_ker1 frobP1U0).
 by do [rewrite -expU0 pi_of_exponent mem_primes => /and3P[] //] in piUq.
 Qed.
 
-Let Ltype1 : FTtype L == 1%N. Proof. exact: FT_Frobenius_type1 frobL. Qed.
-Let defAL : 'A(L) = H^#. Proof. exact: FTsupp_Frobenius frobL. Qed.
-Let sP0H : P0 \subset H. Proof. by rewrite /= -FTcore_type1. Qed.
+Let Ltype1 : FTtype L == 1%N. Proof using frobL. exact: FT_Frobenius_type1 frobL. Qed.
+Let defAL : 'A(L) = H^#. Proof using frobL. exact: FTsupp_Frobenius frobL. Qed.
+Let sP0H : P0 \subset H. Proof using Ltype1. by rewrite /= -FTcore_type1. Qed.
 
 (* This is the first part of Peterfalvi (12.11). *)
 Let defM : K ><| (M :&: L) = M.
-Proof.
+Proof using defAL maxM sNxM sP0H.
 have [ntx /(subsetP (Ohm_sub 1 _))P0x] := setD1P P0_1s_x.
 have Dx: x \in [set y in 'A0(L) | ~~ ('C[y] \subset L)].
   by rewrite inE FTsupp0_type1 // defAL !inE ntx (subsetP sP0H).
@@ -739,7 +739,7 @@ Qed.
 
 (* This is the second part of Peterfalvi (12.11). *)
 Let sML_H : M :&: L \subset H.
-Proof.
+Proof using Mtype1 defM not_sCxK' p'K.
 have [sP0M pP0 _] := and3P sylP0.
 rewrite (sub_normal_Hall (Fcore_Hall L)) ?subsetIr //.
 apply/pgroupP=> q pr_q /Cauchy[]// z /setIP[Mz Lz] oz; pose A := <[z]>%G.
@@ -813,10 +813,10 @@ Let E := sval (sigW (existsP frobL)).
 Let e := #|E|.
 
 Let defL : H ><| E = L.
-Proof. by rewrite /E; case: (sigW _) => E0 /=/Frobenius_context[]. Qed.
+Proof using frobL. by rewrite /E; case: (sigW _) => E0 /=/Frobenius_context[]. Qed.
 
 Let Ecyclic_le_p : cyclic E /\ (e %| p.-1) || (e %| p.+1).
-Proof.
+Proof using defL sML_H.
 pose P := 'O_p(H)%G; pose T := 'Ohm_1('Z(P))%G.
 have sylP: p.-Sylow(H) P := nilpotent_pcore_Hall p (Fcore_nil L).
 have [[sPH pP _] [sP0M pP0 _]] := (and3P sylP, and3P sylP0). 
@@ -942,14 +942,14 @@ Hypotheses (Schi : chi \in calS) (chi1 : chi 1%g = e%:R).
 Let psi := tau1 chi.
 
 Let cohS_H : coherent_with calS L^# tauL_H tau1.
-Proof.
+Proof using cohS.
 have [? Dtau] := cohS; split=> // xi Sxi; have /zcharD1_seqInd_on Hxi := Sxi.
 by rewrite Dtau // FT_DadeF_E ?FT_DadeE ?(cfun_onS (Fcore_sub_FTsupp _)) ?Hxi.
 Qed.
 
 (* This is Peterfalvi (12.14). *)
 Let rhoL_psi : {in K, forall g, psi (x * g)%g = chi x} /\ rhoL psi x = chi x.
-Proof.
+Proof using Ecyclic_le_p Schi chi1 cohS_H prankM.
 have not_LGM: gval M \notin L :^: G.
   apply: contraL p'K => /= /imsetP[z _ ->]; rewrite FcoreJ pgroupJ.
   by rewrite p'groupEpi (piSg sP0H) // -p_rank_gt0 prankP0.
@@ -1078,7 +1078,7 @@ Let rhoM_psi :
   [/\ {in K^#, rhoM psi =1 psi},
       {in K :\: K' &, forall g1 g2, psi g1 = psi g2}
     & {in K :\: K', forall g, psi g \in Cint}].
-Proof.
+Proof using Mtype1 Schi cohS defM prankM.
 have pr_p: prime p.
   by have:= ltnW prankM; rewrite p_rank_gt0 mem_primes => /andP[].
 have [sP0M pP0 _] := and3P sylP0; have abelP01 := Ohm1_abelem pP0 abP0.
@@ -1150,7 +1150,7 @@ Qed.
 
 (* This is the main part of Peterfalvi (12.16). *)
 Lemma FTtype1_nonFrobenius_witness_contradiction : False.
-Proof.
+Proof using All.
 have pr_p: prime p.
   by have:= ltnW prankM; rewrite p_rank_gt0 mem_primes => /andP[].
 have [sP0M pP0 _] := and3P sylP0; have abelP01 := Ohm1_abelem pP0 abP0.
@@ -1276,7 +1276,7 @@ Qed.
 End Twelve_13_to_16.
 
 Lemma FTtype1_nonFrobenius_contradiction : False.
-Proof.
+Proof using All.
 have [_ [tau1 cohS]] := FT_Frobenius_coherence maxL frobL.
 have [chi] := FTtype1_ref_irr maxL; rewrite -(index_sdprod defL).
 exact: FTtype1_nonFrobenius_witness_contradiction cohS.

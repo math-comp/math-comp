@@ -205,7 +205,7 @@ Lemma kHomExtend_id z : z \in E -> kHomExtend z = f z.
 Proof. by move=> Ez; rewrite kHomExtendE Fadjoin_polyC ?map_polyC ?hornerC. Qed.
 
 Lemma kHomExtend_val : kHomExtend x = y.
-Proof.
+Proof using fPx_y_0 homKf.
 have fX: map_poly f 'X = 'X by rewrite (kHom_poly_id homKf) ?polyOverX.
 have [Ex | E'x] := boolP (x \in E); last first.
   by rewrite kHomExtendE Fadjoin_polyX // fX hornerX.
@@ -215,7 +215,7 @@ Qed.
 
 Lemma kHomExtend_poly p :
   p \in polyOver E -> kHomExtend p.[x] = (map_poly f p).[y].
-Proof.
+Proof using fPx_y_0 homKf.
 move=> Ep; rewrite kHomExtendE (Fadjoin_poly_mod x) //.
 rewrite (divp_eq (map_poly f p) (map_poly f Px)).
 rewrite !hornerE (rootP fPx_y_0) mulr0 add0r.
@@ -225,7 +225,7 @@ by rewrite -map_modp -!map_poly_comp (map_modp (kHom_rmorphism homKf)).
 Qed.
 
 Lemma kHomExtendP : kHom K <<E; x>> kHomExtend.
-Proof.
+Proof using All.
 have [fM idKf] := kHomP homKf.
 apply/kHomP; split=> [|z Kz]; last by rewrite kHomExtend_id ?(subvP sKE) ?idKf. 
 move=> _ _ /Fadjoin_polyP[p Ep ->] /Fadjoin_polyP[q Eq ->].
@@ -1532,7 +1532,7 @@ Variable M : {subfield L}.
 Hypothesis (sKME : (K <= M <= E)%VS) (nKM : normalField K M).
 
 Lemma normalField_galois : galois K M.
-Proof.
+Proof using All.
 have [[sKM sME] [_ sepKE nKE]] := (andP sKME, and3P galKE).
 by rewrite /galois sKM (separableSr sME).
 Qed.
@@ -1541,7 +1541,7 @@ Definition normalField_cast (x : gal_of E) : gal_of M := gal M x.
 
 Lemma normalField_cast_eq x :
   x \in 'Gal(E / K) -> {in M, normalField_cast x =1 x}.
-Proof.
+Proof using nKM sKME.
 have [sKM sME] := andP sKME; have sKE := subv_trans sKM sME.
 rewrite gal_kAut // => /(normalField_kAut sKME nKM).
 by rewrite kAutE => /andP[_ /galK].
@@ -1549,7 +1549,7 @@ Qed.
 
 Lemma normalField_castM :
   {in 'Gal(E / K) &, {morph normalField_cast : x y / (x * y)%g}}.
-Proof.
+Proof using nKM sKME.
 move=> x y galEx galEy /=; apply/eqP/gal_eqP => a Ma.
 have Ea: a \in E by have [_ /subvP->] := andP sKME.
 rewrite normalField_cast_eq ?groupM ?galM //=.
@@ -1569,10 +1569,10 @@ by rewrite normalField_cast_eq // gal_id (fixed_gal sME).
 Qed.
 
 Lemma normalField_normal : 'Gal(E / M) <| 'Gal(E / K).
-Proof. by rewrite -normalField_ker ker_normal. Qed.
+Proof using nKM sKME. by rewrite -normalField_ker ker_normal. Qed.
 
 Lemma normalField_img : normalField_cast @* 'Gal(E / K) = 'Gal(M / K).
-Proof.
+Proof using galKE.
 have [[sKM sME] [sKE _ nKE]] := (andP sKME, and3P galKE).
 apply/setP=> x; apply/idP/idP=> [/morphimP[{x}x galEx _ ->] | galMx].
   rewrite gal_kHom //; apply/kAHomP=> a Ka; have Ma := subvP sKM a Ka.
@@ -1587,7 +1587,7 @@ Lemma normalField_isom :
      isom ('Gal(E / K) / 'Gal (E / M)) 'Gal(M / K) f
    & (forall A, f @* (A / 'Gal(E / M)) = normalField_cast @* A)
   /\ {in 'Gal(E / K) & M, forall x, f (coset 'Gal (E / M) x) =1 x} }%g.
-Proof.
+Proof using galKE.
 have:= first_isom normalField_cast_morphism; rewrite normalField_ker.
 case=> f injf Df; exists f; first by apply/isomP; rewrite Df normalField_img.
 split=> [//|x a galEx /normalField_cast_eq<- //]; congr ((_ : gal_of M) a).
@@ -1596,7 +1596,7 @@ by rewrite (subsetP (normal_norm normalField_normal)).
 Qed.
 
 Lemma normalField_isog : 'Gal(E / K) / 'Gal(E / M) \isog 'Gal(M / K).
-Proof. by rewrite -normalField_ker -normalField_img first_isog. Qed.
+Proof using All. by rewrite -normalField_ker -normalField_img first_isog. Qed.
 
 End IntermediateField.
 
@@ -1606,7 +1606,7 @@ Variable G : {group gal_of E}.
 Hypothesis nsGgalE : G <| 'Gal(E / K).
 
 Lemma normal_fixedField_galois : galois K (fixedField G).
-Proof.
+Proof using All.
 have [[sKE sepKE nKE] [sGgal nGgal]] := (and3P galKE, andP nsGgalE).
 rewrite /galois -(galois_connection _ sKE) sGgal.
 rewrite (separableSr _ sepKE) ?capvSl //; apply/forall_inP=> f autKf.

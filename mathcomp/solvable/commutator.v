@@ -95,13 +95,13 @@ Variables (i : nat) (x y : gT).
 Hypothesis cxz : commute x [~ x, y].
 
 Lemma commVg : [~ x^-1, y] = [~ x, y]^-1.
-Proof.
+Proof using cxz.
 apply/eqP; rewrite commgEl eq_sym eq_invg_mul invgK mulgA -cxz.
 by rewrite -conjg_mulR -conjMg mulgV conj1g.
 Qed.
 
 Lemma commXg : [~ x ^+ i, y] = [~ x, y] ^+ i.
-Proof.
+Proof using cxz.
 elim: i => [|i' IHi]; first exact: comm1g.
 by rewrite !expgS commMgJ /conjg commuteX // mulKg IHi.
 Qed.
@@ -115,10 +115,10 @@ Hypothesis cyz : commute y [~ x, y].
 Let cyz' := commuteV cyz.
 
 Lemma commgV : [~ x, y^-1] = [~ x, y]^-1.
-Proof. by rewrite -invg_comm commVg -(invg_comm x y) ?invgK. Qed.
+Proof using cyz'. by rewrite -invg_comm commVg -(invg_comm x y) ?invgK. Qed.
 
 Lemma commgX : [~ x, y ^+ i] = [~ x, y] ^+ i.
-Proof. by rewrite -invg_comm commXg -(invg_comm x y) ?expgVn ?invgK. Qed.
+Proof using cyz'. by rewrite -invg_comm commXg -(invg_comm x y) ?expgVn ?invgK. Qed.
 
 End RightComm.
 
@@ -128,10 +128,10 @@ Variables (i j : nat) (x y : gT).
 Hypotheses (cxz : commute x [~ x, y]) (cyz : commute y [~ x, y]).
 
 Lemma commXXg : [~ x ^+ i, y ^+ j] = [~ x, y] ^+ (i * j).
-Proof. by rewrite expgM commgX commXg //; apply: commuteX. Qed.
+Proof using cyz cxz. by rewrite expgM commgX commXg //; apply: commuteX. Qed.
 
 Lemma expMg_Rmul : (y * x) ^+ i = y ^+ i * x ^+ i * [~ x, y] ^+ 'C(i, 2).
-Proof.
+Proof using cyz cxz.
 rewrite -triangular_sum; symmetry.
 elim: i => [|k IHk] /=; first by rewrite big_geq ?mulg1.
 rewrite big_nat_recr //= addnC expgD !expgS -{}IHk !mulgA; congr (_ * _).

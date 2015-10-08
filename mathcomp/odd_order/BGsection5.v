@@ -105,22 +105,22 @@ Hypothesis rR : 2 < 'r_p(R).
 
 (* This lemma uses only the rR hypothesis. *)
 Lemma narrow_pmaxElem : p.-narrow R -> exists E, E \in 'E_p^2(R) :&: 'E*_p(R).
-Proof. by move=> nnP; apply: set0Pn; apply: implyP rR. Qed.
+Proof using rR. by move=> nnP; apply: set0Pn; apply: implyP rR. Qed.
 
-Let ntR : R :!=: 1. Proof. by case: eqP rR => // ->; rewrite p_rank1. Qed.
-Let p_pr : prime p. Proof. by case: (pgroup_pdiv pR ntR). Qed.
-Let p_gt1 : p > 1. Proof. exact: prime_gt1. Qed.
+Let ntR : R :!=: 1. Proof using rR. by case: eqP rR => // ->; rewrite p_rank1. Qed.
+Let p_pr : prime p. Proof using ntR pR. by case: (pgroup_pdiv pR ntR). Qed.
+Let p_gt1 : p > 1. Proof using p_pr. exact: prime_gt1. Qed.
 
 (* This is B & G, Lemma 5.1(a). *)
 Lemma rank3_SCN3 : exists B, B \in 'SCN_3(R).
-Proof.
+Proof using oddR pR rR.
 by apply/set0Pn; rewrite -(rank2_SCN3_empty pR oddR) leqNgt (rank_pgroup pR) rR.
 Qed.
 
 (* This is B & G, Lemma 5.1(b). *)
 Lemma normal_p2Elem_SCN3 E :
   E \in 'E_p^2(R) -> E <| R -> exists2 B, B \in 'SCN_3(R) & E \subset B.
-Proof.
+Proof using All.
 move=> Ep2E /andP[sER nER]; have [_ abelE dimE] := pnElemP Ep2E.
 have [B Ep3B nBR]: exists2 B, B \in 'E_p^3(R) & R \subset 'N(B).
   have [C] := rank3_SCN3; case/setIdP=> SCN_C rC.
@@ -162,14 +162,14 @@ Let W := 'Ohm_1('Z_2(R)).
 Let T := 'C_R(W).
 
 Let ntZ : Z != 1.
-Proof. by rewrite Ohm1_eq1 (center_nil_eq1 (pgroup_nil pR)). Qed.
+Proof using ntR pR. by rewrite Ohm1_eq1 (center_nil_eq1 (pgroup_nil pR)). Qed.
 
 Let sZR : Z \subset R. Proof. by rewrite !gFsub_trans. Qed.
 
 Let abelZ : p.-abelem (Z). 
-Proof. by rewrite (Ohm1_abelem (pgroupS _ pR)) ?center_sub ?center_abelian. Qed.
+Proof using pR. by rewrite (Ohm1_abelem (pgroupS _ pR)) ?center_sub ?center_abelian. Qed.
 
-Let pZ : p.-group Z. Proof. exact: abelem_pgroup abelZ. Qed.
+Let pZ : p.-group Z. Proof using abelZ. exact: abelem_pgroup abelZ. Qed.
 
 Let defCRZ : 'C_R(Z) = R.
 Proof. by apply/setIidPl; rewrite centsC gFsub_trans ?subsetIr. Qed.
@@ -183,7 +183,7 @@ Lemma Ohm1_ucn_p2maxElem E :
   [/\ (*a*) ~~ (E \subset T),
       (*b*) #|Z| = p /\ [group of W] \in 'E_p^2(R)
     & (*c*) T \char R /\ #|R : T| = p ].
-Proof.
+Proof using ntZ oddR pZ p_gt1.
 case/setIP=> Ep2E maxE; have defCRE1 := Ohm1_cent_max maxE pR.
 have [[sER abelE dimE] oE] := (pnElemP Ep2E, card_pnElem Ep2E).
 have [[sZR_R nZR_R] [pE _ eE]] := (andP (center_normal R), and3P abelE).
@@ -242,7 +242,7 @@ Qed.
 Theorem narrow_cent_dprod S :
     p.-narrow R -> #|S| = p -> S \subset R -> 'r_p('C_R(S)) <= 2 -> 
   [/\ cyclic 'C_T(S), S :&: R^`(1) = 1, S :&: T = 1 & S \x 'C_T(S) = 'C_R(S)].
-Proof.
+Proof using ntZ oddR pZ p_gt1.
 move=> nnR oS sSR rS; have pS : p.-group S := pgroupS sSR pR.
 have [E maxEp2E] := narrow_pmaxElem nnR; have [Ep2E maxE] := setIP maxEp2E.
 have [not_sET [oZ Ep2W] [charT maxT]] := Ohm1_ucn_p2maxElem maxEp2E.
@@ -295,7 +295,7 @@ Qed.
 Corollary narrow_centP : 
   reflect (exists S, [/\ gval S \subset R, #|S| = p & 'r_p('C_R(S)) <= 2])
           (p.-narrow R).
-Proof.
+Proof using ntZ oddR pZ p_gt1.
 rewrite /narrow rR; apply: (iffP (set0Pn _)) => [[E maxEp2E]|[S [sSR oS rCRS]]].
   have [Ep2E maxE] := setIP maxEp2E.
   have{maxEp2E} [_ [oZ _] _] := Ohm1_ucn_p2maxElem maxEp2E.
@@ -333,7 +333,7 @@ Qed.
 (* to our definition of "narrow", the equivalence is the converse of that in  *)
 (* B & G (we define narrow in terms of maximal elementary abelian subgroups). *)
 Lemma narrow_structureP : reflect (narrow_structure p R) (p.-narrow R).
-Proof.
+Proof using ntZ oddR pZ p_gt1.
 apply: (iffP idP) => [nnR | [S C sSR sCR oS cycC defSC]].
   have [S [sSR oS rCRS]] := narrow_centP nnR.
   have [cycC _ _ defCRS] := narrow_cent_dprod nnR oS sSR rCRS.
@@ -352,7 +352,7 @@ Theorem Aut_narrow (A : {group {perm gT}}) :
     p.-narrow R -> solvable A -> A \subset Aut R -> odd #|A| ->
   [/\ (*a*) p^'.-group (A / 'O_p(A)), abelian (A / 'O_p(A))
     & (*b*) 2 < 'r(R) -> forall x, x \in A -> p^'.-elt x -> #[x] %| p.-1].
-Proof.
+Proof using All.
 move=> nnR solA AutA oddA; have nilR := pgroup_nil pR.
 have [rR | rR] := leqP 'r(R) 2.
   have pA' := der1_Aut_rank2_pgroup pR oddR rR AutA solA oddA.

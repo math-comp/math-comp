@@ -401,29 +401,29 @@ Hypothesis leT_tr : transitive leT.
 
 Lemma subseq_order_path x s1 s2 :
   subseq s1 s2 -> path leT x s2 -> path leT x s1.
-Proof.
+Proof using All.
 elim: s2 x s1 => [|y s2 IHs] x [|z s1] //= {IHs}/(IHs y).
 case: eqP => [-> | _] IHs /andP[] => [-> // | leTxy /IHs /=].
 by case/andP=> /(leT_tr leTxy)->.
 Qed.
 
 Lemma order_path_min x s : path leT x s -> all (leT x) s.
-Proof.
+Proof using All.
 move/subseq_order_path=> le_x_s; apply/allP=> y.
 by rewrite -sub1seq => /le_x_s/andP[].
 Qed.
 
 Lemma subseq_sorted s1 s2 : subseq s1 s2 -> sorted s2 -> sorted s1.
-Proof.
+Proof using All.
 case: s1 s2 => [|x1 s1] [|x2 s2] //= sub_s12 /(subseq_order_path sub_s12).
 by case: eqP => [-> | _ /andP[]].
 Qed.
 
 Lemma sorted_filter a s : sorted s -> sorted (filter a s).
-Proof. exact: subseq_sorted (filter_subseq a s). Qed.
+Proof using All. exact: subseq_sorted (filter_subseq a s). Qed.
 
 Lemma sorted_uniq : irreflexive leT -> forall s, sorted s -> uniq s.
-Proof.
+Proof using All.
 move=> leT_irr; elim=> //= x s IHs s_ord.
 rewrite (IHs (path_sorted s_ord)) andbT; apply/negP=> s_x.
 by case/allPn: (order_path_min s_ord); exists x; rewrite // leT_irr.
@@ -431,7 +431,7 @@ Qed.
 
 Lemma eq_sorted : antisymmetric leT ->
   forall s1 s2, sorted s1 -> sorted s2 -> perm_eq s1 s2 -> s1 = s2.
-Proof.
+Proof using All.
 move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
   by case: {+}s2 (perm_eq_size eq_s12).
 have s2_x1: x1 \in s2 by rewrite -(perm_eq_mem eq_s12) mem_head.
@@ -446,7 +446,7 @@ Qed.
 
 Lemma eq_sorted_irr : irreflexive leT ->
   forall s1 s2, sorted s1 -> sorted s2 -> s1 =i s2 -> s1 = s2.
-Proof.
+Proof using All.
 move=> leT_irr s1 s2 s1_sort s2_sort eq_s12.
 have: antisymmetric leT.
   by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); apply: leT_tr ltnm.
@@ -468,7 +468,7 @@ Fixpoint merge s1 :=
 
 Lemma merge_path x s1 s2 :
   path leT x s1 -> path leT x s2 -> path leT x (merge s1 s2).
-Proof.
+Proof using All.
 elim: s1 s2 x => //= x1 s1 IHs1.
 elim=> //= x2 s2 IHs2 x /andP[le_x_x1 ord_s1] /andP[le_x_x2 ord_s2].
 case: ifP => le_x21 /=; first by rewrite le_x_x2 {}IHs2 // le_x21.
@@ -476,7 +476,7 @@ by rewrite le_x_x1 IHs1 //=; have:= leT_total x2 x1; rewrite le_x21 /= => ->.
 Qed.
 
 Lemma merge_sorted s1 s2 : sorted s1 -> sorted s2 -> sorted (merge s1 s2).
-Proof.
+Proof using All.
 case: s1 s2 => [|x1 s1] [|x2 s2] //= ord_s1 ord_s2.
 case: ifP => le_x21 /=.
   by apply: (@merge_path x2 (x1 :: s1)) => //=; rewrite le_x21.
@@ -518,7 +518,7 @@ Fixpoint merge_sort_rec ss s :=
 Definition sort := merge_sort_rec [::].
 
 Lemma sort_sorted s : sorted (sort s).
-Proof.
+Proof using All.
 rewrite /sort; have allss: all sorted [::] by [].
 elim: {s}_.+1 {-2}s [::] allss (ltnSn (size s)) => // n IHn s ss allss.
 have: sorted s -> sorted (merge_sort_pop s ss).
@@ -561,7 +561,7 @@ Proof. by apply: perm_eq_uniq; rewrite perm_sort. Qed.
 
 Lemma perm_sortP : transitive leT -> antisymmetric leT ->
   forall s1 s2, reflect (sort s1 = sort s2) (perm_eq s1 s2).
-Proof.
+Proof using All.
 move=> leT_tr leT_asym s1 s2.
 apply: (iffP idP) => eq12; last by rewrite -perm_sort eq12 perm_sort.
 apply: eq_sorted; rewrite ?sort_sorted //.
@@ -699,7 +699,7 @@ Variables (n0 : nat) (T : eqType) (e : rel T) (p : seq T).
 Hypothesis Up : uniq p.
 
 Lemma prev_next : cancel (next p) (prev p).
-Proof.
+Proof using Up.
 move=> x; rewrite prev_nth mem_next next_nth; case p_x: (x \in p) => //.
 case def_p: p Up p_x => // [y q]; rewrite -{-1}def_p => /= /andP[not_qy Uq] p_x.
 rewrite -{2}(nth_index y p_x); congr (nth y _ _); set i := index x p.
@@ -709,7 +709,7 @@ by apply/eqP; rewrite nth_default // eqn_leq index_size leqNgt index_mem.
 Qed.
 
 Lemma next_prev : cancel (prev p) (next p).
-Proof.
+Proof using Up.
 move=> x; rewrite next_nth mem_prev prev_nth; case p_x: (x \in p) => //.
 case def_p: p p_x => // [y q]; rewrite -def_p => p_x.
 rewrite index_uniq //; last by rewrite def_p ltnS index_size.
@@ -719,7 +719,7 @@ by apply/eqP; rewrite def_p inE q_x orbF eq_sym in p_x.
 Qed.
 
 Lemma cycle_next : fcycle (next p) p.
-Proof.
+Proof using Up.
 case def_p: {-2}p Up => [|x q] Uq //.
 apply/(pathP x)=> i; rewrite size_rcons => le_i_q.
 rewrite -cats1 -cat_cons nth_cat le_i_q /= next_nth {}def_p mem_nth //.
@@ -728,33 +728,33 @@ by case: (i =P _) => //= ->; rewrite subnn nth_default.
 Qed.
 
 Lemma cycle_prev : cycle (fun x y => x == prev p y) p.
-Proof.
+Proof using Up.
 apply: etrans cycle_next; symmetry; case def_p: p => [|x q] //.
 by apply: eq_path; rewrite -def_p; apply: (can2_eq prev_next next_prev).
 Qed.
 
 Lemma cycle_from_next : (forall x, x \in p -> e x (next p x)) -> cycle e p.
-Proof.
+Proof using Up.
 case: p (next p) cycle_next => //= [x q] n; rewrite -(belast_rcons x q x).
 move: {q}(rcons q x) => q n_q; move/allP.
 by elim: q x n_q => //= _ q IHq x /andP[/eqP <- n_q] /andP[-> /IHq->].
 Qed.
 
 Lemma cycle_from_prev : (forall x, x \in p -> e (prev p x) x) -> cycle e p.
-Proof.
+Proof using Up.
 move=> e_p; apply: cycle_from_next => x p_x.
 by rewrite -{1}[x]prev_next e_p ?mem_next.
 Qed.
 
 Lemma next_rot : next (rot n0 p) =1 next p.
-Proof.
+Proof using Up.
 move=> x; have n_p := cycle_next; rewrite -(rot_cycle n0) in n_p.
 case p_x: (x \in p); last by rewrite !next_nth mem_rot p_x.
 by rewrite (eqP (next_cycle n_p _)) ?mem_rot.
 Qed.
 
 Lemma prev_rot : prev (rot n0 p) =1 prev p.
-Proof.
+Proof using Up.
 move=> x; have p_p := cycle_prev; rewrite -(rot_cycle n0) in p_p.
 case p_x: (x \in p); last by rewrite !prev_nth mem_rot p_x.
 by rewrite (eqP (prev_cycle p_p _)) ?mem_rot.
@@ -768,9 +768,9 @@ Variables (n0 : nat) (T : eqType) (p : seq T).
 
 Hypothesis Up : uniq p.
 
-Lemma next_rotr : next (rotr n0 p) =1 next p. Proof. exact: next_rot. Qed.
+Lemma next_rotr : next (rotr n0 p) =1 next p. Proof using Up. exact: next_rot. Qed.
 
-Lemma prev_rotr : prev (rotr n0 p) =1 prev p. Proof. exact: prev_rot. Qed.
+Lemma prev_rotr : prev (rotr n0 p) =1 prev p. Proof using Up. exact: prev_rot. Qed.
 
 End UniqRotrCycle.
 
@@ -815,10 +815,10 @@ Variables (T T' : eqType) (h : T' -> T) (e : rel T) (e' : rel T').
 Hypothesis Ih : injective h.
 
 Lemma mem2_map x' y' p' : mem2 (map h p') (h x') (h y') = mem2 p' x' y'.
-Proof. by rewrite {1}/mem2 (index_map Ih) -map_drop mem_map. Qed.
+Proof using Ih. by rewrite {1}/mem2 (index_map Ih) -map_drop mem_map. Qed.
 
 Lemma next_map p : uniq p -> forall x, next (map h p) (h x) = h (next p x).
-Proof.
+Proof using Ih.
 move=> Up x; case p_x: (x \in p); last by rewrite !next_nth (mem_map Ih) p_x.
 case/rot_to: p_x => i p' def_p.
 rewrite -(next_rot i Up); rewrite -(map_inj_uniq Ih) in Up.
@@ -827,7 +827,7 @@ by case: p' => [|y p''] //=; rewrite !eqxx.
 Qed.
 
 Lemma prev_map p : uniq p -> forall x, prev (map h p) (h x) = h (prev p x).
-Proof.
+Proof using Ih.
 move=> Up x; rewrite -{1}[x](next_prev Up) -(next_map Up).
 by rewrite prev_next ?map_inj_uniq.
 Qed.

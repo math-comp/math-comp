@@ -1948,11 +1948,11 @@ Local Notation P := equivalence_partition.
 Hypothesis eqiR : {in D & &, equivalence_rel R}.
 
 Let Pxx x : x \in D -> x \in Px x.
-Proof. by move=> Dx; rewrite !inE Dx (eqiR Dx Dx). Qed.
+Proof using eqiR. by move=> Dx; rewrite !inE Dx (eqiR Dx Dx). Qed.
 Let PPx x : x \in D -> Px x \in P := fun Dx => mem_imset _ Dx.
 
 Lemma equivalence_partitionP : partition P D.
-Proof.
+Proof using Pxx.
 have defD: cover P == D.
   rewrite eqEsubset; apply/andP; split.
     by apply/bigcupsP=> _ /imsetP[x Dx ->]; rewrite /Px setIdE subsetIl.
@@ -1968,7 +1968,7 @@ Qed.
 
 Lemma pblock_equivalence_partition :
   {in D &, forall x y, (y \in pblock P x) = R x y}.
-Proof.
+Proof using Pxx.
 have [_ tiP _] := and3P equivalence_partitionP. 
 by move=> x y Dx Dy; rewrite /= (def_pblock tiP (PPx Dx) (Pxx Dx)) inE Dy.
 Qed.
@@ -2033,42 +2033,42 @@ Section Transversals.
 Variables (X : {set T}) (P : {set {set T}}) (D : {set T}).
 Hypothesis trPX : is_transversal X P D.
 
-Lemma transversal_sub : X \subset D. Proof. by case/and3P: trPX. Qed.
+Lemma transversal_sub : X \subset D. Proof using trPX. by case/and3P: trPX. Qed.
 
-Let tiP : trivIset P. Proof. by case/andP: trPX => /and3P[]. Qed.
+Let tiP : trivIset P. Proof using trPX. by case/andP: trPX => /and3P[]. Qed.
 
 Let sXP : {subset X <= cover P}.
-Proof. by case/and3P: trPX => /andP[/eqP-> _] /subsetP. Qed.
+Proof using trPX. by case/and3P: trPX => /andP[/eqP-> _] /subsetP. Qed.
 
 Let trX : {in P, forall B, #|X :&: B| == 1}.
-Proof. by case/and3P: trPX => _ _ /forall_inP. Qed.
+Proof using trPX. by case/and3P: trPX => _ _ /forall_inP. Qed.
 
 Lemma setI_transversal_pblock x0 B :
   B \in P -> X :&: B = [set transversal_repr x0 X B].
-Proof.
+Proof using trX.
 by case/trX/cards1P=> x defXB; rewrite /transversal_repr defXB /pick enum_set1.
 Qed.
 
 Lemma repr_mem_pblock x0 B : B \in P -> transversal_repr x0 X B \in B.
-Proof. by move=> PB; rewrite -sub1set -setI_transversal_pblock ?subsetIr. Qed.
+Proof using trX. by move=> PB; rewrite -sub1set -setI_transversal_pblock ?subsetIr. Qed.
 
 Lemma repr_mem_transversal x0 B : B \in P -> transversal_repr x0 X B \in X.
-Proof. by move=> PB; rewrite -sub1set -setI_transversal_pblock ?subsetIl. Qed.
+Proof using trX. by move=> PB; rewrite -sub1set -setI_transversal_pblock ?subsetIl. Qed.
 
 Lemma transversal_reprK x0 : {in P, cancel (transversal_repr x0 X) (pblock P)}.
-Proof. by move=> B PB; rewrite /= (def_pblock tiP PB) ?repr_mem_pblock. Qed.
+Proof using tiP trX. by move=> B PB; rewrite /= (def_pblock tiP PB) ?repr_mem_pblock. Qed.
 
 Lemma pblockK x0 : {in X, cancel (pblock P) (transversal_repr x0 X)}.
-Proof.
+Proof using Type*.
 move=> x Xx; have /bigcupP[B PB Bx] := sXP Xx; rewrite (def_pblock tiP PB Bx).
 by apply/esym/set1P; rewrite -setI_transversal_pblock // inE Xx.
 Qed.
 
 Lemma pblock_inj : {in X &, injective (pblock P)}.
-Proof. by move=> x0; apply: (can_in_inj (pblockK x0)). Qed.
+Proof using Type*. by move=> x0; apply: (can_in_inj (pblockK x0)). Qed.
 
 Lemma pblock_transversal : pblock P @: X = P.
-Proof.
+Proof using Type*.
 apply/setP=> B; apply/imsetP/idP=> [[x Xx ->] | PB].
   by rewrite pblock_mem ?sXP.
 have /cards1P[x0 _] := trX PB; set x := transversal_repr x0 X B.
@@ -2076,10 +2076,10 @@ by exists x; rewrite ?transversal_reprK ?repr_mem_transversal.
 Qed.
 
 Lemma card_transversal : #|X| = #|P|.
-Proof. by rewrite -pblock_transversal card_in_imset //; apply: pblock_inj. Qed.
+Proof using Type*. by rewrite -pblock_transversal card_in_imset //; apply: pblock_inj. Qed.
 
 Lemma im_transversal_repr x0 : transversal_repr x0 X @: P = X.
-Proof.
+Proof using Type*.
 rewrite -{2}[X]imset_id -pblock_transversal -imset_comp.
 by apply: eq_in_imset; apply: pblockK.
 Qed.

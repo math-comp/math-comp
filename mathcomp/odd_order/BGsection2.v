@@ -211,12 +211,12 @@ Let h_gt0 := prim_order_gt0 prim_eps.
 Let eps_h := prim_expr_order prim_eps.
 Let eps_mod_h m := expr_mod m eps_h.
 Let inj_eps : injective (fun i : 'I_h => eps ^+ i).
-Proof.
+Proof using prim_eps.
 move=> i j eq_ij; apply/eqP; move/eqP: eq_ij.
 by rewrite (eq_prim_root_expr prim_eps) !modn_small.
 Qed.
 
-Let inhP m : m %% h < h. Proof. by rewrite ltn_mod. Qed.
+Let inhP m : m %% h < h. Proof using h_gt0. by rewrite ltn_mod. Qed.
 Let inh m := Ordinal (inhP m).
 
 Let V_ i := eigenspace g (eps ^+ i).
@@ -236,10 +236,10 @@ Local Notation "'E_ ( i , t )" := (E2_ i t)
   (at level 8, format "''E_' ( i ,  t )").
 
 Let inj_g : g \in GRing.unit.
-Proof. by rewrite -(unitrX_pos _ h_gt0) gh1 unitr1. Qed.
+Proof using gh1 h_gt0. by rewrite -(unitrX_pos _ h_gt0) gh1 unitr1. Qed.
 
 Let Vi_mod i : 'V_(i %% h) = 'V_i.
-Proof. by rewrite /V_ eps_mod_h. Qed.
+Proof using eps_mod_h g. by rewrite /V_ eps_mod_h. Qed.
 
 Let g_mod i := expr_mod i gh1.
 
@@ -252,7 +252,7 @@ Qed.
 Let E2iP i t e :
   reflect ('V_i *m e <= 'V_t /\ forall j, j != i %[mod h] -> 'V_j *m e = 0)%MS
           (e \in 'E_(i, t))%MS.
-Proof.
+Proof using Vi_mod inh.
 rewrite sub_capmx submxE !(sameP sub_kermxP eqP) /=.
 rewrite !mul_vec_lin !mxvec_eq0 /= -submxE -submx0 sumsmxMr.
 apply: (iffP andP) => [[->] | [-> Ve0]]; last first.
@@ -265,7 +265,7 @@ Let sumV := (\sum_(i < h) 'V_i)%MS.
 
 (* This is B & G, Proposition 2.4(a). *)
 Proposition mxdirect_sum_eigenspace_cycle : (sumV :=: 1%:M)%MS /\ mxdirect sumV.
-Proof.
+Proof using eps_h gh1 h_gt0 inj_eps.
 have splitF: group_splitting_field F (Zp_group h).
   move: prim_eps (abelianS (subsetT (Zp h)) (Zp_abelian _)).
   by rewrite -{1}(card_Zp h_gt0); apply: primitive_root_splitting_abelian.
@@ -315,14 +315,14 @@ Qed.
 
 (* This is B & G, Proposition 2.4(b). *)
 Proposition rank_step_eigenspace_cycle i : 'n_ (i + h) = 'n_ i.
-Proof. by rewrite /n_ -Vi_mod modnDr Vi_mod. Qed.
+Proof using Vi_mod. by rewrite /n_ -Vi_mod modnDr Vi_mod. Qed.
 
 Let sumE := (\sum_(it : 'I_h * 'I_h) 'E_(it.1, it.2))%MS.
 
 (* This is B & G, Proposition 2.4(c). *)
 Proposition mxdirect_sum_proj_eigenspace_cycle :
   (sumE :=: 1%:M)%MS /\ mxdirect sumE.
-Proof.
+Proof using E2iP gh1 inj_eps sumV.
 have [def1V] := mxdirect_sum_eigenspace_cycle; move/mxdirect_sumsP=> dxV.
 pose p (i : 'I_h) := proj_mx 'V_i (\sum_(j | j != i) 'V_j)%MS.
 have def1p: 1%:M = \sum_i p i.
@@ -358,7 +358,7 @@ Qed.
 
 (* This is B & G, Proposition 2.4(d). *)
 Proposition rank_proj_eigenspace_cycle i t : \rank 'E_(i, t) = ('n_i * 'n_t)%N.
-Proof.
+Proof using E2iP gh1 inj_eps sumV.
 have [def1V] := mxdirect_sum_eigenspace_cycle; move/mxdirect_sumsP=> dxV.
 pose p (i : 'I_h) := proj_mx 'V_i (\sum_(j | j != i) 'V_j)%MS.
 have def1p: 1%:M = \sum_i p i.
@@ -400,7 +400,7 @@ Qed.
 (* This is B & G, Proposition 2.4(e). *)
 Proposition proj_eigenspace_cycle_sub_quasi_cent i j :
   ('E_(i, i + j) <= 'E_j)%MS.
-Proof.
+Proof using E2iP EiP inj_eps inj_g sumV.
 apply/(@memmx_subP F _ _ q)=> A /E2iP[ViA Vi'A].
 apply/EiP; apply: canLR (mulKmx inj_g) _; rewrite -{1}[A]mul1mx -{2}[g]mul1mx.
 have: (1%:M <= sumV)%MS by have [->] := mxdirect_sum_eigenspace_cycle.
@@ -419,7 +419,7 @@ Let diagE m :=
 (* This is B & G, Proposition 2.4(f). *)
 Proposition diag_sum_proj_eigenspace_cycle m :
   (diagE m :=: 'E_m)%MS /\ mxdirect (diagE m).
-Proof.
+Proof using E2iP EiP inj_eps inj_g sumE sumV.
 have sub_diagE n: (diagE n <= 'E_n)%MS.
   apply/sumsmx_subP=> [[i t] /= def_t].
   apply: submx_trans (proj_eigenspace_cycle_sub_quasi_cent i n).
@@ -459,7 +459,7 @@ Qed.
 (* This is B & G, Proposition 2.4(g). *)
 Proposition rank_quasi_cent_cycle m :
   \rank 'E_m = (\sum_(i < h) 'n_i * 'n_(i + m))%N.
-Proof.
+Proof using E2iP EiP diagE inj_eps inj_g sumE sumV.
 have [<- dx_diag] := diag_sum_proj_eigenspace_cycle m.
 rewrite (mxdirectP dx_diag) /= (reindex (fun i : 'I_h => (i, inh (i + m)))) /=.
   apply: eq_big => [i | i _]; first by rewrite modn_mod eqxx.
@@ -471,7 +471,7 @@ Qed.
 (* This is B & G, Proposition 2.4(h). *)
 Proposition diff_rank_quasi_cent_cycle m :
   (2 * \rank 'E_0 = 2 * \rank 'E_m + \sum_(i < h) `|'n_i - 'n_(i + m)| ^ 2)%N.
-Proof.
+Proof using E2iP EiP diagE inj_eps inj_g sumE sumV.
 rewrite !rank_quasi_cent_cycle !{1}mul2n -addnn.
 rewrite {1}(reindex (fun i : 'I_h => inh (i + m))) /=; last first.
   exists (fun i : 'I_h => inh (i + (h - m %% h))%N) => i _.
@@ -490,7 +490,7 @@ Proposition rank_eigenspaces_quasi_homocyclic :
   exists2 n, `|q - h * n| = 1%N &
   exists i : 'I_h, [/\ `|'n_i - n| = 1%N, (q < h * n) = ('n_i < n)
                      & forall j, j != i -> 'n_j = n].
-Proof.
+Proof using E2iP EiP diagE inj_eps inj_g rankEm sumE sumV.
 have [defV dxV] := mxdirect_sum_eigenspace_cycle.
 have sum_n: (\sum_(i < h) 'n_i)%N = q by rewrite -(mxdirectP dxV) defV mxrank1.
 suffices [n [i]]: exists n : nat, exists2 i : 'I_h, 
@@ -573,7 +573,7 @@ Qed.
 (* This is B & G, Proposition 2.4(k). *)
 Proposition rank_eigenspaces_free_quasi_homocyclic :
   q > 1 -> 'n_0 = 0%N -> h = q.+1 /\ (forall j, j != 0 %[mod h] -> 'n_j = 1%N).
-Proof.
+Proof using E2iP EiP diagE inj_eps inj_g rankEm sumE sumV.
 move=> q_gt1 n_0; rewrite mod0n.
 have [n d_q_hn [i [n_i lt_q_hn n_i']]] := rank_eigenspaces_quasi_homocyclic.
 move/eqP: d_q_hn; rewrite distn_eq1 {}lt_q_hn.

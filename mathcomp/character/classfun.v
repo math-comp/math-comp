@@ -1497,16 +1497,16 @@ Canonical cfMorph_lrmorphism := [lrmorphism of cfMorph].
 Hypothesis sGD : G \subset D.
 
 Lemma cfMorph_inj : injective cfMorph.
-Proof.
+Proof using sGD.
 move=> phi1 phi2 eq_phi; apply/cfun_inP=> _ /morphimP[x Dx Gx ->].
 by rewrite -!cfMorphE // eq_phi.
 Qed.
 
 Lemma cfMorph_eq1 phi : (cfMorph phi == 1) = (phi == 1).
-Proof. by apply: rmorph_eq1; apply: cfMorph_inj. Qed.
+Proof using sGD. by apply: rmorph_eq1; apply: cfMorph_inj. Qed.
 
 Lemma cfker_morph phi : cfker (cfMorph phi) = G :&: f @*^-1 (cfker phi).
-Proof.
+Proof using sGD.
 apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
 have Dx := subsetP sGD x Gx; rewrite Dx mem_morphim //=.
 apply/forallP/forallP=> Kx y.
@@ -1518,21 +1518,21 @@ by rewrite !cfMorphE ?groupM ?morphM // (subsetP sGD).
 Qed.
 
 Lemma cfker_morph_im phi : f @* cfker (cfMorph phi) = cfker phi.
-Proof. by rewrite cfker_morph // morphim_setIpre (setIidPr (cfker_sub _)). Qed.
+Proof using sGD. by rewrite cfker_morph // morphim_setIpre (setIidPr (cfker_sub _)). Qed.
 
 Lemma sub_cfker_morph phi (A : {set aT}) :
   (A \subset cfker (cfMorph phi)) = (A \subset G) && (f @* A \subset cfker phi).
-Proof.
+Proof using sGD.
 rewrite cfker_morph // subsetI; apply: andb_id2l => sAG.
 by rewrite sub_morphim_pre // (subset_trans sAG).
 Qed.
 
 Lemma sub_morphim_cfker phi (A : {set aT}) :
   A \subset G -> (f @* A \subset cfker phi) = (A \subset cfker (cfMorph phi)).
-Proof. by move=> sAG; rewrite sub_cfker_morph ?sAG. Qed.
+Proof using sGD. by move=> sAG; rewrite sub_cfker_morph ?sAG. Qed.
 
 Lemma cforder_morph phi : #[cfMorph phi]%CF = #[phi]%CF.
-Proof. by apply: cforder_inj_rmorph; apply: cfMorph_inj. Qed.
+Proof using sGD. by apply: cforder_inj_rmorph; apply: cfMorph_inj. Qed.
 
 End Main.
 
@@ -1829,9 +1829,9 @@ Canonical cfSdprod_lrmorphism := [lrmorphism of cfSdprod].
 Lemma cfSdprod1 phi : cfSdprod phi 1%g = phi 1%g.
 Proof. by rewrite unlock /= cfMorph1 cfIsom1. Qed.
 
-Let nsKG : K <| G. Proof. by have [] := sdprod_context defG. Qed.
-Let sHG : H \subset G. Proof. by have [] := sdprod_context defG. Qed.
-Let sKG : K \subset G. Proof. by have [] := andP nsKG. Qed.
+Let nsKG : K <| G. Proof using All. by have [] := sdprod_context defG. Qed.
+Let sHG : H \subset G. Proof using defG. by have [] := sdprod_context defG. Qed.
+Let sKG : K \subset G. Proof using nsKG. by have [] := andP nsKG. Qed.
 
 Lemma cfker_sdprod phi : K \subset cfker (cfSdprod phi).
 Proof. by rewrite unlock_with cfker_mod. Qed.
@@ -1879,7 +1879,7 @@ Hypothesis KxH : K \x H = G.
 Lemma reindex_dprod R idx (op : Monoid.com_law idx) (F : gT -> R) :
    \big[op/idx]_(g in G) F g =
       \big[op/idx]_(k in K) \big[op/idx]_(h in H) F (k * h)%g.
-Proof.
+Proof using KxH.
 have /mulgmP/misomP[fM /isomP[injf im_f]] := KxH.
 rewrite pair_big_dep -im_f morphimEdom big_imset; last exact/injmP.
 by apply: eq_big => [][x y]; rewrite ?inE.
@@ -1917,9 +1917,9 @@ Proof. by rewrite cfDprod_cfun1l rmorph1. Qed.
 Lemma cfDprod_split phi psi : cfDprod phi psi = cfDprod phi 1 * cfDprod 1 psi.
 Proof. by rewrite cfDprod_cfun1l cfDprod_cfun1r. Qed.
 
-Let nsKG : K <| G. Proof. by have [] := dprod_normal2 KxH. Qed.
-Let nsHG : H <| G. Proof. by have [] := dprod_normal2 KxH. Qed.
-Let cKH : H \subset 'C(K). Proof. by have [] := dprodP KxH. Qed.
+Let nsKG : K <| G. Proof using KxH. by have [] := dprod_normal2 KxH. Qed.
+Let nsHG : H <| G. Proof using KxH. by have [] := dprod_normal2 KxH. Qed.
+Let cKH : H \subset 'C(K). Proof using KxH. by have [] := dprodP KxH. Qed.
 Let sKG := normal_sub nsKG.
 Let sHG := normal_sub nsHG.
 
@@ -2017,11 +2017,11 @@ Variables (A : I -> {group gT}) (G : {group gT}).
 Hypothesis defG : \big[dprod/1%g]_(i | P i) A i = G.
 
 Let sAG i : P i -> A i \subset G.
-Proof. by move=> Pi; rewrite -(bigdprodWY defG) (bigD1 i) ?joing_subl. Qed.
+Proof using All. by move=> Pi; rewrite -(bigdprodWY defG) (bigD1 i) ?joing_subl. Qed.
 
 Fact cfBigdprodi_subproof i :
   gval (if P i then A i else 1%G) \x <<\bigcup_(j | P j && (j != i)) A j>> = G.
-Proof.
+Proof using defG.
 have:= defG; rewrite fun_if big_mkcond (bigD1 i) // -big_mkcondl /= => defGi.
 by have [[_ Gi' _ defGi']] := dprodP defGi; rewrite (bigdprodWY defGi') -defGi'.
 Qed.
@@ -2359,7 +2359,7 @@ Hypotheses (isoG : isom G R g) (isoH : isom H S h) (eq_hg : {in H, h =1 g}).
 Hypothesis sHG : H \subset G.
 
 Lemma cfResIsom phi : 'Res[S] (cfIsom isoG phi) = cfIsom isoH ('Res[H] phi).
-Proof.
+Proof using sHG eq_hg.
 have [[injg defR] [injh defS]] := (isomP isoG, isomP isoH).
 rewrite !morphimEdom in defS defR; apply/cfun_inP=> s.
 rewrite -{1}defS => /imsetP[x Hx ->] {s}; have Gx := subsetP sHG x Hx.
@@ -2368,7 +2368,7 @@ by rewrite (eq_in_imset eq_hg) imsetS.
 Qed.
 
 Lemma cfIndIsom phi : 'Ind[R] (cfIsom isoH phi) = cfIsom isoG ('Ind[G] phi).
-Proof.
+Proof using sHG eq_hg.
 have [[injg defR] [_ defS]] := (isomP isoG, isomP isoH).
 rewrite morphimEdom (eq_in_imset eq_hg) -morphimEsub // in defS.
 apply/cfun_inP=> s; rewrite -{1}defR => /morphimP[x _ Gx ->]{s}.

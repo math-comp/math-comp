@@ -177,7 +177,7 @@ Hypotheses (pR : p.-group R) (oddR : odd #|R|) (ncycR : ~~ cyclic R).
 
 (* This is B & G, Lemma 4.5(a), or Gorenstein 5.4.10. *)
 Lemma ex_odd_normal_p2Elem : {S : {group gT} | S <| R & S \in 'E_p^2(R)}.
-Proof.
+Proof using All.
 have [M minM]: {M | [min M | M <| R & ~~ cyclic M]}.
   by apply: ex_mingroup; exists R; rewrite normal_refl.
 have{minM} [[nsMR ncycM] [_ minM]] := (andP (mingroupp minM), mingroupP minM).
@@ -197,7 +197,7 @@ Qed.
 
 (* This is B & G, Lemma 4.5(c). *)
 Lemma Ohm1_odd_ucn2 (Z := 'Ohm_1('Z_2(R))) : ~~ cyclic Z /\ exponent Z %| p.
-Proof. 
+Proof using All. 
 have [S nsSR Ep2S] := ex_odd_normal_p2Elem; have p_pr := pnElem_prime Ep2S.
 have [sSR abelS dimS] := pnElemP Ep2S; have [pS cSS expSp]:= and3P abelS.
 pose SR := [~: S, R]; pose SRR := [~: SR, R].

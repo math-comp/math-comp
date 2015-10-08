@@ -803,12 +803,12 @@ Section SkewField.
 Hypothesis fieldT : GRing.Field.mixin_of aT.
 
 Lemma skew_field_algid1 A : algid A = 1.
-Proof. by rewrite (unitr_algid1 (memv_algid A)) ?fieldT ?algid_neq0. Qed.
+Proof using All. by rewrite (unitr_algid1 (memv_algid A)) ?fieldT ?algid_neq0. Qed.
 
 Lemma skew_field_module_semisimple A M :
   let sumA X := (\sum_(x <- X) A * <[x]>)%VS in
   (A * M <= M)%VS -> {X | [/\ sumA X = M, directv (sumA X) & 0 \notin X]}.
-Proof.
+Proof using All.
 move=> sumA sAM_M; pose X := Nil aT; pose k := (\dim (A * M) - \dim (sumA X))%N.
 have: (\dim (A * M) - \dim (sumA X) < k.+1)%N by [].
 have: [/\ (sumA X <= A * M)%VS, directv (sumA X) & 0 \notin X].
@@ -833,14 +833,14 @@ by rewrite dim_cosetv_unit ?fieldT ?adim_gt0.
 Qed.
 
 Lemma skew_field_module_dimS A M : (A * M <= M)%VS -> \dim A %| \dim M.
-Proof.
+Proof using All.
 case/skew_field_module_semisimple=> X [<- /directvP-> nzX] /=.
 rewrite big_seq prime.dvdn_sum // => x /(memPn nzX)nz_x.
 by rewrite dim_cosetv_unit ?fieldT.
 Qed.
 
 Lemma skew_field_dimS A B : (A <= B)%VS -> \dim A %| \dim B.
-Proof. by move=> sAB; rewrite skew_field_module_dimS ?prodv_sub. Qed.
+Proof using All. by move=> sAB; rewrite skew_field_module_dimS ?prodv_sub. Qed.
 
 End SkewField.
 

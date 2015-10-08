@@ -716,7 +716,7 @@ Hypothesis exP : exists n, P n.
 Inductive acc_nat i : Prop := AccNat0 of P i | AccNatS of acc_nat i.+1.
 
 Lemma find_ex_minn : {m | P m & forall n, P n -> n >= m}.
-Proof.
+Proof using exP.
 have: forall n, P n -> n >= 0 by [].
 have: acc_nat 0.
   case exP => n; rewrite -(addn0 n); elim: n 0 => [|n IHn] j; first by left.
@@ -742,7 +742,7 @@ Variables (P : pred nat) (m : nat).
 Hypotheses (exP : exists i, P i) (ubP : forall i, P i -> i <= m).
 
 Lemma ex_maxn_subproof : exists i, P (m - i).
-Proof. by case: exP => i Pi; exists (m - i); rewrite subKn ?ubP. Qed.
+Proof using All. by case: exP => i Pi; exists (m - i); rewrite subKn ?ubP. Qed.
 
 Definition ex_maxn := m - ex_minn ex_maxn_subproof.
 

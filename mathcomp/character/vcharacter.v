@@ -298,11 +298,11 @@ Hypotheses (Inu : {in 'Z[S] &, isometry nu}) (oSS : pairwise_orthogonal S).
 Let freeS := orthogonal_free oSS.
 Let uniqS : uniq S := free_uniq freeS.
 Let Z_S : {subset S <= 'Z[S]}. Proof. by move=> phi; apply: mem_zchar. Qed.
-Let notS0 : 0 \notin S. Proof. by case/andP: oSS. Qed.
+Let notS0 : 0 \notin S. Proof using oSS. by case/andP: oSS. Qed.
 Let dotSS := proj2 (pairwise_orthogonalP oSS).
 
 Lemma map_pairwise_orthogonal : pairwise_orthogonal (map nu S).
-Proof.
+Proof using Inu dotSS notS0 uniqS.
 have inj_nu: {in S &, injective nu}.
   move=> phi psi Sphi Spsi /= eq_nu; apply: contraNeq (memPn notS0 _ Sphi).
   by rewrite -cfnorm_eq0 -Inu ?Z_S // {2}eq_nu Inu ?Z_S // => /dotSS->.
@@ -318,7 +318,7 @@ Lemma cfproj_sum_orthogonal P z phi :
     phi \in S ->
   '[\sum_(xi <- S | P xi) z xi *: nu xi, nu phi]
     = if P phi then z phi * '[phi] else 0.
-Proof.
+Proof using Inu dotSS uniqS.
 move=> Sphi; have defS := perm_to_rem Sphi.
 rewrite cfdot_suml (eq_big_perm _ defS) big_cons /= cfdotZl Inu ?Z_S //.
 rewrite big1_seq ?addr0 // => xi; rewrite mem_rem_uniq ?inE //.
@@ -328,19 +328,19 @@ Qed.
 Lemma cfdot_sum_orthogonal z1 z2 :
   '[\sum_(xi <- S) z1 xi *: nu xi, \sum_(xi <- S) z2 xi *: nu xi]
     = \sum_(xi <- S) z1 xi * (z2 xi)^* * '[xi].
-Proof.
+Proof using Inu dotSS uniqS.
 rewrite cfdot_sumr; apply: eq_big_seq => phi Sphi.
 by rewrite cfdotZr cfproj_sum_orthogonal // mulrCA mulrA.
 Qed.
 
 Lemma cfnorm_sum_orthogonal z :
   '[\sum_(xi <- S) z xi *: nu xi] = \sum_(xi <- S) `|z xi| ^+ 2 * '[xi].
-Proof.
+Proof using Inu dotSS uniqS.
 by rewrite cfdot_sum_orthogonal; apply: eq_bigr => xi _; rewrite normCK.
 Qed.
 
 Lemma cfnorm_orthogonal : '[\sum_(xi <- S) nu xi] = \sum_(xi <- S) '[xi].
-Proof.
+Proof using Inu dotSS uniqS.
 rewrite -(eq_bigr _ (fun _ _ => scale1r _)) cfnorm_sum_orthogonal.
 by apply: eq_bigr => xi; rewrite normCK conjC1 !mul1r.
 Qed.
@@ -364,42 +364,42 @@ Hypotheses (Inu : {in 'Z[S] &, isometry nu}) (onS : orthonormal S).
 Let oSS := orthonormal_orthogonal onS.
 Let freeS := orthogonal_free oSS.
 Let nS1 : {in S, forall phi, '[phi] = 1}.
-Proof. by move=> phi Sphi; case/orthonormalP: onS => _ -> //; rewrite eqxx. Qed.
+Proof using onS. by move=> phi Sphi; case/orthonormalP: onS => _ -> //; rewrite eqxx. Qed.
 
 Lemma map_orthonormal : orthonormal (map nu S).
-Proof.
+Proof using Inu nS1 oSS.
 rewrite !orthonormalE map_pairwise_orthogonal // andbT.
 by apply/allP=> _ /mapP[xi Sxi ->]; rewrite /= Inu ?nS1 // mem_zchar.
 Qed.
 
 Lemma cfproj_sum_orthonormal z phi :
   phi \in S -> '[\sum_(xi <- S) z xi *: nu xi, nu phi] = z phi.
-Proof. by move=> Sphi; rewrite cfproj_sum_orthogonal // nS1 // mulr1. Qed.
+Proof using Inu nS1 oSS. by move=> Sphi; rewrite cfproj_sum_orthogonal // nS1 // mulr1. Qed.
 
 Lemma cfdot_sum_orthonormal z1 z2 :
   '[\sum_(xi <- S) z1 xi *: xi, \sum_(xi <- S) z2 xi *: xi]
      = \sum_(xi <- S) z1 xi * (z2 xi)^*.
-Proof.
+Proof using nS1 oSS.
 rewrite cfdot_sum_orthogonal //; apply: eq_big_seq => phi /nS1->.
 by rewrite mulr1.
 Qed.
 
 Lemma cfnorm_sum_orthonormal z :
   '[\sum_(xi <- S) z xi *: nu xi] = \sum_(xi <- S) `|z xi| ^+ 2.
-Proof.
+Proof using Inu nS1 oSS.
 rewrite cfnorm_sum_orthogonal //.
 by apply: eq_big_seq => xi /nS1->; rewrite mulr1.
 Qed.
 
 Lemma cfnorm_map_orthonormal : '[\sum_(xi <- S) nu xi] = (size S)%:R.
-Proof.
+Proof using Inu nS1 oSS.
 by rewrite cfnorm_orthogonal // (eq_big_seq _ nS1) big_tnth sumr_const card_ord.
 Qed.
 
 Lemma orthonormal_span phi :
     phi \in <<S>>%VS ->
   {z | z = fun xi => '[phi, xi] & phi = \sum_(xi <- S) z xi *: xi}.
-Proof.
+Proof using nS1 oSS.
 case/orthogonal_span=> // _ -> {2}->; set z := fun _ => _ : algC.
 by exists z => //; apply: eq_big_seq => xi /nS1->; rewrite divr1.
 Qed.

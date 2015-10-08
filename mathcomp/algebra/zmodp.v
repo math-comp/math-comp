@@ -322,28 +322,28 @@ Section F_prime.
 Hypothesis p_pr : prime p.
 
 Lemma Fp_Zcast : (Zp_trunc (pdiv p)).+2 = (Zp_trunc p).+2.
-Proof. by rewrite /pdiv primes_prime. Qed.
+Proof using All. by rewrite /pdiv primes_prime. Qed.
 
 Lemma Fp_cast : (Zp_trunc (pdiv p)).+2 = p.
-Proof. by rewrite Fp_Zcast ?Zp_cast ?prime_gt1. Qed.
+Proof using All. by rewrite Fp_Zcast ?Zp_cast ?prime_gt1. Qed.
 
 Lemma card_Fp : #|'F_p| = p.
-Proof. by rewrite card_ord Fp_cast. Qed.
+Proof using All. by rewrite card_ord Fp_cast. Qed.
 
 Lemma val_Fp_nat n : (n%:R : 'F_p) = (n %% p)%N :> nat.
-Proof. by rewrite Zp_nat /= Fp_cast. Qed.
+Proof using All. by rewrite Zp_nat /= Fp_cast. Qed.
 
 Lemma Fp_nat_mod m : (m %% p)%:R = m%:R :> 'F_p.
-Proof. by apply: ord_inj; rewrite !val_Fp_nat // modn_mod. Qed.
+Proof using All. by apply: ord_inj; rewrite !val_Fp_nat // modn_mod. Qed.
 
 Lemma char_Fp : p \in [char 'F_p].
-Proof. by rewrite !inE -Fp_nat_mod p_pr ?modnn. Qed.
+Proof using All. by rewrite !inE -Fp_nat_mod p_pr ?modnn. Qed.
 
 Lemma char_Fp_0 : p%:R = 0 :> 'F_p.
-Proof. exact: GRing.charf0 char_Fp. Qed.
+Proof using All. exact: GRing.charf0 char_Fp. Qed.
 
 Lemma unitFpE x : ((x%:R : 'F_p) \is a GRing.unit) = coprime p x.
-Proof. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
+Proof using All. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
 
 End F_prime.
 

@@ -102,7 +102,7 @@ by have:= AutGa; rewrite inE => /andP[/perm_closed <-]; rewrite permKV.
 Qed.
 
 Lemma Aut_closed x : x \in G -> a x \in G.
-Proof. by move=> Gx; rewrite -im_autm; apply: mem_morphim. Qed.
+Proof using All. by move=> Gx; rewrite -im_autm; apply: mem_morphim. Qed.
 
 End AutGroup.
 
@@ -133,7 +133,7 @@ Variables (T : finType) (A : {set T}) (f : T -> T).
 Hypotheses (injf : {in A &, injective f}) (sBf : f @: A \subset A).
 
 Lemma perm_in_inj : injective (fun x => if x \in A then f x else x).
-Proof.
+Proof using All.
 move=> x y /=; wlog Ay: x y / y \in A.
   by move=> IH eqfxy; case: ifP (eqfxy); [symmetry | case: ifP => //]; auto.
 rewrite Ay; case: ifP => [Ax | nAx def_x]; first exact: injf.
@@ -162,7 +162,7 @@ Implicit Type A : {set gT}.
 Hypothesis injf : 'injm f.
 
 Lemma morphim_fixP A : A \subset G -> reflect (f @* A = A) (f @* A \subset A).
-Proof.
+Proof using All.
 rewrite /morphim => sAG; have:= eqEcard (f @: A) A.
 rewrite (setIidPr sAG) card_in_imset ?leqnn ?andbT  => [<-|]; first exact: eqP.
 by move/injmP: injf; apply: sub_in2; apply/subsetP.
@@ -171,7 +171,7 @@ Qed.
 Hypothesis Gf : f @* G = G.
 
 Lemma aut_closed : f @: G \subset G.
-Proof. by rewrite -morphimEdom; apply/morphim_fixP. Qed.
+Proof using All. by rewrite -morphimEdom; apply/morphim_fixP. Qed.
 
 Definition aut := perm_in (injmP injf) aut_closed.
 
@@ -210,7 +210,7 @@ Let domG := subsetP sGD.
 
 Lemma Aut_isom_subproof a :
   {a' | a' \in Aut (f @* G) & a \in Aut G -> {in G, a' \o f =1 f \o a}}.
-Proof.
+Proof using All.
 set Aut_a := autm (subgP (subg [Aut G] a)).
 have aDom: 'dom (f \o Aut_a \o invm injf) = f @* G.
   rewrite /dom /= morphpre_invm -morphpreIim; congr (f @* _).
@@ -270,7 +270,7 @@ Lemma Aut_isomP : isom (Aut G) (Aut (f @* G)) (Aut_isom injf sGD).
 Proof. by apply/isomP; split; [apply: injm_Aut_isom | apply: im_Aut_isom]. Qed.
 
 Lemma injm_Aut : Aut (f @* G) \isog Aut G.
-Proof. by rewrite isog_sym (isom_isog _ _ Aut_isomP). Qed.
+Proof using sGD injf. by rewrite isog_sym (isom_isog _ _ Aut_isomP). Qed.
 
 End InjmAut.
 
@@ -459,7 +459,7 @@ Hypothesis injf : 'injm f.
 
 Lemma injm_char (G H : {group aT}) :
   G \subset D -> H \char G -> f @* H \char f @* G.
-Proof.
+Proof using All.
 move=> sGD /charP[sHG charH].
 apply/charP; split=> [|g injg gfG]; first exact: morphimS.
 have /domP[h [_ ker_h _ im_h]]: 'dom (invm injf \o g \o f) = G.
@@ -480,7 +480,7 @@ Hypothesis injf : 'injm f.
 
 Lemma char_injm (G H : {group aT}) :
   G \subset D -> H \subset D -> (f @* H \char f @* G) = (H \char G).
-Proof.
+Proof using All.
 move=> sGD sHD; apply/idP/idP; last exact: injm_char.
 by move/(injm_char (injm_invm injf)); rewrite !morphim_invm ?morphimS // => ->.
 Qed.

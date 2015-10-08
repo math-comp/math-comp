@@ -181,7 +181,7 @@ Variables (rT : finGroupType) (D : {group gT}) (f : {morphism D >-> rT}).
 Hypothesis injf : 'injm f.
 
 Lemma injm_center G : G \subset D -> f @* 'Z(G) = 'Z(f @* G).
-Proof. exact: injm_subcent. Qed.
+Proof using All. exact: injm_subcent. Qed.
 
 End Injm.
 
@@ -289,16 +289,16 @@ Definition ker_cprod_by of isom 'Z(H) 'Z(K) gz :=
 Hypothesis isoZ : isom 'Z(H) 'Z(K) gz.
 Let kerHK := ker_cprod_by isoZ.
 
-Let injgz : 'injm gz. Proof. by case/isomP: isoZ. Qed.
-Let gzZ : gz @* 'Z(H) = 'Z(K). Proof. by case/isomP: isoZ. Qed.
-Let gzZchar : gz @* 'Z(H) \char 'Z(K). Proof. by rewrite gzZ. Qed.
+Let injgz : 'injm gz. Proof using isoZ. by case/isomP: isoZ. Qed.
+Let gzZ : gz @* 'Z(H) = 'Z(K). Proof using isoZ. by case/isomP: isoZ. Qed.
+Let gzZchar : gz @* 'Z(H) \char 'Z(K). Proof using gzZ. by rewrite gzZ. Qed.
 Let sgzZZ : gz @* 'Z(H) \subset 'Z(K) := char_sub gzZchar.
 Let sZH := center_sub H.
 Let sZK := center_sub K.
 Let sgzZG : gz @* 'Z(H) \subset K := subset_trans sgzZZ sZK.
 
 Lemma ker_cprod_by_is_group : group_set kerHK.
-Proof.
+Proof using gz.
 apply/group_setP; rewrite inE /= group1 morph1 invg1 /=.
 split=> // [[x1 y1] [x2 y2]].
 rewrite inE /= => /andP[Zx1 /eqP->]; have [_ cGx1] := setIP Zx1.
@@ -308,7 +308,7 @@ Qed.
 Canonical ker_cprod_by_group := Group ker_cprod_by_is_group.
 
 Lemma ker_cprod_by_central : kerHK \subset 'Z(setX H K).
-Proof.
+Proof using sgzZZ.
 rewrite -(center_dprod (setX_dprod H K)) -morphim_pairg1 -morphim_pair1g.
 rewrite -!injm_center ?subsetT ?injm_pair1g ?injm_pairg1 //=.
 rewrite morphim_pairg1 morphim_pair1g setX_dprod.
@@ -433,10 +433,10 @@ Let gH := ifactm fH injm_cpairg1.
 Let gK := ifactm fK injm_cpair1g.
 
 Lemma xcprodm_cent : gK @* CK \subset 'C(gH @* CH).
-Proof. by rewrite !im_ifactm. Qed.
+Proof using cfHK. by rewrite !im_ifactm. Qed.
 
 Lemma xcprodmI : {in CH :&: CK, gH =1 gK}.
-Proof.
+Proof using eq_fHK.
 rewrite setI_im_cpair -injm_center // => fHx; case/morphimP=> x Gx Zx ->{fHx}.
 by rewrite {2}eq_cpairZ //= ?ifactmE ?eq_fHK //= (subsetP sgzZG) ?mem_morphim.
 Qed.
@@ -499,7 +499,7 @@ Section Isomorphism.
 
 Let gzZ_lone (Y : {group gTK}) :
   Y \subset 'Z(K) -> gz @* 'Z(H) \isog Y -> gz @* 'Z(H) = Y.
-Proof.
+Proof using gzZ.
 move=> sYZ isoY; apply/eqP.
 by rewrite eq_sym eqEcard (card_isog isoY) gzZ sYZ /=.
 Qed.
@@ -513,7 +513,7 @@ Hypotheses (isoGH : GH \isog H) (isoGK : GK \isog K).
 Lemma cprod_by_uniq :
   exists f : {morphism G >-> cprod_by},
     [/\ isom G C f, f @* GH = CH & f @* GK = CK].
-Proof.
+Proof using AutZHfull defG isoGH isoGK ziGHK.
 have [_ defGHK cGKH] := cprodP defG.
 have AutZinH := Aut_sub_fullP sZH AutZHfull.
 have [fH injfH defGH]:= isogP (isog_symr isoGH).
@@ -555,7 +555,7 @@ by split=> //; apply/isomP; rewrite ker_f' injm_invm im_f' -fC im_invm.
 Qed.
 
 Lemma isog_cprod_by : G \isog C.
-Proof. by have [f [isoG _ _]] := cprod_by_uniq; apply: isom_isog isoG. Qed.
+Proof using AutZHfull defG isoGH isoGK ziGHK. by have [f [isoG _ _]] := cprod_by_uniq; apply: isom_isog isoG. Qed.
 
 End Isomorphism.
 

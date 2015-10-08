@@ -209,14 +209,14 @@ Hypotheses (nsPG : P <| G) (sXG : X \subset G).
 Hypotheses (genX : generated_by (p_norm_abelian p P) X).
 
 Let C := 'C_G(P).
-Let defN : 'N_G(P) = G. Proof. by rewrite (setIidPl _) ?normal_norm. Qed.
-Let nsCG : C <| G. Proof. by rewrite -defN subcent_normal. Qed.
+Let defN : 'N_G(P) = G. Proof using nsPG. by rewrite (setIidPl _) ?normal_norm. Qed.
+Let nsCG : C <| G. Proof using defN. by rewrite -defN subcent_normal. Qed.
 Let nCG := normal_norm nsCG.
 Let nCX := subset_trans sXG nCG.
 
 (* This is B & G, Theorem A.5.1; it does not depend on the solG assumption. *)
 Theorem odd_abelian_gen_stable : X / C \subset 'O_p(G / C).
-Proof.
+Proof using genX nCX oddG pP.
 case/exists_eqP: genX => gX defX.
 rewrite -defN sub_quotient_pre // -defX gen_subG.
 apply/bigcupsP=> A gX_A; have [_ pA nAP cAA] := and4P gX_A.
@@ -230,7 +230,7 @@ Qed.
 (* This is B & G, Theorem A.5.2. *)
 Theorem odd_abelian_gen_constrained :
   'O_p^'(G) = 1 -> 'C_('O_p(G))(P) \subset P -> X \subset 'O_p(G).
-Proof.
+Proof using All.
 set Q := 'O_p(G) => p'G1 sCQ_P. 
 have sPQ: P \subset Q by rewrite pcore_max.
 have defQ: 'O_{p^', p}(G) = Q by rewrite pseries_pop2.
@@ -404,7 +404,7 @@ Let sSG := pHall_sub sylS.
 
 (* This is B & G, Lemma B.3. *)
 Lemma pcore_Sylow_Puig_sub : 'L_*(S) \subset 'L_*(T) /\ 'L(T) \subset 'L(S).
-Proof.
+Proof using All.
 have [[kS defLS] [kT defLT]] := (Puig_limit S, Puig_limit [group of T]).
 have [/defLS[<- <-] /defLT[<- <-]] := (leq_maxl kS kT, leq_maxr kS kT).
 have sL_ := subset_trans (Puig_succ_sub _ _).
@@ -429,7 +429,7 @@ Let L := 'L(S).
 
 (* This is B & G, Theorem B.4(b). *)
 Theorem Puig_center_normal : 'Z(L) <| G.
-Proof.
+Proof using Y nsTG oddG p'G1 pS pT sSG solG.
 have [sLiST sLTS] := pcore_Sylow_Puig_sub.
 have sLiLT: 'L_*(T) \subset 'L(T) by apply: Puig_sub_even_odd.
 have sZY: 'Z(L) \subset Y.
@@ -484,7 +484,7 @@ Hypotheses (oddG : odd #|G|) (solG : solvable G) (sylS : p.-Sylow(G) S).
 
 (* This is B & G, Theorem B.4(a). *)
 Theorem Puig_factorization : 'O_p^'(G) * 'N_G('Z('L(S))) = G.
-Proof.
+Proof using All.
 set D := 'O_p^'(G); set Z := 'Z(_); have [sSG pS _] := and3P sylS.
 have sSN: S \subset 'N(D) by rewrite (subset_trans sSG) ?gFnorm.
 have p'D: p^'.-group D := pcore_pgroup _ _.

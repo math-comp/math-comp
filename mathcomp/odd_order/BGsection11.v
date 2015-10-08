@@ -51,10 +51,10 @@ Hypotheses (maxM : M \in 'M) (excM : exceptional_FTmaximal).
 Hypotheses (sylP : p.-Sylow(M) P) (sAP : A \subset P).
 
 (* Splitting the excM hypothesis. *)
-Let sM'p : p \in \sigma(M)^'. Proof. by case: excM. Qed.
-Let Ep2A : A \in 'E_p^2(M). Proof. by case: excM. Qed.
-Let Ep1A0 : A0 \in 'E_p^1(A). Proof. by case: excM. Qed.
-Let sNA0_M : 'N(A0) \subset M. Proof. by case: excM. Qed.
+Let sM'p : p \in \sigma(M)^'. Proof using excM. by case: excM. Qed.
+Let Ep2A : A \in 'E_p^2(M). Proof using excM. by case: excM. Qed.
+Let Ep1A0 : A0 \in 'E_p^1(A). Proof using excM. by case: excM. Qed.
+Let sNA0_M : 'N(A0) \subset M. Proof using excM. by case: excM. Qed.
 
 (* Arithmetics of p. *)
 Let p_pr : prime p := pnElem_prime Ep2A.
@@ -66,12 +66,12 @@ Let oA : #|A| = (p ^ 2)%N := card_pnElem Ep2A.
 Let oA0 : #|A0| = p := card_pnElem Ep1A0.
 
 (* Structure of A. *)
-Let abelA : p.-abelem A. Proof. by case/pnElemP: Ep2A. Qed.
+Let abelA : p.-abelem A. Proof using Ep2A. by case/pnElemP: Ep2A. Qed.
 Let pA : p.-group A := abelem_pgroup abelA.
 Let cAA : abelian A := abelem_abelian abelA.
 
 (* Various set inclusions. *)
-Let sA0A : A0 \subset A. Proof. by case/pnElemP: Ep1A0. Qed.
+Let sA0A : A0 \subset A. Proof using Ep1A0. by case/pnElemP: Ep1A0. Qed.
 Let sPM : P \subset M := pHall_sub sylP.
 Let sAM : A \subset M := subset_trans sAP sPM.
 Let sCA0_M : 'C(A0) \subset M := subset_trans (cent_sub A0) sNA0_M.
@@ -85,7 +85,7 @@ Let Ep1A0_G : A0 \in 'E_p^1(G) := subsetP (pnElemS p 1 (subsetT M)) A0 Ep1A0_M.
 
 (* This does not depend on exceptionalM, and could move to Section 10. *)
 Lemma sigma'_Sylow_contra : p \in \sigma(M)^' -> ~~ ('N(P) \subset M).
-Proof. by apply: contra => sNM; apply/exists_inP; exists P. Qed.
+Proof using sylP. by apply: contra => sNM; apply/exists_inP; exists P. Qed.
 
 (* First preliminary remark of Section 11; only depends on sM'p and sylP. *)
 Let not_sNP_M: ~~ ('N(P) \subset M) := sigma'_Sylow_contra sM'p.
@@ -93,12 +93,12 @@ Let not_sNP_M: ~~ ('N(P) \subset M) := sigma'_Sylow_contra sM'p.
 (* Second preliminary remark of Section 11; only depends on sM'p, Ep1A0_M,    *)
 (* and sNA0_M.                                                                *)
 Lemma p_rank_exceptional : 'r_p(M) = 2.
-Proof. exact: sigma'_norm_mmax_rank2 (pgroupS sA0A pA) _. Qed.
+Proof using maxM pA sA0A sM'p sNA0_M. exact: sigma'_norm_mmax_rank2 (pgroupS sA0A pA) _. Qed.
 Let rM := p_rank_exceptional.
 
 (* Third preliminary remark of Section 11. *)
 Lemma exceptional_pmaxElem : A \in 'E*_p(G).
-Proof.
+Proof using rM sCA_M.
 have [_ _ dimA]:= pnElemP Ep2A.
 apply/pmaxElemP; split=> [|E EpE sAE]; first by rewrite !inE subsetT.
 have [//|ltAE]: A :=: E \/ A \proper E := eqVproper sAE.
@@ -115,7 +115,7 @@ Lemma exceptional_TIsigmaJ g q Q1 Q2 :
     q.-Sylow(M`_\sigma :^ g) Q2 -> A \subset 'N(Q2) ->
      (*a*) Q1 :&: Q2 = 1
   /\ (*b*) (forall X, X \in 'E_p^1(A) -> 'C_Q1(X) = 1 \/ 'C_Q2(X) = 1).
-Proof.
+Proof using EpmA cAA oA p_gt1 sAM.
 move=> notMg sAMg sylQ1 nQ1A sylQ2 nQ2A.
 have [-> | ntQ1] := eqsVneq Q1 1.
   by split=> [|? _]; last left; apply: (setIidPl (sub1G _)).
@@ -164,7 +164,7 @@ Corollary exceptional_TI_MsigmaJ g :
   g \notin M -> A \subset M :^ g ->
     (*a*) M`_\sigma :&: M :^ g = 1
  /\ (*b*) M`_\sigma :&: 'C(A0 :^ g) = 1.
-Proof.
+Proof using EpmA cAA oA p_gt1 sAM.
 move=> notMg sAMg; set Ms := M`_\sigma; set H := [group of Ms :&: M :^ g].
 have [H1 | ntH] := eqsVneq H 1.
   by split=> //; apply/trivgP; rewrite -H1 setIS //= centJ conjSg.
@@ -196,7 +196,7 @@ Qed.
 
 (* This is B & G, Theorem 11.3. *)
 Theorem exceptional_sigma_nil : nilpotent M`_\sigma.
-Proof.
+Proof using EpmA cAA not_sNP_M oA oA0 p_gt1 sAM.
 have [g nPg notMg] := subsetPn not_sNP_M.
 set Ms := M`_\sigma; set F := Ms <*> A0 :^ g.
 have sA0gM: A0 :^ g \subset M.
@@ -215,7 +215,7 @@ Qed.
 (* This is B & G, Corollary 11.4. *)
 Corollary exceptional_sigma_uniq H :
   H \in 'M(A) -> H`_\sigma :&: M `_\sigma != 1 -> H :=: M.
-Proof.
+Proof using EpmA cAA not_sNP_M oA oA0 p_gt1 sAM.
 rewrite setIC => /setIdP[maxH sAH] ntMsHs.
 have [g _ defH]: exists2 g, g \in G & H :=: M :^ g.
   apply/imsetP; apply: contraR ntMsHs => /sigma_disjoint[] // _ _.
@@ -227,7 +227,7 @@ Qed.
 
 (* This is B & G, Theorem 11.5. *)
 Theorem exceptional_Sylow_abelian P1 : p.-Sylow(M) P1 -> abelian P1.
-Proof.
+Proof using EpmA cAA not_sNP_M oA p_gt1 sAM.
 have nregA Q: gval Q != 1 -> A \subset 'N(Q) -> coprime #|Q| #|A| ->
   exists2 X, X \in 'E_p^1(A) & 'C_Q(X) != 1.
 - move=> ntQ nQA coQA; apply/exists_inP; apply: contraR ntQ.
@@ -285,7 +285,7 @@ Corollary exceptional_structure (Ms := M`_\sigma) :
       (*b*) 'C_Ms(A) = 1
     & (*c*) exists2 A1, A1 \in 'E_p^1(A) & exists2 A2, A2 \in 'E_p^1(A) &
             [/\ A1 :!=: A2, 'C_Ms(A1) = 1 & 'C_Ms(A2) = 1]].
-Proof.
+Proof using EpmA cAA not_sNP_M oA p_gt1 sAM.
 pose iMNA := #|'N(A) : M|.
 have defA: A :=: 'Ohm_1(P).
   apply/eqP; rewrite eqEcard -{1}(Ohm1_id abelA) OhmS //= oA -rM.
@@ -326,7 +326,7 @@ Qed.
 
 (* This is B & G, Theorem 11.7 (the main result on exceptional subgroups). *)
 Theorem exceptional_mul_sigma_normal : M`_\sigma <*> A <| M.
-Proof.
+Proof using EpmA cAA not_sNP_M oA p_gt1 sAM.
 set Ms := M`_\sigma; have pP := pHall_pgroup sylP; have solM := mmax_sol maxM.
 have [E hallE sPE] := Hall_superset solM sPM (pi_pnat pP sM'p).
 have sAE := subset_trans sAP sPE; have [sEM s'E _] := and3P hallE.

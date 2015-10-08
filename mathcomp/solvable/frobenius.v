@@ -342,17 +342,17 @@ Variables G H K : {group gT}.
 Hypothesis frobG : [Frobenius G = K ><| H].
 
 Lemma FrobeniusWker : [Frobenius G with kernel K].
-Proof. by apply/existsP; exists H. Qed.
+Proof using All. by apply/existsP; exists H. Qed.
 
 Lemma FrobeniusWcompl : [Frobenius G with complement H].
-Proof. by case/andP: frobG. Qed.
+Proof using All. by case/andP: frobG. Qed.
 
 Lemma FrobeniusW : [Frobenius G].
-Proof. by apply/existsP; exists H; apply: FrobeniusWcompl. Qed.
+Proof using All. by apply/existsP; exists H; apply: FrobeniusWcompl. Qed.
 
 Lemma Frobenius_context :
   [/\ K ><| H = G, K :!=: 1, H :!=: 1, K \proper G & H \proper G].
-Proof.
+Proof using All.
 have [/eqP defG neqHG ntH _] := and4P frobG; rewrite setD_eq0 subG1 in ntH.
 have ntK: K :!=: 1 by apply: contraNneq neqHG => K1; rewrite -defG K1 sdprod1g.
 rewrite properEcard properEneq neqHG; have /mulG_sub[-> ->] := sdprodW defG.
@@ -360,7 +360,7 @@ by rewrite -(sdprod_card defG) ltn_Pmulr ?cardG_gt1.
 Qed.
 
 Lemma Frobenius_partition : partition (gval K |: (H^# :^: K)) G.
-Proof.
+Proof using All.
 have [/eqP defG _ tiHG] := and3P frobG; have [_ tiH1G /eqP defN] := and3P tiHG.
 have [[_ /mulG_sub[sKG sHG] nKH tiKH] mulHK] := (sdprodP defG, sdprodWC defG).
 set HG := H^# :^: K; set KHG := _ |: _.
@@ -383,7 +383,7 @@ by rewrite leq_add2r -mulHK indexMg -indexgI tiKH indexg1.
 Qed.
 
 Lemma Frobenius_cent1_ker : {in K^#, forall x, 'C_G[x] \subset K}.
-Proof.
+Proof using All.
 have [/eqP defG _ /normedTI_memJ_P[_ _ tiHG]] := and3P frobG.
 move=> x /setD1P[ntx Kx]; have [_ /mulG_sub[sKG _] _ tiKH] := sdprodP defG.
 have [/eqP <- _ _] := and3P Frobenius_partition; rewrite big_distrl /=.
@@ -395,7 +395,7 @@ by rewrite /(z ^ x) (cent1P cxz) mulKg.
 Qed.
 
 Lemma Frobenius_reg_ker : semiregular K H.
-Proof.
+Proof using All.
 move=> x /setD1P[ntx Hx].
 apply/trivgP/subsetP=> y /setIP[Ky cxy]; apply: contraR ntx => nty.
 have K1y: y \in K^# by rewrite inE nty.
@@ -405,46 +405,46 @@ by rewrite inE (subsetP (Frobenius_cent1_ker K1y)) // inE cent1C (subsetP sHG).
 Qed.
 
 Lemma Frobenius_reg_compl : semiregular H K.
-Proof. by apply: semiregular_sym; apply: Frobenius_reg_ker. Qed.
+Proof using All. by apply: semiregular_sym; apply: Frobenius_reg_ker. Qed.
 
 Lemma Frobenius_dvd_ker1 : #|H| %| #|K|.-1.
-Proof.
+Proof using All.
 apply: regular_norm_dvd_pred Frobenius_reg_ker.
 by have[/sdprodP[]] := Frobenius_context.
 Qed.
 
 Lemma ltn_odd_Frobenius_ker : odd #|G| -> #|H|.*2 < #|K|.
-Proof.
+Proof using All.
 move/oddSg=> oddG.
 have [/sdprodW/mulG_sub[sKG sHG] ntK _ _ _] := Frobenius_context.
 by rewrite dvdn_double_ltn ?oddG ?cardG_gt1 ?Frobenius_dvd_ker1.
 Qed.
 
 Lemma Frobenius_index_dvd_ker1 : #|G : K| %| #|K|.-1.
-Proof.
+Proof using All.
 have[defG _ _ /andP[sKG _] _] := Frobenius_context.
 by rewrite -divgS // -(sdprod_card defG) mulKn ?Frobenius_dvd_ker1.
 Qed.
 
 Lemma Frobenius_coprime : coprime #|K| #|H|.
-Proof. by rewrite (coprime_dvdr Frobenius_dvd_ker1) ?coprimenP. Qed.
+Proof using All. by rewrite (coprime_dvdr Frobenius_dvd_ker1) ?coprimenP. Qed.
 
 Lemma Frobenius_trivg_cent : 'C_K(H) = 1.
-Proof.
+Proof using All.
 by apply: (cent_semiregular Frobenius_reg_ker); case: Frobenius_context.
 Qed.
 
 Lemma Frobenius_index_coprime : coprime #|K| #|G : K|.
-Proof. by rewrite (coprime_dvdr Frobenius_index_dvd_ker1) ?coprimenP. Qed.
+Proof using All. by rewrite (coprime_dvdr Frobenius_index_dvd_ker1) ?coprimenP. Qed.
 
 Lemma Frobenius_ker_Hall : Hall G K.
-Proof.
+Proof using All.
 have [_ _ _ /andP[sKG _] _] := Frobenius_context.
 by rewrite /Hall sKG Frobenius_index_coprime.
 Qed.
 
 Lemma Frobenius_compl_Hall : Hall G H.
-Proof.
+Proof using All.
 have [defG _ _ _ _] := Frobenius_context.
 by rewrite -(sdprod_Hall defG) Frobenius_ker_Hall.
 Qed.

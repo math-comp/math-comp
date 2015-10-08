@@ -160,48 +160,48 @@ Let V := cyclicTIset defW.
 Let w1 := #|W1|.
 Let w2 := #|W2|.
 
-Let defL : K ><| W1 = L. Proof. by have [[]] := ptiWL. Qed.
-Let ntW1 : W1 :!=: 1%g. Proof. by have [[]] := ptiWL. Qed.
-Let cycW1 : cyclic W1. Proof. by have [[]] := ptiWL. Qed.
-Let hallW1 : Hall L W1. Proof. by have [[]] := ptiWL. Qed.
+Let defL : K ><| W1 = L. Proof using ptiWL. by have [[]] := ptiWL. Qed.
+Let ntW1 : W1 :!=: 1%g. Proof using ptiWL. by have [[]] := ptiWL. Qed.
+Let cycW1 : cyclic W1. Proof using ptiWL. by have [[]] := ptiWL. Qed.
+Let hallW1 : Hall L W1. Proof using ptiWL. by have [[]] := ptiWL. Qed.
 
-Let ntW2 : W2 :!=: 1%g. Proof. by have [_ []] := ptiWL. Qed.
-Let sW2K : W2 \subset K. Proof. by have [_ []] := ptiWL. Qed.
-Let cycW2 : cyclic W2. Proof. by have [_ []] := ptiWL. Qed.
-Let prKW1 : {in W1^#, forall x, 'C_K[x] = W2}. Proof. by have [] := ptiWL. Qed.
+Let ntW2 : W2 :!=: 1%g. Proof using ptiWL. by have [_ []] := ptiWL. Qed.
+Let sW2K : W2 \subset K. Proof using ptiWL. by have [_ []] := ptiWL. Qed.
+Let cycW2 : cyclic W2. Proof using ptiWL. by have [_ []] := ptiWL. Qed.
+Let prKW1 : {in W1^#, forall x, 'C_K[x] = W2}. Proof using ptiWL. by have [] := ptiWL. Qed.
 
-Let oddW : odd #|W|. Proof. by have [] := ptiWL. Qed.
+Let oddW : odd #|W|. Proof using ptiWL. by have [] := ptiWL. Qed.
 
-Let nsKL : K <| L. Proof. by case/sdprod_context: defL. Qed.
-Let sKL : K \subset L. Proof. by case/andP: nsKL. Qed.
-Let sW1L : W1 \subset L. Proof. by case/sdprod_context: defL. Qed.
+Let nsKL : K <| L. Proof using defL. by case/sdprod_context: defL. Qed.
+Let sKL : K \subset L. Proof using nsKL. by case/andP: nsKL. Qed.
+Let sW1L : W1 \subset L. Proof using defL. by case/sdprod_context: defL. Qed.
 Let sWL : W \subset L.
-Proof. by rewrite -(dprodWC defW) -(sdprodW defL) mulgSS. Qed.
-Let sW1W : W1 \subset W. Proof. by have /mulG_sub[] := dprodW defW. Qed.
-Let sW2W : W2 \subset W. Proof. by have /mulG_sub[] := dprodW defW. Qed.
+Proof using defL sW2K. by rewrite -(dprodWC defW) -(sdprodW defL) mulgSS. Qed.
+Let sW1W : W1 \subset W. Proof using defW. by have /mulG_sub[] := dprodW defW. Qed.
+Let sW2W : W2 \subset W. Proof using defW. by have /mulG_sub[] := dprodW defW. Qed.
 
 Let coKW1 : coprime #|K| #|W1|.
-Proof. by rewrite (coprime_sdprod_Hall_r defL). Qed.
+Proof using defL hallW1. by rewrite (coprime_sdprod_Hall_r defL). Qed.
 Let coW12 : coprime #|W1| #|W2|.
-Proof. by rewrite coprime_sym (coprimeSg sW2K). Qed.
+Proof using coKW1 sW2K. by rewrite coprime_sym (coprimeSg sW2K). Qed.
 
-Let cycW : cyclic W. Proof. by rewrite (cyclic_dprod defW). Qed.
-Let cWW : abelian W. Proof. exact: cyclic_abelian. Qed.
-Let oddW1 : odd w1. Proof. exact: oddSg oddW. Qed.
-Let oddW2 : odd w2. Proof. exact: oddSg oddW. Qed.
+Let cycW : cyclic W. Proof using coW12 cycW1 cycW2. by rewrite (cyclic_dprod defW). Qed.
+Let cWW : abelian W. Proof using cycW. exact: cyclic_abelian. Qed.
+Let oddW1 : odd w1. Proof using oddW sW1W. exact: oddSg oddW. Qed.
+Let oddW2 : odd w2. Proof using oddW sW2W. exact: oddSg oddW. Qed.
 
 Let ntV : V != set0.
-Proof.
+Proof using ntW1 ntW2.
 by rewrite -card_gt0 card_cycTIset muln_gt0 -!subn1 !subn_gt0 !cardG_gt1 ntW1.
 Qed.
 
-Let sV_V2 : V \subset W :\: W2. Proof. by rewrite setDS ?subsetUr. Qed.
+Let sV_V2 : V \subset W :\: W2. Proof using W1. by rewrite setDS ?subsetUr. Qed.
 
 Lemma primeTIhyp_quotient (M : {group gT}) :
     (W2 / M != 1)%g -> M \subset K -> M <| L ->
   {defWbar : (W1 / M) \x (W2 / M) = W / M
            & primeTI_hypothesis (L / M) (K / M) defWbar}%g.
-Proof.
+Proof using coW12 cycW1 cycW2 ntW1 oddW prKW1 sW1L sWL.
 move=> ntW2bar sMK /andP[_ nML].
 have coMW1: coprime #|M| #|W1| by rewrite (coprimeSg sMK).
 have [nMW1 nMW] := (subset_trans sW1L nML, subset_trans sWL nML).
@@ -222,7 +222,7 @@ Qed.
 
 (* This is the first part of PeterFalvi, Theorem (4.3)(a). *)
 Theorem normedTI_prTIset : normedTI (W :\: W2) L W.
-Proof.
+Proof using cWW ntV prKW1 sV_V2 sW1W sW2W sWL.
 have [[_ _ cW12 _] [_ _ nKW1 tiKW1]] := (dprodP defW, sdprodP defL).
 have nV2W: W \subset 'N(W :\: W2) by rewrite sub_abelian_norm ?subsetDl.
 have piW1_W: {in W1 & W2, forall x y, (x * y).`_\pi(W1) = x}.
@@ -246,7 +246,7 @@ Qed.
 
 (* Second part of PeterFalvi, Theorem (4.3)(a). *)
 Theorem prime_cycTIhyp : cyclicTI_hypothesis L defW.
-Proof.
+Proof using cWW ntV oddW prKW1 sWL.
 have nVW: W \subset 'N(V) by rewrite sub_abelian_norm ?subsetDl.
 by split=> //; apply: normedTI_S normedTI_prTIset.
 Qed.
@@ -254,19 +254,19 @@ Local Notation ctiW := prime_cycTIhyp.
 Let sigma := cyclicTIiso ctiW.
 Let w_ i j := cyclicTIirr defW i j.
 
-Let Wlin k : 'chi[W]_k \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let W1lin i : 'chi[W1]_i \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let W2lin i : 'chi[W2]_i \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let w_lin i j : w_ i j \is a linear_char. Proof. exact: Wlin. Qed.
+Let Wlin k : 'chi[W]_k \is a linear_char. Proof using cycW. exact/irr_cyclic_lin. Qed.
+Let W1lin i : 'chi[W1]_i \is a linear_char. Proof using cycW1. exact/irr_cyclic_lin. Qed.
+Let W2lin i : 'chi[W2]_i \is a linear_char. Proof using cycW2. exact/irr_cyclic_lin. Qed.
+Let w_lin i j : w_ i j \is a linear_char. Proof using Wlin. exact: Wlin. Qed.
 
-Let nirrW1 : #|Iirr W1| = w1. Proof. exact: card_Iirr_cyclic. Qed.
-Let nirrW2 : #|Iirr W2| = w2. Proof. exact: card_Iirr_cyclic. Qed.
-Let NirrW1 : Nirr W1 = w1. Proof. by rewrite -nirrW1 card_ord. Qed.
-Let NirrW2 : Nirr W2 = w2. Proof. by rewrite -nirrW2 card_ord. Qed.
-Let w1gt1 : (1 < w1)%N. Proof. by rewrite cardG_gt1. Qed.
+Let nirrW1 : #|Iirr W1| = w1. Proof using cycW1. exact: card_Iirr_cyclic. Qed.
+Let nirrW2 : #|Iirr W2| = w2. Proof using cycW2. exact: card_Iirr_cyclic. Qed.
+Let NirrW1 : Nirr W1 = w1. Proof using nirrW1. by rewrite -nirrW1 card_ord. Qed.
+Let NirrW2 : Nirr W2 = w2. Proof using nirrW2. by rewrite -nirrW2 card_ord. Qed.
+Let w1gt1 : (1 < w1)%N. Proof using ntW1. by rewrite cardG_gt1. Qed.
 
 Let cfdot_w i1 j1 i2 j2 : '[w_ i1 j1, w_ i2 j2] = ((i1 == i2) && (j1 == j2))%:R.
-Proof. exact: cfdot_dprod_irr. Qed.
+Proof using defW. exact: cfdot_dprod_irr. Qed.
 
 (* Witnesses for Theorem (4.3)(b). *)
 Fact primeTIdIirr_key : unit. Proof. by []. Qed.
@@ -280,7 +280,7 @@ Local Notation delta_ j := (GRing.sign algCring (primeTI_Isign j)).
 
 Let ew_ i j := w_ i j - w_ 0 j.
 Let V2ew i j : ew_ i j \in 'CF(W, W :\: W2).
-Proof.
+Proof using W1lin w_.
 apply/cfun_onP=> x; rewrite !inE negb_and negbK => /orP[W2x | /cfun0->//].
 by rewrite -[x]mul1g !cfunE /w_ !dprod_IirrE !cfDprodE ?lin_char1 ?subrr.
 Qed.
@@ -734,54 +734,54 @@ Local Notation chi_ j := (primeTIres ptiWL j).
 Local Notation mu_ := (primeTIred ptiWL).
 Local Notation tau := (Dade ddA0).
 
-Let defA0 : A0 = A :|: class_support V L. Proof. by have [] := ddA0def. Qed.
-Let nsAL : A <| L. Proof. by have [_ []] := ddA0def. Qed.
-Let sAA0 : A \subset A0. Proof. by rewrite defA0 subsetUl. Qed.
+Let defA0 : A0 = A :|: class_support V L. Proof using prDadeHyp. by have [] := ddA0def. Qed.
+Let nsAL : A <| L. Proof using prDadeHyp. by have [_ []] := ddA0def. Qed.
+Let sAA0 : A \subset A0. Proof using defA0. by rewrite defA0 subsetUl. Qed.
 
-Let nsHL : H <| L. Proof. by have [[]] := ddA0def. Qed.
-Let sHK : H \subset K. Proof. by have [[]] := ddA0def. Qed.
-Let defL : K ><| W1 = L. Proof. by have [[]] := ptiWL. Qed.
-Let sKL : K \subset L. Proof. by have /mulG_sub[] := sdprodW defL. Qed.
+Let nsHL : H <| L. Proof using prDadeHyp. by have [[]] := ddA0def. Qed.
+Let sHK : H \subset K. Proof using prDadeHyp. by have [[]] := ddA0def. Qed.
+Let defL : K ><| W1 = L. Proof using ptiWL. by have [[]] := ptiWL. Qed.
+Let sKL : K \subset L. Proof using defL. by have /mulG_sub[] := sdprodW defL. Qed.
 Let coKW1 : coprime #|K| #|W1|.
-Proof. by rewrite (coprime_sdprod_Hall_r defL); have [[]] := ptiWL. Qed.
+Proof using defL. by rewrite (coprime_sdprod_Hall_r defL); have [[]] := ptiWL. Qed.
 
 Let sIH_A : \bigcup_(h in H^#) 'C_K[h]^# \subset A.
-Proof. by have [_ []] := ddA0def. Qed.
+Proof using prDadeHyp. by have [_ []] := ddA0def. Qed.
 
-Let sW2H : W2 \subset H. Proof. by have [[]] := ddA0def. Qed.
-Let ntW1 : W1 :!=: 1%g. Proof. by have [[]] := ptiWL. Qed.
-Let ntW2 : W2 :!=: 1%g. Proof. by have [_ []] := ptiWL. Qed.
+Let sW2H : W2 \subset H. Proof using prDadeHyp. by have [[]] := ddA0def. Qed.
+Let ntW1 : W1 :!=: 1%g. Proof using ptiWL. by have [[]] := ptiWL. Qed.
+Let ntW2 : W2 :!=: 1%g. Proof using ptiWL. by have [_ []] := ptiWL. Qed.
 
-Let oddW : odd #|W|. Proof. by have [] := ctiWL. Qed.
-Let sW1W : W1 \subset W. Proof. by have /mulG_sub[] := dprodW defW. Qed.
-Let sW2W : W2 \subset W. Proof. by have /mulG_sub[] := dprodW defW. Qed.
-Let tiW12 : W1 :&: W2 = 1%g. Proof. by have [] := dprodP defW. Qed.
+Let oddW : odd #|W|. Proof using ctiWL. by have [] := ctiWL. Qed.
+Let sW1W : W1 \subset W. Proof using defW. by have /mulG_sub[] := dprodW defW. Qed.
+Let sW2W : W2 \subset W. Proof using defW. by have /mulG_sub[] := dprodW defW. Qed.
+Let tiW12 : W1 :&: W2 = 1%g. Proof using defW. by have [] := dprodP defW. Qed.
 
-Let cycW : cyclic W. Proof. by have [] := ctiWG. Qed.
-Let cycW1 : cyclic W1. Proof. by have [[]] := ptiWL. Qed.
-Let cycW2 : cyclic W2. Proof. by have [_ []] := ptiWL. Qed.
-Let sLG : L \subset G. Proof. by case: ddA0. Qed.
-Let sW2K : W2 \subset K. Proof. by have [_ []] := ptiWL. Qed.
+Let cycW : cyclic W. Proof using ctiWG. by have [] := ctiWG. Qed.
+Let cycW1 : cyclic W1. Proof using ptiWL. by have [[]] := ptiWL. Qed.
+Let cycW2 : cyclic W2. Proof using ptiWL. by have [_ []] := ptiWL. Qed.
+Let sLG : L \subset G. Proof using ddA0. by case: ddA0. Qed.
+Let sW2K : W2 \subset K. Proof using ptiWL. by have [_ []] := ptiWL. Qed.
 
 Let sWL : W \subset L.
-Proof. by rewrite -(dprodWC defW) -(sdprodW defL) mulgSS. Qed.
-Let sWG : W \subset G. Proof. exact: subset_trans sWL sLG. Qed.
+Proof using defL sW2K. by rewrite -(dprodWC defW) -(sdprodW defL) mulgSS. Qed.
+Let sWG : W \subset G. Proof using sLG sWL. exact: subset_trans sWL sLG. Qed.
 
-Let oddW1 : odd #|W1|. Proof. exact: oddSg oddW. Qed.
-Let oddW2 : odd #|W2|. Proof. exact: oddSg oddW. Qed.
+Let oddW1 : odd #|W1|. Proof using oddW sW1W. exact: oddSg oddW. Qed.
+Let oddW2 : odd #|W2|. Proof using oddW sW2W. exact: oddSg oddW. Qed.
 
-Let w1gt1 : (2 < #|W1|)%N. Proof. by rewrite odd_gt2 ?cardG_gt1. Qed.
-Let w2gt2 : (2 < #|W2|)%N. Proof. by rewrite odd_gt2 ?cardG_gt1. Qed.
+Let w1gt1 : (2 < #|W1|)%N. Proof using ntW1 oddW1. by rewrite odd_gt2 ?cardG_gt1. Qed.
+Let w2gt2 : (2 < #|W2|)%N. Proof using ntW2 oddW2. by rewrite odd_gt2 ?cardG_gt1. Qed.
 
-Let nirrW1 : #|Iirr W1| = #|W1|. Proof. exact: card_Iirr_cyclic. Qed.
-Let nirrW2 : #|Iirr W2| = #|W2|. Proof. exact: card_Iirr_cyclic. Qed.
-Let W1lin i : 'chi[W1]_i \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
-Let W2lin i : 'chi[W2]_i \is a linear_char. Proof. exact/irr_cyclic_lin. Qed.
+Let nirrW1 : #|Iirr W1| = #|W1|. Proof using cycW1. exact: card_Iirr_cyclic. Qed.
+Let nirrW2 : #|Iirr W2| = #|W2|. Proof using cycW2. exact: card_Iirr_cyclic. Qed.
+Let W1lin i : 'chi[W1]_i \is a linear_char. Proof using cycW1. exact/irr_cyclic_lin. Qed.
+Let W2lin i : 'chi[W2]_i \is a linear_char. Proof using cycW2. exact/irr_cyclic_lin. Qed.
  
 (* This is the first part of Peterfalvi (4.7). *) 
 Lemma prDade_irr_on k : 
    ~~ (H \subset cfker 'chi[K]_k) -> 'chi_k \in 'CF(K, 1%g |: A).
-Proof.
+Proof using nsHL sHK sIH_A sKL.
 move=> kerH'i; apply/cfun_onP=> g; rewrite !inE => /norP[ntg A'g].
 have [Kg | /cfun0-> //] := boolP (g \in K).
 apply: irr_reg_off_ker_0 (normalS _ _ nsHL) kerH'i _ => //.
@@ -793,14 +793,14 @@ Qed.
 (* This is the second part of Peterfalvi (4.7). *) 
 Lemma prDade_Ind_irr_on k : 
    ~~ (H \subset cfker 'chi[K]_k) -> 'Ind[L] 'chi_k \in 'CF(L, 1%g |: A).
-Proof.
+Proof using nsAL nsHL sHK sIH_A sKL.
 move/prDade_irr_on/(cfInd_on sKL); apply: cfun_onS; rewrite class_supportEr.
 by apply/bigcupsP=> _ /normsP-> //; rewrite normsU ?norms1 ?normal_norm.
 Qed.
 
 (* Third part of Peterfalvi (4.7). *)
 Lemma cfker_prTIres j : j != 0 ->  ~~ (H \subset cfker (chi_ j)).
-Proof.
+Proof using W2lin ntW1 sHK sKL sW2H.
 rewrite -(cfRes_prTIirr _ 0) cfker_Res ?irr_char // subsetI sHK /=.
 apply: contra => kerHmu0j; rewrite -irr_eq1; apply/eqP/cfun_inP=> y W2y.
 have [[x W1x ntx] mulW] := (trivgPn _ ntW1, dprodW defW).
@@ -815,18 +815,18 @@ Qed.
 
 (* Fourth part of Peterfalvi (4.7). *)
 Lemma prDade_TIres_on j : j != 0 -> chi_ j \in 'CF(K, 1%g |: A).
-Proof. by move/cfker_prTIres/prDade_irr_on. Qed.
+Proof using W2lin nsHL ntW1 sHK sIH_A sKL sW2H. by move/cfker_prTIres/prDade_irr_on. Qed.
 
 (* Last part of Peterfalvi (4.7). *)
 Lemma prDade_TIred_on j : j != 0 -> mu_ j \in 'CF(L, 1%g |: A).
-Proof. by move/cfker_prTIres/prDade_Ind_irr_on; rewrite cfInd_prTIres. Qed.
+Proof using W2lin nsAL nsHL ntW1 sHK sIH_A sKL sW2H. by move/cfker_prTIres/prDade_Ind_irr_on; rewrite cfInd_prTIres. Qed.
 
 Import ssrint.
 
 (* Second part of PeterFalvi (4.8). *)
 Lemma prDade_TIsign_eq i j k : 
   mu2_ i j 1%g = mu2_ i k 1%g -> delta_ j = delta_ k.
-Proof.
+Proof using w1gt1.
 move=> eqjk; have{eqjk}: (delta_ j == delta_ k %[mod #|W1|])%C.
   apply: eqCmod_trans (prTIirr1_mod ptiWL i k).
   by rewrite eqCmod_sym -eqjk (prTIirr1_mod ptiWL).
@@ -839,7 +839,7 @@ Qed.
 Lemma prDade_sub_TIirr_on i j k :
     j != 0 -> k != 0 -> mu2_ i j 1%g = mu2_ i k 1%g ->
   mu2_ i j - mu2_ i k \in 'CF(L, A0). 
-Proof.
+Proof using W2lin coKW1 defA0 nsHL sHK sIH_A sKL sW2H w1gt1.
 move=> nzj nzk eq_mu1.
 apply/cfun_onP=> g; rewrite defA0 !inE negb_or !cfunE => /andP[A'g V'g].
 have [Lg | L'g] := boolP (g \in L); last by rewrite !cfun0 ?subrr.
@@ -871,7 +871,7 @@ Qed.
 Lemma prDade_sub_TIirr i j k :
     j != 0 -> k != 0 -> mu2_ i j 1%g = mu2_ i k 1%g -> 
   tau (mu2_ i j - mu2_ i k) = delta_ j *: (eta_ i j - eta_ i k).
-Proof.
+Proof using W2lin coKW1 defA0 nsHL sHK sIH_A sKL sW2H w1gt1.
 move=> nz_j nz_k eq_mu2jk_1.
 have [-> | k'j] := eqVneq j k; first by rewrite !subrr !raddf0.
 have [[Itau Ztau] [_ Zsigma]] := (Dade_Zisometry ddA0, cycTI_Zisometry ctiWL).
@@ -889,7 +889,7 @@ by rewrite !Dmu2 // (prDade_TIsign_eq eq_mu2jk_1) !cfunE -mulrBr.
 Qed.
 
 Lemma prDade_supp_disjoint : V \subset ~: K.
-Proof.
+Proof using coKW1 sW2K.
 rewrite subDset setUC -subDset setDE setCK setIC -(dprod_modr defW sW2K).
 by rewrite coprime_TIg // dprod1g subsetUr.
 Qed.
@@ -909,7 +909,7 @@ Theorem uniform_prTIred_coherent k (calT := uniform_prTIred_seq ptiWL k) :
            forall j, tau1 (mu_ j) = delta_ k *: (\sum_i sigma (w_ i j))
          & {in 'Z[calT], isometry tau1, to 'Z[irr G]}
         /\ {in 'Z[calT, L^#], tau1 =1 tau}).
-Proof.
+Proof using W2lin coKW1 nsAL nsHL sAA0 sHK sIH_A sKL sW2H w1gt1.
 have uniqT: uniq calT by apply/dinjectiveP; apply: in2W; apply: prTIred_inj.
 have sTmu: {subset calT <= codom mu_} by apply: image_codom.
 have oo_mu: pairwise_orthogonal (codom mu_).
@@ -965,7 +965,7 @@ Qed.
 Lemma prDade_sub2_TIirr i j :
   tau (delta_ j *: mu2_ i j - delta_ j *: mu2_ 0 j - mu2_ i 0 + mu2_ 0 0)
     = eta_ i j - eta_ 0 j - eta_ i 0 + eta_ 0 0.
-Proof.
+Proof using ctiWL defA0 sLG sWL.
 pose V0 := class_support V L; have sVV0: V \subset V0 := sub_class_support L V.
 have sV0A0: V0 \subset A0 by rewrite defA0 subsetUr.
 have nV0L: L \subset 'N(V0) := class_support_norm V L.

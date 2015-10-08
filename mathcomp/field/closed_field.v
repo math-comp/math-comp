@@ -591,7 +591,7 @@ by case/andP=> pr psr; split; first apply/eqP=> //; apply/ihps.
 Qed.
 
 Lemma holds_ex_elim : GRing.valid_QE_proj ex_elim.
-Proof.
+Proof using All.
 move=> i [ps qs] /= e; case/andP=> /= rps rqs.
 rewrite ex_elim_seqP big_map.
 have -> : \big[@rgcdp _/0%:P]_(j <- ps) eval_poly e (abstrX i j) =

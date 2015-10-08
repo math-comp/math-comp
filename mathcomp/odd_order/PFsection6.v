@@ -57,17 +57,17 @@ Hypotheses (nsKL : K <| L) (solK : solvable K).
 Hypothesis Itau : {in 'Z[calS, L^#] &, isometry tau}.
 Hypothesis scohS : subcoherent calS tau R.
 
-Let sKL : K \subset L. Proof. exact: normal_sub. Qed.
-Let nKL : L \subset 'N(K). Proof. exact: normal_norm. Qed.
-Let orthS: pairwise_orthogonal calS. Proof. by case: scohS. Qed.
+Let sKL : K \subset L. Proof using nsKL. exact: normal_sub. Qed.
+Let nKL : L \subset 'N(K). Proof using nsKL. exact: normal_norm. Qed.
+Let orthS: pairwise_orthogonal calS. Proof using scohS. by case: scohS. Qed.
 Let sSS M : {subset S M <= calS}. Proof. exact: seqInd_sub. Qed.
 Let ccS M : cfConjC_closed (S M). Proof. exact: cfAut_seqInd. Qed.
 Let uniqS M : uniq (S M). Proof. exact: seqInd_uniq. Qed.
-Let nrS : ~~ has cfReal calS. Proof. by case: scohS => [[]]. Qed.
+Let nrS : ~~ has cfReal calS. Proof using scohS. by case: scohS => [[]]. Qed.
 
 Lemma exists_linInd M :
   M \proper K -> M <| K -> exists2 phi, phi \in S M & phi 1%g = #|L : K|%:R.
-Proof.
+Proof using sKL solK.
 move=> ltMK nsMK; have [sMK nMK] := andP nsMK.
 have ntKM: (K / M)%g != 1%g by rewrite -subG1 quotient_sub1 // proper_subn.
 have [r lin_r ntr] := solvable_has_lin_char ntKM (quotient_sol M solK).
@@ -84,7 +84,7 @@ Lemma coherent_seqIndD_bound (A B C D : {group gT}) :
           & D / B \subset 'Z(C / B)]%g ->
   (*b*) coherent (S A) L^# tau -> \unless coherent (S B) L^# tau,
   #|K : A|%:R - 1 <= 2%:R * #|L : C|%:R * sqrtC #|C : D|%:R.
-Proof.
+Proof using nrS sKL solK.
 move=> [nsAL nsBL nsCL nsDL] [ltAK sBD sDC sCK sDbZC] cohA.
 have sBC := subset_trans sBD sDC; have sBK := subset_trans sBC sCK.
 have [sAK nsBK] := (proper_sub ltAK, normalS sBK sKL nsBL).
@@ -121,7 +121,7 @@ Theorem bounded_seqIndD_coherence M H H1 :
  (*b*) coherent (S H1) L^# tau ->
  (*c*) (#|H : H1| > 4 * #|L : K| ^ 2 + 1)%N ->
  coherent (S M) L^# tau.
-Proof.
+Proof using nrS sKL solK.
 move: H1 => A [nsML nsHL nsAL] [sMA sAH sHK] nilHb cohA lbHA.
 elim: {A}_.+1 {-2}A (ltnSn #|A|) => // m IHm A leAm in nsAL sMA sAH cohA lbHA *.
 have [/group_inj-> // | ltMA] := eqVproper sMA; have [sAL nAL] := andP nsAL.
@@ -180,7 +180,7 @@ Lemma non_coherent_chief M (H1 := (K^`(1) <*> M)%G) :
    [/\ (*a*) chief_factor L H1 K /\ (#|K : H1| <= 4 * #|L : K| ^ 2 + 1)%N
      & (*b*) exists2 p : nat, p.-group (K / M)%g /\ ~~ abelian (K / M)
      & (*c*) ~~ (#|L : K| %| p - 1)].
-Proof.
+Proof using nKL nrS sKL solK.
 case=> oddL [nsML sMK nilKM]; rewrite /= -(erefl (gval H1)) => frobLb.
 set e := #|L : K|; have odd_e: odd e := dvdn_odd (dvdn_indexg L K) oddL.
 have{odd_e} mod1e_lb m: odd m -> m == 1 %[mod e] -> (m > 1 -> 2 * e + 1 <= m)%N.
@@ -266,7 +266,7 @@ Lemma seqIndD_irr_coherence Z (calX := seqIndD K L Z 1) :
     {subset calX <= irr L} ->
   calX =i [pred chi in irr L | ~~ (Z \subset cfker chi)]
   /\ coherent calX L^#tau.
-Proof.
+Proof using nKL nrS sKL solK.
 move=> Frob_quo1 [nsZL ntZ sZ_ZK] irrX; have [sZL nZL] := andP nsZL.
 have abZ: abelian Z by rewrite (abelianS sZ_ZK) ?center_abelian.
 have /andP[sZK nZK]: Z <| K := sub_center_normal sZ_ZK.

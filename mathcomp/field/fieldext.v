@@ -1146,21 +1146,21 @@ Let z0 := if wf_p then z else 0.
 Let n := (size p0).-1.
 
 Let p0_mon : p0 \is monic.
-Proof.
+Proof using wf_p.
 rewrite /p0; case: ifP => [/andP[nz_p _] | _]; last exact: monicX.
 by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0.
 Qed.
 
-Let nz_p0 : p0 != 0. Proof. by rewrite monic_neq0 // p0_mon. Qed.
+Let nz_p0 : p0 != 0. Proof using p0_mon. by rewrite monic_neq0 // p0_mon. Qed.
 
 Let p0z0 : root p0^iota z0.
-Proof.
+Proof using wf_p.
 rewrite /p0 /z0; case: ifP => [/andP[_ pz0]|]; last by rewrite map_polyX rootX.
 by rewrite map_polyZ rootE hornerZ (rootP pz0) mulr0.
 Qed.
 
 Let n_gt0: 0 < n.
-Proof.
+Proof using nz_p0 p0z0.
 rewrite /n -subn1 subn_gt0 -(size_map_poly iota).
 by rewrite (root_size_gt1 _ p0z0) ?map_poly_eq0.
 Qed.
@@ -1231,10 +1231,10 @@ Canonical subfext_zmodType :=
   Eval hnf in ZmodType subFExtend subfext_zmodMixin.
 
 Let poly_rV_modp_K q : rVpoly (poly_rV (q %% p0) : 'rV[F]_n) = q %% p0.
-Proof. by apply: poly_rV_K; rewrite -ltnS -polySpred // ltn_modp. Qed.
+Proof using nz_p0. by apply: poly_rV_K; rewrite -ltnS -polySpred // ltn_modp. Qed.
 
 Let iotaPz_modp q : iotaPz (q %% p0) = iotaPz q.
-Proof.
+Proof using p0z0.
 rewrite {2}(divp_eq q p0) rmorphD rmorphM /=.
 by rewrite [iotaPz p0](rootP p0z0) mulr0 add0r.
 Qed.
@@ -1413,21 +1413,21 @@ Section NonZero.
 Hypothesis nz_p : p != 0.
 
 Lemma subfx_inj_eval q : subfx_inj (subfx_eval q) = q^iota.[z].
-Proof.
+Proof using nz_p pz0.
 by rewrite piE /iotaFz poly_rV_modp_K iotaPz_modp /iotaPz /z0 /wf_p nz_p pz0.
 Qed.
 
 Lemma subfx_inj_root : subfx_inj subfx_root = z.
-Proof. by rewrite subfx_inj_eval // map_polyX hornerX. Qed.
+Proof using nz_p pz0. by rewrite subfx_inj_eval // map_polyX hornerX. Qed.
 
 Lemma subfx_injZ b x : subfx_inj (b *: x) = iota b * subfx_inj x.
-Proof. by rewrite rmorphM /= subfx_inj_eval // map_polyC hornerC. Qed.
+Proof using nz_p pz0. by rewrite rmorphM /= subfx_inj_eval // map_polyC hornerC. Qed.
 
 Lemma subfx_inj_base b : subfx_inj b%:A = iota b.
-Proof. by rewrite subfx_injZ rmorph1 mulr1. Qed.
+Proof using nz_p pz0. by rewrite subfx_injZ rmorph1 mulr1. Qed.
 
 Lemma subfxEroot x : {q | x = (map_poly (in_alg subFExtend) q).[subfx_root]}.
-Proof.
+Proof using nz_p pz0.
 have /sig_eqW[q ->] := subfxE x; exists q.
 apply: (fmorph_inj subfx_inj_rmorphism).
 rewrite -horner_map /= subfx_inj_root subfx_inj_eval //.
@@ -1436,7 +1436,7 @@ Qed.
 
 Lemma subfx_irreducibleP :
  (forall q, root q^iota z -> q != 0 -> size p <= size q) <-> irreducible_poly p.
-Proof.
+Proof using nz_p pz0.
 split=> [min_p | irr_p q qz0 nz_q].
   split=> [|q nonC_q q_dv_p].
     by rewrite -(size_map_poly iota) (root_size_gt1 _ pz0) ?map_poly_eq0.
@@ -1457,11 +1457,11 @@ End NonZero.
 Section Irreducible.
 
 Hypothesis irr_p : irreducible_poly p.
-Let nz_p : p != 0. Proof. exact: irredp_neq0. Qed.
+Let nz_p : p != 0. Proof using irr_p. exact: irredp_neq0. Qed.
 
 (* The Vector axiom requires irreducibility. *)
 Lemma min_subfx_vectAxiom : Vector.axiom (size p).-1 subfx_lmodType.
-Proof.
+Proof using nz_p pz0.
 move/subfx_irreducibleP: irr_p => /=/(_ nz_p) min_p; set d := (size p).-1.
 have Dd: d.+1 = size p by rewrite polySpred.
 pose Fz2v x : 'rV_d := poly_rV (sval (sig_eqW (subfxE x)) %% p).

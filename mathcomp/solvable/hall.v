@@ -673,7 +673,7 @@ Let injA : 'injm inA := injm_sdpair2 _.
 Hypotheses (coGA : coprime #|G| #|A|) (solG : solvable G).
 
 Lemma external_action_im_coprime : coprime #|G'| #|A'|.
-Proof. by rewrite !card_injm. Qed.
+Proof using coGA. by rewrite !card_injm. Qed.
 
 Let coGA' := external_action_im_coprime.
 
@@ -683,7 +683,7 @@ Let nGA' := im_sdpair_norm to.
 
 Lemma ext_coprime_Hall_exists :
   exists2 H : {group gT}, pi.-Hall(G) H & [acts A, on H | to].
-Proof.
+Proof using coGA' solG'.
 have [H' hallH' nHA'] := coprime_Hall_exists pi nGA' coGA' solG'.
 have sHG' := pHall_sub hallH'.
 exists (inG @*^-1 H')%G => /=.
@@ -695,7 +695,7 @@ Lemma ext_coprime_Hall_trans (H1 H2 : {group gT}) :
     pi.-Hall(G) H1 -> [acts A, on H1 | to] ->
     pi.-Hall(G) H2 -> [acts A, on H2 | to] ->
   exists2 x, x \in 'C_(G | to)(A) & H1 :=: H2 :^ x.
-Proof.
+Proof using coGA' solG'.
 move=> hallH1 nH1A hallH2 nH2A.
 have sH1G := pHall_sub hallH1; have sH2G := pHall_sub hallH2.
 rewrite !actsEsd // in nH1A nH2A.
@@ -723,7 +723,7 @@ Lemma ext_coprime_Hall_subset (X : {group gT}) :
     X \subset G -> pi.-group X -> [acts A, on X | to] ->
   exists H : {group gT},
     [/\ pi.-Hall(G) H, [acts A, on H | to] & X \subset H].
-Proof.
+Proof using coGA' solG'.
 move=> sXG piX; rewrite actsEsd // => nXA'.
 case: (coprime_Hall_subset nGA' coGA' solG' _ (morphim_pgroup _ piX) nXA').
   exact: morphimS.

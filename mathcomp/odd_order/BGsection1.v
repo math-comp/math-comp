@@ -167,9 +167,9 @@ Variables (gT : finGroupType) (G G' : {group gT}).
 Hypothesis solG : solvable G.
 Hypothesis nsG'G : G' <| G.
 
-Let sG'G : G' \subset G. Proof. exact: normal_sub. Qed.
-Let nG'G : G \subset 'N(G'). Proof. exact: normal_norm. Qed.
-Let nsF'G : 'F(G') <| G. Proof. exact: gFnormal_trans. Qed.
+Let sG'G : G' \subset G. Proof using nsG'G. exact: normal_sub. Qed.
+Let nG'G : G \subset 'N(G'). Proof using nsG'G. exact: normal_norm. Qed.
+Let nsF'G : 'F(G') <| G. Proof using nsG'G. exact: gFnormal_trans. Qed.
 
 Let Gchief (UV : {group gT} * {group gT}) := chief_factor G UV.2 UV.1.
 Let H := \bigcap_(UV | Gchief UV) 'C(UV.1 / UV.2 | 'Q).
@@ -178,7 +178,7 @@ Let H' :=
 
 (* This is B & G Proposition 1.2, non trivial inclusion of the first equality.*)
 Proposition Fitting_stab_chief : 'F(G') \subset H.
-Proof.
+Proof using nsF'G sG'G nsG'G solG.
 apply/bigcapsP=> [[U V] /= chiefUV].
 have minUV: minnormal (U / V) (G / V) := chief_factor_minnormal chiefUV.
 have{chiefUV} [/=/maxgroupp/andP[_ nVG] sUG nUG] := and3P chiefUV.
@@ -193,7 +193,7 @@ Qed.
 (* This is B & G Proposition 1.2, non trivial inclusion of the second         *)
 (* equality.                                                                  *)
 Proposition chief_stab_sub_Fitting : H' \subset 'F(G').
-Proof.
+Proof using nG'G sG'G nsG'G solG.
 without loss: / {K | [min K | K <| G & ~~ (K \subset 'F(G'))] & K \subset H'}.
   move=> IH; apply: wlog_neg => s'H'F; apply/IH/mingroup_exists=> {IH}/=.
   rewrite /normal subIset ?sG'G ?normsI ?norms_bigcap {s'H'F}//.
@@ -574,7 +574,7 @@ Hypotheses (nMT : T \subset 'N(M)) (coMT : coprime #|M| #|T|).
 
 (* This is B & G, Lemma 1.14, for a global normaliser.                        *)
 Lemma coprime_norm_quotient_pgroup : 'N(T / M) = 'N(T) / M.
-Proof.
+Proof using coMT nMT pT.
 have [-> | ntT] := eqsVneq T 1; first by rewrite quotient1 !norm1 quotientT.
 have [p_pr _ [m oMpm]] := pgroup_pdiv pT ntT.
 apply/eqP; rewrite eqEsubset morphim_norms // andbT; apply/subsetP=> Mx.
@@ -597,7 +597,7 @@ Qed.
 
 (* This is B & G, Lemma 1.14, for a global centraliser.                       *)
 Lemma coprime_cent_quotient_pgroup : 'C(T / M) = 'C(T) / M.
-Proof.
+Proof using coMT nMT pT.
 symmetry; rewrite -quotientInorm -quotientMidl -['C(T / M)]cosetpreK.
 congr (_ / M); set Cq := _ @*^-1 _; set C := 'N_('C(T))(M).
 suffices <-: 'N_Cq(T) = C.
@@ -616,11 +616,11 @@ Hypothesis sMG : M \subset G.
 
 (* This is B & G, Lemma 1.14, for a local normaliser.                        *)
 Lemma coprime_subnorm_quotient_pgroup : 'N_(G / M)(T / M) = 'N_G(T) / M.
-Proof. by rewrite quotientGI -?coprime_norm_quotient_pgroup. Qed.
+Proof using All. by rewrite quotientGI -?coprime_norm_quotient_pgroup. Qed.
 
 (* This is B & G, Lemma 1.14, for a local centraliser.                       *)
 Lemma coprime_subcent_quotient_pgroup : 'C_(G / M)(T / M) = 'C_G(T) / M.
-Proof. by rewrite quotientGI -?coprime_cent_quotient_pgroup. Qed.
+Proof using All. by rewrite quotientGI -?coprime_cent_quotient_pgroup. Qed.
 
 End CoprimeQuotientPgroup.
 
@@ -804,7 +804,7 @@ Import finalg FiniteModule GRing.Theory.
 (* Gorenstein Theorem 7.3.4 and Aschbacher (37.4).                            *)
 Theorem focal_subgroup_gen :
   S :&: G^`(1) = <<[set [~ x, u] | x in S, u in G & x ^ u \in S]>>.
-Proof.
+Proof using All.
 set K := <<_>>; set G' := G^`(1); have [sSG coSiSG] := andP (pHall_Hall sylS).
 apply/eqP; rewrite eqEsubset gen_subG andbC; apply/andP; split.
   apply/subsetP=> _ /imset2P[x u Sx /setIdP[Gu Sxu] ->].
@@ -853,7 +853,7 @@ Qed.
 (* This is B & G, Theorem 1.18 (due to Burnside). *)
 Theorem Burnside_normal_complement :
   'N_G(S) \subset 'C(S) -> 'O_p^'(G) ><| S = G.
-Proof.
+Proof using All.
 move=> cSN; set K := 'O_p^'(G); have [sSG pS _] := and3P sylS.
 have /andP[sKG nKG]: K <| G by apply: pcore_normal.
 have{nKG} nKS := subset_trans sSG nKG.
@@ -889,7 +889,7 @@ Qed.
 (* This is B & G, Corollary 1.19(a). *)
 Corollary cyclic_Sylow_tiVsub_der1 :
   cyclic S -> S :&: G^`(1) = 1 \/ S \subset G^`(1).
-Proof.
+Proof using All.
 move=> cycS; have [sSG pS _] := and3P sylS.
 have nsSN: S <| 'N_G(S) by rewrite normalSG.
 have hallSN: Hall 'N_G(S) S.

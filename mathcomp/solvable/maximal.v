@@ -132,7 +132,7 @@ Variables (gT : finGroupType) (p : nat) (P M : {group gT}).
 Hypothesis pP : p.-group P.
 
 Lemma p_maximal_normal : maximal M P -> M <| P.
-Proof.
+Proof using pP.
 case/maxgroupP=> /andP[sMP sPM] maxM; rewrite /normal sMP.
 have:= subsetIl P 'N(M); rewrite subEproper.
 case/predU1P=> [/setIidPl-> // | /maxM/= SNM]; case/negP: sPM.
@@ -141,7 +141,7 @@ by rewrite SNM // subsetI sMP normG.
 Qed.
 
 Lemma p_maximal_index : maximal M P -> #|P : M| = p.
-Proof.
+Proof using pP.
 move=> maxM; have nM := p_maximal_normal maxM.
 rewrite -card_quotient ?normal_norm //.
 rewrite -(quotient_maximal _ nM) ?normal_refl // trivg_quotient in maxM.
@@ -290,10 +290,10 @@ Variables (gT : finGroupType) (p : nat) (P : {group gT}).
 Hypothesis pP : p.-group P.
 
 Lemma Phi_quotient_abelem : p.-abelem (P / 'Phi(P)).
-Proof. by rewrite -trivg_Phi ?morphim_pgroup //= Phi_quotient_id. Qed.
+Proof using pP. by rewrite -trivg_Phi ?morphim_pgroup //= Phi_quotient_id. Qed.
 
 Lemma Phi_joing : 'Phi(P) = P^`(1) <*> 'Mho^1(P).
-Proof.
+Proof using pP.
 have [sPhiP nPhiP] := andP (Phi_normal P).
 apply/eqP; rewrite eqEsubset join_subG.
 case: (eqsVneq P 1) => [-> | ntP] in sPhiP *.
@@ -316,7 +316,7 @@ by rewrite coset_idr ?groupX ?morphX ?x1P ?mem_morphim.
 Qed.
 
 Lemma Phi_Mho : abelian P -> 'Phi(P) = 'Mho^1(P).
-Proof. by move=> cPP; rewrite Phi_joing (derG1P cPP) joing1G. Qed.
+Proof using pP. by move=> cPP; rewrite Phi_joing (derG1P cPP) joing1G. Qed.
 
 End Frattini3.
 
@@ -821,15 +821,15 @@ Hypotheses (pS : p.-group S) (esS : extraspecial S).
 
 Let pZ : p.-group 'Z(S) := pgroupS (center_sub S) pS.
 Lemma extraspecial_prime : prime p.
-Proof.
+Proof using Type*.
 by case: esS => _ /prime_gt1; rewrite cardG_gt1; case/(pgroup_pdiv pZ).
 Qed.
 
 Lemma card_center_extraspecial : #|'Z(S)| = p.
-Proof. by apply/eqP; apply: (pgroupP pZ); case: esS. Qed.
+Proof using Type*. by apply/eqP; apply: (pgroupP pZ); case: esS. Qed.
 
 Lemma min_card_extraspecial : #|S| >= p ^ 3.
-Proof.
+Proof using Type*.
 have p_gt1 := prime_gt1 extraspecial_prime.
 rewrite leqNgt (card_pgroup pS) ltn_exp2l // ltnS.
 case: esS => [[_ defS']]; apply: contraL => /(p2group_abelian pS)/derG1P S'1.
@@ -955,7 +955,7 @@ Let p_gt0 := prime_gt0 p_pr.
 (* This encasulates Aschbacher (23.10)(1). *)
 Lemma cent1_extraspecial_maximal x :
   x \in G -> x \notin 'Z(G) -> maximal 'C_G[x] G.
-Proof.
+Proof using esG.
 move=> Gx notZx; pose f y := [~ x, y]; have [[_ defG'] prZ] := esG.
 have{defG'} fZ y: y \in G -> f y \in 'Z(G).
   by move=> Gy; rewrite -defG' mem_commg.
@@ -981,7 +981,7 @@ Qed.
 (* (19.1)) to subgroups of an extraspecial group.                             *)
 Lemma subcent1_extraspecial_maximal U x :
   U \subset G -> x \in G :\: 'C(U) -> maximal 'C_U[x] U.
-Proof.
+Proof using esG pG.
 move=> sUG /setDP[Gx not_cUx]; apply/maxgroupP; split=> [|H ltHU sCxH].
   by rewrite /proper subsetIl subsetI subxx sub_cent1.
 case/andP: ltHU => sHU not_sHU; have sHG := subset_trans sHU sUG.
@@ -999,7 +999,7 @@ Qed.
 (* (Aschbacher (19.2)) to subgroups of an extraspecial group.                 *)
 Lemma card_subcent_extraspecial U :
   U \subset G -> #|'C_G(U)| = (#|'Z(G) :&: U| * #|G : U|)%N.
-Proof.
+Proof using p_gt0.
 move=> sUG; rewrite setIAC (setIidPr sUG).
 elim: {U}_.+1 {-2}U (ltnSn #|U|) sUG => // m IHm U leUm sUG.
 have [cUG | not_cUG]:= orP (orbN (G \subset 'C(U))).
@@ -1034,7 +1034,7 @@ Lemma split1_extraspecial x :
         'Z(E) = 'Z(G) /\ 'Z(R) = 'Z(G),
         extraspecial E /\ x \in E
       & if abelian R then R :=: 'Z(G) else extraspecial R]}}.
-Proof.
+Proof using Type*.
 case/setDP=> Gx notZx; rewrite inE Gx /= in notZx.
 have [[defPhiG defG'] prZ] := esG.
 have maxCx: maximal 'C_G[x] G.
@@ -1106,7 +1106,7 @@ Qed.
 (* since we allow for p != 2).                                                *)
 (*   Note that Aschbacher derives this from the Witt lemma, which we avoid.   *)
 Lemma pmaxElem_extraspecial : 'E*_p(G) = 'E_p^('r_p(G))(G).
-Proof.
+Proof using oZ p_gt0.
 have sZmax: {in 'E*_p(G), forall E, 'Z(G) \subset E}.
   move=> E maxE; have defE := pmaxElem_LdivP p_pr maxE.
   have abelZ: p.-abelem 'Z(G) by rewrite prime_abelem ?oZ.
@@ -1217,7 +1217,7 @@ Let oZ := card_center_extraspecial pS esS.
 
 (* This is Aschbacher (23.10)(2). *)
 Lemma card_extraspecial : {n | n > 0 & #|S| = (p ^ n.*2.+1)%N}.
-Proof.
+Proof using Type*.
 exists (logn p #|S|)./2.
   rewrite half_gt0 ltnW // -(leq_exp2l _ _ (prime_gt1 p_pr)) -card_pgroup //.
   exact: min_card_extraspecial.
@@ -1235,7 +1235,7 @@ by rewrite pfactorK //= uphalf_double.
 Qed.
 
 Lemma Aut_extraspecial_full : Aut_in (Aut S) 'Z(S) \isog Aut 'Z(S).
-Proof.
+Proof using Type*.
 have [p_gt1 p_gt0] := (prime_gt1 p_pr, prime_gt0 p_pr).
 have [Es] := extraspecial_structure pS esS.
 elim: Es S oZ => [T _ _ <-| E s IHs T oZT] /=.
@@ -1328,7 +1328,7 @@ Qed.
 (* quoted from Gorenstein in the proof of B & G, Theorem 2.5.                 *)
 Lemma center_aut_extraspecial k : coprime k p ->
   exists2 f, f \in Aut S & forall z, z \in 'Z(S) -> f z = (z ^+ k)%g.
-Proof.
+Proof using Type*.
 have /cyclicP[z defZ]: cyclic 'Z(S) by rewrite prime_cyclic ?oZ.
 have oz: #[z] = p by rewrite orderE -defZ.
 rewrite coprime_sym -unitZpE ?prime_gt1 // -oz => u_k.
@@ -1415,7 +1415,7 @@ Let nZA : A \subset 'N(Z) := sub_abelian_norm cAA sZA.
 
 (* This is Aschbacher 23.15(2). *)
 Lemma der1_stab_Ohm1_SCN_series : ('C(Z) :&: 'C_G(A / Z | 'Q))^`(1) \subset A.
-Proof.
+Proof using nZA.
 case/SCN_P: SCN_A => /andP[sAG nAG] {4} <-.
 rewrite subsetI {1}setICA comm_subG ?subsetIl //= gen_subG.
 apply/subsetP=> w /imset2P[u v].
@@ -1432,7 +1432,7 @@ Qed.
 (* maximality of A.                                                           *)
 Lemma Ohm1_stab_Ohm1_SCN_series :
   odd p -> p.-group G -> 'Ohm_1('C_G(Z)) \subset 'C_G(A / Z | 'Q).
-Proof.
+Proof using nZA.
 have [-> | ntG] := eqsVneq G 1; first by rewrite !(setIidPl (sub1G _)) Ohm1.
 move=> p_odd pG; have{ntG} [p_pr _ _] := pgroup_pdiv pG ntG.
 case/SCN_P: SCN_A => /andP[sAG nAG] _; have pA := pgroupS sAG pG.

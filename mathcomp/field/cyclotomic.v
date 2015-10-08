@@ -68,7 +68,7 @@ Hypothesis prim_z : n.-primitive_root z.
 Let n_gt0 := prim_order_gt0 prim_z.
 
 Lemma root_cyclotomic x : root (cyclotomic z n) x = n.-primitive_root x.
-Proof.
+Proof using All.
 rewrite /cyclotomic -big_filter filter_index_enum.
 rewrite -(big_map _ xpredT (fun y => 'X - y%:P)) root_prod_XsubC.
 apply/imageP/idP=> [[k co_k_n ->] | prim_x].
@@ -81,7 +81,7 @@ Qed.
 
 Lemma prod_cyclotomic :
   'X^n - 1 = \prod_(d <- divisors n) cyclotomic (z ^+ (n %/ d)) d.
-Proof.
+Proof using All.
 have in_d d: (d %| n)%N -> val (@inord n d) = d by move/dvdn_leq/inordK=> /= ->.
 have dv_n k: (n %/ gcdn k n %| n)%N.
   by rewrite -{3}(divnK (dvdn_gcdr k n)) dvdn_mulr.

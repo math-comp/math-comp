@@ -288,7 +288,7 @@ Variables (M G : {group rT}).
 Hypotheses (dM : M \subset f @* D) (dG : G \subset f @* D).
 
 Lemma morphpre_maximal : maximal (f @*^-1 M) (f @*^-1 G) = maximal M G.
-Proof.
+Proof using All.
 apply/maxgroupP/maxgroupP; rewrite morphpre_proper //= => [] [ltMG maxM].
   split=> // H ltHG sMH; have dH := subset_trans (proper_sub ltHG) dG.
   rewrite -(morphpreK dH) [f @*^-1 H]maxM ?morphpreK ?morphpreSK //.
@@ -302,7 +302,7 @@ by rewrite -defH [f @* H]maxM // -(morphpreK dM) morphimS.
 Qed.
 
 Lemma morphpre_maximal_eq : maximal_eq (f @*^-1 M) (f @*^-1 G) = maximal_eq M G.
-Proof. by rewrite /maximal_eq morphpre_maximal !eqEsubset !morphpreSK. Qed.
+Proof using All. by rewrite /maximal_eq morphpre_maximal !eqEsubset !morphpreSK. Qed.
 
 End MorphPreMax.
 
@@ -315,16 +315,16 @@ Hypothesis injf : 'injm f.
 Hypotheses (dM : M \subset D) (dG : G \subset D) (dL : L \subset D).
 
 Lemma injm_maximal : maximal (f @* M) (f @* G) = maximal M G.
-Proof.
+Proof using dG dM injf.
 rewrite -(morphpre_invm injf) -(morphpre_invm injf G).
 by rewrite morphpre_maximal ?morphim_invm.
 Qed.
 
 Lemma injm_maximal_eq : maximal_eq (f @* M) (f @* G) = maximal_eq M G.
-Proof. by rewrite /maximal_eq injm_maximal // injm_eq. Qed.
+Proof using dG dM injf. by rewrite /maximal_eq injm_maximal // injm_eq. Qed.
 
 Lemma injm_maxnormal : maxnormal (f @* M) (f @* G) (f @* L) = maxnormal M G L.
-Proof.
+Proof using All.
 pose injfm := (injm_proper injf, injm_norms, injmSK injf, subsetIl).
 apply/maxgroupP/maxgroupP; rewrite !injfm // => [[nML maxM]].
   split=> // H nHL sMH; have [/proper_sub sHG _] := andP nHL.
@@ -336,7 +336,7 @@ by rewrite -(morphpreK dfH) !injfm // in nHL sMH *; rewrite (maxM _ nHL).
 Qed.
 
 Lemma injm_minnormal : minnormal (f @* M) (f @* G) = minnormal M G.
-Proof.
+Proof using dG dM injf.
 pose injfm := (morphim_injm_eq1 injf, injm_norms, injmSK injf, subsetIl).
 apply/mingroupP/mingroupP; rewrite !injfm // => [[nML minM]].
   split=> // H nHG sHM; have dH := subset_trans sHM dM.

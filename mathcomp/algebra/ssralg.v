@@ -1279,17 +1279,17 @@ Section FrobeniusAutomorphism.
 Variable p : nat.
 Hypothesis charFp : p \in [char R].
 
-Lemma charf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: charFp. Qed.
-Lemma charf_prime : prime p. Proof. by case/andP: charFp. Qed.
+Lemma charf0 : p%:R = 0 :> R. Proof using All. by apply/eqP; case/andP: charFp. Qed.
+Lemma charf_prime : prime p. Proof using All. by case/andP: charFp. Qed.
 Hint Resolve charf_prime.
 
-Lemma mulrn_char x : x *+ p = 0. Proof. by rewrite -mulr_natl charf0 mul0r. Qed.
+Lemma mulrn_char x : x *+ p = 0. Proof using All. by rewrite -mulr_natl charf0 mul0r. Qed.
 
 Lemma natr_mod_char n : (n %% p)%:R = n%:R :> R.
-Proof. by rewrite {2}(divn_eq n p) natrD mulrnA mulrn_char add0r. Qed.
+Proof using All. by rewrite {2}(divn_eq n p) natrD mulrnA mulrn_char add0r. Qed.
 
 Lemma dvdn_charf n : (p %| n)%N = (n%:R == 0 :> R).
-Proof.
+Proof using All.
 apply/idP/eqP=> [/dvdnP[n' ->]|n0]; first by rewrite natrM charf0 mulr0.
 apply/idPn; rewrite -prime_coprime // => /eqnP pn1.
 have [a _ /dvdnP[b]] := Bezoutl n (prime_gt0 charf_prime).
@@ -1298,13 +1298,13 @@ by rewrite natrD !natrM charf0 n0 !mulr0 pn1 addr0 oner_eq0.
 Qed.
 
 Lemma charf_eq : [char R] =i (p : nat_pred).
-Proof.
+Proof using All.
 move=> q; apply/andP/eqP=> [[q_pr q0] | ->]; last by rewrite charf0.
 by apply/eqP; rewrite eq_sym -dvdn_prime2 // dvdn_charf.
 Qed.
 
 Lemma bin_lt_charf_0 k : 0 < k < p -> 'C(p, k)%:R = 0 :> R.
-Proof. by move=> lt0kp; apply/eqP; rewrite -dvdn_charf prime_dvd_bin. Qed.
+Proof using All. by move=> lt0kp; apply/eqP; rewrite -dvdn_charf prime_dvd_bin. Qed.
 
 Local Notation "x ^f" := (Frobenius_aut charFp x).
 
@@ -1366,18 +1366,18 @@ Section Char2.
 
 Hypothesis charR2 : 2 \in [char R].
 
-Lemma addrr_char2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_char. Qed.
+Lemma addrr_char2 x : x + x = 0. Proof using All. by rewrite -mulr2n mulrn_char. Qed.
 
 Lemma oppr_char2 x : - x = x.
-Proof. by apply/esym/eqP; rewrite -addr_eq0 addrr_char2. Qed.
+Proof using All. by apply/esym/eqP; rewrite -addr_eq0 addrr_char2. Qed.
 
-Lemma subr_char2 x y : x - y = x + y. Proof. by rewrite oppr_char2. Qed.
+Lemma subr_char2 x y : x - y = x + y. Proof using All. by rewrite oppr_char2. Qed.
 
 Lemma addrK_char2 x : involutive (+%R^~ x).
-Proof. by move=> y; rewrite /= -subr_char2 addrK. Qed.
+Proof using All. by move=> y; rewrite /= -subr_char2 addrK. Qed.
 
 Lemma addKr_char2 x : involutive (+%R x).
-Proof. by move=> y; rewrite -{1}[x]oppr_char2 addKr. Qed.
+Proof using All. by move=> y; rewrite -{1}[x]oppr_char2 addKr. Qed.
 
 End Char2.
 
@@ -2020,7 +2020,7 @@ Lemma rmorph_sign n : f ((- 1) ^+ n) = (- 1) ^+ n.
 Proof. by rewrite rmorphX rmorphN1. Qed.
 
 Lemma rmorph_char p : p \in [char R] -> p \in [char S].
-Proof. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
+Proof using f. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
 
 Lemma rmorph_eq_nat x n : injective f -> (f x == n%:R) = (x == n%:R).
 Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
@@ -3040,10 +3040,10 @@ Hypothesis mulVx : {in unit, left_inverse 1 inv *%R}.
 Hypothesis unitPl : forall x y, y * x = 1 -> unit x.
 
 Fact mulC_mulrV : {in unit, right_inverse 1 inv *%R}.
-Proof. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
+Proof using mulVx. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
 
 Fact mulC_unitP x y : y * x = 1 /\ x * y = 1 -> unit x.
-Proof. by case=> yx _; apply: unitPl yx. Qed.
+Proof using unitPl. by case=> yx _; apply: unitPl yx. Qed.
 
 Definition Mixin := UnitRingMixin mulVx mulC_mulrV mulC_unitP.
 
@@ -4522,7 +4522,7 @@ by move=> yx1; apply: contraNneq (oner_neq0 R) => x0; rewrite -yx1 x0 mulr0.
 Qed.
 
 Fact inv_out : {in predC (predC1 0), inv =1 id}.
-Proof. by move=> x /negbNE/eqP->. Qed.
+Proof using inv0. by move=> x /negbNE/eqP->. Qed.
 
 Definition UnitMixin := ComUnitRing.Mixin mulVx intro_unit inv_out.
 
@@ -4699,7 +4699,7 @@ Lemma fmorph_eq1 x : (f x == 1) = (x == 1).
 Proof. by rewrite -(inj_eq fmorph_inj) rmorph1. Qed.
 
 Lemma fmorph_char : [char R] =i [char F].
-Proof. by move=> p; rewrite !inE -fmorph_eq0 rmorph_nat. Qed.
+Proof using f. by move=> p; rewrite !inE -fmorph_eq0 rmorph_nat. Qed.
 
 End FieldMorphismInj.
 
@@ -4950,7 +4950,7 @@ Fixpoint quantifier_elim f :=
 
 Lemma quantifier_elim_wf f :
   let qf := quantifier_elim f in rformula f -> qf_form qf && rformula qf.
-Proof.
+Proof using wf_proj.
 suffices aux_wf f0 n : let qf := elim_aux f0 n in
   rformula f0 -> qf_form qf && rformula qf.
 - by elim: f => //=; do ?[  move=> f1 IH1 f2 IH2;
@@ -4975,7 +4975,7 @@ Qed.
 
 Lemma quantifier_elim_rformP e f :
   rformula f -> reflect (holds e f) (qf_eval e (quantifier_elim f)).
-Proof.
+Proof using ok_proj wf_proj.
 pose rc e n f := exists x, qf_eval (set_nth 0 e n x) f.
 have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   reflect (rc e0 n0 f0) (qf_eval e0 (elim_aux f0 n0)).
@@ -5014,7 +5014,7 @@ Qed.
 Definition proj_sat e f := qf_eval e (quantifier_elim (to_rform f)).
 
 Lemma proj_satP : DecidableField.axiom proj_sat.
-Proof.
+Proof using ok_proj wf_proj.
 move=> e f; have fP := quantifier_elim_rformP e (to_rform_rformula f).
 by apply: (iffP fP); move/to_rformP.
 Qed.
@@ -5154,24 +5154,24 @@ Let T' := cast_zmodType VeqT.
 Hypothesis valM : {morph (val : T' -> R) : x y / x - y}.
 
 Let val0 : val (0 : T') = 0.
-Proof. by rewrite -(subrr (0 : T')) valM subrr. Qed.
+Proof using valM. by rewrite -(subrr (0 : T')) valM subrr. Qed.
 Let valD : {morph (val : T' -> R): x y / x + y}.
-Proof.
+Proof using val0.
 by move=> u v; rewrite -{1}[v]opprK -[- v]sub0r !valM val0 sub0r opprK.
 Qed.
 
 Fact mulA : @associative T' mulT.
-Proof. by move=> u1 u2 u3; apply: val_inj; rewrite !SubK mulrA. Qed.
+Proof using T. by move=> u1 u2 u3; apply: val_inj; rewrite !SubK mulrA. Qed.
 Fact mul1l : left_id oneT mulT.
 Proof. by move=> u; apply: val_inj; rewrite !SubK mul1r. Qed.
 Fact mul1r : right_id oneT mulT.
 Proof. by move=> u; apply: val_inj; rewrite !SubK mulr1. Qed.
 Fact mulDl : @left_distributive T' T' mulT +%R.
-Proof. by move=> u1 u2 u3; apply: val_inj; rewrite !(SubK, valD) mulrDl. Qed.
+Proof using valD. by move=> u1 u2 u3; apply: val_inj; rewrite !(SubK, valD) mulrDl. Qed.
 Fact mulDr : @right_distributive T' T' mulT +%R.
-Proof. by move=> u1 u2 u3; apply: val_inj; rewrite !(SubK, valD) mulrDr. Qed.
+Proof using valD. by move=> u1 u2 u3; apply: val_inj; rewrite !(SubK, valD) mulrDr. Qed.
 Fact nz1 : oneT != 0 :> T'.
-Proof.
+Proof using val0.
 by apply: contraNneq (oner_neq0 R) => eq10; rewrite -val0 -eq10 SubK.
 Qed.
 
@@ -5195,9 +5195,9 @@ Proof. by apply: val_inj; rewrite !SubK scalerA. Qed.
 Fact scale1 : left_id 1 scaleW.
 Proof. by move=> w; apply: val_inj; rewrite !SubK scale1r. Qed.
 Fact scaleDr : @right_distributive R W' scaleW +%R.
-Proof. by move=> a w w2; apply: val_inj; rewrite !(SubK, valD) scalerDr. Qed.
+Proof using valD. by move=> a w w2; apply: val_inj; rewrite !(SubK, valD) scalerDr. Qed.
 Fact scaleDl w : {morph (scaleW^~ w : R -> W') : a b / a + b}.
-Proof. by move=> a b; apply: val_inj; rewrite !(SubK, valD) scalerDl. Qed.
+Proof using valD. by move=> a b; apply: val_inj; rewrite !(SubK, valD) scalerDl. Qed.
 
 Definition lmodMixin := LmodMixin scaleA scale1 scaleDr scaleDl.
 
@@ -5242,13 +5242,13 @@ Hypothesis valM : {morph (val : T' -> R) : x y / x * y}.
 
 Fact mulVr :
   {in (unitT : predPredType T'), left_inverse (1 : T') invT (@mul T')}.
-Proof. by move=> u Uu; apply: val_inj; rewrite val1 valM SubK mulVr. Qed.
+Proof using valM val1. by move=> u Uu; apply: val_inj; rewrite val1 valM SubK mulVr. Qed.
 
 Fact mulrV : {in unitT, right_inverse (1 : T') invT (@mul T')}.
-Proof. by move=> u Uu; apply: val_inj; rewrite val1 valM SubK mulrV. Qed.
+Proof using valM val1. by move=> u Uu; apply: val_inj; rewrite val1 valM SubK mulrV. Qed.
 
 Fact unitP (u v : T') : v * u = 1 /\ u * v = 1 -> u \in unitT.
-Proof.
+Proof using valM val1.
 by case=> vu1 uv1; apply/unitrP; exists (val v); rewrite -!valM vu1 uv1.
 Qed.
 
@@ -5999,7 +5999,7 @@ Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDl. Qed.
 Fact ffun_mul_addr :  right_distributive ffun_mul (@ffun_add _ _).
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDr. Qed.
 Fact ffun1_nonzero : ffun_one != 0.
-Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
+Proof using a. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
 Definition ffun_ringMixin :=
   RingMixin ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr

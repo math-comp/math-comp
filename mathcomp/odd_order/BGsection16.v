@@ -262,26 +262,26 @@ Variables M U K : {group gT}.
 Hypotheses (maxM : M \in 'M) (complU : kappa_complement M U K).
 
 Remark trivgFmax : (M \in 'M_'F) = (K :==: 1).
-Proof. by rewrite (trivg_kappa maxM); case: complU. Qed.
+Proof using All. by rewrite (trivg_kappa maxM); case: complU. Qed.
 
 Remark trivgPmax : (M \in 'M_'P) = (K :!=: 1).
-Proof. by rewrite inE trivgFmax maxM andbT. Qed.
+Proof using All. by rewrite inE trivgFmax maxM andbT. Qed.
 
 Remark FmaxP : reflect (K :==: 1 /\ U :!=: 1) (M \in 'M_'F). 
-Proof.
+Proof using All.
 rewrite (trivg_kappa_compl maxM complU) 2!inE.
 have [_ hallK _] := complU; rewrite (trivg_kappa maxM hallK).
 by apply: (iffP idP) => [-> | []].
 Qed.
 
 Remark P1maxP : reflect (K :!=: 1 /\ U :==: 1) (M \in 'M_'P1).
-Proof.
+Proof using All.
 rewrite (trivg_kappa_compl maxM complU) inE -trivgPmax.
 by apply: (iffP idP) => [|[] //]; case/andP=> ->.
 Qed.
 
 Remark P2maxP : reflect (K :!=: 1 /\ U :!=: 1) (M \in 'M_'P2).
-Proof.
+Proof using All.
 rewrite (trivg_kappa_compl maxM complU) -trivgPmax.
 by apply: (iffP setDP) => [] [].
 Qed.
@@ -301,23 +301,23 @@ Hypothesis maxM : M \in 'M.
 
 Lemma kappa_witness :
   exists UK : {group gT} * {group gT}, kappa_complement M UK.1 UK.2.
-Proof.
+Proof using All.
 have [K hallK] := Hall_exists \kappa(M) (mmax_sol maxM).
 by have [U complU] := ex_kappa_compl maxM hallK; exists (U, K).
 Qed.
 
 (* This is B & G, Lemma 16.1(a). *)
 Lemma FTtype_Fmax : (M \in 'M_'F) = (FTtype M == 1%N).
-Proof.
+Proof using All.
 by rewrite inE maxM /FTtype; case: (_.-group M) => //; do 3!case: ifP => // _.
 Qed.
 
 Lemma FTtype_Pmax : (M \in 'M_'P) = (FTtype M != 1%N).
-Proof. by rewrite inE maxM andbT FTtype_Fmax. Qed.
+Proof using All. by rewrite inE maxM andbT FTtype_Fmax. Qed.
 
 (* This is B & G, Lemma 16.1(b). *)
 Lemma FTtype_P2max : (M \in 'M_'P2) = (FTtype M == 2).
-Proof.
+Proof using All.
 have [[U K] /= complU] := kappa_witness.
 rewrite (sameP (P2maxP maxM complU) andP) -(trivgFmax maxM complU) FTtype_Fmax.
 have [-> // | notMtype1] := altP eqP.
@@ -331,21 +331,21 @@ Qed.
 
 (* This covers the P1 part of B & G, Lemma 16.1 (c) and (d). *)
 Lemma FTtype_P1max : (M \in 'M_'P1) = (2 < FTtype M <= 5).
-Proof.
+Proof using All.
 rewrite 2!ltn_neqAle -!andbA FTtype_range andbT eq_sym -FTtype_P2max.
 rewrite eq_sym -FTtype_Pmax in_setD inE.
 by case: (M \in _); rewrite ?andbT ?andbF ?negbK.
 Qed.
 
 Lemma Msigma_eq_der1 : M \in 'M_'P1 -> M`_\sigma = M^`(1).
-Proof.
+Proof using All.
 have [[U K] /= complU] := kappa_witness.
 case/(P1maxP maxM complU)=> ntK; move/eqP=> U1.
 by have [_ [//|<- _] _ _ _] := kappa_structure maxM complU; rewrite U1 sdprodg1.
 Qed.
 
 Lemma def_FTcore : M`_\s = M`_\sigma.
-Proof.
+Proof using All.
 rewrite /FTcore -mem_iota 2!inE -FTtype_Fmax -FTtype_P2max.
 have [notP1maxM |] := ifPn.
   by apply/Fcore_eq_Msigma; rewrite ?notP1type_Msigma_nil.
@@ -356,32 +356,32 @@ Qed.
 (* Other relations between the 'core' groups. *)
 
 Lemma FTcore_sub_der1 : M`_\s \subset M^`(1)%g.
-Proof. by rewrite def_FTcore Msigma_der1. Qed.
+Proof using All. by rewrite def_FTcore Msigma_der1. Qed.
 
 Lemma Fcore_sub_FTcore : M`_\F \subset M`_\s.
-Proof. by rewrite def_FTcore Fcore_sub_Msigma. Qed.
+Proof using All. by rewrite def_FTcore Fcore_sub_Msigma. Qed.
 
 Lemma mmax_Fcore_neq1 : M`_\F != 1.
-Proof. by have [[]] := Fcore_structure maxM. Qed.
+Proof using All. by have [[]] := Fcore_structure maxM. Qed.
 
 Lemma mmax_Fitting_neq1 : 'F(M) != 1.
-Proof. exact: subG1_contra (Fcore_sub_Fitting M) mmax_Fcore_neq1. Qed.
+Proof using All. exact: subG1_contra (Fcore_sub_Fitting M) mmax_Fcore_neq1. Qed.
 
 Lemma FTcore_neq1 : M`_\s != 1.
-Proof. exact: subG1_contra Fcore_sub_FTcore mmax_Fcore_neq1. Qed.
+Proof using All. exact: subG1_contra Fcore_sub_FTcore mmax_Fcore_neq1. Qed.
 
 Lemma norm_mmax_Fcore : 'N(M`_\F) = M.
-Proof. exact: mmax_normal (gFnormal _ _) mmax_Fcore_neq1. Qed.
+Proof using All. exact: mmax_normal (gFnormal _ _) mmax_Fcore_neq1. Qed.
 
 Lemma norm_FTcore : 'N(M`_\s) = M.
-Proof. exact: mmax_normal (FTcore_normal _) FTcore_neq1. Qed.
+Proof using All. exact: mmax_normal (FTcore_normal _) FTcore_neq1. Qed.
 
 Lemma norm_mmax_Fitting : 'N('F(M)) = M.
-Proof. exact: mmax_normal (gFnormal _ _) mmax_Fitting_neq1. Qed.
+Proof using All. exact: mmax_normal (gFnormal _ _) mmax_Fitting_neq1. Qed.
 
 (* This is B & G, Lemma 16.1(f). *)
 Lemma Fcore_eq_FTcore : reflect (M`_\F = M`_\s) (FTtype M \in pred3 1%N 2 5).
-Proof.
+Proof using All.
 rewrite /FTcore -mem_iota 3!inE orbA; case type12M: (_ || _); first by left.
 move: type12M FTtype_P1max; rewrite /FTtype; do 2![case: ifP => // _] => _.
 rewrite !(fun_if (leq^~ 5)) !(fun_if (leq 3)) !if_same /= => P1maxM.
@@ -391,13 +391,13 @@ Qed.
 
 (* This is the second part of B & G, Lemma 16.1(c). *)
 Lemma Fcore_neq_FTcore : (M`_\F != M`_\s) = (FTtype M \in pred2 3 4).
-Proof.
+Proof using All.
 have:= FTtype_range M; rewrite -mem_iota (sameP eqP Fcore_eq_FTcore).
 by do 5!case/predU1P=> [-> //|].
 Qed.
 
 Lemma FTcore_eq_der1 : FTtype M > 2 -> M`_\s = M^`(1).
-Proof.
+Proof using All.
 move=> FTtype_gt2; rewrite def_FTcore Msigma_eq_der1 // FTtype_P1max.
 by rewrite FTtype_gt2; case/andP: (FTtype_range M).
 Qed.
@@ -469,39 +469,39 @@ Variable M : {group gT}.
 Hypothesis maxM : M \in 'M.
 
 Lemma FTsupp1_sub : 'A1(M) \subset 'A(M).
-Proof.
+Proof using All.
 apply/subsetP=> x A1x; apply/bigcupP; exists x => //.
 have [ntx Ms_x] := setD1P A1x; rewrite 3!inE ntx cent1id (subsetP _ x Ms_x) //.
 by case: (~~ _); rewrite ?FTcore_sub_der1 ?FTcore_sub.
 Qed.
 
 Lemma FTsupp1_sub0 : 'A1(M) \subset 'A0(M).
-Proof. exact: subset_trans FTsupp1_sub (FTsupp_sub0 M). Qed.
+Proof using All. exact: subset_trans FTsupp1_sub (FTsupp_sub0 M). Qed.
 
 Lemma FTsupp1_neq0 : 'A1(M) != set0.
-Proof. by rewrite setD_eq0 subG1 FTcore_neq1. Qed.
+Proof using All. by rewrite setD_eq0 subG1 FTcore_neq1. Qed.
 
 Lemma FTsupp_neq0 : 'A(M) != set0.
-Proof.
+Proof using All.
 by apply: contraNneq FTsupp1_neq0 => AM_0; rewrite -subset0 -AM_0 FTsupp1_sub.
 Qed.
 
 Lemma FTsupp0_neq0 : 'A0(M) != set0.
-Proof.
+Proof using All.
 by apply: contraNneq FTsupp_neq0 => A0M_0; rewrite -subset0 -A0M_0 FTsupp_sub0.
 Qed.
 
 Lemma Fcore_sub_FTsupp1 : M`_\F^# \subset 'A1(M).
-Proof. exact: setSD (Fcore_sub_FTcore maxM). Qed.
+Proof using All. exact: setSD (Fcore_sub_FTcore maxM). Qed.
 
 Lemma Fcore_sub_FTsupp : M`_\F^# \subset 'A(M).
-Proof. exact: subset_trans Fcore_sub_FTsupp1 FTsupp1_sub. Qed.
+Proof using All. exact: subset_trans Fcore_sub_FTsupp1 FTsupp1_sub. Qed.
 
 Lemma Fcore_sub_FTsupp0 : M`_\F^# \subset 'A0(M).
-Proof. exact: subset_trans Fcore_sub_FTsupp1 FTsupp1_sub0. Qed.
+Proof using All. exact: subset_trans Fcore_sub_FTsupp1 FTsupp1_sub0. Qed.
 
 Lemma Fitting_sub_FTsupp : 'F(M)^# \subset 'A(M).
-Proof.
+Proof using All.
 pose pi := \pi(M`_\F); have nilF := Fitting_nil M.
 have [U defF]: {U : {group gT} | M`_\F \x U = 'F(M)}.
   have hallH := pHall_subl (Fcore_sub_Fitting M) (gFsub _ _) (Fcore_Hall M).
@@ -521,10 +521,10 @@ by have [_ _ _ ->] := Fitting_structure maxM.
 Qed.
 
 Lemma Fitting_sub_FTsupp0 : 'F(M)^# \subset 'A0(M).
-Proof. exact: subset_trans Fitting_sub_FTsupp (FTsupp_sub0 M). Qed.
+Proof using All. exact: subset_trans Fitting_sub_FTsupp (FTsupp_sub0 M). Qed.
 
 Lemma FTsupp_eq1 : (2 < FTtype M)%N -> 'A(M) = 'A1(M).
-Proof.
+Proof using All.
 move=> typeMgt2; rewrite /'A(M) -(subnKC typeMgt2) /= -FTcore_eq_der1 //.
 apply/setP=> y; apply/bigcupP/idP=> [[x A1x /setD1P[nty /setIP[Ms_y _]]] | A1y].
   exact/setD1P.
@@ -558,7 +558,7 @@ Theorem BGsummaryA :
              & K :!=: 1 -> 'F(M) \subset M^`(1)]
    & (*8*) M`_\F != M`_\sigma ->
            [/\ U :=: 1, normedTI 'F(M)^# G M & prime #|K| ]]].
-Proof.
+Proof using complU maxM.
 have [hallU hallK _] := complU; split.
 - by rewrite pcore_normal Msigma_Hall // Msigma_Hall_G.
 - by have [[]] := kappa_structure maxM complU.
@@ -603,7 +603,7 @@ Qed.
 (* This is a variant of B & G, Lemma 16.1(e) that better fits the Peterfalvi  *)
 (* definitions.                                                               *)
 Lemma sdprod_FTder : M`_\sigma ><| U = M^`(FTtype M != 1%N).
-Proof.
+Proof using complU maxM.
 rewrite -FTtype_Fmax // (trivgFmax maxM complU).
 have [[defM _ _] defM' _ _ _] := kappa_structure maxM complU.
 by case: (altP eqP) defM' defM => [-> _ | _ [] //]; rewrite sdprodg1.
@@ -617,7 +617,7 @@ Theorem BGsummaryB :
   &  (*4*) (forall X, X \subset U -> X :!=: 1 -> 'C_(M`_\sigma)(X) != 1 ->
             'M('C(X)) = [set M])
   /\ (*5*) ('A(M) != 'A1(M) -> normedTI ('A(M) :\: 'A1(M)) G M)].
-Proof.
+Proof using All.
 split.
 - move=> p S sylS; have [hallU _ _] := complU; have [sUM sk'U _] := and3P hallU.
   have [-> | ntS] := eqsVneq S 1; first by rewrite abelian1 rank1.
@@ -694,7 +694,7 @@ Theorem BGsummaryC : K :!=: 1 ->
      (*10*) U :!=: 1 ->
             [/\ prime #|K|, normedTI 'F(M)^# G M & M`_\sigma \subset 'F(M)]
    & (*11*) U :==: 1 -> prime #|Kstar| ]].
-Proof.
+Proof using complU maxM.
 move=> ntK; have [_ hallK _] := complU.
 have PmaxM: M \in 'M_'P by rewrite inE -(trivg_kappa maxM hallK) ntK.
 split.
