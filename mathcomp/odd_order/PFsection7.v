@@ -642,12 +642,13 @@ Hypothesis k_ge2: (k >= 2)%N.
 (*c*) Hypothesis card_coprime : forall i j, i != j -> coprime #|H i| #|H j|.
 
 (* A numerical fact that is used in both (7.10) and (7.11) *)
-Let e_bounds i : 1 < e_ i /\ e_ i <= (h_ i - 1) / 2%:R.
+Local Definition e_bounds i : 1 < e_ i /\ e_ i <= (h_ i - 1) / 2%:R.
 Proof using frobeniusL_G oddG.
 have [/oddSg/(_ oddG)oddL _ frobL] := frobeniusL_G i.
 rewrite ltr1n odd_Frobenius_index_ler ?(FrobeniusWker frobL) //.
 by have [/index_sdprod <-] := Frobenius_context frobL; rewrite cardG_gt1.
 Qed.
+Let e_bounds := e_bounds.
 
 (* This is Peterfalvi (7.10). *)
 Lemma coherent_Frobenius_bound : exists i, let e := e_ i in let h := h_ i in

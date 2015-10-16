@@ -920,26 +920,29 @@ Definition cfCyclicTIsetBase :=
   [seq alpha_ ij.1 ij.2 | ij in setX [set~ 0] [set~ 0]].
 Local Notation cfWVbase := cfCyclicTIsetBase.
 
-Let cfdot_alpha_w i1 j1 i2 j2 :
+Local Definition cfdot_alpha_w i1 j1 i2 j2 :
   i2 != 0 -> j2 != 0 -> '[alpha_ i1 j1, w_ i2 j2] = [&& i1 == i2 & j1 == j2]%:R.
 Proof.
 move=> nzi2 nzj2; rewrite alphaE -w_00 !cfdotDl !cfdotNl !cfdot_w.
 by rewrite !(eq_sym 0) (negPf nzi2) (negPf nzj2) /= andbF !subr0 add0r.
 Qed.
+Let cfdot_alpha_w:= cfdot_alpha_w.
 
-Let cfdot_alpha_1 i j : i != 0 -> j != 0 -> '[alpha_ i j, 1] = 1.
+Local Definition cfdot_alpha_1 i j : i != 0 -> j != 0 -> '[alpha_ i j, 1] = 1.
 Proof.
 move=> nzi nzj; rewrite alphaE -w_00 !cfdotDl !cfdotNl !cfdot_w.
 by rewrite !eqxx andbT /= (negPf nzi) (negPf nzj) addr0 !subr0.
 Qed.
+Let cfdot_alpha_1 := cfdot_alpha_1.
 
-Let cfnorm_alpha i j : i != 0 -> j != 0 -> '[alpha_ i j] = 4%:R.
+Local Definition cfnorm_alpha i j : i != 0 -> j != 0 -> '[alpha_ i j] = 4%:R.
 Proof.
 move=> nzi nzj; rewrite -[4]/(size [:: 1; - w_ i 0; - w_ 0 j; w_ i j]).
 rewrite -cfnorm_orthonormal 3?big_cons ?big_seq1 ?addrA -?alphaE //.
 rewrite /orthonormal -w_00 /= !cfdotNl !cfdotNr !opprK !oppr_eq0 !cfnorm_irr.
 by rewrite !cfdot_w !eqxx /= !(eq_sym 0) (negPf nzi) (negPf nzj) !eqxx.
 Qed.
+Let cfnorm_alpha := cfnorm_alpha.
 
 Lemma cfCycTIbase_free : free cfWVbase.
 Proof.
@@ -1036,7 +1039,7 @@ Local Notation "#1" := (inord 1).
 (* Peterfalvi uses evaluation at 1%g to conclude after the second step; since *)
 (* this is not covered by our model, we have used the dot product constraints *)
 (* between b12 and b11, b21 instead.                                          *)
-Let unsat_J : unsat |= & x1 in b11 & -x1 in b21.
+Local Definition unsat_J : unsat |= & x1 in b11 & -x1 in b21.
 Proof.
 uwlog b11x1: (& b11 = x1 + x2 + x3) by do 2!fill b11.
 uwlog b21x1: (& b21 = -x1 + x2 + x3) by uhave x2, x3 in b21 as O(21, 11).
@@ -1049,6 +1052,7 @@ uhave x3 | ~x3 in b12 as O(12, 11).
   by uhave x1 in b12 as O(12, 21); counter to O(12, 11).
 by uhave x1 in b12 as O(12, 11); counter to O(12, 21).
 Qed.
+Let unsat_J := unsat_J.
 
 Let unsat_II: unsat |= & x1, x2 in b11 & x1, x2 in b21.
 Proof. by fill b11; uhave -x3 in b21 as O(21, 11); symmetric to unsat_J. Qed.
@@ -1066,7 +1070,7 @@ Let Ltest (cl1 cl2 : clause) :=
     else true in
   (i1 == i2) (+) (j1 == j2) ==> loop false kvs2.
 
-Let L ij12 : is_sat_test G (sat_test Ltest ij12).
+Local Definition L ij12 : is_sat_test G (sat_test Ltest ij12).
 Proof.
 apply: sat_testP => m th [[i1 j1] kvs1] [[i2 j2] kvs2] m_th th_cl1 th_cl2.
 wlog eq_j: m th i1 i2 j1 j2 m_th th_cl1 th_cl2 / j1 == j2.
@@ -1102,13 +1106,14 @@ have[] := symP [:: k] _ _ unsat_J; rewrite /= ltkr !andbT /=; apply/andP; split.
   by apply/hasP; exists (i1, j1, kvs1); rewrite //= eqxx kvs1k.
 by apply/hasP; exists (i2, j2, kvs2); rewrite //= (eqP eq_j) eqxx kvs2k.
 Qed.
+Let L := L.
 
 (* This is the combinatorial core of Peterfalvi (3.5.4). *)
 (* We have made a few simplifications to the combinatorial analysis in the    *)
 (* text: we omit the (unused) step (3.5.4.4) entirely, which lets us inline   *)
 (* step (3.5.4.1) in the proof of (3.5.4.2); we clear the assumptions on b31  *)
 (* and b32 before the final step (3.5.4.5), exposing a hidden symmetry.       *)
-Let unsat_Ii : unsat |= & x1 in b11 & x1 in b21 & ~x1 in b31.
+Local Definition unsat_Ii : unsat |= & x1 in b11 & x1 in b21 & ~x1 in b31.
 Proof.
 uwlog Db11: (& b11 = x1 + x2 + x3) by do 2!fill b11.
 uwlog Db21: (& b21 = x1 + x4 + x5).
@@ -1165,8 +1170,9 @@ uhave ~x6 in b12 as L(12, 42); uhave ~x4 in b12 as O(12, 42).
 uhave ~x2 in b12 as O(12, 31).
 by uhave -x1 in b12 as O(12, 21); counter to L(12, 11).
 Qed.
+Let unsat_Ii := unsat_Ii.
 
-Let unsat_C : unsat |= & x1 in b11 & x1 in b21 & x1 in b12.
+Local Definition unsat_C : unsat |= & x1 in b11 & x1 in b21 & x1 in b12.
 Proof.
 consider b31; uwlog Db21: (& b21 = x1 + x2 + x3) by do 2!fill b21.
 uwlog Db12: (& b12 = x1 - x2 + x4).
@@ -1181,9 +1187,10 @@ consider b41; uhave x1 | ~x1 in b41 as L(41, 21); last symmetric to unsat_Ii.
 uhave ~x5 in b41 as L(41, 31); uhave ~x4 in b41 as O(41, 31).
 by uhave ~x2 in b41 as L(41, 21); counter to O(41, 12).
 Qed.
+Let unsat_C:= unsat_C.
 
 (* This refinement of Peterfalvi (3.5.4) is the essential part of (3.5.5). *)
-Let column_pivot (m : model G) (j0 : 'I_m.2.+1) :
+Local Definition column_pivot (m : model G) (j0 : 'I_m.2.+1) :
   exists dk, forall (i : 'I_m.1.+1) (j : 'I_m.2.+1),
     j0 != 0 -> i != 0 -> j != 0 -> '[m (i.-1, j.-1), dchi dk] = (j == j0)%:R.
 Proof.
@@ -1262,6 +1269,7 @@ have{m_x1} m_th: sat m |= & x1 in b11 & x1 in b21 & ? in b12.
 have [v] := sat_cases 0%N m_th (mem_head _ _) m_gt0; rewrite !inE.
 by case/or3P=> /eqP-> => [/and4P[] | /unsat_C | /(L(12,11))].
 Qed.
+Let column_pivot := column_pivot.
 
 (* This is Peterfalvi (3.5). *)
 (* We have inlined part of the proof of (3.5.5) in this main proof, replacing *)

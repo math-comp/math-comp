@@ -132,11 +132,12 @@ Let coHUq : coprime #|HU| q.
 Proof using defM. by rewrite (coprime_sdprod_Hall_r defM); have [[]] := MtypeP. Qed.
 Let coUq : coprime #|U| q. Proof using coHUq sUHU. exact: coprimeSg coHUq. Qed.
 	
-Let neq_pq : p != q.
+Local Definition neq_pq : p != q.
 Proof using coHUq pr_p.
 apply: contraTneq coHUq => <-; rewrite coprime_sym prime_coprime ?cardSg //.
 by rewrite -(typeP_cent_compl MtypeP) subsetIl.
 Qed.
+Let neq_pq := neq_pq.
 
 Let solHU : solvable HU. Proof using maxM. exact: solvableS sHUM (mmax_sol maxM). Qed.
 Let solH : solvable H. Proof using sHHU solHU. exact: solvableS sHHU solHU. Qed.
@@ -144,28 +145,32 @@ Let solH : solvable H. Proof using sHHU solHU. exact: solvableS sHHU solHU. Qed.
 Let ltM''HU :  M^`(2)%g \proper HU.
 Proof using defMs solHU. by rewrite (sol_der1_proper solHU) // -defMs FTcore_neq1. Qed.
 
-Let frobMtilde : [Frobenius M / M^`(2) = (HU / M^`(2)) ><| (W1 / M^`(2))].
+Local Definition frobMtilde : [Frobenius M / M^`(2) = (HU / M^`(2)) ><| (W1 / M^`(2))].
 Proof using coHUq ltM''HU ntW1.
 have [[_ _ _ _] _ _ [_ _ _ sW2M'' prHUW1 ] _] := MtypeP.
 by rewrite Frobenius_coprime_quotient ?gFnormal //; split=> // _ /prHUW1->.
 Qed.
+Let frobMtilde := frobMtilde.
 
-Let defHC : H \x C = HC.
+Local Definition defHC : H \x C = HC.
 Proof using MtypeP. 
 by have [defHC _ _ _] := typeP_context MtypeP; rewrite /= (dprodWY defHC).
 Qed.
+Let defHC := defHC.
 
-Let nC_UW1 : U <*> W1 \subset 'N(C).
+Local Definition nC_UW1 : U <*> W1 \subset 'N(C).
 Proof using MtypeP.
 have /sdprodP[_ _ nHUW1 _] := Ptype_Fcore_sdprod MtypeP.
 by rewrite normsI ?norms_cent // join_subG normG; have [_ []] := MtypeP.
 Qed.
+Let nC_UW1 := nC_UW1.
 
-Let nsCM : C <| M.
+Local Definition nsCM : C <| M.
 Proof using nC_UW1 sUM.
 rewrite /normal subIset ?sUM //= -{1}(sdprodW (Ptype_Fcore_sdprod MtypeP)).
 by rewrite mulG_subG cents_norm // centsC subsetIr.
 Qed.
+Let nsCM := nsCM.
 
 Let nsCU : C <| U. Proof using nsCM. exact: normalS (subsetIl _ _) sUM nsCM. Qed.
 Let nsHC_M : HC <| M. Proof using nsCM. by rewrite normalY ?gFnormal. Qed.
@@ -178,12 +183,13 @@ Proof using notMtype5. by have [] := Ptype_Fcore_kernel_exists maxM MtypeP notMt
 Let minHbar : minnormal Hbar (M / H0).
 Proof using chiefH0. exact: chief_factor_minnormal. Qed.
 
-Let abelHbar : p.-abelem Hbar.
+Local Definition abelHbar : p.-abelem Hbar.
 Proof using minHbar pr_p solH.
 have solHbar : solvable (H / H0) by rewrite quotient_sol.
 have [_ _] := minnormal_solvable minHbar (subxx _) solHbar.
 by rewrite /is_abelem def_Ptype_factor_prime.
 Qed.
+Let abelHbar := abelHbar.
 
 Let sH0H : H0 \subset H.
 Proof using chiefH0. by have/andP[/maxgroupp/andP[/proper_sub]]:= chiefH0. Qed.
@@ -197,11 +203,12 @@ Proof using nH0M sH0H. by rewrite /normal sH0H gFsub_trans. Qed.
 Let nsH0C_M : H0C <| M.
 Proof using nH0M sH0H. by rewrite normalY // /normal ?(subset_trans sH0H) ?gFsub. Qed.
 
-Let defH0C : H0 \x C = H0C.
+Local Definition defH0C : H0 \x C = H0C.
 Proof using sH0H.
 have /dprodP[_ _ cHC tiHC] := defHC.
 by rewrite dprodEY ?(centsS sH0H) //; apply/trivgP; rewrite -tiHC setSI.
 Qed.
+Let defH0C := defH0C.
 
 (* Group-theoretic consequences of the coherence and non-coherence theorems   *)
 (* of Sections 5, 9 and 10 for maximal subgroups of type III and IV.          *)
@@ -356,7 +363,7 @@ rewrite joingC norm_joinEl 1?gFnorm_trans //.
 by rewrite -(setIidPl sRH) -setIA -group_modr ?gFsub // tiHU mul1g.
 Qed.
 
-Let frobUW1bar : [Frobenius U <*> W1 / C = (U / C) ><| (W1 / C)].
+Local Definition frobUW1bar : [Frobenius U <*> W1 / C = (U / C) ><| (W1 / C)].
 Proof using Mtype24 abelHbar coUq defH0C def_p frobMtilde neq_pq nsH0C_M nsH0H nsHC_M sHC_HU scoh1.
 have frobUW1: [Frobenius U <*> W1 = U ><| W1].
   exact: Ptype_compl_Frobenius MtypeP notMtype5.
@@ -365,6 +372,7 @@ have [[_ _ _ defC] regUW1] := (FTtype34_facts, Frobenius_reg_ker frobUW1).
 rewrite Frobenius_coprime_quotient // /normal ?subIset ?joing_subl //.
 by split=> [|x /regUW1->]; rewrite ?sub1G //= defC (sol_der1_proper solHU).
 Qed.
+Let frobUW1bar := frobUW1bar.
 
 (* This is Peterfalvi (11.7).                                                 *)
 (* We have recast the linear algebra arguments in the original text in pure-  *)
@@ -577,11 +585,12 @@ Let eq_proj_eta (alpha gamma : 'CF(G)) := orthogonal (alpha - gamma) etaW.
 Let eta_col j := \sum_i eta_ i j.
 Let bridge0 zeta := mu_ 0 - zeta.
 
-Let proj_col_eta j0 i j : '[eta_col j0, eta_ i j] = (j == j0)%:R.
+Local Definition proj_col_eta j0 i j : '[eta_col j0, eta_ i j] = (j == j0)%:R.
 Proof.
 rewrite cfdot_suml (bigD1 i) //= cfdot_cycTIiso eqxx eq_sym.
 by rewrite big1 ?addr0 // => k /negPf-i'k; rewrite cfdot_cycTIiso i'k.
 Qed.
+Let proj_col_eta := proj_col_eta.
 
 Let nirrW1 : #|Iirr W1| = q. Proof using cycW1. by rewrite card_Iirr_cyclic. Qed.
 Let NirrW1 : Nirr W1 = q. Proof using nirrW1. by rewrite -nirrW1 card_ord. Qed.
@@ -602,25 +611,28 @@ Proof using defMs sHC_HU. by apply: seqInd_conjC_subset1; rewrite /= ?defMs. Qed
 Let scohS1 : subcoherent S1 tau R. Proof using sS10. exact: subset_subcoherent sS10. Qed.
 Let scohS2 : subcoherent S2 tau R. Proof using sS20. exact: subset_subcoherent sS20. Qed.
 
-Let S1_1 : {in S1, forall zeta, zeta 1%g = q%:R}.
+Local Definition S1_1 : {in S1, forall zeta, zeta 1%g = q%:R}.
 Proof using Mtype24 abelHbar defH0C def_p frobMtilde neq_pq nsH0C_M nsH0H nsHC_M sHC_HU scoh1.
 move=> _ /seqIndP[s /setDP[kerM'' _] ->]; rewrite !inE -defM'' in kerM''.
 by rewrite cfInd1 ?gFsub // -(index_sdprod defM) lin_char1 ?mulr1 ?lin_irr_der1.
 Qed.
+Let S1_1 := S1_1.
 
-Let cohS1 : coherent S1 M^# tau.
+Local Definition cohS1 : coherent S1 M^# tau.
 Proof using S1_1 scohS1.
 apply: uniform_degree_coherence scohS1 _.
 by apply/(@all_pred1_constant _ q%:R)/allP=> _ /=/mapP[zeta /S1_1<- ->].
 Qed.
+Let cohS1 := cohS1.
 
-Let irrS1 : {subset S1 <= irr M}.
+Local Definition irrS1 : {subset S1 <= irr M}.
 Proof using Mtype24 abelHbar defH0C def_p frobMtilde neq_pq nsH0C_M nsH0H nsHC_HU scoh1.
 move=> _ /seqIndP[s /setDP[kerHC kerHU] ->]; rewrite !inE in kerHC kerHU.
 rewrite -(quo_IirrK _ kerHC) // mod_IirrE // cfIndMod // cfMod_irr //.
 have /irr_induced_Frobenius_ker := FrobeniusWker frobMtilde; rewrite defM''.
 by apply; rewrite quo_Iirr_eq0 // -subGcfker.
 Qed.
+Let irrS1 := irrS1.
 
 Let o1S1 : orthonormal S1.
 Proof using irrS1. exact: sub_orthonormal (seqInd_uniq _ _) (irr_orthonormal _). Qed.
@@ -628,70 +640,78 @@ Proof using irrS1. exact: sub_orthonormal (seqInd_uniq _ _) (irr_orthonormal _).
 Let cfdotS1 : {in S1 &, forall zeta xi, '[zeta, xi] = (zeta == xi)%:R}.
 Proof using o1S1. by case/orthonormalP: o1S1. Qed.
 
-Let omu2S1 i j : {in S1, forall zeta, '[mu2_ i j, zeta] = 0}.
+Local Definition omu2S1 i j : {in S1, forall zeta, '[mu2_ i j, zeta] = 0}.
 Proof using irrS1 ptiWM.
 move=> zeta S1zeta; have [s _ Dzeta] := seqIndP S1zeta.
 rewrite Dzeta -cfdot_Res_l cfRes_prTIirr cfdot_irr mulrb ifN_eq //.
 apply: contraNneq (prTIred_not_irr ptiWM j) => Ds.
 by rewrite -cfInd_prTIres Ds -Dzeta irrS1.
 Qed.
+Let omu2S1 := omu2S1.
 
 Let Tmu j : mu_ j \in calT. Proof. by rewrite -cfInd_prTIres mem_seqIndT. Qed.
 
-Let omuS1 j : {in S1, forall zeta,  '[mu_ j, zeta] = 0}.
+Local Definition omuS1 j : {in S1, forall zeta,  '[mu_ j, zeta] = 0}.
 Proof using omu2S1.
 by move=> zeta S1zeta /=; rewrite cfdot_suml big1 // => i _; apply: omu2S1.
 Qed.
+Let omuS1 := omuS1.
 
-Let Zbridge0 : {in S1, forall zeta, bridge0 zeta \in 'Z[irr M, HU^#]}.
+Local Definition Zbridge0 : {in S1, forall zeta, bridge0 zeta \in 'Z[irr M, HU^#]}.
 Proof using S1_1 Tmu.
 have mu0_1: mu_ 0 1%g = q%:R by rewrite prTIred_1 prTIirr0_1 mulr1.
 move=> zeta S1zeta; rewrite /= zcharD1 !cfunE subr_eq0 mu0_1 S1_1 // eqxx. 
 by rewrite rpredB ?(seqInd_vchar _ (Tmu 0)) ?(seqInd_vchar _ S1zeta).
 Qed.
+Let Zbridge0 := Zbridge0.
 
 Let A0bridge0 : {in S1, forall zeta, bridge0 zeta \in 'CF(M, 'A0(M))}.
 Proof using Zbridge0 sHU_A0. by move=> zeta /Zbridge0/zchar_on/cfun_onS->. Qed.
 
-Let sS1S2' : {subset S1 <= [predC S2]}.
+Local Definition sS1S2' : {subset S1 <= [predC S2]}.
 Proof using nsHC_M.  
 by move=> _ /seqIndP[s /setDP[kHCs _] ->]; rewrite !inE mem_seqInd // inE kHCs.
 Qed.
+Let sS1S2' := sS1S2'.
 
 Let defS2: S2 = seqIndD HU M H H0C.
 Proof using H0_1. by rewrite /S2 H0_1 -!joinGE join1G joinGC seqIndDY. Qed.
 
-Let cohS2: coherent S2 M^# tau.
+Local Definition cohS2: coherent S2 M^# tau.
 Proof using defS2.
 apply: subset_coherent (Ptype_core_coherence maxM MtypeP notMtype5).
 by rewrite defC defS2; apply: seqIndS; rewrite Iirr_kerDS ?genS ?setUS ?der_sub.
 Qed.
+Let cohS2 := cohS2.
 
 Let Smu := [seq mu_ j | j in predC1 0].
 Let Sred := filter [predC irr M] (seqIndD HU M H H0).
 
-Let memSred : Sred =i Smu.
+Local Definition memSred : Sred =i Smu.
 Proof using def_p nirrW2 ptiWM.
 have [szSred _ memSred _] := typeP_reducible_core_Ind maxM MtypeP notMtype5.
 have uSred: uniq Sred by apply: filter_uniq (seqInd_uniq _ _).
 suffices{uSred}: (size Smu <= size Sred)%N by case/leq_size_perm.
 by rewrite szSred def_p size_map -cardE cardC1 nirrW2.
 Qed.
+Let memSred := memSred.
 
-Let mu_1 j : j != 0 -> mu_ j 1%g = (q * u)%:R.
+Local Definition mu_1 j : j != 0 -> mu_ j 1%g = (q * u)%:R.
 Proof using H0_1 memSred.
 move=> nzj; have Smuj: mu_ j \in Sred by rewrite memSred image_f.
 have [_ _ _ /(_ _ Smuj)[]] := typeP_reducible_core_Ind maxM MtypeP notMtype5.
 by rewrite defC.
 Qed.
+Let mu_1 := mu_1.
 
-Let memS2red : [predD S2 & irr M] =i Smu.
+Local Definition memS2red : [predD S2 & irr M] =i Smu.
 Proof using defS2 memSred.
 move=> xi; rewrite defS2 -memSred mem_filter; apply: andb_id2l => /= red_xi.
 apply/idP/idP=> [|Sxi]; first by apply: seqIndS; rewrite Iirr_kerDS ?joing_subl.
 have [_ _ _ /(_ xi)] := typeP_reducible_core_Ind maxM MtypeP notMtype5.
 by rewrite defC mem_filter /= red_xi; case.
 Qed.
+Let memS2red := memS2red.
 
 Let i1 : Iirr W1 := inord 1.
 Let nz_i1 : i1 != 0. Proof using ntW1. by rewrite Iirr1_neq0. Qed.

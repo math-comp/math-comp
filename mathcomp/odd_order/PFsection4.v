@@ -279,11 +279,12 @@ Local Notation mu2_ i j := 'chi_(primeTI_Iirr (i, j)).
 Local Notation delta_ j := (GRing.sign algCring (primeTI_Isign j)).
 
 Let ew_ i j := w_ i j - w_ 0 j.
-Let V2ew i j : ew_ i j \in 'CF(W, W :\: W2).
+Local Definition V2ew i j : ew_ i j \in 'CF(W, W :\: W2).
 Proof using W1lin w_.
 apply/cfun_onP=> x; rewrite !inE negb_and negbK => /orP[W2x | /cfun0->//].
 by rewrite -[x]mul1g !cfunE /w_ !dprod_IirrE !cfDprodE ?lin_char1 ?subrr.
 Qed.
+Let V2ew := V2ew.
 
 (* This is Peterfalvi, Theorem (4.3)(b, c). *)
 Theorem primeTIirr_spec :

@@ -641,7 +641,7 @@ Local Notation "` 'H'" := (gval L)`_\F (at level 0, format "` 'H'").
 Let nsHL : H <| L. Proof. exact: gFnormal. Qed.
 
 (* This is Peterfalvi (12.10). *)
-Let frobL : [Frobenius L with kernel H].
+Local Definition frobL : [Frobenius L with kernel H].
 Proof using IHp P0_1s_x abP0 maxL not_sCxL prankP0 sP0_Ls sylP0.
 have [sP0M pP0 _] := and3P sylP0.
 have [ntx /(subsetP (Ohm_sub 1 _))P0x] := setD1P P0_1s_x.
@@ -721,13 +721,14 @@ have frobP1U0 := Frobenius_subl ntP1 sP1H nP1U0 frobHU0.
 apply: dvdn_trans (Frobenius_dvd_ker1 frobP1U0).
 by do [rewrite -expU0 pi_of_exponent mem_primes => /and3P[] //] in piUq.
 Qed.
+Let frobL := frobL.
 
 Let Ltype1 : FTtype L == 1%N. Proof using frobL. exact: FT_Frobenius_type1 frobL. Qed.
 Let defAL : 'A(L) = H^#. Proof using frobL. exact: FTsupp_Frobenius frobL. Qed.
 Let sP0H : P0 \subset H. Proof using Ltype1. by rewrite /= -FTcore_type1. Qed.
 
 (* This is the first part of Peterfalvi (12.11). *)
-Let defM : K ><| (M :&: L) = M.
+Local Definition defM : K ><| (M :&: L) = M.
 Proof using defAL maxM sNxM sP0H.
 have [ntx /(subsetP (Ohm_sub 1 _))P0x] := setD1P P0_1s_x.
 have Dx: x \in [set y in 'A0(L) | ~~ ('C[y] \subset L)].
@@ -736,9 +737,10 @@ have [_ [_ /(_ x Dx)uCx] /(_ x Dx)[[defM _] _ _ _]] := FTsupport_facts maxL.
 rewrite /K /= setIC (eq_uniq_mmax uCx maxM) //= -cent_cycle.
 exact: subset_trans (cent_sub <[x]>) sNxM.
 Qed.
+Let defM := defM.
 
 (* This is the second part of Peterfalvi (12.11). *)
-Let sML_H : M :&: L \subset H.
+Local Definition sML_H : M :&: L \subset H.
 Proof using Mtype1 defM not_sCxK' p'K.
 have [sP0M pP0 _] := and3P sylP0.
 rewrite (sub_normal_Hall (Fcore_Hall L)) ?subsetIr //.
@@ -808,6 +810,7 @@ have [_ _ _ regHL] := Frobenius_kerP frobL.
 rewrite (piSg (regHL x _)) //; first by rewrite !inE ntx (subsetP sP0H).
 by rewrite mem_primes pr_q cardG_gt0 -oz cardSg // subsetI cycle_subG Lz.
 Qed.
+Let sML_H := sML_H.
 
 Let E := sval (sigW (existsP frobL)).
 Let e := #|E|.
@@ -815,7 +818,7 @@ Let e := #|E|.
 Let defL : H ><| E = L.
 Proof using frobL. by rewrite /E; case: (sigW _) => E0 /=/Frobenius_context[]. Qed.
 
-Let Ecyclic_le_p : cyclic E /\ (e %| p.-1) || (e %| p.+1).
+Local Definition Ecyclic_le_p : cyclic E /\ (e %| p.-1) || (e %| p.+1).
 Proof using defL sML_H.
 pose P := 'O_p(H)%G; pose T := 'Ohm_1('Z(P))%G.
 have sylP: p.-Sylow(H) P := nilpotent_pcore_Hall p (Fcore_nil L).
@@ -928,6 +931,7 @@ rewrite -val_g // Dgz mul_mx_scalar; congr (_ *: _).
 rewrite -(natr_Zp a) scaler_nat.
 by rewrite -(rmorph_nat (MatrixGenField.gen_rmorphism irrE cErEy)).
 Qed.
+Let Ecyclic_le_p := Ecyclic_le_p.
 
 Let calS := seqIndD H L H 1.
 Notation tauL := (FT_Dade maxL).
@@ -941,14 +945,15 @@ Hypothesis cohS : coherent_with calS L^# tauL tau1.
 Hypotheses (Schi : chi \in calS) (chi1 : chi 1%g = e%:R).
 Let psi := tau1 chi.
 
-Let cohS_H : coherent_with calS L^# tauL_H tau1.
+Local Definition cohS_H : coherent_with calS L^# tauL_H tau1.
 Proof using cohS.
 have [? Dtau] := cohS; split=> // xi Sxi; have /zcharD1_seqInd_on Hxi := Sxi.
 by rewrite Dtau // FT_DadeF_E ?FT_DadeE ?(cfun_onS (Fcore_sub_FTsupp _)) ?Hxi.
 Qed.
+Let cohS_H := cohS_H.
 
 (* This is Peterfalvi (12.14). *)
-Let rhoL_psi : {in K, forall g, psi (x * g)%g = chi x} /\ rhoL psi x = chi x.
+Local Definition rhoL_psi : {in K, forall g, psi (x * g)%g = chi x} /\ rhoL psi x = chi x.
 Proof using Ecyclic_le_p Schi chi1 cohS_H prankM.
 have not_LGM: gval M \notin L :^: G.
   apply: contraL p'K => /= /imsetP[z _ ->]; rewrite FcoreJ pgroupJ.
@@ -1071,10 +1076,11 @@ rewrite raddfB cfdotBr Itau1 ?mem_zchar // ooS // mulrb ifN_eqC // add0r.
 rewrite -De raddfZ_Cnat ?(dvd_index_seqInd1 _ Sxi) // De cfdotZr.
 by rewrite Itau1 ?mem_zchar ?ooS // eqxx mulr1 subrr !mul0r.
 Qed.
+Let rhoL_psi := rhoL_psi.
 
 Let rhoM := invDade (FT_DadeF_hyp maxM).
 
-Let rhoM_psi :
+Local Definition rhoM_psi :
   [/\ {in K^#, rhoM psi =1 psi},
       {in K :\: K' &, forall g1 g2, psi g1 = psi g2}
     & {in K :\: K', forall g, psi g \in Cint}].
@@ -1147,6 +1153,7 @@ apply: Cint_rat_Aint (Aint_vchar g Zpsi).
 rewrite -[psi g](mulKf nzKK') -(canLR (addKr _) Dpsi_g) addrC mulrC.
 by rewrite rpred_div ?rpredB 1?rpredM ?rpred_nat ?Qpsi1.
 Qed.
+Let rhoM_psi := rhoM_psi.
 
 (* This is the main part of Peterfalvi (12.16). *)
 Lemma FTtype1_nonFrobenius_witness_contradiction : False.

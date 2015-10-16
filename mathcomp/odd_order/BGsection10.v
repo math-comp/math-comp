@@ -343,7 +343,7 @@ rewrite -[F](nilpotent_pcoreC \alpha(M) (Fitting_nil _)) -Fitting_pcore /=.
 by rewrite trivg_pcore_quotient (trivgP (Fitting_sub 1)) dprod1g pcore_pgroup.
 Qed.
 
-Let Malpha_quo_sub_Fitting : M^`(1) / M`_\alpha \subset F.
+Local Definition Malpha_quo_sub_Fitting : M^`(1) / M`_\alpha \subset F.
 Proof using solM.
 have [/= K defF sMaK nsKM] := inv_quotientN nsMaM nsFMa; rewrite -/F in defF.
 have [sKM _] := andP nsKM; have nsMaK: M`_\alpha <| K := normalS sMaK sKM nsMaM.
@@ -362,8 +362,9 @@ have{tiMaH isoHF sHM H} rF: 'r(F) <= 2.
   exact: contraL (pnatPpi alpha'F) a_p.
 by rewrite quotient_der // rank2_der1_sub_Fitting ?mFT_quo_odd ?quotient_sol.
 Qed.
+Let Malpha_quo_sub_Fitting := Malpha_quo_sub_Fitting.
 
-Let sigma_Hall_sub_der1 H : \sigma(M).-Hall(M) H -> H \subset M^`(1).
+Local Definition sigma_Hall_sub_der1 H : \sigma(M).-Hall(M) H -> H \subset M^`(1).
 Proof using maxM.
 move=> hallH; have [sHM sH _] := and3P hallH.
 rewrite -(Sylow_gen H) gen_subG; apply/bigcupsP=> P /SylowP[p p_pr sylP].
@@ -386,6 +387,7 @@ have [c cXc [m Mm def_g]] := trMX _ sXM sXgM; rewrite cent_cycle in cXc.
 have def_xg: x ^ g = x ^ m by rewrite def_g conjgM /conjg -(cent1P cXc) mulKg.
 by rewrite commgEl def_xg -commgEl mem_imset2 // inE Mm -def_xg.
 Qed.
+Let sigma_Hall_sub_der1 := sigma_Hall_sub_der1.
 
 (* This is B & G, Theorem 10.2(a1). *) 
 Theorem Malpha_Hall : \alpha(M).-Hall(M) M`_\alpha.

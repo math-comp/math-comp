@@ -397,7 +397,7 @@ Qed.
 Let calS1 := seqIndD H S P 1.
 
 (* Some facts about calS1 used implicitly throughout (13.5-8). *)
-Let S1mu j : j != 0 -> mu_ j \in calS1.
+Local Definition S1mu j : j != 0 -> mu_ j \in calS1.
 Proof using defH notStype5 pddS pr_p ptiWS q.
 move=> nz_j; have /seqIndP[s _ Ds] := Hmu nz_j.
 rewrite Ds mem_seqInd ?gFnormal ?normal1 // !inE sub1G andbT.
@@ -405,9 +405,10 @@ rewrite -(sub_cfker_Ind_irr s (gFsub _ _) (gFnorm _ _)) -Ds /=.
 rewrite -[mu_ j](cfInd_prTIres (FT_prDade_hypF maxS StypeP)).
 by rewrite sub_cfker_Ind_irr ?cfker_prTIres ?gFsub ?gFnorm.
 Qed.
+Let S1mu := S1mu.
 
 Let calSirr := [seq phi <- calS | phi \in irr S].
-Let S1cases zeta :
+Local Definition S1cases zeta :
   zeta \in calS1 -> {j | j != 0 & zeta = mu_ j} + (zeta \in 'Z[calSirr]).
 Proof using S1mu defPU.
 move=> S1zeta; have /sig2_eqW[t /setDP[_ kerP't] Dzeta] := seqIndP S1zeta.
@@ -435,6 +436,7 @@ have muj_mu0j: Imu2 (0, j) \in irr_constt (mu_ j).
 apply: contraNeq (constt_Res_trans (prTIred_char _ _) muj_mu0j jHt).
 by rewrite cfdot_Res_l /= -Dzeta eq_sym => /ooS1-> //; rewrite S1mu.
 Qed.
+Let S1cases := S1cases.
 
 Let sS1S : {subset calS1 <= 'Z[calS]}.
 Proof using S1cases.
@@ -449,7 +451,7 @@ Qed.
 (* longer needed. Note that this lemma is only used to establish various      *)
 (* inequalities (13.6-8) that contribute to (13.10), so it does not need to   *)
 (* be exported from this section.                                             *)
-Let calS1_split1 (tau1 : {additive _}) zeta1 chi :
+Local Definition calS1_split1 (tau1 : {additive _}) zeta1 chi :
    coherent_with calS S^# tau tau1 -> zeta1 \in calS1 -> chi \in 'Z[irr G] ->
    {in calS1, forall zeta, zeta != zeta1 -> '[tau1 zeta, chi] = 0} -> 
   let a := '[tau1 zeta1, chi] in
@@ -575,11 +577,12 @@ suffices ->: alpha y = alpha 1%g by apply: lerr.
 rewrite [alpha]cfun_sum_constt !sum_cfunE; apply: eq_bigr => i.
 by rewrite !cfunE => /kerHalpha; rewrite inE => /subsetP/(_ y Py)/cfker1->.
 Qed.
+Let calS1_split1 := calS1_split1.
 
 Local Notation eta10 := (eta_ #1 0).
 Local Notation eta01 := (eta_ 0 #1).
 
-Let o_tau1_eta (tau1 : {additive _}) i j:
+Local Definition o_tau1_eta (tau1 : {additive _}) i j:
     coherent_with calS S^# tau tau1 -> 
   {in 'Z[calSirr], forall zeta, '[tau1 zeta, eta_ i j] = 0}.
 Proof using StypeP.
@@ -589,8 +592,9 @@ rewrite raddf_sum cfdot_suml big1_seq //= => phi; rewrite mem_filter.
 case/andP=> irr_phi /(coherent_ortho_cycTIiso StypeP sSS0 cohS) o_phi_eta.
 by rewrite raddfZ_Cint {Zz}//= cfdotZl o_phi_eta ?mulr0.
 Qed.
+Let o_tau1_eta := o_tau1_eta.
 
-Let P1_int2_lb b : b \in Cint -> 2%:R * u%:R * b <= #|P|.-1%:R * b ^+ 2.
+Local Definition P1_int2_lb b : b \in Cint -> 2%:R * u%:R * b <= #|P|.-1%:R * b ^+ 2.
 Proof using defPU notStype5 pddS pgt2 pr_p qgt2.
 move=> Zb; rewrite -natrM; apply: ler_trans (_ : (2 * u)%:R * b ^+ 2 <= _).
   by rewrite ler_wpmul2l ?ler0n ?Cint_ler_sqr.
@@ -598,6 +602,7 @@ rewrite ler_wpmul2r -?realEsqr ?Creal_Cint // leC_nat mulnC -leq_divRL //.
 have [_ [_ ->] /leq_trans-> //] := FTtypeP_facts.
 by rewrite leq_div2l // -subn1 ltn_subRL.
 Qed.
+Let P1_int2_lb := P1_int2_lb.
 
 (* This is Peterfalvi (13.6). *)
 Lemma FTtypeP_sum_Ind_Fitting_lb (tau1 : {additive _}) lambda :
@@ -769,7 +774,7 @@ Hypotheses (Slam : lambda \in calS) (irrHlam : irrIndH lambda).
 
 (* This is Peterfalvi (13.9)(a). *)
 (* As this part is only used to establish (13.9.b) it can be Section-local.  *)
-Let cover_G0 : {in G0, forall x, tau1 lambda x != 0 \/ eta_ #1 0 x != 0}.
+Local Definition cover_G0 : {in G0, forall x, tau1 lambda x != 0 \/ eta_ #1 0 x != 0}.
 Proof using K Slam cohS cohSmu defH defPU defS irrHlam nirrW1 notStype5 oU pgt2 pr_p pr_q qgt2.
 have [[b _ Dtau1_mu] [/= Ilam Hlam]] := (cohSmu, andP irrHlam).
 pose sum_eta1 := (-1) ^+ b *: \sum_i eta_ i #1.
@@ -821,6 +826,7 @@ have: - eta_ #1 #1 x \in Cint.
 case/norm_Cint_ge1/implyP/idPn; rewrite eta11x opprK invr_eq0 neq0CG /=.
 by rewrite normfV normr_nat invf_ge1 ?gt0CG // lern1 -ltnNge ltnW.
 Qed.
+Let cover_G0 := cover_G0.
 
 (* This is Peterfalvi (13.9)(b). *)
 Lemma FTtypeP_sum_nonFitting_lb :
@@ -994,7 +1000,7 @@ Let v := #|V : D|.
 Local Notation calT := (seqIndD T^`(1) T (gval T)`_\F 1).
 
 (* This part of the proof of (13.4) is reused in (13.10). *)
-Let tiHK: class_support H^# G :&: class_support K^# G = set0.
+Local Definition tiHK: class_support H^# G :&: class_support K^# G = set0.
 Proof using TtypeP coPUq maxT pgt2 pr_q.
 apply/eqP/set0Pn => [[_ /setIP[/imset2P[x g1 H1x _ ->] /imset2P[xg g2]]]].
 pose g := (g2 * g1^-1)%g => /setD1P[_ Kxg] _ Dxg.
@@ -1017,9 +1023,10 @@ rewrite cardJg /= -eq_Sq_q => /(dvdn_leq_log q (cardG_gt0 _))/idPn[].
 have [_ [_ ->] _ _ _] := FTtypeP_facts maxT TtypeP.
 by rewrite -ltnNge p_part !pfactorK // logn_prime // eqxx ltnW.
 Qed.
+Let tiHK := tiHK.
 
 (* This is Peterfalvi (13.4). *)
-Let T_Galois : [/\ typeP_Galois TtypeP, D = 1%g & v = (q ^ p).-1 %/ q.-1].
+Local Definition T_Galois : [/\ typeP_Galois TtypeP, D = 1%g & v = (q ^ p).-1 %/ q.-1].
 Proof using Hlam Ilam Slam defPU mu_ ntW1 sSS0 tiHK.
 apply: FTtypeP_no_Ind_Fitting_facts => //; apply/hasPn=> theta Ttheta.
 apply/andP=> [[/= irr_theta Ktheta]]; set calK := seqIndT _ T in Ktheta.
@@ -1087,6 +1094,7 @@ rewrite etaC cfdot_sumr (bigD1 j1) //= cfdot_cycTIiso !eqxx addrCA.
 rewrite big1 ?addr0 ?oner_eq0 // => j j1'j; rewrite cfdot_cycTIiso.
 by rewrite eq_sym (negPf j1'j).
 Qed.
+Let T_Galois:= T_Galois.
 
 (* This is Peterfalvi (13.10). *)
 Lemma FTtypeP_compl_ker_ratio_lb : m * (p ^ q.-1)%:R / q%:R < u%:R / c%:R.
@@ -1179,15 +1187,16 @@ Qed.
 End Thirteen_4_10.
 
 (* This is (13.10) without the dependency on T. *)
-Let gen_lb_uc : m * (p ^ q.-1)%:R / q%:R < u%:R / c%:R.
+Local Definition gen_lb_uc : m * (p ^ q.-1)%:R / q%:R < u%:R / c%:R.
 Proof using Hlam Ilam Slam coPUq defPU mu_ oU pgt2 pr_q qgt2 sSS0 sigma w_.
 have [T pairST [xdefW [V TtypeP]]] := FTtypeP_pair_witness maxS StypeP.
 by apply: FTtypeP_compl_ker_ratio_lb TtypeP; have [[]] := pairST.
 Qed.
+Let gen_lb_uc := gen_lb_uc.
 
 Import ssrint.
 (* This is Peterfalvi (13.11). *)
-Let lb_m_cases :
+Local Definition lb_m_cases :
  [/\ (*a*) (q >= 7)%N -> m > 8%:R / 10%:R,
      (*b*) (q >= 5)%N -> m > 7%:R / 10%:R
    & (*c*) q = 3 ->
@@ -1232,9 +1241,10 @@ apply: ler_trans (_ : (3%:R^-1 + 1) ^+ 2 <= _); last by rewrite -!CratrE.
 rewrite ler_sqr ?rpredD ?rpred1 ?rpredV ?rpred_nat // ler_add2r.
 by rewrite lef_pinv ?qualifE ?ltr0n ?leC_nat.
 Qed.
+Let lb_m_cases := lb_m_cases.
 
 (* This corollary of (13.11) is used in both (13.12) and (13.15). *)
-Let small_m_q3 : m < (q * p)%:R / (q.*2.+1 * p.-1)%:R -> q = 3 /\ (p >= 5)%N.
+Local Definition small_m_q3 : m < (q * p)%:R / (q.*2.+1 * p.-1)%:R -> q = 3 /\ (p >= 5)%N.
 Proof using lb_m_cases.
 move=> ub_m; have [lb7_m lb5_m _] := lb_m_cases.
 have [p3 | p_neq3] := eqVneq p 3.
@@ -1262,13 +1272,15 @@ have ub5_m: ~~ (7%:R / 10%:R < m).
 split=> //; apply: contraNeq ub5_m.
 by rewrite neq_ltn ltnNge qgt2 -(odd_geq 5) ?mFT_odd.
 Qed.
+Let small_m_q3 := small_m_q3.
 
 (* A more usable form for (13.10). *)
-Let gen_ub_m : m < (q * u)%:R / (c * p ^ q.-1)%:R.
+Local Definition gen_ub_m : m < (q * u)%:R / (c * p ^ q.-1)%:R.
 Proof using gen_lb_uc.
 rewrite !natrM invfM mulrA ltr_pdivl_mulr ?ltr0n ?expn_gt0 ?cardG_gt0 //.
 by rewrite -mulrA -ltr_pdivr_mull ?gt0CG // mulrC.
 Qed.
+Let gen_ub_m := gen_ub_m.
 
 (* This is the bulk of the proof of Peterfalvi (13.12). *)
 Lemma FTtypeP_Ind_Fitting_reg_Fcore : c = 1%N.

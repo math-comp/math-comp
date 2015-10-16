@@ -452,9 +452,10 @@ Let actsKmax := actsP cent_core_acts_max_norm.
 
 Hypotheses (cstrA : normed_constrained A) (pi'q : q \notin pi).
 
-Let hyp71 H R :
+Local Definition hyp71 H R :
   A \subset H -> H \proper G -> R \in |/|_H(A; pi^') -> R \subset 'O_pi^'(H).
 Proof using cstrA. by case: cstrA H R. Qed.
+Let hyp71 := hyp71.
 
 (* This is the observation between B & G, Hypothesis 7.1 and Lemma 7.1. *)
 Remark normed_constrained_Hall : pi^'.-Hall('C(A)) K.

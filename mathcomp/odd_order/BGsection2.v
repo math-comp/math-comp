@@ -243,13 +243,14 @@ Proof using eps_mod_h g. by rewrite /V_ eps_mod_h. Qed.
 
 Let g_mod i := expr_mod i gh1.
 
-Let EiP i e : reflect (e^g = eps ^+ i *: e) (e \in 'E_i)%MS.
+Local Definition EiP i e : reflect (e^g = eps ^+ i *: e) (e \in 'E_i)%MS.
 Proof.
 rewrite (sameP eigenspaceP eqP) mul_vec_lin -linearZ /=.
 by rewrite (can_eq mxvecK); apply: eqP.
 Qed.
+Let EiP := EiP.
 
-Let E2iP i t e :
+Local Definition E2iP i t e :
   reflect ('V_i *m e <= 'V_t /\ forall j, j != i %[mod h] -> 'V_j *m e = 0)%MS
           (e \in 'E_(i, t))%MS.
 Proof using Vi_mod inh.
@@ -260,6 +261,7 @@ apply: (iffP andP) => [[->] | [-> Ve0]]; last first.
 move/sumsmx_subP=> Ve0; split=> // j ne_ji; apply/eqP.
 by rewrite -submx0 -Vi_mod (Ve0 (inh j)) //= modn_mod.
 Qed.
+Let E2iP := E2iP.
 
 Let sumV := (\sum_(i < h) 'V_i)%MS.
 

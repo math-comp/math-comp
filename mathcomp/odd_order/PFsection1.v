@@ -144,7 +144,7 @@ rewrite -mulr_suml rmorph0 mulr0 IP cfdot_suml big1 // => k _.
 by rewrite cfdotZl [d in _ * d]cfdotC Cmu rmorph0 mulr0.
 Qed.
 
-Let vchar_isometry_base3 f f' : 
+Local Definition vchar_isometry_base3 f f' : 
   f \in 'Z[irr G, G^#] -> '[f]_G = 2%:R ->
   f' \in 'Z[irr G, G^#] -> '[f']_G = 2%:R ->
   '[f, f'] = 1 ->
@@ -166,8 +166,9 @@ case: (i =P k) => // eq_ik; exists (j, i, j', true).
 rewrite !scaler_sign !opprB /= !inE eq_sym negb_or neq_ij neq_jj'.
 by rewrite eq_ik neq_kj'.
 Qed.
+Let vchar_isometry_base3 := vchar_isometry_base3.
 
-Let vchar_isometry_base4 (eps : bool) i j k n m :
+Local Definition vchar_isometry_base4 (eps : bool) i j k n m :
     let f1 := 'chi_j - 'chi_i in
     let f2 := 'chi_k - 'chi_i in
     let f3 := 'chi_n - 'chi_m in
@@ -184,6 +185,7 @@ case: eqP => // ->; case: (j == i) => // _.
 rewrite subr0 add0r => /(canRL (subrK _)); rewrite -(natrD _ 1).
 by move/(can_inj natCK); rewrite (negbTE Hjk).
 Qed.
+Let vchar_isometry_base4 := vchar_isometry_base4.
 
 (* This is Peterfalvi (1.4). *)
 Lemma vchar_isometry_base m L (Chi : m.-tuple 'CF(H)) 

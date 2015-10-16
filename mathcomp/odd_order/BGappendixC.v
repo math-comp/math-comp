@@ -106,12 +106,13 @@ Let memJ_P : {in P & U, forall x u, x ^ u \in P}.
 Proof using nPU. by move=> x u Px Uu; rewrite /= memJ_norm ?(subsetP nPU). Qed.
 Let in_PU := (memJ_P, in_group).
 
-Let sigmaP0 : sigma @* P0 =i Fp.
+Local Definition sigmaP0 : sigma @* P0 =i Fp.
 Proof using Ps sigma_s.
 rewrite -defP0 morphim_cycle // sigma_s => x.
 apply/cycleP/vlineP=> [] [n ->]; first by exists n%:R; rewrite scaler_nat.
 by exists (val n); rewrite -{1}[n]natr_Zp -in_algE rmorph_nat zmodXgE.
 Qed.
+Let sigmaP0 := sigmaP0.
 
 Let nt_s : s != 1%g.
 Proof using Ps inj_sigma sigmaE. by rewrite -(morph_injm_eq1 inj_sigma) // sigmaE oner_eq0. Qed.
@@ -121,14 +122,14 @@ Let q_gt0 : (0 < q)%N. Proof using pr_q. exact: prime_gt0. Qed.
 Let p1_gt0 : (0 < p.-1)%N. Proof using pr_p. by rewrite -subn1 subn_gt0 prime_gt1. Qed.
 
 (* This is B & G, Appendix C, Remark I. *)
-Let not_dvd_q_p1 : ~~ (q %| p.-1)%N.
+Local Definition not_dvd_q_p1 : ~~ (q %| p.-1)%N.
 Proof using coUp1 p1_gt0 p_gt0 pr_q.
 rewrite -prime_coprime // -[q]card_ord -sum1_card -coprime_modl -modn_summ.
 have:= coUp1; rewrite /nU predn_exp mulKn //= -coprime_modl -modn_summ.
 congr (coprime (_ %% _) _); apply: eq_bigr => i _.
 by rewrite -{1}[p](subnK p_gt0) subn1 -modnXm modnDl modnXm exp1n.
 Qed.
-
+Let not_dvd_q_p1 :=  not_dvd_q_p1.
 (* This is the first assertion of B & G, Appendix C, Remark V. *)
 Let odd_p : odd p.
 Proof using ltqp pr_p pr_q.
@@ -155,7 +156,7 @@ Let cUU : abelian U.
 Proof using cycFU inj_sigmaU. by rewrite cyclic_abelian // -(injm_cyclic inj_sigmaU) ?cycFU. Qed.
 
 (* This is B & G, Appendix C, Remark VII. *)
-Let im_psi (x : F) : (x \in psi @: U) = (Nm x == 1).
+Local Definition im_psi (x : F) : (x \in psi @: U) = (Nm x == 1).
 Proof using inj_sigmaU oF oF_p oU.
 have /cyclicP[u0 defFU]: cyclic [set: {unit F}] by apply: cycFU.
 have o_u0: #[u0] = (p ^ q).-1 by rewrite orderE -defFU card_finField_unit oF.
@@ -177,9 +178,10 @@ have /cycleP[n Du]: (insubd u0 u)^-1%g \in <[u0]> by rewrite -defFU inE.
 have{Du} Du: u^-1 = val (u0 ^+ n)%g by rewrite -Du /= insubdK ?unitfE.
 by rewrite Dalpha // Du -val_unitX mem_imset // expgAC mem_cycle.
 Qed.
+Let im_psi := im_psi.
 
 (* This is B & G, Appendix C, Remark VIII. *)
-Let defFU : sigmaU @* U \x [set u | uval u \in Fp] = [set: {unit F}].
+Local Definition defFU : sigmaU @* U \x [set u | uval u \in Fp] = [set: {unit F}].
 Proof using coUp1 inj_sigmaU oF oF_p oU.
 have fP v: in_alg F (uval v) \is a GRing.unit by rewrite rmorph_unit ?(valP v).
 pose f (v : {unit 'F_p}) := FinRing.unit F (fP v).
@@ -202,9 +204,10 @@ rewrite dprodE ?coprime_TIg ?oUU ?oFpU //; last first.
 apply/eqP; rewrite eqEcard subsetT coprime_cardMg oUU oFpU //=.
 by rewrite card_finField_unit oF divnK ?dvdn_pred_predX.
 Qed.
+Let defFU := defFU.
 
 (* This is B & G, Appendix C, Remark IX. *)
-Let frobH : [Frobenius H = P ><| U].
+Local Definition frobH : [Frobenius H = P ><| U].
 Proof using im_sigma inj_sigma inj_sigmaU memJ_P oU pr_p q_gt0 sigmaE.
 apply/Frobenius_semiregularP=> // [||u /setD1P[ntu Uu]].
 - by rewrite -(morphim_injm_eq1 inj_sigma) // im_sigma finRing_nontrivial.
@@ -215,6 +218,7 @@ rewrite inE -!(morph_injm_eq1 inj_sigma) ?(sigmaE, in_PU) //.
 rewrite -mulrN1 addrC -mulrDr mulf_eq0 subr_eq0 => /orP[] // /idPn[].
 by rewrite (inj_eq val_inj (sigmaU u) 1%g) morph_injm_eq1.
 Qed.
+Let frobH := frobH.
 
 (* From the abelQ assumption of Peterfalvi, Theorem (14.2) to the assumptions *)
 (* of part (B) of the assumptions of Theorem C.                               *)
@@ -243,7 +247,7 @@ Let E_1 : 1 \in E.
 Proof. by rewrite !inE -addrA subrr addr0 galNorm1 eqxx. Qed.
 
 (* This is B & G, Appendix C, Lemma C.1. *)
-Let Einv_gt1_le_pq : E = [set x^-1 | x in E] -> (1 < #|E|)%N -> (p <= q)%N.
+Local Definition Einv_gt1_le_pq : E = [set x^-1 | x in E] -> (1 < #|E|)%N -> (p <= q)%N.
 Proof using dimFpq oFp q_gt0.
 rewrite (cardsD1 1) E_1 ltnS card_gt0 => Einv /set0Pn[/= a /setD1P[not_a1 Ea]].
 pose tau (x : F) := (2%:R - x)^-1.
@@ -281,9 +285,10 @@ have sizePa1: size (Pa - 1) = q.+1.
 have nz_Pa1 : Pa - 1 != 0 by rewrite -size_poly_eq0 sizePa1.
 by rewrite -ltnS -oFp -sizePa1 cardE max_poly_roots ?enum_uniq.
 Qed.
+Let Einv_gt1_le_pq := Einv_gt1_le_pq.
 
 (* This is B & G, Appendix C, Lemma C.2. *)
-Let E_gt1 : (1 < #|E|)%N.
+Local Definition E_gt1 : (1 < #|E|)%N.
 Proof using cUU dimFpq frobH im_psi inj_psi oP pgt4 psiE qgt1 sigmaE.
 have [q_gt4 | q_le4] := ltnP 4 q.
   pose inK x := enum_rank_in (classes1 H) (x ^: H).
@@ -449,6 +454,7 @@ apply/eqP; transitivity (fcF.[inF 2%:R]); last by rewrite horner_map fc2 rmorph1
 rewrite DfcF horner_prod; apply: eq_bigr => beta _.
 by rewrite hornerXsubC rmorphB !rmorph_nat.
 Qed.
+Let E_gt1 := E_gt1.
 
 Section AppendixC3.
 
@@ -462,7 +468,7 @@ Let t := s ^ y.
 Let P1 := P0 :^ y.
 
 (* This is B & G, Appendix C, Lemma C.3, Step 1. *)
-Let splitH x :
+Local Definition splitH x :
      x \in H ->
   exists2 u, u \in U & exists2 v, v \in U & exists2 s1, s1 \in P0
   & x = u * s1 * v.
@@ -480,9 +486,10 @@ exists u^-1; last exists (u * v); rewrite ?groupV ?groupM //.
 exists (s ^+ n); rewrite ?groupX // mulgA; congr (_ * _).
 by apply: (injmP inj_sigma); rewrite -?mulgA ?in_PU.
 Qed.
+Let splitH := splitH.
 
 (* This is B & G, Appendix C, Lemma C.3, Step 2. *)
-Let not_splitU s1 s2 u :
+Local Definition not_splitU s1 s2 u :
   s1 \in P0 -> s2 \in P0 -> u \in U -> s1 * u * s2 \in U ->
   (s1 == 1) && (s2 == 1) || (u == 1) && (s1 * s2 == 1).
 Proof using defFU inj_sigma memJ_P sigmaE sigmaP0.
@@ -501,9 +508,10 @@ rewrite -(morph_injm_eq1 inj_sigma) ?(in_PU, sigmaE) // addr_eq0.
 move/eqP/(canRL (mulKf _))->; rewrite ?morph_injm_eq1 //.
 by rewrite mulrC rpred_div ?rpredN //= -sigmaP0 mem_morphim.
 Qed.
+Let not_splitU := not_splitU.
 
 (* This is B & G, Appendix C, Lemma C.3, Step 3. *)
-Let tiH_P1 t1 : t1 \in P1^# -> H :&: H :^ t1 = U.
+Local Definition tiH_P1 t1 : t1 \in P1^# -> H :&: H :^ t1 = U.
 Proof using Qy coQP defFU frobH nUP0y oFp sigmaP0 sigmaE.
 case/setD1P=>[nt_t1 P1t1]; set X := H :&: _.
 have [nsPH sUH _ _ tiPU] := sdprod_context defH.
@@ -556,6 +564,7 @@ rewrite -oP0 cardG_gt1 negbK -subG1 -(Frobenius_trivg_cent frobH) subsetI sP0P.
 apply/commG1P/trivgP; rewrite -tiPU commg_subI // subsetI ?subxx //.
 by rewrite sP0P -eqP10.
 Qed.
+Let tiH_P1 := tiH_P1.
 
 (* This is B & G, Appendix C, Lemma C.3, Step 4. *)
 Fact BGappendixC3_Ediv : E = [set x^-1 | x in E]%R.

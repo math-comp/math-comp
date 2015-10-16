@@ -119,13 +119,14 @@ Let coM'w1 : coprime #|M'| w1.
 Proof using defM. by rewrite (coprime_sdprod_Hall_r defM); have [[]] := MtypeP. Qed.
 
 (* This is used both in (10.2) and (10.8). *)
-Let frobMbar : [Frobenius M / M'' = (M' / M'') ><| (W1 / M'')].
+Local Definition frobMbar : [Frobenius M / M'' = (M' / M'') ><| (W1 / M'')].
 Proof using coM'w1 maxM ntW1 ntW2.
 have [[_ hallW1 _ _] _ _ [_ _ _ sW2M'' regM'W1 ] _] := MtypeP.
 apply: Frobenius_coprime_quotient => //.
 split=> [|w /regM'W1-> //]; apply: (sol_der1_proper (mmax_sol maxM)) => //.
 by apply: subG1_contra ntW2; apply: subset_trans sW2M'' (der_sub 1 M').
 Qed.
+Let frobMbar := frobMbar.
 
 Local Open Scope ring_scope.
 
@@ -153,17 +154,19 @@ Let calS := seqIndD M' M M' 1.
 Let sSS0 : cfConjC_subset calS calS0.
 Proof using defMs. by apply: seqInd_conjC_subset1; rewrite /= ?defMs. Qed.
 
-Let mem_calS s : ('Ind 'chi[M']_s \in calS) = (s != 0).
+Local Definition mem_calS s : ('Ind 'chi[M']_s \in calS) = (s != 0).
 Proof.
 rewrite mem_seqInd ?normal1 ?FTcore_normal //=.
 by rewrite !inE sub1G subGcfker andbT.
 Qed.
+Let mem_calS := mem_calS.
 
-Let calSmu j : j != 0 -> mu_ j \in calS.
+Local Definition calSmu j : j != 0 -> mu_ j \in calS.
 Proof using ptiWM.
 move=> nz_j; rewrite -[mu_ j]cfInd_prTIres mem_calS -irr_eq1.
 by rewrite -(prTIres0 ptiWM) (inj_eq irr_inj) (inj_eq (prTIres_inj _)).
 Qed.
+Let calSmu := calSmu.
 
 Let tauM' : {subset 'Z[calS, M'^#] <= 'CF(M, 'A0(M))}.
 Proof using defA0. by rewrite defA0 => phi /zchar_on/(cfun_onS (subsetUl _ _))->. Qed.
@@ -227,15 +230,16 @@ rewrite divr_ge0 ?ler0n // [delta]signrE opprB addrA -natrD subr_ge0 ler1n.
 by rewrite -(subnKC d_gt1).
 Qed.
 
-Let o_mu2_irr zeta i j :
+Local Definition o_mu2_irr zeta i j :
   zeta \in calS -> zeta \in irr M -> '[mu2_ i j, zeta] = 0.
 Proof using ptiWM.
 case/seqIndP=> s _ -> irr_sM; rewrite -cfdot_Res_l cfRes_prTIirr cfdot_irr.
 rewrite (negPf (contraNneq _ (prTIred_not_irr ptiWM j))) // => Ds.
 by rewrite -cfInd_prTIres Ds.
 Qed.
+Let o_mu2_irr := o_mu2_irr.
 
-Let ZmuBzeta zeta j :
+Local Definition ZmuBzeta zeta j :
     zeta \in calS -> zeta 1%g = w1%:R -> j != 0 ->
   mu_ j - d%:R *: zeta \in 'Z[calS, M'^#].
 Proof using pddM w2_pr.
@@ -244,14 +248,16 @@ rewrite -[d%:R](mulKf (neq0CiG M M')) mulrC -(mu1 0 j nz_j).
 rewrite -(cfResE _ sM'M) // cfRes_prTIirr -cfInd1 // cfInd_prTIres.
 by rewrite (seqInd_sub_lin_vchar _ Szeta) ?calSmu // -(index_sdprod defM).
 Qed.
+Let ZmuBzeta := ZmuBzeta.
 
-Let mu0Bzeta_on zeta :
+Local Definition mu0Bzeta_on zeta :
   zeta \in calS -> zeta 1%g = w1%:R -> mu_ 0 - zeta \in 'CF(M, 'A(M)).
 Proof using defA ptiWM.
 move/seqInd_on=> M'zeta zeta1w1; rewrite [mu_ 0]prTIred0 defA cfun_onD1.
 rewrite !cfunE zeta1w1 cfuniE // group1 mulr1 subrr rpredB ?M'zeta //=.
 by rewrite rpredZ ?cfuni_on.
 Qed.
+Let mu0Bzeta_on := mu0Bzeta_on.
 
 (* We need to prove (10.5) - (10.7) for an arbitrary choice of zeta, to allow *)
 (* part of the proof of (10.5) to be reused in that of (11.8).                *)
@@ -363,7 +369,7 @@ by rewrite cfdotZl (coherent_ortho_cycTIiso MtypeP sS10) ?irrS1 ?mulr0.
 Qed.
 
 (* This is a specialization of the above, used in (10.5) and (10.10). *)
-Let def_tau_alpha calS1 tau1 i j :
+Local Definition def_tau_alpha calS1 tau1 i j :
      coherent_with calS1 M^# tau tau1 -> cfConjC_subset calS1 calS0 ->
      j != 0 -> zeta \in calS1 -> '[(alpha_ i j)^\tau, tau1 zeta] = - n ->
   (alpha_ i j)^\tau = delta *: (eta_ i j - eta_ i 0) - n *: tau1 zeta.
@@ -386,6 +392,7 @@ split=> [|_ /sS21/sS10//|]; last first.
   by apply/allP; rewrite /= !inE cfConjCK !eqxx orbT.
 by rewrite /= inE eq_sym; have [[_ /hasPn-> //]] := scohS0; apply: sS10.
 Qed.
+Let def_tau_alpha  := def_tau_alpha.
 
 Section NonCoherence.
 
@@ -406,7 +413,7 @@ Proof using Szeta. by rewrite (seqInd_conjC_ortho _ _ _ Szeta) ?mFT_odd /= ?defM
 Import ssrint rat.
 
 (* This is the second part of Peterfalvi (10.5). *)
-Let tau_alpha i j : j != 0 ->
+Local Definition tau_alpha i j : j != 0 ->
   (alpha_ i j)^\tau = delta *: (eta_ i j - eta_ i 0) - n *: zeta^\tau1.
 Proof using Dtau1 ZmuBzeta def_tau_alpha o_mu_zeta o_zeta_s sSS0 tauM'.
 move=> nz_j; set al_ij := alpha_ i j; have [[Itau1 Ztau1] _] := cohS.
@@ -469,9 +476,10 @@ rewrite sqrr_sign mulrC [_ + 2%:R]addrC (ltr_le_trans _ ub_da2) //.
 apply: ltr_le_trans (ler_wpmul2l (ler0n _ _) a2_ge1).
 by rewrite mulr1 ltr_subl_addl -mulrS -natrX ltC_nat.
 Qed.
+Let tau_alpha := tau_alpha.
 
 (* This is the first part of Peterfalvi (10.6)(a). *)
-Let tau1mu j : j != 0 -> (mu_ j)^\tau1 = delta *: \sum_i eta_ i j.
+Local Definition tau1mu j : j != 0 -> (mu_ j)^\tau1 = delta *: \sum_i eta_ i j.
 Proof using tau_alpha.
 move=> nz_j; have [[[Itau1 _] _] Smu_j] := (cohS, calSmu nz_j).
 have eta_mu i: '[delta *: (eta_ i j - eta_ i 0), (mu_ j)^\tau1] = 1.
@@ -497,9 +505,10 @@ rewrite cfdotBl !(cfdot_cycTIiso pddM) !(eq_sym 0) conjC_Iirr_eq0 -!irr_eq1.
 rewrite (eq_sym j) -(inj_eq irr_inj) conjC_IirrE.
 by rewrite odd_eq_conj_irr1 ?mFT_odd ?subrr.
 Qed.
+Let tau1mu := tau1mu.
 
 (* This is the second part of Peterfalvi (10.6)(a). *)
-Let tau1mu0 : (mu_ 0 - zeta)^\tau = \sum_i eta_ i 0 - zeta^\tau1.
+Local Definition tau1mu0 : (mu_ 0 - zeta)^\tau = \sum_i eta_ i 0 - zeta^\tau1.
 Proof using nirrW1 tau1mu.
 have [j nz_j] := has_nonprincipal_irr ntW2.
 have sum_al: \sum_i alpha_ i j = mu_ j - d%:R *: zeta - delta *: (mu_ 0 - zeta).
@@ -514,9 +523,10 @@ rewrite -scaler_sumr sumrB scalerBr -tau1mu // opprD !opprK -!addrA addNKr.
 congr (_ + _); rewrite -scaler_nat scalerA mulrC divfK ?neq0CG //.
 by rewrite addrC -!scaleNr -scalerDl addKr.
 Qed.
+Let tau1mu0 := tau1mu0.
 
 (* This is Peterfalvi (10.6)(b). *)
-Let zeta_tau1_coprime g :
+Local Definition zeta_tau1_coprime g :
   g \notin 'A~(M) -> coprime #[g] w1 -> `|zeta^\tau1 g| >= 1.
 Proof using mu0Bzeta_on tau1mu0.
 move=> notAg co_g_w1; have Amu0zeta := mu0Bzeta_on Szeta zeta1w1.
@@ -550,9 +560,10 @@ rewrite norm_Cint_ge1 //; first by rewrite zeta_g rpred_sum.
 apply: contraTneq odd_zeta_g => ->.
 by rewrite eqCmod_sym /eqCmod subr0 /= (dvdC_nat 2 1).
 Qed.
+Let zeta_tau1_coprime := zeta_tau1_coprime.
 
 (* This is Peterfalvi (10.7). *)
-Let Frob_der1_type2 S :
+Local Definition Frob_der1_type2 S :
   S \in 'M -> FTtype S == 2 -> [Frobenius S^`(1) with kernel S`_\F].
 Proof using Szeta ZmuBzeta cohS defA1 irr_zeta sSS0 sigma zeta1w1.
 move: S => L maxL /eqP Ltype2.
@@ -670,6 +681,7 @@ rewrite big1 => [|i ne_i_r']; last first.
 rewrite !addr0 mulr1 big1 ?mulr0 ?signr_eq0 // => i _.
 by rewrite -etaC cfdotC (coherent_ortho_cycTIiso _ _ cohT2) ?conjC0 -?DcalTs.
 Qed.
+Let Frob_der1_type2 := Frob_der1_type2.
 
 (* This is the bulk of the proof of Peterfalvi (10.8); however the result     *)
 (* will be restated below to avoid the quantification on zeta and tau1.       *)

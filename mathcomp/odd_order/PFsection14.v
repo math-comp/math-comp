@@ -525,21 +525,23 @@ Let betaT := FTtypeP_bridge TtypeP #1.
 Let betaL := 'Ind[L, H] 1 - phi.
 
 (* This is the first assertion of Peterfalvi (14.4). *)
-Let galT : typeP_Galois TtypeP.
+Local Definition galT : typeP_Galois TtypeP.
 Proof using ltqp maxT qgt2.
 apply: contraLR ltqp => /(FTtypeP_nonGalois_facts maxT)[].
 by rewrite -/p -leqNgt => ->.
 Qed.
+Let galT := galT.
 
 (* This is the second assertion of Peterfalvi (14.4). *)
-Let oV : v = nV.
+Local Definition oV : v = nV.
 Proof using galT pgt2.
 rewrite /v (card_FTtypeP_Galois_compl maxT galT) -/nV.
 by rewrite !modn_small ?gtn_eqF // ltnW.
 Qed.
+Let oV := oV.
 
 (* This is Peterfalvi (14.5). *)
-Let defL : exists2 y, y \in Q & H ><| (W1 <*> W2 :^ y) = L.
+Local Definition defL : exists2 y, y \in Q & H ><| (W1 <*> W2 :^ y) = L.
 Proof using Lphi Ltype1 Stype2 cohL defPU defS maxNU_L pairST phi1 sNUL sUH.
 have [//|_ _ []// defL] := FTtypeII_support_facts maxS StypeP _ pairST maxNU_L.
 have [_ _ /negP[]] := compl_of_typeII maxS StypeP Stype2.
@@ -552,17 +554,19 @@ have{ubH} /eqP defH: `H == U.
 rewrite (subset_trans sNUL) // -(sdprodW defL) -(sdprodW defS) mulSg //.
 by rewrite -(sdprodW defPU) defH mulG_subr.
 Qed.
+Let defL := defL.
 
-Let indexLH : #|L : H| = (p * q)%N.
+Local Definition indexLH : #|L : H| = (p * q)%N.
 Proof using TtypeP defL maxT.
 have [y Qy /index_sdprod <-] := defL; rewrite (dprod_card xdefW).
 suffices /normP <-: y \in 'N(W1) by rewrite -conjYg cardJg (dprodWY defW).
 have cQQ: abelian Q by have [_ [/and3P[]]] := FTtypeP_facts _ TtypeP.
 by apply: (subsetP (sub_abelian_norm cQQ _)) => //; have [_ _ _ []] := TtypeP.
 Qed.
+Let indexLH := indexLH.
 
 (* This is Peterfalvi (14.6). *)
-Let galS : typeP_Galois StypeP.
+Local Definition galS : typeP_Galois StypeP.
 Proof using defL frobL notStype5 pr_p.
 apply/idPn=> gal'S; have [q3 oU] := FTtypeP_nonGalois_facts maxS gal'S.
 have [H1 [_ _ _ _]] := typeP_Galois_Pn maxS (FTtype5_exclusion maxS) gal'S.
@@ -638,9 +642,10 @@ rewrite -[p.-1]subn1 leq_subLR predn_exp Euclid_dvdM // => /orP[]/dvdn_leq.
 case/pred2P: m12 => ->; rewrite ?(big_ord_recl 1) big_ord1 => /(_ isT) //.
 by move/leq_trans->.
 Qed.
+Let galS := galS.
 
 (* This is Peterfalvi (14.7). *)
-Let not_charUH : ~~ (U \char H).
+Local Definition not_charUH : ~~ (U \char H).
 Proof using TtypeP galS maxT nU pr_q qgt2.
 have [y Qy defLy] := defL; have [_ _ /joing_subP[_ nHW2y] _] := sdprodP defLy.
 apply/negP=> chUH; have nUW2y := char_norm_trans chUH nHW2y.
@@ -679,11 +684,12 @@ exists F sig; first by apply/isomP; rewrite im_sig morphim_comp.
 exists psiU => // z x Pz Ux /=; have inN1 x1: x1 \in 'N(1) by rewrite norm1 inE.
 by rewrite !Dsig -psiJ ?mem_morphim //= qactE ?dom_qactJ.
 Qed.
+Let not_charUH := not_charUH.
 
 (* This is Peterfalvi (14.8)(a). *)
 (* In order to avoid the use of real analysis and logarithms we bound the     *)
 (* binomial expansion of n.+1 ^ q.+1 directly.                                *)
-Let qp1_gt_pq1 : (q ^ p.+1 > p ^ q.+1)%N.
+Local Definition qp1_gt_pq1 : (q ^ p.+1 > p ^ q.+1)%N.
 Proof using ltqp qgt2.
 have: (4 < p)%N by rewrite odd_geq ?mFT_odd ?(leq_trans _ ltqp).
 elim: p ltqp => // n IHn; rewrite !ltnS => ngeq.
@@ -711,9 +717,10 @@ rewrite ffactnS /= -!mulnA leq_mul //=; elim: {i leiq}(q - i)%N => //= i IHi.
 rewrite ffactnSr expnSr mulnACA expnS factS (mulnACA n) mulnC leq_mul //.
 by rewrite leq_mul // (leq_trans (leq_subr _ _)).
 Qed.
+Let qp1_gt_pq1 := qp1_gt_pq1.
 
 (* This is Peterfalvi (14.8)(b). *)
-Let v1p_gt_u1q : (v.-1 %/ p > u.-1 %/ q)%N.
+Local Definition v1p_gt_u1q : (v.-1 %/ p > u.-1 %/ q)%N.
 Proof using nU oV pr_p pr_q qp1_gt_pq1.
 have ub_u: (u.-1 <= nU - 1)%N.
   rewrite -subn1 leq_sub2r //; have [_ _] := FTtypeP_facts maxS StypeP.
@@ -728,6 +735,7 @@ rewrite !mul1n mulnCA -!subn1 ltn_mul ?ltn_sub2r ?prime_gt1 //.
 rewrite -!subnDA !subnKC ?prime_gt0 // !mulnBl -!expnSr !mulnn.
 by rewrite -subSn ?leq_exp2l ?leqW ?prime_gt1 ?leq_sub ?leq_exp2r // ltnW.
 Qed.
+Let v1p_gt_u1q := v1p_gt_u1q.
 
 Let calT0 := seqIndD QV T T`_\s 1.
 Let rmR_T := FTtypeP_coh_base maxT TtypeP.
@@ -890,7 +898,7 @@ Let pq : algC := (p * q)%:R.
 Let h := #|H|.
 
 (* This is the first (and main) part of Peterfalvi (14.11). *)
-Let defK : `K = V.
+Local Definition defK : `K = V.
 Proof using Mpsi Ttype2 betaM cohM frobM galS irrM maxNV_M pairTS pq psi1 sNVM.
 pose e := #|M : K|; pose k := #|K|; apply: contraTeq isT => notKV.
 have [_ sVK defM] := FTtypeII_support_facts maxT TtypeP Ttype2 pairTS maxNV_M.
@@ -1040,9 +1048,10 @@ rewrite (Frobenius_dvd_ker1 frobVW2) /= oV /nV predn_exp.
 rewrite -(subnKC qgt2) -(ltn_predK pgt2) mulKn // subnKC //.
 by rewrite big_ord_recl dvdn_sum // => i _; rewrite expnS dvdn_mulr.
 Qed.
+Let defK := defK.
 
 (* This is the first part of Peterfalvi (14.11). *)
-Let indexMK : #|M : K| = (p * q)%N.
+Local Definition indexMK : #|M : K| = (p * q)%N.
 Proof using defK.
 have [_ _ [defM|]] := FTtypeII_support_facts maxT TtypeP Ttype2 pairTS maxNV_M.
   have:= Ttype2; rewrite (mmax_max maxM (mmax_proper maxT)) ?(eqP Mtype1) //.
@@ -1064,9 +1073,10 @@ have [_ _ [cycV _ _]] := typeP_Galois_P maxT (FTtype5_exclusion maxT) galT.
 rewrite Ptype_Fcompl_kernel_trivial // in cycV.
 by rewrite -(isog_cyclic (quotient1_isog V)) in cycV.
 Qed.
+Let indexMK := indexMK.
 
 (* This is Peterfalvi (14.14). *)
-Let LM_cases :
+Local Definition LM_cases :
     '[tauM betaM, tau1L phi] != 0 /\ h.-1%:R / pq <= pq - 1
  \/ '[tauL betaL, tau1M psi] != 0 /\ q = 3 /\ p = 5.
 Proof using indexLH indexMK irrL not_MG_L.
@@ -1104,9 +1114,10 @@ rewrite -addn1 sqrnD -addnA (mulSn 2) leq_add2l muln1.
 rewrite (@leq_trans (2 * (x * 7))) ?leq_mul //.
 by rewrite mulnCA (mulnDr x 12 2) mulnC leq_add2r -(subnKC xgt6).
 Qed.
+Let LM_cases := LM_cases.
 
 (* This is Peterfalvi (14.15). *)
-Let oU : u = nU.
+Local Definition oU : u = nU.
 Proof using LM_cases.
 case: ifP (card_FTtypeP_Galois_compl maxS galS) => // p1modq oU.
 pose x := #|H : U|; rewrite -/u -/nU -/p -/q in p1modq oU.
@@ -1170,9 +1181,10 @@ have{lb_q2 p1modq} p7: p = 7.
 rewrite oH mulnC oU /nU q3 p7 -leq_divRL //= in ub_h lb_x.
 by have:= leq_trans lb_x ub_h.
 Qed.
+Let oU := oU.
 
 (* This is Peterfalvi (14.16), the last step towards the final contradiction. *)
-Let defH : `H = U.
+Local Definition defH : `H = U.
 Proof using oU.
 pose x := #|H : U|; have oH: h = (u * x)%N by rewrite Lagrange.
 apply/eqP/idPn; rewrite eqEsubset sUH andbT -indexg_gt1 -/x => xgt1.
@@ -1215,6 +1227,7 @@ rewrite cfdotBl cfdot_suml big1 => [|ij _]; last first.
 case: Dchi => ->; first by rewrite (orthogonalP oLM) ?map_f // subr0.
 by rewrite cfdotNl opprK add0r (orthogonalP oLM) ?map_f // cfAut_seqInd.
 Qed.
+Let defH := defH.
 
 Lemma FTtype2_exclusion : False.
 Proof using defH. by have /negP[] := not_charUH; rewrite /= defH char_refl. Qed.

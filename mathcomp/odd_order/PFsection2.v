@@ -97,11 +97,12 @@ Variables (G L : {group gT}) (A : {set gT}).
 
 Let pi := [pred p | [exists a in A, p \in \pi('C_L[a])]].
 
-Let piCL a : a \in A -> pi.-group 'C_L[a].
+Local Definition piCL a : a \in A -> pi.-group 'C_L[a].
 Proof.
 move=> Aa; apply: sub_pgroup (pgroup_pi _) => p cLa_p.
 by apply/exists_inP; exists a.
 Qed.
+Let piCL := piCL.
 
 Fact Dade_signalizer_key : unit. Proof. by []. Qed.
 Definition Dade_signalizer_def a := 'O_pi^'('C_G[a])%G.
@@ -133,13 +134,14 @@ Let cHA := Dade_signalizer_cent.
 Let notHa0 a : H a :* a :!=: set0.
 Proof. by rewrite -cards_eq0 -lt0n card_rcoset cardG_gt0. Qed.
 
-Let HallCL a : a \in A -> pi.-Hall('C_G[a]) 'C_L[a].
+Local Definition HallCL a : a \in A -> pi.-Hall('C_G[a]) 'C_L[a].
 Proof using ddA.
 move=> Aa; have [_ _ _ _ [H1 /(_ a Aa)/sdprodP[_ defCa _ _] coH1L]] := ddA.
 have [|//] := coprime_mulGp_Hall defCa _ (piCL Aa).
 apply: sub_pgroup (pgroup_pi _) => p; apply: contraL => /exists_inP[b Ab].
 by apply: (@pnatPpi \pi(_)^'); rewrite -coprime_pi' ?cardG_gt0 ?coH1L.
 Qed.
+Let HallCL := HallCL.
 
 Lemma def_Dade_signalizer H1 : is_Dade_signalizer G L A H1 -> {in A, H =1 H1}.
 Proof.

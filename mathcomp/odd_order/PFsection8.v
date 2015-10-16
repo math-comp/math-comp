@@ -584,7 +584,7 @@ by do 2![split=> //] => /L2_frob[E /FrobeniusWker].
 Qed.
 
 (* A generic proof of the first assertion of Peterfalvi (8.15). *)
-Let norm_FTsuppX A :
+Local Definition norm_FTsuppX A :
   M \subset 'N(A) -> 'A1(M) \subset A -> A \subset 'A0(M) -> 'N(A) = M.
 Proof using maxM.
 move=> nAM sA1A sAA0; apply: mmax_max => //.
@@ -594,6 +594,7 @@ rewrite (sub_proper_trans (norm_gen _)) ?mFT_norm_proper //; last first.
 rewrite (subG1_contra (genS sA1A)) //= genD1 ?group1 //.
 by rewrite genGid /= def_FTcore ?Msigma_neq1.
 Qed.
+Let norm_FTsuppX := norm_FTsuppX.
 
 Lemma norm_FTsupp1 : 'N('A1(M)) = M.
 Proof using norm_FTsuppX. exact: norm_FTsuppX (FTsupp1_norm M) _ (FTsupp1_sub0 maxM). Qed.
@@ -610,12 +611,13 @@ rewrite /'R__ /= {1}cent1J conjSg; case: ifP => _ /=; first by rewrite conjs1g.
 by rewrite cent1J FT_signalizer_baseJ FcoreJ -conjIg.
 Qed.
 
-Let is_FTsignalizer : is_Dade_signalizer G M 'A0(M) 'R_M.
+Local Definition is_FTsignalizer : is_Dade_signalizer G M 'A0(M) 'R_M.
 Proof using maxM.
 rewrite /'R_M => x A0x /=; rewrite setTI.
 case: ifPn => [sCxM | not_sCxM]; first by rewrite sdprod1g (setIidPr sCxM).
 by have [_ _ /(_ x)[| [] //]] := FTsupport_facts; apply/setIdP.
 Qed.
+Let is_FTsignalizer := is_FTsignalizer.
 
 (* This is Peterfalvi (8.15), second assertion. *)
 Lemma FT_Dade0_hyp : Dade_hypothesis G M 'A0(M).

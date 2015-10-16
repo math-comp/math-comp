@@ -232,7 +232,7 @@ Qed.
 
 Let sCU : C \subset U. Proof. by rewrite [C]unlock subsetIl. Qed.
 
-Let nsCUW1 : C <| U <*> W1.
+Local Definition nsCUW1 : C <| U <*> W1.
 Proof using nH0M.
 have [_ sUW1M _ nHUW1 _] := sdprod_context defHUW1.
 rewrite /normal [C]unlock subIset ?joing_subl // normsI //.
@@ -240,6 +240,7 @@ rewrite /normal [C]unlock subIset ?joing_subl // normsI //.
 rewrite /= astabQ norm_quotient_pre ?norms_cent ?quotient_norms //.
 exact: subset_trans sUW1M nH0M.
 Qed.
+Let nsCUW1 := nsCUW1.
 
 Lemma Ptype_Fcore_extensions_normal :
   [/\ H0C <| M, HC <| M, H0U' <| M & H0C' <| M].
@@ -265,11 +266,12 @@ by rewrite /= -!quotientYK ?gFsub_trans ?quotient_der ?subsetIl //= cosetpreK.
 Qed.
 Local Notation nsH0xx_M := Ptype_Fcore_extensions_normal.
 
-Let Du : u = #|HU : HC|.
+Local Definition Du : u = #|HU : HC|.
 Proof using nsCUW1.
 have nCU := subset_trans (joing_subl U W1) (normal_norm nsCUW1).
 by rewrite -(index_sdprodr defHU) -?card_quotient.
 Qed.
+Let Du := Du.
 
 (* This is Peterfalvi (9.6). *)
 Lemma Ptype_Fcore_factor_facts :
@@ -317,12 +319,13 @@ Proof using coHU defW2bar p_pr q sW2H.
 by have:= typeII_IV_core => /=; case: ifP => // _ [/def_Ptype_factor_prime].
 Qed.
 
-Let frobUW1c : [Frobenius U <*> W1 / C = Ubar ><| W1 / C].
+Local Definition frobUW1c : [Frobenius U <*> W1 / C = Ubar ><| W1 / C].
 Proof using abelHbar defW2bar nsCUW1 ntHbar.
 apply: Frobenius_quotient frobUW1 _ nsCUW1 _.
   by apply: nilpotent_sol; have [_ []] := MtypeP.
 by have [] := Ptype_Fcore_factor_facts; rewrite eqEsubset sCU.
 Qed.  
+Let frobUW1c := frobUW1c.
 
 Definition typeP_Galois := acts_irreducibly U Hbar 'Q.
 
@@ -763,7 +766,7 @@ Let redM := [predC irr M].
 Let mu_ := filter redM (S_ H0).
 
 (* This subproof is shared between (9.8)(b) and (9.9)(b). *)
-Let nb_redM_H0 : size mu_ = p.-1 /\ {subset mu_ <= S_ H0C}.
+Local Definition nb_redM_H0 : size mu_ = p.-1 /\ {subset mu_ <= S_ H0C}.
 Proof using defW2bar nsCUW1 nsH0H p_pr.
 have pddM := FT_prDade_hypF maxM MtypeP; pose ptiWM := prDade_prTI pddM.
 have [nsHUM sW1M /mulG_sub[sHUM _] nHUW1 tiHUW1] := sdprod_context defM.
@@ -818,6 +821,7 @@ have sHOC_HU: H0C \subset HU by apply/joing_subP.
 rewrite sz_mu size_filter nb_redM //= norm_joinEr ?(subset_trans sCM) //.
 by rewrite -group_modl //= setIC [C]unlock setIA tiHU setI1g mulg1.
 Qed.
+Let nb_redM_H0 := nb_redM_H0.
 
 Let isIndHC (zeta : 'CF(M)) :=
   [/\ zeta 1%g = (q * u)%:R, zeta \in S_ H0C
