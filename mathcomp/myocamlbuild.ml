@@ -31,6 +31,11 @@ let config x =
 
 let config_coq = config coqtop
 
+let ocamlfind x =
+  let inc, _ = Unix.open_process ("ocamlfind query " ^ x) in
+  input_line inc
+;;
+
 let coq x = where coqtop ^ "/" ^ x
 let caml x = where "ocamlc" ^ "/" ^ x
 
@@ -48,7 +53,7 @@ let includes = S [
   S (List.map (fun dir -> S [ A "-I"; P (coq dir); ]) dirs);
   A "-I"; P (caml "");
   A "-I"; P (caml "threads/");
-  A "-I"; P (caml "camlp5");
+  A "-I"; P (ocamlfind "camlp5");
 ]
 ;;
 
