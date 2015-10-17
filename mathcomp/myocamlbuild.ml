@@ -83,5 +83,8 @@ let rules () =
  ()
 ;;
 
-rules ()
+let () = dispatch begin function
+  | After_rules -> rules ()
+  | _ -> ()
+end
 
