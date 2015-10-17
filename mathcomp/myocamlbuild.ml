@@ -92,8 +92,10 @@ let rules () =
    ~insert:(`before "ocaml: mldylib & cmx* & o* -> cmxs & so")
    ~prods:["%.cmxs"]
    ~dep:"%.mldylib"
+   (*
    ~doc:"Builds a .cmxs (native archive for dynamic linking) containing exactly\
          the modules listed in the corresponding .mldylib file."
+         *)
    (Ocamlbuild_pack.Ocaml_compiler.native_shared_library_link_mldylib
       "%.mldylib" "%.cmxs");
 
