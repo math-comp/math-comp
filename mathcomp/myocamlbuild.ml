@@ -85,6 +85,18 @@ let rules () =
       Cmd (S[camlp5o; A"-o"; Px ml; A"-impl"; P ml4]));
  flag ["compile"; "ocaml"] (S [flags; includes]);
  flag ["link"; "ocaml"] (S [flags; includes]);
+
+ (* supersedes the built-in .mldylib rule
+    that wrongly assumes a .so is produced *)
+ rule "ocaml: mldylib & cmx* & o* -> cmxs"
+   ~insert:(`before "ocaml: mldylib & cmx* & o* -> cmxs & so")
+   ~prods:["%.cmxs"]
+   ~dep:"%.mldylib"
+   ~doc:"Builds a .cmxs (native archive for dynamic linking) containing exactly\
+         the modules listed in the corresponding .mldylib file."
+   (Ocamlbuild_pack.Ocaml_compiler.native_shared_library_link_mldylib
+      "%.mldylib" "%.cmxs");
+
  ()
 ;;
 
