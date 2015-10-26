@@ -1,0 +1,40 @@
+
+CUSTOMIZATION OF THE PROOF GENERAL EMACS INTERFACE
+==================================================
+
+The ssreflect distribution comes with a small configuration file
+pg-ssr.el to extend ProofGeneral (PG), a generic interface for
+proof assistants based on the customizable text editor Emacs, to the
+syntax of ssreflect.
+
+The >= 3.7 versions of ProofGeneral support this extension.
+
+- Following the installation instructions, unpack the sources of PG in
+a directory, for instance <my-pgssr-location>/ProofGeneral-3.7, and add
+the following line to your .emacs file:
+  - under Unix/MacOS:
+	(load-file
+    "<my-pg-location>/ProofGeneral-3.7/generic/proof-site.el" )
+  - under Windows+Cygwin:
+	(load-file
+    "C:\\<my-pg-location>\\ProofGeneral-3.7\\generic\\proof-site.el")
+where <my-pg-location> is the location of your own ProofGeneral
+directory.
+
+-Immediately after the previous line added to your .emacs, add this
+one:
+	(load-file "<my-pgssr-location>/pg-ssr.el") respectively
+	(load-file "<my-pgssr-location>\\pg-ssr.el") for Windows+Cygwin
+users, where <my-pgssr-location> is the location of your pg-ssr.el file.
+
+Coq sources have a .v extension. Opening any .v file should
+automatically launch ProofGeneral. Try this on a foo.v file.
+
+In the menu 'ProofGeneral', choose the item:
+	'Advanced/Customize/Coq/Coq Prog Name' Change the value of the
+variable to
+	 <my-ssreflect-location>/bin/ssrcoq
+or
+	<my-ssreflect-location>\\bin\\ssrcoq
+for Windows+Cygwin users, where <my-ssreflect-location> is the location of
+your coq directory.
