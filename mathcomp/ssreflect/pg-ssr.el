@@ -1,5 +1,5 @@
-;; Customization of PG for ssreflect syntax
-;; Assia Mahboubi 2007
+;; Customization of Proof General for highlighting ssreflect tactics.
+
 
 (defcustom coq-user-tactics-db
    '(("nat_congr" "ncongr"  "nat_congr" t "nat_congr")
@@ -9,6 +9,8 @@
      ("move" "m"  "move" t "move")
      ("set" "set"  "set # := #" t "set")
      ("have" "hv" "have # : #" t "have")
+     ("gen have" "genhv" "gen have : / #" t "gen have")
+     ("generally have" "generhv" "generally have : / #" t "generally have")
      ("congr" "con" "congr #" t "congr")
      ("wlog" "wlog" "wlog : / #" t "wlog")
      ("without loss" "wilog" "without loss #" t "without loss")
