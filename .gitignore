@@ -12,3 +12,8 @@ mathcomp/ssreflect/ssreflect.ml4
 mathcomp/ssreflect/ssrmatching.ml4
 mathcomp/ssreflect/ssrmatching.mli
 mathcomp/ssreflect/ssreflect.mllib
+mathcomp/ssreflect.ml4
+mathcomp/ssrmatching.ml4
+mathcomp/ssrmatching.mli
+mathcomp/ssreflect.mllib
+mathcomp-*.tar.gz
