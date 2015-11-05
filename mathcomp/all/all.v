@@ -1,5 +1,4 @@
 Require Export mathcomp.ssreflect.all_ssreflect.
-Require Export mathcomp.basic.all_basic.
 Require Export mathcomp.algebra.all_algebra.
 Require Export mathcomp.field.all_field.
 Require Export mathcomp.character.all_character.

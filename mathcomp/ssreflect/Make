@@ -6,6 +6,18 @@ ssreflect.v
 ssrfun.v
 ssrmatching.v
 ssrnat.v
+bigop.v
+binomial.v
+choice.v
+div.v
+finfun.v
+fingraph.v
+finset.v
+fintype.v
+generic_quotient.v
+path.v
+prime.v
+tuple.v
 
 ssreflect.mllib
 ssrmatching.mli
