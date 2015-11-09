@@ -1,6 +1,8 @@
 24/11/2015 - major reorganization of the archive - version 1.6 
 	* Files split into subdirectories: ssreflect, algebra, fingroup,  
-	  solvable, field and character.
+	  solvable, field and character. In this way the user can decide
+	  to compile only the subset of the Mathematical Components library
+	  that is relevant to her.
 
 	* The archive is now open and based on git. Public mirror at:
 	         https://github.com/math-comp/math-comp
