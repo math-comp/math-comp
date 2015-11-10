@@ -6,7 +6,12 @@
 
 	* The archive is now open and based on git. Public mirror at:
 	         https://github.com/math-comp/math-comp
-
+	         
+	* Sources of the reference manual of the Ssreflect tactic language are 
+	  also open and available at:
+		https://github.com/math-comp/ssr-manual
+	  Pull requests improving the documentation are welcome.
+		
 	* Renamings or replacements:
 	  conjC_closed -> cfConjC_closed
 	  class_transr -> class_eqP
