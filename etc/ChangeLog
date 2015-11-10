@@ -18,6 +18,9 @@
 	  cfclass_transl -> cfclass_transr
 	  nontrivial_ideal -> proper_ideal
 	  zchar_orthonormalP -> vchar_orthonormalP
+	  
+	* Definitions that changed:
+	  seq_sub	
 
 	* Statements that changed:
 	  orbit_in_transl, orbit_sym, orbit_trans, orbit_transl, orbit_transr,
@@ -25,6 +28,9 @@
 	  lcoset_transr, rcoset_transl, rcoset_transr, mem2_last,
 	  bind_unless, unless_contra, all_and2, all_and3, all_and4, all_and5,
 	  ltr0_neq0, ltr_prod, Zisometry_of_iso
+	
+	* New definitions:
+	  adhoc_seq_sub_choiceMixin, adhoc_seq_sub_[choice|fin]Type
 
 	* New theorems:
 	  orbit_in_eqP, cards_draws, cfAut_lin_char, cfConjC_lin_char,
