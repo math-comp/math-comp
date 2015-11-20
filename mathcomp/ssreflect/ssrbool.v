@@ -25,7 +25,7 @@ Require Import ssrfun.
 (*             decidable P <-> P is effectively decidable (:= {P} + {~ P}.    *)
 (*    contra, contraL, ... :: contraposition lemmas.                          *)
 (*           altP my_viewP :: natural alternative for reflection; given       *)
-(*                            lemma myvieP: reflect my_Prop my_formula,       *)
+(*                            lemma myviewP: reflect my_Prop my_formula,      *)
 (*                              have [myP | not_myP] := altP my_viewP.        *)
 (*                            generates two subgoals, in which my_formula has *)
 (*                            been replaced by true and false, resp., with    *)
@@ -1329,22 +1329,22 @@ Implicit Arguments has_quality [T].
 
 Lemma qualifE n T p x : (x \in @Qualifier n T p) = p x. Proof. by []. Qed.
 
-Notation "x \is A" := (x \in has_quality 0 A) 
+Notation "x \is A" := (x \in has_quality 0 A)
   (at level 70, no associativity,
    format "'[hv' x '/ '  \is  A ']'") : bool_scope.
-Notation "x \is 'a' A" := (x \in has_quality 1 A) 
+Notation "x \is 'a' A" := (x \in has_quality 1 A)
   (at level 70, no associativity,
    format "'[hv' x '/ '  \is  'a'  A ']'") : bool_scope.
-Notation "x \is 'an' A" := (x \in has_quality 2 A) 
+Notation "x \is 'an' A" := (x \in has_quality 2 A)
   (at level 70, no associativity,
    format "'[hv' x '/ ' \is  'an'  A ']'") : bool_scope.
-Notation "x \isn't A" := (x \notin has_quality 0 A) 
+Notation "x \isn't A" := (x \notin has_quality 0 A)
   (at level 70, no associativity,
    format "'[hv' x '/ '  \isn't  A ']'") : bool_scope.
-Notation "x \isn't 'a' A" := (x \notin has_quality 1 A) 
+Notation "x \isn't 'a' A" := (x \notin has_quality 1 A)
   (at level 70, no associativity,
    format "'[hv' x '/ '  \isn't  'a'  A ']'") : bool_scope.
-Notation "x \isn't 'an' A" := (x \notin has_quality 2 A) 
+Notation "x \isn't 'an' A" := (x \notin has_quality 2 A)
   (at level 70, no associativity,
    format "'[hv' x '/ ' \isn't  'an'  A ']'") : bool_scope.
 Notation "[ 'qualify' x | P ]" := (Qualifier 0 (fun x => P%B))
@@ -1411,11 +1411,11 @@ Canonical keyed_qualifier_keyed := PackKeyedPred k keyed_qualifier_suproof.
 
 End KeyedQualifier.
 
-Notation "x \i 's' A" := (x \i n has_quality 0 A) 
+Notation "x \i 's' A" := (x \i n has_quality 0 A)
   (at level 70, format "'[hv' x '/ '  \i 's'  A ']'") : bool_scope.
-Notation "x \i 's' 'a' A" := (x \i n has_quality 1 A) 
+Notation "x \i 's' 'a' A" := (x \i n has_quality 1 A)
   (at level 70, format "'[hv' x '/ '  \i 's'  'a'  A ']'") : bool_scope.
-Notation "x \i 's' 'an' A" := (x \i n has_quality 2 A) 
+Notation "x \i 's' 'an' A" := (x \i n has_quality 2 A)
   (at level 70, format "'[hv' x '/ '  \i 's'  'an'  A ']'") : bool_scope.
 
 Module DefaultKeying.
@@ -1469,7 +1469,7 @@ Definition pre_symmetric := forall x y, R x y -> R y x.
 
 Lemma symmetric_from_pre : pre_symmetric -> symmetric.
 Proof. by move=> symR x y; apply/idP/idP; apply: symR. Qed.
-  
+
 Definition reflexive := forall x, R x x.
 Definition irreflexive := forall x, R x x = false.
 

@@ -977,7 +977,7 @@ Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : form_scope.
- 
+
 Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
     [arg min_(i < i0 | i \in A) F]
   (at level 0, i, i0 at level 10,
@@ -986,12 +986,12 @@ Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
 Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : form_scope.
- 
+
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
      (arg_max i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : form_scope.
- 
+
 Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
     [arg max_(i > i0 | i \in A) F]
   (at level 0, i, i0 at level 10,
@@ -1491,7 +1491,7 @@ Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
 Definition seq_sub_finMixin := Finite.Mixin seq_sub_countMixin seq_sub_axiom.
 
 (* Beware: these are not the canonical instances, as they are not consistent  *)
-(* the generic sub_choiceType canonical instance.                             *)
+(* with the generic sub_choiceType canonical instance.                        *)
 Definition adhoc_seq_sub_choiceMixin := PcanChoiceMixin seq_sub_pickleK.
 Definition adhoc_seq_sub_choiceType :=
   Eval hnf in ChoiceType seq_sub adhoc_seq_sub_choiceMixin.
