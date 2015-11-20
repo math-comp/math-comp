@@ -290,7 +290,7 @@ Reserved Notation "p1 =i p2"
 (*    [type var separator expr]                                               *)
 (* where "type" is the type of the comprehension (e.g., pred) and "separator" *)
 (* is | or => . It is important that in other notations a leading square      *)
-(* bracket [ is always by an operator symbol or a fixed identifier.           *)
+(* bracket [ is always followed by an operator symbol or a fixed identifier.  *)
 
 Reserved Notation "[ /\ P1 & P2 ]" (at level 0, only parsing).
 Reserved Notation "[ /\ P1 , P2 & P3 ]" (at level 0, format
