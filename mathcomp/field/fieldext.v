@@ -653,7 +653,7 @@ Proof.
 move=> Kp szp; apply/rootP/eqP=> [px0 | ->]; last by rewrite horner0.
 rewrite -(Fadjoin_poly_unique Kp szp px0).
 by apply: Fadjoin_poly_unique; rewrite ?polyOver0 ?size_poly0 ?horner0.
-Qed. 
+Qed.
 
 Lemma minPoly_irr p :
   p \is a polyOver K -> p %| minPoly K x -> (p %= minPoly K x) || (p %= 1).
@@ -1209,7 +1209,7 @@ Canonical pi_subfx_add_morph := PiMorph2 pi_subfext_add.
 Definition subfext_opp := lift_op1 subFExtend -%R.
 Fact pi_subfext_opp : {morph \pi : x / - x >-> subfext_opp x}.
 Proof.
-unlock subfext_opp => y /=; apply/eqmodP/eqP. 
+unlock subfext_opp => y /=; apply/eqmodP/eqP.
 by rewrite /iotaFz !linearN /= !iotaPz_repr.
 Qed.
 Canonical pi_subfext_opp_morph := PiMorph1 pi_subfext_opp.
@@ -1514,7 +1514,7 @@ suffices [L dimL [toPF [toL toPF_K toL_K]]]:
   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
   rewrite linearZ /= -(rmorph1 toL) toL_K -modp_scalel alg_polyC modp_add.
   congr (_ + _); rewrite -toL_K rmorphM /= -/z; congr (toPF (_ * z)).
-  by apply: (can_inj toPF_K); rewrite toL_K. 
+  by apply: (can_inj toPF_K); rewrite toL_K.
 pose toL q : vL := poly_rV (q %% p); pose toPF (x : vL) := rVpoly x.
 have toL_K q : toPF (toL q) = q %% p.
   by rewrite /toPF poly_rV_K // -ltnS Dn ?ltn_modp -?Dn.
@@ -1531,7 +1531,7 @@ have mul1: left_id L1 mul.
 have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
   by rewrite !toL_K /toPF raddfD mulrDl modp_add.
-have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0. 
+have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
 pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
 pose rL := ComRingType (RingType vL mulM) mulC.
 have mulZl: GRing.Lalgebra.axiom mul.
@@ -1565,6 +1565,7 @@ by apply: toPinj; rewrite !toL_K modp_mul -!(mulrC r) modp_mul.
 Qed.
 
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.
+  In Coq 8.4 Qed takes about 18s.
 Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) :
     irreducible_poly p ->
   {L : fieldExtType F & Vector.dim L = (size p).-1 &
