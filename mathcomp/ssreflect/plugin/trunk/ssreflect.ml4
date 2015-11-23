@@ -44,6 +44,7 @@ open Coqlib
 open Glob_term
 open Util
 open Evd
+open Sigma.Notations
 open Extend
 open Goptions
 open Tacexpr
@@ -563,7 +564,9 @@ let pf_partial_solution gl t evl =
 
 let pf_new_evar gl ty =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
-  let sigma, extra = Evarutil.new_evar env sigma ty in
+  let sigma = Sigma.Unsafe.of_evar_map sigma in
+  let Sigma (extra, sigma, _) = Evarutil.new_evar env sigma ty in
+  let sigma = Sigma.to_evar_map sigma in
   re_sig it sigma, extra
 
 (* Basic tactics *)
@@ -2873,23 +2876,33 @@ let mk_abstract_id () = incr ssr_abstract_id; nat_of_n !ssr_abstract_id
 
 let ssrmkabs id gl =
   let env, concl = pf_env gl, pf_concl gl in
-  let step sigma =
+  let step = { run = begin fun sigma ->
+    let sigma = Sigma.to_evar_map sigma in
     let sigma, abstract_proof, abstract_ty =
       let sigma, (ty, _) =
         Evarutil.new_type_evar env sigma Evd.univ_flexible_alg in
       let sigma, ablock = mkSsrConst "abstract_lock" env sigma in
-      let sigma, lock = Evarutil.new_evar env sigma ablock in
+      let sigma = Sigma.Unsafe.of_evar_map sigma in
+      let Sigma (lock, sigma, _) = Evarutil.new_evar env sigma ablock in
+      let sigma = Sigma.to_evar_map sigma in
       let sigma, abstract = mkSsrConst "abstract" env sigma in
       let abstract_ty = mkApp(abstract, [|ty;mk_abstract_id ();lock|]) in
-      let sigma, m = Evarutil.new_evar env sigma abstract_ty in
+      let sigma = Sigma.Unsafe.of_evar_map sigma in
+      let Sigma (m, sigma, _) = Evarutil.new_evar env sigma abstract_ty in
+      let sigma = Sigma.to_evar_map sigma in
       sigma, m, abstract_ty in
     let sigma, kont =
       let rd = Name id, None, abstract_ty in
-      Evarutil.new_evar (Environ.push_rel rd env) sigma concl in
+      let sigma = Sigma.Unsafe.of_evar_map sigma in
+      let Sigma (ev, sigma, _) = Evarutil.new_evar (Environ.push_rel rd env) sigma concl in
+      let sigma = Sigma.to_evar_map sigma in
+      (sigma, ev)
+    in
     pp(lazy(pr_constr concl));
     let term = mkApp (mkLambda(Name id,abstract_ty,kont) ,[|abstract_proof|]) in
     let sigma, _ = Typing.type_of env sigma term in
-    sigma, term in
+    Sigma.Unsafe.of_pair (term, sigma)
+  end } in
   Proofview.V82.of_tactic
     (Proofview.tclTHEN
       (Tactics.New.refine step)
@@ -3368,9 +3381,12 @@ let saturate ?(beta=false) ?(bi_types=false) env sigma c ?(ty=Retyping.get_type_
       (mkApp (c, Array.of_list (List.map snd args))), ty, args, sigma 
   else match kind_of_type ty with
   | ProdType (_, src, tgt) ->
-      let sigma, x =
-        Evarutil.new_evar env (create_evar_defs sigma)
-          (if bi_types then Reductionops.nf_betaiota sigma src else src) in
+      let sigma = create_evar_defs sigma in
+      let sigma = Sigma.Unsafe.of_evar_map sigma in
+      let Sigma (x, sigma, _) =
+        Evarutil.new_evar env sigma
+          (if bi_types then Reductionops.nf_betaiota (Sigma.to_evar_map sigma) src else src) in
+      let sigma = Sigma.to_evar_map sigma in
       loop (subst1 x tgt) ((m - n,x) :: args) sigma (n-1)
   | CastType (t, _) -> loop t args sigma n 
   | LetInType (_, v, _, t) -> loop (subst1 v t) args sigma n
@@ -3945,8 +3961,11 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
           let t, gl = pf_fresh_global (Indrec.lookup_eliminator ind sort) gl in
           gl, t
         else
-          pf_eapply (fun env sigma ->
-            Indrec.build_case_analysis_scheme env sigma indu true) gl sort in
+          pf_eapply (fun env sigma () ->
+            let sigma = Sigma.Unsafe.of_evar_map sigma in
+            let Sigma (ind, sigma, _) = Indrec.build_case_analysis_scheme env sigma indu true sort in
+            let sigma = Sigma.to_evar_map sigma in
+            (sigma, ind)) gl () in
       let gl, elimty = pf_type_of gl elim in
       let pred_id,n_elim_args,is_rec,elim_is_dep,n_pred_args =
         analyze_eliminator elimty env (project gl) in
@@ -4461,7 +4480,10 @@ let newssrcongrtac arg ist gl =
     | None -> t_fail () gl in 
   let mk_evar gl ty = 
     let env, sigma, si = pf_env gl, project gl, sig_it gl in
-    let sigma, x = Evarutil.new_evar env (create_evar_defs sigma) ty in
+    let sigma = create_evar_defs sigma in
+    let sigma = Sigma.Unsafe.of_evar_map sigma in
+    let Sigma (x, sigma, _) = Evarutil.new_evar env sigma ty in
+    let sigma = Sigma.to_evar_map sigma in
     x, re_sig si sigma in
   let arr, gl = pf_mkSsrConst "ssr_congr_arrow" gl in
   let ssr_congr lr = mkApp (arr, lr) in
@@ -4773,7 +4795,11 @@ let pirrel_rewrite pred rdx rdx_ty new_rdx dir (sigma, c) c_ty gl =
   let beta = Reductionops.clos_norm_flags Closure.beta env sigma in
   let sigma, p = 
     let sigma = create_evar_defs sigma in
-    Evarutil.new_evar env sigma (beta (subst1 new_rdx pred)) in
+    let sigma = Sigma.Unsafe.of_evar_map sigma in
+    let Sigma (ev, sigma, _) = Evarutil.new_evar env sigma (beta (subst1 new_rdx pred)) in
+    let sigma = Sigma.to_evar_map sigma in
+    (sigma, ev)
+  in
   let pred = mkNamedLambda pattern_id rdx_ty pred in
   let elim, gl = 
     let ((kn, i) as ind, _), unfolded_c_ty = pf_reduce_to_quantified_ind gl c_ty in
@@ -4914,7 +4940,10 @@ let rwrxtac occ rdx_pat dir rule gl =
       pp(lazy(str"rewrule="++pr_constr t));
       match kind_of_term t with
       | Prod (_, xt, at) ->
-        let ise, x = Evarutil.new_evar env (create_evar_defs sigma) xt in
+        let sigma = create_evar_defs sigma in
+        let sigma = Sigma.Unsafe.of_evar_map sigma in
+        let Sigma (x, sigma, _) = Evarutil.new_evar env sigma xt in
+        let ise = Sigma.to_evar_map sigma in
         loop d ise (mkApp (r, [|x|])) (subst1 x at) rs 0
       | App (pr, a) when is_ind_ref pr coq_prod.Coqlib.typ ->
         let sr sigma = match kind_of_term (Tacred.hnf_constr env sigma r) with
@@ -5938,7 +5967,10 @@ let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
       List.fold_left (fun (env, c) _ ->
         let rd, c = destProd_or_LetIn c in
         Environ.push_rel rd env, c) (pf_env gl, c) gens in
-    let sigma, ev = Evarutil.new_evar env (project gl) Term.mkProp in
+    let sigma = project gl in
+    let sigma = Sigma.Unsafe.of_evar_map sigma in
+    let Sigma (ev, sigma, _) = Evarutil.new_evar env sigma Term.mkProp in
+    let sigma = Sigma.to_evar_map sigma in
     let k, _ = Term.destEvar ev in
     let fake_gl = {Evd.it = k; Evd.sigma = sigma} in
     let _, ct, _, uc = pf_interp_ty ist fake_gl ct in
