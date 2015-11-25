@@ -2397,7 +2397,7 @@ let glob_view_hints lvh =
 
 let add_view_hints lvh i = Lib.add_anonymous_leaf (in_viewhint (i, lvh))
 
-VERNAC COMMAND EXTEND HintView CLASSIFIED AS QUERY
+VERNAC COMMAND EXTEND HintView CLASSIFIED AS SIDEFF
   |  [ "Hint" "View" ssrviewposspc(n) ne_ssrhintref_list(lvh) ] ->
      [ mapviewpos (add_view_hints (glob_view_hints lvh)) n 2 ]
 END
