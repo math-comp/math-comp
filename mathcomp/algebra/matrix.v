@@ -2053,8 +2053,12 @@ Proof.
 by apply/matrixP=> k i; rewrite !mxE; apply: eq_bigr => j _; rewrite !mxE.
 Qed.
 
+Canonical matrix_finLmodType (R : finRingType) m n :=
+  [finLmodType R of 'M[R]_(m, n)].
 Canonical matrix_finRingType (R : finRingType) n' :=
   Eval hnf in [finRingType of 'M[R]_n'.+1].
+Canonical matrix_finLalgType (R : finRingType) n' :=
+  [finLalgType R of 'M[R]_n'.+1].
 
 (* Parametricity over the algebra structure. *)
 Section MapRingMatrix.
@@ -2477,6 +2481,9 @@ End ComMatrix.
 Implicit Arguments lin_mul_row [R m n].
 Implicit Arguments lin_mulmx [R m n p].
 Prenex Implicits lin_mul_row lin_mulmx.
+
+Canonical matrix_finAlgType (R : finComRingType) n' :=
+  [finAlgType R of 'M[R]_n'.+1].
 
 (*****************************************************************************)
 (********************** Matrix unit ring and inverse matrices ****************)
