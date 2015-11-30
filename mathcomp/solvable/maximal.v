@@ -411,12 +411,11 @@ case Gp: (p \in \pi(G)); last first.
   rewrite card1_trivg ?sub1G // (card_Hall sylP).
   rewrite part_p'nat // (pnat_dvd (cardSg (normal_sub nsHG))) //.
   by rewrite /pnat cardG_gt0 all_predC has_pred1 Gp.
-have{P sylP}[-> //] := nilpotent_Hall_pcore nilH sylP.
+rewrite {P sylP}(nilpotent_Hall_pcore nilH sylP).
 rewrite -(bigdprodWY (erefl 'F(G))) sub_gen //.
 rewrite -(filter_pi_of (ltnSn _)) big_filter big_mkord.
-have le_pG: p < #|G|.+1.
-  by rewrite ltnS dvdn_leq //; move: Gp; rewrite mem_primes => /and3P[].
-apply: (bigcup_max (Ordinal le_pG)) => //=.
+apply: (bigcup_max (Sub p _)) => //= [|_].
+  by have:= Gp; rewrite ltnS mem_primes => /and3P[_ ntG /dvdn_leq->].
 by rewrite pcore_max ?pcore_pgroup ?gFnormal_trans.
 Qed.
 
