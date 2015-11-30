@@ -246,7 +246,7 @@ Require Import ssrfun.
 (*        or predicate complement, as in predC.                               *)
 (*  CA -- left commutativity.                                                 *)
 (*   D -- predicate difference, as in predD.                                  *)
-(*   E -- elimination, as in negbEf : ~~ b = false -> b.                      *)
+(*   E -- elimination, as in negbFE : ~~ b = false -> b.                      *)
 (*   F or f -- boolean false, as in andbF : b && false = false.               *)
 (*   I -- left/right injectivity, as in addbI : right_injective addb,         *)
 (*        or predicate intersection, as in predI.                             *)

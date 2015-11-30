@@ -67,7 +67,7 @@ Require Import poly polydiv mxpoly generic_quotient.
 (*                           in turn has an extFieldType F0 structure.        *)
 (*           baseVspace V == the subspace of baseFieldType L that coincides   *)
 (*                           with V : {vspace L}.                             *)
-(* --> Some caution muse be exercised when using fieldOver and basFieldType,  *)
+(* --> Some caution must be exercised when using fieldOver and baseFieldType, *)
 (*     because these are convertible to L while carrying different Lmodule    *)
 (*     structures. This means that the safeguards engineered in the ssralg    *)
 (*     library that normally curb the Coq kernel's inclination to diverge are *)
