@@ -187,7 +187,7 @@ Definition join_finZmodType := @Zmodule.Pack ringType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group ringType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -293,7 +293,7 @@ Definition join_finRingType := @Ring.Pack comRingType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group comRingType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -370,7 +370,7 @@ Definition join_finRingType := @Ring.Pack unitRingType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group unitRingType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -539,7 +539,7 @@ Definition fcjoin_finUnitRingType := @UnitRing.Pack finComRingType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group comUnitRingType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -639,7 +639,7 @@ Definition join_finComUnitRingType := @ComUnitRing.Pack idomainType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group idomainType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -743,7 +743,7 @@ Definition join_finIdomainType := @IntegralDomain.Pack fieldType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group fieldType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -908,7 +908,7 @@ Definition join_finZmodType := @Zmodule.Pack lmodType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group lmodType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -990,7 +990,7 @@ Definition fljoin_finRingType := @Ring.Pack finLmodType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group lalgType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -1084,7 +1084,7 @@ Definition join_finLalgType := @Lalgebra.Pack R phR algType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group algType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef.
@@ -1197,7 +1197,7 @@ Definition ujoin_finAlgType := @Algebra.Pack R phR unitRingType xclass xT.
 
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
+Definition join_baseFinGroupType := base_group unitAlgType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
 End ClassDef. 
