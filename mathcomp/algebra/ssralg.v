@@ -5977,7 +5977,6 @@ Lemma ffunMnE f n x : (f *+ n) x = f x *+ n.
 Proof. by rewrite -[n]card_ord -!sumr_const sum_ffunE. Qed.
 
 End FinFunZmod.
-Canonical exp_zmodType (M : zmodType) n := [zmodType of M ^ n].
 
 Section FinFunRing.
 
@@ -6046,8 +6045,6 @@ Canonical ffun_lmodType :=
   Eval hnf in LmodType R {ffun aT -> rT} ffun_lmodMixin.
 
 End FinFunLmod.
-Canonical exp_lmodType (R : ringType) (M : lmodType R) n :=
-  [lmodType R of M ^ n].
 
 (* External direct product. *)
 Section PairZmod.
