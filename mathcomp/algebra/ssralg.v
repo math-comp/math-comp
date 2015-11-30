@@ -3363,6 +3363,7 @@ Notation zmod_closed := zmod_closed.
 Notation smulr_closed := smulr_closed.
 Notation invr_closed := invr_closed.
 Notation divr_closed := divr_closed.
+Notation scaler_closed := scaler_closed.
 Notation linear_closed := linear_closed.
 Notation submod_closed := submod_closed.
 Notation semiring_closed := semiring_closed.
