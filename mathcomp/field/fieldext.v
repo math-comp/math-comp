@@ -352,7 +352,8 @@ Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
 Fact vsval_multiplicative K : multiplicative (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
 Canonical vsval_rmorphism K := AddRMorphism (vsval_multiplicative K).
-Canonical vsval_lrmorphism K := [lrmorphism of (vsval : subvs_of K -> L)].
+Canonical vsval_lrmorphism K : {lrmorphism subvs_of K -> L} :=
+  [lrmorphism of vsval].
 
 Lemma vsval_invf K (w : subvs_of K) : val w^-1 = (vsval w)^-1.
 Proof.
