@@ -265,6 +265,8 @@ End Exports.
 End FieldExt.
 Export FieldExt.Exports.
 
+Canonical regular_fieldExtType (F : fieldType) := [fieldExtType F of F^o for F].
+
 Section FieldExtTheory.
 
 Variables (F0 : fieldType) (L : fieldExtType F0).

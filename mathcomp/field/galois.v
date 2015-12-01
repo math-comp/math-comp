@@ -456,6 +456,15 @@ apply/seqv_sub_adjoin/imageP; rewrite (tnth_nth 0) /in_mem/=.
 by exists (i, widen_ord (sz_r i) j) => /=.
 Qed.
 
+Fact regular_splittingAxiom F : SplittingField.axiom (regular_fieldExtType F).
+Proof.
+exists 1; first exact: rpred1.
+by exists [::]; [rewrite big_nil eqpxx | rewrite Fadjoin_nil regular_fullv].
+Qed.
+
+Canonical regular_splittingFieldType (F : fieldType) :=
+  SplittingFieldType F F^o (regular_splittingAxiom F).
+
 Section SplittingFieldTheory.
 
 Variables (F : fieldType) (L : splittingFieldType F).

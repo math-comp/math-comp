@@ -214,6 +214,11 @@ Notation "1" := (vline 1) : vspace_scope.
 
 Canonical matrix_FalgType (K : fieldType) n := [FalgType K of 'M[K]_n.+1].
 
+Canonical regular_FalgType (R : comUnitRingType) := [FalgType R of R^o].
+
+Lemma regular_fullv (K : fieldType) : (fullv = 1 :> {vspace K^o})%VS.
+Proof. by apply/esym/eqP; rewrite eqEdim subvf dim_vline oner_eq0 dimvf. Qed.
+
 Section Proper.
 
 Variables (R : ringType) (aT : FalgType R).
