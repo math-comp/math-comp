@@ -764,13 +764,13 @@ have /polyOver_subvs[p Dp]: minPoly K x \is a polyOver K := minPolyOver K x.
 have nz_pKx: minPoly K x != 0 by rewrite monic_neq0 ?monic_minPoly.
 have{nz_pKx} nz_p: p != 0 by rewrite Dp map_poly_eq0 in nz_pKx.
 have{Dp} px0: root (map_poly vsval p) x by rewrite -Dp root_minPoly.
-have [q0 [Kq0 [q0y0 sepKq0]]] := separable_elementP sepKy.
+have [q0 [Kq0 q0y0 sepKq0]] := separable_elementP sepKy.
 have /polyOver_subvs[q Dq]: minPoly K y \is a polyOver K := minPolyOver K y.
 have qy0: root (map_poly vsval q) y by rewrite -Dq root_minPoly.
 have sep_pKy: separable_poly (minPoly K y).
   by rewrite (dvdp_separable _ sepKq0) ?minPoly_dvdp.
 have{sep_pKy} sep_q: separable_poly q by rewrite Dq separable_map in sep_pKy.
-have [r [nz_r PETr]] := large_field_PET nz_p px0 qy0 sep_q.
+have [r nz_r PETr] := large_field_PET nz_p px0 qy0 sep_q.
 have [[s [Us Ks /ltnW leNs]] | //] := finite_PET (size r).
 have{s Us Ks leNs} /allPn[t /Ks Kt nz_rt]: ~~ all (root r) s.
   by apply: contraTN leNs; rewrite -ltnNge => /max_poly_roots->.
