@@ -14,7 +14,10 @@ Require Import poly polydiv mxpoly generic_quotient.
 (*                        it simply combines the fieldType and FalgType F     *)
 (*                        interfaces.                                         *)
 (* [fieldExtType F of L] == a fieldExt F structure for a type L that has both *)
-(*                        fieldType and FalgType F canonical structures.      *)
+(*                        FalgType F and fieldType canonical instances. The   *)
+(*                        field class instance must be manifest with explicit *)
+(*                        comRing, idomain, and field mixins. If L has an     *)
+(*                        abstract field class should use the 'for' variant.  *)
 (* [fieldExtType F of L for K] == a fieldExtType F structure for a type L     *)
 (*                        that has an FalgType F canonical structure, given   *)
 (*                        a K : fieldType whose unitRingType projection       *)
@@ -250,10 +253,7 @@ Notation fieldExtType R := (type (Phant R)).
 Notation "[ 'fieldExtType' F 'of' L ]" :=
   (@pack _ (Phant F) L _ _ id _ _ _ _ id)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
-(*Notation "[ 'fieldExtType' F 'of' L 'for' K ]" :=
-  (@FieldExt.pack _ (Phant F) L _ _ id K _ _ _ idfun)
-  (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
-*)
+
 Notation "[ 'fieldExtType' F 'of' L 'for' K ]" :=
   (@pack_eta _ (Phant F) L K _ _ id _ id)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
