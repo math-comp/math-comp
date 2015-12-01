@@ -8,7 +8,7 @@ Require Import tuple bigop prime finset fingroup ssralg poly polydiv.
 From mathcomp
 Require Import morphism action finalg zmodp cyclic center pgroup abelian.
 From mathcomp
-Require Import matrix mxabelem vector falgebra fieldext separable galois.
+Require Import matrix vector falgebra fieldext separable galois.
 From mathcomp
 Require ssrnum ssrint algC cyclotomic.
 
@@ -121,8 +121,7 @@ Qed.
 Lemma finField_is_abelem : is_abelem [set: F].
 Proof.
 have [p pr_p charFp] := finCharP.
-apply/is_abelemP; exists p; rewrite ?abelemE ?zmod_abelian //=.
-by apply/exponentP=> x _; rewrite zmodXgE mulrn_char.
+by apply/is_abelemP; exists p; last exact: fin_ring_char_abelem.
 Qed.
 
 Lemma card_finCharP p n : #|F| = (p ^ n)%N -> prime p -> p \in [char F].
@@ -231,7 +230,7 @@ Local Infix "*p:" := primeChar_scale (at level 40).
 
 Let natrFp n : (inZp n : 'F_p)%:R = n%:R :> R.
 Proof.
-rewrite {2}(divn_eq n p) natrD mulrnA (mulrn_char charRp) add0r.
+rewrite [in RHS](divn_eq n p) natrD mulrnA (mulrn_char charRp) add0r.
 by rewrite /= (Fp_cast (charf_prime charRp)).
 Qed.
 
@@ -287,14 +286,14 @@ Canonical primeChar_finZmodType := [finZmodType of R].
 Canonical primeChar_baseGroupType := [baseFinGroupType of R for +%R].
 Canonical primeChar_groupType := [finGroupType of R for +%R].
 Canonical primeChar_finRingType := [finRingType of R].
+Canonical primeChar_finLmodType := [finLmodType 'F_p of R].
+Canonical primeChar_finLalgType := [finLalgType 'F_p of R].
+Canonical primeChar_finAlgType := [finAlgType 'F_p of R].
 
 Let pr_p : prime p. Proof. exact: charf_prime charRp. Qed.
 
 Lemma primeChar_abelem : p.-abelem [set: R].
-Proof.
-rewrite abelemE ?zmod_abelian //=.
-by apply/exponentP=> x _; rewrite zmodXgE mulrn_char.
-Qed.
+Proof. exact: fin_Fp_lmod_abelem. Qed.
 
 Lemma primeChar_pgroup : p.-group [set: R].
 Proof. by case/and3P: primeChar_abelem. Qed.
@@ -310,8 +309,8 @@ Proof. by rewrite /n -cardsT {1}(card_pgroup primeChar_pgroup). Qed.
 Lemma primeChar_vectAxiom : Vector.axiom n (primeChar_lmodType charRp).
 Proof.
 have /isog_isom/=[f /isomP[injf im_f]]: [set: R] \isog [set: 'rV['F_p]_n].
-  have [abelR ntR] := (primeChar_abelem, finRing_nontrivial R0).
-  by rewrite /n -cardsT -(dim_abelemE abelR) ?isog_abelem_rV.
+  rewrite (@isog_abelem_card _ _ p) fin_Fp_lmod_abelem //=.
+  by rewrite !cardsT card_primeChar card_matrix mul1n card_Fp.
 exists f; last by exists (invm injf) => x; rewrite ?invmE ?invmK ?im_f ?inE.
 move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.

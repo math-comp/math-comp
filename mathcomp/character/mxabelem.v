@@ -427,11 +427,7 @@ Variables p m n : nat.
 Local Notation Mmn := 'M['F_p]_(m, n).
 
 Lemma mx_Fp_abelem : prime p -> p.-abelem [set: Mmn].
-Proof.
-move=> p_pr; apply/abelemP=> //; rewrite zmod_abelian.
-split=> //= v _; rewrite zmodXgE -scaler_nat.
-by case/andP: (char_Fp p_pr) => _ /eqP->; rewrite scale0r.
-Qed.
+Proof. exact: fin_Fp_lmod_abelem. Qed.
 
 Lemma mx_Fp_stable (L : {group Mmn}) : [acts setT, on L | 'Zm].
 Proof.

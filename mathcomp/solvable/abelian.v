@@ -6,9 +6,9 @@ Require Import ssrbool ssrfun eqtype ssrnat seq path div fintype.
 From mathcomp
 Require Import finfun bigop finset prime binomial fingroup morphism perm.
 From mathcomp
-Require Import automorphism action quotient gfunctor gproduct zmodp cyclic.
+Require Import automorphism action quotient gfunctor gproduct ssralg finalg.
 From mathcomp
-Require Import pgroup gseries nilpotent sylow.
+Require Import zmodp cyclic pgroup gseries nilpotent sylow.
 
 (******************************************************************************)
 (* Constructions based on abelian groups and their structure, with some       *)
@@ -2162,6 +2162,24 @@ Proof. exact: morphim_p_rank_abelian. Qed.
 
 End QuotientRank.
 
+Section FimModAbelem.
 
+Import GRing.Theory FinRing.Theory.
 
+Lemma fin_lmod_char_abelem p (R : ringType) (V : finLmodType R):
+  p \in [char R]%R -> p.-abelem [set: V].
+Proof.
+case/andP=> p_pr /eqP-pR0; apply/abelemP=> //.
+by split=> [|v _]; rewrite ?zmod_abelian // zmodXgE -scaler_nat pR0 scale0r.
+Qed.
+
+Lemma fin_Fp_lmod_abelem p (V : finLmodType 'F_p) :
+  prime p -> p.-abelem [set: V].
+Proof. by move/char_Fp/fin_lmod_char_abelem->. Qed.
+
+Lemma fin_ring_char_abelem p (R : finRingType) :
+  p \in [char R]%R -> p.-abelem [set: R].
+Proof. exact: fin_lmod_char_abelem [finLmodType R of R^o]. Qed.
+
+End FimModAbelem.
 
