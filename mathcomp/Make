@@ -20,7 +20,6 @@ all/all.v
 character/all_character.v
 character/character.v
 character/classfun.v
-character/finfield.v
 character/inertia.v
 character/integral_char.v
 character/mxabelem.v
@@ -35,6 +34,7 @@ field/countalg.v
 field/cyclotomic.v
 field/falgebra.v
 field/fieldext.v
+field/finfield.v
 field/galois.v
 field/separable.v
 fingroup/action.v
