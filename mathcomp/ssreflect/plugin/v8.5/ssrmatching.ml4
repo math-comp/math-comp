@@ -48,12 +48,9 @@ open Notation_ops
 open Locus
 open Locusops
 
-DECLARE PLUGIN "ssreflect"
+open Ssrcommon
 
-type loc = Loc.t
-let dummy_loc = Loc.ghost
-let errorstrm = Errors.errorlabstrm "ssreflect"
-let loc_error loc msg = Errors.user_err_loc (loc, msg, str msg)
+DECLARE PLUGIN "ssreflect"
 
 (* 0 cost pp function. Active only if env variable SSRDEBUG is set *)
 (* or if SsrDebug is Set                                                  *)
@@ -86,51 +83,6 @@ let glob_constr ist genv = function
     Constrintern.intern_gen WithoutTypeConstraint ~ltacvars:ltacvars genv ce
   | rc, None -> rc
 
-(* Term printing utilities functions for deciding bracketing.  *)
-let pr_paren prx x = hov 1 (str "(" ++ prx x ++ str ")")
-(* String lexing utilities *)
-let skip_wschars s =
-  let rec loop i = match s.[i] with '\n'..' ' -> loop (i + 1) | _ -> i in loop
-(* We also guard characters that might interfere with the ssreflect   *)
-(* tactic syntax.                                                     *)
-let guard_term ch1 s i = match s.[i] with
-  | '(' -> false
-  | '{' | '/' | '=' -> true
-  | _ -> ch1 = '('
-(* The call 'guard s i' should return true if the contents of s *)
-(* starting at i need bracketing to avoid ambiguities.          *)
-let pr_guarded guard prc c =
-  msg_with Format.str_formatter (prc c);
-  let s = Format.flush_str_formatter () ^ "$" in
-  if guard s (skip_wschars s 0) then pr_paren prc c else prc c
-(* More sensible names for constr printers *)
-let pr_constr = pr_constr
-let prl_glob_constr c = pr_lglob_constr_env (Global.env ()) c
-let pr_glob_constr c = pr_glob_constr_env (Global.env ()) c
-let prl_constr_expr = pr_lconstr_expr
-let pr_constr_expr = pr_constr_expr
-let prl_glob_constr_and_expr = function
-  | _, Some c -> prl_constr_expr c
-  | c, None -> prl_glob_constr c
-let pr_glob_constr_and_expr = function
-  | _, Some c -> pr_constr_expr c
-  | c, None -> pr_glob_constr c
-let pr_term (k, c) = pr_guarded (guard_term k) pr_glob_constr_and_expr c
-let prl_term (k, c) = pr_guarded (guard_term k) prl_glob_constr_and_expr c
-
-(** Adding a new uninterpreted generic argument type *)
-let add_genarg tag pr =
-  let wit = Genarg.make0 None tag in
-  let glob ist x = (ist, x) in
-  let subst _ x = x in
-  let interp ist gl x = (gl.Evd.sigma, x) in
-  let gen_pr _ _ _ = pr in
-  let () = Genintern.register_intern0 wit glob in
-  let () = Genintern.register_subst0 wit subst in
-  let () = Geninterp.register_interp0 wit interp in
-  Pptactic.declare_extra_genarg_pprule wit gen_pr gen_pr gen_pr;
-  wit
-
 (** Constructors for cast type *)
 let dC t = CastConv t
 (** Constructors for constr_expr *)
@@ -158,9 +110,6 @@ let combineCG t1 t2 f g = match t1, t2 with
 let loc_ofCG = function
  | (_, (s, None)) -> Glob_ops.loc_of_glob_constr s
  | (_, (_, Some s)) -> Constrexpr_ops.constr_loc s
-
-let mk_term k c = k, (mkRHole, Some c)
-let mk_lterm = mk_term ' '
 
 let pf_type_of gl t = let sigma, ty = pf_type_of gl t in re_sig (sig_it gl)  sigma, ty
 
@@ -389,10 +338,6 @@ let iter_constr_LR f c = match kind_of_term c with
 (* projections.                                                            *)
 
 exception NoMatch
-type ssrdir = L2R | R2L
-let pr_dir_side = function L2R -> str "LHS" | R2L -> str "RHS"
-let inv_dir = function L2R -> R2L | R2L -> L2R
-
 
 type pattern_class =
   | KpatFixed
@@ -872,17 +817,15 @@ ARGUMENT EXTEND rpattern TYPED AS rpatternty PRINTED BY pr_rpattern
     [ E_As_X_In_T (mk_lterm e, mk_lterm x, mk_lterm c) ]
 END
 
-type cpattern = char * glob_constr_and_expr
+type cpattern = Ssrcommon.ssrterm
 let tag_of_cpattern = fst
 let loc_of_cpattern = loc_ofCG
 let cpattern_of_term t = t
-type occ = (bool * int list) option
 
 type rpattern = (cpattern, cpattern) ssrpattern
 let pr_rpattern = pr_pattern
 
 type pattern = Evd.evar_map * (Term.constr, Term.constr) ssrpattern
-
 
 let id_of_cpattern = function
   | _,(_,Some (CRef (Ident (_, x), _))) -> Some x
@@ -893,25 +836,7 @@ let id_of_Cterm t = match id_of_cpattern t with
   | Some x -> x
   | None -> loc_error (loc_of_cpattern t) "Only identifiers are allowed here"
 
-let interp_wit wit ist gl x = 
-  let globarg = in_gen (glbwit wit) x in
-  let sigma, arg = interp_genarg ist (pf_env gl) (project gl) (pf_concl gl) gl.Evd.it globarg in
-  sigma, out_gen (topwit wit) arg
-let interp_constr = interp_wit wit_constr
-let interp_open_constr ist gl gc =
-  interp_wit wit_open_constr ist gl ((), gc)
-let pf_intern_term ist gl (_, c) = glob_constr ist (pf_env gl) c
-let interp_term ist gl (_, c) = snd (interp_open_constr ist gl c)
-let glob_ssrterm gs = function
-  | k, (_, Some c) -> k, Tacintern.intern_constr gs c
-  | ct -> ct
-let subst_ssrterm s (k, c) = k, Tacsubst.subst_glob_constr_and_expr s c
 let pr_ssrterm _ _ _ = pr_term
-let input_ssrtermkind strm = match Compat.get_tok (stream_nth 0 strm) with
-  | Tok.KEYWORD "(" -> '('
-  | Tok.KEYWORD "@" -> '@'
-  | _ -> ' '
-let ssrtermkind = Gram.Entry.of_parser "ssrtermkind" input_ssrtermkind
 
 (* This piece of code asserts the following notations are reserved *)
 (* Reserved Notation "( a 'in' b )"        (at level 0).           *)
@@ -932,7 +857,7 @@ let glob_cpattern gs p =
   match p with
   | _, (_, None) as x -> x
   | k, (v, Some t) as orig ->
-     if k = 'x' then glob_ssrterm gs ('(', (v, Some t)) else
+     if k = Cpattern then glob_ssrterm gs (InParens, (v, Some t)) else
      match t with
      | CNotation(_, "( _ in _ )", ([t1; t2], [], [])) ->
          (try match glob t1, glob t2 with
@@ -968,7 +893,9 @@ GEXTEND Gram
   GLOBAL: cpattern;
   cpattern: [[ k = ssrtermkind; c = constr ->
     let pattern = mk_term k c in
-    if loc_ofCG pattern <> !@loc && k = '(' then mk_term 'x' c else pattern ]];
+    if loc_ofCG pattern <> !@loc && k = InParens
+    then mk_term Cpattern c
+    else pattern ]];
 END
 
 ARGUMENT EXTEND lcpattern
@@ -984,7 +911,9 @@ GEXTEND Gram
   GLOBAL: lcpattern;
   lcpattern: [[ k = ssrtermkind; c = lconstr ->
     let pattern = mk_term k c in
-    if loc_ofCG pattern <> !@loc && k = '(' then mk_term 'x' c else pattern ]];
+    if loc_ofCG pattern <> !@loc && k = InParens
+    then mk_term Cpattern c
+    else pattern ]];
 END
 
 let interp_pattern ist gl red redty =
@@ -992,10 +921,10 @@ let interp_pattern ist gl red redty =
   let xInT x y = X_In_T(x,y) and inXInT x y = In_X_In_T(x,y) in
   let inT x = In_T x and eInXInT e x t = E_In_X_In_T(e,x,t) in
   let eAsXInT e x t = E_As_X_In_T(e,x,t) in
-  let mkG ?(k=' ') x = k,(x,None) in
+  let mkG ?(k=NoFlag) x = k,(x,None) in
   let decode t f g =
     try match (pf_intern_term ist gl t) with
-    | GCast(_,GHole _,CastConv(GLambda(_,Name x,_,_,c))) -> f x (' ',(c,None))
+    | GCast(_,GHole _,CastConv(GLambda(_,Name x,_,_,c))) -> f x (NoFlag,(c,None))
     | it -> g t with _ -> g t in
   let decodeG t f g = decode (mkG t) f g in
   let bad_enc id _ = Errors.anomaly (str"bad encoding for pattern "++str id) in
@@ -1051,7 +980,7 @@ let interp_pattern ist gl red redty =
     | E_In_X_In_T (e,x,rp) -> eInXInT e (id_of_Cterm x) rp
     | E_As_X_In_T (e,x,rp) -> eAsXInT e (id_of_Cterm x) rp in
   pp(lazy(str"decoded as: " ++ pr_pattern_w_ids red));
-  let red = match redty with None -> red | Some ty -> let ty = ' ', ty in
+  let red = match redty with None -> red | Some ty -> let ty = NoFlag, ty in
   match red with
   | T t -> T (combineCG t ty (mkCCast (loc_ofCG t)) mkRCast)
   | X_In_T (x,t) ->
@@ -1238,7 +1167,7 @@ let pf_fill_occ_term gl occ t =
   let cl,(_,t) = fill_occ_term env concl occ sigma0 t in
   cl, t
 
-let cpattern_of_id id = ' ', (GRef (dummy_loc, VarRef  id, None), None)
+let cpattern_of_id id = NoFlag, (GRef (dummy_loc, VarRef  id, None), None)
 
 let is_wildcard = function
   | _,(_,Some (CHole _)|GHole _,None) -> true

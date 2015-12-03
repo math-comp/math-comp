@@ -78,24 +78,6 @@ let ipat_rewrite occ dir gl = Hook.get ipat_rewrite_tac occ dir gl
 let move_top_with_view ~next c r v ist gl =
   Hook.get move_top_with_view_tac ~next c r v ist gl
 
-(* Tentative patch from util.ml *)
-
-let array_fold_right_from n f v a =
-  let rec fold n =
-    if n >= Array.length v then a else f v.(n) (fold (succ n))
-  in
-  fold n
-
-let array_app_tl v l =
-  if Array.length v = 0 then invalid_arg "array_app_tl";
-  array_fold_right_from 1 (fun e l -> e::l) v l
-
-let array_list_of_tl v =
-  if Array.length v = 0 then invalid_arg "array_list_of_tl";
-  array_fold_right_from 1 (fun e l -> e::l) v []
-
-(* end patch *)
-
 module Intset = Evar.Set
 
 (** look up a name in the ssreflect internals module *)
@@ -160,48 +142,17 @@ let safeDestApp c =
 let get_index = function ArgArg i -> i | _ ->
   anomaly "Uninterpreted index"
 (* Toplevel constr must be globalized twice ! *)
-let glob_constr ist genv = function
-  | _, Some ce ->
-    let vars = Id.Map.fold (fun x _ accu -> Id.Set.add x accu) ist.lfun Id.Set.empty in
-    let ltacvars = {
-      Constrintern.empty_ltac_sign with Constrintern.ltac_vars = vars } in
-    Constrintern.intern_gen WithoutTypeConstraint ~ltacvars genv ce
-  | rc, None -> rc
 
-(* Term printing utilities functions for deciding bracketing.  *)
-let pr_paren prx x = hov 1 (str "(" ++ prx x ++ str ")")
-(* String lexing utilities *)
-let skip_wschars s =
-  let rec loop i = match s.[i] with '\n'..' ' -> loop (i + 1) | _ -> i in loop
 let skip_numchars s =
   let rec loop i = match s.[i] with '0'..'9' -> loop (i + 1) | _ -> i in loop
-(* We also guard characters that might interfere with the ssreflect   *)
-(* tactic syntax.                                                     *)
-let guard_term ch1 s i = match s.[i] with
-  | '(' -> false
-  | '{' | '/' | '=' -> true
-  | _ -> ch1 = '('
-(* The call 'guard s i' should return true if the contents of s *)
-(* starting at i need bracketing to avoid ambiguities.          *)
-let pr_guarded guard prc c =
-  msg_with Format.str_formatter (prc c);
-  let s = Format.flush_str_formatter () ^ "$" in
-  if guard s (skip_wschars s 0) then pr_paren prc c else prc c
 (* More sensible names for constr printers *)
 let prl_constr = pr_lconstr
 let pr_constr = pr_constr
 let prl_glob_constr c = pr_lglob_constr_env (Global.env ()) c
-let pr_glob_constr c = pr_glob_constr_env (Global.env ()) c
 let prl_constr_expr = pr_lconstr_expr
-let pr_constr_expr = pr_constr_expr
 let prl_glob_constr_and_expr = function
   | _, Some c -> prl_constr_expr c
   | c, None -> prl_glob_constr c
-let pr_glob_constr_and_expr = function
-  | _, Some c -> pr_constr_expr c
-  | c, None -> pr_glob_constr c
-let pr_term (k, c) = pr_guarded (guard_term k) pr_glob_constr_and_expr c
-let prl_term (k, c) = pr_guarded (guard_term k) prl_glob_constr_and_expr c
 
 (** Constructors for cast type *)
 let dC t = CastConv t
@@ -227,7 +178,6 @@ let mkCArrow loc ty t =
    CProdN (loc, [[dummy_loc,Anonymous], Default Explicit, ty], t)
 let mkCCast loc t ty = CCast (loc,t, dC ty)
 (** Constructors for rawconstr *)
-let mkRHole = GHole (dummy_loc, InternalHole, IntroAnonymous, None)
 let rec mkRHoles n = if n > 0 then mkRHole :: mkRHoles (n - 1) else []
 let rec isRHoles = function GHole _ :: cl -> isRHoles cl | cl -> cl = []
 let mkRApp f args = if args = [] then f else GApp (dummy_loc, f, args)
@@ -285,9 +235,6 @@ let combineCG t1 t2 f g = match t1, t2 with
 let loc_ofCG = function
  | (_, (s, None)) -> Glob_ops.loc_of_glob_constr s
  | (_, (_, Some s)) -> Constrexpr_ops.constr_loc s
-
-let mk_term k c = k, (mkRHole, Some c)
-let mk_lterm c = mk_term ' ' c
 
 let pf_type_of gl t = let sigma, ty = pf_type_of gl t in re_sig (sig_it gl)  sigma, ty
 
@@ -1096,14 +1043,6 @@ let ssrevaltac ist gtac =
 
 (** Generic argument-based globbing/typing utilities *)
 
-
-let interp_intro_pattern = interp_wit wit_intro_pattern
-
-let interp_constr = interp_wit wit_constr
-
-let interp_open_constr ist gl gc =
-  interp_wit wit_open_constr ist gl ((), gc)
-
 let interp_refine ist gl rc =
   let constrvars = extract_ltac_constr_values ist (pf_env gl) in
   let vars = { Pretyping.empty_lvar with
@@ -1161,419 +1100,6 @@ let interp_view_nbimps ist gl rc =
     if isAppInd gl c then List.length pl else ~-(List.length pl)
   with _ -> 0
 
-(* }}} *)
-
-(** Vernacular commands: Prenex Implicits and Search {{{ **********************)
-
-(* This should really be implemented as an extension to the implicit   *)
-(* arguments feature, but unfortuately that API is sealed. The current *)
-(* workaround uses a combination of notations that works reasonably,   *)
-(* with the following caveats:                                         *)
-(*  - The pretty-printing always elides prenex implicits, even when    *)
-(*    they are obviously needed.                                       *)
-(*  - Prenex Implicits are NEVER exported from a module, because this  *)
-(*    would lead to faulty pretty-printing and scoping errors.         *)
-(*  - The command "Import Prenex Implicits" can be used to reassert    *)
-(*    Prenex Implicits for all the visible constants that had been     *)
-(*    declared as Prenex Implicits.                                    *)
-
-let declare_one_prenex_implicit locality f =
-  let fref =
-    try Smartlocate.global_with_alias f 
-    with _ -> errorstrm (pr_reference f ++ str " is not declared") in
-  let rec loop = function
-  | a :: args' when Impargs.is_status_implicit a ->
-    (ExplByName (Impargs.name_of_implicit a), (true, true, true)) :: loop args'
-  | args' when List.exists Impargs.is_status_implicit args' ->
-      errorstrm (str "Expected prenex implicits for " ++ pr_reference f)
-  | _ -> [] in
-  let impls =
-    match Impargs.implicits_of_global fref  with
-    | [cond,impls] -> impls
-    | [] -> errorstrm (str "Expected some implicits for " ++ pr_reference f)
-    | _ -> errorstrm (str "Multiple implicits not supported") in
-  match loop impls  with
-  | [] ->
-    errorstrm (str "Expected some implicits for " ++ pr_reference f)
-  | impls ->
-    Impargs.declare_manual_implicits locality fref ~enriching:false [impls]
-
-VERNAC COMMAND EXTEND Ssrpreneximplicits CLASSIFIED AS SIDEFF
-  | [ "Prenex" "Implicits" ne_global_list(fl) ]
-  -> [ let locality =
-         Locality.make_section_locality (Locality.LocalityFixme.consume ()) in
-       List.iter (declare_one_prenex_implicit locality) fl ]
-END
-
-(* Vernac grammar visibility patch *)
-
-GEXTEND Gram
-  GLOBAL: gallina_ext;
-  gallina_ext:
-   [ [ IDENT "Import"; IDENT "Prenex"; IDENT "Implicits" ->
-      Vernacexpr.VernacUnsetOption (["Printing"; "Implicit"; "Defensive"])
-   ] ]
-  ;
-END
-
-(** Extend Search to subsume SearchAbout, also adding hidden Type coercions. *)
-
-(* Main prefilter *)
-
-type raw_glob_search_about_item =
-  | RGlobSearchSubPattern of constr_expr
-  | RGlobSearchString of Loc.t * string * string option
-
-let pr_search_item = function
-  | RGlobSearchString (_,s,_) -> str s
-  | RGlobSearchSubPattern p -> pr_constr_expr p
-
-let wit_ssr_searchitem = add_genarg "ssr_searchitem" pr_search_item
-
-let interp_search_notation loc s opt_scope =
-  try
-    let interp = Notation.interp_notation_as_global_reference loc in
-    let ref = interp (fun _ -> true) s opt_scope in
-    Search.GlobSearchSubPattern (Pattern.PRef ref)
-  with _ ->
-    let diagnosis =
-      try
-        let ntns = Notation.locate_notation pr_glob_constr s opt_scope in
-        let ambig = "This string refers to a complex or ambiguous notation." in
-        str ambig ++ str "\nTry searching with one of\n" ++ ntns
-      with _ -> str "This string is not part of an identifier or notation." in
-    Errors.user_err_loc (loc, "interp_search_notation", diagnosis)
-
-let pr_ssr_search_item _ _ _ = pr_search_item
-
-(* Workaround the notation API that can only print notations *)
-
-let is_ident s = try Lexer.check_ident s; true with _ -> false
-
-let is_ident_part s = is_ident ("H" ^ s)
-
-let interp_search_notation loc tag okey =
-  let err msg = Errors.user_err_loc (loc, "interp_search_notation", msg) in
-  let mk_pntn s for_key =
-    let n = String.length s in
-    let s' = String.make (n + 2) ' ' in
-    let rec loop i i' =
-      if i >= n then s', i' - 2 else if s.[i] = ' ' then loop (i + 1) i' else
-      let j = try String.index_from s (i + 1) ' ' with _ -> n in
-      let m = j - i in
-      if s.[i] = '\'' && i < j - 2 && s.[j - 1] = '\'' then
-        (String.blit s (i + 1) s' i' (m - 2); loop (j + 1) (i' + m - 1))
-      else if for_key && is_ident (String.sub s i m) then
-         (s'.[i'] <- '_'; loop (j + 1) (i' + 2))
-      else (String.blit s i s' i' m; loop (j + 1) (i' + m + 1)) in
-    loop 0 1 in
-  let trim_ntn (pntn, m) = String.sub pntn 1 (max 0 m) in
-  let pr_ntn ntn = str "(" ++ str ntn ++ str ")" in
-  let pr_and_list pr = function
-    | [x] -> pr x
-    | x :: lx -> pr_list pr_comma pr lx ++ pr_comma () ++ str "and " ++ pr x
-    | [] -> mt () in
-  let pr_sc sc = str (if sc = "" then "independently" else sc) in
-  let pr_scs = function
-    | [""] -> pr_sc ""
-    | scs -> str "in " ++ pr_and_list pr_sc scs in
-  let generator, pr_tag_sc =
-    let ign _ = mt () in match okey with
-  | Some key ->
-    let sc = Notation.find_delimiters_scope loc key in
-    let pr_sc s_in = str s_in ++ spc() ++ str sc ++ pr_comma() in
-    Notation.pr_scope ign sc, pr_sc
-  | None -> Notation.pr_scopes ign, ign in
-  let qtag s_in = pr_tag_sc s_in ++ qstring tag ++ spc()in
-  let ptag, ttag =
-    let ptag, m = mk_pntn tag false in
-    if m <= 0 then err (str "empty notation fragment");
-    ptag, trim_ntn (ptag, m) in
-  let last = ref "" and last_sc = ref "" in
-  let scs = ref [] and ntns = ref [] in
-  let push_sc sc = match !scs with
-  | "" :: scs' ->  scs := "" :: sc :: scs'
-  | scs' -> scs := sc :: scs' in
-  let get s _ _ = match !last with
-  | "Scope " -> last_sc := s; last := ""
-  | "Lonely notation" -> last_sc := ""; last := ""
-  | "\"" ->
-      let pntn, m = mk_pntn s true in
-      if String.string_contains pntn ptag then begin
-        let ntn = trim_ntn (pntn, m) in
-        match !ntns with
-        | [] -> ntns := [ntn]; scs := [!last_sc]
-        | ntn' :: _ when ntn' = ntn -> push_sc !last_sc
-        | _ when ntn = ttag -> ntns := ntn :: !ntns; scs := [!last_sc]
-        | _ :: ntns' when List.mem ntn ntns' -> ()
-        | ntn' :: ntns' -> ntns := ntn' :: ntn :: ntns'
-      end;
-      last := ""
-  | _ -> last := s in
-  pp_with (Format.make_formatter get (fun _ -> ())) generator;
-  let ntn = match !ntns with
-  | [] ->
-    err (hov 0 (qtag "in" ++ str "does not occur in any notation"))
-  | ntn :: ntns' when ntn = ttag ->
-    if ntns' <> [] then begin
-      let pr_ntns' = pr_and_list pr_ntn ntns' in
-      msg_warning (hov 4 (qtag "In" ++ str "also occurs in " ++ pr_ntns'))
-    end; ntn
-  | [ntn] ->
-    msgnl (hov 4 (qtag "In" ++ str "is part of notation " ++ pr_ntn ntn)); ntn
-  | ntns' ->
-    let e = str "occurs in" ++ spc() ++ pr_and_list pr_ntn ntns' in
-    err (hov 4 (str "ambiguous: " ++ qtag "in" ++ e)) in
-  let (nvars, body), ((_, pat), osc) = match !scs with
-  | [sc] -> Notation.interp_notation loc ntn (None, [sc])
-  | scs' ->
-    try Notation.interp_notation loc ntn (None, []) with _ ->
-    let e = pr_ntn ntn ++ spc() ++ str "is defined " ++ pr_scs scs' in
-    err (hov 4 (str "ambiguous: " ++ pr_tag_sc "in" ++ e)) in
-  let sc = Option.default "" osc in
-  let _ =
-    let m_sc =
-      if osc <> None then str "In " ++ str sc ++ pr_comma() else mt() in
-    let ntn_pat = trim_ntn (mk_pntn pat false) in
-    let rbody = glob_constr_of_notation_constr loc body in
-    let m_body = hov 0 (Constrextern.without_symbols prl_glob_constr rbody) in
-    let m = m_sc ++ pr_ntn ntn_pat ++ spc () ++ str "denotes " ++ m_body in
-    msgnl (hov 0 m) in
-  if List.length !scs > 1 then
-    let scs' = List.remove (=) sc !scs in
-    let w = pr_ntn ntn ++ str " is also defined " ++ pr_scs scs' in
-    msg_warning (hov 4 w)
-  else if String.string_contains ntn " .. " then
-    err (pr_ntn ntn ++ str " is an n-ary notation");
-  let nvars = List.filter (fun (_,(_,typ)) -> typ = NtnTypeConstr) nvars in
-  let rec sub () = function
-  | NVar x when List.mem_assoc x nvars -> GPatVar (loc, (false, x))
-  | c ->
-    glob_constr_of_notation_constr_with_binders loc (fun _ x -> (), x) sub () c in
-  let _, npat = Patternops.pattern_of_glob_constr (sub () body) in
-  Search.GlobSearchSubPattern npat
-
-ARGUMENT EXTEND ssr_search_item TYPED AS ssr_searchitem
-  PRINTED BY pr_ssr_search_item
-  | [ string(s) ] -> [ RGlobSearchString (loc,s,None) ]
-  | [ string(s) "%" preident(key) ] -> [ RGlobSearchString (loc,s,Some key) ]
-  | [ constr_pattern(p) ] -> [ RGlobSearchSubPattern p ]
-END
-
-let pr_ssr_search_arg _ _ _ =
-  let pr_item (b, p) = str (if b then "-" else "") ++ pr_search_item p in
-  pr_list spc pr_item
-
-ARGUMENT EXTEND ssr_search_arg TYPED AS (bool * ssr_searchitem) list
-  PRINTED BY pr_ssr_search_arg
-  | [ "-" ssr_search_item(p) ssr_search_arg(a) ] -> [ (false, p) :: a ]
-  | [ ssr_search_item(p) ssr_search_arg(a) ] -> [ (true, p) :: a ]
-  | [ ] -> [ [] ]
-END
-
-(* Main type conclusion pattern filter *)
-
-let rec splay_search_pattern na = function 
-  | Pattern.PApp (fp, args) -> splay_search_pattern (na + Array.length args) fp
-  | Pattern.PLetIn (_, _, bp) -> splay_search_pattern na bp
-  | Pattern.PRef hr -> hr, na
-  | _ -> Errors.error "no head constant in head search pattern"
-
-let coerce_search_pattern_to_sort hpat =
-  let env = Global.env () and sigma = Evd.empty in
-  let mkPApp fp n_imps args =
-    let args' = Array.append (Array.make n_imps (Pattern.PMeta None)) args in
-    Pattern.PApp (fp, args') in
-  let hr, na = splay_search_pattern 0 hpat in
-  let dc, ht =
-    Reductionops.splay_prod env sigma (Universes.unsafe_type_of_global hr) in
-  let np = List.length dc in
-  if np < na then Errors.error "too many arguments in head search pattern" else
-  let hpat' = if np = na then hpat else mkPApp hpat (np - na) [||] in
-  let warn () =
-    msg_warning (str "Listing only lemmas with conclusion matching " ++ 
-      pr_constr_pattern hpat') in
-  if isSort ht then begin warn (); true, hpat' end else
-  let filter_head, coe_path =
-    try 
-      let _, cp =
-        Classops.lookup_path_to_sort_from (push_rels_assum dc env) sigma ht in
-      warn ();
-      true, cp
-    with _ -> false, [] in
-  let coerce hp coe_index =
-    let coe = Classops.get_coercion_value coe_index in
-    try
-      let coe_ref = reference_of_constr coe in
-      let n_imps = Option.get (Classops.hide_coercion coe_ref) in
-      mkPApp (Pattern.PRef coe_ref) n_imps [|hp|]
-    with _ ->
-    errorstrm (str "need explicit coercion " ++ pr_constr coe ++ spc ()
-            ++ str "to interpret head search pattern as type") in
-  filter_head, List.fold_left coerce hpat' coe_path
-
-let rec interp_head_pat hpat =
-  let filter_head, p = coerce_search_pattern_to_sort hpat in
-  let rec loop c = match kind_of_term c with
-  | Cast (c', _, _) -> loop c'
-  | Prod (_, _, c') -> loop c'
-  | LetIn (_, _, _, c') -> loop c'
-  | _ -> Constr_matching.is_matching (Global.env()) Evd.empty p c in
-  filter_head, loop
-
-let all_true _ = true
-
-let rec interp_search_about args accu = match args with
-| [] -> accu
-| (flag, arg) :: rem ->
-  fun gr env typ ->
-    let ans = Search.search_about_filter arg gr env typ in
-    (if flag then ans else not ans) && interp_search_about rem accu gr env typ
-
-let interp_search_arg arg =
-  let arg = List.map (fun (x,arg) -> x, match arg with
-  | RGlobSearchString (loc,s,key) ->
-      if is_ident_part s then Search.GlobSearchString s else
-      interp_search_notation loc s key
-  | RGlobSearchSubPattern p ->
-      try
-        let intern = Constrintern.intern_constr_pattern in 
-        Search.GlobSearchSubPattern (snd (intern (Global.env()) p))
-      with e -> let e = Errors.push e in iraise (Cerrors.process_vernac_interp_error e)) arg in
-  let hpat, a1 = match arg with
-  | (_, Search.GlobSearchSubPattern (Pattern.PMeta _)) :: a' -> all_true, a'
-  | (true, Search.GlobSearchSubPattern p) :: a' ->
-     let filter_head, p = interp_head_pat p in
-     if filter_head then p, a' else all_true, arg
-  | _ -> all_true, arg in
-  let is_string =
-    function (_, Search.GlobSearchString _) -> true | _ -> false in
-  let a2, a3 = List.partition is_string a1 in
-  interp_search_about (a2 @ a3) (fun gr env typ -> hpat typ)
-
-(* Module path postfilter *)
-
-let pr_modloc (b, m) = if b then str "-" ++ pr_reference m else pr_reference m
-
-let wit_ssrmodloc = add_genarg "ssrmodloc" pr_modloc
-
-let pr_ssr_modlocs _ _ _ ml =
-  if ml = [] then str "" else spc () ++ str "in " ++ pr_list spc pr_modloc ml
-
-ARGUMENT EXTEND ssr_modlocs TYPED AS ssrmodloc list PRINTED BY pr_ssr_modlocs
-  | [ ] -> [ [] ]
-END
-
-GEXTEND Gram
-  GLOBAL: ssr_modlocs;
-  modloc: [[ "-"; m = global -> true, m | m = global -> false, m]];
-  ssr_modlocs: [[ "in"; ml = LIST1 modloc -> ml ]];
-END
-
-let interp_modloc mr =
-  let interp_mod (_, mr) =
-    let (loc, qid) = qualid_of_reference mr in
-    try Nametab.full_name_module qid with Not_found ->
-    Errors.user_err_loc (loc, "interp_modloc", str "No Module " ++ pr_qualid qid) in
-  let mr_out, mr_in = List.partition fst mr in
-  let interp_bmod b = function
-  | [] -> fun _ _ _ -> true
-  | rmods -> Search.module_filter (List.map interp_mod rmods, b) in
-  let is_in = interp_bmod false mr_in and is_out = interp_bmod true mr_out in
-  fun gr env typ -> is_in gr env typ && is_out gr env typ
-
-(* The unified, extended vernacular "Search" command *)
-
-let ssrdisplaysearch gr env t =
-  let pr_res = pr_global gr ++ spc () ++ str " " ++ pr_lconstr_env env Evd.empty t in
-  msg (hov 2 pr_res ++ fnl ())
-
-VERNAC COMMAND EXTEND SsrSearchPattern CLASSIFIED AS QUERY
-| [ "Search" ssr_search_arg(a) ssr_modlocs(mr) ] ->
-  [ let hpat = interp_search_arg a in
-    let in_mod = interp_modloc mr in
-    let post_filter gr env typ = in_mod gr env typ && hpat gr env typ in
-    let display gr env typ =
-      if post_filter gr env typ then ssrdisplaysearch gr env typ
-    in
-    Search.generic_search None display ]
-END
-
-(* }}} *)
-
-(** Alternative notations for "match" and anonymous arguments. {{{ ************)
-
-(* Syntax:                                                        *)
-(*  if <term> is <pattern> then ... else ...                      *)
-(*  if <term> is <pattern> [in ..] return ... then ... else ...   *)
-(*  let: <pattern> := <term> in ...                               *)
-(*  let: <pattern> [in ...] := <term> return ... in ...           *)
-(* The scope of a top-level 'as' in the pattern extends over the  *)
-(* 'return' type (dependent if/let).                              *)
-(* Note that the optional "in ..." appears next to the <pattern>  *)
-(* rather than the <term> in then "let:" syntax. The alternative  *)
-(* would lead to ambiguities in, e.g.,                            *)
-(* let: p1 := (*v---INNER LET:---v *)                             *)
-(*   let: p2 := let: p3 := e3 in k return t in k2 in k1 return t' *)
-(* in b       (*^--ALTERNATIVE INNER LET--------^ *)              *)
-
-(* Caveat : There is no pretty-printing support, since this would *)
-(* require a modification to the Coq kernel (adding a new match   *)
-(* display style -- why aren't these strings?); also, the v8.1    *)
-(* pretty-printer only allows extension hooks for printing        *)
-(* integer or string literals.                                    *)
-(*   Also note that in the v8 grammar "is" needs to be a keyword; *)
-(* as this can't be done from an ML extension file, the new       *)
-(* syntax will only work when ssreflect.v is imported.            *)
-
-let no_ct = None, None and no_rt = None in 
-let aliasvar = function
-  | [_, [CPatAlias (loc, _, id)]] -> Some (loc,Name id)
-  | _ -> None in
-let mk_cnotype mp = aliasvar mp, None in
-let mk_ctype mp t = aliasvar mp, Some t in
-let mk_rtype t = Some t in
-let mk_dthen loc (mp, ct, rt) c = (loc, mp, c), ct, rt in
-let mk_let loc rt ct mp c1 =
-  CCases (loc, LetPatternStyle, rt, ct, [loc, mp, c1]) in
-GEXTEND Gram
-  GLOBAL: binder_constr;
-  ssr_rtype: [[ "return"; t = operconstr LEVEL "100" -> mk_rtype t ]];
-  ssr_mpat: [[ p = pattern -> [!@loc, [p]] ]];
-  ssr_dpat: [
-    [ mp = ssr_mpat; "in"; t = pattern; rt = ssr_rtype -> mp, mk_ctype mp t, rt
-    | mp = ssr_mpat; rt = ssr_rtype -> mp, mk_cnotype mp, rt
-    | mp = ssr_mpat -> mp, no_ct, no_rt
-  ] ];
-  ssr_dthen: [[ dp = ssr_dpat; "then"; c = lconstr -> mk_dthen !@loc dp c ]];
-  ssr_elsepat: [[ "else" -> [!@loc, [CPatAtom (!@loc, None)]] ]];
-  ssr_else: [[ mp = ssr_elsepat; c = lconstr -> !@loc, mp, c ]];
-  binder_constr: [
-    [ "if"; c = operconstr LEVEL "200"; "is"; db1 = ssr_dthen; b2 = ssr_else ->
-      let b1, ct, rt = db1 in CCases (!@loc, MatchStyle, rt, [c, ct], [b1; b2])
-    | "if"; c = operconstr LEVEL "200";"isn't";db1 = ssr_dthen; b2 = ssr_else ->
-      let b1, ct, rt = db1 in 
-      let b1, b2 = 
-        let (l1, p1, r1), (l2, p2, r2) = b1, b2 in (l1, p1, r2), (l2, p2, r1) in
-      CCases (!@loc, MatchStyle, rt, [c, ct], [b1; b2])
-    | "let"; ":"; mp = ssr_mpat; ":="; c = lconstr; "in"; c1 = lconstr ->
-      mk_let (!@loc) no_rt [c, no_ct] mp c1
-    | "let"; ":"; mp = ssr_mpat; ":="; c = lconstr;
-      rt = ssr_rtype; "in"; c1 = lconstr ->
-      mk_let (!@loc) rt [c, mk_cnotype mp] mp c1
-    | "let"; ":"; mp = ssr_mpat; "in"; t = pattern; ":="; c = lconstr;
-      rt = ssr_rtype; "in"; c1 = lconstr ->
-      mk_let (!@loc) rt [c, mk_ctype mp t] mp c1
-  ] ];
-END
-
-GEXTEND Gram
-  GLOBAL: closed_binder;
-  closed_binder: [
-    [ ["of" | "&"]; c = operconstr LEVEL "99" ->
-      [LocalRawAssum ([!@loc, Anonymous], Default Explicit, c)]
-  ] ];
-END
 (* }}} *)
 
 (** Tacticals (+, -, *, done, by, do, =>, first, and last). {{{ ***************)
@@ -1705,7 +1231,7 @@ let hinttac ist is_by (is_or, atacs) =
   | [tac] -> tac
   | tacs -> tclFIRST tacs
 
-(** The "-"/"+"/"*" tacticals. *)
+(** The "-"/"+"/"*" tacticals.              USELESS SINCE COQ HAS NATIVE BULLETS
 
 (* These are just visual cues to flag the beginning of the script for *)
 (* new subgoals, when indentation is not appropriate (typically after *)
@@ -1724,7 +1250,7 @@ set_pr_ssrtac "tclminus" 5 [ArgSep "- "; ArgSsr "tclarg"]
 TACTIC EXTEND ssrtclstar
 | [ "YouShouldNotTypeThis" "*" ssrtclarg(arg) ] -> [ Proofview.V82.tactic (eval_tclarg ist arg) ]
 END
-set_pr_ssrtac "tclstar" 5 [ArgSep "- "; ArgSsr "tclarg"]
+set_pr_ssrtac "tclstar" 5 [ArgSep "* "; ArgSsr "tclarg"]
 
 let gen_tclarg = in_gen (rawwit wit_ssrtclarg)
 
@@ -1742,7 +1268,7 @@ GEXTEND Gram
     ] ];
 END
 
-(** The "by" tactical. *)
+** The "by" tactical. *)
 
 let pr_hint prt arg =
   if arg = nohint then mt() else str "by " ++ pr_hintarg prt arg
@@ -1768,55 +1294,6 @@ GEXTEND Gram
     let garg = in_gen (rawwit wit_ssrhint) arg in
     ssrtac_atom !@loc "tclby" [garg]
   ] ];
-END
-(* }}} *)
-
-
-(** Terms parsing. {{{ ********************************************************)
-
-(* Because we allow wildcards in term references, we need to stage the *)
-(* interpretation of terms so that it occurs at the right time during  *)
-(* the execution of the tactic (e.g., so that we don't report an error *)
-(* for a term that isn't actually used in the execution).              *)
-(*   The term representation tracks whether the concrete initial term  *)
-(* started with an opening paren, which might avoid a conflict between *)
-(* the ssrreflect term syntax and Gallina notation.                    *)
-
-(* kinds of terms *)
-
-type ssrtermkind = char (* print flag *)
-
-let input_ssrtermkind strm = match Compat.get_tok (stream_nth 0 strm) with
-  | Tok.KEYWORD "(" -> '('
-  | Tok.KEYWORD "@" -> '@'
-  | _ -> ' '
-
-let ssrtermkind = Gram.Entry.of_parser "ssrtermkind" input_ssrtermkind
-
-(* terms *)
-let pr_ssrterm _ _ _ = pr_term
-let pf_intern_term ist gl (_, c) = glob_constr ist (pf_env gl) c
-let intern_term ist sigma env (_, c) = glob_constr ist env c
-let interp_term ist gl (_, c) = snd (interp_open_constr ist gl c)
-let force_term ist gl (_, c) = interp_constr ist gl c
-let glob_ssrterm gs = function
-  | k, (_, Some c) -> k, Tacintern.intern_constr gs c
-  | ct -> ct
-let subst_ssrterm s (k, c) = k, Tacsubst.subst_glob_constr_and_expr s c
-let interp_ssrterm _ gl t = Tacmach.project gl, t
-
-ARGUMENT EXTEND ssrterm
-     PRINTED BY pr_ssrterm
-     INTERPRETED BY interp_ssrterm
-     GLOBALIZED BY glob_ssrterm SUBSTITUTED BY subst_ssrterm
-     RAW_TYPED AS cpattern RAW_PRINTED BY pr_ssrterm
-     GLOB_TYPED AS cpattern GLOB_PRINTED BY pr_ssrterm
-| [ "YouShouldNotTypeThis" constr(c) ] -> [ mk_lterm c ]
-END
-
-GEXTEND Gram
-  GLOBAL: ssrterm;
-  ssrterm: [[ k = ssrtermkind; c = constr -> mk_term k c ]];
 END
 (* }}} *)
 
@@ -2087,85 +1564,6 @@ let simpltac = function
   | SimplCut (n,m) -> tclTHEN (safe_simpltac m) (tclTRY (donetac n))
   | Nop -> tclIDTAC
 
-(** Indexes *)
-
-(* Since SSR indexes are always positive numbers, we use the 0 value *)
-(* to encode an omitted index. We reuse the in or_var type, but we   *)
-(* supply our own interpretation function, which checks for non      *)
-(* positive values, and allows the use of constr numerals, so that   *)
-(* e.g., "let n := eval compute in (1 + 3) in (do n!clear)" works.   *)
-
-type ssrindex = int or_var
-
-let pr_index = function
-  | ArgVar (_, id) -> pr_id id
-  | ArgArg n when n > 0 -> int n
-  | _ -> mt ()
-let pr_ssrindex _ _ _ = pr_index
-
-let noindex = ArgArg 0
-let allocc = Some(false,[])
-
-let check_index loc i =
-  if i > 0 then i else loc_error loc "Index not positive"
-let mk_index loc = function ArgArg i -> ArgArg (check_index loc i) | iv -> iv
-
-let interp_index ist gl idx =
-  Tacmach.project gl, 
-  match idx with
-  | ArgArg _ -> idx
-  | ArgVar (loc, id) ->
-    let i =
-      try
-        let v = Id.Map.find id ist.lfun in
-        begin match Value.to_int v with
-        | Some i -> i
-        | None ->
-        begin match Value.to_constr v with
-        | Some c ->
-          let rc = Detyping.detype false [] (pf_env gl) (project gl) c in
-          begin match Notation.uninterp_prim_token rc with
-          | _, Numeral bigi -> int_of_string (Bigint.to_string bigi)
-          | _ -> raise Not_found
-          end
-        | None -> raise Not_found
-        end end
-    with _ -> loc_error loc "Index not a number" in
-    ArgArg (check_index loc i)
-
-ARGUMENT EXTEND ssrindex TYPED AS int_or_var PRINTED BY pr_ssrindex
-  INTERPRETED BY interp_index
-| [ int_or_var(i) ] -> [ mk_index loc i ]
-END
-
-(** Occurrence switch *)
-
-(* The standard syntax of complemented occurrence lists involves a single *)
-(* initial "-", e.g., {-1 3 5}. An initial                                *)
-(* "+" may be used to indicate positive occurrences (the default). The    *)
-(* "+" is optional, except if the list of occurrences starts with a       *)
-(* variable or is empty (to avoid confusion with a clear switch). The     *)
-(* empty positive switch "{+}" selects no occurrences, while the empty    *)
-(* negative switch "{-}" selects all occurrences explicitly; this is the  *)
-(* default, but "{-}" prevents the implicit clear, and can be used to     *)
-(* force dependent elimination -- see ndefectelimtac below.               *)
-
-type ssrocc = occ
-
-let pr_occ = function
-  | Some (true, occ) -> str "{-" ++ pr_list pr_spc int occ ++ str "}"
-  | Some (false, occ) -> str "{+" ++ pr_list pr_spc int occ ++ str "}"
-  | None -> str "{}"
-
-let pr_ssrocc _ _ _ = pr_occ
-
-ARGUMENT EXTEND ssrocc TYPED AS (bool * int list) option PRINTED BY pr_ssrocc
-| [ natural(n) natural_list(occ) ] -> [
-     Some (false, List.map (check_index loc) (n::occ)) ]
-| [ "-" natural_list(occ) ]     -> [ Some (true, occ) ]
-| [ "+" natural_list(occ) ]     -> [ Some (false, occ) ]
-END
-
 let pf_mkprod gl c ?(name=constr_name c) cl =
   let gl, t = pf_type_of gl c in
   if name <> Anonymous || noccurn 1 cl then gl, mkProd (name, t, cl) else
@@ -2173,508 +1571,7 @@ let pf_mkprod gl c ?(name=constr_name c) cl =
 
 let pf_abs_prod name gl c cl = pf_mkprod gl c ~name (subst_term c cl)
 
-(** Discharge occ switch (combined occurrence / clear switch *)
-
-type ssrdocc = ssrclear option * ssrocc option
-
-let mkocc occ = None, occ
-let noclr = mkocc None
-let mkclr clr  = Some clr, None
-let nodocc = mkclr []
-
-let pr_docc = function
-  | None, occ -> pr_occ occ
-  | Some clr, _ -> pr_clear mt clr
-
-let pr_ssrdocc _ _ _ = pr_docc
-
-ARGUMENT EXTEND ssrdocc TYPED AS ssrclear option * ssrocc PRINTED BY pr_ssrdocc
-| [ "{" ne_ssrhyp_list(clr) "}" ] -> [ mkclr clr ]
-| [ "{" ssrocc(occ) "}" ] -> [ mkocc occ ]
-END
-
-(** View hint database and View application. {{{ ******************************)
-
-(* There are three databases of lemmas used to mediate the application  *)
-(* of reflection lemmas: one for forward chaining, one for backward     *)
-(* chaining, and one for secondary backward chaining.                   *)
-
-(* View hints *)
-
-let rec isCxHoles = function (CHole _, None) :: ch -> isCxHoles ch | _ -> false
-
-let pr_raw_ssrhintref prc _ _ = function
-  | CAppExpl (_, (None, r,x), args) when isCHoles args ->
-    prc (CRef (r,x)) ++ str "|" ++ int (List.length args)
-  | CApp (_, (_, CRef _), _) as c -> prc c
-  | CApp (_, (_, c), args) when isCxHoles args ->
-    prc c ++ str "|" ++ int (List.length args)
-  | c -> prc c
-
-let pr_rawhintref = function
-  | GApp (_, f, args) when isRHoles args ->
-    pr_glob_constr f ++ str "|" ++ int (List.length args)
-  | c -> pr_glob_constr c
-
-let pr_glob_ssrhintref _ _ _ (c, _) = pr_rawhintref c
-
-let pr_ssrhintref prc _ _ = prc
-
-let mkhintref loc c n = match c with
-  | CRef (r,x) -> CAppExpl (loc, (None, r, x), mkCHoles loc n)
-  | _ -> mkAppC (c, mkCHoles loc n)
-
-ARGUMENT EXTEND ssrhintref
-                             PRINTED BY pr_ssrhintref
-    RAW_TYPED AS constr  RAW_PRINTED BY pr_raw_ssrhintref
-   GLOB_TYPED AS constr GLOB_PRINTED BY pr_glob_ssrhintref
-  | [ constr(c) ] -> [ c ]
-  | [ constr(c) "|" natural(n) ] -> [ mkhintref loc c n ]
-END
-
-(* View purpose *)
-
-let pr_viewpos = function
-  | 0 -> str " for move/"
-  | 1 -> str " for apply/"
-  | 2 -> str " for apply//"
-  | _ -> mt ()
-
-let pr_ssrviewpos _ _ _ = pr_viewpos
-
-ARGUMENT EXTEND ssrviewpos TYPED AS int PRINTED BY pr_ssrviewpos
-  | [ "for" "move" "/" ] -> [ 0 ]
-  | [ "for" "apply" "/" ] -> [ 1 ]
-  | [ "for" "apply" "/" "/" ] -> [ 2 ]
-  | [ "for" "apply" "//" ] -> [ 2 ]
-  | [ ] -> [ 3 ]
-END
-
-let pr_ssrviewposspc _ _ _ i = pr_viewpos i ++ spc ()
-
-ARGUMENT EXTEND ssrviewposspc TYPED AS ssrviewpos PRINTED BY pr_ssrviewposspc
-  | [ ssrviewpos(i) ] -> [ i ]
-END
-
-(* The table and its display command *)
-
-let viewtab : glob_constr list array = Array.make 3 []
-
-let _ =
-  let init () = Array.fill viewtab 0 3 [] in
-  let freeze _ = Array.copy viewtab in
-  let unfreeze vt = Array.blit vt 0 viewtab 0 3 in
-  Summary.declare_summary "ssrview"
-    { Summary.freeze_function   = freeze;
-      Summary.unfreeze_function = unfreeze;
-      Summary.init_function     = init }
-
-let mapviewpos f n k = if n < 3 then f n else for i = 0 to k - 1 do f i done
-
-let print_view_hints i =
-  let pp_viewname = str "Hint View" ++ pr_viewpos i ++ str " " in
-  let pp_hints = pr_list spc pr_rawhintref viewtab.(i) in
-  ppnl (pp_viewname ++ hov 0 pp_hints ++ Pp.cut ())
-
-VERNAC COMMAND EXTEND PrintView CLASSIFIED AS QUERY
-| [ "Print" "Hint" "View" ssrviewpos(i) ] -> [ mapviewpos print_view_hints i 3 ]
-END
-
-(* Populating the table *)
-
-let cache_viewhint (_, (i, lvh)) =
-  let mem_raw h = List.exists (Notation_ops.eq_glob_constr h) in
-  let add_hint h hdb = if mem_raw h hdb then hdb else h :: hdb in
-  viewtab.(i) <- List.fold_right add_hint lvh viewtab.(i)
-
-let subst_viewhint ( subst, (i, lvh as ilvh)) =
-  let lvh' = List.smartmap (Detyping.subst_glob_constr subst) lvh in
-  if lvh' == lvh then ilvh else i, lvh'
-      
-let classify_viewhint x = Libobject.Substitute x
-
-let in_viewhint =
-  Libobject.declare_object {(Libobject.default_object "VIEW_HINTS") with
-       Libobject.open_function = (fun i o -> if i = 1 then cache_viewhint o);
-       Libobject.cache_function = cache_viewhint;
-       Libobject.subst_function = subst_viewhint;
-       Libobject.classify_function = classify_viewhint }
-
-let glob_view_hints lvh =
-  List.map (Constrintern.intern_constr (Global.env ())) lvh
-
-let add_view_hints lvh i = Lib.add_anonymous_leaf (in_viewhint (i, lvh))
-
-VERNAC COMMAND EXTEND HintView CLASSIFIED AS SIDEFF
-  |  [ "Hint" "View" ssrviewposspc(n) ne_ssrhintref_list(lvh) ] ->
-     [ mapviewpos (add_view_hints (glob_view_hints lvh)) n 2 ]
-END
-
-(** Views *)
-
-(* Views for the "move" and "case" commands are actually open *)
-(* terms, but this is handled by interp_view, which is called *)
-(* by interp_casearg. We use lists, to support the            *)
-(* "double-view" feature of the apply command.                *)
-
-(* type ssrview = ssrterm list *)
-
-let pr_view = pr_list mt (fun c -> str "/" ++ pr_term c)
-
-let pr_ssrview _ _ _ = pr_view
-
-ARGUMENT EXTEND ssrview TYPED AS ssrterm list
-   PRINTED BY pr_ssrview
-| [ "YouShouldNotTypeThis" ] -> [ [] ]
-END
-
-Pcoq.(
-GEXTEND Gram
-  GLOBAL: ssrview;
-  ssrview: [
-    [  test_not_ssrslashnum; "/"; c = constr -> [mk_term ' ' c]
-    |  test_not_ssrslashnum; "/"; c = constr; w = ssrview ->
-                    (mk_term ' ' c) :: w ]];
-END
-)
-
-(* }}} *)
- 
 (** Extended intro patterns {{{ ***********************************************)
-
-
-let remove_loc = snd
-
-let rec ipat_of_intro_pattern = function
-  | IntroNaming (IntroIdentifier id) -> IpatId id
-  | IntroAction IntroWildcard -> IpatWild
-  | IntroAction (IntroOrAndPattern iorpat) ->
-    IpatCase (`Regular
-      (List.map (List.map ipat_of_intro_pattern) 
-	 (List.map (List.map remove_loc) iorpat)))
-  | IntroNaming IntroAnonymous -> IpatAnon
-  | IntroAction (IntroRewrite b) -> IpatRw (allocc, if b then L2R else R2L)
-  | IntroNaming (IntroFresh id) -> IpatAnon
-  | IntroAction (IntroApplyOn _) -> (* to do *) Errors.error "TO DO"
-  | IntroAction (IntroInjection ips) ->
-      IpatInj [List.map ipat_of_intro_pattern (List.map remove_loc ips)]
-  | IntroForthcoming _ -> (* Unable to determine which kind of ipat interp_introid could return [HH] *)
-      assert false
-
-let rec pr_ipat = function
-  | IpatId id -> pr_id id
-  | IpatSimpl (clr, sim) -> pr_clear mt clr ++ pr_simpl sim
-  | IpatCase (`Regular iorpat) -> hov 1 (str "[" ++ pr_iorpat iorpat ++ str "]")
-  | IpatCase (`Block(before,seed,after)) ->
-       hov 1 (str "[" ++ pr_iorpat before
-                      ++ pr_seed before seed
-                      ++ pr_iorpat after ++ str "]")
-  | IpatSeed s -> pr_seed [] s
-  | IpatInj iorpat -> hov 1 (str "[=" ++ pr_iorpat iorpat ++ str "]")
-  | IpatRw (occ, dir) -> pr_occ occ ++ pr_dir dir
-  | IpatAll -> str "*"
-  | IpatWild -> str "_"
-  | IpatAnon -> str "?"
-  | IpatView v -> pr_view v
-  | IpatNoop -> str "-"
-  | IpatNewHidden l -> str "[:" ++ pr_list spc pr_id l ++ str "]"
-  | IpatFastMode -> str ">"
-  | IpatTmpId -> str "+"
-and pr_space_notFM = function IpatFastMode :: _ -> str"" | _ -> str" "
-and pr_iorpat iorpat = pr_list pr_bar pr_ipats iorpat
-and pr_ipats ipats = pr_space_notFM ipats ++ pr_list spc pr_ipat ipats
-and pr_seed before seed =
-  (if before <> [] then str"|" else str"") ++
-  match seed with
-  | `Id(id,side) -> str"^" ++ str(if side = `Post then "~" else "") ++ pr_id id
-  | `Anon -> str "^ ? "
-  | `Wild -> str "^ _ "
-
-let wit_ssripatrep = add_genarg "ssripatrep" pr_ipat
-
-let pr_ssripat _ _ _ = pr_ipat
-let pr_ssripats _ _ _ = pr_ipats
-let pr_ssriorpat _ _ _ = pr_iorpat
-
-let intern_ipat ist ipat =
-  let rec check_pat = function
-  | IpatSimpl (clr, _) -> ignore (List.map (intern_hyp ist) clr)
-  | IpatCase (`Regular iorpat) -> List.iter (List.iter check_pat) iorpat
-  | IpatCase (`Block (before,_,after)) ->
-       List.iter (List.iter check_pat) (before @ after)
-  | IpatInj iorpat -> List.iter (List.iter check_pat) iorpat
-  | _ -> () in
-  check_pat ipat; ipat
-
-let intern_ipats ist = List.map (intern_ipat ist)
-
-let interp_introid ist gl id =
- try IntroNaming (IntroIdentifier (hyp_id (snd (interp_hyp ist gl (SsrHyp (dummy_loc, id))))))
- with _ -> snd(snd (interp_intro_pattern ist gl (dummy_loc,IntroNaming (IntroIdentifier id))))
-
-let rec add_intro_pattern_hyps (loc, ipat) hyps = match ipat with
-  | IntroNaming (IntroIdentifier id) ->
-    if not_section_id id then SsrHyp (loc, id) :: hyps else
-    hyp_err loc "Can't delete section hypothesis " id
-  | IntroAction IntroWildcard -> hyps
-  | IntroAction (IntroOrAndPattern iorpat) ->
-    List.fold_right (List.fold_right add_intro_pattern_hyps) iorpat hyps
-  | IntroNaming IntroAnonymous -> []
-  | IntroNaming (IntroFresh _) -> []
-  | IntroAction (IntroRewrite _) -> hyps
-  | IntroAction (IntroInjection ips) -> List.fold_right add_intro_pattern_hyps ips hyps
-  | IntroAction (IntroApplyOn (c,pat)) -> add_intro_pattern_hyps pat hyps
-  | IntroForthcoming _ -> 
-    (* As in ipat_of_intro_pattern, was unable to determine which kind
-      of ipat interp_introid could return [HH] *) assert false
-
-let rec interp_ipat ist gl =
-  let ltacvar id = Id.Map.mem id ist.lfun in
-  let interp_seed = function
-    | (`Anon | `Wild) as x -> x
-    | `Id(id,side) ->
-        match interp_introid ist gl id with
-        | IntroNaming (IntroIdentifier id) -> `Id(id,side)
-        | _ -> `Id(Id.of_string "_",`Pre) in
-  let rec interp = function
-  | IpatId id when ltacvar id ->
-    ipat_of_intro_pattern (interp_introid ist gl id)
-  | IpatSimpl (clr, sim) ->
-    let add_hyps (SsrHyp (loc, id) as hyp) hyps =
-      if not (ltacvar id) then hyp :: hyps else
-      add_intro_pattern_hyps (loc, (interp_introid ist gl id)) hyps in
-    let clr' = List.fold_right add_hyps clr [] in
-    check_hyps_uniq [] clr'; IpatSimpl (clr', sim)
-  | IpatCase(`Regular iorpat) ->
-      IpatCase(`Regular(List.map (List.map interp) iorpat))
-  | IpatCase(`Block (before,seed,after)) ->
-      let before = List.map (List.map interp) before in
-      let seed = interp_seed seed in
-      let after = List.map (List.map interp) after in
-      IpatCase(`Block (before,seed,after))
-  | IpatSeed s -> IpatSeed (interp_seed s)
-  | IpatInj iorpat -> IpatInj (List.map (List.map interp) iorpat)
-  | IpatNewHidden l ->
-      IpatNewHidden
-        (List.map (function
-           | IntroNaming (IntroIdentifier id) -> id
-           | _ -> assert false)
-        (List.map (interp_introid ist gl) l))
-  | ipat -> ipat in
-  interp
-
-let interp_ipats ist gl l = project gl, List.map (interp_ipat ist gl) l
-
-let pushIpatRw = function
-  | pats :: orpat -> (IpatRw (allocc, L2R) :: pats) :: orpat
-  | [] -> []
-
-let pushIpatNoop = function
-  | pats :: orpat -> (IpatNoop :: pats) :: orpat
-  | [] -> []
-
-ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
-  INTERPRETED BY interp_ipats
-  GLOBALIZED BY intern_ipats
-  | [ "_" ] -> [ [IpatWild] ]
-  | [ "*" ] -> [ [IpatAll] ]
-  | [ "^" "*" ] -> [ [IpatFastMode] ]
-  | [ "^" "_" ] -> [ [IpatSeed `Wild] ]
-  | [ "^_" ] -> [ [IpatSeed `Wild] ]
-  | [ "^" "?" ] -> [ [IpatSeed `Anon] ]
-  | [ "^?" ] -> [ [IpatSeed `Anon] ]
-  | [ "^" ident(id) ] -> [ [IpatSeed (`Id(id,`Pre))] ]
-  | [ "^" "~" ident(id) ] -> [ [IpatSeed (`Id(id,`Post))] ]
-  | [ "^~" ident(id) ] -> [ [IpatSeed (`Id(id,`Post))] ]
-  | [ ident(id) ] -> [ [IpatId id] ]
-  | [ "?" ] -> [ [IpatAnon] ]
-  | [ "+" ] -> [ [IpatTmpId] ]
-  | [ ssrsimpl_ne(sim) ] -> [ [IpatSimpl ([], sim)] ]
-  | [ ssrdocc(occ) "->" ] -> [ match occ with
-      | None, occ -> [IpatRw (occ, L2R)]
-      | Some clr, _ -> [IpatSimpl (clr, Nop); IpatRw (allocc, L2R)]]
-  | [ ssrdocc(occ) "<-" ] -> [ match occ with
-      | None, occ ->  [IpatRw (occ, R2L)]
-      | Some clr, _ -> [IpatSimpl (clr, Nop); IpatRw (allocc, R2L)]]
-  | [ ssrdocc(occ) ] -> [ match occ with
-      | Some cl, _ -> check_hyps_uniq [] cl; [IpatSimpl (cl, Nop)]
-      | _ -> loc_error loc "Only identifiers are allowed here"]
-  | [ "->" ] -> [ [IpatRw (allocc, L2R)] ]
-  | [ "<-" ] -> [ [IpatRw (allocc, R2L)] ]
-  | [ "-" ] -> [ [IpatNoop] ]
-  | [ "-/" "=" ] -> [ [IpatNoop;IpatSimpl([],Simpl ~-1)] ]
-  | [ "-/=" ] -> [ [IpatNoop;IpatSimpl([],Simpl ~-1)] ]
-  | [ "-/" "/" ] -> [ [IpatNoop;IpatSimpl([],Cut ~-1)] ]
-  | [ "-//" ] -> [ [IpatNoop;IpatSimpl([],Cut ~-1)] ]
-  | [ "-/" integer(n) "/" ] -> [ [IpatNoop;IpatSimpl([],Cut n)] ]
-  | [ "-/" "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (~-1,~-1))] ]
-  | [ "-//" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (~-1,~-1))] ]
-  | [ "-//=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (~-1,~-1))] ]
-  | [ "-/" integer(n) "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut (n,~-1))] ]
-  | [ "-/" integer(n) "/" integer (m) "=" ] ->
-      [ [IpatNoop;IpatSimpl([],SimplCut(n,m))] ]
-  | [ ssrview(v) ] -> [ [IpatView v] ]
-  | [ "[" ":" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
-  | [ "[:" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
-END
-
-ARGUMENT EXTEND ssripats TYPED AS ssripat PRINTED BY pr_ssripats
-  | [ ssripat(i) ssripats(tl) ] -> [ i @ tl ]
-  | [ ] -> [ [] ]
-END
-
-ARGUMENT EXTEND ssriorpat TYPED AS ssripat list PRINTED BY pr_ssriorpat
-| [ ssripats(pats) "|" ssriorpat(orpat) ] -> [ pats :: orpat ]
-| [ ssripats(pats) "|-" ">" ssriorpat(orpat) ] -> [ pats :: pushIpatRw orpat ]
-| [ ssripats(pats) "|-" ssriorpat(orpat) ] -> [ pats :: pushIpatNoop orpat ]
-| [ ssripats(pats) "|->" ssriorpat(orpat) ] -> [ pats :: pushIpatRw orpat ]
-| [ ssripats(pats) "||" ssriorpat(orpat) ] -> [ pats :: [] :: orpat ]
-| [ ssripats(pats) "|||" ssriorpat(orpat) ] -> [ pats :: [] :: [] :: orpat ]
-| [ ssripats(pats) "||||" ssriorpat(orpat) ] -> [ [pats; []; []; []] @ orpat ]
-| [ ssripats(pats) ] -> [ [pats] ]
-END
-
-let reject_ssrhid strm =
-  match Compat.get_tok (stream_nth 0 strm) with
-  | Tok.KEYWORD "[" ->
-      (match Compat.get_tok (stream_nth 1 strm) with
-      | Tok.KEYWORD ":" -> raise Stream.Failure
-      | _ -> ())
-  | _ -> ()
-
-let test_nohidden = Gram.Entry.of_parser "test_ssrhid" reject_ssrhid
-
-ARGUMENT EXTEND ssrcpat TYPED AS ssripatrep PRINTED BY pr_ssripat
-  | [ "YouShouldNotTypeThis" ssriorpat(x) ] -> [ IpatCase(`Regular x) ]
-END
-
-let understand_case_type ior =
-  let rec aux before = function
-    | [] -> `Regular (List.rev before)
-    | [IpatSeed seed] :: rest -> `Block(List.rev before, seed, rest)
-    | ips :: rest -> aux (ips :: before) rest
-  in
-    aux [] ior
-
-let rec check_no_inner_seed loc seen = function
-  | [] -> ()
-  | x :: xs ->
-     let in_x = List.exists (function IpatSeed _ -> true | _ -> false) x in
-     if seen && in_x then
-        Errors.user_err_loc (loc, "ssreflect",
-            strbrk "Only one block ipat per elimination is allowed")
-     else if List.length x < 2 ||
-        List.for_all (function
-          | IpatSeed _ -> false
-          | IpatInj l | IpatCase (`Regular l) ->
-              check_no_inner_seed loc false l; true
-          | IpatCase (`Block(before,_,after)) ->
-              check_no_inner_seed loc false before;
-              check_no_inner_seed loc false after; true
-          | _ -> true) x
-     then check_no_inner_seed loc (seen || in_x) xs
-     else Errors.user_err_loc (loc, "ssreflect",
-            strbrk "Mixing block and regular ipat is forbidden")
-
-GEXTEND Gram
-  GLOBAL: ssrcpat;
-  ssrcpat: [
-   [ test_nohidden; "["; iorpat = ssriorpat; "]" ->
-      check_no_inner_seed !@loc false iorpat;
-      IpatCase (understand_case_type iorpat)
-   | test_nohidden; "[="; iorpat = ssriorpat; "]" ->
-      check_no_inner_seed !@loc false iorpat;
-      IpatInj iorpat ]];
-END
-
-GEXTEND Gram
-  GLOBAL: ssripat;
-  ssripat: [[ pat = ssrcpat -> [pat] ]];
-END
-
-ARGUMENT EXTEND ssripats_ne TYPED AS ssripat PRINTED BY pr_ssripats
-  | [ ssripat(i) ssripats(tl) ] -> [ i @ tl ]
-END
-
-(* subsets of patterns *)
-let check_ssrhpats loc w_binders ipats =
-  let err_loc s = Errors.user_err_loc (loc, "ssreflect", s) in
-  let clr, ipats =
-    let rec aux clr = function
-      | IpatSimpl (cl, Nop) :: tl -> aux (clr @ cl) tl
-      | IpatSimpl (cl, sim) :: tl -> clr @ cl, IpatSimpl ([], sim) :: tl
-      | tl -> clr, tl
-    in aux [] ipats in
-  let simpl, ipats = 
-    match List.rev ipats with
-    | IpatSimpl ([],_) as s :: tl -> [s], List.rev tl
-    | _ -> [],  ipats in
-  if simpl <> [] && not w_binders then
-    err_loc (str "No s-item allowed here: " ++ pr_ipats simpl);
-  let ipat, binders =
-    let rec loop ipat = function
-      | [] -> ipat, []
-      | ( IpatId _| IpatAnon| IpatCase _| IpatRw _ as i) :: tl -> 
-        if w_binders then
-          if simpl <> [] && tl <> [] then 
-            err_loc(str"binders XOR s-item allowed here: "++pr_ipats(tl@simpl))
-          else if not (List.for_all (function IpatId _ -> true | _ -> false) tl)
-          then err_loc (str "Only binders allowed here: " ++ pr_ipats tl)
-          else ipat @ [i], tl
-        else
-          if tl = [] then  ipat @ [i], []
-          else err_loc (str "No binder or s-item allowed here: " ++ pr_ipats tl)
-      | hd :: tl -> loop (ipat @ [hd]) tl
-    in loop [] ipats in
-  ((clr, ipat), binders), simpl
-
-let single loc =
-  function [x] -> x | _ -> loc_error loc "Only one intro pattern is allowed"
-
-let pr_hpats (((clr, ipat), binders), simpl) =
-   pr_clear mt clr ++ pr_ipats ipat ++ pr_ipats binders ++ pr_ipats simpl
-let pr_ssrhpats _ _ _ = pr_hpats
-let pr_ssrhpats_wtransp _ _ _ (_, x) = pr_hpats x
-
-ARGUMENT EXTEND ssrhpats TYPED AS ((ssrclear * ssripat) * ssripat) * ssripat
-PRINTED BY pr_ssrhpats
-  | [ ssripats(i) ] -> [ check_ssrhpats loc true i ]
-END
-
-ARGUMENT EXTEND ssrhpats_wtransp
-  TYPED AS bool * (((ssrclear * ssripat) * ssripat) * ssripat)
-  PRINTED BY pr_ssrhpats_wtransp
-  | [ ssripats(i) ] -> [ false,check_ssrhpats loc true i ]
-  | [ ssripats(i) "@" ssripats(j) ] -> [ true,check_ssrhpats loc true (i @ j) ]
-END
-
-ARGUMENT EXTEND ssrhpats_nobs 
-TYPED AS ((ssrclear * ssripat) * ssripat) * ssripat PRINTED BY pr_ssrhpats
-  | [ ssripats(i) ] -> [ check_ssrhpats loc false i ]
-END
-
-ARGUMENT EXTEND ssrrpat TYPED AS ssripatrep PRINTED BY pr_ssripat
-  | [ "->" ] -> [ IpatRw (allocc, L2R) ]
-  | [ "<-" ] -> [ IpatRw (allocc, R2L) ]
-END
-
-type ssrintros = ssripats
-
-let pr_intros sep intrs =
-  if intrs = [] then mt() else sep () ++ str "=>" ++ pr_ipats intrs
-let pr_ssrintros _ _ _ = pr_intros mt
-
-ARGUMENT EXTEND ssrintros_ne TYPED AS ssripat
- PRINTED BY pr_ssrintros
-  | [ "=>" ssripats_ne(pats) ] -> [ pats ]
-  | [ "=>" ">" ssripats_ne(pats) ] -> [ IpatFastMode :: pats ]
-  | [ "=>>" ssripats_ne(pats) ] -> [ IpatFastMode :: pats ]
-END
-
-ARGUMENT EXTEND ssrintros TYPED AS ssrintros_ne PRINTED BY pr_ssrintros
-  | [ ssrintros_ne(intrs) ] -> [ intrs ]
-  | [ ] -> [ [] ]
-END
 
 (* There are two ways of "applying" a view to term:            *)
 (*  1- using a view hint if the view is an instance of some    *)
@@ -2703,7 +1600,7 @@ let interp_view ist si env sigma gv v rid =
   let rec view_with = function
   | [] -> simple_view [rid] (interp_nbargs ist (re_sig si sigma) rv)
   | hint :: hints -> try interp hint view_args with _ -> view_with hints in
-  snd (view_with (if view_nbimps < 0 then [] else viewtab.(0)))
+  snd (view_with (if view_nbimps < 0 then [] else Ssrvernac.viewtab.(0)))
 
 let top_id = mk_internal_id "top assumption"
 
@@ -2733,7 +1630,7 @@ let with_view ist ~next si env (gl0 : (Proof_type.goal * tac_ctx) Evd.sigma) c n
         match kind_of_term c' with
         | Var id -> ist,mkRVar id
         | _ -> c2r ist c',mkRltacVar top_id in
-      let v = intern_term ist sigma env f in
+      let v = intern_term ist env f in
       let tactic_view = mkSsrRef "tactic_view" in
       match v with
       | GApp (loc, GRef (_,box,None), [GHole (_,_,_, Some tac)])
@@ -3193,19 +2090,6 @@ END
 
 (** Multipliers {{{ ***********************************************************)
 
-(* modality *)
-
-type ssrmmod = May | Must | Once
-
-let pr_mmod = function May -> str "?" | Must -> str "!" | Once -> mt ()
-
-let wit_ssrmmod = add_genarg "ssrmmod" pr_mmod
-let ssrmmod = Pcoq.create_generic_entry "ssrmmod" (Genarg.rawwit wit_ssrmmod)
-GEXTEND Gram
-  GLOBAL: ssrmmod;
-  ssrmmod: [[ "!" -> Must | LEFTQMARK -> May | "?" -> May]];
-END
-
 (* tactical *)
 
 let tclID tac = tac
@@ -3488,7 +2372,7 @@ let pf_interp_ty ?(resolve_typeclasses=false) ist gl ty =
        CProdN (l, abs, force_type t)
      | CLetIn (l, n, v, t) -> incr n_binders; CLetIn (l, n, v, force_type t)
      | ty -> mkCCast dummy_loc ty (mkCType dummy_loc) in
-     mk_term ' ' (force_type ty) in
+     mk_term NoFlag (force_type ty) in
    let strip_cast (sigma, t) =
      let rec aux t = match kind_of_type t with
      | CastType (t, ty) when !n_binders = 0 && isSort ty -> t
@@ -3578,7 +2462,7 @@ let hyp_of_var v =  SsrHyp (dummy_loc, destVar v)
 
 let interp_clr = function
 | Some clr, (k, c) 
-  when (k = ' '  || k = '@') && is_pf_var c -> hyp_of_var c :: clr 
+  when (k = NoFlag  || k = WithAt) && is_pf_var c -> hyp_of_var c :: clr 
 | Some clr, _ -> clr
 | None, _ -> []
 
@@ -3591,7 +2475,7 @@ let pf_interp_gen_aux ist gl to_ind ((oclr, occ), t) =
     with NoMatch -> redex_of_pattern env pat, cl in
   let clr = interp_clr (oclr, (tag_of_cpattern t, c)) in
   if not(occur_existential c) then
-    if tag_of_cpattern t = '@' then 
+    if tag_of_cpattern t = WithAt then 
       if not (isVar c) then
 	errorstrm (str "@ can be used with variables only")
       else match pf_get_hyp gl (destVar c) with
@@ -4507,7 +3391,7 @@ let interp_agen ist gl ((goclr, _), (k, gc)) (clr, rcs) =
   | None -> clr, rcs'
   | Some ghyps ->
     let clr' = snd (interp_hyps ist gl ghyps) @ clr in
-    if k <> ' ' then clr', rcs' else
+    if k <> NoFlag then clr', rcs' else
     match rc with
     | GVar (loc, id) when not_section_id id -> SsrHyp (loc, id) :: clr', rcs'
     | GRef (loc, VarRef id, _) when not_section_id id ->
@@ -4557,7 +3441,8 @@ let refine_interp_apply_view i ist gl gv =
   let rec loop = function
   | [] -> (try apply_rconstr ~ist rv gl with _ -> view_error "apply" gv)
   | h :: hs -> (try refine_with (snd (interp_with h)) gl with _ -> loop hs) in
-  loop (pair i viewtab.(i) @ if i = 2 then pair 1 viewtab.(1) else [])
+  loop (pair i Ssrvernac.viewtab.(i) @
+        if i = 2 then pair 1 Ssrvernac.viewtab.(1) else [])
 
 let apply_top_tac gl =
   tclTHENLIST [introid top_id; apply_rconstr (mkRVar top_id); clear [top_id]] gl
@@ -4622,10 +3507,10 @@ let pr_ssrcongrarg _ _ _ ((n, f), dgens) =
 
 ARGUMENT EXTEND ssrcongrarg TYPED AS (int * ssrterm) * ssrdgens
   PRINTED BY pr_ssrcongrarg
-| [ natural(n) constr(c) ssrdgens(dgens) ] -> [ (n, mk_term ' ' c), dgens ]
-| [ natural(n) constr(c) ] -> [ (n, mk_term ' ' c),([[]],[]) ]
-| [ constr(c) ssrdgens(dgens) ] -> [ (0, mk_term ' ' c), dgens ]
-| [ constr(c) ] -> [ (0, mk_term ' ' c), ([[]],[]) ]
+| [ natural(n) constr(c) ssrdgens(dgens) ] -> [ (n, mk_term NoFlag c), dgens ]
+| [ natural(n) constr(c) ] -> [ (n, mk_term NoFlag c),([[]],[]) ]
+| [ constr(c) ssrdgens(dgens) ] -> [ (0, mk_term NoFlag c), dgens ]
+| [ constr(c) ] -> [ (0, mk_term NoFlag c), ([[]],[]) ]
 END
 
 let rec mkRnat n =
@@ -4728,28 +3613,6 @@ let _ =
       Goptions.optdepr  = false;
       Goptions.optwrite = (fun b -> ssr_strict_match := b) }
 
-(** Rewrite multiplier *)
-
-type ssrmult = int * ssrmmod
-
-let notimes = 0
-let nomult = 1, Once
-
-let pr_mult (n, m) =
-  if n > 0 && m <> Once then int n ++ pr_mmod m else pr_mmod m
-
-let pr_ssrmult _ _ _ = pr_mult
-
-ARGUMENT EXTEND ssrmult_ne TYPED AS int * ssrmmod PRINTED BY pr_ssrmult
-  | [ natural(n) ssrmmod(m) ] -> [ check_index loc n, m ]
-  | [ ssrmmod(m) ]            -> [ notimes, m ]
-END
-
-ARGUMENT EXTEND ssrmult TYPED AS ssrmult_ne PRINTED BY pr_ssrmult
-  | [ ssrmult_ne(m) ] -> [ m ]
-  | [ ] -> [ nomult ]
-END
-
 (** Rewrite clear/occ switches *)
 
 let pr_rwocc = function
@@ -4784,7 +3647,7 @@ let pr_rule = function
 
 let pr_ssrrule _ _ _ = pr_rule
 
-let noruleterm loc = mk_term ' ' (mkCProp loc)
+let noruleterm loc = mk_term NoFlag (mkCProp loc)
 
 ARGUMENT EXTEND ssrrule_ne TYPED AS ssrrwkind * ssrterm PRINTED BY pr_ssrrule
   | [ "YouShouldNotTypeThis" ] -> [ anomaly "Grammar placeholder match" ]
@@ -4904,7 +3767,7 @@ let rec get_evalref c =  match kind_of_term c with
 
 (* Strip a pattern generated by a prenex implicit to its constant. *)
 let strip_unfold_term ((sigma, t) as p) kt = match kind_of_term t with
-  | App (f, a) when kt = ' ' && Array.for_all isEvar a && isConst f -> 
+  | App (f, a) when kt = NoFlag && Array.for_all isEvar a && isConst f -> 
     (sigma, f), true
   | Const _ | Var _ -> p, true
   | _ -> p, false
@@ -5383,7 +4246,7 @@ let unlocktac ist args gl =
   let locked, gl = pf_mkSsrConst "locked" gl in
   let key, gl = pf_mkSsrConst "master_key" gl in
   let ktacs = [
-    (fun gl -> unfoldtac None None (project gl,locked) '(' gl); 
+    (fun gl -> unfoldtac None None (project gl,locked) InParens gl); 
     simplest_newcase key ] in
   tclTHENLIST (List.map utac args @ ktacs) gl
 
@@ -5574,10 +4437,10 @@ let wit_ssrfwdfmt = add_genarg "ssrfwdfmt" pr_fwdfmt
 
 (* type ssrfwd = ssrfwdfmt * ssrterm *)
 
-let mkFwdVal fk c = ((fk, []), mk_term ' ' c)
+let mkFwdVal fk c = ((fk, []), mk_term NoFlag c)
 let mkssrFwdVal fk c = ((fk, []), (c,None))
 
-let mkFwdCast fk loc t c = ((fk, [BFcast]), mk_term ' ' (CCast (loc, c, dC t)))
+let mkFwdCast fk loc t c = ((fk, [BFcast]), mk_term NoFlag (CCast (loc, c, dC t)))
 let mkssrFwdCast fk loc t c = ((fk, [BFcast]), (c, Some t))
 
 let mkFwdHint s t =
@@ -5960,8 +4823,8 @@ let havetac ist
     let gl, _ = pf_e_type_of gl idty in
     pf_unify_HO gl args_id.(2) abstract_key in
  tclTHENFIRST itac_mkabs (fun gl ->
-  let mkt t = mk_term ' ' t in
-  let mkl t = (' ', (t, None)) in
+  let mkt t = mk_term NoFlag t in
+  let mkl t = (NoFlag, (t, None)) in
   let interp gl rtc t = pf_abs_ssrterm ~resolve_typeclasses:rtc ist gl t in
   let interp_ty gl rtc t =
     let a,b,_,u = pf_interp_ty ~resolve_typeclasses:rtc ist gl t in a,b,u in
@@ -6336,65 +5199,6 @@ TACTIC EXTEND ssrgenhave2
     ssr_idcomma(id) ssrhpats_nobs(pats) ssrwlogfwd(fwd) ssrhint(hint) ] ->
   [ let pats = augment_preclr clr pats in
     Proofview.V82.tactic (wlogtac ist pats fwd hint false (`Gen id)) ]
-END
-
-(** Canonical Structure alias *)
-
-GEXTEND Gram
-  GLOBAL: gallina_ext;
-
-  gallina_ext:
-      (* Canonical structure *)
-     [[ IDENT "Canonical"; qid = Constr.global ->
-	  Vernacexpr.VernacCanonical (AN qid)
-      | IDENT "Canonical"; ntn = Prim.by_notation ->
-	  Vernacexpr.VernacCanonical (ByNotation ntn)
-      | IDENT "Canonical"; qid = Constr.global;
-          d = G_vernac.def_body ->
-          let s = coerce_reference_to_id qid in
-	  Vernacexpr.VernacDefinition
-	    ((Some Decl_kinds.Global,Decl_kinds.CanonicalStructure),
-             ((dummy_loc,s),None),(d  ))
-  ]];
-END
-
-(** 9. Keyword compatibility fixes. *)
-
-(* Coq v8.1 notation uses "by" and "of" quasi-keywords, i.e., reserved *)
-(* identifiers used as keywords. This is incompatible with ssreflect.v *)
-(* which makes "by" and "of" true keywords, because of technicalities  *)
-(* in the internal lexer-parser API of Coq. We patch this here by      *)
-(* adding new parsing rules that recognize the new keywords.           *)
-(*   To make matters worse, the Coq grammar for tactics fails to       *)
-(* export the non-terminals we need to patch. Fortunately, the CamlP5  *)
-(* API provides a backdoor access (with loads of Obj.magic trickery).  *)
-
-(* Coq v8.3 defines "by" as a keyword, some hacks are not needed any   *)
-(* longer and thus comment out. Such comments are marked with v8.3     *)
-
-GEXTEND Gram
-  GLOBAL: Tactic.hypident;
-  Tactic.hypident: [
-  [ "("; IDENT "type"; "of"; id = Prim.identref; ")" -> id, InHypTypeOnly
-  | "("; IDENT "value"; "of"; id = Prim.identref; ")" -> id, InHypValueOnly
-  ] ];
-END
-
-GEXTEND Gram
-  GLOBAL: hloc;
-hloc: [
-  [ "in"; "("; "Type"; "of"; id = ident; ")" -> 
-    HypLocation ((dummy_loc,id), InHypTypeOnly)
-  | "in"; "("; IDENT "Value"; "of"; id = ident; ")" -> 
-    HypLocation ((dummy_loc,id), InHypValueOnly)
-  ] ];
-END
-
-GEXTEND Gram
-  GLOBAL: Tactic.constr_eval;
-  Tactic.constr_eval: [
-    [ IDENT "type"; "of"; c = Constr.constr -> Genredexpr.ConstrTypeOf c ]
-  ];
 END
 
 (* We wipe out all the keywords generated by the grammar rules we defined. *)

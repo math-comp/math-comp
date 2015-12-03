@@ -7,6 +7,7 @@ open Tacmach
 open Evd
 open Proof_type
 open Term
+open Ssrcommon
 
 (** ******** Small Scale Reflection pattern matching facilities ************* *)
 
@@ -73,10 +74,6 @@ val interp_cpattern :
   cpattern -> glob_constr_and_expr option ->
     pattern
 
-(** The set of occurrences to be matched. The boolean is set to true
- *  to signal the complement of this set (i.e. {-1 3}) *)
-type occ = (bool * int list) option
-
 (** [subst e p t i]. [i] is the number of binders
     traversed so far, [p] the term from the pattern, [t] the matched one *)
 type subst = env -> constr -> constr -> int -> constr
@@ -92,7 +89,7 @@ type subst = env -> constr -> constr -> int -> constr
 val eval_pattern :
   ?raise_NoMatch:bool ->
   env -> evar_map -> constr ->
-  pattern option -> occ -> subst ->
+  pattern option -> ssrocc -> subst ->
     constr
 
 (** [fill_occ_pattern b env sigma t pat occ h] is a simplified version of 
@@ -106,16 +103,13 @@ val eval_pattern :
 val fill_occ_pattern :
   ?raise_NoMatch:bool ->
   env -> evar_map -> constr ->
-  pattern -> occ -> int ->
+  pattern -> ssrocc -> int ->
     constr Evd.in_evar_universe_context * constr
 
 (** *************************** Low level APIs ****************************** *)
 
 (* The primitive matching facility. It matches of a term with holes, like 
    the T pattern above, and calls a continuation on its occurrences. *)
-
-type ssrdir = L2R | R2L
-val pr_dir_side : ssrdir -> Pp.std_ppcmds
 
 (** a pattern for a term with wildcards *)
 type tpattern
@@ -164,7 +158,7 @@ val mk_tpattern_matcher :
   ?all_instances:bool ->
   ?raise_NoMatch:bool ->
   ?upats_origin:ssrdir * constr ->
-  evar_map -> occ -> evar_map * tpattern list ->
+  evar_map -> ssrocc -> evar_map * tpattern list ->
     find_P * conclude
 
 (** Example of [mk_tpattern_matcher] to implement 
@@ -193,10 +187,10 @@ val mk_tpattern_matcher :
 (* convenience shortcut: [pf_fill_occ_term gl occ (sigma,t)] returns
  * the conclusion of [gl] where [occ] occurrences of [t] have been replaced
  * by [Rel 1] and the instance of [t] *)
-val pf_fill_occ_term : goal sigma -> occ -> evar_map * constr -> constr * constr
+val pf_fill_occ_term : goal sigma -> ssrocc -> evar_map * constr -> constr * constr
 
 (* It may be handy to inject a simple term into the first form of cpattern *)
-val cpattern_of_term : char * glob_constr_and_expr -> cpattern
+val cpattern_of_term : ssrterm -> cpattern
 
 (** Helpers to make stateful closures. Example: a [find_P] function may be 
     called many times, but the pattern instantiation phase is performed only the
@@ -220,7 +214,7 @@ val pf_unify_HO : goal sigma -> constr -> constr -> goal sigma
 
 (** Some more low level functions needed to implement the full SSR language
     on top of the former APIs *)
-val tag_of_cpattern : cpattern -> char
+val tag_of_cpattern : cpattern -> Ssrcommon.ssrtermkind
 val loc_of_cpattern : cpattern -> Loc.t
 val id_of_pattern : pattern -> Names.variable option
 val is_wildcard : cpattern -> bool

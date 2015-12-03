@@ -25,6 +25,8 @@ ssrmatching.ml4
 ssrcommon.mli
 ssrcommon.ml4
 ssreflect.ml4
+ssrvernac.ml4
+ssrvernac.mli
 
 -I .
 -R . mathcomp.ssreflect

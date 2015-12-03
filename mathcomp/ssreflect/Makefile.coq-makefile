@@ -6,6 +6,8 @@ define coqmakefile
 	ln -sf $(1)/plugin/$(V)/ssrcommon.mli .;\
 	ln -sf $(1)/plugin/$(V)/ssrcommon.ml4 .;\
 	ln -sf $(1)/plugin/$(V)/ssreflect.ml4 .;\
+	ln -sf $(1)/plugin/$(V)/ssrvernac.ml4 .;\
+	ln -sf $(1)/plugin/$(V)/ssrvernac.mli .;\
 	$(COQBIN)coq_makefile -f Make -o Makefile.coq)
 endef
 

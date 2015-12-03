@@ -187,6 +187,8 @@ ssrcommon.ml4
 ssrcommon.mli
 ssrmatching.ml4
 ssrmatching.mli
+ssrvernac.ml4
+ssrvernac.mli
 
 -I .
 -R . mathcomp
