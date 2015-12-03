@@ -64,17 +64,11 @@ Section FinRing.
 
 Variable R : finRingType.
 
-(* GG: Coq v8.3 fails to unify FinGroup.arg_sort _ with FinRing.sort R here   *)
-(* because it expands the latter rather than FinGroup.arg_sort, which would   *)
-(* expose the FinGroup.sort projection, thereby enabling canonical structure  *)
-(* expansion. We should check whether the improved heuristics in Coq 8.4 have *)
-(* resolved this issue.                                                       *)
 Lemma finRing_nontrivial : [set: R] != 1%g.
-Proof. by apply/(@trivgPn R); exists 1; rewrite ?inE ?oner_neq0. Qed.
+Proof. by apply/trivgPn; exists 1; rewrite ?inE ?oner_neq0. Qed.
 
-(* GG: same issue here. *)
 Lemma finRing_gt1 : 1 < #|R|.
-Proof. by rewrite -cardsT (@cardG_gt1 R) finRing_nontrivial. Qed.
+Proof. by rewrite -cardsT cardG_gt1 finRing_nontrivial. Qed.
 
 End FinRing.
 
@@ -87,33 +81,30 @@ Proof.
 by rewrite -(cardC1 0) cardsT card_sub; apply: eq_card => x; rewrite unitfE.
 Qed.
 
-Fact finField_unit_subproof x : x != 0 :> F -> x \is a GRing.unit.
-Proof. by rewrite unitfE. Qed.
-
-Definition finField_unit x nz_x :=
-  FinRing.unit F (@finField_unit_subproof x nz_x).
+Definition finField_unit x (nz_x : x != 0) :=
+  FinRing.unit F (etrans (unitfE x) nz_x).
 
 Lemma expf_card x : x ^+ #|F| = x :> F.
 Proof.
-apply/eqP; rewrite -{2}[x]mulr1 -[#|F|]prednK; last by rewrite (cardD1 x).
-rewrite exprS -subr_eq0 -mulrBr mulf_eq0 -implyNb -unitfE subr_eq0.
-apply/implyP=> Ux; rewrite -(val_unitX _ (FinRing.unit F Ux)) -val_unit1.
-by rewrite val_eqE -order_dvdn -card_finField_unit order_dvdG ?inE.
+rewrite -[RHS]mulr1 -(ltn_predK (finRing_gt1 F)) exprS.
+apply/eqP; rewrite -subr_eq0 -mulrBr mulf_eq0 subr_eq0 -implyNb -unitfE.
+apply/implyP=> Ux; rewrite -(val_unitX _ (Sub x _)) -val_unit1 val_eqE.
+by rewrite -order_dvdn -card_finField_unit order_dvdG ?inE.
 Qed.
 
 Lemma finField_genPoly : 'X^#|F| - 'X = \prod_x ('X - x%:P) :> {poly F}.
 Proof.
-set n := #|F|; set Xn := 'X^n; set NX := - 'X; set pF := Xn + NX.
-have lnNXn: size NX <= n by rewrite size_opp size_polyX finRing_gt1.
-have UeF: uniq_roots (enum F) by rewrite uniq_rootsE enum_uniq.
-rewrite [pF](all_roots_prod_XsubC _ _ UeF) ?size_addl ?size_polyXn -?cardE //.
-  by rewrite enumT lead_coefDl ?size_polyXn // (monicP (monicXn _ _)) scale1r.
+set n := #|F|; set oppX := - 'X; set pF := LHS.
+have le_oppX_n: size oppX <= n by rewrite size_opp size_polyX finRing_gt1.
+have: size pF = (size (enum F)).+1 by rewrite -cardE size_addl size_polyXn.
+move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
+  by rewrite enumT lead_coefDl ?size_polyXn // lead_coefXn scale1r.
 by apply/allP=> x _; rewrite rootE !hornerE hornerXn expf_card subrr.
 Qed.
 
 Lemma finCharP : {p | prime p & p \in [char F]}.
 Proof.
-pose e := exponent [set: F]; have e_gt0: e > 0 := exponent_gt0 _.
+pose e := exponent [set: F]; have e_gt0: e > 0 by apply: exponent_gt0.
 have: e%:R == 0 :> F by rewrite -zmodXgE expg_exponent // inE.
 by case/natf0_char/sigW=> // p charFp; exists p; rewrite ?(charf_prime charFp).
 Qed.
@@ -121,7 +112,7 @@ Qed.
 Lemma finField_is_abelem : is_abelem [set: F].
 Proof.
 have [p pr_p charFp] := finCharP.
-by apply/is_abelemP; exists p; last exact: fin_ring_char_abelem.
+by apply/is_abelemP; exists p; last apply: fin_ring_char_abelem.
 Qed.
 
 Lemma card_finCharP p n : #|F| = (p ^ n)%N -> prime p -> p \in [char F].
@@ -175,7 +166,7 @@ have v2rK := @Vector.InternalTheory.v2rK R vT.
 exact: CanFinMixin (v2rK : @cancel _ (CountType vT (CanCountMixin v2rK)) _ _).
 Qed.
 
-(* These instacnces are not exported by default because they conflict with    *)
+(* These instancces are not exported by default because they conflict with    *)
 (* existing finType instances such as matrix_finType or primeChar_finType.    *)
 Module FinVector.
 Section Interfaces.
@@ -368,7 +359,7 @@ Implicit Types (a b : F) (x y : L) (K E : {subfield L}).
 Let galL K : galois K {:L}.
 Proof.
 without loss {K} ->: K / K = 1%AS.
-  by move=> IH; apply: galoisS (IH _ (erefl _)); rewrite sub1v subvf.
+  by move=> IH_K; apply: galoisS (IH_K _ (erefl _)); rewrite sub1v subvf.
 apply/splitting_galoisField; pose finL := FinFieldExtType L.
 exists ('X^#|finL| - 'X); split; first by rewrite rpredB 1?rpredX ?polyOverX.
   rewrite (finField_genPoly finL) -big_filter.
@@ -381,24 +372,22 @@ Fact galLgen K :
   {alpha | generator 'Gal({:L} / K) alpha & forall x, alpha x = x ^+ order K}.
 Proof.
 without loss{K} ->: K / K = 1%AS; last rewrite /order dimv1 expn1.
-  rewrite /generator => /(_ _ (erefl _))[alpha /eqP defGalL].
-  rewrite /order dimv1 expn1 => Dalpha.
+  case/(_ 1%AS)=> // alpha /eqP-defGalL; rewrite /order dimv1 expn1 => Dalpha.
   exists (alpha ^+ \dim K)%g => [|x]; last first.
     elim: (\dim K) => [|n IHn]; first by rewrite gal_id.
     by rewrite expgSr galM ?memvf // IHn Dalpha expnSr exprM.
-  rewrite (eq_subG_cyclic (cycle_cyclic alpha)) ?cycleX //=; last first.
-    by rewrite -defGalL galS ?sub1v.
-  rewrite eq_sym -orderE orderXdiv orderE -defGalL -{1}(galois_dim (galL 1)).
-    by rewrite dimv1 divn1 galois_dim.
-  by rewrite dimv1 divn1 field_dimS // subvf.
+  have sGalLK: 'Gal({:L} / K) \subset <[alpha]> by rewrite -defGalL galS ?sub1v.
+  rewrite /generator {sGalLK}(eq_subG_cyclic _ sGalLK) ?cycle_cyclic ?cycleX //.
+  rewrite -orderE orderXdiv orderE -defGalL -?{1}galois_dim ?dimv1 ?divn1 //.
+  by rewrite field_dimS ?subvf.
 pose f x := x ^+ #|F|.
 have idfP x: reflect (f x = x) (x \in 1%VS).
-  rewrite /f; apply: (iffP (vlineP _ _)) => [[a ->] | xFx].
-    by rewrite -in_algE -rmorphX expf_card.
+  apply: (iffP (vlineP _ _)) => [[a ->] | xFx].
+    by rewrite -in_algE -[LHS]rmorphX expf_card.
   pose q := map_poly (in_alg L) ('X^#|F| - 'X).
   have: root q x.
     rewrite /q rmorphB /= map_polyXn map_polyX.
-    by rewrite rootE !(hornerE, hornerXn) xFx subrr.
+    by rewrite rootE !(hornerE, hornerXn) [x ^+ _]xFx subrr.
   have{q} ->: q = \prod_(z <- [seq b%:A | b : F]) ('X - z%:P).
     rewrite /q finField_genPoly rmorph_prod big_map enumT.
     by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
@@ -414,11 +403,12 @@ have fZ: linear f.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun (Linear fZ)).
   rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.
   exact: (rmorphM (RMorphism fM)).
-exists alpha => [|a]; last by rewrite -Dalpha ?memvf ?lfunE.
-suffices <-: fixedField [set alpha] = 1%AS by rewrite gal_generated /generator.
-apply/vspaceP => x; apply/fixedFieldP/idfP; rewrite ?memvf // => id_x.
-  by rewrite -{2}(id_x _ (set11 _)) -Dalpha ?lfunE ?memvf.
-by move=> _ /set1P->; rewrite -Dalpha ?memvf ?lfunE.
+have{Dalpha} Dalpha: alpha =1 f by move=> a; rewrite -Dalpha ?memvf ?lfunE.
+suffices <-: fixedField [set alpha] = 1%AS.
+  by rewrite gal_generated /generator; exists alpha.
+apply/vspaceP=> x; apply/fixedFieldP/idfP; rewrite ?memvf // => id_x.
+  by rewrite -Dalpha id_x ?set11.
+by move=> _ /set1P->; rewrite Dalpha.
 Qed.
 
 Lemma finField_galois K E : (K <= E)%VS -> galois K E.
