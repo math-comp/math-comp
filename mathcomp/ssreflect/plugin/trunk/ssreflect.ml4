@@ -3304,7 +3304,7 @@ let pf_abs_ssrterm ?(resolve_typeclasses=false) ist gl t =
        let sigma = Typeclasses.resolve_typeclasses ~fail:false env sigma in
        sigma, Evarutil.nf_evar sigma ct in
   let n, c, abstracted_away, ucst = pf_abs_evars gl t in
-  List.fold_left Evd.remove sigma abstracted_away, pf_abs_cterm gl n c, ucst
+  List.fold_left Evd.remove sigma abstracted_away, pf_abs_cterm gl n c, ucst, n
 
 let pf_interp_ty ?(resolve_typeclasses=false) ist gl ty =
    let n_binders = ref 0 in
@@ -5544,7 +5544,7 @@ ARGUMENT EXTEND ssrcofixfwd TYPED AS ssrfixfwd PRINTED BY pr_ssrcofixfwd
 END
 
 let ssrposetac ist (id, (_, t)) gl =
-  let sigma, t, ucst = pf_abs_ssrterm ist gl t in
+  let sigma, t, ucst, _ = pf_abs_ssrterm ist gl t in
   posetac id t (pf_merge_uc ucst gl)
 
 
@@ -5702,7 +5702,7 @@ let unfold cl =
     (List.map (fun c -> F.fCONST (fst (destConst c))) cl @ [F.fBETA; F.fIOTA])))
 
 let havegentac ist t gl =
-  let sigma, c, ucst = pf_abs_ssrterm ist gl t in
+  let sigma, c, ucst, _ = pf_abs_ssrterm ist gl t in
   let gl = pf_merge_uc ucst gl in
   let gl, cty = pf_type_of gl c in
   apply_type (mkArrow cty (pf_concl gl)) [c] gl
@@ -5758,7 +5758,7 @@ let havetac ist
      errorstrm (str"Suff have does not accept a proof term")
    | FwdHave, false, true ->
      let cty = combineCG cty hole (mkCArrow loc) mkRArrow in
-     let _, t, uc = interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
+     let _,t,uc,_ = interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
      let gl = pf_merge_uc uc gl in
      let gl, ty = pf_type_of gl t in
      let ctx, _ = decompose_prod_n 1 ty in
@@ -5774,8 +5774,12 @@ let havetac ist
      let skols_args =
        List.map (fun id -> examine_abstract (mkVar id) gl) skols in
      let gl = List.fold_right unlock_abs skols_args gl in
-     let sigma, t, uc =
+     let sigma, t, uc, n_evars =
        interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
+     if skols <> [] && n_evars <> 0 then
+       Errors.error ("Automatic generalization of unresolved implicit "^
+                     "arguments together with abstract variables is "^
+                     "not supported");
      let gl = re_sig (sig_it gl) (Evd.merge_universe_context sigma uc) in
      let gs =
        List.map (fun (_,a) ->
