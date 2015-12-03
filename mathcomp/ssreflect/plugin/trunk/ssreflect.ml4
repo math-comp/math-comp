@@ -718,13 +718,14 @@ let betared env =
    (Closure.RedFlags.mkflags [Closure.RedFlags.fBETA])
     env
 ;;
-let rec fst_prod red tac = PG.enter begin fun gl ->
-  let concl = Evarutil.nf_evar (PG.sigma gl) (PG.concl (PG.assume gl)) in
+let rec fst_prod red tac = PG.(enter { enter = fun gl ->
+  let sigma = Sigma.to_evar_map (sigma gl) in
+  let concl = Evarutil.nf_evar sigma (concl (assume gl)) in
   match kind_of_term concl with
   | Prod (id,_,tgt) | LetIn(id,_,_,tgt) -> tac id
   | _ -> if red then TN.tclZEROMSG (str"No product even after head-reduction.")
          else TN.tclTHEN (old_tac hnf_in_concl) (fst_prod true tac)
-end
+})
 ;;
 let introid ?(orig=ref Anonymous) name = tclTHEN (fun gl ->
    let g, env = pf_concl gl, pf_env gl in
@@ -1748,15 +1749,17 @@ let rec intro_anon gl =
   with err0 -> try tclTHEN red_in_concl intro_anon gl with _ -> raise err0
   (* with _ -> Errors.error "No product even after reduction" *)
 
-let rec fst_unused_prod red tac = PG.enter begin fun gl ->
-  let concl = Evarutil.nf_evar (PG.sigma gl) (PG.concl (PG.assume gl)) in
+let rec fst_unused_prod red tac = PG.(enter { enter = fun gl ->
+  let sigma = Sigma.to_evar_map (sigma gl) in
+  let concl = Evarutil.nf_evar sigma (concl (assume gl)) in
   match kind_of_term concl with
   | Prod (id,_,tgt) | LetIn(id,_,_,tgt) ->
       if noccurn 1 tgt then tac id
       else TN.tclTHEN (old_tac intro_anon) (fst_unused_prod false tac)
   | _ -> if red then TN.tclZEROMSG (str"No product even after head-reduction.")
          else TN.tclTHEN (old_tac hnf_in_concl) (fst_unused_prod true tac)
-end;;
+})
+;;
 
 let introid_fast orig name = 
   fst_unused_prod false (fun id -> orig := id; old_tac (introid name))
