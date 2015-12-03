@@ -1248,7 +1248,7 @@ Lemma nonTI_Fitting_facts M :
   [/\ M \in 'M_'F :|: 'M_'P1, M`_\F = M`_\sigma & M^`(1) \subset 'F(M)].
 Proof.
 move=> maxM nonTI; suff: [exists (y | y \notin M), 'F(M) :&: 'F(M) :^ y != 1].
-  by case/exists_inP=> y notMy /nonTI_Fitting_structure[] // [[-> ?] _ []].
+  by case/exists_inP=> y notMy /nonTI_Fitting_structure[] // [-> dMF] _ [].
 rewrite -negb_forall_in; apply: contra nonTI => /forall_inP tiF.
 apply/normedTI_P; rewrite normD1 setTI gFnorm setD_eq0 subG1.
 split=> // [|g _]; first by rewrite (trivg_Fitting (mmax_sol maxM)) mmax_neq1.
@@ -1509,5 +1509,3 @@ by rewrite (subG1_contra _ ntCMsx) ?setIS //= -cent_cycle centS.
 Qed.
 
 End Section15.
-
-

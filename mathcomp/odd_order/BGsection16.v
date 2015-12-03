@@ -786,7 +786,7 @@ split; first by have [_ _ _ _ []] := Ptype_structure PmaxM hallK.
 have [<- | neqMF_Ms] := eqVneq M`_\F M`_\sigma; first exact: Fcore_sub_Fitting.
 have solMs: solvable M`_\sigma := solvableS (pcore_sub _ _) (mmax_sol maxM).
 have [D hallD] := Hall_exists #|Kstar|^' solMs.
-by case: (Fcore_structure maxM) notP1maxM => _ /(_ K D)[] // [[->]].
+by case: (Fcore_structure maxM) notP1maxM => _ /(_ K D)[] // [->].
 Qed.
 
 End SingleGroupSummaries.
