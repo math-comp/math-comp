@@ -1554,16 +1554,17 @@ END
 (* to allow for user extensions. "ssrautoprop" defaults to   *)
 (* trivial.                                                  *)
 
-let donetac gl =
+let donetac n gl =
+  let name = if n = -1 then "done" else ("ssrdone" ^ string_of_int n) in
+  let fail msg = Pp.msg_error (str msg); Errors.error msg in
   let tacname = 
-    try Nametab.locate_tactic (qualid_of_ident (id_of_string "done"))
-    with Not_found -> try Nametab.locate_tactic (ssrqid "done")
-    with Not_found -> Errors.error "The ssreflect library was not loaded" in
+    try Nametab.locate_tactic (qualid_of_ident (id_of_string name))
+    with Not_found -> try Nametab.locate_tactic (ssrqid name)
+    with Not_found ->
+      if n = -1 then fail "The ssreflect library was not loaded"
+      else fail ("The tactic "^name^" was not found") in
   let tacexpr = dummy_loc, Tacexpr.Reference (ArgArg (dummy_loc, tacname)) in
   Proofview.V82.of_tactic (eval_tactic (Tacexpr.TacArg tacexpr)) gl
-
-let prof_donetac = mk_profiler "donetac";;
-let donetac gl = prof_donetac.profile donetac gl;;
 
 let ssrautoprop gl =
   try 
@@ -1576,7 +1577,7 @@ let ssrautoprop gl =
 
 let () = ssrautoprop_tac := ssrautoprop
 
-let tclBY tac = tclTHEN tac donetac
+let tclBY tac = tclTHEN tac (donetac ~-1)
 
 (** Tactical arguments. *)
 
@@ -1646,7 +1647,7 @@ ARGUMENT EXTEND ssrortacarg TYPED AS ssrhintarg PRINTED BY pr_ssrhintarg
 END
 
 let hinttac ist is_by (is_or, atacs) =
-  let dtac = if is_by then donetac else tclIDTAC in
+  let dtac = if is_by then donetac ~-1 else tclIDTAC in
   let mktac = function
   | Some atac -> tclTHEN (ssrevaltac ist atac) dtac
   | _ -> dtac in
@@ -2123,22 +2124,48 @@ let tclCLAUSES ist tac (gens, clseq) gl =
 
 (** Simpl switch *)
 
-type ssrsimpl = Simpl | Cut | SimplCut | Nop
+type ssrsimpl = Simpl | Cut of int | SimplCut of int | Nop
 
 let pr_simpl = function
   | Simpl -> str "/="
-  | Cut -> str "//"
-  | SimplCut -> str "//="
+  | Cut -1 -> str "//"
+  | Cut n -> str "/" ++ int n ++ str"/"
+  | SimplCut -1 -> str "//="
+  | SimplCut n -> str "/" ++ int n ++ str"/="
   | Nop -> mt ()
 
 let pr_ssrsimpl _ _ _ = pr_simpl
 
 let wit_ssrsimplrep = add_genarg "ssrsimplrep" pr_simpl
 
+let test_ssrslashnum strm =
+  match Compat.get_tok (stream_nth 0 strm) with
+  | Tok.KEYWORD "/" ->
+      (match Compat.get_tok (stream_nth 1 strm) with
+      | Tok.INT _ -> ()
+      | _ -> raise Stream.Failure)
+  | _ -> raise Stream.Failure
+
+let negate_parser f x =
+  let rc = try Some (f x) with Stream.Failure -> None in
+  match rc with
+  | None -> ()
+  | Some _ -> raise Stream.Failure 
+let test_not_ssrslashnum =
+  Gram.Entry.of_parser "test_not_ssrslashnum" (negate_parser test_ssrslashnum)
+let test_ssrslashnum = Gram.Entry.of_parser "test_ssrslashnum" test_ssrslashnum
+
 ARGUMENT EXTEND ssrsimpl_ne TYPED AS ssrsimplrep PRINTED BY pr_ssrsimpl
 | [ "/=" ] -> [ Simpl ]
-| [ "//" ] -> [ Cut ]
-| [ "//=" ] -> [ SimplCut ]
+| [ "//" ] -> [ Cut ~-1 ]
+| [ "//=" ] -> [ SimplCut ~-1 ]
+END
+
+GEXTEND Gram
+  GLOBAL: ssrsimpl_ne;
+  ssrsimpl_ne: [
+    [ test_ssrslashnum; "/"; n = Prim.natural; "/" -> Cut n 
+    | test_ssrslashnum; "/"; n = Prim.natural; "/=" -> SimplCut n ]];
 END
 
 ARGUMENT EXTEND ssrsimpl TYPED AS ssrsimplrep PRINTED BY pr_ssrsimpl
@@ -2154,8 +2181,8 @@ let safe_simpltac gl =
 
 let simpltac = function
   | Simpl -> safe_simpltac
-  | Cut -> tclTRY donetac
-  | SimplCut -> tclTHEN safe_simpltac (tclTRY donetac)
+  | Cut n -> tclTRY (donetac n)
+  | SimplCut n -> tclTHEN safe_simpltac (tclTRY (donetac n))
   | Nop -> tclIDTAC
 
 (** Rewriting direction *)
@@ -2411,8 +2438,16 @@ let pr_ssrview _ _ _ = pr_view
 
 ARGUMENT EXTEND ssrview TYPED AS ssrterm list
    PRINTED BY pr_ssrview
-| [ "/" constr(c) ] -> [ [mk_term ' ' c] ]
-| [ "/" constr(c) ssrview(w) ] -> [ (mk_term ' ' c) :: w ]
+| [ "YouShouldNotTypeThis" ] -> [ [] ]
+END
+
+
+GEXTEND Gram
+  GLOBAL: ssrview;
+  ssrview: [
+    [  test_not_ssrslashnum; "/"; c = constr -> [mk_term ' ' c]
+    |  test_not_ssrslashnum; "/"; c = constr; w = ssrview ->
+                    (mk_term ' ' c) :: w ]];
 END
 
 (* There are two ways of "applying" a view to term:            *)
@@ -2606,11 +2641,14 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
   | [ "-" ] -> [ [IpatNoop] ]
   | [ "-/" "=" ] -> [ [IpatNoop;IpatSimpl([],Simpl)] ]
   | [ "-/=" ] -> [ [IpatNoop;IpatSimpl([],Simpl)] ]
-  | [ "-/" "/" ] -> [ [IpatNoop;IpatSimpl([],Cut)] ]
-  | [ "-//" ] -> [ [IpatNoop;IpatSimpl([],Cut)] ]
-  | [ "-/" "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut)] ]
-  | [ "-//" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut)] ]
-  | [ "-//=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut)] ]
+  | [ "-/" "/" ] -> [ [IpatNoop;IpatSimpl([],Cut ~-1)] ]
+  | [ "-//" ] -> [ [IpatNoop;IpatSimpl([],Cut ~-1)] ]
+  | [ "-/"  integer(n)"/" ] -> [ [IpatNoop;IpatSimpl([],Cut n)] ]
+  | [ "-/" "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut ~-1)] ]
+  | [ "-//" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut ~-1)] ]
+  | [ "-//=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut ~-1)] ]
+  | [ "-/" integer(n) "/=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut n)] ]
+  | [ "-/" integer(n) "/" "=" ] -> [ [IpatNoop;IpatSimpl([],SimplCut n)] ]
   | [ ssrview(v) ] -> [ [IpatView v] ]
   | [ "[" ":" ident_list(idl) "]" ] -> [ [IpatNewHidden idl] ]
 END
@@ -4574,9 +4612,19 @@ let pr_ssrrule _ _ _ = pr_rule
 let noruleterm loc = mk_term ' ' (mkCProp loc)
 
 ARGUMENT EXTEND ssrrule_ne TYPED AS ssrrwkind * ssrterm PRINTED BY pr_ssrrule
-  | [ ssrsimpl_ne(s) ] -> [ RWred s, noruleterm loc ]
-  | [ "/" ssrterm(t) ] -> [ RWdef, t ] 
-  | [ ssrterm(t) ] -> [ RWeq, t ] 
+  | [ "YouShouldNotTypeThis" ] -> [ anomaly "Grammar placeholder match" ]
+END
+
+GEXTEND Gram
+  GLOBAL: ssrrule_ne;
+  ssrrule_ne : [
+    [ test_not_ssrslashnum; x =
+        [ "/"; t = ssrterm -> RWdef, t
+        | t = ssrterm -> RWeq, t 
+        | s = ssrsimpl_ne -> RWred s, noruleterm !@loc
+        ] -> x
+    | s = ssrsimpl_ne -> RWred s, noruleterm !@loc
+  ]];
 END
 
 ARGUMENT EXTEND ssrrule TYPED AS ssrrule_ne PRINTED BY pr_ssrrule
@@ -4596,6 +4644,8 @@ let pr_rwarg ((d, m), ((docc, rx), r)) =
 
 let pr_ssrrwarg _ _ _ = pr_rwarg
 
+let is_rw_cut = function RWred (Cut _) -> true | _ -> false
+
 let mk_rwarg (d, (n, _ as m)) ((clr, occ as docc), rx) (rt, _ as r) =   
  if rt <> RWeq then begin
    if rt = RWred Nop && not (m = nomult && occ = None && rx = None)
@@ -4603,7 +4653,7 @@ let mk_rwarg (d, (n, _ as m)) ((clr, occ as docc), rx) (rt, _ as r) =
      anomaly "Improper rewrite clear switch";
    if d = R2L && rt <> RWdef then
      Errors.error "Right-to-left switch on simplification";
-   if n <> 1 && rt = RWred Cut then
+   if n <> 1 && is_rw_cut rt then
      Errors.error "Bad or useless multiplier";
    if occ <> None && rx = None && rt <> RWdef then
      Errors.error "Missing redex for simplification occurrence"
@@ -4665,7 +4715,7 @@ let simplintac occ rdx sim gl =
       gl in
   match sim with
   | Simpl -> simptac gl
-  | SimplCut -> tclTHEN simptac (tclTRY donetac) gl
+  | SimplCut n -> tclTHEN simptac (tclTRY (donetac n)) gl
   | _ -> simpltac sim gl
 
 let rec get_evalref c =  match kind_of_term c with

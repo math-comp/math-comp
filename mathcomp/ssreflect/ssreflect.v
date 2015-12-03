@@ -334,6 +334,14 @@ Ltac done :=
    | case not_locked_false_eq_true; assumption
    | match goal with H : ~ _ |- _ => solve [case H; trivial] end ].
 
+(* Quicker done tactic not including split, syntax: /0/ *)
+Ltac ssrdone0 :=
+  trivial; hnf; intros; solve
+   [ do ![solve [trivial | apply: sym_equal; trivial]
+         | discriminate | contradiction ]
+   | case not_locked_false_eq_true; assumption
+   | match goal with H : ~ _ |- _ => solve [case H; trivial] end ].
+
 (* To unlock opaque constants. *)
 Structure unlockable T v := Unlockable {unlocked : T; _ : unlocked = v}.
 Lemma unlock T x C : @unlocked T x C = x. Proof. by case: C. Qed.
