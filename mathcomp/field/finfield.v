@@ -8,7 +8,7 @@ Require Import tuple bigop prime finset fingroup ssralg poly polydiv.
 From mathcomp
 Require Import morphism action finalg zmodp cyclic center pgroup abelian.
 From mathcomp
-Require Import matrix vector falgebra fieldext separable galois.
+Require Import matrix mxpoly vector falgebra fieldext separable galois.
 From mathcomp
 Require ssrnum ssrint algC cyclotomic.
 
@@ -39,6 +39,12 @@ Require ssrnum ssrint algC cyclotomic.
 (*                              structures, plus an FalgType structure if R   *)
 (*                              is a finUnitRingType and a splittingFieldType *)
 (*                              struture if R is a finFieldType.              *)
+(* FinSplittingFieldFor nz_p == sigma-pair whose sval is a splittingFieldType *)
+(*                              that is the splitting field for p : {poly F}  *)
+(*                              over F : finFieldType, given nz_p : p != 0.   *)
+(* PrimePowerField pr_p k_gt0 == sigma2-triple whose s2val is a finFieldType  *)
+(*                              of characteristic p and order m = p ^ k,      *)
+(*                              given pr_p : prime p and k_gt0 : k > 0.       *)
 (*   FinDomainFieldType domR == A finFieldType structure on a finUnitRingType *)
 (*                              R, given domR : GRing.IntegralDomain.axiom R. *)
 (*                              This is intended to be used inside proofs,    *)
@@ -450,6 +456,119 @@ by apply/fixedFieldP/eqP=> [|-> | alpha_x _ /set1P->]; rewrite ?memvf ?set11.
 Qed.
 
 End FinSplittingField.
+
+Section FinFieldExists.
+(* While he existence of finite splitting fields and of finite fields of      *)
+(* arbitrary prime power order is mathematically straightforward, it is       *)
+(* technically challenging to formalize in Coq. The Coq typechecker performs  *)
+(* poorly for the spme of the deeply nested dependent types used in the       *)
+(* construction, such as polynomials over extensions of extensions of finite  *)
+(* fields. Any conversion in a nested structure parameter incurs a huge       *)
+(* overhead as it is shared across term comparison by call-by-need evalution. *)
+(* The proof of FinSplittingFieldFor is contrived to mitigate this effect:    *)
+(* the abbreviation map_poly_extField alone divides by 3 the proof checking   *)
+(* time, by reducing the number of occurrences of field(Ext)Type structures   *)
+(* in the subgoals; the succesive, apparently redundant 'suffices' localize   *)
+(* some of the conversions to smaller subgoals, yielding a further 8-fold     *)
+(* time gain. In particular, we construct the splitting field as a subtype    *)
+(* of a recursive construction rather than prove that the latter yields       *)
+(* precisely a splitting field.                                               *)
+
+(* The apparently redundant type annotation reduces checking time by 30%.     *)
+Let map_poly_extField (F : fieldType) (L : fieldExtType F) :=
+  map_poly (in_alg L) : {poly F} -> {poly L}.
+Local Notation "p ^%:A" := (map_poly_extField _ p)
+  (at level 2, format "p ^%:A") : ring_scope.
+
+Lemma FinSplittingFieldFor (F : finFieldType) (p : {poly F}) :
+  p != 0 -> {L : splittingFieldType F | splittingFieldFor 1 p^%:A {:L}}.
+Proof.
+have mapXsubC (f : {rmorphism _}) x: map_poly f ('X - x%:P) = 'X - (f x)%:P.
+  by rewrite rmorphB /= map_polyX map_polyC.
+move=> nz_p; pose splits q := {zs | q %= \prod_(z <- zs) ('X - z%:P)}.
+suffices [L splitLp]: {L : fieldExtType F | splittingFieldFor 1 p^%:A {:L}}.
+  by exists (FinSplittingFieldType F L).
+suffices [L [ys Dp]]: {L : fieldExtType F & splits L p^%:A}.
+  pose Lp := subvs_of <<1 & ys>>; pose toL := linfun (vsval : Lp -> L).
+  have [zs Dys]: {zs | map toL zs = ys}.
+    exists (map (vsproj _) ys); rewrite -map_comp map_id_in // => y ys_y.
+    by rewrite /= lfunE /= vsprojK ?seqv_sub_adjoin.
+  exists [fieldExtType F of Lp], zs.
+    set lhs := (lhs in lhs %= _); set rhs := (rhs in _ %= rhs).
+    suffices: map_poly toL lhs %= map_poly toL rhs by rewrite eqp_map.
+    rewrite -Dys big_map in Dp; apply: etrans Dp; apply: congr2.
+      by rewrite -map_poly_comp; apply/eq_map_poly=> x; apply: rmorph_alg.
+    by rewrite rmorph_prod; apply/eq_bigr=> z _; apply mapXsubC.
+  set Lzs := LHS; pose Lys := (toL @: Lzs)%VS; apply/vspaceP=> u.
+  have: val u \in Lys by rewrite /Lys aimg_adjoin_seq aimg1 Dys (valP u).
+  by case/memv_imgP=> v Lzs_v; rewrite memvf lfunE => /val_inj->.
+move: {2}_.+1 (ltnSn (size p)) => n; elim: n => // n IHn in F p nz_p * => lbn.
+have [Cp|C'p] := leqP (size p) 1.
+  pose L := [fieldExtType F of F^o for F]; exists L, [::].
+  by rewrite big_nil -size_poly_eq1 size_map_poly eqn_leq Cp size_poly_gt0.
+have [r r_dv_p irr_r]: {r | r %| p & irreducible_poly r}.
+  pose rVp (v : 'rV_n) (r := rVpoly v) := (1 < size r) && (r %| p).
+  have [v0 Dp]: {v0 | rVpoly v0 = p & rVp v0}.
+    by exists (poly_rV p); rewrite /rVp poly_rV_K ?C'p /=.
+  case/(arg_minP (size \o rVpoly))=> /= v; set r := rVpoly v.
+  case/andP=> C'r r_dv_p min_r; exists r => //; split=> // q C'q q_dv_r.
+  have nz_r: r != 0 by rewrite -size_poly_gt0 ltnW.
+  have le_q_r: size q <= size r by rewrite dvdp_leq.
+  have [u Dq]: {u : 'rV_n | rVpoly u = q}.
+    by exists (poly_rV q); rewrite poly_rV_K ?(leq_trans le_q_r) ?size_poly.
+  rewrite -dvdp_size_eqp // eqn_leq le_q_r -Dq min_r // /rVp Dq.
+  rewrite ltn_neqAle eq_sym C'q size_poly_gt0 (dvdpN0 q_dv_r) //=.
+  exact: dvdp_trans q_dv_r r_dv_p.
+have{irr_r} [K _ [x rx0 defK]] := irredp_FAdjoin irr_r.
+have{r rx0 r_dv_p} /factor_theorem/sig_eqW[q Dp]: root p^%:A x.
+  by rewrite -(divpK r_dv_p) [_^%:A]rmorphM rootM rx0 orbT.
+have Dszp: size p = size (q * ('X - x%:P)) by rewrite -Dp size_map_poly.
+have nz_q: q != 0.
+  by move: nz_p; rewrite -size_poly_eq0 Dszp size_poly_eq0 mulf_eq0 => /norP[].
+have [L [zs Dq]]: {L : fieldExtType K & splits L q^%:A}.
+  apply: (IHn (FinFieldExtType K) q nz_q).
+  by rewrite ltnS Dszp size_mul ?polyXsubC_eq0 ?size_XsubC ?addn2 in lbn.
+suffices: splits L p^%:A^%:A.
+  rewrite -[_^%:A]map_poly_comp -(eq_map_poly (fun a => baseField_scaleE a 1)).
+  by exists [fieldExtType F of baseFieldType L].
+exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
+by rewrite Dp mulrC [_^%:A]rmorphM /= mapXsubC /= eqp_mull.
+Qed.
+
+Lemma PrimePowerField p k (m := (p ^ k)%N) :
+  prime p -> 0 < k -> {Fm : finFieldType | p \in [char Fm] & #|Fm| = m}.
+Proof.
+move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
+have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
+pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
+  by rewrite subr0 mulrBl mul1r -exprSr prednK.
+have /FinSplittingFieldFor[/= L splitLq]: q [ringType of 'F_p] != 0.
+  by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monic_Xn_sub_1.
+rewrite [_^%:A]rmorphB rmorphX /= map_polyX -/(q L) in splitLq.
+have charL: p \in [char L] by rewrite char_lalg char_Fp.
+pose Fm := FinFieldExtType L; exists Fm => //.
+have /finField_galois_generator[/= a _ Da]: (1 <= {:L})%VS by apply: sub1v.
+pose Em := fixedSpace (a ^+ k)%g; rewrite card_Fp //= dimv1 expn1 in Da.
+have{splitLq} [zs DqL defL] := splitLq.
+have Uzs: uniq zs.
+  rewrite -separable_prod_XsubC -(eqp_separable DqL) Dq separable_root andbC.
+  rewrite /root !hornerE subr_eq0 eq_sym hornerXn expr0n gtn_eqF ?oner_eq0 //=.
+  rewrite cyclotomic.separable_Xn_sub_1 // -subn1 natrB // subr_eq0.
+  by rewrite natrX charf0 // expr0n gtn_eqF // eq_sym oner_eq0.
+suffices /eq_card->: Fm =i zs.
+  apply: succn_inj; rewrite (card_uniqP _) //= -(size_prod_XsubC _ id).
+  by rewrite -(eqp_size DqL) size_addl size_polyXn // size_opp size_polyX.
+have in_zs: zs =i Em.
+  move=> z; rewrite -root_prod_XsubC -(eqp_root DqL) (sameP fixedSpaceP eqP).
+  rewrite /root !hornerE subr_eq0 /= hornerXn /m; congr (_ == z).
+  elim: (k) => [|i IHi]; first by rewrite gal_id.
+  by rewrite expgSr expnSr exprM IHi galM ?Da ?memvf.
+suffices defEm: Em = {:L}%VS by move=> z; rewrite in_zs defEm memvf.
+apply/eqP; rewrite eqEsubv subvf -defL -[Em]subfield_closed agenvS //. 
+by rewrite subv_add sub1v; apply/span_subvP=> z; rewrite in_zs.
+Qed.
+
+End FinFieldExists.
 
 Section FinDomain.
 
