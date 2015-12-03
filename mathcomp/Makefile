@@ -9,6 +9,7 @@ include ssreflect/Makefile.detect-coq-version
 # this defined coqmakefile
 include ssreflect/Makefile.coq-makefile
 
+# Override COQDEP to find only the "right" copy .ml files
 ifeq "$V" "v8.4"
 COQDEP=../etc/utils/ssrcoqdep
 else
@@ -22,7 +23,6 @@ MAKEFLAGS+=-B
 
 %:
 	$(H)[ -e Makefile.coq ] || $(call coqmakefile,ssreflect)
-	# Override COQDEP to find only the "right" copy .ml files
 	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
 		-f Makefile.coq $* \
 		COQDEP='$(COQDEP) -exclude-dir plugin -c'

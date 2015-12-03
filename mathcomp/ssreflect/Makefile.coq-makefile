@@ -3,6 +3,8 @@ define coqmakefile
 	ln -sf $(1)/plugin/$(V)/ssreflect.mllib .;\
 	ln -sf $(1)/plugin/$(V)/ssrmatching.mli .;\
 	ln -sf $(1)/plugin/$(V)/ssrmatching.ml4 .;\
+	ln -sf $(1)/plugin/$(V)/ssrcommon.mli .;\
+	ln -sf $(1)/plugin/$(V)/ssrcommon.ml4 .;\
 	ln -sf $(1)/plugin/$(V)/ssreflect.ml4 .;\
 	$(COQBIN)coq_makefile -f Make -o Makefile.coq)
 endef
