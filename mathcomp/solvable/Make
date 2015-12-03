@@ -1,7 +1,6 @@
 abelian.v
 all_solvable.v
 alt.v
-burnside_app.v
 center.v
 commutator.v
 cyclic.v
