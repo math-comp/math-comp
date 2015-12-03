@@ -1043,10 +1043,7 @@ let ssrtac_expr = ssrtac_atom
 
 
 let ssrevaltac ist gtac =
-  let debug = match TacStore.get ist.extra f_debug with
-  | None -> Tactic_debug.DebugOff | Some level -> level
-  in
-  Proofview.V82.of_tactic (interp_tac_gen ist.lfun [] debug (globTacticIn (fun _ -> gtac)))
+  Proofview.V82.of_tactic (eval_tactic_ist ist gtac)
 
 (* fun gl -> let lfun = [tacarg_id, val_interp ist gl gtac] in
   interp_tac_gen lfun [] ist.debug tacarg_expr gl *)
