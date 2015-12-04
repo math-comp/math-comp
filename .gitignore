@@ -17,3 +17,4 @@ mathcomp/ssrmatching.ml4
 mathcomp/ssrmatching.mli
 mathcomp/ssreflect.mllib
 mathcomp-*.tar.gz
+*#
