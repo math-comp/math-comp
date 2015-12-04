@@ -68,12 +68,8 @@ Note that the From directive has effect only in Coq 8.5. Coq 8.4 ignores it
 and searches for files in all known paths: hence beware of the
 possible name collisions.
 
-The tarball can be download at the following URL:
+The tarball can be download at http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
 
-    http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
-
-The html documentation of the theory files can be browsed at:
-
-    http://ssr.msr-inria.inria.fr/doc/mathcomp-1.6/
+The html documentation of the theory files can be browsed at http://ssr.msr-inria.inria.fr/doc/mathcomp-1.6/
 
 -- The Mathematical Components team
