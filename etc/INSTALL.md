@@ -1,7 +1,7 @@
 # INSTALLATION PROCEDURE
 
-Users familiar with OPAM can use such tool to install Coq and the Mathematical
-Components library with commands like `opam coq-mathcomp-fingroup`.
+Users familiar with OPAM can use such tool to install Coq and the Mathematical Components library with commands like
+`opam coq-mathcomp-fingroup`.
 
 This document is for users that installed Coq in another way, for example
 compiling it from sources.
@@ -13,15 +13,14 @@ Coq version 8.4pl6 or 8.5 (at the time of writing, beta3)
 ## BUILDING
 
 The Mathematical Components library is divided into various installation
-units.  On can install the entire library (compilation time is XX) or only
-some of its units.
+units.  On can install the entire library (compilation time is around 35 minutes) or only some of its units.
 
 In both cases, if Coq is not installed such that its binaries like `coqc`
 and `coq_makefile` are in the PATH, then the COQBIN environment variable
 must be set to point to the directory containing such binaries.
 For example:
 
-    export COQBIN=/home/gares/coq/bin/
+    export COQBIN=/home/user/coq/bin/
 
 Now, to install the entire library, including the SSReflect proof language:
 

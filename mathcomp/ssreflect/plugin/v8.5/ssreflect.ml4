@@ -2391,7 +2391,7 @@ let glob_view_hints lvh =
 
 let add_view_hints lvh i = Lib.add_anonymous_leaf (in_viewhint (i, lvh))
 
-VERNAC COMMAND EXTEND HintView CLASSIFIED AS QUERY
+VERNAC COMMAND EXTEND HintView CLASSIFIED AS SIDEFF
   |  [ "Hint" "View" ssrviewposspc(n) ne_ssrhintref_list(lvh) ] ->
      [ mapviewpos (add_view_hints (glob_view_hints lvh)) n 2 ]
 END
@@ -3298,7 +3298,7 @@ let pf_abs_ssrterm ?(resolve_typeclasses=false) ist gl t =
        let sigma = Typeclasses.resolve_typeclasses ~fail:false env sigma in
        sigma, Evarutil.nf_evar sigma ct in
   let n, c, abstracted_away, ucst = pf_abs_evars gl t in
-  List.fold_left Evd.remove sigma abstracted_away, pf_abs_cterm gl n c, ucst
+  List.fold_left Evd.remove sigma abstracted_away, pf_abs_cterm gl n c, ucst, n
 
 let pf_interp_ty ?(resolve_typeclasses=false) ist gl ty =
    let n_binders = ref 0 in
@@ -3375,7 +3375,7 @@ let saturate ?(beta=false) ?(bi_types=false) env sigma c ?(ty=Retyping.get_type_
         (Reductionops.whd_betadeltaiota env sigma) ty in
       match kind_of_type ty with
       | ProdType _ -> loop ty args sigma n
-      | _ -> anomaly "saturate did not find enough products"
+      | _ -> raise NotEnoughProducts
   in
    loop ty [] sigma m
 
@@ -3898,7 +3898,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
   | _ -> false in
   let match_pat env p occ h cl = 
     let sigma0 = project orig_gl in
-    pp(lazy(str"matching: " ++ pp_pattern p));
+    pp(lazy(str"matching: " ++ pr_occ occ ++ pp_pattern p));
     let (c,ucst), cl =
       fill_occ_pattern ~raise_NoMatch:true env sigma0 cl p occ h in
     pp(lazy(str"     got: " ++ pr_constr c));
@@ -3918,6 +3918,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
        with e when Errors.noncritical e -> p in
   (* finds the eliminator applies it to evars and c saturated as needed  *)
   (* obtaining "elim ??? (c ???)". pred is the higher order evar         *)
+  (* cty is None when the user writes _ (hence we can't make a pattern *)
   let cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl =
     match elim with
     | Some elim ->
@@ -3928,7 +3929,15 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
         pf_saturate ~beta:is_case gl elim ~ty:elimty n_elim_args in
       let pred = List.assoc pred_id elim_args in
       let elimty = Reductionops.whd_betadeltaiota env (project gl) elimty in
-      None, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
+      let cty, gl =
+        if Option.is_empty oc then None, gl
+        else
+          let c = Option.get oc in let gl, c_ty = pf_type_of gl c in
+          let pc = match c_gen with
+            | Some p -> interp_cpattern (Option.get ist) orig_gl p None 
+            | _ -> mkTpat gl c in
+          Some(c, c_ty, pc), gl in
+      cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
     | None ->
       let c = Option.get oc in let gl, c_ty = pf_type_of gl c in
       let ((kn, i) as ind, _ as indu), unfolded_c_ty =
@@ -3958,7 +3967,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
   in
   pp(lazy(str"elim= "++ pr_constr_pat elim));
-  pp(lazy(str"elimty= "++ pr_constr elimty));
+  pp(lazy(str"elimty= "++ pr_constr_pat elimty));
   let inf_deps_r = match kind_of_type elimty with
     | AtomicType (_, args) -> List.rev (Array.to_list args)
     | _ -> assert false in
@@ -3967,11 +3976,17 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       let c, c_ty, _, gl = pf_saturate gl c ~ty:c_ty n in
       let gl' = f c c_ty gl in
       Some (c, c_ty, gl, gl')
-    with NotEnoughProducts -> None | _ -> loop (n+1) in loop 0 in
-  let elim_is_dep, gl = match cty with
-    | None -> true, gl
+    with
+    | NotEnoughProducts -> None
+    | e when Errors.noncritical e -> loop (n+1) in loop 0 in
+  (* Here we try to understand if the main pattern/term the user gave is
+   * the first pattern to be matched (i.e. if elimty ends in P t1 .. tn,
+   * weather tn is the t the user wrote in 'elim: t' *)
+  let c_is_head_p, gl = match cty with
+    | None -> true, gl  (* The user wrote elim: _ *)
     | Some (c, c_ty, _) ->
     let res = 
+      (* we try to see if c unifies with the last arg of elim *)
       if elim_is_dep then None else
       let arg = List.assoc (n_elim_args - 1) elim_args in
       let gl, arg_ty = pf_type_of gl arg in
@@ -3982,21 +3997,22 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
     match res with
     | Some x -> x
     | None ->
+      (* we try to see if c unifies with the last inferred pattern *)
       let inf_arg = List.hd inf_deps_r in
       let gl, inf_arg_ty = pf_type_of gl inf_arg in
       match saturate_until gl c c_ty (fun _ c_ty gl ->
               pf_unify_HO gl c_ty inf_arg_ty) with
       | Some (c, _, _,gl) -> true, gl
       | None ->
-	errorstrm (str"Unable to apply the eliminator to the term"++
-      spc()++pr_constr c++spc()++str"or to unify it's type with"++
-      pr_constr inf_arg_ty) in
-  pp(lazy(str"elim_is_dep= " ++ bool elim_is_dep));
+        errorstrm (str"Unable to apply the eliminator to the term"++
+          spc()++pr_constr c++spc()++str"or to unify it's type with"++
+          pr_constr inf_arg_ty) in
+  pp(lazy(str"c_is_head_p= " ++ bool c_is_head_p));
   let gl, predty = pf_type_of gl pred in
   (* Patterns for the inductive types indexes to be bound in pred are computed
    * looking at the ones provided by the user and the inferred ones looking at
    * the type of the elimination principle *)
-  let pp_pat (_,p,_,_) = pp_pattern p in
+  let pp_pat (_,p,_,occ) = pr_occ occ ++ pp_pattern p in
   let pp_inf_pat gl (_,_,t,_) = pr_constr_pat (fire_subst gl t) in
   let patterns, clr, gl =
     let rec loop patterns clr i = function
@@ -4012,12 +4028,12 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
           loop (patterns @ [i, p, inf_t, occ]) 
             (clr_t @ clr) (i+1) (deps, inf_deps)
       | [], c :: inf_deps -> 
-          pp(lazy(str"adding inferred pattern " ++ pr_constr_pat c));
+          pp(lazy(str"adding inf pattern " ++ pr_constr_pat c));
           loop (patterns @ [i, mkTpat gl c, c, allocc]) 
             clr (i+1) ([], inf_deps)
       | _::_, [] -> errorstrm (str "Too many dependent abstractions") in
-    let deps, head_p, inf_deps_r = match what, elim_is_dep, cty with
-    | `EConstr _, _, None -> anomaly "Simple welim with no term"
+    let deps, head_p, inf_deps_r = match what, c_is_head_p, cty with
+    | `EConstr _, _, None -> anomaly "Simple elim with no term"
     | _, false, _ -> deps, [], inf_deps_r
     | `EGen gen, true, None -> deps @ [gen], [], inf_deps_r
     | _, true, Some (c, _, pc) ->
@@ -4077,7 +4093,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
           let erefl, gl = mkRefl t c gl in
           let erefl = fire_subst gl erefl in
           apply_type new_concl [erefl], gl in
-        let rel = k + if elim_is_dep then 1 else 0 in
+        let rel = k + if c_is_head_p then 1 else 0 in
         let src, gl = mkProt mkProp (mkApp (eq,[|t; c; mkRel rel|])) gl in
         let concl = mkArrow src (lift 1 concl) in
         let clr = if deps <> [] then clr else [] in
@@ -4643,7 +4659,7 @@ END
 let simplintac occ rdx sim gl = 
   let simptac gl = 
     let sigma0, concl0, env0 = project gl, pf_concl gl, pf_env gl in
-    let simp env c _ = red_safe Tacred.simpl env sigma0 c in
+    let simp env c _ _ = red_safe Tacred.simpl env sigma0 c in
     Proofview.V82.of_tactic
       (convert_concl_no_check (eval_pattern env0 sigma0 concl0 rdx occ simp))
       gl in
@@ -4681,8 +4697,8 @@ let unfoldintac occ rdx t (kt,_) gl =
     let ise, u = mk_tpattern env0 sigma0 (ise,t) all_ok L2R t in
     let find_T, end_T =
       mk_tpattern_matcher ~raise_NoMatch:true sigma0 occ (ise,[u]) in
-    (fun env c h -> 
-      try find_T env c h (fun env c _ -> body env t c)
+    (fun env c _ h -> 
+      try find_T env c h (fun env c _ _ -> body env t c)
       with NoMatch when easy -> c
       | NoMatch | NoProgress -> errorstrm (str"No occurrence of "
         ++ pr_constr_pat t ++ spc() ++ str "in " ++ pr_constr c)),
@@ -4690,7 +4706,7 @@ let unfoldintac occ rdx t (kt,_) gl =
       | NoMatch when easy -> fake_pmatcher_end () 
       | NoMatch -> anomaly "unfoldintac")
   | _ -> 
-    (fun env (c as orig_c) h ->
+    (fun env (c as orig_c) _ h ->
       if const then
           let rec aux c = 
             match kind_of_term c with
@@ -4728,10 +4744,10 @@ let foldtac occ rdx ft gl =
     let ise, ut = mk_tpattern env0 sigma0 (ise,t) all_ok L2R ut in
     let find_T, end_T =
       mk_tpattern_matcher ~raise_NoMatch:true sigma0 occ (ise,[ut]) in
-    (fun env c h -> try find_T env c h (fun env t _ -> t) with NoMatch -> c),
+    (fun env c _ h -> try find_T env c h (fun env t _ _ -> t) with NoMatch ->c),
     (fun () -> try end_T () with NoMatch -> fake_pmatcher_end ())
   | _ -> 
-    (fun env c h -> try let sigma = unify_HO env sigma c t in fs sigma t
+    (fun env c _ h -> try let sigma = unify_HO env sigma c t in fs sigma t
     with _ -> errorstrm (str "fold pattern " ++ pr_constr_pat t ++ spc ()
       ++ str "does not match redex " ++ pr_constr_pat c)), 
     fake_pmatcher_end in
@@ -4896,7 +4912,7 @@ let closed0_check cl p gl =
   if closed0 cl then
     errorstrm (str"No occurrence of redex "++pf_pr_constr gl (project gl) p)
 
-let rwrxtac occ rdx_pat dir rule gl =
+let rwprocess_rule dir rule gl =
   let env = pf_env gl in
   let coq_prod = lz_coq_prod () in
   let is_setoid = ssr_is_setoid env in
@@ -4967,7 +4983,13 @@ let rwrxtac occ rdx_pat dir rule gl =
         in
     let sigma, r = rule in
     let t = Retyping.get_type_of env sigma r in
-    loop dir sigma r t [] 0 in
+    loop dir sigma r t [] 0
+  in
+    r_sigma, rules
+
+let rwrxtac occ rdx_pat dir rule gl =
+  let env = pf_env gl in
+  let r_sigma, rules = rwprocess_rule dir rule gl in
   let find_rule rdx =
     let rec rwtac = function
       | [] ->
@@ -4992,11 +5014,11 @@ let rwrxtac occ rdx_pat dir rule gl =
         sigma, pats @ [pat] in
       let rpats = List.fold_left (rpat env0 sigma0) (r_sigma,[]) rules in
       let find_R, end_R = mk_tpattern_matcher sigma0 occ ~upats_origin rpats in
-      find_R ~k:(fun _ _ h -> mkRel h), 
+      (fun e c _ i -> find_R ~k:(fun _ _ _ h -> mkRel h) e c i), 
       fun cl -> let rdx,d,r = end_R () in closed0_check cl rdx gl; (d,r),rdx
   | Some(_, (T e | X_In_T (_,e) | E_As_X_In_T (e,_,_) | E_In_X_In_T (e,_,_))) ->
       let r = ref None in
-      (fun env c h -> do_once r (fun () -> find_rule c, c); mkRel h),
+      (fun env c _ h -> do_once r (fun () -> find_rule c, c); mkRel h),
       (fun concl -> closed0_check concl e gl; assert_done r) in
   let concl = eval_pattern env0 sigma0 concl0 rdx_pat occ find_R in
   let (d, r), rdx = conclude concl in
@@ -5009,6 +5031,32 @@ let rwrxtac occ rdx_pat dir rule gl =
   prof_rwxrtac.profile (rwrxtac occ rdx_pat dir rule) gl
 ;;
 
+let ssrinstancesofrule ist dir arg gl =
+  let sigma0, env0, concl0 = project gl, pf_env gl, pf_concl gl in
+  let rule = interp_term ist gl arg in
+  let r_sigma, rules = rwprocess_rule dir rule gl in
+  let find, conclude =
+    let upats_origin = dir, snd rule in
+    let rpat env sigma0 (sigma, pats) (d, r, lhs, rhs) =
+      let sigma, pat =
+        mk_tpattern env sigma0 (sigma,r) (rw_progress rhs) d lhs in
+      sigma, pats @ [pat] in
+    let rpats = List.fold_left (rpat env0 sigma0) (r_sigma,[]) rules in
+    mk_tpattern_matcher ~all_instances:true ~raise_NoMatch:true sigma0 None ~upats_origin rpats in
+  let print env p c _ = ppnl (hov 1 (str"instance:" ++ spc() ++ pr_constr p ++ spc() ++ str "matches:" ++ spc() ++ pr_constr c)); c in
+  ppnl (str"BEGIN INSTANCES");
+  try
+    while true do
+      ignore(find env0 concl0 1 ~k:print)
+    done; raise NoMatch
+  with NoMatch -> ppnl (str"END INSTANCES"); tclIDTAC gl
+
+TACTIC EXTEND ssrinstofruleL2R
+| [ "ssrinstancesofruleL2R" ssrterm(arg) ] -> [ Proofview.V82.tactic (ssrinstancesofrule ist L2R arg) ]
+END
+TACTIC EXTEND ssrinstofruleR2L
+| [ "ssrinstancesofruleR2L" ssrterm(arg) ] -> [ Proofview.V82.tactic (ssrinstancesofrule ist R2L arg) ]
+END
 
 (* Resolve forward reference *)
 let _ = 
@@ -5490,7 +5538,7 @@ ARGUMENT EXTEND ssrcofixfwd TYPED AS ssrfixfwd PRINTED BY pr_ssrcofixfwd
 END
 
 let ssrposetac ist (id, (_, t)) gl =
-  let sigma, t, ucst = pf_abs_ssrterm ist gl t in
+  let sigma, t, ucst, _ = pf_abs_ssrterm ist gl t in
   posetac id t (pf_merge_uc ucst gl)
 
 
@@ -5648,7 +5696,7 @@ let unfold cl =
     (List.map (fun c -> F.fCONST (fst (destConst c))) cl @ [F.fBETA; F.fIOTA])))
 
 let havegentac ist t gl =
-  let sigma, c, ucst = pf_abs_ssrterm ist gl t in
+  let sigma, c, ucst, _ = pf_abs_ssrterm ist gl t in
   let gl = pf_merge_uc ucst gl in
   let gl, cty = pf_type_of gl c in
   apply_type (mkArrow cty (pf_concl gl)) [c] gl
@@ -5704,7 +5752,7 @@ let havetac ist
      errorstrm (str"Suff have does not accept a proof term")
    | FwdHave, false, true ->
      let cty = combineCG cty hole (mkCArrow loc) mkRArrow in
-     let _, t, uc = interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
+     let _,t,uc,_ = interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
      let gl = pf_merge_uc uc gl in
      let gl, ty = pf_type_of gl t in
      let ctx, _ = decompose_prod_n 1 ty in
@@ -5720,8 +5768,12 @@ let havetac ist
      let skols_args =
        List.map (fun id -> examine_abstract (mkVar id) gl) skols in
      let gl = List.fold_right unlock_abs skols_args gl in
-     let sigma, t, uc =
+     let sigma, t, uc, n_evars =
        interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
+     if skols <> [] && n_evars <> 0 then
+       Errors.error ("Automatic generalization of unresolved implicit "^
+                     "arguments together with abstract variables is "^
+                     "not supported");
      let gl = re_sig (sig_it gl) (Evd.merge_universe_context sigma uc) in
      let gs =
        List.map (fun (_,a) ->
