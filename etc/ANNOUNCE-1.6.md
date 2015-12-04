@@ -39,7 +39,9 @@ As a consequence users may select and download or compile only the
 components they are interested in. Each component comes with a summary
 file to be Require(d) and Import(ed) in order to load, at once, the
 entire component. For example the command
-  Require Import all_ssreflect.
+
+       Require Import all_ssreflect.
+
 loads all the theory files in the contained in the 'ssreflect'
 component.
 
@@ -47,13 +49,16 @@ This modularity comes at the price of an incompatibility for users of
 previous version of the Mathematical Components library, due to the
 change of logical/physical paths implied by the reorganization of the
 library. In particular the command line
-  Require Ssreflect.ssreflect.
+
+         Require Ssreflect.ssreflect.
+
 does not work anymore.  We propose a replacement schema for such
 command lines that is compatible with both versions 8.4 and 8.5 of
 Coq, namely replacing the previous line with:
 
-  Require Import mathcomp.ssreflect.ssreflect.
-  From mathcomp Require Import ssrfun ssrbool ...
+     Require Import mathcomp.ssreflect.ssreflect.
+
+     From mathcomp Require Import ssrfun ssrbool ...
 
 The first line loads the ssreflect plugin using its full path.
 Then all other files are loaded from the mathcomp name space.
@@ -64,9 +69,11 @@ and searches for files in all known paths: hence beware of the
 possible name collisions.
 
 The tarball can be download at the following URL:
-  http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
+
+    http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
 
 The html documentation of the theory files can be browsed at:
-  http://ssr.msr-inria.inria.fr/doc/mathcomp-1.6/
+
+    http://ssr.msr-inria.inria.fr/doc/mathcomp-1.6/
 
 -- The Mathematical Components team
