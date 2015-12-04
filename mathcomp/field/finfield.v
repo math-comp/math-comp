@@ -127,7 +127,7 @@ move=> oF pr_p; rewrite inE pr_p -order_dvdn.
 rewrite (abelem_order_p finField_is_abelem) ?inE ?oner_neq0 //=.
 have n_gt0: n > 0 by rewrite -(ltn_exp2l _ _ (prime_gt1 pr_p)) -oF finRing_gt1.
 by rewrite cardsT oF -(prednK n_gt0) pdiv_pfactor.
-Qed. 
+Qed.
 
 End FinField.
 
@@ -564,7 +564,7 @@ have in_zs: zs =i Em.
   elim: (k) => [|i IHi]; first by rewrite gal_id.
   by rewrite expgSr expnSr exprM IHi galM ?Da ?memvf.
 suffices defEm: Em = {:L}%VS by move=> z; rewrite in_zs defEm memvf.
-apply/eqP; rewrite eqEsubv subvf -defL -[Em]subfield_closed agenvS //. 
+apply/eqP; rewrite eqEsubv subvf -defL -[Em]subfield_closed agenvS //.
 by rewrite subv_add sub1v; apply/span_subvP=> z; rewrite in_zs.
 Qed.
 
@@ -580,10 +580,10 @@ Variable R : finUnitRingType.
 Hypothesis domR : GRing.IntegralDomain.axiom R.
 Implicit Types x y : R.
 
-Let lregR x : x != 0 -> GRing.lreg x.  
+Let lregR x : x != 0 -> GRing.lreg x.
 Proof. by move=> xnz; apply: mulrI0_lreg => y /domR/orP[/idPn | /eqP]. Qed.
 
-Lemma finDomain_field : GRing.Field.mixin_of R. 
+Lemma finDomain_field : GRing.Field.mixin_of R.
 Proof.
 move=> x /lregR-regx; apply/unitrP; exists (invF regx 1).
 by split; first apply: (regx); rewrite ?mulrA f_invF // mulr1 mul1r.
@@ -595,7 +595,7 @@ Proof.
 have fieldR := finDomain_field.
 have [p p_pr charRp]: exists2 p, prime p & p \in [char R].
   have [e /prod_prime_decomp->]: {e | (e > 0)%N & e%:R == 0 :> R}.
-    by exists #|[set: R]%G|; rewrite // -order_dvdn order_dvdG ?inE. 
+    by exists #|[set: R]%G|; rewrite // -order_dvdn order_dvdG ?inE.
   rewrite big_seq; elim/big_rec: _ => [|[p m] /= n]; first by rewrite oner_eq0.
   case/mem_prime_decomp=> p_pr _ _ IHn.
   elim: m => [|m IHm]; rewrite ?mul1n {IHn}// expnS -mulnA natrM.
@@ -643,7 +643,7 @@ suffices: `|aq n| <= (q - 1)%:R.
   rewrite !hornerE; apply: ler_trans (ler_sub_dist _ _).
   by rewrite normr_nat normrX n1z expr1n ler_subr_addl (leC_nat 2).
 have Zaq d: d %| n -> aq d \in Cint.
-  move/(dvdn_prim_root z_prim)=> zd_prim. 
+  move/(dvdn_prim_root z_prim)=> zd_prim.
   rewrite rpred_horner ?rpred_nat //= -Cintr_Cyclotomic //.
   by apply/polyOverP=> i; rewrite coef_map ?rpred_int.
 suffices: (aq n %| (q - 1)%:R)%C.
