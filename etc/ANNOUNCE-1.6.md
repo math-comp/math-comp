@@ -40,8 +40,10 @@ The main incompatibility concerning users is the change of logical/physical
 path implied by the reorganization of the library.  In particular "Require
 Ssreflect.ssreflect" does not work anymore.  We propose a schema that is
 compatible with both Coq 8.4 and Coq 8.5, namely:
-  Require Import mathcomp.ssreflect.ssreflect.
-  From mathcomp Require Import ssrfun ssrbool ...
+
+    Require Import mathcomp.ssreflect.ssreflect.
+    From mathcomp Require Import ssrfun ssrbool ...
+    
 The first line loads the ssreflect plugin using its full path.
 Then all other files are loaded from the mathcomp name space.
 The component part (like ssreflect or algebra) is omitted.  All theory files in
