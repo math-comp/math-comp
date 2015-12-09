@@ -9,7 +9,7 @@ received minor fixes while the libraries received minor additions.
 
 A detailed ChangeLog is available at:
   https://github.com/math-comp/math-comp/blob/master/etc/ChangeLog
-This document contains in particulat the list of new theorems as well
+This document contains in particular the list of new theorems as well
 as the list of theorems that were renamed or replaced by more
 general variants.
 

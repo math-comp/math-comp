@@ -10,14 +10,14 @@ DOCUMENTATION
 	and a detailed list of the changes made in the releases
         is available as an Inria Research Report at
 
-        	http://hal.inria.fr/inria-00258384 
+        	http://hal.inria.fr/inria-00258384
 
 
 AVAILABILITY
 ============
 
 	Ssreflect and the Mathematical Components library are available at:
-	http://ssr.msr-inria.inria.fr/
+	http://math-comp.github.io/math-comp/
 
 
 THE DISCUSSION LIST
@@ -37,4 +37,4 @@ LICENSING
 
         You should have received a copy of the CeCILL B License with this
         Kit, in the file named "CeCILL-B".
-        If not, visit http://www.cecill.info    
+        If not, visit http://www.cecill.info
