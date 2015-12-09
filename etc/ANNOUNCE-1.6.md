@@ -9,8 +9,10 @@ received minor fixes while the libraries received minor additions.
 
 A detailed ChangeLog is available at:
   https://github.com/math-comp/math-comp/blob/master/etc/ChangeLog
-This document contains the list of new theorems as well as the list
-of theorems that were renamed or replaced by more general variants.
+This document contains in particulat the list of new theorems as well
+as the list of theorems that were renamed or replaced by more
+general variants.
+
 
 Our development repository is now public, and mirrored on github:
   https://github.com/math-comp/math-comp
@@ -45,30 +47,15 @@ entire component. For example the command
 loads all the theory files in the contained in the 'ssreflect'
 component.
 
-This modularity comes at the price of an incompatibility for users of
-previous version of the Mathematical Components library, due to the
-change of logical/physical paths implied by the reorganization of the
-library. In particular the command line
+Note that this modularity comes at the price of a possible
+incompatibility for users of previous version of the Mathematical
+Components library, due to the change of logical/physical paths
+implied by the reorganization of the library. See the installation
+notes for more on this issue an a suggested migration scheme.
 
-         Require Ssreflect.ssreflect.
+The tarball can be download at
+http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
 
-does not work anymore.  We propose a replacement schema for such
-command lines that is compatible with both versions 8.4 and 8.5 of
-Coq, namely replacing the previous line with:
-
-     Require Import mathcomp.ssreflect.ssreflect.
-
-     From mathcomp Require Import ssrfun ssrbool ...
-
-The first line loads the ssreflect plugin using its full path.
-Then all other files are loaded from the mathcomp name space.
-The component part (like ssreflect or algebra) is omitted.  All theory files in
-the library follow this schema.
-Note that the From directive has effect only in Coq 8.5. Coq 8.4 ignores it
-and searches for files in all known paths: hence beware of the
-possible name collisions.
-
-The tarball can be download at http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
 
 The html documentation of the theory files can be browsed at http://ssr.msr-inria.inria.fr/doc/mathcomp-1.6/
 

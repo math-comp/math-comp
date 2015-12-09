@@ -1,26 +1,28 @@
-24/11/2015 - major reorganization of the archive - version 1.6 
-	* Files split into subdirectories: ssreflect, algebra, fingroup,  
+24/11/2015 - major reorganization of the archive - version 1.6
+	* Files split into subdirectories: ssreflect, algebra, fingroup,
 	  solvable, field and character. In this way the user can decide
 	  to compile only the subset of the Mathematical Components library
-	  that is relevant to her.
+	  that is relevant to her. Note that this introduces a possible
+	  incompatibility for users of the previous version. A replacement
+	  scheme is suggested in the installation notes.
 
 	* The archive is now open and based on git. Public mirror at:
 	         https://github.com/math-comp/math-comp
-	         
-	* Sources of the reference manual of the Ssreflect tactic language are 
+
+	* Sources of the reference manual of the Ssreflect tactic language are
 	  also open and available at:
 		https://github.com/math-comp/ssr-manual
 	  Pull requests improving the documentation are welcome.
-		
+
 	* Renamings or replacements:
 	  conjC_closed -> cfConjC_closed
 	  class_transr -> class_eqP
 	  cfclass_transl -> cfclass_transr
 	  nontrivial_ideal -> proper_ideal
 	  zchar_orthonormalP -> vchar_orthonormalP
-	  
+
 	* Definitions that changed:
-	  seq_sub	
+	  seq_sub
 
 	* Statements that changed:
 	  orbit_in_transl, orbit_sym, orbit_trans, orbit_transl, orbit_transr,
@@ -28,7 +30,7 @@
 	  lcoset_transr, rcoset_transl, rcoset_transr, mem2_last,
 	  bind_unless, unless_contra, all_and2, all_and3, all_and4, all_and5,
 	  ltr0_neq0, ltr_prod, Zisometry_of_iso
-	
+
 	* New definitions:
 	  adhoc_seq_sub_choiceMixin, adhoc_seq_sub_[choice|fin]Type
 
@@ -90,4 +92,3 @@
 
 18/03/2008 - ssreflect - version 1.1
 	* First public release
-
