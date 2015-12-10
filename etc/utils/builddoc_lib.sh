@@ -60,6 +60,9 @@ sed -r -e '
 done
 }
 
+# example invocation:
+# MAKEDOT=../etc/utils/ PATH=$COQBIN:$PATH MANGLEDOT=touch COQDOCOPTS="-R . mathcomp" \
+#	build_doc */*.v
 build_doc() {
 rm -rf html
 mkdir html
