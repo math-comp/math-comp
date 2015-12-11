@@ -1,0 +1,11 @@
+action.v
+all_fingroup.v
+automorphism.v
+fingroup.v
+gproduct.v
+morphism.v
+perm.v
+presentation.v
+quotient.v
+
+-R . mathcomp.fingroup

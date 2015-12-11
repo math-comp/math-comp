@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>mathcomp.ssreflect.ssrmatching</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library mathcomp.ssreflect.ssrmatching</h1>
+
+<div class="code">
+<span class="comment">(*&nbsp;(c)&nbsp;Copyright&nbsp;2006-2015&nbsp;Microsoft&nbsp;Corporation&nbsp;and&nbsp;Inria.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;CeCILL-B.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a name="SsrMatchingSyntax"><span class="id" title="module">SsrMatchingSyntax</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Reserve the notation for rewrite patterns so that the user is not allowed  
+ to declare it at a different level.                                         
+</div>
+<div class="code">
+<span class="id" title="keyword">Reserved Notation</span> &quot;( a 'in' b )"        (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0).<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;( a 'as' b )"        (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0).<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;( a 'in' b 'in' c )" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0).<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;( a 'as' b 'in' c )" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Notation to define shortcuts for the "X in t" part of a pattern.            
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="6979a4c7233c121ad2ada238740f8921"><span class="id" title="notation">&quot;</span></a>( X 'in' t )" := (<span class="id" title="var">_</span> : <span class="id" title="keyword">fun</span> <span class="id" title="var">X</span> ⇒ <span class="id" title="var">t</span>) : <span class="id" title="var">ssrpatternscope</span>.<br/>
+<span class="id" title="keyword">Delimit</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">ssrpatternscope</span> <span class="id" title="keyword">with</span> <span class="id" title="tactic">pattern</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Some shortcuts for recurrent "X in t" parts.                                
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="SsrMatchingSyntax.RHS"><span class="id" title="abbreviation">RHS</span></a> := <a class="idref" href="mathcomp.ssreflect.ssrmatching.html#6979a4c7233c121ad2ada238740f8921"><span class="id" title="notation">(</span></a><span class="id" title="var">X</span> <span class="id" title="keyword">in</span> <span class="id" title="var">_</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <span class="id" title="var">X</span><a class="idref" href="mathcomp.ssreflect.ssrmatching.html#6979a4c7233c121ad2ada238740f8921"><span class="id" title="notation">)</span></a>%<span class="id" title="tactic">pattern</span>.<br/>
+<span class="id" title="keyword">Notation</span> <a name="SsrMatchingSyntax.LHS"><span class="id" title="abbreviation">LHS</span></a> := <a class="idref" href="mathcomp.ssreflect.ssrmatching.html#6979a4c7233c121ad2ada238740f8921"><span class="id" title="notation">(</span></a><span class="id" title="var">X</span> <span class="id" title="keyword">in</span> <span class="id" title="var">X</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <span class="id" title="var">_</span><a class="idref" href="mathcomp.ssreflect.ssrmatching.html#6979a4c7233c121ad2ada238740f8921"><span class="id" title="notation">)</span></a>%<span class="id" title="tactic">pattern</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="mathcomp.ssreflect.ssrmatching.html#SsrMatchingSyntax"><span class="id" title="module">SsrMatchingSyntax</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Export</span> <span class="id" title="var">SsrMatchingSyntax</span>.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

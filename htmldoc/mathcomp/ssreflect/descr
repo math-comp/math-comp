@@ -1,0 +1,8 @@
+Small Scale Reflection
+
+This library includes the small scale reflection proof language
+extension and the minimal set of libraries to take advantage of it.
+This includes libraries on lists (seq), boolean and boolean
+predicates, natural numbers and types with decidable equality,
+finite types, finite sets, finite functions, finite graphs, basic arithmetics
+and prime numbers, big operators
