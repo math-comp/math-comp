@@ -1,4 +1,4 @@
-ody { padding: 0px 0px;
+body { padding: 0px 0px;
        margin: 0px 0px; 
        background-color: white }
 
@@ -103,8 +103,13 @@ h4.section {
     color: rgb(30%,30%,70%);
     font-family: monospace } 
 
-.doc .inlinecode .id {
-    color: rgb(30%,30%,70%);
+.doc .inlinecode .id { 
+    color: rgb(30%,30%,70%); 
+} 
+
+.inlinecodenm { 
+    display: inline;
+    color: #444444;
 }
 
 .doc .code { 
@@ -126,12 +131,95 @@ h4.section {
     font-family: monospace;
  } 
 
+table.infrule {
+  border: 0px;
+  margin-left: 50px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+td.infrule {
+    font-family: monospace;
+    text-align: center;
+/*    color: rgb(35%,35%,70%);  */
+    padding: 0px;
+    line-height: 100%;
+}
+
+tr.infrulemiddle hr {
+    margin: 1px 0 1px 0;
+}
+
+.infrulenamecol {
+    color: rgb(60%,60%,60%); 
+    font-size: 80%;
+    padding-left: 1em;
+    padding-bottom: 0.1em
+}
+
 /* Pied de page */
 
 #footer { font-size: 65%;
           font-family: sans-serif; }
 
+/* Identifiers: <span class="id" title="...">) */
+
 .id { display: inline; }
+
+.id[title="constructor"] {
+    color: rgb(60%,0%,0%);
+}
+
+.id[title="var"] {
+    color: rgb(40%,0%,40%);
+}
+
+.id[title="variable"] {
+    color: rgb(40%,0%,40%);
+}
+
+.id[title="definition"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="abbreviation"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="lemma"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="instance"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="projection"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="method"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="inductive"] {
+    color: rgb(0%,0%,80%);
+}
+
+.id[title="record"] {
+    color: rgb(0%,0%,80%);
+}
+
+.id[title="class"] {
+    color: rgb(0%,0%,80%);
+}
+
+.id[title="keyword"] {
+ color : #cf1d1d;
+/*     color: black; */
+}
+
+/* Deprecated rules using the 'type' attribute of <span> (not xhtml valid) */
 
 .id[type="constructor"] { 
     color: rgb(60%,0%,0%);
@@ -232,5 +320,13 @@ h4.section {
 #index #footer {
     position: absolute;
     bottom: 0;
-    text-align: bottom;
-}
+}
+
+.paragraph {
+    height: 0.75em;
+}
+
+ul.doclist {
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
