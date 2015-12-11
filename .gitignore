@@ -18,3 +18,8 @@ mathcomp/ssrmatching.mli
 mathcomp/ssreflect.mllib
 mathcomp-*.tar.gz
 *#
+htmldoc/mathcomp.*html
+htmldoc/index*.*html
+htmldoc/depend
+htmldoc/depend.js
+htmldoc/*.css
