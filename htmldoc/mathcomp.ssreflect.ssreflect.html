@@ -1,0 +1,674 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>mathcomp.ssreflect.ssreflect</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library mathcomp.ssreflect.ssreflect</h1>
+
+<div class="code">
+<span class="comment">(*&nbsp;(c)&nbsp;Copyright&nbsp;2006-2015&nbsp;Microsoft&nbsp;Corporation&nbsp;and&nbsp;Inria.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;CeCILL-B.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Bool.Bool.html#"><span class="id" title="library">Bool</span></a>. <span class="comment">(*&nbsp;For&nbsp;bool_scope&nbsp;delimiter&nbsp;'bool'.&nbsp;*)</span><br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="mathcomp.ssreflect.ssrmatching.html#"><span class="id" title="library">ssrmatching</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ This file is the Gallina part of the ssreflect plugin implementation.      
+ Files that use the ssreflect plugin should always Require ssreflect and    
+ either Import ssreflect or Import ssreflect.SsrSyntax.                     
+   Part of the contents of this file is technical and will only interest    
+ advanced developers; in addition the following are defined:                
+   [the str of v by f] == the Canonical s : str such that f s = v.          
+        [the str of v] == the Canonical s : str that coerces to v.          
+        argumentType c == the T such that c : forall x : T, P x.            
+          returnType c == the R such that c : T -&gt; R.                       
+     {type of c for s} == P s where c : forall x : T, P x.                  
+           phantom T v == singleton type with inhabitant Phantom T v.       
+               phant T == singleton type with inhabitant Phant v.           
+                 =^~ r == the converse of rewriting rule r (e.g., in a      
+                          rewrite multirule).                               
+             unkeyed t == t, but treated as an unkeyed matching pattern by  
+                          the ssreflect matching algorithm.                 
+             nosimpl t == t, but on the right-hand side of Definition C :=  
+                          nosimpl disables expansion of C by /=.            
+              locked t == t, but locked t is not convertible to t.          
+       locked_with k t == t, but not convertible to t or locked_with k' t   
+                          unless k = k' (with k : unit). Coq type-checking  
+                          will be much more efficient if locked_with with a 
+                          bespoke k is used for sealed definitions.         
+          unlockable v == interface for sealed constant definitions of v.   
+        Unlockable def == the unlockable that registers def : C = v.        
+     [unlockable of C] == a clone for C of the canonical unlockable for the 
+                          definition of C (e.g., if it uses locked_with).   
+    [unlockable fun C] == [unlockable of C] with the expansion forced to be 
+                          an explicit lambda expression.                    
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li>&gt; The usage pattern for ADT operations is:                               
+       Definition foo_def x1 .. xn := big_foo_expression.                   
+       Fact foo_key : unit. Proof. by [ ]. Qed.                              
+       Definition foo := locked_with foo_key foo_def.                       
+       Canonical foo_unlockable := [unlockable fun foo].                    
+     This minimizes the comparison overhead for foo, while still allowing   
+     rewrite unlock to expose big_foo_expression.                           
+
+</li>
+</ul>
+ More information about these definitions and their use can be found in the 
+ ssreflect manual, and in specific comments below.                           
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a name="SsrSyntax"><span class="id" title="module">SsrSyntax</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Declare Ssr keywords: 'is' 'of' '//' '/=' and '//='. We also declare the   
+ parsing level 8, as a workaround for a notation grammar factoring problem. 
+ Arguments of application-style notations (at level 10) should be declared  
+ at level 8 rather than 9 or the camlp5 grammar will not factor properly.    
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;(* x 'is' y 'of' z 'isn't' // /= //= *)" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 8).<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;(* 69 *)" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 69).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Non ambiguous keyword to check if the SsrSyntax module is imported  
+</div>
+<div class="code">
+<span class="id" title="keyword">Reserved Notation</span> &quot;(* Use to test if 'SsrSyntax_is_Imported' *)" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 8).<br/>
+
+<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;&lt;hidden n &gt;" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200).<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;T (* n *)" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">format</span> "T  (* n *)").<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#SsrSyntax"><span class="id" title="module">SsrSyntax</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Export</span> <span class="id" title="var">SsrMatchingSyntax</span>.<br/>
+<span class="id" title="keyword">Export</span> <span class="id" title="var">SsrSyntax</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Make the general "if" into a notation, so that we can override it below.   
+ The notations are "only parsing" because the Coq decompiler will not       
+ recognize the expansion of the boolean if; using the default printer       
+ avoids a spurrious trailing %GEN_IF.                                        
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Delimit</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">general_if_scope</span> <span class="id" title="keyword">with</span> <span class="id" title="var">GEN_IF</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="ad01022564f520b6e09272dffbdd57c4"><span class="id" title="notation">&quot;</span></a>'if' c 'then' v1 'else' v2" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <span class="id" title="var">c</span> <span class="id" title="keyword">then</span> <span class="id" title="var">v1</span> <span class="id" title="keyword">else</span> <span class="id" title="var">v2</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">c</span>, <span class="id" title="var">v1</span>, <span class="id" title="var">v2</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>) : <span class="id" title="var">general_if_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="af2f931df4213e5c4cb5b58837f360c0"><span class="id" title="notation">&quot;</span></a>'if' c 'return' t 'then' v1 'else' v2" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <span class="id" title="var">c</span> <span class="id" title="keyword">return</span> <span class="id" title="var">t</span> <span class="id" title="keyword">then</span> <span class="id" title="var">v1</span> <span class="id" title="keyword">else</span> <span class="id" title="var">v2</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">c</span>, <span class="id" title="var">t</span>, <span class="id" title="var">v1</span>, <span class="id" title="var">v2</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>) : <span class="id" title="var">general_if_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="e4a14a1c5fc2957994f55bfc3c2578fd"><span class="id" title="notation">&quot;</span></a>'if' c 'as' x 'return' t 'then' v1 'else' v2" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <span class="id" title="var">c</span> <span class="id" title="keyword">as</span> <span class="id" title="var">x</span> <span class="id" title="keyword">return</span> <span class="id" title="var">t</span> <span class="id" title="keyword">then</span> <span class="id" title="var">v1</span> <span class="id" title="keyword">else</span> <span class="id" title="var">v2</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">c</span>, <span class="id" title="var">t</span>, <span class="id" title="var">v1</span>, <span class="id" title="var">v2</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200, <span class="id" title="var">x</span> <span class="id" title="var">ident</span>, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="var">general_if_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Force boolean interpretation of simple if expressions.                      
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Delimit</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">boolean_if_scope</span> <span class="id" title="keyword">with</span> <span class="id" title="var">BOOL_IF</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="2511079c59ad38c7f21d89316f028f07"><span class="id" title="notation">&quot;</span></a>'if' c 'return' t 'then' v1 'else' v2" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <span class="id" title="var">c</span>%<span class="id" title="var">bool</span> <span class="id" title="var">is</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a> <span class="id" title="keyword">in</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#bool"><span class="id" title="inductive">bool</span></a> <span class="id" title="keyword">return</span> <span class="id" title="var">t</span> <span class="id" title="keyword">then</span> <span class="id" title="var">v1</span> <span class="id" title="keyword">else</span> <span class="id" title="var">v2</span>) : <span class="id" title="var">boolean_if_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="0348819abaa88c2cd747e8fa60dde7ae"><span class="id" title="notation">&quot;</span></a>'if' c 'then' v1 'else' v2" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <span class="id" title="var">c</span>%<span class="id" title="var">bool</span> <span class="id" title="var">is</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a> <span class="id" title="keyword">in</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#bool"><span class="id" title="inductive">bool</span></a> <span class="id" title="keyword">return</span> <span class="id" title="var">_</span> <span class="id" title="keyword">then</span> <span class="id" title="var">v1</span> <span class="id" title="keyword">else</span> <span class="id" title="var">v2</span>) : <span class="id" title="var">boolean_if_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="f2de61384776e923a9c502554d1079cb"><span class="id" title="notation">&quot;</span></a>'if' c 'as' x 'return' t 'then' v1 'else' v2" :=<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <span class="id" title="var">c</span>%<span class="id" title="var">bool</span> <span class="id" title="var">is</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a> <span class="id" title="keyword">as</span> <span class="id" title="var">x</span> <span class="id" title="keyword">in</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#bool"><span class="id" title="inductive">bool</span></a> <span class="id" title="keyword">return</span> <span class="id" title="var">t</span> <span class="id" title="keyword">then</span> <span class="id" title="var">v1</span> <span class="id" title="keyword">else</span> <span class="id" title="var">v2</span>) : <span class="id" title="var">boolean_if_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">boolean_if_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ To allow a wider variety of notations without reserving a large number of  
+ of identifiers, the ssreflect library systematically uses "forms" to       
+ enclose complex mixfix syntax. A "form" is simply a mixfix expression      
+ enclosed in square brackets and introduced by a keyword:                   
+      [keyword ... ]                                                        
+ Because the keyword follows a bracket it does not need to be reserved.     
+ Non-ssreflect libraries that do not respect the form syntax (e.g., the Coq 
+ Lists library) should be loaded before ssreflect so that their notations   
+ do not mask all ssreflect forms.                                            
+</div>
+<div class="code">
+<span class="id" title="keyword">Delimit</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">form_scope</span> <span class="id" title="keyword">with</span> <span class="id" title="var">FORM</span>.<br/>
+<span class="id" title="keyword">Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Allow overloading of the cast (x : T) syntax, put whitespace around the    
+ ":" symbol to avoid lexical clashes (and for consistency with the parsing  
+ precedence of the notation, which binds less tightly than application),    
+ and put printing boxes that print the type of a long definition on a       
+ separate line rather than force-fit it at the right margin.                 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="4509b22bf26e3d6d771897e22bd8bc8f"><span class="id" title="notation">&quot;</span></a>x : T" := (<span class="id" title="var">x</span> : <span class="id" title="var">T</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 100, <span class="id" title="tactic">right</span> <span class="id" title="keyword">associativity</span>,<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="var">format</span> "'[hv' x '/ '  :  T ']'") : <span class="id" title="var">core_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Allow the casual use of notations like nat * nat for explicit Type         
+ declarations. Note that (nat * nat : Type) is NOT equivalent to            
+ (nat * nat)%type, whose inferred type is legacy type "Set".                 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="6c9360eea10372fcfaa3df18c039dca6"><span class="id" title="notation">&quot;</span></a>T : 'Type'" := (<span class="id" title="var">T</span>%<span class="id" title="var">type</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#4509b22bf26e3d6d771897e22bd8bc8f"><span class="id" title="notation">:</span></a> <span class="id" title="keyword">Type</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 100, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>) : <span class="id" title="var">core_scope</span>.<br/>
+</div>
+
+<div class="doc">
+ Allow similarly Prop annotation for, e.g., rewrite multirules.              
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="0fffdc558ce71ab561d36c8a8094dbe5"><span class="id" title="notation">&quot;</span></a>P : 'Prop'" := (<span class="id" title="var">P</span>%<span class="id" title="var">type</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#4509b22bf26e3d6d771897e22bd8bc8f"><span class="id" title="notation">:</span></a> <span class="id" title="keyword">Prop</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 100, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>) : <span class="id" title="var">core_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Constants for abstract: and [: name ] intro pattern  
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <a name="abstract_lock"><span class="id" title="definition">abstract_lock</span></a> := <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#unit"><span class="id" title="inductive">unit</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="abstract_key"><span class="id" title="definition">abstract_key</span></a> := <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="abstract"><span class="id" title="definition">abstract</span></a> (<span class="id" title="var">statement</span> : <span class="id" title="keyword">Type</span>) (<span class="id" title="var">id</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>) (<span class="id" title="var">lock</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#abstract_lock"><span class="id" title="definition">abstract_lock</span></a>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#lock"><span class="id" title="variable">lock</span></a> <span class="id" title="keyword">in</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#statement"><span class="id" title="variable">statement</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="ea6e5339bca9a7fe73febd70a9e03c1f"><span class="id" title="notation">&quot;</span></a>&lt;hidden n &gt;" := (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#abstract"><span class="id" title="definition">abstract</span></a> <span class="id" title="var">_</span> <span class="id" title="var">n</span> <span class="id" title="var">_</span>).<br/>
+<span class="id" title="keyword">Notation</span> <a name="236655c0c1f565860515a54aa729aab2"><span class="id" title="notation">&quot;</span></a>T (* n *)" := (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#abstract"><span class="id" title="definition">abstract</span></a> <span class="id" title="var">T</span> <span class="id" title="var">n</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#abstract_key"><span class="id" title="definition">abstract_key</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Syntax for referring to canonical structures:                              
+      [the struct_type of proj_val by proj_fun]                             
+ This form denotes the Canonical instance s of the Structure type           
+ struct_type whose proj_fun projection is proj_val, i.e., such that         
+      proj_fun s = proj_val.                                                
+ Typically proj_fun will be A record field accessors of struct_type, but    
+ this need not be the case; it can be, for instance, a field of a record    
+ type to which struct_type coerces; proj_val will likewise be coerced to    
+ the return type of proj_fun. In all but the simplest cases, proj_fun       
+ should be eta-expanded to allow for the insertion of implicit arguments.   
+   In the common case where proj_fun itself is a coercion, the "by" part    
+ can be omitted entirely; in this case it is inferred by casting s to the   
+ inferred type of proj_val. Obviously the latter can be fixed by using an   
+ explicit cast on proj_val, and it is highly recommended to do so when the  
+ return type intended for proj_fun is "Type", as the type inferred for      
+ proj_val may vary because of sort polymorphism (it could be Set or Prop).  
+   Note when using the [the _ of _ ] form to generate a substructure from a  
+ telescopes-style canonical hierarchy (implementing inheritance with        
+ coercions), one should always project or coerce the value to the BASE      
+ structure, because Coq will only find a Canonical derived structure for    
+ the Canonical base structure -- not for a base structure that is specific  
+ to proj_value.                                                              
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a name="TheCanonical"><span class="id" title="module">TheCanonical</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">CoInductive</span> <a name="TheCanonical.put"><span class="id" title="inductive">put</span></a> <span class="id" title="var">vT</span> <span class="id" title="var">sT</span> (<span class="id" title="var">v1</span> <span class="id" title="var">v2</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#vT"><span class="id" title="variable">vT</span></a>) (<span class="id" title="var">s</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#sT"><span class="id" title="variable">sT</span></a>) := <a name="TheCanonical.Put"><span class="id" title="constructor">Put</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="TheCanonical.get"><span class="id" title="definition">get</span></a> <span class="id" title="var">vT</span> <span class="id" title="var">sT</span> <span class="id" title="var">v</span> <span class="id" title="var">s</span> (<span class="id" title="var">p</span> : @<a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.put"><span class="id" title="inductive">put</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#vT"><span class="id" title="variable">vT</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#sT"><span class="id" title="variable">sT</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#s"><span class="id" title="variable">s</span></a>) := <span class="id" title="keyword">let</span>: <a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.Put"><span class="id" title="constructor">Put</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#p"><span class="id" title="variable">p</span></a> <span class="id" title="keyword">in</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#s"><span class="id" title="variable">s</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="TheCanonical.get_by"><span class="id" title="definition">get_by</span></a> <span class="id" title="var">vT</span> <span class="id" title="var">sT</span> <span class="id" title="var">of</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#sT"><span class="id" title="variable">sT</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#vT"><span class="id" title="variable">vT</span></a> := @<a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.get"><span class="id" title="definition">get</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#vT"><span class="id" title="variable">vT</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#sT"><span class="id" title="variable">sT</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical"><span class="id" title="module">TheCanonical</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="var">TheCanonical</span>. <span class="comment">(*&nbsp;Note:&nbsp;no&nbsp;export.&nbsp;*)</span><br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="6262e8fab1767906118a9e7696442d97"><span class="id" title="notation">&quot;</span></a>[ 'the' sT 'of' v 'by' f ]" :=<br/>
+&nbsp;&nbsp;(@<a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.get_by"><span class="id" title="definition">get_by</span></a> <span class="id" title="var">_</span> <span class="id" title="var">sT</span> <span class="id" title="var">f</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ((<span class="id" title="keyword">fun</span> <span class="id" title="var">v'</span> (<span class="id" title="var">s</span> : <span class="id" title="var">sT</span>) ⇒ <a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.Put"><span class="id" title="constructor">Put</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#v'"><span class="id" title="variable">v'</span></a> (<span class="id" title="var">f</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#s"><span class="id" title="variable">s</span></a>) <a class="idref" href="mathcomp.ssreflect.ssreflect.html#s"><span class="id" title="variable">s</span></a>) <span class="id" title="var">v</span> <span class="id" title="var">_</span>))<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>) : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="582a1127c53482b5000949a35912f7c9"><span class="id" title="notation">&quot;</span></a>[ 'the' sT 'of' v ]" := (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.get"><span class="id" title="definition">get</span></a> ((<span class="id" title="keyword">fun</span> <span class="id" title="var">s</span> : <span class="id" title="var">sT</span> ⇒ <a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.Put"><span class="id" title="constructor">Put</span></a> <span class="id" title="var">v</span> <span class="comment">(*coerce*)</span><a class="idref" href="mathcomp.ssreflect.ssreflect.html#s"><span class="id" title="variable">s</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#s"><span class="id" title="variable">s</span></a>) <span class="id" title="var">_</span>))<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">only</span> <span class="id" title="var">parsing</span>) : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ The following are "format only" versions of the above notations. Since Coq 
+ doesn't provide this facility, we fake it by splitting the "the" keyword.  
+ We need to do this to prevent the formatter from being be thrown off by    
+ application collapsing, coercion insertion and beta reduction in the right 
+ hand side of the notations above.                                           
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="753a701f2a9640126bfa2fb735f07898"><span class="id" title="notation">&quot;</span></a>[ 'th' 'e' sT 'of' v 'by' f ]" := (@<a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.get_by"><span class="id" title="definition">get_by</span></a> <span class="id" title="var">_</span> <span class="id" title="var">sT</span> <span class="id" title="var">f</span> <span class="id" title="var">v</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0,  <span class="id" title="var">format</span> "[ 'th' 'e'  sT  'of'  v  'by'  f ]") : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="cd5517bdee2add889ae88dd8718b0a53"><span class="id" title="notation">&quot;</span></a>[ 'th' 'e' sT 'of' v ]" := (@<a class="idref" href="mathcomp.ssreflect.ssreflect.html#TheCanonical.get"><span class="id" title="definition">get</span></a> <span class="id" title="var">_</span> <span class="id" title="var">sT</span> <span class="id" title="var">v</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">format</span> "[ 'th' 'e'  sT  'of'  v ]") : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ We would like to recognize
+Notation " [ 'th' 'e' sT 'of' v : 'Type' ]" := (@get Type sT v _ )
+  (at level 0, format " [ 'th' 'e'  sT   'of'  v  :  'Type' ]") : form_scope.
+ 
+<div class="paragraph"> </div>
+
+  Helper notation for canonical structure inheritance support.               
+ This is a workaround for the poor interaction between delta reduction and  
+ canonical projections in Coq's unification algorithm, by which transparent 
+ definitions hide canonical instances, i.e., in                             
+   Canonical a_type_struct := @Struct a_type ...                            
+   Definition my_type := a_type.                                            
+ my_type doesn't effectively inherit the struct structure from a_type. Our  
+ solution is to redeclare the instance as follows                           
+   Canonical my_type_struct := Eval hnf in [struct of my_type].             
+ The special notation [str of _ ] must be defined for each Strucure "str"    
+ with constructor "Str", typically as follows                               
+   Definition clone_str s :=                                                
+      let: Str _ x y ... z := s return {type of Str for s} -&gt; str in        
+      fun k =&gt; k _ x y ... z.                                               
+    Notation " [ 'str' 'of' T 'for' s ]" := (@clone_str s (@Str T))          
+      (at level 0, format " [ 'str'  'of'  T  'for'  s ]") : form_scope.     
+    Notation " [ 'str' 'of' T ]" := (repack_str (fun x =&gt; @Str T x))         
+      (at level 0, format " [ 'str'  'of'  T ]") : form_scope.               
+ The notation for the match return predicate is defined below; the eta      
+ expansion in the second form serves both to distinguish it from the first  
+ and to avoid the delta reduction problem.                                  
+   There are several variations on the notation and the definition of the   
+ the "clone" function, for telescopes, mixin classes, and join (multiple    
+ inheritance) classes. We describe a different idiom for clones in ssrfun;  
+ it uses phantom types (see below) and static unification; see fintype and  
+ ssralg for examples.                                                        
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="argumentType"><span class="id" title="definition">argumentType</span></a> <span class="id" title="var">T</span> <span class="id" title="var">P</span> &amp; <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>, <a class="idref" href="mathcomp.ssreflect.ssreflect.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="dependentReturnType"><span class="id" title="definition">dependentReturnType</span></a> <span class="id" title="var">T</span> <span class="id" title="var">P</span> &amp; <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>, <a class="idref" href="mathcomp.ssreflect.ssreflect.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#P"><span class="id" title="variable">P</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="returnType"><span class="id" title="definition">returnType</span></a> <span class="id" title="var">aT</span> <span class="id" title="var">rT</span> &amp; <a class="idref" href="mathcomp.ssreflect.ssreflect.html#aT"><span class="id" title="variable">aT</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#rT"><span class="id" title="variable">rT</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#rT"><span class="id" title="variable">rT</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="d7f4c4dc11bb6b98f0e78c197b6ba346"><span class="id" title="notation">&quot;</span></a>{ 'type' 'of' c 'for' s }" := (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#dependentReturnType"><span class="id" title="definition">dependentReturnType</span></a> <span class="id" title="var">c</span> <span class="id" title="var">s</span>)<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">format</span> "{ 'type'  'of'  c  'for'  s }") : <span class="id" title="var">type_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ A generic "phantom" type (actually, a unit type with a phantom parameter). 
+ This type can be used for type definitions that require some Structure     
+ on one of their parameters, to allow Coq to infer said structure so it     
+ does not have to be supplied explicitly or via the " [the _ of _ ]" notation 
+ (the latter interacts poorly with other Notation).                         
+   The definition of a (co)inductive type with a parameter p : p_type, that 
+ needs to use the operations of a structure                                 
+  Structure p_str : Type := p_Str {p_repr :&gt; p_type; p_op : p_repr -&gt; ...}  
+ should be given as                                                         
+  Inductive indt_type (p : p_str) := Indt ... .                             
+  Definition indt_of (p : p_str) &amp; phantom p_type p := indt_type p.         
+  Notation "{ 'indt' p }" := (indt_of (Phantom p)).                         
+  Definition indt p x y ... z : {indt p} := @Indt p x y ... z.              
+  Notation " [ 'indt' x y ... z ]" := (indt x y ... z).                      
+ That is, the concrete type and its constructor should be shadowed by       
+ definitions that use a phantom argument to infer and display the true      
+ value of p (in practice, the "indt" constructor often performs additional  
+ functions, like "locking" the representation -- see below).                
+   We also define a simpler version ("phant" / "Phant") of phantom for the  
+ common case where p_type is Type.                                           
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">CoInductive</span> <a name="phantom"><span class="id" title="inductive">phantom</span></a> <span class="id" title="var">T</span> (<span class="id" title="var">p</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>) := <a name="Phantom"><span class="id" title="constructor">Phantom</span></a>.<br/>
+<span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#phantom"><span class="id" title="inductive">phantom</span></a> [].<br/>
+<span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Phantom"><span class="id" title="constructor">Phantom</span></a> [].<br/>
+<span class="id" title="keyword">CoInductive</span> <a name="phant"><span class="id" title="inductive">phant</span></a> (<span class="id" title="var">p</span> : <span class="id" title="keyword">Type</span>) := <a name="Phant"><span class="id" title="constructor">Phant</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Internal tagging used by the implementation of the ssreflect elim.          
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="protect_term"><span class="id" title="definition">protect_term</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) (<span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#A"><span class="id" title="variable">A</span></a>) : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#A"><span class="id" title="variable">A</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ The ssreflect idiom for a non-keyed pattern:                               
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> unkeyed t wiil match any subterm that unifies with t, regardless of     
+    whether it displays the same head symbol as t.                          
+
+</li>
+<li> unkeyed t a b will match any application of a term f unifying with t,   
+    to two arguments unifying with with a and b, repectively, regardless of 
+    apparent head symbols.                                                  
+
+</li>
+<li> unkeyed x where x is a variable will match any subterm with the same    
+    type as x (when x would raise the 'indeterminate pattern' error).        
+</li>
+</ul>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="unkeyed"><span class="id" title="abbreviation">unkeyed</span></a> <span class="id" title="var">x</span> := (<span class="id" title="keyword">let</span> <span class="id" title="var">flex</span> := <span class="id" title="var">x</span> <span class="id" title="keyword">in</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#flex"><span class="id" title="variable">flex</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Ssreflect converse rewrite rule rule idiom.  
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <a name="ssr_converse"><span class="id" title="definition">ssr_converse</span></a> <span class="id" title="var">R</span> (<span class="id" title="var">r</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#R"><span class="id" title="variable">R</span></a>) := <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#44400027531d4bc3f586a1997dc874c0"><span class="id" title="notation">(</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#I"><span class="id" title="constructor">Logic.I</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#44400027531d4bc3f586a1997dc874c0"><span class="id" title="notation">,</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#r"><span class="id" title="variable">r</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#44400027531d4bc3f586a1997dc874c0"><span class="id" title="notation">)</span></a>.<br/>
+<span class="id" title="keyword">Notation</span> <a name="f698c37cdb866c2369b5ae93e22451f0"><span class="id" title="notation">&quot;</span></a>=^~ r" := (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_converse"><span class="id" title="definition">ssr_converse</span></a> <span class="id" title="var">r</span>) (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 100) : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Term tagging (user-level).                                                 
+ The ssreflect library uses four strengths of term tagging to restrict      
+ convertibility during type checking:                                       
+  nosimpl t simplifies to t EXCEPT in a definition; more precisely, given   
+    Definition foo := nosimpl bar, foo (or foo t') will NOT be expanded by  
+    the /= and //= switches unless it is in a forcing context (e.g., in     
+    match foo t' with ... end, foo t' will be reduced if this allows the    
+    match to be reduced). Note that nosimpl bar is simply notation for a    
+    a term that beta-iota reduces to bar; hence rewrite /foo will replace   
+    foo by bar, and rewrite -/foo will replace bar by foo.                  
+    CAVEAT: nosimpl should not be used inside a Section, because the end of 
+    section "cooking" removes the iota redex.                               
+  locked t is provably equal to t, but is not convertible to t; 'locked'    
+    provides support for selective rewriting, via the lock t : t = locked t 
+    Lemma, and the ssreflect unlock tactic.                                 
+  locked_with k t is equal but not convertible to t, much like locked t,    
+    but supports explicit tagging with a value k : unit. This is used to    
+    mitigate a flaw in the term comparison heuristic of the Coq kernel,     
+    which treats all terms of the form locked t as equal and conpares their 
+    arguments recursively, leading to an exponential blowup of comparison.  
+    For this reason locked_with should be used rather than locked when      
+    defining ADT operations. The unlock tactic does not support locked_with 
+    but the unlock rewrite rule does, via the unlockable interface.         
+  we also use Module Type ascription to create truly opaque constants,      
+    because simple expansion of constants to reveal an unreducible term     
+    doubles the time complexity of a negative comparison. Such opaque       
+    constants can be expanded generically with the unlock rewrite rule.     
+    See the definition of card and subset in fintype for examples of this.   
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="nosimpl"><span class="id" title="abbreviation">nosimpl</span></a> <span class="id" title="var">t</span> := (<span class="id" title="keyword">let</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a> := <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a> <span class="id" title="keyword">in</span> <span class="id" title="var">t</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="master_key"><span class="id" title="lemma">master_key</span></a> : <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#unit"><span class="id" title="inductive">unit</span></a>.  <br/>
+<span class="id" title="keyword">Definition</span> <a name="locked"><span class="id" title="definition">locked</span></a> <span class="id" title="var">A</span> := <span class="id" title="keyword">let</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#master_key"><span class="id" title="lemma">master_key</span></a> <span class="id" title="keyword">in</span> <span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#A"><span class="id" title="variable">A</span></a> ⇒ <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="lock"><span class="id" title="lemma">lock</span></a> <span class="id" title="var">A</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#8f9364556521ebb498093f28eea2240f"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#locked"><span class="id" title="definition">locked</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#8f9364556521ebb498093f28eea2240f"><span class="id" title="notation">:&gt;</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#A"><span class="id" title="variable">A</span></a>.  <br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Needed for locked predicates, in particular for eqType's.                   
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a name="not_locked_false_eq_true"><span class="id" title="lemma">not_locked_false_eq_true</span></a> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#locked"><span class="id" title="definition">locked</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#false"><span class="id" title="constructor">false</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#32263a1c8b01baecdff9deb038955bc9"><span class="id" title="notation">≠</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a>.<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+ The basic closing tactic "done".                                            
+</div>
+<div class="code">
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">done</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">trivial</span>; <span class="id" title="tactic">hnf</span>; <span class="id" title="tactic">intros</span>; <span class="id" title="tactic">solve</span><br/>
+&nbsp;&nbsp;&nbsp;[ <span class="id" title="tactic">do</span> ![<span class="id" title="tactic">solve</span> [<span class="id" title="tactic">trivial</span> | <span class="id" title="tactic">apply</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#sym_equal"><span class="id" title="abbreviation">sym_equal</span></a>; <span class="id" title="tactic">trivial</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">discriminate</span> | <span class="id" title="var">contradiction</span> | <span class="id" title="tactic">split</span>]<br/>
+&nbsp;&nbsp;&nbsp;| <span class="id" title="tactic">case</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#not_locked_false_eq_true"><span class="id" title="lemma">not_locked_false_eq_true</span></a>; <span class="id" title="tactic">assumption</span><br/>
+&nbsp;&nbsp;&nbsp;| <span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span> <span class="id" title="var">H</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#611abc97cba304de784fa909dbdea1fa"><span class="id" title="notation">¬</span></a> <span class="id" title="var">_</span> |- <span class="id" title="var">_</span> ⇒ <span class="id" title="tactic">solve</span> [<span class="id" title="tactic">case</span> <span class="id" title="var">H</span>; <span class="id" title="tactic">trivial</span>] <span class="id" title="keyword">end</span> ].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ To unlock opaque constants.  
+</div>
+<div class="code">
+<span class="id" title="keyword">Structure</span> <a name="unlockable"><span class="id" title="record">unlockable</span></a> <span class="id" title="var">T</span> <span class="id" title="var">v</span> := <a name="Unlockable"><span class="id" title="constructor">Unlockable</span></a> {<a name="unlocked"><span class="id" title="projection">unlocked</span></a> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>; <span class="id" title="var">_</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#unlocked"><span class="id" title="method">unlocked</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#v"><span class="id" title="variable">v</span></a>}.<br/>
+<span class="id" title="keyword">Lemma</span> <a name="unlock"><span class="id" title="lemma">unlock</span></a> <span class="id" title="var">T</span> <span class="id" title="var">x</span> <span class="id" title="var">C</span> : @<a class="idref" href="mathcomp.ssreflect.ssreflect.html#unlocked"><span class="id" title="projection">unlocked</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#C"><span class="id" title="variable">C</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>.  <br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="d39a57968bbde827b22f32a7c98c9b3d"><span class="id" title="notation">&quot;</span></a>[ 'unlockable' 'of' C ]" := (@<a class="idref" href="mathcomp.ssreflect.ssreflect.html#Unlockable"><span class="id" title="constructor">Unlockable</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">C</span> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#unlock"><span class="id" title="lemma">unlock</span></a> <span class="id" title="var">_</span>))<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">format</span> "[ 'unlockable'  'of'  C ]") : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="58f94351327943cd874eb55da8e0ca14"><span class="id" title="notation">&quot;</span></a>[ 'unlockable' 'fun' C ]" := (@<a class="idref" href="mathcomp.ssreflect.ssreflect.html#Unlockable"><span class="id" title="constructor">Unlockable</span></a> <span class="id" title="var">_</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span>) <span class="id" title="var">C</span> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#unlock"><span class="id" title="lemma">unlock</span></a> <span class="id" title="var">_</span>))<br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">format</span> "[ 'unlockable'  'fun'  C ]") : <span class="id" title="var">form_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Generic keyed constant locking.  
+<div class="paragraph"> </div>
+
+  The argument order ensures that k is always compared before T.  
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <a name="locked_with"><span class="id" title="definition">locked_with</span></a> <span class="id" title="var">k</span> := <span class="id" title="keyword">let</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <span class="id" title="keyword">in</span> <span class="id" title="keyword">fun</span> <span class="id" title="var">T</span> <span class="id" title="var">x</span> ⇒ <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#4509b22bf26e3d6d771897e22bd8bc8f"><span class="id" title="notation">:</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ This can be used as a cheap alternative to cloning the unlockable instance 
+ below, but with caution as unkeyed matching can be expensive.               
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a name="locked_withE"><span class="id" title="lemma">locked_withE</span></a> <span class="id" title="var">T</span> <span class="id" title="var">k</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#unkeyed"><span class="id" title="abbreviation">unkeyed</span></a> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#locked_with"><span class="id" title="definition">locked_with</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#8f9364556521ebb498093f28eea2240f"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#8f9364556521ebb498093f28eea2240f"><span class="id" title="notation">:&gt;</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>.<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+ Intensionaly, this instance will not apply to locked u.  
+</div>
+<div class="code">
+<span class="id" title="keyword">Canonical</span> <span class="id" title="var">locked_with_unlockable</span> <span class="id" title="var">T</span> <span class="id" title="var">k</span> <span class="id" title="var">x</span> :=<br/>
+&nbsp;&nbsp;@<a class="idref" href="mathcomp.ssreflect.ssreflect.html#Unlockable"><span class="id" title="constructor">Unlockable</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#locked_with"><span class="id" title="definition">locked_with</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>) (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#locked_withE"><span class="id" title="lemma">locked_withE</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ More accurate variant of unlock, and safer alternative to locked_withE.  
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a name="unlock_with"><span class="id" title="lemma">unlock_with</span></a> <span class="id" title="var">T</span> <span class="id" title="var">k</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#unlocked"><span class="id" title="projection">unlocked</span></a> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#locked_with_unlockable"><span class="id" title="definition">locked_with_unlockable</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#8f9364556521ebb498093f28eea2240f"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#8f9364556521ebb498093f28eea2240f"><span class="id" title="notation">:&gt;</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#T"><span class="id" title="variable">T</span></a>.<br/>
+ 
+<br/>
+</div>
+
+<div class="doc">
+ The internal lemmas for the have tactics.                                   
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="ssr_have"><span class="id" title="definition">ssr_have</span></a> <span class="id" title="var">Plemma</span> <span class="id" title="var">Pgoal</span> (<span class="id" title="var">step</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Plemma"><span class="id" title="variable">Plemma</span></a>) <span class="id" title="var">rest</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Pgoal"><span class="id" title="variable">Pgoal</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#rest"><span class="id" title="variable">rest</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#step"><span class="id" title="variable">step</span></a>.<br/>
+<span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_have"><span class="id" title="definition">ssr_have</span></a> [<span class="id" title="var">Pgoal</span>].<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="ssr_have_let"><span class="id" title="definition">ssr_have_let</span></a> <span class="id" title="var">Pgoal</span> <span class="id" title="var">Plemma</span> <span class="id" title="var">step</span><br/>
+&nbsp;&nbsp;(<span class="id" title="var">rest</span> : <span class="id" title="keyword">let</span> <span class="id" title="var">x</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Plemma"><span class="id" title="variable">Plemma</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#step"><span class="id" title="variable">step</span></a> <span class="id" title="keyword">in</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Pgoal"><span class="id" title="variable">Pgoal</span></a>) : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Pgoal"><span class="id" title="variable">Pgoal</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#rest"><span class="id" title="variable">rest</span></a>.<br/>
+<span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_have_let"><span class="id" title="definition">ssr_have_let</span></a> [<span class="id" title="var">Pgoal</span>].<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="ssr_suff"><span class="id" title="definition">ssr_suff</span></a> <span class="id" title="var">Plemma</span> <span class="id" title="var">Pgoal</span> <span class="id" title="var">step</span> (<span class="id" title="var">rest</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Plemma"><span class="id" title="variable">Plemma</span></a>) : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Pgoal"><span class="id" title="variable">Pgoal</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#step"><span class="id" title="variable">step</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#rest"><span class="id" title="variable">rest</span></a>.<br/>
+<span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_suff"><span class="id" title="definition">ssr_suff</span></a> [<span class="id" title="var">Pgoal</span>].<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="ssr_wlog"><span class="id" title="definition">ssr_wlog</span></a> := <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_suff"><span class="id" title="definition">ssr_suff</span></a>.<br/>
+<span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_wlog"><span class="id" title="definition">ssr_wlog</span></a> [<span class="id" title="var">Pgoal</span>].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ Internal N-ary congruence lemmas for the congr tactic.                      
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <a name="nary_congruence_statement"><span class="id" title="definition">nary_congruence_statement</span></a> (<span class="id" title="var">n</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">(</span></a><span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">(</span></a><a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span><a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span><a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#O"><span class="id" title="constructor">O</span></a> ⇒ <span class="id" title="keyword">fun</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="keyword">∀</span> <span class="id" title="var">B</span>, <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">x1</span> <span class="id" title="var">x2</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a> ⇒ <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x1"><span class="id" title="variable">x1</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x2"><span class="id" title="variable">x2</span></a>)<br/>
+&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Datatypes.html#S"><span class="id" title="constructor">S</span></a> <span class="id" title="var">n'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">k'</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span> <span class="id" title="var">e</span> (<span class="id" title="var">f1</span> <span class="id" title="var">f2</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">x1</span> <span class="id" title="var">x2</span>, <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x1"><span class="id" title="variable">x1</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x2"><span class="id" title="variable">x2</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">(</span></a><a class="idref" href="mathcomp.ssreflect.ssreflect.html#e"><span class="id" title="variable">e</span></a> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#f1"><span class="id" title="variable">f1</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x1"><span class="id" title="variable">x1</span></a>) (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#f2"><span class="id" title="variable">f2</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#x2"><span class="id" title="variable">x2</span></a>) <a class="idref" href="mathcomp.ssreflect.ssreflect.html#0fffdc558ce71ab561d36c8a8094dbe5"><span class="id" title="notation">:</span></a> <span class="id" title="keyword">Prop</span><a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">)</span></a> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">fun</span> <span class="id" title="var">k</span> ⇒ <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span>, <a class="idref" href="mathcomp.ssreflect.ssreflect.html#nary_congruence_statement"><span class="id" title="definition">nary_congruence_statement</span></a> <span class="id" title="var">n'</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">B</span> <span class="id" title="var">e</span> ⇒ <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a> <span class="id" title="var">_</span> (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#k'"><span class="id" title="variable">k'</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#e"><span class="id" title="variable">e</span></a>))<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="nary_congruence"><span class="id" title="lemma">nary_congruence</span></a> <span class="id" title="var">n</span> (<span class="id" title="var">k</span> := <span class="id" title="keyword">fun</span> <span class="id" title="var">B</span> <span class="id" title="var">e</span> ⇒ <span class="id" title="keyword">∀</span> <span class="id" title="var">y</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#B"><span class="id" title="variable">B</span></a>, (<a class="idref" href="mathcomp.ssreflect.ssreflect.html#e"><span class="id" title="variable">e</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#0fffdc558ce71ab561d36c8a8094dbe5"><span class="id" title="notation">:</span></a> <span class="id" title="keyword">Prop</span>)) :<br/>
+&nbsp;&nbsp;<a class="idref" href="mathcomp.ssreflect.ssreflect.html#nary_congruence_statement"><span class="id" title="definition">nary_congruence_statement</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#k"><span class="id" title="variable">k</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="ssr_congr_arrow"><span class="id" title="lemma">ssr_congr_arrow</span></a> <span class="id" title="var">Plemma</span> <span class="id" title="var">Pgoal</span> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Plemma"><span class="id" title="variable">Plemma</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Pgoal"><span class="id" title="variable">Pgoal</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Plemma"><span class="id" title="variable">Plemma</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#Pgoal"><span class="id" title="variable">Pgoal</span></a>.<br/>
+ <span class="id" title="keyword">Implicit Arguments</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ssr_congr_arrow"><span class="id" title="lemma">ssr_congr_arrow</span></a> [].<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ View lemmas that don't use reflection.                                      
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="ApplyIff"><span class="id" title="section">ApplyIff</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Variables</span> <a name="ApplyIff.P"><span class="id" title="variable">P</span></a> <a name="ApplyIff.Q"><span class="id" title="variable">Q</span></a> : <span class="id" title="keyword">Prop</span>.<br/>
+<span class="id" title="keyword">Hypothesis</span> <a name="ApplyIff.eqPQ"><span class="id" title="variable">eqPQ</span></a> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#df1ced36fc33ce188051218bca314374"><span class="id" title="notation">↔</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.Q"><span class="id" title="variable">Q</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="iffLR"><span class="id" title="lemma">iffLR</span></a> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.Q"><span class="id" title="variable">Q</span></a>.  <br/>
+<span class="id" title="keyword">Lemma</span> <a name="iffRL"><span class="id" title="lemma">iffRL</span></a> : <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.P"><span class="id" title="variable">P</span></a>.  <br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="iffLRn"><span class="id" title="lemma">iffLRn</span></a> : <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#611abc97cba304de784fa909dbdea1fa"><span class="id" title="notation">¬</span></a><a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#611abc97cba304de784fa909dbdea1fa"><span class="id" title="notation">¬</span></a><a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.Q"><span class="id" title="variable">Q</span></a>.  <br/>
+<span class="id" title="keyword">Lemma</span> <a name="iffRLn"><span class="id" title="lemma">iffRLn</span></a> : <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#611abc97cba304de784fa909dbdea1fa"><span class="id" title="notation">¬</span></a><a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5beta3/stdlib/Coq.Init.Logic.html#611abc97cba304de784fa909dbdea1fa"><span class="id" title="notation">¬</span></a><a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff.P"><span class="id" title="variable">P</span></a>.  <br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="mathcomp.ssreflect.ssreflect.html#ApplyIff"><span class="id" title="section">ApplyIff</span></a>.<br/>
+
+<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
