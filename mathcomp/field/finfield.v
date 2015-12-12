@@ -529,19 +529,7 @@ have [L [zs Dq]]: {L : fieldExtType K & splits L q^%:A}.
   apply: (IHn (FinFieldExtType K) q nz_q).
   by rewrite ltnS Dszp size_mul ?polyXsubC_eq0 ?size_XsubC ?addn2 in lbn.
 suffices: splits L p^%:A^%:A.
- (* Work around: the extra args to baseField_scaleE avoid divergence.
-
-   If you "Check (fun a => baseField_scaleE a 1)" it gives a result that contains 3
-   unresolved evars.
-   The last one looks like "?t : [ ... x: ?t |- fieldType ] (x cannot be used)", so
-   pruning avoids cyclicity.
-
-   Doing a "Check ((fun a => baseField_scaleE a 1) : _)" shows the divergence.
-
-   Divergence (stack overflow) happens in occur_evar_upto_types, but a quick look
-   shows that the functions it calls do honor the filter (pruning).
- *)
-  rewrite -[_^%:A]map_poly_comp -(eq_map_poly (fun a => @baseField_scaleE F K _ a 1)).
+  rewrite -[_^%:A]map_poly_comp -(eq_map_poly (fun a => baseField_scaleE a 1)).
   by exists [fieldExtType F of baseFieldType L].
 exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
 by rewrite Dp mulrC [_^%:A]rmorphM /= mapXsubC /= eqp_mull.
