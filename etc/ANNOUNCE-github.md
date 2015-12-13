@@ -12,7 +12,7 @@ The main archive is now avilable as a git repository in the organization name sp
 https://github.com/math-comp/math-comp and accepts bug reports and pull requests via
 the standard github interface.
 
-Users of the library are encouraged to join the organization an place (or mirror) their projects
+Users of the library are encouraged to join the organization and place (or mirror) their projects
 in the organization name space.  The immediate gain is discoverability.  The more long term deal
 we propose is that the impact of non backward compatibile changes in the Mathematical Components
 library will be carefully assessed on all the mature projects part of the organization.  In
