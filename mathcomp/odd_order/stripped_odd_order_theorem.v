@@ -1,7 +1,8 @@
 (* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+Require mathcomp.ssreflect.
 From mathcomp
-Require ssreflect ssrbool ssrfun eqtype ssrnat fintype finset fingroup.
+Require ssrbool ssrfun eqtype ssrnat fintype finset fingroup.
 From mathcomp
 Require morphism quotient action gfunctor gproduct commutator gseries nilpotent.
 From mathcomp
