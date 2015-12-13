@@ -7,7 +7,7 @@ homepage: "http://ssr.msr-inria.inria.fr/"
 bug-reports: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 license: "CeCILL-B"
 
-build: [ make "-j" "%{jobs}%" ] 
+build: [ make "-j" "%{jobs}%" ]
 install: [ make "install" ]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/real_closed'" ]
 depends: [ "coq-mathcomp-field" { = "dev" } ]
