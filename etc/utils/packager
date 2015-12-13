@@ -3,9 +3,9 @@
 set -e
 set -x
 
-for pkg in algebra basic field character fingroup odd_order real_closed solvable ssreflect
+for pkg in algebra field character fingroup odd_order real_closed solvable ssreflect
 do
-pkgdir="$(git root)/opam/extra-dev/packages/coq:mathcomp:$pkg/coq:mathcomp:$pkg.dev"
+pkgdir="$(git root)/opam/extra-dev/packages/coq-mathcomp-$pkg/coq-mathcomp-$pkg.dev"
 mkdir -p $pkgdir
 cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
 cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
