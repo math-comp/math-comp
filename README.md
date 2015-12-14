@@ -20,7 +20,7 @@ at once using `make`.  This is the simplest option.
 We also provide `opam` files to compile each package using `OPAM`.
 Note that the `OPAM` packages for the Mathematical Components library
 are available in the standard Coq `OPAM` repositories,
-under the `coq:mathcomp:` name space.  If you are only interested
+under the `coq-mathcomp-` name space.  If you are only interested
 in installing a Mathematical Components package via `OPAM`, follow
 the standard instructions available on the Coq website.
 
@@ -50,7 +50,7 @@ The files can be edited using CoqIDE or Proof General, or any
 other editor that understands the `_CoqProject` file, with no
 further configuration from the `mathcomp` directory.
 ```
-coqide basic/div.v
+coqide ssreflect/div.v
 ```
 Note that you may need to enable `_CoqProject` processing in your
 editor (e.g. the default for CoqIDE is to ignore it).
@@ -75,5 +75,5 @@ for P in */opam; do opam pin -n add ${P%%/opam}; done
 Then you can use `opam install` to compile and install any package.
 For example:
 ```
-opam install coq.8.5.dev coq:mathcomp:basic
+opam install coq.8.5.dev coq-mathcomp-ssreflect
 ```
