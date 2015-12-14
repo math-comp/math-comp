@@ -18,7 +18,7 @@ exchange we expect members of the organization to actively maintain their code w
 change is applied or a patch is proposed.
 
 The organization hosts a [wiki](https://github.com/math-comp/math-comp/wiki) for exchanging tips
-and tricks, gotchas, good practices, etc:
+and tricks, gotchas, good practices, etc.
 
 The ssreflect [mailing list](https://sympa.inria.fr/sympa/info/ssreflect) shall serve as the
 privileged communication channel between the organization members.
