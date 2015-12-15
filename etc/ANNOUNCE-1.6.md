@@ -44,14 +44,14 @@ entire component. For example the command
 
        Require Import all_ssreflect.
 
-loads all the theory files in the contained in the 'ssreflect'
+loads all the theory files contained in the 'ssreflect'
 component.
 
 Note that this modularity comes at the price of a possible
 incompatibility for users of previous version of the Mathematical
 Components library, due to the change of logical/physical paths
 implied by the reorganization of the library. See the installation
-notes for more on this issue an a suggested migration scheme.
+notes for more on this issue and a migration scheme.
 
 The tarball can be download at
 http://ssr.msr-inria.inria.fr/FTP/mathcomp-1.6.tar.gz
