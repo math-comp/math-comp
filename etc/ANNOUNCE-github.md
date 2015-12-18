@@ -12,7 +12,7 @@ We accept bug reports and pull requests via the standard github interface.
 
 Users of the library are encouraged to join the organization and place (or mirror) their projects
 in the organization name space.  The immediate gain is discoverability.  The more long term deal
-we propose is that the impact of non backward compatibile changes in the Mathematical Components
+we propose is that the impact of non backward compatible changes in the Mathematical Components
 library will be carefully assessed on all the mature projects part of the organization.  In
 exchange we expect members of the organization to actively maintain their code when a breaking
 change is applied or a patch is proposed.
