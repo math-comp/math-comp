@@ -9,7 +9,7 @@ license: "CeCILL-B"
 
 build: [ make "-j" "%{jobs}%" ]
 install: [ make "install" ]
-remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/ssreflect'" ]
+remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp'" ]
 depends: [ "coq" { ( >= "8.4pl4" & < "8.5" ) | ( = "8.5.dev" ) | ( = "dev")} ]
 
 tags: [ "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" ]
