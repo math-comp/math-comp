@@ -13,7 +13,7 @@ case $key in
     *.v)
 	mkdir -p $(dirname bkpcoqdep/$key)
         cp $key bkpcoqdep/$key
-	sed "s/^From.*//" -i $key
+        sed "s/^From.*//" bkpcoqdep/$key > $key
     ;;
     *)
     ;;
