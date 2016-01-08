@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 
 (* This line is read by the Makefile's dist target: do not remove. *)
-let ssrversion = "1.5";;
+let ssrversion = "1.6";;
 let ssrAstVersion = 1;;
 let () = Mltop.add_known_plugin (fun () ->
   if Flags.is_verbose () && not !Flags.batch_mode then begin
