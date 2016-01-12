@@ -51,6 +51,7 @@ Global Set Asymmetric Patterns.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+Global Set Bullet Behavior "None".
 
 Module SsrSyntax.
 

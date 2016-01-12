@@ -9,10 +9,7 @@ let () = Mltop.add_known_plugin (fun () ->
     Printf.printf "\nSmall Scale Reflection version %s loaded.\n" ssrversion;
     Printf.printf "Copyright 2005-2012 Microsoft Corporation and INRIA.\n";
     Printf.printf "Distributed under the terms of the CeCILL-B license.\n\n"
-  end;
-  (* Disable any semantics associated with bullets *)
-  Goptions.set_string_option_value_gen
-    (Some false) ["Bullet";"Behavior"] "None")
+  end)
   "ssreflect"
 ;;
 (* Defining grammar rules with "xx" in it automatically declares keywords too *)
