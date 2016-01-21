@@ -1,9 +1,10 @@
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
-	ln -sf $(1)/plugin/$(V)/ssreflect.mllib .;\
-	ln -sf $(1)/plugin/$(V)/ssrmatching.mli .;\
-	ln -sf $(1)/plugin/$(V)/ssrmatching.ml4 .;\
-	ln -sf $(1)/plugin/$(V)/ssreflect.ml4 .;\
+	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sf"; fi;\
+	$$LN $(1)/plugin/$(V)/ssreflect.mllib .;\
+	$$LN $(1)/plugin/$(V)/ssrmatching.mli .;\
+	$$LN $(1)/plugin/$(V)/ssrmatching.ml4 .;\
+	$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
 	$(COQBIN)coq_makefile -f Make -o Makefile.coq)
 endef
 
