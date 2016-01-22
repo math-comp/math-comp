@@ -1121,8 +1121,8 @@ Proof.
 by move=> le_nm; apply: (@canRL bool) (addbK _) _; rewrite -odd_add subnK.
 Qed.
 
-Lemma odd_opp i m : odd m = false -> i < m -> odd (m - i) = odd i.
-Proof. by move=> oddm lt_im; rewrite (odd_sub (ltnW lt_im)) oddm. Qed.
+Lemma odd_opp i m : odd m = false -> i <= m -> odd (m - i) = odd i.
+Proof. by move=> oddm le_im; rewrite (odd_sub (le_im)) oddm. Qed.
 
 Lemma odd_mul m n : odd (m * n) = odd m && odd n.
 Proof. by elim: m => //= m IHm; rewrite odd_add -addTb andb_addl -IHm. Qed.
