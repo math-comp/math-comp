@@ -30,6 +30,7 @@ open Evd
 open Extend
 open Goptions
 open Tacexpr
+open Proofview.Notations
 open Tacinterp
 open Pretyping
 open Constr
@@ -894,15 +895,27 @@ let id_of_Cterm t = match id_of_cpattern t with
   | Some x -> x
   | None -> loc_error (loc_of_cpattern t) "Only identifiers are allowed here"
 
+let of_ftactic ftac gl =
+  let r = ref None in
+  let tac = Ftactic.run ftac (fun ans -> r := Some ans; Proofview.tclUNIT ()) in
+  let tac = Proofview.V82.of_tactic tac in
+  let { sigma = sigma } = tac gl in
+  let ans = match !r with
+  | None -> assert false (** If the tactic failed we should not reach this point *)
+  | Some ans -> ans
+  in
+  (sigma, ans)
+
 let interp_wit wit ist gl x = 
   let globarg = in_gen (glbwit wit) x in
-  let sigma, arg = interp_genarg ist (pf_env gl) (project gl) (pf_concl gl) gl.Evd.it globarg in
-  sigma, out_gen (topwit wit) arg
+  let arg = interp_genarg ist globarg in
+  let (sigma, arg) = of_ftactic arg gl in
+  sigma, Value.cast (topwit wit) arg
 let interp_constr = interp_wit wit_constr
 let interp_open_constr ist gl gc =
-  interp_wit wit_open_constr ist gl ((), gc)
+  interp_wit wit_open_constr ist gl gc
 let pf_intern_term ist gl (_, c) = glob_constr ist (pf_env gl) c
-let interp_term ist gl (_, c) = snd (interp_open_constr ist gl c)
+let interp_term ist gl (_, c) = (interp_open_constr ist gl c)
 let glob_ssrterm gs = function
   | k, (_, Some c) -> k, Tacintern.intern_constr gs c
   | ct -> ct
@@ -1004,12 +1017,12 @@ let interp_pattern ist gl red redty =
     let h_k = match kind_of_term h with Evar (k,_) -> k | _ -> assert false in
     let to_clean, update = (* handle rename if x is already used *)
       let ctx = pf_hyps gl in
-      let len = Context.named_context_length ctx in
+      let len = Context.Named.length ctx in
       let name = ref None in
-      try ignore(Context.lookup_named x ctx); (name, fun k ->
+      try ignore(Context.Named.lookup x ctx); (name, fun k ->
         if !name = None then
         let nctx = Evd.evar_context (Evd.find sigma k) in
-        let nlen = Context.named_context_length nctx in
+        let nlen = Context.Named.length nctx in
         if nlen > len then begin
           name := Some (pi1 (List.nth nctx (nlen - len - 1)))
         end)
