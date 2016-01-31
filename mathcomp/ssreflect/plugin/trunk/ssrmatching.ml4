@@ -124,7 +124,7 @@ let add_genarg tag pr =
   let wit = Genarg.make0 None tag in
   let glob ist x = (ist, x) in
   let subst _ x = x in
-  let interp ist gl x = (gl.Evd.sigma, x) in
+  let interp ist x = Ftactic.return x in
   let gen_pr _ _ _ = pr in
   let () = Genintern.register_intern0 wit glob in
   let () = Genintern.register_subst0 wit subst in
@@ -272,7 +272,7 @@ exception NoProgress
 (*      comparison can be much faster than the HO one.          *)
 
 let unif_EQ env sigma p c =
-  let evars = existential_opt_value sigma in 
+  let evars = existential_opt_value sigma, Evd.universes sigma in 
   try let _ = Reduction.conv env p ~evars c in true with _ -> false
 
 let unif_EQ_args env sigma pa a =
@@ -452,7 +452,7 @@ let evars_for_FO ~hack env sigma0 (ise0:evar_map) c0 =
     | x, Some b, t -> d, mkNamedLetIn x (put b) (put t) c
     | x, None, t -> mkVar x :: d, mkNamedProd x (put t) c in
     let a, t =
-      Context.fold_named_context_reverse abs_dc ~init:([], (put evi.evar_concl)) dc in
+      Context.Named.fold_inside abs_dc ~init:([], (put evi.evar_concl)) dc in
     let m = Evarutil.new_meta () in
     ise := meta_declare m t !ise;
     sigma := Evd.define k (applist (mkMeta m, a)) !sigma;
