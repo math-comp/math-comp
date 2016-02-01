@@ -580,6 +580,7 @@ let basecuttac name c gl =
   let t = mkApp (hd, [|c|]) in
   let gl, _ = pf_e_type_of gl t in
   Proofview.V82.of_tactic (apply t) gl
+let apply_type x xs = Proofview.V82.of_tactic (apply_type x xs)
 
 (* we reduce head beta redexes *)
 let betared env = 
@@ -1024,16 +1025,14 @@ let ssrtac_entry name n = {
 }
 
 let set_pr_ssrtac name prec afmt =
-  let fmt = List.map (function ArgSep s -> Some s | _ -> None) afmt in
-  let rec mk_akey = function
-  | ArgSsr s :: afmt' -> ExtraArgType ("ssr" ^ s) :: mk_akey afmt'
-  | ArgCoq a :: afmt' -> a :: mk_akey afmt'
-  | ArgSep _ :: afmt' -> mk_akey afmt'
-  | [] -> [] in
+  let fmt = List.map (function
+    | ArgSep s -> Egramml.GramTerminal s
+    | ArgSsr s -> Egramml.GramTerminal s
+    | ArgCoq at -> Egramml.GramTerminal "COQ_ARG") afmt in
   let tacname = ssrtac_name name in
    Pptactic.declare_ml_tactic_pprule tacname [|
     { Pptactic.pptac_level = prec;
-      Pptactic.pptac_prods = [] (** FIXME *) }
+      Pptactic.pptac_prods = fmt }
    |]
 
 let ssrtac_atom loc name args = TacML (loc, ssrtac_entry name 0, args)
@@ -2030,7 +2029,7 @@ let discharge_hyp (id', (id, mode)) gl =
   let cl' = subst_var id (pf_concl gl) in
   match pf_get_hyp gl id, mode with
   | (_, None, t), _ | (_, Some _, t), "(" -> 
-     Proofview.V82.of_tactic (apply_type (mkProd (Name id', t, cl')) [mkVar id]) gl
+     apply_type (mkProd (Name id', t, cl')) [mkVar id] gl
   | (_, Some v, t), _ ->
      Proofview.V82.of_tactic (convert_concl (mkLetIn (Name id', v, t, cl'))) gl
 
@@ -2129,7 +2128,7 @@ let tclCLAUSES ist tac (gens, clseq) gl =
     let c = pf_concl gl in
     let gl, args, c =
       List.fold_right (abs_wgen true ist mk_discharged_id) gens (gl,[], c) in
-    Proofview.V82.of_tactic (apply_type c args) gl in
+    apply_type c args gl in
   let endtac =
     let id_map = CList.map_filter (function
       | _, Some ((x,_),_) -> let id = hoi_id x in Some (mk_discharged_id id, id)
@@ -2508,10 +2507,13 @@ let remove_loc = snd
 let rec ipat_of_intro_pattern = function
   | IntroNaming (IntroIdentifier id) -> IpatId id
   | IntroAction IntroWildcard -> IpatWild
-  | IntroAction (IntroOrAndPattern iorpat) ->
+  | IntroAction (IntroOrAndPattern (IntroOrPattern iorpat)) ->
     IpatCase 
       (List.map (List.map ipat_of_intro_pattern) 
 	 (List.map (List.map remove_loc) iorpat))
+  | IntroAction (IntroOrAndPattern (IntroAndPattern iandpat)) ->
+    IpatCase 
+      [List.map ipat_of_intro_pattern (List.map remove_loc iandpat)]
   | IntroNaming IntroAnonymous -> IpatAnon
   | IntroAction (IntroRewrite b) -> IpatRw (allocc, if b then L2R else R2L)
   | IntroNaming (IntroFresh id) -> IpatAnon
@@ -2559,8 +2561,10 @@ let rec add_intro_pattern_hyps (loc, ipat) hyps = match ipat with
     if not_section_id id then SsrHyp (loc, id) :: hyps else
     hyp_err loc "Can't delete section hypothesis " id
   | IntroAction IntroWildcard -> hyps
-  | IntroAction (IntroOrAndPattern iorpat) ->
+  | IntroAction (IntroOrAndPattern (IntroOrPattern iorpat)) ->
     List.fold_right (List.fold_right add_intro_pattern_hyps) iorpat hyps
+  | IntroAction (IntroOrAndPattern (IntroAndPattern iandpat)) ->
+    List.fold_right add_intro_pattern_hyps iandpat hyps
   | IntroNaming IntroAnonymous -> []
   | IntroNaming (IntroFresh _) -> []
   | IntroAction (IntroRewrite _) -> hyps
@@ -2846,7 +2850,7 @@ let clear_with_wilds wilds clr0 gl =
     let vars = global_vars_set_of_decl (pf_env gl) nd in
     let occurs id' = Idset.mem id' vars in
     if List.exists occurs clr then id :: clr else clr in
-  clear (Context.fold_named_context_reverse extend_clr ~init:clr0 (pf_hyps gl)) gl
+  clear (Context.Named.fold_inside extend_clr ~init:clr0 (pf_hyps gl)) gl
 
 let tclTHENS_nonstrict tac tacl taclname gl =
   let tacres = tac gl in
@@ -3035,7 +3039,7 @@ END
 set_pr_ssrtac "tclintros" 0 [ArgSsr "introsarg"]
 
 let tclintros_expr loc tac ipats =
-  let args = [in_gen (rawwit wit_ssrintrosarg) (tac, ipats)] in
+  let args = [Tacexpr.TacGeneric (in_gen (rawwit wit_ssrintrosarg) (tac, ipats))] in
   ssrtac_expr loc "tclintros" args
 
 GEXTEND Gram
@@ -3122,7 +3126,7 @@ set_pr_ssrtac "tcldo" 3 [ArgSep "do "; ArgSsr "doarg"]
 
 let ssrdotac_expr loc n m tac clauses =
   let arg = ((n, m), tac), clauses in
-  ssrtac_expr loc "tcldo" [in_gen (rawwit wit_ssrdoarg) arg]
+  ssrtac_expr loc "tcldo" [Tacexpr.TacGeneric (in_gen (rawwit wit_ssrdoarg) arg)]
 
 GEXTEND Gram
   GLOBAL: tactic_expr;
@@ -3289,7 +3293,7 @@ let tclseq_expr loc tac dir arg =
   let arg1 = in_gen (rawwit wit_ssrtclarg) tac in
   let arg2 = in_gen (rawwit wit_ssrseqdir) dir in
   let arg3 = in_gen (rawwit wit_ssrseqarg) (check_seqtacarg dir arg) in
-  ssrtac_expr loc "tclseq" [arg1; arg2; arg3]
+  ssrtac_expr loc "tclseq" (List.map (fun x -> Tacexpr.TacGeneric x) [arg1; arg2; arg3])
 
 GEXTEND Gram
   GLOBAL: tactic_expr;
@@ -3786,7 +3790,7 @@ let analyze_eliminator elimty env sigma =
       str"A (applied) bound variable was expected as the conclusion of "++
       str"the eliminator's"++Pp.cut()++str"type:"++spc()++pr_constr elimty) in
   let ctx, pred_id, elim_is_dep, n_pred_args = loop [] elimty in
-  let n_elim_args = rel_context_nhyps ctx in
+  let n_elim_args = Context.Rel.nhyps ctx in
   let is_rec_elim = 
      let count_occurn n term =
        let count = ref 0 in
@@ -3987,7 +3991,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       let pred_id,n_elim_args,is_rec,elim_is_dep,n_pred_args =
         analyze_eliminator elimty env (project gl) in
       let rctx = fst (decompose_prod_assum unfolded_c_ty) in
-      let n_c_args = rel_context_length rctx in
+      let n_c_args = Context.Rel.length rctx in
       let c, c_ty, t_args, gl = pf_saturate gl c ~ty:c_ty n_c_args in
       let elim, elimty, elim_args, gl =
         pf_saturate ~beta:is_case gl elim ~ty:elimty n_elim_args in
@@ -5917,7 +5921,7 @@ GEXTEND Gram
   tactic_expr: LEVEL "3"
     [ RIGHTA [ IDENT "abstract"; gens = ssrdgens ->
                ssrtac_expr !@loc "abstract"
-                [Genarg.in_gen (Genarg.rawwit wit_ssrdgens) gens] ]];
+                [Tacexpr.TacGeneric (Genarg.in_gen (Genarg.rawwit wit_ssrdgens) gens)] ]];
 END
 TACTIC EXTEND ssrabstract
 | [ "abstract" ssrdgens(gens) ] -> [
