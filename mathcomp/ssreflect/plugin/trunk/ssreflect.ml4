@@ -207,7 +207,7 @@ let add_genarg tag pr =
   let wit = Genarg.make0 None tag in
   let glob ist x = (ist, x) in
   let subst _ x = x in
-  let interp ist gl x = (gl.Evd.sigma, x) in
+  let interp ist x = Ftactic.return x in
   let gen_pr _ _ _ = pr in
   let () = Genintern.register_intern0 wit glob in
   let () = Genintern.register_subst0 wit subst in
@@ -551,7 +551,7 @@ let is_pf_var c = isVar c && not_section_id (destVar c)
 
 let pf_ids_of_proof_hyps gl =
   let add_hyp (id, _, _) ids = if not_section_id id then id :: ids else ids in
-  Context.fold_named_context add_hyp (pf_hyps gl) ~init:[]
+  Context.Named.fold_outside add_hyp (pf_hyps gl) ~init:[]
 
 let pf_nf_evar gl e = Reductionops.nf_evar (project gl) e
 
@@ -793,7 +793,7 @@ let pf_abs_evars gl (sigma, c0) =
     let abs_dc c = function
     | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
     | x, None, t -> mkNamedProd x t c in
-    let t = Context.fold_named_context_reverse abs_dc ~init:evi.evar_concl dc in
+    let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
     Evarutil.nf_evar sigma t in
   let rec put evlist c = match kind_of_term c with
   | Evar (k, a) ->  
@@ -848,7 +848,7 @@ let pf_abs_evars_pirrel gl (sigma, c0) =
     let abs_dc c = function
     | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
     | x, None, t -> mkNamedProd x t c in
-    let t = Context.fold_named_context_reverse abs_dc ~init:evi.evar_concl dc in
+    let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
     Evarutil.nf_evar sigma0 (Evarutil.nf_evar sigma t) in
   let rec put evlist c = match kind_of_term c with
   | Evar (k, a) ->  
@@ -1032,8 +1032,8 @@ let set_pr_ssrtac name prec afmt =
   | [] -> [] in
   let tacname = ssrtac_name name in
    Pptactic.declare_ml_tactic_pprule tacname [|
-    { Pptactic.pptac_args = mk_akey afmt;
-      Pptactic.pptac_prods = (prec, fmt) }
+    { Pptactic.pptac_level = prec;
+      Pptactic.pptac_prods = [] (** FIXME *) }
    |]
 
 let ssrtac_atom loc name args = TacML (loc, ssrtac_entry name 0, args)
@@ -1048,18 +1048,30 @@ let ssrevaltac ist gtac =
 
 (** Generic argument-based globbing/typing utilities *)
 
+let of_ftactic ftac gl =
+  let r = ref None in
+  let tac = Ftactic.run ftac (fun ans -> r := Some ans; Proofview.tclUNIT ()) in
+  let tac = Proofview.V82.of_tactic tac in
+  let { sigma = sigma } = tac gl in
+  let ans = match !r with
+  | None -> assert false (** If the tactic failed we should not reach this point *)
+  | Some ans -> ans
+  in
+  (sigma, ans)
 
 let interp_wit wit ist gl x = 
   let globarg = in_gen (glbwit wit) x in
-  let sigma, arg = interp_genarg ist (pf_env gl) (project gl) (pf_concl gl) gl.Evd.it globarg in
-  sigma, out_gen (topwit wit) arg
+  let arg = interp_genarg ist globarg in
+  let (sigma, arg) = of_ftactic arg gl in
+  sigma, Value.cast (topwit wit) arg
 
 let interp_intro_pattern = interp_wit wit_intro_pattern
 
 let interp_constr = interp_wit wit_constr
 
 let interp_open_constr ist gl gc =
-  interp_wit wit_open_constr ist gl ((), gc)
+  let (sigma, (c, _)) = Tacinterp.interp_open_constr_with_bindings ist (pf_env gl) (project gl) (gc, NoBindings) in
+  (project gl, (sigma, c))
 
 let interp_refine ist gl rc =
   let constrvars = extract_ltac_constr_values ist (pf_env gl) in
@@ -1493,6 +1505,7 @@ let mk_rtype t = Some t in
 let mk_dthen loc (mp, ct, rt) c = (loc, mp, c), ct, rt in
 let mk_let loc rt ct mp c1 =
   CCases (loc, LetPatternStyle, rt, ct, [loc, mp, c1]) in
+let mk_pat c (na, t) = (c, na, t) in
 GEXTEND Gram
   GLOBAL: binder_constr;
   ssr_rtype: [[ "return"; t = operconstr LEVEL "100" -> mk_rtype t ]];
@@ -1507,20 +1520,20 @@ GEXTEND Gram
   ssr_else: [[ mp = ssr_elsepat; c = lconstr -> !@loc, mp, c ]];
   binder_constr: [
     [ "if"; c = operconstr LEVEL "200"; "is"; db1 = ssr_dthen; b2 = ssr_else ->
-      let b1, ct, rt = db1 in CCases (!@loc, MatchStyle, rt, [c, ct], [b1; b2])
+      let b1, ct, rt = db1 in CCases (!@loc, MatchStyle, rt, [mk_pat c ct], [b1; b2])
     | "if"; c = operconstr LEVEL "200";"isn't";db1 = ssr_dthen; b2 = ssr_else ->
       let b1, ct, rt = db1 in 
       let b1, b2 = 
         let (l1, p1, r1), (l2, p2, r2) = b1, b2 in (l1, p1, r2), (l2, p2, r1) in
-      CCases (!@loc, MatchStyle, rt, [c, ct], [b1; b2])
+      CCases (!@loc, MatchStyle, rt, [mk_pat c ct], [b1; b2])
     | "let"; ":"; mp = ssr_mpat; ":="; c = lconstr; "in"; c1 = lconstr ->
-      mk_let (!@loc) no_rt [c, no_ct] mp c1
+      mk_let (!@loc) no_rt [mk_pat c no_ct] mp c1
     | "let"; ":"; mp = ssr_mpat; ":="; c = lconstr;
       rt = ssr_rtype; "in"; c1 = lconstr ->
-      mk_let (!@loc) rt [c, mk_cnotype mp] mp c1
+      mk_let (!@loc) rt [mk_pat c (mk_cnotype mp)] mp c1
     | "let"; ":"; mp = ssr_mpat; "in"; t = pattern; ":="; c = lconstr;
       rt = ssr_rtype; "in"; c1 = lconstr ->
-      mk_let (!@loc) rt [c, mk_ctype mp t] mp c1
+      mk_let (!@loc) rt [mk_pat c (mk_ctype mp t)] mp c1
   ] ];
 END
 
@@ -1680,7 +1693,7 @@ TACTIC EXTEND ssrtclstar
 END
 set_pr_ssrtac "tclstar" 5 [ArgSep "- "; ArgSsr "tclarg"]
 
-let gen_tclarg = in_gen (rawwit wit_ssrtclarg)
+let gen_tclarg tac = TacGeneric (in_gen (rawwit wit_ssrtclarg) tac)
 
 GEXTEND Gram
   GLOBAL: tactic tactic_mode;
@@ -1719,7 +1732,7 @@ GEXTEND Gram
   ssrhint: [[ "by"; arg = ssrhintarg -> arg ]];
   simple_tactic: [
   [ "by"; arg = ssrhintarg ->
-    let garg = in_gen (rawwit wit_ssrhint) arg in
+    let garg = TacGeneric (in_gen (rawwit wit_ssrhint) arg) in
     ssrtac_atom !@loc "tclby" [garg]
   ] ];
 END
@@ -1805,7 +1818,7 @@ let rec check_hyps_uniq ids = function
   | [] -> ()
 
 let check_hyp_exists hyps (SsrHyp(_, id)) =
-  try ignore(Context.lookup_named id hyps)
+  try ignore(Context.Named.lookup id hyps)
   with Not_found -> errorstrm (str"No assumption is named " ++ pr_id id)
 
 let interp_hyps ist gl ghyps =
@@ -2017,7 +2030,7 @@ let discharge_hyp (id', (id, mode)) gl =
   let cl' = subst_var id (pf_concl gl) in
   match pf_get_hyp gl id, mode with
   | (_, None, t), _ | (_, Some _, t), "(" -> 
-     apply_type (mkProd (Name id', t, cl')) [mkVar id] gl
+     Proofview.V82.of_tactic (apply_type (mkProd (Name id', t, cl')) [mkVar id]) gl
   | (_, Some v, t), _ ->
      Proofview.V82.of_tactic (convert_concl (mkLetIn (Name id', v, t, cl'))) gl
 
@@ -2041,7 +2054,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   | _ -> map_constr unmark c in
   let utac hyp =
     Proofview.V82.of_tactic 
-     (convert_hyp_no_check (map_named_declaration unmark hyp)) in
+     (convert_hyp_no_check (Context.Named.Declaration.map unmark hyp)) in
   let utacs = List.map utac (pf_hyps gl) in
   let ugtac gl' =
     Proofview.V82.of_tactic
@@ -2116,7 +2129,7 @@ let tclCLAUSES ist tac (gens, clseq) gl =
     let c = pf_concl gl in
     let gl, args, c =
       List.fold_right (abs_wgen true ist mk_discharged_id) gens (gl,[], c) in
-    apply_type c args gl in
+    Proofview.V82.of_tactic (apply_type c args) gl in
   let endtac =
     let id_map = CList.map_filter (function
       | _, Some ((x,_),_) -> let id = hoi_id x in Some (mk_discharged_id id, id)
@@ -2223,7 +2236,7 @@ let interp_index ist gl idx =
     with _ -> loc_error loc "Index not a number" in
     ArgArg (check_index loc i)
 
-ARGUMENT EXTEND ssrindex TYPED AS int_or_var PRINTED BY pr_ssrindex
+ARGUMENT EXTEND ssrindex TYPED AS ssrindex PRINTED BY pr_ssrindex
   INTERPRETED BY interp_index
 | [ int_or_var(i) ] -> [ mk_index loc i ]
 END
