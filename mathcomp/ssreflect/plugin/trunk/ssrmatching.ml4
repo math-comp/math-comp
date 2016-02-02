@@ -659,7 +659,7 @@ let match_upats_HO ~on_instance upats env sigma0 ise c =
       | Pretype_errors.PretypeError
          (_,_,Pretype_errors.UnsatisfiableConstraints _) ->
           failed_because_of_TC:=true
-      | _ -> () in
+      | e when Errors.noncritical e -> () in
     List.iter one_match fpats
   done;
   iter_constr_LR (aux upats env sigma0 ise) f;
