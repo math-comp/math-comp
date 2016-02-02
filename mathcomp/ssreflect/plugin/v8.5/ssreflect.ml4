@@ -4919,7 +4919,7 @@ let rwprocess_rule dir rule gl =
       let t =
         if red = 1 then Tacred.hnf_constr env sigma t0
         else Reductionops.whd_betaiotazeta sigma t0 in
-      pp(lazy(str"rewrule="++pr_constr t));
+      pp(lazy(str"rewrule="++pr_constr_pat t));
       match kind_of_term t with
       | Prod (_, xt, at) ->
         let ise, x = Evarutil.new_evar env (create_evar_defs sigma) xt in
