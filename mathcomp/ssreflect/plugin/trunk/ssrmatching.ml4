@@ -625,6 +625,7 @@ let match_upats_FO upats env sigma0 ise c =
 
 let match_upats_HO ~on_instance upats env sigma0 ise c =
  let it_did_match = ref false in
+ let failed_because_of_TC = ref false in
  let rec aux upats env sigma0 ise c =
   let f, a = splay_app ise c in let i0 = ref (-1) in
   let fpats = List.fold_right (filter_upat i0 f (Array.length a)) upats [] in
@@ -655,6 +656,9 @@ let match_upats_HO ~on_instance upats env sigma0 ise c =
         on_instance (ungen_upat lhs pt' u)
       with FoundUnif _ as sigma_u -> raise sigma_u 
       | NoProgress -> it_did_match := true
+      | Pretype_errors.PretypeError
+         (_,_,Pretype_errors.UnsatisfiableConstraints _) ->
+          failed_because_of_TC:=true
       | _ -> () in
     List.iter one_match fpats
   done;
@@ -662,7 +666,8 @@ let match_upats_HO ~on_instance upats env sigma0 ise c =
   Array.iter (aux upats env sigma0 ise) a
  in
  aux upats env sigma0 ise c;
- if !it_did_match then raise NoProgress
+ if !it_did_match then raise NoProgress;
+ !failed_because_of_TC
 
 let prof_HO = mk_profiler "match_upats_HO";;
 let match_upats_HO ~on_instance upats env sigma0 ise c =
@@ -760,15 +765,19 @@ let rec uniquize = function
 
 ((fun env c h ~k -> 
   do_once upat_that_matched (fun () -> 
+    let failed_because_of_TC = ref false in
     try
       if not all_instances then match_upats_FO upats env sigma0 ise c;
-      match_upats_HO ~on_instance upats env sigma0 ise c;
+      failed_because_of_TC:=match_upats_HO ~on_instance upats env sigma0 ise c;
       raise NoMatch
     with FoundUnif sigma_u -> 0,[sigma_u]
     | (NoMatch|NoProgress) when all_instances && instances () <> [] ->
       0, uniquize (instances ())
     | NoMatch when (not raise_NoMatch) ->
-      errorstrm (source () ++ str "does not match any subterm of the goal")
+      if !failed_because_of_TC then
+        errorstrm (source ()++strbrk"matches but type classes inference fails")
+      else
+        errorstrm (source () ++ str "does not match any subterm of the goal")
     | NoProgress when (not raise_NoMatch) ->
         let dir = match upats_origin with Some (d,_) -> d | _ ->
           Errors.anomaly (str"mk_tpattern_matcher with no upats_origin") in
