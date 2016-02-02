@@ -621,8 +621,8 @@ let match_upats_HO upats env sigma0 ise c =
         raise (FoundUnif (ungen_upat lhs pt' u))
       with FoundUnif _ as sigma_u -> raise sigma_u 
       | NoProgress -> it_did_match := true
-      | Pretype_errors.PretypeError
-         (_,_,Pretype_errors.UnsatisfiableConstraints _) ->
+      | Typeclasses_errors.TypeClassError
+        (_,Typeclasses_errors.UnsatisfiableConstraints _) ->
           failed_because_of_TC:=true
       | e when Errors.noncritical e -> () in
     List.iter one_match fpats
