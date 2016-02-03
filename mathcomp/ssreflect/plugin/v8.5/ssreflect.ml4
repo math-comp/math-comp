@@ -474,7 +474,7 @@ let _ =
       Goptions.optdepr  = false;
       Goptions.optwrite = (fun b -> ssroldreworder := b) }
 
-let ssrhaveNOtcresolution = ref false
+let ssrhaveNOtcresolution = Summary.ref ~name:"SSR:havenotcresolution" false
 
 let inHaveTCResolution = Libobject.declare_object {
   (Libobject.default_object "SSRHAVETCRESOLUTION") with
