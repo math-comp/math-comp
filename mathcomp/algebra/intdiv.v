@@ -164,7 +164,7 @@ Proof. by move=> p_nz /subnK{2}<-; rewrite exprD mulzK // expf_neq0. Qed.
 Lemma modz1 m : (m %% 1)%Z = 0.
 Proof. by case: m => n; rewrite (modNz_nat, modz_nat) ?modn1. Qed.
 
-Lemma divn1 m : (m %/ 1)%Z = m. Proof. by rewrite -{1}[m]mulr1 mulzK. Qed.
+Lemma divz1 m : (m %/ 1)%Z = m. Proof. by rewrite -{1}[m]mulr1 mulzK. Qed.
 
 Lemma divzz d : (d %/ d)%Z = (d != 0).
 Proof. by have [-> // | d_nz] := altP eqP; rewrite -{1}[d]mul1r mulzK. Qed.
