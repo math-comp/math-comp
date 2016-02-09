@@ -457,6 +457,12 @@ Qed.
 Lemma dvdn_exp k d m : 0 < k -> d %| m -> d %| (m ^ k).
 Proof. by case: k => // k _ d_dv_m; rewrite expnS dvdn_mulr. Qed.
 
+Lemma dvdn_fact m n : 0 < m <= n -> m %| n`!.
+Proof.
+case: m => //= m; elim: n => //= n IHn; rewrite ltnS leq_eqVlt.
+by case/predU1P=> [-> | /IHn]; [apply: dvdn_mulr | apply: dvdn_mull].
+Qed.
+
 Hint Resolve dvdn_add dvdn_sub dvdn_exp.
 
 Lemma eqn_mod_dvd d m n : n <= m -> (m == n %[mod d]) = (d %| m - n).
