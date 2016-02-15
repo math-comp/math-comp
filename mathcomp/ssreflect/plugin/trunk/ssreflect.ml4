@@ -2891,23 +2891,17 @@ let mk_abstract_id () = incr ssr_abstract_id; nat_of_n !ssr_abstract_id
 let ssrmkabs id gl =
   let env, concl = pf_env gl, pf_concl gl in
   let step = { run = begin fun sigma ->
-    let sigma = Sigma.to_evar_map sigma in
-    let sigma, abstract_proof, abstract_ty =
-      let sigma = Sigma.Unsafe.of_evar_map sigma in
-      let Sigma ((ty, _), sigma, _) =
+    let Sigma ((abstract_proof, abstract_ty), sigma, p) =
+      let Sigma ((ty, _), sigma, p1) =
         Evarutil.new_type_evar env sigma Evd.univ_flexible_alg in
-      let Sigma (ablock, sigma, _) = mkSsrConst "abstract_lock" env sigma in
-      let Sigma (lock, sigma, _) = Evarutil.new_evar env sigma ablock in
-      let Sigma (abstract, sigma, _) = mkSsrConst "abstract" env sigma in
-      let sigma = Sigma.to_evar_map sigma in
+      let Sigma (ablock, sigma, p2) = mkSsrConst "abstract_lock" env sigma in
+      let Sigma (lock, sigma, p3) = Evarutil.new_evar env sigma ablock in
+      let Sigma (abstract, sigma, p4) = mkSsrConst "abstract" env sigma in
       let abstract_ty = mkApp(abstract, [|ty;mk_abstract_id ();lock|]) in
-      let sigma = Sigma.Unsafe.of_evar_map sigma in
-      let Sigma (m, sigma, _) = Evarutil.new_evar env sigma abstract_ty in
-      let sigma = Sigma.to_evar_map sigma in
-      sigma, m, abstract_ty in
+      let Sigma (m, sigma, p5) = Evarutil.new_evar env sigma abstract_ty in
+      Sigma ((m, abstract_ty), sigma, p1 +> p2 +> p3 +> p4 +> p5) in
     let sigma, kont =
       let rd = Name id, None, abstract_ty in
-      let sigma = Sigma.Unsafe.of_evar_map sigma in
       let Sigma (ev, sigma, _) = Evarutil.new_evar (Environ.push_rel rd env) sigma concl in
       let sigma = Sigma.to_evar_map sigma in
       (sigma, ev)
