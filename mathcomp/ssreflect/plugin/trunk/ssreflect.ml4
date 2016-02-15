@@ -109,10 +109,12 @@ let mkSsrRef name =
   Errors.error "Small scale reflection library not loaded"
 let mkSsrRRef name = GRef (dummy_loc, mkSsrRef name,None), None
 let mkSsrConst name env sigma =
-  Evd.fresh_global env sigma (mkSsrRef name)
+  Sigma.fresh_global env sigma (mkSsrRef name)
 let pf_mkSsrConst name gl =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
-  let sigma, t = mkSsrConst name env sigma in
+  let sigma = Sigma.Unsafe.of_evar_map sigma in
+  let Sigma (t, sigma, _) = mkSsrConst name env sigma in
+  let sigma = Sigma.to_evar_map sigma in
   t, re_sig it sigma
 let pf_fresh_global name gl =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
@@ -2891,13 +2893,13 @@ let ssrmkabs id gl =
   let step = { run = begin fun sigma ->
     let sigma = Sigma.to_evar_map sigma in
     let sigma, abstract_proof, abstract_ty =
-      let sigma, (ty, _) =
-        Evarutil.new_type_evar env sigma Evd.univ_flexible_alg in
-      let sigma, ablock = mkSsrConst "abstract_lock" env sigma in
       let sigma = Sigma.Unsafe.of_evar_map sigma in
+      let Sigma ((ty, _), sigma, _) =
+        Evarutil.new_type_evar env sigma Evd.univ_flexible_alg in
+      let Sigma (ablock, sigma, _) = mkSsrConst "abstract_lock" env sigma in
       let Sigma (lock, sigma, _) = Evarutil.new_evar env sigma ablock in
+      let Sigma (abstract, sigma, _) = mkSsrConst "abstract" env sigma in
       let sigma = Sigma.to_evar_map sigma in
-      let sigma, abstract = mkSsrConst "abstract" env sigma in
       let abstract_ty = mkApp(abstract, [|ty;mk_abstract_id ();lock|]) in
       let sigma = Sigma.Unsafe.of_evar_map sigma in
       let Sigma (m, sigma, _) = Evarutil.new_evar env sigma abstract_ty in
