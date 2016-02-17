@@ -4130,7 +4130,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       let pat = List.find (fun t -> Intset.mem i (evars_of_term t)) patterns in
       errorstrm(str"Pattern"++spc()++pr_constr_pat pat++spc()++
         str"was not completely instantiated and one of its variables"++spc()++
-        str"occurs in the type of another non instantieted pattern variable");
+        str"occurs in the type of another non-instantiated pattern variable");
     end
   in
   (* the elim tactic, with the eliminator and the predicated we computed *)
