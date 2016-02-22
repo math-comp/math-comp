@@ -1286,7 +1286,7 @@ have haveX xi: xi \in S2 chi1 -> exists2 X, Xspec X & Xi_spec X xi.
   - apply: sub_iso_to IZtau; last exact: zcharW.
     by apply: zchar_trans_on; apply/allP; rewrite /= !Zd.
   have [||minX1 _]:= subcoherent_norm _ _ (erefl _) defX1Y2.
-  - rewrite char_vchar ?N_S /orthogonal //= !oSS ?eqxx ?inv_eq //.
+  - rewrite char_vchar ?N_S /orthogonal //= !oSS ?eqxx // inv_eq //.
     exact: cfConjCK.
   - apply: sub_iso_to IZtau; last exact: zcharW.
     by apply: zchar_trans_on; apply/allP; rewrite /= !Zd.
