@@ -3872,7 +3872,8 @@ let refine_with ?(first_goes_last=false) ?beta ?(with_evars=true) oc gl =
       (mkApp (compose_lam l c, Array.of_list (mkRel 1 :: mkRels n)))
   in
   pp(lazy(str"after: " ++ pr_constr oc));
-  try applyn ~with_evars ~with_shelve:true ?beta n oc gl with _ -> raise dependent_apply_error
+  try applyn ~with_evars ~with_shelve:true ?beta n oc gl
+  with e when Errors.noncritical e -> raise dependent_apply_error
 
 let pf_fresh_inductive_instance ind gl =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
