@@ -571,6 +571,12 @@ exception FoundUnif of (evar_map * evar_universe_context * tpattern)
 (* Note: we don't update env as we descend into the term, as the primitive *)
 (* unification procedure always rejects subterms with bound variables.     *)
 
+let dont_impact_evars_in cl =
+  let evs_in_cl = Evd.evars_of_term cl in
+  fun sigma -> Evar.Set.for_all (fun k ->
+    try let _ = Evd.find_undefined sigma k in true
+    with Not_found -> false) evs_in_cl
+
 (* We are forced to duplicate code between the FO/HO matching because we    *)
 (* have to work around several kludges in unify.ml:                         *)
 (*  - w_unify drops into second-order unification when the pattern is an    *)
@@ -579,7 +585,8 @@ exception FoundUnif of (evar_map * evar_universe_context * tpattern)
 (*    head is an evar or meta (e.g., it fails on ?1 = nat when ?1 : Type).  *)
 (*  - w_unify expands let-in (zeta conversion) eagerly, whereas we want to  *)
 (*    match a head let rigidly.                                             *)
-let match_upats_FO upats env sigma0 ise =
+let match_upats_FO upats env sigma0 ise orig_c =
+  let dont_impact_evars = dont_impact_evars_in orig_c in
   let rec loop c =
     let f, a = splay_app ise c in let i0 = ref (-1) in
     let fpats =
@@ -610,13 +617,13 @@ let match_upats_FO upats env sigma0 ise =
            let lhs = mkSubApp f i a in
            let pt' = unif_end env sigma0 ise' u.up_t (u.up_ok lhs) in
            raise (FoundUnif (ungen_upat lhs pt' u))
-       with FoundUnif _ as sigma_u -> raise sigma_u 
+       with FoundUnif (s,_,_) as sig_u when dont_impact_evars s -> raise sig_u
        | Not_found -> Errors.anomaly (str"incomplete ise in match_upats_FO")
        | _ -> () in
     List.iter one_match fpats
   done;
   iter_constr_LR loop f; Array.iter loop a in
-  fun c -> try loop c with Invalid_argument _ -> Errors.anomaly (str"IN FO")
+  try loop orig_c with Invalid_argument _ -> Errors.anomaly (str"IN FO")
 
 let prof_FO = mk_profiler "match_upats_FO";;
 let match_upats_FO upats env sigma0 ise c =
@@ -625,6 +632,7 @@ let match_upats_FO upats env sigma0 ise c =
 
 
 let match_upats_HO ~on_instance upats env sigma0 ise c =
+  let dont_impact_evars = dont_impact_evars_in c in
  let it_did_match = ref false in
  let failed_because_of_TC = ref false in
  let rec aux upats env sigma0 ise c =
@@ -655,7 +663,7 @@ let match_upats_HO ~on_instance upats env sigma0 ise c =
         let lhs = mkSubApp f i a in
         let pt' = unif_end env sigma0 ise'' u.up_t (u.up_ok lhs) in
         on_instance (ungen_upat lhs pt' u)
-      with FoundUnif _ as sigma_u -> raise sigma_u 
+      with FoundUnif (s,_,_) as sig_u when dont_impact_evars s -> raise sig_u
       | NoProgress -> it_did_match := true
       | Pretype_errors.PretypeError
          (_,_,Pretype_errors.UnsatisfiableConstraints _) ->
