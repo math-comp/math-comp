@@ -1298,12 +1298,25 @@ let ssrpatterntac ist arg gl =
   let (t, uc), concl_x =
     fill_occ_pattern (Global.env()) sigma0 concl0 pat noindex 1 in
   let gl, tty = pf_type_of gl t in
-  let concl = mkLetIn (Name (id_of_string "toto"), t, tty, concl_x) in
+  let concl = mkLetIn (Name (id_of_string "selected"), t, tty, concl_x) in
   Proofview.V82.of_tactic (convert_concl concl DEFAULTcast) gl
 
-TACTIC EXTEND ssrat
-| [ "ssrpattern" ssrpatternarg(arg) ] -> [ Proofview.V82.tactic (ssrpatterntac ist arg) ]
-END
+(* Register "ssrpattern" tactic *)
+let () =
+  let assoc_var s ist =
+  let mltac _ ist =
+    let arg =
+      Genarg.out_gen (topwit wit_ssrpatternarg)
+       (Id.Map.find (Names.Id.of_string "ssrpatternarg") ist.lfun) in
+    Proofview.V82.tactic (ssrpatterntac ist arg) in
+  let name = { mltac_plugin = "ssreflect"; mltac_tactic = "ssrpattern"; } in
+  let () = Tacenv.register_ml_tactic name mltac in
+  let tac =
+    TacFun ([Some (Id.of_string "ssrpatternarg")],
+      TacML (Loc.ghost, name, [])) in
+  let obj () =
+    Tacenv.register_ltac true false (Id.of_string "ssrpattern") tac in
+  Mltop.declare_cache_obj obj "ssreflect"
 
 let ssrinstancesof ist arg gl =
   let ok rhs lhs ise = true in
