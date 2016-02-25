@@ -1290,7 +1290,6 @@ let ssrpatterntac ist arg gl =
 
 (* Register "ssrpattern" tactic *)
 let () =
-  let assoc_var s ist =
   let mltac _ ist =
     let arg =
       Genarg.out_gen (topwit wit_ssrpatternarg)
