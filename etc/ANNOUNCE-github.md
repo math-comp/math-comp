@@ -17,7 +17,7 @@ library will be carefully assessed on all the mature projects part of the organi
 exchange we expect members of the organization to actively maintain their code when a breaking
 change is applied or a patch is proposed.
 
-The organization hosts a [wiki](https://github.com/math-comp/math-comp/wiki/wiki) for exchanging tips
+The organization hosts a [wiki](https://github.com/math-comp/wiki/wiki) for exchanging tips
 and tricks, gotchas, good practices, etc.
 
 The ssreflect [mailing list](https://sympa.inria.fr/sympa/info/ssreflect) shall serve as the
