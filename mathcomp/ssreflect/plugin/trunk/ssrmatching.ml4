@@ -451,8 +451,10 @@ let evars_for_FO ~hack env sigma0 (ise0:evar_map) c0 =
     let evi = Evd.find !sigma k in
     let dc = List.firstn (max 0 (Array.length a - nenv)) (evar_filtered_context evi) in
     let abs_dc (d, c) = function
-    | x, Some b, t -> d, mkNamedLetIn x (put b) (put t) c
-    | x, None, t -> mkVar x :: d, mkNamedProd x (put t) c in
+    | Context.Named.Declaration.LocalDef (x, b, t) ->
+        d, mkNamedLetIn x (put b) (put t) c
+    | Context.Named.Declaration.LocalAssum (x, t) ->
+        mkVar x :: d, mkNamedProd x (put t) c in
     let a, t =
       Context.Named.fold_inside abs_dc ~init:([], (put evi.evar_concl)) dc in
     let m = Evarutil.new_meta () in
@@ -655,7 +657,9 @@ let match_upats_HO ~on_instance upats env sigma0 ise c =
           let x, v, t, b = destLetIn f in
           let _, pv, _, pb = destLetIn u.up_f in
           let ise' = unif_HO env ise pv v in
-          unif_HO (Environ.push_rel (x, None, t) env) ise' pb b
+          unif_HO
+            (Environ.push_rel (Context.Rel.Declaration.LocalAssum(x, t)) env)
+            ise' pb b
         | KpatFlex | KpatProj _ ->
           unif_HO env ise u.up_f (mkSubApp f (i - Array.length u.up_a) a)
         | _ -> unif_HO env ise u.up_f f in
@@ -730,7 +734,8 @@ let mk_tpattern_matcher ?(all_instances=false)
     match u.up_k with
     | KpatLet ->
       let x, pv, t, pb = destLetIn u.up_f in
-      let env' = Environ.push_rel (x, None, t) env in
+      let env' =
+        Environ.push_rel (Context.Rel.Declaration.LocalAssum(x, t)) env in
       let match_let f = match kind_of_term f with
       | LetIn (_, v, _, b) -> unif_EQ env sigma pv v && unif_EQ env' sigma pb b
       | _ -> false in match_let
@@ -810,7 +815,13 @@ let rec uniquize = function
       mkApp (f', Array.map_left (subst_loop acc) a2)
     else
       (* TASSI: clear letin values to avoid unfolding *)
-      let inc_h (n,_,ty) (env,h') = Environ.push_rel (n,None,ty) env, h' + 1 in
+      let inc_h rd (env,h') =
+        let ctx_item =
+          match rd with
+          | Context.Rel.Declaration.LocalAssum _ as x -> x
+          | Context.Rel.Declaration.LocalDef (x,_,y) ->
+              Context.Rel.Declaration.LocalAssum(x,y) in
+        Environ.push_rel ctx_item env, h' + 1 in
       let f' = map_constr_with_binders_left_to_right inc_h subst_loop acc f in
       mkApp (f', Array.map_left (subst_loop acc) a) in
   subst_loop (env,h) c) : find_P),
@@ -1042,7 +1053,7 @@ let interp_pattern ist gl red redty =
         let nctx = Evd.evar_context (Evd.find sigma k) in
         let nlen = Context.Named.length nctx in
         if nlen > len then begin
-          name := Some (pi1 (List.nth nctx (nlen - len - 1)))
+          name := Some (Context.Named.Declaration.get_id (List.nth nctx (nlen - len - 1)))
         end)
       with Not_found -> ref (Some x), fun _ -> () in
     let sigma0 = project gl in
@@ -1305,14 +1316,14 @@ let ssrpatterntac ist arg gl =
 let () =
   let mltac _ ist =
     let arg =
-      Genarg.out_gen (topwit wit_ssrpatternarg)
-       (Id.Map.find (Names.Id.of_string "ssrpatternarg") ist.lfun) in
+      let v = Id.Map.find (Names.Id.of_string "ssrpatternarg") ist.lfun in
+      Value.cast (topwit wit_ssrpatternarg) v in
     Proofview.V82.tactic (ssrpatterntac ist arg) in
-  let name = { mltac_plugin = "ssreflect"; mltac_tactic = "ssrpattern"; } in
-  let () = Tacenv.register_ml_tactic name mltac in
+  let name = { mltac_plugin = "ssrmatching"; mltac_tactic = "ssrpattern"; } in
+  let () = Tacenv.register_ml_tactic name [|mltac|] in
   let tac =
     TacFun ([Some (Id.of_string "ssrpatternarg")],
-      TacML (Loc.ghost, name, [])) in
+      TacML (Loc.ghost, { mltac_name = name; mltac_index = 0 }, [])) in
   let obj () =
     Tacenv.register_ltac true false (Id.of_string "ssrpattern") tac in
   Mltop.declare_cache_obj obj "ssreflect"
