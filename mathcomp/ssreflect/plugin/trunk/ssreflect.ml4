@@ -1456,7 +1456,7 @@ let interp_modloc mr =
 
 let ssrdisplaysearch gr env t =
   let pr_res = pr_global gr ++ spc () ++ str " " ++ pr_lconstr_env env Evd.empty t in
-  msg (hov 2 pr_res ++ fnl ())
+  msg_info (hov 2 pr_res ++ fnl ())
 
 VERNAC COMMAND EXTEND SsrSearchPattern CLASSIFIED AS QUERY
 | [ "Search" ssr_search_arg(a) ssr_modlocs(mr) ] ->
