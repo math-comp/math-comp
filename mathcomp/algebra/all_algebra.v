@@ -14,3 +14,4 @@ Require Export mxalgebra.
 Require Export vector.
 Require Export ring_quotient.
 Require Export fraction.
+Require Export zmodp.
