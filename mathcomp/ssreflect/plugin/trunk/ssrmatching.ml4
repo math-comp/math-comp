@@ -122,7 +122,7 @@ let prl_term (k, c) = pr_guarded (guard_term k) prl_glob_constr_and_expr c
 
 (** Adding a new uninterpreted generic argument type *)
 let add_genarg tag pr =
-  let wit = Genarg.make0 None tag in
+  let wit = Genarg.make0 tag in
   let glob ist x = (ist, x) in
   let subst _ x = x in
   let interp ist x = Ftactic.return x in
