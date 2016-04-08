@@ -184,6 +184,8 @@ End TheCanonical.
 
 Import TheCanonical. (* Note: no export. *)
 
+Local Arguments get_by _%type_scope _%type_scope _ _ _ _.
+
 Notation "[ 'the' sT 'of' v 'by' f ]" :=
   (@get_by _ sT f _ _ ((fun v' (s : sT) => Put v' (f s) s) v _))
   (at level 0, only parsing) : form_scope.

@@ -1604,6 +1604,8 @@ Notation "{ 'on' cd & , P }" :=
   (prop_on2 (mem cd) (inPhantom P) (inPhantom P))
   (at level 0, format "{ 'on'  cd  & ,  P }") : type_scope.
 
+Local Arguments onPhantom {_%type_scope} _ _.
+
 Notation "{ 'on' cd , P & g }" :=
   (prop_on1 (mem cd) (Phantom (_ -> Prop) P) (onPhantom P g))
   (at level 0, format "{ 'on'  cd ,  P  &  g }") : type_scope.
