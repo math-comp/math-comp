@@ -1035,11 +1035,7 @@ let set_pr_ssrtac name prec afmt =
     | ArgSep s -> Egramml.GramTerminal s
     | ArgSsr s -> Egramml.GramTerminal s
     | ArgCoq at -> Egramml.GramTerminal "COQ_ARG") afmt in
-  let tacname = ssrtac_name name in
-   Pptactic.declare_ml_tactic_pprule tacname [|
-    { Pptactic.pptac_level = prec;
-      Pptactic.pptac_prods = fmt }
-   |]
+  let tacname = ssrtac_name name in ()
 
 let ssrtac_atom loc name args = TacML (loc, ssrtac_entry name 0, args)
 let ssrtac_expr = ssrtac_atom
@@ -1725,9 +1721,8 @@ ARGUMENT EXTEND ssrhint TYPED AS ssrhintarg PRINTED BY pr_ssrhint
 END
 
 TACTIC EXTEND ssrtclby
-| [ "YouShouldNotTypeThis" ssrhint(tac) ] -> [ Proofview.V82.tactic (hinttac ist true tac) ]
+| [ "by" ssrhintarg(tac) ] -> [ Proofview.V82.tactic (hinttac ist true tac) ]
 END
-set_pr_ssrtac "tclby" 0 [ArgSsr "hint"]
 
 (* We can't parse "by" in ARGUMENT EXTEND because it will only be made *)
 (* into a keyword in ssreflect.v; so we anticipate this in GEXTEND.    *)
@@ -1735,11 +1730,6 @@ set_pr_ssrtac "tclby" 0 [ArgSsr "hint"]
 GEXTEND Gram
   GLOBAL: ssrhint simple_tactic;
   ssrhint: [[ "by"; arg = ssrhintarg -> arg ]];
-  simple_tactic: [
-  [ "by"; arg = ssrhintarg ->
-    let garg = TacGeneric (in_gen (rawwit wit_ssrhint) arg) in
-    ssrtac_atom !@loc "tclby" [garg]
-  ] ];
 END
 (* }}} *)
 
