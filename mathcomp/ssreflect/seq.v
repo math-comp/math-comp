@@ -644,6 +644,14 @@ Proof. by move <-; elim: s1 => //=; rewrite drop0. Qed.
 Lemma nconsK n x : cancel (ncons n x) (drop n).
 Proof. by elim: n => // -[]. Qed.
 
+Lemma drop_drop s n1 n2 : drop n1 (drop n2 s) = drop (n1 + n2) s.
+Proof.
+elim: s n1 n2 => //= x s IHs.
+case=> [| n1] n2; first by rewrite drop0 add0n.
+rewrite addSn; case: n2 => [| n2]; first by rewrite addn0.
+by rewrite -addSnnS.
+Qed.
+
 Fixpoint take n s {struct s} :=
   match s, n with
   | x :: s', n'.+1 => x :: take n' s'
@@ -849,6 +857,31 @@ Proof. by rewrite !has_count count_rev. Qed.
 
 Lemma all_rev a s : all a (rev s) = all a s.
 Proof. by rewrite !all_count count_rev size_rev. Qed.
+
+Lemma take_rev s n : take n (rev s) = rev (drop (size s - n) s).
+Proof.
+elim: n s => [| n IHn] s.
+  by rewrite take0 subn0 drop_size.
+case/lastP: s => //= s x.
+rewrite rev_rcons /= IHn -rev_rcons; congr rev.
+rewrite size_rcons subSS -(cats1 s) drop_cat.
+case: ltnP; first by rewrite cats1.
+move=> /drop_oversize -> /=.
+suff -> : size s - n - size s = 0 by [].
+by rewrite subnAC subnn sub0n.
+Qed.
+
+Lemma drop_rev s n : drop n (rev s) = rev (take (size s - n) s).
+Proof.
+elim: n s => [| n IHn] s.
+  by rewrite drop0 subn0 take_size.
+case/lastP: s => // s x.
+rewrite rev_rcons /= IHn; congr rev.
+rewrite size_rcons subSS -cats1 take_cat.
+case: ltnP => //= /take_oversize ->.
+suff -> : size s - n - size s = 0 by rewrite cats0.
+by rewrite subnAC subnn sub0n.
+Qed.
 
 End Rev.
 
@@ -1227,6 +1260,26 @@ move=> lt_i_s lt_j_s Us; apply/eqP/eqP=> [eq_sij|-> //].
 by rewrite -(index_uniq lt_i_s Us) eq_sij index_uniq.
 Qed.
 
+Lemma notuniq_witnessP s :
+  reflect (exists i j, i < j < size s /\ nth s i = nth s j)
+  (~~ uniq s).
+Proof.
+apply (iffP idP).
+- elim: s => //= x s IHs.
+  rewrite negb_and => /orP [].
+  + rewrite negbK => Hin.
+    exists 0; exists (index x s).+1 => /=.
+    by split; [rewrite ltnS index_mem | rewrite nth_index].
+  + move/IHs => {IHs} [] i [] j [] Hij Hnth.
+    by exists i.+1; exists j.+1; split; first by rewrite !ltnS.
+- elim: s => [| s0 s IHs ] /= [] i [] j [] /andP [] //=.
+  rewrite negb_and negbK; case: i => [| i].
+  + by case: j => //= j _; rewrite ltnS /= => Hj ->; rewrite mem_nth.
+  + case: j => //= j; rewrite !ltnS /= => Hi Hj Hnth.
+    apply/orP; right; apply IHs.
+    by exists i; exists j; rewrite Hi Hj Hnth.
+Qed.
+
 Lemma mem_rot s : rot n0 s =i s.
 Proof. by move=> x; rewrite -{2}(cat_take_drop n0 s) !mem_cat /= orbC. Qed.
 
@@ -1322,6 +1375,30 @@ elim: v i => [|n v IHv] [|i] //=; first by rewrite size_ncons /= addn1.
 by rewrite IHv; apply: fun_if.
 Qed.
 
+Lemma incr_nth_inj v : injective (incr_nth v).
+Proof.
+move=> i j Hv.
+case (altP (i =P j)) => [//= | /negbTE Hdiff].
+move/(congr1 (fun s => nth 0 s j)) : Hv => /eqP.
+by rewrite !nth_incr_nth eq_refl Hdiff eqn_add2r.
+Qed.
+
+Lemma incr_nthC v i j :
+  incr_nth (incr_nth v i) j = incr_nth (incr_nth v j) i.
+Proof.
+apply (eq_from_nth (x0 := 0)).
+- rewrite !size_incr_nth.
+  case (ltnP i (size v)) => Hi.
+  + case (ltnP j (size v)) => Hj; first by rewrite Hi.
+    by rewrite ltnS (ltnW (leq_trans Hi Hj)).
+  + case (ltnP j (size v)) => Hj.
+    * by rewrite ltnS (ltnW (leq_trans Hj Hi)) ltnNge Hi.
+    * rewrite !ltnS; case: (ltngtP i j) => Hij; last by rewrite Hij.
+      - by rewrite (ltnW Hij) leqNgt Hij.
+      - by rewrite (ltnW Hij) leqNgt Hij.
+- by move=> k Hk; rewrite !nth_incr_nth !addnA [(_ == _) + _]addnC.
+Qed.
+
 (* Equality up to permutation *)
 
 Section PermSeq.
@@ -1405,6 +1482,13 @@ Proof. by move=> /= s2; rewrite perm_catC cat_take_drop. Qed.
 Lemma perm_rotr n s : perm_eql (rotr n s) s.
 Proof. exact: perm_rot. Qed.
 
+Lemma perm_eq_rev s : perm_eq s (rev s).
+Proof.
+elim: s => //= x s; rewrite rev_cons -(perm_cons x).
+move /perm_eq_trans; apply.
+by rewrite perm_eq_sym; apply/perm_eqlP; exact: perm_rcons.
+Qed.
+
 Lemma perm_filterC a s : perm_eql (filter a s ++ filter (predC a) s) s.
 Proof.
 apply/perm_eqlP; elim: s => //= x s IHs.
@@ -1416,6 +1500,19 @@ Proof. by move/perm_eqP=> eq12 x; rewrite -!has_pred1 !has_count eq12. Qed.
 
 Lemma perm_eq_size s1 s2 : perm_eq s1 s2 -> size s1 = size s2.
 Proof. by move/perm_eqP=> eq12; rewrite -!count_predT eq12. Qed.
+
+Lemma filter_perm_eq u v P :
+  perm_eq u v -> perm_eq (filter P u) (filter P v).
+Proof.
+move=> /perm_eqP Hcount.
+by apply/perm_eqP => Q; rewrite !count_filter; exact: Hcount.
+Qed.
+
+Lemma all_perm_eq u v P : perm_eq u v -> all P u -> all P v.
+Proof.
+move=> /perm_eq_mem Hperm /allP Hall; apply/allP => x.
+by rewrite -Hperm => /Hall.
+Qed.
 
 Lemma perm_eq_small s1 s2 : size s2 <= 1 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
@@ -2265,6 +2362,16 @@ Proof. by rewrite mulnC; elim: n => //= n ->. Qed.
 Lemma sumn_cat s1 s2 : sumn (s1 ++ s2) = sumn s1 + sumn s2.
 Proof. by elim: s1 => //= x s1 ->; rewrite addnA. Qed.
 
+Lemma sumn_count (T : eqType) (s : seq T) (P : T -> bool) :
+  sumn [seq nat_of_bool (P i) | i <- s] = count P s.
+Proof. by elim: s => //= s0 s /= ->. Qed.
+
+Lemma sumn_rev s : sumn (rev s) = sumn s.
+Proof.
+elim: s => //= x s <-.
+by rewrite rev_cons -cats1 sumn_cat /= addn0 addnC.
+Qed.
+
 Lemma natnseq0P s : reflect (s = nseq (size s) 0) (sumn s == 0).
 Proof.
 apply: (iffP idP) => [|->]; last by rewrite sumn_nseq.
@@ -2476,6 +2583,173 @@ rewrite -mem_undup => /perm_to_rem/catCA_perm_subst->; last first.
 rewrite /N /= count_cat -/(N x _) Nx0 ?mem_rem_uniq ?undup_uniq ?inE ?eqxx //.
 by rewrite addn0 -{2}(size_nseq (_ s) x) -all_count all_pred1_nseq.
 Qed.
+
+Section FlattenReshape.
+
+Variables S T : eqType.
+Implicit Types (s : seq T) (ss : seq (seq T)).
+
+Lemma flatten_rcons s t : flatten (rcons t s) = flatten t ++ s.
+Proof.
+elim: t => [| t0 t IHt /=]; first by rewrite /= cats0.
+by rewrite IHt catA.
+Qed.
+
+Lemma flatten_seq1 s : flatten [seq [:: x] | x <- s] = s.
+Proof. by elim: s => //= s0 s ->. Qed.
+
+Lemma count_flatten ss P :
+  count P (flatten ss) = sumn [seq count P x | x <- ss].
+Proof. by elim: ss => //= s ss IHss; rewrite count_cat IHss. Qed.
+
+Lemma map_flatten (f : T -> S) ss :
+  map f (flatten ss) = flatten (map (map f) ss).
+Proof. elim: ss => // s ss /= <-; exact: map_cat. Qed.
+
+Lemma filter_flatten ss (P : pred T) :
+  filter P (flatten ss) = flatten [seq filter P i | i <- ss].
+Proof. elim: ss => // s ss /= <-; exact: filter_cat. Qed.
+
+Lemma sumn_flatten (ss : seq (seq nat)) :
+  sumn (flatten ss) = sumn (map sumn ss).
+Proof. elim: ss => // s ss /= <-; exact: sumn_cat. Qed.
+
+Lemma rev_flatten ss :
+  rev (flatten ss) = flatten (rev (map rev ss)).
+Proof.
+elim: ss => //= s ss IHss.
+by rewrite rev_cons flatten_rcons -IHss rev_cat.
+Qed.
+
+Lemma nth_shape ss i : nth 0 (shape ss) i = size (nth [::] ss i).
+Proof.
+rewrite /shape; case: (ltnP i (size ss)) => Hi; first exact: nth_map.
+by rewrite !nth_default // size_map.
+Qed.
+
+Lemma shape_rev ss : shape (rev ss) = rev (shape ss).
+Proof. by rewrite /shape; elim: ss => //= s ss IHss; rewrite map_rev. Qed.
+
+Lemma eq_from_flatten_shape (u v : seq (seq T)) :
+  (u = v) <-> ((flatten u = flatten v) /\ (shape u = shape v)).
+Proof.
+split=> [-> // | [Hflat Hshape]].
+by rewrite -(flattenK u) -(flattenK v) Hflat Hshape.
+Qed.
+
+Lemma rev_reshape (s : seq nat) (l : seq T) :
+  size l = sumn s -> rev (map rev (reshape (rev s) (rev l))) = reshape s l.
+Proof.
+move=> H; apply eq_from_flatten_shape; split.
+- rewrite reshapeKr; last by rewrite H.
+  rewrite -rev_flatten reshapeKr; first by rewrite revK.
+  by rewrite size_rev H sumn_rev.
+- rewrite shape_rev /shape -map_comp.
+  rewrite (eq_map (f2 := size)); last by move=> v; rewrite /= size_rev.
+  rewrite -/(shape _) reshapeKl; last by rewrite size_rev sumn_rev H.
+  rewrite -/(shape _) reshapeKl; last by rewrite H.
+  by rewrite revK.
+Qed.
+
+Lemma nth_reshape (s : seq nat) (l : seq T) n :
+  nth [::] (reshape s l) n = take (nth 0 s n) (drop (sumn (take n s)) l).
+Proof.
+elim: n s l => [| n IHn] [| s0 s] l; rewrite ?take0 ?drop0 //=.
+rewrite addnC -drop_drop; exact: IHn.
+Qed.
+
+Lemma map_reshape (T1 T2 : Type) (f : T1 -> T2) sh (s : seq T1) :
+  map (map f) (reshape sh s) = reshape sh (map f s).
+Proof. elim: sh s => //= sh0 sh IHsh s; by rewrite map_take IHsh map_drop. Qed.
+
+Lemma size_reshape sh s : size (reshape sh s) = size sh.
+Proof. elim: sh s => //= s0 sh IHsh s; by rewrite IHsh. Qed.
+
+Lemma reshape_rcons s sh sn :
+  sumn sh + sn = size s ->
+  reshape (rcons sh sn) s =
+  rcons (reshape sh (take (sumn sh) s)) (drop (sumn sh) s).
+Proof.
+elim: sh s => [| s0 sh IHsh] /= s.
+  rewrite add0n => Hsz.
+  by rewrite drop0 take_oversize; last by rewrite Hsz.
+move=> Hsize.
+have Hs0 : (if s0 < size s then s0 else size s) = s0.
+  have : s0 <= size s by rewrite -Hsize -addnA; apply leq_addr.
+  by rewrite leq_eqVlt => /orP [/eqP -> | -> //]; rewrite ltnn.
+rewrite (_ : take (s0 + sumn sh) s = take s0 s ++ take (sumn sh) (drop s0 s));
+  first last.
+  rewrite -{1 3}[s](cat_take_drop s0) drop_cat take_cat size_take.
+  by rewrite Hs0 ltnNge leq_addr /= addKn ltnn subnn drop0.
+rewrite take_cat size_take Hs0 ltnn subnn take0 cats0.
+rewrite drop_cat size_take Hs0 ltnn subnn drop0.
+rewrite (_ : drop (s0 + sumn sh) s = drop (sumn sh) (drop s0 s)); first last.
+  rewrite -[s](cat_take_drop s0) !drop_cat size_take.
+  by rewrite Hs0 ltnNge leq_addr /= addKn ltnn subnn drop0.
+by rewrite -IHsh; last by rewrite size_drop -Hsize -addnA addKn.
+Qed.
+
+(** ** converting indices in a [seq [seq T]] and its flatten version *)
+Fixpoint reshape_index sh i :=
+  if sh is s0 :: s then
+    if i < s0 then (0, i)
+    else let (r, c) := reshape_index s (i - s0) in (r.+1, c)
+  else (0, i).
+
+Definition flatten_index sh r c := sumn (take r sh) + c.
+
+Lemma flatten_indexP sh r c :
+  c < nth 0 sh r -> flatten_index sh r c < sumn sh.
+Proof.
+case: (ltnP r (size sh)) => Hr; last by rewrite (nth_default _ Hr).
+rewrite /flatten_index => Hc {Hr}.
+rewrite -{2}(cat_take_drop r sh) sumn_cat ltn_add2l.
+apply (leq_trans Hc).
+rewrite {Hc} -{1}(addn0 r) -nth_drop.
+by case: (drop r sh) => //= x s; exact: leq_addr.
+Qed.
+
+Lemma reshape_indexP sh i :
+  i < sumn sh ->
+  let (r, c) := (reshape_index sh i) in r < size sh /\ c < nth 0 sh r.
+Proof.
+elim: sh i => [| s0 sh IHsh] i //= Hi.
+case: (ltnP i s0) => His0 //=.
+move/(_ (i - s0)) : IHsh; case: (reshape_index sh (i - s0)) => r c /=.
+rewrite ltnS; apply.
+by rewrite -(subSn His0) leq_subLR.
+Qed.
+
+Lemma reshape_indexK sh i :
+  let (r, c) := reshape_index sh i in flatten_index sh r c = i.
+Proof.
+rewrite /flatten_index.
+elim: sh i => [| s0 s IHs] i /=; first by rewrite add0n.
+case: (ltnP i s0) => His0 /=; first by rewrite add0n.
+move/(_ (i - s0)) : IHs; case: (reshape_index s (i - s0)) => r c /=.
+by rewrite -addnA => ->; apply: subnKC.
+Qed.
+
+Lemma flatten_indexK sh r c :
+  c < nth 0 sh r -> reshape_index sh (flatten_index sh r c) = (r, c).
+Proof.
+rewrite /flatten_index.
+elim: r c sh => [| r IHr] /= c [//= | s0 s] /=.
+  by rewrite add0n => ->.
+rewrite [X in if X then _ else _]ltnNge -addnA leq_addr /=.
+by rewrite addKn => /IHr ->.
+Qed.
+
+Lemma nth_flatten (x : T) ss i :
+  nth x (flatten ss) i = let (r, c) := (reshape_index (shape ss) i) in
+                          nth x (nth [::] ss r) c.
+Proof.
+  elim: ss i => //= s ss IHss i.
+  rewrite nth_cat; case: ltnP => //= Hi.
+  rewrite IHss; by case: (reshape_index (shape ss) (i - size s)) => r c.
+Qed.
+
+End FlattenReshape.
 
 Section AllPairs.
 
