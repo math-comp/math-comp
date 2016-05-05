@@ -646,10 +646,7 @@ Proof. by elim: n => // -[]. Qed.
 
 Lemma drop_drop s n1 n2 : drop n1 (drop n2 s) = drop (n1 + n2) s.
 Proof.
-elim: s n1 n2 => //= x s IHs.
-case=> [| n1] n2; first by rewrite drop0 add0n.
-rewrite addSn; case: n2 => [| n2]; first by rewrite addn0.
-by rewrite -addSnnS.
+by elim: n2 s => [s|n2 IHn1 [|x s]]; rewrite ?drop0 ?addn0 ?addnS /=.
 Qed.
 
 Fixpoint take n s {struct s} :=
@@ -1483,11 +1480,7 @@ Lemma perm_rotr n s : perm_eql (rotr n s) s.
 Proof. exact: perm_rot. Qed.
 
 Lemma perm_eq_rev s : perm_eq s (rev s).
-Proof.
-elim: s => //= x s; rewrite rev_cons -(perm_cons x).
-move /perm_eq_trans; apply.
-by rewrite perm_eq_sym; apply/perm_eqlP; exact: perm_rcons.
-Qed.
+Proof. by apply/perm_eqP=> i; rewrite count_rev. Qed.
 
 Lemma perm_filterC a s : perm_eql (filter a s ++ filter (predC a) s) s.
 Proof.
