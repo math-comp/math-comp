@@ -1257,26 +1257,6 @@ move=> lt_i_s lt_j_s Us; apply/eqP/eqP=> [eq_sij|-> //].
 by rewrite -(index_uniq lt_i_s Us) eq_sij index_uniq.
 Qed.
 
-Lemma notuniq_witnessP s :
-  reflect (exists i j, i < j < size s /\ nth s i = nth s j)
-  (~~ uniq s).
-Proof.
-apply (iffP idP).
-- elim: s => //= x s IHs.
-  rewrite negb_and => /orP [].
-  + rewrite negbK => Hin.
-    exists 0; exists (index x s).+1 => /=.
-    by split; [rewrite ltnS index_mem | rewrite nth_index].
-  + move/IHs => {IHs} [] i [] j [] Hij Hnth.
-    by exists i.+1; exists j.+1; split; first by rewrite !ltnS.
-- elim: s => [| s0 s IHs ] /= [] i [] j [] /andP [] //=.
-  rewrite negb_and negbK; case: i => [| i].
-  + by case: j => //= j _; rewrite ltnS /= => Hj ->; rewrite mem_nth.
-  + case: j => //= j; rewrite !ltnS /= => Hi Hj Hnth.
-    apply/orP; right; apply IHs.
-    by exists i; exists j; rewrite Hi Hj Hnth.
-Qed.
-
 Lemma mem_rot s : rot n0 s =i s.
 Proof. by move=> x; rewrite -{2}(cat_take_drop n0 s) !mem_cat /= orbC. Qed.
 
@@ -1342,6 +1322,20 @@ Proof. by elim: s n => [|y s' IHs] [|n] /=; auto. Qed.
 
 Lemma headI T s (x : T) : rcons s x = head x s :: behead (rcons s x).
 Proof. by case: s. Qed.
+
+Lemma notuniq_witnessP (T : eqType) (s : seq T) x0 :
+  reflect (exists i j, i < j < size s /\ nth x0 s i = nth x0 s j)
+  (~~ uniq s).
+Proof.
+elim: s => [|x s IHs].
+  by constructor; case=> i [j [/andP[]]]; rewrite ltn0.
+rewrite /= negb_and negbK.
+case: (x \in s) / boolP => [/(nthP _ _ x0) hs | hs] /=.
+  by constructor; case: hs => j hj hnj; exists 0, j.+1.
+apply/(equivP IHs); split; case=> [i [j [hj hnj]]]; first by exists i.+1, j.+1.
+case: i j hj hnj => [|i] [|j] //= hj hnj; last by exists i, j.
+by case/(nthP _ _ x0): hs; exists j.
+Qed.
 
 Implicit Arguments nthP [T s x].
 Implicit Arguments has_nthP [T a s].
@@ -1497,15 +1491,11 @@ Proof. by move/perm_eqP=> eq12; rewrite -!count_predT eq12. Qed.
 Lemma filter_perm_eq u v P :
   perm_eq u v -> perm_eq (filter P u) (filter P v).
 Proof.
-move=> /perm_eqP Hcount.
-by apply/perm_eqP => Q; rewrite !count_filter; exact: Hcount.
+by move/perm_eqP=> uv_count; apply/perm_eqP=> Q; rewrite !count_filter.
 Qed.
 
-Lemma all_perm_eq u v P : perm_eq u v -> all P u -> all P v.
-Proof.
-move=> /perm_eq_mem Hperm /allP Hall; apply/allP => x.
-by rewrite -Hperm => /Hall.
-Qed.
+Lemma all_perm_eq (u v : seq T) P : perm_eq u v -> all P u = all P v.
+Proof. by move/perm_eq_mem/eq_all_r. Qed.
 
 Lemma perm_eq_small s1 s2 : size s2 <= 1 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
