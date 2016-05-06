@@ -24,6 +24,8 @@ let frozen_lexer = Lexer.freeze () ;;
 open Names
 open Pp
 open Pcoq
+open Pcoq.Prim
+open Pcoq.Constr
 open Genarg
 open Stdarg
 open Constrarg
@@ -206,7 +208,7 @@ let prl_term (k, c) = pr_guarded (guard_term k) prl_glob_constr_and_expr c
 
 (** Adding a new uninterpreted generic argument type *)
 let add_genarg tag pr =
-  let wit = Genarg.make0 None tag in
+  let wit = Genarg.make0 tag in
   let glob ist x = (ist, x) in
   let subst _ x = x in
   let interp ist x = Ftactic.return x in
@@ -462,7 +464,7 @@ let _ =
 let tactic_expr = Tactic.tactic_expr
 let gallina_ext = Vernac_.gallina_ext 
 let sprintf = Printf.sprintf
-let tactic_mode = G_vernac.tactic_mode
+let tactic_mode = G_ltac.tactic_mode
 
 (** 1. Utilities *)
 
@@ -552,7 +554,9 @@ let not_section_id id = not (is_section_variable id)
 let is_pf_var c = isVar c && not_section_id (destVar c)
 
 let pf_ids_of_proof_hyps gl =
-  let add_hyp (id, _, _) ids = if not_section_id id then id :: ids else ids in
+  let add_hyp decl ids =
+    let id = Named.Declaration.get_id decl in
+    if not_section_id id then id :: ids else ids in
   Context.Named.fold_outside add_hyp (pf_hyps gl) ~init:[]
 
 let pf_nf_evar gl e = Reductionops.nf_evar (project gl) e
@@ -742,8 +746,8 @@ let mk_anon_id t gl =
 
 let ssr_anon_hyp = "Hyp"
 
-let anontac (x, _, _) gl =
-  let id =  match x with
+let anontac decl gl =
+  let id =  match Rel.Declaration.get_name decl with
   | Name id ->
     if is_discharged_id id then id else mk_anon_id (string_of_id id) gl
   | _ -> mk_anon_id ssr_anon_hyp gl in
@@ -793,7 +797,7 @@ let pf_abs_evars gl (sigma, c0) =
   let abs_evar n k =
     let evi = Evd.find sigma k in
     let dc = List.firstn n (evar_filtered_context evi) in
-    let abs_dc c = function
+    let abs_dc c decl = match Named.Declaration.to_tuple decl with
     | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
     | x, None, t -> mkNamedProd x t c in
     let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
@@ -848,7 +852,7 @@ let pf_abs_evars_pirrel gl (sigma, c0) =
   let abs_evar n k =
     let evi = Evd.find sigma k in
     let dc = List.firstn n (evar_filtered_context evi) in
-    let abs_dc c = function
+    let abs_dc c decl = match Named.Declaration.to_tuple decl with
     | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
     | x, None, t -> mkNamedProd x t c in
     let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
@@ -988,10 +992,10 @@ let pf_unabs_evars gl ise n c0 =
   let push_rel = Environ.push_rel in
   let rec mk_evar j env i c = match kind_of_term c with
   | Prod (x, t, c1) when i < j ->
-    mk_evar j (push_rel (x, None, unabs i t) env) (i + 1) c1
+    mk_evar j (push_rel (Rel.Declaration.LocalAssum (x, unabs i t)) env) (i + 1) c1
   | LetIn (x, b, t, c1) when i < j ->
     let _, _, c2 = destProd c1 in
-    mk_evar j (push_rel (x, Some (unabs i b), unabs i t) env) (i + 1) c2
+    mk_evar j (push_rel (Rel.Declaration.LocalDef (x, unabs i b, unabs i t)) env) (i + 1) c2
   | _ -> Evarutil.e_new_evar env ise (unabs i c) in
   let rec unabs_evars c =
     if !nev = n then unabs n c else match kind_of_term c with
@@ -1031,18 +1035,14 @@ let set_pr_ssrtac name prec afmt =
     | ArgSep s -> Egramml.GramTerminal s
     | ArgSsr s -> Egramml.GramTerminal s
     | ArgCoq at -> Egramml.GramTerminal "COQ_ARG") afmt in
-  let tacname = ssrtac_name name in
-   Pptactic.declare_ml_tactic_pprule tacname [|
-    { Pptactic.pptac_level = prec;
-      Pptactic.pptac_prods = fmt }
-   |]
+  let tacname = ssrtac_name name in ()
 
 let ssrtac_atom loc name args = TacML (loc, ssrtac_entry name 0, args)
 let ssrtac_expr = ssrtac_atom
 
 
 let ssrevaltac ist gtac =
-  Proofview.V82.of_tactic (eval_tactic_ist ist gtac)
+  Proofview.V82.of_tactic (tactic_of_value ist gtac)
 
 (* fun gl -> let lfun = [tacarg_id, val_interp ist gl gtac] in
   interp_tac_gen lfun [] ist.debug tacarg_expr gl *)
@@ -1456,7 +1456,7 @@ let interp_modloc mr =
 
 let ssrdisplaysearch gr env t =
   let pr_res = pr_global gr ++ spc () ++ str " " ++ pr_lconstr_env env Evd.empty t in
-  msg (hov 2 pr_res ++ fnl ())
+  msg_info (hov 2 pr_res ++ fnl ())
 
 VERNAC COMMAND EXTEND SsrSearchPattern CLASSIFIED AS QUERY
 | [ "Search" ssr_search_arg(a) ssr_modlocs(mr) ] ->
@@ -1721,9 +1721,8 @@ ARGUMENT EXTEND ssrhint TYPED AS ssrhintarg PRINTED BY pr_ssrhint
 END
 
 TACTIC EXTEND ssrtclby
-| [ "YouShouldNotTypeThis" ssrhint(tac) ] -> [ Proofview.V82.tactic (hinttac ist true tac) ]
+| [ "by" ssrhintarg(tac) ] -> [ Proofview.V82.tactic (hinttac ist true tac) ]
 END
-set_pr_ssrtac "tclby" 0 [ArgSsr "hint"]
 
 (* We can't parse "by" in ARGUMENT EXTEND because it will only be made *)
 (* into a keyword in ssreflect.v; so we anticipate this in GEXTEND.    *)
@@ -1731,11 +1730,6 @@ set_pr_ssrtac "tclby" 0 [ArgSsr "hint"]
 GEXTEND Gram
   GLOBAL: ssrhint simple_tactic;
   ssrhint: [[ "by"; arg = ssrhintarg -> arg ]];
-  simple_tactic: [
-  [ "by"; arg = ssrhintarg ->
-    let garg = TacGeneric (in_gen (rawwit wit_ssrhint) arg) in
-    ssrtac_atom !@loc "tclby" [garg]
-  ] ];
 END
 (* }}} *)
 
@@ -1994,10 +1988,10 @@ let rec safe_depth c = match kind_of_term c with
 let red_safe r e s c0 =
   let rec red_to e c n = match kind_of_term c with
   | Prod (x, t, c') when n > 0 ->
-    let t' = r e s t in let e' = Environ.push_rel (x, None, t') e in
+    let t' = r e s t in let e' = Environ.push_rel (Rel.Declaration.LocalAssum (x, t')) e in
     mkProd (x, t', red_to e' c' (n - 1))
   | LetIn (x, b, t, c') when n > 0 ->
-    let t' = r e s t in let e' = Environ.push_rel (x, None, t') e in
+    let t' = r e s t in let e' = Environ.push_rel (Rel.Declaration.LocalAssum (x, t')) e in
     mkLetIn (x, r e s b, t', red_to e' c' (n - 1))
   | _ -> r e s c in
   red_to e c0 (safe_depth c0)
@@ -2029,7 +2023,7 @@ let hidetacs clseq idhide cl0 =
 
 let discharge_hyp (id', (id, mode)) gl =
   let cl' = subst_var id (pf_concl gl) in
-  match pf_get_hyp gl id, mode with
+  match Named.Declaration.to_tuple (pf_get_hyp gl id), mode with
   | (_, None, t), _ | (_, Some _, t), "(" -> 
      apply_type (mkProd (Name id', t, cl')) [mkVar id] gl
   | (_, Some v, t), _ ->
@@ -2042,7 +2036,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   let hide_goal = hidden_clseq clseq in
   let c_hidden = hide_goal && c = mkVar gl_id in
   let rec fits forced = function
-  | (id, _) :: ids, (Name id', _, _) :: dc' when id' = id ->
+  | (id, _) :: ids, decl :: dc' when Rel.Declaration.get_name decl = Name id ->
     fits true (ids, dc')
   | ids, dc' ->
     forced && ids = [] && (not hide_goal || dc' = [] && c_hidden) in
@@ -2055,7 +2049,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   | _ -> map_constr unmark c in
   let utac hyp =
     Proofview.V82.of_tactic 
-     (convert_hyp_no_check (Context.Named.Declaration.map unmark hyp)) in
+     (convert_hyp_no_check (Context.Named.Declaration.map_constr unmark hyp)) in
   let utacs = List.map utac (pf_hyps gl) in
   let ugtac gl' =
     Proofview.V82.of_tactic
@@ -2086,10 +2080,10 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   match gen with
   | _, Some ((x, mode), None) when mode = "@" || (mode = " " && keep_let) ->
      let x = hoi_id x in
-     let _, bo, ty = pf_get_hyp gl x in
+     let _, bo, ty = Named.Declaration.to_tuple (pf_get_hyp gl x) in
      gl,
      (if bo <> None then args else mkVar x :: args),
-     mkProd_or_LetIn (Name (f x),bo,ty) (subst_var x c)
+     mkProd_or_LetIn (Rel.Declaration.of_tuple (Name (f x),bo,ty)) (subst_var x c)
   | _, Some ((x, _), None) ->
      let x = hoi_id x in
      gl, mkVar x :: args, mkProd (Name (f x), pf_get_hyp_typ gl x, subst_var x c)
@@ -2827,7 +2821,7 @@ let intro_all gl =
 
 let rec intro_anon gl =
   try anontac (List.hd (fst (Term.decompose_prod_n_assum 1 (pf_concl gl)))) gl
-  with err0 -> try tclTHEN red_in_concl intro_anon gl with _ -> raise err0
+  with err0 -> try tclTHEN (Proofview.V82.of_tactic red_in_concl) intro_anon gl with _ -> raise err0
   (* with _ -> Errors.error "No product even after reduction" *)
 
 let with_top tac =
@@ -2847,7 +2841,8 @@ let clear_wilds wilds gl =
   clear (List.filter (fun id -> List.mem id wilds) (pf_ids_of_hyps gl)) gl
 
 let clear_with_wilds wilds clr0 gl =
-  let extend_clr clr (id, _, _ as nd) =
+  let extend_clr clr nd =
+    let id = Named.Declaration.get_id nd in
     if List.mem id clr || not (List.mem id wilds) then clr else
     let vars = global_vars_set_of_decl (pf_env gl) nd in
     let occurs id' = Idset.mem id' vars in
@@ -2901,7 +2896,7 @@ let ssrmkabs id gl =
       let Sigma (m, sigma, p5) = Evarutil.new_evar env sigma abstract_ty in
       Sigma ((m, abstract_ty), sigma, p1 +> p2 +> p3 +> p4 +> p5) in
     let sigma, kont =
-      let rd = Name id, None, abstract_ty in
+      let rd = Rel.Declaration.LocalAssum (Name id, abstract_ty) in
       let Sigma (ev, sigma, _) = Evarutil.new_evar (Environ.push_rel rd env) sigma concl in
       let sigma = Sigma.to_evar_map sigma in
       (sigma, ev)
@@ -3009,7 +3004,7 @@ let tclINTROS ist tac ipats =
 
 let ssrintros_sep =
   let atom_sep = function
-    | TacSplit (_, [NoBindings]) -> mt
+    (* | TacSplit (_, [NoBindings]) -> mt *)
     (* | TacExtend (_, "ssrapply", []) -> mt *)
     | _ -> spc in
   function
@@ -3020,7 +3015,7 @@ let ssrintros_sep =
     | _ -> spc
 
 let pr_ssrintrosarg _ _ prt (tac, ipats) =
-  prt tacltop tac ++ pr_intros (ssrintros_sep tac) ipats
+  prt tacltop tac ++ pr_intros spc ipats
 
 ARGUMENT EXTEND ssrintrosarg TYPED AS tactic * ssrintros
    PRINTED BY pr_ssrintrosarg
@@ -3055,7 +3050,7 @@ type ssrmmod = May | Must | Once
 let pr_mmod = function May -> str "?" | Must -> str "!" | Once -> mt ()
 
 let wit_ssrmmod = add_genarg "ssrmmod" pr_mmod
-let ssrmmod = Pcoq.create_generic_entry "ssrmmod" (Genarg.rawwit wit_ssrmmod)
+let ssrmmod = Pcoq.create_generic_entry Pcoq.utactic "ssrmmod" (Genarg.rawwit wit_ssrmmod)
 GEXTEND Gram
   GLOBAL: ssrmmod;
   ssrmmod: [[ "!" -> Must | LEFTQMARK -> May | "?" -> May]];
@@ -3452,7 +3447,7 @@ let pf_interp_gen_aux ist gl to_ind ((oclr, occ), t) =
     if tag_of_cpattern t = '@' then 
       if not (isVar c) then
 	errorstrm (str "@ can be used with variables only")
-      else match pf_get_hyp gl (destVar c) with
+      else match Named.Declaration.to_tuple (pf_get_hyp gl (destVar c)) with
       | _, None, _ -> errorstrm (str "@ can be used with let-ins only")
       | name, Some bo, ty -> true, pat, mkLetIn (Name name,bo,ty,cl),c,clr,ucst,gl
     else let gl, ccl =  pf_mkprod gl c cl in false, pat, ccl, c, clr,ucst,gl
@@ -3744,7 +3739,7 @@ let eqmovetac _ gen ist gl =
 
 let movehnftac gl = match kind_of_term (pf_concl gl) with
   | Prod _ | LetIn _ -> tclIDTAC gl
-  | _ -> hnf_in_concl gl
+  | _ -> Proofview.V82.of_tactic hnf_in_concl gl
 
 let ssrmovetac ist = function
   | _::_ as view, (_, (dgens, ipats)) ->
@@ -3776,8 +3771,8 @@ let analyze_eliminator elimty env sigma =
   | AtomicType (hd, args) when isRel hd -> 
     ctx, destRel hd, not (noccurn 1 t), Array.length args
   | CastType (t, _) -> loop ctx t
-  | ProdType (x, ty, t) -> loop ((x,None,ty) :: ctx) t
-  | LetInType (x,b,ty,t) -> loop ((x,Some b,ty) :: ctx) (subst1 b t)
+  | ProdType (x, ty, t) -> loop (Rel.Declaration.LocalAssum (x, ty) :: ctx) t
+  | LetInType (x,b,ty,t) -> loop (Rel.Declaration.LocalDef (x, b, ty) :: ctx) (subst1 b t)
   | _ ->
     let env' = Environ.push_rel_context ctx env in
     let t' = Reductionops.whd_betadeltaiota env' sigma t in
@@ -3810,12 +3805,12 @@ let unprotecttac gl =
   let prot, _ = destConst c in
   onClause (fun idopt ->
     let hyploc = Option.map (fun id -> id, InHyp) idopt in
-    reduct_option 
+    Proofview.V82.of_tactic (reduct_option 
       (Reductionops.clos_norm_flags 
         (Closure.RedFlags.mkflags 
           [Closure.RedFlags.fBETA;
            Closure.RedFlags.fCONST prot;
-           Closure.RedFlags.fIOTA]), DEFAULTcast) hyploc)
+           Closure.RedFlags.fIOTA]), DEFAULTcast) hyploc))
     allHypsAndConcl gl
 
 let dependent_apply_error =
@@ -5830,7 +5825,7 @@ let havetac ist
        tclTHEN (tclTHEN itac_c simpltac)
          (tclTHEN tacopen_skols (fun gl ->
             let abstract, gl = pf_mkSsrConst "abstract" gl in
-            unfold [abstract; abstract_key] gl))
+            Proofview.V82.of_tactic (unfold [abstract; abstract_key]) gl))
    | _,true,true  ->
      let _, ty, uc = interp_ty gl fixtc cty in let gl = pf_merge_uc uc gl in
      gl, mkArrow ty concl, hint, itac, clr
@@ -5901,7 +5896,7 @@ let ssrabstract ist gens (*last*) gl =
       let tacopen gl =
         let stuff, g = Refiner.unpackage gl in
         Refiner.repackage stuff [ g; abstract_proof ] in
-      tclTHENS tacopen [tclSOLVE [Proofview.V82.of_tactic (apply proof)];unfold[abstract;abstract_key]] gl
+      tclTHENS tacopen [tclSOLVE [Proofview.V82.of_tactic (apply proof)]; Proofview.V82.of_tactic (unfold[abstract;abstract_key])] gl
 (* else apply proof gl *)
   in
   let introback ist (gens, _) =
@@ -6003,8 +5998,8 @@ END
 
 let destProd_or_LetIn c =
   match kind_of_term c with
-  | Prod (n,ty,c) -> (n,None,ty), c
-  | LetIn (n,bo,ty,c) -> (n,Some bo,ty), c
+  | Prod (n,ty,c) -> Rel.Declaration.LocalAssum (n, ty), c
+  | LetIn (n,bo,ty,c) -> Rel.Declaration.LocalDef (n, bo, ty), c
   | _ -> raise DestKO
         
 let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
