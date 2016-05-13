@@ -16,7 +16,7 @@ let () = Mltop.add_known_plugin (fun () ->
 
 (* Defining grammar rules with "xx" in it automatically declares keywords too,
  * we thus save the lexer to restore it at the end of the file *)
-let frozen_lexer = Lexer.freeze () ;;
+let frozen_lexer = CLexer.freeze () ;;
 
 (*i camlp4use: "pa_extend.cmo" i*)
 (*i camlp4deps: "grammar/grammar.cma" i*)
@@ -136,7 +136,7 @@ let pf_fresh_global name gl =
 let ssr_loaded = Summary.ref ~name:"SSR:loaded" false
 let is_ssr_loaded () =
   !ssr_loaded ||
-  (if Lexer.is_keyword "SsrSyntax_is_Imported" then ssr_loaded:=true;
+  (if CLexer.is_keyword "SsrSyntax_is_Imported" then ssr_loaded:=true;
    !ssr_loaded)
 
 (* 0 cost pp function. Active only if env variable SSRDEBUG is set *)
@@ -1220,7 +1220,7 @@ let pr_ssr_search_item _ _ _ = pr_search_item
 
 (* Workaround the notation API that can only print notations *)
 
-let is_ident s = try Lexer.check_ident s; true with _ -> false
+let is_ident s = try CLexer.check_ident s; true with _ -> false
 
 let is_ident_part s = is_ident ("H" ^ s)
 
@@ -6218,6 +6218,6 @@ END
 (* The user is supposed to Require Import ssreflect or Require ssreflect   *)
 (* and Import ssreflect.SsrSyntax to obtain these keywords and as a         *)
 (* consequence the extended ssreflect grammar.                             *)
-let () = Lexer.unfreeze frozen_lexer ;;
+let () = CLexer.unfreeze frozen_lexer ;;
 
 (* vim: set filetype=ocaml foldmethod=marker: *)

@@ -3,7 +3,7 @@
 
 (* Defining grammar rules with "xx" in it automatically declares keywords too,
  * we thus save the lexer to restore it at the end of the file *)
-let frozen_lexer = Lexer.freeze () ;;
+let frozen_lexer = CLexer.freeze () ;;
 
 (*i camlp4use: "pa_extend.cmo" i*)
 (*i camlp4deps: "grammar/grammar.cma" i*)
@@ -1357,6 +1357,6 @@ END
 (* The user is supposed to Require Import ssreflect or Require ssreflect   *)
 (* and Import ssreflect.SsrSyntax to obtain these keywords and as a         *)
 (* consequence the extended ssreflect grammar.                             *)
-let () = Lexer.unfreeze frozen_lexer ;;
+let () = CLexer.unfreeze frozen_lexer ;;
 
 (* vim: set filetype=ocaml foldmethod=marker: *)
