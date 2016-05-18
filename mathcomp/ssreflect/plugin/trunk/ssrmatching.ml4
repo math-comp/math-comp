@@ -1033,6 +1033,23 @@ GEXTEND Gram
     if loc_ofCG pattern <> !@loc && k = '(' then mk_term 'x' c else pattern ]];
 END
 
+let thin id sigma goal =
+  let ids = Id.Set.singleton id in
+  let env = Goal.V82.env sigma goal in
+  let cl = Goal.V82.concl sigma goal in
+  let evdref = ref (Evd.clear_metas sigma) in
+  let ans =
+    try Some (Evarutil.clear_hyps_in_evi env evdref (Environ.named_context_val env) cl ids)
+    with Evarutil.ClearDependencyError _ -> None
+  in
+  match ans with
+  | None -> sigma
+  | Some (hyps, concl) ->
+    let sigma = !evdref in
+    let (gl,ev,sigma) = Goal.V82.mk_goal sigma hyps concl (Goal.V82.extra sigma goal) in
+    let sigma = Goal.V82.partial_solution_to sigma goal gl ev in
+    sigma
+
 let interp_pattern ist gl red redty =
   pp(lazy(str"interpreting: " ++ pr_pattern red));
   let xInT x y = X_In_T(x,y) and inXInT x y = In_X_In_T(x,y) in
@@ -1073,8 +1090,7 @@ let interp_pattern ist gl red redty =
         if Option.is_empty !to_clean then sigma else
         let name = Option.get !to_clean in
         pp(lazy(pr_id name));
-        try snd(Logic.prim_refiner (Proof_type.Thin [name]) sigma e)
-        with Evarutil.ClearDependencyError _ -> sigma)
+        thin name sigma e)
       sigma new_evars in
     sigma in
   let red = match red with

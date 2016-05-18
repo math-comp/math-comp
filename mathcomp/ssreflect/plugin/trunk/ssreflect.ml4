@@ -1906,7 +1906,7 @@ ARGUMENT EXTEND ssrclear TYPED AS ssrclear_ne PRINTED BY pr_ssrclear
 | [ ] -> [ [] ]
 END
 
-let cleartac clr = check_hyps_uniq [] clr; clear (hyps_ids clr)
+let cleartac clr = check_hyps_uniq [] clr; Proofview.V82.of_tactic (clear (hyps_ids clr))
 
 (* type ssrwgen = ssrclear * ssrhyp * string *)
 
@@ -2056,7 +2056,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   let ugtac gl' =
     Proofview.V82.of_tactic
       (convert_concl_no_check (unmark (pf_concl gl'))) gl' in
-  let ctacs = if hide_goal then [clear [gl_id]] else [] in
+  let ctacs = if hide_goal then [Proofview.V82.of_tactic (clear [gl_id])] else [] in
   let mktac itacs = tclTHENLIST (itacs @ utacs @ ugtac :: ctacs) in
   let itac (_, id) = Proofview.V82.of_tactic (introduction id) in
   if fits false (id_map, List.rev dc) then mktac (List.map itac id_map) gl else
@@ -2788,7 +2788,7 @@ let injectl2rtac c = match kind_of_term c with
 | Var id -> injectidl2rtac id (mkVar id, NoBindings)
 | _ ->
   let id = injecteq_id in
-  tclTHENLIST [havetac id c; injectidl2rtac id (mkVar id, NoBindings); clear [id]]
+  tclTHENLIST [havetac id c; injectidl2rtac id (mkVar id, NoBindings); Proofview.V82.of_tactic (clear [id])]
 
 let is_injection_case c gl =
   let gl, cty = pf_type_of gl c in
@@ -2827,7 +2827,7 @@ let rec intro_anon gl =
   (* with _ -> Errors.error "No product even after reduction" *)
 
 let with_top tac =
-  tclTHENLIST [introid top_id; tac (mkVar top_id); clear [top_id]]
+  tclTHENLIST [introid top_id; tac (mkVar top_id); Proofview.V82.of_tactic (clear [top_id])]
 
 let rec mapLR f = function [] -> [] | x :: s -> let y = f x in y :: mapLR f s
 
@@ -2840,7 +2840,7 @@ let new_wild_id () =
   id
 
 let clear_wilds wilds gl =
-  clear (List.filter (fun id -> List.mem id wilds) (pf_ids_of_hyps gl)) gl
+  Proofview.V82.of_tactic (clear (List.filter (fun id -> List.mem id wilds) (pf_ids_of_hyps gl))) gl
 
 let clear_with_wilds wilds clr0 gl =
   let extend_clr clr nd =
@@ -2849,7 +2849,7 @@ let clear_with_wilds wilds clr0 gl =
     let vars = global_vars_set_of_decl (pf_env gl) nd in
     let occurs id' = Idset.mem id' vars in
     if List.exists occurs clr then id :: clr else clr in
-  clear (Context.Named.fold_inside extend_clr ~init:clr0 (pf_hyps gl)) gl
+  Proofview.V82.of_tactic (clear (Context.Named.fold_inside extend_clr ~init:clr0 (pf_hyps gl))) gl
 
 let tclTHENS_nonstrict tac tacl taclname gl =
   let tacres = tac gl in
@@ -4378,7 +4378,7 @@ let refine_interp_apply_view i ist gl gv =
   loop (pair i viewtab.(i) @ if i = 2 then pair 1 viewtab.(1) else [])
 
 let apply_top_tac gl =
-  tclTHENLIST [introid top_id; apply_rconstr (mkRVar top_id); clear [top_id]] gl
+  tclTHENLIST [introid top_id; apply_rconstr (mkRVar top_id); Proofview.V82.of_tactic (clear [top_id])] gl
     
 let inner_ssrapplytac gviews ggenl gclr ist gl =
  let _, clr = interp_hyps ist gl gclr in
@@ -4422,12 +4422,15 @@ ARGUMENT EXTEND ssrexactarg TYPED AS ssrapplyarg PRINTED BY pr_ssraarg
   [ mk_exactarg [] ([], clr) ]
 END
 
-let vmexacttac pf gl = exact_no_check (mkCast (pf, VMcast, pf_concl gl)) gl
+let vmexacttac pf =
+  Proofview.Goal.nf_enter { enter = begin fun gl ->
+  exact_no_check (mkCast (pf, VMcast, Tacmach.New.pf_concl gl))
+  end }
 
 TACTIC EXTEND ssrexact
 | [ "exact" ssrexactarg(arg) ] -> [ Proofview.V82.tactic (tclBY (ssrapplytac ist arg)) ]
 | [ "exact" ] -> [ Proofview.V82.tactic (tclORELSE donetac (tclBY apply_top_tac)) ]
-| [ "exact" "<:" lconstr(pf) ] -> [ Proofview.V82.tactic (vmexacttac pf) ]
+| [ "exact" "<:" lconstr(pf) ] -> [ vmexacttac pf ]
 END
 
 (** The "congr" tactic *)
@@ -4900,7 +4903,7 @@ let rwcltac cl rdx dir sr gl =
       let cl' = mkNamedProd rule_id (compose_prod dc r3t) (lift 1 cl) in
       let cl'' = mkNamedProd pattern_id rdxt cl' in
       let itacs = [introid pattern_id; introid rule_id] in
-      let cltac = clear [pattern_id; rule_id] in
+      let cltac = Proofview.V82.of_tactic (clear [pattern_id; rule_id]) in
       let rwtacs = [rewritetac dir (mkVar rule_id); cltac] in
       apply_type cl'' [rdx; compose_lam dc r3], tclTHENLIST (itacs @ rwtacs), gl
   in
@@ -6066,7 +6069,7 @@ let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
       | Some (Some id),_ -> Some id, introid id, clear0, pats
       | Some _,_ ->
           let id = mk_anon_id "tmp" gl in
-          Some id, introid id, tclTHEN clear0 (clear [id]), pats in
+          Some id, introid id, tclTHEN clear0 (Proofview.V82.of_tactic (clear [id])), pats in
       let tac_specialize = match id with
       | None -> tclIDTAC
       | Some id ->
