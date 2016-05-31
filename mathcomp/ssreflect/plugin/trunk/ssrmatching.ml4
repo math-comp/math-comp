@@ -57,10 +57,13 @@ let dummy_loc = Loc.ghost
 let errorstrm = Errors.errorlabstrm "ssreflect"
 let loc_error loc msg = Errors.user_err_loc (loc, msg, str msg)
 
+(* Compatibility with Coq 8.6 *)
+let ppnl = Feedback.msg_info
+
 (* 0 cost pp function. Active only if env variable SSRDEBUG is set *)
 (* or if SsrDebug is Set                                                  *)
 let pp_ref = ref (fun _ -> ())
-let ssr_pp s = pperrnl (str"SSR: "++Lazy.force s)
+let ssr_pp s = Feedback.msg_error (str"SSR: "++Lazy.force s)
 let _ = try ignore(Sys.getenv "SSRDEBUG"); pp_ref := ssr_pp with Not_found -> ()
 let debug b =
   if b then pp_ref := ssr_pp else pp_ref := fun _ -> ()
