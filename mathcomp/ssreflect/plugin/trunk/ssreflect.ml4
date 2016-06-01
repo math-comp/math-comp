@@ -23,6 +23,7 @@ let frozen_lexer = CLexer.freeze () ;;
 
 open Names
 open Pp
+open Feedback
 open Pcoq
 open Pcoq.Prim
 open Pcoq.Constr
@@ -99,6 +100,10 @@ let errorstrm = Errors.errorlabstrm "ssreflect"
 let loc_error loc msg = Errors.user_err_loc (loc, msg, str msg)
 let anomaly s = Errors.anomaly (str s)
 
+(* Compatibility with Coq 8.6 *)
+let ppnl  = msg_info
+let msgnl = msg_info
+
 (** look up a name in the ssreflect internals module *)
 let ssrdirpath = make_dirpath [id_of_string "ssreflect"]
 let ssrqid name = make_qualid ssrdirpath (id_of_string name) 
@@ -142,7 +147,7 @@ let is_ssr_loaded () =
 (* 0 cost pp function. Active only if env variable SSRDEBUG is set *)
 (* or if SsrDebug is Set                                                  *)
 let pp_ref = ref (fun _ -> ())
-let ssr_pp s = pperrnl (str"SSR: "++Lazy.force s)
+let ssr_pp s = msg_error (str"SSR: "++Lazy.force s)
 let _ = try ignore(Sys.getenv "SSRDEBUG"); pp_ref := ssr_pp with Not_found -> ()
 let _ =
   Goptions.declare_bool_option
