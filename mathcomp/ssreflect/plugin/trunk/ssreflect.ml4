@@ -2388,7 +2388,7 @@ END
 (* Populating the table *)
 
 let cache_viewhint (_, (i, lvh)) =
-  let mem_raw h = List.exists (Notation_ops.eq_glob_constr h) in
+  let mem_raw h = List.exists (Glob_ops.glob_constr_eq h) in
   let add_hint h hdb = if mem_raw h hdb then hdb else h :: hdb in
   viewtab.(i) <- List.fold_right add_hint lvh viewtab.(i)
 
