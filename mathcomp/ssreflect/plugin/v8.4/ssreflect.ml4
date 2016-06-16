@@ -10,7 +10,7 @@ let () = Mltop.add_known_plugin (fun () ->
     Printf.printf "Copyright 2005-2012 Microsoft Corporation and INRIA.\n";
     Printf.printf "Distributed under the terms of the CeCILL-B license.\n\n"
   end)
-  "ssreflect"
+  "ssreflect_plugin"
 ;;
 (* Defining grammar rules with "xx" in it automatically declares keywords too *)
 let frozen_lexer = Lexer.freeze () ;;

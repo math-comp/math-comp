@@ -4,7 +4,6 @@ seq.v
 ssrbool.v
 ssreflect.v
 ssrfun.v
-ssrmatching.v
 ssrnat.v
 bigop.v
 binomial.v
@@ -19,9 +18,6 @@ path.v
 prime.v
 tuple.v
 
-ssreflect.mllib
-ssrmatching.mli
-ssrmatching.ml4
 ssreflect.ml4
 
 -I .

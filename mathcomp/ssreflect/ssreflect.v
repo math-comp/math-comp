@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import Bool. (* For bool_scope delimiter 'bool'. *)
 Require Import ssrmatching.
-Declare ML Module "ssreflect".
+Declare ML Module "ssreflect_plugin".
 Set SsrAstVersion.
 
 (******************************************************************************)

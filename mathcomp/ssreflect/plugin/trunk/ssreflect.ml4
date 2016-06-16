@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 
 (* This line is read by the Makefile's dist target: do not remove. *)
-DECLARE PLUGIN "ssreflect"
+DECLARE PLUGIN "ssreflect_plugin"
 let ssrversion = "1.6";;
 let ssrAstVersion = 1;;
 let () = Mltop.add_known_plugin (fun () ->
@@ -11,7 +11,7 @@ let () = Mltop.add_known_plugin (fun () ->
     Printf.printf "Copyright 2005-2014 Microsoft Corporation and INRIA.\n";
     Printf.printf "Distributed under the terms of the CeCILL-B license.\n\n"
   end)
-  "ssreflect"
+  "ssreflect_plugin"
 ;;
 
 (* Defining grammar rules with "xx" in it automatically declares keywords too,
@@ -71,6 +71,7 @@ open Locusops
 open Compat
 open Tok
 
+open Ssrmatching_plugin
 open Ssrmatching
 
 
@@ -1028,7 +1029,7 @@ let pf_unabs_evars gl ise n c0 =
 type ssrargfmt = ArgSsr of string | ArgCoq of argument_type | ArgSep of string
 
 let ssrtac_name name = {
-  mltac_plugin = "ssreflect";
+  mltac_plugin = "ssreflect_plugin";
   mltac_tactic = "ssr" ^ name;
 }
 
