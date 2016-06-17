@@ -171,7 +171,6 @@ ssrtest/view_case.v
 ssrtest/wlogletin.v
 ssrtest/wlog_suff.v
 ssrtest/wlong_intro.v
-ssrtest/tacnotationpattern.v
 ssreflect.ml4
 
 -I .

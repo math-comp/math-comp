@@ -39,7 +39,6 @@ view_case.v
 wlogletin.v
 wlog_suff.v
 wlong_intro.v
-tacnotationpattern.v
 
 -R ../theories Ssreflect
 -I ../src/
