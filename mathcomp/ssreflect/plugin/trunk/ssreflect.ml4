@@ -3405,7 +3405,7 @@ let saturate ?(beta=false) ?(bi_types=false) env sigma c ?(ty=Retyping.get_type_
   | AtomicType _ ->
       let ty = 
         prof_saturate_whd.profile      
-        (Reductionops.whd_betadeltaiota env sigma) ty in
+        (Reductionops.whd_all env sigma) ty in
       match kind_of_type ty with
       | ProdType _ -> loop ty args sigma n
       | _ -> raise NotEnoughProducts
@@ -3783,7 +3783,7 @@ let analyze_eliminator elimty env sigma =
   | LetInType (x,b,ty,t) -> loop (Rel.Declaration.LocalDef (x, b, ty) :: ctx) (subst1 b t)
   | _ ->
     let env' = Environ.push_rel_context ctx env in
-    let t' = Reductionops.whd_betadeltaiota env' sigma t in
+    let t' = Reductionops.whd_all env' sigma t in
     if not (Term.eq_constr t t') then loop ctx t' else
       errorstrm (str"The eliminator has the wrong shape."++spc()++
       str"A (applied) bound variable was expected as the conclusion of "++
@@ -3818,7 +3818,9 @@ let unprotecttac gl =
         (Closure.RedFlags.mkflags 
           [Closure.RedFlags.fBETA;
            Closure.RedFlags.fCONST prot;
-           Closure.RedFlags.fIOTA]), DEFAULTcast) hyploc))
+           Closure.RedFlags.fMATCH;
+           Closure.RedFlags.fFIX;
+           Closure.RedFlags.fCOFIX]), DEFAULTcast) hyploc))
     allHypsAndConcl gl
 
 let dependent_apply_error =
@@ -3962,7 +3964,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       let elim, elimty, elim_args, gl =
         pf_saturate ~beta:is_case gl elim ~ty:elimty n_elim_args in
       let pred = List.assoc pred_id elim_args in
-      let elimty = Reductionops.whd_betadeltaiota env (project gl) elimty in
+      let elimty = Reductionops.whd_all env (project gl) elimty in
       let cty, gl =
         if Option.is_empty oc then None, gl
         else
@@ -4000,7 +4002,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
         | 0, Some p -> interp_cpattern (Option.get ist) orig_gl p None 
         | _ -> mkTpat gl c in
       let cty = Some (c, c_ty, pc) in
-      let elimty = Reductionops.whd_betadeltaiota env (project gl) elimty in
+      let elimty = Reductionops.whd_all env (project gl) elimty in
       cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
   in
   pp(lazy(str"elim= "++ pr_constr_pat elim));
@@ -4856,7 +4858,7 @@ let pirrel_rewrite pred rdx rdx_ty new_rdx dir (sigma, c) c_ty gl =
     | App (hd, args) -> 
         let hd_ty = Retyping.get_type_of env sigma hd in
         let names = let rec aux t = function 0 -> [] | n ->
-          let t = Reductionops.whd_betadeltaiota env sigma t in
+          let t = Reductionops.whd_all env sigma t in
           match kind_of_type t with
           | ProdType (name, _, t) -> name :: aux t (n-1)
           | _ -> assert false in aux hd_ty (Array.length args) in
@@ -4891,7 +4893,7 @@ let rwcltac cl rdx dir sr gl =
       let env, sigma, c, c_eq = pf_env gl, fst sr, snd sr, build_coq_eq () in
       let sigma, c_ty = Typing.type_of env sigma c in
         pp(lazy(str"c_ty@rwcltac=" ++ pr_constr c_ty));
-      match kind_of_type (Reductionops.whd_betadeltaiota env sigma c_ty) with
+      match kind_of_type (Reductionops.whd_all env sigma c_ty) with
       | AtomicType(e, a) when is_ind_ref e c_eq ->
           let new_rdx = if dir = L2R then a.(2) else a.(1) in
           pirrel_rewrite cl rdx rdxt new_rdx dir (sigma,c) c_ty, tclIDTAC, gl
@@ -5743,7 +5745,8 @@ let pf_find_abstract_proof check_lock gl abstract_n =
 let unfold cl =
   let module R = Reductionops in let module F = Closure.RedFlags in
   reduct_in_concl (R.clos_norm_flags (F.mkflags
-    (List.map (fun c -> F.fCONST (fst (destConst c))) cl @ [F.fBETA; F.fIOTA])))
+    (List.map (fun c -> F.fCONST (fst (destConst c))) cl @
+       [F.fBETA; F.fMATCH; F.fFIX; F.fCOFIX])))
 
 let havegentac ist t gl =
   let sigma, c, ucst, _ = pf_abs_ssrterm ist gl t in
