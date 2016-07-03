@@ -97,9 +97,9 @@ module Intset = Evar.Set
 
 type loc = Loc.t
 let dummy_loc = Loc.ghost
-let errorstrm = Errors.errorlabstrm "ssreflect"
-let loc_error loc msg = Errors.user_err_loc (loc, msg, str msg)
-let anomaly s = Errors.anomaly (str s)
+let errorstrm = CErrors.errorlabstrm "ssreflect"
+let loc_error loc msg = CErrors.user_err_loc (loc, msg, str msg)
+let anomaly s = CErrors.anomaly (str s)
 
 (* Compatibility with Coq 8.6 *)
 let ppnl  = msg_info
@@ -114,7 +114,7 @@ let locate_reference qid =
 let mkSsrRef name =
   try locate_reference (ssrqid name) with Not_found ->
   try locate_reference (ssrtopqid name) with Not_found ->
-  Errors.error "Small scale reflection library not loaded"
+  CErrors.error "Small scale reflection library not loaded"
 let mkSsrRRef name = GRef (dummy_loc, mkSsrRef name,None), None
 let mkSsrConst name env sigma =
   Sigma.fresh_global env sigma (mkSsrRef name)
@@ -455,7 +455,7 @@ let mk_profiler s =
 let inVersion = Libobject.declare_object {
   (Libobject.default_object "SSRASTVERSION") with
   Libobject.load_function = (fun _ (_,v) -> 
-    if v <> ssrAstVersion then Errors.error "Please recompile your .vo files");
+    if v <> ssrAstVersion then CErrors.error "Please recompile your .vo files");
   Libobject.classify_function = (fun v -> Libobject.Keep v);
 }
 
@@ -598,15 +598,15 @@ let apply_type x xs = Proofview.V82.of_tactic (apply_type x xs)
 
 (* we reduce head beta redexes *)
 let betared env = 
-  Closure.create_clos_infos 
-   (Closure.RedFlags.mkflags [Closure.RedFlags.fBETA])
+  CClosure.create_clos_infos 
+   (CClosure.RedFlags.mkflags [CClosure.RedFlags.fBETA])
     env
 ;;
 let introid name = tclTHEN (fun gl ->
    let g, env = pf_concl gl, pf_env gl in
    match kind_of_term g with
    | App (hd, _) when isLambda hd -> 
-     let g = Closure.whd_val (betared env) (Closure.inject g) in
+     let g = CClosure.whd_val (betared env) (CClosure.inject g) in
      Proofview.V82.of_tactic (convert_concl_no_check g) gl
    | _ -> tclIDTAC gl)
   (Proofview.V82.of_tactic (intro_mustbe_force name))
@@ -1220,7 +1220,7 @@ let interp_search_notation loc s opt_scope =
         let ambig = "This string refers to a complex or ambiguous notation." in
         str ambig ++ str "\nTry searching with one of\n" ++ ntns
       with _ -> str "This string is not part of an identifier or notation." in
-    Errors.user_err_loc (loc, "interp_search_notation", diagnosis)
+    CErrors.user_err_loc (loc, "interp_search_notation", diagnosis)
 
 let pr_ssr_search_item _ _ _ = pr_search_item
 
@@ -1231,7 +1231,7 @@ let is_ident s = try CLexer.check_ident s; true with _ -> false
 let is_ident_part s = is_ident ("H" ^ s)
 
 let interp_search_notation loc tag okey =
-  let err msg = Errors.user_err_loc (loc, "interp_search_notation", msg) in
+  let err msg = CErrors.user_err_loc (loc, "interp_search_notation", msg) in
   let mk_pntn s for_key =
     let n = String.length s in
     let s' = String.make (n + 2) ' ' in
@@ -1355,7 +1355,7 @@ let rec splay_search_pattern na = function
   | Pattern.PApp (fp, args) -> splay_search_pattern (na + Array.length args) fp
   | Pattern.PLetIn (_, _, bp) -> splay_search_pattern na bp
   | Pattern.PRef hr -> hr, na
-  | _ -> Errors.error "no head constant in head search pattern"
+  | _ -> CErrors.error "no head constant in head search pattern"
 
 let coerce_search_pattern_to_sort hpat =
   let env = Global.env () and sigma = Evd.empty in
@@ -1366,7 +1366,7 @@ let coerce_search_pattern_to_sort hpat =
   let dc, ht =
     Reductionops.splay_prod env sigma (Universes.unsafe_type_of_global hr) in
   let np = List.length dc in
-  if np < na then Errors.error "too many arguments in head search pattern" else
+  if np < na then CErrors.error "too many arguments in head search pattern" else
   let hpat' = if np = na then hpat else mkPApp hpat (np - na) [||] in
   let warn () =
     msg_warning (str "Listing only lemmas with conclusion matching " ++ 
@@ -1417,7 +1417,7 @@ let interp_search_arg arg =
       try
         let intern = Constrintern.intern_constr_pattern in 
         Search.GlobSearchSubPattern (snd (intern (Global.env()) p))
-      with e -> let e = Errors.push e in iraise (Cerrors.process_vernac_interp_error e)) arg in
+      with e -> let e = CErrors.push e in iraise (ExplainErr.process_vernac_interp_error e)) arg in
   let hpat, a1 = match arg with
   | (_, Search.GlobSearchSubPattern (Pattern.PMeta _)) :: a' -> all_true, a'
   | (true, Search.GlobSearchSubPattern p) :: a' ->
@@ -1452,7 +1452,7 @@ let interp_modloc mr =
   let interp_mod (_, mr) =
     let (loc, qid) = qualid_of_reference mr in
     try Nametab.full_name_module qid with Not_found ->
-    Errors.user_err_loc (loc, "interp_modloc", str "No Module " ++ pr_qualid qid) in
+    CErrors.user_err_loc (loc, "interp_modloc", str "No Module " ++ pr_qualid qid) in
   let mr_out, mr_in = List.partition fst mr in
   let interp_bmod b = function
   | [] -> fun _ _ _ -> true
@@ -1584,7 +1584,7 @@ let donetac gl =
   let tacname = 
     try Nametab.locate_tactic (qualid_of_ident (id_of_string "done"))
     with Not_found -> try Nametab.locate_tactic (ssrqid "done")
-    with Not_found -> Errors.error "The ssreflect library was not loaded" in
+    with Not_found -> CErrors.error "The ssreflect library was not loaded" in
   let tacexpr = dummy_loc, Tacexpr.Reference (ArgArg (dummy_loc, tacname)) in
   Proofview.V82.of_tactic (eval_tactic (Tacexpr.TacArg tacexpr)) gl
 
@@ -1758,7 +1758,7 @@ let pr_ssrhyp _ _ _ = pr_hyp
 let wit_ssrhyprep = add_genarg "ssrhyprep" pr_hyp
 
 let hyp_err loc msg id =
-  Errors.user_err_loc (loc, "ssrhyp", str msg ++ pr_id id)
+  CErrors.user_err_loc (loc, "ssrhyp", str msg ++ pr_id id)
 
 let intern_hyp ist (SsrHyp (loc, id) as hyp) =
   let _ = Tacintern.intern_genarg ist (in_gen (rawwit wit_var) (loc, id)) in
@@ -2020,7 +2020,7 @@ let pf_clauseids gl gens clseq =
   let keep_clears = List.map (fun (x, _) -> x, None) in
   if gens <> [] then (check_wgen_uniq gens; gens) else
   if clseq <> InAll && clseq <> InAllHyps then keep_clears gens else
-  Errors.error "assumptions should be named explicitly"
+  CErrors.error "assumptions should be named explicitly"
 
 let hidden_clseq = function InHyps | InHypsSeq | InAllHyps -> true | _ -> false
 
@@ -2068,7 +2068,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   if fits false (id_map, List.rev dc) then mktac (List.map itac id_map) gl else
   let all_ids = ids_of_rel_context dc @ pf_ids_of_hyps gl in
   if List.for_all not_hyp' all_ids && not c_hidden then mktac [] gl else
-  Errors.error "tampering with discharged assumptions of \"in\" tactical"
+  CErrors.error "tampering with discharged assumptions of \"in\" tactical"
 
 let is_id_constr c = match kind_of_term c with
   | Lambda(_,_,c) when isRel c -> 1 = destRel c
@@ -2082,7 +2082,7 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   let sigma, env = project gl, pf_env gl in
   let evar_closed t p =
     if occur_existential t then
-      Errors.user_err_loc (loc_of_cpattern p,"ssreflect",
+      CErrors.user_err_loc (loc_of_cpattern p,"ssreflect",
         pr_constr_pat t ++
         str" contains holes and matches no subterm of the goal") in
   match gen with
@@ -2521,7 +2521,7 @@ let rec ipat_of_intro_pattern = function
   | IntroNaming IntroAnonymous -> IpatAnon
   | IntroAction (IntroRewrite b) -> IpatRw (allocc, if b then L2R else R2L)
   | IntroNaming (IntroFresh id) -> IpatAnon
-  | IntroAction (IntroApplyOn _) -> (* to do *) Errors.error "TO DO"
+  | IntroAction (IntroApplyOn _) -> (* to do *) CErrors.error "TO DO"
   | IntroAction (IntroInjection ips) ->
       IpatCase [List.map ipat_of_intro_pattern (List.map remove_loc ips)]
   | IntroForthcoming _ -> (* Unable to determine which kind of ipat interp_introid could return [HH] *)
@@ -2686,7 +2686,7 @@ END
 
 (* subsets of patterns *)
 let check_ssrhpats loc w_binders ipats =
-  let err_loc s = Errors.user_err_loc (loc, "ssreflect", s) in
+  let err_loc s = CErrors.user_err_loc (loc, "ssreflect", s) in
   let clr, ipats =
     let rec aux clr = function
       | IpatSimpl (cl, Nop) :: tl -> aux (clr @ cl) tl
@@ -2779,8 +2779,8 @@ let equality_inj l b id c gl =
   let msg = ref "" in
   try Proofview.V82.of_tactic (Equality.inj l b None c) gl
   with
-    | Compat.Exc_located(_,Errors.UserError (_,s))
-    | Errors.UserError (_,s)
+    | Compat.Exc_located(_,CErrors.UserError (_,s))
+    | CErrors.UserError (_,s)
   when msg := Pp.string_of_ppcmds s;
        !msg = "Not a projectable equality but a discriminable one." ||
        !msg = "Nothing to inject." ->
@@ -2807,7 +2807,7 @@ let perform_injection c gl =
   let dc, eqt = decompose_prod t in
   if dc = [] then injectl2rtac c gl else
   if not (closed0 eqt) then
-    Errors.error "can't decompose a quantified equality" else
+    CErrors.error "can't decompose a quantified equality" else
   let cl = pf_concl gl in let n = List.length dc in
   let c_eq = mkEtaApp c n 2 in
   let cl1 = mkLambda (Anonymous, mkArrow eqt cl, mkApp (mkRel 1, [|c_eq|])) in
@@ -2830,7 +2830,7 @@ let intro_all gl =
 let rec intro_anon gl =
   try anontac (List.hd (fst (Term.decompose_prod_n_assum 1 (pf_concl gl)))) gl
   with err0 -> try tclTHEN (Proofview.V82.of_tactic red_in_concl) intro_anon gl with _ -> raise err0
-  (* with _ -> Errors.error "No product even after reduction" *)
+  (* with _ -> CErrors.error "No product even after reduction" *)
 
 let with_top tac =
   tclTHENLIST [introid top_id; tac (mkVar top_id); Proofview.V82.of_tactic (clear [top_id])]
@@ -3080,12 +3080,12 @@ let tclDO n tac =
   let tac_err_at i gl =
     try tac gl
     with 
-    | Errors.UserError (l, s) as e ->
-        let _, info = Errors.push e in
-        let e' = Errors.UserError (l, prefix i ++ s) in
+    | CErrors.UserError (l, s) as e ->
+        let _, info = CErrors.push e in
+        let e' = CErrors.UserError (l, prefix i ++ s) in
         Util.iraise (e', info)
-    | Compat.Exc_located(loc, Errors.UserError (l, s))  -> 
-        raise (Compat.Exc_located(loc, Errors.UserError (l, prefix i ++ s))) in
+    | Compat.Exc_located(loc, CErrors.UserError (l, s))  -> 
+        raise (Compat.Exc_located(loc, CErrors.UserError (l, prefix i ++ s))) in
   let rec loop i gl =
     if i = n then tac_err_at i gl else
     (tclTHEN (tac_err_at i) (loop (i + 1))) gl in
@@ -3252,7 +3252,7 @@ let tclREV tac gl = tclPERM List.rev tac gl
 let rot_hyps dir i hyps =
   let n = List.length hyps in
   if i = 0 then List.rev hyps else
-  if i > n then Errors.error "Not enough subgoals" else
+  if i > n then CErrors.error "Not enough subgoals" else
   let rec rot i l_hyps = function
     | hyp :: hyps' when i > 0 -> rot (i - 1) (hyp :: l_hyps) hyps'
     | hyps' -> hyps' @ (List.rev l_hyps) in
@@ -3470,7 +3470,7 @@ let pf_interp_gen_aux ist gl to_ind ((oclr, occ), t) =
 let genclrtac cl cs clr =
   let tclmyORELSE tac1 tac2 gl =
     try tac1 gl
-    with e when Errors.noncritical e -> tac2 e gl in
+    with e when CErrors.noncritical e -> tac2 e gl in
   (* apply_type may give a type error, but the useful message is
    * the one of clear.  You type "move: x" and you get
    * "x is used in hyp H" instead of
@@ -3529,7 +3529,7 @@ let cons_gen gen = function
 
 let cons_dep (gensl, clr) =
   if List.length gensl = 1 then ([] :: gensl, clr) else
-  Errors.error "multiple dependents switches '/'"
+  CErrors.error "multiple dependents switches '/'"
 
 ARGUMENT EXTEND ssrdgens_tl TYPED AS ssrgen list list * ssrclear
                             PRINTED BY pr_ssrdgens
@@ -3574,7 +3574,7 @@ let with_dgens (gensl, clr) maintac ist = match gensl with
 
 let first_goal gls =
   let gl = gls.Evd.it and sig_0 = gls.Evd.sigma in
-  if List.is_empty gl then Errors.error "first_goal";
+  if List.is_empty gl then CErrors.error "first_goal";
   { Evd.it = List.hd gl; Evd.sigma = sig_0; }
 
 let with_deps deps0 maintac cl0 cs0 clr0 ist gl0 =
@@ -3714,13 +3714,13 @@ let rec improper_intros = function
 
 let check_movearg = function
   | view, (eqid, _) when view <> [] && eqid <> None ->
-    Errors.error "incompatible view and equation in move tactic"
+    CErrors.error "incompatible view and equation in move tactic"
   | view, (_, (([gen :: _], _), _)) when view <> [] && has_occ gen ->
-    Errors.error "incompatible view and occurrence switch in move tactic"
+    CErrors.error "incompatible view and occurrence switch in move tactic"
   | _, (_, ((dgens, _), _)) when List.length dgens > 1 ->
-    Errors.error "dependents switch `/' in move tactic"
+    CErrors.error "dependents switch `/' in move tactic"
   | _, (eqid, (_, ipats)) when eqid <> None && improper_intros ipats ->
-    Errors.error "no proper intro pattern for equation in move tactic"
+    CErrors.error "no proper intro pattern for equation in move tactic"
   | arg -> arg
 
 ARGUMENT EXTEND ssrmovearg TYPED AS ssrarg PRINTED BY pr_ssrarg
@@ -3815,16 +3815,16 @@ let unprotecttac gl =
     let hyploc = Option.map (fun id -> id, InHyp) idopt in
     Proofview.V82.of_tactic (reduct_option 
       (Reductionops.clos_norm_flags 
-        (Closure.RedFlags.mkflags 
-          [Closure.RedFlags.fBETA;
-           Closure.RedFlags.fCONST prot;
-           Closure.RedFlags.fMATCH;
-           Closure.RedFlags.fFIX;
-           Closure.RedFlags.fCOFIX]), DEFAULTcast) hyploc))
+        (CClosure.RedFlags.mkflags 
+          [CClosure.RedFlags.fBETA;
+           CClosure.RedFlags.fCONST prot;
+           CClosure.RedFlags.fMATCH;
+           CClosure.RedFlags.fFIX;
+           CClosure.RedFlags.fCOFIX]), DEFAULTcast) hyploc))
     allHypsAndConcl gl
 
 let dependent_apply_error =
-  try Errors.error "Could not fill dependent hole in \"apply\"" with err -> err
+  try CErrors.error "Could not fill dependent hole in \"apply\"" with err -> err
 
 (* TASSI: Sometimes Coq's apply fails. According to my experience it may be
  * related to goals that are products and with beta redexes. In that case it
@@ -3878,7 +3878,7 @@ let refine_with ?(first_goes_last=false) ?beta ?(with_evars=true) oc gl =
   in
   pp(lazy(str"after: " ++ pr_constr oc));
   try applyn ~with_evars ~with_shelve:true ?beta n oc gl
-  with e when Errors.noncritical e -> raise dependent_apply_error
+  with e when CErrors.noncritical e -> raise dependent_apply_error
 
 let pf_fresh_inductive_instance ind gl =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
@@ -3951,7 +3951,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
     | X_In_T (e, p) -> sigma, E_As_X_In_T (t, e, p)
     | _ ->
        try unify_HO env sigma t (fst (redex_of_pattern env p)), r
-       with e when Errors.noncritical e -> p in
+       with e when CErrors.noncritical e -> p in
   (* finds the eliminator applies it to evars and c saturated as needed  *)
   (* obtaining "elim ??? (c ???)". pred is the higher order evar         *)
   (* cty is None when the user writes _ (hence we can't make a pattern *)
@@ -4017,7 +4017,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       Some (c, c_ty, gl, gl')
     with
     | NotEnoughProducts -> None
-    | e when Errors.noncritical e -> loop (n+1) in loop 0 in
+    | e when CErrors.noncritical e -> loop (n+1) in loop 0 in
   (* Here we try to understand if the main pattern/term the user gave is
    * the first pattern to be matched (i.e. if elimty ends in P t1 .. tn,
    * weather tn is the t the user wrote in 'elim: t' *)
@@ -4231,7 +4231,7 @@ let _ = simplest_newcase_ref := simplest_newcase
 
 let check_casearg = function
 | view, (_, (([_; gen :: _], _), _)) when view <> [] && has_occ gen ->
-  Errors.error "incompatible view and occurrence switch in dependent case tactic"
+  CErrors.error "incompatible view and occurrence switch in dependent case tactic"
 | arg -> arg
 
 ARGUMENT EXTEND ssrcasearg TYPED AS ssrarg PRINTED BY pr_ssrarg
@@ -4647,11 +4647,11 @@ let mk_rwarg (d, (n, _ as m)) ((clr, occ as docc), rx) (rt, _ as r) =
                      && (clr = None || clr = Some []) then
      anomaly "Improper rewrite clear switch";
    if d = R2L && rt <> RWdef then
-     Errors.error "Right-to-left switch on simplification";
+     CErrors.error "Right-to-left switch on simplification";
    if n <> 1 && rt = RWred Cut then
-     Errors.error "Bad or useless multiplier";
+     CErrors.error "Bad or useless multiplier";
    if occ <> None && rx = None && rt <> RWdef then
-     Errors.error "Missing redex for simplification occurrence"
+     CErrors.error "Missing redex for simplification occurrence"
  end; (d, m), ((docc, rx), r)
 
 let norwmult = L2R, nomult
@@ -4734,7 +4734,7 @@ let unfoldintac occ rdx t (kt,_) gl =
   let body env t c =
     Tacred.unfoldn [OnlyOccurrences [1], get_evalref t] env sigma0 c in
   let easy = occ = None && rdx = None in
-  let red_flags = if easy then Closure.betaiotazeta else Closure.betaiota in
+  let red_flags = if easy then CClosure.betaiotazeta else CClosure.betaiota in
   let beta env = Reductionops.clos_norm_flags red_flags env sigma0 in
   let unfold, conclude = match rdx with
   | Some (_, (In_T _ | In_X_In_T _)) | None ->
@@ -4825,7 +4825,7 @@ exception PRindetermined_rhs of constr
 let pirrel_rewrite pred rdx rdx_ty new_rdx dir (sigma, c) c_ty gl =
 (*   pp(lazy(str"sigma@pirrel_rewrite=" ++ pr_evar_map None sigma)); *)
   let env = pf_env gl in
-  let beta = Reductionops.clos_norm_flags Closure.beta env sigma in
+  let beta = Reductionops.clos_norm_flags CClosure.beta env sigma in
   let sigma, p = 
     let sigma = create_evar_defs sigma in
     let sigma = Sigma.Unsafe.of_evar_map sigma in
@@ -4922,7 +4922,7 @@ let rwcltac cl rdx dir sr gl =
       then errorstrm (str "Rewriting impacts evars")
       else errorstrm (str "Dependent type error in rewrite of "
         ++ pf_pr_constr gl (project gl) (mkNamedLambda pattern_id rdxt cl))
-    | Errors.UserError _ as e -> raise e
+    | CErrors.UserError _ as e -> raise e
     | e -> anomaly ("cvtac's exception: " ^ Printexc.to_string e);
   in
   tclTHEN cvtac' rwtac gl
@@ -5198,7 +5198,7 @@ END
 let unfoldtac occ ko t kt gl =
   let cl, c = pf_fill_occ_term gl occ (fst (strip_unfold_term t kt)) in
   let cl' = subst1 (pf_unfoldn [OnlyOccurrences [1], get_evalref c] gl c) cl in
-  let f = if ko = None then Closure.betaiotazeta else Closure.betaiota in
+  let f = if ko = None then CClosure.betaiotazeta else CClosure.betaiota in
   Proofview.V82.of_tactic
     (convert_concl (pf_reduce (Reductionops.clos_norm_flags f) gl cl')) gl
 
@@ -5546,7 +5546,7 @@ let pr_ssrfixfwd _ _ _ (id, fwd) = str " fix " ++ pr_id id ++ pr_fwd fwd
 
 let bvar_locid = function
   | CRef (Ident (loc, id), _) -> loc, id
-  | _ -> Errors.error "Missing identifier after \"(co)fix\""
+  | _ -> CErrors.error "Missing identifier after \"(co)fix\""
 
 
 ARGUMENT EXTEND ssrfixfwd TYPED AS ident * ssrfwd PRINTED BY pr_ssrfixfwd
@@ -5563,7 +5563,7 @@ ARGUMENT EXTEND ssrfixfwd TYPED AS ident * ssrfwd PRINTED BY pr_ssrfixfwd
           (l', Name id') :: _ when Option.equal Id.equal sid (Some id') -> true, (l', id')
           | [l', Name id'] when sid = None -> false, (l', id')
           | _ :: bn -> loop bn
-          | [] -> Errors.error "Bad structural argument" in
+          | [] -> CErrors.error "Bad structural argument" in
         loop (names_of_local_assums lb) in
       let h' = BFrec (has_struct, has_cast) :: binders_fmts bs in
       let fix = CFix (loc, lid, [lid, (Some i, CStructRec), lb, t', c']) in
@@ -5743,7 +5743,7 @@ let pf_find_abstract_proof check_lock gl abstract_n =
            strbrk"Did you tamper with it?")
 
 let unfold cl =
-  let module R = Reductionops in let module F = Closure.RedFlags in
+  let module R = Reductionops in let module F = CClosure.RedFlags in
   reduct_in_concl (R.clos_norm_flags (F.mkflags
     (List.map (fun c -> F.fCONST (fst (destConst c))) cl @
        [F.fBETA; F.fMATCH; F.fFIX; F.fCOFIX])))
@@ -5824,7 +5824,7 @@ let havetac ist
      let sigma, t, uc, n_evars =
        interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
      if skols <> [] && n_evars <> 0 then
-       Errors.error ("Automatic generalization of unresolved implicit "^
+       CErrors.error ("Automatic generalization of unresolved implicit "^
                      "arguments together with abstract variables is "^
                      "not supported");
      let gl = re_sig (sig_it gl) (Evd.merge_universe_context sigma uc) in
@@ -6049,14 +6049,14 @@ let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
       | Sort _, [] -> Vars.subst_vars s ct
       | LetIn(Name id as n,b,ty,c), _::g -> mkLetIn (n,b,ty,var2rel c g (id::s))
       | Prod(Name id as n,ty,c), _::g -> mkProd (n,ty,var2rel c g (id::s))
-      | _ -> Errors.anomaly(str"SSR: wlog: var2rel: " ++ pr_constr c) in
+      | _ -> CErrors.anomaly(str"SSR: wlog: var2rel: " ++ pr_constr c) in
     let c = var2rel c gens [] in
     let rec pired c = function
       | [] -> c
       | t::ts as args -> match kind_of_term c with
          | Prod(_,_,c) -> pired (subst1 t c) ts
          | LetIn(id,b,ty,c) -> mkLetIn (id,b,ty,pired c args)
-         | _ -> Errors.anomaly(str"SSR: wlog: pired: " ++ pr_constr c) in
+         | _ -> CErrors.anomaly(str"SSR: wlog: pired: " ++ pr_constr c) in
     c, args, pired c args, pf_merge_uc uc gl in
   let tacipat pats = introstac ~ist pats in
   let tacigens = 
