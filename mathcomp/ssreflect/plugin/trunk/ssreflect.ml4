@@ -2088,10 +2088,15 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   match gen with
   | _, Some ((x, mode), None) when mode = "@" || (mode = " " && keep_let) ->
      let x = hoi_id x in
-     let _, bo, ty = Named.Declaration.to_tuple (pf_get_hyp gl x) in
-     gl,
-     (if bo <> None then args else mkVar x :: args),
-     mkProd_or_LetIn (Rel.Declaration.of_tuple (Name (f x),bo,ty)) (subst_var x c)
+     (match pf_get_hyp gl x with
+     | LocalAssum (_,ty) ->
+         gl,
+         mkVar x :: args,
+         mkProd_or_LetIn (Rel.Declaration.LocalAssum (Name (f x),ty)) (subst_var x c)
+     | LocalDef (_,b,ty) ->
+         gl,
+         args,
+         mkProd_or_LetIn (Rel.Declaration.LocalDef (Name (f x),b,ty)) (subst_var x c))
   | _, Some ((x, _), None) ->
      let x = hoi_id x in
      gl, mkVar x :: args, mkProd (Name (f x), pf_get_hyp_typ gl x, subst_var x c)
