@@ -105,6 +105,11 @@ let anomaly s = CErrors.anomaly (str s)
 let ppnl  = msg_info
 let msgnl = msg_info
 
+let mk_reldecl name obody ty =
+  match obody with
+  | None -> Rel.Declaration.LocalAssum (name, ty)
+  | Some bo -> Rel.Declaration.LocalDef (name, bo, ty)
+
 (** look up a name in the ssreflect internals module *)
 let ssrdirpath = make_dirpath [id_of_string "ssreflect"]
 let ssrqid name = make_qualid ssrdirpath (id_of_string name) 
@@ -2091,10 +2096,10 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
      let _, bo, ty = Named.Declaration.to_tuple (pf_get_hyp gl x) in
      gl,
      (if bo <> None then args else mkVar x :: args),
-     mkProd_or_LetIn (Rel.Declaration.of_tuple (Name (f x),bo,ty)) (subst_var x c)
+     mkProd_or_LetIn (mk_reldecl (Name (f x)) bo ty) (subst_var x c)
   | _, Some ((x, _), None) ->
      let x = hoi_id x in
-     gl, mkVar x :: args, mkProd (Name (f x), pf_get_hyp_typ gl x, subst_var x c)
+     gl, mkVar x :: args, mkProd (Name (f x),pf_get_hyp_typ gl x, subst_var x c)
   | _, Some ((x, "@"), Some p) -> 
      let x = hoi_id x in
      let cp = interp_cpattern ist gl p None in
