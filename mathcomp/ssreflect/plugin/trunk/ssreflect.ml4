@@ -107,11 +107,6 @@ let anomaly s = CErrors.anomaly (str s)
 let ppnl  = msg_info
 let msgnl = msg_info
 
-let mk_reldecl name obody ty =
-  match obody with
-  | None -> RelDecl.LocalAssum (name, ty)
-  | Some bo -> RelDecl.LocalDef (name, bo, ty)
-
 (** look up a name in the ssreflect internals module *)
 let ssrdirpath = make_dirpath [id_of_string "ssreflect"]
 let ssrqid name = make_qualid ssrdirpath (id_of_string name) 
@@ -812,9 +807,9 @@ let pf_abs_evars gl (sigma, c0) =
   let abs_evar n k =
     let evi = Evd.find sigma k in
     let dc = List.firstn n (evar_filtered_context evi) in
-    let abs_dc c decl = match NamedDecl.to_tuple decl with
-    | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
-    | x, None, t -> mkNamedProd x t c in
+    let abs_dc c = function
+    | NamedDecl.LocalDef (x,b,t) -> mkNamedLetIn x b t (mkArrow t c)
+    | NamedDecl.LocalAssum (x,t) -> mkNamedProd x t c in
     let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
     Evarutil.nf_evar sigma t in
   let rec put evlist c = match kind_of_term c with
@@ -867,9 +862,9 @@ let pf_abs_evars_pirrel gl (sigma, c0) =
   let abs_evar n k =
     let evi = Evd.find sigma k in
     let dc = List.firstn n (evar_filtered_context evi) in
-    let abs_dc c decl = match NamedDecl.to_tuple decl with
-    | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
-    | x, None, t -> mkNamedProd x t c in
+    let abs_dc c = function
+    | NamedDecl.LocalDef (x,b,t) -> mkNamedLetIn x b t (mkArrow t c)
+    | NamedDecl.LocalAssum (x,t) -> mkNamedProd x t c in
     let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
     Evarutil.nf_evar sigma0 (Evarutil.nf_evar sigma t) in
   let rec put evlist c = match kind_of_term c with
@@ -2038,10 +2033,10 @@ let hidetacs clseq idhide cl0 =
 
 let discharge_hyp (id', (id, mode)) gl =
   let cl' = subst_var id (pf_concl gl) in
-  match NamedDecl.to_tuple (pf_get_hyp gl id), mode with
-  | (_, None, t), _ | (_, Some _, t), "(" -> 
+  match pf_get_hyp gl id, mode with
+  | NamedDecl.LocalAssum (_, t), _ | NamedDecl.LocalDef (_, _, t), "(" ->
      apply_type (mkProd (Name id', t, cl')) [mkVar id] gl
-  | (_, Some v, t), _ ->
+  | NamedDecl.LocalDef (_, v, t), _ ->
      Proofview.V82.of_tactic (convert_concl (mkLetIn (Name id', v, t, cl'))) gl
 
 let endclausestac id_map clseq gl_id cl0 gl =
@@ -2095,10 +2090,15 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   match gen with
   | _, Some ((x, mode), None) when mode = "@" || (mode = " " && keep_let) ->
      let x = hoi_id x in
-     let _, bo, ty = NamedDecl.to_tuple (pf_get_hyp gl x) in
-     gl,
-     (if bo <> None then args else mkVar x :: args),
-     mkProd_or_LetIn (mk_reldecl (Name (f x)) bo ty) (subst_var x c)
+     (match pf_get_hyp gl x with
+     | LocalAssum (_,ty) ->
+         gl,
+         mkVar x :: args,
+         mkProd_or_LetIn (RelDecl.LocalAssum (Name (f x),ty)) (subst_var x c)
+     | LocalDef (_,b,ty) ->
+         gl,
+         args,
+         mkProd_or_LetIn (RelDecl.LocalDef (Name (f x),b,ty)) (subst_var x c))
   | _, Some ((x, _), None) ->
      let x = hoi_id x in
      gl, mkVar x :: args, mkProd (Name (f x),pf_get_hyp_typ gl x, subst_var x c)
@@ -3462,9 +3462,9 @@ let pf_interp_gen_aux ist gl to_ind ((oclr, occ), t) =
     if tag_of_cpattern t = '@' then 
       if not (isVar c) then
 	errorstrm (str "@ can be used with variables only")
-      else match NamedDecl.to_tuple (pf_get_hyp gl (destVar c)) with
-      | _, None, _ -> errorstrm (str "@ can be used with let-ins only")
-      | name, Some bo, ty -> true, pat, mkLetIn (Name name,bo,ty,cl),c,clr,ucst,gl
+      else match pf_get_hyp gl (destVar c) with
+      | NamedDecl.LocalAssum _ -> errorstrm (str "@ can be used with let-ins only")
+      | NamedDecl.LocalDef (name, b, ty) -> true, pat, mkLetIn (Name name,b,ty,cl),c,clr,ucst,gl
     else let gl, ccl =  pf_mkprod gl c cl in false, pat, ccl, c, clr,ucst,gl
   else if to_ind && occ = None then
     let nv, p, _, ucst' = pf_abs_evars gl (fst pat, c) in
