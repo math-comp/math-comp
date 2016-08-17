@@ -74,6 +74,8 @@ open Tok
 open Ssrmatching_plugin
 open Ssrmatching
 
+module RelDecl = Context.Rel.Declaration
+module NamedDecl = Context.Named.Declaration
 
 (* Tentative patch from util.ml *)
 
@@ -107,8 +109,8 @@ let msgnl = msg_info
 
 let mk_reldecl name obody ty =
   match obody with
-  | None -> Rel.Declaration.LocalAssum (name, ty)
-  | Some bo -> Rel.Declaration.LocalDef (name, bo, ty)
+  | None -> RelDecl.LocalAssum (name, ty)
+  | Some bo -> RelDecl.LocalDef (name, bo, ty)
 
 (** look up a name in the ssreflect internals module *)
 let ssrdirpath = make_dirpath [id_of_string "ssreflect"]
@@ -568,7 +570,7 @@ let is_pf_var c = isVar c && not_section_id (destVar c)
 
 let pf_ids_of_proof_hyps gl =
   let add_hyp decl ids =
-    let id = Named.Declaration.get_id decl in
+    let id = NamedDecl.get_id decl in
     if not_section_id id then id :: ids else ids in
   Context.Named.fold_outside add_hyp (pf_hyps gl) ~init:[]
 
@@ -760,7 +762,7 @@ let mk_anon_id t gl =
 let ssr_anon_hyp = "Hyp"
 
 let anontac decl gl =
-  let id =  match Rel.Declaration.get_name decl with
+  let id =  match RelDecl.get_name decl with
   | Name id ->
     if is_discharged_id id then id else mk_anon_id (string_of_id id) gl
   | _ -> mk_anon_id ssr_anon_hyp gl in
@@ -810,7 +812,7 @@ let pf_abs_evars gl (sigma, c0) =
   let abs_evar n k =
     let evi = Evd.find sigma k in
     let dc = List.firstn n (evar_filtered_context evi) in
-    let abs_dc c decl = match Named.Declaration.to_tuple decl with
+    let abs_dc c decl = match NamedDecl.to_tuple decl with
     | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
     | x, None, t -> mkNamedProd x t c in
     let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
@@ -865,7 +867,7 @@ let pf_abs_evars_pirrel gl (sigma, c0) =
   let abs_evar n k =
     let evi = Evd.find sigma k in
     let dc = List.firstn n (evar_filtered_context evi) in
-    let abs_dc c decl = match Named.Declaration.to_tuple decl with
+    let abs_dc c decl = match NamedDecl.to_tuple decl with
     | x, Some b, t -> mkNamedLetIn x b t (mkArrow t c)
     | x, None, t -> mkNamedProd x t c in
     let t = Context.Named.fold_inside abs_dc ~init:evi.evar_concl dc in
@@ -1005,10 +1007,10 @@ let pf_unabs_evars gl ise n c0 =
   let push_rel = Environ.push_rel in
   let rec mk_evar j env i c = match kind_of_term c with
   | Prod (x, t, c1) when i < j ->
-    mk_evar j (push_rel (Rel.Declaration.LocalAssum (x, unabs i t)) env) (i + 1) c1
+    mk_evar j (push_rel (RelDecl.LocalAssum (x, unabs i t)) env) (i + 1) c1
   | LetIn (x, b, t, c1) when i < j ->
     let _, _, c2 = destProd c1 in
-    mk_evar j (push_rel (Rel.Declaration.LocalDef (x, unabs i b, unabs i t)) env) (i + 1) c2
+    mk_evar j (push_rel (RelDecl.LocalDef (x, unabs i b, unabs i t)) env) (i + 1) c2
   | _ -> Evarutil.e_new_evar env ise (unabs i c) in
   let rec unabs_evars c =
     if !nev = n then unabs n c else match kind_of_term c with
@@ -2001,10 +2003,10 @@ let rec safe_depth c = match kind_of_term c with
 let red_safe r e s c0 =
   let rec red_to e c n = match kind_of_term c with
   | Prod (x, t, c') when n > 0 ->
-    let t' = r e s t in let e' = Environ.push_rel (Rel.Declaration.LocalAssum (x, t')) e in
+    let t' = r e s t in let e' = Environ.push_rel (RelDecl.LocalAssum (x, t')) e in
     mkProd (x, t', red_to e' c' (n - 1))
   | LetIn (x, b, t, c') when n > 0 ->
-    let t' = r e s t in let e' = Environ.push_rel (Rel.Declaration.LocalAssum (x, t')) e in
+    let t' = r e s t in let e' = Environ.push_rel (RelDecl.LocalAssum (x, t')) e in
     mkLetIn (x, r e s b, t', red_to e' c' (n - 1))
   | _ -> r e s c in
   red_to e c0 (safe_depth c0)
@@ -2036,7 +2038,7 @@ let hidetacs clseq idhide cl0 =
 
 let discharge_hyp (id', (id, mode)) gl =
   let cl' = subst_var id (pf_concl gl) in
-  match Named.Declaration.to_tuple (pf_get_hyp gl id), mode with
+  match NamedDecl.to_tuple (pf_get_hyp gl id), mode with
   | (_, None, t), _ | (_, Some _, t), "(" -> 
      apply_type (mkProd (Name id', t, cl')) [mkVar id] gl
   | (_, Some v, t), _ ->
@@ -2049,7 +2051,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   let hide_goal = hidden_clseq clseq in
   let c_hidden = hide_goal && c = mkVar gl_id in
   let rec fits forced = function
-  | (id, _) :: ids, decl :: dc' when Rel.Declaration.get_name decl = Name id ->
+  | (id, _) :: ids, decl :: dc' when RelDecl.get_name decl = Name id ->
     fits true (ids, dc')
   | ids, dc' ->
     forced && ids = [] && (not hide_goal || dc' = [] && c_hidden) in
@@ -2062,7 +2064,7 @@ let endclausestac id_map clseq gl_id cl0 gl =
   | _ -> map_constr unmark c in
   let utac hyp =
     Proofview.V82.of_tactic 
-     (convert_hyp_no_check (Context.Named.Declaration.map_constr unmark hyp)) in
+     (convert_hyp_no_check (NamedDecl.map_constr unmark hyp)) in
   let utacs = List.map utac (pf_hyps gl) in
   let ugtac gl' =
     Proofview.V82.of_tactic
@@ -2093,7 +2095,7 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   match gen with
   | _, Some ((x, mode), None) when mode = "@" || (mode = " " && keep_let) ->
      let x = hoi_id x in
-     let _, bo, ty = Named.Declaration.to_tuple (pf_get_hyp gl x) in
+     let _, bo, ty = NamedDecl.to_tuple (pf_get_hyp gl x) in
      gl,
      (if bo <> None then args else mkVar x :: args),
      mkProd_or_LetIn (mk_reldecl (Name (f x)) bo ty) (subst_var x c)
@@ -2855,7 +2857,7 @@ let clear_wilds wilds gl =
 
 let clear_with_wilds wilds clr0 gl =
   let extend_clr clr nd =
-    let id = Named.Declaration.get_id nd in
+    let id = NamedDecl.get_id nd in
     if List.mem id clr || not (List.mem id wilds) then clr else
     let vars = global_vars_set_of_decl (pf_env gl) nd in
     let occurs id' = Idset.mem id' vars in
@@ -2909,7 +2911,7 @@ let ssrmkabs id gl =
       let Sigma (m, sigma, p5) = Evarutil.new_evar env sigma abstract_ty in
       Sigma ((m, abstract_ty), sigma, p1 +> p2 +> p3 +> p4 +> p5) in
     let sigma, kont =
-      let rd = Rel.Declaration.LocalAssum (Name id, abstract_ty) in
+      let rd = RelDecl.LocalAssum (Name id, abstract_ty) in
       let Sigma (ev, sigma, _) = Evarutil.new_evar (Environ.push_rel rd env) sigma concl in
       let sigma = Sigma.to_evar_map sigma in
       (sigma, ev)
@@ -3460,7 +3462,7 @@ let pf_interp_gen_aux ist gl to_ind ((oclr, occ), t) =
     if tag_of_cpattern t = '@' then 
       if not (isVar c) then
 	errorstrm (str "@ can be used with variables only")
-      else match Named.Declaration.to_tuple (pf_get_hyp gl (destVar c)) with
+      else match NamedDecl.to_tuple (pf_get_hyp gl (destVar c)) with
       | _, None, _ -> errorstrm (str "@ can be used with let-ins only")
       | name, Some bo, ty -> true, pat, mkLetIn (Name name,bo,ty,cl),c,clr,ucst,gl
     else let gl, ccl =  pf_mkprod gl c cl in false, pat, ccl, c, clr,ucst,gl
@@ -3784,8 +3786,8 @@ let analyze_eliminator elimty env sigma =
   | AtomicType (hd, args) when isRel hd -> 
     ctx, destRel hd, not (noccurn 1 t), Array.length args
   | CastType (t, _) -> loop ctx t
-  | ProdType (x, ty, t) -> loop (Rel.Declaration.LocalAssum (x, ty) :: ctx) t
-  | LetInType (x,b,ty,t) -> loop (Rel.Declaration.LocalDef (x, b, ty) :: ctx) (subst1 b t)
+  | ProdType (x, ty, t) -> loop (RelDecl.LocalAssum (x, ty) :: ctx) t
+  | LetInType (x,b,ty,t) -> loop (RelDecl.LocalDef (x, b, ty) :: ctx) (subst1 b t)
   | _ ->
     let env' = Environ.push_rel_context ctx env in
     let t' = Reductionops.whd_all env' sigma t in
@@ -6017,8 +6019,8 @@ END
 
 let destProd_or_LetIn c =
   match kind_of_term c with
-  | Prod (n,ty,c) -> Rel.Declaration.LocalAssum (n, ty), c
-  | LetIn (n,bo,ty,c) -> Rel.Declaration.LocalDef (n, bo, ty), c
+  | Prod (n,ty,c) -> RelDecl.LocalAssum (n, ty), c
+  | LetIn (n,bo,ty,c) -> RelDecl.LocalDef (n, bo, ty), c
   | _ -> raise DestKO
         
 let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
