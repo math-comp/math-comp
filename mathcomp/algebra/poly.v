@@ -2541,6 +2541,33 @@ Definition prim_rootP := prim_rootP.
 
 End UnityRootTheory.
 
+Section DecField.
+
+Variable F : decFieldType.
+
+Lemma dec_factor_theorem (p : {poly F}) : p != 0 ->
+  {s : seq F & {q : {poly F} | p = q * \prod_(x <- s) ('X - x%:P)
+                             /\ forall x, ~~ root q x }}.
+Proof.
+pose polyT (p : seq F) := (foldr (fun c f => f * 'X_0 + c%:T) (0%R)%:T p)%T.
+have eval_polyT (q : {poly F}) x : GRing.eval [:: x] (polyT q) = q.[x].
+  by rewrite /horner; elim: (val q) => //= ? ? ->.
+elim: size {-2}p (leqnn (size p)) => [?|n IHn {p} p sp_ltSn p_neq0].
+  by move=> /size_poly_leq0P->; rewrite eqxx.
+have /decPcases /= := @satP F [::] ('exists 'X_0, polyT p == 0%T).
+case: ifP => [_ /sig_eqW[x]|_ noroot]; last first.
+  exists [::], p; rewrite big_nil mulr1; split => // x.
+  by apply/negP=> /rootP rpx; apply noroot; exists x; rewrite eval_polyT.
+rewrite eval_polyT => /rootP /factor_theorem /sig_eqW [q p_eq].
+move: p_neq0 sp_ltSn; rewrite p_eq {p_eq}.
+rewrite mulf_eq0 polyXsubC_eq0 orbF => q_neq0.
+rewrite size_mul ?polyXsubC_eq0 // ?size_XsubC addn2 /= ltnS => sq_le_n.
+have [] // := IHn q => s [r [-> nr]]; exists (s ++ [::x]), r.
+by rewrite big_cat /= big_seq1 mulrA.
+Qed.
+
+End DecField.
+
 Module PreClosedField.
 Section UseAxiom.
 
