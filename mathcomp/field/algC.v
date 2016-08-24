@@ -17,6 +17,14 @@ Require Import algebraics_fundamentals.
 (* algebraic contents of the Fundamenta Theorem of Algebra.                   *)
 (*       algC == the closed, countable field of algebraic numbers.            *)
 (*  algCeq, algCring, ..., algCnumField == structures for algC.               *)
+(* The ssrnum interfaces are implemented for algC as follows:                 *)
+(*     x <= y <=> (y - x) is a nonnegative real                               *)
+(*      x < y <=> (y - x) is a (strictly) positive real                       *)
+(*       `|z| == the complex norm of z, i.e., sqrtC (z * z^* ).               *)
+(*      Creal == the subset of real numbers (:= Num.real for algC).           *)
+(*         'i == the imaginary number (:= sqrtC (-1)).                        *)
+(*      'Re z == the real component of z.                                     *)
+(*      'Im z == the imaginary component of z.                                *)
 (*        z^* == the complex conjugate of z (:= conjC z).                     *)
 (*    sqrtC z == a nonnegative square root of z, i.e., 0 <= sqrt x if 0 <= x. *)
 (*  n.-root z == more generally, for n > 0, an nth root of z, chosen with a   *)
@@ -25,15 +33,7 @@ Require Import algebraics_fundamentals.
 (*               Note that n.-root (-1) is a primitive 2nth root of unity,    *)
 (*               an thus not equal to -1 for n odd > 1 (this will be shown in *)
 (*               file cyclotomic.v).                                          *)
-(* The ssrnum interfaces are implemented for algC as follows:                 *)
-(*     x <= y <=> (y - x) is a nonnegative real                               *)
-(*      x < y <=> (y - x) is a (strictly) positive real                       *)
-(*       `|z| == the complex norm of z, i.e., sqrtC (z * z^* ).               *)
-(*      Creal == the subset of real numbers (:= Num.real for algC).           *)
 (* In addition, we provide:                                                   *)
-(*         'i == the imaginary number (:= sqrtC (-1)).                        *)
-(*      'Re z == the real component of z.                                     *)
-(*      'Im z == the imaginary component of z.                                *)
 (*       Crat == the subset of rational numbers.                              *)
 (*       Cint == the subset of integers.                                      *)
 (*       Cnat == the subset of natural integers.                              *)
@@ -237,9 +237,8 @@ Parameter numMixin : Num.mixin_of ringType.
 Canonical numDomainType := NumDomainType type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
-Parameter conj : {rmorphism type -> type}.
-Axiom conjK : involutive conj.
-Axiom normK : forall x, `|x| ^+ 2 = x * conj x.
+Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
+Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
 
 Axiom algebraic : integralRange (@ratr unitRingType).
 
@@ -446,6 +445,11 @@ rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
+Program Definition conjMixin :=
+  ImaginaryMixin (svalP (imaginary_exists closedFieldType)) 
+                 (fun x => esym (normK x)).
+Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
+
 End Implementation.
 
 Definition divisor := Implementation.type.
@@ -464,47 +468,7 @@ Local Notation ZtoC := (intr : int -> algC).
 Local Notation Creal := (Num.real : qualifier 0 algC).
 
 Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
-Proof. exact: imaginary_exists. Qed.
-
-Let Re2 z := z + z^*.
-Definition nnegIm z := 0 <= sval algCi_subproof * (z^* - z).
-Definition argCle y z := nnegIm z ==> nnegIm y && (Re2 z <= Re2 y).
-
-CoInductive rootC_spec n (x : algC) : Type :=
-  RootCspec (y : algC) of if (n > 0)%N then y ^+ n = x else y = 0
-                        & forall z, (n > 0)%N -> z ^+ n = x -> argCle y z.
-
-Fact rootC_subproof n x : rootC_spec n x.
-Proof.
-have realRe2 u : Re2 u \is Creal.
-  rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjK addrC -rmorphD -normK.
-  by rewrite exprn_ge0 ?normr_ge0.
-have argCtotal : total argCle.
-  move=> u v; rewrite /total /argCle.
-  by do 2!case: (nnegIm _) => //; rewrite ?orbT //= real_leVge.
-have argCtrans : transitive argCle.
-  move=> u v w /implyP geZuv /implyP geZvw; apply/implyP.
-  by case/geZvw/andP=> /geZuv/andP[-> geRuv] /ler_trans->.
-pose p := 'X^n - (x *+ (n > 0))%:P; have [r0 Dp] := closed_field_poly_normal p.
-have sz_p: size p = n.+1.
-  rewrite size_addl ?size_polyXn // ltnS size_opp size_polyC mulrn_eq0.
-  by case: posnP => //; case: negP.
-pose r := sort argCle r0; have r_arg: sorted argCle r by apply: sort_sorted.
-have{Dp} Dp: p = \prod_(z <- r) ('X - z%:P).
-  rewrite Dp lead_coefE sz_p coefB coefXn coefC -mulrb -mulrnA mulnb lt0n andNb.
-  rewrite subr0 eqxx scale1r; apply: eq_big_perm.
-  by rewrite perm_eq_sym perm_sort.
-have mem_rP z: (n > 0)%N -> reflect (z ^+ n = x) (z \in r).
-  move=> n_gt0; rewrite -root_prod_XsubC -Dp rootE !hornerE hornerXn n_gt0.
-  by rewrite subr_eq0; apply: eqP.
-exists r`_0 => [|z n_gt0 /(mem_rP z n_gt0) r_z].
-  have sz_r: size r = n by apply: succn_inj; rewrite -sz_p Dp size_prod_XsubC.
-  case: posnP => [n0 | n_gt0]; first by rewrite nth_default // sz_r n0.
-  by apply/mem_rP=> //; rewrite mem_nth ?sz_r.
-case: {Dp mem_rP}r r_z r_arg => // y r1; rewrite inE => /predU1P[-> _|r1z].
-  by apply/implyP=> ->; rewrite lerr.
-by move/(order_path_min argCtrans)/allP->.
-Qed.
+Proof. exact: GRing.imaginary_exists. Qed.
 
 CoInductive getCrat_spec : Type := GetCrat_spec CtoQ of cancel QtoC CtoQ.
 
@@ -559,13 +523,10 @@ Module Import Exports.
 Import Implementation Internals.
 
 Notation algC := type.
-Notation conjC := conj.
 Delimit Scope C_scope with C.
 Delimit Scope C_core_scope with Cc.
 Delimit Scope C_expanded_scope with Cx.
 Open Scope C_core_scope.
-Notation "x ^*" := (conjC x) (at level 2, format "x ^*") : C_core_scope.
-Notation "x ^*" := x^* (only parsing) : C_scope.
 
 Canonical eqType.
 Canonical choiceType.
@@ -583,6 +544,7 @@ Canonical fieldType.
 Canonical numFieldType.
 Canonical decFieldType.
 Canonical closedFieldType.
+Canonical numClosedFieldType.
 
 Notation algCeq := eqType.
 Notation algCzmod := zmodType.
@@ -591,22 +553,7 @@ Notation algCuring := unitRingType.
 Notation algCnum := numDomainType.
 Notation algCfield := fieldType.
 Notation algCnumField := numFieldType.
-
-Definition rootC n x := let: RootCspec y _ _ := rootC_subproof n x in y.
-Notation "n .-root" := (rootC n) (at level 2, format "n .-root") : C_core_scope.
-Notation "n .-root" := (rootC n) (only parsing) : C_scope.
-Notation sqrtC := 2.-root.
-
-Definition algCi := sqrtC (-1).
-Notation "'i" := algCi (at level 0) : C_core_scope.
-Notation "'i" := 'i (only parsing) : C_scope.
-
-Definition algRe x := (x + x^*) / 2%:R.
-Definition algIm x := 'i * (x^* - x) / 2%:R.
-Notation "'Re z" := (algRe z) (at level 10, z at level 8) : C_core_scope.
-Notation "'Im z" := (algIm z) (at level 10, z at level 8) : C_core_scope.
-Notation "'Re z" := ('Re z) (only parsing) : C_scope.
-Notation "'Im z" := ('Im z) (only parsing) : C_scope.
+Notation algCnumClosedField := numClosedFieldType.
 
 Notation Creal := (@Num.Def.Rreal numDomainType).
 
@@ -692,42 +639,7 @@ Let nz2 : 2%:R != 0 :> algC. Proof. by rewrite -!CintrE. Qed.
 
 (* Conjugation and norm. *)
 
-Definition conjCK : involutive conjC := Algebraics.Implementation.conjK.
-Definition normCK x : `|x| ^+ 2 = x * x^* := Algebraics.Implementation.normK x.
 Definition algC_algebraic x := Algebraics.Implementation.algebraic x.
-
-Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
-
-Lemma mul_conjC_ge0 x : 0 <= x * x^*.
-Proof. by rewrite -normCK exprn_ge0 ?normr_ge0. Qed.
-
-Lemma mul_conjC_gt0 x : (0 < x * x^*) = (x != 0).
-Proof. 
-have [->|x_neq0] := altP eqP; first by rewrite rmorph0 mulr0.
-by rewrite -normCK exprn_gt0 ?normr_gt0.
-Qed.
-
-Lemma mul_conjC_eq0 x : (x * x^* == 0) = (x == 0).
-Proof. by rewrite -normCK expf_eq0 normr_eq0. Qed.
-
-Lemma conjC_ge0 x : (0 <= x^*) = (0 <= x).
-Proof.
-wlog suffices: x / 0 <= x -> 0 <= x^*.
-  by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
-rewrite le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
-by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
-Qed.
-
-Lemma conjC_nat n : (n%:R)^* = n%:R. Proof. exact: rmorph_nat. Qed.
-Lemma conjC0 : 0^* = 0. Proof. exact: rmorph0. Qed.
-Lemma conjC1 : 1^* = 1. Proof. exact: rmorph1. Qed.
-Lemma conjC_eq0 x : (x^* == 0) = (x == 0). Proof. exact: fmorph_eq0. Qed.
-
-Lemma invC_norm x : x^-1 = `|x| ^- 2 * x^*.
-Proof.
-have [-> | nx_x] := eqVneq x 0; first by rewrite conjC0 mulr0 invr0.
-by rewrite normCK invfM divfK ?conjC_eq0.
-Qed.
 
 (* Real number subset. *)
 
@@ -735,553 +647,19 @@ Lemma Creal0 : 0 \is Creal. Proof. exact: rpred0. Qed.
 Lemma Creal1 : 1 \is Creal. Proof. exact: rpred1. Qed.
 Hint Resolve Creal0 Creal1. (* Trivial cannot resolve a general real0 hint. *)
 
-Lemma CrealE x : (x \is Creal) = (x^* == x).
-Proof.
-rewrite realEsqr ger0_def normrX normCK.
-by have [-> | /mulfI/inj_eq-> //] := eqVneq x 0; rewrite rmorph0 !eqxx.
-Qed.
-
-Lemma CrealP {x} : reflect (x^* = x) (x \is Creal).
-Proof. by rewrite CrealE; apply: eqP. Qed.
-
-Lemma conj_Creal x : x \is Creal -> x^* = x.
-Proof. by move/CrealP. Qed.
-
-Lemma conj_normC z : `|z|^* = `|z|.
-Proof. by rewrite conj_Creal ?normr_real. Qed.
-
-Lemma geC0_conj x : 0 <= x -> x^* = x.
-Proof. by move=> /ger0_real/CrealP. Qed.
-
-Lemma geC0_unit_exp x n : 0 <= x -> (x ^+ n.+1 == 1) = (x == 1).
-Proof. by move=> x_ge0; rewrite pexpr_eq1. Qed.
-
-(* Elementary properties of roots. *)
-
-Ltac case_rootC := rewrite /rootC; case: (rootC_subproof _ _).
-
-Lemma root0C x : 0.-root x = 0. Proof. by case_rootC. Qed.
-
-Lemma rootCK n : (n > 0)%N -> cancel n.-root (fun x => x ^+ n).
-Proof. by case: n => //= n _ x; case_rootC. Qed.
-
-Lemma root1C x : 1.-root x = x. Proof. exact: (@rootCK 1). Qed.
-
-Lemma rootC0 n : n.-root 0 = 0.
-Proof.
-have [-> | n_gt0] := posnP n; first by rewrite root0C.
-by have /eqP := rootCK n_gt0 0; rewrite expf_eq0 n_gt0 /= => /eqP.
-Qed.
-
-Lemma rootC_inj n : (n > 0)%N -> injective n.-root.
-Proof. by move/rootCK/can_inj. Qed.
-
-Lemma eqr_rootC n : (n > 0)%N -> {mono n.-root : x y / x == y}.
-Proof. by move/rootC_inj/inj_eq. Qed.
-
-Lemma rootC_eq0 n x : (n > 0)%N -> (n.-root x == 0) = (x == 0).
-Proof. by move=> n_gt0; rewrite -{1}(rootC0 n) eqr_rootC. Qed.
-
-(* Rectangular coordinates. *)
-
-Lemma sqrCi : 'i ^+ 2 = -1. Proof. exact: rootCK. Qed.
-
-Lemma nonRealCi : 'i \isn't Creal.
-Proof. by rewrite realEsqr sqrCi oppr_ge0 ltr_geF ?ltr01. Qed.
-
-Lemma neq0Ci : 'i != 0.
-Proof. by apply: contraNneq nonRealCi => ->; apply: real0. Qed.
-
-Lemma normCi : `|'i| = 1.
-Proof.
-apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) ?normr_ge0 //.
-by rewrite -normrX sqrCi normrN1.
-Qed.
-
-Lemma invCi : 'i^-1 = - 'i.
-Proof. by rewrite -div1r -[1]opprK -sqrCi mulNr mulfK ?neq0Ci. Qed.
-
-Lemma conjCi : 'i^* = - 'i.
-Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
-
 Lemma algCrect x : x = 'Re x + 'i * 'Im x.
-Proof. 
-rewrite 2!mulrA -expr2 sqrCi mulN1r opprB -mulrDl addrACA subrr addr0.
-by rewrite -mulr2n -mulr_natr mulfK.
-Qed.
+Proof. by rewrite [LHS]Crect. Qed.
 
-Lemma Creal_Re x : 'Re x \is Creal.
-Proof. by rewrite CrealE fmorph_div rmorph_nat rmorphD conjCK addrC. Qed.
+Lemma algCreal_Re x : 'Re x \is Creal.
+Proof. by rewrite Creal_Re. Qed.
 
-Lemma Creal_Im x : 'Im x \is Creal.
-Proof.
-rewrite CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
-by rewrite conjCi -opprB mulrNN.
-Qed.
-Hint Resolve Creal_Re Creal_Im.
-
-Fact algRe_is_additive : additive algRe.
-Proof. by move=> x y; rewrite /algRe rmorphB addrACA -opprD mulrBl. Qed.
-Canonical algRe_additive := Additive algRe_is_additive.
-
-Fact algIm_is_additive : additive algIm.
-Proof.
-by move=> x y; rewrite /algIm rmorphB opprD addrACA -opprD mulrBr mulrBl.
-Qed.
-Canonical algIm_additive := Additive algIm_is_additive.
-
-Lemma Creal_ImP z : reflect ('Im z = 0) (z \is Creal).
-Proof.
-rewrite CrealE -subr_eq0 -(can_eq (mulKf neq0Ci)) mulr0.
-by rewrite -(can_eq (divfK nz2)) mul0r; apply: eqP.
-Qed.
-
-Lemma Creal_ReP z : reflect ('Re z = z) (z \in Creal).
-Proof.
-rewrite (sameP (Creal_ImP z) eqP) -(can_eq (mulKf neq0Ci)) mulr0.
-by rewrite -(inj_eq (addrI ('Re z))) addr0 -algCrect eq_sym; apply: eqP.
-Qed.
-
-Lemma algReMl : {in Creal, forall x, {morph algRe : z / x * z}}.
-Proof.
-by move=> x Rx z /=; rewrite /algRe rmorphM (conj_Creal Rx) -mulrDr -mulrA.
-Qed.
-
-Lemma algReMr : {in Creal, forall x, {morph algRe : z / z * x}}.
-Proof. by move=> x Rx z /=; rewrite mulrC algReMl // mulrC. Qed.
-
-Lemma algImMl : {in Creal, forall x, {morph algIm : z / x * z}}.
-Proof.
-by move=> x Rx z; rewrite /algIm rmorphM (conj_Creal Rx) -mulrBr mulrCA !mulrA.
-Qed.
-
-Lemma algImMr : {in Creal, forall x, {morph algIm : z / z * x}}.
-Proof. by move=> x Rx z /=; rewrite mulrC algImMl // mulrC. Qed.
-
-Lemma algRe_i : 'Re 'i = 0. Proof. by rewrite /algRe conjCi subrr mul0r. Qed.
-
-Lemma algIm_i : 'Im 'i = 1.
-Proof.
-rewrite /algIm conjCi -opprD mulrN -mulr2n mulrnAr ['i * _]sqrCi.
-by rewrite mulNrn opprK divff.
-Qed.
-
-Lemma algRe_conj z : 'Re z^* = 'Re z.
-Proof. by rewrite /algRe addrC conjCK. Qed.
-
-Lemma algIm_conj z : 'Im z^* = - 'Im z.
-Proof. by rewrite /algIm -mulNr -mulrN opprB conjCK. Qed.
-
-Lemma algRe_rect : {in Creal &, forall x y, 'Re (x + 'i * y) = x}.
-Proof.
-move=> x y Rx Ry; rewrite /= raddfD /= (Creal_ReP x Rx).
-by rewrite algReMr // algRe_i mul0r addr0.
-Qed.
-
-Lemma algIm_rect : {in Creal &, forall x y, 'Im (x + 'i * y) = y}.
-Proof.
-move=> x y Rx Ry; rewrite /= raddfD /= (Creal_ImP x Rx) add0r.
-by rewrite algImMr // algIm_i mul1r.
-Qed.
-
-Lemma conjC_rect : {in Creal &, forall x y, (x + 'i * y)^* = x - 'i * y}.
-Proof.
-by move=> x y Rx Ry; rewrite /= rmorphD rmorphM conjCi mulNr !conj_Creal.
-Qed.
-
-Lemma addC_rect x1 y1 x2 y2 :
-  (x1 + 'i * y1) + (x2 + 'i * y2) = x1 + x2 + 'i * (y1 + y2).
-Proof. by rewrite addrACA -mulrDr. Qed.
-
-Lemma oppC_rect x y : - (x + 'i * y)  = - x + 'i * (- y).
-Proof. by rewrite mulrN -opprD. Qed.
-
-Lemma subC_rect x1 y1 x2 y2 :
-  (x1 + 'i * y1) - (x2 + 'i * y2) = x1 - x2 + 'i * (y1 - y2).
-Proof. by rewrite oppC_rect addC_rect. Qed.
-
-Lemma mulC_rect x1 y1 x2 y2 :
-  (x1 + 'i * y1) * (x2 + 'i * y2)
-      = x1 * x2 - y1 * y2 + 'i * (x1 * y2 + x2 * y1).
-Proof.
-rewrite mulrDl !mulrDr mulrCA -!addrA mulrAC -mulrA; congr (_ + _).
-by rewrite mulrACA -expr2 sqrCi mulN1r addrA addrC. 
-Qed.
-
-Lemma normC2_rect :
-  {in Creal &, forall x y, `|x + 'i * y| ^+ 2 = x ^+ 2 + y ^+ 2}.
-Proof.
-move=> x y Rx Ry; rewrite /= normCK rmorphD rmorphM conjCi !conj_Creal //.
-by rewrite mulrC mulNr -subr_sqr exprMn sqrCi mulN1r opprK.
-Qed.
-
-Lemma normC2_Re_Im z : `|z| ^+ 2 = 'Re z ^+ 2 + 'Im z ^+ 2.
-Proof. by rewrite -normC2_rect -?algCrect. Qed.
-
-Lemma invC_rect :
-  {in Creal &, forall x y, (x + 'i * y)^-1  = (x - 'i * y) / (x ^+ 2 + y ^+ 2)}.
-Proof.
-by move=> x y Rx Ry; rewrite /= invC_norm conjC_rect // mulrC normC2_rect.
-Qed.
-
-Lemma lerif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is Creal).
-Proof.
-rewrite -(mono_in_lerif ler_sqr); try by rewrite qualifE normr_ge0.
-rewrite normCK conj_Creal // normC2_Re_Im -expr2.
-rewrite addrC -lerif_subLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
-by apply: lerif_eq; rewrite -realEsqr.
-Qed.
-
-Lemma lerif_Re_Creal z : 'Re z <= `|z| ?= iff (0 <= z).
-Proof.
-have ubRe: 'Re z <= `|'Re z| ?= iff (0 <= 'Re z).
-  by rewrite ger0_def eq_sym; apply/lerif_eq/real_ler_norm.
-congr (_ <= _ ?= iff _): (lerif_trans ubRe (lerif_normC_Re_Creal z)).
-apply/andP/idP=> [[zRge0 /Creal_ReP <- //] | z_ge0].
-by have Rz := ger0_real z_ge0; rewrite (Creal_ReP _ _).
-Qed.
-
-(* Equality from polar coordinates, for the upper plane. *)
-Lemma eqC_semipolar x y :
-  `|x| = `|y| -> 'Re x = 'Re y -> 0 <= 'Im x * 'Im y -> x = y.
-Proof.
-move=> eq_norm eq_Re sign_Im.
-rewrite [x]algCrect [y]algCrect eq_Re; congr (_ + 'i * _).
-have /eqP := congr1 (fun z => z ^+ 2) eq_norm.
-rewrite !normC2_Re_Im eq_Re (can_eq (addKr _)) eqf_sqr => /pred2P[] // eq_Im.
-rewrite eq_Im mulNr -expr2 oppr_ge0 real_exprn_even_le0 //= in sign_Im.
-by rewrite eq_Im (eqP sign_Im) oppr0.
-Qed.
-
-(* Nth roots. *)
-
-Let argCleP y z :
-  reflect (0 <= 'Im z -> 0 <= 'Im y /\ 'Re z <= 'Re y) (argCle y z).
-Proof.
-suffices dIm x: nnegIm x = (0 <= 'Im x).
-  rewrite /argCle !dIm ler_pmul2r ?invr_gt0 ?ltr0n //.
-  by apply: (iffP implyP) => geZyz /geZyz/andP.
-rewrite /('Im x) pmulr_lge0 ?invr_gt0 ?ltr0n //; congr (0 <= _ * _).
-case Du: algCi_subproof => [u u2N1] /=.
-have/eqP := u2N1; rewrite -sqrCi eqf_sqr => /pred2P[] //.
-have:= conjCi; rewrite /'i; case_rootC => /= v v2n1 min_v conj_v Duv.
-have{min_v} /idPn[] := min_v u isT u2N1; rewrite negb_imply /nnegIm Du /= Duv.
-rewrite rmorphN conj_v opprK -opprD mulrNN mulNr -mulr2n mulrnAr -expr2 v2n1.
-by rewrite mulNrn opprK ler0n oppr_ge0 (leC_nat 2 0).
-Qed.
-
-Lemma rootC_Re_max n x y :
-  (n > 0)%N -> y ^+ n = x -> 0 <= 'Im y -> 'Re y <= 'Re (n.-root%C x).
-Proof.
-by move=> n_gt0 yn_x leI0y; case_rootC=> z /= _ /(_ y n_gt0 yn_x)/argCleP[].
-Qed.
-
-Let neg_unity_root n : (n > 1)%N -> exists2 w : algC, w ^+ n = 1 & 'Re w < 0.
-Proof.
-move=> n_gt1; have [|w /eqP pw_0] := closed_rootP (\poly_(i < n) (1 : algC)) _.
-  by rewrite size_poly_eq ?oner_eq0 // -(subnKC n_gt1).
-rewrite horner_poly (eq_bigr _ (fun _ _ => mul1r _)) in pw_0.
-have wn1: w ^+ n = 1 by apply/eqP; rewrite -subr_eq0 subrX1 pw_0 mulr0.
-suffices /existsP[i ltRwi0]: [exists i : 'I_n, 'Re (w ^+ i) < 0].
-  by exists (w ^+ i) => //; rewrite exprAC wn1 expr1n.
-apply: contra_eqT (congr1 algRe pw_0); rewrite negb_exists => /forallP geRw0.
-rewrite raddf_sum raddf0 /= (bigD1 (Ordinal (ltnW n_gt1))) //=.
-rewrite (Creal_ReP _ _) ?rpred1 // gtr_eqF ?ltr_paddr ?ltr01 //=.
-by apply: sumr_ge0 => i _; rewrite real_lerNgt.
-Qed.
-
-Lemma Im_rootC_ge0 n x : (n > 1)%N -> 0 <= 'Im (n.-root x).
-Proof.
-set y := n.-root x => n_gt1; have n_gt0 := ltnW n_gt1.
-apply: wlog_neg; rewrite -real_ltrNge // => ltIy0.
-suffices [z zn_x leI0z]: exists2 z, z ^+ n = x & 'Im z >= 0.
-  by rewrite /y; case_rootC => /= y1 _ /(_ z n_gt0 zn_x)/argCleP[].
-have [w wn1 ltRw0] := neg_unity_root n_gt1.
-wlog leRI0yw: w wn1 ltRw0 / 0 <= 'Re y * 'Im w. 
-  move=> IHw; have: 'Re y * 'Im w \is Creal by rewrite rpredM.
-  case/real_ger0P=> [|/ltrW leRIyw0]; first exact: IHw.
-  apply: (IHw w^*); rewrite ?algRe_conj ?algIm_conj ?mulrN ?oppr_ge0 //.
-  by rewrite -rmorphX wn1 rmorph1.
-exists (w * y); first by rewrite exprMn wn1 mul1r rootCK. 
-rewrite [w]algCrect [y]algCrect mulC_rect.
-by rewrite algIm_rect ?rpredD ?rpredN 1?rpredM // addr_ge0 // ltrW ?nmulr_rgt0.
-Qed.
-
-Lemma rootC_lt0 n x : (1 < n)%N -> (n.-root x < 0) = false.
-Proof.
-set y := n.-root x => n_gt1; have n_gt0 := ltnW n_gt1.
-apply: negbTE; apply: wlog_neg => /negbNE lt0y; rewrite ler_gtF //.
-have Rx: x \is Creal by rewrite -[x](rootCK n_gt0) rpredX // ltr0_real.
-have Re_y: 'Re y = y by apply/Creal_ReP; rewrite ltr0_real.
-have [z zn_x leR0z]: exists2 z, z ^+ n = x & 'Re z >= 0.
-  have [w wn1 ltRw0] := neg_unity_root n_gt1.
-  exists (w * y); first by rewrite exprMn wn1 mul1r rootCK. 
-  by rewrite algReMr ?ltr0_real // ltrW // nmulr_lgt0.
-without loss leI0z: z zn_x leR0z / 'Im z >= 0.
-  move=> IHz; have: 'Im z \is Creal by [].
-  case/real_ger0P=> [|/ltrW leIz0]; first exact: IHz.
-  apply: (IHz z^*); rewrite ?algRe_conj ?algIm_conj ?oppr_ge0 //.
-  by rewrite -rmorphX zn_x conj_Creal.
-by apply: ler_trans leR0z _; rewrite -Re_y ?rootC_Re_max ?ltr0_real.
-Qed.
-
-Lemma rootC_ge0 n x : (n > 0)%N -> (0 <= n.-root x) = (0 <= x).
-Proof.
-set y := n.-root x => n_gt0.
-apply/idP/idP=> [/(exprn_ge0 n) | x_ge0]; first by rewrite rootCK.
-rewrite -(ger_lerif (lerif_Re_Creal y)).
-have Ray: `|y| \is Creal by apply: normr_real.
-rewrite -(Creal_ReP _ Ray) rootC_Re_max ?(Creal_ImP _ Ray) //.
-by rewrite -normrX rootCK // ger0_norm.
-Qed.
-
-Lemma rootC_gt0 n x : (n > 0)%N -> (n.-root x > 0) = (x > 0).
-Proof. by move=> n_gt0; rewrite !lt0r rootC_ge0 ?rootC_eq0. Qed.
-
-Lemma rootC_le0 n x : (1 < n)%N -> (n.-root x <= 0) = (x == 0).
-Proof.
-by move=> n_gt1; rewrite ler_eqVlt rootC_lt0 // orbF rootC_eq0 1?ltnW.
-Qed.
-
-Lemma ler_rootCl n : (n > 0)%N -> {in Num.nneg, {mono n.-root : x y / x <= y}}.
-Proof.
-move=> n_gt0 x x_ge0 y; have [y_ge0 | not_y_ge0] := boolP (0 <= y).
-  by rewrite -(ler_pexpn2r n_gt0) ?qualifE ?rootC_ge0 ?rootCK.
-rewrite (contraNF (@ler_trans _ _ 0 _ _)) ?rootC_ge0 //.
-by rewrite (contraNF (ler_trans x_ge0)).
-Qed.
-
-Lemma ler_rootC n : (n > 0)%N -> {in Num.nneg &, {mono n.-root : x y / x <= y}}.
-Proof. by move=> n_gt0 x y x_ge0 _; apply: ler_rootCl. Qed.
-
-Lemma ltr_rootCl n : (n > 0)%N -> {in Num.nneg, {mono n.-root : x y / x < y}}.
-Proof. by move=> n_gt0 x x_ge0 y; rewrite !ltr_def ler_rootCl ?eqr_rootC. Qed.
-
-Lemma ltr_rootC n : (n > 0)%N -> {in Num.nneg &, {mono n.-root : x y / x < y}}.
-Proof. by move/ler_rootC/lerW_mono_in. Qed.
-
-Lemma exprCK n x : (0 < n)%N -> 0 <= x -> n.-root (x ^+ n) = x.
-Proof.
-move=> n_gt0 x_ge0; apply/eqP.
-by rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 ?exprn_ge0 ?rootCK.
-Qed.
-
-Lemma norm_rootC n x : `|n.-root x| = n.-root `|x|.
-Proof.
-have [-> | n_gt0] := posnP n; first by rewrite !root0C normr0.
-apply/eqP; rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 ?normr_ge0 //.
-by rewrite -normrX !rootCK.
-Qed.
-
-Lemma rootCX n x k : (n > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
-Proof.
-move=> n_gt0 x_ge0; apply/eqP.
-by rewrite -(eqr_expn2 n_gt0) ?(exprn_ge0, rootC_ge0) // 1?exprAC !rootCK.
-Qed.
-
-Lemma rootC1 n : (n > 0)%N -> n.-root 1 = 1.
-Proof. by move/(rootCX 0)/(_ ler01). Qed.
-
-Lemma rootCpX n x k : (k > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
-Proof.
-by case: n => [|n] k_gt0; [rewrite !root0C expr0n gtn_eqF | apply: rootCX].
-Qed.
-
-Lemma rootCV n x : (n > 0)%N -> 0 <= x -> n.-root x^-1 = (n.-root x)^-1.
-Proof.
-move=> n_gt0 x_ge0; apply/eqP.
-by rewrite -(eqr_expn2 n_gt0) ?(invr_ge0, rootC_ge0) // !exprVn !rootCK.
-Qed.
-
-Lemma rootC_eq1 n x : (n > 0)%N -> (n.-root x == 1) = (x == 1).
-Proof. by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) eqr_rootC. Qed.
-
-Lemma rootC_ge1 n x : (n > 0)%N -> (n.-root x >= 1) = (x >= 1).
-Proof.
-by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) ler_rootCl // qualifE ler01.
-Qed.
-
-Lemma rootC_gt1 n x : (n > 0)%N -> (n.-root x > 1) = (x > 1).
-Proof. by move=> n_gt0; rewrite !ltr_def rootC_eq1 ?rootC_ge1. Qed.
-
-Lemma rootC_le1 n x : (n > 0)%N -> 0 <= x -> (n.-root x <= 1) = (x <= 1).
-Proof. by move=> n_gt0 x_ge0; rewrite -{1}(rootC1 n_gt0) ler_rootCl. Qed.
-
-Lemma rootC_lt1 n x : (n > 0)%N -> 0 <= x -> (n.-root x < 1) = (x < 1).
-Proof. by move=> n_gt0 x_ge0; rewrite !ltr_neqAle rootC_eq1 ?rootC_le1. Qed.
-
-Lemma rootCMl n x z : 0 <= x -> n.-root (x * z) = n.-root x * n.-root z.
-Proof.
-rewrite le0r => /predU1P[-> | x_gt0]; first by rewrite !(mul0r, rootC0).
-have [| n_gt1 | ->] := ltngtP n 1; last by rewrite !root1C.
-  by case: n => //; rewrite !root0C mul0r.
-have [x_ge0 n_gt0] := (ltrW x_gt0, ltnW n_gt1).
-have nx_gt0: 0 < n.-root x by rewrite rootC_gt0.
-have Rnx: n.-root x \is Creal by rewrite ger0_real ?ltrW.
-apply: eqC_semipolar; last 1 first; try apply/eqP.
-- by rewrite algImMl // !(Im_rootC_ge0, mulr_ge0, rootC_ge0).
-- by rewrite -(eqr_expn2 n_gt0) ?normr_ge0 // -!normrX exprMn !rootCK.
-rewrite eqr_le; apply/andP; split; last first.
-  rewrite rootC_Re_max ?exprMn ?rootCK ?algImMl //.
-  by rewrite mulr_ge0 ?Im_rootC_ge0 ?ltrW.
-rewrite -[n.-root _](mulVKf (negbT (gtr_eqF nx_gt0))) !(algReMl Rnx) //.
-rewrite ler_pmul2l // rootC_Re_max ?exprMn ?exprVn ?rootCK ?mulKf ?gtr_eqF //.
-by rewrite algImMl ?rpredV // mulr_ge0 ?invr_ge0 ?Im_rootC_ge0 ?ltrW.
-Qed.
-
-Lemma rootCMr n x z : 0 <= x -> n.-root (z * x) = n.-root z * n.-root x.
-Proof. by move=> x_ge0; rewrite mulrC rootCMl // mulrC. Qed.
-
-(* More properties of n.-root will be established in cyclotomic.v. *)
-
-(* The proper form of the Arithmetic - Geometric Mean inequality. *)
-
-Lemma lerif_rootC_AGM (I : finType) (A : pred I) (n := #|A|) E :
-    {in A, forall i, 0 <= E i} ->
-  n.-root (\prod_(i in A) E i) <= (\sum_(i in A) E i) / n%:R
-                             ?= iff [forall i in A, forall j in A, E i == E j].
-Proof.
-move=> Ege0; have [n0 | n_gt0] := posnP n.
-  rewrite n0 root0C invr0 mulr0; apply/lerif_refl/forall_inP=> i.
-  by rewrite (card0_eq n0).
-rewrite -(mono_in_lerif (ler_pexpn2r n_gt0)) ?rootCK //=; first 1 last.
-- by rewrite qualifE rootC_ge0 // prodr_ge0.
-- by rewrite rpred_div ?rpred_nat ?rpred_sum.
-exact: lerif_AGM.
-Qed.
-
-(* Square root. *)
-
-Lemma sqrtC0 : sqrtC 0 = 0. Proof. exact: rootC0. Qed.
-Lemma sqrtC1 : sqrtC 1 = 1. Proof. exact: rootC1. Qed.
-Lemma sqrtCK x : sqrtC x ^+ 2 = x. Proof. exact: rootCK. Qed.
-Lemma sqrCK x : 0 <= x -> sqrtC (x ^+ 2) = x. Proof. exact: exprCK. Qed.
-
-Lemma sqrtC_ge0 x : (0 <= sqrtC x) = (0 <= x). Proof. exact: rootC_ge0. Qed.
-Lemma sqrtC_eq0 x : (sqrtC x == 0) = (x == 0). Proof. exact: rootC_eq0. Qed.
-Lemma sqrtC_gt0 x : (sqrtC x > 0) = (x > 0). Proof. exact: rootC_gt0. Qed.
-Lemma sqrtC_lt0 x : (sqrtC x < 0) = false. Proof. exact: rootC_lt0. Qed.
-Lemma sqrtC_le0 x : (sqrtC x <= 0) = (x == 0). Proof. exact: rootC_le0. Qed.
-
-Lemma ler_sqrtC : {in Num.nneg &, {mono sqrtC : x y / x <= y}}.
-Proof. exact: ler_rootC. Qed.
-Lemma ltr_sqrtC : {in Num.nneg &, {mono sqrtC : x y / x < y}}.
-Proof. exact: ltr_rootC. Qed.
-Lemma eqr_sqrtC : {mono sqrtC : x y / x == y}.
-Proof. exact: eqr_rootC. Qed.
-Lemma sqrtC_inj : injective sqrtC.
-Proof. exact: rootC_inj. Qed.
-Lemma sqrtCM : {in Num.nneg &, {morph sqrtC : x y / x * y}}.
-Proof. by move=> x y _; apply: rootCMr. Qed.
-
-Lemma sqrCK_P x : reflect (sqrtC (x ^+ 2) = x) ((0 <= 'Im x) && ~~ (x < 0)).
-Proof.
-apply: (iffP andP) => [[leI0x not_gt0x] | <-]; last first.
-  by rewrite sqrtC_lt0 Im_rootC_ge0.
-have /eqP := sqrtCK (x ^+ 2); rewrite eqf_sqr => /pred2P[] // defNx.
-apply: sqrCK; rewrite -real_lerNgt // in not_gt0x; apply/Creal_ImP/ler_anti; 
-by rewrite leI0x -oppr_ge0 -raddfN -defNx Im_rootC_ge0.
-Qed.
-
-Lemma normC_def x : `|x| = sqrtC (x * x^*).
-Proof. by rewrite -normCK sqrCK ?normr_ge0. Qed.
-
-Lemma norm_conjC x : `|x^*| = `|x|.
-Proof. by rewrite !normC_def conjCK mulrC. Qed.
-
-Lemma normC_rect :
-  {in Creal &, forall x y, `|x + 'i * y| = sqrtC (x ^+ 2 + y ^+ 2)}.
-Proof. by move=> x y Rx Ry; rewrite /= normC_def -normCK normC2_rect. Qed.
-
-Lemma normC_Re_Im z : `|z| = sqrtC ('Re z ^+ 2 + 'Im z ^+ 2).
-Proof. by rewrite normC_def -normCK normC2_Re_Im. Qed.
-
-(* Norm sum (in)equalities. *)
-
-Lemma normC_add_eq x y :
-    `|x + y| = `|x| + `|y| ->
-  {t : algC | `|t| == 1 & (x, y) = (`|x| * t, `|y| * t)}.
-Proof.
-move=> lin_xy; apply: sig2_eqW; pose u z := if z == 0 then 1 else z / `|z|.
-have uE z: (`|u z| = 1) * (`|z| * u z = z).
-  rewrite /u; have [->|nz_z] := altP eqP; first by rewrite normr0 normr1 mul0r.
-  by rewrite normf_div normr_id mulrCA divff ?mulr1 ?normr_eq0.
-have [->|nz_x] := eqVneq x 0; first by exists (u y); rewrite uE ?normr0 ?mul0r.
-exists (u x); rewrite uE // /u (negPf nz_x); congr (_ , _).
-have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
-  apply/(addrI (x * x^*))/(addIr (y * y^*)); rewrite -2!{1}normCK -sqrrD.
-  by rewrite addrA -addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
-have def_xy: x * y^* = y * x^*.
-  apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
-  rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy exprMn_n exprMn.
-  by rewrite mulrN mulrAC mulrA -mulrA mulrACA -!normCK mulNrn addNr.
-have{def_xy def2xy} def_yx: `|y * x| = y * x^*.
-  by apply: (mulIf nz2); rewrite !mulr_natr mulrC normrM def2xy def_xy.
-rewrite -{1}(divfK nz_x y) invC_norm mulrCA -{}def_yx !normrM invfM.
-by rewrite mulrCA divfK ?normr_eq0 // mulrAC mulrA.
-Qed.
-
-Lemma normC_sum_eq (I : finType) (P : pred I) (F : I -> algC) :
-     `|\sum_(i | P i) F i| = \sum_(i | P i) `|F i| ->
-   {t : algC | `|t| == 1 & forall i, P i -> F i = `|F i| * t}.
-Proof.
-have [i /andP[Pi nzFi] | F0] := pickP [pred i | P i & F i != 0]; last first.
-  exists 1 => [|i Pi]; first by rewrite normr1.
-  by case/nandP: (F0 i) => [/negP[]// | /negbNE/eqP->]; rewrite normr0 mul0r.
-rewrite !(bigD1 i Pi) /= => norm_sumF; pose Q j := P j && (j != i).
-rewrite -normr_eq0 in nzFi; set c := F i / `|F i|; exists c => [|j Pj].
-  by rewrite normrM normfV normr_id divff.
-have [Qj | /nandP[/negP[]// | /negbNE/eqP->]] := boolP (Q j); last first.
-  by rewrite mulrC divfK.
-have: `|F i + F j| = `|F i| + `|F j|.
-  do [rewrite !(bigD1 j Qj) /=; set z := \sum_(k | _) `|_|] in norm_sumF.
-  apply/eqP; rewrite eqr_le ler_norm_add -(ler_add2r z) -addrA -norm_sumF addrA.
-  by rewrite (ler_trans (ler_norm_add _ _)) // ler_add2l ler_norm_sum.
-by case/normC_add_eq=> k _ [/(canLR (mulKf nzFi)) <-]; rewrite -(mulrC (F i)).
-Qed.
-
-Lemma normC_sum_eq1 (I : finType) (P : pred I) (F : I -> algC) :
-    `|\sum_(i | P i) F i| = (\sum_(i | P i) `|F i|) ->
-     (forall i, P i -> `|F i| = 1) ->
-   {t : algC | `|t| == 1 & forall i, P i -> F i = t}.
-Proof.
-case/normC_sum_eq=> t t1 defF normF.
-by exists t => // i Pi; rewrite defF // normF // mul1r.
-Qed.
-
-Lemma normC_sum_upper (I : finType) (P : pred I) (F G : I -> algC) :
-     (forall i, P i -> `|F i| <= G i) ->
-     \sum_(i | P i) F i = \sum_(i | P i) G i ->
-   forall i, P i -> F i = G i.
-Proof.
-set sumF := \sum_(i | _) _; set sumG := \sum_(i | _) _ => leFG eq_sumFG.
-have posG i: P i -> 0 <= G i by move/leFG; apply: ler_trans; apply: normr_ge0.
-have norm_sumG: `|sumG| = sumG by rewrite ger0_norm ?sumr_ge0.
-have norm_sumF: `|sumF| = \sum_(i | P i) `|F i|.
-  apply/eqP; rewrite eqr_le ler_norm_sum eq_sumFG norm_sumG -subr_ge0 -sumrB.
-  by rewrite sumr_ge0 // => i Pi; rewrite subr_ge0 ?leFG.
-have [t _ defF] := normC_sum_eq norm_sumF.
-have [/(psumr_eq0P posG) G0 i Pi | nz_sumG] := eqVneq sumG 0.
-  by apply/eqP; rewrite G0 // -normr_eq0 eqr_le normr_ge0 -(G0 i Pi) leFG.
-have t1: t = 1.
-  apply: (mulfI nz_sumG); rewrite mulr1 -{1}norm_sumG -eq_sumFG norm_sumF.
-  by rewrite mulr_suml -(eq_bigr _ defF).
-have /psumr_eq0P eqFG i: P i -> 0 <= G i - F i.
-  by move=> Pi; rewrite subr_ge0 defF // t1 mulr1 leFG.
-move=> i /eqFG/(canRL (subrK _))->; rewrite ?add0r //.
-by rewrite sumrB -/sumF eq_sumFG subrr.
-Qed.
-
-Lemma normC_sub_eq x y :
-  `|x - y| = `|x| - `|y| -> {t | `|t| == 1 & (x, y) = (`|x| * t, `|y| * t)}.
-Proof.
-rewrite -{-1}(subrK y x) => /(canLR (subrK _))/esym-Dx; rewrite Dx.
-by have [t ? [Dxy Dy]] := normC_add_eq Dx; exists t; rewrite // mulrDl -Dxy -Dy.
-Qed.
+Lemma algCreal_Im x : 'Im x \is Creal.
+Proof. by rewrite Creal_Im. Qed.
+Hint Resolve algCreal_Re algCreal_Im.
 
 (* Integer subset. *)
-
 (* Not relying on the undocumented interval library, for now. *)
+
 Lemma floorC_itv x : x \is Creal -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
 Proof. by rewrite /floorC => Rx; case: (floorC_subproof x) => //= m; apply. Qed.
 

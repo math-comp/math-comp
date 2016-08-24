@@ -288,7 +288,7 @@ Proof.
 have [q_gt4 | q_le4] := ltnP 4 q.
   pose inK x := enum_rank_in (classes1 H) (x ^: H).
   have inK_E x: x \in H -> enum_val (inK x) = x ^: H.
-    by move=> Hx; rewrite enum_rankK_in ?mem_classes. 
+    by move=> Hx; rewrite enum_rankK_in ?mem_classes.
   pose j := inK s; pose k := inK (s ^+ 2)%g; pose e := gring_classM_coef j j k.
   have cPP: abelian P by rewrite -(injm_abelian inj_sigma) ?zmod_abelian.
   have Hs: s \in H by rewrite -(sdprodW defH) -[s]mulg1 mem_mulg.
@@ -355,18 +355,19 @@ have [q_gt4 | q_le4] := ltnP 4 q.
       by rewrite sub_cent1 groupX // (subsetP cPP).
     rewrite mulrnA -second_orthogonality_relation ?groupX // big_mkcond.
     by apply: ler_sum => i _; rewrite normCK; case: ifP; rewrite ?mul_conjC_ge0.
-  have sqrtP_gt0: 0 < sqrtC #|P|%:R by rewrite sqrtC_gt0 ?gt0CG.
-  have{De ub_linH'}: `|(#|P| * e)%:R - #|U|%:R ^+ 2| <= #|P|%:R * sqrtC #|P|%:R.
+  have sqrtP_gt0: 0 < sqrtC #|P|%:R :> algC by rewrite sqrtC_gt0 ?gt0CG.
+  have{De ub_linH'}:
+    `|(#|P| * e)%:R - #|U|%:R ^+ 2| <= #|P|%:R * sqrtC #|P|%:R :> algC.
     rewrite natrM De mulrCA mulrA divfK ?neq0CG // (bigID linH) /= sum_linH.
     rewrite mulrDr addrC addKr mulrC mulr_suml /chi_s2.
     rewrite (ler_trans (ler_norm_sum _ _ _)) // -ler_pdivr_mulr // mulr_suml.
     apply: ler_trans (ub_linH' 1%N isT); apply: ler_sum => i linH'i.
     rewrite ler_pdivr_mulr // degU ?divfK ?neq0CG //.
     rewrite normrM -normrX norm_conjC ler_wpmul2l ?normr_ge0 //.
-    rewrite -ler_sqr ?qualifE ?normr_ge0 ?(@ltrW _ 0) // sqrtCK. 
+    rewrite -ler_sqr ?qualifE ?normr_ge0 ?(@ltrW _ 0) // sqrtCK.
     apply: ler_trans (ub_linH' 2 isT); rewrite (bigD1 i) ?ler_paddr //=.
     by apply: sumr_ge0 => i1 _; rewrite exprn_ge0 ?normr_ge0.
-  rewrite natrM real_ler_distl ?rpredB ?rpredM ?rpred_nat // => /andP[lb_Pe _]. 
+  rewrite natrM real_ler_distl ?rpredB ?rpredM ?rpred_nat // => /andP[lb_Pe _].
   rewrite -ltC_nat -(ltr_pmul2l (gt0CG P)) {lb_Pe}(ltr_le_trans _ lb_Pe) //.
   rewrite ltr_subr_addl (@ler_lt_trans _ ((p ^ q.-1)%:R ^+ 2)) //; last first.
     rewrite  -!natrX ltC_nat ltn_sqr oU ltn_divRL ?dvdn_pred_predX //.

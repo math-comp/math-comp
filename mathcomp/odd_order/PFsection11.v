@@ -232,7 +232,7 @@ Lemma bounded_proper_coherent H1 :
     (#|HU : H1| <= 2 * q * #|U : C| + 1)%N.
 Proof.
 move=> nsH1_M psH1_M' cohH1; have [nsHHU _ _ _ _] := sdprod_context defHU.
-suffices: #|HU : H1|%:R - 1 <= 2%:R * #|M : HC|%:R * sqrtC #|HC : HC|%:R.
+suffices: #|HU : H1|%:R - 1 <= 2%:R * #|M : HC|%:R * sqrtC #|HC : HC|%:R :> algC.
   rewrite  indexgg sqrtC1 mulr1 -leC_nat natrD -ler_subl_addr -mulnA natrM.
   congr (_ <= _ * _%:R); apply/eqP; rewrite -(eqn_pmul2l (cardG_gt0 HC)).
   rewrite Lagrange ?normal_sub // mulnCA -(dprod_card defHC) -mulnA mulnC.

@@ -969,7 +969,8 @@ Lemma cfCauchySchwarz_sqrt phi psi :
   `|'[phi, psi]| <= sqrtC '[phi] * sqrtC '[psi] ?= iff ~~ free (phi :: psi).
 Proof.
 rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE ?cfnorm_ge0 //.
-rewrite (mono_in_lerif ler_sqrtC) 1?rpredM ?qualifE ?normr_ge0 ?cfnorm_ge0 //.
+rewrite (mono_in_lerif (@ler_sqrtC _)) 1?rpredM ?qualifE;
+rewrite ?normr_ge0 ?cfnorm_ge0 //.
 exact: cfCauchySchwarz.
 Qed.
 
