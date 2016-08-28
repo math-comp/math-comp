@@ -2093,7 +2093,7 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
      let decl = pf_get_hyp gl x in
      gl,
      (if NamedDecl.is_local_def decl then args else mkVar x :: args),
-     mkProd_or_LetIn (decl |> NamedDecl.to_rel |> RelDecl.set_name (Name (f x)))
+     mkProd_or_LetIn (decl |> NamedDecl.to_rel_decl |> RelDecl.set_name (Name (f x)))
                      (subst_var x c)
   | _, Some ((x, _), None) ->
      let x = hoi_id x in
