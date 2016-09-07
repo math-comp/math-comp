@@ -422,3 +422,13 @@ End ApplyIff.
 Hint View for move/ iffLRn|2 iffRLn|2 iffLR|2 iffRL|2.
 Hint View for apply/ iffRLn|2 iffLRn|2 iffRL|2 iffLR|2.
 
+(* To focus non-ssreflect tactics on a subterm, eg vm_compute. *)
+(* Usage:                                                      *)
+(*   elim/abstract_context: (pattern) => G defG.               *)
+(*   vm_compute; rewrite {}defG {G}.                           *)
+(* Note that vm_cast are not stored in the proof term, so      *)
+(*   set here := pattern; vm_compute in (value of here)        *)
+(* blows up at Qed time.                                       *)
+Lemma abstract_context T (P : T -> Type) x :
+  (forall Q, Q = P -> Q x) -> P x.
+Proof. by move=> /(_ P); apply. Qed.
