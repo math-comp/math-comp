@@ -426,7 +426,8 @@ Hint View for apply/ iffRLn|2 iffLRn|2 iffRL|2 iffLR|2.
 (* Usage:                                                      *)
 (*   elim/abstract_context: (pattern) => G defG.               *)
 (*   vm_compute; rewrite {}defG {G}.                           *)
-(* Note that vm_cast are not stored in the proof term, so      *)
+(* Note that vm_cast are not stored in the proof term          *)
+(* for reductions occuring in the context, hence               *)
 (*   set here := pattern; vm_compute in (value of here)        *)
 (* blows up at Qed time.                                       *)
 Lemma abstract_context T (P : T -> Type) x :
