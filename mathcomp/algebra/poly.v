@@ -2545,22 +2545,21 @@ Section DecField.
 
 Variable F : decFieldType.
 
-Lemma dec_factor_theorem (p : {poly F}) : p != 0 ->
+Lemma dec_factor_theorem (p : {poly F}) :
   {s : seq F & {q : {poly F} | p = q * \prod_(x <- s) ('X - x%:P)
-                             /\ forall x, ~~ root q x }}.
+                             /\ (q != 0 -> forall x, ~~ root q x)}}.
 Proof.
 pose polyT (p : seq F) := (foldr (fun c f => f * 'X_0 + c%:T) (0%R)%:T p)%T.
 have eval_polyT (q : {poly F}) x : GRing.eval [:: x] (polyT q) = q.[x].
   by rewrite /horner; elim: (val q) => //= ? ? ->.
-elim: size {-2}p (leqnn (size p)) => [?|n IHn {p} p sp_ltSn p_neq0].
-  by move=> /size_poly_leq0P->; rewrite eqxx.
+elim: size {-2}p (leqnn (size p)) => {p} [p|n IHn p].
+  by move=> /size_poly_leq0P->; exists [::], 0; rewrite mul0r eqxx.
 have /decPcases /= := @satP F [::] ('exists 'X_0, polyT p == 0%T).
 case: ifP => [_ /sig_eqW[x]|_ noroot]; last first.
-  exists [::], p; rewrite big_nil mulr1; split => // x.
+  exists [::], p; rewrite big_nil mulr1; split => // p_neq0 x.
   by apply/negP=> /rootP rpx; apply noroot; exists x; rewrite eval_polyT.
-rewrite eval_polyT => /rootP /factor_theorem /sig_eqW [q p_eq].
-move: p_neq0 sp_ltSn; rewrite p_eq {p_eq}.
-rewrite mulf_eq0 polyXsubC_eq0 orbF => q_neq0.
+rewrite eval_polyT => /rootP /factor_theorem /sig_eqW [q ->].
+have [->|q_neq0] := eqVneq q 0; first by exists [::], 0; rewrite !mul0r eqxx.
 rewrite size_mul ?polyXsubC_eq0 // ?size_XsubC addn2 /= ltnS => sq_le_n.
 have [] // := IHn q => s [r [-> nr]]; exists (s ++ [::x]), r.
 by rewrite big_cat /= big_seq1 mulrA.
@@ -2617,15 +2616,12 @@ Proof. exact: PreClosedField.closed_nonrootP. Qed.
 Lemma closed_field_poly_normal p :
   {r : seq F | p = lead_coef p *: \prod_(z <- r) ('X - z%:P)}.
 Proof.
-apply: sig_eqW; elim: {p}_.+1 {-2}p (ltnSn (size p)) => // n IHn p le_p_n.
-have [/size1_polyC-> | p_gt1] := leqP (size p) 1.
-  by exists nil; rewrite big_nil lead_coefC alg_polyC.
-have [|x /factor_theorem[q Dp]] := closed_rootP p _; first by rewrite gtn_eqF.
-have nz_p: p != 0 by rewrite -size_poly_eq0 -(subnKC p_gt1).
-have:= nz_p; rewrite Dp mulf_eq0 lead_coefM => /norP[nz_q nz_Xx].
-rewrite ltnS polySpred // Dp size_mul // size_XsubC addn2 in le_p_n.
-have [r {1}->] := IHn q le_p_n; exists (x :: r).
-by rewrite lead_coefXsubC mulr1 big_cons -scalerAl mulrC.
+apply: sig_eqW; have [r [q [->]]] /= := dec_factor_theorem p.
+have [->|] := altP eqP; first by exists [::]; rewrite mul0r lead_coef0 scale0r.
+have [[x rqx ? /(_ isT x) /negP /(_ rqx)] //|] := altP (closed_rootP q).
+rewrite negbK => /size_poly1P [c c_neq0-> _ _]; exists r.
+rewrite mul_polyC lead_coefZ (monicP _) ?mulr1 //.
+by rewrite monic_prod => // i; rewrite monicXsubC.
 Qed.
 
 End ClosedField.
