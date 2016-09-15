@@ -193,16 +193,14 @@ Lemma binS n m : 'C(n.+1, m.+1) = 'C(n, m.+1) + 'C(n, m). Proof. by []. Qed.
 Lemma bin1 n : 'C(n, 1) = n.
 Proof. by elim: n => //= n IHn; rewrite binS bin0 IHn addn1. Qed.
 
-Lemma bin_gt0 m n : (0 < 'C(m, n)) = (n <= m).
+Lemma bin_gt0 n m : (0 < 'C(n, m)) = (m <= n).
 Proof.
-elim: m n => [|m IHm] [|n] //.
-by rewrite binS addn_gt0 !IHm orbC ltn_neqAle andKb.
+by elim: n m => [|n IHn] [|m] //; rewrite addn_gt0 !IHn orbC ltn_neqAle andKb.
 Qed.
 
-Lemma leq_bin2l m1 m2 n : m1 <= m2 -> 'C(m1, n) <= 'C(m2, n).
+Lemma leq_bin2l n1 n2 m : n1 <= n2 -> 'C(n1, m) <= 'C(n2, m).
 Proof.
-elim: m1 m2 n => [m2 | m1 IHm [|m2] //] [|n] le_m12; rewrite ?bin0 //.
-by rewrite !binS leq_add // IHm.
+by elim: n1 n2 m  => [|n1 IHn] [|n2] [|n] le_n12 //; rewrite leq_add ?IHn.
 Qed.
 
 Lemma bin_small n m : n < m -> 'C(n, m) = 0.
@@ -211,32 +209,30 @@ Proof. by rewrite ltnNge -bin_gt0; case: posnP. Qed.
 Lemma binn n : 'C(n, n) = 1.
 Proof. by elim: n => [|n IHn] //; rewrite binS bin_small. Qed.
 
-Lemma mul_Sm_binm m n : m.+1 * 'C(m, n) = n.+1 * 'C(m.+1, n.+1).
+(* Multiply to move diagonally down and right in the Pascal triangle. *)
+Lemma mul_bin_diag n m : n * 'C(n.-1, m) = m.+1 * 'C(n, m.+1).
 Proof.
-elim: m n => [|m IHm] [|n] //; first by rewrite bin0 bin1 muln1 mul1n.
-by rewrite mulSn {2}binS mulnDr addnCA !IHm -mulnDr.
+rewrite [RHS]mulnC; elim: n m => [|[|n] IHn] [|m] //=; first by rewrite bin1.
+by rewrite mulSn [in _ * _]binS mulnDr addnCA !IHn -mulnS -mulnDl -binS.
 Qed.
 
-Lemma bin_fact m n : n <= m -> 'C(m, n) * (n`! * (m - n)`!) = m`!.
+Lemma bin_fact n m : m <= n -> 'C(n, m) * (m`! * (n - m)`!) = n`!.
 Proof.
-move/subnKC; move: (m - n) => m0 <-{m}.
-elim: n => [|n IHn]; first by rewrite bin0 !mul1n.
-by rewrite -mulnA mulnCA mulnA -mul_Sm_binm -mulnA IHn.
+elim: n m => [|n IHn] [|m] // le_m_n; first by rewrite bin0 !mul1n.
+by rewrite !factS -!mulnA mulnCA mulnA -mul_bin_diag -mulnA IHn.
 Qed.
 
-(* In fact the only exception is n = 0 and m = 1 *)
-Lemma bin_factd n m : 0 < n -> 'C(n, m)  = n`! %/ (m`! * (n - m)`!).
+(* In fact the only exception for bin_factd is n = 0 and m = 1 *)
+Lemma bin_factd n m : 0 < n -> 'C(n, m) = n`! %/ (m`! * (n - m)`!).
 Proof.
-move=> n_gt0; have [/bin_fact <-|lt_n_m] := leqP m n.
-  by rewrite mulnK // muln_gt0 !fact_gt0.
-by rewrite bin_small // divnMA !divn_small ?fact_gt0 // fact_smonotone.
+have [/bin_fact<-|*] := leqP m n; first by rewrite mulnK ?muln_gt0 ?fact_gt0.
+by rewrite divnMA bin_small ?divn_small ?fact_gt0 ?fact_smonotone.
 Qed.
 
 Lemma bin_ffact n m : 'C(n, m) * m`! = n ^_ m.
 Proof.
-apply/eqP; have [lt_n_m | le_m_n] := ltnP n m.
-  by rewrite bin_small ?ffact_small.
-by rewrite -(eqn_pmul2r (fact_gt0 (n - m))) ffact_fact // -mulnA bin_fact.
+have [lt_n_m | le_m_n] := ltnP n m; first by rewrite bin_small ?ffact_small.
+by rewrite ffact_factd // -(bin_fact le_m_n) mulnA mulnK ?fact_gt0.
 Qed.
 
 Lemma bin_ffactd n m : 'C(n, m) = n ^_ m %/ m`!.
@@ -244,26 +240,35 @@ Proof. by rewrite -bin_ffact mulnK ?fact_gt0. Qed.
 
 Lemma bin_sub n m : m <= n -> 'C(n, n - m) = 'C(n, m).
 Proof.
-move=> le_m_n; apply/eqP; move/eqP: (bin_fact (leq_subr m n)).
-by rewrite subKn // -(bin_fact le_m_n) !mulnA mulnAC !eqn_pmul2r // fact_gt0.
+by move=> le_m_n; rewrite !bin_ffactd !ffact_factd ?leq_subr // divnAC subKn.
 Qed.
+
+(* Multiply to move down in the Pascal triangle. *)
+Lemma mul_bin_down n m : n * 'C(n.-1, m) = (n - m) * 'C(n, m).
+Proof.
+case: n => //= n; have [lt_n_m | le_m_n] := ltnP n m.
+  by rewrite (eqnP lt_n_m) mulnC bin_small.
+by rewrite -!['C(_, m)]bin_sub ?leqW ?subSn ?mul_bin_diag.
+Qed.
+
+(* Multiply to move left in the Pascal triangle. *)
+Lemma mul_bin_left n m : m.+1 * 'C(n, m.+1) = (n - m) * 'C(n, m).
+Proof. by rewrite -mul_bin_diag mul_bin_down. Qed.
 
 Lemma binSn n : 'C(n.+1, n) = n.+1.
 Proof. by rewrite -bin_sub ?leqnSn // subSnn bin1. Qed.
 
 Lemma bin2 n : 'C(n, 2) = (n * n.-1)./2.
-Proof.
-by case: n => //= n; rewrite -{3}[n]bin1 mul_Sm_binm mul2n half_double.
-Qed.
+Proof. by rewrite -[n.-1]bin1 mul_bin_diag -divn2 mulKn. Qed.
 
 Lemma bin2odd n : odd n -> 'C(n, 2) = n * n.-1./2.
 Proof. by case: n => // n oddn; rewrite bin2 -!divn2 muln_divA ?dvdn2. Qed.
 
 Lemma prime_dvd_bin k p : prime p -> 0 < k < p -> p %| 'C(p, k).
 Proof.
-move=> p_pr /andP[k_gt0 lt_k_p]; have def_p := ltn_predK lt_k_p.
-have: p %| p * 'C(p.-1, k.-1) by rewrite dvdn_mulr.
-by rewrite -def_p mul_Sm_binm def_p prednK // Euclid_dvdM // gtnNdvd.
+move=> p_pr /andP[k_gt0 lt_k_p].
+suffices /Gauss_dvdr<-: coprime p (p - k) by rewrite -mul_bin_down dvdn_mulr.
+by rewrite prime_coprime // dvdn_subr 1?ltnW // gtnNdvd.
 Qed.
 
 Lemma triangular_sum n : \sum_(0 <= i < n) i = 'C(n, 2).

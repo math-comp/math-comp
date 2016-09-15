@@ -1953,7 +1953,7 @@ have [gtS4alpha s4gt0]: (size S4)%:R > '[alpha] /\ (size S4 > 0)%N.
       rewrite ltn_pmul2r ?expn_gt0 ?a_gt0 // -doubleS.
       by rewrite -(prednK q_gt0) expnS mul2n leq_double ltn_expl.
     rewrite mulnA leq_pmul2r ?expn_gt0 ?a_gt0 // -(subnKC q_gt2).
-    rewrite mulnCA mulnA addSn -mul_Sm_binm bin1 -mulnA leq_pmul2l //.
+    rewrite mulnCA mulnA addSn -mul_bin_diag bin1 -mulnA leq_pmul2l //.
     by rewrite mulnS -addSnnS leq_addr.
   rewrite Dp -Da_p mul2n (addnC a.*2) expnDn -(subnKC q_gt2) !addSn add0n.
   rewrite 3!big_ord_recl big_ord_recr /= !exp1n /= bin1 binn !mul1n /bump /=.
