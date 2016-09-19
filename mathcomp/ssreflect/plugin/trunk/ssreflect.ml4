@@ -99,8 +99,8 @@ module Intset = Evar.Set
 
 type loc = Loc.t
 let dummy_loc = Loc.ghost
-let errorstrm = CErrors.errorlabstrm "ssreflect"
-let loc_error loc msg = CErrors.user_err_loc (loc, msg, str msg)
+let errorstrm msg = CErrors.user_err ~hdr:"ssreflect" msg
+let loc_error loc msg = CErrors.user_err ~loc ~hdr:msg (str msg)
 let anomaly s = CErrors.anomaly (str s)
 
 (* Compatibility with Coq 8.6 *)
@@ -1222,7 +1222,7 @@ let interp_search_notation loc s opt_scope =
         let ambig = "This string refers to a complex or ambiguous notation." in
         str ambig ++ str "\nTry searching with one of\n" ++ ntns
       with _ -> str "This string is not part of an identifier or notation." in
-    CErrors.user_err_loc (loc, "interp_search_notation", diagnosis)
+    CErrors.user_err ~loc ~hdr:"interp_search_notation" diagnosis
 
 let pr_ssr_search_item _ _ _ = pr_search_item
 
@@ -1233,7 +1233,7 @@ let is_ident s = try CLexer.check_ident s; true with _ -> false
 let is_ident_part s = is_ident ("H" ^ s)
 
 let interp_search_notation loc tag okey =
-  let err msg = CErrors.user_err_loc (loc, "interp_search_notation", msg) in
+  let err msg = CErrors.user_err ~loc ~hdr:"interp_search_notation" msg in
   let mk_pntn s for_key =
     let n = String.length s in
     let s' = String.make (n + 2) ' ' in
@@ -1454,7 +1454,7 @@ let interp_modloc mr =
   let interp_mod (_, mr) =
     let (loc, qid) = qualid_of_reference mr in
     try Nametab.full_name_module qid with Not_found ->
-    CErrors.user_err_loc (loc, "interp_modloc", str "No Module " ++ pr_qualid qid) in
+    CErrors.user_err ~loc ~hdr:"interp_modloc" (str "No Module " ++ pr_qualid qid) in
   let mr_out, mr_in = List.partition fst mr in
   let interp_bmod b = function
   | [] -> fun _ _ _ -> true
@@ -1760,7 +1760,7 @@ let pr_ssrhyp _ _ _ = pr_hyp
 let wit_ssrhyprep = add_genarg "ssrhyprep" pr_hyp
 
 let hyp_err loc msg id =
-  CErrors.user_err_loc (loc, "ssrhyp", str msg ++ pr_id id)
+  CErrors.user_err ~loc ~hdr:"ssrhyp" (str msg ++ pr_id id)
 
 let intern_hyp ist (SsrHyp (loc, id) as hyp) =
   let _ = Tacintern.intern_genarg ist (in_gen (rawwit wit_var) (loc, id)) in
@@ -2084,8 +2084,8 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   let sigma, env = project gl, pf_env gl in
   let evar_closed t p =
     if occur_existential t then
-      CErrors.user_err_loc (loc_of_cpattern p,"ssreflect",
-        pr_constr_pat t ++
+      CErrors.user_err ~loc:(loc_of_cpattern p) ~hdr:"ssreflect"
+        (pr_constr_pat t ++
         str" contains holes and matches no subterm of the goal") in
   match gen with
   | _, Some ((x, mode), None) when mode = "@" || (mode = " " && keep_let) ->
@@ -2689,7 +2689,7 @@ END
 
 (* subsets of patterns *)
 let check_ssrhpats loc w_binders ipats =
-  let err_loc s = CErrors.user_err_loc (loc, "ssreflect", s) in
+  let err_loc s = CErrors.user_err ~loc ~hdr:"ssreflect" s in
   let clr, ipats =
     let rec aux clr = function
       | IpatSimpl (cl, Nop) :: tl -> aux (clr @ cl) tl
