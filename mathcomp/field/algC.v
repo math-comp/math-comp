@@ -445,8 +445,8 @@ rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
-Program Definition conjMixin :=
-  ImaginaryMixin (svalP (imaginary_exists closedFieldType)) 
+Definition conjMixin :=
+  ImaginaryMixin (svalP (imaginary_exists closedFieldType))
                  (fun x => esym (normK x)).
 Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
 
