@@ -30,6 +30,7 @@ open Pcoq.Constr
 open Genarg
 open Stdarg
 open Constrarg
+open Tacarg
 open Term
 open Vars
 open Context
@@ -45,6 +46,7 @@ open Coqlib
 open Glob_term
 open Util
 open Evd
+open Proofview.Notations
 open Sigma.Notations
 open Extend
 open Goptions
@@ -52,7 +54,7 @@ open Tacexpr
 open Tacinterp
 open Pretyping
 open Constr
-open Tactic
+open Pltac
 open Extraargs
 open Ppconstr
 open Printer
@@ -471,7 +473,7 @@ let _ =
       Goptions.optwrite = (fun _ -> 
         Lib.add_anonymous_leaf (inVersion ssrAstVersion)) }
 
-let tactic_expr = Tactic.tactic_expr
+let tactic_expr = Pltac.tactic_expr
 let gallina_ext = Vernac_.gallina_ext 
 let sprintf = Printf.sprintf
 let tactic_mode = G_ltac.tactic_mode
@@ -6205,8 +6207,8 @@ END
 (* longer and thus comment out. Such comments are marked with v8.3     *)
 
 GEXTEND Gram
-  GLOBAL: Tactic.hypident;
-  Tactic.hypident: [
+  GLOBAL: Pltac.hypident;
+  Pltac.hypident: [
   [ "("; IDENT "type"; "of"; id = Prim.identref; ")" -> id, InHypTypeOnly
   | "("; IDENT "value"; "of"; id = Prim.identref; ")" -> id, InHypValueOnly
   ] ];
@@ -6223,8 +6225,8 @@ hloc: [
 END
 
 GEXTEND Gram
-  GLOBAL: Tactic.constr_eval;
-  Tactic.constr_eval: [
+  GLOBAL: Pltac.constr_eval;
+  Pltac.constr_eval: [
     [ IDENT "type"; "of"; c = Constr.constr -> Genredexpr.ConstrTypeOf c ]
   ];
 END
