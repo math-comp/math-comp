@@ -29,7 +29,7 @@ open Pcoq.Prim
 open Pcoq.Constr
 open Genarg
 open Stdarg
-open Constrarg
+open Stdarg
 open Term
 open Vars
 open Context
