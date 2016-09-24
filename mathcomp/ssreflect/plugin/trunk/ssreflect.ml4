@@ -29,7 +29,7 @@ open Pcoq.Prim
 open Pcoq.Constr
 open Genarg
 open Stdarg
-open Stdarg
+open Tacarg
 open Term
 open Vars
 open Context
@@ -45,6 +45,7 @@ open Coqlib
 open Glob_term
 open Util
 open Evd
+open Proofview.Notations
 open Sigma.Notations
 open Extend
 open Goptions
