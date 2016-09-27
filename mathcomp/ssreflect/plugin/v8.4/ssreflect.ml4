@@ -1447,7 +1447,7 @@ let interp_modloc mr =
 (* The unified, extended vernacular "Search" command *)
 
 let ssrdisplaysearch gr env t =
-  let pr_res = pr_global gr ++ spc () ++ str " " ++ pr_lconstr_env env t in
+  let pr_res = pr_global gr ++ str ":" ++ spc () ++ pr_lconstr_env env t in
   msg (hov 2 pr_res ++ fnl ())
 
 VERNAC COMMAND EXTEND SsrSearchPattern
