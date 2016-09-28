@@ -20,6 +20,8 @@ algebra/ssrint.v
 algebra/ssrnum.v
 algebra/vector.v
 algebra/zmodp.v
+algebra/forms.v
+algebra/spectral.v
 all/all.v
 character/all_character.v
 character/character.v
