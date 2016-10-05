@@ -177,8 +177,8 @@ Hint Resolve eq_refl eq_sym.
 
 Section Contrapositives.
 
-Variable T : eqType.
-Implicit Types (A : pred T) (b : bool) (x : T).
+Variables (T1 T2 : eqType).
+Implicit Types (A : pred T1) (b : bool) (x : T1) (z : T2).
 
 Lemma contraTeq b x y : (x != y -> ~~ b) -> b -> x = y.
 Proof. by move=> imp hyp; apply/eqP; apply: contraTT hyp. Qed.
@@ -207,10 +207,10 @@ Proof. by move=> imp /eqP; apply: contraTF. Qed.
 Lemma contra_eqT b x y : (~~ b -> x != y) -> x = y -> b.
 Proof. by move=> imp /eqP; apply: contraLR. Qed.
 
-Lemma contra_eq x1 y1 x2 y2 : (x2 != y2 -> x1 != y1) -> x1 = y1 -> x2 = y2.
+Lemma contra_eq z1 z2 x1 x2 : (x1 != x2 -> z1 != z2) -> z1 = z2 -> x1 = x2.
 Proof. by move=> imp /eqP; apply: contraTeq. Qed.
 
-Lemma contra_neq x1 y1 x2 y2 : (x2 = y2 -> x1 = y1) -> x1 != y1 -> x2 != y2.
+Lemma contra_neq z1 z2 x1 x2 : (x1 = x2 -> z1 = z2) -> z1 != z2 -> x1 != x2.
 Proof. by move=> imp; apply: contraNneq => /imp->. Qed.
 
 Lemma memPn A x : reflect {in A, forall y, y != x} (x \notin A).
@@ -230,8 +230,8 @@ Proof. by rewrite eq_sym; apply: ifN. Qed.
 
 End Contrapositives.
 
-Implicit Arguments memPn [T A x].
-Implicit Arguments memPnC [T A x].
+Implicit Arguments memPn [T1 A x].
+Implicit Arguments memPnC [T1 A x].
 
 Theorem eq_irrelevance (T : eqType) x y : forall e1 e2 : x = y :> T, e1 = e2.
 Proof.
