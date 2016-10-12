@@ -1139,7 +1139,7 @@ let interp_view_nbimps ist gl rc =
     let si = sig_it gl in
     let gl = re_sig si sigma in
     let pl, c = splay_open_constr gl t in
-    if isAppInd gl c then List.length pl else ~-(List.length pl)
+    if isAppInd gl c then List.length pl else (-(List.length pl))
   with _ -> 0
 
 (* }}} *)
