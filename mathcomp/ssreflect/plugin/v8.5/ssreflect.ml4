@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 
 (* This line is read by the Makefile's dist target: do not remove. *)
@@ -8,7 +8,7 @@ let ssrAstVersion = 1;;
 let () = Mltop.add_known_plugin (fun () ->
   if Flags.is_verbose () && not !Flags.batch_mode then begin
     Printf.printf "\nSmall Scale Reflection version %s loaded.\n" ssrversion;
-    Printf.printf "Copyright 2005-2014 Microsoft Corporation and INRIA.\n";
+    Printf.printf "Copyright 2005-2016 Microsoft Corporation and INRIA.\n";
     Printf.printf "Distributed under the terms of the CeCILL-B license.\n\n"
   end)
   "ssreflect_plugin"
