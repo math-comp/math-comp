@@ -2476,13 +2476,13 @@ Lemma flatten_cat ss1 ss2 :
 Proof. by elim: ss1 => //= s ss1 ->; rewrite catA. Qed.
 
 Lemma size_reshape sh s : size (reshape sh s) = size sh.
-Proof. elim: sh s => //= s0 sh IHsh s; by rewrite IHsh. Qed.
+Proof. by elim: sh s => //= s0 sh IHsh s; rewrite IHsh. Qed.
 
 Lemma nth_reshape (sh : seq nat) l n :
   nth [::] (reshape sh l) n = take (nth 0 sh n) (drop (sumn (take n sh)) l).
 Proof.
 elim: n sh l => [| n IHn] [| sh0 sh] l; rewrite ?take0 ?drop0 //=.
-rewrite addnC -drop_drop; exact: IHn.
+by rewrite addnC -drop_drop; apply: IHn.
 Qed.
 
 Lemma flattenK ss : reshape (shape ss) (flatten ss) = ss.
@@ -2515,7 +2515,7 @@ Proof. by elim: ss => //= s ss IHss; rewrite count_cat IHss. Qed.
 
 Lemma filter_flatten ss (P : pred T) :
   filter P (flatten ss) = flatten [seq filter P i | i <- ss].
-Proof. elim: ss => // s ss /= <-; exact: filter_cat. Qed.
+Proof. by elim: ss => // s ss /= <-; apply: filter_cat. Qed.
 
 Lemma rev_flatten ss :
   rev (flatten ss) = flatten (rev (map rev ss)).
@@ -2569,11 +2569,11 @@ Proof. by elim: ss => // s ss /= <-; apply: map_cat. Qed.
 
 Lemma sumn_flatten (ss : seq (seq nat)) :
   sumn (flatten ss) = sumn (map sumn ss).
-Proof. elim: ss => // s ss /= <-; exact: sumn_cat. Qed.
+Proof. by elim: ss => // s ss /= <-; apply: sumn_cat. Qed.
 
 Lemma map_reshape T S (f : T -> S) sh s :
   map (map f) (reshape sh s) = reshape sh (map f s).
-Proof. elim: sh s => //= sh0 sh IHsh s; by rewrite map_take IHsh map_drop. Qed.
+Proof. by elim: sh s => //= sh0 sh IHsh s; rewrite map_take IHsh map_drop. Qed.
 
 
 Section EqFlatten.
