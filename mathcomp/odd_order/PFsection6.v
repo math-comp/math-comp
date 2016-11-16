@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -83,13 +83,13 @@ Lemma coherent_seqIndD_bound (A B C D : {group gT}) :
   (*a*) [/\ A \proper K, B \subset D, D \subset C, C \subset K
           & D / B \subset 'Z(C / B)]%g ->
   (*b*) coherent (S A) L^# tau -> \unless coherent (S B) L^# tau,
-  #|K : A|%:R - 1 <= 2%:R * #|L : C|%:R * sqrtC #|C : D|%:R.
+  #|K : A|%:R - 1 <= 2%:R * #|L : C|%:R * sqrtC #|C : D|%:R :> algC.
 Proof.
 move=> [nsAL nsBL nsCL nsDL] [ltAK sBD sDC sCK sDbZC] cohA.
 have sBC := subset_trans sBD sDC; have sBK := subset_trans sBC sCK.
 have [sAK nsBK] := (proper_sub ltAK, normalS sBK sKL nsBL).
 have{sBC} [nsAK nsBC] := (normalS sAK sKL nsAL, normalS sBC sCK nsBK).
-rewrite real_lerNgt ?rpredB ?ger0_real ?mulr_ge0 ?sqrtC_ge0 ?ler0n //.
+rewrite real_lerNgt ?rpredB ?ger0_real ?mulr_ge0 ?sqrtC_ge0 ?ler0n ?ler01 //.
 apply/unless_contra; rewrite negbK -(Lagrange_index sKL sCK) natrM => lb_KA.
 pose S2 : seq 'CF(L) := [::]; pose S1 := S2 ++ S A; rewrite -[S A]/S1 in cohA.
 have ccsS1S: cfConjC_subset S1 calS by apply: seqInd_conjC_subset1.
@@ -153,7 +153,7 @@ have sAbZH: (A / B \subset 'Z(H / B))%g.
   by apply: homg_quotientS; rewrite ?(subset_trans sHL) ?normal_norm.
 have ltAH: A \proper H.
   by rewrite properEneq sAH (contraTneq _ lbHA) // => ->; rewrite indexgg addn1.
-set x := sqrtC #|H : A|%:R.
+set x : algC := sqrtC #|H : A|%:R.
 have [nz_x x_gt0]: x != 0 /\ 0 < x by rewrite gtr_eqF sqrtC_gt0 gt0CiG.
 without loss{cohA} ubKA: / #|K : A|%:R - 1 <= 2%:R * #|L : H|%:R * x.
   have [sAK ltAK] := (subset_trans sAH sHK, proper_sub_trans ltAH sHK).

@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -232,7 +232,7 @@ Structure base_type : Type := PackBase {
 (* coercion of A * B to pred_sort in x \in A * B, or rho * tau to *)
 (* ffun and Funclass in (rho * tau) x, when rho tau : perm T.     *)
 (*   Therefore we define an alias of sort for argument types, and *)
-(* make it the default coercion FinGroup.base_class >-> Sortclass *)
+(* make it the default coercion FinGroup.base_type >-> Sortclass  *)
 (* so that arguments of a functions whose parameters are of type, *)
 (* say, gT : finGroupType, can be coerced to the coercion class   *)
 (* of arg_sort. Care should be taken, however, to declare the     *)

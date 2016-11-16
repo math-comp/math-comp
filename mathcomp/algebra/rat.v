@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -11,8 +11,6 @@ Require Import bigop ssralg div ssrnum ssrint.
 (* structure of archimedean, real field, with int and nat declared as closed  *)
 (* subrings.                                                                  *)
 (*          rat == the type of rational number, with single constructor Rat   *)
-(*      Rat p h == the element of type rat build from p a pair of integers and*)
-(*                 h a proof of (0 < p.2) && coprime `|p.1| `|p.2|            *)
 (*         n%:Q == explicit cast from int to rat, postfix notation for the    *)
 (*                 ratz constant                                              *)
 (*       numq r == numerator of (r : rat)                                     *)

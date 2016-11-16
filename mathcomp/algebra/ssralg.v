@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -5107,6 +5107,12 @@ Variable F : closedFieldType.
 Lemma solve_monicpoly : ClosedField.axiom F.
 Proof. by case: F => ? []. Qed.
 
+Lemma imaginary_exists : {i : F | i ^+ 2 = -1}.
+Proof.
+have /sig_eqW[i Di2] := @solve_monicpoly 2 (nth 0 [:: -1]) isT.
+by exists i; rewrite Di2 !big_ord_recl big_ord0 mul0r mulr1 !addr0.
+Qed.
+
 End ClosedFieldTheory.
 
 Module SubType.
@@ -5741,6 +5747,7 @@ Definition rmorph_alg := rmorph_alg.
 Definition lrmorphismP := lrmorphismP.
 Definition can2_lrmorphism := can2_lrmorphism.
 Definition bij_lrmorphism := bij_lrmorphism.
+Definition imaginary_exists := imaginary_exists.
 
 Notation null_fun V := (null_fun V) (only parsing).
 Notation in_alg A := (in_alg_loc A).

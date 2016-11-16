@@ -1,3 +1,16 @@
+25/08/2016 - refactoring of algC and complex in ssrnum  - development version
+	* ssrnum's interface numClosedFieldType factors some theory from
+	  both complex and algC. Because of that Re, Im, 'i, conjC, n.-root
+	  and sqrtC are not specialized to algC anymore. In case of
+	  ambiguity, they should be instanciated with algC using typing
+	  constraints. Moreoever some lemmas from the theory like conjCK
+	  have an extra nonmaximal implicit argument (C :
+	  numClosedFieldType) which could break some proofs. Additionally,
+	  ad-hoc constructions from complex.v like -*+ or complex.Re are now
+	  deprecated and one should rely solely on the ssrnum interface. The
+	  next revision might definietly hide those constructions under a
+	  module.
+
 24/11/2015 - major reorganization of the archive - version 1.6
 	* Files split into subdirectories: ssreflect, algebra, fingroup,
 	  solvable, field and character. In this way the user can decide

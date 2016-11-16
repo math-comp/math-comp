@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -441,15 +441,18 @@ CoInductive eqn0_xor_gt0 n : bool -> bool -> Set :=
 Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
 Proof. by case: n; constructor. Qed.
 
-CoInductive compare_nat m n : bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n true false false
-  | CompareNatGt of m > n : compare_nat m n false true false
-  | CompareNatEq of m = n : compare_nat m n false false true.
+CoInductive compare_nat m n : bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | CompareNatLt of m < n : compare_nat m n true false true false false false
+  | CompareNatGt of m > n : compare_nat m n false true false true false false
+  | CompareNatEq of m = n : compare_nat m n true true false false true true.
 
-Lemma ltngtP m n : compare_nat m n (m < n) (n < m) (m == n).
+Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n) (n < m) (n == m) (m == n).
 Proof.
-rewrite ltn_neqAle eqn_leq; case: ltnP; first by constructor.
-by rewrite leq_eqVlt orbC; case: leqP; constructor; first apply/eqnP.
+rewrite !ltn_neqAle [_ == m]eq_sym; case: ltnP => [mn|].
+  by rewrite ltnW // gtn_eqF //; constructor.
+rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_nm eq_mn.
+  by rewrite ltn_eqF //; constructor.
+by rewrite eq_mn; constructor; apply/eqP.
 Qed.
 
 (* Monotonicity lemmas *)
@@ -562,7 +565,7 @@ Lemma maxnC : commutative maxn.
 Proof. by move=> m n; rewrite /maxn; case ltngtP. Qed.
 
 Lemma maxnE m n : maxn m n = m + (n - m).
-Proof. by rewrite /maxn addnC; case: leqP => [/eqnP-> | /ltnW/subnK]. Qed.
+Proof. by rewrite /maxn addnC; case: leqP => [/eqnP->|/ltnW/subnK]. Qed.
 
 Lemma maxnAC : right_commutative maxn.
 Proof. by move=> m n p; rewrite !maxnE -!addnA !subnDA -!maxnE maxnC. Qed.
@@ -1591,3 +1594,15 @@ Ltac nat_congr := first
      apply: (congr1 (addn X1) _);
      symmetry
    end ].
+
+Module mc_1_6.
+
+CoInductive compare_nat m n : bool -> bool -> bool -> Set :=
+  | CompareNatLt of m < n : compare_nat m n true false false
+  | CompareNatGt of m > n : compare_nat m n false true false
+  | CompareNatEq of m = n : compare_nat m n false false true.
+
+Lemma ltngtP m n : compare_nat m n (m < n) (n < m) (m == n).
+Proof. by case: ltngtP; constructor. Qed.
+
+End mc_1_6.

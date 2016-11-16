@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 
 (* Defining grammar rules with "xx" in it automatically declares keywords too,
@@ -878,7 +878,36 @@ let pr_ssrpattern_roundp  _ _ _ = pr_pattern_roundp
 
 let wit_rpatternty = add_genarg "rpatternty" pr_pattern
 
-ARGUMENT EXTEND rpattern TYPED AS rpatternty PRINTED BY pr_rpattern
+let glob_ssrterm gs = function
+  | k, (_, Some c) -> k,
+      let x = Tacintern.intern_constr gs c in
+      fst x, Some c
+  | ct -> ct
+
+let glob_rpattern s p =
+  match p with
+  | T t -> T (glob_ssrterm s t)
+  | In_T t -> In_T (glob_ssrterm s t)
+  | X_In_T(x,t) -> X_In_T (x,glob_ssrterm s t)
+  | In_X_In_T(x,t) -> In_X_In_T (x,glob_ssrterm s t)
+  | E_In_X_In_T(e,x,t) -> E_In_X_In_T (glob_ssrterm s e,x,glob_ssrterm s t)
+  | E_As_X_In_T(e,x,t) -> E_As_X_In_T (glob_ssrterm s e,x,glob_ssrterm s t)
+
+let subst_ssrterm s (k, c) = k, Tacsubst.subst_glob_constr_and_expr s c
+
+let subst_rpattern s = function
+  | T t -> T (subst_ssrterm s t)
+  | In_T t -> In_T (subst_ssrterm s t)
+  | X_In_T(x,t) -> X_In_T (x,subst_ssrterm s t)
+  | In_X_In_T(x,t) -> In_X_In_T (x,subst_ssrterm s t)
+  | E_In_X_In_T(e,x,t) -> E_In_X_In_T (subst_ssrterm s e,x,subst_ssrterm s t)
+  | E_As_X_In_T(e,x,t) -> E_As_X_In_T (subst_ssrterm s e,x,subst_ssrterm s t)
+
+ARGUMENT EXTEND rpattern
+  TYPED AS rpatternty
+  PRINTED BY pr_rpattern
+  GLOBALIZED BY glob_rpattern
+  SUBSTITUTED BY subst_rpattern
   | [ lconstr(c) ] -> [ T (mk_lterm c) ]
   | [ "in" lconstr(c) ] -> [ In_T (mk_lterm c) ]
   | [ lconstr(x) "in" lconstr(c) ] -> 
@@ -1264,12 +1293,17 @@ let is_wildcard = function
   | _ -> false
 
 (* "ssrpattern" *)
-let pr_ssrpatternarg _ _ _ cpat = pr_rpattern cpat
+let pr_ssrpatternarg _ _ _ (_,cpat) = pr_rpattern cpat
+let pr_ssrpatternarg_glob _ _ _ cpat = pr_rpattern cpat
+let interp_ssrpatternarg ist gl p = project gl, (ist, p)
 
 ARGUMENT EXTEND ssrpatternarg
-  TYPED AS rpattern
   PRINTED BY pr_ssrpatternarg
-| [ "[" rpattern(pat) "]" ] -> [ pat ]
+  INTERPRETED BY interp_ssrpatternarg
+  GLOBALIZED BY glob_rpattern
+  RAW_TYPED AS rpattern RAW_PRINTED BY pr_ssrpatternarg_glob
+  GLOB_TYPED AS rpattern GLOB_PRINTED BY pr_ssrpatternarg_glob
+| [ rpattern(pat) ] -> [ pat ]
 END
   
 let pf_merge_uc uc gl =
@@ -1278,8 +1312,8 @@ let pf_merge_uc uc gl =
 let pf_unsafe_merge_uc uc gl =
   re_sig (sig_it gl) (Evd.set_universe_context (project gl) uc)
 
-let ssrpatterntac ist arg gl =
-  let pat = interp_rpattern ist gl arg in
+let ssrpatterntac _ist (arg_ist,arg) gl =
+  let pat = interp_rpattern arg_ist gl arg in
   let sigma0 = project gl in
   let concl0 = pf_concl gl in
   let (t, uc), concl_x =

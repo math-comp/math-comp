@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -492,7 +492,7 @@ Definition subcoherent S tau R :=
       (*c*) pairwise_orthogonal S,
       (*d*) {in S, forall xi : 'CF(L : {set gT}),
               [/\ {subset R xi <= 'Z[irr G]}, orthonormal (R xi)
-                & tau (xi - xi^*)%CF = \sum_(alpha <- R xi) alpha]}
+                & tau (xi - xi^*%CF) = \sum_(alpha <- R xi) alpha]}
     & (*e*) {in S &, forall xi phi : 'CF(L),
               orthogonal phi (xi :: xi^*%CF) -> orthogonal (R phi) (R xi)}].
 
@@ -621,7 +621,7 @@ have isoS1: {in S1, isometry [eta tau with eta1 |-> zeta1], to 'Z[irr G]}.
   split=> [xi eta | eta]; rewrite !in_cons /=; last first.
     by case: eqP => [-> | _  /isoS[/Ztau/zcharW]].
   do 2!case: eqP => [-> _|_  /isoS[? ?]] //; last exact: Itau.
-  by apply/(can_inj conjCK); rewrite -!cfdotC.
+  by apply/(can_inj (@conjCK _)); rewrite -!cfdotC.
 have [nu Dnu IZnu] := Zisometry_of_iso freeS1 isoS1.
 exists nu; split=> // phi; rewrite zcharD1E => /andP[].
 case/(zchar_expansion (free_uniq freeS1)) => b Zb {phi}-> phi1_0.
@@ -646,7 +646,7 @@ have N_S: {subset S <= character} by move=> _ /irrS/irrP[i ->]; apply: irr_char.
 have Z_S: {subset S <= 'Z[irr L]} by move=> chi /N_S/char_vchar.
 have o1S: orthonormal S by apply: sub_orthonormal (irr_orthonormal L).
 have [[_ dotSS] oS] := (orthonormalP o1S, orthonormal_orthogonal o1S).
-pose beta chi := tau (chi - chi^*)%CF; pose eqBP := _ =P beta _.
+pose beta chi := tau (chi - chi^*%CF); pose eqBP := _ =P beta _.
 have Zbeta: {in S, forall chi, chi - (chi^*)%CF \in 'Z[S, L^#]}.
   move=> chi Schi; rewrite /= zcharD1E rpredB ?mem_zchar ?ccS //= !cfunE.
   by rewrite subr_eq0 conj_Cnat // Cnat_char1 ?N_S.
@@ -885,7 +885,7 @@ Lemma subcoherent_norm chi psi (tau1 : {additive 'CF(L) -> 'CF(G)}) X Y :
     [/\ chi \in S, psi \in 'Z[irr L] & orthogonal (chi :: chi^*)%CF psi] ->
     let S0 := chi - psi :: chi - chi^*%CF in
     {in 'Z[S0], isometry tau1, to 'Z[irr G]} ->
-    tau1 (chi - chi^*)%CF = tau (chi - chi^*)%CF ->
+    tau1 (chi - chi^*%CF) = tau (chi - chi^*%CF) ->
     [/\ tau1 (chi - psi) = X - Y, '[X, Y] = 0 & orthogonal Y (R chi)] ->
  [/\ (*a*) '[chi] <= '[X]
    & (*b*) '[psi] <= '[Y] ->
