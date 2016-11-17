@@ -93,7 +93,7 @@ Require Import perm zmodp matrix.
 (*                   capmx_gen A B is a rectangular matrix equivalent to     *)
 (*                   (A :&: B)%MS, i.e., (capmx_gen A B == A :&: B)%MS.      *)
 (*    proj_mx A B == a square matrix that projects (A + B)%MS onto A         *)
-(*                   parellel to B, when (A :&: B)%MS = 0 (A and B must also *)
+(*                   parallel to B, when (A :&: B)%MS = 0 (A and B must also *)
 (*                   be square).                                             *)
 (*     mxdirect S == the sum expression S is a direct sum. This is a NON     *)
 (*                   EXTENSIONAL notation: the exact boolean expression is   *)
