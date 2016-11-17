@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -108,10 +108,7 @@ Qed.
 Lemma muP p x n : p != 0 ->
   (('X - x%:P)^+n %| p) && ~~(('X - x%:P)^+n.+1 %| p) = (n == \mu_x p).
 Proof.
-move=> hp0; rewrite !root_le_mu//; case: (ltngtP n (\mu_x p))=> hn.
-+ by rewrite ltnW//=.
-+ by rewrite leqNgt hn.
-+ by rewrite hn leqnn.
+by move=> hp0; rewrite !root_le_mu//; case: (ltngtP n (\mu_x p)).
 Qed.
 
 Lemma mu_gt0 p x : p != 0 -> (0 < \mu_x p)%N = root p x.

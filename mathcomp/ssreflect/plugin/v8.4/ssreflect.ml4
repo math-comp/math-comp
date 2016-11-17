@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 
 (* This line is read by the Makefile's dist target: do not remove. *)
@@ -10,7 +10,7 @@ let () = Mltop.add_known_plugin (fun () ->
     Printf.printf "Copyright 2005-2012 Microsoft Corporation and INRIA.\n";
     Printf.printf "Distributed under the terms of the CeCILL-B license.\n\n"
   end)
-  "ssreflect"
+  "ssreflect_plugin"
 ;;
 (* Defining grammar rules with "xx" in it automatically declares keywords too *)
 let frozen_lexer = Lexer.freeze () ;;
@@ -1447,7 +1447,7 @@ let interp_modloc mr =
 (* The unified, extended vernacular "Search" command *)
 
 let ssrdisplaysearch gr env t =
-  let pr_res = pr_global gr ++ spc () ++ str " " ++ pr_lconstr_env env t in
+  let pr_res = pr_global gr ++ str ":" ++ spc () ++ pr_lconstr_env env t in
   msg (hov 2 pr_res ++ fnl ())
 
 VERNAC COMMAND EXTEND SsrSearchPattern

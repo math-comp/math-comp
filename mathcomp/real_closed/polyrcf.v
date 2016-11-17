@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -359,48 +359,6 @@ rewrite mulrDl mulrDl divff; last by rewrite -mulr2n pnatr_eq0.
 rewrite !mul1r mulrC -ltr_subl_addr.
 by rewrite (ler_lt_trans _ (He' y _)) // ler_sub_dist.
 Qed.
-
-(* Todo : orderedpoly !! *)
-(* Lemma deriv_expz_nat (n : nat) p : (p ^ n)^`() = (p^`() * p ^ (n.-1)) *~ n. *)
-(* Proof. *)
-(* elim: n => [|n ihn] /= in p *; first by rewrite expr0z derivC mul0zr. *)
-(* rewrite exprSz_nat derivM ihn mulzrAr mulrCA -exprSz_nat. *)
-(* by case: n {ihn}=> [|n] //; rewrite mul0zr addr0 mul1zr. *)
-(* Qed. *)
-
-(* Definition derivCE := (derivE, deriv_expz_nat). *)
-
-(* Lemma size_poly_ind : forall K : {poly R} -> Prop, *)
-(*   K 0 ->  *)
-(*   (forall p sp, size p = sp.+1 ->   *)
-(*     forall q, (size q <= sp)%N -> K q -> K p) *)
-(*   -> forall p, K p. *)
-(* Proof. *)
-(* move=> K K0 ihK p. *)
-(* move: {-2}p (leqnn (size p)); elim: (size p)=> {p} [|n ihn] p spn. *)
-(*   by move: spn; rewrite leqn0 size_poly_eq0; move/eqP->. *)
-(* case spSn: (size p == n.+1). *)
-(*   move/eqP:spSn; move/ihK=> ihKp; apply: (ihKp 0)=>//. *)
-(*   by rewrite size_poly0. *)
-(* by move:spn; rewrite leq_eqVlt spSn /= ltnS; by move/ihn.  *)
-(* Qed. *)
-
-(* Lemma size_poly_indW : forall K : {poly R} -> Prop, *)
-(*   K 0 ->  *)
-(*   (forall p sp, size p = sp.+1 ->   *)
-(*     forall q, size q = sp -> K q -> K p) *)
-(*   -> forall p, K p. *)
-(* Proof. *)
-(* move=> K K0 ihK p. *)
-(* move: {-2}p (leqnn (size p)); elim: (size p)=> {p} [|n ihn] p spn. *)
-(*   by move: spn; rewrite leqn0 size_poly_eq0; move/eqP->. *)
-(* case spSn: (size p == n.+1). *)
-(*   move/eqP:spSn; move/ihK=> ihKp; case: n ihn spn ihKp=> [|n] ihn spn ihKp. *)
-(*     by apply: (ihKp 0)=>//; rewrite size_poly0. *)
-(*   apply: (ihKp 'X^n)=>//; first by rewrite size_polyXn. *)
-(*   by apply: ihn; rewrite size_polyXn. *)
-(* by move:spn; rewrite leq_eqVlt spSn /= ltnS; by move/ihn.  *)
-(* Qed. *)
 
 Lemma poly_ltsp_roots p (rs : seq R) :
   (size rs >= size p)%N -> uniq rs -> all (root p) rs -> p = 0.

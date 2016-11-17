@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -259,12 +259,6 @@ by rewrite Dp map_monic; exists p; rewrite // -Dp root_minPoly.
 Qed.
 Prenex Implicits alg_integral.
 
-Lemma imaginary_exists (C : closedFieldType) : {i : C | i ^+ 2 = -1}.
-Proof.
-have /sig_eqW[i Di2] := @solve_monicpoly C 2 (nth 0 [:: -1]) isT.
-by exists i; rewrite Di2 big_ord_recl big_ord1 mul0r mulr1 !addr0.
-Qed.
-
 Import DefaultKeying GRing.DefaultPred.
 Implicit Arguments map_poly_inj [[F] [R] x1 x2].
 
@@ -275,7 +269,7 @@ Proof.
 have maxn3 n1 n2 n3: {m | [/\ n1 <= m, n2 <= m & n3 <= m]%N}.
   by exists (maxn n1 (maxn n2 n3)); apply/and3P; rewrite -!geq_max.
 have [C [/= QtoC algC]] := countable_algebraic_closure [countFieldType of rat].
-exists C; have [i Di2] := imaginary_exists C.
+exists C; have [i Di2] := GRing.imaginary_exists C.
 pose Qfield := fieldExtType rat; pose Cmorph (L : Qfield) := {rmorphism L -> C}.
 have charQ (L : Qfield): [char L] =i pred0 := ftrans (char_lalg L) (char_num _).
 have sepQ  (L : Qfield) (K E : {subfield L}): separable K E.

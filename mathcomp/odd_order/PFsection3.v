@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
@@ -1360,7 +1360,7 @@ have{oxi_00} oxi_i0 i j i0: '[xi_ i j, xi_ i0 0] = ((i == i0) && (j == 0))%:R.
   by rewrite cfdotC Xi0_X0j // conjC0.
 have [-> | nzi2] := altP (i2 =P 0); first exact: oxi_0j.
 have [-> | nzj2] := altP (j2 =P 0); first exact: oxi_i0.
-rewrite cfdotC eq_sym; apply: canLR conjCK _; rewrite rmorph_nat.
+rewrite cfdotC eq_sym; apply: canLR (@conjCK _) _; rewrite rmorph_nat.
 have [-> | nzi1] := altP (i1 =P 0); first exact: oxi_0j.
 have [-> | nzj1] := altP (j1 =P 0); first exact: oxi_i0.
 have ->: xi_ i1 j1 = beta i1 j1 + xi_ i1 0 + xi_ 0 j1 by rewrite /xi_ !ifN.
