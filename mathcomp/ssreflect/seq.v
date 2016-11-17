@@ -137,6 +137,13 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*                      [:: x_(r1 + 1); ...; x_(r0 + r1)];                    *)
 (*                      ...;                                                  *)
 (*                      [:: x_(r1 + ... + r(k-1) + 1); ...; x_(r0 + ... rk)]] *)
+(* flatten_index sh r c == the index, in flatten ss, of the item of indexes   *)
+(*                  (r, c) in any sequence of sequences ss of shape sh        *)
+(*               := sh_1 + sh_2 + ... + sh_r + c                              *)
+(* reshape_index sh i == the index, in reshape sh s, of the sequence          *)
+(*                  containing the i-th item of s.                            *)
+(* reshape_offset sh i == the offset, in the (reshape_index sh i)-th          *)
+(*                  sequence of reshape sh s of the i-th item of s            *)
 (*  ** Notation for manifest comprehensions:                                  *)
 (*         [seq x <- s | C] := filter (fun x => C) s.                         *)
 (*         [seq E | x <- s] := map (fun x => E) s.                            *)
@@ -2468,6 +2475,10 @@ Definition shape := map (@size T).
 Fixpoint reshape sh s :=
   if sh is n :: sh' then take n s :: reshape sh' (drop n s) else [::].
 
+Definition flatten_index sh r c := sumn (take r sh) + c.
+Definition reshape_index sh i := find (pred1 0) (scanl subn i.+1 sh).
+Definition reshape_offset sh i := i - sumn (take (reshape_index sh i) sh).
+
 Lemma size_flatten ss : size (flatten ss) = sumn (shape ss).
 Proof. by elim: ss => //= s ss <-; rewrite size_cat. Qed.
 
@@ -2556,6 +2567,77 @@ Proof.
 move=> Dmn; apply/(can_inj revK); rewrite rev_reshape ?rev_rcons ?sumn_rcons //.
 rewrite /= take_rev drop_rev -Dmn addnK revK -rev_reshape //.
 by rewrite size_takel // -Dmn leq_addr.
+Qed.
+
+Lemma flatten_indexP sh r c :
+  c < nth 0 sh r -> flatten_index sh r c < sumn sh.
+Proof.
+move=> lt_c_sh; rewrite -[sh in sumn sh](cat_take_drop r) sumn_cat ltn_add2l.
+suffices lt_r_sh: r < size sh by rewrite (drop_nth 0 lt_r_sh) ltn_addr.
+by case: ltnP => // le_sh_r; rewrite nth_default in lt_c_sh.
+Qed.
+
+Lemma reshape_indexP sh i : i < sumn sh -> reshape_index sh i < size sh.
+Proof.
+rewrite /reshape_index; elim: sh => //= n sh IHsh in i *; rewrite subn_eq0.
+by have [// | le_n_i] := ltnP i n; rewrite -leq_subLR subSn // => /IHsh.
+Qed.
+
+Lemma reshape_offsetP sh i :
+  i < sumn sh -> reshape_offset sh i < nth 0 sh (reshape_index sh i).
+Proof.
+rewrite /reshape_offset /reshape_index; elim: sh => //= n sh IHsh in i *.
+rewrite subn_eq0; have [| le_n_i] := ltnP i n; first by rewrite subn0.
+by rewrite -leq_subLR /= subnDA subSn // => /IHsh.
+Qed.
+
+Lemma reshape_indexK sh i :
+  flatten_index sh (reshape_index sh i) (reshape_offset sh i) = i.
+Proof.
+rewrite /reshape_offset /reshape_index /flatten_index -subSKn.
+elim: sh => //= n sh IHsh in i *; rewrite subn_eq0; have [//|le_n_i] := ltnP.
+by rewrite /= subnDA subSn // -addnA IHsh subnKC.
+Qed.
+
+Lemma flatten_indexKl sh r c :
+  c < nth 0 sh r -> reshape_index sh (flatten_index sh r c) = r.
+Proof.
+rewrite /reshape_index /flatten_index.
+elim: sh r => [|n sh IHsh] [|r] //= lt_c_sh; first by rewrite ifT.
+by rewrite -addnA -addnS addKn IHsh.
+Qed.
+
+Lemma flatten_indexKr sh r c :
+  c < nth 0 sh r -> reshape_offset sh (flatten_index sh r c) = c.
+Proof.
+rewrite /reshape_offset /reshape_index /flatten_index.
+elim: sh r => [|n sh IHsh] [|r] //= lt_c_sh; first by rewrite ifT ?subn0.
+by rewrite -addnA -addnS addKn /= subnDl IHsh.
+Qed.
+
+Lemma nth_flatten x0 ss i (r := reshape_index (shape ss) i) :
+  nth x0 (flatten ss) i = nth x0 (nth [::] ss r) (reshape_offset (shape ss) i).
+Proof.
+rewrite /reshape_offset -subSKn {}/r /reshape_index.
+elim: ss => //= s ss IHss in i *; rewrite subn_eq0 nth_cat.
+by have [//|le_s_i] := ltnP; rewrite subnDA subSn /=.
+Qed.
+
+Lemma reshape_index_leq sh i1 i2 :
+  i1 <= i2 -> i2 < sumn sh ->
+  (reshape_index sh i1) < (reshape_index sh i2) \/
+  ((reshape_index sh i1) = (reshape_index sh i2) /\
+   (reshape_offset sh i1) <= (reshape_offset sh i2)).
+Proof.
+rewrite /reshape_offset /reshape_index.
+elim: sh i1 i2 => [i1 i2 |] //= s0 s IHs i1 i2.
+rewrite !subn_eq0.
+case: (ltnP i2 s0) => Hi2s0 //=.
+- by move=> Hi12 _; rewrite (leq_ltn_trans Hi12 Hi2s0) /= !subn0; right.
+- case: (ltnP i1 s0) => Hi1s0 //=; first by left.
+  rewrite -{1 2}(subnKC Hi2s0) -leq_subLR ltn_add2l => /IHs{IHs}Hrec/Hrec{Hrec}.
+  rewrite !subSn // !ltnS => [[|[H1 H2]]]; [left => // | right; rewrite !subnDA].
+  by split; first rewrite H1.
 Qed.
 
 End Flatten.
