@@ -4755,7 +4755,7 @@ let unfoldintac occ rdx t (kt,_) gl =
   let sigma0, concl0, env0 = project gl, pf_concl gl, pf_env gl in
   let (sigma, t), const = strip_unfold_term env0 t kt in
   let body env t c =
-    Tacred.unfoldn [OnlyOccurrences [1], get_evalref t] env sigma0 c in
+    Tacred.unfoldn [AllOccurrences, get_evalref t] env sigma0 c in
   let easy = occ = None && rdx = None in
   let red_flags = if easy then CClosure.betaiotazeta else CClosure.betaiota in
   let beta env = Reductionops.clos_norm_flags red_flags env sigma0 in
