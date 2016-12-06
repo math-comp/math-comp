@@ -158,6 +158,7 @@ ssrtest/move_after.v
 ssrtest/multiview.v
 ssrtest/occarrow.v
 ssrtest/patnoX.v
+ssrtest/primproj.v
 ssrtest/rewpatterns.v
 ssrtest/set_lamda.v
 ssrtest/set_pattern.v

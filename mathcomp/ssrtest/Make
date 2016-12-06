@@ -26,6 +26,7 @@ move_after.v
 multiview.v
 occarrow.v
 patnoX.v
+primproj.v
 rewpatterns.v
 set_lamda.v
 set_pattern.v
