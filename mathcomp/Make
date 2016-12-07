@@ -167,6 +167,7 @@ ssrtest/ssrsyntax2.v
 ssrtest/tc.v
 ssrtest/testmx.v
 ssrtest/typeof.v
+ssrtest/unfold_Opaque.v
 ssrtest/unkeyed.v
 ssrtest/view_case.v
 ssrtest/wlogletin.v
