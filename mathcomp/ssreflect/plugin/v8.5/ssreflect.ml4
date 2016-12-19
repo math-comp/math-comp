@@ -4682,11 +4682,9 @@ let rec strip_unfold_term env ((sigma, t) as p) kt = match kind_of_term t with
       then strip_unfold_term env (sigma, f) kt
       else (sigma, f), true
   | Const (c,_) when Environ.is_projection c env ->
-    let sigma = Sigma.Unsafe.of_evar_map sigma in
-    let Sigma ((ty,_), sigma, _) =
+    let sigma, (ty, _) =
       Evarutil.new_type_evar env sigma (Evd.UnivFlexible true) in
-    let Sigma (ev, sigma, _) = Evarutil.new_evar env sigma ty in
-    let sigma = Sigma.to_evar_map sigma in
+    let sigma, ev = Evarutil.new_evar env sigma ty in
     (sigma, mkProj(Projection.make c false, ev)), true
   | Const _ | Var _ -> p, true
   | Proj _ -> p, true
