@@ -113,7 +113,7 @@ Require Import ssrfun.
 (* Alternatively one can use the syntax for explicit simplifying predicates   *)
 (* and relations (in the following x is bound in E):                          *)
 (*            [pred x | E] == simplifying (see ssrfun) predicate x => E.      *)
-(*        [pred x : T | E] == predicate x => T, with a cast on the argument.  *)
+(*        [pred x : T | E] == predicate x => E, with a cast on the argument.  *)
 (*          [pred : T | P] == constant predicate P on type T.                 *)
 (*      [pred x | E1 & E2] == [pred x | E1 && E2]; an x : T cast is allowed.  *)
 (*           [pred x in A] == [pred x | x in A].                              *)
