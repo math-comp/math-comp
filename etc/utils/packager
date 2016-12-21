@@ -14,6 +14,6 @@ sed -r "/^depends.*coq-mathcomp.*/s?dev?1.6.1?" -i $pkgdir/opam
 sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
 echo "http: \"http://github.com/math-comp/math-comp/archive/mathcomp-1.6.1.tar.gz\"" > $pkgdir/url
 # To be fixed after the tag
-#echo "checksum: \"038ba80c0d6b430428726ae4d00affcf\"" >> $pkgdir/url
+echo "checksum: \"10d8a17134ddb509b4afa8d3243ee1a0\"" >> $pkgdir/url
 
 done
