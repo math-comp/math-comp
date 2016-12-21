@@ -9,8 +9,8 @@ license: "CeCILL-B"
 
 build: [ make "-j" "%{jobs}%" ]
 install: [ make "install" ]
-remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/ssreflect'" ]
-depends: [ "coq" { ( >= "8.4pl4" & < "8.5" ) | ( = "8.5.dev" ) | ( = "dev")} ]
+remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp'" ]
+depends: [ "coq" { ((>= "8.4pl4" & < "8.5~") | (>= "8.5" & < "8.6~") | (>= "8.6" & < "8.7~")  | (= "dev"))} ]
 
 tags: [ "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" ]
 authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]

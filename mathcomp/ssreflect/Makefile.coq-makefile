@@ -1,9 +1,22 @@
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
-	ln -sf $(1)/plugin/$(V)/ssreflect.mllib .;\
-	ln -sf $(1)/plugin/$(V)/ssrmatching.mli .;\
-	ln -sf $(1)/plugin/$(V)/ssrmatching.ml4 .;\
-	ln -sf $(1)/plugin/$(V)/ssreflect.ml4 .;\
-	$(COQBIN)coq_makefile -f Make -o Makefile.coq)
+	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sf"; fi;\
+	MLLIB=ssreflect_plugin.mlpack;\
+	EXTRA=;\
+	case $(V) in\
+       	v8.5*|v8.4*)\
+		$$LN $(1)/plugin/$(V)/ssrmatching.mli .;\
+		$$LN $(1)/plugin/$(V)/ssrmatching.ml4 .;\
+		$$LN $(1)/plugin/$(V)/ssrmatching.v .;\
+		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mllib .;\
+		EXTRA="ssrmatching.mli ssrmatching.ml4 ssrmatching.v";\
+		MLLIB=ssreflect_plugin.mllib;\
+	;;\
+	*)\
+		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mlpack .;\
+	;;\
+	esac;\
+	$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
+	$(COQBIN)coq_makefile -f Make $$MLLIB $$EXTRA -o Makefile.coq)
 endef
 

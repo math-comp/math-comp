@@ -1,8 +1,8 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import Bool. (* For bool_scope delimiter 'bool'. *)
 Require Import ssrmatching.
-Declare ML Module "ssreflect".
+Declare ML Module "ssreflect_plugin".
 Set SsrAstVersion.
 
 (******************************************************************************)
@@ -51,6 +51,7 @@ Global Set Asymmetric Patterns.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+Global Set Bullet Behavior "None".
 
 Module SsrSyntax.
 
@@ -182,6 +183,8 @@ Definition get_by vT sT of sT -> vT := @get vT sT.
 End TheCanonical.
 
 Import TheCanonical. (* Note: no export. *)
+
+Local Arguments get_by _%type_scope _%type_scope _ _ _ _.
 
 Notation "[ 'the' sT 'of' v 'by' f ]" :=
   (@get_by _ sT f _ _ ((fun v' (s : sT) => Put v' (f s) s) v _))

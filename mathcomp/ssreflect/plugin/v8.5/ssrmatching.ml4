@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2015 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 
 (* Defining grammar rules with "xx" in it automatically declares keywords too,
@@ -345,6 +345,7 @@ let unif_end env sigma0 ise0 pt ok =
   let ise = Evarconv.consider_remaining_unif_problems env ise0 in
   let s, uc, t = nf_open_term sigma0 ise pt in
   let ise1 = create_evar_defs s in
+  let ise1 = Evd.set_universe_context ise1 uc in
   let ise2 = Typeclasses.resolve_typeclasses ~fail:true env ise1 in
   if not (ok ise) then raise NoProgress else
   if ise2 == ise1 then (s, uc, t)
@@ -421,7 +422,7 @@ let proj_nparams c =
   try 1 + Recordops.find_projection_nparams (ConstRef c) with _ -> 0
 
 let isFixed c = match kind_of_term c with
-  | Var _ | Ind _ | Construct _ | Const _ -> true
+  | Var _ | Ind _ | Construct _ | Const _ | Proj _ -> true
   | _ -> false
 
 let isRigid c = match kind_of_term c with
@@ -471,6 +472,7 @@ let mk_tpattern ?p_origin ?(hack=false) env sigma0 (ise, t) ok dir p =
       let np = proj_nparams p in
       if np = 0 || np > List.length a then KpatConst, f, a else
       let a1, a2 = List.chop np a in KpatProj p, applist(f, a1), a2
+    | Proj (p,arg) -> KpatProj (Projection.constant p), f, a
     | Var _ | Ind _ | Construct _ -> KpatFixed, f, a
     | Evar (k, _) ->
       if Evd.mem sigma0 k then KpatEvar k, f, a else
@@ -551,6 +553,10 @@ let filter_upat i0 f n u fpats =
   if np < na then fpats else
   let () = if !i0 < np then i0 := n in (u, np) :: fpats
 
+let eq_prim_proj c t = match kind_of_term t with
+  | Proj(p,_) -> Constant.equal (Projection.constant p) c
+  | _ -> false
+
 let filter_upat_FO i0 f n u fpats =
   let np = nb_args u.up_FO in
   if n < np then fpats else
@@ -561,13 +567,19 @@ let filter_upat_FO i0 f n u fpats =
   | KpatLet -> isLetIn f
   | KpatLam -> isLambda f
   | KpatRigid -> isRigid f
-  | KpatProj pc -> Term.eq_constr f (mkConst pc)
+  | KpatProj pc -> Term.eq_constr f (mkConst pc) || eq_prim_proj pc f
   | KpatFlex -> i0 := n; true in
   if ok then begin if !i0 < np then i0 := np; (u, np) :: fpats end else fpats
 
 exception FoundUnif of (evar_map * evar_universe_context * tpattern)
 (* Note: we don't update env as we descend into the term, as the primitive *)
 (* unification procedure always rejects subterms with bound variables.     *)
+
+let dont_impact_evars_in cl =
+  let evs_in_cl = Evd.evars_of_term cl in
+  fun sigma -> Evar.Set.for_all (fun k ->
+    try let _ = Evd.find_undefined sigma k in true
+    with Not_found -> false) evs_in_cl
 
 (* We are forced to duplicate code between the FO/HO matching because we    *)
 (* have to work around several kludges in unify.ml:                         *)
@@ -577,7 +589,8 @@ exception FoundUnif of (evar_map * evar_universe_context * tpattern)
 (*    head is an evar or meta (e.g., it fails on ?1 = nat when ?1 : Type).  *)
 (*  - w_unify expands let-in (zeta conversion) eagerly, whereas we want to  *)
 (*    match a head let rigidly.                                             *)
-let match_upats_FO upats env sigma0 ise =
+let match_upats_FO upats env sigma0 ise orig_c =
+  let dont_impact_evars = dont_impact_evars_in orig_c in
   let rec loop c =
     let f, a = splay_app ise c in let i0 = ref (-1) in
     let fpats =
@@ -608,13 +621,13 @@ let match_upats_FO upats env sigma0 ise =
            let lhs = mkSubApp f i a in
            let pt' = unif_end env sigma0 ise' u.up_t (u.up_ok lhs) in
            raise (FoundUnif (ungen_upat lhs pt' u))
-       with FoundUnif _ as sigma_u -> raise sigma_u 
+       with FoundUnif (s,_,_) as sig_u when dont_impact_evars s -> raise sig_u
        | Not_found -> Errors.anomaly (str"incomplete ise in match_upats_FO")
        | _ -> () in
     List.iter one_match fpats
   done;
   iter_constr_LR loop f; Array.iter loop a in
-  fun c -> try loop c with Invalid_argument _ -> Errors.anomaly (str"IN FO")
+  try loop orig_c with Invalid_argument _ -> Errors.anomaly (str"IN FO")
 
 let prof_FO = mk_profiler "match_upats_FO";;
 let match_upats_FO upats env sigma0 ise c =
@@ -623,7 +636,9 @@ let match_upats_FO upats env sigma0 ise c =
 
 
 let match_upats_HO ~on_instance upats env sigma0 ise c =
+  let dont_impact_evars = dont_impact_evars_in c in
  let it_did_match = ref false in
+ let failed_because_of_TC = ref false in
  let rec aux upats env sigma0 ise c =
   let f, a = splay_app ise c in let i0 = ref (-1) in
   let fpats = List.fold_right (filter_upat i0 f (Array.length a)) upats [] in
@@ -652,16 +667,20 @@ let match_upats_HO ~on_instance upats env sigma0 ise c =
         let lhs = mkSubApp f i a in
         let pt' = unif_end env sigma0 ise'' u.up_t (u.up_ok lhs) in
         on_instance (ungen_upat lhs pt' u)
-      with FoundUnif _ as sigma_u -> raise sigma_u 
+      with FoundUnif (s,_,_) as sig_u when dont_impact_evars s -> raise sig_u
       | NoProgress -> it_did_match := true
-      | _ -> () in
+      | Pretype_errors.PretypeError
+         (_,_,Pretype_errors.UnsatisfiableConstraints _) ->
+          failed_because_of_TC:=true
+      | e when Errors.noncritical e -> () in
     List.iter one_match fpats
   done;
   iter_constr_LR (aux upats env sigma0 ise) f;
   Array.iter (aux upats env sigma0 ise) a
  in
  aux upats env sigma0 ise c;
- if !it_did_match then raise NoProgress
+ if !it_did_match then raise NoProgress;
+ !failed_because_of_TC
 
 let prof_HO = mk_profiler "match_upats_HO";;
 let match_upats_HO ~on_instance upats env sigma0 ise c =
@@ -759,15 +778,19 @@ let rec uniquize = function
 
 ((fun env c h ~k -> 
   do_once upat_that_matched (fun () -> 
+    let failed_because_of_TC = ref false in
     try
       if not all_instances then match_upats_FO upats env sigma0 ise c;
-      match_upats_HO ~on_instance upats env sigma0 ise c;
+      failed_because_of_TC:=match_upats_HO ~on_instance upats env sigma0 ise c;
       raise NoMatch
     with FoundUnif sigma_u -> 0,[sigma_u]
     | (NoMatch|NoProgress) when all_instances && instances () <> [] ->
       0, uniquize (instances ())
     | NoMatch when (not raise_NoMatch) ->
-      errorstrm (source () ++ str "does not match any subterm of the goal")
+      if !failed_because_of_TC then
+        errorstrm (source ()++strbrk"matches but type classes inference fails")
+      else
+        errorstrm (source () ++ str "does not match any subterm of the goal")
     | NoProgress when (not raise_NoMatch) ->
         let dir = match upats_origin with Some (d,_) -> d | _ ->
           Errors.anomaly (str"mk_tpattern_matcher with no upats_origin") in
@@ -860,7 +883,36 @@ let pr_ssrpattern_roundp  _ _ _ = pr_pattern_roundp
 
 let wit_rpatternty = add_genarg "rpatternty" pr_pattern
 
-ARGUMENT EXTEND rpattern TYPED AS rpatternty PRINTED BY pr_rpattern
+let glob_ssrterm gs = function
+  | k, (_, Some c) -> k,
+      let x = Tacintern.intern_constr gs c in
+      fst x, Some c
+  | ct -> ct
+
+let glob_rpattern s p =
+  match p with
+  | T t -> T (glob_ssrterm s t)
+  | In_T t -> In_T (glob_ssrterm s t)
+  | X_In_T(x,t) -> X_In_T (x,glob_ssrterm s t)
+  | In_X_In_T(x,t) -> In_X_In_T (x,glob_ssrterm s t)
+  | E_In_X_In_T(e,x,t) -> E_In_X_In_T (glob_ssrterm s e,x,glob_ssrterm s t)
+  | E_As_X_In_T(e,x,t) -> E_As_X_In_T (glob_ssrterm s e,x,glob_ssrterm s t)
+
+let subst_ssrterm s (k, c) = k, Tacsubst.subst_glob_constr_and_expr s c
+
+let subst_rpattern s = function
+  | T t -> T (subst_ssrterm s t)
+  | In_T t -> In_T (subst_ssrterm s t)
+  | X_In_T(x,t) -> X_In_T (x,subst_ssrterm s t)
+  | In_X_In_T(x,t) -> In_X_In_T (x,subst_ssrterm s t)
+  | E_In_X_In_T(e,x,t) -> E_In_X_In_T (subst_ssrterm s e,x,subst_ssrterm s t)
+  | E_As_X_In_T(e,x,t) -> E_As_X_In_T (subst_ssrterm s e,x,subst_ssrterm s t)
+
+ARGUMENT EXTEND rpattern
+  TYPED AS rpatternty
+  PRINTED BY pr_rpattern
+  GLOBALIZED BY glob_rpattern
+  SUBSTITUTED BY subst_rpattern
   | [ lconstr(c) ] -> [ T (mk_lterm c) ]
   | [ "in" lconstr(c) ] -> [ In_T (mk_lterm c) ]
   | [ lconstr(x) "in" lconstr(c) ] -> 
@@ -1246,12 +1298,17 @@ let is_wildcard = function
   | _ -> false
 
 (* "ssrpattern" *)
-let pr_ssrpatternarg _ _ _ cpat = pr_rpattern cpat
+let pr_ssrpatternarg _ _ _ (_,cpat) = pr_rpattern cpat
+let pr_ssrpatternarg_glob _ _ _ cpat = pr_rpattern cpat
+let interp_ssrpatternarg ist gl p = project gl, (ist, p)
 
 ARGUMENT EXTEND ssrpatternarg
-  TYPED AS rpattern
   PRINTED BY pr_ssrpatternarg
-| [ "[" rpattern(pat) "]" ] -> [ pat ]
+  INTERPRETED BY interp_ssrpatternarg
+  GLOBALIZED BY glob_rpattern
+  RAW_TYPED AS rpattern RAW_PRINTED BY pr_ssrpatternarg_glob
+  GLOB_TYPED AS rpattern GLOB_PRINTED BY pr_ssrpatternarg_glob
+| [ rpattern(pat) ] -> [ pat ]
 END
   
 let pf_merge_uc uc gl =
@@ -1260,19 +1317,31 @@ let pf_merge_uc uc gl =
 let pf_unsafe_merge_uc uc gl =
   re_sig (sig_it gl) (Evd.set_universe_context (project gl) uc)
 
-let ssrpatterntac ist arg gl =
-  let pat = interp_rpattern ist gl arg in
+let ssrpatterntac _ist (arg_ist,arg) gl =
+  let pat = interp_rpattern arg_ist gl arg in
   let sigma0 = project gl in
   let concl0 = pf_concl gl in
   let (t, uc), concl_x =
     fill_occ_pattern (Global.env()) sigma0 concl0 pat noindex 1 in
   let gl, tty = pf_type_of gl t in
-  let concl = mkLetIn (Name (id_of_string "toto"), t, tty, concl_x) in
+  let concl = mkLetIn (Name (id_of_string "selected"), t, tty, concl_x) in
   Proofview.V82.of_tactic (convert_concl concl DEFAULTcast) gl
 
-TACTIC EXTEND ssrat
-| [ "ssrpattern" ssrpatternarg(arg) ] -> [ Proofview.V82.tactic (ssrpatterntac ist arg) ]
-END
+(* Register "ssrpattern" tactic *)
+let () =
+  let mltac _ ist =
+    let arg =
+      Genarg.out_gen (topwit wit_ssrpatternarg)
+       (Id.Map.find (Names.Id.of_string "ssrpatternarg") ist.lfun) in
+    Proofview.V82.tactic (ssrpatterntac ist arg) in
+  let name = { mltac_plugin = "ssreflect"; mltac_tactic = "ssrpattern"; } in
+  let () = Tacenv.register_ml_tactic name mltac in
+  let tac =
+    TacFun ([Some (Id.of_string "ssrpatternarg")],
+      TacML (Loc.ghost, name, [])) in
+  let obj () =
+    Tacenv.register_ltac true false (Id.of_string "ssrpattern") tac in
+  Mltop.declare_cache_obj obj "ssreflect"
 
 let ssrinstancesof ist arg gl =
   let ok rhs lhs ise = true in

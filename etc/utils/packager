@@ -3,13 +3,17 @@
 set -e
 set -x
 
-for pkg in algebra field character fingroup odd_order real_closed solvable ssreflect
+for pkg in ssreflect fingroup algebra field solvable character
 do
-pkgdir="$(git root)/opam/extra-dev/packages/coq-mathcomp-$pkg/coq-mathcomp-$pkg.dev"
+pkgdir="$(git root)/opam/released/packages/coq-mathcomp-$pkg/coq-mathcomp-$pkg.1.6.1"
 mkdir -p $pkgdir
 cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
 cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
+sed -r "/^version/s?dev?1.6.1?" -i $pkgdir/opam
+sed -r "/^depends.*coq-mathcomp.*/s?dev?1.6.1?" -i $pkgdir/opam
 sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
-echo "git: \"https://github.com/math-comp/math-comp.git\"" > $pkgdir/url
+echo "http: \"http://github.com/math-comp/math-comp/archive/mathcomp-1.6.1.tar.gz\"" > $pkgdir/url
+# To be fixed after the tag
+#echo "checksum: \"038ba80c0d6b430428726ae4d00affcf\"" >> $pkgdir/url
 
 done
