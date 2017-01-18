@@ -1,7 +1,9 @@
 # INSTALLATION PROCEDURE
 
 Users familiar with OPAM can use such tool to install Coq and the Mathematical Components library with commands like
-`opam coq-mathcomp-fingroup`.
+
+    opam repo add coq-released http://coq.inria.fr/opam/released
+    opam install coq-mathcomp-fingroup
 
 This document is for users that installed Coq in another way, for example
 compiling it from sources.
