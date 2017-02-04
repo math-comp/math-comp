@@ -648,6 +648,7 @@ Canonical Quotient.rquot_eqType.
 Canonical Quotient.rquot_choiceType.
 Canonical Quotient.rquot_zmodType.
 Canonical Quotient.rquot_ringType.
+Canonical Quotient.rquot_comRingType.
 Canonical Quotient.rquot_quotType.
 Canonical Quotient.rquot_eqQuotType.
 Canonical Quotient.rquot_zmodQuotType.
