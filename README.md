@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/math-comp/math-comp.svg?branch=master)](https://travis-ci.org/math-comp/math-comp)
+
 # The Mathematical Components repository
 
 This repository holds the Mathematical Components Library for the Coq system:
