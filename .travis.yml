@@ -1,3 +1,4 @@
+
 dist: trusty
 sudo: required
 language: c
@@ -32,11 +33,10 @@ install:
 - "[ -e .opam ] || opam init -j ${NJOBS} --compiler=${COMPILER} -n -y"
 - eval $(opam config env)
 - opam config var root
-- opam install -j ${NJOBS} -y ocamlfind camlp5 ${EXTRA_OPAM}
-- opam list
 - opam repo add coq-core-dev https://coq.inria.fr/opam/core-dev || true
-- opam pin add -y -n coq ${TEST_TARGET}
-- opam install coq -y -v -j ${NJOBS}
+- opam pin add -y -n coq -k version ${TEST_TARGET}
+- opam install -y -v -j ${NJOBS} coq ${EXTRA_OPAM}
+- opam list
 
 script:
 - echo 'Building Mathcomp...' && echo -en 'travis_fold:start:mathcomp.build\\r'
