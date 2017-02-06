@@ -48,5 +48,6 @@ script:
 - cd mathcomp
 # Full build takes too much time.
 - sed -i.bak '/odd_order/d' Make
-- make -j ${NJOBS}
+- make Makefile.coq
+- make -f Makefile.coq -j ${NJOBS} all
 - echo -en 'travis_fold:end:mathcomp.build\\r'
