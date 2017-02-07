@@ -46,7 +46,12 @@ script:
 - echo 'Building Mathcomp...' && echo -en 'travis_fold:start:mathcomp.build\\r'
 - export PATH=`pwd`/coq-${TEST_TARGET}/bin:$PATH
 - cd mathcomp
-# Full build takes too much time.
-- sed -i.bak '/odd_order/d' Make
-- make -j ${NJOBS}
+# We lack a few minutes to be able to build the whole theorem.
+- sed -i.bak '/stripped_odd_order_theorem/d' Make
+- sed -i.bak '/PFsection7.v/d'               Make
+- sed -i.bak '/PFsection8.v/d'               Make
+- sed -i.bak '/PFsection9.v/d'               Make
+- sed -i.bak '/PFsection1.\.v/d'             Make
+- make Makefile.coq
+- make -f Makefile.coq -j ${NJOBS} all
 - echo -en 'travis_fold:end:mathcomp.build\\r'
