@@ -88,9 +88,9 @@ module RelDecl = Context.Rel.Declaration
 module NamedDecl = Context.Named.Declaration
 
 let pf_concl gl = EConstr.Unsafe.to_constr (pf_concl gl)
-let pf_get_hyp gl x = EConstr.unsafe_cnd_to_constr (pf_get_hyp gl x)
+let pf_get_hyp gl x = EConstr.Unsafe.to_named_decl (pf_get_hyp gl x)
 let pf_get_hyp_typ gl x = EConstr.Unsafe.to_constr (pf_get_hyp_typ gl x)
-let pf_hyps gl = List.map EConstr.unsafe_cnd_to_constr (pf_hyps gl)
+let pf_hyps gl = List.map EConstr.Unsafe.to_named_decl (pf_hyps gl)
 
 (* Tentative patch from util.ml *)
 
@@ -1122,7 +1122,8 @@ let interp_refine ist gl rc =
   let kind = OfType (Tacmach.pf_concl gl) in
   let flags = {
     use_typeclasses = true;
-    use_unif_heuristics(*solve_unification_constraints*) = true;
+    solve_unification_constraints = true;
+    (* use_unif_heuristics(\*solve_unification_constraints*\) = true; *)
     use_hook = None;
     fail_evar = false;
     expand_evars = true }
@@ -2094,8 +2095,8 @@ let endclausestac id_map clseq gl_id cl0 gl =
     mkLetIn (Name (orig_id id), unmark v, unmark t, unmark c')
   | _ -> map_constr unmark c in
   let utac hyp =
-    Proofview.V82.of_tactic 
-     (convert_hyp_no_check (EConstr.cnd_of_constr(NamedDecl.map_constr unmark hyp))) in
+    Proofview.V82.of_tactic
+     (convert_hyp_no_check (EConstr.of_named_decl (NamedDecl.map_constr unmark hyp))) in
   let utacs = List.map utac (pf_hyps gl) in
   let ugtac gl' =
     Proofview.V82.of_tactic
@@ -2130,7 +2131,7 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
      let decl = pf_get_hyp gl x in
      gl,
      (if NamedDecl.is_local_def decl then args else EConstr.mkVar x :: args),
-     mkProd_or_LetIn (decl |> NamedDecl.to_rel_decl |> RelDecl.set_name (Name (f x)) |> EConstr.crd_of_constr)
+     mkProd_or_LetIn (decl |> NamedDecl.to_rel_decl |> RelDecl.set_name (Name (f x)) |> EConstr.of_rel_decl)
                      (EConstr.of_constr (subst_var x c))
   | _, Some ((x, _), None) ->
      let x = hoi_id x in
