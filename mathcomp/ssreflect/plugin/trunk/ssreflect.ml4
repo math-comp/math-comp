@@ -27,6 +27,7 @@ open Feedback
 open Pcoq
 open Pcoq.Prim
 open Pcoq.Constr
+open Ltac_plugin
 open Genarg
 open Stdarg
 open Tacarg
