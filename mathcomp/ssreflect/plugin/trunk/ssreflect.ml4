@@ -669,7 +669,7 @@ END
 
 let mk_internal_id s =
   let s' = sprintf "_%s_" s in
-  for i = 1 to String.length s do if s'.[i] = ' ' then s'.[i] <- '_' done;
+  let s' = String.map (fun c -> if c = ' ' then '_' else c) s' in
   add_internal_name ((=) s'); id_of_string s'
 
 let same_prefix s t n =
@@ -747,12 +747,14 @@ let mk_anon_id t gl =
   let gl_ids = pf_ids_of_hyps gl in
   if not (List.mem id0 gl_ids) then id0 else
   let s, i = List.fold_left (max_suffix m) si0 gl_ids in
-  let n = String.length s - 1 in
+  let open Bytes in
+  let s = of_string s in
+  let n = length s - 1 in
   let rec loop i =
-    if s.[i] = '9' then (s.[i] <- '0'; loop (i - 1)) else
-    if i < m then (s.[n] <- '0'; s.[m] <- '1'; s ^ "_") else
-    (s.[i] <- Char.chr (Char.code s.[i] + 1); s) in
-  id_of_string (loop (n - 1))
+    if get s i = '9' then (set s i '0'; loop (i - 1)) else
+    if i < m then (set s n '0'; set s m '1'; cat s (of_string "_")) else
+    (set s i (Char.chr (Char.code (get s i) + 1)); s) in
+  Id.of_bytes (loop (n - 1))
   
 (* We must not anonymize context names discharged by the "in" tactical. *)
 
@@ -1238,7 +1240,7 @@ let interp_search_notation loc tag okey =
   let err msg = CErrors.user_err ~loc ~hdr:"interp_search_notation" msg in
   let mk_pntn s for_key =
     let n = String.length s in
-    let s' = String.make (n + 2) ' ' in
+    let s' = Bytes.make (n + 2) ' ' in
     let rec loop i i' =
       if i >= n then s', i' - 2 else if s.[i] = ' ' then loop (i + 1) i' else
       let j = try String.index_from s (i + 1) ' ' with _ -> n in
@@ -1246,10 +1248,10 @@ let interp_search_notation loc tag okey =
       if s.[i] = '\'' && i < j - 2 && s.[j - 1] = '\'' then
         (String.blit s (i + 1) s' i' (m - 2); loop (j + 1) (i' + m - 1))
       else if for_key && is_ident (String.sub s i m) then
-         (s'.[i'] <- '_'; loop (j + 1) (i' + 2))
+         (Bytes.set s' i' '_'; loop (j + 1) (i' + 2))
       else (String.blit s i s' i' m; loop (j + 1) (i' + m + 1)) in
     loop 0 1 in
-  let trim_ntn (pntn, m) = String.sub pntn 1 (max 0 m) in
+  let trim_ntn (pntn, m) = Bytes.sub_string pntn 1 (max 0 m) in
   let pr_ntn ntn = str "(" ++ str ntn ++ str ")" in
   let pr_and_list pr = function
     | [x] -> pr x
@@ -1281,7 +1283,7 @@ let interp_search_notation loc tag okey =
   | "Lonely notation" -> last_sc := ""; last := ""
   | "\"" ->
       let pntn, m = mk_pntn s true in
-      if String.string_contains pntn ptag then begin
+      if String.string_contains (Bytes.to_string pntn) (Bytes.to_string ptag) then begin
         let ntn = trim_ntn (pntn, m) in
         match !ntns with
         | [] -> ntns := [ntn]; scs := [!last_sc]
