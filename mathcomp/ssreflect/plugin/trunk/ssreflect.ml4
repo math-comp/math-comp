@@ -16,7 +16,7 @@ let () = Mltop.add_known_plugin (fun () ->
 
 (* Defining grammar rules with "xx" in it automatically declares keywords too,
  * we thus save the lexer to restore it at the end of the file *)
-let frozen_lexer = CLexer.freeze () ;;
+let frozen_lexer = CLexer.get_keyword_state () ;;
 
 (*i camlp4use: "pa_extend.cmo" i*)
 (*i camlp4deps: "grammar/grammar.cma" i*)
@@ -70,7 +70,6 @@ open Notation_ops
 open Locus
 open Locusops
 
-open Compat
 open Tok
 
 open Ssrmatching_plugin
@@ -514,18 +513,18 @@ let _ =
 (** Primitive parsing to avoid syntax conflicts with basic tactics. *)
 
 let accept_before_syms syms strm =
-  match Compat.get_tok (stream_nth 1 strm) with
+  match stream_nth 1 strm with
   | Tok.KEYWORD sym when List.mem sym syms -> ()
   | _ -> raise Stream.Failure
 
 let accept_before_syms_or_any_id syms strm =
-  match Compat.get_tok (stream_nth 1 strm) with
+  match stream_nth 1 strm with
   | Tok.KEYWORD sym when List.mem sym syms -> ()
   | Tok.IDENT _ -> ()
   | _ -> raise Stream.Failure
 
 let accept_before_syms_or_ids syms ids strm =
-  match Compat.get_tok (stream_nth 1 strm) with
+  match stream_nth 1 strm with
   | Tok.KEYWORD sym when List.mem sym syms -> ()
   | Tok.IDENT id when List.mem id ids -> ()
   | _ -> raise Stream.Failure
@@ -660,7 +659,7 @@ let ssr_id_of_string loc s =
 
 let ssr_null_entry = Gram.Entry.of_parser "ssr_null" (fun _ -> ())
 
-let (!@) = Compat.to_coqloc
+let (!@) = Pcoq.to_coqloc
 
 GEXTEND Gram 
   GLOBAL: Prim.ident;
@@ -1853,7 +1852,7 @@ END
 
 type ssrtermkind = char (* print flag *)
 
-let input_ssrtermkind strm = match Compat.get_tok (stream_nth 0 strm) with
+let input_ssrtermkind strm = match stream_nth 0 strm with
   | Tok.KEYWORD "(" -> '('
   | Tok.KEYWORD "@" -> '@'
   | _ -> ' '
@@ -2664,9 +2663,9 @@ ARGUMENT EXTEND ssriorpat TYPED AS ssripat list PRINTED BY pr_ssriorpat
 END
 
 let reject_ssrhid strm =
-  match Compat.get_tok (stream_nth 0 strm) with
+  match stream_nth 0 strm with
   | Tok.KEYWORD "[" ->
-      (match Compat.get_tok (stream_nth 1 strm) with
+      (match stream_nth 1 strm with
       | Tok.KEYWORD ":" -> raise Stream.Failure
       | _ -> ())
   | _ -> ()
@@ -2786,7 +2785,7 @@ let equality_inj l b id c gl =
   let msg = ref "" in
   try Proofview.V82.of_tactic (Equality.inj l b None c) gl
   with
-    | Compat.Exc_located(_,CErrors.UserError (_,s))
+    | Ploc.Exc(_,CErrors.UserError (_,s))
     | CErrors.UserError (_,s)
   when msg := Pp.string_of_ppcmds s;
        !msg = "Not a projectable equality but a discriminable one." ||
@@ -3091,8 +3090,8 @@ let tclDO n tac =
         let _, info = CErrors.push e in
         let e' = CErrors.UserError (l, prefix i ++ s) in
         Util.iraise (e', info)
-    | Compat.Exc_located(loc, CErrors.UserError (l, s))  -> 
-        raise (Compat.Exc_located(loc, CErrors.UserError (l, prefix i ++ s))) in
+    | Ploc.Exc(loc, CErrors.UserError (l, s))  -> 
+        raise (Ploc.Exc(loc, CErrors.UserError (l, prefix i ++ s))) in
   let rec loop i gl =
     if i = n then tac_err_at i gl else
     (tclTHEN (tac_err_at i) (loop (i + 1))) gl in
@@ -3177,7 +3176,7 @@ let sq_brace_tacnames =
    ["first"; "solve"; "do"; "rewrite"; "have"; "suffices"; "wlog"]
    (* "by" is a keyword *)
 let accept_ssrseqvar strm =
-  match Compat.get_tok (stream_nth 0 strm) with
+  match stream_nth 0 strm with
   | Tok.IDENT id when not (List.mem id sq_brace_tacnames) ->
      accept_before_syms_or_ids ["["] ["first";"last"] strm
   | _ -> raise Stream.Failure
@@ -3611,7 +3610,7 @@ ARGUMENT EXTEND ssreqid TYPED AS ssripatrep option PRINTED BY pr_ssreqid
 END
 
 let accept_ssreqid strm =
-  match Compat.get_tok (Util.stream_nth 0 strm) with
+  match Util.stream_nth 0 strm with
   | Tok.IDENT _ -> accept_before_syms [":"] strm
   | Tok.KEYWORD ":" -> ()
   | Tok.KEYWORD pat when List.mem pat ["_"; "?"; "->"; "<-"] ->
@@ -5183,7 +5182,7 @@ let test_ssr_rw_syntax =
   let test strm  =
     if not !ssr_rw_syntax then raise Stream.Failure else
     if is_ssr_loaded () then () else
-    match Compat.get_tok (Util.stream_nth 0 strm) with
+    match Util.stream_nth 0 strm with
     | Tok.KEYWORD key when List.mem key.[0] ['{'; '['; '/'] -> ()
     | _ -> raise Stream.Failure in
   Gram.Entry.of_parser "test_ssr_rw_syntax" test
@@ -5259,7 +5258,7 @@ ARGUMENT EXTEND ssrfwdid TYPED AS ident PRINTED BY pr_ssrfwdid
 END
 
 let accept_ssrfwdid strm =
-  match Compat.get_tok (stream_nth 0 strm) with
+  match stream_nth 0 strm with
   | Tok.IDENT id -> accept_before_syms_or_any_id [":"; ":="; "("] strm
   | _ -> raise Stream.Failure
 
@@ -6151,7 +6150,7 @@ ARGUMENT EXTEND ssr_idcomma TYPED AS ident option option PRINTED BY pr_idcomma
 END
 
 let accept_idcomma strm =
-  match Compat.get_tok (stream_nth 0 strm) with
+  match stream_nth 0 strm with
   | Tok.IDENT _ | Tok.KEYWORD "_" -> accept_before_syms [","] strm
   | _ -> raise Stream.Failure
 
@@ -6244,6 +6243,6 @@ END
 (* The user is supposed to Require Import ssreflect or Require ssreflect   *)
 (* and Import ssreflect.SsrSyntax to obtain these keywords and as a         *)
 (* consequence the extended ssreflect grammar.                             *)
-let () = CLexer.unfreeze frozen_lexer ;;
+let () = CLexer.set_keyword_state frozen_lexer ;;
 
 (* vim: set filetype=ocaml foldmethod=marker: *)
