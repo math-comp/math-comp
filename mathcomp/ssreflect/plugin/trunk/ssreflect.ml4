@@ -168,8 +168,7 @@ let ssr_pp s = msg_error (str"SSR: "++Lazy.force s)
 let _ = try ignore(Sys.getenv "SSRDEBUG"); pp_ref := ssr_pp with Not_found -> ()
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = false;
-      Goptions.optname  = "ssreflect debugging";
+    { Goptions.optname  = "ssreflect debugging";
       Goptions.optkey   = ["SsrDebug"];
       Goptions.optdepr  = false;
       Goptions.optread  = (fun _ -> !pp_ref == ssr_pp);
@@ -411,8 +410,7 @@ let profilers = ref []
 let add_profiler f = profilers := f :: !profilers;;
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = false;
-      Goptions.optname  = "ssreflect profiling";
+    { Goptions.optname  = "ssreflect profiling";
       Goptions.optkey   = ["SsrProfiling"];
       Goptions.optread  = (fun _ -> !profile_now);
       Goptions.optdepr  = false;
@@ -485,8 +483,7 @@ let inVersion = Libobject.declare_object {
 
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = false;
-      Goptions.optname  = "ssreflect version";
+    { Goptions.optname  = "ssreflect version";
       Goptions.optkey   = ["SsrAstVersion"];
       Goptions.optread  = (fun _ -> true);
       Goptions.optdepr  = false;
@@ -504,8 +501,7 @@ let tactic_mode = G_ltac.tactic_mode
 let ssroldreworder = Summary.ref ~name:"SSR:oldreworder" true
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = false;
-      Goptions.optname  = "ssreflect 1.3 compatibility flag";
+    { Goptions.optname  = "ssreflect 1.3 compatibility flag";
       Goptions.optkey   = ["SsrOldRewriteGoalsOrder"];
       Goptions.optread  = (fun _ -> !ssroldreworder);
       Goptions.optdepr  = false;
@@ -522,8 +518,7 @@ let inHaveTCResolution = Libobject.declare_object {
 
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = false;
-      Goptions.optname  = "have type classes";
+    { Goptions.optname  = "have type classes";
       Goptions.optkey   = ["SsrHave";"NoTCResolution"];
       Goptions.optread  = (fun _ -> !ssrhaveNOtcresolution);
       Goptions.optdepr  = false;
@@ -652,8 +647,7 @@ let ssr_reserved_ids = Summary.ref ~name:"SSR:idents" true
 
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = true;
-      Goptions.optname  = "ssreflect identifiers";
+    { Goptions.optname  = "ssreflect identifiers";
       Goptions.optkey   = ["SsrIdents"];
       Goptions.optdepr  = false;
       Goptions.optread  = (fun _ -> !ssr_reserved_ids);
@@ -4616,8 +4610,7 @@ let ssr_strict_match = ref false
 
 let _ =
   Goptions.declare_bool_option 
-    { Goptions.optsync  = true;
-      Goptions.optname  = "strict redex matching";
+    { Goptions.optname  = "strict redex matching";
       Goptions.optkey   = ["Match"; "Strict"];
       Goptions.optread  = (fun () -> !ssr_strict_match);
       Goptions.optdepr  = false;
@@ -5241,8 +5234,7 @@ let ssr_rw_syntax = Summary.ref ~name:"SSR:rewrite" true
 
 let _ =
   Goptions.declare_bool_option
-    { Goptions.optsync  = true;
-      Goptions.optname  = "ssreflect rewrite";
+    { Goptions.optname  = "ssreflect rewrite";
       Goptions.optkey   = ["SsrRewrite"];
       Goptions.optread  = (fun _ -> !ssr_rw_syntax);
       Goptions.optdepr  = false;
