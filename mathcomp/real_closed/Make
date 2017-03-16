@@ -1,5 +1,4 @@
 all_real_closed.v
-bigenough.v
 cauchyreals.v
 complex.v
 ordered_qelim.v
