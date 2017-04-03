@@ -249,8 +249,8 @@ let mkCExplVar loc id n =
    CAppExpl (loc, (None, Ident (loc, id), None), mkCHoles loc n)
 let mkCLambda loc name ty t = 
    CLambdaN (loc, [[loc, name], Default Explicit, ty], t)
-let mkCLetIn loc name bo t = 
-   CLetIn (loc, (loc, name), bo, t)
+let mkCLetIn loc name bo oty t = 
+   CLetIn (loc, (loc, name), bo, oty, t)
 let mkCArrow loc ty t =
    CProdN (loc, [[dummy_loc,Anonymous], Default Explicit, ty], t)
 let mkCCast loc t ty = CCast (loc,t, dC ty)
@@ -1359,7 +1359,7 @@ END
 
 let rec splay_search_pattern na = function 
   | Pattern.PApp (fp, args) -> splay_search_pattern (na + Array.length args) fp
-  | Pattern.PLetIn (_, _, bp) -> splay_search_pattern na bp
+  | Pattern.PLetIn (_, _, _, bp) -> splay_search_pattern na bp
   | Pattern.PRef hr -> hr, na
   | _ -> CErrors.error "no head constant in head search pattern"
 
@@ -1556,7 +1556,7 @@ GEXTEND Gram
   GLOBAL: closed_binder;
   closed_binder: [
     [ ["of" | "&"]; c = operconstr LEVEL "99" ->
-      [LocalRawAssum ([!@loc, Anonymous], Default Explicit, c)]
+      [CLocalAssum ([!@loc, Anonymous], Default Explicit, c)]
   ] ];
 END
 (* }}} *)
@@ -3343,7 +3343,7 @@ let pf_interp_ty ?(resolve_typeclasses=false) ist gl ty =
    | a, (t, None) ->
      let rec force_type = function
      | GProd (l, x, k, s, t) -> incr n_binders; GProd (l, x, k, s, force_type t)
-     | GLetIn (l, x, v, t) -> incr n_binders; GLetIn (l, x, v, force_type t)
+     | GLetIn (l, x, v, oty, t) -> incr n_binders; GLetIn (l, x, v, oty, force_type t)
      | ty -> mkRCast ty mkRType in
      a, (force_type t, None)
    | _, (_, Some ty) ->
@@ -3351,7 +3351,7 @@ let pf_interp_ty ?(resolve_typeclasses=false) ist gl ty =
      | CProdN (l, abs, t) ->
        n_binders := !n_binders +  List.length (List.flatten (List.map pi1 abs));
        CProdN (l, abs, force_type t)
-     | CLetIn (l, n, v, t) -> incr n_binders; CLetIn (l, n, v, force_type t)
+     | CLetIn (l, n, v, oty, t) -> incr n_binders; CLetIn (l, n, v, oty, force_type t)
      | ty -> mkCCast dummy_loc ty (mkCType dummy_loc) in
      mk_term ' ' (force_type ty) in
    let strip_cast (sigma, t) =
@@ -5308,7 +5308,7 @@ type ssrbindfmt =
   | BFvar
   | BFdecl of int        (* #xs *)
   | BFcast               (* final cast *)
-  | BFdef of bool        (* has cast? *)
+  | BFdef
   | BFrec of bool * bool (* has struct? * has cast? *)
 
 let rec mkBstruct i = function
@@ -5321,15 +5321,12 @@ let rec mkBstruct i = function
   | [] -> []
 
 let rec format_local_binders h0 bl0 = match h0, bl0 with
-  | BFvar :: h, LocalRawAssum ([_, x], _,  _) :: bl ->
+  | BFvar :: h, CLocalAssum ([_, x], _,  _) :: bl ->
     Bvar x :: format_local_binders h bl
-  | BFdecl _ :: h, LocalRawAssum (lxs, _, t) :: bl ->
+  | BFdecl _ :: h, CLocalAssum (lxs, _, t) :: bl ->
     Bdecl (List.map snd lxs, t) :: format_local_binders h bl
-  | BFdef false :: h, LocalRawDef ((_, x), v) :: bl ->
-    Bdef (x, None, v) :: format_local_binders h bl
-  | BFdef true :: h,
-      LocalRawDef ((_, x), CCast (_, v, CastConv t)) :: bl ->
-    Bdef (x, Some t, v) :: format_local_binders h bl
+  | BFdef :: h, CLocalDef ((_, x), v, oty) :: bl ->
+    Bdef (x, oty, v) :: format_local_binders h bl
   | _ -> []
   
 let rec format_constr_expr h0 c0 = match h0, c0 with
@@ -5339,12 +5336,9 @@ let rec format_constr_expr h0 c0 = match h0, c0 with
   | BFdecl _:: h, CLambdaN (_, [lxs, _, t], c) ->
     let bs, c' = format_constr_expr h c in
     Bdecl (List.map snd lxs, t) :: bs, c'
-  | BFdef false :: h, CLetIn(_, (_, x), v, c) ->
+  | BFdef :: h, CLetIn(_, (_, x), v, oty, c) ->
     let bs, c' = format_constr_expr h c in
-    Bdef (x, None, v) :: bs, c'
-  | BFdef true :: h, CLetIn(_, (_, x), CCast (_, v, CastConv t), c) ->
-    let bs, c' = format_constr_expr h c in
-    Bdef (x, Some t, v) :: bs, c'
+    Bdef (x, oty, v) :: bs, c'
   | [BFcast], CCast (_, c, CastConv t) ->
     [Bcast t], c
   | BFrec (has_str, has_cast) :: h, 
@@ -5367,10 +5361,8 @@ let rec format_glob_decl h0 d0 = match h0, d0 with
     | Bdecl (xs, _) :: bs -> Bdecl (x :: xs, t) :: bs
     | bs -> Bdecl ([x], t) :: bs
     end
-  | BFdef false :: h, (x, _, Some v, _)  :: d ->
+  | BFdef :: h, (x, _, Some v, _)  :: d ->
     Bdef (x, None, v) :: format_glob_decl h d
-  | BFdef true:: h, (x, _, Some (GCast (_, v, CastConv t)), _) :: d ->
-    Bdef (x, Some t, v) :: format_glob_decl h d
   | _, (x, _, None, t) :: d ->
     Bdecl ([x], t) :: format_glob_decl [] d
   | _, (x, _, Some v, _) :: d ->
@@ -5389,12 +5381,9 @@ let rec format_glob_constr h0 c0 = match h0, c0 with
     | Bdecl (xs, _) :: bs, c' -> Bdecl (x :: xs, t) :: bs, c'
     | _ -> [Bdecl ([x], t)], c
     end
-  | BFdef false :: h, GLetIn(_, x, v, c) ->
+  | BFdef :: h, GLetIn(_, x, v, oty, c) ->
     let bs, c' = format_glob_constr h c in
-    Bdef (x, None, v) :: bs, c'
-  | BFdef true :: h, GLetIn(_, x, GCast (_, v, CastConv t), c) ->
-    let bs, c' = format_glob_constr h c in
-    Bdef (x, Some t, v) :: bs, c'
+    Bdef (x, oty, v) :: bs, c'
   | [BFcast], GCast (_, c, CastConv t) ->
     [Bcast t], c
   | BFrec (has_str, has_cast) :: h, GRec (_, f, _, bl, t, c)
@@ -5501,11 +5490,9 @@ ARGUMENT EXTEND ssrbinder TYPED AS ssrfwdfmt * constr PRINTED BY pr_ssrbinder
      (FwdPose, [BFdecl n]),
      CLambdaN (loc, [xs, Default Explicit, t], mkCHole loc) ]
  | [ "(" ssrbvar(id) ":" lconstr(t) ":=" lconstr(v) ")" ] ->
-   [ let loc' = Loc.join_loc (constr_loc t) (constr_loc v) in
-     let v' = CCast (loc', v, dC t) in
-     (FwdPose,[BFdef true]), CLetIn (loc,bvar_lname id, v',mkCHole loc) ]
+   [ (FwdPose,[BFdef]), CLetIn (loc,bvar_lname id, v, Some t, mkCHole loc) ]
  | [ "(" ssrbvar(id) ":=" lconstr(v) ")" ] ->
-   [ (FwdPose,[BFdef false]), CLetIn (loc,bvar_lname id, v,mkCHole loc) ]
+   [ (FwdPose,[BFdef]), CLetIn (loc,bvar_lname id, v, None, mkCHole loc) ]
 END
 
 GEXTEND Gram
@@ -5529,8 +5516,8 @@ let push_binders c2 bs =
       CProdN (mkloc loc1, b, loop ty c bs)
   | (_, CLambdaN (loc1, b, _)) :: bs ->
       CLambdaN (mkloc loc1, b, loop ty c bs)
-  | (_, CLetIn (loc1, x, v, _)) :: bs ->
-      CLetIn (mkloc loc1, x, v, loop ty c bs)
+  | (_, CLetIn (loc1, x, v, oty, _)) :: bs ->
+      CLetIn (mkloc loc1, x, v, oty, loop ty c bs)
   | [] -> c
   | _ -> anomaly "binder not a lambda nor a let in" in
   match c2 with
@@ -5540,9 +5527,9 @@ let push_binders c2 bs =
 
 let rec fix_binders = function
   | (_, CLambdaN (_, [xs, _, t], _)) :: bs ->
-      LocalRawAssum (xs, Default Explicit, t) :: fix_binders bs
-  | (_, CLetIn (_, x, v, _)) :: bs ->
-    LocalRawDef (x, v) :: fix_binders bs
+      CLocalAssum (xs, Default Explicit, t) :: fix_binders bs
+  | (_, CLetIn (_, x, v, oty, _)) :: bs ->
+    CLocalDef (x, v, oty) :: fix_binders bs
   | _ -> []
 
 let pr_ssrstruct _ _ _ = function
@@ -5708,8 +5695,8 @@ let binder_to_intro_id = List.map (function
   | (FwdPose, [BFvar]), CLambdaN (_,[ids,_,_],_)
   | (FwdPose, [BFdecl _]), CLambdaN (_,[ids,_,_],_) ->
       List.map (function (_, Name id) -> IpatId id | _ -> IpatAnon) ids
-  | (FwdPose, [BFdef _]), CLetIn (_,(_,Name id),_,_) -> [IpatId id]
-  | (FwdPose, [BFdef _]), CLetIn (_,(_,Anonymous),_,_) -> [IpatAnon]
+  | (FwdPose, [BFdef]), CLetIn (_,(_,Name id),_,_,_) -> [IpatId id]
+  | (FwdPose, [BFdef]), CLetIn (_,(_,Anonymous),_,_,_) -> [IpatAnon]
   | _ -> anomaly "ssrbinder is not a binder")
 
 let pr_ssrhavefwdwbinders _ _ prt (tr,((hpats, (fwd, hint)))) =
