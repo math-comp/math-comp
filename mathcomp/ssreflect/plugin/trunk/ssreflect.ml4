@@ -4036,7 +4036,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
       cty, elim, elimty, elim_args, n_elim_args, elim_is_dep, is_rec, pred, gl
     | None ->
       let c = Option.get oc in let gl, c_ty = pfe_type_of gl c in
-      let ((kn, i) as ind, _ as indu), unfolded_c_ty =
+      let ((kn, i) as ind, u), unfolded_c_ty =
         pf_reduce_to_quantified_ind gl c_ty in
       let sort = elimination_sort_of_goal gl in
       let gl, elim =
@@ -4045,6 +4045,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
           gl, t
         else
           pf_eapply (fun env sigma () ->
+            let indu = (ind, EConstr.EInstance.kind sigma u) in
             let sigma = Sigma.Unsafe.of_evar_map sigma in
             let Sigma (ind, sigma, _) = Indrec.build_case_analysis_scheme env sigma indu true sort in
             let sigma = Sigma.to_evar_map sigma in
@@ -5091,8 +5092,9 @@ let rwprocess_rule dir rule gl =
          let s, sigma = sr sigma 1 in
          loop d sigma s a.(0) rs2 0
       | App (r_eq, a) when Hipattern.match_with_equality_type sigma t != None ->
-        let indu = EConstr.destInd sigma r_eq and rhs = Array.last a in
-        let np = Inductiveops.inductive_nparamdecls (fst indu) in
+        let (ind, u) = EConstr.destInd sigma r_eq and rhs = Array.last a in
+        let np = Inductiveops.inductive_nparamdecls ind in
+        let indu = (ind, EConstr.EInstance.kind sigma u) in
         let ind_ct = Inductiveops.type_of_constructors env indu in
         let lhs0 = last_arg sigma (EConstr.of_constr (strip_prod_assum ind_ct.(0))) in
         let rdesc = match EConstr.kind sigma lhs0 with
