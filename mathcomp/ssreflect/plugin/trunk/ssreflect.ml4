@@ -1748,9 +1748,9 @@ GEXTEND Gram
     | "*"; tac = ssrtclarg -> ssrtac_expr !@loc "tclstar" [gen_tclarg tac] 
     ] ];
   tactic_mode: [
-    [ "+"; tac = G_vernac.subgoal_command -> tac None
-    | "-"; tac = G_vernac.subgoal_command -> tac None
-    | "*"; tac = G_vernac.subgoal_command -> tac None
+    [ "+"; tac = G_vernac.query_command -> tac None
+    | "-"; tac = G_vernac.query_command -> tac None
+    | "*"; tac = G_vernac.query_command -> tac None
     ] ];
 END
 
