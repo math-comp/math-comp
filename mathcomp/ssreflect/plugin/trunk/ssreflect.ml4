@@ -184,13 +184,9 @@ let safeDestApp c =
 let get_index = function ArgArg i -> i | _ ->
   anomaly "Uninterpreted index"
 (* Toplevel constr must be globalized twice ! *)
-let glob_constr ist genv = function
-  | _, Some ce ->
-    let vars = Id.Map.fold (fun x _ accu -> Id.Set.add x accu) ist.lfun Id.Set.empty in
-    let ltacvars = {
-      Constrintern.empty_ltac_sign with Constrintern.ltac_vars = vars } in
-    Constrintern.intern_gen WithoutTypeConstraint ~ltacvars genv ce
-  | rc, None -> rc
+let glob_constr ist genv sigma c =
+    (* FIXME: would need to keep a closure to be used within ltac code *)
+    (interp_glob_closure ist genv sigma c).term
 
 (* Term printing utilities functions for deciding bracketing.  *)
 let pr_paren prx x = hov 1 (str "(" ++ prx x ++ str ")")
@@ -1104,24 +1100,11 @@ let interp_intro_pattern = interp_wit wit_intro_pattern
 let interp_constr = interp_wit wit_constr
 
 let interp_open_constr ist gl gc =
-  let (sigma, (c, _)) = Tacinterp.interp_open_constr_with_bindings ist (pf_env gl) (project gl) (gc, NoBindings) in
-  (project gl, (sigma, c))
+  (project gl, Tacinterp.interp_open_constr ist (pf_env gl) (project gl) gc)
 
 let interp_refine ist gl rc =
-  let constrvars = extract_ltac_constr_values ist (pf_env gl) in
-  let vars = { Pretyping.empty_lvar with
-    Pretyping.ltac_constrs = constrvars; ltac_genargs = ist.lfun
-  } in
   let kind = OfType (Tacmach.pf_concl gl) in
-  let flags = {
-    use_typeclasses = true;
-    solve_unification_constraints = true;
-    (* use_unif_heuristics(\*solve_unification_constraints*\) = true; *)
-    use_hook = None;
-    fail_evar = false;
-    expand_evars = true }
-  in
-  let sigma, c = understand_ltac flags (pf_env gl) (project gl) vars kind rc in
+  let sigma, c = interp_open_constr_with_classes ~expected_type:kind ist (pf_env gl) (project gl) (rc,None) in
 (*   pp(lazy(str"sigma@interp_refine=" ++ pr_evar_map None sigma)); *)
   pp(lazy(str"c@interp_refine=" ++ pr_econstr c));
   (sigma, (sigma, c))
@@ -1886,8 +1869,8 @@ let ssrtermkind = Gram.Entry.of_parser "ssrtermkind" input_ssrtermkind
 
 (* terms *)
 let pr_ssrterm _ _ _ = pr_term
-let pf_intern_term ist gl (_, c) = glob_constr ist (pf_env gl) c
-let intern_term ist sigma env (_, c) = glob_constr ist env c
+let pf_intern_term ist gl (_, c) = glob_constr ist (pf_env gl) (project gl) c
+let intern_term ist sigma env (_, c) = glob_constr ist env sigma c
 let interp_term ist gl (_, c) = snd (interp_open_constr ist gl c)
 let force_term ist gl (_, c) = interp_constr ist gl c
 let glob_ssrterm gs = function
@@ -4384,7 +4367,7 @@ END
 
 let interp_agen ist gl ((goclr, _), (k, gc)) (clr, rcs) =
 (* pp(lazy(str"sigma@interp_agen=" ++ pr_evar_map None (project gl))); *)
-  let rc = glob_constr ist (pf_env gl) gc in
+  let rc = glob_constr ist (pf_env gl) (project gl) gc in
   let rcs' = rc :: rcs in
   match goclr with
   | None -> clr, rcs'
