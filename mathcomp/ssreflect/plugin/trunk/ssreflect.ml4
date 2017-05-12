@@ -1351,7 +1351,7 @@ let interp_search_notation ?loc tag okey =
     err (pr_ntn ntn ++ str " is an n-ary notation");
   let nvars = List.filter (fun (_,(_,typ)) -> typ = NtnTypeConstr) nvars in
   let rec sub () = function
-  | NVar x when List.mem_assoc x nvars -> CAst.make ?loc @@ GPatVar (false, x)
+  | NVar x when List.mem_assoc x nvars -> CAst.make ?loc @@ GPatVar (FirstOrderPatVar x)
   | c ->
     glob_constr_of_notation_constr_with_binders ?loc (fun _ x -> (), x) sub () c in
   let _, npat = Patternops.pattern_of_glob_constr (sub () body) in
