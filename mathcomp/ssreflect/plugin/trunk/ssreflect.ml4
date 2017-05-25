@@ -3519,7 +3519,7 @@ let genclrtac cl cs clr =
       (apply_type cl cs)
       (fun type_err gl ->
          tclTHEN
-           (tclTHEN (Proofview.V82.of_tactic (elim_type (EConstr.of_constr (build_coq_False ())))) (cleartac clr))
+           (tclTHEN (Proofview.V82.of_tactic (elim_type (EConstr.of_constr (Universes.constr_of_global @@ build_coq_False ())))) (cleartac clr))
            (fun gl -> raise type_err)
            gl))
     (cleartac clr)
@@ -5032,7 +5032,7 @@ let lz_setoid_relation =
   | env', srel when env' == env -> srel
   | _ ->
     let srel =
-       try Some (coq_constant "Class_setoid" sdir "RewriteRelation")
+       try Some (Universes.constr_of_global @@ coq_reference "Class_setoid" sdir "RewriteRelation")
        with _ -> None in
     last_srel := (env, srel); srel
 
@@ -5078,7 +5078,7 @@ let rwprocess_rule dir rule gl =
           | _ ->
             let sigma, pi2 = Evd.fresh_global env sigma coq_prod.Coqlib.proj2 in
             EConstr.mkApp (EConstr.of_constr pi2, ra), sigma in
-        if EConstr.eq_constr sigma a.(0) (EConstr.of_constr (build_coq_True ())) then
+        if EConstr.eq_constr sigma a.(0) (EConstr.of_constr (Universes.constr_of_global @@ build_coq_True ())) then
          let s, sigma = sr sigma 2 in
          loop (converse_dir d) sigma s a.(1) rs 0
         else
