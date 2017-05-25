@@ -112,9 +112,9 @@ let array_list_of_tl v =
 module Intset = Evar.Set
 
 type loc = Loc.t
-let dummy_loc = Loc.ghost
+
 let errorstrm msg = CErrors.user_err ~hdr:"ssreflect" msg
-let loc_error loc msg = CErrors.user_err ~loc ~hdr:msg (str msg)
+let loc_error ?loc msg = CErrors.user_err ?loc ~hdr:msg (str msg)
 let anomaly s = CErrors.anomaly (str s)
 
 (* Compatibility with Coq 8.6 *)
@@ -131,7 +131,7 @@ let mkSsrRef name =
   try locate_reference (ssrqid name) with Not_found ->
   try locate_reference (ssrtopqid name) with Not_found ->
   CErrors.error "Small scale reflection library not loaded"
-let mkSsrRRef name = GRef (dummy_loc, mkSsrRef name,None), None
+let mkSsrRRef name = (CAst.make @@ GRef (mkSsrRef name,None)), None
 let mkSsrConst name env sigma =
   EConstr.fresh_global env sigma (mkSsrRef name)
 let pf_mkSsrConst name gl =
@@ -247,39 +247,39 @@ let add_genarg tag pr =
 let dC t = CastConv t
 
 (** Constructors for constr_expr *)
-let mkCProp loc = CSort (loc, GProp)
-let mkCType loc = CSort (loc, GType [])
-let mkCVar loc id = CRef (Ident (loc, id),None)
-let isCVar = function CRef (Ident _,_) -> true | _ -> false
-let destCVar = function CRef (Ident (_, id),_) -> id | _ ->
+let mkCProp loc = CAst.make ?loc @@ CSort GProp
+let mkCType loc = CAst.make ?loc @@ CSort (GType [])
+let mkCVar ?loc id = CAst.make ?loc @@ CRef (Ident (Loc.tag ?loc id), None)
+let isCVar = function { CAst.v = CRef (Ident _,_) } -> true | _ -> false
+let destCVar = function { CAst.v = CRef (Ident (_, id),_) } -> id | _ ->
   anomaly "not a CRef"
-let rec mkCHoles loc n =
-  if n <= 0 then [] else CHole (loc, None, IntroAnonymous, None) :: mkCHoles loc (n - 1)
-let mkCHole loc = CHole (loc, None, IntroAnonymous, None)
-let rec isCHoles = function CHole _ :: cl -> isCHoles cl | cl -> cl = []
-let mkCExplVar loc id n =
-   CAppExpl (loc, (None, Ident (loc, id), None), mkCHoles loc n)
-let mkCLambda loc name ty t = 
-   CLambdaN (loc, [[loc, name], Default Explicit, ty], t)
-let mkCLetIn loc name bo oty t = 
-   CLetIn (loc, (loc, name), bo, oty, t)
-let mkCArrow loc ty t =
-   CProdN (loc, [[dummy_loc,Anonymous], Default Explicit, ty], t)
-let mkCCast loc t ty = CCast (loc,t, dC ty)
+let rec mkCHoles ?loc n =
+  if n <= 0 then [] else (CAst.make ?loc @@ CHole (None, IntroAnonymous, None)) :: mkCHoles ?loc (n - 1)
+let mkCHole ?loc = CAst.make ?loc @@ CHole (None, IntroAnonymous, None)
+let rec isCHoles = function { CAst.v = CHole _ } :: cl -> isCHoles cl | cl -> cl = []
+let mkCExplVar ?loc id n = CAst.make ?loc @@
+   CAppExpl ((None, Ident (loc, id), None), mkCHoles ?loc n)
+let mkCLambda ?loc name ty t =  CAst.make ?loc @@
+   CLambdaN ([[loc, name], Default Explicit, ty], t)
+let mkCLetIn ?loc name bo oty t =  CAst.make ?loc @@
+   CLetIn ((loc, name), bo, oty, t)
+let mkCArrow ?loc ty t = CAst.make ?loc @@
+   CProdN ([[Loc.tag Anonymous], Default Explicit, ty], t)
+let mkCCast ?loc t ty = CAst.make ?loc @@ CCast (t, dC ty)
 (** Constructors for rawconstr *)
-let mkRHole = GHole (dummy_loc, InternalHole, IntroAnonymous, None)
+let mkRHole = CAst.make @@ GHole (InternalHole, IntroAnonymous, None)
 let rec mkRHoles n = if n > 0 then mkRHole :: mkRHoles (n - 1) else []
-let rec isRHoles = function GHole _ :: cl -> isRHoles cl | cl -> cl = []
-let mkRApp f args = if args = [] then f else GApp (dummy_loc, f, args)
-let mkRVar id = GRef (dummy_loc, VarRef id,None)
-let mkRltacVar id = GVar (dummy_loc, id)
-let mkRCast rc rt =  GCast (dummy_loc, rc, dC rt)
-let mkRType =  GSort (dummy_loc, GType [])
-let mkRProp =  GSort (dummy_loc, GProp)
-let mkRArrow rt1 rt2 = GProd (dummy_loc, Anonymous, Explicit, rt1, rt2)
-let mkRConstruct c = GRef (dummy_loc, ConstructRef c,None)
-let mkRInd mind = GRef (dummy_loc, IndRef mind,None)
-let mkRLambda n s t = GLambda (dummy_loc, n, Explicit, s, t)
+let rec isRHoles = function { CAst.v = GHole _ } :: cl -> isRHoles cl | cl -> cl = []
+let mkRApp f args = if args = [] then f else CAst.make @@ GApp (f, args)
+let mkRVar id = CAst.make @@ GRef (VarRef id,None)
+let mkRltacVar id = CAst.make @@ GVar (id)
+let mkRCast rc rt =  CAst.make @@ GCast (rc, dC rt)
+let mkRType =  CAst.make @@ GSort (GType [])
+let mkRProp =  CAst.make @@ GSort (GProp)
+let mkRArrow rt1 rt2 = CAst.make @@ GProd (Anonymous, Explicit, rt1, rt2)
+let mkRConstruct c = CAst.make @@ GRef (ConstructRef c,None)
+let mkRInd mind = CAst.make @@ GRef (IndRef mind,None)
+let mkRLambda n s t = CAst.make @@ GLambda (n, Explicit, s, t)
 
 (** Constructors for constr *)
 let pf_e_type_of gl t =
@@ -667,13 +667,13 @@ let internal_names = ref []
 let add_internal_name pt = internal_names := pt :: !internal_names
 let is_internal_name s = List.exists (fun p -> p s) !internal_names
 
-let ssr_id_of_string loc s =
+let ssr_id_of_string ?loc s =
   if is_ssr_reserved s && is_ssr_loaded () then begin
     if !ssr_reserved_ids then
-      loc_error loc ("The identifier " ^ s ^ " is reserved.")
+      loc_error ?loc ("The identifier " ^ s ^ " is reserved.")
     else if is_internal_name s then
-      msg_warning (str ("Conflict between " ^ s ^ " and ssreflect internal names."))
-    else msg_warning (str (
+      msg_warning ?loc (str ("Conflict between " ^ s ^ " and ssreflect internal names."))
+    else msg_warning ?loc (str (
      "The name " ^ s ^ " fits the _xxx_ format used for anonymous variables.\n"
   ^ "Scripts with explicit references to anonymous variables are fragile."))
     end; id_of_string s
@@ -684,7 +684,7 @@ let (!@) = Pcoq.to_coqloc
 
 GEXTEND Gram 
   GLOBAL: Prim.ident;
-  Prim.ident: [[ s = IDENT; ssr_null_entry -> ssr_id_of_string !@loc s ]];
+  Prim.ident: [[ s = IDENT; ssr_null_entry -> ssr_id_of_string ~loc:!@loc s ]];
 END
 
 let mk_internal_id s =
@@ -1076,8 +1076,8 @@ let set_pr_ssrtac name prec afmt =
     | ArgCoq at -> Egramml.GramTerminal "COQ_ARG") afmt in
   let tacname = ssrtac_name name in ()
 
-let ssrtac_atom loc name args = TacML (loc, ssrtac_entry name 0, args)
-let ssrtac_expr = ssrtac_atom
+let ssrtac_atom ?loc name args = TacML (Loc.tag ?loc (ssrtac_entry name 0, args))
+let ssrtac_expr ?loc name args = ssrtac_atom ?loc name args
 
 
 let ssrevaltac ist gtac =
@@ -1232,17 +1232,17 @@ END
 
 type raw_glob_search_about_item =
   | RGlobSearchSubPattern of constr_expr
-  | RGlobSearchString of Loc.t * string * string option
+  | RGlobSearchString of (string * string option) Loc.located
 
 let pr_search_item = function
-  | RGlobSearchString (_,s,_) -> str s
+  | RGlobSearchString (_,(s,_)) -> str s
   | RGlobSearchSubPattern p -> pr_constr_expr p
 
 let wit_ssr_searchitem = add_genarg "ssr_searchitem" pr_search_item
 
-let interp_search_notation loc s opt_scope =
+let interp_search_notation ?loc s opt_scope =
   try
-    let interp = Notation.interp_notation_as_global_reference loc in
+    let interp = Notation.interp_notation_as_global_reference ?loc in
     let ref = interp (fun _ -> true) s opt_scope in
     Search.GlobSearchSubPattern (Pattern.PRef ref)
   with _ ->
@@ -1252,7 +1252,7 @@ let interp_search_notation loc s opt_scope =
         let ambig = "This string refers to a complex or ambiguous notation." in
         str ambig ++ str "\nTry searching with one of\n" ++ ntns
       with _ -> str "This string is not part of an identifier or notation." in
-    CErrors.user_err ~loc ~hdr:"interp_search_notation" diagnosis
+    CErrors.user_err ?loc ~hdr:"interp_search_notation" diagnosis
 
 let pr_ssr_search_item _ _ _ = pr_search_item
 
@@ -1262,8 +1262,8 @@ let is_ident s = try CLexer.check_ident s; true with _ -> false
 
 let is_ident_part s = is_ident ("H" ^ s)
 
-let interp_search_notation loc tag okey =
-  let err msg = CErrors.user_err ~loc ~hdr:"interp_search_notation" msg in
+let interp_search_notation ?loc tag okey =
+  let err msg = CErrors.user_err ?loc ~hdr:"interp_search_notation" msg in
   let mk_pntn s for_key =
     let n = String.length s in
     let s' = Bytes.make (n + 2) ' ' in
@@ -1290,7 +1290,7 @@ let interp_search_notation loc tag okey =
   let generator, pr_tag_sc =
     let ign _ = mt () in match okey with
   | Some key ->
-    let sc = Notation.find_delimiters_scope loc key in
+    let sc = Notation.find_delimiters_scope ?loc key in
     let pr_sc s_in = str s_in ++ spc() ++ str sc ++ pr_comma() in
     Notation.pr_scope ign sc, pr_sc
   | None -> Notation.pr_scopes ign, ign in
@@ -1335,9 +1335,9 @@ let interp_search_notation loc tag okey =
     let e = str "occurs in" ++ spc() ++ pr_and_list pr_ntn ntns' in
     err (hov 4 (str "ambiguous: " ++ qtag "in" ++ e)) in
   let (nvars, body), ((_, pat), osc) = match !scs with
-  | [sc] -> Notation.interp_notation loc ntn (None, [sc])
+  | [sc] -> Notation.interp_notation ?loc ntn (None, [sc])
   | scs' ->
-    try Notation.interp_notation loc ntn (None, []) with _ ->
+    try Notation.interp_notation ?loc ntn (None, []) with _ ->
     let e = pr_ntn ntn ++ spc() ++ str "is defined " ++ pr_scs scs' in
     err (hov 4 (str "ambiguous: " ++ pr_tag_sc "in" ++ e)) in
   let sc = Option.default "" osc in
@@ -1345,7 +1345,7 @@ let interp_search_notation loc tag okey =
     let m_sc =
       if osc <> None then str "In " ++ str sc ++ pr_comma() else mt() in
     let ntn_pat = trim_ntn (mk_pntn pat false) in
-    let rbody = glob_constr_of_notation_constr loc body in
+    let rbody = glob_constr_of_notation_constr ?loc body in
     let m_body = hov 0 (Constrextern.without_symbols prl_glob_constr rbody) in
     let m = m_sc ++ pr_ntn ntn_pat ++ spc () ++ str "denotes " ++ m_body in
     msgnl (hov 0 m) in
@@ -1357,16 +1357,16 @@ let interp_search_notation loc tag okey =
     err (pr_ntn ntn ++ str " is an n-ary notation");
   let nvars = List.filter (fun (_,(_,typ)) -> typ = NtnTypeConstr) nvars in
   let rec sub () = function
-  | NVar x when List.mem_assoc x nvars -> GPatVar (loc, (false, x))
+  | NVar x when List.mem_assoc x nvars -> CAst.make ?loc @@ GPatVar (false, x)
   | c ->
-    glob_constr_of_notation_constr_with_binders loc (fun _ x -> (), x) sub () c in
+    glob_constr_of_notation_constr_with_binders ?loc (fun _ x -> (), x) sub () c in
   let _, npat = Patternops.pattern_of_glob_constr (sub () body) in
   Search.GlobSearchSubPattern npat
 
 ARGUMENT EXTEND ssr_search_item TYPED AS ssr_searchitem
   PRINTED BY pr_ssr_search_item
-  | [ string(s) ] -> [ RGlobSearchString (loc,s,None) ]
-  | [ string(s) "%" preident(key) ] -> [ RGlobSearchString (loc,s,Some key) ]
+  | [ string(s) ] -> [ RGlobSearchString (Loc.tag ~loc (s,None)) ]
+  | [ string(s) "%" preident(key) ] -> [ RGlobSearchString (Loc.tag ~loc (s,Some key)) ]
   | [ constr_pattern(p) ] -> [ RGlobSearchSubPattern p ]
 END
 
@@ -1446,9 +1446,9 @@ let rec interp_search_about args accu = match args with
 
 let interp_search_arg arg =
   let arg = List.map (fun (x,arg) -> x, match arg with
-  | RGlobSearchString (loc,s,key) ->
+  | RGlobSearchString (loc,(s,key)) ->
       if is_ident_part s then Search.GlobSearchString s else
-      interp_search_notation loc s key
+      interp_search_notation ?loc s key
   | RGlobSearchSubPattern p ->
       try
         let intern = Constrintern.intern_constr_pattern in 
@@ -1488,7 +1488,7 @@ let interp_modloc mr =
   let interp_mod (_, mr) =
     let (loc, qid) = qualid_of_reference mr in
     try Nametab.full_name_module qid with Not_found ->
-    CErrors.user_err ~loc ~hdr:"interp_modloc" (str "No Module " ++ pr_qualid qid) in
+    CErrors.user_err ?loc ~hdr:"interp_modloc" (str "No Module " ++ pr_qualid qid) in
   let mr_out, mr_in = List.partition fst mr in
   let interp_bmod b = function
   | [] -> fun _ _ _ -> true
@@ -1542,43 +1542,43 @@ END
 
 let no_ct = None, None and no_rt = None in 
 let aliasvar = function
-  | [_, [CPatAlias (loc, _, id)]] -> Some (loc,Name id)
+  | [_, [{ CAst.v = CPatAlias (_, id); loc }]] -> Some (loc,Name id)
   | _ -> None in
 let mk_cnotype mp = aliasvar mp, None in
 let mk_ctype mp t = aliasvar mp, Some t in
 let mk_rtype t = Some t in
-let mk_dthen loc (mp, ct, rt) c = (loc, mp, c), ct, rt in
-let mk_let loc rt ct mp c1 =
-  CCases (loc, LetPatternStyle, rt, ct, [loc, mp, c1]) in
+let mk_dthen ?loc (mp, ct, rt) c = (Loc.tag ?loc (mp, c)), ct, rt in
+let mk_let ?loc rt ct mp c1 =
+  CAst.make ?loc @@ CCases (LetPatternStyle, rt, ct, [Loc.tag ?loc (mp, c1)]) in
 let mk_pat c (na, t) = (c, na, t) in
 GEXTEND Gram
   GLOBAL: binder_constr;
   ssr_rtype: [[ "return"; t = operconstr LEVEL "100" -> mk_rtype t ]];
-  ssr_mpat: [[ p = pattern -> [!@loc, [p]] ]];
+  ssr_mpat: [[ p = pattern -> [Loc.tag ~loc:!@loc [p]] ]];
   ssr_dpat: [
     [ mp = ssr_mpat; "in"; t = pattern; rt = ssr_rtype -> mp, mk_ctype mp t, rt
     | mp = ssr_mpat; rt = ssr_rtype -> mp, mk_cnotype mp, rt
     | mp = ssr_mpat -> mp, no_ct, no_rt
   ] ];
-  ssr_dthen: [[ dp = ssr_dpat; "then"; c = lconstr -> mk_dthen !@loc dp c ]];
-  ssr_elsepat: [[ "else" -> [!@loc, [CPatAtom (!@loc, None)]] ]];
-  ssr_else: [[ mp = ssr_elsepat; c = lconstr -> !@loc, mp, c ]];
+  ssr_dthen: [[ dp = ssr_dpat; "then"; c = lconstr -> mk_dthen ~loc:!@loc dp c ]];
+  ssr_elsepat: [[ "else" -> [Loc.tag ~loc:!@loc [CAst.make ~loc:!@loc @@ CPatAtom None]] ]];
+  ssr_else: [[ mp = ssr_elsepat; c = lconstr -> Loc.tag ~loc:!@loc (mp, c) ]];
   binder_constr: [
     [ "if"; c = operconstr LEVEL "200"; "is"; db1 = ssr_dthen; b2 = ssr_else ->
-      let b1, ct, rt = db1 in CCases (!@loc, MatchStyle, rt, [mk_pat c ct], [b1; b2])
+      let b1, ct, rt = db1 in CAst.make ~loc:!@loc @@ CCases (MatchStyle, rt, [mk_pat c ct], [b1; b2])
     | "if"; c = operconstr LEVEL "200";"isn't";db1 = ssr_dthen; b2 = ssr_else ->
       let b1, ct, rt = db1 in 
       let b1, b2 = 
-        let (l1, p1, r1), (l2, p2, r2) = b1, b2 in (l1, p1, r2), (l2, p2, r1) in
-      CCases (!@loc, MatchStyle, rt, [mk_pat c ct], [b1; b2])
+        let (l1, (p1, r1)), (l2, (p2, r2)) = b1, b2 in (l1, (p1, r2)), (l2, (p2, r1)) in
+      CAst.make ~loc:!@loc @@ CCases (MatchStyle, rt, [mk_pat c ct], [b1; b2])
     | "let"; ":"; mp = ssr_mpat; ":="; c = lconstr; "in"; c1 = lconstr ->
-      mk_let (!@loc) no_rt [mk_pat c no_ct] mp c1
+      mk_let ~loc:!@loc no_rt [mk_pat c no_ct] mp c1
     | "let"; ":"; mp = ssr_mpat; ":="; c = lconstr;
       rt = ssr_rtype; "in"; c1 = lconstr ->
-      mk_let (!@loc) rt [mk_pat c (mk_cnotype mp)] mp c1
+      mk_let ~loc:!@loc rt [mk_pat c (mk_cnotype mp)] mp c1
     | "let"; ":"; mp = ssr_mpat; "in"; t = pattern; ":="; c = lconstr;
       rt = ssr_rtype; "in"; c1 = lconstr ->
-      mk_let (!@loc) rt [mk_pat c (mk_ctype mp t)] mp c1
+      mk_let ~loc:!@loc rt [mk_pat c (mk_ctype mp t)] mp c1
   ] ];
 END
 
@@ -1586,7 +1586,7 @@ GEXTEND Gram
   GLOBAL: closed_binder;
   closed_binder: [
     [ ["of" | "&"]; c = operconstr LEVEL "99" ->
-      [CLocalAssum ([!@loc, Anonymous], Default Explicit, c)]
+      [CLocalAssum ([Loc.tag ~loc:!@loc Anonymous], Default Explicit, c)]
   ] ];
 END
 (* }}} *)
@@ -1603,7 +1603,7 @@ END
 
 GEXTEND Gram
   GLOBAL: tactic_expr;
-  ssrparentacarg: [[ "("; tac = tactic_expr; ")" -> !@loc, Tacexp tac ]];
+  ssrparentacarg: [[ "("; tac = tactic_expr; ")" -> Loc.tag ~loc:!@loc (Tacexp tac) ]];
   tactic_expr: LEVEL "0" [[ arg = ssrparentacarg -> TacArg arg ]];
 END
 
@@ -1621,7 +1621,7 @@ let donetac gl =
     try Nametab.locate_tactic (qualid_of_ident (id_of_string "done"))
     with Not_found -> try Nametab.locate_tactic (ssrqid "done")
     with Not_found -> CErrors.error "The ssreflect library was not loaded" in
-  let tacexpr = dummy_loc, Tacexpr.Reference (ArgArg (dummy_loc, tacname)) in
+  let tacexpr = Loc.tag @@ Tacexpr.Reference (ArgArg (Loc.tag @@ tacname)) in
   Proofview.V82.of_tactic (eval_tactic (Tacexpr.TacArg tacexpr)) gl
 
 let prof_donetac = mk_profiler "donetac";;
@@ -1632,7 +1632,7 @@ let ssrautoprop gl =
     let tacname = 
       try Nametab.locate_tactic (qualid_of_ident (id_of_string "ssrautoprop"))
       with Not_found -> Nametab.locate_tactic (ssrqid "ssrautoprop") in
-    let tacexpr = dummy_loc, Tacexpr.Reference (ArgArg (dummy_loc, tacname)) in
+    let tacexpr = Loc.tag @@ Tacexpr.Reference (ArgArg (Loc.tag @@ tacname)) in
     Proofview.V82.of_tactic (eval_tactic (Tacexpr.TacArg tacexpr)) gl
   with Not_found -> Proofview.V82.of_tactic (Auto.full_trivial []) gl
 
@@ -1743,9 +1743,9 @@ let gen_tclarg tac = TacGeneric (in_gen (rawwit wit_ssrtclarg) tac)
 GEXTEND Gram
   GLOBAL: tactic tactic_mode;
   tactic: [
-    [ "+"; tac = ssrtclarg -> ssrtac_expr !@loc "tclplus" [gen_tclarg tac]
-    | "-"; tac = ssrtclarg -> ssrtac_expr !@loc "tclminus" [gen_tclarg tac]
-    | "*"; tac = ssrtclarg -> ssrtac_expr !@loc "tclstar" [gen_tclarg tac] 
+    [ "+"; tac = ssrtclarg -> ssrtac_expr ~loc:!@loc "tclplus" [gen_tclarg tac]
+    | "-"; tac = ssrtclarg -> ssrtac_expr ~loc:!@loc "tclminus" [gen_tclarg tac]
+    | "*"; tac = ssrtclarg -> ssrtac_expr ~loc:!@loc "tclstar" [gen_tclarg tac] 
     ] ];
   tactic_mode: [
     [ "+"; tac = G_vernac.query_command -> tac None
@@ -1785,7 +1785,7 @@ END
 (* idents that match global/section constants, since this would lead to    *)
 (* fragile Ltac scripts.                                                   *)
 
-type ssrhyp = SsrHyp of loc * identifier
+type ssrhyp = SsrHyp of identifier Loc.located
 
 let hyp_id (SsrHyp (_, id)) = id
 let pr_hyp (SsrHyp (_, id)) = pr_id id
@@ -1793,23 +1793,23 @@ let pr_ssrhyp _ _ _ = pr_hyp
 
 let wit_ssrhyprep = add_genarg "ssrhyprep" pr_hyp
 
-let hyp_err loc msg id =
-  CErrors.user_err ~loc ~hdr:"ssrhyp" (str msg ++ pr_id id)
+let hyp_err ?loc msg id =
+  CErrors.user_err ?loc ~hdr:"ssrhyp" (str msg ++ pr_id id)
 
 let intern_hyp ist (SsrHyp (loc, id) as hyp) =
   let _ = Tacintern.intern_genarg ist (in_gen (rawwit wit_var) (loc, id)) in
   if not_section_id id then hyp else
-  hyp_err loc "Can't clear section hypothesis " id
+  hyp_err ?loc "Can't clear section hypothesis " id
 
 let interp_hyp ist gl (SsrHyp (loc, id)) =
   let s, id' = interp_wit wit_var ist gl (loc, id) in
   if not_section_id id' then s, SsrHyp (loc, id') else
-  hyp_err loc "Can't clear section hypothesis " id'
+  hyp_err ?loc "Can't clear section hypothesis " id'
 
 ARGUMENT EXTEND ssrhyp TYPED AS ssrhyprep PRINTED BY pr_ssrhyp
                        INTERPRETED BY interp_hyp
                        GLOBALIZED BY intern_hyp
-  | [ ident(id) ] -> [ SsrHyp (loc, id) ]
+  | [ ident(id) ] -> [ SsrHyp (Loc.tag ~loc id) ]
 END
 
 type ssrhyp_or_id = Hyp of ssrhyp | Id of ssrhyp
@@ -1836,12 +1836,12 @@ let interp_ssrhoi ist gl = function
 ARGUMENT EXTEND ssrhoi_hyp TYPED AS ssrhoirep PRINTED BY pr_ssrhoi
                        INTERPRETED BY interp_ssrhoi
                        GLOBALIZED BY intern_ssrhoi
-  | [ ident(id) ] -> [ Hyp (SsrHyp(loc, id)) ]
+  | [ ident(id) ] -> [ Hyp (SsrHyp(Loc.tag ~loc id)) ]
 END
 ARGUMENT EXTEND ssrhoi_id TYPED AS ssrhoirep PRINTED BY pr_ssrhoi
                        INTERPRETED BY interp_ssrhoi
                        GLOBALIZED BY intern_ssrhoi
-  | [ ident(id) ] -> [ Id (SsrHyp(loc, id)) ]
+  | [ ident(id) ] -> [ Id (SsrHyp(Loc.tag ~loc id)) ]
 END
 
 type ssrhyps = ssrhyp list
@@ -1852,7 +1852,7 @@ let hyps_ids = List.map hyp_id
 
 let rec check_hyps_uniq ids = function
   | SsrHyp (loc, id) :: _ when List.mem id ids ->
-    hyp_err loc "Duplicate assumption " id
+    hyp_err ?loc "Duplicate assumption " id
   | SsrHyp (_, id) :: hyps -> check_hyps_uniq (id :: ids) hyps
   | [] -> ()
 
@@ -2121,7 +2121,7 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
   let c = EConstr.Unsafe.to_constr c in
   let evar_closed t p =
     if occur_existential sigma(*XXX*) t then
-      CErrors.user_err ~loc:(loc_of_cpattern p) ~hdr:"ssreflect"
+      CErrors.user_err ?loc:(loc_of_cpattern p) ~hdr:"ssreflect"
         (pr_constr_pat (EConstr.Unsafe.to_constr t) ++
         str" contains holes and matches no subterm of the goal") in
   match gen with
@@ -2160,7 +2160,7 @@ let abs_wgen keep_let ist f gen (gl,args,c) =
 let clr_of_wgen gen clrs = match gen with
   | clr, Some ((x, _), None) ->
      let x = hoi_id x in
-     cleartac clr :: cleartac [SsrHyp(Loc.ghost,x)] :: clrs
+     cleartac clr :: cleartac [SsrHyp(Loc.tag x)] :: clrs
   | clr, _ -> cleartac clr :: clrs
     
 let tclCLAUSES ist tac (gens, clseq) gl =
@@ -2253,9 +2253,9 @@ let pr_ssrindex _ _ _ = pr_index
 let noindex = ArgArg 0
 let allocc = Some(false,[])
 
-let check_index loc i =
-  if i > 0 then i else loc_error loc "Index not positive"
-let mk_index loc = function ArgArg i -> ArgArg (check_index loc i) | iv -> iv
+let check_index ?loc i =
+  if i > 0 then i else loc_error ?loc "Index not positive"
+let mk_index ?loc = function ArgArg i -> ArgArg (check_index ?loc i) | iv -> iv
 
 let interp_index ist gl idx =
   Tacmach.project gl, 
@@ -2277,12 +2277,12 @@ let interp_index ist gl idx =
           end
         | None -> raise Not_found
         end end
-    with _ -> loc_error loc "Index not a number" in
-    ArgArg (check_index loc i)
+    with _ -> loc_error ?loc "Index not a number" in
+    ArgArg (check_index ?loc i)
 
 ARGUMENT EXTEND ssrindex TYPED AS ssrindex PRINTED BY pr_ssrindex
   INTERPRETED BY interp_index
-| [ int_or_var(i) ] -> [ mk_index loc i ]
+| [ int_or_var(i) ] -> [ mk_index ~loc i ]
 END
 
 (** Occurrence switch *)
@@ -2308,7 +2308,7 @@ let pr_ssrocc _ _ _ = pr_occ
 
 ARGUMENT EXTEND ssrocc TYPED AS (bool * int list) option PRINTED BY pr_ssrocc
 | [ natural(n) natural_list(occ) ] -> [
-     Some (false, List.map (check_index loc) (n::occ)) ]
+     Some (false, List.map (check_index ~loc) (n::occ)) ]
 | [ "-" natural_list(occ) ]     -> [ Some (true, occ) ]
 | [ "+" natural_list(occ) ]     -> [ Some (false, occ) ]
 END
@@ -2348,18 +2348,18 @@ END
 
 (* View hints *)
 
-let rec isCxHoles = function (CHole _, None) :: ch -> isCxHoles ch | _ -> false
+let rec isCxHoles = function ({ CAst.v = CHole _ }, None) :: ch -> isCxHoles ch | _ -> false
 
-let pr_raw_ssrhintref prc _ _ = function
-  | CAppExpl (_, (None, r,x), args) when isCHoles args ->
-    prc (CRef (r,x)) ++ str "|" ++ int (List.length args)
-  | CApp (_, (_, CRef _), _) as c -> prc c
-  | CApp (_, (_, c), args) when isCxHoles args ->
+let pr_raw_ssrhintref prc _ _ = let open CAst in function
+  | { v = CAppExpl ((None, r,x), args) } when isCHoles args ->
+    prc (CAst.make @@ CRef (r,x)) ++ str "|" ++ int (List.length args)
+  | { v = CApp ((_, { v = CRef _ }), _) } as c -> prc c
+  | { v = CApp ((_, c), args) } when isCxHoles args ->
     prc c ++ str "|" ++ int (List.length args)
   | c -> prc c
 
-let pr_rawhintref = function
-  | GApp (_, f, args) when isRHoles args ->
+let pr_rawhintref = let open CAst in function
+  | { v = GApp (f, args) } when isRHoles args ->
     pr_glob_constr f ++ str "|" ++ int (List.length args)
   | c -> pr_glob_constr c
 
@@ -2367,16 +2367,16 @@ let pr_glob_ssrhintref _ _ _ (c, _) = pr_rawhintref c
 
 let pr_ssrhintref prc _ _ = prc
 
-let mkhintref loc c n = match c with
-  | CRef (r,x) -> CAppExpl (loc, (None, r, x), mkCHoles loc n)
-  | _ -> mkAppC (c, mkCHoles loc n)
+let mkhintref ?loc c n = match c.CAst.v with
+  | CRef (r,x) -> CAst.make ?loc @@ CAppExpl ((None, r, x), mkCHoles ?loc n)
+  | _ -> mkAppC (c, mkCHoles ?loc n)
 
 ARGUMENT EXTEND ssrhintref
                              PRINTED BY pr_ssrhintref
     RAW_TYPED AS constr  RAW_PRINTED BY pr_raw_ssrhintref
    GLOB_TYPED AS constr GLOB_PRINTED BY pr_glob_ssrhintref
   | [ constr(c) ] -> [ c ]
-  | [ constr(c) "|" natural(n) ] -> [ mkhintref loc c n ]
+  | [ constr(c) "|" natural(n) ] -> [ mkhintref ~loc c n ]
 END
 
 (* View purpose *)
@@ -2488,9 +2488,10 @@ let view_error s gv =
   errorstrm (str ("Cannot " ^ s ^ " view ") ++ pr_term gv)
 
 let interp_view ist si env sigma gv rid =
+  let open CAst in
   match intern_term ist sigma env gv with
-  | GApp (loc, GHole _, rargs) ->
-    let rv = GApp (loc, rid, rargs) in
+  | { v = GApp ( { v = GHole _ } , rargs); loc } ->
+    let rv = make ?loc @@ GApp (rid, rargs) in
     snd (interp_open_constr ist (re_sig si sigma) (rv, None))
   | rv ->
   let interp rc rargs =
@@ -2599,13 +2600,13 @@ let intern_ipat ist ipat =
 let intern_ipats ist = List.map (intern_ipat ist)
 
 let interp_introid ist gl id =
- try IntroNaming (IntroIdentifier (hyp_id (snd (interp_hyp ist gl (SsrHyp (dummy_loc, id))))))
- with _ -> snd(snd (interp_intro_pattern ist gl (dummy_loc,IntroNaming (IntroIdentifier id))))
+ try IntroNaming (IntroIdentifier (hyp_id (snd (interp_hyp ist gl (SsrHyp (Loc.tag id))))))
+ with _ -> snd(snd (interp_intro_pattern ist gl (Loc.tag @@ IntroNaming (IntroIdentifier id))))
 
 let rec add_intro_pattern_hyps (loc, ipat) hyps = match ipat with
   | IntroNaming (IntroIdentifier id) ->
     if not_section_id id then SsrHyp (loc, id) :: hyps else
-    hyp_err loc "Can't delete section hypothesis " id
+    hyp_err ?loc "Can't delete section hypothesis " id
   | IntroAction IntroWildcard -> hyps
   | IntroAction (IntroOrAndPattern (IntroOrPattern iorpat)) ->
     List.fold_right (List.fold_right add_intro_pattern_hyps) iorpat hyps
@@ -2667,7 +2668,7 @@ ARGUMENT EXTEND ssripat TYPED AS ssripatrep list PRINTED BY pr_ssripats
       | Some clr, _ -> [IpatSimpl (clr, Nop); IpatRw (allocc, R2L)]]
   | [ ssrdocc(occ) ] -> [ match occ with
       | Some cl, _ -> check_hyps_uniq [] cl; [IpatSimpl (cl, Nop)]
-      | _ -> loc_error loc "Only identifiers are allowed here"]
+      | _ -> loc_error ~loc "Only identifiers are allowed here"]
   | [ "->" ] -> [ [IpatRw (allocc, L2R)] ]
   | [ "<-" ] -> [ [IpatRw (allocc, R2L)] ]
   | [ "-" ] -> [ [IpatNoop] ]
@@ -2759,7 +2760,7 @@ let check_ssrhpats loc w_binders ipats =
   ((clr, ipat), binders), simpl
 
 let single loc =
-  function [x] -> x | _ -> loc_error loc "Only one intro pattern is allowed"
+  function [x] -> x | _ -> loc_error ?loc "Only one intro pattern is allowed"
 
 let pr_hpats (((clr, ipat), binders), simpl) =
    pr_clear mt clr ++ pr_ipats ipat ++ pr_ipats binders ++ pr_ipats simpl
@@ -2989,7 +2990,7 @@ let introstac, tclEQINTROS =
       let ren_clr, ren = 
         List.split (List.map (fun x -> let x = hyp_id x in
           let x' = mk_anon_id (string_of_id x) gl in
-          SsrHyp (dummy_loc, x'), (x, x')) clr) in
+          (SsrHyp (Loc.tag x')), (x, x')) clr) in
       let () = to_clr := ren_clr in
       Proofview.V82.of_tactic (rename_hyp ren) gl 
     else
@@ -3016,7 +3017,7 @@ let introstac, tclEQINTROS =
               tclTHEN
                 (!move_top_with_view false top_id (false,v) ist)
                 (fun gl -> 
-                  rename true to_clr rest [SsrHyp (dummy_loc, !top_id)]gl)
+                  rename true to_clr rest [SsrHyp (Loc.tag !top_id)]gl)
             | _ -> k, !move_top_with_view true (ref top_id) (true,v) ist
   and tclIORPAT ?ist k tac = function
     | [[]] -> tac
@@ -3081,14 +3082,14 @@ TACTIC EXTEND ssrtclintros
 END
 set_pr_ssrtac "tclintros" 0 [ArgSsr "introsarg"]
 
-let tclintros_expr loc tac ipats =
+let tclintros_expr ?loc tac ipats =
   let args = [Tacexpr.TacGeneric (in_gen (rawwit wit_ssrintrosarg) (tac, ipats))] in
-  ssrtac_expr loc "tclintros" args
+  ssrtac_expr ?loc "tclintros" args
 
 GEXTEND Gram
   GLOBAL: tactic_expr;
   tactic_expr: LEVEL "1" [ RIGHTA
-    [ tac = tactic_expr; intros = ssrintros_ne -> tclintros_expr !@loc tac intros
+    [ tac = tactic_expr; intros = ssrintros_ne -> tclintros_expr ~loc:!@loc tac intros
     ] ];
 END
 (* }}} *)
@@ -3128,7 +3129,7 @@ let tclDO n tac =
         let _, info = CErrors.push e in
         let e' = CErrors.UserError (l, prefix i ++ s) in
         Util.iraise (e', info)
-    | Ploc.Exc(loc, CErrors.UserError (l, s))  -> 
+    | Ploc.Exc(loc, CErrors.UserError (l, s))  ->
         raise (Ploc.Exc(loc, CErrors.UserError (l, prefix i ++ s))) in
   let rec loop i gl =
     if i = n then tac_err_at i gl else
@@ -3167,9 +3168,9 @@ TACTIC EXTEND ssrtcldo
 END
 set_pr_ssrtac "tcldo" 3 [ArgSep "do "; ArgSsr "doarg"]
 
-let ssrdotac_expr loc n m tac clauses =
+let ssrdotac_expr ?loc n m tac clauses =
   let arg = ((n, m), tac), clauses in
-  ssrtac_expr loc "tcldo" [Tacexpr.TacGeneric (in_gen (rawwit wit_ssrdoarg) arg)]
+  ssrtac_expr ?loc "tcldo" [Tacexpr.TacGeneric (in_gen (rawwit wit_ssrdoarg) arg)]
 
 GEXTEND Gram
   GLOBAL: tactic_expr;
@@ -3179,12 +3180,12 @@ GEXTEND Gram
   ] ];
   tactic_expr: LEVEL "3" [ RIGHTA
     [ IDENT "do"; m = ssrmmod; tac = ssrdotac; clauses = ssrclauses ->
-      ssrdotac_expr !@loc noindex m tac clauses
+      ssrdotac_expr ~loc:!@loc noindex m tac clauses
     | IDENT "do"; tac = ssrortacarg; clauses = ssrclauses ->
-      ssrdotac_expr !@loc noindex Once tac clauses
+      ssrdotac_expr ~loc:!@loc noindex Once tac clauses
     | IDENT "do"; n = int_or_var; m = ssrmmod;
                   tac = ssrdotac; clauses = ssrclauses ->
-      ssrdotac_expr !@loc (mk_index !@loc n) m tac clauses
+      ssrdotac_expr ~loc:!@loc (mk_index ~loc:!@loc n) m tac clauses
     ] ];
 END
 (* }}} *)
@@ -3225,17 +3226,17 @@ let swaptacarg (loc, b) = (b, []), Some (TacId [])
 
 let check_seqtacarg dir arg = match snd arg, dir with
   | ((true, []), Some (TacAtom (loc, _))), L2R ->
-    loc_error loc "expected \"last\""
+    loc_error ?loc "expected \"last\""
   | ((false, []), Some (TacAtom (loc, _))), R2L ->
-    loc_error loc "expected \"first\""
+    loc_error ?loc "expected \"first\""
   | _, _ -> arg
 
 let ssrorelse = Gram.entry_create "ssrorelse"
 GEXTEND Gram
   GLOBAL: ssrorelse ssrseqarg;
   ssrseqidx: [
-    [ test_ssrseqvar; id = Prim.ident -> ArgVar (!@loc, id)
-    | n = Prim.natural -> ArgArg (check_index !@loc n)
+    [ test_ssrseqvar; id = Prim.ident -> ArgVar (Loc.tag ~loc:!@loc id)
+    | n = Prim.natural -> ArgArg (check_index ~loc:!@loc n)
     ] ];
   ssrswap: [[ IDENT "first" -> !@loc, true | IDENT "last" -> !@loc, false ]];
   ssrorelse: [[ "||"; tac = tactic_expr LEVEL "2" -> tac ]];
@@ -3332,16 +3333,16 @@ TACTIC EXTEND ssrtclseq
 END
 set_pr_ssrtac "tclseq" 5 [ArgSsr "tclarg"; ArgSsr "seqdir"; ArgSsr "seqarg"]
 
-let tclseq_expr loc tac dir arg =
+let tclseq_expr ?loc tac dir arg =
   let arg1 = in_gen (rawwit wit_ssrtclarg) tac in
   let arg2 = in_gen (rawwit wit_ssrseqdir) dir in
   let arg3 = in_gen (rawwit wit_ssrseqarg) (check_seqtacarg dir arg) in
-  ssrtac_expr loc "tclseq" (List.map (fun x -> Tacexpr.TacGeneric x) [arg1; arg2; arg3])
+  ssrtac_expr ?loc "tclseq" (List.map (fun x -> Tacexpr.TacGeneric x) [arg1; arg2; arg3])
 
 GEXTEND Gram
   GLOBAL: tactic_expr;
   ssr_first: [
-    [ tac = ssr_first; ipats = ssrintros_ne -> tclintros_expr !@loc tac ipats
+    [ tac = ssr_first; ipats = ssrintros_ne -> tclintros_expr ~loc:!@loc tac ipats
     | "["; tacl = LIST0 tactic_expr SEP "|"; "]" -> TacFirst tacl
     ] ];
   ssr_first_else: [
@@ -3351,9 +3352,9 @@ GEXTEND Gram
     [ tac1 = tactic_expr; ";"; IDENT "first"; tac2 = ssr_first_else ->
       TacThen (tac1, tac2)
     | tac = tactic_expr; ";"; IDENT "first"; arg = ssrseqarg ->
-      tclseq_expr !@loc tac L2R arg
+      tclseq_expr ~loc:!@loc tac L2R arg
     | tac = tactic_expr; ";"; IDENT "last"; arg = ssrseqarg ->
-      tclseq_expr !@loc tac R2L arg
+      tclseq_expr ~loc:!@loc tac R2L arg
     ] ];
 END
 (* }}} *)
@@ -3378,18 +3379,18 @@ let pf_interp_ty ?(resolve_typeclasses=false) ist gl ty =
    let n_binders = ref 0 in
    let ty = match ty with
    | a, (t, None) ->
-     let rec force_type = function
-     | GProd (l, x, k, s, t) -> incr n_binders; GProd (l, x, k, s, force_type t)
-     | GLetIn (l, x, v, oty, t) -> incr n_binders; GLetIn (l, x, v, oty, force_type t)
-     | ty -> mkRCast ty mkRType in
+     let rec force_type ty = CAst.(map (function
+     | GProd (x, k, s, t) -> incr n_binders; GProd (x, k, s, force_type t)
+     | GLetIn (x, v, oty, t) -> incr n_binders; GLetIn (x, v, oty, force_type t)
+     | _ -> (mkRCast ty mkRType).v)) ty in
      a, (force_type t, None)
    | _, (_, Some ty) ->
-     let rec force_type = function
-     | CProdN (l, abs, t) ->
+     let rec force_type ty = CAst.(map (function
+     | CProdN (abs, t) ->
        n_binders := !n_binders +  List.length (List.flatten (List.map pi1 abs));
-       CProdN (l, abs, force_type t)
-     | CLetIn (l, n, v, oty, t) -> incr n_binders; CLetIn (l, n, v, oty, force_type t)
-     | ty -> mkCCast dummy_loc ty (mkCType dummy_loc) in
+       CProdN (abs, force_type t)
+     | CLetIn (n, v, oty, t) -> incr n_binders; CLetIn (n, v, oty, force_type t)
+     | _ -> (mkCCast ty (mkCType None)).v)) ty in
      mk_term ' ' (force_type ty) in
    let strip_cast (sigma, t) =
      let rec aux t = match EConstr.kind_of_type sigma t with
@@ -3478,7 +3479,7 @@ ARGUMENT EXTEND ssrgen TYPED AS ssrdocc * cpattern PRINTED BY pr_ssrgen
 END
 
 let has_occ ((_, occ), _) = occ <> None
-let hyp_of_var sigma v =  SsrHyp (dummy_loc, EConstr.destVar sigma v)
+let hyp_of_var sigma v = SsrHyp (Loc.tag @@ EConstr.destVar sigma v)
 
 let interp_clr sigma = function
 | Some clr, (k, c) 
@@ -3509,7 +3510,7 @@ let pf_interp_gen_aux ist gl to_ind ((oclr, occ), t) =
     let p = EConstr.of_constr p in
     let gl, pty = pfe_type_of gl p in
     false, pat, EConstr.mkProd (constr_name (project gl) c, pty, Tacmach.pf_concl gl), p, clr,ucst,gl
-  else loc_error (loc_of_cpattern t) "generalized term didn't match"
+  else loc_error ?loc:(loc_of_cpattern t) "generalized term didn't match"
 
 let genclrtac cl cs clr =
   let tclmyORELSE tac1 tac2 gl =
@@ -3665,10 +3666,10 @@ GEXTEND Gram
     | "?" -> IpatAnon
     | occ = ssrdocc; "->" -> (match occ with
       | None, occ -> IpatRw (occ, L2R)
-      | _ -> loc_error !@loc "Only occurrences are allowed here")
+      | _ -> loc_error ~loc:!@loc "Only occurrences are allowed here")
     | occ = ssrdocc; "<-" -> (match occ with
       | None, occ ->  IpatRw (occ, R2L)
-      | _ -> loc_error !@loc "Only occurrences are allowed here")
+      | _ -> loc_error ~loc:!@loc "Only occurrences are allowed here")
     | "->" -> IpatRw (allocc, L2R)
     | "<-" -> IpatRw (allocc, R2L)
     ]];
@@ -4396,10 +4397,11 @@ let interp_agen ist gl ((goclr, _), (k, gc)) (clr, rcs) =
   | Some ghyps ->
     let clr' = snd (interp_hyps ist gl ghyps) @ clr in
     if k <> ' ' then clr', rcs' else
+    let open CAst in
     match rc with
-    | GVar (loc, id) when not_section_id id -> SsrHyp (loc, id) :: clr', rcs'
-    | GRef (loc, VarRef id, _) when not_section_id id ->
-        SsrHyp (loc, id) :: clr', rcs'
+    | { loc; v = GVar id } when not_section_id id -> SsrHyp (Loc.tag ?loc id) :: clr', rcs'
+    | { loc; v = GRef (VarRef id, _) } when not_section_id id ->
+        SsrHyp (Loc.tag ?loc id) :: clr', rcs'
     | _ -> clr', rcs'
 
 let interp_agens ist gl gagens =
@@ -4417,8 +4419,9 @@ let interp_agens ist gl gagens =
 
 let apply_rconstr ?ist t gl =
 (* pp(lazy(str"sigma@apply_rconstr=" ++ pr_evar_map None (project gl))); *)
+  let open CAst in
   let n = match ist, t with
-    | None, (GVar (_, id) | GRef (_, VarRef id,_)) -> pf_nbargs gl (EConstr.mkVar id)
+    | None, { v = GVar id | GRef (VarRef id,_) } -> pf_nbargs gl (EConstr.mkVar id)
     | Some ist, _ -> interp_nbargs ist gl t
     | _ -> anomaly "apply_rconstr without ist and not RVar" in
   let mkRlemma i = mkRApp t (mkRHoles i) in
@@ -4520,8 +4523,8 @@ ARGUMENT EXTEND ssrcongrarg TYPED AS (int * ssrterm) * ssrdgens
 END
 
 let rec mkRnat n =
-  if n <= 0 then GRef (dummy_loc, glob_O, None) else
-  mkRApp (GRef (dummy_loc, glob_S, None)) [mkRnat (n - 1)]
+  if n <= 0 then CAst.make @@ GRef (glob_O, None) else
+  mkRApp (CAst.make @@ GRef (glob_S, None)) [mkRnat (n - 1)]
 
 let interp_congrarg_at ist gl n rf ty m =
   pp(lazy(str"===interp_congrarg_at==="));
@@ -4636,7 +4639,7 @@ let pr_mult (n, m) =
 let pr_ssrmult _ _ _ = pr_mult
 
 ARGUMENT EXTEND ssrmult_ne TYPED AS int * ssrmmod PRINTED BY pr_ssrmult
-  | [ natural(n) ssrmmod(m) ] -> [ check_index loc n, m ]
+  | [ natural(n) ssrmmod(m) ] -> [ check_index ~loc n, m ]
   | [ ssrmmod(m) ]            -> [ notimes, m ]
 END
 
@@ -4679,7 +4682,7 @@ let pr_rule = function
 
 let pr_ssrrule _ _ _ = pr_rule
 
-let noruleterm loc = mk_term ' ' (mkCProp loc)
+let noruleterm loc = mk_term ' ' (mkCProp (Some loc))
 
 ARGUMENT EXTEND ssrrule_ne TYPED AS ssrrwkind * ssrterm PRINTED BY pr_ssrrule
   | [ ssrsimpl_ne(s) ] -> [ RWred s, noruleterm loc ]
@@ -5404,24 +5407,24 @@ let rec format_local_binders h0 bl0 = match h0, bl0 with
     Bdef (x, oty, v) :: format_local_binders h bl
   | _ -> []
   
-let rec format_constr_expr h0 c0 = match h0, c0 with
-  | BFvar :: h, CLambdaN (_, [[_, x], _, _], c) ->
+let rec format_constr_expr h0 c0 = let open CAst in match h0, c0 with
+  | BFvar :: h, { v = CLambdaN ([[_, x], _, _], c) } ->
     let bs, c' = format_constr_expr h c in
     Bvar x :: bs, c'
-  | BFdecl _:: h, CLambdaN (_, [lxs, _, t], c) ->
+  | BFdecl _:: h, { v = CLambdaN ([lxs, _, t], c) } ->
     let bs, c' = format_constr_expr h c in
     Bdecl (List.map snd lxs, t) :: bs, c'
-  | BFdef :: h, CLetIn(_, (_, x), v, oty, c) ->
+  | BFdef :: h, { v = CLetIn((_, x), v, oty, c) } ->
     let bs, c' = format_constr_expr h c in
     Bdef (x, oty, v) :: bs, c'
-  | [BFcast], CCast (_, c, CastConv t) ->
+  | [BFcast], { v = CCast (c, CastConv t) } ->
     [Bcast t], c
   | BFrec (has_str, has_cast) :: h, 
-    CFix (_, _, [_, (Some locn, CStructRec), bl, t, c]) ->
+    { v = CFix ( _, [_, (Some locn, CStructRec), bl, t, c]) } ->
     let bs = format_local_binders h bl in
     let bstr = if has_str then [Bstruct (Name (snd locn))] else [] in
     bs @ bstr @ (if has_cast then [Bcast t] else []), c 
-  | BFrec (_, has_cast) :: h, CCoFix (_, _, [_, bl, t, c]) ->
+  | BFrec (_, has_cast) :: h, { v = CCoFix ( _, [_, bl, t, c]) } ->
     format_local_binders h bl @ (if has_cast then [Bcast t] else []), c
   | _, c ->
     [], c
@@ -5444,24 +5447,24 @@ let rec format_glob_decl h0 d0 = match h0, d0 with
      Bdef (x, None, v) :: format_glob_decl [] d
   | _, [] -> []
 
-let rec format_glob_constr h0 c0 = match h0, c0 with
-  | BFvar :: h, GLambda (_, x, _, _, c) ->
+let rec format_glob_constr h0 c0 = let open CAst in match h0, c0 with
+  | BFvar :: h, { v = GLambda (x, _, _, c) } ->
     let bs, c' = format_glob_constr h c in
     Bvar x :: bs, c'
-  | BFdecl 1 :: h,  GLambda (_, x, _, t, c) ->
+  | BFdecl 1 :: h, { v = GLambda (x, _, t, c) } ->
     let bs, c' = format_glob_constr h c in
     Bdecl ([x], t) :: bs, c'
-  | BFdecl n :: h,  GLambda (_, x, _, t, c) when n > 1 ->
+  | BFdecl n :: h, { v = GLambda (x, _, t, c) } when n > 1 ->
     begin match format_glob_constr (BFdecl (n - 1) :: h) c with
     | Bdecl (xs, _) :: bs, c' -> Bdecl (x :: xs, t) :: bs, c'
     | _ -> [Bdecl ([x], t)], c
     end
-  | BFdef :: h, GLetIn(_, x, v, oty, c) ->
+  | BFdef :: h, { v = GLetIn(x, v, oty, c) } ->
     let bs, c' = format_glob_constr h c in
     Bdef (x, oty, v) :: bs, c'
-  | [BFcast], GCast (_, c, CastConv t) ->
+  | [BFcast], { v = GCast (c, CastConv t) } ->
     [Bcast t], c
-  | BFrec (has_str, has_cast) :: h, GRec (_, f, _, bl, t, c)
+  | BFrec (has_str, has_cast) :: h, { v = GRec (f, _, bl, t, c) }
       when Array.length c = 1 ->
     let bs = format_glob_decl h bl.(0) in
     let bstr = match has_str, f with
@@ -5493,15 +5496,15 @@ let wit_ssrfwdfmt = add_genarg "ssrfwdfmt" pr_fwdfmt
 let mkFwdVal fk c = ((fk, []), mk_term ' ' c)
 let mkssrFwdVal fk c = ((fk, []), (c,None))
 
-let mkFwdCast fk loc t c = ((fk, [BFcast]), mk_term ' ' (CCast (loc, c, dC t)))
-let mkssrFwdCast fk loc t c = ((fk, [BFcast]), (c, Some t))
+let mkFwdCast fk ?loc t c = ((fk, [BFcast]), mk_term ' ' (CAst.make ?loc @@ CCast (c, dC t)))
+let mkssrFwdCast fk ?loc t c = ((fk, [BFcast]), (c, Some t))
 
 let mkFwdHint s t =
   let loc = constr_loc t in
-  mkFwdCast (FwdHint (s,false)) loc t (mkCHole loc)
+  mkFwdCast (FwdHint (s,false)) ?loc t (mkCHole ?loc)
 let mkFwdHintNoTC s t =
   let loc = constr_loc t in
-  mkFwdCast (FwdHint (s,true)) loc t (mkCHole loc)
+  mkFwdCast (FwdHint (s,true)) ?loc t (mkCHole ?loc)
 
 let pr_gen_fwd prval prc prlc fk (bs, c) =
   let prc s = str s ++ spc () ++ prval prc prlc c in
@@ -5525,7 +5528,7 @@ let pr_ssrfwd _ _ _ = pr_fwd
  
 ARGUMENT EXTEND ssrfwd TYPED AS (ssrfwdfmt * ssrterm) PRINTED BY pr_ssrfwd
   | [ ":=" lconstr(c) ] -> [ mkFwdVal FwdPose c ]
-  | [ ":" lconstr (t) ":=" lconstr(c) ] -> [ mkFwdCast FwdPose loc t c ]
+  | [ ":" lconstr (t) ":=" lconstr(c) ] -> [ mkFwdCast FwdPose ~loc t c ]
 END
 
 (** Independent parsing for binders *)
@@ -5536,13 +5539,13 @@ END
 let pr_ssrbvar prc _ _ v = prc v
 
 ARGUMENT EXTEND ssrbvar TYPED AS constr PRINTED BY pr_ssrbvar
-| [ ident(id) ] -> [ mkCVar loc id ]
-| [ "_" ] -> [ mkCHole loc ]
+| [ ident(id) ] -> [ mkCVar ~loc id ]
+| [ "_" ] -> [ mkCHole ~loc ]
 END
 
-let bvar_lname = function
-  | CRef (Ident (loc, id), _) -> loc, Name id
-  | c -> constr_loc c, Anonymous
+let bvar_lname = let open CAst in function
+  | { v = CRef (Ident (loc, id), _) } -> Loc.tag ?loc @@ Name id
+  | { loc = loc } -> Loc.tag ?loc Anonymous
 
 let pr_ssrbinder prc _ _ (_, c) = prc c
 
@@ -5550,24 +5553,24 @@ ARGUMENT EXTEND ssrbinder TYPED AS ssrfwdfmt * constr PRINTED BY pr_ssrbinder
  | [ ssrbvar(bv) ] ->
    [ let xloc, _ as x = bvar_lname bv in
      (FwdPose, [BFvar]),
-     CLambdaN (loc,[[x],Default Explicit,mkCHole xloc],mkCHole loc) ]
+     CAst.make ~loc @@ CLambdaN ([[x],Default Explicit,mkCHole ?loc:xloc],mkCHole ~loc) ]
  | [ "(" ssrbvar(bv) ")" ] ->
    [ let xloc, _ as x = bvar_lname bv in
      (FwdPose, [BFvar]),
-     CLambdaN (loc,[[x],Default Explicit,mkCHole xloc],mkCHole loc) ]
+     CAst.make ~loc @@ CLambdaN ([[x],Default Explicit,mkCHole ?loc:xloc],mkCHole ~loc) ]
  | [ "(" ssrbvar(bv) ":" lconstr(t) ")" ] ->
    [ let x = bvar_lname bv in
      (FwdPose, [BFdecl 1]),
-     CLambdaN (loc, [[x], Default Explicit, t], mkCHole loc) ]
+     CAst.make ~loc @@ CLambdaN ([[x], Default Explicit, t], mkCHole ~loc) ]
  | [ "(" ssrbvar(bv) ne_ssrbvar_list(bvs) ":" lconstr(t) ")" ] ->
    [ let xs = List.map bvar_lname (bv :: bvs) in
      let n = List.length xs in
      (FwdPose, [BFdecl n]),
-     CLambdaN (loc, [xs, Default Explicit, t], mkCHole loc) ]
+     CAst.make ~loc @@ CLambdaN ([xs, Default Explicit, t], mkCHole ~loc) ]
  | [ "(" ssrbvar(id) ":" lconstr(t) ":=" lconstr(v) ")" ] ->
-   [ (FwdPose,[BFdef]), CLetIn (loc,bvar_lname id, v, Some t, mkCHole loc) ]
+   [ (FwdPose,[BFdef]), CAst.make ~loc @@ CLetIn (bvar_lname id, v, Some t, mkCHole ~loc) ]
  | [ "(" ssrbvar(id) ":=" lconstr(v) ")" ] ->
-   [ (FwdPose,[BFdef]), CLetIn (loc,bvar_lname id, v, None, mkCHole loc) ]
+   [ (FwdPose,[BFdef]), CAst.make ~loc @@ CLetIn (bvar_lname id, v, None, mkCHole ~loc) ]
 END
 
 GEXTEND Gram
@@ -5576,34 +5579,35 @@ GEXTEND Gram
   [  ["of" | "&"]; c = operconstr LEVEL "99" ->
      let loc = !@loc in
      (FwdPose, [BFvar]),
-     CLambdaN (loc,[[loc,Anonymous],Default Explicit,c],mkCHole loc) ]
+     CAst.make ~loc @@ CLambdaN ([[Loc.tag ~loc Anonymous],Default Explicit,c],mkCHole ~loc) ]
   ];
 END
 
-let rec binders_fmts = function
+let rec binders_fmts : (ssrfwdfmt * constr_expr) list -> _ = function
   | ((_, h), _) :: bs -> h @ binders_fmts bs
   | _ -> []
 
 let push_binders c2 bs =
-  let loc2 = constr_loc c2 in let mkloc loc1 = Loc.join_loc loc1 loc2 in
+  let loc2 = constr_loc c2 in let mkloc loc1 = Loc.merge_opt loc1 loc2 in
+  let open CAst in
   let rec loop ty c = function
-  | (_, CLambdaN (loc1, b, _)) :: bs when ty ->
-      CProdN (mkloc loc1, b, loop ty c bs)
-  | (_, CLambdaN (loc1, b, _)) :: bs ->
-      CLambdaN (mkloc loc1, b, loop ty c bs)
-  | (_, CLetIn (loc1, x, v, oty, _)) :: bs ->
-      CLetIn (mkloc loc1, x, v, oty, loop ty c bs)
+  | (_, { loc = loc1; v = CLambdaN (b, _) } ) :: bs when ty ->
+      CAst.make ?loc:(mkloc loc1) @@ CProdN (b, loop ty c bs)
+  | (_, { loc = loc1; v = CLambdaN (b, _) } ) :: bs ->
+      CAst.make ?loc:(mkloc loc1) @@ CLambdaN (b, loop ty c bs)
+  | (_, { loc = loc1; v = CLetIn (x, v, oty, _) } ) :: bs ->
+      CAst.make ?loc:(mkloc loc1) @@ CLetIn (x, v, oty, loop ty c bs)
   | [] -> c
   | _ -> anomaly "binder not a lambda nor a let in" in
   match c2 with
-  | CCast (x, ct, CastConv cty) ->
-      (CCast (x, loop false ct bs, CastConv (loop true cty bs)))
+  | { loc; v = CCast (ct, CastConv cty) } ->
+      CAst.make ?loc @@ (CCast (loop false ct bs, CastConv (loop true cty bs)))
   | ct -> loop false ct bs
 
-let rec fix_binders = function
-  | (_, CLambdaN (_, [xs, _, t], _)) :: bs ->
+let rec fix_binders = let open CAst in function
+  | (_, { v = CLambdaN ([xs, _, t], _) } ) :: bs ->
       CLocalAssum (xs, Default Explicit, t) :: fix_binders bs
-  | (_, CLetIn (_, x, v, oty, _)) :: bs ->
+  | (_, { v = CLetIn (x, v, oty, _) } ) :: bs ->
     CLocalDef (x, v, oty) :: fix_binders bs
   | _ -> []
 
@@ -5620,7 +5624,7 @@ END
 
 (* The plain pose form. *)
 
-let bind_fwd bs = function
+let bind_fwd (bs : (ssrfwdfmt * Constrexpr.constr_expr) list) = function
   | (fk, h), (ck, (rc, Some c)) ->
     (fk,binders_fmts bs @ h), (ck,(rc,Some (push_binders c bs)))
   | fwd -> fwd
@@ -5634,7 +5638,7 @@ END
 let pr_ssrfixfwd _ _ _ (id, fwd) = str " fix " ++ pr_id id ++ pr_fwd fwd
 
 let bvar_locid = function
-  | CRef (Ident (loc, id), _) -> loc, id
+  | { CAst.v = CRef (Ident (loc, id), _) } -> loc, id
   | _ -> CErrors.error "Missing identifier after \"(co)fix\""
 
 
@@ -5645,7 +5649,7 @@ ARGUMENT EXTEND ssrfixfwd TYPED AS ident * ssrfwd PRINTED BY pr_ssrfixfwd
       let c = Option.get oc in
       let has_cast, t', c' = match format_constr_expr h c with
       | [Bcast t'], c' -> true, t', c'
-      | _ -> false, mkCHole (constr_loc c), c in
+      | _ -> false, mkCHole ?loc:(constr_loc c), c in
       let lb = fix_binders bs in
       let has_struct, i =
         let rec loop = function
@@ -5655,7 +5659,7 @@ ARGUMENT EXTEND ssrfixfwd TYPED AS ident * ssrfwd PRINTED BY pr_ssrfixfwd
           | [] -> CErrors.error "Bad structural argument" in
         loop (names_of_local_assums lb) in
       let h' = BFrec (has_struct, has_cast) :: binders_fmts bs in
-      let fix = CFix (loc, lid, [lid, (Some i, CStructRec), lb, t', c']) in
+      let fix = CAst.make ~loc @@ CFix (lid, [lid, (Some i, CStructRec), lb, t', c']) in
       id, ((fk, h'), (ck, (rc, Some fix))) ]
 END
 
@@ -5671,9 +5675,9 @@ ARGUMENT EXTEND ssrcofixfwd TYPED AS ssrfixfwd PRINTED BY pr_ssrcofixfwd
       let c = Option.get oc in
       let has_cast, t', c' = match format_constr_expr h c with
       | [Bcast t'], c' -> true, t', c'
-      | _ -> false, mkCHole (constr_loc c), c in
+      | _ -> false, mkCHole ?loc:(constr_loc c), c in
       let h' = BFrec (false, has_cast) :: binders_fmts bs in
-      let cofix = CCoFix (loc, lid, [lid, fix_binders bs, t', c']) in
+      let cofix = CAst.make ~loc @@ CCoFix (lid, [lid, fix_binders bs, t', c']) in
       id, ((fk, h'), (ck, (rc, Some cofix)))
     ]
 END
@@ -5716,9 +5720,9 @@ ARGUMENT EXTEND ssrsetfwd
 TYPED AS (ssrfwdfmt * (lcpattern * ssrterm option)) * ssrdocc
 PRINTED BY pr_ssrsetfwd
 | [ ":" lconstr(t) ":=" "{" ssrocc(occ) "}" cpattern(c) ] ->
-  [ mkssrFwdCast FwdPose loc (mk_lterm t) c, mkocc occ ]
+  [ mkssrFwdCast FwdPose ~loc (mk_lterm t) c, mkocc occ ]
 | [ ":" lconstr(t) ":=" lcpattern(c) ] ->
-  [ mkssrFwdCast FwdPose loc (mk_lterm t) c, nodocc ]
+  [ mkssrFwdCast FwdPose ~loc (mk_lterm t) c, nodocc ]
 | [ ":=" "{" ssrocc(occ) "}" cpattern(c) ] ->
   [ mkssrFwdVal FwdPose c, mkocc occ ]
 | [ ":=" lcpattern(c) ] -> [ mkssrFwdVal FwdPose c, nodocc ]
@@ -5753,26 +5757,26 @@ let pr_ssrhavefwd _ _ prt (fwd, hint) = pr_fwd fwd ++ pr_hint prt hint
 
 ARGUMENT EXTEND ssrhavefwd TYPED AS ssrfwd * ssrhint PRINTED BY pr_ssrhavefwd
 | [ ":" lconstr(t) ssrhint(hint) ] -> [ mkFwdHint ":" t, hint ]
-| [ ":" lconstr(t) ":=" lconstr(c) ] -> [ mkFwdCast FwdHave loc t c, nohint ]
+| [ ":" lconstr(t) ":=" lconstr(c) ] -> [ mkFwdCast FwdHave ~loc t c, nohint ]
 | [ ":" lconstr(t) ":=" ] -> [ mkFwdHintNoTC ":" t, nohint ]
 | [ ":=" lconstr(c) ] -> [ mkFwdVal FwdHave c, nohint ]
 END
 
 let intro_id_to_binder = List.map (function 
   | IpatId id ->
-      let xloc, _ as x = bvar_lname (mkCVar dummy_loc id) in
+      let xloc, _ as x = bvar_lname (mkCVar id) in
       (FwdPose, [BFvar]),
-        CLambdaN (dummy_loc, [[x], Default Explicit, mkCHole xloc],
-          mkCHole dummy_loc)
+        CAst.make @@ CLambdaN ([[x], Default Explicit, mkCHole ?loc:xloc],
+          mkCHole ?loc:None)
   | _ -> anomaly "non-id accepted as binder")
 
-let binder_to_intro_id = List.map (function
-  | (FwdPose, [BFvar]), CLambdaN (_,[ids,_,_],_)
-  | (FwdPose, [BFdecl _]), CLambdaN (_,[ids,_,_],_) ->
+let binder_to_intro_id = CAst.(List.map (function
+  | (FwdPose, [BFvar]), { v = CLambdaN ([ids,_,_],_) }
+  | (FwdPose, [BFdecl _]), { v = CLambdaN ([ids,_,_],_) } ->
       List.map (function (_, Name id) -> IpatId id | _ -> IpatAnon) ids
-  | (FwdPose, [BFdef]), CLetIn (_,(_,Name id),_,_,_) -> [IpatId id]
-  | (FwdPose, [BFdef]), CLetIn (_,(_,Anonymous),_,_,_) -> [IpatAnon]
-  | _ -> anomaly "ssrbinder is not a binder")
+  | (FwdPose, [BFdef]), { v = CLetIn ((_,Name id),_,_,_) } -> [IpatId id]
+  | (FwdPose, [BFdef]), { v = CLetIn ((_,Anonymous),_,_,_) } -> [IpatAnon]
+  | _ -> anomaly "ssrbinder is not a binder"))
 
 let pr_ssrhavefwdwbinders _ _ prt (tr,((hpats, (fwd, hint)))) =
   pr_hpats hpats ++ pr_fwd fwd ++ pr_hint prt hint
@@ -5880,21 +5884,22 @@ let havetac ist
   let interp gl rtc t = pf_abs_ssrterm ~resolve_typeclasses:rtc ist gl t in
   let interp_ty gl rtc t =
     let a,b,_,u = pf_interp_ty ~resolve_typeclasses:rtc ist gl t in a,b,u in
+  let open CAst in
   let ct, cty, hole, loc = match t with
-    | _, (_, Some (CCast (loc, ct, CastConv cty))) ->
-      mkt ct, mkt cty, mkt (mkCHole dummy_loc), loc
+    | _, (_, Some { loc; v = CCast (ct, CastConv cty)}) ->
+      mkt ct, mkt cty, mkt (mkCHole ?loc:None), loc
     | _, (_, Some ct) ->
-      mkt ct, mkt (mkCHole dummy_loc), mkt (mkCHole dummy_loc), dummy_loc
-    | _, (GCast (loc, ct, CastConv cty), None) ->
+      mkt ct, mkt (mkCHole ?loc:None), mkt (mkCHole ?loc:None), None
+    | _, ({ loc; v = GCast (ct, CastConv cty) }, None) ->
       mkl ct, mkl cty, mkl mkRHole, loc
-    | _, (t, None) -> mkl t, mkl mkRHole, mkl mkRHole, dummy_loc in
+    | _, (t, None) -> mkl t, mkl mkRHole, mkl mkRHole, None in
   let gl, cut, sol, itac1, itac2 =
    match fk, namefst, suff with
    | FwdHave, true, true ->
      errorstrm (str"Suff have does not accept a proof term")
    | FwdHave, false, true ->
-     let cty = combineCG cty hole (mkCArrow loc) mkRArrow in
-     let _,t,uc,_ = interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
+     let cty = combineCG cty hole (mkCArrow ?loc) mkRArrow in
+     let _,t,uc,_ = interp gl false (combineCG ct cty (mkCCast ?loc) mkRCast) in
      let gl = pf_merge_uc uc gl in
      let gl, ty = pf_type_of gl t in
      let ctx, _ = decompose_prod_n 1 ty in
@@ -5911,7 +5916,7 @@ let havetac ist
        List.map (fun id -> examine_abstract (mkVar id) gl) skols in
      let gl = List.fold_right unlock_abs skols_args gl in
      let sigma, t, uc, n_evars =
-       interp gl false (combineCG ct cty (mkCCast loc) mkRCast) in
+       interp gl false (combineCG ct cty (mkCCast ?loc) mkRCast) in
      if skols <> [] && n_evars <> 0 then
        CErrors.error ("Automatic generalization of unresolved implicit "^
                      "arguments together with abstract variables is "^
@@ -6015,7 +6020,7 @@ GEXTEND Gram
   GLOBAL: tactic_expr;
   tactic_expr: LEVEL "3"
     [ RIGHTA [ IDENT "abstract"; gens = ssrdgens ->
-               ssrtac_expr !@loc "abstract"
+               ssrtac_expr ~loc:!@loc "abstract"
                 [Tacexpr.TacGeneric (Genarg.in_gen (Genarg.rawwit wit_ssrdgens) gens)] ]];
 END
 TACTIC EXTEND ssrabstract
@@ -6070,9 +6075,10 @@ END
 
 let sufftac ist ((((clr, pats),binders),simpl), ((_, c), hint)) =
   let htac = tclTHEN (introstac ~ist pats) (hinttac ist true hint) in
+  let open CAst in
   let c = match c with
-  | (a, (b, Some (CCast (_, _, CastConv cty)))) -> a, (b, Some cty)
-  | (a, (GCast (_, _, CastConv cty), None)) -> a, (cty, None)
+  | (a, (b, Some { v = CCast (_, CastConv cty)})) -> a, (b, Some cty)
+  | (a, ({ v = GCast (_, CastConv cty) }, None)) -> a, (cty, None)
   | _ -> anomaly "suff: ssr cast hole deleted by typecheck" in
   let ctac gl =
     let _,ty,_,uc = pf_interp_ty ist gl c in let gl = pf_merge_uc uc gl in
@@ -6111,9 +6117,10 @@ let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
   let mkpats = function
   | _, Some ((x, _), _) -> fun pats -> IpatId (hoi_id x) :: pats
   | _ -> fun x -> x in
+  let open CAst in
   let ct = match ct with
-  | (a, (b, Some (CCast (_, _, CastConv cty)))) -> a, (b, Some cty)
-  | (a, (GCast (_, _, CastConv cty), None)) -> a, (cty, None)
+  | (a, (b, Some { v = CCast (_, CastConv cty)})) -> a, (b, Some cty)
+  | (a, ({ v = GCast (_, CastConv cty) }, None)) -> a, (cty, None)
   | _ -> anomaly "wlog: ssr cast hole deleted by typecheck" in
   let cut_implies_goal = not (suff || ghave <> `NoGen) in
   let c, args, ct, gl =
@@ -6273,7 +6280,7 @@ GEXTEND Gram
           let s = coerce_reference_to_id qid in
 	  Vernacexpr.VernacDefinition
 	    ((Some Decl_kinds.Global,Decl_kinds.CanonicalStructure),
-             ((dummy_loc,s),None),(d  ))
+             ((Loc.tag s),None),(d  ))
   ]];
 END
 
@@ -6303,9 +6310,9 @@ GEXTEND Gram
   GLOBAL: hloc;
 hloc: [
   [ "in"; "("; "Type"; "of"; id = ident; ")" -> 
-    HypLocation ((dummy_loc,id), InHypTypeOnly)
+    HypLocation ((Loc.tag id), InHypTypeOnly)
   | "in"; "("; IDENT "Value"; "of"; id = ident; ")" -> 
-    HypLocation ((dummy_loc,id), InHypValueOnly)
+    HypLocation ((Loc.tag id), InHypValueOnly)
   ] ];
 END
 
