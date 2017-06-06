@@ -47,7 +47,6 @@ open Glob_term
 open Util
 open Evd
 open Proofview.Notations
-open Sigma.Notations
 open Extend
 open Goptions
 open Tacexpr
@@ -136,9 +135,7 @@ let mkSsrConst name env sigma =
   EConstr.fresh_global env sigma (mkSsrRef name)
 let pf_mkSsrConst name gl =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
-  let sigma = Sigma.Unsafe.of_evar_map sigma in
-  let Sigma (t, sigma, _) = mkSsrConst name env sigma in
-  let sigma = Sigma.to_evar_map sigma in
+  let (sigma, t) = mkSsrConst name env sigma in
   t, re_sig it sigma
 let pf_fresh_global name gl =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
@@ -292,9 +289,7 @@ let mkProt t c gl =
 
 let mkRefl t c gl =
   let sigma = project gl in
-  let sigma = Sigma.Unsafe.of_evar_map sigma in
-  let Sigma (refl, sigma, _) = EConstr.fresh_global (pf_env gl) sigma (build_coq_eq_data()).refl in
-  let sigma = Sigma.to_evar_map sigma in
+  let (sigma, refl) = EConstr.fresh_global (pf_env gl) sigma (build_coq_eq_data()).refl in
   EConstr.mkApp (refl, [|t; c|]), { gl with sigma }
 
 
@@ -591,9 +586,7 @@ let pf_partial_solution gl t evl =
 
 let pf_new_evar gl ty =
   let sigma, env, it = project gl, pf_env gl, sig_it gl in
-  let sigma = Sigma.Unsafe.of_evar_map sigma in
-  let Sigma (extra, sigma, _) = Evarutil.new_evar env sigma ty in
-  let sigma = Sigma.to_evar_map sigma in
+  let (sigma, extra) = Evarutil.new_evar env sigma ty in
   re_sig it sigma, extra
 
 (* Basic tactics *)
@@ -2915,27 +2908,26 @@ let mk_abstract_id () = incr ssr_abstract_id; nat_of_n !ssr_abstract_id
 
 let ssrmkabs id gl =
   let env, concl = pf_env gl, Tacmach.pf_concl gl in
-  let step = { run = begin fun sigma ->
-    let Sigma ((abstract_proof, abstract_ty), sigma, p) =
-      let Sigma ((ty, _), sigma, p1) =
+  let step sigma =
+    let (sigma, (abstract_proof, abstract_ty)) =
+      let (sigma, (ty, _)) =
         Evarutil.new_type_evar env sigma Evd.univ_flexible_alg in
-      let Sigma (ablock, sigma, p2) = mkSsrConst "abstract_lock" env sigma in
-      let Sigma (lock, sigma, p3) = Evarutil.new_evar env sigma ablock in
-      let Sigma (abstract, sigma, p4) = mkSsrConst "abstract" env sigma in
+      let (sigma, ablock) = mkSsrConst "abstract_lock" env sigma in
+      let (sigma, lock) = Evarutil.new_evar env sigma ablock in
+      let (sigma, abstract) = mkSsrConst "abstract" env sigma in
       let abstract_ty = EConstr.mkApp(abstract, [|ty;mk_abstract_id ();lock|]) in
-      let Sigma (m, sigma, p5) = Evarutil.new_evar env sigma abstract_ty in
-      Sigma ((m, abstract_ty), sigma, p1 +> p2 +> p3 +> p4 +> p5) in
+      let (sigma, m) = Evarutil.new_evar env sigma abstract_ty in
+      (sigma, (m, abstract_ty)) in
     let sigma, kont =
       let rd = RelDecl.LocalAssum (Name id, abstract_ty) in
-      let Sigma (ev, sigma, _) = Evarutil.new_evar (EConstr.push_rel rd env) sigma concl in
-      let sigma = Sigma.to_evar_map sigma in
+      let (sigma, ev) = Evarutil.new_evar (EConstr.push_rel rd env) sigma concl in
       (sigma, ev)
     in
     pp(lazy(pr_econstr concl));
     let term = EConstr.(mkApp (mkLambda(Name id,abstract_ty,kont) ,[|abstract_proof|])) in
     let sigma, _ = Typing.type_of env sigma term in
-    Sigma.Unsafe.of_pair (term, sigma)
-  end } in
+    (sigma, term)
+  in
   Proofview.V82.of_tactic
     (Proofview.tclTHEN
       (Tactics.New.refine step)
@@ -3414,11 +3406,9 @@ let saturate ?(beta=false) ?(bi_types=false) env sigma c ?(ty=Retyping.get_type_
   else match EConstr.kind_of_type sigma ty with
   | ProdType (_, src, tgt) ->
       let sigma = create_evar_defs sigma in
-      let sigma = Sigma.Unsafe.of_evar_map sigma in
-      let Sigma (x, sigma, _) =
+      let (sigma, x) =
         Evarutil.new_evar env sigma
-          (if bi_types then Reductionops.nf_betaiota (Sigma.to_evar_map sigma) src else src) in
-      let sigma = Sigma.to_evar_map sigma in
+          (if bi_types then Reductionops.nf_betaiota sigma src else src) in
       loop (EConstr.Vars.subst1 x tgt) ((m - n,x) :: args) sigma (n-1)
   | CastType (t, _) -> loop t args sigma n 
   | LetInType (_, v, _, t) -> loop (EConstr.Vars.subst1 v t) args sigma n
@@ -3660,9 +3650,7 @@ END
 
 let mkCoqEq gl =
   let sigma = project gl in
-  let sigma = Sigma.Unsafe.of_evar_map sigma in
-  let Sigma (eq, sigma, _) = EConstr.fresh_global (pf_env gl) sigma (build_coq_eq_data()).eq in
-  let sigma = Sigma.to_evar_map sigma in
+  let (sigma, eq) = EConstr.fresh_global (pf_env gl) sigma (build_coq_eq_data()).eq in
   let gl = { gl with sigma } in
   eq, gl
 
@@ -4023,9 +4011,7 @@ let ssrelim ?(is_case=false) ?ist deps what ?elim eqid ipats gl =
         else
           pf_eapply (fun env sigma () ->
             let indu = (ind, EConstr.EInstance.kind sigma u) in
-            let sigma = Sigma.Unsafe.of_evar_map sigma in
-            let Sigma (ind, sigma, _) = Indrec.build_case_analysis_scheme env sigma indu true sort in
-            let sigma = Sigma.to_evar_map sigma in
+            let (sigma, ind) = Indrec.build_case_analysis_scheme env sigma indu true sort in
             (sigma, ind)) gl () in
       let elim = EConstr.of_constr elim in
       let gl, elimty = pfe_type_of gl elim in
@@ -4473,9 +4459,9 @@ ARGUMENT EXTEND ssrexactarg TYPED AS ssrapplyarg PRINTED BY pr_ssraarg
 END
 
 let vmexacttac pf =
-  Proofview.Goal.nf_enter { enter = begin fun gl ->
+  Proofview.Goal.nf_enter begin fun gl ->
   exact_no_check EConstr.(mkCast (pf, VMcast, Tacmach.New.pf_concl gl))
-  end }
+  end
 
 TACTIC EXTEND ssrexact
 | [ "exact" ssrexactarg(arg) ] -> [ Proofview.V82.tactic (tclBY (ssrapplytac ist arg)) ]
@@ -4557,9 +4543,7 @@ let newssrcongrtac arg ist gl =
   let mk_evar gl ty = 
     let env, sigma, si = pf_env gl, project gl, sig_it gl in
     let sigma = create_evar_defs sigma in
-    let sigma = Sigma.Unsafe.of_evar_map sigma in
-    let Sigma (x, sigma, _) = Evarutil.new_evar env sigma ty in
-    let sigma = Sigma.to_evar_map sigma in
+    let (sigma, x) = Evarutil.new_evar env sigma ty in
     x, re_sig si sigma in
   let arr, gl = pf_mkSsrConst "ssr_congr_arrow" gl in
   let ssr_congr lr = EConstr.mkApp (arr, lr) in
@@ -4771,11 +4755,9 @@ let rec strip_unfold_term env ((sigma, t) as p) kt = match kind_of_term t with
       then strip_unfold_term env (sigma, f) kt
       else (sigma, f), true
   | Const (c,_) when Environ.is_projection c env ->
-    let sigma = Sigma.Unsafe.of_evar_map sigma in
-    let Sigma ((ty,_), sigma, _) =
+    let (sigma, (ty,_)) =
       Evarutil.new_type_evar env sigma (Evd.UnivFlexible true) in
-    let Sigma (ev, sigma, _) = Evarutil.new_evar env sigma ty in
-    let sigma = Sigma.to_evar_map sigma in
+    let (sigma, ev) = Evarutil.new_evar env sigma ty in
     (sigma, mkProj(Projection.make c false, EConstr.Unsafe.to_constr ev)), true
   | Const _ | Var _ -> p, true
   | Proj _ -> p, true
@@ -4900,9 +4882,7 @@ let pirrel_rewrite pred rdx rdx_ty new_rdx dir (sigma, c) c_ty gl =
   let beta = Reductionops.clos_norm_flags CClosure.beta env sigma in
   let sigma, p = 
     let sigma = create_evar_defs sigma in
-    let sigma = Sigma.Unsafe.of_evar_map sigma in
-    let Sigma (ev, sigma, _) = Evarutil.new_evar env sigma (beta (EConstr.Vars.subst1 new_rdx pred)) in
-    let sigma = Sigma.to_evar_map sigma in
+    let (sigma, ev) = Evarutil.new_evar env sigma (beta (EConstr.Vars.subst1 new_rdx pred)) in
     (sigma, ev)
   in
   let pred = EConstr.mkNamedLambda pattern_id rdx_ty pred in
@@ -5046,10 +5026,8 @@ let rwprocess_rule dir rule gl =
       match EConstr.kind sigma t with
       | Prod (_, xt, at) ->
         let sigma = create_evar_defs sigma in
-        let sigma = Sigma.Unsafe.of_evar_map sigma in
-        let Sigma (x, sigma, _) = Evarutil.new_evar env sigma xt in
-        let ise = Sigma.to_evar_map sigma in
-        loop d ise EConstr.(mkApp (r, [|x|])) (EConstr.Vars.subst1 x at) rs 0
+        let (sigma, x) = Evarutil.new_evar env sigma xt in
+        loop d sigma EConstr.(mkApp (r, [|x|])) (EConstr.Vars.subst1 x at) rs 0
       | App (pr, a) when is_ind_ref sigma pr coq_prod.Coqlib.typ ->
         let sr sigma = match EConstr.kind sigma (Tacred.hnf_constr env sigma r) with
         | App (c, ra) when is_construct_ref sigma c coq_prod.Coqlib.intro ->
@@ -6109,9 +6087,7 @@ let wlogtac ist (((clr0, pats),_),_) (gens, ((_, ct))) hint suff ghave gl =
         let rd, c = destProd_or_LetIn c in
         Environ.push_rel rd env, c) (pf_env gl, EConstr.Unsafe.to_constr c) gens in
     let sigma = project gl in
-    let sigma = Sigma.Unsafe.of_evar_map sigma in
-    let Sigma (ev, sigma, _) = Evarutil.new_evar env sigma EConstr.mkProp in
-    let sigma = Sigma.to_evar_map sigma in
+    let (sigma, ev) = Evarutil.new_evar env sigma EConstr.mkProp in
     let k, _ = EConstr.destEvar sigma ev in
     let fake_gl = {Evd.it = k; Evd.sigma = sigma} in
     let _, ct, _, uc = pf_interp_ty ist fake_gl ct in
