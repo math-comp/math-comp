@@ -9,14 +9,32 @@ define coqmakefile
 		$$LN $(1)/plugin/$(V)/ssrmatching.ml4 .;\
 		$$LN $(1)/plugin/$(V)/ssrmatching.v .;\
 		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mllib .;\
+		cd $(1);\
+		$$LN ssreflect.v.86 ssreflect.v;\
+		$$LN ssrbool.v.86 ssrbool.v;\
+		$$LN ssrfun.v.86 ssrfun.v;\
 		EXTRA="ssrmatching.mli ssrmatching.ml4 ssrmatching.v ssreflect.ml4";\
 		MLLIB=ssreflect_plugin.mllib;\
+		cd -;\
 		$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
 	;;\
 	v8.6*)\
 		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mlpack .;\
 		$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
+		cd $(1);\
+		$$LN ssreflect.v.86 ssreflect.v;\
+		$$LN ssrbool.v.86 ssrbool.v;\
+		$$LN ssrfun.v.86 ssrfun.v;\
+		cd -;\
+		EXTRA="ssreflect.ml4";\
 		MLLIB=ssreflect_plugin.mlpack;\
+	;;\
+	trunk*)\
+		cd $(1);\
+		$$LN ssreflect.v.trunk ssreflect.v;\
+		$$LN ssrbool.v.trunk ssrbool.v;\
+		$$LN ssrfun.v.trunk ssrfun.v;\
+		cd -;\
 	;;\
 	esac;\
 	$(COQBIN)coq_makefile -f Make $$MLLIB $$EXTRA -o Makefile.coq)
