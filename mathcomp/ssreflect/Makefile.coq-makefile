@@ -1,6 +1,6 @@
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
-	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sf"; fi;\
+	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sfr"; fi;\
 	MLLIB=;\
 	EXTRA=;\
 	case $(V) in\
@@ -16,7 +16,11 @@ define coqmakefile
 	v8.6*)\
 		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mlpack .;\
 		$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
+		$$LN $(1)/plugin/$(V)/ssrbool.v $(1)/;\
+		$$LN $(1)/plugin/$(V)/ssrfun.v $(1)/;\
+		$$LN $(1)/plugin/$(V)/ssreflect.v $(1)/;\
 		MLLIB=ssreflect_plugin.mlpack;\
+		EXTRA="ssreflect.ml4";\
 	;;\
 	esac;\
 	$(COQBIN)coq_makefile -f Make $$MLLIB $$EXTRA -o Makefile.coq)
