@@ -17,6 +17,7 @@ generic_quotient.v
 path.v
 prime.v
 tuple.v
+ssrnotations.v
 
 ssreflect.ml4
 
