@@ -13,7 +13,7 @@ sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
 echo "git: \"https://github.com/math-comp/math-comp.git\"" > $pkgdir/url
 done
 
-for pkg in ssreflect fingroup algebra field solvable character
+for pkg in ssreflect fingroup algebra field solvable character odd_order
 do
 pkgdir="$(git root)/opam/released/packages/coq-mathcomp-$pkg/coq-mathcomp-$pkg.1.6"
 mkdir -p $pkgdir
