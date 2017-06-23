@@ -1,0 +1,6 @@
+Odd Order Theorem
+
+This library contains the complete formal proof of the Odd Order
+Theorem (aka Feit Thompson Theorem).
+The file stripped_odd_order_theorem.v contains a proof of a self
+contained statement of the odd order.
