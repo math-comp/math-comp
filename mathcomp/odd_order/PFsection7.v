@@ -324,7 +324,7 @@ transitivity (\sum_(x in A) \sum_(xi <- S) \sum_(mu <- S) F xi mu x).
   apply: eq_bigr => x Ax; rewrite part_a // sum_cfunE -mulrA mulr_suml.
   apply: eq_bigr => xi _; rewrite mulrA -mulr_suml rmorph_sum; congr (_ * _).
   rewrite mulr_sumr; apply: eq_bigr => mu _; rewrite !cfunE (cfdotC mu).
-  rewrite -{1}[mu x]conjCK -fmorph_div -rmorphM conjCK -3!mulrA 2!(mulrCA _^-1).
+  rewrite -{1}[mu x]conjCK -fmorph_div -rmorphM conjCK -4!mulrA  2!(mulrCA _^-1).
   by rewrite (mulrA _^-1) -invfM 2!(mulrCA (xi x)) mulrA 2!(mulrA _^*).
 rewrite exchange_big; apply: eq_bigr => xi _; rewrite exchange_big /=.
 apply: eq_big_seq => mu Smu; have Tmu := sST mu Smu.

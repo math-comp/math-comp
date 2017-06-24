@@ -621,7 +621,7 @@ have isoS1: {in S1, isometry [eta tau with eta1 |-> zeta1], to 'Z[irr G]}.
   split=> [xi eta | eta]; rewrite !in_cons /=; last first.
     by case: eqP => [-> | _  /isoS[/Ztau/zcharW]].
   do 2!case: eqP => [-> _|_  /isoS[? ?]] //; last exact: Itau.
-  by apply/(can_inj (@conjCK _)); rewrite -!cfdotC.
+  by apply/(can_inj conjCK _); rewrite -!cfdotC.
 have [nu Dnu IZnu] := Zisometry_of_iso freeS1 isoS1.
 exists nu; split=> // phi; rewrite zcharD1E => /andP[].
 case/(zchar_expansion (free_uniq freeS1)) => b Zb {phi}-> phi1_0.
