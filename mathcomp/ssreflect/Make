@@ -19,4 +19,5 @@ prime.v
 tuple.v
 ssrnotations.v
 
+-I .
 -R . mathcomp.ssreflect
