@@ -21,7 +21,7 @@ env:
   matrix:
   - TEST_TARGET="v8.5"
   - TEST_TARGET="v8.6"
-  - TEST_TARGET="trunk"
+  - TEST_TARGET="master"
 
 # matrix:
 #   allow_failures:

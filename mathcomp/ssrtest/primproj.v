@@ -47,9 +47,11 @@ match goal with
 | |- foo_car _ bar = 10 => idtac
 end.
 rewrite /foo_car.
+(*
 Fail match goal with
 | |- foo_car _ bar = 10 => idtac
 end.
+*)
 Admitted.
 
 End T1.
@@ -66,9 +68,11 @@ match goal with
 | |- foo_car bar = 10 => idtac
 end.
 rewrite /foo_car.
+(*
 Fail match goal with
 | |- foo_car bar = 10 => idtac
 end.
+*)
 Admitted.
 
 End T2.

@@ -197,11 +197,81 @@ rewrite lognE -mem_primes; case: ifP => pi1p; last exact: dvd1n.
 by case: ifP => pr_p; [rewrite pi12 | rewrite if_same].
 Qed.
 
-Function plus (m n : nat) {struct n} : nat :=
+Fixpoint plus (m n : nat) {struct n} : nat :=
    match n with
    | 0 => m
    | S p => S (plus m p)
    end.
+
+Definition plus_equation :
+forall m n : nat,
+       plus m n =
+       match n with
+       | 0 => m
+       | p.+1 => (plus m p).+1
+       end
+:=
+fun m n : nat =>
+match
+  n as n0
+  return
+    (forall m0 : nat,
+     plus m0 n0 =
+     match n0 with
+     | 0 => m0
+     | p.+1 => (plus m0 p).+1
+     end)
+with
+| 0 => @erefl nat
+| n0.+1 => fun m0 : nat => erefl (plus m0 n0).+1
+end m.
+
+Definition plus_rect :
+forall (m : nat) (P : nat -> nat -> Type),
+       (forall n : nat, n = 0 -> P 0 m) ->
+       (forall n p : nat,
+        n = p.+1 -> P p (plus m p) -> P p.+1 (plus m p).+1) ->
+       forall n : nat, P n (plus m n)
+:= 
+fun (m : nat) (P : nat -> nat -> Type)
+  (f0 : forall n : nat, n = 0 -> P 0 m)
+  (f : forall n p : nat,
+       n = p.+1 -> P p (plus m p) -> P p.+1 (plus m p).+1) =>
+fix plus0 (n : nat) : P n (plus m n) :=
+  eq_rect_r [eta P n]
+    (let f1 := f0 n in
+     let f2 := f n in
+     match
+       n as n0
+       return
+         (n = n0 ->
+          (forall p : nat,
+           n0 = p.+1 -> P p (plus m p) -> P p.+1 (plus m p).+1) ->
+          (n0 = 0 -> P 0 m) ->
+          P n0 match n0 with
+               | 0 => m
+               | p.+1 => (plus m p).+1
+               end)
+     with
+     | 0 =>
+         fun (_ : n = 0)
+           (_ : forall p : nat,
+                0 = p.+1 ->
+                P p (plus m p) -> P p.+1 (plus m p).+1)
+           (f4 : 0 = 0 -> P 0 m) => unkeyed (f4 (erefl 0))
+     | n0.+1 =>
+         fun (_ : n = n0.+1)
+           (f3 : forall p : nat,
+                 n0.+1 = p.+1 ->
+                 P p (plus m p) -> P p.+1 (plus m p).+1)
+           (_ : n0.+1 = 0 -> P 0 m) =>
+         let f5 :=
+           let p := n0 in
+           let H := erefl n0.+1 : n0.+1 = p.+1 in f3 p H in
+         unkeyed (let Hrec := plus0 n0 in f5 Hrec)
+     end (erefl n) f2 f1) (plus_equation m n).
+
+Definition plus_ind := plus_rect.
 
 Lemma exF x y z: plus (plus x y) z = plus x (plus y z).
 elim/plus_ind: z / (plus _ z).
