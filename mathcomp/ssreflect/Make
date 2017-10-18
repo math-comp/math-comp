@@ -17,8 +17,7 @@ generic_quotient.v
 path.v
 prime.v
 tuple.v
-
-ssreflect.ml4
+ssrnotations.v
 
 -I .
 -R . mathcomp.ssreflect

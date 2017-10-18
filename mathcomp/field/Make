@@ -9,5 +9,6 @@ falgebra.v
 fieldext.v
 galois.v
 separable.v
+finfield.v
 
 -R . mathcomp.field
