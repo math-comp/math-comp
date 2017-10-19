@@ -61,8 +61,6 @@ Section "Ssreflect and MathComp" Sec
   File /r ${SRC}\*.vo
   File /r ${SRC}\*.v
   File /r ${SRC}\*.glob
-  File /r ${SRC}\*.cmxs
-  File /r ${SRC}\*.cmi
 
   CreateDirectory "$SMPROGRAMS\Coq"
 
