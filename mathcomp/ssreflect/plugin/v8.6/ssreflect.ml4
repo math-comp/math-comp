@@ -3,7 +3,7 @@
 
 (* This line is read by the Makefile's dist target: do not remove. *)
 DECLARE PLUGIN "ssreflect_plugin"
-let ssrversion = "1.6.1";;
+let ssrversion = "1.6.2";;
 let ssrAstVersion = 1;;
 let () = Mltop.add_known_plugin (fun () ->
   if Flags.is_verbose () && not !Flags.batch_mode then begin

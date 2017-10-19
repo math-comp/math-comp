@@ -1,7 +1,7 @@
 define coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
-	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sf"; fi;\
-	MLLIB=ssreflect_plugin.mlpack;\
+	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sfr"; fi;\
+	MLLIB=;\
 	EXTRA=;\
 	case $(V) in\
        	v8.5*|v8.4*)\
@@ -9,14 +9,23 @@ define coqmakefile
 		$$LN $(1)/plugin/$(V)/ssrmatching.ml4 .;\
 		$$LN $(1)/plugin/$(V)/ssrmatching.v .;\
 		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mllib .;\
-		EXTRA="ssrmatching.mli ssrmatching.ml4 ssrmatching.v";\
+		$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
+		$$LN $(1)/plugin/$(V)/ssrbool.v $(1)/;\
+		$$LN $(1)/plugin/$(V)/ssrfun.v $(1)/;\
+		$$LN $(1)/plugin/$(V)/ssreflect.v $(1)/;\
 		MLLIB=ssreflect_plugin.mllib;\
+		EXTRA="ssrmatching.mli ssrmatching.ml4 ssrmatching.v ssreflect.ml4";\
 	;;\
-	*)\
+	v8.6*)\
 		$$LN $(1)/plugin/$(V)/ssreflect_plugin.mlpack .;\
+		$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
+		$$LN $(1)/plugin/$(V)/ssrbool.v $(1)/;\
+		$$LN $(1)/plugin/$(V)/ssrfun.v $(1)/;\
+		$$LN $(1)/plugin/$(V)/ssreflect.v $(1)/;\
+		MLLIB=ssreflect_plugin.mlpack;\
+		EXTRA="ssreflect.ml4";\
 	;;\
 	esac;\
-	$$LN $(1)/plugin/$(V)/ssreflect.ml4 .;\
 	$(COQBIN)coq_makefile -f Make $$MLLIB $$EXTRA -o Makefile.coq)
 endef
 

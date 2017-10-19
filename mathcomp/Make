@@ -32,6 +32,7 @@ field/countalg.v
 field/cyclotomic.v
 field/falgebra.v
 field/fieldext.v
+field/finfield.v
 field/galois.v
 field/separable.v
 fingroup/action.v
@@ -79,9 +80,9 @@ ssreflect/seq.v
 ssreflect/ssrbool.v
 ssreflect/ssreflect.v
 ssreflect/ssrfun.v
+ssreflect/ssrnotations.v
 ssreflect/ssrnat.v
 ssreflect/tuple.v
-ssreflect.ml4
 
 -I .
 -R . mathcomp

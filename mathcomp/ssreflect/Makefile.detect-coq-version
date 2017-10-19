@@ -1,4 +1,4 @@
-BRANCH_coq = $(shell $(COQBIN)coqtop -v | head -1 | grep trunk \
+BRANCH_coq = $(shell $(COQBIN)coqtop -v | head -1 | grep -E '(trunk|master)' \
 	     | wc -l | sed 's/ *//g')
 
 ifneq "$(BRANCH_coq)" "0"

@@ -1,0 +1,60 @@
+dist: trusty
+sudo: required
+language: c
+cache:
+  apt: true
+  directories:
+  - $HOME/.opam
+addons:
+  apt:
+    sources:
+    - avsm
+    packages:
+    - opam
+    - aspcud
+env:
+  global:
+  - NJOBS=2
+  # system is == 4.02.3
+  - COMPILER="system"
+  # Main test targets
+  matrix:
+  - TEST_TARGET="v8.5"
+  - TEST_TARGET="v8.6"
+  - TEST_TARGET="v8.7"
+  - TEST_TARGET="master"
+
+# matrix:
+#   allow_failures:
+  # v8.5 was too slow to build mathcomp
+  # - env: TEST_TARGET="v8.5"
+
+install:
+- opam init -j ${NJOBS} --compiler=${COMPILER} -n -y
+- eval $(opam config env)
+- opam config var root
+- opam install -j ${NJOBS} -y ocamlfind camlp5 ${EXTRA_OPAM}
+- opam list
+# We could do "opam install coq=${TEST_TARGET}" but not so sure how
+# that does work for trunk.
+- git clone --depth 1 -b ${TEST_TARGET} git://scm.gforge.inria.fr/coq/coq.git coq-${TEST_TARGET}
+- cd coq-${TEST_TARGET}
+- ./configure -native-compiler no -local -coqide no
+- make -j ${NJOBS}
+- cd -
+
+script:
+- echo 'Building Mathcomp...' && echo -en 'travis_fold:start:mathcomp.build\\r'
+- export PATH=`pwd`/coq-${TEST_TARGET}/bin:$PATH
+- cd mathcomp
+# We lack a few minutes to be able to build the whole theorem.
+- sed -i.bak '/stripped_odd_order_theorem/d' Make
+- sed -i.bak '/PFsection6\.v/d'              Make
+- sed -i.bak '/PFsection7\.v/d'              Make
+- sed -i.bak '/PFsection8\.v/d'              Make
+- sed -i.bak '/PFsection9\.v/d'              Make
+- sed -i.bak '/PFsection1.\.v/d'             Make
+- "if [ ${TEST_TARGET} = \"v8.5\" ]; then sed -i.bak '/primproj\\.v/d' Make ; sed -i.bak '/odd_order/d' Make ; fi"
+- make Makefile.coq
+- make -f Makefile.coq -j ${NJOBS} all VERBOSE=1
+- echo -en 'travis_fold:end:mathcomp.build\\r'
