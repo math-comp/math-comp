@@ -3,7 +3,7 @@ name: "coq-mathcomp-fingroup"
 version: "dev"
 maintainer: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 
-homepage: "http://ssr.msr-inria.inria.fr/"
+homepage: "http://math-comp.github.io/math-comp/"
 bug-reports: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 license: "CeCILL-B"
 
