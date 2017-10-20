@@ -1,24 +1,45 @@
 #!/bin/bash
-# usage : packager VERSION [BRANCH]
-# VERSION is the version number of the package to create, we expect
-#   there is a tag named mathcomp-$VERSION which archive we can
-#   download from github
-# BRANCH is the name of a branch where we can find accurate local opam
-#   files. Actually, this may only matter for the Coq version dependencies
-#   located in the ssreflect package.
-
 set -e
 set -x
 
+if [ -z $1 ] || [ $1 == "--help" ] || [ $1 == "-h" ]
+then cat <<EOF
+usage : packager VERSION [BRANCH] [TAG]"
+- VERSION is the version number of the package to create, we expect
+    there is a tag named mathcomp-\$VERSION which archive we can
+    download from github
+- BRANCH is the name of a branch where we can find accurate local opam
+    files. Actually, this may only matter for the Coq version dependencies
+    located in the ssreflect package. Default value is "mathcomp-\$VERSION"
+- TAG is the name of the tag used to build the archive, this is
+    particularily useful for generating the package for the odd order
+    theorem if we want to keep it separate from the rest of mathcomp
+    e.g. "packager 1.6.1 mathcomp-odd-order.1.6.1 mathcomp-odd-order.1.6.1"
+    Default value is "mathcomp-\$VERSION"
+EOF
+     exit 0
+else
+VERSION=$1
+fi
+
 if [ -z $2 ]
-then BRANCH="mathcomp-$1"
+then BRANCH="mathcomp-$VERSION"
 else BRANCH=$2
 fi
-# shows $BRANCH for debugging, fails if the branch does not exist
-git show $BRANCH
+# verify whether $BRANCH exists
+git rev-parse --verify $BRANCH
+
+if [ -z $3 ]
+then TAG="mathcomp-$VERSION"
+else TAG=$3
+fi
+# verify whether $TAG exists
+git rev-parse --verify $TAG
+
+ARCHIVEURL="http://github.com/math-comp/math-comp/archive/$TAG.tar.gz"
 
 # we build the url file content and the list of packages, and where to put them
-if [ $1 == "dev" ]
+if [ $VERSION == "dev" ]
 then
 # variables useful for package construction
   URLLINE="git: \"https://github.com/math-comp/math-comp.git\""
@@ -27,12 +48,12 @@ then
   PKGPREFIX="$(git root)/opam/extra-dev/packages"
 else
   ARCHIVE=$(mktemp)
-  wget -O $ARCHIVE "http://github.com/math-comp/math-comp/archive/mathcomp-$1.tar.gz"
-   SUM=$(md5sum $ARCHIVE | cut -d " " -f 1)
+  wget -O $ARCHIVE $ARCHIVEURL
+  SUM=$(md5sum $ARCHIVE | cut -d " " -f 1)
   EXTRACTED=$(mktemp -d)
   tar -C $EXTRACTED -zxvf $ARCHIVE
 # variables useful for package construction
-  URLLINE="http: \"http://github.com/math-comp/math-comp/archive/mathcomp-$1.tar.gz\""
+  URLLINE="http: \"$ARCHIVEURL\""
   CHECKSUMLINE="checksum: \"$SUM\""
   PKGS=$(ls -fs -d -1 $EXTRACTED/*/mathcomp/*/ \
         | sed -r "s?.*mathcomp/([^/]+)/?\1?" \
@@ -44,19 +65,19 @@ fi
 # rewrite them to adapt them to single package construction and
 # version numbers
 for pkg in $PKGS
-do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$1"
+do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    mkdir -p $pkgdir
-   if [ $1 == "dev" ]
+   if [ $VERSION == "dev" ]
    then cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
         cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
    else git show "$BRANCH:mathcomp/$pkg/opam" > $pkgdir/opam
 	git show "$BRANCH:mathcomp/$pkg/descr" > $pkgdir/descr
-        sed -r "/^version/s?dev?$1?" -i $pkgdir/opam
-        sed -r "/^depends.*coq-mathcomp.*/s?dev?$1?" -i $pkgdir/opam
+        sed -r "/^version/s?dev?$VERSION?" -i $pkgdir/opam
+        sed -r "/^depends.*coq-mathcomp.*/s?dev?$VERSION?" -i $pkgdir/opam
    fi
    sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
    echo $URLLINE > $pkgdir/url
-   if [ $1 != "dev" ]
+   if [ $VERSION != "dev" ]
    then echo $CHECKSUMLINE >> $pkgdir/url
    fi
 done
