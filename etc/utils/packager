@@ -48,7 +48,8 @@ then
   PKGPREFIX="$(git root)/opam/extra-dev/packages"
 else
   ARCHIVE=$(mktemp)
-  wget -O $ARCHIVE $ARCHIVEURL
+  git archive --format=tgz --output=$ARCHIVE \
+      --prefix=math-comp-$TAG/ $TAG # reproduce github archive
   SUM=$(md5sum $ARCHIVE | cut -d " " -f 1)
   EXTRACTED=$(mktemp -d)
   tar -C $EXTRACTED -zxvf $ARCHIVE
@@ -81,3 +82,6 @@ do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    then echo $CHECKSUMLINE >> $pkgdir/url
    fi
 done
+
+# finally test the existence of the archive
+wget --spider $ARCHIVEURL
