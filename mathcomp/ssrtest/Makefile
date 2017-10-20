@@ -30,13 +30,13 @@ MAKEFLAGS+=-B
 
 %:
 	$(H)[ -e Makefile.coq ] || $(COQBIN)/coq_makefile -f Make -o Makefile.coq
-	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
+	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
 		-f Makefile.coq $* \
 		COQDEP='$(COQDEP) -c'
 
 .PHONY: clean
 clean:
-	$(H)MAKEFLAGS=$(OLD_MAKEFLAGS) $(MAKE) --no-print-directory \
+	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
 		-f Makefile.coq clean
 	$(H)rm -f Makefile.coq
 
