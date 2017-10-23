@@ -1,5 +1,3 @@
-algebra/fraction.v
-field/finfield.v
 odd_order/BGappendixAB.v
 odd_order/BGappendixC.v
 odd_order/BGsection10.v
@@ -34,17 +32,6 @@ odd_order/PFsection8.v
 odd_order/PFsection9.v
 odd_order/stripped_odd_order_theorem.v
 odd_order/wielandt_fixpoint.v
-real_closed/bigenough.v
-real_closed/cauchyreals.v
-real_closed/complex.v
-real_closed/mxtens.v
-real_closed/ordered_qelim.v
-real_closed/polyorder.v
-real_closed/polyrcf.v
-real_closed/qe_rcf_th.v
-real_closed/qe_rcf.v
-real_closed/realalg.v
-solvable/burnside_app.v
 
 -I .
 -R . mathcomp
