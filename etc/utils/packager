@@ -1,28 +1,87 @@
 #!/bin/bash
-
 set -e
 set -x
 
-for pkg in ssreflect fingroup algebra field solvable character real_closed odd_order
-do
-pkgdir="$(git root)/opam/extra-dev/packages/coq-mathcomp-$pkg/coq-mathcomp-$pkg.dev"
-mkdir -p $pkgdir
-cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
-cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
-sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
-echo "git: \"https://github.com/math-comp/math-comp.git\"" > $pkgdir/url
+if [ -z $1 ] || [ $1 == "--help" ] || [ $1 == "-h" ]
+then cat <<EOF
+usage : packager VERSION [BRANCH] [TAG]"
+- VERSION is the version number of the package to create, we expect
+    there is a tag named mathcomp-\$VERSION which archive we can
+    download from github
+- BRANCH is the name of a branch where we can find accurate local opam
+    files. Actually, this may only matter for the Coq version dependencies
+    located in the ssreflect package. Default value is "mathcomp-\$VERSION"
+- TAG is the name of the tag used to build the archive, this is
+    particularily useful for generating the package for the odd order
+    theorem if we want to keep it separate from the rest of mathcomp
+    e.g. "packager 1.6.1 mathcomp-odd-order.1.6.1 mathcomp-odd-order.1.6.1"
+    Default value is "mathcomp-\$VERSION"
+EOF
+     exit 0
+else
+VERSION=$1
+fi
+
+if [ -z $2 ]
+then BRANCH="mathcomp-$VERSION"
+else BRANCH=$2
+fi
+# verify whether $BRANCH exists
+git rev-parse --verify $BRANCH
+
+if [ -z $3 ]
+then TAG="mathcomp-$VERSION"
+else TAG=$3
+fi
+# verify whether $TAG exists
+git rev-parse --verify $TAG
+
+ARCHIVEURL="http://github.com/math-comp/math-comp/archive/$TAG.tar.gz"
+
+# we build the url file content and the list of packages, and where to put them
+if [ $VERSION == "dev" ]
+then
+# variables useful for package construction
+  URLLINE="git: \"https://github.com/math-comp/math-comp.git\""
+  PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $(git root)/mathcomp/all/all.v \
+        | paste -sd " " -)
+  PKGPREFIX="$(git root)/opam/extra-dev/packages"
+else
+  ARCHIVE=$(mktemp)
+  git archive --format=tgz --output=$ARCHIVE \
+      --prefix=math-comp-$TAG/ $TAG # reproduce github archive
+  SUM=$(md5sum $ARCHIVE | cut -d " " -f 1)
+  EXTRACTED=$(mktemp -d)
+  tar -C $EXTRACTED -zxvf $ARCHIVE
+# variables useful for package construction
+  URLLINE="http: \"$ARCHIVEURL\""
+  CHECKSUMLINE="checksum: \"$SUM\""
+  PKGS=$(ls -fs -d -1 $EXTRACTED/*/mathcomp/*/ \
+        | sed -r "s?.*mathcomp/([^/]+)/?\1?" \
+        | paste -sd " " -)
+  PKGPREFIX="$(git root)/opam/released/packages"
+fi
+
+# for each package, we pick the corresponding opam and descr file and
+# rewrite them to adapt them to single package construction and
+# version numbers
+for pkg in $PKGS
+do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
+   mkdir -p $pkgdir
+   if [ $VERSION == "dev" ]
+   then cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
+        cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
+   else git show "$BRANCH:mathcomp/$pkg/opam" > $pkgdir/opam
+	git show "$BRANCH:mathcomp/$pkg/descr" > $pkgdir/descr
+        sed -r "/^version/s?dev?$VERSION?" -i $pkgdir/opam
+        sed -r "/^depends.*coq-mathcomp.*/s?dev?$VERSION?" -i $pkgdir/opam
+   fi
+   sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
+   echo $URLLINE > $pkgdir/url
+   if [ $VERSION != "dev" ]
+   then echo $CHECKSUMLINE >> $pkgdir/url
+   fi
 done
 
-for pkg in ssreflect fingroup algebra field solvable character odd_order
-do
-pkgdir="$(git root)/opam/released/packages/coq-mathcomp-$pkg/coq-mathcomp-$pkg.1.6"
-mkdir -p $pkgdir
-cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
-cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
-sed -r "/^version/s?dev?1.6?" -i $pkgdir/opam
-sed -r "/^depends.*coq-mathcomp.*/s?dev?1.6?" -i $pkgdir/opam
-sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
-echo "http: \"http://github.com/math-comp/math-comp/archive/mathcomp-1.6.tar.gz\"" > $pkgdir/url
-echo "checksum: \"038ba80c0d6b430428726ae4d00affcf\"" >> $pkgdir/url
-
-done
+# finally test the existence of the archive
+wget --spider $ARCHIVEURL
