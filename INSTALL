@@ -1,14 +1,16 @@
 # INSTALLATION PROCEDURE
 
 Users familiar with OPAM can use such tool to install Coq and the Mathematical Components library with commands like
-`opam coq-mathcomp-fingroup`.
+
+    opam repo add coq-released http://coq.inria.fr/opam/released
+    opam install coq-mathcomp-fingroup
 
 This document is for users that installed Coq in another way, for example
 compiling it from sources.
 
 ## REQUIREMENTS
 
-Coq version 8.4pl6 or 8.5 (at the time of writing, beta3)
+Coq version 8.5 to 8.7.0
 
 ## BUILDING
 
@@ -74,27 +76,3 @@ file.
 
 Coq sources have a .v extension. Opening any .v file should
 automatically launch ProofGeneral.
-
-## TRANSITION FROM 1.5 to 1.6
-
-The change of logical/physical paths implied by the reorganization of the
-library causes an incompatibility for users of previous version of the
-Mathematical Components library. For instance the command line
-
-          Require Ssreflect.ssreflect.
-
-does not work anymore.  We propose a replacement schema for such
-command lines that is compatible with both versions 8.4 and 8.5 of
-Coq, namely replacing the previous line with:
-
-          Require Import mathcomp.ssreflect.ssreflect.
-
-          From mathcomp Require Import ssrfun ssrbool ...
-
-The first line loads the ssreflect plugin using its full path.
-Then all other files are loaded from the mathcomp name space.
-The component part (like ssreflect or algebra) is omitted.  All theory files in
-the library follow this schema.
-Note that the From directive has effect only in Coq 8.5. Coq 8.4 ignores it
-and searches for files in all known paths: hence beware of the
-possible name collisions.
