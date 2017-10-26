@@ -1,6 +1,10 @@
-07/09/2016 - compatibility with Coq 8.7 and several small fixes - version 1.7
+07/09/2016 - compatibility with Coq 8.7 and several small fixes -
+	version 1.6.2 and upcomming version 1.7
 	* Compatibility with Coq 8.7
+	* Lost compatibility with Coq 8.4
 
+07/09/2016 - compatibility with Coq 8.7 and several small fixes -
+	upcomming version 1.7
 	* New Theorems:
 	   dec_factor_theorem, abstract_context,
 	   mul_bin_down, mul_bin_left
@@ -15,7 +19,8 @@
 	* Plugin:
 	  ssrpattern: compose nicely with Tactic Notation
 
-25/08/2016 - refactoring of algC and complex in ssrnum
+25/08/2016 - refactoring of algC and complex in ssrnum -
+	upcomming version 1.7
 	* ssrnum's interface numClosedFieldType factors some theory from
 	  both complex and algC. Because of that Re, Im, 'i, conjC, n.-root
 	  and sqrtC are not specialized to algC anymore. In case of
