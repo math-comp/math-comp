@@ -1,3 +1,5 @@
+26/10/2018 - point release to support Coq 8.7 - version 1.6.3
+
 21/12/2016 - point release to support Coq 8.6 - version 1.6.1
 	* ssreflect/plugin/v8.6: port of the plugin to Coq 8.6
 	* ssreflect/plugin/: bug fixes (most apply only on Coq 8.5 and 8.6):
