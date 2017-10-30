@@ -135,7 +135,7 @@ Unset Printing Implicit Defensive.
 
 Import GroupScope.
 Import GRing.Theory.
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Reserved Notation "\rank A" (at level 10, A at level 8, format "\rank  A").
 Reserved Notation "A ^C"    (at level 8, format "A ^C").
@@ -160,7 +160,7 @@ Notation "''A' [ F ]_ n" := 'A[F]_(n)
 
 Delimit Scope matrix_set_scope with MS.
 
-Notation Local simp := (Monoid.Theory.simpm, oppr0).
+Local Notation simp := (Monoid.Theory.simpm, oppr0).
 
 (*****************************************************************************)
 (******************** Rank and row-space theory ******************************)

@@ -856,7 +856,7 @@ Implicit Arguments revK [[T]].
 Section EqSeq.
 
 Variables (n0 : nat) (T : eqType) (x0 : T).
-Notation Local nth := (nth x0).
+Local Notation nth := (nth x0).
 Implicit Type s : seq T.
 Implicit Types x y z : T.
 

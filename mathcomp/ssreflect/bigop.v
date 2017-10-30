@@ -1094,14 +1094,14 @@ Import Monoid.Theory.
 Variable R : Type.
 
 Variable idx : R.
-Notation Local "1" := idx.
+Local Notation "1" := idx.
 
 Section Plain.
 
 Variable op : Monoid.law 1.
 
-Notation Local "*%M" := op (at level 0).
-Notation Local "x * y" := (op x y).
+Local Notation "*%M" := op (at level 0).
+Local Notation "x * y" := (op x y).
 
 Lemma eq_big_idx_seq idx' I r (P : pred I) F :
      right_id idx' *%M -> has P r ->
@@ -1226,8 +1226,8 @@ Section Abelian.
 
 Variable op : Monoid.com_law 1.
 
-Notation Local "'*%M'" := op (at level 0).
-Notation Local "x * y" := (op x y).
+Local Notation "'*%M'" := op (at level 0).
+Local Notation "x * y" := (op x y).
 
 Lemma eq_big_perm (I : eqType) r1 r2 (P : pred I) F :
     perm_eq r1 r2 ->
@@ -1517,14 +1517,14 @@ Import Monoid.Theory.
 
 Variable R : Type.
 Variables zero one : R.
-Notation Local "0" := zero.
-Notation Local "1" := one.
+Local Notation "0" := zero.
+Local Notation "1" := one.
 Variable times : Monoid.mul_law 0.
-Notation Local "*%M" := times (at level 0).
-Notation Local "x * y" := (times x y).
+Local Notation "*%M" := times (at level 0).
+Local Notation "x * y" := (times x y).
 Variable plus : Monoid.add_law 0 *%M.
-Notation Local "+%M" := plus (at level 0).
-Notation Local "x + y" := (plus x y).
+Local Notation "+%M" := plus (at level 0).
+Local Notation "x + y" := (plus x y).
 
 Lemma big_distrl I r a (P : pred I) F :
   \big[+%M/0]_(i <- r | P i) F i * a = \big[+%M/0]_(i <- r | P i) (F i * a).

@@ -151,9 +151,9 @@ Notation "A :!=: B" := (A != B :> {set _})
 Notation "A :=P: B" := (A =P B :> {set _})
   (at level 70, no associativity, only parsing) : set_scope.
 
-Notation Local finset_def := (fun T P => @FinSet T (finfun P)).
+Local Notation finset_def := (fun T P => @FinSet T (finfun P)).
 
-Notation Local pred_of_set_def := (fun T (A : set_type T) => val A : _ -> _).
+Local Notation pred_of_set_def := (fun T (A : set_type T) => val A : _ -> _).
 
 Module Type SetDefSig.
 Parameter finset : forall T : finType, pred T -> {set T}.
@@ -1021,9 +1021,9 @@ End CartesianProd.
 Implicit Arguments setXP [x1 x2 fT1 fT2 A1 A2].
 Prenex Implicits setXP.
 
-Notation Local imset_def :=
+Local Notation imset_def :=
   (fun (aT rT : finType) f mD => [set y in @image_mem aT rT f mD]).
-Notation Local imset2_def :=
+Local Notation imset2_def :=
   (fun (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) =>
      [set y in @image_mem _ rT (prod_curry f)
                            (mem [pred u | D1 u.1 & D2 u.1 u.2])]).

@@ -105,7 +105,7 @@ Definition pfactor p e := p ^ e.
 
 Definition cons_pfactor (p e : nat) pd := ifnz e ((p, e) :: pd) pd.
 
-Notation Local "p ^? e :: pd" := (cons_pfactor p e pd)
+Local Notation "p ^? e :: pd" := (cons_pfactor p e pd)
   (at level 30, e at level 30, pd at level 60) : nat_scope.
 
 Section prime_decomp.

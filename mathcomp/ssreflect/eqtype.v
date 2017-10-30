@@ -696,7 +696,7 @@ Section SubEqType.
 
 Variables (T : eqType) (P : pred T) (sT : subType P).
 
-Notation Local ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
+Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
 Definition sub_eqMixin := EqMixin val_eqP.

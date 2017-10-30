@@ -36,7 +36,7 @@ Definition Sym of phant T : {set {perm T}} := setT.
 
 Canonical Sym_group phT := Eval hnf in [group of Sym phT].
 
-Notation Local "'Sym_T" := (Sym (Phant T)) (at level 0).
+Local Notation "'Sym_T" := (Sym (Phant T)) (at level 0).
 
 Canonical sign_morph := @Morphism _ _ 'Sym_T _ (in2W (@odd_permM _)).
 
@@ -44,7 +44,7 @@ Definition Alt of phant T := 'ker (@odd_perm T).
 
 Canonical Alt_group phT := Eval hnf in [group of Alt phT].
 
-Notation Local "'Alt_T" := (Alt (Phant T)) (at level 0).
+Local Notation "'Alt_T" := (Alt (Phant T)) (at level 0).
 
 Lemma Alt_even p : (p \in 'Alt_T) = ~~ p.
 Proof. by rewrite !inE /=; case: odd_perm. Qed.

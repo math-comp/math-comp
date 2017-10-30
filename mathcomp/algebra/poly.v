@@ -101,7 +101,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Import GRing.Theory.
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Reserved Notation "{ 'poly' T }" (at level 0, format "{ 'poly'  T }").
 Reserved Notation "c %:P" (at level 2, format "c %:P").

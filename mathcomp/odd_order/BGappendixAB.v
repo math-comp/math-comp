@@ -31,7 +31,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 Import GroupScope GRing.Theory.
 
 Section AppendixA.

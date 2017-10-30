@@ -64,7 +64,7 @@ Unset Printing Implicit Defensive.
 Import GRing.Theory.
 Import Monoid.Theory.
 
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Import Pdiv.Idomain.
 (* Row vector <-> bounded degree polynomial bijection *)
