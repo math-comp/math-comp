@@ -312,7 +312,7 @@ Qed.
 
 Section Matrix.
 
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 Import GRing.Theory.
 
 Variable R: ringType.

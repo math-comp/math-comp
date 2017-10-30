@@ -93,7 +93,7 @@ Require Import finfun tuple ssralg matrix mxalgebra zmodp.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Reserved Notation "{ 'vspace' T }" (at level 0, format "{ 'vspace'  T }").
 Reserved Notation "''Hom' ( T , rT )" (at level 8, format "''Hom' ( T ,  rT )").

@@ -1242,7 +1242,7 @@ Structure group_type : Type := Group {
 }.
 
 Definition group_of of phant gT : predArgType := group_type.
-Notation Local groupT := (group_of (Phant gT)).
+Local Notation groupT := (group_of (Phant gT)).
 Identity Coercion type_of_group : group_of >-> group_type.
 
 Canonical group_subType := Eval hnf in [subType for gval].

@@ -79,7 +79,7 @@ Require Import div tuple finfun bigop ssralg finalg zmodp matrix vector poly.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Reserved Notation "{ 'aspace' T }" (at level 0, format "{ 'aspace'  T }").
 Reserved Notation "<< U & vs >>" (at level 0, format "<< U  &  vs >>").

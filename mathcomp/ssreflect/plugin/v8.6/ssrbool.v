@@ -1506,17 +1506,17 @@ Proof. by move=> trR x y z Ryx Rzy; apply: trR Rzy Ryx. Qed.
 
 (* Property localization *)
 
-Notation Local "{ 'all1' P }" := (forall x, P x : Prop) (at level 0).
-Notation Local "{ 'all2' P }" := (forall x y, P x y : Prop) (at level 0).
-Notation Local "{ 'all3' P }" := (forall x y z, P x y z: Prop) (at level 0).
-Notation Local ph := (phantom _).
+Local Notation "{ 'all1' P }" := (forall x, P x : Prop) (at level 0).
+Local Notation "{ 'all2' P }" := (forall x y, P x y : Prop) (at level 0).
+Local Notation "{ 'all3' P }" := (forall x y z, P x y z: Prop) (at level 0).
+Local Notation ph := (phantom _).
 
 Section LocalProperties.
 
 Variables T1 T2 T3 : Type.
 
 Variables (d1 : mem_pred T1) (d2 : mem_pred T2) (d3 : mem_pred T3).
-Notation Local ph := (phantom Prop).
+Local Notation ph := (phantom Prop).
 
 Definition prop_for (x : T1) P & ph {all1 P} := P x.
 

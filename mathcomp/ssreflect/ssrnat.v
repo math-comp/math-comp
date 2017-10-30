@@ -1395,10 +1395,10 @@ Definition exp m n := if n is n'.+1 then mul_exp m n' m else 1.
 
 Notation "n ^ m" := (exp n m) : nat_scope.
 
-Notation Local oddn := odd.
+Local Notation oddn := odd.
 Fixpoint odd n := if n is n'.+2 then odd n' else eqn n 1.
 
-Notation Local doublen := double.
+Local Notation doublen := double.
 Definition double n := if n is n'.+1 then n' + n.+1 else 0.
 Notation "n .*2" := (double n) : nat_scope.
 
@@ -1460,7 +1460,7 @@ Fixpoint nat_of_pos p0 :=
 
 End Trec.
 
-Coercion Local nat_of_pos : positive >-> nat.
+Local Coercion nat_of_pos : positive >-> nat.
 
 Coercion nat_of_bin b := if b is Npos p then p : nat else 0.
 

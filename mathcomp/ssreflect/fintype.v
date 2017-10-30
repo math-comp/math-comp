@@ -430,8 +430,8 @@ Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
-Notation Local subset_type := (forall (T : finType) (A B : mem_pred T), bool).
-Notation Local subset_def := (fun T A B => pred0b (predD A B)).
+Local Notation subset_type := (forall (T : finType) (A B : mem_pred T), bool).
+Local Notation subset_def := (fun T A B => pred0b (predD A B)).
 Module Type SubsetDefSig.
 Parameter subset : subset_type. Axiom subsetEdef : subset = subset_def.
 End SubsetDefSig.
