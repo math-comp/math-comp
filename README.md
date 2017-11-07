@@ -14,17 +14,21 @@ The library is divided into packages which group together related
 files. Each package defines a distribution and compilation unit.
 
 Packages can be compiled using the traditional `make` utility or
-the more recent `OPAM` one.
+the more recent `OPAM` one. The released and current dev version are
+also available as opam packages.
 
-We provide a convenience root Makefile in order to compile all packages
-at once using `make`.  This is the simplest option.
-
-We also provide `opam` files to compile each package using `OPAM`.
-Note that the `OPAM` packages for the Mathematical Components library
-are available in the standard Coq `OPAM` repositories,
-under the `coq-mathcomp-` name space.  If you are only interested
-in installing a Mathematical Components package via `OPAM`, follow
-the standard instructions available on the Coq website.
+## Compilation and installation of released and current dev version with OPAM
+```
+opam init # if you use opam for the first time
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam pin add -n coq -k version 8.7.0
+opam install coq -j3
+opam install coq-mathcomp-ssreflect.1.6.4 -j3
+```
+Replace `ssreflect` here by the package you want, dependencies will be
+installed automatically. You can replace `1.6.4` by `dev` to get the last
+development version. We recommand to pin a particular version of Coq
+(here `8.7.0`).
 
 ## Compilation and installation with make
 
@@ -59,7 +63,7 @@ editor (e.g. the default for CoqIDE is to ignore it).
 
 To install the compiled library, just execute `make install`.
 
-## Compilation and installation with OPAM
+## Compilation and installation of a custom version using OPAM
 
 The instructions assume you are in the `mathcomp` directory
 and that you have `OPAM` installed and configured with the
@@ -77,5 +81,5 @@ for P in */opam; do opam pin -n add ${P%%/opam}; done
 Then you can use `opam install` to compile and install any package.
 For example:
 ```
-opam install coq.8.5.dev coq-mathcomp-ssreflect
+opam install coq.8.7.0 coq-mathcomp-ssreflect
 ```
