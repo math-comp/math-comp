@@ -18,8 +18,14 @@ the more recent `OPAM` one. The released and current dev version are
 also available as opam packages.
 
 ## Compilation and installation of released and current dev version with OPAM
+If you just installed opam you may have to do the following. You may also want
+to read opam user manual first https://opam.ocaml.org/doc/Usage.html
 ```
-opam init # if you use opam for the first time
+opam init
+eval `opam config env`
+```
+Once your opam envionement is configure you can install any math-comp package via
+```
 opam repo add coq-released https://coq.inria.fr/opam/released
 opam pin add -n coq -k version 8.7.0
 opam install coq -j3
