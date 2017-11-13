@@ -49,11 +49,11 @@ open Notation_ops
 open Locus
 open Locusops
 
-DECLARE PLUGIN "ssreflect"
+DECLARE PLUGIN "ssrmatching_plugin"
 
 type loc = Loc.t
 let dummy_loc = Loc.ghost
-let errorstrm = Errors.errorlabstrm "ssreflect"
+let errorstrm = Errors.errorlabstrm "ssrmatching"
 let loc_error loc msg = Errors.user_err_loc (loc, msg, str msg)
 
 (* 0 cost pp function. Active only if env variable SSRDEBUG is set *)
@@ -1334,14 +1334,14 @@ let () =
       Genarg.out_gen (topwit wit_ssrpatternarg)
        (Id.Map.find (Names.Id.of_string "ssrpatternarg") ist.lfun) in
     Proofview.V82.tactic (ssrpatterntac ist arg) in
-  let name = { mltac_plugin = "ssreflect"; mltac_tactic = "ssrpattern"; } in
+  let name = { mltac_plugin = "ssrmatching_plugin"; mltac_tactic = "ssrpattern"; } in
   let () = Tacenv.register_ml_tactic name mltac in
   let tac =
     TacFun ([Some (Id.of_string "ssrpatternarg")],
       TacML (Loc.ghost, name, [])) in
   let obj () =
     Tacenv.register_ltac true false (Id.of_string "ssrpattern") tac in
-  Mltop.declare_cache_obj obj "ssreflect"
+  Mltop.declare_cache_obj obj "ssrmatching_plugin"
 
 let ssrinstancesof ist arg gl =
   let ok rhs lhs ise = true in

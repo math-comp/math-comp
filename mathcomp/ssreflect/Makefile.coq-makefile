@@ -4,7 +4,8 @@ define coqmakefile
 	MLLIB=;\
 	EXTRA=;\
 	case $(V) in\
-       	v8.5*|v8.4*)\
+	v8.5*|v8.4*)\
+		$$LN $(1)/plugin/$(V)/ssrmatching_plugin.mllib .;\
 		$$LN $(1)/plugin/$(V)/ssrmatching.mli .;\
 		$$LN $(1)/plugin/$(V)/ssrmatching.ml4 .;\
 		$$LN $(1)/plugin/$(V)/ssrmatching.v .;\
@@ -13,7 +14,7 @@ define coqmakefile
 		$$LN $(1)/plugin/$(V)/ssrbool.v $(1)/;\
 		$$LN $(1)/plugin/$(V)/ssrfun.v $(1)/;\
 		$$LN $(1)/plugin/$(V)/ssreflect.v $(1)/;\
-		MLLIB=ssreflect_plugin.mllib;\
+		MLLIB="ssrmatching_plugin.mllib ssreflect_plugin.mllib";\
 		EXTRA="ssrmatching.mli ssrmatching.ml4 ssrmatching.v ssreflect.ml4";\
 	;;\
 	v8.6*)\
