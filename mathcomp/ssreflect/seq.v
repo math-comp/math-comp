@@ -1319,6 +1319,35 @@ elim: v i => [|n v IHv] [|i] //=; first by rewrite size_ncons /= addn1.
 by rewrite IHv; apply: fun_if.
 Qed.
 
+Section uniqP.
+Variable T : eqType.
+Implicit Type s : seq T.
+
+Lemma uniqP x0 s :
+ reflect {in [pred i | i < size s] &, injective (nth x0 s)} (uniq s).
+Proof.
+apply: (iffP idP) => [uq_s i j lei lej /eqP|].
++ by rewrite nth_uniq // => /eqP.
+elim: s => //= x s ih inj_nth; rewrite ih ?andbT; last first.
++ by move=> i j lei lej /(inj_nth i.+1 j.+1 lei lej) [].
+apply/negP=> /(nthP x0) [i lti xE].
+by have := (inj_nth 0 i.+1 (ltn0Sn _) lti (esym xE)).
+Qed.
+
+Lemma uniqPn x0 s :
+  reflect (exists i j, [&& i < size s, j < size s,
+                        i != j & nth x0 s i == nth x0 s j])
+          (~~ uniq s).
+Proof.
+apply: (iffP idP) => [|[i] [j] /and4P[lei lej /eqP ne_ij eq_nth]]; last first.
++ by apply/negP=> /uniqP /(_ _ _ lei lej (eqP eq_nth)).
+elim: s => //= x s ih /nandP[]; last first.
++ by case/ih=> [i] [j] {ih}ih; exists i.+1, j.+1.
+rewrite negbK => /(nthP x0) [j ltj <-].
+by exists 0, j.+1 => /=; rewrite eqxx andbT.
+Qed.
+End uniqP.
+
 (* Equality up to permutation *)
 
 Section PermSeq.
