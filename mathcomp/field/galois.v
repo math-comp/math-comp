@@ -227,7 +227,7 @@ Qed.
 Lemma kHomExtendP : kHom K <<E; x>> kHomExtend.
 Proof.
 have [fM idKf] := kHomP homKf.
-apply/kHomP; split=> [|z Kz]; last by rewrite kHomExtend_id ?(subvP sKE) ?idKf. 
+apply/kHomP; split=> [|z Kz]; last by rewrite kHomExtend_id ?(subvP sKE) ?idKf.
 move=> _ _ /Fadjoin_polyP[p Ep ->] /Fadjoin_polyP[q Eq ->].
 rewrite -hornerM !kHomExtend_poly ?rpredM // -hornerM; congr _.[_].
 apply/polyP=> i; rewrite coef_map !coefM /= linear_sum /=.
@@ -255,7 +255,7 @@ Proof.
 by move=> sKE eq_fg; rewrite !kAutE (kHom_eq sKE eq_fg) (eq_in_limg eq_fg).
 Qed.
 
-Lemma kAutfE K f : kAut K {:L} f = kHom K {:L} f. 
+Lemma kAutfE K f : kAut K {:L} f = kHom K {:L} f.
 Proof. by rewrite kAutE subvf andbT. Qed.
 
 Lemma kAut1E E (f : 'AEnd(L)) : kAut 1 E f = (f @: E <= E)%VS.
@@ -438,7 +438,7 @@ Lemma normal_field_splitting (F : fieldType) (L : fieldExtType F) :
   SplittingField.axiom L.
 Proof.
 move=> normalL; pose r i := sval (sigW (normalL 1%AS (tnth (vbasis {:L}) i))).
-have sz_r i: size (r i) <= \dim {:L}. 
+have sz_r i: size (r i) <= \dim {:L}.
   rewrite -ltnS -(size_prod_XsubC _ id) /r; case: sigW => _ /= /eqP <-.
   rewrite size_minPoly ltnS; move: (tnth _ _) => x.
   by rewrite adjoin_degreeE dimv1 divn1 dimvS // subvf.
@@ -615,7 +615,7 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
     have [q2 Dq2]: exists q2, q1z = map_poly inLz q2.
       exists (\poly_(i < size q1z) (sval (sig_eqW (F0q1z i)))%:A).
       rewrite -{1}[q1z]coefK; apply/polyP=> i; rewrite coef_map !{1}coef_poly.
-      by case: sig_eqW => a; case: ifP; rewrite /= ?rmorph0 ?linearZ ?rmorph1. 
+      by case: sig_eqW => a; case: ifP; rewrite /= ?rmorph0 ?linearZ ?rmorph1.
     rewrite Dq2 dvdp_map minPoly_dvdp //.
       apply/polyOverP=> i; have[a] := F0q1z i.
       rewrite -(rmorph1 [rmorphism of inLz]) -linearZ.
@@ -771,7 +771,7 @@ Variable V : {vspace L}.
 (* The <<_>>, which becomes redundant when V is a {subfield L}, ensures that  *)
 (* the argument of [subg _] is syntactically a group.                         *)
 Inductive gal_of := Gal of [subg kAEnd_group 1 <<V>> / kAEndf (agenv V)].
-Definition gal (f : 'AEnd(L)) := Gal (subg _ (coset _ f)). 
+Definition gal (f : 'AEnd(L)) := Gal (subg _ (coset _ f)).
 Definition gal_sgval x := let: Gal u := x in u.
 
 Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
@@ -1009,7 +1009,7 @@ Qed.
 Lemma galois_connection K E (A : {set gal_of E}):
   (K <= E)%VS -> (A \subset 'Gal(E / K)) = (K <= fixedField A)%VS.
 Proof.
-move=> sKE; apply/idP/idP => [/fixedFieldS | /(galS E)]. 
+move=> sKE; apply/idP/idP => [/fixedFieldS | /(galS E)].
   by apply: subv_trans; apply galois_connection_subv.
 by apply: subset_trans; apply: galois_connection_subset.
 Qed.
@@ -1143,7 +1143,7 @@ Lemma normalFieldS K M E : (K <= M)%VS -> normalField K E -> normalField M E.
 Proof.
 move=> sKM /normalFieldP nKE; apply/normalFieldP=> a Ea.
 have [r /allP Er splitKa] := nKE a Ea.
-have /dvdp_prod_XsubC[m splitMa]: minPoly M a %| \prod_(b <- r) ('X - b%:P). 
+have /dvdp_prod_XsubC[m splitMa]: minPoly M a %| \prod_(b <- r) ('X - b%:P).
   by rewrite -splitKa minPolyS.
 exists (mask m r); first by apply/allP=> b /mem_mask/Er.
 by apply/eqP; rewrite -eqp_monic ?monic_prod_XsubC ?monic_minPoly.
@@ -1169,7 +1169,7 @@ have sXE := basis_mem (vbasisP E); set X : seq L := vbasis E in sXE.
 exists (\prod_(a <- X) minPoly K a).
   by apply: rpred_prod => a _; apply: minPolyOver.
 exists (flatten [seq (sval (rK_ a)) | a <- X]).
-  move/allP: sXE; elim: X => [|a X IHX] ; first by rewrite !big_nil eqpxx.
+  move/allP: sXE; elim: X => [|a X IHX]; first by rewrite !big_nil eqpxx.
   rewrite big_cons /= big_cat /= => /andP[Ea sXE].
   by case: (rK_ a) => /= r [] // _ <-; apply/eqp_mull/IHX.
 apply/eqP; rewrite eqEsubv; apply/andP; split.
@@ -1215,7 +1215,7 @@ Lemma normalField_factors K E :
    (normalField K E).
 Proof.
 move=> sKE; apply: (iffP idP) => [nKE a Ea | nKE]; last first.
-  apply/normalFieldP=> a Ea; have [r _ ->] := nKE a Ea. 
+  apply/normalFieldP=> a Ea; have [r _ ->] := nKE a Ea.
   exists [seq x a | x : gal_of E <- r]; last by rewrite big_map.
   by rewrite all_map; apply/allP=> b _; apply: memv_gal.
 have [r Er splitKa] := normalFieldP nKE a Ea.
@@ -1312,7 +1312,7 @@ apply (iffP idP) => [/and3P[sKE /separableP sepKE nKE] | fixedKE].
   rewrite -eqSS -size_minPoly splitKa size_prod_XsubC eqSS -/(size [:: a]).
   have Ur: uniq r by rewrite -separable_prod_XsubC -splitKa; apply: sepKE.
   rewrite -uniq_size_uniq {Ur}// => b; rewrite inE -root_prod_XsubC -splitKa.
-  apply/eqP/idP=> [-> | pKa_b_0]; first exact: root_minPoly. 
+  apply/eqP/idP=> [-> | pKa_b_0]; first exact: root_minPoly.
   by have [x /fixEa-> ->] := normalField_root_minPoly sKE nKE Ea pKa_b_0.
 have sKE: (K <= E)%VS by rewrite -fixedKE capvSl.
 apply/galois_factors=> // a Ea.
@@ -1321,7 +1321,7 @@ have /fin_all_exists2[x_ galEx_ Dx_a] (b : seq_sub r_pKa) := imageP (valP b).
 exists (codom x_); rewrite -map_comp; set r := map _ _.
 have r_xa x: x \in 'Gal(E / K) -> x a \in r.
   move=> galEx; have r_pKa_xa: x a \in r_pKa by apply/imageP; exists x.
-  by rewrite [x a](Dx_a (SeqSub r_pKa_xa)); apply: codom_f. 
+  by rewrite [x a](Dx_a (SeqSub r_pKa_xa)); apply: codom_f.
 have Ur: uniq r by apply/injectiveP=> b c /=; rewrite -!Dx_a => /val_inj.
 split=> //; first by apply/subsetP=> _ /codomP[b ->].
 apply/eqP; rewrite -eqp_monic ?monic_minPoly ?monic_prod_XsubC //.
@@ -1389,10 +1389,10 @@ have [x1 | ntx] := eqVneq x 1%g.
   by rewrite -{1}normEa1 /galNorm DgalE x1 cycle1 big_set1 !gal_id divr1.
 pose c_ y := \prod_(i < invm (injm_Zpm x) y) (x ^+ i)%g a.
 have nz_c1: c_ 1%g != 0 by rewrite /c_ morph1 big_ord0 oner_neq0.
-have [d] := @gal_independent_contra _ (mem 'Gal(E / K)) _ _ (group1 _) nz_c1. 
+have [d] := @gal_independent_contra _ (mem 'Gal(E / K)) _ _ (group1 _) nz_c1.
 set b := \sum_(y in _) _ => Ed nz_b; exists b.
   split=> //; apply: rpred_sum => y galEy.
-  by apply: rpredM; first apply:  rpred_prod => i _; apply: memv_gal.
+  by apply: rpredM; first apply: rpred_prod => i _; apply: memv_gal.
 apply: canRL (mulfK _) _; first by rewrite fmorph_eq0.
 rewrite rmorph_sum mulr_sumr [b](reindex_acts 'R _ galEx) ?astabsR //=.
 apply: eq_bigr => y galEy; rewrite galM // rmorphM mulrA; congr (_ * _).
@@ -1477,7 +1477,7 @@ rewrite mulrC memv_mul ?memv_line //; apply/fixedFieldP=> [|x Gx].
   have Edet n (N : 'M_n) (E_N : forall i j, N i j \in E): \det N \in E.
     by apply: rpred_sum => sigma _; rewrite rpredMsign rpred_prod.
   rewrite /invmx uM 2!mxE mulrC rpred_div ?Edet //.
-  by rewrite rpredMsign Edet // => k l; rewrite 2!mxE.  
+  by rewrite rpredMsign Edet // => k l; rewrite 2!mxE.
 suffices{i} {2}<-: map_mx x v = v by rewrite [map_mx x v i 0]mxE.
 have uMx: map_mx x (M w) \in unitmx by rewrite map_unitmx.
 rewrite map_mxM map_invmx /=; apply: canLR {uMx}(mulKmx uMx) _.

@@ -109,7 +109,7 @@ have amE u v : am u v = v * u by rewrite lfunE.
 pose uam := [pred u | lker (am u) == 0%VS].
 pose vam := [fun u => if u \in uam then (am u)^-1%VF 1 else u].
 have vamKl: {in uam, left_inverse 1 vam *%R}.
-  by move=> u Uu; rewrite /= Uu -amE lker0_lfunVK.  
+  by move=> u Uu; rewrite /= Uu -amE lker0_lfunVK.
 exists uam vam => // [u Uu | u v [_ uv1] | u /negbTE/= -> //].
   by apply/(lker0P Uu); rewrite !amE -mulrA vamKl // mul1r mulr1.
 by apply/lker0P=> w1 w2 /(congr1 (am v)); rewrite !amE -!mulrA uv1 !mulr1.
@@ -747,7 +747,7 @@ Qed.
 
 Lemma memvV A u : (u^-1 \in A) = (u \in A).
 Proof.
-suffices{u} invA: invr_closed A by apply/idP/idP=> /invA; rewrite ?invrK. 
+suffices{u} invA: invr_closed A by apply/idP/idP=> /invA; rewrite ?invrK.
 move=> u Au; have [Uu | /invr_out-> //] := boolP (u \is a GRing.unit).
 rewrite memvE -(limg_ker0 _ _ (lker0_amulr Uu)) limg_line lfunE /= mulVr //.
 suff ->: (amulr u @: A)%VS = A by rewrite -memvE -algid_eq1 (unitr_algid1 Au).
@@ -1202,7 +1202,7 @@ Notation "''AHom' ( aT , rT )" := (ahom aT rT) : type_scope.
 Notation "''AEnd' ( aT )" := (ahom aT aT) : type_scope.
 
 Delimit Scope lrfun_scope with AF.
-Bind Scope lrfun_scope with ahom. 
+Bind Scope lrfun_scope with ahom.
 
 Notation "\1" := (@id_ahom _ _) : lrfun_scope.
 Notation "f \o g" := (comp_ahom f g) : lrfun_scope.

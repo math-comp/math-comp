@@ -420,7 +420,7 @@ Qed.
 
 Lemma maxnormal_minnormal G L M :
     G \subset 'N(M) -> L \subset 'N(G) ->  maxnormal M G L ->
-  minnormal (G / M) (L / M). 
+  minnormal (G / M) (L / M).
 Proof.
 move=> nMG nGL /maxgroupP[/andP[/andP[sMG ltMG] nML] maxM]; apply/mingroupP.
 rewrite -subG1 quotient_sub1 ?ltMG ?quotient_norms //.
@@ -544,7 +544,7 @@ Proof. by case/and3P=> /quotient_cents2r *; rewrite subsetI quotientS. Qed.
 Lemma central_central_factor H K :
   (K / H) \subset 'Z(G / H) -> H <| K -> H <| G -> central_factor G H K.
 Proof.
-case/subsetIP=> sKGb cGKb /andP[sHK nHK] /andP[sHG nHG]. 
+case/subsetIP=> sKGb cGKb /andP[sHK nHK] /andP[sHG nHG].
 by rewrite /central_factor -quotient_cents2 // cGKb sHK -(quotientSGK nHK).
 Qed.
 

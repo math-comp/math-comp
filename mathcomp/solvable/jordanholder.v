@@ -306,7 +306,7 @@ Qed.
 Lemma acts_qact_doms (H : {group rT}) :
   H \subset D -> [acts A, on H | to] -> qact_dom to H :=: A.
 Proof.
-move=> sHD aH; apply/eqP; rewrite eqEsubset; apply/andP. 
+move=> sHD aH; apply/eqP; rewrite eqEsubset; apply/andP.
 split; first exact: qact_dom_doms.
 apply/subsetP=> x Ax; rewrite qact_domE //; apply/gastabsP=> //.
 by move/gactsP: aH; move/(_ x Ax).
@@ -527,11 +527,11 @@ have: K' :=: 1%G \/ K' :=: (G / H).
   apply/morphimP; exists (to z x) => //.
   suff h: qact_dom to H \subset A.
     by rewrite astabs_act // (subsetP aK) //; apply: (subsetP h).
-  by apply/subsetP=> t; rewrite qact_domE // inE; case/ andP.
+  by apply/subsetP=> t; rewrite qact_domE // inE; case/andP.
 case; last first.
   move/quotient_injG; rewrite !inE /=; move/(_ nKH nHG)=> c; move: nsGK.
   by rewrite c subxx.
-rewrite /= -trivg_quotient; move=> tK'; apply:(congr1 (@gval _)); move: tK'.
+rewrite /= -trivg_quotient => - tK'; apply: (congr1 (@gval _)); move: tK'.
 by apply: (@quotient_injG _ H); rewrite ?inE /= ?normal_refl.
 Qed.
 
@@ -565,7 +565,7 @@ have aKQ1 : [acts qact_dom to N1, on K | to / N1].
   have sH'N2 : H' \subset N2.
     rewrite /H' eHH' quotientGK ?normal_cosetpre //=.
     by rewrite sub_cosetpre_quo ?normal_sub.
-  have -> : f1 @* H' = coset N1 @* H' by rewrite f1im //=. 
+  have -> : f1 @* H' = coset N1 @* H' by rewrite f1im //=.
   apply: qacts_coset => //; apply: qacts_cosetpre => //; last exact: gactsI.
   by apply: (subset_trans (subsetIr _ _)).
 have injf2 : 'injm f2.

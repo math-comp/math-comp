@@ -271,7 +271,7 @@ have nSyl5: #|'Syl_5(H)| = 1%N.
   move: (card_Syl_dvd 5 H) (card_Syl_mod H prime_5).
   rewrite Hcard20; case: (card _) => // n Hdiv.
   move: (dvdn_leq  (isT: (0 < 20)%N) Hdiv).
-  by move: (n) Hdiv; do 20 (case => //).
+  by move: (n) Hdiv; do 20 (case=> //).
 case: (Sylow_exists 5 H) => S; case/pHallP=> sSH oS.
 have{oS} oS: #|S| = 5 by rewrite oS p_part Hcard20.
 suff: 20 %| #|S| by rewrite oS.
@@ -350,7 +350,7 @@ have Hp1: p1 x = x.
 have Hcp1: #|[set x | p1 x != x]| <= n.
   have F1 y: p y = y -> p1 y = y.
     move=> Hy; rewrite /p1 permM Hy.
-    case tpermP => //; first by move => <-.
+    case tpermP => //; first by move=> <-.
     by move=> Hpx1; apply: (@perm_inj _ p); rewrite -Hpx1.
   have F2: p1 x1 = x1 by rewrite /p1 permM tpermR.
   have F3: [set x | p1 x != x] \subset [predD1 [set x | p x != x] & x1].

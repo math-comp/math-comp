@@ -255,7 +255,7 @@ have [X1 EpX1 nregX11] := nregA _ ntQ1 nQ1A coQ1A.
 pose Q2 := Q1 :^ g; have sylQ2: q.-Sylow(Ms :^ g) Q2 by rewrite pHallJ2.
 have{ntQ1} ntQ2: Q2 != 1 by rewrite -!cardG_gt1 cardJg in ntQ1 *.
 have nQ2A: A \subset 'N(Q2) by rewrite (subset_trans sAP) ?norm_conj_norm.
-have{coQ1A} coQ2A: coprime #|Q2| #|A| by rewrite cardJg. 
+have{coQ1A} coQ2A: coprime #|Q2| #|A| by rewrite cardJg.
 have{nregA ntQ2 coQ2A} [X2 EpX2 nregX22] := nregA _ ntQ2 nQ2A coQ2A.
 have [|_ regA]:= exceptional_TIsigmaJ notMg _ sylQ1 nQ1A sylQ2 nQ2A.
   by rewrite (subset_trans sAP) // -(normP nPg) conjSg.
@@ -424,7 +424,7 @@ have qQ0: q.-group Q0 := pgroupS sQ0Q qQ.
 have p'Q0: p^'.-group Q0 by apply: (pi_pnat qQ0); rewrite eq_sym in q'p.
 have sM'Q0: \sigma(M)^'.-group Q0 := pi_pnat qQ0 sM'q.
 have cQ0Q0: abelian Q0 := center_abelian Q.
-have defQ0: [~: A, Q0] = Q0. 
+have defQ0: [~: A, Q0] = Q0.
   rewrite -{2}[Q0](coprime_abelian_cent_dprod nQ0A) //.
     by rewrite setIAC regQ setI1g dprodg1 commGC.
   by rewrite (coprimeSg (subset_trans sQ0Q sQK)).

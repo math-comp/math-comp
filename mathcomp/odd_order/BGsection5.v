@@ -69,7 +69,7 @@ Proof.
 move=> injf sHG; rewrite /narrow injm_p_rank //; congr (_ ==> _).
 apply/set0Pn/set0Pn=> [] [E /setIP[Ep2E maxE]].
   exists (invm injf @* E)%G; rewrite -[H](group_inj (morphim_invm injf _)) //.
-  have sEfG: E \subset f @* G. 
+  have sEfG: E \subset f @* G.
     by rewrite (subset_trans _ (morphimS _ sHG)) //; case/pnElemP: Ep2E.
   by rewrite inE injm_pnElem ?injm_pmaxElem ?injm_invm ?morphimS // Ep2E.
 have sEG: E \subset G by rewrite (subset_trans _ sHG) //; case/pnElemP: Ep2E.
@@ -166,7 +166,7 @@ Proof. by rewrite Ohm1_eq1 (center_nil_eq1 (pgroup_nil pR)). Qed.
 
 Let sZR : Z \subset R. Proof. by rewrite !gFsub_trans. Qed.
 
-Let abelZ : p.-abelem (Z). 
+Let abelZ : p.-abelem (Z).
 Proof. by rewrite (Ohm1_abelem (pgroupS _ pR)) ?center_sub ?center_abelian. Qed.
 
 Let pZ : p.-group Z. Proof. exact: abelem_pgroup abelZ. Qed.
@@ -272,12 +272,12 @@ have sZT: Z \subset T.
 have{SZ sSSZ maxSZ} not_sST: ~~ (S \subset T).
   have: ~~ (SZ \subset T) by case/Ohm1_ucn_p2maxElem: maxSZ.
   by rewrite join_subG sZT andbT.
-have tiST: S :&: T :=: 1 by rewrite prime_TIg ?oS. 
+have tiST: S :&: T :=: 1 by rewrite prime_TIg ?oS.
 have defST: S * T = R.
   apply/eqP; rewrite eqEcard TI_cardMg ?mul_subG ?subsetIl //=.
-  by rewrite  mulnC oS -maxT Lagrange ?subsetIl.
+  by rewrite mulnC oS -maxT Lagrange ?subsetIl.
 have cRRb: abelian (R / T) by rewrite -defST quotientMidr quotient_abelian.
-have sR'T: R^`(1) \subset T by rewrite der1_min ?char_norm. 
+have sR'T: R^`(1) \subset T by rewrite der1_min ?char_norm.
 have TI_SR': S :&: R^`(1) :=: 1.
   by rewrite prime_TIg ?oS // (contra _ not_sST) // => /subset_trans->.
 have defCRS : S \x 'C_T(S) = 'C_R(S).
@@ -385,12 +385,12 @@ have tiHS: H :&: S = 1.
   have nsUR: U <| R.
     rewrite /normal sUR -commg_subl (subset_trans (commSg _ sUH)) //= -/U.
     by rewrite (subset_trans sHRZ) // joing_subr.
-  have{rU}:= leq_trans rU rCRS; rewrite leq_eqVlt => /predU1P[] rU. 
+  have{rU}:= leq_trans rU rCRS; rewrite leq_eqVlt => /predU1P[] rU.
     have Ep2U: [group of U] \in 'E_p^2(R).
       by rewrite !inE /= sUR abelU -(p_rank_abelem abelU) rU.
     have [F scn3F sUF] := normal_p2Elem_SCN3 rR Ep2U nsUR.
-    have [scnF rF] := setIdP scn3F; have [_ scF] := SCN_P scnF. 
-    rewrite (leq_trans rF) // -scF -rank_pgroup ?(pgroupS (subsetIl _ _)) //. 
+    have [scnF rF] := setIdP scn3F; have [_ scF] := SCN_P scnF.
+    rewrite (leq_trans rF) // -scF -rank_pgroup ?(pgroupS (subsetIl _ _)) //.
     by rewrite rankS ?setIS ?centS // (subset_trans _ sUF) ?joing_subl.
   have defU: S :=: U.
     apply/eqP; rewrite eqEcard oS joing_subl (card_pgroup (pgroupS sUR pR)).
@@ -424,7 +424,7 @@ suffices pB (X : {group {perm gT}}): X \subset B -> p^'.-group X -> X :=: 1.
     rewrite -partn_eq1 ?cardG_gt0 // -(card_Hall sylX).
     by rewrite (pB X) ?cards1 ?(pi_pgroup qX) ?(subset_trans sXA') ?joing_subl.
   rewrite cAbAb -(nilpotent_pcoreC p (abelian_nil cAbAb)) trivg_pcore_quotient.
-  rewrite dprod1g pcore_pgroup; split=> //_ a Aa p'a. 
+  rewrite dprod1g pcore_pgroup; split=> //_ a Aa p'a.
   rewrite order_dvdn -cycle_eq1 [<[_]>]pB ?(pgroupS (cycleX _ _) p'a) //.
   by rewrite genS // sub1set inE orbC (mem_imset (expgn^~ _)).
 move=> sXB p'X; have AutX := subset_trans sXB AutB.
@@ -478,7 +478,7 @@ apply: dvdn_trans (order_dvdG (actperm_Aut _ Dx)) _.
 by rewrite card_Aut_cyclic // oLb (@totient_pfactor p 1) ?muln1.
 Qed.
 
-End OneGroup. 
+End OneGroup.
 
 (* This is B & G, Theorem 5.6, parts (a) and (c). We do not prove parts (b),  *)
 (* (d) and (e), as they are not used in the proof of the Odd Order Theorem.   *)

@@ -998,7 +998,7 @@ apply/eqP; rewrite eqn_dvd dvdn_lcm !partn_dvd ?dvdn_lcml ?dvdn_lcmr //.
 rewrite -(dvdn_pmul2r (part_gt0 pi^' (lcmn m n))) partnC // dvdn_lcm !andbT.
 rewrite -{1}(partnC pi m_gt0) andbC -{1}(partnC pi n_gt0).
 by rewrite !dvdn_mul ?partn_dvd ?dvdn_lcml ?dvdn_lcmr.
-Qed. 
+Qed.
 
 Lemma partn_gcd pi m n : m > 0 -> n > 0 -> (gcdn m n)`_pi = gcdn m`_pi n`_pi.
 Proof.
@@ -1007,7 +1007,7 @@ apply/eqP; rewrite eqn_dvd dvdn_gcd !partn_dvd ?dvdn_gcdl ?dvdn_gcdr //=.
 rewrite -(dvdn_pmul2r (part_gt0 pi^' (gcdn m n))) partnC // dvdn_gcd.
 rewrite -{3}(partnC pi m_gt0) andbC -{3}(partnC pi n_gt0).
 by rewrite !dvdn_mul ?partn_dvd ?dvdn_gcdl ?dvdn_gcdr.
-Qed. 
+Qed.
 
 Lemma partn_biglcm (I : finType) (P : pred I) F pi :
     (forall i, P i -> F i > 0) ->
@@ -1313,7 +1313,7 @@ move=> n_gt0; wlog le_b_a: a b / b <= a.
   move=> IH; case: (leqP b a) => [|/ltnW] /IH {IH}// IH.
   by rewrite eq_sym; apply: (iffP IH) => eqab p; move/eqab.
 rewrite eqn_mod_dvd //; apply: (iffP (dvdn_partP _ n_gt0)) => eqab p /eqab;
-  by rewrite -eqn_mod_dvd // => /eqP.   
+  by rewrite -eqn_mod_dvd // => /eqP.
 Qed.
 
 (* The Euler totient function *)

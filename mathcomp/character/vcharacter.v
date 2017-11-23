@@ -248,7 +248,7 @@ by rewrite !cfunE rpredB // rpred_Cnat ?Cnat_char1.
 Qed.
 
 Lemma Cint_cfdot_vchar_irr i phi : phi \in 'Z[irr G] -> '[phi, 'chi_i] \in Cint.
-Proof.  
+Proof.
 case/vcharP=> chi1 Nchi1 [chi2 Nchi2 ->].
 by rewrite cfdotBl rpredB // rpred_Cnat ?Cnat_cfdot_char_irr.
 Qed.
@@ -310,7 +310,7 @@ have notSnu0: 0 \notin map nu S.
   apply: contra notS0 => /mapP[phi Sphi /esym/eqP].
   by rewrite -cfnorm_eq0 Inu ?Z_S // cfnorm_eq0 => /eqP <-.
 apply/pairwise_orthogonalP; split; first by rewrite /= notSnu0 map_inj_in_uniq.
-move=>_ _ /mapP[phi Sphi ->] /mapP[psi Spsi ->].
+move=> _ _ /mapP[phi Sphi ->] /mapP[psi Spsi ->].
 by rewrite (inj_in_eq inj_nu) // Inu ?Z_S //; apply: dotSS.
 Qed.
 
@@ -553,9 +553,9 @@ Lemma isometry_in_zchar nu : {in S &, isometry nu} -> {in 'Z[S] &, isometry nu}.
 Proof.
 move=> Inu _ _ /zchar_nth_expansion[u Zu ->] /zchar_nth_expansion[v Zv ->].
 rewrite !raddf_sum; apply: eq_bigr => j _ /=.
-rewrite !cfdot_suml; apply: eq_bigr => i _.  
+rewrite !cfdot_suml; apply: eq_bigr => i _.
 by rewrite !raddfZ_Cint //= !cfdotZl !cfdotZr Inu ?mem_nth.
-Qed. 
+Qed.
 
 End Isometries.
 
@@ -702,7 +702,7 @@ have [j def_chi_j]: {j | 'chi_j = phi}.
 exists j; rewrite ?cfkerEirr def_chi_j //; apply/subsetP => x /setDP[Gx notHx].
 rewrite inE cfunE def_phi // cfunE -/a cfun1E // Gx mulr1 cfIndE //.
 rewrite big1 ?mulr0 ?add0r // => y Gy; apply/theta0/(contra _ notHx) => Hxy.
-by rewrite -(conjgK y x) cover_imset -class_supportEr mem_imset2 ?groupV. 
+by rewrite -(conjgK y x) cover_imset -class_supportEr mem_imset2 ?groupV.
 Qed.
 
 End MoreVchar.
@@ -732,7 +732,7 @@ Proof. by rewrite !inE mem_irr. Qed.
 Lemma dirrP f :
   reflect (exists b : bool, exists i, f = (-1) ^+ b *: 'chi_i) (f \in dirr G).
 Proof.
-apply: (iffP idP) => [| [b [i ->]]]; last by rewrite dirr_sign irr_dirr. 
+apply: (iffP idP) => [| [b [i ->]]]; last by rewrite dirr_sign irr_dirr.
 case/orP=> /irrP[i Hf]; first by exists false, i; rewrite scale1r.
 by exists true, i; rewrite scaleN1r -Hf opprK.
 Qed.

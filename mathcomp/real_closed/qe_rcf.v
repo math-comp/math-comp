@@ -160,7 +160,7 @@ Fixpoint eval (e : seq R) (t : term R) {struct t} : R :=
   end.
 
 Lemma evalE (e : seq R) (t : term R) : eval e t = GRing.eval e t.
-Proof. by elim: t=> /=; do ?[move->|move=>?]. Qed.
+Proof. by elim: t=> /=; do ?[move->|move=> ?]. Qed.
 
 Definition qf_eval e := fix loop (f : formula R) : bool :=
   match f with
@@ -175,7 +175,7 @@ Definition qf_eval e := fix loop (f : formula R) : bool :=
   end%qfT.
 
 Lemma qf_evalE (e : seq R) (f : formula R) : qf_eval e f = ord.qf_eval e f.
-Proof. by elim: f=> /=; do ?[rewrite evalE|move->|move=>?]. Qed.
+Proof. by elim: f=> /=; do ?[rewrite evalE|move->|move=> ?]. Qed.
 
 Lemma to_rtermE (t : GRing.term R) :
   GRing.rterm t -> to_rterm t = t :> GRing.term _.
@@ -206,10 +206,10 @@ Lemma qf_formF (f : fF) : qf_form f.
 Proof. by elim: f=> // *; apply/andP; split. Qed.
 
 Lemma rtermF (t : tF) : GRing.rterm t.
-Proof. by elim: t=> //=; do ?[move->|move=>?]. Qed.
+Proof. by elim: t=> //=; do ?[move->|move=> ?]. Qed.
 
 Lemma rformulaF (f : fF) : rformula f.
-Proof. by elim: f=> /=; do ?[rewrite rtermF|move->|move=>?]. Qed.
+Proof. by elim: f=> /=; do ?[rewrite rtermF|move->|move=> ?]. Qed.
 
 Section If.
 
@@ -846,7 +846,7 @@ symmetry; rewrite /ctmat1.
 apply/matrixP => i j; rewrite !(big_ord_recl, big_ord0, mxE) /=.
 have halfP (K : numFieldType) : 2%:R^-1 + 2%:R^-1 = 1 :> K.
   by rewrite -mulr2n -[_ *+ 2]mulr_natl mulfV // pnatr_eq0.
-move: i; do ?[case => //=]; move: j; do ?[case => //=] => _ _;
+move: i; do ?[case=> //=]; move: j; do ?[case=> //=] => _ _;
 rewrite !(mulr1, mul1r, mulrN1, mulN1r, mulr0, mul0r, opprK);
 by rewrite !(addr0, add0r, oppr0, subrr, addrA, halfP).
 Qed.

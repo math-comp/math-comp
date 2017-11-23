@@ -267,7 +267,7 @@ Proof. by rewrite (trivg_kappa maxM); case: complU. Qed.
 Remark trivgPmax : (M \in 'M_'P) = (K :!=: 1).
 Proof. by rewrite inE trivgFmax maxM andbT. Qed.
 
-Remark FmaxP : reflect (K :==: 1 /\ U :!=: 1) (M \in 'M_'F). 
+Remark FmaxP : reflect (K :==: 1 /\ U :!=: 1) (M \in 'M_'F).
 Proof.
 rewrite (trivg_kappa_compl maxM complU) 2!inE.
 have [_ hallK _] := complU; rewrite (trivg_kappa maxM hallK).
@@ -415,7 +415,7 @@ by rewrite injm_abelian /= ?im_quotient // injm_quotm ?injm_conj.
 Qed.
 
 Lemma FTcoreJ M x : (M :^ x)`_\s = M`_\s :^ x.
-Proof. by rewrite /FTcore FTtypeJ FcoreJ derJ; case: ifP. Qed. 
+Proof. by rewrite /FTcore FTtypeJ FcoreJ derJ; case: ifP. Qed.
 
 Lemma FTsupp1J M x : 'A1(M :^ x) = 'A1(M) :^ x.
 Proof. by rewrite conjD1g -FTcoreJ. Qed.
@@ -1073,7 +1073,7 @@ have [K1 | ntK] := eqsVneq K 1.
   have FmaxM: M \in 'M_'F by rewrite -(trivg_kappa maxM hallK) K1.
   have ->: FTtype M = 1%N by apply/eqP; rewrite -FTtype_Fmax.
   have ntU: U :!=: 1 by case/(FmaxP maxM complU): FmaxM.
-  have defH: H = Ms. 
+  have defH: H = Ms.
     by apply/Fcore_eq_Msigma; rewrite // notP1type_Msigma_nil ?FmaxM.
   have defM: H ><| U = M.
     by have [_] := kappa_compl_context maxM complU; rewrite defH K1 sdprodg1.
@@ -1106,7 +1106,7 @@ have [K1 | ntK] := eqsVneq K 1.
   by exists p; rewrite // -p_rank_gt0 -(rank_Sylow sylP) rank_gt0.
 have PmaxM: M \in 'M_'P by rewrite inE -(trivg_kappa maxM hallK) ntK.
 have [Mstar _ [_ _ _ [cycW _ _ _ _]]] := Ptype_embedding PmaxM hallK.
-case=> [[tiV _ _] _ _ defM {Mstar}].  
+case=> [[tiV _ _] _ _ defM {Mstar}].
 have [_ [_ cycK] [_ nUK _ _ _] _] := BGsummaryA maxM complU; rewrite -/H.
 case=> [[ntKs defCMK] [_ _ _ _ nilM'H] [sM''F defF /(_ ntK)sFM'] types34].
 have hallK_M := pHall_Hall hallK.
@@ -1280,7 +1280,7 @@ have tiA0A x a: x \in 'A0(M) :\: 'A(M) -> x ^ a \notin 'A(M).
   rewrite 3!inE; case: (x \in _) => //= /and3P[_ notM'x _].
   apply: contra notM'x => /bigcupP[y _ /setD1P[_ /setIP[Mx _]]].
   by rewrite -(p_eltJ _ _ a) (mem_p_elt (pgroup_pi _)).
-have tiA0 x a: x \in 'A0(M) :\: 'A1(M) -> x ^ a \in 'A0(M) -> a \in M. 
+have tiA0 x a: x \in 'A0(M) :\: 'A1(M) -> x ^ a \in 'A0(M) -> a \in M.
   case/setDP=> A0x notA1x A0xa.
   have [Mx Mxa] := (subsetP sA0M x A0x, subsetP sA0M _ A0xa).
   have [[U K] /= complU] := kappa_witness maxM.
@@ -1329,7 +1329,7 @@ have [FmaxM t2'M]: M \in 'M_'F /\ \tau2(M)^'.-group M.
   apply: (non_disjoint_signalizer_Frobenius ell1x MSx_gt1 SMxM).
   by apply: contra not_sNx'CMy; apply: pgroupS (subsetIl _ _).
 have defA0: 'A0(M) = Ms^#.
-  rewrite FTsupp0_type1; last by rewrite -FTtype_Fmax. 
+  rewrite FTsupp0_type1; last by rewrite -FTtype_Fmax.
   rewrite /'A(M) /'A1(M) -FTtype_Fmax // FmaxM def_FTcore //= -/Ms.
   apply/setP => z; apply/bigcupP/idP=> [[t Ms1t] | Ms1z]; last first.
     have [ntz Ms_z] := setD1P Ms1z.

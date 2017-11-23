@@ -130,7 +130,7 @@ have trS: [transitive G, on S | 'JG].
   apply/imsetP; exists P => //; apply/eqP.
   rewrite eqEsubset andbC acts_sub_orbit // S_P; apply/subsetP=> Q S_Q.
   have:= S_P; rewrite inE => /maxgroupP[/andP[_ pP]].
-  have [-> max1 | ntP _] := eqVneq P 1%G. 
+  have [-> max1 | ntP _] := eqVneq P 1%G.
     move/andP/max1: (S_pG _ S_Q) => Q1.
     by rewrite (group_inj (Q1 (sub1G Q))) orbit_refl.
   have:= oG_mod _ _ S_P S_P; rewrite (oG_mod _ Q) // orbit_refl.
@@ -346,7 +346,7 @@ have nsHG: H :&: G <| G by rewrite /normal subsetIr normsI ?normG.
 rewrite -!(setIC H) defG -(partnC pi (cardG_gt0 _)).
 rewrite -(card_Hall (Hall_setI_normal nsHG hallR)) /= setICA.
 rewrite -(card_Hall (Hall_setI_normal nsHG hallK)) /= setICA.
-by rewrite -defG (setIidPl (mulG_subl _ _)) (setIidPl (mulG_subr _ _)).  
+by rewrite -defG (setIidPl (mulG_subl _ _)) (setIidPl (mulG_subr _ _)).
 Qed.
 
 End SomeHall.
@@ -550,7 +550,7 @@ Lemma normal_pgroup r P N :
 Proof.
 elim: r gT P N => [|r IHr] gTr P N pP nNP le_r.
   by exists (1%G : {group gTr}); rewrite sub1G normal1 cards1.
-have [NZ_1 | ntNZ] := eqVneq (N :&: 'Z(P)) 1. 
+have [NZ_1 | ntNZ] := eqVneq (N :&: 'Z(P)) 1.
   by rewrite (TI_center_nil (pgroup_nil pP)) // cards1 logn1 in le_r.
 have: p.-group (N :&: 'Z(P)) by apply: pgroupS pP; rewrite /= setICA subsetIl.
 case/pgroup_pdiv=> // p_pr /Cauchy[// | z].
@@ -622,7 +622,7 @@ have{n leGn IHn nDG} pN: p.-group <<'N_E(D)>>.
     by rewrite subsetI nDG andbF.
   - by rewrite inE Nx1 (subsetP sEG) ?mem_gen.
   have Ex1y: x1 ^ y \in E.
-    by rewrite  -mem_conjgV (normsP nEG) // groupV; case/setIP: Ny.
+    by rewrite -mem_conjgV (normsP nEG) // groupV; case/setIP: Ny.
   apply: pgroupS (genS _) (pE _ _ Ex1 Ex1y).
   by apply/subsetP=> u; rewrite !inE.
 have [y1 Ny1 Py1]: exists2 y1, y1 \in 'N_E(D) & y1 \notin P.

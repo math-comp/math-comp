@@ -712,7 +712,7 @@ Definition regular_mx x : 'M[R]_nG :=
 Lemma regular_mx_repr : mx_repr G regular_mx.
 Proof.
 split=> [|x y Gx Gy]; apply/row_matrixP=> i; rewrite !rowK.
-  by rewrite mulg1 row1 gring_valK. 
+  by rewrite mulg1 row1 gring_valK.
 by rewrite row_mul rowK -rowE rowK mulgA gring_indexK // groupM ?enum_valP.
 Qed.
 Canonical regular_repr := MxRepresentation regular_mx_repr.
@@ -1453,7 +1453,7 @@ Lemma cyclic_mx_sub m u (W : 'M_(m, n)) :
 Proof.
 move=> modU Wu; rewrite genmxE; apply/row_subP=> i.
 by rewrite row_mul mul_rV_lin1 /= mxmodule_envelop // vec_mxK row_sub.
-Qed. 
+Qed.
 
 Lemma hom_cyclic_mx u f :
   (u <= dom_hom_mx f)%MS -> (cyclic_mx u *m f :=: cyclic_mx (u *m f))%MS.
@@ -1585,7 +1585,7 @@ Proof.
 move=> isoUV [modU nzU simU]; have [f injf homUf defV] := isoUV.
 split=> [||W modW sWV nzW]; first by rewrite (mx_iso_module isoUV).
   by rewrite -(eqmx_eq0 defV) -(mul0mx n f) (can_eq (mulmxK injf)).
-rewrite -defV -[W](mulmxKV injf) submxMr //; set W' := W *m _. 
+rewrite -defV -[W](mulmxKV injf) submxMr //; set W' := W *m _.
 have sW'U: (W' <= U)%MS by rewrite -[U](mulmxK injf) submxMr ?defV.
 rewrite (simU W') //; last by rewrite -(can_eq (mulmxK injf)) mul0mx mulmxKV.
 rewrite hom_mxmodule ?dom_hom_invmx // -[W](mulmxKV injf) submxMr //.
@@ -1640,7 +1640,7 @@ Proof.
 move=> simU simV homUf sUfV nzUf; have [modU _ _] := simU.
 have [g invg homUg defUg] := mx_Schur_inj_iso simU homUf nzUf.
 exists g => //; apply: mx_Schur_onto; rewrite ?defUg //.
-by rewrite -!submx0 defUg in nzUf *. 
+by rewrite -!submx0 defUg in nzUf *.
 Qed.
 
 (* A boolean test for module isomorphism that is only valid for simple        *)
@@ -1998,7 +1998,7 @@ Proof.
 have [I [W isoUW ->]] := component_mx_def => simV homWf sVWf.
 have [i _ _|i _ ] := hom_mxsemisimple_iso simV _ homWf sVWf.
   exact: mx_iso_simple (simU).
-exact: mx_iso_trans. 
+exact: mx_iso_trans.
 Qed.
 
 Lemma component_mx_iso V : mxsimple V -> (V <= compU)%MS -> mx_iso U V.
@@ -2189,7 +2189,7 @@ have modMS: mxmodule (M :&: S)%MS by rewrite capmx_module ?subSocle_module.
 have [J /= U simU defMS _] := mxsemisimpleS modMS (capmxSr M S) ssimS.
 rewrite -defMS; apply/sumsmx_subP=> j _.
 have [sUjV sUjS]: (U j <= M /\ U j <= S)%MS.
-  by apply/andP; rewrite -sub_capmx -defMS (sumsmx_sup j). 
+  by apply/andP; rewrite -sub_capmx -defMS (sumsmx_sup j).
 have [W P_W isoWU] := subSocle_iso (simU j) sUjS.
 rewrite (sumsmx_sup W) // sub_capmx sUjV mx_iso_component //.
 exact: socle_simple.
@@ -2360,7 +2360,7 @@ suffices defM: (M == 1%:M)%MS by rewrite (eqmxP defM) mxrank1 in rM.
 case: (mx_abs_irrW absG) => _ _ ->; rewrite ?submx1 -?mxrank_eq0 ?rM //.
 apply/mxmoduleP=> x Gx; suffices: is_scalar_mx (rG x).
   by case/is_scalar_mxP=> a ->; rewrite mul_mx_scalar scalemx_sub.
-apply: (mx_abs_irr_cent_scalar absG). 
+apply: (mx_abs_irr_cent_scalar absG).
 by apply/centgmxP=> y Gy; rewrite -!repr_mxM // (centsP cGG).
 Qed.
 
@@ -3442,7 +3442,7 @@ rewrite inE -val_eqE /= PackSocleK eq_sym.
 by apply/component_mx_isoP; rewrite ?subgK //; apply: Clifford_iso.
 Qed.
 
-Lemma Clifford_astab1 (W : sH) : 'C[W | 'Cl] = rstabs rG W. 
+Lemma Clifford_astab1 (W : sH) : 'C[W | 'Cl] = rstabs rG W.
 Proof.
 apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
 rewrite sub1set inE (sameP eqP socleP) !val_Clifford_act //.
@@ -3638,7 +3638,7 @@ have UvalI: (valI <= U)%MS.
 exists (valI *m in_factmod _ 1%:M *m in_submod _ 1%:M) => [||x Gx].
 - apply: (@addIn (\rank (U :&: V) + \rank V)%N); rewrite genmxE addnA addnCA.
   rewrite /nI genmxE !{1}mxrank_in_factmod 2?(addsmx_idPr _) //.
-  by rewrite -mxrank_sum_cap addnC. 
+  by rewrite -mxrank_sum_cap addnC.
 - rewrite -kermx_eq0; apply/rowV0P=> u; rewrite (sameP sub_kermxP eqP).
   rewrite mulmxA -in_submodE mulmxA -in_factmodE -(inj_eq val_submod_inj).
   rewrite linear0 in_submodK ?in_factmod_eq0 => [Vvu|]; last first.
@@ -4329,7 +4329,7 @@ rewrite -ker_irr_comp_op sub_capmx (sameP sub_kermxP eqP) mul_vec_lin.
 by rewrite 2!linearB /= eqAB subrr linear0 addmx_sub ?eqmx_opp /=.
 Qed.
 
-Lemma rank_irr_comp : \rank 'R_iG = \rank E_G. 
+Lemma rank_irr_comp : \rank 'R_iG = \rank E_G.
 Proof.
 symmetry; rewrite -{1}irr_comp_envelop; apply/mxrank_injP.
 by rewrite ker_irr_comp_op.
@@ -4544,7 +4544,7 @@ have [_ nG'G] := andP (der_normal 1 G); apply/eqP; rewrite -card_quotient //.
 have cGqGq: abelian (G / G^`(1))%g by apply: sub_der1_abelian.
 have F'Gq: [char F]^'.-group (G / G^`(1))%g by apply: morphim_pgroup.
 have splitGq: group_splitting_field (G / G^`(1))%G.
-  exact: quotient_splitting_field. 
+  exact: quotient_splitting_field.
 rewrite -(sum_irr_degree sGq) // -sum1_card.
 pose rG (j : sGq) := morphim_repr (socle_repr j) nG'G.
 have irrG j: mx_irreducible (rG j) by apply/morphim_mx_irr; apply: socle_irr.
@@ -4785,7 +4785,7 @@ suffices defU: (\sum_i oapp W_ V i :=: U)%MS.
 apply: eqmx_trans defVW; rewrite (bigD1 None) //=; apply/eqmxP.
 have [i0 _ | I0] := pickP I.
   by rewrite (reindex some) ?addsmxS ?defW //; exists (odflt i0) => //; case.
-rewrite big_pred0 //; last by case => // /I0.
+rewrite big_pred0 //; last by case=> // /I0.
 by rewrite !addsmxS ?sub0mx // -defW big_pred0.
 Qed.
 
@@ -4841,7 +4841,7 @@ have sVS: (V <= \sum_(W : sG | has (fun Mi => Mi <= W) Ms) W)%MS.
   rewrite [V](big_nth 0) big_mkord; apply/sumsmx_subP=> i _.
   set Mi := Ms`_i; have MsMi: Mi \in Ms by apply: mem_nth.
   have simMi := simMs _ MsMi; have S_Mi := component_socle sG simMi.
-  rewrite (sumsmx_sup (PackSocle S_Mi)) ?PackSocleK //. 
+  rewrite (sumsmx_sup (PackSocle S_Mi)) ?PackSocleK //.
   by apply/hasP; exists Mi; rewrite ?component_mx_id.
 have [W MsW isoWM] := subSocle_iso simM (submx_trans sMV sVS).
 have [Mi MsMi sMiW] := hasP MsW; apply/hasP; exists Mi => //.
@@ -4908,7 +4908,7 @@ Lemma map_mx_faithful : mx_faithful rGf = mx_faithful rG.
 Proof. by rewrite /mx_faithful rker_map. Qed.
 
 Lemma map_mx_abs_irr :
-  mx_absolutely_irreducible rGf = mx_absolutely_irreducible rG. 
+  mx_absolutely_irreducible rGf = mx_absolutely_irreducible rG.
 Proof.
 by rewrite /mx_absolutely_irreducible -map_enveloping_algebra_mx row_full_map.
 Qed.
@@ -5284,7 +5284,7 @@ rewrite {1}mulSn -Bfree -{1}rBj {rBj} -mxrank_disjoint_sum.
   rewrite mxrankS // addsmx_sub -[m.+1]/(1 + m)%N; apply/andP; split.
     apply/row_subP=> k; rewrite row_mul mul_rV_lin1 /=.
     apply: eq_row_sub (mxvec_index (lshift _ 0) k)  _.
-    by rewrite !rowK mxvecK mxvecE mxE row_mxEl mxE -row_mul mul1mx. 
+    by rewrite !rowK mxvecK mxvecE mxE row_mxEl mxE -row_mul mul1mx.
   apply/row_subP; case/mxvec_indexP=> i k.
   apply: eq_row_sub (mxvec_index (rshift 1 i) k) _.
   by rewrite !rowK !mxvecE 2!mxE row_mxEr.

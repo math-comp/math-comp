@@ -59,15 +59,15 @@ Proof. by []. Qed.
 Lemma lin_fib_alt : forall n a b,
   lin_fib a b n.+2 = lin_fib a b n.+1 + lin_fib a b n.
 Proof.
-case=>//; elim => [//|n IHn] a b.
+case=> //; elim=> [//|n IHn] a b.
 by rewrite lin_fibSS (IHn b (b + a)) lin_fibE.
 Qed.
 
 Lemma fib_is_linear : fib =1 lin_fib 0 1.
 Proof.
-move=>n; elim: n {-2}n (leqnn n)=> [n|n IHn].
+move=> n; elim: n {-2}n (leqnn n)=> [n|n IHn].
   by rewrite leqn0; move/eqP=>->.
-case=>//; case=>// n0; rewrite ltnS=> ltn0n; rewrite fibSS lin_fib_alt.
+case=> //; case=> // n0; rewrite ltnS=> ltn0n; rewrite fibSS lin_fib_alt.
 by rewrite (IHn _ ltn0n) (IHn _ (ltnW ltn0n)).
 Qed.
 
@@ -132,7 +132,7 @@ case: m=> [|[|m]] Hm.
 - by rewrite eq_sym fib_eq1 orbF [1==_]eq_sym; case: eqP.
 have: 1 < m.+2 < n by [].
 move/fib_smonotone; rewrite ltn_neqAle; case/andP; move/negPf=> -> _.
-case: n Hm=> [|[|n]] //;rewrite ltn_neqAle; case/andP; move/negPf=> ->.
+case: n Hm=> [|[|n]] //; rewrite ltn_neqAle; case/andP; move/negPf=> ->.
 by rewrite andbF.
 Qed.
 
@@ -154,7 +154,7 @@ case/orP: (Hf _ (dvdn_fib _ _ (dvdn_mulr d (dvdnn k)))).
   rewrite fib_eq; case/or3P; first by move/eqP<-; rewrite eqxx orbT.
     by case/andP=>->.
   by rewrite Hk; case: (d)=> [|[|[|]]].
-rewrite fib_eq; case/or3P; last by case/andP;move/eqP->; case: (d)=> [|[|]].
+rewrite fib_eq; case/or3P; last by case/andP; move/eqP->; case: (d)=> [|[|]].
   rewrite -{1}[k]muln1; rewrite eqn_mul2l; case/orP; move/eqP=> HH.
     by move: Pp; rewrite Hp HH.
   by rewrite -HH eqxx.
@@ -216,9 +216,9 @@ Proof. by []. Qed.
 
 Lemma lucas_is_linear : lucas =1 lin_fib 2 1.
 Proof.
-move=>n; elim: n {-2}n (leqnn n)=> [n|n IHn].
+move=> n; elim: n {-2}n (leqnn n)=> [n|n IHn].
   by rewrite leqn0; move/eqP=>->.
-case=>//; case=>// n0; rewrite ltnS=> ltn0n; rewrite lucasSS lin_fib_alt.
+case=> //; case=> // n0; rewrite ltnS=> ltn0n; rewrite lucasSS lin_fib_alt.
 by rewrite (IHn _ ltn0n) (IHn _ (ltnW ltn0n)).
 Qed.
 
@@ -329,7 +329,7 @@ Local Notation "''M{' l } " := (seq2matrix _ _ l).
 
 Lemma matrix_fib : forall n,
   'M{[:: [::(fib n.+2)%:R; (fib n.+1)%:R];
-         [::(fib n.+1)%:R;    (fib n)%:R]]} =  
+         [::(fib n.+1)%:R; (fib n)%:R]]} =  
  ('M{[:: [:: 1; 1];
          [:: 1; 0]]})^+n.+1 :> 'M[R]_(2,2).
 Proof.

@@ -186,7 +186,7 @@ rewrite !tensmxE castmxE /= cast_ord_id esymK !mxE /=.
 case: splitP=> i0' /= hi0'; case: splitP=> k /= hk.
 + case: (mxtens_indexP k) hk=> k0 k1 /=; rewrite tensmxE.
   move=> /(f_equal (edivn^~ p)); rewrite !edivn_eq // => [] [h0 h1].
-  by congr (r _ _ * N _ _); apply:val_inj; rewrite /= -?h0 ?h1.
+  by congr (r _ _ * N _ _); apply: val_inj; rewrite /= -?h0 ?h1.
 + move: hk (ltn_ord i1); rewrite hi0'.
   by rewrite [i0']ord1 mul0n mul1n add0n ltnNge=> ->; rewrite leq_addr.
 + move: (ltn_ord k); rewrite -hk hi0' ltnNge {1}mul1n.
@@ -194,7 +194,7 @@ case: splitP=> i0' /= hi0'; case: splitP=> k /= hk.
 case: (mxtens_indexP k) hk=> k0 k1 /=; rewrite tensmxE.
 rewrite hi0' mulnDl -addnA=> /addnI.
  move=> /(f_equal (edivn^~ p)); rewrite !edivn_eq // => [] [h0 h1].
-by congr (M _ _ * N _ _); apply:val_inj; rewrite /= -?h0 ?h1.
+by congr (M _ _ * N _ _); apply: val_inj; rewrite /= -?h0 ?h1.
 Qed.
 
 Lemma tens_row_mx {m n p q} (r : 'cV[R]_m) (M :'M[R]_(m,n)) (N : 'M[R]_(p,q)) :

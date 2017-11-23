@@ -55,11 +55,11 @@ Definition mulrg v1 v2 :=
  GAlg ([ffun g => \sum_(k : gT) (v1 k) * (v2 ((k^-1) * g)%g)]).
 
 Lemma addrgA : associative addrg.
-Proof. 
+Proof.
 by move=> *; apply: val_inj; apply/ffunP=> ?; rewrite !ffunE addrA.
 Qed.
 Lemma addrgC : commutative addrg.
-Proof. 
+Proof.
 by move=> *; apply: val_inj; apply/ffunP=> ?; rewrite !ffunE addrC.
 Qed.
 Lemma addr0g : left_id g0 addrg.

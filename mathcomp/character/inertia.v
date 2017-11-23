@@ -277,7 +277,7 @@ Qed.
 
 Lemma inertia_scale a phi : 'I[phi] \subset 'I[a *: phi].
 Proof.
-apply/subsetP=> x /setIdP[nHx /eqP Iphi_x]. 
+apply/subsetP=> x /setIdP[nHx /eqP Iphi_x].
 by rewrite inE nHx linearZ /= Iphi_x.
 Qed.
 
@@ -497,7 +497,7 @@ Lemma cfResInd j:
 Proof.
 case/andP=> [sHG /subsetP nHG].
 rewrite (reindex_inj invg_inj); apply/cfun_inP=> x Hx.
-rewrite  cfResE // cfIndE // ?cfunE ?sum_cfunE; congr (_ * _).
+rewrite cfResE // cfIndE // ?cfunE ?sum_cfunE; congr (_ * _).
 by apply: eq_big => [y | y Gy]; rewrite ?cfConjgE ?groupV ?invgK ?nHG.
 Qed.
 
@@ -933,7 +933,7 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
 - rewrite !constt_Ind_Res => sHt; have [r sGr] := constt_cfInd_irr s sTG.
   have rTs: s \in irr_constt ('Res[T] 'chi_r) by rewrite -constt_Ind_Res.
   have NrT: 'Res[T] 'chi_r \is a character by rewrite cfRes_char ?irr_char.
-  have rHt: t \in irr_constt ('Res[H] 'chi_r). 
+  have rHt: t \in irr_constt ('Res[H] 'chi_r).
     by have:= constt_Res_trans NrT rTs sHt; rewrite cfResRes.
   pose e := '['Res[H] 'chi_r, theta]; set f := '['Res[H] psi, theta].
   have DrH: 'Res[H] 'chi_r = e *: \sum_(xi <- (theta ^: G)%CF) xi.
@@ -956,7 +956,7 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
     rewrite (mono_lerif (ler_pmul2r (irr1_gt0 t))); apply: lerif_eq.
     by rewrite /e -(cfResRes _ sHT) ?cfdot_Res_ge_constt.
   have [_ /esym] := lerif_trans ub_chi_r lb_chi_r; rewrite eqxx.
-  by case/andP=> /eqP Dchi /eqP->;rewrite cfIirrE -/chi -?Dchi ?mem_irr.
+  by case/andP=> /eqP Dchi /eqP->; rewrite cfIirrE -/chi -?Dchi ?mem_irr.
 have part_c: {in calA, forall s (chi := 'Ind[G] 'chi_s),
   [predI irr_constt ('Res[T] chi) & calA] =i pred1 s}.
 - move=> s As chi s1; have [irr_chi _ /eqP Dchi_theta] := AtoB_P s As.
@@ -987,14 +987,14 @@ exists s => //; have [/irrP[r1 DsG] _ _] := AtoB_P s As.
 by apply/eqP; rewrite /AtoB -constt_Ind_Res DsG irrK constt_irr in rTs *.
 Qed.
 
-End ConsttInertiaBijection. 
+End ConsttInertiaBijection.
 
 Section ExtendInvariantIrr.
 
 Variable gT : finGroupType.
 Implicit Types G H K L M N : {group gT}.
 
-Section ConsttIndExtendible. 
+Section ConsttIndExtendible.
 
 Variables (G N : {group gT}) (t : Iirr N) (c : Iirr G).
 Let theta := 'chi_t.
@@ -1174,7 +1174,7 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)); last first.
     by rewrite -(cfRes1 L) DthL cfunE => ->; rewrite !mul0r.
   rewrite -leq_sqr -leC_nat natrX -(ler_pmul2r (irr1_gt0 p0)) -mulrA mul1r.
-  have ->: e%:R * 'chi_p0 1%g = 'Res[L] theta 1%g by rewrite DthL cfunE. 
+  have ->: e%:R * 'chi_p0 1%g = 'Res[L] theta 1%g by rewrite DthL cfunE.
   rewrite cfRes1 -(ler_pmul2l (gt0CiG K L)) -cfInd1 // -/phi.
   rewrite -card_quotient // -card_Iirr_abelian // mulr_natl.
   rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID (mem (codom mmLth))) /=.
@@ -1497,7 +1497,7 @@ have kerN_mu_t: N \subset cfker (mu / 'chi_t)%R.
   rewrite -subsetIidl -cfker_Res ?lin_charW ?rpred_div ?rmorph_div //.
   by rewrite /= uNlam tNlam divrr ?lin_char_unitr ?cfker_cfun1.
 have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
-  suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF. 
+  suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
     by rewrite (coprime_dvdr dv_o_mu_t) // coprime_mulr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
   rewrite invr_lin_char // !cfunE exprMn -rmorphX {2}mulnC.
@@ -1607,7 +1607,7 @@ apply: (iffP idP) => [not_chijK1 | [i nzi ->]]; last first.
 have /neq0_has_constt[i chijKi]: 'Res[K] 'chi_j != 0 by apply: Res_irr_neq0.
 have nz_i: i != 0.
   by apply: contraNneq not_chijK1 => i0; rewrite constt0_Res_cfker // -i0.
-have /irrP[k def_chik] := irr_induced_Frobenius_ker nz_i. 
+have /irrP[k def_chik] := irr_induced_Frobenius_ker nz_i.
 have: '['chi_j, 'chi_k] != 0 by rewrite -def_chik -cfdot_Res_l.
 by rewrite cfdot_irr pnatr_eq0; case: (j =P k) => // ->; exists i.
 Qed.

@@ -272,7 +272,7 @@ Qed.
 Lemma der1_joing_cycles (x y : gT) : 
   let XY := <[x]> <*> <[y]> in let xy := [~ x, y] in
   xy \in 'C(XY) -> XY^`(1) = <[xy]>.
-Proof. 
+Proof.
 rewrite joing_idl joing_idr /= -sub_cent1 => /norms_gen nRxy.
 apply/eqP; rewrite eqEsubset cycle_subG mem_commg ?mem_gen ?set21 ?set22 //.
 rewrite der1_min // quotient_gen -1?gen_subG // quotientU abelian_gen.

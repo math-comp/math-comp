@@ -151,7 +151,7 @@ by rewrite Frobenius_coprime_quotient ?gFnormal //; split=> // _ /prHUW1->.
 Qed.
 
 Let defHC : H \x C = HC.
-Proof. 
+Proof.
 by have [defHC _ _ _] := typeP_context MtypeP; rewrite /= (dprodWY defHC).
 Qed.
 
@@ -233,7 +233,7 @@ Lemma bounded_proper_coherent H1 :
 Proof.
 move=> nsH1_M psH1_M' cohH1; have [nsHHU _ _ _ _] := sdprod_context defHU.
 suffices: #|HU : H1|%:R - 1 <= 2%:R * #|M : HC|%:R * sqrtC #|HC : HC|%:R :> algC.
-  rewrite  indexgg sqrtC1 mulr1 -leC_nat natrD -ler_subl_addr -mulnA natrM.
+  rewrite indexgg sqrtC1 mulr1 -leC_nat natrD -ler_subl_addr -mulnA natrM.
   congr (_ <= _ * _%:R); apply/eqP; rewrite -(eqn_pmul2l (cardG_gt0 HC)).
   rewrite Lagrange ?normal_sub // mulnCA -(dprod_card defHC) -mulnA mulnC.
   by rewrite Lagrange ?subsetIl // (sdprod_card defHU) (sdprod_card defM).
@@ -281,7 +281,7 @@ Local Notation defM'' := FTtype34_der2.
 
 (* This is Peterfalvi (11.6). *)
 Lemma FTtype34_facts (H' := H^`(1)%g):
-  [/\ p.-group H, U \subset 'C(H0), H0 :=: H' & C :=: U']. 
+  [/\ p.-group H, U \subset 'C(H0), H0 :=: H' & C :=: U'].
 Proof.
 have nilH: nilpotent H := Fcore_nil M.
 have /sdprod_context[/andP[_ nHM] sUW1M _ _ _] := Ptype_Fcore_sdprod MtypeP.
@@ -323,7 +323,7 @@ have{coH_UW1} defH0: H0 :=: H'.
     by have [_ _ _ <-] := dprodP defHUhat; rewrite setIC setIS ?der_sub.
   have coHUhat: coprime #|Hhat| #|Uhat|.
     by rewrite coprime_morph ?(coprimegS _ coH_UW1) ?joing_subl.
-  have defHhat: 'C_Hhat(Uhat) \x [~: Hhat, Uhat] = Hhat. 
+  have defHhat: 'C_Hhat(Uhat) \x [~: Hhat, Uhat] = Hhat.
     by rewrite dprodC coprime_abelian_cent_dprod ?der_abelian ?quotient_norms.
   rewrite /HUhat -(sdprodWY defHU) quotientY //= -(dprodWY defHhat).
   have [_ _ cCRhat tiCRhat] := dprodP defHhat.
@@ -342,7 +342,7 @@ have /subsetIP[sRH cUR]: R \subset 'C_H(U).
   rewrite (card_Hall (setI_normal_Hall _ hallR _)) ?subsetIl ?gFnormal //.
   rewrite partnM ?expn_gt0 ?cardG_gt0 //= part_p'nat ?mul1n ?pnatNK //.
   by rewrite pnat_exp ?pnat_id.
-suffices: ~~ (R^`(1)%g \proper R) by apply: contraNeq (sol_der1_proper solH _). 
+suffices: ~~ (R^`(1)%g \proper R) by apply: contraNeq (sol_der1_proper solH _).
 have /setIidPr {2}<-: R \subset HU^`(1)%g.
   by rewrite [HU^`(1)%g]defM'' -(dprodWY defHC) sub_gen ?subsetU ?sRH.
 suffices defRHpU: R \x ('O_p(H) <*> U) = HU.
@@ -521,7 +521,7 @@ have{oDx12} phi_w12 ubar: ubar \in Ubar -> (phi_ w1 ubar * phi_ w2 ubar = 1)%g.
     apply; apply/rcoset_kercosetP; rewrite ?groupX ?nH0H //.
     by rewrite morphX ?morphJ ?(nH0W1 w) // ?nH0H //= -Dubar -Dxbar xbarJ.
   rewrite -eq_expg_mod_order -{1}Dsym expgM expgVn ?(DXn, Dsym) ?Hx_ //.
-  rewrite /D -!morphR ?nQH ?Hx_ // -conjRg (conjg_fixP _) //. 
+  rewrite /D -!morphR ?nQH ?Hx_ // -conjRg (conjg_fixP _) //.
   by apply/commgP/esym/(centsP cH0U); rewrite ?memH0 ?Hx_.
 pose wbar := bar (w1 * w2 ^-1)%g; pose W1bar := (W1 / H0)%g.
 have W1wbar: wbar \in W1bar by rewrite mem_quotient ?groupM ?groupV.
@@ -646,7 +646,7 @@ Qed.
 Let Zbridge0 : {in S1, forall zeta, bridge0 zeta \in 'Z[irr M, HU^#]}.
 Proof.
 have mu0_1: mu_ 0 1%g = q%:R by rewrite prTIred_1 prTIirr0_1 mulr1.
-move=> zeta S1zeta; rewrite /= zcharD1 !cfunE subr_eq0 mu0_1 S1_1 // eqxx. 
+move=> zeta S1zeta; rewrite /= zcharD1 !cfunE subr_eq0 mu0_1 S1_1 // eqxx.
 by rewrite rpredB ?(seqInd_vchar _ (Tmu 0)) ?(seqInd_vchar _ S1zeta).
 Qed.
 
@@ -654,7 +654,7 @@ Let A0bridge0 : {in S1, forall zeta, bridge0 zeta \in 'CF(M, 'A0(M))}.
 Proof. by move=> zeta /Zbridge0/zchar_on/cfun_onS->. Qed.
 
 Let sS1S2' : {subset S1 <= [predC S2]}.
-Proof.  
+Proof.
 by move=> _ /seqIndP[s /setDP[kHCs _] ->]; rewrite !inE mem_seqInd // inE kHCs.
 Qed.
 
@@ -771,7 +771,7 @@ without loss Dpsi: tau1 coh_tau1 @zeta1 / psi = eta_col 0 - zeta1.
       rewrite Dade_vchar // zchar_split A0bridge0 //.
       by rewrite rpredB ?char_vchar ?prTIred_char ?irrWchar.
     apply: (addrI q%:R); transitivity '[psi]; last first.
-      rewrite Dade_isometry ?A0bridge0 // (cfnormBd (omuS1 _ _)) //. 
+      rewrite Dade_isometry ?A0bridge0 // (cfnormBd (omuS1 _ _)) //.
       by rewrite cfnorm_prTIred n1S1.
     rewrite Dpsi [RHS]cfnormDd; last first.
       rewrite opprB cfdotC cfdot_sumr big1 ?conjC0 // => i _.
@@ -827,7 +827,7 @@ have Rbeta: cfReal beta.
   rewrite /cfReal eq_sym -subr_eq0 rmorphD !rmorphB /= opprB 2!opprD opprB -/j.
   rewrite 2![(eta_ 0 _)^*%CF]cfAut_cycTIiso -!cycTIirr_aut !aut_Iirr0 -Dade_aut.
   set k := aut_Iirr conjC j; rewrite -(betaE 0 k) ?aut_Iirr_eq0 // addrACA.
-  rewrite addrC addr_eq0 addrCA subrK opprD opprK Dn raddfZnat -!raddfB /= -Dn. 
+  rewrite addrC addr_eq0 addrCA subrK opprD opprK Dn raddfZnat -!raddfB /= -Dn.
   apply/eqP; rewrite (cfConjC_Dade_coherent coh_tau1) ?mFT_odd // -raddfB.
   rewrite Dtau1 ?Zzeta_S1 ?cfAut_seqInd //= -linearZ scalerBr; congr (tau _).
   rewrite opprD !rmorphB !deltaZ /= -!prTIirr_aut !aut_Iirr0 addrACA subrr.
@@ -955,7 +955,7 @@ without loss tau2muj: tau2 coh_tau2 / tau2 (mu_ j) = eta_col j; last first.
       by case; apply/seqIndS/Iirr_kerDS; rewrite ?joing_subr.
     by rewrite !mem_seqInd // inE orbC inE kCi k'HUi andbT orbN.
   move: tau_theta; rewrite -tau2muj // -raddfZnat.
-  apply: (bridge_coherent scohM) sS20 coh_tau2 sS10 coh_tau1 sS1S2' _. 
+  apply: (bridge_coherent scohM) sS20 coh_tau2 sS10 coh_tau1 sS1S2' _.
   by rewrite (cfun_onS _ HUtheta) ?setSD // rpredZnat ?Z_S1.
 move=> IHtau2; apply: (IHtau2 tau2 coh_tau2); have [IZtau2 Dtau2] := coh_tau2.
 have{IHtau2} /hasP[xi S2xi /=irr_xi]: has [mem irr M] S2.

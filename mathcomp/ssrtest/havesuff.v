@@ -9,7 +9,7 @@ Lemma test1 : (P -> G) -> P -> G.
 Proof.
 move=> pg p.
 have suff {pg} H : P.
-  match goal with |- P -> G => move=> _; exact: pg p | _ => fail end. 
+  match goal with |- P -> G => move=> _; exact: pg p | _ => fail end.
 match goal with H : P -> G |- G => exact: H p | _ => fail end.
 Qed.
 
@@ -17,7 +17,7 @@ Lemma test2 : (P -> G) -> P -> G.
 Proof.
 move=> pg p.
 have suffices {pg} H : P.
-  match goal with |- P -> G => move=> _;exact: pg p | _ => fail end. 
+  match goal with |- P -> G => move=> _; exact: pg p | _ => fail end.
 match goal with H : P -> G |- G => exact: H p | _ => fail end.
 Qed.
 
@@ -25,7 +25,7 @@ Lemma test3 : (P -> G) -> P -> G.
 Proof.
 move=> pg p.
 suff have {pg} H : P.
-  match goal with H : P |- G => exact: pg H | _ => fail end. 
+  match goal with H : P |- G => exact: pg H | _ => fail end.
 match goal with |- (P -> G) -> G => move=> H; exact: H p | _ => fail end.
 Qed.
 
@@ -33,7 +33,7 @@ Lemma test4 : (P -> G) -> P -> G.
 Proof.
 move=> pg p.
 suffices have {pg} H: P.
-  match goal with H : P |- G => exact: pg H | _ => fail end. 
+  match goal with H : P |- G => exact: pg H | _ => fail end.
 match goal with |- (P -> G) -> G => move=> H; exact: H p | _ => fail end.
 Qed.
 

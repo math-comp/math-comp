@@ -143,7 +143,7 @@ Definition eprodv vs ws := span (Tuple (size_eprodv vs ws)).
 Local Notation "A :* B" := (eprodv A B) : vspace_scope.
 
 Lemma memv_eprod vs ws a b : a \in vs -> b \in ws -> a :* b \in (vs :* ws)%VS.
-Proof. 
+Proof.
 move=> Ha Hb.
 rewrite (coord_vbasis Ha) (coord_vbasis Hb).
 rewrite linear_sum /=; apply: memv_suml => j _.
@@ -190,7 +190,7 @@ move=> vs; apply subv_anti; apply/andP; split.
   apply/eprodvP=> a b Ha; case/vlineP=> k1 ->.
   by rewrite linearZ /= rmul1 memvZ.
 apply/subvP=> v Hv.
-rewrite (coord_vbasis Hv); apply: memv_suml=> [] [i Hi] _ /=.  
+rewrite (coord_vbasis Hv); apply: memv_suml=> [] [i Hi] _ /=.
 apply: memvZ.
 rewrite -[_`_i]rmul1; apply: memv_eprod; last by apply: memv_line.
 by apply: vbasis_mem; apply: mem_nth; rewrite size_tuple.
@@ -211,9 +211,9 @@ Qed.
 Lemma eprodv_addl: left_distributive eprodv addv.
 Proof.
 move=> vs1 vs2 ws; apply subv_anti; apply/andP; split.
-  apply/eprodvP=> a b;case/memv_addP=> v1 Hv1 [v2 Hv2 ->] Hb.
+  apply/eprodvP=> a b; case/memv_addP=> v1 Hv1 [v2 Hv2 ->] Hb.
   by rewrite rmulD; apply: memv_add; apply: memv_eprod.
-apply/subvP=> v;  case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
+apply/subvP=> v; case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
 apply: memvD.
   by move: v1 Hv1; apply/subvP; apply: eprodvSl; apply: addvSl.
 by move: v2 Hv2; apply/subvP; apply: eprodvSl; apply: addvSr.
@@ -222,9 +222,9 @@ Qed.
 Lemma eprodv_sumr vs ws1 ws2 : (vs :* (ws1 + ws2) = vs :* ws1 + vs :* ws2)%VS.
 Proof.
 apply subv_anti; apply/andP; split.
-  apply/eprodvP=> a b Ha;case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
+  apply/eprodvP=> a b Ha; case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
   by rewrite linearD; apply: memv_add; apply: memv_eprod.
-apply/subvP=> v;  case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
+apply/subvP=> v; case/memv_addP=> v1 Hv1 [v2 Hv2 ->].
 apply: memvD.
   by move: v1 Hv1; apply/subvP; apply: eprodvSr; apply: addvSl.
 by move: v2 Hv2; apply/subvP; apply: eprodvSr; apply: addvSr.
@@ -244,7 +244,7 @@ Proof. by move=> al; apply: subvf. Qed.
 
 Lemma memv_mod_mul : forall ms al m a, 
   modv ms al -> m \in ms -> a \in al -> m :* a \in ms.
-Proof. 
+Proof.
 move=> ms al m a Hmo Hm Ha; apply: subv_trans Hmo.
 by apply: memv_eprod.
 Qed.
@@ -262,7 +262,7 @@ Lemma modv_cap : forall ms1 ms2 al ,
 Proof.
 move=> ms1 ms2 al Hm1 Hm2.
 by rewrite /modv subv_cap; apply/andP; split;
-  [apply: subv_trans Hm1 | apply: subv_trans Hm2]; 
+  [apply: subv_trans Hm1 | apply: subv_trans Hm2];
    apply: eprodvSl; rewrite (capvSr,capvSl).
 Qed.
 
@@ -324,7 +324,7 @@ Lemma modf_add : forall f1 f2 ms al,
 Proof.
 move=> f1 f2 ms al Hm1 Hm2; apply/allP=> [] [v x].
 case/allpairsP=> [[x1 x2] [I1 I2 ->]]; rewrite !lfunE rmulD /=.
-move/modfP: Hm1->; try apply: vbasis_mem=>//.
+move/modfP: Hm1->; try apply: vbasis_mem=> //.
 by move/modfP: Hm2->; try apply: vbasis_mem.
 Qed.
 
@@ -414,7 +414,7 @@ rewrite memv_cap; apply/andP; split.
   apply: memvB=> //; apply: subv_trans Hsub.
   by rewrite -If; apply: memv_img; apply: memvf.
 rewrite memv_ker linearB /= (Himf (f v)) ?subrr // /in_mem /= -If.
-by apply: memv_img; apply: memvf. 
+by apply: memv_img; apply: memvf.
 Qed.
 
 End ModuleRepresentation.

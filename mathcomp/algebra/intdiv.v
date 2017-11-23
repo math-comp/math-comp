@@ -223,7 +223,7 @@ Proof. by move=> d_gt0; rewrite !lerNgt ltz_divLR. Qed.
 Lemma divz_ge0 m d : d > 0 -> ((m %/ d)%Z >= 0) = (m >= 0).
 Proof. by case: d m => // d [] n d_gt0; rewrite (divz_nat, divNz_nat). Qed.
 
-Lemma divzMA_ge0 m n p : n >= 0 -> (m %/ (n * p) = (m %/ n)%Z %/ p)%Z. 
+Lemma divzMA_ge0 m n p : n >= 0 -> (m %/ (n * p) = (m %/ n)%Z %/ p)%Z.
 Proof.
 case: n => // [[|n]] _; first by rewrite mul0r !divz0 div0z.
 wlog p_gt0: p / p > 0; last case: p => // p in p_gt0 *.
@@ -457,7 +457,7 @@ Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> ((m%:~R / d%:~R : rat) \is a Qint).
 Proof.
 case/dvdzP=> z ->; rewrite rmorphM /=; case: (altP (d =P 0)) => [->|dn0].
   by rewrite mulr0 mul0r.
-by rewrite mulfK ?intr_eq0 // rpred_int. 
+by rewrite mulfK ?intr_eq0 // rpred_int.
 Qed.
 
 Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> ((m%:R / d%:R : rat) \is a Qnat).
@@ -934,7 +934,7 @@ wlog [j a'Mij]: m n M i Da le_mn / {j | ~~ (a %| M i j)%Z}; last first.
   have uU: U \in unitmx.
     rewrite unitmxE det_ublock det1 (expand_det_col _ 0) big_ord_recl big_ord1.
     do 2!rewrite /cofactor [row' _ _]mx11_scalar !mxE det_scalar1 /=.
-    rewrite mulr1 mul1r mulN1r opprK -[_ + _](mulzK _ nz_b) mulrDl. 
+    rewrite mulr1 mul1r mulN1r opprK -[_ + _](mulzK _ nz_b) mulrDl.
     by rewrite -!mulrA !divzK ?dvdz_gcdl ?dvdz_gcdr // Db divzz nz_b unitr1.
   have{Db} Db: M1 i 0 = b.
     rewrite /M1 -(lshift0 n 1) [U]block_mxEh mul_mx_row row_mxEl.
@@ -952,9 +952,9 @@ move=> {A leA IHa} IHa; wlog Di: i M Da / i = 0; last rewrite {i}Di in Da.
   by rewrite mulmxA -perm_mxM tperm2 perm_mx1 mul1mx.
 without loss /forallP a_dvM0: / [forall j, a %| M 0 j]%Z.
   have [_|] := altP forallP; first exact; rewrite negb_forall => /existsP/sigW.
-  by move/IHa=> IH _; apply: IH. 
+  by move/IHa=> IH _; apply: IH.
 without loss{Da a_dvM0} Da: M / forall j, M 0 j = a.
-  pose Uur := col' 0 (\row_j (1 - (M 0 j %/ a)%Z)). 
+  pose Uur := col' 0 (\row_j (1 - (M 0 j %/ a)%Z)).
   pose U : 'M_(1 + n) := block_mx 1 Uur 0 1%:M; pose M1 := M *m U.
   have uU: U \in unitmx by rewrite unitmxE det_ublock !det1 mulr1.
   case/(_ (M *m U)) => [j | L uL [R uR [d dvD dM]]].

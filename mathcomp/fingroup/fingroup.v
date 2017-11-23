@@ -1163,7 +1163,7 @@ move=> Ax; apply/setP=> y.
 by apply/imsetP/set1P=> [[a Aa]|] ->; last exists x; rewrite ?conj1g.
 Qed.
 
-Lemma classVg x A : x^-1 ^: A = (x ^: A)^-1. 
+Lemma classVg x A : x^-1 ^: A = (x ^: A)^-1.
 Proof.
 apply/setP=> xy; rewrite inE; apply/imsetP/imsetP=> [] [y Ay def_xy].
   by rewrite def_xy conjVg invgK; exists y.
@@ -2661,7 +2661,7 @@ Lemma norms_class_support : A \subset 'N(class_support B C).
 Proof.
 apply/subsetP=> x Ax; rewrite inE sub_conjg class_supportEr.
 apply/bigcupsP=> y Cy; rewrite -sub_conjg -conjsgM conjgC conjsgM.
-by rewrite  (normsP nBA) // bigcup_sup ?memJ_norm ?(subsetP nCA).
+by rewrite (normsP nBA) // bigcup_sup ?memJ_norm ?(subsetP nCA).
 Qed.
 
 End norm_trans.

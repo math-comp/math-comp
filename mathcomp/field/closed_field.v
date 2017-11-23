@@ -98,9 +98,9 @@ rewrite -cons_poly_def /lift polyseq_cons /nilp.
 case pn0: (_ == _) => /=; last by move->; rewrite -cons_poly_def.
 move=> _; rewrite polyseqC.
 case c0: (_==_)=> /=.
-  move: pn0; rewrite (eqP c0) size_poly_eq0; move/eqP->. 
-  by apply:val_inj=> /=; rewrite polyseq_cons // polyseq0.
-by rewrite mul0r add0r; apply:val_inj=> /=; rewrite polyseq_cons // /nilp pn0.
+  move: pn0; rewrite (eqP c0) size_poly_eq0; move/eqP->.
+  by apply: val_inj=> /=; rewrite polyseq_cons // polyseq0.
+by rewrite mul0r add0r; apply: val_inj=> /=; rewrite polyseq_cons // /nilp pn0.
 Qed.
 
 Fixpoint lead_coefT (k : term F -> fF) p :=  
@@ -181,11 +181,11 @@ Qed.
 
 Lemma rpoly_map_mul (t : term F) (p : polyF) (rt : rterm t) : 
   rpoly (map (Mul t) p) = rpoly p.
-Proof. 
+Proof.
 by rewrite /rpoly all_map /= (@eq_all _ _ (@rterm _)) // => x; rewrite /= rt.
 Qed.
 
-Lemma rmulpT (p q : polyF) : rpoly p -> rpoly q -> rpoly (mulpT p q). 
+Lemma rmulpT (p q : polyF) : rpoly p -> rpoly q -> rpoly (mulpT p q).
 Proof.
 elim: p q=> [|a p ihp] q rp rq //=; move: rp; case/andP=> ra rp /=.
 apply: rsumpT; last exact: ihp.
@@ -206,7 +206,7 @@ Lemma eval_natmulpT  (p : polyF) (n : nat) (e : seq F) :
   eval_poly e (natmulpT n p) = (eval_poly e p) *+ n.
 Proof.
 elim: p; rewrite //= ?mul0rn // => c p ->.
-rewrite mulrnDl mulr_natl polyC_muln; congr (_+_). 
+rewrite mulrnDl mulr_natl polyC_muln; congr (_+_).
 by rewrite -mulr_natl mulrAC -mulrA mulr_natl mulrC.
 Qed.
 
@@ -245,16 +245,16 @@ move=> Pk q sq cq c qq r n e /=.
 elim: n c qq r k Pk e => [|n Pn] c qq r k Pk e; rewrite sizeTP.
   case ltrq : (_ < _); first by rewrite /= ltrq /= -Pk.
   rewrite lead_coefTP => [|a p]; rewrite Pk.
-    rewrite ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=. 
+    rewrite ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
     by rewrite ltrq //= mul_polyC ?(mul0r,add0r).
   by symmetry; rewrite Pk ?(eval_mulpT,eval_amulXnT,eval_sumpT, eval_opppT).
 case ltrq : (_<_); first by rewrite /= ltrq Pk.
 rewrite lead_coefTP.
-  rewrite Pn ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=. 
+  rewrite Pn ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
   by rewrite ltrq //= mul_polyC ?(mul0r,add0r).
 rewrite -/redivp_rec_loopT => x e'.
-rewrite Pn; last by move=>*; rewrite Pk. 
-symmetry; rewrite Pn; last by move=>*; rewrite Pk.
+rewrite Pn; last by move=> *; rewrite Pk.
+symmetry; rewrite Pn; last by move=> *; rewrite Pk.
 rewrite Pk ?(eval_lift,eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT).
 by rewrite mul_polyC ?(mul0r,add0r).
 Qed.
@@ -267,7 +267,7 @@ Lemma redivp_rec_loopT_qf (q : polyF) (sq : nat) (cq : term F)
 Proof.
 elim: n q sq cq k c qq r => [|n ihn] q sq cq k c qq r kP rq rcq rqq rr.
   apply: sizeT_qf=> // n; case: (_ < _); first by apply: kP; rewrite // rqq rr.
-  apply: lead_coefT_qf=> // l rl; apply: kP. 
+  apply: lead_coefT_qf=> // l rl; apply: kP.
   by rewrite /= ?(rsumpT,rmulpT,ramulXnT,rpoly_map_mul) //= rcq.
 apply: sizeT_qf=> // m; case: (_ < _); first by apply: kP => //=; rewrite rqq rr.
 apply: lead_coefT_qf=> // l rl; apply: ihn; rewrite //= ?rcq //.
@@ -290,7 +290,7 @@ Definition redivpT (p : polyF) (k : nat * polyF * polyF -> fF)
 
 Lemma redivp_rec_loopP  (q : {poly F}) (c : nat) (qq r : {poly F}) (n : nat) :
   redivp_rec q c qq r n = redivp_rec_loop q (size q) (lead_coef q) c qq r n.
-Proof. by elim: n c qq r => [| n Pn] c qq r //=; rewrite Pn. Qed. 
+Proof. by elim: n c qq r => [| n Pn] c qq r //=; rewrite Pn. Qed.
 
 Lemma redivpTP (k : nat * polyF * polyF -> formula F) :
   (forall c qq r e,  
@@ -346,12 +346,12 @@ Lemma rgcdp_loopP (k : polyF -> formula F) :
 Proof.
 move=> Pk n p q e.
 elim: n p q e => /= [| m Pm] p q e.
-  rewrite redivpTP; last by move=>*; rewrite !isnullP eval_lift.
+  rewrite redivpTP; last by move=> *; rewrite !isnullP eval_lift.
   rewrite isnullP eval_lift; case: (_ == 0); first by rewrite Pk.
-  by rewrite redivpTP; last by move=>*; rewrite Pk.
-rewrite redivpTP; last by move=>*; rewrite !isnullP eval_lift.
+  by rewrite redivpTP; last by move=> *; rewrite Pk.
+rewrite redivpTP; last by move=> *; rewrite !isnullP eval_lift.
 rewrite isnullP eval_lift; case: (_ == 0); first by rewrite Pk.
-by rewrite redivpTP; move=>*; rewrite ?Pm !eval_lift.
+by rewrite redivpTP => - *; rewrite ?Pm !eval_lift.
 Qed.
 
 Lemma rgcdp_loopT_qf (p : polyF) (k : polyF -> formula F) (q : polyF) (n : nat) :
@@ -371,16 +371,16 @@ Definition rgcdpT (p : polyF) k (q : polyF) : fF :=
     (fun b => if b 
       then (k q1) 
       else (sizeT (fun n => (rgcdp_loopT p1 k n q1)) p1)) p1
-    in (lt_sizeT (fun b => if b then (aux q k p) else (aux p k q)) p q). 
+    in (lt_sizeT (fun b => if b then (aux q k p) else (aux p k q)) p q).
 
 Lemma rgcdpTP (k : seq (term F) -> formula F) :
   (forall p e, qf_eval e (k p) = qf_eval e (k (lift (eval_poly e p)))) ->
    forall p q e, qf_eval e (rgcdpT p k q) = 
                  qf_eval e (k (lift (rgcdp (eval_poly e p) (eval_poly e q)))).
 Proof.
-move=> Pk p q e; rewrite /rgcdpT !sizeTP; case lqp: (_ < _).  
+move=> Pk p q e; rewrite /rgcdpT !sizeTP; case lqp: (_ < _).
   rewrite isnullP; case q0: (_ == _); first by rewrite Pk (eqP q0) rgcdp0.
-  rewrite sizeTP rgcdp_loopP => [|e' p']; last by rewrite Pk. 
+  rewrite sizeTP rgcdp_loopP => [|e' p']; last by rewrite Pk.
   by rewrite /rgcdp lqp q0.
 rewrite isnullP; case p0: (_ == _); first by rewrite Pk (eqP p0) rgcd0p.
 rewrite sizeTP rgcdp_loopP => [|e' p']; last by rewrite Pk.
@@ -391,7 +391,7 @@ Lemma rgcdpT_qf  (p : polyF) (k : polyF -> formula F) (q : polyF) :
   (forall r, rpoly r -> qf (k r)) -> rpoly p -> rpoly q -> qf (rgcdpT p k q).
 Proof.
 move=> kP rp rq; apply: sizeT_qf=> // n; apply: sizeT_qf=> // m.
-by case:(_ < _); 
+by case: (_ < _);
    apply: isnull_qf=> //; case; do ?apply: kP=> //;
    apply: sizeT_qf=> // n'; apply: rgcdp_loopT_qf.
 Qed.
@@ -467,7 +467,7 @@ Proof. by move=> *; rewrite sizeTP rgdcop_recTP 1?Pk. Qed.
 
 Lemma rgdcopT_qf (p : polyF) (k : polyF -> formula F) (q : polyF) :
   (forall r, rpoly r -> qf (k r)) -> rpoly p -> rpoly q -> qf (rgdcopT p k q).
-Proof. 
+Proof.
 by move=> kP rp rq; apply: sizeT_qf => // n; apply: rgdcop_recT_qf.
 Qed.
 
@@ -505,16 +505,16 @@ Lemma abstrXP  (i : nat) (t : term F) (e : seq F) (x : F) :
   rterm t -> (eval_poly e (abstrX i t)).[x] = eval (set_nth 0 e i x) t.
 Proof.
 elim: t => [n | r | n | t tP s sP | t tP | t tP n | t tP s sP | t tP | t tP n] h.
-- move=> /=; case ni: (_ == _); 
+- move=> /=; case ni: (_ == _);
     rewrite //= ?(mul0r,add0r,addr0,polyC1,mul1r,hornerX,hornerC);
     by rewrite // nth_set_nth /= ni.
 - by rewrite /= mul0r add0r hornerC.
 - by rewrite /= mul0r add0r hornerC.
-- by case/andP: h => *; rewrite /= eval_sumpT hornerD tP ?sP. 
+- by case/andP: h => *; rewrite /= eval_sumpT hornerD tP ?sP.
 - by rewrite /= eval_opppT hornerN tP.
 - by rewrite /= eval_natmulpT hornerMn tP.
 - by case/andP: h => *; rewrite /= eval_mulpT hornerM tP ?sP.
-- by []. 
+- by [].
 - elim: n h => [|n ihn] rt; first by rewrite /= expr0 mul0r add0r hornerC.
   by rewrite /= eval_mulpT exprSr hornerM ihn // mulrC tP.
 Qed.
@@ -576,7 +576,7 @@ Proof.
 move=> e i x; elim=> [|p ps ihps] //=.
 case/andP=> rp rps; rewrite rootE abstrXP //.
 constructor; first by case=> -> hps; rewrite eqxx /=; apply/ihps.
-by case/andP; move/eqP=> -> psr; split=> //; apply/ihps. 
+by case/andP; move/eqP=> -> psr; split=> //; apply/ihps.
 Qed.
 
 Lemma holds_conjn (e : seq F) (i : nat) (x : F) (ps : seq (term F)) :
@@ -587,10 +587,10 @@ Proof.
 elim: ps => [|p ps ihps] //=.
 case/andP=> rp rps; rewrite rootE abstrXP //.
 constructor; first by case=> /eqP-> hps /=; apply/ihps.
-by case/andP=> pr psr; split; first apply/eqP=> //; apply/ihps. 
+by case/andP=> pr psr; split; first apply/eqP=> //; apply/ihps.
 Qed.
 
-Lemma holds_ex_elim : GRing.valid_QE_proj ex_elim.
+Lemma holds_ex_elim: GRing.valid_QE_proj ex_elim.
 Proof.
 move=> i [ps qs] /= e; case/andP=> /= rps rqs.
 rewrite ex_elim_seqP big_map.
@@ -616,7 +616,7 @@ case g0: (\big[(@rgcdp F)/0%:P]_(j <- map (eval_poly e \o abstrX i) ps) j == 0).
   exists x; do 2?constructor=> //; last by apply/holds_conjn.
   apply/holds_conj; rewrite //= -root_biggcd.
   by rewrite (eqp_root (aux _ _ _ )) (eqP g0) root0.
-apply:(iffP (closed_rootP axiom _)); case=> x Px; exists x; move:Px => //=.
+apply: (iffP (closed_rootP axiom _)); case=> x Px; exists x; move: Px => //=.
   rewrite (eqp_root (eqp_rgdco_gdco _ _)) root_gdco ?g0 //.
   rewrite -(eqp_root (aux _ _ _ )) root_biggcd  abstrX_bigmul eval_bigmul.
   rewrite -bigmap_id root_bigmul; case/andP=> psr qsr.
@@ -629,7 +629,7 @@ constructor; first by apply/holds_conj.
 by apply/holds_conjn.
 Qed.
 
-Lemma wf_ex_elim : GRing.wf_QE_proj ex_elim.
+Lemma wf_ex_elim: GRing.wf_QE_proj ex_elim.
 Proof. by move=> i bc /= rbc; apply: ex_elim_qf. Qed.
 
 Definition closed_fields_QEMixin := 

@@ -28,7 +28,7 @@ Module BigEnough.
 
 Record big_rel_class_of T (leq : rel T) := 
   BigRelClass {
-      leq_big_internal_op : rel T; 
+      leq_big_internal_op : rel T;
       bigger_than_op : seq T -> T;
       _ : leq_big_internal_op = leq;
       _ : forall i s, leq_big_internal_op i (bigger_than_op (i :: s));
