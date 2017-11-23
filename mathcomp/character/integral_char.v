@@ -77,7 +77,7 @@ exists QnC => [// nuQn|].
 rewrite span_seq1 in genQn.
 exists w => // hT H phi Nphi x x_dv_n.
 apply: sig_eqW; have [rH ->] := char_reprP Nphi.
-have [Hx | /cfun0->] := boolP (x \in H); last by exists 0; rewrite rmorph0.  
+have [Hx | /cfun0->] := boolP (x \in H); last by exists 0; rewrite rmorph0.
 have [e [_ [enx1 _] [-> _] _]] := repr_rsim_diag rH Hx.
 have /fin_all_exists[k Dk] i: exists k, e 0 i = z ^+ k.
   have [|k ->] := (prim_rootP prim_z) (e 0 i); last by exists k.
@@ -657,14 +657,14 @@ have{defQn} imItoQ: calG = ItoQ @: {:I}.
 have injItoQ: {in {:I} &, injective ItoQ}.
   move=> k1 k2 _ _ /(congr1 (fun nu : gal_of _ => nu eps))/eqP.
   by apply: contraTeq; rewrite !defItoQ (eq_prim_root_expr pr_eps) !modn_small.
-pose pi1 := \prod_(s in S) chi s; pose pi2 := \prod_(s in S) `|chi s| ^+ 2. 
+pose pi1 := \prod_(s in S) chi s; pose pi2 := \prod_(s in S) `|chi s| ^+ 2.
 have Qpi1: pi1 \in Crat.
   have [a Da] := QnGg _ Nchi; suffices ->: pi1 = QnC (galNorm 1 {:Qn} a).
     have /vlineP[q ->] := mem_galNorm galQn (memvf a).
     by rewrite rmorphZ_num rmorph1 mulr1 Crat_rat.
   rewrite /galNorm rmorph_prod -/calG imItoQ big_imset //=.
   rewrite /pi1 -(eq_bigl _ _ imItoS) -big_uniq // big_map big_filter /=.
-  apply: eq_bigr => k _;  have [nuC DnuC] := gQnC (ItoQ k); rewrite DnuC Da.
+  apply: eq_bigr => k _; have [nuC DnuC] := gQnC (ItoQ k); rewrite DnuC Da.
   have [r ->] := char_sum_irr Nchi; rewrite !sum_cfunE rmorph_sum.
   apply: eq_bigr => i _; have /QnGg[b Db] := irr_char i.
   have Lchi_i: 'chi_i \is a linear_char by rewrite irr_cyclic_lin.

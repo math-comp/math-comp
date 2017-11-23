@@ -213,7 +213,7 @@ Lemma next_nth p x :
                if p is y :: p' then nth y p' (index x p) else x
              else x.
 Proof.
-case: p => //= y0 p. 
+case: p => //= y0 p.
 elim: p {2 3 5}y0 => [|y' p IHp] y /=; rewrite (eq_sym y) inE;
   by case: ifP => // _; apply: IHp.
 Qed.
@@ -542,7 +542,7 @@ have: perm_eq (catss ss ++ s) (merge_sort_pop s ss).
   by rewrite perm_catC catA perm_catC perm_cat2l -perm_merge.
 case: s => // x1 [//|x2 s _]; move/ltnW; move/IHn=> {n IHn}IHs.
 rewrite -{IHs}(perm_eqrP (IHs _)) ifE; set s1 := if_expr _ _ _.
-rewrite (catA _ [::_;_] s) {s}perm_cat2r.
+rewrite (catA _ [::_; _] s) {s}perm_cat2r.
 apply: (@perm_eq_trans _ (catss ss ++ s1)).
   by rewrite perm_cat2l /s1 -ifE; case: ifP; rewrite // (perm_catC [::_]).
 elim: ss {x1 x2}s1 => /= [|s2 ss IHss] s1; first by rewrite cats0.

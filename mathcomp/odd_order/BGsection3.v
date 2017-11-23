@@ -123,7 +123,7 @@ have fixsum (H : {group gT}): H \subset G -> (gsum H <= rfix_mx rG H)%MS.
   move/subsetP=> sHG; apply/rfix_mxP=> x Hx; have Gx := sHG x Hx.
   rewrite -gring_opG // -gring_opM ?envelop_mx_id //; congr (gring_op _ _).
   rewrite {2}/gset_mx (reindex_acts 'R _ Hx) ?astabsR //= mulmx_suml.
-  by apply:eq_bigr=> y; move/sHG=> Gy; rewrite repr_mxM.
+  by apply: eq_bigr=> y; move/sHG=> Gy; rewrite repr_mxM.
 have: gsum G + rG 1 *+ #|K| = gsum K + \sum_(x in K) gsum (R :^ x).
   rewrite -gring_opG // -sumr_const -!linear_sum -!linearD; congr gring_op.
   rewrite {1}/gset_mx (set_partition_big _ (Frobenius_partition frobG)) /=.
@@ -350,7 +350,7 @@ have [nsKG sRG defKR nKR tiKR] := sdprod_context defG.
 have [sKG nKG] := andP nsKG; have solK := solvableS sKG solG.
 have cycR := prime_cyclic p_pr.
 case: (eqsVneq K 1) => [-> | ntK]; first by rewrite derg1 commG1 sub1G.
-have defR x: x \in R^# -> <[x]> = R.  
+have defR x: x \in R^# -> <[x]> = R.
   case/setD1P; rewrite -cycle_subG -cycle_eq1 => ntX sXR.
   apply/eqP; rewrite eqEsubset sXR; apply: contraR ntX => /(prime_TIg p_pr).
   by rewrite /= (setIidPr sXR) => ->.
@@ -856,7 +856,7 @@ have{IHsub nVH} IHsub: forall X : {group gT},
     rewrite sub_Hall_pcore //; last by rewrite -defP commSg ?joing_subr.
     rewrite /pHall pcore_sub pcore_pgroup /= -(pseries_pop2 _ Op'HR0).
     rewrite -card_quotient ?normal_norm ?pseries_normal // -/(pgroup _ _).
-    by rewrite -{1}((_ :=P: _) p1_HR0) (quotient_pseries [::_;_]) pcore_pgroup.
+    by rewrite -{1}((_ :=P: _) p1_HR0) (quotient_pseries [::_; _]) pcore_pgroup.
   apply/trivgP; have <-: K :&: 'O_p([~: H0, R0]) = 1.
     by rewrite setIC coprime_TIg // (pnat_coprime (pcore_pgroup p _)).
   by rewrite commg_subI // subsetI ?sPOpHR0 ?sXK //= gFnorm_trans // normsRl.
@@ -953,7 +953,7 @@ have iK'K: 'C_(P <*> R / K')(K / K') = 1 -> #|K / K'| > q ^ 2.
   by rewrite /pgroup (pi_pnat rR) // (pi_pnat pP) // !inE eq_sym.
 case cKK: (abelian K); last first.
   have [|[dPhiK dK'] dCKP] := abelian_charsimple_special qK coKP defKP.
-    apply/bigcupsP=> L /andP[charL]; have sLK := char_sub charL. 
+    apply/bigcupsP=> L /andP[charL]; have sLK := char_sub charL.
     by case/IHsub: sLK cKK => // [|-> -> //]; apply: char_norm_trans charL _.
   have eK: exponent K %| q.
     have oddK: odd #|K| := oddSg sKG oddG.
@@ -1395,7 +1395,7 @@ have chF: 'F(K) \char K := Fitting_char K; have nFR := char_norm_trans chF nKR.
 have nsFK := char_normal chF; have [sFK nFK] := andP nsFK.
 pose KqF := K / 'F(K); have solK := solvableS sKG solG.
 without loss [p p_pr pKqF]: / exists2 p, prime p & p.-group KqF.
-  move=> IHp;  apply: wlog_neg => IH_KR; rewrite -quotient_cents2 //= -/KqF.
+  move=> IHp; apply: wlog_neg => IH_KR; rewrite -quotient_cents2 //= -/KqF.
   set Rq := R / 'F(K); have nKRq: Rq \subset 'N(KqF) by apply: quotient_norms.
   rewrite centsC.
   apply: subset_trans (coprime_cent_Fitting nKRq _ _); last first.
@@ -1487,7 +1487,7 @@ have defKv: (P / V) * 'C_(G / V)(W) = (K / V).
   rewrite (subset_trans (quotientS _ sK_PF)) // quotientMl // mulgS //.
   rewrite subsetI -quotient_astabQ !quotientS //.
   by rewrite (subset_trans (Fitting_stab_chief solG nsKG)) ?(bigcap_inf (U, V)).
-have nW_ := subset_trans (quotientS _ _) nWG; have nWK := nW_ _ sKG. 
+have nW_ := subset_trans (quotientS _ _) nWG; have nWK := nW_ _ sKG.
 rewrite -quotient_cents2 ?norms_cent ?(nW_ _ sRG) //.
 have [eq_qp | p'q] := eqVneq q p.
   apply: subset_trans (sub1G _); rewrite -trivg_quotient quotientS // centsC.

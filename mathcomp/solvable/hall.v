@@ -291,7 +291,7 @@ case: (SchurZassenhaus_trans_sol _ nMK sK1G1 coMK) => [||x Mx defK1].
     by apply/trivgP; rewrite -trMH /= setIA subsetIl.
   rewrite -coprime_cardMg // defG1; apply/eqP; congr #|(_ : {set _})|.
   rewrite group_modl; last by rewrite -defG1 mulG_subl.
-  by apply/setIidPr;  rewrite defG gen_subG subUset sKG.
+  by apply/setIidPr; rewrite defG gen_subG subUset sKG.
 exists x^-1; first by rewrite groupV (subsetP sMG).
 by rewrite -(_ : K1 :^ x^-1 = K) ?(conjSg, subsetIl) // defK1 conjsgK.
 Qed.
@@ -310,7 +310,7 @@ Corollary Hall_trans pi (G H1 H2 : {group gT}) :
   solvable G -> pi.-Hall(G) H1 -> pi.-Hall(G) H2 ->
   exists2 x, x \in G & H1 :=: H2 :^ x.
 Proof.
-move=> solG; have [H hallH transH] := Hall_exists_subJ pi solG. 
+move=> solG; have [H hallH transH] := Hall_exists_subJ pi solG.
 have conjH (K : {group gT}):
   pi.-Hall(G) K -> exists2 x, x \in G & K = (H :^ x)%G.
 - move=> hallK; have [sKG piK _] := and3P hallK.
@@ -418,7 +418,7 @@ Proposition coprime_Hall_trans A G H1 H2 :
   exists2 x, x \in 'C_G(A) & H1 :=: H2 :^ x.
 Proof.
 move: H1 => H nGA coGA solG hallH nHA hallH2.
-have{H2 hallH2} [x Gx -> nH1xA] := Hall_trans solG hallH2 hallH. 
+have{H2 hallH2} [x Gx -> nH1xA] := Hall_trans solG hallH2 hallH.
 have sG_AG: G \subset A <*> G by rewrite -{1}genGid genS ?subsetUr.
 have nG_AG: A <*> G \subset 'N(G) by rewrite gen_subG subUset nGA normG.
 pose N := 'N_(A <*> G)(H)%G.

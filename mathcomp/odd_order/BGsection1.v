@@ -148,7 +148,7 @@ apply/setIidPl/minM'; last exact: subsetIl.
 apply/andP; split; last by rewrite normsI // normal_norm.
 apply: meet_center_nil => //; first by apply: Fitting_nil.
 apply/andP; split; last exact: gFsub_trans.
-apply: Fitting_max; rewrite // /normal ?sMG //; apply: abelian_nil. 
+apply: Fitting_max; rewrite // /normal ?sMG //; apply: abelian_nil.
 by move: (minnormal_solvable_abelem minM solM) => /abelem_abelian.
 Qed.
 
@@ -426,7 +426,7 @@ have sCG: C \subset G by rewrite subsetIl.
 suffices cNA : A \subset 'C(N).
   rewrite centsC (sameP setIidPl eqP) -(nilpotent_sub_norm nilG sCG) //= -/C.
   by rewrite subsetI subsetIl centsC.
-have{nilG} solN: solvable N by rewrite(solvableS sNG) ?nilpotent_sol.
+have{nilG} solN: solvable N by rewrite (solvableS sNG) ?nilpotent_sol.
 rewrite (stable_factor_cent cCA) ?(coprimeSg sNG) /stable_factor //= -/N -/C.
 rewrite subcent_normal subsetI (subset_trans (commSg A sNG)) ?commg_subl //=.
 rewrite comm_norm_cent_cent 1?centsC ?subsetIr // normsI // !norms_norm //.
@@ -636,7 +636,7 @@ have nKG: G \subset 'N(K) by rewrite normal_norm ?pcore_normal.
 have nKC: 'C_G(P) \subset 'N(K) by rewrite subIset ?nKG.
 rewrite -(quotientSGK nKC) //; last first.
   by rewrite /= -pseries1 (pseries_sub_catl [::_]).
-apply: subset_trans (quotient_subcent _ _ _) _ ;rewrite /= -/K.
+apply: subset_trans (quotient_subcent _ _ _) _; rewrite /= -/K.
 suffices ->: P / K = 'O_p(G / K).
   rewrite quotient_pseries2 -Fitting_eq_pcore ?trivg_pcore_quotient // -/K.
   by rewrite cent_sub_Fitting ?morphim_sol.
@@ -753,7 +753,7 @@ apply/andP; split; last by apply/bigcupsP=> B _; apply: subsetIl.
 have [Z1 | ntZ] := eqsVneq 'Z(G) 1.
   by rewrite (TI_center_nil _ (normal_refl G)) ?Z1 ?(setIidPr _) ?sub1G.
 have{ntZ} [M /= minM] := minnormal_exists ntZ (gFnorm_trans _ nGA).
-rewrite subsetI centsC => /andP[sMG /cents_norm nMG]. 
+rewrite subsetI centsC => /andP[sMG /cents_norm nMG].
 have coMA := coprimeSg sMG coGA; have{nilG} solG := nilpotent_sol nilG.
 have [nMA ntM abelM] := minnormal_solvable minM sMG solG.
 set GC := <<_>>; have sMGC: M \subset GC.
@@ -1145,7 +1145,7 @@ apply/idP/idP=> [p1G | pU].
 have nOG: 'O_{p^', p}(G) <| G by apply: pseries_normal.
 rewrite eqEsubset pseries_sub.
 rewrite -(quotientSGK (normal_norm nOG)) ?(pseries_sub_catl [:: _; _]) //=.
-rewrite (quotient_pseries [::_;_]) pcore_max //.
+rewrite (quotient_pseries [::_; _]) pcore_max //.
 rewrite /pgroup card_quotient ?normal_norm //.
 apply: pnat_dvd (indexgS G (_ : p_elt_gen p G \subset _)) _; last first.
   case p_pr: (prime p); last by rewrite p'natEpi // mem_primes p_pr.

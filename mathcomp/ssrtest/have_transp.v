@@ -10,7 +10,7 @@ Proof.
 have [:s1] @h m : 'I_(n+m).+1.
   apply: Sub 0 _.
   abstract: s1 m.
-  by auto. 
+  by auto.
 cut (forall m, 0 < (n+m).+1); last assumption.
 rewrite [_ 1 _]/= in s1 h *.
 by [].

@@ -506,7 +506,7 @@ Lemma cardE A : #|A| = size (enum A).
 Proof. by rewrite unlock. Qed.
 
 Lemma eq_card A B : A =i B -> #|A| = #|B|.
-Proof. by move=>eqAB; rewrite !cardE (eq_enum eqAB). Qed.
+Proof. by move=> eqAB; rewrite !cardE (eq_enum eqAB). Qed.
 
 Lemma eq_card_trans A B n : #|A| = n -> B =i A -> #|B| = n.
 Proof. by move <-; apply: eq_card. Qed.

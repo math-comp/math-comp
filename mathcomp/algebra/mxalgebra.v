@@ -658,7 +658,7 @@ Qed.
 Lemma submx_full m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   row_full B -> (A <= B)%MS.
 Proof.
-by rewrite submxE /cokermx =>/eqnP->; rewrite /copid_mx pid_mx_1 subrr !mulmx0.
+by rewrite submxE /cokermx => /eqnP->; rewrite /copid_mx pid_mx_1 subrr !mulmx0.
 Qed.
 
 Lemma row_fullP m n (A : 'M_(m, n)) :
@@ -700,7 +700,7 @@ Lemma row_full_unit n (A : 'M_n) : row_full A = (A \in unitmx).
 Proof. exact: row_free_unit. Qed.
   
 Lemma mxrank_unit n (A : 'M_n) : A \in unitmx -> \rank A = n.
-Proof. by rewrite -row_full_unit =>/eqnP. Qed.
+Proof. by rewrite -row_full_unit => /eqnP. Qed.
 
 Lemma mxrank1 n : \rank (1%:M : 'M_n) = n.
 Proof. by apply: mxrank_unit; apply: unitmx1. Qed.
@@ -1114,7 +1114,7 @@ Lemma sub_sumsmxP P m n (A : 'M_(m, n)) (B_ : I -> 'M_n) :
           (A <= \sum_(i | P i) B_ i)%MS.
 Proof.
 apply: (iffP idP) => [| [u_ ->]]; last first.
-  by apply: summx_sub_sums => i _; apply: submxMl. 
+  by apply: summx_sub_sums => i _; apply: submxMl.
 elim: {P}_.+1 {-2}P A (ltnSn #|P|) => // b IHb P A.
 case: (pickP P) => [i Pi | P0 _]; last first.
   rewrite big_pred0 //; move/submx0null->.
@@ -1202,7 +1202,7 @@ Lemma mxrank_Frobenius m n p q (A : 'M_(m, n)) B (C : 'M_(p, q)) :
 Proof.
 rewrite -{2}(mulmx_base (A *m B)) -mulmxA (eqmxMfull _ (col_base_full _)).
 set C2 := row_base _ *m C.
-rewrite -{1}(subnK (rank_leq_row C2)) -(mxrank_ker C2) addnAC leq_add2r. 
+rewrite -{1}(subnK (rank_leq_row C2)) -(mxrank_ker C2) addnAC leq_add2r.
 rewrite addnC -{1}(mulmx_base B) -mulmxA eqmxMfull //.
 set C1 := _ *m C; rewrite -{2}(subnKC (rank_leq_row C1)) leq_add2l -mxrank_ker.
 rewrite -(mxrankMfree _ (row_base_free (A *m B))).
@@ -1466,7 +1466,7 @@ apply/eqP; set K := kermx B; set C := (A :&: K)%MS.
 rewrite -(eqmxMr B (eq_row_base A)); set K' := _ *m B.
 rewrite -{2}(subnKC (rank_leq_row K')) -mxrank_ker eqn_add2l.
 rewrite -(mxrankMfree _ (row_base_free A)) mxrank_leqif_sup.
-  rewrite sub_capmx -(eq_row_base A) submxMl. 
+  rewrite sub_capmx -(eq_row_base A) submxMl.
   by apply/sub_kermxP; rewrite -mulmxA mulmx_ker.
 have /submxP[C' defC]: (C <= row_base A)%MS by rewrite eq_row_base capmxSl.
 rewrite defC submxMr //; apply/sub_kermxP.
@@ -1573,7 +1573,7 @@ Proof.
 move=> dxUV sWU; apply/eqP; rewrite -subr_eq0 -submx0 -dxUV.
 rewrite sub_capmx addmx_sub ?eqmx_opp ?proj_mx_sub //= -eqmx_opp opprB.
 by rewrite proj_mx_compl_sub // (submx_trans sWU) ?addsmxSl.
-Qed. 
+Qed.
 
 Lemma proj_mx_0 m n U V (W : 'M_(m, n)) :
   (U :&: V = 0)%MS -> (W <= V)%MS -> W *m proj_mx U V = 0.
@@ -1845,7 +1845,7 @@ Proof.
 rewrite /TIsum; apply: (iffP eqnP) => /= [dxS i Pi | dxS].
   set Si' := (\sum_(j | _) unwrap (S_ j))%MS.
   have: mxdirect (unwrap (S_ i) + Si') by apply/eqnP; rewrite /= -!(bigD1 i).
-  by rewrite mxdirect_addsE => /and3P[-> _ /eqP].  
+  by rewrite mxdirect_addsE => /and3P[-> _ /eqP].
 elim: _.+1 {-2 4}P (subxx P) (ltnSn #|P|) => // m IHm Q; move/subsetP=> sQP.
 case: (pickP Q) => [i Qi | Q0]; last by rewrite !big_pred0 ?mxrank0.
 rewrite (cardD1x Qi) !((bigD1 i) Q) //=.

@@ -230,7 +230,7 @@ Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
 
 Lemma itvP : forall (x : R) (i : interval R), (x \in i) -> itv_rewrite i x.
 Proof.
-move=> x [[[] a|] [[] b|]]; move/itv_dec=> //= [hl hu];do ?[split=> //;
+move=> x [[[] a|] [[] b|]]; move/itv_dec=> //= [hl hu]; do ?[split=> //;
   do ?[by rewrite ltrW | by rewrite ltrWN | by rewrite ltrNW |
     by rewrite (ltr_geF, ler_gtF)]];
   rewrite ?(bound_in_itv) /le_boundl /le_boundr //=; do ?
@@ -254,7 +254,7 @@ Lemma subitvP : forall (i2 i1 : interval R),
   (subitv i1 i2) -> {subset i1 <= i2}.
 Proof.
 by move=> [[[] a2|] [[] b2|]] [[[] a1|] [[] b1|]];
-  rewrite /subitv //; case/andP=> /= ha hb; move=> x hx; rewrite ?inE;
+  rewrite /subitv //; case/andP=> /= ha hb x hx; rewrite ?inE;
     rewrite ?(ler_trans ha) ?(ler_lt_trans ha) ?(ltr_le_trans ha) //;
       rewrite ?(ler_trans _ hb) ?(ltr_le_trans _ hb) ?(ler_lt_trans _ hb) //;
         rewrite ?(itvP hx) //.

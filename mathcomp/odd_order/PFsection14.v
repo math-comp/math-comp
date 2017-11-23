@@ -231,7 +231,7 @@ have lb_b ij (b_ij := b (sigma 'chi_ij)):
   1 <= `|b_ij| ^+ 2 ?= iff [exists n : bool, b_ij == (-1) ^+ n].
 - have /codomP[[i j] Dij] := dprod_Iirr_onto defW ij.
   have{b_ij} ->: b_ij = a i j.
-    rewrite /a /w_ -Dij Dbeta defGa 2!cfdotDl. 
+    rewrite /a /w_ -Dij Dbeta defGa 2!cfdotDl.
     have ->: '[X, sigma 'chi_ij] = b_ij by rewrite /b_ij Db.
     by rewrite (orthoPl oYeta) ?(orthoPl oZeta) ?map_f ?mem_irr // !addr0.
   have Zaij: a i j \in Cint by rewrite Cint_cfdot_vchar ?cycTIiso_vchar.
@@ -282,7 +282,7 @@ suffices /cfdot_add_dirr_eq1: '[tau1L phi - tau1L phi^*%CF, chi] = 1.
 rewrite cfdotBr (span_orthogonal o_tauLeta) ?add0r //; last first.
   by rewrite rpredB ?memv_span ?map_f ?cfAut_seqInd.
 have Zdphi := seqInd_sub_aut_zchar nsHL conjC Lphi.
-rewrite -raddfB Dtau1 ?zcharD1_seqInd // Dade_isometry ?(zchar_on Zdphi) //. 
+rewrite -raddfB Dtau1 ?zcharD1_seqInd // Dade_isometry ?(zchar_on Zdphi) //.
 rewrite cfdotBr !cfdotBl cfdot_conjCl cfAutInd rmorph1 irrWnorm //.
 rewrite (seqInd_ortho_Ind1 _ _ Lphi) // conjC0 subrr add0r opprK.
 by rewrite cfdot_conjCl (seqInd_conjC_ortho _ _ _ Lphi) ?mFT_odd ?conjC0 ?subr0.
@@ -596,7 +596,7 @@ have /exists_inP[x /setD1P[ntx R0x] ntCPx]: [exists x in R0^#, 'C_P[x] != 1%g].
   by rewrite gen_subG; apply/bigcupsP=> x /(eqfun_inP regR0P)->.
 have{x ntx R0x ntCPx} sZR_R0: 'Z(R) \subset R0.
   have A0x: x \in 'A0(S).
-    have [z /setIP[Pz cyz] ntz] := trivgPn _ ntCPx. 
+    have [z /setIP[Pz cyz] ntz] := trivgPn _ ntCPx.
     apply/setUP; left; apply/bigcupP; exists z.
       by rewrite !inE ntz (subsetP (Fcore_sub_FTcore maxS)).
     by rewrite (eqP Stype2) 3!inE ntx cent1C (subsetP sUPU) ?(subsetP sR0U).
@@ -798,7 +798,7 @@ have nzT1_Ga zeta: zeta \in calT1 -> `|'[Gamma, tau1T zeta]| ^+ 2 >= 1.
   have A0betaT0: betaT0 \in 'CF(T, 'A0(T)).
     by rewrite (cfun_onS (FTsupp1_sub0 _)) // /'A1(T) ?FTcore_eq_der1.
   have ZbetaT0: betaT0 \in 'Z[irr T].
-    by rewrite rpredB ?char_vchar ?(seqInd_char T1zeta) ?prTIred_char.      
+    by rewrite rpredB ?char_vchar ?(seqInd_char T1zeta) ?prTIred_char.
   pose Delta := tauT betaT0 - 1 + tau1T zeta.
   have nz_i1: #1 != 0 := Iirr1_neq0 ntW2.
   rewrite -(canLR (addKr _) (erefl Delta)) opprB cfdotDr cfdotBr oGa1 add0r.

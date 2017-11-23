@@ -22,7 +22,7 @@ Axiom V : forall A {f : foo A} (x:A), P x -> P (id x).
 
 Lemma test1 (x : nat) : P x -> P (id x).
 Proof.
-move => px.
+move=> px.
 Timeout 2 Fail move/V: px.
 Timeout 2 move/V : (px) => _.
 move/(V nat) : px => H; exact H.

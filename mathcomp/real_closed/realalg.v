@@ -229,7 +229,7 @@ Lemma root_inv_algcreal (x : algcreal) (x_neq0 : (x != 0)%CR) :
 Proof.
 rewrite /div_algcreal; case: eq_algcreal_dec=> [/(_ x_neq0)|x_neq0'] //=.
 case: simplify_algcreal=> x' px'0_neq0 [x'_neq0 eq_xx'].
-apply: is_root_annul_creal;rewrite /= -(@eq_creal_inv _ _ _ x_neq0) //.
+apply: is_root_annul_creal; rewrite /= -(@eq_creal_inv _ _ _ x_neq0) //.
 by apply: eq_crealP; exists m0=> * /=; rewrite div1r subrr normr0.
 Qed.
 

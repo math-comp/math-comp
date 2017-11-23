@@ -196,7 +196,7 @@ Lemma vchar_isometry_base m L (Chi : m.-tuple 'CF(H))
       uniq mu
     & exists epsilon : bool, forall i : 'I_m,
       tau (Chi`_i - Chi`_0) = (-1) ^+ epsilon *: ('chi_(mu`_i) - 'chi_(mu`_0)).
-Proof. 
+Proof.
 case: m Chi => [|[|m]] // Chi _ irrChi Chifree Chi1 ChiCF [iso_tau Ztau].
 rewrite -(tnth_nth 0 _ 0); set chi := tnth Chi.
 have chiE i: chi i = Chi`_i by rewrite -tnth_nth.
@@ -272,7 +272,7 @@ rewrite (partition_big (conjg_Iirr t) xpredT) //=; apply: eq_bigr => i _.
 have [[y Gy chi_i] | not_i_t] := cfclassP _ _ _; last first.
   apply: big1 => z; rewrite groupV => /andP[Gz /eqP def_i].
   by case: not_i_t; exists z; rewrite // -def_i conjg_IirrE.
-rewrite  -(card_rcoset _ y) mulr_natl -sumr_const; apply: eq_big => z.
+rewrite -(card_rcoset _ y) mulr_natl -sumr_const; apply: eq_big => z.
   rewrite -(inj_eq irr_inj) conjg_IirrE chi_i mem_rcoset inE groupMr ?groupV //.
   apply: andb_id2l => Gz; rewrite eq_sym (cfConjg_eqE _ nsHG) //.
   by rewrite mem_rcoset inE groupM ?groupV.
@@ -315,7 +315,7 @@ Qed.
 (* Useful consequences of (1.5)(c) *)
 Lemma not_cfclass_Ind_ortho i j :
     H <| G -> ('chi_i \notin 'chi_j ^: G)%CF ->
-  '['Ind[G, H] 'chi_i, 'Ind[G, H] 'chi_j] = 0. 
+  '['Ind[G, H] 'chi_i, 'Ind[G, H] 'chi_j] = 0.
 Proof. by move/(cfclass_Ind_cases i j); rewrite cfclass_sym; case: ifP. Qed.
 
 Lemma cfclass_Ind_irrP i j :
@@ -363,7 +363,7 @@ Qed.
 (* This is Peterfalvi (1.5)(e). *)
 Lemma odd_induced_orthogonal t :
      H <| G -> odd #|G| -> t != 0 ->
-  '['Ind[G, H] 'chi_t, ('Ind[G] 'chi_t)^*] = 0. 
+  '['Ind[G, H] 'chi_t, ('Ind[G] 'chi_t)^*] = 0.
 Proof.
 move=> nsHG oddG nz_t; have [sHG _] := andP nsHG.
 have:= cfclass_Ind_cases t (conjC_Iirr t) nsHG.
@@ -582,7 +582,7 @@ have I1B: 'chi_i1 1%g ^+ 2 <= #|C : D|%:R.
   move/ler_trans; apply.
   rewrite ler_nat // -(index_quotient_eq CBsH) ?normal_norm //.
   rewrite -(@leq_pmul2l #|'Z('chi_i2)%CF|) ?cardG_gt0 ?cfcenter_sub //.
-  rewrite  Lagrange ?quotientS ?cfcenter_sub //.
+  rewrite Lagrange ?quotientS ?cfcenter_sub //.
   rewrite -(@leq_pmul2l #|(D / B)%g|) ?cardG_gt0 //.
   rewrite mulnA mulnAC Lagrange ?quotientS //.
   rewrite mulnC leq_pmul2l ?cardG_gt0 // subset_leq_card //.

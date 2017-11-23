@@ -10,8 +10,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Import Prenex Implicits.
 
-Local Open Scope nat_scope. 
-Local Open Scope ring_scope. 
+Local Open Scope nat_scope.
+Local Open Scope ring_scope.
 
 Section TestMx.
 

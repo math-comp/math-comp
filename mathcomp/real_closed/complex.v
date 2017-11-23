@@ -58,7 +58,7 @@ Section ComplexEqChoice.
 
 Variable R : Type.
 
-Definition sqR_of_complex (x : R[i]) := let: a +i* b := x in [::a;  b].
+Definition sqR_of_complex (x : R[i]) := let: a +i* b := x in [::a; b].
 Definition complex_of_sqR (x : seq R) :=
   if x is [:: a; b] then Some (a +i* b) else None.
 
@@ -462,7 +462,7 @@ by rewrite -mulrA ['i%C * _]sqr_i mulrN1 opprB.
 Qed.
 
 Lemma complex_real (a b : R) : a +i* b \is Num.real = (b == 0).
-Proof. 
+Proof.
 rewrite realE; simpc; rewrite [0 == _]eq_sym.
 by have [] := ltrgtP 0 a; rewrite ?(andbF, andbT, orbF, orbb).
 Qed.
@@ -557,7 +557,7 @@ have F3: 0 <= (sqrtr (a ^+ 2 + b ^+ 2) - a) / 2%:R.
 have F4: 0 <= (sqrtr (a ^+ 2 + b ^+ 2) + a) / 2%:R.
   rewrite mulr_ge0 // -{2}[a]opprK subr_ge0 (ler_trans _ F2) //.
   by rewrite -(maxrN a) ler_maxr lerr orbT.
-congr (_ +i* _);  set u := if _ then _ else _.
+congr (_ +i* _); set u := if _ then _ else _.
   rewrite mulrCA !mulrA.
   have->: (u * u) = 1.
     rewrite /u; case: (altP (_ =P _)); rewrite ?mul1r //.
@@ -573,7 +573,7 @@ rewrite [_^+2 + _]addrC addrK -mulrA -expr2 sqrtrM ?exprn_even_ge0 //.
 rewrite !sqrtr_sqr -mulr_natr.
 rewrite [`|_^-1|]ger0_norm // -mulrA [_ * _%:R]mulrC divff //.
 rewrite mulr1 /u; case: (_ =P _)=>[->|].
-  by rewrite  normr0 mulr0.
+  by rewrite normr0 mulr0.
 by rewrite mulr_sg_norm.
 Qed.
 
@@ -998,7 +998,7 @@ Qed.
 
 Lemma Lemma3 K d : Eigen1Vec K d -> forall r, CommonEigenVec K d r.+1.
 Proof.
-move=> E1V_K_d; elim => [|r IHr m V]; first exact/Eigen1VecP.
+move=> E1V_K_d; elim=> [|r IHr m V]; first exact/Eigen1VecP.
 move: (\rank V) {-2}V (leqnn (\rank V)) => n {V}.
 elim: n m => [|n IHn] m V.
   by rewrite leqn0 => /eqP ->; rewrite dvdn0.
@@ -1111,7 +1111,7 @@ have [] := @Lemma4 _ _ 1%:M _ [::L1; L2] (erefl _).
   case: n {x} (vec_mx x) => [//|n] x in HrV u v *.
   do ?[rewrite -(scalemxAl, scalemxAr, scalerN, scalerDr)
       |rewrite (mulmxN, mulNmx, trmxK, trmx_mul)
-      |rewrite  ?[(_ *: _)^T]linearZ ?[(_ + _)^T]linearD ?[(- _)^T]linearN /=].
+      |rewrite ?[(_ *: _)^T]linearZ ?[(_ + _)^T]linearD ?[(- _)^T]linearN /=].
   congr (_ *: _).
   rewrite !(mulmxDr, mulmxDl, mulNmx, mulmxN, mulmxA, opprD, opprK).
   do ![move: (_ *m _ *m _)] => t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12.

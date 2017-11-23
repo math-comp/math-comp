@@ -242,7 +242,7 @@ set part_c := forall U, _; have c_holds: part_c.
   have piCx_hyp: {in X^#, forall x', x' \in ('C_M[x])^# /\ \sigma(M)^'.-elt x'}.
     move=> x' /setD1P[ntx' Xx']; have Ex' := subsetP sXE x' Xx'.
     rewrite 3!inE ntx' (subsetP sEM) ?(mem_p_elt s'M_E) //=.
-    by rewrite (subsetP _ _ Xx') ?sub_cent1.   
+    by rewrite (subsetP _ _ Xx') ?sub_cent1.
   have piCx x' X1x' := (* GG -- ssreflect evar generalization fails in trunk *)
     let: conj c e := piCx_hyp x' X1x' in pi_of_cent_sigma maxM Ms1x c e.
   have t2X: \tau2(M).-group X.
@@ -250,7 +250,7 @@ set part_c := forall U, _; have c_holds: part_c.
     have X1x': x' \in X^# by rewrite !inE Xx' -order_gt1 ox' prime_gt1.
     have [[]|[]] := piCx _ X1x'; last by rewrite /p_elt ox' pnatE.
     case/idPn; have:= mem_p_elt (pgroupS sXU sk'U) Xx'.
-    by rewrite /p_elt ox' !pnatE // => /norP[]. 
+    by rewrite /p_elt ox' !pnatE // => /norP[].
   suffices cycX: cyclic X.
     split=> //; have [x' defX] := cyclicP cycX.
     have X1x': x' \in X^# by rewrite !inE -cycle_eq1 -cycle_subG -defX ntX /=.
@@ -292,7 +292,7 @@ have{cycZ cUU} [cycK cUU] := (cyclicS (joing_subl _ _) cycZ, cUU ntK).
 split=> // [_||/UtypeF[] //]; first split=> //.
   apply/eqP; rewrite eq_sym eqEcard -(leq_pmul2r (cardG_gt0 K)).
   have [nsMsU_M _ mulMsU _ _] := sdprod_context defM.
-  rewrite  (sdprod_card defM) (sdprod_card defM') der1_min ?normal_norm //=.
+  rewrite (sdprod_card defM) (sdprod_card defM') der1_min ?normal_norm //=.
   by rewrite -(isog_abelian (sdprod_isog defM)) cyclic_abelian.
 by apply: abelianS cUU; rewrite gen_subG -big_distrr subsetIl.
 Qed.
@@ -348,7 +348,7 @@ have ltM'M: M' \proper M by rewrite (sol_der1_proper solM) ?mmax_neq1.
 have sMsM': Ms \subset M' := Msigma_der1 maxM.
 have [-> | ltMF_Ms] := eqVproper sMF_Ms; first by rewrite eqxx Msigma_neq1.
 set KDpart := (X in _ /\ X); suffices KD_holds: KDpart.
-  do 2!split=> //;  have [K hallK] := Hall_exists \kappa(M) solM.
+  do 2!split=> //; have [K hallK] := Hall_exists \kappa(M) solM.
   pose q := #|'C_(M`_\sigma)(K)|; have [D hallD] := Hall_exists q^' solMs.
   have [_ [_ _ piMFq _] _ _ _] := KD_holds K D hallK (proper_neq ltMF_Ms) hallD.
   by rewrite -rank_gt0 (leq_trans _ (p_rank_le_rank q _)) ?p_rank_gt0.
@@ -467,7 +467,7 @@ have{K1 sK1M sK1K coMsK1 coQK1 prK1 defCMsK1 nQK1 solMs} Qi_rec Qi:
     rewrite -(setIidPr sLD_Ms) setIAC defCMsK1 quotientS1 //= -/Ks joingC.
     rewrite norm_joinEl // -(setIidPl sKsQ) -setIA -group_modr // tiQD mul1g.
     have [-> | ntLKs] := eqVneq (Ks :&: L) 1; first exact: sub1G.
-    by rewrite subIset ?(implyP regLK) // prime_meetG. 
+    by rewrite subIset ?(implyP regLK) // prime_meetG.
   apply: (prime_Frobenius_sol_kernel_nil defLK1b).
     by apply: solvableS (quotient_sol _ solM); rewrite join_subG !quotientS.
   by rewrite -(card_isog (quotient_isog _ _)) ?coprime_TIg // (coprimeSg sQiQ).
@@ -566,7 +566,7 @@ have{frobDKb regQbDb} [p_pr oQb cQbD']:
     transitivity ('C_Q[x] / Q0); last first.
       rewrite -(coprime_quotient_cent (subsetIl Q _) nQ0K coQK solQ) /= -/Q0.
       by rewrite -/Q -(setIidPl sQMs) -!setIA prMsK // !inE ntx.
-    rewrite -!cent_cycle -quotient_cycle //; rewrite -!cycle_subG in Kx nQ0x.  
+    rewrite -!cent_cycle -quotient_cycle //; rewrite -!cycle_subG in Kx nQ0x.
     by rewrite coprime_quotient_cent ?(coprimegS Kx).
   have:= Frobenius_primact frobDKb _ _ _ ntQb _ prQbK regQbDb.
   have [nQDK solDK] := (subset_trans sDKM nQM, solvableS sDKM solM).
@@ -577,7 +577,7 @@ have{cQbD'} sM''FM: M'' \subset 'F(M).
   have nQMs := subset_trans sMsM nQM.
   rewrite [M'']dergSn -/M' -defMs -(quotientSGK _ sQFM) ?comm_subG //.
   rewrite (quotient_der 1) //= -/Ms -mulQD quotientMidl -quotient_der //= -/Q.
-  by rewrite quotientS // -defFM subsetI sub_astabQ !comm_subG ?quotient_der. 
+  by rewrite quotientS // -defFM subsetI sub_astabQ !comm_subG ?quotient_der.
 have sQ0Ms := subset_trans sQ0Q sQMs.
 have ->: 'C_Ms(Ks / Q0 | 'Q) = 'F(M).
   have sFMcKsb: 'F(M) \subset 'C_Ms(Ks / Q0 | 'Q).
@@ -1048,7 +1048,7 @@ split=> // [E E1 E2 E3 complEi | {Y t2Y defF sM'F}].
   have E3_1: E3 :=: 1.
     have [sEM s'E _] := and3P hallE; have sE'M' := dergS 1 sEM.
     have sE3F: E3 \subset 'F(M) := subset_trans sE3E' (subset_trans sE'M' sM'F).
-    rewrite -(setIidPr sE3F) coprime_TIg // -(dprod_card defF) coprime_mull. 
+    rewrite -(setIidPr sE3F) coprime_TIg // -(dprod_card defF) coprime_mull.
     rewrite (pnat_coprime (pcore_pgroup _ _) (pgroupS sE3E s'E)).
     exact: p'nat_coprime (sub_pgroup (@tau3'2 _ M) t2Y) t3E3.
   have{defE} defE: E2 ><| E1 = E by rewrite -defE E3_1 sdprod1g.
@@ -1106,7 +1106,7 @@ have max_rB A: p.-abelem A -> B \subset A -> 'r_p(A) <= 2.
   have [x1 defX1]: exists x1, X1 :=: <[x1]>.
     by apply/cyclicP; rewrite prime_cyclic ?oX1.
   have Px1: x1 \in P by rewrite -cycle_subG -defX1.
-  have Px1a: x1 ^ a \in P. 
+  have Px1a: x1 ^ a \in P.
     by rewrite (subsetP sAaP) // memJ_conjg -cycle_subG -defX1.
   have [b nPb def_xb] := sigma_Hall_tame maxM sylP_Ms Px1 Px1a.
   exists (a * b^-1); rewrite !inE !actM !sub_conjgV defX1 /= -!cycleJ def_xb.
@@ -1268,7 +1268,7 @@ Theorem tau2_P2type_signalizer M Mstar U K r R H (q := #|K|) :
   [/\ prime q, \tau2(H) =i (q : nat_pred) & \tau2(M)^'.-group M].
 Proof.
 move: Mstar => L P2maxM complU maxCK_L sylR maxNR_H not_t2'H.
-have [[PmaxM notP1maxM] [hallU hallK _]] := (setDP P2maxM, complU). 
+have [[PmaxM notP1maxM] [hallU hallK _]] := (setDP P2maxM, complU).
 have q_pr: prime q by have [_ _ _ _ []] := Ptype_structure PmaxM hallK.
 have [[maxH _] [maxM _]] := (setIdP maxNR_H, setDP PmaxM).
 have [maxL sCKL] := setIdP maxCK_L; have hallLs := Msigma_Hall maxL.

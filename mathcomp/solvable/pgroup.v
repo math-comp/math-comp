@@ -192,7 +192,7 @@ Proof. by move=> pG; rewrite -p_part part_pnat_id. Qed.
 
 Lemma properG_ltn_log p G H :
   p.-group G -> H \proper G -> logn p #|H| < logn p #|G|.
-Proof. 
+Proof.
 move=> pG; rewrite properEneq eqEcard andbC ltnNge => /andP[sHG].
 rewrite sHG /= {1}(card_pgroup pG) {1}(card_pgroup (pgroupS sHG pG)).
 by apply: contra; case: p {pG} => [|p] leHG; rewrite ?logn0 // leq_pexp2l.
@@ -281,7 +281,7 @@ Lemma eq_in_pHall pi rho G H :
   {in \pi(G), pi =i rho} -> pi.-Hall(G) H = rho.-Hall(G) H.
 Proof.
 move=> eq_pi_rho; apply: andb_id2l => sHG.
-congr (_ && _); apply: eq_in_pnat => p piHp. 
+congr (_ && _); apply: eq_in_pnat => p piHp.
   by apply: eq_pi_rho; apply: (piSg sHG).
 by congr (~~ _); apply: eq_pi_rho; apply: (pi_of_dvd (dvdn_indexg G H)).
 Qed.
@@ -904,7 +904,7 @@ Proof.
 have [M maxM _]: {M | [max M | pi.-subgroup(G) M] & 1%G \subset M}.
   by apply: maxgroup_exists; rewrite /psubgroup sub1G pgroup1.
 have sOM: 'O_pi(G) \subset M by apply: bigcap_inf.
-have /andP[piM sMG] := maxgroupp maxM. 
+have /andP[piM sMG] := maxgroupp maxM.
 by rewrite /psubgroup (pgroupS sOM) // (subset_trans sOM).
 Qed.
 

@@ -32,7 +32,7 @@ Local Open Scope ring_scope.
 Local Notation sgr := Num.sg.
 
 Record rat : Set := Rat {
-  valq : (int * int) ;
+  valq : (int * int);
   _ : (0 < valq.2) && coprime `|valq.1| `|valq.2|
 }.
 
@@ -73,7 +73,7 @@ Lemma coprime_num_den x : coprime `|numq x| `|denq x|.
 Proof. by rewrite /numq /denq; case: x=> [[a b] /= /andP []]. Qed.
 
 Fact RatK x P : @Rat (numq x, denq x) P = x.
-Proof. by move:x P => [[a b] P'] P; apply: val_inj. Qed.
+Proof. by move: x P => [[a b] P'] P; apply: val_inj. Qed.
 
 Fact fracq_subproof : forall x : int * int,
   let n :=
@@ -100,8 +100,8 @@ Proof. by apply: val_inj; rewrite /= gcdn1 !divn1 abszE mulr_sign_norm. Qed.
 
 Fact valqK x : fracq (valq x) = x.
 Proof.
-move:x => [[n d] /= Pnd]; apply: val_inj=> /=.
-move: Pnd; rewrite /coprime /fracq /=; case/andP=> hd; move/eqP=> hnd.
+move: x => [[n d] /= Pnd]; apply: val_inj=> /=.
+move: Pnd; rewrite /coprime /fracq /= => -/andP[] hd -/eqP hnd.
 by rewrite ltr_gtF ?gtr_eqF //= hnd !divn1 mulz_sign_abs abszE gtr0_norm.
 Qed.
 
@@ -407,7 +407,7 @@ Proof. by rewrite -ratzE /ratz rat_eqE /numq /denq /= mulr0 eqxx andbT. Qed.
 (* fracq should never appear, its canonical form is _%:Q / _%:Q *)
 Lemma fracqE x : fracq x = x.1%:Q / x.2%:Q.
 Proof.
-move:x => [m n] /=.
+move: x => [m n] /=.
 case n0: (n == 0); first by rewrite (eqP n0) fracq0 rat0 invr0 mulr0.
 rewrite -[m%:Q]valqK -[n%:Q]valqK.
 rewrite [_^-1]invq_frac ?(denq_neq0, numq_eq0, n0, intq_eq0) //.
@@ -426,7 +426,7 @@ CoInductive divq_spec (n d : int) : int -> int -> rat -> Type :=
 Lemma divqP n d : divq_spec n d n d (n%:Q / d%:Q).
 Proof.
 set x := (n, d); rewrite -[n]/x.1 -[d]/x.2 -fracqE.
-by case: fracqP => [_|k fx k_neq0] /=; constructor. 
+by case: fracqP => [_|k fx k_neq0] /=; constructor.
 Qed.
 
 Lemma divq_eq (nx dx ny dy : rat) :
@@ -466,7 +466,8 @@ Qed.
 
 Lemma denqVz (i : int) : i != 0 -> denq (i%:~R^-1) = `|i|.
 Proof.
-by move=> h; rewrite -div1r -[1]/(1%:~R) coprimeq_den /= ?coprime1n // (negPf h).
+move=> h; rewrite -div1r -[1]/(1%:~R).
+by rewrite coprimeq_den /= ?coprime1n // (negPf h).
 Qed.
 
 Lemma numqE x : (numq x)%:~R = x * (denq x)%:~R.
@@ -657,7 +658,7 @@ Qed.
 
 Fact Qnat_semiring_closed : semiring_closed Qnat.
 Proof.
-do 2?split; move => // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
+do 2?split; move=> // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
   by rewrite rpredD // addr_ge0.
 by rewrite rpredM // mulr_ge0.
 Qed.

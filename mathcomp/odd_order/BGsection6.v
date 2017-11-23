@@ -31,7 +31,7 @@ Implicit Type p : nat.
 
 Section OneType.
 
-Variable gT : finGroupType. 
+Variable gT : finGroupType.
 Implicit Types G H K S U : {group gT}.
 
 (* This is B & G, Theorem A.4(b) and 6.1, or Gorenstein 6.5.2, the main Hall- *)
@@ -77,7 +77,7 @@ case/sdprodP=> _ defG nKH tiKH coKH solK sKG'.
 set K' := K^`(1); have [sK'K nK'K] := andP (der_normal 1 K : K' <| K).
 have nK'H: H \subset 'N(K') := gFnorm_trans _ nKH.
 set R := [~: K, H]; have sRK: R \subset K by rewrite commg_subl.
-have [nRK nRH] := joing_subP (commg_norm K H : K <*> H \subset 'N(R)). 
+have [nRK nRH] := joing_subP (commg_norm K H : K <*> H \subset 'N(R)).
 have sKbK'H': K / R \subset (K / R)^`(1) * (H / R)^`(1).
   have defGb: (K / R) \* (H / R) = G / R.
     by rewrite -defG quotientMl ?cprodE // centsC quotient_cents2r.
@@ -90,7 +90,7 @@ have{sKbK'H' tiKbHb'} derKb: (K / R)^`(1) = K / R.
 have{derKb} Kb1: K / R = 1.
   rewrite (contraNeq (sol_der1_proper _ (subxx (K / R)))) ?quotient_sol //.
   by rewrite derKb properxx.
-have{Kb1 sRK} defKH: [~: K, H] = K. 
+have{Kb1 sRK} defKH: [~: K, H] = K.
   by apply/eqP; rewrite eqEsubset sRK -quotient_sub1 ?Kb1 //=.
 split=> //; rewrite -quotient_sub1 ?subIset ?nK'K //= -/K'.
 have cKaKa: abelian (K / K') := der_abelian 0 K.
@@ -255,7 +255,7 @@ Qed.
 (* This is B & G, Lemma 6.6(d). *)
 Lemma plength1_Sylow_Jsub (Q : {group gT}) : 
     Q \subset G -> p.-group Q ->
-  exists2 x, x \in 'C_G(Q :&: S) & Q :^ x \subset S. 
+  exists2 x, x \in 'C_G(Q :&: S) & Q :^ x \subset S.
 Proof.
 move=> sQG pQ; have sQ_Gp'p: Q \subset 'O_{p^',p}(G).
   rewrite -sub_quotient_pre /= pcore_mod1 ?(subset_trans sQG) //.
@@ -278,7 +278,7 @@ End OneType.
 Theorem plength1_norm_pmaxElem gT p (G E L : {group gT}) :
     E \in 'E*_p(G) -> odd p -> solvable G -> p.-length_1 G ->
     L \subset G -> E \subset 'N(L) -> p^'.-group L -> 
-  L \subset 'O_p^'(G). 
+  L \subset 'O_p^'(G).
 Proof.
 move=> maxE p_odd solG pl1G sLG nEL p'L.
 case p_pr: (prime p); last first.

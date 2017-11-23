@@ -756,7 +756,7 @@ Lemma eqr_opp x y : (- x == - y) = (x == y).
 Proof. exact: can_eq opprK x y. Qed.
 
 Lemma eqr_oppLR x y : (- x == y) = (x == - y).
-Proof. exact: inv_eq opprK x y. Qed. 
+Proof. exact: inv_eq opprK x y. Qed.
 
 Lemma mulr0n x : x *+ 0 = 0. Proof. by []. Qed.
 Lemma mulr1n x : x *+ 1 = x. Proof. by []. Qed.
@@ -1234,7 +1234,7 @@ rewrite exprS {}IHn /= mulrDl !big_distrr /= big_ord_recl mulr1 subn0.
 rewrite !big_ord_recr /= !binn !subnn !mul1r !subn0 bin0 !exprS -addrA.
 congr (_ + _); rewrite addrA -big_split /=; congr (_ + _).
 apply: eq_bigr => i _; rewrite !mulrnAr !mulrA -exprS -subSn ?(valP i) //.
-by rewrite  subSS (commrX _ (commr_sym cxy)) -mulrA -exprS -mulrnDr.
+by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -exprS -mulrnDr.
 Qed.
 
 Lemma exprBn_comm x y n (cxy : comm x y) :
@@ -2612,7 +2612,7 @@ Section ClassDef.
 Variable R : ringType.
 
 Record class_of (T : Type) : Type := Class {
-  base : Lalgebra.class_of R T; 
+  base : Lalgebra.class_of R T;
   mixin : axiom (Lalgebra.Pack _ base T)
 }.
 Local Coercion base : class_of >-> Lalgebra.class_of.
@@ -2682,7 +2682,7 @@ Lemma mulr_algr a x : x * a%:A = a *: x.
 Proof. by rewrite -scalerAr mulr1. Qed.
 
 Lemma exprZn k x n : (k *: x) ^+ n = k ^+ n *: x ^+ n.
-Proof. 
+Proof.
 elim: n => [|n IHn]; first by rewrite !expr0 scale1r.
 by rewrite !exprS IHn -scalerA scalerAr scalerAl.
 Qed.
@@ -3124,7 +3124,7 @@ Section ClassDef.
 Variable R : ringType.
 
 Record class_of (T : Type) : Type := Class {
-  base : Algebra.class_of R T; 
+  base : Algebra.class_of R T;
   mixin : GRing.UnitRing.mixin_of (Ring.Pack base T)
 }.
 Definition base2 R m := UnitRing.Class (@mixin R m).
@@ -3627,7 +3627,7 @@ End LmodPred.
 
 Section UnitRingPred.
 
-Variable R : unitRingType. 
+Variable R : unitRingType.
 
 Section Div.
 
@@ -4247,7 +4247,7 @@ Proof. by move=> /= -> -> ->. Qed.
 
 Lemma eval_If e :
   let ev := qf_eval e in ev If = (if ev pred_f then ev then_f else ev else_f).
-Proof. by rewrite /=; case: ifP => _; rewrite ?orbF. Qed. 
+Proof. by rewrite /=; case: ifP => _; rewrite ?orbF. Qed.
 
 End If.
 
@@ -6011,7 +6011,7 @@ Section FinFunRing.
 Variable (aT : finType) (R : ringType) (a : aT).
 
 Definition ffun_one : {ffun aT -> R} := [ffun => 1].
-Definition ffun_mul (f g : {ffun aT -> R}) := [ffun x => f x * g x]. 
+Definition ffun_mul (f g : {ffun aT -> R}) := [ffun x => f x * g x].
 
 Fact ffun_mulA : associative ffun_mul.
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrA. Qed.

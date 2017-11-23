@@ -447,7 +447,7 @@ rewrite -{1}[x](addrNK z) -{1}[p.[x]](addrNK p.[z]).
 rewrite !addrA -![_ - _ + _ - _]addrA mulrDr ltr_add //.
   rewrite -ltr_pdivl_mulr ?subr_gt0 //.
   by rewrite ltr_minl hk1 ?gtr_eqF.
-rewrite  -ltr_pdivl_mulr ?subr_gt0 //.
+rewrite -ltr_pdivl_mulr ?subr_gt0 //.
 by rewrite ltr_minl hk2 ?orbT ?gtr_eqF.
 Qed.
 
@@ -1325,7 +1325,7 @@ have upx_eq0 : u.[x] * p.[x] == 0 by rewrite px0 mul_creal0.
 pose_big_enough i.
   have := (erefl ((1 : {poly F}).[x i])).
   rewrite -{1}hpq /= hornerD hornerC.
-  set upxi := (u * _).[_]; move=> hpqi.
+  set upxi := (u * _).[_] => - hpqi.
   apply: (@neq_crealP ((ubound v.[x])%CR^-1 / 2%:R) i i) => //.
     by rewrite pmulr_rgt0 ?gtr0E // ubound_gt0.
   rewrite /= subr0 ler_pdivr_mull ?ubound_gt0 //.

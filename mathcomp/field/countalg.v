@@ -957,7 +957,7 @@ pose incEp E i j :=
   let v := map_poly (EtoInc E i) (tagged E j) in
   if decode j is [:: i1; k] then
     if i1 == i then odflt v (unpickle k) else v
-  else v. 
+  else v.
 pose fix E_ i := if i is i1.+1 then MkExt _ (incEp (E_ i1) i1) else MkExt F \0.
 pose E i := tag (E_ i); pose Krep := {i : nat & E i}.
 pose fix toEadd i k : {rmorphism E i -> E (k + i)%N} :=

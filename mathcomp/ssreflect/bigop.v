@@ -403,7 +403,7 @@ Variable (T : Type) (zero one : T) (mul add : T -> T -> T) (inv : T -> T).
 Hypothesis mulC : commutative mul.
 
 Lemma mulC_id : left_id one mul -> right_id one mul.
-Proof. by move=>  mul1x x; rewrite mulC. Qed.
+Proof. by move=> mul1x x; rewrite mulC. Qed.
 
 Lemma mulC_zero : left_zero zero mul -> right_zero zero mul.
 Proof. by move=> mul0x x; rewrite mulC. Qed.
@@ -1596,7 +1596,7 @@ case: (pickP J) => [j0 _ | J0]; first exact: (big_distr_big_dep j0).
 rewrite {1 4}/index_enum -enumT; case: (enum I) (mem_enum I) => [I0 | i r _].
   have f0: I -> J by move=> i; have:= I0 i.
   rewrite (big_pred1 (finfun f0)) ?big_nil // => g.
-  by apply/familyP/eqP=> _; first apply/ffunP; move=> i; have:= I0 i.
+  by apply/familyP/eqP=> _; first apply/ffunP; move => i; have:= I0 i.
 have Q0 i': Q i' =1 pred0 by move=> j; have:= J0 j.
 rewrite big_cons /= big_pred0 // mul0m big_pred0 // => f.
 by apply/familyP=> /(_ i); rewrite [_ \in _]Q0.
@@ -1762,7 +1762,7 @@ Proof.
 apply: (iffP idP) => [dvFm i Pi | dvFm].
   by rewrite (bigD1 i) // dvdn_lcm in dvFm; case/andP: dvFm.
 by elim/big_ind: _ => // p q p_m; rewrite dvdn_lcm p_m.
-Qed. 
+Qed.
 
 Lemma biglcmn_sup (I : finType) i0 (P : pred I) F m :
   P i0 -> m %| F i0 -> m %| \big[lcmn/1%N]_(i | P i) F i.
@@ -1777,7 +1777,7 @@ Proof.
 apply: (iffP idP) => [dvmF i Pi | dvmF].
   by rewrite (bigD1 i) // dvdn_gcd in dvmF; case/andP: dvmF.
 by elim/big_ind: _ => // p q m_p; rewrite dvdn_gcd m_p.
-Qed. 
+Qed.
 
 Lemma biggcdn_inf (I : finType) i0 (P : pred I) F m :
   P i0 -> F i0 %| m -> \big[gcdn/0]_(i | P i) F i %| m.

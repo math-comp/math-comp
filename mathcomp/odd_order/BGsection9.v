@@ -372,14 +372,14 @@ have uNP0_mCA M: M \in 'M('C(A)) -> 'M('N(P0)) = [set M].
       have nVU := subset_trans sUDL (subset_trans sDL nV_LM).
       rewrite IHs ?(subset_trans sVU) // /stable_factor /normal sVU nVU !andbT.
       have nVP0 := subset_trans (subset_trans sP0_LM' (der_sub _ _)) nV_LM.
-      rewrite commGC -sub_astabQR // (subset_trans sP0_LM') //. 
+      rewrite commGC -sub_astabQR // (subset_trans sP0_LM') //.
       have /is_abelemP[q _ /andP[qUV _]]: is_abelem (U / V).
         exact: sol_chief_abelem solLM chUV.
       apply: rank2_der1_cent_chief qUV sUDL; rewrite ?mFT_odd //.
       exact: leq_trans (p_rank_le_rank _ _) DLle2.
     rewrite centsC (subset_trans cDL_P0) ?centS ?setIS //.
     by rewrite (subset_trans _ sCxL) // -cent_set1 centS ?sub1set.
-  case: (ltnP 2 'r(F)) => [| Fle2]. 
+  case: (ltnP 2 'r(F)) => [| Fle2].
     have [q q_pr -> /= Fq3] := rank_witness [group of F].
     have Mq3: 'r('O_q(M)) >= 3.
       rewrite (rank_pgroup (pcore_pgroup _ _)) /= -p_core_Fitting.

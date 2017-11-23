@@ -114,7 +114,7 @@ Lemma centrals_nil (s : seq {group gT}) G :
   G.-central.-series 1%G s -> last 1%G s = G -> nilpotent G.
 Proof.
 move=> cGs defG; apply/forall_inP=> H /subsetIP[sHG sHR].
-move: sHG; rewrite -{}defG -subG1 -[1]/(gval 1%G). 
+move: sHG; rewrite -{}defG -subG1 -[1]/(gval 1%G).
 elim: s 1%G cGs => //= L s IHs K /andP[/and3P[sRK sKL sLG] /IHs sHL] sHs.
 exact: subset_trans sHR (subset_trans (commSg _ (sHL sHs)) sRK).
 Qed.
@@ -490,7 +490,7 @@ Qed.
 Lemma ucn_id n G : 'Z_n('Z_n(G)) = 'Z_n(G).
 Proof. exact: gFid. Qed.
 
-Lemma ucn_nilpotent n G : nilpotent 'Z_n(G). 
+Lemma ucn_nilpotent n G : nilpotent 'Z_n(G).
 Proof. by apply/ucnP; exists n; rewrite ucn_id. Qed.
 
 Lemma nil_class_ucn n G : nil_class 'Z_n(G) <= n.
@@ -677,7 +677,7 @@ Lemma solvable1 : solvable [1 gT]. Proof. exact: abelian_sol (abelian1 gT). Qed.
 
 Lemma solvableS G H : H \subset G -> solvable G -> solvable H.
 Proof.
-move=> sHG solG;  apply/forall_inP=> K /subsetIP[sKH sKK'].
+move=> sHG solG; apply/forall_inP=> K /subsetIP[sKH sKK'].
 by rewrite (forall_inP solG) // subsetI (subset_trans sKH).
 Qed.
 
@@ -685,7 +685,7 @@ Lemma sol_der1_proper G H :
   solvable G -> H \subset G -> H :!=: 1 -> H^`(1) \proper H.
 Proof.
 move=> solG sHG ntH; rewrite properE comm_subG //; apply: implyP ntH.
-by have:= forallP solG H; rewrite subsetI sHG implybNN. 
+by have:= forallP solG H; rewrite subsetI sHG implybNN.
 Qed.
 
 Lemma derivedP G : reflect (exists n, G^`(n) = 1) (solvable G).

@@ -127,7 +127,7 @@ Qed.
 Lemma Grp_pX1p2 :
   p^{1+2} \isog Grp (x : y : (x ^+ p, y ^+ p, [~ x, y, x], [~ x, y, y])).
 Proof.
-rewrite [@gtype _]unlock ; apply: intro_isoGrp => [|rT H].
+rewrite [@gtype _]unlock; apply: intro_isoGrp => [|rT H].
   apply/existsP; pose x := sdpair1 actp (0, 1)%R; pose y := sdpair2 actp 1%R.
   exists (x, y); rewrite /= !xpair_eqE; set z := [~ x, y]; set G := _ <*> _.
   have def_z: z = sdpair1 actp (1, 0)%R.
@@ -463,7 +463,7 @@ have ox: #[x] = p.
 have defCy: 'C_G(Y) = Z * <[x]>.
   apply/eqP; rewrite eq_sym eqEcard mulG_subG setIS ?centS //=.
   rewrite cycle_subG inE Gx cYx oCY TI_cardMg ?oZ -?orderE ?ox //=.
-  by rewrite setIC prime_TIg -?orderE ?ox ?cycle_subG. 
+  by rewrite setIC prime_TIg -?orderE ?ox ?cycle_subG.
 have abelYt: p.-abelem (Y / Z).
   by rewrite (abelemS (quotientS _ sYG)) //= -/Z -defPhiG Phi_quotient_abelem.
 have Yxt: coset Z x \in Y / Z by rewrite mem_quotient.

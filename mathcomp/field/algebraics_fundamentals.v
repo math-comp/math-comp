@@ -561,7 +561,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have [m [le_vm le_wm _]] := maxn3 (n_ v) (n_ w) 0%N; rewrite !(posE m) //.
     by rewrite /nlim limN -ltr_normr (ltr_trans e_gt0) ?v_gte ?ab_le.
   have posD v w: lt 0 v -> lt 0 w -> lt 0 (v + w).
-    move=>  /posP[m [d d_gt0 v_gtd]] /posP[n [e e_gt0 w_gte]].
+    move=> /posP[m [d d_gt0 v_gtd]] /posP[n [e e_gt0 w_gte]].
     apply/posP; exists (maxn m n), (d + e) => [|k]; first exact: addr_gt0.
     rewrite geq_max => /andP[le_mk le_nk]; rewrite /nlim /lim.
     have ->: q_ (v + w) = q_ v + q_ w.

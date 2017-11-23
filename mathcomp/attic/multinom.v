@@ -107,7 +107,7 @@ Definition multi_var n (i : 'I_n) := cast_multi (subnK (valP i)) 'X.
 Notation "'X_ i" := (multi_var i).
 
 Lemma inject_is_rmorphism : forall m n, rmorphism (@inject n m).
-Proof. 
+Proof.
 elim=> // m ihm n /=; have ->: inject m = RMorphism (ihm n) by [].
 by rewrite -/(_ \o _); apply: rmorphismP.
 Qed.
@@ -132,14 +132,14 @@ Lemma cast_multi_inj n i i' n' (m1 m2 : multi n)
   cast_multi p1 m1 == cast_multi p2 m2 = (m1 == m2).
 Proof.
 have := p2; rewrite -{1}[n']p1; move/eqP; rewrite eqn_add2r.
-move=> /eqP /= Eii; move:p2; rewrite Eii=> p2 {Eii}.
+move=> /eqP /= Eii; move: p2; rewrite Eii=> p2 {Eii}.
 have <-: p1 = p2; first exact: nat_irrelevance.
 apply/idP/idP; last by move/eqP->.
-move => Hm {p2}.
+move=> Hm {p2}.
 have : inject i m1 = inject i m2; last first.
    by move/eqP; rewrite (inj_eq (@inject_inj _ _)).
-move: Hm; move:(p1); rewrite -p1 => p2. 
-rewrite (_ : p2 = erefl (i+n)%N); last exact: nat_irrelevance. 
+move: Hm; move: (p1); rewrite -p1 => p2.
+rewrite (_ : p2 = erefl (i+n)%N); last exact: nat_irrelevance.
 by move/eqP.
 Qed.
 
@@ -195,8 +195,8 @@ Lemma interp_cast_multi n n' m (nltn' : n <= n') :
 Proof.
 move=> dmltn; have dmltn' := (leq_trans dmltn nltn').
 elim: m nltn' dmltn dmltn'.
-+ move=> a /= nltn' dmltn dmltn'. 
-  apply/eqP; rewrite /multiC. 
++ move=> a /= nltn' dmltn dmltn'.
+  apply/eqP; rewrite /multiC.
   by rewrite cast_multi_add /= cast_multi_inj.
 +  move=> N /= nltn' dmltn dmltn'.
   move: (refl_equal (_ N < n')) (refl_equal (_ N < n)).

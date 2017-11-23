@@ -140,13 +140,13 @@ Canonical fmod_morphism := Morphism fmodM.
 Lemma fmodX n : {in A, {morph fmod : x / (x ^+ n)%g >-> x *+ n}}.
 Proof. exact: morphX. Qed.
 Lemma fmodV : {morph fmod : x / x^-1%g >-> - x}.
-Proof. 
+Proof.
 move=> x; apply: val_inj; rewrite fmvalN !fmodKcond groupV.
 by case: (x \in A); rewrite ?invg1.
 Qed.
 
 Lemma injm_fmod : 'injm fmod.
-Proof. 
+Proof.
 by apply/injmP=> x y Ax Ay []; move/val_inj; apply: (injmP (injm_subg A)).
 Qed.
 
@@ -212,13 +212,13 @@ Proof.
 by move=> x y Nx Ny /= u; apply: val_inj; rewrite !fmvalJ ?conjgM ?groupM.
 Qed.
 
-Lemma actrK x : cancel (actr^~ x) (actr^~ x^-1%g). 
+Lemma actrK x : cancel (actr^~ x) (actr^~ x^-1%g).
 Proof.
 move=> u; apply: val_inj; rewrite !fmvalJcond groupV.
 by case: ifP => -> //; rewrite conjgK.
 Qed.
 
-Lemma actrKV x : cancel (actr^~ x^-1%g) (actr^~ x). 
+Lemma actrKV x : cancel (actr^~ x^-1%g) (actr^~ x).
 Proof. by move=> u; rewrite /= -{2}(invgK x) actrK. Qed.
 
 End OneFinMod.
@@ -330,7 +330,7 @@ have{cocycle_nu} fM: {in G &, {morph f : x y / x * y}}.
   move=> x y Gx Gy; rewrite /f ?rHmul // -3!mulgA; congr (_ * _).
   rewrite (mulgA _ (rH y)) (conjgC _ (rH y)) -mulgA; congr (_ * _).
   rewrite -fmvalJ ?actrH ?nHG ?GrH // -!fmvalA actZr -mulrnDl.
-  rewrite  -(addrC (nu y)) cocycle_nu // mulrnDl !fmvalA; congr (_ * _).
+  rewrite -(addrC (nu y)) cocycle_nu // mulrnDl !fmvalA; congr (_ * _).
   by rewrite !fmvalZ expgK ?fmodP.
 exists (Morphism fM @* G)%G; apply/complP; split.
   apply/trivgP/subsetP=> x /setIP[Hx /morphimP[y _ Gy eq_x]].
@@ -479,7 +479,7 @@ Lemma mulg_exp_card_rcosets x : x * (g ^+ n_ x) \in H :* x.
 Proof.
 rewrite /n_ /indexg -orbitRs -pcycle_actperm ?inE //.
 rewrite -{2}(iter_pcycle (actperm 'Rs g) (H :* x)) -permX -morphX ?inE //.
-by rewrite actpermE //= rcosetE -rcosetM rcoset_refl. 
+by rewrite actpermE //= rcosetE -rcosetM rcoset_refl.
 Qed.
 
 Let HGg : {set {set {set gT}}} := orbit 'Rs <[g]> @: HG.
@@ -545,9 +545,9 @@ have pcyc_eq x: pcyc x =i traj x by apply: pcycle_traject.
 have uniq_traj x: uniq (traj x) by apply: uniq_traject_pcycle.
 have n_eq x: n_ x = #|pcyc x| by rewrite -Hgr_eq.
 have size_traj x: size (traj x) = n_ x by rewrite n_eq size_traject.
-have nth_traj x j: j < n_ x -> nth (H :* x) (traj x) j = H :* (x * g ^+ j). 
+have nth_traj x j: j < n_ x -> nth (H :* x) (traj x) j = H :* (x * g ^+ j).
   move=> lt_j_x; rewrite nth_traject -?n_eq //.
-  by rewrite  -permX -morphX ?inE // actpermE //= rcosetE rcosetM.
+  by rewrite -permX -morphX ?inE // actpermE //= rcosetE rcosetM.
 have sYG: Y \subset G.
   apply/bigcupsP=> x Xx; apply/subsetP=> _ /imsetP[i _ ->].
   by rewrite groupM ?groupX // sXG.
@@ -586,7 +586,7 @@ rewrite /traj -n_eq; case def_n: (n_ x) (n_gt0) => // [n] _.
 rewrite conjgE invgK -{1}[H :* x]rcoset1 -{1}(expg0 g).
 elim: {1 3}n 0%N (addn0 n) => [|m IHm] i def_i /=.
   rewrite big_seq1 {i}[i]def_i rYE // ?def_n //.
-  rewrite  -(mulgA _ _ g) -rcosetM -expgSr -[(H :* x) :* _]rcosetE. 
+  rewrite -(mulgA _ _ g) -rcosetM -expgSr -[(H :* x) :* _]rcosetE.
   rewrite -actpermE morphX ?inE // permX // -{2}def_n n_eq iter_pcycle mulgA.
   by rewrite -[H :* x]rcoset1 (rYE _ 0%N) ?mulg1.
 rewrite big_cons rYE //; last by rewrite def_n -def_i ltnS leq_addl.
