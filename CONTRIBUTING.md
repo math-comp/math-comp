@@ -8,6 +8,13 @@ integrated to the library.
 This file is not comprehensive yet and might still contain mistakes or
 unclear indications, please consider contributing.
 
+We provide partial linters to enforce, or highlight some of these
+rules. We provide two different linters. One written with awk
+(`etc/utils/linter.awk`) that performs some checks and the other
+written in Qed (`etc/utils/linter.sed`) that performs some
+transformations. Use the latter **AFTER** a commit, otherwise it might
+mess up your code.
+
 ## Proof style.
 ### General guidelines
 - **A line should have no more than 80 characters**. If a line is
