@@ -14,7 +14,7 @@ Import ssreflect.
 
 Goal (forall a b, a + b = b + a).
 intros.
-rewrite 2![_ + _]plus_comm. 
+rewrite 2![_ + _]plus_comm.
 split.
 Abort.
 End Foo.

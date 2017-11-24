@@ -71,13 +71,13 @@ apply: (iffP idP) => [sep_p | [sq'p nz_der1p]].
   split=> [u v | u u_dv_p]; last first.
     apply: contraTneq => u'0; rewrite -leqNgt -(eqnP sep_p).
     rewrite dvdp_leq -?size_poly_eq0 ?(eqnP sep_p) // dvdp_gcd u_dv_p.
-    have /dvdp_scaler <-: lead_coef u ^+ scalp p u != 0 by rewrite lcn_neq0. 
+    have /dvdp_scaler <-: lead_coef u ^+ scalp p u != 0 by rewrite lcn_neq0.
     by rewrite -derivZ -Pdiv.Idomain.divpK //= derivM u'0 mulr0 addr0 dvdp_mull.
   rewrite Pdiv.Idomain.dvdp_eq mulrCA mulrA; set c := _ ^+ _ => /eqP Dcp.
   have nz_c: c != 0 by rewrite lcn_neq0.
   move: sep_p; rewrite coprimep_sym -[separable _](coprimep_scalel _ _ nz_c).
   rewrite -(coprimep_scaler _ _ nz_c) -derivZ Dcp derivM coprimep_mull.
-  by rewrite coprimep_addl_mul !coprimep_mulr -andbA => /and4P[]. 
+  by rewrite coprimep_addl_mul !coprimep_mulr -andbA => /and4P[].
 rewrite /separable coprimep_def eqn_leq size_poly_gt0; set g := gcdp _ _.
 have nz_g: g != 0.
   rewrite -dvd0p dvdp_gcd -(mulr0 0); apply/nandP; left.
@@ -217,7 +217,7 @@ pose kappa' := inj_subfx iota z r1.
 have /eq_map_poly Diota: kappa \o kappa' =1 iota.
   by move=> w; rewrite /kappa /= subfx_inj_eval // map_polyC hornerC.
 suffices [y3]: exists y3, y = kappa y3.
-  have [q3 ->] := subfxE y3; rewrite /kappa subfx_inj_eval // => Dy.  
+  have [q3 ->] := subfxE y3; rewrite /kappa subfx_inj_eval // => Dy.
   split; [exists (t *: q3 - 'X) | by exists q3].
   by rewrite rmorphB linearZ /= map_polyX !hornerE -Dy opprB addrC addrNK.
 pose p0 := p ^ iota \Po (iota t *: 'X - z%:P).
@@ -244,7 +244,7 @@ have{p0} [p3 ->]: exists p3, p0 = p3 ^ kappa.
 rewrite -Diota map_poly_comp -gcdp_map /= -/kappa.
 move: (gcdp _ _) => r3 /eqpf_eq[c nz_c Dr3].
 exists (- (r3`_0 / r3`_1)); rewrite [kappa _]rmorphN fmorph_div -!coef_map Dr3.
-by rewrite !coefZ polyseqXsubC mulr1 mulrC mulKf ?opprK. 
+by rewrite !coefZ polyseqXsubC mulr1 mulrC mulKf ?opprK.
 Qed.
 
 Lemma char0_PET (q : {poly F}) :
@@ -534,7 +534,7 @@ have Dder: Derivation <<K; x>> D.
   apply/allP=> u /vbasis_mem Kx_u; apply/allP=> v /vbasis_mem Kx_v.
   rewrite !lfunE /= -{-2}(Fadjoin_poly_eq Kx_u) -{-3}(Fadjoin_poly_eq Kx_v).
   rewrite -!hornerM -hornerD -derivM.
-  rewrite Fadjoin_poly_mod ?rpredM ?Fadjoin_polyOver //. 
+  rewrite Fadjoin_poly_mod ?rpredM ?Fadjoin_polyOver //.
   rewrite {2}(divp_eq (_ * _) (minPoly K x)) derivD derivM pKx'_0 mulr0 addr0.
   by rewrite hornerD hornerM minPolyxx mulr0 add0r.
 have{Dder DK_0}: x \in lker D by apply: subvP Kx_x; apply: derKx_0.
@@ -608,7 +608,7 @@ Lemma charf_p_separable K x e p :
   p \in [char L] -> separable_element K x = (x \in <<K; x ^+ (p ^ e.+1)>>%VS).
 Proof.
 move=> charLp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
-  set m := p ^ _;set f := Fadjoin_poly K _ x => Dx; apply/separable_elementP.
+  set m := p ^ _; set f := Fadjoin_poly K _ x => Dx; apply/separable_elementP.
   have mL0: m%:R = 0 :> L by apply/eqP; rewrite -(dvdn_charf charLp) dvdn_exp.
   exists ('X - (f \Po 'X^m)); split.
   - by rewrite rpredB ?polyOver_comp ?rpredX ?polyOverX ?Fadjoin_polyOver.
@@ -672,7 +672,7 @@ Lemma separable_inseparable_element K x :
 Proof.
 rewrite /purely_inseparable_element; case: ex_minnP => [[|m]] //=.
 rewrite subfield_closed; case: m => /= [-> //| m _ /(_ 1%N)/implyP/= insepKx].
-by rewrite (negPf insepKx) (contraNF (@base_separable K x) insepKx). 
+by rewrite (negPf insepKx) (contraNF (@base_separable K x) insepKx).
 Qed.
 
 Lemma base_inseparable K x : x \in K -> purely_inseparable_element K x.

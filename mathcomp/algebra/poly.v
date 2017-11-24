@@ -564,7 +564,7 @@ pose dp := (size p).-1; pose dq := (size q).-1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite lead_coef0 !mul0r coef0.
 have [-> | nz_q] := eqVneq q 0; first by rewrite lead_coef0 !mulr0 coef0.
 have ->: (size p + size q).-2 = (dp + dq)%N.
-  by do 2! rewrite polySpred // addSn addnC.
+  by do 2!rewrite polySpred // addSn addnC.
 have lt_p_pq: dp < (dp + dq).+1 by rewrite ltnS leq_addr.
 rewrite coefM (bigD1 (Ordinal lt_p_pq)) ?big1 ?simp ?addKn //= => i.
 rewrite -val_eqE neq_ltn /= => /orP[lt_i_p | gt_i_p]; last first.
@@ -1271,7 +1271,7 @@ End OnePrimitive.
 Lemma prim_root_exp_coprime n z k :
   n.-primitive_root z -> n.-primitive_root (z ^+ k) = coprime k n.
 Proof.
-move=> prim_z;have n_gt0 := prim_order_gt0 prim_z.
+move=> prim_z; have n_gt0 := prim_order_gt0 prim_z.
 apply/idP/idP=> [prim_zk | co_k_n].
   set d := gcdn k n; have dv_d_n: (d %| n)%N := dvdn_gcdr _ _.
   rewrite /coprime -/d -(eqn_pmul2r n_gt0) mul1n -{2}(gcdnMl n d).

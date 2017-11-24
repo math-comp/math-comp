@@ -68,7 +68,7 @@ have piCA: pi.-group('C(A)).
   have Mx := subsetP sCAM x cAx; pose C := 'C_F(<[x]>).
   have sAC: A \subset C by rewrite subsetI sAF centsC cycle_subG.
   have sCFC_C: 'C_F(C) \subset C.
-    by rewrite (subset_trans _ sAC) ?setIS // centS ?(subset_trans _ sAC). 
+    by rewrite (subset_trans _ sAC) ?setIS // centS ?(subset_trans _ sAC).
   have cFx: x \in 'C_M(F).
     rewrite inE Mx -cycle_subG coprime_nil_faithful_cent_stab //=.
       by rewrite cycle_subG (subsetP (gFnorm _ _)).
@@ -339,7 +339,7 @@ have prH: H \proper G by rewrite inE in maxH; apply: maxgroupp maxH.
 have sAHM: A \subset H :&: M by rewrite subsetI sAH.
 have [R sylR_HM sAR]:= Sylow_superset sAHM (pgroupS sAP pP).
 have [/subsetIP[sRH sRM] pR _] := and3P sylR_HM.
-have{sylR_HM} sylR_H: p.-Sylow(H) R. 
+have{sylR_HM} sylR_H: p.-Sylow(H) R.
   have [Q sylQ] := Sylow_superset sRM pR; have [sQM pQ _] := and3P sylQ.
   case/eqVproper=> [defR | /(nilpotent_proper_norm (pgroup_nil pQ)) sRN].
     apply: (pHall_subl sRH (subsetT _)); rewrite pHallE subsetT /=.

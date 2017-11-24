@@ -247,7 +247,7 @@ Lemma dprod_rowg  m1 m2 (A : 'M[F]_(m1, n)) (B : 'M[F]_(m2, n)) :
 Proof.
 rewrite (sameP mxdirect_addsP eqP) -trivg_rowg rowgI => /eqP tiAB.
 by rewrite -cprod_rowg dprodEcp.
-Qed. 
+Qed.
 
 Lemma bigcprod_rowg m I r (P : pred I) (A : I -> 'M[F]_n) (B : 'M[F]_(m, n)) :
     (\sum_(i <- r | P i) A i :=: B)%MS ->
@@ -356,7 +356,7 @@ move=> m_gt0 n_gt0 q_gt1; apply/eqP; rewrite eqn_dvd; apply/andP; split.
   apply/exponentP=> x _; apply/matrixP=> i j; rewrite mulmxnE !mxE.
   by rewrite -mulr_natr -Zp_nat_mod // modnn mulr0.
 pose cmx1 := const_mx 1%R : 'M['Z_q]_(m, n).
-apply: dvdn_trans (dvdn_exponent (in_setT cmx1)). 
+apply: dvdn_trans (dvdn_exponent (in_setT cmx1)).
 have/matrixP/(_ (Ordinal m_gt0))/(_ (Ordinal n_gt0))/eqP := expg_order cmx1.
 by rewrite mulmxnE !mxE -order_dvdn order_Zp1 Zp_cast.
 Qed.
@@ -374,7 +374,7 @@ have ->: (q ^ (m * n))%N = #|G| by rewrite cardsT card_matrix card_ord Zp_cast.
 rewrite max_card_abelian //= -grank_abelian //= -/G.
 pose B : {set 'M['Z_q]_(m, n)} := [set delta_mx ij.1 ij.2 | ij : 'I_m * 'I_n].
 suffices ->: G = <<B>>.
-  have ->: (m * n)%N = #|{: 'I_m * 'I_n}| by rewrite card_prod !card_ord. 
+  have ->: (m * n)%N = #|{: 'I_m * 'I_n}| by rewrite card_prod !card_ord.
   exact: leq_trans (grank_min _) (leq_imset_card _ _).
 apply/setP=> v; rewrite inE (matrix_sum_delta v).
 rewrite group_prod // => i _; rewrite group_prod // => j _.
@@ -770,7 +770,7 @@ move: {2}_.+1 (ltnSn (n + #|H|)) {rG G sHG}(subg_repr _ _) => m.
 elim: m gT H pH => // m IHm gT' G pG in n n_gt0 *; rewrite ltnS => le_nG_m rG.
 apply/eqP=> Gregular; have irrG: mx_irreducible rG.
   apply/mx_irrP; split=> // U modU; rewrite -mxrank_eq0 -lt0n => Unz.
-  rewrite /row_full eqn_leq rank_leq_col leqNgt; apply/negP=> ltUn. 
+  rewrite /row_full eqn_leq rank_leq_col leqNgt; apply/negP=> ltUn.
   have: rfix_mx (submod_repr modU) G != 0.
     by apply: IHm => //; apply: leq_trans le_nG_m; rewrite ltn_add2r.
   by rewrite -mxrank_eq0 (rfix_submod modU) // Gregular capmx0 linear0 mxrank0.
@@ -857,7 +857,7 @@ Theorem extraspecial_repr_structure (sS : irrType F S) :
               exists2 w, primitive_root_of_unity p w
                        & forall i, phi i z = (w ^+ i.+1)%:M
           & forall i, irr_degree (iphi i) = (p ^ n)%N]
-    & #|sS| = (p ^ n.*2 + p.-1)%N].            
+    & #|sS| = (p ^ n.*2 + p.-1)%N].
 Proof.
 have [[defPhiS defS'] prZ] := esS; set linS := linear_irr sS.
 have nb_lin: #|linS| = (p ^ n.*2)%N.
@@ -916,7 +916,7 @@ have phi_ze e: phi (z ^+ e)%g = (w ^+ e)%:M.
   by rewrite /phi irr_center_scalar ?groupX ?irr_modeX.
 have wp1: w ^+ p = 1 by rewrite -irr_modeX // -ozp expg_order irr_mode1.
 have injw: {in 'Z(S) &, injective (irr_mode i0)}.
-  move=> x y Zx Zy /= eq_xy; have [[Sx _] [Sy _]] := (setIP Zx, setIP Zy). 
+  move=> x y Zx Zy /= eq_xy; have [[Sx _] [Sy _]] := (setIP Zx, setIP Zy).
   apply: mx_faithful_inj (fful_nlin _ nlin_i0) _ _ Sx Sy _.
   by rewrite !{1}irr_center_scalar ?eq_xy; first by split.
 have prim_w e: 0 < e < p -> p.-primitive_root (w ^+ e).

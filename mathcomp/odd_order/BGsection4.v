@@ -47,7 +47,7 @@ Proposition exponent_odd_nil23 gT (R : {group gT}) p :
 Proof.
 move=> pR oddR classR.
 pose f n := 'C(n, 3); pose g n := 'C(n, 3).*2 + 'C(n, 2).
-have fS n: f n.+1 = 'C(n, 2) + f n by rewrite /f binS addnC. 
+have fS n: f n.+1 = 'C(n, 2) + f n by rewrite /f binS addnC.
 have gS n: g n.+1 = 'C(n, 2).*2 + 'C(n, 1) + g n.
   by rewrite /g !binS doubleD -!addnA; do 3!nat_congr.
 have [-> | ntR] := eqsVneq R 1.
@@ -64,7 +64,7 @@ have exp_dv_p x m (S : {group gT}):
 - move=> expSp p_dv_m Sx; apply/eqP; rewrite -order_dvdn.
   by apply: dvdn_trans (dvdn_trans expSp p_dv_m); apply: dvdn_exponent.
 have p3_L21: p <= 3 -> {in R & &, forall u v w, [~ u, v, w] = 1}.
-  move=> lep3 u v w Ru Rv Rw; rewrite (ltnNge 3) lep3 nil_class2 in classR. 
+  move=> lep3 u v w Ru Rv Rw; rewrite (ltnNge 3) lep3 nil_class2 in classR.
   by apply/eqP/commgP; red; rewrite (centerC Rw) // (subsetP classR) ?mem_commg.
 have{fS gS} expMR_fg: {in R &, forall u v n (r := [~ v, u]),
   (u * v) ^+ n = u ^+ n * v ^+ n * r ^+ 'C(n, 2)
@@ -79,7 +79,7 @@ have{fS gS} expMR_fg: {in R &, forall u v n (r := [~ v, u]),
   rewrite -commuteM; try by apply: commuteX; red; rewrite cRr ?groupM.
   rewrite -mulgA; do 2!rewrite (mulgA _ u) (commgC _ u) -2!mulgA.
   congr (_ * (_ * _)); rewrite (mulgA _ v).
-  have ->: [~ v ^+ n, u] = r ^+ n * [~ r, v] ^+ 'C(n, 2). 
+  have ->: [~ v ^+ n, u] = r ^+ n * [~ r, v] ^+ 'C(n, 2).
     elim: n => [|n IHn]; first by rewrite comm1g mulg1.
     rewrite !expgS commMgR -/r {}IHn commgX; last exact: cRr.
     rewrite binS bin1 addnC expgD -2!mulgA; congr (_ * _); rewrite 2!mulgA.
@@ -168,7 +168,7 @@ have [[x y] genR modR] := generators_modular_group p_pr e_gt1 isoR.
 have [_ _ _ _] := modular_group_structure p_pr e_gt1 genR isoR modR.
 rewrite xpair_eqE p2; case/(_ 1%N) => // _ oR1.
 by rewrite 2!inE Ohm_sub oR1 pfactorK ?abelem_Ohm1 ?(card_p2group_abelian p_pr).
-Qed.  
+Qed.
 
 Section OddNonCyclic.
 
@@ -197,7 +197,7 @@ Qed.
 
 (* This is B & G, Lemma 4.5(c). *)
 Lemma Ohm1_odd_ucn2 (Z := 'Ohm_1('Z_2(R))) : ~~ cyclic Z /\ exponent Z %| p.
-Proof. 
+Proof.
 have [S nsSR Ep2S] := ex_odd_normal_p2Elem; have p_pr := pnElem_prime Ep2S.
 have [sSR abelS dimS] := pnElemP Ep2S; have [pS cSS expSp]:= and3P abelS.
 pose SR := [~: S, R]; pose SRR := [~: SR, R].
@@ -209,7 +209,7 @@ have sSR_R := subset_trans sSR_S sSR.
 have{ntS} prSR: SR \proper S.
   by rewrite (nil_comm_properl nilR) // subsetI subxx -commg_subl.
 have SRR1: SRR = 1.
-  have [SR1 | ntSR] := eqVneq SR 1; first by rewrite /SRR SR1 comm1G. 
+  have [SR1 | ntSR] := eqVneq SR 1; first by rewrite /SRR SR1 comm1G.
   have prSRR: SRR \proper SR.
     rewrite /proper sSRR_SR; apply: contra ntSR => sSR_SRR.
     by rewrite (forall_inP nilR) // subsetI sSR_R.
@@ -303,7 +303,7 @@ have{gtR2} [A] := p_rank_geP gtR2; pose H := 'C_A(Z); pose K := H <*> Z.
 case/pnElemP=> sAR abelA dimA3; have [pA cAA _] := and3P abelA.
 have{nsZR} nZA := subset_trans sAR (normal_norm nsZR).
 have sHA: H \subset A := subsetIl A _; have abelH := abelemS sHA abelA.
-have geH2: logn p #|H| >= 2. 
+have geH2: logn p #|H| >= 2.
   rewrite -ltnS -dimA3 -(Lagrange sHA) lognM // -addn1 leq_add2l /= -/H.
   by rewrite logn_quotient_cent_abelem ?dimZ2.
 have{abelH} abelK : p.-abelem K.
@@ -330,7 +330,7 @@ have sAR := normal_sub nAR; have pA := pgroupS sAR pR.
 have abelA : p.-abelem A.
   by rewrite /abelem pA cAA /= (dvdn_trans (exponentS sAR) expR).
 have cardA : logn p #|A| <= 2.
-  by rewrite -rank_abelem // (leq_trans (rankS sAR) rankR). 
+  by rewrite -rank_abelem // (leq_trans (rankS sAR) rankR).
 have cardRA : logn p #|R : A| <= 1.
   by rewrite -cRAA logn_quotient_cent_abelem // (normal_norm nAR).
 rewrite -(Lagrange sAR) lognM ?cardG_gt0 //.
@@ -384,7 +384,7 @@ have dimS1b: logn p #|R / 'Ohm_1(S)| <= 1.
   by rewrite dvdn_leq_log ?prime_gt0 // order_dvdn yp1.
 rewrite (leq_trans (nil_class_pgroup pR)) // geq_max /= -subn1 leq_subLR.
 by rewrite -(Lagrange sS1R) lognM // -card_quotient // addnC leq_add.
-Qed. 
+Qed.
 
 (* This is B & G, Lemma 4.9. *)
 Lemma quotient_p2_Ohm1 gT p (R : {group gT}) :
@@ -495,7 +495,7 @@ have [cRR | not_cRR] := boolP (abelian R).
     by rewrite big_seq1 => <-; rewrite cyclic_metacyclic ?cycle_cyclic.
   rewrite big_cons big_seq1; case/dprodP=> _ <- cAB _.
   apply/existsP; exists <[a]>%G; rewrite cycle_cyclic /=.
-  rewrite /normal mulG_subl mulG_subG normG cents_norm //= quotientMidl. 
+  rewrite /normal mulG_subl mulG_subG normG cents_norm //= quotientMidl.
   by rewrite quotient_cycle ?cycle_cyclic // -cycle_subG cents_norm.
 pose R' := R^`(1); pose e := 'Mho^1(R') != 1.
 have nsR'R: R' <| R := der_normal 1 R; have [sR'R nR'R] := andP nsR'R.
@@ -757,7 +757,7 @@ case recR: [exists (S : {group gT} | S \proper R), a \in 'N(S) :\: 'C(S)].
   by apply: IHn nSa oa _; rewrite ?(pgroupS sSR) ?(leq_trans ltSR).
 do [rewrite inE -!cycle_subG orderE; set A := <[a]>] in nRa oa.
 have{nRa oa} [[not_cRA nRA] oA] := (andP nRa, oa).
-have coRA : coprime #|R| #|A| by rewrite oA (pnat_coprime pR) ?pnatE. 
+have coRA : coprime #|R| #|A| by rewrite oA (pnat_coprime pR) ?pnatE.
 have{recR} IH: forall S, gval S \proper R -> A \subset 'N(S) -> A \subset 'C(S).
   move=> S ltSR; rewrite !cycle_subG => nSa; apply: contraFT recR => not_cSa.
   by apply/exists_inP; exists S; rewrite // inE not_cSa nSa.
@@ -929,9 +929,9 @@ have{ziTX defB1} cycX: cyclic X; last have [x defX]:= cyclicP cycX.
 have{Xb defXb defBb nsCX} mulSX: S * X = R.
   have nCT: T \subset 'N(C) := subset_trans sTR nCR.
   rewrite -defR -(normC (subset_trans sSR nBR)) -[B](quotientGK nsCB) -defBb.
-  rewrite cosetpreM quotientK // defXb quotientGK // -(normC nCT). 
+  rewrite cosetpreM quotientK // defXb quotientGK // -(normC nCT).
   by rewrite -mulgA (mulSGid sCX) mulgA (mulGSid sTS).
-have{mulSX} not_sXS_S': ~~ ([~: X, S] \subset S'). 
+have{mulSX} not_sXS_S': ~~ ([~: X, S] \subset S').
   apply: contra not_sTS' => sXS_S'; rewrite /T -mulSX.
   by rewrite commGC commMG ?(subset_trans sXR) // mul_subG.
 have [oSb oTb] : #|S / T| = p /\ #|T / S'| = p.
@@ -993,7 +993,7 @@ have i_neq0: i != 0 %[mod p].
   rewrite -(orderJ _ a) conjXg xa order_eq1 -expgM -order_dvdn mod0n.
   apply: contra; case/dvdnP=> m ->; rewrite -mulnA -expnS dvdn_mull //.
   by rewrite {1}[#[x]](card_pgroup pX) dvdn_exp2l ?leqSpred.
-have Txy: [~ x, y] \in T by rewrite [T]commGC mem_commg // -cycle_subG -defX. 
+have Txy: [~ x, y] \in T by rewrite [T]commGC mem_commg // -cycle_subG -defX.
 have [Rx Ry]: x \in R /\ y \in R by rewrite -cycle_subG -defX (subsetP sSR).
 have [nS'x nS'y] := (subsetP nS'R x Rx, subsetP nS'R y Ry).
 have{not_sXS_S'} not_S'xy: [~ x, y] \notin S'.
@@ -1077,7 +1077,7 @@ have s_p'C_B X: gval X \subset C -> p^'.-group X -> X \subset B.
     by rewrite qact_domE ?acts_char.
   rewrite gacentE // subsetIidl -/V; apply/subsetP=> v Vv; apply/afixP=> a Xa.
   have [cVa dom_a] := (subsetP sXC a Xa, subsetP domXb a Xa).
-  have [x Nx Hx def_v] := morphimP Vv;  rewrite {1}def_v qactE //=.
+  have [x Nx Hx def_v] := morphimP Vv; rewrite {1}def_v qactE //=.
   by rewrite -qactE ?(astab_dom cVa) ?(astab_act cVa) -?def_v.
 have{B pB s_p'C_B} pC : p.-group C.
   apply/pgroupP=> q q_pr /Cauchy[] // a Ca oa; apply: wlog_neg => p'q.
@@ -1107,7 +1107,7 @@ rewrite !inE; case/pred2P=> dimV.
 pose Vb := sdpair1 toAV @* V; pose Ab := sdpair2 toAV @* A.
 have [injV injA] := (injm_sdpair1 toAV, injm_sdpair2 toAV).
 have abelVb: p.-abelem Vb := morphim_abelem _ abelV.
-have ntVb: Vb != 1 by rewrite morphim_injm_eq1. 
+have ntVb: Vb != 1 by rewrite morphim_injm_eq1.
 have nVbA: Ab \subset 'N(Vb) := im_sdpair_norm toAV.
 pose rV := morphim_repr (abelem_repr abelVb ntVb nVbA) (subxx A).
 have{defC} <-: rker rV = C; last move: rV.
@@ -1128,8 +1128,8 @@ without loss Gp'1: gT G solG oddG rG q_dv_G / 'O_p^'(G) = 1.
   rewrite trivg_pcore_quotient -(card_isog (quotient1_isog _)).
   by rewrite p_rank_p'quotient ?pcore_pgroup ?gFnorm //; apply.
 set R := 'O_p(G); have pR: p.-group R := pcore_pgroup p G.
-have [sRG nRG] := andP (pcore_normal p G : R <| G). 
-have oddR: odd #|R| := oddSg sRG oddG. 
+have [sRG nRG] := andP (pcore_normal p G : R <| G).
+have oddR: odd #|R| := oddSg sRG oddG.
 have rR: 'r(R) <= 2 by rewrite (rank_pgroup pR) (leq_trans _ rG) ?p_rankS.
 rewrite leq_eqVlt -implyNb; apply/implyP=> p'q.
 have [|//] := pi_Aut_rank2_pgroup pR oddR rR _ p'q; rewrite eq_sym in p'q.
@@ -1193,7 +1193,7 @@ Qed.
 (* This is B & G, Theorem 4.18(d) *)
 Theorem rank2_sub_p'core_der1 gT (G A : {group gT}) p :
     solvable G -> odd #|G| -> 'r_p(G) <= 2 -> p^'.-subgroup(G^`(1)) A ->
-  A \subset 'O_p^'(G^`(1)). 
+  A \subset 'O_p^'(G^`(1)).
 Proof.
 move=> solG oddG rG /andP[sAG' p'A]; rewrite sub_Hall_pcore //.
 by have [-> _ _] := rank2_der1_complement solG oddG rG.
@@ -1264,7 +1264,7 @@ have pGb: p.-group((G / 'C_G(R))^`(1)).
   by rewrite defA -pgroupE (der1_Aut_rank2_pgroup pR) ?(oddSg sRG).
 set C := 'C_G(U / V | 'Q).
 have nUfG: [acts G, on U / V | 'Q] by rewrite actsQ.
-have nCG: G \subset 'N(C) by rewrite -(setIidPl nUfG) normsGI ?astab_norm. 
+have nCG: G \subset 'N(C) by rewrite -(setIidPl nUfG) normsGI ?astab_norm.
 have{pGb sUfR} pGa': p.-group (G / C)^`(1).
   have nCRG : G \subset 'N('C_G(R)) by rewrite normsI ?normG ?norms_cent.
   have sCR_C: 'C_G(R) \subset C.

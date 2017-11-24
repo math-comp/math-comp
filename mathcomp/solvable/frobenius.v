@@ -567,7 +567,7 @@ have hallK: Hall G K.
   rewrite !inE -andbA -sub_cent1=> /and4P[_ Kz _ cPz] ntz.
   by apply: subset_trans (regK z _); [apply/subsetIP | apply/setD1P].
 have /splitsP[H /complP[tiKH defG]] := SchurZassenhaus_split hallK nsKG.
-have [_ sHG] := mulG_sub defG; have nKH := subset_trans sHG nKG. 
+have [_ sHG] := mulG_sub defG; have nKH := subset_trans sHG nKG.
 exists H; apply/Frobenius_semiregularP; rewrite ?sdprodE //.
   by apply: contraNneq (proper_subn ltKG) => H1; rewrite -defG H1 mulg1.
 apply: semiregular_sym => x Kx; apply/trivgP; rewrite -tiKH.
@@ -603,7 +603,7 @@ have partG: partition (gval K |: (H^# :^: K)) G.
   apply: Frobenius_partition; apply/andP; rewrite defG; split=> //.
   by apply/Frobenius_actionP; apply: HasFrobeniusAction FrobG.
 have{FrobG} [ffulG transG regG ntH [u Su defH]]:= FrobG.
-apply/setP=> x; rewrite !inE; have [-> | ntx] := altP eqP; first exact: group1. 
+apply/setP=> x; rewrite !inE; have [-> | ntx] := altP eqP; first exact: group1.
 rewrite /= -(cover_partition partG) /cover.
 have neKHy y: gval K <> H^# :^ y.
   by move/setP/(_ 1); rewrite group1 conjD1g setD11.

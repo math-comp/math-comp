@@ -73,7 +73,7 @@ suffices IH gT (E : {group gT}) x y (G := <<[set x; y]>>) :
   by rewrite -cRA !commgSS ?sub1set.
 move: {2}_.+1 (ltnSn #|E|) => n; elim: n => // n IHn in gT E x y G *.
 rewrite ltnS => leEn /and3P[oddG pE nEG] /and3P[/andP[p_x cRx] p_y cRy].
-have [Gx Gy]: x \in G /\ y \in G by apply/andP; rewrite -!sub1set -join_subG. 
+have [Gx Gy]: x \in G /\ y \in G by apply/andP; rewrite -!sub1set -join_subG.
 apply: wlog_neg => p'Gc; apply/pgroupP=> q q_pr qGc; apply/idPn => p'q.
 have [Q sylQ] := Sylow_exists q [group of G].
 have [sQG qQ]: Q \subset G /\ q.-group Q by case/and3P: sylQ.
@@ -130,7 +130,7 @@ case ncxy: (rG x *m rG y == rG y *m rG x).
     rewrite -defC inE groupR //= !repr_mxM ?groupM ?groupV // mul1mx -/rG.
     by rewrite (eqP ncxy) -!repr_mxM ?groupM ?groupV // mulKg mulVg repr_mx1.
   rewrite [_^`(1)](commG1P _) ?pgroup1 //= quotient_gen -gen_subG //= -/G.
-  rewrite !gen_subG centsC gen_subG quotient_cents2r ?gen_subG //= -/G. 
+  rewrite !gen_subG centsC gen_subG quotient_cents2r ?gen_subG //= -/G.
   rewrite /commg_set imset2Ul !imset2_set1l !imsetU !imset_set1.
   by rewrite !subUset andbC !sub1set !commgg group1 /= -invg_comm groupV Cxy.
 pose Ax : 'M(E) := rG x - 1; pose Ay : 'M(E) := rG y - 1.
@@ -231,7 +231,7 @@ Qed.
 Theorem odd_abelian_gen_constrained :
   'O_p^'(G) = 1 -> 'C_('O_p(G))(P) \subset P -> X \subset 'O_p(G).
 Proof.
-set Q := 'O_p(G) => p'G1 sCQ_P. 
+set Q := 'O_p(G) => p'G1 sCQ_P.
 have sPQ: P \subset Q by rewrite pcore_max.
 have defQ: 'O_{p^', p}(G) = Q by rewrite pseries_pop2.
 have pQ: p.-group Q by apply: pcore_pgroup.
@@ -460,7 +460,7 @@ have sylCS: p.-Sylow(C) (C :&: S) := Sylow_setI_normal nsCG sylS.
 have{defC} defC: 'C_G(Y) * (C :&: S) = C.
   apply/eqP; rewrite eqEsubset mulG_subG sCY_C subsetIl /=.
   have nCY_C: C \subset 'N('C_G(Y)).
-    exact: subset_trans (normal_sub nsCG) (normal_norm nsCY_G). 
+    exact: subset_trans (normal_sub nsCG) (normal_norm nsCY_G).
   rewrite -quotientSK // -defC /= -pseries1.
   rewrite -(pseries_catr_id [:: p : nat_pred]) (pseries_rcons_id [::]) /=.
   rewrite pseries1 /= pseries1 defC pcore_sub_Hall // morphim_pHall //.

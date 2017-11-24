@@ -33,8 +33,8 @@ match goal with |- (let fxy0 := f x y in P fxy0 -> P fxy -> P x) => by auto | _ 
 Qed.
 
 Lemma test4 : forall n m z: bool, n = z -> let x := n in x = m && n -> x = m && n.
-move=> n m z E x H. 
-case: true.   
-  by rewrite  {1 2}E in (x) H |- *.
+move=> n m z E x H.
+case: true.
+  by rewrite {1 2}E in (x) H |- *.
 by rewrite {1}E in x H |- *.
 Qed.

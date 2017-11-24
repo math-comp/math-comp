@@ -870,7 +870,7 @@ Definition vspaceOver V := <<vbasis V : seq L_F>>%VS.
 
 Lemma mem_vspaceOver V : vspaceOver V =i (F * V)%VS.
 Proof.
-move=> y; apply/idP/idP; last rewrite unlock; move=> /coord_span->.
+move=> y; apply/idP/idP; last rewrite unlock; move/coord_span->.
   rewrite (@memv_suml F0 L) // => i _.
   by rewrite memv_mul ?subvsP // vbasis_mem ?memt_nth.
 rewrite memv_suml // => ij _; rewrite -tnth_nth; set x := tnth _ ij.
@@ -1538,7 +1538,7 @@ have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
 pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
 pose rL := ComRingType (RingType vL mulM) mulC.
 have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: toPinj; rewrite  toL_K /toPF !linearZ /= -!/(toPF _).
+  move=> a x y; apply: toPinj; rewrite toL_K /toPF !linearZ /= -!/(toPF _).
   by rewrite toL_K -scalerAl modp_scalel.
 have mulZr: GRing.Algebra.axiom (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
@@ -1569,6 +1569,8 @@ Qed.
 
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.
   In Coq 8.4 Qed takes about 18s.
+  In Coq 8.7, everything seems to be all right *)
+(*
 Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) :
     irreducible_poly p ->
   {L : fieldExtType F & Vector.dim L = (size p).-1 &
@@ -1609,7 +1611,7 @@ have unitE: GRing.Field.mixin_of urL.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
     have /contraR := irr_p _ _ (dvdp_gcdl p q); apply.
     have: size (gcdp p q) <= size q by apply: leq_gcdpr.
-    rewrite leqNgt;apply:contra;move/eqp_size ->.
+    rewrite leqNgt; apply: contra; move/eqp_size ->.
     by rewrite (polySpred nz_p) ltnS size_poly.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1).

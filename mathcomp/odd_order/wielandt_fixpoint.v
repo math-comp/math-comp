@@ -108,7 +108,7 @@ have{B ntB sBAn tiBU} [Ku S_Ku eKu]: exists2 Ku, Ku \in S & exponent Ku == (p ^ 
     by apply/imsetP; rewrite -MhoEabelian ?(subsetP sBAn).
   rewrite morphX ?(subsetP nUA) // (exponentP _ _ (mem_quotient _ Ay)) //.
   rewrite -sub_Ldiv -OhmEabelian ?(abelianS (Ohm_sub n _)) //=.
-  rewrite (OhmE n pAu) /= -(bigdprodWY defAu) genS // subsetI sub_gen //=. 
+  rewrite (OhmE n pAu) /= -(bigdprodWY defAu) genS // subsetI sub_gen //=.
   apply/bigcupsP=> Ku S_Ku; rewrite sub_LdivT.
   have: exponent Ku %| p ^ n.+1.
     by rewrite (dvdn_trans (exponentS (sSAu _ S_Ku))) // -eA exponent_quotient.

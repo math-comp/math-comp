@@ -176,7 +176,7 @@ Qed.
 Lemma OhmPredP (x : gT) :
   reflect (exists2 p, prime p & x ^+ (p ^ n) = 1) (x ^+ (pdiv #[x] ^ n) == 1).
 Proof.
-have [-> | nt_x] := eqVneq x 1. 
+have [-> | nt_x] := eqVneq x 1.
   by rewrite expg1n eqxx; left; exists 2; rewrite ?expg1n.
 apply: (iffP idP) => [/eqP | [p p_pr /eqP x_pn]].
   by exists (pdiv #[x]); rewrite ?pdiv_prime ?order_gt1.
@@ -702,7 +702,7 @@ move=> p_pr; apply: (iffP (pmaxElemP p G E)) => [[] | defE].
     by rewrite cycle_abelem ?p_pr ?orbT // order_dvdn xp.
   by rewrite (subsetP sEG) // (subsetP cEE) // (exponentP eE).
 split=> [|H]; last first.
-  case/pElemP=> sHG /abelemP[// | cHH Hp1] sEH. 
+  case/pElemP=> sHG /abelemP[// | cHH Hp1] sEH.
   apply/eqP; rewrite eqEsubset sEH andbC /= -defE; apply/subsetP=> x Hx.
   by rewrite 3!inE (subsetP sHG) // Hp1 ?(subsetP (centsS _ cHH)) /=.
 apply/pElemP; split; first by rewrite -defE -setIA subsetIl.
@@ -1891,7 +1891,7 @@ rewrite big_cons => defG; case/dprodP: defG (defG) => [[_ K _ defK]].
 rewrite defK => defHm cxK; rewrite setIC; move/trivgP=> tiKx defHd.
 rewrite -{1}defHm {defHm} mulG_subG cycle_subG ltnNge -trivg_card_le1.
 case/andP=> Gx sKG; rewrite -(Mho_dprod _ defHd) => /esym defMho /andP[ntx ntb].
-have{defHd} defOhm := Ohm_dprod n defHd. 
+have{defHd} defOhm := Ohm_dprod n defHd.
 apply/andP; split; last first.
   apply: (IHb K) => //; have:= dprod_modr defMho (Mho_sub _ _).
   rewrite -(dprod_modr defOhm (Ohm_sub _ _)).

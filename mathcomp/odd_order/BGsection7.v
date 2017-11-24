@@ -770,9 +770,9 @@ End NormedConstrained.
 Proposition plength_1_normed_constrained p A :
     A :!=: 1 -> A \in 'E*_p(G) -> (forall M, M \proper G -> p.-length_1 M) ->
   normed_constrained A.
-Proof. 
+Proof.
 move=> ntA EpA pl1subG.
-case/pmaxElemP: (EpA); case/pElemP=> sAG; case/and3P=> pA cAA _ _. 
+case/pmaxElemP: (EpA); case/pElemP=> sAG; case/and3P=> pA cAA _ _.
 have prA: A \proper G := sub_proper_trans cAA (mFT_cent_proper ntA).
 split=> // X Y sAX prX; case/setIdP; case/andP=> sYX p'Y nYA.
 have pl1X := pl1subG _ prX; have solX := mFT_sol prX.

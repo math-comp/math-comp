@@ -557,7 +557,7 @@ have [part_a _ _ [part_b part_c]] := BGsummaryB maxM complU.
 rewrite eqEsubset FTsupp1_sub // andbT -setD_eq0 in part_c.
 split=> // X notX0 /subsetD1P[sXU notX1]; rewrite -cent_gen defH.
 apply: part_b; rewrite -?subG1 ?gen_subG //.
-by rewrite  -setD_eq0 setDE (setIidPl _) // subsetC sub1set inE.
+by rewrite -setD_eq0 setDE (setIidPl _) // subsetC sub1set inE.
 Qed.
 
 (* This is Peterfalvi (8.13). *)
@@ -1111,7 +1111,7 @@ without loss{suppST} suppST: T maxT ncST / FTsupports S T.
 have{suppST} [y /and3P[ASy not_sCyS sCyT]] := existsP suppST.
 have Dy: y \in [set z in 'A0(S) | ~~ ('C[z] \subset S)] by rewrite !inE ASy.
 have [_ [_ /(_ y Dy) uCy]  /(_ y Dy)[_ coTcS _ typeT]] := FTsupport_facts maxS.
-rewrite  -mem_iota -(eq_uniq_mmax uCy maxT sCyT) !inE in coTcS typeT.
+rewrite -mem_iota -(eq_uniq_mmax uCy maxT sCyT) !inE in coTcS typeT.
 apply/negbNE; rewrite -part_b /NC 1?orbit_sym // negb_exists.
 apply/forallP=> x; rewrite part_a1 ?mmaxJ ?negbK //; last first.
   by rewrite /NC (orbit_transl _ (mem_orbit _ _ _)) ?in_setT // orbit_sym.

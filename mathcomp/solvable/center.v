@@ -70,7 +70,7 @@ Canonical center_pgFun := [pgFun by morphim_center].
 Section Center.
 
 Variables gT : finGroupType.
-Implicit Type rT : finGroupType. 
+Implicit Type rT : finGroupType.
 Implicit Types (x y : gT) (A B : {set gT}) (G H K D : {group gT}).
 
 Lemma subcentP A B x : reflect (x \in A /\ centralises x B) (x \in 'C_A(B)).
@@ -101,7 +101,7 @@ Proof. exact: subcentP. Qed.
 Lemma center_sub A : 'Z(A) \subset A.
 Proof. exact: subsetIl. Qed.
 
-Lemma center1 : 'Z(1) = 1 :> {set gT}. 
+Lemma center1 : 'Z(1) = 1 :> {set gT}.
 Proof. exact: gF1. Qed.
 
 Lemma centerC A : {in A, centralised 'Z(A)}.
@@ -338,7 +338,7 @@ Proof.
 transitivity ('ker (subg [group of setX H K / kerHK] \o coset kerHK)).
   rewrite /ker /morphpre /= /in_cprod /cprod_by; case: cprod_by_key => /=.
   by rewrite ['N(_) :&: _]quotientGK ?sub_center_normal ?ker_cprod_by_central.
-by rewrite ker_comp ker_subg -kerE ker_coset. 
+by rewrite ker_comp ker_subg -kerE ker_coset.
 Qed.
 
 Lemma cpairg1_dom : H \subset 'dom (in_cprod \o @pairg1 gTH gTK).

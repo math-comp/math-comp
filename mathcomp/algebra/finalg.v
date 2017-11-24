@@ -883,7 +883,7 @@ Section ClassDef.
 Variable R : ringType.
 
 Record class_of M :=
-  Class { base : GRing.Lmodule.class_of R M ; mixin : mixin_of M base }.
+  Class { base : GRing.Lmodule.class_of R M; mixin : mixin_of M base }.
 Definition base2 R (c : class_of R) := Zmodule.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Lmodule.class_of.
 Local Coercion base2 : class_of >-> Zmodule.class_of.
@@ -1144,7 +1144,7 @@ Section ClassDef.
 Variable R : unitRingType.
  
 Record class_of M := 
-  Class { base : GRing.UnitAlgebra.class_of R M ; mixin : mixin_of M base }. 
+  Class { base : GRing.UnitAlgebra.class_of R M; mixin : mixin_of M base }.
 Definition base2 M (c : class_of M) := Algebra.Class (mixin c).
 Definition base3 M (c : class_of M) := @UnitRing.Class _ (base c) (mixin c).
 
@@ -1155,27 +1155,27 @@ Local Coercion base3 : class_of >-> UnitRing.class_of.
 Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
 Local Coercion sort : type >-> Sortclass.
 Variables (phR : phant R) (cT : type phR).
-Definition pack := gen_pack (Pack phR) Class (@GRing.UnitAlgebra.class R phR). 
+Definition pack := gen_pack (Pack phR) Class (@GRing.UnitAlgebra.class R phR).
 Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass xT. 
-Definition choiceType := @Choice.Pack cT xclass xT. 
-Definition countType := @Countable.Pack cT (fin_ xclass) xT. 
-Definition finType := @Finite.Pack cT (fin_ xclass) xT. 
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT. 
-Definition finZmodType := @Zmodule.Pack cT xclass xT. 
-Definition ringType := @GRing.Ring.Pack cT xclass xT. 
-Definition finRingType := @Ring.Pack cT xclass xT. 
+Definition eqType := @Equality.Pack cT xclass xT.
+Definition choiceType := @Choice.Pack cT xclass xT.
+Definition countType := @Countable.Pack cT (fin_ xclass) xT.
+Definition finType := @Finite.Pack cT (fin_ xclass) xT.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
+Definition finZmodType := @Zmodule.Pack cT xclass xT.
+Definition ringType := @GRing.Ring.Pack cT xclass xT.
+Definition finRingType := @Ring.Pack cT xclass xT.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition finUnitRingType := @UnitRing.Pack cT xclass xT. 
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass xT. 
-Definition finLmodType := @Lmodule.Pack R phR cT xclass xT. 
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass xT. 
-Definition finLalgType := @Lalgebra.Pack R phR cT xclass xT. 
-Definition algType := @GRing.Algebra.Pack R phR cT xclass xT. 
-Definition finAlgType := @Algebra.Pack R phR cT xclass xT. 
+Definition finUnitRingType := @UnitRing.Pack cT xclass xT.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass xT.
+Definition finLmodType := @Lmodule.Pack R phR cT xclass xT.
+Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass xT.
+Definition finLalgType := @Lalgebra.Pack R phR cT xclass xT.
+Definition algType := @GRing.Algebra.Pack R phR cT xclass xT.
+Definition finAlgType := @Algebra.Pack R phR cT xclass xT.
 Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT xclass xT.
 
 Definition join_finType := @Finite.Pack unitAlgType (fin_ xclass) xT.
@@ -1200,7 +1200,7 @@ Definition finGroupType := fin_group baseFinGroupType zmodType.
 Definition join_baseFinGroupType := base_group unitAlgType zmodType finType.
 Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
 
-End ClassDef. 
+End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.UnitAlgebra.class_of.
@@ -1290,7 +1290,7 @@ End FinRing.
 Import FinRing.
 Export Zmodule.Exports Ring.Exports ComRing.Exports.
 Export UnitRing.Exports UnitsGroupExports ComUnitRing.Exports.
-Export IntegralDomain.Exports Field.Exports DecField.Exports.    
+Export IntegralDomain.Exports Field.Exports DecField.Exports.
 Export Lmodule.Exports Lalgebra.Exports Algebra.Exports UnitAlgebra.Exports.
 
 Notation "{ 'unit' R }" := (unit_of (Phant R))

@@ -273,7 +273,7 @@ Qed.
 
 Lemma triangular_sum n : \sum_(0 <= i < n) i = 'C(n, 2).
 Proof.
-elim: n => [|n IHn]; first by rewrite big_geq. 
+elim: n => [|n IHn]; first by rewrite big_geq.
 by rewrite big_nat_recr // IHn binS bin1.
 Qed.
 
@@ -307,7 +307,7 @@ suffices{k i} fxx k i: f k.+1 i.+1 = f k i.+1 + f k i.
   by rewrite big_ord_recl big_ord0 addn0 !bin0 muln1.
 rewrite {}/f big_ord_recl (big_ord_recl (i.+1)) !bin0 !mul1n.
 rewrite -addnA -big_split /=; congr (_ + _).
-by apply: eq_bigr => j _ ; rewrite -mulnDl.
+by apply: eq_bigr => j _; rewrite -mulnDl.
 Qed.
 
 Lemma subn_exp m n k :
@@ -504,7 +504,7 @@ Qed.
 Lemma card_partial_ord_partitions m n :
   #|[set t : m.-tuple 'I_n.+1 | \sum_(i <- t) i <= n]| = 'C(m + n, m).
 Proof.
-symmetry; set In1 := 'I_n.+1; pose x0 : In1 := ord0. 
+symmetry; set In1 := 'I_n.+1; pose x0 : In1 := ord0.
 pose add_mn (i j : In1) : In1 := inord (i + j).
 pose f_add (t : m.-tuple In1) := [tuple of scanl add_mn x0 t].
 rewrite -card_sorted_tuples -!sum1dep_card (reindex f_add) /=.
@@ -535,7 +535,7 @@ Qed.
 Lemma card_ord_partitions m n :
   #|[set t : m.+1.-tuple 'I_n.+1 | \sum_(i <- t) i == n]| = 'C(m + n, m).
 Proof.
-symmetry; set In1 := 'I_n.+1; pose x0 : In1 := ord0. 
+symmetry; set In1 := 'I_n.+1; pose x0 : In1 := ord0.
 pose f_add (t : m.-tuple In1) := [tuple of sub_ord (\sum_(x <- t) x) :: t].
 rewrite -card_partial_ord_partitions -!sum1dep_card (reindex f_add) /=.
   by apply: eq_bigl => t; rewrite big_cons /= addnC (sameP maxn_idPr eqP) maxnE.

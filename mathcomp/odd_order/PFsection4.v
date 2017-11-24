@@ -482,7 +482,7 @@ Lemma prTIred_inj : injective mu_.
 Proof.
 move=> j1 j2 /(congr1 (cfdot (mu_ j1)))/esym/eqP; rewrite !cfdot_prTIred.
 by rewrite eqC_nat eqn_pmul2r ?cardG_gt0 // eqxx; case: (j1 =P j2).
-Qed. 
+Qed.
 
 Lemma prTIred_not_real j : j != 0 -> ~~ cfReal (mu_ j).
 Proof.
@@ -645,7 +645,7 @@ have [[_ nKL] [nKz _]] := (andP nsKL, setIdP Itheta_z).
 suffices{k theta Itheta_z} /eqP->: imIchi == 'Fix_Jirr[z].
   by apply/afix1P/irr_inj; rewrite conjg_IirrE inertiaJ.
 rewrite eqEcard; apply/andP; split.
-  apply/subsetP=> _ /imsetP[j _ ->]; apply/afix1P/irr_inj. 
+  apply/subsetP=> _ /imsetP[j _ ->]; apply/afix1P/irr_inj.
   by rewrite conjg_IirrE -(cfRes_prTIirr 0) (cfConjgRes _ _ nsKL) ?cfConjg_id.
 have ->: #|imIchi| = w2 by rewrite card_imset //; apply: prTIres_inj.
 have actsL_KK: [acts L, on classes K | 'Js \ subsetT L].
@@ -720,7 +720,7 @@ Record prime_Dade_hypothesis : Prop := PrimeDadeHypothesis {
 Hypothesis prDadeHyp : prime_Dade_hypothesis.
 
 Let ctiWG : cyclicTI_hypothesis G defW := prDadeHyp.
-Let ptiWL : primeTI_hypothesis L K defW := prDadeHyp. 
+Let ptiWL : primeTI_hypothesis L K defW := prDadeHyp.
 Let ctiWL : cyclicTI_hypothesis L defW := prime_cycTIhyp ptiWL.
 Let ddA0 : Dade_hypothesis G L A0 := prDadeHyp.
 Local Notation ddA0def := (prDade_def prDadeHyp).
@@ -838,7 +838,7 @@ Qed.
 (* First part of PeterFalvi (4.8). *)
 Lemma prDade_sub_TIirr_on i j k :
     j != 0 -> k != 0 -> mu2_ i j 1%g = mu2_ i k 1%g ->
-  mu2_ i j - mu2_ i k \in 'CF(L, A0). 
+  mu2_ i j - mu2_ i k \in 'CF(L, A0).
 Proof.
 move=> nzj nzk eq_mu1.
 apply/cfun_onP=> g; rewrite defA0 !inE negb_or !cfunE => /andP[A'g V'g].
@@ -846,7 +846,7 @@ have [Lg | L'g] := boolP (g \in L); last by rewrite !cfun0 ?subrr.
 have{Lg} /bigcupP[_ /rcosetsP[x W1x ->] Kx_g]: g \in cover (rcosets K W1).
   by rewrite (cover_partition (rcosets_partition_mul W1 K)) (sdprodW defL).
 have [x1 | ntx] := eqVneq x 1%g.
-  have [-> | ntg] := eqVneq g 1%g; first by rewrite  eq_mu1 subrr.
+  have [-> | ntg] := eqVneq g 1%g; first by rewrite eq_mu1 subrr.
   have{A'g} A1'g: g \notin 1%g |: A by rewrite !inE negb_or ntg.
   rewrite x1 mulg1 in Kx_g; rewrite -!(cfResE (mu2_ i _) sKL) ?cfRes_prTIirr //.
   by rewrite !(cfun_onP (prDade_TIres_on _)) ?subrr.
@@ -924,7 +924,7 @@ have ccT: cfConjC_closed calT.
   by rewrite prTIred_aut cfunE conj_Cnat ?Cnat_char1 ?prTIred_char.
 have TonA: 'Z[calT, L^#] =i 'Z[calT, A].
   have A'1: 1%g \notin A by apply: contra (subsetP sAA0 _) _; have [] := ddA0.
-  move => psi; rewrite zcharD1E -(setU1K A'1) zcharD1; congr (_ && _).
+  move=> psi; rewrite zcharD1E -(setU1K A'1) zcharD1; congr (_ && _).
   apply/idP/idP; [apply: zchar_trans_on psi => psi Tpsi | exact: zcharW].
   have [j /andP[nz_j _] Dpsi] := imageP Tpsi.
   by rewrite zchar_split mem_zchar // Dpsi prDade_TIred_on.

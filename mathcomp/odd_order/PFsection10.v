@@ -417,14 +417,14 @@ have al_ij_zeta_s: '[al_ij^\tau, zeta^*^\tau1] = a.
   have M'dz: zeta - zeta^*%CF \in 'Z[calS, M'^#] by apply: seqInd_sub_aut_zchar.
   rewrite Dtau1 // Dade_isometry ?alpha_on ?tauM' //.
   rewrite cfdotBr opprB cfdotBl cfdot_conjCr rmorphB linearZ /=.
-  rewrite -!prTIirr_aut !cfdotBl !cfdotZl !o_mu2_zeta o_zeta_s !mulr0. 
+  rewrite -!prTIirr_aut !cfdotBl !cfdotZl !o_mu2_zeta o_zeta_s !mulr0.
   by rewrite opprB !(subr0, rmorph0) add0r irrWnorm ?mulr1.
 have Zal_ij: al_ij^\tau \in 'Z[irr G] by apply: Zalpha_tau.
 have Za: a \in Cint.
   by rewrite rpredD ?(Cint_Cnat Nn) ?Cint_cfdot_vchar ?Ztau1 ?(mem_zchar Szeta).
 have{al_ij_zeta_s} ub_da2: (d ^ 2)%:R * a ^+ 2 <= (2%:R + n ^+ 2) * w1%:R.
   have [k nz_k j'k]: exists2 k, k != 0 & k != j.
-    have:= w2gt2; rewrite -nirrW2 (cardD1 0) (cardD1 j) !inE nz_j !ltnS lt0n. 
+    have:= w2gt2; rewrite -nirrW2 (cardD1 0) (cardD1 j) !inE nz_j !ltnS lt0n.
     by case/pred0Pn=> k /and3P[]; exists k.
   have muk_1: mu_ k 1%g = (d * w1)%:R.
     by rewrite (prTIred_1 pddM) mu1 // mulrC -natrM.
@@ -437,7 +437,7 @@ have{al_ij_zeta_s} ub_da2: (d ^ 2)%:R * a ^+ 2 <= (2%:R + n ^+ 2) * w1%:R.
     by rewrite 2![_ == k](negPf _) 1?eq_sym // mulr0 -mulrN opprB !subr0 add0r.
   have ZSmuk: mu_ k \in 'Z[calS] by rewrite mem_zchar ?calSmu.
   have <-: '[al_ij^\tau] * '[(mu_ k)^\tau1] = (2%:R + n ^+ 2) * w1%:R.
-    by rewrite Itau1 // cfdot_prTIred eqxx mul1n norm_alpha. 
+    by rewrite Itau1 // cfdot_prTIred eqxx mul1n norm_alpha.
   by rewrite -Cint_normK ?cfCauchySchwarz // Cint_cfdot_vchar // Ztau1.
 suffices a0 : a = 0.
   by apply: (def_tau_alpha _ sSS0); rewrite // -sub0r -a0 addrK.
@@ -1087,7 +1087,7 @@ have Dalpha i (al_ij := alpha_ i j) :
     by rewrite -mulrA !mulr_natl; case: (S1) => // in S1zeta lb_n2alij *.
   have{ub_a2} ub_8a2: 8%:R * a ^+ 2 <= 4%:R * a + 2%:R.
     rewrite mulrAC Dn -natrM in ub_a2; apply: ler_trans ub_a2.
-    rewrite -Cint_normK // ler_wpmul2r ?exprn_ge0 ?normr_ge0 // leC_nat szS1. 
+    rewrite -Cint_normK // ler_wpmul2r ?exprn_ge0 ?normr_ge0 // leC_nat szS1.
     rewrite (subn_sqr p 1) def_p_w1 subnK ?muln_gt0 // mulnA mulnK // mulnC.
     by rewrite -subnDA -(mulnBr 2 _ 1%N) mulnA (@leq_pmul2l 4 2) ?ltn_subRL.
   have Z_4a1: 4%:R * a - 1%:R \in Cint by rewrite rpredB ?rpredM ?rpred_nat.

@@ -715,7 +715,7 @@ Proof. by move=> sth21 Uth1 m /(sat_exact sth21)/Uth1. Qed.
 Fact tr_Lmodel_subproof (m : model) : is_Lmodel (tr m) (fun ij => m (tr ij)).
 Proof.
 case: m => /= d f _ [[odd_d1 odd_d2 d1gt1 d2gt1 neq_d12] Zf fP] _.
-split=> // [|[j1 i1] [j2 i2]]; first by rewrite eq_sym. 
+split=> // [|[j1 i1] [j2 i2]]; first by rewrite eq_sym.
 by rewrite ![_ \in _]andbC /= => wf_ij1 wf_ij2; rewrite fP // /dot_ref mulnC.
 Qed.
 
@@ -1079,7 +1079,7 @@ rewrite -[f in f _ kvs2]/(idfun _); set f := idfun _; rewrite /= in f *.
 have [/= _ Ukvs2 kvsP] := satP m_th _ th_cl2.
 move: Ukvs2; set kvs2' := kvs2; set mm := false.
 have /allP: {subset kvs2' <= kvs2} by [].
-pose lit12 k := (k, 1) \in kvs1 /\ (k, 1) \in kvs2. 
+pose lit12 k := (k, 1) \in kvs1 /\ (k, 1) \in kvs2.
 have: mm -> {k | lit12 k & k \notin unzip1 kvs2'} by [].
 elim: kvs2' mm => [|[k v2] kvs2' IH] //= mm mmP /andP[kvs2k /IH{IH}IHkvs].
 case/andP=> kvs2'k /IHkvs{IHkvs}IHkvs; case: ifP => [_ | /norP[]].
@@ -1087,7 +1087,7 @@ case/andP=> kvs2'k /IHkvs{IHkvs}IHkvs; case: ifP => [_ | /norP[]].
 have [v1 /= kvs1k | //] := get_litP; case: eqP => // -> in kvs2k * => _ nz_v1.
 case Dbb: (th_bbox th) (th_bboxP (bbox_refl (th_bbox th))) => [ri rj] rijP.
 have [/andP[/=lti1r ltj1r] /andP[/=lti2r _]] := (rijP _ th_cl1, rijP _ th_cl2).
-have rkP := th_dimP (leqnn _) _ th_cl1;  have /= ltkr := rkP _ kvs1k.
+have rkP := th_dimP (leqnn _) _ th_cl1; have /= ltkr := rkP _ kvs1k.
 have symP := unsat_match (Sym [:: i2; i1] [:: j1] _) _ _ m m_th.
 rewrite /= Dbb lti1r lti2r ltj1r inE eq_sym neq_i /= in symP.
 have [Dv1 | v1_neq1] /= := altP eqP; first rewrite Dv1 in kvs1k.
@@ -1156,7 +1156,7 @@ consider b42; uwlog Db42: (& b42 = x6 - x4 + x5).
     by uhave -x2 in b42 as O(42, 31); symmetric to b42x4.
   by uhave ~x1 in b42 as L(42, 41); uhave x5 in b42 as O(42, 21); uexact Db42.
 uwlog Db32: (& ? in b32); first uexact Db32.
-uwlog Db41: (& ? in b41); first uexact Db41. 
+uwlog Db41: (& ? in b41); first uexact Db41.
 consider b12; uwlog b12x5: x5 | ~x5 in b12 as L(12, 42).
   uhave ~x6 | x6 in b12 as L(12, 42); last by consider b22; symmetric to b12x5.
   uhave -x4 in b12 as O(12, 42); uhave x1 in b12 as O(12, 21).
@@ -1521,7 +1521,7 @@ Lemma cycTI_NC_opp (phi : 'CF(G)) : (NC (- phi)%R = NC phi)%N.
 Proof. by apply: eq_card=> [[i j]]; rewrite !inE cfdotNl oppr_eq0. Qed.
 
 Lemma cycTI_NC_sign (phi : 'CF(G)) n : (NC ((-1) ^+ n *: phi)%R = NC phi)%N.
-Proof. 
+Proof.
 elim: n=> [|n IH]; rewrite ?(expr0,scale1r) //.
 by rewrite exprS -scalerA scaleN1r cycTI_NC_opp.
 Qed.
@@ -1561,7 +1561,7 @@ Qed.
 
 Lemma cycTI_NC_sub n1 n2 phi1 phi2 :
   (NC phi1 <= n1 -> NC phi2 <= n2 -> NC (phi1 - phi2)%R <= n1 + n2)%N.
-Proof. by move=> ub1 ub2; rewrite cycTI_NC_add ?cycTI_NC_opp. Qed. 
+Proof. by move=> ub1 ub2; rewrite cycTI_NC_add ?cycTI_NC_opp. Qed.
 
 Lemma cycTI_NC_scale_nz a phi : a != 0 -> NC (a *: phi) = NC phi.
 Proof.
@@ -1660,7 +1660,7 @@ Lemma cycTI_NC_minn (phi : 'CF(G)) :
   (minn w1 w2 <= NC phi)%N.
 Proof.
 move=> phiV_0 /andP[/card_gt0P[[i0 j0]]]; rewrite inE /= => nz_a0 ubNC.
-pose L := [seq (i0, j) | j : Iirr W2]; pose C := [seq (i, j0) | i : Iirr W1]. 
+pose L := [seq (i0, j) | j : Iirr W2]; pose C := [seq (i, j0) | i : Iirr W1].
 have [oL oC]: #|L| = w2 /\ #|C| = w1 by rewrite !card_image // => i j [].
 have [Da | Da] := small_cycTI_NC phiV_0 ubNC nz_a0.
   rewrite geq_min -oC subset_leq_card //.
@@ -1726,7 +1726,7 @@ have NCk2'_le1 (dI : {set _}):
 - rewrite (cardsD1 dk2) => -> /eqP/cards1P[dk ->].
   by rewrite big_set1 cycTI_NC_dirr ?dirr_dchi.
 suffices /psi_phi'_lt0/ltr_geF/idP[]: dk2 \in Irho :\: Iphi.
-  rewrite rhoIdE cfdotZr signrN rmorphN mulNr oppr_ge0 rmorph_sign.  
+  rewrite rhoIdE cfdotZr signrN rmorphN mulNr oppr_ge0 rmorph_sign.
   have := small_cycTI_NC psiV0 NCpsi psi_k1_neq0.
   by case=> // ->; rewrite mulrCA nmulr_lle0 ?ler0n.
 have: (1 + 1 < NC psi)%N.

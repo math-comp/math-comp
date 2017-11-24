@@ -200,7 +200,7 @@ rewrite leq_subLR addnA; apply: leq_trans (leq_divDl _ _ _).
 by rewrite -maxnE leq_div2r ?leq_maxr.
 Qed.
 
-Lemma divnMA m n p : m %/ (n * p) = m %/ n %/ p. 
+Lemma divnMA m n p : m %/ (n * p) = m %/ n %/ p.
 Proof.
 case: n p => [|n] [|p]; rewrite ?muln0 ?div0n //.
 rewrite {2}(divn_eq m (n.+1 * p.+1)) mulnA mulnAC !divnMDl //.
