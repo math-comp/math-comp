@@ -735,7 +735,7 @@ Proof. by move=> x y; rewrite -[y in LHS]opprK opprB addrC. Qed.
 Lemma addrKA z x y : (x + z) - (z + y) = x - y.
 Proof. by rewrite opprD addrA addrK. Qed.
 
-Lemma subrKA z x y : (x - z) + (z - y) = x - y.
+Lemma subrKA z x y : (x - z) + (z + y) = x + y.
 Proof. by rewrite addrA addrNK. Qed.
 
 Lemma subr0_eq x y : x - y = 0 -> x = y.
