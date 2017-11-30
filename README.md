@@ -40,7 +40,6 @@ installation instructions in other scenarios.
 
 ## Publications and Tools using MathComp
 
-[Papers](https://github.com/math-comp/math-comp/wiki/Publications) and
-[Software](https://github.com/math-comp/math-comp/wiki/Software) built
+[Papers](https://github.com/math-comp/math-comp/wiki/Publications) 
 using the Mathematical Components library can be found at the
 [wiki](https://github.com/math-comp/math-comp/wiki)
