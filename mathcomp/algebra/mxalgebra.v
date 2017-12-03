@@ -93,7 +93,7 @@ Require Import perm zmodp matrix.
 (*                   capmx_gen A B is a rectangular matrix equivalent to     *)
 (*                   (A :&: B)%MS, i.e., (capmx_gen A B == A :&: B)%MS.      *)
 (*    proj_mx A B == a square matrix that projects (A + B)%MS onto A         *)
-(*                   parellel to B, when (A :&: B)%MS = 0 (A and B must also *)
+(*                   parallel to B, when (A :&: B)%MS = 0 (A and B must also *)
 (*                   be square).                                             *)
 (*     mxdirect S == the sum expression S is a direct sum. This is a NON     *)
 (*                   EXTENSIONAL notation: the exact boolean expression is   *)
@@ -135,7 +135,7 @@ Unset Printing Implicit Defensive.
 
 Import GroupScope.
 Import GRing.Theory.
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Reserved Notation "\rank A" (at level 10, A at level 8, format "\rank  A").
 Reserved Notation "A ^C"    (at level 8, format "A ^C").
@@ -160,7 +160,7 @@ Notation "''A' [ F ]_ n" := 'A[F]_(n)
 
 Delimit Scope matrix_set_scope with MS.
 
-Notation Local simp := (Monoid.Theory.simpm, oppr0).
+Local Notation simp := (Monoid.Theory.simpm, oppr0).
 
 (*****************************************************************************)
 (******************** Rank and row-space theory ******************************)

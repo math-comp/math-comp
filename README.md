@@ -1,79 +1,44 @@
+[![Build Status](https://travis-ci.org/math-comp/math-comp.svg?branch=master)](https://travis-ci.org/math-comp/math-comp)
+
 # The Mathematical Components repository
 
-This repository holds the Mathematical Components Library for the Coq system:
-an extensive body of mathematics formalized in the Coq/SSReflect language.
+The Mathematical Components Library is an extensive and coherent
+repository of formalized mathematical theories. It is based on
+the [Coq](http://coq.inria.fr) proof assistant, powered with the
+[Coq/SSReflect](https://coq.inria.fr/distrib/current/refman/ssreflect.html)
+language.
 
-It also contains the proof of the Odd Order Theorem, that builds on top
-of the Mathematical Components Library.
+These formal theories cover a wide spectrum of topics, ranging from the formal theory of general purpose data structures like [lists](mathcomp/ssreflect/seq.v), [prime numbers](mathcomp/ssreflect/prime.v) or [finite graphs](mathcomp/ssreflect/fingraph.v), to advanced topics in algebra. The repository includes the socle of formal theories used in a [formal proof](https://www.ams.org/notices/200811/tx081101382p.pdf) of the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_color_theorem) (Appel - Haken, 1976) and a [mechanization](https://hal.archives-ouvertes.fr/hal-00816699/) of the [Odd Order Theorem](https://en.wikipedia.org/wiki/Feit%E2%80%93Thompson_theorem) (Feit - Thompson, 1963), a landmark result of finite group theory, which utilizes the library extensively.
 
-# Layout and compilation of the library
+## Installation
 
-The library is divided into packages which group together related
-files. Each package defines a distribution and compilation unit.
+If you already have OPAM installed:
 
-Packages can be compiled using the traditional `make` utility or
-the more recent `OPAM` one.
-
-We provide a convenience root Makefile in order to compile all packages
-at once using `make`.  This is the simplest option.
-
-We also provide `opam` files to compile each package using `OPAM`.
-Note that the `OPAM` packages for the Mathematical Components library
-are available in the standard Coq `OPAM` repositories,
-under the `coq-mathcomp-` name space.  If you are only interested
-in installing a Mathematical Components package via `OPAM`, follow
-the standard instructions available on the Coq website.
-
-## Compilation and installation with make
-
-The instructions assume you are in the `mathcomp` directory and that
-you have a supported version of Coq.
-The list of Coq versions that are known to work can be obtained with:
 ```
-ls ssreflect/plugin/
-```
-Alternatively, if you are familiar with the `OPAM` slang:
-```
-grep depends: ssreflect/opam
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam install coq-mathcomp-ssreflect
 ```
 
-If `coqc` is in your `PATH`, then you are good to go.  Alternatively you
-can export the `COQBIN` variable to tell make where the `coqc` binary is:
-```
-export COQBIN=/home/gares/COQ/coq/bin/
-```
+Additional packages go by the name of `coq-mathcomp-algebra`,
+`coq-mathcomp-field`, etc... See [INSTALL](INSTALL.md) for detailed
+installation instructions in other scenarios.
 
-To compile the entire library just type `make`. If you have parallel
-hardware then `make -j 3` is probably a faster option. 
+## How to get help
 
-The files can be edited using CoqIDE or Proof General, or any
-other editor that understands the `_CoqProject` file, with no
-further configuration from the `mathcomp` directory.
-```
-coqide ssreflect/div.v
-```
-Note that you may need to enable `_CoqProject` processing in your
-editor (e.g. the default for CoqIDE is to ignore it).
+- The [ssreflect mailing
+  list](https://sympa.inria.fr/sympa/info/ssreflect) is the primary
+  venue for help and questions about the library.
+- The [Mathematical Components Book](https://math-comp.github.io/mcb/)
+  provides a comprehensive introduction to the library.
+- The [MathComp wiki](https://github.com/math-comp/math-comp/wiki)
+  contains many useful information, including including a list of
+  [tutorials](https://github.com/math-comp/math-comp/wiki/tutorials).
+- Experienced users hang around at
+  [StackOverflow](https://stackoverflow.com/questions/tagged/ssreflect)
+  listening to the `ssreflect` and `coq` tags.
 
-To install the compiled library, just execute `make install`.
+## Publications and Tools using MathComp
 
-## Compilation and installation with OPAM
-
-The instructions assume you are in the `mathcomp` directory
-and that you have `OPAM` installed and configured with the
-standard Coq repositories.
-
-For each package, pin the `opam` file:
-```
-opam pin -n add ssreflect
-```
-This can be achieved in one go as follows:
-```
-for P in */opam; do opam pin -n add ${P%%/opam}; done
-```
-
-Then you can use `opam install` to compile and install any package.
-For example:
-```
-opam install coq.8.5.dev coq-mathcomp-ssreflect
-```
+A collection of [papers](https://github.com/math-comp/math-comp/wiki/Publications) 
+using the Mathematical Components library can be found on the
+[wiki](https://github.com/math-comp/math-comp/wiki).

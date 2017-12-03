@@ -1337,7 +1337,7 @@ Hypothesis nHK : K \subset 'N(H).
 Hypothesis actf : {in H & K, morph_act 'J 'J fH fK}.
 Hypothesis eqfHK : {in H :&: K, fH =1 fK}.
 
-Notation Local f := (pprodm nHK actf eqfHK).
+Local Notation f := (pprodm nHK actf eqfHK).
 
 Lemma pprodmE x a : x \in H -> a \in K -> f (x * a) = fH x * fK a.
 Proof.

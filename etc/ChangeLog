@@ -1,15 +1,49 @@
-25/08/2016 - refactoring of algC and complex in ssrnum  - development version
+07/09/2016 - compatibility with Coq 8.7 and several small fixes -
+	version 1.6.2 and upcomming version 1.7
+	* Compatibility with Coq 8.7
+	* Lost compatibility with Coq 8.4
+
+07/09/2016 - compatibility with Coq 8.7 and several small fixes -
+	upcomming version 1.7
+	* New Theorems:
+	   dec_factor_theorem, abstract_context,
+	   mul_bin_down, mul_bin_left
+
+	* Renamings or replacements:
+	  mul_Sm_binm -> mul_bin_diag
+	  divn1 -> divz1 (in intdiv)
+
+	* Generalized or extended:
+	  ltngtP, contra_eq, contra_neq, odd_opp
+
+	* Plugin:
+	  ssrpattern: compose nicely with Tactic Notation
+
+25/08/2016 - refactoring of algC and complex in ssrnum -
+	upcomming version 1.7
 	* ssrnum's interface numClosedFieldType factors some theory from
 	  both complex and algC. Because of that Re, Im, 'i, conjC, n.-root
 	  and sqrtC are not specialized to algC anymore. In case of
 	  ambiguity, they should be instanciated with algC using typing
-	  constraints. Moreoever some lemmas from the theory like conjCK
-	  have an extra nonmaximal implicit argument (C :
-	  numClosedFieldType) which could break some proofs. Additionally,
-	  ad-hoc constructions from complex.v like -*+ or complex.Re are now
-	  deprecated and one should rely solely on the ssrnum interface. The
-	  next revision might definietly hide those constructions under a
-	  module.
+	  constraints. Moreoever all the lemmas from ssrnum that used to
+	  be in algC (like conjCK), now take an extra nonmaximal implicit
+	  argument (C : numClosedFieldType) which could break some proofs.
+	  Additionally, ad-hoc constructions from complex.v like -*+ or
+	  complex.Re are now deprecated and one should rely solely on the
+	  ssrnum interface. The next revision might definietly hide those
+	  constructions under a module.
+
+	* Structures that change:
+	  numClosedFieldType
+
+	* Renamed and generalized definitions:
+	  rootC -> nthroot
+	  algRe -> Re
+	  algIm -> Im
+	  algCi -> imaginaryC
+
+	* Renamed and generalized theorems:
+	  Every theorem from ssrnum that used to be in algC
 
 24/11/2015 - major reorganization of the archive - version 1.6
 	* Files split into subdirectories: ssreflect, algebra, fingroup,

@@ -129,6 +129,7 @@ ssreflect/ssrbool.v
 ssreflect/ssreflect.v
 ssreflect/ssrfun.v
 ssreflect/ssrnat.v
+ssreflect/ssrnotations.v
 ssreflect/tuple.v
 ssrtest/absevarprop.v
 ssrtest/binders_of.v
@@ -158,6 +159,7 @@ ssrtest/move_after.v
 ssrtest/multiview.v
 ssrtest/occarrow.v
 ssrtest/patnoX.v
+ssrtest/primproj.v
 ssrtest/rewpatterns.v
 ssrtest/set_lamda.v
 ssrtest/set_pattern.v
@@ -166,12 +168,12 @@ ssrtest/ssrsyntax2.v
 ssrtest/tc.v
 ssrtest/testmx.v
 ssrtest/typeof.v
+ssrtest/unfold_Opaque.v
 ssrtest/unkeyed.v
 ssrtest/view_case.v
 ssrtest/wlogletin.v
 ssrtest/wlog_suff.v
 ssrtest/wlong_intro.v
-ssreflect.ml4
 
 -I .
 -R . mathcomp

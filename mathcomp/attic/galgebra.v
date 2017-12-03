@@ -18,7 +18,7 @@ Unset Printing Implicit Defensive.
 Reserved Notation "g %:FG"
   (at level 2, left associativity, format "g %:FG").
 
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 Import GRing.Theory.
 
 Section GroupAlgebraDef.
@@ -42,7 +42,7 @@ Lemma galgE : forall f, GAlg (finfun f) =1 f.
 Proof. by move=> f i; rewrite /fun_of_galg ffunE. Qed.
 
 Definition injG (g : gT) :=  GAlg ([ffun k => (k == g)%:R]).
-Notation Local "g %:FG" := (injG g).
+Local Notation "g %:FG" := (injG g).
 
 Implicit Types v: galg.
 

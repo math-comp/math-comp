@@ -1006,7 +1006,7 @@ Variables (G : {group gT}) (H : {group hT}).
 Variable f : {morphism G >-> hT}.
 Variable g : {morphism H >-> rT}.
 
-Notation Local gof := (mfun g \o mfun f).
+Local Notation gof := (mfun g \o mfun f).
 
 Lemma comp_morphM : {in f @*^-1 H &, {morph gof: x y / x * y}}.
 Proof.

@@ -87,8 +87,8 @@ Bind Scope group_scope with perm_of.
 Notation "''S_' n" := {perm 'I_n}
   (at level 8, n at level 2, format "''S_' n").
 
-Notation Local fun_of_perm_def := (fun T (u : perm_type T) => val u : T -> T).
-Notation Local perm_def := (fun T f injf => Perm (@perm_proof T f injf)).
+Local Notation fun_of_perm_def := (fun T (u : perm_type T) => val u : T -> T).
+Local Notation perm_def := (fun T f injf => Perm (@perm_proof T f injf)).
 
 Module Type PermDefSig.
 Parameter fun_of_perm : forall T, perm_type T -> T -> T.

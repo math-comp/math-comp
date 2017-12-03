@@ -147,7 +147,7 @@ Unset Printing Implicit Defensive.
 
 Import GroupScope.
 Import GRing.Theory.
-Open Local Scope ring_scope.
+Local Open Scope ring_scope.
 
 Reserved Notation "''M_' n"     (at level 8, n at level 2, format "''M_' n").
 Reserved Notation "''rV_' n"    (at level 8, n at level 2, format "''rV_' n").
@@ -193,7 +193,7 @@ Reserved Notation "\tr A"   (at level 10, A at level 8, format "\tr  A").
 Reserved Notation "\det A"  (at level 10, A at level 8, format "\det  A").
 Reserved Notation "\adj A"  (at level 10, A at level 8, format "\adj  A").
 
-Notation Local simp := (Monoid.Theory.simpm, oppr0).
+Local Notation simp := (Monoid.Theory.simpm, oppr0).
 
 (*****************************************************************************)
 (****************************Type Definition**********************************)

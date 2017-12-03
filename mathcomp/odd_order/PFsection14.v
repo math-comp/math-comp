@@ -349,7 +349,7 @@ have o1M: orthonormal (map tau1M calM).
 have Lgt1: (1 < size calL)%N by apply: seqInd_nontrivial (mFT_odd _ ) _ Lphi.
 have [[_ _]] := Dade_Ind1_sub_lin cohL Lgt1 irr_phi Lphi phi1.
 rewrite -/tauL -/betaL -/calL => ZbetaL [Gamma [_ _ [b _ Dbeta]]]. 
-rewrite odd_Frobenius_index_ler ?mFT_odd // -/u => -[]// [_ ub_Ga] _ nz_a.
+rewrite odd_Frobenius_index_ler ?mFT_odd // -/u => -[]// _ ub_Ga _ nz_a.
 have Za: a \in Cint by rewrite Cint_cfdot_vchar // ?Ztau1 ?mem_zchar.
 have [X M_X [Del [defGa oXD oDM]]] := orthogonal_split (map tau1M calM) Gamma.
 apply: ler_trans ub_Ga; rewrite defGa cfnormDd // ler_paddr ?cfnorm_ge0 //.

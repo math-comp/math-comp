@@ -86,9 +86,6 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*  ** Filtering:                                                             *)
 (*           filter p s == the subsequence of s consisting of all the items   *)
 (*                         for which the (boolean) predicate p holds.         *)
-(* subfilter s : seq sT == when sT has a subType p structure, the sequence    *)
-(*                         of items of type sT corresponding to items of s    *)
-(*                         for which p holds.                                 *)
 (*              rem x s == the subsequence of s, where the first occurrence   *)
 (*                         of x has been removed (compare filter (predC1 x) s *)
 (*                         where ALL occurrences of x are removed).           *)
@@ -885,7 +882,7 @@ Implicit Arguments revK [[T]].
 Section EqSeq.
 
 Variables (n0 : nat) (T : eqType) (x0 : T).
-Notation Local nth := (nth x0).
+Local Notation nth := (nth x0).
 Implicit Type s : seq T.
 Implicit Types x y z : T.
 
@@ -1369,6 +1366,35 @@ Proof.
 apply: (@eq_from_nth _ 0) => [|k _]; last by rewrite !nth_incr_nth addnCA.
 by do !rewrite size_incr_nth leqNgt if_neg -/(maxn _ _); apply: maxnAC.
 Qed.
+
+Section uniqP.
+Variable T : eqType.
+Implicit Type s : seq T.
+
+Lemma uniqP x0 s :
+ reflect {in [pred i | i < size s] &, injective (nth x0 s)} (uniq s).
+Proof.
+apply: (iffP idP) => [uq_s i j lei lej /eqP|].
++ by rewrite nth_uniq // => /eqP.
+elim: s => //= x s ih inj_nth; rewrite ih ?andbT; last first.
++ by move=> i j lei lej /(inj_nth i.+1 j.+1 lei lej) [].
+apply/negP=> /(nthP x0) [i lti xE].
+by have := (inj_nth 0 i.+1 (ltn0Sn _) lti (esym xE)).
+Qed.
+
+Lemma uniqPn x0 s :
+  reflect (exists i j, [&& i < size s, j < size s,
+                        i != j & nth x0 s i == nth x0 s j])
+          (~~ uniq s).
+Proof.
+apply: (iffP idP) => [|[i] [j] /and4P[lei lej /eqP ne_ij eq_nth]]; last first.
++ by apply/negP=> /uniqP /(_ _ _ lei lej (eqP eq_nth)).
+elim: s => //= x s ih /nandP[]; last first.
++ by case/ih=> [i] [j] {ih}ih; exists i.+1, j.+1.
+rewrite negbK => /(nthP x0) [j ltj <-].
+by exists 0, j.+1 => /=; rewrite eqxx andbT.
+Qed.
+End uniqP.
 
 (* Equality up to permutation *)
 
@@ -2621,23 +2647,6 @@ Proof.
 rewrite /reshape_offset -subSKn {}/r /reshape_index.
 elim: ss => //= s ss IHss in i *; rewrite subn_eq0 nth_cat.
 by have [//|le_s_i] := ltnP; rewrite subnDA subSn /=.
-Qed.
-
-Lemma reshape_index_leq sh i1 i2 :
-  i1 <= i2 -> i2 < sumn sh ->
-  (reshape_index sh i1) < (reshape_index sh i2) \/
-  ((reshape_index sh i1) = (reshape_index sh i2) /\
-   (reshape_offset sh i1) <= (reshape_offset sh i2)).
-Proof.
-rewrite /reshape_offset /reshape_index.
-elim: sh i1 i2 => [i1 i2 |] //= s0 s IHs i1 i2.
-rewrite !subn_eq0.
-case: (ltnP i2 s0) => Hi2s0 //=.
-- by move=> Hi12 _; rewrite (leq_ltn_trans Hi12 Hi2s0) /= !subn0; right.
-- case: (ltnP i1 s0) => Hi1s0 //=; first by left.
-  rewrite -{1 2}(subnKC Hi2s0) -leq_subLR ltn_add2l => /IHs{IHs}Hrec/Hrec{Hrec}.
-  rewrite !subSn // !ltnS => [[|[H1 H2]]]; [left => // | right; rewrite !subnDA].
-  by split; first rewrite H1.
 Qed.
 
 End Flatten.

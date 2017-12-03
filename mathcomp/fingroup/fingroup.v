@@ -130,7 +130,7 @@ Require Import div path bigop prime finset.
 (* In addition to the generic suffixes described in ssrbool.v and finset.v,   *)
 (* we associate the following suffixes to group operations:                   *)
 (*   1 - identity element, as in group1 : 1 \in G.                            *)
-(*   M - multiplication, as is invMg : (x * y)^-1 = x^-1 * y^-1.              *)
+(*   M - multiplication, as is invMg : (x * y)^-1 = y^-1 * x^-1.              *)
 (*       Also nat multiplication, for expgM : x ^+ (m * n) = x ^+ m ^+ n.     *)
 (*   D - (nat) addition, for expgD : x ^+ (m + n) = x ^+ m * x ^+ n.          *)
 (*   V - inverse, as in mulgV : x * x^-1 = 1.                                 *)
@@ -1242,7 +1242,7 @@ Structure group_type : Type := Group {
 }.
 
 Definition group_of of phant gT : predArgType := group_type.
-Notation Local groupT := (group_of (Phant gT)).
+Local Notation groupT := (group_of (Phant gT)).
 Identity Coercion type_of_group : group_of >-> group_type.
 
 Canonical group_subType := Eval hnf in [subType for gval].
