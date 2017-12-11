@@ -59,7 +59,7 @@ We write
 
 ## Statements of lemmas, theorems and definitions.
 
-- Universal quantifications with dependent variable should appear on the left hand side of the colon, until we reach the first non dependent variable. e.g.
+- Universal quantifications with dependent variable should appear on the left hand side of the colon, until we reach the first non dependent variables. e.g.
   `Lemma example x y : x < y -> x >= y = false`
 
 ### Term style.
@@ -71,8 +71,8 @@ This particular example can be problematic if matrix.v is imported because then,
   + Hypothesis should not be named `H`, `H'`,... (these collide with
   subgroup variable conventions) but have meaningful names. For
   example, an hypothesis `n > 0` should be named `n_gt0`.
-  + Induction Hypothesies are prefixed by `IH` or `ih` (e.g. induction hypothesis on `n` is called `IH`).
-  + Natural numbers and integers should be names `m`, `n`, `p`, `d`, ...
+  + Induction Hypotheses are prefixed by `IH` or `ih` (e.g. induction hypothesis on `n` is called `IH`).
+  + Natural numbers and integers should be named `m`, `n`, `p`, `d`, ...
   + Elements of another ring should be named `x`, `y`, `z`, `u`, `v`, `w`, ...
-  + Polynomials are named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
-  + Matrices are named `M`, `N`, `D`, ...
+  + Polynomials should be named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
+  + Matrices should be named `A`, `B`, ..., `M`, `N`, ...
