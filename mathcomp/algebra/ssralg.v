@@ -4643,6 +4643,13 @@ Proof. by rewrite invfM invrK mulrC. Qed.
 Lemma divKf x : x != 0 -> involutive (fun y => x / y).
 Proof. by move=> nz_x y; rewrite invf_div mulrC divfK. Qed.
 
+Lemma div_eq1 x y : x / y = 1 -> x = y.
+Proof.
+  move=> H.
+  have := GRing.Field.intro_unit H; rewrite invr_eq0 => Hy.
+  by rewrite -[y]mul1r -H -mulrA [_ * y]mulrC (divff Hy) mulr1.
+Qed.
+
 Lemma expfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof.
 move/subnK=> <-; rewrite addnA addnK !exprD.
@@ -5630,6 +5637,7 @@ Definition mulfK := mulfK.
 Definition mulfVK := mulfVK.
 Definition divfK := divfK.
 Definition divKf := divKf.
+Definition div_eq1 := div_eq1.
 Definition invfM := invfM.
 Definition invf_div := invf_div.
 Definition expfB_cond := expfB_cond.
