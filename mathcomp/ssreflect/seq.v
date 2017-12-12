@@ -2623,6 +2623,23 @@ elim: ss => //= s ss IHss in i *; rewrite subn_eq0 nth_cat.
 by have [//|le_s_i] := ltnP; rewrite subnDA subSn /=.
 Qed.
 
+Lemma reshape_index_leq sh i1 i2
+      (r1 := reshape_index sh i1) (c1 := reshape_offset sh i1)
+      (r2 := reshape_index sh i2) (c2 := reshape_offset sh i2) :
+  i2 < sumn sh ->
+  (i1 <= i2) = ((r1 < r2) || ((r1 == r2 ) && (c1 <= c2))).
+Proof.
+rewrite {}/r1 {}/c1 {}/r2 {}/c2 /reshape_offset /reshape_index.
+elim: sh i1 i2 => [i1 i2 |] //= s0 s IHs i1 i2.
+rewrite !subn_eq0.
+case: (ltnP i1 s0) => Hi1s0 //= ; case: (ltnP i2 s0) => Hi2s0 //=.
+- by rewrite !subn0.
+- by have := leq_trans Hi1s0 Hi2s0 => /ltnW ->.
+- by have := leq_trans Hi2s0 Hi1s0; rewrite ltnNge => /negbTE ->.
+- rewrite -leq_subLR ltnS eqSS (subSn Hi1s0) (subSn Hi2s0).
+  by rewrite -{2}(subnK Hi2s0) addnC -leq_subLR !subnDA => /IHs ->.
+Qed.
+
 End Flatten.
 
 Prenex Implicits flatten shape reshape.
