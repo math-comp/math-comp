@@ -2087,6 +2087,25 @@ Notation "\bigcap_ ( i 'in' A | P ) B" :=
 Notation "\bigcap_ ( i 'in' A ) B" :=
   (\big[capmx/1%:M]_(i in A) B%MS) : matrix_set_scope.
 
+Section DirectSums.
+Variables (F : fieldType) (I : finType) (P : pred I).
+
+Lemma mxdirect_delta n f : {in P &, injective f} ->
+  mxdirect (\sum_(i | P i) <<delta_mx 0 (f i) : 'rV[F]_n>>).
+Proof.
+pose fP := image f P => Uf; have UfP: uniq fP by apply/dinjectiveP.
+suffices /mxdirectP : mxdirect (\sum_i <<delta_mx 0 i : 'rV[F]_n>>).
+  rewrite /= !(bigID [mem fP] predT) -!big_uniq //= !big_map !big_filter.
+  by move/mxdirectP; rewrite mxdirect_addsE => /andP[].
+apply/mxdirectP=> /=; transitivity (mxrank (1%:M : 'M[F]_n)).
+  apply/eqmx_rank; rewrite submx1 mx1_sum_delta summx_sub_sums // => i _.
+  by rewrite -(mul_delta_mx (0 : 'I_1)) genmxE submxMl.
+rewrite mxrank1 -[LHS]card_ord -sum1_card.
+by apply/eq_bigr=> i _; rewrite /= mxrank_gen mxrank_delta.
+Qed.
+
+End DirectSums.
+
 Section CardGL.
 
 Variable F : finFieldType.
