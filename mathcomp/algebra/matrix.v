@@ -1172,6 +1172,24 @@ Lemma add_block_mx m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2))
   A + B = block_mx (Aul + Bul) (Aur + Bur) (Adl + Bdl) (Adr + Bdr).
 Proof. by rewrite /= add_col_mx !add_row_mx. Qed.
 
+Lemma row_mx_eq0 (m n1 n2 : nat) (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)):
+  (row_mx A1 A2 == 0) = (A1 == 0) && (A2 == 0).
+Proof.
+apply/eqP/andP; last by case=> /eqP-> /eqP->; rewrite row_mx0.
+by rewrite -row_mx0 => /eq_row_mx [-> ->].
+Qed.
+
+Lemma col_mx_eq0 (m1 m2 n : nat) (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)):
+  (col_mx A1 A2 == 0) = (A1 == 0) && (A2 == 0).
+Proof.
+by rewrite -![_ == 0](inj_eq (@trmx_inj _ _ _)) !trmx0 tr_col_mx row_mx_eq0.
+Qed.
+
+Lemma block_mx_eq0 m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2)) :
+  (block_mx Aul Aur Adl Adr == 0) =
+  [&& Aul == 0, Aur == 0, Adl == 0 & Adr == 0].
+Proof. by rewrite col_mx_eq0 !row_mx_eq0 !andbA. Qed.
+
 Definition nz_row m n (A : 'M_(m, n)) :=
   oapp (fun i => row i A) 0 [pick i | row i A != 0].
 
