@@ -738,8 +738,10 @@ Proof. by rewrite opprD addrA addrK. Qed.
 Lemma subrKA z x y : (x - z) + (z + y) = x + y.
 Proof. by rewrite addrA addrNK. Qed.
 
-Lemma subr0_eq x y : x - y = 0 -> x = y.
-Proof. by rewrite -(subrr y) => /addIr. Qed.
+Lemma addr0_eq x y : x + y = 0 -> - x = y.
+Proof. by rewrite -[-x]addr0 => <-; rewrite addKr. Qed.
+
+Lemma subr0_eq x y : x - y = 0 -> x = y. Proof. by move/addr0_eq/oppr_inj. Qed.
 
 Lemma subr_eq x y z : (x - z == y) = (x == y + z).
 Proof. exact: can2_eq (subrK z) (addrK z) x y. Qed.
@@ -3200,6 +3202,13 @@ Proof.
 by apply: (iffP (unitrP x)) => [[y []] | [y]]; exists y; rewrite // mulrC.
 Qed.
 
+Lemma mulr1_eq x y : x * y = 1 -> x^-1 = y.
+Proof.
+by move=> xy_eq1; rewrite -[LHS]mulr1 -xy_eq1; apply/mulKr/unitrPr; exists y.
+Qed.
+
+Lemma divr1_eq x y : x / y = 1 -> x = y. Proof. by move/mulr1_eq/invr_inj. Qed.
+
 Lemma divKr x : x \is a unit -> {in unit, involutive (fun y => x / y)}.
 Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 
@@ -5354,6 +5363,7 @@ Definition opprB := opprB.
 Definition subr0 := subr0.
 Definition sub0r := sub0r.
 Definition subr_eq := subr_eq.
+Definition addr0_eq := addr0_eq.
 Definition subr0_eq := subr0_eq.
 Definition subr_eq0 := subr_eq0.
 Definition addr_eq0 := addr_eq0.
@@ -5598,6 +5608,8 @@ Definition holds_fsubst := holds_fsubst.
 Definition unitrM := unitrM.
 Definition unitrPr {R x} := @unitrPr R x.
 Definition expr_div_n := expr_div_n.
+Definition mulr1_eq := mulr1_eq.
+Definition divr1_eq := divr1_eq.
 Definition divKr := divKr.
 Definition mulf_eq0 := mulf_eq0.
 Definition prodf_eq0 := prodf_eq0.
