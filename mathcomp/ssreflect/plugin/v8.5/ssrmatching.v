@@ -1,9 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-
-Set Implicit Arguments.
-Unset Strict Implicit.
-Unset Printing Implicit Defensive.
+Declare ML Module "ssrmatching_plugin".
 
 Module SsrMatchingSyntax.
 
@@ -25,3 +22,5 @@ Notation LHS := (X in X = _)%pattern.
 End SsrMatchingSyntax.
 
 Export SsrMatchingSyntax.
+
+Tactic Notation "ssrpattern" ssrpatternarg(p) := ssrpattern p .
