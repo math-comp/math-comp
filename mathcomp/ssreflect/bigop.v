@@ -1159,6 +1159,14 @@ rewrite !(big_mkcond _ P) unlock.
 by elim: r1 => /= [|i r1 ->]; rewrite (mul1m, mulmA).
 Qed.
 
+Lemma big_allpairs I1 I2 (r1 : seq I1) (r2 : seq I2) F :
+  \big[*%M/1]_(i <- [seq (i1, i2) | i1 <- r1, i2 <- r2]) F i =
+    \big[*%M/1]_(i1 <- r1) \big[op/idx]_(i2 <- r2) F (i1, i2).
+Proof.
+elim: r1 => [|i1 r1 IHr1]; first by rewrite !big_nil.
+by rewrite big_cat IHr1 big_cons big_map.
+Qed.
+
 Lemma big_pred1_eq (I : finType) (i : I) F :
   \big[*%M/1]_(j | j == i) F j = F i.
 Proof. by rewrite -big_filter filter_index_enum enum1 big_seq1. Qed.
@@ -1504,6 +1512,7 @@ Implicit Arguments reindex [R op idx I J P F].
 Implicit Arguments reindex_inj [R op idx I h P F].
 Implicit Arguments pair_big_dep [R op idx I J].
 Implicit Arguments pair_big [R op idx I J].
+Implicit Arguments big_allpairs [R op idx I1 I2 r1 r2 F].
 Implicit Arguments exchange_big_dep [R op idx I J rI rJ P Q F].
 Implicit Arguments exchange_big_dep_nat [R op idx m1 n1 m2 n2 P Q F].
 Implicit Arguments big_ord_recl [R op idx].
