@@ -464,58 +464,110 @@ Qed.
 
 End Loop.
 
+Section orbit_in.
+
+Variable S : pred_sort (predPredType T).
+
+Hypothesis f_in : {in S, forall x, f x \in S}.
+Hypothesis injf : {in S &, injective f}.
+
+Lemma iter_in : {in S, forall x i, iter i f x \in S}.
+Proof. by move=> x xS; elim=> [|i /f_in]. Qed.
+
+Lemma finv_in : {in S, forall x, finv x \in S}.
+Proof. by move=> ??; rewrite iter_in. Qed.
+
+Lemma f_finv_in : {in S, cancel finv f}.
+Proof.
+move=> x xS; move: (looping_order x) (orbit_uniq x).
+rewrite /looping /orbit -orderSpred looping_uniq /= /looping; set n := _.-1.
+case/predU1P=> // /trajectP[i lt_i_n]; rewrite -iterSr.
+by move=> /injf ->; rewrite ?iter_in //; case/trajectP; exists i.
+Qed.
+
+Lemma finv_f_in : {in S, cancel f finv}.
+Proof. by move=> x xS; apply/injf; rewrite ?iter_in ?f_finv_in ?f_in. Qed.
+
+Lemma finv_inj_in : {in S &, injective finv}.
+Proof. by move=> x y xS yS q; rewrite -(f_finv_in xS) q f_finv_in. Qed.
+
+Lemma fconnect_sym_in : {in S &, forall x y, fconnect f x y = fconnect f y x}.
+Proof.
+suff Sf : {in S &, forall x y, fconnect f x y -> fconnect f y x}.
+  by move=> *; apply/idP/idP=> /Sf->.
+move=> x _ xS _ /connectP [p f_p ->]; elim: p => //= y p IHp in x xS f_p *.
+move: f_p; rewrite -{2}(finv_f_in xS) => /andP[/eqP <- /(IHp _ (f_in xS))].
+by move=> /connect_trans -> //; apply: fconnect_finv.
+Qed.
+
+Lemma iter_order_in : {in S, forall x, iter (order x) f x = x}.
+Proof. by move=> x xS; rewrite -orderSpred iterS; apply: f_finv_in. Qed.
+
+Lemma iter_finv_in n :
+  {in S, forall x, n <= order x -> iter n finv x = iter (order x - n) f x}.
+Proof.
+move=> x xS; rewrite -{2}[x]iter_order_in => // /subnKC {1}<-; move: (_ - n).
+move=> m; rewrite iter_add; elim: n => // n {2}<-.
+by rewrite iterSr /= finv_f_in // -iter_add iter_in.
+Qed.
+
+Lemma cycle_orbit_in : {in S, forall x, (fcycle f) (orbit x)}.
+Proof.
+move=> x xS; rewrite /orbit -orderSpred (cycle_path x) /= last_traject.
+by rewrite -/(finv x) fpath_traject f_finv_in ?eqxx.
+Qed.
+
+Lemma fpath_finv_in p x : (x \in S) && (fpath finv x p) =
+                          (last x p \in S) && (fpath f (last x p) (rev (belast x p))).
+Proof.
+elim: p x => //= y p IHp x; rewrite rev_cons rcons_path.
+transitivity [&& y \in S, f y == x & fpath finv y p].
+  apply/and3P/and3P => -[xS /eqP<- fxp]; split;
+  by rewrite ?f_finv_in ?finv_f_in ?finv_in ?f_in.
+rewrite andbCA {}IHp !andbA [RHS]andbC -andbA; congr [&& _, _ & _].
+by case: p => //= z p; rewrite rev_cons last_rcons.
+Qed.
+
+Lemma fpath_finv_f_in p : {in S, forall x,
+  fpath finv x p -> fpath f (last x p) (rev (belast x p))}.
+Proof. by move=> x xS /(conj xS)/andP; rewrite fpath_finv_in => /andP[]. Qed.
+
+Lemma fpath_f_finv_in p x : last x p \in S ->
+  fpath f (last x p) (rev (belast x p)) -> fpath finv x p.
+Proof. by move=> lS /(conj lS)/andP; rewrite -fpath_finv_in => /andP[]. Qed.
+
+End orbit_in.
+
 Hypothesis injf : injective f.
 
-Lemma f_finv : cancel finv f.
-Proof.
-move=> x; move: (looping_order x) (orbit_uniq x).
-rewrite /looping /orbit -orderSpred looping_uniq /= /looping; set n := _.-1.
-case/predU1P=> // /trajectP[i lt_i_n]; rewrite -iterSr => /= /injf ->.
-by case/trajectP; exists i.
-Qed.
+Lemma f_finv : cancel finv f. Proof. exact: (in1T (f_finv_in _ (in2W _))). Qed.
 
-Lemma finv_f : cancel f finv.
-Proof. exact (inj_can_sym f_finv injf). Qed.
+Lemma finv_f : cancel f finv. Proof. exact: (in1T (finv_f_in _ (in2W _))). Qed.
 
 Lemma fin_inj_bij : bijective f.
-Proof. by exists finv; [apply finv_f | apply f_finv]. Qed.
+Proof. by exists finv; [apply: finv_f|apply: f_finv]. Qed.
 
 Lemma finv_bij : bijective finv.
-Proof. by exists f; [apply f_finv | apply finv_f]. Qed.
+Proof. by exists f; [apply: f_finv|apply: finv_f]. Qed.
 
-Lemma finv_inj : injective finv.
-Proof. exact (can_inj f_finv). Qed.
+Lemma finv_inj : injective finv. Proof. exact: (can_inj f_finv). Qed.
 
 Lemma fconnect_sym x y : fconnect f x y = fconnect f y x.
-Proof.
-suff{x y} Sf x y: fconnect f x y -> fconnect f y x by apply/idP/idP; auto.
-case/connectP=> p f_p -> {y}; elim: p x f_p => //= y p IHp x.
-rewrite -{2}(finv_f x) => /andP[/eqP-> /IHp/connect_trans-> //].
-exact: fconnect_finv.
-Qed.
+Proof. exact: (in2T (fconnect_sym_in _ (in2W _))). Qed.
+
 Let symf := fconnect_sym.
 
 Lemma iter_order x : iter (order x) f x = x.
-Proof. by rewrite -orderSpred iterS; apply (f_finv x). Qed.
+Proof. exact: (in1T (iter_order_in _ (in2W _))). Qed.
 
 Lemma iter_finv n x : n <= order x -> iter n finv x = iter (order x - n) f x.
-Proof.
-rewrite -{2}[x]iter_order => /subnKC {1}<-; move: (_ - n) => m.
-by rewrite iter_add; elim: n => // n {2}<-; rewrite iterSr /= finv_f.
-Qed.
+Proof. exact: (in1T (@iter_finv_in _ _ (in2W _) _)). Qed.
 
 Lemma cycle_orbit x : fcycle f (orbit x).
-Proof.
-rewrite /orbit -orderSpred (cycle_path x) /= last_traject -/(finv x).
-by rewrite fpath_traject f_finv andbT /=.
-Qed.
+Proof. exact: (in1T (cycle_orbit_in _ (in2W _))). Qed.
 
 Lemma fpath_finv x p : fpath finv x p = fpath f (last x p) (rev (belast x p)).
-Proof.
-elim: p x => //= y p IHp x; rewrite rev_cons rcons_path -{}IHp andbC /=.
-rewrite (canF_eq finv_f) eq_sym; congr (_ && (_ == _)).
-by case: p => //= z p; rewrite rev_cons last_rcons.
-Qed.
+Proof. exact: (@fpath_finv_in T _ (in2W _)). Qed.
 
 Lemma same_fconnect_finv : fconnect finv =2 fconnect f.
 Proof.
@@ -722,4 +774,3 @@ Implicit Arguments intro_adjunction [T T' h e e' a].
 Implicit Arguments adjunction_n_comp [T T' e e' a].
 
 Unset Implicit Arguments.
-
