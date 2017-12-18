@@ -15,7 +15,9 @@ else
 COQDEP=$(COQBIN)coqdep
 endif
 
-OLD_MAKEFLAGS:=$(MAKEFLAGS)
+HAS_B:=$(filter -B B,$(MAKEFLAGS))
+# OLD_MAKEFLAGS must use =, not :=, to capture MAKEFLAGS at call time
+OLD_MAKEFLAGS=$(if $(HAS_B),$(MAKEFLAGS),$(filter-out -B B,$(MAKEFLAGS)))
 MAKEFLAGS+=-B
 
 .DEFAULT_GOAL := all
