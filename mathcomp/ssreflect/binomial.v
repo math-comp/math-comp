@@ -375,7 +375,7 @@ Lemma card_inj_ffuns D T :
   #|[set f : {ffun D -> T} | injectiveb f]| = #|T| ^_ #|D|.
 Proof.
 rewrite -card_inj_ffuns_on; apply: eq_card => f.
-by rewrite 2!inE; case: ffun_onP => // [].
+by rewrite 2!inE; case: ffun_onP.
 Qed.
 
 Lemma cards_draws T (B : {set T}) k :
