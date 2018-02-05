@@ -81,7 +81,6 @@ odd_order/PFsection9.v
 odd_order/stripped_odd_order_theorem.v
 odd_order/wielandt_fixpoint.v
 real_closed/all_real_closed.v
-real_closed/bigenough.v
 real_closed/cauchyreals.v
 real_closed/complex.v
 real_closed/mxtens.v
@@ -112,6 +111,7 @@ solvable/pgroup.v
 solvable/primitive_action.v
 solvable/sylow.v
 ssreflect/all_ssreflect.v
+ssreflect/bigenough.v
 ssreflect/bigop.v
 ssreflect/binomial.v
 ssreflect/choice.v
