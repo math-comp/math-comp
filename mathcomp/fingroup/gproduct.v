@@ -524,7 +524,7 @@ Lemma bigcprodWY I (r : seq I) P F G :
   \big[cprod/1]_(i <- r | P i) F i = G -> << \bigcup_(i <- r | P i) F i >> = G.
 Proof.
 elim/big_rec2: _ G => [|i A B _ IH G]; first by rewrite gen0.
-case /cprodP => [[K H -> defB] <- cKH].
+case/cprodP => [[K H -> defB] <- cKH].
 by rewrite -[<<_>>]joing_idr (IH H) ?cent_joinEr -?defB.
 Qed.
 
@@ -1034,7 +1034,7 @@ Proof. by move=> x y. Qed.
 
 Canonical fst_morphism := @Morphism _ _ setT _ (in2W fst_morphM).
 
-Canonical snd_morphism := @Morphism _ _ setT _ (in2W snd_morphM). 
+Canonical snd_morphism := @Morphism _ _ setT _ (in2W snd_morphM).
 
 Lemma injm_pair1g : 'injm pair1g.
 Proof. by apply/subsetP=> x /morphpreP[_ /set1P[->]]; apply: set11. Qed.
@@ -1052,7 +1052,7 @@ Lemma morphim_fstX (H1: {set gT1}) (H2 : {group gT2}) :
   [morphism of fun x => x.1] @* setX H1 H2 = H1.
 Proof.
 apply/eqP; rewrite eqEsubset morphimE setTI /=.
-apply/andP; split; apply/subsetP=> x. 
+apply/andP; split; apply/subsetP=> x.
   by case/imsetP=> x0; rewrite inE; move/andP=> [Hx1 _] ->.
 move=> Hx1; apply/imsetP; exists (x, 1); last by trivial.
 by rewrite in_setX Hx1 /=.
@@ -1062,9 +1062,9 @@ Lemma morphim_sndX (H1: {group gT1}) (H2 : {set gT2}) :
   [morphism of fun x => x.2] @* setX H1 H2 = H2.
 Proof.
 apply/eqP; rewrite eqEsubset morphimE setTI /=.
-apply/andP; split; apply/subsetP=> x. 
+apply/andP; split; apply/subsetP=> x.
   by case/imsetP=> x0; rewrite inE; move/andP=> [_ Hx2] ->.
-move=>Hx2; apply/imsetP; exists (1, x); last by [].
+move=> Hx2; apply/imsetP; exists (1, x); last by [].
 by rewrite in_setX Hx2 andbT.
 Qed.
 
@@ -1084,7 +1084,7 @@ Lemma setX_dprod (H1 : {group gT1}) (H2 : {group gT2}) :
 Proof.
 rewrite dprodE ?setX_prod //.
   apply/centsP=> [[x u]]; rewrite !inE /= => /andP[/eqP-> _] [v y].
-  by rewrite !inE /= => /andP[_ /eqP->]; congr (_, _); rewrite ?mul1g ?mulg1. 
+  by rewrite !inE /= => /andP[_ /eqP->]; congr (_, _); rewrite ?mul1g ?mulg1.
 apply/trivgP; apply/subsetP=> [[x y]]; rewrite !inE /= -!andbA.
 by case/and4P=> _ /eqP-> /eqP->; rewrite eqxx.
 Qed.

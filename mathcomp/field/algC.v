@@ -152,7 +152,7 @@ have sposDl x y : lt 0 x -> le 0 y -> lt 0 (x + y).
   have sqrtJ z : le 0 z -> conj (sqrt z) = sqrt z.
     rewrite posE -{2}[z]sqrtK -subr_eq0 -mulrBr mulf_eq0 subr_eq0.
     by case/pred2P=> ->; rewrite ?rmorph0.
-  case/andP=> nz_x /sqrtJ uJ /sqrtJ vJ. 
+  case/andP=> nz_x /sqrtJ uJ /sqrtJ vJ.
   set u := sqrt x in uJ; set v := sqrt y in vJ; pose w := u + i * v.
   have ->: x + y = w * conj w.
     rewrite rmorphD rmorphM iJ uJ vJ mulNr mulrC -subr_sqr sqrMi opprK.
@@ -171,7 +171,7 @@ have normD x y : le (norm (x + y)) (norm x + norm y).
     by have /andP[]: lt 0 (u + v) by rewrite sposDl // /lt nz_u.
   have le_sqr u v: conj u = u -> le 0 v -> le (u ^+ 2) (v ^+ 2) -> le u v.
     move=> Ru v_ge0; have [-> // | nz_u] := eqVneq u 0.
-    have [u_gt0 | u_le0 _] := boolP (lt 0 u).    
+    have [u_gt0 | u_le0 _] := boolP (lt 0 u).
       by rewrite leB (leB u) subr_sqr mulrC addrC; apply: sposM; apply: sposDl.
     rewrite leB posD // posE normN -addr_eq0; apply/eqP.
     rewrite /lt nz_u posE -subr_eq0 in u_le0; apply: (mulfI u_le0).
@@ -184,7 +184,7 @@ have normD x y : le (norm (x + y)) (norm x + norm y).
     by rewrite rmorphD !rmorphM !conjK addrC mulrC (mulrC y).
   rewrite -mulr2n -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
-  rewrite  subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
+  rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
   rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
   by rewrite (mulrC x) (mulrC y).
@@ -421,7 +421,7 @@ Lemma conjK : involutive conj.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
 
 Fact conj_nt : ~ conj =1 id.
-Proof. 
+Proof.
 have [i i2]: exists i : type, i ^+ 2 = -1.
   have [i] := @solve_monicpoly _ 2 (nth 0 [:: -1 : type]) isT.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
@@ -988,7 +988,7 @@ Proof.
 rewrite unfold_in CintEge0 ?divr_ge0 ?invr_ge0 ?ler0n // !pnatr_eq0.
 have [-> | nz_p] := altP eqP; first by rewrite dvd0n.
 apply/CnatP/dvdnP=> [[q def_q] | [q ->]]; exists q.
-  by apply/eqP; rewrite -eqC_nat natrM -def_q divfK ?pnatr_eq0. 
+  by apply/eqP; rewrite -eqC_nat natrM -def_q divfK ?pnatr_eq0.
 by rewrite [num in num / _]natrM mulfK ?pnatr_eq0.
 Qed.
 
@@ -1213,10 +1213,10 @@ Section AutLmodC.
 
 Variables (U V : lmodType algC) (f : {additive U -> V}).
 
-Lemma raddfZ_Cnat a u : a \in Cnat -> f (a *: u) = a *: f u. 
+Lemma raddfZ_Cnat a u : a \in Cnat -> f (a *: u) = a *: f u.
 Proof. by case/CnatP=> n ->; apply: raddfZnat. Qed.
 
-Lemma raddfZ_Cint a u : a \in Cint -> f (a *: u) = a *: f u. 
+Lemma raddfZ_Cint a u : a \in Cint -> f (a *: u) = a *: f u.
 Proof. by case/CintP=> m ->; rewrite !scaler_int raddfMz. Qed.
 
 End AutLmodC.

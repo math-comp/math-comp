@@ -370,7 +370,7 @@ have [q_gt4 | q_le4] := ltnP 4 q.
   rewrite natrM real_ler_distl ?rpredB ?rpredM ?rpred_nat // => /andP[lb_Pe _].
   rewrite -ltC_nat -(ltr_pmul2l (gt0CG P)) {lb_Pe}(ltr_le_trans _ lb_Pe) //.
   rewrite ltr_subr_addl (@ler_lt_trans _ ((p ^ q.-1)%:R ^+ 2)) //; last first.
-    rewrite  -!natrX ltC_nat ltn_sqr oU ltn_divRL ?dvdn_pred_predX //.
+    rewrite -!natrX ltC_nat ltn_sqr oU ltn_divRL ?dvdn_pred_predX //.
     rewrite -(subnKC qgt1) /= -!subn1 mulnBr muln1 -expnSr.
     by rewrite ltn_sub2l ?(ltn_exp2l 0) // prime_gt1.
   rewrite -mulrDr -natrX -expnM muln2 -subn1 doubleB -addnn -addnBA // subn2.

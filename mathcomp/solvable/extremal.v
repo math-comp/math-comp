@@ -343,7 +343,7 @@ have [ms0 os0]: m s0 = (p ^ n).+1%:R /\ #[s0] = p.
   rewrite subnK // mulSn -mulnA -expnS -addSn natrD natrM -oG char_Zp //.
   rewrite mulr0 addr0 => m_s0; split => //.
   have [d _] := m_se (n - e0)%N; rewrite -subnSK // expnSr expgM -/s0.
-  rewrite addSn subnK // -oG  mulrS natrM char_Zp // {d}mulr0 addr0. 
+  rewrite addSn subnK // -oG  mulrS natrM char_Zp // {d}mulr0 addr0.
   move/eqP; rewrite -m1 (inj_in_eq inj_m) ?group1 ?groupX // -order_dvdn.
   move/min_p; rewrite order_eq1; case/predU1P=> [s0_1 | ]; last by move/eqP.
   move/eqP: m_s0; rewrite eq_sym s0_1 m1 -subr_eq0 mulrSr addrK -val_eqE /=.
@@ -361,7 +361,7 @@ have defS1: 'Ohm_1(<[s]>) = <[s0]>.
   rewrite (Ohm1_cyclic_pgroup_prime _ p_s) ?cycle_cyclic ?leqnn ?cycle_eq1 //=.
     rewrite (OhmE _ p_s) mem_gen ?groupX //= !inE mem_cycle //.
     by rewrite -order_dvdn os0 ?dvdnn.
-  by apply/eqP=> s1; rewrite -os0 /s0 s1 expg1n order1 in p_gt1.  
+  by apply/eqP=> s1; rewrite -os0 /s0 s1 expg1n order1 in p_gt1.
 case: (even_prime p_pr) => [p2 | oddp]; last first.
   rewrite {+}/e0 oddp subn0 in s0 os0 ms0 os ms defS1 *.
   have [f defF] := cyclicP cycF; have defP: P = <[s]>.
@@ -591,7 +591,7 @@ rewrite (mulnC r) /r {1}def_n expnSr mulnA -mulnDl -mulnA -expnS.
 rewrite subnSK  // subn2 /q -def_n1 expnS dvdn_pmul2r // dvdn_addl.
   by case/dvdnP=> k ->; rewrite mulnC expgM mem_mulg ?mem_cycle.
 case: (ltngtP n 3) => [|n_gt3|n3]; first by rewrite ltnNge n_gt2.
-  by rewrite -subnSK // expnSr mulnA dvdn_mull. 
+  by rewrite -subnSK // expnSr mulnA dvdn_mull.
 case: (even_prime p_pr) notG8 => [-> | oddp _]; first by rewrite n3.
 by rewrite bin2odd // -!mulnA dvdn_mulr.
 Qed.
@@ -756,7 +756,7 @@ set B := [set: gT] => oB; set K := _ :\: _.
 case/existsP=> -[u v] /= /eqP[defB uq v4 uv].
 have nUV: <[v]> \subset 'N(<[u]>) by rewrite norms_cycle uv groupV cycle_id.
 rewrite norm_joinEr // in defB.
-have le_ou: #[u] <= q by rewrite dvdn_leq ?expn_gt0 // order_dvdn uq. 
+have le_ou: #[u] <= q by rewrite dvdn_leq ?expn_gt0 // order_dvdn uq.
 have le_ov: #[v] <= 4 by rewrite dvdn_leq // order_dvdn v4.
 have tiUV: <[u]> :&: <[v]> = 1 by rewrite cardMg_TI // defB oB leq_mul.
 have{le_ou le_ov} [ou ov]: #[u] = q /\ #[v] = 4.
@@ -1011,7 +1011,7 @@ have def_tG: {in G :\: X, forall t, t ^: G = <[x ^+ 2]> :* t}.
   move=> t X't; have [Gt notXt] := setDP X't.
   have defJt: {in X, forall z, t ^ z = z ^- 2 * t}.
     move=> z Xz; rewrite /= invMg -mulgA (conjgC _ t).
-    by rewrite  (invXX' _ t) ?groupV ?invgK.
+    by rewrite (invXX' _ t) ?groupV ?invgK.
   have defGt: X * <[t]> = G by rewrite (mulg_normal_maximal nsXG) ?cycle_subG.
   apply/setP=> tz; apply/imsetP/rcosetP=> [[t'z] | [z]].
     rewrite -defGt -normC ?cycle_subG ?(subsetP nXG) //.
@@ -1067,7 +1067,7 @@ split.
 - split=> //= H; apply/idP/idP=> [maxH |]; last first.
     by case/or3P=> /eqP->; rewrite ?maxMt.
   have [sHG nHG]:= andP (p_maximal_normal pG maxH).
-  have oH: #|H| = q. 
+  have oH: #|H| = q.
     apply: double_inj; rewrite -muln2 -(p_maximal_index pG maxH) Lagrange //.
     by rewrite oG -mul2n.
   rewrite !(eq_sym (gval H)) -eq_sym !eqEcard oH -orderE ox !oMt // !leqnn.
@@ -1212,7 +1212,7 @@ have def_tG: {in G :\: X, forall t, t ^: G = <[x ^+ 2]> :* t}.
   move=> t X't; have [Gt notXt] := setDP X't.
   have defJt: {in X, forall z, t ^ z = z ^- 2 * t}.
     move=> z Xz; rewrite /= invMg -mulgA (conjgC _ t).
-    by rewrite  (invXX' _ t) ?groupV ?invgK.
+    by rewrite (invXX' _ t) ?groupV ?invgK.
   have defGt: X * <[t]> = G by rewrite (mulg_normal_maximal nsXG) ?cycle_subG.
   apply/setP=> tz; apply/imsetP/rcosetP=> [[t'z] | [z]].
     rewrite -defGt -normC ?cycle_subG ?(subsetP nXG) //.
@@ -1795,7 +1795,7 @@ have p_i: p %| i.
 case=> [[n_gt23 xy] | [p2 Z_xxy]].
   suffices ->: cG = ModularGroup by []; apply/modular_group_classP.
   exists p => //; exists n => //; rewrite isogEcard card_modular_group //.
-  rewrite  oG leqnn andbT Grp_modular_group // -/q -/r.
+  rewrite oG leqnn andbT Grp_modular_group // -/q -/r.
   have{i def_yp p_i} [i def_yp]: exists i, y ^- p = x ^+ i ^+ p.
     by case/dvdnP: p_i => j def_i; exists j; rewrite -expgM -def_i.
   have Zyx: [~ y, x] \in Z.
@@ -1825,7 +1825,7 @@ case=> [[n_gt23 xy] | [p2 Z_xxy]].
   by rewrite -p2 -oZ order_dvdG.
 have{i def_yp p_i} Zy2: y ^+ 2 \in Z.
   rewrite defZ (OhmE _ pX) -groupV -p2 def_yp mem_gen // !inE groupX //= p2.
-  rewrite  expgS -{2}def_yp -(mulKg y y) -conjgE -conjXg -conjVg def_yp conjXg.
+  rewrite expgS -{2}def_yp -(mulKg y y) -conjgE -conjXg -conjVg def_yp conjXg.
   rewrite -expgMn //; last by apply: (centsP cXX); rewrite ?memJ_norm.
   by rewrite -order_dvdn (dvdn_trans (order_dvdG Z_xxy)) ?oZ.
 rewrite !cycle_traject !orderE oZ p2 !inE !mulg1 /= in Z_xxy Zy2 *.

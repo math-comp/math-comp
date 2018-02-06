@@ -120,7 +120,7 @@ Lemma int_rect (P : int -> Type) :
   -> (forall n : nat, P (- n) -> P (- (n.+1)))
   -> forall n : int, P n.
 Proof.
-by move=> P0 hPp hPn []; elim=> [|n ihn]//; do? [apply: hPn | apply: hPp].
+by move=> P0 hPp hPn []; elim=> [|n ihn]//; do ?[apply: hPn | apply: hPp].
 Qed.
 
 Definition int_rec := int_rect.
@@ -210,7 +210,7 @@ Lemma int_rect (P : int -> Type) :
   -> (forall n : nat, P (- (n%:Z)) -> P (- (n.+1%N%:Z)))
   -> forall n : int, P n.
 Proof.
-by move=> P0 hPp hPn []; elim=> [|n ihn]//; do? [apply: hPn | apply: hPp].
+by move=> P0 hPp hPn []; elim=> [|n ihn]//; do ?[apply: hPn | apply: hPp].
 Qed.
 
 Definition int_rec := int_rect.
@@ -546,7 +546,7 @@ case: (leqP m n)=> hmn; rewrite /intmul //=.
   rewrite -{2}[n](@subnKC m)// mulrnDr opprD addrA subrr sub0r.
   by case hdmn: (_ - _)%N=> [|dmn] /=; first by rewrite mulr0n oppr0.
 have hnm := ltnW hmn.
-rewrite  -{2}[m](@subnKC n)// mulrnDr addrAC subrr add0r.
+rewrite -{2}[m](@subnKC n)// mulrnDr addrAC subrr add0r.
 by rewrite subzn.
 Qed.
 

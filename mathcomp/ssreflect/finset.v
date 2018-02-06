@@ -746,7 +746,7 @@ Lemma cardsU A B : #|A :|: B| = (#|A| + #|B| - #|A :&: B|)%N.
 Proof. by rewrite -cardsUI addnK. Qed.
 
 Lemma cardsI A B : #|A :&: B| = (#|A| + #|B| - #|A :|: B|)%N.
-Proof. by rewrite  -cardsUI addKn. Qed.
+Proof. by rewrite -cardsUI addKn. Qed.
 
 Lemma cardsT : #|[set: T]| = #|T|.
 Proof. by rewrite cardsE. Qed.
@@ -1969,7 +1969,7 @@ Qed.
 Lemma pblock_equivalence_partition :
   {in D &, forall x y, (y \in pblock P x) = R x y}.
 Proof.
-have [_ tiP _] := and3P equivalence_partitionP. 
+have [_ tiP _] := and3P equivalence_partitionP.
 by move=> x y Dx Dy; rewrite /= (def_pblock tiP (PPx Dx) (Pxx Dx)) inE Dy.
 Qed.
 

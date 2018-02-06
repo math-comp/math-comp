@@ -204,7 +204,7 @@ Proof.
 have r2vP r: {v | v2r v = r}.
   by apply: sig_eqW; have [v _ vK] := v2r_bij; exists (v r).
 by exists (fun r => sval (r2vP r)) => r; case: (r2vP r).
-Qed. 
+Qed.
 Definition r2v := sval r2v_subproof.
 
 Lemma r2vK : cancel r2v v2r.   Proof. exact: (svalP r2v_subproof). Qed.
@@ -721,7 +721,7 @@ Lemma dimvS U V : (U <= V)%VS -> \dim U <= \dim V.
 Proof. exact: mxrankS. Qed.
 
 Lemma dimv_leqif_sup U V : (U <= V)%VS -> \dim U <= \dim V ?= iff (V <= U)%VS.
-Proof. exact: mxrank_leqif_sup. Qed. 
+Proof. exact: mxrank_leqif_sup. Qed.
 
 Lemma dimv_leqif_eq U V : (U <= V)%VS -> \dim U <= \dim V ?= iff (U == V).
 Proof. by rewrite eqEsubv; apply: mxrank_leqif_eq. Qed.
@@ -939,7 +939,7 @@ Lemma span_subvP {X U} : reflect {subset X <= U} (<<X>> <= U)%VS.
 Proof.
 rewrite /subV [@span _ _]unlock genmxE.
 apply: (iffP row_subP) => /= [sXU | sXU i].
-  by move=>  _ /seq_tnthP[i ->]; have:= sXU i; rewrite rowK memvK.
+  by move=> _ /seq_tnthP[i ->]; have:= sXU i; rewrite rowK memvK.
 by rewrite rowK -memvK sXU ?mem_tnth.
 Qed.
 
@@ -1005,7 +1005,7 @@ Lemma seq1_free v : free [:: v] = (v != 0).
 Proof. by rewrite /free span_seq1 dim_vline; case: (~~ _). Qed.
  
 Lemma perm_free X Y : perm_eq X Y -> free X = free Y.
-Proof. 
+Proof.
 by move=> eqX; rewrite /free (perm_eq_size eqX) (eq_span (perm_eq_mem eqX)).
 Qed.
 
@@ -1202,7 +1202,7 @@ Lemma bigcat_free :
     directv (\sum_(i | P i) <<Xs i>>) -> 
   (forall i, P i -> free (Xs i)) -> free (\big[cat/[::]]_(i | P i) Xs i).
 Proof.
-rewrite /free directvE /= span_bigcat => /directvP-> /= freeXs. 
+rewrite /free directvE /= span_bigcat => /directvP-> /= freeXs.
 rewrite (big_morph _ (@size_cat _) (erefl _)) /=.
 by apply/eqP/eq_bigr=> i /freeXs/eqP.
 Qed.
@@ -1534,7 +1534,7 @@ Qed.
 Lemma limg_lfunVK f : {in limg f, cancel f^-1%VF f}.
 Proof. by move=> _ /memv_imgP[u _ ->]; rewrite -!comp_lfunE inv_lfun_def. Qed.
 
-Lemma lkerE f U : (U <= lker f)%VS = (f @: U == 0)%VS. 
+Lemma lkerE f U : (U <= lker f)%VS = (f @: U == 0)%VS.
 Proof.
 rewrite unlock -dimv_eq0 /dimv /subsetv !genmxE mxrank_eq0.
 by rewrite (sameP sub_kermxP eqP).
@@ -1550,7 +1550,7 @@ Lemma eqlfun_inP V f g : reflect {in V, f =1 g} (V <= lker (f - g))%VS.
 Proof. by apply: (iffP subvP) => E x /E/eqlfunP. Qed.
 
 Lemma limg_ker_compl f U : (f @: (U :\: lker f) = f @: U)%VS.
-Proof. 
+Proof.
 rewrite -{2}(addv_diff_cap U (lker f)) limg_add; apply/esym/addv_idPl.
 by rewrite (subv_trans _ (sub0v _)) // subv0 -lkerE capvSr.
 Qed.
@@ -1825,7 +1825,7 @@ Lemma addv_pi2_proj U V w (pi2 := addv_pi2 U V) : pi2 (pi2 w) = pi2 w.
 Proof. by rewrite addv_pi2_id ?memv_pi2. Qed.
 
 Lemma addv_pi1_pi2 U V w :
-  w \in (U + V)%VS -> addv_pi1 U V w + addv_pi2 U V w = w. 
+  w \in (U + V)%VS -> addv_pi1 U V w + addv_pi2 U V w = w.
 Proof. by rewrite -addv_diff; apply: daddv_pi_add; apply: capv_diff. Qed.
 
 Section Sumv_Pi.

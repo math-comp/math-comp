@@ -23,10 +23,10 @@ Variable Q1 : forall P1, Q 1 P1.
 
 Lemma testmE1 : myEx.
 Proof.
-apply: ExI 1 _ _ _ _. 
+apply: ExI 1 _ _ _ _.
   match goal with |- P 1 => exact: P1 | _ => fail end.
   match goal with |- P (1+1) => exact: P11 | _ => fail end.
-  match goal with |- forall p : P 1, Q 1 p => move=>*; exact: Q1 | _ => fail end.
+  match goal with |- forall p : P 1, Q 1 p => move=> *; exact: Q1 | _ => fail end.
 match goal with |- forall (p : P 1) (q : P (1+1)), is_true (R 1 p 1 q) => done | _ => fail end.
 Qed.
 
@@ -54,7 +54,7 @@ Hint Resolve P1.
 
 Lemma testmE12 : myEx.
 Proof.
-apply: ExI 1 _ _ _ _. 
+apply: ExI 1 _ _ _ _.
   match goal with |- P (1+1) => exact: P11 | _ => fail end.
   match goal with |- Q 1 P1 => exact: Q1 | _ => fail end.
 match goal with |- forall (q : P (1+1)), is_true (R 1 P1 1 q) => done | _ => fail end.
@@ -68,7 +68,7 @@ Ltac ssrautoprop := trivial with SSR.
 
 Lemma testmE13 : myEx.
 Proof.
-apply: ExI 1 _ _ _ _. 
+apply: ExI 1 _ _ _ _.
   match goal with |- Q 1 P1 => exact: Q1 | _ => fail end.
 match goal with |- is_true (R 1 P1 1 P11) => done | _ => fail end.
 Qed.
@@ -84,7 +84,7 @@ Hint Resolve (Q1 P1) : SSR.
    thus the goal Q 1 ?p1 is faced by trivial after ?p1, and is thus evar free *)
 Lemma testmE14 : myEx1.
 Proof.
-apply: ExI1 1 _ _ _ _.  
+apply: ExI1 1 _ _ _ _.
 match goal with |- is_true (R1 1 P1 1 P11 (Q1 P1)) => done | _ => fail end.
 Qed.
 

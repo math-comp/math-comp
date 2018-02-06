@@ -382,7 +382,7 @@ Lemma prod_repr_lin n2 (rG1 : reprG 1) (rG2 : reprG n2) :
   {in G, forall x, let cast_n2 := esym (mul1n n2) in
       prod_repr rG1 rG2 x = castmx (cast_n2, cast_n2) (rG1 x 0 0 *: rG2 x)}.
 Proof.
-move=> x Gx /=; set cast_n2 := esym _; rewrite /prod_repr /= !mxE !lshift0.      
+move=> x Gx /=; set cast_n2 := esym _; rewrite /prod_repr /= !mxE !lshift0.
 apply/matrixP=> i j; rewrite castmxE /=.
 do 2![rewrite mxE; case: splitP => [? ? | []//]].
 by congr ((_ *: rG2 x) _ _); apply: val_inj.
@@ -511,7 +511,7 @@ Proof. by move=> A B; rewrite /xcfun linearB mulmxBl !mxE. Qed.
 Canonical xcfun_additive phi := Additive (xcfun_is_additive phi).
 
 Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
-Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed. 
+Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.
 
 (* In order to add a second canonical structure on xcfun *)
 Definition xcfun_r_head k A phi := let: tt := k in xcfun phi A.
@@ -530,7 +530,7 @@ Lemma xcfunZl a phi A : xcfun (a *: phi) A = a * xcfun phi A.
 Proof.
 rewrite /xcfun !mxE big_distrr; apply: eq_bigr => i _ /=.
 by rewrite !mxE cfunE mulrCA.
-Qed. 
+Qed.
 
 Lemma xcfun_repr n rG A : xcfun (@cfRepr n rG) A = \tr (gring_op rG A).
 Proof.
@@ -1431,7 +1431,7 @@ Proof.
 apply/eqP/andP=> [|[/eqP-> /pred2P[]-> //]]; last by rewrite !scale0r.
 move/(congr1 (cfdotr 'chi__)) => /= eq_ai_bj.
 move: {eq_ai_bj}(eq_ai_bj i) (esym (eq_ai_bj j)); rewrite !cfdotZl !cfdot_irr.
-by rewrite !mulr_natr !mulrb !eqxx eq_sym orbC; case: ifP => _ -> //= ->. 
+by rewrite !mulr_natr !mulrb !eqxx eq_sym orbC; case: ifP => _ -> //= ->.
 Qed.
 
 Lemma eq_signed_irr (s t : bool) i j :
@@ -1624,7 +1624,7 @@ have:= (normC_sum_upper _ Kx) i; rewrite !cfunE => -> // {i Ci} i _.
 have chi_i_ge0: 0 <= '[chi, 'chi_i].
   by rewrite Cnat_ge0 ?Cnat_cfdot_char_irr.
 by rewrite !cfunE normrM (normr_idP _) ?ler_wpmul2l ?char1_ge_norm ?irr_char.
-Qed. 
+Qed.
 
 Lemma TI_cfker_irr : \bigcap_i cfker 'chi[G]_i = [1].
 Proof.
@@ -1710,7 +1710,7 @@ Lemma cfRes_irr_irr chi :
   chi \is a character -> 'Res[H] chi \in irr H -> chi \in irr G.
 Proof.
 have [sHG /char_reprP[rG ->] | not_sHG Nchi] := boolP (H \subset G).
-  rewrite -(cfRepr_sub _ sHG) => /irr_reprP[rH irrH def_rH]; apply/irr_reprP. 
+  rewrite -(cfRepr_sub _ sHG) => /irr_reprP[rH irrH def_rH]; apply/irr_reprP.
   suffices /subg_mx_irr: mx_irreducible (subg_repr rG sHG) by exists rG.
   by apply: mx_rsim_irr irrH; apply/cfRepr_rsimP/eqP.
 rewrite cfResEout // => /irrP[j Dchi_j]; apply/lin_char_irr/cfRes_lin_lin=> //.
@@ -2152,7 +2152,7 @@ Lemma cfBigdprod_eq1 phi :
 Proof.
 move=> Nphi; set Phi := cfBigdprod defG phi.
 apply/eqP/eqfun_inP=> [Phi1 i Pi | phi1]; last first.
-  by apply: big1 => i /phi1->; rewrite rmorph1. 
+  by apply: big1 => i /phi1->; rewrite rmorph1.
 have Phi1_1: Phi 1%g = 1 by rewrite Phi1 cfun1E group1.
 have nz_Phi1: Phi 1%g != 0 by rewrite Phi1_1 oner_eq0.
 have [_ <-] := cfBigdprodK nz_Phi1 Pi.
@@ -2484,7 +2484,7 @@ Lemma lin_char_group G :
              {morph cF : u v / (u * v)%g >-> (u * v)%R},
              forall k, {morph cF : u / (u^+ k)%g >-> u ^+ k},
              {morph cF: u / u^-1%g >-> u^-1%CF}
-           & {mono cF: u / #[u]%g >-> #[u]%CF} ]}}. 
+           & {mono cF: u / #[u]%g >-> #[u]%CF} ]}}.
 Proof.
 pose linT := {i : Iirr G | 'chi_i \is a linear_char}.
 pose cF (u : linT) := 'chi_(sval u).
@@ -2567,7 +2567,7 @@ Variables (n : nat) (rG : mx_representation [fieldType of algC] G n).
 
 Definition det_repr_mx x : 'M_1 := (\det (rG x))%:M.
 
-Fact det_is_repr : mx_repr G det_repr_mx. 
+Fact det_is_repr : mx_repr G det_repr_mx.
 Proof.
 split=> [|g h Gg Gh]; first by rewrite /det_repr_mx repr_mx1 det1.
 by rewrite /det_repr_mx repr_mxM // det_mulmx !mulmxE scalar_mxM.
@@ -2725,7 +2725,7 @@ apply/eqP/is_scalar_mxP=> [|[c rG_c]].
   by case/max_cfRepr_norm_scalar=> // c; exists c.
 rewrite -(sqrCK (char1_ge0 (cfRepr_char rG))) normC_def; congr (sqrtC _).
 rewrite expr2 -{2}(mulgV x) -char_inv ?cfRepr_char ?cfunE ?groupM ?groupV //.
-rewrite  Gx group1 repr_mx1 repr_mxM ?repr_mxV ?groupV // !mulrb rG_c.
+rewrite Gx group1 repr_mx1 repr_mxM ?repr_mxV ?groupV // !mulrb rG_c.
 by rewrite invmx_scalar -scalar_mxM !mxtrace_scalar mulrnAr mulrnAl mulr_natl.
 Qed.
 

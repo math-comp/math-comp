@@ -15,5 +15,5 @@ Set Implicit Arguments.
     | false => o = None
     end.
   Proof.
-  by case: b; elim/wf_inv=>//;case: o=>// a *; exists a.
+  by case: b; elim/wf_inv=> //; case: o=> // a *; exists a.
   Qed.

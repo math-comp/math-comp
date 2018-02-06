@@ -441,12 +441,14 @@ CoInductive eqn0_xor_gt0 n : bool -> bool -> Set :=
 Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
 Proof. by case: n; constructor. Qed.
 
-CoInductive compare_nat m n : bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+CoInductive compare_nat m n :
+   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | CompareNatLt of m < n : compare_nat m n true false true false false false
   | CompareNatGt of m > n : compare_nat m n false true false true false false
   | CompareNatEq of m = n : compare_nat m n true true false false true true.
 
-Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n) (n < m) (n == m) (m == n).
+Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
+                                   (n < m) (n == m) (m == n).
 Proof.
 rewrite !ltn_neqAle [_ == m]eq_sym; case: ltnP => [mn|].
   by rewrite ltnW // gtn_eqF //; constructor.

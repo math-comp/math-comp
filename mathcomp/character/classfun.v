@@ -464,7 +464,7 @@ Notation "{ 'in' CFD , 'isometry' tau , 'to' CFR }" :=
   (at level 0, format "{ 'in'  CFD ,  'isometry'  tau ,  'to'  CFR }")
      : type_scope.
 
-Section ClassFun. 
+Section ClassFun.
 
 Variables (gT : finGroupType) (G : {group gT}).
 Implicit Types (A B : {set gT}) (H K : {group gT}) (phi psi xi : 'CF(G)).
@@ -1123,7 +1123,7 @@ Qed.
 Lemma eq_pairwise_orthogonal R S :
   perm_eq R S -> pairwise_orthogonal R = pairwise_orthogonal S.
 Proof.
-apply: catCA_perm_subst R S => R S S'. 
+apply: catCA_perm_subst R S => R S S'.
 rewrite !pairwise_orthogonal_cat !orthogonal_catr (orthogonal_sym R S) -!andbA.
 by do !bool_congr.
 Qed.
@@ -1201,7 +1201,7 @@ Qed.
 Lemma sub_orthonormal S1 S2 :
   {subset S1 <= S2} -> uniq S1 -> orthonormal S2 -> orthonormal S1.
 Proof.
-move=> sS12 uniqS1 /orthonormalP[_ oS1]. 
+move=> sS12 uniqS1 /orthonormalP[_ oS1].
 by apply/orthonormalP; split; last apply: sub_in2 sS12 _ _.
 Qed.
 
@@ -1386,7 +1386,7 @@ Qed.
 
 Lemma cfRes_is_multiplicative : multiplicative cfRes.
 Proof.
-split=> [phi psi|]; [apply/cfunP=> x | exact: cfRes_cfun1]. 
+split=> [phi psi|]; [apply/cfunP=> x | exact: cfRes_cfun1].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
 Canonical cfRes_rmorphism := AddRMorphism cfRes_is_multiplicative.
@@ -1489,7 +1489,7 @@ Canonical cfMorph_linear := Linear cfMorph_is_linear.
 
 Fact cfMorph_is_multiplicative : multiplicative cfMorph.
 Proof.
-split=> [phi psi|]; [apply/cfunP=> x | exact: cfMorph_cfun1]. 
+split=> [phi psi|]; [apply/cfunP=> x | exact: cfMorph_cfun1].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
 Canonical cfMorph_rmorphism := AddRMorphism cfMorph_is_multiplicative.
@@ -1567,7 +1567,7 @@ Canonical cfIsom_unlockable := [unlockable of cfIsom].
 
 Lemma cfIsomE phi x : x \in G -> cfIsom phi (f x) = phi x.
 Proof.
-move=> Gx; rewrite unlock cfMorphE //= /restrm ?defG ?cfRes_id ?invmE //. 
+move=> Gx; rewrite unlock cfMorphE //= /restrm ?defG ?cfRes_id ?invmE //.
 by rewrite -defR mem_morphim.
 Qed.
 
@@ -1751,7 +1751,7 @@ Lemma sub_cfker_mod (A : {set gT}) K (psi : 'CF(G / K)) :
   (A \subset cfker (psi %% K)) = (A / K \subset cfker psi)%g.
 Proof.
 by move=> nsKG nKA; rewrite -(quotientSGK nKA) ?quotient_cfker_mod ?cfker_mod.
-Qed.  
+Qed.
 
 Lemma cfker_quo H phi :
   H <| G -> H \subset cfker (phi) -> cfker (phi / H) = (cfker phi / H)%g.
@@ -1872,7 +1872,7 @@ Proof. by apply: cforder_inj_rmorph cfSdprod_inj. Qed.
 
 End SDproduct.
 
-Section DProduct. 
+Section DProduct.
 
 Variables (gT : finGroupType) (G K H : {group gT}).
 Hypothesis KxH : K \x H = G.
@@ -2065,7 +2065,7 @@ by rewrite -[P j](mem_enum P) r_j.
 Qed.
 
 Lemma cfBigdprodi_iso i : P i -> isometry (@cfBigdprodi i).
-Proof. by move=> Pi phi psi; rewrite cfDprodl_iso Pi !cfRes_id. Qed. 
+Proof. by move=> Pi phi psi; rewrite cfDprodl_iso Pi !cfRes_id. Qed.
 
 Definition cfBigdprod (phi : forall i, 'CF(A i)) :=
   \prod_(i | P i) cfBigdprodi (phi i).
@@ -2321,7 +2321,7 @@ Lemma cfIndM phi psi:  H \subset G ->
 Proof.
 move=> HsG; apply/cfun_inP=> x Gx; rewrite !cfIndE // !cfunE !cfIndE // -mulrA.
 congr (_ * _); rewrite mulr_suml; apply: eq_bigr=> i iG; rewrite !cfunE.
-case:(boolP (x^i \in H))=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
+case: (boolP (x^i \in H))=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
 by rewrite !cfResE //; congr (_*_); rewrite cfunJgen ?genGid.
 Qed.
 

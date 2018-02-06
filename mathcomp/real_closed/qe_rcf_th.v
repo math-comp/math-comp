@@ -143,7 +143,7 @@ move/eqP: (rdivp_eq q p).
 rewrite eq_sym (can2_eq (addKr _ ) (addNKr _)); move/eqP=> hr.
 rewrite hr; case qpq0: (rdivp p q == 0).
   by rewrite (eqP qpq0) mul0r oppr0 add0r mu_mulC // lcn_neq0.
-rewrite  (leq_trans _ (mu_add _ _)) // -?hr //.
+rewrite (leq_trans _ (mu_add _ _)) // -?hr //.
 rewrite leq_min mu_opp mu_mul ?mulf_neq0 ?qpq0 ?q0 // leq_addl.
 by rewrite mu_mulC // lcn_neq0.
 Qed.
@@ -185,7 +185,7 @@ Definition ctmat n := (ctmat1 ^t n).
 Lemma ctmat_unit : forall n, zmxR (ctmat n) \in unitmx.
 Proof.
 case=> [|n] /=; first by rewrite map_mx1 ?unitmx1//; apply: zinjR_morph.
-elim:n=> [|n ihn] /=; first by  apply: ctmat1_unit.
+elim: n=> [|n ihn] /=; first by  apply: ctmat1_unit.
 rewrite map_mxT //.
 apply: tensmx_unit=> //; last exact: ctmat1_unit.
 by elim: n {ihn}=> // n ihn; rewrite muln_eq0.
@@ -277,7 +277,7 @@ Qed.
 
 Fixpoint sg_tab n : seq (seq int) :=
   if n is m.+1
-    then flatten (map (fun x => map (fun l => x :: l) (sg_tab m)) [::1;-1;0])
+    then flatten (map (fun x => map (fun l => x :: l) (sg_tab m)) [::1; -1; 0])
     else [::[::]].
 
 Lemma sg_tab_nil n : (sg_tab n == [::]) = false.
@@ -522,7 +522,7 @@ have [p'0|p'_neq0] := eqVneq p^`() 0.
   move/(root_size_gt1 p_neq0): rpx.
   by rewrite -subn_gt0 subn1 -size_deriv p'0 size_poly0.
 have p'q0: p^`() * q != 0 by rewrite mulf_neq0.
-move:(p'q0); rewrite mulf_eq0 negb_or; case/andP=> p'0 q0.
+move: (p'q0); rewrite mulf_eq0 negb_or; case/andP=> p'0 q0.
 have p0: p != 0 by move: p'0; apply: contra; move/eqP->; rewrite derivC.
 rewrite /jump  mu_mul// {1}(@mu_deriv_root _ _ p)// addn1 p'q0 /=.
 case emq: (\mu_(_) q)=> [|m].
@@ -825,10 +825,10 @@ wlog cpq: p q hpqa hpqb / coprimep p q => [hwlog|].
   apply: hwlog; rewrite ?coprimep_div_gcd ?p0 // rootM.
   + apply: contra hpqa; rewrite -!dvdp_XsubCl => /orP.
     case=> /dvdp_trans-> //; rewrite (dvdp_trans (divp_dvd _));
-    by rewrite  ?(dvdp_gcdl, dvdp_gcdr) ?(dvdp_mulIl, dvdp_mulIr).
+    by rewrite ?(dvdp_gcdl, dvdp_gcdr) ?(dvdp_mulIl, dvdp_mulIr).
   + apply: contra hpqb; rewrite -!dvdp_XsubCl => /orP.
     case=> /dvdp_trans-> //; rewrite (dvdp_trans (divp_dvd _));
-    by rewrite  ?(dvdp_gcdl, dvdp_gcdr) ?(dvdp_mulIl, dvdp_mulIr).
+    by rewrite ?(dvdp_gcdl, dvdp_gcdr) ?(dvdp_mulIl, dvdp_mulIr).
 have p0: p != 0 by apply: contraNneq hpqa => ->; rewrite mul0r rootC.
 have q0: q != 0 by apply: contraNneq hpqa => ->; rewrite mulr0 rootC.
 have pq0 : p * q != 0 by rewrite mulf_neq0.
@@ -903,7 +903,7 @@ pose m p q := maxn (size p) (size q).+1; rewrite -!/(m _ _).
 suff {p q} Hnext p q : q != 0 -> (m q (next_mod p q) < m p q)%N; last first.
   rewrite /m -maxnSS leq_max !geq_max !ltnS leqnn /= /next_mod.
   rewrite size_scale ?oppr_eq0 ?lcn_neq0 //=.
-  by move=> q_neq0; rewrite  ltn_rmodp ?q_neq0 ?orbT.
+  by move=> q_neq0; rewrite ltn_rmodp ?q_neq0 ?orbT.
 suff {p q} m_gt0 p q : (0 < m p q)%N; last by rewrite leq_max orbT.
 rewrite -[m p q]prednK //=; have [//|p_neq0] := altP (p =P 0).
 have [->|q_neq0] := altP (q =P 0); first by rewrite !aux0.

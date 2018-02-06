@@ -147,7 +147,7 @@ Proof.
 move=> p_nc q_nc; pose dp := (size p).-1; pose dq := (size q).-1.
 pose S := Sylvester_mx p q; pose dS := (dq + dp)%N.
 have dS_gt0: dS > 0 by rewrite /dS /dq -(subnKC q_nc).
-pose j0 := Ordinal dS_gt0. 
+pose j0 := Ordinal dS_gt0.
 pose Ss0 := col_mx (p *: \col_(i < dq) 'X^i) (q *: \col_(i < dp) 'X^i).
 pose Ss := \matrix_(i, j) (if j == j0 then Ss0 i 0 else (S i j)%:P).
 pose u ds s := \sum_(i < ds) cofactor Ss (s i) j0 * 'X^i.
@@ -325,13 +325,13 @@ apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
   - by rewrite size_poly1.
   - apply: leq_trans (size_mul_leq _ _) _.
     by rewrite -subn1 -addnS leq_subLR addnA leq_add.
-  rewrite !mxE eq_sym !inE; case: (s j == j); first by rewrite polyseqXsubC. 
+  rewrite !mxE eq_sym !inE; case: (s j == j); first by rewrite polyseqXsubC.
   by rewrite sub0r size_opp size_polyC leq_b1.
 rewrite -{8}[n]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
 apply: subset_leq_card; apply/subsetP=> j; move/(_ =P j)=> fix_j.
 rewrite !inE -{1}fix_j (inj_eq (@perm_inj _ s)) orbb.
 by apply: contraNneq nfix_i => <-; rewrite fix_j.
-Qed.   
+Qed.
 
 Lemma size_char_poly : size char_poly = n.+1.
 Proof.
@@ -356,7 +356,7 @@ have ->: \tr A = \sum_(x <- diagA) x by rewrite big_map enumT.
 rewrite -size_diagA {}/p; elim: diagA => [|x d IHd].
   by rewrite !big_nil mulr1 coefX oppr0.
 rewrite !big_cons coefXM mulrBl coefB IHd opprD addrC; congr (- _ + _).
-rewrite mul_polyC coefZ [size _]/= -(size_prod_XsubC _ id) -lead_coefE. 
+rewrite mul_polyC coefZ [size _]/= -(size_prod_XsubC _ id) -lead_coefE.
 by rewrite (monicP _) ?monic_prod_XsubC ?mulr1.
 Qed.
 
@@ -591,7 +591,7 @@ Variables (d n : nat) (A : 'M[aR]_n).
 Lemma map_rVpoly (u : 'rV_d) : fp (rVpoly u) = rVpoly u^f.
 Proof.
 apply/polyP=> k; rewrite coef_map !coef_rVpoly.
-by case: (insub k) => [i|]; rewrite  /=  ?rmorph0 // mxE.
+by case: (insub k) => [i|]; rewrite /=  ?rmorph0 // mxE.
 Qed.
 
 Lemma map_poly_rV p : (poly_rV p)^f = poly_rV (fp p) :> 'rV_d.
@@ -817,7 +817,7 @@ rewrite polySpred ?monic_neq0 // -/m1 big_ord_recr /= -lead_coefE.
 rewrite opprD addrC (monicP mon_p) mul1r subrK !mulrN -mulNr !mulr_sumr.
 apply: Msum => j _; rewrite mulrA mulrACA -exprD; apply: IHn.
   by rewrite -addnS addnC addnBA // leq_subLR leq_add.
-by rewrite -mulN1r; do 2!apply: (genM) => //; apply: genR. 
+by rewrite -mulN1r; do 2!apply: (genM) => //; apply: genR.
 Qed.
 
 Lemma integral_root_monic u p :

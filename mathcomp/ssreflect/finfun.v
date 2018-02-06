@@ -207,7 +207,7 @@ Lemma pffun_onP y D R f :
           (f \in pffun_on_mem y (mem D) (mem R)).
 Proof.
 apply: (iffP (pfamilyP y D (fun _ => R) f)) => [] [-> f_fam]; split=> //.
-  by move=>  _ /imageP[x Ax ->]; apply: f_fam.
+  by move=> _ /imageP[x Ax ->]; apply: f_fam.
 by move=> x Ax; apply: f_fam; apply/imageP; exists x.
 Qed.
 
@@ -267,7 +267,7 @@ apply/imageP/andP=> [[f0 /familyP/=Ff0] [{f}-> ->]| [Fy /familyP/=Ff]].
   split; first by have:= Ff0 x0; rewrite /= mem_head.
   apply/familyP=> x; have:= Ff0 x; rewrite ffunE inE /=.
   by case: eqP => //= -> _; rewrite ifN ?inE.
-exists (g (y, f)). 
+exists (g (y, f)).
   by apply/familyP=> x; have:= Ff x; rewrite ffunE /= inE; case: eqP => // ->.
 congr (_, _); last apply/ffunP=> x; do !rewrite ffunE /= ?eqxx //.
 by case: eqP => // ->{x}; apply/eqP; have:= Ff x0; rewrite ifN.

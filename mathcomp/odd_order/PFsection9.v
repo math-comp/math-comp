@@ -89,7 +89,7 @@ Let defW2 : 'C_H(W1) = W2. Proof. exact: typeP_cent_core_compl MtypeP. Qed.
 
 Lemma Ptype_Fcore_sdprod : H ><| (U <*> W1) = M.
 Proof.
-have [_ /= sW1M mulHUW1 _ tiHUW1] := sdprod_context defM. 
+have [_ /= sW1M mulHUW1 _ tiHUW1] := sdprod_context defM.
 have [/= /andP[sHHU _] sUHU mulHU nHU tiHU] := sdprod_context defHU.
 rewrite sdprodE /= norm_joinEr // ?mulgA ?mulHU //.
   by rewrite mulG_subG nHU (subset_trans sW1M) ?gFnorm.
@@ -322,7 +322,7 @@ Proof.
 apply: Frobenius_quotient frobUW1 _ nsCUW1 _.
   by apply: nilpotent_sol; have [_ []] := MtypeP.
 by have [] := Ptype_Fcore_factor_facts; rewrite eqEsubset sCU.
-Qed.  
+Qed.
 
 Definition typeP_Galois := acts_irreducibly U Hbar 'Q.
 
@@ -397,7 +397,7 @@ have [oH1 defHbar]: #|H1| = p /\ \big[dprod/1]_(w in W1bar) H1 :^ w = Hbar.
   by rewrite -(big_imset id injW1) -defH1W0 big_imset.
 split=> //; set a := #|_ : _|; pose q1 := #|(W1 / H0)^#|.
 have a_gt1: a > 1.
-  rewrite indexg_gt1 subsetIidl /= astabQ -sub_quotient_pre //. 
+  rewrite indexg_gt1 subsetIidl /= astabQ -sub_quotient_pre //.
   apply: contra neqCU => cH1U; rewrite [C]unlock (sameP eqP setIidPl) /= astabQ.
   rewrite -sub_quotient_pre // -(bigdprodWY defHbar) cent_gen centsC.
   by apply/bigcupsP=> w Ww; rewrite centsC centJ -(normsP nUW1b w) ?conjSg.
@@ -663,7 +663,7 @@ pose nF := <[1%R : F]>; have o_nF: #|nF| = p.
 have cyc_uF := @field_unit_group_cyclic F.
 exists F.
   exists phi; last first.
-    split=> //; first exact/isomP; apply/esym/eqP; rewrite eqEcard o_nF -phi_s. 
+    split=> //; first exact/isomP; apply/esym/eqP; rewrite eqEcard o_nF -phi_s.
     by rewrite (@cycle_subG F) mem_morphim //= card_injm ?subsetIl ?oW2b.
   exists psi => //; last first.
     by split=> // h x Hh Ux; rewrite qactJ (subsetP nH0U) ?phiJ.
@@ -834,7 +834,7 @@ Lemma typeP_nonGalois_characters (not_Galois : ~~ typeP_Galois) :
             (lb_d %| lb_n /\ lb_n %/ lb_d <= count irr_qa (S_ H0U'))%N].
 Proof.
 case: (typeP_Galois_Pn _) => H1 [oH1 nH1U nH1Uq defHbar aP]; rewrite [sval _]/=.
-move => a; case: aP; rewrite -/a => a_gt1 a_dv_p1 cycUb1 isoUb.
+move=> a; case: aP; rewrite -/a => a_gt1 a_dv_p1 cycUb1 isoUb.
 set part_a := ({in _, _}); pose HCbar := (HC / H0)%G.
 have [_ /mulG_sub[sHUM sW1M] nHUW1 tiHUW1] := sdprodP defM.
 have [nsHHU _ /mulG_sub[sHHU sUHU] nHU tiHU] := sdprod_context defHU.
@@ -870,7 +870,7 @@ have Part_a: part_a.
   have{kersH0} kertH0: H0 \subset cfker 'chi_t.
     by rewrite (sub_cfker_constt_Res_irr sHt).
   have Ltheta: theta \is a linear_char.
-    by rewrite /theta -quo_IirrE // (char_abelianP _ _). 
+    by rewrite /theta -quo_IirrE // (char_abelianP _ _).
   have Dtheta : _ = theta := cfBigdprod_Res_lin defHbar Ltheta.
   set T := 'I_HU['chi_t]; have sHT: H \subset T by rewrite sub_Inertia.
   have sTHU: T \subset HU by rewrite Inertia_sub.
@@ -1086,11 +1086,11 @@ split=> {Part_a part_a}//.
     rewrite odd_exp -(subnKC (prime_gt1 pr_q)) /= -subn1 odd_sub ?prime_gt0 //.
     by rewrite -oH1 (oddSg sH1H) ?quotient_odd // mFT_odd.
   have p1_gt0: (0 < p.-1)%N by rewrite -(subnKC (prime_gt1 p_pr)).
-  apply/eqP; rewrite -(eqn_pmul2r p1_gt0) -expnSr prednK ?prime_gt0 //. 
+  apply/eqP; rewrite -(eqn_pmul2r p1_gt0) -expnSr prednK ?prime_gt0 //.
   by rewrite -oXtheta -defXmu card_in_imset // cardC1 card_Iirr_abelian ?oH1.
 clear Xmu def_IXmu Smu sSmu_mu ResIndXmu uSmu sz_Smu sz_mu s_mu_H0C Dmu.
 clear Mtheta Xtheta irrXtheta oXtheta sXthXH0C mu_f Fmu_f mk_mu sW1_Imu inj_mu.
-clear nz_thetaH lin_thetaH lin_theta Ftheta inj_theta irr_thetaH0 def_Itheta. 
+clear nz_thetaH lin_thetaH lin_theta Ftheta inj_theta irr_thetaH0 def_Itheta.
 clear theta Dtheta => irr_qa lb_n lb_d.
 have sU'U: U' \subset U := der_sub 1 U.
 have nH0U := subset_trans sUHU nH0HU; have nH0U' := subset_trans sU'U nH0U.
@@ -1157,7 +1157,7 @@ have{lam_lin} thetaH1 i j: 'Res[H1] (theta i j) = 'chi_i.
 have Itheta r: r \in Mtheta -> 'I_HU['chi_r]%CF = HCH1.
   case/imset2P=> i j; rewrite /= in_setC1 => nz_i _ Dr; apply/eqP.
   rewrite eqEsubset sub_Inertia //= Dr mod_IirrE // cfIirrE ?lin_char_irr //.
-  rewrite andbT -(quotientSGK _ (normal_sub nsH0_HCH1)) ?subIset ?nH0HU //. 
+  rewrite andbT -(quotientSGK _ (normal_sub nsH0_HCH1)) ?subIset ?nH0HU //.
   rewrite inertia_mod_quo //.
   apply: subset_trans (sub_inertia_Res _ (nH1wHUb _ (group1 _))) _.
   rewrite /= conjsg1 thetaH1 (inertia_irr_prime _ p_pr) //.
@@ -1533,7 +1533,7 @@ have sS10: cfConjC_subset S1 (S_ H0C').
 have cohS1: coherent S1 M^# tau.
   apply: uniform_degree_coherence (subset_subcoherent scohS0 sS10) _.
   by apply: all_pred1_constant (q * a)%:R _ _; rewrite all_map filter_all.
-pose S3 := filter [predC S1] (S_ H0C'); move: {2}_.+1 (ltnSn (size S3)) => nS. 
+pose S3 := filter [predC S1] (S_ H0C'); move: {2}_.+1 (ltnSn (size S3)) => nS.
 move: @S3 (sS10) (cohS1); have: {subset S1 <= S1} by [].
 elim: nS {-1}S1 => // nS IHnS S2 => sS12 S3 sS20 cohS2; rewrite ltnS => leS3nS.
 have [ntS3|] := boolP (size S3 > 0)%N; last first.
@@ -1563,7 +1563,7 @@ without loss [[eqS12 irrS1 H0C_S1] [Da_p defC] [S3qu ne_qa_qu] [oS1 oS1ua]]:
   pose is_qu := [pred chi : 'CF(M) | chi 1%g == (q * u)%:R].
   pose isn't_qu := [pred chi | is_qu chi ==> all is_qu S3].
   have /hasP[chi S3chi qu'chi]: has isn't_qu S3.
-    rewrite /isn't_qu; have [_|] := boolP (all _ _); last by rewrite has_predC. 
+    rewrite /isn't_qu; have [_|] := boolP (all _ _); last by rewrite has_predC.
     by rewrite (eq_has (fun _ => implybT _)) has_predT.
   have [S2'chi S0chi]: chi \notin S2 /\ chi \in S_ H0C'.
     by apply/andP; rewrite mem_filter in S3chi.

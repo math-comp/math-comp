@@ -400,16 +400,16 @@ by apply: sub_in_pnat => p /(pnatPpi skM)/orP[] // kMp /negP.
 Qed.
 
 Lemma FtypeJ M x : ((M :^ x)%G \in 'M_'F) = (M \in 'M_'F).
-Proof. by rewrite inE mmaxJ pgroupJ (eq_p'group _ (kappaJ M x)) !inE. Qed. 
+Proof. by rewrite inE mmaxJ pgroupJ (eq_p'group _ (kappaJ M x)) !inE. Qed.
 
 Lemma PtypeJ M x : ((M :^ x)%G \in 'M_'P) = (M \in 'M_'P).
-Proof. by rewrite !in_setD mmaxJ FtypeJ. Qed. 
+Proof. by rewrite !in_setD mmaxJ FtypeJ. Qed.
 
 Lemma P1typeJ M x : ((M :^ x)%G \in 'M_'P1) = (M \in 'M_'P1).
 Proof.
 rewrite inE PtypeJ pgroupJ [M \in 'M_'P1]inE; congr (_ && _).
 by apply: eq_pgroup => p; rewrite inE /= kappaJ sigmaJ.
-Qed. 
+Qed.
 
 Lemma P2typeJ M x : ((M :^ x)%G \in 'M_'P2) = (M \in 'M_'P2).
 Proof. by rewrite in_setD PtypeJ P1typeJ -in_setD. Qed.
@@ -529,7 +529,7 @@ have [have_a nK1K ntE1 sE1K]: [/\ part_a, b1_hyp, E1 :!=: 1 & E1 \subset K].
       apply: contraNeq (kappa_nonregular (pnatPpi kK piKp) EpMY).
       move/(subG1_contra (setIS U (centS sYy))).
       have{y sYy Ky} sYE1 := subset_trans sYy (subset_trans Ky sKE1).
-      have ntY: Y :!=: 1 by apply: (nt_pnElem EpY). 
+      have ntY: Y :!=: 1 by apply: (nt_pnElem EpY).
       rewrite -subG1 /=; have [_ <- _ tiE32] := sdprodP defU.
       rewrite -subcent_TImulg ?subsetI ?(subset_trans sYE1) // mulG_subG.
       rewrite !subG1 /= => /nandP[nregE3Y | nregE2Y].
@@ -769,7 +769,7 @@ have hallE: \sigma(M)^'.-Hall(M) E.
   rewrite pHallE /= -/E -mulUK mul_subG //= TI_cardMg //.
   rewrite -(partnC \kappa(M) (part_gt0 _ _)) (partn_part _ (@kappa_sigma' M)).
   apply/eqP; rewrite -partnI -(card_Hall hallK) mulnC; congr (_ * _)%N.
-  by rewrite (card_Hall hallU); apply: eq_partn => p; apply: negb_or. 
+  by rewrite (card_Hall hallU); apply: eq_partn => p; apply: negb_or.
 have [K1 | ntK] := altP (K :=P: 1).
   rewrite K1 sdprodg1 -{1}(mulg1 U) -{1}K1 mulUK sdprod_sigma //.
   by split=> //; first apply: semiregular_prime; apply: semiregular1r.
@@ -1448,7 +1448,7 @@ have{K_spec} defZX: {in MX, forall Mi, K_ Mi \x Ks_ Mi = Z}.
   by rewrite -defNXs (subset_trans sXK) // (subset_trans (joing_subl _ Ks)).
 have{hallK_Zi} hallK_Z: {in MX, forall Mi, co_sHallK Mi Z}.
   by move=> Mi MXi; rewrite -(defZX _ MXi); apply: hallK_Zi.
-have nsK_Z: {in MX, forall Mi, K_ Mi <| Z /\ Ks_ Mi <| Z}. 
+have nsK_Z: {in MX, forall Mi, K_ Mi <| Z /\ Ks_ Mi <| Z}.
   by move=> Mi /defZX; apply: dprod_normal2.
 have tiKs: {in MX &, forall Mi Mj, gval Mi != gval Mj -> Ks_ Mi :&: Ks_ Mj = 1}.
   move=> Mi Mj MXi MXj; apply: contraNeq; rewrite -rank_gt0.
@@ -1514,7 +1514,7 @@ have defT: \bigcup_(Mi in MX) (Ks_ Mi)^# * (K_ Mi)^# = T.
     have [sXx abelX dimX] := pnElemP EpX.
     have piXp: p \in \pi(X) by rewrite -p_rank_gt0 p_rank_abelem ?dimX.
     have sXK: X \subset K by rewrite (subset_trans sXx) ?cycle_subG.
-    have E1X: X \in 'E^1(K) by apply/nElemP; exists p; apply/pnElemP. 
+    have E1X: X \in 'E^1(K) by apply/nElemP; exists p; apply/pnElemP.
     have [Mi MNXi sXMis] := exMNX X E1X; have MXi: Mi \in MX := setU1r M MNXi.
     have sXZ: X \subset Z := subset_trans sXK (joing_subl _ _).
     have sMip: p \in \sigma(Mi) := pnatPpi (pcore_pgroup _ _) (piSg sXMis piXp).
@@ -1609,9 +1609,9 @@ have oTG: (#|TG|%:R = (1 + n / z - \sum_(Mi in MX) (k_ Mi)^-1) * g)%R.
   rewrite natrM natf_indexg ?subsetT //= -/z -mulrA mulrC; congr (_ * _)%R.
   rewrite oT natrB; last by rewrite ltnW // -subn_gt0 lt0n -oT cards_eq0.
   rewrite mulrC natrD -/n -/z natr_sum /=.
-  rewrite mulrBl mulrDl big_distrl divff //=; congr (_ - _)%R. 
+  rewrite mulrBl mulrDl big_distrl divff //=; congr (_ - _)%R.
   apply: eq_bigr => Mi MXi; have defZi := defZX _ MXi.
-  by rewrite /z -(dprod_card defZi) natrM invfM mulrC divfK.  
+  by rewrite /z -(dprod_card defZi) natrM invfM mulrC divfK.
 have neMNX: MNX != set0.
   move: ntK; rewrite -rank_gt0 => /rank_geP[X /exMNX[Mi MNXi _]].
   by apply/set0Pn; exists Mi.
@@ -1722,7 +1722,7 @@ have{nilMis} cycZ: cyclic Z.
     apply: wlog_neg; rewrite -ltnNge ltn_neqAle p_rank_gt0 => /andP[_ piSp].
     have [_ /and3P[sKjMj kKj _]] := PmaxMX _ MXj.
     rewrite -(rank_kappa (pnatPpi kKj (piSg sSKj piSp))) p_rankS //.
-    exact: subset_trans sSKj sKjMj.  
+    exact: subset_trans sSKj sKjMj.
   rewrite (dprod_nil (defZX _ MXi)) abelian_nil ?cyclic_abelian //=.
   exact: (nilpotentS (subsetIl _ _)) nilMis.
 have cycK: cyclic K := cyclicS (joing_subl _ _) cycZ.
@@ -1798,7 +1798,7 @@ have oTGgt_g2: (g / 2%:R < #|TG|%:R)%R.
   without loss [lt1p ltpq]: p q odd_p odd_q / 1 < p /\ p < q.
     have [p_pr q_pr]: prime p /\ prime q by rewrite !pdiv_prime ?cardG_gt1.
     have [ltpq | ltqp | eqpq] := ltngtP p q.
-    - by apply; rewrite ?prime_gt1. 
+    - by apply; rewrite ?prime_gt1.
     - by rewrite mulrC; apply; rewrite ?prime_gt1.
     have [] := hallK_Z _ MX0.
     rewrite K0 Ks0 => /and3P[_ sM'K _] /and3P[_ sMKs _].
@@ -1839,7 +1839,7 @@ rewrite defZhat {1}defKs; split; first 2 [by split].
     rewrite sub_abelian_cent ?cyclic_abelian //=; last first.
       by rewrite (subset_trans sxK) ?joing_subl.
     move: ntx; rewrite -rank_gt0 /= -{1}(setIidPr sxK) => /rank_geP[X].
-    rewrite nElemI -setIdE -defZ => /setIdP[E1X sXx]. 
+    rewrite nElemI -setIdE -defZ => /setIdP[E1X sXx].
     by have [<- _] := defNX _ E1X; rewrite setIS ?cents_norm ?centS.
   + case/setD1P; rewrite -cycle_eq1 -cycle_subG -cent_cycle => nty syKs.
     have [_ [defNKs defNY] _ _ _] := Ptype_structure PmaxMstar hallKstar.
@@ -2067,7 +2067,7 @@ have [Mst _ [_ _ _ [cycZ _ defZ _ _] _]] := Ptype_embedding PmaxM hallK.
 rewrite -(mulKVg y x) -/y' 2!inE negb_or andbC.
 do [set Ks := 'C_(_)(K); set Z := K <*> _] in cycZ defZ *.
 have Ks_y: y \in Ks.
-  have cKZ := sub_abelian_cent (cyclic_abelian cycZ) (joing_subl K Ks). 
+  have cKZ := sub_abelian_cent (cyclic_abelian cycZ) (joing_subl K Ks).
   rewrite inE Ms_y (subsetP cKZ) // -(defZ y'); last by rewrite !inE nty'.
   by rewrite inE cent1C (subsetP sMsM).
 have [_ [defNK _] _ _ _] := Ptype_structure PmaxM hallK.
@@ -2169,7 +2169,7 @@ have [sKM s'K] := (subset_trans sKE sEM, pgroupS sKE s'E).
 have regQ: 'C_(M`_\sigma)(Q) = 1.
   apply/eqP; apply: contraFT (k'M q) => nregQ.
   have EqQ_M: Q \in 'E_q^1(M) by apply/pnElemP.
-  by rewrite unlock 3!inE /= t1Mq; apply/exists_inP; exists Q. 
+  by rewrite unlock 3!inE /= t1Mq; apply/exists_inP; exists Q.
 have nsKM: K <| M.
   have [s'q _] := andP t1Mq.
   have EqQ_NK: Q \in 'E_q^1('N_M(K)) by apply/pnElemP; rewrite subsetI sQM.
@@ -2240,7 +2240,7 @@ have{t12Hq} [/= t1Hq | /= t2Hq] := orP t12Hq.
   by have [_ _ _ _ [|<- //]] := Ptype_structure PmaxH hallL; apply/setDP.
 left; split=> //.
 have [x defQ]: exists x, Q :=: <[x]> by apply/cyclicP; rewrite prime_cyclic ?oQ.
-rewrite defQ cent_cycle in nregQHs *; rewrite (cent1_nreg_sigma_uniq maxH) //. 
+rewrite defQ cent_cycle in nregQHs *; rewrite (cent1_nreg_sigma_uniq maxH) //.
   by rewrite 2!inE -cycle_eq1 -cycle_subG -defQ (nt_pnElem EqQ).
 by rewrite /p_elt /order -defQ oQ pnatE.
 Qed.
@@ -2351,7 +2351,7 @@ have sUHs: U \subset H`_\sigma.
   have sK_HsDq: K \subset HsDq.
     rewrite sub_gen ?subsetU // orbC -p_core_Fitting.
     by rewrite (sub_Hall_pcore (nilpotent_pcore_Hall _ (Fitting_nil _))) ?qK.
-  have [|sHsDq_H nHsDq_H] := andP (_ : HsDq <| H).   
+  have [|sHsDq_H nHsDq_H] := andP (_ : HsDq <| H).
     rewrite -(quotientGK nsHsH) -[HsDq]quotientYK //= cosetpre_normal //.
     by rewrite -{3}mulHsD quotientMidl quotient_normal // pcore_normal.
   have sU_HsDq: U \subset HsDq.
@@ -2458,7 +2458,7 @@ have{p pi_p sMp t2Np b'Mp} FmaxM: M \in 'M_'F.
   have kMq: q \in \kappa(M).
     by case/orP: (pnatPpi skM piMq) => //= sMq; case/negP: sM'q.
   have [K hallK sQK] := Hall_superset (mmax_sol maxM) sQM (pi_pnat qQ kMq).
-  have EqKQ: Q \in 'E_q^1(K) by apply/pnElemP.  
+  have EqKQ: Q \in 'E_q^1(K) by apply/pnElemP.
   have [L _ [uniqL [kLhallKs sMhallKs] _ _ _]] := Ptype_embedding PmaxM hallK.
   set Ks := 'C_(_)(K) in kLhallKs sMhallKs.
   have{uniqL} defL: 'N[x] :^ g = L.

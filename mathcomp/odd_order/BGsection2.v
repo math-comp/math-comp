@@ -134,7 +134,7 @@ without loss closF: F rG absG / group_closure_field F gT.
   move=> IH; apply: (@group_closure_field_exists gT F) => [[F' f closF']].
   by apply: IH (map_repr f rG) _ closF'; rewrite map_mx_abs_irr.
 elim: {G}_.+1 {-2}G (ltnSn #|G|) => // m IHm G leGm in n rG absG solG *.
-have [G1 | ntG] := eqsVneq G 1%g. 
+have [G1 | ntG] := eqsVneq G 1%g.
   by rewrite abelian_abs_irr ?G1 ?abelian1 // in absG; rewrite (eqP absG) dvd1n.
 have [H nsHG p_pr] := sol_prime_factor_exists solG ntG.
 set p := #|G : H| in p_pr.
@@ -159,7 +159,7 @@ have card_sH: #|sH| = #|G : 'C_G[W | 'Cl]|.
     have /imsetP[W' _ defW'] := Clifford_atrans irrG sH.
     have WW': W' \in orbit 'Cl G W by rewrite orbit_in_sym // -defW' inE.
     by rewrite defW' andbT; apply/subsetP=> W'' /orbit_in_trans->.
-  rewrite orbit_stabilizer // card_in_imset //. 
+  rewrite orbit_stabilizer // card_in_imset //.
   exact: can_in_inj (act_reprK _).
 have sHcW: H \subset 'C_G[W | 'Cl].
   apply: subset_trans (subset_trans (joing_subl _ _) (Clifford_astab sH)) _.
@@ -882,7 +882,7 @@ have{IHm} abelQ: abelian Q.
     move/forallP/(_ P); apply: contraL; rewrite subsetI subxx => -> /=.
     apply: contra ntQ'; rewrite /Q => /eqP->.
     by rewrite (setIidPr _) ?sub1G // commG1.
-  case/eqP: ntQ';  have{p'Q'}: P :&: Q^`(1)%g = 1%g.
+  case/eqP: ntQ'; have{p'Q'}: P :&: Q^`(1)%g = 1%g.
     rewrite coprime_TIg ?(pnat_coprime (pHall_pgroup sylP)) //= -/Q.
     by rewrite (pi_p'nat p'Q') // !inE p_pr.
   by rewrite (setIidPr _) // comm_subG ?subsetIr.
@@ -925,7 +925,7 @@ have ap1: a ^+ p = 1.
 have ab1: a * b = 1.
   have: Q \subset <<[set y in G | \det (rG y) == 1]>>.
   rewrite subIset // genS //; apply/subsetP=> yz; case/imset2P=> y z Gy Gz ->.
-    rewrite inE !repr_mxM ?groupM ?groupV //= !detM (mulrCA _ (\det (rG y))). 
+    rewrite inE !repr_mxM ?groupM ?groupV //= !detM (mulrCA _ (\det (rG y))).
     rewrite -!det_mulmx -!repr_mxM ?groupM ?groupV //.
     by rewrite mulKg mulVg repr_mx1 det1.
   rewrite gen_set_id; last first.
@@ -1034,7 +1034,7 @@ pose B := col_mx u v; have uB: B \in unitmx.
   by rewrite mulmx1 -addsmxE addsmxS ?defU ?defUc.
 have Umod: mxmodule rP U by apply: rfix_mx_module.
 pose W := rfix_mx (factmod_repr Umod) P.
-have ntW: W != 0. 
+have ntW: W != 0.
   apply: (rfix_pgroup_char charFp) => //.
   rewrite eqmxMfull ?row_full_unit ?unitmx_inv ?row_ebase_unit //.
   by rewrite rank_copid_mx -(eqP Uscal).

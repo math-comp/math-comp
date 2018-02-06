@@ -14,7 +14,7 @@ Require Import sylow abelian maximal hall frobenius.
 From mathcomp
 Require Import matrix mxalgebra mxrepresentation vector ssrnum algC algnum.
 From mathcomp
-Require Import classfun character inertia vcharacter integral_char. 
+Require Import classfun character inertia vcharacter integral_char.
 From mathcomp
 Require Import PFsection1 PFsection2 PFsection3 PFsection4 PFsection5.
 
@@ -187,7 +187,7 @@ have{odd_e} mod1e_lb m: odd m -> m == 1 %[mod e] -> (m > 1 -> 2 * e + 1 <= m)%N.
   move=> odd_m e_dv_m1 m_gt1; rewrite eqn_mod_dvd 1?ltnW // subn1 in e_dv_m1.
   by rewrite mul2n addn1 dvdn_double_ltn.
 have nsH1L: H1 <| L by rewrite normalY // gFnormal_trans.
-have nsH1K: H1 <| K by rewrite (normalS _ sKL nsH1L) // join_subG der_sub. 
+have nsH1K: H1 <| K by rewrite (normalS _ sKL nsH1L) // join_subG der_sub.
 have [sH1K nH1K] := andP nsH1K; have sMH1: M \subset H1 by apply: joing_subr.
 have cohH1: coherent (S H1) L^# tau.
   apply: uniform_degree_coherence (subset_subcoherent scohS _) _ => //.
@@ -229,7 +229,7 @@ have not_abKb: ~~ abelian (K / M).
   by rewrite join_subG subxx andbT -quotient_der ?quotient_sub1.
 have /is_abelemP[p p_pr /and3P[pKb _ _]]: is_abelem (K / H1).
   have: solvable (K / H1)%g by apply: quotient_sol solK.
-  by case/(minnormal_solvable (chief_factor_minnormal chiefH1)).  
+  by case/(minnormal_solvable (chief_factor_minnormal chiefH1)).
 have [[_ p_dv_Kb _] nsMK] := (pgroup_pdiv pKb ntKb, normalS sMK sKL nsML).
 have isoKb: K / M / (H1 / M) \isog K / H1 := third_isog sMH1 nsMK nsH1K.
 have{nilKM} pKM: p.-group (K / M)%g.
@@ -309,7 +309,7 @@ have Ndg: {in calX, forall xi : 'CF(L), xi 1%g = (e * p ^ d xi)%:R}.
   rewrite /d => _ /seqIndP[i _ ->]; rewrite cfInd1 // -/e.
   have:= dvd_irr1_cardG i; have /CnatP[n ->] := Cnat_irr1 i.
   rewrite -natrM natCK dvdC_nat mulKn // -p_part => dv_n_K.
-  by rewrite part_pnat_id // (pnat_dvd dv_n_K).  
+  by rewrite part_pnat_id // (pnat_dvd dv_n_K).
 have [chi Ychi leYchi]: {chi | chi \in Y & {in Y, forall xi, d xi <= d chi}%N}.
   have [/eqP/nilP Y0 | ntY] := posnP (size Y); first by rewrite Y0 in homoY.
   pose i := [arg max_(i > Ordinal ntY) d Y`_i].
@@ -459,7 +459,7 @@ suffices Ea2 l (phi := 'chi[G]_l) (kerZphi : kerZ l):
 - move=> l phi kerZphi.
   have Zphi1: phi 1%g \in Cint by rewrite irr1_degree rpred_nat.
   have chi0 x: x \in Z -> 'chi[G]_0 x = 1.
-    by rewrite irr0 cfun1E => /(subsetP sZG) ->.  
+    by rewrite irr0 cfun1E => /(subsetP sZG) ->.
   have: kerZ 0 by move=> x y /setD1P[_ Zx] /setD1P[_ Zy]; rewrite !chi0.
   move/Ea2/(eqAmodMl (Aint_irr l z)); rewrite !{}chi0 // -/phi eqAmod_sym.
   rewrite mulrDr mulr1 !mulr_natr => /eqAmod_trans/(_ (Ea2 l kerZphi)).
@@ -474,7 +474,7 @@ suffices Ea2 l (phi := 'chi[G]_l) (kerZphi : kerZ l):
   have: '['Res[Z] phi, 'chi_0] \in Crat.
     by rewrite rpred_Cnat ?Cnat_cfdot_char ?cfRes_char ?irr_char.
   rewrite irr0 cfdotE (big_setD1 _ (group1 Z)) cfun1E cfResE ?group1 //=.
-  rewrite rmorph1 mulr1; congr (_ * (_ + _) \in Crat). 
+  rewrite rmorph1 mulr1; congr (_ * (_ + _) \in Crat).
   rewrite -sumr_const; apply: eq_bigr => x Z1x; have [_ Zx] := setD1P Z1x.
   by rewrite cfun1E cfResE ?Zx // rmorph1 mulr1; apply: kerZphi.
 pose alpha := 'omega_l['K_i1]; pose phi1 := phi 1%g.
@@ -653,7 +653,7 @@ without loss [/p_groupP[p p_pr pH] not_cHH]: / p_group H /\ ~~ abelian H.
   by apply; rewrite (isog_abelian isoH) (pgroup_p pH).
 have sylH: p.-Sylow(G) H. (* required for (6.7) *)
   rewrite -Sylow_subnorm -normD1; have [_ _ /eqP->] := and3P tiA.
-  by apply/and3P; rewrite -oW1 -pgroupE (coprime_p'group _ pH) // coprime_sym. 
+  by apply/and3P; rewrite -oW1 -pgroupE (coprime_p'group _ pH) // coprime_sym.
 pose caseA := 'Z(H) :&: W2 \subset [1]%g; pose caseB := ~~ caseA.
 have caseB_P: caseB -> [/\ case_c2, W2 :!=: 1%g & W2 \subset 'Z(H)].
   rewrite /caseB /caseA; have [->|] := eqP; first by rewrite subsetIr.
@@ -779,7 +779,7 @@ have{odd_frobL1} caseA_cohXY: caseA -> coherent (X ++ Y) L^# tau.
   pose psi1 := xi1 - a *: eta1.
   have Zpsi1: psi1 \in 'Z[S, L^#].
     rewrite zcharD1E !cfunE (uniY _ Yeta1) -xi1_1 subrr eqxx andbT.
-    by rewrite rpredB ?rpredZ_Cnat ?mem_zchar ?(sXS _ Xxi1) // sYS.    
+    by rewrite rpredB ?rpredZ_Cnat ?mem_zchar ?(sXS _ Xxi1) // sYS.
   have [Y1 dY1 [X1 [dX1 _ oX1tauY]]] := orthogonal_split (map tau1 Y)(tau psi1).
   have{dX1 Y1 dY1 oYtau} [b Zb tau_psi1]: {b | b \in Cint &
     tau psi1 = X1 - a *: tau1 eta1 + b *: (\sum_(eta <- Y) tau1 eta)}.
@@ -896,7 +896,7 @@ have{odd_frobL1} caseA_cohXY: caseA -> coherent (X ++ Y) L^# tau.
       have [|//]:= leq_size_perm uYeta _ szY2.
       by apply/allP; rewrite /= Yeta1 ccY.
     have memYtau1c: {subset [seq tau1 eta^* | eta <- Y]%CF <= map tau1 Y}.
-      by move=> _ /mapP[eta Yeta ->]; rewrite /= map_f ?ccY.     
+      by move=> _ /mapP[eta Yeta ->]; rewrite /= map_f ?ccY.
     apply: IH (dual_coherence scohY cohY szY2) _ _ _.
     - rewrite (map_comp -%R) orthogonal_oppr.
       by apply/orthogonalP=> phi psi ? /memYtau1c; apply: (orthogonalP o_tauXY).
@@ -1188,7 +1188,7 @@ have{caseA_cohXY Itau1 Ztau1 Dtau1 oYYt} cohXY: coherent (X ++ Y) L^# tau.
       exists (YZ1 + b *: Y1) => [/oRY-oRiY|]; last first.
         by rewrite addrCA subrK addrC cfdotDl cfdotZl normY1 mulr1 addrN.
       apply/orthoPl=> aa Raa; rewrite cfdotDl (orthoPl oYZ1R) // add0r.
-      by rewrite cfdotC (span_orthogonal oRiY) ?conjC0 ?rpredZ // memv_span. 
+      by rewrite cfdotC (span_orthogonal oRiY) ?conjC0 ?rpredZ // memv_span.
     case/all_and2=> defXbZ oZY1; have spanR_X1 := zchar_span (R_X1 _ _).
     have ub_alpha i: i \in rp ->
        [/\ '[chi i] <= '[X1 i]
@@ -1214,7 +1214,7 @@ have{caseA_cohXY Itau1 Ztau1 Dtau1 oYYt} cohXY: coherent (X ++ Y) L^# tau.
       rewrite -(@ler_pexpn2r _ 2) ?qualifE ?(ltrW ai_gt0) ?norm_ger0 //.
       apply: ler_trans (_ : '[b i *: Y1 - Z1 i] <= _).
         rewrite cfnormBd; last by rewrite cfdotZl cfdotC oZY1 ?conjC0 ?mulr0.
-        by rewrite cfnormZ normY1 mulr1 ler_addl cfnorm_ge0. 
+        by rewrite cfnormZ normY1 mulr1 ler_addl cfnorm_ge0.
       rewrite -(ler_add2l '[X1 i]) -cfnormBd; last first.
         rewrite cfdotBr cfdotZr (span_orthogonal (oRY i _)) ?spanR_X1 //.
         rewrite mulr0 sub0r cfdotC.

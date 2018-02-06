@@ -315,7 +315,7 @@ Section AutomorphismCFun.
 Variable u : {rmorphism algC -> algC}.
 Local Notation "alpha ^u" := (cfAut u alpha).
 
-Lemma Dade_aut alpha : (alpha^u)^\tau = (alpha^\tau)^u. 
+Lemma Dade_aut alpha : (alpha^u)^\tau = (alpha^\tau)^u.
 Proof.
 apply/cfunP => g; rewrite cfunE.
 have [/bigcupP[a Aa A1g] | notAtau_g] := boolP (g \in Atau).
@@ -325,7 +325,7 @@ Qed.
 
 End AutomorphismCFun.
 
-Lemma Dade_conjC alpha : (alpha^*)^\tau = ((alpha^\tau)^*)%CF. 
+Lemma Dade_conjC alpha : (alpha^*)^\tau = ((alpha^\tau)^*)%CF.
 Proof. exact: Dade_aut. Qed.
 
 (* This is Peterfalvi (2.7), main part *)
@@ -344,7 +344,7 @@ have dd1_id: {in A, forall a, dd1 (repr (a ^: L)) = dd1 a}.
   by move=> a Aa /=; have [x Lx ->] := repr_class L a; apply: Dade_support1_id.
 have ->: Atau = cover P_G.
   apply/setP=> u; apply/bigcupP/bigcupP=> [[a Aa Fa_u] | [Fa]]; last first.
-    by case/imsetP=> a /sTA Aa -> Fa_u; exists a. 
+    by case/imsetP=> a /sTA Aa -> Fa_u; exists a.
   by exists (dd1 a) => //; rewrite -dd1_id //; do 2!apply: mem_imset.
 have [tiP_G inj_dd1]: trivIset P_G /\ {in T &, injective dd1}.
   apply: trivIimset => [_ _ /imsetP[a Aa ->] /imsetP[b Ab ->] |]; last first.
@@ -507,7 +507,7 @@ have defMBx: 'M(B :^ x) = 'M(B) :^ x.
 have def_aa_x y: 'aa_(B :^ x) (y ^ x) = 'aa_B y.
   rewrite !rDadeE // defMBx memJ_conjg !mulrb -mulHNB defHBx defNBx.
   have [[h z Hh Nz ->] | // ] := mulsgP.
-  by rewrite conjMg !remgrMid ?cfunJ ?memJ_conjg // -conjIg tiHNB conjs1g. 
+  by rewrite conjMg !remgrMid ?cfunJ ?memJ_conjg // -conjIg tiHNB conjs1g.
 apply/cfunP=> y; have Gx := subsetP sLG x Lx.
 rewrite [eq]lock !cfIndE ?sMG //= {1}defMBx cardJg -lock; congr (_ * _).
 rewrite (reindex_astabs 'R x) ?astabsR //=.
@@ -542,7 +542,7 @@ Proof.
 move=> dB; set LHS := 'Ind _ g.
 have defMB := Dade_set_sdprod dB; have [_ mulHNB nHNB tiHNB] := sdprodP defMB.
 have [sHMB sNMB] := mulG_sub mulHNB.
-have{LHS} ->: LHS = #|'M(B)|%:R^-1 * \sum_(x in calA g 'M(B)) 'aa_B (g ^ x). 
+have{LHS} ->: LHS = #|'M(B)|%:R^-1 * \sum_(x in calA g 'M(B)) 'aa_B (g ^ x).
   rewrite {}/LHS cfIndE ?sMG //; congr (_ * _).
   rewrite (bigID [pred x | g ^ x \in 'M(B)]) /= addrC big1 ?add0r => [|x].
     by apply: eq_bigl => x; rewrite inE.
@@ -551,7 +551,7 @@ pose fBg x := remgr 'H(B) 'N_L(B) (g ^ x).
 pose supp_aBg := [pred b in A | g \in dd1 b].
 have supp_aBgP: {in calA g 'M(B), forall x,
   ~~ supp_aBg (fBg x) -> 'aa_B (g ^ x)%g = 0}.
-- move=> x /setIdP[]; set b := fBg x => Gx MBgx notHGx; rewrite rDadeE // MBgx. 
+- move=> x /setIdP[]; set b := fBg x => Gx MBgx notHGx; rewrite rDadeE // MBgx.
   have Nb: b \in 'N_L(B) by rewrite mem_remgr ?mulHNB.
   have Cb: b \in 'C_L[b] by rewrite inE cent1id; have [-> _] := setIP Nb.
   rewrite (cfun_on0 CFaa) // -/(fBg x) -/b; apply: contra notHGx => Ab.
@@ -559,7 +559,7 @@ have supp_aBgP: {in calA g 'M(B), forall x,
   have [sBA /set0Pn[a Ba]] := setIdP dB; have Aa := subsetP sBA a Ba.
   have [|/= partHBb _] := partition_cent_rcoset nHb.
     rewrite (coprime_dvdr (order_dvdG Cb)) //= ['H(B)](bigD1 a) //=.
-    by rewrite (coprimeSg (subsetIl _ _)) ?coHL. 
+    by rewrite (coprimeSg (subsetIl _ _)) ?coHL.
   have Hb_gx: g ^ x \in 'H(B) :* b by rewrite mem_rcoset mem_divgr ?mulHNB.
   have [defHBb _ _] := and3P partHBb; rewrite -(eqP defHBb) in Hb_gx.
   case/bigcupP: Hb_gx => Cy; case/imsetP=> y HBy ->{Cy} Cby_gx.
@@ -571,7 +571,7 @@ have supp_aBgP: {in calA g 'M(B), forall x,
   have [nsHb _ defCb _ _] := sdprod_context (defCA Ab).
   have [hallHb _] := coprime_mulGp_Hall defCb (pi'H b) (piCL Ab).
   rewrite (sub_normal_Hall hallHb) ?setSI // (pgroupS _ (pi'H a)) //=.
-  by rewrite subIset ?sHBa.  
+  by rewrite subIset ?sHBa.
 split=> [notHGg | a Aa Hag].
   rewrite big1 ?mulr0 // => x; move/supp_aBgP; apply; set b := fBg x.
   by apply: contra notHGg; case/andP=> Ab Hb_x; apply/bigcupP; exists b.
@@ -697,7 +697,7 @@ have Ca: a \in 'C_L[a] by rewrite inE cent1id La.
 have [|/= partHBa nbHBa] := partition_cent_rcoset nHa.
   have [sBA] := setIdP dB; case/set0Pn=> b Bb; have Ab := subsetP sBA b Bb.
   rewrite (coprime_dvdr (order_dvdG Ca)) //= ['H(B)](bigD1 b) //=.
-  by rewrite (coprimeSg (subsetIl _ _)) ?coHL. 
+  by rewrite (coprimeSg (subsetIl _ _)) ?coHL.
 pose pHBa := mem ('H(B) :* a).
 rewrite -sum1_card (partition_big (fun x => g ^ x) pHBa) /= => [|x]; last first.
   by case/setIdP=> _ ->.

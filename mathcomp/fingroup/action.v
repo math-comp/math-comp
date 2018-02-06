@@ -380,14 +380,14 @@ apply/subsetP=> a cSa; rewrite !inE (astab_dom cSa).
 by apply/subsetP=> x Sx; rewrite inE (astab_act cSa).
 Qed.
 
-Lemma astabsC S : 'N(~: S | to) = 'N(S | to). 
+Lemma astabsC S : 'N(~: S | to) = 'N(S | to).
 Proof.
 apply/setP=> a; apply/idP/idP=> nSa; rewrite !inE (astabs_dom nSa).
   by rewrite -setCS -preimsetC; apply/subsetP=> x; rewrite inE astabs_act.
 by rewrite preimsetC setCS; apply/subsetP=> x; rewrite inE astabs_act.
 Qed.
 
-Lemma astabsI S T : 'N(S | to) :&: 'N(T | to) \subset 'N(S :&: T | to). 
+Lemma astabsI S T : 'N(S | to) :&: 'N(T | to) \subset 'N(S :&: T | to).
 Proof.
 apply/subsetP=> a; rewrite !inE -!andbA preimsetI => /and4P[-> nSa _ nTa] /=.
 by rewrite setISS.
@@ -425,7 +425,7 @@ Proof.
 move=> sAD; apply/subsetP/subsetP=> [sAC x xS | sSF a aA].
   by apply/afixP=> a aA; apply: astab_act (sAC _ aA) xS.
 rewrite !inE (subsetP sAD _ aA); apply/subsetP=> x xS.
-by move/afixP/(_ _ aA): (sSF _ xS); rewrite inE => ->. 
+by move/afixP/(_ _ aA): (sSF _ xS); rewrite inE => ->.
 Qed.
 
 Section ActsSetop.
@@ -436,12 +436,12 @@ Hypotheses (AactS : [acts A, on S | to]) (AactT : [acts A, on T | to]).
 Lemma astabU : 'C(S :|: T | to) = 'C(S | to) :&: 'C(T | to).
 Proof. by apply/setP=> a; rewrite !inE subUset; case: (a \in D). Qed.
 
-Lemma astabsU : 'N(S | to) :&: 'N(T | to) \subset 'N(S :|: T | to). 
+Lemma astabsU : 'N(S | to) :&: 'N(T | to) \subset 'N(S :|: T | to).
 Proof.
 by rewrite -(astabsC S) -(astabsC T) -(astabsC (S :|: T)) setCU astabsI.
 Qed.
 
-Lemma astabsD : 'N(S | to) :&: 'N(T | to) \subset 'N(S :\: T| to). 
+Lemma astabsD : 'N(S | to) :&: 'N(T | to) \subset 'N(S :\: T| to).
 Proof. by rewrite setDE -(astabsC T) astabsI. Qed.
 
 Lemma actsI : [acts A, on S :&: T | to].
@@ -680,13 +680,13 @@ Proof. by move=> Da; rewrite afix_gen_in ?sub1set. Qed.
 
 Lemma afixYin A B :
   A \subset D -> B \subset D -> 'Fix_to(A <*> B) = 'Fix_to(A) :&: 'Fix_to(B).
-Proof. by move=> sAD sBD; rewrite afix_gen_in ?afixU // subUset sAD. Qed. 
+Proof. by move=> sAD sBD; rewrite afix_gen_in ?afixU // subUset sAD. Qed.
 
 Lemma afixMin G H :
   G \subset D -> H \subset D -> 'Fix_to(G * H) = 'Fix_to(G) :&: 'Fix_to(H).
 Proof.
 by move=> sGD sHD; rewrite -afix_gen_in ?mul_subG // genM_join afixYin.
-Qed. 
+Qed.
 
 Lemma sub_astab1_in A x :
   A \subset D -> (A \subset 'C[x | to]) = (x \in 'Fix_to(A)).
@@ -952,7 +952,7 @@ Proof. exact: sameP eqP (orbit_eqP G x y). Qed.
 Lemma orbit_inv A x y : (y \in orbit to A^-1 x) = (x \in orbit to A y).
 Proof. by rewrite orbit_inv_in ?subsetT. Qed.
 
-Lemma orbit_lcoset A a x : orbit to (a *: A) x = orbit to A (to x a). 
+Lemma orbit_lcoset A a x : orbit to (a *: A) x = orbit to A (to x a).
 Proof. by rewrite orbit_lcoset_in ?subsetT ?inE. Qed.
 
 Lemma orbit_rcoset A a x y :
@@ -1910,7 +1910,7 @@ Lemma gacentIim : 'C_(R | to)(A) = 'C_(|to)(A).
 Proof. by rewrite setIA setIid. Qed.
 
 Lemma gacentS : A \subset B -> 'C_(|to)(B) \subset 'C_(|to)(A).
-Proof. by move=> sAB; rewrite !(setIS, afixS). Qed.  
+Proof. by move=> sAB; rewrite !(setIS, afixS). Qed.
 
 Lemma gacentU : 'C_(|to)(A :|: B) = 'C_(|to)(A) :&: 'C_(|to)(B).
 Proof. by rewrite -setIIr -afixU -setIUr. Qed.
@@ -2001,8 +2001,8 @@ by move=> sGD sHB; rewrite -gacent_gen ?mul_subG // genM_join gacentY.
 Qed.
 
 Lemma astab1 : 'C(1 | to) = D.
-Proof. 
-by apply/setP=> x; rewrite ?(inE, sub1set) andb_idr //; move/gact1=> ->. 
+Proof.
+by apply/setP=> x; rewrite ?(inE, sub1set) andb_idr //; move/gact1=> ->.
 Qed.
 
 Lemma astab_range : 'C(R | to) = 'C(setT | to).
@@ -2599,10 +2599,10 @@ Lemma actsQ A B H :
   A \subset 'N(H) -> A \subset 'N(B) -> [acts A, on B / H | 'Q].
 Proof.
 by move=> nHA nBA; rewrite acts_quotient // subsetI dom_qactJ nHA astabsJ.
-Qed. 
+Qed.
 
 Lemma astabsQ G H : H <| G -> 'N(G / H | 'Q) = 'N(H) :&: 'N(G).
-Proof. by move=> nsHG; rewrite astabs_quotient // dom_qactJ astabsJ. Qed. 
+Proof. by move=> nsHG; rewrite astabs_quotient // dom_qactJ astabsJ. Qed.
 
 Lemma astabQ H Abar : 'C(Abar |'Q) = coset H @*^-1 'C(Abar).
 Proof.

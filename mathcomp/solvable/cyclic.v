@@ -316,7 +316,7 @@ Hypothesis dvd_y_x : #[y] %| #[x].
 Lemma eltmE i : eltm dvd_y_x (x ^+ i) = y ^+ i.
 Proof.
 apply/eqP; rewrite eq_expg_mod_order.
-have [x_le1 | x_gt1] := leqP #[x] 1. 
+have [x_le1 | x_gt1] := leqP #[x] 1.
   suffices: #[y] %| 1 by rewrite dvdn1 => /eqP->; rewrite !modn1.
   by rewrite (dvdn_trans dvd_y_x) // dvdn1 order_eq1 -cycle_eq1 trivg_card_le1.
 rewrite -(expg_znat i (cycle_id x)) invmE /=; last by rewrite /Zp x_gt1 inE.
@@ -536,7 +536,7 @@ Lemma metacyclicP A :
 Proof. exact: 'exists_and3P. Qed.
 
 Lemma metacyclic1 : metacyclic 1.
-Proof. 
+Proof.
 by apply/existsP; exists 1%G; rewrite normal1 trivg_quotient !cyclic1.
 Qed.
 

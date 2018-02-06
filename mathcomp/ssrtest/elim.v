@@ -7,7 +7,7 @@ Axiom daemon : False. Ltac myadmit := case: daemon.
 
 (* Ltac debugging feature: recursive elim + eq generation *)
 Lemma testL1 : forall A (s : seq A), s = s.
-Proof. 
+Proof.
 move=> A s; elim branch: s => [|x xs _].
 match goal with _ : _ = [::] |- [::] = [::] => move: branch => // | _ => fail end.
 match goal with _ : _ =  _ :: _ |- _ :: _ = _ :: _ => move: branch => // | _ => fail end.
@@ -15,7 +15,7 @@ Qed.
 
 (* The same but with explicit eliminator and a conflict in the intro pattern *)
 Lemma testL2 : forall A (s : seq A), s = s.
-Proof. 
+Proof.
 move=> A s; elim/last_ind branch: s => [|x s _].
 match goal with _ : _ = [::] |- [::] = [::] => move: branch => // | _ => fail end.
 match goal with _ : _ =  rcons _ _ |- rcons _ _ = rcons _ _ => move: branch => // | _ => fail end.
@@ -23,17 +23,17 @@ Qed.
 
 (* The same but without names for variables involved in the generated eq *)
 Lemma testL3 : forall A (s : seq A), s = s.
-Proof. 
+Proof.
 move=> A s; elim branch: s; move: (s) => _.
 match goal with _ : _ = [::] |- [::] = [::] => move: branch => // | _ => fail end.
-move=> _;match goal with _ : _ =  _ :: _ |- _ :: _ = _ :: _ => move: branch => // | _ => fail end.
+move=> _; match goal with _ : _ =  _ :: _ |- _ :: _ = _ :: _ => move: branch => // | _ => fail end.
 Qed.
 
 Inductive foo : Type := K1 : foo | K2 : foo -> foo -> foo | K3 : (nat -> foo) -> foo.
 
 (* The same but with more intros to be done *)
 Lemma testL4 : forall (o : foo), o = o.
-Proof. 
+Proof.
 move=> o; elim branch: o.
 match goal with _ : _ = K1 |- K1 = K1 => move: branch => // | _ => fail end.
 move=> _; match goal with _ : _ = K2 _ _ |- K2 _ _ = K2 _ _ => move: branch => // | _ => fail end.
@@ -88,21 +88,21 @@ Qed.
 
 (* Patterns *)
 Lemma testP1: forall (x y : nat), (y == x) && (y == x) -> y == x.
-move=> x y; elim: {2}(_ == _) / eqP. 
-match goal with |- (y = x -> is_true ((y == x) && true) -> is_true (y == x)) => move=>-> // | _ => fail end.
-match goal with |- (y <> x -> is_true ((y == x) && false) -> is_true (y == x)) => move=>_; rewrite andbC // | _ => fail end.
+move=> x y; elim: {2}(_ == _) / eqP.
+match goal with |- (y = x -> is_true ((y == x) && true) -> is_true (y == x)) => move=> -> // | _ => fail end.
+match goal with |- (y <> x -> is_true ((y == x) && false) -> is_true (y == x)) => move=> _; rewrite andbC // | _ => fail end.
 Qed.
 
 (* The same but with an implicit pattern *)
 Lemma testP2 : forall (x y : nat), (y == x) && (y == x) -> y == x.
-move=> x y; elim: {2}_ / eqP. 
-match goal with |- (y = x -> is_true ((y == x) && true) -> is_true (y == x)) => move=>-> // | _ => fail end.
-match goal with |- (y <> x -> is_true ((y == x) && false) -> is_true (y == x)) => move=>_; rewrite andbC // | _ => fail end.
+move=> x y; elim: {2}_ / eqP.
+match goal with |- (y = x -> is_true ((y == x) && true) -> is_true (y == x)) => move=> -> // | _ => fail end.
+match goal with |- (y <> x -> is_true ((y == x) && false) -> is_true (y == x)) => move=> _; rewrite andbC // | _ => fail end.
 Qed.
 
 (* The same but with an eq generation switch *)
 Lemma testP3 : forall (x y : nat), (y == x) && (y == x) -> y == x.
-move=> x y; elim E: {2}_ / eqP. 
+move=> x y; elim E: {2}_ / eqP.
 match goal with _ : y = x |- (is_true ((y == x) && true) -> is_true (y == x)) => rewrite E; reflexivity | _ => fail end.
 match goal with _ : y <> x |- (is_true ((y == x) && false) -> is_true (y == x)) => rewrite E => /= H; exact H  | _ => fail end.
 Qed.
@@ -113,25 +113,25 @@ Lemma specP : spec 0 2 4. Proof. by constructor. Qed.
 
 Lemma testP4 : (1+1) * 4 = 2 + (1+1) + (2 + 2).
 Proof.
-case: specP => a b c defa defb defc. 
+case: specP => a b c defa defb defc.
 match goal with |- (a.+1 + a.+1) * c = b + (a.+1 + a.+1) + (b + b) => subst; done | _ => fail end.
 Qed.
 
 Lemma testP5 : (1+1) * 4 = 2 + (1+1) + (2 + 2).
 Proof.
-case: (1 + 1) _ / specP => a b c defa defb defc. 
+case: (1 + 1) _ / specP => a b c defa defb defc.
 match goal with |- b * c = a.+2 + b + (a.+2 + a.+2) => subst; done | _ => fail end.
 Qed.
 
 Lemma testP6 : (1+1) * 4 = 2 + (1+1) + (2 + 2).
 Proof.
-case: {2}(1 + 1) _ / specP => a b c defa defb defc. 
+case: {2}(1 + 1) _ / specP => a b c defa defb defc.
 match goal with |- (a.+1 + a.+1) * c = a.+2 + b + (a.+2 + a.+2) => subst; done | _ => fail end.
 Qed.
 
 Lemma testP7 : (1+1) * 4 = 2 + (1+1) + (2 + 2).
 Proof.
-case: _ (1 + 1) (2 + _) / specP => a b c defa defb defc. 
+case: _ (1 + 1) (2 + _) / specP => a b c defa defb defc.
 match goal with |- b * a.+4 = c + c => subst; done | _ => fail end.
 Qed.
 
@@ -276,7 +276,7 @@ Definition plus_ind := plus_rect.
 Lemma exF x y z: plus (plus x y) z = plus x (plus y z).
 elim/plus_ind: z / (plus _ z).
 match goal with |- forall n : nat, n = 0 -> plus x y = plus x (plus y 0) => idtac end.
-Undo 2. 
+Undo 2.
 elim/plus_ind: (plus _ z).
 match goal with |- forall n : nat, n = 0 -> plus x y = plus x (plus y 0) => idtac end.
 Undo 2.

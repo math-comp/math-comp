@@ -140,7 +140,7 @@ Local Notation "\pi" := (pi_phant (Phant qT)).
 Definition repr_of := quot_repr (quot_class qT).
 
 Lemma repr_ofK : cancel repr_of \pi.
-Proof. by rewrite /pi_phant /repr_of /=; case:qT=> [? []]. Qed.
+Proof. by rewrite /pi_phant /repr_of /=; case: qT=> [? []]. Qed.
 
 Definition QuotType_clone (Q : Type) qT cT 
   of phant_id (quot_class qT) cT := @QuotTypePack Q cT Q.
@@ -487,7 +487,7 @@ Lemma equiv_sym : symmetric e. Proof. by case: e => [] ? []. Qed.
 Lemma equiv_trans : transitive e. Proof. by case: e => [] ? []. Qed.
 
 Lemma eq_op_trans (T' : eqType) : transitive (@eq_op T').
-Proof. by move=> x y z;  move/eqP->; move/eqP->. Qed.
+Proof. by move=> x y z; move/eqP->; move/eqP->. Qed.
 
 Lemma equiv_ltrans: left_transitive e.
 Proof. by apply: left_trans; [apply: equiv_sym|apply: equiv_trans]. Qed.
@@ -567,7 +567,7 @@ Qed.
 
 Canonical encoded_equiv_equiv_rel := EquivRelPack encoded_equiv_is_equiv.
 
-Lemma encoded_equivP x : e' (DE (ED x)) x. 
+Lemma encoded_equivP x : e' (DE (ED x)) x.
 Proof. by rewrite /encoded_equiv /= encModEquivP. Qed.
 
 End EncodingModuloEquiv.

@@ -271,7 +271,7 @@ pose z_s := [seq coord b ij.2 (tnth s ij.1) | ij : IzT].
 pose rank2 j i: Iz := enum_rank (i, j); pose val21 (p : Iz) := (enum_val p).1.
 pose inQzs w := [forall j, Crat_span z_s (coord b j w)].
 have enum_pairK j: {in predT, cancel (rank2 j) val21}.
-  by move=> i; rewrite /val21 enum_rankK. 
+  by move=> i; rewrite /val21 enum_rankK.
 have Qz_Zs a: inQzs (\sum_(i < m) s`_i *~ a i).
   apply/forallP=> j; apply/Crat_spanP; rewrite /in_Crat_span size_map -cardE.
   exists [ffun ij => (a (val21 ij))%:Q *+ ((enum_val ij).2 == j)].

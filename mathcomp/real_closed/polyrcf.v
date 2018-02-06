@@ -441,7 +441,7 @@ elim: (size p) a b lab pa0 pb0=> [|n ihn] a b lab pa0 pb0 max_roots.
   rewrite (@max_roots [::]) //=.
   by exists (mid a b); rewrite ?mid_in_itv // derivE horner0.
 case: (@rolle_weak a b p); rewrite // ?pa0 ?pb0 //=.
-move=> c hc;  case: (altP (_ =P 0))=> //= p'c0 pc0; first by exists c.
+move=> c hc; case: (altP (_ =P 0))=> //= p'c0 pc0; first by exists c.
 suff: { d : R | d \in `]a, c[ & (p^`()).[d] = 0 }.
   case=> [d hd] p'd0; exists d=> //.
   by apply: subitvPr hd; rewrite //= (itvP hc).
@@ -860,7 +860,7 @@ rewrite in_cons; case ezy: (z == y)=> /=.
   by rewrite (eqP ezy) py0 andbT (subitvPr _ hy) //= ?(itvP hx).
 rewrite -(ihs y) //; last exact: path_sorted ss; last first.
   by rewrite inE /= (itvP hx) (itvP hy).
-case pz0: root;  rewrite ?(andbT, andbF) //.
+case pz0: root; rewrite ?(andbT, andbF) //.
 rewrite (@itv_splitU2 _ y); last by rewrite (subitvPr _ hy) //= (itvP hx).
 rewrite ezy /=; case: (z \in `]y, b[); rewrite ?orbF ?orbT //.
 by apply/negP=> hz; move: (hay z); rewrite hz pz0 in_nil.
@@ -913,7 +913,7 @@ move: (roots_on_nil har1).
 case pr1 : (root p r1); case/monotonic_rootN => hrootsl; last 2 first.
 - exists s; constructor=> //.
   by rewrite -[s]cat0s; apply: (cat_roots_on hr1)=> //; rewrite pr1.
-- case:hrootsl=> r hr; exists (r::s); constructor=> //=.
+- case: hrootsl=> r hr; exists (r::s); constructor=> //=.
     by rewrite -cat1s; apply: (cat_roots_on hr1)=> //; rewrite pr1.
   rewrite path_min_sorted // => y; rewrite -hroot; case/andP=> hy _.
   rewrite (@ltr_trans _ r1) ?(itvP hy) //.
@@ -954,7 +954,7 @@ Proof. by case: rootsP=> //=; rewrite eqxx. Qed.
 
 Lemma roots_on_roots : forall p a b, p != 0 ->
   roots_on p `]a, b[ (roots p a b).
-Proof. by move=> a b p; case:rootsP. Qed.
+Proof. by move=> a b p; case: rootsP. Qed.
 Hint Resolve roots_on_roots.
 
 Lemma sorted_roots a b p : sorted <%R (roots p a b).
@@ -1012,7 +1012,7 @@ elim: s1 p a b s2 => [| r1 s1 ih] p a b [| r2 s2] ps1 ps2 rs1 rs2 //.
     move/(@sym_eq _ true); case/orP => hr2; first by rewrite (eqP hr2).
     move: ps1=> /=; move/(order_path_min (@ltr_trans R)); move/allP.
     move/(_ r2 hr2) => h1.
-    move: (rs2 r1);  rewrite (roots_on_root rs1) ?mem_head //.
+    move: (rs2 r1); rewrite (roots_on_root rs1) ?mem_head //.
     rewrite !(roots_on_in rs1) ?mem_head //= in_cons.
     move/(@sym_eq _ true); case/orP => hr1; first by rewrite (eqP hr1).
     move: ps2=> /=; move/(order_path_min (@ltr_trans R)); move/allP.
@@ -1212,7 +1212,7 @@ case; first by move->; rewrite /next_root eqxx.
   move=> c p0 ->; case: maxrP=> hab; last by rewrite itv_gte //= ltrW.
   by move=> hpz _ py0 hy; move/hpz:hy; rewrite rootE py0 eqxx.
 case: next_rootP => //; first by move->; rewrite eqxx.
-  by move=> y np0 py0 hy _ c _ _;  move/(_ _ hy); rewrite rootE py0 eqxx.
+  by move=> y np0 py0 hy _ c _ _; move/(_ _ hy); rewrite rootE py0 eqxx.
 by move=> c _ -> _ c' _ ->.
 Qed.
 
@@ -1507,11 +1507,11 @@ Lemma sgr_neighpr b p x :
 Proof.
 elim: (size p) {-2}p (leqnn (size p))=> [|n ihn] {p} p.
   rewrite leqn0 size_poly_eq0 /neighpr; move/eqP=> -> /=.
-  by move=>y; rewrite next_root0 itv_xx.
+  by move=> y; rewrite next_root0 itv_xx.
 rewrite leq_eqVlt ltnS; case/orP; last exact: ihn.
 move/eqP=> sp; rewrite /sgp_right sp /=.
 case px0: root=> /=; last first.
-  move=> y; rewrite/neighpr => hy /=; symmetry.
+  move=> y; rewrite /neighpr => hy /=; symmetry.
   apply: (@polyrN0_itv `[x, y]); do ?by rewrite bound_in_itv /= (itvP hy).
   move=> z; rewrite (@itv_splitU _ x true) ?bound_in_itv /= ?(itvP hy) //.
   rewrite itv_xx /=; case/predU1P=> hz; first by rewrite hz px0.
@@ -1547,11 +1547,11 @@ Lemma sgr_neighpl a p x :
 Proof.
 elim: (size p) {-2}p (leqnn (size p))=> [|n ihn] {p} p.
   rewrite leqn0 size_poly_eq0 /neighpl; move/eqP=> -> /=.
-  by move=>y; rewrite prev_root0 itv_xx.
+  by move=> y; rewrite prev_root0 itv_xx.
 rewrite leq_eqVlt ltnS; case/orP; last exact: ihn.
 move/eqP=> sp; rewrite /sgp_right sp /=.
 case px0: root=> /=; last first.
-  move=> y; rewrite/neighpl => hy /=; symmetry.
+  move=> y; rewrite /neighpl => hy /=; symmetry.
   move: (negbT px0); rewrite -mu_gt0; last first.
     by apply: contraFN px0; move/eqP->; rewrite rootC.
   rewrite -leqNgt leqn0; move/eqP=> -> /=; rewrite expr0 mul1r.

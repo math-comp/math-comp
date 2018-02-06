@@ -59,7 +59,7 @@ Lemma andb_sym2 : forall A B : bool, A && B -> B && A.
 Proof. by case; case. Qed.
 
 Lemma andb_sym3 : forall A B : bool, A && B -> B && A.
-Proof. by do 2! case. Qed.
+Proof. by do 2!case. Qed.
 
 Variables (C D : Prop) (hC : C) (hD : D).
 Check (and C D).

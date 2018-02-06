@@ -864,7 +864,7 @@ Section VecMatrix.
 
 Variables m n : nat.
 
-Lemma mxvec_cast : #|{:'I_m * 'I_n}| = (m * n)%N. 
+Lemma mxvec_cast : #|{:'I_m * 'I_n}| = (m * n)%N.
 Proof. by rewrite card_prod !card_ord. Qed.
 
 Definition mxvec_index (i : 'I_m) (j : 'I_n) :=
@@ -973,7 +973,7 @@ Proof. by apply/matrixP=> i j; rewrite !(castmxE, mxE). Qed.
 Lemma map_conform_mx m' n' (B : 'M_(m', n')) :
   (conform_mx B A)^f = conform_mx B^f A^f.
 Proof.
-move: B; have [[<- <-] B|] := eqVneq (m, n) (m', n'). 
+move: B; have [[<- <-] B|] := eqVneq (m, n) (m', n').
   by rewrite !conform_mx_id.
 by rewrite negb_and => neq_mn B; rewrite !nonconform_mx.
 Qed.
@@ -1197,7 +1197,7 @@ Lemma nz_row_eq0 m n (A : 'M_(m, n)) : (nz_row A == 0) = (A == 0).
 Proof.
 rewrite /nz_row; symmetry; case: pickP => [i /= nzAi | Ai0].
   by rewrite (negbTE nzAi); apply: contraTF nzAi => /eqP->; rewrite row0 eqxx.
-by rewrite eqxx; apply/eqP/row_matrixP=> i; move/eqP: (Ai0 i) ->; rewrite row0. 
+by rewrite eqxx; apply/eqP/row_matrixP=> i; move/eqP: (Ai0 i) ->; rewrite row0.
 Qed.
 
 End MatrixZmodule.
@@ -1755,7 +1755,7 @@ Lemma mul_pid_mx m n p q r :
   (pid_mx q : 'M_(m, n)) *m (pid_mx r : 'M_(n, p)) = pid_mx (minn n (minn q r)).
 Proof.
 apply/matrixP=> i k; rewrite !mxE !leq_min.
-have [le_n_i | lt_i_n] := leqP n i. 
+have [le_n_i | lt_i_n] := leqP n i.
   rewrite andbF big1 // => j _.
   by rewrite -pid_mx_minh !mxE leq_min ltnNge le_n_i andbF mul0r.
 rewrite (bigD1 (Ordinal lt_i_n)) //= big1 ?addr0 => [|j].
@@ -1903,7 +1903,7 @@ move=> a A B; apply/row_matrixP; case/mxvec_indexP=> i j.
 rewrite linearP /= !rowE !mul_rV_lin /= vec_mx_delta -linearP mulmxDr.
 congr (mxvec (_ + _)); apply/row_matrixP=> k.
 rewrite linearZ /= !row_mul rowE mul_delta_mx_cond.
-by case: (k == i); [rewrite -!rowE linearZ | rewrite !mul0mx raddf0]. 
+by case: (k == i); [rewrite -!rowE linearZ | rewrite !mul0mx raddf0].
 Qed.
 Canonical lin_mulmxr_additive := Additive lin_mulmxr_is_linear.
 Canonical lin_mulmxr_linear := Linear lin_mulmxr_is_linear.
@@ -2810,7 +2810,7 @@ Proof. exact: map_unitmx. Qed.
 Lemma map_invmx n (A : 'M_n) : (invmx A)^f = invmx A^f.
 Proof.
 rewrite /invmx map_unitmx (fun_if ((map_mx f) n n)).
-by rewrite map_mxZ map_mx_adj det_map_mx fmorphV. 
+by rewrite map_mxZ map_mx_adj det_map_mx fmorphV.
 Qed.
 
 Lemma map_mx_inv n' (A : 'M_n'.+1) : A^-1^f = A^f^-1.
