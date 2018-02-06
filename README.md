@@ -8,7 +8,7 @@ the [Coq](http://coq.inria.fr) proof assistant, powered with the
 [Coq/SSReflect](https://coq.inria.fr/distrib/current/refman/ssreflect.html)
 language.
 
-These formal theories cover a wide spectrum of topics, ranging from the formal theory of general purpose data structures like [lists](mathcomp/ssreflect/seq.v), [prime numbers](mathcomp/ssreflect/prime.v) or [finite graphs](mathcomp/ssreflect/fingraph.v), to advanced topics in algebra. The repository includes the socle of formal theories used in a [formal proof](https://www.ams.org/notices/200811/tx081101382p.pdf) of the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_color_theorem) (Appel - Haken, 1976) and a [mechanization](https://hal.archives-ouvertes.fr/hal-00816699/) of the [Odd Order Theorem](https://en.wikipedia.org/wiki/Feit%E2%80%93Thompson_theorem) (Feit - Thompson, 1963), a landmark result of finite group theory, which utilizes the library extensively.
+These formal theories cover a wide spectrum of topics, ranging from the formal theory of general purpose data structures like [lists](mathcomp/ssreflect/seq.v), [prime numbers](mathcomp/ssreflect/prime.v) or [finite graphs](mathcomp/ssreflect/fingraph.v), to advanced topics in algebra. The repository includes the foundation of formal theories used in a [formal proof](https://www.ams.org/notices/200811/tx081101382p.pdf) of the [Four Colour Theorem](https://en.wikipedia.org/wiki/Four_color_theorem) (Appel - Haken, 1976) and a [mechanization](https://hal.archives-ouvertes.fr/hal-00816699/) of the [Odd Order Theorem](https://en.wikipedia.org/wiki/Feit%E2%80%93Thompson_theorem) (Feit - Thompson, 1963), a landmark result of finite group theory, which utilizes the library extensively.
 
 ## Installation
 
