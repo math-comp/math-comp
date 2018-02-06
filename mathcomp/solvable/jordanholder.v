@@ -531,7 +531,7 @@ have: K' :=: 1%G \/ K' :=: (G / H).
 case; last first.
   move/quotient_injG; rewrite !inE /=; move/(_ nKH nHG)=> c; move: nsGK.
   by rewrite c subxx.
-rewrite /= -trivg_quotient => - tK'; apply: (congr1 (@gval _)); move: tK'.
+rewrite /= -trivg_quotient => tK'; apply: (congr1 (@gval _)); move: tK'.
 by apply: (@quotient_injG _ H); rewrite ?inE /= ?normal_refl.
 Qed.
 

@@ -2138,9 +2138,9 @@ Proof. by rewrite mulrC; apply: Gauss_dvdpl. Qed.
 Lemma Gauss_dvdp m n p : coprimep m n -> (m * n %| p) = (m %| p) && (n %| p).
 Proof.
 case: (eqVneq m 0) => [-> | mn0].
-  by rewrite coprime0p; move/eqp_dvdl->; rewrite !mul0r dvd0p dvd1p andbT.
+  by rewrite coprime0p => /eqp_dvdl->; rewrite !mul0r dvd0p dvd1p andbT.
 case: (eqVneq n 0) => [-> | nn0].
-  by rewrite coprimep0; move/eqp_dvdl->; rewrite !mulr0 dvd1p.
+  by rewrite coprimep0 => /eqp_dvdl->; rewrite !mulr0 dvd1p.
 move=> hc; apply/idP/idP.
   move/Gauss_dvdpl: hc => <- h; move/(dvdp_mull m): (h); rewrite dvdp_mul2l //.
   move->; move/(dvdp_mulr n): (h); rewrite dvdp_mul2r // andbT.

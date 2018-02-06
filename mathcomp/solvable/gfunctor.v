@@ -158,7 +158,7 @@ End Definitions.
 Section ClassDefinitions.
 
 Structure iso_map := IsoMap {
-  apply: object_map;
+  apply : object_map;
   _ : group_valued apply;
   _ : closed apply;
   _ : iso_continuous apply

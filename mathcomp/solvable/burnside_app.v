@@ -75,7 +75,7 @@ Ltac inj_tac :=
   move: (erefl rot_inv); unfold rot_inv;
   match goal with |- ?X = _ -> injective ?Y =>
     move=> _; let x := get_inv Y X in
-    apply: (can_inj (g:=x)); move => [val H1]
+    apply: (can_inj (g:=x)); move=> [val H1]
   end.
 
 Lemma R1_inj :  injective R1.
@@ -1137,10 +1137,10 @@ Qed.
 Lemma uniq4_uniq6 : forall x y z t : cube,
   uniq [:: x; y; z; t] -> exists u, exists v, uniq [:: x; y; z; t; u; v].
 Proof.
-move=> x y z t Uxt; move: ( cardC  (mem [:: x; y; z; t])).
+move=> x y z t Uxt; move: (cardC (mem [:: x; y; z; t])).
 rewrite card_ord  (card_uniq_tuple Uxt) => hcard.
 have hcard2: #|predC (mem [:: x; y; z; t])| = 2.
-  by apply: ( @addnI 4); rewrite /injective  hcard.
+  by apply: (@addnI 4); rewrite /injective  hcard.
 have:  #|predC (mem [:: x; y; z; t])| != 0 by rewrite hcard2.
 case/existsP=> u Hu; exists u.
 move: (cardC (mem [:: x; y; z; t; u])); rewrite card_ord => hcard5.

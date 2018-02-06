@@ -156,8 +156,8 @@ Lemma eval_sumpT (p q : polyF) (e : seq F) :
 Proof.
 elim: p q => [|a p Hp] q /=; first by rewrite add0r.
 case: q => [|b q] /=; first by rewrite addr0.
-rewrite Hp mulrDl -!addrA; congr (_+_); rewrite polyC_add addrC -addrA.
-by congr (_+_); rewrite addrC.
+rewrite Hp mulrDl -!addrA; congr (_ + _); rewrite polyC_add addrC -addrA.
+by congr (_ + _); rewrite addrC.
 Qed.
 
 Lemma rsumpT (p q : polyF) : rpoly p -> rpoly q -> rpoly (sumpT p q).
@@ -174,7 +174,7 @@ Lemma eval_mulpT (p q : polyF) (e : seq F) :
   eval_poly e (mulpT p q) = (eval_poly e p) * (eval_poly e q).
 Proof.
 elim: p q=> [|a p Hp] q /=; first by rewrite mul0r.
-rewrite eval_sumpT /= Hp addr0 mulrDl addrC mulrAC; congr (_+_).
+rewrite eval_sumpT /= Hp addr0 mulrDl addrC mulrAC; congr (_ + _).
 elim: q=> [|b q Hq] /=; first by rewrite mulr0.
 by rewrite Hq polyC_mul mulrDr mulrA.
 Qed.
@@ -206,7 +206,7 @@ Lemma eval_natmulpT  (p : polyF) (n : nat) (e : seq F) :
   eval_poly e (natmulpT n p) = (eval_poly e p) *+ n.
 Proof.
 elim: p; rewrite //= ?mul0rn // => c p ->.
-rewrite mulrnDl mulr_natl polyC_muln; congr (_+_).
+rewrite mulrnDl mulr_natl polyC_muln; congr (_ + _).
 by rewrite -mulr_natl mulrAC -mulrA mulr_natl mulrC.
 Qed.
 
@@ -351,7 +351,7 @@ elim: n p q e => /= [| m Pm] p q e.
   by rewrite redivpTP; last by move=> *; rewrite Pk.
 rewrite redivpTP; last by move=> *; rewrite !isnullP eval_lift.
 rewrite isnullP eval_lift; case: (_ == 0); first by rewrite Pk.
-by rewrite redivpTP => - *; rewrite ?Pm !eval_lift.
+by rewrite redivpTP => *; rewrite ?Pm !eval_lift.
 Qed.
 
 Lemma rgcdp_loopT_qf (p : polyF) (k : polyF -> formula F) (q : polyF) (n : nat) :
@@ -629,7 +629,7 @@ constructor; first by apply/holds_conj.
 by apply/holds_conjn.
 Qed.
 
-Lemma wf_ex_elim: GRing.wf_QE_proj ex_elim.
+Lemma wf_ex_elim : GRing.wf_QE_proj ex_elim.
 Proof. by move=> i bc /= rbc; apply: ex_elim_qf. Qed.
 
 Definition closed_fields_QEMixin := 

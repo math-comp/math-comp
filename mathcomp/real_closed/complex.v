@@ -58,7 +58,7 @@ Section ComplexEqChoice.
 
 Variable R : Type.
 
-Definition sqR_of_complex (x : R[i]) := let: a +i* b := x in [::a; b].
+Definition sqR_of_complex (x : R[i]) := let: a +i* b := x in [:: a; b].
 Definition complex_of_sqR (x : seq R) :=
   if x is [:: a; b] then Some (a +i* b) else None.
 

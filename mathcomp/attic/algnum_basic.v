@@ -126,7 +126,7 @@ Qed.
 Lemma int_clos_incl a : a \in A -> integral a.
 Proof.
 move=> ainA; exists ('X - a%:P); rewrite monicXsubC root_XsubC.
-rewrite polyOverXsubC => //; by apply Asubr.
+rewrite polyOverXsubC => //; by apply: Asubr.
 Qed.
 
 Lemma intPl (I : eqType) G (r : seq I) l : has (fun x => G x != 0) r ->
@@ -162,7 +162,7 @@ have rs : size r = n.-1 by rewrite /r size_takel // size_opp leq_pred.
 exists r; split.
   apply/eqP => /nilP; rewrite /nilp /r size_takel; last by rewrite size_opp leq_pred.
   by rewrite -subn1 subn_eq0 leqNgt ps.
-  have : - p \is a polyOver A by rewrite rpredN //; apply Asubr.
+  have : - p \is a polyOver A by rewrite rpredN //; apply: Asubr.
   by move=> /allP-popA; apply/allP => x /mem_take /popA.
 move: pr => /rootP; rewrite horner_coef -(prednK (n := size p)); last by rewrite ltnW.
 rewrite big_ord_recr /= rs; have := monicP pm; rewrite /lead_coef => ->; rewrite mul1r => /eqP.
@@ -178,7 +178,7 @@ move=> /intPr[ra [/negbTE-ran raA raS]] /intPr[rb [/negbTE-rbn rbA rbS]].
 pose n := size ra; pose m := size rb; pose r := Finite.enum [finType of 'I_n * 'I_m].
 pose G (z : 'I_n * 'I_m) := let (k, l) := z in a ^ k * b ^l.
 have [nz mz] : 0 < n /\ 0 < m.
-  by rewrite !lt0n; split; apply/negP => - /nilP/eqP; rewrite ?ran ?rbn.
+  by rewrite !lt0n; split; apply/negP => /nilP/eqP; rewrite ?ran ?rbn.
 have rnn : has (fun x => G x != 0) r.
   apply/hasP; exists (Ordinal nz, Ordinal mz); first by rewrite /r -enumT mem_enum.
   by rewrite /G mulr1 oner_neq0.
@@ -248,7 +248,7 @@ Hypothesis Aint  : int_closed A.
 Hypothesis Afrac : is_frac_field A 1%AS.
 
 Lemma tr_int k l : integral A k -> integral A l -> (tr k l)%:A \in A.
-Proof. admit. Qed.
+Proof. admit. Admitted.
 
 Section NDeg.
 
@@ -367,7 +367,7 @@ Hypothesis Afrac : is_frac_field A K.
 Hypothesis AsubL : {subset A <= L}.
 
 Lemma trK_int k l : integral A k -> integral A l -> ((trK k l)%:A : L0') \in A.
-Proof. admit. Qed.
+Proof. admit. Admitted.
 
 End TraceFieldOver.
 
@@ -429,8 +429,8 @@ suffices FisK (F : fieldType) (L0 : fieldExtType F) (A : pred L0) (L : {subfield
   have [X Xsize [Xf [Xs Xi]]] := FisK _ L0 _ _ Isubr Iint Ipid Ifrac1 Lnd.
   rewrite -dim_aspaceOver => //; have /eqP <- := Xsize; exists (in_tuple X); split; last first.
     split => m; last by move=> /Xi; rewrite /int_closure LK.
-    by rewrite /int_closure -LK => - /Xs.
-  move: Xf; rewrite -{1}(in_tupleE X) => - /freeP-XfL0; apply/freeP => k.
+    by rewrite /int_closure -LK => /Xs.
+  move: Xf; rewrite -{1}(in_tupleE X) => /freeP-XfL0; apply/freeP => k.
   have [k' kk'] : exists k' : 'I_(size X) -> F, forall i, (k i)%:A = vsval (k' i).
     by exists (fun i => vsproj Ifr (k i)%:A) => i; rewrite vsprojK ?rpredZ ?mem1v.
   pose Ainj := fmorph_inj [rmorphism of in_alg E].
@@ -477,7 +477,7 @@ have Mbasis k (X : k.-tuple L0) M : free X -> module A M -> submod M (span_mod A
     have seqF (s : seq L0) : all A s -> exists s', s = [seq c%:A | c <- s'].
       elim: s => [_| a l IHl /= /andP[/Asub1/vlineP[c ->]]]; first by exists [::].
       by move=> /IHl[s' ->]; exists (c :: s').
-    move=> mM; have := Ms m mM; rewrite /span_mod !size_tuple => - [r rA rS].
+    move=> mM; have := Ms m mM; rewrite /span_mod !size_tuple => -[r rA rS].
     exists r; split => //; have [rF rFr] := seqF r rA => {seqF}; rewrite rFr in rA.
     have rFs : size rF = k.+1 by rewrite -(size_tuple r) rFr size_map.
     have -> : m = \sum_(i < k.+1) rF`_i *: X`_i.
@@ -489,13 +489,13 @@ have Mbasis k (X : k.-tuple L0) M : free X -> module A M -> submod M (span_mod A
       rewrite /module /M1 linear0; split => // a x y aA [xM xfc0] [yM yfc0].
       have := Mm a x y aA xM yM; move: aA => /Asub1/vlineP[r] ->; rewrite mulr_algl => msc.
       by rewrite /M1 linearB linearZ /= xfc0 yfc0 subr0 mulr0.
-    move=> m [mM mfc0]; have := span_coord m mM => - [r [rA rS rC]].
-    move: mfc0 (rC 0) ->; rewrite scale0r => - r0; rewrite /span_mod size_tuple.
+    move=> m [mM mfc0]; have := span_coord m mM => -[r [rA rS rC]].
+    move: mfc0 (rC 0) ->; rewrite scale0r => r0; rewrite /span_mod size_tuple.
     exists [tuple of behead r]; first by apply/allP => a /mem_behead/(allP rA).
     by rewrite rS big_ord_recl -r0 mul0r add0r; apply/eq_bigr => i _; rewrite !nth_behead.
   have [a [w wM wC] aG] : exists2 a, M2 a & forall v, M2 v -> exists2 d, d \in A & d * a = v.
     apply/Apid; split.
-      move=> c [m mM <-]; have := span_coord m mM => - [r [/all_nthP-rA _ rC]].
+      move=> c [m mM <-]; have := span_coord m mM => -[r [/all_nthP-rA _ rC]].
       by move: rC ->; apply/rA; rewrite size_tuple.
     split; first by exists 0 => //; rewrite linear0 scale0r.
     move=> c x y cA [mx mxM mxC] [my myM myC]; have := Mm c mx my cA mxM myM.
@@ -510,10 +510,10 @@ have Mbasis k (X : k.-tuple L0) M : free X -> module A M -> submod M (span_mod A
     by rewrite a0 mulr0 scale0r.
   exists (w :: B1); split.
     rewrite free_cons B1f andbT; move: an0; apply/contra; move: wC <-.
-    rewrite -(in_tupleE B1) => - /coord_span ->; apply/eqP.
+    rewrite -(in_tupleE B1) => /coord_span ->; apply/eqP.
     rewrite linear_sum big1 ?scale0r => //= i _; rewrite linearZ /=.
     by have [_] := B1A B1`_i (mem_nth 0 (ltn_ord _)) => ->; rewrite mulr0.
-  split => [m mM | m]; last by rewrite in_cons => - /orP; case=> [/eqP ->|/B1A[mM]].
+  split => [m mM | m]; last by rewrite in_cons => /orP; case=> [/eqP ->|/B1A[mM]].
   have [d dA dam] := mcM1 m mM; have mdwM1 : M1 (m - d * w).
     split; [have Mdwm := Mm d w m dA wM mM; have := Mm _ _ _ A0 Mdwm Mdwm |].
       by rewrite mul0r sub0r opprB.
@@ -525,16 +525,16 @@ have [X Xb] : exists X, basis_of_mod A (int_closure A L) X.
   apply/(Mbasis _ b2 _ b2f) => [| m [mL mI]]; first by apply/int_mod_closed.
   pose r : n.-tuple L0 := [tuple (coord b2 i m)%:A | i < n]; rewrite /span_mod size_tuple.
   exists r; have rci (i : 'I_n) : r`_i = (coord b2 i m)%:A by rewrite -tnth_nth tnth_mktuple.
-    apply/(all_nthP 0) => i; rewrite size_tuple => - iB.
+    apply/(all_nthP 0) => i; rewrite size_tuple => iB.
     by have -> := rci (Ordinal iB); apply/b2H.
-  move: mL; rewrite -b2s => - /coord_span ->; apply/eq_bigr => i _.
+  move: mL; rewrite -b2s => /coord_span ->; apply/eq_bigr => i _.
   by rewrite rci mulr_algl.
 exists X => //; move: Xb => [/eqP-Xf [Xs Xg]]; rewrite -Xf eqn_leq; apply/andP; split.
   by apply/dimvS/span_subvP => m /Xg[mL _].
 have /andP[/eqP-b1s _] := b1B; rewrite -b1s; apply/dimvS/span_subvP => b /tnthP-[i ->] {b}.
 rewrite (tnth_nth 0); have [r /all_tnthP-rA ->] : span_mod A X b1`_i.
   by apply/Xs; rewrite /int_closure (basis_mem b1B) ?mem_nth ?size_tuple => //.
-apply/rpred_sum => j _; have := rA j; rewrite (tnth_nth 0) => - /Asub1/vlineP[c ->].
+apply/rpred_sum => j _; have := rA j; rewrite (tnth_nth 0) => /Asub1/vlineP[c ->].
 by rewrite mulr_algl; apply/rpredZ/memv_span/mem_nth.
 Qed.
 

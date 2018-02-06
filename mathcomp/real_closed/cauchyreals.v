@@ -1325,7 +1325,7 @@ have upx_eq0 : u.[x] * p.[x] == 0 by rewrite px0 mul_creal0.
 pose_big_enough i.
   have := (erefl ((1 : {poly F}).[x i])).
   rewrite -{1}hpq /= hornerD hornerC.
-  set upxi := (u * _).[_] => - hpqi.
+  set upxi := (u * _).[_] => hpqi.
   apply: (@neq_crealP ((ubound v.[x])%CR^-1 / 2%:R) i i) => //.
     by rewrite pmulr_rgt0 ?gtr0E // ubound_gt0.
   rewrite /= subr0 ler_pdivr_mull ?ubound_gt0 //.

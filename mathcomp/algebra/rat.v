@@ -101,7 +101,7 @@ Proof. by apply: val_inj; rewrite /= gcdn1 !divn1 abszE mulr_sign_norm. Qed.
 Fact valqK x : fracq (valq x) = x.
 Proof.
 move: x => [[n d] /= Pnd]; apply: val_inj=> /=.
-move: Pnd; rewrite /coprime /fracq /= => -/andP[] hd -/eqP hnd.
+move: Pnd; rewrite /coprime /fracq /= => /andP[] hd -/eqP hnd.
 by rewrite ltr_gtF ?gtr_eqF //= hnd !divn1 mulz_sign_abs abszE gtr0_norm.
 Qed.
 

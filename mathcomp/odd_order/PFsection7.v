@@ -426,7 +426,7 @@ split=> // [ | chi /irrP[t def_chi] o_chiSnu].
   have hu: h * u = e^-1 * (h - 1) by rewrite mulrCA (mulrBr h) mulr1 divff.
   have ->: '[(nu zeta)^\rho] = u * a ^+ 2 - v * a *+ 2 + w.
     have defT1: perm_eq calT [:: phi, Ind1H, zeta & S2].
-      by rewrite defT defS1 (perm_catCA [::_; _] phi).
+      by rewrite defT defS1 (perm_catCA [:: _; _] phi).
     have [c ua _ ->] := invDade_seqInd_sum (nu zeta) defT1.
     have def_c xi: xi \in calS -> c xi = '[xi, zeta].
       move=> S2xi; rewrite /c mulrC -{1}[xi]scale1r -(mulVf nz_phi1) -!scalerA.
