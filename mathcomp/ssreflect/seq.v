@@ -2227,7 +2227,7 @@ Qed.
 Lemma iota_addl m1 m2 n : iota (m1 + m2) n = map (addn m1) (iota m2 n).
 Proof. by elim: n m2 => //= n IHn m2; rewrite -addnS IHn. Qed.
 
-Lemma nth_iota m n i : i < n -> nth 0 (iota m n) i = m + i.
+Lemma nth_iota p m n i : i < n -> nth p (iota m n) i = m + i.
 Proof.
 by move/subnKC <-; rewrite addSnnS iota_add nth_cat size_iota ltnn subnn.
 Qed.
