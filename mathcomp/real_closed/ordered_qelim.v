@@ -76,7 +76,7 @@ Canonical term_eqMixin (T : eqType) := EqMixin (@term_eqP T).
 Canonical term_eqType (T : eqType) :=
    Eval hnf in EqType (term T) (@term_eqMixin T).
 
-Implicit Arguments term_eqP [x y].
+Arguments term_eqP T [x y].
 Prenex Implicits term_eq.
 
 
@@ -98,7 +98,7 @@ Arguments Scope Not [_ oterm_scope].
 Arguments Scope Exists [_ nat_scope oterm_scope].
 Arguments Scope Forall [_ nat_scope oterm_scope].
 
-Implicit Arguments Bool [T].
+Arguments Bool [T].
 Prenex Implicits Const Add Opp NatMul Mul Exp Bool Unit And Or Implies Not.
 Prenex Implicits Exists Forall Lt.
 
@@ -199,7 +199,7 @@ Canonical oclause_eqMixin (T : eqType) := EqMixin (@oclause_eqP T).
 Canonical oclause_eqType (T : eqType) :=
    Eval hnf in EqType (oclause T) (@oclause_eqMixin T).
 
-Implicit Arguments oclause_eqP [x y].
+Arguments oclause_eqP T [x y].
 Prenex Implicits oclause_eq.
 
 Section EvalTerm.

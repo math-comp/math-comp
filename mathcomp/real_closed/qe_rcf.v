@@ -114,7 +114,7 @@ Arguments Scope Or [_ qf_scope qf_scope].
 Arguments Scope Implies [_ qf_scope qf_scope].
 Arguments Scope Not [_ qf_scope].
 
-Implicit Arguments Bool [R].
+Arguments Bool [R].
 Prenex Implicits Const Add Opp NatMul Mul Exp Bool Unit And Or Implies Not Lt.
 Prenex Implicits to_rterm.
 
@@ -537,7 +537,7 @@ rewrite lead_coefDl ?lead_coefMX ?size_mulX // ltnS size_polyC.
 by rewrite (leq_trans (leq_b1 _)) // size_poly_gt0.
 Qed.
 
-Implicit Arguments eval_LeadCoef [e p k].
+Arguments eval_LeadCoef [e p k].
 Prenex Implicits eval_LeadCoef.
 
 Lemma eval_AmulXn a n e : eval_poly e (AmulXn a n) = (eval e a)%:P * 'X^n.
@@ -625,7 +625,7 @@ rewrite (ihps _ (fun ps => k' (eval e lp :: ps))) => //= lps.
 by rewrite Pk.
 Qed.
 
-Implicit Arguments eval_SeqPInfty [e ps k].
+Arguments eval_SeqPInfty [e ps k].
 Prenex Implicits eval_SeqPInfty.
 
 Lemma eval_SeqMInfty e ps k k' :
@@ -640,7 +640,7 @@ rewrite eval_Size /= /k'' {k''}.
 by set X := map _ _; grab_eq k'' X; apply: ihps => {X} lps; rewrite Pk.
 Qed.
 
-Implicit Arguments eval_SeqMInfty [e ps k].
+Arguments eval_SeqMInfty [e ps k].
 Prenex Implicits eval_SeqMInfty.
 
 Lemma eval_ChangesPoly e ps k : qf_eval e (ChangesPoly ps k) =
@@ -682,7 +682,7 @@ set X := lead_coef _; grab_eq k'' X; apply: eval_LeadCoef => {X}.
 by move=> x; rewrite ihn // !eval_OpPoly /= !mul_polyC.
 Qed.
 
-Implicit Arguments eval_Rediv_rec_loop [e q sq cq c qq r n k].
+Arguments eval_Rediv_rec_loop [e q sq cq c qq r n k].
 Prenex Implicits eval_Rediv_rec_loop.
 
 Lemma eval_Rediv e p q k k' (d := (redivp (eval_poly e p) (eval_poly e q))) :
@@ -698,7 +698,7 @@ rewrite (eval_LeadCoef (fun lq =>
 by rewrite redivp_rec_loopP.
 Qed.
 
-Implicit Arguments eval_Rediv [e p q k].
+Arguments eval_Rediv [e p q k].
 Prenex Implicits eval_Rediv.
 
 Lemma eval_NextMod e p q k k' :
@@ -716,7 +716,7 @@ rewrite (eval_Rediv (fun mpq =>
 by rewrite Pk !eval_OpPoly.
 Qed.
 
-Implicit Arguments eval_NextMod [e p q k].
+Arguments eval_NextMod [e p q k].
 Prenex Implicits eval_NextMod.
 
 Lemma eval_Rgcd_loop e n p q k k' :
@@ -759,7 +759,7 @@ rewrite big_cons (ihsp _ (fun r => k' (rgcdp (eval_poly e p) r))) //.
 by move=> r; apply: eval_Rgcd.
 Qed.
 
-Implicit Arguments eval_Rgcd [e p q k].
+Arguments eval_Rgcd [e p q k].
 Prenex Implicits eval_Rgcd.
 
 
@@ -781,7 +781,7 @@ rewrite (eval_NextMod (fun npq => k' (p' :: mods_aux q' npq n))) => // npq.
 by rewrite (ihn _ _ _ (fun ps => k' (p' :: ps))) => // ps; rewrite Pk.
 Qed.
 
-Implicit Arguments eval_ModsAux [e p q n k].
+Arguments eval_ModsAux [e p q n k].
 Prenex Implicits eval_ModsAux.
 
 Lemma eval_Mods e p q k k' :
@@ -789,7 +789,7 @@ Lemma eval_Mods e p q k k' :
   qf_eval e (Mods p q k) = k' (mods (eval_poly e p) (eval_poly e q)).
 Proof. by move=> Pk; rewrite !eval_Size; apply: eval_ModsAux. Qed.
 
-Implicit Arguments eval_Mods [e p q k].
+Arguments eval_Mods [e p q k].
 Prenex Implicits eval_Mods.
 
 Lemma eval_TaqR e p q k :
@@ -831,7 +831,7 @@ Lemma eval_TaqsR e p sq i k k' :
   k' (taqsR (eval_poly e p) (map (eval_poly e) sq) i).
 Proof. by move=> Pk; rewrite /TaqsR /taqsR eval_TaqR Pk /= eval_Pcq. Qed.
 
-Implicit Arguments eval_TaqsR [e p sq i k].
+Arguments eval_TaqsR [e p sq i k].
 Prenex Implicits eval_TaqsR.
 
 Fact invmx_ctmat1 : invmx (map_mx (intr : int -> F) ctmat1) =
@@ -885,7 +885,7 @@ rewrite (eval_TaqsR
 by move=> y; rewrite (ihn _ k') // -(eval_Coefs e).
 Qed.
 
-Implicit Arguments eval_CcountWeak [e p sq k].
+Arguments eval_CcountWeak [e p sq k].
 Prenex Implicits eval_CcountWeak.
 
 Lemma eval_ProdPoly e T s f k f' k' :
@@ -902,7 +902,7 @@ move=> fa; rewrite (ihs _ (fun fs => k' (eval_poly e fa * fs))) //.
 by move=> fs; rewrite Pk eval_OpPoly.
 Qed.
 
-Implicit Arguments eval_ProdPoly [e T s f k].
+Arguments eval_ProdPoly [e T s f k].
 Prenex Implicits eval_ProdPoly.
 
 Lemma eval_BoundingPoly e sq :
