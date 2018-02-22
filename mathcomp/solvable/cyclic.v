@@ -292,7 +292,7 @@ End Cyclic.
 Arguments Scope cyclic [_ group_scope].
 Arguments Scope generator [_ group_scope group_scope].
 Arguments Scope expg_invn [_ group_scope nat_scope].
-Implicit Arguments cyclicP [gT A].
+Arguments cyclicP [gT A].
 Prenex Implicits cyclic Zpm generator expg_invn.
 
 (* Euler's theorem *)
@@ -558,7 +558,7 @@ End Metacyclic.
 
 Arguments Scope metacyclic [_ group_scope].
 Prenex Implicits metacyclic.
-Implicit Arguments metacyclicP [gT A].
+Arguments metacyclicP [gT A].
 
 (* Automorphisms of cyclic groups. *)
 Section CyclicAutomorphism.

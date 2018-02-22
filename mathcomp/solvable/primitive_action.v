@@ -187,7 +187,7 @@ End NTransitive.
 Arguments Scope dtuple_on [_ nat_scope group_scope].
 Arguments Scope ntransitive
   [_ _ nat_scope group_scope group_scope action_scope].
-Implicit Arguments n_act [gT sT n].
+Arguments n_act [gT sT] _ [n].
 
 Notation "n .-dtuple ( S )" := (dtuple_on n S)
   (at level 8, format "n .-dtuple ( S )") : set_scope.

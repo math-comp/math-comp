@@ -246,7 +246,7 @@ have Gg: g \in G by rewrite groupMl ?groupV.
 rewrite -conjIg (inj_eq (act_inj 'Js x)) (eq_sym A) (sameP eqP normP).
 by rewrite -cards_eq0 cardJg cards_eq0 setI_eq0 => /tiAG/(subsetP nAL)->.
 Qed.
-Implicit Arguments normedTI_P [A G L].
+Arguments normedTI_P [A G L].
 
 Lemma normedTI_memJ_P A G L :
   reflect [/\ A != set0, L \subset G
@@ -622,9 +622,9 @@ Qed.
 
 End FrobeniusBasics.
 
-Implicit Arguments normedTI_P [gT A G L].
-Implicit Arguments normedTI_memJ_P [gT A G L].
-Implicit Arguments Frobenius_kerP [gT G K].
+Arguments normedTI_P [gT A G L].
+Arguments normedTI_memJ_P [gT A G L].
+Arguments Frobenius_kerP [gT G K].
 
 Lemma Frobenius_coprime_quotient (gT : finGroupType) (G K H N : {group gT}) :
     K ><| H = G -> N <| G -> coprime #|K| #|H| /\ H :!=: 1%g ->

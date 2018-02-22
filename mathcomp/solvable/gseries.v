@@ -212,7 +212,7 @@ Qed.
 
 End Subnormal.
 
-Implicit Arguments subnormalP [gT G H].
+Arguments subnormalP [gT H G].
 Prenex Implicits subnormalP.
 
 Section MorphSubNormal.
