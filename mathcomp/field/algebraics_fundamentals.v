@@ -260,7 +260,7 @@ Qed.
 Prenex Implicits alg_integral.
 
 Import DefaultKeying GRing.DefaultPred.
-Implicit Arguments map_poly_inj [[F] [R] x1 x2].
+Arguments map_poly_inj {F R} f [x1 x2].
 
 Theorem Fundamental_Theorem_of_Algebraics :
   {L : closedFieldType &
