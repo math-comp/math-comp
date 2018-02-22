@@ -118,8 +118,8 @@ Notation "[ 'morphism' D 'of' f ]" :=
 Notation "[ 'morphism' 'of' f ]" := (clone_morphism (@Morphism _ _ _ f))
    (at level 0, format "[ 'morphism'  'of'  f ]") : form_scope.
 
-Implicit Arguments morphimP [aT rT D A f y].
-Implicit Arguments morphpreP [aT rT D R f x].
+Arguments morphimP [aT rT D A y f].
+Arguments morphpreP [aT rT D R x f].
 Prenex Implicits morphimP morphpreP.
 
 (* Domain, image, preimage, kernel, using phantom types to infer the domain. *)
@@ -873,7 +873,7 @@ Notation "f @* G" := (morphim_group (MorPhantom f) G) : Group_scope.
 Notation "f @*^-1 M" := (morphpre_group (MorPhantom f) M) : Group_scope.
 Notation "f @: D" := (morph_dom_group f D) : Group_scope.
 
-Implicit Arguments injmP [aT rT D f].
+Arguments injmP [aT rT D f].
 
 Section IdentityMorphism.
 
@@ -969,8 +969,8 @@ End RestrictedMorphism.
 
 Arguments Scope restrm [_ _ group_scope group_scope _ group_scope].
 Prenex Implicits restrm.
-Implicit Arguments restrmP [aT rT D A].
-Implicit Arguments domP [aT rT D A].
+Arguments restrmP [aT rT A D].
+Arguments domP [aT rT A D].
 
 Section TrivMorphism.
 
@@ -995,7 +995,7 @@ Proof. by apply/setIidPl/subsetP=> x _; rewrite !inE /=. Qed.
 End TrivMorphism.
 
 Arguments Scope trivm [_ _ group_scope group_scope].
-Implicit Arguments trivm [[aT] [rT]].
+Arguments trivm {aT rT}.
 
 (* The composition of two morphisms is a Canonical morphism instance. *)
 Section MorphismComposition.
@@ -1259,7 +1259,7 @@ End Defs.
 
 Infix "\isog" := isog.
 
-Implicit Arguments isom_isog [A B D].
+Arguments isom_isog [A B D].
 
 (* The real reflection properties only hold for true groups and morphisms. *)
 
@@ -1330,11 +1330,11 @@ Arguments Scope morphic [_ _ group_scope _].
 Arguments Scope misom [_ _ group_scope group_scope _].
 Arguments Scope isog [_ _ group_scope group_scope].
 
-Implicit Arguments morphicP [aT rT A f].
-Implicit Arguments misomP [aT rT A B f].
-Implicit Arguments isom_isog [aT rT A B D].
-Implicit Arguments isomP [aT rT G H f].
-Implicit Arguments isogP [aT rT G H].
+Arguments morphicP [aT rT A f].
+Arguments misomP [aT rT A B f].
+Arguments isom_isog [aT rT A B D].
+Arguments isomP [aT rT G H f].
+Arguments isogP [aT rT G H].
 Prenex Implicits morphic morphicP morphm isom isog isomP misomP isogP.
 Notation "x \isog y":= (isog x y).
 
@@ -1483,7 +1483,7 @@ Arguments Scope homg [_ _ group_scope group_scope].
 Notation "G \homg H" := (homg G H)
   (at level 70, no associativity) : group_scope.
 
-Implicit Arguments homgP [rT aT C D].
+Arguments homgP [rT aT C D].
 
 (* Isomorphism between a group and its subtype. *)
 

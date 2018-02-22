@@ -96,10 +96,10 @@ Arguments Scope complements_to_in [_ group_scope group_scope].
 Arguments Scope splits_over [_ group_scope group_scope].
 Arguments Scope remgr [_ group_scope group_scope group_scope].
 Arguments Scope divgr [_ group_scope group_scope group_scope].
-Implicit Arguments partial_product [].
-Implicit Arguments semidirect_product [].
-Implicit Arguments central_product [].
-Implicit Arguments direct_product [].
+Arguments partial_product : clear implicits.
+Arguments semidirect_product : clear implicits.
+Arguments central_product : clear implicits.
+Arguments direct_product : clear implicits.
 Notation pprod := (partial_product _).
 Notation sdprod := (semidirect_product _).
 Notation cprod := (central_product _).
@@ -870,11 +870,11 @@ Qed.
 
 End InternalProd.
 
-Implicit Arguments complP [gT H A B].
-Implicit Arguments splitsP [gT A B].
-Implicit Arguments sdprod_normal_complP [gT K H G].
-Implicit Arguments dprodYP [gT K H].
-Implicit Arguments bigdprodYP [gT I P F].
+Arguments complP [gT H A B].
+Arguments splitsP [gT B A].
+Arguments sdprod_normal_complP [gT G K H].
+Arguments dprodYP [gT K H].
+Arguments bigdprodYP [gT I P F].
 
 Section MorphimInternalProd.
 
@@ -1703,5 +1703,5 @@ Qed.
 
 End DirprodIsom.
 
-Implicit Arguments mulgmP [gT H1 H2 G].
+Arguments mulgmP [gT H1 H2 G].
 Prenex Implicits mulgm mulgmP.
