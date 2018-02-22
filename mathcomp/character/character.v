@@ -390,7 +390,7 @@ Qed.
 
 End StandardRepresentation.
 
-Implicit Arguments grepr0 [R gT G].
+Arguments grepr0 [R gT G].
 Prenex Implicits grepr0 dadd_grepr.
 
 Section Char.
@@ -818,7 +818,7 @@ End IrrClass.
 
 Arguments Scope cfReg [_ group_scope].
 Prenex Implicits cfIirr.
-Implicit Arguments irr_inj [[gT] [G] x1 x2].
+Arguments irr_inj {gT G} [x1 x2].
 
 Section IsChar.
 
@@ -924,7 +924,7 @@ Canonical char_semiringPred := SemiringPred mul_char.
 
 End IsChar.
 Prenex Implicits character.
-Implicit Arguments char_reprP [gT G phi].
+Arguments char_reprP [gT G phi].
 
 Section AutChar.
 
@@ -1870,7 +1870,7 @@ Proof. by apply/eqP; rewrite isom_Iirr_eq0. Qed.
 
 End Isom.
 
-Implicit Arguments isom_Iirr_inj [aT rT G f R x1 x2].
+Arguments isom_Iirr_inj [aT rT G f R] isoGR [x1 x2].
 
 Section IsomInv.
 
@@ -1938,7 +1938,7 @@ Qed.
 
 End Sdprod.
 
-Implicit Arguments sdprod_Iirr_inj [gT K H G x1 x2].
+Arguments sdprod_Iirr_inj [gT K H G] defG [x1 x2].
 
 Section DProd.
 
@@ -2089,7 +2089,7 @@ Proof. by apply/(canLR dprod_IirrK); rewrite dprod_Iirr0. Qed.
 
 End DProd.
 
-Implicit Arguments dprod_Iirr_inj [gT G K H x1 x2].
+Arguments dprod_Iirr_inj [gT G K H] KxH [x1 x2].
 
 Lemma dprod_IirrC (gT : finGroupType) (G K H : {group gT})
                   (KxH : K \x H = G) (HxK : H \x K = G) i j :
@@ -2257,7 +2257,7 @@ Qed.
 
 End Aut.
 
-Implicit Arguments aut_Iirr_inj [gT G x1 x2].
+Arguments aut_Iirr_inj [gT G] u [x1 x2].
 
 Section Coset.
 
@@ -2554,7 +2554,7 @@ Qed.
 
 End DerivedGroup.
 
-Implicit Arguments irr_prime_injP [gT G i].
+Arguments irr_prime_injP [gT G i].
 
 (* Determinant characters and determinential order. *)
 Section DetOrder.

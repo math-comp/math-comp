@@ -557,7 +557,7 @@ rewrite big1 ?addr0 // => _ /andP[/imsetP[y Gy ->]]; apply: contraNeq.
 rewrite cfunE cfun_repr cfun_classE Gy mulf_eq0 => /norP[_].
 by rewrite pnatr_eq0 -lt0n lt0b => /class_eqP->.
 Qed.
-Implicit Arguments cfun_onP [A phi].
+Arguments cfun_onP [A phi].
 
 Lemma cfun_on0 A phi x : phi \in 'CF(G, A) -> x \notin A -> phi x = 0.
 Proof. by move/cfun_onP; apply. Qed.
@@ -759,7 +759,7 @@ End ClassFun.
 Arguments Scope classfun_on [_ group_scope group_scope].
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 
-Implicit Arguments cfun_onP [gT G A phi].
+Arguments cfun_onP [gT G A phi].
 Hint Resolve cfun_onT.
 
 Section DotProduct.
@@ -1009,7 +1009,7 @@ Lemma orthoPl phi S :
 Proof.
 by rewrite [orthogonal _ S]andbT /=; apply: (iffP allP) => ophiS ? /ophiS/eqP.
 Qed.
-Implicit Arguments orthoPl [phi S].
+Arguments orthoPl [phi S].
 
 Lemma orthogonal_sym : symmetric (@orthogonal _ G).
 Proof.
@@ -1242,12 +1242,12 @@ Qed.
 
 End DotProduct.
 
-Implicit Arguments orthoP [gT G phi psi].
-Implicit Arguments orthoPl [gT G phi S].
-Implicit Arguments orthoPr [gT G S psi].
-Implicit Arguments orthogonalP [gT G R S].
-Implicit Arguments pairwise_orthogonalP [gT G S].
-Implicit Arguments orthonormalP [gT G S].
+Arguments orthoP [gT G phi psi].
+Arguments orthoPl [gT G phi S].
+Arguments orthoPr [gT G S psi].
+Arguments orthogonalP [gT G S R].
+Arguments pairwise_orthogonalP [gT G S].
+Arguments orthonormalP [gT G S].
 
 Section CfunOrder.
 
@@ -1273,7 +1273,7 @@ Proof. by apply/eqP; rewrite -dvdn_cforder. Qed.
 
 End CfunOrder.
 
-Implicit Arguments dvdn_cforderP [gT G phi n].
+Arguments dvdn_cforderP [gT G phi n].
 
 Section MorphOrder.
 
@@ -1621,7 +1621,7 @@ Proof. exact: cforder_inj_rmorph cfIsom_inj. Qed.
 
 End InvMorphism.
 
-Implicit Arguments cfIsom_inj [aT rT G R f x1 x2].
+Arguments cfIsom_inj [aT rT G f R] isoGR [x1 x2].
 
 Section Coset.
 
@@ -2487,9 +2487,9 @@ Proof. by rewrite rmorphM /= cfAutDprodl cfAutDprodr. Qed.
 
 End FieldAutomorphism.
 
-Implicit Arguments cfAutK [[gT] [G]].
-Implicit Arguments cfAutVK [[gT] [G]].
-Implicit Arguments cfAut_inj [gT G x1 x2].
+Arguments cfAutK u {gT G}.
+Arguments cfAutVK u {gT G}.
+Arguments cfAut_inj u [gT G x1 x2].
 
 Definition conj_cfRes := cfAutRes conjC.
 Definition cfker_conjC := cfker_aut conjC.
