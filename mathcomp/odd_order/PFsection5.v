@@ -263,7 +263,7 @@ End Beta.
 
 End SeqInd.
 
-Implicit Arguments seqIndP [calX phi].
+Arguments seqIndP [calX phi].
 
 Lemma seqIndS (calX calY : {set Iirr K}) :
  calX \subset calY -> {subset seqInd calX <= seqInd calY}.
@@ -443,8 +443,8 @@ Proof. by rewrite sum_seqIndD_square ?normal1 ?sub1G // indexg1. Qed.
 
 End InducedIrrs.
 
-Implicit Arguments seqIndP [gT K L calX phi].
-Implicit Arguments seqIndC1P [gT K L phi].
+Arguments seqIndP [gT K L calX phi].
+Arguments seqIndC1P [gT K L phi].
 
 Section Five.
 
@@ -1605,5 +1605,5 @@ End DadeAut.
 
 End Five.
 
-Implicit Arguments coherent_prDade_TIred
-  [gT G H L K W W1 W2 A0 A S0 k tau1 defW].
+Arguments coherent_prDade_TIred
+  [gT G H L K W W1 W2 S0 A A0 k tau1 defW].

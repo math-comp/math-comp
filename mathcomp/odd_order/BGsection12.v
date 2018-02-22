@@ -241,9 +241,9 @@ Qed.
 
 End Introduction.
 
-Implicit Arguments tau2'1 [[M] x].
-Implicit Arguments tau3'1 [[M] x].
-Implicit Arguments tau3'2 [[M] x].
+Arguments tau2'1 {M} [x].
+Arguments tau3'1 {M} [x].
+Arguments tau3'2 {M} [x].
 
 (* This is the rest of B & G, Lemma 12.1 (parts b, c, d,e, and f). *)
 Lemma sigma_compl_context M E E1 E2 E3 :
@@ -2680,7 +2680,7 @@ Qed.
 
 End Section12.
 
-Implicit Arguments tau2'1 [[gT] [M] x].
-Implicit Arguments tau3'1 [[gT] [M] x].
-Implicit Arguments tau3'2 [[gT] [M] x].
+Arguments tau2'1 {gT M} [x].
+Arguments tau3'1 {gT M} [x].
+Arguments tau3'2 {gT M} [x].
 
