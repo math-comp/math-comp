@@ -178,9 +178,9 @@ Proof. by rewrite orderE -Zp_cycle cardsT card_ord. Qed.
 
 End ZpDef.
 
-Implicit Arguments Zp0 [[p']].
-Implicit Arguments Zp1 [[p']].
-Implicit Arguments inZp [[p']].
+Arguments Zp0 {p'}.
+Arguments Zp1 {p'}.
+Arguments inZp {p'}.
 
 Lemma ord1 : all_equal_to (0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.

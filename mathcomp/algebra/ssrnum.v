@@ -1251,11 +1251,11 @@ Definition normrE x := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
 
 End NumIntegralDomainTheory.
 
-Implicit Arguments ler01 [R].
-Implicit Arguments ltr01 [R].
-Implicit Arguments normr_idP [R x].
-Implicit Arguments normr0P [R x].
-Implicit Arguments lerifP [R x y C].
+Arguments ler01 [R].
+Arguments ltr01 [R].
+Arguments normr_idP [R x].
+Arguments normr0P [R x].
+Arguments lerifP [R x y C].
 Hint Resolve @ler01 @ltr01 lerr ltrr ltrW ltr_eqF ltr0Sn ler0n normr_ge0.
 
 Section NumIntegralDomainMonotonyTheory.
@@ -2680,7 +2680,7 @@ Lemma real_ler_normlP x y :
 Proof.
 by move=> Rx; rewrite real_ler_norml // ler_oppl; apply: (iffP andP) => [] [].
 Qed.
-Implicit Arguments real_ler_normlP [x y].
+Arguments real_ler_normlP [x y].
 
 Lemma real_eqr_norml x y :
   x \is real -> (`|x| == y) = ((x == y) || (x == -y)) && (0 <= y).
@@ -2716,7 +2716,7 @@ Proof.
 move=> Rx; rewrite real_ltr_norml // ltr_oppl.
 by apply: (iffP (@andP _ _)); case.
 Qed.
-Implicit Arguments real_ltr_normlP [x y].
+Arguments real_ltr_normlP [x y].
 
 Lemma real_ler_normr x y : y \is real -> (x <= `|y|) = (x <= y) || (x <= - y).
 Proof.
@@ -3138,16 +3138,16 @@ Qed.
 End NumDomainOperationTheory.
 
 Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real.
-Implicit Arguments ler_sqr [[R] x y].
-Implicit Arguments ltr_sqr [[R] x y].
-Implicit Arguments signr_inj [[R] x1 x2].
-Implicit Arguments real_ler_normlP [R x y].
-Implicit Arguments real_ltr_normlP [R x y].
-Implicit Arguments lerif_refl [R x C].
-Implicit Arguments mono_in_lerif [R A f C].
-Implicit Arguments nmono_in_lerif [R A f C].
-Implicit Arguments mono_lerif [R f C].
-Implicit Arguments nmono_lerif [R f C].
+Arguments ler_sqr {R} [x y].
+Arguments ltr_sqr {R} [x y].
+Arguments signr_inj {R} [x1 x2].
+Arguments real_ler_normlP [R x y].
+Arguments real_ltr_normlP [R x y].
+Arguments lerif_refl [R x C].
+Arguments mono_in_lerif [R A f C].
+Arguments nmono_in_lerif [R A f C].
+Arguments mono_lerif [R f C].
+Arguments nmono_lerif [R f C].
 
 Section NumDomainMonotonyTheoryForReals.
 
@@ -3631,7 +3631,7 @@ Proof. exact: real_ler_norml. Qed.
 
 Lemma ler_normlP x y : reflect ((- x <= y) * (x <= y)) (`|x| <= y).
 Proof. exact: real_ler_normlP. Qed.
-Implicit Arguments ler_normlP [x y].
+Arguments ler_normlP [x y].
 
 Lemma eqr_norml x y : (`|x| == y) = ((x == y) || (x == -y)) && (0 <= y).
 Proof. exact: real_eqr_norml. Qed.
@@ -3646,7 +3646,7 @@ Definition lter_norml := (ler_norml, ltr_norml).
 
 Lemma ltr_normlP x y : reflect ((-x < y) * (x < y)) (`|x| < y).
 Proof. exact: real_ltr_normlP. Qed.
-Implicit Arguments ltr_normlP [x y].
+Arguments ltr_normlP [x y].
 
 Lemma ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y).
 Proof. by rewrite lerNgt ltr_norml negb_and -!lerNgt orbC ler_oppr. Qed.

@@ -432,7 +432,7 @@ Proof. by rewrite mulmxA -[col_base A *m _]mulmxA pid_mx_id ?mulmx_ebase. Qed.
 Lemma mulmx1_min_rank r m n (A : 'M_(m, n)) M N :
   M *m A *m N = 1%:M :> 'M_r -> r <= \rank A.
 Proof. by rewrite -{1}(mulmx_base A) mulmxA -mulmxA; move/mulmx1_min. Qed.
-Implicit Arguments mulmx1_min_rank [r m n A].
+Arguments mulmx1_min_rank [r m n A].
 
 Lemma mulmx_max_rank r m n (M : 'M_(m, r)) (N : 'M_(r, n)) :
   \rank (M *m N) <= r.
@@ -444,7 +444,7 @@ suffices: L *m M *m (N *m U) = 1%:M by apply: mulmx1_min.
 rewrite mulmxA -(mulmxA L) -[M *m N]mulmx_ebase -/MN.
 by rewrite !mulmxA mulmxKV // mulmxK // !pid_mx_id /rMN ?pid_mx_1.
 Qed.
-Implicit Arguments mulmx_max_rank [r m n].
+Arguments mulmx_max_rank [r m n].
 
 Lemma mxrank_tr m n (A : 'M_(m, n)) : \rank A^T = \rank A.
 Proof.
@@ -511,7 +511,7 @@ Proof.
 apply: (iffP idP) => [/mulmxKpV | [D ->]]; first by exists (A *m pinvmx B).
 by rewrite submxE -mulmxA mulmx_coker mulmx0.
 Qed.
-Implicit Arguments submxP [m1 m2 n A B].
+Arguments submxP [m1 m2 n A B].
 
 Lemma submx_refl m n (A : 'M_(m, n)) : (A <= A)%MS.
 Proof. by rewrite submxE mulmx_coker. Qed.
@@ -612,7 +612,7 @@ apply: (iffP idP) => [sAB i|sAB].
 rewrite submxE; apply/eqP/row_matrixP=> i; apply/eqP.
 by rewrite row_mul row0 -submxE.
 Qed.
-Implicit Arguments row_subP [m1 m2 n A B].
+Arguments row_subP [m1 m2 n A B].
 
 Lemma rV_subP m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (forall v : 'rV_n, v <= A -> v <= B)%MS (A <= B)%MS.
@@ -620,7 +620,7 @@ Proof.
 apply: (iffP idP) => [sAB v Av | sAB]; first exact: submx_trans sAB.
 by apply/row_subP=> i; rewrite sAB ?row_sub.
 Qed.
-Implicit Arguments rV_subP [m1 m2 n A B].
+Arguments rV_subP [m1 m2 n A B].
 
 Lemma row_subPn m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (exists i, ~~ (row i A <= B)%MS) (~~ (A <= B)%MS).
@@ -668,7 +668,7 @@ apply: (iffP idP) => [Afull | [B kA]].
   by exists (1%:M *m pinvmx A); apply: mulmxKpV (submx_full _ Afull).
 by rewrite [_ A]eqn_leq rank_leq_col (mulmx1_min_rank B 1%:M) ?mulmx1.
 Qed.
-Implicit Arguments row_fullP [m n A].
+Arguments row_fullP [m n A].
 
 Lemma row_full_inj m n p A : row_full A -> injective (@mulmx _ m n p A).
 Proof.
@@ -739,7 +739,7 @@ split=> [|m3 C]; first by apply/eqP; rewrite eqn_leq !mxrankS.
 split; first by apply/idP/idP; apply: submx_trans.
 by apply/idP/idP=> sC; apply: submx_trans sC _.
 Qed.
-Implicit Arguments eqmxP [m1 m2 n A B].
+Arguments eqmxP [m1 m2 n A B].
 
 Lemma rV_eqP m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (forall u : 'rV_n, (u <= A) = (u <= B))%MS (A == B)%MS.
@@ -860,7 +860,7 @@ Proof.
 apply: (iffP idP) => eqAB; first exact: eq_genmx (eqmxP _).
 by rewrite -!(genmxE A) eqAB !genmxE andbb.
 Qed.
-Implicit Arguments genmxP [m1 m2 n A B].
+Arguments genmxP [m1 m2 n A B].
 
 Lemma genmx0 m n : <<0 : 'M_(m, n)>>%MS = 0.
 Proof. by apply/eqP; rewrite -submx0 genmxE sub0mx. Qed.
@@ -1066,7 +1066,7 @@ apply: (iffP idP) => [|[u ->]]; last by rewrite addmx_sub_adds ?submxMl.
 rewrite addsmxE; case/submxP=> u ->; exists (lsubmx u, rsubmx u).
 by rewrite -mul_row_col hsubmxK.
 Qed.
-Implicit Arguments sub_addsmxP [m1 m2 m3 n A B C].
+Arguments sub_addsmxP [m1 m2 m3 n A B C].
 
 Variable I : finType.
 Implicit Type P : pred I.
@@ -1080,7 +1080,7 @@ Lemma sumsmx_sup i0 P m n (A : 'M_(m, n)) (B_ : I -> 'M_n) :
 Proof.
 by move=> Pi0 sAB; apply: submx_trans sAB _; rewrite (bigD1 i0) // addsmxSl.
 Qed.
-Implicit Arguments sumsmx_sup [P m n A B_].
+Arguments sumsmx_sup i0 [P m n A B_].
 
 Lemma sumsmx_subP P m n (A_ : I -> 'M_n) (B : 'M_(m, n)) :
   reflect (forall i, P i -> A_ i <= B)%MS (\sum_(i | P i) A_ i <= B)%MS.
@@ -1790,7 +1790,7 @@ Notation mxdirect A := (mxdirect_def (Phantom 'M_(_,_) A%MS)).
 Lemma mxdirectP n (S : proper_mxsum_expr n) :
   reflect (\rank S = proper_mxsum_rank S) (mxdirect S).
 Proof. exact: eqnP. Qed.
-Implicit Arguments mxdirectP [n S].
+Arguments mxdirectP [n S].
 
 Lemma mxdirect_trivial m n A : mxdirect (unwrap (@trivial_mxsum m n A)).
 Proof. exact: eqxx. Qed.
@@ -1972,38 +1972,38 @@ End Eigenspace.
 End RowSpaceTheory.
 
 Hint Resolve submx_refl.
-Implicit Arguments submxP [F m1 m2 n A B].
-Implicit Arguments eq_row_sub [F m n v A].
-Implicit Arguments row_subP [F m1 m2 n A B].
-Implicit Arguments rV_subP [F m1 m2 n A B].
-Implicit Arguments row_subPn [F m1 m2 n A B].
-Implicit Arguments sub_rVP [F n u v].
-Implicit Arguments rV_eqP [F m1 m2 n A B].
-Implicit Arguments rowV0Pn [F m n A].
-Implicit Arguments rowV0P [F m n A].
-Implicit Arguments eqmx0P [F m n A].
-Implicit Arguments row_fullP [F m n A].
-Implicit Arguments row_freeP [F m n A].
-Implicit Arguments eqmxP [F m1 m2 n A B].
-Implicit Arguments genmxP [F m1 m2 n A B].
-Implicit Arguments addsmx_idPr [F m1 m2 n A B].
-Implicit Arguments addsmx_idPl [F m1 m2 n A B].
-Implicit Arguments sub_addsmxP [F m1 m2 m3 n A B C].
-Implicit Arguments sumsmx_sup [F I P m n A B_].
-Implicit Arguments sumsmx_subP [F I P m n A_ B].
-Implicit Arguments sub_sumsmxP [F I P m n A B_].
-Implicit Arguments sub_kermxP [F p m n A B].
-Implicit Arguments capmx_idPr [F m1 m2 n A B].
-Implicit Arguments capmx_idPl [F m1 m2 n A B].
-Implicit Arguments bigcapmx_inf [F I P m n A_ B].
-Implicit Arguments sub_bigcapmxP [F I P m n A B_].
-Implicit Arguments mxrank_injP [F m n A f].
-Implicit Arguments mxdirectP [F n S].
-Implicit Arguments mxdirect_addsP [F m1 m2 n A B].
-Implicit Arguments mxdirect_sumsP [F I P n A_].
-Implicit Arguments mxdirect_sumsE [F I P n S_].
-Implicit Arguments eigenspaceP [F n g a m W].
-Implicit Arguments eigenvalueP [F n g a].
+Arguments submxP [F m1 m2 n A B].
+Arguments eq_row_sub [F m n v A].
+Arguments row_subP [F m1 m2 n A B].
+Arguments rV_subP [F m1 m2 n A B].
+Arguments row_subPn [F m1 m2 n A B].
+Arguments sub_rVP [F n u v].
+Arguments rV_eqP [F m1 m2 n A B].
+Arguments rowV0Pn [F m n A].
+Arguments rowV0P [F m n A].
+Arguments eqmx0P [F m n A].
+Arguments row_fullP [F m n A].
+Arguments row_freeP [F m n A].
+Arguments eqmxP [F m1 m2 n A B].
+Arguments genmxP [F m1 m2 n A B].
+Arguments addsmx_idPr [F m1 m2 n A B].
+Arguments addsmx_idPl [F m1 m2 n A B].
+Arguments sub_addsmxP [F m1 m2 m3 n A B C].
+Arguments sumsmx_sup [F I] i0 [P m n A B_].
+Arguments sumsmx_subP [F I P m n A_ B].
+Arguments sub_sumsmxP [F I P m n A B_].
+Arguments sub_kermxP [F p m n A B].
+Arguments capmx_idPr [F n m1 m2 A B].
+Arguments capmx_idPl [F n m1 m2 A B].
+Arguments bigcapmx_inf [F I] i0 [P m n A_ B].
+Arguments sub_bigcapmxP [F I P m n A B_].
+Arguments mxrank_injP [F m n] p [A f].
+Arguments mxdirectP [F n S].
+Arguments mxdirect_addsP [F m1 m2 n A B].
+Arguments mxdirect_sumsP [F I P n A_].
+Arguments mxdirect_sumsE [F I P n S_].
+Arguments eigenspaceP [F n g a m W].
+Arguments eigenvalueP [F n g a].
 
 Arguments Scope mxrank [_ nat_scope nat_scope matrix_set_scope].
 Arguments Scope complmx [_ nat_scope nat_scope matrix_set_scope].
@@ -2241,7 +2241,7 @@ Proof.
 apply: (iffP idP) => [sR12 A R1_A | sR12]; first exact: submx_trans sR12.
 by apply/rV_subP=> vA; rewrite -(vec_mxK vA); apply: sR12.
 Qed.
-Implicit Arguments memmx_subP [m1 m2 n R1 R2].
+Arguments memmx_subP [m1 m2 n R1 R2].
 
 Lemma memmx_eqP m1 m2 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) :
   reflect (forall A, (A \in R1) = (A \in R2)) (R1 == R2)%MS.
@@ -2249,7 +2249,7 @@ Proof.
 apply: (iffP eqmxP) => [eqR12 A | eqR12]; first by rewrite eqR12.
 by apply/eqmxP; apply/rV_eqP=> vA; rewrite -(vec_mxK vA) eqR12.
 Qed.
-Implicit Arguments memmx_eqP [m1 m2 n R1 R2].
+Arguments memmx_eqP [m1 m2 n R1 R2].
 
 Lemma memmx_addsP m1 m2 n A (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) :
   reflect (exists D, [/\ D.1 \in R1, D.2 \in R2 & A = D.1 + D.2])
@@ -2261,7 +2261,7 @@ apply: (iffP sub_addsmxP) => [[u /(canRL mxvecK)->] | [D []]].
 case/submxP=> u1 defD1 /submxP[u2 defD2] ->.
 by exists (u1, u2); rewrite linearD /= defD1 defD2.
 Qed.
-Implicit Arguments memmx_addsP [m1 m2 n A R1 R2].
+Arguments memmx_addsP [m1 m2 n A R1 R2].
 
 Lemma memmx_sumsP (I : finType) (P : pred I) n (A : 'M_n) R_ :
   reflect (exists2 A_, A = \sum_(i | P i) A_ i & forall i, A_ i \in R_ i)
@@ -2274,7 +2274,7 @@ apply: (iffP sub_sumsmxP) => [[C defA] | [A_ -> R_A] {A}].
 exists (fun i => mxvec (A_ i) *m pinvmx (R_ i)).
 by rewrite linear_sum; apply: eq_bigr => i _; rewrite mulmxKpV.
 Qed.
-Implicit Arguments memmx_sumsP [I P n A R_].
+Arguments memmx_sumsP [I P n A R_].
 
 Lemma has_non_scalar_mxP m n (R : 'A_(m, n)) : 
     (1%:M \in R)%MS ->
@@ -2325,7 +2325,7 @@ case/memmx_sumsP=> A_ -> R_A; rewrite linear_sum summx_sub //= => j _.
 rewrite (submx_trans (R_A _)) // genmxE; apply/row_subP=> i.
 by rewrite row_mul mul_rV_lin sR12R ?vec_mxK ?row_sub.
 Qed.
-Implicit Arguments mulsmx_subP [m1 m2 m n R1 R2 R].
+Arguments mulsmx_subP [m1 m2 m n R1 R2 R].
 
 Lemma mulsmxS m1 m2 m3 m4 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n))
                             (R3 : 'A_(m3, n)) (R4 : 'A_(m4, n)) :
@@ -2360,7 +2360,7 @@ exists A2_ => [i|]; first by rewrite vec_mxK -(genmxE R2) row_sub.
 apply: eq_bigr => i _; rewrite -[_ *m _](mx_rV_lin (mulmxr_linear _ _)).
 by rewrite -mulmxA mulmxKpV ?mxvecK // -(genmxE (_ *m _)) R_A.
 Qed.
-Implicit Arguments mulsmxP [m1 m2 n A R1 R2].
+Arguments mulsmxP [m1 m2 n A R1 R2].
 
 Lemma mulsmxA m1 m2 m3 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) (R3 : 'A_(m3, n)) :
   (R1 * (R2 * R3) = R1 * R2 * R3)%MS.
@@ -2450,7 +2450,7 @@ congr (row_mx 0 (row_mx (mxvec _) (mxvec _))); apply/row_matrixP=> i.
   by rewrite !row_mul !mul_rV_lin1 /= mxvecK ideR vec_mxK ?row_sub.
 by rewrite !row_mul !mul_rV_lin1 /= mxvecK idRe vec_mxK ?row_sub.
 Qed.
-Implicit Arguments mxring_idP [m n R].
+Arguments mxring_idP [m n R].
 
 Section CentMxDef.
 
@@ -2486,7 +2486,7 @@ apply: (iffP sub_kermxP); rewrite mul_vec_lin => cBE.
 apply: (canLR vec_mxK); apply/row_matrixP=> i.
 by rewrite row_mul mul_rV_lin /= cBE subrr !linear0.
 Qed.
-Implicit Arguments cent_rowP [m n B R].
+Arguments cent_rowP [m n B R].
 
 Lemma cent_mxP m n B (R : 'A_(m, n)) :
   reflect (forall A, A \in R -> A *m B = B *m A) (B \in 'C(R))%MS.
@@ -2497,7 +2497,7 @@ apply: (iffP cent_rowP) => cEB => [A sAE | i A].
   by rewrite !linearZ -scalemxAl /= cEB.
 by rewrite cEB // vec_mxK row_sub.
 Qed.
-Implicit Arguments cent_mxP [m n B R].
+Arguments cent_mxP [m n B R].
 
 Lemma scalar_mx_cent m n a (R : 'A_(m, n)) : (a%:M \in 'C(R))%MS.
 Proof. by apply/cent_mxP=> A _; apply: scalar_mxC. Qed.
@@ -2512,7 +2512,7 @@ Proof.
 rewrite sub_capmx; case R_A: (A \in R); last by right; case.
 by apply: (iffP cent_mxP) => [cAR | [_ cAR]].
 Qed.
-Implicit Arguments center_mxP [m n A R].
+Arguments center_mxP [m n A R].
 
 Lemma mxring_id_uniq m n (R : 'A_(m, n)) e1 e2 :
   mxring_id R e1 -> mxring_id R e2 -> e1 = e2.
@@ -2634,16 +2634,16 @@ Notation "''C_' R ( S )" := (R :&: 'C(S))%MS : matrix_set_scope.
 Notation "''C_' ( R ) ( S )" := ('C_R(S))%MS (only parsing) : matrix_set_scope.
 Notation "''Z' ( R )" := (center_mx R) : matrix_set_scope.
 
-Implicit Arguments memmx_subP [F m1 m2 n R1 R2].
-Implicit Arguments memmx_eqP [F m1 m2 n R1 R2].
-Implicit Arguments memmx_addsP [F m1 m2 n R1 R2].
-Implicit Arguments memmx_sumsP [F I P n A R_].
-Implicit Arguments mulsmx_subP [F m1 m2 m n R1 R2 R].
-Implicit Arguments mulsmxP [F m1 m2 n A R1 R2].
-Implicit Arguments mxring_idP [m n R].
-Implicit Arguments cent_rowP [F m n B R].
-Implicit Arguments cent_mxP [F m n B R].
-Implicit Arguments center_mxP [F m n A R].
+Arguments memmx_subP [F m1 m2 n R1 R2].
+Arguments memmx_eqP [F m1 m2 n R1 R2].
+Arguments memmx_addsP [F m1 m2 n] A [R1 R2].
+Arguments memmx_sumsP [F I P n A R_].
+Arguments mulsmx_subP [F m1 m2 m n R1 R2 R].
+Arguments mulsmxP [F m1 m2 n A R1 R2].
+Arguments mxring_idP F [m n R].
+Arguments cent_rowP [F m n B R].
+Arguments cent_mxP [F m n B R].
+Arguments center_mxP [F m n A R].
 
 (* Parametricity for the row-space/F-algebra theory.                         *)
 Section MapMatrixSpaces.

@@ -777,7 +777,7 @@ Qed.
 
 End InPrealField.
 
-Implicit Arguments ratr [[R]].
+Arguments ratr {R}.
 
 (* Conntecting rationals to the ring an field tactics *)
 
