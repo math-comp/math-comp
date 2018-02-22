@@ -243,7 +243,7 @@ End BasicSetTheory.
 
 Definition inE := (in_set, inE).
 
-Implicit Arguments set0 [T].
+Arguments set0 [T].
 Prenex Implicits set0.
 Hint Resolve in_setT.
 
@@ -827,7 +827,7 @@ Proof.
 apply: (iffP subsetP) => [sAB | <- x /setIP[] //].
 by apply/setP=> x; rewrite inE; apply/andb_idr/sAB.
 Qed.
-Implicit Arguments setIidPl [A B].
+Arguments setIidPl [A B].
 
 Lemma setIidPr A B : reflect (A :&: B = B) (B \subset A).
 Proof. by rewrite setIC; apply: setIidPl. Qed.
@@ -955,26 +955,26 @@ Proof. by rewrite setDE disjoints_subset => /properI/andP[-> /proper_sub]. Qed.
 
 End setOps.
 
-Implicit Arguments set1P [T x a].
-Implicit Arguments set1_inj [T].
-Implicit Arguments set2P [T x a b].
-Implicit Arguments setIdP [T x pA pB].
-Implicit Arguments setIP [T x A B].
-Implicit Arguments setU1P [T x a B].
-Implicit Arguments setD1P [T x A b].
-Implicit Arguments setUP [T x A B].
-Implicit Arguments setDP [T x A B].
-Implicit Arguments cards1P [T A].
-Implicit Arguments setCP [T x A].
-Implicit Arguments setIidPl [T A B].
-Implicit Arguments setIidPr [T A B].
-Implicit Arguments setUidPl [T A B].
-Implicit Arguments setUidPr [T A B].
-Implicit Arguments setDidPl [T A B].
-Implicit Arguments subsetIP [T A B C].
-Implicit Arguments subUsetP [T A B C].
-Implicit Arguments subsetDP [T A B C].
-Implicit Arguments subsetD1P [T A B x].
+Arguments set1P [T x a].
+Arguments set1_inj [T].
+Arguments set2P [T x a b].
+Arguments setIdP [T x pA pB].
+Arguments setIP [T x A B].
+Arguments setU1P [T x a B].
+Arguments setD1P [T x A b].
+Arguments setUP [T x A B].
+Arguments setDP [T A B x].
+Arguments cards1P [T A].
+Arguments setCP [T x A].
+Arguments setIidPl [T A B].
+Arguments setIidPr [T A B].
+Arguments setUidPl [T A B].
+Arguments setUidPr [T A B].
+Arguments setDidPl [T A B].
+Arguments subsetIP [T A B C].
+Arguments subUsetP [T A B C].
+Arguments subsetDP [T A B C].
+Arguments subsetD1P [T A B x].
 Prenex Implicits set1 set1_inj.
 Prenex Implicits set1P set2P setU1P setD1P setIdP setIP setUP setDP.
 Prenex Implicits cards1P setCP setIidPl setIidPr setUidPl setUidPr setDidPl.
@@ -1018,7 +1018,7 @@ Proof. by rewrite cardsE cardX. Qed.
 
 End CartesianProd.
 
-Implicit Arguments setXP [x1 x2 fT1 fT2 A1 A2].
+Arguments setXP [fT1 fT2 A1 A2 x1 x2].
 Prenex Implicits setXP.
 
 Local Notation imset_def :=
@@ -1365,8 +1365,8 @@ Proof. by move=> sAB1 sAB2; rewrite -!imset2_pair imset2S. Qed.
 
 End FunImage.
 
-Implicit Arguments imsetP [aT rT f D y].
-Implicit Arguments imset2P [aT aT2 rT f2 D1 D2 y].
+Arguments imsetP [aT rT f D y].
+Arguments imset2P [aT aT2 rT f2 D1 D2 y].
 Prenex Implicits imsetP imset2P.
 
 Section BigOps.
@@ -1439,11 +1439,11 @@ Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
 
 End BigOps.
 
-Implicit Arguments big_setID [R idx aop I A].
-Implicit Arguments big_setD1 [R idx aop I A F].
-Implicit Arguments big_setU1 [R idx aop I A F].
-Implicit Arguments big_imset [R idx aop h I J A].
-Implicit Arguments partition_big_imset [R idx aop I J].
+Arguments big_setID [R idx aop I A].
+Arguments big_setD1 [R idx aop I] a [A F].
+Arguments big_setU1 [R idx aop I] a [A F].
+Arguments big_imset [R idx aop I J h A].
+Arguments partition_big_imset [R idx aop I J].
 
 Section Fun2Set1.
 
@@ -1499,7 +1499,7 @@ Proof. by move=> fK gK; apply: can2_in_imset_pre; apply: in1W. Qed.
 
 End CardFunImage.
 
-Implicit Arguments imset_injP [aT rT f D].
+Arguments imset_injP [aT rT f D].
 
 Lemma on_card_preimset (aT rT : finType) (f : aT -> rT) (R : pred rT) :
   {on R, bijective f} -> #|f @^-1: R| = #|R|.
@@ -1701,14 +1701,14 @@ Proof. by apply: setC_inj; rewrite !setC_bigcap bigcup_seq. Qed.
 
 End BigSetOps.
 
-Implicit Arguments bigcup_sup [T I P F].
-Implicit Arguments bigcup_max [T I U P F].
-Implicit Arguments bigcupP [T I x P F].
-Implicit Arguments bigcupsP [T I U P F].
-Implicit Arguments bigcap_inf [T I P F].
-Implicit Arguments bigcap_min [T I U P F].
-Implicit Arguments bigcapP [T I x P F].
-Implicit Arguments bigcapsP [T I U P F].
+Arguments bigcup_sup [T I] j [P F].
+Arguments bigcup_max [T I] j [U P F].
+Arguments bigcupP [T I x P F].
+Arguments bigcupsP [T I U P F].
+Arguments bigcap_inf [T I] j [P F].
+Arguments bigcap_min [T I] j [U P F].
+Arguments bigcapP [T I x P F].
+Arguments bigcapsP [T I U P F].
 Prenex Implicits bigcupP bigcupsP bigcapP bigcapsP.
 
 Section ImsetCurry.
@@ -2088,11 +2088,11 @@ End Transversals.
 
 End Partitions.
 
-Implicit Arguments trivIsetP [T P].
-Implicit Arguments big_trivIset_cond [T R idx op K E].
-Implicit Arguments set_partition_big_cond [T R idx op D K E].
-Implicit Arguments big_trivIset [T R idx op E].
-Implicit Arguments set_partition_big [T R idx op D E].
+Arguments trivIsetP [T P].
+Arguments big_trivIset_cond [T R idx op] P [K E].
+Arguments set_partition_big_cond [T R idx op] P [D K E].
+Arguments big_trivIset [T R idx op] P [E].
+Arguments set_partition_big [T R idx op] P [D E].
 
 Prenex Implicits cover trivIset partition pblock trivIsetP.
 
@@ -2141,7 +2141,7 @@ apply: (iffP forallP) => [minA | [PA minA] B].
   by move=> B PB sBA; have:= minA B; rewrite PB sBA /= eqb_id => /eqP.
 by apply/implyP=> sBA; apply/eqP; apply/eqP/idP=> [-> // | /minA]; apply.
 Qed.
-Implicit Arguments minsetP [P A].
+Arguments minsetP [P A].
 
 Lemma minsetp P A : minset P A -> P A.
 Proof. by case/minsetP. Qed.
@@ -2212,7 +2212,7 @@ Qed.
 
 End MaxSetMinSet.
 
-Implicit Arguments minsetP [T P A].
-Implicit Arguments maxsetP [T P A].
+Arguments minsetP [T P A].
+Arguments maxsetP [T P A].
 Prenex Implicits minset maxset minsetP maxsetP.
 

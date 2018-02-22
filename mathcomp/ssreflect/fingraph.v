@@ -224,9 +224,9 @@ Notation closure e a := (closure_mem e (mem a)).
 
 Prenex Implicits connect root roots.
 
-Implicit Arguments dfsP [T g x y].
-Implicit Arguments connectP [T e x y].
-Implicit Arguments rootP [T e x y].
+Arguments dfsP [T g x y].
+Arguments connectP [T e x y].
+Arguments rootP [T e] _ [x y].
 
 Notation fconnect f := (connect (coerced_frel f)).
 Notation froot f := (root (coerced_frel f)).
@@ -770,7 +770,7 @@ Notation "@ 'fun_adjunction' T T' h f f' a" :=
   (@rel_adjunction T T' h (frel f) (frel f') a)
   (at level 10, T, T', h, f, f', a at level 8, only parsing) : type_scope.
 
-Implicit Arguments intro_adjunction [T T' h e e' a].
-Implicit Arguments adjunction_n_comp [T T' e e' a].
+Arguments intro_adjunction [T T' h e e'] _ [a].
+Arguments adjunction_n_comp [T T'] h [e e'] _ _ [a].
 
 Unset Implicit Arguments.

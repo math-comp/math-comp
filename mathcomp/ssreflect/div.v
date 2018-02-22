@@ -130,11 +130,11 @@ rewrite {2}/divn; case: edivnP; rewrite d_gt0 /= => q r ->{m} lt_rd.
 rewrite mulnDr mulnCA divnMDl; last by rewrite muln_gt0 p_gt0.
 by rewrite addnC divn_small // ltn_pmul2l.
 Qed.
-Implicit Arguments divnMl [p m d].
+Arguments divnMl [p m d].
 
 Lemma divnMr p m d : p > 0 -> m * p %/ (d * p) = m %/ d.
 Proof. by move=> p_gt0; rewrite -!(mulnC p) divnMl. Qed.
-Implicit Arguments divnMr [p m d].
+Arguments divnMr [p m d].
 
 Lemma ltn_mod m d : (m %% d < d) = (0 < d).
 Proof. by case: d => // d; rewrite modn_def; case: edivnP. Qed.
@@ -302,7 +302,7 @@ Proof.
 apply: (iffP eqP) => [md0 | [k ->]]; last by rewrite modnMl.
 by exists (m %/ d); rewrite {1}(divn_eq m d) md0 addn0.
 Qed.
-Implicit Arguments dvdnP [d m].
+Arguments dvdnP [d m].
 Prenex Implicits dvdnP.
 
 Lemma dvdn0 d : d %| 0.
@@ -401,11 +401,11 @@ Qed.
 
 Lemma dvdn_pmul2l p d m : 0 < p -> (p * d %| p * m) = (d %| m).
 Proof. by case: p => // p _; rewrite /dvdn -muln_modr // muln_eq0. Qed.
-Implicit Arguments dvdn_pmul2l [p m d].
+Arguments dvdn_pmul2l [p d m].
 
 Lemma dvdn_pmul2r p d m : 0 < p -> (d * p %| m * p) = (d %| m).
 Proof. by move=> p_gt0; rewrite -!(mulnC p) dvdn_pmul2l. Qed.
-Implicit Arguments dvdn_pmul2r [p m d].
+Arguments dvdn_pmul2r [p d m].
 
 Lemma dvdn_divLR p d m : 0 < p -> p %| d -> (d %/ p %| m) = (d %| m * p).
 Proof. by move=> /(@dvdn_pmul2r p _ m) <- /divnK->. Qed.

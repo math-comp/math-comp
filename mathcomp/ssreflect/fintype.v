@@ -820,13 +820,13 @@ End OpsTheory.
 
 Hint Resolve subxx_hint.
 
-Implicit Arguments pred0P [T P].
-Implicit Arguments pred0Pn [T P].
-Implicit Arguments subsetP [T A B].
-Implicit Arguments subsetPn [T A B].
-Implicit Arguments subset_eqP [T A B].
-Implicit Arguments card_uniqP [T s].
-Implicit Arguments properP [T A B].
+Arguments pred0P [T P].
+Arguments pred0Pn [T P].
+Arguments subsetP [T A B].
+Arguments subsetPn [T A B].
+Arguments subset_eqP [T A B].
+Arguments card_uniqP [T s].
+Arguments properP [T A B].
 Prenex Implicits pred0P pred0Pn subsetP subsetPn subset_eqP card_uniqP.
 
 (**********************************************************************)
@@ -919,14 +919,14 @@ Proof. by rewrite negb_exists; apply/eq_forallb => x; rewrite [~~ _]fun_if. Qed.
 
 End Quantifiers.
 
-Implicit Arguments forallP [T P].
-Implicit Arguments eqfunP [T rT f1 f2].
-Implicit Arguments forall_inP [T D P].
-Implicit Arguments eqfun_inP [T rT D f1 f2].
-Implicit Arguments existsP [T P].
-Implicit Arguments exists_eqP [T rT f1 f2].
-Implicit Arguments exists_inP [T D P].
-Implicit Arguments exists_eq_inP [T rT D f1 f2].
+Arguments forallP [T P].
+Arguments eqfunP [T rT f1 f2].
+Arguments forall_inP [T D P].
+Arguments eqfun_inP [T rT D f1 f2].
+Arguments existsP [T P].
+Arguments exists_eqP [T rT f1 f2].
+Arguments exists_inP [T D P].
+Arguments exists_eq_inP [T rT D f1 f2].
 
 Section Extrema.
 
@@ -1184,15 +1184,15 @@ Qed.
 End Image.
 
 Prenex Implicits codom iinv.
-Implicit Arguments imageP [T T' f A y].
-Implicit Arguments codomP [T T' f y].
+Arguments imageP [T T' f A y].
+Arguments codomP [T T' f y].
 
 Lemma flatten_imageP (aT : finType) (rT : eqType) A (P : pred aT) (y : rT) :
   reflect (exists2 x, x \in P & y \in A x) (y \in flatten [seq A x | x in P]).
 Proof.
 by apply: (iffP flatten_mapP) => [][x Px]; exists x; rewrite ?mem_enum in Px *.
 Qed.
-Implicit Arguments flatten_imageP [aT rT A P y].
+Arguments flatten_imageP [aT rT A P y].
 
 Section CardFunImage.
 
@@ -1240,7 +1240,7 @@ Qed.
 
 End CardFunImage.
 
-Implicit Arguments image_injP [T T' f A].
+Arguments image_injP [T T' f A].
 
 Section FinCancel.
 
@@ -1748,8 +1748,8 @@ Qed.
 
 End EnumRank.
 
-Implicit Arguments enum_val_inj [[T] [A] x1 x2].
-Implicit Arguments enum_rank_inj [[T] x1 x2].
+Arguments enum_val_inj {T A} [x1 x2].
+Arguments enum_rank_inj {T} [x1 x2].
 Prenex Implicits enum_val enum_rank.
 
 Lemma enum_rank_ord n i : enum_rank i = cast_ord (esym (card_ord n)) i.
@@ -1963,10 +1963,10 @@ Lemma lift0 (i : 'I_n') : lift ord0 i = i.+1 :> nat. Proof. by []. Qed.
 
 End OrdinalPos.
 
-Implicit Arguments ord0 [[n']].
-Implicit Arguments ord_max [[n']].
-Implicit Arguments inord [[n']].
-Implicit Arguments sub_ord [[n']].
+Arguments ord0 {n'}.
+Arguments ord_max {n'}.
+Arguments inord {n'}.
+Arguments sub_ord {n'}.
 
 (* Product of two fintypes which is a fintype *)
 Section ProdFinType.

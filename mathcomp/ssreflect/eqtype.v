@@ -147,7 +147,7 @@ Proof. by []. Qed.
 
 Lemma eqP T : Equality.axiom (@eq_op T).
 Proof. by case: T => ? []. Qed.
-Implicit Arguments eqP [T x y].
+Arguments eqP [T x y].
 
 Delimit Scope eq_scope with EQ.
 Open Scope eq_scope.
@@ -230,8 +230,8 @@ Proof. by rewrite eq_sym; apply: ifN. Qed.
 
 End Contrapositives.
 
-Implicit Arguments memPn [T1 A x].
-Implicit Arguments memPnC [T1 A x].
+Arguments memPn [T1 A x].
+Arguments memPnC [T1 A x].
 
 Theorem eq_irrelevance (T : eqType) x y : forall e1 e2 : x = y :> T, e1 = e2.
 Proof.
@@ -339,9 +339,9 @@ Proof. by case: eqP; [left | right]. Qed.
 
 End EqPred.
 
-Implicit Arguments predU1P [T x y b].
-Implicit Arguments pred2P [T T2 x y z u].
-Implicit Arguments predD1P [T x y b].
+Arguments predU1P [T x y b].
+Arguments pred2P [T T2 x y z u].
+Arguments predD1P [T x y b].
 Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1 predU1P.
 
 Notation "[ 'predU1' x & A ]" := (predU1 x [mem A])
@@ -491,7 +491,7 @@ Structure subType : Type := SubType {
   _ : forall x Px, val (@Sub x Px) = x
 }.
 
-Implicit Arguments Sub [s].
+Arguments Sub [s].
 Lemma vrefl : forall x, P x -> x = x. Proof. by []. Qed.
 Definition vrefl_rect := vrefl.
 
@@ -572,14 +572,14 @@ Qed.
 
 End SubType.
 
-Implicit Arguments SubType [T P].
-Implicit Arguments Sub [T P s].
-Implicit Arguments vrefl [T P].
-Implicit Arguments vrefl_rect [T P].
-Implicit Arguments clone_subType [T P sT c Urec cK].
-Implicit Arguments insub [T P sT].
-Implicit Arguments insubT [T sT x].
-Implicit Arguments val_inj [T P sT].
+Arguments SubType [T P].
+Arguments Sub [T P s].
+Arguments vrefl [T P].
+Arguments vrefl_rect [T P].
+Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
+Arguments insub [T P sT].
+Arguments insubT [T] P [sT x].
+Arguments val_inj [T P sT].
 Prenex Implicits val Sub vrefl vrefl_rect insub insubd val_inj.
 
 Local Notation inlined_sub_rect :=
@@ -610,7 +610,7 @@ Notation "[ 'subType' 'of' U ]" := (clone_subType U _ id id)
 Definition NewType T U v c Urec :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
   SubType U v (fun x _ => c x) Urec'.
-Implicit Arguments NewType [T U].
+Arguments NewType [T U].
 
 Notation "[ 'newType' 'for' v ]" := (NewType v _ inlined_new_rect vrefl_rect)
  (at level 0, only parsing) : form_scope.
@@ -622,7 +622,7 @@ Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
  (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.
 
 Definition innew T nT x := @Sub T predT nT x (erefl true).
-Implicit Arguments innew [T nT].
+Arguments innew [T nT].
 Prenex Implicits innew.
 
 Lemma innew_val T nT : cancel val (@innew T nT).
@@ -713,7 +713,7 @@ Proof. by []. Qed.
 
 End SubEqType.
 
-Implicit Arguments val_eqP [T P sT x y].
+Arguments val_eqP [T P sT x y].
 Prenex Implicits val_eqP.
 
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.class_of T)
@@ -757,7 +757,7 @@ Proof. by case/andP. Qed.
 
 End ProdEqType.
 
-Implicit Arguments pair_eqP [T1 T2].
+Arguments pair_eqP [T1 T2].
 
 Prenex Implicits pair_eqP.
 
@@ -787,7 +787,7 @@ End OptionEqType.
 Definition tag := projS1.
 Definition tagged I T_ :  forall u, T_(tag u) := @projS2 I [eta T_].
 Definition Tagged I i T_ x := @existS I [eta T_] i x.
-Implicit Arguments Tagged [I i].
+Arguments Tagged [I i].
 Prenex Implicits tag tagged Tagged.
 
 Section TaggedAs.
@@ -834,7 +834,7 @@ Proof. by rewrite -tag_eqE /tag_eq eqxx tagged_asE. Qed.
 
 End TagEqType.
 
-Implicit Arguments tag_eqP [I T_ x y].
+Arguments tag_eqP [I T_ x y].
 Prenex Implicits tag_eqP.
 
 Section SumEqType.
@@ -858,5 +858,5 @@ Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 
 End SumEqType.
 
-Implicit Arguments sum_eqP [T1 T2 x y].
+Arguments sum_eqP [T1 T2 x y].
 Prenex Implicits sum_eqP.
