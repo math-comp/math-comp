@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import div fintype path bigop finset fingroup.
+From mathcomp Require Import div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
@@ -154,45 +154,88 @@ Reserved Notation ">= y :> T" (at level 35, y at next level).
 Reserved Notation "< y :> T" (at level 35, y at next level).
 Reserved Notation "> y :> T" (at level 35, y at next level).
 
-Module Num.
-
-(* Principal mixin; further classes add axioms rather than operations. *)
-Record mixin_of (R : ringType) := Mixin {
-  norm_op : R -> R;
-  le_op : rel R;
-  lt_op : rel R;
-  _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
-  _ : forall x y, lt_op 0 x -> lt_op 0 y -> lt_op 0 (x + y);
-  _ : forall x, norm_op x = 0 -> x = 0;
-  _ : forall x y, le_op 0 x -> le_op 0 y -> le_op x y || le_op y x;
-  _ : {morph norm_op : x y / x * y};
-  _ : forall x y, (le_op x y) = (norm_op (y - x) == y - x);
-  _ : forall x y, (lt_op x y) = (y != x) && (le_op x y)
-}.
-
-Local Notation ring_for T b := (@GRing.Ring.Pack T b).
-
-(* Base interface. *)
-Module NumDomain.
+(* this structures should be shared and overloaded *)
+(* by every notion of norm or abslute value *)
+Module Norm.
 
 Section ClassDef.
+Variable (R : Type).
 
-Record class_of T := Class {
-  base : GRing.IntegralDomain.class_of T;
-  mixin : mixin_of (ring_for T base)
-}.
-Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
+Definition class_of T := T -> R.
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
 Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : mixin_of (ring_for T b0)) :=
-  fun bT b & phant_id (GRing.IntegralDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
+Definition pack m := @Pack T m.
+
+End ClassDef.
+
+Module Exports.
+Coercion sort : type >-> Sortclass.
+Bind Scope ring_scope with sort.
+Notation normedType := type.
+Notation NormedType R T m := (@pack R T m).
+Notation "[ 'normedType' R 'of' T 'for' cT ]" := (@clone R T cT _ idfun)
+  (at level 0, format "[ 'normedType'  R  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'normedType' R 'of' T ]" := (@clone R T _ _ id)
+  (at level 0, format "[ 'normedType'  R  'of'  T ]") : form_scope.
+End Exports.
+
+End Norm.
+Import Norm.Exports.
+
+Definition norm (R : Type) (T : normedType R) : T -> R := @Norm.class R T.
+Notation "`| x |" := (norm x) : ring_scope.
+
+Import Order.Theory Order.Def Order.Syntax.
+Local Open Scope order_scope.
+Local Open Scope ring_scope.
+
+Fact ring_display : unit. Proof. exact: tt. Qed.
+
+Module Num.
+
+Record mixin_of (R : ringType) (Rorder : Order.POrder.mixin_of R)  
+       (le_op := Order.POrder.le Rorder)
+       (lt_op := Order.POrder.lt Rorder) (norm_op : R -> R)
+  := Mixin {
+  _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
+  _ : forall x y, lt_op 0 x -> lt_op 0 y -> lt_op 0 (x + y);
+  _ : forall x, norm_op x = 0 -> x = 0;
+  _ : forall x y, le_op 0 x -> le_op 0 y -> le_op x y || le_op y x;
+  _ : {morph norm_op : x y / x * y};
+  _ : forall x y, (le_op x y) = (norm_op (y - x) == y - x);
+  _ : forall x y, (lt_op x y) = (y != x) && (le_op x y)}.
+
+Local Notation ring_for T b := (@GRing.Ring.Pack T b).
+
+Module NumDomain.
+
+Section ClassDef.
+Record class_of T := Class {
+  base : GRing.IntegralDomain.class_of T;
+  order_mixin : Order.POrder.mixin_of (ring_for T base);
+  norm_base   :  Norm.class_of T T;
+  mixin : mixin_of order_mixin norm_base
+}.
+
+Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
+Local Coercion order_base T (class_of_T : class_of T) :=
+  @Order.POrder.Class _ class_of_T (order_mixin class_of_T).
+Local Coercion norm_base : class_of >-> Norm.class_of.
+
+Structure type := Pack {sort; _ : class_of sort}.
+Local Coercion sort : type >-> Sortclass.
+Variables (T : Type) (cT : type).
+Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
+Notation xclass := (class : class_of xT).
+Definition clone c of phant_id class c := @Pack T c.
+(* TODO Kazuhiko: this is broken, rewrite the pack please *)
+Definition pack c := @Pack T c.
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -202,14 +245,22 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
+Definition normedType := @Norm.Pack cT cT xclass.
+
+Definition order_zmodType :=
+  @GRing.Zmodule.Pack (Order.POrder.sort porderType) xclass.
+Definition order_ringType :=
+  @GRing.Ring.Pack (Order.POrder.sort porderType) xclass.
+(* 9 more missing *)
 
 End ClassDef.
-
 Module Exports.
-Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
+Coercion order_base : class_of >-> Order.POrder.class_of.
+Coercion base  : class_of >-> GRing.IntegralDomain.class_of.
+Coercion norm_base : class_of >-> Norm.class_of.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
 Coercion choiceType : type >-> Choice.type.
@@ -226,51 +277,42 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
+Coercion normedType : type >-> Norm.type.
+Canonical normedType.
+Canonical order_zmodType.
+Canonical order_ringType.
+(* 9 more missing *)
 Notation numDomainType := type.
-Notation NumMixin := Mixin.
-Notation NumDomainType T m := (@pack T _ m _ _ id _ id).
+Notation NumDomainType T m := (@pack T m).
 Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
   (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'numDomainType' 'of' T ]" := (@clone T _ _ id)
   (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
 End Exports.
-
 End NumDomain.
 Import NumDomain.Exports.
 
+About  NumDomain.order_zmodType.
+Print Canonical Projections.
+
 Module Import Def. Section Def.
 Import NumDomain.
-Context {R : type}.
+Context {R : numDomainType}.
 Implicit Types (x y : R) (C : bool).
 
-Definition normr : R -> R := norm_op (class R).
-Definition ler : rel R := le_op (class R).
-Definition ltr : rel R := lt_op (class R).
-Local Notation "x <= y" := (ler x y) : ring_scope.
-Local Notation "x < y" := (ltr x y) : ring_scope.
-
-Definition ger : simpl_rel R := [rel x y | y <= x].
-Definition gtr : simpl_rel R := [rel x y | y < x].
-Definition lerif x y C : Prop := ((x <= y) * ((x == y) = C))%type.
 Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
-Definition minr x y : R := if x <= y then x else y.
-Definition maxr x y : R := if y <= x then x else y.
 
 Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
 Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
 Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
 Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
+
 End Def. End Def.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
-Notation norm := normr.
-Notation le := ler.
-Notation lt := ltr.
-Notation ge := ger.
-Notation gt := gtr.
 Notation sg := sgr.
-Notation max := maxr.
-Notation min := minr.
 Notation pos := Rpos.
 Notation neg := Rneg.
 Notation nneg := Rnneg.
@@ -286,51 +328,13 @@ Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
 Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
 Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
 Definition Rreal_keyed := KeyedQualifier Rreal_key.
-Definition ler_of_leif x y C (le_xy : @lerif R x y C) := le_xy.1 : le x y.
+(* Decide whether this should stay: *)
+(* Definition ler_of_leif x y C (le_xy : @lerif R x y C) := le_xy.1 : le x y. *)
 End Keys. End Keys.
 
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
 Import Def Keys.
-
-Notation "`| x |" := (norm x) : ring_scope.
-
-Notation "<%R" := lt : ring_scope.
-Notation ">%R" := gt : ring_scope.
-Notation "<=%R" := le : ring_scope.
-Notation ">=%R" := ge : ring_scope.
-Notation "<?=%R" := lerif : ring_scope.
-
-Notation "< y" := (gt y) : ring_scope.
-Notation "< y :> T" := (< (y : T)) : ring_scope.
-Notation "> y" := (lt y) : ring_scope.
-Notation "> y :> T" := (> (y : T)) : ring_scope.
-
-Notation "<= y" := (ge y) : ring_scope.
-Notation "<= y :> T" := (<= (y : T)) : ring_scope.
-Notation ">= y"  := (le y) : ring_scope.
-Notation ">= y :> T" := (>= (y : T)) : ring_scope.
-
-Notation "x < y"  := (lt x y) : ring_scope.
-Notation "x < y :> T" := ((x : T) < (y : T)) : ring_scope.
-Notation "x > y"  := (y < x) (only parsing) : ring_scope.
-Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
-
-Notation "x <= y" := (le x y) : ring_scope.
-Notation "x <= y :> T" := ((x : T) <= (y : T)) : ring_scope.
-Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
-Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
-
-Notation "x <= y <= z" := ((x <= y) && (y <= z)) : ring_scope.
-Notation "x < y <= z" := ((x < y) && (y <= z)) : ring_scope.
-Notation "x <= y < z" := ((x <= y) && (y < z)) : ring_scope.
-Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
-
-Notation "x <= y ?= 'iff' C" := (lerif x y C) : ring_scope.
-Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
-  (only parsing) : ring_scope.
-
-Coercion ler_of_leif : lerif >-> is_true.
 
 Canonical Rpos_keyed.
 Canonical Rneg_keyed.
@@ -984,6 +988,12 @@ Qed.
 
 End RealClosed.
 
+(* TODO Kazuhiko: Add a normedModType R, with R : numDomainType *)
+(* follow https://github.com/math-comp/analysis/blob/3f8dfbe0e8a963d32003ef7fdcef71823c8484c3/hierarchy.v#L1273-L1279 replacing absRingType by numDomainType,
+parametrize by Norm.class, and remove ax3 *)
+
+(* TODO Kazuhiko: Add that any R : numDomainType is canonically a normedModType R *)
+
 End Internals.
 
 Module PredInstances.
@@ -1019,6 +1029,14 @@ End ExtraDef.
 
 Notation bound := archi_bound.
 Notation sqrt := sqrtr.
+
+
+(* /!\ TODO Kazuhiko: REWRITE DIFFERENTLY *)
+(* - Everything only about 0, + and norm and order on R
+     should be for a normedModType R *)
+(* - Everything about only < and <= and meet and join should be 
+     removed or ported to order *)
+(* - Everything else should be for a numDomainType or substructure *)
 
 Module Theory.
 
@@ -5006,6 +5024,8 @@ Arguments sqrCK {C} [x] le0x.
 Arguments sqrCK_P {C x}.
 
 End Theory.
+
+(* TODO Kazuhiko: divide those Mixin builders into order.v and here *)
 
 Module RealMixin.
 
