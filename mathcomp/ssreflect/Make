@@ -19,6 +19,7 @@ prime.v
 tuple.v
 ssrnotations.v
 ssrmatching.v
+order.v
 
 -I .
 -R . mathcomp.ssreflect
