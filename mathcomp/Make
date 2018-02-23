@@ -77,6 +77,7 @@ ssreflect/fingraph.v
 ssreflect/finset.v
 ssreflect/fintype.v
 ssreflect/generic_quotient.v
+ssreflect/order.v
 ssreflect/path.v
 ssreflect/prime.v
 ssreflect/seq.v
