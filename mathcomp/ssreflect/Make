@@ -18,6 +18,7 @@ path.v
 prime.v
 tuple.v
 ssrnotations.v
+ssrmatching.v
 
 -I .
 -R . mathcomp.ssreflect

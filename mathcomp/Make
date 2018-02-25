@@ -130,6 +130,7 @@ ssreflect/ssreflect.v
 ssreflect/ssrfun.v
 ssreflect/ssrnat.v
 ssreflect/ssrnotations.v
+ssreflect/ssrmatching.v
 ssreflect/tuple.v
 ssrtest/absevarprop.v
 ssrtest/abstract_var2.v

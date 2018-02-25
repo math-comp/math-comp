@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import Bool. (* For bool_scope delimiter 'bool'. *)
-Require Import ssrmatching.
+From Coq Require Import ssrmatching.
 Declare ML Module "ssreflect_plugin".
 Set SsrAstVersion.
 
