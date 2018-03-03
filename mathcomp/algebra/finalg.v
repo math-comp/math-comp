@@ -62,8 +62,7 @@ Definition gen_pack T :=
 
 End Generic.
 
-Implicit Arguments
-  gen_pack [type base_type class_of base_of to_choice base_sort].
+Arguments gen_pack [type base_type class_of base_of to_choice base_sort].
 Local Notation fin_ c := (@Finite.Class _ c c).
 Local Notation do_pack pack T := (pack T _ _ id _ _ id).
 Import GRing.Theory.

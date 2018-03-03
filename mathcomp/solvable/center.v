@@ -187,7 +187,7 @@ End Injm.
 
 End Center.
 
-Implicit Arguments center_idP [gT A].
+Arguments center_idP [gT A].
 
 Lemma isog_center (aT rT : finGroupType) (G : {group aT}) (H : {group rT}) :
   G \isog H -> 'Z(G) \isog 'Z(H).

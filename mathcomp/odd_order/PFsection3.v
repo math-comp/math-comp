@@ -260,7 +260,7 @@ suffices ->: sub_bbox (th_bbox th) bb = all in_bb th by apply: allP.
 elim: th => [|[[i j] _] th] //=; case: (th_bbox th) => ri rj /=.
 by rewrite /sub_bbox /= !geq_max andbACA => ->.
 Qed.
-Implicit Arguments th_bboxP [th bb].
+Arguments th_bboxP [th bb].
 
 Fixpoint th_dim th : nat :=
   if th is (_, kvs) :: th1 then
@@ -277,7 +277,7 @@ suffices ->: (th_dim th <= bk)%N = all in_bk th.
 elim: th => // [[_ kvs] th /= <-]; elim: kvs => //= kv kvs.
 by rewrite -andbA geq_max => ->.
 Qed.
-Implicit Arguments th_dimP [th bk].
+Arguments th_dimP [th bk].
 
 (* Theory and clause lookup. *)
 
@@ -468,7 +468,7 @@ split; first by apply/th_bboxP=> cl /thP[].
   by apply/th_dimP=> cl /thP[_ _ clP] kv /clP[].
 by apply/allP=> cl /thP[_ Ucl clP]; rewrite /sat_cl Ucl; apply/allP=> kv /clP[].
 Qed.
-Implicit Arguments satP [m th].
+Arguments satP [m th].
 
 (* Reflexion of the dot product. *)
 
@@ -573,7 +573,7 @@ suffices{Dthx} m_th1: sat m th1.
 apply/satP=> cl1; rewrite Dth1 inE; case: ifP => [_ /eqP-> | _ /thP] //=.
 by rewrite cl'k; split=> // kv /predU1P[-> | /clP//]; rewrite /sat_lit Dv.
 Qed.
-Implicit Arguments sat_cases [m th cl].
+Arguments sat_cases [m th] k [cl].
 
 Definition unsat_cases_hyp th0 kvs tO cl :=
   let: (k, _) := head (2, 0) kvs in let thk_ := ext_cl th0 cl k in
@@ -797,14 +797,14 @@ Proof. by case: find_sym => // s; apply: unsat_match. Qed.
 
 End Interpretation.
 
-Implicit Arguments satP [gT G m th].
-Implicit Arguments unsat [gT G].
-Implicit Arguments sat_cases [gT G m th cl].
-Implicit Arguments unsat_cases [gT G th tO].
-Implicit Arguments unsat_wlog [gT G].
-Implicit Arguments unsat_fill [gT G].
-Implicit Arguments unsat_consider [gT G].
-Implicit Arguments unsat_match [gT G th1 th2].
+Arguments satP [gT G m th].
+Arguments unsat [gT G].
+Arguments sat_cases [gT G m th] k [cl].
+Arguments unsat_cases [gT G th] ij kvs [tO].
+Arguments unsat_wlog [gT G].
+Arguments unsat_fill [gT G].
+Arguments unsat_consider [gT G].
+Arguments unsat_match [gT G] s [th1 th2].
 
 (* The domain-specific tactic language. *)
 
@@ -1829,7 +1829,7 @@ End AutCyclicTI.
 
 End Three.
 
-Implicit Arguments ortho_cycTIiso_vanish [gT G W W1 W2 defW psi].
+Arguments ortho_cycTIiso_vanish [gT G W W1 W2 defW] ctiW [psi].
 
 Section ThreeSymmetry.
 

@@ -692,10 +692,10 @@ Notation primeTIsign ptiW j :=
 Notation primeTIirr ptiW i j := 'chi_(primeTI_Iirr ptiW (i, j)) (only parsing).
 Notation primeTIres ptiW j := 'chi_(primeTI_Ires ptiW j) (only parsing).
 
-Implicit Arguments prTIirr_inj [gT L K W W1 W2 defW x1 x2].
-Implicit Arguments prTIred_inj [gT L K W W1 W2 defW x1 x2].
-Implicit Arguments prTIres_inj [gT L K W W1 W2 defW x1 x2].
-Implicit Arguments not_prTIirr_vanish [gT L K W W1 W2 defW k].
+Arguments prTIirr_inj [gT L K W W1 W2 defW] ptiWL [x1 x2].
+Arguments prTIred_inj [gT L K W W1 W2 defW] ptiWL [x1 x2].
+Arguments prTIres_inj [gT L K W W1 W2 defW] ptiWL [x1 x2].
+Arguments not_prTIirr_vanish [gT L K W W1 W2 defW] ptiWL [k].
 
 Section Four_6_t0_10.
 

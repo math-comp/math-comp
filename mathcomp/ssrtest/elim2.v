@@ -9,7 +9,7 @@ Lemma big_load R (K K' : R -> Type) idx op I r (P : pred I) F :
   let s := \big[op/idx]_(i <- r | P i) F i in
   K s * K' s -> K' s.
 Proof. by move=> /= [_]. Qed.
-Implicit Arguments big_load [R K' idx op I r P F].
+Arguments big_load [R] K [K' idx op I r P F].
 
 Section Elim1.
 

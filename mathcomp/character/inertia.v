@@ -569,7 +569,7 @@ End Inertia.
 
 Arguments Scope inertia [_ group_scope cfun_scope].
 Arguments Scope cfclass [_ group_scope cfun_scope group_scope].
-Implicit Arguments conjg_Iirr_inj [gT H x1 x2].
+Arguments conjg_Iirr_inj [gT H] y [x1 x2].
 
 Notation "''I[' phi ] " := (inertia phi) : group_scope.
 Notation "''I[' phi ] " := (inertia_group phi) : Group_scope.

@@ -709,7 +709,7 @@ End MoreVchar.
 
 Definition dirr (gT : finGroupType) (B : {set gT}) : pred_class :=  
   [pred f : 'CF(B) | (f \in irr B) || (- f \in irr B)].
-Implicit Arguments dirr [[gT]].
+Arguments dirr {gT}.
 
 Section Norm1vchar.
 

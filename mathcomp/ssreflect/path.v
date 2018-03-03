@@ -159,7 +159,7 @@ Qed.
 
 End Paths.
 
-Implicit Arguments pathP [T e x p].
+Arguments pathP [T e x p].
 Prenex Implicits pathP.
 
 Section EqPath.
@@ -687,9 +687,9 @@ Qed.
 
 End EqTrajectory.
 
-Implicit Arguments fpathP [T f x p].
-Implicit Arguments loopingP [T f x n].
-Implicit Arguments trajectP [T f x n y].
+Arguments fpathP [T f x p].
+Arguments loopingP [T f x n].
+Arguments trajectP [T f x n y].
 Prenex Implicits traject fpathP loopingP trajectP.
 
 Section UniqCycle.

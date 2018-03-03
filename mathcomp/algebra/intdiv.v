@@ -186,11 +186,11 @@ rewrite {1}(divz_eq m d) mulrDr mulrCA divzMDl ?mulf_neq0 ?gtr_eqF // addrC.
 rewrite divz_small ?add0r // PoszM pmulr_rge0 ?modz_ge0 ?gtr_eqF //=.
 by rewrite ltr_pmul2l ?ltz_pmod.
 Qed.
-Implicit Arguments divzMpl [p m d].
+Arguments divzMpl [p m d].
 
 Lemma divzMpr p m d : p > 0 -> (m * p %/ (d * p) = m %/ d)%Z.
 Proof. by move=> p_gt0; rewrite -!(mulrC p) divzMpl. Qed.
-Implicit Arguments divzMpr [p m d].
+Arguments divzMpr [p m d].
 
 Lemma lez_floor m d : d != 0 -> (m %/ d)%Z * d <= m.
 Proof. by rewrite -subr_ge0; apply: modz_ge0. Qed.
@@ -340,14 +340,14 @@ apply: (iffP dvdnP) => [] [q Dm]; last by exists `|q|%N; rewrite Dm abszM.
 exists ((-1) ^+ (m < 0)%R * q%:Z * (-1) ^+ (d < 0)%R).
 by rewrite -!mulrA -abszEsign -PoszM -Dm -intEsign.
 Qed.
-Implicit Arguments dvdzP [d m].
+Arguments dvdzP [d m].
 
 Lemma dvdz_mod0P d m : reflect (m %% d = 0)%Z (d %| m)%Z.
 Proof.
 apply: (iffP dvdzP) => [[q ->] | md0]; first by rewrite modzMl.
 by rewrite (divz_eq m d) md0 addr0; exists (m %/ d)%Z.
 Qed.
-Implicit Arguments dvdz_mod0P [d m].
+Arguments dvdz_mod0P [d m].
 
 Lemma dvdz_eq d m : (d %| m)%Z = ((m %/ d)%Z * d == m).
 Proof. by rewrite (sameP dvdz_mod0P eqP) subr_eq0 eq_sym. Qed.
@@ -408,11 +408,11 @@ Proof. by rewrite -!(mulrC p); apply: divzMl. Qed.
 
 Lemma dvdz_mul2l p d m : p != 0 -> (p * d %| p * m)%Z = (d %| m)%Z.
 Proof. by rewrite !dvdzE -absz_gt0 !abszM; apply: dvdn_pmul2l. Qed.
-Implicit Arguments dvdz_mul2l [p m d].
+Arguments dvdz_mul2l [p d m].
 
 Lemma dvdz_mul2r p d m : p != 0 -> (d * p %| m * p)%Z = (d %| m)%Z.
 Proof. by rewrite !dvdzE -absz_gt0 !abszM; apply: dvdn_pmul2r. Qed.
-Implicit Arguments dvdz_mul2r [p m d].
+Arguments dvdz_mul2r [p d m].
 
 Lemma dvdz_exp2l p m n : (m <= n)%N -> (p ^+ m %| p ^+ n)%Z.
 Proof. by rewrite dvdzE !abszX; apply: dvdn_exp2l. Qed.

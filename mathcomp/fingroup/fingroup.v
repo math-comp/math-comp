@@ -493,7 +493,7 @@ Qed.
 End PreGroupIdentities.
 
 Hint Resolve commute1.
-Implicit Arguments invg_inj [T].
+Arguments invg_inj [T].
 Prenex Implicits commute invgK invg_inj.
 
 Section GroupIdentities.
@@ -641,11 +641,11 @@ Ltac gsimpl := autorewrite with gsimpl; try done.
 Definition gsimp := (mulg1 , mul1g, (invg1, @invgK), (mulgV, mulVg)).
 Definition gnorm := (gsimp, (mulgK, mulgKV, (mulgA, invMg))).
 
-Implicit Arguments mulgI [T].
-Implicit Arguments mulIg [T].
-Implicit Arguments conjg_inj [T].
-Implicit Arguments commgP [T x y].
-Implicit Arguments conjg_fixP [T x y].
+Arguments mulgI [T].
+Arguments mulIg [T].
+Arguments conjg_inj [T].
+Arguments commgP [T x y].
+Arguments conjg_fixP [T x y].
 Prenex Implicits conjg_fixP commgP.
 
 Section Repr.
@@ -672,7 +672,7 @@ Proof. by rewrite /repr; case: pickP => [x|_]; rewrite !inE. Qed.
 
 End Repr.
 
-Implicit Arguments mem_repr [gT A].
+Arguments mem_repr [gT A].
 
 Section BaseSetMulDef.
 (* We only assume a baseFinGroupType to allow this construct to be iterated. *)
@@ -946,9 +946,9 @@ Proof. by apply/setP=> y; rewrite !inE inv_eq //; apply: invgK. Qed.
 
 End BaseSetMulProp.
 
-Implicit Arguments set1gP [gT x].
-Implicit Arguments mulsgP [gT A B x].
-Implicit Arguments prodsgP [gT I P A x].
+Arguments set1gP [gT x].
+Arguments mulsgP [gT A B x].
+Arguments prodsgP [gT I P A x].
 
 Section GroupSetMulProp.
 (* Constructs that need a finGroupType *)
@@ -1304,11 +1304,11 @@ Definition order x := #|cycle x|.
 
 End GroupSetMulProp.
 
-Implicit Arguments lcosetP [gT A x y].
-Implicit Arguments lcosetsP [gT A B C].
-Implicit Arguments rcosetP [gT A x y].
-Implicit Arguments rcosetsP [gT A B C].
-Implicit Arguments group_setP [gT A].
+Arguments lcosetP [gT A x y].
+Arguments lcosetsP [gT A B C].
+Arguments rcosetP [gT A x y].
+Arguments rcosetsP [gT A B C].
+Arguments group_setP [gT A].
 Prenex Implicits group_set mulsgP set1gP.
 Prenex Implicits lcosetP lcosetsP rcosetP rcosetsP group_setP.
 
@@ -1858,15 +1858,15 @@ Notation "[ 'subg' G ]" := [set: subg_of G]%G : Group_scope.
 Prenex Implicits subg sgval subg_of.
 Bind Scope group_scope with subg_of.
 
-Implicit Arguments trivgP [gT G].
-Implicit Arguments trivGP [gT G].
-Implicit Arguments lcoset_eqP [gT G x y].
-Implicit Arguments rcoset_eqP [gT G x y].
-Implicit Arguments mulGidPl [gT G H].
-Implicit Arguments mulGidPr [gT G H].
-Implicit Arguments comm_group_setP [gT G H].
-Implicit Arguments class_eqP [gT G x y].
-Implicit Arguments repr_classesP [gT G xG].
+Arguments trivgP [gT G].
+Arguments trivGP [gT G].
+Arguments lcoset_eqP [gT G x y].
+Arguments rcoset_eqP [gT G x y].
+Arguments mulGidPl [gT G H].
+Arguments mulGidPr [gT G H].
+Arguments comm_group_setP [gT G H].
+Arguments class_eqP [gT G x y].
+Arguments repr_classesP [gT G xG].
 Prenex Implicits trivgP trivGP lcoset_eqP rcoset_eqP comm_group_setP class_eqP.
 
 Section GroupInter.
@@ -2396,11 +2396,11 @@ Qed.
 
 End GeneratedGroup.
 
-Implicit Arguments gen_prodgP [gT A x].
-Implicit Arguments joing_idPl [gT G A].
-Implicit Arguments joing_idPr [gT A G].
-Implicit Arguments mulGsubP [gT K H G].
-Implicit Arguments joing_subP [gT A B G].
+Arguments gen_prodgP [gT A x].
+Arguments joing_idPl [gT G A].
+Arguments joing_idPr [gT A G].
+Arguments mulGsubP [gT K H G].
+Arguments joing_subP [gT A B G].
 
 Section Cycles.
 
@@ -2524,7 +2524,7 @@ Proof.
 suffices ->: (x \in 'N(A)) = (A :^ x == A) by apply: eqP.
 by rewrite eqEcard cardJg leqnn andbT inE.
 Qed.
-Implicit Arguments normP [x A].
+Arguments normP [x A].
 
 Lemma group_set_normaliser A : group_set 'N(A).
 Proof.
@@ -2539,7 +2539,7 @@ Proof.
 apply: (iffP subsetP) => nBA x Ax; last by rewrite inE nBA //.
 by apply/normP; apply: nBA.
 Qed.
-Implicit Arguments normsP [A B].
+Arguments normsP [A B].
 
 Lemma memJ_norm x y A : x \in 'N(A) -> (y ^ x \in A) = (y \in A).
 Proof. by move=> Nx; rewrite -{1}(normP Nx) memJ_conjg. Qed.
@@ -2987,13 +2987,13 @@ End SubAbelian.
 
 End Normaliser.
 
-Implicit Arguments normP [gT x A].
-Implicit Arguments centP [gT x A].
-Implicit Arguments normsP [gT A B].
-Implicit Arguments cent1P [gT x y].
-Implicit Arguments normalP [gT A B].
-Implicit Arguments centsP [gT A B].
-Implicit Arguments commG1P [gT A B].
+Arguments normP [gT x A].
+Arguments centP [gT A x].
+Arguments normsP [gT A B].
+Arguments cent1P [gT x y].
+Arguments normalP [gT A B].
+Arguments centsP [gT A B].
+Arguments commG1P [gT A B].
 
 Prenex Implicits normP normsP cent1P normalP centP centsP commG1P.
 
@@ -3091,6 +3091,6 @@ Notation "[ 'min' A 'of' G | gP & gQ ]" :=
   [min A of G | gP && gQ] : group_scope.
 Notation "[ 'min' G | gP & gQ ]" := [min G | gP && gQ] : group_scope.
 
-Implicit Arguments mingroupP [gT gP G].
-Implicit Arguments maxgroupP [gT gP G].
+Arguments mingroupP [gT gP G].
+Arguments maxgroupP [gT gP G].
 Prenex Implicits mingroupP maxgroupP.

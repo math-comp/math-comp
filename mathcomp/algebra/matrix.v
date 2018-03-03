@@ -306,7 +306,7 @@ Variable R : Type.
 (* Constant matrix *)
 Fact const_mx_key : unit. Proof. by []. Qed.
 Definition const_mx m n a : 'M[R]_(m, n) := \matrix[const_mx_key]_(i, j) a.
-Implicit Arguments const_mx [[m] [n]].
+Arguments const_mx {m n}.
 
 Section FixedDim.
 (* Definitions and properties for which we can work with fixed dimensions. *)
@@ -911,10 +911,10 @@ End VecMatrix.
 
 End MatrixStructural.
 
-Implicit Arguments const_mx [R m n].
-Implicit Arguments row_mxA [R m n1 n2 n3 A1 A2 A3].
-Implicit Arguments col_mxA [R m1 m2 m3 n A1 A2 A3].
-Implicit Arguments block_mxA
+Arguments const_mx [R m n].
+Arguments row_mxA [R m n1 n2 n3 A1 A2 A3].
+Arguments col_mxA [R m1 m2 m3 n A1 A2 A3].
+Arguments block_mxA
   [R m1 m2 m3 n1 n2 n3 A11 A12 A13 A21 A22 A23 A31 A32 A33].
 Prenex Implicits const_mx castmx trmx lsubmx rsubmx usubmx dsubmx row_mx col_mx.
 Prenex Implicits block_mx ulsubmx ursubmx dlsubmx drsubmx.
@@ -2042,19 +2042,19 @@ Definition adjugate n (A : 'M_n) := \matrix[adjugate_key]_(i, j) cofactor A j i.
 
 End MatrixAlgebra.
 
-Implicit Arguments delta_mx [R m n].
-Implicit Arguments scalar_mx [R n].
-Implicit Arguments perm_mx [R n].
-Implicit Arguments tperm_mx [R n].
-Implicit Arguments pid_mx [R m n].
-Implicit Arguments copid_mx [R n].
-Implicit Arguments lin_mulmxr [R m n p].
+Arguments delta_mx [R m n].
+Arguments scalar_mx [R n].
+Arguments perm_mx [R n].
+Arguments tperm_mx [R n].
+Arguments pid_mx [R m n].
+Arguments copid_mx [R n].
+Arguments lin_mulmxr [R m n p].
 Prenex Implicits delta_mx diag_mx scalar_mx is_scalar_mx perm_mx tperm_mx.
 Prenex Implicits pid_mx copid_mx mulmx lin_mulmxr.
 Prenex Implicits mxtrace determinant cofactor adjugate.
 
-Implicit Arguments is_scalar_mxP [R n A].
-Implicit Arguments mul_delta_mx [R m n p].
+Arguments is_scalar_mxP [R n A].
+Arguments mul_delta_mx [R m n p].
 Prenex Implicits mul_delta_mx.
 
 Notation "a %:M" := (scalar_mx a) : ring_scope.
@@ -2496,8 +2496,8 @@ Proof. by rewrite -det_tr tr_block_mx trmx0 det_ublock !det_tr. Qed.
 
 End ComMatrix.
 
-Implicit Arguments lin_mul_row [R m n].
-Implicit Arguments lin_mulmx [R m n p].
+Arguments lin_mul_row [R m n].
+Arguments lin_mulmx [R m n p].
 Prenex Implicits lin_mul_row lin_mulmx.
 
 Canonical matrix_finAlgType (R : finComRingType) n' :=
@@ -2779,7 +2779,7 @@ Qed.
 
 End MatrixDomain.
 
-Implicit Arguments det0P [R n A].
+Arguments det0P [R n A].
 
 (* Parametricity at the field level (mx_is_scalar, unit and inverse are only *)
 (* mapped at this level).                                                    *)

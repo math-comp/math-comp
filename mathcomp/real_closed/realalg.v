@@ -194,11 +194,11 @@ Definition eq_algcreal : rel algcreal := eq_algcreal_dec.
 
 Lemma eq_algcrealP (x y : algcreal) : reflect (x == y)%CR (eq_algcreal x y).
 Proof. by rewrite /eq_algcreal; case: eq_algcreal_dec=> /=; constructor. Qed.
-Implicit Arguments eq_algcrealP [x y].
+Arguments eq_algcrealP [x y].
 
 Lemma neq_algcrealP (x y : algcreal) : reflect (x != y)%CR (~~ eq_algcreal x y).
 Proof. by rewrite /eq_algcreal; case: eq_algcreal_dec=> /=; constructor. Qed.
-Implicit Arguments neq_algcrealP [x y].
+Arguments neq_algcrealP [x y].
 Prenex Implicits eq_algcrealP neq_algcrealP.
 
 Fact eq_algcreal_is_equiv : equiv_class_of eq_algcreal.
@@ -284,11 +284,11 @@ Definition le_algcreal : rel algcreal := fun x y => ~~ ltVge_algcreal_dec y x.
 
 Lemma lt_algcrealP (x y : algcreal) : reflect (x < y)%CR (lt_algcreal x y).
 Proof. by rewrite /lt_algcreal; case: ltVge_algcreal_dec; constructor. Qed.
-Implicit Arguments lt_algcrealP [x y].
+Arguments lt_algcrealP [x y].
 
 Lemma le_algcrealP (x y : algcreal) : reflect (x <= y)%CR (le_algcreal x y).
 Proof. by rewrite /le_algcreal; case: ltVge_algcreal_dec; constructor. Qed.
-Implicit Arguments le_algcrealP [x y].
+Arguments le_algcrealP [x y].
 Prenex Implicits lt_algcrealP le_algcrealP.
 
 Definition exp_algcreal x n := iterop n mul_algcreal x one_algcreal.
@@ -609,7 +609,7 @@ Qed.
 
 Lemma nequiv_alg (x y : algcreal) : reflect (x != y)%CR (x != y %[mod {alg F}]).
 Proof. by rewrite eqquotE; apply: neq_algcrealP. Qed.
-Implicit Arguments nequiv_alg [x y].
+Arguments nequiv_alg [x y].
 Prenex Implicits nequiv_alg.
 
 Lemma pi_algK (x : algcreal) : (repr (\pi_{alg F} x) == x)%CR.
@@ -711,7 +711,7 @@ elim/quotW=> x; elim/quotW=> y; elim/quotW=> z; rewrite !piE -equiv_alg /=.
 by apply: eq_crealP; exists m0=> * /=; rewrite mulrDl subrr normr0.
 Qed.
 
-Implicit Arguments neq_creal_cst [F x y].
+Arguments neq_creal_cst [F x y].
 Prenex Implicits neq_creal_cst.
 
 Lemma nonzero1_alg : one_alg != zero_alg.
@@ -964,11 +964,11 @@ Proof. by rewrite [`|_|]piE. Qed.
 
 Lemma lt_algP (x y : algcreal) : reflect (x < y)%CR (\pi_{alg F} x < \pi y).
 Proof. by rewrite lt_pi; apply: lt_algcrealP. Qed.
-Implicit Arguments lt_algP [x y].
+Arguments lt_algP [x y].
 
 Lemma le_algP (x y : algcreal) : reflect (x <= y)%CR (\pi_{alg F} x <= \pi y).
 Proof. by rewrite le_pi; apply: le_algcrealP. Qed.
-Implicit Arguments le_algP [x y].
+Arguments le_algP [x y].
 Prenex Implicits lt_algP le_algP.
 
 Lemma ler_to_alg : {mono to_alg : x y / x <= y}.

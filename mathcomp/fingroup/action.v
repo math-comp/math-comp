@@ -287,7 +287,7 @@ Variables (aT : finGroupType) (D : {set aT}) (rT : finType) (to : action D rT).
 Implicit Types (a : aT) (x y : rT) (A B : {set aT}) (S T : {set rT}).
 
 Lemma act_inj : left_injective to. Proof. by case: to => ? []. Qed.
-Implicit Arguments act_inj [].
+Arguments act_inj : clear implicits.
 
 Lemma actMin x : {in D &, act_morph to x}.
 Proof. by case: to => ? []. Qed.
@@ -486,17 +486,17 @@ End RawAction.
 
 (* Warning: this directive depends on names of bound variables in the *)
 (* definition of injective, in ssrfun.v.                              *)
-Implicit Arguments act_inj [[aT] [D] [rT] x1 x2].
+Arguments act_inj {aT D rT} to _ [x1 x2].
 
 Notation "to ^*" := (set_action to) : action_scope.
 
-Implicit Arguments orbitP [aT D rT to A x y].
-Implicit Arguments afixP [aT D rT to A x].
-Implicit Arguments afix1P [aT D rT to a x].
+Arguments orbitP [aT D rT to A x y].
+Arguments afixP [aT D rT to A x].
+Arguments afix1P [aT D rT to a x].
 Prenex Implicits orbitP afixP afix1P.
 
-Implicit Arguments reindex_astabs [aT D rT vT idx op S F].
-Implicit Arguments reindex_acts [aT D rT vT idx op S A a F].
+Arguments reindex_astabs [aT D rT] to [vT idx op S] a [F].
+Arguments reindex_acts [aT D rT] to [vT idx op S A a F].
 
 Section PartialAction.
 (* Lemmas that require a (partial) group domain. *)
@@ -879,9 +879,9 @@ End PartialAction.
 
 Arguments Scope orbit_transversal
   [_ group_scope _ action_scope group_scope group_scope].
-Implicit Arguments orbit_in_eqP [aT D rT to G x y].
-Implicit Arguments orbit1P [aT D rT to G x].
-Implicit Arguments contra_orbit [aT D rT x y].
+Arguments orbit_in_eqP [aT D rT to G x y].
+Arguments orbit1P [aT D rT to G x].
+Arguments contra_orbit [aT D rT] to G [x y].
 Prenex Implicits orbit_in_eqP orbit1P.
 
 Notation "''C' ( S | to )" := (astab_group to S) : Group_scope.
@@ -1008,7 +1008,7 @@ Proof.
 apply: (iffP idP) => [nSA x|nSA]; first exact: acts_act.
 by apply/subsetP=> a Aa; rewrite !inE; apply/subsetP=> x; rewrite inE nSA.
 Qed.
-Implicit Arguments actsP [A S].
+Arguments actsP [A S].
 
 Lemma setact_orbit A x b : to^* (orbit to A x) b = orbit to (A :^ b) (to x b).
 Proof.
@@ -1137,13 +1137,13 @@ Qed.
 
 End TotalActions.
 
-Implicit Arguments astabP [aT rT to S a].
-Implicit Arguments orbit_eqP [aT rT to G x y].
-Implicit Arguments astab1P [aT rT to x a].
-Implicit Arguments astabsP [aT rT to S a].
-Implicit Arguments atransP [aT rT to G S].
-Implicit Arguments actsP [aT rT to A S].
-Implicit Arguments faithfulP [aT rT to A S].
+Arguments astabP [aT rT to S a].
+Arguments orbit_eqP [aT rT to G x y].
+Arguments astab1P [aT rT to x a].
+Arguments astabsP [aT rT to S a].
+Arguments atransP [aT rT to G S].
+Arguments actsP [aT rT to A S].
+Arguments faithfulP [aT rT to A S].
 Prenex Implicits astabP orbit_eqP astab1P astabsP atransP actsP faithfulP.
 
 Section Restrict.
@@ -1637,7 +1637,7 @@ Proof. by apply/permP=> x; rewrite permE. Qed.
 
 End PermAction.
 
-Implicit Arguments perm_act1P [rT a].
+Arguments perm_act1P [rT a].
 Prenex Implicits perm_act1P.
 
 Notation "'P" := (perm_action _) (at level 8) : action_scope.

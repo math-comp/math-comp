@@ -193,7 +193,7 @@ Qed.
 End Def.
 
 End GenTree.
-Implicit Arguments GenTree.codeK [].
+Arguments GenTree.codeK : clear implicits.
 
 Definition tree_eqMixin (T : eqType) := PcanEqMixin (GenTree.codeK T).
 Canonical tree_eqType (T : eqType) := EqType (GenTree.tree T) (tree_eqMixin T).
@@ -558,7 +558,7 @@ Export Countable.Exports.
 
 Definition unpickle T := Countable.unpickle (Countable.class T).
 Definition pickle T := Countable.pickle (Countable.class T).
-Implicit Arguments unpickle [T].
+Arguments unpickle [T].
 Prenex Implicits pickle unpickle.
 
 Section CountableTheory.

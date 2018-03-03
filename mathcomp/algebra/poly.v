@@ -1662,7 +1662,7 @@ Qed.
 End PolynomialTheory.
 
 Prenex Implicits polyC Poly lead_coef root horner polyOver.
-Implicit Arguments monic [[R]].
+Arguments monic {R}.
 Notation "\poly_ ( i < n ) E" := (poly n (fun i => E)) : ring_scope.
 Notation "c %:P" := (polyC c) : ring_scope.
 Notation "'X" := (polyX _) : ring_scope.
@@ -1674,12 +1674,12 @@ Notation "a ^` ()" := (deriv a) : ring_scope.
 Notation "a ^` ( n )" := (derivn n a) : ring_scope.
 Notation "a ^`N ( n )" := (nderivn n a) : ring_scope.
 
-Implicit Arguments monicP [R p].
-Implicit Arguments rootP [R p x].
-Implicit Arguments rootPf [R p x].
-Implicit Arguments rootPt [R p x].
-Implicit Arguments unity_rootP [R n z].
-Implicit Arguments polyOverP [[R] [S0] [addS] [kS] [p]].
+Arguments monicP [R p].
+Arguments rootP [R p x].
+Arguments rootPf [R p x].
+Arguments rootPt [R p x].
+Arguments unity_rootP [R n z].
+Arguments polyOverP {R S0 addS kS p}.
 
 (* Container morphism. *)
 Section MapPoly.
@@ -2342,7 +2342,7 @@ Qed.
 
 End MapFieldPoly.
 
-Implicit Arguments map_poly_inj [[F] [R] x1 x2].
+Arguments map_poly_inj {F R} f [x1 x2].
 
 Section MaxRoots.
 
@@ -2523,7 +2523,7 @@ Open Scope unity_root_scope.
 
 Definition unity_rootE := unity_rootE.
 Definition unity_rootP := @unity_rootP.
-Implicit Arguments unity_rootP [R n z].
+Arguments unity_rootP [R n z].
 
 Definition prim_order_exists := prim_order_exists.
 Notation prim_order_gt0 :=  prim_order_gt0.

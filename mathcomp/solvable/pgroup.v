@@ -170,7 +170,7 @@ Proof. exact: partn_eq1 (cardG_gt0 G). Qed.
 Lemma pgroupP pi G :
   reflect (forall p, prime p -> p %| #|G| -> p \in pi) (pi.-group G).
 Proof. exact: pnatP. Qed.
-Implicit Arguments pgroupP [pi G].
+Arguments pgroupP [pi G].
 
 Lemma pgroup1 pi : pi.-group [1 gT].
 Proof. by rewrite /pgroup cards1. Qed.
@@ -679,8 +679,8 @@ Qed.
 
 End PgroupProps.
 
-Implicit Arguments pgroupP [gT pi G].
-Implicit Arguments constt1P [gT pi x].
+Arguments pgroupP [gT pi G].
+Arguments constt1P [gT pi x].
 Prenex Implicits pgroupP constt1P.
 
 Section NormalHall.
@@ -1302,8 +1302,8 @@ Qed.
 
 End EqPcore.
 
-Implicit Arguments sdprod_Hall_pcoreP [gT pi G H].
-Implicit Arguments sdprod_Hall_p'coreP [gT pi G H].
+Arguments sdprod_Hall_pcoreP [pi gT H G].
+Arguments sdprod_Hall_p'coreP [gT pi H G].
 
 Section Injm.
 

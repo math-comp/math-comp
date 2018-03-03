@@ -751,8 +751,8 @@ Qed.
 
 End EqIso.
 
-Implicit Arguments qisom_inj [gT G H].
-Implicit Arguments morphim_qisom_inj [gT G H].
+Arguments qisom_inj [gT G H].
+Arguments morphim_qisom_inj [gT G H].
 
 Section FirstIsomorphism.
 

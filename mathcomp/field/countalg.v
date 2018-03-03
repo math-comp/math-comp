@@ -59,7 +59,7 @@ Definition gen_pack T :=
 
 End Generic.
 
-Implicit Arguments gen_pack [type base_type class_of base_of base_sort].
+Arguments gen_pack [type base_type class_of base_of base_sort].
 Local Notation cnt_ c := (@Countable.Class _ c c).
 Local Notation do_pack pack T := (pack T _ _ id _ _ _ id).
 Import GRing.Theory.

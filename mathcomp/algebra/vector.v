@@ -303,7 +303,7 @@ Notation "U <= V <= W" := (subsetv U V && subsetv V W) : vspace_scope.
 Notation "<[ v ] >" := (vline v) : vspace_scope.
 Notation "<< X >>" := (span X) : vspace_scope.
 Notation "0" := (vline 0) : vspace_scope.
-Implicit Arguments fullv [[K] [vT]].
+Arguments fullv {K vT}.
 Prenex Implicits subsetv addv capv complv diffv span free basis_of.
 
 Notation "U + V" := (addv U V) : vspace_scope.
@@ -568,7 +568,7 @@ Implicit Type P : pred I.
 Lemma sumv_sup i0 P U Vs :
   P i0 -> (U <= Vs i0)%VS -> (U <= \sum_(i | P i) Vs i)%VS.
 Proof. by move=> Pi0 /subv_trans-> //; rewrite (bigD1 i0) ?addvSl. Qed.
-Implicit Arguments sumv_sup [P U Vs].
+Arguments sumv_sup i0 [P U Vs].
 
 Lemma subv_sumP {P Us V} :
   reflect (forall i, P i -> Us i <= V)%VS  (\sum_(i | P i) Us i <= V)%VS.
@@ -1223,27 +1223,27 @@ End BigSumBasis.
 End VectorTheory.
 
 Hint Resolve subvv.
-Implicit Arguments subvP [K vT U V].
-Implicit Arguments addv_idPl [K vT U V].
-Implicit Arguments addv_idPr [K vT U V].
-Implicit Arguments memv_addP [K vT U V w].
-Implicit Arguments sumv_sup [K vT I P U Vs].
-Implicit Arguments memv_sumP [K vT I P Us v].
-Implicit Arguments subv_sumP [K vT I P Us V].
-Implicit Arguments capv_idPl [K vT U V].
-Implicit Arguments capv_idPr [K vT U V].
-Implicit Arguments memv_capP [K vT U V w].
-Implicit Arguments bigcapv_inf [K vT I P Us V].
-Implicit Arguments subv_bigcapP [K vT I P U Vs].
-Implicit Arguments directvP [K vT S].
-Implicit Arguments directv_addP [K vT U V].
-Implicit Arguments directv_add_unique [K vT U V].
-Implicit Arguments directv_sumP [K vT I P Us].
-Implicit Arguments directv_sumE [K vT I P Ss].
-Implicit Arguments directv_sum_independent [K vT I P Us].
-Implicit Arguments directv_sum_unique [K vT I P Us].
-Implicit Arguments span_subvP [K vT X U].
-Implicit Arguments freeP [K vT n X].
+Arguments subvP [K vT U V].
+Arguments addv_idPl [K vT U V].
+Arguments addv_idPr [K vT U V].
+Arguments memv_addP [K vT w U V ].
+Arguments sumv_sup [K vT I] i0 [P U Vs].
+Arguments memv_sumP [K vT I P Us v].
+Arguments subv_sumP [K vT I P Us V].
+Arguments capv_idPl [K vT U V].
+Arguments capv_idPr [K vT U V].
+Arguments memv_capP [K vT w U V].
+Arguments bigcapv_inf [K vT I] i0 [P Us V].
+Arguments subv_bigcapP [K vT I P U Vs].
+Arguments directvP [K vT S].
+Arguments directv_addP [K vT U V].
+Arguments directv_add_unique [K vT U V].
+Arguments directv_sumP [K vT I P Us].
+Arguments directv_sumE [K vT I P Ss].
+Arguments directv_sum_independent [K vT I P Us].
+Arguments directv_sum_unique [K vT I P Us].
+Arguments span_subvP [K vT X U].
+Arguments freeP [K vT n X].
 
 Prenex Implicits coord.
 Notation directv S := (directv_def (Phantom _ S%VS)).
@@ -1598,11 +1598,11 @@ Proof. by move/lker0_lfunK=> fK; apply/lfunP=> u; rewrite !lfunE /= fK. Qed.
 
 End LinearImage.
 
-Implicit Arguments memv_imgP [K aT rT f U w].
-Implicit Arguments lfunPn [K aT rT f g].
-Implicit Arguments lker0P [K aT rT f].
-Implicit Arguments eqlfunP [K aT rT f g v].
-Implicit Arguments eqlfun_inP [K aT rT f g V].
+Arguments memv_imgP [K aT rT f w U].
+Arguments lfunPn [K aT rT f g].
+Arguments lker0P [K aT rT f].
+Arguments eqlfunP [K aT rT f g v].
+Arguments eqlfun_inP [K aT rT V f g].
 
 Section FixedSpace.
 
@@ -1632,8 +1632,8 @@ Qed.
 
 End FixedSpace.
 
-Implicit Arguments fixedSpaceP [K vT f a].
-Implicit Arguments fixedSpacesP [K vT f U].
+Arguments fixedSpaceP [K vT f a].
+Arguments fixedSpacesP [K vT f U].
 
 Section LinAut.
 
@@ -1943,8 +1943,8 @@ Canonical subvs_vectType := VectType K subvs_of subvs_vectMixin.
 
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.
-Implicit Arguments subvs_inj [[K] [vT] [U] x1 x2].
-Implicit Arguments vsprojK [[K] [vT] [U] x].
+Arguments subvs_inj {K vT U} [x1 x2].
+Arguments vsprojK {K vT U} [x].
 
 Section MatrixVectType.
 

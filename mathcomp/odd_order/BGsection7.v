@@ -267,7 +267,7 @@ Proof. by rewrite inE mmaxJ conjSg !inE. Qed.
 
 Lemma uniq_mmaxP U : reflect (exists M, 'M(U) = [set M]) (U \in 'U).
 Proof. by rewrite inE; apply: cards1P. Qed.
-Implicit Arguments uniq_mmaxP [U].
+Arguments uniq_mmaxP [U].
 
 Lemma mem_uniq_mmax U M : 'M(U) = [set M] -> M \in 'M /\ U \subset M.
 Proof. by move/setP/(_ M); rewrite set11 => /setIdP. Qed.
@@ -354,7 +354,7 @@ Qed.
 
 End MinSimpleOdd.
 
-Implicit Arguments uniq_mmaxP [gT U].
+Arguments uniq_mmaxP [gT U].
 Prenex Implicits uniq_mmaxP.
 
 Notation "''M'" := (minSimple_max_groups _) : group_scope.

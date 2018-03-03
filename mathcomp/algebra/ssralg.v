@@ -859,9 +859,9 @@ End ClosedPredicates.
 
 End ZmoduleTheory.
 
-Implicit Arguments addrI [[V] x1 x2].
-Implicit Arguments addIr [[V] x1 x2].
-Implicit Arguments oppr_inj [[V] x1 x2].
+Arguments addrI {V} y [x1 x2].
+Arguments addIr {V} x [x1 x2].
+Arguments oppr_inj {V} [x1 x2].
 
 Module Ring.
 
@@ -2476,7 +2476,7 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> Ring.class_of.
-Implicit Arguments mixin [R].
+Arguments mixin [R].
 Coercion mixin : class_of >-> commutative.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
@@ -3016,7 +3016,7 @@ End ClosedPredicates.
 
 End UnitRingTheory.
 
-Implicit Arguments invr_inj [[R] x1 x2].
+Arguments invr_inj {R} [x1 x2].
 
 Section UnitRingMorphism.
 
@@ -3740,7 +3740,7 @@ Arguments Scope Not [_ term_scope].
 Arguments Scope Exists [_ nat_scope term_scope].
 Arguments Scope Forall [_ nat_scope term_scope].
 
-Implicit Arguments Bool [R].
+Arguments Bool [R].
 Prenex Implicits Const Add Opp NatMul Mul Exp Bool Unit And Or Implies Not.
 Prenex Implicits Exists Forall.
 
@@ -4363,7 +4363,7 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> ComUnitRing.class_of.
-Implicit Arguments mixin [R x y].
+Arguments mixin [R] c [x y].
 Coercion mixin : class_of >-> axiom.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
@@ -4511,8 +4511,8 @@ Canonical regular_idomainType := [idomainType of R^o].
 
 End IntegralDomainTheory.
 
-Implicit Arguments lregP [[R] [x]].
-Implicit Arguments rregP [[R] [x]].
+Arguments lregP {R x}.
+Arguments rregP {R x}.
 
 Module Field.
 
@@ -4580,7 +4580,7 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> IntegralDomain.class_of.
-Implicit Arguments mixin [F x].
+Arguments mixin [F] c [x].
 Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
@@ -4794,7 +4794,7 @@ End Predicates.
 
 End FieldTheory.
 
-Implicit Arguments fmorph_inj [[F] [R] x1 x2].
+Arguments fmorph_inj {F R} f [x1 x2].
 
 Module DecidableField.
 
@@ -4928,8 +4928,8 @@ Qed.
 
 End DecidableFieldTheory.
 
-Implicit Arguments satP [[F] [e] [f]].
-Implicit Arguments solP [[F] [n] [f]].
+Arguments satP {F e f}.
+Arguments solP {F n f}.
 
 Section QE_Mixin.
 
@@ -5349,13 +5349,13 @@ Definition addrI := @addrI.
 Definition addIr := @addIr.
 Definition subrI := @subrI.
 Definition subIr := @subIr.
-Implicit Arguments addrI [[V] x1 x2].
-Implicit Arguments addIr [[V] x1 x2].
-Implicit Arguments subrI [[V] x1 x2].
-Implicit Arguments subIr [[V] x1 x2].
+Arguments addrI {V} y [x1 x2].
+Arguments addIr {V} x [x1 x2].
+Arguments subrI {V} y [x1 x2].
+Arguments subIr {V} x [x1 x2].
 Definition opprK := opprK.
 Definition oppr_inj := @oppr_inj.
-Implicit Arguments oppr_inj [[V] x1 x2].
+Arguments oppr_inj {V} [x1 x2].
 Definition oppr0 := oppr0.
 Definition oppr_eq0 := oppr_eq0.
 Definition opprD := opprD.
@@ -5539,7 +5539,7 @@ Definition commrV := commrV.
 Definition unitrE := unitrE.
 Definition invrK := invrK.
 Definition invr_inj := @invr_inj.
-Implicit Arguments invr_inj [[R] x1 x2].
+Arguments invr_inj {R} [x1 x2].
 Definition unitrV := unitrV.
 Definition unitr1 := unitr1.
 Definition invr1 := invr1.
@@ -5702,7 +5702,7 @@ Definition rmorphV := rmorphV.
 Definition rmorph_div := rmorph_div.
 Definition fmorph_eq0 := fmorph_eq0.
 Definition fmorph_inj := @fmorph_inj.
-Implicit Arguments fmorph_inj [[F] [R] x1 x2].
+Arguments fmorph_inj {F R} f [x1 x2].
 Definition fmorph_eq1 := fmorph_eq1.
 Definition fmorph_char := fmorph_char.
 Definition fmorph_unit := fmorph_unit.

@@ -174,7 +174,7 @@ Qed.
 Canonical nat_eqMixin := EqMixin eqnP.
 Canonical nat_eqType := Eval hnf in EqType nat nat_eqMixin.
 
-Implicit Arguments eqnP [x y].
+Arguments eqnP [x y].
 Prenex Implicits eqnP.
 
 Lemma eqnE : eqn = eq_op. Proof. by []. Qed.
@@ -394,7 +394,7 @@ apply: (iffP idP); last by elim: n / => // n _ /leq_trans->.
 elim: n => [|n IHn]; first by case: m.
 by rewrite leq_eqVlt ltnS => /predU1P[<- // | /IHn]; right.
 Qed.
-Implicit Arguments leP [m n].
+Arguments leP [m n].
 
 Lemma le_irrelevance m n le_mn1 le_mn2 : le_mn1 = le_mn2 :> (m <= n)%coq_nat.
 Proof.
@@ -411,7 +411,7 @@ Qed.
 
 Lemma ltP m n : reflect (m < n)%coq_nat (m < n).
 Proof. exact leP. Qed.
-Implicit Arguments ltP [m n].
+Arguments ltP [m n].
 
 Lemma lt_irrelevance m n lt_mn1 lt_mn2 : lt_mn1 = lt_mn2 :> (m < n)%coq_nat.
 Proof. exact: (@le_irrelevance m.+1). Qed.
@@ -925,19 +925,19 @@ Proof. by rewrite eqn_leq !leq_mul2r -orb_andr -eqn_leq. Qed.
 
 Lemma leq_pmul2l m n1 n2 : 0 < m -> (m * n1 <= m * n2) = (n1 <= n2).
 Proof. by move/prednK=> <-; rewrite leq_mul2l. Qed.
-Implicit Arguments leq_pmul2l [m n1 n2].
+Arguments leq_pmul2l [m n1 n2].
 
 Lemma leq_pmul2r m n1 n2 : 0 < m -> (n1 * m <= n2 * m) = (n1 <= n2).
 Proof. by move/prednK <-; rewrite leq_mul2r. Qed.
-Implicit Arguments leq_pmul2r [m n1 n2].
+Arguments leq_pmul2r [m n1 n2].
 
 Lemma eqn_pmul2l m n1 n2 : 0 < m -> (m * n1 == m * n2) = (n1 == n2).
 Proof. by move/prednK <-; rewrite eqn_mul2l. Qed.
-Implicit Arguments eqn_pmul2l [m n1 n2].
+Arguments eqn_pmul2l [m n1 n2].
 
 Lemma eqn_pmul2r m n1 n2 : 0 < m -> (n1 * m == n2 * m) = (n1 == n2).
 Proof. by move/prednK <-; rewrite eqn_mul2r. Qed.
-Implicit Arguments eqn_pmul2r [m n1 n2].
+Arguments eqn_pmul2r [m n1 n2].
 
 Lemma ltn_mul2l m n1 n2 : (m * n1 < m * n2) = (0 < m) && (n1 < n2).
 Proof. by rewrite lt0n !ltnNge leq_mul2l negb_or. Qed.
@@ -947,11 +947,11 @@ Proof. by rewrite lt0n !ltnNge leq_mul2r negb_or. Qed.
 
 Lemma ltn_pmul2l m n1 n2 : 0 < m -> (m * n1 < m * n2) = (n1 < n2).
 Proof. by move/prednK <-; rewrite ltn_mul2l. Qed.
-Implicit Arguments ltn_pmul2l [m n1 n2].
+Arguments ltn_pmul2l [m n1 n2].
 
 Lemma ltn_pmul2r m n1 n2 : 0 < m -> (n1 * m < n2 * m) = (n1 < n2).
 Proof. by move/prednK <-; rewrite ltn_mul2r. Qed.
-Implicit Arguments ltn_pmul2r [m n1 n2].
+Arguments ltn_pmul2r [m n1 n2].
 
 Lemma ltn_Pmull m n : 1 < n -> 0 < m -> m < n * m.
 Proof. by move=> lt1n m_gt0; rewrite -{1}[m]mul1n ltn_pmul2r. Qed.

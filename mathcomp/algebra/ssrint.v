@@ -970,7 +970,7 @@ End NumMorphism.
 
 End MorphTheory.
 
-Implicit Arguments intr_inj [[R] x1 x2].
+Arguments intr_inj {R} [x1 x2].
 
 Definition exprz (R : unitRingType) (x : R) (n : int) := nosimpl
   match n with

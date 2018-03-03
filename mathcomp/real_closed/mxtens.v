@@ -44,8 +44,8 @@ Proof. by rewrite ltn_mod; case: n k=> //; rewrite muln0=> [] []. Qed.
 Definition mxtens_unindex m n k :=
   (Ordinal (@mxtens_index_proof1 m n k), Ordinal (@mxtens_index_proof2 m n k)).
 
-Implicit Arguments mxtens_index [[m] [n]].
-Implicit Arguments mxtens_unindex [[m] [n]].
+Arguments mxtens_index {m n}.
+Arguments mxtens_unindex {m n}.
 
 Lemma mxtens_indexK m n : cancel (@mxtens_index m n) (@mxtens_unindex m n).
 Proof.

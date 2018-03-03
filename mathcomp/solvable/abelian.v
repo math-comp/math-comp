@@ -196,7 +196,7 @@ Arguments Scope Ohm [nat_scope _ group_scope].
 Arguments Scope Ohm_group [nat_scope _ group_scope].
 Arguments Scope Mho [nat_scope _ group_scope].
 Arguments Scope Mho_group [nat_scope _ group_scope].
-Implicit Arguments OhmPredP [n gT x].
+Arguments OhmPredP [n gT x].
 
 Notation "''Ohm_' n ( G )" := (Ohm n G)
   (at level 8, n at level 2, format "''Ohm_' n ( G )") : group_scope.
@@ -233,7 +233,7 @@ apply: (iffP (dvdn_biglcmP _ _ _)) => eAn x Ax.
   by apply/eqP; rewrite -order_dvdn eAn.
 by rewrite order_dvdn eAn.
 Qed.
-Implicit Arguments exponentP [A n].
+Arguments exponentP [A n].
 
 Lemma trivg_exponent G : (G :==: 1) = (exponent G %| 1).
 Proof.
@@ -495,7 +495,7 @@ Qed.
 
 Lemma pElemP p A E : reflect (E \subset A /\ p.-abelem E) (E \in 'E_p(A)).
 Proof. by rewrite inE; apply: andP. Qed.
-Implicit Arguments pElemP [p A E].
+Arguments pElemP [p A E].
 
 Lemma pElemS p A B : A \subset B -> 'E_p(A) \subset 'E_p(B).
 Proof.
@@ -511,7 +511,7 @@ Proof. by rewrite !inE conjSg abelemJ. Qed.
 Lemma pnElemP p n A E :
   reflect [/\ E \subset A, p.-abelem E & logn p #|E| = n] (E \in 'E_p^n(A)).
 Proof. by rewrite !inE -andbA; apply: (iffP and3P) => [] [-> -> /eqP]. Qed.
-Implicit Arguments pnElemP [p n A E].
+Arguments pnElemP [p n A E].
 
 Lemma pnElemPcard p n A E :
   E \in 'E_p^n(A) -> [/\ E \subset A, p.-abelem E & #|E| = p ^ n]%N.
@@ -636,7 +636,7 @@ have:= EpnE; rewrite pnElemE ?(pnElem_prime EpnE) // !inE -andbA ltnS.
 case/and3P=> sEG _ oE; rewrite dvdn_leq // (dvdn_trans _ (cardSg sEG)) //.
 by rewrite (eqP oE) dvdn_exp.
 Qed.
-Implicit Arguments nElemP [n G E].
+Arguments nElemP [n G E].
 
 Lemma nElem0 G : 'E^0(G) = [set 1%G].
 Proof.
@@ -899,18 +899,18 @@ Qed.
 
 End ExponentAbelem.
 
-Implicit Arguments LdivP [gT A n x].
-Implicit Arguments exponentP [gT A n].
-Implicit Arguments abelemP [gT p G].
-Implicit Arguments is_abelemP [gT G].
-Implicit Arguments pElemP [gT p A E].
-Implicit Arguments pnElemP [gT p n A E].
-Implicit Arguments nElemP [gT n G E].
-Implicit Arguments nElem1P [gT G E].
-Implicit Arguments pmaxElemP [gT p A E].
-Implicit Arguments pmaxElem_LdivP [gT p G E].
-Implicit Arguments p_rank_geP [gT p n G].
-Implicit Arguments rank_geP [gT n G].
+Arguments LdivP [gT A n x].
+Arguments exponentP [gT A n].
+Arguments abelemP [gT p G].
+Arguments is_abelemP [gT G].
+Arguments pElemP [gT p A E].
+Arguments pnElemP [gT p n A E].
+Arguments nElemP [gT n G E].
+Arguments nElem1P [gT G E].
+Arguments pmaxElemP [gT p A E].
+Arguments pmaxElem_LdivP [gT p G E].
+Arguments p_rank_geP [gT p n G].
+Arguments rank_geP [gT n G].
 
 Section MorphAbelem.
 

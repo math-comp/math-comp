@@ -780,8 +780,8 @@ End Sequences.
 
 Definition rev T (s : seq T) := nosimpl (catrev s [::]).
 
-Implicit Arguments nilP [T s].
-Implicit Arguments all_filterP [T a s].
+Arguments nilP [T s].
+Arguments all_filterP [T a s].
 
 Prenex Implicits size nilP head ohead behead last rcons belast.
 Prenex Implicits cat take drop rev rot rotr.
@@ -875,7 +875,7 @@ Qed.
 
 End Rev.
 
-Implicit Arguments revK [[T]].
+Arguments revK {T}.
 
 (* Equality and eqType for seq.                                          *)
 
@@ -1287,13 +1287,13 @@ Definition inE := (mem_seq1, in_cons, inE).
 
 Prenex Implicits mem_seq1 uniq undup index.
 
-Implicit Arguments eqseqP [T x y].
-Implicit Arguments hasP [T a s].
-Implicit Arguments hasPn [T a s].
-Implicit Arguments allP [T a s].
-Implicit Arguments allPn [T a s].
-Implicit Arguments nseqP [T n x y].
-Implicit Arguments count_memPn [T x s].
+Arguments eqseqP [T x y].
+Arguments hasP [T a s].
+Arguments hasPn [T a s].
+Arguments allP [T a s].
+Arguments allPn [T a s].
+Arguments nseqP [T n x y].
+Arguments count_memPn [T x s].
 Prenex Implicits eqseqP hasP hasPn allP allPn nseqP count_memPn.
 
 Section NthTheory.
@@ -1332,9 +1332,9 @@ Proof. by elim: s n => [|y s' IHs] [|n] /=; auto. Qed.
 Lemma headI T s (x : T) : rcons s x = head x s :: behead (rcons s x).
 Proof. by case: s. Qed.
 
-Implicit Arguments nthP [T s x].
-Implicit Arguments has_nthP [T a s].
-Implicit Arguments all_nthP [T a s].
+Arguments nthP [T s x].
+Arguments has_nthP [T a s].
+Arguments all_nthP [T a s].
 Prenex Implicits nthP has_nthP all_nthP.
 
 Definition bitseq := seq bool.
@@ -1576,9 +1576,9 @@ End PermSeq.
 Notation perm_eql s1 s2 := (perm_eq s1 =1 perm_eq s2).
 Notation perm_eqr s1 s2 := (perm_eq^~ s1 =1 perm_eq^~ s2).
 
-Implicit Arguments perm_eqP [T s1 s2].
-Implicit Arguments perm_eqlP [T s1 s2].
-Implicit Arguments perm_eqrP [T s1 s2].
+Arguments perm_eqP [T s1 s2].
+Arguments perm_eqlP [T s1 s2].
+Arguments perm_eqrP [T s1 s2].
 Prenex Implicits perm_eq perm_eqP perm_eqlP perm_eqrP.
 Hint Resolve perm_eq_refl.
 
@@ -1853,7 +1853,7 @@ Proof. by case/subseqP=> m _ -> Us2; apply: mask_uniq. Qed.
 End Subseq.
 
 Prenex Implicits subseq.
-Implicit Arguments subseqP [T s1 s2].
+Arguments subseqP [T s1 s2].
 
 Hint Resolve subseq_refl.
 
@@ -2029,7 +2029,7 @@ Qed.
 
 End FilterSubseq.
 
-Implicit Arguments subseq_uniqP [T s1 s2].
+Arguments subseq_uniqP [T s1 s2].
 
 Section EqMap.
 
@@ -2097,7 +2097,7 @@ Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
 
 End EqMap.
 
-Implicit Arguments mapP [T1 T2 f s y].
+Arguments mapP [T1 T2 f s y].
 Prenex Implicits mapP.
 
 Lemma map_of_seq (T1 : eqType) T2 (s : seq T1) (fs : seq T2) (y0 : T2) :
@@ -2289,7 +2289,7 @@ Qed.
 
 End MakeEqSeq.
 
-Implicit Arguments perm_eq_iotaP [[T] [s] [t]].
+Arguments perm_eq_iotaP {T s t}.
 
 Section FoldRight.
 
@@ -2663,7 +2663,7 @@ elim: A => /= [|s A /iffP IH_A]; [by right; case | rewrite mem_cat].
 have [s_x|s'x] := @idP (x \in s); first by left; exists s; rewrite ?mem_head.
 by apply: IH_A => [[t] | [t /predU1P[->|]]]; exists t; rewrite // mem_behead.
 Qed.
-Implicit Arguments flattenP [A x].
+Arguments flattenP [A x].
 
 Lemma flatten_mapP (A : S -> seq T) s y :
   reflect (exists2 x, x \in s & y \in A x) (y \in flatten (map A s)).
@@ -2674,8 +2674,8 @@ Qed.
 
 End EqFlatten.
 
-Implicit Arguments flattenP [T A x].
-Implicit Arguments flatten_mapP [S T A s y].
+Arguments flattenP [T A x].
+Arguments flatten_mapP [S T A s y].
 
 Lemma perm_undup_count (T : eqType) (s : seq T) :
   perm_eq (flatten [seq nseq (count_mem x s) x | x <- undup s]) s.

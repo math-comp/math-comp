@@ -134,7 +134,7 @@ Lemma itv_dec : forall (x : R) (i : interval R),
   reflect (itv_decompose i x) (x \in i).
 Proof. by move=> x [[[] a|] [[] b|]]; apply: (iffP andP); case. Qed.
 
-Implicit Arguments itv_dec [x i].
+Arguments itv_dec [x i].
 
 Definition lersif (x y : R) b := if b then x < y else x <= y.
 
@@ -243,7 +243,7 @@ move=> x [[[] a|] [[] b|]]; move/itv_dec=> //= [hl hu]; do ?[split=> //;
 Qed.
 
 Hint Rewrite intP.
-Implicit Arguments itvP [x i].
+Arguments itvP [x i].
 
 Definition subitv (i1 i2 : interval R) :=
   match i1, i2 with
