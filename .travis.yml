@@ -19,7 +19,6 @@ env:
   - COMPILER="system"
   # Main test targets
   matrix:
-  - TEST_TARGET="v8.5"
   - TEST_TARGET="v8.6"
   - TEST_TARGET="v8.7"
   - TEST_TARGET="master"
