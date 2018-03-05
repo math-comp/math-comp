@@ -791,25 +791,24 @@ Definition centralised A := forall x, centralises x A.
 
 End GroupSetMulDef.
 
-Arguments Scope lcoset [_ group_scope group_scope].
-Arguments Scope rcoset [_ group_scope group_scope].
-Arguments Scope rcosets [_ group_scope group_scope].
-Arguments Scope lcosets [_ group_scope group_scope].
-Arguments Scope indexg [_ group_scope group_scope].
-Arguments Scope conjugate [_ group_scope group_scope].
-Arguments Scope conjugates [_ group_scope group_scope].
-Arguments Scope class [_ group_scope group_scope].
-Arguments Scope classes [_ group_scope].
-Arguments Scope class_support [_ group_scope group_scope].
-Arguments Scope commg_set [_ group_scope group_scope].
-Arguments Scope normaliser [_ group_scope].
-Arguments Scope centraliser [_ group_scope].
-Arguments Scope abelian [_ group_scope].
-Arguments Scope normal [_ group_scope group_scope].
-Arguments Scope centralised [_ group_scope].
-Arguments Scope normalised [_ group_scope].
-Arguments Scope centralises [_ group_scope group_scope].
-Arguments Scope centralised [_ group_scope].
+Arguments lcoset _ _%g _%g.
+Arguments rcoset _ _%g _%g.
+Arguments rcosets _ _%g _%g.
+Arguments lcosets _ _%g _%g.
+Arguments indexg _ _%g _%g.
+Arguments conjugate _ _%g _%g.
+Arguments conjugates _ _%g _%g.
+Arguments class _ _%g _%g.
+Arguments classes _ _%g.
+Arguments class_support _ _%g _%g.
+Arguments commg_set _ _%g _%g.
+Arguments normaliser _ _%g.
+Arguments centraliser _ _%g.
+Arguments abelian _ _%g.
+Arguments normal _ _%g _%g.
+Arguments normalised _ _%g.
+Arguments centralises _ _%g _%g.
+Arguments centralised _ _%g.
 
 Notation "[ 1 gT ]" := (1 : {set gT}) : group_scope.
 Notation "[ 1 ]" := [1 FinGroup.sort _] : group_scope.
@@ -1312,9 +1311,9 @@ Arguments group_setP [gT A].
 Prenex Implicits group_set mulsgP set1gP.
 Prenex Implicits lcosetP lcosetsP rcosetP rcosetsP group_setP.
 
-Arguments Scope commutator [_ group_scope group_scope].
-Arguments Scope joing [_ group_scope group_scope].
-Arguments Scope generated [_ group_scope].
+Arguments commutator _ _%g _%g.
+Arguments joing _ _%g _%g.
+Arguments generated _ _%g.
 
 Notation "{ 'group' gT }" := (group_of (Phant gT))
   (at level 0, format "{ 'group'  gT }") : type_scope.
@@ -1913,9 +1912,9 @@ End GroupInter.
 
 Hint Resolve order_gt0.
 
-Arguments Scope generated_group [_ group_scope].
-Arguments Scope joing_group [_ group_scope group_scope].
-Arguments Scope subgroups [_ group_scope].
+Arguments generated_group _ _%g.
+Arguments joing_group _ _%g _%g.
+Arguments subgroups _ _%g.
 
 Notation "G :&: H" := (setI_group G H) : Group_scope.
 Notation "<< A >>"  := (generated_group A) : Group_scope.
@@ -2997,8 +2996,8 @@ Arguments commG1P [gT A B].
 
 Prenex Implicits normP normsP cent1P normalP centP centsP commG1P.
 
-Arguments Scope normaliser_group [_ group_scope].
-Arguments Scope centraliser_group [_ group_scope].
+Arguments normaliser_group _ _%g.
+Arguments centraliser_group _ _%g.
 
 Notation "''N' ( A )" := (normaliser_group A) : Group_scope.
 Notation "''C' ( A )" := (centraliser_group A) : Group_scope.
@@ -3017,7 +3016,7 @@ Section MinMaxGroup.
 
 Variable gT : finGroupType.
 Variable gP : pred {group gT}.
-Arguments Scope gP [Group_scope].
+Arguments gP _%G.
 
 Definition maxgroup := maxset (fun A => group_set A && gP <<A>>).
 Definition mingroup := minset (fun A => group_set A && gP <<A>>).

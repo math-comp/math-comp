@@ -33,7 +33,7 @@ Definition derived_at_rec n (gT : finGroupType) (A : {set gT}) :=
 (* "cooking" destroys it.                                                    *)
 Definition derived_at := nosimpl derived_at_rec.
 
-Arguments Scope derived_at [nat_scope _ group_scope].
+Arguments derived_at _%N _ _%g.
 Notation "G ^` ( n )" := (derived_at n G) : group_scope.
 
 Section DerivedBasics.

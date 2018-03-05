@@ -198,9 +198,9 @@ Lemma quotientE : quotient = coset @* Q. Proof. by []. Qed.
 
 End Cosets.
 
-Arguments Scope coset_of [_ group_scope].
-Arguments Scope coset [_ group_scope group_scope].
-Arguments Scope quotient [_ group_scope group_scope].
+Arguments coset_of _ _%g.
+Arguments coset _ _%g _%g.
+Arguments quotient _ _%g _%g.
 Prenex Implicits coset_of coset.
 
 Bind Scope group_scope with coset_of.

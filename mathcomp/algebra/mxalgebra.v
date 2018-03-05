@@ -216,9 +216,9 @@ Definition pinvmx : 'M_(n, m) :=
 
 End Defs.
 
-Arguments Scope mxrank [nat_scope nat_scope matrix_set_scope].
+Arguments mxrank _%N _%N _%MS.
 Local Notation "\rank A" := (mxrank A) : nat_scope.
-Arguments Scope complmx [nat_scope nat_scope matrix_set_scope].
+Arguments complmx _%N _%N _%MS.
 Local Notation "A ^C" := (complmx A) : matrix_set_scope.
 
 Definition submx_def := idfun (fun m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) =>
@@ -227,8 +227,7 @@ Fact submx_key : unit. Proof. by []. Qed.
 Definition submx := locked_with submx_key submx_def.
 Canonical submx_unlockable := [unlockable fun submx].
 
-Arguments Scope submx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments submx _%N _%N _%N _%MS _%MS.
 Prenex Implicits submx.
 Local Notation "A <= B" := (submx A B) : matrix_set_scope.
 Local Notation "A <= B <= C" := ((A <= B) && (B <= C))%MS : matrix_set_scope.
@@ -236,8 +235,7 @@ Local Notation "A == B" := (A <= B <= A)%MS : matrix_set_scope.
 
 Definition ltmx m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :=
   (A <= B)%MS && ~~ (B <= A)%MS.
-Arguments Scope ltmx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments ltmx _%N _%N _%N _%MS _%MS.
 Prenex Implicits ltmx.
 Local Notation "A < B" := (ltmx A B) : matrix_set_scope.
 
@@ -245,8 +243,7 @@ Definition eqmx m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :=
   prod (\rank A = \rank B)
        (forall m3 (C : 'M_(m3, n)),
             ((A <= C) = (B <= C)) * ((C <= A) = (C <= B)))%MS.
-Arguments Scope eqmx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments eqmx _%N _%N _%N _%MS _%MS.
 Local Notation "A :=: B" := (eqmx A B) : matrix_set_scope.
 
 Section LtmxIdentities.
@@ -301,8 +298,7 @@ Definition addsmx_def := idfun (fun m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) =>
 Fact addsmx_key : unit. Proof. by []. Qed.
 Definition addsmx := locked_with addsmx_key addsmx_def.
 Canonical addsmx_unlockable := [unlockable fun addsmx].
-Arguments Scope addsmx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments addsmx _%N _%N _%N _%MS _%MS.
 Prenex Implicits addsmx.
 Local Notation "A + B" := (addsmx A B) : matrix_set_scope.
 Local Notation "\sum_ ( i | P ) B" := (\big[addsmx/0]_(i | P) B%MS)
@@ -337,8 +333,7 @@ Definition capmx_def := idfun (fun m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) =>
 Fact capmx_key : unit. Proof. by []. Qed.
 Definition capmx := locked_with capmx_key capmx_def.
 Canonical capmx_unlockable := [unlockable fun capmx].
-Arguments Scope capmx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments capmx _%N _%N _%N _%MS _%MS.
 Prenex Implicits capmx.
 Local Notation "A :&: B" := (capmx A B) : matrix_set_scope.
 Local Notation "\bigcap_ ( i | P ) B" := (\big[capmx/1%:M]_(i | P) B)
@@ -349,8 +344,7 @@ Definition diffmx_def := idfun (fun m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) =>
 Fact diffmx_key : unit. Proof. by []. Qed.
 Definition diffmx := locked_with diffmx_key diffmx_def.
 Canonical diffmx_unlockable := [unlockable fun diffmx].
-Arguments Scope diffmx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments diffmx _%N _%N _%N _%MS _%MS.
 Prenex Implicits diffmx.
 Local Notation "A :\: B" := (diffmx A B) : matrix_set_scope.
 
@@ -1735,7 +1729,7 @@ Inductive mxsum_spec n : forall m, 'M[F]_(m, n) -> nat -> Prop :=
  | ProperMxsum m1 m2 T1 T2 r1 r2 of
       @mxsum_spec n m1 T1 r1 & @mxsum_spec n m2 T2 r2
     : mxsum_spec (T1 + T2)%MS (r1 + r2)%N.
-Arguments Scope mxsum_spec [nat_scope nat_scope matrix_set_scope nat_scope].
+Arguments mxsum_spec _%N _%N _%MS _%N.
 
 Structure mxsum_expr m n := Mxsum {
   mxsum_val :> wrapped 'M_(m, n);
@@ -2005,21 +1999,15 @@ Arguments mxdirect_sumsE [F I P n S_].
 Arguments eigenspaceP [F n g a m W].
 Arguments eigenvalueP [F n g a].
 
-Arguments Scope mxrank [_ nat_scope nat_scope matrix_set_scope].
-Arguments Scope complmx [_ nat_scope nat_scope matrix_set_scope].
-Arguments Scope row_full [_ nat_scope nat_scope matrix_set_scope].
-Arguments Scope submx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope ltmx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope eqmx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope addsmx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope capmx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope diffmx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments mxrank _ _%N _%N _%MS.
+Arguments complmx _ _%N _%N _%MS.
+Arguments row_full _ _%N _%N _%MS.
+Arguments submx _ _%N _%N _%N _%MS _%MS.
+Arguments ltmx _ _%N _%N _%N _%MS _%MS.
+Arguments eqmx _ _%N _%N _%N _%MS _%MS.
+Arguments addsmx _ _%N _%N _%N _%MS _%MS.
+Arguments capmx _ _%N _%N _%N _%MS _%MS.
+Arguments diffmx _ _%N _%N _%N _%MS _%MS.
 Prenex Implicits mxrank genmx complmx submx ltmx addsmx capmx.
 Notation "\rank A" := (mxrank A) : nat_scope.
 Notation "<< A >>" := (genmx A) : matrix_set_scope.
@@ -2295,8 +2283,7 @@ Qed.
 Definition mulsmx m1 m2 n (R1 : 'A[F]_(m1, n)) (R2 : 'A_(m2, n)) :=
   (\sum_i <<R1 *m lin_mx (mulmxr (vec_mx (row i R2)))>>)%MS.
 
-Arguments Scope mulsmx
-  [nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
+Arguments mulsmx _%N _%N _%N _%MS _%MS.
 
 Local Notation "R1 * R2" := (mulsmx R1 R2) : matrix_set_scope.
 
@@ -2606,24 +2593,15 @@ Qed.
 
 End MatrixAlgebra.
 
-Arguments Scope mulsmx
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope left_mx_ideal
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope right_mx_ideal
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope mx_ideal
-  [_ nat_scope nat_scope nat_scope matrix_set_scope matrix_set_scope].
-Arguments Scope mxring_id
-  [_ nat_scope nat_scope ring_scope matrix_set_scope].
-Arguments Scope has_mxring_id
-  [_ nat_scope nat_scope ring_scope matrix_set_scope].
-Arguments Scope mxring
-  [_ nat_scope nat_scope matrix_set_scope].
-Arguments Scope cent_mx
-  [_ nat_scope nat_scope matrix_set_scope].
-Arguments Scope center_mx
-  [_ nat_scope nat_scope matrix_set_scope].
+Arguments mulsmx _ _%N _%N _%N _%MS _%MS.
+Arguments left_mx_ideal _ _%N _%N _%N _%MS _%MS.
+Arguments right_mx_ideal _ _%N _%N _%N _%MS _%MS.
+Arguments mx_ideal _ _%N _%N _%N _%MS _%MS.
+Arguments mxring_id _ _%N _%N _%R _%MS.
+Arguments has_mxring_id _ _%N _%N _%R _%MS : extra scopes.
+Arguments mxring _ _%N _%N _%MS.
+Arguments cent_mx _ _%N _%N _%MS.
+Arguments center_mx _ _%N _%N _%MS.
 
 Prenex Implicits mulsmx.
 

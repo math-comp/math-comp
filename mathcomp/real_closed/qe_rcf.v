@@ -102,17 +102,18 @@ End QF.
 
 Bind Scope qf_scope with term.
 Bind Scope qf_scope with formula.
-Arguments Scope Add [_ qf_scope qf_scope].
-Arguments Scope Opp [_ qf_scope].
-Arguments Scope NatMul [_ qf_scope nat_scope].
-Arguments Scope Mul [_ qf_scope qf_scope].
-Arguments Scope Mul [_ qf_scope qf_scope].
-Arguments Scope Exp [_ qf_scope nat_scope].
-Arguments Scope Equal [_ qf_scope qf_scope].
-Arguments Scope And [_ qf_scope qf_scope].
-Arguments Scope Or [_ qf_scope qf_scope].
-Arguments Scope Implies [_ qf_scope qf_scope].
-Arguments Scope Not [_ qf_scope].
+Delimit Scope qf_scope with qfT.
+Arguments Add _ _%qfT _%qfT.
+Arguments Opp _ _%qfT.
+Arguments NatMul _ _%qfT _%N.
+Arguments Mul _ _%qfT _%qfT.
+Arguments Mul _ _%qfT _%qfT.
+Arguments Exp _ _%qfT _%N.
+Arguments Equal _ _%qfT _%qfT.
+Arguments And _ _%qfT _%qfT.
+Arguments Or _ _%qfT _%qfT.
+Arguments Implies _ _%qfT _%qfT.
+Arguments Not _ _%qfT.
 
 Arguments Bool [R].
 Prenex Implicits Const Add Opp NatMul Mul Exp Bool Unit And Or Implies Not Lt.
@@ -121,7 +122,6 @@ Prenex Implicits to_rterm.
 Notation True := (Bool true).
 Notation False := (Bool false).
 
-Delimit Scope qf_scope with qfT.
 Notation "''X_' i" := (Var _ i) : qf_scope.
 Notation "n %:R" := (NatConst _ n) : qf_scope.
 Notation "x %:T" := (Const x) : qf_scope.

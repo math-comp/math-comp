@@ -392,14 +392,14 @@ End Defs.
 
 Bind Scope cfun_scope with classfun.
 
-Arguments Scope classfun [_ group_scope].
-Arguments Scope classfun_on [_ group_scope group_scope].
-Arguments Scope cfun_indicator [_ group_scope].
-Arguments Scope cfAut [_ group_scope _ cfun_scope].
-Arguments Scope cfReal [_ group_scope cfun_scope].
-Arguments Scope cfdot [_ group_scope cfun_scope cfun_scope].
-Arguments Scope cfdotr_head [_ group_scope _ cfun_scope cfun_scope].
-Arguments Scope cfdotr_head [_ group_scope _ cfun_scope].
+Arguments classfun _ _%g.
+Arguments classfun_on _ _%g _%g.
+Arguments cfun_indicator _ _%g.
+Arguments cfAut _ _%g _ _%CF.
+Arguments cfReal _ _%g _%CF.
+Arguments cfdot _ _%g _%CF _%CF.
+Arguments cfdotr_head _ _%g _ _%CF _%CF.
+Arguments cfdotr_head _ _%g _ _%CF.
 
 Notation "''CF' ( G )" := (classfun G) : type_scope.
 Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
@@ -452,12 +452,12 @@ End Predicates.
 (* Outside section so the nosimpl does not get "cooked" out. *)
 Definition orthogonal gT D S1 S2 := nosimpl (@ortho_rec gT D S1 S2).
 
-Arguments Scope cfker [_ group_scope cfun_scope].
-Arguments Scope cfaithful [_ group_scope cfun_scope].
-Arguments Scope orthogonal [_ group_scope cfun_scope cfun_scope].
-Arguments Scope pairwise_orthogonal [_ group_scope cfun_scope].
-Arguments Scope orthonormal [_ group_scope cfun_scope].
-Arguments Scope isometry [_ _ group_scope group_scope cfun_scope].
+Arguments cfker _ _%g _%CF.
+Arguments cfaithful _ _%g _%CF.
+Arguments orthogonal _ _%g _%CF _%CF.
+Arguments pairwise_orthogonal _ _%g _%CF.
+Arguments orthonormal _ _%g _%CF.
+Arguments isometry _ _ _%g _%g _%CF.
 
 Notation "{ 'in' CFD , 'isometry' tau , 'to' CFR }" :=
     (isometry_from_to (mem CFD) tau (mem CFR))
@@ -756,7 +756,7 @@ Proof. by []. Qed.
 
 End ClassFun.
 
-Arguments Scope classfun_on [_ group_scope group_scope].
+Arguments classfun_on _ _%g _%g.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 
 Arguments cfun_onP [gT G A phi].
@@ -1394,7 +1394,7 @@ Canonical cfRes_lrmorphism := [lrmorphism of cfRes].
 
 End Restrict.
 
-Arguments Scope cfRes [_ group_scope group_scope cfun_scope].
+Arguments cfRes _ _%g _%g _%CF.
 Notation "''Res[' H , G ]" := (@cfRes _ H G) (only parsing) : ring_scope.
 Notation "''Res[' H ]" := 'Res[H, _] : ring_scope.
 Notation "''Res'" := 'Res[_] (only parsing) : ring_scope.
@@ -1727,8 +1727,8 @@ Proof. by move=> nsBG kerH; rewrite -cfMod_eq1 // cfQuoK. Qed.
 
 End Coset.
 
-Arguments Scope cfQuo [_ Group_scope group_scope cfun_scope].
-Arguments Scope cfMod [_ Group_scope group_scope cfun_scope].
+Arguments cfQuo _ _%G _%g _%CF.
+Arguments cfMod _ _%G _%g _%CF.
 Prenex Implicits cfMod.
 Notation "phi / H" := (cfQuo H phi) : cfun_scope.
 Notation "phi %% H" := (@cfMod _ _ H phi) : cfun_scope.
@@ -2327,7 +2327,7 @@ Qed.
 
 End Induced.
 
-Arguments Scope cfInd [_ group_scope group_scope cfun_scope].
+Arguments cfInd _ _%g _%g _%CF.
 Notation "''Ind[' G , H ]" := (@cfInd _ G H) (only parsing) : ring_scope.
 Notation "''Ind[' G ]" := 'Ind[G, _] : ring_scope.
 Notation "''Ind'" := 'Ind[_] (only parsing) : ring_scope.

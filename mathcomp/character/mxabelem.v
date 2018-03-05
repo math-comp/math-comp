@@ -341,7 +341,7 @@ Proof. by move=> sHG; rewrite gacentE // setTI afix_repr. Qed.
 
 End FinFieldRepr.
 
-Arguments Scope rowg_mx [_ _ group_scope].
+Arguments rowg_mx _ _ _%g.
 Notation "''Zm'" := (scale_action _ _ _) (at level 8) : action_scope.
 Notation "''Zm'" := (scale_groupAction _ _ _) : groupAction_scope.
 
@@ -406,7 +406,7 @@ Open Scope abelem_scope.
 
 Definition abelem_dim' (gT : finGroupType) (E : {set gT}) :=
   (logn (pdiv #|E|) #|E|).-1.
-Arguments Scope abelem_dim' [_ group_scope].
+Arguments abelem_dim' _ _%g.
 Notation "''dim' E" := (abelem_dim' E).+1
   (at level 10, E at level 8, format "''dim'  E") : abelem_scope.
 

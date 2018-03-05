@@ -157,7 +157,7 @@ Canonical gring_irr_mode_unlockable := [unlockable fun gring_irr_mode].
 
 End GenericClassSums.
 
-Arguments Scope gring_irr_mode [_ Group_scope ring_scope group_scope].
+Arguments gring_irr_mode _ _%G _%R _%g : extra scopes.
 
 Notation "''K_' i" := (gring_class_sum _ i)
   (at level 8, i at level 2, format "''K_' i") : ring_scope.

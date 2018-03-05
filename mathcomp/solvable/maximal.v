@@ -102,14 +102,14 @@ Definition SCN_at n B := [set A in SCN B | n <= 'r(A)].
 
 End Defs.
 
-Arguments Scope charsimple [_ group_scope].
-Arguments Scope Frattini [_ group_scope].
-Arguments Scope Fitting [_ group_scope].
-Arguments Scope critical [_ group_scope group_scope].
-Arguments Scope special [_ group_scope].
-Arguments Scope extraspecial [_ group_scope].
-Arguments Scope SCN [_ group_scope].
-Arguments Scope SCN_at [_ nat_scope group_scope].
+Arguments charsimple _ _%g.
+Arguments Frattini _ _%g.
+Arguments Fitting _ _%g.
+Arguments critical _ _%g _%g.
+Arguments special _ _%g.
+Arguments extraspecial _ _%g.
+Arguments SCN _ _%g.
+Arguments SCN_at _ _%N _%g.
 
 Prenex Implicits maximal simple charsimple critical special extraspecial.
 

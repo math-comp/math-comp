@@ -245,7 +245,7 @@ Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
 Canonical hom_subType := [newType for f2mx].
 End Hom.
 
-Arguments Scope mx2vs [_ _ nat_scope matrix_set_scope].
+Arguments mx2vs _ _ _%N _%MS.
 Prenex Implicits v2r r2v v2rK r2vK b2mx vs2mx vs2mxK f2mx.
 
 End InternalTheory.

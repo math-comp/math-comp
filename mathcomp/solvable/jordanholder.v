@@ -475,10 +475,8 @@ Qed.
 
 End StableCompositionSeries.
 
-Arguments Scope maxainv
-   [_ _ Group_scope Group_scope groupAction_scope group_scope group_scope].
-Arguments Scope asimple
-  [_ _ Group_scope Group_scope groupAction_scope group_scope].
+Arguments maxainv _ _ _%G _%G _%gact _%g _%g.
+Arguments asimple _ _ _%G _%G _%gact _%g.
 
 Section StrongJordanHolder.
 

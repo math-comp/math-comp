@@ -52,8 +52,8 @@ Definition lower_central_at n := lower_central_at_rec n.-1.
 (* "cooking" destroys it.                                                     *)
 Definition upper_central_at := nosimpl upper_central_at_rec.
 
-Arguments Scope lower_central_at [nat_scope _ group_scope].
-Arguments Scope upper_central_at [nat_scope _ group_scope].
+Arguments lower_central_at _%N _ _%g.
+Arguments upper_central_at _%N _ _%g.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
   (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.
@@ -75,9 +75,9 @@ Definition solvable :=
 
 End PropertiesDefs.
 
-Arguments Scope nilpotent [_ group_scope].
-Arguments Scope nil_class [_ group_scope].
-Arguments Scope solvable [_ group_scope].
+Arguments nilpotent _ _%g.
+Arguments nil_class _ _%g.
+Arguments solvable _ _%g.
 Prenex Implicits nil_class nilpotent solvable.
 
 Section NilpotentProps.

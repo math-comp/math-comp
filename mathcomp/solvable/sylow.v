@@ -535,7 +535,7 @@ Qed.
 
 End Zgroups.
 
-Arguments Scope Zgroup [_ group_scope].
+Arguments Zgroup _ _%g.
 Prenex Implicits Zgroup.
 
 Section NilPGroups.

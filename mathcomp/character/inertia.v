@@ -567,8 +567,8 @@ Qed.
 
 End Inertia.
 
-Arguments Scope inertia [_ group_scope cfun_scope].
-Arguments Scope cfclass [_ group_scope cfun_scope group_scope].
+Arguments inertia _ _%g _%CF.
+Arguments cfclass _ _%g _%CF _%g.
 Arguments conjg_Iirr_inj [gT H] y [x1 x2].
 
 Notation "''I[' phi ] " := (inertia phi) : group_scope.
