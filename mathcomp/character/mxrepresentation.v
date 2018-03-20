@@ -291,7 +291,7 @@ Structure mx_representation G n :=
   MxRepresentation { repr_mx :> gT -> 'M_n; _ : mx_repr G repr_mx }.
 
 Variables (G : {group gT}) (n : nat) (rG : mx_representation G n).
-Arguments Scope rG [group_scope].
+Arguments rG _%group_scope : extra scopes.
 
 Lemma repr_mx1 : rG 1 = 1%:M.
 Proof. by case: rG => r []. Qed.
@@ -814,10 +814,10 @@ End Regular.
 
 End RingRepr.
 
-Arguments Scope mx_representation [_ _ group_scope nat_scope].
-Arguments Scope mx_repr [_ _ group_scope nat_scope _].
-Arguments Scope group_ring [_ _ group_scope].
-Arguments Scope regular_repr [_ _ group_scope].
+Arguments mx_representation _ _ _%g _%N.
+Arguments mx_repr _ _ _%g _%N _.
+Arguments group_ring _ _ _%g.
+Arguments regular_repr _ _ _%g.
 
 Arguments centgmxP [R gT G n rG f].
 Arguments rkerP [R gT G n rG x].
@@ -891,7 +891,7 @@ Section OneRepresentation.
 Variable gT : finGroupType.
 
 Variables (G : {group gT}) (n : nat) (rG : mx_representation F G n).
-Arguments Scope rG [group_scope].
+Arguments rG _%group_scope : extra scopes.
 
 Local Notation E_G := (enveloping_algebra_mx rG).
 
@@ -4654,10 +4654,10 @@ End LinearIrr.
 
 End FieldRepr.
 
-Arguments Scope rfix_mx [_ _ group_scope nat_scope _ group_scope].
-Arguments Scope gset_mx [_ _ group_scope group_scope].
-Arguments Scope classg_base [_ _ group_scope group_scope].
-Arguments Scope irrType [_ _ group_scope group_scope].
+Arguments rfix_mx _ _ _%g _%N _ _%g.
+Arguments gset_mx _ _ _%g _%g.
+Arguments classg_base _ _ _%g _%g : extra scopes.
+Arguments irrType _ _ _%g _%g : extra scopes.
 
 Arguments mxmoduleP [F gT G n rG m U].
 Arguments envelop_mxP [F gT G n rG A].
@@ -4681,9 +4681,9 @@ Notation "'Cl" := (Clifford_action _) : action_scope.
 
 Bind Scope irrType_scope with socle_sort.
 Notation "[ 1 sG ]" := (principal_comp sG) : irrType_scope.
-Arguments Scope irr_degree [_ _ Group_scope _ irrType_scope].
-Arguments Scope irr_repr [_ _ Group_scope _ irrType_scope group_scope].
-Arguments Scope irr_mode [_ _ Group_scope _ irrType_scope group_scope].
+Arguments irr_degree _ _ _%G _ _%irr.
+Arguments irr_repr _ _ _%G _ _%irr _%g : extra scopes.
+Arguments irr_mode _ _ _%G _ _%irr _%g : extra scopes.
 Notation "''n_' i" := (irr_degree i) : group_ring_scope.
 Notation "''R_' i" := (Wedderburn_subring i) : group_ring_scope.
 Notation "''e_' i" := (Wedderburn_id i) : group_ring_scope.

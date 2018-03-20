@@ -3724,21 +3724,20 @@ End TermDef.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
-Arguments Scope Add [_ term_scope term_scope].
-Arguments Scope Opp [_ term_scope].
-Arguments Scope NatMul [_ term_scope nat_scope].
-Arguments Scope Mul [_ term_scope term_scope].
-Arguments Scope Mul [_ term_scope term_scope].
-Arguments Scope Inv [_ term_scope].
-Arguments Scope Exp [_ term_scope nat_scope].
-Arguments Scope Equal [_ term_scope term_scope].
-Arguments Scope Unit [_ term_scope].
-Arguments Scope And [_ term_scope term_scope].
-Arguments Scope Or [_ term_scope term_scope].
-Arguments Scope Implies [_ term_scope term_scope].
-Arguments Scope Not [_ term_scope].
-Arguments Scope Exists [_ nat_scope term_scope].
-Arguments Scope Forall [_ nat_scope term_scope].
+Arguments Add _ _%T _%T.
+Arguments Opp _ _%T.
+Arguments NatMul _ _%T _%N.
+Arguments Mul _ _%T _%T.
+Arguments Inv _ _%T.
+Arguments Exp _ _%T _%N.
+Arguments Equal _ _%T _%T.
+Arguments Unit _ _%T.
+Arguments And _ _%T _%T.
+Arguments Or _ _%T _%T.
+Arguments Implies _ _%T _%T.
+Arguments Not _ _%T.
+Arguments Exists _ _%N _%T.
+Arguments Forall _ _%N _%T.
 
 Arguments Bool [R].
 Prenex Implicits Const Add Opp NatMul Mul Exp Bool Unit And Or Implies Not.

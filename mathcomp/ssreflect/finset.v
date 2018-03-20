@@ -130,7 +130,7 @@ Delimit Scope set_scope with SET.
 Bind Scope set_scope with set_type.
 Bind Scope set_scope with set_of.
 Open Scope set_scope.
-Arguments Scope finfun_of_set [_ set_scope].
+Arguments finfun_of_set _ _%SET.
 
 Notation "{ 'set' T }" := (set_of (Phant T))
   (at level 0, format "{ 'set'  T }") : type_scope.

@@ -620,8 +620,8 @@ End FalgebraTheory.
 Delimit Scope aspace_scope with AS.
 Bind Scope aspace_scope with aspace.
 Bind Scope aspace_scope with aspace_of.
-Arguments Scope asval [_ _ aspace_scope].
-Arguments Scope clone_aspace [_ _ vspace_scope aspace_scope _ _].
+Arguments asval _ _ _%AS.
+Arguments clone_aspace _ _ _%VS _%AS _ _.
 
 Notation "{ 'aspace' T }" := (aspace_of (Phant T)) : type_scope.
 Notation "A * B" := (prodv A B) : vspace_scope.

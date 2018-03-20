@@ -89,16 +89,13 @@ Definition divgr A B x := x * (remgr A B x)^-1.
 
 End Defs.
 
-Arguments Scope partial_product [_ group_scope group_scope].
-Arguments Scope semidirect_product [_ group_scope group_scope].
-Arguments Scope central_product [_ group_scope group_scope].
-Arguments Scope complements_to_in [_ group_scope group_scope].
-Arguments Scope splits_over [_ group_scope group_scope].
-Arguments Scope remgr [_ group_scope group_scope group_scope].
-Arguments Scope divgr [_ group_scope group_scope group_scope].
-Arguments partial_product : clear implicits.
-Arguments semidirect_product : clear implicits.
-Arguments central_product : clear implicits.
+Arguments partial_product _ _%g _%g : clear implicits.
+Arguments semidirect_product _ _%g _%g : clear implicits.
+Arguments central_product _ _%g _%g : clear implicits.
+Arguments complements_to_in _ _%g _%g.
+Arguments splits_over _ _%g _%g.
+Arguments remgr _ _%g _%g _%g.
+Arguments divgr _ _%g _%g _%g.
 Arguments direct_product : clear implicits.
 Notation pprod := (partial_product _).
 Notation sdprod := (semidirect_product _).

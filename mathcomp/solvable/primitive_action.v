@@ -43,9 +43,8 @@ Definition primitive :=
 
 End PrimitiveDef.
 
-Arguments Scope imprimitivity_system
-  [_ _ group_scope group_scope action_scope group_scope].
-Arguments Scope primitive [_ _ group_scope group_scope action_scope].
+Arguments imprimitivity_system _ _ _%g _%g _%act _%g.
+Arguments primitive _ _ _%g _%g _%act.
 
 Notation "[ 'primitive' A , 'on' S | to ]" := (primitive A S to)
   (at level 0, format "[ 'primitive'  A ,  'on'  S  |  to ]") : form_scope.
@@ -184,9 +183,8 @@ Qed.
 
 End NTransitive.
 
-Arguments Scope dtuple_on [_ nat_scope group_scope].
-Arguments Scope ntransitive
-  [_ _ nat_scope group_scope group_scope action_scope].
+Arguments dtuple_on _ _%N _%g.
+Arguments ntransitive _ _ _%N _%g _%g _%act.
 Arguments n_act [gT sT] _ [n].
 
 Notation "n .-dtuple ( S )" := (dtuple_on n S)

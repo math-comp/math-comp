@@ -289,9 +289,9 @@ Proof. by rewrite /order => /(<[a]> =P _)->. Qed.
 
 End Cyclic.
 
-Arguments Scope cyclic [_ group_scope].
-Arguments Scope generator [_ group_scope group_scope].
-Arguments Scope expg_invn [_ group_scope nat_scope].
+Arguments cyclic _ _%g.
+Arguments generator _ _%g _%g.
+Arguments expg_invn _ _%g _%N.
 Arguments cyclicP [gT A].
 Prenex Implicits cyclic Zpm generator expg_invn.
 
@@ -556,7 +556,7 @@ Qed.
 
 End Metacyclic.
 
-Arguments Scope metacyclic [_ group_scope].
+Arguments metacyclic _ _%g.
 Prenex Implicits metacyclic.
 Arguments metacyclicP [gT A].
 

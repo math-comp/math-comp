@@ -111,16 +111,16 @@ Definition gen_rank A := #|[arg min_(B < A | <<B>> == A) #|B|]|.
 
 End AbelianDefs.
 
-Arguments Scope exponent [_ group_scope].
-Arguments Scope abelem [_ nat_scope group_scope].
-Arguments Scope is_abelem [_ group_scope].
-Arguments Scope pElem [_ nat_scope group_scope].
-Arguments Scope pnElem [_ nat_scope nat_scope group_scope].
-Arguments Scope nElem [_ nat_scope group_scope].
-Arguments Scope pmaxElem [_ nat_scope group_scope].
-Arguments Scope p_rank [_ nat_scope group_scope].
-Arguments Scope rank [_ group_scope].
-Arguments Scope gen_rank [_ group_scope].
+Arguments exponent _ _%g.
+Arguments abelem _ _%N _%g.
+Arguments is_abelem _ _%g.
+Arguments pElem _ _%N _%g.
+Arguments pnElem _ _%N _%N _%g.
+Arguments nElem _ _%N _%g.
+Arguments pmaxElem _ _%N _%g.
+Arguments p_rank _ _%N _%g.
+Arguments rank _ _%g.
+Arguments gen_rank _ _%g.
 
 Notation "''Ldiv_' n ()" := (Ldiv _ n)
   (at level 8, n at level 2, format "''Ldiv_' n ()") : group_scope.
@@ -192,10 +192,10 @@ Qed.
 
 End Functors.
 
-Arguments Scope Ohm [nat_scope _ group_scope].
-Arguments Scope Ohm_group [nat_scope _ group_scope].
-Arguments Scope Mho [nat_scope _ group_scope].
-Arguments Scope Mho_group [nat_scope _ group_scope].
+Arguments Ohm _%N _ _%g.
+Arguments Ohm_group _%N _ _%g.
+Arguments Mho _%N _ _%g.
+Arguments Mho_group _%N _ _%g.
 Arguments OhmPredP [n gT x].
 
 Notation "''Ohm_' n ( G )" := (Ohm n G)
@@ -2023,8 +2023,8 @@ Qed.
 
 End AbelianStructure.
 
-Arguments Scope abelian_type [_ group_scope].
-Arguments Scope homocyclic [_ group_scope].
+Arguments abelian_type _ _%g.
+Arguments homocyclic _ _%g.
 Prenex Implicits abelian_type homocyclic.
 
 Section IsogAbelian.

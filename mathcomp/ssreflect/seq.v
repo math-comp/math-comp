@@ -169,7 +169,7 @@ Notation Cons T := (@cons T) (only parsing).
 Notation Nil T := (@nil T) (only parsing).
 
 Bind Scope seq_scope with list.
-Arguments Scope cons [type_scope _ seq_scope].
+Arguments cons _%type _ _%SEQ.
 
 (* As :: and ++ are (improperly) declared in Init.datatypes, we only rebind   *)
 (* them here.                                                                 *)

@@ -134,17 +134,17 @@ Coercion Formula : formula >-> type.
 
 (* Declare (implicitly) the argument scope tags. *)
 Notation "1" := Idx : group_presentation.
-Arguments Scope Inv [group_presentation].
-Arguments Scope Exp [group_presentation nat_scope].
-Arguments Scope Mul [group_presentation group_presentation].
-Arguments Scope Conj [group_presentation group_presentation].
-Arguments Scope Comm [group_presentation group_presentation].
-Arguments Scope Eq1 [group_presentation].
-Arguments Scope Eq2 [group_presentation group_presentation].
-Arguments Scope Eq3 [group_presentation group_presentation group_presentation].
-Arguments Scope And [group_presentation group_presentation].
-Arguments Scope Formula [group_presentation].
-Arguments Scope Cast [group_presentation].
+Arguments Inv _%group_presentation.
+Arguments Exp _%group_presentation _%N.
+Arguments Mul _%group_presentation _%group_presentation.
+Arguments Conj _%group_presentation _%group_presentation.
+Arguments Comm _%group_presentation _%group_presentation.
+Arguments Eq1 _%group_presentation.
+Arguments Eq2 _%group_presentation _%group_presentation.
+Arguments Eq3 _%group_presentation _%group_presentation _%group_presentation.
+Arguments And _%group_presentation _%group_presentation.
+Arguments Formula _%group_presentation.
+Arguments Cast _%group_presentation.
 
 Infix "*" := Mul : group_presentation.
 Infix "^+" := Exp : group_presentation.
@@ -160,9 +160,9 @@ Notation "( r1 , r2 , .. , rn )" :=
 
 (* Declare (implicitly) the argument scope tags. *)
 Notation "x : p" := (fun x => Cast p) : nt_group_presentation.
-Arguments Scope Generator [nt_group_presentation].
-Arguments Scope hom [_ group_scope nt_group_presentation].
-Arguments Scope iso [_ group_scope nt_group_presentation].
+Arguments Generator _%nt_group_presentation.
+Arguments hom _ _%group_scope _%nt_group_presentation.
+Arguments  iso _ _%group_scope _%nt_group_presentation.
 
 Notation "x : p" := (Generator (x : p)) : group_presentation.
 

@@ -146,9 +146,9 @@ End Polynomial.
 (* directives take effect.                                         *)
 Bind Scope ring_scope with poly_of.
 Bind Scope ring_scope with polynomial.
-Arguments Scope polyseq [_ ring_scope].
-Arguments Scope poly_inj [_ ring_scope ring_scope _].
-Arguments Scope coefp_head [_ _ nat_scope ring_scope _].
+Arguments polyseq _ _%R.
+Arguments poly_inj _ _%R _%R _.
+Arguments coefp_head _ _ _%N _%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)).
 Notation coefp i := (coefp_head tt i).
 
