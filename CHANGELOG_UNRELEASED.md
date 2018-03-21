@@ -29,6 +29,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added lemmas `foldr_rcons`, `foldl_rcons`, `scanl_rcons` and
   `nth_cons_scanl` in `seq`
 
+- ssrAC tactics, see header of `ssreflect/ssrAC.v` for documentation
+  of `(AC patternshape reordering)`, `(ACl reordering)` `(ACof
+  reordering reordering)`, `op.[AC patternshape reordering]`, `op.[ACl
+  reordering]` and `op.[ACof reordering reordering]`.
+
 ### Changed
 
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.

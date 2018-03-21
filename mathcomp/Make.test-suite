@@ -1,4 +1,5 @@
 test_suite/hierarchy_test.v
+test_suite/test_ssrAC.v
 
 -I .
 -R . mathcomp

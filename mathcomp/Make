@@ -81,6 +81,7 @@ ssreflect/order.v
 ssreflect/path.v
 ssreflect/prime.v
 ssreflect/seq.v
+ssreflect/ssrAC.v
 ssreflect/ssrbool.v
 ssreflect/ssreflect.v
 ssreflect/ssrfun.v
