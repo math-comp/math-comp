@@ -726,7 +726,7 @@ have: forall n, P n -> n >= 0 by [].
 have: acc_nat 0.
   case exP => n; rewrite -(addn0 n); elim: n 0 => [|n IHn] j; first by left.
   by rewrite addSnnS; right; apply: IHn.
-move: 0; fix 2 => m IHm m_lb; case Pm: (P m); first by exists m.
+move: 0; fix find_ex_minn 2 => m IHm m_lb; case Pm: (P m); first by exists m.
 apply: find_ex_minn m.+1 _ _ => [|n Pn]; first by case: IHm; rewrite ?Pm.
 by rewrite ltn_neqAle m_lb //; case: eqP Pm => // -> /idP[].
 Qed.
