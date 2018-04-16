@@ -772,7 +772,7 @@ have sep_pKy: separable_poly (minPoly K y).
 have{sep_pKy} sep_q: separable_poly q by rewrite Dq separable_map in sep_pKy.
 have [r nz_r PETr] := large_field_PET nz_p px0 qy0 sep_q.
 have [[s [Us Ks /ltnW leNs]] | //] := finite_PET (size r).
-have{s Us Ks leNs} /allPn[t /Ks Kt nz_rt]: ~~ all (root r) s.
+have{s Us leNs} /allPn[t {Ks}/Ks Kt nz_rt]: ~~ all (root r) s.
   by apply: contraTN leNs; rewrite -ltnNge => /max_poly_roots->.
 have{PETr} [/= [p1 Dx] [q1 Dy]] := PETr (Subvs Kt) nz_rt.
 set z := t * y - x in Dx Dy; exists z; apply/eqP.
