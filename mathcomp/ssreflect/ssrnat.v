@@ -1596,15 +1596,3 @@ Ltac nat_congr := first
      apply: (congr1 (addn X1) _);
      symmetry
    end ].
-
-Module mc_1_6.
-
-CoInductive compare_nat m n : bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n true false false
-  | CompareNatGt of m > n : compare_nat m n false true false
-  | CompareNatEq of m = n : compare_nat m n false false true.
-
-Lemma ltngtP m n : compare_nat m n (m < n) (n < m) (m == n).
-Proof. by case: ltngtP; constructor. Qed.
-
-End mc_1_6.
