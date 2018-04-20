@@ -4,7 +4,7 @@ ifeq "$(COQBIN)" ""
 COQBIN=$(dir $(shell which coqtop))/
 endif
 
-SRC=$(shell cd ../mathcomp; ls */*.v | grep -v ssrtest/ | grep -v attic/)
+SRC=$(shell cd ../mathcomp; ls */*.v | grep -v attic/)
 HEAD=$(shell git symbolic-ref HEAD)
 ifeq "$(HEAD)" "refs/heads/master"
 LAST=$(shell git tag -l --sort=v:refname "mathcomp-*" | tail -n 1)
