@@ -9,11 +9,7 @@ include ssreflect/Makefile.detect-coq-version
 # this defined coqmakefile
 include ssreflect/Makefile.coq-makefile
 
-ifeq "$V" "v8.4"
-COQDEP=../etc/utils/ssrcoqdep
-else
 COQDEP=$(COQBIN)coqdep
-endif
 
 OLD_MAKEFLAGS:=$(MAKEFLAGS)
 MAKEFLAGS+=-B
