@@ -23,7 +23,8 @@ MAKEFLAGS+=-B
 		-f Makefile.coq $* \
 		COQDEP='$(COQDEP) -exclude-dir plugin -c'
 
-clean:
+clean: 
+	$(H)[ -e Makefile.coq ] || $(call coqmakefile,ssreflect)
 	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
 		-f Makefile.coq clean
 	$(H)rm -f Makefile.coq
