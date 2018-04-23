@@ -1,11 +1,18 @@
-07/09/2016 - compatibility with Coq 8.7 and several small fixes -
+23/04/2018 - compatibility with Coq 8.7 and several small fixes -
 	upcoming version 1.7
-	* Compatibility with Coq 8.7
+	* Compatibility with Coq 8.8 (and >= 8.6)
 	* Lost compatibility with Coq 8.4
 
-	* Library refactoring: algC, complex, ssrnum: Library ssrnum.v now
+	* Integration to Coq: ssrbool.v ssrfun.v and plugin.
+	  ssrtest also moved to Coq test suite.
+
+	* Library refactoring:
+	odd_order and real_closed: are now in separate repositories.
+
+	algC, complex, ssrnum: Library ssrnum.v now
 	provides an interface numClosedFieldType, which factors some
-	theory from both complex and algC. In particular, Re, Im, 'i,
+	theory from both library complex.v (now in the real_closed
+	repository) and algC. In particular, Re, Im, 'i,
 	conjC, n.-root and sqrtC are now part of this generic
 	interface. In case of ambiguity, they can be casted to the type
 	algC, of complex algebraic numbers, via typing constraints. Some
@@ -19,12 +26,20 @@
 	numClosedFieldType interface. The next revision might definitely
 	hide those constructions under a module.
 
+	Lemma dvdn_fact moved from prime to div
+
 	* Structures, changes in interfaces:
 	  numClosedFieldType
 
 	* New Theorems:
-	   dec_factor_theorem, abstract_context,
-	   mul_bin_down, mul_bin_left
+	iter_in, finv_in, inv_f_in, finv_inj_in, fconnect_sym_in,
+	iter_order_in, iter_finv_in, cycle_orbit_in, fpath_finv_in,
+	fpath_finv_f_in, fpath_f_finv_in
+	big_allpairs
+	uniqP, uniqPn
+	dec_factor_theorem,
+	mul_bin_down, mul_bin_left
+        abstract_context (now merged in Coq)
 
 	* Renamed/generalized:
 	  mul_Sm_binm -> mul_bin_diag
@@ -33,14 +48,15 @@
 	  algRe -> Re
 	  algIm -> Im
 	  algCi -> imaginaryC
+  	  reshape_index_leq -> reshape_leq
 	  Every theorem from ssrnum that used to be in algC
 
 	* Generalized or improved:
-	  ltngtP, contra_eq, contra_neq, odd_opp
+	  ltngtP, contra_eq, contra_neq, odd_opp, nth_iota
 
 	* Plugin:
-	  ssrpattern: compatibility with Tactic Notation
-
+	ssrpattern: compatibility with Tactic Notation
+	rewrite /foo now allows foo to be a primitive projection.
 
 24/11/2015 - major reorganization of the archive - version 1.6
 	* Files split into sub-directories: ssreflect, algebra, fingroup,
