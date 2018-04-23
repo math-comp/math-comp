@@ -1,52 +1,49 @@
 07/09/2016 - compatibility with Coq 8.7 and several small fixes -
-	version 1.6.2 and upcomming version 1.7
+	upcoming version 1.7
 	* Compatibility with Coq 8.7
 	* Lost compatibility with Coq 8.4
 
-07/09/2016 - compatibility with Coq 8.7 and several small fixes -
-	upcomming version 1.7
+	* Library refactoring: algC, complex, ssrnum: Library ssrnum.v now
+	provides an interface numClosedFieldType, which factors some
+	theory from both complex and algC. In particular, Re, Im, 'i,
+	conjC, n.-root and sqrtC are now part of this generic
+	interface. In case of ambiguity, they can be casted to the type
+	algC, of complex algebraic numbers, via typing constraints. Some
+	theory was thus made more generic, and the corresponding lemmas,
+	previously defined in library algC.v (e.g. conjCK) now feature an
+	extra, non maximal implicit, parameter
+	(C : numClosedFieldType). This could break some
+	proofs. Additionally, a few ad hoc constructions in library
+	complex.v, e.g. -*+ or complex.Re, are now deprecated and should
+	be replaced by the corresponding ones provided by the
+	numClosedFieldType interface. The next revision might definitely
+	hide those constructions under a module.
+
+	* Structures, changes in interfaces:
+	  numClosedFieldType
+
 	* New Theorems:
 	   dec_factor_theorem, abstract_context,
 	   mul_bin_down, mul_bin_left
 
-	* Renamings or replacements:
+	* Renamed/generalized:
 	  mul_Sm_binm -> mul_bin_diag
 	  divn1 -> divz1 (in intdiv)
-
-	* Generalized or extended:
-	  ltngtP, contra_eq, contra_neq, odd_opp
-
-	* Plugin:
-	  ssrpattern: compose nicely with Tactic Notation
-
-25/08/2016 - refactoring of algC and complex in ssrnum -
-	upcomming version 1.7
-	* ssrnum's interface numClosedFieldType factors some theory from
-	  both complex and algC. Because of that Re, Im, 'i, conjC, n.-root
-	  and sqrtC are not specialized to algC anymore. In case of
-	  ambiguity, they should be instanciated with algC using typing
-	  constraints. Moreoever all the lemmas from ssrnum that used to
-	  be in algC (like conjCK), now take an extra nonmaximal implicit
-	  argument (C : numClosedFieldType) which could break some proofs.
-	  Additionally, ad-hoc constructions from complex.v like -*+ or
-	  complex.Re are now deprecated and one should rely solely on the
-	  ssrnum interface. The next revision might definietly hide those
-	  constructions under a module.
-
-	* Structures that change:
-	  numClosedFieldType
-
-	* Renamed and generalized definitions:
 	  rootC -> nthroot
 	  algRe -> Re
 	  algIm -> Im
 	  algCi -> imaginaryC
-
-	* Renamed and generalized theorems:
 	  Every theorem from ssrnum that used to be in algC
 
+	* Generalized or improved:
+	  ltngtP, contra_eq, contra_neq, odd_opp
+
+	* Plugin:
+	  ssrpattern: compatibility with Tactic Notation
+
+
 24/11/2015 - major reorganization of the archive - version 1.6
-	* Files split into subdirectories: ssreflect, algebra, fingroup,
+	* Files split into sub-directories: ssreflect, algebra, fingroup,
 	  solvable, field and character. In this way the user can decide
 	  to compile only the subset of the Mathematical Components library
 	  that is relevant to her. Note that this introduces a possible
@@ -61,7 +58,7 @@
 		https://github.com/math-comp/ssr-manual
 	  Pull requests improving the documentation are welcome.
 
-	* Renamings or replacements:
+	* Renaming or replacements:
 	  conjC_closed -> cfConjC_closed
 	  class_transr -> class_eqP
 	  cfclass_transl -> cfclass_transr
@@ -102,7 +99,7 @@
 	  spectrum of mathematics.
 
 	* With respect to version 1.4 the proof language got a few new
-	  features related to forward reasoning and some bugfixes. The
+	  features related to forward reasoning and some bug fixes. The
 	  Mathematical Components library features 16 new theory files and in
 	  particular: some field and Galois theory, advanced character theory
 	  and a construction of algebraic numbers.
