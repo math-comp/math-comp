@@ -56,8 +56,8 @@ else
 # variables useful for package construction
   URLLINE="http: \"$ARCHIVEURL\""
   CHECKSUMLINE="checksum: \"$SUM\""
-  PKGS=$(ls -fs -d -1 $EXTRACTED/*/mathcomp/*/ \
-        | sed -r "s?.*mathcomp/([^/]+)/?\1?" \
+  PKGS=$(ls -fs -d -1 $EXTRACTED/*/mathcomp/*/opam \
+        | sed -r "s?.*mathcomp/([^/]+)/opam?\1?" \
         | paste -sd " " -)
   PKGPREFIX="$(git root)/opam/released/packages"
 fi
