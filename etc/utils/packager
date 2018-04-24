@@ -37,15 +37,16 @@ fi
 git rev-parse --verify $TAG
 
 ARCHIVEURL="http://github.com/math-comp/math-comp/archive/$TAG.tar.gz"
+GITROOT=$(git rev-parse --show-toplevel)
 
 # we build the url file content and the list of packages, and where to put them
 if [ $VERSION == "dev" ]
 then
 # variables useful for package construction
   URLLINE="git: \"https://github.com/math-comp/math-comp.git\""
-  PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $(git root)/mathcomp/all/all.v \
+  PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $GITROOT/mathcomp/all/all.v \
         | paste -sd " " -)
-  PKGPREFIX="$(git root)/opam/extra-dev/packages"
+  PKGPREFIX="$GITROOT/opam/extra-dev/packages"
 else
   ARCHIVE=$(mktemp)
   git archive --format=tgz --output=$ARCHIVE \
@@ -59,7 +60,7 @@ else
   PKGS=$(ls -fs -d -1 $EXTRACTED/*/mathcomp/*/opam \
         | sed -r "s?.*mathcomp/([^/]+)/opam?\1?" \
         | paste -sd " " -)
-  PKGPREFIX="$(git root)/opam/released/packages"
+  PKGPREFIX="$GITROOT/opam/released/packages"
 fi
 
 # for each package, we pick the corresponding opam and descr file and
@@ -69,8 +70,8 @@ for pkg in $PKGS
 do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    mkdir -p $pkgdir
    if [ $VERSION == "dev" ]
-   then cp $(git root)/mathcomp/$pkg/opam $pkgdir/opam
-        cp $(git root)/mathcomp/$pkg/descr $pkgdir/descr
+   then cp $GITROOT/mathcomp/$pkg/opam $pkgdir/opam
+        cp $GITROOT/mathcomp/$pkg/descr $pkgdir/descr
    else git show "$BRANCH:mathcomp/$pkg/opam" > $pkgdir/opam
 	git show "$BRANCH:mathcomp/$pkg/descr" > $pkgdir/descr
         sed -r "/^version/s?dev?$VERSION?" -i $pkgdir/opam
