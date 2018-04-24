@@ -1,7 +1,7 @@
-23/04/2018 - compatibility with Coq 8.7 and several small fixes -
-	upcoming version 1.7
-	* Compatibility with Coq 8.8
-	* Lost compatibility with Coq <= 8.5
+24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
+
+	* Added compatibility with Coq 8.8 and lost compatibility with
+	  Coq <= 8.5. This release is compatible with Coq 8.6, 8.7 and 8.8.
 
 	* Integration to Coq: ssrbool.v ssrfun.v and plugin.
 	  ssrtest also moved to Coq test suite.
@@ -17,13 +17,13 @@
 	  conjC, n.-root and sqrtC, previously defined in library algC.v,
 	  are now part of this generic interface. In case of ambiguity,
 	  a cast to type algC, of complex algebraic numbers, can be used to
-	  desambiguate via  typing constraints. Some theory was thus made
+	  disambiguate via  typing constraints. Some theory was thus made
 	  more generic, and the corresponding lemmas, previously defined in
 	  library algC.v (e.g. conjCK) now feature an extra, non maximal
 	  implicit, parameter of type numClosedFieldType. This could break
 	  some proofs.
 
-	Lemma dvdn_fact was moved from library prime.v to library div.v
+	* Lemma dvdn_fact was moved from library prime.v to library div.v
 
 	* Structures, changes in interfaces:
 	  numClosedFieldType
@@ -52,6 +52,7 @@
 	  ltngtP, contra_eq, contra_neq, odd_opp, nth_iota
 
 24/11/2015 - major reorganization of the archive - version 1.6
+
 	* Files split into sub-directories: ssreflect, algebra, fingroup,
 	  solvable, field and character. In this way the user can decide
 	  to compile only the subset of the Mathematical Components library
