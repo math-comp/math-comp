@@ -17,7 +17,7 @@
 	  conjC, n.-root and sqrtC, previously defined in library algC.v,
 	  are now part of this generic interface. In case of ambiguity,
 	  a cast to type algC, of complex algebraic numbers, can be used to
-	  desambiguate via  typing constraints. Some theory was thus made
+	  disambiguate via  typing constraints. Some theory was thus made
 	  more generic, and the corresponding lemmas, previously defined in
 	  library algC.v (e.g. conjCK) now feature an extra, non maximal
 	  implicit, parameter of type numClosedFieldType. This could break
