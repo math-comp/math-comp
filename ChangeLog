@@ -1,45 +1,42 @@
 23/04/2018 - compatibility with Coq 8.7 and several small fixes -
 	upcoming version 1.7
-	* Compatibility with Coq 8.8 (and >= 8.6)
-	* Lost compatibility with Coq 8.4
+	* Compatibility with Coq 8.8
+	* Lost compatibility with Coq <= 8.5
 
 	* Integration to Coq: ssrbool.v ssrfun.v and plugin.
 	  ssrtest also moved to Coq test suite.
 
-	* Library refactoring:
-	odd_order and real_closed: are now in separate repositories.
+	* Cleaning up the github repository: the math-comp repository is
+	  now dedicated to the released material (as in the present
+	  release). For instance, directories real-closed and odd-order now
+	  have their own repository.
 
-	algC, complex, ssrnum: Library ssrnum.v now
-	provides an interface numClosedFieldType, which factors some
-	theory from both library complex.v (now in the real_closed
-	repository) and algC. In particular, Re, Im, 'i,
-	conjC, n.-root and sqrtC are now part of this generic
-	interface. In case of ambiguity, they can be casted to the type
-	algC, of complex algebraic numbers, via typing constraints. Some
-	theory was thus made more generic, and the corresponding lemmas,
-	previously defined in library algC.v (e.g. conjCK) now feature an
-	extra, non maximal implicit, parameter
-	(C : numClosedFieldType). This could break some
-	proofs. Additionally, a few ad hoc constructions in library
-	complex.v, e.g. -*+ or complex.Re, are now deprecated and should
-	be replaced by the corresponding ones provided by the
-	numClosedFieldType interface. The next revision might definitely
-	hide those constructions under a module.
+	* Library refactoring: algC ssrnum: Library ssrnum.v now
+	  provides an interface numClosedFieldType, which abstracts the
+	  theory of algebraic numbers. In particular, Re, Im, 'i,
+	  conjC, n.-root and sqrtC, previously defined in library algC.v,
+	  are now part of this generic interface. In case of ambiguity,
+	  a cast to type algC, of complex algebraic numbers, can be used to
+	  desambiguate via  typing constraints. Some theory was thus made
+	  more generic, and the corresponding lemmas, previously defined in
+	  library algC.v (e.g. conjCK) now feature an extra, non maximal
+	  implicit, parameter of type numClosedFieldType. This could break
+	  some proofs.
 
-	Lemma dvdn_fact moved from prime to div
+	Lemma dvdn_fact was moved from library prime.v to library div.v
 
 	* Structures, changes in interfaces:
 	  numClosedFieldType
 
 	* New Theorems:
-	iter_in, finv_in, inv_f_in, finv_inj_in, fconnect_sym_in,
-	iter_order_in, iter_finv_in, cycle_orbit_in, fpath_finv_in,
-	fpath_finv_f_in, fpath_f_finv_in
-	big_allpairs
-	uniqP, uniqPn
-	dec_factor_theorem,
-	mul_bin_down, mul_bin_left
-        abstract_context (now merged in Coq)
+	  iter_in, finv_in, inv_f_in, finv_inj_in, fconnect_sym_in,
+	  iter_order_in, iter_finv_in, cycle_orbit_in, fpath_finv_in,
+	  fpath_finv_f_in, fpath_f_finv_in
+	  big_allpairs
+	  uniqP, uniqPn
+	  dec_factor_theorem,
+	  mul_bin_down, mul_bin_left
+          abstract_context (now merged in Coq)
 
 	* Renamed/generalized:
 	  mul_Sm_binm -> mul_bin_diag
@@ -53,10 +50,6 @@
 
 	* Generalized or improved:
 	  ltngtP, contra_eq, contra_neq, odd_opp, nth_iota
-
-	* Plugin:
-	ssrpattern: compatibility with Tactic Notation
-	rewrite /foo now allows foo to be a primitive projection.
 
 24/11/2015 - major reorganization of the archive - version 1.6
 	* Files split into sub-directories: ssreflect, algebra, fingroup,
