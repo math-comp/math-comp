@@ -1,52 +1,58 @@
-07/09/2016 - compatibility with Coq 8.7 and several small fixes -
-	version 1.6.2 and upcomming version 1.7
-	* Compatibility with Coq 8.7
-	* Lost compatibility with Coq 8.4
+23/04/2018 - compatibility with Coq 8.7 and several small fixes -
+	upcoming version 1.7
+	* Compatibility with Coq 8.8
+	* Lost compatibility with Coq <= 8.5
 
-07/09/2016 - compatibility with Coq 8.7 and several small fixes -
-	upcomming version 1.7
-	* New Theorems:
-	   dec_factor_theorem, abstract_context,
-	   mul_bin_down, mul_bin_left
+	* Integration to Coq: ssrbool.v ssrfun.v and plugin.
+	  ssrtest also moved to Coq test suite.
 
-	* Renamings or replacements:
-	  mul_Sm_binm -> mul_bin_diag
-	  divn1 -> divz1 (in intdiv)
+	* Cleaning up the github repository: the math-comp repository is
+	  now dedicated to the released material (as in the present
+	  release). For instance, directories real-closed and odd-order now
+	  have their own repository.
 
-	* Generalized or extended:
-	  ltngtP, contra_eq, contra_neq, odd_opp
+	* Library refactoring: algC ssrnum: Library ssrnum.v now
+	  provides an interface numClosedFieldType, which abstracts the
+	  theory of algebraic numbers. In particular, Re, Im, 'i,
+	  conjC, n.-root and sqrtC, previously defined in library algC.v,
+	  are now part of this generic interface. In case of ambiguity,
+	  a cast to type algC, of complex algebraic numbers, can be used to
+	  desambiguate via  typing constraints. Some theory was thus made
+	  more generic, and the corresponding lemmas, previously defined in
+	  library algC.v (e.g. conjCK) now feature an extra, non maximal
+	  implicit, parameter of type numClosedFieldType. This could break
+	  some proofs.
 
-	* Plugin:
-	  ssrpattern: compose nicely with Tactic Notation
+	Lemma dvdn_fact was moved from library prime.v to library div.v
 
-25/08/2016 - refactoring of algC and complex in ssrnum -
-	upcomming version 1.7
-	* ssrnum's interface numClosedFieldType factors some theory from
-	  both complex and algC. Because of that Re, Im, 'i, conjC, n.-root
-	  and sqrtC are not specialized to algC anymore. In case of
-	  ambiguity, they should be instanciated with algC using typing
-	  constraints. Moreoever all the lemmas from ssrnum that used to
-	  be in algC (like conjCK), now take an extra nonmaximal implicit
-	  argument (C : numClosedFieldType) which could break some proofs.
-	  Additionally, ad-hoc constructions from complex.v like -*+ or
-	  complex.Re are now deprecated and one should rely solely on the
-	  ssrnum interface. The next revision might definietly hide those
-	  constructions under a module.
-
-	* Structures that change:
+	* Structures, changes in interfaces:
 	  numClosedFieldType
 
-	* Renamed and generalized definitions:
+	* New Theorems:
+	  iter_in, finv_in, inv_f_in, finv_inj_in, fconnect_sym_in,
+	  iter_order_in, iter_finv_in, cycle_orbit_in, fpath_finv_in,
+	  fpath_finv_f_in, fpath_f_finv_in
+	  big_allpairs
+	  uniqP, uniqPn
+	  dec_factor_theorem,
+	  mul_bin_down, mul_bin_left
+          abstract_context (now merged in Coq)
+
+	* Renamed/generalized:
+	  mul_Sm_binm -> mul_bin_diag
+	  divn1 -> divz1 (in intdiv)
 	  rootC -> nthroot
 	  algRe -> Re
 	  algIm -> Im
 	  algCi -> imaginaryC
-
-	* Renamed and generalized theorems:
+  	  reshape_index_leq -> reshape_leq
 	  Every theorem from ssrnum that used to be in algC
 
+	* Generalized or improved:
+	  ltngtP, contra_eq, contra_neq, odd_opp, nth_iota
+
 24/11/2015 - major reorganization of the archive - version 1.6
-	* Files split into subdirectories: ssreflect, algebra, fingroup,
+	* Files split into sub-directories: ssreflect, algebra, fingroup,
 	  solvable, field and character. In this way the user can decide
 	  to compile only the subset of the Mathematical Components library
 	  that is relevant to her. Note that this introduces a possible
@@ -61,7 +67,7 @@
 		https://github.com/math-comp/ssr-manual
 	  Pull requests improving the documentation are welcome.
 
-	* Renamings or replacements:
+	* Renaming or replacements:
 	  conjC_closed -> cfConjC_closed
 	  class_transr -> class_eqP
 	  cfclass_transl -> cfclass_transr
@@ -102,7 +108,7 @@
 	  spectrum of mathematics.
 
 	* With respect to version 1.4 the proof language got a few new
-	  features related to forward reasoning and some bugfixes. The
+	  features related to forward reasoning and some bug fixes. The
 	  Mathematical Components library features 16 new theory files and in
 	  particular: some field and Galois theory, advanced character theory
 	  and a construction of algebraic numbers.
