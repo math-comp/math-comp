@@ -76,3 +76,54 @@ This particular example can be problematic if matrix.v is imported because then,
   + Elements of another ring should be named `x`, `y`, `z`, `u`, `v`, `w`, ...
   + Polynomials should be named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
   + Matrices should be named `A`, `B`, ..., `M`, `N`, ...
+  
+### Naming conventions (Non exhaustive)
+#### Names in the library usually obey one of following the convention
+ - `(condition_)?mainSymbol_suffixes`
+ - `mainSymbol_suffixes(_condition)?`
+Or in the presence of a property denoted by a nary or unary predicate:
+ - `naryPredicate_mainSymbol+`
+ - `mainSymbol_unaryPredicate`
+#### Where :
+ - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object ofstudy, head symbol or not. It is usually either
+  - one of the main symbols of the theory at hand. For example, it will be `opp`, `add`, `mul`, etc...
+  - or a special "canonical" operation, such as a ring morphism or a
+    subtype predicate. e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc ...
+ - "condition" is used when the lemma applies under some hypothesis.
+ - "suffixes" are there to refine what shape and/or what other symbols  the lemma has. It can either be the name of a symbol ("add", "mul",  etc...), or the (short) name of a predicate ("`inj`" for "`injectivity`", "`id`" for "identity", ...) or an abbreviation.
+Abbreviations are in the header of the file which introduce them. We list here the main abbreviations.
+  - A -- associativity, as in `andbA : associative andb.`
+  - AC -- right commutativity.
+  - ACA -- self-interchange (inner commutativity), e.g., `orbACA : (a || b) || (c || d) = (a || c) || (b || d).`
+  - b -- a boolean argument, as in `andbb : idempotent andb.`
+  - C -- commutativity, as in `andbC : commutative andb`,
+    or predicate complement, as in `predC.`
+  - CA -- left commutativity.
+  - D -- predicate difference, as in `predD.`
+  - E -- elimination, as in `negbFE : ~~ b = false -> b`.
+  - F or f -- boolean false, as in `andbF : b && false = false.`
+  - I -- left/right injectivity, as in `addbI : right_injective addb` or predicate  intersection, as in `predI.`
+  - l -- a left-hand operation, as `andb_orl : left_distributive andb orb.`
+  - N or n -- boolean negation, as in `andbN : a && (~~ a) = false.`
+  - n -- alternatively, it is a natural number argument
+  - P -- a characteristic property, often a reflection lemma, as in
+     `andP : reflect (a /\ b) (a && b)`.
+  - r -- a right-hand operation, as `orb_andr : right_distributive orb andb.`
+      -- alternatively, it is a ring argument
+  - T or t -- boolean truth, as in `andbT: right_id true andb.`
+  - U -- predicate union, as in `predU`.
+  - W -- weakening, as in `in1W : {in D, forall x, P} -> forall x, P.`
+  - 0 -- ring 0, as in `addr0 : x + 0 = x.`
+  - 1 -- ring 1, as in `mulr1 : x * 1 = x.`
+  - D -- ring addition, as in `linearD : f (u + v) = f u + f v.`
+  - B -- ring subtraction, as in `opprB : - (x - y) = y - x.`
+  - M -- ring multiplication, as in `invfM : (x * y)^-1 = x^-1 * y^-1.`
+  - Mn -- ring by nat multiplication, as in `raddfMn : f (x *+ n) = f x *+ n.`
+  - mx -- a matrix argument
+  - N -- ring opposite, as in `mulNr : (- x) * y = - (x * y).`
+  - V -- ring inverse, as in `mulVr : x^-1 * x = 1.`
+  - X -- ring exponentiation, as in `rmorphX : f (x ^+ n) = f x ^+ n.`
+  - Z -- (left) module scaling, as in `linearZ : f (a *: v)  = s *: f v.`
+  - z -- a int operation
+#### Typical search pattern
+`Search _ "prefix" "suffix"* (symbol|pattern)* in library.`
