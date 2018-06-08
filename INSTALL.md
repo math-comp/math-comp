@@ -31,6 +31,17 @@ opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
 opam install coq-mathcomp-ssreflect.dev -j3
 ```
 
+## Compilation and installation in a dedicated OPAM root
+
+If you want to install the library in a sedicated environment
+(lets name it `MC`) which
+will remain independed from your current OPAM setup you can:
+```
+opam init --root=$PWD/MC
+eval `opam config env --root=$PWD/MC`
+```
+After that the instructions above apply.
+
 ## Compilation and installation with make
 
 The instructions assume you are in the `mathcomp` directory and that
