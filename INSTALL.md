@@ -33,14 +33,18 @@ opam install coq-mathcomp-ssreflect.dev -j3
 
 ## Compilation and installation in a dedicated OPAM root
 
-If you want to install the library in a sedicated environment
-(lets name it `MC`) which
-will remain independed from your current OPAM setup you can:
+If you want to install the library in a dedicated environment
+(let's name it `MC`) which will remain independent from your
+current OPAM setup you can run the following commands:
 ```
 opam init --root=$PWD/MC
 eval `opam config env --root=$PWD/MC`
 ```
-After that the instructions above apply.
+After that the installations instructions above apply.
+
+Coq and the library are installed in the `$PWD/MC` directory
+(called an OPAM root). To discard the OPAM root, simply delete
+the directory.
 
 ## Compilation and installation with make
 
