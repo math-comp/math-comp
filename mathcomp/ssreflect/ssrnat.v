@@ -361,6 +361,12 @@ Proof. by rewrite eqn_leq (leqNgt n) => ->. Qed.
 Lemma ltn_eqF m n : m < n -> m == n = false.
 Proof. by move/gtn_eqF; rewrite eq_sym. Qed.
 
+Lemma ltn_geF m n : m < n -> m >= n = false.
+Proof. by rewrite (leqNgt n) => ->. Qed.
+
+Lemma leq_gtF m n : m <= n -> m > n = false.
+Proof. by rewrite (ltnNge n) => ->. Qed.
+
 Lemma leq_eqVlt m n : (m <= n) = (m == n) || (m < n).
 Proof. by elim: m n => [|m IHm] []. Qed.
 
@@ -1374,6 +1380,132 @@ Proof.
 rewrite -[4]/(2 * 2) -mulnA mul2n -addnn sqrnD; apply/leqifP.
 by rewrite ltn_add2r eqn_add2r ltn_neqAle !nat_Cauchy; case: ifP => ->.
 Qed.
+
+Section NatHomomorphism.
+Variable T : Type.
+
+Lemma homo_ltn_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
+  (forall y x z, r x y -> r y z -> r x z) ->
+  {in D &, forall i j k, i < k < j -> k \in D} ->
+  {in D, forall i, i.+1 \in D -> r (f i) (f i.+1)} ->
+  {in D &, {homo f : i j / i < j >-> r i j}}.
+Proof.
+move=> r_trans Dcx r_incr i j iD jD lt_ij; move: (lt_ij) (jD) => /subnKC<-.
+elim: (_ - _) => [|k ihk]; first by rewrite addn0 => Dsi; apply: r_incr.
+move=> DSiSk [: DSik]; apply: (r_trans _ _ _ (ihk _)); rewrite ?addnS.
+  by abstract: DSik; apply: (Dcx _ _ iD DSiSk); rewrite ltn_addr ?addnS /=.
+by apply: r_incr; rewrite -?addnS.
+Qed.
+
+Lemma homo_ltn (f : nat -> T) (r : T -> T -> Prop) :
+  (forall y x z, r x y -> r y z -> r x z) ->
+  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i < j >-> r i j}.
+Proof. by move=> /(@homo_ltn_in predT f) fr fS i j; apply: fr. Qed.
+
+Lemma homo_leq_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
+  (forall x, r x x) -> (forall y x z, r x y -> r y z -> r x z) ->
+  {in D &, forall i j k, i < k < j -> k \in D} ->
+  {in D, forall i, i.+1 \in D -> r (f i) (f i.+1)} ->
+  {in D &, {homo f : i j / i <= j >-> r i j}}.
+Proof.
+move=> r_refl r_trans Dcx /(homo_ltn_in r_trans Dcx) lt_r i j iD jD.
+by rewrite leq_eqVlt => /predU1P[->//|/lt_r]; apply.
+Qed.
+
+Lemma homo_leq (f : nat -> T) (r : T -> T -> Prop) :
+   (forall x, r x x) -> (forall y x z, r x y -> r y z -> r x z) ->
+  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i <= j >-> r i j}.
+Proof. by move=> rrefl /(@homo_leq_in predT f r) fr fS i j; apply: fr. Qed.
+
+Section NatToNat.
+Variable (f : nat -> nat).
+
+Let ltn_neqAle := ltn_neqAle.
+Let gtn_neqAge x y : (y < x) = (x != y) && (y <= x).
+Proof. by rewrite ltn_neqAle eq_sym. Qed.
+Let anti_leq := anti_leq.
+Let anti_geq : antisymmetric geq.
+Proof. by move=> m n /=; rewrite andbC => /anti_leq. Qed.
+Let leq_total := leq_total.
+
+Lemma ltnW_homo : {homo f : m n / m < n} -> {homo f : m n / m <= n}.
+Proof. exact: homoW. Qed.
+
+Lemma homo_inj_lt : injective f -> {homo f : m n / m <= n} ->
+  {homo f : m n / m < n}.
+Proof. exact: inj_homo. Qed.
+
+Lemma ltnW_nhomo : {homo f : m n /~ m < n} -> {homo f : m n /~ m <= n}.
+Proof. exact: homoW. Qed.
+
+Lemma nhomo_inj_lt : injective f -> {homo f : m n /~ m <= n} ->
+  {homo f : m n /~ m < n}.
+Proof. exact: inj_homo. Qed.
+
+Lemma incrn_inj : {mono f : m n / m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma decrn_inj : {mono f : m n /~ m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma leqW_mono : {mono f : m n / m <= n} -> {mono f : m n / m < n}.
+Proof. exact: anti_mono. Qed.
+
+Lemma leqW_nmono : {mono f : m n /~ m <= n} -> {mono f : m n /~ m < n}.
+Proof. exact: anti_mono. Qed.
+
+Lemma leq_mono : {homo f : m n / m < n} -> {mono f : m n / m <= n}.
+Proof. exact: total_homo_mono. Qed.
+
+Lemma leq_nmono : {homo f : m n /~ m < n} -> {mono f : m n /~ m <= n}.
+Proof. exact: total_homo_mono. Qed.
+
+Variable (D D' : pred nat).
+
+Lemma ltnW_homo_in : {in D & D', {homo f : m n / m < n}} ->
+  {in D & D', {homo f : m n / m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltnW_nhomo_in : {in D & D', {homo f : m n /~ m < n}} ->
+                 {in D & D', {homo f : m n /~ m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma homo_inj_lt_in : {in D & D', injective f} ->
+                        {in D & D', {homo f : m n / m <= n}} ->
+  {in D & D', {homo f : m n / m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma nhomo_inj_lt_in : {in D & D', injective f} ->
+                        {in D & D', {homo f : m n /~ m <= n}} ->
+  {in D & D', {homo f : m n /~ m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma incrn_inj_in : {in D &, {mono f : m n / m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma decrn_inj_in : {in D &, {mono f : m n /~ m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma leqW_mono_in : {in D &, {mono f : m n / m <= n}} ->
+  {in D &, {mono f : m n / m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma leqW_nmono_in : {in D &, {mono f : m n /~ m <= n}} ->
+  {in D &, {mono f : m n /~ m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma leq_mono_in : {in D &, {homo f : m n / m < n}} ->
+  {in D &, {mono f : m n / m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
+
+Lemma leq_nmono_in : {in D &, {homo f : m n /~ m < n}} ->
+  {in D &, {mono f : m n /~ m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
+
+End NatToNat.
+End NatHomomorphism.
 
 (* Support for larger integers. The normal definitions of +, - and even  *)
 (* IO are unsuitable for Peano integers larger than 2000 or so because   *)

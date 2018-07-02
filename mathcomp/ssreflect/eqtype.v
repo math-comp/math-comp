@@ -230,11 +230,26 @@ Proof. by move=> imp /eqP; apply: contraTF. Qed.
 Lemma contra_eqT b x y : (~~ b -> x != y) -> x = y -> b.
 Proof. by move=> imp /eqP; apply: contraLR. Qed.
 
+Lemma contra_neqN b x y : (b -> x = y) -> x != y -> ~~ b.
+Proof. by move=> imp; apply: contraNN => /imp->. Qed.
+
+Lemma contra_neqF b x y : (b -> x = y) -> x != y -> b = false.
+Proof. by move=> imp; apply: contraNF => /imp->. Qed.
+
+Lemma contra_neqT b x y : (~~ b -> x = y) -> x != y -> b.
+Proof. by move=> imp; apply: contraNT => /imp->. Qed.
+
 Lemma contra_eq z1 z2 x1 x2 : (x1 != x2 -> z1 != z2) -> z1 = z2 -> x1 = x2.
 Proof. by move=> imp /eqP; apply: contraTeq. Qed.
 
 Lemma contra_neq z1 z2 x1 x2 : (x1 = x2 -> z1 = z2) -> z1 != z2 -> x1 != x2.
 Proof. by move=> imp; apply: contraNneq => /imp->. Qed.
+
+Lemma contra_neq_eq z1 z2 x1 x2 : (x1 != x2 -> z1 = z2) -> z1 != z2 -> x1 = x2.
+Proof. by move=> imp; apply: contraNeq => /imp->. Qed.
+
+Lemma contra_eq_neq z1 z2 x1 x2 : (z1 = z2 -> x1 != x2) -> x1 = x2 -> z1 != z2.
+Proof. by move=> imp; apply: contra_eqN => /eqP /imp. Qed.
 
 Lemma memPn A x : reflect {in A, forall y, y != x} (x \notin A).
 Proof.
@@ -882,3 +897,103 @@ End SumEqType.
 
 Arguments sum_eq {T1 T2} !u !v.
 Arguments sum_eqP {T1 T2 x y}.
+
+Section MonoHomoTheory.
+
+Variables (aT rT : eqType) (f : aT -> rT).
+Variables (aR aR' : rel aT) (rR rR' : rel rT).
+
+Hypothesis aR_refl : reflexive aR.
+Hypothesis rR_refl : reflexive rR.
+Hypothesis aR'E : forall x y, aR' x y = (x != y) && (aR x y).
+Hypothesis rR'E : forall x y, rR' x y = (x != y) && (rR x y).
+
+Let aRE x y : aR x y = (x == y) || (aR' x y).
+Proof. by rewrite aR'E; case: (altP eqP) => //= ->; apply: aR_refl. Qed.
+Let rRE x y : rR x y = (x == y) || (rR' x y).
+Proof. by rewrite rR'E; case: (altP eqP) => //= ->; apply: rR_refl. Qed.
+
+Section InDom.
+Variable D : pred aT.
+
+Section DifferentDom.
+Variable D' : pred aT.
+
+Lemma homoW_in : {in D & D', {homo f : x y / aR' x y >-> rR' x y}} ->
+                 {in D & D', {homo f : x y / aR x y >-> rR x y}}.
+Proof.
+move=> mf x y xD yD /=; rewrite aRE => /orP[/eqP->|/mf];
+by rewrite rRE ?eqxx // orbC => ->.
+Qed.
+
+Lemma inj_homo_in : {in D & D', injective f} ->
+  {in D & D', {homo f : x y / aR x y >-> rR x y}} ->
+  {in D & D', {homo f : x y / aR' x y >-> rR' x y}}.
+Proof.
+move=> fI mf x y xD yD /=; rewrite aR'E rR'E => /andP[neq_xy xy].
+by rewrite mf ?andbT //; apply: contra_neq neq_xy => /fI; apply.
+Qed.
+
+End DifferentDom.
+
+Hypothesis aR_anti : antisymmetric aR.
+Hypothesis rR_anti : antisymmetric rR.
+
+Lemma mono_inj_in : {in D &, {mono f : x y / aR x y >-> rR x y}} ->
+                 {in D &, injective f}.
+Proof. by move=> mf x y ?? eqf; apply/aR_anti; rewrite -!mf// eqf rR_refl. Qed.
+
+Lemma anti_mono_in : {in D &, {mono f : x y / aR x y >-> rR x y}} ->
+                     {in D &, {mono f : x y / aR' x y >-> rR' x y}}.
+Proof.
+move=> mf x y ??; rewrite rR'E aR'E mf// (@inj_in_eq _ _ D)//.
+exact: mono_inj_in.
+Qed.
+
+Lemma total_homo_mono_in : total aR ->
+    {in D &, {homo f : x y / aR' x y >-> rR' x y}} ->
+   {in D &, {mono f : x y / aR x y >-> rR x y}}.
+Proof.
+move=> aR_tot mf x y xD yD.
+have [->|neq_xy] := altP (x =P y); first by rewrite ?eqxx ?aR_refl ?rR_refl.
+have [xy|] := (boolP (aR x y)); first by rewrite rRE mf ?orbT// aR'E neq_xy.
+have /orP [->//|] := aR_tot x y.
+rewrite aRE eq_sym (negPf neq_xy) /= => /mf -/(_ yD xD).
+rewrite rR'E => /andP[Nfxfy fyfx] _; apply: contra_neqF Nfxfy => fxfy.
+by apply/rR_anti; rewrite fyfx fxfy.
+Qed.
+
+End InDom.
+
+Let D := @predT aT.
+
+Lemma homoW : {homo f : x y / aR' x y >-> rR' x y} ->
+                 {homo f : x y / aR x y >-> rR x y}.
+Proof. by move=> mf ???; apply: (@homoW_in D D) => // ????; apply: mf. Qed.
+
+Lemma inj_homo : injective f ->
+  {homo f : x y / aR x y >-> rR x y} ->
+  {homo f : x y / aR' x y >-> rR' x y}.
+Proof.
+by move=> fI mf ???; apply: (@inj_homo_in D D) => //????; [apply: fI|apply: mf].
+Qed.
+
+Hypothesis aR_anti : antisymmetric aR.
+Hypothesis rR_anti : antisymmetric rR.
+
+Lemma mono_inj : {mono f : x y / aR x y >-> rR x y} -> injective f.
+Proof. by move=> mf x y eqf; apply/aR_anti; rewrite -!mf eqf rR_refl. Qed.
+
+Lemma anti_mono : {mono f : x y / aR x y >-> rR x y} ->
+                  {mono f : x y / aR' x y >-> rR' x y}.
+Proof. by move=> mf x y; rewrite rR'E aR'E mf inj_eq //; apply: mono_inj. Qed.
+
+Lemma total_homo_mono : total aR ->
+    {homo f : x y / aR' x y >-> rR' x y} ->
+   {mono f : x y / aR x y >-> rR x y}.
+Proof.
+move=> /(@total_homo_mono_in D rR_anti) hmf hf => x y.
+by apply: hmf => // ?? _ _; apply: hf.
+Qed.
+
+End MonoHomoTheory.

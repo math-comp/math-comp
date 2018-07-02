@@ -890,3 +890,46 @@ End CycleArc.
 
 Prenex Implicits arc.
 
+Section Homomorphism.
+
+Variables (T : eqType) (r : rel T).
+
+Hypothesis r_trans : transitive r.
+
+Lemma sorted_lt_nth x0 (s : seq T) : sorted r s ->
+  {in [pred n | n < size s] &, {homo nth x0 s : i j / i < j >-> r i j}}.
+Proof.
+move=> s_sorted i j; rewrite -!topredE /=.
+wlog ->: i j s s_sorted / i = 0 => [/(_ 0 (j - i) (drop i s)) hw|] ilt jlt ltij.
+  move: hw; rewrite !size_drop !nth_drop addn0 subnKC ?(ltnW ltij) //.
+  by rewrite (subseq_sorted _ (drop_subseq _ _)) ?subn_gt0 ?ltn_sub2r//; apply.
+case: s ilt j jlt ltij => [|x s] //= _ [//|j] jlt _ in s_sorted *.
+by have /allP -> //= := order_path_min r_trans s_sorted; rewrite mem_nth.
+Qed.
+
+Lemma ltn_index (s : seq T) : sorted r s ->
+  {in s &, forall x y, index x s < index y s -> r x y}.
+Proof.
+case: s => [//|x0 s'] r_sorted x y xs ys.
+move=> /(@sorted_lt_nth x0 (x0 :: s')).
+by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
+Qed.
+
+Hypothesis r_refl : reflexive r.
+
+Lemma sorted_le_nth x0 (s : seq T) : sorted r s ->
+  {in [pred n | n < size s] &, {homo nth x0 s : i j / i <= j >-> r i j}}.
+Proof.
+move=> s_sorted x y xs ys.
+by rewrite leq_eqVlt=> /orP[/eqP->//|/sorted_lt_nth]; apply.
+Qed.
+
+Lemma leq_index (s : seq T) : sorted r s ->
+  {in s &, forall x y, index x s <= index y s -> r x y}.
+Proof.
+case: s => [//|x0 s'] r_sorted x y xs ys.
+move=> /(@sorted_le_nth x0 (x0 :: s')).
+by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
+Qed.
+
+End Homomorphism.

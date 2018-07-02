@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat seq choice.
+Require Import ssrfun ssrbool eqtype ssrnat seq choice path.
 
 (******************************************************************************)
 (*    The Finite interface describes Types with finitely many elements,       *)
@@ -942,17 +942,19 @@ Notation "'forall_in_ view" := (forall_inPP _ (fun _ => view))
 
 Section Extrema.
 
+Variant extremum_spec {T : eqType} {I : finType}
+  (P : pred I) (F : I -> T) (ord : rel T) : I -> Type :=
+  ExtremumSpec (i : I) of P i & (forall j : I, P j -> ord (F i) (F j)) :
+                   extremum_spec P F ord i.
+
+Let arg_pred {T : eqType} {I : finType} (P : pred I) (F : I -> T) ord :=
+  [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
+
+Section ArgMin.
+
 Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat).
 
-Let arg_pred ord := [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
-
-Definition arg_min := odflt i0 (pick (arg_pred leq)).
-
-Definition arg_max := odflt i0 (pick (arg_pred geq)).
-
-Variant extremum_spec (ord : rel nat) : I -> Type :=
-  ExtremumSpec i of P i & (forall j, P j -> ord (F i) (F j))
-    : extremum_spec ord i.
+Definition arg_min := odflt i0 (pick (arg_pred P F leq)).
 
 Hypothesis Pi0 : P i0.
 
@@ -961,7 +963,7 @@ Let FP_F i : P i -> FP (F i).
 Proof. by move=> Pi; apply/existsP; exists i; rewrite Pi /=. Qed.
 Let exFP : exists n, FP n. Proof. by exists (F i0); apply: FP_F. Qed.
 
-Lemma arg_minP : extremum_spec leq arg_min.
+Lemma arg_minP : extremum_spec P F leq arg_min.
 Proof.
 rewrite /arg_min; case: pickP => [i /andP[Pi /forallP/= min_i] | no_i].
   by split=> // j; apply/implyP.
@@ -970,18 +972,48 @@ apply: contraFF (no_i i) => /andP[Pi /eqP def_n]; rewrite /= Pi.
 by apply/forall_inP=> j Pj; rewrite def_n min_i ?FP_F.
 Qed.
 
-Lemma arg_maxP : extremum_spec geq arg_max.
+End ArgMin.
+
+Section Extremum.
+
+Context {T : eqType} {I : finType}.
+Context (i0 : I) (P : pred I) (F : I -> T) (ord : rel T).
+
+Hypothesis ord_refl : reflexive ord.
+Hypothesis ord_trans : transitive ord.
+Hypothesis ord_total : total ord.
+
+Definition extremum := odflt i0 (pick (arg_pred P F ord)).
+
+Hypothesis Pi0 : P i0.
+
+Lemma extremumP : extremum_spec P F ord extremum.
 Proof.
-rewrite /arg_max; case: pickP => [i /andP[Pi /forall_inP/= max_i] | no_i].
+rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
   by split=> // j; apply/implyP.
-have (n): FP n -> n <= foldr maxn 0 (map F (enum P)).
-  case/existsP=> i; rewrite -[P i]mem_enum andbC /= => /andP[/eqP <-].
-  elim: (enum P) => //= j e IHe; rewrite leq_max orbC !inE.
-  by case/predU1P=> [-> | /IHe-> //]; rewrite leqnn orbT.
-case/ex_maxnP=> // n ex_i max_i; case/pred0P: ex_i => i /=.
-apply: contraFF (no_i i) => /andP[Pi def_n]; rewrite /= Pi.
-by apply/forall_inP=> j Pj; rewrite (eqP def_n) max_i ?FP_F.
+pose s := sort ord [seq F i | i <- enum I]; have F_in i : F i \in s.
+  by rewrite mem_sort; apply/mapP; exists i; rewrite ?mem_enum.
+have [i Pi le_index] := arg_minP (fun i => index (F i) s) Pi0.
+have /negP[] := no_i i; rewrite /= Pi /=; apply/forall_inP => j /le_index sij.
+by apply: leq_index sij => //; rewrite sort_sorted.
 Qed.
+
+End Extremum.
+
+Section ArgMax.
+
+Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat) (Pi0 : P i0).
+
+Definition arg_max := extremum i0 P F geq.
+
+Lemma arg_maxP : extremum_spec P F geq arg_max.
+Proof.
+apply: extremumP => //; first exact: leqnn.
+  by move=> n m p mn np; apply: leq_trans mn.
+by move=> ??; apply: leq_total.
+Qed.
+
+End ArgMax.
 
 End Extrema.
 

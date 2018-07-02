@@ -1842,6 +1842,12 @@ Proof. by rewrite -[s1 in subseq s1]cats0 cat_subseq ?sub0seq. Qed.
 Lemma suffix_subseq s1 s2 : subseq s2 (s1 ++ s2).
 Proof. exact: cat_subseq (sub0seq s1) _. Qed.
 
+Lemma take_subseq s i : subseq (take i s) s.
+Proof. by rewrite -[s in X in subseq _ X](cat_take_drop i) prefix_subseq. Qed.
+
+Lemma drop_subseq s i : subseq (drop i s) s.
+Proof. by rewrite -[s in X in subseq _ X](cat_take_drop i) suffix_subseq. Qed.
+
 Lemma mem_subseq s1 s2 : subseq s1 s2 -> {subset s1 <= s2}.
 Proof. by case/subseqP=> m _ -> x; apply: mem_mask. Qed.
 
