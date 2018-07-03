@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
 From mathcomp
-Require Import bigop ssralg binomial.
+Require Import bigop ssralg binomial tuple.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
@@ -359,6 +359,9 @@ Proof. by apply: (iffP idP); rewrite size_poly_leq0; move/eqP. Qed.
 Lemma size_poly_gt0 p : (0 < size p) = (p != 0).
 Proof. by rewrite lt0n size_poly_eq0. Qed.
 
+Lemma gt_size_poly_neq0 p n : (size p > n)%N -> p != 0.
+Proof. by move=> /(leq_ltn_trans _) h; rewrite -size_poly_eq0 lt0n_neq0 ?h. Qed.
+
 Lemma nil_poly p : nilp p = (p == 0).
 Proof. exact: size_poly_eq0. Qed.
 
@@ -383,6 +386,9 @@ apply: (iffP eqP) => [pC | [c nz_c ->]]; last by rewrite size_polyC nz_c.
 have def_p: p = (p`_0)%:P by rewrite -size1_polyC ?pC.
 by exists p`_0; rewrite // -polyC_eq0 -def_p -size_poly_eq0 pC.
 Qed.
+
+Lemma size_polyC_leq1 (c : R) : (size c%:P <= 1)%N.
+Proof. by rewrite size_polyC; case: (c == 0). Qed.
 
 Lemma leq_sizeP p i : reflect (forall j, i <= j -> p`_j = 0) (size p <= i).
 Proof.
@@ -460,6 +466,9 @@ Proof.
 move=> ltqp; rewrite /lead_coef coefD size_addl //.
 by rewrite addrC nth_default ?simp // -ltnS (ltn_predK ltqp).
 Qed.
+
+Lemma lead_coefDr p q : size q > size p -> lead_coef (p + q) = lead_coef q.
+Proof. by move/lead_coefDl<-; rewrite addrC. Qed.
 
 (* Polynomial ring structure. *)
 
@@ -1939,6 +1948,13 @@ Proof.
 by rewrite [p \Po q]horner_poly; apply: eq_bigr => i _; rewrite mul_polyC.
 Qed.
 
+Lemma coef_comp_poly p q n :
+  (p \Po q)`_n = \sum_(i < size p) p`_i * (q ^+ i)`_n.
+Proof.
+rewrite comp_polyE coef_sum.
+by elim/big_ind2: _ => [//|? ? ? ? -> -> //|i]; rewrite coefZ.
+Qed.
+
 Lemma polyOver_comp S (ringS : semiringPred S) (kS : keyed_pred ringS) :
   {in polyOver kS &, forall p q, p \Po q \in polyOver kS}.
 Proof.
@@ -2216,6 +2232,38 @@ elim/big_rec2: _ => [|i d p /nzF nzFi IHp]; first by rewrite size_poly1.
 by rewrite size_mul // -?size_poly_eq0 IHp // addnS polySpred.
 Qed.
 
+Lemma size_prod_seq (I : eqType)  (s : seq I) (F : I -> {poly R}) :
+    (forall i, i \in s -> F i != 0) ->
+  size (\prod_(i <- s) F i) = ((\sum_(i <- s) size (F i)).+1 - size s)%N.
+Proof.
+move=> nzF; rewrite big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
+by rewrite cardT /= size_enum_ord [in RHS]big_tnth.
+Qed.
+
+Lemma size_prod_eq1 (I : finType) (P : pred I) (F : I -> {poly R}) :
+  (size (\prod_(i | P i) F i) == 1%N) = [forall (i | P i), size (F i) == 1%N].
+Proof.
+have [/forall_inP F_neq0|] := boolP [forall (i | P i), F i != 0]; last first.
+  rewrite negb_forall_in => /exists_inP [i Pi]; rewrite negbK => /eqP Fi_eq0.
+  rewrite (bigD1 i) //= Fi_eq0 mul0r size_poly0; symmetry.
+  by apply/existsP; exists i; rewrite Pi Fi_eq0 size_poly0.
+rewrite size_prod // -sum1_card subSn; last first.
+  by rewrite leq_sum // => i Pi; rewrite size_poly_gt0 F_neq0.
+rewrite (eq_bigr (fun i => (size (F i)).-1 + 1))%N; last first.
+  by move=> i Pi; rewrite addn1 -polySpred ?F_neq0.
+rewrite big_split /= addnK -big_andE /=.
+by elim/big_ind2: _ => // [[] [|n] [] [|m]|i Pi]; rewrite -?polySpred ?F_neq0.
+Qed.
+
+Lemma size_prod_seq_eq1 (I : choiceType) (s : seq I) (F : I -> {poly R}) :
+  reflect (forall i, i \in s -> size (F i) = 1%N)
+          (size (\prod_(i <- s) F i) == 1%N).
+Proof.
+rewrite big_tnth size_prod_eq1.
+apply: (iffP forall_inP) => Fi i; last by rewrite Fi // mem_tnth.
+by move=> /seq_tnthP [{i}i ->]; apply/eqP/Fi.
+Qed.
+
 Lemma size_exp p n : (size (p ^+ n)).-1 = ((size p).-1 * n)%N.
 Proof.
 elim: n => [|n IHn]; first by rewrite size_poly1 muln0.
@@ -2255,30 +2303,32 @@ rewrite (leq_trans (size_scale_leq _ _)) // polySpred ?expf_neq0 //.
 by rewrite size_exp -(subnKC nc_q) ltn_pmul2l.
 Qed.
 
+Lemma lead_coef_comp p q : size q > 1 ->
+  lead_coef (p \Po q) = (lead_coef p) * lead_coef q ^+ (size p).-1.
+Proof.
+move=> q_gt1; rewrite !lead_coefE coef_comp_poly size_comp_poly.
+have [->|nz_p] := eqVneq p 0; first by rewrite size_poly0 big_ord0 coef0 mul0r.
+rewrite polySpred //= big_ord_recr /= big1 ?add0r => [|i _].
+  by rewrite -!lead_coefE -lead_coef_exp !lead_coefE size_exp mulnC.
+rewrite [X in _ * X]nth_default ?mulr0 ?(leq_trans (size_exp_leq _ _)) //.
+by rewrite mulnC ltn_mul2r -subn1 subn_gt0 q_gt1 /=.
+Qed.
+
+Lemma comp_poly_eq0 p q : size q > 1 -> (p \Po q == 0) = (p == 0).
+Proof.
+move=> sq_gt1; rewrite -!lead_coef_eq0 lead_coef_comp //.
+rewrite mulf_eq0 expf_eq0 !lead_coef_eq0 -[q == 0]size_poly_leq0.
+by rewrite [_ <= 0]leqNgt (leq_ltn_trans _ sq_gt1) ?andbF ?orbF.
+Qed.
+
 Lemma size_comp_poly2 p q : size q = 2 -> size (p \Po q) = size p.
 Proof.
-have [/size1_polyC->| p_gt1] := leqP (size p) 1; first by rewrite comp_polyC.
-move=> lin_q; have{lin_q} sz_pq: (size (p \Po q)).-1 = (size p).-1.
-  by rewrite size_comp_poly lin_q muln1.
-rewrite -(ltn_predK p_gt1) -sz_pq -polySpred // -size_poly_gt0 ltnW //.
-by rewrite -subn_gt0 subn1 sz_pq -subn1 subn_gt0.
+move=> sq2; have [->|pN0] := eqVneq p 0; first by rewrite comp_polyC.
+by rewrite polySpred ?size_comp_poly ?comp_poly_eq0 ?sq2 // muln1 polySpred.
 Qed.
 
 Lemma comp_poly2_eq0 p q : size q = 2 -> (p \Po q == 0) = (p == 0).
 Proof. by rewrite -!size_poly_eq0 => /size_comp_poly2->. Qed.
-
-Lemma lead_coef_comp p q :
-  size q > 1 -> lead_coef (p \Po q) = lead_coef p * lead_coef q ^+ (size p).-1.
-Proof.
-move=> q_gt1; have nz_q: q != 0 by rewrite -size_poly_gt0 ltnW.
-have [-> | nz_p] := eqVneq p 0; first by rewrite comp_poly0 !lead_coef0 mul0r.
-rewrite comp_polyE polySpred //= big_ord_recr /= addrC -lead_coefE.
-rewrite lead_coefDl; first by rewrite lead_coefZ lead_coef_exp.
-rewrite size_scale ?lead_coef_eq0 // (polySpred (expf_neq0 _ nz_q)) ltnS.
-apply/leq_sizeP=> i le_qp_i; rewrite coef_sum big1 // => j _.
-rewrite coefZ (nth_default 0 (leq_trans _ le_qp_i)) ?mulr0 //=.
-by rewrite polySpred ?expf_neq0 // !size_exp -(subnKC q_gt1) ltn_pmul2l.
-Qed.
 
 Theorem max_poly_roots p rs :
   p != 0 -> all (root p) rs -> uniq rs -> size rs < size p.
@@ -2292,6 +2342,10 @@ suff /eq_in_all h : {in rs, root q =1 root p} by apply: ihrs => //; rewrite h.
 move=> x xrs; rewrite epq rootM root_XsubC orbC; case: (altP (x =P r)) => // exr.
 by move: rnrs; rewrite -exr xrs.
 Qed.
+
+Lemma roots_geq_poly_eq0 p (rs : seq R) : all (root p) rs -> uniq rs ->
+  (size rs >= size p)%N -> p = 0.
+Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
 

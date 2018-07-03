@@ -1171,6 +1171,9 @@ Proof. by rewrite exprAC sqrrN !expr1n. Qed.
 Lemma signrMK n : @involutive R ( *%R ((-1) ^+ n)).
 Proof. by move=> x; rewrite mulrA -expr2 sqrr_sign mul1r. Qed.
 
+Lemma lastr_eq0 (s : seq R) x : x != 0 -> (last x s == 0) = (last 1 s == 0).
+Proof. by elim: s => [|y s ihs] /negPf // ->; rewrite oner_eq0. Qed.
+
 Lemma mulrI_eq0 x y : lreg x -> (x * y == 0) = (y == 0).
 Proof. by move=> reg_x; rewrite -{1}(mulr0 x) (inj_eq reg_x). Qed.
 
