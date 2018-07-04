@@ -1182,6 +1182,14 @@ Lemma big_mkcondl I r (P Q : pred I) F :
      \big[*%M/1]_(i <- r | Q i) (if P i then F i else 1).
 Proof. by rewrite big_andbC big_mkcondr. Qed.
 
+Lemma big_rmcond (I : eqType) (r : seq I) (P : pred I) F :
+  (forall i, i \in r -> ~~ P i -> F i = 1) ->
+  \big[*%M/1]_(i <- r | P i) F i = \big[*%M/1]_(i <- r) F i.
+Proof.
+move=> Fidx; rewrite big_mkcond big_seq_cond [in RHS]big_seq_cond ?big_mkcondr.
+by apply: eq_bigr => i /Fidx {Fidx}; case: (P i) => // ->.
+Qed.
+
 Lemma big_cat I r1 r2 (P : pred I) F :
   \big[*%M/1]_(i <- r1 ++ r2 | P i) F i =
      \big[*%M/1]_(i <- r1 | P i) F i * \big[*%M/1]_(i <- r2 | P i) F i.
@@ -1425,6 +1433,39 @@ Lemma reindex_inj (I : finType) (h : I -> I) (P : pred I) F :
 Proof. by move=> injh; apply: reindex (onW_bij _ (injF_bij injh)). Qed.
 Arguments reindex_inj [I h P F].
 
+Lemma reindex_enum_val_cond (I : finType) (A : pred I) (P : pred I) F :
+  \big[op/idx]_(x in A | P x) F x =
+  \big[op/idx]_(i < #|A| | P (enum_val i)) F (enum_val i).
+Proof.
+have [A_eq0|/card_gt0P[x0 x0A]] := posnP #|A|.
+  rewrite !big_pred0 // => i; last by rewrite card0_eq.
+  by have: false by move: i => []; rewrite A_eq0.
+rewrite (reindex (enum_val : 'I_#|A| -> I)).
+  by apply: eq_big => [x|x Px]; rewrite ?enum_valP.
+by apply: subon_bij (enum_val_bij_in x0A) => y /andP[].
+Qed.
+Arguments reindex_enum_val_cond [I A] P F.
+
+Lemma reindex_enum_rank_cond (I : finType) (A : pred I) x (xA : x \in A) P F
+  (h := enum_rank_in xA) :
+  \big[op/idx]_(i < #|A| | P i) F i = \big[op/idx]_(s in A | P (h s)) F (h s).
+Proof.
+rewrite reindex_enum_val_cond {}/h.
+by apply: eq_big => [i|i Pi]; rewrite ?enum_valK_in.
+Qed.
+Arguments reindex_enum_rank_cond [I A x] xA P F.
+
+Lemma reindex_enum_val (I : finType) (A : pred I) F :
+  \big[op/idx]_(x in A) F x = \big[op/idx]_(i < #|A|) F (enum_val i).
+Proof. by rewrite -(reindex_enum_val_cond predT) big_mkcondr. Qed.
+Arguments reindex_enum_val [I A] F.
+
+Lemma reindex_enum_rank (I : finType) (A : pred I) x (xA : x \in A) F
+  (h := enum_rank_in xA) :
+  \big[op/idx]_(i < #|A|) F i = \big[op/idx]_(s in A) F (h s).
+Proof. by rewrite (reindex_enum_rank_cond xA) big_mkcondr. Qed.
+Arguments reindex_enum_rank [I A x] xA F.
+
 Lemma big_nat_rev m n P F :
   \big[*%M/1]_(m <= i < n | P i) F i
      = \big[*%M/1]_(m <= i < n | P (m + n - i.+1)) F (m + n - i.+1).
@@ -1547,6 +1588,10 @@ Arguments partition_big [R idx op I J P] p Q [F].
 Arguments reindex_onto [R idx op I J] h h' [P F].
 Arguments reindex [R idx op I J] h [P F].
 Arguments reindex_inj [R idx op I h P F].
+Arguments reindex_enum_val_cond [R idx op I A] P F.
+Arguments reindex_enum_rank_cond [R idx op I A x] xA P F.
+Arguments reindex_enum_val [R idx op I A] F.
+Arguments reindex_enum_rank [R idx op I A x] xA F.
 Arguments pair_big_dep [R idx op I J].
 Arguments pair_big [R idx op I J].
 Arguments big_allpairs_dep [R idx op I1 I2 J h r1 r2 F].
