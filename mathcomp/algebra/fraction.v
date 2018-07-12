@@ -53,7 +53,7 @@ Proof. by move=> ny0; rewrite /Ratio /insubd insubT. Qed.
 
 Definition numden_Ratio := (numer_Ratio, denom_Ratio).
 
-CoInductive Ratio_spec (n d : R) : {ratio R} -> R -> R -> Type :=
+Variant Ratio_spec (n d : R) : {ratio R} -> R -> R -> Type :=
   | RatioNull of d = 0 : Ratio_spec n d ratio0 n 0
   | RatioNonNull (d_neq0 : d != 0) : 
     Ratio_spec n d (@mkRatio (n, d) d_neq0) n d.

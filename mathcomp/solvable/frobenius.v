@@ -93,7 +93,7 @@ Definition Frobenius_action :=
 
 End FrobeniusAction.
 
-CoInductive has_Frobenius_action G H : Prop :=
+Variant has_Frobenius_action G H : Prop :=
   HasFrobeniusAction sT S to of @Frobenius_action G H sT S to.
 
 End Definitions.

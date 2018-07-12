@@ -97,7 +97,7 @@ Definition clone_morphism D f :=
 
 Variables (D A : {set aT}) (R : {set rT}) (x : aT) (y : rT) (f : aT -> rT).
 
-CoInductive morphim_spec : Prop := MorphimSpec z & z \in D & z \in A & y = f z.
+Variant morphim_spec : Prop := MorphimSpec z & z \in D & z \in A & y = f z.
 
 Lemma morphimP : reflect morphim_spec (y \in f @: (D :&: A)).
 Proof.

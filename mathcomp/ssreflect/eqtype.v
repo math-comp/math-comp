@@ -420,7 +420,7 @@ Section FunWith.
 
 Variables (aT : eqType) (rT : Type).
 
-CoInductive fun_delta : Type := FunDelta of aT & rT.
+Variant fun_delta : Type := FunDelta of aT & rT.
 
 Definition fwith x y (f : aT -> rT) := [fun z => if z == x then y else f z].
 
@@ -501,7 +501,7 @@ Definition clone_subType U v :=
 
 Variable sT : subType.
 
-CoInductive Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
+Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
 
 Lemma SubP u : Sub_spec u.
 Proof. by case: sT Sub_spec SubSpec u => T' _ C rec /= _. Qed.
@@ -514,7 +514,7 @@ Definition insub x :=
 
 Definition insubd u0 x := odflt u0 (insub x).
 
-CoInductive insub_spec x : option sT -> Type :=
+Variant insub_spec x : option sT -> Type :=
   | InsubSome u of P x & val u = x : insub_spec x (Some u)
   | InsubNone   of ~~ P x          : insub_spec x None.
 

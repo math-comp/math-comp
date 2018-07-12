@@ -220,7 +220,7 @@ Qed.
 
 Definition tperm x y := perm (can_inj (tperm_proof x y)).
 
-CoInductive tperm_spec x y z : T -> Type :=
+Variant tperm_spec x y z : T -> Type :=
   | TpermFirst of z = x          : tperm_spec x y z y
   | TpermSecond of z = y         : tperm_spec x y z x
   | TpermNone of z <> x & z <> y : tperm_spec x y z z.

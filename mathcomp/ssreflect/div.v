@@ -37,7 +37,7 @@ Definition edivn_rec d :=
 
 Definition edivn m d := if d > 0 then edivn_rec d.-1 m 0 else (0, m).
 
-CoInductive edivn_spec m d : nat * nat -> Type :=
+Variant edivn_spec m d : nat * nat -> Type :=
   EdivnSpec q r of m = q * d + r & (d > 0) ==> (r < d) : edivn_spec m d (q, r).
 
 Lemma edivnP m d : edivn_spec m d (edivn m d).
@@ -581,7 +581,7 @@ Fixpoint egcdn_rec m n s qs :=
 
 Definition egcdn m n := Bezout_rec 0 1 (egcdn_rec m n n [::]).
 
-CoInductive egcdn_spec m n : nat * nat -> Type :=
+Variant egcdn_spec m n : nat * nat -> Type :=
   EgcdnSpec km kn of km * m = kn * n + gcdn m n & kn * gcdn m n < m :
     egcdn_spec m n (km, kn).
 

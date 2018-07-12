@@ -325,7 +325,7 @@ Prenex Implicits pred0b.
 
 Module FiniteQuant.
 
-CoInductive quantified := Quantified of bool.
+Variant quantified := Quantified of bool.
 
 Delimit Scope fin_quant_scope with Q. (* Bogus, only used to declare scope. *)
 Bind Scope fin_quant_scope with quantified.
@@ -483,7 +483,7 @@ rewrite [enum _](all_pred1P x _ _); first by rewrite size_filter enumP.
 by apply/allP=> y; rewrite mem_enum.
 Qed.
 
-CoInductive pick_spec : option T -> Type :=
+Variant pick_spec : option T -> Type :=
   | Pick x of P x         : pick_spec (Some x)
   | Nopick of P =1 xpred0 : pick_spec None.
 
@@ -938,7 +938,7 @@ Definition arg_min := odflt i0 (pick (arg_pred leq)).
 
 Definition arg_max := odflt i0 (pick (arg_pred geq)).
 
-CoInductive extremum_spec (ord : rel nat) : I -> Type :=
+Variant extremum_spec (ord : rel nat) : I -> Type :=
   ExtremumSpec i of P i & (forall j, P j -> ord (F i) (F j))
     : extremum_spec ord i.
 
@@ -1845,7 +1845,7 @@ Qed.
 Definition unlift n (h i : 'I_n) :=
   omap (fun u : {j | j != h} => Ordinal (unlift_subproof u)) (insub i).
 
-CoInductive unlift_spec n h i : option 'I_n.-1 -> Type :=
+Variant unlift_spec n h i : option 'I_n.-1 -> Type :=
   | UnliftSome j of i = lift h j : unlift_spec h i (Some j)
   | UnliftNone   of i = h        : unlift_spec h i None.
 
@@ -1900,7 +1900,7 @@ Definition split m n (i : 'I_(m + n)) : 'I_m + 'I_n :=
   | GeqNotLtn ge_i_m =>  inr _ (Ordinal (split_subproof ge_i_m))
   end.
 
-CoInductive split_spec m n (i : 'I_(m + n)) : 'I_m + 'I_n -> bool -> Type :=
+Variant split_spec m n (i : 'I_(m + n)) : 'I_m + 'I_n -> bool -> Type :=
   | SplitLo (j : 'I_m) of i = j :> nat     : split_spec i (inl _ j) true
   | SplitHi (k : 'I_n) of i = m + k :> nat : split_spec i (inr _ k) false.
 

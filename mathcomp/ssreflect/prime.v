@@ -77,7 +77,7 @@ Fixpoint elogn2 e q r {struct q} :=
   | q'.+1, r'.+2 => elogn2 e q' r'
   end.
 
-CoInductive elogn2_spec n : nat * nat -> Type :=
+Variant elogn2_spec n : nat * nat -> Type :=
   Elogn2Spec e m of n = 2 ^ e * m.*2.+1 : elogn2_spec n (e, m).
 
 Lemma elogn2P n : elogn2_spec n.+1 (elogn2 0 n n).
@@ -91,7 +91,7 @@ Qed.
 
 Definition ifnz T n (x y : T) := if n is 0 then y else x.
 
-CoInductive ifnz_spec T n (x y : T) : T -> Type :=
+Variant ifnz_spec T n (x y : T) : T -> Type :=
   | IfnzPos of n > 0 : ifnz_spec n x y x
   | IfnzZero of n = 0 : ifnz_spec n x y y.
 

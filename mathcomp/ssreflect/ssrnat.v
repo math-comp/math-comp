@@ -418,7 +418,7 @@ Proof. exact: (@le_irrelevance m.+1). Qed.
 
 (* Comparison predicates. *)
 
-CoInductive leq_xor_gtn m n : bool -> bool -> Set :=
+Variant leq_xor_gtn m n : bool -> bool -> Set :=
   | LeqNotGtn of m <= n : leq_xor_gtn m n true false
   | GtnNotLeq of n < m  : leq_xor_gtn m n false true.
 
@@ -427,21 +427,21 @@ Proof.
 by rewrite ltnNge; case le_mn: (m <= n); constructor; rewrite // ltnNge le_mn.
 Qed.
 
-CoInductive ltn_xor_geq m n : bool -> bool -> Set :=
+Variant ltn_xor_geq m n : bool -> bool -> Set :=
   | LtnNotGeq of m < n  : ltn_xor_geq m n false true
   | GeqNotLtn of n <= m : ltn_xor_geq m n true false.
 
 Lemma ltnP m n : ltn_xor_geq m n (n <= m) (m < n).
 Proof. by rewrite -(ltnS n); case: leqP; constructor. Qed.
 
-CoInductive eqn0_xor_gt0 n : bool -> bool -> Set :=
+Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
   | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
   | PosNotEq0 of n > 0 : eqn0_xor_gt0 n false true.
 
 Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
 Proof. by case: n; constructor. Qed.
 
-CoInductive compare_nat m n :
+Variant compare_nat m n :
    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | CompareNatLt of m < n : compare_nat m n true false true false false false
   | CompareNatGt of m > n : compare_nat m n false true false true false false
@@ -751,7 +751,7 @@ Proof. by case: exP => i Pi; exists (m - i); rewrite subKn ?ubP. Qed.
 
 Definition ex_maxn := m - ex_minn ex_maxn_subproof.
 
-CoInductive ex_maxn_spec : nat -> Type :=
+Variant ex_maxn_spec : nat -> Type :=
   ExMaxnSpec i of P i & (forall j, P j -> j <= i) : ex_maxn_spec i.
 
 Lemma ex_maxnP : ex_maxn_spec ex_maxn.

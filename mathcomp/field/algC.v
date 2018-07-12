@@ -470,7 +470,7 @@ Local Notation Creal := (Num.real : qualifier 0 algC).
 Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
 Proof. exact: GRing.imaginary_exists. Qed.
 
-CoInductive getCrat_spec : Type := GetCrat_spec CtoQ of cancel QtoC CtoQ.
+Variant getCrat_spec : Type := GetCrat_spec CtoQ of cancel QtoC CtoQ.
 
 Fact getCrat_subproof : getCrat_spec.
 Proof.

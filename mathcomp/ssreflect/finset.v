@@ -1197,7 +1197,7 @@ Variables (f : aT -> rT) (f2 : aT -> aT2 -> rT).
 Lemma imsetP D y : reflect (exists2 x, in_mem x D & y = f x) (y \in imset f D).
 Proof. by rewrite [@imset]unlock inE; apply: imageP. Qed.
 
-CoInductive imset2_spec D1 D2 y : Prop :=
+Variant imset2_spec D1 D2 y : Prop :=
   Imset2spec x1 x2 of in_mem x1 D1 & in_mem x2 (D2 x1) & y = f2 x1 x2.
 
 Lemma imset2P D1 D2 y : reflect (imset2_spec D1 D2 y) (y \in imset2 f2 D1 D2).

@@ -1589,7 +1589,7 @@ Proof. by move=> Gx; rewrite (rcoset_eqP (_ : x \in G :* 1)) mulg1. Qed.
 
 (* Elimination form. *)
 
-CoInductive rcoset_repr_spec x : gT -> Type :=
+Variant rcoset_repr_spec x : gT -> Type :=
   RcosetReprSpec g : g \in G -> rcoset_repr_spec x (g * x).
 
 Lemma mem_repr_rcoset x : repr (G :* x) \in G :* x.

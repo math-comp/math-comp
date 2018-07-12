@@ -150,7 +150,7 @@ Qed.
 
 Fact fracq0  x : fracq (x, 0) = zeroq. Proof. exact/eqP. Qed.
 
-CoInductive fracq_spec (x : int * int) : int * int -> rat -> Type :=
+Variant fracq_spec (x : int * int) : int * int -> rat -> Type :=
   | FracqSpecN of x.2 = 0 : fracq_spec x (x.1, 0) zeroq
   | FracqSpecP k fx of k != 0 : fracq_spec x (k * numq fx, k * denq fx) fx.
 
@@ -418,7 +418,7 @@ Qed.
 Lemma divq_num_den x : (numq x)%:Q / (denq x)%:Q = x.
 Proof. by rewrite -{3}[x]valqK [valq _]surjective_pairing /= fracqE. Qed.
 
-CoInductive divq_spec (n d : int) : int -> int -> rat -> Type :=
+Variant divq_spec (n d : int) : int -> int -> rat -> Type :=
 | DivqSpecN of d = 0 : divq_spec n d n 0 0
 | DivqSpecP k x of k != 0 : divq_spec n d (k * numq x) (k * denq x) x.
 
@@ -436,7 +436,7 @@ move=> dx_neq0 dy_neq0; rewrite -(inj_eq (@mulIf _ (dx * dy) _)) ?mulf_neq0 //.
 by rewrite mulrA divfK // mulrCA divfK // [dx * _ ]mulrC.
 Qed.
 
-CoInductive rat_spec (* (x : rat) *) : rat -> int -> int -> Type :=
+Variant rat_spec (* (x : rat) *) : rat -> int -> int -> Type :=
   Rat_spec (n : int) (d : nat)  & coprime `|n| d.+1
   : rat_spec (* x  *) (n%:Q / d.+1%:Q) n d.+1.
 

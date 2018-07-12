@@ -48,7 +48,7 @@ Delimit Scope int_scope with Z.
 Local Open Scope int_scope.
 
 (* Defining int *)
-CoInductive int : Set := Posz of nat | Negz of nat.
+Variant int : Set := Posz of nat | Negz of nat.
 (* This must be deferred to module DistInt to work around the design flaws of *)
 (* the Coq module system.                                                     *)
 (* Coercion Posz : nat >-> int. *)
@@ -126,7 +126,7 @@ Qed.
 Definition int_rec := int_rect.
 Definition int_ind := int_rect.
 
-CoInductive int_spec (x : int) : int -> Type :=
+Variant int_spec (x : int) : int -> Type :=
 | ZintNull of x = 0 : int_spec x 0
 | ZintPos n of x = n.+1 : int_spec x n.+1
 | ZintNeg n of x = - (n.+1)%:Z : int_spec x (- n.+1).
@@ -216,7 +216,7 @@ Qed.
 Definition int_rec := int_rect.
 Definition int_ind := int_rect.
 
-CoInductive int_spec (x : int) : int -> Type :=
+Variant int_spec (x : int) : int -> Type :=
 | ZintNull : int_spec x 0
 | ZintPos n : int_spec x n.+1
 | ZintNeg n : int_spec x (- (n.+1)%:Z).
@@ -1438,7 +1438,7 @@ Lemma sgz_cp0 x :
   ((sgz x == 0) = (x == 0)).
 Proof. by rewrite /sgz; case: ltrgtP. Qed.
 
-CoInductive sgz_val x : bool -> bool -> bool -> bool -> bool -> bool
+Variant sgz_val x : bool -> bool -> bool -> bool -> bool -> bool
   -> bool -> bool -> bool -> bool -> bool -> bool
   -> bool -> bool -> bool -> bool -> bool -> bool
   -> R -> R -> int -> Set :=
