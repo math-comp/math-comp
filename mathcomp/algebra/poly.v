@@ -2253,12 +2253,15 @@ by elim/big_ind2: _ => // [[] [|n] [] [|m]|i Pi]; rewrite -?polySpred ?F_neq0.
 Qed.
 
 Lemma size_prod_seq_eq1 (I : eqType) (s : seq I) (F : I -> {poly R}) :
-  reflect (forall i, i \in s -> size (F i) = 1%N)
-          (size (\prod_(i <- s) F i) == 1%N).
+  (size (\prod_(i <- s) F i) == 1%N) = (all [pred i | size (F i) == 1%N] s).
 Proof.
-rewrite big_tnth size_prod_eq1.
-apply: (iffP forall_inP) => Fi i; last by rewrite Fi // mem_tnth.
-by move=> /seq_tnthP [{i}i ->]; apply/eqP/Fi.
+by rewrite big_tnth size_prod_eq1 -big_all [in RHS]big_tnth big_andE.
+Qed.
+
+Lemma size_mul_eq1 p q :
+  (size (p * q) == 1%N) = ((size p == 1%N) && (size q == 1%N)).
+Proof.
+by have := size_prod_seq_eq1 [:: p; q] id; rewrite unlock /= mulr1 andbT.
 Qed.
 
 Lemma size_exp p n : (size (p ^+ n)).-1 = ((size p).-1 * n)%N.
