@@ -1950,10 +1950,7 @@ Qed.
 
 Lemma coef_comp_poly p q n :
   (p \Po q)`_n = \sum_(i < size p) p`_i * (q ^+ i)`_n.
-Proof.
-rewrite comp_polyE coef_sum.
-by elim/big_ind2: _ => [//|? ? ? ? -> -> //|i]; rewrite coefZ.
-Qed.
+Proof. by rewrite comp_polyE coef_sum; apply: eq_bigr => i; rewrite coefZ. Qed.
 
 Lemma polyOver_comp S (ringS : semiringPred S) (kS : keyed_pred ringS) :
   {in polyOver kS &, forall p q, p \Po q \in polyOver kS}.
@@ -2255,7 +2252,7 @@ rewrite big_split /= addnK -big_andE /=.
 by elim/big_ind2: _ => // [[] [|n] [] [|m]|i Pi]; rewrite -?polySpred ?F_neq0.
 Qed.
 
-Lemma size_prod_seq_eq1 (I : choiceType) (s : seq I) (F : I -> {poly R}) :
+Lemma size_prod_seq_eq1 (I : eqType) (s : seq I) (F : I -> {poly R}) :
   reflect (forall i, i \in s -> size (F i) = 1%N)
           (size (\prod_(i <- s) F i) == 1%N).
 Proof.
