@@ -220,7 +220,7 @@ Proof. by []. Qed.
 Lemma tuple0 : all_equal_to ([tuple] : 0.-tuple T).
 Proof. by move=> t; apply: val_inj; case: t => [[]]. Qed.
 
-CoInductive tuple1_spec : n.+1.-tuple T -> Type :=
+Variant tuple1_spec : n.+1.-tuple T -> Type :=
   Tuple1spec x t : tuple1_spec [tuple of x :: t].
 
 Lemma tupleP u : tuple1_spec u.

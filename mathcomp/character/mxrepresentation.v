@@ -1513,7 +1513,7 @@ Qed.
 (* Module isomorphism is an intentional property in general, but it can be    *)
 (* decided when one of the two modules is known to be simple.                 *)
 
-CoInductive mx_iso (U V : 'M_n) : Prop :=
+Variant mx_iso (U V : 'M_n) : Prop :=
   MxIso f of f \in unitmx & (U <= dom_hom_mx f)%MS & (U *m f :=: V)%MS.
 
 Lemma eqmx_iso U V : (U :=: V)%MS -> mx_iso U V.
@@ -1692,7 +1692,7 @@ Qed.
 
 Implicit Type I : finType.
 
-CoInductive mxsemisimple (V : 'M_n) :=
+Variant mxsemisimple (V : 'M_n) :=
   MxSemisimple I U (W := (\sum_(i : I) U i)%MS) of
     forall i, mxsimple (U i) & (W :=: V)%MS & mxdirect W.
 
@@ -1812,7 +1812,7 @@ Qed.
 
 (* Completely reducible modules, and Maeschke's Theorem. *)
 
-CoInductive mxsplits (V U : 'M_n) :=
+Variant mxsplits (V U : 'M_n) :=
   MxSplits (W : 'M_n) of mxmodule W & (U + W :=: V)%MS & mxdirect (U + W).
 
 Definition mx_completely_reducible V :=
@@ -2969,7 +2969,7 @@ Section Similarity.
 Variables (gT : finGroupType) (G : {group gT}).
 Local Notation reprG := (mx_representation F G).
 
-CoInductive mx_rsim n1 (rG1 : reprG n1) n2 (rG2 : reprG n2) : Prop :=
+Variant mx_rsim n1 (rG1 : reprG n1) n2 (rG2 : reprG n2) : Prop :=
   MxReprSim B of n1 = n2 & row_free B
               & forall x, x \in G -> rG1 x *m B = B *m rG2 x.
 

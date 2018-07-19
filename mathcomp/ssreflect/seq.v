@@ -305,7 +305,7 @@ Proof. by rewrite -cats1 -catA. Qed.
 Lemma rcons_cat x s1 s2 : rcons (s1 ++ s2) x = s1 ++ rcons s2 x.
 Proof. by rewrite -!cats1 catA. Qed.
 
-CoInductive last_spec : seq T -> Type :=
+Variant last_spec : seq T -> Type :=
   | LastNil        : last_spec [::]
   | LastRcons s x  : last_spec (rcons s x).
 
@@ -1272,7 +1272,7 @@ Proof. by move=> x; rewrite -{2}(cat_take_drop n0 s) !mem_cat /= orbC. Qed.
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. by apply: inj_eq; apply: rot_inj. Qed.
 
-CoInductive rot_to_spec s x := RotToSpec i s' of rot i s = x :: s'.
+Variant rot_to_spec s x := RotToSpec i s' of rot i s = x :: s'.
 
 Lemma rot_to s x : x \in s -> rot_to_spec s x.
 Proof.

@@ -1874,7 +1874,7 @@ Section SubDaddsmx.
 Variables m m1 m2 n : nat.
 Variables (A : 'M[F]_(m, n)) (B1 : 'M[F]_(m1, n)) (B2 : 'M[F]_(m2, n)).
 
-CoInductive sub_daddsmx_spec : Prop :=
+Variant sub_daddsmx_spec : Prop :=
   SubDaddsmxSpec A1 A2 of (A1 <= B1)%MS & (A2 <= B2)%MS & A = A1 + A2
                         & forall C1 C2, (C1 <= B1)%MS -> (C2 <= B2)%MS ->
                           A = C1 + C2 -> C1 = A1 /\ C2 = A2.
@@ -1896,7 +1896,7 @@ Section SubDsumsmx.
 
 Variables (P : pred I) (m n : nat) (A : 'M[F]_(m, n)) (B : I -> 'M[F]_n).
 
-CoInductive sub_dsumsmx_spec : Prop :=
+Variant sub_dsumsmx_spec : Prop :=
   SubDsumsmxSpec A_ of forall i, P i -> (A_ i <= B i)%MS
                         & A = \sum_(i | P i) A_ i
                         & forall C, (forall i, P i -> C i <= B i)%MS ->

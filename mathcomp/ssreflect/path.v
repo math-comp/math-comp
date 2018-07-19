@@ -167,7 +167,7 @@ Section EqPath.
 Variables (n0 : nat) (T : eqType) (x0_cycle : T) (e : rel T).
 Implicit Type p : seq T.
 
-CoInductive split x : seq T -> seq T -> seq T -> Type :=
+Variant split x : seq T -> seq T -> seq T -> Type :=
   Split p1 p2 : split x (rcons p1 x ++ p2) p1 p2.
 
 Lemma splitP p x (i := index x p) :
@@ -177,7 +177,7 @@ move=> p_x; have lt_ip: i < size p by rewrite index_mem.
 by rewrite -{1}(cat_take_drop i p) (drop_nth x lt_ip) -cat_rcons nth_index.
 Qed.
 
-CoInductive splitl x1 x : seq T -> Type :=
+Variant splitl x1 x : seq T -> Type :=
   Splitl p1 p2 of last x1 p1 = x : splitl x1 x (p1 ++ p2).
 
 Lemma splitPl x1 p x : x \in x1 :: p -> splitl x1 x p.
@@ -186,7 +186,7 @@ rewrite inE; case: eqP => [->| _ /splitP[]]; first by rewrite -(cat0s p).
 by split; apply: last_rcons.
 Qed.
 
-CoInductive splitr x : seq T -> Type :=
+Variant splitr x : seq T -> Type :=
   Splitr p1 p2 : splitr x (p1 ++ x :: p2).
 
 Lemma splitPr p x : x \in p -> splitr x p.
@@ -341,7 +341,7 @@ move=> p2'x p2'y; rewrite catA !mem2_cat !mem_cat.
 by rewrite (negPf p2'x) (negPf p2'y) (mem2lf p2'x) andbF !orbF.
 Qed.
 
-CoInductive split2r x y : seq T -> Type :=
+Variant split2r x y : seq T -> Type :=
   Split2r p1 p2 of y \in x :: p2 : split2r x y (p1 ++ x :: p2).
 
 Lemma splitP2r p x y : mem2 p x y -> split2r x y p.
@@ -356,7 +356,7 @@ Fixpoint shorten x p :=
     if x \in p then shorten x p' else y :: shorten y p'
   else [::].
 
-CoInductive shorten_spec x p : T -> seq T -> Type :=
+Variant shorten_spec x p : T -> seq T -> Type :=
    ShortenSpec p' of path e x p' & uniq (x :: p') & subpred (mem p') (mem p) :
      shorten_spec x p (last x p') p'.
 
@@ -870,7 +870,7 @@ rewrite -[p]cat_cons -rot_size_cat rot_uniq => Up.
 by rewrite arc_rot ?left_arc ?mem_head.
 Qed.
 
-CoInductive rot_to_arc_spec p x y :=
+Variant rot_to_arc_spec p x y :=
     RotToArcSpec i p1 p2 of x :: p1 = arc p x y
                           & y :: p2 = arc p y x
                           & rot i p = x :: p1 ++ y :: p2 :

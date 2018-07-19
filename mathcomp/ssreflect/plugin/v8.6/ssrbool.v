@@ -442,7 +442,7 @@ Section BoolIf.
 
 Variables (A B : Type) (x : A) (f : A -> B) (b : bool) (vT vF : A).
 
-CoInductive if_spec (not_b : Prop) : bool -> A -> Set :=
+Variant if_spec (not_b : Prop) : bool -> A -> Set :=
   | IfSpecTrue  of      b : if_spec not_b true vT
   | IfSpecFalse of  not_b : if_spec not_b false vF.
 
@@ -577,7 +577,7 @@ Lemma rwP2 : reflect Q b -> (P <-> Q).
 Proof. by move=> Qb; split=> ?; [apply: appP | apply: elimT; case: Qb]. Qed.
 
 (*  Predicate family to reflect excluded middle in bool.                      *)
-CoInductive alt_spec : bool -> Type :=
+Variant alt_spec : bool -> Type :=
   | AltTrue of     P : alt_spec true
   | AltFalse of ~~ b : alt_spec false.
 
@@ -595,7 +595,7 @@ Hint View for apply// equivPif|3 xorPif|3 equivPifn|3 xorPifn|3.
 (* Allow the direct application of a reflection lemma to a boolean assertion. *)
 Coercion elimT : reflect >-> Funclass.
 
-CoInductive implies P Q := Implies of P -> Q.
+Variant implies P Q := Implies of P -> Q.
 Lemma impliesP P Q : implies P Q -> P -> Q. Proof. by case. Qed.
 Lemma impliesPn (P Q : Prop) : implies P Q -> ~ Q -> ~ P.
 Proof. by case=> iP ? /iP. Qed.
@@ -1111,7 +1111,7 @@ Proof. by move=> *; apply/orP; left. Qed.
 Lemma subrelUr r1 r2 : subrel r2 (relU r1 r2).
 Proof. by move=> *; apply/orP; right. Qed.
 
-CoInductive mem_pred := Mem of pred T.
+Variant mem_pred := Mem of pred T.
 
 Definition isMem pT topred mem := mem = (fun p : pT => Mem [eta topred p]).
 
@@ -1321,7 +1321,7 @@ End simpl_mem.
 
 (* Qualifiers and keyed predicates. *)
 
-CoInductive qualifier (q : nat) T := Qualifier of predPredType T.
+Variant qualifier (q : nat) T := Qualifier of predPredType T.
 
 Coercion has_quality n T (q : qualifier n T) : pred_class :=
   fun x => let: Qualifier p := q in p x.
@@ -1368,7 +1368,7 @@ Notation "[ 'qualify' 'an' x : T | P ]" := (Qualifier 2 (fun x : T => P%B))
 Section KeyPred.
 
 Variable T : Type.
-CoInductive pred_key (p : predPredType T) := DefaultPredKey.
+Variant pred_key (p : predPredType T) := DefaultPredKey.
 
 Variable p : predPredType T.
 Structure keyed_pred (k : pred_key p) :=

@@ -132,7 +132,7 @@ Proof. by move=> A; rewrite /pprod eqxx. Qed.
 Lemma pprodg1 : right_id 1 pprod.
 Proof. by move=> A; rewrite /pprod eqxx; case: eqP. Qed.
 
-CoInductive are_groups A B : Prop := AreGroups K H of A = K & B = H.
+Variant are_groups A B : Prop := AreGroups K H of A = K & B = H.
 
 Lemma group_not0 G : set0 <> G.
 Proof. by move/setP/(_ 1); rewrite inE group1. Qed.

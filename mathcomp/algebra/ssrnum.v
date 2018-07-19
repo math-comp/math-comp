@@ -1550,15 +1550,15 @@ Proof. exact: rpredD. Qed.
 
 (* dichotomy and trichotomy *)
 
-CoInductive ler_xor_gt (x y : R) : R -> R -> bool -> bool -> Set :=
+Variant ler_xor_gt (x y : R) : R -> R -> bool -> bool -> Set :=
   | LerNotGt of x <= y : ler_xor_gt x y (y - x) (y - x) true false
   | GtrNotLe of y < x  : ler_xor_gt x y (x - y) (x - y) false true.
 
-CoInductive ltr_xor_ge (x y : R) : R -> R -> bool -> bool -> Set :=
+Variant ltr_xor_ge (x y : R) : R -> R -> bool -> bool -> Set :=
   | LtrNotGe of x < y  : ltr_xor_ge x y (y - x) (y - x) false true
   | GerNotLt of y <= x : ltr_xor_ge x y (x - y) (x - y) true false.
 
-CoInductive comparer x y : R -> R ->
+Variant comparer x y : R -> R ->
   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | ComparerLt of x < y : comparer x y (y - x) (y - x)
     false false true false true false
@@ -1603,15 +1603,15 @@ have /eqP ->: x == y by rewrite eqr_le le_yx le_xy.
 by rewrite subrr eqxx; constructor.
 Qed.
 
-CoInductive ger0_xor_lt0 (x : R) : R -> bool -> bool -> Set :=
+Variant ger0_xor_lt0 (x : R) : R -> bool -> bool -> Set :=
   | Ger0NotLt0 of 0 <= x : ger0_xor_lt0 x x false true
   | Ltr0NotGe0 of x < 0  : ger0_xor_lt0 x (- x) true false.
 
-CoInductive ler0_xor_gt0 (x : R) : R -> bool -> bool -> Set :=
+Variant ler0_xor_gt0 (x : R) : R -> bool -> bool -> Set :=
   | Ler0NotLe0 of x <= 0 : ler0_xor_gt0 x (- x) false true
   | Gtr0NotGt0 of 0 < x  : ler0_xor_gt0 x x true false.
 
-CoInductive comparer0 x :
+Variant comparer0 x :
                R -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | ComparerGt0 of 0 < x : comparer0 x x false false false true false true
   | ComparerLt0 of x < 0 : comparer0 x (- x) false false true false true false
@@ -3574,7 +3574,7 @@ case: (x =P 0) => [-> | _]; first by rewrite !(eq_sym 0) !signr_eq0 ltrr eqxx.
 by rewrite !(inj_eq signr_inj) eqb_id eqbF_neg signr_eq0 //.
 Qed.
 
-CoInductive sgr_val x : R -> bool -> bool -> bool -> bool -> bool -> bool
+Variant sgr_val x : R -> bool -> bool -> bool -> bool -> bool -> bool
   -> bool -> bool -> bool -> bool -> bool -> bool -> R -> Set :=
   | SgrNull of x = 0 : sgr_val x 0 true true true true false false
     true false false true false false 0
@@ -3760,7 +3760,7 @@ Proof. by move=> x y z; rewrite !minrA [minr x y]minrC. Qed.
 Lemma minrAC : @right_commutative R R min.
 Proof. by move=> x y z; rewrite -!minrA [minr y z]minrC. Qed.
 
-CoInductive minr_spec x y : bool -> bool -> R -> Type :=
+Variant minr_spec x y : bool -> bool -> R -> Type :=
 | Minr_r of x <= y : minr_spec x y true false x
 | Minr_l of y < x : minr_spec x y false true y.
 
@@ -3788,7 +3788,7 @@ Proof. by move=> x y z; rewrite !maxrA [maxr x y]maxrC. Qed.
 Lemma maxrAC : @right_commutative R R max.
 Proof. by move=> x y z; rewrite -!maxrA [maxr y z]maxrC. Qed.
 
-CoInductive maxr_spec x y : bool -> bool -> R -> Type :=
+Variant maxr_spec x y : bool -> bool -> R -> Type :=
 | Maxr_r of y <= x : maxr_spec x y true false x
 | Maxr_l of x < y : maxr_spec x y false true y.
 
@@ -4041,7 +4041,7 @@ Qed.
 Lemma ltr0_sqrtr a : a < 0 -> sqrt a = 0.
 Proof. by move=> /ltrW; apply: ler0_sqrtr. Qed.
 
-CoInductive sqrtr_spec a : R -> bool -> bool -> R -> Type :=
+Variant sqrtr_spec a : R -> bool -> bool -> R -> Type :=
 | IsNoSqrtr of a < 0 : sqrtr_spec a a false true 0
 | IsSqrtr b of 0 <= b : sqrtr_spec a (b ^+ 2) true false b.
 
@@ -4154,7 +4154,7 @@ Let Re2 z := z + z^*.
 Definition nnegIm z := (0 <= imaginaryC * (z^* - z)).
 Definition argCle y z := nnegIm z ==> nnegIm y && (Re2 z <= Re2 y).
 
-CoInductive rootC_spec n (x : C) : Type :=
+Variant rootC_spec n (x : C) : Type :=
   RootCspec (y : C) of if (n > 0)%N then y ^+ n = x else y = 0
                         & forall z, (n > 0)%N -> z ^+ n = x -> argCle y z.
 

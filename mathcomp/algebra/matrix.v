@@ -870,7 +870,7 @@ Proof. by rewrite card_prod !card_ord. Qed.
 Definition mxvec_index (i : 'I_m) (j : 'I_n) :=
   cast_ord mxvec_cast (enum_rank (i, j)).
 
-CoInductive is_mxvec_index : 'I_(m * n) -> Type :=
+Variant is_mxvec_index : 'I_(m * n) -> Type :=
   IsMxvecIndex i j : is_mxvec_index (mxvec_index i j).
 
 Lemma mxvec_indexP k : is_mxvec_index k.

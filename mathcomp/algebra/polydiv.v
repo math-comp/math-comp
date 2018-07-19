@@ -384,7 +384,7 @@ apply: Irec => //; last by rewrite ltn_rmodp.
 by rewrite ltnW // ltn_rmodp.
 Qed.
 
-CoInductive comm_redivp_spec m d : nat * {poly R} * {poly R} -> Type :=
+Variant comm_redivp_spec m d : nat * {poly R} * {poly R} -> Type :=
   ComEdivnSpec k (q r : {poly R}) of
    (GRing.comm d (lead_coef d)%:P -> m * (lead_coef d ^+ k)%:P = q * d + r) &
    (d != 0 -> size r < size d) : comm_redivp_spec m d (k, q, r).
@@ -510,7 +510,7 @@ rewrite -/v -!exprD addnC subnK ?leq_maxl //.
 by rewrite addnC subnK ?subrr ?leq_maxr.
 Qed.
 
-CoInductive rdvdp_spec p q : {poly R} -> bool -> Type :=
+Variant rdvdp_spec p q : {poly R} -> bool -> Type :=
   | Rdvdp k q1 & p * ((lead_coef q)^+ k)%:P = q1 * q : rdvdp_spec p q 0 true
   | RdvdpN & rmodp p q != 0 : rdvdp_spec p q (rmodp p q) false.
 
@@ -727,7 +727,7 @@ Variable R : comRingType.
 
 Implicit Types d p q m n r : {poly R}.
 
-CoInductive redivp_spec (m d : {poly R}) : nat * {poly R} * {poly R} -> Type :=
+Variant redivp_spec (m d : {poly R}) : nat * {poly R} * {poly R} -> Type :=
   EdivnSpec k (q r: {poly R}) of
     (lead_coef d ^+ k) *: m = q * d + r &
    (d != 0 -> size r < size d) : redivp_spec m d (k, q, r).
@@ -870,7 +870,7 @@ Qed.
 
 Hint Resolve lc_expn_scalp_neq0.
 
-CoInductive edivp_spec (m d : {poly R}) :
+Variant edivp_spec (m d : {poly R}) :
                                      nat * {poly R} * {poly R} -> bool -> Type :=
 |Redivp_spec k (q r: {poly R}) of
   (lead_coef d ^+ k) *: m = q * d + r & lead_coef d \notin GRing.unit &
@@ -2340,7 +2340,7 @@ Fixpoint gdcop_rec q p k :=
 
 Definition gdcop q p := gdcop_rec q p (size p).
 
-CoInductive gdcop_spec q p : {poly R} -> Type :=
+Variant gdcop_spec q p : {poly R} -> Type :=
   GdcopSpec r of (dvdp r p) & ((coprimep r q) || (p == 0))
   & (forall d,  dvdp d p -> coprimep d q -> dvdp d r)
   : gdcop_spec q p r.
@@ -3194,7 +3194,7 @@ Qed.
 (* Just to have it without importing the weak theory *)
 Lemma dvdpE p q : p %| q = rdvdp p q. Proof. exact: Idomain.dvdpE. Qed.
 
-CoInductive edivp_spec m d : nat * {poly F} * {poly F} -> Type :=
+Variant edivp_spec m d : nat * {poly F} * {poly F} -> Type :=
   EdivpSpec n q r of
   m = q * d + r & (d != 0) ==> (size r < size d) : edivp_spec m d (n, q, r).
 

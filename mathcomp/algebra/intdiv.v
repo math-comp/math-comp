@@ -560,7 +560,7 @@ Proof. by rewrite coprimezE abszN. Qed.
 Lemma coprimezN m n : coprimez m (- n) = coprimez m n.
 Proof. by rewrite coprimezE abszN. Qed.
 
-CoInductive egcdz_spec m n : int * int -> Type :=
+Variant egcdz_spec m n : int * int -> Type :=
   EgcdzSpec u v of u * m + v * n = gcdz m n & coprimez u v
      : egcdz_spec m n (u, v).
 

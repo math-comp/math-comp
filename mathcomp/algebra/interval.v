@@ -48,10 +48,10 @@ Local Notation mid x y := ((x + y) / 2%:R).
 
 Section IntervalPo.
 
-CoInductive itv_bound (T : Type) : Type := BOpen_if of bool & T | BInfty.
+Variant itv_bound (T : Type) : Type := BOpen_if of bool & T | BInfty.
 Notation BOpen := (BOpen_if true).
 Notation BClose := (BOpen_if false).
-CoInductive interval (T : Type) := Interval of itv_bound T & itv_bound T.
+Variant interval (T : Type) := Interval of itv_bound T & itv_bound T.
 
 Variable (R : numDomainType).
 

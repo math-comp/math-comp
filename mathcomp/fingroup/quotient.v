@@ -569,7 +569,7 @@ Variables (G : {group gT}) (Kbar : {group coset_of H}).
 
 Hypothesis nHG : H <| G.
 
-CoInductive inv_quotient_spec (P : pred {group gT}) : Prop :=
+Variant inv_quotient_spec (P : pred {group gT}) : Prop :=
   InvQuotientSpec K of Kbar :=: K / H & H \subset K & P K.
 
 Lemma inv_quotientS :
