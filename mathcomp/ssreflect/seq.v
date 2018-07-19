@@ -992,6 +992,9 @@ Proof. by move=> s0x; rewrite -(cat_take_drop n0 s) mem_cat /= s0x. Qed.
 Lemma mem_drop s x : x \in drop n0 s -> x \in s.
 Proof. by move=> s0'x; rewrite -(cat_take_drop n0 s) mem_cat /= s0'x orbT. Qed.
 
+Lemma last_eq s z x y : x != y -> z != y -> (last x s == y) = (last z s == y).
+Proof. by move=> /negPf xz /negPf yz; case: s => [|t s]//; rewrite xz yz. Qed.
+
 Section Filters.
 
 Variable a : pred T.
