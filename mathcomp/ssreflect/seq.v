@@ -992,6 +992,9 @@ Proof. by move=> s0x; rewrite -(cat_take_drop n0 s) mem_cat /= s0x. Qed.
 Lemma mem_drop s x : x \in drop n0 s -> x \in s.
 Proof. by move=> s0'x; rewrite -(cat_take_drop n0 s) mem_cat /= s0'x orbT. Qed.
 
+Lemma last_eq s z x y : x != y -> z != y -> (last x s == y) = (last z s == y).
+Proof. by move=> /negPf xz /negPf yz; case: s => [|t s]//; rewrite xz yz. Qed.
+
 Section Filters.
 
 Variable a : pred T.
@@ -1003,6 +1006,10 @@ case ay: (a y); first by left; exists y; rewrite ?mem_head.
 apply: (iffP IHs) => [] [x ysx ax]; exists x => //; first exact: mem_behead.
 by case: (predU1P ysx) ax => [->|//]; rewrite ay.
 Qed.
+
+Lemma hasPP s aP : (forall x, reflect (aP x) (a x)) ->
+  reflect (exists2 x, x \in s & aP x) (has a s).
+Proof. by move=> vP; apply: (iffP (hasP _)) => -[x?/vP]; exists x. Qed.
 
 Lemma hasPn s : reflect (forall x, x \in s -> ~~ a x) (~~ has a s).
 Proof.
@@ -1019,6 +1026,10 @@ rewrite /= andbC; case: IHs => IHs /=.
   by case/predU1P=> [->|Hy]; auto.
 by right=> H; case IHs => y Hy; apply H; apply: mem_behead.
 Qed.
+
+Lemma allPP s aP : (forall x, reflect (aP x) (a x)) ->
+  reflect (forall x, x \in s -> aP x) (all a s).
+Proof. by move=> vP; apply: (iffP (allP _)) => /(_ _ _) /vP. Qed.
 
 Lemma allPn s : reflect (exists2 x, x \in s & ~~ a x) (~~ all a s).
 Proof.
@@ -1037,6 +1048,11 @@ by case: eqP => [->|_]; case (a y); rewrite /= ?andbF.
 Qed.
 
 End Filters.
+
+Notation "'has_ view" := (hasPP _ (fun _ => view))
+  (at level 4, right associativity, format "''has_' view").
+Notation "'all_ view" := (allPP _ (fun _ => view))
+  (at level 4, right associativity, format "''all_' view").
 
 Section EqIn.
 
