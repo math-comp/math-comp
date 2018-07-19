@@ -2237,31 +2237,35 @@ move=> nzF; rewrite big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
 by rewrite cardT /= size_enum_ord [in RHS]big_tnth.
 Qed.
 
-Lemma size_prod_eq1 (I : finType) (P : pred I) (F : I -> {poly R}) :
-  (size (\prod_(i | P i) F i) == 1%N) = [forall (i | P i), size (F i) == 1%N].
-Proof.
-have [/forall_inP F_neq0|] := boolP [forall (i | P i), F i != 0]; last first.
-  rewrite negb_forall_in => /exists_inP [i Pi]; rewrite negbK => /eqP Fi_eq0.
-  rewrite (bigD1 i) //= Fi_eq0 mul0r size_poly0; symmetry.
-  by apply/existsP; exists i; rewrite Pi Fi_eq0 size_poly0.
-rewrite size_prod // -sum1_card subSn; last first.
-  by rewrite leq_sum // => i Pi; rewrite size_poly_gt0 F_neq0.
-rewrite (eq_bigr (fun i => (size (F i)).-1 + 1))%N; last first.
-  by move=> i Pi; rewrite addn1 -polySpred ?F_neq0.
-rewrite big_split /= addnK -big_andE /=.
-by elim/big_ind2: _ => // [[] [|n] [] [|m]|i Pi]; rewrite -?polySpred ?F_neq0.
-Qed.
-
-Lemma size_prod_seq_eq1 (I : eqType) (s : seq I) (F : I -> {poly R}) :
-  (size (\prod_(i <- s) F i) == 1%N) = (all [pred i | size (F i) == 1%N] s).
-Proof.
-by rewrite big_tnth size_prod_eq1 -big_all [in RHS]big_tnth big_andE.
-Qed.
-
 Lemma size_mul_eq1 p q :
   (size (p * q) == 1%N) = ((size p == 1%N) && (size q == 1%N)).
 Proof.
-by have := size_prod_seq_eq1 [:: p; q] id; rewrite unlock /= mulr1 andbT.
+have [->|pNZ] := eqVneq p 0; first by rewrite mul0r size_poly0.
+have [->|qNZ] := eqVneq q 0; first by rewrite mulr0 size_poly0 andbF.
+rewrite size_mul //.
+by move: pNZ qNZ; rewrite -!size_poly_gt0; (do 2 case: size) => //= n [|[|]].
+Qed.
+
+Lemma size_prod_seq_eq1 (I : eqType) (s : seq I) (P : pred I) (F : I -> {poly R}) :
+  reflect (forall i, P i && (i \in s) -> size (F i) = 1%N)
+          (size (\prod_(i <- s | P i) F i) == 1%N).
+Proof.
+have -> : (size (\prod_(i <- s | P i) F i) == 1%N) =
+  (all [pred i | P i ==> (size (F i) == 1%N)] s).
+  elim: s => [|a s IHs /=]; first by rewrite big_nil size_poly1.
+  by rewrite big_cons; case: (P a) => //=; rewrite size_mul_eq1 IHs.
+apply: (iffP allP) => /= [/(_ _ _)/implyP /(_ _)/eqP|] sF_eq1 i.
+  by move=> /andP[Pi si]; rewrite sF_eq1.
+by move=> si; apply/implyP => Pi; rewrite sF_eq1 ?Pi.
+Qed.
+
+Lemma size_prod_eq1 (I : finType) (P : pred I) (F : I -> {poly R}) :
+  reflect (forall i, P i -> size (F i) = 1%N)
+          (size (\prod_(i | P i) F i) == 1%N).
+Proof.
+apply: (iffP (size_prod_seq_eq1 _ _ _)) => Hi i.
+  by move=> Pi; apply: Hi; rewrite Pi /= mem_index_enum.
+by rewrite mem_index_enum andbT; apply: Hi.
 Qed.
 
 Lemma size_exp p n : (size (p ^+ n)).-1 = ((size p).-1 * n)%N.

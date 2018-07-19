@@ -867,9 +867,13 @@ Proof. exact: 'forall_eqP. Qed.
 Lemma forall_inP D P : reflect (forall x, D x -> P x) [forall (x | D x), P x].
 Proof. exact: 'forall_implyP. Qed.
 
+Lemma forall_inPP D P PP : (forall x, reflect (PP x) (P x)) ->
+  reflect (forall x, D x -> PP x) [forall (x | D x), P x].
+Proof. by move=> vP; apply: (iffP (forall_inP _ _)) => /(_ _ _) /vP. Qed.
+
 Lemma eqfun_inP D f1 f2 :
   reflect {in D, forall x, f1 x = f2 x} [forall (x | x \in D), f1 x == f2 x].
-Proof. by apply: (iffP 'forall_implyP) => eq_f12 x Dx; apply/eqP/eq_f12. Qed.
+Proof. exact: (forall_inPP _ (fun=> eqP)). Qed.
 
 Lemma existsP P : reflect (exists x, P x) [exists x, P x].
 Proof. exact: 'exists_idP. Qed.
@@ -881,9 +885,13 @@ Proof. exact: 'exists_eqP. Qed.
 Lemma exists_inP D P : reflect (exists2 x, D x & P x) [exists (x | D x), P x].
 Proof. by apply: (iffP 'exists_andP) => [[x []] | [x]]; exists x. Qed.
 
+Lemma exists_inPP D P PP : (forall x, reflect (PP x) (P x)) ->
+  reflect (exists2 x, D x & PP x) [exists (x | D x), P x].
+Proof. by move=> vP; apply: (iffP (exists_inP _ _)) => -[x?/vP]; exists x. Qed.
+
 Lemma exists_eq_inP D f1 f2 :
   reflect (exists2 x, D x & f1 x = f2 x) [exists (x | D x), f1 x == f2 x].
-Proof. by apply: (iffP (exists_inP _ _)) => [] [x Dx /eqP]; exists x. Qed.
+Proof. exact: (exists_inPP _ (fun=> eqP)). Qed.
 
 Lemma eq_existsb P1 P2 : P1 =1 P2 -> [exists x, P1 x] = [exists x, P2 x].
 Proof. by move=> eqP12; congr (_ != 0); apply: eq_card. Qed.
@@ -927,6 +935,11 @@ Arguments existsP [T P].
 Arguments exists_eqP [T rT f1 f2].
 Arguments exists_inP [T D P].
 Arguments exists_eq_inP [T rT D f1 f2].
+
+Notation "'exists_in_ view" := (exists_inPP _ (fun _ => view))
+  (at level 4, right associativity, format "''exists_in_' view").
+Notation "'forall_in_ view" := (forall_inPP _ (fun _ => view))
+  (at level 4, right associativity, format "''forall_in_' view").
 
 Section Extrema.
 
