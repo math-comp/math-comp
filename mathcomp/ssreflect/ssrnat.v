@@ -512,6 +512,15 @@ Proof. by rewrite addnC; apply: subnKC. Qed.
 Lemma addnBA m n p : p <= n -> m + (n - p) = m + n - p.
 Proof. by move=> le_pn; rewrite -{2}(subnK le_pn) addnA addnK. Qed.
 
+Lemma addnBAC m n p : n <= m -> m - n + p = m + p - n.
+Proof. by move=> le_nm; rewrite addnC addnBA // addnC. Qed.
+
+Lemma addnBCA m n p : p <= m -> p <= n -> m + (n - p) = n + (m - p).
+Proof. by move=> le_pm le_pn; rewrite !addnBA // addnC. Qed.
+
+Lemma addnABC m n p : p <= m -> p <= n -> m + (n - p) = m - p + n.
+Proof. by move=> le_pm le_pn; rewrite addnBA // addnBAC. Qed.
+
 Lemma subnBA m n p : p <= n -> m - (n - p) = m + p - n.
 Proof. by move=> le_pn; rewrite -{2}(subnK le_pn) subnDr. Qed.
 
