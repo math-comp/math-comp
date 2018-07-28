@@ -3,7 +3,6 @@ algC.v
 algebraics_fundamentals.v
 algnum.v
 closed_field.v
-countalg.v
 cyclotomic.v
 falgebra.v
 fieldext.v

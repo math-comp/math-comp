@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp
-Require Import fintype finfun bigop ssralg ssrnum poly.
+Require Import fintype finfun bigop ssralg countalg ssrnum poly.
 Import GRing.Theory Num.Theory.
 
 (******************************************************************************)
@@ -358,6 +358,13 @@ Canonical int_unitRingType :=
 Canonical int_comUnitRing := Eval hnf in [comUnitRingType of int].
 Canonical int_iDomain :=
   Eval hnf in IdomainType int intUnitRing.idomain_axiomz.
+
+Canonical int_countZmodType := [countZmodType of int].
+Canonical int_countRingType := [countRingType of int].
+Canonical int_countComRingType := [countComRingType of int].
+Canonical int_countUnitRingType := [countUnitRingType of int].
+Canonical int_countComUnitRingType := [countComUnitRingType of int].
+Canonical int_countIdomainType := [countIdomainType of int].
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
 Notation "m - n" :=

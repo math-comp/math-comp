@@ -6,7 +6,7 @@ Require Import ssrbool ssrfun ssrnat eqtype seq choice div fintype.
 From mathcomp
 Require Import path tuple bigop finset prime ssralg poly polydiv mxpoly.
 From mathcomp
-Require Import countalg ssrnum ssrint rat intdiv.
+Require Import countalg closed_field ssrnum ssrint rat intdiv.
 From mathcomp
 Require Import fingroup finalg zmodp cyclic pgroup sylow.
 From mathcomp
@@ -27,7 +27,7 @@ Require Import vector falgebra fieldext separable galois.
 (* algebraics as a subfield. To avoid some duplication a few basic properties *)
 (* of the algebraics, such as the existence of minimal polynomials, that are  *)
 (* required by the proof of the Theorem, are also proved here.                *)
-(*  The main theorem of countalg.v supplies us directly with an algebraic     *)
+(*  The main theorem of closed_field supplies us directly with an algebraic   *)
 (* closure of the rationals (as the rationals are a countable field), so all  *)
 (* we really need to construct is a conjugation automorphism that exchanges   *)
 (* the two roots (i and -i) of X^2 + 1, and fixes a (real) subfield of        *)
