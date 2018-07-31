@@ -9,7 +9,9 @@ include Makefile.common
 
 # --------------------------------------------------------------------
 # this sets variable V (coq version) and MLLIBEXTRA
-# assuming SSR is set to the directory which contains the ssreflect package
+# assuming PLUGIN is set to the directory which contains the plugins
+# and SSR is set to the directory of the ssreflect package
+PLUGIN=../plugin
 SSR=ssreflect
 include ssreflect/Makefile.detect-coq-version
 COQMAKEFILEOPTIONS=$(MLLIBEXTRA)

@@ -12,9 +12,9 @@ V:=$(BRANCH_coq)
 
 MLLIBEXTRA:=$(shell \
 	if [ $(V) = "8.6" ];\
-	   then cp $(SSR)/plugin/v$(V)/ssreflect_plugin.mlpack .;\
-		cp $(SSR)/plugin/v$(V)/ssreflect.ml4 .;\
-		cp $(SSR)/plugin/v$(V)/ssrbool.v $(SSR)/;\
-		cp $(SSR)/plugin/v$(V)/ssrfun.v $(SSR)/;\
-		cp $(SSR)/plugin/v$(V)/ssreflect.v $(SSR)/;\
+	   then cp $(PLUGIN)/v$(V)/ssreflect_plugin.mlpack .;\
+		cp $(PLUGIN)/v$(V)/ssreflect.ml4 .;\
+		cp $(PLUGIN)/v$(V)/ssrbool.v $(SSR)/;\
+		cp $(PLUGIN)/v$(V)/ssrfun.v $(SSR)/;\
+		cp $(PLUGIN)/v$(V)/ssreflect.v $(SSR)/;\
 		echo "ssreflect_plugin.mlpack ssreflect.ml4"; fi)
