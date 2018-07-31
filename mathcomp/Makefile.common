@@ -27,6 +27,8 @@ Makefile.coq: $(BEFOREMAKEFILE) Makefile
 
 Makefile.this: $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES)
 	cat $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES) > Makefile.this
+
+__always__: Makefile.this
 # --------------------------------------------------------------------
 config: sub-config this-config Makefile.this
 
@@ -39,7 +41,7 @@ distclean: sub-distclean this-distclean
 # --------------------------------------------------------------------
 .PHONY: this-config this-build this-distclean this-clean
 
-this-build:: config
+this-build:: __always__
 	+$(COQMAKE)
 
 this-distclean:: this-clean $(OTHERCLEAN)
@@ -51,7 +53,7 @@ this-clean::
 # --------------------------------------------------------------------
 .PHONY: install
 
-install:
+install: __always__
 	$(COQMAKE) install
 # --------------------------------------------------------------------
 .PHONY: count
