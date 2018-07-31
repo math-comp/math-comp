@@ -1,22 +1,15 @@
 # -*- Makefile -*-
 
-COQPROJECT="Make"
+# setting variables
+COQPROJECT?=Make
+COQMAKEOPTIONS=--no-print-directory
 
-# --------------------------------------------------------------------
-# this sets variable V
-include Makefile.detect-coq-version
-# this defines prepare_coqmakefile
-include Makefile.coq-makefile
+# Main Makefile
 include ../Makefile.common
 
 # --------------------------------------------------------------------
-COQMAKEOPTIONS=--no-print-directory \
-	COQDEP='$(COQDEP) -exclude-dir plugin -c'
-COQMAKEFILEOPTIONS=$(MLLIB) $(EXTRA)
-
-# --------------------------------------------------------------------
-.PHONY: pre_makefile
-BEFOREMAKEFILE=pre_makefile
-
-pre_makefile:
-	$(call prepare_coqmakefile,.)
+# this sets variable V (coq version) and MLLIBEXTRA
+# assuming SSR is set to the directory which contains the ssreflect package
+SSR=.
+include Makefile.detect-coq-version
+COQMAKEFILEOPTIONS=$(MLLIBEXTRA)

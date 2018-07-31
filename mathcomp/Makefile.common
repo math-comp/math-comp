@@ -1,33 +1,34 @@
 # -*- Makefile -*-
-
-ifeq "$(COQBIN)" ""
-COQBIN=$(dir $(shell which coqtop))/
-endif
-ifeq "$(COQMAKEFILE)" ""
-COQMAKEFILE=$(COQBIN)coq_makefile
-endif
-COQDEP=$(COQBIN)coqdep
-
-ifeq "$(COQPROJECT)" ""
-COQPROJECT="_CoqProject"
-endif
+V?=
+VERBOSE?=V
+H:= $(if $(VERBOSE),,@)
+# Options
+COQBIN?=$(dir $(shell which coqtop))
+COQMAKEFILE?=$(COQBIN)coq_makefile
+COQDEP?=$(COQBIN)coqdep
+COQPROJECT?=_CoqProject
+COQMAKEOPTIONS?=
+COQMAKEFILEOPTIONS?=
+BEFOREMAKEFILE?=
 
 # --------------------------------------------------------------------
 .PHONY: all config build clean distclean __always__
 .SUFFIXES:
 
 TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
-COQMAKE = $(MAKE) -f Makefile.coq $(COQMAKEOPTIONS)
+COQMAKE = $(MAKE) -f Makefile.this $(COQMAKEOPTIONS)
 
 # --------------------------------------------------------------------
 all: config build
 
 # --------------------------------------------------------------------
-Makefile.coq: Makefile $(BEFOREMAKEFILE)
+Makefile.coq: $(BEFOREMAKEFILE) Makefile
 	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
 
+Makefile.this: $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES)
+	cat $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES) > Makefile.this
 # --------------------------------------------------------------------
-config: sub-config this-config Makefile.coq
+config: sub-config this-config Makefile.this
 
 build: sub-build this-build
 
@@ -38,14 +39,14 @@ distclean: sub-distclean this-distclean
 # --------------------------------------------------------------------
 .PHONY: this-config this-build this-distclean this-clean
 
-this-build::
+this-build:: config
 	+$(COQMAKE)
 
-this-distclean:: this-clean
-	rm -f Makefile.coq Makefile.coq.conf
+this-distclean:: this-clean $(OTHERCLEAN)
+	rm -f Makefile.coq Makefile.coq.conf Makefile.this
 
 this-clean::
-	@if [ -f Makefile.coq ]; then $(COQMAKE) cleanall; fi
+	@if [ -f Makefile.this ]; then $(COQMAKE) cleanall; fi
 
 # --------------------------------------------------------------------
 .PHONY: install
