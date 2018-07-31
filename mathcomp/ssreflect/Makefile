@@ -1,28 +1,22 @@
-H=@
+# -*- Makefile -*-
 
-ifeq "$(COQBIN)" ""
-COQBIN=$(dir $(shell which coqtop))/
-endif
+COQPROJECT="Make"
 
+# --------------------------------------------------------------------
 # this sets variable V
 include Makefile.detect-coq-version
-# this defined coqmakefile
+# this defines prepare_coqmakefile
 include Makefile.coq-makefile
+include ../Makefile.common
 
-COQDEP=$(COQBIN)coqdep
+# --------------------------------------------------------------------
+COQMAKEOPTIONS=--no-print-directory \
+	COQDEP='$(COQDEP) -exclude-dir plugin -c'
+COQMAKEFILEOPTIONS=$(MLLIB) $(EXTRA)
 
-OLD_MAKEFLAGS:=$(MAKEFLAGS)
-MAKEFLAGS+=-B
+# --------------------------------------------------------------------
+.PHONY: pre_makefile
+BEFOREMAKEFILE=pre_makefile
 
-.DEFAULT_GOAL := all
-
-%:
-	$(H)[ -e Makefile.coq ] || $(call coqmakefile,.)
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq $* \
-		COQDEP='$(COQDEP) -exclude-dir plugin -c'
-
-clean:
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq clean
-	$(H)rm -f Makefile.coq
+pre_makefile:
+	$(call prepare_coqmakefile,.)

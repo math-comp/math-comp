@@ -1,30 +1,23 @@
-H=@
+# -*- Makefile -*-
 
-ifeq "$(COQBIN)" ""
-COQBIN=$(dir $(shell which coqtop))/
-endif
+COQPROJECT="Make"
 
+# --------------------------------------------------------------------
 # this sets variable V
 include ssreflect/Makefile.detect-coq-version
-# this defined coqmakefile
+# this defines prepare_coqmakefile
 include ssreflect/Makefile.coq-makefile
+include Makefile.common
 
-COQDEP=$(COQBIN)coqdep
+# --------------------------------------------------------------------
+COQMAKEOPTIONS=--no-print-directory \
+	COQDEP='$(COQDEP) -exclude-dir ssreflect/plugin -c'
+COQMAKEFILEOPTIONS=$(MLLIB) $(EXTRA)
 
-OLD_MAKEFLAGS:=$(MAKEFLAGS)
-MAKEFLAGS+=-B
+# --------------------------------------------------------------------
+.PHONY: pre_makefile
+BEFOREMAKEFILE=pre_makefile
 
-.DEFAULT_GOAL := all
+pre_makefile:
+	$(call prepare_coqmakefile,ssreflect)
 
-%:
-	$(H)[ -e Makefile.coq ] || $(call coqmakefile,ssreflect)
-	# Override COQDEP to find only the "right" copy .ml files
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq $* \
-		COQDEP='$(COQDEP) -exclude-dir plugin -c'
-
-clean: 
-	$(H)[ -e Makefile.coq ] || $(call coqmakefile,ssreflect)
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq clean
-	$(H)rm -f Makefile.coq

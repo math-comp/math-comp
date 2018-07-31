@@ -1,4 +1,4 @@
-define coqmakefile
+define prepare_coqmakefile
 	(echo "Generating Makefile.coq for Coq $(V) with COQBIN=$(COQBIN)";\
 	if [ "$$OS" = "Windows_NT" ]; then LN=cp; else LN="ln -sfr"; fi;\
 	MLLIB=;\
@@ -26,7 +26,6 @@ define coqmakefile
 		MLLIB=ssreflect_plugin.mlpack;\
 		EXTRA="ssreflect.ml4";\
 	;;\
-	esac;\
-	$(COQBIN)coq_makefile -f Make $$MLLIB $$EXTRA -o Makefile.coq)
+	esac
 endef
 
