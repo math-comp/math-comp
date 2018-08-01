@@ -8,10 +8,9 @@ COQMAKEOPTIONS=--no-print-directory
 include ../Makefile.common
 
 # --------------------------------------------------------------------
-# this sets variable V (coq version) and MLLIBEXTRA
+# this sets variables COQVERSION and MLLIBEXTRA
 # assuming PLUGIN is set to the directory which contains the plugins
 PLUGIN=../../plugin/
 SSR=.
 include Makefile.detect-coq-version
-
 COQMAKEFILEOPTIONS=$(MLLIBEXTRA)

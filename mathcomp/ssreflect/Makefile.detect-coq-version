@@ -2,19 +2,17 @@ BRANCH_coq:= $(shell $(COQBIN)coqtop -v | head -1 | grep -E '(trunk|master)' \
 	     | wc -l | sed 's/ *//g')
 
 ifneq "$(BRANCH_coq)" "0"
-BRANCH_coq:= master
+COQVERSION:= master
 else
-BRANCH_coq:= $(shell $(COQBIN)coqtop -v | head -1 \
+COQVERSION:= $(shell $(COQBIN)coqtop -v | head -1 \
 	     | sed 's/.*version \([0-9]\.[0-9]\)[^ ]* .*/\1/')
 endif
 
-V:=$(BRANCH_coq)
-
 MLLIBEXTRA:=$(shell \
-	if [ $(V) = "8.6" ];\
-	   then cp $(PLUGIN)/v$(V)/ssreflect_plugin.mlpack .;\
-		cp $(PLUGIN)/v$(V)/ssreflect.ml4 .;\
-		cp $(PLUGIN)/v$(V)/ssrbool.v $(SSR)/;\
-		cp $(PLUGIN)/v$(V)/ssrfun.v $(SSR)/;\
-		cp $(PLUGIN)/v$(V)/ssreflect.v $(SSR)/;\
+	if [ $(COQVERSION) = "8.6" ];\
+	   then cp $(PLUGIN)/v$(COQVERSION)/ssreflect_plugin.mlpack .;\
+		cp $(PLUGIN)/v$(COQVERSION)/ssreflect.ml4 .;\
+		cp $(PLUGIN)/v$(COQVERSION)/ssrbool.v $(SSR)/;\
+		cp $(PLUGIN)/v$(COQVERSION)/ssrfun.v $(SSR)/;\
+		cp $(PLUGIN)/v$(COQVERSION)/ssreflect.v $(SSR)/;\
 		echo "ssreflect_plugin.mlpack ssreflect.ml4"; fi)
