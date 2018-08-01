@@ -1,36 +1,40 @@
 # -*- Makefile -*-
-V?=
-VERBOSE?=V
-H:= $(if $(VERBOSE),,@)
-# Options
+
+######################################################################
+# USAGE:                                                             #
+# The rules this-config::, this-build::, this-distclean::,           #
+# pre-makefile::, this-clean:: and __always__:: may be extended      #
+# Additionally, the following variables may be customized:           #
+SUBDIRS?=
 COQBIN?=$(dir $(shell which coqtop))
 COQMAKEFILE?=$(COQBIN)coq_makefile
 COQDEP?=$(COQBIN)coqdep
 COQPROJECT?=_CoqProject
 COQMAKEOPTIONS?=
 COQMAKEFILEOPTIONS?=
-BEFOREMAKEFILE?=
+V?=
+VERBOSE?=V
+######################################################################
 
-# --------------------------------------------------------------------
+# local context: -----------------------------------------------------
 .PHONY: all config build clean distclean __always__
 .SUFFIXES:
 
+H:= $(if $(VERBOSE),,@)  # not used yet
 TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
-COQMAKE = $(MAKE) -f Makefile.this $(COQMAKEOPTIONS)
+COQMAKE = $(MAKE) -f Makefile.coq $(COQMAKEOPTIONS)
 
-# --------------------------------------------------------------------
+# all: ---------------------------------------------------------------
 all: config build
 
-# --------------------------------------------------------------------
-Makefile.coq: $(BEFOREMAKEFILE) Makefile
+# Makefile.coq: ------------------------------------------------------
+.PHONY: pre-makefile
+
+Makefile.coq: pre-makefile Makefile
 	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
 
-Makefile.this: $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES)
-	cat $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES) > Makefile.this
-
-__always__: Makefile.this
-# --------------------------------------------------------------------
-config: sub-config this-config Makefile.this
+# Global config, build, clean and distclean --------------------------
+config: sub-config this-config
 
 build: sub-build this-build
 
@@ -38,24 +42,26 @@ clean: sub-clean this-clean
 
 distclean: sub-distclean this-distclean
 
-# --------------------------------------------------------------------
+# Local config, build, clean and distclean ---------------------------
 .PHONY: this-config this-build this-distclean this-clean
 
-this-build:: __always__
+this-config:: __always__
+
+this-build:: this-config Makefile.coq
 	+$(COQMAKE)
 
 this-distclean:: this-clean $(OTHERCLEAN)
-	rm -f Makefile.coq Makefile.coq.conf Makefile.this
+	rm -f Makefile.coq Makefile.coq.conf Makefile.coq
 
-this-clean::
-	@if [ -f Makefile.this ]; then $(COQMAKE) cleanall; fi
+this-clean:: __always__
+	@if [ -f Makefile.coq ]; then $(COQMAKE) cleanall; fi
 
-# --------------------------------------------------------------------
+# Install target -----------------------------------------------------
 .PHONY: install
 
-install: __always__
+install: __always__ Makefile.coq
 	$(COQMAKE) install
-# --------------------------------------------------------------------
+# counting lines of Coq code -----------------------------------------
 .PHONY: count
 
 COQFILES := $(shell grep '.v$$' Make)
@@ -63,11 +69,11 @@ COQFILES := $(shell grep '.v$$' Make)
 count:
 	@coqwc $(COQFILES) | tail -1 | \
 	  awk '{printf ("%d (spec=%d+proof=%d)\n", $$1+$$2, $$1, $$2)}'
-# --------------------------------------------------------------------
+# Additionally cleaning backup (*~) files ----------------------------
 this-distclean::
 	rm -f $(shell find . -name '*~')
 
-# --------------------------------------------------------------------
+# Make in SUBDIRS ----------------------------------------------------
 ifdef SUBDIRS
 sub-%: __always__
 	@set -e; for d in $(SUBDIRS); do +$(MAKE) -C $$d $(@:sub-%=%); done
@@ -76,6 +82,6 @@ sub-%: __always__
 	@true
 endif
 
-# --------------------------------------------------------------------
-%.vo: __always__
+# Make of individual .vo ---------------------------------------------
+%.vo: __always__ Makefile.coq
 	+$(COQMAKE) $@

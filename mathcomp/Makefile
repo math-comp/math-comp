@@ -8,7 +8,7 @@ COQMAKEOPTIONS=--no-print-directory
 include Makefile.common
 
 # --------------------------------------------------------------------
-# this sets variable V (coq version) and MLLIBEXTRA
+# this sets variables COQVERSION and MLLIBEXTRA
 # assuming PLUGIN is set to the directory which contains the plugins
 # and SSR is set to the directory of the ssreflect package
 PLUGIN=../plugin
