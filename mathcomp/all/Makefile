@@ -1,22 +1,25 @@
-H=@
+# -*- Makefile -*-
 
-ifeq "$(COQBIN)" ""
-COQBIN=$(dir $(shell which coqtop))/
-endif
+COQPROJECT="Make"
 
-OLD_MAKEFLAGS:=$(MAKEFLAGS)
-MAKEFLAGS+=-B
+# --------------------------------------------------------------------
+include Makefile.common
 
-.DEFAULT_GOAL := all
+# --------------------------------------------------------------------
+COQMAKEOPTIONS=--no-print-directory
 
-%:
-	$(H)[ -e Makefile.coq ] || $(COQBIN)/coq_makefile -f Make -o Makefile.coq
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq $*
+# --------------------------------------------------------------------
+.PHONY: install
 
-.PHONY: clean
-clean:
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq clean
-	$(H)rm -f Makefile.coq
+install:
+	$(MAKE) -f Makefile.coq install
+
+# --------------------------------------------------------------------
+.PHONY: count
+
+COQFILES := $(shell grep '.v$$' Make)
+
+count:
+	@coqwc $(COQFILES) | tail -1 | \
+	  awk '{printf ("%d (spec=%d+proof=%d)\n", $$1+$$2, $$1, $$2)}'
 

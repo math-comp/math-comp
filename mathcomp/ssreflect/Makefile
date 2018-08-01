@@ -1,28 +1,17 @@
-H=@
+# -*- Makefile -*-
 
-ifeq "$(COQBIN)" ""
-COQBIN=$(dir $(shell which coqtop))/
-endif
+# setting variables
+COQPROJECT?=Make
+COQMAKEOPTIONS=--no-print-directory
 
-# this sets variable V
+# Main Makefile
+include ../Makefile.common
+
+# --------------------------------------------------------------------
+# this sets variable V (coq version) and MLLIBEXTRA
+# assuming PLUGIN is set to the directory which contains the plugins
+PLUGIN=../../plugin/
+SSR=.
 include Makefile.detect-coq-version
-# this defined coqmakefile
-include Makefile.coq-makefile
 
-COQDEP=$(COQBIN)coqdep
-
-OLD_MAKEFLAGS:=$(MAKEFLAGS)
-MAKEFLAGS+=-B
-
-.DEFAULT_GOAL := all
-
-%:
-	$(H)[ -e Makefile.coq ] || $(call coqmakefile,.)
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq $* \
-		COQDEP='$(COQDEP) -exclude-dir plugin -c'
-
-clean:
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq clean
-	$(H)rm -f Makefile.coq
+COQMAKEFILEOPTIONS=$(MLLIBEXTRA)

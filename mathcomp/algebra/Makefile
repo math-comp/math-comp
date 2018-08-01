@@ -1,24 +1,10 @@
-H=@
+# -*- Makefile -*-
 
-ifeq "$(COQBIN)" ""
-COQBIN=$(dir $(shell which coqtop))/
-endif
+COQPROJECT="Make"
 
-COQDEP=$(COQBIN)/coqdep
-OLD_MAKEFLAGS:=$(MAKEFLAGS)
-MAKEFLAGS+=-B
+# --------------------------------------------------------------------
+include ../Makefile.common
 
-.DEFAULT_GOAL := all
-
-%:
-	$(H)[ -e Makefile.coq ] || $(COQBIN)/coq_makefile -f Make -o Makefile.coq
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq $* \
-		COQDEP='$(COQDEP) -c'
-
-.PHONY: clean
-clean:
-	$(H)MAKEFLAGS="$(OLD_MAKEFLAGS)" $(MAKE) --no-print-directory \
-		-f Makefile.coq clean
-	$(H)rm -f Makefile.coq
+# --------------------------------------------------------------------
+COQMAKEOPTIONS=--no-print-directory
 

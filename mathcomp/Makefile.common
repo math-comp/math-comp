@@ -1,0 +1,81 @@
+# -*- Makefile -*-
+V?=
+VERBOSE?=V
+H:= $(if $(VERBOSE),,@)
+# Options
+COQBIN?=$(dir $(shell which coqtop))
+COQMAKEFILE?=$(COQBIN)coq_makefile
+COQDEP?=$(COQBIN)coqdep
+COQPROJECT?=_CoqProject
+COQMAKEOPTIONS?=
+COQMAKEFILEOPTIONS?=
+BEFOREMAKEFILE?=
+
+# --------------------------------------------------------------------
+.PHONY: all config build clean distclean __always__
+.SUFFIXES:
+
+TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
+COQMAKE = $(MAKE) -f Makefile.this $(COQMAKEOPTIONS)
+
+# --------------------------------------------------------------------
+all: config build
+
+# --------------------------------------------------------------------
+Makefile.coq: $(BEFOREMAKEFILE) Makefile
+	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
+
+Makefile.this: $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES)
+	cat $(BEFOREMAKEFILES) Makefile.coq $(AFTERMAKEFILES) > Makefile.this
+
+__always__: Makefile.this
+# --------------------------------------------------------------------
+config: sub-config this-config Makefile.this
+
+build: sub-build this-build
+
+clean: sub-clean this-clean
+
+distclean: sub-distclean this-distclean
+
+# --------------------------------------------------------------------
+.PHONY: this-config this-build this-distclean this-clean
+
+this-build:: __always__
+	+$(COQMAKE)
+
+this-distclean:: this-clean $(OTHERCLEAN)
+	rm -f Makefile.coq Makefile.coq.conf Makefile.this
+
+this-clean::
+	@if [ -f Makefile.this ]; then $(COQMAKE) cleanall; fi
+
+# --------------------------------------------------------------------
+.PHONY: install
+
+install: __always__
+	$(COQMAKE) install
+# --------------------------------------------------------------------
+.PHONY: count
+
+COQFILES := $(shell grep '.v$$' Make)
+
+count:
+	@coqwc $(COQFILES) | tail -1 | \
+	  awk '{printf ("%d (spec=%d+proof=%d)\n", $$1+$$2, $$1, $$2)}'
+# --------------------------------------------------------------------
+this-distclean::
+	rm -f $(shell find . -name '*~')
+
+# --------------------------------------------------------------------
+ifdef SUBDIRS
+sub-%: __always__
+	@set -e; for d in $(SUBDIRS); do +$(MAKE) -C $$d $(@:sub-%=%); done
+else
+sub-%: __always__
+	@true
+endif
+
+# --------------------------------------------------------------------
+%.vo: __always__
+	+$(COQMAKE) $@
