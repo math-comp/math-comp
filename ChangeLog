@@ -1,3 +1,7 @@
+??/??/???? - version 1.7.1
+	* Added companion matrix of a polynomial `companionmx p` and the
+	  theorems: companionmxK, map_mx_companion and companion_map_poly
+
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 
 	* Added compatibility with Coq 8.8 and lost compatibility with
