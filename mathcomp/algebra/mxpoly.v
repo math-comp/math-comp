@@ -26,10 +26,11 @@ Require Import poly polydiv.
 (* powers_mx A d == the d x (n ^ 2) matrix whose rows are the mxvec encodings *)
 (*                  of the first d powers of A (n of the form n'.+1). Thus,   *)
 (*                  vec_mx (v *m powers_mx A d) = horner_mx A (rVpoly v).     *)
-(*   char_poly A == the characteristic polynomial of A.                       *)
-(* char_poly_mx A == a matrix whose detereminant is char_poly A.              *)
-(*   mxminpoly A == the minimal polynomial of A, i.e., the smallest monic     *)
-(*                  polynomial that annihilates A (A must be nontrivial).     *)
+(*   char_poly A  == the characteristic polynomial of A.                      *)
+(* char_poly_mx A == a matrix whose determinant is char_poly A.               *)
+(*  companionmx p == a matrix whose char_poly is p                            *)
+(*   mxminpoly A  == the minimal polynomial of A, i.e., the smallest monic     *)
+(*                   polynomial that annihilates A (A must be nontrivial).    *)
 (* degree_mxminpoly A == the (positive) degree of mxminpoly A.                *)
 (* mx_inv_horner A == the inverse of horner_mx A for polynomials of degree    *)
 (*                  smaller than degree_mxminpoly A.                          *)
@@ -430,6 +431,64 @@ rewrite (big_morph _ (fun p q => hornerM p q a) (hornerC 1 a)).
 by apply: eq_bigr => i _; rewrite !mxE !(hornerE, hornerMn).
 Qed.
 
+Section Companion.
+
+Definition companionmx (R : ringType) (p : seq R) (d := (size p).-1) :=
+  \matrix_(i < d, j < d)
+    if (i == d.-1 :> nat) then - p`_j else (i.+1 == j :> nat)%:R.
+
+Lemma companionmxK (R : comRingType) (p : {poly R}) :
+   p \is monic -> char_poly (companionmx p) = p.
+Proof.
+pose D n : 'M[{poly R}]_n := \matrix_(i, j)
+   ('X *+ (i == j.+1 :> nat) - ((i == j)%:R)%:P).
+have detD n : \det (D n) = (-1) ^+ n.
+  elim: n => [|n IHn]; first by rewrite det_mx00.
+  rewrite (expand_det_row _ ord0) big_ord_recl !mxE /= sub0r.
+  rewrite big1 ?addr0; last by move=> i _; rewrite !mxE /= subrr mul0r.
+  rewrite /cofactor mul1r [X in \det X](_ : _ = D _) ?IHn ?exprS//.
+  by apply/matrixP=> i j; rewrite !mxE /= /bump !add1n eqSS.
+elim/poly_ind: p => [|p c IHp].
+  by rewrite monicE lead_coef0 eq_sym oner_eq0.
+have [->|p_neq0] := eqVneq p 0.
+  rewrite mul0r add0r monicE lead_coefC => /eqP->.
+  by rewrite /companionmx /char_poly size_poly1 det_mx00.
+rewrite monicE lead_coefDl ?lead_coefMX => [p_monic|]; last first.
+  rewrite size_polyC size_mulX ?polyX_eq0// ltnS.
+  by rewrite (leq_trans (leq_b1 _)) ?size_poly_gt0.
+rewrite -[in RHS]IHp // /companionmx size_MXaddC (negPf p_neq0) /=.
+rewrite /char_poly polySpred //.
+have [->|spV1_gt0] := posnP (size p).-1.
+  rewrite [X in \det X]mx11_scalar det_scalar1 !mxE ?eqxx det_mx00.
+  by rewrite mul1r -horner_coef0 hornerMXaddC mulr0 add0r rmorphN opprK.
+rewrite (expand_det_col _ ord0) /= -[(size p).-1]prednK //.
+rewrite big_ord_recr big_ord_recl/= big1 ?add0r //=; last first.
+  move=> i _; rewrite !mxE -val_eqE /= /bump leq0n add1n eqSS.
+  by rewrite ltn_eqF ?subrr ?mul0r.
+rewrite !mxE ?subnn -horner_coef0 /= hornerMXaddC.
+rewrite !(eqxx, mulr0, add0r, addr0, subr0, rmorphN, opprK)/=.
+rewrite mulrC /cofactor; congr (_ * 'X + _).
+  rewrite /cofactor -signr_odd odd_add addbb mul1r; congr (\det _).
+  apply/matrixP => i j; rewrite !mxE -val_eqE coefD coefMX coefC.
+  by rewrite /= /bump /= !add1n !eqSS addr0.
+rewrite /cofactor [X in \det X](_ : _ = D _).
+  by rewrite detD /= addn0 -signr_odd -signr_addb addbb mulr1.
+apply/matrixP=> i j; rewrite !mxE -!val_eqE /= /bump /=.
+by rewrite leqNgt ltn_ord add0n add1n [_ == _.-2.+1]ltn_eqF.
+Qed.
+
+Lemma mulmx_delta_companion (R : ringType) (p : seq R)
+  (i: 'I_(size p).-1) (i_small : i.+1 < (size p).-1):
+  delta_mx 0 i *m companionmx p = delta_mx 0 (Ordinal i_small) :> 'rV__.
+Proof.
+apply/rowP => j; rewrite !mxE (bigD1 i) //= ?(=^~val_eqE, mxE) /= eqxx mul1r.
+rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //; last first.
+  by rewrite -ltnS prednK // (leq_trans  _ i_small).
+by move=> k /negPf ki_eqF; rewrite !mxE eqxx ki_eqF mul0r.
+Qed.
+
+End Companion.
+
 Section MinPoly.
 
 Variables (F : fieldType) (n' : nat).
@@ -644,7 +703,18 @@ Section MapField.
 Variables (aF rF : fieldType) (f : {rmorphism aF -> rF}).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Local Notation fp := (map_poly f).
-Variables (n' : nat) (A : 'M[aF]_n'.+1).
+Variables (n' : nat) (A : 'M[aF]_n'.+1) (p : {poly aF}).
+
+Lemma map_mx_companion (e := congr1 predn (size_map_poly _ _)) :
+  (companionmx p)^f = castmx (e, e) (companionmx (fp p)).
+Proof.
+apply/matrixP => i j; rewrite !(castmxE, mxE) /= (fun_if f).
+by rewrite rmorphN coef_map size_map_poly rmorph_nat.
+Qed.
+
+Lemma companion_map_poly (e := esym (congr1 predn (size_map_poly _ _))) :
+  companionmx (fp p) = castmx (e, e) (companionmx p)^f.
+Proof. by rewrite map_mx_companion castmx_comp castmx_id. Qed.
 
 Lemma degree_mxminpoly_map : degree_mxminpoly A^f = degree_mxminpoly A.
 Proof. by apply: eq_ex_minn => e; rewrite -map_powers_mx mxrank_map. Qed.
@@ -821,7 +891,7 @@ by rewrite -mulN1r; do 2!apply: (genM) => //; apply: genR.
 Qed.
 
 Lemma integral_root_monic u p :
-    p \is monic -> root p u -> {in p : seq K, integralRange RtoK} -> 
+    p \is monic -> root p u -> {in p : seq K, integralRange RtoK} ->
   integralOver RtoK u.
 Proof.
 move=> mon_p pu0 intRp; rewrite -[u]hornerX.
@@ -840,7 +910,7 @@ Lemma integral_opp u : integralOver RtoK u -> integralOver RtoK (- u).
 Proof. by rewrite -{1}[u]opprK => /intR_XsubC/integral_root_monic; apply. Qed.
 
 Lemma integral_horner (p : {poly K}) u :
-    {in p : seq K, integralRange RtoK} -> integralOver RtoK u -> 
+    {in p : seq K, integralRange RtoK} -> integralOver RtoK u ->
   integralOver RtoK p.[u].
 Proof. by move=> ? /integral_opp/intR_XsubC/integral_horner_root; apply. Qed.
 
