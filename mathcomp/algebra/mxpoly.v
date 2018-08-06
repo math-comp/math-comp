@@ -435,16 +435,16 @@ Section Companion.
 
 Definition companionmx (R : ringType) (p : seq R) (d := (size p).-1) :=
   \matrix_(i < d, j < d)
-    if (i == 0%N :> nat) then - p`_(d.-1 - j) else (i == j.+1 :> nat)%:R.
+    if (i == d.-1 :> nat) then - p`_j else (i.+1 == j :> nat)%:R.
 
 Lemma companionmxK (R : comRingType) (p : {poly R}) :
    p \is monic -> char_poly (companionmx p) = p.
 Proof.
 pose D n : 'M[{poly R}]_n := \matrix_(i, j)
-   ('X *+ (i.+1 == j :> nat) - ((i.+1 == j.+1)%:R)%:P).
+   ('X *+ (i == j.+1 :> nat) - ((i == j)%:R)%:P).
 have detD n : \det (D n) = (-1) ^+ n.
   elim: n => [|n IHn]; first by rewrite det_mx00.
-  rewrite (expand_det_col _ ord0) big_ord_recl !mxE /= sub0r.
+  rewrite (expand_det_row _ ord0) big_ord_recl !mxE /= sub0r.
   rewrite big1 ?addr0; last by move=> i _; rewrite !mxE /= subrr mul0r.
   rewrite /cofactor mul1r [X in \det X](_ : _ = D _) ?IHn ?exprS//.
   by apply/matrixP=> i j; rewrite !mxE /= /bump !add1n eqSS.
@@ -461,19 +461,30 @@ rewrite /char_poly polySpred //.
 have [->|spV1_gt0] := posnP (size p).-1.
   rewrite [X in \det X]mx11_scalar det_scalar1 !mxE ?eqxx det_mx00.
   by rewrite mul1r -horner_coef0 hornerMXaddC mulr0 add0r rmorphN opprK.
-rewrite (expand_det_col _ ord_max) /= -[(size p).-1]prednK //.
-rewrite big_ord_recr big_ord_recl big1 ?add0r //=; last first.
-  move=> i _; rewrite !mxE -val_eqE /= /bump leq0n add1n !eqSS.
-  by rewrite !ltn_eqF ?oppr0 ?addr0 ?subrr ?mul0r // leqW.
-rewrite !mxE ?subnn -horner_coef0 /= hornerMXaddC ltn_eqF //.
-rewrite !(eqxx, mulr0, add0r, addr0, subr0, rmorphN, opprK).
-rewrite {1}/cofactor [X in \det X](_ : _ = D _); last first.
-  apply/matrixP=> i j; rewrite !mxE -!val_eqE /= /bump /=.
-  by rewrite leqNgt ltn_ord add0n add1n.
-rewrite detD /= add0n -signr_odd -signr_addb addbb mulr1 addrC mulrC.
-rewrite /cofactor -signr_odd odd_add addbb mul1r; congr (\det _ * _ + _).
-apply/matrixP => i j; rewrite !mxE -val_eqE /= /bump /= coefD coefMX coefC.
-by rewrite subn_eq0 !ltnNge ?leq_ord ?add0n //= subSKn ?addr0.
+rewrite (expand_det_col _ ord0) /= -[(size p).-1]prednK //.
+rewrite big_ord_recr big_ord_recl/= big1 ?add0r //=; last first.
+  move=> i _; rewrite !mxE -val_eqE /= /bump leq0n add1n eqSS.
+  by rewrite ltn_eqF ?subrr ?mul0r.
+rewrite !mxE ?subnn -horner_coef0 /= hornerMXaddC.
+rewrite !(eqxx, mulr0, add0r, addr0, subr0, rmorphN, opprK)/=.
+rewrite mulrC /cofactor; congr (_ * 'X + _).
+  rewrite /cofactor -signr_odd odd_add addbb mul1r; congr (\det _).
+  apply/matrixP => i j; rewrite !mxE -val_eqE coefD coefMX coefC.
+  by rewrite /= /bump /= !add1n !eqSS addr0.
+rewrite /cofactor [X in \det X](_ : _ = D _).
+  by rewrite detD /= addn0 -signr_odd -signr_addb addbb mulr1.
+apply/matrixP=> i j; rewrite !mxE -!val_eqE /= /bump /=.
+by rewrite leqNgt ltn_ord add0n add1n [_ == _.-2.+1]ltn_eqF.
+Qed.
+
+Lemma mulmx_delta_companion (R : ringType) (p : seq R)
+  (i: 'I_(size p).-1) (i_small : i.+1 < (size p).-1):
+  delta_mx 0 i *m companionmx p = delta_mx 0 (Ordinal i_small) :> 'rV__.
+Proof.
+apply/rowP => j; rewrite !mxE (bigD1 i) //= ?(=^~val_eqE, mxE) /= eqxx mul1r.
+rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //; last first.
+  by rewrite -ltnS prednK // (leq_trans  _ i_small).
+by move=> k /negPf ki_eqF; rewrite !mxE eqxx ki_eqF mul0r.
 Qed.
 
 End Companion.
