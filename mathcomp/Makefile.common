@@ -23,6 +23,18 @@ VERBOSE?=V
 H:= $(if $(VERBOSE),,@)  # not used yet
 TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
 COQMAKE = $(MAKE) -f Makefile.coq $(COQMAKEOPTIONS)
+BRANCH_coq:= $(shell $(COQBIN)coqtop -v | head -1 | grep -E '(trunk|master)' \
+	      | wc -l | sed 's/ *//g')
+
+# coq version:
+ifneq "$(BRANCH_coq)" "0"
+COQVVV:= dev
+else
+COQVVV:=$(shell $(COQBIN)coqtop --print-version | cut -d" " -f1)
+endif
+
+COQV:= $(shell echo $(COQVVV) | cut -d"." -f1)
+COQVV:= $(shell echo $(COQVVV) | cut -d"." -f1-2)
 
 # all: ---------------------------------------------------------------
 all: config build
@@ -30,7 +42,7 @@ all: config build
 # Makefile.coq: ------------------------------------------------------
 .PHONY: pre-makefile
 
-Makefile.coq: pre-makefile Makefile
+Makefile.coq: pre-makefile $(COQPROJECT) Makefile
 	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
 
 # Global config, build, clean and distclean --------------------------
@@ -50,7 +62,7 @@ this-config:: __always__
 this-build:: this-config Makefile.coq
 	+$(COQMAKE)
 
-this-distclean:: this-clean $(OTHERCLEAN)
+this-distclean:: this-clean
 	rm -f Makefile.coq Makefile.coq.conf Makefile.coq
 
 this-clean:: __always__
@@ -64,7 +76,7 @@ install: __always__ Makefile.coq
 # counting lines of Coq code -----------------------------------------
 .PHONY: count
 
-COQFILES := $(shell grep '.v$$' Make)
+COQFILES = $(shell grep '.v$$' $(COQPROJECT))
 
 count:
 	@coqwc $(COQFILES) | tail -1 | \
