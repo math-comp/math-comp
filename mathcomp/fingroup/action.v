@@ -1680,7 +1680,37 @@ Proof. by rewrite ker_actperm astab_actby setIT (setIidPr (astab_sub _ _)). Qed.
 Lemma im_restr_perm p : restr_perm p @: S = S.
 Proof. exact: im_perm_on (restr_perm_on p). Qed.
 
+Definition perm_ong : {set {perm T}} := [set s | perm_on S s].
+Lemma group_set_perm_ong : group_set perm_ong.
+Proof using.
+apply/group_setP; split => [| s t]; rewrite !inE;
+   [exact: perm_on1 | exact: perm_onM].
+Qed.
+Canonical perm_ong_group : {group {perm T}} := Group group_set_perm_ong.
+Lemma card_perm_ong : #|perm_ong| = #|S|`!.
+Proof using. by rewrite cardsE /= card_perm. Qed.
+
+Lemma perm_ongE : perm_ong = 'C(~:S | 'P).
+Proof using.
+apply/setP => s; rewrite inE; apply/idP/astabP => [Hperm x | Hstab].
+- by rewrite inE /= apermE => /out_perm; apply.
+- apply/subsetP => x; rewrite unfold_in; apply contraR => H.
+  by move/(_ x): Hstab; rewrite inE /= apermE => ->.
+Qed.
+
+Lemma restr_perm_commute s : commute (restr_perm s) s.
+Proof using.
+case: (boolP (s \in 'N(S | 'P))) =>
+    [HC | /triv_restr_perm ->]; last exact: (commute_sym (commute1 _)).
+apply/permP => x; case: (boolP (x \in S)) => Hx; rewrite !permM.
+- by rewrite !restr_permE //; move: HC => /astabsP/(_ x)/= ->.
+- have:= restr_perm_on s => /out_perm Hout.
+  rewrite (Hout _ Hx) {}Hout //.
+  by move: Hx; apply contra; move: HC => /astabsP/(_ x)/= ->.
+Qed.
+
 End RestrictPerm.
+
 
 Section AutIn.
 

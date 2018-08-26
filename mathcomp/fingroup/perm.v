@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype tuple finfun bigop finset binomial.
 From mathcomp Require Import fingroup.
@@ -161,6 +162,9 @@ Canonical perm_of_finGroupType := Eval hnf in [finGroupType of {perm T} ].
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
 
+Lemma imset_perm1 (S : {set T}) : [set fun_of_perm 1 x | x in S] = S.
+Proof. by rewrite -[RHS]imset_id; apply eq_imset => x; rewrite perm1. Qed.
+
 Lemma permM s t x : (s * t) x = t (s x).
 Proof. by rewrite permE. Qed.
 
@@ -175,6 +179,12 @@ Proof. by rewrite !permM permK. Qed.
 
 Lemma permX s x n : (s ^+ n) x = iter n s x.
 Proof. by elim: n => [|n /= <-]; rewrite ?perm1 // -permM expgSr. Qed.
+
+Lemma permX_fix s x n : s x = x -> (s ^+ n) x = x.
+Proof using.
+move=> Hs; elim: n => [|n IHn]; first by rewrite expg0 perm1.
+by rewrite expgS permM Hs.
+Qed.
 
 Lemma im_permV s S : s^-1 @: S = s @^-1: S.
 Proof. exact: can2_imset_pre (permKV s) (permK s). Qed.
@@ -341,6 +351,11 @@ Proof. by rewrite (mem_imset (aperm x)) ?mem_cycle. Qed.
 Lemma pcycle_id s x : x \in pcycle s x.
 Proof. by rewrite -{1}[x]perm1 (mem_pcycle s 0). Qed.
 
+Lemma card_pcycle_neq0 s x : #|pcycle s x| != 0.
+Proof using.
+by rewrite -lt0n card_gt0; apply/set0Pn; exists x; exact: pcycle_id.
+Qed.
+
 Lemma uniq_traject_pcycle s x : uniq (traject s x #|pcycle s x|).
 Proof.
 case def_n: #|_| => // [n]; rewrite looping_uniq.
@@ -380,6 +395,17 @@ Proof. by rewrite -!eq_pcycle_mem eq_sym. Qed.
 
 Lemma pcycle_perm s i x : pcycle s ((s ^+ i) x) = pcycle s x.
 Proof. by apply/eqP; rewrite eq_pcycle_mem mem_pcycle. Qed.
+
+Lemma pcyclePmin s x y :
+  y \in pcycle s x -> exists2 i, i < #[s] & y = (s ^+ i) x.
+Proof using. by move=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i. Qed.
+
+Lemma pcycleP s x y :
+  reflect (exists i, y = (s ^+ i) x) (y \in pcycle s x).
+Proof using.
+apply (iffP idP) => [/pcyclePmin [i _ ->]| [i ->]]; last exact: mem_pcycle.
+by exists i.
+Qed.
 
 Lemma ncycles_mul_tperm s x y : let t := tperm x y in
   #|pcycles (t * s)| + (x \notin pcycle s y).*2 = #|pcycles s| + (x != y).
@@ -512,6 +538,14 @@ Variable n : nat.
 Implicit Types i j : 'I_n.+1.
 Implicit Types s t : 'S_n.
 
+Lemma card_Sn : #|'S_(n)| = n`!.
+Proof.
+rewrite (eq_card (B := perm_on [set : 'I_n])).
+  by rewrite card_perm /= cardsE /= card_ord.
+move=> p; rewrite inE unfold_in /perm_on /=.
+by apply/esym/subsetP => i _; rewrite in_set.
+Qed.
+
 Definition lift_perm_fun i j s k :=
   if unlift i k is Some k' then lift j (s k') else j.
 
@@ -575,4 +609,55 @@ Qed.
 
 End LiftPerm.
 
-Prenex Implicits lift_perm lift_permK.
+Lemma permS0 (g : 'S_0) : g = 1%g.
+Proof. by apply permP => x; case x. Qed.
+Lemma permS1 (g : 'S_1) : g = 1%g.
+Proof.
+apply/permP => i; rewrite perm1.
+case: (g i) => a Ha; case: i => b Hb.
+by apply val_inj => /=; case: a b Ha Hb => [|a] [|b].
+Qed.
+
+Section CastSn.
+
+Definition cast_perm m n (eq_mn : m = n) (s : 'S_m) :=
+  let: erefl in _ = n := eq_mn return 'S_n in s.
+
+Lemma cast_perm_id n eq_n s : cast_perm eq_n s = s :> 'S_n.
+Proof using. by apply/permP => i; rewrite /cast_perm /= eq_axiomK. Qed.
+
+Lemma cast_ord_permE m n eq_m_n (s : 'S_m) i :
+  @cast_ord m n eq_m_n (s i) = (cast_perm eq_m_n s) (cast_ord eq_m_n i).
+Proof using. by subst m; rewrite cast_perm_id !cast_ord_id. Qed.
+
+Lemma cast_permE m n (eq_m_n : m = n) (s : 'S_m) (i : 'I_n) :
+  cast_ord eq_m_n (s (cast_ord (esym eq_m_n) i)) = cast_perm eq_m_n s i.
+Proof. by rewrite cast_ord_permE cast_ordKV. Qed.
+
+Lemma cast_permK m n eq_m_n :
+  cancel (@cast_perm m n eq_m_n) (cast_perm (esym eq_m_n)).
+Proof using. by subst m. Qed.
+
+Lemma cast_permKV m n eq_m_n :
+  cancel (cast_perm (esym eq_m_n)) (@cast_perm m n eq_m_n).
+Proof using. by subst m. Qed.
+
+Lemma cast_perm_inj m n eq_m_n : injective (@cast_perm m n eq_m_n).
+Proof using. exact: can_inj (cast_permK eq_m_n). Qed.
+
+Lemma cast_perm_morphM m n eq_m_n :
+  {morph @cast_perm m n eq_m_n : x y / x * y >-> x * y}.
+Proof using. by subst m. Qed.
+Canonical morph_of_cast_perm m n eq_m_n :=
+  Morphism (D := setT) (in2W (@cast_perm_morphM m n eq_m_n)).
+
+Lemma isom_cast_perm m n eq_m_n : isom setT setT (@cast_perm m n eq_m_n).
+Proof using.
+subst m.
+apply/isomP; split.
+- apply/injmP=> i j _ _; exact: cast_perm_inj.
+- apply/setP => /= s; rewrite !inE.
+  by apply/imsetP; exists s; rewrite ?inE.
+Qed.
+
+End CastSn.
