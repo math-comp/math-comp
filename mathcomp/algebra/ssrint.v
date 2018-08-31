@@ -1853,22 +1853,28 @@ Proof. by rewrite -mul_polyC polyCMz polyC1 mulrzl. Qed.
 
 End PolyZintRing.
 
-Section ZnatPred.
+Module intArchimedean.
+Section intArchimedean.
 
-Definition Znat_pred := fun n : int => 0 <= n.
-Definition Znat := [qualify a n : int | Znat_pred n].
+Implicit Types n : int.
 
-Lemma Znat_def n : (n \is a Znat) = (0 <= n). Proof. by []. Qed.
+Let trunc n : nat := if n is Posz n' then n' else 0%N.
 
-Lemma Znat_semiring_closed : semiring_closed Znat.
-Proof. by do 2?split => //; [apply: addr_ge0 | apply: mulr_ge0]. Qed.
-HB.instance Definition _ := GRing.isSemiringClosed.Build int Znat_pred
-  Znat_semiring_closed.
+Lemma truncP n :
+  if 0 <= n then (trunc n)%:R <= n < (trunc n).+1%:R else trunc n == 0%N.
+Proof. by case: n => //= n; rewrite !natz intS ltz1D lexx. Qed.
 
-Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a Znat).
-Proof. by apply: (iffP idP) => [|[n -> //]]; case: m => // n; exists n. Qed.
+Lemma is_natE n : (0 <= n) = ((trunc n)%:R == n).
+Proof. by case: n => //= n; rewrite natz eqxx. Qed.
 
-End ZnatPred.
+Lemma is_intE n : true = (0 <= n) || (0 <= - n).
+Proof. by case: n. Qed.
+
+End intArchimedean.
+End intArchimedean.
+
+HB.instance Definition _ := Num.NumDomain_isArchimedean.Build int
+  intArchimedean.truncP intArchimedean.is_natE intArchimedean.is_intE.
 
 Section rpred.
 
@@ -1893,4 +1899,23 @@ Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
 
-Arguments Znat_pred _ /.
+Module mc_2_0.
+
+Local Lemma Znat_def (n : int) : (n \is a Num.Def.nat_num) = (0 <= n).
+Proof. by []. Qed.
+
+Local Lemma ZnatP (m : int) :
+  reflect (exists n : nat, m = n) (m \is a Num.Def.nat_num).
+Proof. by case: m => m; constructor; [exists m | case]. Qed.
+
+End mc_2_0.
+
+#[deprecated(since="mathcomp 2.1.0", note="Use polyCMz instead.")]
+Notation polyC_mulrz := polyCMz (only parsing).
+#[deprecated(since="mathcomp 2.1.0",
+             note="Require archimedean.v and use Num.nat instead.")]
+Notation Znat := (Num.Def.nat_num : qualifier 1 int) (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation Znat_def := mc_2_0.Znat_def (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation ZnatP := mc_2_0.ZnatP (only parsing).

@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
+From mathcomp Require Import ssralg poly ssrnum ssrint archimedean rat matrix.
 From mathcomp Require Import polydiv perm zmodp mxalgebra vector.
 
 (******************************************************************************)
@@ -456,18 +456,15 @@ Lemma divzDr m n d :
   (d %| n)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
 Proof. by move=> dv_n; rewrite addrC divzDl // addrC. Qed.
 
-Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> (m%:~R / d%:~R : rat) \is a Qint.
+Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> (m%:~R / d%:~R : rat) \is a Num.int.
 Proof.
 case/dvdzP=> z ->; rewrite rmorphM /=; have [->|dn0] := eqVneq d 0.
   by rewrite mulr0 mul0r.
-by rewrite mulfK ?intr_eq0 // rpred_int.
+by rewrite mulfK ?intr_eq0.
 Qed.
 
-Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Qnat.
-Proof.
-move=> h; rewrite Qnat_def divr_ge0 ?ler0n // -[m%:R]/(m%:~R) -[d%:R]/(d%:~R).
-by rewrite Qint_dvdz.
-Qed.
+Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
+Proof. by move=> h; rewrite natrEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
 
 (* Greatest common divisor *)
 

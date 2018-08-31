@@ -3,10 +3,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg finalg zmodp poly ssrnum ssrint rat.
-From mathcomp Require Import polydiv intdiv algC matrix mxalgebra mxpoly.
-From mathcomp Require Import vector falgebra fieldext separable galois.
-From mathcomp Require Import cyclotomic.
+From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean rat.
+From mathcomp Require Import finalg zmodp matrix mxalgebra mxpoly vector intdiv.
+From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)
@@ -527,14 +526,14 @@ Qed.
 
 (* Algebraic integers. *)
 
-Definition Aint : {pred algC} := fun x => minCpoly x \is a polyOver Cint.
+Definition Aint : {pred algC} := fun x => minCpoly x \is a polyOver Num.int.
 
 Lemma root_monic_Aint p x :
-  root p x -> p \is monic -> p \is a polyOver Cint -> x \in Aint.
+  root p x -> p \is monic -> p \is a polyOver Num.int -> x \in Aint.
 Proof.
 have pZtoQtoC pz: pQtoC (pZtoQ pz) = pZtoC pz.
   by rewrite -map_poly_comp; apply: eq_map_poly => b; rewrite /= rmorph_int.
-move=> px0 mon_p /floorCpP[pz Dp]; rewrite unfold_in.
+move=> px0 mon_p /floorpP[pz Dp]; rewrite unfold_in.
 move: px0; rewrite Dp -pZtoQtoC; have [q [-> mon_q] ->] := minCpolyP x.
 case/dvdpP_rat_int=> qz [a nz_a Dq] [r].
 move/(congr1 (fun q1 => lead_coef (a *: pZtoQ q1))).
@@ -542,10 +541,10 @@ rewrite rmorphM scalerAl -Dq lead_coefZ lead_coefM /=.
 have /monicP->: pZtoQ pz \is monic by rewrite -(map_monic QtoC) pZtoQtoC -Dp.
 rewrite (monicP mon_q) mul1r mulr1 lead_coef_map_inj //; last exact: intr_inj.
 rewrite Dq => ->; apply/polyOverP=> i; rewrite !(coefZ, coef_map).
-by rewrite -rmorphM /= rmorph_int Cint_int.
+by rewrite -rmorphM /= rmorph_int.
 Qed.
 
-Lemma Cint_rat_Aint z : z \in Crat -> z \in Aint -> z \in Cint.
+Lemma Cint_rat_Aint z : z \in Crat -> z \in Aint -> z \in Num.int.
 Proof.
 case/CratP=> a ->{z} /polyOverP/(_ 0%N).
 have [p [Dp mon_p] dv_p] := minCpolyP (ratr a); rewrite Dp coef_map.
@@ -555,14 +554,13 @@ rewrite -eqp_monic ?monicXsubC // irredp_XsubC //.
 by rewrite -dv_p fmorph_root root_XsubC.
 Qed.
 
-Lemma Aint_Cint : {subset Cint <= Aint}.
+Lemma Aint_Cint : {subset Num.int <= Aint}.
 Proof.
 move=> x; rewrite -polyOverXsubC.
 by apply: root_monic_Aint; rewrite ?monicXsubC ?root_XsubC.
 Qed.
 
-Lemma Aint_int x : x%:~R \in Aint.
-Proof. by rewrite Aint_Cint ?Cint_int. Qed.
+Lemma Aint_int x : x%:~R \in Aint. Proof. by rewrite Aint_Cint. Qed.
 
 Lemma Aint0 : 0 \in Aint. Proof. exact: Aint_int 0. Qed.
 Lemma Aint1 : 1 \in Aint. Proof. exact: Aint_int 1. Qed.
@@ -580,8 +578,8 @@ move=> pr_z; apply/(Aint_unity_root (prim_order_gt0 pr_z))/unity_rootP.
 exact: prim_expr_order.
 Qed.
 
-Lemma Aint_Cnat : {subset Cnat <= Aint}.
-Proof. by move=> z /Cint_Cnat/Aint_Cint. Qed.
+Lemma Aint_Cnat : {subset Num.nat <= Aint}.
+Proof. by move=> z /intr_nat/Aint_Cint. Qed.
 
 (* This is Isaacs, Lemma (3.3) *)
 Lemma Aint_subring_exists (X : seq algC) :
@@ -618,7 +616,7 @@ have SmulX (i : 'I_m): {in S, forall x, x * X`_i \in S}.
   have [/monicP ] := (minCpoly_monic X`_i, root_minCpoly X`_i).
   rewrite /root horner_coef lead_coefE -(subnKC (size_minCpoly _)) subn2.
   rewrite big_ord_recr /= addrC addr_eq0 => ->; rewrite mul1r => /eqP->.
-  have /floorCpP[p Dp]: X`_i \in Aint.
+  have /floorpP[p Dp]: X`_i \in Aint.
     by have [/(nth_default 0)-> | /(mem_nth 0)/AZ_X] := leqP (size X) i.
   rewrite -/(n i) Dp mulNr rpredN // mulr_suml rpred_sum // => [[e le_e]] /= _.
   rewrite coef_map -mulrA mulrzl rpredMz ?sYS //; apply/imageP.
@@ -650,7 +648,8 @@ Proof.
 move=> mulS.
 pose Sm := GRing.isMulClosed.Build _ _ mulS.
 pose SC : mulrClosed _ := HB.pack S Sm.
-have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
+have ZP_C c: (ZtoC c)%:P \is a polyOver Num.int_num_subdef.
+  by rewrite raddfMz rpred_int.
 move=> S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
   case/S_P: Sx => {}x ->; rewrite big1 ?isAlgInt0 // => i _.
@@ -659,7 +658,7 @@ have sYS (i : 'I_n): x * Y`_i \in SC.
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
 pose A := \matrix_(i, j < n) sval (sig_eqW (S_P _ (sYS j))) i.
 pose p := char_poly (map_mx ZtoC A).
-have: p \is a polyOver Cint.
+have: p \is a polyOver Num.int_num_subdef.
   rewrite rpred_sum // => s _; rewrite rpredMsign rpred_prod // => j _.
   by rewrite !mxE /= rpredB ?rpredMn ?polyOverX.
 apply: root_monic_Aint (char_poly_monic _).

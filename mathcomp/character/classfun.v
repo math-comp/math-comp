@@ -7,6 +7,7 @@ From mathcomp Require Import ssralg poly finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient finalg action gproduct.
 From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
 From mathcomp Require Import matrix vector falgebra ssrnum algC algnum.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)
@@ -2413,11 +2414,11 @@ Local Notation "phi ^u" := (cfAut u phi) (at level 3, format "phi ^u").
 Lemma cfAutZ_nat n phi : (n%:R *: phi)^u = n%:R *: phi^u.
 Proof. exact: raddfZnat. Qed.
 
-Lemma cfAutZ_Cnat z phi : z \in Cnat -> (z *: phi)^u = z *: phi^u.
-Proof. exact: raddfZ_Cnat. Qed.
+Lemma cfAutZ_Cnat z phi : z \in Num.nat -> (z *: phi)^u = z *: phi^u.
+Proof. exact: raddfZ_nat. Qed.
 
-Lemma cfAutZ_Cint z phi : z \in Cint -> (z *: phi)^u = z *: phi^u.
-Proof. exact: raddfZ_Cint. Qed.
+Lemma cfAutZ_Cint z phi : z \in Num.int -> (z *: phi)^u = z *: phi^u.
+Proof. exact: raddfZ_int. Qed.
 
 Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut u)).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_autK. Qed.

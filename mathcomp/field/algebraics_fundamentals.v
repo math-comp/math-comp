@@ -4,9 +4,9 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint rat intdiv fingroup finalg zmodp.
-From mathcomp Require Import cyclic pgroup sylow vector falgebra fieldext.
-From mathcomp Require Import separable galois.
+From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
+From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
+From mathcomp Require Import fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -598,7 +598,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose RyM := Num.IntegralDomain_isLtReal.Build (Q y) posD
                 posM posNneg posB posVneg absN absE (rrefl _).
   pose Ry : realFieldType := HB.pack (Q y) RyM.
-  have QisArchi : Num.RealField_isArchimedean Ry.
+  have QisArchi : Num.NumDomain_bounded_isArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
   exists (HB.pack_for archiFieldType _ QisArchi); apply: idfun.
 have some_realC: realC.
