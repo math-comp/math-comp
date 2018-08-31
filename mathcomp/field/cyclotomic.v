@@ -124,6 +124,7 @@ Local Notation pQtoC := (map_poly ratr).
 
 Local Hint Resolve (@intr_inj [numDomainType of algC]).
 Local Notation QtoC_M := (ratr_rmorphism [numFieldType of algC]).
+Local Notation floorC := (@floorC [numArchiDomainType of algC]).
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.
@@ -148,7 +149,7 @@ Notation "''Phi_' n" := (Cyclotomic n)
 Lemma Cyclotomic_monic n : 'Phi_n \is monic.
 Proof.
 rewrite /'Phi_n; case: (C_prim_root_exists _) => z /= _.
-rewrite monicE lead_coefE coef_map_id0 ?(int_algC_K 0) ?getCint0 //.
+rewrite monicE lead_coefE coef_map_id0 ?(int_algC_K 0) ?getCint0 ?floorC0 //.
 by rewrite size_poly_eq -lead_coefE (monicP (cyclotomic_monic _ _)) (intCK 1).
 Qed.
 
