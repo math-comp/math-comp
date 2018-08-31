@@ -242,6 +242,11 @@ Canonical numFieldType := [numFieldType of type].
 Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
 Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
 
+Axiom archimedean : Num.archimedean_axiom numDomainType.
+Canonical numArchiDomainType := NumArchiDomainType type archimedean.
+Canonical numArchiFieldType := [numArchiFieldType of type].
+Canonical numArchiClosedFieldType := [numArchiClosedFieldType of type].
+
 Axiom algebraic : integralRange (@ratr unitRingType).
 
 End Specification.
@@ -454,6 +459,12 @@ Definition conjMixin :=
                  (fun x => esym (normK x)).
 Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
 
+Fact archimedean : Num.archimedean_axiom numDomainType.
+Proof. exact: rat_algebraic_archimedean algebraic. Qed.
+Canonical numArchiDomainType := NumArchiDomainType type archimedean.
+Canonical numArchiFieldType := [numArchiFieldType of type].
+Canonical numArchiClosedFieldType := [numArchiClosedFieldType of type].
+
 End Implementation.
 
 Definition divisor := Implementation.type.
@@ -470,6 +481,8 @@ Local Notation pQtoC := (map_poly QtoC).
 Local Notation ZtoQ := (intr : int -> rat).
 Local Notation ZtoC := (intr : int -> algC).
 Local Notation Creal := (Num.real : qualifier 0 algC).
+Local Notation Cnat := (Cnat : qualifier 1 algC).
+Local Notation Cint := (Cint : qualifier 1 algC).
 
 Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
 Proof. exact: GRing.imaginary_exists. Qed.
@@ -482,25 +495,6 @@ have isQ := rat_algebraic_decidable algebraic.
 exists (fun z => if isQ z is left Qz then sval (sig_eqW Qz) else 0) => a.
 case: (isQ _) => [Qa | []]; last by exists a.
 by case: (sig_eqW _) => b /= /fmorph_inj.
-Qed.
-
-Fact floorC_subproof x : {m | x \is Creal -> ZtoC m <= x < ZtoC (m + 1)}.
-Proof.
-have [Rx | _] := boolP (x \is Creal); last by exists 0.
-without loss x_ge0: x Rx / x >= 0.
-  have [x_ge0 | /ltW x_le0] := real_ge0P Rx; first exact.
-  case/(_ (- x)) => [||m /(_ isT)]; rewrite ?rpredN ?oppr_ge0 //.
-  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= lt_neqAle le_eqVlt.
-  case: eqP => [-> _ | _ /and3P[lt_x_m _ le_m_x]].
-    by exists (- m) => _; rewrite lexx rmorphD ltr_addl ltr01.
-  by exists (- m - 1); rewrite le_m_x subrK.
-have /ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
-  have [n le_x_n] := rat_algebraic_archimedean algebraic x.
-  by exists n; rewrite -(ger0_norm x_ge0) (lt_trans le_x_n) ?ltr_nat.
-exists n%:Z => _; rewrite addrC -intS lt_x_n1 andbT.
-case Dn: n => // [n1]; rewrite -Dn.
-have [||//|] := @real_leP _ n%:R x; rewrite ?rpred_nat //.
-by rewrite Dn => /min_n; rewrite Dn ltnn.
 Qed.
 
 Fact minCpoly_subproof (x : algC) :
@@ -551,6 +545,9 @@ Canonical numFieldType.
 Canonical decFieldType.
 Canonical closedFieldType.
 Canonical numClosedFieldType.
+Canonical numArchiDomainType.
+Canonical numArchiFieldType.
+Canonical numArchiClosedFieldType.
 
 Notation algCeq := eqType.
 Notation algCzmod := zmodType.
@@ -565,12 +562,6 @@ Notation Creal := (@Num.Def.Rreal numDomainType).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
-
-Definition floorC x := sval (floorC_subproof x).
-Definition Cint : {pred algC} := fun x => (floorC x)%:~R == x.
-
-Definition truncC x := if x >= 0 then `|floorC x|%N else 0%N.
-Definition Cnat : {pred algC} := fun x => (truncC x)%:R == x.
 
 Definition minCpoly x : {poly algC} :=
   let: exist2 p _ _ := minCpoly_subproof x in map_poly ratr p.
@@ -654,7 +645,7 @@ Definition algC_algebraic x := Algebraics.Implementation.algebraic x.
 Lemma Creal0 : 0 \is Creal. Proof. exact: rpred0. Qed.
 Lemma Creal1 : 1 \is Creal. Proof. exact: rpred1. Qed.
 (* Trivial cannot resolve a general real0 hint. *)
-Hint Resolve Creal0 Creal1 : core. 
+Hint Resolve Creal0 Creal1 : core.
 
 Lemma algCrect x : x = 'Re x + 'i * 'Im x.
 Proof. by rewrite [LHS]Crect. Qed.
@@ -666,278 +657,12 @@ Lemma algCreal_Im x : 'Im x \is Creal.
 Proof. by rewrite Creal_Im. Qed.
 Hint Resolve algCreal_Re algCreal_Im : core.
 
-(* Integer subset. *)
-(* Not relying on the undocumented interval library, for now. *)
-
-Lemma floorC_itv x : x \is Creal -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
-Proof. by rewrite /floorC => Rx; case: (floorC_subproof x) => //= m; apply. Qed.
-
-Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
-Proof.
-case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltz_addr1.
-have /floorC_itv/andP[lefx ltxf1]: x \is Creal.
-  by rewrite -[x](subrK m%:~R) rpredD ?realz ?ler_sub_real.
-by rewrite -!(ltr_int [numFieldType of algC]) 2?(@le_lt_trans _ _ x).
-Qed.
-
-Lemma intCK : cancel intr floorC.
-Proof.
-by move=> m; apply: floorC_def; rewrite ler_int ltr_int ltz_addr1 lexx.
-Qed.
-
-Lemma floorCK : {in Cint, cancel floorC intr}. Proof. by move=> z /eqP. Qed.
-
-Lemma floorC0 : floorC 0 = 0. Proof. exact: (intCK 0). Qed.
-Lemma floorC1 : floorC 1 = 1. Proof. exact: (intCK 1). Qed.
-Hint Resolve floorC0 floorC1 : core.
-
-Lemma floorCpK (p : {poly algC}) :
-  p \is a polyOver Cint -> map_poly intr (map_poly floorC p) = p.
-Proof.
-move/(all_nthP 0)=> Zp; apply/polyP=> i.
-rewrite coef_map coef_map_id0 //= -[p]coefK coef_poly.
-by case: ifP => [/Zp/floorCK // | _]; rewrite floorC0.
-Qed.
-
-Lemma floorCpP (p : {poly algC}) :
-  p \is a polyOver Cint -> {q | p = map_poly intr q}.
-Proof. by exists (map_poly floorC p); rewrite floorCpK. Qed.
-
-Lemma Cint_int m : m%:~R \in Cint.
-Proof. by rewrite unfold_in intCK. Qed.
-
-Lemma CintP x : reflect (exists m, x = m%:~R) (x \in Cint).
-Proof.
-by apply: (iffP idP) => [/eqP<-|[m ->]]; [exists (floorC x) | apply: Cint_int].
-Qed.
-
-Lemma floorCD : {in Cint & Creal, {morph floorC : x y / x + y}}.
-Proof.
-move=> _ y /CintP[m ->] Ry; apply: floorC_def.
-by rewrite -addrA 2!rmorphD /= intCK ler_add2l ltr_add2l floorC_itv.
-Qed.
-
-Lemma floorCN : {in Cint, {morph floorC : x / - x}}.
-Proof. by move=> _ /CintP[m ->]; rewrite -rmorphN !intCK. Qed.
-
-Lemma floorCM : {in Cint &, {morph floorC : x y / x * y}}.
-Proof. by move=> _ _ /CintP[m1 ->] /CintP[m2 ->]; rewrite -rmorphM !intCK. Qed.
-
-Lemma floorCX n : {in Cint, {morph floorC : x / x ^+ n}}.
-Proof. by move=> _ /CintP[m ->]; rewrite -rmorphX !intCK. Qed.
-
-Lemma rpred_Cint
-        (S : {pred algC}) (ringS : subringPred S) (kS : keyed_pred ringS) x :
-  x \in Cint -> x \in kS.
-Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
-
-Lemma Cint0 : 0 \in Cint. Proof. exact: (Cint_int 0). Qed.
-Lemma Cint1 : 1 \in Cint. Proof. exact: (Cint_int 1). Qed.
-Hint Resolve Cint0 Cint1 : core.
-
-Fact Cint_key : pred_key Cint. Proof. by []. Qed.
-Fact Cint_subring : subring_closed Cint.
-Proof.
-by split=> // _ _ /CintP[m ->] /CintP[p ->];
-    rewrite -(rmorphB, rmorphM) Cint_int.
-Qed.
-Canonical Cint_keyed := KeyedPred Cint_key.
-Canonical Cint_opprPred := OpprPred Cint_subring.
-Canonical Cint_addrPred := AddrPred Cint_subring.
-Canonical Cint_mulrPred := MulrPred Cint_subring.
-Canonical Cint_zmodPred := ZmodPred Cint_subring.
-Canonical Cint_semiringPred := SemiringPred Cint_subring.
-Canonical Cint_smulrPred := SmulrPred Cint_subring.
-Canonical Cint_subringPred := SubringPred Cint_subring.
-
-Lemma Creal_Cint : {subset Cint <= Creal}.
-Proof. by move=> _ /CintP[m ->]; apply: realz. Qed.
-
-Lemma conj_Cint x : x \in Cint -> x^* = x.
-Proof. by move/Creal_Cint/conj_Creal. Qed.
-
-Lemma Cint_normK x : x \in Cint -> `|x| ^+ 2 = x ^+ 2.
-Proof. by move/Creal_Cint/real_normK. Qed.
-
-Lemma CintEsign x : x \in Cint -> x = (-1) ^+ (x < 0)%C * `|x|.
-Proof. by move/Creal_Cint/realEsign. Qed.
-
-(* Natural integer subset. *)
-
-Lemma truncC_itv x : 0 <= x -> (truncC x)%:R <= x < (truncC x).+1%:R.
-Proof.
-move=> x_ge0; have /andP[lemx ltxm1] := floorC_itv (ger0_real x_ge0).
-rewrite /truncC x_ge0 -addn1 !pmulrn PoszD gez0_abs ?lemx //.
-by rewrite -ltz_addr1 -(ltr_int [numFieldType of algC]) (le_lt_trans x_ge0).
-Qed.
-
-Lemma truncC_def x n : n%:R <= x < n.+1%:R -> truncC x = n.
-Proof.
-move=> ivt_n_x; have /andP[lenx _] := ivt_n_x.
-by rewrite /truncC (le_trans (ler0n _ n)) // (@floorC_def _ n) // addrC -intS.
-Qed.
-
-Lemma natCK n : truncC n%:R = n.
-Proof. by apply: truncC_def; rewrite lexx ltr_nat /=. Qed.
-
-Lemma CnatP x : reflect (exists n, x = n%:R) (x \in Cnat).
-Proof.
-by apply: (iffP eqP) => [<- | [n ->]]; [exists (truncC x) | rewrite natCK].
-Qed.
-
-Lemma truncCK : {in Cnat, cancel truncC (GRing.natmul 1)}.
-Proof. by move=> x /eqP. Qed.
-
-Lemma truncC_gt0 x : (0 < truncC x)%N = (1 <= x).
-Proof.
-apply/idP/idP=> [m_gt0 | x_ge1].
-  have /truncC_itv/andP[lemx _]: 0 <= x.
-    by move: m_gt0; rewrite /truncC; case: ifP.
-  by apply: le_trans lemx; rewrite ler1n.
-have /truncC_itv/andP[_ ltxm1]:= le_trans ler01 x_ge1.
-by rewrite -ltnS -ltC_nat (le_lt_trans x_ge1).
-Qed.
-
-Lemma truncC0Pn x : reflect (truncC x = 0%N) (~~ (1 <= x)).
-Proof. by rewrite -truncC_gt0 -eqn0Ngt; apply: eqP. Qed.
-
-Lemma truncC0 : truncC 0 = 0%N. Proof. exact: (natCK 0). Qed.
-Lemma truncC1 : truncC 1 = 1%N. Proof. exact: (natCK 1). Qed.
-
-Lemma truncCD :
-  {in Cnat & Num.nneg, {morph truncC : x y / x + y >-> (x + y)%N}}.
-Proof.
-move=> _ y /CnatP[n ->] y_ge0; apply: truncC_def.
-by rewrite -addnS !natrD !natCK ler_add2l ltr_add2l truncC_itv.
-Qed.
-
-Lemma truncCM : {in Cnat &, {morph truncC : x y / x * y >-> (x * y)%N}}.
-Proof. by move=> _ _ /CnatP[n1 ->] /CnatP[n2 ->]; rewrite -natrM !natCK. Qed.
-
-Lemma truncCX n : {in Cnat, {morph truncC : x / x ^+ n >-> (x ^ n)%N}}.
-Proof. by move=> _ /CnatP[n1 ->]; rewrite -natrX !natCK. Qed.
-
-Lemma rpred_Cnat
-        (S : {pred algC}) (ringS : semiringPred S) (kS : keyed_pred ringS) x :
-  x \in Cnat -> x \in kS.
-Proof. by case/CnatP=> n ->; apply: rpred_nat. Qed.
-
-Lemma Cnat_nat n : n%:R \in Cnat. Proof. by apply/CnatP; exists n. Qed.
-Lemma Cnat0 : 0 \in Cnat. Proof. exact: (Cnat_nat 0). Qed.
-Lemma Cnat1 : 1 \in Cnat. Proof. exact: (Cnat_nat 1). Qed.
-Hint Resolve Cnat_nat Cnat0 Cnat1 : core.
-
-Fact Cnat_key : pred_key Cnat. Proof. by []. Qed.
-Fact Cnat_semiring : semiring_closed Cnat.
-Proof.
-by do 2![split] => //= _ _ /CnatP[n ->] /CnatP[m ->]; rewrite -(natrD, natrM).
-Qed.
-Canonical Cnat_keyed := KeyedPred Cnat_key.
-Canonical Cnat_addrPred := AddrPred Cnat_semiring.
-Canonical Cnat_mulrPred := MulrPred Cnat_semiring.
-Canonical Cnat_semiringPred := SemiringPred Cnat_semiring.
-
-Lemma Cnat_ge0 x : x \in Cnat -> 0 <= x.
-Proof. by case/CnatP=> n ->; apply: ler0n. Qed.
-
-Lemma Cnat_gt0 x : x \in Cnat -> (0 < x) = (x != 0).
-Proof. by case/CnatP=> n ->; rewrite pnatr_eq0 ltr0n lt0n. Qed.
-
-Lemma conj_Cnat x : x \in Cnat -> x^* = x.
-Proof. by case/CnatP=> n ->; apply: rmorph_nat. Qed.
-
-Lemma norm_Cnat x : x \in Cnat -> `|x| = x.
-Proof. by move/Cnat_ge0/ger0_norm. Qed.
-
-Lemma Creal_Cnat : {subset Cnat <= Creal}.
-Proof. by move=> z /conj_Cnat/CrealP. Qed.
-
-Lemma Cnat_sum_eq1 (I : finType) (P : pred I) (F : I -> algC) :
-     (forall i, P i -> F i \in Cnat) -> \sum_(i | P i) F i = 1 ->
-   {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
-Proof.
-move=> natF sumF1; pose nF i := truncC (F i).
-have{natF} defF i: P i -> F i = (nF i)%:R by move/natF/eqP.
-have{sumF1} /eqP sumF1: (\sum_(i | P i) nF i == 1)%N.
-  by rewrite -eqC_nat natr_sum -(eq_bigr _ defF) sumF1.
-have [i Pi nZfi]: {i : I | P i & nF i != 0%N}.
-  by apply/sig2W/exists_inP; rewrite -negb_forall_in -sum_nat_eq0 sumF1.
-have F'ge0 := (leq0n _, etrans (eq_sym _ _) (sum_nat_eq0 (predD1 P i) nF)).
-rewrite -lt0n in nZfi; have [_] := (leqif_add (leqif_eq nZfi) (F'ge0 _)).
-rewrite /= big_andbC -bigD1 // sumF1 => /esym/andP/=[/eqP Fi1 /forall_inP Fi'0].
-exists i; split=> // [|j neq_ji Pj]; first by rewrite defF // -Fi1.
-by rewrite defF // (eqP (Fi'0 j _)) // neq_ji.
-Qed.
-
-Lemma Cnat_mul_eq1 x y :
-  x \in Cnat -> y \in Cnat -> (x * y == 1) = (x == 1) && (y == 1).
-Proof. by do 2!move/truncCK <-; rewrite -natrM !pnatr_eq1 muln_eq1. Qed.
-
-Lemma Cnat_prod_eq1 (I : finType) (P : pred I) (F : I -> algC) :
-    (forall i, P i -> F i \in Cnat) -> \prod_(i | P i) F i = 1 ->
-  forall i, P i -> F i = 1.
-Proof.
-move=> natF prodF1; apply/eqfun_inP; rewrite -big_andE.
-move: prodF1; elim/(big_load (fun x => x \in Cnat)): _.
-elim/big_rec2: _ => // i all1x x /natF N_Fi [Nx x1all1].
-by split=> [|/eqP]; rewrite ?rpredM ?Cnat_mul_eq1 // => /andP[-> /eqP].
-Qed.
-
-(* Relating Cint and Cnat. *)
-
-Lemma Cint_Cnat : {subset Cnat <= Cint}.
-Proof. by move=> _ /CnatP[n ->]; rewrite pmulrn Cint_int. Qed.
-
-Lemma CintE x : (x \in Cint) = (x \in Cnat) || (- x \in Cnat).
-Proof.
-apply/idP/idP=> [/CintP[[n | n] ->] | ]; first by rewrite Cnat_nat.
-  by rewrite NegzE opprK Cnat_nat orbT.
-by case/pred2P=> [<- | /(canLR opprK) <-]; rewrite ?rpredN rpred_nat.
-Qed.
-
-Lemma Cnat_norm_Cint x : x \in Cint -> `|x| \in Cnat.
-Proof.
-case/CintP=> [m ->]; rewrite [m]intEsign rmorphM rmorph_sign.
-by rewrite normrM normr_sign mul1r normr_nat rpred_nat.
-Qed.
-
-Lemma CnatEint x : (x \in Cnat) = (x \in Cint) && (0 <= x).
-Proof.
-apply/idP/andP=> [Nx | [Zx x_ge0]]; first by rewrite Cint_Cnat ?Cnat_ge0.
-by rewrite -(ger0_norm x_ge0) Cnat_norm_Cint.
-Qed.
-
-Lemma CintEge0 x : 0 <= x -> (x \in Cint) = (x \in Cnat).
-Proof. by rewrite CnatEint andbC => ->. Qed.
-
-Lemma Cnat_exp_even x n : ~~ odd n -> x \in Cint -> x ^+ n \in Cnat.
-Proof.
-rewrite -dvdn2 => /dvdnP[m ->] Zx; rewrite mulnC exprM -Cint_normK ?rpredX //.
-exact: Cnat_norm_Cint.
-Qed.
-
-Lemma norm_Cint_ge1 x : x \in Cint -> x != 0 -> 1 <= `|x|.
-Proof.
-rewrite -normr_eq0 => /Cnat_norm_Cint/CnatP[n ->].
-by rewrite pnatr_eq0 ler1n lt0n.
-Qed.
-
-Lemma sqr_Cint_ge1 x : x \in Cint -> x != 0 -> 1 <= x ^+ 2.
-Proof. by move=> Zx nz_x; rewrite -Cint_normK // expr_ge1 ?norm_Cint_ge1. Qed.
-
-Lemma Cint_ler_sqr x : x \in Cint -> x <= x ^+ 2.
-Proof.
-move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
-apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Creal_Cint.
-by rewrite -Cint_normK // ler_eexpr // norm_Cint_ge1.
-Qed.
-
 (* Integer divisibility. *)
 
 Lemma dvdCP x y : reflect (exists2 z, z \in Cint & y = z * x) (x %| y)%C.
 Proof.
 rewrite unfold_in; have [-> | nz_x] := eqVneq.
-  by apply: (iffP eqP) => [-> | [z _ ->]]; first exists 0; rewrite ?mulr0.
+  by apply: (iffP eqP) => [->|[z _ ->]]; first exists 0; rewrite ?mulr0 ?Cint0.
 apply: (iffP idP) => [Zyx | [z Zz ->]]; last by rewrite mulfK.
 by exists (y / x); rewrite ?divfK.
 Qed.
@@ -951,7 +676,7 @@ by move=> /pmulr_lge0-> /CintEge0-> /CnatP[n ->]; exists n.
 Qed.
 
 Lemma dvdC0 x : (x %| 0)%C.
-Proof. by apply/dvdCP; exists 0; rewrite ?mul0r. Qed.
+Proof. by apply/dvdCP; exists 0; rewrite ?mul0r ?Cint0. Qed.
 
 Lemma dvd0C x : (0 %| x)%C = (x == 0).
 Proof. by rewrite unfold_in eqxx. Qed.
@@ -978,7 +703,7 @@ Lemma dvdC_trans x y z : (x %| y)%C -> (y %| z)%C -> (x %| z)%C.
 Proof. by move=> x_dv_y /dvdCP[m Zm ->]; apply: dvdC_mull. Qed.
 
 Lemma dvdC_refl x : (x %| x)%C.
-Proof. by apply/dvdCP; exists 1; rewrite ?mul1r. Qed.
+Proof. by apply/dvdCP; exists 1; rewrite ?mul1r ?Cint1. Qed.
 Hint Resolve dvdC_refl : core.
 
 Fact dvdC_key x : pred_key (dvdC x). Proof. by []. Qed.
@@ -1161,22 +886,8 @@ Section AutC.
 
 Implicit Type nu : {rmorphism algC -> algC}.
 
-Lemma aut_Cnat nu : {in Cnat, nu =1 id}.
-Proof. by move=> _ /CnatP[n ->]; apply: rmorph_nat. Qed.
-
-Lemma aut_Cint nu : {in Cint, nu =1 id}.
-Proof. by move=> _ /CintP[m ->]; apply: rmorph_int. Qed.
-
 Lemma aut_Crat nu : {in Crat, nu =1 id}.
 Proof. by move=> _ /CratP[a ->]; apply: fmorph_rat. Qed.
-
-Lemma Cnat_aut nu x : (nu x \in Cnat) = (x \in Cnat).
-Proof.
-by do [apply/idP/idP=> Nx; have:= aut_Cnat nu Nx] => [/fmorph_inj <- | ->].
-Qed.
-
-Lemma Cint_aut nu x : (nu x \in Cint) = (x \in Cint).
-Proof. by rewrite !CintE -rmorphN !Cnat_aut. Qed.
 
 Lemma Crat_aut nu x : (nu x \in Crat) = (x \in Crat).
 Proof.
@@ -1219,32 +930,6 @@ Qed.
 
 End AutC.
 
-Section AutLmodC.
-
-Variables (U V : lmodType algC) (f : {additive U -> V}).
-
-Lemma raddfZ_Cnat a u : a \in Cnat -> f (a *: u) = a *: f u.
-Proof. by case/CnatP=> n ->; apply: raddfZnat. Qed.
-
-Lemma raddfZ_Cint a u : a \in Cint -> f (a *: u) = a *: f u.
-Proof. by case/CintP=> m ->; rewrite !scaler_int raddfMz. Qed.
-
-End AutLmodC.
-
-Section PredCmod.
-
-Variable V : lmodType algC.
-
-Lemma rpredZ_Cnat S (addS : @addrPred V S) (kS : keyed_pred addS) :
-  {in Cnat & kS, forall z u, z *: u \in kS}.
-Proof. by move=> _ u /CnatP[n ->]; apply: rpredZnat. Qed.
-
-Lemma rpredZ_Cint S (subS : @zmodPred V S) (kS : keyed_pred subS) :
-  {in Cint & kS, forall z u, z *: u \in kS}.
-Proof. by move=> _ u /CintP[m ->]; apply: rpredZint. Qed.
-
-End PredCmod.
-
 End AlgebraicsTheory.
-Hint Resolve Creal0 Creal1 Cnat_nat Cnat0 Cnat1 Cint0 Cint1 floorC0 Crat0 Crat1 : core.
+Hint Resolve Creal0 Creal1 Crat0 Crat1 : core.
 Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
