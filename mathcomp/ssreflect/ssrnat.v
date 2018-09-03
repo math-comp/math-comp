@@ -1445,7 +1445,7 @@ End NatTrec.
 
 Notation natTrecE := NatTrec.trecE.
 
-Lemma eq_binP : Equality.axiom Ndec.Neqb.
+Lemma eq_binP : Equality.axiom N.eqb.
 Proof.
 move=> p q; apply: (iffP idP) => [|<-]; last by case: p => //; elim.
 by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //=; case/IHp=> ->.
@@ -1499,7 +1499,7 @@ case=> //=; elim=> //= p; case: (nat_of_pos p) => //= n [<-].
 by rewrite natTrecE addnS /= addnS {2}addnn; elim: {1 3}n.
 Qed.
 
-Lemma nat_of_succ_gt0 p : Psucc p = p.+1 :> nat.
+Lemma nat_of_succ_gt0 p : Pos.succ p = p.+1 :> nat.
 Proof. by elim: p => //= p ->; rewrite !natTrecE. Qed.
 
 Lemma nat_of_addn_gt0 p q : (p + q)%positive = p + q :> nat.
