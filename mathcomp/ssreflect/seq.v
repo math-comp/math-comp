@@ -2783,3 +2783,19 @@ by apply: inj_f => //; apply/allpairsP; [exists (x, y1) | exists (x, y2)].
 Qed.
 
 End EqAllPairs.
+
+Section All2.
+Fixpoint all2 {T U : Type} (p : T -> U -> bool) s1 s2 :=
+  match s1, s2 with
+  | [::], [::] => true
+  | x1 :: s1, x2 :: s2 => p x1 x2 && all2 p s1 s2
+  | _, _ => false
+  end.
+
+Lemma all2P {T U : Type} (p : T -> U -> bool) s1 s2:
+    all2 p s1 s2
+  = (size s1 == size s2) && (all [pred xy | p xy.1 xy.2] (zip s1 s2)).
+Proof.
+by elim: s1 s2 => [|x s1 ih] [|y s2] //=; rewrite ih andbCA eqSS.
+Qed.
+End All2.
