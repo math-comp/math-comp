@@ -2799,3 +2799,5 @@ Proof.
 by elim: s1 s2 => [|x s1 ih] [|y s2] //=; rewrite ih andbCA eqSS.
 Qed.
 End All2.
+
+Arguments all2 {T U} p !s1 !s2.
