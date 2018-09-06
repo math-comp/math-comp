@@ -784,9 +784,9 @@ Canonical option_eqType := Eval hnf in EqType (option T) option_eqMixin.
 
 End OptionEqType.
 
-Definition tag := projS1.
-Definition tagged I T_ :  forall u, T_(tag u) := @projS2 I [eta T_].
-Definition Tagged I i T_ x := @existS I [eta T_] i x.
+Definition tag := projT1.
+Definition tagged I T_ :  forall u, T_(tag u) := @projT2 I [eta T_].
+Definition Tagged I i T_ x := @existT I [eta T_] i x.
 Arguments Tagged [I i].
 Prenex Implicits tag tagged Tagged.
 
