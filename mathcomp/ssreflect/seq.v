@@ -2792,7 +2792,7 @@ Fixpoint all2 {T U : Type} (p : T -> U -> bool) s1 s2 :=
   | _, _ => false
   end.
 
-Lemma all2P {T U : Type} (p : T -> U -> bool) s1 s2:
+Lemma all2E {T U : Type} (p : T -> U -> bool) s1 s2:
     all2 p s1 s2
   = (size s1 == size s2) && (all [pred xy | p xy.1 xy.2] (zip s1 s2)).
 Proof.
