@@ -2794,8 +2794,8 @@ Fixpoint all2 s1 s2 :=
   | _, _ => false
   end.
 
-Lemma all2E s1 s2: all2 s1 s2 =
-  (size s1 == size s2) && (all [pred xy | p xy.1 xy.2] (zip s1 s2)).
+Lemma all2E s1 s2 :
+  all2 s1 s2 = (size s1 == size s2) && all [pred xy | p xy.1 xy.2] (zip s1 s2).
 Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2] //=; rewrite ihs1 andbCA. Qed.
 
 End All2.
