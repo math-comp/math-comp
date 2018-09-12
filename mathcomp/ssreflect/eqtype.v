@@ -274,9 +274,6 @@ Canonical bool_eqType := Eval hnf in EqType bool bool_eqMixin.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
-Lemma bool_irrelevance (x y : bool) (E E' : x = y) : E = E'.
-Proof. exact: eq_irrelevance. Qed.
-
 Lemma negb_add b1 b2 : ~~ (b1 (+) b2) = (b1 == b2).
 Proof. by rewrite -addNb. Qed.
 
@@ -526,7 +523,7 @@ Qed.
 Lemma insubT x Px : insub x = Some (Sub x Px).
 Proof.
 do [case: insubP => [/SubP[y Py] _ <- | /negP// ]; rewrite SubK]  in Px *.
-by rewrite (bool_irrelevance Px Py).
+by rewrite (eq_irrelevance Px Py).
 Qed.
 
 Lemma insubF x : P x = false -> insub x = None.

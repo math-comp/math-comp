@@ -970,7 +970,7 @@ have toEeq i le_ii: toE i i le_ii =1 id.
 have toEleS i j leij leiSj z: toE i j.+1 leiSj z = EtoInc _ _ (toE i j leij z).
   rewrite /toE; move: (j - i)%N {leij leiSj}(subnK _) (subnK _) => k.
   by case: j /; rewrite (addnK i k.+1) => eq_kk; rewrite [eq_kk]eq_axiomK.
-have toEirr := congr1 ((toE _ _)^~ _) (bool_irrelevance _ _).
+have toEirr := congr1 ((toE _ _)^~ _) (eq_irrelevance _ _).
 have toEtrans j i k leij lejk leik z:
   toE i k leik z = toE j k lejk (toE i j leij z).
 - elim: k leik lejk => [|k IHk] leiSk lejSk.

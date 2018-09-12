@@ -3781,7 +3781,7 @@ have:= mx_butterfly modUm' modVm' modUm neqUVm' maxUm maxVUm.
 move: (capmx_module _ _); set Wm := (Um' :&: Vm')%MS => modWm [maxWUm simWVm].
 have:= mx_butterfly modVm' modUm' modUm _ maxVUm maxUm.
 move: (capmx_module _ _); rewrite andbC capmxC -/Wm => modWmV [// | maxWVm].
-rewrite {modWmV}(bool_irrelevance modWmV modWm) => simWUm.
+rewrite {modWmV}(eq_irrelevance modWmV modWm) => simWUm.
 have [W compW lastW] := mx_JordanHolder_exists compU modWm maxWUm.
 have compWU: mx_series (rcons W Um') by apply/mx_series_rcons; rewrite lastW.
 have compWV: mx_series (rcons W Vm') by apply/mx_series_rcons; rewrite lastW.
