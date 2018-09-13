@@ -153,6 +153,12 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*   We are quite systematic in providing lemmas to rewrite any composition   *)
 (* of two operations. "rev", whose simplifications are not natural, is        *)
 (* protected with nosimpl.                                                    *)
+(*  ** The following are equivalent:                                          *)
+(*  [<-> P0; P1; ..; Pn] == P0, P1, ..., Pn are all equivalent                *)
+(*                       := P0 -> P1 -> ... -> Pn -> P0                       *)
+(*  if  T : [<-> P0; P1; ..; Pn]  is such an equivalence, and i, j are in nat *)
+(*  then T i j is a proof of the equivalence Pi <-> Pj between Pi and Pj      *)
+(*  when i (resp j) is out of bound, Pi (resp Pj) defaults to P0              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -2783,3 +2789,53 @@ by apply: inj_f => //; apply/allpairsP; [exists (x, y1) | exists (x, y2)].
 Qed.
 
 End EqAllPairs.
+
+Section AllIff.
+(* The Following Are Equivalent *)
+
+(* We introduce a specific conjunction, used to chain the consecutive *)
+(* items in a circular list of implications *)
+Inductive all_iff_and (P Q : Prop) : Prop := AllIffConj of P & Q.
+
+Definition all_iff (P0 : Prop) (Ps : seq Prop) : Prop :=
+  (fix aux (P : Prop) (Qs : seq Prop) : Prop :=
+      if Qs is Q :: Qs then all_iff_and (P -> Q) (aux Q Qs)
+      else P -> P0 : Prop) P0 Ps.
+
+(* This means "the following are all equivalent: P0, ... Pn" *)
+Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" := (all_iff P0 (P1 :: .. [:: Pn] ..))
+  (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]")
+  : form_scope.
+
+Lemma all_iffLR P0 Ps : all_iff P0 Ps ->
+   forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
+Proof.
+have homo_ltn T (f : nat -> T) (r : T -> T -> Prop) : (* #201 *)
+  (forall y x z, r x y -> r y z -> r x z) ->
+  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i < j >-> r i j}.
+  move=> rtrans rfS x y; elim: y x => // y ihy x; rewrite ltnS leq_eqVlt.
+  case/orP=> [/eqP-> // | ltxy]; apply: rtrans (rfS _); exact: ihy.
+move=> Ps_iff; have ltn_imply : {homo nth P0 Ps : m n / m < n >-> (m -> n)}.
+  apply: homo_ltn => [??? xy yz /xy /yz //|i].
+  elim: Ps i P0 Ps_iff => [|P [|/=Q Ps] IHPs] [|i]//= P0 [P0P Ps_iff]//=;
+     do ?by [rewrite nth_nil|case: Ps_iff].
+  by case: Ps_iff => [PQ Ps_iff]; apply: IHPs; split => // /P0P.
+have {ltn_imply}leq_imply : {homo nth P0 Ps : m n / m <= n >-> (m -> n)}.
+  by move=> m n; rewrite leq_eqVlt => /predU1P[->//|/ltn_imply].
+move=> [:P0ton Pnto0] [|m] [|n]//=.
+- abstract: P0ton n.
+  suff P0to0 : P0 -> nth P0 Ps 0 by move=> /P0to0; apply: leq_imply.
+  by case: Ps Ps_iff {leq_imply} => // P Ps [].
+- abstract: Pnto0 m => /(leq_imply m (maxn (size Ps) m)).
+  by rewrite nth_default ?leq_max ?leqnn // orbT ; apply.
+by move=> /Pnto0; apply: P0ton.
+Qed.
+
+Lemma all_iffP P0 Ps : all_iff P0 Ps ->
+   forall m n, nth P0 (P0 :: Ps) m <-> nth P0 (P0 :: Ps) n.
+Proof. by move=> /all_iffLR iffPs m n; split => /iffPs. Qed.
+
+End AllIff.
+Arguments all_iffLR {P0 Ps}.
+Arguments all_iffP {P0 Ps}.
+Coercion all_iffP : all_iff >-> Funclass.

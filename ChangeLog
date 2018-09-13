@@ -2,6 +2,11 @@
 	* Added companion matrix of a polynomial `companionmx p` and the
 	  theorems: companionmxK, map_mx_companion and companion_map_poly
 
+	* Added all_iff, "the following are all equivalent"
+	  with notation [<-> P0; P1; ..; Pn] and theorems
+	  `all_iffLR` and coercion `all_iffP` (see header for doc)
+	  proved by circular implication P0 -> P1 -> ... -> Pn -> P0
+
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 
 	* Added compatibility with Coq 8.8 and lost compatibility with
