@@ -527,42 +527,40 @@ Qed.
 
 Section f_step.
 
-Lemma fconnect_step_cycle_orbit x :
-  fconnect f (f x) x -> fcycle f (orbit x).
+Lemma fconnect_step_cycle_orbit x : fconnect f (f x) x = fcycle f (orbit x).
 Proof.
-move=> c; move/iter_findex: (c); set k := findex _ _ => kq.
-have oeq : order x = (order (f x)).
-  apply: eq_card=> y; rewrite !inE; apply/idP/idP; apply/connect_trans => //.
-  by apply/fconnect1.
-suff ko : k.+1 = order x.
-  rewrite /orbit -orderSpred trajectS /= -cats1 cat_path fpath_traject andTb.
-  by rewrite last_traject -ko /= -iterS iterSr kq eqxx.
-move/findex_max: (c); rewrite -/k -oeq leq_eqVlt => /orP[/eqP -> // |].
-move: (orbit_uniq x); rewrite /orbit -orderSpred ltnS=> ou A; move: ou.
-rewrite trajectS cons_uniq andbC => /andP [] _ /negP; case; apply/trajectP.
-by exists k; rewrite ?kq.
+apply/idP/idP.
+- move => c; move: (c); rewrite fconnect_orbit; case/trajectP => k ko kq.
+  move: ko (orbit_uniq x).
+  have <-: order x = order (f x).
+    apply: eq_card=> y; rewrite !inE; apply/idP/idP; apply/connect_trans => //.
+    by apply/fconnect1.
+  rewrite /orbit -orderSpred ltnS /= rcons_path fpath_traject last_traject /=
+          -iterS iterSr leq_eqVlt => /predU1P [<- | ? /andP [] /trajectP []];
+    by [ rewrite -kq | exists k ].
+- move: (fconnect1 x); rewrite !fconnect_orbit => fx cyx.
+  apply/trajectP; rewrite (cycle_orbit_order_eq cyx fx) {fx} -orderSpred.
+  by exists (order x).-1; rewrite // -iterSr orderSpred cycle_orbit_iter_order.
 Qed.
 
-Lemma fconnect_step x y : fconnect f x y -> (x == y) || (fconnect f (f x) y).
+Lemma fconnect_step x y : fconnect f x y = (x == y) || fconnect f (f x) y.
 Proof.
-move/iter_findex; case: (findex x y) => [| i] <-; first by rewrite eqxx.
-by rewrite iterSr fconnect_iter orbT.
+apply/idP/idP => [/iter_findex <- | /predU1P [<- |] //].
+- by case: (findex x y) => [| i]; rewrite ?eqxx // iterSr fconnect_iter orbT.
+- by apply/connect_trans/fconnect1.
 Qed.
 
 Lemma order_step x :
   order x = order (f x) /\ iter (order x) f x = x \/
   order x = (order (f x)).+1.
 Proof.
-have [/fconnect_step_cycle_orbit cyc | /negP noc] :=
-  boolP (fconnect f (f x) x); last first.
+have [| /negP noc] := boolP (fconnect f (f x) x); last first.
   right; rewrite /order; set M := fconnect f (f x); set N := pred1 x.
-  have -> : #|fconnect f x| = #|[predU M & N]|.
-    apply: eq_card=> z; rewrite !inE; apply/idP/idP.
-      by move=> ?; rewrite orbC eq_sym; apply: fconnect_step.
-    move=> /orP [ | /eqP -> ]; last by rewrite connect0.
-    by apply/connect_trans/fconnect1.
-  rewrite -[LHS]addn0 -[0%N](_ : #|[predI M & N]| = _) ?cardUI ?card1 ?addn1 //.
-  by rewrite eq_card0 // => z; rewrite !inE andbC; apply/negP=>/andP [/eqP ->].
+  have ->: #|fconnect f x| = #|[predU N & M]|
+    by apply: eq_card=> z; rewrite !inE fconnect_step eq_sym.
+  rewrite -[LHS]addn0 -add1n -(card1 x) -cardUI; congr addn.
+  by rewrite eq_card0 // => z; rewrite !inE; apply/negP => /andP [/eqP ->].
+rewrite fconnect_step_cycle_orbit.
 left; split; last by apply: cycle_orbit_iter_order.
 by apply/esym/cycle_orbit_order_eq; rewrite // -fconnect_orbit fconnect1.
 Qed.
