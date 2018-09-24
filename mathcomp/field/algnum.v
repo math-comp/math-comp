@@ -354,10 +354,10 @@ Lemma extend_algC_subfield_aut (Qs : fieldExtType rat)
 Proof.
 pose numF_inj (Qr : fieldExtType rat) := {rmorphism Qr -> algC}.
 pose subAut := {Qr : _ & numF_inj Qr * {lrmorphism Qr -> Qr}}%type.
-pose SubAut := existS _ _ (_, _) : subAut.
-pose Sdom (mu : subAut) := projS1 mu.
-pose Sinj (mu : subAut) : {rmorphism Sdom mu -> algC} := (projS2 mu).1.
-pose Saut (mu : subAut) : {rmorphism Sdom mu -> Sdom mu} := (projS2 mu).2.
+pose SubAut := existT _ _ (_, _) : subAut.
+pose Sdom (mu : subAut) := projT1 mu.
+pose Sinj (mu : subAut) : {rmorphism Sdom mu -> algC} := (projT2 mu).1.
+pose Saut (mu : subAut) : {rmorphism Sdom mu -> Sdom mu} := (projT2 mu).2.
 have SinjZ Qr (QrC : numF_inj Qr) a x: QrC (a *: x) = QtoC a * QrC x.
   rewrite mulrAC; apply: canRL (mulfK _) _.
     by rewrite intr_eq0 denq_neq0.
