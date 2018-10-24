@@ -2800,11 +2800,6 @@ Definition all_iff (P0 : Prop) (Ps : seq Prop) : Prop :=
       if Qs is Q :: Qs then all_iff_and (P -> Q) (aux Q Qs)
       else P -> P0 : Prop) P0 Ps.
 
-(* This means "the following are all equivalent: P0, ... Pn" *)
-Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" := (all_iff P0 (P1 :: .. [:: Pn] ..))
-  (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]")
-  : form_scope.
-
 Lemma all_iffLR P0 Ps : all_iff P0 Ps ->
    forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
 Proof.
@@ -2837,6 +2832,11 @@ End AllIff.
 Arguments all_iffLR {P0 Ps}.
 Arguments all_iffP {P0 Ps}.
 Coercion all_iffP : all_iff >-> Funclass.
+
+(* This means "the following are all equivalent: P0, ... Pn" *)
+Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" := (all_iff P0 (P1 :: .. [:: Pn] ..))
+  (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]")
+  : form_scope.
 
 Section All2.
 Context {T U : Type} (p : T -> U -> bool).
