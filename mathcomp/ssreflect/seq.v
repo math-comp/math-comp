@@ -111,6 +111,7 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (* allpairs f s t == the sequence of all the f x y, with x and y drawn from   *)
 (*                  s and t, respectively, in row-major order.                *)
 (*               := [:: f x_1 y_1; ...; f x_1 y_m; f x_2 y_1; ...; f x_n y_m] *)
+(*  allsigs f s t == same as allpairs, but with t depending on s              *)
 (*      pmap pf s == the sequence [:: y_i1, ..., y_ik] where i1 < ... < ik,   *)
 (*                   pf x_i = Some y_i, and pf x_j = None iff j is not in     *)
 (*                   {i1, ..., ik}.                                           *)
@@ -145,6 +146,7 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*         [seq x <- s | C] := filter (fun x => C) s.                         *)
 (*         [seq E | x <- s] := map (fun x => E) s.                            *)
 (* [seq E | x <- s, y <- t] := allpairs (fun x y => E) s t.                   *)
+(* [seq E | x <- s & y <- t] := allsigs (fun x y => E) s t.                    *)
 (*   [seq x <- s | C1 & C2] := [seq x <- s | C1 && C2].                       *)
 (*     [seq E | x <- s & C] := [seq E | x <- [seq x | C]].                    *)
 (*  --> The above allow optional type casts on the eigenvariables, as in      *)
@@ -2857,3 +2859,85 @@ Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2] //=; rewrite ihs1 andbCA. Qed.
 End All2.
 
 Arguments all2 {T U} p !s1 !s2.
+
+Section AllSigs.
+
+Variables (S : Type) (T : S -> Type)  (R : Type) (f : forall x, T x -> R).
+Implicit Types (s : seq S) (t : forall x, seq (T x)).
+
+Definition allsigs s t := foldr (fun x => cat (map (@f x) (t x))) [::] s.
+
+Lemma size_allsigs s t : size (allsigs s t) = sumn [seq size (t x) | x <- s].
+Proof. by elim: s => //= x s IHs; rewrite size_cat size_map IHs. Qed.
+
+Lemma allsigs_cat s1 s2 t :
+  allsigs (s1 ++ s2) t = allsigs s1 t ++ allsigs s2 t.
+Proof. by elim: s1 => //= x s1 ->; rewrite catA. Qed.
+
+End AllSigs.
+
+Prenex Implicits allsigs.
+
+Notation "[ 'seq' E | i <- s & j <- t ]" := (allsigs (fun i j => E) s (fun i => t))
+  (at level 0, E at level 99, i ident, j ident,
+   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s  & '/   '  j  <-  t ] ']'")
+   : seq_scope.
+Notation "[ 'seq' E | i : T <- s  & j : U <- t ]" :=
+  (allsigs (fun (i : T) (j : U) => E) s (fun i : T => t))
+  (at level 0, E at level 99, i ident, j ident, only parsing) : seq_scope.
+
+Section EqAllSigs.
+
+Variables (S : eqType) (T : S -> eqType).
+Implicit Types (R : eqType) (s : seq S) (t : forall x, seq (T x)).
+
+Lemma allsigsP R (f : forall x, T x -> R) s t z : reflect
+  (exists p : sigT T, [/\ tag p \in s, tagged p \in t (tag p) & z = f (tag p) (tagged p)])
+  (z \in allsigs f s t).
+Proof.
+elim: s => [|x s IHs /=]; first by right=> [[p []]].
+rewrite mem_cat; have [fxt_z | not_fxt_z] := altP mapP.
+  by left; have [y t_y ->] := fxt_z; exists (Tagged T y); rewrite mem_head.
+apply: (iffP IHs) => [] [[x' y] /= [s_x' t_y def_z]]; exists (Tagged T y) => /=.
+  by rewrite !inE predU1r.
+have [def_x' | //] := predU1P s_x'.
+by do [case: _ / def_x'; rewrite def_z map_f] in s_x' not_fxt_z *.
+Qed.
+
+Lemma mem_allsigs R (f : forall x, T x -> R) s1 t1 s2 t2 :
+   s1 =i s2 -> (forall x, x \in s1 -> t1 x =i t2 x) ->
+   allsigs f s1 t1 =i allsigs f s2 t2.
+Proof.
+move=> eq_s eq_t z; apply/allsigsP/allsigsP=> [] [p fpz]; exists p => [];
+by move: fpz (fpz) => [???]; rewrite eq_s eq_t //= 1?eq_s.
+Qed.
+
+Lemma allsigs_catr R (f : forall x, T x -> R) s t1 t2 :
+  allsigs f s (fun x => t1 x ++ t2 x) =i allsigs f s t1 ++ allsigs f s t2.
+Proof.
+move=> z; rewrite mem_cat.
+apply/allsigsP/orP=> [[p [sP1]]|].
+  by rewrite mem_cat; case/orP; [left | right]; apply/allsigsP; exists p.
+by case=> /allsigsP[p [sp1 sp2 ->]]; exists p; rewrite mem_cat sp2 ?orbT.
+Qed.
+
+Lemma allsigs_uniq R (f : forall x, T x -> R) s t :
+    uniq s -> (forall x, x \in s -> uniq (t x)) ->
+    {in [seq Tagged T y | x <- s & y <- t x] &,
+     injective (fun p : sigT T => f (tag p) (tagged p))} ->
+  uniq (allsigs f s t).
+Proof.
+move=> Us Ut inj_f; have: all (mem s) s by apply/allP.
+elim: {-2}s Us => //= x s1 IHs /andP[s1'x Us1] /andP[sx1 ss1].
+rewrite cat_uniq {}IHs // andbT map_inj_in_uniq ?Ut // => [|y1 y2 *].
+  apply/hasPn=> _ /allsigsP[z [s1z tz ->]]; apply/mapP=> [[y ty Dy]].
+  suffices [Dz1 _]: Tagged T (tagged z) = Tagged T y.
+     by rewrite -Dz1 s1z in s1'x.
+  apply: inj_f => //; apply/allsigsP; last by exists (Tagged T y).
+  by have:= allP ss1 _ s1z; exists z.
+suffices /eqP: Tagged T y1 = Tagged T y2 by rewrite eq_Tagged => /eqP.
+apply: inj_f => //; apply/allsigsP;
+by [exists (Tagged T y1) | exists (Tagged T y2)].
+Qed.
+
+End EqAllSigs.
