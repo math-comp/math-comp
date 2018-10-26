@@ -6,7 +6,7 @@ Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
 From mathcomp
 Require Import finfun bigop prime binomial ssralg finset fingroup finalg.
 From mathcomp
-Require Import perm zmodp.
+Require Import perm zmodp countalg.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
@@ -2071,6 +2071,10 @@ Proof.
 by apply/matrixP=> k i; rewrite !mxE; apply: eq_bigr => j _; rewrite !mxE.
 Qed.
 
+Canonical matrix_countZmodType (M : countZmodType) m n :=
+  [countZmodType of 'M[M]_(m, n)].
+Canonical matrix_countRingType (R : countRingType) n :=
+  [countRingType of 'M[R]_n.+1].
 Canonical matrix_finLmodType (R : finRingType) m n :=
   [finLmodType R of 'M[R]_(m, n)].
 Canonical matrix_finRingType (R : finRingType) n' :=
@@ -2643,6 +2647,9 @@ Qed.
 End MatrixInv.
 
 Prenex Implicits unitmx invmx.
+
+Canonical matrix_countUnitRingType (R : countComUnitRingType) n :=
+  [countUnitRingType of 'M[R]_n.+1].
 
 (* Finite inversible matrices and the general linear group. *)
 Section FinUnitMatrix.

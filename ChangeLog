@@ -3,6 +3,15 @@
 	* Added companion matrix of a polynomial `companionmx p` and the
 	  theorems: companionmxK, map_mx_companion and companion_map_poly
 
+	* Reshuffled theorems inside files and packages:
+	  * countalg goes from the field to the algebra package
+	  * finalg now gets inheritance from countalg
+	  * closed_field now contains the construction of algebraic closure
+	    for countable fields that used to be in countalg.
+
+        * Rewritten proof of quantifier elimination for closed field in a
+	  monadic style.
+
 	* Added allsigs, the dependent version of allpairs,
 	  with notation `[seq E | i <- s & j <- t]`
 

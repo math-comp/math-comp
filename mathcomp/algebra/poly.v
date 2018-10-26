@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
 From mathcomp
-Require Import bigop ssralg binomial tuple.
+Require Import bigop ssralg countalg binomial tuple.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
@@ -151,6 +151,11 @@ Arguments poly_inj _ _%R _%R _.
 Arguments coefp_head _ _ _%N _%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)).
 Notation coefp i := (coefp_head tt i).
+
+Definition poly_countMixin (R : countRingType) :=
+  [countMixin of polynomial R by <:].
+Canonical polynomial_countType R := CountType _ (poly_countMixin R).
+Canonical poly_countType (R : countRingType) := [countType of {poly R}].
 
 Section PolynomialTheory.
 
@@ -1690,6 +1695,13 @@ Arguments rootPt [R p x].
 Arguments unity_rootP [R n z].
 Arguments polyOverP {R S0 addS kS p}.
 
+Canonical polynomial_countZmodType (R : countRingType) :=
+  [countZmodType of polynomial R].
+Canonical poly_countZmodType (R : countRingType) := [countZmodType of {poly R}].
+Canonical polynomial_countRingType (R : countRingType) :=
+  [countRingType of polynomial R].
+Canonical poly_countRingType (R : countRingType) := [countRingType of {poly R}].
+
 (* Container morphism. *)
 Section MapPoly.
 
@@ -2116,6 +2128,11 @@ Definition derivCE := (derivE, deriv_exp).
 
 End PolynomialComRing.
 
+Canonical polynomial_countComRingType (R : countComRingType) :=
+  [countComRingType of polynomial R].
+Canonical poly_countComRingType (R : countComRingType) :=
+  [countComRingType of {poly R}].
+
 Section PolynomialIdomain.
 
 (* Integral domain structure on poly *)
@@ -2352,6 +2369,19 @@ Lemma roots_geq_poly_eq0 p (rs : seq R) : all (root p) rs -> uniq rs ->
 Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
+
+Canonical polynomial_countUnitRingType (R : countIdomainType) :=
+  [countUnitRingType of polynomial R].
+Canonical poly_countUnitRingType (R : countIdomainType) :=
+  [countUnitRingType of {poly R}].
+Canonical polynomial_countComUnitRingType (R : countIdomainType) :=
+  [countComUnitRingType of polynomial R].
+Canonical poly_countComUnitRingType (R : countIdomainType) :=
+  [countComUnitRingType of {poly R}].
+Canonical polynomial_countIdomainType (R : countIdomainType) :=
+  [countIdomainType of polynomial R].
+Canonical poly_countIdomainType (R : countIdomainType) :=
+  [countIdomainType of {poly R}].
 
 Section MapFieldPoly.
 

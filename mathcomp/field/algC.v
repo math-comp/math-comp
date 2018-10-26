@@ -6,7 +6,7 @@ Require Import ssrbool ssrfun ssrnat eqtype seq choice div fintype.
 From mathcomp
 Require Import path bigop finset prime ssralg poly polydiv mxpoly.
 From mathcomp
-Require Import generic_quotient countalg ssrnum ssrint rat intdiv.
+Require Import generic_quotient countalg closed_field ssrnum ssrint rat intdiv.
 From mathcomp
 Require Import algebraics_fundamentals.
 
@@ -400,7 +400,7 @@ rewrite horner_poly rmorph_sum; apply: eq_bigr => k _.
 by rewrite rmorphM rmorphX /= LtoC_K.
 Qed.
 
-Definition decFieldMixin := closed_field.closed_fields_QEMixin closedFieldAxiom.
+Definition decFieldMixin := closed_field_QEMixin closedFieldAxiom.
 Canonical decFieldType := DecFieldType type decFieldMixin.
 Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
 

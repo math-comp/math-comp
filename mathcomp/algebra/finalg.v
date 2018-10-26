@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
 From mathcomp
-Require Import ssralg finset fingroup morphism perm action.
+Require Import ssralg finset fingroup morphism perm action countalg.
 
 (*****************************************************************************)
 (* This file clones the entire ssralg hierachy for finite types; this allows *)
@@ -136,6 +136,7 @@ Notation "[ 'baseFinGroupType' 'of' R 'for' +%R ]" :=
 Notation "[ 'finGroupType' 'of' R 'for' +%R ]" :=
     (@FinGroup.clone R _ (finGroupType _) id _ id)
   (at level 0, format "[ 'finGroupType'  'of'  R  'for'  +%R ]") : form_scope.
+Canonical countZmodType (T : type) := [countZmodType of T].
 End Exports.
 
 End Zmodule.
@@ -219,6 +220,8 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Canonical countZmodType (T : type) := [countZmodType of T].
+Canonical countRingType (T : type) := [countRingType of T].
 End Exports.
 
 Section Unit.
@@ -330,6 +333,9 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Canonical countZmodType (T : type) := [countZmodType of T].
+Canonical countRingType (T : type) := [countRingType of T].
+Canonical countComRingType (T : type) := [countComRingType of T].
 End Exports.
 
 End ComRing.
@@ -407,6 +413,9 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Canonical countZmodType (T : type) := [countZmodType of T].
+Canonical countRingType (T : type) := [countRingType of T].
+Canonical countUnitRingType (T : type) := [countUnitRingType of T].
 End Exports.
 
 End UnitRing.
@@ -590,6 +599,11 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Canonical countZmodType (T : type) := [countZmodType of T].
+Canonical countRingType (T : type) := [countRingType of T].
+Canonical countUnitRingType (T : type) := [countUnitRingType of T].
+Canonical countComRingType (T : type) := [countComRingType of T].
+Canonical countComUnitRingType (T : type) := [countComUnitRingType of T].
 End Exports.
 
 End ComUnitRing.
@@ -691,6 +705,12 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Canonical countZmodType (T : type) := [countZmodType of T].
+Canonical countRingType (T : type) := [countRingType of T].
+Canonical countUnitRingType (T : type) := [countUnitRingType of T].
+Canonical countComRingType (T : type) := [countComRingType of T].
+Canonical countComUnitRingType (T : type) := [countComUnitRingType of T].
+Canonical countIdomainType (T : type) := [countIdomainType of T].
 End Exports.
 
 End IntegralDomain.
@@ -800,6 +820,13 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Canonical countZmodType (T : type) := [countZmodType of T].
+Canonical countRingType (T : type) := [countRingType of T].
+Canonical countUnitRingType (T : type) := [countUnitRingType of T].
+Canonical countComRingType (T : type) := [countComRingType of T].
+Canonical countComUnitRingType (T : type) := [countComUnitRingType of T].
+Canonical countIdomainType (T : type) := [countIdomainType of T].
+Canonical countFieldType (T : type) := [countFieldType of T].
 End Exports.
 
 End Field.
@@ -871,6 +898,7 @@ Canonical finComUnitRingType.
 Canonical finIdomainType.
 Canonical baseFinGroupType.
 Canonical finGroupType.
+
 End Exports.
 
 End DecField.
@@ -940,6 +968,10 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Section counttype.
+Variables (R : ringType) (phR : phant R) (T : type phR).
+Canonical countZmodType := [countZmodType of T].
+End counttype.
 End Exports.
 
 End Lmodule.
@@ -1036,6 +1068,11 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Section counttype.
+Variables (R : GRing.Ring.type) (phR : phant R) (T : type phR).
+Canonical countZmodType := [countZmodType of T].
+Canonical countRingType := [countRingType of T].
+End counttype.
 End Exports.
 
 End Lalgebra.
@@ -1131,18 +1168,23 @@ Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Section counttype.
+Variables (R : GRing.Ring.type) (phR : phant R) (T : type phR).
+Canonical countZmodType := [countZmodType of T].
+Canonical countRingType := [countRingType of T].
+End counttype.
 End Exports.
 
 End Algebra.
 Import Algebra.Exports.
 
 Module UnitAlgebra.
- 
+
 Section ClassDef.
 
 Variable R : unitRingType.
- 
-Record class_of M := 
+
+Record class_of M :=
   Class { base : GRing.UnitAlgebra.class_of R M; mixin : mixin_of M base }.
 Definition base2 M (c : class_of M) := Algebra.Class (mixin c).
 Definition base3 M (c : class_of M) := @UnitRing.Class _ (base c) (mixin c).
@@ -1257,12 +1299,18 @@ Canonical ujoin_finLmodType.
 Canonical ujoin_finLalgType.
 Canonical ujoin_finAlgType.
 Notation finUnitAlgType R := (type (Phant R)).
-Notation "[ 'finUnitAlgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T) 
+Notation "[ 'finUnitAlgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
   (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
 Canonical baseFinGroupType.
 Canonical finGroupType.
 Canonical join_baseFinGroupType.
 Canonical join_finGroupType.
+Section counttype.
+Variables (R : GRing.UnitRing.type) (phR : phant R) (T : type phR).
+Canonical countZmodType := [countZmodType of T].
+Canonical countRingType := [countRingType of T].
+Canonical countUnitRingType := [countUnitRingType of T].
+End counttype.
 End Exports.
 
 End UnitAlgebra.
@@ -1297,4 +1345,3 @@ Notation "{ 'unit' R }" := (unit_of (Phant R))
 Prenex Implicits FinRing.uval.
 Notation "''U'" := (unit_action _) (at level 8) : action_scope.
 Notation "''U'" := (unit_groupAction _) (at level 8) : groupAction_scope.
-

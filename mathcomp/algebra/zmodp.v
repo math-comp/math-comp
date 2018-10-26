@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp
-Require Import fintype bigop finset prime fingroup ssralg finalg.
+Require Import fintype bigop finset prime fingroup ssralg finalg countalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)
@@ -364,3 +364,12 @@ Canonical Fp_decFieldType :=
   Eval hnf in [decFieldType of 'F_p for Fp_finFieldType].
 
 End PrimeField.
+
+Canonical Zp_countZmodType m := [countZmodType of 'I_m.+1].
+Canonical Zp_countRingType m := [countRingType of 'I_m.+2].
+Canonical Zp_countComRingType m := [countComRingType of 'I_m.+2].
+Canonical Zp_countUnitRingType m := [countUnitRingType of 'I_m.+2].
+Canonical Zp_countComUnitRingType m := [countComUnitRingType of 'I_m.+2].
+Canonical Fp_countIdomainType p := [countIdomainType of 'F_p].
+Canonical Fp_countFieldType p := [countFieldType of 'F_p].
+Canonical Fp_countDecFieldType p := [countDecFieldType of 'F_p].

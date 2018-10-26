@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
 From mathcomp
-Require Import bigop ssralg div ssrnum ssrint.
+Require Import bigop ssralg countalg div ssrnum ssrint.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -349,6 +349,14 @@ Definition RatFieldIdomainMixin := (FieldIdomainMixin rat_field_axiom).
 Canonical rat_iDomain :=
   Eval hnf in IdomainType rat (FieldIdomainMixin rat_field_axiom).
 Canonical rat_fieldType := FieldType rat rat_field_axiom.
+
+Canonical rat_countZmodType := [countZmodType of rat].
+Canonical rat_countRingType := [countRingType of rat].
+Canonical rat_countComRingType := [countComRingType of rat].
+Canonical rat_countUnitRingType := [countUnitRingType of rat].
+Canonical rat_countComUnitRingType := [countComUnitRingType of rat].
+Canonical rat_countIdomainType := [countIdomainType of rat].
+Canonical rat_countFieldType := [countFieldType of rat].
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
