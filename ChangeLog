@@ -23,6 +23,9 @@
 	* Removed duplicated definitions of `tag` `tagged` and `Tagged`
 	  from eqtype.v. They were already in ssrfun.v.
 
+	* Specialized `bool_irrelevance` so that the statement reflects
+	  the name
+
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 
 	* Added compatibility with Coq 8.8 and lost compatibility with
