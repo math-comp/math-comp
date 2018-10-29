@@ -1,5 +1,4 @@
 ??/??/???? - version 1.7.1
-
 	* Added companion matrix of a polynomial `companionmx p` and the
 	  theorems: companionmxK, map_mx_companion and companion_map_poly
 
@@ -11,9 +10,6 @@
 
         * Rewritten proof of quantifier elimination for closed field in a
 	  monadic style.
-
-	* Added allsigs, the dependent version of allpairs,
-	  with notation `[seq E | i <- s & j <- t]`
 
 	* Added all_iff, "the following are all equivalent"
 	  with notation [<-> P0; P1; ..; Pn] and theorems
