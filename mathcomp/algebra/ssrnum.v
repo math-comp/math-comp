@@ -129,16 +129,15 @@ Require Import bigop ssralg finset fingroup zmodp poly.
 (*   e : exterior = in [1, +oo[ or ]1; +oo[                                   *)
 (*   w : non strict (weak) monotony                                           *)
 (*                                                                            *)
-(* [arg minr_(i < i0 | P) M] == a value of i : T minimizing M : R, subject    *)
+(* [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject       *)
 (*                   to the condition P (i may appear in P and M), and        *)
 (*                   provided P holds for i0.                                 *)
-(* [arg maxr_(i > i0 | P) M] == a value of i maximizing M subject to P and    *)
+(* [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and       *)
 (*                   provided P holds for i0.                                 *)
 (* [arg minr_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.         *)
 (* [arg maxr_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.         *)
 (* [arg minr_(i < i0) M] == an i : T minimizing M, given i0 : T.              *)
 (* [arg maxr_(i > i0) M] == an i : T maximizing M, given i0 : T.              *)
-(*                                                                            *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -1281,6 +1280,12 @@ Variables R R' : numDomainType.
 Implicit Types m n p : nat.
 Implicit Types x y z : R.
 Implicit Types u v w : R'.
+
+(****************************************************************************)
+(* This listing of "Let"s factor out the required premices for the          *)
+(* subsequent lemmas, putting them in the context so that "done" solves the *)
+(* goals quickly                                                            *)
+(****************************************************************************)
 
 Let leqnn := leqnn.
 Let ltnE := ltn_neqAle.
@@ -3718,13 +3723,13 @@ Section RealDomainArgExtremum.
 Context {R : realDomainType} {I : finType} (i0 : I).
 Context (P : pred I) (F : I -> R) (Pi0 : P i0).
 
-Definition arg_minr := extremum i0 P F <=%R.
-Definition arg_maxr := extremum i0 P F >=%R.
+Definition arg_minr := extremum <=%R i0 P F.
+Definition arg_maxr := extremum >=%R i0 P F.
 
-Lemma arg_minrP: extremum_spec P F <=%R arg_minr.
+Lemma arg_minrP: extremum_spec <=%R P F arg_minr.
 Proof. by apply: extremumP => //; [apply: ler_trans|apply: ler_total]. Qed.
 
-Lemma arg_maxrP: extremum_spec P F >=%R arg_maxr.
+Lemma arg_maxrP: extremum_spec >=%R P F arg_maxr.
 Proof.
 apply: extremumP => //; first exact: lerr.
   by move=> ??? /(ler_trans _) le /le.

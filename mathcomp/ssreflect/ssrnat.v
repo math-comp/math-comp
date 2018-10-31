@@ -1381,7 +1381,7 @@ rewrite -[4]/(2 * 2) -mulnA mul2n -addnn sqrnD; apply/leqifP.
 by rewrite ltn_add2r eqn_add2r ltn_neqAle !nat_Cauchy; case: ifP => ->.
 Qed.
 
-Section NatHomomorphism.
+Section Monotonicity.
 Variable T : Type.
 
 Lemma homo_ltn_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
@@ -1419,6 +1419,12 @@ Proof. by move=> rrefl /(@homo_leq_in predT f r) fr fS i j; apply: fr. Qed.
 
 Section NatToNat.
 Variable (f : nat -> nat).
+
+(****************************************************************************)
+(* This listing of "Let"s factor out the required premices for the          *)
+(* subsequent lemmas, putting them in the context so that "done" solves the *)
+(* goals quickly                                                            *)
+(****************************************************************************)
 
 Let ltn_neqAle := ltn_neqAle.
 Let gtn_neqAge x y : (y < x) = (x != y) && (y <= x).
@@ -1505,7 +1511,7 @@ Lemma leq_nmono_in : {in D &, {homo f : m n /~ m < n}} ->
 Proof. exact: total_homo_mono_in. Qed.
 
 End NatToNat.
-End NatHomomorphism.
+End Monotonicity.
 
 (* Support for larger integers. The normal definitions of +, - and even  *)
 (* IO are unsuitable for Peano integers larger than 2000 or so because   *)

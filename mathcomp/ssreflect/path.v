@@ -890,7 +890,7 @@ End CycleArc.
 
 Prenex Implicits arc.
 
-Section Homomorphism.
+Section Monotonicity.
 
 Variables (T : eqType) (r : rel T).
 
@@ -932,4 +932,4 @@ move=> /(@sorted_le_nth x0 (x0 :: s')).
 by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
 Qed.
 
-End Homomorphism.
+End Monotonicity.
