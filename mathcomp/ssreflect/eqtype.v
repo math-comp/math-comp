@@ -7,20 +7,40 @@ Require Import ssrfun ssrbool.
 (******************************************************************************)
 (* This file defines two "base" combinatorial interfaces:                     *)
 (*    eqType == the structure for types with a decidable equality.            *)
-(*              Equality mixins can be made Canonical to allow generic        *)
-(*              folding of equality predicates.                               *)
-(* subType p == the structure for types isomorphic to {x : T | p x} with      *)
-(*              p : pred T for some type T.                                   *)
-(* The eqType interface supports the following operations:                    *)
-(*          x == y <=> x compares equal to y (this is a boolean test).        *)
-(*     x == y :> T <=> x == y at type T.                                      *)
-(*          x != y <=> x and y compare unequal.                               *)
-(*     x != y :> T <=>  "    "      "    "     at type T.                     *)
-(*         x =P y  :: a proof of reflect (x = y) (x == y); this coerces       *)
-(*                     to x == y -> x = y.                                    *)
-(*    comparable T <-> equality on T is decidable                             *)
+(* subType P == the structure for types isomorphic to {x : T | P x} with      *)
+(*              P : pred T for some type T.                                   *)
+(* The following are used to construct eqType instances:                      *)
+(*         EqType T m == the packed eqType class for type T and mixin m.      *)
+(* --> As eqType is a root class, equality mixins and classes coincide.       *)
+(*   Equality.axiom e <-> e : rel T is a valid comparison decision procedure  *)
+(*                       for type T: reflect (x = y) (e x y) for all x y : T. *)
+(*         EqMixin eP == the equality mixin for eP : Equality.axiom e.        *)
+(* --> Such manifest equality mixins should be declared Canonical to allow    *)
+(* for generic folding of equality predicates (see lemma eqE below).          *)
+(*  [eqType of T for eT] == clone for T of eT, where eT is an eqType for a    *)
+(*                      type convertible, but usually not identical, to T.    *)
+(*      [eqType of T] == clone for T of the eqType inferred for T, possibly   *)
+(*                       after unfolding some definitions.                    *)
+(*     [eqMixin of T] == mixin of the eqType inferred for T.                  *)
+(*       comparable T <-> equality on T is decidable.                         *)
 (*                    := forall x y : T, decidable (x = y)                    *)
-(*  comparableClass compT == eqType mixin/class for compT : comparable T.     *)
+(*  comparableMixin compT == equality mixin for compT : comparable T.         *)
+(*   InjEqMixin injf == an Equality mixin for T, using an f : T -> U  where   *)
+(*                      U has an eqType structure and injf : injective f.     *)
+(*    PcanEqMixin fK == an Equality mixin similarly derived from f and a left *)
+(*                      inverse partial function g and fK : pcancel f g.      *)
+(*     CanEqMixin fK == an Equality mixin similarly derived from f and a left *)
+(*                      inverse function g and fK : cancel f g.               *)
+(* --> Equality mixins derived by the above should never be made Canonical as *)
+(* they provide only comparisons with a generic head constant.                *)
+(*   The eqType interface supports the following operations:                  *)
+(*              x == y <=> x compares equal to y (this is a boolean test).    *)
+(*         x == y :> T <=> x == y at type T.                                  *)
+(*              x != y <=> x and y compare unequal.                           *)
+(*         x != y :> T <=> x and y compare unequal at type T.                 *)
+(*             x =P y  :: a proof of reflect (x = y) (x == y); x =P y coerces *)
+(*                     to x == y -> x = y.                                    *)
+(*               eq_op == the boolean relation behing the == notation.        *)
 (*             pred1 a == the singleton predicate [pred x | x == a].          *)
 (* pred2, pred3, pred4 == pair, triple, quad predicates.                      *)
 (*            predC1 a == [pred x | x != a].                                  *)
@@ -64,7 +84,7 @@ Require Import ssrfun ssrbool.
 (*                a proof of x0 \in A.                                        *)
 (* insub_eq x == transparent version of insub x that expands to Some/None     *)
 (*               when P x can evaluate.                                       *)
-(*  The subType P interface is most often implemented using one of:           *)
+(* The subType P interface is most often implemented using one of:            *)
 (*   [subType for S_val]                                                      *)
 (*     where S_val : S -> T is the first projection of a type S isomorphic to *)
 (*     {x : T | P}.                                                           *)
@@ -85,16 +105,9 @@ Require Import ssrfun ssrbool.
 (* Subtypes inherit the eqType structure of their base types; the generic     *)
 (* structure should be explicitly instantiated using the                      *)
 (*   [eqMixin of S by <:]                                                     *)
-(* construct to declare the Equality mixin; this pattern is repeated for all  *)
-(* the combinatorial interfaces (Choice, Countable, Finite).                  *)
-(*   More generally, the eqType structure can be transfered by (partial)      *)
-(* injections, using:                                                         *)
-(*   InjEqMixin injf == an Equality mixin for T, using an f : T -> eT where   *)
-(*                      eT has an eqType structure and injf : injective f.    *)
-(*    PcanEqMixin fK == an Equality mixin similarly derived from f and a left *)
-(*                      inverse partial function g and fK : pcancel f g.      *)
-(*     CanEqMixin fK == an Equality mixin similarly derived from f and a left *)
-(*                      inverse function g and fK : cancel f g.               *)
+(* construct to declare the equality mixin; this pattern is repeated for all  *)
+(* the combinatorial interfaces (Choice, Countable, Finite). As noted above,  *)
+(* such mixins should not be mad Canonical.                                   *)
 (*   We add the following to the standard suffixes documented in ssrbool.v:   *)
 (*  1, 2, 3, 4 -- explicit enumeration predicate for 1 (singleton), 2, 3, or  *)
 (*                4 values.                                                   *)
@@ -465,14 +478,14 @@ Variable T : Type.
 
 Definition comparable := forall x y : T, decidable (x = y).
 
-Hypothesis Hcompare : comparable.
+Hypothesis compare_T : comparable.
 
-Definition compareb x y : bool := Hcompare x y.
+Definition compareb x y : bool := compare_T x y.
 
 Lemma compareP : Equality.axiom compareb.
 Proof. by move=> x y; apply: sumboolP. Qed.
 
-Definition comparableClass := EqMixin compareP.
+Definition comparableMixin := EqMixin compareP.
 
 End ComparableType.
 

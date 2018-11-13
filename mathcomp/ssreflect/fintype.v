@@ -19,7 +19,7 @@ Require Import ssrfun ssrbool eqtype ssrnat seq choice.
 (* interfaces, in this file for subFinType, and in the finalg library.        *)
 (*    We define the following interfaces and structures:                      *)
 (*         finType == the packed class type of the Finite interface.          *)
-(*       FinType m == the packed class for the Finite mixin m.                *)
+(*     FinType T m == the packed finType class for type T and Finite mixin m. *)
 (*  Finite.axiom e <-> every x : T occurs exactly once in e : seq T.          *)
 (*   FinMixin ax_e == the Finite mixin for T, encapsulating                   *)
 (*                    ax_e : Finite.axiom e for some e : seq T.               *)
