@@ -1309,14 +1309,14 @@ Definition inE := (mem_seq1, in_cons, inE).
 
 Prenex Implicits mem_seq1 uniq undup index.
 
-Arguments eqseqP [T x y].
-Arguments hasP [T a s].
-Arguments hasPn [T a s].
-Arguments allP [T a s].
-Arguments allPn [T a s].
-Arguments nseqP [T n x y].
-Arguments count_memPn [T x s].
-Prenex Implicits eqseqP hasP hasPn allP allPn nseqP count_memPn.
+Arguments eqseq {T} !_ !_.
+Arguments eqseqP {T x y}.
+Arguments hasP {T a s}.
+Arguments hasPn {T a s}.
+Arguments allP {T a s}.
+Arguments allPn {T a s}.
+Arguments nseqP {T n x y}.
+Arguments count_memPn {T x s}.
 
 Section NthTheory.
 

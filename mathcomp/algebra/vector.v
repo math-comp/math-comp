@@ -1302,7 +1302,7 @@ Section LfunZmodType.
 Variables (R : ringType) (aT rT : vectType R).
 Implicit Types f g h : 'Hom(aT, rT).
 
-Canonical lfun_eqMixin := Eval hnf in [eqMixin of 'Hom(aT, rT) by <:].
+Definition lfun_eqMixin := Eval hnf in [eqMixin of 'Hom(aT, rT) by <:].
 Canonical lfun_eqType := EqType 'Hom(aT, rT) lfun_eqMixin.
 Definition lfun_choiceMixin := [choiceMixin of 'Hom(aT, rT) by <:].
 Canonical lfun_choiceType := ChoiceType 'Hom(aT, rT) lfun_choiceMixin.

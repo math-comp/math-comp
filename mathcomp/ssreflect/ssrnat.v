@@ -174,8 +174,8 @@ Qed.
 Canonical nat_eqMixin := EqMixin eqnP.
 Canonical nat_eqType := Eval hnf in EqType nat nat_eqMixin.
 
-Arguments eqnP [x y].
-Prenex Implicits eqnP.
+Arguments eqn !_ !_.
+Arguments eqnP {x y}.
 
 Lemma eqnE : eqn = eq_op. Proof. by []. Qed.
 
@@ -1453,6 +1453,8 @@ Qed.
 
 Canonical bin_nat_eqMixin := EqMixin eq_binP.
 Canonical bin_nat_eqType := Eval hnf in EqType N bin_nat_eqMixin.
+
+Arguments N.eqb !_ !_.
 
 Section NumberInterpretation.
 
