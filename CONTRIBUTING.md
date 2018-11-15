@@ -129,3 +129,20 @@ Abbreviations are in the header of the file which introduce them. We list here t
   - `z` -- an int argument
 #### Typical search pattern
 `Search _ "prefix" "suffix"* (symbol|pattern)* in library.`
+
+## Doc style.
+### Header documentary comments
+We try to document types, definitions and notations precisely, but only describe
+the lemmas and theorems in general terms, because we don't want to discourage users
+from actually reading the documentation.
+There are some exceptions for some particularly important theorems.
+
+### Commenting source code
+The MathComp library uses exclusively block comments, with 80-character lines
+enclosed in the `(*` / `*)` delimiters, e.g.
+```
+(* Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  Donec hendrerit *)
+(* tempor tellus.  Donec pretium posuere tellus.  Proin quam nisl, tincidunt  *)
+(* et, mattis eget, convallis nec, purus.                                     *)
+```
+Multiline comments are strictly limited to out-commented code.
