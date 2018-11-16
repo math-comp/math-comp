@@ -128,11 +128,10 @@ Notation quot_class_of := quot_mixin_of.
 
 Record quotType := QuotTypePack {
   quot_sort :> Type;
-  quot_class : quot_class_of quot_sort;
-  _ : Type
+  quot_class : quot_class_of quot_sort
 }.
 
-Definition QuotType_pack qT m := @QuotTypePack qT m qT.
+Definition QuotType_pack qT m := @QuotTypePack qT m.
 
 Variable qT : quotType.
 Definition pi_phant of phant qT := quot_pi (quot_class qT).
@@ -143,7 +142,7 @@ Lemma repr_ofK : cancel repr_of \pi.
 Proof. by rewrite /pi_phant /repr_of /=; case: qT=> [? []]. Qed.
 
 Definition QuotType_clone (Q : Type) qT cT 
-  of phant_id (quot_class qT) cT := @QuotTypePack Q cT Q.
+  of phant_id (quot_class qT) cT := @QuotTypePack Q cT.
 
 End QuotientDef.
 
@@ -329,8 +328,8 @@ Variable eq_quot_op : rel T.
 
 Definition eq_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
   (ec : Equality.class_of Q) :=
-  {mono \pi_(QuotTypePack qc Q) : x y /
-   eq_quot_op x y >-> @eq_op (Equality.Pack ec Q) x y}.
+  {mono \pi_(QuotTypePack qc) : x y /
+   eq_quot_op x y >-> @eq_op (Equality.Pack ec) x y}.
 
 Record eq_quot_class_of (Q : Type) : Type := EqQuotClass {
   eq_quot_quot_class :> quot_class_of T Q;
@@ -341,13 +340,13 @@ Record eq_quot_class_of (Q : Type) : Type := EqQuotClass {
 Record eqQuotType : Type := EqQuotTypePack {
   eq_quot_sort :> Type;
   _ : eq_quot_class_of eq_quot_sort;
-  _ : Type
+ 
 }.
 
 Implicit Type eqT : eqQuotType.
 
 Definition eq_quot_class eqT : eq_quot_class_of eqT :=
-  let: EqQuotTypePack _ cT _ as qT' := eqT return eq_quot_class_of qT' in cT.
+  let: EqQuotTypePack _ cT as qT' := eqT return eq_quot_class_of qT' in cT.
 
 Canonical eqQuotType_eqType eqT := EqType eqT (eq_quot_class eqT).
 Canonical eqQuotType_quotType eqT := QuotType eqT (eq_quot_class eqT).
@@ -358,10 +357,10 @@ Coercion eqQuotType_quotType : eqQuotType >-> quotType.
 Definition EqQuotType_pack Q :=
   fun (qT : quotType T) (eT : eqType) qc ec 
   of phant_id (quot_class qT) qc & phant_id (Equality.class eT) ec => 
-    fun m => EqQuotTypePack (@EqQuotClass Q qc ec m) Q.
+    fun m => EqQuotTypePack (@EqQuotClass Q qc ec m).
 
 Definition EqQuotType_clone (Q : Type) eqT cT 
-  of phant_id (eq_quot_class eqT) cT := @EqQuotTypePack Q cT Q.
+  of phant_id (eq_quot_class eqT) cT := @EqQuotTypePack Q cT.
 
 Lemma pi_eq_quot eqT : {mono \pi_eqT : x y / eq_quot_op x y >-> x == y}.
 Proof. by case: eqT => [] ? []. Qed.

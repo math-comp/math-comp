@@ -302,10 +302,10 @@ Local Notation T := (arg_sort bT).
 Local Notation rT := (sort bT).
 Local Notation class := (finClass bT).
 
-Canonical eqType := Equality.Pack class rT.
-Canonical choiceType := Choice.Pack class rT.
-Canonical countType := Countable.Pack class rT.
-Canonical finType := Finite.Pack class rT.
+Canonical eqType := Equality.Pack class.
+Canonical choiceType := Choice.Pack class.
+Canonical countType := Countable.Pack class.
+Canonical finType := Finite.Pack class.
 Definition arg_eqType := Eval hnf in [eqType of T].
 Definition arg_choiceType := Eval hnf in [choiceType of T].
 Definition arg_countType := Eval hnf in [countType of T].

@@ -172,7 +172,7 @@ Section Mixins.
 Variable T : countType.
 
 Definition EnumMixin :=
-  let: Countable.Pack _ (Countable.Class _ m) _ as cT := T
+  let: Countable.Pack _ (Countable.Class _ m) as cT := T
     return forall e : seq cT, axiom e -> mixin_of cT in
   @Mixin (EqType _ _) m.
 
@@ -198,26 +198,26 @@ Section ClassDef.
 
 Record class_of T := Class {
   base : Choice.class_of T;
-  mixin : mixin_of (Equality.Pack base T)
+  mixin : mixin_of (Equality.Pack base)
 }.
 Definition base2 T c := Countable.Class (@base T c) (mixin_base (mixin c)).
 Local Coercion base : class_of >-> Choice.class_of.
 
-Structure type : Type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type : Type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack b0 (m0 : mixin_of (EqType T b0)) :=
   fun bT b & phant_id (Choice.class bT) b =>
-  fun m & phant_id m0 m => Pack (@Class T b m) T.
+  fun m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition countType := @Countable.Pack cT (base2 xclass) xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition countType := @Countable.Pack cT (base2 xclass).
 
 End ClassDef.
 
@@ -1379,7 +1379,7 @@ Coercion subFinType_subCountType sT := @SubCountType _ _ sT (subFin_mixin sT).
 Canonical subFinType_subCountType.
 
 Coercion subFinType_finType sT :=
-  Pack (@Class sT (sub_choiceClass sT) (subFin_mixin sT)) sT.
+  Pack (@Class sT (sub_choiceClass sT) (subFin_mixin sT)).
 Canonical subFinType_finType.
 
 Lemma codom_val sT x : (x \in codom (val : sT -> T)) = P x.
