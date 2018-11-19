@@ -107,7 +107,7 @@ Require Import ssrfun ssrbool.
 (*   [eqMixin of S by <:]                                                     *)
 (* construct to declare the equality mixin; this pattern is repeated for all  *)
 (* the combinatorial interfaces (Choice, Countable, Finite). As noted above,  *)
-(* such mixins should not be mad Canonical.                                   *)
+(* such mixins should not be made Canonical.                                  *)
 (*   We add the following to the standard suffixes documented in ssrbool.v:   *)
 (*  1, 2, 3, 4 -- explicit enumeration predicate for 1 (singleton), 2, 3, or  *)
 (*                4 values.                                                   *)
@@ -155,6 +155,17 @@ Export Equality.Exports.
 
 Definition eq_op T := Equality.op (Equality.class T).
 
+(* eqE is a generic lemma that can be used to fold back recursive comparisons *)
+(* after using partial evaluation to simplify comparisons on concrete         *)
+(* instances. The eqE lemma can be used e.g. like so: rewrite !eqE /= -!eqE.  *)
+(* For instance, with the above rewrite, n.+1 == n.+1 gets simplified to      *)
+(* n == n. For this to work, we need to declare equality _mixins_             *)
+(* as canonical. Canonical declarations remove the need for specific          *)
+(* inverses to eqE (like eqbE, eqnE, eqseqE, etc.) for new recursive          *)
+(* comparisons, but can only be used for manifest mixing with a bespoke       *)
+(* comparison function, and so is incompatible with PcanEqMixin and the like  *)
+(* - this is why the tree_eqMixin for GenTree.tree in library choice is not   *)
+(* declared Canonical.                                                        *)
 Lemma eqE T x : eq_op x = Equality.op (Equality.class T) x.
 Proof. by []. Qed.
 
@@ -745,7 +756,7 @@ Section ProdEqType.
 
 Variable T1 T2 : eqType.
 
-Definition pair_eq := [rel u v : T1 * T2 | (u.1 == v.1) && (u.2 == v.2)].
+Definition pair_eq : rel (T1 * T2) := fun u v => (u.1 == v.1) && (u.2 == v.2).
 
 Lemma pair_eqP : Equality.axiom pair_eq.
 Proof.
@@ -753,7 +764,7 @@ move=> [x1 x2] [y1 y2] /=; apply: (iffP andP) => [[]|[<- <-]] //=.
 by do 2!move/eqP->.
 Qed.
 
-Definition prod_eqMixin := EqMixin pair_eqP.
+Canonical prod_eqMixin := EqMixin pair_eqP.
 Canonical prod_eqType := Eval hnf in EqType (T1 * T2) prod_eqMixin.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
@@ -770,9 +781,8 @@ Proof. by case/andP. Qed.
 
 End ProdEqType.
 
-Arguments pair_eqP [T1 T2].
-
-Prenex Implicits pair_eqP.
+Arguments pair_eq {T1 T2} _ _ /.
+Arguments pair_eqP {T1 T2}.
 
 Definition predX T1 T2 (p1 : pred T1) (p2 : pred T2) :=
   [pred z | p1 z.1 & p2 z.2].
@@ -796,6 +806,8 @@ Canonical option_eqMixin := EqMixin opt_eqP.
 Canonical option_eqType := Eval hnf in EqType (option T) option_eqMixin.
 
 End OptionEqType.
+
+Arguments opt_eq {T} !_ !_.
 
 Section TaggedAs.
 
@@ -841,8 +853,8 @@ Proof. by rewrite -tag_eqE /tag_eq eqxx tagged_asE. Qed.
 
 End TagEqType.
 
-Arguments tag_eqP [I T_ x y].
-Prenex Implicits tag_eqP.
+Arguments tag_eq {I T_} !_ !_.
+Arguments tag_eqP {I T_ x y}.
 
 Section SumEqType.
 
@@ -865,5 +877,5 @@ Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 
 End SumEqType.
 
-Arguments sum_eqP [T1 T2 x y].
-Prenex Implicits sum_eqP.
+Arguments sum_eq {T1 T2} !_ !_.
+Arguments sum_eqP {T1 T2 x y}.
