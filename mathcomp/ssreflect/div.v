@@ -302,8 +302,7 @@ Proof.
 apply: (iffP eqP) => [md0 | [k ->]]; last by rewrite modnMl.
 by exists (m %/ d); rewrite {1}(divn_eq m d) md0 addn0.
 Qed.
-Arguments dvdnP [d m].
-Prenex Implicits dvdnP.
+Arguments dvdnP {d m}.
 
 Lemma dvdn0 d : d %| 0.
 Proof. by case: d. Qed.

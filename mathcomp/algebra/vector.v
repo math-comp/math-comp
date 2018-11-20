@@ -1223,27 +1223,27 @@ End BigSumBasis.
 End VectorTheory.
 
 Hint Resolve subvv.
-Arguments subvP [K vT U V].
-Arguments addv_idPl [K vT U V].
-Arguments addv_idPr [K vT U V].
-Arguments memv_addP [K vT w U V ].
+Arguments subvP {K vT U V}.
+Arguments addv_idPl {K vT U V}.
+Arguments addv_idPr {K vT U V}.
+Arguments memv_addP {K vT w U V }.
 Arguments sumv_sup [K vT I] i0 [P U Vs].
-Arguments memv_sumP [K vT I P Us v].
-Arguments subv_sumP [K vT I P Us V].
-Arguments capv_idPl [K vT U V].
-Arguments capv_idPr [K vT U V].
-Arguments memv_capP [K vT w U V].
+Arguments memv_sumP {K vT I P Us v}.
+Arguments subv_sumP {K vT I P Us V}.
+Arguments capv_idPl {K vT U V}.
+Arguments capv_idPr {K vT U V}.
+Arguments memv_capP {K vT w U V}.
 Arguments bigcapv_inf [K vT I] i0 [P Us V].
-Arguments subv_bigcapP [K vT I P U Vs].
-Arguments directvP [K vT S].
-Arguments directv_addP [K vT U V].
-Arguments directv_add_unique [K vT U V].
-Arguments directv_sumP [K vT I P Us].
-Arguments directv_sumE [K vT I P Ss].
-Arguments directv_sum_independent [K vT I P Us].
-Arguments directv_sum_unique [K vT I P Us].
-Arguments span_subvP [K vT X U].
-Arguments freeP [K vT n X].
+Arguments subv_bigcapP {K vT I P U Vs}.
+Arguments directvP {K vT S}.
+Arguments directv_addP {K vT U V}.
+Arguments directv_add_unique {K vT U V}.
+Arguments directv_sumP {K vT I P Us}.
+Arguments directv_sumE {K vT I P Ss}.
+Arguments directv_sum_independent {K vT I P Us}.
+Arguments directv_sum_unique {K vT I P Us}.
+Arguments span_subvP {K vT X U}.
+Arguments freeP {K vT n X}.
 
 Prenex Implicits coord.
 Notation directv S := (directv_def (Phantom _ S%VS)).
@@ -1598,11 +1598,11 @@ Proof. by move/lker0_lfunK=> fK; apply/lfunP=> u; rewrite !lfunE /= fK. Qed.
 
 End LinearImage.
 
-Arguments memv_imgP [K aT rT f w U].
-Arguments lfunPn [K aT rT f g].
-Arguments lker0P [K aT rT f].
-Arguments eqlfunP [K aT rT f g v].
-Arguments eqlfun_inP [K aT rT V f g].
+Arguments memv_imgP {K aT rT f w U}.
+Arguments lfunPn {K aT rT f g}.
+Arguments lker0P {K aT rT f}.
+Arguments eqlfunP {K aT rT f g v}.
+Arguments eqlfun_inP {K aT rT V f g}.
 
 Section FixedSpace.
 
@@ -1632,8 +1632,8 @@ Qed.
 
 End FixedSpace.
 
-Arguments fixedSpaceP [K vT f a].
-Arguments fixedSpacesP [K vT f U].
+Arguments fixedSpaceP {K vT f a}.
+Arguments fixedSpacesP {K vT f U}.
 
 Section LinAut.
 

@@ -461,7 +461,7 @@ Lemma odd_tperm x y : odd_perm (tperm x y) = (x != y).
 Proof. by rewrite -[_ y]mulg1 odd_mul_tperm odd_perm1 addbF. Qed.
 
 Definition dpair (eT : eqType) := [pred t | t.1 != t.2 :> eT].
-Arguments dpair [eT].
+Arguments dpair {eT}.
 
 Lemma prod_tpermP s :
   {ts : seq (T * T) | s = \prod_(t <- ts) tperm t.1 t.2 & all dpair ts}.
@@ -503,7 +503,7 @@ Proof. by rewrite !odd_permM odd_permV addbC addbK. Qed.
 End PermutationParity.
 
 Coercion odd_perm : perm_type >-> bool.
-Arguments dpair [eT].
+Arguments dpair {eT}.
 Prenex Implicits pcycle dpair pcycles aperm.
 
 Section LiftPerm.

@@ -134,7 +134,7 @@ Lemma itv_dec : forall (x : R) (i : interval R),
   reflect (itv_decompose i x) (x \in i).
 Proof. by move=> x [[[] a|] [[] b|]]; apply: (iffP andP); case. Qed.
 
-Arguments itv_dec [x i].
+Arguments itv_dec {x i}.
 
 Definition lersif (x y : R) b := if b then x < y else x <= y.
 

@@ -820,14 +820,13 @@ End OpsTheory.
 
 Hint Resolve subxx_hint.
 
-Arguments pred0P [T P].
-Arguments pred0Pn [T P].
-Arguments subsetP [T A B].
-Arguments subsetPn [T A B].
-Arguments subset_eqP [T A B].
-Arguments card_uniqP [T s].
-Arguments properP [T A B].
-Prenex Implicits pred0P pred0Pn subsetP subsetPn subset_eqP card_uniqP.
+Arguments pred0P {T P}.
+Arguments pred0Pn {T P}.
+Arguments subsetP {T A B}.
+Arguments subsetPn {T A B}.
+Arguments subset_eqP {T A B}.
+Arguments card_uniqP {T s}.
+Arguments properP {T A B}.
 
 (**********************************************************************)
 (*                                                                    *)
@@ -927,14 +926,14 @@ Proof. by rewrite negb_exists; apply/eq_forallb => x; rewrite [~~ _]fun_if. Qed.
 
 End Quantifiers.
 
-Arguments forallP [T P].
-Arguments eqfunP [T rT f1 f2].
-Arguments forall_inP [T D P].
-Arguments eqfun_inP [T rT D f1 f2].
-Arguments existsP [T P].
-Arguments exists_eqP [T rT f1 f2].
-Arguments exists_inP [T D P].
-Arguments exists_eq_inP [T rT D f1 f2].
+Arguments forallP {T P}.
+Arguments eqfunP {T rT f1 f2}.
+Arguments forall_inP {T D P}.
+Arguments eqfun_inP {T rT D f1 f2}.
+Arguments existsP {T P}.
+Arguments exists_eqP {T rT f1 f2}.
+Arguments exists_inP {T D P}.
+Arguments exists_eq_inP {T rT D f1 f2}.
 
 Notation "'exists_in_ view" := (exists_inPP _ (fun _ => view))
   (at level 4, right associativity, format "''exists_in_' view").
@@ -1197,15 +1196,15 @@ Qed.
 End Image.
 
 Prenex Implicits codom iinv.
-Arguments imageP [T T' f A y].
-Arguments codomP [T T' f y].
+Arguments imageP {T T' f A y}.
+Arguments codomP {T T' f y}.
 
 Lemma flatten_imageP (aT : finType) (rT : eqType) A (P : pred aT) (y : rT) :
   reflect (exists2 x, x \in P & y \in A x) (y \in flatten [seq A x | x in P]).
 Proof.
 by apply: (iffP flatten_mapP) => [][x Px]; exists x; rewrite ?mem_enum in Px *.
 Qed.
-Arguments flatten_imageP [aT rT A P y].
+Arguments flatten_imageP {aT rT A P y}.
 
 Section CardFunImage.
 
@@ -1253,7 +1252,7 @@ Qed.
 
 End CardFunImage.
 
-Arguments image_injP [T T' f A].
+Arguments image_injP {T T' f A}.
 
 Section FinCancel.
 

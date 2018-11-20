@@ -329,9 +329,9 @@ End kHom.
 
 Notation "f ^-1" := (inv_ahom f) : lrfun_scope.
 
-Arguments kHomP [F L K V f].
-Arguments kAHomP [F L U V f].
-Arguments kHom_lrmorphism [F L f].
+Arguments kHomP {F L K V f}.
+Arguments kAHomP {F L U V f}.
+Arguments kHom_lrmorphism {F L f}.
 
 Module SplittingField.
 
@@ -1205,7 +1205,7 @@ have [x galEx Df] := kHom_to_gal sK_Ka_E nKE homKa_f; exists x => //.
 by rewrite -Df ?memv_adjoin // (kHomExtend_val (kHom1 K K)) ?lfun1_poly.
 Qed.
 
-Arguments normalFieldP [K E].
+Arguments normalFieldP {K E}.
 
 Lemma normalField_factors K E :
    (K <= E)%VS ->
@@ -1637,7 +1637,7 @@ End GaloisTheory.
 Notation "''Gal' ( V / U )" := (galoisG V U) : group_scope.
 Notation "''Gal' ( V / U )" := (galoisG_group V U) : Group_scope.
 
-Arguments fixedFieldP [F L E A a].
-Arguments normalFieldP [F L K E].
-Arguments splitting_galoisField [F L K E].
-Arguments galois_fixedField [F L K E].
+Arguments fixedFieldP {F L E A a}.
+Arguments normalFieldP {F L K E}.
+Arguments splitting_galoisField {F L K E}.
+Arguments galois_fixedField {F L K E}.

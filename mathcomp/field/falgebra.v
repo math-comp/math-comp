@@ -641,12 +641,12 @@ Notation "[ 'aspace' 'of' U ]" := (@clone_aspace _ _ U _ _ id)
 Notation "[ 'aspace' 'of' U 'for' A ]" := (@clone_aspace _ _ U A _ idfun)
   (at level 0, format "[ 'aspace'  'of'  U  'for'  A ]") : form_scope.
 
-Arguments prodvP [K aT U V W].
-Arguments cent1vP [K aT u v].
-Arguments centvP [K aT u V].
-Arguments centvsP [K aT U V].
-Arguments has_algidP [K aT U].
-Arguments polyOver1P [K aT p].
+Arguments prodvP {K aT U V W}.
+Arguments cent1vP {K aT u v}.
+Arguments centvP {K aT u V}.
+Arguments centvsP {K aT U V}.
+Arguments has_algidP {K aT U}.
+Arguments polyOver1P {K aT p}.
 
 Section AspaceTheory.
 
@@ -856,8 +856,8 @@ Notation "'C [ u ]" := (centraliser1_aspace u) : aspace_scope.
 Notation "'C ( V )" := (centraliser_aspace V) : aspace_scope.
 Notation "'Z ( A )" := (center_aspace A) : aspace_scope.
 
-Arguments adim1P [K aT A].
-Arguments memv_cosetP [K aT U v w].
+Arguments adim1P {K aT A}.
+Arguments memv_cosetP {K aT U v w}.
 
 Section Closure.
 
@@ -1118,8 +1118,8 @@ Canonical linfun_ahom f := AHom (linfun_is_ahom f).
 End Class_Def.
 
 Arguments ahom_in [aT rT].
-Arguments ahom_inP [aT rT f U].
-Arguments ahomP [aT rT f].
+Arguments ahom_inP {aT rT f U}.
+Arguments ahomP {aT rT f}.
 
 Section LRMorphism.
 

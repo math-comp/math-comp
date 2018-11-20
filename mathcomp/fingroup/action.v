@@ -488,10 +488,9 @@ Arguments act_inj {aT D rT} to _ [x1 x2].
 
 Notation "to ^*" := (set_action to) : action_scope.
 
-Arguments orbitP [aT D rT to A x y].
-Arguments afixP [aT D rT to A x].
-Arguments afix1P [aT D rT to a x].
-Prenex Implicits orbitP afixP afix1P.
+Arguments orbitP {aT D rT to A x y}.
+Arguments afixP {aT D rT to A x}.
+Arguments afix1P {aT D rT to a x}.
 
 Arguments reindex_astabs [aT D rT] to [vT idx op S] a [F].
 Arguments reindex_acts [aT D rT] to [vT idx op S A a F].
@@ -876,10 +875,9 @@ Qed.
 End PartialAction.
 
 Arguments orbit_transversal _ _%g _ _%act _%g _%g.
-Arguments orbit_in_eqP [aT D rT to G x y].
-Arguments orbit1P [aT D rT to G x].
+Arguments orbit_in_eqP {aT D rT to G x y}.
+Arguments orbit1P {aT D rT to G x}.
 Arguments contra_orbit [aT D rT] to G [x y].
-Prenex Implicits orbit_in_eqP orbit1P.
 
 Notation "''C' ( S | to )" := (astab_group to S) : Group_scope.
 Notation "''C_' A ( S | to )" := (setI_group A 'C(S | to)) : Group_scope.
@@ -1005,7 +1003,7 @@ Proof.
 apply: (iffP idP) => [nSA x|nSA]; first exact: acts_act.
 by apply/subsetP=> a Aa; rewrite !inE; apply/subsetP=> x; rewrite inE nSA.
 Qed.
-Arguments actsP [A S].
+Arguments actsP {A S}.
 
 Lemma setact_orbit A x b : to^* (orbit to A x) b = orbit to (A :^ b) (to x b).
 Proof.
@@ -1134,14 +1132,13 @@ Qed.
 
 End TotalActions.
 
-Arguments astabP [aT rT to S a].
-Arguments orbit_eqP [aT rT to G x y].
-Arguments astab1P [aT rT to x a].
-Arguments astabsP [aT rT to S a].
-Arguments atransP [aT rT to G S].
-Arguments actsP [aT rT to A S].
-Arguments faithfulP [aT rT to A S].
-Prenex Implicits astabP orbit_eqP astab1P astabsP atransP actsP faithfulP.
+Arguments astabP {aT rT to S a}.
+Arguments orbit_eqP {aT rT to G x y}.
+Arguments astab1P {aT rT to x a}.
+Arguments astabsP {aT rT to S a}.
+Arguments atransP {aT rT to G S}.
+Arguments actsP {aT rT to A S}.
+Arguments faithfulP {aT rT to A S}.
 
 Section Restrict.
 
@@ -1634,8 +1631,7 @@ Proof. by apply/permP=> x; rewrite permE. Qed.
 
 End PermAction.
 
-Arguments perm_act1P [rT a].
-Prenex Implicits perm_act1P.
+Arguments perm_act1P {rT a}.
 
 Notation "'P" := (perm_action _) (at level 8) : action_scope.
 

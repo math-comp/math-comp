@@ -116,8 +116,8 @@ Canonical rVpoly_linear := Linear rVpoly_is_linear.
 
 End RowPoly.
 
-Arguments poly_rV [R d].
-Prenex Implicits rVpoly poly_rV.
+Arguments poly_rV {R d}.
+Prenex Implicits rVpoly.
 
 Section Resultant.
 

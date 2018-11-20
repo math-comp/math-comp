@@ -340,14 +340,14 @@ apply: (iffP dvdnP) => [] [q Dm]; last by exists `|q|%N; rewrite Dm abszM.
 exists ((-1) ^+ (m < 0)%R * q%:Z * (-1) ^+ (d < 0)%R).
 by rewrite -!mulrA -abszEsign -PoszM -Dm -intEsign.
 Qed.
-Arguments dvdzP [d m].
+Arguments dvdzP {d m}.
 
 Lemma dvdz_mod0P d m : reflect (m %% d = 0)%Z (d %| m)%Z.
 Proof.
 apply: (iffP dvdzP) => [[q ->] | md0]; first by rewrite modzMl.
 by rewrite (divz_eq m d) md0 addr0; exists (m %/ d)%Z.
 Qed.
-Arguments dvdz_mod0P [d m].
+Arguments dvdz_mod0P {d m}.
 
 Lemma dvdz_eq d m : (d %| m)%Z = ((m %/ d)%Z * d == m).
 Proof. by rewrite (sameP dvdz_mod0P eqP) subr_eq0 eq_sym. Qed.

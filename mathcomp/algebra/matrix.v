@@ -911,14 +911,13 @@ End VecMatrix.
 
 End MatrixStructural.
 
-Arguments const_mx [R m n].
-Arguments row_mxA [R m n1 n2 n3 A1 A2 A3].
-Arguments col_mxA [R m1 m2 m3 n A1 A2 A3].
+Arguments const_mx {R m n}.
+Arguments row_mxA {R m n1 n2 n3 A1 A2 A3}.
+Arguments col_mxA {R m1 m2 m3 n A1 A2 A3}.
 Arguments block_mxA
-  [R m1 m2 m3 n1 n2 n3 A11 A12 A13 A21 A22 A23 A31 A32 A33].
-Prenex Implicits const_mx castmx trmx lsubmx rsubmx usubmx dsubmx row_mx col_mx.
+  {R m1 m2 m3 n1 n2 n3 A11 A12 A13 A21 A22 A23 A31 A32 A33}.
+Prenex Implicits castmx trmx lsubmx rsubmx usubmx dsubmx row_mx col_mx.
 Prenex Implicits block_mx ulsubmx ursubmx dlsubmx drsubmx.
-Prenex Implicits row_mxA col_mxA block_mxA.
 Prenex Implicits mxvec vec_mx mxvec_indexP mxvecK vec_mxK.
 
 Notation "A ^T" := (trmx A) : ring_scope.
@@ -2042,20 +2041,18 @@ Definition adjugate n (A : 'M_n) := \matrix[adjugate_key]_(i, j) cofactor A j i.
 
 End MatrixAlgebra.
 
-Arguments delta_mx [R m n].
-Arguments scalar_mx [R n].
-Arguments perm_mx [R n].
-Arguments tperm_mx [R n].
-Arguments pid_mx [R m n].
-Arguments copid_mx [R n].
-Arguments lin_mulmxr [R m n p].
-Prenex Implicits delta_mx diag_mx scalar_mx is_scalar_mx perm_mx tperm_mx.
-Prenex Implicits pid_mx copid_mx mulmx lin_mulmxr.
-Prenex Implicits mxtrace determinant cofactor adjugate.
+Arguments delta_mx {R m n}.
+Arguments scalar_mx {R n}.
+Arguments perm_mx {R n}.
+Arguments tperm_mx {R n}.
+Arguments pid_mx {R m n}.
+Arguments copid_mx {R n}.
+Arguments lin_mulmxr {R m n p}.
+Prenex Implicits diag_mx is_scalar_mx.
+Prenex Implicits mulmx mxtrace determinant cofactor adjugate.
 
-Arguments is_scalar_mxP [R n A].
-Arguments mul_delta_mx [R m n p].
-Prenex Implicits mul_delta_mx.
+Arguments is_scalar_mxP {R n A}.
+Arguments mul_delta_mx {R m n p}.
 
 Notation "a %:M" := (scalar_mx a) : ring_scope.
 Notation "A *m B" := (mulmx A B) : ring_scope.
@@ -2500,9 +2497,8 @@ Proof. by rewrite -det_tr tr_block_mx trmx0 det_ublock !det_tr. Qed.
 
 End ComMatrix.
 
-Arguments lin_mul_row [R m n].
-Arguments lin_mulmx [R m n p].
-Prenex Implicits lin_mul_row lin_mulmx.
+Arguments lin_mul_row {R m n}.
+Arguments lin_mulmx {R m n p}.
 
 Canonical matrix_finAlgType (R : finComRingType) n' :=
   [finAlgType R of 'M[R]_n'.+1].
@@ -2667,8 +2663,7 @@ Coercion GLval ph (u : GLtype ph) : 'M[R]_n.-1.+1 :=
 End FinUnitMatrix.
 
 Bind Scope group_scope with GLtype.
-Arguments GLval _%N _ _ _%g.
-Prenex Implicits GLval.
+Arguments GLval {_%N _ _} _%g.
 
 Notation "{ ''GL_' n [ R ] }" := (GLtype n (Phant R))
   (at level 0, n at level 2, format "{ ''GL_' n [ R ] }") : type_scope.
@@ -2786,7 +2781,7 @@ Qed.
 
 End MatrixDomain.
 
-Arguments det0P [R n A].
+Arguments det0P {R n A}.
 
 (* Parametricity at the field level (mx_is_scalar, unit and inverse are only *)
 (* mapped at this level).                                                    *)

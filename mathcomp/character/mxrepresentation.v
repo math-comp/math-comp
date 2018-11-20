@@ -427,7 +427,7 @@ Qed.
 
 End OneRepresentation.
 
-Arguments rkerP [gT G n rG x].
+Arguments rkerP {gT G n rG x}.
 
 Section Proper.
 
@@ -819,8 +819,8 @@ Arguments mx_repr _ _ _%g _%N _.
 Arguments group_ring _ _ _%g.
 Arguments regular_repr _ _ _%g.
 
-Arguments centgmxP [R gT G n rG f].
-Arguments rkerP [R gT G n rG x].
+Arguments centgmxP {R gT G n rG f}.
+Arguments rkerP {R gT G n rG x}.
 Prenex Implicits gring_mxK.
 
 Section ChangeOfRing.
@@ -933,7 +933,7 @@ by apply: (iffP subsetP) => modU x Gx; have:= modU x Gx; rewrite !inE ?Gx.
 Qed.
 
 End Stabilisers.
-Arguments mxmoduleP [m U].
+Arguments mxmoduleP {m U}.
 
 Lemma rstabS m1 m2 (U : 'M_(m1, n)) (V : 'M_(m2, n)) :
   (U <= V)%MS -> rstab rG V \subset rstab rG U.
@@ -1288,7 +1288,7 @@ apply/sub_kermxP; rewrite mul_rV_lin1 /=; apply: (canLR vec_mxK).
 apply/row_matrixP=> j; rewrite !row_mul rowK mul_vec_lin /= mul_vec_lin_row.
 by rewrite -!row_mul mulmxBr !mulmxA cGf ?enum_valP // subrr !linear0.
 Qed.
-Arguments hom_mxP [m f W].
+Arguments hom_mxP {m f W}.
 
 Lemma hom_envelop_mxC m f (W : 'M_(m, n)) A :
   (W <= dom_hom_mx f -> A \in E_G -> W *m A *m f = W *m f *m A)%MS.
@@ -1366,7 +1366,7 @@ apply/sub_kermxP; rewrite mul_rV_lin1 /=; apply: (canLR vec_mxK).
 apply/row_matrixP=> i; rewrite row_mul rowK mul_vec_lin_row -row_mul.
 by rewrite mulmxBr mulmx1 cHW ?enum_valP // subrr !linear0.
 Qed.
-Arguments rfix_mxP [m W].
+Arguments rfix_mxP {m W}.
 
 Lemma rfix_mx_id (H : {set gT}) x : x \in H -> rfix_mx H *m rG x = rfix_mx H.
 Proof. exact/rfix_mxP. Qed.
@@ -1428,7 +1428,7 @@ rewrite genmxE; apply: (iffP submxP) => [[a] | [A /submxP[a defA]]] -> {v}.
   by rewrite vec_mxK submxMl.
 by exists a; rewrite mulmxA mul_rV_lin1 /= -defA mxvecK.
 Qed.
-Arguments cyclic_mxP [u v].
+Arguments cyclic_mxP {u v}.
 
 Lemma cyclic_mx_id u : (u <= cyclic_mx u)%MS.
 Proof. by apply/cyclic_mxP; exists 1%:M; rewrite ?mulmx1 ?envelop_mx1. Qed.
@@ -2366,21 +2366,19 @@ Qed.
 
 End OneRepresentation.
 
-Arguments mxmoduleP [gT G n rG m U].
-Arguments envelop_mxP [gT G n rG A].
-Arguments hom_mxP [gT G n rG m f W].
-Arguments rfix_mxP [gT G n rG m W].
-Arguments cyclic_mxP [gT G n rG u v].
-Arguments annihilator_mxP [gT G n rG u A].
-Arguments row_hom_mxP [gT G n rG u v].
-Arguments mxsimple_isoP [gT G n rG U V].
-Arguments socleP [gT G n rG sG0 W W'].
-Arguments mx_abs_irrP [gT G n rG].
+Arguments mxmoduleP {gT G n rG m U}.
+Arguments envelop_mxP {gT G n rG A}.
+Arguments hom_mxP {gT G n rG m f W}.
+Arguments rfix_mxP {gT G n rG m W}.
+Arguments cyclic_mxP {gT G n rG u v}.
+Arguments annihilator_mxP {gT G n rG u A}.
+Arguments row_hom_mxP {gT G n rG u v}.
+Arguments mxsimple_isoP {gT G n rG U V}.
+Arguments socleP {gT G n rG sG0 W W'}.
+Arguments mx_abs_irrP {gT G n rG}.
 
-Arguments val_submod_inj [n U m].
-Arguments val_factmod_inj [n U m].
-
-Prenex Implicits val_submod_inj val_factmod_inj.
+Arguments val_submod_inj {n U m}.
+Arguments val_factmod_inj {n U m}.
 
 Section Proper.
 
@@ -4659,23 +4657,22 @@ Arguments gset_mx _ _ _%g _%g.
 Arguments classg_base _ _ _%g _%g : extra scopes.
 Arguments irrType _ _ _%g _%g : extra scopes.
 
-Arguments mxmoduleP [F gT G n rG m U].
-Arguments envelop_mxP [F gT G n rG A].
-Arguments hom_mxP [F gT G n rG m f W].
+Arguments mxmoduleP {F gT G n rG m U}.
+Arguments envelop_mxP {F gT G n rG A}.
+Arguments hom_mxP {F gT G n rG m f W}.
 Arguments mx_Maschke [F gT G n] rG _ [U].
-Arguments rfix_mxP [F gT G n rG m W].
-Arguments cyclic_mxP [F gT G n rG u v].
-Arguments annihilator_mxP [F gT G n rG u A].
-Arguments row_hom_mxP [F gT G n rG u v].
-Arguments mxsimple_isoP [F gT G n rG U V].
+Arguments rfix_mxP {F gT G n rG m W}.
+Arguments cyclic_mxP {F gT G n rG u v}.
+Arguments annihilator_mxP {F gT G n rG u A}.
+Arguments row_hom_mxP {F gT G n rG u v}.
+Arguments mxsimple_isoP {F gT G n rG U V}.
 Arguments socle_exists [F gT G n].
-Arguments socleP [F gT G n rG sG0 W W'].
-Arguments mx_abs_irrP [F gT G n rG].
-Arguments socle_rsimP [F gT G n rG sG W1 W2].
+Arguments socleP {F gT G n rG sG0 W W'}.
+Arguments mx_abs_irrP {F gT G n rG}.
+Arguments socle_rsimP {F gT G n rG sG W1 W2}.
 
-Arguments val_submod_inj [F n U m].
-Arguments val_factmod_inj [F n U m].
-Prenex Implicits val_submod_inj val_factmod_inj.
+Arguments val_submod_inj {F n U m}.
+Arguments val_factmod_inj {F n U m}.
 
 Notation "'Cl" := (Clifford_action _) : action_scope.
 

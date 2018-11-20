@@ -562,8 +562,8 @@ Export Countable.Exports.
 
 Definition unpickle T := Countable.unpickle (Countable.class T).
 Definition pickle T := Countable.pickle (Countable.class T).
-Arguments unpickle [T].
-Prenex Implicits pickle unpickle.
+Arguments unpickle {T}.
+Prenex Implicits pickle.
 
 Section CountableTheory.
 
