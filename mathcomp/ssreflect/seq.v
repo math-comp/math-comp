@@ -2043,7 +2043,7 @@ Qed.
 Lemma perm_to_subseq s1 s2 :
   subseq s1 s2 -> {s3 | perm_eq s2 (s1 ++ s3)}.
 Proof.
-elim Ds2: s2 s1 => [|y s2' IHs] [|x s1] //=; try by exists s2; rewrite Ds2.
+pose s := s2; elim: s2 s1 => [|y s2 IHs] [|x s1] //= in s *; try by exists s.
 case: eqP => [-> | _] /IHs[s3 perm_s2] {IHs}.
   by exists s3; rewrite perm_cons.
 by exists (rcons s3 y); rewrite -cat_cons -perm_rcons -!cats1 catA perm_cat2r.
