@@ -131,8 +131,6 @@ Record quotType := QuotTypePack {
   quot_class : quot_class_of quot_sort
 }.
 
-Definition QuotType_pack qT m := @QuotTypePack qT m.
-
 Variable qT : quotType.
 Definition pi_phant of phant qT := quot_pi (quot_class qT).
 Local Notation "\pi" := (pi_phant (Phant qT)).
@@ -193,7 +191,7 @@ Canonical pi_unlock := Unlockable Pi.E.
 Canonical repr_unlock := Unlockable Repr.E.
 
 Notation quot_class_of := quot_mixin_of.
-Notation QuotType Q m := (@QuotType_pack _ Q m).
+Notation QuotType Q m := (@QuotTypePack _ Q m).
 Notation "[ 'quotType' 'of' Q ]" := (@QuotType_clone _ Q _ _ id)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
