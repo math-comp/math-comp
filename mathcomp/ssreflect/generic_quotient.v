@@ -198,8 +198,7 @@ Notation QuotType Q m := (@QuotType_pack _ Q m).
 Notation "[ 'quotType' 'of' Q ]" := (@QuotType_clone _ Q _ _ id)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
-Arguments repr [T qT].
-Prenex Implicits repr.
+Arguments repr {T qT}.
 
 (************************)
 (* Exporting the theory *)
@@ -248,8 +247,7 @@ Notation piE := (@equal_toE _ _).
 Canonical equal_to_pi T (qT : quotType T) (x : T) :=
   @EqualTo _ (\pi_qT x) (\pi x) (erefl _).
 
-Arguments EqualTo [T x equal_val].
-Prenex Implicits EqualTo.
+Arguments EqualTo {T x equal_val}.
 
 Section Morphism.
 
@@ -276,12 +274,11 @@ Lemma pi_morph11 : \pi (h a) = hq (equal_val x). Proof. by rewrite !piE. Qed.
 
 End Morphism.
 
-Arguments pi_morph1 [T qT f fq].
-Arguments pi_morph2 [T qT g gq].
-Arguments pi_mono1 [T U qT p pq].
-Arguments pi_mono2 [T U qT r rq].
-Arguments pi_morph11 [T U qT qU h hq].
-Prenex Implicits pi_morph1 pi_morph2 pi_mono1 pi_mono2 pi_morph11.
+Arguments pi_morph1 {T qT f fq}.
+Arguments pi_morph2 {T qT g gq}.
+Arguments pi_mono1 {T U qT p pq}.
+Arguments pi_mono2 {T U qT r rq}.
+Arguments pi_morph11 {T U qT qU h hq}.
 
 Notation "{pi_ Q a }" := (equal_to (\pi_Q a)) : quotient_scope.
 Notation "{pi a }" := (equal_to (\pi a)) : quotient_scope.

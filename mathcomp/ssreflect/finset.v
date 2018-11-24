@@ -243,8 +243,7 @@ End BasicSetTheory.
 
 Definition inE := (in_set, inE).
 
-Arguments set0 [T].
-Prenex Implicits set0.
+Arguments set0 {T}.
 Hint Resolve in_setT.
 
 Notation "[ 'set' : T ]" := (setTfor (Phant T))
@@ -827,7 +826,7 @@ Proof.
 apply: (iffP subsetP) => [sAB | <- x /setIP[] //].
 by apply/setP=> x; rewrite inE; apply/andb_idr/sAB.
 Qed.
-Arguments setIidPl [A B].
+Arguments setIidPl {A B}.
 
 Lemma setIidPr A B : reflect (A :&: B = B) (B \subset A).
 Proof. by rewrite setIC; apply: setIidPl. Qed.
@@ -955,29 +954,27 @@ Proof. by rewrite setDE disjoints_subset => /properI/andP[-> /proper_sub]. Qed.
 
 End setOps.
 
-Arguments set1P [T x a].
-Arguments set1_inj [T].
-Arguments set2P [T x a b].
-Arguments setIdP [T x pA pB].
-Arguments setIP [T x A B].
-Arguments setU1P [T x a B].
-Arguments setD1P [T x A b].
-Arguments setUP [T x A B].
-Arguments setDP [T A B x].
-Arguments cards1P [T A].
-Arguments setCP [T x A].
-Arguments setIidPl [T A B].
-Arguments setIidPr [T A B].
-Arguments setUidPl [T A B].
-Arguments setUidPr [T A B].
-Arguments setDidPl [T A B].
-Arguments subsetIP [T A B C].
-Arguments subUsetP [T A B C].
-Arguments subsetDP [T A B C].
-Arguments subsetD1P [T A B x].
-Prenex Implicits set1 set1_inj.
-Prenex Implicits set1P set2P setU1P setD1P setIdP setIP setUP setDP.
-Prenex Implicits cards1P setCP setIidPl setIidPr setUidPl setUidPr setDidPl.
+Arguments set1P {T x a}.
+Arguments set1_inj {T}.
+Arguments set2P {T x a b}.
+Arguments setIdP {T x pA pB}.
+Arguments setIP {T x A B}.
+Arguments setU1P {T x a B}.
+Arguments setD1P {T x A b}.
+Arguments setUP {T x A B}.
+Arguments setDP {T A B x}.
+Arguments cards1P {T A}.
+Arguments setCP {T x A}.
+Arguments setIidPl {T A B}.
+Arguments setIidPr {T A B}.
+Arguments setUidPl {T A B}.
+Arguments setUidPr {T A B}.
+Arguments setDidPl {T A B}.
+Arguments subsetIP {T A B C}.
+Arguments subUsetP {T A B C}.
+Arguments subsetDP {T A B C}.
+Arguments subsetD1P {T A B x}.
+Prenex Implicits set1.
 Hint Resolve subsetT_hint.
 
 Section setOpsAlgebra.
@@ -1018,8 +1015,7 @@ Proof. by rewrite cardsE cardX. Qed.
 
 End CartesianProd.
 
-Arguments setXP [fT1 fT2 A1 A2 x1 x2].
-Prenex Implicits setXP.
+Arguments setXP {fT1 fT2 A1 A2 x1 x2}.
 
 Local Notation imset_def :=
   (fun (aT rT : finType) f mD => [set y in @image_mem aT rT f mD]).
@@ -1365,9 +1361,8 @@ Proof. by move=> sAB1 sAB2; rewrite -!imset2_pair imset2S. Qed.
 
 End FunImage.
 
-Arguments imsetP [aT rT f D y].
-Arguments imset2P [aT aT2 rT f2 D1 D2 y].
-Prenex Implicits imsetP imset2P.
+Arguments imsetP {aT rT f D y}.
+Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 
 Section BigOps.
 
@@ -1499,7 +1494,7 @@ Proof. by move=> fK gK; apply: can2_in_imset_pre; apply: in1W. Qed.
 
 End CardFunImage.
 
-Arguments imset_injP [aT rT f D].
+Arguments imset_injP {aT rT f D}.
 
 Lemma on_card_preimset (aT rT : finType) (f : aT -> rT) (R : pred rT) :
   {on R, bijective f} -> #|f @^-1: R| = #|R|.
@@ -1703,13 +1698,12 @@ End BigSetOps.
 
 Arguments bigcup_sup [T I] j [P F].
 Arguments bigcup_max [T I] j [U P F].
-Arguments bigcupP [T I x P F].
-Arguments bigcupsP [T I U P F].
+Arguments bigcupP {T I x P F}.
+Arguments bigcupsP {T I U P F}.
 Arguments bigcap_inf [T I] j [P F].
 Arguments bigcap_min [T I] j [U P F].
-Arguments bigcapP [T I x P F].
-Arguments bigcapsP [T I U P F].
-Prenex Implicits bigcupP bigcupsP bigcapP bigcapsP.
+Arguments bigcapP {T I x P F}.
+Arguments bigcapsP {T I U P F}.
 
 Section ImsetCurry.
 
@@ -2088,13 +2082,13 @@ End Transversals.
 
 End Partitions.
 
-Arguments trivIsetP [T P].
+Arguments trivIsetP {T P}.
 Arguments big_trivIset_cond [T R idx op] P [K E].
 Arguments set_partition_big_cond [T R idx op] P [D K E].
 Arguments big_trivIset [T R idx op] P [E].
 Arguments set_partition_big [T R idx op] P [D E].
 
-Prenex Implicits cover trivIset partition pblock trivIsetP.
+Prenex Implicits cover trivIset partition pblock.
 
 Lemma partition_partition (T : finType) (D : {set T}) P Q :
     partition P D -> partition Q P ->
@@ -2141,7 +2135,7 @@ apply: (iffP forallP) => [minA | [PA minA] B].
   by move=> B PB sBA; have:= minA B; rewrite PB sBA /= eqb_id => /eqP.
 by apply/implyP=> sBA; apply/eqP; apply/eqP/idP=> [-> // | /minA]; apply.
 Qed.
-Arguments minsetP [P A].
+Arguments minsetP {P A}.
 
 Lemma minsetp P A : minset P A -> P A.
 Proof. by case/minsetP. Qed.
@@ -2212,7 +2206,7 @@ Qed.
 
 End MaxSetMinSet.
 
-Arguments minsetP [T P A].
-Arguments maxsetP [T P A].
-Prenex Implicits minset maxset minsetP maxsetP.
+Arguments minsetP {T P A}.
+Arguments maxsetP {T P A}.
+Prenex Implicits minset maxset.
 

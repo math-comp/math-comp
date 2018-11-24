@@ -266,8 +266,8 @@ Proof. by rewrite -existsb_tnth; apply: existsP. Qed.
 
 End TupleQuantifiers.
 
-Arguments all_tnthP [n T a t].
-Arguments has_tnthP [n T a t].
+Arguments all_tnthP {n T a t}.
+Arguments has_tnthP {n T a t}.
 
 Section EqTuple.
 

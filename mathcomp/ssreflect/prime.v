@@ -349,9 +349,8 @@ case/primeP=> _ min_p d_neq1; apply: (iffP idP) => [/min_p|-> //].
 by rewrite (negPf d_neq1) /= => /eqP.
 Qed.
 
-Arguments primeP [p].
-Arguments primePn [n].
-Prenex Implicits primePn primeP.
+Arguments primeP {p}.
+Arguments primePn {n}.
 
 Lemma prime_gt1 p : prime p -> 1 < p.
 Proof. by case/primeP. Qed.
@@ -541,8 +540,7 @@ exists (pdiv n); rewrite pdiv_dvd pdiv_prime //; split=> //.
 by case: leqP npr_p => //; move/ltn_pdiv2_prime->; auto.
 Qed.
 
-Arguments primePns [n].
-Prenex Implicits primePns.
+Arguments primePns {n}.
 
 Lemma pdivP n : n > 1 -> {p | prime p & p %| n}.
 Proof. by move=> lt1n; exists (pdiv n); rewrite ?pdiv_dvd ?pdiv_prime. Qed.

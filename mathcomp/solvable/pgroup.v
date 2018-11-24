@@ -83,16 +83,15 @@ Definition Sylow A B := p_group B && Hall A B.
 
 End PgroupDefs.
 
-Arguments pgroup _ _%N _%g.
+Arguments pgroup {_} _%N _%g.
 Arguments psubgroup _ _%N _%g _%g.
 Arguments p_group _ _%g.
 Arguments p_elt _ _%N.
 Arguments constt _ _%g _%N.
-Arguments Hall _ _%g _%g.
+Arguments Hall {_} _%g _%g.
 Arguments pHall _ _%N _%g _%g.
 Arguments Syl _ _%N _%g.
-Arguments Sylow _ _%g _%g.
-Prenex Implicits p_group Hall Sylow.
+Arguments Sylow {_} _%g _%g.
 
 Notation "pi .-group" := (pgroup pi)
   (at level 2, format "pi .-group") : group_scope.
@@ -170,7 +169,7 @@ Proof. exact: partn_eq1 (cardG_gt0 G). Qed.
 Lemma pgroupP pi G :
   reflect (forall p, prime p -> p %| #|G| -> p \in pi) (pi.-group G).
 Proof. exact: pnatP. Qed.
-Arguments pgroupP [pi G].
+Arguments pgroupP {pi G}.
 
 Lemma pgroup1 pi : pi.-group [1 gT].
 Proof. by rewrite /pgroup cards1. Qed.
@@ -679,9 +678,8 @@ Qed.
 
 End PgroupProps.
 
-Arguments pgroupP [gT pi G].
-Arguments constt1P [gT pi x].
-Prenex Implicits pgroupP constt1P.
+Arguments pgroupP {gT pi G}.
+Arguments constt1P {gT pi x}.
 
 Section NormalHall.
 
@@ -1302,8 +1300,8 @@ Qed.
 
 End EqPcore.
 
-Arguments sdprod_Hall_pcoreP [pi gT H G].
-Arguments sdprod_Hall_p'coreP [gT pi H G].
+Arguments sdprod_Hall_pcoreP {pi gT H G}.
+Arguments sdprod_Hall_p'coreP {gT pi H G}.
 
 Section Injm.
 

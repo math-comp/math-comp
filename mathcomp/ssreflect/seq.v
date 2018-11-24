@@ -786,12 +786,12 @@ End Sequences.
 
 Definition rev T (s : seq T) := nosimpl (catrev s [::]).
 
-Arguments nilP [T s].
-Arguments all_filterP [T a s].
+Arguments nilP {T s}.
+Arguments all_filterP {T a s}.
 
-Prenex Implicits size nilP head ohead behead last rcons belast.
+Prenex Implicits size head ohead behead last rcons belast.
 Prenex Implicits cat take drop rev rot rotr.
-Prenex Implicits find count nth all has filter all_filterP.
+Prenex Implicits find count nth all has filter.
 
 Notation count_mem x := (count (pred_of_simpl (pred1 x))).
 
@@ -1354,10 +1354,9 @@ Proof. by elim: s n => [|y s' IHs] [|n] /=; auto. Qed.
 Lemma headI T s (x : T) : rcons s x = head x s :: behead (rcons s x).
 Proof. by case: s. Qed.
 
-Arguments nthP [T s x].
-Arguments has_nthP [T a s].
-Arguments all_nthP [T a s].
-Prenex Implicits nthP has_nthP all_nthP.
+Arguments nthP {T s x}.
+Arguments has_nthP {T a s}.
+Arguments all_nthP {T a s}.
 
 Definition bitseq := seq bool.
 Canonical bitseq_eqType := Eval hnf in [eqType of bitseq].
@@ -1598,10 +1597,10 @@ End PermSeq.
 Notation perm_eql s1 s2 := (perm_eq s1 =1 perm_eq s2).
 Notation perm_eqr s1 s2 := (perm_eq^~ s1 =1 perm_eq^~ s2).
 
-Arguments perm_eqP [T s1 s2].
-Arguments perm_eqlP [T s1 s2].
-Arguments perm_eqrP [T s1 s2].
-Prenex Implicits perm_eq perm_eqP perm_eqlP perm_eqrP.
+Arguments perm_eqP {T s1 s2}.
+Arguments perm_eqlP {T s1 s2}.
+Arguments perm_eqrP {T s1 s2}.
+Prenex Implicits perm_eq.
 Hint Resolve perm_eq_refl.
 
 Section RotrLemmas.
@@ -1875,7 +1874,7 @@ Proof. by case/subseqP=> m _ -> Us2; apply: mask_uniq. Qed.
 End Subseq.
 
 Prenex Implicits subseq.
-Arguments subseqP [T s1 s2].
+Arguments subseqP {T s1 s2}.
 
 Hint Resolve subseq_refl.
 
@@ -2119,8 +2118,7 @@ Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
 
 End EqMap.
 
-Arguments mapP [T1 T2 f s y].
-Prenex Implicits mapP.
+Arguments mapP {T1 T2 f s y}.
 
 Lemma map_of_seq (T1 : eqType) T2 (s : seq T1) (fs : seq T2) (y0 : T2) :
   {f | uniq s -> size fs = size s -> map f s = fs}.
@@ -2685,7 +2683,7 @@ elim: A => /= [|s A /iffP IH_A]; [by right; case | rewrite mem_cat].
 have [s_x|s'x] := @idP (x \in s); first by left; exists s; rewrite ?mem_head.
 by apply: IH_A => [[t] | [t /predU1P[->|]]]; exists t; rewrite // mem_behead.
 Qed.
-Arguments flattenP [A x].
+Arguments flattenP {A x}.
 
 Lemma flatten_mapP (A : S -> seq T) s y :
   reflect (exists2 x, x \in s & y \in A x) (y \in flatten (map A s)).
@@ -2696,8 +2694,8 @@ Qed.
 
 End EqFlatten.
 
-Arguments flattenP [T A x].
-Arguments flatten_mapP [S T A s y].
+Arguments flattenP {T A x}.
+Arguments flatten_mapP {S T A s y}.
 
 Lemma perm_undup_count (T : eqType) (s : seq T) :
   perm_eq (flatten [seq nseq (count_mem x s) x | x <- undup s]) s.

@@ -390,8 +390,8 @@ Qed.
 
 End StandardRepresentation.
 
-Arguments grepr0 [R gT G].
-Prenex Implicits grepr0 dadd_grepr.
+Arguments grepr0 {R gT G}.
+Prenex Implicits dadd_grepr.
 
 Section Char.
 
@@ -924,7 +924,7 @@ Canonical char_semiringPred := SemiringPred mul_char.
 
 End IsChar.
 Prenex Implicits character.
-Arguments char_reprP [gT G phi].
+Arguments char_reprP {gT G phi}.
 
 Section AutChar.
 
@@ -2554,7 +2554,7 @@ Qed.
 
 End DerivedGroup.
 
-Arguments irr_prime_injP [gT G i].
+Arguments irr_prime_injP {gT G i}.
 
 (* Determinant characters and determinential order. *)
 Section DetOrder.

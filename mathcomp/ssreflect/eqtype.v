@@ -171,7 +171,7 @@ Proof. by []. Qed.
 
 Lemma eqP T : Equality.axiom (@eq_op T).
 Proof. by case: T => ? []. Qed.
-Arguments eqP [T x y].
+Arguments eqP {T x y}.
 
 Delimit Scope eq_scope with EQ.
 Open Scope eq_scope.
@@ -254,8 +254,8 @@ Proof. by rewrite eq_sym; apply: ifN. Qed.
 
 End Contrapositives.
 
-Arguments memPn [T1 A x].
-Arguments memPnC [T1 A x].
+Arguments memPn {T1 A x}.
+Arguments memPnC {T1 A x}.
 
 Theorem eq_irrelevance (T : eqType) x y : forall e1 e2 : x = y :> T, e1 = e2.
 Proof.
@@ -363,10 +363,10 @@ Proof. by case: eqP; [left | right]. Qed.
 
 End EqPred.
 
-Arguments predU1P [T x y b].
-Arguments pred2P [T T2 x y z u].
-Arguments predD1P [T x y b].
-Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1 predU1P.
+Arguments predU1P {T x y b}.
+Arguments pred2P {T T2 x y z u}.
+Arguments predD1P {T x y b}.
+Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1.
 
 Notation "[ 'predU1' x & A ]" := (predU1 x [mem A])
   (at level 0, format "[ 'predU1'  x  &  A ]") : fun_scope.
@@ -597,14 +597,14 @@ Qed.
 End SubType.
 
 Arguments SubType [T P].
-Arguments Sub [T P s].
-Arguments vrefl [T P].
-Arguments vrefl_rect [T P].
+Arguments Sub {T P s}.
+Arguments vrefl {T P}.
+Arguments vrefl_rect {T P}.
 Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
-Arguments insub [T P sT].
+Arguments insub {T P sT}.
 Arguments insubT [T] P [sT x].
-Arguments val_inj [T P sT].
-Prenex Implicits val Sub vrefl vrefl_rect insub insubd val_inj.
+Arguments val_inj {T P sT}.
+Prenex Implicits val insubd.
 
 Local Notation inlined_sub_rect :=
   (fun K K_S u => let (x, Px) as u return K u := u in K_S x Px).
@@ -646,8 +646,7 @@ Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
  (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.
 
 Definition innew T nT x := @Sub T predT nT x (erefl true).
-Arguments innew [T nT].
-Prenex Implicits innew.
+Arguments innew {T nT}.
 
 Lemma innew_val T nT : cancel val (@innew T nT).
 Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
@@ -737,8 +736,7 @@ Proof. by []. Qed.
 
 End SubEqType.
 
-Arguments val_eqP [T P sT x y].
-Prenex Implicits val_eqP.
+Arguments val_eqP {T P sT x y}.
 
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.class_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.

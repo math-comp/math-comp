@@ -198,8 +198,8 @@ Qed.
 
 End MakeAut.
 
-Arguments morphim_fixP [gT G f].
-Prenex Implicits aut morphim_fixP.
+Arguments morphim_fixP {gT G f}.
+Prenex Implicits aut.
 
 Section AutIsom.
 

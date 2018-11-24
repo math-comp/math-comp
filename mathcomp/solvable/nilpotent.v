@@ -75,10 +75,9 @@ Definition solvable :=
 
 End PropertiesDefs.
 
-Arguments nilpotent _ _%g.
-Arguments nil_class _ _%g.
-Arguments solvable _ _%g.
-Prenex Implicits nil_class nilpotent solvable.
+Arguments nilpotent {_} _%g.
+Arguments nil_class {_} _%g.
+Arguments solvable {_} _%g.
 
 Section NilpotentProps.
 

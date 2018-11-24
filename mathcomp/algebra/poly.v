@@ -1688,11 +1688,11 @@ Notation "a ^` ()" := (deriv a) : ring_scope.
 Notation "a ^` ( n )" := (derivn n a) : ring_scope.
 Notation "a ^`N ( n )" := (nderivn n a) : ring_scope.
 
-Arguments monicP [R p].
-Arguments rootP [R p x].
-Arguments rootPf [R p x].
-Arguments rootPt [R p x].
-Arguments unity_rootP [R n z].
+Arguments monicP {R p}.
+Arguments rootP {R p x}.
+Arguments rootPf {R p x}.
+Arguments rootPt {R p x}.
+Arguments unity_rootP {R n z}.
 Arguments polyOverP {R S0 addS kS p}.
 
 Canonical polynomial_countZmodType (R : countRingType) :=
@@ -2611,7 +2611,7 @@ Open Scope unity_root_scope.
 
 Definition unity_rootE := unity_rootE.
 Definition unity_rootP := @unity_rootP.
-Arguments unity_rootP [R n z].
+Arguments unity_rootP {R n z}.
 
 Definition prim_order_exists := prim_order_exists.
 Notation prim_order_gt0 :=  prim_order_gt0.

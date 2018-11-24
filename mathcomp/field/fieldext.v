@@ -696,7 +696,7 @@ move=> sKE; apply: minPoly_dvdp; last exact: root_minPoly.
 by apply: (polyOverSv sKE); rewrite minPolyOver.
 Qed.
 
-Arguments Fadjoin_polyP [K x v].
+Arguments Fadjoin_polyP {K x v}.
 Lemma Fadjoin1_polyP x v :
   reflect (exists p, v = (map_poly (in_alg L) p).[x]) (v \in <<1; x>>%VS).
 Proof.
@@ -737,13 +737,13 @@ Notation "'C_ ( E ) ( V )" := (capv_aspace E 'C(V))
 Notation "E * F" := (prodv_aspace E F) : aspace_scope.
 Notation "f @: E" := (aimg_aspace f E) : aspace_scope.
 
-Arguments Fadjoin_idP [F0 L K x].
-Arguments FadjoinP [F0 L K x E].
-Arguments Fadjoin_seqP [F0 L K rs E].
-Arguments polyOver_subvs [F0 L K p].
-Arguments Fadjoin_polyP [F0 L K x v].
-Arguments Fadjoin1_polyP [F0 L x v].
-Arguments minPoly_XsubC [F0 L K x].
+Arguments Fadjoin_idP {F0 L K x}.
+Arguments FadjoinP {F0 L K x E}.
+Arguments Fadjoin_seqP {F0 L K rs E}.
+Arguments polyOver_subvs {F0 L K p}.
+Arguments Fadjoin_polyP {F0 L K x v}.
+Arguments Fadjoin1_polyP {F0 L x v}.
+Arguments minPoly_XsubC {F0 L K x}.
 
 Section MapMinPoly.
 

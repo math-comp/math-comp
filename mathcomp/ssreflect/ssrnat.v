@@ -394,7 +394,7 @@ apply: (iffP idP); last by elim: n / => // n _ /leq_trans->.
 elim: n => [|n IHn]; first by case: m.
 by rewrite leq_eqVlt ltnS => /predU1P[<- // | /IHn]; right.
 Qed.
-Arguments leP [m n].
+Arguments leP {m n}.
 
 Lemma le_irrelevance m n le_mn1 le_mn2 : le_mn1 = le_mn2 :> (m <= n)%coq_nat.
 Proof.
@@ -411,7 +411,7 @@ Qed.
 
 Lemma ltP m n : reflect (m < n)%coq_nat (m < n).
 Proof. exact leP. Qed.
-Arguments ltP [m n].
+Arguments ltP {m n}.
 
 Lemma lt_irrelevance m n lt_mn1 lt_mn2 : lt_mn1 = lt_mn2 :> (m < n)%coq_nat.
 Proof. exact: (@le_irrelevance m.+1). Qed.

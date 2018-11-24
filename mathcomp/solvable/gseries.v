@@ -71,17 +71,16 @@ Definition simple A := minnormal A A.
 Definition chief_factor A V U := maxnormal V U A && (U <| A).
 End GroupDefs.
 
-Arguments subnormal _ _%g _%g.
+Arguments subnormal {_} _%g _%g.
 Arguments invariant_factor _ _%g _%g _%g.
 Arguments stable_factor _ _%g _%g _%g.
 Arguments central_factor _ _%g _%g _%g.
-Arguments maximal _ _%g _%g.
+Arguments maximal {_} _%g _%g.
 Arguments maximal_eq _ _%g _%g.
 Arguments maxnormal _ _%g _%g _%g.
 Arguments minnormal _ _%g _%g.
-Arguments simple _ _%g.
+Arguments simple {_} _%g.
 Arguments chief_factor _ _%g _%g _%g.
-Prenex Implicits subnormal maximal simple.
 
 Notation "H <|<| G" := (subnormal H G)
   (at level 70, no associativity) : group_scope.
@@ -212,8 +211,7 @@ Qed.
 
 End Subnormal.
 
-Arguments subnormalP [gT H G].
-Prenex Implicits subnormalP.
+Arguments subnormalP {gT H G}.
 
 Section MorphSubNormal.
 

@@ -147,8 +147,8 @@ End PlainTheory.
 Notation family F := (family_mem (fun_of_simpl (fmem F))).
 Notation ffun_on R := (ffun_on_mem _ (mem R)).
 
-Arguments familyP [aT rT pT F f].
-Arguments ffun_onP [aT rT R f].
+Arguments familyP {aT rT pT F f}.
+Arguments ffun_onP {aT rT R f}.
 
 (*****************************************************************************)
 
@@ -213,7 +213,7 @@ Qed.
 
 End EqTheory.
 
-Arguments supportP [aT rT y D g].
+Arguments supportP {aT rT y D g}.
 Notation pfamily y D F := (pfamily_mem y (mem D) (fun_of_simpl (fmem F))).
 Notation pffun_on y D R := (pffun_on_mem y (mem D) (mem R)).
 

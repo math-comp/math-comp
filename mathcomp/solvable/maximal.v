@@ -1649,4 +1649,4 @@ Qed.
 
 End SCN.
 
-Arguments SCN_P [gT G A].
+Arguments SCN_P {gT G A}.

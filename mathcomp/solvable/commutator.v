@@ -352,7 +352,7 @@ Proof. exact: commG1P. Qed.
 
 End Commutator_properties.
 
-Arguments derG1P [gT G].
+Arguments derG1P {gT G}.
 
 Lemma der_cont n : GFunctor.continuous (derived_at n).
 Proof. by move=> aT rT G f; rewrite morphim_der. Qed.

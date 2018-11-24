@@ -493,8 +493,8 @@ Qed.
 End PreGroupIdentities.
 
 Hint Resolve commute1.
-Arguments invg_inj [T].
-Prenex Implicits commute invgK invg_inj.
+Arguments invg_inj {T}.
+Prenex Implicits commute invgK.
 
 Section GroupIdentities.
 
@@ -644,9 +644,8 @@ Definition gnorm := (gsimp, (mulgK, mulgKV, (mulgA, invMg))).
 Arguments mulgI [T].
 Arguments mulIg [T].
 Arguments conjg_inj [T].
-Arguments commgP [T x y].
-Arguments conjg_fixP [T x y].
-Prenex Implicits conjg_fixP commgP.
+Arguments commgP {T x y}.
+Arguments conjg_fixP {T x y}.
 
 Section Repr.
 (* Plucking a set representative. *)
@@ -945,9 +944,9 @@ Proof. by apply/setP=> y; rewrite !inE inv_eq //; apply: invgK. Qed.
 
 End BaseSetMulProp.
 
-Arguments set1gP [gT x].
-Arguments mulsgP [gT A B x].
-Arguments prodsgP [gT I P A x].
+Arguments set1gP {gT x}.
+Arguments mulsgP {gT A B x}.
+Arguments prodsgP {gT I P A x}.
 
 Section GroupSetMulProp.
 (* Constructs that need a finGroupType *)
@@ -1303,13 +1302,12 @@ Definition order x := #|cycle x|.
 
 End GroupSetMulProp.
 
-Arguments lcosetP [gT A x y].
-Arguments lcosetsP [gT A B C].
-Arguments rcosetP [gT A x y].
-Arguments rcosetsP [gT A B C].
-Arguments group_setP [gT A].
+Arguments lcosetP {gT A x y}.
+Arguments lcosetsP {gT A B C}.
+Arguments rcosetP {gT A x y}.
+Arguments rcosetsP {gT A B C}.
+Arguments group_setP {gT A}.
 Prenex Implicits group_set mulsgP set1gP.
-Prenex Implicits lcosetP lcosetsP rcosetP rcosetsP group_setP.
 
 Arguments commutator _ _%g _%g.
 Arguments joing _ _%g _%g.
@@ -1857,16 +1855,15 @@ Notation "[ 'subg' G ]" := [set: subg_of G]%G : Group_scope.
 Prenex Implicits subg sgval subg_of.
 Bind Scope group_scope with subg_of.
 
-Arguments trivgP [gT G].
-Arguments trivGP [gT G].
-Arguments lcoset_eqP [gT G x y].
-Arguments rcoset_eqP [gT G x y].
+Arguments trivgP {gT G}.
+Arguments trivGP {gT G}.
+Arguments lcoset_eqP {gT G x y}.
+Arguments rcoset_eqP {gT G x y}.
 Arguments mulGidPl [gT G H].
 Arguments mulGidPr [gT G H].
-Arguments comm_group_setP [gT G H].
-Arguments class_eqP [gT G x y].
-Arguments repr_classesP [gT G xG].
-Prenex Implicits trivgP trivGP lcoset_eqP rcoset_eqP comm_group_setP class_eqP.
+Arguments comm_group_setP {gT G H}.
+Arguments class_eqP {gT G x y}.
+Arguments repr_classesP {gT G xG}.
 
 Section GroupInter.
 
@@ -2395,11 +2392,11 @@ Qed.
 
 End GeneratedGroup.
 
-Arguments gen_prodgP [gT A x].
-Arguments joing_idPl [gT G A].
-Arguments joing_idPr [gT A G].
-Arguments mulGsubP [gT K H G].
-Arguments joing_subP [gT A B G].
+Arguments gen_prodgP {gT A x}.
+Arguments joing_idPl {gT G A}.
+Arguments joing_idPr {gT A G}.
+Arguments mulGsubP {gT K H G}.
+Arguments joing_subP {gT A B G}.
 
 Section Cycles.
 
@@ -2523,7 +2520,7 @@ Proof.
 suffices ->: (x \in 'N(A)) = (A :^ x == A) by apply: eqP.
 by rewrite eqEcard cardJg leqnn andbT inE.
 Qed.
-Arguments normP [x A].
+Arguments normP {x A}.
 
 Lemma group_set_normaliser A : group_set 'N(A).
 Proof.
@@ -2538,7 +2535,7 @@ Proof.
 apply: (iffP subsetP) => nBA x Ax; last by rewrite inE nBA //.
 by apply/normP; apply: nBA.
 Qed.
-Arguments normsP [A B].
+Arguments normsP {A B}.
 
 Lemma memJ_norm x y A : x \in 'N(A) -> (y ^ x \in A) = (y \in A).
 Proof. by move=> Nx; rewrite -{1}(normP Nx) memJ_conjg. Qed.
@@ -2986,15 +2983,13 @@ End SubAbelian.
 
 End Normaliser.
 
-Arguments normP [gT x A].
-Arguments centP [gT A x].
-Arguments normsP [gT A B].
-Arguments cent1P [gT x y].
-Arguments normalP [gT A B].
-Arguments centsP [gT A B].
-Arguments commG1P [gT A B].
-
-Prenex Implicits normP normsP cent1P normalP centP centsP commG1P.
+Arguments normP {gT x A}.
+Arguments centP {gT A x}.
+Arguments normsP {gT A B}.
+Arguments cent1P {gT x y}.
+Arguments normalP {gT A B}.
+Arguments centsP {gT A B}.
+Arguments commG1P {gT A B}.
 
 Arguments normaliser_group _ _%g.
 Arguments centraliser_group _ _%g.
@@ -3090,6 +3085,5 @@ Notation "[ 'min' A 'of' G | gP & gQ ]" :=
   [min A of G | gP && gQ] : group_scope.
 Notation "[ 'min' G | gP & gQ ]" := [min G | gP && gQ] : group_scope.
 
-Arguments mingroupP [gT gP G].
-Arguments maxgroupP [gT gP G].
-Prenex Implicits mingroupP maxgroupP.
+Arguments mingroupP {gT gP G}.
+Arguments maxgroupP {gT gP G}.
