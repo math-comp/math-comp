@@ -244,7 +244,7 @@ End BasicSetTheory.
 Definition inE := (in_set, inE).
 
 Arguments set0 {T}.
-Hint Resolve in_setT.
+Hint Resolve in_setT : core.
 
 Notation "[ 'set' : T ]" := (setTfor (Phant T))
   (at level 0, format "[ 'set' :  T ]") : set_scope.
@@ -348,7 +348,7 @@ Proof. by apply/subsetP=> x; rewrite inE. Qed.
 
 Lemma subsetT_hint mA : subset mA (mem [set: T]).
 Proof. by rewrite unlock; apply/pred0P=> x; rewrite !inE. Qed.
-Hint Resolve subsetT_hint.
+Hint Resolve subsetT_hint : core.
 
 Lemma subTset A : (setT \subset A) = (A == setT).
 Proof. by rewrite eqEsubset subsetT. Qed.
@@ -975,7 +975,7 @@ Arguments subUsetP {T A B C}.
 Arguments subsetDP {T A B C}.
 Arguments subsetD1P {T A B x}.
 Prenex Implicits set1.
-Hint Resolve subsetT_hint.
+Hint Resolve subsetT_hint : core.
 
 Section setOpsAlgebra.
 

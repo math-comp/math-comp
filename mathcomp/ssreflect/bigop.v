@@ -558,7 +558,7 @@ Qed.
 
 Lemma mem_index_enum T i : i \in index_enum T.
 Proof. by rewrite -[index_enum T]enumT mem_enum. Qed.
-Hint Resolve mem_index_enum.
+Hint Resolve mem_index_enum : core.
 
 Lemma filter_index_enum T P : filter P (index_enum T) = enum P.
 Proof. by []. Qed.

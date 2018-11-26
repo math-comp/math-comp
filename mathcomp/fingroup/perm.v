@@ -129,7 +129,7 @@ Lemma perm_inj s : injective s.
 Proof. by rewrite -!pvalE; apply: (injectiveP _ (valP s)). Qed.
 
 Arguments perm_inj : clear implicits.
-Hint Resolve perm_inj.
+Hint Resolve perm_inj : core.
 
 Lemma perm_onto s : codom s =i predT.
 Proof. by apply/subset_cardP; rewrite ?card_codom ?subset_predT. Qed.

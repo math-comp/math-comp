@@ -196,7 +196,7 @@ Notation eqxx := eq_refl.
 Lemma eq_sym (T : eqType) (x y : T) : (x == y) = (y == x).
 Proof. exact/eqP/eqP. Qed.
 
-Hint Resolve eq_refl eq_sym.
+Hint Resolve eq_refl eq_sym : core.
 
 Section Contrapositives.
 

@@ -449,7 +449,7 @@ End Characteristicity.
 
 Arguments characteristic _ _%g _%g.
 Notation "H \char G" := (characteristic H G) : group_scope.
-Hint Resolve char_refl.
+Hint Resolve char_refl : core.
 
 Section InjmChar.
 

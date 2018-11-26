@@ -626,7 +626,7 @@ Lemma subxx_hint (mA : mem_pred T) : subset mA mA.
 Proof.
 by case: mA => A; have:= introT (subsetP A A); rewrite !unlock => ->.
 Qed.
-Hint Resolve subxx_hint.
+Hint Resolve subxx_hint : core.
 
 (* The parametrization by predType makes it easier to apply subxx. *)
 Lemma subxx (pT : predType T) (pA : pT) : pA \subset pA.
@@ -818,7 +818,7 @@ Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
 
-Hint Resolve subxx_hint.
+Hint Resolve subxx_hint : core.
 
 Arguments pred0P {T P}.
 Arguments pred0Pn {T P}.
@@ -1585,7 +1585,7 @@ End OrdinalSub.
 Notation "''I_' n" := (ordinal n)
   (at level 8, n at level 2, format "''I_' n").
 
-Hint Resolve ltn_ord.
+Hint Resolve ltn_ord : core.
 
 Section OrdinalEnum.
 

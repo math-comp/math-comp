@@ -491,7 +491,7 @@ Proof. by apply: right_trans; [apply: equiv_sym|apply: equiv_trans]. Qed.
 
 End EquivRel.
 
-Hint Resolve equiv_refl.
+Hint Resolve equiv_refl : core.
 
 Notation EquivRel r er es et := (@EquivRelPack _ r (EquivClass er es et)).
 Notation "[ 'equiv_rel' 'of' e ]" := (@equiv_pack _ _ e _ id)

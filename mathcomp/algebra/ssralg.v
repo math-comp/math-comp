@@ -1305,7 +1305,7 @@ Hypothesis charFp : p \in [char R].
 
 Lemma charf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: charFp. Qed.
 Lemma charf_prime : prime p. Proof. by case/andP: charFp. Qed.
-Hint Resolve charf_prime.
+Hint Resolve charf_prime : core.
 
 Lemma mulrn_char x : x *+ p = 0. Proof. by rewrite -mulr_natl charf0 mul0r. Qed.
 

@@ -1422,7 +1422,7 @@ Qed.
 
 Lemma perm_eq_refl s : perm_eq s s.
 Proof. exact/perm_eqP. Qed.
-Hint Resolve perm_eq_refl.
+Hint Resolve perm_eq_refl : core.
 
 Lemma perm_eq_sym : symmetric perm_eq.
 Proof. by move=> s1 s2; apply/perm_eqP/perm_eqP=> ? ?. Qed.
@@ -1601,7 +1601,7 @@ Arguments perm_eqP {T s1 s2}.
 Arguments perm_eqlP {T s1 s2}.
 Arguments perm_eqrP {T s1 s2}.
 Prenex Implicits perm_eq.
-Hint Resolve perm_eq_refl.
+Hint Resolve perm_eq_refl : core.
 
 Section RotrLemmas.
 
@@ -1827,7 +1827,7 @@ Qed.
 
 Lemma subseq_refl s : subseq s s.
 Proof. by elim: s => //= x s IHs; rewrite eqxx. Qed.
-Hint Resolve subseq_refl.
+Hint Resolve subseq_refl : core.
 
 Lemma cat_subseq s1 s2 s3 s4 :
   subseq s1 s3 -> subseq s2 s4 -> subseq (s1 ++ s2) (s3 ++ s4).
@@ -1876,7 +1876,7 @@ End Subseq.
 Prenex Implicits subseq.
 Arguments subseqP {T s1 s2}.
 
-Hint Resolve subseq_refl.
+Hint Resolve subseq_refl : core.
 
 Section Rem.
 
