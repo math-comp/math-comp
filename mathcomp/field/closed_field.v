@@ -713,9 +713,7 @@ have EmulV: GRing.Field.axiom Einv.
   apply/eqP; case: sig_eqW => {ex_uv} [uv uv1]; set i := _.+1 in uv1 *.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
   by rewrite -uv1 opprD addNKr -mulNr; apply/memI; exists i; apply: dvdp_mull.
-pose EringU := [comUnitRingType of UnitRingType _ (FieldUnitMixin EmulV Einv0)].
-have Eunitf := @FieldMixin _ _ EmulV Einv0.
-pose Efield := FieldType (IdomainType EringU (FieldIdomainMixin Eunitf)) Eunitf.
+pose Efield := FieldType _ (FieldMixin EmulV Einv0).
 pose Ecount := CountType Efield (CanCountMixin (@reprK _ _)).
 pose FtoE := [rmorphism of PtoE \o polyC]; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.

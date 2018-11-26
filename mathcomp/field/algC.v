@@ -377,7 +377,7 @@ Definition unitRingMixin := FieldUnitMixin mulVf inv0.
 Canonical unitRingType := UnitRingType type unitRingMixin.
 Canonical comUnitRingType := [comUnitRingType of type].
 
-Definition fieldMixin := @FieldMixin _ _ mulVf inv0.
+Definition fieldMixin := FieldMixin mulVf inv0.
 Definition idomainAxiom := FieldIdomainMixin fieldMixin.
 Canonical idomainType := IdomainType type idomainAxiom.
 Canonical fieldType := FieldType type fieldMixin.

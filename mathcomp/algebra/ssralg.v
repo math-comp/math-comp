@@ -153,9 +153,10 @@ Require Import finfun bigop prime binomial.
 (*                  WARNING: while it is possible to omit R for most of the   *)
 (*                           XxxType functions, R MUST be explicitly given    *)
 (*                           when UnitRingType is used with a mixin produced  *)
-(*                           by ComUnitRingMixin, otherwise the resulting     *)
-(*                           structure will have the WRONG sort key and will  *)
-(*                           NOT BE USED during type inference.               *)
+(*                           by ComUnitRingMixin, in a Canonical definition,  *)
+(*                           otherwise the resulting structure will have the  *)
+(*                           WRONG sort key and will NOT BE USED during type  *)
+(*                           inference.                                       *)
 (* [unitRingType of R for S] == R-clone of the unitRingType structure S.      *)
 (*    [unitRingType of R] == clones a canonical unitRingType structure on R.  *)
 (*     x \is a GRing.unit <=> x is a unit (i.e., has an inverse).             *)
@@ -204,16 +205,29 @@ Require Import finfun bigop prime binomial.
 (*                                                                            *)
 (*  * Field (commutative fields):                                             *)
 (*              fieldType == interface type for fields.                       *)
-(*  GRing.Field.axiom inv == the field axiom (x != 0 -> inv x * x = 1).       *)
-(* FieldUnitMixin mulVx unitP inv0id == builds a *non commutative unit ring*  *)
-(*                           mixin, using the field axiom to simplify proof   *)
-(*                           obligations. The carrier type must have a        *)
-(*                           comRingType canonical structure.                 *)
-(*       FieldMixin mulVx == builds the field mixin from the field axiom. The *)
-(*                           carrier type must have a comRingType structure.  *)
-(*    FieldIdomainMixin m == builds an *idomain* mixin from a field mixin m.  *)
+(*  GRing.Field.mixin_of R == the field property: x != 0 -> x \is a unit, for *)
+(*                           x : R; R must be or coerce to a unitRingType.    *)
+(*  GRing.Field.axiom inv == the field axiom: x != 0 -> inv x * x = 1 for all *)
+(*                           x. This is equivalent to the property above, but *)
+(*                           does not require a unitRingType as inv is an     *)
+(*                           explicit argument.                               *)
+(* FieldUnitMixin mulVf inv0 == a *non commutative unit ring* mixin, using an *)
+(*                           inverse function that satisfies the field axiom  *)
+(*                           and fixes 0 (arguments mulVf and inv0, resp.),   *)
+(*                           and x != 0 as the Ring.unit predicate. The       *)
+(*                           carrier type must be a canonical comRingType.    *)
+(*    FieldIdomainMixin m == an *idomain* mixin derived from a field mixin m. *)
+(* GRing.Field.IdomainType mulVf inv0 == an idomainType incorporating the two *)
+(*                           mixins above, where FieldIdomainMixin is applied *)
+(*                           to the trivial field mixin for FieldUnitMixin.   *)
+(*  FieldMixin mulVf inv0 == the (trivial) field mixin for Field.IdomainType. *)
 (*          FieldType R m == packs the field mixin M into a fieldType. The    *)
 (*                           carrier type R must be an idomainType.           *)
+(* --> Given proofs mulVf and inv0 as above, a non-Canonical instances        *)
+(* of fieldType can be created with FieldType _ (FieldMixin mulVf inv0).      *)
+(* For Canonical instances one should always specify the first (sort)         *)
+(* argument of FieldType and other instance constructors, as well as pose     *)
+(* Definitions for unit ring, field, and idomain mixins (in that order).      *)
 (* [fieldType of F for S] == F-clone of the fieldType structure S.            *)
 (*       [fieldType of F] == clone of a canonical fieldType structure on F.   *)
 (*   [fieldMixin of R by <:] == mixin axiom for a field subType.              *)
@@ -4517,7 +4531,7 @@ Arguments rregP {R x}.
 
 Module Field.
 
-Definition mixin_of (F : unitRingType) := forall x : F, x != 0 -> x \in unit.
+Definition mixin_of (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 
 Lemma IdomainMixin R : mixin_of R -> IntegralDomain.axiom R.
 Proof.
@@ -4527,11 +4541,10 @@ Qed.
 
 Section Mixins.
 
-Variables (R : comRingType) (inv : R -> R).
+Definition axiom (R : ringType) inv := forall x : R, x != 0 -> inv x * x = 1.
 
-Definition axiom := forall x, x != 0 -> inv x * x = 1.
-Hypothesis mulVx : axiom.
-Hypothesis inv0 : inv 0 = 0.
+Variables (R : comRingType) (inv : R -> R).
+Hypotheses (mulVf : axiom inv) (inv0 : inv 0 = 0).
 
 Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
@@ -4541,10 +4554,14 @@ Qed.
 Fact inv_out : {in predC (predC1 0), inv =1 id}.
 Proof. by move=> x /negbNE/eqP->. Qed.
 
-Definition UnitMixin := ComUnitRing.Mixin mulVx intro_unit inv_out.
+Definition UnitMixin := ComUnitRing.Mixin mulVf intro_unit inv_out.
 
-Lemma Mixin : mixin_of (UnitRing.Pack (UnitRing.Class UnitMixin) R).
-Proof. by []. Qed.
+Definition UnitRingType := [comUnitRingType of UnitRingType R UnitMixin].
+
+Definition IdomainType :=
+  IdomainType UnitRingType (@IdomainMixin UnitRingType (fun => id)).
+
+Lemma Mixin : mixin_of IdomainType. Proof. by []. Qed.
 
 End Mixins.
 
@@ -4603,6 +4620,7 @@ Coercion idomainType : type >-> IntegralDomain.type.
 Canonical idomainType.
 Notation fieldType := type.
 Notation FieldType T m := (@pack T _ m _ _ id _ id).
+Arguments Mixin {R inv} mulVf inv0 [x] nz_x.
 Notation FieldUnitMixin := UnitMixin.
 Notation FieldIdomainMixin := IdomainMixin.
 Notation FieldMixin := Mixin.
