@@ -460,7 +460,7 @@ Notation "x |-> y" := (FunDelta x y)
    format "'[hv' x '/ '  |->  y ']'") : fun_delta_scope.
 
 Delimit Scope fun_delta_scope with FUN_DELTA.
-Arguments app_fdelta _ _%type _%FUN_DELTA _ _.
+Arguments app_fdelta {aT rT%type} df%FUN_DELTA f z.
 
 Notation "[ 'fun' z : T => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z : T =>
@@ -603,7 +603,7 @@ Arguments vrefl_rect {T P}.
 Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
 Arguments insub {T P sT}.
 Arguments insubT [T] P [sT x].
-Arguments val_inj {T P sT}.
+Arguments val_inj {T P sT} [x1 x2].
 Prenex Implicits val insubd.
 
 Local Notation inlined_sub_rect :=
@@ -779,7 +779,7 @@ Proof. by case/andP. Qed.
 
 End ProdEqType.
 
-Arguments pair_eq {T1 T2} _ _ /.
+Arguments pair_eq {T1 T2} u v /.
 Arguments pair_eqP {T1 T2}.
 
 Definition predX T1 T2 (p1 : pred T1) (p2 : pred T2) :=
@@ -805,7 +805,7 @@ Canonical option_eqType := Eval hnf in EqType (option T) option_eqMixin.
 
 End OptionEqType.
 
-Arguments opt_eq {T} !_ !_.
+Arguments opt_eq {T} !u !v.
 
 Section TaggedAs.
 
@@ -851,7 +851,7 @@ Proof. by rewrite -tag_eqE /tag_eq eqxx tagged_asE. Qed.
 
 End TagEqType.
 
-Arguments tag_eq {I T_} !_ !_.
+Arguments tag_eq {I T_} !u !v.
 Arguments tag_eqP {I T_ x y}.
 
 Section SumEqType.
@@ -875,5 +875,5 @@ Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 
 End SumEqType.
 
-Arguments sum_eq {T1 T2} !_ !_.
+Arguments sum_eq {T1 T2} !u !v.
 Arguments sum_eqP {T1 T2 x y}.

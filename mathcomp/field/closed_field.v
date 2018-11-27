@@ -54,18 +54,18 @@ Proof. by split=> /andP[]. Qed.
 
 Notation cps T := ((T -> fF) -> fF).
 Definition ret T1 : T1 -> cps T1 := fun x k => k x.
-Arguments ret T1 x k /.
+Arguments ret {T1} x k /.
 
 Definition bind T1 T2 (x : cps T1) (f : T1 -> cps T2) : cps T2 :=
   fun k => x (fun x => f x k).
-Arguments bind T1 T2 x f k /.
+Arguments bind {T1 T2} x f k /.
 Notation "''let' x <- y ; z" :=
   (bind y (fun x => z)) (at level 99, x at level 0, y at level 0,
     format "'[hv' ''let'  x  <-  y ;  '/' z ']'").
 
 Definition cpsif T (c : fF) (t : T) (e : T) : cps T :=
   fun k => GRing.If c (k t) (k e).
-Arguments cpsif T c t e k /.
+Arguments cpsif {T} c t e k /.
 Notation "''if' c1 'then' c2 'else' c3" := (cpsif c1%T c2%T c3%T)
   (at level 200, right associativity, format
 "'[hv   ' ''if'  c1  '/' '[' 'then'  c2  ']' '/' '[' 'else'  c3 ']' ']'").

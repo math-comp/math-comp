@@ -493,7 +493,7 @@ Qed.
 End PreGroupIdentities.
 
 Hint Resolve commute1.
-Arguments invg_inj {T}.
+Arguments invg_inj {T} [x1 x2].
 Prenex Implicits commute invgK.
 
 Section GroupIdentities.
@@ -643,7 +643,7 @@ Definition gnorm := (gsimp, (mulgK, mulgKV, (mulgA, invMg))).
 
 Arguments mulgI [T].
 Arguments mulIg [T].
-Arguments conjg_inj [T].
+Arguments conjg_inj {T} x [x1 x2].
 Arguments commgP {T x y}.
 Arguments conjg_fixP {T x y}.
 

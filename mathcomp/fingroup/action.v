@@ -148,10 +148,10 @@ End ActionDef.
 (* Need to close the Section here to avoid re-declaring all Argument Scopes *)
 Delimit Scope action_scope with act.
 Bind Scope action_scope with action.
-Arguments act_morph _ _%g _ _ _%g : extra scopes.
-Arguments is_action _ _%g _ _.
-Arguments act _ _%g _%type _%act _%g _%g.
-Arguments clone_action _ _%g _%type _%act _.
+Arguments act_morph {aT rT%type} to x%g.
+Arguments is_action {aT} D%g {rT} to.
+Arguments act {aT D%g rT%type} to%act x%g a%g : rename.
+Arguments clone_action [aT D%g rT%type to%act] _.
 
 Notation "{ 'action' aT &-> T }" := (action [set: aT] T)
   (at level 0, format "{ 'action'  aT  &->  T }") : type_scope.
@@ -210,15 +210,15 @@ Definition faithful A S to := A :&: astab S to \subset [1].
 
 End ActionDefs.
 
-Arguments setact _ _%g _ _%act _%g _%g.
-Arguments orbit _ _%g _ _%act _%g _%g.
-Arguments amove _ _%g _ _%act _%g _%g _%g.
-Arguments afix _ _%g _ _%act _%g.
-Arguments astab _ _%g _ _%g _%act.
-Arguments astabs _ _%g _ _%g _%act.
-Arguments acts_on _ _%g _ _%g _%g _%act.
-Arguments atrans _ _%g _ _%g _%g _%act.
-Arguments faithful _ _%g _ _%g _%g _%act.
+Arguments setact {aT D%g rT} to%act S%g a%g.
+Arguments orbit {aT D%g rT} to%act A%g x%g.
+Arguments amove {aT D%g rT} to%act A%g x%g y%g.
+Arguments afix {aT D%g rT} to%act A%g.
+Arguments astab {aT D%g rT} S%g to%act.
+Arguments astabs {aT D%g rT} S%g to%act.
+Arguments acts_on {aT D%g rT} A%g S%g to%act.
+Arguments atrans {aT D%g rT} A%g S%g to%act.
+Arguments faithful {aT D%g rT} A%g S%g to%act.
 
 Notation "to ^*" := (setact to) (at level 2, format "to ^*") : fun_scope.
 
@@ -482,9 +482,7 @@ End Reindex.
 
 End RawAction.
 
-(* Warning: this directive depends on names of bound variables in the *)
-(* definition of injective, in ssrfun.v.                              *)
-Arguments act_inj {aT D rT} to _ [x1 x2].
+Arguments act_inj {aT D rT} to a [x1 x2] : rename.
 
 Notation "to ^*" := (set_action to) : action_scope.
 
@@ -874,7 +872,7 @@ Qed.
 
 End PartialAction.
 
-Arguments orbit_transversal _ _%g _ _%act _%g _%g.
+Arguments orbit_transversal {aT D%g rT} to%act A%g S%g.
 Arguments orbit_in_eqP {aT D rT to G x y}.
 Arguments orbit1P {aT D rT to G x}.
 Arguments contra_orbit [aT D rT] to G [x y].
@@ -1741,7 +1739,7 @@ Qed.
 
 End AutIn.
 
-Arguments Aut_in _ _%g _%g.
+Arguments Aut_in {gT} A%g B%g.
 
 Section InjmAutIn.
 
@@ -1818,9 +1816,9 @@ End GroupAction.
 Delimit Scope groupAction_scope with gact.
 Bind Scope groupAction_scope with groupAction.
 
-Arguments is_groupAction _ _ _%g _%g _%act.
-Arguments groupAction _ _ _%g _%g.
-Arguments gact _ _ _%g _%g _%gact.
+Arguments is_groupAction {aT rT D%g} R%g to%act.
+Arguments groupAction {aT rT} D%g R%g.
+Arguments gact {aT rT D%g R%g} to%gact : rename.
 
 Notation "[ 'groupAction' 'of' to ]" :=
      (clone_groupAction (@GroupAction _ _ _ _ to))
@@ -1847,9 +1845,9 @@ Definition acts_irreducibly A S to :=
 
 End GroupActionDefs.
 
-Arguments gacent _ _ _%g _%g _%gact _%g.
-Arguments acts_on_group _ _ _%g _%g _%g _%g _%gact.
-Arguments acts_irreducibly _ _ _%g _%g _%g _%g _%gact.
+Arguments gacent {aT rT D%g R%g} to%gact A%g.
+Arguments acts_on_group {aT rT D%g R%g} A%g S%g to%gact.
+Arguments acts_irreducibly {aT rT D%g R%g} A%g S%g to%gact.
 
 Notation "''C_' ( | to ) ( A )" := (gacent to A)
   (at level 8, format "''C_' ( | to ) ( A )") : group_scope.
@@ -2705,8 +2703,8 @@ Canonical aut_groupAction := GroupAction autact_is_groupAction.
 
 End AutAct.
 
-Arguments aut_action _ _%g.
-Arguments aut_groupAction _ _%g.
+Arguments aut_action {gT} G%g.
+Arguments aut_groupAction {gT} G%g.
 Notation "[ 'Aut' G ]" := (aut_action G) : action_scope.
 Notation "[ 'Aut' G ]" := (aut_groupAction G) : groupAction_scope.
 

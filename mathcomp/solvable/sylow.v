@@ -535,7 +535,7 @@ Qed.
 
 End Zgroups.
 
-Arguments Zgroup {_} _%g.
+Arguments Zgroup {gT} A%g.
 
 Section NilPGroups.
 

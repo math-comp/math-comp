@@ -3727,23 +3727,23 @@ End TermDef.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
-Arguments Add {_} _%T _%T.
-Arguments Opp {_} _%T.
-Arguments NatMul {_} _%T _%N.
-Arguments Mul {_} _%T _%T.
-Arguments Inv {_} _%T.
-Arguments Exp {_} _%T _%N.
-Arguments Equal {_} _%T _%T.
-Arguments Unit {_} _%T.
-Arguments And {_} _%T _%T.
-Arguments Or {_} _%T _%T.
-Arguments Implies {_} _%T _%T.
-Arguments Not {_} _%T.
-Arguments Exists {_} _%N _%T.
-Arguments Forall {_} _%N _%T.
+Arguments Add {R} t1%T t2%T.
+Arguments Opp {R} t1%T.
+Arguments NatMul {R} t1%T n%N.
+Arguments Mul {R} t1%T t2%T.
+Arguments Inv {R} t1%T.
+Arguments Exp {R} t1%T n%N.
+Arguments Equal {R} t1%T t2%T.
+Arguments Unit {R} t1%T.
+Arguments And {R} f1%T f2%T.
+Arguments Or {R} f1%T f2%T.
+Arguments Implies {R} f1%T f2%T.
+Arguments Not {R} f1%T.
+Arguments Exists {R} i%N f1%T.
+Arguments Forall {R} i%N f1%T.
 
-Arguments Bool {R}.
-Arguments Const {R}.
+Arguments Bool {R} b.
+Arguments Const {R} x.
 
 Notation True := (Bool true).
 Notation False := (Bool false).

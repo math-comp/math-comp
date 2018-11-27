@@ -392,14 +392,13 @@ End Defs.
 
 Bind Scope cfun_scope with classfun.
 
-Arguments classfun _ _%g.
-Arguments classfun_on _ _%g _%g.
-Arguments cfun_indicator _ _%g.
-Arguments cfAut _ _%g _ _%CF.
-Arguments cfReal _ _%g _%CF.
-Arguments cfdot _ _%g _%CF _%CF.
-Arguments cfdotr_head _ _%g _ _%CF _%CF.
-Arguments cfdotr_head _ _%g _ _%CF.
+Arguments classfun {gT} B%g.
+Arguments classfun_on {gT} B%g A%g.
+Arguments cfun_indicator {gT} B%g.
+Arguments cfAut {gT B%g} u phi%CF.
+Arguments cfReal {gT B%g} phi%CF.
+Arguments cfdot {gT B%g} phi%CF psi%CF.
+Arguments cfdotr_head {gT B%g} k psi%CF phi%CF.
 
 Notation "''CF' ( G )" := (classfun G) : type_scope.
 Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
@@ -452,12 +451,12 @@ End Predicates.
 (* Outside section so the nosimpl does not get "cooked" out. *)
 Definition orthogonal gT D S1 S2 := nosimpl (@ortho_rec gT D S1 S2).
 
-Arguments cfker _ _%g _%CF.
-Arguments cfaithful _ _%g _%CF.
-Arguments orthogonal _ _%g _%CF _%CF.
-Arguments pairwise_orthogonal _ _%g _%CF.
-Arguments orthonormal _ _%g _%CF.
-Arguments isometry _ _ _%g _%g _%CF.
+Arguments cfker {gT D%g} phi%CF.
+Arguments cfaithful {gT D%g} phi%CF.
+Arguments orthogonal {gT D%g} S1%CF S2%CF.
+Arguments pairwise_orthogonal {gT D%g} S%CF.
+Arguments orthonormal {gT D%g} S%CF.
+Arguments isometry {gT rT D%g R%g} tau%CF.
 
 Notation "{ 'in' CFD , 'isometry' tau , 'to' CFR }" :=
     (isometry_from_to (mem CFD) tau (mem CFR))
@@ -756,7 +755,7 @@ Proof. by []. Qed.
 
 End ClassFun.
 
-Arguments classfun_on _ _%g _%g.
+Arguments classfun_on {gT} B%g A%g.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 
 Arguments cfun_onP {gT G A phi}.
@@ -1394,7 +1393,7 @@ Canonical cfRes_lrmorphism := [lrmorphism of cfRes].
 
 End Restrict.
 
-Arguments cfRes _ _%g _%g _%CF.
+Arguments cfRes {gT} A%g {B%g} phi%CF.
 Notation "''Res[' H , G ]" := (@cfRes _ H G) (only parsing) : ring_scope.
 Notation "''Res[' H ]" := 'Res[H, _] : ring_scope.
 Notation "''Res'" := 'Res[_] (only parsing) : ring_scope.
@@ -1621,7 +1620,7 @@ Proof. exact: cforder_inj_rmorph cfIsom_inj. Qed.
 
 End InvMorphism.
 
-Arguments cfIsom_inj [aT rT G f R] isoGR [x1 x2].
+Arguments cfIsom_inj {aT rT G f R} isoGR [phi1 phi2] : rename.
 
 Section Coset.
 
@@ -1727,9 +1726,8 @@ Proof. by move=> nsBG kerH; rewrite -cfMod_eq1 // cfQuoK. Qed.
 
 End Coset.
 
-Arguments cfQuo _ _%G _%g _%CF.
-Arguments cfMod _ _%G _%g _%CF.
-Prenex Implicits cfMod.
+Arguments cfQuo {gT G%G} B%g phi%CF.
+Arguments cfMod {gT G%G B%g} phi%CF.
 Notation "phi / H" := (cfQuo H phi) : cfun_scope.
 Notation "phi %% H" := (@cfMod _ _ H phi) : cfun_scope.
 
@@ -2327,7 +2325,7 @@ Qed.
 
 End Induced.
 
-Arguments cfInd _ _%g _%g _%CF.
+Arguments cfInd {gT} B%g {A%g} phi%CF.
 Notation "''Ind[' G , H ]" := (@cfInd _ G H) (only parsing) : ring_scope.
 Notation "''Ind[' G ]" := 'Ind[G, _] : ring_scope.
 Notation "''Ind'" := 'Ind[_] (only parsing) : ring_scope.
@@ -2489,7 +2487,7 @@ End FieldAutomorphism.
 
 Arguments cfAutK u {gT G}.
 Arguments cfAutVK u {gT G}.
-Arguments cfAut_inj u [gT G x1 x2].
+Arguments cfAut_inj u {gT G} [phi1 phi2] : rename.
 
 Definition conj_cfRes := cfAutRes conjC.
 Definition cfker_conjC := cfker_aut conjC.

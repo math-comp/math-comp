@@ -475,8 +475,8 @@ Qed.
 
 End StableCompositionSeries.
 
-Arguments maxainv _ _ _%G _%G _%gact _%g _%g.
-Arguments asimple _ _ _%G _%G _%gact _%g.
+Arguments maxainv {aT rT D%G A%G} to%gact B%g C%g.
+Arguments asimple {aT rT D%G A%G} to%gact K%g.
 
 Section StrongJordanHolder.
 

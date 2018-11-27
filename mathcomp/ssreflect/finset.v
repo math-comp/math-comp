@@ -130,7 +130,7 @@ Delimit Scope set_scope with SET.
 Bind Scope set_scope with set_type.
 Bind Scope set_scope with set_of.
 Open Scope set_scope.
-Arguments finfun_of_set _ _%SET.
+Arguments finfun_of_set {T} A%SET.
 
 Notation "{ 'set' T }" := (set_of (Phant T))
   (at level 0, format "{ 'set'  T }") : type_scope.
@@ -955,7 +955,7 @@ Proof. by rewrite setDE disjoints_subset => /properI/andP[-> /proper_sub]. Qed.
 End setOps.
 
 Arguments set1P {T x a}.
-Arguments set1_inj {T}.
+Arguments set1_inj {T} [x1 x2].
 Arguments set2P {T x a b}.
 Arguments setIdP {T x pA pB}.
 Arguments setIP {T x A B}.

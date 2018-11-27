@@ -2663,7 +2663,7 @@ Coercion GLval ph (u : GLtype ph) : 'M[R]_n.-1.+1 :=
 End FinUnitMatrix.
 
 Bind Scope group_scope with GLtype.
-Arguments GLval {_%N _ _} _%g.
+Arguments GLval {n%N R ph} u%g.
 
 Notation "{ ''GL_' n [ R ] }" := (GLtype n (Phant R))
   (at level 0, n at level 2, format "{ ''GL_' n [ R ] }") : type_scope.

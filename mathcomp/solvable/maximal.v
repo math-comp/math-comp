@@ -102,16 +102,14 @@ Definition SCN_at n B := [set A in SCN B | n <= 'r(A)].
 
 End Defs.
 
-Arguments charsimple _ _%g.
-Arguments Frattini _ _%g.
-Arguments Fitting _ _%g.
-Arguments critical _ _%g _%g.
-Arguments special _ _%g.
-Arguments extraspecial _ _%g.
-Arguments SCN _ _%g.
-Arguments SCN_at _ _%N _%g.
-
-Prenex Implicits maximal simple charsimple critical special extraspecial.
+Arguments charsimple {gT} A%g.
+Arguments Frattini {gT} A%g.
+Arguments Fitting {gT} A%g.
+Arguments critical {gT} A%g B%g.
+Arguments special {gT} A%g.
+Arguments extraspecial {gT} A%g.
+Arguments SCN {gT} B%g.
+Arguments SCN_at {gT} n%N B%g.
 
 Notation "''Phi' ( A )" := (Frattini A)
   (at level 8, format "''Phi' ( A )") : group_scope.
@@ -459,7 +457,7 @@ Section FittingFun.
 
 Implicit Types gT rT : finGroupType.
 
-Lemma morphim_Fitting : GFunctor.pcontinuous Fitting.
+Lemma morphim_Fitting : GFunctor.pcontinuous (@Fitting).
 Proof.
 move=> gT rT G D f; apply: Fitting_max.
   by rewrite morphim_normal ?Fitting_normal.

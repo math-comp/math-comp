@@ -56,11 +56,11 @@ Canonical center_group (G : {group gT}) : {group gT} :=
 
 End Defs.
 
-Arguments center _ _%g.
+Arguments center {gT} A%g.
 Notation "''Z' ( A )" := (center A) : group_scope.
 Notation "''Z' ( H )" := (center_group H) : Group_scope.
 
-Lemma morphim_center : GFunctor.pcontinuous center.
+Lemma morphim_center : GFunctor.pcontinuous (@center).
 Proof. by move=> gT rT G D f; apply: morphim_subcent. Qed.
 
 Canonical center_igFun := [igFun by fun _ _ => subsetIl _ _ & morphim_center].
