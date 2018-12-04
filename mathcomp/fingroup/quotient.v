@@ -750,8 +750,8 @@ Qed.
 
 End EqIso.
 
-Arguments qisom_inj [gT G H].
-Arguments morphim_qisom_inj [gT G H].
+Arguments qisom_inj {gT G H} eqGH [x1 x2].
+Arguments morphim_qisom_inj {gT G H} eqGH [x1 x2].
 
 Section FirstIsomorphism.
 

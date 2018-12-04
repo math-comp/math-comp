@@ -111,16 +111,16 @@ Definition gen_rank A := #|[arg min_(B < A | <<B>> == A) #|B|]|.
 
 End AbelianDefs.
 
-Arguments exponent _ _%g.
-Arguments abelem _ _%N _%g.
-Arguments is_abelem _ _%g.
-Arguments pElem _ _%N _%g.
-Arguments pnElem _ _%N _%N _%g.
-Arguments nElem _ _%N _%g.
-Arguments pmaxElem _ _%N _%g.
-Arguments p_rank _ _%N _%g.
-Arguments rank _ _%g.
-Arguments gen_rank _ _%g.
+Arguments exponent {gT} A%g.
+Arguments abelem {gT} p%N A%g.
+Arguments is_abelem {gT} A%g.
+Arguments pElem {gT} p%N A%g.
+Arguments pnElem {gT} p%N n%N A%g.
+Arguments nElem {gT} n%N A%g.
+Arguments pmaxElem {gT} p%N A%g.
+Arguments p_rank {gT} p%N A%g.
+Arguments rank {gT} A%g.
+Arguments gen_rank {gT} A%g.
 
 Notation "''Ldiv_' n ()" := (Ldiv _ n)
   (at level 8, n at level 2, format "''Ldiv_' n ()") : group_scope.
@@ -192,10 +192,10 @@ Qed.
 
 End Functors.
 
-Arguments Ohm _%N _ _%g.
-Arguments Ohm_group _%N _ _%g.
-Arguments Mho _%N _ _%g.
-Arguments Mho_group _%N _ _%g.
+Arguments Ohm n%N {gT} A%g.
+Arguments Ohm_group n%N {gT} A%g.
+Arguments Mho n%N {gT} A%g.
+Arguments Mho_group n%N {gT} A%g.
 Arguments OhmPredP {n gT x}.
 
 Notation "''Ohm_' n ( G )" := (Ohm n G)
@@ -2023,8 +2023,8 @@ Qed.
 
 End AbelianStructure.
 
-Arguments abelian_type {_} _%g.
-Arguments homocyclic {_} _%g.
+Arguments abelian_type {gT} A%g.
+Arguments homocyclic {gT} A%g.
 
 Section IsogAbelian.
 

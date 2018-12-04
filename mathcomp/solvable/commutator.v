@@ -33,7 +33,7 @@ Definition derived_at_rec n (gT : finGroupType) (A : {set gT}) :=
 (* "cooking" destroys it.                                                    *)
 Definition derived_at := nosimpl derived_at_rec.
 
-Arguments derived_at _%N _ _%g.
+Arguments derived_at n%N {gT} A%g.
 Notation "G ^` ( n )" := (derived_at n G) : group_scope.
 
 Section DerivedBasics.
@@ -354,7 +354,7 @@ End Commutator_properties.
 
 Arguments derG1P {gT G}.
 
-Lemma der_cont n : GFunctor.continuous (derived_at n).
+Lemma der_cont n : GFunctor.continuous (@derived_at n).
 Proof. by move=> aT rT G f; rewrite morphim_der. Qed.
 
 Canonical der_igFun n := [igFun by der_sub^~ n & der_cont n].

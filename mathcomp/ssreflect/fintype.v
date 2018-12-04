@@ -1760,7 +1760,7 @@ Qed.
 
 End EnumRank.
 
-Arguments enum_val_inj {T A} [x1 x2].
+Arguments enum_val_inj {T A} [i1 i2] : rename.
 Arguments enum_rank_inj {T} [x1 x2].
 Prenex Implicits enum_val enum_rank.
 

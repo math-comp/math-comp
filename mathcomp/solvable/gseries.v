@@ -71,16 +71,16 @@ Definition simple A := minnormal A A.
 Definition chief_factor A V U := maxnormal V U A && (U <| A).
 End GroupDefs.
 
-Arguments subnormal {_} _%g _%g.
-Arguments invariant_factor _ _%g _%g _%g.
-Arguments stable_factor _ _%g _%g _%g.
-Arguments central_factor _ _%g _%g _%g.
-Arguments maximal {_} _%g _%g.
-Arguments maximal_eq _ _%g _%g.
-Arguments maxnormal _ _%g _%g _%g.
-Arguments minnormal _ _%g _%g.
-Arguments simple {_} _%g.
-Arguments chief_factor _ _%g _%g _%g.
+Arguments subnormal {gT} A%g B%g.
+Arguments invariant_factor {gT} A%g B%g C%g.
+Arguments stable_factor {gT} A%g V%g U%g.
+Arguments central_factor {gT} A%g V%g U%g.
+Arguments maximal {gT} A%g B%g.
+Arguments maximal_eq {gT} A%g B%g.
+Arguments maxnormal {gT} A%g B%g U%g.
+Arguments minnormal {gT} A%g B%g.
+Arguments simple {gT} A%g.
+Arguments chief_factor {gT} A%g V%g U%g.
 
 Notation "H <|<| G" := (subnormal H G)
   (at level 70, no associativity) : group_scope.
@@ -94,7 +94,7 @@ Notation "A .-central" := (central_factor A)
 Notation "G .-chief" := (chief_factor G)
   (at level 2, format "G .-chief") : group_rel_scope.
 
-Arguments group_rel_of _ _%group_rel_scope _%G _%G : extra scopes.
+Arguments group_rel_of {gT} r%group_rel_scope _%G _%G : extra scopes.
 
 Notation "r .-series" := (path (rel_of_simpl_rel (group_rel_of r)))
   (at level 2, format "r .-series") : group_scope.

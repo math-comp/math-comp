@@ -544,7 +544,7 @@ Notation xcfun_r A := (xcfun_r_head tt A).
 Notation "phi .[ A ]" := (xcfun phi A) : cfun_scope.
 
 Definition pred_Nirr gT B := #|@classes gT B|.-1.
-Arguments pred_Nirr _ _%g.
+Arguments pred_Nirr {gT} B%g.
 Notation Nirr G := (pred_Nirr G).+1.
 Notation Iirr G := 'I_(Nirr G).
 
@@ -587,7 +587,7 @@ Proof. by apply: onW_bij; exists irr_of_socle. Qed.
 End IrrClassDef.
 
 Prenex Implicits socle_of_IirrK irr_of_socleK.
-Arguments socle_of_Iirr _ _%R.
+Arguments socle_of_Iirr {gT G%G} i%R.
 
 Notation "''Chi_' i" := (irr_repr (socle_of_Iirr i))
   (at level 8, i at level 2, format "''Chi_' i").
@@ -598,7 +598,7 @@ Definition irr_def gT B : (Nirr B).-tuple 'CF(B) :=
    [tuple of mkseq irr_of (Nirr B)].
 Definition irr := locked_with irr_key irr_def.
 
-Arguments irr _ _%g.
+Arguments irr {gT} B%g.
 
 Notation "''chi_' i" :=  (tnth (irr _) i%R)
   (at level 8, i at level 2, format "''chi_' i") : ring_scope.
@@ -621,7 +621,7 @@ Proof. by move/Iirr1_neq0; exists (inord 1). Qed.
 
 Lemma irrRepr i : cfRepr 'Chi_i = 'chi_i.
 Proof.
-rewrite [irr]unlock (tnth_nth 0) nth_mkseq // -[<<G>>]/(gval _) genGidG.
+rewrite [@irr]unlock (tnth_nth 0) nth_mkseq // -[<<G>>]/(gval _) genGidG.
 by rewrite cfRes_id inord_val.
 Qed.
 
@@ -816,7 +816,7 @@ Qed.
 
 End IrrClass.
 
-Arguments cfReg _ _%g.
+Arguments cfReg {gT} B%g.
 Prenex Implicits cfIirr.
 Arguments irr_inj {gT G} [x1 x2].
 
@@ -1334,7 +1334,7 @@ Qed.
 
 End OrthogonalityRelations.
 
-Arguments character_table _ _%g.
+Arguments character_table {gT} G%g.
 
 Section InnerProduct.
 
@@ -1565,7 +1565,7 @@ Qed.
 
 End IrrConstt.
 
-Arguments irr_constt _ _%g _%CF.
+Arguments irr_constt {gT B%g} phi%CF.
 
 Section Kernel.
 
@@ -1733,7 +1733,7 @@ Qed.
 
 End Restrict.
 
-Arguments Res_Iirr _ _%g _%g _%R.
+Arguments Res_Iirr {gT A%g} B%g i%R.
 
 Section MoreConstt.
 
@@ -1870,7 +1870,7 @@ Proof. by apply/eqP; rewrite isom_Iirr_eq0. Qed.
 
 End Isom.
 
-Arguments isom_Iirr_inj [aT rT G f R] isoGR [x1 x2].
+Arguments isom_Iirr_inj {aT rT G f R} isoGR [i1 i2] : rename.
 
 Section IsomInv.
 
@@ -1938,7 +1938,7 @@ Qed.
 
 End Sdprod.
 
-Arguments sdprod_Iirr_inj [gT K H G] defG [x1 x2].
+Arguments sdprod_Iirr_inj {gT K H G} defG [i1 i2] : rename.
 
 Section DProd.
 
@@ -2089,7 +2089,7 @@ Proof. by apply/(canLR dprod_IirrK); rewrite dprod_Iirr0. Qed.
 
 End DProd.
 
-Arguments dprod_Iirr_inj [gT G K H] KxH [x1 x2].
+Arguments dprod_Iirr_inj {gT G K H} KxH [i1 i2] : rename.
 
 Lemma dprod_IirrC (gT : finGroupType) (G K H : {group gT})
                   (KxH : K \x H = G) (HxK : H \x K = G) i j :
@@ -2257,7 +2257,7 @@ Qed.
 
 End Aut.
 
-Arguments aut_Iirr_inj [gT G] u [x1 x2].
+Arguments aut_Iirr_inj {gT G} u [i1 i2] : rename.
 
 Section Coset.
 
@@ -2993,4 +2993,4 @@ Proof. by move/cfker_Ind->; rewrite ?irr_neq0 ?irr_char. Qed.
 
 End Induced.
 
-Arguments Ind_Iirr _ _%g _%g _%R.
+Arguments Ind_Iirr {gT A%g} B%g i%R.

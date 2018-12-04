@@ -814,10 +814,10 @@ End Regular.
 
 End RingRepr.
 
-Arguments mx_representation _ _ _%g _%N.
-Arguments mx_repr _ _ _%g _%N _.
-Arguments group_ring _ _ _%g.
-Arguments regular_repr _ _ _%g.
+Arguments mx_representation R {gT} G%g n%N.
+Arguments mx_repr {R gT} G%g {n%N} r.
+Arguments group_ring R {gT} G%g.
+Arguments regular_repr R {gT} G%g.
 
 Arguments centgmxP {R gT G n rG f}.
 Arguments rkerP {R gT G n rG x}.
@@ -2377,8 +2377,8 @@ Arguments mxsimple_isoP {gT G n rG U V}.
 Arguments socleP {gT G n rG sG0 W W'}.
 Arguments mx_abs_irrP {gT G n rG}.
 
-Arguments val_submod_inj {n U m}.
-Arguments val_factmod_inj {n U m}.
+Arguments val_submod_inj {n U m} [W1 W2] : rename.
+Arguments val_factmod_inj {n U m} [W1 W2] : rename.
 
 Section Proper.
 
@@ -4652,10 +4652,10 @@ End LinearIrr.
 
 End FieldRepr.
 
-Arguments rfix_mx _ _ _%g _%N _ _%g.
-Arguments gset_mx _ _ _%g _%g.
-Arguments classg_base _ _ _%g _%g : extra scopes.
-Arguments irrType _ _ _%g _%g : extra scopes.
+Arguments rfix_mx {F gT G%g n%N} rG H%g.
+Arguments gset_mx F {gT} G%g A%g.
+Arguments classg_base F {gT} G%g _%g : extra scopes.
+Arguments irrType F {gT} G%g.
 
 Arguments mxmoduleP {F gT G n rG m U}.
 Arguments envelop_mxP {F gT G n rG A}.
@@ -4671,16 +4671,16 @@ Arguments socleP {F gT G n rG sG0 W W'}.
 Arguments mx_abs_irrP {F gT G n rG}.
 Arguments socle_rsimP {F gT G n rG sG W1 W2}.
 
-Arguments val_submod_inj {F n U m}.
-Arguments val_factmod_inj {F n U m}.
+Arguments val_submod_inj {F n U m} [W1 W2] : rename.
+Arguments val_factmod_inj {F n U m} [W1 W2] : rename.
 
 Notation "'Cl" := (Clifford_action _) : action_scope.
 
 Bind Scope irrType_scope with socle_sort.
 Notation "[ 1 sG ]" := (principal_comp sG) : irrType_scope.
-Arguments irr_degree _ _ _%G _ _%irr.
-Arguments irr_repr _ _ _%G _ _%irr _%g : extra scopes.
-Arguments irr_mode _ _ _%G _ _%irr _%g : extra scopes.
+Arguments irr_degree {F gT G%G sG} i%irr.
+Arguments irr_repr [F gT G%G sG] i%irr _%g : extra scopes.
+Arguments irr_mode [F gT G%G sG] i%irr z%g : rename.
 Notation "''n_' i" := (irr_degree i) : group_ring_scope.
 Notation "''R_' i" := (Wedderburn_subring i) : group_ring_scope.
 Notation "''e_' i" := (Wedderburn_id i) : group_ring_scope.

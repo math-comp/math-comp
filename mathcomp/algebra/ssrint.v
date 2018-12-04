@@ -369,7 +369,7 @@ Canonical int_countIdomainType := [countIdomainType of int].
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
-Arguments absz _%distn_scope.
+Arguments absz m%distn_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 
 Module intOrdered.
@@ -1607,7 +1607,7 @@ Module Export IntDist.
 
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
-Arguments absz _%distn_scope.
+Arguments absz m%distn_scope.
 Notation "`| m |" := (absz m) : nat_scope.
 Coercion Posz : nat >-> int.
 
