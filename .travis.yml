@@ -40,6 +40,12 @@ script:
     cd mathcomp
     make Makefile.coq
     make -f Makefile.coq -j ${NJOBS} all
+    make install
+    # Testing odd-order
+    cd ../..
+    git clone https://github.com/math-comp/odd-order
+    cd odd-order
+    make -j ${NJOBS}
     "
 - docker stop COQ  # optional
 - echo -en 'travis_fold:end:script\\r'
