@@ -1609,6 +1609,20 @@ rewrite (eqmxMr _ (genmxE U)) injfU genmxE addrC -mulmxDl subrK.
 by rewrite mul1mx mulVmx ?row_ebase_unit.
 Qed.
 
+(* Two matrices with the same shape represent the same subspace *)
+(* iff they differ only by a change of basis.                   *)
+
+Lemma eqmxMunitP m n (U V : 'M_(m, n)) :
+  reflect (exists2 P, P \in unitmx & U = P *m V) (U == V)%MS.
+Proof.
+apply: (iffP eqmxP) => [eqUV | [P Punit ->]]; last first.
+  by apply/eqmxMfull; rewrite row_full_unit.
+have [D defU]: exists D, U = D *m V by apply/submxP; rewrite eqUV.
+have{eqUV} [Pt Pt_unit defUt]: {Pt | Pt \in unitmx & V^T *m D^T = V^T *m Pt}.
+  by apply/complete_unitmx; rewrite -trmx_mul -defU !mxrank_tr eqUV.
+by exists Pt^T; last apply/trmx_inj; rewrite ?unitmx_tr // defU !trmx_mul trmxK.
+Qed.
+
 (* Mapping between two subspaces with the same dimension. *)
 
 Lemma eq_rank_unitmx m1 m2 n (U : 'M_(m1, n)) (V : 'M_(m2, n)) :
