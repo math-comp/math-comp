@@ -1,4 +1,8 @@
 ??/??/???? - version 1.7.1
+
+	* Removed `_ : Type` field from packed classes. This performance
+	  optimization is not strictly necessary with modern Coq versions.
+
 	* Added companion matrix of a polynomial `companionmx p` and the
 	  theorems: companionmxK, map_mx_companion and companion_map_poly
 

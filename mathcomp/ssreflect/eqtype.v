@@ -126,14 +126,13 @@ Notation class_of := mixin_of (only parsing).
 
 Section ClassDef.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 
-Definition class := let: Pack _ c _ := cT return class_of cT in c.
+Definition class := let: Pack _ c := cT return class_of cT in c.
 
-Definition pack c := @Pack T c T.
-Definition clone := fun c & cT -> T & phant_id (pack c) cT => pack c.
+Definition clone := fun c & cT -> T & phant_id (@Pack T c) cT => Pack c.
 
 End ClassDef.
 
@@ -141,7 +140,7 @@ Module Exports.
 Coercion sort : type >-> Sortclass.
 Notation eqType := type.
 Notation EqMixin := Mixin.
-Notation EqType T m := (@pack T m).
+Notation EqType T m := (@Pack T m).
 Notation "[ 'eqMixin' 'of' T ]" := (class _ : mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T ]") : form_scope.
 Notation "[ 'eqType' 'of' T 'for' C ]" := (@clone T C _ idfun id)

@@ -138,7 +138,7 @@ Variables (F : finFieldType) (T : finType).
 Section Vector.
 
 Variable cvT : Vector.class_of F T.
-Let vT := Vector.Pack (Phant F) cvT T.
+Let vT := Vector.Pack (Phant F) cvT.
 
 Lemma card_vspace (V : {vspace vT}) : #|V| = (#|F| ^ \dim V)%N.
 Proof.
@@ -159,7 +159,7 @@ Proof. by apply: eq_card => v; rewrite (@memvf _ vT). Qed.
 End Vector.
 
 Variable caT : Falgebra.class_of F T.
-Let aT := Falgebra.Pack (Phant F) caT T.
+Let aT := Falgebra.Pack (Phant F) caT.
 
 Lemma card_vspace1 : #|(1%VS : {vspace aT})| = #|F|.
 Proof. by rewrite card_vspace (dimv1 aT). Qed.
@@ -691,7 +691,7 @@ Definition FinDomainFieldType : finFieldType :=
   let dom_class := @GRing.IntegralDomain.Class R com_unit_class domR in
   let field_class := @GRing.Field.Class R dom_class finDomain_field in
   let finfield_class := @FinRing.Field.Class R field_class fin_unit_class in
-  FinRing.Field.Pack finfield_class R.
+  FinRing.Field.Pack finfield_class.
 
 Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=
    let RoverFp := @primeChar_splittingFieldType p FinDomainFieldType charRp in

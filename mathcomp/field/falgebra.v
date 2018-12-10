@@ -119,7 +119,7 @@ Definition BaseType T :=
   fun c vAm & phant_id c (GRing.UnitRing.Class (BaseMixin vAm)) =>
   fun (vT : vectType K) & phant vT
      & phant_id (Vector.mixin (Vector.class vT)) vAm =>
-  @GRing.UnitRing.Pack T c T.
+  @GRing.UnitRing.Pack T c.
 
 End DefaultBase.
 
@@ -129,41 +129,41 @@ Implicit Type phR : phant R.
 
 Record class_of A := Class {
   base1 : GRing.UnitAlgebra.class_of R A;
-  mixin : Vector.mixin_of (GRing.Lmodule.Pack _ base1 A)
+  mixin : Vector.mixin_of (GRing.Lmodule.Pack _ base1)
 }.
 Local Coercion base1 : class_of >-> GRing.UnitAlgebra.class_of.
 Definition base2 A c := @Vector.Class _ _ (@base1 A c) (mixin c).
 Local Coercion base2 : class_of >-> Vector.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 
 Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ := cT return class_of cT in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c := cT return class_of cT in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@GRing.UnitAlgebra.class R phR bT)
                       (b : GRing.UnitAlgebra.class_of R T) =>
   fun mT m & phant_id (@Vector.class R phR mT) (@Vector.Class R T b m) =>
-  Pack (Phant R) (@Class T b m) T.
+  Pack (Phant R) (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass xT.
-Definition algType := @GRing.Algebra.Pack R phR cT xclass xT.
-Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT xclass xT.
-Definition vectType := @Vector.Pack R phR cT xclass cT.
-Definition vect_ringType := @GRing.Ring.Pack vectType xclass xT.
-Definition vect_unitRingType := @GRing.UnitRing.Pack vectType xclass xT.
-Definition vect_lalgType := @GRing.Lalgebra.Pack R phR vectType xclass xT.
-Definition vect_algType := @GRing.Algebra.Pack R phR vectType xclass xT.
-Definition vect_unitAlgType := @GRing.UnitAlgebra.Pack R phR vectType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass.
+Definition algType := @GRing.Algebra.Pack R phR cT xclass.
+Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT xclass.
+Definition vectType := @Vector.Pack R phR cT xclass.
+Definition vect_ringType := @GRing.Ring.Pack vectType xclass.
+Definition vect_unitRingType := @GRing.UnitRing.Pack vectType xclass.
+Definition vect_lalgType := @GRing.Lalgebra.Pack R phR vectType xclass.
+Definition vect_algType := @GRing.Algebra.Pack R phR vectType xclass.
+Definition vect_unitAlgType := @GRing.UnitAlgebra.Pack R phR vectType xclass.
 
 End ClassDef.
 

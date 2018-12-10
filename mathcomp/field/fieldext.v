@@ -99,8 +99,8 @@ Variable R : ringType.
 Record class_of T := Class {
   base : Falgebra.class_of R T;
   comm_ext : commutative (Ring.mul base);
-  idomain_ext : IntegralDomain.axiom (Ring.Pack base T);
-  field_ext : Field.mixin_of (UnitRing.Pack base T)
+  idomain_ext : IntegralDomain.axiom (Ring.Pack base);
+  field_ext : Field.mixin_of (UnitRing.Pack base)
 }.
 
 Local Coercion base : class_of >-> Falgebra.class_of.
@@ -117,12 +117,12 @@ Local Coercion base2 : class_of >-> ComUnitRing.class_of.
 Local Coercion base3 : class_of >-> IntegralDomain.class_of.
 Local Coercion base4 : class_of >-> Field.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 
 Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ :=  cT return class_of cT in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c :=  cT return class_of cT in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
@@ -131,59 +131,59 @@ Definition pack :=
                (b : Falgebra.class_of R T) =>
   fun mT Cm IDm Fm & phant_id (Field.class mT) (@Field.Class T
         (@IntegralDomain.Class T (@ComUnitRing.Class T (@ComRing.Class T b
-          Cm) b) IDm) Fm) => Pack phR (@Class T b Cm IDm Fm) T.
+          Cm) b) IDm) Fm) => Pack phR (@Class T b Cm IDm Fm).
 
 Definition pack_eta K :=
   let cK := Field.class K in let Cm := ComRing.mixin cK in
   let IDm := IntegralDomain.mixin cK in let Fm := Field.mixin cK in
   fun (bT : Falgebra.type phR) b & phant_id (Falgebra.class bT) b =>
-  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm) T.
+  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @IntegralDomain.Pack cT xclass xT.
-Definition fieldType := @Field.Pack cT xclass xT.
-Definition lmodType := @Lmodule.Pack R phR cT xclass xT.
-Definition lalgType := @Lalgebra.Pack R phR cT xclass xT.
-Definition algType := @Algebra.Pack R phR cT xclass xT.
-Definition unitAlgType := @UnitAlgebra.Pack R phR cT xclass xT.
-Definition vectType := @Vector.Pack R phR cT xclass xT.
-Definition FalgType := @Falgebra.Pack R phR cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition idomainType := @IntegralDomain.Pack cT xclass.
+Definition fieldType := @Field.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lalgType := @Lalgebra.Pack R phR cT xclass.
+Definition algType := @Algebra.Pack R phR cT xclass.
+Definition unitAlgType := @UnitAlgebra.Pack R phR cT xclass.
+Definition vectType := @Vector.Pack R phR cT xclass.
+Definition FalgType := @Falgebra.Pack R phR cT xclass.
 
-Definition Falg_comRingType := @ComRing.Pack FalgType xclass xT.
-Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType xclass xT.
-Definition Falg_idomainType := @IntegralDomain.Pack FalgType xclass xT.
-Definition Falg_fieldType := @Field.Pack FalgType xclass xT.
+Definition Falg_comRingType := @ComRing.Pack FalgType xclass.
+Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType xclass.
+Definition Falg_idomainType := @IntegralDomain.Pack FalgType xclass.
+Definition Falg_fieldType := @Field.Pack FalgType xclass.
 
-Definition vect_comRingType := @ComRing.Pack vectType xclass xT.
-Definition vect_comUnitRingType := @ComUnitRing.Pack vectType xclass xT.
-Definition vect_idomainType := @IntegralDomain.Pack vectType xclass xT.
-Definition vect_fieldType := @Field.Pack vectType xclass xT.
+Definition vect_comRingType := @ComRing.Pack vectType xclass.
+Definition vect_comUnitRingType := @ComUnitRing.Pack vectType xclass.
+Definition vect_idomainType := @IntegralDomain.Pack vectType xclass.
+Definition vect_fieldType := @Field.Pack vectType xclass.
 
-Definition unitAlg_comRingType := @ComRing.Pack unitAlgType xclass xT.
-Definition unitAlg_comUnitRingType := @ComUnitRing.Pack unitAlgType xclass xT.
-Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType xclass xT.
-Definition unitAlg_fieldType := @Field.Pack unitAlgType xclass xT.
+Definition unitAlg_comRingType := @ComRing.Pack unitAlgType xclass.
+Definition unitAlg_comUnitRingType := @ComUnitRing.Pack unitAlgType xclass.
+Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType xclass.
+Definition unitAlg_fieldType := @Field.Pack unitAlgType xclass.
 
-Definition alg_comRingType := @ComRing.Pack algType xclass xT.
-Definition alg_comUnitRingType := @ComUnitRing.Pack algType xclass xT.
-Definition alg_idomainType := @IntegralDomain.Pack algType xclass xT.
-Definition alg_fieldType := @Field.Pack algType xclass xT.
+Definition alg_comRingType := @ComRing.Pack algType xclass.
+Definition alg_comUnitRingType := @ComUnitRing.Pack algType xclass.
+Definition alg_idomainType := @IntegralDomain.Pack algType xclass.
+Definition alg_fieldType := @Field.Pack algType xclass.
 
-Definition lalg_comRingType := @ComRing.Pack lalgType xclass xT.
-Definition lalg_comUnitRingType := @ComUnitRing.Pack lalgType xclass xT.
-Definition lalg_idomainType := @IntegralDomain.Pack lalgType xclass xT.
-Definition lalg_fieldType := @Field.Pack lalgType xclass xT.
+Definition lalg_comRingType := @ComRing.Pack lalgType xclass.
+Definition lalg_comUnitRingType := @ComUnitRing.Pack lalgType xclass.
+Definition lalg_idomainType := @IntegralDomain.Pack lalgType xclass.
+Definition lalg_fieldType := @Field.Pack lalgType xclass.
 
-Definition lmod_comRingType := @ComRing.Pack lmodType xclass xT.
-Definition lmod_comUnitRingType := @ComUnitRing.Pack lmodType xclass xT.
-Definition lmod_idomainType := @IntegralDomain.Pack lmodType xclass xT.
-Definition lmod_fieldType := @Field.Pack lmodType xclass xT.
+Definition lmod_comRingType := @ComRing.Pack lmodType xclass.
+Definition lmod_comUnitRingType := @ComUnitRing.Pack lmodType xclass.
+Definition lmod_idomainType := @IntegralDomain.Pack lmodType xclass.
+Definition lmod_fieldType := @Field.Pack lmodType xclass.
 
 End FieldExt.
 

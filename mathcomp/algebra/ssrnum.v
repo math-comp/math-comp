@@ -163,7 +163,7 @@ Record mixin_of (R : ringType) := Mixin {
   _ : forall x y, (lt_op x y) = (y != x) && (le_op x y)
 }.
 
-Local Notation ring_for T b := (@GRing.Ring.Pack T b T).
+Local Notation ring_for T b := (@GRing.Ring.Pack T b).
 
 (* Base interface. *)
 Module NumDomain.
@@ -175,25 +175,26 @@ Record class_of T := Class {
   mixin : mixin_of (ring_for T base)
 }.
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _  as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : mixin_of (ring_for T b0)) :=
   fun bT b & phant_id (GRing.IntegralDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 
 End ClassDef.
 
@@ -345,7 +346,7 @@ Definition real_closed_axiom : Prop :=
 
 End ExtensionAxioms.
 
-Local Notation num_for T b := (@NumDomain.Pack T b T).
+Local Notation num_for T b := (@NumDomain.Pack T b).
 
 (* The rest of the numbers interface hierarchy. *)
 Module NumField.
@@ -358,28 +359,29 @@ Definition base2 R (c : class_of R) := NumDomain.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Field.class_of.
 Local Coercion base2 : class_of >-> NumDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+
 Definition pack :=
   fun bT b & phant_id (GRing.Field.class bT) (b : GRing.Field.class_of T) =>
   fun mT m & phant_id (NumDomain.class mT) (@NumDomain.Class T b m) =>
-  Pack (@Class T b m) T.
+  Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition join_numDomainType := @NumDomain.Pack fieldType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition join_numDomainType := @NumDomain.Pack fieldType xclass.
 
 End ClassDef.
 
@@ -436,36 +438,37 @@ Definition base2 R (c : class_of R) := NumField.Class (mixin c).
 Local Coercion base : class_of >-> GRing.ClosedField.class_of.
 Local Coercion base2 : class_of >-> NumField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+
 Definition pack :=
   fun bT b & phant_id (GRing.ClosedField.class bT)
                       (b : GRing.ClosedField.class_of T) =>
   fun mT m & phant_id (NumField.class mT) (@NumField.Class T b m) =>
-  fun mc => Pack (@Class T b m mc) T.
-Definition clone := fun b & phant_id class (b : class_of T) => Pack b T.
+  fun mc => Pack (@Class T b m mc).
+Definition clone := fun b & phant_id class (b : class_of T) => Pack b.
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition decFieldType := @GRing.DecidableField.Pack cT xclass xT.
-Definition closedFieldType := @GRing.ClosedField.Pack cT xclass xT.
-Definition join_dec_numDomainType := @NumDomain.Pack decFieldType xclass xT.
-Definition join_dec_numFieldType := @NumField.Pack decFieldType xclass xT.
-Definition join_numDomainType := @NumDomain.Pack closedFieldType xclass xT.
-Definition join_numFieldType := @NumField.Pack closedFieldType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
+Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
+Definition join_dec_numDomainType := @NumDomain.Pack decFieldType xclass.
+Definition join_dec_numFieldType := @NumField.Pack decFieldType xclass.
+Definition join_numDomainType := @NumDomain.Pack closedFieldType xclass.
+Definition join_numFieldType := @NumField.Pack closedFieldType xclass.
 
 End ClassDef.
 
@@ -524,26 +527,27 @@ Record class_of R :=
   Class {base : NumDomain.class_of R; _ : @real_axiom (num_for R base)}.
 Local Coercion base : class_of >-> NumDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : real_axiom (num_for T b0)) :=
   fun bT b & phant_id (NumDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
 
 End ClassDef.
 
@@ -590,30 +594,31 @@ Definition base2 R (c : class_of R) := RealDomain.Class (@mixin R c).
 Local Coercion base : class_of >-> NumField.class_of.
 Local Coercion base2 : class_of >-> RealDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+
 Definition pack :=
   fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
   fun mT m & phant_id (RealDomain.class mT) (@RealDomain.Class T b m) =>
-  Pack (@Class T b m) T.
+  Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition realDomainType := @RealDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition join_realDomainType := @RealDomain.Pack numFieldType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition realDomainType := @RealDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition join_realDomainType := @RealDomain.Pack numFieldType xclass.
 
 End ClassDef.
 
@@ -663,30 +668,31 @@ Record class_of R :=
   Class { base : RealField.class_of R; _ : archimedean_axiom (num_for R base) }.
 Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition realDomainType := @RealDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition realFieldType := @RealField.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition realDomainType := @RealDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition realFieldType := @RealField.Pack cT xclass.
 
 End ClassDef.
 
@@ -739,30 +745,31 @@ Record class_of R :=
   Class { base : RealField.class_of R; _ : real_closed_axiom (num_for R base) }.
 Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : real_closed_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition realDomainType := @RealDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition realFieldType := @RealField.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition realDomainType := @RealDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition realFieldType := @RealField.Pack cT xclass.
 
 End ClassDef.
 

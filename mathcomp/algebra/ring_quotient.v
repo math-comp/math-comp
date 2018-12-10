@@ -110,11 +110,11 @@ Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
 Record zmod_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
   (zc : GRing.Zmodule.class_of Q) := ZmodQuotMixinPack {
     zmod_eq_quot_mixin :> eq_quot_mixin_of eqT qc zc;
-    _ : \pi_(QuotTypePack qc Q) zeroT = 0 :> GRing.Zmodule.Pack zc Q;
-    _ : {morph \pi_(QuotTypePack qc Q) : x /
-         oppT x >-> @GRing.opp (GRing.Zmodule.Pack zc Q) x};
-    _ : {morph \pi_(QuotTypePack qc Q) : x y /
-         addT x y >-> @GRing.add (GRing.Zmodule.Pack zc Q) x y}
+    _ : \pi_(QuotTypePack qc) zeroT = 0 :> GRing.Zmodule.Pack zc;
+    _ : {morph \pi_(QuotTypePack qc) : x /
+         oppT x >-> @GRing.opp (GRing.Zmodule.Pack zc) x};
+    _ : {morph \pi_(QuotTypePack qc) : x y /
+         addT x y >-> @GRing.add (GRing.Zmodule.Pack zc) x y}
 }.
 
 Record zmod_quot_class_of (Q : Type) : Type := ZmodQuotClass {
@@ -127,25 +127,25 @@ Record zmod_quot_class_of (Q : Type) : Type := ZmodQuotClass {
 Structure zmodQuotType : Type := ZmodQuotTypePack {
   zmod_quot_sort :> Type;
   _ : zmod_quot_class_of zmod_quot_sort;
-  _ : Type
+ 
 }.
 
 Implicit Type zqT : zmodQuotType.
 
 Definition zmod_quot_class zqT : zmod_quot_class_of zqT :=
-  let: ZmodQuotTypePack _ cT _ as qT' := zqT return zmod_quot_class_of qT' in cT.
+  let: ZmodQuotTypePack _ cT as qT' := zqT return zmod_quot_class_of qT' in cT.
 
 Definition zmod_eq_quot_class zqT (zqc : zmod_quot_class_of zqT) :
   eq_quot_class_of eqT zqT := EqQuotClass zqc.
 
-Canonical zmodQuotType_eqType zqT := Equality.Pack (zmod_quot_class zqT) zqT.
+Canonical zmodQuotType_eqType zqT := Equality.Pack (zmod_quot_class zqT).
 Canonical zmodQuotType_choiceType zqT :=
-  Choice.Pack (zmod_quot_class zqT) zqT.
+  Choice.Pack (zmod_quot_class zqT).
 Canonical zmodQuotType_zmodType zqT :=
-  GRing.Zmodule.Pack (zmod_quot_class zqT) zqT.
-Canonical zmodQuotType_quotType zqT := QuotTypePack (zmod_quot_class zqT) zqT.
+  GRing.Zmodule.Pack (zmod_quot_class zqT).
+Canonical zmodQuotType_quotType zqT := QuotTypePack (zmod_quot_class zqT).
 Canonical zmodQuotType_eqQuotType zqT := EqQuotTypePack
-  (zmod_eq_quot_class (zmod_quot_class zqT)) zqT.
+  (zmod_eq_quot_class (zmod_quot_class zqT)).
 
 Coercion zmodQuotType_eqType : zmodQuotType >-> eqType.
 Coercion zmodQuotType_choiceType : zmodQuotType >-> choiceType.
@@ -156,7 +156,7 @@ Coercion zmodQuotType_eqQuotType : zmodQuotType >-> eqQuotType.
 Definition ZmodQuotType_pack Q :=
   fun (qT : quotType T) (zT : zmodType) qc zc
   of phant_id (quot_class qT) qc & phant_id (GRing.Zmodule.class zT) zc =>
-    fun m => ZmodQuotTypePack (@ZmodQuotClass Q qc zc m) Q.
+    fun m => ZmodQuotTypePack (@ZmodQuotClass Q qc zc m).
 
 Definition ZmodQuotMixin_pack Q :=
   fun (qT : eqQuotType eqT) (qc : eq_quot_class_of eqT Q)
@@ -165,7 +165,7 @@ Definition ZmodQuotMixin_pack Q :=
     fun e m0 mN mD => @ZmodQuotMixinPack Q qc zc e m0 mN mD.
 
 Definition ZmodQuotType_clone (Q : Type) qT cT
-  of phant_id (zmod_quot_class qT) cT := @ZmodQuotTypePack Q cT Q.
+  of phant_id (zmod_quot_class qT) cT := @ZmodQuotTypePack Q cT.
 
 Lemma zmod_quot_mixinP zqT :
   zmod_quot_mixin_of (zmod_quot_class zqT) (zmod_quot_class zqT).
@@ -216,9 +216,9 @@ Variables (oneT : T) (mulT : T -> T -> T).
 Record ring_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
   (rc : GRing.Ring.class_of Q) := RingQuotMixinPack {
     ring_zmod_quot_mixin :> zmod_quot_mixin_of eqT zeroT oppT addT qc rc;
-    _ : \pi_(QuotTypePack qc Q) oneT = 1 :> GRing.Ring.Pack rc Q;
-    _ : {morph \pi_(QuotTypePack qc Q) : x y /
-         mulT x y >-> @GRing.mul (GRing.Ring.Pack rc Q) x y}
+    _ : \pi_(QuotTypePack qc) oneT = 1 :> GRing.Ring.Pack rc;
+    _ : {morph \pi_(QuotTypePack qc) : x y /
+         mulT x y >-> @GRing.mul (GRing.Ring.Pack rc) x y}
 }.
 
 Record ring_quot_class_of (Q : Type) : Type := RingQuotClass {
@@ -231,30 +231,30 @@ Record ring_quot_class_of (Q : Type) : Type := RingQuotClass {
 Structure ringQuotType : Type := RingQuotTypePack {
   ring_quot_sort :> Type;
   _ : ring_quot_class_of ring_quot_sort;
-  _ : Type
+ 
 }.
 
 Implicit Type rqT : ringQuotType.
 
 Definition ring_quot_class rqT : ring_quot_class_of rqT :=
-  let: RingQuotTypePack _ cT _ as qT' := rqT return ring_quot_class_of qT' in cT.
+  let: RingQuotTypePack _ cT as qT' := rqT return ring_quot_class_of qT' in cT.
 
 Definition ring_zmod_quot_class rqT (rqc : ring_quot_class_of rqT) :
   zmod_quot_class_of eqT zeroT oppT addT rqT := ZmodQuotClass rqc.
 Definition ring_eq_quot_class rqT (rqc : ring_quot_class_of rqT) :
   eq_quot_class_of eqT rqT := EqQuotClass rqc.
 
-Canonical ringQuotType_eqType rqT := Equality.Pack (ring_quot_class rqT) rqT.
-Canonical ringQuotType_choiceType rqT := Choice.Pack (ring_quot_class rqT) rqT.
+Canonical ringQuotType_eqType rqT := Equality.Pack (ring_quot_class rqT).
+Canonical ringQuotType_choiceType rqT := Choice.Pack (ring_quot_class rqT).
 Canonical ringQuotType_zmodType rqT :=
-  GRing.Zmodule.Pack (ring_quot_class rqT) rqT.
+  GRing.Zmodule.Pack (ring_quot_class rqT).
 Canonical ringQuotType_ringType rqT :=
-  GRing.Ring.Pack (ring_quot_class rqT) rqT.
-Canonical ringQuotType_quotType rqT := QuotTypePack (ring_quot_class rqT) rqT.
+  GRing.Ring.Pack (ring_quot_class rqT).
+Canonical ringQuotType_quotType rqT := QuotTypePack (ring_quot_class rqT).
 Canonical ringQuotType_eqQuotType rqT :=
-  EqQuotTypePack (ring_eq_quot_class (ring_quot_class rqT)) rqT.
+  EqQuotTypePack (ring_eq_quot_class (ring_quot_class rqT)).
 Canonical ringQuotType_zmodQuotType rqT :=
-  ZmodQuotTypePack (ring_zmod_quot_class (ring_quot_class rqT)) rqT.
+  ZmodQuotTypePack (ring_zmod_quot_class (ring_quot_class rqT)).
 
 Coercion ringQuotType_eqType : ringQuotType >-> eqType.
 Coercion ringQuotType_choiceType : ringQuotType >-> choiceType.
@@ -267,7 +267,7 @@ Coercion ringQuotType_zmodQuotType : ringQuotType >-> zmodQuotType.
 Definition RingQuotType_pack Q :=
   fun (qT : quotType T) (zT : ringType) qc rc
   of phant_id (quot_class qT) qc & phant_id (GRing.Ring.class zT) rc =>
-    fun m => RingQuotTypePack (@RingQuotClass Q qc rc m) Q.
+    fun m => RingQuotTypePack (@RingQuotClass Q qc rc m).
 
 Definition RingQuotMixin_pack Q :=
   fun (qT : zmodQuotType eqT zeroT oppT addT) =>
@@ -277,7 +277,7 @@ Definition RingQuotMixin_pack Q :=
     fun mZ m1 mM => @RingQuotMixinPack Q qc rc mZ m1 mM.
 
 Definition RingQuotType_clone (Q : Type) qT cT
-  of phant_id (ring_quot_class qT) cT := @RingQuotTypePack Q cT Q.
+  of phant_id (ring_quot_class qT) cT := @RingQuotTypePack Q cT.
 
 Lemma ring_quot_mixinP rqT :
   ring_quot_mixin_of (ring_quot_class rqT) (ring_quot_class rqT).
@@ -327,10 +327,10 @@ Record unit_ring_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
   (rc : GRing.UnitRing.class_of Q) := UnitRingQuotMixinPack {
     unit_ring_zmod_quot_mixin :>
         ring_quot_mixin_of eqT zeroT oppT addT oneT mulT qc rc;
-    _ : {mono \pi_(QuotTypePack qc Q) : x /
-         unitT x >-> x \in @GRing.unit (GRing.UnitRing.Pack rc Q)};
-    _ : {morph \pi_(QuotTypePack qc Q) : x /
-         invT x >-> @GRing.inv (GRing.UnitRing.Pack rc Q) x}
+    _ : {mono \pi_(QuotTypePack qc) : x /
+         unitT x >-> x \in @GRing.unit (GRing.UnitRing.Pack rc)};
+    _ : {morph \pi_(QuotTypePack qc) : x /
+         invT x >-> @GRing.inv (GRing.UnitRing.Pack rc) x}
 }.
 
 Record unit_ring_quot_class_of (Q : Type) : Type := UnitRingQuotClass {
@@ -343,13 +343,13 @@ Record unit_ring_quot_class_of (Q : Type) : Type := UnitRingQuotClass {
 Structure unitRingQuotType : Type := UnitRingQuotTypePack {
   unit_ring_quot_sort :> Type;
   _ : unit_ring_quot_class_of unit_ring_quot_sort;
-  _ : Type
+ 
 }.
 
 Implicit Type rqT : unitRingQuotType.
 
 Definition unit_ring_quot_class rqT : unit_ring_quot_class_of rqT :=
-  let: UnitRingQuotTypePack _ cT _ as qT' := rqT
+  let: UnitRingQuotTypePack _ cT as qT' := rqT
     return unit_ring_quot_class_of qT' in cT.
 
 Definition unit_ring_ring_quot_class rqT (rqc : unit_ring_quot_class_of rqT) :
@@ -360,23 +360,23 @@ Definition unit_ring_eq_quot_class rqT (rqc : unit_ring_quot_class_of rqT) :
   eq_quot_class_of eqT rqT := EqQuotClass rqc.
 
 Canonical unitRingQuotType_eqType rqT :=
-  Equality.Pack (unit_ring_quot_class rqT) rqT.
+  Equality.Pack (unit_ring_quot_class rqT).
 Canonical unitRingQuotType_choiceType rqT :=
-  Choice.Pack (unit_ring_quot_class rqT) rqT.
+  Choice.Pack (unit_ring_quot_class rqT).
 Canonical unitRingQuotType_zmodType rqT :=
-  GRing.Zmodule.Pack (unit_ring_quot_class rqT) rqT.
+  GRing.Zmodule.Pack (unit_ring_quot_class rqT).
 Canonical unitRingQuotType_ringType rqT :=
-  GRing.Ring.Pack (unit_ring_quot_class rqT) rqT.
+  GRing.Ring.Pack (unit_ring_quot_class rqT).
 Canonical unitRingQuotType_unitRingType rqT :=
-  GRing.UnitRing.Pack (unit_ring_quot_class rqT) rqT.
+  GRing.UnitRing.Pack (unit_ring_quot_class rqT).
 Canonical unitRingQuotType_quotType rqT :=
-  QuotTypePack (unit_ring_quot_class rqT) rqT.
+  QuotTypePack (unit_ring_quot_class rqT).
 Canonical unitRingQuotType_eqQuotType rqT :=
-  EqQuotTypePack (unit_ring_eq_quot_class (unit_ring_quot_class rqT)) rqT.
+  EqQuotTypePack (unit_ring_eq_quot_class (unit_ring_quot_class rqT)).
 Canonical unitRingQuotType_zmodQuotType rqT :=
-  ZmodQuotTypePack (unit_ring_zmod_quot_class (unit_ring_quot_class rqT)) rqT.
+  ZmodQuotTypePack (unit_ring_zmod_quot_class (unit_ring_quot_class rqT)).
 Canonical unitRingQuotType_ringQuotType rqT :=
-  RingQuotTypePack (unit_ring_ring_quot_class (unit_ring_quot_class rqT)) rqT.
+  RingQuotTypePack (unit_ring_ring_quot_class (unit_ring_quot_class rqT)).
 
 Coercion unitRingQuotType_eqType : unitRingQuotType >-> eqType.
 Coercion unitRingQuotType_choiceType : unitRingQuotType >-> choiceType.
@@ -391,7 +391,7 @@ Coercion unitRingQuotType_ringQuotType : unitRingQuotType >-> ringQuotType.
 Definition UnitRingQuotType_pack Q :=
   fun (qT : quotType T) (rT : unitRingType) qc rc
   of phant_id (quot_class qT) qc & phant_id (GRing.UnitRing.class rT) rc =>
-    fun m => UnitRingQuotTypePack (@UnitRingQuotClass Q qc rc m) Q.
+    fun m => UnitRingQuotTypePack (@UnitRingQuotClass Q qc rc m).
 
 Definition UnitRingQuotMixin_pack Q :=
   fun (qT : ringQuotType eqT zeroT oppT addT oneT mulT) =>
@@ -401,7 +401,7 @@ Definition UnitRingQuotMixin_pack Q :=
     fun mR mU mV => @UnitRingQuotMixinPack Q qc rc mR mU mV.
 
 Definition UnitRingQuotType_clone (Q : Type) qT cT
-  of phant_id (unit_ring_quot_class qT) cT := @UnitRingQuotTypePack Q cT Q.
+  of phant_id (unit_ring_quot_class qT) cT := @UnitRingQuotTypePack Q cT.
 
 Lemma unit_ring_quot_mixinP rqT :
   unit_ring_quot_mixin_of (unit_ring_quot_class rqT) (unit_ring_quot_class rqT).
