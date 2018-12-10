@@ -87,6 +87,7 @@ ssreflect/ssrnat.v
 ssreflect/ssrnotations.v
 ssreflect/ssrmatching.v
 ssreflect/tuple.v
+ssreflect/finmap.v
 test_suite/hierarchy_test.v
 
 -I .
