@@ -1045,7 +1045,7 @@ Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 Lemma lerr x : x <= x. Proof. exact: lerr. Qed.
 Lemma ltrr x : x < x = false. Proof. by rewrite ltr_def eqxx. Qed.
 Lemma ltrW x y : x < y -> x <= y. Proof. exact: ltrW. Qed.
-Hint Resolve lerr ltrr ltrW.
+Hint Resolve lerr ltrr ltrW : core.
 
 Lemma ltr_neqAle x y : (x < y) = (x != y) && (x <= y).
 Proof. by rewrite ltr_def eq_sym. Qed.
@@ -1080,12 +1080,12 @@ Qed.
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. exact: ltr01. Qed.
 Lemma ler0n n : 0 <= n%:R :> R. Proof. by rewrite -nnegrE rpred_nat. Qed.
-Hint Resolve ler01 ltr01 ler0n.
+Hint Resolve ler01 ltr01 ler0n : core.
 Lemma ltr0Sn n : 0 < n.+1%:R :> R.
 Proof. by elim: n => // n; apply: addr_gt0. Qed.
 Lemma ltr0n n : (0 < n%:R :> R) = (0 < n)%N.
 Proof. by case: n => //= n; apply: ltr0Sn. Qed.
-Hint Resolve ltr0Sn.
+Hint Resolve ltr0Sn : core.
 
 Lemma pnatr_eq0 n : (n%:R == 0 :> R) = (n == 0)%N.
 Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gtr_eqF. Qed.
@@ -1154,7 +1154,7 @@ by rewrite -{2}normrN -normr0 -(subrr x) ler_norm_add.
 Qed.
 
 Lemma normr_ge0 x : 0 <= `|x|. Proof. by rewrite ger0_def normr_id. Qed.
-Hint Resolve normr_ge0.
+Hint Resolve normr_ge0 : core.
 
 Lemma ler0_norm x : x <= 0 -> `|x| = - x.
 Proof. by move=> x_le0; rewrite -[r in _ = r]ger0_norm ?normrN ?oppr_ge0. Qed.
@@ -1263,7 +1263,7 @@ Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R x}.
 Arguments lerifP {R x y C}.
-Hint Resolve @ler01 @ltr01 lerr ltrr ltrW ltr_eqF ltr0Sn ler0n normr_ge0.
+Hint Resolve @ler01 @ltr01 lerr ltrr ltrW ltr_eqF ltr0Sn ler0n normr_ge0 : core.
 
 Section NumIntegralDomainMonotonyTheory.
 
@@ -1450,10 +1450,10 @@ Implicit Types x y z t : R.
 
 Lemma ler_opp2 : {mono -%R : x y /~ x <= y :> R}.
 Proof. by move=> x y /=; rewrite -subr_ge0 opprK addrC subr_ge0. Qed.
-Hint Resolve ler_opp2.
+Hint Resolve ler_opp2 : core.
 Lemma ltr_opp2 : {mono -%R : x y /~ x < y :> R}.
 Proof. by move=> x y /=; rewrite lerW_nmono. Qed.
-Hint Resolve ltr_opp2.
+Hint Resolve ltr_opp2 : core.
 Definition lter_opp2 := (ler_opp2, ltr_opp2).
 
 Lemma ler_oppr x y : (x <= - y) = (y <= - x).
@@ -1525,10 +1525,10 @@ Lemma ltr0_real x : x < 0 -> x \is real.
 Proof. by move=> /ltrW/ler0_real. Qed.
 
 Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real0.
+Hint Resolve real0 : core.
 
 Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real1.
+Hint Resolve real1 : core.
 
 Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
 
@@ -2640,7 +2640,7 @@ Qed.
 (* norm + add *)
 
 Lemma normr_real x : `|x| \is real. Proof. by rewrite ger0_real. Qed.
-Hint Resolve normr_real.
+Hint Resolve normr_real : core.
 
 Lemma ler_norm_sum I r (G : I -> R) (P : pred I):
   `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i|.
@@ -3144,7 +3144,7 @@ Qed.
 
 End NumDomainOperationTheory.
 
-Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real.
+Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
 Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
@@ -3429,13 +3429,13 @@ End NumFieldTheory.
 
 Section RealDomainTheory.
 
-Hint Resolve lerr.
+Hint Resolve lerr : core.
 
 Variable R : realDomainType.
 Implicit Types x y z t : R.
 
 Lemma num_real x : x \is real. Proof. exact: num_real. Qed.
-Hint Resolve num_real.
+Hint Resolve num_real : core.
 
 Lemma ler_total : total (@le R). Proof. by move=> x y; apply: real_leVge. Qed.
 
@@ -3534,14 +3534,14 @@ Proof. by rewrite -real_normrEsign. Qed.
 
 End RealDomainTheory.
 
-Hint Resolve num_real.
+Hint Resolve num_real : core.
 
 Section RealDomainMonotony.
 
 Variables (R : realDomainType) (R' : numDomainType) (D : pred R) (f : R -> R').
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
 
-Hint Resolve (@num_real R).
+Hint Resolve (@num_real R) : core.
 
 Lemma homo_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
 Proof. by move=> mf x y; apply: real_mono. Qed.
@@ -3569,7 +3569,7 @@ Section RealDomainOperations.
 
 Variable R : realDomainType.
 Implicit Types x y z t : R.
-Hint Resolve (@num_real R).
+Hint Resolve (@num_real R) : core.
 
 Lemma sgr_cp0 x :
   ((sg x == 1) = (0 < x)) *
@@ -4032,7 +4032,7 @@ Lemma poly_ivt : real_closed_axiom R. Proof. exact: poly_ivt. Qed.
 
 Lemma sqrtr_ge0 a : 0 <= sqrt a.
 Proof. by rewrite /sqrt; case: (sig2W _). Qed.
-Hint Resolve sqrtr_ge0.
+Hint Resolve sqrtr_ge0 : core.
 
 Lemma sqr_sqrtr a : 0 <= a -> sqrt a ^+ 2 = a.
 Proof.
@@ -4325,7 +4325,7 @@ Proof.
 rewrite CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
-Hint Resolve Creal_Re Creal_Im.
+Hint Resolve Creal_Re Creal_Im : core.
 
 Fact Re_is_additive : additive Re.
 Proof. by move=> x y; rewrite /Re rmorphB addrACA -opprD mulrBl. Qed.

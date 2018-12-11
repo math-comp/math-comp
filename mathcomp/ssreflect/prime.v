@@ -358,7 +358,7 @@ Proof. by case/primeP. Qed.
 Lemma prime_gt0 p : prime p -> 0 < p.
 Proof. by move/prime_gt1; apply: ltnW. Qed.
 
-Hint Resolve prime_gt1 prime_gt0.
+Hint Resolve prime_gt1 prime_gt0 : core.
 
 Lemma prod_prime_decomp n :
   n > 0 -> n = \prod_(f <- prime_decomp n) f.1 ^ f.2.
@@ -494,7 +494,7 @@ Proof. by case: n => [|[|n]] //; rewrite prime_gt0 ?pdiv_prime. Qed.
 
 Lemma max_pdiv_gt0 n : 0 < max_pdiv n.
 Proof. by case: n => [|[|n]] //; rewrite prime_gt0 ?max_pdiv_prime. Qed.
-Hint Resolve pdiv_gt0 max_pdiv_gt0.
+Hint Resolve pdiv_gt0 max_pdiv_gt0 : core.
 
 Lemma pdiv_min_dvd m d : 1 < d -> d %| m -> pdiv m <= d.
 Proof.
@@ -636,7 +636,7 @@ Proof. by rewrite lognE dvdn1 /= andbC; case: eqP => // ->. Qed.
 
 Lemma pfactor_gt0 p n : 0 < p ^ logn p n.
 Proof. by rewrite expn_gt0 lognE; case: (posnP p) => // ->. Qed.
-Hint Resolve pfactor_gt0.
+Hint Resolve pfactor_gt0 : core.
 
 Lemma pfactor_dvdn p n m : prime p -> m > 0 -> (p ^ n %| m) = (n <= logn p m).
 Proof.
@@ -858,7 +858,7 @@ Qed.
 
 Lemma part_gt0 pi n : 0 < n`_pi.
 Proof. exact: prodn_gt0. Qed.
-Hint Resolve part_gt0.
+Hint Resolve part_gt0 : core.
 
 Lemma sub_in_partn pi1 pi2 n :
   {in \pi(n), {subset pi1 <= pi2}} -> n`_pi1 %| n`_pi2.
@@ -1219,7 +1219,7 @@ Lemma odd_2'nat n : odd n = 2^'.-nat n.
 Proof. by case: n => // n; rewrite p'natE // dvdn2 negbK. Qed.
 
 End PnatTheory.
-Hint Resolve part_gt0.
+Hint Resolve part_gt0 : core.
 
 (************************************)
 (* Properties of the divisors list. *)

@@ -187,12 +187,12 @@ Proof. by move: bl br => [[] a|] [[] b|]. Qed.
 Lemma le_boundr_refl : reflexive le_boundr.
 Proof. by move=> [[] b|]; rewrite /le_boundr /= ?lerr. Qed.
 
-Hint Resolve le_boundr_refl.
+Hint Resolve le_boundr_refl : core.
 
 Lemma le_boundl_refl : reflexive le_boundl.
 Proof. by move=> [[] b|]; rewrite /le_boundl /= ?lerr. Qed.
 
-Hint Resolve le_boundl_refl.
+Hint Resolve le_boundl_refl : core.
 
 Lemma le_boundl_bb x b1 b2 :
   le_boundl (BOpen_if b1 x) (BOpen_if b2 x) = (b1 ==> b2).
@@ -242,7 +242,7 @@ move=> x [[[] a|] [[] b|]]; move/itv_dec=> //= [hl hu]; do ?[split=> //;
     | by apply: negbTE; rewrite ltr_geF // (@ler_lt_trans _ x)].
 Qed.
 
-Hint Rewrite intP.
+Hint Rewrite intP : core.
 Arguments itvP [x i].
 
 Definition subitv (i1 i2 : interval R) :=

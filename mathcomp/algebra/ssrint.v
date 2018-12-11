@@ -967,7 +967,7 @@ Proof. by rewrite mulrz_eq0 negb_or. Qed.
 
 Lemma realz n : (n%:~R : R) \in Num.real.
 Proof. by rewrite -topredE /Num.real /= ler0z lerz0 ler_total. Qed.
-Hint Resolve realz.
+Hint Resolve realz : core.
 
 Definition intr_inj := @mulrIz 1 (oner_neq0 R).
 

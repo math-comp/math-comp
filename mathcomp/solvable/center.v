@@ -375,7 +375,7 @@ rewrite /cpairg1 /cpair1g; do 2!case: restrmP => _ [_ _ _ -> //].
 rewrite !morphim_comp morphim_cents // morphim_pair1g morphim_pairg1.
 by case/dprodP: (setX_dprod H K).
 Qed.
-Hint Resolve im_cpair_cent.
+Hint Resolve im_cpair_cent : core.
 
 Lemma im_cpair : CH * CK = C.
 Proof.

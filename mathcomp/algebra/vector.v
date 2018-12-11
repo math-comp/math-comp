@@ -460,7 +460,7 @@ by have:= sU12 (r2v u); rewrite !memvE /subsetv !genmxE r2vK.
 Qed.
 
 Lemma subvv U : (U <= U)%VS. Proof. exact/subvP. Qed.
-Hint Resolve subvv.
+Hint Resolve subvv : core.
 
 Lemma subv_trans : transitive subV.
 Proof. by move=> U V W /subvP sUV /subvP sVW; apply/subvP=> u /sUV/sVW. Qed.
@@ -1222,7 +1222,7 @@ End BigSumBasis.
 
 End VectorTheory.
 
-Hint Resolve subvv.
+Hint Resolve subvv : core.
 Arguments subvP {K vT U V}.
 Arguments addv_idPl {K vT U V}.
 Arguments addv_idPr {K vT U V}.

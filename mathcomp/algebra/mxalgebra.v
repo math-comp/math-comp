@@ -388,7 +388,7 @@ case: GaussE (IHm _ B) => [[L U] r] /= uL.
 rewrite unitmxE xrowE det_mulmx (@det_lblock _ 1) det1 mul1r unitrM.
 by rewrite -unitmxE unitmx_perm.
 Qed.
-Hint Resolve rank_leq_row rank_leq_col row_ebase_unit col_ebase_unit.
+Hint Resolve rank_leq_row rank_leq_col row_ebase_unit col_ebase_unit : core.
 
 Lemma mulmx_ebase m n (A : 'M_(m, n)) :
   col_ebase A *m pid_mx (\rank A) *m row_ebase A = A.
@@ -504,7 +504,7 @@ Arguments submxP {m1 m2 n A B}.
 
 Lemma submx_refl m n (A : 'M_(m, n)) : (A <= A)%MS.
 Proof. by rewrite submxE mulmx_coker. Qed.
-Hint Resolve submx_refl.
+Hint Resolve submx_refl : core.
 
 Lemma submxMl m n p (D : 'M_(m, n)) (A : 'M_(n, p)) : (D *m A <= A)%MS.
 Proof. by rewrite submxE -mulmxA mulmx_coker mulmx0. Qed.
@@ -874,7 +874,7 @@ Proof.
 apply/row_fullP; exists (pid_mx (\rank A) *m invmx (col_ebase A)).
 by rewrite !mulmxA mulmxKV // pid_mx_id // pid_mx_1.
 Qed.
-Hint Resolve row_base_free col_base_full.
+Hint Resolve row_base_free col_base_full : core.
 
 Lemma mxrank_leqif_sup m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (A <= B)%MS -> \rank A <= \rank B ?= iff (B <= A)%MS.
@@ -1974,7 +1974,7 @@ End Eigenspace.
 
 End RowSpaceTheory.
 
-Hint Resolve submx_refl.
+Hint Resolve submx_refl : core.
 Arguments submxP {F m1 m2 n A B}.
 Arguments eq_row_sub [F m n v A].
 Arguments row_subP {F m1 m2 n A B}.

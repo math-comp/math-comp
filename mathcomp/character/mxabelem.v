@@ -511,7 +511,7 @@ Proof. by rewrite im_abelem_rV inE. Qed.
 
 Lemma sub_im_abelem_rV mA : subset mA (mem (ErV @* E)).
 Proof. by rewrite unlock; apply/pred0P=> v /=; rewrite mem_im_abelem_rV. Qed.
-Hint Resolve mem_im_abelem_rV sub_im_abelem_rV.
+Hint Resolve mem_im_abelem_rV sub_im_abelem_rV : core.
 
 Lemma abelem_rV_1 : ErV 1 = 0%R. Proof. by rewrite morph1. Qed.
 
@@ -552,7 +552,7 @@ Proof. by rewrite -im_rVabelem mem_morphim. Qed.
 
 Lemma sub_rVabelem L : rV_E @* L \subset E.
 Proof. by rewrite -[_ @* L]morphimIim im_invm subsetIl. Qed.
-Hint Resolve mem_rVabelem sub_rVabelem.
+Hint Resolve mem_rVabelem sub_rVabelem : core.
 
 Lemma card_rVabelem L : #|rV_E @* L| = #|L|.
 Proof. by rewrite card_injm ?rVabelem_injm. Qed.

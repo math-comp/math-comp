@@ -1495,7 +1495,7 @@ Proof. by apply/injmP; apply: in2W; apply: subg_inj. Qed.
 
 Lemma injm_subg : 'injm (subg G).
 Proof. by apply/injmP; apply: can_in_inj (@subgK _ _). Qed.
-Hint Resolve injm_sgval injm_subg.
+Hint Resolve injm_sgval injm_subg : core.
 
 Lemma ker_sgval : 'ker sgval = 1. Proof. exact/trivgP. Qed.
 Lemma ker_subg : 'ker (subg G) = 1. Proof. exact/trivgP. Qed.

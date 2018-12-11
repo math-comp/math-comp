@@ -95,7 +95,7 @@ Definition qf_cps T D (x : cps T) :=
 
 Lemma qf_cps_ret T D (x : T) : D x -> qf_cps D (ret x).
 Proof. move=> ??; exact. Qed.
-Hint Resolve qf_cps_ret.
+Hint Resolve qf_cps_ret : core.
 
 Lemma qf_cps_bind T1 D1 T2 D2 (x : cps T1) (f : T1 -> cps T2) :
   qf_cps D1 x -> (forall x, D1 x -> qf_cps D2 (f x)) -> qf_cps D2 (bind x f).

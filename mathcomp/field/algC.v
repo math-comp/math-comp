@@ -607,7 +607,7 @@ Local Notation intrp := (map_poly intr).
 Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
-Local Hint Resolve (@intr_inj _ : injective ZtoC).
+Local Hint Resolve (@intr_inj _ : injective ZtoC) : core.
 
 (* Specialization of a few basic ssrnum order lemmas. *)
 
@@ -645,7 +645,8 @@ Definition algC_algebraic x := Algebraics.Implementation.algebraic x.
 
 Lemma Creal0 : 0 \is Creal. Proof. exact: rpred0. Qed.
 Lemma Creal1 : 1 \is Creal. Proof. exact: rpred1. Qed.
-Hint Resolve Creal0 Creal1. (* Trivial cannot resolve a general real0 hint. *)
+(* Trivial cannot resolve a general real0 hint. *)
+Hint Resolve Creal0 Creal1 : core. 
 
 Lemma algCrect x : x = 'Re x + 'i * 'Im x.
 Proof. by rewrite [LHS]Crect. Qed.
@@ -655,7 +656,7 @@ Proof. by rewrite Creal_Re. Qed.
 
 Lemma algCreal_Im x : 'Im x \is Creal.
 Proof. by rewrite Creal_Im. Qed.
-Hint Resolve algCreal_Re algCreal_Im.
+Hint Resolve algCreal_Re algCreal_Im : core.
 
 (* Integer subset. *)
 (* Not relying on the undocumented interval library, for now. *)
@@ -680,7 +681,7 @@ Lemma floorCK : {in Cint, cancel floorC intr}. Proof. by move=> z /eqP. Qed.
 
 Lemma floorC0 : floorC 0 = 0. Proof. exact: (intCK 0). Qed.
 Lemma floorC1 : floorC 1 = 1. Proof. exact: (intCK 1). Qed.
-Hint Resolve floorC0 floorC1.
+Hint Resolve floorC0 floorC1 : core.
 
 Lemma floorCpK (p : {poly algC}) :
   p \is a polyOver Cint -> map_poly intr (map_poly floorC p) = p.
@@ -723,7 +724,7 @@ Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
 
 Lemma Cint0 : 0 \in Cint. Proof. exact: (Cint_int 0). Qed.
 Lemma Cint1 : 1 \in Cint. Proof. exact: (Cint_int 1). Qed.
-Hint Resolve Cint0 Cint1.
+Hint Resolve Cint0 Cint1 : core.
 
 Fact Cint_key : pred_key Cint. Proof. by []. Qed.
 Fact Cint_subring : subring_closed Cint.
@@ -814,7 +815,7 @@ Proof. by case/CnatP=> n ->; apply: rpred_nat. Qed.
 Lemma Cnat_nat n : n%:R \in Cnat. Proof. by apply/CnatP; exists n. Qed.
 Lemma Cnat0 : 0 \in Cnat. Proof. exact: (Cnat_nat 0). Qed.
 Lemma Cnat1 : 1 \in Cnat. Proof. exact: (Cnat_nat 1). Qed.
-Hint Resolve Cnat_nat Cnat0 Cnat1.
+Hint Resolve Cnat_nat Cnat0 Cnat1 : core.
 
 Fact Cnat_key : pred_key Cnat. Proof. by []. Qed.
 Fact Cnat_semiring : semiring_closed Cnat.
@@ -970,7 +971,7 @@ Proof. by move=> x_dv_y /dvdCP[m Zm ->]; apply: dvdC_mull. Qed.
 
 Lemma dvdC_refl x : (x %| x)%C.
 Proof. by apply/dvdCP; exists 1; rewrite ?mul1r. Qed.
-Hint Resolve dvdC_refl.
+Hint Resolve dvdC_refl : core.
 
 Fact dvdC_key x : pred_key (dvdC x). Proof. by []. Qed.
 Lemma dvdC_zmod x : zmod_closed (dvdC x).
@@ -1004,7 +1005,7 @@ Lemma eqCmod_refl e x : (x == x %[mod e])%C.
 Proof. by rewrite /eqCmod subrr rpred0. Qed.
 
 Lemma eqCmodm0 e : (e == 0 %[mod e])%C. Proof. by rewrite /eqCmod subr0. Qed.
-Hint Resolve eqCmod_refl eqCmodm0.
+Hint Resolve eqCmod_refl eqCmodm0 : core.
 
 Lemma eqCmod0 e x : (x == 0 %[mod e])%C = (e %| x)%C.
 Proof. by rewrite /eqCmod subr0. Qed.
@@ -1091,7 +1092,7 @@ Qed.
 
 Lemma Crat0 : 0 \in Crat. Proof. by apply/CratP; exists 0; rewrite rmorph0. Qed.
 Lemma Crat1 : 1 \in Crat. Proof. by apply/CratP; exists 1; rewrite rmorph1. Qed.
-Hint Resolve Crat0 Crat1.
+Hint Resolve Crat0 Crat1 : core.
 
 Fact Crat_key : pred_key Crat. Proof. by []. Qed.
 Fact Crat_divring_closed : divring_closed Crat.
@@ -1236,5 +1237,5 @@ Proof. by move=> _ u /CintP[m ->]; apply: rpredZint. Qed.
 End PredCmod.
 
 End AlgebraicsTheory.
-Hint Resolve Creal0 Creal1 Cnat_nat Cnat0 Cnat1 Cint0 Cint1 floorC0 Crat0 Crat1.
-Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0.
+Hint Resolve Creal0 Creal1 Cnat_nat Cnat0 Cnat1 Cint0 Cint1 floorC0 Crat0 Crat1 : core.
+Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.

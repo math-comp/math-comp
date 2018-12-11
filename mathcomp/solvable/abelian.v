@@ -249,7 +249,7 @@ Proof. by apply/dvdn_biglcmP=> x Gx; apply: order_dvdG. Qed.
 
 Lemma exponent_gt0 G : 0 < exponent G.
 Proof. exact: dvdn_gt0 (exponent_dvdn G). Qed.
-Hint Resolve exponent_gt0.
+Hint Resolve exponent_gt0 : core.
 
 Lemma pnat_exponent pi G : pi.-nat (exponent G) = pi.-group G.
 Proof.

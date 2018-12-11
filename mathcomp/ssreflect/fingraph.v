@@ -216,7 +216,7 @@ Definition closure_mem m_a : pred T :=
 
 End Connect.
 
-Hint Resolve connect0.
+Hint Resolve connect0 : core.
 
 Notation n_comp e a := (n_comp_mem e (mem a)).
 Notation closed e a := (closed_mem e (mem a)).

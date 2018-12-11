@@ -327,7 +327,7 @@ Proof. by case/dvdnP=> n' ->; rewrite /dvdn mulnA modnMl. Qed.
 
 Lemma dvdn_mulr d m n : d %| m -> d %| m * n.
 Proof. by move=> d_m; rewrite mulnC dvdn_mull. Qed.
-Hint Resolve dvdn0 dvd1n dvdnn dvdn_mull dvdn_mulr.
+Hint Resolve dvdn0 dvd1n dvdnn dvdn_mull dvdn_mulr : core.
 
 Lemma dvdn_mul d1 d2 m1 m2 : d1 %| m1 -> d2 %| m2 -> d1 * d2 %| m1 * m2.
 Proof.
@@ -462,7 +462,7 @@ case: m => //= m; elim: n => //= n IHn; rewrite ltnS leq_eqVlt.
 by case/predU1P=> [-> | /IHn]; [apply: dvdn_mulr | apply: dvdn_mull].
 Qed.
 
-Hint Resolve dvdn_add dvdn_sub dvdn_exp.
+Hint Resolve dvdn_add dvdn_sub dvdn_exp : core.
 
 Lemma eqn_mod_dvd d m n : n <= m -> (m == n %[mod d]) = (d %| m - n).
 Proof.

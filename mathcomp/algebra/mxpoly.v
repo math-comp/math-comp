@@ -899,7 +899,7 @@ apply: integral_horner_root mon_p pu0 intRp _.
 by apply/integral_poly => i; rewrite coefX; apply: integral_nat.
 Qed.
 
-Hint Resolve (integral0 RtoK) (integral1 RtoK) (@monicXsubC K).
+Hint Resolve (integral0 RtoK) (integral1 RtoK) (@monicXsubC K) : core.
 
 Let XsubC0 (u : K) : root ('X - u%:P) u. Proof. by rewrite root_XsubC. Qed.
 Let intR_XsubC u :
