@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/math-comp/math-comp.svg?branch=master)](https://travis-ci.org/math-comp/math-comp)
+[![Join the chat at https://gitter.im/math-comp/](https://badges.gitter.im/math-comp.svg)](https://gitter.im/math-comp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # The Mathematical Components repository
 
