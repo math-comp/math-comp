@@ -714,7 +714,7 @@ rewrite mul1n; apply/dvdn_biggcdP/(all_nthP 0)=> a_dv_p i ltip /=.
 exact: a_dv_p.
 Qed.
 
-Lemma map_poly_divzK a p :
+Lemma map_poly_divzK {a} p :
   p \is a polyOver (dvdz a) -> a *: map_poly (divz^~ a) p = p.
 Proof.
 move/polyOverP=> a_dv_p; apply/polyP=> i.

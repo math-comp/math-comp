@@ -1634,6 +1634,9 @@ End FundamentalTheoremOfGaloisTheory.
 
 End GaloisTheory.
 
+Prenex Implicits gal_repr gal gal_reprK.
+Arguments gal_repr_inj {F L V} [x1 x2].
+
 Notation "''Gal' ( V / U )" := (galoisG V U) : group_scope.
 Notation "''Gal' ( V / U )" := (galoisG_group V U) : Group_scope.
 

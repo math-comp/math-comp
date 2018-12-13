@@ -1468,7 +1468,7 @@ Proof.
 move/subfx_irreducibleP: irr_p => /=/(_ nz_p) min_p; set d := (size p).-1.
 have Dd: d.+1 = size p by rewrite polySpred.
 pose Fz2v x : 'rV_d := poly_rV (sval (sig_eqW (subfxE x)) %% p).
-pose vFz : 'rV_d -> subFExtend := subfx_eval \o @rVpoly F d.
+pose vFz : 'rV_d -> subFExtend := subfx_eval \o rVpoly.
 have FLinj: injective subfx_inj by apply: fmorph_inj.
 have Fz2vK: cancel Fz2v vFz.
   move=> x; rewrite /vFz /Fz2v; case: (sig_eqW _) => /= q ->.
@@ -1479,7 +1479,7 @@ suffices vFzK: cancel vFz Fz2v.
 apply: inj_can_sym Fz2vK _ => v1 v2 /(congr1 subfx_inj)/eqP.
 rewrite -subr_eq0 -!raddfB /= subfx_inj_eval // => /min_p/implyP.
 rewrite leqNgt implybNN -Dd ltnS size_poly linearB subr_eq0 /=.
-by move/eqP/(can_inj (@rVpolyK _ _)).
+by move/eqP/(can_inj rVpolyK).
 Qed.
 
 Definition SubfxVectMixin := VectMixin min_subfx_vectAxiom.
@@ -1559,7 +1559,7 @@ pose ucrL := [comUnitRingType of ComRingType urL mulC].
 have mul0 := GRing.Field.IdomainMixin unitE.
 pose fL := FieldType (IdomainType ucrL mul0) unitE.
 exists [fieldExtType F of faL for fL]; first by rewrite dimvf; apply: mul1n.
-exists [linear of toPF as @rVpoly _ _].
+exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
 have toLlin: linear toL.
   by move=> a q1 q2; rewrite -linearP -modp_scalel -modp_add.
@@ -1592,13 +1592,13 @@ have mul1: left_id L1 mul.
   move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS.
   by rewrite size_poly.
 have mulD: left_distributive mul +%R.
-  move=> x y z; apply: canLR (@rVpolyK _ _) _.
+  move=> x y z; apply: canLR rVpolyK _.
   by rewrite !raddfD mulrDl /= !toL_K /toL modp_add.
-have nzL1: L1 != 0 by rewrite -(can_eq (@rVpolyK _ _)) L1K raddf0 oner_eq0.
+have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0.
 pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
 pose rL := ComRingType (RingType vL mulM) mulC.
 have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: canRL (@rVpolyK _ _) _; rewrite !linearZ /= toL_K.
+  move=> a x y; apply: canRL rVpolyK _; rewrite !linearZ /= toL_K.
   by rewrite -scalerAl modp_scalel.
 have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
@@ -1607,7 +1607,7 @@ pose uaL := [unitAlgType F of AlgType F urL mulZr].
 pose faL := [FalgType F of uaL].
 have unitE: GRing.Field.mixin_of urL.
   move=> x nz_x; apply/unitrP; set q := rVpoly x.
-  have nz_q: q != 0 by rewrite -(can_eq (@rVpolyK _ _)) raddf0 in nz_x.
+  have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
     have /contraR := irr_p _ _ (dvdp_gcdl p q); apply.
     have: size (gcdp p q) <= size q by apply: leq_gcdpr.
@@ -1627,11 +1627,10 @@ have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
   rewrite linearZ /= L1K alg_polyC modp_add; congr (_ + _); last first.
     by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW.
   by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul.
-exists z; first by rewrite /root -(can_eq (@rVpolyK _ _)) q_z modpp linear0.
+exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0.
 apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP.
 exists (map_poly iota (rVpoly x)).
   by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v.
-apply: (can_inj (@rVpolyK _ _)).
-by rewrite q_z modp_small // -Dn ltnS size_poly.
+by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly.
 Qed.
 *)

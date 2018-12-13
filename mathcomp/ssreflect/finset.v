@@ -2206,6 +2206,7 @@ Qed.
 
 End MaxSetMinSet.
 
+Arguments setCK {T}.
 Arguments minsetP {T P A}.
 Arguments maxsetP {T P A}.
 Prenex Implicits minset maxset.

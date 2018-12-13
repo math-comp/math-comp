@@ -755,6 +755,8 @@ End SubGroup.
 
 End AbelemRepr.
 
+Arguments rVabelem_inj {p%N gT E%G} abelE ntE [v1%R v2%R] : rename.
+
 Section ModularRepresentation.
 
 Variables (F : fieldType) (p : nat) (gT : finGroupType).

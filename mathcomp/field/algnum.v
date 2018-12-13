@@ -56,7 +56,7 @@ Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
-Local Hint Resolve (@intr_inj _ : injective ZtoC) : core.
+Local Hint Resolve (intr_inj : injective ZtoC) : core.
 Local Notation QtoCm := [rmorphism of QtoC].
 
 (* Number fields and rational spans. *)
@@ -417,7 +417,7 @@ have ext1 mu0 x: {mu1 | exists y, x = Sinj mu1 y
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.
   have splitQr: splittingFieldFor K pr fullv.
     apply: splittingFieldForS (sub1v (Sub K algK)) (subvf _) _; exists rr => //.
-    congr (_ %= _): (eqpxx pr); apply: (@map_poly_inj _ _ QrC).
+    congr (_ %= _): (eqpxx pr); apply/(map_poly_inj QrC).
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod; apply: eq_bigr => zz _.
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.

@@ -125,10 +125,8 @@ Proof. by rewrite [@fun_of_perm]unlock. Qed.
 Lemma permE f f_inj : @perm T f f_inj =1 f.
 Proof. by move=> x; rewrite -pvalE [@perm]unlock ffunE. Qed.
 
-Lemma perm_inj s : injective s.
+Lemma perm_inj {s} : injective s.
 Proof. by rewrite -!pvalE; apply: (injectiveP _ (valP s)). Qed.
-
-Arguments perm_inj : clear implicits.
 Hint Resolve perm_inj : core.
 
 Lemma perm_onto s : codom s =i predT.
@@ -141,7 +139,7 @@ Proof. by move=> x /=; rewrite f_iinv. Qed.
 
 Definition perm_inv s := perm (can_inj (perm_invK s)).
 
-Definition perm_mul s t := perm (inj_comp (perm_inj t) (perm_inj s)).
+Definition perm_mul s t := perm (inj_comp (@perm_inj t) (@perm_inj s)).
 
 Lemma perm_oneP : left_id perm_one perm_mul.
 Proof. by move=> s; apply/permP => x; rewrite permE /= permE. Qed.
@@ -191,7 +189,7 @@ Definition perm_on S : pred {perm T} := fun s => [pred x | s x != x] \subset S.
 Lemma perm_closed S s x : perm_on S s -> (s x \in S) = (x \in S).
 Proof.
 move/subsetP=> s_on_S; have [-> // | nfix_s_x] := eqVneq (s x) x.
-by rewrite !s_on_S // inE /= ?(inj_eq (perm_inj s)).
+by rewrite !s_on_S // inE /= ?(inj_eq perm_inj).
 Qed.
 
 Lemma perm_on1 H : perm_on H 1.
@@ -282,7 +280,11 @@ Qed.
 
 End Theory.
 
-Prenex Implicits tperm.
+Prenex Implicits tperm permK permKV tpermK.
+Arguments perm_inj {T s} [x1 x2] eq_sx12.
+
+(* Shorthand for using a permutation to reindex a bigop. *)
+Notation reindex_perm s := (reindex_inj (@perm_inj _ s)).
 
 Lemma inj_tperm (T T' : finType) (f : T -> T') x y z :
   injective f -> f (tperm x y z) = tperm (f x) (f y) (f z).
@@ -291,8 +293,7 @@ Proof. by move=> injf; rewrite !permE /= !(inj_eq injf) !(fun_if f). Qed.
 Lemma tpermJ (T : finType) x y (s : {perm T}) :
   (tperm x y) ^ s = tperm (s x) (s y).
 Proof.
-apply/permP => z; rewrite -(permKV s z) permJ; apply: inj_tperm.
-exact: perm_inj.
+by apply/permP => z; rewrite -(permKV s z) permJ; apply/inj_tperm/perm_inj.
 Qed.
 
 Lemma tuple_perm_eqP {T : eqType} {n} {s : seq T} {t : n.-tuple T} :
@@ -554,7 +555,7 @@ congr (_ (+) _); last first.
   elim: ts => [|t ts IHts] /=; first by rewrite big_nil lift_perm1 !odd_perm1.
   rewrite big_cons odd_mul_tperm -(lift_permM _ j) odd_permM {}IHts //.
   congr (_ (+) _); transitivity (tperm (lift j t.1) (lift j t.2)); last first.
-    by rewrite odd_tperm (inj_eq (@lift_inj _ _)).
+     by rewrite odd_tperm (inj_eq (pcan_inj (liftK j))).
   congr odd_perm; apply/permP=> k; case: (unliftP j k) => [k'|] ->.
     by rewrite lift_perm_lift inj_tperm //; apply: lift_inj.
   by rewrite lift_perm_id tpermD // eq_sym neq_lift.
@@ -575,6 +576,8 @@ by rewrite add1n eqSS eq_sym; case: eqP.
 Qed.
 
 End LiftPerm.
+
+Prenex Implicits lift_perm lift_permK.
 
 
 

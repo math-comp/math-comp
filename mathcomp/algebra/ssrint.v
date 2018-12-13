@@ -290,7 +290,7 @@ Lemma mulz_addl : left_distributive mulz (+%R).
 Proof.
 move=> x y z; elim: z=> [|n|n]; first by rewrite !(mul0z,mulzC).
   by rewrite !mulzS=> ->; rewrite !addrA [X in X + _]addrAC.
-rewrite !mulzN !mulzS -!opprD=> /(inv_inj (@opprK _))->.
+rewrite !mulzN !mulzS -!opprD=> /oppr_inj->.
 by rewrite !addrA [X in X + _]addrAC.
 Qed.
 
@@ -330,22 +330,21 @@ Lemma mulVz : {in unitz, left_inverse 1%R invz *%R}.
 Proof. by move=> n /pred2P[] ->. Qed.
 
 Lemma mulzn_eq1 m (n : nat) : (m * n == 1) = (m == 1) && (n == 1%N).
-Proof. by case: m=> m /=; [rewrite -PoszM [_==_]muln_eq1 | case: n]. Qed.
+Proof. by case: m => m /=; [rewrite -PoszM [_==_]muln_eq1 | case: n]. Qed.
 
 Lemma unitzPl m n : n * m = 1 -> m \is a unitz.
 Proof.
-case: m => m; move/eqP; rewrite qualifE.
-* by rewrite mulzn_eq1; case/andP=> _; move/eqP->.
-* by rewrite NegzE intS mulrN -mulNr mulzn_eq1; case/andP=> _.
+rewrite qualifE => /eqP.
+by case: m => m; rewrite ?NegzE ?mulrN -?mulNr mulzn_eq1 => /andP[_ /eqP->].
 Qed.
 
-Lemma  invz_out : {in [predC unitz], invz =1 id}.
+Lemma invz_out : {in [predC unitz], invz =1 id}.
 Proof. exact. Qed.
 
 Lemma idomain_axiomz m n : m * n = 0 -> (m == 0) || (n == 0).
 Proof.
-by case: m n => m [] n //=; move/eqP; rewrite ?(NegzE,mulrN,mulNr);
-  rewrite ?(inv_eq (@opprK _)) -PoszM [_==_]muln_eq0.
+by case: m n => m [] n //= /eqP;
+  rewrite ?(NegzE, mulrN, mulNr) ?oppr_eq0 -PoszM [_ == _]muln_eq0.
 Qed.
 
 Definition comMixin := ComUnitRingMixin mulVz unitzPl invz_out.

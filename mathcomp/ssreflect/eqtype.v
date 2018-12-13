@@ -514,7 +514,8 @@ Structure subType : Type := SubType {
   _ : forall x Px, val (@Sub x Px) = x
 }.
 
-Arguments Sub [s].
+(* Generic proof that the second property holds by conversion.                *)
+(* The vrefl_rect alias is used to flag generic proofs of the first property. *)
 Lemma vrefl : forall x, P x -> x = x. Proof. by []. Qed.
 Definition vrefl_rect := vrefl.
 
@@ -522,18 +523,21 @@ Definition clone_subType U v :=
   fun sT & sub_sort sT -> U =>
   fun c Urec cK (sT' := @SubType U v c Urec cK) & phant_id sT' sT => sT'.
 
+Section Theory.
+
 Variable sT : subType.
+
+Local Notation val := (@val sT).
+Local Notation Sub x Px := (@Sub sT x Px).
 
 Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
 
 Lemma SubP u : Sub_spec u.
-Proof. by case: sT Sub_spec SubSpec u => T' _ C rec /= _. Qed.
+Proof. by case: sT Sub_spec SubSpec u => /= U _ mkU rec _. Qed.
 
-Lemma SubK x Px : @val sT (Sub x Px) = x.
-Proof. by case: sT. Qed.
+Lemma SubK x Px : val (Sub x Px) = x. Proof. by case: sT. Qed.
 
-Definition insub x :=
-  if @idP (P x) is ReflectT Px then @Some sT (Sub x Px) else None.
+Definition insub x := if idP is ReflectT Px then Some (Sub x Px) else None.
 
 Definition insubd u0 x := odflt u0 (insub x).
 
@@ -561,49 +565,55 @@ Proof. by move/negPf/insubF. Qed.
 Lemma isSome_insub : ([eta insub] : pred T) =1 P.
 Proof. by apply: fsym => x; case: insubP => // /negPf. Qed.
 
-Lemma insubK : ocancel insub (@val _).
+Lemma insubK : ocancel insub val.
 Proof. by move=> x; case: insubP. Qed.
 
-Lemma valP (u : sT) : P (val u).
+Lemma valP u : P (val u).
 Proof. by case/SubP: u => x Px; rewrite SubK. Qed.
 
-Lemma valK : pcancel (@val _) insub.
+Lemma valK : pcancel val insub.
 Proof. by case/SubP=> x Px; rewrite SubK; apply: insubT. Qed.
 
-Lemma val_inj : injective (@val sT).
+Lemma val_inj : injective val.
 Proof. exact: pcan_inj valK. Qed.
 
-Lemma valKd u0 : cancel (@val _) (insubd u0).
+Lemma valKd u0 : cancel val (insubd u0).
 Proof. by move=> u; rewrite /insubd valK. Qed.
 
 Lemma val_insubd u0 x : val (insubd u0 x) = if P x then x else val u0.
 Proof. by rewrite /insubd; case: insubP => [u -> | /negPf->]. Qed.
 
-Lemma insubdK u0 : {in P, cancel (insubd u0) (@val _)}.
+Lemma insubdK u0 : {in P, cancel (insubd u0) val}.
 Proof. by move=> x Px; rewrite /= val_insubd [P x]Px. Qed.
 
-Definition insub_eq x :=
-  let Some_sub Px := Some (Sub x Px : sT) in
-  let None_sub _ := None in
-  (if P x as Px return P x = Px -> _ then Some_sub else None_sub) (erefl _).
+Let insub_eq_aux x isPx : P x = isPx -> option sT :=
+  if isPx as b return _ = b -> _ then fun Px => Some (Sub x Px) else fun=> None.
+Definition insub_eq x := insub_eq_aux (erefl (P x)).
 
 Lemma insub_eqE : insub_eq =1 insub.
 Proof.
-rewrite /insub_eq /insub => x; case: {2 3}_ / idP (erefl _) => // Px Px'.
-by congr (Some _); apply: val_inj; rewrite !SubK.
+rewrite /insub_eq => x; set b := P x; rewrite [in LHS]/b in (Db := erefl b) *.
+by case: b in Db *; [rewrite insubT | rewrite insubF].
 Qed.
+
+End Theory.
 
 End SubType.
 
-Arguments SubType [T P].
-Arguments Sub {T P s}.
-Arguments vrefl {T P}.
-Arguments vrefl_rect {T P}.
+Arguments SubType {T P} sub_sort val Sub rec SubK.
+Arguments val {T P sT} u : rename.
+Arguments Sub {T P sT} x Px : rename.
+Arguments vrefl {T P} x Px.
+Arguments vrefl_rect {T P} x Px.
 Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
-Arguments insub {T P sT}.
+Arguments insub {T P sT} x.
+Arguments insubd {T P sT} u0 x.
 Arguments insubT [T] P [sT x].
-Arguments val_inj {T P sT} [x1 x2].
-Prenex Implicits val insubd.
+Arguments val_inj {T P sT} [u1 u2] eq_u12 : rename.
+Arguments valK {T P sT} u : rename.
+Arguments valKd {T P sT} u0 u : rename.
+Arguments insubK {T P} sT x.
+Arguments insubdK {T P sT} u0 [x] Px.
 
 Local Notation inlined_sub_rect :=
   (fun K K_S u => let (x, Px) as u return K u := u in K_S x Px).
@@ -623,10 +633,6 @@ Notation "[ 'subType' 'for' v 'by' rec ]" := (SubType _ v _ rec vrefl)
 Notation "[ 'subType' 'of' U 'for' v ]" := (clone_subType U v id idfun)
  (at level 0, format "[ 'subType'  'of'  U  'for'  v ]") : form_scope.
 
-(*
-Notation "[ 'subType' 'for' v ]" := (clone_subType _ v id idfun)
- (at level 0, format "[ 'subType'  'for'  v ]") : form_scope.
-*)
 Notation "[ 'subType' 'of' U ]" := (clone_subType U _ id id)
  (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
 

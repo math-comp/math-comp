@@ -1457,18 +1457,18 @@ Hint Resolve ltr_opp2 : core.
 Definition lter_opp2 := (ler_opp2, ltr_opp2).
 
 Lemma ler_oppr x y : (x <= - y) = (y <= - x).
-Proof. by rewrite (monoRL (@opprK _) ler_opp2). Qed.
+Proof. by rewrite (monoRL opprK ler_opp2). Qed.
 
 Lemma ltr_oppr x y : (x < - y) = (y < - x).
-Proof. by rewrite (monoRL (@opprK _) (lerW_nmono _)). Qed.
+Proof. by rewrite (monoRL opprK (lerW_nmono _)). Qed.
 
 Definition lter_oppr := (ler_oppr, ltr_oppr).
 
 Lemma ler_oppl x y : (- x <= y) = (- y <= x).
-Proof. by rewrite (monoLR (@opprK _) ler_opp2). Qed.
+Proof. by rewrite (monoLR opprK ler_opp2). Qed.
 
 Lemma ltr_oppl x y : (- x < y) = (- y < x).
-Proof. by rewrite (monoLR (@opprK _) (lerW_nmono _)). Qed.
+Proof. by rewrite (monoLR opprK (lerW_nmono _)). Qed.
 
 Definition lter_oppl := (ler_oppl, ltr_oppl).
 
@@ -4797,11 +4797,16 @@ Qed.
 
 End ClosedFieldTheory.
 
-Notation "n .-root" := (@nthroot _ n) (at level 2, format "n .-root") : ring_scope.
+Notation "n .-root" := (@nthroot _ n)
+  (at level 2, format "n .-root") : ring_scope.
 Notation sqrtC := 2.-root.
 Notation "'i" := (@imaginaryC _) (at level 0) : ring_scope.
 Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
 Notation "'Im z" := (Im z) (at level 10, z at level 8) : ring_scope.
+
+Arguments conjCK {C} x.
+Arguments sqrCK {C} [x] le0x.
+Arguments sqrCK_P {C x}.
 
 End Theory.
 
