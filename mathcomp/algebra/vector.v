@@ -1355,6 +1355,8 @@ Proof. by elim/big_rec2: _ => [|i _ f _ <-]; rewrite lfunE. Qed.
 
 End LfunZmodType.
 
+Arguments fun_of_lfunK {R aT rT}.
+
 Section LfunVectType.
 
 Variables (R : comRingType) (aT rT : vectType R).
@@ -1603,6 +1605,7 @@ Arguments lfunPn {K aT rT f g}.
 Arguments lker0P {K aT rT f}.
 Arguments eqlfunP {K aT rT f g v}.
 Arguments eqlfun_inP {K aT rT V f g}.
+Arguments limg_lfunVK {K aT rT f} [x] f_x.
 
 Section FixedSpace.
 
@@ -1717,6 +1720,8 @@ by rewrite memv_ker addrC linearB /= subr_eq0 limg_lfunVK ?memv_img ?memvf.
 Qed.
 
 End LinearPreimage.
+
+Arguments lpreimK {K aT rT f} [W] fW.
 
 Section LfunAlgebra.
 (* This section is a bit of a place holder: the instances we build here can't *)
@@ -1944,7 +1949,7 @@ Canonical subvs_vectType := VectType K subvs_of subvs_vectMixin.
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.
 Arguments subvs_inj {K vT U} [x1 x2].
-Arguments vsprojK {K vT U} [x].
+Arguments vsprojK {K vT U} [x] Ux.
 
 Section MatrixVectType.
 

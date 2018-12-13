@@ -144,6 +144,8 @@ Definition QuotType_clone (Q : Type) qT cT
 
 End QuotientDef.
 
+Arguments repr_ofK {T qT}.
+
 (****************************)
 (* Protecting some symbols. *)
 (****************************)
@@ -195,7 +197,7 @@ Notation QuotType Q m := (@QuotTypePack _ Q m).
 Notation "[ 'quotType' 'of' Q ]" := (@QuotType_clone _ Q _ _ id)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
-Arguments repr {T qT}.
+Arguments repr {T qT} x.
 
 (************************)
 (* Exporting the theory *)
@@ -226,6 +228,8 @@ Lemma quotP P : (forall y : T, repr (\pi_qT y) = y -> P (\pi_qT y))
 Proof. by move=> Py x; rewrite -[x]reprK; apply: Py; rewrite reprK. Qed.
 
 End QuotTypeTheory.
+
+Arguments reprK {T qT} x.
 
 (*******************)
 (* About morphisms *)
@@ -657,6 +661,8 @@ Canonical EquivQuot.eqType.
 Canonical EquivQuot.choiceType.
 Canonical EquivQuot.eqQuotType.
 
+Arguments EquivQuot.ereprK {D C CD DC eD encD}.
+
 Notation "{eq_quot e }" :=
 (@EquivQuot.type_of _ _ _ _ _ _ (Phantom (rel _) e)) : quotient_scope.
 Notation "x == y %[mod_eq r ]" := (x == y %[mod {eq_quot r}]) : quotient_scope.
@@ -690,7 +696,7 @@ Variables (eD : equiv_rel D) (encD : encModRel CD DC eD).
 Notation eC := (encoded_equiv encD).
 
 Fact eq_quot_countMixin : Countable.mixin_of {eq_quot encD}.
-Proof. exact: CanCountMixin (@EquivQuot.ereprK _ _ _ _ _ _). Qed.
+Proof. exact: CanCountMixin EquivQuot.ereprK. Qed.
 Canonical eq_quot_countType := CountType {eq_quot encD} eq_quot_countMixin.
 
 End CountEncodingModuloRel.

@@ -243,6 +243,11 @@ Canonical FiniteModule.fmod_finZmodType.
 Canonical FiniteModule.fmod_baseFinGroupType.
 Canonical FiniteModule.fmod_finGroupType.
 
+Arguments FiniteModule.fmodK {gT A} abelA [x] Ax.
+Arguments FiniteModule.fmvalK {gT A abelA} x.
+Arguments FiniteModule.actrK {gT A abelA} x.
+Arguments FiniteModule.actrKV {gT A abelA} x.
+
 (* Still allow ring notations, but give priority to groups now. *)
 Import FiniteModule GroupScope.
 

@@ -142,8 +142,8 @@ Definition coefp_head h i (p : poly_of (Phant R)) := let: tt := h in p`_i.
 
 End Polynomial.
 
-(* We need to break off the section here to let the argument scope *)
-(* directives take effect.                                         *)
+(* We need to break off the section here to let the Bind Scope directives     *)
+(* take effect.                                                               *)
 Bind Scope ring_scope with poly_of.
 Bind Scope ring_scope with polynomial.
 Arguments polyseq {R} p%R.
@@ -1675,7 +1675,7 @@ Qed.
 
 End PolynomialTheory.
 
-Prenex Implicits polyC Poly lead_coef root horner polyOver.
+Prenex Implicits polyC polyCK Poly polyseqK lead_coef root horner polyOver.
 Arguments monic {R}.
 Notation "\poly_ ( i < n ) E" := (poly n (fun i => E)) : ring_scope.
 Notation "c %:P" := (polyC c) : ring_scope.
@@ -1694,6 +1694,7 @@ Arguments rootPf {R p x}.
 Arguments rootPt {R p x}.
 Arguments unity_rootP {R n z}.
 Arguments polyOverP {R S0 addS kS p}.
+Arguments polyC_inj {R} [x1 x2] eq_x12P.
 
 Canonical polynomial_countZmodType (R : countRingType) :=
   [countZmodType of polynomial R].
@@ -1947,7 +1948,7 @@ Definition comp_poly q p := p^:P.[q].
 Local Notation "p \Po q" := (comp_poly q p) : ring_scope.
 
 Lemma size_map_polyC p : size p^:P = size p.
-Proof. exact: size_map_inj_poly (@polyC_inj R) _ _. Qed.
+Proof. exact/(size_map_inj_poly polyC_inj). Qed.
 
 Lemma map_polyC_eq0 p : (p^:P == 0) = (p == 0).
 Proof. by rewrite -!size_poly_eq0 size_map_polyC. Qed.

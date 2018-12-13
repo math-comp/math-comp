@@ -577,7 +577,7 @@ Lemma conjg_inj : @left_injective T T T conjg.
 Proof. by move=> y; apply: can_inj (conjgK y). Qed.
 
 Lemma conjg_eq1 x y : (x ^ y == 1) = (x == 1).
-Proof. by rewrite -(inj_eq (@conjg_inj y) x) conj1g. Qed.
+Proof. by rewrite (canF_eq (conjgK _)) conj1g. Qed.
 
 Lemma conjg_prod I r (P : pred I) F z :
   (\prod_(i <- r | P i) F i) ^ z = \prod_(i <- r | P i) (F i ^ z).
@@ -1854,6 +1854,9 @@ Notation "[ 'subg' G ]" := [set: subg_of G]%G : Group_scope.
 
 Prenex Implicits subg sgval subg_of.
 Bind Scope group_scope with subg_of.
+Arguments subgK {gT G}.
+Arguments sgvalK {gT G}.
+Arguments subg_inj {gT G} [u1 u2] eq_u12 : rename.
 
 Arguments trivgP {gT G}.
 Arguments trivGP {gT G}.

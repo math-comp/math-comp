@@ -141,6 +141,9 @@ Proof. by case. Qed.
 
 End OtherEncodings.
 
+Prenex Implicits seq_of_opt tag_of_pair pair_of_tag opair_of_sum sum_of_opair.
+Prenex Implicits seq_of_optK tag_of_pairK pair_of_tagK opair_of_sumK.
+
 (* Generic variable-arity tree type, providing an encoding target for         *)
 (* miscellaneous user datatypes. The GenTree.tree type can be combined with   *)
 (* a sigT type to model multi-sorted concrete datatypes.                      *)
@@ -562,8 +565,8 @@ Export Countable.Exports.
 
 Definition unpickle T := Countable.unpickle (Countable.class T).
 Definition pickle T := Countable.pickle (Countable.class T).
-Arguments unpickle {T}.
-Prenex Implicits pickle.
+Arguments unpickle {T} n.
+Arguments pickle {T} x.
 
 Section CountableTheory.
 
@@ -608,6 +611,11 @@ End CountableTheory.
 Notation "[ 'countMixin' 'of' T 'by' <: ]" :=
     (sub_countMixin _ : Countable.mixin_of T)
   (at level 0, format "[ 'countMixin'  'of'  T  'by'  <: ]") : form_scope.
+
+Arguments pickle_inv {T} n.
+Arguments pickleK {T} x.
+Arguments pickleK_inv {T} x.
+Arguments pickle_invK {T} n : rename.
 
 Section SubCountType.
 

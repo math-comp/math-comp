@@ -279,7 +279,7 @@ Canonical eqType := EqType type eqMixin.
 Definition choiceMixin : Choice.mixin_of type := EquivQuot.choiceMixin _.
 Canonical choiceType := ChoiceType type choiceMixin.
 
-Definition countMixin : Countable.mixin_of type := CanCountMixin (@reprK _ _).
+Definition countMixin : Countable.mixin_of type := CanCountMixin reprK.
 Canonical countType := CountType type countMixin.
 
 Definition CtoL (u : type) := rootQtoL (repr u).
@@ -607,7 +607,8 @@ Local Notation intrp := (map_poly intr).
 Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
-Local Hint Resolve (@intr_inj _ : injective ZtoC) : core.
+
+Local Hint Resolve (intr_inj : injective ZtoC) : core.
 
 (* Specialization of a few basic ssrnum order lemmas. *)
 
@@ -882,7 +883,7 @@ Lemma CintE x : (x \in Cint) = (x \in Cnat) || (- x \in Cnat).
 Proof.
 apply/idP/idP=> [/CintP[[n | n] ->] | ]; first by rewrite Cnat_nat.
   by rewrite NegzE opprK Cnat_nat orbT.
-by case/pred2P=> [<- | /(canLR (@opprK _)) <-]; rewrite ?rpredN rpred_nat.
+by case/pred2P=> [<- | /(canLR opprK) <-]; rewrite ?rpredN rpred_nat.
 Qed.
 
 Lemma Cnat_norm_Cint x : x \in Cint -> `|x| \in Cnat.

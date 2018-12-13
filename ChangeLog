@@ -24,7 +24,20 @@
 	  from eqtype.v. They were already in ssrfun.v.
 
 	* Specialized `bool_irrelevance` so that the statement reflects
-	  the name
+	  the name.
+
+	* Changed the shape of the type of FieldMixin to allow one-line
+	  in-proof definition of bespoke fieldType structure.
+
+	* Refactored and extended Arguments directives to provide more
+	  comprehensive signature information.
+
+	* Added maximal implicits to reflection, injectivity and cancellation
+	  lemmas so that they are easier to pass to combinator lemmas such as
+	  sameP, inj_eq or canLR.
+
+	* Added reindex_inj s shorthand for reindexing a bigop with a
+	  permutation s.
 
 	* Added lemma `eqmxMunitP`: two matrices with the same shape
 	  represent the same subspace iff they differ only by a change of

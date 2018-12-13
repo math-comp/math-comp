@@ -147,6 +147,7 @@ End PlainTheory.
 Notation family F := (family_mem (fun_of_simpl (fmem F))).
 Notation ffun_on R := (ffun_on_mem _ (mem R)).
 
+Arguments ffunK {aT rT}.
 Arguments familyP {aT rT pT F f}.
 Arguments ffun_onP {aT rT R f}.
 

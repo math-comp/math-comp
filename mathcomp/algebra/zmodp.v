@@ -180,7 +180,8 @@ End ZpDef.
 
 Arguments Zp0 {p'}.
 Arguments Zp1 {p'}.
-Arguments inZp {p'}.
+Arguments inZp {p'} i.
+Arguments valZpK {p'} x.
 
 Lemma ord1 : all_equal_to (0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.
@@ -258,6 +259,8 @@ Notation "''Z_' p" := 'I_(Zp_trunc p).+2
   (at level 8, p at level 2, format "''Z_' p") : type_scope.
 Notation "''F_' p" := 'Z_(pdiv p)
   (at level 8, p at level 2, format "''F_' p") : type_scope.
+
+Arguments natr_Zp {p'} x.
 
 Section Groups.
 

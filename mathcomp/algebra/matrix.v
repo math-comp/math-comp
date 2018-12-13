@@ -916,9 +916,10 @@ Arguments row_mxA {R m n1 n2 n3 A1 A2 A3}.
 Arguments col_mxA {R m1 m2 m3 n A1 A2 A3}.
 Arguments block_mxA
   {R m1 m2 m3 n1 n2 n3 A11 A12 A13 A21 A22 A23 A31 A32 A33}.
-Prenex Implicits castmx trmx lsubmx rsubmx usubmx dsubmx row_mx col_mx.
+Prenex Implicits castmx trmx trmxK lsubmx rsubmx usubmx dsubmx row_mx col_mx.
 Prenex Implicits block_mx ulsubmx ursubmx dlsubmx drsubmx.
 Prenex Implicits mxvec vec_mx mxvec_indexP mxvecK vec_mxK.
+Arguments trmx_inj {R m n} [A1 A2] eqA12t : rename.
 
 Notation "A ^T" := (trmx A) : ring_scope.
 
@@ -1030,6 +1031,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
 End Block.
 
 End MapMatrix.
+
+Arguments map_mx {aT rT} f {m n} A.
 
 (*****************************************************************************)
 (********************* Matrix Zmodule (additive) structure *******************)
@@ -1180,9 +1183,7 @@ Qed.
 
 Lemma col_mx_eq0 (m1 m2 n : nat) (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)):
   (col_mx A1 A2 == 0) = (A1 == 0) && (A2 == 0).
-Proof.
-by rewrite -![_ == 0](inj_eq (@trmx_inj _ _ _)) !trmx0 tr_col_mx row_mx_eq0.
-Qed.
+Proof. by rewrite -![_ == 0](inj_eq trmx_inj) !trmx0 tr_col_mx row_mx_eq0. Qed.
 
 Lemma block_mx_eq0 m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2)) :
   (block_mx Aul Aur Adl Adr == 0) =
@@ -1332,29 +1333,29 @@ Proof. by rewrite {1}[u]matrix_sum_delta big_ord1. Qed.
 Lemma delta_mx_lshift m n1 n2 i j :
   delta_mx i (lshift n2 j) = row_mx (delta_mx i j) 0 :> 'M_(m, n1 + n2).
 Proof.
-apply/matrixP=> i' j'; rewrite !mxE -(can_eq (@splitK _ _)).
-by rewrite (unsplitK (inl _ _)); case: split => ?; rewrite mxE ?andbF.
+apply/matrixP=> i' j'; rewrite !mxE -(can_eq splitK) (unsplitK (inl _ _)).
+by case: split => ?; rewrite mxE ?andbF.
 Qed.
 
 Lemma delta_mx_rshift m n1 n2 i j :
   delta_mx i (rshift n1 j) = row_mx 0 (delta_mx i j) :> 'M_(m, n1 + n2).
 Proof.
-apply/matrixP=> i' j'; rewrite !mxE -(can_eq (@splitK _ _)).
-by rewrite (unsplitK (inr _ _)); case: split => ?; rewrite mxE ?andbF.
+apply/matrixP=> i' j'; rewrite !mxE -(can_eq splitK) (unsplitK (inr _ _)).
+by case: split => ?; rewrite mxE ?andbF.
 Qed.
 
 Lemma delta_mx_ushift m1 m2 n i j :
   delta_mx (lshift m2 i) j = col_mx (delta_mx i j) 0 :> 'M_(m1 + m2, n).
 Proof.
-apply/matrixP=> i' j'; rewrite !mxE -(can_eq (@splitK _ _)).
-by rewrite (unsplitK (inl _ _)); case: split => ?; rewrite mxE.
+apply/matrixP=> i' j'; rewrite !mxE -(can_eq splitK) (unsplitK (inl _ _)).
+by  case: split => ?; rewrite mxE.
 Qed.
 
 Lemma delta_mx_dshift m1 m2 n i j :
   delta_mx (rshift m1 i) j = col_mx 0 (delta_mx i j) :> 'M_(m1 + m2, n).
 Proof.
-apply/matrixP=> i' j'; rewrite !mxE -(can_eq (@splitK _ _)).
-by rewrite (unsplitK (inr _ _)); case: split => ?; rewrite mxE.
+apply/matrixP=> i' j'; rewrite !mxE -(can_eq splitK) (unsplitK (inr _ _)).
+by case: split => ?; rewrite mxE.
 Qed.
 
 Lemma vec_mx_delta m n i j :
@@ -1628,7 +1629,7 @@ Qed.
 Lemma mul_col_perm m n p s (A : 'M_(m, n)) (B : 'M_(n, p)) :
   col_perm s A *m B = A *m row_perm s^-1 B.
 Proof.
-apply/matrixP=> i k; rewrite !mxE (reindex_inj (@perm_inj _ s^-1)).
+apply/matrixP=> i k; rewrite !mxE (reindex_perm s^-1).
 by apply: eq_bigr => j _ /=; rewrite !mxE permKV.
 Qed.
 
@@ -2013,7 +2014,7 @@ Lemma lift0_mx_perm s : lift0_mx (perm_mx s) = perm_mx (lift0_perm s).
 Proof.
 apply/matrixP=> /= i j; rewrite !mxE split1 /=; case: unliftP => [i'|] -> /=.
   rewrite lift0_perm_lift !mxE split1 /=.
-  by case: unliftP => [j'|] ->; rewrite ?(inj_eq (@lift_inj _ _)) /= !mxE.
+  by case: unliftP => [j'|] ->; rewrite ?(inj_eq (lift_inj _)) /= !mxE.
 rewrite lift0_perm0 !mxE split1 /=.
 by case: unliftP => [j'|] ->; rewrite /= mxE.
 Qed.
@@ -2142,7 +2143,7 @@ Lemma map_copid_mx n r : (copid_mx r)^f = copid_mx r :> 'M_n.
 Proof. by rewrite map_mx_sub map_mx1 map_pid_mx. Qed.
 
 Lemma map_mx_is_multiplicative n' (n := n'.+1) :
-  multiplicative ((map_mx f) n n).
+  multiplicative (map_mx f : 'M_n -> 'M_n).
 Proof. by split; [apply: map_mxM | apply: map_mx1]. Qed.
 
 Canonical map_mx_rmorphism n' := AddRMorphism (map_mx_is_multiplicative n').
@@ -2291,14 +2292,14 @@ rewrite [\det A](bigID (@odd_perm _)) /=.
 apply: canLR (subrK _) _; rewrite add0r -sumrN.
 rewrite (reindex_inj (mulgI t)); apply: eq_big => //= s.
 rewrite oddMt => /negPf->; rewrite mulN1r mul1r; congr (- _).
-rewrite (reindex_inj (@perm_inj _ t)); apply: eq_bigr => /= i _.
+rewrite (reindex_perm t); apply: eq_bigr => /= i _.
 by rewrite permM tpermK /t; case: tpermP => // ->; rewrite eqA12.
 Qed.
 
 Lemma det_tr n (A : 'M[R]_n) : \det A^T = \det A.
 Proof.
-rewrite [\det A^T](reindex_inj (@invg_inj _)) /=.
-apply: eq_bigr => s _ /=; rewrite !odd_permV (reindex_inj (@perm_inj _ s)) /=.
+rewrite [\det A^T](reindex_inj invg_inj) /=.
+apply: eq_bigr => s _ /=; rewrite !odd_permV (reindex_perm s) /=.
 by congr (_ * _); apply: eq_bigr => i _; rewrite mxE permK.
 Qed.
 
@@ -2349,7 +2350,7 @@ rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [|f Uf].
   rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
   rewrite big_split /= mulrA mulrCA mulrA mulrCA mulrA.
   rewrite -signr_addb odd_permM !pvalE; congr (_ * _); symmetry.
-  by rewrite (reindex_inj (@perm_inj _ s)); apply: eq_bigr => i; rewrite permM.
+  by rewrite (reindex_perm s); apply: eq_bigr => i; rewrite permM.
 transitivity (\det (\matrix_(i, j) B (f i) j) * \prod_i A i (f i)).
   rewrite mulrC big_distrr /=; apply: eq_bigr => s _.
   rewrite mulrCA big_split //=; congr (_ * (_ * _)).
@@ -2382,7 +2383,7 @@ rewrite (reindex (lift_perm i0 j0)); last first.
   pose ulsf i (s : 'S_n.+1) k := odflt k (unlift (s i) (s (lift i k))).
   have ulsfK i (s : 'S_n.+1) k: lift (s i) (ulsf i s k) = s (lift i k).
     rewrite /ulsf; have:= neq_lift i k.
-    by rewrite -(inj_eq (@perm_inj _ s)) => /unlift_some[] ? ? ->.
+    by rewrite -(can_eq (permK s)) => /unlift_some[] ? ? ->.
   have inj_ulsf: injective (ulsf i0 _).
     move=> s; apply: can_inj (ulsf (s i0) s^-1%g) _ => k'.
     by rewrite {1}/ulsf ulsfK !permK liftK.
@@ -2497,8 +2498,8 @@ Proof. by rewrite -det_tr tr_block_mx trmx0 det_ublock !det_tr. Qed.
 
 End ComMatrix.
 
-Arguments lin_mul_row {R m n}.
-Arguments lin_mulmx {R m n p}.
+Arguments lin_mul_row {R m n} u.
+Arguments lin_mulmx {R m n p} A.
 
 Canonical matrix_finAlgType (R : finComRingType) n' :=
   [finAlgType R of 'M[R]_n'.+1].
@@ -2642,7 +2643,7 @@ Qed.
 
 End MatrixInv.
 
-Prenex Implicits unitmx invmx.
+Prenex Implicits unitmx invmx invmxK.
 
 Canonical matrix_countUnitRingType (R : countComUnitRingType) n :=
   [countUnitRingType of 'M[R]_n.+1].
@@ -2790,7 +2791,7 @@ Section MapFieldMatrix.
 Variables (aF : fieldType) (rF : comUnitRingType) (f : {rmorphism aF -> rF}).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 
-Lemma map_mx_inj m n : injective ((map_mx f) m n).
+Lemma map_mx_inj {m n} : injective (map_mx f : 'M_(m, n) -> 'M_(m, n)).
 Proof.
 move=> A B eq_AB; apply/matrixP=> i j.
 by move/matrixP/(_ i j): eq_AB; rewrite !mxE; apply: fmorph_inj.
@@ -2811,7 +2812,7 @@ Proof. exact: map_unitmx. Qed.
 
 Lemma map_invmx n (A : 'M_n) : (invmx A)^f = invmx A^f.
 Proof.
-rewrite /invmx map_unitmx (fun_if ((map_mx f) n n)).
+rewrite /invmx map_unitmx (fun_if (map_mx f)).
 by rewrite map_mxZ map_mx_adj det_map_mx fmorphV.
 Qed.
 
@@ -2819,9 +2820,11 @@ Lemma map_mx_inv n' (A : 'M_n'.+1) : A^-1^f = A^f^-1.
 Proof. exact: map_invmx. Qed.
   
 Lemma map_mx_eq0 m n (A : 'M_(m, n)) : (A^f == 0) = (A == 0).
-Proof. by rewrite -(inj_eq (@map_mx_inj m n)) raddf0. Qed.
+Proof. by rewrite -(inj_eq map_mx_inj) raddf0. Qed.
 
 End MapFieldMatrix.
+
+Arguments map_mx_inj {aF rF f m n} [A1 A2] eqA12f : rename.
 
 (*****************************************************************************)
 (****************************** LUP decomposion ******************************)

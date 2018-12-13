@@ -1485,7 +1485,7 @@ Proof. by rewrite mem_undup mem_pmap -valK map_f ?ssvalP. Qed.
 Lemma val_seq_sub_enum : uniq s -> map val seq_sub_enum = s.
 Proof.
 move=> Us; rewrite /seq_sub_enum undup_id ?pmap_sub_uniq //.
-rewrite (pmap_filter (@insubK _ _ _)); apply/all_filterP.
+rewrite (pmap_filter (insubK _)); apply/all_filterP.
 by apply/allP => x; rewrite isSome_insub.
 Qed.
 
@@ -1646,13 +1646,13 @@ Lemma rev_ord_proof n (i : 'I_n) : n - i.+1  < n.
 Proof. by case: n i => [|n] [i lt_i_n] //; rewrite ltnS subSS leq_subr. Qed.
 Definition rev_ord n i := Ordinal (@rev_ord_proof n i).
 
-Lemma rev_ordK n : involutive (@rev_ord n).
+Lemma rev_ordK {n} : involutive (@rev_ord n).
 Proof.
 by case: n => [|n] [i lti] //; apply: val_inj; rewrite /= !subSS subKn.
 Qed.
 
 Lemma rev_ord_inj {n} : injective (@rev_ord n).
-Proof. exact: inv_inj (@rev_ordK n). Qed.
+Proof. exact: inv_inj rev_ordK. Qed.
 
 (* bijection between any finType T and the Ordinal finType of its cardinal *)
 Section EnumRank.
@@ -1762,7 +1762,7 @@ End EnumRank.
 
 Arguments enum_val_inj {T A} [i1 i2] : rename.
 Arguments enum_rank_inj {T} [x1 x2].
-Prenex Implicits enum_val enum_rank.
+Prenex Implicits enum_val enum_rank enum_valK enum_rankK.
 
 Lemma enum_rank_ord n i : enum_rank i = cast_ord (esym (card_ord n)) i.
 Proof.
@@ -1800,8 +1800,8 @@ case: (ltngtP i h) => /= [-> | ltih | ->] //; last by rewrite ltnn.
 by rewrite subn1 /= leqNgt !(ltn_predK ltih, ltih, add1n).
 Qed.
 
-Lemma unbumpK h : {in predC1 h, cancel (unbump h) (bump h)}.
-Proof. by move=> i; move/negbTE=> neq_h_i; rewrite unbumpKcond neq_h_i. Qed.
+Lemma unbumpK {h} : {in predC1 h, cancel (unbump h) (bump h)}.
+Proof. by move=> i /negbTE-neq_h_i; rewrite unbumpKcond neq_h_i. Qed.
 
 Lemma bump_addl h i k : bump (k + h) (k + i) = k + bump h i.
 Proof. by rewrite /bump leq_add2l addnCA. Qed.
@@ -1882,15 +1882,11 @@ by case Dui: (unlift h i) / (unliftP h i) => [j Dh|//]; exists j.
 Qed.
 
 Lemma lift_inj n (h : 'I_n) : injective (lift h).
-Proof.
-move=> i1 i2; move/eqP; rewrite [_ == _](can_eq (@bumpK _)) => eq_i12.
-exact/eqP.
-Qed.
+Proof. by move=> i1 i2 [/(can_inj (bumpK h))/val_inj]. Qed.
+Arguments lift_inj {n h} [i1 i2] eq_i12h : rename.
 
 Lemma liftK n (h : 'I_n) : pcancel (lift h) (unlift h).
-Proof.
-by move=> i; case: (unlift_some (neq_lift h i)) => j; move/lift_inj->.
-Qed.
+Proof. by move=> i; case: (unlift_some (neq_lift h i)) => j /lift_inj->. Qed.
 
 (* Shifting and splitting indices, for cutting and pasting arrays *)
 
@@ -1906,7 +1902,7 @@ Definition rshift m n (i : 'I_n) := Ordinal (rshift_subproof m i).
 Lemma split_subproof m n (i : 'I_(m + n)) : i >= m -> i - m < n.
 Proof. by move/subSn <-; rewrite leq_subLR. Qed.
 
-Definition split m n (i : 'I_(m + n)) : 'I_m + 'I_n :=
+Definition split {m n} (i : 'I_(m + n)) : 'I_m + 'I_n :=
   match ltnP (i) m with
   | LtnNotGeq lt_i_m =>  inl _ (Ordinal lt_i_m)
   | GeqNotLtn ge_i_m =>  inr _ (Ordinal (split_subproof ge_i_m))
@@ -1922,16 +1918,16 @@ rewrite /split {-3}/leq.
 by case: (@ltnP i m) => cmp_i_m //=; constructor; rewrite ?subnKC.
 Qed.
 
-Definition unsplit m n (jk : 'I_m + 'I_n) :=
+Definition unsplit {m n} (jk : 'I_m + 'I_n) :=
   match jk with inl j => lshift n j | inr k => rshift m k end.
 
 Lemma ltn_unsplit m n (jk : 'I_m + 'I_n) : (unsplit jk < m) = jk.
 Proof. by case: jk => [j|k]; rewrite /= ?ltn_ord // ltnNge leq_addr. Qed.
 
-Lemma splitK m n : cancel (@split m n) (@unsplit m n).
+Lemma splitK {m n} : cancel (@split m n) unsplit.
 Proof. by move=> i; apply: val_inj; case: splitP. Qed.
 
-Lemma unsplitK m n : cancel (@unsplit m n) (@split m n).
+Lemma unsplitK {m n} : cancel (@unsplit m n) split.
 Proof.
 move=> jk; have:= ltn_unsplit jk.
 by do [case: splitP; case: jk => //= i j] => [|/addnI] => /ord_inj->.
@@ -1979,6 +1975,8 @@ Arguments ord0 {n'}.
 Arguments ord_max {n'}.
 Arguments inord {n'}.
 Arguments sub_ord {n'}.
+Arguments sub_ordK {n'}.
+Arguments inord_val {n'}.
 
 (* Product of two fintypes which is a fintype *)
 Section ProdFinType.

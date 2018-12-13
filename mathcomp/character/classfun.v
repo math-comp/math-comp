@@ -759,6 +759,7 @@ Arguments classfun_on {gT} B%g A%g.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 
 Arguments cfun_onP {gT G A phi}.
+Arguments cfConjCK {gT G} phi : rename.
 Hint Resolve cfun_onT : core.
 
 Section DotProduct.

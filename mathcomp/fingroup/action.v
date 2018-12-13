@@ -2703,6 +2703,7 @@ Canonical aut_groupAction := GroupAction autact_is_groupAction.
 
 End AutAct.
 
+Arguments autact {gT} G%g.
 Arguments aut_action {gT} G%g.
 Arguments aut_groupAction {gT} G%g.
 Notation "[ 'Aut' G ]" := (aut_action G) : action_scope.

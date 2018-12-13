@@ -873,6 +873,7 @@ Notation "f @*^-1 M" := (morphpre_group (MorPhantom f) M) : Group_scope.
 Notation "f @: D" := (morph_dom_group f D) : Group_scope.
 
 Arguments injmP {aT rT D f}.
+Arguments morphpreK {aT rT D f} [R] sRf.
 
 Section IdentityMorphism.
 
@@ -1491,10 +1492,10 @@ Canonical sgval_morphism := Morphism (@sgvalM _ G).
 Canonical subg_morphism := Morphism (@subgM _ G).
 
 Lemma injm_sgval : 'injm sgval.
-Proof. by apply/injmP; apply: in2W; apply: subg_inj. Qed.
+Proof. exact/injmP/(in2W subg_inj). Qed.
 
 Lemma injm_subg : 'injm (subg G).
-Proof. by apply/injmP; apply: can_in_inj (@subgK _ _). Qed.
+Proof. exact/injmP/(can_in_inj subgK). Qed.
 Hint Resolve injm_sgval injm_subg : core.
 
 Lemma ker_sgval : 'ker sgval = 1. Proof. exact/trivgP. Qed.
@@ -1536,4 +1537,7 @@ Lemma isog_subg : isog G [subg G].
 Proof. exact: isom_isog isom_subg. Qed.
 
 End SubMorphism.
+
+Arguments sgvalmK {gT G} A.
+Arguments subgmK {gT G} [A] sAG.
 

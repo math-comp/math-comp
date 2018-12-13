@@ -300,13 +300,13 @@ Lemma repr_mxM : {in G &, {morph rG : x y / (x * y)%g >-> x *m y}}.
 Proof. by case: rG => r []. Qed.
 
 Lemma repr_mxK m x :
-  x \in G ->  cancel ((@mulmx _ m n n)^~ (rG x)) (mulmx^~ (rG x^-1)).
+  x \in G ->  cancel ((@mulmx R m n n)^~ (rG x)) (mulmx^~ (rG x^-1)).
 Proof.
 by move=> Gx U; rewrite -mulmxA -repr_mxM ?groupV // mulgV repr_mx1 mulmx1.
 Qed.
 
 Lemma repr_mxKV m x :
-  x \in G -> cancel ((@mulmx _ m n n)^~ (rG x^-1)) (mulmx^~ (rG x)).
+  x \in G -> cancel ((@mulmx R m n n)^~ (rG x^-1)) (mulmx^~ (rG x)).
 Proof. by rewrite -groupV -{3}[x]invgK; apply: repr_mxK. Qed.
 
 Lemma repr_mx_unit x : x \in G -> rG x \in unitmx.
@@ -821,7 +821,11 @@ Arguments regular_repr R {gT} G%g.
 
 Arguments centgmxP {R gT G n rG f}.
 Arguments rkerP {R gT G n rG x}.
-Prenex Implicits gring_mxK.
+Arguments repr_mxK {R gT G%G n%N} rG {m%N} [x%g] Gx.
+Arguments repr_mxKV {R gT G%G n%N} rG {m%N} [x%g] Gx.
+Arguments gring_valK {gT G%G} i%R : rename.
+Arguments gring_indexK {gT G%G} x%g.
+Arguments gring_mxK {R gT G%G} v%R : rename.
 
 Section ChangeOfRing.
 
@@ -2377,7 +2381,16 @@ Arguments mxsimple_isoP {gT G n rG U V}.
 Arguments socleP {gT G n rG sG0 W W'}.
 Arguments mx_abs_irrP {gT G n rG}.
 
+Arguments val_submod {n U m} W.
+Arguments in_submod {n} U {m} W.
+Arguments val_submodK {n U m} W : rename.
+Arguments in_submodK {n U m} [W] sWU.
 Arguments val_submod_inj {n U m} [W1 W2] : rename.
+
+Arguments val_factmod {n U m} W.
+Arguments in_factmod {n} U {m} W.
+Arguments val_factmodK {n U m} W : rename.
+Arguments in_factmodK {n} U {m} [W] sWU.
 Arguments val_factmod_inj {n U m} [W1 W2] : rename.
 
 Section Proper.
@@ -3797,7 +3810,7 @@ rewrite !permM; case: (unliftP i_m i) => [j {simWUm}|] ->{i}; last first.
 apply: rsimT (rsimC _) {pUW}(rsimT (pUW j) _).
   by rewrite lift_max; apply: rsim_rcons.
 rewrite lift_perm_lift; case: (unliftP j_m (pU j)) => [k|] ->{j pU}.
-  rewrite tpermD ?(inj_eq (@lift_inj _ _)) ?neq_lift //.
+  rewrite tpermD ?(inj_eq lift_inj) ?neq_lift //.
   rewrite lift_perm_lift !lift_max; set j := lift j_m k.
   have ltjW: j < size W by have:= ltn_ord k; rewrite -(lift_max k) /= {1 3}szW.
   apply: rsimT (rsimT (pWV j) _); last by apply: rsim_rcons; rewrite -szV.
@@ -4671,16 +4684,28 @@ Arguments socleP {F gT G n rG sG0 W W'}.
 Arguments mx_abs_irrP {F gT G n rG}.
 Arguments socle_rsimP {F gT G n rG sG W1 W2}.
 
+Arguments val_submod {F n U m} W.
+Arguments in_submod {F n} U {m} W.
+Arguments val_submodK {F n U m} W : rename.
+Arguments in_submodK {F n U m} [W] sWU.
 Arguments val_submod_inj {F n U m} [W1 W2] : rename.
+
+Arguments val_factmod {F n U m} W.
+Arguments in_factmod {F n} U {m} W.
+Arguments val_factmodK {F n U m} W : rename.
+Arguments in_factmodK {F n} U {m} [W] sWU.
 Arguments val_factmod_inj {F n U m} [W1 W2] : rename.
 
 Notation "'Cl" := (Clifford_action _) : action_scope.
 
+Arguments gring_row {R gT G} A.
+Arguments gring_rowK {F gT G} [A] RG_A.
+
 Bind Scope irrType_scope with socle_sort.
 Notation "[ 1 sG ]" := (principal_comp sG) : irrType_scope.
 Arguments irr_degree {F gT G%G sG} i%irr.
-Arguments irr_repr [F gT G%G sG] i%irr _%g : extra scopes.
-Arguments irr_mode [F gT G%G sG] i%irr z%g : rename.
+Arguments irr_repr {F gT G%G sG} i%irr _%g : extra scopes.
+Arguments irr_mode {F gT G%G sG} i%irr z%g : rename.
 Notation "''n_' i" := (irr_degree i) : group_ring_scope.
 Notation "''R_' i" := (Wedderburn_subring i) : group_ring_scope.
 Notation "''e_' i" := (Wedderburn_id i) : group_ring_scope.
@@ -4973,7 +4998,7 @@ Proof.
 move=> splitG n rG irrG.
 have modU0: all ((mxmodule (regular_repr aF G)) #|G|) [::] by [].
 apply: (mx_Schreier modU0 _) => // [[U [compU lastU _]]]; have [modU _]:= compU.
-pose Uf := map ((map_mx f) _ _) U.
+pose Uf := map (map_mx f) U.
 have{lastU} lastUf: (last 0 Uf :=: 1%:M)%MS.
   by rewrite -(map_mx0 f) -(map_mx1 f) last_map; apply/map_eqmx.
 have modUf: mx_subseries (regular_repr rF G) Uf.
@@ -5062,7 +5087,7 @@ by rewrite /mxval [pval _]poly_rV_K ?horner_mx_C // size_polyC; case: (x != 0).
 Qed.
 
 Lemma mxval_inj : injective mxval.
-Proof. exact: inj_comp (@horner_rVpoly_inj _ _ A) val_inj. Qed.
+Proof. exact: inj_comp horner_rVpoly_inj val_inj. Qed.
 
 Lemma mxval0 : mxval 0 = 0.
 Proof. by rewrite /mxval [pval _]raddf0 rmorph0. Qed.
@@ -5557,6 +5582,11 @@ Proof. by rewrite /mx_faithful rker_gen. Qed.
 
 End GenField.
 
+Arguments in_gen {F gT G n' rG A} irrG cGA {m1} W.
+Arguments val_gen {F gT G n' rG A} irrG cGA {m1} W.
+Arguments in_genK {F gT G n' rG A} irrG cGA {m1} W : rename.
+Arguments val_genK {F gT G n' rG A} irrG cGA {m1} W : rename.
+
 Section DecideGenField.
 
 Import MatrixFormula.
@@ -5596,7 +5626,7 @@ Lemma eval_mulT e u v :
   eval_mx e (mulT u v) = val (inFA (eval_mx e u) * inFA (eval_mx e v)).
 Proof.
 rewrite !(eval_mulmx, eval_mxvec) !eval_mxT eval_mx_term.
-by apply: (can_inj (@rVpolyK _ _)); rewrite -mxvalM [rVpoly _]horner_rVpolyK.
+by apply: (can_inj rVpolyK); rewrite -mxvalM [rVpoly _]horner_rVpolyK.
 Qed.
 
 Fixpoint gen_term t := match t with

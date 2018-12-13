@@ -817,7 +817,9 @@ Qed.
 End IrrClass.
 
 Arguments cfReg {gT} B%g.
-Prenex Implicits cfIirr.
+Prenex Implicits cfIirr irrK.
+Arguments irrP {gT G xi}.
+Arguments irr_reprP {gT G xi}.
 Arguments irr_inj {gT G} [x1 x2].
 
 Section IsChar.
@@ -1334,6 +1336,8 @@ Qed.
 
 End OrthogonalityRelations.
 
+Prenex Implicits irr_class class_Iirr irr_classK.
+Arguments class_IirrK {gT G%G} [xG%g] GxG : rename.
 Arguments character_table {gT} G%g.
 
 Section InnerProduct.
@@ -1353,7 +1357,7 @@ Lemma irr_orthonormal : orthonormal (irr G).
 Proof.
 apply/orthonormalP; split; first exact: free_uniq (irr_free G).
 move=> _ _ /irrP[i ->] /irrP[j ->].
-by rewrite cfdot_irr (inj_eq (@irr_inj _ G)).
+by rewrite cfdot_irr (inj_eq irr_inj).
 Qed.
 
 Lemma coord_cfdot phi i : coord (irr G) i phi = '[phi, 'chi_i].
@@ -1436,7 +1440,7 @@ Qed.
 
 Lemma eq_signed_irr (s t : bool) i j :
   ((-1) ^+ s *: 'chi[G]_i == (-1) ^+ t *: 'chi_j) = (s == t) && (i == j).
-Proof. by rewrite eq_scaled_irr signr_eq0 (inj_eq (@signr_inj _)). Qed.
+Proof. by rewrite eq_scaled_irr signr_eq0 (inj_eq signr_inj). Qed.
 
 Lemma eq_scale_irr a (i j : Iirr G) :
   (a *: 'chi_i == a *: 'chi_j) = (a == 0) || (i == j).
@@ -2258,6 +2262,7 @@ Qed.
 End Aut.
 
 Arguments aut_Iirr_inj {gT G} u [i1 i2] : rename.
+Arguments conjC_IirrK {gT G} i : rename.
 
 Section Coset.
 

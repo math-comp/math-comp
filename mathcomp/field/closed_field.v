@@ -714,7 +714,7 @@ have EmulV: GRing.Field.axiom Einv.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
   by rewrite -uv1 opprD addNKr -mulNr; apply/memI; exists i; apply: dvdp_mull.
 pose Efield := FieldType _ (FieldMixin EmulV Einv0).
-pose Ecount := CountType Efield (CanCountMixin (@reprK _ _)).
+pose Ecount := CountType Efield (CanCountMixin reprK).
 pose FtoE := [rmorphism of PtoE \o polyC]; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
   by rewrite map_poly_comp horner_map [_.['X]]comp_polyXr.
@@ -783,7 +783,7 @@ have eqKtrans : transitive eqKrep.
   do [rewrite -toEtrans ?le_max // -maxnA => lez2m] in lez3m *.
   by rewrite (toEtrans (maxn (tag z2) (tag z3))) // eq_z23 -toEtrans.
 pose K := {eq_quot (EquivRel _  eqKrefl eqKsym eqKtrans)}%qT.
-have cntK : Countable.mixin_of K := CanCountMixin (@reprK _ _).
+have cntK : Countable.mixin_of K := CanCountMixin reprK.
 pose EtoKrep i (x : E i) : K := \pi%qT (Tagged E x).
 have [EtoK piEtoK]: {EtoK | forall i, EtoKrep i =1 EtoK i} by exists EtoKrep.
 pose FtoK := EtoK 0%N; rewrite {}/EtoKrep in piEtoK.
