@@ -43,6 +43,8 @@
 	  represent the same subspace iff they differ only by a change of
 	  basis.
 
+	* Corrected implicits and documentation of MatrixGenField.
+
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 
 	* Added compatibility with Coq 8.8 and lost compatibility with
