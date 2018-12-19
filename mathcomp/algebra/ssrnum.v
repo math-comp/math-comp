@@ -129,6 +129,15 @@ Require Import bigop ssralg finset fingroup zmodp poly.
 (*   e : exterior = in [1, +oo[ or ]1; +oo[                                   *)
 (*   w : non strict (weak) monotony                                           *)
 (*                                                                            *)
+(* [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject       *)
+(*                   to the condition P (i may appear in P and M), and        *)
+(*                   provided P holds for i0.                                 *)
+(* [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and       *)
+(*                   provided P holds for i0.                                 *)
+(* [arg minr_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.         *)
+(* [arg maxr_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.         *)
+(* [arg minr_(i < i0) M] == an i : T minimizing M, given i0 : T.              *)
+(* [arg maxr_(i > i0) M] == an i : T maximizing M, given i0 : T.              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -1272,172 +1281,265 @@ Implicit Types m n p : nat.
 Implicit Types x y z : R.
 Implicit Types u v w : R'.
 
+(****************************************************************************)
+(* This listing of "Let"s factor out the required premices for the          *)
+(* subsequent lemmas, putting them in the context so that "done" solves the *)
+(* goals quickly                                                            *)
+(****************************************************************************)
+
+Let leqnn := leqnn.
+Let ltnE := ltn_neqAle.
+Let ltrE := @ltr_neqAle R.
+Let ltr'E := @ltr_neqAle R'.
+Let gtnE (m n : nat) : (m > n)%N = (m != n) && (m >= n)%N.
+Proof. by rewrite ltn_neqAle eq_sym. Qed.
+Let gtrE (x y : R) : (x > y) = (x != y) && (x >= y).
+Proof. by rewrite ltr_neqAle eq_sym. Qed.
+Let gtr'E (x y : R') : (x > y) = (x != y) && (x >= y).
+Proof. by rewrite ltr_neqAle eq_sym. Qed.
+Let leq_anti : antisymmetric leq.
+Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
+Let geq_anti : antisymmetric geq.
+Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
+Let ler_antiR := @ler_anti R.
+Let ler_antiR' := @ler_anti R'.
+Let ger_antiR : antisymmetric (>=%R : rel R).
+Proof. by move=> ??; rewrite andbC; apply: ler_anti. Qed.
+Let ger_antiR' : antisymmetric (>=%R : rel R').
+Proof. by move=> ??; rewrite andbC; apply: ler_anti. Qed.
+Let leq_total := leq_total.
+Let geq_total : total geq.
+Proof. by move=> m n; apply: leq_total. Qed.
+
 Section AcrossTypes.
 
 Variable D D' : pred R.
 Variable (f : R -> R').
 
 Lemma ltrW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
-Proof. by move=> mf x y /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW]. Qed.
+Proof. exact: homoW. Qed.
 
 Lemma ltrW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y}.
-Proof. by move=> mf x y /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW]. Qed.
+Proof. exact: homoW. Qed.
 
-Lemma homo_inj_lt :
+Lemma inj_homo_ltr :
   injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y}.
-Proof.
-by move=> fI mf x y /= hxy; rewrite ltr_neqAle (inj_eq fI) mf (ltr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma nhomo_inj_lt :
+Lemma inj_nhomo_ltr :
   injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y}.
-Proof.
-by move=> fI mf x y /= hxy; rewrite ltr_neqAle (inj_eq fI) mf (gtr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma mono_inj : {mono f : x y / x <= y} -> injective f.
-Proof. by move=> mf x y /eqP; rewrite eqr_le !mf -eqr_le=> /eqP. Qed.
+Lemma incr_inj : {mono f : x y / x <= y} -> injective f.
+Proof. exact: mono_inj. Qed.
 
-Lemma nmono_inj : {mono f : x y /~ x <= y} -> injective f.
-Proof. by move=> mf x y /eqP; rewrite eqr_le !mf -eqr_le=> /eqP. Qed.
+Lemma decr_inj : {mono f : x y /~ x <= y} -> injective f.
+Proof. exact: mono_inj. Qed.
 
 Lemma lerW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
-Proof.
-by move=> mf x y /=; rewrite !ltr_neqAle mf inj_eq //; apply: mono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
 Lemma lerW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
-Proof.
-by move=> mf x y /=; rewrite !ltr_neqAle mf eq_sym inj_eq //; apply: nmono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
 (* Monotony in D D' *)
 Lemma ltrW_homo_in :
   {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}}.
-Proof.
-by move=> mf x y hx hy /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW] //; apply.
-Qed.
+Proof. exact: homoW_in. Qed.
 
 Lemma ltrW_nhomo_in :
   {in D & D', {homo f : x y /~ x < y}} -> {in D & D', {homo f : x y /~ x <= y}}.
-Proof.
-by move=> mf x y hx hy /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW] //; apply.
-Qed.
+Proof. exact: homoW_in. Qed.
 
-Lemma homo_inj_in_lt :
+Lemma inj_homo_ltr_in :
     {in D & D', injective f} ->  {in D & D', {homo f : x y / x <= y}} ->
   {in D & D', {homo f : x y / x < y}}.
-Proof.
-move=> fI mf x y hx hy /= hxy; rewrite ltr_neqAle; apply/andP; split.
-  by apply: contraTN hxy => /eqP /fI -> //; rewrite ltrr.
-by rewrite mf // (ltr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo_in. Qed.
 
-Lemma nhomo_inj_in_lt :
+Lemma inj_nhomo_ltr_in :
     {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
   {in D & D', {homo f : x y /~ x < y}}.
-Proof.
-move=> fI mf x y hx hy /= hxy; rewrite ltr_neqAle; apply/andP; split.
-  by apply: contraTN hxy => /eqP /fI -> //; rewrite ltrr.
-by rewrite mf // (gtr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo_in. Qed.
 
-Lemma mono_inj_in : {in D &, {mono f : x y / x <= y}} -> {in D &, injective f}.
-Proof.
-by move=> mf x y hx hy /= /eqP; rewrite eqr_le !mf // -eqr_le => /eqP.
-Qed.
+Lemma incr_inj_in : {in D &, {mono f : x y / x <= y}} ->
+   {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
 
-Lemma nmono_inj_in :
+Lemma decr_inj_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
-Proof.
-by move=> mf x y hx hy /= /eqP; rewrite eqr_le !mf // -eqr_le => /eqP.
-Qed.
+Proof. exact: mono_inj_in. Qed.
 
 Lemma lerW_mono_in :
   {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
-Proof.
-move=> mf x y hx hy /=; rewrite !ltr_neqAle mf // (@inj_in_eq _ _ D) //.
-exact: mono_inj_in.
-Qed.
+Proof. exact: anti_mono_in. Qed.
 
 Lemma lerW_nmono_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
-Proof.
-move=> mf x y hx hy /=; rewrite !ltr_neqAle mf // eq_sym (@inj_in_eq _ _ D) //.
-exact: nmono_inj_in.
-Qed.
+Proof. exact: anti_mono_in. Qed.
 
 End AcrossTypes.
 
 Section NatToR.
 
+Variable D D' : pred nat.
 Variable (f : nat -> R).
 
-Lemma ltn_ltrW_homo :
-    {homo f : m n / (m < n)%N >-> m < n} ->
+Lemma ltnrW_homo : {homo f : m n / (m < n)%N >-> m < n} ->
   {homo f : m n / (m <= n)%N >-> m <= n}.
-Proof. by move=> mf m n /=; rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW //]. Qed.
+Proof. exact: homoW. Qed.
 
-Lemma ltn_ltrW_nhomo :
-    {homo f : m n / (n < m)%N >-> m < n} ->
+Lemma ltnrW_nhomo : {homo f : m n / (n < m)%N >-> m < n} ->
   {homo f : m n / (n <= m)%N >-> m <= n}.
-Proof. by move=> mf m n /=; rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW//]. Qed.
+Proof. exact: homoW. Qed.
 
-Lemma homo_inj_ltn_lt :
-    injective f -> {homo f : m n / (m <= n)%N >-> m <= n} ->
+Lemma inj_homo_ltnr : injective f ->
+  {homo f : m n / (m <= n)%N >-> m <= n} ->
   {homo f : m n / (m < n)%N >-> m < n}.
-Proof.
-move=> fI mf m n /= hmn.
-by rewrite ltr_neqAle (inj_eq fI) mf ?neq_ltn ?hmn ?orbT // ltnW.
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma nhomo_inj_ltn_lt :
-    injective f -> {homo f : m n / (n <= m)%N >-> m <= n} ->
+Lemma inj_nhomo_ltnr : injective f ->
+  {homo f : m n / (n <= m)%N >-> m <= n} ->
   {homo f : m n / (n < m)%N >-> m < n}.
-Proof.
-move=> fI mf m n /= hmn; rewrite ltr_def (inj_eq fI).
-by rewrite mf ?neq_ltn ?hmn // ltnW.
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma leq_mono_inj : {mono f : m n / (m <= n)%N >-> m <= n} -> injective f.
-Proof. by move=> mf m n /eqP; rewrite eqr_le !mf -eqn_leq => /eqP. Qed.
+Lemma incnr_inj : {mono f : m n / (m <= n)%N >-> m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
 
-Lemma leq_nmono_inj : {mono f : m n / (n <= m)%N >-> m <= n} -> injective f.
-Proof. by move=> mf m n /eqP; rewrite eqr_le !mf -eqn_leq => /eqP. Qed.
+Lemma decnr_inj_inj : {mono f : m n / (n <= m)%N >-> m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
 
-Lemma leq_lerW_mono :
-    {mono f : m n / (m <= n)%N >-> m <= n} ->
+Lemma lenrW_mono : {mono f : m n / (m <= n)%N >-> m <= n} ->
   {mono f : m n / (m < n)%N >-> m < n}.
-Proof.
-move=> mf m n /=; rewrite !ltr_neqAle mf inj_eq ?ltn_neqAle 1?eq_sym //.
-exact: leq_mono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
-Lemma leq_lerW_nmono :
-    {mono f : m n / (n <= m)%N >-> m <= n} ->
+Lemma lenrW_nmono : {mono f : m n / (n <= m)%N >-> m <= n} ->
   {mono f : m n / (n < m)%N >-> m < n}.
-Proof.
-move=> mf x y /=; rewrite ltr_neqAle mf eq_sym inj_eq ?ltn_neqAle 1?eq_sym //.
-exact: leq_nmono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
-Lemma homo_leq_mono :
-    {homo f : m n / (m < n)%N >-> m < n} ->
+Lemma lenr_mono : {homo f : m n / (m < n)%N >-> m < n} ->
    {mono f : m n / (m <= n)%N >-> m <= n}.
-Proof.
-move=> mf m n /=; case: leqP; last by move=> /mf /ltr_geF.
-by rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW //]; rewrite lerr.
-Qed.
+Proof. exact: total_homo_mono. Qed.
 
-Lemma nhomo_leq_mono :
-    {homo f : m n / (n < m)%N >-> m < n} ->
+Lemma lenr_nmono : {homo f : m n / (n < m)%N >-> m < n} ->
   {mono f : m n / (n <= m)%N >-> m <= n}.
-Proof.
-move=> mf m n /=; case: leqP; last by move=> /mf /ltr_geF.
-by rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW //]; rewrite lerr.
-Qed.
+Proof. exact: total_homo_mono. Qed.
+
+Lemma ltnrW_homo_in : {in D & D', {homo f : m n / (m < n)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltnrW_nhomo_in : {in D & D', {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma inj_homo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (m < n)%N >-> m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma inj_nhomo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (n < m)%N >-> m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma incnr_inj_in : {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma decnr_inj_inj_in : {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma lenrW_mono_in : {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (m < n)%N >-> m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma lenrW_nmono_in : {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (n < m)%N >-> m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma lenr_mono_in : {in D &, {homo f : m n / (m < n)%N >-> m < n}} ->
+   {in D &, {mono f : m n / (m <= n)%N >-> m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
+
+Lemma lenr_nmono_in : {in D &, {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
 
 End NatToR.
+
+Section RToNat.
+
+Variable D D' : pred R.
+Variable (f : R -> nat).
+
+Lemma ltrnW_homo : {homo f : m n / m < n >-> (m < n)%N} ->
+  {homo f : m n / m <= n >-> (m <= n)%N}.
+Proof. exact: homoW. Qed.
+
+Lemma ltrnW_nhomo : {homo f : m n / n < m >-> (m < n)%N} ->
+  {homo f : m n / n <= m >-> (m <= n)%N}.
+Proof. exact: homoW. Qed.
+
+Lemma inj_homo_ltrn : injective f ->
+  {homo f : m n / m <= n >-> (m <= n)%N} ->
+  {homo f : m n / m < n >-> (m < n)%N}.
+Proof. exact: inj_homo. Qed.
+
+Lemma inj_nhomo_ltrn : injective f ->
+  {homo f : m n / n <= m >-> (m <= n)%N} ->
+  {homo f : m n / n < m >-> (m < n)%N}.
+Proof. exact: inj_homo. Qed.
+
+Lemma incrn_inj : {mono f : m n / m <= n >-> (m <= n)%N} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma decrn_inj : {mono f : m n / n <= m >-> (m <= n)%N} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma lernW_mono : {mono f : m n / m <= n >-> (m <= n)%N} ->
+  {mono f : m n / m < n >-> (m < n)%N}.
+Proof. exact: anti_mono. Qed.
+
+Lemma lernW_nmono : {mono f : m n / n <= m >-> (m <= n)%N} ->
+  {mono f : m n / n < m >-> (m < n)%N}.
+Proof. exact: anti_mono. Qed.
+
+Lemma ltrnW_homo_in : {in D & D', {homo f : m n / m < n >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltrnW_nhomo_in : {in D & D', {homo f : m n / n < m >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma inj_homo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / m < n >-> (m < n)%N}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma inj_nhomo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / n < m >-> (m < n)%N}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma incrn_inj_in : {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma decrn_inj_in : {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma lernW_mono_in : {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / m < n >-> (m < n)%N}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma lernW_nmono_in : {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / n < m >-> (m < n)%N}}.
+Proof. exact: anti_mono_in. Qed.
+
+End RToNat.
 
 End NumIntegralDomainMonotonyTheory.
 
@@ -1975,7 +2077,7 @@ Lemma ltr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x < y}.
 Proof. by move/ler_pmuln2r/lerW_mono. Qed.
 
 Lemma pmulrnI n : (0 < n)%N -> injective ((@GRing.natmul R)^~ n).
-Proof. by move/ler_pmuln2r/mono_inj. Qed.
+Proof. by move/ler_pmuln2r/incr_inj. Qed.
 
 Lemma eqr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x == y}.
 Proof. by move/pmulrnI/inj_eq. Qed.
@@ -2054,7 +2156,7 @@ Qed.
 
 Lemma ltr_pmuln2l x :
   0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> x_gt0; apply: leq_lerW_mono (ler_pmuln2l _). Qed.
+Proof. by move=> x_gt0; apply: lenrW_mono (ler_pmuln2l _). Qed.
 
 Lemma ler_nmuln2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
@@ -2064,7 +2166,7 @@ Qed.
 
 Lemma ltr_nmuln2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> x_lt0; apply: leq_lerW_nmono (ler_nmuln2l _). Qed.
+Proof. by move=> x_lt0; apply: lenrW_nmono (ler_nmuln2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
 Proof. by rewrite ler_pmuln2l. Qed.
@@ -2470,28 +2572,28 @@ Qed.
 Lemma ler_iexpn2l x :
   0 < x -> x < 1 -> {mono (GRing.exp x) : m n / (n <= m)%N >-> m <= n}.
 Proof.
-move=> xgt0 xlt1; apply: (nhomo_leq_mono (nhomo_inj_ltn_lt _ _)); last first.
+move=> xgt0 xlt1; apply: (lenr_nmono (inj_nhomo_ltnr _ _)); last first.
   by apply: ler_wiexpn2l; rewrite ltrW.
 by apply: ieexprIn; rewrite ?ltr_eqF ?ltr_cpable.
 Qed.
 
 Lemma ltr_iexpn2l x :
   0 < x -> x < 1 -> {mono (GRing.exp x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> xgt0 xlt1; apply: (leq_lerW_nmono (ler_iexpn2l _ _)). Qed.
+Proof. by move=> xgt0 xlt1; apply: (lenrW_nmono (ler_iexpn2l _ _)). Qed.
 
 Definition lter_iexpn2l := (ler_iexpn2l, ltr_iexpn2l).
 
 Lemma ler_eexpn2l x :
   1 < x -> {mono (GRing.exp x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
-move=> xgt1; apply: (homo_leq_mono (homo_inj_ltn_lt _ _)); last first.
+move=> xgt1; apply: (lenr_mono (inj_homo_ltnr _ _)); last first.
   by apply: ler_weexpn2l; rewrite ltrW.
 by apply: ieexprIn; rewrite ?gtr_eqF ?gtr_cpable //; apply: ltr_trans xgt1.
 Qed.
 
 Lemma ltr_eexpn2l x :
   1 < x -> {mono (GRing.exp x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> xgt1; apply: (leq_lerW_mono (ler_eexpn2l _)). Qed.
+Proof. by move=> xgt1; apply: (lenrW_mono (ler_eexpn2l _)). Qed.
 
 Definition lter_eexpn2l := (ler_eexpn2l, ltr_eexpn2l).
 
@@ -2535,7 +2637,7 @@ Qed.
 Definition lter_pexpn2r := (ler_pexpn2r, ltr_pexpn2r).
 
 Lemma pexpIrn n : (0 < n)%N -> {in nneg &, injective ((@GRing.exp R)^~ n)}.
-Proof. by move=> n_gt0; apply: mono_inj_in (ler_pexpn2r _). Qed.
+Proof. by move=> n_gt0; apply: incr_inj_in (ler_pexpn2r _). Qed.
 
 (* expr and ler/ltr *)
 Lemma expr_le1 n x : (0 < n)%N -> 0 <= x -> (x ^+ n <= 1) = (x <= 1).
@@ -2971,25 +3073,26 @@ Lemma mono_in_lerif (A : pred R) (f : R -> R) C :
    {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
 Proof.
-by move=> mf x y Ax Ay; rewrite /lerif mf ?(inj_in_eq (mono_inj_in mf)).
+by move=> mf x y Ax Ay; rewrite /lerif mf ?(inj_in_eq (incr_inj_in mf)).
 Qed.
 
 Lemma mono_lerif (f : R -> R) C :
     {mono f : x y / x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
-Proof. by move=> mf x y; rewrite /lerif mf (inj_eq (mono_inj _)). Qed.
+Proof. by move=> mf x y; rewrite /lerif mf (inj_eq (incr_inj _)). Qed.
 
 Lemma nmono_in_lerif (A : pred R) (f : R -> R) C :
     {in A &, {mono f : x y /~ x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
 Proof.
-by move=> mf x y Ax Ay; rewrite /lerif eq_sym mf ?(inj_in_eq (nmono_inj_in mf)).
+move=> mf x y Ax Ay; rewrite /lerif eq_sym mf //.
+by rewrite ?(inj_in_eq (decr_inj_in mf)).
 Qed.
 
 Lemma nmono_lerif (f : R -> R) C :
     {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
-Proof. by move=> mf x y; rewrite /lerif eq_sym mf ?(inj_eq (nmono_inj mf)). Qed.
+Proof. by move=> mf x y; rewrite /lerif eq_sym mf ?(inj_eq (decr_inj mf)). Qed.
 
 Lemma lerif_subLR x y z C : (x - y <= z ?= iff C) = (x <= z + y ?= iff C).
 Proof. by rewrite /lerif !eqr_le ler_subr_addr ler_subl_addr. Qed.
@@ -3158,7 +3261,7 @@ Arguments nmono_lerif [R f C].
 
 Section NumDomainMonotonyTheoryForReals.
 
-Variables (R R' : numDomainType) (D : pred R) (f : R -> R').
+Variables (R R' : numDomainType) (D : pred R) (f : R -> R') (f' : R -> nat).
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
 
 Lemma real_mono :
@@ -3177,7 +3280,6 @@ move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltrP xR yR.
 by rewrite ltrW_nhomo.
 Qed.
 
-(* GG: Domain should precede condition. *)
 Lemma real_mono_in :
     {in D &, {homo f : x y / x < y}} ->
   {in [pred x in D | x \is real] &, {mono f : x y / x <= y}}.
@@ -3194,6 +3296,38 @@ Proof.
 move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
 have [lt_xy|le_yx] := real_ltrP xR yR; last by rewrite (ltrW_nhomo_in Dmf).
 by rewrite ltr_geF ?Dmf.
+Qed.
+
+Lemma realn_mono : {homo f' : x y / x < y >-> (x < y)%N} ->
+  {in real &, {mono f' : x y / x <= y >-> (x <= y)%N}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy | le_yx] := real_lerP xR yR.
+  by rewrite ltrnW_homo.
+by rewrite ltn_geF ?mf.
+Qed.
+
+Lemma realn_nmono : {homo f' : x y / y < x >-> (x < y)%N} ->
+  {in real &, {mono f' : x y / y <= x >-> (x <= y)%N}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltrP xR yR.
+  by rewrite ltn_geF ?mf.
+by rewrite ltrnW_nhomo.
+Qed.
+
+Lemma realn_mono_in : {in D &, {homo f' : x y / x < y >-> (x < y)%N}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / x <= y >-> (x <= y)%N}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := real_lerP xR yR; first by rewrite (ltrnW_homo_in Dmf).
+by rewrite ltn_geF ?Dmf.
+Qed.
+
+Lemma realn_nmono_in : {in D &, {homo f' : x y / y < x >-> (x < y)%N}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / y <= x >-> (x <= y)%N}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := real_ltrP xR yR; last by rewrite (ltrnW_nhomo_in Dmf).
+by rewrite ltn_geF ?Dmf.
 Qed.
 
 End NumDomainMonotonyTheoryForReals.
@@ -3538,30 +3672,99 @@ Hint Resolve num_real : core.
 
 Section RealDomainMonotony.
 
-Variables (R : realDomainType) (R' : numDomainType) (D : pred R) (f : R -> R').
+Variables (R : realDomainType) (R' : numDomainType) (D : pred R).
+Variables (f : R -> R') (f' : R -> nat).
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
 
 Hint Resolve (@num_real R) : core.
 
-Lemma homo_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
+Lemma ler_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
 Proof. by move=> mf x y; apply: real_mono. Qed.
 
-Lemma nhomo_mono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
+Lemma ler_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
 Proof. by move=> mf x y; apply: real_nmono. Qed.
 
-Lemma homo_mono_in :
+Lemma ler_mono_in :
   {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
 Proof.
 by move=> mf x y Dx Dy; apply: (real_mono_in mf); rewrite ?inE ?Dx ?Dy /=.
 Qed.
 
-Lemma nhomo_mono_in :
+Lemma ler_nmono_in :
   {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
 Proof.
 by move=> mf x y Dx Dy; apply: (real_nmono_in mf); rewrite ?inE ?Dx ?Dy /=.
 Qed.
 
+Lemma lern_mono : {homo f' : m n / m < n >-> (m < n)%N} ->
+   {mono f' : m n / m <= n >-> (m <= n)%N}.
+Proof. by move=> mf x y; apply: realn_mono. Qed.
+
+Lemma lern_nmono : {homo f' : m n / n < m >-> (m < n)%N} ->
+  {mono f' : m n / n <= m >-> (m <= n)%N}.
+Proof. by move=> mf x y; apply: realn_nmono. Qed.
+
+Lemma lern_mono_in : {in D &, {homo f' : m n / m < n >-> (m < n)%N}} ->
+   {in D &, {mono f' : m n / m <= n >-> (m <= n)%N}}.
+Proof.
+by move=> mf x y Dx Dy; apply: (realn_mono_in mf); rewrite ?inE ?Dx ?Dy /=.
+Qed.
+
+Lemma lern_nmono_in : {in D &, {homo f' : m n / n < m >-> (m < n)%N}} ->
+  {in D &, {mono f' : m n / n <= m >-> (m <= n)%N}}.
+Proof.
+by move=> mf x y Dx Dy; apply: (realn_nmono_in mf); rewrite ?inE ?Dx ?Dy /=.
+Qed.
+
 End RealDomainMonotony.
+
+Section RealDomainArgExtremum.
+
+Context {R : realDomainType} {I : finType} (i0 : I).
+Context (P : pred I) (F : I -> R) (Pi0 : P i0).
+
+Definition arg_minr := extremum <=%R i0 P F.
+Definition arg_maxr := extremum >=%R i0 P F.
+
+Lemma arg_minrP: extremum_spec <=%R P F arg_minr.
+Proof. by apply: extremumP => //; [apply: ler_trans|apply: ler_total]. Qed.
+
+Lemma arg_maxrP: extremum_spec >=%R P F arg_maxr.
+Proof.
+apply: extremumP => //; first exact: lerr.
+  by move=> ??? /(ler_trans _) le /le.
+by move=> ??; apply: ler_total.
+Qed.
+
+End RealDomainArgExtremum.
+
+Notation "[ 'arg' 'minr_' ( i < i0 | P ) F ]" :=
+    (arg_minr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 'in' A ) F ]" :=
+    [arg minr_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 ) F ]" := [arg minr_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0 )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 | P ) F ]" :=
+     (arg_maxr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 'in' A ) F ]" :=
+    [arg maxr_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
 
 Section RealDomainOperations.
 
@@ -4107,7 +4310,7 @@ Qed.
 
 Lemma ler_psqrt : {in @pos R &, {mono sqrt : a b / a <= b}}.
 Proof.
-apply: homo_mono_in => x y x_gt0 y_gt0.
+apply: ler_mono_in => x y x_gt0 y_gt0.
 rewrite !ltr_neqAle => /andP[neq_xy le_xy].
 by rewrite ler_wsqrtr // eqr_sqrt ?ltrW // neq_xy.
 Qed.

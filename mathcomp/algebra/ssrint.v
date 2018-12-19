@@ -919,7 +919,7 @@ Proof. by rewrite -(mulr0z x) ler_nmulz2l. Qed.
 Lemma mulrIz x (hx : x != 0) : injective ( *~%R x).
 Proof.
 move=> y z; rewrite -![x *~ _]mulrzr => /(mulfI hx).
-by apply: mono_inj y z; apply: ler_pmulz2l.
+by apply: incr_inj y z; apply: ler_pmulz2l.
 Qed.
 
 Lemma ler_int m n : (m%:~R <= n%:~R :> R) = (m <= n).
@@ -1279,7 +1279,7 @@ Qed.
 Lemma ler_piexpz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in >= 0 &, {mono (exprz x) : x y /~ x <= y}}.
 Proof.
-apply: (nhomo_mono_in (nhomo_inj_in_lt _ _)).
+apply: (ler_nmono_in (inj_nhomo_ltr_in _ _)).
   by move=> n m hn hm /=; apply: ieexprIz; rewrite // ltr_eqF.
 by apply: ler_wpiexpz2l; rewrite ?ltrW.
 Qed.
@@ -1291,7 +1291,7 @@ Proof. exact: (lerW_nmono_in (ler_piexpz2l _ _)). Qed.
 Lemma ler_niexpz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in < 0 &, {mono (exprz x) : x y /~ x <= y}}.
 Proof.
-apply: (nhomo_mono_in (nhomo_inj_in_lt _ _)).
+apply: (ler_nmono_in (inj_nhomo_ltr_in _ _)).
   by move=> n m hn hm /=; apply: ieexprIz; rewrite // ltr_eqF.
 by apply: ler_wniexpz2l; rewrite ?ltrW.
 Qed.
@@ -1302,7 +1302,7 @@ Proof. exact: (lerW_nmono_in (ler_niexpz2l _ _)). Qed.
 
 Lemma ler_eexpz2l x (x1 : 1 < x) : {mono (exprz x) : x y / x <= y}.
 Proof.
-apply: (homo_mono (homo_inj_lt _ _)).
+apply: (ler_mono (inj_homo_ltr _ _)).
   by apply: ieexprIz; rewrite ?(ltr_trans ltr01) // gtr_eqF.
 by apply: ler_weexpz2l; rewrite ?ltrW.
 Qed.
@@ -1348,7 +1348,7 @@ Qed.
 Lemma ler_pexpz2r n (hn : 0 < n) :
   {in >= 0 & , {mono ((@exprz R)^~ n) : x y / x <= y}}.
 Proof.
-apply: homo_mono_in (homo_inj_in_lt _ _).
+apply: ler_mono_in (inj_homo_ltr_in _ _).
   by move=> x y hx hy /=; apply: pexpIrz; rewrite // gtr_eqF.
 by apply: ler_wpexpz2r; rewrite ltrW.
 Qed.
@@ -1360,7 +1360,7 @@ Proof. exact: lerW_mono_in (ler_pexpz2r _). Qed.
 Lemma ler_nexpz2r n (hn : n < 0) :
   {in > 0 & , {mono ((@exprz R)^~ n) : x y /~ x <= y}}.
 Proof.
-apply: nhomo_mono_in (nhomo_inj_in_lt _ _); last first.
+apply: ler_nmono_in (inj_nhomo_ltr_in _ _); last first.
   by apply: ler_wnexpz2r; rewrite ltrW.
 by move=> x y hx hy /=; apply: pexpIrz; rewrite ?[_ \in _]ltrW ?ltr_eqF.
 Qed.
