@@ -70,6 +70,28 @@ coq-8.8:
 coq-dev:
   extends: .opam-build
 
+# set var OPAM_SWITCH (if need be) and COQ_VERSION when using
+.make-build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    # This image will be built locally only (not pushed)
+    IMAGE: "mathcomp-dev:make_coq-${COQ_VERSION}"
+    OPAM_SWITCH: "edge"
+  before_script:
+  script:
+    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+  except:
+    - tags
+    - merge_requests
+
+make-coq-latest:
+  extends: .make-build
+  variables:
+    COQ_VERSION: "latest"
+  
 # set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
 .ci:
   stage: test
