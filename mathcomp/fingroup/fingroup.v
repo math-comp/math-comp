@@ -3013,23 +3013,25 @@ Hint Resolve normG normal_refl : core.
 Section MinMaxGroup.
 
 Variable gT : finGroupType.
+Implicit Types gP : pred {group gT}.
+
+Definition maxgroup A gP := maxset (fun A => group_set A && gP <<A>>%G) A.
+Definition mingroup A gP := minset (fun A => group_set A && gP <<A>>%G) A.
+
 Variable gP : pred {group gT}.
-Arguments gP _%G.
+Arguments gP G%G.
 
-Definition maxgroup := maxset (fun A => group_set A && gP <<A>>).
-Definition mingroup := minset (fun A => group_set A && gP <<A>>).
-
-Lemma ex_maxgroup : (exists G, gP G) -> {G : {group gT} | maxgroup G}.
+Lemma ex_maxgroup : (exists G, gP G) -> {G : {group gT} | maxgroup G gP}.
 Proof.
-move=> exP; have [A maxA]: {A | maxgroup A}.
+move=> exP; have [A maxA]: {A | maxgroup A gP}.
   apply: ex_maxset; case: exP => G gPG.
   by exists (G : {set gT}); rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (maxsetp maxA).
 Qed.
 
-Lemma ex_mingroup : (exists G, gP G) -> {G : {group gT} | mingroup G}.
+Lemma ex_mingroup : (exists G, gP G) -> {G : {group gT} | mingroup G gP}.
 Proof.
-move=> exP; have [A minA]: {A | mingroup A}.
+move=> exP; have [A minA]: {A | mingroup A gP}.
   apply: ex_minset; case: exP => G gPG.
   by exists (G : {set gT}); rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (minsetp minA).
@@ -3038,7 +3040,7 @@ Qed.
 Variable G : {group gT}.
 
 Lemma mingroupP :
-  reflect (gP G /\ forall H, gP H -> H \subset G -> H :=: G) (mingroup G).
+  reflect (gP G /\ forall H, gP H -> H \subset G -> H :=: G) (mingroup G gP).
 Proof.
 apply: (iffP minsetP); rewrite /= groupP genGidG /= => [] [-> minG].
   by split=> // H gPH sGH; apply: minG; rewrite // groupP genGidG.
@@ -3046,47 +3048,49 @@ by split=> // A; case/andP=> gA gPA; rewrite -(gen_set_id gA); apply: minG.
 Qed.
 
 Lemma maxgroupP :
-  reflect (gP G /\ forall H, gP H -> G \subset H -> H :=: G) (maxgroup G).
+  reflect (gP G /\ forall H, gP H -> G \subset H -> H :=: G) (maxgroup G gP).
 Proof.
 apply: (iffP maxsetP); rewrite /= groupP genGidG /= => [] [-> maxG].
   by split=> // H gPH sGH; apply: maxG; rewrite // groupP genGidG.
 by split=> // A; case/andP=> gA gPA; rewrite -(gen_set_id gA); apply: maxG.
 Qed.
 
-Lemma maxgroupp : maxgroup G -> gP G. Proof. by case/maxgroupP. Qed.
+Lemma maxgroupp : maxgroup G gP -> gP G. Proof. by case/maxgroupP. Qed.
 
-Lemma mingroupp : mingroup G -> gP G. Proof. by case/mingroupP. Qed.
+Lemma mingroupp : mingroup G gP -> gP G. Proof. by case/mingroupP. Qed.
 
 Hypothesis gPG : gP G.
 
-Lemma maxgroup_exists : {H : {group gT} | maxgroup H & G \subset H}.
+Lemma maxgroup_exists : {H : {group gT} | maxgroup H gP & G \subset H}.
 Proof.
-have [A maxA sGA]: {A | maxgroup A & G \subset A}.
+have [A maxA sGA]: {A | maxgroup A gP & G \subset A}.
   by apply: maxset_exists; rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (maxsetp maxA).
 Qed.
 
-Lemma mingroup_exists : {H : {group gT} | mingroup H & H \subset G}.
+Lemma mingroup_exists : {H : {group gT} | mingroup H gP & H \subset G}.
 Proof.
-have [A maxA sGA]: {A | mingroup A & A \subset G}.
+have [A maxA sGA]: {A | mingroup A gP & A \subset G}.
   by apply: minset_exists; rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (minsetp maxA).
 Qed.
 
 End MinMaxGroup.
 
+Arguments mingroup {gT} A%g gP.
+Arguments maxgroup {gT} A%g gP.
+Arguments mingroupP {gT gP G}.
+Arguments maxgroupP {gT gP G}.
+
 Notation "[ 'max' A 'of' G | gP ]" :=
-  (maxgroup (fun G : {group _} => gP) A) : group_scope.
+  (maxgroup A (fun G : {group _} => gP)) : group_scope.
 Notation "[ 'max' G | gP ]" := [max gval G of G | gP] : group_scope.
 Notation "[ 'max' A 'of' G | gP & gQ ]" :=
   [max A of G | gP && gQ] : group_scope.
 Notation "[ 'max' G | gP & gQ ]" := [max G | gP && gQ] : group_scope.
 Notation "[ 'min' A 'of' G | gP ]" :=
-  (mingroup (fun G : {group _} => gP) A) : group_scope.
+  (mingroup A (fun G : {group _} => gP)) : group_scope.
 Notation "[ 'min' G | gP ]" := [min gval G of G | gP] : group_scope.
 Notation "[ 'min' A 'of' G | gP & gQ ]" :=
   [min A of G | gP && gQ] : group_scope.
 Notation "[ 'min' G | gP & gQ ]" := [min G | gP && gQ] : group_scope.
-
-Arguments mingroupP {gT gP G}.
-Arguments maxgroupP {gT gP G}.
