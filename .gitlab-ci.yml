@@ -28,7 +28,7 @@ stages:
   - test
 
 # set var OPAM_SWITCH (if need be) when using
-.build:
+.opam-build:
   stage: build
   image: docker:latest
   services:
@@ -57,18 +57,18 @@ stages:
     - merge_requests
 
 coq-8.6:
-  extends: .build
+  extends: .opam-build
   variables:
     OPAM_SWITCH: "base"
 
 coq-8.7:
-  extends: .build
+  extends: .opam-build
 
 coq-8.8:
-  extends: .build
+  extends: .opam-build
 
 coq-dev:
-  extends: .build
+  extends: .opam-build
 
 # set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
 .ci:
