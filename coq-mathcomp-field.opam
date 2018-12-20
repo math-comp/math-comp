@@ -8,8 +8,8 @@ bug-reports: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 dev-repo: "https://github.com/math-comp/math-comp.git"
 license: "CeCILL-B"
 
-build: [ make "-j" "%{jobs}%" ]
-install: [ make "install" ]
+build: [ make "-C" "mathcomp/field" "-j" "%{jobs}%" ]
+install: [ make "-C" "mathcomp/field" "install" ]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/field'" ]
 depends: [ "coq-mathcomp-solvable" { = "dev" } ]
 
