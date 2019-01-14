@@ -1979,7 +1979,7 @@ Qed.
 Lemma equivalence_partition_pblock P D :
   partition P D -> equivalence_partition (fun x y => y \in pblock P x) D = P.
 Proof.
-case/and3P=> /eqP <-{D} tiP notP0; apply/setP=> B /=; set D := cover P.
+case/and3P=> /eqP {D}<- tiP notP0; apply/setP=> B /=; set D := cover P.
 have defP x: x \in D -> [set y in D | y \in pblock P x] = pblock P x.
   by move=> Dx; apply/setIidPr; rewrite (bigcup_max (pblock P x)) ?pblock_mem.
 apply/imsetP/idP=> [[x Px ->{B}] | PB]; first by rewrite defP ?pblock_mem.

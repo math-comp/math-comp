@@ -241,7 +241,7 @@ Qed.
 
 Lemma Phi_quotient_cyclic G : cyclic (G / 'Phi(G)) -> cyclic G.
 Proof.
-case/cyclicP=> /= Px; case: (cosetP Px) => x nPx ->{Px} defG.
+case/cyclicP=> /= Px; case: (cosetP Px) => x nPx {Px}-> defG.
 apply/cyclicP; exists x; symmetry; apply: Phi_nongen.
 rewrite -joing_idr norm_joinEr -?quotientK ?cycle_subG //.
 by rewrite /quotient morphim_cycle //= -defG quotientGK ?Phi_normal.

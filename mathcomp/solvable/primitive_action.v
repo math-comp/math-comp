@@ -269,7 +269,7 @@ Qed.
 Lemma ntransitive_primitive m :
   1 < m -> [transitive^m G, on S | to] -> [primitive G, on S | to].
 Proof.
-move=> lt1m /(ntransitive_weak lt1m) {m lt1m}tr2G.
+move=> lt1m /(ntransitive_weak lt1m) {m lt1m}-tr2G.
 have trG: [transitive G, on S | to] by apply: ntransitive1 tr2G.
 have [x Sx _]:= imsetP trG; rewrite (trans_prim_astab Sx trG).
 apply/maximal_eqP; split=> [|H]; first exact: subsetIl; rewrite subEproper.

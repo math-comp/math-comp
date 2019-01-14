@@ -554,7 +554,7 @@ have defMho: 'Mho^1(G) = <[x ^+ p]>.
   apply: subsetP (XYp z t Xz Yt); case/cycleP: Xz => i ->.
   by rewrite expgAC mul_subG ?sub1set ?mem_cycle //= -defZ cycle_subG groupX.
 split=> //; try exact: extend_cyclic_Mho.
-- rewrite sdprodE //; split=> // z; case/cycleP=> i ->{z} j.
+- rewrite sdprodE //; split=> // z; case/cycleP=> i {z}-> j.
   rewrite conjXg -expgM mulnC expgM actX; congr (_ ^+ i).
   elim: j {i} => //= j ->; rewrite conjXg xy -!expgM mulnS mulSn addSn.
   rewrite addnA -mulSn -addSn expgD mulnCA (mulnC j).
@@ -1096,7 +1096,7 @@ have isoMt: {in G :\: X, forall t, <<t ^: G>> \isog 'D_q}.
   have [_ <- nX2T _] := sdprodP (defMt t X't); rewrite norm_joinEr //.
   rewrite -/q -/r !xpair_eqE eqxx -expgM def2r -ox -{1}(oX' t X't).
   by rewrite !expg_order !eqxx /= invXX' ?mem_cycle.
-rewrite !isoMt //; split=> // C; case/cyclicP=> z ->{C} sCG iCG.
+rewrite !isoMt //; split=> // C; case/cyclicP=> z {C}-> sCG iCG.
 rewrite [X]defU // defU -?cycle_subG //.
 by apply: double_inj; rewrite -muln2 -iCG Lagrange // oG -mul2n.
 Qed.
@@ -1293,7 +1293,7 @@ have isoMt: {in G :\: X, forall z, <<z ^: G>> \isog 'Q_q}.
   rewrite defMt // -/q -/r !xpair_eqE -!expgM def2r -order_dvdn ox dvdnn.
   rewrite -expnS prednK; last by rewrite -subn2 subn_gt0.
   by rewrite X'2 // def_xr !eqxx /= invXX' ?mem_cycle.
-rewrite !isoMt //; split=> // C; case/cyclicP=> z ->{C} sCG iCG.
+rewrite !isoMt //; split=> // C; case/cyclicP=> z {C}-> sCG iCG.
 rewrite [X]defU // defU -?cycle_subG //.
 by apply: double_inj; rewrite -muln2 -iCG Lagrange // oG -mul2n.
 Qed.
@@ -1492,7 +1492,7 @@ have invX2X': {in G :\: X, forall t, x ^+ 2 ^ t == x ^- 2}.
 - apply/existsP; exists (x ^+ 2, x * y); rewrite /= defMt // !xpair_eqE.
   rewrite -!expgM def2r -order_dvdn ox xy2 dvdnn eqxx invX2X' //=.
   by rewrite andbT /r -(subnKC n_gt3).
-case/cyclicP=> z ->{C} sCG iCG; rewrite [X]defU // defU -?cycle_subG //.
+case/cyclicP=> z {C}-> sCG iCG; rewrite [X]defU // defU -?cycle_subG //.
 by apply: double_inj; rewrite -muln2 -iCG Lagrange // oG -mul2n.
 Qed.
 

@@ -2163,7 +2163,7 @@ have [_ <-] := cfBigdprodK nz_Phi1 Pi.
 rewrite Phi1_1 divr1 -/Phi Phi1 rmorph1.
 rewrite prod_cfunE // in Phi1_1; have := Cnat_prod_eq1 _ Phi1_1 Pi.
 rewrite -(cfRes1 (A i)) cfBigdprodiK // => ->; first by rewrite scale1r.
-by move=> {i Pi} j /Nphi Nphi_j; rewrite Cnat_char1 ?cfBigdprodi_char.
+by move=> {i Pi}-j /Nphi Nphi_j; rewrite Cnat_char1 ?cfBigdprodi_char.
 Qed.
 
 Lemma cfBigdprod_Res_lin chi :

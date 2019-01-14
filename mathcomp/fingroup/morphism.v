@@ -832,7 +832,7 @@ Proof. by move=> Dx; rewrite injm_subnorm ?morphim_set1 ?sub1set. Qed.
 Lemma injm_cent A : A \subset D -> f @* 'C(A) = 'C_(f @* D)(f @* A).
 Proof.
 move=> sAD; apply/eqP; rewrite -morphimIdom eqEsubset morphim_subcent.
-apply/subsetP=> fx; case/setIP; case/morphimP=> x Dx _ ->{fx} cAfx.
+apply/subsetP=> fx; case/setIP; case/morphimP=> x Dx _ {fx}-> cAfx.
 rewrite mem_morphim // inE Dx -sub1set centsC cent_set1 -injmSK //.
 by rewrite injm_cent1 // subsetI morphimS // -cent_set1 centsC sub1set.
 Qed.
@@ -1023,7 +1023,7 @@ Proof.
 apply/setP=> z; apply/morphimP/morphimP=> [[x]|[y Hy fAy ->{z}]].
   rewrite !inE => /andP[Gx Hfx]; exists (f x) => //.
   by apply/morphimP; exists x.
-by case/morphimP: fAy Hy => x Gx Ax ->{y} Hfx; exists x; rewrite ?inE ?Gx.
+by case/morphimP: fAy Hy => x Gx Ax {y}-> Hfx; exists x; rewrite ?inE ?Gx.
 Qed.
 
 Lemma morphpre_comp (C : {set rT}) : gof @*^-1 C = f @*^-1 (g @*^-1 C).
@@ -1304,7 +1304,7 @@ Proof. by case/(restrmP f)=> g [gf _ _ <- //]; rewrite -gf; case/isomP. Qed.
 Lemma sub_isom (A : {set aT}) (C : {set rT}) :
   A \subset G -> f @* A = C -> 'injm f -> isom A C f.
 Proof.
-move=> sAG; case: (restrmP f sAG) => g [_ _ _ img] <-{C} injf.
+move=> sAG; case: (restrmP f sAG) => g [_ _ _ img] {C}<- injf.
 rewrite /isom -morphimEsub ?morphimDG ?morphim1 //.
 by rewrite subDset setUC subsetU ?sAG.
 Qed.

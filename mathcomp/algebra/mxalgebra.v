@@ -2586,7 +2586,7 @@ have anhR i j A B : i != j -> A \in R_ i -> B \in R_ j -> A *m B = 0.
   by rewrite (mulsmx_subP idRiR) // (memmx_subP (sR_R j)).
 apply/eqmxP/andP; split.
   apply/memmx_subP=> Z; rewrite sub_capmx => /andP[].
-  rewrite -{1}defR => /memmx_sumsP[z ->{Z} Rz cRz].
+  rewrite -{1}defR => /memmx_sumsP[z {Z}-> Rz cRz].
   apply/memmx_sumsP; exists z => // i; rewrite sub_capmx Rz.
   apply/cent_mxP=> A RiA; have:= cent_mxP cRz A (memmx_subP (sR_R i) A RiA).
   rewrite (bigD1 i) //= mulmxDl mulmxDr mulmx_suml mulmx_sumr.

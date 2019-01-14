@@ -3313,7 +3313,7 @@ Lemma Clifford_componentJ M x :
 Proof.
 set simH := mxsimple rH; set cH := component_mx rH.
 have actG: {in G, forall y M, simH M -> cH M *m rG y <= cH (M *m rG y)}%MS.
-  move=> {M} y Gy /= M simM; have [I [U isoU def_cHM]] := component_mx_def simM.
+  move=> {M} - y Gy /= M simM; have [I [U isoU def_cHM]] := component_mx_def simM.
   rewrite /cH def_cHM sumsmxMr; apply/sumsmx_subP=> i _.
   by apply: mx_iso_component; [apply: Clifford_simple | apply: Clifford_iso2].
 move=> simM Gx; apply/eqmxP; rewrite actG // -/cH.
@@ -4239,7 +4239,7 @@ have [I [W isoW defW]]:= component_mx_def simSi.
 rewrite /'R_i /socle_val /= defW genmxE defE submxMr //.
 apply/sumsmx_subP=> j _.
 have simW := mx_iso_simple (isoW j) simSi; have [modW _ minW] := simW.
-have [{minW}dxWE | nzWE] := eqVneq (W j :&: M)%MS 0; last first.
+have [{minW}-dxWE | nzWE] := eqVneq (W j :&: M)%MS 0; last first.
   by rewrite (sameP capmx_idPl eqmxP) minW ?capmxSl ?capmx_module.
 have [_ Rei ideRi _] := Wedderburn_is_id i.
 have:= nzE; rewrite -submx0 => /memmx_subP[A E_A].

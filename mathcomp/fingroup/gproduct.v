@@ -1611,7 +1611,7 @@ Proof.
 move=> defG {C D} /dprodP[[C D -> ->] defL cCD trCD].
 case/dprodP: defG (defG) => {A B} [[A B -> ->] defG _ _] dG defC defD.
 case/isogP: defC defL cCD trCD => fA injfA <-{C}.
-case/isogP: defD => fB injfB <-{D} defL cCD trCD.
+case/isogP: defD => fB injfB {D}<- defL cCD trCD.
 apply/isogP; exists (dprodm_morphism dG cCD).
   by rewrite injm_dprodm injfA injfB trCD eqxx.
 by rewrite /= -{2}defG morphim_dprodm.

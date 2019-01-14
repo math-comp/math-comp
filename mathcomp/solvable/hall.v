@@ -131,7 +131,7 @@ have [xb]: exists2 xb, xb \in H / M & K1 / M = (K / M) :^ xb.
   apply: IHn; try by rewrite (quotient_sol, morphim_norms, oKM K) ?(oKM K1).
     by apply: leq_trans leHn; rewrite ltn_quotient.
   by rewrite -morphimMl ?nMsG // -defG morphimS.
-case/morphimP=> x nMx Hx ->{xb} eqK1Kx; pose K2 := (K :^ x)%G.
+case/morphimP=> x nMx Hx {xb}-> eqK1Kx; pose K2 := (K :^ x)%G.
 have{eqK1Kx} eqK12: K1 / M = K2 / M by rewrite quotientJ.
 suff [y My ->]: exists2 y, y \in M & K1 :=: K2 :^ y.
   by exists (x * y); [rewrite groupMl // (subsetP sMH) | rewrite conjsgM].

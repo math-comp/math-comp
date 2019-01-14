@@ -4032,7 +4032,7 @@ suffices{e f} equal0_equiv e t1 t2:
   + by move=> n f1 IHf1 e; split=> [] [x] /IHf1; exists x.
   + by move=> n f1 IHf1 e; split=> Hx x; apply/IHf1.
 rewrite -(add0r (eval e t2)) -(can2_eq (subrK _) (addrK _)).
-rewrite -/(eval e (t1 - t2)); move: (t1 - t2)%T => {t1 t2} t.
+rewrite -/(eval e (t1 - t2)); move: (t1 - t2)%T => {t1 t2}- t.
 have sub_var_tsubst s t0: s.1 >= ub_var t0 -> tsubst t0 s = t0.
   elim: t0 {t} => //=.
   - by move=> n; case: ltngtP.
@@ -5020,7 +5020,7 @@ have auxP f0 e0 n0: qf_form f0 && rformula f0 ->
   - by case=> x; rewrite qf_to_dnfP //; exists x.
   have: all dnf_rterm bcs by case/andP: cf => _; apply: qf_to_dnf_rterm.
   elim: {f0 cf}bcs => [|bc bcs IHbcs] /=; first by right; case.
-  case/andP=> r_bc /IHbcs {IHbcs}bcsP.
+  case/andP=> r_bc /IHbcs {IHbcs}- bcsP.
   have f_qf := dnf_to_form_qf [:: bc].
   case: ok_proj => //= [ex_x|no_x].
     left; case: ex_x => x /(qf_evalP _ f_qf); rewrite /= orbF => bc_x.

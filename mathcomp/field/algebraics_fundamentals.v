@@ -607,7 +607,7 @@ pose fix xR n : realC :=
   tag (add_Rroot (xR n') p c).
 pose x_ n := tag (xR n).
 have sRle m n: (m <= n)%N -> {subset sQ (x_ m) <= sQ (x_ n)}.
-  move/subnK <-; elim: {n}(n - m)%N => // n IHn x /IHn{IHn}Rx.
+  move/subnK <-; elim: {n}(n - m)%N => // n IHn x /IHn{IHn}-Rx.
   rewrite addSn /x_ /=; case: (unpickle _) => [[p c]|] //=.
   by case: (add_Rroot _ _ _) => yR /= /(sQtrans _ x)->.
 have xRroot n p c: has_Rroot (xR n) p c -> {m | n <= m & root_in (xR m) p}%N.
@@ -738,7 +738,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
       apply/polyOver_poly=> j _; rewrite -memRn; apply: polyOverP j => /=.
       by rewrite rpredM 1?polyOver_comp ?rpredN ?polyOverX.
     have Rp0: ofQ t pw.[0] \in sQ (x_ n) by rewrite -memRn rpred_horner ?rpred0.
-    have [|{mon_p Rp Rp0 Dp0}m lenm p_Rm_0] := xRroot n p (ofQ t pw.[0]).
+    have [|{mon_p Rp Rp0 Dp0}-m lenm p_Rm_0] := xRroot n p (ofQ t pw.[0]).
       by rewrite /has_Rroot mon_p Rp Rp0 -Dp0 /=.
     have{p_Rm_0} [y Ry pw_y]: {y | y \in sQ (x_ m) & root (pw ^ ofQ t) y}.
       apply/sig2W; have [y Ry] := p_Rm_0.

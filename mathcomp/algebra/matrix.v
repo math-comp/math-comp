@@ -650,7 +650,7 @@ apply: (canRL (castmxKV _ _)); apply/matrixP=> i j.
 rewrite castmxE !mxE cast_ord_id; case: splitP => j1 /= def_j.
   have: (j < n1 + n2) && (j < n1) by rewrite def_j lshift_subproof /=.
   by move: def_j; do 2![case: splitP => // ? ->; rewrite ?mxE] => /ord_inj->.
-case: splitP def_j => j2 ->{j} def_j; rewrite !mxE.
+case: splitP def_j => j2 {j}-> def_j; rewrite !mxE.
   have: ~~ (j2 < n1) by rewrite -leqNgt def_j leq_addr.
   have: j1 < n2 by rewrite -(ltn_add2l n1) -def_j.
   by move: def_j; do 2![case: splitP => // ? ->] => /addnI/val_inj->.
@@ -2747,7 +2747,7 @@ apply: (iffP eqP) => [detA0 | [v n0v vA0]]; last first.
   by rewrite scaler0 -mul_mx_scalar -mul_mx_adj mulmxA vA0 mul0mx.
 elim: n => [|n IHn] in A detA0 *.
   by case/idP: (oner_eq0 R); rewrite -detA0 [A]thinmx0 -(thinmx0 1%:M) det1.
-have [{detA0}A'0 | nzA'] := eqVneq (row 0 (\adj A)) 0; last first.
+have [{detA0}-A'0 | nzA'] := eqVneq (row 0 (\adj A)) 0; last first.
   exists (row 0 (\adj A)) => //; rewrite rowE -mulmxA mul_adj_mx detA0.
   by rewrite mul_mx_scalar scale0r.
 pose A' := col' 0 A; pose vA := col 0 A.

@@ -411,7 +411,7 @@ case: n1 / le_mn1 def_n1 => [|n1 le_mn1] def_n1 [|n2 le_mn2] def_n2.
 - by rewrite [def_n2]eq_axiomK.
 - by move/leP: (le_mn2); rewrite -{1}def_n2 ltnn.
 - by move/leP: (le_mn1); rewrite {1}def_n2 ltnn.
-case: def_n2 (def_n2) => ->{n2} def_n2 in le_mn2 *.
+case: def_n2 (def_n2) => {n2}-> def_n2 in le_mn2 *.
 by rewrite [def_n2]eq_axiomK /=; congr le_S; apply: IHn.
 Qed.
 

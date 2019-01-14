@@ -539,7 +539,7 @@ elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
 have: perm_eq (catss ss ++ s) (merge_sort_pop s ss).
   elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(perm_eqrP (IHss _)).
   by rewrite perm_catC catA perm_catC perm_cat2l -perm_merge.
-case: s => // x1 [//|x2 s _]; move/ltnW; move/IHn=> {n IHn}IHs.
+case: s => // x1 [//|x2 s _]; move/ltnW; move/IHn=> {n IHn}-IHs.
 rewrite -{IHs}(perm_eqrP (IHs _)) ifE; set s1 := if_expr _ _ _.
 rewrite (catA _ [:: _; _] s) {s}perm_cat2r.
 apply: (@perm_eq_trans _ (catss ss ++ s1)).

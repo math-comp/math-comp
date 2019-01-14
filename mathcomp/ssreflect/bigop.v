@@ -1560,7 +1560,7 @@ transitivity (\big[+%M/0]_(f in Pf r) \big[*%M/1]_(i <- r) F i (f i)).
 have: uniq r by apply: enum_uniq.
 elim: {P}r => /= [_ | i r IHr].
   rewrite (big_pred1 [ffun => j0]) ?big_nil //= => f.
-  apply/familyP/eqP=> /= [Df |->{f} i]; last by rewrite ffunE !inE.
+  apply/familyP/eqP=> /= [Df | {f}-> i]; last by rewrite ffunE !inE.
   by apply/ffunP=> i; rewrite ffunE; apply/eqP/Df.
 case/andP=> /negbTE nri; rewrite big_cons big_distrl => {IHr}/IHr <-.
 rewrite (partition_big (fun f : fIJ => f i) (Q i)) => [|f]; last first.

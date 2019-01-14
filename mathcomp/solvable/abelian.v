@@ -584,7 +584,7 @@ Qed.
 Lemma card_p1Elem_pnElem p n A E :
   E \in 'E_p^n(A) -> #|'E_p^1(E)| = (\sum_(i < n) p ^ i)%N.
 Proof.
-case/pnElemP=> _ {A} abelE dimE; have [pE cEE _] := and3P abelE.
+case/pnElemP=> _ {A}- abelE dimE; have [pE cEE _] := and3P abelE.
 have [E1 | ntE] := eqsVneq E 1.
   rewrite -dimE E1 cards1 logn1 big_ord0 eq_card0 // => X.
   by rewrite !inE subG1 trivg_card1; case: eqP => // ->; rewrite logn1 andbF.
@@ -1470,7 +1470,7 @@ Lemma cyclic_pgroup_dprod_trivg p A B C :
     p.-group C -> cyclic C -> A \x B = C ->
   A = 1 /\ B = C \/ B = 1 /\ A = C.
 Proof.
-move=> pC cycC; case/cyclicP: cycC pC => x ->{C} pC defC.
+move=> pC cycC; case/cyclicP: cycC pC => x {C}-> pC defC.
 case/dprodP: defC => [] [G H -> ->{A B}] defC _ tiGH; rewrite -defC.
 case: (eqVneq <[x]> 1) => [|ntC].
   move/trivgP; rewrite -defC mulG_subG => /andP[/trivgP-> _].
@@ -1562,7 +1562,7 @@ have{x_yp} xp_yp: (y ^+ p \in <[x ^+ p]>).
   rewrite cycle_subG orderXdiv // divnA // mulnC ox.
   by rewrite -muln_divA ?dvdn_exponent ?expgM 1?groupX ?cycle_id.
 have: p <= #[y] by rewrite dvdn_leq.
-rewrite leq_eqVlt; case/predU1P=> [{xp_yp m IHm leym}oy | ltpy]; last first.
+rewrite leq_eqVlt; case/predU1P=> [{xp_yp m IHm leym}-oy | ltpy]; last first.
   case/cycleP: xp_yp => k; rewrite -expgM mulnC expgM => def_yp.
   suffices: #[y * x ^- k] < m.
     by move/IHm; apply; rewrite groupMr // groupV groupX ?cycle_id.

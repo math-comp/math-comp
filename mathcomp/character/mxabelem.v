@@ -703,7 +703,7 @@ Lemma rfix_abelem (H : {set gT}) :
 Proof.
 move/subsetP=> sHG; apply/eqmxP/andP; split.
   rewrite -rowgS rowg_mxK -sub_rVabelem_im // subsetI sub_rVabelem /=.
-  apply/centsP=> y /morphimP[v _]; rewrite inE => cGv ->{y} x Gx.
+  apply/centsP=> y /morphimP[v _]; rewrite inE => cGv {y}-> x Gx.
   by apply/commgP/conjg_fixP; rewrite /= -rVabelemJ ?sHG ?(rfix_mxP H _).
 rewrite genmxE; apply/rfix_mxP=> x Hx; apply/row_matrixP=> i.
 rewrite row_mul rowK; case/morphimP: (enum_valP i) => z Ez /setIP[_ cHz] ->.
@@ -871,7 +871,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     transitivity #|[set [set z] | z in 'Z(S)]|; last first.
       by rewrite card_imset //; apply: set1_inj.
     apply: eq_card => zS; apply/setIdP/imsetP=> [[] | [z]].
-      case/imsetP=> z Sz ->{zS} szSZ.
+      case/imsetP=> z Sz {zS}-> szSZ.
       have Zz: z \in 'Z(S) by rewrite (subsetP szSZ) ?class_refl.
       exists z => //; rewrite inE Sz in Zz.
       apply/eqP; rewrite eq_sym eqEcard sub1set class_refl cards1.
@@ -890,7 +890,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
   have pn_gt0: p ^ n.*2 > 0 by rewrite expn_gt0 p_gt0.
   rewrite card_irr // oSpn expnS -(prednK pn_gt0) mulnS eqn_add2l.
   rewrite (eq_bigr (fun _ => p)) => [|xS]; last first.
-    case/andP=> SxS; rewrite inE SxS; case/imsetP: SxS => x Sx ->{xS} notZxS.
+    case/andP=> SxS; rewrite inE SxS; case/imsetP: SxS => x Sx {xS}-> notZxS.
     have [y Sy ->] := repr_class S x; apply: p_maximal_index => //.
     apply: cent1_extraspecial_maximal => //; first exact: groupJ.
     apply: contra notZxS => Zxy; rewrite -{1}(lcoset_id Sy) class_lcoset.

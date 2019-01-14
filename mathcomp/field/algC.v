@@ -144,7 +144,7 @@ have posP x : reflect (exists y, x = y * conj y) (le 0 x).
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
   by rewrite (normE _ _ (normK y)) rmorphM conjK (mulrC (conj _)) -expr2 normK.
 have posJ x : le 0 x -> conj x = x.
-  by case/posP=> {x}u ->; rewrite rmorphM conjK mulrC.
+  by case/posP=> {x} - u ->; rewrite rmorphM conjK mulrC.
 have pos_linear x y : le 0 x -> le 0 y -> le x y || le y x.
   move=> pos_x pos_y; rewrite leB -opprB orbC leB !posE normN -eqf_sqr.
   by rewrite normK rmorphB !posJ ?subrr.

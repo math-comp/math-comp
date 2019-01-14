@@ -2596,7 +2596,7 @@ Lemma astabQ H Abar : 'C(Abar |'Q) = coset H @*^-1 'C(Abar).
 Proof.
 apply/setP=> x; rewrite inE /= dom_qactJ morphpreE in_setI /=.
 apply: andb_id2l => Nx; rewrite !inE -sub1set centsC cent_set1.
-apply: eq_subset_r => {Abar} Hy; rewrite inE qactJ Nx (sameP eqP conjg_fixP).
+apply: eq_subset_r => {Abar}- Hy; rewrite inE qactJ Nx (sameP eqP conjg_fixP).
 by rewrite (sameP cent1P eqP) (sameP commgP eqP).
 Qed.
 

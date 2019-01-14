@@ -272,7 +272,7 @@ rewrite -!sum1dep_card -sum1_card (reindex_onto fA pfT) => [|f].
   by rewrite if_arg ffunE; case: insubP; rewrite // pvalE perm1 if_same eqxx.
 case/andP=> /forallP-onA /injectiveP-f_inj.
 apply/ffunP=> u; rewrite ffunE -pvalE insubdK; first by rewrite ffunE valK.
-apply/injectiveP=> {u} x y; rewrite !ffunE.
+apply/injectiveP=> {u}- x y; rewrite !ffunE.
 case: insubP => [u _ <-|]; case: insubP => [v _ <-|] //=; first by move/f_inj->.
   by move=> Ay' def_y; rewrite -def_y [_ \in A]onA in Ay'.
 by move=> Ax' def_x; rewrite def_x [_ \in A]onA in Ax'.
@@ -419,7 +419,7 @@ rewrite (cardsD1 (pcycle s y)) (cardsD1 (pcycle s x)) !(mem_imset, inE) //.
 rewrite -/(dp s) !addnA !eq_pcycle_mem andbT; congr (_ + _); last first.
   wlog suffices: s / dp s <= dp (t x y s).
     by move=> IHs; apply/eqP; rewrite eqn_leq -{2}(tK x y s) !IHs.
-  apply/subset_leq_card/subsetP=> {dp} C.
+  apply/subset_leq_card/subsetP=> {dp}- C.
   rewrite !inE andbA andbC !(eq_sym C) => /and3P[/imsetP[z _ ->{C}]].
   rewrite 2!eq_pcycle_mem => sxz syz.
   suffices ts_z: pcycle (t x y s) z = pcycle s z.
@@ -490,8 +490,8 @@ Qed.
 
 Lemma odd_permM : {morph odd_perm : s1 s2 / s1 * s2 >-> s1 (+) s2}.
 Proof.
-move=> s1 s2; case: (prod_tpermP s1) => ts1 ->{s1} dts1.
-case: (prod_tpermP s2) => ts2 ->{s2} dts2.
+move=> s1 s2; case: (prod_tpermP s1) => ts1 {s1}-> dts1.
+case: (prod_tpermP s2) => ts2 {s2}-> dts2.
 by rewrite -big_cat !odd_perm_prod ?all_cat ?dts1 // size_cat odd_add.
 Qed.
 
