@@ -1804,11 +1804,11 @@ Qed.
 Lemma ler_add2r x : {mono +%R^~ x : y z / y <= z}.
 Proof. by move=> y z /=; rewrite ![_ + x]addrC ler_add2l. Qed.
 
-Lemma ltr_add2r z x y : (x + z < y + z) = (x < y).
-Proof. by rewrite (lerW_mono (ler_add2r _)). Qed.
+Lemma ltr_add2l x : {mono +%R x : y z / y < z}.
+Proof. by move=> y z /=; rewrite (lerW_mono (ler_add2l _)). Qed.
 
-Lemma ltr_add2l z x y : (z + x < z + y) = (x < y).
-Proof. by rewrite (lerW_mono (ler_add2l _)). Qed.
+Lemma ltr_add2r x : {mono +%R^~ x : y z / y < z}.
+Proof. by move=> y z /=; rewrite (lerW_mono (ler_add2r _)). Qed.
 
 Definition ler_add2 := (ler_add2l, ler_add2r).
 Definition ltr_add2 := (ltr_add2l, ltr_add2r).

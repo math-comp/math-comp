@@ -56,8 +56,13 @@ Local Notation "x <= y ?< 'if' b" := (lersif x y b)
   (at level 70, y at next level,
   format "x '[hv'  <=  y '/'  ?<  'if'  b ']'") : ring_scope.
 
-Lemma lersifxx x b: (x <= x ?< if b) = ~~ b.
-Proof. by case: b; rewrite /= lterr. Qed.
+Lemma subr_lersifr0 b (x y : R) : (y - x <= 0 ?< if b) = (y <= x ?< if b).
+Proof. by case: b => /=; rewrite subr_lte0. Qed.
+
+Lemma subr_lersif0r b (x y : R) : (0 <= y - x ?< if b) = (x <= y ?< if b).
+Proof. by case: b => /=; rewrite subr_gte0. Qed.
+
+Definition subr_lersif0 := (subr_lersifr0, subr_lersif0r).
 
 Lemma lersif_trans x y z b1 b2 :
   x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
@@ -66,8 +71,11 @@ case: b1; first by case: b2; [apply: ltr_trans | apply: ltr_le_trans].
 by case: b2; [apply: ler_lt_trans | apply: ler_trans].
 Qed.
 
-Lemma lersifW b x y : x <= y ?< if b -> x <= y.
-Proof. by case: b => //; move/ltrW. Qed.
+Lemma lersif01 b : 0 <= 1 ?< if b.
+Proof. by case: b; apply lter01. Qed.
+
+Lemma lersifxx x b : (x <= x ?< if b) = ~~ b.
+Proof. by case: b; rewrite /= lterr. Qed.
 
 Lemma lersifNF x y b : y <= x ?< if ~~ b -> x <= y ?< if b = false.
 Proof. by case: b => /= [/ler_gtF|/ltr_geF]. Qed.
@@ -79,14 +87,46 @@ Lemma lersifT x y : x <= y ?< if true = (x < y). Proof. by []. Qed.
 
 Lemma lersifF x y : x <= y ?< if false = (x <= y). Proof. by []. Qed.
 
+Lemma lersif_oppl b x y : - x <= y ?< if b = (- y <= x ?< if b).
+Proof. by case: b; apply lter_oppl. Qed.
+
+Lemma lersif_oppr b x y : x <= - y ?< if b = (y <= - x ?< if b).
+Proof. by case: b; apply lter_oppr. Qed.
+
+Lemma lersif_0oppr b x : 0 <= - x ?< if b = (x <= 0 ?< if b).
+Proof. by case: b; apply (oppr_ge0, oppr_gt0). Qed.
+
+Lemma lersif_oppr0 b x : - x <= 0 ?< if b = (0 <= x ?< if b).
+Proof. by case: b; apply (oppr_le0, oppr_lt0). Qed.
+
 Lemma lersif_opp2 b : {mono -%R : x y /~ x <= y ?< if b}.
-Proof. by case: b => /= x y; rewrite (ltr_oppl, ler_oppl) opprK. Qed.
+Proof. by case: b; apply lter_opp2. Qed.
 
-Lemma subr_lersif0r b (x y : R) : (0 <= y - x ?< if b) = (x <= y ?< if b).
-Proof. by case: b => /=; rewrite (subr_ge0, subr_gt0). Qed.
+Definition lersif_oppE := (lersif_0oppr, lersif_oppr0, lersif_opp2).
 
-Lemma addr_lersif0r b (x y : R) : (0 <= x + y ?< if b) = (- x <= y ?< if b).
-Proof. by rewrite addrC -{1}(opprK x) subr_lersif0r. Qed.
+Lemma lersif_add2l b x : {mono +%R x : y z / y <= z ?< if b}.
+Proof. by case: b => ? ?; apply lter_add2. Qed.
+
+Lemma lersif_add2r b x : {mono +%R^~ x : y z / y <= z ?< if b}.
+Proof. by case: b => ? ?; apply lter_add2. Qed.
+
+Definition lersif_add2 := (lersif_add2l, lersif_add2r).
+
+Lemma lersif_subl_addr b x y z : (x - y <= z ?< if b) = (x <= z + y ?< if b).
+Proof. by case: b; apply lter_sub_addr. Qed.
+
+Lemma lersif_subr_addr b x y z : (x <= y - z ?< if b) = (x + z <= y ?< if b).
+Proof. by case: b; apply lter_sub_addr. Qed.
+
+Definition lersif_sub_addr := (lersif_subl_addr, lersif_subr_addr).
+
+Lemma lersif_subl_addl b x y z : (x - y <= z ?< if b) = (x <= y + z ?< if b).
+Proof. by case: b; apply lter_sub_addl. Qed.
+
+Lemma lersif_subr_addl b x y z : (x <= y - z ?< if b) = (z + x <= y ?< if b).
+Proof. by case: b; apply lter_sub_addl. Qed.
+
+Definition lersif_sub_addl := (lersif_subl_addl, lersif_subr_addl).
 
 Lemma lersif_andb x y : {morph lersif x y : p q / p || q >-> p && q}.
 Proof.
@@ -102,31 +142,42 @@ Qed.
 
 Lemma lersif_imply b1 b2 r1 r2 :
   b2 ==> b1 -> r1 <= r2 ?< if b1 -> r1 <= r2 ?< if b2.
-Proof.
-by case: b1; case: b2 => //= _; rewrite ler_eqVlt => ->; rewrite orbT.
-Qed.
+Proof. by case: b1 b2 => [] [] //= _ /ltrW. Qed.
 
-Lemma lersif_pmul2l b x : (0 < x)%R -> {mono *%R x : y z / y <= z ?< if b}.
-Proof. by case: b => /= H y z; rewrite lter_pmul2l. Qed.
+Lemma lersifW b x y : x <= y ?< if b -> x <= y.
+Proof. by case: b => // /ltrW. Qed.
 
-Lemma lersif_pmul2r b x : (0 < x)%R -> {mono *%R^~ x : y z / y <= z ?< if b}.
-Proof. by case: b => /= H y z; rewrite lter_pmul2r. Qed.
+Lemma ltrW_lersif b x y : x < y -> x <= y ?< if b.
+Proof. by case: b => // /ltrW. Qed.
 
-Lemma lersif_nmul2l b x : (x < 0)%R -> {mono *%R x : y z /~ y <= z ?< if b}.
-Proof. by case: b => /= H y z; rewrite lter_nmul2l. Qed.
+Lemma lersif_pmul2l b x : (0 < x) -> {mono *%R x : y z / y <= z ?< if b}.
+Proof. by case: b; apply lter_pmul2l. Qed.
 
-Lemma lersif_nmul2r b x : (x < 0)%R -> {mono *%R^~ x : y z /~ y <= z ?< if b}.
-Proof. by case: b => /= H y z; rewrite lter_nmul2r. Qed.
+Lemma lersif_pmul2r b x : (0 < x) -> {mono *%R^~ x : y z / y <= z ?< if b}.
+Proof. by case: b; apply lter_pmul2r. Qed.
 
-Lemma lersif_add2l b x : {mono +%R x : y z / y <= z ?< if b}.
-Proof. by case: b => /= y z; rewrite lter_add2. Qed.
+Lemma lersif_nmul2l b x : (x < 0) -> {mono *%R x : y z /~ y <= z ?< if b}.
+Proof. by case: b; apply lter_nmul2l. Qed.
 
-Lemma lersif_add2r b x : {mono +%R^~ x : y z / y <= z ?< if b}.
-Proof. by case: b => /= y z; rewrite lter_add2. Qed.
+Lemma lersif_nmul2r b x : (x < 0) -> {mono *%R^~ x : y z /~ y <= z ?< if b}.
+Proof. by case: b; apply lter_nmul2r. Qed.
 
-Lemma real_lersifN x y b : x \in Num.real -> y \in Num.real ->
+Lemma real_lersifN x y b : x \is Num.real -> y \is Num.real ->
   x <= y ?< if ~~b = ~~ (y <= x ?< if b).
-Proof. by case: b => [] xR yR /=; rewrite (real_ltrNge, real_lerNgt). Qed.
+Proof. by case: b => [] xR yR /=; case: real_ltrgtP. Qed.
+
+Lemma real_lersif_norml b x y :
+  x \is Num.real ->
+  (`|x| <= y ?< if b) = ((- y <= x ?< if b) && (x <= y ?< if b)).
+Proof. by case: b; apply real_lter_norml. Qed.
+
+Lemma real_lersif_normr b x y :
+  y \is Num.real ->
+  (x <= `|y| ?< if b) = ((x <= y ?< if b) || (x <= - y ?< if b)).
+Proof. by case: b; apply real_lter_normr. Qed.
+
+Lemma lersif_nnormr b x y : y <= 0 ?< if ~~ b -> (`|x| <= y ?< if b) = false.
+Proof. by case: b => /=; apply lter_nnormr. Qed.
 
 End Lersif.
 
@@ -153,16 +204,50 @@ Proof. by case: b => H /=; rewrite lter_pdivr_mull. Qed.
 Lemma lersif_ndivl_mulr : z < 0 -> x <= y / z ?< if b = (y <= x * z ?< if b).
 Proof. by case: b => H /=; rewrite lter_ndivl_mulr. Qed.
 
-Lemma lter_ndivr_mulr : z < 0 -> y / z <= x ?< if b = (x * z <= y ?< if b).
+Lemma lersif_ndivr_mulr : z < 0 -> y / z <= x ?< if b = (x * z <= y ?< if b).
 Proof. by case: b => H /=; rewrite lter_ndivr_mulr. Qed.
 
-Lemma lter_ndivl_mull : z < 0 -> x <= z^-1 * y ?< if b = (y <=z * x ?< if b).
+Lemma lersif_ndivl_mull : z < 0 -> x <= z^-1 * y ?< if b = (y <=z * x ?< if b).
 Proof. by case: b => H /=; rewrite lter_ndivl_mull. Qed.
 
-Lemma lter_ndivr_mull : z < 0 -> z^-1 * y <= x ?< if b = (z * x <= y ?< if b).
+Lemma lersif_ndivr_mull : z < 0 -> z^-1 * y <= x ?< if b = (z * x <= y ?< if b).
 Proof. by case: b => H /=; rewrite lter_ndivr_mull. Qed.
 
 End LersifField.
+
+Section LersifRealDomain.
+
+Variable (R : realDomainType) (b : bool) (x y z e : R).
+
+Lemma lersif_norml :
+  (`|x| <= y ?< if b) = (- y <= x ?< if b) && (x <= y ?< if b).
+Proof. by case: b; apply lter_norml. Qed.
+
+Lemma lersif_normr :
+  (x <= `|y| ?< if b) = (x <= y ?< if b) || (x <= - y ?< if b).
+Proof. by case: b; apply lter_normr. Qed.
+
+Lemma lersif_distl :
+  (`|x - y| <= e ?< if b) = (y - e <= x ?< if b) && (x <= y + e ?< if b).
+Proof. by case: b; apply lter_distl. Qed.
+
+Lemma lersif_minr :
+  (x <= Num.min y z ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
+Proof. by case: b; apply lter_minr. Qed.
+
+Lemma lersif_minl :
+  (Num.min y z <= x ?< if b) = (y <= x ?< if b) || (z <= x ?< if b).
+Proof. by case: b; apply lter_minl. Qed.
+
+Lemma lersif_maxr :
+  (x <= Num.max y z ?< if b) = (x <= y ?< if b) || (x <= z ?< if b).
+Proof. by case: b; apply lter_maxr. Qed.
+
+Lemma lersif_maxl :
+  (Num.max y z <= x ?< if b) = (y <= x ?< if b) && (z <= x ?< if b).
+Proof. by case: b; apply lter_maxl. Qed.
+
+End LersifRealDomain.
 
 Section IntervalPo.
 
