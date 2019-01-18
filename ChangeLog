@@ -14,6 +14,8 @@
 
 	* Extended theory about homo and mono for leq/or and Num.le
 
+	* Extended theory of lersif and intervals
+
 	* Renamed: (together with the _in suffix counterpart)
 	  mono_inj -> incr_inj
 	  nmono_inj -> decr_inj
