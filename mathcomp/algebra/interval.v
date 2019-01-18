@@ -150,16 +150,16 @@ Proof. by case: b => // /ltrW. Qed.
 Lemma ltrW_lersif b x y : x < y -> x <= y ?< if b.
 Proof. by case: b => // /ltrW. Qed.
 
-Lemma lersif_pmul2l b x : (0 < x) -> {mono *%R x : y z / y <= z ?< if b}.
+Lemma lersif_pmul2l b x : 0 < x -> {mono *%R x : y z / y <= z ?< if b}.
 Proof. by case: b; apply lter_pmul2l. Qed.
 
-Lemma lersif_pmul2r b x : (0 < x) -> {mono *%R^~ x : y z / y <= z ?< if b}.
+Lemma lersif_pmul2r b x : 0 < x -> {mono *%R^~ x : y z / y <= z ?< if b}.
 Proof. by case: b; apply lter_pmul2r. Qed.
 
-Lemma lersif_nmul2l b x : (x < 0) -> {mono *%R x : y z /~ y <= z ?< if b}.
+Lemma lersif_nmul2l b x : x < 0 -> {mono *%R x : y z /~ y <= z ?< if b}.
 Proof. by case: b; apply lter_nmul2l. Qed.
 
-Lemma lersif_nmul2r b x : (x < 0) -> {mono *%R^~ x : y z /~ y <= z ?< if b}.
+Lemma lersif_nmul2r b x : x < 0 -> {mono *%R^~ x : y z /~ y <= z ?< if b}.
 Proof. by case: b; apply lter_nmul2r. Qed.
 
 Lemma real_lersifN x y b : x \is Num.real -> y \is Num.real ->
@@ -416,7 +416,7 @@ Proof. by move=> [] xb [[] xa|] //=; rewrite inE lterr ?andbT ?andbF. Qed.
 
 Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
 
-Lemma itvP : forall (x : R) (i : interval R), (x \in i) -> itv_rewrite i x.
+Lemma itvP : forall (x : R) (i : interval R), x \in i -> itv_rewrite i x.
 Proof.
 move=> x [[[] a|] [[] b|]]; move/itv_dec=> //= [hl hu]; do ?[split=> //;
   do ?[by rewrite ltrW | by rewrite ltrWN | by rewrite ltrNW |
@@ -438,8 +438,7 @@ Definition subitv (i1 i2 : interval R) :=
     | Interval a1 b1, Interval a2 b2 => le_boundl a2 a1 && le_boundr b1 b2
   end.
 
-Lemma subitvP : forall (i2 i1 : interval R), 
-  (subitv i1 i2) -> {subset i1 <= i2}.
+Lemma subitvP : forall (i2 i1 : interval R), subitv i1 i2 -> {subset i1 <= i2}.
 Proof.
 by move=> [[[] a2|] [[] b2|]] [[[] a1|] [[] b1|]];
   rewrite /subitv //; case/andP=> /= ha hb x hx; rewrite ?inE;
@@ -577,7 +576,7 @@ Section IntervalField.
 
 Variable R : realFieldType.
 
-Lemma mid_in_itv : forall ba bb (xa xb : R), xa <= xb ?< if (ba || bb)
+Lemma mid_in_itv : forall ba bb (xa xb : R), xa <= xb ?< if ba || bb
   -> mid xa xb \in Interval (BOpen_if ba xa) (BOpen_if bb xb).
 Proof.
 by move=> [] [] xa xb /= hx; apply/itv_dec=> /=; rewrite ?midf_lte // ?ltrW.
