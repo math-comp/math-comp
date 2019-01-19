@@ -219,6 +219,9 @@ Section LersifRealDomain.
 
 Variable (R : realDomainType) (b : bool) (x y z e : R).
 
+Lemma lersifN : (x <= y ?< if ~~ b) = ~~ (y <= x ?< if b).
+Proof. by rewrite real_lersifN ?num_real. Qed.
+
 Lemma lersif_norml :
   (`|x| <= y ?< if b) = (- y <= x ?< if b) && (x <= y ?< if b).
 Proof. by case: b; apply lter_norml. Qed.
@@ -536,9 +539,6 @@ Proof. by move=> [[] l |] [[] r |] //=; case: (ltrgtP l r). Qed.
 
 Lemma le_boundr_total : total (@le_boundr R).
 Proof. by move=> [[] l |] [[] r |] //=; case (ltrgtP l r). Qed.
-
-Lemma lersifN (x y : R) b : (x <= y ?< if ~~ b) = ~~ (y <= x ?< if b).
-Proof. by rewrite real_lersifN ?num_real. Qed.
 
 Lemma itv_splitU (xc : R) bc a b : xc \in Interval a b ->
   forall y, y \in Interval a b =
