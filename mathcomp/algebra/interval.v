@@ -46,9 +46,9 @@ Import GRing.Theory Num.Theory.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
-Section Lersif.
+Section LersifPo.
 
-Variable (R : numDomainType).
+Variable R : numDomainType.
 
 Definition lersif (x y : R) b := if b then x < y else x <= y.
 
@@ -67,12 +67,17 @@ Definition subr_lersif0 := (subr_lersifr0, subr_lersif0r).
 Lemma lersif_trans x y z b1 b2 :
   x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
 Proof.
-case: b1; first by case: b2; [apply: ltr_trans | apply: ltr_le_trans].
-by case: b2; [apply: ler_lt_trans | apply: ler_trans].
+by case: b1 b2 => [] [];
+  apply (ltr_trans, ltr_le_trans, ler_lt_trans, ler_trans).
 Qed.
 
 Lemma lersif01 b : 0 <= 1 ?< if b.
 Proof. by case: b; apply lter01. Qed.
+
+Lemma lersif_anti b1 b2 x y :
+  (x <= y ?< if b1) && (y <= x ?< if b2) =
+  if b1 || b2 then false else x == y.
+Proof. by case: b1 b2 => [] []; rewrite lter_anti. Qed.
 
 Lemma lersifxx x b : (x <= x ?< if b) = ~~ b.
 Proof. by case: b; rewrite /= lterr. Qed.
@@ -179,43 +184,13 @@ Proof. by case: b; apply real_lter_normr. Qed.
 Lemma lersif_nnormr b x y : y <= 0 ?< if ~~ b -> (`|x| <= y ?< if b) = false.
 Proof. by case: b => /=; apply lter_nnormr. Qed.
 
-End Lersif.
+End LersifPo.
 
 Notation "x <= y ?< 'if' b" := (lersif x y b)
   (at level 70, y at next level,
   format "x '[hv'  <=  y '/'  ?<  'if'  b ']'") : ring_scope.
 
-Section LersifField.
-
-Variable (F : numFieldType) (b : bool) (z x y : F).
-
-Lemma lersif_pdivl_mulr : 0 < z -> x <= y / z ?< if b = (x * z <= y ?< if b).
-Proof. by case: b => H /=; rewrite lter_pdivl_mulr. Qed.
-
-Lemma lersif_pdivr_mulr : 0 < z -> y / z <= x ?< if b = (y <= x * z ?< if b).
-Proof. by case: b => H /=; rewrite lter_pdivr_mulr. Qed.
-
-Lemma lersif_pdivl_mull : 0 < z -> x <= z^-1 * y ?< if b = (z * x <= y ?< if b).
-Proof. by case: b => H /=; rewrite lter_pdivl_mull. Qed.
-
-Lemma lersif_pdivr_mull : 0 < z -> z^-1 * y <= x ?< if b = (y <= z * x ?< if b).
-Proof. by case: b => H /=; rewrite lter_pdivr_mull. Qed.
-
-Lemma lersif_ndivl_mulr : z < 0 -> x <= y / z ?< if b = (y <= x * z ?< if b).
-Proof. by case: b => H /=; rewrite lter_ndivl_mulr. Qed.
-
-Lemma lersif_ndivr_mulr : z < 0 -> y / z <= x ?< if b = (x * z <= y ?< if b).
-Proof. by case: b => H /=; rewrite lter_ndivr_mulr. Qed.
-
-Lemma lersif_ndivl_mull : z < 0 -> x <= z^-1 * y ?< if b = (y <=z * x ?< if b).
-Proof. by case: b => H /=; rewrite lter_ndivl_mull. Qed.
-
-Lemma lersif_ndivr_mull : z < 0 -> z^-1 * y <= x ?< if b = (z * x <= y ?< if b).
-Proof. by case: b => H /=; rewrite lter_ndivr_mull. Qed.
-
-End LersifField.
-
-Section LersifRealDomain.
+Section LersifOrdered.
 
 Variable (R : realDomainType) (b : bool) (x y z e : R).
 
@@ -250,7 +225,37 @@ Lemma lersif_maxl :
   (Num.max y z <= x ?< if b) = (y <= x ?< if b) && (z <= x ?< if b).
 Proof. by case: b; apply lter_maxl. Qed.
 
-End LersifRealDomain.
+End LersifOrdered.
+
+Section LersifField.
+
+Variable (F : numFieldType) (b : bool) (z x y : F).
+
+Lemma lersif_pdivl_mulr : 0 < z -> x <= y / z ?< if b = (x * z <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivl_mulr. Qed.
+
+Lemma lersif_pdivr_mulr : 0 < z -> y / z <= x ?< if b = (y <= x * z ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivr_mulr. Qed.
+
+Lemma lersif_pdivl_mull : 0 < z -> x <= z^-1 * y ?< if b = (z * x <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivl_mull. Qed.
+
+Lemma lersif_pdivr_mull : 0 < z -> z^-1 * y <= x ?< if b = (y <= z * x ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivr_mull. Qed.
+
+Lemma lersif_ndivl_mulr : z < 0 -> x <= y / z ?< if b = (y <= x * z ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivl_mulr. Qed.
+
+Lemma lersif_ndivr_mulr : z < 0 -> y / z <= x ?< if b = (x * z <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivr_mulr. Qed.
+
+Lemma lersif_ndivl_mull : z < 0 -> x <= z^-1 * y ?< if b = (y <=z * x ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivl_mull. Qed.
+
+Lemma lersif_ndivr_mull : z < 0 -> z^-1 * y <= x ?< if b = (z * x <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivr_mull. Qed.
+
+End LersifField.
 
 Section IntervalPo.
 
@@ -259,7 +264,7 @@ Notation BOpen := (BOpen_if true).
 Notation BClose := (BOpen_if false).
 Variant interval (T : Type) := Interval of itv_bound T & itv_bound T.
 
-Variable (R : numDomainType).
+Variable R : numDomainType.
 
 Definition pred_of_itv (i : interval R) : pred R :=
   [pred x | let: Interval l u := i in
