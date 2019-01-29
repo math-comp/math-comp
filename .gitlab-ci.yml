@@ -4,7 +4,7 @@
 #     (Dockerfile containing: "opam switch set $compiler && eval $(opam env)")
 #   - master (protected branch) => push on GitLab registry and Docker Hub
 #   - other branches (not tags) => push on GitLab registry
-#   - Todo: GitHub PRs => push on GitLab
+#   - GitHub PRs => push on GitLab and report back thanks to @coqbot
 # - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.6)
 #   - script template foreach project (custom CONTRIB_URL, script)
 #   - jobs foreach project and Coq version (custom COQ_VERSION, CONTRIB_VERSION)
@@ -67,6 +67,9 @@ coq-8.7:
 coq-8.8:
   extends: .opam-build
 
+coq-8.9:
+  extends: .opam-build
+
 coq-dev:
   extends: .opam-build
 
@@ -117,6 +120,7 @@ make-coq-latest:
 # - Add 1 job per Coq version to test, that extends the previous hidden job,
 #   and sets vars COQ_VERSION, CONTRIB_VERSION (compatible Git branch/tag)
 
+# The Four Color Theorem
 .ci-fourcolor:
   extends: .ci
   variables:
@@ -144,5 +148,45 @@ ci-fourcolor-8.8:
 
 ci-fourcolor-dev:
   extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "dev"
+
+# The Odd Order Theorem
+.ci-odd-order:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/math-comp/odd-order.git"
+    CONTRIB_VERSION: master
+  script:
+    - make -j "${NJOBS}"
+    - make install
+
+ci-odd-order-8.7:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.7"
+
+# The Lemma Overloading library
+.ci-lemma-overloading:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/coq-community/lemma-overloading.git"
+    CONTRIB_VERSION: master
+  script:
+    - opam pin add -n -k path coq-lemma-overloading .
+    - opam install -y -v -j "${NJOBS}" coq-lemma-overloading
+
+ci-lemma-overloading-8.8:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-lemma-overloading-8.9:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.9"
+
+ci-lemma-overloading-dev:
+  extends: .ci-lemma-overloading
   variables:
     COQ_VERSION: "dev"

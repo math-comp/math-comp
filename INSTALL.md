@@ -12,7 +12,7 @@ If you just installed OPAM you may have to do the following. You may also want
 to read [OPAM user manual](https://opam.ocaml.org/doc/Usage.html) first. 
 ```
 opam init
-eval `opam config env`
+eval $(opam config env)
 ```
 Once your OPAM environment is configured
 you can install any math-comp package via
@@ -38,7 +38,7 @@ If you want to install the library in a dedicated environment
 current OPAM setup you can run the following commands:
 ```
 opam init --root=$PWD/MC
-eval `opam config env --root=$PWD/MC`
+eval $(opam config env --root=$PWD/MC`)
 ```
 After that the installations instructions above apply.
 
@@ -73,22 +73,28 @@ To install the compiled library, just execute `make install`.
 
 ## Compilation and installation of a custom version using OPAM
 
-The instructions assume you are in the `mathcomp` directory
-and that you have OPAM installed and configured with the
-standard Coq repositories.
+The instructions assume you are in the parent directory (that contains
+this file `INSTALL.md`) and that you have OPAM installed and
+configured with the standard Coq repositories.
 
-For each package, pin the `opam` file:
+First, we recommend pinning a particular version of Coq
+(here `8.8.0`):
 ```
-opam pin -n add ssreflect
+opam pin add -n coq -k version 8.8.0
 ```
+
+Then for each math-comp package, pin the `opam` file:
+```
+opam pin add -n -k path coq-mathcomp-ssreflect .
+```
+
 This can be achieved in one go as follows:
 ```
-for P in */opam; do opam pin -n add ${P%%/opam}; done
+for P in *.opam; do opam pin add -n -k path ${P%.opam} .; done
 ```
 
 Then you can use `opam install` to compile and install any package.
 For example:
 ```
-opam install coq.8.8.0 coq-mathcomp-ssreflect
+opam install coq-mathcomp-character -j3
 ```
-
