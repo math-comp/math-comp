@@ -46,6 +46,217 @@ Import GRing.Theory Num.Theory.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
+Section LersifPo.
+
+Variable R : numDomainType.
+
+Definition lersif (x y : R) b := if b then x < y else x <= y.
+
+Local Notation "x <= y ?< 'if' b" := (lersif x y b)
+  (at level 70, y at next level,
+  format "x '[hv'  <=  y '/'  ?<  'if'  b ']'") : ring_scope.
+
+Lemma subr_lersifr0 b (x y : R) : (y - x <= 0 ?< if b) = (y <= x ?< if b).
+Proof. by case: b => /=; rewrite subr_lte0. Qed.
+
+Lemma subr_lersif0r b (x y : R) : (0 <= y - x ?< if b) = (x <= y ?< if b).
+Proof. by case: b => /=; rewrite subr_gte0. Qed.
+
+Definition subr_lersif0 := (subr_lersifr0, subr_lersif0r).
+
+Lemma lersif_trans x y z b1 b2 :
+  x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
+Proof.
+by case: b1 b2 => [] [];
+  apply (ltr_trans, ltr_le_trans, ler_lt_trans, ler_trans).
+Qed.
+
+Lemma lersif01 b : 0 <= 1 ?< if b.
+Proof. by case: b; apply lter01. Qed.
+
+Lemma lersif_anti b1 b2 x y :
+  (x <= y ?< if b1) && (y <= x ?< if b2) =
+  if b1 || b2 then false else x == y.
+Proof. by case: b1 b2 => [] []; rewrite lter_anti. Qed.
+
+Lemma lersifxx x b : (x <= x ?< if b) = ~~ b.
+Proof. by case: b; rewrite /= lterr. Qed.
+
+Lemma lersifNF x y b : y <= x ?< if ~~ b -> x <= y ?< if b = false.
+Proof. by case: b => /= [/ler_gtF|/ltr_geF]. Qed.
+
+Lemma lersifS x y b : x < y -> x <= y ?< if b.
+Proof. by case: b => //= /ltrW. Qed.
+
+Lemma lersifT x y : x <= y ?< if true = (x < y). Proof. by []. Qed.
+
+Lemma lersifF x y : x <= y ?< if false = (x <= y). Proof. by []. Qed.
+
+Lemma lersif_oppl b x y : - x <= y ?< if b = (- y <= x ?< if b).
+Proof. by case: b; apply lter_oppl. Qed.
+
+Lemma lersif_oppr b x y : x <= - y ?< if b = (y <= - x ?< if b).
+Proof. by case: b; apply lter_oppr. Qed.
+
+Lemma lersif_0oppr b x : 0 <= - x ?< if b = (x <= 0 ?< if b).
+Proof. by case: b; apply (oppr_ge0, oppr_gt0). Qed.
+
+Lemma lersif_oppr0 b x : - x <= 0 ?< if b = (0 <= x ?< if b).
+Proof. by case: b; apply (oppr_le0, oppr_lt0). Qed.
+
+Lemma lersif_opp2 b : {mono -%R : x y /~ x <= y ?< if b}.
+Proof. by case: b; apply lter_opp2. Qed.
+
+Definition lersif_oppE := (lersif_0oppr, lersif_oppr0, lersif_opp2).
+
+Lemma lersif_add2l b x : {mono +%R x : y z / y <= z ?< if b}.
+Proof. by case: b => ? ?; apply lter_add2. Qed.
+
+Lemma lersif_add2r b x : {mono +%R^~ x : y z / y <= z ?< if b}.
+Proof. by case: b => ? ?; apply lter_add2. Qed.
+
+Definition lersif_add2 := (lersif_add2l, lersif_add2r).
+
+Lemma lersif_subl_addr b x y z : (x - y <= z ?< if b) = (x <= z + y ?< if b).
+Proof. by case: b; apply lter_sub_addr. Qed.
+
+Lemma lersif_subr_addr b x y z : (x <= y - z ?< if b) = (x + z <= y ?< if b).
+Proof. by case: b; apply lter_sub_addr. Qed.
+
+Definition lersif_sub_addr := (lersif_subl_addr, lersif_subr_addr).
+
+Lemma lersif_subl_addl b x y z : (x - y <= z ?< if b) = (x <= y + z ?< if b).
+Proof. by case: b; apply lter_sub_addl. Qed.
+
+Lemma lersif_subr_addl b x y z : (x <= y - z ?< if b) = (z + x <= y ?< if b).
+Proof. by case: b; apply lter_sub_addl. Qed.
+
+Definition lersif_sub_addl := (lersif_subl_addl, lersif_subr_addl).
+
+Lemma lersif_andb x y : {morph lersif x y : p q / p || q >-> p && q}.
+Proof.
+by case=> [] [] /=; rewrite ?ler_eqVlt;
+  case: (_ < _)%R; rewrite ?(orbT, orbF, andbF, andbb).
+Qed.
+
+Lemma lersif_orb x y : {morph lersif x y : p q / p && q >-> p || q}.
+Proof.
+by case=> [] [] /=; rewrite ?ler_eqVlt;
+  case: (_ < _)%R; rewrite ?(orbT, orbF, orbb).
+Qed.
+
+Lemma lersif_imply b1 b2 r1 r2 :
+  b2 ==> b1 -> r1 <= r2 ?< if b1 -> r1 <= r2 ?< if b2.
+Proof. by case: b1 b2 => [] [] //= _ /ltrW. Qed.
+
+Lemma lersifW b x y : x <= y ?< if b -> x <= y.
+Proof. by case: b => // /ltrW. Qed.
+
+Lemma ltrW_lersif b x y : x < y -> x <= y ?< if b.
+Proof. by case: b => // /ltrW. Qed.
+
+Lemma lersif_pmul2l b x : 0 < x -> {mono *%R x : y z / y <= z ?< if b}.
+Proof. by case: b; apply lter_pmul2l. Qed.
+
+Lemma lersif_pmul2r b x : 0 < x -> {mono *%R^~ x : y z / y <= z ?< if b}.
+Proof. by case: b; apply lter_pmul2r. Qed.
+
+Lemma lersif_nmul2l b x : x < 0 -> {mono *%R x : y z /~ y <= z ?< if b}.
+Proof. by case: b; apply lter_nmul2l. Qed.
+
+Lemma lersif_nmul2r b x : x < 0 -> {mono *%R^~ x : y z /~ y <= z ?< if b}.
+Proof. by case: b; apply lter_nmul2r. Qed.
+
+Lemma real_lersifN x y b : x \is Num.real -> y \is Num.real ->
+  x <= y ?< if ~~b = ~~ (y <= x ?< if b).
+Proof. by case: b => [] xR yR /=; case: real_ltrgtP. Qed.
+
+Lemma real_lersif_norml b x y :
+  x \is Num.real ->
+  (`|x| <= y ?< if b) = ((- y <= x ?< if b) && (x <= y ?< if b)).
+Proof. by case: b; apply real_lter_norml. Qed.
+
+Lemma real_lersif_normr b x y :
+  y \is Num.real ->
+  (x <= `|y| ?< if b) = ((x <= y ?< if b) || (x <= - y ?< if b)).
+Proof. by case: b; apply real_lter_normr. Qed.
+
+Lemma lersif_nnormr b x y : y <= 0 ?< if ~~ b -> (`|x| <= y ?< if b) = false.
+Proof. by case: b => /=; apply lter_nnormr. Qed.
+
+End LersifPo.
+
+Notation "x <= y ?< 'if' b" := (lersif x y b)
+  (at level 70, y at next level,
+  format "x '[hv'  <=  y '/'  ?<  'if'  b ']'") : ring_scope.
+
+Section LersifOrdered.
+
+Variable (R : realDomainType) (b : bool) (x y z e : R).
+
+Lemma lersifN : (x <= y ?< if ~~ b) = ~~ (y <= x ?< if b).
+Proof. by rewrite real_lersifN ?num_real. Qed.
+
+Lemma lersif_norml :
+  (`|x| <= y ?< if b) = (- y <= x ?< if b) && (x <= y ?< if b).
+Proof. by case: b; apply lter_norml. Qed.
+
+Lemma lersif_normr :
+  (x <= `|y| ?< if b) = (x <= y ?< if b) || (x <= - y ?< if b).
+Proof. by case: b; apply lter_normr. Qed.
+
+Lemma lersif_distl :
+  (`|x - y| <= e ?< if b) = (y - e <= x ?< if b) && (x <= y + e ?< if b).
+Proof. by case: b; apply lter_distl. Qed.
+
+Lemma lersif_minr :
+  (x <= Num.min y z ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
+Proof. by case: b; apply lter_minr. Qed.
+
+Lemma lersif_minl :
+  (Num.min y z <= x ?< if b) = (y <= x ?< if b) || (z <= x ?< if b).
+Proof. by case: b; apply lter_minl. Qed.
+
+Lemma lersif_maxr :
+  (x <= Num.max y z ?< if b) = (x <= y ?< if b) || (x <= z ?< if b).
+Proof. by case: b; apply lter_maxr. Qed.
+
+Lemma lersif_maxl :
+  (Num.max y z <= x ?< if b) = (y <= x ?< if b) && (z <= x ?< if b).
+Proof. by case: b; apply lter_maxl. Qed.
+
+End LersifOrdered.
+
+Section LersifField.
+
+Variable (F : numFieldType) (b : bool) (z x y : F).
+
+Lemma lersif_pdivl_mulr : 0 < z -> x <= y / z ?< if b = (x * z <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivl_mulr. Qed.
+
+Lemma lersif_pdivr_mulr : 0 < z -> y / z <= x ?< if b = (y <= x * z ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivr_mulr. Qed.
+
+Lemma lersif_pdivl_mull : 0 < z -> x <= z^-1 * y ?< if b = (z * x <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivl_mull. Qed.
+
+Lemma lersif_pdivr_mull : 0 < z -> z^-1 * y <= x ?< if b = (y <= z * x ?< if b).
+Proof. by case: b => H /=; rewrite lter_pdivr_mull. Qed.
+
+Lemma lersif_ndivl_mulr : z < 0 -> x <= y / z ?< if b = (y <= x * z ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivl_mulr. Qed.
+
+Lemma lersif_ndivr_mulr : z < 0 -> y / z <= x ?< if b = (x * z <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivr_mulr. Qed.
+
+Lemma lersif_ndivl_mull : z < 0 -> x <= z^-1 * y ?< if b = (y <=z * x ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivl_mull. Qed.
+
+Lemma lersif_ndivr_mull : z < 0 -> z^-1 * y <= x ?< if b = (z * x <= y ?< if b).
+Proof. by case: b => H /=; rewrite lter_ndivr_mull. Qed.
+
+End LersifField.
+
 Section IntervalPo.
 
 Variant itv_bound (T : Type) : Type := BOpen_if of bool & T | BInfty.
@@ -53,7 +264,7 @@ Notation BOpen := (BOpen_if true).
 Notation BClose := (BOpen_if false).
 Variant interval (T : Type) := Interval of itv_bound T & itv_bound T.
 
-Variable (R : numDomainType).
+Variable R : numDomainType.
 
 Definition pred_of_itv (i : interval R) : pred R :=
   [pred x | let: Interval l u := i in
@@ -136,43 +347,14 @@ Proof. by move=> x [[[] a|] [[] b|]]; apply: (iffP andP); case. Qed.
 
 Arguments itv_dec {x i}.
 
-Definition lersif (x y : R) b := if b then x < y else x <= y.
-
-Local Notation "x <= y ?< 'if' b" := (lersif x y b)
-  (at level 70, y at next level,
-  format "x '[hv'  <=  y '/'  ?<  'if'  b ']'") : ring_scope.
-
-Lemma lersifxx x b: (x <= x ?< if b) = ~~ b.
-Proof. by case: b; rewrite /= lterr. Qed.
-
-Lemma lersif_trans x y z b1 b2 :
-  x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
-Proof.
-case: b1; first by case: b2; [apply: ltr_trans | apply: ltr_le_trans].
-by case: b2; [apply: ler_lt_trans | apply: ler_trans].
-Qed.
-
-Lemma lersifW b x y : x <= y ?< if b -> x <= y.
-Proof. by case: b => //; move/ltrW. Qed.
-
-Lemma lersifNF x y b : y <= x ?< if ~~ b ->  x <= y ?< if b = false.
-Proof. by case: b => /= [/ler_gtF|/ltr_geF]. Qed.
-
-Lemma lersifS x y b : x < y -> x <= y ?< if b.
-Proof. by case: b => //= /ltrW. Qed.
-
-Lemma lersifT x y : x <= y ?< if true = (x < y). Proof. by []. Qed.
-
-Lemma lersifF x y : x <= y ?< if false = (x <= y). Proof. by []. Qed.
-
-Definition le_boundl b1 b2 :=
+Definition le_boundl (b1 b2 : itv_bound R) :=
   match b1, b2 with
     | BOpen_if b1 x1, BOpen_if b2 x2 => x1 <= x2 ?< if (~~ b2 && b1)
     | BOpen_if _ _, BInfty => false
     | _, _ => true
   end.
 
-Definition le_boundr b1 b2 :=
+Definition le_boundr (b1 b2 : itv_bound R) :=
   match b1, b2 with
     | BOpen_if b1 x1, BOpen_if b2 x2 => x1 <= x2 ?< if (~~ b1 && b2)
     | BInfty, BOpen_if _ _ => false
@@ -184,15 +366,29 @@ Lemma itv_boundlr bl br x :
   (le_boundl bl (BClose x)) && (le_boundr (BClose x) br).
 Proof. by move: bl br => [[] a|] [[] b|]. Qed.
 
+Lemma le_boundl_refl : reflexive le_boundl.
+Proof. by move=> [[] b|]; rewrite /le_boundl /= ?lerr. Qed.
+
+Hint Resolve le_boundl_refl : core.
+
 Lemma le_boundr_refl : reflexive le_boundr.
 Proof. by move=> [[] b|]; rewrite /le_boundr /= ?lerr. Qed.
 
 Hint Resolve le_boundr_refl : core.
 
-Lemma le_boundl_refl : reflexive le_boundl.
-Proof. by move=> [[] b|]; rewrite /le_boundl /= ?lerr. Qed.
+Lemma le_boundl_trans : transitive le_boundl.
+Proof.
+move=> [lb1 lr1 |] [lb2 lr2 |] [lb3 lr3 |] //= H H0.
+apply: {H H0} (lersif_imply _ (lersif_trans H H0)).
+by case: lb1; case: lb2; case: lb3.
+Qed.
 
-Hint Resolve le_boundl_refl : core.
+Lemma le_boundr_trans : transitive le_boundr.
+Proof.
+move=> [lb1 lr1 |] [lb2 lr2 |] [lb3 lr3 |] //= H H0.
+apply: {H H0} (lersif_imply _ (lersif_trans H H0)).
+by case: lb1; case: lb2; case: lb3.
+Qed.
 
 Lemma le_boundl_bb x b1 b2 :
   le_boundl (BOpen_if b1 x) (BOpen_if b2 x) = (b1 ==> b2).
@@ -228,7 +424,7 @@ Proof. by move=> [] xb [[] xa|] //=; rewrite inE lterr ?andbT ?andbF. Qed.
 
 Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
 
-Lemma itvP : forall (x : R) (i : interval R), (x \in i) -> itv_rewrite i x.
+Lemma itvP : forall (x : R) (i : interval R), x \in i -> itv_rewrite i x.
 Proof.
 move=> x [[[] a|] [[] b|]]; move/itv_dec=> //= [hl hu]; do ?[split=> //;
   do ?[by rewrite ltrW | by rewrite ltrWN | by rewrite ltrNW |
@@ -250,8 +446,7 @@ Definition subitv (i1 i2 : interval R) :=
     | Interval a1 b1, Interval a2 b2 => le_boundl a2 a1 && le_boundr b1 b2
   end.
 
-Lemma subitvP : forall (i2 i1 : interval R), 
-  (subitv i1 i2) -> {subset i1 <= i2}.
+Lemma subitvP : forall (i2 i1 : interval R), subitv i1 i2 -> {subset i1 <= i2}.
 Proof.
 by move=> [[[] a2|] [[] b2|]] [[[] a1|] [[] b1|]];
   rewrite /subitv //; case/andP=> /= ha hb x hx; rewrite ?inE;
@@ -300,11 +495,6 @@ Lemma itv_splitI : forall a b, forall x,
   x \in Interval a b = (x \in Interval a (BInfty _)) && (x \in Interval (BInfty _) b).
 Proof. by move=> [[] a|] [[] b|] x; rewrite ?inE ?andbT. Qed.
 
-
-Lemma real_lersifN x y b : x \in Num.real -> y \in Num.real ->
-  x <= y ?< if ~~b = ~~ (y <= x ?< if b).
-Proof. by case: b => [] xR yR /=; rewrite (real_ltrNge, real_lerNgt). Qed.
-
 Lemma oppr_itv ba bb (xa xb x : R) :
   (-x \in Interval (BOpen_if ba xa) (BOpen_if bb xb)) = 
   (x \in Interval (BOpen_if bb (-xb)) (BOpen_if ba (-xa))).
@@ -345,16 +535,15 @@ Notation "`] a , '+oo' [" := (Interval (BOpen a) (BInfty _))
 Notation "`] -oo , '+oo' [" := (Interval (BInfty _) (BInfty _))
   (at level 0, format "`] -oo ,  '+oo' [") : ring_scope.
 
-Notation "x <= y ?< 'if' b" := (lersif x y b)
-  (at level 70, y at next level,
-  format "x '[hv'  <=  y '/'  ?<  'if'  b ']'") : ring_scope.
-
 Section IntervalOrdered.
 
 Variable R : realDomainType.
 
-Lemma lersifN (x y : R) b : (x <= y ?< if ~~ b) = ~~ (y <= x ?< if b).
-Proof. by rewrite real_lersifN ?num_real. Qed.
+Lemma le_boundl_total : total (@le_boundl R).
+Proof. by move=> [[] l |] [[] r |] //=; case: (ltrgtP l r). Qed.
+
+Lemma le_boundr_total : total (@le_boundr R).
+Proof. by move=> [[] l |] [[] r |] //=; case (ltrgtP l r). Qed.
 
 Lemma itv_splitU (xc : R) bc a b : xc \in Interval a b ->
   forall y, y \in Interval a b =
@@ -392,7 +581,7 @@ Section IntervalField.
 
 Variable R : realFieldType.
 
-Lemma mid_in_itv : forall ba bb (xa xb : R), xa <= xb ?< if (ba || bb)
+Lemma mid_in_itv : forall ba bb (xa xb : R), xa <= xb ?< if ba || bb
   -> mid xa xb \in Interval (BOpen_if ba xa) (BOpen_if bb xb).
 Proof.
 by move=> [] [] xa xb /= hx; apply/itv_dec=> /=; rewrite ?midf_lte // ?ltrW.
