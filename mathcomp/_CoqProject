@@ -1,1 +1,6 @@
+-I .
 -R . mathcomp
+
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -redundant-canonical-projection
+-arg -w -arg -notation-overridden
