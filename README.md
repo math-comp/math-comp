@@ -27,7 +27,7 @@ installation instructions in other scenarios.
 ## How to get help
 
 - The [website](http://math-comp.github.io/math-comp/) of the MathComp library
-  contains links to the HTML documentation of each file
+  contains links to the HTML documentation of each file.
 - The [ssreflect mailing
   list](https://sympa.inria.fr/sympa/info/ssreflect) is the primary
   venue for help and questions about the library.
