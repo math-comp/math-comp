@@ -36,7 +36,8 @@ Tactic Notation "check_join"
   end.
 """)
     for x in G.keys():
-        if x.rfind("Lmod") >= 0 or x.rfind("Splitting") >= 0 or \
+        if x.rfind("Order") >= 0 or x.rfind("Norm") >= 0 or \
+           x.rfind("Lmod") >= 0 or x.rfind("Splitting") >= 0 or \
            x.rfind("lgebra") >= 0 or x.rfind("FieldExt") >= 0 or \
            x.rfind("Vector") >= 0:
             print ("Local Notation \"" + x + ".type\" := (" + x + ".type _) (only parsing).")

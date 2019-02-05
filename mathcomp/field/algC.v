@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path bigop finset prime ssralg poly.
-From mathcomp Require Import polydiv mxpoly generic_quotient countalg ssrnum.
-From mathcomp Require Import closed_field ssrint rat intdiv.
+From mathcomp Require Import div fintype path bigop finset prime order ssralg.
+From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
+From mathcomp Require Import ssrnum closed_field ssrint rat intdiv.
 From mathcomp Require Import algebraics_fundamentals.
 
 (******************************************************************************)
@@ -53,14 +53,14 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 (* The Num mixin for an algebraically closed field with an automorphism of    *)
 (* order 2, making it into a field of complex numbers.                        *)
 Lemma ComplexNumMixin (L : closedFieldType) (conj : {rmorphism L -> L}) :
     involutive conj -> ~ conj =1 id ->
-  {numL | forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}.
+  {numL : numMixin L | forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}.
 Proof.
 move=> conjK conj_nt.
 have nz2: 2%:R != 0 :> L.
@@ -184,7 +184,7 @@ have normD x y : le (norm (x + y)) (norm x + norm y).
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
   rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
   by rewrite (mulrC x) (mulrC y).
-by exists (Num.Mixin normD sposD norm_eq0 pos_linear normM (rrefl _) (rrefl _)).
+by exists (NumMixin normD sposD norm_eq0 pos_linear normM (rrefl _) (rrefl _)).
 Qed.
 
 Module Algebraics.
@@ -229,8 +229,10 @@ Canonical decFieldType := DecFieldType type decFieldMixin.
 Axiom closedFieldAxiom : GRing.ClosedField.axiom ringType.
 Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
 
-Parameter numMixin : Num.mixin_of ringType.
+Parameter numMixin : numMixin idomainType.
+Canonical porderType := POrderType ring_display type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
+Canonical normedDomainType := NormedDomainType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
@@ -422,13 +424,15 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   have [i] := @solve_monicpoly _ 2 (nth 0 [:: -1 : type]) isT.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
-have/ltr_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-rewrite -i2 rmorphX /= expr2 -{2}iL_J -(svalP LnumMixin).
-by rewrite exprn_ge0 ?normr_ge0.
+have/lt_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
+by rewrite -i2 rmorphX /= expr2 -{2}iL_J -(svalP LnumMixin) exprn_ge0.
 Qed.
 
-Definition numMixin := sval (ComplexNumMixin conjK conj_nt).
+Definition numMixin : numMixin closedFieldType :=
+  sval (ComplexNumMixin conjK conj_nt).
+Canonical porderType := POrderType ring_display type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
+Canonical normedDomainType := NormedDomainType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
@@ -480,18 +484,18 @@ Fact floorC_subproof x : {m | x \is Creal -> ZtoC m <= x < ZtoC (m + 1)}.
 Proof.
 have [Rx | _] := boolP (x \is Creal); last by exists 0.
 without loss x_ge0: x Rx / x >= 0.
-  have [x_ge0 | /ltrW x_le0] := real_ger0P Rx; first exact.
+  have [x_ge0 | /ltW x_le0] := real_ge0P Rx; first exact.
   case/(_ (- x)) => [||m /(_ isT)]; rewrite ?rpredN ?oppr_ge0 //.
-  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= ltr_neqAle ler_eqVlt.
+  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= lt_neqAle le_eqVlt.
   case: eqP => [-> _ | _ /and3P[lt_x_m _ le_m_x]].
-    by exists (- m) => _; rewrite lerr rmorphD ltr_addl ltr01.
+    by exists (- m) => _; rewrite lexx rmorphD ltr_addl ltr01.
   by exists (- m - 1); rewrite le_m_x subrK.
 have /ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
   have [n le_x_n] := rat_algebraic_archimedean algebraic x.
-  by exists n; rewrite -(ger0_norm x_ge0) (ltr_trans le_x_n) ?ltr_nat.
+  by exists n; rewrite -(ger0_norm x_ge0) (lt_trans le_x_n) ?ltr_nat.
 exists n%:Z => _; rewrite addrC -intS lt_x_n1 andbT.
 case Dn: n => // [n1]; rewrite -Dn.
-have [||//|] := @real_lerP _ n%:R x; rewrite ?rpred_nat //.
+have [||//|] := @real_leP _ n%:R x; rewrite ?rpred_nat //.
 by rewrite Dn => /min_n; rewrite Dn ltnn.
 Qed.
 
@@ -535,7 +539,9 @@ Canonical unitRingType.
 Canonical comRingType.
 Canonical comUnitRingType.
 Canonical idomainType.
+Canonical porderType.
 Canonical numDomainType.
+Canonical normedDomainType.
 Canonical fieldType.
 Canonical numFieldType.
 Canonical decFieldType.
@@ -663,15 +669,15 @@ Proof. by rewrite /floorC => Rx; case: (floorC_subproof x) => //= m; apply. Qed.
 
 Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
 Proof.
-case/andP=> lemx ltxm1; apply/eqP; rewrite eqr_le -!ltz_addr1.
+case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltz_addr1.
 have /floorC_itv/andP[lefx ltxf1]: x \is Creal.
   by rewrite -[x](subrK m%:~R) rpredD ?realz ?ler_sub_real.
-by rewrite -!(ltr_int [numFieldType of algC]) 2?(@ler_lt_trans _ x).
+by rewrite -!(ltr_int [numFieldType of algC]) 2?(@le_lt_trans _ _ x).
 Qed.
 
 Lemma intCK : cancel intr floorC.
 Proof.
-by move=> m; apply: floorC_def; rewrite ler_int ltr_int ltz_addr1 lerr.
+by move=> m; apply: floorC_def; rewrite ler_int ltr_int ltz_addr1 lexx.
 Qed.
 
 Lemma floorCK : {in Cint, cancel floorC intr}. Proof. by move=> z /eqP. Qed.
@@ -757,17 +763,17 @@ Lemma truncC_itv x : 0 <= x -> (truncC x)%:R <= x < (truncC x).+1%:R.
 Proof.
 move=> x_ge0; have /andP[lemx ltxm1] := floorC_itv (ger0_real x_ge0).
 rewrite /truncC x_ge0 -addn1 !pmulrn PoszD gez0_abs ?lemx //.
-by rewrite -ltz_addr1 -(ltr_int [numFieldType of algC]) (ler_lt_trans x_ge0).
+by rewrite -ltz_addr1 -(ltr_int [numFieldType of algC]) (le_lt_trans x_ge0).
 Qed.
 
 Lemma truncC_def x n : n%:R <= x < n.+1%:R -> truncC x = n.
 Proof.
 move=> ivt_n_x; have /andP[lenx _] := ivt_n_x.
-by rewrite /truncC (ler_trans (ler0n _ n)) // (@floorC_def _ n) // addrC -intS.
+by rewrite /truncC (le_trans (ler0n _ n)) // (@floorC_def _ n) // addrC -intS.
 Qed.
 
 Lemma natCK n : truncC n%:R = n.
-Proof. by apply: truncC_def; rewrite lerr ltr_nat /=. Qed.
+Proof. by apply: truncC_def; rewrite lexx ltr_nat /=. Qed.
 
 Lemma CnatP x : reflect (exists n, x = n%:R) (x \in Cnat).
 Proof.
@@ -782,9 +788,9 @@ Proof.
 apply/idP/idP=> [m_gt0 | x_ge1].
   have /truncC_itv/andP[lemx _]: 0 <= x.
     by move: m_gt0; rewrite /truncC; case: ifP.
-  by apply: ler_trans lemx; rewrite ler1n.
-have /truncC_itv/andP[_ ltxm1]:= ler_trans ler01 x_ge1.
-by rewrite -ltnS -ltC_nat (ler_lt_trans x_ge1).
+  by apply: le_trans lemx; rewrite ler1n.
+have /truncC_itv/andP[_ ltxm1]:= le_trans ler01 x_ge1.
+by rewrite -ltnS -ltC_nat (le_lt_trans x_ge1).
 Qed.
 
 Lemma truncC0Pn x : reflect (truncC x = 0%N) (~~ (1 <= x)).
@@ -912,14 +918,12 @@ by rewrite pnatr_eq0 ler1n lt0n.
 Qed.
 
 Lemma sqr_Cint_ge1 x : x \in Cint -> x != 0 -> 1 <= x ^+ 2.
-Proof.
-by move=> Zx nz_x; rewrite -Cint_normK // expr_ge1 ?normr_ge0 ?norm_Cint_ge1.
-Qed.
+Proof. by move=> Zx nz_x; rewrite -Cint_normK // expr_ge1 ?norm_Cint_ge1. Qed.
 
 Lemma Cint_ler_sqr x : x \in Cint -> x <= x ^+ 2.
 Proof.
 move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
-apply: ler_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Creal_Cint.
+apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Creal_Cint.
 by rewrite -Cint_normK // ler_eexpr // norm_Cint_ge1.
 Qed.
 
@@ -937,7 +941,7 @@ Lemma dvdCP_nat x y : 0 <= x -> 0 <= y -> (x %| y)%C -> {n | y = n%:R * x}.
 Proof.
 move=> x_ge0 y_ge0 x_dv_y; apply: sig_eqW.
 case/dvdCP: x_dv_y => z Zz -> in y_ge0 *; move: x_ge0 y_ge0 Zz.
-rewrite ler_eqVlt => /predU1P[<- | ]; first by exists 22; rewrite !mulr0.
+rewrite le_eqVlt => /predU1P[<- | ]; first by exists 22; rewrite !mulr0.
 by move=> /pmulr_lge0-> /CintEge0-> /CnatP[n ->]; exists n.
 Qed.
 
