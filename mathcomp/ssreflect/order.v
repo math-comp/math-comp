@@ -388,15 +388,15 @@ Definition leif (x y : T) C : Prop := ((x <= y) * ((x == y) = C))%type.
 
 Definition le_of_leif x y C (le_xy : @leif x y C) := le_xy.1 : le x y.
 
-CoInductive le_xor_gt (x y : T) : bool -> bool -> Set :=
+Variant le_xor_gt (x y : T) : bool -> bool -> Set :=
   | LerNotGt of x <= y : le_xor_gt x y true false
   | GtrNotLe of y < x  : le_xor_gt x y false true.
 
-CoInductive lt_xor_ge (x y : T) : bool -> bool -> Set :=
+Variant lt_xor_ge (x y : T) : bool -> bool -> Set :=
   | LtrNotGe of x < y  : lt_xor_ge x y false true
   | GerNotLt of y <= x : lt_xor_ge x y true false.
 
-CoInductive comparer (x y : T) :
+Variant comparer (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | ComparerEq of x = y : comparer x y
     true true true true false false
@@ -405,7 +405,7 @@ CoInductive comparer (x y : T) :
   | ComparerGt of y < x : comparer x y
     false false false true false true.
 
-CoInductive incomparer (x y : T) :
+Variant incomparer (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | InComparerEq of x = y : incomparer x y
     true true true true false false true true
@@ -557,8 +557,40 @@ Module Import LatticeDef.
 Section LatticeDef.
 Context {display : unit}.
 Local Notation latticeType := (latticeType display).
-Definition meet {T : latticeType} : T -> T -> T := Lattice.meet (Lattice.class T).
-Definition join {T : latticeType} : T -> T -> T := Lattice.join (Lattice.class T).
+Context {T : latticeType}.
+Definition meet : T -> T -> T := Lattice.meet (Lattice.class T).
+Definition join : T -> T -> T := Lattice.join (Lattice.class T).
+
+Variant le_xor_gt (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
+  | LerNotGt of x <= y : le_xor_gt x y true false x x y y
+  | GtrNotLe of y < x  : le_xor_gt x y false true y y x x.
+
+Variant lt_xor_ge (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
+  | LtrNotGe of x < y  : lt_xor_ge x y false true x x y y
+  | GerNotLt of y <= x : lt_xor_ge x y true false y y x x.
+
+Variant comparer (x y : T) :
+  bool -> bool -> bool -> bool -> bool -> bool -> T -> T -> T -> T -> Set :=
+  | ComparerEq of x = y : comparer x y
+    true true true true false false x x x x
+  | ComparerLt of x < y : comparer x y
+    false false true false true false x x y y
+  | ComparerGt of y < x : comparer x y
+    false false false true false true y y x x.
+
+Variant incomparer (x y : T) :
+  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool ->
+  T -> T -> T -> T -> Set :=
+  | InComparerEq of x = y : incomparer x y
+    true true true true false false true true x x x x
+  | InComparerLt of x < y : incomparer x y
+    false false true false true false true true x x y y
+  | InComparerGt of y < x : incomparer x y
+    false false false true false true true true y y x x
+  | InComparer of x >< y  : incomparer x y
+    false false false false false false false false
+    (meet x y) (meet x y) (join x y) (join x y).
+
 End LatticeDef.
 End LatticeDef.
 
@@ -570,8 +602,8 @@ Notation "x `|` y" := (join x y).
 End LatticeSyntax.
 
 Module Total.
+Notation mixin_of T := (total (<=%O : rel T)).
 Section ClassDef.
-Local Notation mixin_of T := (total (<=%O : rel T)).
 
 Record class_of d (T : Type) := Class {
   base  : Lattice.class_of d T;
@@ -1641,12 +1673,16 @@ End ReverseSyntax.
 
 Module Import POrderTheory.
 Section POrderTheory.
+Import POrderDef.
 
 Context {display : unit}.
 Local Notation porderType := (porderType display).
 Context {T : porderType}.
 
 Implicit Types x y : T.
+
+Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
+Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
 
 Lemma lexx (x : T) : x <= x.
 Proof. by case: T x => ? [? []]. Qed.
@@ -1664,11 +1700,16 @@ Proof. by case: T => ? [? []]. Qed.
 Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
 Proof. by case: T x y => ? [? []]. Qed.
 
+Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
+Proof. by rewrite lt_neqAle eq_sym. Qed.
+
 Lemma ltxx x: x < x = false.
 Proof. by rewrite lt_neqAle eqxx. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
 Hint Resolve lt_irreflexive.
+
+Definition ltexx := (lexx, ltxx).
 
 Lemma le_eqVlt x y: (x <= y) = (x == y) || (x < y).
 Proof. by rewrite lt_neqAle; case: eqP => //= ->; rewrite lexx. Qed.
@@ -1700,6 +1741,9 @@ Proof. by rewrite le_eqVlt => /orP [/eqP ->|/lt_trans t /t]. Qed.
 Lemma lt_nsym x y : x < y -> y < x -> False.
 Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
 
+Lemma lt_asym x y : x < y < x = false.
+Proof. by apply/negP => /andP []; apply lt_nsym. Qed.
+
 Lemma le_gtF x y: x <= y -> y < x = false.
 Proof.
 by move=> le_xy; apply/negP => /lt_le_trans /(_ le_xy); rewrite ltxx.
@@ -1719,10 +1763,12 @@ by rewrite lt_neqAle lexy andbT; apply: contraNneq Nleyx => ->.
 Qed.
 
 Lemma lt_le_asym x y : x < y <= x = false.
-Proof. by rewrite lt_neqAle -andbA -eq_le eq_sym; case: (_ == _). Qed.
+Proof. by rewrite lt_neqAle -andbA -eq_le eq_sym andNb. Qed.
 
 Lemma le_lt_asym x y : x <= y < x = false.
 Proof. by rewrite andbC lt_le_asym. Qed.
+
+Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
 Lemma lt_sorted_uniq_le (s : seq T) :
    sorted lt s = uniq s && sorted le s.
@@ -1818,11 +1864,153 @@ rewrite /leif le_eqVlt; apply: (iffP idP)=> [|[]].
 by move=> /orP[/eqP->|lxy] <-; rewrite ?eqxx // lt_eqF.
 Qed.
 
+Lemma leif_refl x C : reflect (x <= x ?= iff C) C.
+Proof. by apply: (iffP idP) => [-> | <-] //; split; rewrite ?eqxx. Qed.
+
+Lemma leif_trans x1 x2 x3 C12 C23 :
+  x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23.
+Proof.
+move=> ltx12 ltx23; apply/leifP; rewrite -ltx12.
+case eqx12: (x1 == x2).
+  by rewrite (eqP eqx12) lt_neqAle !ltx23 andbT; case C23.
+by rewrite (@lt_le_trans x2) ?ltx23 // lt_neqAle eqx12 ltx12.
+Qed.
+
+Lemma leif_le x y : x <= y -> x <= y ?= iff (x >= y).
+Proof. by move=> lexy; split=> //; rewrite eq_le lexy. Qed.
+
+Lemma leif_eq x y : x <= y -> x <= y ?= iff (x == y).
+Proof. by []. Qed.
+
+Lemma ger_leif x y C : x <= y ?= iff C -> (y <= x) = C.
+Proof. by case=> le_xy; rewrite eq_le le_xy. Qed.
+
+Lemma ltr_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
+Proof. by move=> le_xy; rewrite lt_neqAle !le_xy andbT. Qed.
+
+Lemma mono_in_leif (A : pred T) (f : T -> T) C :
+   {in A &, {mono f : x y / x <= y}} ->
+  {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
+Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
+
+Lemma mono_leif (f : T -> T) C :
+    {mono f : x y / x <= y} ->
+  forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
+Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+
+Lemma nmono_in_leif (A : pred T) (f : T -> T) C :
+    {in A &, {mono f : x y /~ x <= y}} ->
+  {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
+Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
+
+Lemma nmono_leif (f : T -> T) C :
+    {mono f : x y /~ x <= y} ->
+  forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
+Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+
 End POrderTheory.
 End POrderTheory.
 
-Hint Resolve lexx le_refl lt_irreflexive.
+Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF.
 
+Arguments leifP {display T x y C}.
+Arguments leif_refl {display T x C}.
+Arguments mono_in_leif [display T A f C].
+Arguments nmono_in_leif [display T A f C].
+Arguments mono_leif [display T f C].
+Arguments nmono_leif [display T f C].
+
+Module Import POrderMonotonyTheory.
+Section POrderMonotonyTheory.
+
+Context {display display' : unit}.
+Context {T : porderType display} {T' : porderType display'}.
+Implicit Types (m n p : nat) (x y z : T) (u v w : T').
+Variable D D' : pred T.
+Variable (f : T -> T').
+
+(****************************************************************************)
+(* This listing of "Let"s factor out the required premices for the          *)
+(* subsequent lemmas, putting them in the context so that "done" solves the *)
+(* goals quickly                                                            *)
+(****************************************************************************)
+
+Let ltE := @lt_neqAle _ T.
+Let lt'E := @lt_neqAle _ T'.
+Let gtE (x y : T) : (x > y) = (x != y) && (x >= y).
+Proof. by rewrite lt_neqAle eq_sym. Qed.
+Let gt'E (x y : T') : (x > y) = (x != y) && (x >= y).
+Proof. by rewrite lt_neqAle eq_sym. Qed.
+Let le_antiT := @le_anti _ T.
+Let le_antiT' := @le_anti _ T'.
+Let ge_antiT : antisymmetric (>=%O : rel T).
+Proof. by move=> ??; rewrite andbC; apply: le_anti. Qed.
+Let ge_antiT' : antisymmetric (>=%O : rel T').
+Proof. by move=> ??; rewrite andbC; apply: le_anti. Qed.
+
+Lemma ltW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
+Proof. exact: homoW. Qed.
+
+Lemma ltW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y}.
+Proof. exact: homoW. Qed.
+
+Lemma inj_homo_lt :
+  injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y}.
+Proof. exact: inj_homo. Qed.
+
+Lemma inj_nhomo_lt :
+  injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y}.
+Proof. exact: inj_homo. Qed.
+
+Lemma inc_inj : {mono f : x y / x <= y} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma dec_inj : {mono f : x y /~ x <= y} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma leW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
+Proof. exact: anti_mono. Qed.
+
+Lemma leW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
+Proof. exact: anti_mono. Qed.
+
+(* Monotony in D D' *)
+Lemma ltW_homo_in :
+  {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltW_nhomo_in :
+  {in D & D', {homo f : x y /~ x < y}} -> {in D & D', {homo f : x y /~ x <= y}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma inj_homo_lt_in :
+    {in D & D', injective f} ->  {in D & D', {homo f : x y / x <= y}} ->
+  {in D & D', {homo f : x y / x < y}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma inj_nhomo_lt_in :
+    {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
+  {in D & D', {homo f : x y /~ x < y}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma inc_inj_in : {in D &, {mono f : x y / x <= y}} ->
+   {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma dec_inj_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma leW_mono_in :
+  {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma leW_nmono_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
+Proof. exact: anti_mono_in. Qed.
+
+End POrderMonotonyTheory.
+End POrderMonotonyTheory.
 
 Module Import ReversePOrder.
 Section ReversePOrder.
@@ -1936,16 +2124,6 @@ Proof. by rewrite meetAC meetC meetxx. Qed.
 
 (* interaction with order *)
 
-Lemma meet_idPl {x y} : reflect (x `&` y = x) (x <= y).
-Proof. by rewrite leEmeet; apply/eqP. Qed.
-Lemma meet_idPr {x y} : reflect (y `&` x = x) (x <= y).
-Proof. by rewrite meetC; apply/meet_idPl. Qed.
-
-Lemma leIidl x y : (x <= x `&` y) = (x <= y).
-Proof. by rewrite !leEmeet meetKI. Qed.
-Lemma leIidr x y : (x <= y `&` x) = (x <= y).
-Proof. by rewrite !leEmeet meetKIC. Qed.
-
 Lemma lexI x y z : (x <= y `&` z) = (x <= y) && (x <= z).
 Proof.
 rewrite !leEmeet; apply/idP/idP => [/eqP<-|/andP[/eqP<- /eqP<-]].
@@ -1966,6 +2144,22 @@ Proof. by rewrite leIx ?lexx ?orbT. Qed.
 Lemma leIl x y : x `&` y <= x.
 Proof. by rewrite leIx ?lexx ?orbT. Qed.
 
+Lemma meet_idPl {x y} : reflect (x `&` y = x) (x <= y).
+Proof. by rewrite leEmeet; apply/eqP. Qed.
+Lemma meet_idPr {x y} : reflect (y `&` x = x) (x <= y).
+Proof. by rewrite meetC; apply/meet_idPl. Qed.
+
+Lemma leIidl x y : (x <= x `&` y) = (x <= y).
+Proof. by rewrite !leEmeet meetKI. Qed.
+Lemma leIidr x y : (x <= y `&` x) = (x <= y).
+Proof. by rewrite !leEmeet meetKIC. Qed.
+
+Lemma eq_meetl x y : (x `&` y == x) = (x <= y).
+Proof. by apply/esym/leEmeet. Qed.
+
+Lemma eq_meetr x y : (x `&` y == y) = (y <= x).
+Proof. by rewrite meetC eq_meetl. Qed.
+
 Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
 Proof. by move=> xz yt; rewrite lexI !leIx ?xz ?yt ?orbT //. Qed.
 
@@ -1974,6 +2168,7 @@ End LatticeTheoryMeet.
 
 Module Import LatticeTheoryJoin.
 Section LatticeTheoryJoin.
+Import LatticeDef.
 Context {display : unit}.
 Local Notation latticeType := (latticeType display).
 Context {L : latticeType}.
@@ -2000,6 +2195,16 @@ Lemma joinUKC y x : y `|` x `|` y = x `|` y.
 Proof. exact: (@meetIKC _ [latticeType of L^r]). Qed.
 
 (* interaction with order *)
+Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
+Proof. exact: (@lexI _ [latticeType of L^r]). Qed.
+Lemma lexU x y z : (x <= y) || (x <= z) -> x <= y `|` z.
+Proof. exact: (@leIx _ [latticeType of L^r]). Qed.
+
+Lemma leUr x y : x <= y `|` x.
+Proof. exact: (@leIr _ [latticeType of L^r]). Qed.
+Lemma leUl x y : x <= x `|` y.
+Proof. exact: (@leIl _ [latticeType of L^r]). Qed.
+
 Lemma join_idPl {x y} : reflect (x `|` y = y) (x <= y).
 Proof. exact: (@meet_idPr _ [latticeType of L^r]). Qed.
 Lemma join_idPr {x y} : reflect (y `|` x = y) (x <= y).
@@ -2010,17 +2215,10 @@ Proof. exact: (@leIidr _ [latticeType of L^r]). Qed.
 Lemma leUidr x y : (y `|` x <= y) = (x <= y).
 Proof. exact: (@leIidl _ [latticeType of L^r]). Qed.
 
-Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
-Proof. exact: (@lexI _ [latticeType of L^r]). Qed.
-
-Lemma lexU x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx _ [latticeType of L^r]). Qed.
-
-Lemma leUr x y : x <= y `|` x.
-Proof. exact: (@leIr _ [latticeType of L^r]). Qed.
-
-Lemma leUl x y : x <= x `|` y.
-Proof. exact: (@leIl _ [latticeType of L^r]). Qed.
+Lemma eq_joinl x y : (x `|` y == x) = (y <= x).
+Proof. exact: (@eq_meetl _ [latticeType of L^r]). Qed.
+Lemma eq_joinr x y : (x `|` y == y) = (x <= y).
+Proof. exact: (@eq_meetr _ [latticeType of L^r]). Qed.
 
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
 Proof. exact: (@leI2 _ [latticeType of L^r]). Qed.
@@ -2029,11 +2227,35 @@ Proof. exact: (@leI2 _ [latticeType of L^r]). Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. exact: (@meetUr _ [latticeType of L^r]). Qed.
 
+Lemma lcomparableP x y : incomparer x y
+  (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y)
+  (y >=< x) (x >=< y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+Proof.
+case: (comparableP x) => [-> | hxy | hxy | hxy]; try have hxy' := ltW hxy;
+  rewrite ?(meetxx, joinxx, meetC y, joinC y)
+          ?(meet_idPl hxy', meet_idPr hxy', join_idPl hxy', join_idPr hxy');
+  try by constructor.
+Qed.
+
+Lemma lcomparable_ltgtP x y : x >=< y ->
+  comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y)
+           (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+Proof. by case: (lcomparableP x) => // *; constructor. Qed.
+
+Lemma lcomparable_leP x y : x >=< y ->
+  le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+Proof. by move/lcomparable_ltgtP => [->|/ltW xy|xy]; constructor => //. Qed.
+
+Lemma lcomparable_ltP x y : x >=< y ->
+  lt_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+Proof. by move=> /lcomparable_ltgtP [->|xy|/ltW xy]; constructor => //. Qed.
+
 End LatticeTheoryJoin.
 End LatticeTheoryJoin.
 
 Module TotalLattice.
 Section TotalLattice.
+Import POrderDef.
 Context {display : unit}.
 Local Notation porderType := (porderType display).
 Context {T : porderType}.
@@ -2107,7 +2329,7 @@ Section TotalTheory.
 Context {display : unit}.
 Local Notation orderType := (orderType display).
 Context {T : orderType}.
-Implicit Types (x y : T).
+Implicit Types (x y z t : T).
 
 Lemma le_total : total (<=%O : rel T). Proof. by case: T => [? [?]]. Qed.
 Hint Resolve le_total.
@@ -2132,13 +2354,133 @@ Proof. by rewrite comparable_leNgt. Qed.
 Lemma ltNge x y : (x < y) = ~~ (y <= x).
 Proof. by rewrite comparable_ltNge. Qed.
 
-Definition ltgtP := TotalLattice.ltgtP le_total.
-Definition leP := TotalLattice.leP le_total.
-Definition ltP := TotalLattice.ltP le_total.
+Lemma wlog_le P :
+     (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
+   forall x y, P x y.
+Proof.
+move=> sP hP x y; case hxy: (x <= y); last apply/sP; apply/hP => //.
+by move/negbT: hxy; rewrite -ltNge; apply/ltW.
+Qed.
+
+Lemma wlog_lt P :
+    (forall x, P x x) ->
+    (forall x y, (P y x -> P x y)) -> (forall x y, x < y -> P x y) ->
+  forall x y, P x y.
+Proof.
+move=> rP sP hP x y; case hxy: (x < y); first by apply/hP.
+case hxy': (x == y); first by move/eqP: hxy' => <-; apply rP.
+by apply/sP/hP; rewrite lt_def leNgt hxy hxy'.
+Qed.
+
+Definition ltgtP x y := LatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
+Definition leP x y := LatticeTheoryJoin.lcomparable_leP (comparableT x y).
+Definition ltP x y := LatticeTheoryJoin.lcomparable_ltP (comparableT x y).
+
+Lemma neq_lt x y : (x != y) = (x < y) || (y < x).
+Proof. by case: ltgtP. Qed.
+
+Lemma lt_total x y : x != y -> (x < y) || (y < x).
+Proof. by rewrite neq_lt. Qed.
+
+Lemma eq_leLR x y z t :
+  (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
+Proof. by move=> *; apply/idP/idP; rewrite // !leNgt; apply: contra. Qed.
+
+Lemma eq_leRL x y z t :
+  (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y).
+Proof. by move=> *; symmetry; apply: eq_leLR. Qed.
+
+Lemma eq_ltLR x y z t :
+  (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t).
+Proof. by move=> *; rewrite !ltNge; congr negb; apply: eq_leLR. Qed.
+
+Lemma eq_ltRL x y z t :
+  (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
+Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
+
+(* interaction with lattice operations *)
+
+Definition lexI_total := @lexI _ T.
+Definition leUx_total := @leUx _ T.
+
+Lemma leIx_total x y z : (meet y z <= x) = (y <= x) || (z <= x).
+Proof.
+by case: (leP y z) => hyz; case: leP => ?;
+  rewrite ?(orbT, orbF) //=; apply/esym/negbTE; rewrite -ltNge;
+  [rewrite (lt_le_trans _ hyz) | rewrite (lt_trans _ hyz)].
+Qed.
+
+Lemma lexU_total x y z : (x <= join y z) = (x <= y) || (x <= z).
+Proof.
+by case: (leP y z) => hyz; case: leP => ?;
+  rewrite ?(orbT, orbF) //=; apply/esym/negbTE; rewrite -ltNge;
+  [rewrite (le_lt_trans hyz) | rewrite (lt_trans hyz)].
+Qed.
+
+Lemma ltxI x y z : (x < meet y z) = (x < y) && (x < z).
+Proof. by rewrite !ltNge leIx_total negb_or. Qed.
+
+Lemma ltIx x y z : (meet y z < x) = (y < x) || (z < x).
+Proof. by rewrite !ltNge lexI negb_and. Qed.
+
+Lemma ltxU x y z : (x < join y z) = (x < y) || (x < z).
+Proof. by rewrite !ltNge leUx negb_and. Qed.
+
+Lemma ltUx x y z : (join y z < x) = (y < x) && (z < x).
+Proof. by rewrite !ltNge lexU_total negb_or. Qed.
+
+Definition ltexI := (lexI_total, ltxI).
+Definition lteIx := (leIx_total, ltIx).
+Definition ltexU := (lexU_total, ltxU).
+Definition lteUx := (leUx_total, ltxU).
 
 End TotalTheory.
 End TotalTheory.
 
+Module Import TotalMonotonyTheory.
+Section TotalMonotonyTheory.
+
+Import TotalTheory.
+
+Context {display : unit} {display' : unit}.
+Context {T : orderType display} {T' : porderType display'}.
+Variables (D : pred T) (f : T -> T').
+Implicit Types (x y z : T) (u v w : T').
+
+Lemma le_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
+Proof.
+move=> mf x y; case: ltgtP; first (by move=> ->; apply/lexx); move/mf => fxy.
+- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
+- by apply/ltW.
+Qed.
+
+Lemma le_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
+Proof.
+move=> mf x y; case: ltgtP; first (by move=> ->; apply/lexx); move/mf => fxy.
+- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
+- by apply/ltW.
+Qed.
+
+Lemma le_mono_in :
+  {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
+Proof.
+move=> mf x y Dx Dy; case: ltgtP;
+  first (by move=> ->; apply/lexx); move/mf => fxy.
+- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
+- by apply/ltW/fxy.
+Qed.
+
+Lemma le_nmono_in :
+  {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
+Proof.
+move=> mf x y Dx Dy; case: ltgtP;
+  first (by move=> ->; apply/lexx); move/mf => fxy.
+- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
+- by apply/ltW/fxy.
+Qed.
+
+End TotalMonotonyTheory.
+End TotalMonotonyTheory.
 
 Module Import BLatticeTheory.
 Section BLatticeTheory.
@@ -2203,7 +2545,7 @@ apply/idP/idP; last by move=> /andP [/eqP-> /eqP->]; rewrite joinx0.
 by move=> /eqP xUy0; rewrite -!lex0 -!xUy0 ?leUl ?leUr.
 Qed.
 
-CoInductive eq0_xor_gt0 x : bool -> bool -> Set :=
+Variant eq0_xor_gt0 x : bool -> bool -> Set :=
     Eq0NotPOs : x = 0 -> eq0_xor_gt0 x true false
   | POsNotEq0 : 0 < x -> eq0_xor_gt0 x false true.
 
@@ -2829,6 +3171,8 @@ Module Theory.
 Export ReversePOrder.
 Export POrderTheory.
 Export TotalTheory.
+Export POrderMonotonyTheory.
+Export TotalMonotonyTheory.
 Export ReverseLattice.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
