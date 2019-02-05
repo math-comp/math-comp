@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient finalg action gproduct.
 From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
@@ -40,7 +40,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory Num.Theory.
+Import Order.Theory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Section Basics.
@@ -225,8 +225,8 @@ exists chi1; last exists (- nchi2); last by rewrite opprK.
   apply: rpred_sum => i zi_ge0; rewrite -tnth_nth rpredZ_Cnat ?irr_char //.
   by rewrite CnatEint Zz.
 rewrite -sumrN rpred_sum // => i zi_lt0; rewrite -scaleNr -tnth_nth.
-rewrite rpredZ_Cnat ?irr_char // CnatEint rpredN Zz oppr_ge0 ltrW //.
-by rewrite real_ltrNge ?Creal_Cint.
+rewrite rpredZ_Cnat ?irr_char // CnatEint rpredN Zz oppr_ge0 ltW //.
+by rewrite real_ltNge ?Creal_Cint.
 Qed.
 
 Lemma Aint_vchar phi x : phi \in 'Z[irr G] -> phi x \in Aint.
@@ -501,8 +501,8 @@ have neq_ji: j != i.
   by rewrite signr_eq0.
 have neq_bc: b != c.
   apply: contraTneq phi1_0; rewrite def_phi def_chi def_xi => ->.
-  rewrite -scalerDr !cfunE mulf_eq0 signr_eq0 eqr_le ltr_geF //.
-  by rewrite ltr_paddl ?ltrW ?irr1_gt0.
+  rewrite -scalerDr !cfunE mulf_eq0 signr_eq0 eq_le lt_geF //.
+  by rewrite ltr_paddl ?ltW ?irr1_gt0.
 rewrite {}def_phi {}def_chi {}def_xi !scaler_sign.
 case: b c neq_bc => [|] [|] // _; last by exists i, j.
 by exists j, i; rewrite 1?eq_sym // addrC.
@@ -691,8 +691,8 @@ have def_phi: {in H, phi =1 'chi_i}.
 have [j def_chi_j]: {j | 'chi_j = phi}.
   apply/sig_eqW; have [[] [j]] := vchar_norm1P Zphi n1phi; last first.
     by rewrite scale1r; exists j.
-  move/cfunP/(_ 1%g)/eqP; rewrite scaleN1r def_phi // cfunE -addr_eq0 eqr_le.
-  by rewrite ltr_geF // ltr_paddl ?ltrW ?irr1_gt0.
+  move/cfunP/(_ 1%g)/eqP; rewrite scaleN1r def_phi // cfunE -addr_eq0 eq_le.
+  by rewrite lt_geF // ltr_paddl ?ltW ?irr1_gt0.
 exists j; rewrite ?cfkerEirr def_chi_j //; apply/subsetP => x /setDP[Gx notHx].
 rewrite inE cfunE def_phi // cfunE -/a cfun1E // Gx mulr1 cfIndE //.
 rewrite big1 ?mulr0 ?add0r // => y Gy; apply/theta0/(contra _ notHx) => Hxy.
@@ -834,7 +834,7 @@ Proof. by rewrite inE. Qed.
 Lemma Cnat_dirr (phi : 'CF(G)) i :
   phi \in 'Z[irr G] -> i \in dirr_constt phi -> '[phi, dchi i] \in Cnat.
 Proof.
-move=> PiZ; rewrite CnatEint dirr_consttE andbC => /ltrW -> /=.
+move=> PiZ; rewrite CnatEint dirr_consttE andbC => /ltW -> /=.
 by case: i => b i; rewrite cfdotZr rmorph_sign rpredMsign Cint_cfdot_vchar_irr.
 Qed.
  
@@ -846,15 +846,14 @@ Lemma dirr_constt_oppI (phi: 'CF(G)) :
    dirr_constt phi :&: dirr_constt (-phi) = set0.
 Proof.
 apply/setP=> i; rewrite inE !dirr_consttE cfdotNl inE.
-apply/idP=> /andP [L1 L2]; have := ltr_paddl (ltrW L1) L2.
-by rewrite subrr ltr_def eqxx.
+apply/idP=> /andP [L1 L2]; have := ltr_paddl (ltW L1) L2.
+by rewrite subrr lt_def eqxx.
 Qed.
 
 Lemma dirr_constt_oppl (phi: 'CF(G)) i :
-  i \in dirr_constt phi ->  (ndirr i) \notin dirr_constt phi.
+  i \in dirr_constt phi -> (ndirr i) \notin dirr_constt phi.
 Proof.
-rewrite !dirr_consttE dchi_ndirrE cfdotNr oppr_gt0.
-by move/ltrW=> /ler_gtF ->.
+by rewrite !dirr_consttE dchi_ndirrE cfdotNr oppr_gt0 => /ltW /le_gtF ->.
 Qed.
 
 Definition to_dirr  (B : {set gT}) (phi : 'CF(B)) (i : Iirr B) : dIirr B := 
@@ -876,7 +875,7 @@ Lemma of_irrK (phi: 'CF(G)) :
   {in dirr_constt phi, cancel (@of_irr G) (to_dirr phi)}.
 Proof.
 case=> b i; rewrite dirr_consttE cfdotZr rmorph_sign /= /to_dirr mulr_sign.
-by rewrite fun_if oppr_gt0; case: b => [|/ltrW/ler_gtF] ->.
+by rewrite fun_if oppr_gt0; case: b => [|/ltW/le_gtF] ->.
 Qed.
 
 Lemma cfdot_todirrE (phi: 'CF(G)) i (phi_i := dchi (to_dirr phi i)) :
@@ -913,7 +912,7 @@ Lemma dirr_small_norm (phi : 'CF(G)) n :
 Proof.
 move=> PiZ Pln; rewrite ltnNge -leC_nat => Nl4.
 suffices Fd i: i \in dirr_constt phi -> '[phi, dchi i] = 1.
-  split; last 2 [by apply/setP=> u; rewrite !inE cfdotNl oppr_gt0 ltr_asym].
+  split; last 2 [by apply/setP=> u; rewrite !inE cfdotNl oppr_gt0 lt_asym].
     apply/eqP; rewrite -eqC_nat -sumr_const -Pln (cnorm_dconstt PiZ).
     by apply/eqP/eq_bigr=> i Hi; rewrite Fd // expr1n.
   rewrite {1}[phi]cfun_sum_dconstt //.

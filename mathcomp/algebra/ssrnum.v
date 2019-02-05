@@ -5,91 +5,93 @@ From mathcomp Require Import div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
-(*                                                                            *)
 (* This file defines some classes to manipulate number structures, i.e        *)
-(*   structures with an order and a norm                                      *)
+(* structures with an order and a norm.                                       *)
 (*                                                                            *)
-(*   * NumDomain  (Integral domain with an order and a norm)                  *)
-(*         NumMixin == the mixin that provides an order and a norm over       *)
-(*                     a ring and their characteristic properties.            *)
+(*   * NumDomain (Integral domain with an order and a norm)                   *)
 (*    numDomainType == interface for a num integral domain.                   *)
-(*    NumDomainType T m                                                       *)
-(*                  == packs the num mixin into a numberDomainType. The       *)
-(*                     carrier T must have a integral domain structure.       *)
-(*  [numDomainType of T for S ]                                               *)
-(*                  == T-clone of the numDomainType structure  S.             *)
-(*  [numDomainType of T]                                                      *)
-(*                 == clone of a canonical numDomainType structure on T.      *)
+(*   NumDomainType T m                                                        *)
+(*                  == packs the num mixin into a numDomainType. The carrier  *)
+(*                     T must have an integral domain and a partial order     *)
+(*                     structures.                                            *)
+(*   [numDomainType of T for S]                                               *)
+(*                  == T-clone of the numDomainType structure S.              *)
+(*   [numDomainType of T]                                                     *)
+(*                  == clone of a canonical numDomainType structure on T.     *)
+(*                                                                            *)
+(*   * NormedDomain (Integral domain with a norm)                             *)
+(*   normedDomainType R                                                       *)
+(*                  == interface for a normed domain structure indexed by     *)
+(*                     numDomainType R.                                       *)
+(*   NormedDomainType R T m                                                   *)
+(*                  == pack the normed domain mixin into a normedDomainType.  *)
+(*                     The carrier T must have an integral domain structure.  *)
+(*   [normedDomainType R of T for S]                                          *)
+(*                  == T-clone of the normedDomainType R structure S.         *)
+(*   [normedDomainType R of T]                                                *)
+(*                  == clone of a canonical normedDomainType R structure on T.*)
 (*                                                                            *)
 (*   * NumField (Field with an order and a norm)                              *)
-(*    numFieldType == interface for a num field.                              *)
-(*  [numFieldType of T]                                                       *)
-(*                  == clone of a canonical numFieldType structure on T       *)
+(*     numFieldType == interface for a num field.                             *)
+(*   [numFieldType of T]                                                      *)
+(*                  == clone of a canonical numFieldType structure on T.      *)
 (*                                                                            *)
-(*   * NumClosedField (Closed Field with an order and a norm)                 *)
-(*    numClosedFieldType                                                      *)
-(*                  == interface for a num closed field.                      *)
-(*  [numClosedFieldType of T]                                                 *)
-(*                  == clone of a canonical numClosedFieldType structure on T *)
+(*   * NumClosedField (Partially ordered Closed Field with conjugation)       *)
+(*   numClosedFieldType                                                       *)
+(*                  == interface for a closed field with conj.                *)
+(*   NumClosedFieldType T r                                                   *)
+(*                  == packs the real closed axiom r into a                   *)
+(*                     numClosedFieldType. The carrier T must have a closed   *)
+(*                     field type structure.                                  *)
+(*   [numClosedFieldType of T]                                                *)
+(*                  == clone of a canonical numClosedFieldType structure on T.*)
+(*   [numClosedFieldType of T for S]                                          *)
+(*                  == T-clone of the numClosedFieldType structure S.         *)
 (*                                                                            *)
-(*   * RealDomain  (Num domain where all elements are positive or negative)   *)
+(*   * RealDomain (Num domain where all elements are positive or negative)    *)
 (*   realDomainType == interface for a real integral domain.                  *)
-(*   RealDomainType T r                                                       *)
-(*                  == packs the  real axiom r into a realDomainType. The     *)
-(*                     carrier T must have a num domain structure.            *)
-(*  [realDomainType of T for S ]                                              *)
-(*                  == T-clone of the realDomainType structure  S.            *)
-(*  [realDomainType of T]                                                     *)
+(*   [realDomainType of T]                                                    *)
 (*                  == clone of a canonical realDomainType structure on T.    *)
 (*                                                                            *)
 (*   * RealField (Num Field where all elements are positive or negative)      *)
 (*    realFieldType == interface for a real field.                            *)
-(*  [realFieldType of T]                                                      *)
-(*                  == clone of a canonical realFieldType structure on T      *)
+(*   [realFieldType of T]                                                     *)
+(*                  == clone of a canonical realFieldType structure on T.     *)
 (*                                                                            *)
 (*   * ArchiField (A Real Field with the archimedean axiom)                   *)
-(*  archiFieldType  == interface for an archimedean field.                    *)
+(*   archiFieldType == interface for an archimedean field.                    *)
 (*   ArchiFieldType T r                                                       *)
 (*                  == packs the archimeadean axiom r into an archiFieldType. *)
-(*                     The  carrier T must have a real field type structure.  *)
-(*  [archiFieldType of T for S ]                                              *)
-(*                  == T-clone of the archiFieldType structure  S.            *)
-(*  [archiFieldType of T]                                                     *)
-(*                  == clone of a canonical archiFieldType structure on T     *)
+(*                     The carrier T must have a real field type structure.   *)
+(*   [archiFieldType of T for S]                                              *)
+(*                  == T-clone of the archiFieldType structure S.             *)
+(*   [archiFieldType of T]                                                    *)
+(*                  == clone of a canonical archiFieldType structure on T.    *)
 (*                                                                            *)
 (*   * RealClosedField (Real Field with the real closed axiom)                *)
-(*    rcfType       == interface for a real closed field.                     *)
-(*   RcfType T r    == packs the real closed axiom r into a                   *)
-(*                     rcfType. The  carrier T must have a real               *)
-(*                     field type structure.                                  *)
-(*  [rcfType of T]  == clone of a canonical realClosedFieldType structure on  *)
+(*          rcfType == interface for a real closed field.                     *)
+(*      RcfType T r == packs the real closed axiom r into a rcfType.          *)
+(*                     The carrier T must have a real field type structure.   *)
+(*   [rcfType of T] == clone of a canonical realClosedFieldType structure on  *)
 (*                     T.                                                     *)
-(*  [rcfType of T for S ]                                                     *)
-(*                  == T-clone of the realClosedFieldType structure  S.       *)
+(*   [rcfType of T for S]                                                     *)
+(*                  == T-clone of the realClosedFieldType structure S.        *)
 (*                                                                            *)
-(*   * NumClosedField (Partially ordered Closed Field with conjugation)       *)
-(*    numClosedFieldType       == interface for a closed field with conj.     *)
-(*  NumClosedFieldType T r    == packs the real closed axiom r into a         *)
-(*                     numClosedFieldType. The  carrier T must have a closed  *)
-(*                     field type structure.                                  *)
-(*  [numClosedFieldType of T]  == clone of a canonical numClosedFieldType     *)
-(*                               structure on  T                              *)
-(*  [numClosedFieldType of T for S ]                                          *)
-(*                  == T-clone of the realClosedFieldType structure  S.       *)
+(* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _, >=<,    *)
+(* and ><) and lattice operations (meet and join) defined in order.v are      *)
+(* redefined for the ring_display in the ring_scope (%R). 0-ary ordering      *)
+(* symbols for the ring_display have the suffix "%R", e.g., <%R. All the      *)
+(* other ordering notations are the same as order.v. The meet and join        *)
+(* operators for the ring_display are Num.min and Num.max.                    *)
 (*                                                                            *)
 (* Over these structures, we have the following operations                    *)
-(*            `|x| == norm of x.                                              *)
-(*          x <= y <=> x is less than or equal to y (:= '|y - x| == y - x).   *)
-(*           x < y <=> x is less than y (:= (x <= y) && (x != y)).            *)
-(* x <= y ?= iff C <-> x is less than y, or equal iff C is true.              *)
-(*        Num.sg x == sign of x: equal to 0 iff x = 0, to 1 iff x > 0, and    *)
-(*                    to -1 in all other cases (including x < 0).             *)
+(*             `|x| == norm of x.                                             *)
+(*         Num.sg x == sign of x: equal to 0 iff x = 0, to 1 iff x > 0, and   *)
+(*                     to -1 in all other cases (including x < 0).            *)
 (*  x \is a Num.pos <=> x is positive (:= x > 0).                             *)
 (*  x \is a Num.neg <=> x is negative (:= x < 0).                             *)
 (* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0).                       *)
 (* x \is a Num.real <=> x is real (:= x >= 0 or x < 0).                       *)
-(*      Num.min x y == minimum of x y                                         *)
-(*      Num.max x y == maximum of x y                                         *)
 (*      Num.bound x == in archimedean fields, and upper bound for x, i.e.,    *)
 (*                     and n such that `|x| < n%:R.                           *)
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
@@ -107,17 +109,6 @@ From mathcomp Require Import ssralg poly.
 (*               an thus not equal to -1 for n odd > 1 (this will be shown in *)
 (*               file cyclotomic.v).                                          *)
 (*                                                                            *)
-(*  There are now three distinct uses of the symbols <, <=, > and >=:         *)
-(*    0-ary, unary (prefix) and binary (infix).                               *)
-(*  0. <%R, <=%R, >%R, >=%R stand respectively for lt, le, gt and ge.         *)
-(*  1. (< x),  (<= x), (> x),  (>= x) stand respectively for                  *)
-(*     (gt x), (ge x), (lt x), (le x).                                        *)
-(*     So (< x) is a predicate characterizing elements smaller than x.        *)
-(*  2. (x < y), (x <= y), ... mean what they are expected to.                 *)
-(*  These convention are compatible with haskell's,                           *)
-(*   where ((< y) x) = (x < y) = ((<) x y),                                   *)
-(*   except that we write <%R instead of (<).                                 *)
-(*                                                                            *)
 (* - list of prefixes :                                                       *)
 (*   p : positive                                                             *)
 (*   n : negative                                                             *)
@@ -126,24 +117,15 @@ From mathcomp Require Import ssralg poly.
 (*   i : interior = in [0, 1] or ]0, 1[                                       *)
 (*   e : exterior = in [1, +oo[ or ]1; +oo[                                   *)
 (*   w : non strict (weak) monotony                                           *)
-(*                                                                            *)
-(* [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject       *)
-(*                   to the condition P (i may appear in P and M), and        *)
-(*                   provided P holds for i0.                                 *)
-(* [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and       *)
-(*                   provided P holds for i0.                                 *)
-(* [arg minr_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.         *)
-(* [arg maxr_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.         *)
-(* [arg minr_(i < i0) M] == an i : T minimizing M, given i0 : T.              *)
-(* [arg maxr_(i > i0) M] == an i : T maximizing M, given i0 : T.              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import GRing.Theory.
+Import Order.Theory Order.Def Order.Syntax GRing.Theory.
 
 Reserved Notation "<= y" (at level 35).
 Reserved Notation ">= y" (at level 35).
@@ -154,61 +136,29 @@ Reserved Notation ">= y :> T" (at level 35, y at next level).
 Reserved Notation "< y :> T" (at level 35, y at next level).
 Reserved Notation "> y :> T" (at level 35, y at next level).
 
-(* this structures should be shared and overloaded *)
-(* by every notion of norm or abslute value *)
-Module Norm.
-
-Section ClassDef.
-Variable (R : Type).
-
-Definition class_of T := T -> R.
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack m := @Pack T m.
-
-End ClassDef.
-
-Module Exports.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Notation normedType := type.
-Notation NormedType R T m := (@pack R T m).
-Notation "[ 'normedType' R 'of' T 'for' cT ]" := (@clone R T cT _ idfun)
-  (at level 0, format "[ 'normedType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'normedType' R 'of' T ]" := (@clone R T _ _ id)
-  (at level 0, format "[ 'normedType'  R  'of'  T ]") : form_scope.
-End Exports.
-
-End Norm.
-Import Norm.Exports.
-
-Definition norm (R : Type) (T : normedType R) : T -> R := @Norm.class R T.
-Notation "`| x |" := (norm x) : ring_scope.
-
-Import Order.Theory Order.Def Order.Syntax.
-Local Open Scope order_scope.
-Local Open Scope ring_scope.
-
 Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record mixin_of (R : ringType) (Rorder : Order.POrder.mixin_of R)  
-       (le_op := Order.POrder.le Rorder)
-       (lt_op := Order.POrder.lt Rorder) (norm_op : R -> R)
-  := Mixin {
+Record normed_mixin_of (R T : ringType) (Rorder : porderMixin R)
+       (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
+  := NormedMixin {
+  norm_op : T -> R;
   _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
-  _ : forall x y, lt_op 0 x -> lt_op 0 y -> lt_op 0 (x + y);
   _ : forall x, norm_op x = 0 -> x = 0;
+  _ : forall x n, norm_op (x *+ n) = norm_op x *+ n;
+  _ : forall x, norm_op (- x) = norm_op x;
+}.
+
+Record mixin_of (R : ringType) (Rorder : porderMixin R)
+       (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
+       (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
+  := Mixin {
+  _ : forall x y, lt_op 0 x -> lt_op 0 y -> lt_op 0 (x + y);
   _ : forall x y, le_op 0 x -> le_op 0 y -> le_op x y || le_op y x;
   _ : {morph norm_op : x y / x * y};
   _ : forall x y, (le_op x y) = (norm_op (y - x) == y - x);
-  _ : forall x y, (lt_op x y) = (y != x) && (le_op x y)}.
+}.
 
 Local Notation ring_for T b := (@GRing.Ring.Pack T b).
 
@@ -217,15 +167,14 @@ Module NumDomain.
 Section ClassDef.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
-  order_mixin : Order.POrder.mixin_of (ring_for T base);
-  norm_base   :  Norm.class_of T T;
-  mixin : mixin_of order_mixin norm_base
+  order_mixin : porderMixin (ring_for T base);
+  normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
+  mixin : mixin_of normed_mixin;
 }.
 
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
 Local Coercion order_base T (class_of_T : class_of T) :=
   @Order.POrder.Class _ class_of_T (order_mixin class_of_T).
-Local Coercion norm_base : class_of >-> Norm.class_of.
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -234,8 +183,15 @@ Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition clone c of phant_id class c := @Pack T c.
-(* TODO Kazuhiko: this is broken, rewrite the pack please *)
-Definition pack c := @Pack T c.
+Definition pack (b0 : GRing.IntegralDomain.class_of _) om0
+           (nm0 : @normed_mixin_of (ring_for T b0) (ring_for T b0) om0)
+           (m0 : @mixin_of (ring_for T b0) om0 nm0) :=
+  fun bT (b : GRing.IntegralDomain.class_of T)
+      & phant_id (@GRing.IntegralDomain.class bT) b =>
+  fun om & phant_id om0 om =>
+  fun nm & phant_id nm0 nm =>
+  fun m & phant_id m0 m =>
+  @Pack T (@Class T b om nm m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -246,21 +202,21 @@ Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition normedType := @Norm.Pack cT cT xclass.
-
-Definition order_zmodType :=
-  @GRing.Zmodule.Pack (Order.POrder.sort porderType) xclass.
-Definition order_ringType :=
-  @GRing.Ring.Pack (Order.POrder.sort porderType) xclass.
-(* 9 more missing *)
+Definition porder_zmodType := @GRing.Zmodule.Pack porderType xclass.
+Definition porder_ringType := @GRing.Ring.Pack porderType xclass.
+Definition porder_comRingType := @GRing.ComRing.Pack porderType xclass.
+Definition porder_unitRingType := @GRing.UnitRing.Pack porderType xclass.
+Definition porder_comUnitRingType := @GRing.ComUnitRing.Pack porderType xclass.
+Definition porder_idomainType := @GRing.IntegralDomain.Pack porderType xclass.
 
 End ClassDef.
+
 Module Exports.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
-Coercion order_base : class_of >-> Order.POrder.class_of.
 Coercion base  : class_of >-> GRing.IntegralDomain.class_of.
-Coercion norm_base : class_of >-> Norm.class_of.
+Coercion order_base : class_of >-> Order.POrder.class_of.
+Coercion normed_mixin : class_of >-> normed_mixin_of.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
 Coercion choiceType : type >-> Choice.type.
@@ -279,31 +235,162 @@ Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
 Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
-Coercion normedType : type >-> Norm.type.
-Canonical normedType.
-Canonical order_zmodType.
-Canonical order_ringType.
-(* 9 more missing *)
+Canonical porder_zmodType.
+Canonical porder_ringType.
+Canonical porder_comRingType.
+Canonical porder_unitRingType.
+Canonical porder_comUnitRingType.
+Canonical porder_idomainType.
 Notation numDomainType := type.
-Notation NumDomainType T m := (@pack T m).
+Notation NumDomainType T m := (@pack T _ _ _ m _ _ id _ id _ id _ id).
 Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
   (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'numDomainType' 'of' T ]" := (@clone T _ _ id)
   (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
 End Exports.
+
 End NumDomain.
 Import NumDomain.Exports.
 
-About  NumDomain.order_zmodType.
-Print Canonical Projections.
+Local Notation num_for T b := (@NumDomain.Pack T b).
 
-Module Import Def. Section Def.
+Module NormedDomain.
+
+Section ClassDef.
+
+Variable R : numDomainType.
+
+Record class_of (T : Type) := Class {
+  base : GRing.IntegralDomain.class_of T;
+  mixin : @normed_mixin_of R (ring_for T base) (NumDomain.class R);
+}.
+
+Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
+Local Coercion mixin : class_of >-> normed_mixin_of.
+
+Structure type (phR : phant R) :=
+  Pack { sort; _ : class_of sort }.
+Local Coercion sort : type >-> Sortclass.
+
+Variables (phR : phant R) (T : Type) (cT : type phR).
+
+Definition class := let: Pack _ c := cT return class_of cT in c.
+Definition clone c of phant_id class c := @Pack phR T c.
+Let xT := let: Pack T _ := cT in T.
+Notation xclass := (class : class_of xT).
+Definition pack b0 (m0 : @normed_mixin_of R (@GRing.IntegralDomain.Pack T b0)
+                                          (NumDomain.class R)) :=
+  Pack phR (@Class T b0 m0).
+
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+
+End ClassDef.
+
+Definition numDomain_normedDomainType (R : numDomainType) : type (Phant R) :=
+  Pack (Phant R) (@Class R _ _ (NumDomain.normed_mixin (NumDomain.class R))).
+
+Module Exports.
+Coercion base : class_of >-> GRing.IntegralDomain.class_of.
+Coercion mixin : class_of >-> normed_mixin_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Canonical eqType.
+Coercion choiceType : type >-> Choice.type.
+Canonical choiceType.
+Coercion zmodType : type >-> GRing.Zmodule.type.
+Canonical zmodType.
+Coercion ringType : type >-> GRing.Ring.type.
+Canonical ringType.
+Coercion comRingType : type >-> GRing.ComRing.type.
+Canonical comRingType.
+Coercion unitRingType : type >-> GRing.UnitRing.type.
+Canonical unitRingType.
+Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
+Canonical comUnitRingType.
+Coercion idomainType : type >-> GRing.IntegralDomain.type.
+Canonical idomainType.
+Coercion numDomain_normedDomainType : numDomainType >-> type.
+Canonical numDomain_normedDomainType.
+Notation normedDomainType R := (type (Phant R)).
+Notation NormedDomainType R T m := (@pack _ (Phant R) T _ m).
+Notation NormedDomainMixin := Mixin.
+Notation "[ 'normedDomainType' R 'of' T 'for' cT ]" :=
+  (@clone _ (Phant R) T cT _ idfun)
+  (at level 0, format "[ 'normedDomainType'  R  'of'  T  'for'  cT ]") :
+  form_scope.
+Notation "[ 'normedDomainType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
+  (at level 0, format "[ 'normedDomainType'  R  'of'  T ]") : form_scope.
+End Exports.
+
+End NormedDomain.
+Import NormedDomain.Exports.
+
+Module NumDomain_joins.
 Import NumDomain.
+Section NumDomain_joins.
+
+Variables (T : Type) (cT : type).
+
+Let xT := let: Pack T _ := cT in T.
+Notation xclass := (class cT : class_of xT).
+
+Notation ringType := (ringType cT).
+Notation normedDomainType := (NormedDomain.numDomain_normedDomainType cT).
+
+Definition normedDomain_porderType :=
+  @Order.POrder.Pack ring_display normedDomainType xclass.
+
+End NumDomain_joins.
+
+Module Exports.
+Canonical normedDomain_porderType.
+End Exports.
+End NumDomain_joins.
+Export NumDomain_joins.Exports.
+
+Module Import Def.
+
+Definition normr (R : numDomainType) (T : normedDomainType R) : T -> R :=
+  nosimpl (norm_op (NormedDomain.class T)).
+Arguments normr {R T} x.
+
+Notation ler := (@le ring_display _) (only parsing).
+Notation "@ 'ler' R" :=
+  (@le ring_display R) (at level 10, R at level 8, only parsing).
+Notation ltr := (@lt ring_display _) (only parsing).
+Notation "@ 'ltr' R" :=
+  (@lt ring_display R) (at level 10, R at level 8, only parsing).
+Notation ger := (@ge ring_display _) (only parsing).
+Notation "@ 'ger' R" :=
+  (@ge ring_display R) (at level 10, R at level 8, only parsing).
+Notation gtr := (@gt ring_display _) (only parsing).
+Notation "@ 'gtr' R" :=
+  (@gt ring_display R) (at level 10, R at level 8, only parsing).
+Notation lerif := (@leif ring_display _) (only parsing).
+Notation "@ 'lerif' R" :=
+  (@lerif ring_display R) (at level 10, R at level 8, only parsing).
+Notation comparabler := (@comparable ring_display _) (only parsing).
+Notation "@ 'comparabler' R" :=
+  (@comparable ring_display R) (at level 10, R at level 8, only parsing).
+Notation maxr := (@join ring_display _).
+Notation "@ 'maxr' R" :=
+  (@join ring_display R) (at level 10, R at level 8, only parsing).
+Notation minr := (@meet ring_display _).
+Notation "@ 'minr' R" :=
+  (@meet ring_display R) (at level 10, R at level 8, only parsing).
+
+Section Def.
 Context {R : numDomainType}.
-Implicit Types (x y : R) (C : bool).
+Implicit Types (x : R).
 
 Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
-
 Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
 Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
 Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
@@ -312,7 +399,16 @@ Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
 End Def. End Def.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
+Notation norm := normr (only parsing).
+Notation le := ler (only parsing).
+Notation lt := ltr (only parsing).
+Notation ge := ger (only parsing).
+Notation gt := gtr (only parsing).
+Notation leif := lerif (only parsing).
+Notation comparable := comparabler (only parsing).
 Notation sg := sgr.
+Notation max := maxr.
+Notation min := minr.
 Notation pos := Rpos.
 Notation neg := Rneg.
 Notation nneg := Rnneg.
@@ -328,18 +424,68 @@ Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
 Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
 Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
 Definition Rreal_keyed := KeyedQualifier Rreal_key.
-(* Decide whether this should stay: *)
-(* Definition ler_of_leif x y C (le_xy : @lerif R x y C) := le_xy.1 : le x y. *)
 End Keys. End Keys.
 
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
 Import Def Keys.
 
+Notation "`| x |" := (norm x) : ring_scope.
+
+Notation "<=%R" := le : ring_scope.
+Notation ">=%R" := ge : ring_scope.
+Notation "<%R" := lt : ring_scope.
+Notation ">%R" := gt : ring_scope.
+Notation "<?=%R" := leif : ring_scope.
+Notation ">=<%R" := comparable : ring_scope.
+Notation "><%R" := (fun x y => ~~ (comparable x y)) : ring_scope.
+
+Notation "<= y" := (ge y) : ring_scope.
+Notation "<= y :> T" := (<= (y : T)) : ring_scope.
+Notation ">= y"  := (le y) : ring_scope.
+Notation ">= y :> T" := (>= (y : T)) : ring_scope.
+
+Notation "< y" := (gt y) : ring_scope.
+Notation "< y :> T" := (< (y : T)) : ring_scope.
+Notation "> y" := (lt y) : ring_scope.
+Notation "> y :> T" := (> (y : T)) : ring_scope.
+
+Notation ">=< y" := (comparable y) : ring_scope.
+Notation ">=< y :> T" := (>=< (y : T)) : ring_scope.
+
+Notation "x <= y" := (le x y) : ring_scope.
+Notation "x <= y :> T" := ((x : T) <= (y : T)) : ring_scope.
+Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
+Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
+
+Notation "x < y"  := (lt x y) : ring_scope.
+Notation "x < y :> T" := ((x : T) < (y : T)) : ring_scope.
+Notation "x > y"  := (y < x) (only parsing) : ring_scope.
+Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
+
+Notation "x <= y <= z" := ((x <= y) && (y <= z)) : ring_scope.
+Notation "x < y <= z" := ((x < y) && (y <= z)) : ring_scope.
+Notation "x <= y < z" := ((x <= y) && (y < z)) : ring_scope.
+Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
+
+Notation "x <= y ?= 'iff' C" := (lerif x y C) : ring_scope.
+Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
+  (only parsing) : ring_scope.
+
+Notation ">=< x" := (comparable x) : ring_scope.
+Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : ring_scope.
+Notation "x >=< y" := (comparable x y) : ring_scope.
+
+Notation ">< x" := (fun y => ~~ (comparable x y)) : ring_scope.
+Notation ">< x :> T" := (>< (x : T)) (only parsing) : ring_scope.
+Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
+
 Canonical Rpos_keyed.
 Canonical Rneg_keyed.
 Canonical Rnneg_keyed.
 Canonical Rreal_keyed.
+
+Export Order.POCoercions.
 
 End Syntax.
 
@@ -357,18 +503,18 @@ Definition real_closed_axiom : Prop :=
 
 End ExtensionAxioms.
 
-Local Notation num_for T b := (@NumDomain.Pack T b).
-
 (* The rest of the numbers interface hierarchy. *)
 Module NumField.
 
 Section ClassDef.
 
-Record class_of R :=
-  Class { base : GRing.Field.class_of R; mixin : mixin_of (ring_for R base) }.
-Definition base2 R (c : class_of R) := NumDomain.Class (mixin c).
-Local Coercion base : class_of >-> GRing.Field.class_of.
-Local Coercion base2 : class_of >-> NumDomain.class_of.
+Record class_of R := Class {
+  base  : NumDomain.class_of R;
+  mixin : GRing.Field.mixin_of (num_for R base);
+}.
+Local Coercion base : class_of >-> NumDomain.class_of.
+Local Coercion base2 R (c : class_of R) : GRing.Field.class_of _ :=
+  GRing.Field.Class (@mixin _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -376,10 +522,9 @@ Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
 Definition pack :=
-  fun bT b & phant_id (GRing.Field.class bT) (b : GRing.Field.class_of T) =>
-  fun mT m & phant_id (NumDomain.class mT) (@NumDomain.Class T b m) =>
+  fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
+  fun mT m & phant_id (GRing.Field.mixin (GRing.Field.class mT)) m =>
   Pack (@Class T b m).
 
 Definition eqType := @Equality.Pack cT xclass.
@@ -390,15 +535,19 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition join_numDomainType := @NumDomain.Pack fieldType xclass.
+Definition normedDomainType := NormedDomainType numDomainType cT xclass.
+Definition porder_fieldType := @GRing.Field.Pack porderType xclass.
+Definition normedDomain_fieldType := @GRing.Field.Pack normedDomainType xclass.
+Definition numDomain_fieldType := @GRing.Field.Pack numDomainType xclass.
 
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> GRing.Field.class_of.
-Coercion base2 : class_of >-> NumDomain.class_of.
+Coercion base : class_of >-> NumDomain.class_of.
+Coercion base2 : class_of >-> GRing.Field.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -417,10 +566,17 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
+Coercion normedDomainType : type >-> NormedDomain.type.
+Canonical normedDomainType.
+Canonical porder_fieldType.
+Canonical normedDomain_fieldType.
+Canonical numDomain_fieldType.
 Notation numFieldType := type.
 Notation "[ 'numFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'numFieldType'  'of'  T ]") : form_scope.
@@ -441,13 +597,16 @@ Record imaginary_mixin_of (R : numDomainType) := ImaginaryMixin {
 }.
 
 Record class_of R := Class {
-  base : GRing.ClosedField.class_of R;
-  mixin : mixin_of (ring_for R base);
-  conj_mixin : imaginary_mixin_of (num_for R (NumDomain.Class mixin))
+  base : NumField.class_of R;
+  decField_mixin : GRing.DecidableField.mixin_of (num_for R base);
+  closedField_axiom : GRing.ClosedField.axiom (num_for R base);
+  conj_mixin  : imaginary_mixin_of (num_for R base);
 }.
-Definition base2 R (c : class_of R) := NumField.Class (mixin c).
-Local Coercion base : class_of >-> GRing.ClosedField.class_of.
-Local Coercion base2 : class_of >-> NumField.class_of.
+Local Coercion base : class_of >-> NumField.class_of.
+Local Coercion base2 R (c : class_of R) : GRing.ClosedField.class_of R :=
+  @GRing.ClosedField.Class
+    R (@GRing.DecidableField.Class R (base c) (@decField_mixin _ c))
+    (@closedField_axiom _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -455,13 +614,14 @@ Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
-Definition pack :=
-  fun bT b & phant_id (GRing.ClosedField.class bT)
-                      (b : GRing.ClosedField.class_of T) =>
-  fun mT m & phant_id (NumField.class mT) (@NumField.Class T b m) =>
-  fun mc => Pack (@Class T b m mc).
 Definition clone := fun b & phant_id class (b : class_of T) => Pack b.
+Definition pack :=
+  fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
+  fun mT dec closed
+      & phant_id (GRing.ClosedField.class mT)
+                 (@GRing.ClosedField.Class
+                    _ (@GRing.DecidableField.Class _ b dec) closed) =>
+  fun mc => Pack (@Class T b dec closed mc).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -471,21 +631,33 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
 Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
-Definition join_dec_numDomainType := @NumDomain.Pack decFieldType xclass.
-Definition join_dec_numFieldType := @NumField.Pack decFieldType xclass.
-Definition join_numDomainType := @NumDomain.Pack closedFieldType xclass.
-Definition join_numFieldType := @NumField.Pack closedFieldType xclass.
+Definition normedDomainType := NormedDomainType numDomainType cT xclass.
+Definition porder_decFieldType := @GRing.DecidableField.Pack porderType xclass.
+Definition normedDomain_decFieldType :=
+  @GRing.DecidableField.Pack normedDomainType xclass.
+Definition numDomain_decFieldType :=
+  @GRing.DecidableField.Pack numDomainType xclass.
+Definition numField_decFieldType :=
+  @GRing.DecidableField.Pack numFieldType xclass.
+Definition porder_closedFieldType := @GRing.ClosedField.Pack porderType xclass.
+Definition normedDomain_closedFieldType :=
+  @GRing.ClosedField.Pack normedDomainType xclass.
+Definition numDomain_closedFieldType :=
+  @GRing.ClosedField.Pack numDomainType xclass.
+Definition numField_closedFieldType :=
+  @GRing.ClosedField.Pack numFieldType xclass.
 
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> GRing.ClosedField.class_of.
-Coercion base2 : class_of >-> NumField.class_of.
+Coercion base : class_of >-> NumField.class_of.
+Coercion base2 : class_of >-> GRing.ClosedField.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -504,6 +676,8 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
@@ -514,12 +688,18 @@ Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion closedFieldType : type >-> GRing.ClosedField.type.
 Canonical closedFieldType.
-Canonical join_dec_numDomainType.
-Canonical join_dec_numFieldType.
-Canonical join_numDomainType.
-Canonical join_numFieldType.
+Coercion normedDomainType : type >-> NormedDomain.type.
+Canonical normedDomainType.
+Canonical porder_decFieldType.
+Canonical normedDomain_decFieldType.
+Canonical numDomain_decFieldType.
+Canonical numField_decFieldType.
+Canonical porder_closedFieldType.
+Canonical normedDomain_closedFieldType.
+Canonical numDomain_closedFieldType.
+Canonical numField_closedFieldType.
 Notation numClosedFieldType := type.
-Notation NumClosedFieldType T m := (@pack T _ _ id _ _ id m).
+Notation NumClosedFieldType T m := (@pack T _ _ id _ _ _ id m).
 Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (@clone T cT _ id)
   (at level 0, format "[ 'numClosedFieldType'  'of'  T  'for' cT ]") :
                                                          form_scope.
@@ -534,9 +714,17 @@ Module RealDomain.
 
 Section ClassDef.
 
-Record class_of R :=
-  Class {base : NumDomain.class_of R; _ : @real_axiom (num_for R base)}.
+Record class_of R := Class {
+  base   : NumDomain.class_of R;
+  lmixin_disp : unit;
+  lmixin : Order.Lattice.mixin_of (Order.POrder.Pack lmixin_disp base);
+  tmixin_disp : unit;
+  tmixin : Order.Total.mixin_of
+             (Order.Lattice.Pack tmixin_disp (Order.Lattice.Class lmixin));
+}.
 Local Coercion base : class_of >-> NumDomain.class_of.
+Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
+  @Order.Total.Class _ (Order.Lattice.Class (@lmixin _ c)) _ (@tmixin _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -544,11 +732,13 @@ Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : real_axiom (num_for T b0)) :=
-  fun bT b & phant_id (NumDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
+Definition pack :=
+  fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
+  fun mT ldisp l mdisp m &
+      phant_id (@Order.Total.class ring_display mT)
+               (@Order.Total.Class
+                  T (@Order.Lattice.Class T b ldisp l) mdisp m) =>
+  Pack (@Class T b ldisp l mdisp  m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -558,12 +748,45 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition normedDomainType := NormedDomainType numDomainType cT xclass.
+Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType xclass.
+Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType xclass.
+Definition comRing_latticeType :=
+  @Order.Lattice.Pack ring_display comRingType xclass.
+Definition unitRing_latticeType :=
+  @Order.Lattice.Pack ring_display unitRingType xclass.
+Definition comUnitRing_latticeType :=
+  @Order.Lattice.Pack ring_display comUnitRingType xclass.
+Definition idomain_latticeType :=
+  @Order.Lattice.Pack ring_display idomainType xclass.
+Definition normedDomain_latticeType :=
+  @Order.Lattice.Pack ring_display normedDomainType xclass.
+Definition numDomain_latticeType :=
+  @Order.Lattice.Pack ring_display numDomainType xclass.
+Definition zmod_orderType := @Order.Total.Pack ring_display zmodType xclass.
+Definition ring_orderType := @Order.Total.Pack ring_display ringType xclass.
+Definition comRing_orderType :=
+  @Order.Total.Pack ring_display comRingType xclass.
+Definition unitRing_orderType :=
+  @Order.Total.Pack ring_display unitRingType xclass.
+Definition comUnitRing_orderType :=
+  @Order.Total.Pack ring_display comUnitRingType xclass.
+Definition idomain_orderType :=
+  @Order.Total.Pack ring_display idomainType xclass.
+Definition normedDomain_orderType :=
+  @Order.Total.Pack ring_display normedDomainType xclass.
+Definition numDomain_orderType :=
+  @Order.Total.Pack ring_display numDomainType xclass.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> NumDomain.class_of.
+Coercion base2 : class_of >-> Order.Total.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -582,13 +805,34 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
+Coercion orderType : type >-> Order.Total.type.
+Canonical orderType.
+Coercion normedDomainType : type >-> NormedDomain.type.
+Canonical normedDomainType.
+Canonical zmod_latticeType.
+Canonical ring_latticeType.
+Canonical comRing_latticeType.
+Canonical unitRing_latticeType.
+Canonical comUnitRing_latticeType.
+Canonical idomain_latticeType.
+Canonical normedDomain_latticeType.
+Canonical numDomain_latticeType.
+Canonical zmod_orderType.
+Canonical ring_orderType.
+Canonical comRing_orderType.
+Canonical unitRing_orderType.
+Canonical comUnitRing_orderType.
+Canonical idomain_orderType.
+Canonical normedDomain_orderType.
+Canonical numDomain_orderType.
 Notation realDomainType := type.
-Notation RealDomainType T m := (@pack T _ m _ _ id _ id).
-Notation "[ 'realDomainType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
-  (at level 0, format "[ 'realDomainType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'realDomainType' 'of' T ]" := (@clone T _ _ id)
+Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ id)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -599,11 +843,17 @@ Module RealField.
 
 Section ClassDef.
 
-Record class_of R :=
-  Class { base : NumField.class_of R; mixin : real_axiom (num_for R base) }.
-Definition base2 R (c : class_of R) := RealDomain.Class (@mixin R c).
+Record class_of R := Class {
+  base  : NumField.class_of R;
+  lmixin_disp : unit;
+  lmixin : Order.Lattice.mixin_of (@Order.POrder.Pack lmixin_disp R base);
+  tmixin_disp : unit;
+  tmixin : Order.Total.mixin_of
+             (Order.Lattice.Pack tmixin_disp (Order.Lattice.Class lmixin));
+}.
 Local Coercion base : class_of >-> NumField.class_of.
-Local Coercion base2 : class_of >-> RealDomain.class_of.
+Local Coercion base2 R (c : class_of R) : RealDomain.class_of R :=
+  RealDomain.Class (@tmixin R c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -611,11 +861,11 @@ Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
 Definition pack :=
-  fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
-  fun mT m & phant_id (RealDomain.class mT) (@RealDomain.Class T b m) =>
-  Pack (@Class T b m).
+  fun bT (b : NumField.class_of T) & phant_id (NumField.class bT) b =>
+  fun mT ldisp l tdisp t & phant_id (RealDomain.class mT)
+                                    (@RealDomain.Class T b ldisp l tdisp t) =>
+  Pack (@Class T b ldisp l tdisp t).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -625,11 +875,23 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
-Definition join_realDomainType := @RealDomain.Pack numFieldType xclass.
+Definition normedDomainType := NormedDomainType numDomainType cT xclass.
+Definition field_latticeType :=
+  @Order.Lattice.Pack ring_display fieldType xclass.
+Definition field_orderType := @Order.Total.Pack ring_display fieldType xclass.
+Definition field_realDomainType := @RealDomain.Pack fieldType xclass.
+Definition numField_latticeType :=
+  @Order.Lattice.Pack ring_display numFieldType xclass.
+Definition numField_orderType :=
+  @Order.Total.Pack ring_display numFieldType xclass.
+Definition numField_realDomainType := @RealDomain.Pack numFieldType xclass.
 
 End ClassDef.
 
@@ -654,17 +916,30 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
+Coercion orderType : type >-> Order.Total.type.
+Canonical orderType.
 Coercion realDomainType : type >-> RealDomain.type.
 Canonical realDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
 Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
-Canonical join_realDomainType.
+Coercion normedDomainType : type >-> NormedDomain.type.
+Canonical normedDomainType.
+Canonical field_latticeType.
+Canonical field_orderType.
+Canonical field_realDomainType.
+Canonical numField_latticeType.
+Canonical numField_orderType.
+Canonical numField_realDomainType.
 Notation realFieldType := type.
-Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
+Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ id)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -685,7 +960,6 @@ Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
 Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
@@ -699,11 +973,15 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition realFieldType := @RealField.Pack cT xclass.
+Definition normedDomainType := NormedDomainType numDomainType cT xclass.
 
 End ClassDef.
 
@@ -727,8 +1005,14 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
+Coercion orderType : type >-> Order.Total.type.
+Canonical orderType.
 Coercion realDomainType : type >-> RealDomain.type.
 Canonical realDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
@@ -737,6 +1021,8 @@ Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion realFieldType : type >-> RealField.type.
 Canonical realFieldType.
+Coercion normedDomainType : type >-> NormedDomain.type.
+Canonical normedDomainType.
 Notation archiFieldType := type.
 Notation ArchiFieldType T m := (@pack T _ m _ _ id _ id).
 Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
@@ -762,7 +1048,6 @@ Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-
 Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : real_closed_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
@@ -776,11 +1061,15 @@ Definition comRingType := @GRing.ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition realFieldType := @RealField.Pack cT xclass.
+Definition normedDomainType := NormedDomainType numDomainType cT xclass.
 
 End ClassDef.
 
@@ -804,16 +1093,24 @@ Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion porderType : type >-> Order.POrder.type.
+Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
 Coercion realDomainType : type >-> RealDomain.type.
 Canonical realDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
+Coercion orderType : type >-> Order.Total.type.
+Canonical orderType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
 Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion realFieldType : type >-> RealField.type.
 Canonical realFieldType.
+Coercion normedDomainType : type >-> NormedDomain.type.
+Canonical normedDomainType.
 Notation rcfType := Num.RealClosedField.type.
 Notation RcfType T m := (@pack T _ m _ _ id _ id).
 Notation "[ 'rcfType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
@@ -829,32 +1126,41 @@ Import RealClosedField.Exports.
 (* operations for the extensions described above.                             *)
 Module Import Internals.
 
-Section Domain.
+Section NormedDomain.
+Variables (R : numDomainType) (V : normedDomainType R).
+Implicit Types (l : R) (x y : V).
+
+Lemma ler_norm_add x y : `|x + y| <= `|x| + `|y|.
+Proof. by case: V x y => ? [? []]. Qed.
+
+Lemma normr0_eq0 x : `|x| = 0 -> x = 0.
+Proof. by case: V x => ? [? []]. Qed.
+
+Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
+Proof. by case: V x => ? [? []]. Qed.
+
+Lemma normrN x : `|- x| = `|x|.
+Proof. by case: V x => ? [? []]. Qed.
+
+End NormedDomain.
+
+Section NumDomain.
 Variable R : numDomainType.
 Implicit Types x y : R.
 
 (* Lemmas from the signature *)
 
-Lemma normr0_eq0 x : `|x| = 0 -> x = 0.
-Proof. by case: R x => ? [? []]. Qed.
-
-Lemma ler_norm_add x y : `|x + y| <= `|x| + `|y|.
-Proof. by case: R x y => ? [? []]. Qed.
-
 Lemma addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y.
-Proof. by case: R x y => ? [? []]. Qed.
+Proof. by case: R x y => ? [? ? ? []]. Qed.
 
 Lemma ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x).
-Proof. by case: R x y => ? [? []]. Qed.
+Proof. by case: R x y => ? [? ? ? []]. Qed.
 
-Lemma normrM : {morph norm : x y / x * y : R}.
-Proof. by case: R => ? [? []]. Qed.
+Lemma normrM : {morph norm : x y / (x : R) * y}.
+Proof. by case: R => ? [? ? ? []]. Qed.
 
 Lemma ler_def x y : (x <= y) = (`|y - x| == y - x).
-Proof. by case: R x y => ? [? []]. Qed.
-
-Lemma ltr_def x y : (x < y) = (y != x) && (x <= y).
-Proof. by case: R x y => ? [? []]. Qed.
+Proof. by case: R x y => ? [? ? ? []]. Qed.
 
 (* Basic consequences (just enough to get predicate closure properties). *)
 
@@ -869,33 +1175,24 @@ Proof. by rewrite -sub0r subr_ge0. Qed.
 
 Lemma ler01 : 0 <= 1 :> R.
 Proof.
-have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /normr0_eq0->.
+have n1_nz: `|1 : R| != 0 by apply: contraNneq (@oner_neq0 R) => /normr0_eq0->.
 by rewrite ger0_def -(inj_eq (mulfI n1_nz)) -normrM !mulr1.
 Qed.
 
-Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite ltr_def oner_neq0 ler01. Qed.
-
-Lemma ltrW x y : x < y -> x <= y. Proof. by rewrite ltr_def => /andP[]. Qed.
-
-Lemma lerr x : x <= x.
-Proof.
-have n2: `|2%:R| == 2%:R :> R by rewrite -ger0_def ltrW ?addr_gt0 ?ltr01.
-rewrite ler_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
-by rewrite -(eqP n2) -normrM mul0r.
-Qed.
+Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
-Proof. by rewrite ltr_def; case: eqP => // ->; rewrite lerr. Qed.
+Proof. by rewrite lt_def; case: eqP => // ->; rewrite lexx. Qed.
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
 rewrite le0r; case/predU1P=> [-> | x_pos]; rewrite ?add0r // le0r.
-by case/predU1P=> [-> | y_pos]; rewrite ltrW ?addr0 ?addr_gt0.
+by case/predU1P=> [-> | y_pos]; rewrite ltW ?addr0 ?addr_gt0.
 Qed.
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
 Proof.
-rewrite !ltr_def !ger0_def normrM mulf_eq0 negb_or => /andP[x_neq0 /eqP->].
+rewrite !lt_def !ger0_def normrM mulf_eq0 negb_or => /andP[x_neq0 /eqP->].
 by rewrite x_neq0 (inj_eq (mulfI x_neq0)).
 Qed.
 
@@ -924,7 +1221,7 @@ Canonical nneg_mulrPred := MulrPred nneg_divr_closed.
 Canonical nneg_divrPred := DivrPred nneg_divr_closed.
 
 Fact nneg_addr_closed : addr_closed (@nneg R).
-Proof. by split; [apply: lerr | apply: addr_ge0]. Qed.
+Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
 Canonical nneg_addrPred := AddrPred nneg_addr_closed.
 Canonical nneg_semiringPred := SemiringPred nneg_divr_closed.
 
@@ -934,7 +1231,7 @@ Canonical real_opprPred := OpprPred real_oppr_closed.
 
 Fact real_addr_closed : addr_closed (@real R).
 Proof.
-split=> [|x y Rx Ry]; first by rewrite realE lerr.
+split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.
   case/orP: Rx => [? | x_le0]; first exact.
   by rewrite -rpredN opprD; apply; rewrite ?rpredN ?oppr_ge0.
@@ -962,10 +1259,10 @@ Canonical real_semiringPred := SemiringPred real_divr_closed.
 Canonical real_subringPred := SubringPred real_divr_closed.
 Canonical real_divringPred := DivringPred real_divr_closed.
 
-End Domain.
+End NumDomain.
 
 Lemma num_real (R : realDomainType) (x : R) : x \is real.
-Proof. by case: R x => T []. Qed.
+Proof. by rewrite unfold_in; apply: le_total. Qed.
 
 Fact archi_bound_subproof (R : archiFieldType) : archimedean_axiom R.
 Proof. by case: R => ? []. Qed.
@@ -987,12 +1284,6 @@ by rewrite rootE !hornerE subr_eq0; exists y.
 Qed.
 
 End RealClosed.
-
-(* TODO Kazuhiko: Add a normedModType R, with R : numDomainType *)
-(* follow https://github.com/math-comp/analysis/blob/3f8dfbe0e8a963d32003ef7fdcef71823c8484c3/hierarchy.v#L1273-L1279 replacing absRingType by numDomainType,
-parametrize by Norm.class, and remove ax3 *)
-
-(* TODO Kazuhiko: Add that any R : numDomainType is canonically a normedModType R *)
 
 End Internals.
 
@@ -1030,36 +1321,28 @@ End ExtraDef.
 Notation bound := archi_bound.
 Notation sqrt := sqrtr.
 
-
-(* /!\ TODO Kazuhiko: REWRITE DIFFERENTLY *)
-(* - Everything only about 0, + and norm and order on R
-     should be for a normedModType R *)
-(* - Everything about only < and <= and meet and join should be 
-     removed or ported to order *)
-(* - Everything else should be for a numDomainType or substructure *)
-
 Module Theory.
 
 Section NumIntegralDomainTheory.
 
 Variable R : numDomainType.
-Implicit Types x y z t : R.
+Implicit Types (V : normedDomainType R) (x y z t : R).
 
 (* Lemmas from the signature (reexported from internals). *)
 
-Definition ler_norm_add x y : `|x + y| <= `|x| + `|y| := ler_norm_add x y.
+Definition ler_norm_add V (x y : V) : `|x + y| <= `|x| + `|y| :=
+  ler_norm_add x y.
 Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
-Definition normr0_eq0 x : `|x| = 0 -> x = 0 := @normr0_eq0 R x.
+Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 R V x.
 Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
   @ger_leVge R x y.
-Definition normrM : {morph normr : x y / x * y : R} := @normrM R.
-Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := @ler_def R x y.
-Definition ltr_def x y : (x < y) = (y != x) && (x <= y) := @ltr_def R x y.
+Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
+Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := ler_def x y.
+Definition normrMn V (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.
+Definition normrN V (x : V) : `|- x| = `|x| := normrN x.
 
-(* Predicate and relation definitions. *)
+(* Predicate definitions. *)
 
-Lemma gerE x y : ge x y = (y <= x). Proof. by []. Qed.
-Lemma gtrE x y : gt x y = (y < x). Proof. by []. Qed.
 Lemma posrE x : (x \is pos) = (0 < x). Proof. by []. Qed.
 Lemma negrE x : (x \is neg) = (x < 0). Proof. by []. Qed.
 Lemma nnegrE x : (x \is nneg) = (0 <= x). Proof. by []. Qed.
@@ -1067,31 +1350,14 @@ Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
 
-Lemma lerr x : x <= x. Proof. exact: lerr. Qed.
-Lemma ltrr x : x < x = false. Proof. by rewrite ltr_def eqxx. Qed.
-Lemma ltrW x y : x < y -> x <= y. Proof. exact: ltrW. Qed.
-Hint Resolve lerr ltrr ltrW : core.
-
-Lemma ltr_neqAle x y : (x < y) = (x != y) && (x <= y).
-Proof. by rewrite ltr_def eq_sym. Qed.
-
-Lemma ler_eqVlt x y : (x <= y) = (x == y) || (x < y).
-Proof. by rewrite ltr_neqAle; case: eqP => // ->; rewrite lerr. Qed.
-
-Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. by rewrite ltr_def. Qed.
+Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. by rewrite lt_def. Qed.
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x). Proof. exact: le0r. Qed.
 
-Lemma lt0r_neq0 (x : R) : 0 < x  -> x != 0.
+Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0.
 Proof. by rewrite lt0r; case/andP. Qed.
 
-Lemma ltr0_neq0 (x : R) : x < 0  -> x != 0.
-Proof. by rewrite ltr_neqAle; case/andP. Qed.
-
-Lemma gtr_eqF x y : y < x -> x == y = false.
-Proof. by rewrite ltr_def; case/andP; move/negPf=> ->. Qed.
-
-Lemma ltr_eqF x y : x < y -> x == y = false.
-Proof. by move=> hyx; rewrite eq_sym gtr_eqF. Qed.
+Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0.
+Proof. by rewrite lt_neqAle; case/andP. Qed.
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
 Proof. exact: pmulr_rgt0. Qed.
@@ -1113,7 +1379,7 @@ Proof. by case: n => //= n; apply: ltr0Sn. Qed.
 Hint Resolve ltr0Sn : core.
 
 Lemma pnatr_eq0 n : (n%:R == 0 :> R) = (n == 0)%N.
-Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gtr_eqF. Qed.
+Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gt_eqF. Qed.
 
 Lemma char_num : [char R] =i pred0.
 Proof. by case=> // p /=; rewrite !inE pnatr_eq0 andbF. Qed.
@@ -1124,12 +1390,8 @@ Lemma ger0_def x : (0 <= x) = (`|x| == x). Proof. exact: ger0_def. Qed.
 Lemma normr_idP {x} : reflect (`|x| = x) (0 <= x).
 Proof. by rewrite ger0_def; apply: eqP. Qed.
 Lemma ger0_norm x : 0 <= x -> `|x| = x. Proof. exact: normr_idP. Qed.
-
-Lemma normr0 : `|0| = 0 :> R. Proof. exact: ger0_norm. Qed.
-Lemma normr1 : `|1| = 1 :> R. Proof. exact: ger0_norm. Qed.
-Lemma normr_nat n : `|n%:R| = n%:R :> R. Proof. exact: ger0_norm. Qed.
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof. by rewrite -mulr_natl normrM normr_nat mulr_natl. Qed.
+Lemma normr1 : `|1 : R| = 1. Proof. exact: ger0_norm. Qed.
+Lemma normr_nat n : `|n%:R : R| = n%:R. Proof. exact: ger0_norm. Qed.
 
 Lemma normr_prod I r (P : pred I) (F : I -> R) :
   `|\prod_(i <- r | P i) F i| = \prod_(i <- r | P i) `|F i|.
@@ -1138,60 +1400,78 @@ Proof. exact: (big_morph norm normrM normr1). Qed.
 Lemma normrX n x : `|x ^+ n| = `|x| ^+ n.
 Proof. by rewrite -(card_ord n) -!prodr_const normr_prod. Qed.
 
-Lemma normr_unit : {homo (@norm R) : x / x \is a GRing.unit}.
+Lemma normr_unit : {homo (@norm R R) : x / x \is a GRing.unit}.
 Proof.
 move=> x /= /unitrP [y [yx xy]]; apply/unitrP; exists `|y|.
 by rewrite -!normrM xy yx normr1.
 Qed.
 
-Lemma normrV : {in GRing.unit, {morph (@normr R) : x / x ^-1}}.
+Lemma normrV : {in GRing.unit, {morph (@norm R R) : x / x ^-1}}.
 Proof.
 move=> x ux; apply: (mulrI (normr_unit ux)).
 by rewrite -normrM !divrr ?normr1 ?normr_unit.
 Qed.
 
-Lemma normr0P {x} : reflect (`|x| = 0) (x == 0).
-Proof. by apply: (iffP eqP)=> [->|/normr0_eq0 //]; apply: normr0. Qed.
-
-Definition normr_eq0 x := sameP (`|x| =P 0) normr0P.
-
-Lemma normrN1 : `|-1| = 1 :> R.
+Lemma normrN1 : `|-1 : R| = 1.
 Proof.
-have: `|-1| ^+ 2 == 1 :> R by rewrite -normrX -signr_odd normr1.
+have: `|-1 : R| ^+ 2 == 1 by rewrite -normrX -signr_odd normr1.
 rewrite sqrf_eq1 => /orP[/eqP //|]; rewrite -ger0_def le0r oppr_eq0 oner_eq0.
-by move/(addr_gt0 ltr01); rewrite subrr ltrr.
+by move/(addr_gt0 ltr01); rewrite subrr ltxx.
 Qed.
 
-Lemma normrN x : `|- x| = `|x|.
-Proof. by rewrite -mulN1r normrM normrN1 mul1r. Qed.
+Section NormedDomainTheory.
 
-Lemma distrC x y : `|x - y| = `|y - x|.
+Variable V : normedDomainType R.
+Implicit Types (v w : V).
+
+Lemma normr0 : `|0 : V| = 0.
+Proof. by rewrite -(mulr0n 0) normrMn mulr0n. Qed.
+
+Lemma normr0P v : reflect (`|v| = 0) (v == 0).
+Proof. by apply: (iffP eqP)=> [->|/normr0_eq0 //]; apply: normr0. Qed.
+
+Definition normr_eq0 v := sameP (`|v| =P 0) (normr0P v).
+
+Lemma distrC v w : `|v - w| = `|w - v|.
 Proof. by rewrite -opprB normrN. Qed.
+
+Lemma normr_id v : `| `|v| | = `|v|.
+Proof.
+have nz2: 2%:R != 0 :> R by rewrite pnatr_eq0.
+apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n ger0_norm //.
+by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
+Qed.
+
+Lemma normr_ge0 v : 0 <= `|v|. Proof. by rewrite ger0_def normr_id. Qed.
+
+Lemma normr_le0 v : `|v| <= 0 = (v == 0).
+Proof. by rewrite -normr_eq0 eq_le normr_ge0 andbT. Qed.
+
+Lemma normr_lt0 v : `|v| < 0 = false.
+Proof. by rewrite lt_neqAle normr_le0 normr_eq0 andNb. Qed.
+
+Lemma normr_gt0 v : `|v| > 0 = (v != 0).
+Proof. by rewrite lt_def normr_eq0 normr_ge0 andbT. Qed.
+
+Definition normrE := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
+  normr_lt0, normr_le0, normr_gt0, normrN).
+
+End NormedDomainTheory.
 
 Lemma ler0_def x : (x <= 0) = (`|x| == - x).
 Proof. by rewrite ler_def sub0r normrN. Qed.
 
-Lemma normr_id x : `|`|x| | = `|x|.
-Proof.
-have nz2: 2%:R != 0 :> R by rewrite pnatr_eq0.
-apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n ger0_norm //.
-by rewrite -{2}normrN -normr0 -(subrr x) ler_norm_add.
-Qed.
-
-Lemma normr_ge0 x : 0 <= `|x|. Proof. by rewrite ger0_def normr_id. Qed.
-Hint Resolve normr_ge0 : core.
-
 Lemma ler0_norm x : x <= 0 -> `|x| = - x.
 Proof. by move=> x_le0; rewrite -[r in _ = r]ger0_norm ?normrN ?oppr_ge0. Qed.
 
-Definition gtr0_norm x (hx : 0 < x) := ger0_norm (ltrW hx).
-Definition ltr0_norm x (hx : x < 0) := ler0_norm (ltrW hx).
+Definition gtr0_norm x (hx : 0 < x) := ger0_norm (ltW hx).
+Definition ltr0_norm x (hx : x < 0) := ler0_norm (ltW hx).
 
 (* Comparision to 0 of a difference *)
 
 Lemma subr_ge0 x y : (0 <= y - x) = (x <= y). Proof. exact: subr_ge0. Qed.
 Lemma subr_gt0 x y : (0 < y - x) = (x < y).
-Proof. by rewrite !ltr_def subr_eq0 subr_ge0. Qed.
+Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
 Lemma subr_le0  x y : (y - x <= 0) = (y <= x).
 Proof. by rewrite -subr_ge0 opprB add0r subr_ge0. Qed.
 Lemma subr_lt0  x y : (y - x < 0) = (y < x).
@@ -1203,358 +1483,19 @@ Definition subr_cp0 := (subr_lte0, subr_gte0).
 
 (* Ordered ring properties. *)
 
-Lemma ler_asym : antisymmetric (<=%R : rel R).
-Proof.
-move=> x y; rewrite !ler_def distrC -opprB -addr_eq0 => /andP[/eqP->].
-by rewrite -mulr2n -mulr_natl mulf_eq0 subr_eq0 pnatr_eq0 => /eqP.
-Qed.
-
-Lemma eqr_le x y : (x == y) = (x <= y <= x).
-Proof. by apply/eqP/idP=> [->|/ler_asym]; rewrite ?lerr. Qed.
-
-Lemma ltr_trans : transitive (@ltr R).
-Proof.
-move=> y x z le_xy le_yz.
-by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 ?subr_gt0.
-Qed.
-
-Lemma ler_lt_trans y x z : x <= y -> y < z -> x < z.
-Proof. by rewrite !ler_eqVlt => /orP[/eqP -> //|/ltr_trans]; apply. Qed.
-
-Lemma ltr_le_trans y x z : x < y -> y <= z -> x < z.
-Proof. by rewrite !ler_eqVlt => lxy /orP[/eqP <- //|/(ltr_trans lxy)]. Qed.
-
-Lemma ler_trans : transitive (@ler R).
-Proof.
-move=> y x z; rewrite !ler_eqVlt => /orP [/eqP -> //|lxy].
-by move=> /orP [/eqP <-|/(ltr_trans lxy) ->]; rewrite ?lxy orbT.
-Qed.
-
 Definition lter01 := (ler01, ltr01).
-Definition lterr := (lerr, ltrr).
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof. exact: addr_ge0. Qed.
-
-Lemma lerifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
-Proof.
-rewrite /lerif ler_eqVlt; apply: (iffP idP)=> [|[]].
-  by case: C => [/eqP->|lxy]; rewrite ?eqxx // lxy ltr_eqF.
-by move=> /orP[/eqP->|lxy] <-; rewrite ?eqxx // ltr_eqF.
-Qed.
-
-Lemma ltr_asym x y : x < y < x = false.
-Proof. by apply/negP=> /andP [/ltr_trans hyx /hyx]; rewrite ltrr. Qed.
-
-Lemma ler_anti : antisymmetric (@ler R).
-Proof. by move=> x y; rewrite -eqr_le=> /eqP. Qed.
-
-Lemma ltr_le_asym x y : x < y <= x = false.
-Proof. by rewrite ltr_neqAle -andbA -eqr_le eq_sym; case: (_ == _). Qed.
-
-Lemma ler_lt_asym x y : x <= y < x = false.
-Proof. by rewrite andbC ltr_le_asym. Qed.
-
-Definition lter_anti := (=^~ eqr_le, ltr_asym, ltr_le_asym, ler_lt_asym).
-
-Lemma ltr_geF x y : x < y -> (y <= x = false).
-Proof.
-by move=> xy; apply: contraTF isT=> /(ltr_le_trans xy); rewrite ltrr.
-Qed.
-
-Lemma ler_gtF x y : x <= y -> (y < x = false).
-Proof. by apply: contraTF=> /ltr_geF->. Qed.
-
-Definition ltr_gtF x y hxy := ler_gtF (@ltrW x y hxy).
-
-(* Norm and order properties. *)
-
-Lemma normr_le0 x : (`|x| <= 0) = (x == 0).
-Proof. by rewrite -normr_eq0 eqr_le normr_ge0 andbT. Qed.
-
-Lemma normr_lt0 x : `|x| < 0 = false.
-Proof. by rewrite ltr_neqAle normr_le0 normr_eq0 andNb. Qed.
-
-Lemma normr_gt0 x : (`|x| > 0) = (x != 0).
-Proof. by rewrite ltr_def normr_eq0 normr_ge0 andbT. Qed.
-
-Definition normrE x := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
-  normr_lt0, normr_le0, normr_gt0, normrN).
 
 End NumIntegralDomainTheory.
 
 Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
-Arguments normr0P {R x}.
-Arguments lerifP {R x y C}.
-Hint Resolve @ler01 @ltr01 lerr ltrr ltrW ltr_eqF ltr0Sn ler0n normr_ge0 : core.
-
-Section NumIntegralDomainMonotonyTheory.
-
-Variables R R' : numDomainType.
-Implicit Types m n p : nat.
-Implicit Types x y z : R.
-Implicit Types u v w : R'.
-
-(****************************************************************************)
-(* This listing of "Let"s factor out the required premices for the          *)
-(* subsequent lemmas, putting them in the context so that "done" solves the *)
-(* goals quickly                                                            *)
-(****************************************************************************)
-
-Let leqnn := leqnn.
-Let ltnE := ltn_neqAle.
-Let ltrE := @ltr_neqAle R.
-Let ltr'E := @ltr_neqAle R'.
-Let gtnE (m n : nat) : (m > n)%N = (m != n) && (m >= n)%N.
-Proof. by rewrite ltn_neqAle eq_sym. Qed.
-Let gtrE (x y : R) : (x > y) = (x != y) && (x >= y).
-Proof. by rewrite ltr_neqAle eq_sym. Qed.
-Let gtr'E (x y : R') : (x > y) = (x != y) && (x >= y).
-Proof. by rewrite ltr_neqAle eq_sym. Qed.
-Let leq_anti : antisymmetric leq.
-Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
-Let geq_anti : antisymmetric geq.
-Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
-Let ler_antiR := @ler_anti R.
-Let ler_antiR' := @ler_anti R'.
-Let ger_antiR : antisymmetric (>=%R : rel R).
-Proof. by move=> ??; rewrite andbC; apply: ler_anti. Qed.
-Let ger_antiR' : antisymmetric (>=%R : rel R').
-Proof. by move=> ??; rewrite andbC; apply: ler_anti. Qed.
-Let leq_total := leq_total.
-Let geq_total : total geq.
-Proof. by move=> m n; apply: leq_total. Qed.
-
-Section AcrossTypes.
-
-Variables (D D' : {pred R}) (f : R -> R').
-
-Lemma ltrW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
-Proof. exact: homoW. Qed.
-
-Lemma ltrW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y}.
-Proof. exact: homoW. Qed.
-
-Lemma inj_homo_ltr :
-  injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y}.
-Proof. exact: inj_homo. Qed.
-
-Lemma inj_nhomo_ltr :
-  injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y}.
-Proof. exact: inj_homo. Qed.
-
-Lemma incr_inj : {mono f : x y / x <= y} -> injective f.
-Proof. exact: mono_inj. Qed.
-
-Lemma decr_inj : {mono f : x y /~ x <= y} -> injective f.
-Proof. exact: mono_inj. Qed.
-
-Lemma lerW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
-Proof. exact: anti_mono. Qed.
-
-Lemma lerW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
-Proof. exact: anti_mono. Qed.
-
-(* Monotony in D D' *)
-Lemma ltrW_homo_in :
-  {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}}.
-Proof. exact: homoW_in. Qed.
-
-Lemma ltrW_nhomo_in :
-  {in D & D', {homo f : x y /~ x < y}} -> {in D & D', {homo f : x y /~ x <= y}}.
-Proof. exact: homoW_in. Qed.
-
-Lemma inj_homo_ltr_in :
-    {in D & D', injective f} ->  {in D & D', {homo f : x y / x <= y}} ->
-  {in D & D', {homo f : x y / x < y}}.
-Proof. exact: inj_homo_in. Qed.
-
-Lemma inj_nhomo_ltr_in :
-    {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
-  {in D & D', {homo f : x y /~ x < y}}.
-Proof. exact: inj_homo_in. Qed.
-
-Lemma incr_inj_in : {in D &, {mono f : x y / x <= y}} ->
-   {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
-
-Lemma decr_inj_in :
-  {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
-
-Lemma lerW_mono_in :
-  {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
-Proof. exact: anti_mono_in. Qed.
-
-Lemma lerW_nmono_in :
-  {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
-Proof. exact: anti_mono_in. Qed.
-
-End AcrossTypes.
-
-Section NatToR.
-
-Variables (D D' : {pred nat}) (f : nat -> R).
-
-Lemma ltnrW_homo : {homo f : m n / (m < n)%N >-> m < n} ->
-  {homo f : m n / (m <= n)%N >-> m <= n}.
-Proof. exact: homoW. Qed.
-
-Lemma ltnrW_nhomo : {homo f : m n / (n < m)%N >-> m < n} ->
-  {homo f : m n / (n <= m)%N >-> m <= n}.
-Proof. exact: homoW. Qed.
-
-Lemma inj_homo_ltnr : injective f ->
-  {homo f : m n / (m <= n)%N >-> m <= n} ->
-  {homo f : m n / (m < n)%N >-> m < n}.
-Proof. exact: inj_homo. Qed.
-
-Lemma inj_nhomo_ltnr : injective f ->
-  {homo f : m n / (n <= m)%N >-> m <= n} ->
-  {homo f : m n / (n < m)%N >-> m < n}.
-Proof. exact: inj_homo. Qed.
-
-Lemma incnr_inj : {mono f : m n / (m <= n)%N >-> m <= n} -> injective f.
-Proof. exact: mono_inj. Qed.
-
-Lemma decnr_inj_inj : {mono f : m n / (n <= m)%N >-> m <= n} -> injective f.
-Proof. exact: mono_inj. Qed.
-
-Lemma lenrW_mono : {mono f : m n / (m <= n)%N >-> m <= n} ->
-  {mono f : m n / (m < n)%N >-> m < n}.
-Proof. exact: anti_mono. Qed.
-
-Lemma lenrW_nmono : {mono f : m n / (n <= m)%N >-> m <= n} ->
-  {mono f : m n / (n < m)%N >-> m < n}.
-Proof. exact: anti_mono. Qed.
-
-Lemma lenr_mono : {homo f : m n / (m < n)%N >-> m < n} ->
-   {mono f : m n / (m <= n)%N >-> m <= n}.
-Proof. exact: total_homo_mono. Qed.
-
-Lemma lenr_nmono : {homo f : m n / (n < m)%N >-> m < n} ->
-  {mono f : m n / (n <= m)%N >-> m <= n}.
-Proof. exact: total_homo_mono. Qed.
-
-Lemma ltnrW_homo_in : {in D & D', {homo f : m n / (m < n)%N >-> m < n}} ->
-  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}}.
-Proof. exact: homoW_in. Qed.
-
-Lemma ltnrW_nhomo_in : {in D & D', {homo f : m n / (n < m)%N >-> m < n}} ->
-  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}}.
-Proof. exact: homoW_in. Qed.
-
-Lemma inj_homo_ltnr_in : {in D & D', injective f} ->
-  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} ->
-  {in D & D', {homo f : m n / (m < n)%N >-> m < n}}.
-Proof. exact: inj_homo_in. Qed.
-
-Lemma inj_nhomo_ltnr_in : {in D & D', injective f} ->
-  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} ->
-  {in D & D', {homo f : m n / (n < m)%N >-> m < n}}.
-Proof. exact: inj_homo_in. Qed.
-
-Lemma incnr_inj_in : {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
-  {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
-
-Lemma decnr_inj_inj_in : {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
-  {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
-
-Lemma lenrW_mono_in : {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
-  {in D &, {mono f : m n / (m < n)%N >-> m < n}}.
-Proof. exact: anti_mono_in. Qed.
-
-Lemma lenrW_nmono_in : {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
-  {in D &, {mono f : m n / (n < m)%N >-> m < n}}.
-Proof. exact: anti_mono_in. Qed.
-
-Lemma lenr_mono_in : {in D &, {homo f : m n / (m < n)%N >-> m < n}} ->
-   {in D &, {mono f : m n / (m <= n)%N >-> m <= n}}.
-Proof. exact: total_homo_mono_in. Qed.
-
-Lemma lenr_nmono_in : {in D &, {homo f : m n / (n < m)%N >-> m < n}} ->
-  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}}.
-Proof. exact: total_homo_mono_in. Qed.
-
-End NatToR.
-
-Section RToNat.
-
-Variables (D D' : {pred R}) (f : R -> nat).
-
-Lemma ltrnW_homo : {homo f : m n / m < n >-> (m < n)%N} ->
-  {homo f : m n / m <= n >-> (m <= n)%N}.
-Proof. exact: homoW. Qed.
-
-Lemma ltrnW_nhomo : {homo f : m n / n < m >-> (m < n)%N} ->
-  {homo f : m n / n <= m >-> (m <= n)%N}.
-Proof. exact: homoW. Qed.
-
-Lemma inj_homo_ltrn : injective f ->
-  {homo f : m n / m <= n >-> (m <= n)%N} ->
-  {homo f : m n / m < n >-> (m < n)%N}.
-Proof. exact: inj_homo. Qed.
-
-Lemma inj_nhomo_ltrn : injective f ->
-  {homo f : m n / n <= m >-> (m <= n)%N} ->
-  {homo f : m n / n < m >-> (m < n)%N}.
-Proof. exact: inj_homo. Qed.
-
-Lemma incrn_inj : {mono f : m n / m <= n >-> (m <= n)%N} -> injective f.
-Proof. exact: mono_inj. Qed.
-
-Lemma decrn_inj : {mono f : m n / n <= m >-> (m <= n)%N} -> injective f.
-Proof. exact: mono_inj. Qed.
-
-Lemma lernW_mono : {mono f : m n / m <= n >-> (m <= n)%N} ->
-  {mono f : m n / m < n >-> (m < n)%N}.
-Proof. exact: anti_mono. Qed.
-
-Lemma lernW_nmono : {mono f : m n / n <= m >-> (m <= n)%N} ->
-  {mono f : m n / n < m >-> (m < n)%N}.
-Proof. exact: anti_mono. Qed.
-
-Lemma ltrnW_homo_in : {in D & D', {homo f : m n / m < n >-> (m < n)%N}} ->
-  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}}.
-Proof. exact: homoW_in. Qed.
-
-Lemma ltrnW_nhomo_in : {in D & D', {homo f : m n / n < m >-> (m < n)%N}} ->
-  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}}.
-Proof. exact: homoW_in. Qed.
-
-Lemma inj_homo_ltrn_in : {in D & D', injective f} ->
-  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} ->
-  {in D & D', {homo f : m n / m < n >-> (m < n)%N}}.
-Proof. exact: inj_homo_in. Qed.
-
-Lemma inj_nhomo_ltrn_in : {in D & D', injective f} ->
-  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} ->
-  {in D & D', {homo f : m n / n < m >-> (m < n)%N}}.
-Proof. exact: inj_homo_in. Qed.
-
-Lemma incrn_inj_in : {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
-  {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
-
-Lemma decrn_inj_in : {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
-  {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
-
-Lemma lernW_mono_in : {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
-  {in D &, {mono f : m n / m < n >-> (m < n)%N}}.
-Proof. exact: anti_mono_in. Qed.
-
-Lemma lernW_nmono_in : {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
-  {in D &, {mono f : m n / n < m >-> (m < n)%N}}.
-Proof. exact: anti_mono_in. Qed.
-
-End RToNat.
-
-End NumIntegralDomainMonotonyTheory.
+Arguments normr0P {R V v}.
+Hint Resolve @ler01 @ltr01 ltr0Sn ler0n : core.
+Hint Extern 0 (is_true (0 <= norm _)) => exact: normr_ge0 : core.
 
 Section NumDomainOperationTheory.
 
@@ -1567,7 +1508,7 @@ Lemma ler_opp2 : {mono -%R : x y /~ x <= y :> R}.
 Proof. by move=> x y /=; rewrite -subr_ge0 opprK addrC subr_ge0. Qed.
 Hint Resolve ler_opp2 : core.
 Lemma ltr_opp2 : {mono -%R : x y /~ x < y :> R}.
-Proof. by move=> x y /=; rewrite lerW_nmono. Qed.
+Proof. by move=> x y /=; rewrite leW_nmono. Qed.
 Hint Resolve ltr_opp2 : core.
 Definition lter_opp2 := (ler_opp2, ltr_opp2).
 
@@ -1575,7 +1516,7 @@ Lemma ler_oppr x y : (x <= - y) = (y <= - x).
 Proof. by rewrite (monoRL opprK ler_opp2). Qed.
 
 Lemma ltr_oppr x y : (x < - y) = (y < - x).
-Proof. by rewrite (monoRL opprK (lerW_nmono _)). Qed.
+Proof. by rewrite (monoRL opprK (leW_nmono _)). Qed.
 
 Definition lter_oppr := (ler_oppr, ltr_oppr).
 
@@ -1583,7 +1524,7 @@ Lemma ler_oppl x y : (- x <= y) = (- y <= x).
 Proof. by rewrite (monoLR opprK ler_opp2). Qed.
 
 Lemma ltr_oppl x y : (- x < y) = (- y < x).
-Proof. by rewrite (monoLR opprK (lerW_nmono _)). Qed.
+Proof. by rewrite (monoLR opprK (leW_nmono _)). Qed.
 
 Definition lter_oppl := (ler_oppl, ltr_oppl).
 
@@ -1606,23 +1547,23 @@ Definition oppr_cp0 := (oppr_gte0, oppr_lte0).
 Definition lter_oppE := (oppr_cp0, lter_opp2).
 
 Lemma ge0_cp x : 0 <= x -> (- x <= 0) * (- x <= x).
-Proof. by move=> hx; rewrite oppr_cp0 hx (@ler_trans _ 0) ?oppr_cp0. Qed.
+Proof. by move=> hx; rewrite oppr_cp0 hx (@le_trans _ _ 0) ?oppr_cp0. Qed.
 
 Lemma gt0_cp x : 0 < x ->
   (0 <= x) * (- x <= 0) * (- x <= x) * (- x < 0) * (- x < x).
 Proof.
-move=> hx; move: (ltrW hx) => hx'; rewrite !ge0_cp hx' //.
-by rewrite oppr_cp0 hx // (@ltr_trans _ 0) ?oppr_cp0.
+move=> hx; move: (ltW hx) => hx'; rewrite !ge0_cp hx' //.
+by rewrite oppr_cp0 hx // (@lt_trans _ _ 0) ?oppr_cp0.
 Qed.
 
 Lemma le0_cp x : x <= 0 -> (0 <= - x) * (x <= - x).
-Proof. by move=> hx; rewrite oppr_cp0 hx (@ler_trans _ 0) ?oppr_cp0. Qed.
+Proof. by move=> hx; rewrite oppr_cp0 hx (@le_trans _ _ 0) ?oppr_cp0. Qed.
 
 Lemma lt0_cp x :
   x < 0 -> (x <= 0) * (0 <= - x) * (x <= - x) * (0 < - x) * (x < - x).
 Proof.
-move=> hx; move: (ltrW hx) => hx'; rewrite !le0_cp // hx'.
-by rewrite oppr_cp0 hx // (@ltr_trans _ 0) ?oppr_cp0.
+move=> hx; move: (ltW hx) => hx'; rewrite !le0_cp // hx'.
+by rewrite oppr_cp0 hx // (@lt_trans _ _ 0) ?oppr_cp0.
 Qed.
 
 (* Properties of the real subset. *)
@@ -1634,10 +1575,10 @@ Lemma ler0_real x : x <= 0 -> x \is real.
 Proof. by rewrite realE orbC => ->. Qed.
 
 Lemma gtr0_real x : 0 < x -> x \is real.
-Proof. by move=> /ltrW/ger0_real. Qed.
+Proof. by move=> /ltW/ger0_real. Qed.
 
 Lemma ltr0_real x : x < 0 -> x \is real.
-Proof. by move=> /ltrW/ler0_real. Qed.
+Proof. by move=> /ltW/ler0_real. Qed.
 
 Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
 Hint Resolve real0 : core.
@@ -1653,8 +1594,8 @@ Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) h /h; rewrite !ler_opp2. Qed.
 Lemma real_leVge x y : x \is real -> y \is real -> (x <= y) || (y <= x).
 Proof.
 rewrite !realE; have [x_ge0 _|x_nge0 /= x_le0] := boolP (_ <= _); last first.
-  by have [/(ler_trans x_le0)->|_ /(ler_leVge x_le0) //] := boolP (0 <= _).
-by have [/(ger_leVge x_ge0)|_ /ler_trans->] := boolP (0 <= _); rewrite ?orbT.
+  by have [/(le_trans x_le0)->|_ /(ler_leVge x_le0) //] := boolP (0 <= _).
+by have [/(ger_leVge x_ge0)|_ /le_trans->] := boolP (0 <= _); rewrite ?orbT.
 Qed.
 
 Lemma realB : {in real &, forall x y, x - y \is real}.
@@ -1689,39 +1630,39 @@ Variant comparer x y : R -> R ->
   | ComparerEq of x = y : comparer x y 0 0
     true true true true false false.
 
-Lemma real_lerP x y :
+Lemma real_leP x y :
     x \is real -> y \is real ->
   ler_xor_gt x y `|x - y| `|y - x| (x <= y) (y < x).
 Proof.
 move=> xR /(real_leVge xR); have [le_xy _|Nle_xy /= le_yx] := boolP (_ <= _).
-  have [/(ler_lt_trans le_xy)|] := boolP (_ < _); first by rewrite ltrr.
+  have [/(le_lt_trans le_xy)|] := boolP (_ < _); first by rewrite ltxx.
   by rewrite ler0_norm ?ger0_norm ?subr_cp0 ?opprB //; constructor.
 have [lt_yx|] := boolP (_ < _).
   by rewrite ger0_norm ?ler0_norm ?subr_cp0 ?opprB //; constructor.
-by rewrite ltr_def le_yx andbT negbK=> /eqP exy; rewrite exy lerr in Nle_xy.
+by rewrite lt_def le_yx andbT negbK=> /eqP exy; rewrite exy lexx in Nle_xy.
 Qed.
 
-Lemma real_ltrP x y :
+Lemma real_ltP x y :
     x \is real -> y \is real ->
   ltr_xor_ge x y `|x - y| `|y - x| (y <= x) (x < y).
-Proof. by move=> xR yR; case: real_lerP=> //; constructor. Qed.
+Proof. by move=> xR yR; case: real_leP=> //; constructor. Qed.
 
-Lemma real_ltrNge : {in real &, forall x y, (x < y) = ~~ (y <= x)}.
-Proof. by move=> x y xR yR /=; case: real_lerP. Qed.
+Lemma real_ltNge : {in real &, forall x y, (x < y) = ~~ (y <= x)}.
+Proof. by move=> x y xR yR /=; case: real_leP. Qed.
 
-Lemma real_lerNgt : {in real &, forall x y, (x <= y) = ~~ (y < x)}.
-Proof. by move=> x y xR yR /=; case: real_lerP. Qed.
+Lemma real_leNgt : {in real &, forall x y, (x <= y) = ~~ (y < x)}.
+Proof. by move=> x y xR yR /=; case: real_leP. Qed.
 
-Lemma real_ltrgtP x y :
+Lemma real_ltgtP x y :
     x \is real -> y \is real ->
   comparer x y `|x - y| `|y - x|
                 (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
 Proof.
-move=> xR yR; case: real_lerP => // [le_yx|lt_xy]; last first.
-  by rewrite gtr_eqF // ltr_eqF // ler_gtF ?ltrW //; constructor.
-case: real_lerP => // [le_xy|lt_yx]; last first.
-  by rewrite ltr_eqF // gtr_eqF //; constructor.
-have /eqP ->: x == y by rewrite eqr_le le_yx le_xy.
+move=> xR yR; case: real_leP => // [le_yx|lt_xy]; last first.
+  by rewrite gt_eqF // lt_eqF // le_gtF ?ltW //; constructor.
+case: real_leP => // [le_xy|lt_yx]; last first.
+  by rewrite lt_eqF // gt_eqF //; constructor.
+have /eqP ->: x == y by rewrite eq_le le_yx le_xy.
 by rewrite subrr eqxx; constructor.
 Qed.
 
@@ -1739,28 +1680,28 @@ Variant comparer0 x :
   | ComparerLt0 of x < 0 : comparer0 x (- x) false false true false true false
   | ComparerEq0 of x = 0 : comparer0 x 0 true true true true false false.
 
-Lemma real_ger0P x : x \is real -> ger0_xor_lt0 x `|x| (x < 0) (0 <= x).
+Lemma real_ge0P x : x \is real -> ger0_xor_lt0 x `|x| (x < 0) (0 <= x).
 Proof.
-move=> hx; rewrite -{2}[x]subr0; case: real_ltrP;
+move=> hx; rewrite -{2}[x]subr0; case: real_ltP;
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
-Lemma real_ler0P x : x \is real -> ler0_xor_gt0 x `|x| (0 < x) (x <= 0).
+Lemma real_le0P x : x \is real -> ler0_xor_gt0 x `|x| (0 < x) (x <= 0).
 Proof.
-move=> hx; rewrite -{2}[x]subr0; case: real_ltrP;
+move=> hx; rewrite -{2}[x]subr0; case: real_ltP;
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
-Lemma real_ltrgt0P x :
+Lemma real_ltgt0P x :
      x \is real ->
   comparer0 x `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof.
-move=> hx; rewrite -{2}[x]subr0; case: real_ltrgtP;
+move=> hx; rewrite -{2}[x]subr0; case: real_ltgtP;
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
 Lemma real_neqr_lt : {in real &, forall x y, (x != y) = (x < y) || (y < x)}.
-Proof. by move=> * /=; case: real_ltrgtP. Qed.
+Proof. by move=> * /=; case: real_ltgtP. Qed.
 
 Lemma ler_sub_real x y : x <= y -> y - x \is real.
 Proof. by move=> le_xy; rewrite ger0_real // subr_ge0. Qed.
@@ -1784,10 +1725,10 @@ Lemma Nreal_geF x y : y \is real -> x \notin real -> (y <= x) = false.
 Proof. by move=> yR; apply: contraNF=> /ger_real->. Qed.
 
 Lemma Nreal_ltF x y : y \is real -> x \notin real -> (x < y) = false.
-Proof. by move=> yR xNR; rewrite ltr_def Nreal_leF ?andbF. Qed.
+Proof. by move=> yR xNR; rewrite lt_def Nreal_leF ?andbF. Qed.
 
 Lemma Nreal_gtF x y : y \is real -> x \notin real -> (y < x) = false.
-Proof. by move=> yR xNR; rewrite ltr_def Nreal_geF ?andbF. Qed.
+Proof. by move=> yR xNR; rewrite lt_def Nreal_geF ?andbF. Qed.
 
 (* real wlog *)
 
@@ -1796,7 +1737,7 @@ Lemma real_wlog_ler P :
   forall a b : R, a \is real -> b \is real -> P a b.
 Proof.
 move=> sP hP a b ha hb; wlog: a b ha hb / a <= b => [hwlog|]; last exact: hP.
-by case: (real_lerP ha hb)=> [/hP //|/ltrW hba]; apply: sP; apply: hP.
+by case: (real_leP ha hb)=> [/hP //|/ltW hba]; apply: sP; apply: hP.
 Qed.
 
 Lemma real_wlog_ltr P :
@@ -1805,7 +1746,7 @@ Lemma real_wlog_ltr P :
   forall a b : R, a \is real -> b \is real -> P a b.
 Proof.
 move=> rP sP hP; apply: real_wlog_ler=> // a b.
-by rewrite ler_eqVlt; case: (altP (_ =P _))=> [->|] //= _ lab; apply: hP.
+by rewrite le_eqVlt; case: (altP (_ =P _))=> [->|] //= _ lab; apply: hP.
 Qed.
 
 (* Monotony of addition *)
@@ -1818,10 +1759,10 @@ Lemma ler_add2r x : {mono +%R^~ x : y z / y <= z}.
 Proof. by move=> y z /=; rewrite ![_ + x]addrC ler_add2l. Qed.
 
 Lemma ltr_add2l x : {mono +%R x : y z / y < z}.
-Proof. by move=> y z /=; rewrite (lerW_mono (ler_add2l _)). Qed.
+Proof. by move=> y z /=; rewrite (leW_mono (ler_add2l _)). Qed.
 
 Lemma ltr_add2r x : {mono +%R^~ x : y z / y < z}.
-Proof. by move=> y z /=; rewrite (lerW_mono (ler_add2r _)). Qed.
+Proof. by move=> y z /=; rewrite (leW_mono (ler_add2r _)). Qed.
 
 Definition ler_add2 := (ler_add2l, ler_add2r).
 Definition ltr_add2 := (ltr_add2l, ltr_add2r).
@@ -1829,16 +1770,16 @@ Definition lter_add2 := (ler_add2, ltr_add2).
 
 (* Addition, subtraction and transitivity *)
 Lemma ler_add x y z t : x <= y -> z <= t -> x + z <= y + t.
-Proof. by move=> lxy lzt; rewrite (@ler_trans _ (y + z)) ?lter_add2. Qed.
+Proof. by move=> lxy lzt; rewrite (@le_trans _ _ (y + z)) ?lter_add2. Qed.
 
 Lemma ler_lt_add x y z t : x <= y -> z < t -> x + z < y + t.
-Proof. by move=> lxy lzt; rewrite (@ler_lt_trans _ (y + z)) ?lter_add2. Qed.
+Proof. by move=> lxy lzt; rewrite (@le_lt_trans _ _ (y + z)) ?lter_add2. Qed.
 
 Lemma ltr_le_add x y z t : x < y -> z <= t -> x + z < y + t.
-Proof. by move=> lxy lzt; rewrite (@ltr_le_trans _ (y + z)) ?lter_add2. Qed.
+Proof. by move=> lxy lzt; rewrite (@lt_le_trans _ _ (y + z)) ?lter_add2. Qed.
 
 Lemma ltr_add x y z t : x < y -> z < t -> x + z < y + t.
-Proof. by move=> lxy lzt; rewrite ltr_le_add // ltrW. Qed.
+Proof. by move=> lxy lzt; rewrite ltr_le_add // ltW. Qed.
 
 Lemma ler_sub x y z t : x <= y -> t <= z -> x - z <= y - t.
 Proof. by move=> lxy ltz; rewrite ler_add // lter_opp2. Qed.
@@ -1966,7 +1907,7 @@ Lemma paddr_eq0 (x y : R) :
   0 <= x -> 0 <= y -> (x + y == 0) = (x == 0) && (y == 0).
 Proof.
 rewrite le0r; case/orP=> [/eqP->|hx]; first by rewrite add0r eqxx.
-by rewrite (gtr_eqF hx) /= => hy; rewrite gtr_eqF // ltr_spaddl.
+by rewrite (gt_eqF hx) /= => hy; rewrite gt_eqF // ltr_spaddl.
 Qed.
 
 Lemma naddr_eq0 (x y : R) :
@@ -1988,7 +1929,7 @@ Proof. exact: (big_ind _ _ (@ler_paddl 0)). Qed.
 Lemma ler_sum I (r : seq I) (P : pred I) (F G : I -> R) :
     (forall i, P i -> F i <= G i) ->
   \sum_(i <- r | P i) F i <= \sum_(i <- r | P i) G i.
-Proof. exact: (big_ind2 _ (lerr _) ler_add). Qed.
+Proof. exact: (big_ind2 _ (lexx _) ler_add). Qed.
 
 Lemma psumr_eq0 (I : eqType) (r : seq I) (P : pred I) (F : I -> R) :
     (forall i, P i -> 0 <= F i) ->
@@ -2015,7 +1956,7 @@ by move=> x_gt0 y z /=; rewrite -subr_ge0 -mulrBr pmulr_rge0 // subr_ge0.
 Qed.
 
 Lemma ltr_pmul2l x : 0 < x -> {mono *%R x : x y / x < y}.
-Proof. by move=> x_gt0; apply: lerW_mono (ler_pmul2l _). Qed.
+Proof. by move=> x_gt0; apply: leW_mono (ler_pmul2l _). Qed.
 
 Definition lter_pmul2l := (ler_pmul2l, ltr_pmul2l).
 
@@ -2023,7 +1964,7 @@ Lemma ler_pmul2r x : 0 < x -> {mono *%R^~ x : x y / x <= y}.
 Proof. by move=> x_gt0 y z /=; rewrite ![_ * x]mulrC ler_pmul2l. Qed.
 
 Lemma ltr_pmul2r x : 0 < x -> {mono *%R^~ x : x y / x < y}.
-Proof. by move=> x_gt0; apply: lerW_mono (ler_pmul2r _). Qed.
+Proof. by move=> x_gt0; apply: leW_mono (ler_pmul2r _). Qed.
 
 Definition lter_pmul2r := (ler_pmul2r, ltr_pmul2r).
 
@@ -2033,7 +1974,7 @@ by move=> x_lt0 y z /=; rewrite -ler_opp2 -!mulNr ler_pmul2l ?oppr_gt0.
 Qed.
 
 Lemma ltr_nmul2l x : x < 0 -> {mono *%R x : x y /~ x < y}.
-Proof. by move=> x_lt0; apply: lerW_nmono (ler_nmul2l _). Qed.
+Proof. by move=> x_lt0; apply: leW_nmono (ler_nmul2l _). Qed.
 
 Definition lter_nmul2l := (ler_nmul2l, ltr_nmul2l).
 
@@ -2041,7 +1982,7 @@ Lemma ler_nmul2r x : x < 0 -> {mono *%R^~ x : x y /~ x <= y}.
 Proof. by move=> x_lt0 y z /=; rewrite ![_ * x]mulrC ler_nmul2l. Qed.
 
 Lemma ltr_nmul2r x : x < 0 -> {mono *%R^~ x : x y /~ x < y}.
-Proof. by move=> x_lt0; apply: lerW_nmono (ler_nmul2r _). Qed.
+Proof. by move=> x_lt0; apply: leW_nmono (ler_nmul2r _). Qed.
 
 Definition lter_nmul2r := (ler_nmul2r, ltr_nmul2r).
 
@@ -2068,15 +2009,15 @@ Qed.
 Lemma ler_pmul x1 y1 x2 y2 :
   0 <= x1 -> 0 <= x2 -> x1 <= y1 -> x2 <= y2 -> x1 * x2 <= y1 * y2.
 Proof.
-move=> x1ge0 x2ge0 le_xy1 le_xy2; have y1ge0 := ler_trans x1ge0 le_xy1.
-exact: ler_trans (ler_wpmul2r x2ge0 le_xy1) (ler_wpmul2l y1ge0 le_xy2).
+move=> x1ge0 x2ge0 le_xy1 le_xy2; have y1ge0 := le_trans x1ge0 le_xy1.
+exact: le_trans (ler_wpmul2r x2ge0 le_xy1) (ler_wpmul2l y1ge0 le_xy2).
 Qed.
 
 Lemma ltr_pmul x1 y1 x2 y2 :
   0 <= x1 -> 0 <= x2 -> x1 < y1 -> x2 < y2 -> x1 * x2 < y1 * y2.
 Proof.
-move=> x1ge0 x2ge0 lt_xy1 lt_xy2; have y1gt0 := ler_lt_trans x1ge0 lt_xy1.
-by rewrite (ler_lt_trans (ler_wpmul2r x2ge0 (ltrW lt_xy1))) ?ltr_pmul2l.
+move=> x1ge0 x2ge0 lt_xy1 lt_xy2; have y1gt0 := le_lt_trans x1ge0 lt_xy1.
+by rewrite (le_lt_trans (ler_wpmul2r x2ge0 (ltW lt_xy1))) ?ltr_pmul2l.
 Qed.
 
 (* complement for x *+ n and <= or < *)
@@ -2087,10 +2028,10 @@ by case: n => // n _ x y /=; rewrite -mulr_natl -[y *+ _]mulr_natl ler_pmul2l.
 Qed.
 
 Lemma ltr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x < y}.
-Proof. by move/ler_pmuln2r/lerW_mono. Qed.
+Proof. by move/ler_pmuln2r/leW_mono. Qed.
 
 Lemma pmulrnI n : (0 < n)%N -> injective ((@GRing.natmul R)^~ n).
-Proof. by move/ler_pmuln2r/incr_inj. Qed.
+Proof. by move/ler_pmuln2r/inc_inj. Qed.
 
 Lemma eqr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x == y}.
 Proof. by move/pmulrnI/inj_eq. Qed.
@@ -2123,13 +2064,13 @@ Lemma mulrn_wle0 x n : x <= 0 -> x *+ n <= 0.
 Proof. by move=> /(ler_wmuln2r n); rewrite mul0rn. Qed.
 
 Lemma ler_muln2r n x y : (x *+ n <= y *+ n) = ((n == 0%N) || (x <= y)).
-Proof. by case: n => [|n]; rewrite ?lerr ?eqxx // ler_pmuln2r. Qed.
+Proof. by case: n => [|n]; rewrite ?lexx ?eqxx // ler_pmuln2r. Qed.
 
 Lemma ltr_muln2r n x y : (x *+ n < y *+ n) = ((0 < n)%N && (x < y)).
-Proof. by case: n => [|n]; rewrite ?lerr ?eqxx // ltr_pmuln2r. Qed.
+Proof. by case: n => [|n]; rewrite ?lexx ?eqxx // ltr_pmuln2r. Qed.
 
 Lemma eqr_muln2r n x y : (x *+ n == y *+ n) = (n == 0)%N || (x == y).
-Proof. by rewrite !eqr_le !ler_muln2r -orb_andr. Qed.
+Proof. by rewrite !(@eq_le _ R) !ler_muln2r -orb_andr. Qed.
 
 (* More characteristic zero properties. *)
 
@@ -2162,14 +2103,14 @@ Proof. by case: n => // n hx; rewrite pmulrn_llt0. Qed.
 Lemma ler_pmuln2l x :
   0 < x -> {mono (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
-move=> x_gt0 m n /=; case: leqP => hmn; first by rewrite ler_wpmuln2l // ltrW.
-rewrite -(subnK (ltnW hmn)) mulrnDr ger_addr ltr_geF //.
+move=> x_gt0 m n /=; case: leqP => hmn; first by rewrite ler_wpmuln2l // ltW.
+rewrite -(subnK (ltnW hmn)) mulrnDr ger_addr lt_geF //.
 by rewrite mulrn_wgt0 // subn_gt0.
 Qed.
 
 Lemma ltr_pmuln2l x :
   0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> x_gt0; apply: lenrW_mono (ler_pmuln2l _). Qed.
+Proof. by move=> x_gt0; apply: leW_mono (ler_pmuln2l _). Qed.
 
 Lemma ler_nmuln2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
@@ -2179,7 +2120,7 @@ Qed.
 
 Lemma ltr_nmuln2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> x_lt0; apply: lenrW_nmono (ler_nmuln2l _). Qed.
+Proof. by move=> x_lt0; apply: leW_nmono (ler_nmuln2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
 Proof. by rewrite ler_pmuln2l. Qed.
@@ -2206,10 +2147,10 @@ Lemma ltrn1 n : n%:R < 1 :> R = (n < 1)%N. Proof. by rewrite -ltr_nat. Qed.
 
 Lemma ltrN10 : -1 < 0 :> R. Proof. by rewrite oppr_lt0. Qed.
 Lemma lerN10 : -1 <= 0 :> R. Proof. by rewrite oppr_le0. Qed.
-Lemma ltr10 : 1 < 0 :> R = false. Proof. by rewrite ler_gtF. Qed.
-Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite ltr_geF. Qed.
-Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite ler_gtF // lerN10. Qed.
-Lemma ler0N1 : 0 <= -1 :> R = false. Proof. by rewrite ltr_geF // ltrN10. Qed.
+Lemma ltr10 : 1 < 0 :> R = false. Proof. by rewrite le_gtF. Qed.
+Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite lt_geF. Qed.
+Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
+Lemma ler0N1 : 0 <= -1 :> R = false. Proof. by rewrite lt_geF // ltrN10. Qed.
 
 Lemma pmulrn_rgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
 Proof. by move=> x_gt0; rewrite -(mulr0n x) ltr_pmuln2l. Qed.
@@ -2324,9 +2265,9 @@ Lemma ltr_prod I r (P : pred I) (E1 E2 : I -> R) :
 Proof.
 elim: r => //= i r IHr; rewrite !big_cons; case: ifP => {IHr}// Pi _ ltE12.
 have /andP[le0E1i ltE12i] := ltE12 i Pi; set E2r := \prod_(j <- r | P j) E2 j.
-apply: ler_lt_trans (_ : E1 i * E2r < E2 i * E2r).
-  by rewrite ler_wpmul2l ?ler_prod // => j /ltE12/andP[-> /ltrW].
-by rewrite ltr_pmul2r ?prodr_gt0 // => j /ltE12/andP[le0E1j /ler_lt_trans->].
+apply: le_lt_trans (_ : E1 i * E2r < E2 i * E2r).
+  by rewrite ler_wpmul2l ?ler_prod // => j /ltE12/andP[-> /ltW].
+by rewrite ltr_pmul2r ?prodr_gt0 // => j /ltE12/andP[le0E1j /le_lt_trans->].
 Qed.
 
 Lemma ltr_prod_nat (E1 E2 : nat -> R) (n m : nat) :
@@ -2341,7 +2282,7 @@ Qed.
 
 Lemma realMr x y : x != 0 -> x \is real -> (x * y \is real) = (y \is real).
 Proof.
-move=> x_neq0 xR; case: real_ltrgtP x_neq0 => // hx _; rewrite !realE.
+move=> x_neq0 xR; case: real_ltgtP x_neq0 => // hx _; rewrite !realE.
   by rewrite nmulr_rge0 // nmulr_rle0 // orbC.
 by rewrite pmulr_rge0 // pmulr_rle0 // orbC.
 Qed.
@@ -2433,21 +2374,21 @@ Lemma ler_nimulr x y : y <= 0 -> x <= 1 -> y <= y * x.
 Proof. by move=> hx hy; rewrite -{1}[y]mulr1 ler_wnmul2l. Qed.
 
 Lemma mulr_ile1 x y : 0 <= x -> 0 <= y -> x <= 1 -> y <= 1 -> x * y <= 1.
-Proof. by move=> *; rewrite (@ler_trans _ y) ?ler_pimull. Qed.
+Proof. by move=> *; rewrite (@le_trans _ _ y) ?ler_pimull. Qed.
 
 Lemma mulr_ilt1 x y : 0 <= x -> 0 <= y -> x < 1 -> y < 1 -> x * y < 1.
-Proof. by move=> *; rewrite (@ler_lt_trans _ y) ?ler_pimull // ltrW. Qed.
+Proof. by move=> *; rewrite (@le_lt_trans _ _ y) ?ler_pimull // ltW. Qed.
 
 Definition mulr_ilte1 := (mulr_ile1, mulr_ilt1).
 
 Lemma mulr_ege1 x y : 1 <= x -> 1 <= y -> 1 <= x * y.
 Proof.
-by move=> le1x le1y; rewrite (@ler_trans _ y) ?ler_pemull // (ler_trans ler01).
+by move=> le1x le1y; rewrite (@le_trans _ _ y) ?ler_pemull // (le_trans ler01).
 Qed.
 
 Lemma mulr_egt1 x y : 1 < x -> 1 < y -> 1 < x * y.
 Proof.
-by move=> le1x lt1y; rewrite (@ltr_trans _ y) // ltr_pmull // (ltr_trans ltr01).
+by move=> le1x lt1y; rewrite (@lt_trans _ _ y) // ltr_pmull // (lt_trans ltr01).
 Qed.
 Definition mulr_egte1 := (mulr_ege1, mulr_egt1).
 Definition mulr_cp1 := (mulr_ilte1, mulr_egte1).
@@ -2504,7 +2445,7 @@ Qed.
 Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> x ^+ n < 1 = (n != 0%N).
 Proof.
 move=> xge0 xlt1.
-case: n; [by rewrite eqxx ltrr | elim=> [|n ihn]; first by rewrite expr1].
+case: n; [by rewrite eqxx ltxx | elim=> [|n ihn]; first by rewrite expr1].
 by rewrite exprS mulr_ilt1 // exprn_ge0.
 Qed.
 
@@ -2517,7 +2458,7 @@ Qed.
 
 Lemma exprn_egt1 n x : 1 < x -> 1 < x ^+ n = (n != 0%N).
 Proof.
-move=> xgt1; case: n; first by rewrite eqxx ltrr.
+move=> xgt1; case: n; first by rewrite eqxx ltxx.
 elim=> [|n ihn]; first by rewrite expr1.
 by rewrite exprS mulr_egt1 // exprn_ge0.
 Qed.
@@ -2530,8 +2471,8 @@ Proof. by case: n => n // *; rewrite exprS ler_pimulr // exprn_ile1. Qed.
 
 Lemma ltr_iexpr x n : 0 < x -> x < 1 -> (x ^+ n < x) = (1 < n)%N.
 Proof.
-case: n=> [|[|n]] //; first by rewrite expr0 => _ /ltr_gtF ->.
-by move=> x0 x1; rewrite exprS gtr_pmulr // ?exprn_ilt1 // ltrW.
+case: n=> [|[|n]] //; first by rewrite expr0 => _ /lt_gtF ->.
+by move=> x0 x1; rewrite exprS gtr_pmulr // ?exprn_ilt1 // ltW.
 Qed.
 
 Definition lter_iexpr := (ler_iexpr, ltr_iexpr).
@@ -2539,13 +2480,13 @@ Definition lter_iexpr := (ler_iexpr, ltr_iexpr).
 Lemma ler_eexpr x n : (0 < n)%N -> 1 <= x -> x <= x ^+ n.
 Proof.
 case: n => // n _ x_ge1.
-by rewrite exprS ler_pemulr ?(ler_trans _ x_ge1) // exprn_ege1.
+by rewrite exprS ler_pemulr ?(le_trans _ x_ge1) // exprn_ege1.
 Qed.
 
 Lemma ltr_eexpr x n : 1 < x -> (x < x ^+ n) = (1 < n)%N.
 Proof.
-move=> x_ge1; case: n=> [|[|n]] //; first by rewrite expr0 ltr_gtF.
-by rewrite exprS ltr_pmulr ?(ltr_trans _ x_ge1) ?exprn_egt1.
+move=> x_ge1; case: n=> [|[|n]] //; first by rewrite expr0 lt_gtF.
+by rewrite exprS ltr_pmulr ?(lt_trans _ x_ge1) ?exprn_egt1.
 Qed.
 
 Definition lter_eexpr := (ler_eexpr, ltr_eexpr).
@@ -2562,15 +2503,15 @@ Lemma ler_weexpn2l x :
   1 <= x -> {homo (GRing.exp x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
 move=> xge1 m n /= hmn; rewrite -(subnK hmn) exprD.
-by rewrite ler_pemull ?(exprn_ge0, exprn_ege1) // (ler_trans _ xge1) ?ler01.
+by rewrite ler_pemull ?(exprn_ge0, exprn_ege1) // (le_trans _ xge1) ?ler01.
 Qed.
 
 Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0%N) || (x == 1)).
 Proof.
 move=> xle0; case: n => [|n]; first by rewrite expr0 eqxx.
-case: (@real_ltrgtP x 1); do ?by rewrite ?ger0_real.
-+ by move=> x_lt1; rewrite ?ltr_eqF // exprn_ilt1.
-+ by move=> x_lt1; rewrite ?gtr_eqF // exprn_egt1.
+case: (@real_ltgtP x 1); do ?by rewrite ?ger0_real.
++ by move=> x_lt1; rewrite 1?lt_eqF // exprn_ilt1.
++ by move=> x_lt1; rewrite 1?gt_eqF // exprn_egt1.
 by move->; rewrite expr1n eqxx.
 Qed.
 
@@ -2579,50 +2520,50 @@ Proof.
 move=> x_gt0 x_neq1 m n; without loss /subnK <-: m n / (n <= m)%N.
   by move=> IH eq_xmn; case/orP: (leq_total m n) => /IH->.
 case: {m}(m - n)%N => // m /eqP/idPn[]; rewrite -[x ^+ n]mul1r exprD.
-by rewrite (inj_eq (mulIf _)) ?ieexprn_weq1 ?ltrW // expf_neq0 ?gtr_eqF.
+by rewrite (inj_eq (mulIf _)) ?ieexprn_weq1 ?ltW // expf_neq0 ?gt_eqF.
 Qed.
 
 Lemma ler_iexpn2l x :
   0 < x -> x < 1 -> {mono (GRing.exp x) : m n / (n <= m)%N >-> m <= n}.
 Proof.
-move=> xgt0 xlt1; apply: (lenr_nmono (inj_nhomo_ltnr _ _)); last first.
-  by apply: ler_wiexpn2l; rewrite ltrW.
-by apply: ieexprIn; rewrite ?ltr_eqF ?ltr_cpable.
+move=> xgt0 xlt1; apply: (le_nmono (inj_nhomo_lt _ _)); last first.
+  by apply: ler_wiexpn2l; rewrite ltW.
+by apply: ieexprIn; rewrite ?lt_eqF ?ltr_cpable.
 Qed.
 
 Lemma ltr_iexpn2l x :
   0 < x -> x < 1 -> {mono (GRing.exp x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> xgt0 xlt1; apply: (lenrW_nmono (ler_iexpn2l _ _)). Qed.
+Proof. by move=> xgt0 xlt1; apply: (leW_nmono (ler_iexpn2l _ _)). Qed.
 
 Definition lter_iexpn2l := (ler_iexpn2l, ltr_iexpn2l).
 
 Lemma ler_eexpn2l x :
   1 < x -> {mono (GRing.exp x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
-move=> xgt1; apply: (lenr_mono (inj_homo_ltnr _ _)); last first.
-  by apply: ler_weexpn2l; rewrite ltrW.
-by apply: ieexprIn; rewrite ?gtr_eqF ?gtr_cpable //; apply: ltr_trans xgt1.
+move=> xgt1; apply: (le_mono (inj_homo_lt _ _)); last first.
+  by apply: ler_weexpn2l; rewrite ltW.
+by apply: ieexprIn; rewrite ?gt_eqF ?gtr_cpable //; apply: lt_trans xgt1.
 Qed.
 
 Lemma ltr_eexpn2l x :
   1 < x -> {mono (GRing.exp x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> xgt1; apply: (lenrW_mono (ler_eexpn2l _)). Qed.
+Proof. by move=> xgt1; apply: (leW_mono (ler_eexpn2l _)). Qed.
 
 Definition lter_eexpn2l := (ler_eexpn2l, ltr_eexpn2l).
 
 Lemma ltr_expn2r n x y : 0 <= x -> x < y ->  x ^+ n < y ^+ n = (n != 0%N).
 Proof.
-move=> xge0 xlty; case: n; first by rewrite ltrr.
+move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
-rewrite (@ler_lt_trans _ (x * y ^+ n.+1)) ?ler_wpmul2l ?ltr_pmul2r ?IHn //.
-  by rewrite ltrW // ihn.
-by rewrite exprn_gt0 // (ler_lt_trans xge0).
+rewrite (@le_lt_trans _ _ (x * y ^+ n.+1)) ?ler_wpmul2l ?ltr_pmul2r ?IHn //.
+  by rewrite ltW // ihn.
+by rewrite exprn_gt0 // (le_lt_trans xge0).
 Qed.
 
 Lemma ler_expn2r n : {in nneg & , {homo ((@GRing.exp R)^~ n) : x y / x <= y}}.
 Proof.
 move=> x y /= x0 y0 xy; elim: n => [|n IHn]; rewrite !(expr0, exprS) //.
-by rewrite (@ler_trans _ (x * y ^+ n)) ?ler_wpmul2l ?ler_wpmul2r ?exprn_ge0.
+by rewrite (@le_trans _ _ (x * y ^+ n)) ?ler_wpmul2l ?ler_wpmul2r ?exprn_ge0.
 Qed.
 
 Definition lter_expn2r := (ler_expn2r, ltr_expn2r).
@@ -2644,13 +2585,13 @@ Qed.
 Lemma ltr_pexpn2r n :
   (0 < n)%N -> {in nneg & , {mono ((@GRing.exp R)^~ n) : x y / x < y}}.
 Proof.
-by move=> n_gt0 x y x_ge0 y_ge0; rewrite !ltr_neqAle !eqr_le !ler_pexpn2r.
+by move=> n_gt0 x y x_ge0 y_ge0; rewrite !lt_neqAle !eq_le !ler_pexpn2r.
 Qed.
 
 Definition lter_pexpn2r := (ler_pexpn2r, ltr_pexpn2r).
 
 Lemma pexpIrn n : (0 < n)%N -> {in nneg &, injective ((@GRing.exp R)^~ n)}.
-Proof. by move=> n_gt0; apply: incr_inj_in (ler_pexpn2r _). Qed.
+Proof. by move=> n_gt0; apply: inc_inj_in (ler_pexpn2r _). Qed.
 
 (* expr and ler/ltr *)
 Lemma expr_le1 n x : (0 < n)%N -> 0 <= x -> (x ^+ n <= 1) = (x <= 1).
@@ -2678,7 +2619,7 @@ Qed.
 Definition expr_gte1 := (expr_ge1, expr_gt1).
 
 Lemma pexpr_eq1 x n : (0 < n)%N -> 0 <= x -> (x ^+ n == 1) = (x == 1).
-Proof. by move=> ngt0 xge0; rewrite !eqr_le expr_le1 // expr_ge1. Qed.
+Proof. by move=> ngt0 xge0; rewrite !eq_le expr_le1 // expr_ge1. Qed.
 
 Lemma pexprn_eq1 x n : 0 <= x -> (x ^+ n == 1) = (n == 0%N) || (x == 1).
 Proof. by case: n => [|n] xge0; rewrite ?eqxx // pexpr_eq1 ?gtn_eqF. Qed.
@@ -2717,11 +2658,11 @@ Qed.
 
 Lemma ltr_pinv :
   {in [pred x in GRing.unit | 0 < x] &, {mono (@GRing.inv R) : x y /~ x < y}}.
-Proof. exact: lerW_nmono_in ler_pinv. Qed.
+Proof. exact: leW_nmono_in ler_pinv. Qed.
 
 Lemma ltr_ninv :
   {in [pred x in GRing.unit | x < 0] &, {mono (@GRing.inv R) : x y /~ x < y}}.
-Proof. exact: lerW_nmono_in ler_ninv. Qed.
+Proof. exact: leW_nmono_in ler_ninv. Qed.
 
 Lemma invr_gt1 x : x \is a GRing.unit -> 0 < x -> (1 < x^-1) = (x < 1).
 Proof.
@@ -2749,44 +2690,61 @@ Definition invr_cp1 := (invr_gte1, invr_lte1).
 
 Lemma real_ler_norm x : x \is real -> x <= `|x|.
 Proof.
-by case/real_ger0P=> hx //; rewrite (ler_trans (ltrW hx)) // oppr_ge0 ltrW.
+by case/real_ge0P=> hx //; rewrite (le_trans (ltW hx)) // oppr_ge0 ltW.
 Qed.
 
 (* norm + add *)
 
-Lemma normr_real x : `|x| \is real. Proof. by rewrite ger0_real. Qed.
+Section NormedDomainTheory.
+
+Variable V : normedDomainType R.
+Implicit Types (u v w : V).
+
+Lemma normr_real v : `|v| \is real. Proof. by apply/ger0_real. Qed.
 Hint Resolve normr_real : core.
 
-Lemma ler_norm_sum I r (G : I -> R) (P : pred I):
+Lemma ler_norm_sum I r (G : I -> V) (P : pred I):
   `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i|.
 Proof.
 elim/big_rec2: _ => [|i y x _]; first by rewrite normr0.
-by rewrite -(ler_add2l `|G i|); apply: ler_trans; apply: ler_norm_add.
+by rewrite -(ler_add2l `|G i|); apply: le_trans; apply: ler_norm_add.
 Qed.
 
-Lemma ler_norm_sub x y : `|x - y| <= `|x| + `|y|.
-Proof. by rewrite (ler_trans (ler_norm_add _ _)) ?normrN. Qed.
+Lemma ler_norm_sub v w : `|v - w| <= `|v| + `|w|.
+Proof. by rewrite (le_trans (ler_norm_add _ _)) ?normrN. Qed.
 
-Lemma ler_dist_add z x y : `|x - y| <= `|x - z| + `|z - y|.
-Proof. by rewrite (ler_trans _ (ler_norm_add _ _)) // addrA addrNK. Qed.
+Lemma ler_dist_add u v w : `|v - w| <= `|v - u| + `|u - w|.
+Proof. by rewrite (le_trans _ (ler_norm_add _ _)) // addrA addrNK. Qed.
 
-Lemma ler_sub_norm_add x y : `|x| - `|y| <= `|x + y|.
+Lemma ler_sub_norm_add v w : `|v| - `|w| <= `|v + w|.
 Proof.
-rewrite -{1}[x](addrK y) lter_sub_addl.
-by rewrite (ler_trans (ler_norm_add _ _)) // addrC normrN.
+rewrite -{1}[v](addrK w) lter_sub_addl.
+by rewrite (le_trans (ler_norm_add _ _)) // addrC normrN.
 Qed.
 
-Lemma ler_sub_dist x y : `|x| - `|y| <= `|x - y|.
-Proof. by rewrite -[`|y|]normrN ler_sub_norm_add. Qed.
+Lemma ler_sub_dist v w : `|v| - `|w| <= `|v - w|.
+Proof. by rewrite -[`|w|]normrN ler_sub_norm_add. Qed.
 
-Lemma ler_dist_dist x y : `|`|x| - `|y| | <= `|x - y|.
+Lemma ler_dist_dist v w : `| `|v| - `|w| | <= `|v - w|.
 Proof.
-have [||_|_] // := @real_lerP `|x| `|y|; last by rewrite ler_sub_dist.
+have [||_|_] // := @real_leP `|v| `|w|; last by rewrite ler_sub_dist.
 by rewrite distrC ler_sub_dist.
 Qed.
 
-Lemma ler_dist_norm_add x y : `| `|x| - `|y| | <= `| x + y |.
-Proof. by rewrite -[y]opprK normrN ler_dist_dist. Qed.
+Lemma ler_dist_norm_add v w : `| `|v| - `|w| | <= `|v + w|.
+Proof. by rewrite -[w]opprK normrN ler_dist_dist. Qed.
+
+Lemma ler_nnorml v x : x < 0 -> `|v| <= x = false.
+Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h). Qed.
+
+Lemma ltr_nnorml v x : x <= 0 -> `|v| < x = false.
+Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h). Qed.
+
+Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
+
+End NormedDomainTheory.
+
+Hint Extern 0 (is_true (norm _ \is real)) => exact: normr_real : core.
 
 Lemma real_ler_norml x y : x \is real -> (`|x| <= y) = (- y <= x <= y).
 Proof.
@@ -2794,7 +2752,7 @@ move=> xR; wlog x_ge0 : x xR / 0 <= x => [hwlog|].
   move: (xR) => /(@real_leVge 0) /orP [|/hwlog->|hx] //.
   by rewrite -[x]opprK normrN ler_opp2 andbC ler_oppl hwlog ?realN ?oppr_ge0.
 rewrite ger0_norm //; have [le_xy|] := boolP (x <= y); last by rewrite andbF.
-by rewrite (ler_trans _ x_ge0) // oppr_le0 (ler_trans x_ge0).
+by rewrite (le_trans _ x_ge0) // oppr_le0 (le_trans x_ge0).
 Qed.
 
 Lemma real_ler_normlP x y :
@@ -2809,16 +2767,16 @@ Lemma real_eqr_norml x y :
 Proof.
 move=> Rx.
 apply/idP/idP=> [|/andP[/pred2P[]-> /ger0_norm/eqP]]; rewrite ?normrE //.
-case: real_ler0P => // hx; rewrite 1?eqr_oppLR => /eqP exy.
+case: real_le0P => // hx; rewrite 1?eqr_oppLR => /eqP exy.
   by move: hx; rewrite exy ?oppr_le0 eqxx orbT //.
-by move: hx=> /ltrW; rewrite exy eqxx.
+by move: hx=> /ltW; rewrite exy eqxx.
 Qed.
 
 Lemma real_eqr_norm2 x y :
   x \is real -> y \is real -> (`|x| == `|y|) = (x == y) || (x == -y).
 Proof.
 move=> Rx Ry; rewrite real_eqr_norml // normrE andbT.
-by case: real_ler0P; rewrite // opprK orbC.
+by case: real_le0P; rewrite // opprK orbC.
 Qed.
 
 Lemma real_ltr_norml x y : x \is real -> (`|x| < y) = (- y < x < y).
@@ -2827,7 +2785,7 @@ move=> Rx; wlog x_ge0 : x Rx / 0 <= x => [hwlog|].
   move: (Rx) => /(@real_leVge 0) /orP [|/hwlog->|hx] //.
   by rewrite -[x]opprK normrN ltr_opp2 andbC ltr_oppl hwlog ?realN ?oppr_ge0.
 rewrite ger0_norm //; have [le_xy|] := boolP (x < y); last by rewrite andbF.
-by rewrite (ltr_le_trans _ x_ge0) // oppr_lt0 (ler_lt_trans x_ge0).
+by rewrite (lt_le_trans _ x_ge0) // oppr_lt0 (le_lt_trans x_ge0).
 Qed.
 
 Definition real_lter_norml := (real_ler_norml, real_ltr_norml).
@@ -2844,7 +2802,7 @@ Lemma real_ler_normr x y : y \is real -> (x <= `|y|) = (x <= y) || (x <= - y).
 Proof.
 move=> Ry.
 have [xR|xNR] := boolP (x \is real); last by rewrite ?Nreal_leF ?realN.
-rewrite real_lerNgt ?real_ltr_norml // negb_and -?real_lerNgt ?realN //.
+rewrite real_leNgt ?real_ltr_norml // negb_and -?real_leNgt ?realN //.
 by rewrite orbC ler_oppr.
 Qed.
 
@@ -2852,19 +2810,11 @@ Lemma real_ltr_normr x y : y \is real -> (x < `|y|) = (x < y) || (x < - y).
 Proof.
 move=> Ry.
 have [xR|xNR] := boolP (x \is real); last by rewrite ?Nreal_ltF ?realN.
-rewrite real_ltrNge ?real_ler_norml // negb_and -?real_ltrNge ?realN //.
+rewrite real_ltNge ?real_ler_norml // negb_and -?real_ltNge ?realN //.
 by rewrite orbC ltr_oppr.
 Qed.
 
 Definition real_lter_normr :=  (real_ler_normr, real_ltr_normr).
-
-Lemma ler_nnorml x y : y < 0 -> `|x| <= y = false.
-Proof. by move=> y_lt0; rewrite ltr_geF // (ltr_le_trans y_lt0). Qed.
-
-Lemma ltr_nnorml x y : y <= 0 -> `|x| < y = false.
-Proof. by move=> y_le0; rewrite ler_gtF // (ler_trans y_le0). Qed.
-
-Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
 
 Lemma real_ler_distl x y e :
   x - y \is real -> (`|x - y| <= e) = (y - e <= x <= y + e).
@@ -2883,9 +2833,9 @@ Definition eqr_norm_idVN := =^~ (ger0_def, ler0_def).
 
 Lemma real_exprn_even_ge0 n x : x \is real -> ~~ odd n -> 0 <= x ^+ n.
 Proof.
-move=> xR even_n; have [/exprn_ge0 -> //|x_lt0] := real_ger0P xR.
+move=> xR even_n; have [/exprn_ge0 -> //|x_lt0] := real_ge0P xR.
 rewrite -[x]opprK -mulN1r exprMn -signr_odd (negPf even_n) expr0 mul1r.
-by rewrite exprn_ge0 ?oppr_ge0 ?ltrW.
+by rewrite exprn_ge0 ?oppr_ge0 ?ltW.
 Qed.
 
 Lemma real_exprn_even_gt0 n x :
@@ -2898,21 +2848,21 @@ Qed.
 Lemma real_exprn_even_le0 n x :
   x \is real -> ~~ odd n -> (x ^+ n <= 0) = (n != 0%N) && (x == 0).
 Proof.
-move=> xR n_even; rewrite !real_lerNgt ?rpred0 ?rpredX //.
+move=> xR n_even; rewrite !real_leNgt ?rpred0 ?rpredX //.
 by rewrite real_exprn_even_gt0 // negb_or negbK.
 Qed.
 
 Lemma real_exprn_even_lt0 n x :
   x \is real -> ~~ odd n -> (x ^+ n < 0) = false.
-Proof. by move=> xR n_even; rewrite ler_gtF // real_exprn_even_ge0. Qed.
+Proof. by move=> xR n_even; rewrite le_gtF // real_exprn_even_ge0. Qed.
 
 Lemma real_exprn_odd_ge0 n x :
   x \is real -> odd n -> (0 <= x ^+ n) = (0 <= x).
 Proof.
-case/real_ger0P => [x_ge0|x_lt0] n_odd; first by rewrite exprn_ge0.
-apply: negbTE; rewrite ltr_geF //.
+case/real_ge0P => [x_ge0|x_lt0] n_odd; first by rewrite exprn_ge0.
+apply: negbTE; rewrite lt_geF //.
 case: n n_odd => // n /= n_even; rewrite exprS pmulr_llt0 //.
-by rewrite real_exprn_even_gt0 ?ler0_real ?ltrW // ltr_eqF ?orbT.
+by rewrite real_exprn_even_gt0 ?ler0_real ?ltW // (lt_eqF x_lt0) ?orbT.
 Qed.
 
 Lemma real_exprn_odd_gt0 n x : x \is real -> odd n -> (0 < x ^+ n) = (0 < x).
@@ -2922,12 +2872,12 @@ Qed.
 
 Lemma real_exprn_odd_le0 n x : x \is real -> odd n -> (x ^+ n <= 0) = (x <= 0).
 Proof.
-by move=> xR n_odd; rewrite !real_lerNgt ?rpred0 ?rpredX // real_exprn_odd_gt0.
+by move=> xR n_odd; rewrite !real_leNgt ?rpred0 ?rpredX // real_exprn_odd_gt0.
 Qed.
 
 Lemma real_exprn_odd_lt0 n x : x \is real -> odd n -> (x ^+ n < 0) = (x < 0).
 Proof.
-by move=> xR n_odd; rewrite !real_ltrNge ?rpred0 ?rpredX // real_exprn_odd_ge0.
+by move=> xR n_odd; rewrite !real_ltNge ?rpred0 ?rpredX // real_exprn_odd_ge0.
 Qed.
 
 (* GG: Could this be a better definition of "real" ? *)
@@ -2939,7 +2889,7 @@ Proof. by move=> Rx; rewrite -normrX ger0_norm -?realEsqr. Qed.
 
 (* Binary sign ((-1) ^+ s). *)
 
-Lemma normr_sign s : `|(-1) ^+ s| = 1 :> R.
+Lemma normr_sign s : `|(-1) ^+ s : R| = 1.
 Proof. by rewrite normrX normrN1 expr1n. Qed.
 
 Lemma normrMsign s x : `|(-1) ^+ s * x| = `|x|.
@@ -2955,7 +2905,7 @@ Lemma signr_ge0 (b : bool) : (0 <= (-1) ^+ b :> R) = ~~ b.
 Proof. by rewrite le0r signr_eq0 signr_gt0. Qed.
 
 Lemma signr_le0 (b : bool) : ((-1) ^+ b <= 0 :> R) = b.
-Proof. by rewrite ler_eqVlt signr_eq0 signr_lt0. Qed.
+Proof. by rewrite le_eqVlt signr_eq0 signr_lt0. Qed.
 
 (* This actually holds for char R != 2. *)
 Lemma signr_inj : injective (fun b : bool => (-1) ^+ b : R).
@@ -2970,10 +2920,10 @@ Lemma neqr0_sign x : x != 0 -> (-1) ^+ (x < 0)%R = sgr x.
 Proof. by rewrite sgr_def  => ->. Qed.
 
 Lemma gtr0_sg x : 0 < x -> sg x = 1.
-Proof. by move=> x_gt0; rewrite /sg gtr_eqF // ltr_gtF. Qed.
+Proof. by move=> x_gt0; rewrite /sg gt_eqF // lt_gtF. Qed.
 
 Lemma ltr0_sg x : x < 0 -> sg x = -1.
-Proof. by move=> x_lt0; rewrite /sg x_lt0 ltr_eqF. Qed.
+Proof. by move=> x_lt0; rewrite /sg x_lt0 lt_eqF. Qed.
 
 Lemma sgr0 : sg 0 = 0 :> R. Proof. by rewrite /sgr eqxx. Qed.
 Lemma sgr1 : sg 1 = 1 :> R. Proof. by rewrite gtr0_sg // ltr01. Qed.
@@ -3017,16 +2967,16 @@ Proof. by rewrite !(fun_if sg) !sgrE. Qed.
 Lemma sgr_lt0 x : (sg x < 0) = (x < 0).
 Proof.
 rewrite /sg; case: eqP => [-> // | _].
-by case: ifP => _; rewrite ?ltrN10 // ltr_gtF.
+by case: ifP => _; rewrite ?ltrN10 // lt_gtF.
 Qed.
 
 Lemma sgr_le0 x : (sgr x <= 0) = (x <= 0).
-Proof. by rewrite !ler_eqVlt sgr_eq0 sgr_lt0. Qed.
+Proof. by rewrite !le_eqVlt sgr_eq0 sgr_lt0. Qed.
 
 (* sign and norm *)
 
 Lemma realEsign x : x \is real -> x = (-1) ^+ (x < 0)%R * `|x|.
-Proof. by case/real_ger0P; rewrite (mul1r, mulN1r) ?opprK. Qed.
+Proof. by case/real_ge0P; rewrite (mul1r, mulN1r) ?opprK. Qed.
 
 Lemma realNEsign x : x \is real -> - x = (-1) ^+ (0 < x)%R * `|x|.
 Proof. by move=> Rx; rewrite -normrN -oppr_lt0 -realEsign ?rpredN. Qed.
@@ -3051,121 +3001,72 @@ Lemma normr_sg x : `|sg x| = (x != 0)%:R.
 Proof. by rewrite sgr_def -mulr_natr normrMsign normr_nat. Qed.
 
 Lemma sgr_norm x : sg `|x| = (x != 0)%:R.
-Proof. by rewrite /sg ler_gtF ?normr_ge0 // normr_eq0 mulrb if_neg. Qed.
+Proof. by rewrite /sg le_gtF // normr_eq0 mulrb if_neg. Qed.
 
-(* lerif *)
+(* leif *)
 
-Lemma lerif_refl x C : reflect (x <= x ?= iff C) C.
-Proof. by apply: (iffP idP) => [-> | <-] //; split; rewrite ?eqxx. Qed.
+Lemma leif_nat_r m n C : (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N.
+Proof. by rewrite /leif !ler_nat eqr_nat. Qed.
 
-Lemma lerif_trans x1 x2 x3 C12 C23 :
-  x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23.
-Proof.
-move=> ltx12 ltx23; apply/lerifP; rewrite -ltx12.
-case eqx12: (x1 == x2).
-  by rewrite (eqP eqx12) ltr_neqAle !ltx23 andbT; case C23.
-by rewrite (@ltr_le_trans _ x2) ?ltx23 // ltr_neqAle eqx12 ltx12.
-Qed.
+Lemma leif_subLR x y z C : (x - y <= z ?= iff C) = (x <= z + y ?= iff C).
+Proof. by rewrite /leif !eq_le ler_subr_addr ler_subl_addr. Qed.
 
-Lemma lerif_le x y : x <= y -> x <= y ?= iff (x >= y).
-Proof. by move=> lexy; split=> //; rewrite eqr_le lexy. Qed.
+Lemma leif_subRL x y z C : (x <= y - z ?= iff C) = (x + z <= y ?= iff C).
+Proof. by rewrite -leif_subLR opprK. Qed.
 
-Lemma lerif_eq x y : x <= y -> x <= y ?= iff (x == y).
-Proof. by []. Qed.
-
-Lemma ger_lerif x y C : x <= y ?= iff C -> (y <= x) = C.
-Proof. by case=> le_xy; rewrite eqr_le le_xy. Qed.
-
-Lemma ltr_lerif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
-Proof. by move=> le_xy; rewrite ltr_neqAle !le_xy andbT. Qed.
-
-Lemma lerif_nat m n C : (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N.
-Proof. by rewrite /lerif !ler_nat eqr_nat. Qed.
-
-Lemma mono_in_lerif (A : {pred R}) (f : R -> R) C :
-   {in A &, {mono f : x y / x <= y}} ->
-  {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
-Proof.
-by move=> mf x y Ax Ay; rewrite /lerif mf ?(inj_in_eq (incr_inj_in mf)).
-Qed.
-
-Lemma mono_lerif (f : R -> R) C :
-    {mono f : x y / x <= y} ->
-  forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
-Proof. by move=> mf x y; rewrite /lerif mf (inj_eq (incr_inj _)). Qed.
-
-Lemma nmono_in_lerif (A : {pred R}) (f : R -> R) C :
-    {in A &, {mono f : x y /~ x <= y}} ->
-  {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
-Proof.
-move=> mf x y Ax Ay; rewrite /lerif eq_sym mf //.
-by rewrite ?(inj_in_eq (decr_inj_in mf)).
-Qed.
-
-Lemma nmono_lerif (f : R -> R) C :
-    {mono f : x y /~ x <= y} ->
-  forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
-Proof. by move=> mf x y; rewrite /lerif eq_sym mf ?(inj_eq (decr_inj mf)). Qed.
-
-Lemma lerif_subLR x y z C : (x - y <= z ?= iff C) = (x <= z + y ?= iff C).
-Proof. by rewrite /lerif !eqr_le ler_subr_addr ler_subl_addr. Qed.
-
-Lemma lerif_subRL x y z C : (x <= y - z ?= iff C) = (x + z <= y ?= iff C).
-Proof. by rewrite -lerif_subLR opprK. Qed.
-
-Lemma lerif_add x1 y1 C1 x2 y2 C2 :
+Lemma leif_add x1 y1 C1 x2 y2 C2 :
     x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 + x2 <= y1 + y2 ?= iff C1 && C2.
 Proof.
-rewrite -(mono_lerif _ (ler_add2r x2)) -(mono_lerif C2 (ler_add2l y1)).
-exact: lerif_trans.
+rewrite -(mono_leif (ler_add2r x2)) -(mono_leif (C := C2) (ler_add2l y1)).
+exact: leif_trans.
 Qed.
 
-Lemma lerif_sum (I : finType) (P C : pred I) (E1 E2 : I -> R) :
+Lemma leif_sum (I : finType) (P C : pred I) (E1 E2 : I -> R) :
     (forall i, P i -> E1 i <= E2 i ?= iff C i) ->
   \sum_(i | P i) E1 i <= \sum_(i | P i) E2 i ?= iff [forall (i | P i), C i].
 Proof.
 move=> leE12; rewrite -big_andE.
-elim/big_rec3: _ => [|i Ci m2 m1 /leE12]; first by rewrite /lerif lerr eqxx.
-exact: lerif_add.
+elim/big_rec3: _ => [|i Ci m2 m1 /leE12]; first by rewrite /leif lexx eqxx.
+exact: leif_add.
 Qed.
 
-Lemma lerif_0_sum (I : finType) (P C : pred I) (E : I -> R) :
+Lemma leif_0_sum (I : finType) (P C : pred I) (E : I -> R) :
     (forall i, P i -> 0 <= E i ?= iff C i) ->
   0 <= \sum_(i | P i) E i ?= iff [forall (i | P i), C i].
-Proof. by move/lerif_sum; rewrite big1_eq. Qed.
+Proof. by move/leif_sum; rewrite big1_eq. Qed.
 
-Lemma real_lerif_norm x : x \is real -> x <= `|x| ?= iff (0 <= x).
+Lemma real_leif_norm x : x \is real -> x <= `|x| ?= iff (0 <= x).
 Proof.
-by move=> xR; rewrite ger0_def eq_sym; apply: lerif_eq; rewrite real_ler_norm.
+by move=> xR; rewrite ger0_def eq_sym; apply: leif_eq; rewrite real_ler_norm.
 Qed.
 
-Lemma lerif_pmul x1 x2 y1 y2 C1 C2 :
+Lemma leif_pmul x1 x2 y1 y2 C1 C2 :
     0 <= x1 -> 0 <= x2 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 * x2 <= y1 * y2 ?= iff (y1 * y2 == 0) || C1 && C2.
 Proof.
 move=> x1_ge0 x2_ge0 le_xy1 le_xy2; have [y_0 | ] := altP (_ =P 0).
-  apply/lerifP; rewrite y_0 /= mulf_eq0 !eqr_le x1_ge0 x2_ge0 !andbT.
+  apply/leifP; rewrite y_0 /= mulf_eq0 !eq_le x1_ge0 x2_ge0 !andbT.
   move/eqP: y_0; rewrite mulf_eq0.
   by case/pred2P=> <-; rewrite (le_xy1, le_xy2) ?orbT.
 rewrite /= mulf_eq0 => /norP[y1nz y2nz].
-have y1_gt0: 0 < y1 by rewrite ltr_def y1nz (ler_trans _ le_xy1).
+have y1_gt0: 0 < y1 by rewrite lt_def y1nz (le_trans _ le_xy1).
 have [x2_0 | x2nz] := eqVneq x2 0.
-  apply/lerifP; rewrite -le_xy2 x2_0 eq_sym (negPf y2nz) andbF mulr0.
-  by rewrite mulr_gt0 // ltr_def y2nz -x2_0 le_xy2.
-have:= le_xy2; rewrite -(mono_lerif _ (ler_pmul2l y1_gt0)).
-by apply: lerif_trans; rewrite (mono_lerif _ (ler_pmul2r _)) // ltr_def x2nz.
+  apply/leifP; rewrite -le_xy2 x2_0 eq_sym (negPf y2nz) andbF mulr0.
+  by rewrite mulr_gt0 // lt_def y2nz -x2_0 le_xy2.
+have:= le_xy2; rewrite -(mono_leif (ler_pmul2l y1_gt0)).
+by apply: leif_trans; rewrite (mono_leif (ler_pmul2r _)) // lt_def x2nz.
 Qed.
 
-Lemma lerif_nmul x1 x2 y1 y2 C1 C2 :
+Lemma leif_nmul x1 x2 y1 y2 C1 C2 :
     y1 <= 0 -> y2 <= 0 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   y1 * y2 <= x1 * x2 ?= iff (x1 * x2 == 0) || C1 && C2.
 Proof.
 rewrite -!oppr_ge0 -mulrNN -[x1 * x2]mulrNN => y1le0 y2le0 le_xy1 le_xy2.
-by apply: lerif_pmul => //; rewrite (nmono_lerif _ ler_opp2).
+by apply: leif_pmul => //; rewrite (nmono_leif ler_opp2).
 Qed.
 
-Lemma lerif_pprod (I : finType) (P C : pred I) (E1 E2 : I -> R) :
+Lemma leif_pprod (I : finType) (P C : pred I) (E1 E2 : I -> R) :
     (forall i, P i -> 0 <= E1 i) ->
     (forall i, P i -> E1 i <= E2 i ?= iff C i) ->
   let pi E := \prod_(i | P i) E i in
@@ -3173,35 +3074,35 @@ Lemma lerif_pprod (I : finType) (P C : pred I) (E1 E2 : I -> R) :
 Proof.
 move=> E1_ge0 leE12 /=; rewrite -big_andE; elim/(big_load (fun x => 0 <= x)): _.
 elim/big_rec3: _ => [|i Ci m2 m1 Pi [m1ge0 le_m12]].
-  by split=> //; apply/lerifP; rewrite orbT.
+  by split=> //; apply/leifP; rewrite orbT.
 have Ei_ge0 := E1_ge0 i Pi; split; first by rewrite mulr_ge0.
-congr (lerif _ _ _): (lerif_pmul Ei_ge0 m1ge0 (leE12 i Pi) le_m12).
+congr (leif _ _ _): (leif_pmul Ei_ge0 m1ge0 (leE12 i Pi) le_m12).
 by rewrite mulf_eq0 -!orbA; congr (_ || _); rewrite !orb_andr orbA orbb.
 Qed.
 
 (* Mean inequalities. *)
 
-Lemma real_lerif_mean_square_scaled x y :
+Lemma real_leif_mean_square_scaled x y :
   x \is real -> y \is real -> x * y *+ 2 <= x ^+ 2 + y ^+ 2 ?= iff (x == y).
 Proof.
-move=> Rx Ry; rewrite -[_ *+ 2]add0r -lerif_subRL addrAC -sqrrB -subr_eq0.
-by rewrite -sqrf_eq0 eq_sym; apply: lerif_eq; rewrite -realEsqr rpredB.
+move=> Rx Ry; rewrite -[_ *+ 2]add0r -leif_subRL addrAC -sqrrB -subr_eq0.
+by rewrite -sqrf_eq0 eq_sym; apply: leif_eq; rewrite -realEsqr rpredB.
 Qed.
 
-Lemma real_lerif_AGM2_scaled x y :
+Lemma real_leif_AGM2_scaled x y :
   x \is real -> y \is real -> x * y *+ 4 <= (x + y) ^+ 2 ?= iff (x == y).
 Proof.
-move=> Rx Ry; rewrite sqrrD addrAC (mulrnDr _ 2) -lerif_subLR addrK.
-exact: real_lerif_mean_square_scaled.
+move=> Rx Ry; rewrite sqrrD addrAC (mulrnDr _ 2) -leif_subLR addrK.
+exact: real_leif_mean_square_scaled.
 Qed.
 
-Lemma lerif_AGM_scaled (I : finType) (A : {pred I}) (E : I -> R) (n := #|A|) :
+Lemma leif_AGM_scaled (I : finType) (A : {pred I}) (E : I -> R) (n := #|A|) :
     {in A, forall i, 0 <= E i *+ n} ->
   \prod_(i in A) (E i *+ n) <= (\sum_(i in A) E i) ^+ n
                             ?= iff [forall i in A, forall j in A, E i == E j].
 Proof.
 have [m leAm] := ubnP #|A|; elim: m => // m IHm in A leAm E n * => Ege0.
-apply/lerifP; case: ifPn => [/forall_inP-Econstant | Enonconstant].
+apply/leifP; case: ifPn => [/forall_inP-Econstant | Enonconstant].
   have [i /= Ai | A0] := pickP (mem A); last by rewrite [n]eq_card0 ?big_pred0.
   have /eqfun_inP-E_i := Econstant i Ai; rewrite -(eq_bigr _ E_i) sumr_const.
   by rewrite exprMn_n prodrMn -(eq_bigr _ E_i) prodr_const.
@@ -3211,9 +3112,9 @@ have{Enonconstant} has_cmp_mu e (s := (-1) ^+ e): {i | i \in A & cmp_mu s i}.
   apply/sig2W/exists_inP; apply: contraR Enonconstant => /exists_inPn-mu_s_A.
   have n_gt0 i: i \in A -> (0 < n)%N by rewrite [n](cardD1 i) => ->.
   have{mu_s_A} mu_s_A i: i \in A -> s * En i <= s * mu.
-    move=> Ai; rewrite real_lerNgt ?mu_s_A ?rpredMsign ?ger0_real ?Ege0 //.
+    move=> Ai; rewrite real_leNgt ?mu_s_A ?rpredMsign ?ger0_real ?Ege0 //.
     by rewrite -(pmulrn_lge0 _ (n_gt0 i Ai)) -sumrMnl sumr_ge0.
-  have [_ /esym/eqfun_inP] := lerif_sum (fun i Ai => lerif_eq (mu_s_A i Ai)).
+  have [_ /esym/eqfun_inP] := leif_sum (fun i Ai => leif_eq (mu_s_A i Ai)).
   rewrite sumr_const -/n -mulr_sumr sumrMnl -/mu mulrnAr eqxx => A_mu.
   apply/forall_inP=> i Ai; apply/eqfun_inP=> j Aj.
   by apply: (pmulrnI (n_gt0 i Ai)); apply: (can_inj (signrMK e)); rewrite !A_mu.
@@ -3221,17 +3122,17 @@ have [[i Ai Ei_lt_mu] [j Aj Ej_gt_mu]] := (has_cmp_mu 1, has_cmp_mu 0)%N.
 rewrite {cmp_mu has_cmp_mu}/= !mul1r !mulN1r ltr_opp2 in Ei_lt_mu Ej_gt_mu.
 pose A' := [predD1 A & i]; pose n' := #|A'|.
 have [Dn n_gt0]: n = n'.+1 /\ (n > 0)%N  by rewrite [n](cardD1 i) Ai.
-have i'j: j != i by apply: contraTneq Ej_gt_mu => ->; rewrite ltr_gtF.
+have i'j: j != i by apply: contraTneq Ej_gt_mu => ->; rewrite lt_gtF.
 have{i'j} A'j: j \in A' by rewrite !inE Aj i'j.
-have mu_gt0: 0 < mu := ler_lt_trans (Ege0 i Ai) Ei_lt_mu.
+have mu_gt0: 0 < mu := le_lt_trans (Ege0 i Ai) Ei_lt_mu.
 rewrite (bigD1 i) // big_andbC (bigD1 j) //= mulrA; set pi := \prod_(k | _) _.
 have [-> | nz_pi] := eqVneq pi 0; first by rewrite !mulr0 exprn_gt0.
 have{nz_pi} pi_gt0: 0 < pi.
-  by rewrite ltr_def nz_pi prodr_ge0 // => k /andP[/andP[_ /Ege0]].
+  by rewrite lt_def nz_pi prodr_ge0 // => k /andP[/andP[_ /Ege0]].
 rewrite -/(En i) -/(En j); pose E' := [eta En with j |-> En i + En j - mu].
 have E'ge0 k: k \in A' -> E' k *+ n' >= 0.
   case/andP=> /= _ Ak; apply: mulrn_wge0; case: ifP => _; last exact: Ege0.
-  by rewrite subr_ge0 ler_paddl ?Ege0 // ltrW.
+  by rewrite subr_ge0 ler_paddl ?Ege0 // ltW.
 rewrite -/n Dn in leAm; have{leAm IHm E'ge0}: _ <= _ := IHm _ leAm _ E'ge0.
 have ->: \sum_(k in A') E' k = mu *+ n'.
   apply: (addrI mu); rewrite -mulrS -Dn -sumrMnl (bigD1 i Ai) big_andbC /=.
@@ -3240,7 +3141,7 @@ have ->: \sum_(k in A') E' k = mu *+ n'.
 rewrite prodrMn exprMn_n -/n' ler_pmuln2r ?expn_gt0; last by case: (n').
 have ->: \prod_(k in A') E' k = E' j * pi.
   by rewrite (bigD1 j) //=; congr *%R; apply: eq_bigr => k /andP[_ /negPf->].
-rewrite -(ler_pmul2l mu_gt0) -exprS -Dn mulrA; apply: ltr_le_trans.
+rewrite -(ler_pmul2l mu_gt0) -exprS -Dn mulrA; apply: lt_le_trans.
 rewrite ltr_pmul2r //= eqxx -addrA mulrDr mulrC -ltr_subl_addl -mulrBl.
 by rewrite mulrC ltr_pmul2r ?subr_gt0.
 Qed.
@@ -3252,9 +3153,9 @@ Implicit Type p : {poly R}.
 Lemma poly_disk_bound p b : {ub | forall x, `|x| <= b -> `|p.[x]| <= ub}.
 Proof.
 exists (\sum_(j < size p) `|p`_j| * b ^+ j) => x le_x_b.
-rewrite horner_coef (ler_trans (ler_norm_sum _ _ _)) ?ler_sum // => j _.
-rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in ?normr_ge0 //.
-exact: ler_trans (normr_ge0 x) le_x_b.
+rewrite horner_coef (le_trans (ler_norm_sum _ _ _)) ?ler_sum // => j _.
+rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in //.
+exact: le_trans (normr_ge0 x) le_x_b.
 Qed.
 
 End NumDomainOperationTheory.
@@ -3265,13 +3166,9 @@ Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
 Arguments real_ler_normlP {R x y}.
 Arguments real_ltr_normlP {R x y}.
-Arguments lerif_refl {R x C}.
-Arguments mono_in_lerif [R A f C].
-Arguments nmono_in_lerif [R A f C].
-Arguments mono_lerif [R f C].
-Arguments nmono_lerif [R f C].
 
 Section NumDomainMonotonyTheoryForReals.
+Local Open Scope order_scope.
 
 Variables (R R' : numDomainType) (D : pred R) (f : R -> R') (f' : R -> nat).
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
@@ -3279,17 +3176,17 @@ Implicit Types (m n p : nat) (x y z : R) (u v w : R').
 Lemma real_mono :
   {homo f : x y / x < y} -> {in real &, {mono f : x y / x <= y}}.
 Proof.
-move=> mf x y xR yR /=; have [lt_xy | le_yx] := real_lerP xR yR.
-  by rewrite ltrW_homo.
-by rewrite ltr_geF ?mf.
+move=> mf x y xR yR /=; have [lt_xy | le_yx] := real_leP xR yR.
+  by rewrite ltW_homo.
+by rewrite lt_geF ?mf.
 Qed.
 
 Lemma real_nmono :
   {homo f : x y /~ x < y} -> {in real &, {mono f : x y /~ x <= y}}.
 Proof.
-move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltrP xR yR.
-  by rewrite ltr_geF ?mf.
-by rewrite ltrW_nhomo.
+move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltP xR yR.
+  by rewrite lt_geF ?mf.
+by rewrite ltW_nhomo.
 Qed.
 
 Lemma real_mono_in :
@@ -3297,8 +3194,8 @@ Lemma real_mono_in :
   {in [pred x in D | x \is real] &, {mono f : x y / x <= y}}.
 Proof.
 move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
-have [lt_xy|le_yx] := real_lerP xR yR; first by rewrite (ltrW_homo_in Dmf).
-by rewrite ltr_geF ?Dmf.
+have [lt_xy|le_yx] := real_leP xR yR; first by rewrite (ltW_homo_in Dmf).
+by rewrite lt_geF ?Dmf.
 Qed.
 
 Lemma real_nmono_in :
@@ -3306,40 +3203,40 @@ Lemma real_nmono_in :
   {in [pred x in D | x \is real] &, {mono f : x y /~ x <= y}}.
 Proof.
 move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
-have [lt_xy|le_yx] := real_ltrP xR yR; last by rewrite (ltrW_nhomo_in Dmf).
-by rewrite ltr_geF ?Dmf.
+have [lt_xy|le_yx] := real_ltP xR yR; last by rewrite (ltW_nhomo_in Dmf).
+by rewrite lt_geF ?Dmf.
 Qed.
 
-Lemma realn_mono : {homo f' : x y / x < y >-> (x < y)%N} ->
-  {in real &, {mono f' : x y / x <= y >-> (x <= y)%N}}.
+Lemma realn_mono : {homo f' : x y / x < y >-> (x < y)} ->
+  {in real &, {mono f' : x y / x <= y >-> (x <= y)}}.
 Proof.
-move=> mf x y xR yR /=; have [lt_xy | le_yx] := real_lerP xR yR.
-  by rewrite ltrnW_homo.
-by rewrite ltn_geF ?mf.
+move=> mf x y xR yR /=; have [lt_xy | le_yx] := real_leP xR yR.
+  by rewrite ltW_homo.
+by rewrite lt_geF ?mf.
 Qed.
 
-Lemma realn_nmono : {homo f' : x y / y < x >-> (x < y)%N} ->
-  {in real &, {mono f' : x y / y <= x >-> (x <= y)%N}}.
+Lemma realn_nmono : {homo f' : x y / y < x >-> (x < y)} ->
+  {in real &, {mono f' : x y / y <= x >-> (x <= y)}}.
 Proof.
-move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltrP xR yR.
-  by rewrite ltn_geF ?mf.
-by rewrite ltrnW_nhomo.
+move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltP xR yR.
+  by rewrite lt_geF ?mf.
+by rewrite ltW_nhomo.
 Qed.
 
-Lemma realn_mono_in : {in D &, {homo f' : x y / x < y >-> (x < y)%N}} ->
-  {in [pred x in D | x \is real] &, {mono f' : x y / x <= y >-> (x <= y)%N}}.
-Proof.
-move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
-have [lt_xy|le_yx] := real_lerP xR yR; first by rewrite (ltrnW_homo_in Dmf).
-by rewrite ltn_geF ?Dmf.
-Qed.
-
-Lemma realn_nmono_in : {in D &, {homo f' : x y / y < x >-> (x < y)%N}} ->
-  {in [pred x in D | x \is real] &, {mono f' : x y / y <= x >-> (x <= y)%N}}.
+Lemma realn_mono_in : {in D &, {homo f' : x y / x < y >-> (x < y)}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / x <= y >-> (x <= y)}}.
 Proof.
 move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
-have [lt_xy|le_yx] := real_ltrP xR yR; last by rewrite (ltrnW_nhomo_in Dmf).
-by rewrite ltn_geF ?Dmf.
+have [lt_xy|le_yx] := real_leP xR yR; first by rewrite (ltW_homo_in Dmf).
+by rewrite lt_geF ?Dmf.
+Qed.
+
+Lemma realn_nmono_in : {in D &, {homo f' : x y / y < x >-> (x < y)}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / y <= x >-> (x <= y)}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := real_ltP xR yR; last by rewrite (ltW_nhomo_in Dmf).
+by rewrite lt_geF ?Dmf.
 Qed.
 
 End NumDomainMonotonyTheoryForReals.
@@ -3355,13 +3252,13 @@ Lemma natrG_gt0 G : #|G|%:R > 0 :> R.
 Proof. by rewrite ltr0n cardG_gt0. Qed.
 
 Lemma natrG_neq0 G : #|G|%:R != 0 :> R.
-Proof. by rewrite gtr_eqF // natrG_gt0. Qed.
+Proof. by rewrite gt_eqF // natrG_gt0. Qed.
 
 Lemma natr_indexg_gt0 G B : #|G : B|%:R > 0 :> R.
 Proof. by rewrite ltr0n indexg_gt0. Qed.
 
 Lemma natr_indexg_neq0 G B : #|G : B|%:R != 0 :> R.
-Proof. by rewrite gtr_eqF // natr_indexg_gt0. Qed.
+Proof. by rewrite gt_eqF // natr_indexg_gt0. Qed.
 
 End FinGroup.
 
@@ -3371,10 +3268,10 @@ Variable F : numFieldType.
 Implicit Types x y z t : F.
 
 Lemma unitf_gt0 x : 0 < x -> x \is a GRing.unit.
-Proof. by move=> hx; rewrite unitfE eq_sym ltr_eqF. Qed.
+Proof. by move=> hx; rewrite unitfE eq_sym lt_eqF. Qed.
 
 Lemma unitf_lt0 x : x < 0 -> x \is a GRing.unit.
-Proof. by move=> hx; rewrite unitfE ltr_eqF. Qed.
+Proof. by move=> hx; rewrite unitfE lt_eqF. Qed.
 
 Lemma lef_pinv : {in pos &, {mono (@GRing.inv F) : x y /~ x <= y}}.
 Proof. by move=> x y hx hy /=; rewrite ler_pinv ?inE ?unitf_gt0. Qed.
@@ -3383,10 +3280,10 @@ Lemma lef_ninv : {in neg &, {mono (@GRing.inv F) : x y /~ x <= y}}.
 Proof. by move=> x y hx hy /=; rewrite ler_ninv ?inE ?unitf_lt0. Qed.
 
 Lemma ltf_pinv : {in pos &, {mono (@GRing.inv F) : x y /~ x < y}}.
-Proof. exact: lerW_nmono_in lef_pinv. Qed.
+Proof. exact: leW_nmono_in lef_pinv. Qed.
 
 Lemma ltf_ninv: {in neg &, {mono (@GRing.inv F) : x y /~ x < y}}.
-Proof. exact: lerW_nmono_in lef_ninv. Qed.
+Proof. exact: leW_nmono_in lef_ninv. Qed.
 
 Definition ltef_pinv := (lef_pinv, ltf_pinv).
 Definition ltef_ninv := (lef_ninv, ltf_ninv).
@@ -3410,18 +3307,18 @@ Definition invf_cp1 := (invf_gte1, invf_lte1).
 
 (* These lemma are all combinations of mono(LR|RL) with ler_[pn]mul2[rl]. *)
 Lemma ler_pdivl_mulr z x y : 0 < z -> (x <= y / z) = (x * z <= y).
-Proof. by move=> z_gt0; rewrite -(@ler_pmul2r _ z) ?mulfVK ?gtr_eqF. Qed.
+Proof. by move=> z_gt0; rewrite -(@ler_pmul2r _ z _ x) ?mulfVK ?gt_eqF. Qed.
 
 Lemma ltr_pdivl_mulr z x y : 0 < z -> (x < y / z) = (x * z < y).
-Proof. by move=> z_gt0; rewrite -(@ltr_pmul2r _ z) ?mulfVK ?gtr_eqF. Qed.
+Proof. by move=> z_gt0; rewrite -(@ltr_pmul2r _ z _ x) ?mulfVK ?gt_eqF. Qed.
 
 Definition lter_pdivl_mulr := (ler_pdivl_mulr, ltr_pdivl_mulr).
 
 Lemma ler_pdivr_mulr z x y : 0 < z -> (y / z <= x) = (y <= x * z).
-Proof. by move=> z_gt0; rewrite -(@ler_pmul2r _ z) ?mulfVK ?gtr_eqF. Qed.
+Proof. by move=> z_gt0; rewrite -(@ler_pmul2r _ z) ?mulfVK ?gt_eqF. Qed.
 
 Lemma ltr_pdivr_mulr z x y : 0 < z -> (y / z < x) = (y < x * z).
-Proof. by move=> z_gt0; rewrite -(@ltr_pmul2r _ z) ?mulfVK ?gtr_eqF. Qed.
+Proof. by move=> z_gt0; rewrite -(@ltr_pmul2r _ z) ?mulfVK ?gt_eqF. Qed.
 
 Definition lter_pdivr_mulr := (ler_pdivr_mulr, ltr_pdivr_mulr).
 
@@ -3442,18 +3339,18 @@ Proof. by move=> z_gt0; rewrite mulrC ltr_pdivr_mulr ?[z * _]mulrC. Qed.
 Definition lter_pdivr_mull := (ler_pdivr_mull, ltr_pdivr_mull).
 
 Lemma ler_ndivl_mulr z x y : z < 0 -> (x <= y / z) = (y <= x * z).
-Proof. by move=> z_lt0; rewrite -(@ler_nmul2r _ z) ?mulfVK  ?ltr_eqF. Qed.
+Proof. by move=> z_lt0; rewrite -(@ler_nmul2r _ z) ?mulfVK  ?lt_eqF. Qed.
 
 Lemma ltr_ndivl_mulr z x y : z < 0 -> (x < y / z) = (y < x * z).
-Proof. by move=> z_lt0; rewrite -(@ltr_nmul2r _ z) ?mulfVK ?ltr_eqF. Qed.
+Proof. by move=> z_lt0; rewrite -(@ltr_nmul2r _ z) ?mulfVK ?lt_eqF. Qed.
 
 Definition lter_ndivl_mulr := (ler_ndivl_mulr, ltr_ndivl_mulr).
 
 Lemma ler_ndivr_mulr z x y : z < 0 -> (y / z <= x) = (x * z <= y).
-Proof. by move=> z_lt0; rewrite -(@ler_nmul2r _ z) ?mulfVK ?ltr_eqF. Qed.
+Proof. by move=> z_lt0; rewrite -(@ler_nmul2r _ z) ?mulfVK ?lt_eqF. Qed.
 
 Lemma ltr_ndivr_mulr z x y : z < 0 -> (y / z < x) = (x * z < y).
-Proof. by move=> z_lt0; rewrite -(@ltr_nmul2r _ z) ?mulfVK ?ltr_eqF. Qed.
+Proof. by move=> z_lt0; rewrite -(@ltr_nmul2r _ z) ?mulfVK ?lt_eqF. Qed.
 
 Definition lter_ndivr_mulr := (ler_ndivr_mulr, ltr_ndivr_mulr).
 
@@ -3476,13 +3373,13 @@ Definition lter_ndivr_mull := (ler_ndivr_mull, ltr_ndivr_mull).
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
 
-Lemma normfV : {morph (@norm F) : x / x ^-1}.
+Lemma normfV : {morph (@norm F F) : x / x ^-1}.
 Proof.
 move=> x /=; have [/normrV //|Nux] := boolP (x \is a GRing.unit).
 by rewrite !invr_out // unitfE normr_eq0 -unitfE.
 Qed.
 
-Lemma normf_div : {morph (@norm F) : x y / x / y}.
+Lemma normf_div : {morph (@norm F F) : x y / x / y}.
 Proof. by move=> x y /=; rewrite normrM normfV. Qed.
 
 Lemma invr_sg x : (sg x)^-1 = sgr x.
@@ -3511,32 +3408,32 @@ Definition midf_lte := (midf_le, midf_lt).
 
 (* The AGM, unscaled but without the nth root. *)
 
-Lemma real_lerif_mean_square x y :
+Lemma real_leif_mean_square x y :
   x \is real -> y \is real -> x * y <= mid (x ^+ 2) (y ^+ 2) ?= iff (x == y).
 Proof.
-move=> Rx Ry; rewrite -(mono_lerif (ler_pmul2r (ltr_nat F 0 2))).
-by rewrite divfK ?pnatr_eq0 // mulr_natr; apply: real_lerif_mean_square_scaled.
+move=> Rx Ry; rewrite -(mono_leif (ler_pmul2r (ltr_nat F 0 2))).
+by rewrite divfK ?pnatr_eq0 // mulr_natr; apply: real_leif_mean_square_scaled.
 Qed.
 
-Lemma real_lerif_AGM2 x y :
+Lemma real_leif_AGM2 x y :
   x \is real -> y \is real -> x * y <= mid x y ^+ 2 ?= iff (x == y).
 Proof.
-move=> Rx Ry; rewrite -(mono_lerif (ler_pmul2r (ltr_nat F 0 4))).
+move=> Rx Ry; rewrite -(mono_leif (ler_pmul2r (ltr_nat F 0 4))).
 rewrite mulr_natr (natrX F 2 2) -exprMn divfK ?pnatr_eq0 //.
-exact: real_lerif_AGM2_scaled.
+exact: real_leif_AGM2_scaled.
 Qed.
 
-Lemma lerif_AGM (I : finType) (A : {pred I}) (E : I -> F) :
+Lemma leif_AGM (I : finType) (A : {pred I}) (E : I -> F) :
     let n := #|A| in let mu := (\sum_(i in A) E i) / n%:R in
     {in A, forall i, 0 <= E i} ->
   \prod_(i in A) E i <= mu ^+ n
                      ?= iff [forall i in A, forall j in A, E i == E j].
 Proof.
 move=> n mu Ege0; have [n0 | n_gt0] := posnP n.
-  by rewrite n0 -big_andE !(big_pred0 _ _ _ _ (card0_eq n0)); apply/lerifP.
+  by rewrite n0 -big_andE !(big_pred0 _ _ _ _ (card0_eq n0)); apply/leifP.
 pose E' i := E i / n%:R.
 have defE' i: E' i *+ n = E i by rewrite -mulr_natr divfK ?pnatr_eq0 -?lt0n.
-have /lerif_AGM_scaled (i): i \in A -> 0 <= E' i *+ n by rewrite defE' => /Ege0.
+have /leif_AGM_scaled (i): i \in A -> 0 <= E' i *+ n by rewrite defE' => /Ege0.
 rewrite -/n -mulr_suml (eq_bigr _ (in1W defE')); congr (_ <= _ ?= iff _).
 by do 2![apply: eq_forallb_in => ? _]; rewrite -(eqr_pmuln2r n_gt0) !defE'.
 Qed.
@@ -3552,17 +3449,17 @@ have [q Dp]: {q | forall x, x != 0 -> p.[x] = (a - q.[x^-1] / x) * x ^+ n}.
   rewrite -/n -lead_coefE; congr (_ + _); apply: eq_bigr=> i _.
   by rewrite exprB ?unitfE // -exprVn mulrA mulrAC exprSr mulrA.
 have [b ub_q] := poly_disk_bound q 1; exists (b / `|a| + 1) => x px0.
-have b_ge0: 0 <= b by rewrite (ler_trans (normr_ge0 q.[1])) ?ub_q ?normr1.
-have{b_ge0} ba_ge0: 0 <= b / `|a| by rewrite divr_ge0 ?normr_ge0.
-rewrite real_lerNgt ?rpredD ?rpred1 ?ger0_real ?normr_ge0 //.
+have b_ge0: 0 <= b by rewrite (le_trans (normr_ge0 q.[1])) ?ub_q ?normr1.
+have{b_ge0} ba_ge0: 0 <= b / `|a| by rewrite divr_ge0.
+rewrite real_leNgt ?rpredD ?rpred1 ?ger0_real //.
 apply: contraL px0 => lb_x; rewrite rootE.
-have x_ge1: 1 <= `|x| by rewrite (ler_trans _ (ltrW lb_x)) // ler_paddl.
-have nz_x: x != 0 by rewrite -normr_gt0 (ltr_le_trans ltr01).
+have x_ge1: 1 <= `|x| by rewrite (le_trans _ (ltW lb_x)) // ler_paddl.
+have nz_x: x != 0 by rewrite -normr_gt0 (lt_le_trans ltr01).
 rewrite {}Dp // mulf_neq0 ?expf_neq0 // subr_eq0 eq_sym.
-have: (b / `|a|) < `|x| by rewrite (ltr_trans _ lb_x) // ltr_spaddr ?ltr01.
+have: (b / `|a|) < `|x| by rewrite (lt_trans _ lb_x) // ltr_spaddr ?ltr01.
 apply: contraTneq => /(canRL (divfK nz_x))Dax.
 rewrite ltr_pdivr_mulr ?normr_gt0 ?lead_coef_eq0 // mulrC -normrM -{}Dax.
-by rewrite ler_gtF // ub_q // normfV invf_le1 ?normr_gt0.
+by rewrite le_gtF // ub_q // normfV invf_le1 ?normr_gt0.
 Qed.
 
 Import GroupScope.
@@ -3575,73 +3472,32 @@ End NumFieldTheory.
 
 Section RealDomainTheory.
 
-Hint Resolve lerr : core.
-
 Variable R : realDomainType.
 Implicit Types x y z t : R.
 
 Lemma num_real x : x \is real. Proof. exact: num_real. Qed.
 Hint Resolve num_real : core.
 
-Lemma ler_total : total (@le R). Proof. by move=> x y; apply: real_leVge. Qed.
-
-Lemma ltr_total x y : x != y -> (x < y) || (y < x).
-Proof. by rewrite !ltr_def [_ == y]eq_sym => ->; apply: ler_total. Qed.
-
-Lemma wlog_ler P :
-     (forall a b, P b a -> P a b) -> (forall a b, a <= b -> P a b) ->
-   forall a b : R, P a b.
-Proof. by move=> sP hP a b; apply: real_wlog_ler. Qed.
-
-Lemma wlog_ltr P :
-    (forall a, P a a) ->
-    (forall a b, (P b a -> P a b)) -> (forall a b, a < b -> P a b) ->
-  forall a b : R, P a b.
-Proof. by move=> rP sP hP a b; apply: real_wlog_ltr. Qed.
-
-Lemma ltrNge x y : (x < y) = ~~ (y <= x). Proof. exact: real_ltrNge. Qed.
-
-Lemma lerNgt x y : (x <= y) = ~~ (y < x). Proof. exact: real_lerNgt. Qed.
-
 Lemma lerP x y : ler_xor_gt x y `|x - y| `|y - x| (x <= y) (y < x).
-Proof. exact: real_lerP. Qed.
+Proof. exact: real_leP. Qed.
 
 Lemma ltrP x y : ltr_xor_ge x y `|x - y| `|y - x| (y <= x) (x < y).
-Proof. exact: real_ltrP. Qed.
+Proof. exact: real_ltP. Qed.
 
 Lemma ltrgtP x y :
    comparer x y `|x - y| `|y - x| (y == x) (x == y)
                  (x <= y) (y <= x) (x < y) (x > y) .
-Proof. exact: real_ltrgtP. Qed.
+Proof. exact: real_ltgtP. Qed.
 
 Lemma ger0P x : ger0_xor_lt0 x `|x| (x < 0) (0 <= x).
-Proof. exact: real_ger0P. Qed.
+Proof. exact: real_ge0P. Qed.
 
 Lemma ler0P x : ler0_xor_gt0 x `|x| (0 < x) (x <= 0).
-Proof. exact: real_ler0P. Qed.
+Proof. exact: real_le0P. Qed.
 
 Lemma ltrgt0P x :
   comparer0 x `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
-Proof. exact: real_ltrgt0P. Qed.
-
-Lemma neqr_lt x y : (x != y) = (x < y) || (y < x).
-Proof. exact: real_neqr_lt. Qed.
-
-Lemma eqr_leLR x y z t :
-  (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
-Proof. by move=> *; apply/idP/idP; rewrite // !lerNgt; apply: contra. Qed.
-
-Lemma eqr_leRL x y z t :
-  (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y).
-Proof. by move=> *; symmetry; apply: eqr_leLR. Qed.
-
-Lemma eqr_ltLR x y z t :
-  (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t).
-Proof. by move=> *; rewrite !ltrNge; congr negb; apply: eqr_leLR. Qed.
-
-Lemma eqr_ltRL x y z t :
-  (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
-Proof. by move=> *; symmetry; apply: eqr_ltLR. Qed.
+Proof. exact: real_ltgt0P. Qed.
 
 (* sign *)
 
@@ -3661,7 +3517,7 @@ Lemma mulr_sign_lt0 (b : bool) x :
   ((-1) ^+ b * x < 0) = (x != 0) && (b (+) (x < 0)%R).
 Proof. by rewrite mulr_lt0 signr_lt0 signr_eq0. Qed.
 
-(* sign & norm*)
+(* sign & norm *)
 
 Lemma mulr_sign_norm x : (-1) ^+ (x < 0)%R * `|x| = x.
 Proof. by rewrite real_mulr_sign_norm. Qed.
@@ -3682,103 +3538,35 @@ End RealDomainTheory.
 
 Hint Resolve num_real : core.
 
-Section RealDomainMonotony.
-
-Variables (R : realDomainType) (R' : numDomainType) (D : pred R).
-Variables (f : R -> R') (f' : R -> nat).
-Implicit Types (m n p : nat) (x y z : R) (u v w : R').
-
-Hint Resolve (@num_real R) : core.
-
-Lemma ler_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
-Proof. by move=> mf x y; apply: real_mono. Qed.
-
-Lemma ler_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
-Proof. by move=> mf x y; apply: real_nmono. Qed.
-
-Lemma ler_mono_in :
-  {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
-Proof.
-by move=> mf x y Dx Dy; apply: (real_mono_in mf); rewrite ?inE ?Dx ?Dy /=.
-Qed.
-
-Lemma ler_nmono_in :
-  {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
-Proof.
-by move=> mf x y Dx Dy; apply: (real_nmono_in mf); rewrite ?inE ?Dx ?Dy /=.
-Qed.
-
-Lemma lern_mono : {homo f' : m n / m < n >-> (m < n)%N} ->
-   {mono f' : m n / m <= n >-> (m <= n)%N}.
-Proof. by move=> mf x y; apply: realn_mono. Qed.
-
-Lemma lern_nmono : {homo f' : m n / n < m >-> (m < n)%N} ->
-  {mono f' : m n / n <= m >-> (m <= n)%N}.
-Proof. by move=> mf x y; apply: realn_nmono. Qed.
-
-Lemma lern_mono_in : {in D &, {homo f' : m n / m < n >-> (m < n)%N}} ->
-   {in D &, {mono f' : m n / m <= n >-> (m <= n)%N}}.
-Proof.
-by move=> mf x y Dx Dy; apply: (realn_mono_in mf); rewrite ?inE ?Dx ?Dy /=.
-Qed.
-
-Lemma lern_nmono_in : {in D &, {homo f' : m n / n < m >-> (m < n)%N}} ->
-  {in D &, {mono f' : m n / n <= m >-> (m <= n)%N}}.
-Proof.
-by move=> mf x y Dx Dy; apply: (realn_nmono_in mf); rewrite ?inE ?Dx ?Dy /=.
-Qed.
-
-End RealDomainMonotony.
-
-Section RealDomainArgExtremum.
-
-Context {R : realDomainType} {I : finType} (i0 : I).
-Context (P : pred I) (F : I -> R) (Pi0 : P i0).
-
-Definition arg_minr := extremum <=%R i0 P F.
-Definition arg_maxr := extremum >=%R i0 P F.
-
-Lemma arg_minrP: extremum_spec <=%R P F arg_minr.
-Proof. by apply: extremumP => //; [apply: ler_trans|apply: ler_total]. Qed.
-
-Lemma arg_maxrP: extremum_spec >=%R P F arg_maxr.
-Proof.
-apply: extremumP => //; first exact: lerr.
-  by move=> ??? /(ler_trans _) le /le.
-by move=> ??; apply: ler_total.
-Qed.
-
-End RealDomainArgExtremum.
-
-Notation "[ 'arg' 'minr_' ( i < i0 | P ) F ]" :=
-    (arg_minr i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'minr_' ( i  <  i0  |  P )  F ]") : form_scope.
-
-Notation "[ 'arg' 'minr_' ( i < i0 'in' A ) F ]" :=
-    [arg minr_(i < i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'minr_' ( i  <  i0  'in'  A )  F ]") : form_scope.
-
-Notation "[ 'arg' 'minr_' ( i < i0 ) F ]" := [arg minr_(i < i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'minr_' ( i  <  i0 )  F ]") : form_scope.
-
-Notation "[ 'arg' 'maxr_' ( i > i0 | P ) F ]" :=
-     (arg_maxr i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'maxr_' ( i  >  i0  |  P )  F ]") : form_scope.
-
-Notation "[ 'arg' 'maxr_' ( i > i0 'in' A ) F ]" :=
-    [arg maxr_(i > i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'maxr_' ( i  >  i0  'in'  A )  F ]") : form_scope.
-
-Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
-
 Section RealDomainOperations.
+
+Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
+    (arg_min (disp := ring_display) i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : ring_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
+    [arg min_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : ring_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : ring_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
+     (arg_max (disp := ring_display) i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : ring_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
+    [arg max_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : ring_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : ring_scope.
 
 (* sgr section *)
 
@@ -3791,8 +3579,8 @@ Lemma sgr_cp0 x :
   ((sg x == -1) = (x < 0)) *
   ((sg x == 0) = (x == 0)).
 Proof.
-rewrite -[1]/((-1) ^+ false) -signrN lt0r lerNgt sgr_def.
-case: (x =P 0) => [-> | _]; first by rewrite !(eq_sym 0) !signr_eq0 ltrr eqxx.
+rewrite -[1]/((-1) ^+ false) -signrN lt0r leNgt sgr_def.
+case: (x =P 0) => [-> | _]; first by rewrite !(eq_sym 0) !signr_eq0 ltxx eqxx.
 by rewrite !(inj_eq signr_inj) eqb_id eqbF_neg signr_eq0 //.
 Qed.
 
@@ -3841,7 +3629,7 @@ Lemma sgr_gt0 x : (sg x > 0) = (x > 0).
 Proof. by rewrite -sgr_cp0 sgr_id sgr_cp0. Qed.
 
 Lemma sgr_ge0 x : (sgr x >= 0) = (x >= 0).
-Proof. by rewrite !lerNgt sgr_lt0. Qed.
+Proof. by rewrite !leNgt sgr_lt0. Qed.
 
 (* norm section *)
 
@@ -3871,10 +3659,10 @@ Proof. exact: real_ltr_normlP. Qed.
 Arguments ltr_normlP {x y}.
 
 Lemma ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y).
-Proof. by rewrite lerNgt ltr_norml negb_and -!lerNgt orbC ler_oppr. Qed.
+Proof. by rewrite leNgt ltr_norml negb_and -!leNgt orbC ler_oppr. Qed.
 
 Lemma ltr_normr x y : (x < `|y|) = (x < y) || (x < - y).
-Proof. by rewrite ltrNge ler_norml negb_and -!ltrNge orbC ltr_oppr. Qed.
+Proof. by rewrite ltNge ler_norml negb_and -!ltNge orbC ltr_oppr. Qed.
 
 Definition lter_normr := (ler_normr, ltr_normr).
 
@@ -3917,45 +3705,23 @@ Lemma sqr_ge0 x : 0 <= x ^+ 2. Proof. by rewrite exprn_even_ge0. Qed.
 Lemma sqr_norm_eq1 x : (x ^+ 2 == 1) = (`|x| == 1).
 Proof. by rewrite sqrf_eq1 eqr_norml ler01 andbT. Qed.
 
-Lemma lerif_mean_square_scaled x y :
+Lemma leif_mean_square_scaled x y :
   x * y *+ 2 <= x ^+ 2 + y ^+ 2 ?= iff (x == y).
-Proof. exact: real_lerif_mean_square_scaled. Qed.
+Proof. exact: real_leif_mean_square_scaled. Qed.
 
-Lemma lerif_AGM2_scaled x y : x * y *+ 4 <= (x + y) ^+ 2 ?= iff (x == y).
-Proof. exact: real_lerif_AGM2_scaled. Qed.
+Lemma leif_AGM2_scaled x y : x * y *+ 4 <= (x + y) ^+ 2 ?= iff (x == y).
+Proof. exact: real_leif_AGM2_scaled. Qed.
 
 Section MinMax.
 
 (* GG: Many of the first lemmas hold unconditionally, and others hold for    *)
 (* the real subset of a general domain.                                      *)
-Lemma minrC : @commutative R R min.
-Proof. by move=> x y; rewrite /min; case: ltrgtP. Qed.
-
-Lemma minrr : @idempotent R min.
-Proof. by move=> x; rewrite /min if_same. Qed.
-
-Lemma minr_l x y : x <= y -> min x y = x.
-Proof. by rewrite /minr => ->. Qed.
-
-Lemma minr_r x y : y <= x -> min x y = y.
-Proof. by move/minr_l; rewrite minrC. Qed.
-
-Lemma maxrC : @commutative R R max.
-Proof. by move=> x y; rewrite /maxr; case: ltrgtP. Qed.
-
-Lemma maxrr : @idempotent R max.
-Proof. by move=> x; rewrite /max if_same. Qed.
-
-Lemma maxr_l x y : y <= x -> max x y = x.
-Proof. by move=> hxy; rewrite /max hxy. Qed.
-
-Lemma maxr_r x y : x <= y -> max x y = y.
-Proof. by move=> hxy; rewrite maxrC maxr_l. Qed.
 
 Lemma addr_min_max x y : min x y + max x y = x + y.
 Proof.
-case: (lerP x y)=> hxy; first by rewrite maxr_r ?minr_l.
-by rewrite maxr_l ?minr_r ?ltrW // addrC.
+case: (lerP x y)=> [| /ltW] hxy;
+  first by rewrite (meet_idPl hxy) (join_idPl hxy).
+by rewrite (meet_idPr hxy) (join_idPr hxy) addrC.
 Qed.
 
 Lemma addr_max_min x y : max x y + min x y = x + y.
@@ -3967,164 +3733,35 @@ Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
 Lemma maxr_to_min x y : max x y = x + y - min x y.
 Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
 
-Lemma minrA x y z : min x (min y z) = min (min x y) z.
+Lemma oppr_max : {morph -%R : x y / max x y >-> min x y : R}.
 Proof.
-rewrite /min; case: (lerP y z) => [hyz | /ltrW hyz].
-  by case: lerP => hxy; rewrite ?hyz // (@ler_trans _ y).
-case: lerP=> hxz; first by rewrite !(ler_trans hxz).
-case: (lerP x y)=> hxy; first by rewrite lerNgt hxz.
-by case: ltrgtP hyz.
+by move=> x y; case: leP; rewrite -lter_opp2 => hxy;
+  rewrite ?(meet_idPr hxy) ?(meet_idPl (ltW hxy)).
 Qed.
 
-Lemma minrCA : @left_commutative R R min.
-Proof. by move=> x y z; rewrite !minrA [minr x y]minrC. Qed.
-
-Lemma minrAC : @right_commutative R R min.
-Proof. by move=> x y z; rewrite -!minrA [minr y z]minrC. Qed.
-
-Variant minr_spec x y : bool -> bool -> R -> Type :=
-| Minr_r of x <= y : minr_spec x y true false x
-| Minr_l of y < x : minr_spec x y false true y.
-
-Lemma minrP x y : minr_spec x y (x <= y) (y < x) (min x y).
-Proof.
-case: lerP=> hxy; first by rewrite minr_l //; constructor.
-by rewrite minr_r 1?ltrW //; constructor.
-Qed.
-
-Lemma oppr_max x y : - max x y = min (- x) (- y).
-Proof.
-case: minrP; rewrite lter_opp2 => hxy; first by rewrite maxr_l.
-by rewrite maxr_r // ltrW.
-Qed.
-
-Lemma oppr_min x y : - min x y = max (- x) (- y).
-Proof. by rewrite -[maxr _ _]opprK oppr_max !opprK. Qed.
-
-Lemma maxrA x y z : max x (max y z) = max (max x y) z.
-Proof. by apply/eqP; rewrite -eqr_opp !oppr_max minrA. Qed.
-
-Lemma maxrCA : @left_commutative R R max.
-Proof. by move=> x y z; rewrite !maxrA [maxr x y]maxrC. Qed.
-
-Lemma maxrAC : @right_commutative R R max.
-Proof. by move=> x y z; rewrite -!maxrA [maxr y z]maxrC. Qed.
-
-Variant maxr_spec x y : bool -> bool -> R -> Type :=
-| Maxr_r of y <= x : maxr_spec x y true false x
-| Maxr_l of x < y : maxr_spec x y false true y.
-
-Lemma maxrP x y : maxr_spec x y (y <= x) (x < y) (maxr x y).
-Proof.
-case: lerP => hxy; first by rewrite maxr_l //; constructor.
-by rewrite maxr_r 1?ltrW //; constructor.
-Qed.
-
-Lemma eqr_minl x y : (min x y == x) = (x <= y).
-Proof. by case: minrP=> hxy; rewrite ?eqxx // ltr_eqF. Qed.
-
-Lemma eqr_minr x y : (min x y == y) = (y <= x).
-Proof. by rewrite minrC eqr_minl. Qed.
-
-Lemma eqr_maxl x y : (max x y == x) = (y <= x).
-Proof. by case: maxrP=> hxy; rewrite ?eqxx // eq_sym ltr_eqF. Qed.
-
-Lemma eqr_maxr x y : (max x y == y) = (x <= y).
-Proof. by rewrite maxrC eqr_maxl. Qed.
-
-Lemma ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z).
-Proof.
-case: minrP=> hyz.
-  by case: lerP=> hxy //; rewrite (ler_trans _ hyz).
-by case: lerP=> hxz; rewrite andbC // (ler_trans hxz) // ltrW.
-Qed.
-
-Lemma ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x).
-Proof.
-case: minrP => hyz.
-  case: lerP => hyx //=; symmetry; apply: negbTE.
-  by rewrite -ltrNge (@ltr_le_trans _ y).
-case: lerP => hzx; rewrite orbC //=; symmetry; apply: negbTE.
-by rewrite -ltrNge (@ltr_trans _ z).
-Qed.
-
-Lemma ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z).
-Proof. by rewrite -lter_opp2 oppr_max ler_minl !ler_opp2. Qed.
-
-Lemma ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x).
-Proof. by rewrite -lter_opp2 oppr_max ler_minr !ler_opp2. Qed.
-
-Lemma ltr_minr x y z : (x < min y z) = (x < y) && (x < z).
-Proof. by rewrite !ltrNge ler_minl negb_or. Qed.
-
-Lemma ltr_minl x y z : (min y z < x) = (y < x) || (z < x).
-Proof. by rewrite !ltrNge ler_minr negb_and. Qed.
-
-Lemma ltr_maxr x y z : (x < max y z) = (x < y) || (x < z).
-Proof. by rewrite !ltrNge ler_maxl negb_and. Qed.
-
-Lemma ltr_maxl x y z : (max y z < x) = (y < x) && (z < x).
-Proof. by rewrite !ltrNge ler_maxr negb_or. Qed.
-
-Definition lter_minr := (ler_minr, ltr_minr).
-Definition lter_minl := (ler_minl, ltr_minl).
-Definition lter_maxr := (ler_maxr, ltr_maxr).
-Definition lter_maxl := (ler_maxl, ltr_maxl).
+Lemma oppr_min : {morph -%R : x y / min x y >-> max x y : R}.
+Proof. by move=> x y; rewrite -[max _ _]opprK oppr_max !opprK. Qed.
 
 Lemma addr_minl : @left_distributive R R +%R min.
 Proof.
-move=> x y z; case: minrP=> hxy; first by rewrite minr_l // ler_add2r.
-by rewrite minr_r // ltrW // ltr_add2r.
+by move=> x y z; case: leP; case: leP => //; rewrite lter_add2; case: leP.
 Qed.
 
 Lemma addr_minr : @right_distributive R R +%R min.
-Proof.
-move=> x y z; case: minrP=> hxy; first by rewrite minr_l // ler_add2l.
-by rewrite minr_r // ltrW // ltr_add2l.
-Qed.
+Proof. by move=> x y z; rewrite !(addrC x) addr_minl. Qed.
 
 Lemma addr_maxl : @left_distributive R R +%R max.
 Proof.
-move=> x y z; rewrite -[_ + _]opprK opprD oppr_max.
-by rewrite addr_minl -!opprD oppr_min !opprK.
+by move=> x y z; case: leP; case: leP => //; rewrite lter_add2; case: leP.
 Qed.
 
 Lemma addr_maxr : @right_distributive R R +%R max.
-Proof.
-move=> x y z; rewrite -[_ + _]opprK opprD oppr_max.
-by rewrite addr_minr -!opprD oppr_min !opprK.
-Qed.
-
-Lemma minrK x y : max (min x y) x = x.
-Proof. by case: minrP => hxy; rewrite ?maxrr ?maxr_r // ltrW. Qed.
-
-Lemma minKr x y : min y (max x y) = y.
-Proof. by case: maxrP => hxy; rewrite ?minrr ?minr_l. Qed.
-
-Lemma maxr_minl : @left_distributive R R max min.
-Proof.
-move=> x y z; case: minrP => hxy.
-  by case: maxrP => hm; rewrite minr_l // ler_maxr (hxy, lerr) ?orbT.
-by case: maxrP => hyz; rewrite minr_r // ler_maxr (ltrW hxy, lerr) ?orbT.
-Qed.
-
-Lemma maxr_minr : @right_distributive R R max min.
-Proof. by move=> x y z; rewrite maxrC maxr_minl ![_ _ x]maxrC. Qed.
-
-Lemma minr_maxl : @left_distributive R R min max.
-Proof.
-move=> x y z; rewrite -[min _ _]opprK !oppr_min [- max x y]oppr_max.
-by rewrite maxr_minl !(oppr_max, oppr_min, opprK).
-Qed.
-
-Lemma minr_maxr : @right_distributive R R min max.
-Proof. by move=> x y z; rewrite minrC minr_maxl ![_ _ x]minrC. Qed.
+Proof. by move=> x y z; rewrite !(addrC x) addr_maxl. Qed.
 
 Lemma minr_pmulr x y z : 0 <= x -> x * min y z = min (x * y) (x * z).
 Proof.
-case: sgrP=> // hx _; first by rewrite hx !mul0r minrr.
-case: minrP=> hyz; first by rewrite minr_l // ler_pmul2l.
-by rewrite minr_r // ltrW // ltr_pmul2l.
+case: sgrP=> // hx _; first by rewrite hx !mul0r meetxx.
+by case: leP; case: leP => //; rewrite lter_pmul2l //; case: leP.
 Qed.
 
 Lemma minr_nmulr x y z : x <= 0 -> x * min y z = max (x * y) (x * z).
@@ -4158,19 +3795,16 @@ Lemma maxr_nmull x y z : x <= 0 -> max y z * x = min (y * x) (z * x).
 Proof. by move=> *; rewrite mulrC maxr_nmulr // ![_ * x]mulrC. Qed.
 
 Lemma maxrN x : max x (- x) = `|x|.
-Proof.
-case: ger0P=> hx; first by rewrite maxr_l // ge0_cp //.
-by rewrite maxr_r // le0_cp // ltrW.
-Qed.
+Proof. by case: ger0P=> [/ge0_cp [] | /lt0_cp []]; case: (leP (- x) x). Qed.
 
 Lemma maxNr x : max (- x) x = `|x|.
-Proof. by rewrite maxrC maxrN. Qed.
+Proof. by rewrite joinC maxrN. Qed.
 
 Lemma minrN x : min x (- x) = - `|x|.
-Proof. by rewrite -[minr _ _]opprK oppr_min opprK maxNr. Qed.
+Proof. by rewrite -[min _ _]opprK oppr_min opprK maxNr. Qed.
 
 Lemma minNr x : min (- x) x = - `|x|.
-Proof. by rewrite -[minr _ _]opprK oppr_min opprK maxrN. Qed.
+Proof. by rewrite -[min _ _]opprK oppr_min opprK maxrN. Qed.
 
 End MinMax.
 
@@ -4180,8 +3814,8 @@ Variable p : {poly R}.
 
 Lemma poly_itv_bound a b : {ub | forall x, a <= x <= b -> `|p.[x]| <= ub}.
 Proof.
-have [ub le_p_ub] := poly_disk_bound p (Num.max `|a| `|b|).
-exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // ler_maxr !ler_normr.
+have [ub le_p_ub] := poly_disk_bound p (`|a| `|` `|b|).
+exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // lexU !ler_normr.
 by have [_|_] := ler0P x; rewrite ?ler_opp2 ?le_a_x ?le_x_b orbT.
 Qed.
 
@@ -4192,16 +3826,16 @@ have [p_le1 | p_gt1] := leqP (size p) 1.
   exists 0 => x _; rewrite (size1_polyC p_le1) hornerC.
   by rewrite -[p`_0]lead_coefC -size1_polyC // mon_p ltr01.
 pose lb := \sum_(j < n.+1) `|p`_j|; exists (lb + 1) => x le_ub_x.
-have x_ge1: 1 <= x; last have x_gt0 := ltr_le_trans ltr01 x_ge1.
-  by rewrite -(ler_add2l lb) ler_paddl ?sumr_ge0 // => j _; apply: normr_ge0.
+have x_ge1: 1 <= x; last have x_gt0 := lt_le_trans ltr01 x_ge1.
+  by rewrite -(ler_add2l lb) ler_paddl ?sumr_ge0 // => j _.
 rewrite horner_coef -(subnK p_gt1) -/n addnS big_ord_recr /= addn1.
 rewrite [in p`__]subnSK // subn1 -lead_coefE mon_p mul1r -ltr_subl_addl sub0r.
-apply: ler_lt_trans (_ : lb * x ^+ n < _); last first.
+apply: le_lt_trans (_ : lb * x ^+ n < _); last first.
   rewrite exprS ltr_pmul2r ?exprn_gt0 ?(ltr_le_trans ltr01) //.
   by rewrite -(ltr_add2r 1) ltr_spaddr ?ltr01.
-rewrite -sumrN mulr_suml ler_sum // => j _; apply: ler_trans (ler_norm _) _.
-rewrite normrN normrM ler_wpmul2l ?normr_ge0 // normrX.
-by rewrite ger0_norm ?(ltrW x_gt0) // ler_weexpn2l ?leq_ord.
+rewrite -sumrN mulr_suml ler_sum // => j _; apply: le_trans (ler_norm _) _.
+rewrite normrN normrM ler_wpmul2l // normrX.
+by rewrite ger0_norm ?(ltW x_gt0) // ler_weexpn2l ?leq_ord.
 Qed.
 
 End PolyBounds.
@@ -4212,11 +3846,11 @@ Section RealField.
 
 Variables (F : realFieldType) (x y : F).
 
-Lemma lerif_mean_square : x * y <= (x ^+ 2 + y ^+ 2) / 2%:R ?= iff (x == y).
-Proof. by apply: real_lerif_mean_square; apply: num_real. Qed.
+Lemma leif_mean_square : x * y <= (x ^+ 2 + y ^+ 2) / 2%:R ?= iff (x == y).
+Proof. by apply: real_leif_mean_square; apply: num_real. Qed.
 
-Lemma lerif_AGM2 : x * y <= ((x + y) / 2%:R)^+ 2 ?= iff (x == y).
-Proof. by apply: real_lerif_AGM2; apply: num_real. Qed.
+Lemma leif_AGM2 : x * y <= ((x + y) / 2%:R)^+ 2 ?= iff (x == y).
+Proof. by apply: real_leif_AGM2; apply: num_real. Qed.
 
 End RealField.
 
@@ -4230,7 +3864,7 @@ Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
 Lemma upper_nthrootP i : (bound x <= i)%N -> x < 2%:R ^+ i.
 Proof.
 rewrite /bound; case: (sigW _) => /= b le_x_b le_b_i.
-apply: ler_lt_trans (ler_norm x) (ltr_trans le_x_b _ ).
+apply: le_lt_trans (ler_norm x) (lt_trans le_x_b _ ).
 by rewrite -natrX ltr_nat (leq_ltn_trans le_b_i) // ltn_expl.
 Qed.
 
@@ -4261,7 +3895,7 @@ by have [//|_ /eqP//|->] := ltrgt0P a; rewrite mulf_eq0 orbb => /eqP.
 Qed.
 
 Lemma ltr0_sqrtr a : a < 0 -> sqrt a = 0.
-Proof. by move=> /ltrW; apply: ler0_sqrtr. Qed.
+Proof. by move=> /ltW; apply: ler0_sqrtr. Qed.
 
 Variant sqrtr_spec a : R -> bool -> bool -> R -> Type :=
 | IsNoSqrtr of a < 0 : sqrtr_spec a a false true 0
@@ -4298,13 +3932,13 @@ Proof. by move: (sqrtr_sqr 1); rewrite expr1n => ->; rewrite normr1. Qed.
 
 Lemma sqrtr_eq0 a : (sqrt a == 0) = (a <= 0).
 Proof.
-case: sqrtrP => [/ltrW ->|b]; first by rewrite eqxx.
-case: ltrgt0P => [b_gt0|//|->]; last by rewrite exprS mul0r lerr.
-by rewrite ltr_geF ?pmulr_rgt0.
+case: sqrtrP => [/ltW ->|b]; first by rewrite eqxx.
+case: ltrgt0P => [b_gt0|//|->]; last by rewrite exprS mul0r lexx.
+by rewrite lt_geF ?pmulr_rgt0.
 Qed.
 
 Lemma sqrtr_gt0 a : (0 < sqrt a) = (0 < a).
-Proof. by rewrite lt0r sqrtr_ge0 sqrtr_eq0 -ltrNge andbT. Qed.
+Proof. by rewrite lt0r sqrtr_ge0 sqrtr_eq0 -ltNge andbT. Qed.
 
 Lemma eqr_sqrt a b : 0 <= a -> 0 <= b -> (sqrt a == sqrt b) = (a == b).
 Proof.
@@ -4315,29 +3949,29 @@ Qed.
 Lemma ler_wsqrtr : {homo @sqrt R : a b / a <= b}.
 Proof.
 move=> a b /= le_ab; case: (boolP (0 <= a))=> [pa|]; last first.
-  by rewrite -ltrNge; move/ltrW; rewrite -sqrtr_eq0; move/eqP->.
+  by rewrite -ltNge; move/ltW; rewrite -sqrtr_eq0; move/eqP->.
 rewrite -(@ler_pexpn2r R 2) ?nnegrE ?sqrtr_ge0 //.
-by rewrite !sqr_sqrtr // (ler_trans pa).
+by rewrite !sqr_sqrtr // (le_trans pa).
 Qed.
 
 Lemma ler_psqrt : {in @pos R &, {mono sqrt : a b / a <= b}}.
 Proof.
-apply: ler_mono_in => x y x_gt0 y_gt0.
-rewrite !ltr_neqAle => /andP[neq_xy le_xy].
-by rewrite ler_wsqrtr // eqr_sqrt ?ltrW // neq_xy.
+apply: le_mono_in => x y x_gt0 y_gt0.
+rewrite !lt_neqAle => /andP[neq_xy le_xy].
+by rewrite ler_wsqrtr // eqr_sqrt ?ltW // neq_xy.
 Qed.
 
 Lemma ler_sqrt a b : 0 < b -> (sqrt a <= sqrt b) = (a <= b).
 Proof.
 move=> b_gt0; have [a_le0|a_gt0] := ler0P a; last by rewrite ler_psqrt.
-by rewrite ler0_sqrtr // sqrtr_ge0 (ler_trans a_le0) ?ltrW.
+by rewrite ler0_sqrtr // sqrtr_ge0 (le_trans a_le0) ?ltW.
 Qed.
 
 Lemma ltr_sqrt a b : 0 < b -> (sqrt a < sqrt b) = (a < b).
 Proof.
 move=> b_gt0; have [a_le0|a_gt0] := ler0P a; last first.
-  by rewrite (lerW_mono_in ler_psqrt).
-by rewrite ler0_sqrtr // sqrtr_gt0 b_gt0 (ler_lt_trans a_le0).
+  by rewrite (leW_mono_in ler_psqrt).
+by rewrite ler0_sqrtr // sqrtr_gt0 b_gt0 (le_lt_trans a_le0).
 Qed.
 
 End RealClosedFieldTheory.
@@ -4356,10 +3990,10 @@ Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
 Definition normCK x : `|x| ^+ 2 = x * x^*.
-Proof. by case: C x => ? [? ? []]. Qed.
+Proof. by case: C x => ? [? ? ? []]. Qed.
 
 Lemma sqrCi : 'i ^+ 2 = -1 :> C.
-Proof. by case: C => ? [? ? []]. Qed.
+Proof. by case: C => ? [? ? ? []]. Qed.
 
 Lemma conjCK : involutive (@conjC C).
 Proof.
@@ -4382,15 +4016,14 @@ Variant rootC_spec n (x : C) : Type :=
 
 Fact rootC_subproof n x : rootC_spec n x.
 Proof.
-have realRe2 u : Re2 u \is Num.real.
-  rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK.
-  by rewrite exprn_ge0 ?normr_ge0.
+have realRe2 u : Re2 u \is Num.real by
+  rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK exprn_ge0.
 have argCle_total : total argCle.
   move=> u v; rewrite /total /argCle.
   by do 2!case: (nnegIm _) => //; rewrite ?orbT //= real_leVge.
 have argCle_trans : transitive argCle.
   move=> u v w /implyP geZuv /implyP geZvw; apply/implyP.
-  by case/geZvw/andP=> /geZuv/andP[-> geRuv] /ler_trans->.
+  by case/geZvw/andP=> /geZuv/andP[-> geRuv] /le_trans->.
 pose p := 'X^n - (x *+ (n > 0))%:P; have [r0 Dp] := closed_field_poly_normal p.
 have sz_p: size p = n.+1.
   rewrite size_addl ?size_polyXn // ltnS size_opp size_polyC mulrn_eq0.
@@ -4407,7 +4040,7 @@ exists r`_0 => [|z n_gt0 /(mem_rP z n_gt0) r_z].
   case: posnP => [n0 | n_gt0]; first by rewrite nth_default // sz_r n0.
   by apply/mem_rP=> //; rewrite mem_nth ?sz_r.
 case: {Dp mem_rP}r r_z r_arg => // y r1; rewrite inE => /predU1P[-> _|r1z].
-  by apply/implyP=> ->; rewrite lerr.
+  by apply/implyP=> ->; rewrite lexx.
 by move/(order_path_min argCle_trans)/allP->.
 Qed.
 
@@ -4426,7 +4059,7 @@ Let nz2 : 2%:R != 0 :> C. Proof. by rewrite pnatr_eq0. Qed.
 Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
 
 Lemma mul_conjC_ge0 x : 0 <= x * x^*.
-Proof. by rewrite -normCK exprn_ge0 ?normr_ge0. Qed.
+Proof. by rewrite -normCK exprn_ge0. Qed.
 
 Lemma mul_conjC_gt0 x : (0 < x * x^*) = (x != 0).
 Proof.
@@ -4508,16 +4141,13 @@ Proof. by move=> n_gt0; rewrite -{1}(rootC0 n) eqr_rootC. Qed.
 (* Rectangular coordinates. *)
 
 Lemma nonRealCi : ('i : C) \isn't real.
-Proof. by rewrite realEsqr sqrCi oppr_ge0 ltr_geF ?ltr01. Qed.
+Proof. by rewrite realEsqr sqrCi oppr_ge0 lt_geF ?ltr01. Qed.
 
 Lemma neq0Ci : 'i != 0 :> C.
 Proof. by apply: contraNneq nonRealCi => ->; apply: real0. Qed.
 
 Lemma normCi : `|'i| = 1 :> C.
-Proof.
-apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) ?normr_ge0 //.
-by rewrite -normrX sqrCi normrN1.
-Qed.
+Proof. by apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) // -normrX sqrCi normrN1. Qed.
 
 Lemma invCi : 'i^-1 = - 'i :> C.
 Proof. by rewrite -div1r -[1]opprK -sqrCi mulNr mulfK ?neq0Ci. Qed.
@@ -4645,19 +4275,19 @@ Proof.
 by move=> x y Rx Ry; rewrite /= invC_norm conjC_rect // mulrC normC2_rect.
 Qed.
 
-Lemma lerif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
+Lemma leif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
 Proof.
-rewrite -(mono_in_lerif ler_sqr); try by rewrite qualifE normr_ge0.
+rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE.
 rewrite normCK conj_Creal // normC2_Re_Im -expr2.
-rewrite addrC -lerif_subLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
-by apply: lerif_eq; rewrite -realEsqr.
+rewrite addrC -leif_subLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
+by apply: leif_eq; rewrite -realEsqr.
 Qed.
 
-Lemma lerif_Re_Creal z : 'Re z <= `|z| ?= iff (0 <= z).
+Lemma leif_Re_Creal z : 'Re z <= `|z| ?= iff (0 <= z).
 Proof.
 have ubRe: 'Re z <= `|'Re z| ?= iff (0 <= 'Re z).
-  by rewrite ger0_def eq_sym; apply/lerif_eq/real_ler_norm.
-congr (_ <= _ ?= iff _): (lerif_trans ubRe (lerif_normC_Re_Creal z)).
+  by rewrite ger0_def eq_sym; apply/leif_eq/real_ler_norm.
+congr (_ <= _ ?= iff _): (leif_trans ubRe (leif_normC_Re_Creal z)).
 apply/andP/idP=> [[zRge0 /Creal_ReP <- //] | z_ge0].
 by have Rz := ger0_real z_ge0; rewrite (Creal_ReP _ _).
 Qed.
@@ -4708,50 +4338,50 @@ suffices /existsP[i ltRwi0]: [exists i : 'I_n, 'Re (w ^+ i) < 0].
   by exists (w ^+ i) => //; rewrite exprAC wn1 expr1n.
 apply: contra_eqT (congr1 Re pw_0) => /existsPn geRw0.
 rewrite raddf_sum raddf0 /= (bigD1 (Ordinal (ltnW n_gt1))) //=.
-rewrite (Creal_ReP _ _) ?rpred1 // gtr_eqF ?ltr_paddr ?ltr01 //=.
-by apply: sumr_ge0 => i _; rewrite real_lerNgt ?rpred0.
+rewrite (Creal_ReP _ _) ?rpred1 // gt_eqF ?ltr_paddr ?ltr01 //=.
+by apply: sumr_ge0 => i _; rewrite real_leNgt ?rpred0.
 Qed.
 
 Lemma Im_rootC_ge0 n x : (n > 1)%N -> 0 <= 'Im (n.-root x).
 Proof.
 set y := n.-root x => n_gt1; have n_gt0 := ltnW n_gt1.
-apply: wlog_neg; rewrite -real_ltrNge ?rpred0 // => ltIy0.
+apply: wlog_neg; rewrite -real_ltNge ?rpred0 // => ltIy0.
 suffices [z zn_x leI0z]: exists2 z, z ^+ n = x & 'Im z >= 0.
   by rewrite /y; case_rootC => /= y1 _ /(_ z n_gt0 zn_x)/argCleP[].
 have [w wn1 ltRw0] := neg_unity_root n_gt1.
 wlog leRI0yw: w wn1 ltRw0 / 0 <= 'Re y * 'Im w.
   move=> IHw; have: 'Re y * 'Im w \is real by rewrite rpredM.
-  case/real_ger0P=> [|/ltrW leRIyw0]; first exact: IHw.
+  case/real_ge0P=> [|/ltW leRIyw0]; first exact: IHw.
   apply: (IHw w^*); rewrite ?Re_conj ?Im_conj ?mulrN ?oppr_ge0 //.
   by rewrite -rmorphX wn1 rmorph1.
 exists (w * y); first by rewrite exprMn wn1 mul1r rootCK.
 rewrite [w]Crect [y]Crect mulC_rect.
-by rewrite Im_rect ?rpredD ?rpredN 1?rpredM // addr_ge0 // ltrW ?nmulr_rgt0.
+by rewrite Im_rect ?rpredD ?rpredN 1?rpredM // addr_ge0 // ltW ?nmulr_rgt0.
 Qed.
 
 Lemma rootC_lt0 n x : (1 < n)%N -> (n.-root x < 0) = false.
 Proof.
 set y := n.-root x => n_gt1; have n_gt0 := ltnW n_gt1.
-apply: negbTE; apply: wlog_neg => /negbNE lt0y; rewrite ler_gtF //.
+apply: negbTE; apply: wlog_neg => /negbNE lt0y; rewrite le_gtF //.
 have Rx: x \is real by rewrite -[x](rootCK n_gt0) rpredX // ltr0_real.
 have Re_y: 'Re y = y by apply/Creal_ReP; rewrite ltr0_real.
 have [z zn_x leR0z]: exists2 z, z ^+ n = x & 'Re z >= 0.
   have [w wn1 ltRw0] := neg_unity_root n_gt1.
   exists (w * y); first by rewrite exprMn wn1 mul1r rootCK.
-  by rewrite ReMr ?ltr0_real // ltrW // nmulr_lgt0.
+  by rewrite ReMr ?ltr0_real // ltW // nmulr_lgt0.
 without loss leI0z: z zn_x leR0z / 'Im z >= 0.
   move=> IHz; have: 'Im z \is real by [].
-  case/real_ger0P=> [|/ltrW leIz0]; first exact: IHz.
+  case/real_ge0P=> [|/ltW leIz0]; first exact: IHz.
   apply: (IHz z^*); rewrite ?Re_conj ?Im_conj ?oppr_ge0 //.
   by rewrite -rmorphX zn_x conj_Creal.
-by apply: ler_trans leR0z _; rewrite -Re_y ?rootC_Re_max ?ltr0_real.
+by apply: le_trans leR0z _; rewrite -Re_y ?rootC_Re_max ?ltr0_real.
 Qed.
 
 Lemma rootC_ge0 n x : (n > 0)%N -> (0 <= n.-root x) = (0 <= x).
 Proof.
 set y := n.-root x => n_gt0.
 apply/idP/idP=> [/(exprn_ge0 n) | x_ge0]; first by rewrite rootCK.
-rewrite -(ger_lerif (lerif_Re_Creal y)).
+rewrite -(ge_leif (leif_Re_Creal y)).
 have Ray: `|y| \is real by apply: normr_real.
 rewrite -(Creal_ReP _ Ray) rootC_Re_max ?(Creal_ImP _ Ray) //.
 by rewrite -normrX rootCK // ger0_norm.
@@ -4762,25 +4392,25 @@ Proof. by move=> n_gt0; rewrite !lt0r rootC_ge0 ?rootC_eq0. Qed.
 
 Lemma rootC_le0 n x : (1 < n)%N -> (n.-root x <= 0) = (x == 0).
 Proof.
-by move=> n_gt1; rewrite ler_eqVlt rootC_lt0 // orbF rootC_eq0 1?ltnW.
+by move=> n_gt1; rewrite le_eqVlt rootC_lt0 // orbF rootC_eq0 1?ltnW.
 Qed.
 
 Lemma ler_rootCl n : (n > 0)%N -> {in Num.nneg, {mono n.-root : x y / x <= y}}.
 Proof.
 move=> n_gt0 x x_ge0 y; have [y_ge0 | not_y_ge0] := boolP (0 <= y).
   by rewrite -(ler_pexpn2r n_gt0) ?qualifE ?rootC_ge0 ?rootCK.
-rewrite (contraNF (@ler_trans _ _ 0 _ _)) ?rootC_ge0 //.
-by rewrite (contraNF (ler_trans x_ge0)).
+rewrite (contraNF (@le_trans _ _ _ 0 _ _)) ?rootC_ge0 //.
+by rewrite (contraNF (le_trans x_ge0)).
 Qed.
 
 Lemma ler_rootC n : (n > 0)%N -> {in Num.nneg &, {mono n.-root : x y / x <= y}}.
 Proof. by move=> n_gt0 x y x_ge0 _; apply: ler_rootCl. Qed.
 
 Lemma ltr_rootCl n : (n > 0)%N -> {in Num.nneg, {mono n.-root : x y / x < y}}.
-Proof. by move=> n_gt0 x x_ge0 y; rewrite !ltr_def ler_rootCl ?eqr_rootC. Qed.
+Proof. by move=> n_gt0 x x_ge0 y; rewrite !lt_def ler_rootCl ?eqr_rootC. Qed.
 
 Lemma ltr_rootC n : (n > 0)%N -> {in Num.nneg &, {mono n.-root : x y / x < y}}.
-Proof. by move/ler_rootC/lerW_mono_in. Qed.
+Proof. by move/ler_rootC/leW_mono_in. Qed.
 
 Lemma exprCK n x : (0 < n)%N -> 0 <= x -> n.-root (x ^+ n) = x.
 Proof.
@@ -4791,8 +4421,7 @@ Qed.
 Lemma norm_rootC n x : `|n.-root x| = n.-root `|x|.
 Proof.
 have [-> | n_gt0] := posnP n; first by rewrite !root0C normr0.
-apply/eqP; rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 ?normr_ge0 //.
-by rewrite -normrX !rootCK.
+by apply/eqP; rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 // -normrX !rootCK.
 Qed.
 
 Lemma rootCX n x k : (n > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
@@ -4824,31 +4453,31 @@ by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) ler_rootCl // qualifE ler01.
 Qed.
 
 Lemma rootC_gt1 n x : (n > 0)%N -> (n.-root x > 1) = (x > 1).
-Proof. by move=> n_gt0; rewrite !ltr_def rootC_eq1 ?rootC_ge1. Qed.
+Proof. by move=> n_gt0; rewrite !lt_def rootC_eq1 ?rootC_ge1. Qed.
 
 Lemma rootC_le1 n x : (n > 0)%N -> 0 <= x -> (n.-root x <= 1) = (x <= 1).
 Proof. by move=> n_gt0 x_ge0; rewrite -{1}(rootC1 n_gt0) ler_rootCl. Qed.
 
 Lemma rootC_lt1 n x : (n > 0)%N -> 0 <= x -> (n.-root x < 1) = (x < 1).
-Proof. by move=> n_gt0 x_ge0; rewrite !ltr_neqAle rootC_eq1 ?rootC_le1. Qed.
+Proof. by move=> n_gt0 x_ge0; rewrite !lt_neqAle rootC_eq1 ?rootC_le1. Qed.
 
 Lemma rootCMl n x z : 0 <= x -> n.-root (x * z) = n.-root x * n.-root z.
 Proof.
 rewrite le0r => /predU1P[-> | x_gt0]; first by rewrite !(mul0r, rootC0).
 have [| n_gt1 | ->] := ltngtP n 1; last by rewrite !root1C.
   by case: n => //; rewrite !root0C mul0r.
-have [x_ge0 n_gt0] := (ltrW x_gt0, ltnW n_gt1).
+have [x_ge0 n_gt0] := (ltW x_gt0, ltnW n_gt1).
 have nx_gt0: 0 < n.-root x by rewrite rootC_gt0.
-have Rnx: n.-root x \is real by rewrite ger0_real ?ltrW.
+have Rnx: n.-root x \is real by rewrite ger0_real ?ltW.
 apply: eqC_semipolar; last 1 first; try apply/eqP.
 - by rewrite ImMl // !(Im_rootC_ge0, mulr_ge0, rootC_ge0).
-- by rewrite -(eqr_expn2 n_gt0) ?normr_ge0 // -!normrX exprMn !rootCK.
-rewrite eqr_le; apply/andP; split; last first.
+- by rewrite -(eqr_expn2 n_gt0) // -!normrX exprMn !rootCK.
+rewrite eq_le; apply/andP; split; last first.
   rewrite rootC_Re_max ?exprMn ?rootCK ?ImMl //.
-  by rewrite mulr_ge0 ?Im_rootC_ge0 ?ltrW.
-rewrite -[n.-root _](mulVKf (negbT (gtr_eqF nx_gt0))) !(ReMl Rnx) //.
-rewrite ler_pmul2l // rootC_Re_max ?exprMn ?exprVn ?rootCK ?mulKf ?gtr_eqF //.
-by rewrite ImMl ?rpredV // mulr_ge0 ?invr_ge0 ?Im_rootC_ge0 ?ltrW.
+  by rewrite mulr_ge0 ?Im_rootC_ge0 ?ltW.
+rewrite -[n.-root _](mulVKf (negbT (gt_eqF nx_gt0))) !(ReMl Rnx) //.
+rewrite ler_pmul2l // rootC_Re_max ?exprMn ?exprVn ?rootCK ?mulKf ?gt_eqF //.
+by rewrite ImMl ?rpredV // mulr_ge0 ?invr_ge0 ?Im_rootC_ge0 ?ltW.
 Qed.
 
 Lemma rootCMr n x z : 0 <= x -> n.-root (z * x) = n.-root z * n.-root x.
@@ -4865,18 +4494,18 @@ Qed.
 
 (* The proper form of the Arithmetic - Geometric Mean inequality. *)
 
-Lemma lerif_rootC_AGM (I : finType) (A : {pred I}) (n := #|A|) E :
+Lemma leif_rootC_AGM (I : finType) (A : {pred I}) (n := #|A|) E :
     {in A, forall i, 0 <= E i} ->
   n.-root (\prod_(i in A) E i) <= (\sum_(i in A) E i) / n%:R
                              ?= iff [forall i in A, forall j in A, E i == E j].
 Proof.
 move=> Ege0; have [n0 | n_gt0] := posnP n.
-  rewrite n0 root0C invr0 mulr0; apply/lerif_refl/forall_inP=> i.
+  rewrite n0 root0C invr0 mulr0; apply/leif_refl/forall_inP=> i.
   by rewrite (card0_eq n0).
-rewrite -(mono_in_lerif (ler_pexpn2r n_gt0)) ?rootCK //=; first 1 last.
+rewrite -(mono_in_leif (ler_pexpn2r n_gt0)) ?rootCK //=; first 1 last.
 - by rewrite qualifE rootC_ge0 // prodr_ge0.
 - by rewrite rpred_div ?rpred_nat ?rpred_sum.
-exact: lerif_AGM.
+exact: leif_AGM.
 Qed.
 
 (* Square root. *)
@@ -4908,13 +4537,13 @@ Proof.
 apply: (iffP andP) => [[leI0x not_gt0x] | <-]; last first.
   by rewrite sqrtC_lt0 Im_rootC_ge0.
 have /eqP := sqrtCK (x ^+ 2); rewrite eqf_sqr => /pred2P[] // defNx.
-apply: sqrCK; rewrite -real_lerNgt ?rpred0 // in not_gt0x;
-apply/Creal_ImP/ler_anti;
+apply: sqrCK; rewrite -real_leNgt ?rpred0 // in not_gt0x;
+apply/Creal_ImP/le_anti;
 by rewrite leI0x -oppr_ge0 -raddfN -defNx Im_rootC_ge0.
 Qed.
 
 Lemma normC_def x : `|x| = sqrtC (x * x^*).
-Proof. by rewrite -normCK sqrCK ?normr_ge0. Qed.
+Proof. by rewrite -normCK sqrCK. Qed.
 
 Lemma norm_conjC x : `|x^*| = `|x|.
 Proof. by rewrite !normC_def conjCK mulrC. Qed.
@@ -4947,7 +4576,7 @@ have def_xy: x * y^* = y * x^*.
   by rewrite mulrN mulrAC mulrA -mulrA mulrACA -!normCK mulNrn addNr.
 have{def_xy def2xy} def_yx: `|y * x| = y * x^*.
   by apply: (mulIf nz2); rewrite !mulr_natr mulrC normrM def2xy def_xy.
-rewrite -{1}(divfK nz_x y) invC_norm mulrCA -{}def_yx !normrM invfM.
+rewrite -{1}(divfK nz_x y) (invC_norm x) mulrCA -{}def_yx !normrM invfM.
 by rewrite mulrCA divfK ?normr_eq0 // mulrAC mulrA.
 Qed.
 
@@ -4965,8 +4594,8 @@ have [Qj | /nandP[/negP[]// | /negbNE/eqP->]] := boolP (Q j); last first.
   by rewrite mulrC divfK.
 have: `|F i + F j| = `|F i| + `|F j|.
   do [rewrite !(bigD1 j Qj) /=; set z := \sum_(k | _) `|_|] in norm_sumF.
-  apply/eqP; rewrite eqr_le ler_norm_add -(ler_add2r z) -addrA -norm_sumF addrA.
-  by rewrite (ler_trans (ler_norm_add _ _)) // ler_add2l ler_norm_sum.
+  apply/eqP; rewrite eq_le ler_norm_add -(ler_add2r z) -addrA -norm_sumF addrA.
+  by rewrite (le_trans (ler_norm_add _ _)) // ler_add2l ler_norm_sum.
 by case/normC_add_eq=> k _ [/(canLR (mulKf nzFi)) <-]; rewrite -(mulrC (F i)).
 Qed.
 
@@ -4985,14 +4614,14 @@ Lemma normC_sum_upper (I : finType) (P : pred I) (F G : I -> C) :
    forall i, P i -> F i = G i.
 Proof.
 set sumF := \sum_(i | _) _; set sumG := \sum_(i | _) _ => leFG eq_sumFG.
-have posG i: P i -> 0 <= G i by move/leFG; apply: ler_trans; apply: normr_ge0.
+have posG i: P i -> 0 <= G i by move/leFG; apply: le_trans.
 have norm_sumG: `|sumG| = sumG by rewrite ger0_norm ?sumr_ge0.
 have norm_sumF: `|sumF| = \sum_(i | P i) `|F i|.
-  apply/eqP; rewrite eqr_le ler_norm_sum eq_sumFG norm_sumG -subr_ge0 -sumrB.
+  apply/eqP; rewrite eq_le ler_norm_sum eq_sumFG norm_sumG -subr_ge0 -sumrB.
   by rewrite sumr_ge0 // => i Pi; rewrite subr_ge0 ?leFG.
 have [t _ defF] := normC_sum_eq norm_sumF.
 have [/(psumr_eq0P posG) G0 i Pi | nz_sumG] := eqVneq sumG 0.
-  by apply/eqP; rewrite G0 // -normr_eq0 eqr_le normr_ge0 -(G0 i Pi) leFG.
+  by apply/eqP; rewrite G0 // -normr_eq0 eq_le normr_ge0 -(G0 i Pi) leFG.
 have t1: t = 1.
   apply: (mulfI nz_sumG); rewrite mulr1 -{1}norm_sumG -eq_sumFG norm_sumF.
   by rewrite mulr_suml -(eq_bigr _ defF).
@@ -5025,43 +4654,188 @@ Arguments sqrCK_P {C x}.
 
 End Theory.
 
-(* TODO Kazuhiko: divide those Mixin builders into order.v and here *)
+(*************)
+(* FACTORIES *)
+(*************)
+
+Module NumMixin.
+Section NumMixin.
+Variable (R : idomainType).
+
+Record of_ := Mixin {
+  le : rel R;
+  lt : rel R;
+  norm : R -> R;
+  normD     : forall x y, le (norm (x + y)) (norm x + norm y);
+  addr_gt0  : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
+  norm_eq0  : forall x, norm x = 0 -> x = 0;
+  ger_total : forall x y, le 0 x -> le 0 y -> le x y || le y x;
+  normM     : {morph norm : x y / x * y};
+  le_def    : forall x y, (le x y) = (norm (y - x) == y - x);
+  lt_def    : forall x y, (lt x y) = (y != x) && (le x y)
+}.
+
+Variable (m : of_).
+
+Local Notation "x <= y" := (le m x y).
+Local Notation "x < y" := (lt m x y).
+Local Notation "`| x |" := (norm m x) : ring_scope.
+
+Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
+
+Lemma ge0_def x : (0 <= x) = (`|x| == x).
+Proof. by rewrite le_def subr0. Qed.
+
+Lemma subr_ge0 x y : (0 <= x - y) = (y <= x).
+Proof. by rewrite ge0_def -le_def. Qed.
+
+Lemma subr_gt0 x y : (0 < y - x) = (x < y).
+Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
+
+Lemma lt_trans : transitive (lt m).
+Proof.
+move=> y x z le_xy le_yz.
+by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 // subr_gt0.
+Qed.
+
+Lemma le01 : 0 <= 1.
+Proof.
+have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /norm_eq0->.
+by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
+Qed.
+
+Lemma lt01 : 0 < 1.
+Proof. by rewrite lt_def oner_neq0 le01. Qed.
+
+Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
+
+Lemma lerr x : x <= x.
+Proof.
+have n2: `|2%:R| == 2%:R :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
+rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
+by rewrite -(eqP n2) -normM mul0r.
+Qed.
+
+Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
+Proof.
+by rewrite eq_sym lt_def; case: eqP => //= ->; rewrite lerr.
+Qed.
+
+Lemma le_trans : transitive (le m).
+by move=> y x z; rewrite !le_def' => /predU1P [->|hxy] // /predU1P [<-|hyz];
+  rewrite ?hxy ?(lt_trans hxy hyz) orbT.
+Qed.
+
+Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
+Proof.
+rewrite -mulr_natr -[RHS]mulr_natr normM.
+congr (_ * _); apply/eqP; rewrite -ge0_def.
+elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
+by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
+Qed.
+
+Lemma normrN1 : `|-1| = 1 :> R.
+Proof.
+have: `|-1| ^+ 2 == 1 :> R
+  by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
+rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
+have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
+  by rewrite lt_def; case: eqP => // ->; rewrite lerr.
+by rewrite oppr_eq0 oner_eq0 => /(addr_gt0 lt01); rewrite subrr ltrr.
+Qed.
+
+Lemma normrN x : `|- x| = `|x|.
+Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
+
+Definition porderMixin : ltPOrderMixin R :=
+  LtPOrderMixin ltrr lt_trans le_def'.
+
+Definition normedDomainMixin :
+  @normed_mixin_of R R porderMixin :=
+  @Num.NormedMixin _ _ porderMixin (norm m)
+                   (normD m) (@norm_eq0 m) normrMn normrN.
+
+Definition numDomainMixin :
+  @mixin_of R porderMixin normedDomainMixin :=
+  @Num.Mixin _ porderMixin normedDomainMixin (@addr_gt0 m)
+             (@ger_total m) (@normM m) (@le_def m).
+
+End NumMixin.
+
+Module Exports.
+Notation numMixin := of_.
+Notation NumMixin := Mixin.
+Coercion porderMixin : numMixin >-> ltPOrderMixin.
+Coercion normedDomainMixin : numMixin >-> normed_mixin_of.
+Coercion numDomainMixin : numMixin >-> mixin_of.
+End Exports.
+
+End NumMixin.
 
 Module RealMixin.
+Section RealMixin.
+Variables (R : numDomainType).
 
-Section RealMixins.
+Variable (real : real_axiom R).
 
-Variables (R : idomainType) (le : rel R) (lt : rel R) (norm : R -> R).
-Local Infix "<=" := le.
-Local Infix "<" := lt.
-Local Notation "`| x |" := (norm x) : ring_scope.
+Lemma le_total : totalLatticeMixin R.
+Proof.
+move=> x y; move: (real (x - y)).
+by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
+Qed.
 
-Section LeMixin.
+Definition totalMixin :
+  Order.Total.mixin_of (LatticeType R le_total) := le_total.
 
-Hypothesis le0_add : forall x y, 0 <= x -> 0 <= y -> 0 <= x + y.
-Hypothesis le0_mul : forall x y, 0 <= x -> 0 <= y -> 0 <= x * y.
-Hypothesis le0_anti : forall x, 0 <= x -> x <= 0 -> x = 0.
-Hypothesis sub_ge0  : forall x y, (0 <= y - x) = (x <= y).
-Hypothesis le0_total : forall x, (0 <= x) || (x <= 0).
-Hypothesis normN: forall x, `|- x| = `|x|.
-Hypothesis ge0_norm : forall x, 0 <= x -> `|x| = x.
-Hypothesis lt_def : forall x y, (x < y) = (y != x) && (x <= y).
+End RealMixin.
+
+Module Exports.
+Coercion le_total : real_axiom >-> totalLatticeMixin.
+Coercion totalMixin : real_axiom >-> Order.Total.mixin_of.
+End Exports.
+
+End RealMixin.
+
+Module RealLeMixin.
+Section RealLeMixin.
+Variables (R : idomainType).
+
+Record of_ := Mixin {
+  le : rel R;
+  lt : rel R;
+  norm : R -> R;
+  le0_add   : forall x y, le 0 x -> le 0 y -> le 0 (x + y);
+  le0_mul   : forall x y, le 0 x -> le 0 y -> le 0 (x * y);
+  le0_anti  : forall x, le 0 x -> le x 0 -> x = 0;
+  sub_ge0   : forall x y, le 0 (y - x) = le x y;
+  le0_total : forall x, le 0 x || le x 0;
+  normN     : forall x, norm (- x) = norm x;
+  ge0_norm  : forall x, le 0 x -> norm x = x;
+  lt_def    : forall x y, lt x y = (y != x) && le x y;
+}.
+
+Variable (m : of_).
+
+Local Notation "x <= y" := (le m x y).
+Local Notation "x < y" := (lt m x y).
+Local Notation "`| x |" := (norm m x) : ring_scope.
 
 Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
 Let leN_total x : 0 <= x \/ 0 <= - x.
 Proof. by apply/orP; rewrite le0N le0_total. Qed.
 
-Let le00 : (0 <= 0). Proof. by have:= le0_total 0; rewrite orbb. Qed.
-Let le01 : (0 <= 1).
+Let le00 : 0 <= 0. Proof. by have:= le0_total m 0; rewrite orbb. Qed.
+Let le01 : 0 <= 1.
 Proof.
-by case/orP: (le0_total 1)=> // ?; rewrite -[1]mul1r -mulrNN le0_mul ?le0N.
+by case/orP: (le0_total m 1)=> // ?; rewrite -[1]mul1r -mulrNN le0_mul ?le0N.
 Qed.
+Let lt01 : 0 < 1. Proof. by rewrite lt_def oner_eq0. Qed.
 
 Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
 Proof.
-rewrite !lt_def => /andP[x_neq0 l0x] /andP[y_neq0 l0y]; rewrite le0_add //.
+rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
 rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
-by rewrite [x]le0_anti // hxy -le0N opprK.
+by rewrite [x](@le0_anti m) // hxy -le0N opprK.
 Qed.
 
 Fact eq0_norm x : `|x| = 0 -> x = 0.
@@ -5077,7 +4851,7 @@ rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
 by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
 Qed.
 
-Fact normM : {morph norm : x y / x * y}.
+Fact normM : {morph norm m : x y / x * y}.
 Proof.
 move=> x y /=; wlog x_ge0 : x / 0 <= x.
   by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
@@ -5096,73 +4870,761 @@ rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
 by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
 Qed.
 
-Lemma le_total x y : (x <= y) || (y <= x).
-Proof. by rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
+Fact le_total : total (le m).
+Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
-Definition Le :=
-  Mixin le_normD lt0_add eq0_norm (in2W le_total) normM le_def lt_def.
+Fact lerr : reflexive (le m).
+Proof. by move=> x; move: (le_total x x); rewrite orbb. Qed.
 
-Lemma Real (R' : numDomainType) & phant R' :
-  R' = NumDomainType R Le -> real_axiom R'.
-Proof. by move->. Qed.
+Fact le_anti : antisymmetric (le m).
+Proof.
+move=> x y /andP [].
+rewrite -sub_ge0 -(sub_ge0 _ y) -opprB le0N => hxy hxy'.
+by move/eqP: (le0_anti hxy' hxy); rewrite subr_eq0 => /eqP.
+Qed.
 
-End LeMixin.
+Fact le_trans : transitive (le m).
+Proof.
+by move=> x y z hyx hxz; rewrite -sub_ge0 -(subrK x z) -addrA le0_add ?sub_ge0.
+Qed.
 
-Section LtMixin.
+Lemma ge0_def x : (0 <= x) = (`|x| == x).
+Proof. by rewrite le_def subr0. Qed.
 
-Hypothesis lt0_add : forall x y, 0 < x -> 0 < y -> 0 < x + y.
-Hypothesis lt0_mul : forall x y, 0 < x -> 0 < y -> 0 < x * y.
-Hypothesis lt0_ngt0  : forall x,  0 < x -> ~~ (x < 0).
-Hypothesis sub_gt0  : forall x y, (0 < y - x) = (x < y).
-Hypothesis lt0_total : forall x, x != 0 -> (0 < x) || (x < 0).
-Hypothesis normN : forall x, `|- x| = `|x|.
-Hypothesis ge0_norm : forall x, 0 <= x -> `|x| = x.
-Hypothesis le_def : forall x y, (x <= y) = (y == x) || (x < y).
+Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
+Proof.
+rewrite -mulr_natr -[RHS]mulr_natr normM.
+congr (_ * _); apply/eqP; rewrite -ge0_def.
+elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
+by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
+Qed.
+
+Lemma normrN1 : `|-1| = 1 :> R.
+Proof.
+have: `|-1| ^+ 2 == 1 :> R
+  by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
+rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
+have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
+  by rewrite lt_def; case: eqP => // ->.
+by rewrite oppr_eq0 oner_eq0 => /(lt0_add lt01); rewrite subrr lt_def eqxx.
+Qed.
+
+Lemma normrN x : `|- x| = `|x|.
+Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
+
+Definition orderMixin : leOrderMixin ring_display R :=
+  LeOrderMixin ring_display
+               le_anti le_trans le_total (lt_def _) (rrefl _) (rrefl _).
+
+Definition normedDomainMixin :
+  @normed_mixin_of R R orderMixin :=
+  @Num.NormedMixin _ _ orderMixin (norm m)
+                   le_normD eq0_norm normrMn normrN.
+
+Definition numMixin :
+  @mixin_of R orderMixin normedDomainMixin :=
+  @Num.Mixin _ orderMixin normedDomainMixin
+             lt0_add (in2W le_total) normM le_def.
+
+End RealLeMixin.
+
+Module Exports.
+Notation realLeMixin := of_.
+Notation RealLeMixin := Mixin.
+Coercion orderMixin : realLeMixin >-> leOrderMixin.
+Coercion normedDomainMixin : realLeMixin >-> normed_mixin_of.
+Coercion numMixin : realLeMixin >-> mixin_of.
+End Exports.
+
+End RealLeMixin.
+
+Module RealLtMixin.
+Section RealLtMixin.
+Variables (R : idomainType).
+
+Record of_ := Mixin {
+  lt : rel R;
+  le : rel R;
+  norm : R -> R;
+  lt0_add   : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
+  lt0_mul   : forall x y, lt 0 x -> lt 0 y -> lt 0 (x * y);
+  lt0_ngt0  : forall x,  lt 0 x -> ~~ (lt x 0);
+  sub_gt0   : forall x y, lt 0 (y - x) = lt x y;
+  lt0_total : forall x, x != 0 -> lt 0 x || lt x 0;
+  normN     : forall x, norm (- x) = norm x;
+  ge0_norm  : forall x, le 0 x -> norm x = x;
+  le_def    : forall x y, le x y = (x == y) || lt x y;
+}.
+
+Variable (m : of_).
+
+Local Notation "x < y" := (lt m x y).
+Local Notation "x <= y" := (le m x y).
+Local Notation "`| x |" := (norm m x) : ring_scope.
+
+Fact lt0N x : (- x < 0) = (0 < x).
+Proof. by rewrite -sub_gt0 add0r opprK. Qed.
+Let leN_total x : 0 <= x \/ 0 <= - x.
+Proof.
+rewrite !le_def [_ == - x]eq_sym oppr_eq0 eq_sym -[0 < - x]lt0N opprK.
+apply/orP; case: (altP eqP) => //=; exact: lt0_total.
+Qed.
+
+Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
+Let le01 : (0 <= 1).
+Proof.
+rewrite le_def eq_sym; case: (altP eqP) => // /(lt0_total m) /orP [] //= ?.
+by rewrite -[1]mul1r -mulrNN lt0_mul -?lt0N ?opprK.
+Qed.
+
+Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
+Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
 
 Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
-rewrite !le_def => /predU1P[->|x_gt0]; first by rewrite add0r.
-by case/predU1P=> [->|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
+rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
+by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
 Qed.
 
 Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
 Proof.
-rewrite !le_def => /predU1P[->|x_gt0]; first by rewrite mul0r eqxx.
-by case/predU1P=> [->|y_gt0]; rewrite ?mulr0 ?eqxx // orbC lt0_mul.
+rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite mul0r eqxx.
+by case/predU1P=> [<-|y_gt0]; rewrite ?mulr0 ?eqxx ?lt0_mul // orbT.
 Qed.
 
-Fact le0_anti x : 0 <= x -> x <= 0 -> x = 0.
-Proof. by rewrite !le_def => /predU1P[] // /lt0_ngt0/negPf-> /predU1P[]. Qed.
+Fact normM : {morph norm m : x y / x * y}.
+Proof.
+move=> x y /=; wlog x_ge0 : x / 0 <= x.
+  by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
+wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
+by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
+Qed.
 
-Fact sub_ge0  x y : (0 <= y - x) = (x <= y).
-Proof. by rewrite !le_def subr_eq0 sub_gt0. Qed.
+Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+Proof.
+wlog x_ge0 : x y / 0 <= x.
+  by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
+rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
+  by rewrite !ge0_norm ?subrr ?le0_add.
+rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
+  by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
+Qed.
+
+Fact eq0_norm x : `|x| = 0 -> x = 0.
+Proof.
+case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
+by rewrite -[x]opprK -Dnx normN nx0 oppr0.
+Qed.
+
+Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
+Proof.
+wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
+rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
+by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
+Qed.
 
 Fact lt_def x y : (x < y) = (y != x) && (x <= y).
 Proof.
-rewrite le_def; case: eqP => //= ->; rewrite -sub_gt0 subrr.
+rewrite le_def eq_sym; case: eqP => //= ->; rewrite -sub_gt0 subrr.
 by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
 Qed.
 
-Fact le0_total x : (0 <= x) || (x <= 0).
-Proof. by rewrite !le_def [0 == _]eq_sym; have [|/lt0_total] := altP eqP. Qed.
+Fact lt_irr : irreflexive (lt m).
+Proof. by move=> x; rewrite lt_def eqxx. Qed.
 
-Definition Lt :=
-  Le le0_add le0_mul le0_anti sub_ge0 le0_total normN ge0_norm lt_def.
+Fact lt_asym x y : ~~ ((x < y) && (y < x)).
+Proof.
+rewrite -[x < _]sub_gt0 -[y < _]sub_gt0 -lt0N opprB andbC.
+by apply/negP => /andP [] /lt0_ngt0; case: (_ < _).
+Qed.
 
-End LtMixin.
+Fact lt_trans : transitive (lt m).
+Proof.
+move=> y x z; rewrite -sub_gt0 -![_ < z]sub_gt0.
+rewrite -[z - x](subrKA y) [_ - _ + _]addrC; exact: lt0_add.
+Qed.
 
-End RealMixins.
+Lemma le_trans : transitive (le m).
+by move=> y x z; rewrite !le_def => /predU1P [->|hxy] // /predU1P [<-|hyz];
+  rewrite ?hxy ?(lt_trans hxy hyz) orbT.
+Qed.
 
-End RealMixin.
+Fact lt_total x y : x != y -> (x < y) || (y < x).
+Proof.
+rewrite -subr_eq0 => /(lt0_total m).
+by rewrite -(sub_gt0 _ (x - y)) sub0r opprB !sub_gt0 orbC.
+Qed.
+
+Fact le_total : total (le m).
+Proof.
+by move=> x y; rewrite !le_def [y == x]eq_sym; case: (altP eqP) => [|/lt_total].
+Qed.
+
+Let lt01 : 0 < 1. Proof. by rewrite lt_def oner_eq0. Qed.
+
+Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
+Proof.
+rewrite -mulr_natr -[RHS]mulr_natr normM.
+congr (_ * _); apply/eqP; rewrite -[n%:R]subr0 -le_def'.
+elim: n => [|n ih]; [rewrite le_def eqxx // | apply: (le_trans ih)].
+by rewrite le_def' -natrB // subSnn -[_%:R]subr0 -le_def' mulr1n le01.
+Qed.
+
+Definition orderMixin : ltOrderMixin ring_display R :=
+  LtOrderMixin ring_display
+               lt_irr lt_trans lt_total (le_def m) (rrefl _) (rrefl _).
+
+Definition normedDomainMixin :
+  @normed_mixin_of R R orderMixin :=
+  @Num.NormedMixin _ _ orderMixin (norm m)
+                   le_normD eq0_norm normrMn (@normN m).
+
+Definition numMixin :
+  @mixin_of R orderMixin normedDomainMixin :=
+  @Num.Mixin _ orderMixin normedDomainMixin
+             (@lt0_add m) (in2W le_total) normM le_def'.
+
+End RealLtMixin.
+
+Module Exports.
+Notation realLtMixin := of_.
+Notation RealLtMixin := Mixin.
+Coercion orderMixin : realLtMixin >-> ltOrderMixin.
+Coercion normedDomainMixin : realLtMixin >-> normed_mixin_of.
+Coercion numMixin : realLtMixin >-> mixin_of.
+End Exports.
+
+End RealLtMixin.
 
 End Num.
 
-Export Num.NumDomain.Exports Num.NumField.Exports Num.ClosedField.Exports.
+Export Num.NumDomain.Exports Num.NormedDomain.Exports.
+Export Num.NumDomain_joins.Exports.
+Export Num.NumField.Exports Num.ClosedField.Exports.
 Export Num.RealDomain.Exports Num.RealField.Exports.
 Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
+Export Num.NumMixin.Exports Num.RealMixin.Exports.
+Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
 
-Notation RealLeMixin := Num.RealMixin.Le.
-Notation RealLtMixin := Num.RealMixin.Lt.
-Notation RealLeAxiom R := (Num.RealMixin.Real (Phant R) (erefl _)).
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
+
+(* compatibility module *)
+Module mc_1_9.
+Module Num.
+(* If you failed to process the next line in the PG or the CoqIDE, replace    *)
+(* all the "ssrnum.Num" with "Top.Num" in this module to process them, and    *)
+(* revert them in order to compile and commit.  This problem will be solved   *)
+(* in Coq 8.10.  See also: https://github.com/math-comp/math-comp/pull/270.   *)
+Export ssrnum.Num.
+Import ssrnum.Num.Def.
+
+Module Import Syntax.
+Notation "`| x |" :=
+  (@norm _ (@Num.NormedDomain.numDomain_normedDomainType _) x) : ring_scope.
+End Syntax.
+
+Module Import Theory.
+Export ssrnum.Num.Theory.
+
+Section NumIntegralDomainTheory.
+Variable R : numDomainType.
+Implicit Types x y z : R.
+Definition ltr_def x y : (x < y) = (y != x) && (x <= y) := lt_def x y.
+Definition gerE x y : ge x y = (y <= x) := geE x y.
+Definition gtrE x y : gt x y = (y < x) := gtE x y.
+Definition lerr x : x <= x := lexx x.
+Definition ltrr x : x < x = false := ltxx x.
+Definition ltrW x y : x < y -> x <= y := @ltW _ _ x y.
+Definition ltr_neqAle x y : (x < y) = (x != y) && (x <= y) := lt_neqAle x y.
+Definition ler_eqVlt x y : (x <= y) = (x == y) || (x < y) := le_eqVlt x y.
+Definition gtr_eqF x y : y < x -> x == y = false := @gt_eqF _ _ x y.
+Definition ltr_eqF x y : x < y -> x == y = false := @lt_eqF _ _ x y.
+Definition ler_asym : antisymmetric (@ler R) := le_anti.
+Definition eqr_le x y : (x == y) = (x <= y <= x) := eq_le x y.
+Definition ltr_trans : transitive (@ltr R) := lt_trans.
+Definition ler_lt_trans y x z : x <= y -> y < z -> x < z :=
+  @le_lt_trans _ _ y x z.
+Definition ltr_le_trans y x z : x < y -> y <= z -> x < z :=
+  @lt_le_trans _ _ y x z.
+Definition ler_trans : transitive (@ler R) := le_trans.
+Definition lterr := (lerr, ltrr).
+Definition lerifP x y C :
+  reflect (x <= y ?= iff C) (if C then x == y else x < y) := leifP.
+Definition ltr_asym x y : x < y < x = false := lt_asym x y.
+Definition ler_anti : antisymmetric (@ler R) := le_anti.
+Definition ltr_le_asym x y : x < y <= x = false := lt_le_asym x y.
+Definition ler_lt_asym x y : x <= y < x = false := le_lt_asym x y.
+Definition lter_anti := (=^~ eqr_le, ltr_asym, ltr_le_asym, ler_lt_asym).
+Definition ltr_geF x y : x < y -> y <= x = false := @lt_geF _ _ x y.
+Definition ler_gtF x y : x <= y -> y < x = false := @le_gtF _ _ x y.
+Definition ltr_gtF x y : x < y -> y < x = false := @lt_gtF _ _ x y.
+Definition normr0 : `|0| = 0 :> R := normr0 _.
+Definition normrMn x n : `|x *+ n| = `|x| *+ n := normrMn x n.
+Definition normr0P {x} : reflect (`|x| = 0) (x == 0) := normr0P.
+Definition normr_eq0 x : (`|x| == 0) = (x == 0) := normr_eq0 x.
+Definition normrN x : `|- x| = `|x| := normrN x.
+Definition distrC x y : `|x - y| = `|y - x| := distrC x y.
+Definition normr_id x : `| `|x| | = `|x| := normr_id x.
+Definition normr_ge0 x : 0 <= `|x| := normr_ge0 x.
+Definition normr_le0 x : (`|x| <= 0) = (x == 0) := normr_le0 x.
+Definition normr_lt0 x : `|x| < 0 = false := normr_lt0 x.
+Definition normr_gt0 x : (`|x| > 0) = (x != 0) := normr_gt0 x.
+Definition normrE := (normr_id, normr0, @normr1 R, @normrN1 R, normr_ge0,
+                      normr_eq0, normr_lt0, normr_le0, normr_gt0, normrN).
+End NumIntegralDomainTheory.
+
+Section NumIntegralDomainMonotonyTheory.
+Variables R R' : numDomainType.
+Section AcrossTypes.
+Variables (D D' : pred R) (f : R -> R').
+Definition ltrW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y} :=
+  ltW_homo (f := f).
+Definition ltrW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y} :=
+  ltW_nhomo (f := f).
+Definition inj_homo_ltr :
+  injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y} :=
+  inj_homo_lt (f := f).
+Definition inj_nhomo_ltr :
+  injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y} :=
+  inj_nhomo_lt (f := f).
+Definition incr_inj : {mono f : x y / x <= y} -> injective f :=
+  inc_inj (f := f).
+Definition decr_inj : {mono f : x y /~ x <= y} -> injective f :=
+  dec_inj (f := f).
+Definition lerW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y} :=
+  leW_mono (f := f).
+Definition lerW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y} :=
+  leW_nmono (f := f).
+Definition ltrW_homo_in :
+  {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}} :=
+  ltW_homo_in (f := f).
+Definition ltrW_nhomo_in :
+  {in D & D', {homo f : x y /~ x < y}} ->
+  {in D & D', {homo f : x y /~ x <= y}} :=
+  ltW_nhomo_in (f := f).
+Definition inj_homo_ltr_in :
+  {in D & D', injective f} -> {in D & D', {homo f : x y / x <= y}} ->
+  {in D & D', {homo f : x y / x < y}} :=
+  inj_homo_lt_in (f := f).
+Definition inj_nhomo_ltr_in :
+    {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
+  {in D & D', {homo f : x y /~ x < y}} :=
+  inj_nhomo_lt_in (f := f).
+Definition incr_inj_in :
+  {in D &, {mono f : x y / x <= y}} -> {in D &, injective f} :=
+  inc_inj_in (f := f).
+Definition decr_inj_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f} :=
+  dec_inj_in (f := f).
+Definition lerW_mono_in :
+  {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}} :=
+  leW_mono_in (f := f).
+Definition lerW_nmono_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}} :=
+  leW_nmono_in (f := f).
+End AcrossTypes.
+Section NatToR.
+Variables (D D' : pred nat) (f : nat -> R).
+Definition ltnrW_homo :
+  {homo f : m n / (m < n)%N >-> m < n} ->
+  {homo f : m n / (m <= n)%N >-> m <= n} :=
+  ltW_homo (f := f).
+Definition ltnrW_nhomo :
+  {homo f : m n / (n < m)%N >-> m < n} ->
+  {homo f : m n / (n <= m)%N >-> m <= n} :=
+  ltW_nhomo (f := f).
+Definition inj_homo_ltnr : injective f ->
+  {homo f : m n / (m <= n)%N >-> m <= n} ->
+  {homo f : m n / (m < n)%N >-> m < n} :=
+  inj_homo_lt (f := f).
+Definition inj_nhomo_ltnr : injective f ->
+  {homo f : m n / (n <= m)%N >-> m <= n} ->
+  {homo f : m n / (n < m)%N >-> m < n} :=
+  inj_nhomo_lt (f := f).
+Definition incnr_inj :
+  {mono f : m n / (m <= n)%N >-> m <= n} -> injective f :=
+  inc_inj (f := f).
+Definition decnr_inj :
+  {mono f : m n / (n <= m)%N >-> m <= n} -> injective f :=
+  dec_inj (f := f).
+Definition decnr_inj_inj := decnr_inj.
+Definition lenrW_mono : {mono f : m n / (m <= n)%N >-> m <= n} ->
+  {mono f : m n / (m < n)%N >-> m < n} :=
+  leW_mono (f := f).
+Definition lenrW_nmono : {mono f : m n / (n <= m)%N >-> m <= n} ->
+  {mono f : m n / (n < m)%N >-> m < n} :=
+  leW_nmono (f := f).
+Definition lenr_mono : {homo f : m n / (m < n)%N >-> m < n} ->
+   {mono f : m n / (m <= n)%N >-> m <= n} :=
+  le_mono (f := f).
+Definition lenr_nmono :
+  {homo f : m n / (n < m)%N >-> m < n} ->
+  {mono f : m n / (n <= m)%N >-> m <= n} :=
+  le_nmono (f := f).
+Definition ltnrW_homo_in :
+  {in D & D', {homo f : m n / (m < n)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} :=
+  ltW_homo_in (f := f).
+Definition ltnrW_nhomo_in :
+  {in D & D', {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} :=
+  ltW_nhomo_in (f := f).
+Definition inj_homo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (m < n)%N >-> m < n}} :=
+  inj_homo_lt_in (f := f).
+Definition inj_nhomo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (n < m)%N >-> m < n}} :=
+  inj_nhomo_lt_in (f := f).
+Definition incnr_inj_in :
+  {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} -> {in D &, injective f} :=
+  inc_inj_in (f := f).
+Definition decnr_inj_in :
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} -> {in D &, injective f} :=
+  dec_inj_in (f := f).
+Definition decnr_inj_inj_in := decnr_inj_in.
+Definition lenrW_mono_in :
+  {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (m < n)%N >-> m < n}} :=
+  leW_mono_in (f := f).
+Definition lenrW_nmono_in :
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (n < m)%N >-> m < n}} :=
+  leW_nmono_in (f := f).
+Definition lenr_mono_in :
+  {in D &, {homo f : m n / (m < n)%N >-> m < n}} ->
+  {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} :=
+  le_mono_in (f := f).
+Definition lenr_nmono_in :
+  {in D &, {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} :=
+  le_nmono_in (f := f).
+End NatToR.
+Section RToNat.
+Variables (D D' : pred R) (f : R -> nat).
+Definition ltrnW_homo :
+  {homo f : m n / m < n >-> (m < n)%N} ->
+  {homo f : m n / m <= n >-> (m <= n)%N} :=
+  ltW_homo (f := f).
+Definition ltrnW_nhomo :
+  {homo f : m n / n < m >-> (m < n)%N} ->
+ {homo f : m n / n <= m >-> (m <= n)%N} :=
+  ltW_nhomo (f := f).
+Definition inj_homo_ltrn : injective f ->
+  {homo f : m n / m <= n >-> (m <= n)%N} ->
+  {homo f : m n / m < n >-> (m < n)%N} :=
+  inj_homo_lt (f := f).
+Definition inj_nhomo_ltrn : injective f ->
+  {homo f : m n / n <= m >-> (m <= n)%N} ->
+  {homo f : m n / n < m >-> (m < n)%N} :=
+  inj_nhomo_lt (f := f).
+Definition incrn_inj : {mono f : m n / m <= n >-> (m <= n)%N} -> injective f :=
+  inc_inj (f := f).
+Definition decrn_inj : {mono f : m n / n <= m >-> (m <= n)%N} -> injective f :=
+  dec_inj (f := f).
+Definition lernW_mono :
+  {mono f : m n / m <= n >-> (m <= n)%N} ->
+  {mono f : m n / m < n >-> (m < n)%N} :=
+  leW_mono (f := f).
+Definition lernW_nmono :
+  {mono f : m n / n <= m >-> (m <= n)%N} ->
+  {mono f : m n / n < m >-> (m < n)%N} :=
+  leW_nmono (f := f).
+Definition ltrnW_homo_in :
+  {in D & D', {homo f : m n / m < n >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} :=
+  ltW_homo_in (f := f).
+Definition ltrnW_nhomo_in :
+  {in D & D', {homo f : m n / n < m >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} :=
+  ltW_nhomo_in (f := f).
+Definition inj_homo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / m < n >-> (m < n)%N}} :=
+  inj_homo_lt_in (f := f).
+Definition inj_nhomo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / n < m >-> (m < n)%N}} :=
+  inj_nhomo_lt_in (f := f).
+Definition incrn_inj_in :
+  {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} -> {in D &, injective f} :=
+  inc_inj_in (f := f).
+Definition decrn_inj_in :
+  {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} -> {in D &, injective f} :=
+  dec_inj_in (f := f).
+Definition lernW_mono_in :
+  {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / m < n >-> (m < n)%N}} :=
+  leW_mono_in (f := f).
+Definition lernW_nmono_in :
+  {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / n < m >-> (m < n)%N}} :=
+  leW_nmono_in (f := f).
+End RToNat.
+End NumIntegralDomainMonotonyTheory.
+
+Section NumDomainOperationTheory.
+Variable R : numDomainType.
+Implicit Types x y z t : R.
+Definition real_lerP := real_leP.
+Definition real_ltrP := real_ltP.
+Definition real_ltrNge := real_ltNge.
+Definition real_lerNgt := real_leNgt.
+Definition real_ltrgtP := real_ltgtP.
+Definition real_ger0P := real_ge0P.
+Definition real_ltrgt0P := real_ltgt0P.
+Definition lerif_refl x C : reflect (x <= x ?= iff C) C := leif_refl.
+Definition lerif_trans x1 x2 x3 C12 C23 :
+  x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23 :=
+  @leif_trans _ _ x1 x2 x3 C12 C23.
+Definition lerif_le x y : x <= y -> x <= y ?= iff (x >= y) := @leif_le _ _ x y.
+Definition lerif_eq x y : x <= y -> x <= y ?= iff (x == y) := @leif_eq _ _ x y.
+Definition ger_lerif x y C : x <= y ?= iff C -> (y <= x) = C :=
+  @ge_leif _ _ x y C.
+Definition ltr_lerif x y C : x <= y ?= iff C -> (x < y) = ~~ C :=
+  @lt_leif _ _ x y C.
+Definition normr_real x : `|x| \is real := normr_real x.
+Definition ler_norm_sum I r (G : I -> R) (P : pred I):
+  `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i| :=
+  ler_norm_sum r G P.
+Definition ler_norm_sub x y : `|x - y| <= `|x| + `|y| := ler_norm_sub x y.
+Definition ler_dist_add z x y : `|x - y| <= `|x - z| + `|z - y| :=
+  ler_dist_add z x y.
+Definition ler_sub_norm_add x y : `|x| - `|y| <= `|x + y| :=
+  ler_sub_norm_add x y.
+Definition ler_sub_dist x y : `|x| - `|y| <= `|x - y| := ler_sub_dist x y.
+Definition ler_dist_dist x y : `| `|x| - `|y| | <= `|x - y| :=
+  ler_dist_dist x y.
+Definition ler_dist_norm_add x y : `| `|x| - `|y| | <= `|x + y| :=
+  ler_dist_norm_add x y.
+Definition ler_nnorml x y : y < 0 -> `|x| <= y = false := @ler_nnorml _ _ x y.
+Definition ltr_nnorml x y : y <= 0 -> `|x| < y = false := @ltr_nnorml _ _ x y.
+Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
+Definition lerif_nat m n C :
+  (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N :=
+  leif_nat_r _ m n C.
+Definition mono_in_lerif (A : pred R) (f : R -> R) C :
+  {in A &, {mono f : x y / x <= y}} ->
+  {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)} :=
+  @mono_in_leif _ _ A f C.
+Definition mono_lerif (f : R -> R) C :
+  {mono f : x y / x <= y} ->
+  forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C) :=
+  @mono_leif _ _ f C.
+Definition nmono_in_lerif (A : pred R) (f : R -> R) C :
+  {in A &, {mono f : x y /~ x <= y}} ->
+  {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)} :=
+  @nmono_in_leif _ _ A f C.
+Definition nmono_lerif (f : R -> R) C :
+  {mono f : x y /~ x <= y} ->
+  forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C) :=
+  @nmono_leif _ _ f C.
+Definition lerif_subLR := leif_subLR.
+Definition lerif_subRL := leif_subRL.
+Definition lerif_add := leif_add.
+Definition lerif_sum := leif_sum.
+Definition lerif_0_sum := leif_0_sum.
+Definition real_lerif_norm := real_leif_norm.
+Definition lerif_pmul := leif_pmul.
+Definition lerif_nmul := leif_nmul.
+Definition lerif_pprod := leif_pprod.
+Definition real_lerif_mean_square_scaled := real_leif_mean_square_scaled.
+Definition real_lerif_AGM2_scaled := real_leif_AGM2_scaled.
+Definition lerif_AGM_scaled := leif_AGM_scaled.
+End NumDomainOperationTheory.
+
+Section NumFieldTheory.
+Definition real_lerif_mean_square := real_leif_mean_square.
+Definition real_lerif_AGM2 := real_leif_AGM2.
+Definition lerif_AGM := leif_AGM.
+End NumFieldTheory.
+
+Section RealDomainTheory.
+Variable R : realDomainType.
+Implicit Types x y z t : R.
+Definition ler_total : total (@ler R) := le_total.
+Definition ltr_total x y : x != y -> (x < y) || (y < x) :=
+  @lt_total _ _ x y.
+Definition wlog_ler P :
+  (forall a b, P b a -> P a b) -> (forall a b, a <= b -> P a b) ->
+  forall a b : R, P a b :=
+  @wlog_le _ _ P.
+Definition wlog_ltr P :
+  (forall a, P a a) ->
+  (forall a b, (P b a -> P a b)) -> (forall a b, a < b -> P a b) ->
+  forall a b : R, P a b :=
+  @wlog_lt _ _ P.
+Definition ltrNge x y : (x < y) = ~~ (y <= x) := @ltNge _ _ x y.
+Definition lerNgt x y : (x <= y) = ~~ (y < x) := @leNgt _ _ x y.
+Definition neqr_lt x y : (x != y) = (x < y) || (y < x) := @neq_lt _ _ x y.
+Definition eqr_leLR x y z t :
+  (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t) :=
+  @eq_leLR _ _ x y z t.
+Definition eqr_leRL x y z t :
+  (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y) :=
+  @eq_leRL _ _ x y z t.
+Definition eqr_ltLR x y z t :
+  (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t) :=
+  @eq_ltLR _ _ x y z t.
+Definition eqr_ltRL x y z t :
+  (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y) :=
+  @eq_ltRL _ _ x y z t.
+End RealDomainTheory.
+
+Section RealDomainMonotony.
+Variables (R : realDomainType) (R' : numDomainType) (D : pred R).
+Variables (f : R -> R') (f' : R -> nat).
+Definition ler_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y} :=
+  le_mono (f := f).
+Definition homo_mono := ler_mono.
+Definition ler_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y} :=
+  le_nmono (f := f).
+Definition nhomo_mono := ler_nmono.
+Definition ler_mono_in :
+  {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}} :=
+  le_mono_in (f := f).
+Definition homo_mono_in := ler_mono_in.
+Definition ler_nmono_in :
+  {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}} :=
+  le_nmono_in (f := f).
+Definition nhomo_mono_in := ler_nmono_in.
+Definition lern_mono :
+  {homo f' : m n / m < n >-> (m < n)%N} ->
+  {mono f' : m n / m <= n >-> (m <= n)%N} :=
+  le_mono (f := f').
+Definition lern_nmono :
+  {homo f' : m n / n < m >-> (m < n)%N} ->
+  {mono f' : m n / n <= m >-> (m <= n)%N} :=
+  le_nmono (f := f').
+Definition lern_mono_in :
+  {in D &, {homo f' : m n / m < n >-> (m < n)%N}} ->
+  {in D &, {mono f' : m n / m <= n >-> (m <= n)%N}} :=
+  le_mono_in (f := f').
+Definition lern_nmono_in :
+  {in D &, {homo f' : m n / n < m >-> (m < n)%N}} ->
+  {in D &, {mono f' : m n / n <= m >-> (m <= n)%N}} :=
+  le_nmono_in (f := f').
+End RealDomainMonotony.
+
+Section RealDomainOperations.
+Variable R : realDomainType.
+Implicit Types x y z : R.
+Definition lerif_mean_square_scaled := leif_mean_square_scaled.
+Definition lerif_AGM2_scaled := leif_AGM2_scaled.
+Section MinMax.
+Definition minrC : @commutative R R min := @meetC _ R.
+Definition minrr : @idempotent R min := @meetxx _ R.
+Definition minr_l x y : x <= y -> min x y = x := elimT meet_idPl.
+Definition minr_r x y : y <= x -> min x y = y := elimT meet_idPr.
+Definition maxrC : @commutative R R max := @joinC _ R.
+Definition maxrr : @idempotent R max := @joinxx _ R.
+Definition maxr_l x y : y <= x -> max x y = x := elimT join_idPr.
+Definition maxr_r x y : x <= y -> max x y = y := elimT join_idPl.
+Definition minrA x y z : min x (min y z) = min (min x y) z := meetA x y z.
+Definition minrCA : @left_commutative R R min := meetCA.
+Definition minrAC : @right_commutative R R min := meetAC.
+Definition maxrA x y z : max x (max y z) = max (max x y) z := joinA x y z.
+Definition maxrCA : @left_commutative R R max := joinCA.
+Definition maxrAC : @right_commutative R R max := joinAC.
+Definition eqr_minl x y : (min x y == x) = (x <= y) := eq_meetl x y.
+Definition eqr_minr x y : (min x y == y) = (y <= x) := eq_meetr x y.
+Definition eqr_maxl x y : (max x y == x) = (y <= x) := eq_joinl x y.
+Definition eqr_maxr x y : (max x y == y) = (x <= y) := eq_joinr x y.
+Definition ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z) := lexI x y z.
+Definition ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x) := leIx x y z.
+Definition ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z) := lexU x y z.
+Definition ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x) := leUx y z x.
+Definition ltr_minr x y z : (x < min y z) = (x < y) && (x < z) := ltxI x y z.
+Definition ltr_minl x y z : (min y z < x) = (y < x) || (z < x) := ltIx x y z.
+Definition ltr_maxr x y z : (x < max y z) = (x < y) || (x < z) := ltxU x y z.
+Definition ltr_maxl x y z : (max y z < x) = (y < x) && (z < x) := ltUx x y z.
+Definition lter_minr := (ler_minr, ltr_minr).
+Definition lter_minl := (ler_minl, ltr_minl).
+Definition lter_maxr := (ler_maxr, ltr_maxr).
+Definition lter_maxl := (ler_maxl, ltr_maxl).
+Definition minrK x y : max (min x y) x = x := meetUKC y x.
+Definition minKr x y : min y (max x y) = y := joinKIC x y.
+Definition maxr_minl : @left_distributive R R max min := @joinIl _ R.
+Definition maxr_minr : @right_distributive R R max min := @joinIr _ R.
+Definition minr_maxl : @left_distributive R R min max := @meetUl _ R.
+Definition minr_maxr : @right_distributive R R min max := @meetUr _ R.
+Variant minr_spec x y : bool -> bool -> R -> Type :=
+| Minr_r of x <= y : minr_spec x y true false x
+| Minr_l of y < x : minr_spec x y false true y.
+Lemma minrP x y : minr_spec x y (x <= y) (y < x) (min x y).
+Proof. by case: leP; constructor. Qed.
+Variant maxr_spec x y : bool -> bool -> R -> Type :=
+| Maxr_r of y <= x : maxr_spec x y true false x
+| Maxr_l of x < y : maxr_spec x y false true y.
+Lemma maxrP x y : maxr_spec x y (y <= x) (x < y) (max x y).
+Proof. by case: (leP y); constructor. Qed.
+End MinMax.
+End RealDomainOperations.
+
+Section RealField.
+Definition lerif_mean_square := leif_mean_square.
+Definition lerif_AGM2 := leif_AGM2.
+End RealField.
+
+Section RealClosedFieldTheory.
+Definition lerif_normC_Re_Creal := leif_normC_Re_Creal.
+Definition lerif_Re_Creal := leif_Re_Creal.
+Definition lerif_rootC_AGM := leif_rootC_AGM.
+End RealClosedFieldTheory.
+
+Arguments lerifP {R x y C}.
+Arguments lerif_refl {R x C}.
+Arguments mono_in_lerif [R A f C].
+Arguments nmono_in_lerif [R A f C].
+Arguments mono_lerif [R f C].
+Arguments nmono_lerif [R f C].
+
+Section RealDomainArgExtremum.
+
+Context {R : realDomainType} {I : finType} (i0 : I).
+Context (P : pred I) (F : I -> R) (Pi0 : P i0).
+
+Definition arg_minr := extremum <=%R i0 P F.
+Definition arg_maxr := extremum >=%R i0 P F.
+Definition arg_minrP : extremum_spec <=%R P F arg_minr := arg_minP F Pi0.
+Definition arg_maxrP : extremum_spec >=%R P F arg_maxr := arg_maxP F Pi0.
+
+End RealDomainArgExtremum.
+
+End Theory.
+
+Notation "[ 'arg' 'minr_' ( i < i0 | P ) F ]" :=
+    (arg_minr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 'in' A ) F ]" :=
+    [arg minr_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 ) F ]" := [arg minr_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0 )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 | P ) F ]" :=
+     (arg_maxr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 'in' A ) F ]" :=
+    [arg maxr_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
+
+End Num.
+End mc_1_9.
+
+Export mc_1_9 mc_1_9.Num.Syntax.

@@ -1700,7 +1700,7 @@ Definition clone c of phant_id class c := @Pack phR T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack T b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0) mul0) :=
+Definition pack b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0) mul0) :=
   fun bT b & phant_id (Ring.class bT) (b : Ring.class_of T) =>
   fun mT m & phant_id (@Lmodule.class R phR mT) (@Lmodule.Class R T b m) =>
   fun ax & phant_id axT ax =>

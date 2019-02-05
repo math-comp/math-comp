@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient finalg action gproduct.
 From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
@@ -91,7 +91,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory Num.Theory.
+Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 Delimit Scope cfun_scope with CF.
 
@@ -900,7 +900,7 @@ by rewrite phi0 // => y _; apply: mul_conjC_ge0.
 Qed.
 
 Lemma cfnorm_gt0 phi : ('[phi] > 0) = (phi != 0).
-Proof. by rewrite ltr_def cfnorm_ge0 cfnorm_eq0 andbT. Qed.
+Proof. by rewrite lt_def cfnorm_ge0 cfnorm_eq0 andbT. Qed.
 
 Lemma sqrt_cfnorm_ge0 phi : 0 <= sqrtC '[phi].
 Proof. by rewrite sqrtC_ge0 cfnorm_ge0. Qed.
@@ -944,7 +944,7 @@ Lemma cfCauchySchwarz phi psi :
 Proof.
 rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC.
 have [-> | nz_psi] /= := altP (psi =P 0).
-  by apply/lerifP; rewrite !cfdot0r normCK mul0r mulr0.
+  by apply/leifP; rewrite !cfdot0r normCK mul0r mulr0.
 without loss ophi: phi / '[phi, psi] = 0.
   move=> IHo; pose a := '[phi, psi] / '[psi]; pose phi1 := phi - a *: psi.
   have ophi: '[phi1, psi] = 0.
@@ -952,7 +952,7 @@ without loss ophi: phi / '[phi, psi] = 0.
   rewrite (canRL (subrK _) (erefl phi1)) rpredDr ?rpredZ ?memv_line //.
   rewrite cfdotDl ophi add0r cfdotZl normrM (ger0_norm (cfnorm_ge0 _)).
   rewrite exprMn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ophi mulr0.
-  by have:= IHo _ ophi; rewrite mulrDl -lerif_subLR subrr ophi normCK mul0r.
+  by have:= IHo _ ophi; rewrite mulrDl -leif_subLR subrr ophi normCK mul0r.
 rewrite ophi normCK mul0r; split; first by rewrite mulr_ge0 ?cfnorm_ge0.
 rewrite eq_sym mulf_eq0 orbC cfnorm_eq0 (negPf nz_psi) /=.
 apply/idP/idP=> [|/vlineP[a {2}->]]; last by rewrite cfdotZr ophi mulr0.
@@ -963,20 +963,19 @@ Lemma cfCauchySchwarz_sqrt phi psi :
   `|'[phi, psi]| <= sqrtC '[phi] * sqrtC '[psi] ?= iff ~~ free (phi :: psi).
 Proof.
 rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE ?cfnorm_ge0 //.
-rewrite (mono_in_lerif (@ler_sqrtC _)) 1?rpredM ?qualifE;
-rewrite ?normr_ge0 ?cfnorm_ge0 //.
+rewrite (mono_in_leif (@ler_sqrtC _)) 1?rpredM ?qualifE ?cfnorm_ge0 //.
 exact: cfCauchySchwarz.
 Qed.
 
-Lemma cf_triangle_lerif phi psi :
+Lemma cf_triangle_leif phi psi :
   sqrtC '[phi + psi] <= sqrtC '[phi] + sqrtC '[psi]
            ?= iff ~~ free (phi :: psi) && (0 <= coord [tuple psi] 0 phi).
 Proof.
-rewrite -(mono_in_lerif ler_sqr) ?rpredD ?qualifE ?sqrtC_ge0 ?cfnorm_ge0 //.
-rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_lerif (ler_add2l _)).
+rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE ?sqrtC_ge0 ?cfnorm_ge0 //.
+rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (ler_add2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
-rewrite (mono_lerif (ler_pmul2r _)) ?ltr0n //.
-have:= lerif_trans (lerif_Re_Creal '[phi, psi]) (cfCauchySchwarz_sqrt phi psi).
+rewrite (mono_leif (ler_pmul2r _)) ?ltr0n //.
+have:= leif_trans (leif_Re_Creal '[phi, psi]) (cfCauchySchwarz_sqrt phi psi).
 congr (_ <= _ ?= iff _); apply: andb_id2r.
 rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC.
 have [-> | nz_psi] := altP (psi =P 0); first by rewrite cfdot0r coord0.

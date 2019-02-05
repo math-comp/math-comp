@@ -568,7 +568,7 @@ End FinFieldExists.
 
 Section FinDomain.
 
-Import ssrnum ssrint algC cyclotomic Num.Theory.
+Import order ssrnum ssrint algC cyclotomic Order.Theory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.
@@ -625,18 +625,18 @@ without loss n_gt1: / (1 < n)%N by rewrite ltnNge; apply: wlog_neg.
 have [q_gt0 n_gt0] := (ltnW q_gt1, ltnW n_gt1).
 have [z z_prim] := C_prim_root_exists n_gt0.
 have zn1: z ^+ n = 1 by apply: prim_expr_order.
-have /eqP-n1z: `|z| == 1.
-  by rewrite -(pexpr_eq1 n_gt0) ?normr_ge0 // -normrX zn1 normr1.
-suffices /eqP/normC_sub_eq[t n1t [Dq Dz]]: `|q%:R - z| == `|q%:R| - `|z|.
+have /eqP-n1z: `|z| == 1 by rewrite -(pexpr_eq1 n_gt0) // -normrX zn1 normr1.
+suffices /eqP/normC_sub_eq[t n1t [Dq Dz]]:
+  `|q%:R - z : algC| == `|q%:R : algC| - `|z|.
   suffices z1: z == 1 by rewrite leq_eqVlt -dvdn1 (prim_order_dvd z_prim) z1.
   by rewrite Dz n1z mul1r -(eqr_pmuln2r q_gt0) Dq normr_nat mulr_natl.
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
-  rewrite eqr_le ler_sub_dist andbT n1z normr_nat natrB //; apply: ler_trans.
+  rewrite eq_le ler_sub_dist andbT n1z normr_nat natrB //; apply: le_trans.
   rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod.
   rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_pemulr //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
-  rewrite !hornerE; apply: ler_trans (ler_sub_dist _ _).
+  rewrite !hornerE; apply: le_trans (ler_sub_dist _ _).
   by rewrite normr_nat normrX n1z expr1n ler_subr_addl (leC_nat 2).
 have Zaq d: d %| n -> aq d \in Cint.
   move/(dvdn_prim_root z_prim)=> zd_prim.
