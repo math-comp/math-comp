@@ -1051,16 +1051,16 @@ End Extremum.
 Notation "[ 'arg[' ord ]_( i < i0 | P ) F ]" :=
     (extremum ord i0 (fun i => P%B) (fun i => F))
   (at level 0, ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0  |  P )  F ]") : form_scope.
+   format "[ 'arg[' ord ]_( i  <  i0  |  P )  F ]") : nat_scope.
 
 Notation "[ 'arg[' ord ]_( i < i0 'in' A ) F ]" :=
     [arg[ord]_(i < i0 | i \in A) F]
   (at level 0, ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : form_scope.
+   format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : nat_scope.
 
 Notation "[ 'arg[' ord ]_( i < i0 ) F ]" := [arg[ord]_(i < i0 | true) F]
   (at level 0, ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : form_scope.
+   format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : nat_scope.
 
 Section ArgMinMax.
 
@@ -1086,30 +1086,30 @@ End Extrema.
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : form_scope.
+   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
     [arg min_(i < i0 | i \in A) F]
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : form_scope.
+   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : form_scope.
+   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
      (arg_max i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : form_scope.
+   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
     [arg max_(i > i0 | i \in A) F]
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : form_scope.
+   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : form_scope.
+   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : nat_scope.
 
 (**********************************************************************)
 (*                                                                    *)

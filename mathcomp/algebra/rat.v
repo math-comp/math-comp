@@ -1,7 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop ssralg countalg div ssrnum ssrint.
+From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -18,8 +19,7 @@ From mathcomp Require Import fintype bigop ssralg countalg div ssrnum ssrint.
 (*       ratr x == generic embedding of  (r : R) into an arbitrary unitring.  *)
 (******************************************************************************)
 
-Import GRing.Theory.
-Import Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -51,16 +51,16 @@ Canonical rat_subCountType := [subCountType of rat].
 Definition numq x := nosimpl ((valq x).1).
 Definition denq x := nosimpl ((valq x).2).
 
-Lemma denq_gt0  x : 0 < denq x.
+Lemma denq_gt0 x : 0 < denq x.
 Proof. by rewrite /denq; case: x=> [[a b] /= /andP []]. Qed.
 Hint Resolve denq_gt0 : core.
 
-Definition denq_ge0 x := ltrW (denq_gt0 x).
+Definition denq_ge0 x := ltW (denq_gt0 x).
 
-Lemma denq_lt0  x : (denq x < 0) = false. Proof. by rewrite ltr_gtF. Qed.
+Lemma denq_lt0 x : (denq x < 0) = false. Proof. by rewrite lt_gtF. Qed.
 
 Lemma denq_neq0 x : denq x != 0.
-Proof. by rewrite /denq gtr_eqF ?denq_gt0. Qed.
+Proof. by rewrite /denq gt_eqF ?denq_gt0. Qed.
 Hint Resolve denq_neq0 : core.
 
 Lemma denq_eq0 x : (denq x == 0) = false.
@@ -99,7 +99,7 @@ Fact valqK x : fracq (valq x) = x.
 Proof.
 move: x => [[n d] /= Pnd]; apply: val_inj=> /=.
 move: Pnd; rewrite /coprime /fracq /= => /andP[] hd -/eqP hnd.
-by rewrite ltr_gtF ?gtr_eqF //= hnd !divn1 mulz_sign_abs abszE gtr0_norm.
+by rewrite lt_gtF ?gt_eqF //= hnd !divn1 mulz_sign_abs abszE gtr0_norm.
 Qed.
 
 Fact scalq_key : unit. Proof. by []. Qed.
@@ -343,7 +343,7 @@ Canonical rat_comUnitRing := Eval hnf in [comUnitRingType of rat].
 Fact rat_field_axiom : GRing.Field.mixin_of rat_unitRing. Proof. exact. Qed.
 
 Definition RatFieldIdomainMixin := (FieldIdomainMixin rat_field_axiom).
-Canonical rat_iDomain :=
+Canonical rat_idomainType :=
   Eval hnf in IdomainType rat (FieldIdomainMixin rat_field_axiom).
 Canonical rat_fieldType := FieldType rat rat_field_axiom.
 
@@ -396,13 +396,13 @@ Lemma rat1 : 1%:Q = 1. Proof. by []. Qed.
 Lemma numqN x : numq (- x) = - numq x.
 Proof.
 rewrite /numq; case: x=> [[a b] /= /andP [hb]]; rewrite /coprime=> /eqP hab.
-by rewrite ltr_gtF ?gtr_eqF // {2}abszN hab divn1 mulz_sign_abs.
+by rewrite lt_gtF ?gt_eqF // {2}abszN hab divn1 mulz_sign_abs.
 Qed.
 
 Lemma denqN x : denq (- x) = denq x.
 Proof.
 rewrite /denq; case: x=> [[a b] /= /andP [hb]]; rewrite /coprime=> /eqP hab.
-by rewrite gtr_eqF // abszN hab divn1 gtz0_abs.
+by rewrite gt_eqF // abszN hab divn1 gtz0_abs.
 Qed.
 
 (* Will be subsumed by pnatr_eq0 *)
@@ -502,7 +502,7 @@ Proof.
 rewrite !ge_rat0 => hnx hny.
 have hxy: (0 <= numq x * denq y + numq y * denq x).
   by rewrite addr_ge0 ?mulr_ge0.
-by rewrite /numq /= -!/(denq _) ?mulf_eq0 ?denq_eq0 !ler_gtF ?mulr_ge0.
+by rewrite /numq /= -!/(denq _) ?mulf_eq0 ?denq_eq0 !le_gtF ?mulr_ge0.
 Qed.
 
 Fact le_rat0M x y : le_rat 0 x -> le_rat 0 y -> le_rat 0 (x * y).
@@ -510,12 +510,12 @@ Proof.
 rewrite !ge_rat0 => hnx hny.
 have hxy: (0 <= numq x * denq y + numq y * denq x).
   by rewrite addr_ge0 ?mulr_ge0.
-by rewrite /numq /= -!/(denq _) ?mulf_eq0 ?denq_eq0 !ler_gtF ?mulr_ge0.
+by rewrite /numq /= -!/(denq _) ?mulf_eq0 ?denq_eq0 !le_gtF ?mulr_ge0.
 Qed.
 
 Fact le_rat0_anti x : le_rat 0 x -> le_rat x 0 -> x = 0.
 Proof.
-by move=> hx hy; apply/eqP; rewrite -numq_eq0 eqr_le -ge_rat0 -le_rat0 hx hy.
+by move=> hx hy; apply/eqP; rewrite -numq_eq0 eq_le -ge_rat0 -le_rat0 hx hy.
 Qed.
 
 Lemma sgr_numq_div (n d : int) : sgr (numq (n%:Q / d%:Q)) = sgr n * sgr d.
@@ -530,12 +530,12 @@ Proof.
 symmetry; rewrite ge_rat0 /le_rat -subr_ge0.
 case: ratP => nx dx cndx; case: ratP => ny dy cndy.
 rewrite -!mulNr addf_div ?intq_eq0 // !mulNr -!rmorphM -rmorphB /=.
-symmetry; rewrite !lerNgt -sgr_cp0 sgr_numq_div mulrC gtr0_sg //.
+symmetry; rewrite !leNgt -sgr_cp0 sgr_numq_div mulrC gtr0_sg //.
 by rewrite mul1r sgr_cp0.
 Qed.
 
 Fact le_rat_total : total le_rat.
-Proof. by move=> x y; apply: ler_total. Qed.
+Proof. by move=> x y; apply: le_total. Qed.
 
 Fact numq_sign_mul (b : bool) x : numq ((-1) ^+ b * x) = (-1) ^+ b * numq x.
 Proof. by case: b; rewrite ?(mul1r, mulN1r) // numqN. Qed.
@@ -566,14 +566,19 @@ by rewrite /normq /= normr_num_div ?ger0_norm // divq_num_den.
 Qed.
 
 Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
-Proof. by rewrite /lt_rat ltr_def rat_eq. Qed.
+Proof. by rewrite /lt_rat lt_def rat_eq. Qed.
 
-Definition ratLeMixin := RealLeMixin le_rat0D le_rat0M le_rat0_anti
-  subq_ge0 (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
+Definition ratLeMixin : realLeMixin rat_idomainType :=
+  RealLeMixin le_rat0D le_rat0M le_rat0_anti subq_ge0
+              (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
+Canonical rat_porderType := POrderType ring_display rat ratLeMixin.
+Canonical rat_latticeType := LatticeType rat ratLeMixin.
+Canonical rat_orderType := OrderType rat le_rat_total.
 Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
+Canonical rat_normedDomainType := NormedDomainType rat rat ratLeMixin.
 Canonical rat_numFieldType := [numFieldType of rat].
-Canonical rat_realDomainType := RealDomainType rat (@le_rat_total 0).
+Canonical rat_realDomainType := [realDomainType of rat].
 Canonical rat_realFieldType := [realFieldType of rat].
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
@@ -585,10 +590,10 @@ Lemma numq_le0 x : (numq x <= 0) = (x <= 0).
 Proof. by rewrite -oppr_ge0 -numqN numq_ge0 oppr_ge0. Qed.
 
 Lemma numq_gt0 x : (0 < numq x) = (0 < x).
-Proof. by rewrite !ltrNge numq_le0. Qed.
+Proof. by rewrite !ltNge numq_le0. Qed.
 
 Lemma numq_lt0 x : (numq x < 0) = (x < 0).
-Proof. by rewrite !ltrNge numq_ge0. Qed.
+Proof. by rewrite !ltNge numq_ge0. Qed.
 
 Lemma sgr_numq x : sgz (numq x) = sgz x.
 Proof.
@@ -605,7 +610,7 @@ Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr ?norm_ge0 //.
+rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
@@ -758,7 +763,7 @@ by rewrite ![_ / _ * _]mulrAC !ler_pdivr_mulr ?ltr0z // -!rmorphM /= !ler_int.
 Qed.
 
 Lemma ltr_rat : {mono (@ratr F) : x y / x < y}.
-Proof. exact: lerW_mono ler_rat. Qed.
+Proof. exact: leW_mono ler_rat. Qed.
 
 Lemma ler0q x : (0 <= ratr F x) = (0 <= x).
 Proof. by rewrite (_ : 0 = ratr F 0) ?ler_rat ?rmorph0. Qed.
@@ -777,8 +782,7 @@ Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn rmorph_sign. Qed.
 
 Lemma ratr_norm x : ratr F `|x| = `|ratr F x|.
 Proof.
-rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm //.
-by rewrite ler0q ?normr_ge0.
+by rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm ?ler0q.
 Qed.
 
 End InPrealField.
