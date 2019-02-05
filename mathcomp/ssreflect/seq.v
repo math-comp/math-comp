@@ -2189,6 +2189,12 @@ Hypothesis fK : ocancel f g.
 Lemma pmap_filter s : map g (pmap s) = filter [eta f] s.
 Proof. by elim: s => //= x s <-; rewrite -{3}(fK x); case: (f _). Qed.
 
+Lemma pmap_cat a b : pmap (a ++ b) = pmap a ++ pmap b.
+Proof.
+  elim: a => [|a' as' IH] //=.
+  case: (f a'); by [|rewrite IH].
+Qed.
+
 End Pmap.
 
 Section EqPmap.
@@ -2211,6 +2217,19 @@ Qed.
 Lemma pmap_uniq s : uniq s -> uniq (pmap f s).
 Proof.
 by move/(filter_uniq [eta f]); rewrite -(pmap_filter fK); apply: map_uniq.
+Qed.
+
+Lemma pmap_perm a b:
+    perm_eq a b -> perm_eq (pmap f a) (pmap f b).
+Proof.
+  move=> H1; apply/perm_eqP=> x.
+  have H2: forall (c : seq aT),
+      count x (pmap f c) =
+        size (filter (fun y => if f y is Some y' then x y' else false) c).
+  - elim=> [|c' cs' IH] //=.
+    case (f c')=> //= c''; case (x c'')=> //=.
+    by rewrite IH.
+  - by rewrite 2!H2; apply /perm_eq_size /perm_filter.
 Qed.
 
 End EqPmap.
