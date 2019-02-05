@@ -358,7 +358,8 @@ pose Saut (mu : subAut) : {rmorphism Sdom mu -> Sdom mu} := (projT2 mu).2.
 have SinjZ Qr (QrC : numF_inj Qr) a x: QrC (a *: x) = QtoC a * QrC x.
   rewrite mulrAC; apply: canRL (mulfK _) _.
     by rewrite intr_eq0 denq_neq0.
-  by rewrite mulrzr mulrzl -!rmorphMz scalerMzl -scaler_int -mulrzr -numqE.
+  by rewrite mulrzr mulrzl -!rmorphMz scalerMzl -[x *~ _]scaler_int -mulrzr
+             -numqE.
 have Sinj_poly Qr (QrC : numF_inj Qr) p:
   map_poly QrC (map_poly (in_alg Qr) p) = pQtoC p.
 - rewrite -map_poly_comp; apply: eq_map_poly => a.

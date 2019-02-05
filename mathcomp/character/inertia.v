@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice div fintype tuple finfun bigop prime.
+From mathcomp Require Import choice fintype div tuple finfun bigop prime order.
 From mathcomp Require Import ssralg ssrnum finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient action zmodp cyclic center.
 From mathcomp Require Import gproduct commutator gseries nilpotent pgroup.
@@ -12,7 +12,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory Num.Theory.
+Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 (******************************************************************************)
@@ -938,7 +938,7 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
   have ub_chi_r: 'chi_r 1%g <= chi 1%g ?= iff ('chi_r == chi).
     have Nchi: chi \is a character by rewrite cfInd_char ?irr_char.
     have [chi1 Nchi1->] := constt_charP _ Nchi sGr.
-    rewrite addrC cfunE -lerif_subLR subrr eq_sym -subr_eq0 addrK.
+    rewrite addrC cfunE -leif_subLR subrr eq_sym -subr_eq0 addrK.
     by split; rewrite ?char1_ge0 // eq_sym char1_eq0.
   have lb_chi_r: chi 1%g <= 'chi_r 1%g ?= iff (f == e).
     rewrite cfInd1 // -(cfRes1 H) DpsiH -(cfRes1 H 'chi_r) DrH !cfunE sum_cfunE.
@@ -946,10 +946,10 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
       by case/cfclassP=> y _ ->; rewrite cfConjg1.
     rewrite reindex_cfclass //= sumr_const -(eq_card (cfclass_IirrE _ _)).
     rewrite mulr_natl mulrnAr card_cfclass_Iirr //.
-    rewrite (mono_lerif (ler_pmuln2r (indexg_gt0 G T))).
-    rewrite (mono_lerif (ler_pmul2r (irr1_gt0 t))); apply: lerif_eq.
+    rewrite (mono_leif (ler_pmuln2r (indexg_gt0 G T))).
+    rewrite (mono_leif (ler_pmul2r (irr1_gt0 t))); apply: leif_eq.
     by rewrite /e -(cfResRes _ sHT) ?cfdot_Res_ge_constt.
-  have [_ /esym] := lerif_trans ub_chi_r lb_chi_r; rewrite eqxx.
+  have [_ /esym] := leif_trans ub_chi_r lb_chi_r; rewrite eqxx.
   by case/andP=> /eqP Dchi /eqP->; rewrite cfIirrE -/chi -?Dchi ?mem_irr.
 have part_c: {in calA, forall s (chi := 'Ind[G] 'chi_s),
   [predI irr_constt ('Res[T] chi) & calA] =i pred1 s}.
@@ -957,14 +957,14 @@ have part_c: {in calA, forall s (chi := 'Ind[G] 'chi_s),
   have chiTs: s \in irr_constt ('Res[T] chi).
     by rewrite irr_consttE cfdot_Res_l irrWnorm ?oner_eq0.
   apply/andP/eqP=> [[/= chiTs1 As1] | -> //].
-  apply: contraTeq Dchi_theta => s's1; rewrite ltr_eqF // -/chi.
+  apply: contraTeq Dchi_theta => s's1; rewrite lt_eqF // -/chi.
   have [|phi Nphi DchiT] := constt_charP _ _ chiTs.
     by rewrite cfRes_char ?cfInd_char ?irr_char.
   have [|phi1 Nphi1 Dphi] := constt_charP s1 Nphi _.
     rewrite irr_consttE -(canLR (addKr _) DchiT) addrC cfdotBl cfdot_irr.
     by rewrite mulrb ifN_eqC ?subr0.
   rewrite -(cfResRes chi sHT sTG) DchiT Dphi !rmorphD !cfdotDl /=.
-  rewrite -ltr_subl_addl subrr ltr_paddr ?ltr_def //;
+  rewrite -ltr_subl_addl subrr ltr_paddr ?lt_def //;
     rewrite Cnat_ge0 ?Cnat_cfdot_char ?cfRes_char ?irr_char //.
   by rewrite andbT -irr_consttE -constt_Ind_Res.
 do [split=> //; try by move=> s /AtoB_P[]] => [s1 s2 As1 As2 | r].
@@ -1039,8 +1039,8 @@ have [_]: '['Ind[G] phi] <= '['Ind[G] psi] ?= iff d_delta.
     rewrite DpsiG cfdot_suml; apply: eq_bigr => b _.
     rewrite -scalerAl cfdotZl cfdot_sumr; congr (_ * _).
     by apply: eq_bigr => g _; rewrite -scalerAl cfdotZr conj_Cnat.
-  have eMmono := mono_lerif (ler_pmul2l (egt0 _ _)).
-  apply: lerif_sum => b /eMmono->; apply: lerif_sum => g /eMmono->.
+  have eMmono := mono_leif (ler_pmul2l (egt0 _ _)).
+  apply: leif_sum => b /eMmono->; apply: leif_sum => g /eMmono->.
   split; last exact: eq_sym.
   have /CnatP[n Dd]: d b g \in Cnat by rewrite Cnat_cfdot_char.
   have [Db | _] := eqP; rewrite Dd leC_nat // -ltC_nat -Dd Db cfnorm_gt0.
@@ -1059,7 +1059,7 @@ apply/idP/idP=> [|/imageP[b Sb ->]].
   apply: contraR => N'i; rewrite big1 // => b Sb.
   rewrite cfdotZl cfdot_irr mulrb ifN_eqC ?mulr0 //.
   by apply: contraNneq N'i => ->; apply: image_f.
-rewrite gtr_eqF // (bigD1 b) //= cfdotZl cfnorm_irr mulr1 ltr_paddr ?egt0 //.
+rewrite gt_eqF // (bigD1 b) //= cfdotZl cfnorm_irr mulr1 ltr_paddr ?egt0 //.
 apply: sumr_ge0 => g /andP[Sg _]; rewrite cfdotZl cfdot_irr.
 by rewrite mulr_ge0 ?ler0n ?Cnat_ge0.
 Qed.
@@ -1186,7 +1186,7 @@ have ltUK: U \proper K.
   rewrite Dmu subGcfker -irr_eq1 -Dmu cfMod_eq1 //.
   by rewrite (can2_eq (divrK Uj) (mulrK Uj)) mul1r (inj_eq irr_inj).
 suffices: theta \in 'CF(K, L).
-  rewrite -cfnorm_Res_lerif // DthL cfnormZ !cfnorm_irr !mulr1 normr_nat.
+  rewrite -cfnorm_Res_leif // DthL cfnormZ !cfnorm_irr !mulr1 normr_nat.
   by rewrite -natrX eqC_nat => /eqP.
 have <-: gcore U G = L.
   apply: maxL; last by rewrite sub_gcore ?cfker_mod.
