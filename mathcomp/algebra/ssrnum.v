@@ -144,8 +144,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import GRing.Theory.
+Import GRing.Theory Order.Theory Order.Def Order.Syntax.
 
 Reserved Notation "<= y" (at level 35).
 Reserved Notation ">= y" (at level 35).
@@ -161,7 +162,7 @@ Reserved Notation "> y :> T" (at level 35, y at next level).
 Module Norm.
 
 Section ClassDef.
-Variable (R : Type).
+Variable R : Type.
 
 Definition class_of T := T -> R.
 Structure type := Pack {sort; _ : class_of sort}.
@@ -192,11 +193,6 @@ Import Norm.Exports.
 Definition norm (R : Type) (T : normedType R) : T -> R :=
   nosimpl (@Norm.class R T).
 Arguments norm {R T} x.
-Notation "`| x |" := (norm x) : ring_scope.
-
-Import Order.Theory Order.Def Order.Syntax.
-Local Open Scope order_scope.
-Local Open Scope ring_scope.
 
 Fact ring_display : unit. Proof. exact: tt. Qed.
 
@@ -357,6 +353,57 @@ End Keys. End Keys.
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
 Import Def Keys.
+
+Notation "`| x |" := (norm x) : ring_scope.
+
+Notation "<=%R" := (@le ring_display _) : ring_scope.
+Notation ">=%R" := (@ge ring_display _) : ring_scope.
+Notation "<%R" := (@lt ring_display _) : ring_scope.
+Notation ">%R" := (@gt ring_display _) : ring_scope.
+Notation "<?=%R" := (@leif ring_display _) : ring_scope.
+Notation ">=<%R" := (@comparable ring_display _) : ring_scope.
+Notation "><%R" :=
+  (fun x y => ~~ (@comparable ring_display _ x y)) : ring_scope.
+
+Notation "<= y" := (@ge ring_display _ y) : ring_scope.
+Notation "<= y :> T" := (<= (y : T)) : ring_scope.
+Notation ">= y"  := (@le ring_display _ y) : ring_scope.
+Notation ">= y :> T" := (>= (y : T)) : ring_scope.
+
+Notation "< y" := (@gt ring_display _ y) : ring_scope.
+Notation "< y :> T" := (< (y : T)) : ring_scope.
+Notation "> y" := (@lt ring_display _ y) : ring_scope.
+Notation "> y :> T" := (> (y : T)) : ring_scope.
+
+Notation ">=< y" := (@comparable ring_display _ y) : ring_scope.
+Notation ">=< y :> T" := (>=< (y : T)) : ring_scope.
+
+Notation "x <= y" := (@le ring_display _ x y) : ring_scope.
+Notation "x <= y :> T" := ((x : T) <= (y : T)) : ring_scope.
+Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
+Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
+
+Notation "x < y"  := (@lt ring_display _ x y) : ring_scope.
+Notation "x < y :> T" := ((x : T) < (y : T)) : ring_scope.
+Notation "x > y"  := (y < x) (only parsing) : ring_scope.
+Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
+
+Notation "x <= y <= z" := ((x <= y) && (y <= z)) : ring_scope.
+Notation "x < y <= z" := ((x < y) && (y <= z)) : ring_scope.
+Notation "x <= y < z" := ((x <= y) && (y < z)) : ring_scope.
+Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
+
+Notation "x <= y ?= 'iff' C" := (@leif ring_display _ x y C) : ring_scope.
+Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
+  (only parsing) : ring_scope.
+
+Notation ">=< x" := (@comparable ring_display _ x) : ring_scope.
+Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : ring_scope.
+Notation "x >=< y" := (@comparable ring_display _ x y) : ring_scope.
+
+Notation ">< x" := (fun y => ~~ (@comparable ring_display _ x y)) : ring_scope.
+Notation ">< x :> T" := (>< (x : T)) (only parsing) : ring_scope.
+Notation "x >< y" := (~~ (@comparable ring_display _ x y)) : ring_scope.
 
 Canonical Rpos_keyed.
 Canonical Rneg_keyed.
@@ -1113,7 +1160,7 @@ Import RealClosedField.Exports.
 Module Import Internals.
 
 Section NormedModule.
-Variable (R : numDomainType) (V : normedModType R).
+Variables (R : numDomainType) (V : normedModType R).
 Implicit Types (l : R) (x y : V).
 
 Lemma ler_norm_add x y : `|x + y| <= `|x| + `|y|.
@@ -1162,8 +1209,7 @@ have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /normr0_eq0->.
 by rewrite ger0_def -(inj_eq (mulfI n1_nz)) -normrM !mulr1.
 Qed.
 
-Lemma ltr01 : 0 < 1 :> R.
-Proof. by rewrite lt_def oner_neq0 ler01. Qed.
+Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
 (* Duplication of ltW
 Lemma ltrW x y : x < y -> x <= y.
@@ -1325,7 +1371,7 @@ Module Theory.
 
 Section NumIntegralDomainTheory.
 
-Variable (R : numDomainType).
+Variable R : numDomainType.
 Implicit Types (V : normedModType R) (x y z t : R).
 
 (* Lemmas from the signature (reexported from internals). *)
@@ -1449,7 +1495,7 @@ Qed.
 
 Section NormedModuleTheory.
 
-Variable (V : normedModType R).
+Variable V : normedModType R.
 Implicit Types (v w : V).
 
 Lemma normr0 : `|0 : V| = 0 :> R.
@@ -1479,13 +1525,13 @@ Qed.
 Lemma normr_ge0 v : 0 <= `|v|. Proof. by rewrite ger0_def normr_id. Qed.
 Hint Resolve normr_ge0 : core.
 
-Lemma normr_le0 v : (`|v| <= 0) = (v == 0).
+Lemma normr_le0 v : `|v| <= 0 = (v == 0).
 Proof. by rewrite -normr_eq0 eq_le normr_ge0 andbT. Qed.
 
 Lemma normr_lt0 v : `|v| < 0 = false.
 Proof. by rewrite lt_neqAle normr_le0 normr_eq0 andNb. Qed.
 
-Lemma normr_gt0 v : (`|v| > 0) = (v != 0).
+Lemma normr_gt0 v : `|v| > 0 = (v != 0).
 Proof. by rewrite lt_def normr_eq0 normr_ge0 andbT. Qed.
 
 Definition normrE := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
@@ -1519,7 +1565,7 @@ Definition subr_cp0 := (subr_lte0, subr_gte0).
 (* Ordered ring properties. *)
 
 (* Duplication of le_anti, eq_le, lt_trans, le_lt_trans, lt_le_trans, le_trans
-Lemma ler_asym : antisymmetric (<=%O : rel R).
+Lemma ler_asym : antisymmetric (<=%R : rel R).
 Proof.
 move=> x y; rewrite !ler_def distrC -opprB -addr_eq0 => /andP[/eqP->].
 by rewrite -mulr2n -mulr_natl mulf_eq0 subr_eq0 pnatr_eq0 => /eqP.
@@ -2903,14 +2949,10 @@ Qed.
 Definition real_lter_normr :=  (real_ler_normr, real_ltr_normr).
 
 Lemma ler_nnorml x y : y < 0 -> `|x| <= y = false.
-Proof.
-by move=> y_lt0; rewrite lt_geF //; apply/(lt_le_trans y_lt0)/normr_ge0.
-Qed.
+Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h)/normr_ge0. Qed.
 
 Lemma ltr_nnorml x y : y <= 0 -> `|x| < y = false.
-Proof.
-by move=> y_le0; rewrite le_gtF //; apply/(le_trans y_le0)/normr_ge0.
-Qed.
+Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h)/normr_ge0. Qed.
 
 Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
 
@@ -3267,6 +3309,7 @@ Arguments real_ler_normlP {R x y}.
 Arguments real_ltr_normlP {R x y}.
 
 Section NumDomainMonotonyTheoryForReals.
+Local Open Scope order_scope.
 
 Variables (R R' : numDomainType) (D : pred R) (f : R -> R') (f' : R -> nat).
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
@@ -3596,7 +3639,7 @@ Lemma wlog_ltr P :
 Proof. by move=> rP sP hP a b; apply: real_wlog_ltr. Qed.
 *)
 
-(* Duplication of
+(* Duplication of ltNge, leNgt
 Lemma ltrNge x y : (x < y) = ~~ (y <= x). Proof. exact: real_ltrNge. Qed.
 
 Lemma lerNgt x y : (x <= y) = ~~ (y < x). Proof. exact: real_lerNgt. Qed.
@@ -3688,13 +3731,13 @@ Section RealDomainArgExtremum.
 Context {R : realDomainType} {I : finType} (i0 : I).
 Context (P : pred I) (F : I -> R) (Pi0 : P i0).
 
-Definition arg_minr := extremum <=%O i0 P F.
-Definition arg_maxr := extremum >=%O i0 P F.
+Definition arg_minr := extremum <=%R i0 P F.
+Definition arg_maxr := extremum >=%R i0 P F.
 
-Lemma arg_minrP: extremum_spec <=%O P F arg_minr.
+Lemma arg_minrP: extremum_spec <=%R P F arg_minr.
 Proof. by apply: extremumP => //; [apply: le_trans|apply: le_total]. Qed.
 
-Lemma arg_maxrP: extremum_spec >=%O P F arg_maxr.
+Lemma arg_maxrP: extremum_spec >=%R P F arg_maxr.
 Proof.
 apply: extremumP => //; first exact: lexx.
   by move=> ??? /(le_trans _) le /le.
@@ -4717,7 +4760,7 @@ Lemma rootC_ge0 n x : (n > 0)%N -> (0 <= n.-root x) = (0 <= x).
 Proof.
 set y := n.-root x => n_gt0.
 apply/idP/idP=> [/(exprn_ge0 n) | x_ge0]; first by rewrite rootCK.
-rewrite -(ger_leif (leif_Re_Creal y)).
+rewrite -(ge_leif (leif_Re_Creal y)).
 have Ray: `|y| \is real by apply: normr_real.
 rewrite -(Creal_ReP _ Ray) rootC_Re_max ?(Creal_ImP _ Ray) //.
 by rewrite -normrX rootCK // ger0_norm.
@@ -5082,9 +5125,11 @@ Proof.
 by move=> x y z hyx hxz; rewrite -sub_ge0 -(subrK x z) -addrA le0_add ?sub_ge0.
 Qed.
 
-Definition Le :=
-  Mixin (Rorder := @POrderMixin R le lt lt_neqAle le_refl le_anti le_trans)
-        le_normD lt0_add eq0_norm (in2W le_total) normM le_def.
+Definition LePo : porderMixin R :=
+  POrderMixin lt_neqAle le_refl le_anti le_trans.
+
+Definition Le : mixin_of LePo norm :=
+  Mixin (Rorder := LePo) le_normD lt0_add eq0_norm (in2W le_total) normM le_def.
 
 Lemma Real (R' : numDomainType) & phant R' :
   R' = NumDomainType R Le -> real_axiom R'.
@@ -5130,7 +5175,10 @@ Qed.
 Fact le0_total x : (0 <= x) || (x <= 0).
 Proof. by rewrite !le_def [0 == _]eq_sym; have [|/lt0_total] := altP eqP. Qed.
 
-Definition Lt :=
+Definition LtPo : porderMixin R :=
+  LePo le0_add le0_anti sub_ge0 le0_total lt_def.
+
+Definition Lt : mixin_of LtPo norm :=
   Le le0_add le0_mul le0_anti sub_ge0 le0_total normN ge0_norm lt_def.
 
 End LtMixin.
@@ -5139,13 +5187,450 @@ End RealMixins.
 
 End RealMixin.
 
+(* compatibility module *)
+Module mc_1_7.
+
+Module Def.
+Notation normr := norm (only parsing).
+Notation ler := le (only parsing).
+Notation ltr := lt (only parsing).
+Notation ger := ge (only parsing).
+Notation gtr := gt (only parsing).
+Notation lerif := leif (only parsing).
+Notation minr := meet (only parsing).
+Notation maxr := join (only parsing).
+End Def.
+
+Module Theory.
+Import Num.Theory.
+
+Section NumIntegralDomainTheory.
+Variable R : numDomainType.
+Implicit Types x y z : R.
+Definition ltr_def x y : (x < y) = (y != x) && (x <= y) := lt_def x y.
+Definition gerE x y : ge x y = (y <= x) := geE x y.
+Definition gtrE x y : gt x y = (y < x) := gtE x y.
+Definition lerr x : x <= x := lexx x.
+Definition ltrr x : x < x = false := ltxx x.
+Definition ltrW x y : x < y -> x <= y := @ltW _ _ x y.
+Definition ltr_neqAle x y : (x < y) = (x != y) && (x <= y) := lt_neqAle x y.
+Definition ler_eqVlt x y : (x <= y) = (x == y) || (x < y) := le_eqVlt x y.
+Definition gtr_eqF x y : y < x -> x == y = false := @gt_eqF _ _ x y.
+Definition ltr_eqF x y : x < y -> x == y = false := @lt_eqF _ _ x y.
+Definition ler_asym : antisymmetric (<=%R : rel R) := le_anti.
+Definition eqr_le x y : (x == y) = (x <= y <= x) := eq_le x y.
+Definition ltr_trans : transitive (@lt _ R) := lt_trans.
+Definition ler_lt_trans y x z : x <= y -> y < z -> x < z :=
+  @le_lt_trans _ _ y x z.
+Definition ltr_le_trans y x z : x < y -> y <= z -> x < z :=
+  @lt_le_trans _ _ y x z.
+Definition ler_trans : transitive (@le _ R) := le_trans.
+Definition lterr := (lerr, ltrr).
+Definition lerifP x y C :
+  reflect (x <= y ?= iff C) (if C then x == y else x < y) := leifP.
+Definition ltr_asym x y : x < y < x = false := lt_asym x y.
+Definition ler_anti : antisymmetric (@le _ R) := le_anti.
+Definition ltr_le_asym x y : x < y <= x = false := lt_le_asym x y.
+Definition ler_lt_asym x y : x <= y < x = false := le_lt_asym x y.
+Definition lter_anti := (=^~ eqr_le, ltr_asym, ltr_le_asym, ler_lt_asym).
+Definition ltr_geF x y : x < y -> y <= x = false := @lt_geF _ _ x y.
+Definition ler_gtF x y : x <= y -> y < x = false := @le_gtF _ _ x y.
+Definition ltr_gtF x y : x < y -> y < x = false := @lt_gtF _ _ x y.
+End NumIntegralDomainTheory.
+
+Section NumIntegralDomainMonotonyTheory.
+Variables R R' : numDomainType.
+Section AcrossTypes.
+Variables (D D' : pred R) (f : R -> R').
+Definition ltrW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y} :=
+  ltW_homo (f := f).
+Definition ltrW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y} :=
+  ltW_nhomo (f := f).
+Definition inj_homo_ltr :
+  injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y} :=
+  inj_homo_lt (f := f).
+Definition inj_nhomo_ltr :
+  injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y} :=
+  inj_nhomo_lt (f := f).
+Definition incr_inj : {mono f : x y / x <= y} -> injective f :=
+  inc_inj (f := f).
+Definition decr_inj : {mono f : x y /~ x <= y} -> injective f :=
+  dec_inj (f := f).
+Definition lerW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y} :=
+  leW_mono (f := f).
+Definition lerW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y} :=
+  leW_nmono (f := f).
+Definition ltrW_homo_in :
+  {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}} :=
+  ltW_homo_in (f := f).
+Definition ltrW_nhomo_in :
+  {in D & D', {homo f : x y /~ x < y}} ->
+  {in D & D', {homo f : x y /~ x <= y}} :=
+  ltW_nhomo_in (f := f).
+Definition inj_homo_ltr_in :
+  {in D & D', injective f} -> {in D & D', {homo f : x y / x <= y}} ->
+  {in D & D', {homo f : x y / x < y}} :=
+  inj_homo_lt_in (f := f).
+Definition inj_nhomo_ltr_in :
+    {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
+  {in D & D', {homo f : x y /~ x < y}} :=
+  inj_nhomo_lt_in (f := f).
+Definition incr_inj_in :
+  {in D &, {mono f : x y / x <= y}} -> {in D &, injective f} :=
+  inc_inj_in (f := f).
+Definition decr_inj_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f} :=
+  dec_inj_in (f := f).
+Definition lerW_mono_in :
+  {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}} :=
+  leW_mono_in (f := f).
+Definition lerW_nmono_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}} :=
+  leW_nmono_in (f := f).
+End AcrossTypes.
+Section NatToR.
+Variables (D D' : pred nat) (f : nat -> R).
+Definition ltnrW_homo :
+  {homo f : m n / (m < n)%N >-> m < n} ->
+  {homo f : m n / (m <= n)%N >-> m <= n} :=
+  ltW_homo (f := f).
+Definition ltnrW_nhomo :
+  {homo f : m n / (n < m)%N >-> m < n} ->
+  {homo f : m n / (n <= m)%N >-> m <= n} :=
+  ltW_nhomo (f := f).
+Definition inj_homo_ltnr : injective f ->
+  {homo f : m n / (m <= n)%N >-> m <= n} ->
+  {homo f : m n / (m < n)%N >-> m < n} :=
+  inj_homo_lt (f := f).
+Definition inj_nhomo_ltnr : injective f ->
+  {homo f : m n / (n <= m)%N >-> m <= n} ->
+  {homo f : m n / (n < m)%N >-> m < n} :=
+  inj_nhomo_lt (f := f).
+Definition incnr_inj :
+  {mono f : m n / (m <= n)%N >-> m <= n} -> injective f :=
+  inc_inj (f := f).
+Definition decnr_inj_inj :
+  {mono f : m n / (n <= m)%N >-> m <= n} -> injective f :=
+  dec_inj (f := f).
+Definition lenrW_mono : {mono f : m n / (m <= n)%N >-> m <= n} ->
+  {mono f : m n / (m < n)%N >-> m < n} :=
+  leW_mono (f := f).
+Definition lenrW_nmono : {mono f : m n / (n <= m)%N >-> m <= n} ->
+  {mono f : m n / (n < m)%N >-> m < n} :=
+  leW_nmono (f := f).
+Definition lenr_mono : {homo f : m n / (m < n)%N >-> m < n} ->
+   {mono f : m n / (m <= n)%N >-> m <= n} :=
+  le_mono (f := f).
+Definition lenr_nmono :
+  {homo f : m n / (n < m)%N >-> m < n} ->
+  {mono f : m n / (n <= m)%N >-> m <= n} :=
+  le_nmono (f := f).
+Definition ltnrW_homo_in :
+  {in D & D', {homo f : m n / (m < n)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} :=
+  ltW_homo_in (f := f).
+Definition ltnrW_nhomo_in :
+  {in D & D', {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} :=
+  ltW_nhomo_in (f := f).
+Definition inj_homo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (m < n)%N >-> m < n}} :=
+  inj_homo_lt_in (f := f).
+Definition inj_nhomo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (n < m)%N >-> m < n}} :=
+  inj_nhomo_lt_in (f := f).
+Definition incnr_inj_in :
+  {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} -> {in D &, injective f} :=
+  inc_inj_in (f := f).
+Definition decnr_inj_inj_in :
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} -> {in D &, injective f} :=
+  dec_inj_in (f := f).
+Definition lenrW_mono_in :
+  {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (m < n)%N >-> m < n}} :=
+  leW_mono_in (f := f).
+Definition lenrW_nmono_in :
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (n < m)%N >-> m < n}} :=
+  leW_nmono_in (f := f).
+Definition lenr_mono_in :
+  {in D &, {homo f : m n / (m < n)%N >-> m < n}} ->
+  {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} :=
+  le_mono_in (f := f).
+Definition lenr_nmono_in :
+  {in D &, {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} :=
+  le_nmono_in (f := f).
+End NatToR.
+Section RToNat.
+Variables (D D' : pred R) (f : R -> nat).
+Definition ltrnW_homo :
+  {homo f : m n / m < n >-> (m < n)%N} ->
+  {homo f : m n / m <= n >-> (m <= n)%N} :=
+  ltW_homo (f := f).
+Definition ltrnW_nhomo :
+  {homo f : m n / n < m >-> (m < n)%N} ->
+ {homo f : m n / n <= m >-> (m <= n)%N} :=
+  ltW_nhomo (f := f).
+Definition inj_homo_ltrn : injective f ->
+  {homo f : m n / m <= n >-> (m <= n)%N} ->
+  {homo f : m n / m < n >-> (m < n)%N} :=
+  inj_homo_lt (f := f).
+Definition inj_nhomo_ltrn : injective f ->
+  {homo f : m n / n <= m >-> (m <= n)%N} ->
+  {homo f : m n / n < m >-> (m < n)%N} :=
+  inj_nhomo_lt (f := f).
+Definition incrn_inj : {mono f : m n / m <= n >-> (m <= n)%N} -> injective f :=
+  inc_inj (f := f).
+Definition decrn_inj : {mono f : m n / n <= m >-> (m <= n)%N} -> injective f :=
+  dec_inj (f := f).
+Definition lernW_mono :
+  {mono f : m n / m <= n >-> (m <= n)%N} ->
+  {mono f : m n / m < n >-> (m < n)%N} :=
+  leW_mono (f := f).
+Definition lernW_nmono :
+  {mono f : m n / n <= m >-> (m <= n)%N} ->
+  {mono f : m n / n < m >-> (m < n)%N} :=
+  leW_nmono (f := f).
+Definition ltrnW_homo_in :
+  {in D & D', {homo f : m n / m < n >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} :=
+  ltW_homo_in (f := f).
+Definition ltrnW_nhomo_in :
+  {in D & D', {homo f : m n / n < m >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} :=
+  ltW_nhomo_in (f := f).
+Definition inj_homo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / m < n >-> (m < n)%N}} :=
+  inj_homo_lt_in (f := f).
+Definition inj_nhomo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / n < m >-> (m < n)%N}} :=
+  inj_nhomo_lt_in (f := f).
+Definition incrn_inj_in :
+  {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} -> {in D &, injective f} :=
+  inc_inj_in (f := f).
+Definition decrn_inj_in :
+  {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} -> {in D &, injective f} :=
+  dec_inj_in (f := f).
+Definition lernW_mono_in :
+  {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / m < n >-> (m < n)%N}} :=
+  leW_mono_in (f := f).
+Definition lernW_nmono_in :
+  {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / n < m >-> (m < n)%N}} :=
+  leW_nmono_in (f := f).
+End RToNat.
+End NumIntegralDomainMonotonyTheory.
+
+Section NumDomainOperationTheory.
+Variable R : numDomainType.
+Implicit Types x y z t : R.
+Definition real_lerP := real_leP.
+Definition real_ltrP := real_ltP.
+Definition real_ltrgtP := real_ltgtP.
+Definition real_ger0P := real_ge0P.
+Definition real_ltrgt0P := real_ltgt0P.
+Definition lerif_refl x C : reflect (x <= x ?= iff C) C := leif_refl.
+Definition lerif_trans x1 x2 x3 C12 C23 :
+  x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23 :=
+  @leif_trans _ _ x1 x2 x3 C12 C23.
+Definition lerif_le x y : x <= y -> x <= y ?= iff (x >= y) := @leif_le _ _ x y.
+Definition lerif_eq x y : x <= y -> x <= y ?= iff (x == y) := @leif_eq _ _ x y.
+Definition ger_lerif x y C : x <= y ?= iff C -> (y <= x) = C :=
+  @ge_leif _ _ x y C.
+Definition ltr_lerif x y C : x <= y ?= iff C -> (x < y) = ~~ C :=
+  @lt_leif _ _ x y C.
+Definition lerif_nat m n C :
+  (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N :=
+  leif_nat_r _ m n C.
+Definition mono_in_lerif (A : pred R) (f : R -> R) C :
+  {in A &, {mono f : x y / x <= y}} ->
+  {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)} :=
+  @mono_in_leif _ _ A f C.
+Definition mono_lerif (f : R -> R) C :
+  {mono f : x y / x <= y} ->
+  forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C) :=
+  @mono_leif _ _ f C.
+Definition nmono_in_lerif (A : pred R) (f : R -> R) C :
+  {in A &, {mono f : x y /~ x <= y}} ->
+  {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)} :=
+  @nmono_in_leif _ _ A f C.
+Definition nmono_lerif (f : R -> R) C :
+  {mono f : x y /~ x <= y} ->
+  forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C) :=
+  @nmono_leif _ _ f C.
+Definition lerif_subLR := leif_subLR.
+Definition lerif_subRL := leif_subRL.
+Definition lerif_add := leif_add.
+Definition lerif_sum := leif_sum.
+Definition lerif_0_sum := leif_0_sum.
+Definition real_lerif_norm := real_leif_norm.
+Definition lerif_pmul := leif_pmul.
+Definition lerif_nmul := leif_nmul.
+Definition lerif_pprod := leif_pprod.
+Definition real_lerif_mean_square_scaled := real_leif_mean_square_scaled.
+Definition real_lerif_AGM2_scaled := real_leif_AGM2_scaled.
+Definition lerif_AGM_scaled := leif_AGM_scaled.
+End NumDomainOperationTheory.
+
+Section NumFieldTheory.
+Definition real_lerif_mean_square := real_leif_mean_square.
+Definition real_lerif_AGM2 := real_leif_AGM2.
+Definition lerif_AGM := leif_AGM.
+End NumFieldTheory.
+
+Section RealDomainTheory.
+Variable R : realDomainType.
+Implicit Types x y z t : R.
+Definition ler_total : total (@le _ R) := le_total.
+Definition ltr_total x y : x != y -> (x < y) || (y < x) :=
+  @lt_total _ _ x y.
+Definition wlog_ler P :
+  (forall a b, P b a -> P a b) -> (forall a b, a <= b -> P a b) ->
+  forall a b : R, P a b :=
+  @wlog_le _ _ P.
+Definition wlog_ltr P :
+  (forall a, P a a) ->
+  (forall a b, (P b a -> P a b)) -> (forall a b, a < b -> P a b) ->
+  forall a b : R, P a b :=
+  @wlog_lt _ _ P.
+Definition ltrNge x y : (x < y) = ~~ (y <= x) := @ltNge _ _ x y.
+Definition lerNgt x y : (x <= y) = ~~ (y < x) := @leNgt _ _ x y.
+Definition neqr_lt x y : (x != y) = (x < y) || (y < x) := @neq_lt _ _ x y.
+Definition eqr_leLR x y z t :
+  (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t) :=
+  @eq_leLR _ _ x y z t.
+Definition eqr_leRL x y z t :
+  (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y) :=
+  @eq_leRL _ _ x y z t.
+Definition eqr_ltLR x y z t :
+  (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t) :=
+  @eq_ltLR _ _ x y z t.
+Definition eqr_ltRL x y z t :
+  (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y) :=
+  @eq_ltRL _ _ x y z t.
+End RealDomainTheory.
+
+Section RealDomainMonotony.
+Variables (R : realDomainType) (R' : numDomainType) (D : pred R).
+Variables (f : R -> R') (f' : R -> nat).
+Definition ler_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y} :=
+  le_mono (f := f).
+Definition ler_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y} :=
+  le_nmono (f := f).
+Definition ler_mono_in :
+  {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}} :=
+  le_mono_in (f := f).
+Definition ler_nmono_in :
+  {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}} :=
+  le_nmono_in (f := f).
+Definition lern_mono :
+  {homo f' : m n / m < n >-> (m < n)%N} ->
+  {mono f' : m n / m <= n >-> (m <= n)%N} :=
+  le_mono (f := f').
+Definition lern_nmono :
+  {homo f' : m n / n < m >-> (m < n)%N} ->
+  {mono f' : m n / n <= m >-> (m <= n)%N} :=
+  le_nmono (f := f').
+Definition lern_mono_in :
+  {in D &, {homo f' : m n / m < n >-> (m < n)%N}} ->
+  {in D &, {mono f' : m n / m <= n >-> (m <= n)%N}} :=
+  le_mono_in (f := f').
+Definition lern_nmono_in :
+  {in D &, {homo f' : m n / n < m >-> (m < n)%N}} ->
+  {in D &, {mono f' : m n / n <= m >-> (m <= n)%N}} :=
+  le_nmono_in (f := f').
+End RealDomainMonotony.
+
+Section RealDomainOperations.
+Variable R : realDomainType.
+Implicit Types x y z : R.
+Definition lerif_mean_square_scaled := leif_mean_square_scaled.
+Definition lerif_AGM2_scaled := leif_AGM2_scaled.
+Section MinMax.
+Local Notation min := meet (only parsing).
+Local Notation max := join (only parsing).
+Definition minrC : @commutative R R min := @meetC _ R.
+Definition minrr : @idempotent R min := @meetxx _ R.
+Definition minr_l x y : x <= y -> min x y = x := elimT meet_idPl.
+Definition minr_r x y : y <= x -> min x y = y := elimT meet_idPr.
+Definition maxrC : @commutative R R max := @joinC _ R.
+Definition maxrr : @idempotent R max := @joinxx _ R.
+Definition maxr_l x y : y <= x -> max x y = x := elimT join_idPr.
+Definition maxr_r x y : x <= y -> max x y = y := elimT join_idPl.
+Definition minrA x y z : min x (min y z) = min (min x y) z := meetA x y z.
+Definition minrCA : @left_commutative R R min := meetCA.
+Definition minrAC : @right_commutative R R min := meetAC.
+Definition maxrA x y z : max x (max y z) = max (max x y) z := joinA x y z.
+Definition maxrCA : @left_commutative R R max := joinCA.
+Definition maxrAC : @right_commutative R R max := joinAC.
+Definition eqr_minl x y : (min x y == x) = (x <= y) := eq_meetl x y.
+Definition eqr_minr x y : (min x y == y) = (y <= x) := eq_meetr x y.
+Definition eqr_maxl x y : (max x y == x) = (y <= x) := eq_joinl x y.
+Definition eqr_maxr x y : (max x y == y) = (x <= y) := eq_joinr x y.
+Definition ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z) := lexI x y z.
+Definition ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x) :=
+  leIx_total x y z.
+Definition ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z) :=
+  lexU_total x y z.
+Definition ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x) := leUx y z x.
+Definition ltr_minr x y z : (x < min y z) = (x < y) && (x < z) := ltxI x y z.
+Definition ltr_minl x y z : (min y z < x) = (y < x) || (z < x) := ltIx x y z.
+Definition ltr_maxr x y z : (x < max y z) = (x < y) || (x < z) := ltxU x y z.
+Definition ltr_maxl x y z : (max y z < x) = (y < x) && (z < x) := ltUx x y z.
+Definition lter_minr := (ler_minr, ltr_minr).
+Definition lter_minl := (ler_minl, ltr_minl).
+Definition lter_maxr := (ler_maxr, ltr_maxr).
+Definition lter_maxl := (ler_maxl, ltr_maxl).
+Definition minrK x y : max (min x y) x = x := meetUKC y x.
+Definition minKr x y : min y (max x y) = y := joinKIC x y.
+Definition maxr_minl : @left_distributive R R max min := @joinIl _ R.
+Definition maxr_minr : @right_distributive R R max min := @joinIr _ R.
+Definition minr_maxl : @left_distributive R R min max := @meetUl _ R.
+Definition minr_maxr : @right_distributive R R min max := @meetUr _ R.
+Variant minr_spec x y : bool -> bool -> R -> Type :=
+| Minr_r of x <= y : minr_spec x y true false x
+| Minr_l of y < x : minr_spec x y false true y.
+Lemma minrP x y : minr_spec x y (x <= y) (y < x) (min x y).
+Proof. by case: leP; constructor. Qed.
+Variant maxr_spec x y : bool -> bool -> R -> Type :=
+| Maxr_r of y <= x : maxr_spec x y true false x
+| Maxr_l of x < y : maxr_spec x y false true y.
+Lemma maxrP x y : maxr_spec x y (y <= x) (x < y) (max x y).
+Proof. by case: (leP y); constructor. Qed.
+End MinMax.
+End RealDomainOperations.
+
+Section RealField.
+Definition lerif_mean_square := leif_mean_square.
+Definition lerif_AGM2 := leif_AGM2.
+End RealField.
+
+Section RealClosedFieldTheory.
+Definition lerif_normC_Re_Creal := leif_normC_Re_Creal.
+Definition lerif_Re_Creal := leif_Re_Creal.
+Definition lerif_rootC_AGM := leif_rootC_AGM.
+End RealClosedFieldTheory.
+
+End Theory.
+
+End mc_1_7.
+
 End Num.
 
-Export Num.NumDomain.Exports Num.NumField.Exports Num.ClosedField.Exports.
+Export Num.NumDomain.Exports Num.NormedModule.Exports.
+Export Num.NumField.Exports Num.ClosedField.Exports.
 Export Num.RealDomain.Exports Num.RealField.Exports.
 Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
 
+Notation RealLePoMixin := Num.RealMixin.LePo.
+Notation RealLtPoMixin := Num.RealMixin.LtPo.
 Notation RealLeMixin := Num.RealMixin.Le.
 Notation RealLtMixin := Num.RealMixin.Lt.
 Notation RealLeAxiom R := (Num.RealMixin.Real (Phant R) (erefl _)).
