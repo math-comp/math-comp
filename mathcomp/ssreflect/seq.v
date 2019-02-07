@@ -2122,6 +2122,13 @@ Proof. by rewrite /index; elim: s => //= y s IHs; rewrite (inj_eq Hf) IHs. Qed.
 Lemma map_inj_uniq s : uniq (map f s) = uniq s.
 Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
 
+Lemma perm_map_inj s t : perm_eq (map f s) (map f t) -> perm_eq s t.
+Proof.
+move/perm_eqP=> Est; apply/allP=> x _ /=.
+have Dx: pred1 x =1 preim f (pred1 (f x)) by move=> y /=; rewrite inj_eq.
+by rewrite !(eq_count Dx) -!count_map Est.
+Qed.
+
 End EqMap.
 
 Arguments mapP {T1 T2 f s y}.
@@ -2189,6 +2196,9 @@ Hypothesis fK : ocancel f g.
 Lemma pmap_filter s : map g (pmap s) = filter [eta f] s.
 Proof. by elim: s => //= x s <-; rewrite -{3}(fK x); case: (f _). Qed.
 
+Lemma pmap_cat s t : pmap (s ++ t) = pmap s ++ pmap t.
+Proof. by elim: s => //= x s ->; case/f: x. Qed.
+
 End Pmap.
 
 Section EqPmap.
@@ -2211,6 +2221,12 @@ Qed.
 Lemma pmap_uniq s : uniq s -> uniq (pmap f s).
 Proof.
 by move/(filter_uniq [eta f]); rewrite -(pmap_filter fK); apply: map_uniq.
+Qed.
+
+Lemma perm_pmap s t : perm_eq s t -> perm_eq (pmap f s) (pmap f t).
+Proof.
+move=> eq_st; apply/(perm_map_inj (@Some_inj _)); rewrite !pmapS_filter.
+exact/perm_map/perm_filter.
 Qed.
 
 End EqPmap.
