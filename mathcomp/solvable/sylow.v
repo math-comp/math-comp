@@ -535,8 +535,7 @@ Qed.
 
 End Zgroups.
 
-Arguments Zgroup _ _%g.
-Prenex Implicits Zgroup.
+Arguments Zgroup {gT} A%g.
 
 Section NilPGroups.
 

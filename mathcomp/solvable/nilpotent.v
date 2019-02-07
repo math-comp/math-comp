@@ -52,8 +52,8 @@ Definition lower_central_at n := lower_central_at_rec n.-1.
 (* "cooking" destroys it.                                                     *)
 Definition upper_central_at := nosimpl upper_central_at_rec.
 
-Arguments lower_central_at _%N _ _%g.
-Arguments upper_central_at _%N _ _%g.
+Arguments lower_central_at n%N {gT} A%g.
+Arguments upper_central_at n%N {gT} A%g.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
   (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.
@@ -75,10 +75,9 @@ Definition solvable :=
 
 End PropertiesDefs.
 
-Arguments nilpotent _ _%g.
-Arguments nil_class _ _%g.
-Arguments solvable _ _%g.
-Prenex Implicits nil_class nilpotent solvable.
+Arguments nilpotent {gT} A%g.
+Arguments nil_class {gT} A%g.
+Arguments solvable {gT} A%g.
 
 Section NilpotentProps.
 
@@ -321,7 +320,7 @@ End LowerCentral.
 
 Notation "''L_' n ( G )" := (lower_central_at_group n G) : Group_scope.
 
-Lemma lcn_cont n : GFunctor.continuous (lower_central_at n).
+Lemma lcn_cont n : GFunctor.continuous (@lower_central_at n).
 Proof.
 case: n => //; elim=> // n IHn g0T h0T H phi.
 by rewrite !lcnSn morphimR ?lcn_sub // commSg ?IHn.
@@ -339,7 +338,7 @@ Implicit Type gT : finGroupType.
 Lemma ucn_pmap : exists hZ : GFunctor.pmap, @upper_central_at n = hZ.
 Proof.
 elim: n => [|n' [hZ defZ]]; first by exists trivGfun_pgFun.
-by exists [pgFun of center %% hZ]; rewrite /= -defZ.
+by exists [pgFun of @center %% hZ]; rewrite /= -defZ.
 Qed.
 
 (* Now extract all the intermediate facts of the last proof. *)
@@ -352,7 +351,7 @@ Canonical upper_central_at_group gT G := Group (@ucn_group_set gT G).
 Lemma ucn_sub gT (G : {group gT}) : 'Z_n(G) \subset G.
 Proof. by have [hZ ->] := ucn_pmap; apply: gFsub. Qed.
 
-Lemma morphim_ucn : GFunctor.pcontinuous (upper_central_at n).
+Lemma morphim_ucn : GFunctor.pcontinuous (@upper_central_at n).
 Proof. by have [hZ ->] := ucn_pmap; apply: pmorphimF. Qed.
 
 Canonical ucn_igFun := [igFun by ucn_sub & morphim_ucn].

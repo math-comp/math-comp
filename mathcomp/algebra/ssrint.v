@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp
-Require Import fintype finfun bigop ssralg ssrnum poly.
+Require Import fintype finfun bigop ssralg countalg ssrnum poly.
 Import GRing.Theory Num.Theory.
 
 (******************************************************************************)
@@ -290,7 +290,7 @@ Lemma mulz_addl : left_distributive mulz (+%R).
 Proof.
 move=> x y z; elim: z=> [|n|n]; first by rewrite !(mul0z,mulzC).
   by rewrite !mulzS=> ->; rewrite !addrA [X in X + _]addrAC.
-rewrite !mulzN !mulzS -!opprD=> /(inv_inj (@opprK _))->.
+rewrite !mulzN !mulzS -!opprD=> /oppr_inj->.
 by rewrite !addrA [X in X + _]addrAC.
 Qed.
 
@@ -330,22 +330,21 @@ Lemma mulVz : {in unitz, left_inverse 1%R invz *%R}.
 Proof. by move=> n /pred2P[] ->. Qed.
 
 Lemma mulzn_eq1 m (n : nat) : (m * n == 1) = (m == 1) && (n == 1%N).
-Proof. by case: m=> m /=; [rewrite -PoszM [_==_]muln_eq1 | case: n]. Qed.
+Proof. by case: m => m /=; [rewrite -PoszM [_==_]muln_eq1 | case: n]. Qed.
 
 Lemma unitzPl m n : n * m = 1 -> m \is a unitz.
 Proof.
-case: m => m; move/eqP; rewrite qualifE.
-* by rewrite mulzn_eq1; case/andP=> _; move/eqP->.
-* by rewrite NegzE intS mulrN -mulNr mulzn_eq1; case/andP=> _.
+rewrite qualifE => /eqP.
+by case: m => m; rewrite ?NegzE ?mulrN -?mulNr mulzn_eq1 => /andP[_ /eqP->].
 Qed.
 
-Lemma  invz_out : {in [predC unitz], invz =1 id}.
+Lemma invz_out : {in [predC unitz], invz =1 id}.
 Proof. exact. Qed.
 
 Lemma idomain_axiomz m n : m * n = 0 -> (m == 0) || (n == 0).
 Proof.
-by case: m n => m [] n //=; move/eqP; rewrite ?(NegzE,mulrN,mulNr);
-  rewrite ?(inv_eq (@opprK _)) -PoszM [_==_]muln_eq0.
+by case: m n => m [] n //= /eqP;
+  rewrite ?(NegzE, mulrN, mulNr) ?oppr_eq0 -PoszM [_ == _]muln_eq0.
 Qed.
 
 Definition comMixin := ComUnitRingMixin mulVz unitzPl invz_out.
@@ -359,10 +358,17 @@ Canonical int_comUnitRing := Eval hnf in [comUnitRingType of int].
 Canonical int_iDomain :=
   Eval hnf in IdomainType int intUnitRing.idomain_axiomz.
 
+Canonical int_countZmodType := [countZmodType of int].
+Canonical int_countRingType := [countRingType of int].
+Canonical int_countComRingType := [countComRingType of int].
+Canonical int_countUnitRingType := [countUnitRingType of int].
+Canonical int_countComUnitRingType := [countComUnitRingType of int].
+Canonical int_countIdomainType := [countIdomainType of int].
+
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
-Arguments absz _%distn_scope.
+Arguments absz m%distn_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 
 Module intOrdered.
@@ -913,7 +919,7 @@ Proof. by rewrite -(mulr0z x) ler_nmulz2l. Qed.
 Lemma mulrIz x (hx : x != 0) : injective ( *~%R x).
 Proof.
 move=> y z; rewrite -![x *~ _]mulrzr => /(mulfI hx).
-by apply: mono_inj y z; apply: ler_pmulz2l.
+by apply: incr_inj y z; apply: ler_pmulz2l.
 Qed.
 
 Lemma ler_int m n : (m%:~R <= n%:~R :> R) = (m <= n).
@@ -960,7 +966,7 @@ Proof. by rewrite mulrz_eq0 negb_or. Qed.
 
 Lemma realz n : (n%:~R : R) \in Num.real.
 Proof. by rewrite -topredE /Num.real /= ler0z lerz0 ler_total. Qed.
-Hint Resolve realz.
+Hint Resolve realz : core.
 
 Definition intr_inj := @mulrIz 1 (oner_neq0 R).
 
@@ -1273,7 +1279,7 @@ Qed.
 Lemma ler_piexpz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in >= 0 &, {mono (exprz x) : x y /~ x <= y}}.
 Proof.
-apply: (nhomo_mono_in (nhomo_inj_in_lt _ _)).
+apply: (ler_nmono_in (inj_nhomo_ltr_in _ _)).
   by move=> n m hn hm /=; apply: ieexprIz; rewrite // ltr_eqF.
 by apply: ler_wpiexpz2l; rewrite ?ltrW.
 Qed.
@@ -1285,7 +1291,7 @@ Proof. exact: (lerW_nmono_in (ler_piexpz2l _ _)). Qed.
 Lemma ler_niexpz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in < 0 &, {mono (exprz x) : x y /~ x <= y}}.
 Proof.
-apply: (nhomo_mono_in (nhomo_inj_in_lt _ _)).
+apply: (ler_nmono_in (inj_nhomo_ltr_in _ _)).
   by move=> n m hn hm /=; apply: ieexprIz; rewrite // ltr_eqF.
 by apply: ler_wniexpz2l; rewrite ?ltrW.
 Qed.
@@ -1296,7 +1302,7 @@ Proof. exact: (lerW_nmono_in (ler_niexpz2l _ _)). Qed.
 
 Lemma ler_eexpz2l x (x1 : 1 < x) : {mono (exprz x) : x y / x <= y}.
 Proof.
-apply: (homo_mono (homo_inj_lt _ _)).
+apply: (ler_mono (inj_homo_ltr _ _)).
   by apply: ieexprIz; rewrite ?(ltr_trans ltr01) // gtr_eqF.
 by apply: ler_weexpz2l; rewrite ?ltrW.
 Qed.
@@ -1342,7 +1348,7 @@ Qed.
 Lemma ler_pexpz2r n (hn : 0 < n) :
   {in >= 0 & , {mono ((@exprz R)^~ n) : x y / x <= y}}.
 Proof.
-apply: homo_mono_in (homo_inj_in_lt _ _).
+apply: ler_mono_in (inj_homo_ltr_in _ _).
   by move=> x y hx hy /=; apply: pexpIrz; rewrite // gtr_eqF.
 by apply: ler_wpexpz2r; rewrite ltrW.
 Qed.
@@ -1354,7 +1360,7 @@ Proof. exact: lerW_mono_in (ler_pexpz2r _). Qed.
 Lemma ler_nexpz2r n (hn : n < 0) :
   {in > 0 & , {mono ((@exprz R)^~ n) : x y /~ x <= y}}.
 Proof.
-apply: nhomo_mono_in (nhomo_inj_in_lt _ _); last first.
+apply: ler_nmono_in (inj_nhomo_ltr_in _ _); last first.
   by apply: ler_wnexpz2r; rewrite ltrW.
 by move=> x y hx hy /=; apply: pexpIrz; rewrite ?[_ \in _]ltrW ?ltr_eqF.
 Qed.
@@ -1600,7 +1606,7 @@ Module Export IntDist.
 
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
-Arguments absz _%distn_scope.
+Arguments absz m%distn_scope.
 Notation "`| m |" := (absz m) : nat_scope.
 Coercion Posz : nat >-> int.
 

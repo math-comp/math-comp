@@ -174,8 +174,8 @@ Qed.
 Canonical nat_eqMixin := EqMixin eqnP.
 Canonical nat_eqType := Eval hnf in EqType nat nat_eqMixin.
 
-Arguments eqnP [x y].
-Prenex Implicits eqnP.
+Arguments eqn !m !n.
+Arguments eqnP {x y}.
 
 Lemma eqnE : eqn = eq_op. Proof. by []. Qed.
 
@@ -316,11 +316,11 @@ Lemma leq0n n : 0 <= n.                 Proof. by []. Qed.
 Lemma ltn0Sn n : 0 < n.+1.              Proof. by []. Qed.
 Lemma ltn0 n : n < 0 = false.           Proof. by []. Qed.
 Lemma leqnn n : n <= n.                 Proof. by elim: n. Qed.
-Hint Resolve leqnn.
+Hint Resolve leqnn : core.
 Lemma ltnSn n : n < n.+1.               Proof. by []. Qed.
 Lemma eq_leq m n : m = n -> m <= n.     Proof. by move->. Qed.
 Lemma leqnSn n : n <= n.+1.             Proof. by elim: n. Qed.
-Hint Resolve leqnSn.
+Hint Resolve leqnSn : core.
 Lemma leq_pred n : n.-1 <= n.           Proof. by case: n => /=. Qed.
 Lemma leqSpred n : n <= n.-1.+1.        Proof. by case: n => /=. Qed.
 
@@ -344,7 +344,7 @@ Lemma lt0n n : (0 < n) = (n != 0).             Proof. by case: n. Qed.
 Lemma lt0n_neq0 n : 0 < n -> n != 0.           Proof. by case: n. Qed.
 Lemma eqn0Ngt n : (n == 0) = ~~ (n > 0).       Proof. by case: n. Qed.
 Lemma neq0_lt0n n : (n == 0) = false -> 0 < n. Proof. by case: n. Qed.
-Hint Resolve lt0n_neq0 neq0_lt0n.
+Hint Resolve lt0n_neq0 neq0_lt0n : core.
 
 Lemma eqn_leq m n : (m == n) = (m <= n <= m).
 Proof. by elim: m n => [|m IHm] []. Qed.
@@ -361,6 +361,12 @@ Proof. by rewrite eqn_leq (leqNgt n) => ->. Qed.
 Lemma ltn_eqF m n : m < n -> m == n = false.
 Proof. by move/gtn_eqF; rewrite eq_sym. Qed.
 
+Lemma ltn_geF m n : m < n -> m >= n = false.
+Proof. by rewrite (leqNgt n) => ->. Qed.
+
+Lemma leq_gtF m n : m <= n -> m > n = false.
+Proof. by rewrite (ltnNge n) => ->. Qed.
+
 Lemma leq_eqVlt m n : (m <= n) = (m == n) || (m < n).
 Proof. by elim: m n => [|m IHm] []. Qed.
 
@@ -375,7 +381,7 @@ Proof. by move=> Hmn; apply: leq_trans. Qed.
 
 Lemma ltnW m n : m < n -> m <= n.
 Proof. exact: leq_trans. Qed.
-Hint Resolve ltnW.
+Hint Resolve ltnW : core.
 
 Lemma leqW m n : m <= n -> m <= n.+1.
 Proof. by move=> le_mn; apply: ltnW. Qed.
@@ -394,7 +400,7 @@ apply: (iffP idP); last by elim: n / => // n _ /leq_trans->.
 elim: n => [|n IHn]; first by case: m.
 by rewrite leq_eqVlt ltnS => /predU1P[<- // | /IHn]; right.
 Qed.
-Arguments leP [m n].
+Arguments leP {m n}.
 
 Lemma le_irrelevance m n le_mn1 le_mn2 : le_mn1 = le_mn2 :> (m <= n)%coq_nat.
 Proof.
@@ -411,7 +417,7 @@ Qed.
 
 Lemma ltP m n : reflect (m < n)%coq_nat (m < n).
 Proof. exact leP. Qed.
-Arguments ltP [m n].
+Arguments ltP {m n}.
 
 Lemma lt_irrelevance m n lt_mn1 lt_mn2 : lt_mn1 = lt_mn2 :> (m < n)%coq_nat.
 Proof. exact: (@le_irrelevance m.+1). Qed.
@@ -1375,6 +1381,138 @@ rewrite -[4]/(2 * 2) -mulnA mul2n -addnn sqrnD; apply/leqifP.
 by rewrite ltn_add2r eqn_add2r ltn_neqAle !nat_Cauchy; case: ifP => ->.
 Qed.
 
+Section Monotonicity.
+Variable T : Type.
+
+Lemma homo_ltn_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
+  (forall y x z, r x y -> r y z -> r x z) ->
+  {in D &, forall i j k, i < k < j -> k \in D} ->
+  {in D, forall i, i.+1 \in D -> r (f i) (f i.+1)} ->
+  {in D &, {homo f : i j / i < j >-> r i j}}.
+Proof.
+move=> r_trans Dcx r_incr i j iD jD lt_ij; move: (lt_ij) (jD) => /subnKC<-.
+elim: (_ - _) => [|k ihk]; first by rewrite addn0 => Dsi; apply: r_incr.
+move=> DSiSk [: DSik]; apply: (r_trans _ _ _ (ihk _)); rewrite ?addnS.
+  by abstract: DSik; apply: (Dcx _ _ iD DSiSk); rewrite ltn_addr ?addnS /=.
+by apply: r_incr; rewrite -?addnS.
+Qed.
+
+Lemma homo_ltn (f : nat -> T) (r : T -> T -> Prop) :
+  (forall y x z, r x y -> r y z -> r x z) ->
+  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i < j >-> r i j}.
+Proof. by move=> /(@homo_ltn_in predT f) fr fS i j; apply: fr. Qed.
+
+Lemma homo_leq_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
+  (forall x, r x x) -> (forall y x z, r x y -> r y z -> r x z) ->
+  {in D &, forall i j k, i < k < j -> k \in D} ->
+  {in D, forall i, i.+1 \in D -> r (f i) (f i.+1)} ->
+  {in D &, {homo f : i j / i <= j >-> r i j}}.
+Proof.
+move=> r_refl r_trans Dcx /(homo_ltn_in r_trans Dcx) lt_r i j iD jD.
+by rewrite leq_eqVlt => /predU1P[->//|/lt_r]; apply.
+Qed.
+
+Lemma homo_leq (f : nat -> T) (r : T -> T -> Prop) :
+   (forall x, r x x) -> (forall y x z, r x y -> r y z -> r x z) ->
+  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i <= j >-> r i j}.
+Proof. by move=> rrefl /(@homo_leq_in predT f r) fr fS i j; apply: fr. Qed.
+
+Section NatToNat.
+Variable (f : nat -> nat).
+
+(****************************************************************************)
+(* This listing of "Let"s factor out the required premices for the          *)
+(* subsequent lemmas, putting them in the context so that "done" solves the *)
+(* goals quickly                                                            *)
+(****************************************************************************)
+
+Let ltn_neqAle := ltn_neqAle.
+Let gtn_neqAge x y : (y < x) = (x != y) && (y <= x).
+Proof. by rewrite ltn_neqAle eq_sym. Qed.
+Let anti_leq := anti_leq.
+Let anti_geq : antisymmetric geq.
+Proof. by move=> m n /=; rewrite andbC => /anti_leq. Qed.
+Let leq_total := leq_total.
+
+Lemma ltnW_homo : {homo f : m n / m < n} -> {homo f : m n / m <= n}.
+Proof. exact: homoW. Qed.
+
+Lemma homo_inj_lt : injective f -> {homo f : m n / m <= n} ->
+  {homo f : m n / m < n}.
+Proof. exact: inj_homo. Qed.
+
+Lemma ltnW_nhomo : {homo f : m n /~ m < n} -> {homo f : m n /~ m <= n}.
+Proof. exact: homoW. Qed.
+
+Lemma nhomo_inj_lt : injective f -> {homo f : m n /~ m <= n} ->
+  {homo f : m n /~ m < n}.
+Proof. exact: inj_homo. Qed.
+
+Lemma incrn_inj : {mono f : m n / m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma decrn_inj : {mono f : m n /~ m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma leqW_mono : {mono f : m n / m <= n} -> {mono f : m n / m < n}.
+Proof. exact: anti_mono. Qed.
+
+Lemma leqW_nmono : {mono f : m n /~ m <= n} -> {mono f : m n /~ m < n}.
+Proof. exact: anti_mono. Qed.
+
+Lemma leq_mono : {homo f : m n / m < n} -> {mono f : m n / m <= n}.
+Proof. exact: total_homo_mono. Qed.
+
+Lemma leq_nmono : {homo f : m n /~ m < n} -> {mono f : m n /~ m <= n}.
+Proof. exact: total_homo_mono. Qed.
+
+Variable (D D' : pred nat).
+
+Lemma ltnW_homo_in : {in D & D', {homo f : m n / m < n}} ->
+  {in D & D', {homo f : m n / m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltnW_nhomo_in : {in D & D', {homo f : m n /~ m < n}} ->
+                 {in D & D', {homo f : m n /~ m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma homo_inj_lt_in : {in D & D', injective f} ->
+                        {in D & D', {homo f : m n / m <= n}} ->
+  {in D & D', {homo f : m n / m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma nhomo_inj_lt_in : {in D & D', injective f} ->
+                        {in D & D', {homo f : m n /~ m <= n}} ->
+  {in D & D', {homo f : m n /~ m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma incrn_inj_in : {in D &, {mono f : m n / m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma decrn_inj_in : {in D &, {mono f : m n /~ m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma leqW_mono_in : {in D &, {mono f : m n / m <= n}} ->
+  {in D &, {mono f : m n / m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma leqW_nmono_in : {in D &, {mono f : m n /~ m <= n}} ->
+  {in D &, {mono f : m n /~ m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma leq_mono_in : {in D &, {homo f : m n / m < n}} ->
+  {in D &, {mono f : m n / m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
+
+Lemma leq_nmono_in : {in D &, {homo f : m n /~ m < n}} ->
+  {in D &, {mono f : m n /~ m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
+
+End NatToNat.
+End Monotonicity.
+
 (* Support for larger integers. The normal definitions of +, - and even  *)
 (* IO are unsuitable for Peano integers larger than 2000 or so because   *)
 (* they are not tail-recursive. We provide a workaround module, along    *)
@@ -1445,7 +1583,7 @@ End NatTrec.
 
 Notation natTrecE := NatTrec.trecE.
 
-Lemma eq_binP : Equality.axiom Ndec.Neqb.
+Lemma eq_binP : Equality.axiom N.eqb.
 Proof.
 move=> p q; apply: (iffP idP) => [|<-]; last by case: p => //; elim.
 by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //=; case/IHp=> ->.
@@ -1453,6 +1591,8 @@ Qed.
 
 Canonical bin_nat_eqMixin := EqMixin eq_binP.
 Canonical bin_nat_eqType := Eval hnf in EqType N bin_nat_eqMixin.
+
+Arguments N.eqb !n !m.
 
 Section NumberInterpretation.
 
@@ -1499,7 +1639,7 @@ case=> //=; elim=> //= p; case: (nat_of_pos p) => //= n [<-].
 by rewrite natTrecE addnS /= addnS {2}addnn; elim: {1 3}n.
 Qed.
 
-Lemma nat_of_succ_gt0 p : Psucc p = p.+1 :> nat.
+Lemma nat_of_succ_gt0 p : Pos.succ p = p.+1 :> nat.
 Proof. by elim: p => //= p ->; rewrite !natTrecE. Qed.
 
 Lemma nat_of_addn_gt0 p q : (p + q)%positive = p + q :> nat.

@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp
-Require Import fintype bigop finset prime fingroup ssralg finalg.
+Require Import fintype bigop finset prime fingroup ssralg finalg countalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)
@@ -180,7 +180,8 @@ End ZpDef.
 
 Arguments Zp0 {p'}.
 Arguments Zp1 {p'}.
-Arguments inZp {p'}.
+Arguments inZp {p'} i.
+Arguments valZpK {p'} x.
 
 Lemma ord1 : all_equal_to (0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.
@@ -258,6 +259,8 @@ Notation "''Z_' p" := 'I_(Zp_trunc p).+2
   (at level 8, p at level 2, format "''Z_' p") : type_scope.
 Notation "''F_' p" := 'Z_(pdiv p)
   (at level 8, p at level 2, format "''F_' p") : type_scope.
+
+Arguments natr_Zp {p'} x.
 
 Section Groups.
 
@@ -364,3 +367,12 @@ Canonical Fp_decFieldType :=
   Eval hnf in [decFieldType of 'F_p for Fp_finFieldType].
 
 End PrimeField.
+
+Canonical Zp_countZmodType m := [countZmodType of 'I_m.+1].
+Canonical Zp_countRingType m := [countRingType of 'I_m.+2].
+Canonical Zp_countComRingType m := [countComRingType of 'I_m.+2].
+Canonical Zp_countUnitRingType m := [countUnitRingType of 'I_m.+2].
+Canonical Zp_countComUnitRingType m := [countComUnitRingType of 'I_m.+2].
+Canonical Fp_countIdomainType p := [countIdomainType of 'F_p].
+Canonical Fp_countFieldType p := [countFieldType of 'F_p].
+Canonical Fp_countDecFieldType p := [countDecFieldType of 'F_p].

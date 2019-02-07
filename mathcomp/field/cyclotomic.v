@@ -122,7 +122,7 @@ Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
-Local Hint Resolve (@intr_inj [numDomainType of algC]).
+Local Hint Resolve (@intr_inj [numDomainType of algC]) : core.
 Local Notation QtoC_M := (ratr_rmorphism [numFieldType of algC]).
 Local Notation floorC := (@floorC [numArchiDomainType of algC]).
 

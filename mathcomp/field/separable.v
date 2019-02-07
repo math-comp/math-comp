@@ -170,7 +170,7 @@ Qed.
 
 End SeparablePoly.
 
-Arguments separable_polyP [R p].
+Arguments separable_polyP {R p}.
 
 Lemma separable_map (F : fieldType) (R : idomainType)
                     (f : {rmorphism F -> R}) (p : {poly F}) :
@@ -544,7 +544,7 @@ Qed.
 
 End SeparableElement.
 
-Arguments separable_elementP [K x].
+Arguments separable_elementP {K x}.
 
 Lemma separable_elementS K E x :
   (K <= E)%VS -> separable_element K x -> separable_element E x.
@@ -992,10 +992,10 @@ Qed.
 
 End Separable.
 
-Arguments separable_elementP [F L K x].
-Arguments separablePn [F L K x].
-Arguments Derivation_separableP [F L K x].
-Arguments adjoin_separableP [F L K x].
-Arguments purely_inseparable_elementP [F L K x].
-Arguments separableP [F L K E].
-Arguments purely_inseparableP [F L K E].
+Arguments separable_elementP {F L K x}.
+Arguments separablePn {F L K x}.
+Arguments Derivation_separableP {F L K x}.
+Arguments adjoin_separableP {F L K x}.
+Arguments purely_inseparable_elementP {F L K x}.
+Arguments separableP {F L K E}.
+Arguments purely_inseparableP {F L K E}.

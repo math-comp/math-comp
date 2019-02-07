@@ -341,7 +341,7 @@ Proof. by move=> sHG; rewrite gacentE // setTI afix_repr. Qed.
 
 End FinFieldRepr.
 
-Arguments rowg_mx _ _ _%g.
+Arguments rowg_mx {F n%N} L%g.
 Notation "''Zm'" := (scale_action _ _ _) (at level 8) : action_scope.
 Notation "''Zm'" := (scale_groupAction _ _ _) : groupAction_scope.
 
@@ -406,7 +406,7 @@ Open Scope abelem_scope.
 
 Definition abelem_dim' (gT : finGroupType) (E : {set gT}) :=
   (logn (pdiv #|E|) #|E|).-1.
-Arguments abelem_dim' _ _%g.
+Arguments abelem_dim' {gT} E%g.
 Notation "''dim' E" := (abelem_dim' E).+1
   (at level 10, E at level 8, format "''dim'  E") : abelem_scope.
 
@@ -511,7 +511,7 @@ Proof. by rewrite im_abelem_rV inE. Qed.
 
 Lemma sub_im_abelem_rV mA : subset mA (mem (ErV @* E)).
 Proof. by rewrite unlock; apply/pred0P=> v /=; rewrite mem_im_abelem_rV. Qed.
-Hint Resolve mem_im_abelem_rV sub_im_abelem_rV.
+Hint Resolve mem_im_abelem_rV sub_im_abelem_rV : core.
 
 Lemma abelem_rV_1 : ErV 1 = 0%R. Proof. by rewrite morph1. Qed.
 
@@ -552,7 +552,7 @@ Proof. by rewrite -im_rVabelem mem_morphim. Qed.
 
 Lemma sub_rVabelem L : rV_E @* L \subset E.
 Proof. by rewrite -[_ @* L]morphimIim im_invm subsetIl. Qed.
-Hint Resolve mem_rVabelem sub_rVabelem.
+Hint Resolve mem_rVabelem sub_rVabelem : core.
 
 Lemma card_rVabelem L : #|rV_E @* L| = #|L|.
 Proof. by rewrite card_injm ?rVabelem_injm. Qed.
@@ -754,6 +754,8 @@ Qed.
 End SubGroup.
 
 End AbelemRepr.
+
+Arguments rVabelem_inj {p%N gT E%G} abelE ntE [v1%R v2%R] : rename.
 
 Section ModularRepresentation.
 

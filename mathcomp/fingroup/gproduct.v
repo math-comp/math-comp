@@ -867,11 +867,11 @@ Qed.
 
 End InternalProd.
 
-Arguments complP [gT H A B].
-Arguments splitsP [gT B A].
-Arguments sdprod_normal_complP [gT G K H].
-Arguments dprodYP [gT K H].
-Arguments bigdprodYP [gT I P F].
+Arguments complP {gT H A B}.
+Arguments splitsP {gT B A}.
+Arguments sdprod_normal_complP {gT G K H}.
+Arguments dprodYP {gT K H}.
+Arguments bigdprodYP {gT I P F}.
 
 Section MorphimInternalProd.
 
@@ -1700,5 +1700,5 @@ Qed.
 
 End DirprodIsom.
 
-Arguments mulgmP [gT H1 H2 G].
-Prenex Implicits mulgm mulgmP.
+Arguments mulgmP {gT H1 H2 G}.
+Prenex Implicits mulgm.

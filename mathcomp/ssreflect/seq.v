@@ -153,6 +153,12 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*   We are quite systematic in providing lemmas to rewrite any composition   *)
 (* of two operations. "rev", whose simplifications are not natural, is        *)
 (* protected with nosimpl.                                                    *)
+(*  ** The following are equivalent:                                          *)
+(*  [<-> P0; P1; ..; Pn] == P0, P1, ..., Pn are all equivalent                *)
+(*                       := P0 -> P1 -> ... -> Pn -> P0                       *)
+(*  if  T : [<-> P0; P1; ..; Pn]  is such an equivalence, and i, j are in nat *)
+(*  then T i j is a proof of the equivalence Pi <-> Pj between Pi and Pj      *)
+(*  when i (resp j) is out of bound, Pi (resp Pj) defaults to P0              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -780,12 +786,12 @@ End Sequences.
 
 Definition rev T (s : seq T) := nosimpl (catrev s [::]).
 
-Arguments nilP [T s].
-Arguments all_filterP [T a s].
+Arguments nilP {T s}.
+Arguments all_filterP {T a s}.
 
-Prenex Implicits size nilP head ohead behead last rcons belast.
+Prenex Implicits size head ohead behead last rcons belast.
 Prenex Implicits cat take drop rev rot rotr.
-Prenex Implicits find count nth all has filter all_filterP.
+Prenex Implicits find count nth all has filter.
 
 Notation count_mem x := (count (pred_of_simpl (pred1 x))).
 
@@ -1303,14 +1309,14 @@ Definition inE := (mem_seq1, in_cons, inE).
 
 Prenex Implicits mem_seq1 uniq undup index.
 
-Arguments eqseqP [T x y].
-Arguments hasP [T a s].
-Arguments hasPn [T a s].
-Arguments allP [T a s].
-Arguments allPn [T a s].
-Arguments nseqP [T n x y].
-Arguments count_memPn [T x s].
-Prenex Implicits eqseqP hasP hasPn allP allPn nseqP count_memPn.
+Arguments eqseq {T} !_ !_.
+Arguments eqseqP {T x y}.
+Arguments hasP {T a s}.
+Arguments hasPn {T a s}.
+Arguments allP {T a s}.
+Arguments allPn {T a s}.
+Arguments nseqP {T n x y}.
+Arguments count_memPn {T x s}.
 
 Section NthTheory.
 
@@ -1348,10 +1354,9 @@ Proof. by elim: s n => [|y s' IHs] [|n] /=; auto. Qed.
 Lemma headI T s (x : T) : rcons s x = head x s :: behead (rcons s x).
 Proof. by case: s. Qed.
 
-Arguments nthP [T s x].
-Arguments has_nthP [T a s].
-Arguments all_nthP [T a s].
-Prenex Implicits nthP has_nthP all_nthP.
+Arguments nthP {T s x}.
+Arguments has_nthP {T a s}.
+Arguments all_nthP {T a s}.
 
 Definition bitseq := seq bool.
 Canonical bitseq_eqType := Eval hnf in [eqType of bitseq].
@@ -1417,7 +1422,7 @@ Qed.
 
 Lemma perm_eq_refl s : perm_eq s s.
 Proof. exact/perm_eqP. Qed.
-Hint Resolve perm_eq_refl.
+Hint Resolve perm_eq_refl : core.
 
 Lemma perm_eq_sym : symmetric perm_eq.
 Proof. by move=> s1 s2; apply/perm_eqP/perm_eqP=> ? ?. Qed.
@@ -1592,11 +1597,11 @@ End PermSeq.
 Notation perm_eql s1 s2 := (perm_eq s1 =1 perm_eq s2).
 Notation perm_eqr s1 s2 := (perm_eq^~ s1 =1 perm_eq^~ s2).
 
-Arguments perm_eqP [T s1 s2].
-Arguments perm_eqlP [T s1 s2].
-Arguments perm_eqrP [T s1 s2].
-Prenex Implicits perm_eq perm_eqP perm_eqlP perm_eqrP.
-Hint Resolve perm_eq_refl.
+Arguments perm_eqP {T s1 s2}.
+Arguments perm_eqlP {T s1 s2}.
+Arguments perm_eqrP {T s1 s2}.
+Prenex Implicits perm_eq.
+Hint Resolve perm_eq_refl : core.
 
 Section RotrLemmas.
 
@@ -1822,7 +1827,7 @@ Qed.
 
 Lemma subseq_refl s : subseq s s.
 Proof. by elim: s => //= x s IHs; rewrite eqxx. Qed.
-Hint Resolve subseq_refl.
+Hint Resolve subseq_refl : core.
 
 Lemma cat_subseq s1 s2 s3 s4 :
   subseq s1 s3 -> subseq s2 s4 -> subseq (s1 ++ s2) (s3 ++ s4).
@@ -1836,6 +1841,12 @@ Proof. by rewrite -[s1 in subseq s1]cats0 cat_subseq ?sub0seq. Qed.
 
 Lemma suffix_subseq s1 s2 : subseq s2 (s1 ++ s2).
 Proof. exact: cat_subseq (sub0seq s1) _. Qed.
+
+Lemma take_subseq s i : subseq (take i s) s.
+Proof. by rewrite -[s in X in subseq _ X](cat_take_drop i) prefix_subseq. Qed.
+
+Lemma drop_subseq s i : subseq (drop i s) s.
+Proof. by rewrite -[s in X in subseq _ X](cat_take_drop i) suffix_subseq. Qed.
 
 Lemma mem_subseq s1 s2 : subseq s1 s2 -> {subset s1 <= s2}.
 Proof. by case/subseqP=> m _ -> x; apply: mem_mask. Qed.
@@ -1869,9 +1880,9 @@ Proof. by case/subseqP=> m _ -> Us2; apply: mask_uniq. Qed.
 End Subseq.
 
 Prenex Implicits subseq.
-Arguments subseqP [T s1 s2].
+Arguments subseqP {T s1 s2}.
 
-Hint Resolve subseq_refl.
+Hint Resolve subseq_refl : core.
 
 Section Rem.
 
@@ -2113,8 +2124,7 @@ Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
 
 End EqMap.
 
-Arguments mapP [T1 T2 f s y].
-Prenex Implicits mapP.
+Arguments mapP {T1 T2 f s y}.
 
 Lemma map_of_seq (T1 : eqType) T2 (s : seq T1) (fs : seq T2) (y0 : T2) :
   {f | uniq s -> size fs = size s -> map f s = fs}.
@@ -2679,7 +2689,7 @@ elim: A => /= [|s A /iffP IH_A]; [by right; case | rewrite mem_cat].
 have [s_x|s'x] := @idP (x \in s); first by left; exists s; rewrite ?mem_head.
 by apply: IH_A => [[t] | [t /predU1P[->|]]]; exists t; rewrite // mem_behead.
 Qed.
-Arguments flattenP [A x].
+Arguments flattenP {A x}.
 
 Lemma flatten_mapP (A : S -> seq T) s y :
   reflect (exists2 x, x \in s & y \in A x) (y \in flatten (map A s)).
@@ -2690,8 +2700,8 @@ Qed.
 
 End EqFlatten.
 
-Arguments flattenP [T A x].
-Arguments flatten_mapP [S T A s y].
+Arguments flattenP {T A x}.
+Arguments flatten_mapP {S T A s y}.
 
 Lemma perm_undup_count (T : eqType) (s : seq T) :
   perm_eq (flatten [seq nseq (count_mem x s) x | x <- undup s]) s.
@@ -2783,3 +2793,71 @@ by apply: inj_f => //; apply/allpairsP; [exists (x, y1) | exists (x, y2)].
 Qed.
 
 End EqAllPairs.
+
+Section AllIff.
+(* The Following Are Equivalent *)
+
+(* We introduce a specific conjunction, used to chain the consecutive *)
+(* items in a circular list of implications *)
+Inductive all_iff_and (P Q : Prop) : Prop := AllIffConj of P & Q.
+
+Definition all_iff (P0 : Prop) (Ps : seq Prop) : Prop :=
+  (fix aux (P : Prop) (Qs : seq Prop) : Prop :=
+      if Qs is Q :: Qs then all_iff_and (P -> Q) (aux Q Qs)
+      else P -> P0 : Prop) P0 Ps.
+
+Lemma all_iffLR P0 Ps : all_iff P0 Ps ->
+   forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
+Proof.
+have homo_ltn T (f : nat -> T) (r : T -> T -> Prop) : (* #201 *)
+  (forall y x z, r x y -> r y z -> r x z) ->
+  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i < j >-> r i j}.
+  move=> rtrans rfS x y; elim: y x => // y ihy x; rewrite ltnS leq_eqVlt.
+  case/orP=> [/eqP-> // | ltxy]; apply: rtrans (rfS _); exact: ihy.
+move=> Ps_iff; have ltn_imply : {homo nth P0 Ps : m n / m < n >-> (m -> n)}.
+  apply: homo_ltn => [??? xy yz /xy /yz //|i].
+  elim: Ps i P0 Ps_iff => [|P [|/=Q Ps] IHPs] [|i]//= P0 [P0P Ps_iff]//=;
+     do ?by [rewrite nth_nil|case: Ps_iff].
+  by case: Ps_iff => [PQ Ps_iff]; apply: IHPs; split => // /P0P.
+have {ltn_imply}leq_imply : {homo nth P0 Ps : m n / m <= n >-> (m -> n)}.
+  by move=> m n; rewrite leq_eqVlt => /predU1P[->//|/ltn_imply].
+move=> [:P0ton Pnto0] [|m] [|n]//=.
+- abstract: P0ton n.
+  suff P0to0 : P0 -> nth P0 Ps 0 by move=> /P0to0; apply: leq_imply.
+  by case: Ps Ps_iff {leq_imply} => // P Ps [].
+- abstract: Pnto0 m => /(leq_imply m (maxn (size Ps) m)).
+  by rewrite nth_default ?leq_max ?leqnn // orbT ; apply.
+by move=> /Pnto0; apply: P0ton.
+Qed.
+
+Lemma all_iffP P0 Ps : all_iff P0 Ps ->
+   forall m n, nth P0 (P0 :: Ps) m <-> nth P0 (P0 :: Ps) n.
+Proof. by move=> /all_iffLR iffPs m n; split => /iffPs. Qed.
+
+End AllIff.
+Arguments all_iffLR {P0 Ps}.
+Arguments all_iffP {P0 Ps}.
+Coercion all_iffP : all_iff >-> Funclass.
+
+(* This means "the following are all equivalent: P0, ... Pn" *)
+Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" := (all_iff P0 (P1 :: .. [:: Pn] ..))
+  (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]")
+  : form_scope.
+
+Section All2.
+Context {T U : Type} (p : T -> U -> bool).
+
+Fixpoint all2 s1 s2 :=
+  match s1, s2 with
+  | [::], [::] => true
+  | x1 :: s1, x2 :: s2 => p x1 x2 && all2 s1 s2
+  | _, _ => false
+  end.
+
+Lemma all2E s1 s2 :
+  all2 s1 s2 = (size s1 == size s2) && all [pred xy | p xy.1 xy.2] (zip s1 s2).
+Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2] //=; rewrite ihs1 andbCA. Qed.
+
+End All2.
+
+Arguments all2 {T U} p !s1 !s2.

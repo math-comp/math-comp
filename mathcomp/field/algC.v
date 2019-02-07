@@ -6,7 +6,7 @@ Require Import ssrbool ssrfun ssrnat eqtype seq choice div fintype.
 From mathcomp
 Require Import path bigop finset prime ssralg poly polydiv mxpoly.
 From mathcomp
-Require Import generic_quotient countalg ssrnum ssrint rat intdiv.
+Require Import generic_quotient countalg closed_field ssrnum ssrint rat intdiv.
 From mathcomp
 Require Import algebraics_fundamentals.
 
@@ -284,7 +284,7 @@ Canonical eqType := EqType type eqMixin.
 Definition choiceMixin : Choice.mixin_of type := EquivQuot.choiceMixin _.
 Canonical choiceType := ChoiceType type choiceMixin.
 
-Definition countMixin : Countable.mixin_of type := CanCountMixin (@reprK _ _).
+Definition countMixin : Countable.mixin_of type := CanCountMixin reprK.
 Canonical countType := CountType type countMixin.
 
 Definition CtoL (u : type) := rootQtoL (repr u).
@@ -382,7 +382,7 @@ Definition unitRingMixin := FieldUnitMixin mulVf inv0.
 Canonical unitRingType := UnitRingType type unitRingMixin.
 Canonical comUnitRingType := [comUnitRingType of type].
 
-Definition fieldMixin := @FieldMixin _ _ mulVf inv0.
+Definition fieldMixin := FieldMixin mulVf inv0.
 Definition idomainAxiom := FieldIdomainMixin fieldMixin.
 Canonical idomainType := IdomainType type idomainAxiom.
 Canonical fieldType := FieldType type fieldMixin.
@@ -405,7 +405,7 @@ rewrite horner_poly rmorph_sum; apply: eq_bigr => k _.
 by rewrite rmorphM rmorphX /= LtoC_K.
 Qed.
 
-Definition decFieldMixin := closed_field.closed_fields_QEMixin closedFieldAxiom.
+Definition decFieldMixin := closed_field_QEMixin closedFieldAxiom.
 Canonical decFieldType := DecFieldType type decFieldMixin.
 Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
 
@@ -600,7 +600,8 @@ Local Notation intrp := (map_poly intr).
 Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
-Local Hint Resolve (@intr_inj _ : injective ZtoC).
+
+Local Hint Resolve (intr_inj : injective ZtoC) : core.
 
 (* Specialization of a few basic ssrnum order lemmas. *)
 
@@ -638,7 +639,8 @@ Definition algC_algebraic x := Algebraics.Implementation.algebraic x.
 
 Lemma Creal0 : 0 \is Creal. Proof. exact: rpred0. Qed.
 Lemma Creal1 : 1 \is Creal. Proof. exact: rpred1. Qed.
-Hint Resolve Creal0 Creal1. (* Trivial cannot resolve a general real0 hint. *)
+(* Trivial cannot resolve a general real0 hint. *)
+Hint Resolve Creal0 Creal1 : core. 
 
 Lemma algCrect x : x = 'Re x + 'i * 'Im x.
 Proof. by rewrite [LHS]Crect. Qed.
@@ -648,7 +650,7 @@ Proof. by rewrite Creal_Re. Qed.
 
 Lemma algCreal_Im x : 'Im x \is Creal.
 Proof. by rewrite Creal_Im. Qed.
-Hint Resolve algCreal_Re algCreal_Im.
+Hint Resolve algCreal_Re algCreal_Im : core.
 
 (* Integer divisibility. *)
 
@@ -696,8 +698,8 @@ Lemma dvdC_trans x y z : (x %| y)%C -> (y %| z)%C -> (x %| z)%C.
 Proof. by move=> x_dv_y /dvdCP[m Zm ->]; apply: dvdC_mull. Qed.
 
 Lemma dvdC_refl x : (x %| x)%C.
-Proof. by apply/dvdCP; exists 1; rewrite ?mul1r ?Cint1. Qed.
-Hint Resolve dvdC_refl.
+Proof. by apply/dvdCP; exists 1; rewrite ?mul1r. Qed.
+Hint Resolve dvdC_refl : core.
 
 Fact dvdC_key x : pred_key (dvdC x). Proof. by []. Qed.
 Lemma dvdC_zmod x : zmod_closed (dvdC x).
@@ -731,7 +733,7 @@ Lemma eqCmod_refl e x : (x == x %[mod e])%C.
 Proof. by rewrite /eqCmod subrr rpred0. Qed.
 
 Lemma eqCmodm0 e : (e == 0 %[mod e])%C. Proof. by rewrite /eqCmod subr0. Qed.
-Hint Resolve eqCmod_refl eqCmodm0.
+Hint Resolve eqCmod_refl eqCmodm0 : core.
 
 Lemma eqCmod0 e x : (x == 0 %[mod e])%C = (e %| x)%C.
 Proof. by rewrite /eqCmod subr0. Qed.
@@ -818,7 +820,7 @@ Qed.
 
 Lemma Crat0 : 0 \in Crat. Proof. by apply/CratP; exists 0; rewrite rmorph0. Qed.
 Lemma Crat1 : 1 \in Crat. Proof. by apply/CratP; exists 1; rewrite rmorph1. Qed.
-Hint Resolve Crat0 Crat1.
+Hint Resolve Crat0 Crat1 : core.
 
 Fact Crat_key : pred_key Crat. Proof. by []. Qed.
 Fact Crat_divring_closed : divring_closed Crat.
@@ -923,5 +925,6 @@ Qed.
 End AutC.
 
 End AlgebraicsTheory.
-Hint Resolve Creal0 Creal1 Crat0 Crat1.
-Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0.
+
+Hint Resolve Creal0 Creal1 Crat0 Crat1 : core.
+Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.

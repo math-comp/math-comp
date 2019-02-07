@@ -98,15 +98,15 @@ Variant has_Frobenius_action G H : Prop :=
 
 End Definitions.
 
-Arguments semiregular _ _%g _%g.
-Arguments semiprime _ _%g _%g.
-Arguments normedTI _ _%g _%g _%g.
-Arguments Frobenius_group_with_complement _ _%g _%g.
-Arguments Frobenius_group _ _%g.
-Arguments Frobenius_group_with_kernel _ _%g _%g.
-Arguments Frobenius_group_with_kernel_and_complement _ _%g _%g _%g.
-Arguments Frobenius_action _ _%g _%g _ _%g _%act.
-Arguments has_Frobenius_action _ _%g _%g.
+Arguments semiregular {gT} K%g H%g.
+Arguments semiprime {gT} K%g H%g.
+Arguments normedTI {gT} A%g G%g L%g.
+Arguments Frobenius_group_with_complement {gT} G%g H%g.
+Arguments Frobenius_group {gT} G%g.
+Arguments Frobenius_group_with_kernel {gT} G%g K%g.
+Arguments Frobenius_group_with_kernel_and_complement {gT} G%g K%g H%g.
+Arguments Frobenius_action {gT} G%g H%g {sT} S%g to%act.
+Arguments has_Frobenius_action {gT} G%g H%g.
 
 Notation "[ 'Frobenius' G 'with' 'complement' H ]" :=
   (Frobenius_group_with_complement G H)
@@ -244,7 +244,7 @@ have Gg: g \in G by rewrite groupMl ?groupV.
 rewrite -conjIg (inj_eq (act_inj 'Js x)) (eq_sym A) (sameP eqP normP).
 by rewrite -cards_eq0 cardJg cards_eq0 setI_eq0 => /tiAG/(subsetP nAL)->.
 Qed.
-Arguments normedTI_P [A G L].
+Arguments normedTI_P {A G L}.
 
 Lemma normedTI_memJ_P A G L :
   reflect [/\ A != set0, L \subset G
@@ -620,9 +620,9 @@ Qed.
 
 End FrobeniusBasics.
 
-Arguments normedTI_P [gT A G L].
-Arguments normedTI_memJ_P [gT A G L].
-Arguments Frobenius_kerP [gT G K].
+Arguments normedTI_P {gT A G L}.
+Arguments normedTI_memJ_P {gT A G L}.
+Arguments Frobenius_kerP {gT G K}.
 
 Lemma Frobenius_coprime_quotient (gT : finGroupType) (G K H N : {group gT}) :
     K ><| H = G -> N <| G -> coprime #|K| #|H| /\ H :!=: 1%g ->

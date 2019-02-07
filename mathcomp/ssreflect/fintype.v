@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat seq choice.
+Require Import ssrfun ssrbool eqtype ssrnat seq choice path.
 
 (******************************************************************************)
 (*    The Finite interface describes Types with finitely many elements,       *)
@@ -19,7 +19,7 @@ Require Import ssrfun ssrbool eqtype ssrnat seq choice.
 (* interfaces, in this file for subFinType, and in the finalg library.        *)
 (*    We define the following interfaces and structures:                      *)
 (*         finType == the packed class type of the Finite interface.          *)
-(*       FinType m == the packed class for the Finite mixin m.                *)
+(*     FinType T m == the packed finType class for type T and Finite mixin m. *)
 (*  Finite.axiom e <-> every x : T occurs exactly once in e : seq T.          *)
 (*   FinMixin ax_e == the Finite mixin for T, encapsulating                   *)
 (*                    ax_e : Finite.axiom e for some e : seq T.               *)
@@ -133,15 +133,22 @@ Require Import ssrfun ssrbool eqtype ssrnat seq choice.
 (*   [pick x | P & Q] := [pick x | P & Q].                                    *)
 (* [pick x in A | P & Q] := [pick x | P & Q].                                 *)
 (* and (un)typed variants [pick x : T | P], [pick x : T in A], [pick x], etc. *)
-(* [arg min_(i < i0 | P) M] == a value of i : T minimizing M : nat, subject   *)
+(* [arg min_(i < i0 | P) M] == a value i : T minimizing M : nat, subject      *)
 (*                   to the condition P (i may appear in P and M), and        *)
 (*                   provided P holds for i0.                                 *)
-(* [arg max_(i > i0 | P) M] == a value of i maximizing M subject to P and     *)
+(* [arg max_(i > i0 | P) M] == a value i maximizing M subject to P and        *)
 (*                   provided P holds for i0.                                 *)
 (* [arg min_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.          *)
 (* [arg max_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.          *)
 (* [arg min_(i < i0) M] == an i : T minimizing M, given i0 : T.               *)
 (* [arg max_(i > i0) M] == an i : T maximizing M, given i0 : T.               *)
+(*   These are special instances of                                           *)
+(* [arg[ord]_(i < i0 | P) F] == a value i : I, minimizing F wrt ord : rel T   *)
+(*                              such that for all j : T, ord (F i) (F j)      *)
+(*                              subject to the condition P, and provided P i0 *)
+(*                              where I : finType, T : eqType and F : I -> T  *)
+(* [arg[ord]_(i < i0 in A) F] == an i \in A minimizing F wrt ord, if i0 \in A.*)
+(* [arg[ord]_(i < i0) F] == an i : T minimizing F wrt ord, given i0 : T.      *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -172,7 +179,7 @@ Section Mixins.
 Variable T : countType.
 
 Definition EnumMixin :=
-  let: Countable.Pack _ (Countable.Class _ m) _ as cT := T
+  let: Countable.Pack _ (Countable.Class _ m) as cT := T
     return forall e : seq cT, axiom e -> mixin_of cT in
   @Mixin (EqType _ _) m.
 
@@ -198,26 +205,26 @@ Section ClassDef.
 
 Record class_of T := Class {
   base : Choice.class_of T;
-  mixin : mixin_of (Equality.Pack base T)
+  mixin : mixin_of (Equality.Pack base)
 }.
 Definition base2 T c := Countable.Class (@base T c) (mixin_base (mixin c)).
 Local Coercion base : class_of >-> Choice.class_of.
 
-Structure type : Type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type : Type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack b0 (m0 : mixin_of (EqType T b0)) :=
   fun bT b & phant_id (Choice.class bT) b =>
-  fun m & phant_id m0 m => Pack (@Class T b m) T.
+  fun m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition countType := @Countable.Pack cT (base2 xclass) xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition countType := @Countable.Pack cT (base2 xclass).
 
 End ClassDef.
 
@@ -626,7 +633,7 @@ Lemma subxx_hint (mA : mem_pred T) : subset mA mA.
 Proof.
 by case: mA => A; have:= introT (subsetP A A); rewrite !unlock => ->.
 Qed.
-Hint Resolve subxx_hint.
+Hint Resolve subxx_hint : core.
 
 (* The parametrization by predType makes it easier to apply subxx. *)
 Lemma subxx (pT : predType T) (pA : pT) : pA \subset pA.
@@ -818,16 +825,15 @@ Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
 
-Hint Resolve subxx_hint.
+Hint Resolve subxx_hint : core.
 
-Arguments pred0P [T P].
-Arguments pred0Pn [T P].
-Arguments subsetP [T A B].
-Arguments subsetPn [T A B].
-Arguments subset_eqP [T A B].
-Arguments card_uniqP [T s].
-Arguments properP [T A B].
-Prenex Implicits pred0P pred0Pn subsetP subsetPn subset_eqP card_uniqP.
+Arguments pred0P {T P}.
+Arguments pred0Pn {T P}.
+Arguments subsetP {T A B}.
+Arguments subsetPn {T A B}.
+Arguments subset_eqP {T A B}.
+Arguments card_uniqP {T s}.
+Arguments properP {T A B}.
 
 (**********************************************************************)
 (*                                                                    *)
@@ -927,14 +933,14 @@ Proof. by rewrite negb_exists; apply/eq_forallb => x; rewrite [~~ _]fun_if. Qed.
 
 End Quantifiers.
 
-Arguments forallP [T P].
-Arguments eqfunP [T rT f1 f2].
-Arguments forall_inP [T D P].
-Arguments eqfun_inP [T rT D f1 f2].
-Arguments existsP [T P].
-Arguments exists_eqP [T rT f1 f2].
-Arguments exists_inP [T D P].
-Arguments exists_eq_inP [T rT D f1 f2].
+Arguments forallP {T P}.
+Arguments eqfunP {T rT f1 f2}.
+Arguments forall_inP {T D P}.
+Arguments eqfun_inP {T rT D f1 f2}.
+Arguments existsP {T P}.
+Arguments exists_eqP {T rT f1 f2}.
+Arguments exists_inP {T D P}.
+Arguments exists_eq_inP {T rT D f1 f2}.
 
 Notation "'exists_in_ view" := (exists_inPP _ (fun _ => view))
   (at level 4, right associativity, format "''exists_in_' view").
@@ -943,46 +949,75 @@ Notation "'forall_in_ view" := (forall_inPP _ (fun _ => view))
 
 Section Extrema.
 
-Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat).
+Variant extremum_spec {T : eqType} (ord : rel T) {I : finType}
+  (P : pred I) (F : I -> T) : I -> Type :=
+  ExtremumSpec (i : I) of P i & (forall j : I, P j -> ord (F i) (F j)) :
+                   extremum_spec ord P F i.
 
-Let arg_pred ord := [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
+Let arg_pred {T : eqType} ord {I : finType} (P : pred I) (F : I -> T) :=
+  [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
 
-Definition arg_min := odflt i0 (pick (arg_pred leq)).
+Section Extremum.
 
-Definition arg_max := odflt i0 (pick (arg_pred geq)).
+Context {T : eqType} {I : finType} (ord : rel T).
+Context (i0 : I) (P : pred I) (F : I -> T).
 
-Variant extremum_spec (ord : rel nat) : I -> Type :=
-  ExtremumSpec i of P i & (forall j, P j -> ord (F i) (F j))
-    : extremum_spec ord i.
+Hypothesis ord_refl : reflexive ord.
+Hypothesis ord_trans : transitive ord.
+Hypothesis ord_total : total ord.
+
+Definition extremum := odflt i0 (pick (arg_pred ord P F)).
 
 Hypothesis Pi0 : P i0.
 
-Let FP n := [exists (i | P i), F i == n].
-Let FP_F i : P i -> FP (F i).
-Proof. by move=> Pi; apply/existsP; exists i; rewrite Pi /=. Qed.
-Let exFP : exists n, FP n. Proof. by exists (F i0); apply: FP_F. Qed.
-
-Lemma arg_minP : extremum_spec leq arg_min.
+Lemma extremumP : extremum_spec ord P F extremum.
 Proof.
-rewrite /arg_min; case: pickP => [i /andP[Pi /forallP/= min_i] | no_i].
+rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
   by split=> // j; apply/implyP.
-case/ex_minnP: exFP => n ex_i min_i; case/pred0P: ex_i => i /=.
-apply: contraFF (no_i i) => /andP[Pi /eqP def_n]; rewrite /= Pi.
-by apply/forall_inP=> j Pj; rewrite def_n min_i ?FP_F.
+have := sort_sorted ord_total [seq F i | i <- enum P].
+set s := sort _ _ => ss; have s_gt0 : size s > 0
+   by rewrite size_sort size_map -cardE; apply/card_gt0P; exists i0.
+pose t0 := nth (F i0) s 0; have: t0 \in s by rewrite mem_nth.
+rewrite mem_sort => /mapP/sig2_eqW[it0]; rewrite mem_enum => it0P def_t0.
+have /negP[/=] := no_i it0; rewrite [P _]it0P/=; apply/'forall_implyP=> j Pj.
+have /(nthP (F i0))[k g_lt <-] : F j \in s by rewrite mem_sort map_f ?mem_enum.
+by rewrite -def_t0 sorted_le_nth.
 Qed.
 
-Lemma arg_maxP : extremum_spec geq arg_max.
+End Extremum.
+
+Notation "[ 'arg[' ord ]_( i < i0 | P ) F ]" :=
+    (extremum ord i0 (fun i => P%B) (fun i => F))
+  (at level 0, ord, i, i0 at level 10,
+   format "[ 'arg[' ord ]_( i  <  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg[' ord ]_( i < i0 'in' A ) F ]" :=
+    [arg[ord]_(i < i0 | i \in A) F]
+  (at level 0, ord, i, i0 at level 10,
+   format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg[' ord ]_( i < i0 ) F ]" := [arg[ord]_(i < i0 | true) F]
+  (at level 0, ord, i, i0 at level 10,
+   format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : form_scope.
+
+Section ArgMinMax.
+
+Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat) (Pi0 : P i0).
+
+Definition arg_min := extremum leq i0 P F.
+Definition arg_max := extremum geq i0 P F.
+
+Lemma arg_minP : extremum_spec leq P F arg_min.
+Proof. by apply: extremumP => //; [apply: leq_trans|apply: leq_total]. Qed.
+
+Lemma arg_maxP : extremum_spec geq P F arg_max.
 Proof.
-rewrite /arg_max; case: pickP => [i /andP[Pi /forall_inP/= max_i] | no_i].
-  by split=> // j; apply/implyP.
-have (n): FP n -> n <= foldr maxn 0 (map F (enum P)).
-  case/existsP=> i; rewrite -[P i]mem_enum andbC /= => /andP[/eqP <-].
-  elim: (enum P) => //= j e IHe; rewrite leq_max orbC !inE.
-  by case/predU1P=> [-> | /IHe-> //]; rewrite leqnn orbT.
-case/ex_maxnP=> // n ex_i max_i; case/pred0P: ex_i => i /=.
-apply: contraFF (no_i i) => /andP[Pi def_n]; rewrite /= Pi.
-by apply/forall_inP=> j Pj; rewrite (eqP def_n) max_i ?FP_F.
+apply: extremumP => //; first exact: leqnn.
+  by move=> n m p mn np; apply: leq_trans mn.
+by move=> ??; apply: leq_total.
 Qed.
+
+End ArgMinMax.
 
 End Extrema.
 
@@ -1197,15 +1232,15 @@ Qed.
 End Image.
 
 Prenex Implicits codom iinv.
-Arguments imageP [T T' f A y].
-Arguments codomP [T T' f y].
+Arguments imageP {T T' f A y}.
+Arguments codomP {T T' f y}.
 
 Lemma flatten_imageP (aT : finType) (rT : eqType) A (P : pred aT) (y : rT) :
   reflect (exists2 x, x \in P & y \in A x) (y \in flatten [seq A x | x in P]).
 Proof.
 by apply: (iffP flatten_mapP) => [][x Px]; exists x; rewrite ?mem_enum in Px *.
 Qed.
-Arguments flatten_imageP [aT rT A P y].
+Arguments flatten_imageP {aT rT A P y}.
 
 Section CardFunImage.
 
@@ -1253,7 +1288,7 @@ Qed.
 
 End CardFunImage.
 
-Arguments image_injP [T T' f A].
+Arguments image_injP {T T' f A}.
 
 Section FinCancel.
 
@@ -1380,7 +1415,7 @@ Coercion subFinType_subCountType sT := @SubCountType _ _ sT (subFin_mixin sT).
 Canonical subFinType_subCountType.
 
 Coercion subFinType_finType sT :=
-  Pack (@Class sT (sub_choiceClass sT) (subFin_mixin sT)) sT.
+  Pack (@Class sT (sub_choiceClass sT) (subFin_mixin sT)).
 Canonical subFinType_finType.
 
 Lemma codom_val sT x : (x \in codom (val : sT -> T)) = P x.
@@ -1486,7 +1521,7 @@ Proof. by rewrite mem_undup mem_pmap -valK map_f ?ssvalP. Qed.
 Lemma val_seq_sub_enum : uniq s -> map val seq_sub_enum = s.
 Proof.
 move=> Us; rewrite /seq_sub_enum undup_id ?pmap_sub_uniq //.
-rewrite (pmap_filter (@insubK _ _ _)); apply/all_filterP.
+rewrite (pmap_filter (insubK _)); apply/all_filterP.
 by apply/allP => x; rewrite isSome_insub.
 Qed.
 
@@ -1586,7 +1621,7 @@ End OrdinalSub.
 Notation "''I_' n" := (ordinal n)
   (at level 8, n at level 2, format "''I_' n").
 
-Hint Resolve ltn_ord.
+Hint Resolve ltn_ord : core.
 
 Section OrdinalEnum.
 
@@ -1647,13 +1682,13 @@ Lemma rev_ord_proof n (i : 'I_n) : n - i.+1  < n.
 Proof. by case: n i => [|n] [i lt_i_n] //; rewrite ltnS subSS leq_subr. Qed.
 Definition rev_ord n i := Ordinal (@rev_ord_proof n i).
 
-Lemma rev_ordK n : involutive (@rev_ord n).
+Lemma rev_ordK {n} : involutive (@rev_ord n).
 Proof.
 by case: n => [|n] [i lti] //; apply: val_inj; rewrite /= !subSS subKn.
 Qed.
 
 Lemma rev_ord_inj {n} : injective (@rev_ord n).
-Proof. exact: inv_inj (@rev_ordK n). Qed.
+Proof. exact: inv_inj rev_ordK. Qed.
 
 (* bijection between any finType T and the Ordinal finType of its cardinal *)
 Section EnumRank.
@@ -1761,9 +1796,9 @@ Qed.
 
 End EnumRank.
 
-Arguments enum_val_inj {T A} [x1 x2].
+Arguments enum_val_inj {T A} [i1 i2] : rename.
 Arguments enum_rank_inj {T} [x1 x2].
-Prenex Implicits enum_val enum_rank.
+Prenex Implicits enum_val enum_rank enum_valK enum_rankK.
 
 Lemma enum_rank_ord n i : enum_rank i = cast_ord (esym (card_ord n)) i.
 Proof.
@@ -1801,8 +1836,8 @@ case: (ltngtP i h) => /= [-> | ltih | ->] //; last by rewrite ltnn.
 by rewrite subn1 /= leqNgt !(ltn_predK ltih, ltih, add1n).
 Qed.
 
-Lemma unbumpK h : {in predC1 h, cancel (unbump h) (bump h)}.
-Proof. by move=> i; move/negbTE=> neq_h_i; rewrite unbumpKcond neq_h_i. Qed.
+Lemma unbumpK {h} : {in predC1 h, cancel (unbump h) (bump h)}.
+Proof. by move=> i /negbTE-neq_h_i; rewrite unbumpKcond neq_h_i. Qed.
 
 Lemma bump_addl h i k : bump (k + h) (k + i) = k + bump h i.
 Proof. by rewrite /bump leq_add2l addnCA. Qed.
@@ -1883,15 +1918,11 @@ by case Dui: (unlift h i) / (unliftP h i) => [j Dh|//]; exists j.
 Qed.
 
 Lemma lift_inj n (h : 'I_n) : injective (lift h).
-Proof.
-move=> i1 i2; move/eqP; rewrite [_ == _](can_eq (@bumpK _)) => eq_i12.
-exact/eqP.
-Qed.
+Proof. by move=> i1 i2 [/(can_inj (bumpK h))/val_inj]. Qed.
+Arguments lift_inj {n h} [i1 i2] eq_i12h : rename.
 
 Lemma liftK n (h : 'I_n) : pcancel (lift h) (unlift h).
-Proof.
-by move=> i; case: (unlift_some (neq_lift h i)) => j; move/lift_inj->.
-Qed.
+Proof. by move=> i; case: (unlift_some (neq_lift h i)) => j /lift_inj->. Qed.
 
 (* Shifting and splitting indices, for cutting and pasting arrays *)
 
@@ -1907,7 +1938,7 @@ Definition rshift m n (i : 'I_n) := Ordinal (rshift_subproof m i).
 Lemma split_subproof m n (i : 'I_(m + n)) : i >= m -> i - m < n.
 Proof. by move/subSn <-; rewrite leq_subLR. Qed.
 
-Definition split m n (i : 'I_(m + n)) : 'I_m + 'I_n :=
+Definition split {m n} (i : 'I_(m + n)) : 'I_m + 'I_n :=
   match ltnP (i) m with
   | LtnNotGeq lt_i_m =>  inl _ (Ordinal lt_i_m)
   | GeqNotLtn ge_i_m =>  inr _ (Ordinal (split_subproof ge_i_m))
@@ -1923,16 +1954,16 @@ rewrite /split {-3}/leq.
 by case: (@ltnP i m) => cmp_i_m //=; constructor; rewrite ?subnKC.
 Qed.
 
-Definition unsplit m n (jk : 'I_m + 'I_n) :=
+Definition unsplit {m n} (jk : 'I_m + 'I_n) :=
   match jk with inl j => lshift n j | inr k => rshift m k end.
 
 Lemma ltn_unsplit m n (jk : 'I_m + 'I_n) : (unsplit jk < m) = jk.
 Proof. by case: jk => [j|k]; rewrite /= ?ltn_ord // ltnNge leq_addr. Qed.
 
-Lemma splitK m n : cancel (@split m n) (@unsplit m n).
+Lemma splitK {m n} : cancel (@split m n) unsplit.
 Proof. by move=> i; apply: val_inj; case: splitP. Qed.
 
-Lemma unsplitK m n : cancel (@unsplit m n) (@split m n).
+Lemma unsplitK {m n} : cancel (@unsplit m n) split.
 Proof.
 move=> jk; have:= ltn_unsplit jk.
 by do [case: splitP; case: jk => //= i j] => [|/addnI] => /ord_inj->.
@@ -1980,6 +2011,8 @@ Arguments ord0 {n'}.
 Arguments ord_max {n'}.
 Arguments inord {n'}.
 Arguments sub_ord {n'}.
+Arguments sub_ordK {n'}.
+Arguments inord_val {n'}.
 
 (* Product of two fintypes which is a fintype *)
 Section ProdFinType.

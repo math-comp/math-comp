@@ -216,7 +216,7 @@ Definition closure_mem m_a : pred T :=
 
 End Connect.
 
-Hint Resolve connect0.
+Hint Resolve connect0 : core.
 
 Notation n_comp e a := (n_comp_mem e (mem a)).
 Notation closed e a := (closed_mem e (mem a)).
@@ -224,9 +224,9 @@ Notation closure e a := (closure_mem e (mem a)).
 
 Prenex Implicits connect root roots.
 
-Arguments dfsP [T g x y].
-Arguments connectP [T e x y].
-Arguments rootP [T e] _ [x y].
+Arguments dfsP {T g x y}.
+Arguments connectP {T e x y}.
+Arguments rootP [T e] _ {x y}.
 
 Notation fconnect f := (connect (coerced_frel f)).
 Notation froot f := (root (coerced_frel f)).

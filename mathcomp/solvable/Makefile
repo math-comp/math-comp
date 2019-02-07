@@ -1,10 +1,7 @@
 # -*- Makefile -*-
 
-COQPROJECT="Make"
+COQPROJECT=Make
+COQMAKEOPTIONS=--no-print-directory
 
 # --------------------------------------------------------------------
 include ../Makefile.common
-
-# --------------------------------------------------------------------
-COQMAKEOPTIONS=--no-print-directory
-

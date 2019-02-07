@@ -70,14 +70,13 @@ for pkg in $PKGS
 do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    mkdir -p $pkgdir
    if [ $VERSION == "dev" ]
-   then cp $GITROOT/mathcomp/$pkg/opam $pkgdir/opam
+   then cp $GITROOT/coq-mathcomp-$pkg.opam $pkgdir/opam
         cp $GITROOT/mathcomp/$pkg/descr $pkgdir/descr
-   else git show "$BRANCH:mathcomp/$pkg/opam" > $pkgdir/opam
+   else git show "$BRANCH:coq-mathcomp-$pkg.opam" > $pkgdir/opam
 	git show "$BRANCH:mathcomp/$pkg/descr" > $pkgdir/descr
         sed -r "/^version/s?dev?$VERSION?" -i $pkgdir/opam
         sed -r "/^depends.*coq-mathcomp.*/s?dev?$VERSION?" -i $pkgdir/opam
    fi
-   sed -r "/^(build|install)/s?make?make \"-C\" \"mathcomp/$pkg\"?" -i $pkgdir/opam
    echo $URLLINE > $pkgdir/url
    if [ $VERSION != "dev" ]
    then echo $CHECKSUMLINE >> $pkgdir/url

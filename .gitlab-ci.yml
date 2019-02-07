@@ -1,0 +1,192 @@
+# Design:
+# - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.6 .)
+#   - choice of the OCaml compiler: var OPAM_SWITCH in {base, edge}
+#     (Dockerfile containing: "opam switch set $compiler && eval $(opam env)")
+#   - master (protected branch) => push on GitLab registry and Docker Hub
+#   - other branches (not tags) => push on GitLab registry
+#   - GitHub PRs => push on GitLab and report back thanks to @coqbot
+# - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.6)
+#   - script template foreach project (custom CONTRIB_URL, script)
+#   - jobs foreach project and Coq version (custom COQ_VERSION, CONTRIB_VERSION)
+#
+# Config for protected branches:
+# - set vars HUB_REGISTRY, HUB_REGISTRY_USER, HUB_REGISTRY_IMAGE, HUB_TOKEN
+#
+# Remark:
+# - The name chosen for branches should ideally yield different values
+#   of CI_COMMIT_REF_SLUG.
+# - But this is not mandatory as image tags start with "${CI_PIPELINE_IID}_".
+# cf. doc:
+# - CI_COMMIT_REF_NAME: The branch or tag name for which project is built.
+# - CI_COMMIT_REF_SLUG: $CI_COMMIT_REF_NAME lowercased, shortened to 63 bytes,
+#   and with everything except 0-9 and a-z replaced with -.
+#   No leading / trailing -. Use in URLs, host names and domain names.
+# - CI_PIPELINE_IID: The unique id of the current pipeline scoped to project.
+
+stages:
+  - build
+  - test
+
+# set var OPAM_SWITCH (if need be) when using
+.opam-build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    IMAGE: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_${CI_JOB_NAME}"
+    HUB_IMAGE: "${HUB_REGISTRY_IMAGE}:${CI_JOB_NAME}"
+    OPAM_SWITCH: "edge"
+  before_script:
+    - echo "${CI_JOB_TOKEN}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
+  script:
+    - docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//-/:}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+    - docker push "${IMAGE}"
+    - docker logout "${CI_REGISTRY}"
+    - |
+      if [ -n "${HUB_REGISTRY_IMAGE}" ]; then
+        set -e
+        echo "${HUB_TOKEN}" | docker login -u "${HUB_REGISTRY_USER}" --password-stdin "${HUB_REGISTRY}"
+        docker tag "${IMAGE}" "${HUB_IMAGE}"
+        docker push "${HUB_IMAGE}"
+        docker logout "${HUB_REGISTRY}"
+        set +e
+      fi
+  except:
+    - tags
+    - merge_requests
+
+coq-8.6:
+  extends: .opam-build
+  variables:
+    OPAM_SWITCH: "base"
+
+coq-8.7:
+  extends: .opam-build
+
+coq-8.8:
+  extends: .opam-build
+
+coq-8.9:
+  extends: .opam-build
+
+coq-dev:
+  extends: .opam-build
+
+# set var OPAM_SWITCH (if need be) and COQ_VERSION when using
+.make-build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    # This image will be built locally only (not pushed)
+    IMAGE: "mathcomp-dev:make_coq-${COQ_VERSION}"
+    OPAM_SWITCH: "edge"
+  before_script:
+  script:
+    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+  except:
+    - tags
+    - merge_requests
+
+make-coq-latest:
+  extends: .make-build
+  variables:
+    COQ_VERSION: "latest"
+  
+# set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
+.ci:
+  stage: test
+  image: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_coq-${COQ_VERSION}"
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - cat /proc/{cpu,mem}info || true
+    # don't printenv if there are private tokens
+    - opam config list
+    - opam repo list
+    - opam list
+    - coqc --version
+    - git clone -b "${CONTRIB_VERSION}" --depth 1 "${CONTRIB_URL}" /home/coq/ci
+    - cd /home/coq/ci
+  except:
+    - tags
+    - merge_requests
+
+# Guidelines to add a library to mathcomp CI:
+# - Add a hidden job (starting with a .) .ci-lib that extends the .ci job,
+#   sets var CONTRIB_URL (library Git URL), and defines a dedicated script
+# - Add 1 job per Coq version to test, that extends the previous hidden job,
+#   and sets vars COQ_VERSION, CONTRIB_VERSION (compatible Git branch/tag)
+
+# The Four Color Theorem
+.ci-fourcolor:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/math-comp/fourcolor.git"
+    CONTRIB_VERSION: master
+  script:
+    - make -j "${NJOBS}"
+    - make install
+
+ci-fourcolor-8.6:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.6"
+    # CONTRIB_VERSION: "v8.6"
+
+ci-fourcolor-8.7:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.7"
+
+ci-fourcolor-8.8:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-fourcolor-dev:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "dev"
+
+# The Odd Order Theorem
+.ci-odd-order:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/math-comp/odd-order.git"
+    CONTRIB_VERSION: master
+  script:
+    - make -j "${NJOBS}"
+    - make install
+
+ci-odd-order-8.7:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.7"
+
+# The Lemma Overloading library
+.ci-lemma-overloading:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/coq-community/lemma-overloading.git"
+    CONTRIB_VERSION: master
+  script:
+    - opam pin add -n -k path coq-lemma-overloading .
+    - opam install -y -v -j "${NJOBS}" coq-lemma-overloading
+
+ci-lemma-overloading-8.8:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-lemma-overloading-8.9:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.9"
+
+ci-lemma-overloading-dev:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "dev"

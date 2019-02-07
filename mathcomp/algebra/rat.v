@@ -4,15 +4,15 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
 From mathcomp
-Require Import bigop ssralg div ssrnum ssrint.
+Require Import bigop ssralg countalg div ssrnum ssrint.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
 (* structure of archimedean, real field, with int and nat declared as closed  *)
 (* subrings.                                                                  *)
 (*          rat == the type of rational number, with single constructor Rat   *)
-(*         n%:Q == explicit cast from int to rat, postfix notation for the    *)
-(*                 ratz constant                                              *)
+(*         n%:Q == explicit cast from int to rat, ie. the specialization to   *)
+(*                 rationals of the generic ring morphism n%:~R               *)
 (*       numq r == numerator of (r : rat)                                     *)
 (*       denq r == denominator of (r : rat)                                   *)
 (* x \is a Qint == x is an element of rat whose denominator is equal to 1     *)
@@ -56,7 +56,7 @@ Definition denq x := nosimpl ((valq x).2).
 
 Lemma denq_gt0  x : 0 < denq x.
 Proof. by rewrite /denq; case: x=> [[a b] /= /andP []]. Qed.
-Hint Resolve denq_gt0.
+Hint Resolve denq_gt0 : core.
 
 Definition denq_ge0 x := ltrW (denq_gt0 x).
 
@@ -64,7 +64,7 @@ Lemma denq_lt0  x : (denq x < 0) = false. Proof. by rewrite ltr_gtF. Qed.
 
 Lemma denq_neq0 x : denq x != 0.
 Proof. by rewrite /denq gtr_eqF ?denq_gt0. Qed.
-Hint Resolve denq_neq0.
+Hint Resolve denq_neq0 : core.
 
 Lemma denq_eq0 x : (denq x == 0) = false.
 Proof. exact: negPf (denq_neq0 _). Qed.
@@ -350,6 +350,14 @@ Canonical rat_iDomain :=
   Eval hnf in IdomainType rat (FieldIdomainMixin rat_field_axiom).
 Canonical rat_fieldType := FieldType rat rat_field_axiom.
 
+Canonical rat_countZmodType := [countZmodType of rat].
+Canonical rat_countRingType := [countRingType of rat].
+Canonical rat_countComRingType := [countComRingType of rat].
+Canonical rat_countUnitRingType := [countUnitRingType of rat].
+Canonical rat_countComUnitRingType := [countComUnitRingType of rat].
+Canonical rat_countIdomainType := [countIdomainType of rat].
+Canonical rat_countFieldType := [countFieldType of rat].
+
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
 rewrite -[x]valqK fracq_eq0; case: fracqP=> /= [|k {x} x k0].
@@ -360,7 +368,7 @@ Qed.
 Notation "n %:Q" := ((n : int)%:~R : rat)
   (at level 2, left associativity, format "n %:Q")  : ring_scope.
 
-Hint Resolve denq_neq0 denq_gt0 denq_ge0.
+Hint Resolve denq_neq0 denq_gt0 denq_ge0 : core.
 
 Definition subq (x y : rat) : rat := (addq x (oppq y)).
 Definition divq (x y : rat) : rat := (mulq x (invq y)).

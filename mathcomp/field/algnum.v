@@ -56,7 +56,7 @@ Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
-Local Hint Resolve (@intr_inj _ : injective ZtoC).
+Local Hint Resolve (intr_inj : injective ZtoC) : core.
 Local Notation QtoCm := [rmorphism of QtoC].
 
 (* Number fields and rational spans. *)
@@ -354,10 +354,10 @@ Lemma extend_algC_subfield_aut (Qs : fieldExtType rat)
 Proof.
 pose numF_inj (Qr : fieldExtType rat) := {rmorphism Qr -> algC}.
 pose subAut := {Qr : _ & numF_inj Qr * {lrmorphism Qr -> Qr}}%type.
-pose SubAut := existS _ _ (_, _) : subAut.
-pose Sdom (mu : subAut) := projS1 mu.
-pose Sinj (mu : subAut) : {rmorphism Sdom mu -> algC} := (projS2 mu).1.
-pose Saut (mu : subAut) : {rmorphism Sdom mu -> Sdom mu} := (projS2 mu).2.
+pose SubAut := existT _ _ (_, _) : subAut.
+pose Sdom (mu : subAut) := projT1 mu.
+pose Sinj (mu : subAut) : {rmorphism Sdom mu -> algC} := (projT2 mu).1.
+pose Saut (mu : subAut) : {rmorphism Sdom mu -> Sdom mu} := (projT2 mu).2.
 have SinjZ Qr (QrC : numF_inj Qr) a x: QrC (a *: x) = QtoC a * QrC x.
   rewrite mulrAC; apply: canRL (mulfK _) _.
     by rewrite intr_eq0 denq_neq0.
@@ -417,7 +417,7 @@ have ext1 mu0 x: {mu1 | exists y, x = Sinj mu1 y
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.
   have splitQr: splittingFieldFor K pr fullv.
     apply: splittingFieldForS (sub1v (Sub K algK)) (subvf _) _; exists rr => //.
-    congr (_ %= _): (eqpxx pr); apply: (@map_poly_inj _ _ QrC).
+    congr (_ %= _): (eqpxx pr); apply/(map_poly_inj QrC).
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod; apply: eq_bigr => zz _.
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
@@ -550,7 +550,7 @@ Proof. by rewrite Aint_Cint ?Cint_int. Qed.
 
 Lemma Aint0 : 0 \in Aint. Proof. exact: (Aint_int 0). Qed.
 Lemma Aint1 : 1 \in Aint. Proof. exact: (Aint_int 1). Qed.
-Hint Resolve Aint0 Aint1.
+Hint Resolve Aint0 Aint1 : core.
 
 Lemma Aint_unity_root n x : (n > 0)%N -> n.-unity_root x -> x \in Aint.
 Proof.
@@ -702,7 +702,7 @@ Notation "x != y %[mod e ]" := (~~ (eqAmod e x y)) : algC_scope.
 
 Lemma eqAmod_refl e x : (x == x %[mod e])%A.
 Proof. by rewrite /eqAmod subrr rpred0. Qed.
-Hint Resolve eqAmod_refl.
+Hint Resolve eqAmod_refl : core.
 
 Lemma eqAmod_sym e x y : ((x == y %[mod e]) = (y == x %[mod e]))%A.
 Proof. by rewrite /eqAmod -opprB rpredN. Qed.
@@ -739,7 +739,7 @@ Qed.
 
 Lemma eqAmodm0 e : (e == 0 %[mod e])%A.
 Proof. by rewrite /eqAmod subr0 unfold_in; case: ifPn => // /divff->. Qed.
-Hint Resolve eqAmodm0.
+Hint Resolve eqAmodm0 : core.
 
 Lemma eqAmodMr e :
   {in Aint, forall z x y, x == y %[mod e] -> x * z == y * z %[mod e]}%A.

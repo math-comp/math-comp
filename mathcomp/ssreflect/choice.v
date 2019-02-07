@@ -17,8 +17,12 @@ Require Import ssrfun ssrbool eqtype ssrnat seq.
 (*    unpickle n == a partial inverse to pickle: unpickle (pickle x) = Some x *)
 (*  pickle_inv n == a sharp partial inverse to pickle pickle_inv n = Some x   *)
 (*                  if and only if pickle x = n.                              *)
+(*            choiceMixin T == type of choice mixins; the exact contents is   *)
+(*                        documented below in the Choice submodule.           *)
+(*           ChoiceType T m == the packed choiceType class for T and mixin m. *)
 (* [choiceType of T for cT] == clone for T of the choiceType cT.              *)
 (*        [choiceType of T] == clone for T of the choiceType inferred for T.  *)
+(*            CountType T m == the packed countType class for T and mixin m.  *)
 (*  [countType of T for cT] == clone for T of the countType cT.               *)
 (*        [count Type of T] == clone for T of the countType inferred for T.   *)
 (* [choiceMixin of T by <:] == Choice mixin for T when T has a subType p      *)
@@ -137,6 +141,9 @@ Proof. by case. Qed.
 
 End OtherEncodings.
 
+Prenex Implicits seq_of_opt tag_of_pair pair_of_tag opair_of_sum sum_of_opair.
+Prenex Implicits seq_of_optK tag_of_pairK pair_of_tagK opair_of_sumK.
+
 (* Generic variable-arity tree type, providing an encoding target for         *)
 (* miscellaneous user datatypes. The GenTree.tree type can be combined with   *)
 (* a sigT type to model multi-sorted concrete datatypes.                      *)
@@ -251,19 +258,19 @@ Record mixin_of T := Mixin {
 Record class_of T := Class {base : Equality.class_of T; mixin : mixin_of T}.
 Local Coercion base : class_of >->  Equality.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack m :=
-  fun b bT & phant_id (Equality.class bT) b => Pack (@Class T b m) T.
+  fun b bT & phant_id (Equality.class bT) b => Pack (@Class T b m).
 
 (* Inheritance *)
-Definition eqType := @Equality.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
 
 End ClassDef.
 
@@ -404,7 +411,7 @@ Variables (P : pred T) (sT : subType P).
 
 Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
 Definition sub_choiceClass := @Choice.Class sT (sub_eqMixin sT) sub_choiceMixin.
-Canonical sub_choiceType := Choice.Pack sub_choiceClass sT.
+Canonical sub_choiceType := Choice.Pack sub_choiceClass.
 
 End SubChoice.
 
@@ -518,19 +525,19 @@ Section ClassDef.
 Record class_of T := Class { base : Choice.class_of T; mixin : mixin_of T }.
 Local Coercion base : class_of >-> Choice.class_of.
 
-Structure type : Type := Pack {sort : Type; _ : class_of sort; _ : Type}.
+Structure type : Type := Pack {sort : Type; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack m :=
-  fun bT b & phant_id (Choice.class bT) b => Pack (@Class T b m) T.
+  fun bT b & phant_id (Choice.class bT) b => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
 
 End ClassDef.
 
@@ -558,8 +565,8 @@ Export Countable.Exports.
 
 Definition unpickle T := Countable.unpickle (Countable.class T).
 Definition pickle T := Countable.pickle (Countable.class T).
-Arguments unpickle [T].
-Prenex Implicits pickle unpickle.
+Arguments unpickle {T} n.
+Arguments pickle {T} x.
 
 Section CountableTheory.
 
@@ -604,6 +611,11 @@ End CountableTheory.
 Notation "[ 'countMixin' 'of' T 'by' <: ]" :=
     (sub_countMixin _ : Countable.mixin_of T)
   (at level 0, format "[ 'countMixin'  'of'  T  'by'  <: ]") : form_scope.
+
+Arguments pickle_inv {T} n.
+Arguments pickleK {T} x.
+Arguments pickleK_inv {T} x.
+Arguments pickle_invK {T} n : rename.
 
 Section SubCountType.
 

@@ -2,15 +2,17 @@ opam-version: "1.2"
 name: "coq-mathcomp-ssreflect"
 version: "dev"
 maintainer: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
+synopsis: "The Mathematical Components library"
 
-homepage: "http://math-comp.github.io/math-comp/"
+homepage: "https://math-comp.github.io/math-comp/"
 bug-reports: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
+dev-repo: "https://github.com/math-comp/math-comp.git"
 license: "CeCILL-B"
 
-build: [ make "-j" "%{jobs}%" ]
-install: [ make "install" ]
+build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" ]
+install: [ make "-C" "mathcomp/ssreflect" "install" ]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp'" ]
-depends: [ "coq" { ((>= "8.6" & < "8.9~") | (= "dev"))} ]
+depends: [ "coq" { ((>= "8.6" & < "8.10~") | (= "dev"))} ]
 
 tags: [ "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" ]
 authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]

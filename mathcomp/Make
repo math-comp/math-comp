@@ -1,5 +1,6 @@
 algebra/all_algebra.v
 algebra/finalg.v
+algebra/countalg.v
 algebra/fraction.v
 algebra/intdiv.v
 algebra/interval.v
@@ -30,7 +31,6 @@ field/algebraics_fundamentals.v
 field/algnum.v
 field/all_field.v
 field/closed_field.v
-field/countalg.v
 field/cyclotomic.v
 field/falgebra.v
 field/fieldext.v
@@ -90,3 +90,7 @@ ssreflect/tuple.v
 
 -I .
 -R . mathcomp
+
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -redundant-canonical-projection
+-arg -w -arg -notation-overridden

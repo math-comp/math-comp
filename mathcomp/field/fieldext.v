@@ -99,8 +99,8 @@ Variable R : ringType.
 Record class_of T := Class {
   base : Falgebra.class_of R T;
   comm_ext : commutative (Ring.mul base);
-  idomain_ext : IntegralDomain.axiom (Ring.Pack base T);
-  field_ext : Field.mixin_of (UnitRing.Pack base T)
+  idomain_ext : IntegralDomain.axiom (Ring.Pack base);
+  field_ext : Field.mixin_of (UnitRing.Pack base)
 }.
 
 Local Coercion base : class_of >-> Falgebra.class_of.
@@ -117,12 +117,12 @@ Local Coercion base2 : class_of >-> ComUnitRing.class_of.
 Local Coercion base3 : class_of >-> IntegralDomain.class_of.
 Local Coercion base4 : class_of >-> Field.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 
 Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ :=  cT return class_of cT in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c :=  cT return class_of cT in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
@@ -131,59 +131,59 @@ Definition pack :=
                (b : Falgebra.class_of R T) =>
   fun mT Cm IDm Fm & phant_id (Field.class mT) (@Field.Class T
         (@IntegralDomain.Class T (@ComUnitRing.Class T (@ComRing.Class T b
-          Cm) b) IDm) Fm) => Pack phR (@Class T b Cm IDm Fm) T.
+          Cm) b) IDm) Fm) => Pack phR (@Class T b Cm IDm Fm).
 
 Definition pack_eta K :=
   let cK := Field.class K in let Cm := ComRing.mixin cK in
   let IDm := IntegralDomain.mixin cK in let Fm := Field.mixin cK in
   fun (bT : Falgebra.type phR) b & phant_id (Falgebra.class bT) b =>
-  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm) T.
+  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @IntegralDomain.Pack cT xclass xT.
-Definition fieldType := @Field.Pack cT xclass xT.
-Definition lmodType := @Lmodule.Pack R phR cT xclass xT.
-Definition lalgType := @Lalgebra.Pack R phR cT xclass xT.
-Definition algType := @Algebra.Pack R phR cT xclass xT.
-Definition unitAlgType := @UnitAlgebra.Pack R phR cT xclass xT.
-Definition vectType := @Vector.Pack R phR cT xclass xT.
-Definition FalgType := @Falgebra.Pack R phR cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition idomainType := @IntegralDomain.Pack cT xclass.
+Definition fieldType := @Field.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lalgType := @Lalgebra.Pack R phR cT xclass.
+Definition algType := @Algebra.Pack R phR cT xclass.
+Definition unitAlgType := @UnitAlgebra.Pack R phR cT xclass.
+Definition vectType := @Vector.Pack R phR cT xclass.
+Definition FalgType := @Falgebra.Pack R phR cT xclass.
 
-Definition Falg_comRingType := @ComRing.Pack FalgType xclass xT.
-Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType xclass xT.
-Definition Falg_idomainType := @IntegralDomain.Pack FalgType xclass xT.
-Definition Falg_fieldType := @Field.Pack FalgType xclass xT.
+Definition Falg_comRingType := @ComRing.Pack FalgType xclass.
+Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType xclass.
+Definition Falg_idomainType := @IntegralDomain.Pack FalgType xclass.
+Definition Falg_fieldType := @Field.Pack FalgType xclass.
 
-Definition vect_comRingType := @ComRing.Pack vectType xclass xT.
-Definition vect_comUnitRingType := @ComUnitRing.Pack vectType xclass xT.
-Definition vect_idomainType := @IntegralDomain.Pack vectType xclass xT.
-Definition vect_fieldType := @Field.Pack vectType xclass xT.
+Definition vect_comRingType := @ComRing.Pack vectType xclass.
+Definition vect_comUnitRingType := @ComUnitRing.Pack vectType xclass.
+Definition vect_idomainType := @IntegralDomain.Pack vectType xclass.
+Definition vect_fieldType := @Field.Pack vectType xclass.
 
-Definition unitAlg_comRingType := @ComRing.Pack unitAlgType xclass xT.
-Definition unitAlg_comUnitRingType := @ComUnitRing.Pack unitAlgType xclass xT.
-Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType xclass xT.
-Definition unitAlg_fieldType := @Field.Pack unitAlgType xclass xT.
+Definition unitAlg_comRingType := @ComRing.Pack unitAlgType xclass.
+Definition unitAlg_comUnitRingType := @ComUnitRing.Pack unitAlgType xclass.
+Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType xclass.
+Definition unitAlg_fieldType := @Field.Pack unitAlgType xclass.
 
-Definition alg_comRingType := @ComRing.Pack algType xclass xT.
-Definition alg_comUnitRingType := @ComUnitRing.Pack algType xclass xT.
-Definition alg_idomainType := @IntegralDomain.Pack algType xclass xT.
-Definition alg_fieldType := @Field.Pack algType xclass xT.
+Definition alg_comRingType := @ComRing.Pack algType xclass.
+Definition alg_comUnitRingType := @ComUnitRing.Pack algType xclass.
+Definition alg_idomainType := @IntegralDomain.Pack algType xclass.
+Definition alg_fieldType := @Field.Pack algType xclass.
 
-Definition lalg_comRingType := @ComRing.Pack lalgType xclass xT.
-Definition lalg_comUnitRingType := @ComUnitRing.Pack lalgType xclass xT.
-Definition lalg_idomainType := @IntegralDomain.Pack lalgType xclass xT.
-Definition lalg_fieldType := @Field.Pack lalgType xclass xT.
+Definition lalg_comRingType := @ComRing.Pack lalgType xclass.
+Definition lalg_comUnitRingType := @ComUnitRing.Pack lalgType xclass.
+Definition lalg_idomainType := @IntegralDomain.Pack lalgType xclass.
+Definition lalg_fieldType := @Field.Pack lalgType xclass.
 
-Definition lmod_comRingType := @ComRing.Pack lmodType xclass xT.
-Definition lmod_comUnitRingType := @ComUnitRing.Pack lmodType xclass xT.
-Definition lmod_idomainType := @IntegralDomain.Pack lmodType xclass xT.
-Definition lmod_fieldType := @Field.Pack lmodType xclass xT.
+Definition lmod_comRingType := @ComRing.Pack lmodType xclass.
+Definition lmod_comUnitRingType := @ComUnitRing.Pack lmodType xclass.
+Definition lmod_idomainType := @IntegralDomain.Pack lmodType xclass.
+Definition lmod_fieldType := @Field.Pack lmodType xclass.
 
 End FieldExt.
 
@@ -696,7 +696,7 @@ move=> sKE; apply: minPoly_dvdp; last exact: root_minPoly.
 by apply: (polyOverSv sKE); rewrite minPolyOver.
 Qed.
 
-Arguments Fadjoin_polyP [K x v].
+Arguments Fadjoin_polyP {K x v}.
 Lemma Fadjoin1_polyP x v :
   reflect (exists p, v = (map_poly (in_alg L) p).[x]) (v \in <<1; x>>%VS).
 Proof.
@@ -737,13 +737,13 @@ Notation "'C_ ( E ) ( V )" := (capv_aspace E 'C(V))
 Notation "E * F" := (prodv_aspace E F) : aspace_scope.
 Notation "f @: E" := (aimg_aspace f E) : aspace_scope.
 
-Arguments Fadjoin_idP [F0 L K x].
-Arguments FadjoinP [F0 L K x E].
-Arguments Fadjoin_seqP [F0 L K rs E].
-Arguments polyOver_subvs [F0 L K p].
-Arguments Fadjoin_polyP [F0 L K x v].
-Arguments Fadjoin1_polyP [F0 L x v].
-Arguments minPoly_XsubC [F0 L K x].
+Arguments Fadjoin_idP {F0 L K x}.
+Arguments FadjoinP {F0 L K x E}.
+Arguments Fadjoin_seqP {F0 L K rs E}.
+Arguments polyOver_subvs {F0 L K p}.
+Arguments Fadjoin_polyP {F0 L K x v}.
+Arguments Fadjoin1_polyP {F0 L x v}.
+Arguments minPoly_XsubC {F0 L K x}.
 
 Section MapMinPoly.
 
@@ -1468,7 +1468,7 @@ Proof.
 move/subfx_irreducibleP: irr_p => /=/(_ nz_p) min_p; set d := (size p).-1.
 have Dd: d.+1 = size p by rewrite polySpred.
 pose Fz2v x : 'rV_d := poly_rV (sval (sig_eqW (subfxE x)) %% p).
-pose vFz : 'rV_d -> subFExtend := subfx_eval \o @rVpoly F d.
+pose vFz : 'rV_d -> subFExtend := subfx_eval \o rVpoly.
 have FLinj: injective subfx_inj by apply: fmorph_inj.
 have Fz2vK: cancel Fz2v vFz.
   move=> x; rewrite /vFz /Fz2v; case: (sig_eqW _) => /= q ->.
@@ -1479,7 +1479,7 @@ suffices vFzK: cancel vFz Fz2v.
 apply: inj_can_sym Fz2vK _ => v1 v2 /(congr1 subfx_inj)/eqP.
 rewrite -subr_eq0 -!raddfB /= subfx_inj_eval // => /min_p/implyP.
 rewrite leqNgt implybNN -Dd ltnS size_poly linearB subr_eq0 /=.
-by move/eqP/(can_inj (@rVpolyK _ _)).
+by move/eqP/(can_inj rVpolyK).
 Qed.
 
 Definition SubfxVectMixin := VectMixin min_subfx_vectAxiom.
@@ -1559,7 +1559,7 @@ pose ucrL := [comUnitRingType of ComRingType urL mulC].
 have mul0 := GRing.Field.IdomainMixin unitE.
 pose fL := FieldType (IdomainType ucrL mul0) unitE.
 exists [fieldExtType F of faL for fL]; first by rewrite dimvf; apply: mul1n.
-exists [linear of toPF as @rVpoly _ _].
+exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
 have toLlin: linear toL.
   by move=> a q1 q2; rewrite -linearP -modp_scalel -modp_add.
@@ -1592,13 +1592,13 @@ have mul1: left_id L1 mul.
   move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS.
   by rewrite size_poly.
 have mulD: left_distributive mul +%R.
-  move=> x y z; apply: canLR (@rVpolyK _ _) _.
+  move=> x y z; apply: canLR rVpolyK _.
   by rewrite !raddfD mulrDl /= !toL_K /toL modp_add.
-have nzL1: L1 != 0 by rewrite -(can_eq (@rVpolyK _ _)) L1K raddf0 oner_eq0.
+have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0.
 pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
 pose rL := ComRingType (RingType vL mulM) mulC.
 have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: canRL (@rVpolyK _ _) _; rewrite !linearZ /= toL_K.
+  move=> a x y; apply: canRL rVpolyK _; rewrite !linearZ /= toL_K.
   by rewrite -scalerAl modp_scalel.
 have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
@@ -1607,7 +1607,7 @@ pose uaL := [unitAlgType F of AlgType F urL mulZr].
 pose faL := [FalgType F of uaL].
 have unitE: GRing.Field.mixin_of urL.
   move=> x nz_x; apply/unitrP; set q := rVpoly x.
-  have nz_q: q != 0 by rewrite -(can_eq (@rVpolyK _ _)) raddf0 in nz_x.
+  have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
     have /contraR := irr_p _ _ (dvdp_gcdl p q); apply.
     have: size (gcdp p q) <= size q by apply: leq_gcdpr.
@@ -1627,11 +1627,10 @@ have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
   rewrite linearZ /= L1K alg_polyC modp_add; congr (_ + _); last first.
     by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW.
   by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul.
-exists z; first by rewrite /root -(can_eq (@rVpolyK _ _)) q_z modpp linear0.
+exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0.
 apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP.
 exists (map_poly iota (rVpoly x)).
   by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v.
-apply: (can_inj (@rVpolyK _ _)).
-by rewrite q_z modp_small // -Dn ltnS size_poly.
+by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly.
 Qed.
 *)

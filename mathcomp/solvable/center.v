@@ -56,11 +56,11 @@ Canonical center_group (G : {group gT}) : {group gT} :=
 
 End Defs.
 
-Arguments center _ _%g.
+Arguments center {gT} A%g.
 Notation "''Z' ( A )" := (center A) : group_scope.
 Notation "''Z' ( H )" := (center_group H) : Group_scope.
 
-Lemma morphim_center : GFunctor.pcontinuous center.
+Lemma morphim_center : GFunctor.pcontinuous (@center).
 Proof. by move=> gT rT G D f; apply: morphim_subcent. Qed.
 
 Canonical center_igFun := [igFun by fun _ _ => subsetIl _ _ & morphim_center].
@@ -187,7 +187,7 @@ End Injm.
 
 End Center.
 
-Arguments center_idP [gT A].
+Arguments center_idP {gT A}.
 
 Lemma isog_center (aT rT : finGroupType) (G : {group aT}) (H : {group rT}) :
   G \isog H -> 'Z(G) \isog 'Z(H).
@@ -375,7 +375,7 @@ rewrite /cpairg1 /cpair1g; do 2!case: restrmP => _ [_ _ _ -> //].
 rewrite !morphim_comp morphim_cents // morphim_pair1g morphim_pairg1.
 by case/dprodP: (setX_dprod H K).
 Qed.
-Hint Resolve im_cpair_cent.
+Hint Resolve im_cpair_cent : core.
 
 Lemma im_cpair : CH * CK = C.
 Proof.

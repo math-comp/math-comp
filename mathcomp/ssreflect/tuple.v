@@ -266,8 +266,8 @@ Proof. by rewrite -existsb_tnth; apply: existsP. Qed.
 
 End TupleQuantifiers.
 
-Arguments all_tnthP [n T a t].
-Arguments has_tnthP [n T a t].
+Arguments all_tnthP {n T a t}.
+Arguments has_tnthP {n T a t}.
 
 Section EqTuple.
 
@@ -336,7 +336,7 @@ Definition enum : seq (n.-tuple T) :=
 
 Lemma enumP : Finite.axiom enum.
 Proof.
-case=> /= t t_n; rewrite -(count_map _ (pred1 t)) (pmap_filter (@insubK _ _ _)).
+case=> /= t t_n; rewrite -(count_map _ (pred1 t)) (pmap_filter (insubK _)).
 rewrite count_filter -(@eq_count _ (pred1 t)) => [|s /=]; last first.
   by rewrite isSome_insub; case: eqP=> // ->.
 elim: n t t_n => [|m IHm] [|x t] //= {IHm}/IHm; move: (iter m _ _) => em IHm.
@@ -360,7 +360,12 @@ Section UseFinTuple.
 
 Variables (n : nat) (T : finType).
 
-Canonical tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
+(* tuple_finMixin could, in principle, be made Canonical to allow for folding *)
+(* Finite.enum of a finite tuple type (see comments around eqE in eqtype.v),  *)
+(* but in practice it will not work because the mixin_enum projector          *)
+(* has been burried under an opaque alias, to avoid some performance issues   *)
+(* during type inference.                                                     *)
+Definition tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
 Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.
 Canonical tuple_subFinType := Eval hnf in [subFinType of n.-tuple T].
 

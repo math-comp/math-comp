@@ -128,11 +128,8 @@ Notation quot_class_of := quot_mixin_of.
 
 Record quotType := QuotTypePack {
   quot_sort :> Type;
-  quot_class : quot_class_of quot_sort;
-  _ : Type
+  quot_class : quot_class_of quot_sort
 }.
-
-Definition QuotType_pack qT m := @QuotTypePack qT m qT.
 
 Variable qT : quotType.
 Definition pi_phant of phant qT := quot_pi (quot_class qT).
@@ -143,9 +140,11 @@ Lemma repr_ofK : cancel repr_of \pi.
 Proof. by rewrite /pi_phant /repr_of /=; case: qT=> [? []]. Qed.
 
 Definition QuotType_clone (Q : Type) qT cT 
-  of phant_id (quot_class qT) cT := @QuotTypePack Q cT Q.
+  of phant_id (quot_class qT) cT := @QuotTypePack Q cT.
 
 End QuotientDef.
+
+Arguments repr_ofK {T qT}.
 
 (****************************)
 (* Protecting some symbols. *)
@@ -194,12 +193,11 @@ Canonical pi_unlock := Unlockable Pi.E.
 Canonical repr_unlock := Unlockable Repr.E.
 
 Notation quot_class_of := quot_mixin_of.
-Notation QuotType Q m := (@QuotType_pack _ Q m).
+Notation QuotType Q m := (@QuotTypePack _ Q m).
 Notation "[ 'quotType' 'of' Q ]" := (@QuotType_clone _ Q _ _ id)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
-Arguments repr [T qT].
-Prenex Implicits repr.
+Arguments repr {T qT} x.
 
 (************************)
 (* Exporting the theory *)
@@ -231,6 +229,8 @@ Proof. by move=> Py x; rewrite -[x]reprK; apply: Py; rewrite reprK. Qed.
 
 End QuotTypeTheory.
 
+Arguments reprK {T qT} x.
+
 (*******************)
 (* About morphisms *)
 (*******************)
@@ -248,8 +248,7 @@ Notation piE := (@equal_toE _ _).
 Canonical equal_to_pi T (qT : quotType T) (x : T) :=
   @EqualTo _ (\pi_qT x) (\pi x) (erefl _).
 
-Arguments EqualTo [T x equal_val].
-Prenex Implicits EqualTo.
+Arguments EqualTo {T x equal_val}.
 
 Section Morphism.
 
@@ -276,12 +275,11 @@ Lemma pi_morph11 : \pi (h a) = hq (equal_val x). Proof. by rewrite !piE. Qed.
 
 End Morphism.
 
-Arguments pi_morph1 [T qT f fq].
-Arguments pi_morph2 [T qT g gq].
-Arguments pi_mono1 [T U qT p pq].
-Arguments pi_mono2 [T U qT r rq].
-Arguments pi_morph11 [T U qT qU h hq].
-Prenex Implicits pi_morph1 pi_morph2 pi_mono1 pi_mono2 pi_morph11.
+Arguments pi_morph1 {T qT f fq}.
+Arguments pi_morph2 {T qT g gq}.
+Arguments pi_mono1 {T U qT p pq}.
+Arguments pi_mono2 {T U qT r rq}.
+Arguments pi_morph11 {T U qT qU h hq}.
 
 Notation "{pi_ Q a }" := (equal_to (\pi_Q a)) : quotient_scope.
 Notation "{pi a }" := (equal_to (\pi a)) : quotient_scope.
@@ -332,8 +330,8 @@ Variable eq_quot_op : rel T.
 
 Definition eq_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
   (ec : Equality.class_of Q) :=
-  {mono \pi_(QuotTypePack qc Q) : x y /
-   eq_quot_op x y >-> @eq_op (Equality.Pack ec Q) x y}.
+  {mono \pi_(QuotTypePack qc) : x y /
+   eq_quot_op x y >-> @eq_op (Equality.Pack ec) x y}.
 
 Record eq_quot_class_of (Q : Type) : Type := EqQuotClass {
   eq_quot_quot_class :> quot_class_of T Q;
@@ -344,13 +342,13 @@ Record eq_quot_class_of (Q : Type) : Type := EqQuotClass {
 Record eqQuotType : Type := EqQuotTypePack {
   eq_quot_sort :> Type;
   _ : eq_quot_class_of eq_quot_sort;
-  _ : Type
+ 
 }.
 
 Implicit Type eqT : eqQuotType.
 
 Definition eq_quot_class eqT : eq_quot_class_of eqT :=
-  let: EqQuotTypePack _ cT _ as qT' := eqT return eq_quot_class_of qT' in cT.
+  let: EqQuotTypePack _ cT as qT' := eqT return eq_quot_class_of qT' in cT.
 
 Canonical eqQuotType_eqType eqT := EqType eqT (eq_quot_class eqT).
 Canonical eqQuotType_quotType eqT := QuotType eqT (eq_quot_class eqT).
@@ -361,10 +359,10 @@ Coercion eqQuotType_quotType : eqQuotType >-> quotType.
 Definition EqQuotType_pack Q :=
   fun (qT : quotType T) (eT : eqType) qc ec 
   of phant_id (quot_class qT) qc & phant_id (Equality.class eT) ec => 
-    fun m => EqQuotTypePack (@EqQuotClass Q qc ec m) Q.
+    fun m => EqQuotTypePack (@EqQuotClass Q qc ec m).
 
 Definition EqQuotType_clone (Q : Type) eqT cT 
-  of phant_id (eq_quot_class eqT) cT := @EqQuotTypePack Q cT Q.
+  of phant_id (eq_quot_class eqT) cT := @EqQuotTypePack Q cT.
 
 Lemma pi_eq_quot eqT : {mono \pi_eqT : x y / eq_quot_op x y >-> x == y}.
 Proof. by case: eqT => [] ? []. Qed.
@@ -497,7 +495,7 @@ Proof. by apply: right_trans; [apply: equiv_sym|apply: equiv_trans]. Qed.
 
 End EquivRel.
 
-Hint Resolve equiv_refl.
+Hint Resolve equiv_refl : core.
 
 Notation EquivRel r er es et := (@EquivRelPack _ r (EquivClass er es et)).
 Notation "[ 'equiv_rel' 'of' e ]" := (@equiv_pack _ _ e _ id)
@@ -663,6 +661,8 @@ Canonical EquivQuot.eqType.
 Canonical EquivQuot.choiceType.
 Canonical EquivQuot.eqQuotType.
 
+Arguments EquivQuot.ereprK {D C CD DC eD encD}.
+
 Notation "{eq_quot e }" :=
 (@EquivQuot.type_of _ _ _ _ _ _ (Phantom (rel _) e)) : quotient_scope.
 Notation "x == y %[mod_eq r ]" := (x == y %[mod {eq_quot r}]) : quotient_scope.
@@ -696,7 +696,7 @@ Variables (eD : equiv_rel D) (encD : encModRel CD DC eD).
 Notation eC := (encoded_equiv encD).
 
 Fact eq_quot_countMixin : Countable.mixin_of {eq_quot encD}.
-Proof. exact: CanCountMixin (@EquivQuot.ereprK _ _ _ _ _ _). Qed.
+Proof. exact: CanCountMixin EquivQuot.ereprK. Qed.
 Canonical eq_quot_countType := CountType {eq_quot encD} eq_quot_countMixin.
 
 End CountEncodingModuloRel.

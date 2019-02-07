@@ -1,6 +1,7 @@
 Require Export ssralg.
 Require Export ssrnum.
 Require Export finalg.
+Require Export countalg.
 Require Export poly.
 Require Export polydiv.
 Require Export polyXY.

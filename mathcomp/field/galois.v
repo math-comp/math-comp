@@ -329,9 +329,9 @@ End kHom.
 
 Notation "f ^-1" := (inv_ahom f) : lrfun_scope.
 
-Arguments kHomP [F L K V f].
-Arguments kAHomP [F L U V f].
-Arguments kHom_lrmorphism [F L f].
+Arguments kHomP {F L K V f}.
+Arguments kAHomP {F L U V f}.
+Arguments kHom_lrmorphism {F L f}.
 
 Module SplittingField.
 
@@ -345,38 +345,38 @@ Definition axiom (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
 Record class_of (L : Type) : Type :=
-  Class {base : FieldExt.class_of F L; _ : axiom (FieldExt.Pack _ base L)}.
+  Class {base : FieldExt.class_of F L; _ : axiom (FieldExt.Pack _ base)}.
 Local Coercion base : class_of >-> FieldExt.class_of.
 
-Structure type (phF : phant F) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phF : phant F) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (phF : phant F) (T : Type) (cT : type phF).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition clone c of phant_id class c := @Pack phF T c T.
+Definition clone c of phant_id class c := @Pack phF T c.
 
-Definition pack b0 (ax0 : axiom (@FieldExt.Pack F (Phant F) T b0 T)) :=
+Definition pack b0 (ax0 : axiom (@FieldExt.Pack F (Phant F) T b0)) :=
  fun bT b & phant_id (@FieldExt.class F phF bT) b =>
- fun   ax & phant_id ax0 ax => Pack (Phant F) (@Class T b ax) T.
+ fun   ax & phant_id ax0 ax => Pack (Phant F) (@Class T b ax).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @IntegralDomain.Pack cT xclass xT.
-Definition fieldType := @Field.Pack cT xclass xT.
-Definition lmodType := @Lmodule.Pack F phF cT xclass xT.
-Definition lalgType := @Lalgebra.Pack F phF cT xclass xT.
-Definition algType := @Algebra.Pack F phF cT xclass xT.
-Definition unitAlgType := @UnitAlgebra.Pack F phF cT xclass xT.
-Definition vectType := @Vector.Pack F phF cT xclass xT.
-Definition FalgType := @Falgebra.Pack F phF cT xclass xT.
-Definition fieldExtType := @FieldExt.Pack F phF cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition idomainType := @IntegralDomain.Pack cT xclass.
+Definition fieldType := @Field.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack F phF cT xclass.
+Definition lalgType := @Lalgebra.Pack F phF cT xclass.
+Definition algType := @Algebra.Pack F phF cT xclass.
+Definition unitAlgType := @UnitAlgebra.Pack F phF cT xclass.
+Definition vectType := @Vector.Pack F phF cT xclass.
+Definition FalgType := @Falgebra.Pack F phF cT xclass.
+Definition fieldExtType := @FieldExt.Pack F phF cT xclass.
 
 End ClassDef.
 
@@ -1205,7 +1205,7 @@ have [x galEx Df] := kHom_to_gal sK_Ka_E nKE homKa_f; exists x => //.
 by rewrite -Df ?memv_adjoin // (kHomExtend_val (kHom1 K K)) ?lfun1_poly.
 Qed.
 
-Arguments normalFieldP [K E].
+Arguments normalFieldP {K E}.
 
 Lemma normalField_factors K E :
    (K <= E)%VS ->
@@ -1634,10 +1634,13 @@ End FundamentalTheoremOfGaloisTheory.
 
 End GaloisTheory.
 
+Prenex Implicits gal_repr gal gal_reprK.
+Arguments gal_repr_inj {F L V} [x1 x2].
+
 Notation "''Gal' ( V / U )" := (galoisG V U) : group_scope.
 Notation "''Gal' ( V / U )" := (galoisG_group V U) : Group_scope.
 
-Arguments fixedFieldP [F L E A a].
-Arguments normalFieldP [F L K E].
-Arguments splitting_galoisField [F L K E].
-Arguments galois_fixedField [F L K E].
+Arguments fixedFieldP {F L E A a}.
+Arguments normalFieldP {F L K E}.
+Arguments splitting_galoisField {F L K E}.
+Arguments galois_fixedField {F L K E}.

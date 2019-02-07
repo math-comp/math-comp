@@ -1,6 +1,96 @@
 ??/??/???? - version 1.7.1
+
+	* Removed `_ : Type` field from packed classes. This performance
+	  optimization is not strictly necessary with modern Coq versions.
+
 	* Added companion matrix of a polynomial `companionmx p` and the
-	  theorems: companionmxK, map_mx_companion and companion_map_poly
+	  theorems: companionmxK, map_mx_companion and companion_map_poly.
+
+	* Extended generic theory about monotonocity (*mono* and *homo* lemmas).
+
+	* Added: homoW_in, inj_homo_in, mono_inj_in, anti_mono_in,
+	  total_homo_mono_in, homoW, inj_homo, monoj, anti_mono,
+	  total_homo_mono.
+
+	* Extended theory about homo and mono for leq/or and Num.le
+
+	* Extended theory of lersif and intervals
+
+	* Renamed: (together with the _in suffix counterpart)
+	  mono_inj -> incr_inj
+	  nmono_inj -> decr_inj
+	  leq_mono_inj -> incnr_inj
+	  leq_nmono_inj -> decnr_inj
+	  homo_inj_ltn_lt -> incnr_inj
+	  nhomo_inj_ltn_lt -> decnr_inj
+	  homo_inj_in_lt -> inj_homo_ltr_in
+	  nhomo_inj_in_lt -> inj_nhomo_ltr_in
+	  ltn_ltrW_homo -> ltnrW_homo
+	  ltn_ltrW_nhomo -> ltnrW_nhomo
+	  leq_lerW_mono -> lenrW_mono
+	  leq_lerW_nmono -> lenrW_nmono
+	  homo_leq_mono -> lenr_mono
+	  nhomo_leq_mono -> lenr_nmono
+	  homo_inj_lt -> inj_homo_ltr
+	  nhomo_inj_lt -> inj_nhomo_ltr
+	  homo_inj_ltn_lt -> inj_homo_ltnr
+	  nhomo_inj_ltn_lt -> inj_nhomo_ltnr
+	  homo_mono -> ler_mono
+	  nhomo_mono -> ler_nmono
+
+	* Added sorted_lt_nth, ltn_index, sorted_le_nth, leq_index.
+
+	* Generalized extremum_spec and its theory, added extremum and
+	  extremumP, generalizing arg_min for an arbitrary eqType with an
+	  order relation on it (rather than nat). Redefined arg_min and
+	  arg_max with it.
+
+	* Added [arg minr_( i < n | P ) F] and [arg maxr_( i < n | P ) F]
+	  with all their variants, following the same convention as for nat.
+
+	* Added missing contra* lemma: contra_neqN, contra_neqF,
+	  contra_neqT, contra_neq_eq, contra_eq_neq.
+
+	* Addded missing seq theorems: take_subseq, drop_subseq
+
+	* Reshuffled theorems inside files and packages:
+	  * countalg goes from the field to the algebra package
+	  * finalg now gets inheritance from countalg
+	  * closed_field now contains the construction of algebraic closure
+	    for countable fields that used to be in countalg.
+
+        * Rewritten proof of quantifier elimination for closed field in a
+	  monadic style.
+
+	* Added all_iff, "the following are all equivalent"
+	  with notation [<-> P0; P1; ..; Pn] and theorems
+	  `all_iffLR` and coercion `all_iffP` (see header for doc)
+	  proved by circular implication P0 -> P1 -> ... -> Pn -> P0
+
+	* Removed duplicated definitions of `tag` `tagged` and `Tagged`
+	  from eqtype.v. They were already in ssrfun.v.
+
+	* Specialized `bool_irrelevance` so that the statement reflects
+	  the name.
+
+	* Changed the shape of the type of FieldMixin to allow one-line
+	  in-proof definition of bespoke fieldType structure.
+
+	* Refactored and extended Arguments directives to provide more
+	  comprehensive signature information.
+
+	* Added maximal implicits to reflection, injectivity and cancellation
+	  lemmas so that they are easier to pass to combinator lemmas such as
+	  sameP, inj_eq or canLR.
+
+	* Added reindex_inj s shorthand for reindexing a bigop with a
+	  permutation s.
+
+	* Added lemma `eqmxMunitP`: two matrices with the same shape
+	  represent the same subspace iff they differ only by a change of
+	  basis.
+
+	* Corrected implicits and documentation of MatrixGenField.
 
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 

@@ -1,19 +1,31 @@
-*.d
-*.vo
-*.vio
-*.cm*
-*~
-*.glob
-*.aux
-*.a
-*.o
-Make*.coq
-Make*.coq.bak
-Make*.coq.conf
+*
+# Begin files referenced by symlinks
+!README.md
+!AUTHORS
+!INSTALL.md
+!CeCILL-B
+# End files referenced by symlinks
+!*.opam
+!plugin
+!mathcomp
+
+**/*.d
+**/*.vo
+**/*.vio
+**/*.cm*
+**/*~
+**/*.glob
+**/*.aux
+**/*.a
+**/*.o
+**/*#
+**/Make*.coq
+**/Make*.coq.bak
+**/Make*.coq.conf
 mathcomp/ssreflect/ssreflect.ml4
 mathcomp/ssreflect/ssrmatching.ml4
 mathcomp/ssreflect/ssrmatching.mli
-mathcomp/ssreflect/ssrmatching.v
+# mathcomp/ssreflect/ssrmatching.v
 mathcomp/ssreflect/ssreflect_plugin.mllib
 mathcomp/ssreflect/ssreflect_plugin.mlpack
 mathcomp/ssreflect.ml4
@@ -22,10 +34,3 @@ mathcomp/ssrmatching.mli
 mathcomp/ssrmatching.v
 mathcomp/ssreflect_plugin.mllib
 mathcomp/ssreflect_plugin.mlpack
-mathcomp-*.tar.gz
-*#
-htmldoc/mathcomp.*html
-htmldoc/index*.*html
-htmldoc/depend
-htmldoc/depend.js
-htmldoc/*.css

@@ -153,9 +153,10 @@ Require Import finfun bigop prime binomial.
 (*                  WARNING: while it is possible to omit R for most of the   *)
 (*                           XxxType functions, R MUST be explicitly given    *)
 (*                           when UnitRingType is used with a mixin produced  *)
-(*                           by ComUnitRingMixin, otherwise the resulting     *)
-(*                           structure will have the WRONG sort key and will  *)
-(*                           NOT BE USED during type inference.               *)
+(*                           by ComUnitRingMixin, in a Canonical definition,  *)
+(*                           otherwise the resulting structure will have the  *)
+(*                           WRONG sort key and will NOT BE USED during type  *)
+(*                           inference.                                       *)
 (* [unitRingType of R for S] == R-clone of the unitRingType structure S.      *)
 (*    [unitRingType of R] == clones a canonical unitRingType structure on R.  *)
 (*     x \is a GRing.unit <=> x is a unit (i.e., has an inverse).             *)
@@ -204,16 +205,29 @@ Require Import finfun bigop prime binomial.
 (*                                                                            *)
 (*  * Field (commutative fields):                                             *)
 (*              fieldType == interface type for fields.                       *)
-(*  GRing.Field.axiom inv == the field axiom (x != 0 -> inv x * x = 1).       *)
-(* FieldUnitMixin mulVx unitP inv0id == builds a *non commutative unit ring*  *)
-(*                           mixin, using the field axiom to simplify proof   *)
-(*                           obligations. The carrier type must have a        *)
-(*                           comRingType canonical structure.                 *)
-(*       FieldMixin mulVx == builds the field mixin from the field axiom. The *)
-(*                           carrier type must have a comRingType structure.  *)
-(*    FieldIdomainMixin m == builds an *idomain* mixin from a field mixin m.  *)
+(*  GRing.Field.mixin_of R == the field property: x != 0 -> x \is a unit, for *)
+(*                           x : R; R must be or coerce to a unitRingType.    *)
+(*  GRing.Field.axiom inv == the field axiom: x != 0 -> inv x * x = 1 for all *)
+(*                           x. This is equivalent to the property above, but *)
+(*                           does not require a unitRingType as inv is an     *)
+(*                           explicit argument.                               *)
+(* FieldUnitMixin mulVf inv0 == a *non commutative unit ring* mixin, using an *)
+(*                           inverse function that satisfies the field axiom  *)
+(*                           and fixes 0 (arguments mulVf and inv0, resp.),   *)
+(*                           and x != 0 as the Ring.unit predicate. The       *)
+(*                           carrier type must be a canonical comRingType.    *)
+(*    FieldIdomainMixin m == an *idomain* mixin derived from a field mixin m. *)
+(* GRing.Field.IdomainType mulVf inv0 == an idomainType incorporating the two *)
+(*                           mixins above, where FieldIdomainMixin is applied *)
+(*                           to the trivial field mixin for FieldUnitMixin.   *)
+(*  FieldMixin mulVf inv0 == the (trivial) field mixin for Field.IdomainType. *)
 (*          FieldType R m == packs the field mixin M into a fieldType. The    *)
 (*                           carrier type R must be an idomainType.           *)
+(* --> Given proofs mulVf and inv0 as above, a non-Canonical instances        *)
+(* of fieldType can be created with FieldType _ (FieldMixin mulVf inv0).      *)
+(* For Canonical instances one should always specify the first (sort)         *)
+(* argument of FieldType and other instance constructors, as well as pose     *)
+(* Definitions for unit ring, field, and idomain mixins (in that order).      *)
 (* [fieldType of F for S] == F-clone of the fieldType structure S.            *)
 (*       [fieldType of F] == clone of a canonical fieldType structure on F.   *)
 (*   [fieldMixin of R by <:] == mixin axiom for a field subType.              *)
@@ -612,19 +626,19 @@ Section ClassDef.
 Record class_of T := Class { base : Choice.class_of T; mixin : mixin_of T }.
 Local Coercion base : class_of >-> Choice.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack m :=
-  fun bT b & phant_id (Choice.class bT) b => Pack (@Class T b m) T.
+  fun bT b & phant_id (Choice.class bT) b => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
 
 End ClassDef.
 
@@ -861,6 +875,7 @@ End ZmoduleTheory.
 
 Arguments addrI {V} y [x1 x2].
 Arguments addIr {V} x [x1 x2].
+Arguments opprK {V}.
 Arguments oppr_inj {V} [x1 x2].
 
 Module Ring.
@@ -878,33 +893,32 @@ Record mixin_of (R : zmodType) : Type := Mixin {
 
 Definition EtaMixin R one mul mulA mul1x mulx1 mul_addl mul_addr nz1 :=
   let _ := @Mixin R one mul mulA mul1x mulx1 mul_addl mul_addr nz1 in
-  @Mixin (Zmodule.Pack (Zmodule.class R) R) _ _
+  @Mixin (Zmodule.Pack (Zmodule.class R)) _ _
      mulA mul1x mulx1 mul_addl mul_addr nz1.
 
 Section ClassDef.
 
 Record class_of (R : Type) : Type := Class {
   base : Zmodule.class_of R;
-  mixin : mixin_of (Zmodule.Pack base R)
+  mixin : mixin_of (Zmodule.Pack base)
 }.
 Local Coercion base : class_of >-> Zmodule.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-
-Definition pack b0 (m0 : mixin_of (@Zmodule.Pack T b0 T)) :=
+Definition pack b0 (m0 : mixin_of (@Zmodule.Pack T b0)) :=
   fun bT b & phant_id (Zmodule.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
 
 End ClassDef.
 
@@ -1292,7 +1306,7 @@ Hypothesis charFp : p \in [char R].
 
 Lemma charf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: charFp. Qed.
 Lemma charf_prime : prime p. Proof. by case/andP: charFp. Qed.
-Hint Resolve charf_prime.
+Hint Resolve charf_prime : core.
 
 Lemma mulrn_char x : x *+ p = 0. Proof. by rewrite -mulr_natl charf0 mul0r. Qed.
 
@@ -1490,26 +1504,25 @@ Variable R : ringType.
 
 Structure class_of V := Class {
   base : Zmodule.class_of V;
-  mixin : mixin_of R (Zmodule.Pack base V)
+  mixin : mixin_of R (Zmodule.Pack base)
 }.
 Local Coercion base : class_of >-> Zmodule.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack phR T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack phR T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-
-Definition pack b0 (m0 : mixin_of R (@Zmodule.Pack T b0 T)) :=
+Definition pack b0 (m0 : mixin_of R (@Zmodule.Pack T b0)) :=
   fun bT b & phant_id (Zmodule.class bT) b =>
-  fun    m & phant_id m0 m => Pack phR (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack phR (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
 
 End ClassDef.
 
@@ -1646,33 +1659,33 @@ Variable R : ringType.
 
 Record class_of (T : Type) : Type := Class {
   base : Ring.class_of T;
-  mixin : Lmodule.mixin_of R (Zmodule.Pack base T);
-  ext : @axiom R (Lmodule.Pack _ (Lmodule.Class mixin) T) (Ring.mul base)
+  mixin : Lmodule.mixin_of R (Zmodule.Pack base);
+  ext : @axiom R (Lmodule.Pack _ (Lmodule.Class mixin)) (Ring.mul base)
 }.
 Definition base2 R m := Lmodule.Class (@mixin R m).
 Local Coercion base : class_of >-> Ring.class_of.
 Local Coercion base2 : class_of >-> Lmodule.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack phR T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack phR T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack T b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0 T) mul0) :=
+Definition pack T b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0) mul0) :=
   fun bT b & phant_id (Ring.class bT) (b : Ring.class_of T) =>
   fun mT m & phant_id (@Lmodule.class R phR mT) (@Lmodule.Class R T b m) =>
   fun ax & phant_id axT ax =>
-  Pack (Phant R) (@Class T b m ax) T.
+  Pack (Phant R) (@Class T b m ax).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition lmodType := @Lmodule.Pack R phR cT xclass xT.
-Definition lmod_ringType := @Lmodule.Pack R phR ringType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lmod_ringType := @Lmodule.Pack R phR ringType xclass.
 
 End ClassDef.
 
@@ -2458,22 +2471,22 @@ Record class_of R :=
   Class {base : Ring.class_of R; mixin : commutative (Ring.mul base)}.
 Local Coercion base : class_of >-> Ring.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack mul0 (m0 : @commutative T T mul0) :=
   fun bT b & phant_id (Ring.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
 
 End ClassDef.
 
@@ -2616,28 +2629,28 @@ Variable R : ringType.
 
 Record class_of (T : Type) : Type := Class {
   base : Lalgebra.class_of R T;
-  mixin : axiom (Lalgebra.Pack _ base T)
+  mixin : axiom (Lalgebra.Pack _ base)
 }.
 Local Coercion base : class_of >-> Lalgebra.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack phR T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack phR T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack b0 (ax0 : @axiom R b0) :=
   fun bT b & phant_id (@Lalgebra.class R phR bT) b =>
-  fun   ax & phant_id ax0 ax => Pack phR (@Class T b ax) T.
+  fun   ax & phant_id ax0 ax => Pack phR (@Class T b ax).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition lmodType := @Lmodule.Pack R phR cT xclass xT.
-Definition lalgType := @Lalgebra.Pack R phR cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lalgType := @Lalgebra.Pack R phR cT xclass.
 
 End ClassDef.
 
@@ -2730,32 +2743,32 @@ Record mixin_of (R : ringType) : Type := Mixin {
 
 Definition EtaMixin R unit inv mulVr mulrV unitP inv_out :=
   let _ := @Mixin R unit inv mulVr mulrV unitP inv_out in
-  @Mixin (Ring.Pack (Ring.class R) R) unit inv mulVr mulrV unitP inv_out.
+  @Mixin (Ring.Pack (Ring.class R)) unit inv mulVr mulrV unitP inv_out.
 
 Section ClassDef.
 
 Record class_of (R : Type) : Type := Class {
   base : Ring.class_of R;
-  mixin : mixin_of (Ring.Pack base R)
+  mixin : mixin_of (Ring.Pack base)
 }.
 Local Coercion base : class_of >-> Ring.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@Ring.Pack T b0 T)) :=
+Definition pack b0 (m0 : mixin_of (@Ring.Pack T b0)) :=
   fun bT b & phant_id (Ring.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
 
 End ClassDef.
 
@@ -3019,6 +3032,7 @@ End ClosedPredicates.
 
 End UnitRingTheory.
 
+Arguments invrK {R}.
 Arguments invr_inj {R} [x1 x2].
 
 Section UnitRingMorphism.
@@ -3064,31 +3078,31 @@ Section ClassDef.
 
 Record class_of (R : Type) : Type := Class {
   base : ComRing.class_of R;
-  mixin : UnitRing.mixin_of (Ring.Pack base R)
+  mixin : UnitRing.mixin_of (Ring.Pack base)
 }.
 Local Coercion base : class_of >-> ComRing.class_of.
 Definition base2 R m := UnitRing.Class (@mixin R m).
 Local Coercion base2 : class_of >-> UnitRing.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (ComRing.class bT) (b : ComRing.class_of T) =>
   fun mT m & phant_id (UnitRing.class mT) (@UnitRing.Class T b m) =>
-  Pack (@Class T b m) T.
+  Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition com_unitRingType := @UnitRing.Pack comRingType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition com_unitRingType := @UnitRing.Pack comRingType xclass.
 
 End ClassDef.
 
@@ -3128,35 +3142,35 @@ Variable R : ringType.
 
 Record class_of (T : Type) : Type := Class {
   base : Algebra.class_of R T;
-  mixin : GRing.UnitRing.mixin_of (Ring.Pack base T)
+  mixin : GRing.UnitRing.mixin_of (Ring.Pack base)
 }.
 Definition base2 R m := UnitRing.Class (@mixin R m).
 Local Coercion base : class_of >-> Algebra.class_of.
 Local Coercion base2 : class_of >-> UnitRing.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@Algebra.class R phR bT) (b : Algebra.class_of R T) =>
   fun mT m & phant_id (UnitRing.mixin (UnitRing.class mT)) m =>
-  Pack (Phant R) (@Class T b m) T.
+  Pack (Phant R) (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition lmodType := @Lmodule.Pack R phR cT xclass xT.
-Definition lalgType := @Lalgebra.Pack R phR cT xclass xT.
-Definition algType := @Algebra.Pack R phR cT xclass xT.
-Definition lmod_unitRingType := @Lmodule.Pack R phR unitRingType xclass xT.
-Definition lalg_unitRingType := @Lalgebra.Pack R phR unitRingType xclass xT.
-Definition alg_unitRingType := @Algebra.Pack R phR unitRingType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lalgType := @Lalgebra.Pack R phR cT xclass.
+Definition algType := @Algebra.Pack R phR cT xclass.
+Definition lmod_unitRingType := @Lmodule.Pack R phR unitRingType xclass.
+Definition lalg_unitRingType := @Lalgebra.Pack R phR unitRingType xclass.
+Definition alg_unitRingType := @Algebra.Pack R phR unitRingType xclass.
 
 End ClassDef.
 
@@ -3727,24 +3741,23 @@ End TermDef.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
-Arguments Add _ _%T _%T.
-Arguments Opp _ _%T.
-Arguments NatMul _ _%T _%N.
-Arguments Mul _ _%T _%T.
-Arguments Inv _ _%T.
-Arguments Exp _ _%T _%N.
-Arguments Equal _ _%T _%T.
-Arguments Unit _ _%T.
-Arguments And _ _%T _%T.
-Arguments Or _ _%T _%T.
-Arguments Implies _ _%T _%T.
-Arguments Not _ _%T.
-Arguments Exists _ _%N _%T.
-Arguments Forall _ _%N _%T.
+Arguments Add {R} t1%T t2%T.
+Arguments Opp {R} t1%T.
+Arguments NatMul {R} t1%T n%N.
+Arguments Mul {R} t1%T t2%T.
+Arguments Inv {R} t1%T.
+Arguments Exp {R} t1%T n%N.
+Arguments Equal {R} t1%T t2%T.
+Arguments Unit {R} t1%T.
+Arguments And {R} f1%T f2%T.
+Arguments Or {R} f1%T f2%T.
+Arguments Implies {R} f1%T f2%T.
+Arguments Not {R} f1%T.
+Arguments Exists {R} i%N f1%T.
+Arguments Forall {R} i%N f1%T.
 
-Arguments Bool [R].
-Prenex Implicits Const Add Opp NatMul Mul Exp Bool Unit And Or Implies Not.
-Prenex Implicits Exists Forall.
+Arguments Bool {R} b.
+Arguments Const {R} x.
 
 Notation True := (Bool true).
 Notation False := (Bool false).
@@ -4338,28 +4351,28 @@ Definition axiom (R : ringType) :=
 Section ClassDef.
 
 Record class_of (R : Type) : Type :=
-  Class {base : ComUnitRing.class_of R; mixin : axiom (Ring.Pack base R)}.
+  Class {base : ComUnitRing.class_of R; mixin : axiom (Ring.Pack base)}.
 Local Coercion base : class_of >-> ComUnitRing.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : axiom (@Ring.Pack T b0 T)) :=
+Definition pack b0 (m0 : axiom (@Ring.Pack T b0)) :=
   fun bT b & phant_id (ComUnitRing.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
 
 End ClassDef.
 
@@ -4518,7 +4531,7 @@ Arguments rregP {R x}.
 
 Module Field.
 
-Definition mixin_of (F : unitRingType) := forall x : F, x != 0 -> x \in unit.
+Definition mixin_of (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 
 Lemma IdomainMixin R : mixin_of R -> IntegralDomain.axiom R.
 Proof.
@@ -4528,11 +4541,10 @@ Qed.
 
 Section Mixins.
 
-Variables (R : comRingType) (inv : R -> R).
+Definition axiom (R : ringType) inv := forall x : R, x != 0 -> inv x * x = 1.
 
-Definition axiom := forall x, x != 0 -> inv x * x = 1.
-Hypothesis mulVx : axiom.
-Hypothesis inv0 : inv 0 = 0.
+Variables (R : comRingType) (inv : R -> R).
+Hypotheses (mulVf : axiom inv) (inv0 : inv 0 = 0).
 
 Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
@@ -4542,10 +4554,14 @@ Qed.
 Fact inv_out : {in predC (predC1 0), inv =1 id}.
 Proof. by move=> x /negbNE/eqP->. Qed.
 
-Definition UnitMixin := ComUnitRing.Mixin mulVx intro_unit inv_out.
+Definition UnitMixin := ComUnitRing.Mixin mulVf intro_unit inv_out.
 
-Lemma Mixin : mixin_of (UnitRing.Pack (UnitRing.Class UnitMixin) R).
-Proof. by []. Qed.
+Definition UnitRingType := [comUnitRingType of UnitRingType R UnitMixin].
+
+Definition IdomainType :=
+  IdomainType UnitRingType (@IdomainMixin UnitRingType (fun => id)).
+
+Lemma Mixin : mixin_of IdomainType. Proof. by []. Qed.
 
 End Mixins.
 
@@ -4553,30 +4569,30 @@ Section ClassDef.
 
 Record class_of (F : Type) : Type := Class {
   base : IntegralDomain.class_of F;
-  mixin : mixin_of (UnitRing.Pack base F)
+  mixin : mixin_of (UnitRing.Pack base)
 }.
 Local Coercion base : class_of >-> IntegralDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@UnitRing.Pack T b0 T)) :=
+Definition pack b0 (m0 : mixin_of (@UnitRing.Pack T b0)) :=
   fun bT b & phant_id (IntegralDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @IntegralDomain.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition idomainType := @IntegralDomain.Pack cT xclass.
 
 End ClassDef.
 
@@ -4604,6 +4620,7 @@ Coercion idomainType : type >-> IntegralDomain.type.
 Canonical idomainType.
 Notation fieldType := type.
 Notation FieldType T m := (@pack T _ m _ _ id _ id).
+Arguments Mixin {R inv} mulVf inv0 [x] nz_x.
 Notation FieldUnitMixin := UnitMixin.
 Notation FieldIdomainMixin := IdomainMixin.
 Notation FieldMixin := Mixin.
@@ -4809,30 +4826,30 @@ Record mixin_of (R : unitRingType) : Type :=
 Section ClassDef.
 
 Record class_of (F : Type) : Type :=
-  Class {base : Field.class_of F; mixin : mixin_of (UnitRing.Pack base F)}.
+  Class {base : Field.class_of F; mixin : mixin_of (UnitRing.Pack base)}.
 Local Coercion base : class_of >-> Field.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@UnitRing.Pack T b0 T)) :=
+Definition pack b0 (m0 : mixin_of (@UnitRing.Pack T b0)) :=
   fun bT b & phant_id (Field.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @IntegralDomain.Pack cT xclass xT.
-Definition fieldType := @Field.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition idomainType := @IntegralDomain.Pack cT xclass.
+Definition fieldType := @Field.Pack cT xclass.
 
 End ClassDef.
 
@@ -5051,34 +5068,34 @@ Definition axiom (R : ringType) :=
 Section ClassDef.
 
 Record class_of (F : Type) : Type :=
-  Class {base : DecidableField.class_of F; _ : axiom (Ring.Pack base F)}.
+  Class {base : DecidableField.class_of F; _ : axiom (Ring.Pack base)}.
 Local Coercion base : class_of >-> DecidableField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Definition clone c of phant_id class c := @Pack T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : axiom (@Ring.Pack T b0 T)) :=
+Definition pack b0 (m0 : axiom (@Ring.Pack T b0)) :=
   fun bT b & phant_id (DecidableField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
 (* There should eventually be a constructor from polynomial resolution *)
 (* that builds the DecidableField mixin using QE.                      *)
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @Zmodule.Pack cT xclass xT.
-Definition ringType := @Ring.Pack cT xclass xT.
-Definition comRingType := @ComRing.Pack cT xclass xT.
-Definition unitRingType := @UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @IntegralDomain.Pack cT xclass xT.
-Definition fieldType := @Field.Pack cT xclass xT.
-Definition decFieldType := @DecidableField.Pack cT class xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition idomainType := @IntegralDomain.Pack cT xclass.
+Definition fieldType := @Field.Pack cT xclass.
+Definition decFieldType := @DecidableField.Pack cT class.
 
 End ClassDef.
 
@@ -5166,7 +5183,7 @@ Variables (ringS : subringPred S) (kS : keyed_pred ringS).
 
 Definition cast_zmodType (V : zmodType) T (VeqT : V = T :> Type) :=
   let cast mV := let: erefl in _ = T := VeqT return Zmodule.class_of T in mV in
-  Zmodule.Pack (cast (Zmodule.class V)) T.
+  Zmodule.Pack (cast (Zmodule.class V)).
 
 Variable (T : subType (mem kS)) (V : zmodType) (VeqT: V = T :> Type).
 
@@ -5249,7 +5266,7 @@ Section UnitRing.
 
 Definition cast_ringType (Q : ringType) T (QeqT : Q = T :> Type) :=
   let cast rQ := let: erefl in _ = T := QeqT return Ring.class_of T in rQ in
-  Ring.Pack (cast (Ring.class Q)) T.
+  Ring.Pack (cast (Ring.class Q)).
 
 Variables (R : unitRingType) (S : predPredType R).
 Variables (ringS : divringPred S) (kS : keyed_pred ringS).
@@ -5355,7 +5372,8 @@ Arguments addrI {V} y [x1 x2].
 Arguments addIr {V} x [x1 x2].
 Arguments subrI {V} y [x1 x2].
 Arguments subIr {V} x [x1 x2].
-Definition opprK := opprK.
+Definition opprK := @opprK.
+Arguments opprK {V}.
 Definition oppr_inj := @oppr_inj.
 Arguments oppr_inj {V} [x1 x2].
 Definition oppr0 := oppr0.
@@ -5539,7 +5557,8 @@ Definition divIr := divIr.
 Definition telescope_prodr := telescope_prodr.
 Definition commrV := commrV.
 Definition unitrE := unitrE.
-Definition invrK := invrK.
+Definition invrK := @invrK.
+Arguments invrK {R}.
 Definition invr_inj := @invr_inj.
 Arguments invr_inj {R} [x1 x2].
 Definition unitrV := unitrV.

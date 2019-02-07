@@ -117,27 +117,27 @@ Inductive mixin_of (V : lmodType R) := Mixin dim & axiom_def dim (Phant V).
 
 Structure class_of V := Class {
   base : GRing.Lmodule.class_of R V;
-  mixin : mixin_of (GRing.Lmodule.Pack _ base V)
+  mixin : mixin_of (GRing.Lmodule.Pack _ base)
 }.
 Local Coercion base : class_of >-> GRing.Lmodule.class_of.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c _ := cT return class_of cT in c.
-Definition clone c of phant_id class c := @Pack phR T c T.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c := cT return class_of cT in c.
+Definition clone c of phant_id class c := @Pack phR T c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition dim := let: Mixin n _ := mixin class in n.
 
-Definition pack b0 (m0 : mixin_of (@GRing.Lmodule.Pack R _ T b0 T)) :=
+Definition pack b0 (m0 : mixin_of (@GRing.Lmodule.Pack R _ T b0)) :=
   fun bT b & phant_id (@GRing.Lmodule.class _ phR bT) b =>
-  fun    m & phant_id m0 m => Pack phR (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack phR (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
 
 End ClassDef.
 Notation axiom n V := (axiom_def n (Phant V)).
@@ -245,7 +245,7 @@ Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
 Canonical hom_subType := [newType for f2mx].
 End Hom.
 
-Arguments mx2vs _ _ _%N _%MS.
+Arguments mx2vs {K vT m%N} A%MS.
 Prenex Implicits v2r r2v v2rK r2vK b2mx vs2mx vs2mxK f2mx.
 
 End InternalTheory.
@@ -460,7 +460,7 @@ by have:= sU12 (r2v u); rewrite !memvE /subsetv !genmxE r2vK.
 Qed.
 
 Lemma subvv U : (U <= U)%VS. Proof. exact/subvP. Qed.
-Hint Resolve subvv.
+Hint Resolve subvv : core.
 
 Lemma subv_trans : transitive subV.
 Proof. by move=> U V W /subvP sUV /subvP sVW; apply/subvP=> u /sUV/sVW. Qed.
@@ -1222,28 +1222,28 @@ End BigSumBasis.
 
 End VectorTheory.
 
-Hint Resolve subvv.
-Arguments subvP [K vT U V].
-Arguments addv_idPl [K vT U V].
-Arguments addv_idPr [K vT U V].
-Arguments memv_addP [K vT w U V ].
+Hint Resolve subvv : core.
+Arguments subvP {K vT U V}.
+Arguments addv_idPl {K vT U V}.
+Arguments addv_idPr {K vT U V}.
+Arguments memv_addP {K vT w U V }.
 Arguments sumv_sup [K vT I] i0 [P U Vs].
-Arguments memv_sumP [K vT I P Us v].
-Arguments subv_sumP [K vT I P Us V].
-Arguments capv_idPl [K vT U V].
-Arguments capv_idPr [K vT U V].
-Arguments memv_capP [K vT w U V].
+Arguments memv_sumP {K vT I P Us v}.
+Arguments subv_sumP {K vT I P Us V}.
+Arguments capv_idPl {K vT U V}.
+Arguments capv_idPr {K vT U V}.
+Arguments memv_capP {K vT w U V}.
 Arguments bigcapv_inf [K vT I] i0 [P Us V].
-Arguments subv_bigcapP [K vT I P U Vs].
-Arguments directvP [K vT S].
-Arguments directv_addP [K vT U V].
-Arguments directv_add_unique [K vT U V].
-Arguments directv_sumP [K vT I P Us].
-Arguments directv_sumE [K vT I P Ss].
-Arguments directv_sum_independent [K vT I P Us].
-Arguments directv_sum_unique [K vT I P Us].
-Arguments span_subvP [K vT X U].
-Arguments freeP [K vT n X].
+Arguments subv_bigcapP {K vT I P U Vs}.
+Arguments directvP {K vT S}.
+Arguments directv_addP {K vT U V}.
+Arguments directv_add_unique {K vT U V}.
+Arguments directv_sumP {K vT I P Us}.
+Arguments directv_sumE {K vT I P Ss}.
+Arguments directv_sum_independent {K vT I P Us}.
+Arguments directv_sum_unique {K vT I P Us}.
+Arguments span_subvP {K vT X U}.
+Arguments freeP {K vT n X}.
 
 Prenex Implicits coord.
 Notation directv S := (directv_def (Phantom _ S%VS)).
@@ -1302,7 +1302,7 @@ Section LfunZmodType.
 Variables (R : ringType) (aT rT : vectType R).
 Implicit Types f g h : 'Hom(aT, rT).
 
-Canonical lfun_eqMixin := Eval hnf in [eqMixin of 'Hom(aT, rT) by <:].
+Definition lfun_eqMixin := Eval hnf in [eqMixin of 'Hom(aT, rT) by <:].
 Canonical lfun_eqType := EqType 'Hom(aT, rT) lfun_eqMixin.
 Definition lfun_choiceMixin := [choiceMixin of 'Hom(aT, rT) by <:].
 Canonical lfun_choiceType := ChoiceType 'Hom(aT, rT) lfun_choiceMixin.
@@ -1354,6 +1354,8 @@ Lemma sum_lfunE I (r : seq I) (P : pred I) (fs : I -> 'Hom(aT, rT)) x :
 Proof. by elim/big_rec2: _ => [|i _ f _ <-]; rewrite lfunE. Qed.
 
 End LfunZmodType.
+
+Arguments fun_of_lfunK {R aT rT}.
 
 Section LfunVectType.
 
@@ -1598,11 +1600,12 @@ Proof. by move/lker0_lfunK=> fK; apply/lfunP=> u; rewrite !lfunE /= fK. Qed.
 
 End LinearImage.
 
-Arguments memv_imgP [K aT rT f w U].
-Arguments lfunPn [K aT rT f g].
-Arguments lker0P [K aT rT f].
-Arguments eqlfunP [K aT rT f g v].
-Arguments eqlfun_inP [K aT rT V f g].
+Arguments memv_imgP {K aT rT f w U}.
+Arguments lfunPn {K aT rT f g}.
+Arguments lker0P {K aT rT f}.
+Arguments eqlfunP {K aT rT f g v}.
+Arguments eqlfun_inP {K aT rT V f g}.
+Arguments limg_lfunVK {K aT rT f} [x] f_x.
 
 Section FixedSpace.
 
@@ -1632,8 +1635,8 @@ Qed.
 
 End FixedSpace.
 
-Arguments fixedSpaceP [K vT f a].
-Arguments fixedSpacesP [K vT f U].
+Arguments fixedSpaceP {K vT f a}.
+Arguments fixedSpacesP {K vT f U}.
 
 Section LinAut.
 
@@ -1717,6 +1720,8 @@ by rewrite memv_ker addrC linearB /= subr_eq0 limg_lfunVK ?memv_img ?memvf.
 Qed.
 
 End LinearPreimage.
+
+Arguments lpreimK {K aT rT f} [W] fW.
 
 Section LfunAlgebra.
 (* This section is a bit of a place holder: the instances we build here can't *)
@@ -1944,7 +1949,7 @@ Canonical subvs_vectType := VectType K subvs_of subvs_vectMixin.
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.
 Arguments subvs_inj {K vT U} [x1 x2].
-Arguments vsprojK {K vT U} [x].
+Arguments vsprojK {K vT U} [x] Ux.
 
 Section MatrixVectType.
 

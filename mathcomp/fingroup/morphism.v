@@ -118,9 +118,8 @@ Notation "[ 'morphism' D 'of' f ]" :=
 Notation "[ 'morphism' 'of' f ]" := (clone_morphism (@Morphism _ _ _ f))
    (at level 0, format "[ 'morphism'  'of'  f ]") : form_scope.
 
-Arguments morphimP [aT rT D A y f].
-Arguments morphpreP [aT rT D R x f].
-Prenex Implicits morphimP morphpreP.
+Arguments morphimP {aT rT D A y f}.
+Arguments morphpreP {aT rT D R x f}.
 
 (* Domain, image, preimage, kernel, using phantom types to infer the domain. *)
 
@@ -873,7 +872,8 @@ Notation "f @* G" := (morphim_group (MorPhantom f) G) : Group_scope.
 Notation "f @*^-1 M" := (morphpre_group (MorPhantom f) M) : Group_scope.
 Notation "f @: D" := (morph_dom_group f D) : Group_scope.
 
-Arguments injmP [aT rT D f].
+Arguments injmP {aT rT D f}.
+Arguments morphpreK {aT rT D f} [R] sRf.
 
 Section IdentityMorphism.
 
@@ -908,8 +908,7 @@ Proof. exact: morphim_idm. Qed.
 
 End IdentityMorphism.
 
-Arguments idm _ _%g _%g.
-Prenex Implicits idm.
+Arguments idm {_} _%g _%g.
 
 Section RestrictedMorphism.
 
@@ -967,10 +966,9 @@ Proof. by move <-; exists f. Qed.
 
 End RestrictedMorphism.
 
-Arguments restrm _ _ _%g _%g _ _%g.
-Prenex Implicits restrm.
-Arguments restrmP [aT rT A D].
-Arguments domP [aT rT A D].
+Arguments restrm {_ _ _%g _%g} _ _%g.
+Arguments restrmP {aT rT A D}.
+Arguments domP {aT rT A D}.
 
 Section TrivMorphism.
 
@@ -1324,17 +1322,17 @@ Proof. exact: restr_isom_to. Qed.
 
 End ReflectProp.
 
-Arguments isom _ _ _%g _%g _.
-Arguments morphic _ _ _%g _.
+Arguments isom {_ _} _%g _%g _.
+Arguments morphic {_ _} _%g _.
 Arguments misom _ _ _%g _%g _.
-Arguments isog _ _ _%g _%g.
+Arguments isog {_ _} _%g _%g.
 
-Arguments morphicP [aT rT A f].
-Arguments misomP [aT rT A B f].
+Arguments morphicP {aT rT A f}.
+Arguments misomP {aT rT A B f}.
 Arguments isom_isog [aT rT A B D].
-Arguments isomP [aT rT G H f].
-Arguments isogP [aT rT G H].
-Prenex Implicits morphic morphicP morphm isom isog isomP misomP isogP.
+Arguments isomP {aT rT G H f}.
+Arguments isogP {aT rT G H}.
+Prenex Implicits morphm.
 Notation "x \isog y":= (isog x y).
 
 Section Isomorphisms.
@@ -1482,7 +1480,7 @@ Arguments homg _ _ _%g _%g.
 Notation "G \homg H" := (homg G H)
   (at level 70, no associativity) : group_scope.
 
-Arguments homgP [rT aT C D].
+Arguments homgP {rT aT C D}.
 
 (* Isomorphism between a group and its subtype. *)
 
@@ -1494,11 +1492,11 @@ Canonical sgval_morphism := Morphism (@sgvalM _ G).
 Canonical subg_morphism := Morphism (@subgM _ G).
 
 Lemma injm_sgval : 'injm sgval.
-Proof. by apply/injmP; apply: in2W; apply: subg_inj. Qed.
+Proof. exact/injmP/(in2W subg_inj). Qed.
 
 Lemma injm_subg : 'injm (subg G).
-Proof. by apply/injmP; apply: can_in_inj (@subgK _ _). Qed.
-Hint Resolve injm_sgval injm_subg.
+Proof. exact/injmP/(can_in_inj subgK). Qed.
+Hint Resolve injm_sgval injm_subg : core.
 
 Lemma ker_sgval : 'ker sgval = 1. Proof. exact/trivgP. Qed.
 Lemma ker_subg : 'ker (subg G) = 1. Proof. exact/trivgP. Qed.
@@ -1539,4 +1537,7 @@ Lemma isog_subg : isog G [subg G].
 Proof. exact: isom_isog isom_subg. Qed.
 
 End SubMorphism.
+
+Arguments sgvalmK {gT G} A.
+Arguments subgmK {gT G} [A] sAG.
 

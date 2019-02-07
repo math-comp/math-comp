@@ -198,14 +198,14 @@ Lemma quotientE : quotient = coset @* Q. Proof. by []. Qed.
 
 End Cosets.
 
-Arguments coset_of _ _%g.
-Arguments coset _ _%g _%g.
-Arguments quotient _ _%g _%g.
-Prenex Implicits coset_of coset.
+Arguments coset_of {gT} H%g : rename.
+Arguments coset {gT} H%g x%g : rename.
+Arguments quotient {gT} A%g H%g : rename.
+Arguments coset_reprK {gT H%g} xbar%g : rename.
 
 Bind Scope group_scope with coset_of.
 
-Notation "A / B" := (quotient A B) : group_scope.
+Notation "A / H" := (quotient A H) : group_scope.
 
 Section CosetOfGroupTheory.
 
@@ -455,7 +455,7 @@ Proof. by rewrite /normal -{1}ker_coset; apply: morphim_injG. Qed.
 
 Lemma quotient_inj G1 G2 :
    H <| G1 -> H <| G2 -> G1 / H = G2 / H -> G1 :=: G2.
-Proof. by rewrite /normal -{1 3}ker_coset; apply: morphim_inj. Qed.
+Proof. by rewrite /normal -[in mem H]ker_coset; apply: morphim_inj. Qed.
 
 Lemma quotient_neq1 A : H <| A -> (A / H != 1) = (H \proper A).
 Proof.
@@ -751,8 +751,8 @@ Qed.
 
 End EqIso.
 
-Arguments qisom_inj [gT G H].
-Arguments morphim_qisom_inj [gT G H].
+Arguments qisom_inj {gT G H} eqGH [x1 x2].
+Arguments morphim_qisom_inj {gT G H} eqGH [x1 x2].
 
 Section FirstIsomorphism.
 

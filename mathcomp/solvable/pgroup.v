@@ -83,16 +83,15 @@ Definition Sylow A B := p_group B && Hall A B.
 
 End PgroupDefs.
 
-Arguments pgroup _ _%N _%g.
-Arguments psubgroup _ _%N _%g _%g.
-Arguments p_group _ _%g.
-Arguments p_elt _ _%N.
-Arguments constt _ _%g _%N.
-Arguments Hall _ _%g _%g.
-Arguments pHall _ _%N _%g _%g.
-Arguments Syl _ _%N _%g.
-Arguments Sylow _ _%g _%g.
-Prenex Implicits p_group Hall Sylow.
+Arguments pgroup {gT} pi%N A%g.
+Arguments psubgroup {gT} pi%N A%g B%g.
+Arguments p_group {gT} A%g.
+Arguments p_elt {gT} pi%N x.
+Arguments constt {gT} x%g pi%N.
+Arguments Hall {gT} A%g B%g.
+Arguments pHall {gT} pi%N A%g B%g.
+Arguments Syl {gT} p%N A%g.
+Arguments Sylow {gT} A%g B%g.
 
 Notation "pi .-group" := (pgroup pi)
   (at level 2, format "pi .-group") : group_scope.
@@ -170,7 +169,7 @@ Proof. exact: partn_eq1 (cardG_gt0 G). Qed.
 Lemma pgroupP pi G :
   reflect (forall p, prime p -> p %| #|G| -> p \in pi) (pi.-group G).
 Proof. exact: pnatP. Qed.
-Arguments pgroupP [pi G].
+Arguments pgroupP {pi G}.
 
 Lemma pgroup1 pi : pi.-group [1 gT].
 Proof. by rewrite /pgroup cards1. Qed.
@@ -679,9 +678,8 @@ Qed.
 
 End PgroupProps.
 
-Arguments pgroupP [gT pi G].
-Arguments constt1P [gT pi x].
-Prenex Implicits pgroupP constt1P.
+Arguments pgroupP {gT pi G}.
+Arguments constt1P {gT pi x}.
 
 Section NormalHall.
 
@@ -863,8 +861,8 @@ Canonical pcore_group : {group gT} := Eval hnf in [group of pcore].
 
 End PcoreDef.
 
-Arguments pcore _ _%N _%g.
-Arguments pcore_group _ _%N _%G.
+Arguments pcore pi%N {gT} A%g.
+Arguments pcore_group pi%N {gT} A%G.
 Notation "''O_' pi ( G )" := (pcore pi G)
   (at level 8, pi at level 2, format "''O_' pi ( G )") : group_scope.
 Notation "''O_' pi ( G )" := (pcore_group pi G) : Group_scope.
@@ -886,7 +884,7 @@ Canonical pseries_group : {group gT} := group pseries_group_set.
 
 End PseriesDefs.
 
-Arguments pseries _ _%SEQ _%g.
+Arguments pseries pis%SEQ {gT} _%g.
 Local Notation ConsPred p := (@Cons nat_pred p%N) (only parsing).
 Notation "''O_{' p1 , .. , pn } ( A )" :=
   (pseries (ConsPred p1 .. (ConsPred pn [::]) ..) A)
@@ -979,7 +977,7 @@ Section MorphPcore.
 
 Implicit Types (pi : nat_pred) (gT rT : finGroupType).
 
-Lemma morphim_pcore pi : GFunctor.pcontinuous (pcore pi).
+Lemma morphim_pcore pi : GFunctor.pcontinuous (@pcore pi).
 Proof.
 move=> gT rT D G f; apply/bigcapsP=> M /normal_sub_max_pgroup; apply.
   by rewrite morphim_pgroup ?pcore_pgroup.
@@ -1056,7 +1054,7 @@ Lemma pseries_rcons pi pis gT (A : {set gT}) :
 Proof. by rewrite /pseries rev_rcons. Qed.
 
 Lemma pseries_subfun pis :
-   GFunctor.closed (pseries pis) /\  GFunctor.pcontinuous (pseries pis).
+   GFunctor.closed (@pseries pis) /\  GFunctor.pcontinuous (@pseries pis).
 Proof.
 elim/last_ind: pis => [|pis pi [sFpi fFpi]].
   by split=> [gT G | gT rT D G f]; rewrite (sub1G, morphim1).
@@ -1066,13 +1064,13 @@ split=> [gT G | gT rT D G f]; rewrite !pseries_rcons ?(pcore_mod_sub F) //.
 exact: (morphim_pcore_mod F).
 Qed.
 
-Lemma pseries_sub pis : GFunctor.closed (pseries pis).
+Lemma pseries_sub pis : GFunctor.closed (@pseries pis).
 Proof. by case: (pseries_subfun pis). Qed.
 
-Lemma morphim_pseries pis : GFunctor.pcontinuous (pseries pis).
+Lemma morphim_pseries pis : GFunctor.pcontinuous (@pseries pis).
 Proof. by case: (pseries_subfun pis). Qed.
 
-Lemma pseriesS pis : GFunctor.hereditary (pseries pis).
+Lemma pseriesS pis : GFunctor.hereditary (@pseries pis).
 Proof. exact: (morphim_pseries pis). Qed.
 
 Canonical pseries_igFun pis := [igFun by pseries_sub pis & morphim_pseries pis].
@@ -1151,7 +1149,7 @@ apply: (quotient_inj nH2H).
   by apply/andP; rewrite /= -cats1 pseries_sub_catl pseries_norm2.
 rewrite /= quotient_pseries /= -IHpi -rcons_cat.
 rewrite -[G / _ / _](morphim_invm inj_f) //= {2}im_f //.
-rewrite -(@injmF [igFun of pcore pi]) /= ?injm_invm ?im_f // -quotient_pseries.
+rewrite -(@injmF [igFun of @pcore pi]) /= ?injm_invm ?im_f // -quotient_pseries.
 by rewrite -im_f ?morphim_invm ?morphimS ?normal_sub.
 Qed.
 
@@ -1302,8 +1300,8 @@ Qed.
 
 End EqPcore.
 
-Arguments sdprod_Hall_pcoreP [pi gT H G].
-Arguments sdprod_Hall_p'coreP [gT pi H G].
+Arguments sdprod_Hall_pcoreP {pi gT H G}.
+Arguments sdprod_Hall_p'coreP {gT pi H G}.
 
 Section Injm.
 

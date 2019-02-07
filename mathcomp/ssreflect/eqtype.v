@@ -7,20 +7,40 @@ Require Import ssrfun ssrbool.
 (******************************************************************************)
 (* This file defines two "base" combinatorial interfaces:                     *)
 (*    eqType == the structure for types with a decidable equality.            *)
-(*              Equality mixins can be made Canonical to allow generic        *)
-(*              folding of equality predicates.                               *)
-(* subType p == the structure for types isomorphic to {x : T | p x} with      *)
-(*              p : pred T for some type T.                                   *)
-(* The eqType interface supports the following operations:                    *)
-(*          x == y <=> x compares equal to y (this is a boolean test).        *)
-(*     x == y :> T <=> x == y at type T.                                      *)
-(*          x != y <=> x and y compare unequal.                               *)
-(*     x != y :> T <=>  "    "      "    "     at type T.                     *)
-(*         x =P y  :: a proof of reflect (x = y) (x == y); this coerces       *)
-(*                     to x == y -> x = y.                                    *)
-(*    comparable T <-> equality on T is decidable                             *)
+(* subType P == the structure for types isomorphic to {x : T | P x} with      *)
+(*              P : pred T for some type T.                                   *)
+(* The following are used to construct eqType instances:                      *)
+(*         EqType T m == the packed eqType class for type T and mixin m.      *)
+(* --> As eqType is a root class, equality mixins and classes coincide.       *)
+(*   Equality.axiom e <-> e : rel T is a valid comparison decision procedure  *)
+(*                       for type T: reflect (x = y) (e x y) for all x y : T. *)
+(*         EqMixin eP == the equality mixin for eP : Equality.axiom e.        *)
+(* --> Such manifest equality mixins should be declared Canonical to allow    *)
+(* for generic folding of equality predicates (see lemma eqE below).          *)
+(*  [eqType of T for eT] == clone for T of eT, where eT is an eqType for a    *)
+(*                      type convertible, but usually not identical, to T.    *)
+(*      [eqType of T] == clone for T of the eqType inferred for T, possibly   *)
+(*                       after unfolding some definitions.                    *)
+(*     [eqMixin of T] == mixin of the eqType inferred for T.                  *)
+(*       comparable T <-> equality on T is decidable.                         *)
 (*                    := forall x y : T, decidable (x = y)                    *)
-(*  comparableClass compT == eqType mixin/class for compT : comparable T.     *)
+(*  comparableMixin compT == equality mixin for compT : comparable T.         *)
+(*   InjEqMixin injf == an Equality mixin for T, using an f : T -> U  where   *)
+(*                      U has an eqType structure and injf : injective f.     *)
+(*    PcanEqMixin fK == an Equality mixin similarly derived from f and a left *)
+(*                      inverse partial function g and fK : pcancel f g.      *)
+(*     CanEqMixin fK == an Equality mixin similarly derived from f and a left *)
+(*                      inverse function g and fK : cancel f g.               *)
+(* --> Equality mixins derived by the above should never be made Canonical as *)
+(* they provide only comparisons with a generic head constant.                *)
+(*   The eqType interface supports the following operations:                  *)
+(*              x == y <=> x compares equal to y (this is a boolean test).    *)
+(*         x == y :> T <=> x == y at type T.                                  *)
+(*              x != y <=> x and y compare unequal.                           *)
+(*         x != y :> T <=> x and y compare unequal at type T.                 *)
+(*             x =P y  :: a proof of reflect (x = y) (x == y); x =P y coerces *)
+(*                     to x == y -> x = y.                                    *)
+(*               eq_op == the boolean relation behing the == notation.        *)
 (*             pred1 a == the singleton predicate [pred x | x == a].          *)
 (* pred2, pred3, pred4 == pair, triple, quad predicates.                      *)
 (*            predC1 a == [pred x | x != a].                                  *)
@@ -64,7 +84,7 @@ Require Import ssrfun ssrbool.
 (*                a proof of x0 \in A.                                        *)
 (* insub_eq x == transparent version of insub x that expands to Some/None     *)
 (*               when P x can evaluate.                                       *)
-(*  The subType P interface is most often implemented using one of:           *)
+(* The subType P interface is most often implemented using one of:            *)
 (*   [subType for S_val]                                                      *)
 (*     where S_val : S -> T is the first projection of a type S isomorphic to *)
 (*     {x : T | P}.                                                           *)
@@ -85,16 +105,9 @@ Require Import ssrfun ssrbool.
 (* Subtypes inherit the eqType structure of their base types; the generic     *)
 (* structure should be explicitly instantiated using the                      *)
 (*   [eqMixin of S by <:]                                                     *)
-(* construct to declare the Equality mixin; this pattern is repeated for all  *)
-(* the combinatorial interfaces (Choice, Countable, Finite).                  *)
-(*   More generally, the eqType structure can be transfered by (partial)      *)
-(* injections, using:                                                         *)
-(*   InjEqMixin injf == an Equality mixin for T, using an f : T -> eT where   *)
-(*                      eT has an eqType structure and injf : injective f.    *)
-(*    PcanEqMixin fK == an Equality mixin similarly derived from f and a left *)
-(*                      inverse partial function g and fK : pcancel f g.      *)
-(*     CanEqMixin fK == an Equality mixin similarly derived from f and a left *)
-(*                      inverse function g and fK : cancel f g.               *)
+(* construct to declare the equality mixin; this pattern is repeated for all  *)
+(* the combinatorial interfaces (Choice, Countable, Finite). As noted above,  *)
+(* such mixins should not be made Canonical.                                  *)
 (*   We add the following to the standard suffixes documented in ssrbool.v:   *)
 (*  1, 2, 3, 4 -- explicit enumeration predicate for 1 (singleton), 2, 3, or  *)
 (*                4 values.                                                   *)
@@ -113,14 +126,13 @@ Notation class_of := mixin_of (only parsing).
 
 Section ClassDef.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 
-Definition class := let: Pack _ c _ := cT return class_of cT in c.
+Definition class := let: Pack _ c := cT return class_of cT in c.
 
-Definition pack c := @Pack T c T.
-Definition clone := fun c & cT -> T & phant_id (pack c) cT => pack c.
+Definition clone := fun c & cT -> T & phant_id (@Pack T c) cT => Pack c.
 
 End ClassDef.
 
@@ -128,7 +140,7 @@ Module Exports.
 Coercion sort : type >-> Sortclass.
 Notation eqType := type.
 Notation EqMixin := Mixin.
-Notation EqType T m := (@pack T m).
+Notation EqType T m := (@Pack T m).
 Notation "[ 'eqMixin' 'of' T ]" := (class _ : mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T ]") : form_scope.
 Notation "[ 'eqType' 'of' T 'for' C ]" := (@clone T C _ idfun id)
@@ -142,12 +154,23 @@ Export Equality.Exports.
 
 Definition eq_op T := Equality.op (Equality.class T).
 
+(* eqE is a generic lemma that can be used to fold back recursive comparisons *)
+(* after using partial evaluation to simplify comparisons on concrete         *)
+(* instances. The eqE lemma can be used e.g. like so: rewrite !eqE /= -!eqE.  *)
+(* For instance, with the above rewrite, n.+1 == n.+1 gets simplified to      *)
+(* n == n. For this to work, we need to declare equality _mixins_             *)
+(* as canonical. Canonical declarations remove the need for specific          *)
+(* inverses to eqE (like eqbE, eqnE, eqseqE, etc.) for new recursive          *)
+(* comparisons, but can only be used for manifest mixing with a bespoke       *)
+(* comparison function, and so is incompatible with PcanEqMixin and the like  *)
+(* - this is why the tree_eqMixin for GenTree.tree in library choice is not   *)
+(* declared Canonical.                                                        *)
 Lemma eqE T x : eq_op x = Equality.op (Equality.class T) x.
 Proof. by []. Qed.
 
 Lemma eqP T : Equality.axiom (@eq_op T).
 Proof. by case: T => ? []. Qed.
-Arguments eqP [T x y].
+Arguments eqP {T x y}.
 
 Delimit Scope eq_scope with EQ.
 Open Scope eq_scope.
@@ -173,7 +196,7 @@ Notation eqxx := eq_refl.
 Lemma eq_sym (T : eqType) (x y : T) : (x == y) = (y == x).
 Proof. exact/eqP/eqP. Qed.
 
-Hint Resolve eq_refl eq_sym.
+Hint Resolve eq_refl eq_sym : core.
 
 Section Contrapositives.
 
@@ -207,11 +230,26 @@ Proof. by move=> imp /eqP; apply: contraTF. Qed.
 Lemma contra_eqT b x y : (~~ b -> x != y) -> x = y -> b.
 Proof. by move=> imp /eqP; apply: contraLR. Qed.
 
+Lemma contra_neqN b x y : (b -> x = y) -> x != y -> ~~ b.
+Proof. by move=> imp; apply: contraNN => /imp->. Qed.
+
+Lemma contra_neqF b x y : (b -> x = y) -> x != y -> b = false.
+Proof. by move=> imp; apply: contraNF => /imp->. Qed.
+
+Lemma contra_neqT b x y : (~~ b -> x = y) -> x != y -> b.
+Proof. by move=> imp; apply: contraNT => /imp->. Qed.
+
 Lemma contra_eq z1 z2 x1 x2 : (x1 != x2 -> z1 != z2) -> z1 = z2 -> x1 = x2.
 Proof. by move=> imp /eqP; apply: contraTeq. Qed.
 
 Lemma contra_neq z1 z2 x1 x2 : (x1 = x2 -> z1 = z2) -> z1 != z2 -> x1 != x2.
 Proof. by move=> imp; apply: contraNneq => /imp->. Qed.
+
+Lemma contra_neq_eq z1 z2 x1 x2 : (x1 != x2 -> z1 = z2) -> z1 != z2 -> x1 = x2.
+Proof. by move=> imp; apply: contraNeq => /imp->. Qed.
+
+Lemma contra_eq_neq z1 z2 x1 x2 : (z1 = z2 -> x1 != x2) -> x1 = x2 -> z1 != z2.
+Proof. by move=> imp; apply: contra_eqN => /eqP /imp. Qed.
 
 Lemma memPn A x : reflect {in A, forall y, y != x} (x \notin A).
 Proof.
@@ -230,8 +268,8 @@ Proof. by rewrite eq_sym; apply: ifN. Qed.
 
 End Contrapositives.
 
-Arguments memPn [T1 A x].
-Arguments memPnC [T1 A x].
+Arguments memPn {T1 A x}.
+Arguments memPnC {T1 A x}.
 
 Theorem eq_irrelevance (T : eqType) x y : forall e1 e2 : x = y :> T, e1 = e2.
 Proof.
@@ -274,7 +312,7 @@ Canonical bool_eqType := Eval hnf in EqType bool bool_eqMixin.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
-Lemma bool_irrelevance (x y : bool) (E E' : x = y) : E = E'.
+Lemma bool_irrelevance (b : bool) (p1 p2 : b) : p1 = p2.
 Proof. exact: eq_irrelevance. Qed.
 
 Lemma negb_add b1 b2 : ~~ (b1 (+) b2) = (b1 == b2).
@@ -339,10 +377,10 @@ Proof. by case: eqP; [left | right]. Qed.
 
 End EqPred.
 
-Arguments predU1P [T x y b].
-Arguments pred2P [T T2 x y z u].
-Arguments predD1P [T x y b].
-Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1 predU1P.
+Arguments predU1P {T x y b}.
+Arguments pred2P {T T2 x y z u}.
+Arguments predD1P {T x y b}.
+Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1.
 
 Notation "[ 'predU1' x & A ]" := (predU1 x [mem A])
   (at level 0, format "[ 'predU1'  x  &  A ]") : fun_scope.
@@ -436,7 +474,7 @@ Notation "x |-> y" := (FunDelta x y)
    format "'[hv' x '/ '  |->  y ']'") : fun_delta_scope.
 
 Delimit Scope fun_delta_scope with FUN_DELTA.
-Arguments app_fdelta _ _%type _%FUN_DELTA _ _.
+Arguments app_fdelta {aT rT%type} df%FUN_DELTA f z.
 
 Notation "[ 'fun' z : T => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z : T =>
@@ -465,14 +503,14 @@ Variable T : Type.
 
 Definition comparable := forall x y : T, decidable (x = y).
 
-Hypothesis Hcompare : comparable.
+Hypothesis compare_T : comparable.
 
-Definition compareb x y : bool := Hcompare x y.
+Definition compareb x y : bool := compare_T x y.
 
 Lemma compareP : Equality.axiom compareb.
 Proof. by move=> x y; apply: sumboolP. Qed.
 
-Definition comparableClass := EqMixin compareP.
+Definition comparableMixin := EqMixin compareP.
 
 End ComparableType.
 
@@ -491,7 +529,8 @@ Structure subType : Type := SubType {
   _ : forall x Px, val (@Sub x Px) = x
 }.
 
-Arguments Sub [s].
+(* Generic proof that the second property holds by conversion.                *)
+(* The vrefl_rect alias is used to flag generic proofs of the first property. *)
 Lemma vrefl : forall x, P x -> x = x. Proof. by []. Qed.
 Definition vrefl_rect := vrefl.
 
@@ -499,18 +538,21 @@ Definition clone_subType U v :=
   fun sT & sub_sort sT -> U =>
   fun c Urec cK (sT' := @SubType U v c Urec cK) & phant_id sT' sT => sT'.
 
+Section Theory.
+
 Variable sT : subType.
+
+Local Notation val := (@val sT).
+Local Notation Sub x Px := (@Sub sT x Px).
 
 Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
 
 Lemma SubP u : Sub_spec u.
-Proof. by case: sT Sub_spec SubSpec u => T' _ C rec /= _. Qed.
+Proof. by case: sT Sub_spec SubSpec u => /= U _ mkU rec _. Qed.
 
-Lemma SubK x Px : @val sT (Sub x Px) = x.
-Proof. by case: sT. Qed.
+Lemma SubK x Px : val (Sub x Px) = x. Proof. by case: sT. Qed.
 
-Definition insub x :=
-  if @idP (P x) is ReflectT Px then @Some sT (Sub x Px) else None.
+Definition insub x := if idP is ReflectT Px then Some (Sub x Px) else None.
 
 Definition insubd u0 x := odflt u0 (insub x).
 
@@ -538,49 +580,55 @@ Proof. by move/negPf/insubF. Qed.
 Lemma isSome_insub : ([eta insub] : pred T) =1 P.
 Proof. by apply: fsym => x; case: insubP => // /negPf. Qed.
 
-Lemma insubK : ocancel insub (@val _).
+Lemma insubK : ocancel insub val.
 Proof. by move=> x; case: insubP. Qed.
 
-Lemma valP (u : sT) : P (val u).
+Lemma valP u : P (val u).
 Proof. by case/SubP: u => x Px; rewrite SubK. Qed.
 
-Lemma valK : pcancel (@val _) insub.
+Lemma valK : pcancel val insub.
 Proof. by case/SubP=> x Px; rewrite SubK; apply: insubT. Qed.
 
-Lemma val_inj : injective (@val sT).
+Lemma val_inj : injective val.
 Proof. exact: pcan_inj valK. Qed.
 
-Lemma valKd u0 : cancel (@val _) (insubd u0).
+Lemma valKd u0 : cancel val (insubd u0).
 Proof. by move=> u; rewrite /insubd valK. Qed.
 
 Lemma val_insubd u0 x : val (insubd u0 x) = if P x then x else val u0.
 Proof. by rewrite /insubd; case: insubP => [u -> | /negPf->]. Qed.
 
-Lemma insubdK u0 : {in P, cancel (insubd u0) (@val _)}.
+Lemma insubdK u0 : {in P, cancel (insubd u0) val}.
 Proof. by move=> x Px; rewrite /= val_insubd [P x]Px. Qed.
 
-Definition insub_eq x :=
-  let Some_sub Px := Some (Sub x Px : sT) in
-  let None_sub _ := None in
-  (if P x as Px return P x = Px -> _ then Some_sub else None_sub) (erefl _).
+Let insub_eq_aux x isPx : P x = isPx -> option sT :=
+  if isPx as b return _ = b -> _ then fun Px => Some (Sub x Px) else fun=> None.
+Definition insub_eq x := insub_eq_aux (erefl (P x)).
 
 Lemma insub_eqE : insub_eq =1 insub.
 Proof.
-rewrite /insub_eq /insub => x; case: {2 3}_ / idP (erefl _) => // Px Px'.
-by congr (Some _); apply: val_inj; rewrite !SubK.
+rewrite /insub_eq => x; set b := P x; rewrite [in LHS]/b in (Db := erefl b) *.
+by case: b in Db *; [rewrite insubT | rewrite insubF].
 Qed.
+
+End Theory.
 
 End SubType.
 
-Arguments SubType [T P].
-Arguments Sub [T P s].
-Arguments vrefl [T P].
-Arguments vrefl_rect [T P].
+Arguments SubType {T P} sub_sort val Sub rec SubK.
+Arguments val {T P sT} u : rename.
+Arguments Sub {T P sT} x Px : rename.
+Arguments vrefl {T P} x Px.
+Arguments vrefl_rect {T P} x Px.
 Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
-Arguments insub [T P sT].
+Arguments insub {T P sT} x.
+Arguments insubd {T P sT} u0 x.
 Arguments insubT [T] P [sT x].
-Arguments val_inj [T P sT].
-Prenex Implicits val Sub vrefl vrefl_rect insub insubd val_inj.
+Arguments val_inj {T P sT} [u1 u2] eq_u12 : rename.
+Arguments valK {T P sT} u : rename.
+Arguments valKd {T P sT} u0 u : rename.
+Arguments insubK {T P} sT x.
+Arguments insubdK {T P sT} u0 [x] Px.
 
 Local Notation inlined_sub_rect :=
   (fun K K_S u => let (x, Px) as u return K u := u in K_S x Px).
@@ -600,10 +648,6 @@ Notation "[ 'subType' 'for' v 'by' rec ]" := (SubType _ v _ rec vrefl)
 Notation "[ 'subType' 'of' U 'for' v ]" := (clone_subType U v id idfun)
  (at level 0, format "[ 'subType'  'of'  U  'for'  v ]") : form_scope.
 
-(*
-Notation "[ 'subType' 'for' v ]" := (clone_subType _ v id idfun)
- (at level 0, format "[ 'subType'  'for'  v ]") : form_scope.
-*)
 Notation "[ 'subType' 'of' U ]" := (clone_subType U _ id id)
  (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
 
@@ -622,8 +666,7 @@ Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
  (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.
 
 Definition innew T nT x := @Sub T predT nT x (erefl true).
-Arguments innew [T nT].
-Prenex Implicits innew.
+Arguments innew {T nT}.
 
 Lemma innew_val T nT : cancel val (@innew T nT).
 Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
@@ -713,8 +756,7 @@ Proof. by []. Qed.
 
 End SubEqType.
 
-Arguments val_eqP [T P sT x y].
-Prenex Implicits val_eqP.
+Arguments val_eqP {T P sT x y}.
 
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.class_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
@@ -732,7 +774,7 @@ Section ProdEqType.
 
 Variable T1 T2 : eqType.
 
-Definition pair_eq := [rel u v : T1 * T2 | (u.1 == v.1) && (u.2 == v.2)].
+Definition pair_eq : rel (T1 * T2) := fun u v => (u.1 == v.1) && (u.2 == v.2).
 
 Lemma pair_eqP : Equality.axiom pair_eq.
 Proof.
@@ -740,7 +782,7 @@ move=> [x1 x2] [y1 y2] /=; apply: (iffP andP) => [[]|[<- <-]] //=.
 by do 2!move/eqP->.
 Qed.
 
-Definition prod_eqMixin := EqMixin pair_eqP.
+Canonical prod_eqMixin := EqMixin pair_eqP.
 Canonical prod_eqType := Eval hnf in EqType (T1 * T2) prod_eqMixin.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
@@ -757,9 +799,8 @@ Proof. by case/andP. Qed.
 
 End ProdEqType.
 
-Arguments pair_eqP [T1 T2].
-
-Prenex Implicits pair_eqP.
+Arguments pair_eq {T1 T2} u v /.
+Arguments pair_eqP {T1 T2}.
 
 Definition predX T1 T2 (p1 : pred T1) (p2 : pred T2) :=
   [pred z | p1 z.1 & p2 z.2].
@@ -784,11 +825,7 @@ Canonical option_eqType := Eval hnf in EqType (option T) option_eqMixin.
 
 End OptionEqType.
 
-Definition tag := projS1.
-Definition tagged I T_ :  forall u, T_(tag u) := @projS2 I [eta T_].
-Definition Tagged I i T_ x := @existS I [eta T_] i x.
-Arguments Tagged [I i].
-Prenex Implicits tag tagged Tagged.
+Arguments opt_eq {T} !u !v.
 
 Section TaggedAs.
 
@@ -834,8 +871,8 @@ Proof. by rewrite -tag_eqE /tag_eq eqxx tagged_asE. Qed.
 
 End TagEqType.
 
-Arguments tag_eqP [I T_ x y].
-Prenex Implicits tag_eqP.
+Arguments tag_eq {I T_} !u !v.
+Arguments tag_eqP {I T_ x y}.
 
 Section SumEqType.
 
@@ -858,5 +895,105 @@ Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 
 End SumEqType.
 
-Arguments sum_eqP [T1 T2 x y].
-Prenex Implicits sum_eqP.
+Arguments sum_eq {T1 T2} !u !v.
+Arguments sum_eqP {T1 T2 x y}.
+
+Section MonoHomoTheory.
+
+Variables (aT rT : eqType) (f : aT -> rT).
+Variables (aR aR' : rel aT) (rR rR' : rel rT).
+
+Hypothesis aR_refl : reflexive aR.
+Hypothesis rR_refl : reflexive rR.
+Hypothesis aR'E : forall x y, aR' x y = (x != y) && (aR x y).
+Hypothesis rR'E : forall x y, rR' x y = (x != y) && (rR x y).
+
+Let aRE x y : aR x y = (x == y) || (aR' x y).
+Proof. by rewrite aR'E; case: (altP eqP) => //= ->; apply: aR_refl. Qed.
+Let rRE x y : rR x y = (x == y) || (rR' x y).
+Proof. by rewrite rR'E; case: (altP eqP) => //= ->; apply: rR_refl. Qed.
+
+Section InDom.
+Variable D : pred aT.
+
+Section DifferentDom.
+Variable D' : pred aT.
+
+Lemma homoW_in : {in D & D', {homo f : x y / aR' x y >-> rR' x y}} ->
+                 {in D & D', {homo f : x y / aR x y >-> rR x y}}.
+Proof.
+move=> mf x y xD yD /=; rewrite aRE => /orP[/eqP->|/mf];
+by rewrite rRE ?eqxx // orbC => ->.
+Qed.
+
+Lemma inj_homo_in : {in D & D', injective f} ->
+  {in D & D', {homo f : x y / aR x y >-> rR x y}} ->
+  {in D & D', {homo f : x y / aR' x y >-> rR' x y}}.
+Proof.
+move=> fI mf x y xD yD /=; rewrite aR'E rR'E => /andP[neq_xy xy].
+by rewrite mf ?andbT //; apply: contra_neq neq_xy => /fI; apply.
+Qed.
+
+End DifferentDom.
+
+Hypothesis aR_anti : antisymmetric aR.
+Hypothesis rR_anti : antisymmetric rR.
+
+Lemma mono_inj_in : {in D &, {mono f : x y / aR x y >-> rR x y}} ->
+                 {in D &, injective f}.
+Proof. by move=> mf x y ?? eqf; apply/aR_anti; rewrite -!mf// eqf rR_refl. Qed.
+
+Lemma anti_mono_in : {in D &, {mono f : x y / aR x y >-> rR x y}} ->
+                     {in D &, {mono f : x y / aR' x y >-> rR' x y}}.
+Proof.
+move=> mf x y ??; rewrite rR'E aR'E mf// (@inj_in_eq _ _ D)//.
+exact: mono_inj_in.
+Qed.
+
+Lemma total_homo_mono_in : total aR ->
+    {in D &, {homo f : x y / aR' x y >-> rR' x y}} ->
+   {in D &, {mono f : x y / aR x y >-> rR x y}}.
+Proof.
+move=> aR_tot mf x y xD yD.
+have [->|neq_xy] := altP (x =P y); first by rewrite ?eqxx ?aR_refl ?rR_refl.
+have [xy|] := (boolP (aR x y)); first by rewrite rRE mf ?orbT// aR'E neq_xy.
+have /orP [->//|] := aR_tot x y.
+rewrite aRE eq_sym (negPf neq_xy) /= => /mf -/(_ yD xD).
+rewrite rR'E => /andP[Nfxfy fyfx] _; apply: contra_neqF Nfxfy => fxfy.
+by apply/rR_anti; rewrite fyfx fxfy.
+Qed.
+
+End InDom.
+
+Let D := @predT aT.
+
+Lemma homoW : {homo f : x y / aR' x y >-> rR' x y} ->
+                 {homo f : x y / aR x y >-> rR x y}.
+Proof. by move=> mf ???; apply: (@homoW_in D D) => // ????; apply: mf. Qed.
+
+Lemma inj_homo : injective f ->
+  {homo f : x y / aR x y >-> rR x y} ->
+  {homo f : x y / aR' x y >-> rR' x y}.
+Proof.
+by move=> fI mf ???; apply: (@inj_homo_in D D) => //????; [apply: fI|apply: mf].
+Qed.
+
+Hypothesis aR_anti : antisymmetric aR.
+Hypothesis rR_anti : antisymmetric rR.
+
+Lemma mono_inj : {mono f : x y / aR x y >-> rR x y} -> injective f.
+Proof. by move=> mf x y eqf; apply/aR_anti; rewrite -!mf eqf rR_refl. Qed.
+
+Lemma anti_mono : {mono f : x y / aR x y >-> rR x y} ->
+                  {mono f : x y / aR' x y >-> rR' x y}.
+Proof. by move=> mf x y; rewrite rR'E aR'E mf inj_eq //; apply: mono_inj. Qed.
+
+Lemma total_homo_mono : total aR ->
+    {homo f : x y / aR' x y >-> rR' x y} ->
+   {mono f : x y / aR x y >-> rR x y}.
+Proof.
+move=> /(@total_homo_mono_in D rR_anti) hmf hf => x y.
+by apply: hmf => // ?? _ _; apply: hf.
+Qed.
+
+End MonoHomoTheory.

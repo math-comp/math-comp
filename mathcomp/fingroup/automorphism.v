@@ -198,8 +198,8 @@ Qed.
 
 End MakeAut.
 
-Arguments morphim_fixP [gT G f].
-Prenex Implicits aut morphim_fixP.
+Arguments morphim_fixP {gT G f}.
+Prenex Implicits aut.
 
 Section AutIsom.
 
@@ -449,7 +449,7 @@ End Characteristicity.
 
 Arguments characteristic _ _%g _%g.
 Notation "H \char G" := (characteristic H G) : group_scope.
-Hint Resolve char_refl.
+Hint Resolve char_refl : core.
 
 Section InjmChar.
 

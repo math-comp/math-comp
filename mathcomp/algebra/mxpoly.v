@@ -29,7 +29,7 @@ Require Import poly polydiv.
 (*   char_poly A  == the characteristic polynomial of A.                      *)
 (* char_poly_mx A == a matrix whose determinant is char_poly A.               *)
 (*  companionmx p == a matrix whose char_poly is p                            *)
-(*   mxminpoly A  == the minimal polynomial of A, i.e., the smallest monic     *)
+(*   mxminpoly A  == the minimal polynomial of A, i.e., the smallest monic    *)
 (*                   polynomial that annihilates A (A must be nontrivial).    *)
 (* degree_mxminpoly A == the (positive) degree of mxminpoly A.                *)
 (* mx_inv_horner A == the inverse of horner_mx A for polynomials of degree    *)
@@ -116,8 +116,9 @@ Canonical rVpoly_linear := Linear rVpoly_is_linear.
 
 End RowPoly.
 
-Arguments poly_rV [R d].
-Prenex Implicits rVpoly poly_rV.
+Prenex Implicits rVpoly rVpolyK.
+Arguments poly_rV {R d}.
+Arguments poly_rV_K {R d} [p] le_p_d.
 
 Section Resultant.
 
@@ -139,6 +140,8 @@ Qed.
 Definition resultant := \det Sylvester_mx.
 
 End Resultant.
+
+Prenex Implicits Sylvester_mx resultant.
 
 Lemma resultant_in_ideal (R : comRingType) (p q : {poly R}) :
     size p > 1 -> size q > 1 ->
@@ -224,7 +227,7 @@ apply/det0P/idP=> [[uv nz_uv] | r_nonC].
   rewrite addrC addr_eq0 => /eqP vq_up.
   have nz_v: v != 0.
     apply: contraNneq nz_uv => v0; apply/eqP.
-    congr row_mx; apply: (can_inj (@rVpolyK _ _)); rewrite linear0 // -/u.
+    congr row_mx; apply: (can_inj rVpolyK); rewrite linear0 // -/u.
     by apply: contra_eq vq_up; rewrite v0 mul0r -addr_eq0 add0r => /mulf_neq0->.
   have r_nz: r != 0 := dvdpN0 r_p p_nz.
   have /dvdpP [[c w] /= nz_c wv]: v %| m by rewrite dvdp_gcd !dvdp_mulr.
@@ -298,6 +301,8 @@ Qed.
 
 End HornerMx.
 
+Prenex Implicits horner_mx powers_mx.
+
 Section CharPoly.
 
 Variables (R : ringType) (n : nat) (A : 'M[R]_n).
@@ -330,7 +335,7 @@ apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
   by rewrite sub0r size_opp size_polyC leq_b1.
 rewrite -{8}[n]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
 apply: subset_leq_card; apply/subsetP=> j; move/(_ =P j)=> fix_j.
-rewrite !inE -{1}fix_j (inj_eq (@perm_inj _ s)) orbb.
+rewrite !inE -{1}fix_j (inj_eq perm_inj) orbb.
 by apply: contraNneq nfix_i => <-; rewrite fix_j.
 Qed.
 
@@ -372,6 +377,8 @@ by rewrite coefM big_ord1 IHe !mxE coefB coefC coefMn coefX mul0rn sub0r.
 Qed.
 
 End CharPoly.
+
+Prenex Implicits char_poly_mx char_poly.
 
 Lemma mx_poly_ring_isom (R : ringType) n' (n := n'.+1) :
   exists phi : {rmorphism 'M[{poly R}]_n -> {poly 'M[R]_n}},
@@ -431,13 +438,11 @@ rewrite (big_morph _ (fun p q => hornerM p q a) (hornerC 1 a)).
 by apply: eq_bigr => i _; rewrite !mxE !(hornerE, hornerMn).
 Qed.
 
-Section Companion.
-
-Definition companionmx (R : ringType) (p : seq R) (d := (size p).-1) :=
+Definition companionmx {R : ringType} (p : seq R) (d := (size p).-1) :=
   \matrix_(i < d, j < d)
     if (i == d.-1 :> nat) then - p`_j else (i.+1 == j :> nat)%:R.
 
-Lemma companionmxK (R : comRingType) (p : {poly R}) :
+Lemma companionmxK {R : comRingType} (p : {poly R}) :
    p \is monic -> char_poly (companionmx p) = p.
 Proof.
 pose D n : 'M[{poly R}]_n := \matrix_(i, j)
@@ -486,8 +491,6 @@ rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //; last first.
   by rewrite -ltnS prednK // (leq_trans  _ i_small).
 by move=> k /negPf ki_eqF; rewrite !mxE eqxx ki_eqF mul0r.
 Qed.
-
-End Companion.
 
 Section MinPoly.
 
@@ -601,10 +604,10 @@ Qed.
 Lemma mxminpoly_min p : horner_mx A p = 0 -> p_A %| p.
 Proof. by move=> pA0; rewrite /dvdp -horner_mxK pA0 mx_inv_horner0. Qed.
 
-Lemma horner_rVpoly_inj : @injective 'M_n 'rV_d (horner_mx A \o rVpoly).
+Lemma horner_rVpoly_inj : injective (horner_mx A \o rVpoly : 'rV_d -> 'M_n).
 Proof.
-apply: can_inj (poly_rV \o mx_inv_horner) _ => u.
-by rewrite /= horner_rVpolyK rVpolyK.
+apply: can_inj (poly_rV \o mx_inv_horner) _ => u /=.
+by rewrite horner_rVpolyK rVpolyK.
 Qed.
 
 Lemma mxminpoly_linear_is_scalar : (d <= 1) = is_scalar_mx A.
@@ -639,6 +642,11 @@ Qed.
 
 End MinPoly.
 
+Prenex Implicits degree_mxminpoly mxminpoly mx_inv_horner.
+
+Arguments mx_inv_hornerK {F n' A} [B] AnB.
+Arguments horner_rVpoly_inj {F n' A} [u1 u2] eq_u12A : rename.
+          
 (* Parametricity. *)
 Section MapRingMatrix.
 
@@ -899,7 +907,7 @@ apply: integral_horner_root mon_p pu0 intRp _.
 by apply/integral_poly => i; rewrite coefX; apply: integral_nat.
 Qed.
 
-Hint Resolve (integral0 RtoK) (integral1 RtoK) (@monicXsubC K).
+Hint Resolve (integral0 RtoK) (integral1 RtoK) (@monicXsubC K) : core.
 
 Let XsubC0 (u : K) : root ('X - u%:P) u. Proof. by rewrite root_XsubC. Qed.
 Let intR_XsubC u :
@@ -1044,9 +1052,9 @@ Local Notation holds := GRing.holds.
 Local Notation qf_form := GRing.qf_form.
 Local Notation qf_eval := GRing.qf_eval.
 
-Definition eval_mx (e : seq F) := map_mx (eval e).
+Definition eval_mx (e : seq F) := @map_mx term F (eval e).
 
-Definition mx_term := map_mx (@GRing.Const F).
+Definition mx_term := @map_mx F term GRing.Const.
 
 Lemma eval_mx_term e m n (A : 'M_(m, n)) : eval_mx e (mx_term A) = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.

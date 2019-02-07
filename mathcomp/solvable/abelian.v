@@ -111,16 +111,16 @@ Definition gen_rank A := #|[arg min_(B < A | <<B>> == A) #|B|]|.
 
 End AbelianDefs.
 
-Arguments exponent _ _%g.
-Arguments abelem _ _%N _%g.
-Arguments is_abelem _ _%g.
-Arguments pElem _ _%N _%g.
-Arguments pnElem _ _%N _%N _%g.
-Arguments nElem _ _%N _%g.
-Arguments pmaxElem _ _%N _%g.
-Arguments p_rank _ _%N _%g.
-Arguments rank _ _%g.
-Arguments gen_rank _ _%g.
+Arguments exponent {gT} A%g.
+Arguments abelem {gT} p%N A%g.
+Arguments is_abelem {gT} A%g.
+Arguments pElem {gT} p%N A%g.
+Arguments pnElem {gT} p%N n%N A%g.
+Arguments nElem {gT} n%N A%g.
+Arguments pmaxElem {gT} p%N A%g.
+Arguments p_rank {gT} p%N A%g.
+Arguments rank {gT} A%g.
+Arguments gen_rank {gT} A%g.
 
 Notation "''Ldiv_' n ()" := (Ldiv _ n)
   (at level 8, n at level 2, format "''Ldiv_' n ()") : group_scope.
@@ -192,11 +192,11 @@ Qed.
 
 End Functors.
 
-Arguments Ohm _%N _ _%g.
-Arguments Ohm_group _%N _ _%g.
-Arguments Mho _%N _ _%g.
-Arguments Mho_group _%N _ _%g.
-Arguments OhmPredP [n gT x].
+Arguments Ohm n%N {gT} A%g.
+Arguments Ohm_group n%N {gT} A%g.
+Arguments Mho n%N {gT} A%g.
+Arguments Mho_group n%N {gT} A%g.
+Arguments OhmPredP {n gT x}.
 
 Notation "''Ohm_' n ( G )" := (Ohm n G)
   (at level 8, n at level 2, format "''Ohm_' n ( G )") : group_scope.
@@ -233,7 +233,7 @@ apply: (iffP (dvdn_biglcmP _ _ _)) => eAn x Ax.
   by apply/eqP; rewrite -order_dvdn eAn.
 by rewrite order_dvdn eAn.
 Qed.
-Arguments exponentP [A n].
+Arguments exponentP {A n}.
 
 Lemma trivg_exponent G : (G :==: 1) = (exponent G %| 1).
 Proof.
@@ -249,7 +249,7 @@ Proof. by apply/dvdn_biglcmP=> x Gx; apply: order_dvdG. Qed.
 
 Lemma exponent_gt0 G : 0 < exponent G.
 Proof. exact: dvdn_gt0 (exponent_dvdn G). Qed.
-Hint Resolve exponent_gt0.
+Hint Resolve exponent_gt0 : core.
 
 Lemma pnat_exponent pi G : pi.-nat (exponent G) = pi.-group G.
 Proof.
@@ -495,7 +495,7 @@ Qed.
 
 Lemma pElemP p A E : reflect (E \subset A /\ p.-abelem E) (E \in 'E_p(A)).
 Proof. by rewrite inE; apply: andP. Qed.
-Arguments pElemP [p A E].
+Arguments pElemP {p A E}.
 
 Lemma pElemS p A B : A \subset B -> 'E_p(A) \subset 'E_p(B).
 Proof.
@@ -511,7 +511,7 @@ Proof. by rewrite !inE conjSg abelemJ. Qed.
 Lemma pnElemP p n A E :
   reflect [/\ E \subset A, p.-abelem E & logn p #|E| = n] (E \in 'E_p^n(A)).
 Proof. by rewrite !inE -andbA; apply: (iffP and3P) => [] [-> -> /eqP]. Qed.
-Arguments pnElemP [p n A E].
+Arguments pnElemP {p n A E}.
 
 Lemma pnElemPcard p n A E :
   E \in 'E_p^n(A) -> [/\ E \subset A, p.-abelem E & #|E| = p ^ n]%N.
@@ -636,7 +636,7 @@ have:= EpnE; rewrite pnElemE ?(pnElem_prime EpnE) // !inE -andbA ltnS.
 case/and3P=> sEG _ oE; rewrite dvdn_leq // (dvdn_trans _ (cardSg sEG)) //.
 by rewrite (eqP oE) dvdn_exp.
 Qed.
-Arguments nElemP [n G E].
+Arguments nElemP {n G E}.
 
 Lemma nElem0 G : 'E^0(G) = [set 1%G].
 Proof.
@@ -899,18 +899,18 @@ Qed.
 
 End ExponentAbelem.
 
-Arguments LdivP [gT A n x].
-Arguments exponentP [gT A n].
-Arguments abelemP [gT p G].
-Arguments is_abelemP [gT G].
-Arguments pElemP [gT p A E].
-Arguments pnElemP [gT p n A E].
-Arguments nElemP [gT n G E].
-Arguments nElem1P [gT G E].
-Arguments pmaxElemP [gT p A E].
-Arguments pmaxElem_LdivP [gT p G E].
-Arguments p_rank_geP [gT p n G].
-Arguments rank_geP [gT n G].
+Arguments LdivP {gT A n x}.
+Arguments exponentP {gT A n}.
+Arguments abelemP {gT p G}.
+Arguments is_abelemP {gT G}.
+Arguments pElemP {gT p A E}.
+Arguments pnElemP {gT p n A E}.
+Arguments nElemP {gT n G E}.
+Arguments nElem1P {gT G E}.
+Arguments pmaxElemP {gT p A E}.
+Arguments pmaxElem_LdivP {gT p G E}.
+Arguments p_rank_geP {gT p n G}.
+Arguments rank_geP {gT n G}.
 
 Section MorphAbelem.
 
@@ -2023,9 +2023,8 @@ Qed.
 
 End AbelianStructure.
 
-Arguments abelian_type _ _%g.
-Arguments homocyclic _ _%g.
-Prenex Implicits abelian_type homocyclic.
+Arguments abelian_type {gT} A%g.
+Arguments homocyclic {gT} A%g.
 
 Section IsogAbelian.
 

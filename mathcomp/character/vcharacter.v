@@ -749,7 +749,7 @@ Lemma cfdot_dirr f g : f \in dirr G -> g \in dirr G ->
 Proof.
 case/dirrP=> [b1 [i1 ->]] /dirrP[b2 [i2 ->]].
 rewrite cfdotZl cfdotZr rmorph_sign mulrA -signr_addb cfdot_irr.
-rewrite -scaleNr -signrN !eq_scaled_irr signr_eq0 !(inj_eq (@signr_inj _)) /=.
+rewrite -scaleNr -signrN !eq_scaled_irr signr_eq0 !(inj_eq signr_inj) /=.
 by rewrite -!negb_add addbN mulr_sign -mulNrn mulrb; case: ifP.
 Qed.
 
@@ -799,7 +799,7 @@ Lemma cfdot_dchi (i j : dIirr G) :
   '[dchi i, dchi j] = (i == j)%:R - (i == ndirr j)%:R.
 Proof.
 case: i => bi i; case: j => bj j; rewrite cfdot_dirr ?dirr_dchi // !xpair_eqE.
-rewrite -dchi_ndirrE !eq_scaled_irr signr_eq0 !(inj_eq (@signr_inj _)) /=.
+rewrite -dchi_ndirrE !eq_scaled_irr signr_eq0 !(inj_eq signr_inj) /=.
 by rewrite -!negb_add addbN negbK; case: andP => [[->]|]; rewrite ?subr0 ?add0r.
 Qed.
 
@@ -811,7 +811,7 @@ Proof.  by case: i => b i; rewrite cfnorm_sign cfnorm_irr. Qed.
 
 Lemma dirr_inj : injective (@dchi G).
 Proof.
-case=> b1 i1 [b2 i2] /eqP; rewrite eq_scaled_irr (inj_eq (@signr_inj _)) /=.
+case=> b1 i1 [b2 i2] /eqP; rewrite eq_scaled_irr (inj_eq signr_inj) /=.
 by rewrite signr_eq0 -xpair_eqE => /eqP.
 Qed.
 
@@ -890,15 +890,13 @@ Lemma cfdot_todirrE (phi: 'CF(G)) i (phi_i := dchi (to_dirr phi i)) :
 Proof. by rewrite cfdotZr rmorph_sign mulrC -scalerA signrZK. Qed.
 
 Lemma cfun_sum_dconstt (phi : 'CF(G)) :
-  phi \in 'Z[irr G] ->
+    phi \in 'Z[irr G] ->
   phi = \sum_(i in dirr_constt phi) '[phi, dchi i] *: dchi i.
 Proof.
-(* GG -- rewrite pattern fails in trunk
-  move=> PiZ; rewrite [X in X = _]cfun_sum_constt. *)
-move=> PiZ; rewrite {1}[phi]cfun_sum_constt.
+move=> PiZ; rewrite [LHS]cfun_sum_constt.
 rewrite (reindex (to_dirr phi))=> [/= |]; last first.
   by exists (@of_irr _)=> //; apply: of_irrK .
-by apply: eq_big=> i; rewrite ?irr_constt_to_dirr // cfdot_todirrE.
+by apply: eq_big => i; rewrite ?irr_constt_to_dirr // cfdot_todirrE.
 Qed.
 
 Lemma cnorm_dconstt (phi : 'CF(G)) :
@@ -981,3 +979,6 @@ by case: (i1 == j) eq_phi_psi; case: (i2 == j); do 2!case: (_ (+) c).
 Qed.
 
 End Norm1vchar.
+
+Prenex Implicits ndirr ndirrK to_dirr to_dirrK of_irr.
+Arguments of_irrK {gT G phi} [i] phi_i : rename.

@@ -302,10 +302,10 @@ Local Notation T := (arg_sort bT).
 Local Notation rT := (sort bT).
 Local Notation class := (finClass bT).
 
-Canonical eqType := Equality.Pack class rT.
-Canonical choiceType := Choice.Pack class rT.
-Canonical countType := Countable.Pack class rT.
-Canonical finType := Finite.Pack class rT.
+Canonical eqType := Equality.Pack class.
+Canonical choiceType := Choice.Pack class.
+Canonical countType := Countable.Pack class.
+Canonical finType := Finite.Pack class.
 Definition arg_eqType := Eval hnf in [eqType of T].
 Definition arg_choiceType := Eval hnf in [choiceType of T].
 Definition arg_countType := Eval hnf in [countType of T].
@@ -492,9 +492,9 @@ Qed.
 
 End PreGroupIdentities.
 
-Hint Resolve commute1.
-Arguments invg_inj [T].
-Prenex Implicits commute invgK invg_inj.
+Hint Resolve commute1 : core.
+Arguments invg_inj {T} [x1 x2].
+Prenex Implicits commute invgK.
 
 Section GroupIdentities.
 
@@ -577,7 +577,7 @@ Lemma conjg_inj : @left_injective T T T conjg.
 Proof. by move=> y; apply: can_inj (conjgK y). Qed.
 
 Lemma conjg_eq1 x y : (x ^ y == 1) = (x == 1).
-Proof. by rewrite -(inj_eq (@conjg_inj y) x) conj1g. Qed.
+Proof. by rewrite (canF_eq (conjgK _)) conj1g. Qed.
 
 Lemma conjg_prod I r (P : pred I) F z :
   (\prod_(i <- r | P i) F i) ^ z = \prod_(i <- r | P i) (F i ^ z).
@@ -643,10 +643,9 @@ Definition gnorm := (gsimp, (mulgK, mulgKV, (mulgA, invMg))).
 
 Arguments mulgI [T].
 Arguments mulIg [T].
-Arguments conjg_inj [T].
-Arguments commgP [T x y].
-Arguments conjg_fixP [T x y].
-Prenex Implicits conjg_fixP commgP.
+Arguments conjg_inj {T} x [x1 x2].
+Arguments commgP {T x y}.
+Arguments conjg_fixP {T x y}.
 
 Section Repr.
 (* Plucking a set representative. *)
@@ -945,9 +944,9 @@ Proof. by apply/setP=> y; rewrite !inE inv_eq //; apply: invgK. Qed.
 
 End BaseSetMulProp.
 
-Arguments set1gP [gT x].
-Arguments mulsgP [gT A B x].
-Arguments prodsgP [gT I P A x].
+Arguments set1gP {gT x}.
+Arguments mulsgP {gT A B x}.
+Arguments prodsgP {gT I P A x}.
 
 Section GroupSetMulProp.
 (* Constructs that need a finGroupType *)
@@ -1303,13 +1302,12 @@ Definition order x := #|cycle x|.
 
 End GroupSetMulProp.
 
-Arguments lcosetP [gT A x y].
-Arguments lcosetsP [gT A B C].
-Arguments rcosetP [gT A x y].
-Arguments rcosetsP [gT A B C].
-Arguments group_setP [gT A].
+Arguments lcosetP {gT A x y}.
+Arguments lcosetsP {gT A B C}.
+Arguments rcosetP {gT A x y}.
+Arguments rcosetsP {gT A B C}.
+Arguments group_setP {gT A}.
 Prenex Implicits group_set mulsgP set1gP.
-Prenex Implicits lcosetP lcosetsP rcosetP rcosetsP group_setP.
 
 Arguments commutator _ _%g _%g.
 Arguments joing _ _%g _%g.
@@ -1360,7 +1358,7 @@ Lemma valG : val G = G. Proof. by []. Qed.
 (* Non-triviality. *)
 
 Lemma group1 : 1 \in G. Proof. by case/group_setP: (valP G). Qed.
-Hint Resolve group1.
+Hint Resolve group1 : core.
 
 (* Loads of silly variants to placate the incompleteness of trivial. *)
 (* An alternative would be to upgrade done, pending better support   *)
@@ -1649,7 +1647,7 @@ Proof. by move=> y Gy /=; rewrite -class_rcoset rcoset_id. Qed.
 
 Lemma class_refl x : x \in x ^: G.
 Proof. by apply/imsetP; exists 1; rewrite ?conjg1. Qed.
-Hint Resolve class_refl.
+Hint Resolve class_refl : core.
 
 Lemma class_eqP x y : reflect (x ^: G = y ^: G) (x \in y ^: G).
 Proof.
@@ -1796,7 +1794,7 @@ Proof. by move=> x y Gx Gy; apply: val_inj; rewrite /= !subgK ?groupM. Qed.
 
 End OneGroup.
 
-Hint Resolve group1.
+Hint Resolve group1 : core.
 
 Lemma groupD1_inj G H : G^# = H^# -> G :=: H.
 Proof. by move/(congr1 (setU 1)); rewrite !setD1K. Qed.
@@ -1844,9 +1842,9 @@ Qed.
 
 End GroupProp.
 
-Hint Resolve group1 group1_class1 group1_class12 group1_class12.
-Hint Resolve group1_eqType group1_finType.
-Hint Resolve cardG_gt0 cardG_gt0_reduced indexg_gt0.
+Hint Resolve group1 group1_class1 group1_class12 group1_class12 : core.
+Hint Resolve group1_eqType group1_finType : core.
+Hint Resolve cardG_gt0 cardG_gt0_reduced indexg_gt0 : core.
 
 Notation "G :^ x" := (conjG_group G x) : Group_scope.
 
@@ -1856,17 +1854,19 @@ Notation "[ 'subg' G ]" := [set: subg_of G]%G : Group_scope.
 
 Prenex Implicits subg sgval subg_of.
 Bind Scope group_scope with subg_of.
+Arguments subgK {gT G}.
+Arguments sgvalK {gT G}.
+Arguments subg_inj {gT G} [u1 u2] eq_u12 : rename.
 
-Arguments trivgP [gT G].
-Arguments trivGP [gT G].
-Arguments lcoset_eqP [gT G x y].
-Arguments rcoset_eqP [gT G x y].
+Arguments trivgP {gT G}.
+Arguments trivGP {gT G}.
+Arguments lcoset_eqP {gT G x y}.
+Arguments rcoset_eqP {gT G x y}.
 Arguments mulGidPl [gT G H].
 Arguments mulGidPr [gT G H].
-Arguments comm_group_setP [gT G H].
-Arguments class_eqP [gT G x y].
-Arguments repr_classesP [gT G xG].
-Prenex Implicits trivgP trivGP lcoset_eqP rcoset_eqP comm_group_setP class_eqP.
+Arguments comm_group_setP {gT G H}.
+Arguments class_eqP {gT G x y}.
+Arguments repr_classesP {gT G xG}.
 
 Section GroupInter.
 
@@ -1910,7 +1910,7 @@ Proof. exact: cardG_gt0. Qed.
 
 End GroupInter.
 
-Hint Resolve order_gt0.
+Hint Resolve order_gt0 : core.
 
 Arguments generated_group _ _%g.
 Arguments joing_group _ _%g _%g.
@@ -2395,11 +2395,11 @@ Qed.
 
 End GeneratedGroup.
 
-Arguments gen_prodgP [gT A x].
-Arguments joing_idPl [gT G A].
-Arguments joing_idPr [gT A G].
-Arguments mulGsubP [gT K H G].
-Arguments joing_subP [gT A B G].
+Arguments gen_prodgP {gT A x}.
+Arguments joing_idPl {gT G A}.
+Arguments joing_idPr {gT A G}.
+Arguments mulGsubP {gT K H G}.
+Arguments joing_subP {gT A B G}.
 
 Section Cycles.
 
@@ -2523,7 +2523,7 @@ Proof.
 suffices ->: (x \in 'N(A)) = (A :^ x == A) by apply: eqP.
 by rewrite eqEcard cardJg leqnn andbT inE.
 Qed.
-Arguments normP [x A].
+Arguments normP {x A}.
 
 Lemma group_set_normaliser A : group_set 'N(A).
 Proof.
@@ -2538,7 +2538,7 @@ Proof.
 apply: (iffP subsetP) => nBA x Ax; last by rewrite inE nBA //.
 by apply/normP; apply: nBA.
 Qed.
-Arguments normsP [A B].
+Arguments normsP {A B}.
 
 Lemma memJ_norm x y A : x \in 'N(A) -> (y ^ x \in A) = (y \in A).
 Proof. by move=> Nx; rewrite -{1}(normP Nx) memJ_conjg. Qed.
@@ -2986,15 +2986,13 @@ End SubAbelian.
 
 End Normaliser.
 
-Arguments normP [gT x A].
-Arguments centP [gT A x].
-Arguments normsP [gT A B].
-Arguments cent1P [gT x y].
-Arguments normalP [gT A B].
-Arguments centsP [gT A B].
-Arguments commG1P [gT A B].
-
-Prenex Implicits normP normsP cent1P normalP centP centsP commG1P.
+Arguments normP {gT x A}.
+Arguments centP {gT A x}.
+Arguments normsP {gT A B}.
+Arguments cent1P {gT x y}.
+Arguments normalP {gT A B}.
+Arguments centsP {gT A B}.
+Arguments commG1P {gT A B}.
 
 Arguments normaliser_group _ _%g.
 Arguments centraliser_group _ _%g.
@@ -3010,28 +3008,30 @@ Notation "''C_' G [ x ]" := (setI_group G 'C[x]) : Group_scope.
 Notation "''C_' ( G ) [ x ]" := (setI_group G 'C[x])
   (only parsing) : Group_scope.
 
-Hint Resolve normG normal_refl.
+Hint Resolve normG normal_refl : core.
 
 Section MinMaxGroup.
 
 Variable gT : finGroupType.
+Implicit Types gP : pred {group gT}.
+
+Definition maxgroup A gP := maxset (fun A => group_set A && gP <<A>>%G) A.
+Definition mingroup A gP := minset (fun A => group_set A && gP <<A>>%G) A.
+
 Variable gP : pred {group gT}.
-Arguments gP _%G.
+Arguments gP G%G.
 
-Definition maxgroup := maxset (fun A => group_set A && gP <<A>>).
-Definition mingroup := minset (fun A => group_set A && gP <<A>>).
-
-Lemma ex_maxgroup : (exists G, gP G) -> {G : {group gT} | maxgroup G}.
+Lemma ex_maxgroup : (exists G, gP G) -> {G : {group gT} | maxgroup G gP}.
 Proof.
-move=> exP; have [A maxA]: {A | maxgroup A}.
+move=> exP; have [A maxA]: {A | maxgroup A gP}.
   apply: ex_maxset; case: exP => G gPG.
   by exists (G : {set gT}); rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (maxsetp maxA).
 Qed.
 
-Lemma ex_mingroup : (exists G, gP G) -> {G : {group gT} | mingroup G}.
+Lemma ex_mingroup : (exists G, gP G) -> {G : {group gT} | mingroup G gP}.
 Proof.
-move=> exP; have [A minA]: {A | mingroup A}.
+move=> exP; have [A minA]: {A | mingroup A gP}.
   apply: ex_minset; case: exP => G gPG.
   by exists (G : {set gT}); rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (minsetp minA).
@@ -3040,7 +3040,7 @@ Qed.
 Variable G : {group gT}.
 
 Lemma mingroupP :
-  reflect (gP G /\ forall H, gP H -> H \subset G -> H :=: G) (mingroup G).
+  reflect (gP G /\ forall H, gP H -> H \subset G -> H :=: G) (mingroup G gP).
 Proof.
 apply: (iffP minsetP); rewrite /= groupP genGidG /= => [] [-> minG].
   by split=> // H gPH sGH; apply: minG; rewrite // groupP genGidG.
@@ -3048,48 +3048,49 @@ by split=> // A; case/andP=> gA gPA; rewrite -(gen_set_id gA); apply: minG.
 Qed.
 
 Lemma maxgroupP :
-  reflect (gP G /\ forall H, gP H -> G \subset H -> H :=: G) (maxgroup G).
+  reflect (gP G /\ forall H, gP H -> G \subset H -> H :=: G) (maxgroup G gP).
 Proof.
 apply: (iffP maxsetP); rewrite /= groupP genGidG /= => [] [-> maxG].
   by split=> // H gPH sGH; apply: maxG; rewrite // groupP genGidG.
 by split=> // A; case/andP=> gA gPA; rewrite -(gen_set_id gA); apply: maxG.
 Qed.
 
-Lemma maxgroupp : maxgroup G -> gP G. Proof. by case/maxgroupP. Qed.
+Lemma maxgroupp : maxgroup G gP -> gP G. Proof. by case/maxgroupP. Qed.
 
-Lemma mingroupp : mingroup G -> gP G. Proof. by case/mingroupP. Qed.
+Lemma mingroupp : mingroup G gP -> gP G. Proof. by case/mingroupP. Qed.
 
 Hypothesis gPG : gP G.
 
-Lemma maxgroup_exists : {H : {group gT} | maxgroup H & G \subset H}.
+Lemma maxgroup_exists : {H : {group gT} | maxgroup H gP & G \subset H}.
 Proof.
-have [A maxA sGA]: {A | maxgroup A & G \subset A}.
+have [A maxA sGA]: {A | maxgroup A gP & G \subset A}.
   by apply: maxset_exists; rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (maxsetp maxA).
 Qed.
 
-Lemma mingroup_exists : {H : {group gT} | mingroup H & H \subset G}.
+Lemma mingroup_exists : {H : {group gT} | mingroup H gP & H \subset G}.
 Proof.
-have [A maxA sGA]: {A | mingroup A & A \subset G}.
+have [A maxA sGA]: {A | mingroup A gP & A \subset G}.
   by apply: minset_exists; rewrite groupP genGidG.
 by exists <<A>>%G; rewrite /= gen_set_id; case/andP: (minsetp maxA).
 Qed.
 
 End MinMaxGroup.
 
+Arguments mingroup {gT} A%g gP.
+Arguments maxgroup {gT} A%g gP.
+Arguments mingroupP {gT gP G}.
+Arguments maxgroupP {gT gP G}.
+
 Notation "[ 'max' A 'of' G | gP ]" :=
-  (maxgroup (fun G : {group _} => gP) A) : group_scope.
+  (maxgroup A (fun G : {group _} => gP)) : group_scope.
 Notation "[ 'max' G | gP ]" := [max gval G of G | gP] : group_scope.
 Notation "[ 'max' A 'of' G | gP & gQ ]" :=
   [max A of G | gP && gQ] : group_scope.
 Notation "[ 'max' G | gP & gQ ]" := [max G | gP && gQ] : group_scope.
 Notation "[ 'min' A 'of' G | gP ]" :=
-  (mingroup (fun G : {group _} => gP) A) : group_scope.
+  (mingroup A (fun G : {group _} => gP)) : group_scope.
 Notation "[ 'min' G | gP ]" := [min gval G of G | gP] : group_scope.
 Notation "[ 'min' A 'of' G | gP & gQ ]" :=
   [min A of G | gP && gQ] : group_scope.
 Notation "[ 'min' G | gP & gQ ]" := [min G | gP && gQ] : group_scope.
-
-Arguments mingroupP [gT gP G].
-Arguments maxgroupP [gT gP G].
-Prenex Implicits mingroupP maxgroupP.

@@ -567,9 +567,9 @@ Qed.
 
 End Inertia.
 
-Arguments inertia _ _%g _%CF.
-Arguments cfclass _ _%g _%CF _%g.
-Arguments conjg_Iirr_inj [gT H] y [x1 x2].
+Arguments inertia {gT B%g} phi%CF.
+Arguments cfclass {gT A%g} phi%CF B%g.
+Arguments conjg_Iirr_inj {gT H} y [i1 i2] : rename.
 
 Notation "''I[' phi ] " := (inertia phi) : group_scope.
 Notation "''I[' phi ] " := (inertia_group phi) : Group_scope.

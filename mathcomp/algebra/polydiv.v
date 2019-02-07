@@ -868,7 +868,7 @@ case: (eqVneq q 0) => [->|nzq]; last by rewrite expf_neq0 ?lead_coef_eq0.
 by rewrite /scalp 2!unlock /= eqxx lead_coef0 unitr0 /= oner_neq0.
 Qed.
 
-Hint Resolve lc_expn_scalp_neq0.
+Hint Resolve lc_expn_scalp_neq0 : core.
 
 Variant edivp_spec (m d : {poly R}) :
                                      nat * {poly R} * {poly R} -> bool -> Type :=
@@ -988,7 +988,7 @@ Qed.
 
 End WeakTheoryForIDomainPseudoDivision.
 
-Hint Resolve lc_expn_scalp_neq0.
+Hint Resolve lc_expn_scalp_neq0 : core.
 
 End WeakIdomain.
 
@@ -1049,7 +1049,7 @@ Proof.
 by rewrite /modp unlock redivp_def /=; case: ifP; rewrite rmodp1 // scaler0.
 Qed.
 
-Hint Resolve divp0 divp1 mod0p modp0 modp1.
+Hint Resolve divp0 divp1 mod0p modp0 modp1 : core.
 
 Lemma modp_small p q : size p < size q -> p %% q = p.
 Proof.
@@ -1156,7 +1156,7 @@ Qed.
 Lemma dvdp0 d : d %| 0.
 Proof. by rewrite /dvdp mod0p. Qed.
 
-Hint Resolve dvdp0.
+Hint Resolve dvdp0 : core.
 
 Lemma dvd0p p : (0 %| p) = (p == 0).
 Proof. by rewrite /dvdp modp0. Qed.
@@ -1231,7 +1231,7 @@ Qed.
 Lemma dvdpp d : d %| d.
 Proof. by rewrite /dvdp modpp. Qed.
 
-Hint Resolve dvdpp.
+Hint Resolve dvdpp : core.
 
 Lemma divp_dvd p q : (p %| q) -> ((q %/ p) %| q).
 Proof.
@@ -1253,7 +1253,7 @@ Qed.
 Lemma dvdp_mulr n d m : d %| m -> d %| m * n.
 Proof. by move=> hdm; rewrite mulrC dvdp_mull. Qed.
 
-Hint Resolve dvdp_mull dvdp_mulr.
+Hint Resolve dvdp_mull dvdp_mulr : core.
 
 Lemma dvdp_mul d1 d2 m1 m2 : d1 %| m1 -> d2 %| m2 -> d1 * d2 %| m1 * m2.
 Proof.
@@ -1468,7 +1468,7 @@ Qed.
 Lemma eqpxx : reflexive (@eqp R).
 Proof. by move=> p; rewrite /eqp dvdpp. Qed.
 
-Hint Resolve eqpxx.
+Hint Resolve eqpxx : core.
 
 Lemma eqp_sym : symmetric (@eqp R).
 Proof. by move=> p q; rewrite /eqp andbC. Qed.
@@ -2533,8 +2533,8 @@ Qed.
 
 End IDomainPseudoDivision.
 
-Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp.
-Hint Resolve dvdp0.
+Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp : core.
+Hint Resolve dvdp0 : core.
 
 End CommonIdomain.
 

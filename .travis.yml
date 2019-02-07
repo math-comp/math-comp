@@ -15,8 +15,7 @@ addons:
 env:
   global:
   - NJOBS=2
-  # system is == 4.02.3
-  - COMPILER="system"
+  - COMPILER="4.05.0"
   # Main test targets
   matrix:
   - TEST_TARGET="v8.6"

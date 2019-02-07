@@ -160,6 +160,15 @@ Require Import bigop ssralg finset fingroup zmodp poly.
 (*   e : exterior = in [1, +oo[ or ]1; +oo[                                   *)
 (*   w : non strict (weak) monotony                                           *)
 (*                                                                            *)
+(* [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject       *)
+(*                   to the condition P (i may appear in P and M), and        *)
+(*                   provided P holds for i0.                                 *)
+(* [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and       *)
+(*                   provided P holds for i0.                                 *)
+(* [arg minr_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.         *)
+(* [arg maxr_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.         *)
+(* [arg minr_(i < i0) M] == an i : T minimizing M, given i0 : T.              *)
+(* [arg maxr_(i > i0) M] == an i : T maximizing M, given i0 : T.              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -194,7 +203,7 @@ Record mixin_of (R : ringType) := Mixin {
   _ : forall x y, (lt_op x y) = (y != x) && (le_op x y)
 }.
 
-Local Notation ring_for T b := (@GRing.Ring.Pack T b T).
+Local Notation ring_for T b := (@GRing.Ring.Pack T b).
 
 (* Base interface. *)
 Module NumDomain.
@@ -206,25 +215,26 @@ Record class_of T := Class {
   mixin : mixin_of (ring_for T base)
 }.
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _  as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : mixin_of (ring_for T b0)) :=
   fun bT b & phant_id (GRing.IntegralDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 
 End ClassDef.
 
@@ -376,7 +386,7 @@ Definition real_closed_axiom : Prop :=
 
 End ExtensionAxioms.
 
-Local Notation num_for T b := (@NumDomain.Pack T b T).
+Local Notation num_for T b := (@NumDomain.Pack T b).
 
 (* The rest of the numbers interface hierarchy. *)
 Module NumField.
@@ -389,28 +399,29 @@ Definition base2 R (c : class_of R) := NumDomain.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Field.class_of.
 Local Coercion base2 : class_of >-> NumDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+
 Definition pack :=
   fun bT b & phant_id (GRing.Field.class bT) (b : GRing.Field.class_of T) =>
   fun mT m & phant_id (NumDomain.class mT) (@NumDomain.Class T b m) =>
-  Pack (@Class T b m) T.
+  Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition join_numDomainType := @NumDomain.Pack fieldType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition join_numDomainType := @NumDomain.Pack fieldType xclass.
 
 End ClassDef.
 
@@ -467,36 +478,37 @@ Definition base2 R (c : class_of R) := NumField.Class (mixin c).
 Local Coercion base : class_of >-> GRing.ClosedField.class_of.
 Local Coercion base2 : class_of >-> NumField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+
 Definition pack :=
   fun bT b & phant_id (GRing.ClosedField.class bT)
                       (b : GRing.ClosedField.class_of T) =>
   fun mT m & phant_id (NumField.class mT) (@NumField.Class T b m) =>
-  fun mc => Pack (@Class T b m mc) T.
-Definition clone := fun b & phant_id class (b : class_of T) => Pack b T.
+  fun mc => Pack (@Class T b m mc).
+Definition clone := fun b & phant_id class (b : class_of T) => Pack b.
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition decFieldType := @GRing.DecidableField.Pack cT xclass xT.
-Definition closedFieldType := @GRing.ClosedField.Pack cT xclass xT.
-Definition join_dec_numDomainType := @NumDomain.Pack decFieldType xclass xT.
-Definition join_dec_numFieldType := @NumField.Pack decFieldType xclass xT.
-Definition join_numDomainType := @NumDomain.Pack closedFieldType xclass xT.
-Definition join_numFieldType := @NumField.Pack closedFieldType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
+Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
+Definition join_dec_numDomainType := @NumDomain.Pack decFieldType xclass.
+Definition join_dec_numFieldType := @NumField.Pack decFieldType xclass.
+Definition join_numDomainType := @NumDomain.Pack closedFieldType xclass.
+Definition join_numFieldType := @NumField.Pack closedFieldType xclass.
 
 End ClassDef.
 
@@ -555,26 +567,27 @@ Record class_of R :=
   Class {base : NumDomain.class_of R; _ : @real_axiom (num_for R base)}.
 Local Coercion base : class_of >-> NumDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : real_axiom (num_for T b0)) :=
   fun bT b & phant_id (NumDomain.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
 
 End ClassDef.
 
@@ -621,30 +634,31 @@ Definition base2 R (c : class_of R) := RealDomain.Class (@mixin R c).
 Local Coercion base : class_of >-> NumField.class_of.
 Local Coercion base2 : class_of >-> RealDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+
 Definition pack :=
   fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
   fun mT m & phant_id (RealDomain.class mT) (@RealDomain.Class T b m) =>
-  Pack (@Class T b m) T.
+  Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition realDomainType := @RealDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition join_realDomainType := @RealDomain.Pack numFieldType xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition realDomainType := @RealDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition join_realDomainType := @RealDomain.Pack numFieldType xclass.
 
 End ClassDef.
 
@@ -694,30 +708,30 @@ Record class_of R :=
   Class { base : RealField.class_of R; _ : real_closed_axiom (num_for R base) }.
 Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
-Definition clone c of phant_id class c := @Pack T c T.
+Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : real_closed_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m) T.
+  fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass xT.
-Definition choiceType := @Choice.Pack cT xclass xT.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass xT.
-Definition ringType := @GRing.Ring.Pack cT xclass xT.
-Definition comRingType := @GRing.ComRing.Pack cT xclass xT.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass xT.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass xT.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass xT.
-Definition numDomainType := @NumDomain.Pack cT xclass xT.
-Definition realDomainType := @RealDomain.Pack cT xclass xT.
-Definition fieldType := @GRing.Field.Pack cT xclass xT.
-Definition numFieldType := @NumField.Pack cT xclass xT.
-Definition realFieldType := @RealField.Pack cT xclass xT.
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition realDomainType := @RealDomain.Pack cT xclass.
+Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition numFieldType := @NumField.Pack cT xclass.
+Definition realFieldType := @RealField.Pack cT xclass.
 
 End ClassDef.
 
@@ -770,12 +784,13 @@ Record class_of R :=
   Class {base : NumDomain.class_of R; _ : @archimedean_axiom (num_for R base)}.
 Local Coercion base : class_of >-> NumDomain.class_of.
 
-Structure type := Pack {sort; _ : class_of sort; _ : Type}.
+Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c _ as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ _ := cT in T.
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
+<<<<<<< HEAD
 Definition clone c of phant_id class c := @Pack T c T.
 Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
   fun bT b & phant_id (NumDomain.class bT) b =>
@@ -1473,7 +1488,7 @@ Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 Lemma lerr x : x <= x. Proof. exact: lerr. Qed.
 Lemma ltrr x : x < x = false. Proof. by rewrite ltr_def eqxx. Qed.
 Lemma ltrW x y : x < y -> x <= y. Proof. exact: ltrW. Qed.
-Hint Resolve lerr ltrr ltrW.
+Hint Resolve lerr ltrr ltrW : core.
 
 Lemma ltr_neqAle x y : (x < y) = (x != y) && (x <= y).
 Proof. by rewrite ltr_def eq_sym. Qed.
@@ -1508,12 +1523,12 @@ Qed.
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. exact: ltr01. Qed.
 Lemma ler0n n : 0 <= n%:R :> R. Proof. by rewrite -nnegrE rpred_nat. Qed.
-Hint Resolve ler01 ltr01 ler0n.
+Hint Resolve ler01 ltr01 ler0n : core.
 Lemma ltr0Sn n : 0 < n.+1%:R :> R.
 Proof. by elim: n => // n; apply: addr_gt0. Qed.
 Lemma ltr0n n : (0 < n%:R :> R) = (0 < n)%N.
 Proof. by case: n => //= n; apply: ltr0Sn. Qed.
-Hint Resolve ltr0Sn.
+Hint Resolve ltr0Sn : core.
 
 Lemma pnatr_eq0 n : (n%:R == 0 :> R) = (n == 0)%N.
 Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gtr_eqF. Qed.
@@ -1582,7 +1597,7 @@ by rewrite -{2}normrN -normr0 -(subrr x) ler_norm_add.
 Qed.
 
 Lemma normr_ge0 x : 0 <= `|x|. Proof. by rewrite ger0_def normr_id. Qed.
-Hint Resolve normr_ge0.
+Hint Resolve normr_ge0 : core.
 
 Lemma ler0_norm x : x <= 0 -> `|x| = - x.
 Proof. by move=> x_le0; rewrite -[r in _ = r]ger0_norm ?normrN ?oppr_ge0. Qed.
@@ -1686,12 +1701,12 @@ Definition normrE x := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
 
 End NumIntegralDomainTheory.
 
-Arguments ler01 [R].
-Arguments ltr01 [R].
-Arguments normr_idP [R x].
-Arguments normr0P [R x].
-Arguments lerifP [R x y C].
-Hint Resolve @ler01 @ltr01 lerr ltrr ltrW ltr_eqF ltr0Sn ler0n normr_ge0.
+Arguments ler01 {R}.
+Arguments ltr01 {R}.
+Arguments normr_idP {R x}.
+Arguments normr0P {R x}.
+Arguments lerifP {R x y C}.
+Hint Resolve @ler01 @ltr01 lerr ltrr ltrW ltr_eqF ltr0Sn ler0n normr_ge0 : core.
 
 Section NumIntegralDomainMonotonyTheory.
 
@@ -1700,172 +1715,265 @@ Implicit Types m n p : nat.
 Implicit Types x y z : R.
 Implicit Types u v w : R'.
 
+(****************************************************************************)
+(* This listing of "Let"s factor out the required premices for the          *)
+(* subsequent lemmas, putting them in the context so that "done" solves the *)
+(* goals quickly                                                            *)
+(****************************************************************************)
+
+Let leqnn := leqnn.
+Let ltnE := ltn_neqAle.
+Let ltrE := @ltr_neqAle R.
+Let ltr'E := @ltr_neqAle R'.
+Let gtnE (m n : nat) : (m > n)%N = (m != n) && (m >= n)%N.
+Proof. by rewrite ltn_neqAle eq_sym. Qed.
+Let gtrE (x y : R) : (x > y) = (x != y) && (x >= y).
+Proof. by rewrite ltr_neqAle eq_sym. Qed.
+Let gtr'E (x y : R') : (x > y) = (x != y) && (x >= y).
+Proof. by rewrite ltr_neqAle eq_sym. Qed.
+Let leq_anti : antisymmetric leq.
+Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
+Let geq_anti : antisymmetric geq.
+Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
+Let ler_antiR := @ler_anti R.
+Let ler_antiR' := @ler_anti R'.
+Let ger_antiR : antisymmetric (>=%R : rel R).
+Proof. by move=> ??; rewrite andbC; apply: ler_anti. Qed.
+Let ger_antiR' : antisymmetric (>=%R : rel R').
+Proof. by move=> ??; rewrite andbC; apply: ler_anti. Qed.
+Let leq_total := leq_total.
+Let geq_total : total geq.
+Proof. by move=> m n; apply: leq_total. Qed.
+
 Section AcrossTypes.
 
 Variable D D' : pred R.
 Variable (f : R -> R').
 
 Lemma ltrW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
-Proof. by move=> mf x y /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW]. Qed.
+Proof. exact: homoW. Qed.
 
 Lemma ltrW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y}.
-Proof. by move=> mf x y /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW]. Qed.
+Proof. exact: homoW. Qed.
 
-Lemma homo_inj_lt :
+Lemma inj_homo_ltr :
   injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y}.
-Proof.
-by move=> fI mf x y /= hxy; rewrite ltr_neqAle (inj_eq fI) mf (ltr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma nhomo_inj_lt :
+Lemma inj_nhomo_ltr :
   injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y}.
-Proof.
-by move=> fI mf x y /= hxy; rewrite ltr_neqAle (inj_eq fI) mf (gtr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma mono_inj : {mono f : x y / x <= y} -> injective f.
-Proof. by move=> mf x y /eqP; rewrite eqr_le !mf -eqr_le=> /eqP. Qed.
+Lemma incr_inj : {mono f : x y / x <= y} -> injective f.
+Proof. exact: mono_inj. Qed.
 
-Lemma nmono_inj : {mono f : x y /~ x <= y} -> injective f.
-Proof. by move=> mf x y /eqP; rewrite eqr_le !mf -eqr_le=> /eqP. Qed.
+Lemma decr_inj : {mono f : x y /~ x <= y} -> injective f.
+Proof. exact: mono_inj. Qed.
 
 Lemma lerW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
-Proof.
-by move=> mf x y /=; rewrite !ltr_neqAle mf inj_eq //; apply: mono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
 Lemma lerW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
-Proof.
-by move=> mf x y /=; rewrite !ltr_neqAle mf eq_sym inj_eq //; apply: nmono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
 (* Monotony in D D' *)
 Lemma ltrW_homo_in :
   {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}}.
-Proof.
-by move=> mf x y hx hy /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW] //; apply.
-Qed.
+Proof. exact: homoW_in. Qed.
 
 Lemma ltrW_nhomo_in :
   {in D & D', {homo f : x y /~ x < y}} -> {in D & D', {homo f : x y /~ x <= y}}.
-Proof.
-by move=> mf x y hx hy /=; rewrite ler_eqVlt => /orP[/eqP->|/mf/ltrW] //; apply.
-Qed.
+Proof. exact: homoW_in. Qed.
 
-Lemma homo_inj_in_lt :
+Lemma inj_homo_ltr_in :
     {in D & D', injective f} ->  {in D & D', {homo f : x y / x <= y}} ->
   {in D & D', {homo f : x y / x < y}}.
-Proof.
-move=> fI mf x y hx hy /= hxy; rewrite ltr_neqAle; apply/andP; split.
-  by apply: contraTN hxy => /eqP /fI -> //; rewrite ltrr.
-by rewrite mf // (ltr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo_in. Qed.
 
-Lemma nhomo_inj_in_lt :
+Lemma inj_nhomo_ltr_in :
     {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
   {in D & D', {homo f : x y /~ x < y}}.
-Proof.
-move=> fI mf x y hx hy /= hxy; rewrite ltr_neqAle; apply/andP; split.
-  by apply: contraTN hxy => /eqP /fI -> //; rewrite ltrr.
-by rewrite mf // (gtr_eqF, ltrW).
-Qed.
+Proof. exact: inj_homo_in. Qed.
 
-Lemma mono_inj_in : {in D &, {mono f : x y / x <= y}} -> {in D &, injective f}.
-Proof.
-by move=> mf x y hx hy /= /eqP; rewrite eqr_le !mf // -eqr_le => /eqP.
-Qed.
+Lemma incr_inj_in : {in D &, {mono f : x y / x <= y}} ->
+   {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
 
-Lemma nmono_inj_in :
+Lemma decr_inj_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
-Proof.
-by move=> mf x y hx hy /= /eqP; rewrite eqr_le !mf // -eqr_le => /eqP.
-Qed.
+Proof. exact: mono_inj_in. Qed.
 
 Lemma lerW_mono_in :
   {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
-Proof.
-move=> mf x y hx hy /=; rewrite !ltr_neqAle mf // (@inj_in_eq _ _ D) //.
-exact: mono_inj_in.
-Qed.
+Proof. exact: anti_mono_in. Qed.
 
 Lemma lerW_nmono_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
-Proof.
-move=> mf x y hx hy /=; rewrite !ltr_neqAle mf // eq_sym (@inj_in_eq _ _ D) //.
-exact: nmono_inj_in.
-Qed.
+Proof. exact: anti_mono_in. Qed.
 
 End AcrossTypes.
 
 Section NatToR.
 
+Variable D D' : pred nat.
 Variable (f : nat -> R).
 
-Lemma ltn_ltrW_homo :
-    {homo f : m n / (m < n)%N >-> m < n} ->
+Lemma ltnrW_homo : {homo f : m n / (m < n)%N >-> m < n} ->
   {homo f : m n / (m <= n)%N >-> m <= n}.
-Proof. by move=> mf m n /=; rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW //]. Qed.
+Proof. exact: homoW. Qed.
 
-Lemma ltn_ltrW_nhomo :
-    {homo f : m n / (n < m)%N >-> m < n} ->
+Lemma ltnrW_nhomo : {homo f : m n / (n < m)%N >-> m < n} ->
   {homo f : m n / (n <= m)%N >-> m <= n}.
-Proof. by move=> mf m n /=; rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW//]. Qed.
+Proof. exact: homoW. Qed.
 
-Lemma homo_inj_ltn_lt :
-    injective f -> {homo f : m n / (m <= n)%N >-> m <= n} ->
+Lemma inj_homo_ltnr : injective f ->
+  {homo f : m n / (m <= n)%N >-> m <= n} ->
   {homo f : m n / (m < n)%N >-> m < n}.
-Proof.
-move=> fI mf m n /= hmn.
-by rewrite ltr_neqAle (inj_eq fI) mf ?neq_ltn ?hmn ?orbT // ltnW.
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma nhomo_inj_ltn_lt :
-    injective f -> {homo f : m n / (n <= m)%N >-> m <= n} ->
+Lemma inj_nhomo_ltnr : injective f ->
+  {homo f : m n / (n <= m)%N >-> m <= n} ->
   {homo f : m n / (n < m)%N >-> m < n}.
-Proof.
-move=> fI mf m n /= hmn; rewrite ltr_def (inj_eq fI).
-by rewrite mf ?neq_ltn ?hmn // ltnW.
-Qed.
+Proof. exact: inj_homo. Qed.
 
-Lemma leq_mono_inj : {mono f : m n / (m <= n)%N >-> m <= n} -> injective f.
-Proof. by move=> mf m n /eqP; rewrite eqr_le !mf -eqn_leq => /eqP. Qed.
+Lemma incnr_inj : {mono f : m n / (m <= n)%N >-> m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
 
-Lemma leq_nmono_inj : {mono f : m n / (n <= m)%N >-> m <= n} -> injective f.
-Proof. by move=> mf m n /eqP; rewrite eqr_le !mf -eqn_leq => /eqP. Qed.
+Lemma decnr_inj_inj : {mono f : m n / (n <= m)%N >-> m <= n} -> injective f.
+Proof. exact: mono_inj. Qed.
 
-Lemma leq_lerW_mono :
-    {mono f : m n / (m <= n)%N >-> m <= n} ->
+Lemma lenrW_mono : {mono f : m n / (m <= n)%N >-> m <= n} ->
   {mono f : m n / (m < n)%N >-> m < n}.
-Proof.
-move=> mf m n /=; rewrite !ltr_neqAle mf inj_eq ?ltn_neqAle 1?eq_sym //.
-exact: leq_mono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
-Lemma leq_lerW_nmono :
-    {mono f : m n / (n <= m)%N >-> m <= n} ->
+Lemma lenrW_nmono : {mono f : m n / (n <= m)%N >-> m <= n} ->
   {mono f : m n / (n < m)%N >-> m < n}.
-Proof.
-move=> mf x y /=; rewrite ltr_neqAle mf eq_sym inj_eq ?ltn_neqAle 1?eq_sym //.
-exact: leq_nmono_inj.
-Qed.
+Proof. exact: anti_mono. Qed.
 
-Lemma homo_leq_mono :
-    {homo f : m n / (m < n)%N >-> m < n} ->
+Lemma lenr_mono : {homo f : m n / (m < n)%N >-> m < n} ->
    {mono f : m n / (m <= n)%N >-> m <= n}.
-Proof.
-move=> mf m n /=; case: leqP; last by move=> /mf /ltr_geF.
-by rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW //]; rewrite lerr.
-Qed.
+Proof. exact: total_homo_mono. Qed.
 
-Lemma nhomo_leq_mono :
-    {homo f : m n / (n < m)%N >-> m < n} ->
+Lemma lenr_nmono : {homo f : m n / (n < m)%N >-> m < n} ->
   {mono f : m n / (n <= m)%N >-> m <= n}.
-Proof.
-move=> mf m n /=; case: leqP; last by move=> /mf /ltr_geF.
-by rewrite leq_eqVlt => /orP[/eqP->|/mf/ltrW //]; rewrite lerr.
-Qed.
+Proof. exact: total_homo_mono. Qed.
+
+Lemma ltnrW_homo_in : {in D & D', {homo f : m n / (m < n)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltnrW_nhomo_in : {in D & D', {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma inj_homo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (m < n)%N >-> m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma inj_nhomo_ltnr_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D & D', {homo f : m n / (n < m)%N >-> m < n}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma incnr_inj_in : {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma decnr_inj_inj_in : {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma lenrW_mono_in : {in D &, {mono f : m n / (m <= n)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (m < n)%N >-> m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma lenrW_nmono_in : {in D &, {mono f : m n / (n <= m)%N >-> m <= n}} ->
+  {in D &, {mono f : m n / (n < m)%N >-> m < n}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma lenr_mono_in : {in D &, {homo f : m n / (m < n)%N >-> m < n}} ->
+   {in D &, {mono f : m n / (m <= n)%N >-> m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
+
+Lemma lenr_nmono_in : {in D &, {homo f : m n / (n < m)%N >-> m < n}} ->
+  {in D &, {mono f : m n / (n <= m)%N >-> m <= n}}.
+Proof. exact: total_homo_mono_in. Qed.
 
 End NatToR.
+
+Section RToNat.
+
+Variable D D' : pred R.
+Variable (f : R -> nat).
+
+Lemma ltrnW_homo : {homo f : m n / m < n >-> (m < n)%N} ->
+  {homo f : m n / m <= n >-> (m <= n)%N}.
+Proof. exact: homoW. Qed.
+
+Lemma ltrnW_nhomo : {homo f : m n / n < m >-> (m < n)%N} ->
+  {homo f : m n / n <= m >-> (m <= n)%N}.
+Proof. exact: homoW. Qed.
+
+Lemma inj_homo_ltrn : injective f ->
+  {homo f : m n / m <= n >-> (m <= n)%N} ->
+  {homo f : m n / m < n >-> (m < n)%N}.
+Proof. exact: inj_homo. Qed.
+
+Lemma inj_nhomo_ltrn : injective f ->
+  {homo f : m n / n <= m >-> (m <= n)%N} ->
+  {homo f : m n / n < m >-> (m < n)%N}.
+Proof. exact: inj_homo. Qed.
+
+Lemma incrn_inj : {mono f : m n / m <= n >-> (m <= n)%N} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma decrn_inj : {mono f : m n / n <= m >-> (m <= n)%N} -> injective f.
+Proof. exact: mono_inj. Qed.
+
+Lemma lernW_mono : {mono f : m n / m <= n >-> (m <= n)%N} ->
+  {mono f : m n / m < n >-> (m < n)%N}.
+Proof. exact: anti_mono. Qed.
+
+Lemma lernW_nmono : {mono f : m n / n <= m >-> (m <= n)%N} ->
+  {mono f : m n / n < m >-> (m < n)%N}.
+Proof. exact: anti_mono. Qed.
+
+Lemma ltrnW_homo_in : {in D & D', {homo f : m n / m < n >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma ltrnW_nhomo_in : {in D & D', {homo f : m n / n < m >-> (m < n)%N}} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}}.
+Proof. exact: homoW_in. Qed.
+
+Lemma inj_homo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / m < n >-> (m < n)%N}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma inj_nhomo_ltrn_in : {in D & D', injective f} ->
+  {in D & D', {homo f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D & D', {homo f : m n / n < m >-> (m < n)%N}}.
+Proof. exact: inj_homo_in. Qed.
+
+Lemma incrn_inj_in : {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma decrn_inj_in : {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D &, injective f}.
+Proof. exact: mono_inj_in. Qed.
+
+Lemma lernW_mono_in : {in D &, {mono f : m n / m <= n >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / m < n >-> (m < n)%N}}.
+Proof. exact: anti_mono_in. Qed.
+
+Lemma lernW_nmono_in : {in D &, {mono f : m n / n <= m >-> (m <= n)%N}} ->
+  {in D &, {mono f : m n / n < m >-> (m < n)%N}}.
+Proof. exact: anti_mono_in. Qed.
+
+End RToNat.
 
 End NumIntegralDomainMonotonyTheory.
 
@@ -1878,25 +1986,25 @@ Implicit Types x y z t : R.
 
 Lemma ler_opp2 : {mono -%R : x y /~ x <= y :> R}.
 Proof. by move=> x y /=; rewrite -subr_ge0 opprK addrC subr_ge0. Qed.
-Hint Resolve ler_opp2.
+Hint Resolve ler_opp2 : core.
 Lemma ltr_opp2 : {mono -%R : x y /~ x < y :> R}.
 Proof. by move=> x y /=; rewrite lerW_nmono. Qed.
-Hint Resolve ltr_opp2.
+Hint Resolve ltr_opp2 : core.
 Definition lter_opp2 := (ler_opp2, ltr_opp2).
 
 Lemma ler_oppr x y : (x <= - y) = (y <= - x).
-Proof. by rewrite (monoRL (@opprK _) ler_opp2). Qed.
+Proof. by rewrite (monoRL opprK ler_opp2). Qed.
 
 Lemma ltr_oppr x y : (x < - y) = (y < - x).
-Proof. by rewrite (monoRL (@opprK _) (lerW_nmono _)). Qed.
+Proof. by rewrite (monoRL opprK (lerW_nmono _)). Qed.
 
 Definition lter_oppr := (ler_oppr, ltr_oppr).
 
 Lemma ler_oppl x y : (- x <= y) = (- y <= x).
-Proof. by rewrite (monoLR (@opprK _) ler_opp2). Qed.
+Proof. by rewrite (monoLR opprK ler_opp2). Qed.
 
 Lemma ltr_oppl x y : (- x < y) = (- y < x).
-Proof. by rewrite (monoLR (@opprK _) (lerW_nmono _)). Qed.
+Proof. by rewrite (monoLR opprK (lerW_nmono _)). Qed.
 
 Definition lter_oppl := (ler_oppl, ltr_oppl).
 
@@ -1953,10 +2061,10 @@ Lemma ltr0_real x : x < 0 -> x \is real.
 Proof. by move=> /ltrW/ler0_real. Qed.
 
 Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real0.
+Hint Resolve real0 : core.
 
 Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real1.
+Hint Resolve real1 : core.
 
 Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
 
@@ -2130,11 +2238,11 @@ Qed.
 Lemma ler_add2r x : {mono +%R^~ x : y z / y <= z}.
 Proof. by move=> y z /=; rewrite ![_ + x]addrC ler_add2l. Qed.
 
-Lemma ltr_add2r z x y : (x + z < y + z) = (x < y).
-Proof. by rewrite (lerW_mono (ler_add2r _)). Qed.
+Lemma ltr_add2l x : {mono +%R x : y z / y < z}.
+Proof. by move=> y z /=; rewrite (lerW_mono (ler_add2l _)). Qed.
 
-Lemma ltr_add2l z x y : (z + x < z + y) = (x < y).
-Proof. by rewrite (lerW_mono (ler_add2l _)). Qed.
+Lemma ltr_add2r x : {mono +%R^~ x : y z / y < z}.
+Proof. by move=> y z /=; rewrite (lerW_mono (ler_add2r _)). Qed.
 
 Definition ler_add2 := (ler_add2l, ler_add2r).
 Definition ltr_add2 := (ltr_add2l, ltr_add2r).
@@ -2403,7 +2511,7 @@ Lemma ltr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x < y}.
 Proof. by move/ler_pmuln2r/lerW_mono. Qed.
 
 Lemma pmulrnI n : (0 < n)%N -> injective ((@GRing.natmul R)^~ n).
-Proof. by move/ler_pmuln2r/mono_inj. Qed.
+Proof. by move/ler_pmuln2r/incr_inj. Qed.
 
 Lemma eqr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x == y}.
 Proof. by move/pmulrnI/inj_eq. Qed.
@@ -2482,7 +2590,7 @@ Qed.
 
 Lemma ltr_pmuln2l x :
   0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> x_gt0; apply: leq_lerW_mono (ler_pmuln2l _). Qed.
+Proof. by move=> x_gt0; apply: lenrW_mono (ler_pmuln2l _). Qed.
 
 Lemma ler_nmuln2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
@@ -2492,7 +2600,7 @@ Qed.
 
 Lemma ltr_nmuln2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> x_lt0; apply: leq_lerW_nmono (ler_nmuln2l _). Qed.
+Proof. by move=> x_lt0; apply: lenrW_nmono (ler_nmuln2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
 Proof. by rewrite ler_pmuln2l. Qed.
@@ -2898,28 +3006,28 @@ Qed.
 Lemma ler_iexpn2l x :
   0 < x -> x < 1 -> {mono (GRing.exp x) : m n / (n <= m)%N >-> m <= n}.
 Proof.
-move=> xgt0 xlt1; apply: (nhomo_leq_mono (nhomo_inj_ltn_lt _ _)); last first.
+move=> xgt0 xlt1; apply: (lenr_nmono (inj_nhomo_ltnr _ _)); last first.
   by apply: ler_wiexpn2l; rewrite ltrW.
 by apply: ieexprIn; rewrite ?ltr_eqF ?ltr_cpable.
 Qed.
 
 Lemma ltr_iexpn2l x :
   0 < x -> x < 1 -> {mono (GRing.exp x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> xgt0 xlt1; apply: (leq_lerW_nmono (ler_iexpn2l _ _)). Qed.
+Proof. by move=> xgt0 xlt1; apply: (lenrW_nmono (ler_iexpn2l _ _)). Qed.
 
 Definition lter_iexpn2l := (ler_iexpn2l, ltr_iexpn2l).
 
 Lemma ler_eexpn2l x :
   1 < x -> {mono (GRing.exp x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
-move=> xgt1; apply: (homo_leq_mono (homo_inj_ltn_lt _ _)); last first.
+move=> xgt1; apply: (lenr_mono (inj_homo_ltnr _ _)); last first.
   by apply: ler_weexpn2l; rewrite ltrW.
 by apply: ieexprIn; rewrite ?gtr_eqF ?gtr_cpable //; apply: ltr_trans xgt1.
 Qed.
 
 Lemma ltr_eexpn2l x :
   1 < x -> {mono (GRing.exp x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> xgt1; apply: (leq_lerW_mono (ler_eexpn2l _)). Qed.
+Proof. by move=> xgt1; apply: (lenrW_mono (ler_eexpn2l _)). Qed.
 
 Definition lter_eexpn2l := (ler_eexpn2l, ltr_eexpn2l).
 
@@ -2963,7 +3071,7 @@ Qed.
 Definition lter_pexpn2r := (ler_pexpn2r, ltr_pexpn2r).
 
 Lemma pexpIrn n : (0 < n)%N -> {in nneg &, injective ((@GRing.exp R)^~ n)}.
-Proof. by move=> n_gt0; apply: mono_inj_in (ler_pexpn2r _). Qed.
+Proof. by move=> n_gt0; apply: incr_inj_in (ler_pexpn2r _). Qed.
 
 (* expr and ler/ltr *)
 Lemma expr_le1 n x : (0 < n)%N -> 0 <= x -> (x ^+ n <= 1) = (x <= 1).
@@ -3068,7 +3176,7 @@ Qed.
 (* norm + add *)
 
 Lemma normr_real x : `|x| \is real. Proof. by rewrite ger0_real. Qed.
-Hint Resolve normr_real.
+Hint Resolve normr_real : core.
 
 Lemma ler_norm_sum I r (G : I -> R) (P : pred I):
   `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i|.
@@ -3115,7 +3223,7 @@ Lemma real_ler_normlP x y :
 Proof.
 by move=> Rx; rewrite real_ler_norml // ler_oppl; apply: (iffP andP) => [] [].
 Qed.
-Arguments real_ler_normlP [x y].
+Arguments real_ler_normlP {x y}.
 
 Lemma real_eqr_norml x y :
   x \is real -> (`|x| == y) = ((x == y) || (x == -y)) && (0 <= y).
@@ -3151,7 +3259,7 @@ Proof.
 move=> Rx; rewrite real_ltr_norml // ltr_oppl.
 by apply: (iffP (@andP _ _)); case.
 Qed.
-Arguments real_ltr_normlP [x y].
+Arguments real_ltr_normlP {x y}.
 
 Lemma real_ler_normr x y : y \is real -> (x <= `|y|) = (x <= y) || (x <= - y).
 Proof.
@@ -3399,25 +3507,26 @@ Lemma mono_in_lerif (A : pred R) (f : R -> R) C :
    {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
 Proof.
-by move=> mf x y Ax Ay; rewrite /lerif mf ?(inj_in_eq (mono_inj_in mf)).
+by move=> mf x y Ax Ay; rewrite /lerif mf ?(inj_in_eq (incr_inj_in mf)).
 Qed.
 
 Lemma mono_lerif (f : R -> R) C :
     {mono f : x y / x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
-Proof. by move=> mf x y; rewrite /lerif mf (inj_eq (mono_inj _)). Qed.
+Proof. by move=> mf x y; rewrite /lerif mf (inj_eq (incr_inj _)). Qed.
 
 Lemma nmono_in_lerif (A : pred R) (f : R -> R) C :
     {in A &, {mono f : x y /~ x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
 Proof.
-by move=> mf x y Ax Ay; rewrite /lerif eq_sym mf ?(inj_in_eq (nmono_inj_in mf)).
+move=> mf x y Ax Ay; rewrite /lerif eq_sym mf //.
+by rewrite ?(inj_in_eq (decr_inj_in mf)).
 Qed.
 
 Lemma nmono_lerif (f : R -> R) C :
     {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
-Proof. by move=> mf x y; rewrite /lerif eq_sym mf ?(inj_eq (nmono_inj mf)). Qed.
+Proof. by move=> mf x y; rewrite /lerif eq_sym mf ?(inj_eq (decr_inj mf)). Qed.
 
 Lemma lerif_subLR x y z C : (x - y <= z ?= iff C) = (x <= z + y ?= iff C).
 Proof. by rewrite /lerif !eqr_le ler_subr_addr ler_subl_addr. Qed.
@@ -3572,13 +3681,13 @@ Qed.
 
 End NumDomainOperationTheory.
 
-Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real.
+Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
 Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
-Arguments real_ler_normlP [R x y].
-Arguments real_ltr_normlP [R x y].
-Arguments lerif_refl [R x C].
+Arguments real_ler_normlP {R x y}.
+Arguments real_ltr_normlP {R x y}.
+Arguments lerif_refl {R x C}.
 Arguments mono_in_lerif [R A f C].
 Arguments nmono_in_lerif [R A f C].
 Arguments mono_lerif [R f C].
@@ -3586,7 +3695,7 @@ Arguments nmono_lerif [R f C].
 
 Section NumDomainMonotonyTheoryForReals.
 
-Variables (R R' : numDomainType) (D : pred R) (f : R -> R').
+Variables (R R' : numDomainType) (D : pred R) (f : R -> R') (f' : R -> nat).
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
 
 Lemma real_mono :
@@ -3605,7 +3714,6 @@ move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltrP xR yR.
 by rewrite ltrW_nhomo.
 Qed.
 
-(* GG: Domain should precede condition. *)
 Lemma real_mono_in :
     {in D &, {homo f : x y / x < y}} ->
   {in [pred x in D | x \is real] &, {mono f : x y / x <= y}}.
@@ -3622,6 +3730,38 @@ Proof.
 move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
 have [lt_xy|le_yx] := real_ltrP xR yR; last by rewrite (ltrW_nhomo_in Dmf).
 by rewrite ltr_geF ?Dmf.
+Qed.
+
+Lemma realn_mono : {homo f' : x y / x < y >-> (x < y)%N} ->
+  {in real &, {mono f' : x y / x <= y >-> (x <= y)%N}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy | le_yx] := real_lerP xR yR.
+  by rewrite ltrnW_homo.
+by rewrite ltn_geF ?mf.
+Qed.
+
+Lemma realn_nmono : {homo f' : x y / y < x >-> (x < y)%N} ->
+  {in real &, {mono f' : x y / y <= x >-> (x <= y)%N}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy|le_yx] := real_ltrP xR yR.
+  by rewrite ltn_geF ?mf.
+by rewrite ltrnW_nhomo.
+Qed.
+
+Lemma realn_mono_in : {in D &, {homo f' : x y / x < y >-> (x < y)%N}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / x <= y >-> (x <= y)%N}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := real_lerP xR yR; first by rewrite (ltrnW_homo_in Dmf).
+by rewrite ltn_geF ?Dmf.
+Qed.
+
+Lemma realn_nmono_in : {in D &, {homo f' : x y / y < x >-> (x < y)%N}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / y <= x >-> (x <= y)%N}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := real_ltrP xR yR; last by rewrite (ltrnW_nhomo_in Dmf).
+by rewrite ltn_geF ?Dmf.
 Qed.
 
 End NumDomainMonotonyTheoryForReals.
@@ -3857,13 +3997,13 @@ End NumFieldTheory.
 
 Section RealDomainTheory.
 
-Hint Resolve lerr.
+Hint Resolve lerr : core.
 
 Variable R : realDomainType.
 Implicit Types x y z t : R.
 
 Lemma num_real x : x \is real. Proof. exact: num_real. Qed.
-Hint Resolve num_real.
+Hint Resolve num_real : core.
 
 Lemma ler_total : total (@le R). Proof. by move=> x y; apply: real_leVge. Qed.
 
@@ -3962,34 +4102,103 @@ Proof. by rewrite -real_normrEsign. Qed.
 
 End RealDomainTheory.
 
-Hint Resolve num_real.
+Hint Resolve num_real : core.
 
 Section RealDomainMonotony.
 
-Variables (R : realDomainType) (R' : numDomainType) (D : pred R) (f : R -> R').
+Variables (R : realDomainType) (R' : numDomainType) (D : pred R).
+Variables (f : R -> R') (f' : R -> nat).
 Implicit Types (m n p : nat) (x y z : R) (u v w : R').
 
-Hint Resolve (@num_real R).
+Hint Resolve (@num_real R) : core.
 
-Lemma homo_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
+Lemma ler_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
 Proof. by move=> mf x y; apply: real_mono. Qed.
 
-Lemma nhomo_mono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
+Lemma ler_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
 Proof. by move=> mf x y; apply: real_nmono. Qed.
 
-Lemma homo_mono_in :
+Lemma ler_mono_in :
   {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
 Proof.
 by move=> mf x y Dx Dy; apply: (real_mono_in mf); rewrite ?inE ?Dx ?Dy /=.
 Qed.
 
-Lemma nhomo_mono_in :
+Lemma ler_nmono_in :
   {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
 Proof.
 by move=> mf x y Dx Dy; apply: (real_nmono_in mf); rewrite ?inE ?Dx ?Dy /=.
 Qed.
 
+Lemma lern_mono : {homo f' : m n / m < n >-> (m < n)%N} ->
+   {mono f' : m n / m <= n >-> (m <= n)%N}.
+Proof. by move=> mf x y; apply: realn_mono. Qed.
+
+Lemma lern_nmono : {homo f' : m n / n < m >-> (m < n)%N} ->
+  {mono f' : m n / n <= m >-> (m <= n)%N}.
+Proof. by move=> mf x y; apply: realn_nmono. Qed.
+
+Lemma lern_mono_in : {in D &, {homo f' : m n / m < n >-> (m < n)%N}} ->
+   {in D &, {mono f' : m n / m <= n >-> (m <= n)%N}}.
+Proof.
+by move=> mf x y Dx Dy; apply: (realn_mono_in mf); rewrite ?inE ?Dx ?Dy /=.
+Qed.
+
+Lemma lern_nmono_in : {in D &, {homo f' : m n / n < m >-> (m < n)%N}} ->
+  {in D &, {mono f' : m n / n <= m >-> (m <= n)%N}}.
+Proof.
+by move=> mf x y Dx Dy; apply: (realn_nmono_in mf); rewrite ?inE ?Dx ?Dy /=.
+Qed.
+
 End RealDomainMonotony.
+
+Section RealDomainArgExtremum.
+
+Context {R : realDomainType} {I : finType} (i0 : I).
+Context (P : pred I) (F : I -> R) (Pi0 : P i0).
+
+Definition arg_minr := extremum <=%R i0 P F.
+Definition arg_maxr := extremum >=%R i0 P F.
+
+Lemma arg_minrP: extremum_spec <=%R P F arg_minr.
+Proof. by apply: extremumP => //; [apply: ler_trans|apply: ler_total]. Qed.
+
+Lemma arg_maxrP: extremum_spec >=%R P F arg_maxr.
+Proof.
+apply: extremumP => //; first exact: lerr.
+  by move=> ??? /(ler_trans _) le /le.
+by move=> ??; apply: ler_total.
+Qed.
+
+End RealDomainArgExtremum.
+
+Notation "[ 'arg' 'minr_' ( i < i0 | P ) F ]" :=
+    (arg_minr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 'in' A ) F ]" :=
+    [arg minr_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 ) F ]" := [arg minr_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0 )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 | P ) F ]" :=
+     (arg_maxr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 'in' A ) F ]" :=
+    [arg maxr_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
 
 Section RealDomainOperations.
 
@@ -3997,7 +4206,7 @@ Section RealDomainOperations.
 
 Variable R : realDomainType.
 Implicit Types x y z t : R.
-Hint Resolve (@num_real R).
+Hint Resolve (@num_real R) : core.
 
 Lemma sgr_cp0 x :
   ((sg x == 1) = (0 < x)) *
@@ -4066,7 +4275,7 @@ Proof. exact: real_ler_norml. Qed.
 
 Lemma ler_normlP x y : reflect ((- x <= y) * (x <= y)) (`|x| <= y).
 Proof. exact: real_ler_normlP. Qed.
-Arguments ler_normlP [x y].
+Arguments ler_normlP {x y}.
 
 Lemma eqr_norml x y : (`|x| == y) = ((x == y) || (x == -y)) && (0 <= y).
 Proof. exact: real_eqr_norml. Qed.
@@ -4081,7 +4290,7 @@ Definition lter_norml := (ler_norml, ltr_norml).
 
 Lemma ltr_normlP x y : reflect ((-x < y) * (x < y)) (`|x| < y).
 Proof. exact: real_ltr_normlP. Qed.
-Arguments ltr_normlP [x y].
+Arguments ltr_normlP {x y}.
 
 Lemma ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y).
 Proof. by rewrite lerNgt ltr_norml negb_and -!lerNgt orbC ler_oppr. Qed.
@@ -4444,7 +4653,7 @@ Lemma poly_ivt : real_closed_axiom R. Proof. exact: poly_ivt. Qed.
 
 Lemma sqrtr_ge0 a : 0 <= sqrt a.
 Proof. by rewrite /sqrt; case: (sig2W _). Qed.
-Hint Resolve sqrtr_ge0.
+Hint Resolve sqrtr_ge0 : core.
 
 Lemma sqr_sqrtr a : 0 <= a -> sqrt a ^+ 2 = a.
 Proof.
@@ -4519,7 +4728,7 @@ Qed.
 
 Lemma ler_psqrt : {in @pos R &, {mono sqrt : a b / a <= b}}.
 Proof.
-apply: homo_mono_in => x y x_gt0 y_gt0.
+apply: ler_mono_in => x y x_gt0 y_gt0.
 rewrite !ltr_neqAle => /andP[neq_xy le_xy].
 by rewrite ler_wsqrtr // eqr_sqrt ?ltrW // neq_xy.
 Qed.
@@ -4737,7 +4946,7 @@ Proof.
 rewrite CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
-Hint Resolve Creal_Re Creal_Im.
+Hint Resolve Creal_Re Creal_Im : core.
 
 Fact Re_is_additive : additive Re.
 Proof. by move=> x y; rewrite /Re rmorphB addrACA -opprD mulrBl. Qed.
@@ -5209,7 +5418,8 @@ Qed.
 
 End ClosedFieldTheory.
 
-Notation "n .-root" := (@nthroot _ n) (at level 2, format "n .-root") : ring_scope.
+Notation "n .-root" := (@nthroot _ n)
+  (at level 2, format "n .-root") : ring_scope.
 Notation sqrtC := 2.-root.
 Notation "'i" := (@imaginaryC _) (at level 0) : ring_scope.
 Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
@@ -5435,6 +5645,9 @@ Proof. by case/CnatP=> n ->; apply: rmorph_nat. Qed.
 
 
 End NumArchiClosedFieldTheory.
+Arguments conjCK {C} x.
+Arguments sqrCK {C} [x] le0x.
+Arguments sqrCK_P {C x}.
 
 End Theory.
 

@@ -235,12 +235,12 @@ have FF (H : {group {perm T}}): H <| 'Alt_T -> H :<>: 1 -> 20 %| #|H|.
     have DnS1: S1 \in 3.-dtuple(setT).
       rewrite inE memtE subset_all /= !inE /= !negb_or -!andbA /= andbT.
       rewrite -{1}[h]expg1 !diff_hnx_x // expgSr permM.
-      by rewrite (inj_eq (@perm_inj _ _)) diff_hnx_x.
+      by rewrite (inj_eq perm_inj) diff_hnx_x.
     pose S2 := [tuple x; h x; (h ^+ 2) x].
     have DnS2:  S2 \in 3.-dtuple(setT).
       rewrite inE memtE subset_all /= !inE /= !negb_or -!andbA /= andbT.
       rewrite -{1}[h]expg1 !diff_hnx_x // expgSr permM.
-      by rewrite (inj_eq (@perm_inj _ _)) diff_hnx_x.
+      by rewrite (inj_eq perm_inj) diff_hnx_x.
     case: (atransP2 F2 DnS1 DnS2) => g Hg [/=].
     rewrite /aperm => Hgx Hghx Hgh3x.
     have h_g_com: h * g = g * h.
@@ -290,8 +290,8 @@ Notation T' := {y | y != x}.
 Lemma rfd_funP (p : {perm T}) (u : T') :
   let p1 := if p x == x then p else 1 in p1 (val u) != x.
 Proof.
-case: (p x =P x) => /= [pxx|_]; last by rewrite perm1 (valP u).
-by rewrite -{2}pxx (inj_eq (@perm_inj _ p)); apply: (valP u).
+case: (p x =P x) => /= [pxx | _]; last by rewrite perm1 (valP u).
+by rewrite -[x in _ != x]pxx (inj_eq perm_inj); apply: (valP u).
 Qed.
 
 Definition rfd_fun p := [fun u => Sub ((_ : {perm T}) _) (rfd_funP p u) : T'].
@@ -299,7 +299,7 @@ Definition rfd_fun p := [fun u => Sub ((_ : {perm T}) _) (rfd_funP p u) : T'].
 Lemma rfdP p : injective (rfd_fun p).
 Proof.
 apply: can_inj (rfd_fun p^-1) _ => u; apply: val_inj => /=.
-rewrite -(inj_eq (@perm_inj _ p)) permKV eq_sym.
+rewrite -(can_eq (permK p)) permKV eq_sym.
 by case: eqP => _; rewrite !(perm1, permK).
 Qed.
 
@@ -350,8 +350,7 @@ have Hp1: p1 x = x.
 have Hcp1: #|[set x | p1 x != x]| <= n.
   have F1 y: p y = y -> p1 y = y.
     move=> Hy; rewrite /p1 permM Hy.
-    case tpermP => //; first by move=> <-.
-    by move=> Hpx1; apply: (@perm_inj _ p); rewrite -Hpx1.
+    by case: tpermP => [<-|/(canLR (permK p))<-|] //; apply/(canLR (permK p)).
   have F2: p1 x1 = x1 by rewrite /p1 permM tpermR.
   have F3: [set x | p1 x != x] \subset [predD1 [set x | p x != x] & x1].
     apply/subsetP => z; rewrite !inE permM.
@@ -494,8 +493,7 @@ case diff_hgx_hx: ((h * g) x == h x).
   case/negP: diff_1_g; apply/eqP.
   by apply: (Hreg _ (h x)) => //; apply/eqP; rewrite -permM.
 case diff_hgx_gx: ((h * g) x == g x).
-  case/eqP: diff_hx_x; apply: (@perm_inj _ g) => //.
-  by apply/eqP; rewrite -permM.
+  by case/idP: diff_hx_x; rewrite -(can_eq (permK g)) -permM.
 case Ez: (pred0b
             (predD1 (predD1 (predD1 (predD1 T x) (h x)) (g x)) ((h * g) x))).
 - move: oT; rewrite /pred0b in Ez.

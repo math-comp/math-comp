@@ -326,7 +326,7 @@ Proof. by rewrite !dvdzE abszM; apply: dvdn_mull. Qed.
 
 Lemma dvdz_mulr d m n : (d %| m)%Z -> (d %| m * n)%Z.
 Proof. by move=> d_m; rewrite mulrC dvdz_mull. Qed.
-Hint Resolve dvdz0 dvd1z dvdzz dvdz_mull dvdz_mulr.
+Hint Resolve dvdz0 dvd1z dvdzz dvdz_mull dvdz_mulr : core.
 
 Lemma dvdz_mul d1 d2 m1 m2 : (d1 %| m1 -> d2 %| m2 -> d1 * d2 %| m1 * m2)%Z.
 Proof. by rewrite !dvdzE !abszM; apply: dvdn_mul. Qed.
@@ -340,14 +340,14 @@ apply: (iffP dvdnP) => [] [q Dm]; last by exists `|q|%N; rewrite Dm abszM.
 exists ((-1) ^+ (m < 0)%R * q%:Z * (-1) ^+ (d < 0)%R).
 by rewrite -!mulrA -abszEsign -PoszM -Dm -intEsign.
 Qed.
-Arguments dvdzP [d m].
+Arguments dvdzP {d m}.
 
 Lemma dvdz_mod0P d m : reflect (m %% d = 0)%Z (d %| m)%Z.
 Proof.
 apply: (iffP dvdzP) => [[q ->] | md0]; first by rewrite modzMl.
 by rewrite (divz_eq m d) md0 addr0; exists (m %/ d)%Z.
 Qed.
-Arguments dvdz_mod0P [d m].
+Arguments dvdz_mod0P {d m}.
 
 Lemma dvdz_eq d m : (d %| m)%Z = ((m %/ d)%Z * d == m).
 Proof. by rewrite (sameP dvdz_mod0P eqP) subr_eq0 eq_sym. Qed.
@@ -714,7 +714,7 @@ rewrite mul1n; apply/dvdn_biggcdP/(all_nthP 0)=> a_dv_p i ltip /=.
 exact: a_dv_p.
 Qed.
 
-Lemma map_poly_divzK a p :
+Lemma map_poly_divzK {a} p :
   p \is a polyOver (dvdz a) -> a *: map_poly (divz^~ a) p = p.
 Proof.
 move/polyOverP=> a_dv_p; apply/polyP=> i.

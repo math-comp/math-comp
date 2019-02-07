@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
 From mathcomp
-Require Import bigop ssralg binomial tuple.
+Require Import bigop ssralg countalg binomial tuple.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
@@ -142,15 +142,20 @@ Definition coefp_head h i (p : poly_of (Phant R)) := let: tt := h in p`_i.
 
 End Polynomial.
 
-(* We need to break off the section here to let the argument scope *)
-(* directives take effect.                                         *)
+(* We need to break off the section here to let the Bind Scope directives     *)
+(* take effect.                                                               *)
 Bind Scope ring_scope with poly_of.
 Bind Scope ring_scope with polynomial.
-Arguments polyseq _ _%R.
-Arguments poly_inj _ _%R _%R _.
-Arguments coefp_head _ _ _%N _%R.
+Arguments polyseq {R} p%R.
+Arguments poly_inj {R} [p1%R p2%R] : rename.
+Arguments coefp_head {R} h i%N p%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)).
 Notation coefp i := (coefp_head tt i).
+
+Definition poly_countMixin (R : countRingType) :=
+  [countMixin of polynomial R by <:].
+Canonical polynomial_countType R := CountType _ (poly_countMixin R).
+Canonical poly_countType (R : countRingType) := [countType of {poly R}].
 
 Section PolynomialTheory.
 
@@ -1670,7 +1675,7 @@ Qed.
 
 End PolynomialTheory.
 
-Prenex Implicits polyC Poly lead_coef root horner polyOver.
+Prenex Implicits polyC polyCK Poly polyseqK lead_coef root horner polyOver.
 Arguments monic {R}.
 Notation "\poly_ ( i < n ) E" := (poly n (fun i => E)) : ring_scope.
 Notation "c %:P" := (polyC c) : ring_scope.
@@ -1683,12 +1688,20 @@ Notation "a ^` ()" := (deriv a) : ring_scope.
 Notation "a ^` ( n )" := (derivn n a) : ring_scope.
 Notation "a ^`N ( n )" := (nderivn n a) : ring_scope.
 
-Arguments monicP [R p].
-Arguments rootP [R p x].
-Arguments rootPf [R p x].
-Arguments rootPt [R p x].
-Arguments unity_rootP [R n z].
+Arguments monicP {R p}.
+Arguments rootP {R p x}.
+Arguments rootPf {R p x}.
+Arguments rootPt {R p x}.
+Arguments unity_rootP {R n z}.
 Arguments polyOverP {R S0 addS kS p}.
+Arguments polyC_inj {R} [x1 x2] eq_x12P.
+
+Canonical polynomial_countZmodType (R : countRingType) :=
+  [countZmodType of polynomial R].
+Canonical poly_countZmodType (R : countRingType) := [countZmodType of {poly R}].
+Canonical polynomial_countRingType (R : countRingType) :=
+  [countRingType of polynomial R].
+Canonical poly_countRingType (R : countRingType) := [countRingType of {poly R}].
 
 (* Container morphism. *)
 Section MapPoly.
@@ -1935,7 +1948,7 @@ Definition comp_poly q p := p^:P.[q].
 Local Notation "p \Po q" := (comp_poly q p) : ring_scope.
 
 Lemma size_map_polyC p : size p^:P = size p.
-Proof. exact: size_map_inj_poly (@polyC_inj R) _ _. Qed.
+Proof. exact/(size_map_inj_poly polyC_inj). Qed.
 
 Lemma map_polyC_eq0 p : (p^:P == 0) = (p == 0).
 Proof. by rewrite -!size_poly_eq0 size_map_polyC. Qed.
@@ -2115,6 +2128,11 @@ Qed.
 Definition derivCE := (derivE, deriv_exp).
 
 End PolynomialComRing.
+
+Canonical polynomial_countComRingType (R : countComRingType) :=
+  [countComRingType of polynomial R].
+Canonical poly_countComRingType (R : countComRingType) :=
+  [countComRingType of {poly R}].
 
 Section PolynomialIdomain.
 
@@ -2353,6 +2371,19 @@ Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
 
+Canonical polynomial_countUnitRingType (R : countIdomainType) :=
+  [countUnitRingType of polynomial R].
+Canonical poly_countUnitRingType (R : countIdomainType) :=
+  [countUnitRingType of {poly R}].
+Canonical polynomial_countComUnitRingType (R : countIdomainType) :=
+  [countComUnitRingType of polynomial R].
+Canonical poly_countComUnitRingType (R : countIdomainType) :=
+  [countComUnitRingType of {poly R}].
+Canonical polynomial_countIdomainType (R : countIdomainType) :=
+  [countIdomainType of polynomial R].
+Canonical poly_countIdomainType (R : countIdomainType) :=
+  [countIdomainType of {poly R}].
+
 Section MapFieldPoly.
 
 Variables (F : fieldType) (R : ringType) (f : {rmorphism F -> R}).
@@ -2400,7 +2431,7 @@ Qed.
 
 End MapFieldPoly.
 
-Arguments map_poly_inj {F R} f [x1 x2].
+Arguments map_poly_inj {F R} f [p1 p2] : rename.
 
 Section MaxRoots.
 
@@ -2581,7 +2612,7 @@ Open Scope unity_root_scope.
 
 Definition unity_rootE := unity_rootE.
 Definition unity_rootP := @unity_rootP.
-Arguments unity_rootP [R n z].
+Arguments unity_rootP {R n z}.
 
 Definition prim_order_exists := prim_order_exists.
 Notation prim_order_gt0 :=  prim_order_gt0.

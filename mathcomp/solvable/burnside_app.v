@@ -26,7 +26,7 @@ rewrite big_uniq // -(card_uniqP Us) (eq_card sG) -Frobenius_Cauchy.
 by apply/actsP=> ? _ ?; rewrite !inE.
 Qed.
 
-Arguments burnside_formula [gT].
+Arguments burnside_formula {gT}.
 
 Section colouring.
 
