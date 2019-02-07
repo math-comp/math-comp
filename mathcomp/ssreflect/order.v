@@ -1882,10 +1882,10 @@ Proof. by move=> lexy; split=> //; rewrite eq_le lexy. Qed.
 Lemma leif_eq x y : x <= y -> x <= y ?= iff (x == y).
 Proof. by []. Qed.
 
-Lemma ger_leif x y C : x <= y ?= iff C -> (y <= x) = C.
+Lemma ge_leif x y C : x <= y ?= iff C -> (y <= x) = C.
 Proof. by case=> le_xy; rewrite eq_le le_xy. Qed.
 
-Lemma ltr_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
+Lemma lt_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
 Proof. by move=> le_xy; rewrite lt_neqAle !le_xy andbT. Qed.
 
 Lemma mono_in_leif (A : pred T) (f : T -> T) C :
