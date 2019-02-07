@@ -14,7 +14,10 @@
 
 	* Extended theory about homo and mono for leq/or and Num.le
 
-	* Extended theory of lersif and intervals
+	* Changed and extended theory of lersif and intervals:
+	  * Many lersif related lemmas are ported from ssrnum
+	  * Definitions that changed: prev_of_itv, itv_decompose, and itv_rewrite
+	  * Theory of intersections of intervals is added
 
 	* Renamed: (together with the _in suffix counterpart)
 	  mono_inj -> incr_inj
