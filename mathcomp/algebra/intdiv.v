@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
 From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
 
@@ -46,7 +46,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.mc_1_7.Theory.
 Local Open Scope ring_scope.
 
 Definition divz (m d : int) :=
@@ -79,7 +79,7 @@ Proof. by case: d => // d; rewrite /divz /= mul1r. Qed.
 Lemma divzN m d : (m %/ - d)%Z = - (m %/ d)%Z.
 Proof. by case: m => n; rewrite /divz /= sgzN abszN mulNr. Qed.
 
-Lemma divz_abs m d : (m %/ `|d|)%Z = (-1) ^+ (d < 0)%R * (m %/ d)%Z.
+Lemma divz_abs (m d : int) : (m %/ `|d|)%Z = (-1) ^+ (d < 0)%R * (m %/ d)%Z.
 Proof.
 by rewrite {3}[d]intEsign !mulr_sign; case: ifP => -> //; rewrite divzN opprK.
 Qed.
@@ -209,7 +209,8 @@ Qed.
 Lemma ltz_divLR m n d : d > 0 -> ((m %/ d)%Z < n) = (m < n * d).
 Proof.
 move=> d_gt0; apply/idP/idP.
-  by rewrite -lez_addr1 -(ler_pmul2r d_gt0); apply: ltr_le_trans (ltz_ceil _ _).
+  by rewrite -[_ < n]lez_addr1 -(ler_pmul2r d_gt0);
+     apply: ltr_le_trans (ltz_ceil _ _).
 rewrite -(ltr_pmul2r d_gt0 _ n) //; apply: ler_lt_trans (lez_floor _ _).
 by rewrite gtr_eqF.
 Qed.
@@ -864,8 +865,9 @@ Qed.
 Lemma dvdp_rat_int p q : (pZtoQ p %| pZtoQ q) = (p %| q).
 Proof.
 apply/dvdpP/Pdiv.Idomain.dvdpP=> [[/= r1 Dq] | [[/= a r] nz_a Dq]]; last first.
-  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq.
-  by rewrite -{2}[a]intz scaler_int rmorphMz -scaler_int scalerK ?intr_eq0.
+  exists (a%:~R^-1 *: pZtoQ r).
+  by rewrite -scalerAl -rmorphM -Dq -{2}[a]intz scaler_int rmorphMz
+             -[X in _ *: X]scaler_int scalerK ?intr_eq0.
 have [r [a nz_a Dr1]] := rat_poly_scale r1; exists (a, r) => //=.
 apply: (map_inj_poly _ _ : injective pZtoQ) => //; first exact: intr_inj.
 rewrite -[a]intz scaler_int rmorphMz -scaler_int /= Dq Dr1.
@@ -1075,4 +1077,3 @@ rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
   by apply: (row_free_inj uT); rewrite mul1mx mulmxKpV.
 by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
 Qed.
-

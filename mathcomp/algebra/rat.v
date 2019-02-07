@@ -1,7 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop ssralg countalg div ssrnum ssrint.
+From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -18,8 +19,7 @@ From mathcomp Require Import fintype bigop ssralg countalg div ssrnum ssrint.
 (*       ratr x == generic embedding of  (r : R) into an arbitrary unitring.  *)
 (******************************************************************************)
 
-Import GRing.Theory.
-Import Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.mc_1_7.Theory.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -568,13 +568,26 @@ Qed.
 Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite /lt_rat ltr_def rat_eq. Qed.
 
-Definition ratLeMixin := RealLeMixin le_rat0D le_rat0M le_rat0_anti
-  subq_ge0 (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
+Canonical rat_normedType := Norm.Exports.NormedType rat rat normq.
 
+Definition ratPoMixin :=
+  RealLePoMixin le_rat0D le_rat0_anti subq_ge0 (@le_rat_total 0) lt_rat_def.
+
+Definition ratLeMixin : Num.mixin_of ratPoMixin norm :=
+  RealLeMixin le_rat0D le_rat0M le_rat0_anti subq_ge0
+              (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
+
+Canonical rat_porderType := POrderType ring_display rat ratPoMixin.
+Canonical rat_latticeType :=
+  LatticeType rat (Order.TotalLattice.Mixin le_rat_total).
+Canonical rat_orderType := OrderType rat le_rat_total.
 Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
 Canonical rat_numFieldType := [numFieldType of rat].
-Canonical rat_realDomainType := RealDomainType rat (@le_rat_total 0).
+Canonical rat_realDomainType := RealDomainType rat le_rat_total.
 Canonical rat_realFieldType := [realFieldType of rat].
+Canonical rat_lmodType := LmodType rat rat (GRing.regular_lmodMixin _).
+Canonical rat_normedModType :=
+  NormedModType rat rat (Num.numDomain_normedModMixin _).
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
 Proof.
@@ -605,7 +618,7 @@ Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr ?norm_ge0 //.
+rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr ?normr_ge0 //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 

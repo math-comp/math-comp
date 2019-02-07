@@ -1,7 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop ssralg countalg ssrnum poly.
+From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
+From mathcomp Require Import poly.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
@@ -39,7 +40,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.mc_1_7.Theory.
 Delimit Scope int_scope with Z.
 Local Open Scope int_scope.
 
@@ -362,6 +363,10 @@ Canonical int_countComUnitRingType := [countComUnitRingType of int].
 Canonical int_countIdomainType := [countIdomainType of int].
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
+
+Canonical int_normedType :=
+  Norm.Exports.NormedType int int (fun m => (absz m)%:Z).
+
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
 Arguments absz m%distn_scope.
@@ -371,8 +376,6 @@ Module intOrdered.
 Section intOrdered.
 Implicit Types m n p : int.
 Local Coercion Posz : nat >-> int.
-
-Local Notation normz m := (absz m)%:Z.
 
 Definition lez m n :=
   match m, n with
@@ -390,26 +393,14 @@ Definition ltz m n :=
     | Negz m', Negz n' => (n' < m')%N
   end.
 
-Fact lez_norm_add x y : lez (normz (x + y)) (normz x + normz y).
-Proof.
-move: x y=> [] m [] n; rewrite /= ?addnS //=;
-rewrite /GRing.add /GRing.Zmodule.add /=; case: ltnP=> //=;
-rewrite ?addSn ?ltnS ?leq_subLR ?(addnS, addSn) ?(leq_trans _ (leqnSn _)) //;
-by rewrite 1?addnCA ?leq_addr ?addnA ?leq_addl.
-Qed.
+Fact lez_add m n : lez 0 m -> lez 0 n -> lez 0 (m + n).
+Proof. by case: m n => [] m [] n. Qed.
 
-Fact ltz_add x y : ltz 0 x -> ltz 0 y -> ltz 0 (x + y).
-Proof. by move: x y => [] x [] y //= hx hy; rewrite ltn_addr. Qed.
+Fact lez_mul m n : lez 0 m -> lez 0 n -> lez 0 (m * n).
+Proof. by case: m n => [] m [] n. Qed.
 
-Fact eq0_normz x : normz x = 0 -> x = 0. Proof. by case: x. Qed.
-
-Fact lez_total x y : lez x y || lez y x.
-Proof. by move: x y => [] x [] y //=; apply: leq_total. Qed.
-
-Lemma abszN (n : nat) : absz (- n%:Z) = n. Proof. by case: n. Qed.
-
-Fact normzM : {morph (fun n => normz n) : x y / x * y}.
-Proof. by move=> [] x [] y; rewrite // abszN // mulnC. Qed.
+Fact lez_anti m : lez 0 m -> lez m 0 -> m = 0.
+Proof. by case: m; first case. Qed.
 
 Lemma subz_ge0 m n : lez 0 (n - m) = lez m n.
 Proof.
@@ -420,23 +411,39 @@ by [ rewrite subzn //
       move: hmn; rewrite -subn_gt0; case: (_ - _)%N].
 Qed.
 
-Fact lez_def x y : (lez x y) = (normz (y - x) == y - x).
-Proof. by rewrite -subz_ge0; move: (_ - _) => [] n //=; rewrite eqxx. Qed.
+Fact lez_total m n : lez m n || lez n m.
+Proof. by move: m n => [] m [] n //=; apply: leq_total. Qed.
 
-Fact ltz_def x y : (ltz x y) = (y != x) && (lez x y).
+Fact normzN m : `|- m| = `|m|.
+Proof. by case: m => // -[]. Qed.
+
+Fact gez0_norm m : lez 0 m -> `|m| = m.
+Proof. by case: m. Qed.
+
+Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).
 Proof.
-by move: x y=> [] x [] y //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
+by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
 
-Definition Mixin :=
-   NumMixin lez_norm_add ltz_add eq0_normz (in2W lez_total) normzM
-            lez_def ltz_def.
+Definition PoMixin :=
+  RealLePoMixin lez_add lez_anti subz_ge0 (lez_total 0) ltz_def.
+
+Definition Mixin : Num.mixin_of PoMixin norm :=
+  RealLeMixin
+    lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
 
 End intOrdered.
 End intOrdered.
 
+Canonical int_porderType := POrderType ring_display int intOrdered.PoMixin.
+Canonical int_latticeType :=
+  LatticeType int (Order.TotalLattice.Mixin intOrdered.lez_total).
+Canonical int_orderType := OrderType int intOrdered.lez_total.
 Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
-Canonical int_realDomainType := RealDomainType int (intOrdered.lez_total 0).
+Canonical int_realDomainType := RealDomainType int intOrdered.lez_total.
+Canonical int_lmodType := LmodType int int (GRing.regular_lmodMixin _).
+Canonical int_normedModType :=
+  NormedModType int int (Num.numDomain_normedModMixin _).
 
 Section intOrderedTheory.
 
@@ -1667,7 +1674,7 @@ wlog le_m31 : m1 m3 / (m3 <= m1)%R.
   by rewrite (addrC `|_|)%R orbC !(distrC m1) !(distrC m3).
 rewrite ger0_norm ?subr_ge0 // orb_idl => [|/andP[le_m12 le_m23]]; last first.
   by have /eqP->: m2 == m3; rewrite ?lerr // eqr_le le_m23 (ler_trans le_m31).
-rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -subr_ge0.
+rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -[X in X && _]subr_ge0.
 by apply: lerif_add; apply/real_lerif_norm/num_real.
 Qed.
 
