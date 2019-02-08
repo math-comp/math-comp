@@ -570,7 +570,7 @@ Qed.
 Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite /lt_rat ltr_def rat_eq. Qed.
 
-Canonical rat_normedType := Norm.Exports.NormedType rat rat normq.
+Canonical rat_normedType := NormedType rat rat normq.
 
 Definition ratPoMixin :=
   RealLePoMixin le_rat0D le_rat0_anti subq_ge0 (@le_rat_total 0) lt_rat_def.
@@ -589,7 +589,7 @@ Canonical rat_realDomainType := RealDomainType rat le_rat_total.
 Canonical rat_realFieldType := [realFieldType of rat].
 Canonical rat_lmodType := LmodType rat rat (GRing.regular_lmodMixin _).
 Canonical rat_normedModType :=
-  NormedModType rat rat (Num.numDomain_normedModMixin _).
+  NormedModType rat rat rat_numDomainType.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
 Proof.
