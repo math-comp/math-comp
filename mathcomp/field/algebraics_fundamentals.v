@@ -117,7 +117,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory Num.Theory.
+Import GroupScope GRing.Theory Num.Theory Num.mc_1_7 Num.mc_1_7.Theory.
 Local Open Scope ring_scope.
 
 Local Notation "p ^ f" := (map_poly f p) : ring_scope.
@@ -143,7 +143,7 @@ apply: ltr_le_trans; rewrite mulrDl mul1r ltr_spaddr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (ler_trans (real_ler_norm _)) //.
   by rewrite rpredN rpredM ?rpred_rat ?rpredX // ger0_real.
-rewrite normrN normrM ler_pmul //=.
+rewrite normrN normrM ler_pmul ?normr_ge0 //.
   rewrite normf_div -!intr_norm -!abszE ler_pimulr ?ler0n //.
   by rewrite invf_le1 ?ler1n ?ltr0n ?absz_gt0 ?denq_eq0.
 rewrite normrX ger0_norm ?(ltrW x_gt0) // ler_weexpn2l ?leq_ord //.
@@ -515,7 +515,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite ltr_pdivr_mulr // -(ltr_add2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
     rewrite ?(ler_lt_trans (ler_norm_add _ _)) ?ltr_le_add ?ub_rp //.
-    by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM.
+    by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM ?normr_ge0.
   have ab_le m n: (m <= n)%N -> (ab_ n).2 \in Iab_ m.
     move/subnKC=> <-; move: {n}(n - m)%N => n; rewrite /ab_.
     have /(findP m)[/(findP n)[[_ _]]] := xab0.
@@ -592,7 +592,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
   pose QyNum := RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _).
   pose QyNumField := [numFieldType of NumDomainType (Q y) QyNum].
-  pose Ry := [realFieldType of RealDomainType _ (RealLeAxiom QyNumField)].
+  pose Ry := [realFieldType of RealDomainType _ (RealLeTotal QyNumField)].
   have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
   by exists (ArchiFieldType Ry archiRy); apply: [rmorphism of idfun].
 have some_realC: realC.

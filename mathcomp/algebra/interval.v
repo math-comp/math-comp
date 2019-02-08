@@ -42,13 +42,14 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope ring_scope.
-Import GRing.Theory Num.Theory.
+Import GRing.Theory Num.Theory Num.mc_1_7 Num.mc_1_7.Theory.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
 Section LersifPo.
 
 Variable R : numDomainType.
+Implicit Types (b : bool) (x y z : R).
 
 Definition lersif (x y : R) b := if b then x < y else x <= y.
 
@@ -562,7 +563,7 @@ Lemma le_boundl_total : total (@le_boundl R).
 Proof. by move=> [[] l |] [[] r |] //=; case: (ltrgtP l r). Qed.
 
 Lemma le_boundr_total : total (@le_boundr R).
-Proof. by move=> [[] l |] [[] r |] //=; case (ltrgtP l r). Qed.
+Proof. by move=> [[] l |] [[] r |] //=; case: (ltrgtP l r). Qed.
 
 Lemma itv_splitU (xc : R) bc a b : xc \in Interval a b ->
   forall y, y \in Interval a b =

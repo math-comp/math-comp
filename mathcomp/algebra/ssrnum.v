@@ -198,7 +198,7 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record mixin_of (R : ringType) (Rorder : Order.POrder.mixin_of R)  
+Record mixin_of (R : ringType) (Rorder : porderMixin R)
        (le_op := Order.POrder.le Rorder)
        (lt_op := Order.POrder.lt Rorder) (norm_op : R -> R)
   := Mixin {
@@ -216,7 +216,7 @@ Module NumDomain.
 Section ClassDef.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
-  order_mixin : Order.POrder.mixin_of (ring_for T base);
+  order_mixin : porderMixin (ring_for T base);
   norm_base   :  Norm.class_of T T;
   mixin : mixin_of order_mixin norm_base
 }.
@@ -472,7 +472,20 @@ Definition normedType := @Norm.Pack R cT xclass.
 Definition normed_eqType := @Equality.Pack normedType xclass.
 Definition normed_choiceType := @Choice.Pack normedType xclass.
 Definition normed_lmodType := @GRing.Lmodule.Pack R phR normedType xclass.
+
 End ClassDef.
+
+Definition numDomain_normedModMixin (R : numDomainType) :
+  @NormedModule.mixin_of R (GRing.regular_lmodType R) (NumDomain.class R) :=
+  @NormedModule.Mixin
+    R
+    (GRing.regular_lmodType R)
+    (NumDomain.norm_base (NumDomain.class R))
+    (let: Num.Mixin a _ _ _ _ _ := NumDomain.mixin (NumDomain.class R) in a)
+    (let: Num.Mixin _ _ _ _ a _ := NumDomain.mixin (NumDomain.class R) in a)
+    (let: Num.Mixin _ _ a _ _ _ := NumDomain.mixin (NumDomain.class R) in a).
+Definition numDomain_normedModType (R : numDomainType) : type (Phant R) :=
+  @pack _ (Phant R) R _ _ (numDomain_normedModMixin R).
 
 Module Exports.
 Coercion base : class_of >-> GRing.Lmodule.class_of.
@@ -492,6 +505,9 @@ Canonical normedType.
 Canonical normed_eqType.
 Canonical normed_choiceType.
 Canonical normed_lmodType.
+Coercion numDomain_normedModMixin : numDomainType >-> mixin_of.
+Coercion numDomain_normedModType : numDomainType >-> type.
+Canonical numDomain_normedModType.
 Notation normedModType R := (type (Phant R)).
 Notation NormedModType R T m := (@pack _ (Phant R) T _ _ m).
 Notation NormedModMixin := Mixin.
@@ -506,21 +522,6 @@ End Exports.
 End NormedModule.
 Import NormedModule.Exports.
 
-Coercion numDomain_normedModMixin (R : numDomainType) :
-  @NormedModule.mixin_of R (GRing.regular_lmodType R) (NumDomain.class R) :=
-  @NormedModule.Mixin
-    R
-    (GRing.regular_lmodType R)
-    (NumDomain.norm_base (NumDomain.class R))
-    (let: Num.Mixin a _ _ _ _ _ := NumDomain.mixin (NumDomain.class R) in a)
-    (let: Num.Mixin _ _ _ _ a _ := NumDomain.mixin (NumDomain.class R) in a)
-    (let: Num.Mixin _ _ a _ _ _ := NumDomain.mixin (NumDomain.class R) in a).
-
-Canonical numDomain_normedModType (R : numDomainType) : normedModType R :=
-  NormedModType R R R.
-
-Coercion numDomain_normedModType : numDomainType >-> normedModType.
-
 (* The rest of the numbers interface hierarchy. *)
 Module NumField.
 
@@ -528,7 +529,7 @@ Section ClassDef.
 
 Record class_of R := Class {
   base        : GRing.Field.class_of R;
-  order_mixin : Order.POrder.mixin_of (ring_for R base);
+  order_mixin : porderMixin (ring_for R base);
   norm_base   : Norm.class_of R R;
   mixin       : mixin_of order_mixin norm_base
 }.
@@ -559,8 +560,7 @@ Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition normedType := @Norm.Pack cT cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition normedModType :=
-  NormedModType numDomainType cT (numDomain_normedModMixin numDomainType).
+Definition normedModType := NormedModType numDomainType cT numDomainType.
 Definition field_porderType :=
   @Order.POrder.Pack ring_display fieldType xclass.
 Definition field_normedType := @Norm.Pack xT fieldType xclass.
@@ -623,7 +623,7 @@ Record imaginary_mixin_of (R : numDomainType) := ImaginaryMixin {
 
 Record class_of R := Class {
   base        : GRing.ClosedField.class_of R;
-  order_mixin : Order.POrder.mixin_of (ring_for R base);
+  order_mixin : porderMixin (ring_for R base);
   norm_base   : Norm.class_of R R;
   mixin       : mixin_of order_mixin norm_base;
   conj_mixin  : imaginary_mixin_of (num_for R (NumDomain.Class mixin))
@@ -661,7 +661,7 @@ Definition numFieldType := @NumField.Pack cT xclass.
 Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
 Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
 Definition normedModType :=
-  NormedModType numDomainType cT (numDomain_normedModMixin numDomainType).
+  NormedModType numDomainType cT numDomainType.
 Definition dec_porderType :=
   @Order.POrder.Pack ring_display decFieldType xclass.
 Definition dec_normedType := @Norm.Pack xT decFieldType xclass.
@@ -780,8 +780,7 @@ Definition normedType := @Norm.Pack cT cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
-Definition normedModType :=
-  NormedModType numDomainType cT (numDomain_normedModMixin numDomainType).
+Definition normedModType := NormedModType numDomainType cT numDomainType.
 Definition lattice_zmodType := @GRing.Zmodule.Pack latticeType xclass.
 Definition lattice_ringType := @GRing.Ring.Pack latticeType xclass.
 Definition lattice_comRingType := @GRing.ComRing.Pack latticeType xclass.
@@ -902,8 +901,7 @@ Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
-Definition normedModType :=
-  NormedModType numDomainType cT (numDomain_normedModMixin numDomainType).
+Definition normedModType := NormedModType numDomainType cT numDomainType.
 Definition field_latticeType :=
   @Order.Lattice.Pack ring_display fieldType xclass.
 Definition field_orderType := @Order.Total.Pack ring_display fieldType xclass.
@@ -1006,8 +1004,7 @@ Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition realFieldType := @RealField.Pack cT xclass.
-Definition normedModType :=
-  NormedModType numDomainType cT (numDomain_normedModMixin numDomainType).
+Definition normedModType := NormedModType numDomainType cT numDomainType.
 
 End ClassDef.
 
@@ -1099,8 +1096,7 @@ Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition realFieldType := @RealField.Pack cT xclass.
-Definition normedModType :=
-  NormedModType numDomainType cT (numDomain_normedModMixin numDomainType).
+Definition normedModType := NormedModType numDomainType cT numDomainType.
 
 End ClassDef.
 
@@ -5135,6 +5131,10 @@ Lemma Real (R' : numDomainType) & phant R' :
   R' = NumDomainType R Le -> real_axiom R'.
 Proof. by move->. Qed.
 
+Lemma Total (R' : numDomainType) & phant R' :
+  R' = NumDomainType R Le -> total (<=%R : rel R').
+Proof. move->; exact: le_total. Qed.
+
 End LeMixin.
 
 Section LtMixin.
@@ -5190,7 +5190,7 @@ End RealMixin.
 (* compatibility module *)
 Module mc_1_7.
 
-Module Def.
+Module Import Def.
 Notation normr := norm (only parsing).
 Notation ler := le (only parsing).
 Notation ltr := lt (only parsing).
@@ -5200,6 +5200,16 @@ Notation lerif := leif (only parsing).
 Notation minr := meet (only parsing).
 Notation maxr := join (only parsing).
 End Def.
+
+Module Num.
+Notation norm := normr (only parsing).
+Notation le := ler (only parsing).
+Notation lt := ltr (only parsing).
+Notation ge := ger (only parsing).
+Notation gt := gtr (only parsing).
+Notation max := maxr (only parsing).
+Notation min := minr (only parsing).
+End Num.
 
 Module Theory.
 Import Num.Theory.
@@ -5432,6 +5442,8 @@ Variable R : numDomainType.
 Implicit Types x y z t : R.
 Definition real_lerP := real_leP.
 Definition real_ltrP := real_ltP.
+Definition real_ltrNge := real_ltNge.
+Definition real_lerNgt := real_leNgt.
 Definition real_ltrgtP := real_ltgtP.
 Definition real_ger0P := real_ge0P.
 Definition real_ltrgt0P := real_ltgt0P.
@@ -5617,12 +5629,20 @@ Definition lerif_Re_Creal := leif_Re_Creal.
 Definition lerif_rootC_AGM := leif_rootC_AGM.
 End RealClosedFieldTheory.
 
+Arguments lerifP {R x y C}.
+Arguments lerif_refl {R x C}.
+Arguments mono_in_lerif [R A f C].
+Arguments nmono_in_lerif [R A f C].
+Arguments mono_lerif [R f C].
+Arguments nmono_lerif [R f C].
+
 End Theory.
 
 End mc_1_7.
 
 End Num.
 
+Export Norm.Exports.
 Export Num.NumDomain.Exports Num.NormedModule.Exports.
 Export Num.NumField.Exports Num.ClosedField.Exports.
 Export Num.RealDomain.Exports Num.RealField.Exports.
@@ -5634,4 +5654,5 @@ Notation RealLtPoMixin := Num.RealMixin.LtPo.
 Notation RealLeMixin := Num.RealMixin.Le.
 Notation RealLtMixin := Num.RealMixin.Lt.
 Notation RealLeAxiom R := (Num.RealMixin.Real (Phant R) (erefl _)).
+Notation RealLeTotal R := (Num.RealMixin.Total (Phant R) (erefl _)).
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
