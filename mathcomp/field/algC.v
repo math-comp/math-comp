@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path bigop finset prime ssralg poly.
-From mathcomp Require Import polydiv mxpoly generic_quotient countalg ssrnum.
-From mathcomp Require Import closed_field ssrint rat intdiv.
+From mathcomp Require Import div fintype path bigop finset prime order ssralg.
+From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
+From mathcomp Require Import ssrnum closed_field ssrint rat intdiv.
 From mathcomp Require Import algebraics_fundamentals.
 
 (******************************************************************************)
@@ -53,14 +53,15 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.mc_1_7.Theory.
 Local Open Scope ring_scope.
 
 (* The Num mixin for an algebraically closed field with an automorphism of    *)
 (* order 2, making it into a field of complex numbers.                        *)
 Lemma ComplexNumMixin (L : closedFieldType) (conj : {rmorphism L -> L}) :
     involutive conj -> ~ conj =1 id ->
-  {numL | forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}.
+  {ordL : porderMixin L & {normL : L -> L & {numL : @Num.mixin_of L ordL normL |
+   forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}}}.
 Proof.
 move=> conjK conj_nt.
 have nz2: 2%:R != 0 :> L.
@@ -134,8 +135,11 @@ have normM x y : norm (x * y) = norm x * norm y.
 have normN x : norm (- x) = norm x.
   by rewrite -mulN1r normM {1}/norm iJ mulrN -expr2 sqrtK opprK mul1r.
 pose le x y := norm (y - x) == y - x; pose lt x y := (y != x) && le x y.
+have ltW x y : lt x y -> le x y by rewrite /lt => /andP [].
+have lt_def x y : lt x y = (x != y) && le x y by rewrite eq_sym.
 have posE x: le 0 x = (norm x == x) by rewrite /le subr0.
 have leB x y: le x y = le 0 (y - x) by rewrite posE.
+have ltB x y: lt x y = lt 0 (y - x) by rewrite /lt -leB subr_eq0.
 have posP x : reflect (exists y, x = y * conj y) (le 0 x).
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
   by rewrite (normE _ _ (normK y)) rmorphM conjK (mulrC (conj _)) -expr2 normK.
@@ -184,7 +188,34 @@ have normD x y : le (norm (x + y)) (norm x + norm y).
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
   rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
   by rewrite (mulrC x) (mulrC y).
-by exists (Num.Mixin normD sposD norm_eq0 pos_linear normM (rrefl _) (rrefl _)).
+have le01 : le 0 1.
+  have n1_nz: norm 1 != 0 by apply: contraNneq (@oner_neq0 L) => /norm_eq0 /eqP.
+  by rewrite posE -(inj_eq (mulfI (n1_nz))) -normM !mulr1.
+have lt01 : lt 0 1 by rewrite /lt oner_neq0 le01.
+have le_refl x: le x x by
+  rewrite /le subrr -(inj_eq (addrI (norm 0))) addr0 -mulr2n -mulr_natr
+          -(eqP _ : norm 2%:R = 2%:R) -?normM ?mul0r // -posE ltW ?sposD.
+have le_def x y : le x y = (x == y) || lt x y
+  by rewrite lt_def; case: eqP => //= ->; apply: le_refl.
+have lt_trans : transitive lt
+  by move=> y x z le_xy le_yz; rewrite ltB -(subrK y z) -addrA sposD -?ltB.
+have le_trans : transitive le.
+  move=> y x z; rewrite !le_def => /orP [/eqP -> //|lxy].
+  by move=> /orP [/eqP <-|/(lt_trans _ _ _ lxy) ->]; rewrite ?lxy orbT.
+have le0n n : le 0 n%:R.
+  elim: n => [|n ih]; first exact: le_refl.
+  by rewrite (le_trans _ _ _ ih) // /le -natrB // subSnn -(subr0 1%:R).
+have lt0Sn n : lt 0 n.+1%:R by elim: n => // n; apply: sposD.
+have gt_eqF x y : lt y x -> (x == y) = false by rewrite /lt; case: eqP.
+have pnat_eq0 n : (n%:R == 0 :> L) = (n == 0)%N
+  by case: n => [| n]; rewrite ?mulr0n ?eqxx // gt_eqF.
+have le_asym x y : le x y && le y x -> x = y.
+  rewrite /le -normN opprB -opprB -addr_eq0 => /andP[/eqP->].
+  by rewrite -mulr2n -mulr_natl mulf_eq0 subr_eq0 pnat_eq0 /= => /eqP.
+exists (Order.POrder.Mixin lt_def le_refl le_asym le_trans).
+exists norm => /=.
+by exists (@Num.Mixin L (Order.POrder.Mixin lt_def le_refl le_asym le_trans)
+                      norm normD sposD norm_eq0 pos_linear normM (rrefl _)).
 Qed.
 
 Module Algebraics.
@@ -229,8 +260,15 @@ Canonical decFieldType := DecFieldType type decFieldMixin.
 Axiom closedFieldAxiom : GRing.ClosedField.axiom ringType.
 Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
 
-Parameter numMixin : Num.mixin_of ringType.
+Parameter porderMixin : porderMixin eqType.
+Canonical porderType := POrderType ring_display type porderMixin.
+
+Parameter normedMixin : type -> type.
+Canonical normedType := NormedType type type normedMixin.
+
+Parameter numMixin : Num.mixin_of porderMixin normedMixin.
 Canonical numDomainType := NumDomainType type numMixin.
+Canonical normedModType := NormedModType type type numDomainType.
 Canonical numFieldType := [numFieldType of type].
 
 Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
@@ -254,7 +292,13 @@ Fact conjL_nt : ~ conjL =1 id.
 Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
 Definition LnumMixin := ComplexNumMixin conjL_K conjL_nt.
-Definition Lnum := NumDomainType L (sval LnumMixin).
+Definition porderMixin_ : porderMixin L := projT1 LnumMixin.
+Definition normedMixin_ : L -> L := projT1 (projT2 LnumMixin).
+Definition numMixin_ : Num.mixin_of porderMixin_ normedMixin_ :=
+  sval (projT2 (projT2 LnumMixin)).
+Definition Lnum := NumDomainType L numMixin_.
+Definition normK_ : forall x : Lnum, `|x| ^+ 2 = x * conjL x :=
+  proj2_sig (projT2 (projT2 LnumMixin)).
 
 Definition QtoL := [rmorphism of @ratr [numFieldType of Lnum]].
 Notation pQtoL := (map_poly QtoL).
@@ -423,16 +467,25 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/ltr_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-rewrite -i2 rmorphX /= expr2 -{2}iL_J -(svalP LnumMixin).
-by rewrite exprn_ge0 ?normr_ge0.
+by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normK_ exprn_ge0 ?normr_ge0.
 Qed.
 
-Definition numMixin := sval (ComplexNumMixin conjK conj_nt).
+Definition porderMixin : porderMixin eqType :=
+  projT1 (ComplexNumMixin conjK conj_nt).
+Canonical porderType := POrderType ring_display type porderMixin.
+
+Definition normedMixin : type -> type :=
+  projT1 (projT2 (ComplexNumMixin conjK conj_nt)).
+Canonical normedType := NormedType type type normedMixin.
+
+Definition numMixin : Num.mixin_of porderMixin normedMixin :=
+  sval (projT2 (projT2 (ComplexNumMixin conjK conj_nt))).
 Canonical numDomainType := NumDomainType type numMixin.
+Canonical normedModType := NormedModType type type numDomainType.
 Canonical numFieldType := [numFieldType of type].
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
-Proof. exact: svalP (ComplexNumMixin conjK conj_nt) u. Qed.
+Proof. exact: svalP (projT2 (projT2 (ComplexNumMixin conjK conj_nt))) u. Qed.
 
 Lemma algebraic : integralRange (@ratr unitRingType).
 Proof.
@@ -535,7 +588,10 @@ Canonical unitRingType.
 Canonical comRingType.
 Canonical comUnitRingType.
 Canonical idomainType.
+Canonical porderType.
+Canonical normedType.
 Canonical numDomainType.
+Canonical normedModType.
 Canonical fieldType.
 Canonical numFieldType.
 Canonical decFieldType.

@@ -46,7 +46,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Order.Theory Num.Theory Num.mc_1_7.Theory.
+Import GRing.Theory Num.Theory Num.mc_1_7.Theory.
 Local Open Scope ring_scope.
 
 Definition divz (m d : int) :=

@@ -567,7 +567,8 @@ End FinFieldExists.
 
 Section FinDomain.
 
-Import ssrnum ssrint algC cyclotomic Num.Theory.
+Import ssrnum ssrint algC cyclotomic.
+Import Num.Theory Num.mc_1_7.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.
@@ -632,8 +633,8 @@ suffices /eqP/normC_sub_eq[t n1t [Dq Dz]]: `|q%:R - z| == `|q%:R| - `|z|.
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
   rewrite eqr_le ler_sub_dist andbT n1z normr_nat natrB //; apply: ler_trans.
-  rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod.
-  rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_pemulr //.
+  rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod (bigD1 (Ordinal n_gt1))
+          ?coprime1n //= !hornerE ler_pemulr ?normr_ge0 //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: ler_trans (ler_sub_dist _ _).
   by rewrite normr_nat normrX n1z expr1n ler_subr_addl (leC_nat 2).
