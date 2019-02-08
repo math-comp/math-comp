@@ -366,8 +366,7 @@ Canonical int_countIdomainType := [countIdomainType of int].
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
 
-Canonical int_normedType :=
-  Norm.Exports.NormedType int int (fun m => (absz m)%:Z).
+Canonical int_normedType := NormedType int int (fun m => (absz m)%:Z).
 
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
@@ -444,8 +443,7 @@ Canonical int_orderType := OrderType int intOrdered.lez_total.
 Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
 Canonical int_realDomainType := RealDomainType int intOrdered.lez_total.
 Canonical int_lmodType := LmodType int int (GRing.regular_lmodMixin _).
-Canonical int_normedModType :=
-  NormedModType int int (Num.numDomain_normedModMixin _).
+Canonical int_normedModType := NormedModType int int int_numDomainType.
 
 Section intOrderedTheory.
 

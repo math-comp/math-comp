@@ -96,7 +96,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory Num.Theory.
+Import GroupScope GRing.Theory Num.Theory Num.mc_1_7 Num.mc_1_7.Theory.
 Local Open Scope ring_scope.
 Delimit Scope cfun_scope with CF.
 
