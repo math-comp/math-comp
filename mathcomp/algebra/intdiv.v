@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrbool ssrfun eqtype ssrnat seq path div choice fintype tuple.
 From mathcomp
-Require Import finfun bigop prime order ssralg poly ssrnum ssrint rat.
+Require Import finfun bigop prime ssralg poly ssrnum ssrint rat.
 From mathcomp
 Require Import polydiv finalg perm zmodp matrix mxalgebra vector.
 
@@ -49,7 +49,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Order.Theory Num.Theory Num.mc_1_7.Theory.
+Import GRing.Theory Num.Theory Num.mc_1_7.Theory.
 Local Open Scope ring_scope.
 
 Definition divz (m d : int) :=
