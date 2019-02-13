@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
+Require Import ssrbool ssrfun eqtype ssrnat seq path div choice fintype.
 From mathcomp
-Require Import fintype tuple finfun bigop prime ssralg poly finset gproduct.
+Require Import tuple finfun bigop prime order ssralg poly finset gproduct.
 From mathcomp
 Require Import fingroup morphism perm automorphism quotient finalg action.
 From mathcomp
@@ -73,7 +73,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory Num.Theory Num.mc_1_7 Num.mc_1_7.Theory.
+Import Order.UnboundedTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation algCF := [fieldType of algC].
@@ -662,7 +662,7 @@ Lemma irr1_gt0 i : 0 < 'chi_i 1%g.
 Proof. by rewrite irr1_degree ltr0n irr_degree_gt0. Qed.
 
 Lemma irr1_neq0 i : 'chi_i 1%g != 0.
-Proof. by rewrite eqr_le ltr_geF ?irr1_gt0. Qed.
+Proof. by rewrite eq_le lt_geF ?irr1_gt0. Qed.
 
 Lemma irr_neq0 i : 'chi_i != 0.
 Proof. by apply: contraNneq (irr1_neq0 i) => ->; rewrite cfunE. Qed.
@@ -884,7 +884,7 @@ Lemma char1_eq0 chi : chi \is a character -> (chi 1%g == 0) = (chi == 0).
 Proof.
 case/char_sum_irr=> r ->; apply/idP/idP=> [|/eqP->]; last by rewrite cfunE.
 case: r => [|i r]; rewrite ?big_nil // sum_cfunE big_cons.
-rewrite paddr_eq0 ?sumr_ge0  => // [||j _]; rewrite 1?ltrW ?irr1_gt0 //.
+rewrite paddr_eq0 ?sumr_ge0  => // [||j _]; rewrite 1?ltW ?irr1_gt0 //.
 by rewrite (negbTE (irr1_neq0 i)).
 Qed.
 
@@ -1171,8 +1171,8 @@ have norm1_e j: `|e 0 j| = 1.
   by rewrite -normrX exp_e normr1.
 exists e; split=> //; first by exists B.
   rewrite cfRepr1 !cfunE Gx rGx mxtrace_mulC mulKVmx // mxtrace_diag.
-  split=> //=; apply: (ler_trans (ler_norm_sum _ _ _)).
-  by rewrite (eq_bigr _ (in1W norm1_e)) sumr_const card_ord lerr.
+  split=> //=; apply: (le_trans (ler_norm_sum _ _ _)).
+  by rewrite (eq_bigr _ (in1W norm1_e)) sumr_const card_ord lexx.
 rewrite !cfunE groupV !mulrb Gx rGx mxtrace_mulC mulKVmx //.
 rewrite -trace_map_mx map_diag_mx; set d' := diag_mx _.
 rewrite -[d'](mulKVmx unitB) mxtrace_mulC -[_ *m _](repr_mxK rG Gx) rGx.
@@ -1502,7 +1502,7 @@ Qed.
 Lemma max_cfRepr_mx1 n (rG : mx_representation algCF G n) x :
    x \in G -> cfRepr rG x = cfRepr rG 1%g -> rG x = 1%:M.
 Proof.
-move=> Gx kerGx; have [|c _ def_x] := @max_cfRepr_norm_scalar n rG x Gx.
+move=> Gx kerGx; have [|c _ def_x] := @ max_cfRepr_norm_scalar n rG x Gx.
   by rewrite kerGx cfRepr1 normr_nat.
 move/eqP: kerGx; rewrite cfRepr1 cfunE Gx {rG}def_x mxtrace_scalar.
 case: n => [_|n]; first by rewrite ![_%:M]flatmx0.
@@ -1563,7 +1563,7 @@ Lemma constt_ortho_char (phi psi : 'CF(G)) i j :
 Proof.
 move=> _ _ /constt_charP[//|phi1 Nphi1 ->] /constt_charP[//|psi1 Npsi1 ->].
 rewrite cfdot_irr; case: eqP => // -> /eqP/idPn[].
-rewrite cfdotDl !cfdotDr cfnorm_irr -addrA gtr_eqF ?ltr_paddr ?ltr01 //.
+rewrite cfdotDl !cfdotDr cfnorm_irr -addrA gt_eqF ?ltr_paddr ?ltr01 //.
 by rewrite Cnat_ge0 ?rpredD ?Cnat_cfdot_char ?irr_char.
 Qed.
 
@@ -1760,7 +1760,7 @@ Lemma constt_Res_trans j psi :
     psi \is a character -> j \in irr_constt psi -> 
   {subset irr_constt ('Res[H, G] 'chi_j) <= irr_constt ('Res[H] psi)}.
 Proof.
-move=> Npsi Cj i; apply: contraNneq; rewrite eqr_le => {1}<-.
+move=> Npsi Cj i; apply: contraNneq; rewrite eq_le => {1}<-.
 rewrite cfdot_Res_ge_constt ?Cnat_ge0 ?Cnat_cfdot_char_irr //.
 by rewrite cfRes_char ?irr_char.
 Qed.
@@ -2863,18 +2863,18 @@ by rewrite cfcenter_eq_center subsetIr.
 Qed.
 
 (* This is Isaacs (2.29). *)
-Lemma cfnorm_Res_lerif H phi :
+Lemma cfnorm_Res_leif H phi :
     H \subset G ->
   '['Res[H] phi] <= #|G : H|%:R * '[phi] ?= iff (phi \in 'CF(G, H)).
 Proof.
 move=> sHG; rewrite cfun_onE mulrCA natf_indexg // -mulrA mulKf ?neq0CG //.
 rewrite (big_setID H) (setIidPr sHG) /= addrC.
-rewrite (mono_lerif (ler_pmul2l _)) ?invr_gt0 ?gt0CG // -lerif_subLR -sumrB.
+rewrite (mono_leif (ler_pmul2l _)) ?invr_gt0 ?gt0CG // -leif_subLR -sumrB.
 rewrite big1 => [|x Hx]; last by rewrite !cfResE ?subrr.
 have ->: (support phi \subset H) = (G :\: H \subset [set x | phi x == 0]).
   rewrite subDset setUC -subDset; apply: eq_subset => x.
   by rewrite !inE (andb_idr (contraR _)) // => /cfun0->.
-rewrite (sameP subsetP forall_inP); apply: lerif_0_sum => x _.
+rewrite (sameP subsetP forall_inP); apply: leif_0_sum => x _.
 by rewrite !inE /<?=%R mul_conjC_ge0 eq_sym mul_conjC_eq0.
 Qed.
 
@@ -2883,7 +2883,7 @@ Lemma irr1_bound (i : Iirr G) :
   ('chi_i 1%g) ^+ 2 <= #|G : 'Z('chi_i)%CF|%:R
                     ?= iff ('chi_i \in 'CF(G, 'Z('chi_i)%CF)).
 Proof.
-congr (_ <= _ ?= iff _): (cfnorm_Res_lerif 'chi_i (cfcenter_sub 'chi_i)).
+congr (_ <= _ ?= iff _): (cfnorm_Res_leif 'chi_i (cfcenter_sub 'chi_i)).
   have [xi Lxi ->] := cfcenter_Res 'chi_i.
   have /irrP[j ->] := lin_char_irr Lxi; rewrite cfdotZl cfdotZr cfdot_irr eqxx.
   by rewrite mulr1 irr1_degree conjC_nat.
