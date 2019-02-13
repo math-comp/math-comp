@@ -46,7 +46,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Num.Theory Num.mc_1_7.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Definition divz (m d : int) :=
@@ -132,7 +132,7 @@ Qed.
 
 Lemma divzMDl q m d : d != 0 -> ((q * d + m) %/ d)%Z = q + (m %/ d)%Z.
 Proof.
-rewrite neqr_lt -oppr_gt0 => nz_d.
+rewrite neq_lt -oppr_gt0 => nz_d.
 wlog{nz_d} d_gt0: q d / d > 0; last case: d => // d in d_gt0 *.
   move=> IH; case/orP: nz_d => /IH// /(_  (- q)).
   by rewrite mulrNN !divzN -opprD => /oppr_inj.
@@ -179,8 +179,8 @@ Lemma divzMpl p m d : p > 0 -> (p * m %/ (p * d) = m %/ d)%Z.
 Proof.
 case: p => // p p_gt0; wlog d_gt0: d / d > 0; last case: d => // d in d_gt0 *.
   by move=> IH; case/intP: d => [|d|d]; rewrite ?mulr0 ?divz0 ?mulrN ?divzN ?IH.
-rewrite {1}(divz_eq m d) mulrDr mulrCA divzMDl ?mulf_neq0 ?gtr_eqF // addrC.
-rewrite divz_small ?add0r // PoszM pmulr_rge0 ?modz_ge0 ?gtr_eqF //=.
+rewrite {1}(divz_eq m d) mulrDr mulrCA divzMDl ?mulf_neq0 ?gt_eqF // addrC.
+rewrite divz_small ?add0r // PoszM pmulr_rge0 ?modz_ge0 ?gt_eqF //=.
 by rewrite ltr_pmul2l ?ltz_pmod.
 Qed.
 Arguments divzMpl [p m d].
@@ -203,20 +203,20 @@ Qed.
  
 Lemma ltz_ceil m d : d > 0 -> m < ((m %/ d)%Z + 1) * d.
 Proof.
-by case: d => // d d_gt0; rewrite mulrDl mul1r -ltr_subl_addl ltz_mod ?gtr_eqF.
+by case: d => // d d_gt0; rewrite mulrDl mul1r -ltr_subl_addl ltz_mod ?gt_eqF.
 Qed.
 
 Lemma ltz_divLR m n d : d > 0 -> ((m %/ d)%Z < n) = (m < n * d).
 Proof.
 move=> d_gt0; apply/idP/idP.
   by rewrite -[_ < n]lez_addr1 -(ler_pmul2r d_gt0);
-     apply: ltr_le_trans (ltz_ceil _ _).
-rewrite -(ltr_pmul2r d_gt0 _ n) //; apply: ler_lt_trans (lez_floor _ _).
-by rewrite gtr_eqF.
+     apply: lt_le_trans (ltz_ceil _ _).
+rewrite -(ltr_pmul2r d_gt0 _ n) //; apply: le_lt_trans (lez_floor _ _).
+by rewrite gt_eqF.
 Qed.
 
 Lemma lez_divRL m n d : d > 0 -> (m <= (n %/ d)%Z) = (m * d <= n).
-Proof. by move=> d_gt0; rewrite !lerNgt ltz_divLR. Qed.
+Proof. by move=> d_gt0; rewrite !leNgt ltz_divLR. Qed.
 
 Lemma divz_ge0 m d : d > 0 -> ((m %/ d)%Z >= 0) = (m >= 0).
 Proof. by case: d m => // d [] n d_gt0; rewrite (divz_nat, divNz_nat). Qed.
@@ -226,9 +226,9 @@ Proof.
 case: n => // [[|n]] _; first by rewrite mul0r !divz0 div0z.
 wlog p_gt0: p / p > 0; last case: p => // p in p_gt0 *.
   by case/intP: p => [|p|p] IH; rewrite ?mulr0 ?divz0 ?mulrN ?divzN // IH.
-rewrite {2}(divz_eq m (n.+1%:Z * p)) mulrA mulrAC !divzMDl // ?gtr_eqF //.
+rewrite {2}(divz_eq m (n.+1%:Z * p)) mulrA mulrAC !divzMDl // ?gt_eqF //.
 rewrite [rhs in _ + rhs]divz_small ?addr0 // ltz_divLR // divz_ge0 //.
-by rewrite mulrC ltz_pmod ?modz_ge0 ?gtr_eqF ?pmulr_lgt0.
+by rewrite mulrC ltz_pmod ?modz_ge0 ?gt_eqF ?pmulr_lgt0.
 Qed.
 
 Lemma modz_small m d : 0 <= m < d -> (m %% d)%Z = m.

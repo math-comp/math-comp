@@ -144,7 +144,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import GRing.Theory Order.Theory Order.Def Order.Syntax.
+Import Order.Theory Order.Def Order.Syntax GRing.Theory.
 
 Reserved Notation "<= y" (at level 35).
 Reserved Notation ">= y" (at level 35).
@@ -1205,14 +1205,6 @@ Qed.
 
 Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
-(* Duplication of ltW
-Lemma ltrW x y : x < y -> x <= y.
-*)
-
-(* Duplication of lexx
-Lemma lerr x : x <= x.
-*)
-
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
 Proof. by rewrite lt_def; case: eqP => // ->; rewrite lexx. Qed.
 
@@ -1353,14 +1345,6 @@ End ExtraDef.
 Notation bound := archi_bound.
 Notation sqrt := sqrtr.
 
-
-(* /!\ TODO Kazuhiko: REWRITE DIFFERENTLY *)
-(* - Everything only about 0, + and norm and order on R
-     should be for a normedModType R *)
-(* - Everything about only < and <= and meet and join should be 
-     removed or ported to order *)
-(* - Everything else should be for a numDomainType or substructure *)
-
 Module Theory.
 
 Section NumIntegralDomainTheory.
@@ -1379,35 +1363,15 @@ Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
 Definition normrM : {morph norm : x y / x * y : R} := @normrM R.
 Definition norm_scale V x (v : V) : `|x *: v| = `|x| * `|v| := norm_scale x v.
 Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := @ler_def R x y.
-(*
-Definition ltr_def x y : (x < y) = (y != x) && (x <= y) := @ltr_def R x y.
-*)
 
 (* Predicate definitions. *)
 
-(* Ported to order: geE, gtrE
-Lemma gerE x y : ge x y = (y <= x). Proof. by []. Qed.
-Lemma gtrE x y : gt x y = (y < x). Proof. by []. Qed.
-*)
 Lemma posrE x : (x \is pos) = (0 < x). Proof. by []. Qed.
 Lemma negrE x : (x \is neg) = (x < 0). Proof. by []. Qed.
 Lemma nnegrE x : (x \is nneg) = (0 <= x). Proof. by []. Qed.
 Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
-
-(* Duplication of lexx, ltxx, ltW, lt_neqAle, le_eqVlt
-Lemma lerr x : x <= x. Proof. exact: lerr. Qed.
-Lemma ltrr x : x < x = false. Proof. by rewrite ltr_def eqxx. Qed.
-Lemma ltrW x y : x < y -> x <= y. Proof. exact: ltrW. Qed.
-Hint Resolve lerr ltrr ltrW : core.
-
-Lemma ltr_neqAle x y : (x < y) = (x != y) && (x <= y).
-Proof. by rewrite ltr_def eq_sym. Qed.
-
-Lemma ler_eqVlt x y : (x <= y) = (x == y) || (x < y).
-Proof. by rewrite ltr_neqAle; case: eqP => // ->; rewrite lerr. Qed.
-*)
 
 Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. by rewrite lt_def. Qed.
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x). Proof. exact: le0r. Qed.
@@ -1417,14 +1381,6 @@ Proof. by rewrite lt0r; case/andP. Qed.
 
 Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0.
 Proof. by rewrite lt_neqAle; case/andP. Qed.
-
-(* Duplication of gt_eqF, lt_eqF
-Lemma gtr_eqF x y : y < x -> x == y = false.
-Proof. by rewrite ltr_def; case/andP; move/negPf=> ->. Qed.
-
-Lemma ltr_eqF x y : x < y -> x == y = false.
-Proof. by move=> hyx; rewrite eq_sym gtr_eqF. Qed.
-*)
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
 Proof. exact: pmulr_rgt0. Qed.
@@ -1517,7 +1473,6 @@ by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
 Qed.
 
 Lemma normr_ge0 v : 0 <= `|v|. Proof. by rewrite ger0_def normr_id. Qed.
-Hint Resolve normr_ge0 : core.
 
 Lemma normr_le0 v : `|v| <= 0 = (v == 0).
 Proof. by rewrite -normr_eq0 eq_le normr_ge0 andbT. Qed.
@@ -1558,79 +1513,10 @@ Definition subr_cp0 := (subr_lte0, subr_gte0).
 
 (* Ordered ring properties. *)
 
-(* Duplication of le_anti, eq_le, lt_trans, le_lt_trans, lt_le_trans, le_trans
-Lemma ler_asym : antisymmetric (<=%R : rel R).
-Proof.
-move=> x y; rewrite !ler_def distrC -opprB -addr_eq0 => /andP[/eqP->].
-by rewrite -mulr2n -mulr_natl mulf_eq0 subr_eq0 pnatr_eq0 => /eqP.
-Qed.
-
-Lemma eqr_le x y : (x == y) = (x <= y <= x).
-Proof. by apply/eqP/idP=> [->|/ler_asym]; rewrite ?lerr. Qed.
-
-Lemma ltr_trans : transitive (@ltr R).
-Proof.
-move=> y x z le_xy le_yz.
-by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 ?subr_gt0.
-Qed.
-
-Lemma ler_lt_trans y x z : x <= y -> y < z -> x < z.
-Proof. by rewrite !ler_eqVlt => /orP[/eqP -> //|/ltr_trans]; apply. Qed.
-
-Lemma ltr_le_trans y x z : x < y -> y <= z -> x < z.
-Proof. by rewrite !ler_eqVlt => lxy /orP[/eqP <- //|/(ltr_trans lxy)]. Qed.
-
-Lemma ler_trans : transitive (@ler R).
-Proof.
-move=> y x z; rewrite !ler_eqVlt => /orP [/eqP -> //|lxy].
-by move=> /orP [/eqP <-|/(ltr_trans lxy) ->]; rewrite ?lxy orbT.
-Qed.
-*)
-
 Definition lter01 := (ler01, ltr01).
-(* Ported to order: ltexx
-Definition lterr := (lerr, ltrr).
-*)
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof. exact: addr_ge0. Qed.
-
-(* Duplication of leifP
-Lemma lerifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
-Proof.
-rewrite /lerif ler_eqVlt; apply: (iffP idP)=> [|[]].
-  by case: C => [/eqP->|lxy]; rewrite ?eqxx // lxy ltr_eqF.
-by move=> /orP[/eqP->|lxy] <-; rewrite ?eqxx // ltr_eqF.
-Qed.
-*)
-
-(* Ported to order: lt_asym
-Lemma ltr_asym x y : x < y < x = false.
-Proof. by apply/negP=> /andP [/ltr_trans hyx /hyx]; rewrite ltrr. Qed.
-*)
-
-(* Duplication of le_anti, lt_le_asym, lte_anti, lt_geF, le_gtF, lt_gtF
-Lemma ler_anti : antisymmetric (@ler R).
-Proof. by move=> x y; rewrite -eqr_le=> /eqP. Qed.
-
-Lemma ltr_le_asym x y : x < y <= x = false.
-Proof. by rewrite ltr_neqAle -andbA -eqr_le eq_sym; case: (_ == _). Qed.
-
-Lemma ler_lt_asym x y : x <= y < x = false.
-Proof. by rewrite andbC ltr_le_asym. Qed.
-
-Definition lter_anti := (=^~ eqr_le, ltr_asym, ltr_le_asym, ler_lt_asym).
-
-Lemma ltr_geF x y : x < y -> (y <= x = false).
-Proof.
-by move=> xy; apply: contraTF isT=> /(ltr_le_trans xy); rewrite ltrr.
-Qed.
-
-Lemma ler_gtF x y : x <= y -> (y < x = false).
-Proof. by apply: contraTF=> /ltr_geF->. Qed.
-
-Definition ltr_gtF x y hxy := ler_gtF (@ltrW x y hxy).
-*)
 
 End NumIntegralDomainTheory.
 
@@ -3613,32 +3499,6 @@ Implicit Types x y z t : R.
 Lemma num_real x : x \is real. Proof. exact: num_real. Qed.
 Hint Resolve num_real : core.
 
-(* Duplication of le_total
-Lemma ler_total : total (@le R). Proof. by move=> x y; apply: real_leVge. Qed.
-*)
-
-(* Ported to order: lt_total, wlog_le, wlog_lt
-Lemma ltr_total x y : x != y -> (x < y) || (y < x).
-Proof. by rewrite !ltr_def [_ == y]eq_sym => ->; apply: ler_total. Qed.
-
-Lemma wlog_ler P :
-     (forall a b, P b a -> P a b) -> (forall a b, a <= b -> P a b) ->
-   forall a b : R, P a b.
-Proof. by move=> sP hP a b; apply: real_wlog_ler. Qed.
-
-Lemma wlog_ltr P :
-    (forall a, P a a) ->
-    (forall a b, (P b a -> P a b)) -> (forall a b, a < b -> P a b) ->
-  forall a b : R, P a b.
-Proof. by move=> rP sP hP a b; apply: real_wlog_ltr. Qed.
-*)
-
-(* Duplication of ltNge, leNgt
-Lemma ltrNge x y : (x < y) = ~~ (y <= x). Proof. exact: real_ltrNge. Qed.
-
-Lemma lerNgt x y : (x <= y) = ~~ (y < x). Proof. exact: real_lerNgt. Qed.
-*)
-
 Lemma lerP x y : ler_xor_gt x y `|x - y| `|y - x| (x <= y) (y < x).
 Proof. exact: real_leP. Qed.
 
@@ -3659,27 +3519,6 @@ Proof. exact: real_le0P. Qed.
 Lemma ltrgt0P x :
   comparer0 x `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof. exact: real_ltgt0P. Qed.
-
-(* Ported to order: neq_lt, eq_leLR, eq_leRL, eq_ltLR, eq_ltRL
-Lemma neqr_lt x y : (x != y) = (x < y) || (y < x).
-Proof. exact: real_neqr_lt. Qed.
-
-Lemma eqr_leLR x y z t :
-  (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
-Proof. by move=> *; apply/idP/idP; rewrite // !lerNgt; apply: contra. Qed.
-
-Lemma eqr_leRL x y z t :
-  (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y).
-Proof. by move=> *; symmetry; apply: eqr_leLR. Qed.
-
-Lemma eqr_ltLR x y z t :
-  (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t).
-Proof. by move=> *; rewrite !ltrNge; congr negb; apply: eqr_leLR. Qed.
-
-Lemma eqr_ltRL x y z t :
-  (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
-Proof. by move=> *; symmetry; apply: eqr_ltLR. Qed.
-*)
 
 (* sign *)
 
@@ -3922,33 +3761,6 @@ Section MinMax.
 Local Notation min := meet (only parsing).
 Local Notation max := join (only parsing).
 
-(* Duplication of meetC, meetxx, meet_idPl, meet_idPr,
-                  joinC, joinxx, join_idPr, join_idPl
-Lemma minrC : @commutative R R min.
-Proof. by move=> x y; rewrite /min; case: ltrgtP. Qed.
-
-Lemma minrr : @idempotent R min.
-Proof. by move=> x; rewrite /min if_same. Qed.
-
-Lemma minr_l x y : x <= y -> min x y = x.
-Proof. by rewrite /minr => ->. Qed.
-
-Lemma minr_r x y : y <= x -> min x y = y.
-Proof. by move/minr_l; rewrite minrC. Qed.
-
-Lemma maxrC : @commutative R R max.
-Proof. by move=> x y; rewrite /maxr; case: ltrgtP. Qed.
-
-Lemma maxrr : @idempotent R max.
-Proof. by move=> x; rewrite /max if_same. Qed.
-
-Lemma maxr_l x y : y <= x -> max x y = x.
-Proof. by move=> hxy; rewrite /max hxy. Qed.
-
-Lemma maxr_r x y : x <= y -> max x y = y.
-Proof. by move=> hxy; rewrite maxrC maxr_l. Qed.
-*)
-
 Lemma addr_min_max x y : min x y + max x y = x + y.
 Proof.
 case: (lerP x y)=> [| /ltW] hxy;
@@ -3965,35 +3777,6 @@ Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
 Lemma maxr_to_min x y : max x y = x + y - min x y.
 Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
 
-(* Duplication of meetA, meetCA, meetAC
-Lemma minrA x y z : min x (min y z) = min (min x y) z.
-Proof.
-rewrite /min; case: (lerP y z) => [hyz | /ltrW hyz].
-  by case: lerP => hxy; rewrite ?hyz // (@ler_trans _ y).
-case: lerP=> hxz; first by rewrite !(ler_trans hxz).
-case: (lerP x y)=> hxy; first by rewrite lerNgt hxz.
-by case: ltrgtP hyz.
-Qed.
-
-Lemma minrCA : @left_commutative R R min.
-Proof. by move=> x y z; rewrite !minrA [minr x y]minrC. Qed.
-
-Lemma minrAC : @right_commutative R R min.
-Proof. by move=> x y z; rewrite -!minrA [minr y z]minrC. Qed.
-*)
-
-(* Ported to order: leP, ltP
-Variant minr_spec x y : bool -> bool -> R -> Type :=
-| Minr_r of x <= y : minr_spec x y true false x
-| Minr_l of y < x : minr_spec x y false true y.
-
-Lemma minrP x y : minr_spec x y (x <= y) (y < x) (min x y).
-Proof.
-by case: lerP => hxy;
-  rewrite ?(meet_idPl hxy) ?(meet_idPr (ltW hxy)); constructor.
-Qed.
-*)
-
 Lemma oppr_max : {morph -%R : x y / max x y >-> min x y : R}.
 Proof.
 by move=> x y; case: leP; rewrite -lter_opp2 => hxy;
@@ -4002,86 +3785,6 @@ Qed.
 
 Lemma oppr_min : {morph -%R : x y / min x y >-> max x y : R}.
 Proof. by move=> x y; rewrite -[max _ _]opprK oppr_max !opprK. Qed.
-
-(* Duplication of joinA, joinCA, joinAC
-Lemma maxrA x y z : max x (max y z) = max (max x y) z.
-Proof. by apply/eqP; rewrite -eqr_opp !oppr_max minrA. Qed.
-
-Lemma maxrCA : @left_commutative R R max.
-Proof. by move=> x y z; rewrite !maxrA [maxr x y]maxrC. Qed.
-
-Lemma maxrAC : @right_commutative R R max.
-Proof. by move=> x y z; rewrite -!maxrA [maxr y z]maxrC. Qed.
-*)
-
-(* Ported to order: leP, ltP, eq_meetl, eq_meetr, eq_joinl, eq_joinr
-Variant maxr_spec x y : bool -> bool -> R -> Type :=
-| Maxr_r of y <= x : maxr_spec x y true false x
-| Maxr_l of x < y : maxr_spec x y false true y.
-
-Lemma maxrP x y : maxr_spec x y (y <= x) (x < y) (max x y).
-Proof.
-by case: lerP => hxy;
-  rewrite ?(join_idPr hxy) ?(join_idPl (ltW hxy)); constructor.
-Qed.
-
-Lemma eqr_minl x y : (min x y == x) = (x <= y).
-Proof. by case: minrP=> hxy; rewrite ?eqxx // ltr_eqF. Qed.
-
-Lemma eqr_minr x y : (min x y == y) = (y <= x).
-Proof. by rewrite minrC eqr_minl. Qed.
-
-Lemma eqr_maxl x y : (max x y == x) = (y <= x).
-Proof. by case: maxrP=> hxy; rewrite ?eqxx // eq_sym ltr_eqF. Qed.
-
-Lemma eqr_maxr x y : (max x y == y) = (x <= y).
-Proof. by rewrite maxrC eqr_maxl. Qed.
-*)
-
-(* Duplication of lexI
-Lemma ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z).
-Proof.
-case: minrP=> hyz.
-  by case: lerP=> hxy //; rewrite (ler_trans _ hyz).
-by case: lerP=> hxz; rewrite andbC // (ler_trans hxz) // ltrW.
-Qed.
-*)
-
-(* Ported to order: leIx_total, lexU_total
-Lemma ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x).
-Proof.
-by case: (leP y z) => hyz; case: leP => ?; rewrite /= ?(orbT, orbF) //;
-  apply/esym/negbTE; rewrite -ltNge;
-  [rewrite (@lt_le_trans _ _ y) | rewrite (@lt_trans _ _ z)].
-Qed.
-
-Lemma ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z).
-Proof. by rewrite -lter_opp2 oppr_max ler_minl !ler_opp2. Qed.
-*)
-
-(* Duplication of lexU
-Lemma ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x).
-Proof. by rewrite -lter_opp2 oppr_max ler_minr !ler_opp2. Qed.
-*)
-
-(* Ported to order: ltxI, ltIx, ltxU, ltUx, ltexI, lteIx, ltexU, lteUx
-Lemma ltr_minr x y z : (x < min y z) = (x < y) && (x < z).
-Proof. by rewrite !ltNge ler_minl negb_or. Qed.
-
-Lemma ltr_minl x y z : (min y z < x) = (y < x) || (z < x).
-Proof. by rewrite !ltrNge ler_minr negb_and. Qed.
-
-Lemma ltr_maxr x y z : (x < max y z) = (x < y) || (x < z).
-Proof. by rewrite !ltrNge ler_maxl negb_and. Qed.
-
-Lemma ltr_maxl x y z : (max y z < x) = (y < x) && (z < x).
-Proof. by rewrite !ltrNge ler_maxr negb_or. Qed.
-
-Definition lter_minr := (ler_minr, ltr_minr).
-Definition lter_minl := (ler_minl, ltr_minl).
-Definition lter_maxr := (ler_maxr, ltr_maxr).
-Definition lter_maxl := (ler_maxl, ltr_maxl).
-*)
 
 Lemma addr_minl : @left_distributive R R +%R min.
 Proof.
@@ -4098,33 +3801,6 @@ Qed.
 
 Lemma addr_maxr : @right_distributive R R +%R max.
 Proof. by move=> x y z; rewrite !(addrC x) addr_maxl. Qed.
-
-(* Duplication of meetUKC, joinKIC, joinIl, joinIr, meetUl, meetUr
-Lemma minrK x y : max (min x y) x = x.
-Proof. by case: minrP => hxy; rewrite ?maxrr ?maxr_r // ltrW. Qed.
-
-Lemma minKr x y : min y (max x y) = y.
-Proof. by case: maxrP => hxy; rewrite ?minrr ?minr_l. Qed.
-
-Lemma maxr_minl : @left_distributive R R max min.
-Proof.
-move=> x y z; case: minrP => hxy.
-  by case: maxrP => hm; rewrite minr_l // ler_maxr (hxy, lerr) ?orbT.
-by case: maxrP => hyz; rewrite minr_r // ler_maxr (ltrW hxy, lerr) ?orbT.
-Qed.
-
-Lemma maxr_minr : @right_distributive R R max min.
-Proof. by move=> x y z; rewrite maxrC maxr_minl ![_ _ x]maxrC. Qed.
-
-Lemma minr_maxl : @left_distributive R R min max.
-Proof.
-move=> x y z; rewrite -[min _ _]opprK !oppr_min [- max x y]oppr_max.
-by rewrite maxr_minl !(oppr_max, oppr_min, opprK).
-Qed.
-
-Lemma minr_maxr : @right_distributive R R min max.
-Proof. by move=> x y z; rewrite minrC minr_maxl ![_ _ x]minrC. Qed.
-*)
 
 Lemma minr_pmulr x y z : 0 <= x -> x * min y z = min (x * y) (x * z).
 Proof.
@@ -5205,8 +4881,8 @@ Notation le := ler (only parsing).
 Notation lt := ltr (only parsing).
 Notation ge := ger (only parsing).
 Notation gt := gtr (only parsing).
-Notation max := maxr (only parsing).
 Notation min := minr (only parsing).
+Notation max := maxr (only parsing).
 End Num.
 
 Module Theory.
@@ -5257,13 +4933,17 @@ Definition ltrW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y} :=
 Definition inj_homo_ltr :
   injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y} :=
   inj_homo_lt (f := f).
+Definition homo_inj_lt := inj_homo_ltr.
 Definition inj_nhomo_ltr :
   injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y} :=
   inj_nhomo_lt (f := f).
+Definition nhomo_inj_lt := inj_nhomo_ltr.
 Definition incr_inj : {mono f : x y / x <= y} -> injective f :=
   inc_inj (f := f).
+Definition mono_inj := incr_inj.
 Definition decr_inj : {mono f : x y /~ x <= y} -> injective f :=
   dec_inj (f := f).
+Definition nmono_inj := decr_inj.
 Definition lerW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y} :=
   leW_mono (f := f).
 Definition lerW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y} :=
@@ -5279,16 +4959,20 @@ Definition inj_homo_ltr_in :
   {in D & D', injective f} -> {in D & D', {homo f : x y / x <= y}} ->
   {in D & D', {homo f : x y / x < y}} :=
   inj_homo_lt_in (f := f).
+Definition homo_inj_in_lt := inj_homo_ltr_in.
 Definition inj_nhomo_ltr_in :
     {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
   {in D & D', {homo f : x y /~ x < y}} :=
   inj_nhomo_lt_in (f := f).
+Definition nhomo_inj_in_lt := inj_nhomo_ltr_in.
 Definition incr_inj_in :
   {in D &, {mono f : x y / x <= y}} -> {in D &, injective f} :=
   inc_inj_in (f := f).
+Definition mono_inj_in := incr_inj_in.
 Definition decr_inj_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f} :=
   dec_inj_in (f := f).
+Definition nmono_inj_in := decr_inj_in.
 Definition lerW_mono_in :
   {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}} :=
   leW_mono_in (f := f).
@@ -5302,37 +4986,47 @@ Definition ltnrW_homo :
   {homo f : m n / (m < n)%N >-> m < n} ->
   {homo f : m n / (m <= n)%N >-> m <= n} :=
   ltW_homo (f := f).
+Definition ltn_ltrW_homo := ltnrW_homo.
 Definition ltnrW_nhomo :
   {homo f : m n / (n < m)%N >-> m < n} ->
   {homo f : m n / (n <= m)%N >-> m <= n} :=
   ltW_nhomo (f := f).
+Definition ltn_ltrW_nhomo := ltnrW_nhomo.
 Definition inj_homo_ltnr : injective f ->
   {homo f : m n / (m <= n)%N >-> m <= n} ->
   {homo f : m n / (m < n)%N >-> m < n} :=
   inj_homo_lt (f := f).
+Definition homo_inj_ltn_lt := inj_homo_ltnr.
 Definition inj_nhomo_ltnr : injective f ->
   {homo f : m n / (n <= m)%N >-> m <= n} ->
   {homo f : m n / (n < m)%N >-> m < n} :=
   inj_nhomo_lt (f := f).
+Definition nhomo_inj_ltn_lt := inj_nhomo_ltnr.
 Definition incnr_inj :
   {mono f : m n / (m <= n)%N >-> m <= n} -> injective f :=
   inc_inj (f := f).
-Definition decnr_inj_inj :
+Definition leq_mono_inj := incnr_inj.
+Definition decnr_inj :
   {mono f : m n / (n <= m)%N >-> m <= n} -> injective f :=
   dec_inj (f := f).
+Definition leq_nmono_inj := decnr_inj.
 Definition lenrW_mono : {mono f : m n / (m <= n)%N >-> m <= n} ->
   {mono f : m n / (m < n)%N >-> m < n} :=
   leW_mono (f := f).
+Definition leq_lerW_mono := lenrW_mono.
 Definition lenrW_nmono : {mono f : m n / (n <= m)%N >-> m <= n} ->
   {mono f : m n / (n < m)%N >-> m < n} :=
   leW_nmono (f := f).
+Definition leq_lerW_nmono := lenrW_nmono.
 Definition lenr_mono : {homo f : m n / (m < n)%N >-> m < n} ->
    {mono f : m n / (m <= n)%N >-> m <= n} :=
   le_mono (f := f).
+Definition homo_leq_mono := lenr_mono.
 Definition lenr_nmono :
   {homo f : m n / (n < m)%N >-> m < n} ->
   {mono f : m n / (n <= m)%N >-> m <= n} :=
   le_nmono (f := f).
+Definition nhomo_leq_mono := lenr_nmono.
 Definition ltnrW_homo_in :
   {in D & D', {homo f : m n / (m < n)%N >-> m < n}} ->
   {in D & D', {homo f : m n / (m <= n)%N >-> m <= n}} :=
@@ -5531,14 +5225,18 @@ Variables (R : realDomainType) (R' : numDomainType) (D : pred R).
 Variables (f : R -> R') (f' : R -> nat).
 Definition ler_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y} :=
   le_mono (f := f).
+Definition homo_mono := ler_mono.
 Definition ler_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y} :=
   le_nmono (f := f).
+Definition nhomo_mono := ler_nmono.
 Definition ler_mono_in :
   {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}} :=
   le_mono_in (f := f).
+Definition homo_mono_in := ler_mono_in.
 Definition ler_nmono_in :
   {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}} :=
   le_nmono_in (f := f).
+Definition nhomo_mono_in := ler_nmono_in.
 Definition lern_mono :
   {homo f' : m n / m < n >-> (m < n)%N} ->
   {mono f' : m n / m <= n >-> (m <= n)%N} :=

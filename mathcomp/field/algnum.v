@@ -41,7 +41,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Num.Theory Num.mc_1_7.Theory.
+Import GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation ZtoQ := (intr : int -> rat).
