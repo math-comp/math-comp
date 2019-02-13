@@ -2400,9 +2400,6 @@ Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
 
 (* interaction with lattice operations *)
 
-Definition lexI_total := @lexI _ T.
-Definition leUx_total := @leUx _ T.
-
 Lemma leIx_total x y z : (meet y z <= x) = (y <= x) || (z <= x).
 Proof.
 by case: (leP y z) => hyz; case: leP => ?;
@@ -2429,10 +2426,10 @@ Proof. by rewrite !ltNge leUx negb_and. Qed.
 Lemma ltUx x y z : (join y z < x) = (y < x) && (z < x).
 Proof. by rewrite !ltNge lexU_total negb_or. Qed.
 
-Definition ltexI := (lexI_total, ltxI).
+Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx_total, ltIx).
 Definition ltexU := (lexU_total, ltxU).
-Definition lteUx := (leUx_total, ltxU).
+Definition lteUx := (@leUx _ T, ltUx).
 
 End TotalTheory.
 End TotalTheory.
@@ -3167,7 +3164,7 @@ Export CTBLatticeSyntax.
 Export ReverseSyntax.
 End Syntax.
 
-Module Theory.
+Module UnboundedTheory.
 Export ReversePOrder.
 Export POrderTheory.
 Export TotalTheory.
@@ -3176,24 +3173,30 @@ Export TotalMonotonyTheory.
 Export ReverseLattice.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
-Export BLatticeTheory.
-Export CBLatticeTheory.
-Export ReverseTBLattice.
-Export TBLatticeTheory.
-Export CTBLatticeTheory.
 Export NatOrder.
 Export SeqLexPOrder.
 
 Export POrder.Exports.
 Export Total.Exports.
 Export Lattice.Exports.
+Export FinPOrder.Exports.
+Export FinTotal.Exports.
+Export FinLattice.Exports.
+End UnboundedTheory.
+
+Module Theory.
+Export UnboundedTheory.
+
+Export BLatticeTheory.
+Export CBLatticeTheory.
+Export ReverseTBLattice.
+Export TBLatticeTheory.
+Export CTBLatticeTheory.
+
 Export BLattice.Exports.
 Export CBLattice.Exports.
 Export TBLattice.Exports.
 Export CTBLattice.Exports.
-Export FinPOrder.Exports.
-Export FinTotal.Exports.
-Export FinLattice.Exports.
 Export FinBLattice.Exports.
 Export FinCBLattice.Exports.
 Export FinTBLattice.Exports.
