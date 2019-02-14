@@ -471,7 +471,7 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normK_ exprn_ge0 ?normr_ge0.
+by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normK_ exprn_ge0.
 Qed.
 
 Definition porderMixin : porderMixin eqType :=
@@ -970,9 +970,7 @@ by rewrite pnatr_eq0 ler1n lt0n.
 Qed.
 
 Lemma sqr_Cint_ge1 x : x \in Cint -> x != 0 -> 1 <= x ^+ 2.
-Proof.
-by move=> Zx nz_x; rewrite -Cint_normK // expr_ge1 ?normr_ge0 ?norm_Cint_ge1.
-Qed.
+Proof. by move=> Zx nz_x; rewrite -Cint_normK // expr_ge1 ?norm_Cint_ge1. Qed.
 
 Lemma Cint_ler_sqr x : x \in Cint -> x <= x ^+ 2.
 Proof.
