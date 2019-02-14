@@ -618,7 +618,7 @@ Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr ?normr_ge0 //.
+rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
@@ -790,8 +790,7 @@ Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn rmorph_sign. Qed.
 
 Lemma ratr_norm x : ratr F `|x| = `|ratr F x|.
 Proof.
-rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm //.
-by rewrite ler0q ?normr_ge0.
+by rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm ?ler0q.
 Qed.
 
 End InPrealField.

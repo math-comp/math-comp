@@ -124,7 +124,7 @@ Lemma rat_algebraic_archimedean (C : numFieldType) (QtoC : Qmorphism C) :
   integralRange QtoC -> Num.archimedean_axiom C.
 Proof.
 move=> algC x.
-without loss x_ge0: x / 0 <= x by rewrite -normr_id; apply; apply: normr_ge0.
+without loss x_ge0: x / 0 <= x by rewrite -normr_id; apply.
 have [-> | nz_x] := eqVneq x 0; first by exists 1%N; rewrite normr0.
 have [p mon_p px0] := algC x; exists (\sum_(j < size p) `|numq p`_j|)%N.
 rewrite ger0_norm // real_ltNge ?rpred_nat ?ger0_real //.
@@ -138,7 +138,7 @@ apply: lt_le_trans; rewrite mulrDl mul1r ltr_spaddr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
   by rewrite rpredN rpredM ?rpred_rat ?rpredX // ger0_real.
-rewrite normrN normrM ler_pmul ?normr_ge0 //.
+rewrite normrN normrM ler_pmul //.
   rewrite normf_div -!intr_norm -!abszE ler_pimulr ?ler0n //.
   by rewrite invf_le1 ?ler1n ?ltr0n ?absz_gt0 ?denq_eq0.
 rewrite normrX ger0_norm ?(ltrW x_gt0) // ler_weexpn2l ?leq_ord //.
@@ -194,7 +194,7 @@ have Dm: m%:R = `|y * a%:~R + N%:R|.
 have ltr_Qnat n1 n2 : (n1%:R < n2%:R :> rat = _) := ltr_nat _ n1 n2.
 have ub_y: `|y * a%:~R| < N%:R.
   apply: le_lt_trans (archi_boundP (normr_ge0 _)); rewrite !normrM.
-  by rewrite ler_pmul ?normr_ge0 // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
+  by rewrite ler_pmul // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
 apply/mapP; exists m.
   rewrite mem_iota /= add0n -addnn -ltr_Qnat Dm natrD.
   by rewrite (le_lt_trans (ler_norm_add _ _)) // normr_nat ltr_add2r.
@@ -457,9 +457,9 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite -/d => qa1_le0 qb1_ge0 le_ab1 [/= le_aa1 le_b1b] Dab1 le_a1c le_cb1.
     have /MuP lbMu: c \in itv ab.
       by rewrite !inE (le_trans le_aa1) ?(le_trans le_cb1).
-    have Mu_ge0: 0 <= Mu by rewrite (le_trans _ lbMu) ?normr_ge0.
+    have Mu_ge0: 0 <= Mu by rewrite (le_trans _ lbMu).
     have Mdq_ge0: 0 <= Mdq.
-      by rewrite (le_trans _ (MdqP 0 _)) ?normr_ge0 ?normr0.
+      by rewrite (le_trans _ (MdqP 0 _)) ?normr0.
     suffices lb1 a2 b2 (ab1 := (a1, b1)) (ab2 := (a2, b2)) :
       xup q ab2 /\ sub_itv ab2 ab1 -> q.[b2] - q.[a2] <= Mdq * wid ab1.
     + apply: le_lt_trans (_ : Mu * Mdq * wid (a1, b1) < h2); last first.
@@ -467,7 +467,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
         rewrite (lt_le_trans (archi_boundP _)) ?mulr_ge0 ?ltr_nat // -/n.
         rewrite ler_pdivl_mull ?ltr0n // -natrM ler_nat.
         by case: n => // n; rewrite expnS leq_pmul2l // ltn_expl.
-      rewrite -mulrA hornerM normrM ler_pmul ?normr_ge0 //.
+      rewrite -mulrA hornerM normrM ler_pmul //.
       have [/ltW qc_le0 | qc_ge0] := ltrP q.[c] 0.
         by apply: le_trans (lb1 c b1 _); rewrite ?ler0_norm ?ler_paddl.
       by apply: le_trans (lb1 a1 c _); rewrite ?ger0_norm ?ler_paddr ?oppr_ge0.
@@ -483,9 +483,9 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     apply: le_trans (_ : `|dq.[h] * h| <= _); last first.
       by rewrite normrM ler_pmul ?normr_ge0 ?MdqP // ?ger0_norm ?ler_sub ?h_ge0.
     rewrite horner_poly ger0_norm ?mulr_ge0 ?sumr_ge0 // => [|j _]; last first.
-      by rewrite mulr_ge0 ?exprn_ge0 // (le_trans _ (MqPx1 _)) ?normr_ge0.
+      by rewrite mulr_ge0 ?exprn_ge0 // (le_trans _ (MqPx1 _)).
     rewrite mulr_suml ler_sum // => j _; rewrite normrM -mulrA -exprSr.
-    by rewrite ler_pmul ?normr_ge0 // normrX ger0_norm.
+    by rewrite ler_pmul // normrX ger0_norm.
   have [ab0 xab0]: {ab | xup (p ^ QxR) ab}.
     have /monic_Cauchy_bound[b pb_gt0]: p ^ QxR \is monic by apply: monic_map.
     by exists (0, `|b|); rewrite /xup normr_ge0 p0_le0 ltW ?pb_gt0 ?ler_norm.
@@ -510,7 +510,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite ltr_pdivr_mulr // -(ltr_add2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
     rewrite ?(le_lt_trans (ler_norm_add _ _)) ?ltr_le_add ?ub_rp //.
-    by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM ?normr_ge0.
+    by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM.
   have ab_le m n: (m <= n)%N -> (ab_ n).2 \in Iab_ m.
     move/subnKC=> <-; move: {n}(n - m)%N => n; rewrite /ab_.
     have /(findP m)[/(findP n)[[_ _]]] := xab0.

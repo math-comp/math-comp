@@ -1524,7 +1524,8 @@ Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R V v}.
-Hint Resolve @ler01 @ltr01 ltr0Sn ler0n normr_ge0 : core.
+Hint Resolve @ler01 @ltr01 ltr0Sn ler0n : core.
+Hint Extern 0 (is_true (0 <= norm _)) => exact: normr_ge0 : core.
 
 Section NumDomainOperationTheory.
 
@@ -2724,7 +2725,7 @@ Qed.
 
 (* norm + add *)
 
-Lemma normr_real x : `|x| \is real. Proof. apply/ger0_real/normr_ge0. Qed.
+Lemma normr_real x : `|x| \is real. Proof. by apply/ger0_real. Qed.
 Hint Resolve normr_real : core.
 
 Lemma ler_norm_sum I r (G : I -> R) (P : pred I):
@@ -2829,10 +2830,10 @@ Qed.
 Definition real_lter_normr :=  (real_ler_normr, real_ltr_normr).
 
 Lemma ler_nnorml x y : y < 0 -> `|x| <= y = false.
-Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h)/normr_ge0. Qed.
+Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h). Qed.
 
 Lemma ltr_nnorml x y : y <= 0 -> `|x| < y = false.
-Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h)/normr_ge0. Qed.
+Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h). Qed.
 
 Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
 
@@ -3021,7 +3022,7 @@ Lemma normr_sg x : `|sg x| = (x != 0)%:R.
 Proof. by rewrite sgr_def -mulr_natr normrMsign normr_nat. Qed.
 
 Lemma sgr_norm x : sg `|x| = (x != 0)%:R.
-Proof. by rewrite /sg le_gtF ?normr_ge0 // normr_eq0 mulrb if_neg. Qed.
+Proof. by rewrite /sg le_gtF // normr_eq0 mulrb if_neg. Qed.
 
 (* leif *)
 
@@ -3175,7 +3176,7 @@ Lemma poly_disk_bound p b : {ub | forall x, `|x| <= b -> `|p.[x]| <= ub}.
 Proof.
 exists (\sum_(j < size p) `|p`_j| * b ^+ j) => x le_x_b.
 rewrite horner_coef (le_trans (ler_norm_sum _ _ _)) ?ler_sum // => j _.
-rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in ?normr_ge0 //.
+rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in //.
 exact: le_trans (normr_ge0 x) le_x_b.
 Qed.
 
@@ -3471,8 +3472,8 @@ have [q Dp]: {q | forall x, x != 0 -> p.[x] = (a - q.[x^-1] / x) * x ^+ n}.
   by rewrite exprB ?unitfE // -exprVn mulrA mulrAC exprSr mulrA.
 have [b ub_q] := poly_disk_bound q 1; exists (b / `|a| + 1) => x px0.
 have b_ge0: 0 <= b by rewrite (le_trans (normr_ge0 q.[1])) ?ub_q ?normr1.
-have{b_ge0} ba_ge0: 0 <= b / `|a| by rewrite divr_ge0 ?normr_ge0.
-rewrite real_leNgt ?rpredD ?rpred1 ?ger0_real ?normr_ge0 //.
+have{b_ge0} ba_ge0: 0 <= b / `|a| by rewrite divr_ge0.
+rewrite real_leNgt ?rpredD ?rpred1 ?ger0_real //.
 apply: contraL px0 => lb_x; rewrite rootE.
 have x_ge1: 1 <= `|x| by rewrite (le_trans _ (ltW lb_x)) // ler_paddl.
 have nz_x: x != 0 by rewrite -normr_gt0 (lt_le_trans ltr01).
@@ -3871,14 +3872,14 @@ have [p_le1 | p_gt1] := leqP (size p) 1.
   by rewrite -[p`_0]lead_coefC -size1_polyC // mon_p ltr01.
 pose lb := \sum_(j < n.+1) `|p`_j|; exists (lb + 1) => x le_ub_x.
 have x_ge1: 1 <= x; last have x_gt0 := lt_le_trans ltr01 x_ge1.
-  by rewrite -(ler_add2l lb) ler_paddl ?sumr_ge0 // => j _; apply: normr_ge0.
+  by rewrite -(ler_add2l lb) ler_paddl ?sumr_ge0 // => j _.
 rewrite horner_coef -(subnK p_gt1) -/n addnS big_ord_recr /= addn1.
 rewrite [in p`__]subnSK // subn1 -lead_coefE mon_p mul1r -ltr_subl_addl sub0r.
 apply: le_lt_trans (_ : lb * x ^+ n < _); last first.
   rewrite exprS ltr_pmul2r ?exprn_gt0 ?(ltr_le_trans ltr01) //.
   by rewrite -(ltr_add2r 1) ltr_spaddr ?ltr01.
 rewrite -sumrN mulr_suml ler_sum // => j _; apply: le_trans (ler_norm _) _.
-rewrite normrN normrM ler_wpmul2l ?normr_ge0 // normrX.
+rewrite normrN normrM ler_wpmul2l // normrX.
 by rewrite ger0_norm ?(ltW x_gt0) // ler_weexpn2l ?leq_ord.
 Qed.
 
@@ -4060,9 +4061,8 @@ Variant rootC_spec n (x : C) : Type :=
 
 Fact rootC_subproof n x : rootC_spec n x.
 Proof.
-have realRe2 u : Re2 u \is Num.real.
-  rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK.
-  by rewrite exprn_ge0 ?normr_ge0.
+have realRe2 u : Re2 u \is Num.real by
+  rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK exprn_ge0.
 have argCle_total : total argCle.
   move=> u v; rewrite /total /argCle.
   by do 2!case: (nnegIm _) => //; rewrite ?orbT //= real_leVge.
@@ -4105,7 +4105,7 @@ Let nz2 : 2%:R != 0 :> C. Proof. by rewrite pnatr_eq0. Qed.
 Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
 
 Lemma mul_conjC_ge0 x : 0 <= x * x^*.
-Proof. by rewrite -normCK exprn_ge0 ?normr_ge0. Qed.
+Proof. by rewrite -normCK exprn_ge0. Qed.
 
 Lemma mul_conjC_gt0 x : (0 < x * x^*) = (x != 0).
 Proof.
@@ -4193,10 +4193,7 @@ Lemma neq0Ci : 'i != 0 :> C.
 Proof. by apply: contraNneq nonRealCi => ->; apply: real0. Qed.
 
 Lemma normCi : `|'i| = 1 :> C.
-Proof.
-apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) ?normr_ge0 //.
-by rewrite -normrX sqrCi normrN1.
-Qed.
+Proof. by apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) // -normrX sqrCi normrN1. Qed.
 
 Lemma invCi : 'i^-1 = - 'i :> C.
 Proof. by rewrite -div1r -[1]opprK -sqrCi mulNr mulfK ?neq0Ci. Qed.
@@ -4326,7 +4323,7 @@ Qed.
 
 Lemma leif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
 Proof.
-rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE normr_ge0.
+rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE.
 rewrite normCK conj_Creal // normC2_Re_Im -expr2.
 rewrite addrC -leif_subLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
 by apply: leif_eq; rewrite -realEsqr.
@@ -4470,8 +4467,7 @@ Qed.
 Lemma norm_rootC n x : `|n.-root x| = n.-root `|x|.
 Proof.
 have [-> | n_gt0] := posnP n; first by rewrite !root0C normr0.
-apply/eqP; rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 ?normr_ge0 //.
-by rewrite -normrX !rootCK.
+by apply/eqP; rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 // -normrX !rootCK.
 Qed.
 
 Lemma rootCX n x k : (n > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
@@ -4521,7 +4517,7 @@ have nx_gt0: 0 < n.-root x by rewrite rootC_gt0.
 have Rnx: n.-root x \is real by rewrite ger0_real ?ltW.
 apply: eqC_semipolar; last 1 first; try apply/eqP.
 - by rewrite ImMl // !(Im_rootC_ge0, mulr_ge0, rootC_ge0).
-- by rewrite -(eqr_expn2 n_gt0) ?normr_ge0 // -!normrX exprMn !rootCK.
+- by rewrite -(eqr_expn2 n_gt0) // -!normrX exprMn !rootCK.
 rewrite eq_le; apply/andP; split; last first.
   rewrite rootC_Re_max ?exprMn ?rootCK ?ImMl //.
   by rewrite mulr_ge0 ?Im_rootC_ge0 ?ltW.
@@ -4593,7 +4589,7 @@ by rewrite leI0x -oppr_ge0 -raddfN -defNx Im_rootC_ge0.
 Qed.
 
 Lemma normC_def x : `|x| = sqrtC (x * x^*).
-Proof. by rewrite -normCK sqrCK ?normr_ge0. Qed.
+Proof. by rewrite -normCK sqrCK. Qed.
 
 Lemma norm_conjC x : `|x^*| = `|x|.
 Proof. by rewrite !normC_def conjCK mulrC. Qed.
@@ -4664,7 +4660,7 @@ Lemma normC_sum_upper (I : finType) (P : pred I) (F G : I -> C) :
    forall i, P i -> F i = G i.
 Proof.
 set sumF := \sum_(i | _) _; set sumG := \sum_(i | _) _ => leFG eq_sumFG.
-have posG i: P i -> 0 <= G i by move/leFG; apply: le_trans; apply: normr_ge0.
+have posG i: P i -> 0 <= G i by move/leFG; apply: le_trans.
 have norm_sumG: `|sumG| = sumG by rewrite ger0_norm ?sumr_ge0.
 have norm_sumF: `|sumF| = \sum_(i | P i) `|F i|.
   apply/eqP; rewrite eq_le ler_norm_sum eq_sumFG norm_sumG -subr_ge0 -sumrB.
