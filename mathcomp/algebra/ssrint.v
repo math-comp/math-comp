@@ -413,10 +413,10 @@ Qed.
 Fact lez_total m n : lez m n || lez n m.
 Proof. by move: m n => [] m [] n //=; apply: leq_total. Qed.
 
-Fact normzN m : `|- m| = `|m|.
+Fact normzN m : norm (- m) = norm m.
 Proof. by case: m => // -[]. Qed.
 
-Fact gez0_norm m : lez 0 m -> `|m| = m.
+Fact gez0_norm m : lez 0 m -> norm m = m.
 Proof. by case: m. Qed.
 
 Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).

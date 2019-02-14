@@ -346,6 +346,7 @@ Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
 Definition Rreal_keyed := KeyedQualifier Rreal_key.
 (* Decide whether this should stay: *)
 (* Definition ler_of_leif x y C (le_xy : @lerif R x y C) := le_xy.1 : le x y. *)
+Definition le_of_leif' := le_of_leif.
 End Keys. End Keys.
 
 (* (Exported) symbolic syntax. *)
@@ -407,6 +408,8 @@ Canonical Rpos_keyed.
 Canonical Rneg_keyed.
 Canonical Rnneg_keyed.
 Canonical Rreal_keyed.
+
+Coercion le_of_leif' : leif >-> is_true.
 
 End Syntax.
 
@@ -4857,10 +4860,31 @@ End RealMixins.
 
 End RealMixin.
 
+End Num.
+
+Export Norm.Exports.
+Export Num.NumDomain.Exports Num.NormedModule.Exports.
+Export Num.NumField.Exports Num.ClosedField.Exports.
+Export Num.RealDomain.Exports Num.RealField.Exports.
+Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
+Export Num.Syntax Num.PredInstances.
+
+Notation RealLePoMixin := Num.RealMixin.LePo.
+Notation RealLtPoMixin := Num.RealMixin.LtPo.
+Notation RealLeMixin := Num.RealMixin.Le.
+Notation RealLtMixin := Num.RealMixin.Lt.
+Notation RealLeAxiom R := (Num.RealMixin.Real (Phant R) (erefl _)).
+Notation RealLeTotal R := (Num.RealMixin.Total (Phant R) (erefl _)).
+Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
+
 (* compatibility module *)
 Module mc_1_7.
+Module OrigNum := Num.
+Module Num.
+Export OrigNum.
 
 Module Import Def.
+Export OrigNum.Def.
 Notation normr := norm (only parsing).
 Notation ler := le (only parsing).
 Notation ltr := lt (only parsing).
@@ -4871,7 +4895,6 @@ Notation minr := meet (only parsing).
 Notation maxr := join (only parsing).
 End Def.
 
-Module Num.
 Notation norm := normr (only parsing).
 Notation le := ler (only parsing).
 Notation lt := ltr (only parsing).
@@ -4879,10 +4902,13 @@ Notation ge := ger (only parsing).
 Notation gt := gtr (only parsing).
 Notation min := minr (only parsing).
 Notation max := maxr (only parsing).
-End Num.
+
+Module Import Syntax.
+Notation "`| x |" := (@norm _ (@Num.NumDomain.normedType _) x) : ring_scope.
+End Syntax.
 
 Module Theory.
-Import Num.Theory.
+Export OrigNum.Theory.
 
 Section NumIntegralDomainTheory.
 Variable R : numDomainType.
@@ -5330,21 +5356,7 @@ Arguments nmono_lerif [R f C].
 
 End Theory.
 
+End Num.
 End mc_1_7.
 
-End Num.
-
-Export Norm.Exports.
-Export Num.NumDomain.Exports Num.NormedModule.Exports.
-Export Num.NumField.Exports Num.ClosedField.Exports.
-Export Num.RealDomain.Exports Num.RealField.Exports.
-Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
-Export Num.Syntax Num.PredInstances.
-
-Notation RealLePoMixin := Num.RealMixin.LePo.
-Notation RealLtPoMixin := Num.RealMixin.LtPo.
-Notation RealLeMixin := Num.RealMixin.Le.
-Notation RealLtMixin := Num.RealMixin.Lt.
-Notation RealLeAxiom R := (Num.RealMixin.Real (Phant R) (erefl _)).
-Notation RealLeTotal R := (Num.RealMixin.Total (Phant R) (erefl _)).
-Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
+Export mc_1_7 mc_1_7.Num.Syntax.
