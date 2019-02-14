@@ -1025,7 +1025,7 @@ Proof. by move=> Gx; rewrite -lin_charX // expg_order lin_char1. Qed.
 
 Lemma normC_lin_char x : x \in G -> `|xi x| = 1.
 Proof.
-move=> Gx; apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) ?normr_ge0 //.
+move=> Gx; apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) //.
 by rewrite -normrX // lin_char_unity_root ?normr1.
 Qed.
 
@@ -1167,8 +1167,7 @@ have exp_e j: e 0 j ^+ #[x] = 1.
   rewrite expgS repr_mxM ?groupX // {1}rGx -!mulmxA mulKVmx //.
   by rewrite mul_diag_mx mulmxA [M in _ = M]mxE -IHn exprS {1}mxE eqxx.
 have norm1_e j: `|e 0 j| = 1.
-  apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) ?normr_ge0 //.
-  by rewrite -normrX exp_e normr1.
+  by apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) // -normrX exp_e normr1.
 exists e; split=> //; first by exists B.
   rewrite cfRepr1 !cfunE Gx rGx mxtrace_mulC mulKVmx // mxtrace_diag.
   split=> //=; apply: (le_trans (ler_norm_sum _ _ _)).

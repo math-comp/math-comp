@@ -312,11 +312,11 @@ have [|nz_a] := boolP (alpha == 0).
 have: beta != 0 by rewrite Dbeta; apply/prodf_neq0 => nu _; rewrite fmorph_eq0.
 move/(norm_Cint_ge1 Zbeta); rewrite lt_geF //; apply: le_lt_trans a_lt1.
 rewrite -[`|alpha|]mulr1 Dbeta (bigD1 1%g) ?group1 //= -Da.
-case: (gQnC _) => /= _ <-; rewrite gal_id normrM.
-rewrite -subr_ge0 -mulrBr mulr_ge0 ?normr_ge0 // Da subr_ge0.
+case: (gQnC _) => /= _ <-.
+rewrite gal_id normrM -subr_ge0 -mulrBr mulr_ge0 // Da subr_ge0.
 elim/big_rec: _ => [|nu c _]; first by rewrite normr1 lexx.
 apply: le_trans; rewrite -subr_ge0 -{1}[`|c|]mul1r normrM -mulrBl.
-by rewrite mulr_ge0 ?normr_ge0 // subr_ge0 norm_a_nu.
+by rewrite mulr_ge0 // subr_ge0 norm_a_nu.
 Qed.
 
 End GringIrrMode.
@@ -683,7 +683,7 @@ have{pi1 Zpi1} pi2_ge1: 1 <= pi2.
   by rewrite Cint_normK // sqr_Cint_ge1 //; apply/prodf_neq0.
 have Sgt0: (#|S| > 0)%N by rewrite (cardD1 g) [g \in S]Sg.
 rewrite -mulr_natr -ler_pdivl_mulr ?ltr0n //.
-have n2chi_ge0 s: s \in S -> 0 <= `|chi s| ^+ 2 by rewrite exprn_ge0 ?normr_ge0.
+have n2chi_ge0 s: s \in S -> 0 <= `|chi s| ^+ 2 by rewrite exprn_ge0.
 rewrite -(expr_ge1 Sgt0); last by rewrite divr_ge0 ?ler0n ?sumr_ge0.
 by rewrite (le_trans pi2_ge1) // leif_AGM.
 Qed.
@@ -694,7 +694,7 @@ Theorem nonlinear_irr_vanish gT (G : {group gT}) i :
 Proof.
 move=> chi1gt1; apply/exists_eq_inP; apply: contraFT (lt_geF chi1gt1).
 rewrite negb_exists_in => /forall_inP-nz_chi.
-rewrite -(norm_Cnat (Cnat_irr1 i)) -(@expr_le1 _ 2) ?normr_ge0 //.
+rewrite -(norm_Cnat (Cnat_irr1 i)) -(@expr_le1 _ 2) //.
 rewrite -(ler_add2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
 rewrite (cfnormE (cfun_onG _)) mulVKf ?neq0CG // (big_setD1 1%g) //=.
 rewrite addrCA ler_add2l (cardsD1 1%g) group1 mulrS ler_add2l.
