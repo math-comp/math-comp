@@ -473,9 +473,11 @@ Notation ">< x" := (fun y => ~~ (comparable x y)) : order_scope.
 Notation ">< x :> T" := (>< (x : T)) (only parsing) : order_scope.
 Notation "x >< y" := (~~ (comparable x y)) : order_scope.
 
-Coercion le_of_leif : leif >-> is_true.
-
 End POSyntax.
+
+Module POCoercions.
+Coercion le_of_leif : leif >-> is_true.
+End POCoercions.
 
 Module Lattice.
 Section ClassDef.
@@ -2131,18 +2133,20 @@ rewrite !leEmeet; apply/idP/idP => [/eqP<-|/andP[/eqP<- /eqP<-]].
 by rewrite -[X in X `&` _]meetA meetIK meetA.
 Qed.
 
-Lemma leIx x y z : (y <= x) || (z <= x) -> y `&` z <= x.
-Proof.
-rewrite !leEmeet => /orP [/eqP <-|/eqP <-].
-  by rewrite -meetA meetACA meetxx meetAC.
-by rewrite -meetA meetIK.
-Qed.
+Lemma leIxl x y z : y <= x -> y `&` z <= x.
+Proof. by rewrite !leEmeet meetAC => /eqP ->. Qed.
+
+Lemma leIxr x y z : z <= x -> y `&` z <= x.
+Proof. by rewrite !leEmeet -meetA => /eqP ->. Qed.
+
+Lemma leIx2 x y z : (y <= x) || (z <= x) -> y `&` z <= x.
+Proof. by case/orP => [/leIxl|/leIxr]. Qed.
 
 Lemma leIr x y : y `&` x <= x.
-Proof. by rewrite leIx ?lexx ?orbT. Qed.
+Proof. by rewrite leIx2 ?lexx ?orbT. Qed.
 
 Lemma leIl x y : x `&` y <= x.
-Proof. by rewrite leIx ?lexx ?orbT. Qed.
+Proof. by rewrite leIx2 ?lexx ?orbT. Qed.
 
 Lemma meet_idPl {x y} : reflect (x `&` y = x) (x <= y).
 Proof. by rewrite leEmeet; apply/eqP. Qed.
@@ -2161,7 +2165,7 @@ Lemma eq_meetr x y : (x `&` y == y) = (y <= x).
 Proof. by rewrite meetC eq_meetl. Qed.
 
 Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
-Proof. by move=> xz yt; rewrite lexI !leIx ?xz ?yt ?orbT //. Qed.
+Proof. by move=> xz yt; rewrite lexI !leIx2 ?xz ?yt ?orbT //. Qed.
 
 End LatticeTheoryMeet.
 End LatticeTheoryMeet.
@@ -2197,8 +2201,12 @@ Proof. exact: (@meetIKC _ [latticeType of L^r]). Qed.
 (* interaction with order *)
 Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
 Proof. exact: (@lexI _ [latticeType of L^r]). Qed.
-Lemma lexU x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx _ [latticeType of L^r]). Qed.
+Lemma lexUl x y z : x <= y -> x <= y `|` z.
+Proof. exact: (@leIxl _ [latticeType of L^r]). Qed.
+Lemma lexUr x y z : x <= z -> x <= y `|` z.
+Proof. exact: (@leIxr _ [latticeType of L^r]). Qed.
+Lemma lexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
+Proof. exact: (@leIx2 _ [latticeType of L^r]). Qed.
 
 Lemma leUr x y : x <= y `|` x.
 Proof. exact: (@leIr _ [latticeType of L^r]). Qed.
@@ -2400,22 +2408,22 @@ Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
 
 (* interaction with lattice operations *)
 
-Lemma leIx_total x y z : (meet y z <= x) = (y <= x) || (z <= x).
+Lemma leIx x y z : (meet y z <= x) = (y <= x) || (z <= x).
 Proof.
 by case: (leP y z) => hyz; case: leP => ?;
-  rewrite ?(orbT, orbF) //=; apply/esym/negbTE; rewrite -ltNge;
-  [rewrite (lt_le_trans _ hyz) | rewrite (lt_trans _ hyz)].
+  rewrite ?(orbT, orbF) //=; apply/esym/negbTE;
+  rewrite -ltNge ?(lt_le_trans _ hyz) ?(lt_trans _ hyz).
 Qed.
 
-Lemma lexU_total x y z : (x <= join y z) = (x <= y) || (x <= z).
+Lemma lexU x y z : (x <= join y z) = (x <= y) || (x <= z).
 Proof.
 by case: (leP y z) => hyz; case: leP => ?;
-  rewrite ?(orbT, orbF) //=; apply/esym/negbTE; rewrite -ltNge;
-  [rewrite (le_lt_trans hyz) | rewrite (lt_trans hyz)].
+  rewrite ?(orbT, orbF) //=; apply/esym/negbTE;
+  rewrite -ltNge ?(le_lt_trans hyz) ?(lt_trans hyz).
 Qed.
 
 Lemma ltxI x y z : (x < meet y z) = (x < y) && (x < z).
-Proof. by rewrite !ltNge leIx_total negb_or. Qed.
+Proof. by rewrite !ltNge leIx negb_or. Qed.
 
 Lemma ltIx x y z : (meet y z < x) = (y < x) || (z < x).
 Proof. by rewrite !ltNge lexI negb_and. Qed.
@@ -2424,11 +2432,11 @@ Lemma ltxU x y z : (x < join y z) = (x < y) || (x < z).
 Proof. by rewrite !ltNge leUx negb_and. Qed.
 
 Lemma ltUx x y z : (join y z < x) = (y < x) && (z < x).
-Proof. by rewrite !ltNge lexU_total negb_or. Qed.
+Proof. by rewrite !ltNge lexU negb_or. Qed.
 
 Definition ltexI := (@lexI _ T, ltxI).
-Definition lteIx := (leIx_total, ltIx).
-Definition ltexU := (lexU_total, ltxU).
+Definition lteIx := (leIx, ltIx).
+Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
 
 End TotalTheory.
@@ -2522,7 +2530,7 @@ Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
 
 Lemma lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
 Proof.
-move=> xz0; apply/idP/idP=> xy; last by rewrite lexU ?xy.
+move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
 by apply: (@leU2l_le x z); rewrite ?joinxx.
 Qed.
 
@@ -2554,7 +2562,7 @@ Canonical join_comoid := Monoid.ComLaw (@joinC _ _).
 
 Lemma join_sup (I : finType) (j : I) (P : pred I) (F : I -> L) :
    P j -> F j <= \join_(i | P i) F i.
-Proof. by move=> Pj; rewrite (bigD1 j) //= lexU ?lexx. Qed.
+Proof. by move=> Pj; rewrite (bigD1 j) //= lexU2 ?lexx. Qed.
 
 Lemma join_min (I : finType) (j : I) (l : L) (P : pred I) (F : I -> L) :
    P j -> l <= F j -> l <= \join_(i | P i) F i.
@@ -2577,7 +2585,7 @@ move=> AsubB; rewrite -(setID B A).
 rewrite [X in _ <= X](eq_bigl [predU B :&: A & B :\: A]); last first.
   by move=> i; rewrite !inE.
 rewrite bigU //=; last by rewrite -setI_eq0 setDE setIACA setICr setI0.
-by rewrite lexU // (setIidPr _) // lexx.
+by rewrite lexU2 // (setIidPr _) // lexx.
 Qed.
 
 Lemma joins_setU (I : finType) (A B : {set I}) (F : I -> L) :
@@ -2585,7 +2593,7 @@ Lemma joins_setU (I : finType) (A B : {set I}) (F : I -> L) :
 Proof.
 apply/eqP; rewrite eq_le leUx !le_joins ?subsetUl ?subsetUr ?andbT //.
 apply/joinsP => i; rewrite inE; move=> /orP.
-by case=> ?; rewrite lexU //; [rewrite join_sup|rewrite orbC join_sup].
+by case=> ?; rewrite lexU2 //; [rewrite join_sup|rewrite orbC join_sup].
 Qed.
 
 Lemma join_seq (I : finType) (r : seq I) (F : I -> L) :
@@ -2595,7 +2603,7 @@ rewrite [RHS](eq_bigl (mem [set i | i \in r])); last by move=> i; rewrite !inE.
 elim: r => [|i r ihr]; first by rewrite big_nil big1 // => i; rewrite ?inE.
 rewrite big_cons {}ihr; apply/eqP; rewrite eq_le set_cons.
 rewrite leUx join_sup ?inE ?eqxx // le_joins //= ?subsetUr //.
-apply/joinsP => j; rewrite !inE => /predU1P [->|jr]; rewrite ?lexU ?lexx //.
+apply/joinsP => j; rewrite !inE => /predU1P [->|jr]; rewrite ?lexU2 ?lexx //.
 by rewrite join_sup ?orbT ?inE.
 Qed.
 
@@ -2811,7 +2819,7 @@ Lemma joinBIC y x : (x `\` y) `|` (y `&` x) = x.
 Proof. by rewrite meetC joinBI. Qed.
 
 Lemma leBx x y : x `\` y <= x.
-Proof. by rewrite -{2}[x](joinIB y) lexU // lexx orbT. Qed.
+Proof. by rewrite -{2}[x](joinIB y) lexU2 // lexx orbT. Qed.
 Hint Resolve leBx.
 
 Lemma subxx x : x `\` x = 0.
@@ -2861,7 +2869,7 @@ Proof. by rewrite ![_ `|` x]joinC ![_ `&` x]meetC joinxB. Qed.
 
 Lemma leBr z x y : x <= y -> z `\` y <= z `\` x.
 Proof.
-by move=> lexy; rewrite leBLR joinxB (meet_idPr _) ?leBUK ?leUr ?lexU ?lexy.
+by move=> lexy; rewrite leBLR joinxB (meet_idPr _) ?leBUK ?leUr ?lexU2 ?lexy.
 Qed.
 
 Lemma leB2 x y z t : x <= z -> t <= y -> x `\` y <= z `\` t.
@@ -2885,7 +2893,7 @@ Proof. by rewrite eq_le leBLR leBRL andbCA andbA. Qed.
 Lemma subxU x y z : z `\` (x `|` y) = (z `\` x) `&` (z `\` y).
 Proof.
 apply/eqP; rewrite eq_le lexI !leBr ?leUl ?leUr //=.
-rewrite leBRL leIx ?leBx //= meetUr meetAC subIK -meetA subIK.
+rewrite leBRL leIx2 ?leBx //= meetUr meetAC subIK -meetA subIK.
 by rewrite meet0x meetx0 joinx0.
 Qed.
 
@@ -3228,6 +3236,7 @@ Export ReverseSyntax.
 End Syntax.
 
 Module UnboundedTheory.
+Export POCoercions.
 Export ReversePOrder.
 Export POrderTheory.
 Export TotalTheory.
