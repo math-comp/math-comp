@@ -344,7 +344,6 @@ Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
 Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
 Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
 Definition Rreal_keyed := KeyedQualifier Rreal_key.
-Definition le_of_leif' := le_of_leif.
 End Keys. End Keys.
 
 (* (Exported) symbolic syntax. *)
@@ -407,7 +406,7 @@ Canonical Rneg_keyed.
 Canonical Rnneg_keyed.
 Canonical Rreal_keyed.
 
-Coercion le_of_leif' : leif >-> is_true.
+Export Order.POCoercions.
 
 End Syntax.
 
@@ -3861,7 +3860,7 @@ Variable p : {poly R}.
 Lemma poly_itv_bound a b : {ub | forall x, a <= x <= b -> `|p.[x]| <= ub}.
 Proof.
 have [ub le_p_ub] := poly_disk_bound p (`|a| `|` `|b|).
-exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // lexU_total !ler_normr.
+exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // lexU !ler_normr.
 by have [_|_] := ler0P x; rewrite ?ler_opp2 ?le_a_x ?le_x_b orbT.
 Qed.
 
@@ -5302,10 +5301,8 @@ Definition eqr_minr x y : (min x y == y) = (y <= x) := eq_meetr x y.
 Definition eqr_maxl x y : (max x y == x) = (y <= x) := eq_joinl x y.
 Definition eqr_maxr x y : (max x y == y) = (x <= y) := eq_joinr x y.
 Definition ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z) := lexI x y z.
-Definition ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x) :=
-  leIx_total x y z.
-Definition ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z) :=
-  lexU_total x y z.
+Definition ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x) := leIx x y z.
+Definition ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z) := lexU x y z.
 Definition ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x) := leUx y z x.
 Definition ltr_minr x y z : (x < min y z) = (x < y) && (x < z) := ltxI x y z.
 Definition ltr_minl x y z : (min y z < x) = (y < x) || (z < x) := ltIx x y z.

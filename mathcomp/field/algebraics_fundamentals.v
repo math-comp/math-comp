@@ -505,7 +505,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have [M Mgt0 ubM]: {M | 0 < M & {in Iab_ n, forall a, `|r.2.[a]| <= M}}.
       have [M ubM] := poly_itv_bound r.2 (ab_ n).1 (ab_ n).2.
       exists (1 `|` M) => [|s /ubM vM]; first by rewrite ltxU ltr01.
-      by rewrite lexU_total orbC vM.
+      by rewrite lexU orbC vM.
     exists (h2 / M) => [|a xn_a]; first by rewrite divr_gt0 ?invr_gt0 ?ltr0n.
     rewrite ltr_pdivr_mulr // -(ltr_add2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
