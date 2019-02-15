@@ -3039,6 +3039,69 @@ End CTBLatticeTheory.
 End CTBLatticeTheory.
 
 (*************)
+(* FACTORIES *)
+(*************)
+
+Module LeMixin.
+Section LeMixin.
+Variable (T : eqType).
+
+Record of_ := Build {
+  le : rel T;
+  le_refl  : reflexive     le;
+  le_anti  : antisymmetric le;
+  le_trans : transitive    le
+}.
+
+Coercion porderMixin (m : of_) :=
+   POrderMixin (fun _ _ => erefl) (@le_refl m) (@le_anti m) (@le_trans m).
+
+End LeMixin.
+
+Module Exports.
+Notation leMixin := of_.
+Notation LeMixin := Build.
+End Exports.
+
+End LeMixin.
+
+Module LtMixin.
+Section LtMixin.
+Variable (T : eqType).
+
+Record of_ := Build {
+  lt : rel T;
+  lt_irr  : irreflexive    lt;
+  lt_asym  : forall x y, ~~ ((lt x y) && (lt y x));
+  lt_trans : transitive  lt
+}.
+
+Section InMixin.
+Variable (m : of_).
+
+Definition le x y := (x == y) || (lt m x y).
+
+Lemma lt_eq x y : lt m x y = (x != y) && le x y.
+Admitted.
+
+Lemma le_refl  : reflexive     le. Admitted.
+Lemma le_anti  : antisymmetric le. Admitted.
+Lemma le_trans : transitive    le. Admitted.
+End InMixin.
+
+Coercion porderMixin (m : of_) :=
+   @POrderMixin _ (le m) (lt m) (@lt_eq m) (@le_refl m) (@le_anti m) (@le_trans m).
+
+End LtMixin.
+
+Module Exports.
+Notation ltMixin := of_.
+Notation LtMixin := Build.
+End Exports.
+
+End LtMixin.
+
+(*************)
 (* INSTANCES *)
 (*************)
 

@@ -346,8 +346,6 @@ Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
 Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
 Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
 Definition Rreal_keyed := KeyedQualifier Rreal_key.
-(* Decide whether this should stay: *)
-(* Definition ler_of_leif x y C (le_xy : @lerif R x y C) := le_xy.1 : le x y. *)
 Definition le_of_leif' := le_of_leif.
 End Keys. End Keys.
 
