@@ -419,24 +419,20 @@ Proof. by case: m => // -[]. Qed.
 Fact gez0_norm m : lez 0 m -> norm m = m.
 Proof. by case: m. Qed.
 
-Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).
+Fact ltz_def m n : (ltz m n) = (m != n) && (lez m n).
 Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
 
-Definition PoMixin :=
-  RealLePoMixin lez_add lez_anti subz_ge0 (lez_total 0) ltz_def.
-
-Definition Mixin : Num.mixin_of PoMixin norm :=
+Definition Mixin : realLeMixin int_iDomain :=
   RealLeMixin
     lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
 
 End intOrdered.
 End intOrdered.
 
-Canonical int_porderType := POrderType ring_display int intOrdered.PoMixin.
-Canonical int_latticeType :=
-  LatticeType int (Order.TotalLattice.Mixin intOrdered.lez_total).
+Canonical int_porderType := POrderType ring_display int intOrdered.Mixin.
+Canonical int_latticeType := LatticeType int intOrdered.Mixin.
 Canonical int_orderType := OrderType int intOrdered.lez_total.
 Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
 Canonical int_realDomainType := RealDomainType int intOrdered.lez_total.

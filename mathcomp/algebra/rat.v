@@ -565,29 +565,24 @@ rewrite ge_rat0; case: ratP=> [] // n d cnd n_ge0.
 by rewrite /normq /= normr_num_div ?ger0_norm // divq_num_den.
 Qed.
 
-Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
-Proof. by rewrite /lt_rat lt_def rat_eq. Qed.
+Fact lt_rat_def x y : (lt_rat x y) = (x != y) && (le_rat x y).
+Proof. by rewrite /lt_rat lt_def rat_eq eq_sym. Qed.
 
 Canonical rat_normedType := NormedType rat rat normq.
 
-Definition ratPoMixin :=
-  RealLePoMixin le_rat0D le_rat0_anti subq_ge0 (@le_rat_total 0) lt_rat_def.
-
-Definition ratLeMixin : Num.mixin_of ratPoMixin norm :=
+Definition ratLeMixin : realLeMixin rat_iDomain :=
   RealLeMixin le_rat0D le_rat0M le_rat0_anti subq_ge0
               (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
-Canonical rat_porderType := POrderType ring_display rat ratPoMixin.
-Canonical rat_latticeType :=
-  LatticeType rat (Order.TotalLattice.Mixin le_rat_total).
+Canonical rat_porderType := POrderType ring_display rat ratLeMixin.
+Canonical rat_latticeType := LatticeType rat ratLeMixin.
 Canonical rat_orderType := OrderType rat le_rat_total.
 Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
 Canonical rat_numFieldType := [numFieldType of rat].
 Canonical rat_realDomainType := RealDomainType rat le_rat_total.
 Canonical rat_realFieldType := [realFieldType of rat].
 Canonical rat_lmodType := LmodType rat rat (GRing.regular_lmodMixin _).
-Canonical rat_normedModType :=
-  NormedModType rat rat rat_numDomainType.
+Canonical rat_normedModType := NormedModType rat rat rat_numDomainType.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
 Proof.
