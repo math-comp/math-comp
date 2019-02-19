@@ -1744,7 +1744,7 @@ Lemma lt_nsym x y : x < y -> y < x -> False.
 Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
 
 Lemma lt_asym x y : x < y < x = false.
-Proof. by apply/negP => /andP []; apply lt_nsym. Qed.
+Proof. by apply/negP => /andP []; apply: lt_nsym. Qed.
 
 Lemma le_gtF x y: x <= y -> y < x = false.
 Proof.
@@ -2041,9 +2041,6 @@ Canonical reverse_porderType :=
 End ReversePOrder.
 End ReversePOrder.
 
-Definition LePOrderMixin T le rle ale tle :=
-   @POrderMixin T le _ (fun _ _ => erefl) rle ale tle.
-
 Module Import ReverseLattice.
 Section ReverseLattice.
 Context {display : unit}.
@@ -2261,77 +2258,6 @@ Proof. by move=> /lcomparable_ltgtP [->|xy|/ltW xy]; constructor => //. Qed.
 End LatticeTheoryJoin.
 End LatticeTheoryJoin.
 
-Module TotalLattice.
-Section TotalLattice.
-Import POrderDef.
-Context {display : unit}.
-Local Notation porderType := (porderType display).
-Context {T : porderType}.
-Implicit Types (x y z : T).
-Hypothesis le_total : total (<=%O : rel T).
-
-Fact comparableT x y : x >=< y. Proof. exact: le_total. Qed.
-Hint Resolve comparableT.
-
-Fact ltgtP x y :
-  comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
-Proof. exact: comparable_ltgtP. Qed.
-
-Fact leP x y : le_xor_gt x y (x <= y) (y < x).
-Proof. exact: comparable_leP. Qed.
-
-Fact ltP x y : lt_xor_ge x y (y <= x) (x < y).
-Proof. exact: comparable_ltP. Qed.
-
-Definition meet x y := if x <= y then x else y.
-Definition join x y := if y <= x then x else y.
-
-Fact meetC : commutative meet.
-Proof. by move=> x y; rewrite /meet; have [] := ltgtP. Qed.
-
-Fact joinC : commutative join.
-Proof. by move=> x y; rewrite /join; have [] := ltgtP. Qed.
-
-Fact meetA : associative meet.
-Proof.
-move=> x y z; rewrite /meet; case: (leP y z) => yz; case: (leP x y) => xy //=.
-- by rewrite (le_trans xy).
-- by rewrite yz.
-by rewrite !lt_geF // (lt_trans yz).
-Qed.
-
-Fact joinA : associative join.
-Proof.
-move=> x y z; rewrite /join; case: (leP z y) => yz; case: (leP y x) => xy //=.
-- by rewrite (le_trans yz).
-- by rewrite yz.
-by rewrite !lt_geF // (lt_trans xy).
-Qed.
-
-Fact joinKI y x : meet x (join x y) = x.
-Proof. by rewrite /meet /join; case: (leP y x) => yx; rewrite ?lexx ?ltW. Qed.
-
-Fact meetKU y x : join x (meet x y) = x.
-Proof. by rewrite /meet /join; case: (leP x y) => yx; rewrite ?lexx ?ltW. Qed.
-
-Fact leEmeet x y : (x <= y) = (meet x y == x).
-Proof. by rewrite /meet; case: leP => ?; rewrite ?eqxx ?lt_eqF. Qed.
-
-Fact meetUl : left_distributive meet join.
-Proof.
-move=> x y z; rewrite /meet /join.
-case: (leP y z) => yz; case: (leP y x) => xy //=; first 1 last.
-- by rewrite yz [x <= z](le_trans _ yz) ?[x <= y]ltW // lt_geF.
-- by rewrite lt_geF ?lexx // (lt_le_trans yz).
-- by rewrite lt_geF //; have [->|/lt_geF->|] := (ltgtP x z); rewrite ?lexx.
-- by have [] := (leP x z); rewrite ?xy ?yz.
-Qed.
-
-Definition Mixin := LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
-
-End TotalLattice.
-End TotalLattice.
-
 Module TotalTheory.
 Section TotalTheory.
 Context {display : unit}.
@@ -2376,7 +2302,7 @@ Lemma wlog_lt P :
   forall x y, P x y.
 Proof.
 move=> rP sP hP x y; case hxy: (x < y); first by apply/hP.
-case hxy': (x == y); first by move/eqP: hxy' => <-; apply rP.
+case hxy': (x == y); first by move/eqP: hxy' => <-; apply: rP.
 by apply/sP/hP; rewrite lt_def leNgt hxy hxy'.
 Qed.
 
@@ -3050,64 +2976,357 @@ End CTBLatticeTheory.
 (* FACTORIES *)
 (*************)
 
-Module LeMixin.
-Section LeMixin.
+Module TotalLattice.
+Section TotalLattice.
+Import POrderDef.
+Context {display : unit}.
+Local Notation porderType := (porderType display).
+Context {T : porderType}.
+Implicit Types (x y z : T).
+Hypothesis le_total : total (<=%O : rel T).
+
+Fact comparableT x y : x >=< y. Proof. exact: le_total. Qed.
+Hint Resolve comparableT.
+
+Fact ltgtP x y :
+  comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
+Proof. exact: comparable_ltgtP. Qed.
+
+Fact leP x y : le_xor_gt x y (x <= y) (y < x).
+Proof. exact: comparable_leP. Qed.
+
+Fact ltP x y : lt_xor_ge x y (y <= x) (x < y).
+Proof. exact: comparable_ltP. Qed.
+
+Definition meet x y := if x <= y then x else y.
+Definition join x y := if y <= x then x else y.
+
+Fact meetC : commutative meet.
+Proof. by move=> x y; rewrite /meet; have [] := ltgtP. Qed.
+
+Fact joinC : commutative join.
+Proof. by move=> x y; rewrite /join; have [] := ltgtP. Qed.
+
+Fact meetA : associative meet.
+Proof.
+move=> x y z; rewrite /meet; case: (leP y z) => yz; case: (leP x y) => xy //=.
+- by rewrite (le_trans xy).
+- by rewrite yz.
+by rewrite !lt_geF // (lt_trans yz).
+Qed.
+
+Fact joinA : associative join.
+Proof.
+move=> x y z; rewrite /join; case: (leP z y) => yz; case: (leP y x) => xy //=.
+- by rewrite (le_trans yz).
+- by rewrite yz.
+by rewrite !lt_geF // (lt_trans xy).
+Qed.
+
+Fact joinKI y x : meet x (join x y) = x.
+Proof. by rewrite /meet /join; case: (leP y x) => yx; rewrite ?lexx ?ltW. Qed.
+
+Fact meetKU y x : join x (meet x y) = x.
+Proof. by rewrite /meet /join; case: (leP x y) => yx; rewrite ?lexx ?ltW. Qed.
+
+Fact leEmeet x y : (x <= y) = (meet x y == x).
+Proof. by rewrite /meet; case: leP => ?; rewrite ?eqxx ?lt_eqF. Qed.
+
+Fact meetUl : left_distributive meet join.
+Proof.
+move=> x y z; rewrite /meet /join.
+case: (leP y z) => yz; case: (leP y x) => xy //=; first 1 last.
+- by rewrite yz [x <= z](le_trans _ yz) ?[x <= y]ltW // lt_geF.
+- by rewrite lt_geF ?lexx // (lt_le_trans yz).
+- by rewrite lt_geF //; have [->|/lt_geF->|] := (ltgtP x z); rewrite ?lexx.
+- by have [] := (leP x z); rewrite ?xy ?yz.
+Qed.
+
+Definition Mixin :=
+  LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
+
+End TotalLattice.
+End TotalLattice.
+
+Module LePOrderMixin.
+Section LePOrderMixin.
 Variable (T : eqType).
 
 Record of_ := Build {
   le : rel T;
-  le_refl  : reflexive     le;
+  lt : rel T;
+  le_refl  : reflexive le;
   le_anti  : antisymmetric le;
-  le_trans : transitive    le
+  le_trans : transitive le;
+  lt_def   : forall x y, lt x y = (x != y) && le x y;
 }.
 
-Coercion porderMixin (m : of_) :=
-   POrderMixin (fun _ _ => erefl) (@le_refl m) (@le_anti m) (@le_trans m).
+Definition porderMixin (m : of_) : porderMixin T :=
+   POrderMixin (@lt_def m) (@le_refl m) (@le_anti m) (@le_trans m).
 
-End LeMixin.
+End LePOrderMixin.
 
 Module Exports.
-Notation leMixin := of_.
-Notation LeMixin := Build.
+Notation lePOrderMixin := of_.
+Notation LePOrderMixin := Build.
+Coercion porderMixin : lePOrderMixin >-> POrder.mixin_of.
 End Exports.
 
-End LeMixin.
+End LePOrderMixin.
+Import LePOrderMixin.Exports.
 
-Module LtMixin.
-Section LtMixin.
+Module LtPOrderMixin.
+Section LtPOrderMixin.
 Variable (T : eqType).
 
 Record of_ := Build {
+  le : rel T;
   lt : rel T;
-  lt_irr  : irreflexive    lt;
-  lt_asym  : forall x y, ~~ ((lt x y) && (lt y x));
-  lt_trans : transitive  lt
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive lt;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
 }.
 
-Section InMixin.
 Variable (m : of_).
 
-Definition le x y := (x == y) || (lt m x y).
+Fact lt_asym x y : (lt m x y && lt m y x) = false.
+Proof.
+by apply/negP => /andP [] xy /(lt_trans xy); apply/negP; rewrite (lt_irr m x).
+Qed.
 
-Lemma lt_eq x y : lt m x y = (x != y) && le x y.
-Admitted.
+Fact lt_def x y : lt m x y = (x != y) && le m x y.
+Proof. by rewrite le_def; case: eqP => //= ->; rewrite lt_irr. Qed.
 
-Lemma le_refl  : reflexive     le. Admitted.
-Lemma le_anti  : antisymmetric le. Admitted.
-Lemma le_trans : transitive    le. Admitted.
-End InMixin.
+Fact le_refl : reflexive (le m).
+Proof. by move=> ?; rewrite le_def eqxx. Qed.
 
-Coercion porderMixin (m : of_) :=
-   @POrderMixin _ (le m) (lt m) (@lt_eq m) (@le_refl m) (@le_anti m) (@le_trans m).
+Fact le_anti : antisymmetric (le m).
+Proof. by move=> ??; rewrite !le_def eq_sym -orb_andr lt_asym orbF => /eqP. Qed.
 
-End LtMixin.
+Fact le_trans : transitive (le m).
+Proof.
+by move=> y x z; rewrite !le_def => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
+  rewrite ?ltxy ?(lt_trans ltxy ltyz) // ?orbT.
+Qed.
+
+Definition porderMixin : porderMixin T :=
+   @POrderMixin _ (le m) (lt m) lt_def le_refl le_anti le_trans.
+
+End LtPOrderMixin.
 
 Module Exports.
-Notation ltMixin := of_.
-Notation LtMixin := Build.
+Notation ltPOrderMixin := of_.
+Notation LtPOrderMixin := Build.
+Coercion porderMixin : ltPOrderMixin >-> POrder.mixin_of.
 End Exports.
 
-End LtMixin.
+End LtPOrderMixin.
+Import LtPOrderMixin.Exports.
+
+Module MeetJoinMixin.
+
+Record of_ (display : unit) (T : choiceType) := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  meetC : commutative meet;
+  joinC : commutative join;
+  meetA : associative meet;
+  joinA : associative join;
+  joinKI : forall y x : T, meet x (join x y) = x;
+  meetKU : forall y x : T, join x (meet x y) = x;
+  meetUl : left_distributive meet join;
+  meetxx : idempotent meet;
+  le_def : forall x y : T, le x y = (meet x y == x);
+  lt_def : forall x y : T, lt x y = (x != y) && le x y;
+}.
+
+Section MeetJoinMixin.
+
+Variable (display : unit) (T : choiceType) (m : of_ display T).
+
+Fact le_refl : reflexive (le m).
+Proof. by move=> x; rewrite le_def meetxx. Qed.
+
+Fact le_anti : antisymmetric (le m).
+Proof. by move=> x y; rewrite !le_def meetC => /andP [] /eqP {2}<- /eqP ->. Qed.
+
+Fact le_trans : transitive (le m).
+Proof.
+move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
+by rewrite -[in LHS]lexy -meetA leyz lexy.
+Qed.
+
+Definition porderMixin : lePOrderMixin T :=
+  LePOrderMixin le_refl le_anti le_trans (lt_def m).
+
+Definition latticeMixin : latticeMixin (POrderType display T porderMixin) :=
+  @LatticeMixin display (POrderType display T porderMixin) (meet m) (join m)
+                (meetC m) (joinC m) (meetA m) (joinA m)
+                (joinKI m) (meetKU m) (le_def m) (meetUl m).
+
+End MeetJoinMixin.
+
+Module Exports.
+Notation meetJoinMixin := of_.
+Notation MeetJoinMixin := Build.
+Coercion porderMixin : meetJoinMixin >-> lePOrderMixin.
+Coercion latticeMixin : meetJoinMixin >-> Lattice.mixin_of.
+End Exports.
+
+End MeetJoinMixin.
+Import MeetJoinMixin.Exports.
+
+Module LeOrderMixin.
+
+Record of_ (display : unit) (T : choiceType) := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  le_anti : antisymmetric le;
+  le_trans : transitive le;
+  le_total : total le;
+  lt_def : forall x y, lt x y = (x != y) && le x y;
+  meet_def : forall x y, meet x y = if le x y then x else y;
+  join_def : forall x y, join x y = if le y x then x else y;
+}.
+
+Section LeOrderMixin.
+
+Variable (display : unit) (T : choiceType) (m : of_ display T).
+
+Fact le_refl : reflexive (le m).
+Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
+
+Definition porderT : porderType display :=
+  POrderType
+    display T
+    (LePOrderMixin le_refl (@le_anti _ _ m) (@le_trans _ _ m) (lt_def m)).
+Definition latticeT : latticeType display :=
+  LatticeType porderT (@TotalLattice.Mixin _ porderT (le_total m)).
+
+Implicit Types (x y z : latticeT).
+
+Fact meetE x y : meet m x y = x `&` y. Proof. by rewrite meet_def. Qed.
+Fact joinE x y : join m x y = x `|` y. Proof. by rewrite join_def. Qed.
+Fact meetC : commutative (meet m).
+Proof. by move=> *; rewrite !meetE meetC. Qed.
+Fact joinC : commutative (join m).
+Proof. by move=> *; rewrite !joinE joinC. Qed.
+Fact meetA : associative (meet m).
+Proof. by move=> *; rewrite !meetE meetA. Qed.
+Fact joinA : associative (join m).
+Proof. by move=> *; rewrite !joinE joinA. Qed.
+Fact joinKI y x : meet m x (join m x y) = x.
+Proof. by rewrite meetE joinE joinKI. Qed.
+Fact meetKU y x : join m x (meet m x y) = x.
+Proof. by rewrite meetE joinE meetKU. Qed.
+Fact meetUl : left_distributive (meet m) (join m).
+Proof. by move=> *; rewrite !meetE !joinE meetUl. Qed.
+Fact meetxx : idempotent (meet m).
+Proof. by move=> *; rewrite meetE meetxx. Qed.
+Fact le_def x y : x <= y = (meet m x y == x).
+Proof. by rewrite meetE (eq_meetl x y). Qed.
+
+Definition latticeMixin : meetJoinMixin display T :=
+  @MeetJoinMixin
+    _ _ (le m) (lt m) (meet m) (join m)
+    meetC joinC meetA joinA joinKI meetKU meetUl meetxx le_def (lt_def m).
+
+Definition totalMixin :
+  total (<=%O : rel (POrderType display T latticeMixin)) := le_total m.
+
+End LeOrderMixin.
+
+Module Exports.
+Notation leOrderMixin := of_.
+Notation LeOrderMixin := Build.
+Coercion latticeMixin : leOrderMixin >-> meetJoinMixin.
+Coercion totalMixin : leOrderMixin >-> total.
+End Exports.
+
+End LeOrderMixin.
+Import LeOrderMixin.Exports.
+
+Module LtOrderMixin.
+
+Record of_ (display : unit) (T : choiceType) := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive lt;
+  lt_total : forall x y, x != y -> lt x y || lt y x;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
+  meet_def : forall x y, meet x y = if lt x y then x else y;
+  join_def : forall x y, join x y = if lt y x then x else y;
+}.
+
+Section LtOrderMixin.
+
+Variable (display : unit) (T : choiceType) (m : of_ display T).
+
+Fact le_total : total (le m).
+Proof.
+by move=> x y; rewrite !le_def (eq_sym y); case: (altP eqP); [|apply: lt_total].
+Qed.
+
+Definition porderT : porderType display :=
+  POrderType display T (LtPOrderMixin (lt_irr m) (@lt_trans _ _ m) (le_def m)).
+Definition latticeT : latticeType display :=
+  LatticeType porderT (@TotalLattice.Mixin _ porderT le_total).
+
+Implicit Types (x y z : latticeT).
+
+Fact leP x y :
+  le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+Proof. by apply/lcomparable_leP/le_total. Qed.
+Fact meetE x y : meet m x y = x `&` y.
+Proof. by rewrite meet_def (_ : lt m x y = (x < y)) //; case: (leP y). Qed.
+Fact joinE x y : join m x y = x `|` y.
+Proof. by rewrite join_def (_ : lt m y x = (y < x)) //; case: leP. Qed.
+Fact meetC : commutative (meet m).
+Proof. by move=> *; rewrite !meetE meetC. Qed.
+Fact joinC : commutative (join m).
+Proof. by move=> *; rewrite !joinE joinC. Qed.
+Fact meetA : associative (meet m).
+Proof. by move=> *; rewrite !meetE meetA. Qed.
+Fact joinA : associative (join m).
+Proof. by move=> *; rewrite !joinE joinA. Qed.
+Fact joinKI y x : meet m x (join m x y) = x.
+Proof. by rewrite meetE joinE joinKI. Qed.
+Fact meetKU y x : join m x (meet m x y) = x.
+Proof. by rewrite meetE joinE meetKU. Qed.
+Fact meetUl : left_distributive (meet m) (join m).
+Proof. by move=> *; rewrite !meetE !joinE meetUl. Qed.
+Fact meetxx : idempotent (meet m).
+Proof. by move=> *; rewrite meetE meetxx. Qed.
+Fact le_def' x y : x <= y = (meet m x y == x).
+Proof. by rewrite meetE (eq_meetl x y). Qed.
+
+Definition latticeMixin : meetJoinMixin display T :=
+  @MeetJoinMixin
+    _ _ (le m) (lt m) (meet m) (join m)
+    meetC joinC meetA joinA joinKI meetKU meetUl meetxx
+    le_def' (@lt_neqAle _ latticeT).
+
+Definition totalMixin :
+  total (<=%O : rel (POrderType display T latticeMixin)) := le_total.
+
+End LtOrderMixin.
+
+Module Exports.
+Notation ltOrderMixin := of_.
+Notation LtOrderMixin := Build.
+Coercion latticeMixin : ltOrderMixin >-> meetJoinMixin.
+Coercion totalMixin : ltOrderMixin >-> total.
+End Exports.
+
+End LtOrderMixin.
+Import LtOrderMixin.Exports.
 
 (*************)
 (* INSTANCES *)
@@ -3117,9 +3336,17 @@ Module Import NatOrder.
 Section NatOrder.
 
 Fact nat_display : unit. Proof. exact: tt. Qed.
-Program Definition natPOrderMixin := @POrderMixin _ leq ltn _ leqnn anti_leq leq_trans.
-Next Obligation. by rewrite ltn_neqAle. Qed.
-Canonical natPOrderType  := POrderType nat_display nat natPOrderMixin.
+
+Lemma minnE x y : minn x y = if (x <= y)%N then x else y.
+Proof. by case: leqP => [/minn_idPl|/ltnW /minn_idPr]. Qed.
+
+Lemma maxnE x y : maxn x y = if (y <= x)%N then x else y.
+Proof. by case: leqP => [/maxn_idPl|/ltnW/maxn_idPr]. Qed.
+
+Definition natOrderMixin :=
+  LeOrderMixin nat_display anti_leq leq_trans leq_total ltn_neqAle minnE maxnE.
+
+Canonical natPOrderType := POrderType nat_display nat natOrderMixin.
 
 Lemma leEnat (n m : nat): (n <= m) = (n <= m)%N.
 Proof. by []. Qed.
@@ -3127,9 +3354,8 @@ Proof. by []. Qed.
 Lemma ltEnat (n m : nat): (n < m) = (n < m)%N.
 Proof. by []. Qed.
 
-Definition natLatticeMixin := TotalLattice.Mixin leq_total.
-Canonical natLatticeType := LatticeType nat natLatticeMixin.
-Canonical natOrderType := OrderType nat leq_total.
+Canonical natLatticeType := LatticeType nat natOrderMixin.
+Canonical natOrderType := OrderType nat natOrderMixin.
 
 Definition natBLatticeMixin := BLatticeMixin leq0n.
 Canonical natBLatticeType := BLatticeType nat natBLatticeMixin.
@@ -3166,7 +3392,6 @@ Notation "\max_ ( i 'in' A ) F" :=
  (\big[@join nat_display _/0%O]_(i in A) F%O) : order_scope.
 
 End NatOrder.
-
 
 Module SeqLexPOrder.
 Section SeqLexPOrder.
@@ -3208,7 +3433,8 @@ case: (comparableP x y) => //=; case: (comparableP y z) => //=.
 - by move=> ltyz /lt_trans - /(_ _ ltyz) ->.
 Qed.
 
-Definition lexi_porderMixin := LePOrderMixin lexi_refl lexi_anti lexi_trans.
+Definition lexi_porderMixin :=
+  LePOrderMixin lexi_refl lexi_anti lexi_trans (rrefl _).
 Canonical lexi_porderType := POrderType display (seq T) lexi_porderMixin.
 
 End SeqLexPOrder.
@@ -3245,6 +3471,11 @@ Export TotalMonotonyTheory.
 Export ReverseLattice.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
+Export LePOrderMixin.Exports.
+Export LtPOrderMixin.Exports.
+Export MeetJoinMixin.Exports.
+Export LeOrderMixin.Exports.
+Export LtOrderMixin.Exports.
 Export NatOrder.
 Export SeqLexPOrder.
 
