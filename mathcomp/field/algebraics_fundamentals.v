@@ -582,17 +582,17 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite rmorphM hornerM ler_pmul ?ltW ?v_gtd ?w_gte.
     rewrite -ltr_pdivr_mull ?mulr_gt0 // (le_lt_trans _ ub_rp) //.
     by rewrite -scalerAl hornerZ -rmorphM mulrN -normrN ler_norm.
-  pose le v w := (w == v) || lt v w.
+  pose le v w := (v == w) || lt v w.
   pose abs v := if le 0 v then v else - v.
   have absN v: abs (- v) = abs v.
-    rewrite /abs /le oppr_eq0 opprK posN.
+    rewrite /abs /le !(eq_sym 0) oppr_eq0 opprK posN.
     have [-> | /posVneg/orP[v_gt0 | v_lt0]] := altP eqP; first by rewrite oppr0.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
   pose QyNum := RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _).
   pose QyNumField := [numFieldType of NumDomainType (Q y) QyNum].
-  pose Ry := [realFieldType of RealDomainType _ (RealLeTotal QyNumField)].
+  pose Ry := [realFieldType of RealDomainType _ (realLtMixin_total QyNumField)].
   have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
   by exists (ArchiFieldType Ry archiRy); apply: [rmorphism of idfun].
 have some_realC: realC.
