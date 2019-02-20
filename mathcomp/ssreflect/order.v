@@ -666,6 +666,43 @@ Notation "[ 'orderType' 'of' T 'with' disp ]" := [orderType of T for _ with disp
 End Exports.
 End Total.
 
+Module Import TotalSyntax.
+
+Fact total_display : unit. Proof. exact: tt. Qed.
+
+Notation "@ 'max'" := (@join total_display).
+Notation max := (@join total_display _).
+Notation "@ 'min'" := (@meet total_display).
+Notation min := (@meet total_display _).
+
+Notation "\max_ ( i <- r | P ) F" :=
+  (\big[@join total_display _/0%O]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max_ ( i <- r ) F" :=
+  (\big[@join total_display _/0%O]_(i <- r) F%O) : order_scope.
+Notation "\max_ ( i | P ) F" :=
+  (\big[@join total_display _/0%O]_(i | P%B) F%O) : order_scope.
+Notation "\max_ i F" :=
+  (\big[@join total_display _/0%O]_i F%O) : order_scope.
+Notation "\max_ ( i : I | P ) F" :=
+  (\big[@join total_display _/0%O]_(i : I | P%B) F%O) (only parsing) :
+  order_scope.
+Notation "\max_ ( i : I ) F" :=
+  (\big[@join total_display _/0%O]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\max_ ( m <= i < n | P ) F" :=
+  (\big[@join total_display _/0%O]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max_ ( m <= i < n ) F" :=
+  (\big[@join total_display _/0%O]_(m <= i < n) F%O) : order_scope.
+Notation "\max_ ( i < n | P ) F" :=
+  (\big[@join total_display _/0%O]_(i < n | P%B) F%O) : order_scope.
+Notation "\max_ ( i < n ) F" :=
+  (\big[@join total_display _/0%O]_(i < n) F%O) : order_scope.
+Notation "\max_ ( i 'in' A | P ) F" :=
+  (\big[@join total_display _/0%O]_(i in A | P%B) F%O) : order_scope.
+Notation "\max_ ( i 'in' A ) F" :=
+  (\big[@join total_display _/0%O]_(i in A) F%O) : order_scope.
+
+End TotalSyntax.
+
 Import Total.Exports.
 
 Module BLattice.
@@ -758,17 +795,17 @@ Notation "\join_ ( i : I | P ) F" :=
 Notation "\join_ ( i : I ) F" :=
   (\big[@join _ _/0%O]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\join_ ( m <= i < n | P ) F" :=
- (\big[@join _ _/0%O]_(m <= i < n | P%B) F%O) : order_scope.
+  (\big[@join _ _/0%O]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\join_ ( m <= i < n ) F" :=
- (\big[@join _ _/0%O]_(m <= i < n) F%O) : order_scope.
+  (\big[@join _ _/0%O]_(m <= i < n) F%O) : order_scope.
 Notation "\join_ ( i < n | P ) F" :=
- (\big[@join _ _/0%O]_(i < n | P%B) F%O) : order_scope.
+  (\big[@join _ _/0%O]_(i < n | P%B) F%O) : order_scope.
 Notation "\join_ ( i < n ) F" :=
- (\big[@join _ _/0%O]_(i < n) F%O) : order_scope.
+  (\big[@join _ _/0%O]_(i < n) F%O) : order_scope.
 Notation "\join_ ( i 'in' A | P ) F" :=
- (\big[@join _ _/0%O]_(i in A | P%B) F%O) : order_scope.
+  (\big[@join _ _/0%O]_(i in A | P%B) F%O) : order_scope.
 Notation "\join_ ( i 'in' A ) F" :=
- (\big[@join _ _/0%O]_(i in A) F%O) : order_scope.
+  (\big[@join _ _/0%O]_(i in A) F%O) : order_scope.
 
 End BLatticeSyntax.
 
@@ -1911,18 +1948,6 @@ Lemma nmono_leif (f : T -> T) C :
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
 
 End POrderTheory.
-End POrderTheory.
-
-Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF.
-
-Arguments leifP {display T x y C}.
-Arguments leif_refl {display T x C}.
-Arguments mono_in_leif [display T A f C].
-Arguments nmono_in_leif [display T A f C].
-Arguments mono_leif [display T f C].
-Arguments nmono_leif [display T f C].
-
-Module Import POrderMonotonyTheory.
 Section POrderMonotonyTheory.
 
 Context {display display' : unit}.
@@ -1931,24 +1956,10 @@ Implicit Types (m n p : nat) (x y z : T) (u v w : T').
 Variable D D' : pred T.
 Variable (f : T -> T').
 
-(****************************************************************************)
-(* This listing of "Let"s factor out the required premices for the          *)
-(* subsequent lemmas, putting them in the context so that "done" solves the *)
-(* goals quickly                                                            *)
-(****************************************************************************)
+Hint Resolve lexx lt_neqAle (@le_anti _ T) (@le_anti _ T') lt_def.
 
-Let ltE := @lt_neqAle _ T.
-Let lt'E := @lt_neqAle _ T'.
-Let gtE (x y : T) : (x > y) = (x != y) && (x >= y).
-Proof. by rewrite lt_neqAle eq_sym. Qed.
-Let gt'E (x y : T') : (x > y) = (x != y) && (x >= y).
-Proof. by rewrite lt_neqAle eq_sym. Qed.
-Let le_antiT := @le_anti _ T.
-Let le_antiT' := @le_anti _ T'.
 Let ge_antiT : antisymmetric (>=%O : rel T).
-Proof. by move=> ??; rewrite andbC; apply: le_anti. Qed.
-Let ge_antiT' : antisymmetric (>=%O : rel T').
-Proof. by move=> ??; rewrite andbC; apply: le_anti. Qed.
+Proof. by move=> ?? /le_anti. Qed.
 
 Lemma ltW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
 Proof. exact: homoW. Qed.
@@ -2012,7 +2023,17 @@ Lemma leW_nmono_in :
 Proof. exact: anti_mono_in. Qed.
 
 End POrderMonotonyTheory.
-End POrderMonotonyTheory.
+
+End POrderTheory.
+
+Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF.
+
+Arguments leifP {display T x y C}.
+Arguments leif_refl {display T x C}.
+Arguments mono_in_leif [display T A f C].
+Arguments nmono_in_leif [display T A f C].
+Arguments mono_leif [display T f C].
+Arguments nmono_leif [display T f C].
 
 Module Import ReversePOrder.
 Section ReversePOrder.
@@ -2366,12 +2387,7 @@ Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
 
 End TotalTheory.
-End TotalTheory.
-
-Module Import TotalMonotonyTheory.
 Section TotalMonotonyTheory.
-
-Import TotalTheory.
 
 Context {display : unit} {display' : unit}.
 Context {T : orderType display} {T' : porderType display'}.
@@ -2411,7 +2427,7 @@ move=> mf x y Dx Dy; case: ltgtP;
 Qed.
 
 End TotalMonotonyTheory.
-End TotalMonotonyTheory.
+End TotalTheory.
 
 Module Import BLatticeTheory.
 Section BLatticeTheory.
@@ -3335,8 +3351,6 @@ Import LtOrderMixin.Exports.
 Module Import NatOrder.
 Section NatOrder.
 
-Fact nat_display : unit. Proof. exact: tt. Qed.
-
 Lemma minnE x y : minn x y = if (x <= y)%N then x else y.
 Proof. by case: leqP => [/minn_idPl|/ltnW /minn_idPr]. Qed.
 
@@ -3344,9 +3358,10 @@ Lemma maxnE x y : maxn x y = if (y <= x)%N then x else y.
 Proof. by case: leqP => [/maxn_idPl|/ltnW/maxn_idPr]. Qed.
 
 Definition natOrderMixin :=
-  LeOrderMixin nat_display anti_leq leq_trans leq_total ltn_neqAle minnE maxnE.
+  LeOrderMixin
+    total_display anti_leq leq_trans leq_total ltn_neqAle minnE maxnE.
 
-Canonical natPOrderType := POrderType nat_display nat natOrderMixin.
+Canonical natPOrderType  := POrderType total_display nat natOrderMixin.
 
 Lemma leEnat (n m : nat): (n <= m) = (n <= m)%N.
 Proof. by []. Qed.
@@ -3360,36 +3375,6 @@ Canonical natOrderType := OrderType nat natOrderMixin.
 Definition natBLatticeMixin := BLatticeMixin leq0n.
 Canonical natBLatticeType := BLatticeType nat natBLatticeMixin.
 End NatOrder.
-
-Notation "@max" := (@join nat_display).
-Notation max := (@join nat_display _).
-Notation "@min" := (@meet nat_display).
-Notation min := (@meet nat_display _).
-
-Notation "\max_ ( i <- r | P ) F" :=
-  (\big[@join nat_display _/0%O]_(i <- r | P%B) F%O) : order_scope.
-Notation "\max_ ( i <- r ) F" :=
-  (\big[@join nat_display _/0%O]_(i <- r) F%O) : order_scope.
-Notation "\max_ ( i | P ) F" :=
-  (\big[@join nat_display _/0%O]_(i | P%B) F%O) : order_scope.
-Notation "\max_ i F" :=
-  (\big[@join nat_display _/0%O]_i F%O) : order_scope.
-Notation "\max_ ( i : I | P ) F" :=
-  (\big[@join nat_display _/0%O]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\max_ ( i : I ) F" :=
-  (\big[@join nat_display _/0%O]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\max_ ( m <= i < n | P ) F" :=
- (\big[@join nat_display _/0%O]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\max_ ( m <= i < n ) F" :=
- (\big[@join nat_display _/0%O]_(m <= i < n) F%O) : order_scope.
-Notation "\max_ ( i < n | P ) F" :=
- (\big[@join nat_display _/0%O]_(i < n | P%B) F%O) : order_scope.
-Notation "\max_ ( i < n ) F" :=
- (\big[@join nat_display _/0%O]_(i < n) F%O) : order_scope.
-Notation "\max_ ( i 'in' A | P ) F" :=
- (\big[@join nat_display _/0%O]_(i in A | P%B) F%O) : order_scope.
-Notation "\max_ ( i 'in' A ) F" :=
- (\big[@join nat_display _/0%O]_(i in A) F%O) : order_scope.
 
 End NatOrder.
 
@@ -3453,6 +3438,7 @@ End Def.
 
 Module Syntax.
 Export POSyntax.
+Export TotalSyntax.
 Export LatticeSyntax.
 Export BLatticeSyntax.
 Export TBLatticeSyntax.
@@ -3466,8 +3452,6 @@ Export POCoercions.
 Export ReversePOrder.
 Export POrderTheory.
 Export TotalTheory.
-Export POrderMonotonyTheory.
-Export TotalMonotonyTheory.
 Export ReverseLattice.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.

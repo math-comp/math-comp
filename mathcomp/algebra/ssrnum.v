@@ -231,7 +231,7 @@ Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition clone c of phant_id class c := @Pack T c.
-Definition pack T b0 om0 nb0 (m0 : @mixin_of (ring_for T b0) om0 nb0) :=
+Definition pack b0 om0 nb0 (m0 : @mixin_of (ring_for T b0) om0 nb0) :=
   fun bT b & phant_id (@GRing.IntegralDomain.class bT) b =>
   fun om   & phant_id om0 om =>
   fun m    & phant_id m0 m =>
@@ -401,6 +401,11 @@ Notation ">< x" := (fun y => ~~ (@comparable ring_display _ x y)) : ring_scope.
 Notation ">< x :> T" := (>< (x : T)) (only parsing) : ring_scope.
 Notation "x >< y" := (~~ (@comparable ring_display _ x y)) : ring_scope.
 
+Notation "@ 'maxr'" := (@join ring_display).
+Notation maxr := (@join ring_display _).
+Notation "@ 'minr'" := (@meet ring_display).
+Notation minr := (@meet ring_display _).
+
 Canonical Rpos_keyed.
 Canonical Rneg_keyed.
 Canonical Rnneg_keyed.
@@ -409,6 +414,9 @@ Canonical Rreal_keyed.
 Export Order.POCoercions.
 
 End Syntax.
+
+Notation min := minr.
+Notation max := maxr.
 
 Section ExtensionAxioms.
 
@@ -3759,9 +3767,6 @@ Section MinMax.
 (* GG: Many of the first lemmas hold unconditionally, and others hold for    *)
 (* the real subset of a general domain.                                      *)
 
-Local Notation min := meet (only parsing).
-Local Notation max := join (only parsing).
-
 Lemma addr_min_max x y : min x y + max x y = x + y.
 Proof.
 case: (lerP x y)=> [| /ltW] hxy;
@@ -4987,8 +4992,6 @@ Notation ltr := lt (only parsing).
 Notation ger := ge (only parsing).
 Notation gtr := gt (only parsing).
 Notation lerif := leif (only parsing).
-Notation minr := meet (only parsing).
-Notation maxr := join (only parsing).
 End Def.
 
 Notation norm := normr (only parsing).
@@ -4996,8 +4999,6 @@ Notation le := ler (only parsing).
 Notation lt := ltr (only parsing).
 Notation ge := ger (only parsing).
 Notation gt := gtr (only parsing).
-Notation min := minr (only parsing).
-Notation max := maxr (only parsing).
 
 Module Import Syntax.
 Notation "`| x |" := (@norm _ (@Num.NumDomain.normedType _) x) : ring_scope.
@@ -5379,8 +5380,6 @@ Implicit Types x y z : R.
 Definition lerif_mean_square_scaled := leif_mean_square_scaled.
 Definition lerif_AGM2_scaled := leif_AGM2_scaled.
 Section MinMax.
-Local Notation min := meet (only parsing).
-Local Notation max := join (only parsing).
 Definition minrC : @commutative R R min := @meetC _ R.
 Definition minrr : @idempotent R min := @meetxx _ R.
 Definition minr_l x y : x <= y -> min x y = x := elimT meet_idPl.
