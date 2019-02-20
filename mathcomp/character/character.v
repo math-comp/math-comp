@@ -1501,7 +1501,7 @@ Qed.
 Lemma max_cfRepr_mx1 n (rG : mx_representation algCF G n) x :
    x \in G -> cfRepr rG x = cfRepr rG 1%g -> rG x = 1%:M.
 Proof.
-move=> Gx kerGx; have [|c _ def_x] := @ max_cfRepr_norm_scalar n rG x Gx.
+move=> Gx kerGx; have [|c _ def_x] := @max_cfRepr_norm_scalar n rG x Gx.
   by rewrite kerGx cfRepr1 normr_nat.
 move/eqP: kerGx; rewrite cfRepr1 cfunE Gx {rG}def_x mxtrace_scalar.
 case: n => [_|n]; first by rewrite ![_%:M]flatmx0.
