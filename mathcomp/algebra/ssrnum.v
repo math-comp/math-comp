@@ -2733,39 +2733,56 @@ Qed.
 
 (* norm + add *)
 
-Lemma normr_real x : `|x| \is real. Proof. by apply/ger0_real. Qed.
+Section NormedModuleTheory.
+
+Variable V : normedModType R.
+Implicit Types (u v w : V).
+
+Lemma normr_real v : `|v| \is real. Proof. by apply/ger0_real. Qed.
 Hint Resolve normr_real : core.
 
-Lemma ler_norm_sum I r (G : I -> R) (P : pred I):
+Lemma ler_norm_sum I r (G : I -> V) (P : pred I):
   `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i|.
 Proof.
 elim/big_rec2: _ => [|i y x _]; first by rewrite normr0.
 by rewrite -(ler_add2l `|G i|); apply: le_trans; apply: ler_norm_add.
 Qed.
 
-Lemma ler_norm_sub x y : `|x - y| <= `|x| + `|y|.
+Lemma ler_norm_sub v w : `|v - w| <= `|v| + `|w|.
 Proof. by rewrite (le_trans (ler_norm_add _ _)) ?normrN. Qed.
 
-Lemma ler_dist_add z x y : `|x - y| <= `|x - z| + `|z - y|.
+Lemma ler_dist_add u v w : `|v - w| <= `|v - u| + `|u - w|.
 Proof. by rewrite (le_trans _ (ler_norm_add _ _)) // addrA addrNK. Qed.
 
-Lemma ler_sub_norm_add x y : `|x| - `|y| <= `|x + y|.
+Lemma ler_sub_norm_add v w : `|v| - `|w| <= `|v + w|.
 Proof.
-rewrite -{1}[x](addrK y) lter_sub_addl.
+rewrite -{1}[v](addrK w) lter_sub_addl.
 by rewrite (le_trans (ler_norm_add _ _)) // addrC normrN.
 Qed.
 
-Lemma ler_sub_dist x y : `|x| - `|y| <= `|x - y|.
-Proof. by rewrite -[`|y|]normrN ler_sub_norm_add. Qed.
+Lemma ler_sub_dist v w : `|v| - `|w| <= `|v - w|.
+Proof. by rewrite -[`|w|]normrN ler_sub_norm_add. Qed.
 
-Lemma ler_dist_dist x y : `| `|x| - `|y| | <= `|x - y|.
+Lemma ler_dist_dist v w : `| `|v| - `|w| | <= `|v - w|.
 Proof.
-have [||_|_] // := @real_leP `|x| `|y|; last by rewrite ler_sub_dist.
+have [||_|_] // := @real_leP `|v| `|w|; last by rewrite ler_sub_dist.
 by rewrite distrC ler_sub_dist.
 Qed.
 
-Lemma ler_dist_norm_add x y : `| `|x| - `|y| | <= `| x + y |.
-Proof. by rewrite -[y]opprK normrN ler_dist_dist. Qed.
+Lemma ler_dist_norm_add v w : `| `|v| - `|w| | <= `|v + w|.
+Proof. by rewrite -[w]opprK normrN ler_dist_dist. Qed.
+
+Lemma ler_nnorml v x : x < 0 -> `|v| <= x = false.
+Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h). Qed.
+
+Lemma ltr_nnorml v x : x <= 0 -> `|v| < x = false.
+Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h). Qed.
+
+Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
+
+End NormedModuleTheory.
+
+Hint Extern 0 (is_true (norm _ \is real)) => exact: normr_real : core.
 
 Lemma real_ler_norml x y : x \is real -> (`|x| <= y) = (- y <= x <= y).
 Proof.
@@ -2836,14 +2853,6 @@ by rewrite orbC ltr_oppr.
 Qed.
 
 Definition real_lter_normr :=  (real_ler_normr, real_ltr_normr).
-
-Lemma ler_nnorml x y : y < 0 -> `|x| <= y = false.
-Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h). Qed.
-
-Lemma ltr_nnorml x y : y <= 0 -> `|x| < y = false.
-Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h). Qed.
-
-Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
 
 Lemma real_ler_distl x y e :
   x - y \is real -> (`|x - y| <= e) = (y - e <= x <= y + e).
@@ -5039,6 +5048,19 @@ Definition lter_anti := (=^~ eqr_le, ltr_asym, ltr_le_asym, ler_lt_asym).
 Definition ltr_geF x y : x < y -> y <= x = false := @lt_geF _ _ x y.
 Definition ler_gtF x y : x <= y -> y < x = false := @le_gtF _ _ x y.
 Definition ltr_gtF x y : x < y -> y < x = false := @lt_gtF _ _ x y.
+Definition normr0 : `|0| = 0 :> R := normr0 _.
+Definition normrMn x n : `|x *+ n| = `|x| *+ n := normrMn x n.
+Definition normr0P {x} : reflect (`|x| = 0) (x == 0) := normr0P.
+Definition normr_eq0 x : (`|x| == 0) = (x == 0) := normr_eq0 x.
+Definition normrN x : `|- x| = `|x| := normrN x.
+Definition distrC x y : `|x - y| = `|y - x| := distrC x y.
+Definition normr_id x : `| `|x| | = `|x| := normr_id x.
+Definition normr_ge0 x : 0 <= `|x| := normr_ge0 x.
+Definition normr_le0 x : (`|x| <= 0) = (x == 0) := normr_le0 x.
+Definition normr_lt0 x : `|x| < 0 = false := normr_lt0 x.
+Definition normr_gt0 x : (`|x| > 0) = (x != 0) := normr_gt0 x.
+Definition normrE := (normr_id, normr0, @normr1 R, @normrN1 R, normr_ge0,
+                      normr_eq0, normr_lt0, normr_le0, normr_gt0, normrN).
 End NumIntegralDomainTheory.
 
 Section NumIntegralDomainMonotonyTheory.
@@ -5268,6 +5290,23 @@ Definition ger_lerif x y C : x <= y ?= iff C -> (y <= x) = C :=
   @ge_leif _ _ x y C.
 Definition ltr_lerif x y C : x <= y ?= iff C -> (x < y) = ~~ C :=
   @lt_leif _ _ x y C.
+Definition normr_real x : `|x| \is real := normr_real x.
+Definition ler_norm_sum I r (G : I -> R) (P : pred I):
+  `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i| :=
+  ler_norm_sum r G P.
+Definition ler_norm_sub x y : `|x - y| <= `|x| + `|y| := ler_norm_sub x y.
+Definition ler_dist_add z x y : `|x - y| <= `|x - z| + `|z - y| :=
+  ler_dist_add z x y.
+Definition ler_sub_norm_add x y : `|x| - `|y| <= `|x + y| :=
+  ler_sub_norm_add x y.
+Definition ler_sub_dist x y : `|x| - `|y| <= `|x - y| := ler_sub_dist x y.
+Definition ler_dist_dist x y : `| `|x| - `|y| | <= `|x - y| :=
+  ler_dist_dist x y.
+Definition ler_dist_norm_add x y : `| `|x| - `|y| | <= `|x + y| :=
+  ler_dist_norm_add x y.
+Definition ler_nnorml x y : y < 0 -> `|x| <= y = false := @ler_nnorml _ _ x y.
+Definition ltr_nnorml x y : y <= 0 -> `|x| < y = false := @ltr_nnorml _ _ x y.
+Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
 Definition lerif_nat m n C :
   (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N :=
   leif_nat_r _ m n C.
