@@ -36,7 +36,7 @@ Require Import fintype tuple bigop path finset.
 (*        tlatticeType == ... with a top element                             *)
 (*       tblatticeType == ... with both a top and a bottom                   *)
 (*       cblatticeType == ... with a complement to, and bottom               *)
-(*      tcblatticeType == ... with a top, bottom, and general complement     *)
+(*      ctblatticeType == ... with a top, bottom, and general complement     *)
 (*                                                                           *)
 (* Each of these structure take a first argument named display, of type unit *)
 (* instanciating it with tt or an unknown key will lead to a default display *)
@@ -298,7 +298,7 @@ Module Order.
 
 Module POrder.
 Section ClassDef.
-Structure mixin_of (T : eqType) := Mixin {
+Record mixin_of (T : eqType) := Mixin {
   le : rel T;
   lt : rel T;
   _  : forall x y, lt x y = (x != y) && (le x y);
@@ -334,33 +334,32 @@ Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base   : class_of >-> Choice.class_of.
-Coercion mixin  : class_of >-> mixin_of.
-Coercion sort   : type >-> Sortclass.
+Module Exports.
+Coercion base : class_of >-> Choice.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
-
 Canonical eqType.
 Canonical choiceType.
-
 Notation porderType := type.
 Notation porderMixin := mixin_of.
 Notation POrderMixin := Mixin.
 Notation POrderType disp T m := (@pack T disp _ _ id m).
-
 Notation "[ 'porderType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'porderType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'porderType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'porderType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'porderType' 'of' T ]" := [porderType of T for _]
   (at level 0, format "[ 'porderType'  'of'  T ]") : form_scope.
-Notation "[ 'porderType' 'of' T 'with' disp ]" := [porderType of T for _ with disp]
+Notation "[ 'porderType' 'of' T 'with' disp ]" :=
+  [porderType of T for _ with disp]
   (at level 0, format "[ 'porderType'  'of'  T  'with' disp ]") : form_scope.
 End Exports.
-End POrder.
 
+End POrder.
 Import POrder.Exports.
 Bind Scope cpo_sort with POrder.sort.
 
@@ -482,7 +481,7 @@ End POCoercions.
 Module Lattice.
 Section ClassDef.
 
-Structure mixin_of d (T : porderType d) := Mixin {
+Record mixin_of d (T : porderType d) := Mixin {
   meet : T -> T -> T;
   join : T -> T -> T;
   _ : commutative meet;
@@ -524,35 +523,34 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> POrder.class_of.
-Coercion mixin     : class_of >-> mixin_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
+Module Exports.
+Coercion base : class_of >-> POrder.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
-
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-
 Notation latticeType  := type.
 Notation latticeMixin := mixin_of.
 Notation LatticeMixin := Mixin.
 Notation LatticeType T m := (@pack T _ _ m _ _ id _ id).
-
 Notation "[ 'latticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'latticeType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'latticeType' 'of' T ]" := [latticeType of T for _]
   (at level 0, format "[ 'latticeType'  'of'  T ]") : form_scope.
-Notation "[ 'latticeType' 'of' T 'with' disp ]" := [latticeType of T for _ with disp]
+Notation "[ 'latticeType' 'of' T 'with' disp ]" :=
+  [latticeType of T for _ with disp]
   (at level 0, format "[ 'latticeType'  'of'  T  'with' disp ]") : form_scope.
 End Exports.
-End Lattice.
 
+End Lattice.
 Export Lattice.Exports.
 
 Module Import LatticeDef.
@@ -637,35 +635,33 @@ Definition latticeType := @Lattice.Pack disp cT xclass.
 
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> Lattice.class_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
+Module Exports.
+Coercion base : class_of >-> Lattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
 Coercion latticeType : type >-> Lattice.type.
-
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
 Canonical latticeType.
-
 Notation orderType  := type.
 Notation OrderType T m := (@pack T _ _ m _ _ id _ id).
-
 Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'orderType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'orderType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'orderType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'orderType' 'of' T ]" := [orderType of T for _]
   (at level 0, format "[ 'orderType'  'of'  T ]") : form_scope.
-Notation "[ 'orderType' 'of' T 'with' disp ]" := [orderType of T for _ with disp]
+Notation "[ 'orderType' 'of' T 'with' disp ]" :=
+  [orderType of T for _ with disp]
   (at level 0, format "[ 'orderType'  'of'  T  'with' disp ]") : form_scope.
-
 End Exports.
-End Total.
 
+End Total.
 Module Import TotalSyntax.
 
 Fact total_display : unit. Proof. exact: tt. Qed.
@@ -707,7 +703,7 @@ Import Total.Exports.
 
 Module BLattice.
 Section ClassDef.
-Structure mixin_of d (T : porderType d) := Mixin {
+Record mixin_of d (T : porderType d) := Mixin {
   bottom : T;
   _ : forall x, bottom <= x;
 }.
@@ -741,37 +737,36 @@ Definition porderType := @POrder.Pack disp cT xclass.
 Definition latticeType := @Lattice.Pack disp cT xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> Lattice.class_of.
-Coercion mixin     : class_of >-> mixin_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
+Module Exports.
+Coercion base : class_of >-> Lattice.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
 Coercion latticeType : type >-> Lattice.type.
-
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
 Canonical latticeType.
-
 Notation blatticeType  := type.
 Notation blatticeMixin := mixin_of.
 Notation BLatticeMixin := Mixin.
 Notation BLatticeType T m := (@pack T _ _ m _ _ id _ id).
-
 Notation "[ 'blatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'blatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'blatticeType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'blatticeType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'blatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'blatticeType' 'of' T ]" := [blatticeType of T for _]
   (at level 0, format "[ 'blatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'blatticeType' 'of' T 'with' disp ]" := [blatticeType of T for _ with disp]
+Notation "[ 'blatticeType' 'of' T 'with' disp ]" :=
+  [blatticeType of T for _ with disp]
   (at level 0, format "[ 'blatticeType'  'of'  T  'with' disp ]") : form_scope.
 End Exports.
-End BLattice.
 
+End BLattice.
 Export BLattice.Exports.
 
 Module Import BLatticeDef.
@@ -811,7 +806,7 @@ End BLatticeSyntax.
 
 Module TBLattice.
 Section ClassDef.
-Structure mixin_of d (T : porderType d) := Mixin {
+Record mixin_of d (T : porderType d) := Mixin {
   top : T;
   _ : forall x, x <= top;
 }.
@@ -846,39 +841,37 @@ Definition latticeType := @Lattice.Pack disp cT xclass.
 Definition blatticeType := @BLattice.Pack disp cT xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> BLattice.class_of.
-Coercion mixin     : class_of >-> mixin_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
+Module Exports.
+Coercion base : class_of >-> BLattice.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion porderType : type >-> POrder.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion blatticeType : type >-> BLattice.type.
-
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
 Canonical latticeType.
 Canonical blatticeType.
-
 Notation tblatticeType  := type.
 Notation tblatticeMixin := mixin_of.
 Notation TBLatticeMixin := Mixin.
 Notation TBLatticeType T m := (@pack T _ _ m _ _ id _ id).
-
 Notation "[ 'tblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'tblatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'tblatticeType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'tblatticeType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'tblatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'tblatticeType' 'of' T ]" := [tblatticeType of T for _]
   (at level 0, format "[ 'tblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'tblatticeType' 'of' T 'with' disp ]" := [tblatticeType of T for _ with disp]
+Notation "[ 'tblatticeType' 'of' T 'with' disp ]" :=
+  [tblatticeType of T for _ with disp]
   (at level 0, format "[ 'tblatticeType'  'of'  T  'with' disp ]") : form_scope.
-
 End Exports.
-End TBLattice.
 
+End TBLattice.
 Export TBLattice.Exports.
 
 Module Import TBLatticeDef.
@@ -919,7 +912,7 @@ End TBLatticeSyntax.
 
 Module CBLattice.
 Section ClassDef.
-Structure mixin_of d (T : blatticeType d) := Mixin {
+Record mixin_of d (T : blatticeType d) := Mixin {
   sub : T -> T -> T;
   _ : forall x y, y `&` sub x y = bottom;
   _ : forall x y, (x `&` y) `|` sub x y = x
@@ -946,7 +939,7 @@ Notation xclass := (class : class_of _ xT).
 
 Definition pack b0 (m0 : mixin_of (@BLattice.Pack disp T b0)) :=
   fun bT b & phant_id (@BLattice.class disp bT) b =>
-    fun    m & phant_id m0 m => Pack (@Class disp T b m).
+  fun    m & phant_id m0 m => Pack (@Class disp T b m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -955,40 +948,38 @@ Definition latticeType := @Lattice.Pack disp cT xclass.
 Definition blatticeType := @BLattice.Pack disp cT xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> BLattice.class_of.
-Coercion mixin     : class_of >-> mixin_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
+Module Exports.
+Coercion base : class_of >-> BLattice.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion blatticeType : type >-> BLattice.type.
-
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
 Canonical latticeType.
 Canonical blatticeType.
-
 Notation cblatticeType  := type.
 Notation cblatticeMixin := mixin_of.
 Notation CBLatticeMixin := Mixin.
 Notation CBLatticeType T m := (@pack T _ _ m _ _ id _ id).
-
 Notation "[ 'cblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'cblatticeType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'cblatticeType' 'of' T ]" := [cblatticeType of T for _]
   (at level 0, format "[ 'cblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'cblatticeType' 'of' T 'with' disp ]" := [cblatticeType of T for _ with disp]
+Notation "[ 'cblatticeType' 'of' T 'with' disp ]" :=
+  [cblatticeType of T for _ with disp]
   (at level 0, format "[ 'cblatticeType'  'of'  T  'with' disp ]") : form_scope.
-
 End Exports.
-End CBLattice.
 
+End CBLattice.
 Export CBLattice.Exports.
 
 Module Import CBLatticeDef.
@@ -1048,20 +1039,19 @@ Definition tbd_cblatticeType :=
   @CBLattice.Pack disp tblatticeType xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> TBLattice.class_of.
-Coercion base2     : class_of >-> CBLattice.class_of.
-Coercion mixin1     : class_of >-> CBLattice.mixin_of.
-Coercion mixin2     : class_of >-> mixin_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
+Module Exports.
+Coercion base : class_of >-> TBLattice.class_of.
+Coercion base2 : class_of >-> CBLattice.class_of.
+Coercion mixin1 : class_of >-> CBLattice.mixin_of.
+Coercion mixin2 : class_of >-> mixin_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion blatticeType : type >-> BLattice.type.
 Coercion tblatticeType : type >-> TBLattice.type.
 Coercion cblatticeType : type >-> CBLattice.type.
-
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
@@ -1070,29 +1060,27 @@ Canonical blatticeType.
 Canonical tblatticeType.
 Canonical cblatticeType.
 Canonical tbd_cblatticeType.
-
 Notation ctblatticeType  := type.
 Notation ctblatticeMixin := mixin_of.
 Notation CTBLatticeMixin := Mixin.
 Notation CTBLatticeType T m := (@pack T _ _ _ id _ _ id m).
-
 Notation "[ 'cblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
   (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'cblatticeType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT  'with'  disp ]") : form_scope.
+  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
 Notation "[ 'cblatticeType' 'of' T ]" := [cblatticeType of T for _]
   (at level 0, format "[ 'cblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'cblatticeType' 'of' T 'with' disp ]" := [cblatticeType of T for _ with disp]
+Notation "[ 'cblatticeType' 'of' T 'with' disp ]" :=
+  [cblatticeType of T for _ with disp]
   (at level 0, format "[ 'cblatticeType'  'of'  T  'with' disp ]") : form_scope.
-
 Notation "[ 'default_ctblatticeType' 'of' T ]" :=
   (@pack T _ _ _ id _ _ id (fun=> erefl))
   (at level 0, format "[ 'default_ctblatticeType'  'of'  T ]") : form_scope.
-
 End Exports.
-End CTBLattice.
 
+End CTBLattice.
 Export CTBLattice.Exports.
 
 Module Import CTBLatticeDef.
@@ -1136,34 +1124,35 @@ Definition pack :=
   Pack disp (@Class T b m).
 
 Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
+Definition countType := @Countable.Pack cT xclass.
+Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 Definition fin_porderType := @POrder.Pack disp finType xclass.
 End ClassDef.
 
-Module Import Exports.
-Coercion base   : class_of >-> Finite.class_of.
-Coercion base2  : class_of >-> POrder.class_of.
-Coercion sort   : type >-> Sortclass.
+Module Exports.
+Coercion base : class_of >-> Finite.class_of.
+Coercion base2 : class_of >-> POrder.class_of.
+Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
 Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
 Coercion porderType : type >-> POrder.type.
-
 Canonical eqType.
-Canonical finType.
 Canonical choiceType.
+Canonical countType.
+Canonical finType.
 Canonical porderType.
 Canonical fin_porderType.
-
 Notation finPOrderType := type.
-Notation "[ 'finPOrderType' 'of' T ]" := (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
+Notation "[ 'finPOrderType' 'of' T ]" :=
+  (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
   (at level 0, format "[ 'finPOrderType'  'of'  T ]") : form_scope.
-
 End Exports.
-End FinPOrder.
 
+End FinPOrder.
 Import FinPOrder.Exports.
 Bind Scope cpo_sort with FinPOrder.sort.
 
@@ -1171,13 +1160,17 @@ Module FinLattice.
 Section ClassDef.
 
 Record class_of d (T : Type) := Class {
-  base  : FinPOrder.class_of T;
-  mixin : Lattice.mixin_of (POrder.Pack d base)
+  base : FinPOrder.class_of T;
+  mixin1 : Lattice.mixin_of (POrder.Pack d base);
+  mixin2 : BLattice.mixin_of (POrder.Pack d base);
+  mixin3 : TBLattice.mixin_of (POrder.Pack d base)
 }.
 
 Local Coercion base : class_of >-> FinPOrder.class_of.
-Definition base2 d T (c : class_of d T) := (Lattice.Class (mixin c)).
-Local Coercion base2 : class_of >-> Lattice.class_of.
+Local Coercion base2 d T (c : class_of d T) : TBLattice.class_of d T :=
+  (@TBLattice.Class
+     _ _ (@BLattice.Class _ _ (Lattice.Class (mixin1 c)) (mixin2 c))
+     (mixin3 c)).
 
 Structure type (display : unit) :=
   Pack { sort; _ : class_of display sort }.
@@ -1191,47 +1184,146 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of _ xT).
 
 Definition pack disp :=
-  fun bT b & phant_id (@FinPOrder.class disp bT) b =>
-  fun mT m & phant_id (@Lattice.mixin disp mT) m =>
-  Pack (@Class disp T b m).
+  fun bT  b  & phant_id (@FinPOrder.class disp bT) b =>
+  fun m1T m1 & phant_id (@Lattice.mixin disp m1T) m1 =>
+  fun m2T m2 & phant_id (@BLattice.mixin disp m2T) m2 =>
+  fun m3T m3 & phant_id (@TBLattice.mixin disp m3T) m3 =>
+  Pack (@Class disp T b m1 m2 m3).
 
 Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
+Definition countType := @Countable.Pack cT xclass.
+Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
 Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition fin_latticeType := @Lattice.Pack disp finPOrderType xclass.
+Definition blatticeType := @BLattice.Pack disp cT xclass.
+Definition tblatticeType := @TBLattice.Pack disp cT xclass.
+Definition fin_latticeType := @Lattice.Pack disp finType xclass.
+Definition fin_blatticeType := @BLattice.Pack disp finType xclass.
+Definition fin_tblatticeType := @TBLattice.Pack disp finType xclass.
 
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> FinPOrder.class_of.
-Coercion base2     : class_of >-> Lattice.class_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
+Module Exports.
+Coercion base : class_of >-> FinPOrder.class_of.
+Coercion base2 : class_of >-> TBLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
 Coercion porderType : type >-> POrder.type.
 Coercion finPOrderType : type >-> FinPOrder.type.
 Coercion latticeType : type >-> Lattice.type.
-
+Coercion blatticeType : type >-> BLattice.type.
+Coercion tblatticeType : type >-> TBLattice.type.
 Canonical eqType.
-Canonical finType.
 Canonical choiceType.
+Canonical countType.
+Canonical finType.
 Canonical porderType.
 Canonical finPOrderType.
 Canonical latticeType.
+Canonical blatticeType.
+Canonical tblatticeType.
 Canonical fin_latticeType.
-
+Canonical fin_blatticeType.
+Canonical fin_tblatticeType.
 Notation finLatticeType  := type.
-
-Notation "[ 'finLatticeType' 'of' T ]" := (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
+Notation "[ 'finLatticeType' 'of' T ]" :=
+  (@pack T _ _ _ erefl _ _ phant_id  _ _ phant_id _ _ phant_id)
   (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
 End Exports.
-End FinLattice.
 
+End FinLattice.
 Export FinLattice.Exports.
+
+Module FinCLattice.
+Section ClassDef.
+
+Record class_of d (T : Type) := Class {
+  base  : FinLattice.class_of d T;
+  mixin1 : CBLattice.mixin_of (BLattice.Pack base);
+  mixin2 : @CTBLattice.mixin_of d (TBLattice.Pack base) (CBLattice.sub mixin1)
+}.
+
+Local Coercion base : class_of >-> FinLattice.class_of.
+Local Coercion base2 d T (c : class_of d T) : CTBLattice.class_of d T :=
+   (@CTBLattice.Class _ _ c (@mixin1 _ _ c) (@mixin2 _ _ c)).
+
+Structure type (display : unit) :=
+  Pack { sort; _ : class_of display sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of _ cT' in c.
+Let xT := let: Pack T _ := cT in T.
+Notation xclass := (class : class_of _ xT).
+
+Definition pack disp :=
+  fun bT b & phant_id (@FinLattice.class disp bT) b =>
+  fun m1T m1 & phant_id (@CTBLattice.mixin1 disp m1T) m1 =>
+  fun m2T m2 & phant_id (@CTBLattice.mixin2 disp m2T) m2 =>
+  Pack (@Class disp T b m1 m2).
+
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition countType := @Countable.Pack cT xclass.
+Definition finType := @Finite.Pack cT xclass.
+Definition porderType := @POrder.Pack disp cT xclass.
+Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
+Definition latticeType := @Lattice.Pack disp cT xclass.
+Definition blatticeType := @BLattice.Pack disp cT xclass.
+Definition tblatticeType := @TBLattice.Pack disp cT xclass.
+Definition finLatticeType := @FinLattice.Pack disp cT xclass.
+Definition cblatticeType := @CBLattice.Pack disp cT xclass.
+Definition ctblatticeType := @CTBLattice.Pack disp cT xclass.
+Definition fin_cblatticeType := @CBLattice.Pack disp finLatticeType xclass.
+Definition fin_ctblatticeType := @CTBLattice.Pack disp finLatticeType xclass.
+
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> FinLattice.class_of.
+Coercion base2 : class_of >-> CTBLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion latticeType : type >-> Lattice.type.
+Coercion blatticeType : type >-> BLattice.type.
+Coercion tblatticeType : type >-> TBLattice.type.
+Coercion finLatticeType : type >-> FinLattice.type.
+Coercion cblatticeType : type >-> CBLattice.type.
+Coercion ctblatticeType : type >-> CTBLattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical finPOrderType.
+Canonical latticeType.
+Canonical blatticeType.
+Canonical tblatticeType.
+Canonical finLatticeType.
+Canonical cblatticeType.
+Canonical ctblatticeType.
+Canonical fin_cblatticeType.
+Canonical fin_ctblatticeType.
+Notation finCLatticeType  := type.
+Notation "[ 'finCLatticeType' 'of' T ]" :=
+  (@pack T _ _ erefl _ _ phant_id  _ _ phant_id _ _ phant_id)
+  (at level 0, format "[ 'finCLatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinCLattice.
+Export FinCLattice.Exports.
 
 Module FinTotal.
 Section ClassDef.
@@ -1263,383 +1355,65 @@ Definition pack disp :=
   Pack (@Class disp T b m).
 
 Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
+Definition countType := @Countable.Pack cT xclass.
+Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
 Definition latticeType := @Lattice.Pack disp cT xclass.
+Definition blatticeType := @BLattice.Pack disp cT xclass.
+Definition tblatticeType := @TBLattice.Pack disp cT xclass.
 Definition finLatticeType := @FinLattice.Pack disp cT xclass.
 Definition orderType := @Total.Pack disp cT xclass.
-Definition fin_orderType := @Total.Pack disp finLatticeType xclass.
+Definition order_countType := @Countable.Pack orderType xclass.
+Definition order_finType := @Finite.Pack orderType xclass.
+Definition order_finPOrderType := @FinPOrder.Pack disp orderType xclass.
+Definition order_blatticeType := @BLattice.Pack disp orderType xclass.
+Definition order_tblatticeType := @TBLattice.Pack disp orderType xclass.
+Definition order_finLatticeType := @FinLattice.Pack disp orderType xclass.
 
 End ClassDef.
 
-Module Import Exports.
-Coercion base      : class_of >-> FinLattice.class_of.
-Coercion base2     : class_of >-> Total.class_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
+Module Exports.
+Coercion base : class_of >-> FinLattice.class_of.
+Coercion base2 : class_of >-> Total.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
 Coercion porderType : type >-> POrder.type.
 Coercion finPOrderType : type >-> FinPOrder.type.
 Coercion latticeType : type >-> Lattice.type.
+Coercion blatticeType : type >-> BLattice.type.
+Coercion tblatticeType : type >-> TBLattice.type.
 Coercion finLatticeType : type >-> FinLattice.type.
 Coercion orderType : type >-> Total.type.
-
 Canonical eqType.
-Canonical finType.
 Canonical choiceType.
+Canonical countType.
+Canonical finType.
 Canonical porderType.
 Canonical finPOrderType.
 Canonical latticeType.
+Canonical blatticeType.
+Canonical tblatticeType.
 Canonical finLatticeType.
 Canonical orderType.
-Canonical fin_orderType.
-
-Notation finOrderType  := type.
-
-Notation "[ 'finOrderType' 'of' T ]" := (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
+Canonical order_countType.
+Canonical order_finType.
+Canonical order_finPOrderType.
+Canonical order_blatticeType.
+Canonical order_tblatticeType.
+Canonical order_finLatticeType.
+Notation finOrderType := type.
+Notation "[ 'finOrderType' 'of' T ]" :=
+  (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
   (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
 End Exports.
+
 End FinTotal.
-
 Export Total.Exports.
-
-Module FinBLattice.
-Section ClassDef.
-
-Record class_of d (T : Type) := Class {
-  base  : FinLattice.class_of d T;
-  mixin : BLattice.mixin_of (FinPOrder.Pack d base)
-}.
-
-Local Coercion base : class_of >-> FinLattice.class_of.
-Definition base2 d T (c : class_of d T) :=
-   (@BLattice.Class _ _ (FinLattice.base2 c) (@mixin _ _ c)).
-Local Coercion base2 : class_of >-> BLattice.class_of.
-
-Structure type (display : unit) :=
-  Pack { sort; _ : class_of display sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of _ cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of _ xT).
-
-Definition pack disp :=
-  fun bT b & phant_id (@FinPOrder.class disp bT) b =>
-  fun mT m & phant_id (@BLattice.mixin disp mT) m =>
-  Pack (@Class disp T b m).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition porderType := @POrder.Pack disp cT xclass.
-Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition finLatticeType := @FinLattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition fin_blatticeType := @BLattice.Pack disp finLatticeType xclass.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base      : class_of >-> FinLattice.class_of.
-Coercion base2     : class_of >-> BLattice.class_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-
-Canonical eqType.
-Canonical finType.
-Canonical choiceType.
-Canonical porderType.
-Canonical finPOrderType.
-Canonical latticeType.
-Canonical finLatticeType.
-Canonical blatticeType.
-Canonical fin_blatticeType.
-
-Notation finBLatticeType  := type.
-
-Notation "[ 'finBLatticeType' 'of' T ]" := (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
-  (at level 0, format "[ 'finBLatticeType'  'of'  T ]") : form_scope.
-End Exports.
-End FinBLattice.
-
-Export FinBLattice.Exports.
-
-Module FinTBLattice.
-Section ClassDef.
-
-Record class_of d (T : Type) := Class {
-  base  : FinBLattice.class_of d T;
-  mixin : TBLattice.mixin_of (FinPOrder.Pack d base)
-}.
-
-Local Coercion base : class_of >-> FinBLattice.class_of.
-Definition base2 d T (c : class_of d T) :=
-   (@TBLattice.Class _ _ c (@mixin _ _ c)).
-Local Coercion base2 : class_of >-> TBLattice.class_of.
-
-Structure type (display : unit) :=
-  Pack { sort; _ : class_of display sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of _ cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of _ xT).
-
-Definition pack disp :=
-  fun bT b & phant_id (@FinBLattice.class disp bT) b =>
-  fun mT m & phant_id (@TBLattice.mixin disp mT) m =>
-  Pack (@Class disp T b m).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition porderType := @POrder.Pack disp cT xclass.
-Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition finLatticeType := @FinLattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition finBLatticeType := @FinBLattice.Pack disp cT xclass.
-Definition tblatticeType := @TBLattice.Pack disp cT xclass.
-Definition fin_blatticeType := @TBLattice.Pack disp finBLatticeType xclass.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base      : class_of >-> FinBLattice.class_of.
-Coercion base2     : class_of >-> TBLattice.class_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion finBLatticeType : type >-> FinBLattice.type.
-Coercion tblatticeType : type >-> TBLattice.type.
-
-Canonical eqType.
-Canonical finType.
-Canonical choiceType.
-Canonical porderType.
-Canonical finPOrderType.
-Canonical latticeType.
-Canonical finLatticeType.
-Canonical blatticeType.
-Canonical finBLatticeType.
-Canonical tblatticeType.
-Canonical fin_blatticeType.
-
-Notation finTBLatticeType  := type.
-
-Notation "[ 'finTBLatticeType' 'of' T ]" := (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
-  (at level 0, format "[ 'finTBLatticeType'  'of'  T ]") : form_scope.
-End Exports.
-End FinTBLattice.
-
-Export FinTBLattice.Exports.
-
-Module FinCBLattice.
-Section ClassDef.
-
-Record class_of d (T : Type) := Class {
-  base  : FinBLattice.class_of d T;
-  mixin : CBLattice.mixin_of (BLattice.Pack base)
-}.
-
-Local Coercion base : class_of >-> FinBLattice.class_of.
-Definition base2 d T (c : class_of d T) :=
-   (@CBLattice.Class _ _ c (@mixin _ _ c)).
-Local Coercion base2 : class_of >-> CBLattice.class_of.
-
-Structure type (display : unit) :=
-  Pack { sort; _ : class_of display sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of _ cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of _ xT).
-
-Definition pack disp :=
-  fun bT b & phant_id (@FinBLattice.class disp bT) b =>
-  fun mT m & phant_id (@CBLattice.mixin disp mT) m =>
-  Pack (@Class disp T b m).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition porderType := @POrder.Pack disp cT xclass.
-Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition finLatticeType := @FinLattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition finBLatticeType := @FinBLattice.Pack disp cT xclass.
-Definition cblatticeType := @CBLattice.Pack disp cT xclass.
-Definition fin_blatticeType := @CBLattice.Pack disp finBLatticeType xclass.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base      : class_of >-> FinBLattice.class_of.
-Coercion base2     : class_of >-> CBLattice.class_of.
-Coercion sort      : type >-> Sortclass.
-Coercion eqType    : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion finBLatticeType : type >-> FinBLattice.type.
-Coercion cblatticeType : type >-> CBLattice.type.
-
-Canonical eqType.
-Canonical finType.
-Canonical choiceType.
-Canonical porderType.
-Canonical finPOrderType.
-Canonical latticeType.
-Canonical finLatticeType.
-Canonical blatticeType.
-Canonical finBLatticeType.
-Canonical cblatticeType.
-Canonical fin_blatticeType.
-
-Notation finCBLatticeType  := type.
-
-Notation "[ 'finCBLatticeType' 'of' T ]" := (@pack T _ _ erefl _ _ phant_id  _ _ phant_id)
-  (at level 0, format "[ 'finCBLatticeType'  'of'  T ]") : form_scope.
-End Exports.
-End FinCBLattice.
-
-Export FinCBLattice.Exports.
-
-Module FinCTBLattice.
-Section ClassDef.
-
-Record class_of d (T : Type) := Class {
-  base  : FinTBLattice.class_of d T;
-  mixin1 : CBLattice.mixin_of (BLattice.Pack base);
-  mixin2 : @CTBLattice.mixin_of d (TBLattice.Pack base) (CBLattice.sub mixin1)
-}.
-
-Local Coercion base : class_of >-> FinTBLattice.class_of.
-Definition base1 d T (c : class_of d T) :=
-   (@FinCBLattice.Class _ _ c (@mixin1 _ _ c)).
-Local Coercion base1 : class_of >-> FinCBLattice.class_of.
-Definition base2 d T (c : class_of d T) :=
-   (@CTBLattice.Class _ _ c (@mixin1 _ _ c) (@mixin2 _ _ c)).
-Local Coercion base2 : class_of >-> CTBLattice.class_of.
-
-Structure type (display : unit) :=
-  Pack { sort; _ : class_of display sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of _ cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of _ xT).
-
-Definition pack disp :=
-  fun bT b & phant_id (@FinTBLattice.class disp bT) b =>
-  fun m1T m1 & phant_id (@CTBLattice.mixin1 disp m1T) m1 =>
-  fun m2T m2 & phant_id (@CTBLattice.mixin2 disp m2T) m2 =>
-  Pack (@Class disp T b m1 m2).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition finType := @Finite.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition porderType := @POrder.Pack disp cT xclass.
-Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition finLatticeType := @FinLattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition finBLatticeType := @FinBLattice.Pack disp cT xclass.
-Definition cblatticeType := @CBLattice.Pack disp cT xclass.
-Definition tblatticeType := @TBLattice.Pack disp cT xclass.
-Definition finTBLatticeType := @FinTBLattice.Pack disp cT xclass.
-Definition finCBLatticeType := @FinCBLattice.Pack disp cT xclass.
-Definition ctblatticeType := @CTBLattice.Pack disp cT xclass.
-Definition fintb_ctblatticeType := @CTBLattice.Pack disp finTBLatticeType xclass.
-Definition fincb_ctblatticeType := @CTBLattice.Pack disp finCBLatticeType xclass.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base      : class_of >-> FinTBLattice.class_of.
-Coercion base1     : class_of >-> FinCBLattice.class_of.
-Coercion base2     : class_of >-> CTBLattice.class_of.
-Coercion sort      : type >-> Sortclass.
-
-Coercion eqType : type >-> Equality.type.
-Coercion finType : type >-> Finite.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion finBLatticeType : type >-> FinBLattice.type.
-Coercion cblatticeType : type >-> CBLattice.type.
-Coercion tblatticeType : type >-> TBLattice.type.
-Coercion finTBLatticeType : type >-> FinTBLattice.type.
-Coercion finCBLatticeType : type >-> FinCBLattice.type.
-Coercion ctblatticeType : type >-> CTBLattice.type.
-Coercion fintb_ctblatticeType : type >-> CTBLattice.type.
-Coercion fincb_ctblatticeType : type >-> CTBLattice.type.
-
-
-Canonical eqType.
-Canonical finType.
-Canonical choiceType.
-Canonical porderType.
-Canonical finPOrderType.
-Canonical latticeType.
-Canonical finLatticeType.
-Canonical blatticeType.
-Canonical finBLatticeType.
-Canonical cblatticeType.
-Canonical tblatticeType.
-Canonical finTBLatticeType.
-Canonical finCBLatticeType.
-Canonical ctblatticeType.
-Canonical fintb_ctblatticeType.
-Canonical fincb_ctblatticeType.
-
-Notation finCTBLatticeType  := type.
-
-Notation "[ 'finCTBLatticeType' 'of' T ]" :=
-  (@pack T _ _ erefl _ _ phant_id  _ _ phant_id _ _ phant_id)
-  (at level 0, format "[ 'finCTBLatticeType'  'of'  T ]") : form_scope.
-End Exports.
-End FinCTBLattice.
-
-Export FinCTBLattice.Exports.
 
 (***********)
 (* REVERSE *)
@@ -2047,7 +1821,8 @@ Variable T : porderType.
 Definition reverse_le (x y : T) := (y <= x).
 Definition reverse_lt (x y : T) := (y < x).
 
-Lemma reverse_lt_neqAle (x y : T) : reverse_lt x y = (x != y) && (reverse_le x y).
+Lemma reverse_lt_neqAle (x y : T) :
+  reverse_lt x y = (x != y) && (reverse_le x y).
 Proof. by rewrite eq_sym; apply: lt_neqAle. Qed.
 
 Fact reverse_le_anti : antisymmetric reverse_le.
@@ -3462,8 +3237,6 @@ Export POrder.Exports.
 Export Total.Exports.
 Export Lattice.Exports.
 Export FinPOrder.Exports.
-Export FinTotal.Exports.
-Export FinLattice.Exports.
 End UnboundedTheory.
 
 Module Theory.
@@ -3479,10 +3252,9 @@ Export BLattice.Exports.
 Export CBLattice.Exports.
 Export TBLattice.Exports.
 Export CTBLattice.Exports.
-Export FinBLattice.Exports.
-Export FinCBLattice.Exports.
-Export FinTBLattice.Exports.
-Export FinCTBLattice.Exports.
+Export FinLattice.Exports.
+Export FinCLattice.Exports.
+Export FinTotal.Exports.
 End Theory.
 
 End Order.
