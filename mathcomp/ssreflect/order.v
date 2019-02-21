@@ -1725,10 +1725,10 @@ Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
 
 Lemma lexx (x : T) : x <= x.
 Proof. by case: T x => ? [? []]. Qed.
-Hint Resolve lexx.
+Hint Resolve lexx : core.
 
 Definition le_refl : reflexive le := lexx.
-Hint Resolve le_refl.
+Hint Resolve le_refl : core.
 
 Lemma le_anti: antisymmetric (<=%O : rel T).
 Proof. by case: T => ? [? []]. Qed.
@@ -1746,7 +1746,7 @@ Lemma ltxx x: x < x = false.
 Proof. by rewrite lt_neqAle eqxx. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
-Hint Resolve lt_irreflexive.
+Hint Resolve lt_irreflexive : core.
 
 Definition ltexx := (lexx, ltxx).
 
@@ -1956,7 +1956,7 @@ Implicit Types (m n p : nat) (x y z : T) (u v w : T').
 Variable D D' : pred T.
 Variable (f : T -> T').
 
-Hint Resolve lexx lt_neqAle (@le_anti _ T) (@le_anti _ T') lt_def.
+Hint Resolve lexx lt_neqAle (@le_anti _ T) (@le_anti _ T') lt_def : core.
 
 Let ge_antiT : antisymmetric (>=%O : rel T).
 Proof. by move=> ?? /le_anti. Qed.
@@ -2026,7 +2026,7 @@ End POrderMonotonyTheory.
 
 End POrderTheory.
 
-Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF.
+Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
 
 Arguments leifP {display T x y C}.
 Arguments leif_refl {display T x C}.
@@ -2287,10 +2287,10 @@ Context {T : orderType}.
 Implicit Types (x y z t : T).
 
 Lemma le_total : total (<=%O : rel T). Proof. by case: T => [? [?]]. Qed.
-Hint Resolve le_total.
+Hint Resolve le_total : core.
 
 Lemma comparableT x y : x >=< y. Proof. exact: le_total. Qed.
-Hint Resolve comparableT.
+Hint Resolve comparableT : core.
 
 Lemma sort_le_sorted (s : seq T) : sorted <=%O (sort <=%O s).
 Proof. exact: sort_sorted. Qed.
@@ -2303,11 +2303,9 @@ Proof.
 by move=> ss; apply: eq_sorted_le; rewrite ?sort_le_sorted // perm_sort.
 Qed.
 
-Lemma leNgt x y : (x <= y) = ~~ (y < x).
-Proof. by rewrite comparable_leNgt. Qed.
+Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 
-Lemma ltNge x y : (x < y) = ~~ (y <= x).
-Proof. by rewrite comparable_ltNge. Qed.
+Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
 
 Lemma wlog_le P :
      (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
@@ -2331,11 +2329,9 @@ Definition ltgtP x y := LatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
 Definition leP x y := LatticeTheoryJoin.lcomparable_leP (comparableT x y).
 Definition ltP x y := LatticeTheoryJoin.lcomparable_ltP (comparableT x y).
 
-Lemma neq_lt x y : (x != y) = (x < y) || (y < x).
-Proof. by case: ltgtP. Qed.
+Lemma neq_lt x y : (x != y) = (x < y) || (y < x). Proof. by case: ltgtP. Qed.
 
-Lemma lt_total x y : x != y -> (x < y) || (y < x).
-Proof. by rewrite neq_lt. Qed.
+Lemma lt_total x y : x != y -> (x < y) || (y < x). Proof. by case: ltgtP. Qed.
 
 Lemma eq_leLR x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
@@ -2439,7 +2435,7 @@ Local Notation "0" := bottom.
 
 (* Distributive lattice theory with 0 & 1*)
 Lemma le0x x : 0 <= x. Proof. by case: L x => [?[?[]]]. Qed.
-Hint Resolve le0x.
+Hint Resolve le0x : core.
 
 Lemma lex0 x : (x <= 0) = (x == 0).
 Proof. by rewrite le_eqVlt (le_gtF (le0x _)) orbF. Qed.
@@ -2651,7 +2647,7 @@ Implicit Types (x y : L).
 
 Local Notation "1" := top.
 
-Hint Resolve le0x lex1.
+Hint Resolve le0x lex1 : core.
 
 Lemma meetx1 : right_id 1 (@meet _ L).
 Proof. exact: (@joinx0 _ [tblatticeType of L^r]). Qed.
@@ -2762,7 +2758,7 @@ Proof. by rewrite meetC joinBI. Qed.
 
 Lemma leBx x y : x `\` y <= x.
 Proof. by rewrite -{2}[x](joinIB y) lexU2 // lexx orbT. Qed.
-Hint Resolve leBx.
+Hint Resolve leBx : core.
 
 Lemma subxx x : x `\` x = 0.
 Proof. by have := subKI x x; rewrite (meet_idPr _). Qed.
@@ -3001,8 +2997,7 @@ Context {T : porderType}.
 Implicit Types (x y z : T).
 Hypothesis le_total : total (<=%O : rel T).
 
-Fact comparableT x y : x >=< y. Proof. exact: le_total. Qed.
-Hint Resolve comparableT.
+Let comparableT x y : x >=< y := le_total x y.
 
 Fact ltgtP x y :
   comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
