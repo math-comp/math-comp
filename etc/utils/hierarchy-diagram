@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo "digraph structures {"
+
+{
+cat <<EOT
+Set Printing Width 4611686018427387903.
+Require Import all.all.
+Print Graph.
+EOT
+} | \
+coqtop -w none -R mathcomp mathcomp 2>/dev/null | \
+grep '^\[[^ ;]*\] : [a-zA-Z_\.]*\.class_of >-> [a-zA-Z_\.]*\.class_of$' | \
+while read -r line; do
+  echo $line | \
+  sed 's/^\[\([^]]*\)\] : \([a-zA-Z_\.]*\)\.class_of >-> \([a-zA-Z_\.]*\)\.class_of$/"\2" -> "\3";/'
+  #sed 's/^\[\([^]]*\)\] : \([a-zA-Z_\.]*\)\.class_of >-> \([a-zA-Z_\.]*\)\.class_of$/"\2" -> "\3" [label="\1"];/'
+done
+
+echo "}"
