@@ -6,22 +6,40 @@ Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
 
 (******************************************************************************)
 (* This file implements a type for functions with a finite domain:            *)
-(*    {ffun aT -> rT} where aT should have a finType structure.               *)
+(*      {ffun aT -> rT} where aT should have a finType structure,             *)
+(*      {ffun forall x : aT, rT} for dependent functions over a finType aT,   *)
+(*  and {ffun funT} where funT expands to a product over a finType.           *)
 (* Any eqType, choiceType, countType and finType structures on rT extend to   *)
 (* {ffun aT -> rT} as Leibnitz equality and extensional equalities coincide.  *)
 (*     (T ^ n)%type is notation for {ffun 'I_n -> T}, which is isomorphic     *)
-(*                     to n.-tuple T.                                         *)
-(*  For f : {ffun aT -> rT}, we define                                        *)
+(*   to n.-tuple T, but is structurally positive and thus can be used to      *)
+(*   define inductive types, e.g., Inductive tree := node n of tree ^ n.      *)
+(* --> More generally, {ffun fT} is always structurally positive.             *)
+(*  For f : {ffun fT} with fT := forall x : aT -> rT x, we define             *)
 (*              f x == the image of x under f (f coerces to a CiC function)   *)
-(*         fgraph f == the graph of f, i.e., the #|aT|.-tuple rT of the       *)
-(*                     values of f over enum aT.                              *)
-(*       finfun lam == the f such that f =1 lam; this is the RECOMMENDED      *)
-(*                     interface to build an element of {ffun aT -> rT}.      *)
-(* [ffun x => expr] == finfun (fun x => expr)                                 *)
-(*    [ffun=> expr] == finfun (fun _ => expr)                                 *)
-(*        ffun0 aT0 == the trivial finfun, from a proof aT0 that #|aT| = 0    *)
-(*  f \in ffun_on R == the range of f is a subset of R                        *)
+(* --> The coercion is structurally decreasing, e.g., Coq will accept         *)
+(*   Fixpoint size t := let: node n f := t in sumn (codom (size \o f)) + 1.   *)
+(* as structurally decreasing on t of the inductive tree type above.          *)
+(*      total_fun g == the function induced by a dependent function g of type *)
+(*                     forall x, rT on the total space {x : aT & rT x}.       *)
+(*                  := fun x =>  Tagged (fun x => rT) (g x).                  *)
+(*        tfgraph f == the total function graph of f, i.e., the #|aT|.-tuple  *)
+(*                     of all the (dependent pair) values of total_fun f.     *)
+(*         finfun g == the f extensionally equal to g, and the RECOMMENDED    *)
+(*                     interface for building elements of {ffun fT}.          *)
+(* [ffun x => expr] := finfun (fun x => expr).                                *)
+(*    [ffun=> expr] := [ffun _ => expr].                                      *)
+(* [ffun x : aT => expr] := finfun (fun x : aT => expr) (only parsing)        *)
+(*        ffun0 aT0 == the trivial finfun, from a proof aT0 that #|aT| = 0.   *)
 (*   f \in family F == f belongs to the family F (f x \in F x for all x)      *)
+(* Also, {ffun fT} inherits combinatorial structures of rT, i.e., eqType,     *)
+(* choiceType, countType, and finType.                                        *)
+(*   There are addidional operations for non-dependent finite functions,      *)
+(* i.e., f in {ffun aT -> rT}.                                                *)
+(*         fgraph f == the function graph of f, i.e., the #|aT|.-tuple        *)
+(*                     listing the values of f x, for x ranging over enum aT. *)
+(*         Finfun G == the finfun f whose (simple) function graph is G.       *)
+(*  f \in ffun_on R == the range of f is a subset of R.                       *)
 (*     y.-support f == the y-support of f, i.e., [pred x | f x != y].         *)
 (*                     Thus, y.-support f \subset D means f has y-support D.  *)
 (*                     We will put Notation support := 0.-support in ssralg.  *)
@@ -37,135 +55,234 @@ Unset Printing Implicit Defensive.
 
 Section Def.
 
-Variables (aT : finType) (rT : Type).
+Variables (aT : finType) (rT : aT -> Type).
 
-Inductive finfun_type : predArgType := Finfun of #|aT|.-tuple rT.
+Inductive finfun_on : seq aT -> Type :=
+| finfun_nil                            : finfun_on [::]
+| finfun_cons x s of rT x & finfun_on s : finfun_on (x :: s).
 
-Definition finfun_of of phant (aT -> rT) := finfun_type.
+Local Fixpoint finfun_rec (g : forall x, rT x) s : finfun_on s :=
+  if s is x1 :: s1 then finfun_cons (g x1) (finfun_rec g s1) else finfun_nil.
 
-Identity Coercion type_of_finfun : finfun_of >-> finfun_type.
+Local Fixpoint fun_of_fin_rec x s (f_s : finfun_on s) : x \in s -> rT x :=
+  if f_s is finfun_cons x1 s1 y1 f_s1 then
+    if eqP is ReflectT Dx in reflect _ Dxb return Dxb || (x \in s1) -> rT x then
+      fun=> ecast x (rT x) (esym Dx) y1
+    else fun_of_fin_rec f_s1
+  else fun isF =>  False_rect (rT x) (notF isF).
 
-Definition fgraph f := let: Finfun t := f in t.
+Variant finfun_of (ph : phant (forall x, rT x)) : predArgType :=
+  FinfunOf of finfun_on (enum aT).
 
-Canonical finfun_subType := Eval hnf in [newType for fgraph].
+Definition fun_of_fin ph (f : finfun_of ph) x :=
+  let: FinfunOf f_aT := f in fun_of_fin_rec f_aT (mem_enum aT x).
 
 End Def.
 
+Coercion fun_of_fin : finfun_of >-> Funclass.
+Arguments fun_of_fin {aT rT ph} f x.
+
 Notation "{ 'ffun' fT }" := (finfun_of (Phant fT))
   (at level 0, format "{ 'ffun'  '[hv' fT ']' }") : type_scope.
-Definition exp_finIndexType n := ordinal_finType n.
-Notation "T ^ n" := (@finfun_of (exp_finIndexType n) T (Phant _)) : type_scope.
+Definition exp_finIndexType := ordinal_finType.
+Notation "T ^ n" :=
+  (@finfun_of (exp_finIndexType n) (fun=> T) (Phant _)) : type_scope.
 
-Local Notation fun_of_fin_def :=
-  (fun aT rT f x => tnth (@fgraph aT rT f) (enum_rank x)).
+Local Notation finPi aT rT := (forall x : Finite.sort aT, rT x) (only parsing).
+Local Notation finfun_def :=
+  (fun aT rT g => FinfunOf (Phant (finPi aT rT)) (finfun_rec g (enum aT))).
 
-Local Notation finfun_def := (fun aT rT f => @Finfun aT rT (codom_tuple f)).
-
-Module Type FunFinfunSig.
-Parameter fun_of_fin : forall aT rT, finfun_type aT rT -> aT -> rT.
-Parameter finfun : forall (aT : finType) rT, (aT -> rT) -> {ffun aT -> rT}.
-Axiom fun_of_finE : fun_of_fin = fun_of_fin_def.
+Module Type FinfunSig.
+Parameter finfun : forall aT rT, finPi aT rT -> {ffun finPi aT rT}.
 Axiom finfunE : finfun = finfun_def.
-End FunFinfunSig.
+End FinfunSig.
 
-Module FunFinfun : FunFinfunSig.
-Definition fun_of_fin := fun_of_fin_def.
+Module Finfun : FinfunSig.
 Definition finfun := finfun_def.
-Lemma fun_of_finE : fun_of_fin = fun_of_fin_def. Proof. by []. Qed.
 Lemma finfunE : finfun = finfun_def. Proof. by []. Qed.
-End FunFinfun.
+End Finfun.
 
-Notation fun_of_fin := FunFinfun.fun_of_fin.
-Notation finfun := FunFinfun.finfun.
-Coercion fun_of_fin : finfun_type >-> Funclass.
-Canonical fun_of_fin_unlock := Unlockable FunFinfun.fun_of_finE.
-Canonical finfun_unlock := Unlockable FunFinfun.finfunE.
+Notation finfun := Finfun.finfun.
+Canonical finfun_unlock := Unlockable Finfun.finfunE.
+Arguments finfun {aT rT} g.
 
 Notation "[ 'ffun' x : aT => F ]" := (finfun (fun x : aT => F))
   (at level 0, x ident, only parsing) : fun_scope.
 
-Notation "[ 'ffun' : aT => F ]" := (finfun (fun _ : aT => F))
-  (at level 0, only parsing) : fun_scope.
-
 Notation "[ 'ffun' x => F ]" := [ffun x : _ => F]
   (at level 0, x ident, format "[ 'ffun'  x  =>  F ]") : fun_scope.
 
-Notation "[ 'ffun' => F ]" := [ffun : _ => F]
+Notation "[ 'ffun' => F ]" := [ffun _ => F]
   (at level 0, format "[ 'ffun' =>  F ]") : fun_scope.
 
-(* Helper for defining notation for function families. *)
-Definition fmem aT rT (pT : predType rT) (f : aT -> pT) := [fun x => mem (f x)].
+(* Test that the type and accessor are structurally positive and decreasing,
+   respectively.
+Inductive tree := node n of tree ^ n.
+Fixpoint size t := let: node n f := t in sumn (codom (size \o f)) + 1.
+Inductive tri_tree n := tri_row of {ffun forall i : 'I_n, tri_tree i}.
+Fixpoint tri_size n (t : tri_tree n) :=
+  let: tri_row f := t in sumn [seq tri_size (f i) | i : 'I_n] + 1.
+*)
 
-(* Lemmas on the correspondance between finfun_type and CiC functions. *)
-Section PlainTheory.
+(* Lemmas on the correspondance between finfun_of and CiC dependent functions. *)
+Section DepPlainTheory.
+Variables (aT : finType) (rT : aT -> Type).
+Notation fT := {ffun finPi aT rT}.
+Implicit Type f : fT.
+
+Fact ffun0 (aT0 : #|aT| = 0) : fT.
+Proof. by apply/finfun=> x; have:= card0_eq aT0 x. Qed.
+
+Lemma ffunE g x : (finfun g : fT) x = g x.
+Proof.
+rewrite unlock /=; set s := enum aT; set s_x : mem_seq s x := mem_enum _ _.
+by elim: s s_x => //= x1 s IHs; case: eqP => [|_]; [case: x1 / | apply: IHs].
+Qed.
+
+Lemma ffunP (f1 f2 : fT) : (forall x, f1 x = f2 x) <-> f1 = f2.
+Proof.
+suffices ffunK f g: (forall x, f x = g x) -> f = finfun g.
+  by split=> [/ffunK|] -> //; apply/esym/ffunK.
+case: f => f Dg; rewrite unlock; congr FinfunOf.
+have{Dg} Dg x (aTx : mem_seq (enum aT) x): g x = fun_of_fin_rec f aTx.
+  by rewrite -Dg /= (bool_irrelevance (mem_enum _ _) aTx).
+elim: (enum aT) / f (enum_uniq aT) => //= x1 s y f IHf /andP[s'x1 Us] in Dg *.
+rewrite Dg ?eqxx //=; case: eqP => // /eq_axiomK-> /= _.
+rewrite {}IHf // => x s_x; rewrite Dg ?s_x ?orbT //.
+by case: eqP (memPn s'x1 x s_x) => // _ _ /(bool_irrelevance s_x) <-.
+Qed.
+
+Lemma ffunK : @cancel (finPi aT rT) fT fun_of_fin finfun.
+Proof. by move=> f; apply/ffunP=> x; rewrite ffunE. Qed.
+
+Lemma eq_dffun (g1 g2 : forall x, rT x) :
+   (forall x, g1 x = g2 x) -> finfun g1 = finfun g2.
+Proof. by move=> eq_g; apply/ffunP => x; rewrite !ffunE eq_g. Qed.
+
+Definition total_fun g x := Tagged rT (g x : rT x).
+
+Definition tfgraph f := codom_tuple (total_fun f).
+
+Lemma codom_tffun f : codom (total_fun f) = tfgraph f. Proof. by []. Qed.
+
+Local Definition tfgraph_inv (G : #|aT|.-tuple {x : aT & rT x}) : option fT :=
+  if eqfunP isn't ReflectT Dtg then None else
+  Some [ffun x => ecast x (rT x) (Dtg x) (tagged (tnth G (enum_rank x)))].
+
+Local Lemma tfgraphK : pcancel tfgraph tfgraph_inv.
+Proof.
+move=> f; have Dg x: tnth (tfgraph f) (enum_rank x) = total_fun f x.
+  by rewrite tnth_map -[tnth _ _]enum_val_nth enum_rankK.
+rewrite /tfgraph_inv; case: eqfunP => /= [Dtg | [] x]; last by rewrite Dg.
+congr (Some _); apply/ffunP=> x; rewrite ffunE.
+by rewrite Dg in (Dx := Dtg x) *; rewrite eq_axiomK.
+Qed.
+
+Lemma tfgraph_inj : injective tfgraph. Proof. exact: pcan_inj tfgraphK. Qed.
+
+Definition family_mem mF := [pred f : fT | [forall x, in_mem (f x) (mF x)]].
+
+Variables (pT : forall x, predType (rT x)) (F : forall x, pT x).
+
+(* Helper for defining notation for function families. *)
+Local Definition fmem F x := mem (F x : pT x).
+
+Lemma familyP f : reflect (forall x, f x \in F x) (f \in family_mem (fmem F)).
+Proof. exact: forallP. Qed.
+
+End DepPlainTheory.
+
+Arguments ffunK {aT rT} f : rename.
+Arguments ffun0 {aT rT} aT0.
+Arguments eq_dffun {aT rT} [g1] g2 eq_g12.
+Arguments total_fun {aT rT} g x.
+Arguments tfgraph {aT rT} f.
+Arguments tfgraph_inj {aT rT} [f1 f2] : rename.
+
+Arguments fmem {aT rT pT} F x /.
+Arguments familyP {aT rT pT F f}.
+Notation family F := (family_mem (fmem F)).
+
+Definition finfun_eqMixin aT (rT : _ -> eqType) :=
+  PcanEqMixin (@tfgraphK aT rT).
+Canonical finfun_eqType aT rT :=
+  EqType {ffun finPi aT _} (finfun_eqMixin rT).
+
+Definition finfun_choiceMixin aT (rT : _ -> choiceType) :=
+  PcanChoiceMixin (@tfgraphK aT rT).
+Canonical finfun_choiceType aT rT :=
+  ChoiceType {ffun finPi aT _} (finfun_choiceMixin rT).
+
+Definition finfun_countMixin aT (rT : _ -> countType) :=
+  PcanCountMixin (@tfgraphK aT rT).
+Canonical finfun_countType aT rT :=
+  CountType {ffun finPi aT _} (finfun_countMixin rT).
+
+Definition finfun_finMixin aT (rT : _ -> finType) :=
+  PcanFinMixin (@tfgraphK aT rT).
+Canonical finfun_finType aT rT :=
+  FinType {ffun finPi aT _} (finfun_finMixin rT).
+
+Section FunPlainTheory.
 
 Variables (aT : finType) (rT : Type).
 Notation fT := {ffun aT -> rT}.
 Implicit Types (f : fT) (R : pred rT).
 
-Canonical finfun_of_subType := Eval hnf in [subType of fT].
+Definition fgraph f := codom_tuple f.
+
+Definition Finfun (G : #|aT|.-tuple rT) := [ffun x => tnth G (enum_rank x)].
 
 Lemma tnth_fgraph f i : tnth (fgraph f) i = f (enum_val i).
-Proof. by rewrite [@fun_of_fin]unlock enum_valK. Qed.
+Proof. by rewrite tnth_map /tnth -enum_val_nth. Qed.
 
-Definition ffun0 (aT0 : #|aT| = 0) : {ffun aT -> rT} :=
-  Finfun (ecast _ _ (esym aT0) (nil_tuple _)).
-
-Lemma ffunE (g : aT -> rT) : finfun g =1 g.
+Lemma FinfunK : cancel Finfun fgraph.
 Proof.
-move=> x; rewrite [@finfun]unlock unlock tnth_map.
-by rewrite -[tnth _ _]enum_val_nth enum_rankK.
+by move=> G; apply/eq_from_tnth=> i; rewrite tnth_fgraph ffunE enum_valK.
 Qed.
+
+Lemma fgraphK : cancel fgraph Finfun.
+Proof. by move=> f; apply/ffunP=> x; rewrite ffunE tnth_fgraph enum_rankK. Qed.
+
+Lemma fgraph_ffun0 aT0 : fgraph (ffun0 aT0) = nil :> seq rT.
+Proof. by apply/nilP/eqP; rewrite size_tuple. Qed.
+
+Lemma codom_ffun f : codom f = fgraph f. Proof. by []. Qed.
+
+Lemma tagged_tfgraph f : @map _ rT tagged (tfgraph f) = fgraph f.
+Proof. by rewrite -map_comp. Qed.
+
+Lemma eq_ffun (g1 g2 : aT -> rT) : g1 =1 g2 -> finfun g1 = finfun g2.
+Proof. exact: eq_dffun. Qed.
 
 Lemma fgraph_codom f : fgraph f = codom_tuple f.
-Proof.
-apply: eq_from_tnth => i; rewrite [@fun_of_fin]unlock tnth_map.
-by congr tnth; rewrite -[tnth _ _]enum_val_nth enum_valK.
-Qed.
+Proof. exact/esym/val_inj/codom_ffun. Qed.
 
-Lemma codom_ffun f : codom f = val f.
-Proof. by rewrite /= fgraph_codom. Qed.
-
-Lemma ffunP f1 f2 : f1 =1 f2 <-> f1 = f2.
-Proof.
-split=> [eq_f12 | -> //]; do 2!apply: val_inj => /=.
-by rewrite !fgraph_codom /= (eq_codom eq_f12).
-Qed.
-
-Lemma eq_ffun (g1 g2 : aT -> rT) :
-  g1 =1 g2 -> finfun g1 = finfun g2.
-Proof. by move=> eq_g; apply/ffunP => x; rewrite !ffunE eq_g. Qed.
-
-Lemma ffunK : cancel (@fun_of_fin aT rT) (@finfun aT rT).
-Proof. by move=> f; apply/ffunP/ffunE. Qed.
-
-Definition family_mem mF := [pred f : fT | [forall x, in_mem (f x) (mF x)]].
-
-Lemma familyP (pT : predType rT) (F : aT -> pT) f :
-  reflect (forall x, f x \in F x) (f \in family_mem (fmem F)).
-Proof. exact: forallP. Qed.
-
-Definition ffun_on_mem mR := family_mem (fun _ => mR).
+Definition ffun_on_mem (mR : mem_pred rT) := family_mem (fun _ : aT => mR).
 
 Lemma ffun_onP R f : reflect (forall x, f x \in R) (f \in ffun_on_mem (mem R)).
 Proof. exact: forallP. Qed.
 
-End PlainTheory.
+End FunPlainTheory.
 
-Notation family F := (family_mem (fun_of_simpl (fmem F))).
-Notation ffun_on R := (ffun_on_mem _ (mem R)).
-
-Arguments ffunK {aT rT}.
+Arguments Finfun {aT rT} G.
+Arguments fgraph {aT rT} f.
+Arguments FinfunK {aT rT} G : rename.
+Arguments fgraphK {aT rT} f : rename.
 Arguments eq_ffun {aT rT} [g1] g2 eq_g12.
-Arguments familyP {aT rT pT F f}.
 Arguments ffun_onP {aT rT R f}.
 
-(*****************************************************************************)
+Notation ffun_on R := (ffun_on_mem _ (mem R)).
+Notation "@ 'ffun_on' aT R" :=
+  (ffun_on R : simpl_pred (finfun_of (Phant (aT -> id _))))
+  (at level 10, aT, R at level 9).
 
 Lemma nth_fgraph_ord T n (x0 : T) (i : 'I_n) f : nth x0 (fgraph f) i = f i.
 Proof.
-by rewrite -{2}(enum_rankK i) -tnth_fgraph (tnth_nth x0) enum_rank_ord.
+by rewrite -[i in RHS]enum_rankK -tnth_fgraph  (tnth_nth x0) enum_rank_ord.
 Qed.
+
+(*****************************************************************************)
 
 Section Support.
 
@@ -191,11 +308,6 @@ Lemma supportP y D g :
 Proof.
 by apply: (iffP subsetP) => Dg x; [apply: contraNeq | apply: contraR] => /Dg->.
 Qed.
-
-Definition finfun_eqMixin :=
-  Eval hnf in [eqMixin of finfun_type aT rT by <:].
-Canonical finfun_eqType := Eval hnf in EqType _ finfun_eqMixin.
-Canonical finfun_of_eqType := Eval hnf in [eqType of fT].
 
 Definition pfamily_mem y mD (mF : aT -> mem_pred rT) :=
   family (fun i : aT => if in_mem i mD then pred_of_simpl (mF i) else pred1 y).
@@ -224,73 +336,70 @@ Qed.
 End EqTheory.
 
 Arguments supportP {aT rT y D g}.
-Notation pfamily y D F := (pfamily_mem y (mem D) (fun_of_simpl (fmem F))).
+Arguments pfamilyP {aT rT pT y D F f}.
+Arguments pffun_onP {aT rT y D R f}.
+
+Notation pfamily y D F := (pfamily_mem y (mem D) (fmem F)).
 Notation pffun_on y D R := (pffun_on_mem y (mem D) (mem R)).
-
-Definition finfun_choiceMixin aT (rT : choiceType) :=
-  [choiceMixin of finfun_type aT rT by <:].
-Canonical finfun_choiceType aT rT :=
-  Eval hnf in ChoiceType _ (finfun_choiceMixin aT rT).
-Canonical finfun_of_choiceType (aT : finType) (rT : choiceType) :=
-  Eval hnf in [choiceType of {ffun aT -> rT}].
-
-Definition finfun_countMixin aT (rT : countType) :=
-  [countMixin of finfun_type aT rT by <:].
-Canonical finfun_countType aT (rT : countType) :=
-  Eval hnf in CountType _ (finfun_countMixin aT rT).
-Canonical finfun_of_countType (aT : finType) (rT : countType) :=
-  Eval hnf in [countType of {ffun aT -> rT}].
-Canonical finfun_subCountType aT (rT : countType) :=
-  Eval hnf in [subCountType of finfun_type aT rT].
-Canonical finfun_of_subCountType (aT : finType) (rT : countType) :=
-  Eval hnf in [subCountType of {ffun aT -> rT}].
 
 (*****************************************************************************)
 
-Section FinTheory.
+Section FinDepTheory.
+
+Variables (aT : finType) (rT : aT -> finType).
+Notation fT := {ffun forall x : aT, rT x}.
+
+Lemma card_family (F : forall x, pred (rT x)) :
+  #|family F| = foldr muln 1 [seq #|F x| | x : aT].
+Proof.
+rewrite /image_mem; set E := enum aT in (uniqE := enum_uniq aT) *.
+have trivF x: x \notin E -> #|F x| = 1 by rewrite mem_enum.
+elim: E uniqE => /= [_ | x0 E IH_E /andP[E'x0 uniqE]] in F trivF *.
+  have /fin_all_exists[f0 Ff0] x: exists y0, F x =i pred1 y0.
+    have /pred0Pn[y Fy]: #|F x| != 0 by rewrite trivF.
+    by exists y; apply/fsym/subset_cardP; rewrite ?subset_pred1 // card1 trivF.
+  apply: (@eq_card1 _ (finfun f0)) => f; apply/familyP/eqP=> [Ff | {f}-> x].
+    by apply/ffunP=> x; have:= Ff x; rewrite Ff0 ffunE => /eqP.
+  by rewrite ffunE Ff0 inE /=.
+have [y0 Fxy0 | Fx00] := pickP (F x0); last first.
+  by rewrite !eq_card0 // => f; apply: contraFF (Fx00 (f x0))=> /familyP; apply.
+pose F1 x := if eqP is ReflectT Dx then xpred1 (ecast x (rT x) Dx y0) else F x.
+transitivity (#|[predX F x0 & family F1]|) => [{uniqE IH_E}|]; last first.
+  rewrite cardX {}IH_E {uniqE}// => [|x E'x]; last first.
+    rewrite /F1; case: eqP => [Dx | /nesym/eqP-x0'x]; first exact: card1.
+    by rewrite trivF // negb_or x0'x.
+  congr (_ * foldr _ _ _); apply/eq_in_map=> x Ex.
+  by rewrite /F1; case: eqP => // Dx0; rewrite Dx0 Ex in E'x0.
+pose g yf := let: (y, f) := yf : rT x0 * fT in
+  [ffun x => if eqP is ReflectT Dx then ecast x (rT x) Dx y else f x].
+have gK: cancel (fun f : fT => (f x0, g (y0, f))) g.
+  by move=> f; apply/ffunP=> x; rewrite !ffunE; case: eqP => //; case: x /.
+rewrite -(card_image (can_inj gK)); apply: eq_card => [] [y f] /=.
+apply/imageP/andP=> [[f1 /familyP/=Ff1] [-> ->]| [/=Fx0y /familyP/=Ff]].
+  split=> //; apply/familyP=> x; rewrite ffunE /F1 /=.
+  by case: eqP => // Dx; apply: eqxx.
+exists (g (y, f)).
+  by apply/familyP=> x; have:= Ff x; rewrite ffunE /F1; case: eqP; [case: x /|].
+congr (_, _); first by rewrite /= ffunE; case: eqP => // Dx; rewrite eq_axiomK.
+by apply/ffunP=> x; have:= Ff x; rewrite !ffunE /F1; case: eqP => // Dx /eqP.
+Qed.
+
+Lemma card_dep_ffun : #|fT| = foldr muln 1 [seq #|rT x| | x : aT].
+Proof. by rewrite -card_family; apply/esym/eq_card=> f; apply/familyP. Qed.
+
+End FinDepTheory.
+
+Section FinFunTheory.
 
 Variables aT rT : finType.
 Notation fT := {ffun aT -> rT}.
-Notation ffT := (finfun_type aT rT).
 Implicit Types (D : pred aT) (R : pred rT) (F : aT -> pred rT).
-
-Definition finfun_finMixin := [finMixin of ffT by <:].
-Canonical finfun_finType := Eval hnf in FinType ffT finfun_finMixin.
-Canonical finfun_subFinType := Eval hnf in [subFinType of ffT].
-Canonical finfun_of_finType := Eval hnf in [finType of fT for finfun_finType].
-Canonical finfun_of_subFinType := Eval hnf in [subFinType of fT].
 
 Lemma card_pfamily y0 D F :
   #|pfamily y0 D F| = foldr muln 1 [seq #|F x| | x in D].
 Proof.
-rewrite /image_mem; transitivity #|pfamily y0 (enum D) F|.
-  by apply/eq_card=> f; apply/eq_forallb=> x /=; rewrite mem_enum.
-elim: {D}(enum D) (enum_uniq D) => /= [_|x0 s IHs /andP[s'x0 /IHs<-{IHs}]].
-  apply: eq_card1 [ffun=> y0] _ _ => f.
-  apply/familyP/eqP=> [y0_f|-> x]; last by rewrite ffunE inE.
-  by apply/ffunP=> x; rewrite ffunE (eqP (y0_f x)).
-pose g (xf : rT * fT) := finfun [eta xf.2 with x0 |-> xf.1].
-have gK: cancel (fun f : fT => (f x0, g (y0, f))) g.
-  by move=> f; apply/ffunP=> x; do !rewrite ffunE /=; case: eqP => // ->.
-rewrite -cardX -(card_image (can_inj gK)); apply: eq_card => [] [y f] /=.
-apply/imageP/andP=> [[f0 /familyP/=Ff0] [{f}-> ->]| [Fy /familyP/=Ff]].
-  split; first by have:= Ff0 x0; rewrite /= mem_head.
-  apply/familyP=> x; have:= Ff0 x; rewrite ffunE inE /=.
-  by case: eqP => //= -> _; rewrite ifN ?inE.
-exists (g (y, f)).
-  by apply/familyP=> x; have:= Ff x; rewrite ffunE /= inE; case: eqP => // ->.
-congr (_, _); last apply/ffunP=> x; do !rewrite ffunE /= ?eqxx //.
-by case: eqP => // ->{x}; apply/eqP; have:= Ff x0; rewrite ifN.
-Qed.
-
-Lemma card_family F : #|family F| = foldr muln 1 [seq #|F x| | x : aT].
-Proof.
-have [y0 _ | rT0] := pickP rT; first exact: (card_pfamily y0 aT).
-rewrite /image_mem; case DaT: (enum aT) => [{rT0}|x0 e] /=; last first.
-  by rewrite !eq_card0 // => [f | y]; [have:= rT0 (f x0) | have:= rT0 y].
-have{DaT} no_aT P (x : aT) : P by have:= mem_enum aT x; rewrite DaT.
-apply: eq_card1 [ffun x => no_aT rT x] _ _ => f.
-by apply/familyP/eqP=> _; [apply/ffunP | ] => x; apply: no_aT.
+rewrite card_family !/(image _ _) /(enum D) -enumT /=.
+by elim: (enum aT) => //= x E ->; have [// | D'x] := ifP; rewrite card1 mul1n.
 Qed.
 
 Lemma card_pffun_on y0 D R : #|pffun_on y0 D R| = #|R| ^ #|D|.
@@ -299,7 +408,7 @@ rewrite (cardE D) card_pfamily /image_mem.
 by elim: (enum D) => //= _ e ->; rewrite expnS.
 Qed.
 
-Lemma card_ffun_on R : #|ffun_on R| = #|R| ^ #|aT|.
+Lemma card_ffun_on R : #|@ffun_on aT R| = #|R| ^ #|aT|.
 Proof.
 rewrite card_family /image_mem cardT.
 by elim: (enum aT) => //= _ e ->; rewrite expnS.
@@ -308,5 +417,4 @@ Qed.
 Lemma card_ffun : #|fT| = #|rT| ^ #|aT|.
 Proof. by rewrite -card_ffun_on; apply/esym/eq_card=> f; apply/forallP. Qed.
 
-End FinTheory.
-
+End FinFunTheory.
