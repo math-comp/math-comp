@@ -128,6 +128,10 @@ split=> [eq_f12 | -> //]; do 2!apply: val_inj => /=.
 by rewrite !fgraph_codom /= (eq_codom eq_f12).
 Qed.
 
+Lemma eq_ffun (g1 g2 : aT -> rT) :
+  g1 =1 g2 -> finfun g1 = finfun g2.
+Proof. by move=> eq_g; apply/ffunP => x; rewrite !ffunE eq_g. Qed.
+
 Lemma ffunK : cancel (@fun_of_fin aT rT) (@finfun aT rT).
 Proof. by move=> f; apply/ffunP/ffunE. Qed.
 
@@ -148,6 +152,7 @@ Notation family F := (family_mem (fun_of_simpl (fmem F))).
 Notation ffun_on R := (ffun_on_mem _ (mem R)).
 
 Arguments ffunK {aT rT}.
+Arguments eq_ffun {aT rT} [g1] g2 eq_g12.
 Arguments familyP {aT rT pT F f}.
 Arguments ffun_onP {aT rT R f}.
 

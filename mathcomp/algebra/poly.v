@@ -1673,6 +1673,9 @@ apply: eq_bigr => i _; case: leqP => // /nderivn_poly0->.
 by rewrite horner0 simp.
 Qed.
 
+Lemma eq_poly n E1 E2 : E1 =1 E2 -> poly n E1 = poly n E2.
+Proof. by move=> E; rewrite !poly_def; apply: eq_bigr => i _; rewrite E. Qed.
+
 End PolynomialTheory.
 
 Prenex Implicits polyC polyCK Poly polyseqK lead_coef root horner polyOver.
@@ -1695,6 +1698,7 @@ Arguments rootPt {R p x}.
 Arguments unity_rootP {R n z}.
 Arguments polyOverP {R S0 addS kS p}.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
+Arguments eq_poly {R n} [E1] E2 eq_E12.
 
 Canonical polynomial_countZmodType (R : countRingType) :=
   [countZmodType of polynomial R].

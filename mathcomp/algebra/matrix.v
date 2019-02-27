@@ -232,7 +232,12 @@ rewrite /fun_of_matrix; split=> [/= eqAB | -> //].
 by apply/val_inj/ffunP=> [[i j]]; apply: eqAB.
 Qed.
 
+Lemma eq_mx k F1 F2 : (F1 =2 F2) -> matrix_of_fun k F1 = matrix_of_fun k F2.
+Proof. by move=> eq_F; apply/matrixP => i j; rewrite !mxE eq_F. Qed.
+
 End MatrixDef.
+
+Arguments eq_mx {R m n k} [F1] F2 eq_F12.
 
 Bind Scope ring_scope with matrix.
 
