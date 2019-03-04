@@ -239,34 +239,35 @@ Notation family F := (family_mem (fmem F)).
 Section InheritedStructures.
 
 Variable aT : finType.
+Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
 
-Definition finfun_eqMixin (rT : _ -> eqType) :=
-  @PcanEqMixin {dffun finPi aT rT} _ _ _ tfgraphK.
+Local Remark eqMixin rT : Equality.mixin_of (dffun_aT rT eqType).
+Proof. exact: PcanEqMixin tfgraphK. Qed.
 Canonical finfun_eqType (rT : eqType) :=
-  EqType {ffun aT -> rT} (finfun_eqMixin _).
-Canonical dfinfun_eqType (rT : _ -> eqType) :=
-  EqType {dffun finPi aT rT} (finfun_eqMixin _).
+  EqType {ffun aT -> rT} (eqMixin (fun=> rT)).
+Canonical dfinfun_eqType rT :=
+  EqType (dffun_aT rT eqType) (eqMixin rT).
 
-Definition finfun_choiceMixin (rT : _ -> choiceType) :=
-  @PcanChoiceMixin _ {dffun finPi aT rT} _ _ tfgraphK.
+Local Remark choiceMixin rT : Choice.mixin_of (dffun_aT rT choiceType).
+Proof. exact: PcanChoiceMixin tfgraphK. Qed.
 Canonical finfun_choiceType (rT : choiceType) :=
-  ChoiceType {ffun aT -> rT} (finfun_choiceMixin _).
-Canonical dfinfun_choiceType (rT : _ -> choiceType) :=
-  ChoiceType {dffun finPi aT _} (finfun_choiceMixin rT).
+  ChoiceType {ffun aT -> rT} (choiceMixin (fun=> rT)).
+Canonical dfinfun_choiceType rT :=
+  ChoiceType (dffun_aT rT choiceType) (choiceMixin rT).
 
-Definition finfun_countMixin (rT : _ -> countType) :=
-  @PcanCountMixin _ {dffun finPi aT rT} _ _ tfgraphK.
+Local Remark countMixin rT : Countable.mixin_of (dffun_aT rT countType).
+Proof. exact: PcanCountMixin tfgraphK. Qed.
 Canonical finfun_countType (rT : countType) :=
-  CountType {ffun aT -> rT} (finfun_countMixin _).
-Canonical dfinfun_countType (rT : _ -> countType) :=
-  CountType {dffun finPi aT rT} (finfun_countMixin _).
+  CountType {ffun aT -> rT} (countMixin (fun => rT)).
+Canonical dfinfun_countType rT :=
+  CountType (dffun_aT rT countType) (countMixin rT).
 
-Definition finfun_finMixin (rT : _ -> finType) :=
-  @PcanFinMixin (dfinfun_countType rT) _ _ _ tfgraphK.
+Local Definition finMixin rT :=
+  PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT rT finType) _ _).
 Canonical finfun_finType (rT : finType) :=
-  FinType {ffun aT -> rT} (finfun_finMixin _).
-Canonical dfinfun_finType (rT : _ -> finType) :=
-  FinType {dffun finPi aT rT} (finfun_finMixin _).
+  FinType {ffun aT -> rT} (finMixin (fun=> rT)).
+Canonical dfinfun_finType rT :=
+  FinType (dffun_aT rT finType) (finMixin rT).
 
 End InheritedStructures.
 
