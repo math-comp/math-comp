@@ -301,7 +301,7 @@ Section ClassDef.
 Record mixin_of (T : eqType) := Mixin {
   le : rel T;
   lt : rel T;
-  _  : forall x y, lt x y = (x != y) && (le x y);
+  _  : forall x y, lt x y = (y != x) && (le x y);
   _  : reflexive     le;
   _  : antisymmetric le;
   _  : transitive    le
@@ -461,7 +461,7 @@ Notation "x <= y < z" := ((x <= y) && (y < z)) : order_scope.
 Notation "x < y < z" := ((x < y) && (y < z)) : order_scope.
 
 Notation "x <= y ?= 'iff' C" := (leif x y C) : order_scope.
-Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
+Notation "x <= y ?= 'iff' C :> T" := ((x : T) <= (y : T) ?= iff C)
   (only parsing) : order_scope.
 
 Notation ">=< x" := (comparable x) : order_scope.
@@ -666,10 +666,12 @@ Module Import TotalSyntax.
 
 Fact total_display : unit. Proof. exact: tt. Qed.
 
-Notation "@ 'max'" := (@join total_display).
 Notation max := (@join total_display _).
-Notation "@ 'min'" := (@meet total_display).
+Notation "@ 'max' R" :=
+  (@join total_display R) (at level 10, R at level 8, only parsing).
 Notation min := (@meet total_display _).
+Notation "@ 'min' R" :=
+  (@meet total_display R) (at level 10, R at level 8, only parsing).
 
 Notation "\max_ ( i <- r | P ) F" :=
   (\big[@join total_display _/0%O]_(i <- r | P%B) F%O) : order_scope.
@@ -1064,17 +1066,18 @@ Notation ctblatticeType  := type.
 Notation ctblatticeMixin := mixin_of.
 Notation CTBLatticeMixin := Mixin.
 Notation CTBLatticeType T m := (@pack T _ _ _ id _ _ id m).
-Notation "[ 'cblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'cblatticeType' 'of' T 'for' cT 'with' disp ]" :=
+Notation "[ 'ctblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ erefl id)
+  (at level 0, format "[ 'ctblatticeType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'ctblatticeType' 'of' T 'for' cT 'with' disp ]" :=
   (@clone T _ cT disp _ (unit_irrelevance _ _) id)
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
-  form_scope.
-Notation "[ 'cblatticeType' 'of' T ]" := [cblatticeType of T for _]
-  (at level 0, format "[ 'cblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'cblatticeType' 'of' T 'with' disp ]" :=
+  (at level 0, format "[ 'ctblatticeType'  'of'  T  'for'  cT  'with'  disp ]")
+  : form_scope.
+Notation "[ 'ctblatticeType' 'of' T ]" := [cblatticeType of T for _]
+  (at level 0, format "[ 'ctblatticeType'  'of'  T ]") : form_scope.
+Notation "[ 'ctblatticeType' 'of' T 'with' disp ]" :=
   [cblatticeType of T for _ with disp]
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'with' disp ]") : form_scope.
+  (at level 0, format "[ 'ctblatticeType'  'of'  T  'with' disp ]") :
+  form_scope.
 Notation "[ 'default_ctblatticeType' 'of' T ]" :=
   (@pack T _ _ _ id _ _ id (fun=> erefl))
   (at level 0, format "[ 'default_ctblatticeType'  'of'  T ]") : form_scope.
@@ -1510,14 +1513,14 @@ Proof. by case: T => ? [? []]. Qed.
 Lemma le_trans: transitive (<=%O : rel T).
 Proof. by case: T => ? [? []]. Qed.
 
-Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
+Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
 Proof. by case: T x y => ? [? []]. Qed.
 
-Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
-Proof. by rewrite lt_neqAle eq_sym. Qed.
+Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
+Proof. by rewrite lt_def eq_sym. Qed.
 
 Lemma ltxx x: x < x = false.
-Proof. by rewrite lt_neqAle eqxx. Qed.
+Proof. by rewrite lt_def eqxx. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
 Hint Resolve lt_irreflexive : core.
@@ -1821,15 +1824,15 @@ Variable T : porderType.
 Definition reverse_le (x y : T) := (y <= x).
 Definition reverse_lt (x y : T) := (y < x).
 
-Lemma reverse_lt_neqAle (x y : T) :
-  reverse_lt x y = (x != y) && (reverse_le x y).
-Proof. by rewrite eq_sym; apply: lt_neqAle. Qed.
+Lemma reverse_lt_def (x y : T) :
+  reverse_lt x y = (y != x) && (reverse_le x y).
+Proof. by apply: lt_neqAle. Qed.
 
 Fact reverse_le_anti : antisymmetric reverse_le.
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
 Definition reverse_porderMixin :=
-  POrderMixin reverse_lt_neqAle (lexx : reflexive reverse_le) reverse_le_anti
+  POrderMixin reverse_lt_def (lexx : reflexive reverse_le) reverse_le_anti
              (fun y z x zy yx => @le_trans _ _ y x z yx zy).
 Canonical reverse_porderType :=
   POrderType (reverse_display display) (T^r) reverse_porderMixin.
@@ -2054,7 +2057,7 @@ Proof. by move=> /lcomparable_ltgtP [->|xy|/ltW xy]; constructor => //. Qed.
 End LatticeTheoryJoin.
 End LatticeTheoryJoin.
 
-Module TotalTheory.
+Module Import TotalTheory.
 Section TotalTheory.
 Context {display : unit}.
 Local Notation orderType := (orderType display).
@@ -2844,7 +2847,7 @@ Record of_ := Build {
   le_refl  : reflexive le;
   le_anti  : antisymmetric le;
   le_trans : transitive le;
-  lt_def   : forall x y, lt x y = (x != y) && le x y;
+  lt_def   : forall x y, lt x y = (y != x) && le x y;
 }.
 
 Definition porderMixin (m : of_) : porderMixin T :=
@@ -2880,8 +2883,8 @@ Proof.
 by apply/negP => /andP [] xy /(lt_trans xy); apply/negP; rewrite (lt_irr m x).
 Qed.
 
-Fact lt_def x y : lt m x y = (x != y) && le m x y.
-Proof. by rewrite le_def; case: eqP => //= ->; rewrite lt_irr. Qed.
+Fact lt_def x y : lt m x y = (y != x) && le m x y.
+Proof. by rewrite le_def eq_sym; case: eqP => //= <-; rewrite lt_irr. Qed.
 
 Fact le_refl : reflexive (le m).
 Proof. by move=> ?; rewrite le_def eqxx. Qed.
@@ -2925,7 +2928,7 @@ Record of_ (display : unit) (T : choiceType) := Build {
   meetUl : left_distributive meet join;
   meetxx : idempotent meet;
   le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (x != y) && le x y;
+  lt_def : forall x y : T, lt x y = (y != x) && le x y;
 }.
 
 Section MeetJoinMixin.
@@ -2974,7 +2977,7 @@ Record of_ (display : unit) (T : choiceType) := Build {
   le_anti : antisymmetric le;
   le_trans : transitive le;
   le_total : total le;
-  lt_def : forall x y, lt x y = (x != y) && le x y;
+  lt_def : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if le x y then x else y;
   join_def : forall x y, join x y = if le y x then x else y;
 }.
@@ -3097,7 +3100,7 @@ Definition latticeMixin : meetJoinMixin display T :=
   @MeetJoinMixin
     _ _ (le m) (lt m) (meet m) (join m)
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx
-    le_def' (@lt_neqAle _ latticeT).
+    le_def' (@lt_def _ latticeT).
 
 Definition totalMixin :
   total (<=%O : rel (POrderType display T latticeMixin)) := le_total.
@@ -3127,11 +3130,13 @@ Proof. by case: leqP => [/minn_idPl|/ltnW /minn_idPr]. Qed.
 Lemma maxnE x y : maxn x y = if (y <= x)%N then x else y.
 Proof. by case: leqP => [/maxn_idPl|/ltnW/maxn_idPr]. Qed.
 
-Definition natOrderMixin :=
-  LeOrderMixin
-    total_display anti_leq leq_trans leq_total ltn_neqAle minnE maxnE.
+Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
+Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
-Canonical natPOrderType  := POrderType total_display nat natOrderMixin.
+Definition nat_orderMixin :=
+  LeOrderMixin total_display anti_leq leq_trans leq_total ltn_def minnE maxnE.
+
+Canonical nat_porderType := POrderType total_display nat nat_orderMixin.
 
 Lemma leEnat (n m : nat): (n <= m) = (n <= m)%N.
 Proof. by []. Qed.
@@ -3139,13 +3144,18 @@ Proof. by []. Qed.
 Lemma ltEnat (n m : nat): (n < m) = (n < m)%N.
 Proof. by []. Qed.
 
-Canonical natLatticeType := LatticeType nat natOrderMixin.
-Canonical natOrderType := OrderType nat natOrderMixin.
+Canonical nat_latticeType := LatticeType nat nat_orderMixin.
+Canonical nat_orderType := OrderType nat nat_orderMixin.
 
-Definition natBLatticeMixin := BLatticeMixin leq0n.
-Canonical natBLatticeType := BLatticeType nat natBLatticeMixin.
+Definition nat_blatticeMixin := BLatticeMixin leq0n.
+Canonical nat_blatticeType := BLatticeType nat nat_blatticeMixin.
 End NatOrder.
-
+Module Exports.
+Canonical nat_porderType.
+Canonical nat_latticeType.
+Canonical nat_orderType.
+Canonical nat_blatticeType.
+End Exports.
 End NatOrder.
 
 Module SeqLexPOrder.
@@ -3193,9 +3203,10 @@ Definition lexi_porderMixin :=
 Canonical lexi_porderType := POrderType display (seq T) lexi_porderMixin.
 
 End SeqLexPOrder.
+Module Exports.
+Canonical lexi_porderType.
+End Exports.
 End SeqLexPOrder.
-
-Canonical SeqLexPOrder.lexi_porderType.
 
 Module Def.
 Export POrderDef.
@@ -3217,44 +3228,49 @@ Export CTBLatticeSyntax.
 Export ReverseSyntax.
 End Syntax.
 
-Module UnboundedTheory.
+Module LTheory.
 Export POCoercions.
 Export ReversePOrder.
 Export POrderTheory.
-Export TotalTheory.
+
 Export ReverseLattice.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
-Export LePOrderMixin.Exports.
-Export LtPOrderMixin.Exports.
-Export MeetJoinMixin.Exports.
-Export LeOrderMixin.Exports.
-Export LtOrderMixin.Exports.
-Export NatOrder.
-Export SeqLexPOrder.
-
-Export POrder.Exports.
-Export Total.Exports.
-Export Lattice.Exports.
-Export FinPOrder.Exports.
-End UnboundedTheory.
-
-Module Theory.
-Export UnboundedTheory.
-
 Export BLatticeTheory.
-Export CBLatticeTheory.
 Export ReverseTBLattice.
 Export TBLatticeTheory.
-Export CTBLatticeTheory.
+End LTheory.
 
-Export BLattice.Exports.
-Export CBLattice.Exports.
-Export TBLattice.Exports.
-Export CTBLattice.Exports.
-Export FinLattice.Exports.
-Export FinCLattice.Exports.
-Export FinTotal.Exports.
+Module CTheory.
+Export LTheory CBLatticeTheory CTBLatticeTheory.
+End CTheory.
+
+Module TTheory.
+Export LTheory TotalTheory.
+End TTheory.
+
+Module Theory.
+Export CTheory TotalTheory.
 End Theory.
 
 End Order.
+
+Export Order.POrder.Exports.
+Export Order.FinPOrder.Exports.
+Export Order.Lattice.Exports.
+Export Order.BLattice.Exports.
+Export Order.TBLattice.Exports.
+Export Order.FinLattice.Exports.
+Export Order.CBLattice.Exports.
+Export Order.CTBLattice.Exports.
+Export Order.FinCLattice.Exports.
+Export Order.Total.Exports.
+Export Order.FinTotal.Exports.
+
+Export Order.LePOrderMixin.Exports.
+Export Order.LtPOrderMixin.Exports.
+Export Order.MeetJoinMixin.Exports.
+Export Order.LeOrderMixin.Exports.
+Export Order.LtOrderMixin.Exports.
+Export Order.NatOrder.Exports.
+Export Order.SeqLexPOrder.Exports.
