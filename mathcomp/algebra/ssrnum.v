@@ -313,7 +313,34 @@ End Exports.
 End NumDomain.
 Import NumDomain.Exports.
 
-Module Import Def. Section Def.
+Module Import Def.
+
+Notation ler := (@le ring_display _) (only parsing).
+Notation "@ 'ler' R" :=
+  (@le ring_display R) (at level 10, R at level 8, only parsing).
+Notation ltr := (@lt ring_display _) (only parsing).
+Notation "@ 'ltr' R" :=
+  (@lt ring_display R) (at level 10, R at level 8, only parsing).
+Notation ger := (@ge ring_display _) (only parsing).
+Notation "@ 'ger' R" :=
+  (@ge ring_display R) (at level 10, R at level 8, only parsing).
+Notation gtr := (@gt ring_display _) (only parsing).
+Notation "@ 'gtr' R" :=
+  (@gt ring_display R) (at level 10, R at level 8, only parsing).
+Notation lerif := (@leif ring_display _) (only parsing).
+Notation "@ 'lerif' R" :=
+  (@lerif ring_display R) (at level 10, R at level 8, only parsing).
+Notation comparabler := (@comparable ring_display _) (only parsing).
+Notation "@ 'comparabler' R" :=
+  (@comparable ring_display R) (at level 10, R at level 8, only parsing).
+Notation maxr := (@join ring_display _).
+Notation "@ 'maxr' R" :=
+  (@join ring_display R) (at level 10, R at level 8, only parsing).
+Notation minr := (@meet ring_display _).
+Notation "@ 'minr' R" :=
+  (@meet ring_display R) (at level 10, R at level 8, only parsing).
+
+Section Def.
 Import NumDomain.
 Context {R : numDomainType}.
 Implicit Types (x y : R) (C : bool).
@@ -328,7 +355,15 @@ Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
 End Def. End Def.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
+Notation le := ler (only parsing).
+Notation lt := ltr (only parsing).
+Notation ge := ger (only parsing).
+Notation gt := gtr (only parsing).
+Notation leif := lerif (only parsing).
+Notation comparable := comparabler (only parsing).
 Notation sg := sgr.
+Notation max := maxr.
+Notation min := minr.
 Notation pos := Rpos.
 Notation neg := Rneg.
 Notation nneg := Rnneg.
@@ -352,34 +387,33 @@ Import Def Keys.
 
 Notation "`| x |" := (norm x) : ring_scope.
 
-Notation "<=%R" := (@le ring_display _) : ring_scope.
-Notation ">=%R" := (@ge ring_display _) : ring_scope.
-Notation "<%R" := (@lt ring_display _) : ring_scope.
-Notation ">%R" := (@gt ring_display _) : ring_scope.
-Notation "<?=%R" := (@leif ring_display _) : ring_scope.
-Notation ">=<%R" := (@comparable ring_display _) : ring_scope.
-Notation "><%R" :=
-  (fun x y => ~~ (@comparable ring_display _ x y)) : ring_scope.
+Notation "<=%R" := le : ring_scope.
+Notation ">=%R" := ge : ring_scope.
+Notation "<%R" := lt : ring_scope.
+Notation ">%R" := gt : ring_scope.
+Notation "<?=%R" := leif : ring_scope.
+Notation ">=<%R" := comparable : ring_scope.
+Notation "><%R" := (fun x y => ~~ (comparable x y)) : ring_scope.
 
-Notation "<= y" := (@ge ring_display _ y) : ring_scope.
+Notation "<= y" := (ge y) : ring_scope.
 Notation "<= y :> T" := (<= (y : T)) : ring_scope.
-Notation ">= y"  := (@le ring_display _ y) : ring_scope.
+Notation ">= y"  := (le y) : ring_scope.
 Notation ">= y :> T" := (>= (y : T)) : ring_scope.
 
-Notation "< y" := (@gt ring_display _ y) : ring_scope.
+Notation "< y" := (gt y) : ring_scope.
 Notation "< y :> T" := (< (y : T)) : ring_scope.
-Notation "> y" := (@lt ring_display _ y) : ring_scope.
+Notation "> y" := (lt y) : ring_scope.
 Notation "> y :> T" := (> (y : T)) : ring_scope.
 
-Notation ">=< y" := (@comparable ring_display _ y) : ring_scope.
+Notation ">=< y" := (comparable y) : ring_scope.
 Notation ">=< y :> T" := (>=< (y : T)) : ring_scope.
 
-Notation "x <= y" := (@le ring_display _ x y) : ring_scope.
+Notation "x <= y" := (le x y) : ring_scope.
 Notation "x <= y :> T" := ((x : T) <= (y : T)) : ring_scope.
 Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
 Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
 
-Notation "x < y"  := (@lt ring_display _ x y) : ring_scope.
+Notation "x < y"  := (lt x y) : ring_scope.
 Notation "x < y :> T" := ((x : T) < (y : T)) : ring_scope.
 Notation "x > y"  := (y < x) (only parsing) : ring_scope.
 Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
@@ -389,22 +423,17 @@ Notation "x < y <= z" := ((x < y) && (y <= z)) : ring_scope.
 Notation "x <= y < z" := ((x <= y) && (y < z)) : ring_scope.
 Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
 
-Notation "x <= y ?= 'iff' C" := (@leif ring_display _ x y C) : ring_scope.
+Notation "x <= y ?= 'iff' C" := (lerif x y C) : ring_scope.
 Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
   (only parsing) : ring_scope.
 
-Notation ">=< x" := (@comparable ring_display _ x) : ring_scope.
+Notation ">=< x" := (comparable x) : ring_scope.
 Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : ring_scope.
-Notation "x >=< y" := (@comparable ring_display _ x y) : ring_scope.
+Notation "x >=< y" := (comparable x y) : ring_scope.
 
-Notation ">< x" := (fun y => ~~ (@comparable ring_display _ x y)) : ring_scope.
+Notation ">< x" := (fun y => ~~ (comparable x y)) : ring_scope.
 Notation ">< x :> T" := (>< (x : T)) (only parsing) : ring_scope.
-Notation "x >< y" := (~~ (@comparable ring_display _ x y)) : ring_scope.
-
-Notation "@ 'maxr'" := (@join ring_display).
-Notation maxr := (@join ring_display _).
-Notation "@ 'minr'" := (@meet ring_display).
-Notation minr := (@meet ring_display _).
+Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
 
 Canonical Rpos_keyed.
 Canonical Rneg_keyed.
@@ -414,9 +443,6 @@ Canonical Rreal_keyed.
 Export Order.POCoercions.
 
 End Syntax.
-
-Notation min := minr.
-Notation max := maxr.
 
 Section ExtensionAxioms.
 
@@ -4717,6 +4743,88 @@ End Theory.
 (* FACTORIES *)
 (*************)
 
+Module NumMixin.
+Section NumMixin.
+Variable (R : idomainType).
+
+Record of_ := Mixin {
+  le : rel R;
+  lt : rel R;
+  norm : R -> R;
+  normD     : forall x y, le (norm (x + y)) (norm x + norm y);
+  addr_gt0  : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
+  norm_eq0  : forall x, norm x = 0 -> x = 0;
+  ger_total : forall x y, le 0 x -> le 0 y -> le x y || le y x;
+  normM     : {morph norm : x y / x * y};
+  le_def    : forall x y, (le x y) = (norm (y - x) == y - x);
+  lt_def    : forall x y, (lt x y) = (y != x) && (le x y)
+}.
+
+Variable (m : of_).
+
+Local Notation "x <= y" := (le m x y).
+Local Notation "x < y" := (lt m x y).
+Local Notation "`| x |" := (norm m x) : ring_scope.
+
+Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
+
+Lemma ge0_def x : (0 <= x) = (`|x| == x).
+Proof. by rewrite le_def subr0. Qed.
+
+Lemma subr_ge0 x y : (0 <= x - y) = (y <= x).
+Proof. by rewrite ge0_def -le_def. Qed.
+
+Lemma subr_gt0 x y : (0 < y - x) = (x < y).
+Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
+
+Lemma lt_trans : transitive (lt m).
+Proof.
+move=> y x z le_xy le_yz.
+by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 // subr_gt0.
+Qed.
+
+Lemma le01 : 0 <= 1.
+Proof.
+have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /norm_eq0->.
+by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
+Qed.
+
+Lemma lt01 : 0 < 1.
+Proof. by rewrite lt_def oner_neq0 le01. Qed.
+
+Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
+
+Lemma lerr x : x <= x.
+Proof.
+have n2: `|2%:R| == 2%:R :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
+rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
+by rewrite -(eqP n2) -normM mul0r.
+Qed.
+
+Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
+Proof.
+by rewrite eq_sym lt_def; case: eqP => //= ->; rewrite lerr.
+Qed.
+
+Definition porderMixin : ltPOrderMixin R :=
+  LtPOrderMixin ltrr lt_trans le_def'.
+
+Definition numDomainMixin : mixin_of porderMixin (norm m) :=
+  @Num.Mixin _ porderMixin _ (normD m) (@addr_gt0 m) (@norm_eq0 m)
+             (@ger_total m) (@normM m) (@le_def m).
+
+End NumMixin.
+
+Module Exports.
+Notation numMixin := of_.
+Notation NumMixin := Mixin.
+Coercion porderMixin : numMixin >-> ltPOrderMixin.
+Coercion NumMixin.norm : numMixin >-> Funclass.
+Coercion numDomainMixin : numMixin >-> mixin_of.
+End Exports.
+
+End NumMixin.
+
 Module RealLeMixin.
 Section RealLeMixin.
 Variables (R : idomainType).
@@ -4732,7 +4840,7 @@ Record of_ := Mixin {
   le0_total : forall x, le 0 x || le x 0;
   normN     : forall x, norm (- x) = norm x;
   ge0_norm  : forall x, le 0 x -> norm x = x;
-  lt_def    : forall x y, lt x y = (x != y) && le x y;
+  lt_def    : forall x y, lt x y = (y != x) && le x y;
 }.
 
 Variable (m : of_).
@@ -4754,7 +4862,7 @@ Qed.
 Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
 Proof.
 rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
-rewrite andbT eq_sym addr_eq0; apply: contraNneq x_neq0 => hxy.
+rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
 by rewrite [x](@le0_anti m) // hxy -le0N opprK.
 Qed.
 
@@ -4983,38 +5091,32 @@ Export Num.NumField.Exports Num.ClosedField.Exports.
 Export Num.RealDomain.Exports Num.RealField.Exports.
 Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
-Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
+Export Num.NumMixin.Exports Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
 
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
 
 (* compatibility module *)
 Module mc_1_7.
-Module OrigNum := Num.
 Module Num.
-Export OrigNum.
+(* If you failed to process the next line in the PG or the CoqIDE, replace    *)
+(* all the "ssrnum.Num" with "Top.Num" in this module to process them, and    *)
+(* revert them in order to compile and commit.  This problem will be solved   *)
+(* in Coq 8.10.  See also: https://github.com/math-comp/math-comp/pull/270.   *)
+Export ssrnum.Num.
 
 Module Import Def.
-Export OrigNum.Def.
+Export ssrnum.Num.Def.
 Notation normr := norm (only parsing).
-Notation ler := le (only parsing).
-Notation ltr := lt (only parsing).
-Notation ger := ge (only parsing).
-Notation gtr := gt (only parsing).
-Notation lerif := leif (only parsing).
 End Def.
 
 Notation norm := normr (only parsing).
-Notation le := ler (only parsing).
-Notation lt := ltr (only parsing).
-Notation ge := ger (only parsing).
-Notation gt := gtr (only parsing).
 
 Module Import Syntax.
 Notation "`| x |" := (@norm _ (@Num.NumDomain.normedType _) x) : ring_scope.
 End Syntax.
 
 Module Theory.
-Export OrigNum.Theory.
+Export ssrnum.Num.Theory.
 
 Section NumIntegralDomainTheory.
 Variable R : numDomainType.
@@ -5029,19 +5131,19 @@ Definition ltr_neqAle x y : (x < y) = (x != y) && (x <= y) := lt_neqAle x y.
 Definition ler_eqVlt x y : (x <= y) = (x == y) || (x < y) := le_eqVlt x y.
 Definition gtr_eqF x y : y < x -> x == y = false := @gt_eqF _ _ x y.
 Definition ltr_eqF x y : x < y -> x == y = false := @lt_eqF _ _ x y.
-Definition ler_asym : antisymmetric (<=%R : rel R) := le_anti.
+Definition ler_asym : antisymmetric (@ler R) := le_anti.
 Definition eqr_le x y : (x == y) = (x <= y <= x) := eq_le x y.
-Definition ltr_trans : transitive (@lt _ R) := lt_trans.
+Definition ltr_trans : transitive (@ltr R) := lt_trans.
 Definition ler_lt_trans y x z : x <= y -> y < z -> x < z :=
   @le_lt_trans _ _ y x z.
 Definition ltr_le_trans y x z : x < y -> y <= z -> x < z :=
   @lt_le_trans _ _ y x z.
-Definition ler_trans : transitive (@le _ R) := le_trans.
+Definition ler_trans : transitive (@ler R) := le_trans.
 Definition lterr := (lerr, ltrr).
 Definition lerifP x y C :
   reflect (x <= y ?= iff C) (if C then x == y else x < y) := leifP.
 Definition ltr_asym x y : x < y < x = false := lt_asym x y.
-Definition ler_anti : antisymmetric (@le _ R) := le_anti.
+Definition ler_anti : antisymmetric (@ler R) := le_anti.
 Definition ltr_le_asym x y : x < y <= x = false := lt_le_asym x y.
 Definition ler_lt_asym x y : x <= y < x = false := le_lt_asym x y.
 Definition lter_anti := (=^~ eqr_le, ltr_asym, ltr_le_asym, ler_lt_asym).
@@ -5349,7 +5451,7 @@ End NumFieldTheory.
 Section RealDomainTheory.
 Variable R : realDomainType.
 Implicit Types x y z t : R.
-Definition ler_total : total (@le _ R) := le_total.
+Definition ler_total : total (@ler R) := le_total.
 Definition ltr_total x y : x != y -> (x < y) || (y < x) :=
   @lt_total _ _ x y.
 Definition wlog_ler P :

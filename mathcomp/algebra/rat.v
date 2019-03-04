@@ -565,8 +565,8 @@ rewrite ge_rat0; case: ratP=> [] // n d cnd n_ge0.
 by rewrite /normq /= normr_num_div ?ger0_norm // divq_num_den.
 Qed.
 
-Fact lt_rat_def x y : (lt_rat x y) = (x != y) && (le_rat x y).
-Proof. by rewrite /lt_rat lt_def rat_eq eq_sym. Qed.
+Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
+Proof. by rewrite /lt_rat lt_def rat_eq. Qed.
 
 Canonical rat_normedType := NormedType rat rat normq.
 
