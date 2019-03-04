@@ -215,7 +215,7 @@ Definition mx_val A := let: Matrix g := A in g.
 Canonical matrix_subType := Eval hnf in [newType for mx_val].
 
 Fact matrix_key : unit. Proof. by []. Qed.
-Definition matrix_of_fun_def F := Matrix [ffun ij => F ij.1 ij.2 : R].
+Definition matrix_of_fun_def F := Matrix [ffun ij => F ij.1 ij.2].
 Definition matrix_of_fun k := locked_with k matrix_of_fun_def.
 Canonical matrix_unlockable k := [unlockable fun matrix_of_fun k].
 
@@ -277,8 +277,7 @@ Notation "\row_ ( j < n ) E" := (@matrix_of_fun _ 1 n matrix_key (fun _ j => E))
 Notation "\row_ j E" := (\row_(j < _) E) : ring_scope.
 
 Definition matrix_eqMixin (R : eqType) m n :=
-  @SubEqMixin (@finfun_eqType _ (fun=> _)) _ (matrix_subType R m n).
-(*  Eval hnf in [eqMixin of 'M[R]_(m, n) by <:]. *)
+  Eval hnf in [eqMixin of 'M[R]_(m, n) by <:].
 Canonical matrix_eqType (R : eqType) m n:=
   Eval hnf in EqType 'M[R]_(m, n) (matrix_eqMixin R m n).
 Definition matrix_choiceMixin (R : choiceType) m n :=

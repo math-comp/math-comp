@@ -423,7 +423,7 @@ Theorem dvd_irr1_index_center gT (G : {group gT}) i :
   ('chi[G]_i 1%g %| #|G : 'Z('chi_i)%CF|)%C.
 Proof.
 without loss fful: gT G i / cfaithful 'chi_i.
-  rewrite -{2}[i](quo_IirrK _ (subxx _)) ?mod_IirrE ?cfModE ?cfker_normal //.
+  rewrite -{2}[i](quo_IirrK _ (subxx _)) 1?mod_IirrE ?cfModE ?cfker_normal //.
   rewrite morph1; set i1 := quo_Iirr _ i => /(_ _ _ i1) IH.
   have fful_i1: cfaithful 'chi_i1.
     by rewrite quo_IirrE ?cfker_normal ?cfaithful_quo.
