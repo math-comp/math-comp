@@ -421,7 +421,7 @@ Proof. by case: m => // -[]. Qed.
 Fact gez0_norm m : lez 0 m -> norm m = m.
 Proof. by case: m. Qed.
 
-Fact ltz_def m n : (ltz m n) = (m != n) && (lez m n).
+Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).
 Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
