@@ -590,9 +590,12 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
-  pose QyNum := RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _).
-  pose QyNumField := [numFieldType of NumDomainType (Q y) QyNum].
-  pose Ry := [realFieldType of RealDomainType _ (realLtMixin_total QyNumField)].
+  pose QyNum : realLtMixin (Q y) :=
+    RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _).
+  pose QyOrder :=
+    OrderType (LatticeType (POrderType ring_display (Q y) QyNum) QyNum) QyNum.
+  pose QyNumField := [numFieldType of NumDomainType QyOrder QyNum].
+  pose Ry := [realFieldType of [realDomainType of QyNumField]].
   have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
   by exists (ArchiFieldType Ry archiRy); apply: [rmorphism of idfun].
 have some_realC: realC.
