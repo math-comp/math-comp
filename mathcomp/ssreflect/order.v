@@ -602,12 +602,12 @@ Notation "x `|` y" := (join x y).
 End LatticeSyntax.
 
 Module Total.
-Notation mixin_of T := (total (<=%O : rel T)).
+Definition mixin_of d (T : latticeType d) := (total (<=%O : rel T)).
 Section ClassDef.
 
 Record class_of d (T : Type) := Class {
   base  : Lattice.class_of d T;
-  mixin : total (<=%O : rel (POrder.Pack d base))
+  mixin : mixin_of (Lattice.Pack base)
 }.
 
 Local Coercion base : class_of >-> Lattice.class_of.
@@ -3025,7 +3025,8 @@ Definition latticeMixin : meetJoinMixin display T :=
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx le_def (lt_def m).
 
 Definition totalMixin :
-  total (<=%O : rel (POrderType display T latticeMixin)) := le_total m.
+  Total.mixin_of (LatticeType (POrderType display T latticeMixin) latticeMixin) :=
+  le_total m.
 
 End LeOrderMixin.
 
@@ -3033,7 +3034,7 @@ Module Exports.
 Notation leOrderMixin := of_.
 Notation LeOrderMixin := Build.
 Coercion latticeMixin : leOrderMixin >-> meetJoinMixin.
-Coercion totalMixin : leOrderMixin >-> total.
+Coercion totalMixin : leOrderMixin >-> Total.mixin_of.
 End Exports.
 
 End LeOrderMixin.
@@ -3103,7 +3104,8 @@ Definition latticeMixin : meetJoinMixin display T :=
     le_def' (@lt_def _ latticeT).
 
 Definition totalMixin :
-  total (<=%O : rel (POrderType display T latticeMixin)) := le_total.
+  Total.mixin_of (LatticeType (POrderType display T latticeMixin) latticeMixin) :=
+  le_total.
 
 End LtOrderMixin.
 
@@ -3111,7 +3113,7 @@ Module Exports.
 Notation ltOrderMixin := of_.
 Notation LtOrderMixin := Build.
 Coercion latticeMixin : ltOrderMixin >-> meetJoinMixin.
-Coercion totalMixin : ltOrderMixin >-> total.
+Coercion totalMixin : ltOrderMixin >-> Total.mixin_of.
 End Exports.
 
 End LtOrderMixin.
