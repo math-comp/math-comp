@@ -17,13 +17,13 @@
 	  part of the finmap library.
 
 	* Reorganized the algebraic hierarchy and the theory of ssrnum.v
-	  * numDomainType and realDomainType get inheritances from porderType
-	    and orderType respectively
+	  * numDomainType and realDomainType get inheritances respectively from
+	    porderType and orderType.
 	  * normedType is a new structure to share the same notation for norms
-	    and absolute values
+	    and absolute values.
 	  * normedModType is a new structure for numDomainType indexed normed
-	    modules
-	  * Generalized and relocated to order.v:
+	    modules.
+	  * The following lemmas are generalized and relocated to order.v:
 	    ler, Num.le -> lt
 	    ltr, Num.lt -> lt
 	    ger, Num.ge -> ge
@@ -94,6 +94,11 @@
 	    real_lerif_mean_square_scaled, real_lerif_AGM2_scaled,
 	    lerif_AGM_scaled, real_lerif_mean_square, real_lerif_AGM2,
 	    lerif_AGM, relif_mean_square_scaled, lerif_AGM2_scaled.
+	  * The compatibility layer for the version 1.7 is provided as the
+	    ssrnum.mc_1_7 module. One may compile proofs compatible with the
+	    version 1.7 in newer versions by using the mc_1_7.Num module instead
+	    of the Num module. However, instances of the number structures would
+	    require changes.
 
 	* Changed and extended theory of lersif and intervals:
 	  * Many lersif related lemmas are ported from ssrnum
