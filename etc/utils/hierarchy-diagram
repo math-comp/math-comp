@@ -1,55 +1,135 @@
 #!/bin/bash
 
+usage(){
+cat <<EOT >&2
+Usage : hierarchy-diagram [OPTIONS]
+
+Description:
+    hierarchy-diagram is a small utility to draw hierarchy diagrams of
+    mathematical structures.  This utility uses the coercion paths and the
+    canonical projections between <module>.type types (typically in the MathComp
+    library) to draw the diagram.  Indirect edges which can be composed of other
+    edges by transitivity are eliminated automatically for each kind of edges.
+    A diagram appears on the standard output in the DOT format which can be
+    converted to several image formats by Graphviz.
+
+Options:
+    -h, -help:
+        Output a usage message and exit.
+
+    -canonicals (off|on|color):
+        Configure output of edges of canonical projections.  The default value
+        is "on".
+
+    -coercions (off|on|color):
+        Configure output of edges of coercions.  The default value is "off".
+        The value given by this option must be different from that by
+        -canonical soption.
+
+    -R dir coqdir:
+        This option is passed to coqtop: "recursively map physical dir to
+        logical coqdir".
+
+    -lib library:
+        Specify a Coq library used to draw a diagram.  This option can appear
+        repetitively.  If not specified, all.all will be used.
+EOT
+}
+
 raw_coercions=$(tempfile -s .out | sed s/\.out$//)
 raw_canonicals=$(tempfile -s .out | sed s/\.out$//)
 parsed_coercions=$(tempfile)
 parsed_canonicals=$(tempfile)
+opt_canonicals=on
+opt_coercions=off
+opt_libs=()
+opt_coqtopargs=()
 
-coqtop -w none -R mathcomp mathcomp >/dev/null 2>&1 <<EOT
+while [[ $# -gt 0 ]]
+do
+
+case "$1" in
+  -canonicals)
+    opt_canonicals="$2"
+    shift; shift
+  ;;
+  -coercions)
+    opt_coercions="$2"
+    shift; shift
+  ;;
+  -R)
+    opt_coqtopargs+=("-R" "$2" "$3")
+    shift; shift; shift
+  ;;
+  -lib)
+    opt_libs+=("$2")
+    shift; shift
+  ;;
+  -h|-help)
+    usage; exit
+  ;;
+  *)
+    echo "ERROR: invalid option -- $1" >&2
+    echo >&2
+    usage; exit 1
+  ;;
+esac
+
+done
+
+[[ ${#opt_libs[@]} -eq 0 ]] && opt_libs=(all.all)
+
+coqtop -w none ${opt_coqtopargs[@]} >/dev/null 2>&1 <<EOT
 Set Printing Width 4611686018427387903.
-Require Import all.all.
+Require Import ${opt_libs[@]}.
 Redirect "$raw_coercions" Print Graph.
 Redirect "$raw_canonicals" Print Canonical Projections.
 EOT
 
-cat $raw_coercions.out \
-| sed -n 's/^\[\([^]]*\)\] : \([a-zA-Z_\.]*\)\.type >-> \([a-zA-Z_\.]*\)\.type$/\2 \3 \1/p' > $parsed_coercions
-
-cat $raw_canonicals.out \
-| sed -n 's/^\([a-zA-Z_\.]*\)\.sort <- \([a-zA-Z_\.]*\)\.sort ( \([a-zA-Z_\.]*\)\.\([a-zA-Z_]*\) )$/\1 \2 \3 \4/p' \
-| while read -r from_module to_module proj_module projection; do
-  if [[ $from_module = $proj_module ]] || [[ $to_module = $proj_module ]]; then
-    echo $from_module $to_module $proj_module $projection
-  fi
-done > $parsed_canonicals
-
 echo "digraph structures {"
 
-cat $parsed_coercions | while read -r from_module to_module coercion; do
+if [[ $opt_canonicals != "off" ]]; then
 
-  grep "^$from_module " $parsed_coercions | ( while read -r _ middle_module _; do
-    if grep -q "^$middle_module $to_module " $parsed_coercions; then
-      exit 1
+  cat $raw_canonicals.out \
+  | sed -n 's/^\([a-zA-Z_\.]*\)\.sort <- \([a-zA-Z_\.]*\)\.sort ( \([a-zA-Z_\.]*\)\.\([a-zA-Z_]*\) )$/\1 \2 \3 \4/p' \
+  | while read -r from_module to_module proj_module projection; do
+    if [[ $from_module = $proj_module ]] || [[ $to_module = $proj_module ]]; then
+      echo $from_module $to_module $proj_module $projection
     fi
-  done )
-  if [[ "$?" = "0" ]]; then
-    echo "\"$to_module\" -> \"$from_module\"[color=red];"
-  fi
+  done > $parsed_canonicals
 
-done
-
-cat $parsed_canonicals | while read -r from_module to_module proj_module projection; do
-
-  grep "^$from_module " $parsed_canonicals | ( while read -r _ middle_module _ _; do
-    if grep -q "^$middle_module $to_module " $parsed_canonicals; then
-      exit 1
+  cat $parsed_canonicals | while read -r from_module to_module proj_module projection; do
+    grep "^$from_module " $parsed_canonicals | ( while read -r _ middle_module _ _; do
+      if grep -q "^$middle_module $to_module " $parsed_canonicals; then
+        exit 1
+      fi
+    done )
+    if [[ "$?" = "0" ]]; then
+      echo -n "\"$to_module\" -> \"$from_module\""
+      [[ $opt_canonicals == "on" ]] || echo -n "[color=$opt_canonicals]"
+      echo ";"
     fi
-  done )
-  if [[ "$?" = "0" ]]; then
-    echo "\"$to_module\" -> \"$from_module\"[color=blue];"
-  fi
+  done
 
-done
+fi
+
+if [[ $opt_coercions != "off" ]]; then
+  cat $raw_coercions.out \
+  | sed -n 's/^\[\([^]]*\)\] : \([a-zA-Z_\.]*\)\.type >-> \([a-zA-Z_\.]*\)\.type$/\2 \3 \1/p' > $parsed_coercions
+
+  cat $parsed_coercions | while read -r from_module to_module coercion; do
+    grep "^$from_module " $parsed_coercions | ( while read -r _ middle_module _; do
+      if grep -q "^$middle_module $to_module " $parsed_coercions; then
+        exit 1
+      fi
+    done )
+    if [[ "$?" = "0" ]]; then
+      echo -n "\"$to_module\" -> \"$from_module\""
+      [[ $opt_coercions == "on" ]] || echo -n "[color=$opt_coercions]"
+      echo ";"
+    fi
+  done
+fi
 
 echo "}"
 
