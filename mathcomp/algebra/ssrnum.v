@@ -127,16 +127,6 @@ From mathcomp Require Import ssralg poly.
 (*   i : interior = in [0, 1] or ]0, 1[                                       *)
 (*   e : exterior = in [1, +oo[ or ]1; +oo[                                   *)
 (*   w : non strict (weak) monotony                                           *)
-(*                                                                            *)
-(* [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject       *)
-(*                   to the condition P (i may appear in P and M), and        *)
-(*                   provided P holds for i0.                                 *)
-(* [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and       *)
-(*                   provided P holds for i0.                                 *)
-(* [arg minr_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.         *)
-(* [arg maxr_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.         *)
-(* [arg minr_(i < i0) M] == an i : T minimizing M, given i0 : T.              *)
-(* [arg maxr_(i > i0) M] == an i : T maximizing M, given i0 : T.              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -3609,54 +3599,6 @@ Proof. by rewrite -real_normrEsign. Qed.
 End RealDomainTheory.
 
 Hint Resolve num_real : core.
-
-Section RealDomainArgExtremum.
-
-Context {R : realDomainType} {I : finType} (i0 : I).
-Context (P : pred I) (F : I -> R) (Pi0 : P i0).
-
-Definition arg_minr := extremum <=%R i0 P F.
-Definition arg_maxr := extremum >=%R i0 P F.
-
-Lemma arg_minrP: extremum_spec <=%R P F arg_minr.
-Proof. by apply: extremumP => //; [apply: le_trans|apply: le_total]. Qed.
-
-Lemma arg_maxrP: extremum_spec >=%R P F arg_maxr.
-Proof.
-apply: extremumP => //; first exact: lexx.
-  by move=> ??? /(le_trans _) le /le.
-by move=> ??; apply: le_total.
-Qed.
-
-End RealDomainArgExtremum.
-
-Notation "[ 'arg' 'minr_' ( i < i0 | P ) F ]" :=
-    (arg_minr i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'minr_' ( i  <  i0  |  P )  F ]") : form_scope.
-
-Notation "[ 'arg' 'minr_' ( i < i0 'in' A ) F ]" :=
-    [arg minr_(i < i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'minr_' ( i  <  i0  'in'  A )  F ]") : form_scope.
-
-Notation "[ 'arg' 'minr_' ( i < i0 ) F ]" := [arg minr_(i < i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'minr_' ( i  <  i0 )  F ]") : form_scope.
-
-Notation "[ 'arg' 'maxr_' ( i > i0 | P ) F ]" :=
-     (arg_maxr i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'maxr_' ( i  >  i0  |  P )  F ]") : form_scope.
-
-Notation "[ 'arg' 'maxr_' ( i > i0 'in' A ) F ]" :=
-    [arg maxr_(i > i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'maxr_' ( i  >  i0  'in'  A )  F ]") : form_scope.
-
-Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
 
 Section RealDomainOperations.
 
