@@ -85,6 +85,16 @@ Require Import fintype tuple bigop path finset.
 (*              ~` x == the complement of x in [0, 1].                        *)
 (*   \meet_<range> e == iterated meet of a lattice with a top.                *)
 (*   \join_<range> e == iterated join of a lattice with a bottom.             *)
+(* For orderType we provide the following operations                          *)
+(*   [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject to  *)
+(*                      the condition P (i may appear in P and M), and        *)
+(*                      provided P holds for i0.                              *)
+(*   [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and     *)
+(*                      provided P holds for i0.                              *)
+(*   [arg min_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.        *)
+(*   [arg max_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.        *)
+(*   [arg min_(i < i0) M] == an i : T minimizing M, given i0 : T.             *)
+(*   [arg max_(i > i0) M] == an i : T maximizing M, given i0 : T.             *)
 (*                                                                            *)
 (* There are three distinct uses of the symbols                               *)
 (* <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><:                                *)
@@ -697,6 +707,16 @@ Notation "[ 'orderType' 'of' T 'with' disp ]" :=
 End Exports.
 
 End Total.
+Import Total.Exports.
+
+Module Import TotalDef.
+Section TotalDef.
+Context {display : unit} {T : orderType display} {I : finType}.
+Definition arg_min := @extremum T I <=%O.
+Definition arg_max := @extremum T I >=%O.
+End TotalDef.
+End TotalDef.
+
 Module Import TotalSyntax.
 
 Fact total_display : unit. Proof. exact: tt. Qed.
@@ -734,9 +754,35 @@ Notation "\max_ ( i 'in' A | P ) F" :=
 Notation "\max_ ( i 'in' A ) F" :=
   (\big[@join total_display _/0%O]_(i in A) F%O) : order_scope.
 
-End TotalSyntax.
+Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
+    (arg_min i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : form_scope.
 
-Import Total.Exports.
+Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
+    [arg min_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : form_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
+     (arg_max i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
+    [arg max_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : form_scope.
+
+End TotalSyntax.
 
 Module BLattice.
 Section ClassDef.
@@ -1540,13 +1586,20 @@ Proof. by case: T x => ? [? []]. Qed.
 Hint Resolve lexx : core.
 
 Definition le_refl : reflexive le := lexx.
+Definition ge_refl : reflexive ge := lexx.
 Hint Resolve le_refl : core.
 
 Lemma le_anti: antisymmetric (<=%O : rel T).
 Proof. by case: T => ? [? []]. Qed.
 
+Lemma ge_anti: antisymmetric (>=%O : rel T).
+Proof. by move=> x y /le_anti. Qed.
+
 Lemma le_trans: transitive (<=%O : rel T).
 Proof. by case: T => ? [? []]. Qed.
+
+Lemma ge_trans: transitive (>=%O : rel T).
+Proof. by move=> ????/le_trans; apply. Qed.
 
 Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
 Proof. by case: T x y => ? [? []]. Qed.
@@ -2102,6 +2155,10 @@ Implicit Types (x y z t : T).
 Lemma le_total : total (<=%O : rel T). Proof. by case: T => [? [?]]. Qed.
 Hint Resolve le_total : core.
 
+Lemma ge_total : total (>=%O : rel T).
+Proof. by move=> ??; apply: le_total. Qed.
+Hint Resolve ge_total : core.
+
 Lemma comparableT x y : x >=< y. Proof. exact: le_total. Qed.
 Hint Resolve comparableT : core.
 
@@ -2194,6 +2251,18 @@ Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx, ltIx).
 Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
+
+Section ArgExtremum.
+
+Context (I : finType) (i0 : I) (P : pred I) (F : I -> T) (Pi0 : P i0).
+
+Lemma arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
+Proof. by apply: extremumP => //; apply: le_trans. Qed.
+
+Lemma arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
+Proof. by apply: extremumP => //; [apply ge_refl | apply ge_trans]. Qed.
+
+End ArgExtremum.
 
 End TotalTheory.
 Section TotalMonotonyTheory.
@@ -3248,6 +3317,7 @@ End SeqLexPOrder.
 Module Def.
 Export POrderDef.
 Export LatticeDef.
+Export TotalDef.
 Export BLatticeDef.
 Export TBLatticeDef.
 Export CBLatticeDef.
