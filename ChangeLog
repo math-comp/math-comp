@@ -112,9 +112,6 @@
 	  order relation on it (rather than nat). Redefined arg_min and
 	  arg_max with it.
 
-	* Added [arg minr_( i < n | P ) F] and [arg maxr_( i < n | P ) F]
-	  with all their variants, following the same convention as for nat.
-
 	* Added missing contra* lemma: contra_neqN, contra_neqF,
 	  contra_neqT, contra_neq_eq, contra_eq_neq.
 
