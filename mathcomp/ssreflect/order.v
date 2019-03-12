@@ -2870,16 +2870,15 @@ End CTBLatticeTheory.
 (* FACTORIES *)
 (*************)
 
-Module TotalLattice.
-Section TotalLattice.
+Module TotalLatticeMixin.
+Section TotalLatticeMixin.
 Import POrderDef.
-Context {display : unit}.
-Local Notation porderType := (porderType display).
-Context {T : porderType}.
+Variable (display : unit) (T : porderType display).
+Definition of_ := total (<=%O : rel T).
+Variable (m : of_).
 Implicit Types (x y z : T).
-Hypothesis le_total : total (<=%O : rel T).
 
-Let comparableT x y : x >=< y := le_total x y.
+Let comparableT x y : x >=< y := m x y.
 
 Fact ltgtP x y :
   comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
@@ -2935,11 +2934,18 @@ case: (leP y z) => yz; case: (leP y x) => xy //=; first 1 last.
 - by have [] := (leP x z); rewrite ?xy ?yz.
 Qed.
 
-Definition Mixin :=
+Definition latticeMixin :=
   LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
 
-End TotalLattice.
-End TotalLattice.
+End TotalLatticeMixin.
+
+Module Exports.
+Notation totalLatticeMixin := of_.
+Coercion latticeMixin : totalLatticeMixin >-> Order.Lattice.mixin_of.
+End Exports.
+
+End TotalLatticeMixin.
+Import TotalLatticeMixin.Exports.
 
 Module LePOrderMixin.
 Section LePOrderMixin.
@@ -3017,6 +3023,9 @@ End LtPOrderMixin.
 Import LtPOrderMixin.Exports.
 
 Module MeetJoinMixin.
+Section MeetJoinMixin.
+
+Variable (display : unit) (T : choiceType).
 
 Record of_ (display : unit) (T : choiceType) := Build {
   le : rel T;
@@ -3035,9 +3044,8 @@ Record of_ (display : unit) (T : choiceType) := Build {
   lt_def : forall x y : T, lt x y = (y != x) && le x y;
 }.
 
-Section MeetJoinMixin.
 
-Variable (display : unit) (T : choiceType) (m : of_ display T).
+Variable (m : of_ display T).
 
 Fact le_refl : reflexive (le m).
 Proof. by move=> x; rewrite le_def meetxx. Qed.
@@ -3072,6 +3080,7 @@ End MeetJoinMixin.
 Import MeetJoinMixin.Exports.
 
 Module LeOrderMixin.
+Section LeOrderMixin.
 
 Record of_ (display : unit) (T : choiceType) := Build {
   le : rel T;
@@ -3086,21 +3095,19 @@ Record of_ (display : unit) (T : choiceType) := Build {
   join_def : forall x y, join x y = if le y x then x else y;
 }.
 
-Section LeOrderMixin.
-
 Variable (display : unit) (T : choiceType) (m : of_ display T).
 
 Fact le_refl : reflexive (le m).
 Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
 
-Definition porderT : porderType display :=
+Definition T_porderType : porderType display :=
   POrderType
     display T
     (LePOrderMixin le_refl (@le_anti _ _ m) (@le_trans _ _ m) (lt_def m)).
-Definition latticeT : latticeType display :=
-  LatticeType porderT (@TotalLattice.Mixin _ porderT (le_total m)).
+Definition T_latticeType : latticeType display :=
+  LatticeType T_porderType (le_total m : totalLatticeMixin T_porderType).
 
-Implicit Types (x y z : latticeT).
+Implicit Types (x y z : T_latticeType).
 
 Fact meetE x y : meet m x y = x `&` y. Proof. by rewrite meet_def. Qed.
 Fact joinE x y : join m x y = x `|` y. Proof. by rewrite join_def. Qed.
@@ -3129,8 +3136,8 @@ Definition latticeMixin : meetJoinMixin display T :=
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx le_def (lt_def m).
 
 Definition totalMixin :
-  Total.mixin_of (LatticeType (POrderType display T latticeMixin) latticeMixin) :=
-  le_total m.
+  Total.mixin_of (LatticeType (POrderType display T latticeMixin) latticeMixin)
+  := le_total m.
 
 End LeOrderMixin.
 
@@ -3168,12 +3175,12 @@ Proof.
 by move=> x y; rewrite !le_def (eq_sym y); case: (altP eqP); [|apply: lt_total].
 Qed.
 
-Definition porderT : porderType display :=
+Definition T_porderType : porderType display :=
   POrderType display T (LtPOrderMixin (lt_irr m) (@lt_trans _ _ m) (le_def m)).
-Definition latticeT : latticeType display :=
-  LatticeType porderT (@TotalLattice.Mixin _ porderT le_total).
+Definition T_latticeType : latticeType display :=
+  LatticeType T_porderType (le_total : totalLatticeMixin T_porderType).
 
-Implicit Types (x y z : latticeT).
+Implicit Types (x y z : T_latticeType).
 
 Fact leP x y :
   le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
@@ -3205,11 +3212,11 @@ Definition latticeMixin : meetJoinMixin display T :=
   @MeetJoinMixin
     _ _ (le m) (lt m) (meet m) (join m)
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx
-    le_def' (@lt_def _ latticeT).
+    le_def' (@lt_def _ T_latticeType).
 
 Definition totalMixin :
-  Total.mixin_of (LatticeType (POrderType display T latticeMixin) latticeMixin) :=
-  le_total.
+  Total.mixin_of (LatticeType (POrderType display T latticeMixin) latticeMixin)
+  := le_total.
 
 End LtOrderMixin.
 
@@ -3374,6 +3381,7 @@ Export Order.FinCLattice.Exports.
 Export Order.Total.Exports.
 Export Order.FinTotal.Exports.
 
+Export Order.TotalLatticeMixin.Exports.
 Export Order.LePOrderMixin.Exports.
 Export Order.LtPOrderMixin.Exports.
 Export Order.MeetJoinMixin.Exports.
