@@ -769,18 +769,6 @@ Local Coercion base2 T (c : class_of T) :
   Order.Total.class_of ring_display T :=
   @Order.Total.Class _ _ (Order.Lattice.Class (@lmixin _ c)) (@tmixin _ c).
 
-(*
-Lemma real_axiom_total (R : numDomainType) :
-  real_axiom R -> Order.Total.mixin_of R.
-Proof.
-move=> H x y; move: {H} (H (x - y)); rewrite unfold_in /le /=.
-case: R x y => T [base order norm [/= ? ? ? ? ? H]] x y.
-by rewrite H subr0 -H orbC; congr orb; rewrite H opprD add0r opprK addrC.
-Qed.
-
-Coercion real_axiom_total : real_axiom >-> Order.Total.mixin_of.
-*)
-
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
@@ -4774,6 +4762,30 @@ End Exports.
 
 End NumMixin.
 
+Module RealMixin.
+Section RealMixin.
+Variables (R : numDomainType).
+
+Variable (real : real_axiom R).
+
+Lemma le_total : totalLatticeMixin R.
+Proof.
+move=> x y; move: (real (x - y)).
+by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
+Qed.
+
+Definition totalMixin :
+  Order.Total.mixin_of (LatticeType R le_total) := le_total.
+
+End RealMixin.
+
+Module Exports.
+Coercion le_total : real_axiom >-> totalLatticeMixin.
+Coercion totalMixin : real_axiom >-> Order.Total.mixin_of.
+End Exports.
+
+End RealMixin.
+
 Module RealLeMixin.
 Section RealLeMixin.
 Variables (R : idomainType).
@@ -5030,7 +5042,8 @@ Export Num.NumField.Exports Num.ClosedField.Exports.
 Export Num.RealDomain.Exports Num.RealField.Exports.
 Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
-Export Num.NumMixin.Exports Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
+Export Num.NumMixin.Exports Num.RealMixin.Exports.
+Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
 
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
 
