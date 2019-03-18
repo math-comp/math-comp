@@ -1950,8 +1950,12 @@ Variant split_spec m n (i : 'I_(m + n)) : 'I_m + 'I_n -> bool -> Type :=
 
 Lemma splitP m n (i : 'I_(m + n)) : split_spec i (split i) (i < m).
 Proof.
-rewrite /split {-3}/leq.
-by case: (@ltnP i m) => cmp_i_m //=; constructor; rewrite ?subnKC.
+(* We need to prevent the case on ltnP from rewriting the hidden constructor  *)
+(* argument types of the match branches exposed by unfolding split. If the    *)
+(* match representation is changed to omit these then this proof could reduce *)
+(* to by rewrite /split; case: ltnP; [left | right. rewrite subnKC].          *)
+set lt_i_m := i < m; rewrite /split.
+by case: {-}_ lt_i_m / ltnP; [left | right; rewrite subnKC].
 Qed.
 
 Definition unsplit {m n} (jk : 'I_m + 'I_n) :=
