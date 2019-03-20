@@ -1193,13 +1193,19 @@ rewrite !(big_mkcond _ P) unlock.
 by elim: r1 => /= [|i r1 ->]; rewrite (mul1m, mulmA).
 Qed.
 
-Lemma big_allpairs I1 I2 (r1 : seq I1) (r2 : seq I2) F :
-  \big[*%M/1]_(i <- [seq (i1, i2) | i1 <- r1, i2 <- r2]) F i =
-    \big[*%M/1]_(i1 <- r1) \big[op/idx]_(i2 <- r2) F (i1, i2).
+Lemma big_allpairs_dep I1 (I2 : I1 -> Type) J (h : forall i1, I2 i1 -> J)
+    (r1 : seq I1) (r2 : forall i1, seq (I2 i1)) (F : J -> R) :
+  \big[*%M/1]_(i <- [seq h i1 i2 | i1 <- r1, i2 <- r2 i1]) F i =
+    \big[*%M/1]_(i1 <- r1) \big[*%M/1]_(i2 <- r2 i1) F (h i1 i2).
 Proof.
 elim: r1 => [|i1 r1 IHr1]; first by rewrite !big_nil.
 by rewrite big_cat IHr1 big_cons big_map.
 Qed.
+
+Lemma big_allpairs I1 I2 (r1 : seq I1) (r2 : seq I2) F :
+  \big[*%M/1]_(i <- [seq (i1, i2) | i1 <- r1, i2 <- r2]) F i =
+    \big[*%M/1]_(i1 <- r1) \big[op/idx]_(i2 <- r2) F (i1, i2).
+Proof. exact: big_allpairs_dep. Qed.
 
 Lemma big_pred1_eq (I : finType) (i : I) F :
   \big[*%M/1]_(j | j == i) F j = F i.
@@ -1546,6 +1552,7 @@ Arguments reindex [R idx op I J] h [P F].
 Arguments reindex_inj [R idx op I h P F].
 Arguments pair_big_dep [R idx op I J].
 Arguments pair_big [R idx op I J].
+Arguments big_allpairs_dep [R idx op I1 I2 J h r1 r2 F].
 Arguments big_allpairs [R idx op I1 I2 r1 r2 F].
 Arguments exchange_big_dep [R idx op I J rI rJ P Q] xQ [F].
 Arguments exchange_big_dep_nat [R idx op m1 n1 m2 n2 P Q] xQ [F].
