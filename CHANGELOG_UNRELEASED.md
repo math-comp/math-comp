@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Added fixpoint and cofixpoint constructions to `finset`: `fixset`,
+  `cofixset` and `fix_order`, with a few theorems about them
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to

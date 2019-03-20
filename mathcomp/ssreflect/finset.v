@@ -72,6 +72,15 @@ From mathcomp Require Import choice fintype finfun bigop.
 (*                comprehension as Coq parsing confuses [x | P] and [E | x].  *)
 (*        minset p A == A is a minimal set satisfying p.                      *)
 (*        maxset p A == A is a maximal set satisfying p.                      *)
+(* Provided a monotonous function F : {set T} -> {set T}, we get fixpoints    *)
+(*      fixset F := iter #|T| F set0                                          *)
+(*               == the fixpoint of F                                         *)
+(*               == the minimal set such that F X == X                        *)
+(* fix_order F x == the minimum number of iterations so that                  *)
+(*                  x is in iter (fix_order F x) F set0                       *)
+(*    cofixset F == the cofixpoint of F                                       *)
+(*               == the maximal set such that F X == X                        *)
+(*               := ~: fixset (funsetC F)                                     *)
 (* We also provide notations A :=: B, A :<>: B, A :==: B, A :!=: B, A :=P: B  *)
 (* that specialize A = B, A <> B, A == B, etc., to {set _}. This is useful    *)
 (* for subtypes of {set T}, such as {group T}, that coerce to {set T}.        *)
@@ -2213,3 +2222,132 @@ Arguments setCK {T}.
 Arguments minsetP {T P A}.
 Arguments maxsetP {T P A}.
 Prenex Implicits minset maxset.
+
+Section SetFixpoint.
+
+Section Least.
+Variables (T : finType) (F : {set T} -> {set T}).
+Hypothesis (F_mono : {homo F : X Y / X \subset Y}).
+
+Let n := #|T|.
+Notation iterF := (fun i => iter i F set0).
+
+Lemma set_iterF_sub i : iterF i \subset iterF i.+1.
+Proof. by elim: i => [| i IHi]; rewrite /= ?sub0set ?F_mono. Qed.
+
+Lemma set_iterF_mono : {homo iterF : i j / i <= j >-> i \subset j}.
+Proof.
+by apply: homo_leq => //[???|]; [apply: subset_trans|apply: set_iterF_sub].
+Qed.
+
+Definition fixset := iterF n.
+
+Lemma fixsetK : F fixset = fixset.
+Proof.
+suff /'exists_eqP[x /= e]: [exists k : 'I_n.+1, iterF k == iterF k.+1].
+  by rewrite /fixset -(subnK (leq_ord x)) iter_add iter_fix.
+apply: contraT; rewrite negb_exists => /forallP /(_ (Ordinal _)) /= neq_iter.
+suff iter_big k : k <= n.+1 -> k <= #|iter k F set0|.
+  by have := iter_big _ (leqnn _); rewrite ltnNge max_card.
+elim: k => [|k IHk] k_lt //=; apply: (leq_ltn_trans (IHk (ltnW k_lt))).
+by rewrite proper_card// properEneq// set_iterF_sub neq_iter.
+Qed.
+Hint Resolve fixsetK.
+
+Lemma minset_fix : minset [pred X | F X == X] fixset.
+Proof.
+apply/minsetP; rewrite inE fixsetK eqxx; split=> // X /eqP FXeqX Xsubfix.
+apply/eqP; rewrite eqEsubset Xsubfix/=.
+suff: fixset \subset iter n F X by rewrite iter_fix.
+by rewrite /fixset; elim: n => //= [|m IHm]; rewrite ?sub0set ?F_mono.
+Qed.
+
+Lemma fixsetKn k : iter k F fixset = fixset.
+Proof. by rewrite iter_fix. Qed.
+
+Lemma iter_sub_fix k : iterF k \subset fixset.
+Proof.
+have [/set_iterF_mono//|/ltnW/subnK<-] := leqP k n;
+by rewrite iter_add fixsetKn.
+Qed.
+
+Lemma fix_order_proof x : x \in fixset -> exists n, x \in iterF n.
+Proof. by move=> x_fix; exists n. Qed.
+
+Definition fix_order (x : T) :=
+ if (x \in fixset) =P true isn't ReflectT x_fix then 0
+ else (ex_minn (fix_order_proof x_fix)).
+
+Lemma fix_order_le_max (x : T) : fix_order x <= n.
+Proof.
+rewrite /fix_order; case: eqP => //= x_in.
+by case: ex_minnP => //= ??; apply.
+Qed.
+
+Lemma in_iter_fix_orderE (x : T) :
+  (x \in iterF (fix_order x)) = (x \in fixset).
+Proof.
+rewrite /fix_order; case: eqP; last by move=>/negP/negPf->; rewrite inE.
+by move=> x_in; case: ex_minnP => m ->; rewrite x_in.
+Qed.
+
+Lemma fix_order_gt0 (x : T) : (fix_order x > 0) = (x \in fixset).
+Proof.
+rewrite /fix_order; case: eqP => [x_in|/negP/negPf->//].
+by rewrite x_in; case: ex_minnP => -[|m]; rewrite ?inE//= => _; apply.
+Qed.
+
+Lemma fix_order_eq0 (x : T) : (fix_order x == 0) = (x \notin fixset).
+Proof. by rewrite -fix_order_gt0 -ltnNge ltnS leqn0. Qed.
+
+Lemma in_iter_fixE (x : T) k : (x \in iterF k) = (0 < fix_order x <= k).
+Proof.
+rewrite /fix_order; case: eqP => //= [x_in|/negP xNin]; last first.
+  by apply: contraNF xNin; apply/subsetP/iter_sub_fix.
+case: ex_minnP => -[|m]; rewrite ?inE// => xm mP.
+by apply/idP/idP=> [/mP//|lt_mk]; apply: subsetP xm; apply: set_iterF_mono.
+Qed.
+
+Lemma in_iter (x : T) k : x \in fixset -> fix_order x <= k -> x \in iterF k.
+Proof. by move=> x_in xk; rewrite in_iter_fixE fix_order_gt0 x_in xk. Qed.
+
+Lemma notin_iter (x : T) k : k < fix_order x -> x \notin iterF k.
+Proof. by move=> k_le; rewrite in_iter_fixE negb_and orbC -ltnNge k_le. Qed.
+
+Lemma fix_order_small x k : x \in iterF k -> fix_order x <= k.
+Proof. by rewrite in_iter_fixE => /andP[]. Qed.
+
+Lemma fix_order_big x k : x \in fixset -> x \notin iterF k -> fix_order x > k.
+Proof. by move=> x_in; rewrite in_iter_fixE fix_order_gt0 x_in /= -ltnNge. Qed.
+
+Lemma le_fix_order (x y : T) : y \in iterF (fix_order x) ->
+  fix_order y <= fix_order x.
+Proof. exact: fix_order_small. Qed.
+
+End Least.
+
+Section Greatest.
+Variables (T : finType) (F : {set T} -> {set T}).
+Hypothesis (F_mono : {homo F : X Y / X \subset Y}).
+
+Notation n := #|T|.
+Definition funsetC X := ~: (F (~: X)).
+Notation G := funsetC.
+Lemma funsetC_mono : {homo G : X Y / X \subset Y}.
+Proof. by move=> *; rewrite subCset setCK F_mono// subCset setCK. Qed.
+Hint Resolve funsetC_mono.
+
+Definition cofixset := ~: fixset G.
+
+Lemma cofixsetK : F cofixset = cofixset.
+Proof. by rewrite /cofixset -[in RHS]fixsetK ?setCK. Qed.
+
+Lemma maxset_cofix : maxset [pred X | F X == X] cofixset.
+Proof.
+rewrite maxminset setCK (@minset_eq _ _ [pred X | G X == X]) ?minset_fix//.
+by move=> X /=; rewrite (can2_eq setCK setCK).
+Qed.
+
+End Greatest.
+
+End SetFixpoint.
