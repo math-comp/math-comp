@@ -1926,6 +1926,9 @@ Qed.
 Lemma mem_rem_uniq s : uniq s -> rem s =i [predD1 s & x].
 Proof. by move/rem_filter=> -> y; rewrite mem_filter. Qed.
 
+Lemma mem_rem_uniqF s : uniq s -> x \in rem s = false.
+Proof. by move/mem_rem_uniq->; rewrite inE eqxx. Qed.
+
 End Rem.
 
 Section Map.
