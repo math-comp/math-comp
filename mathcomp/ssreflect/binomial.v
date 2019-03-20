@@ -387,7 +387,7 @@ have [ltTk | lekT] := ltnP #|B| k.
   have [AsubB /=|//] := boolP (A \subset B).
   by rewrite (leq_ltn_trans (subset_leq_card AsubB)) ?andbF.
 apply/eqP; rewrite -(eqn_pmul2r (fact_gt0 k)) bin_ffact // eq_sym.
-rewrite -sum_nat_dep_const -{1 3}(card_ord k).
+rewrite -sum_nat_cond_const -{1 3}(card_ord k).
 rewrite -card_inj_ffuns_on -sum1dep_card.
 pose imIk (f : {ffun 'I_k -> T}) := f @: 'I_k.
 rewrite (partition_big imIk (fun A => (A \subset B) && (#|A| == k))) /=

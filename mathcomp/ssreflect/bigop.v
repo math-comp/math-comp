@@ -786,6 +786,9 @@ Section SeqExtension.
 
 Variable I : Type.
 
+Lemma foldrE r : foldr op idx r = \big[op/idx]_(x <- r) x.
+Proof. by rewrite unlock. Qed.
+
 Lemma big_filter r (P : pred I) F :
   \big[op/idx]_(i <- filter P r) F i = \big[op/idx]_(i <- r | P i) F i.
 Proof. by rewrite unlock; elim: r => //= i r <-; case (P i). Qed.
@@ -877,6 +880,11 @@ Lemma big_const_seq r (P : pred I) x :
 Proof. by rewrite unlock; elim: r => //= i r ->; case: (P i). Qed.
 
 End SeqExtension.
+
+Lemma big_map_id J (h : J -> R) r (P : pred R) :
+  \big[op/idx]_(i <- map h r | P i) i
+     = \big[op/idx]_(j <- r | P (h j)) h j.
+Proof. exact: big_map. Qed.
 
 (* The following lemmas can be used to localise extensionality to a specific  *)
 (* index sequence. This is done by ssreflect rewriting, before applying       *)
@@ -1085,6 +1093,24 @@ Lemma big_nseq I n a (F : I -> R):
   \big[op/idx]_(i <- nseq n a) F i = iter n (op (F a)) idx.
 Proof. exact: big_nseq_cond. Qed.
 
+Lemma big_image_cond I (J : finType) (h : J -> I) (A : pred J) (P : pred I) F :
+  \big[op/idx]_(i <- [seq h j | j in A] | P i) F i
+     = \big[op/idx]_(j in A | P (h j)) F (h j).
+Proof. by rewrite big_map big_filter_cond. Qed.
+
+Lemma big_image I (J : finType) (h : J -> I) (A : pred J) F :
+  \big[op/idx]_(i <- [seq h j | j in A]) F i = \big[op/idx]_(j in A) F (h j).
+Proof. by rewrite big_map big_filter. Qed.
+
+Lemma big_image_cond_id (J : finType) (h : J -> R) (A : pred J) (P : pred R) :
+  \big[op/idx]_(i <- [seq h j | j in A] | P i) i
+     = \big[op/idx]_(j in A | P (h j)) h j.
+Proof. exact: big_image_cond. Qed.
+
+Lemma big_image_id (J : finType) (h : J -> R) (A : pred J) :
+  \big[op/idx]_(i <- [seq h j | j in A]) i = \big[op/idx]_(j in A) h j.
+Proof. exact: big_image. Qed.
+
 End Extensionality.
 
 Section MonoidProperties.
@@ -1102,6 +1128,14 @@ Variable op : Monoid.law 1.
 
 Local Notation "*%M" := op (at level 0).
 Local Notation "x * y" := (op x y).
+
+Lemma foldlE x r : foldl *%M x r = \big[*%M/1]_(y <- x :: r) y.
+Proof.
+by rewrite -foldrE; elim: r => [|y r IHr]/= in x *; rewrite ?mulm1 ?mulmA ?IHr.
+Qed.
+
+Lemma foldl_idx r : foldl *%M 1 r = \big[*%M/1]_(x <- r) x.
+Proof. by rewrite foldlE big_cons mul1m. Qed.
 
 Lemma eq_big_idx_seq idx' I r (P : pred I) F :
      right_id idx' *%M -> has P r ->
@@ -1327,7 +1361,7 @@ by apply: big_pred1 => i; rewrite /= andbC; case: eqP => // ->.
 Qed.
 Arguments bigD1 [I] j [P F].
 
-Lemma bigD1_seq (I : eqType) (r : seq I) j F : 
+Lemma bigD1_seq (I : eqType) (r : seq I) j F :
     j \in r -> uniq r ->
   \big[*%M/1]_(i <- r) F i = F j * \big[*%M/1]_(i <- r | i != j) F i.
 Proof. by move=> /big_rem-> /rem_filter->; rewrite big_filter. Qed.
@@ -1686,6 +1720,8 @@ Lemma prod_nat_const_nat n1 n2 n : \prod_(n1 <= i < n2) n = n ^ (n2 - n1).
 Proof. by rewrite big_const_nat -Monoid.iteropE. Qed.
 
 End NatConst.
+
+Lemma sumnE r : sumn r = \sum_(i <- r) i. Proof. exact: foldrE. Qed.
 
 Lemma leqif_sum (I : finType) (P C : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i ?= iff C i) ->

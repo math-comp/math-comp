@@ -717,7 +717,7 @@ Proof. exact/eq_card/in_set. Qed.
 Lemma sum1dep_card pA : \sum_(x | pA x) 1 = #|[set x | pA x]|.
 Proof. by rewrite sum1_card cardsE. Qed.
 
-Lemma sum_nat_dep_const pA n : \sum_(x | pA x) n = #|[set x | pA x]| * n.
+Lemma sum_nat_cond_const pA n : \sum_(x | pA x) n = #|[set x | pA x]| * n.
 Proof. by rewrite sum_nat_const cardsE. Qed.
 
 Lemma cards0 : #|@set0 T| = 0.
@@ -1380,23 +1380,20 @@ Proof. by apply: big_pred0 => i; rewrite inE. Qed.
 Lemma big_set1 a F : \big[op/idx]_(i in [set a]) F i = F a.
 Proof. by apply: big_pred1 => i; rewrite !inE. Qed.
 
-Lemma big_setIDdep A B P F :
-  \big[aop/idx]_(i in A | P i) F i =
-     aop (\big[aop/idx]_(i in A :&: B | P i) F i)
-         (\big[aop/idx]_(i in A :\: B | P i) F i).
-Proof.
-rewrite (bigID (mem B)) setDE.
-by congr (aop _ _); apply: eq_bigl => i; rewrite !inE andbAC.
-Qed.
-
 Lemma big_setID A B F :
   \big[aop/idx]_(i in A) F i =
      aop (\big[aop/idx]_(i in A :&: B) F i)
          (\big[aop/idx]_(i in A :\: B) F i).
 Proof.
-rewrite (bigID (mem B)) !(eq_bigl _ _ (in_set _)) //=.
-by congr (aop _); apply: eq_bigl => i; rewrite andbC.
+rewrite (bigID (mem B)) setDE.
+by congr (aop _ _); apply: eq_bigl => i; rewrite !inE.
 Qed.
+
+Lemma big_setIDcond A B P F :
+  \big[aop/idx]_(i in A | P i) F i =
+     aop (\big[aop/idx]_(i in A :&: B | P i) F i)
+         (\big[aop/idx]_(i in A :\: B | P i) F i).
+Proof. by rewrite !big_mkcondr; apply: big_setID. Qed.
 
 Lemma big_setD1 a A F : a \in A ->
   \big[aop/idx]_(i in A) F i = aop (F a) (\big[aop/idx]_(i in A :\ a) F i).
@@ -1409,8 +1406,7 @@ Lemma big_setU1 a A F : a \notin A ->
   \big[aop/idx]_(i in a |: A) F i = aop (F a) (\big[aop/idx]_(i in A) F i).
 Proof. by move=> notAa; rewrite (@big_setD1 a) ?setU11 //= setU1K. Qed.
 
-Lemma big_imset h (A : pred I) G :
-     {in A &, injective h} ->
+Lemma big_imset h (A : pred I) G : {in A &, injective h} ->
   \big[aop/idx]_(j in h @: A) G j = \big[aop/idx]_(i in A) G (h i).
 Proof.
 move=> injh; pose hA := mem (image h A).
@@ -1426,6 +1422,11 @@ apply: eq_bigl => i; case: insubP => [u -> /= def_u | nhAhi].
 symmetry; rewrite (negbTE nhAhi); apply/idP=> Ai.
 by case/imageP: nhAhi; exists i.
 Qed.
+
+Lemma big_imset_cond h (A : pred I) (P : pred J) G : {in A &, injective h} ->
+  \big[aop/idx]_(j in h @: A | P j) G j =
+    \big[aop/idx]_(i in A | P (h i)) G (h i).
+Proof. by move=> h_inj; rewrite 2!big_mkcondr big_imset. Qed.
 
 Lemma partition_big_imset h (A : pred I) F :
   \big[aop/idx]_(i in A) F i =

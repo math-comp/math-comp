@@ -897,7 +897,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     rewrite ((_ ^: _ =P [set x ^ y])%g _) ?sub1set // eq_sym eqEcard.
     rewrite sub1set class_refl cards1 -index_cent1 (setIidPl _) ?indexgg //.
     by rewrite sub_cent1; apply: subsetP Zxy; apply: subsetIr.
-  rewrite sum_nat_dep_const mulnC eqn_pmul2l //; move/eqP <-.
+  rewrite sum_nat_cond_const mulnC eqn_pmul2l //; move/eqP <-.
   rewrite addSnnS prednK // -cardZcl -[card _](cardsID Zcl) /= addnC.
   by congr (_ + _)%N; apply: eq_card => t; rewrite !inE andbC // andbAC andbb.
 have fful_nlin i: i \in ~: linS -> mx_faithful (irr_repr i).
