@@ -14,7 +14,7 @@ Require Import ssrbool ssrfun eqtype ssrnat seq path fintype.
 (*    dfs g n v x == the list of points traversed by a depth-first search of  *)
 (*                   the g, at depth n, starting from x, and avoiding v.      *)
 (* dfs_path g v x y <-> there is a path from x to y in g \ v.                 *)
-(*      connect e == the transitive closure of e (computed by dfs).           *)
+(*      connect e == the reflexive transitive closure of e (computed by dfs). *)
 (*  connect_sym e <-> connect e is symmetric, hence an equivalence relation.  *)
 (*       root e x == a representative of connect e x, which is the component  *)
 (*                   of x in the transitive closure of e.                     *)
