@@ -163,6 +163,11 @@ ci-odd-order-8.7:
   variables:
     COQ_VERSION: "8.7"
 
+ci-odd-order-dev:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "dev"
+
 # The Lemma Overloading library
 .ci-lemma-overloading:
   extends: .ci
@@ -185,6 +190,124 @@ ci-lemma-overloading-8.9:
 
 ci-lemma-overloading-dev:
   extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "dev"
+
+# The bigenough library (will be later subsumed by near)
+.ci-bigenough:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/math-comp/bigenough.git"
+    CONTRIB_VERSION: master
+  script:
+    - opam pin add -n -k path coq-mathcomp-bigenough .
+    - opam install -y -v -j "${NJOBS}" coq-mathcomp-bigenough
+
+ci-bigenough-8.7:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.7"
+
+ci-bigenough-8.8:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-bigenough-8.9:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.9"
+
+ci-bigenough-dev:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "dev"
+
+# # The real-closed library
+# .ci-real-closed:
+#   extends: .ci
+#   variables:
+#     CONTRIB_URL: "https://github.com/math-comp/real-closed.git"
+#     CONTRIB_VERSION: master
+#   script:
+#     - opam pin add -n -k path coq-mathcomp-real-closed .
+#     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-real-closed
+#     - opam install -y -v -j "${NJOBS}" coq-mathcomp-real-closed
+# 
+# ci-real-closed-8.7:
+#   extends: .ci-real-closed
+#   variables:
+#     COQ_VERSION: "8.7"
+# 
+# ci-real-closed-8.8:
+#   extends: .ci-real-closed
+#   variables:
+#     COQ_VERSION: "8.8"
+# 
+# ci-real-closed-8.9:
+#   extends: .ci-real-closed
+#   variables:
+#     COQ_VERSION: "8.9"
+# 
+# ci-real-closed-dev:
+#   extends: .ci-real-closed
+#   variables:
+#     COQ_VERSION: "dev"
+# 
+# # The analysis library
+# .ci-analysis:
+#   extends: .ci
+#   variables:
+#     CONTRIB_URL: "https://github.com/math-comp/analysis.git"
+#     CONTRIB_VERSION: master
+#   script:
+#     - opam pin add -n -k path coq-mathcomp-analysis .
+#     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-analysis
+#     - opam install -y -v -j "${NJOBS}" coq-mathcomp-analysis
+# 
+# ci-analysis-8.8:
+#   extends: .ci-analysis
+#   variables:
+#     COQ_VERSION: "8.8"
+# 
+# ci-analysis-8.9:
+#   extends: .ci-analysis
+#   variables:
+#     COQ_VERSION: "8.9"
+# 
+# ci-analysis-dev:
+#   extends: .ci-analysis
+#   variables:
+#     COQ_VERSION: "dev"
+
+# The finmap library
+.ci-finmap:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/math-comp/finmap.git"
+    CONTRIB_VERSION: master
+  script:
+    - opam pin add -n -k path coq-mathcomp-finmap .
+    - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-finmap
+    - opam install -y -v -j "${NJOBS}" coq-mathcomp-finmap
+
+ci-finmap-8.7:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.7"
+
+ci-finmap-8.8:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-finmap-8.9:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.9"
+
+ci-finmap-dev:
+  extends: .ci-finmap
   variables:
     COQ_VERSION: "dev"
 
