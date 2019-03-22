@@ -112,6 +112,7 @@ coq-dev:
     - git clone -b "${CONTRIB_VERSION}" --depth 1 "${CONTRIB_URL}" /home/coq/ci
     - cd /home/coq/ci
     - git rev-parse --verify HEAD
+    - git describe --all --long --abbrev=40 --always --dirty
   except:
     - tags
     - merge_requests
