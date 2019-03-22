@@ -18,7 +18,8 @@ Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
 (*       finfun lam == the f such that f =1 lam; this is the RECOMMENDED      *)
 (*                     interface to build an element of {ffun aT -> rT}.      *)
 (* [ffun x => expr] == finfun (fun x => expr)                                 *)
-(*   [ffun => expr] == finfun (fun _ => expr)                                 *)
+(*    [ffun=> expr] == finfun (fun _ => expr)                                 *)
+(*        ffun0 aT0 == the trivial finfun, from a proof aT0 that #|aT| = 0    *)
 (*  f \in ffun_on R == the range of f is a subset of R                        *)
 (*   f \in family F == f belongs to the family F (f x \in F x for all x)      *)
 (*     y.-support f == the y-support of f, i.e., [pred x | f x != y].         *)
@@ -106,6 +107,9 @@ Canonical finfun_of_subType := Eval hnf in [subType of fT].
 
 Lemma tnth_fgraph f i : tnth (fgraph f) i = f (enum_val i).
 Proof. by rewrite [@fun_of_fin]unlock enum_valK. Qed.
+
+Definition ffun0 (aT0 : #|aT| = 0) : {ffun aT -> rT} :=
+  Finfun (ecast _ _ (esym aT0) (nil_tuple _)).
 
 Lemma ffunE (g : aT -> rT) : finfun g =1 g.
 Proof.
