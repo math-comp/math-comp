@@ -13,7 +13,8 @@ Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
 (* {ffun aT -> rT} as Leibnitz equality and extensional equalities coincide.  *)
 (*     (T ^ n)%type is notation for {ffun 'I_n -> T}, which is isomorphic     *)
 (*   to n.-tuple T, but is structurally positive and thus can be used to      *)
-(*   define inductive types, e.g., Inductive tree := node n of tree ^ n.      *)
+(*   define inductive types, e.g., Inductive tree := node n of tree ^ n (see  *)
+(*   mid-file for an expanded example).                                       *)
 (* --> More generally, {ffun fT} is always structurally positive.             *)
 (*  For f : {ffun fT} with fT := forall x : aT -> rT x, we define             *)
 (*              f x == the image of x under f (f coerces to a CiC function)   *)
@@ -115,16 +116,30 @@ Notation "[ 'ffun' x => F ]" := [ffun x : _ => F]
 Notation "[ 'ffun' => F ]" := [ffun _ => F]
   (at level 0, format "[ 'ffun' =>  F ]") : fun_scope.
 
-(* Test that the type and accessor are structurally positive and decreasing,
-   respectively.
+(* Example outcommented.
+(* Examples of using finite functions as containers in recursive inductive    *)
+(* types, and making use of the fact that the type and accessor are           *)
+(* structurally positive and decreasing, respectively.                        *)
+Unset Elimination Schemes.
 Inductive tree := node n of tree ^ n.
 Fixpoint size t := let: node n f := t in sumn (codom (size \o f)) + 1.
+Example tree_step (K : tree -> Type) :=
+  forall n st (t := node st) & forall i : 'I_n, K (st i), K t.
+Example tree_rect K (Kstep : tree_step K) : forall t, K t.
+Proof. by fix IHt 1 => -[n st]; apply/Kstep=> i; apply: IHt. Defined.
+
+(* An artificial example use of dependent functions.                          *)
 Inductive tri_tree n := tri_row of {ffun forall i : 'I_n, tri_tree i}.
 Fixpoint tri_size n (t : tri_tree n) :=
   let: tri_row f := t in sumn [seq tri_size (f i) | i : 'I_n] + 1.
-*)
+Example tri_tree_step (K : forall n, tri_tree n -> Type) :=
+  forall n st (t := tri_row st) & forall i : 'I_n, K i (st i), K n t.
+Example tri_tree_rect K (Kstep : tri_tree_step K) : forall n t, K n t.
+Proof. by fix IHt 2 => n [st]; apply/Kstep=> i; apply: IHt. Defined.
+Set Elimination Schemes.
+(* End example. *) *)
 
-(* Lemmas on the correspondance between finfun_of and CiC dependent functions. *)
+(* The correspondance between finfun_of and CiC dependent functions.          *)
 Section DepPlainTheory.
 Variables (aT : finType) (rT : aT -> Type).
 Notation fT := {ffun finPi aT rT}.
