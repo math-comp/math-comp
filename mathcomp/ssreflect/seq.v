@@ -106,11 +106,19 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*               rev s == the (linear time) reversal of s.                    *)
 (*        catrev s1 s2 == the reversal of s1 followed by s2 (this is the      *)
 (*                        recursive form of rev).                             *)
+(*  ** Dependent iterator: for s : seq S and t : S -> seq T                   *)
+(* [seq E | x <- s, y <- t] := flatten [seq [seq E | x <- t] | y <- s]        *)
+(*                == the sequence of all the f x y, with x and y drawn from   *)
+(*                   s and t, respectively, in row-major order,               *)
+(*                   and where t is possibly dependent in elements of s       *)
+(* allpairs_dep f s t := self expanding definition for                        *)
+(*                       [seq f x y | x <- s, y <- t i]                       *)
 (*  ** Iterators: for s == [:: x_1, ..., x_n], t == [:: y_1, ..., y_m],       *)
-(*        map f s == the sequence [:: f x_1, ..., f x_n].                     *)
-(* allpairs f s t == the sequence of all the f x y, with x and y drawn from   *)
-(*                  s and t, respectively, in row-major order.                *)
+(* allpairs f s t := same as allpairs_dep but where t is non dependent,       *)
+(*                    i.e. self expanding definition for                      *)
+(*                      [seq f x y | x <- s, y <- t]                          *)
 (*               := [:: f x_1 y_1; ...; f x_1 y_m; f x_2 y_1; ...; f x_n y_m] *)
+(*        map f s == the sequence [:: f x_1, ..., f x_n].                     *)
 (*      pmap pf s == the sequence [:: y_i1, ..., y_ik] where i1 < ... < ik,   *)
 (*                   pf x_i = Some y_i, and pf x_j = None iff j is not in     *)
 (*                   {i1, ..., ik}.                                           *)
@@ -144,7 +152,6 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*  ** Notation for manifest comprehensions:                                  *)
 (*         [seq x <- s | C] := filter (fun x => C) s.                         *)
 (*         [seq E | x <- s] := map (fun x => E) s.                            *)
-(* [seq E | x <- s, y <- t] := allpairs (fun x y => E) s t.                   *)
 (*   [seq x <- s | C1 & C2] := [seq x <- s | C1 && C2].                       *)
 (*     [seq E | x <- s & C] := [seq E | x <- [seq x | C]].                    *)
 (*  --> The above allow optional type casts on the eigenvariables, as in      *)
@@ -2736,31 +2743,106 @@ rewrite /N /= count_cat -/(N x _) Nx0 ?mem_rem_uniq ?undup_uniq ?inE ?eqxx //.
 by rewrite addn0 -{2}(size_nseq (_ s) x) -all_count all_pred1_nseq.
 Qed.
 
-Section AllPairs.
+Notation "[ 'seq' E | x <- s , y <- t ]" :=
+  (flatten [seq [seq E | y <- t] | x <- s])
+  (at level 0, E at level 99, x ident, y ident,
+   format "[ '[hv' 'seq'  E '/ '  |  x  <-  s , '/   '  y  <-  t ] ']'")
+   : seq_scope.
+Notation "[ 'seq' E | x : S <- s , y : T <- t ]" :=
+  (flatten [seq [seq E | y : T <- t] | x : S  <- s])
+  (at level 0, E at level 99, x ident, y ident, only parsing) : seq_scope.
+
+Section AllPairsDep.
+
+Variables (S : Type) (T : S -> Type)  (R : Type) (f : forall x, T x -> R).
+Implicit Types (s : seq S) (t : forall x, seq (T x)).
+
+Definition allpairs_dep s t := [seq f y | x <- s, y <- t x].
+
+Lemma size_allpairs_dep s t :
+  size [seq f y | x <- s, y <- t x] = sumn [seq size (t x) | x <- s].
+Proof. by elim: s => //= x s IHs; rewrite size_cat size_map IHs. Qed.
+
+Lemma allpairs_cat s1 s2 t :
+  [seq f y | x <- s1 ++ s2, y <- t x] =
+    [seq f y | x <- s1, y <- t x] ++ [seq f y | x <- s2, y <- t x].
+Proof. by rewrite map_cat flatten_cat. Qed.
+
+Lemma allpairs_comp R' (g : R -> R') s t :
+  [seq g (f y) | x <- s, y <- t x] =
+    [seq g r | r <- [seq f y | x <- s, y <- t x]].
+Proof. by elim: s => //= x s ->; rewrite map_cat map_comp. Qed.
+
+End AllPairsDep.
+
+Arguments allpairs_dep {S T R} f s t /.
+
+Section AllPairsNonDep.
 
 Variables (S T R : Type) (f : S -> T -> R).
 Implicit Types (s : seq S) (t : seq T).
 
-Definition allpairs s t := foldr (fun x => cat (map (f x) t)) [::] s.
+Definition allpairs s t := [seq f x y | x <- s, y <- t].
 
-Lemma size_allpairs s t : size (allpairs s t) = size s * size t.
+Lemma size_allpairs s t : size [seq f x y | x <- s, y <- t] = size s * size t.
 Proof. by elim: s => //= x s IHs; rewrite size_cat size_map IHs. Qed.
 
-Lemma allpairs_cat s1 s2 t :
-  allpairs (s1 ++ s2) t = allpairs s1 t ++ allpairs s2 t.
-Proof. by elim: s1 => //= x s1 ->; rewrite catA. Qed.
+End AllPairsNonDep.
 
-End AllPairs.
+Arguments allpairs {S T R} f s t /.
 
-Prenex Implicits allpairs.
+Section EqAllPairsDep.
 
-Notation "[ 'seq' E | i <- s , j <- t ]" := (allpairs (fun i j => E) s t)
-  (at level 0, E at level 99, i ident, j ident,
-   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s , '/   '  j  <-  t ] ']'")
-   : seq_scope.
-Notation "[ 'seq' E | i : T <- s , j : U <- t ]" :=
-  (allpairs (fun (i : T) (j : U) => E) s t)
-  (at level 0, E at level 99, i ident, j ident, only parsing) : seq_scope.
+Variables (S : eqType) (T : S -> eqType).
+Implicit Types (R : eqType) (s : seq S) (t : forall x, seq (T x)).
+
+Lemma allpairsPdep R f s t (z : R) :
+  reflect (exists x y, [/\ x \in s, y \in t x & z = f x y])
+          (z \in [seq f x y | x <- s, y <- t x]).
+Proof.
+apply: (iffP flatten_mapP); first by case=> x ? /mapP[y ? ->]; exists x, y.
+by move=> [x [y [xs yt ->]]]; exists x => //; apply: map_f.
+Qed.
+
+Lemma allpairs_f_dep R (f : forall x, T x -> R) s t x y :
+  x \in s -> y \in t x -> f x y \in [seq f x y | x <- s, y <- t x].
+Proof. by move=> xs yt; apply/allpairsPdep; exists x, y. Qed.
+
+Lemma mem_allpairs_dep R (f : forall x, T x -> R) s1 t1 s2 t2 :
+    s1 =i s2 -> (forall x, x \in s1 -> t1 x =i t2 x) ->
+  [seq f x y | x <- s1, y <- t1 x] =i [seq f x y | x <- s2, y <- t2 x].
+Proof.
+move=> eq_s eq_t z; apply/allpairsPdep/allpairsPdep=> -[x [y [xs ys ->]]];
+by exists x, y; rewrite ?eq_s ?eq_t// -?eq_s -?eq_t// eq_s.
+Qed.
+
+Lemma allpairs_catr R (f : forall x, T x -> R) s t1 t2 :
+  [seq f x y | x <- s, y <- t1 x ++ t2 x] =i
+    [seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x].
+Proof.
+move=> r; rewrite mem_cat; apply/allpairsPdep/orP=> [[x [y [xs]]]|].
+  by rewrite mem_cat; case/orP; [left|right]; apply/allpairsPdep; exists x, y.
+by case=>/allpairsPdep[x [y [? yt ->]]]; exists x, y; rewrite mem_cat yt ?orbT.
+Qed.
+
+Lemma allpairs_uniq_dep R (f : forall x, T x -> R) s t
+    (g := fun p : {x : S & T x} => f _ (tagged p)) :
+    uniq s -> (forall x, x \in s -> uniq (t x)) ->
+    {in [seq Tagged T y | x <- s, y <- t x] &, injective g} ->
+  uniq [seq f x y | x <- s, y <- t x].
+Proof.
+move=> Us Ut gI; have s_s : all (mem s) s by apply/allP.
+rewrite (allpairs_comp (fun=> Tagged T) g) map_inj_in_uniq// {f g gI R}.
+elim: {-1}s s_s Us => //= x s1 IHs /andP[xs s_s1] /andP[xNs1 Us1].
+rewrite cat_uniq {}IHs // andbT map_inj_in_uniq ?Ut //; last first.
+  by move=> y1 y2 _ _ /eqP; rewrite eq_Tagged /= => /eqP.
+apply/hasPn=> _ /allpairsPdep[x1 [y1 [xs1 ys2 ->]]].
+by apply/mapP=> [[y ty [x1_eq _]]]; move: xs1 xNs1; rewrite x1_eq => ->.
+Qed.
+
+End EqAllPairsDep.
+
+Arguments allpairsPdep {S T R f s t z}.
 
 Section EqAllPairs.
 
@@ -2769,49 +2851,31 @@ Implicit Types (R : eqType) (s : seq S) (t : seq T).
 
 Lemma allpairsP R (f : S -> T -> R) s t z :
   reflect (exists p, [/\ p.1 \in s, p.2 \in t & z = f p.1 p.2])
-          (z \in allpairs f s t).
+          (z \in [seq f x y | x <- s, y <- t]).
 Proof.
-elim: s => [|x s IHs /=]; first by right=> [[p []]].
-rewrite mem_cat; have [fxt_z | not_fxt_z] := altP mapP.
-  by left; have [y t_y ->] := fxt_z; exists (x, y); rewrite mem_head.
-apply: (iffP IHs) => [] [[x' y] /= [s_x' t_y def_z]]; exists (x', y).
-  by rewrite !inE predU1r.
-by have [def_x' | //] := predU1P s_x'; rewrite def_z def_x' map_f in not_fxt_z.
+by apply: (iffP allpairsPdep) => [[x[y]]|[[x y]]]; [exists (x, y)|exists x, y].
 Qed.
 
-Lemma mem_allpairs R (f : S -> T -> R) s1 t1 s2 t2 :
-  s1 =i s2 -> t1 =i t2 -> allpairs f s1 t1 =i allpairs f s2 t2.
-Proof.
-move=> eq_s eq_t z.
-by apply/allpairsP/allpairsP=> [] [p fpz]; exists p; rewrite eq_s eq_t in fpz *.
-Qed.
+Lemma allpairs_f R (f : S -> T -> R) s t x y :
+  x \in s -> y \in t -> f x y \in [seq f x y | x <- s, y <- t].
+Proof. exact: allpairs_f_dep. Qed.
 
-Lemma allpairs_catr R (f : S -> T -> R) s t1 t2 :
-  allpairs f s (t1 ++ t2) =i allpairs f s t1 ++ allpairs f s t2.
-Proof.
-move=> z; rewrite mem_cat.
-apply/allpairsP/orP=> [[p [sP1]]|].
-  by rewrite mem_cat; case/orP; [left | right]; apply/allpairsP; exists p.
-by case=> /allpairsP[p [sp1 sp2 ->]]; exists p; rewrite mem_cat sp2 ?orbT.
-Qed.
+Lemma mem_allpairs R (f : S -> T -> R) s1 t1 s2 t2 : s1 =i s2 -> t1 =i t2 ->
+  [seq f x y | x <- s1, y <- t1] =i [seq f x y | x <- s2, y <- t2].
+Proof. by move=> *; apply: mem_allpairs_dep. Qed.
 
-Lemma allpairs_uniq R (f : S -> T -> R) s t :
-    uniq s -> uniq t ->
+Lemma allpairs_uniq R (f : S -> T -> R) s t : uniq s -> uniq t ->
     {in [seq (x, y) | x <- s, y <- t] &, injective (prod_curry f)} ->
-  uniq (allpairs f s t).
+  uniq [seq f x y | x <- s, y <- t].
 Proof.
-move=> Us Ut inj_f; have: all (mem s) s by apply/allP.
-elim: {-2}s Us => //= x s1 IHs /andP[s1'x Us1] /andP[sx1 ss1].
-rewrite cat_uniq {}IHs // andbT map_inj_in_uniq ?Ut // => [|y1 y2 *].
-  apply/hasPn=> _ /allpairsP[z [s1z tz ->]]; apply/mapP=> [[y ty Dy]].
-  suffices [Dz1 _]: (z.1, z.2) = (x, y) by rewrite -Dz1 s1z in s1'x.
-  apply: inj_f => //; apply/allpairsP; last by exists (x, y).
-  by have:= allP ss1 _ s1z; exists z.
-suffices: (x, y1) = (x, y2) by case.
-by apply: inj_f => //; apply/allpairsP; [exists (x, y1) | exists (x, y2)].
+move=> Us Ut inj_f; apply: allpairs_uniq_dep => //.
+move=> _ _ /allpairsPdep[x [y [xs yt ->]]] /allpairsPdep[u [v [us vt ->]]]/=.
+by move=> /(inj_f (_, _) (_, _)); rewrite !allpairs_f// => /(_ isT isT)[->->].
 Qed.
 
 End EqAllPairs.
+
+Arguments allpairsP {S T R f s t z}.
 
 Section AllIff.
 (* The Following Are Equivalent *)
