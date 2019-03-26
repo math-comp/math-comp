@@ -95,6 +95,16 @@
 
 	* Corrected implicits and documentation of MatrixGenField.
 
+	* Renamed `big_setIDdep` to `big_setIDcond`
+	  and `sum_nat_dep_const` to `sum_nat_cond_const`
+
+	* Added lemmas `big_imset_cond`,`big_map_id`, `big_image_cond`
+	  `big_image`, `big_image_cond_id` and `big_image_id` for
+	  completeness purposes
+
+	* Added lemmas `foldrE`, `foldlE`, `foldl_idx` and `sumnE`
+	  to turn "seq statements" into "bigop statements"
+
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 
 	* Added compatibility with Coq 8.8 and lost compatibility with
