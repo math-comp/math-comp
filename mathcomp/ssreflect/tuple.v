@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype.
+Require Import ssrfun ssrbool eqtype ssrnat seq choice div fintype.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -302,75 +302,9 @@ Qed.
 
 End EqTuple.
 
-Definition tuple_choiceMixin n (T : choiceType) :=
-  [choiceMixin of n.-tuple T by <:].
-
-Canonical tuple_choiceType n (T : choiceType) :=
-  Eval hnf in ChoiceType (n.-tuple T) (tuple_choiceMixin n T).
-
-Definition tuple_countMixin n (T : countType) :=
-  [countMixin of n.-tuple T by <:].
-
-Canonical tuple_countType n (T : countType) :=
-  Eval hnf in CountType (n.-tuple T) (tuple_countMixin n T).
-
-Canonical tuple_subCountType n (T : countType) :=
-  Eval hnf in [subCountType of n.-tuple T].
-
-Module Type FinTupleSig.
-Section FinTupleSig.
-Variables (n : nat) (T : finType).
-Parameter enum : seq (n.-tuple T).
-Axiom enumP : Finite.axiom enum.
-Axiom size_enum : size enum = #|T| ^ n.
-End FinTupleSig.
-End FinTupleSig.
-
-Module FinTuple : FinTupleSig.
-Section FinTuple.
-Variables (n : nat) (T : finType).
-
-Definition enum : seq (n.-tuple T) :=
-  let extend e := flatten (codom (fun x => map (cons x) e)) in
-  pmap insub (iter n extend [::[::]]).
-
-Lemma enumP : Finite.axiom enum.
-Proof.
-case=> /= t t_n; rewrite -(count_map _ (pred1 t)) (pmap_filter (insubK _)).
-rewrite count_filter -(@eq_count _ (pred1 t)) => [|s /=]; last first.
-  by rewrite isSome_insub; case: eqP=> // ->.
-elim: n t t_n => [|m IHm] [|x t] //= {IHm}/IHm; move: (iter m _ _) => em IHm.
-transitivity (x \in T : nat); rewrite // -mem_enum codomE.
-elim: (fintype.enum T)  (enum_uniq T) => //= y e IHe /andP[/negPf ney].
-rewrite count_cat count_map inE /preim /= {1}/eq_op /= eq_sym => /IHe->.
-by case: eqP => [->|_]; rewrite ?(ney, count_pred0, IHm).
-Qed.
-
-Lemma size_enum : size enum = #|T| ^ n.
-Proof.
-rewrite /= cardE size_pmap_sub; elim: n => //= m IHm.
-rewrite expnS /codom /image_mem; elim: {2 3}(fintype.enum T) => //= x e IHe.
-by rewrite count_cat {}IHe count_map IHm.
-Qed.
-
-End FinTuple.
-End FinTuple.
-
 Section UseFinTuple.
 
 Variables (n : nat) (T : finType).
-
-(* tuple_finMixin could, in principle, be made Canonical to allow for folding *)
-(* Finite.enum of a finite tuple type (see comments around eqE in eqtype.v),  *)
-(* but in practice it will not work because the mixin_enum projector          *)
-(* has been burried under an opaque alias, to avoid some performance issues   *)
-(* during type inference.                                                     *)
-Definition tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
-Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.
-Canonical tuple_subFinType := Eval hnf in [subFinType of n.-tuple T].
-
-Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
-Proof. by rewrite [#|_|]cardT enumT unlock FinTuple.size_enum. Qed.
 
 Lemma enum_tupleP (A : pred T) : size (enum A) == #|A|.
 Proof. by rewrite -cardE. Qed.
@@ -411,11 +345,167 @@ Proof. by rewrite -tnth_nth tnth_mktuple. Qed.
 
 End MkTuple.
 
+End UseFinTuple.
+
+Definition tuple_choiceMixin n (T : choiceType) :=
+  [choiceMixin of n.-tuple T by <:].
+
+Canonical tuple_choiceType n (T : choiceType) :=
+  Eval hnf in ChoiceType (n.-tuple T) (tuple_choiceMixin n T).
+
+Definition tuple_countMixin n (T : countType) :=
+  [countMixin of n.-tuple T by <:].
+
+Canonical tuple_countType n (T : countType) :=
+  Eval hnf in CountType (n.-tuple T) (tuple_countMixin n T).
+
+Canonical tuple_subCountType n (T : countType) :=
+  Eval hnf in [subCountType of n.-tuple T].
+
+Module Type FinTupleSig.
+Section FinTupleSig.
+Variables (n : nat) (T : finType).
+Parameter fin_encode : n.-tuple T -> 'I_($|T| ^ n).
+Parameter fin_decode : 'I_($|T| ^ n) -> n.-tuple T.
+Axiom fin_encodeK : cancel fin_encode fin_decode.
+Axiom fin_decodeK : cancel fin_decode fin_encode.
+End FinTupleSig.
+End FinTupleSig.
+
+Module FinTuple : FinTupleSig.
+
+Lemma sumn_expn n m :
+  0 < n -> n ^ m = (sumn [seq n.-1 * n ^ i | i <- iota 0 m]).+1.
+Proof.
+case: n => //= n _; elim: m => // m IH.
+by rewrite -{2}(addn1 m) iota_add add0n map_cat sumn_cat /=
+           addn0 expnS -addSn mulSn {1}IH.
+Qed.
+
+Lemma positional_notation_upper_bound n m (f : nat -> nat) :
+  (forall i, i < m -> f i < n) -> sumn [seq f i * n ^ i | i <- iota 0 m] < n ^ m.
+Proof.
+case: n => //=; first by case: m => // m /(_ 0) /(_ erefl); rewrite ltn0.
+move=> n H; rewrite sumn_expn //=; rewrite ltnS.
+have {H}: forall i, i \in iota 0 m -> f i <= n
+  by move=> i; rewrite mem_iota add0n => /andP [_] /H; rewrite ltnS.
+elim: iota => //= j js IH H.
+apply leq_add => //.
+- by rewrite leq_pmul2r ?expn_gt0 //; apply H; rewrite inE eqxx.
+- by apply IH => i H0; apply H; rewrite inE H0 orbT.
+Qed.
+
+Fixpoint enum n (T : finType) : seq (n.-tuple T) :=
+  if n isn't n'.+1 then [tuple] else
+    [seq cons_tuple x xs | xs <- enum n' T, x <- Finite.enum T].
+
+Section FinTuple.
+Variables (n : nat) (T : finType).
+
+Lemma fin_encodeP (x : n.-tuple T) :
+  sumn [seq Finite.encode (tnth x i) * $|T| ^ i | i : 'I_n <- ord_enum n] <
+  $|T| ^ n.
+Proof.
+pose f i := if insub i is Some i' then Finite.encode (tnth x i') : nat else 0.
+suff ->:
+  [seq Finite.encode (tnth x i) * $|T| ^ i | i : 'I_n <- ord_enum n] =
+  [seq f i * $|T| ^ i | i <- iota 0 n]
+  by apply positional_notation_upper_bound => i ?; rewrite /f insubT.
+rewrite -val_ord_enum -map_comp.
+apply eq_in_map => /= i _; rewrite /f insubT ?ltn_ord // => ?.
+by congr (Finite.encode (tnth _ _) * _); apply/val_inj.
+Qed.
+
+Definition fin_encode (x : n.-tuple T) : 'I_($|T| ^ n) :=
+  Ordinal (fin_encodeP x).
+
+Lemma fin_decodeP (i : 'I_($|T| ^ n)) (j : 'I_n) :
+  (i %/ ($|T| ^ j)) %% $|T| < $|T|.
+Proof.
+by apply ltn_pmod; case: n j $|T| i =>
+   [[] | n'] // j [] //; rewrite exp0n => // -[].
+Qed.
+
+Definition fin_decode (i : 'I_($|T| ^ n)) : n.-tuple T :=
+  mktuple (fun j : 'I_n => Finite.decode (Ordinal (fin_decodeP i j))).
+
+Lemma fin_encodeK : cancel fin_encode fin_decode.
+Proof.
+move=> xs; rewrite /fin_encode /fin_decode.
+apply/eq_from_tnth => i.
+rewrite tnth_map tnth_ord_tuple -(raw_fin_encodeK (tnth xs i)).
+congr Finite.decode; apply/val_inj => /=.
+have HT : 0 < #|T| by apply/card_gt0P; exists (tnth xs i).
+have ->: forall (f : nat -> nat) (g : 'I_n -> nat),
+    [seq g j * f j | j : 'I_n <- ord_enum n] =
+    [seq [fun j => if insub j is Some j' then g j' else 0] j * f j |
+          j <- iota 0 n].
+  move=> f g; rewrite -val_ord_enum -map_comp; apply/eq_in_map => /= j _.
+  by rewrite insubT ?ltn_ord // => ?; congr (g _ * _); apply/val_inj.
+set f := [fun j => _].
+have Hf j : f j < $|T|
+  by simpl; case: (insub j) => //; rewrite !raw_cardE.
+have <- : f i = Finite.encode (tnth xs i)
+  by rewrite /= insubT // => H; move/val_inj: (SubK [subType of 'I_n] H) ->.
+case: f Hf => /= f Hf.
+rewrite -{1}(subnKC (ltn_ord i)) -{1}addn1 !iota_add !map_cat !sumn_cat /=
+        addn1 (addnC 0 i.+1) iota_addl -map_comp !/comp add0n addn0.
+have ->:
+  sumn [seq f (i.+1 + j) * $|T| ^ (i.+1 + j) | j <- iota 0 (n - i.+1)] =
+  $|T| ^ (i.+1) * sumn [seq f (i.+1 + j) * $|T| ^ j | j <- iota 0 (n - i.+1)]
+  by elim: iota => //= j js ->; rewrite expnD mulnCA mulnDr.
+rewrite expnS -mulnAC -addnA -mulnDl addnC divnMDl;
+  last by rewrite raw_cardE expn_gt0 HT.
+rewrite divn_small; last by apply positional_notation_upper_bound.
+by rewrite addn0 addnC mulnC modnMDl modn_small.
+Qed.
+
+Lemma fin_decodeK : cancel fin_decode fin_encode.
+Proof.
+move=> i; rewrite /fin_encode /fin_decode.
+apply/val_inj => /=.
+set xs := map _ _.
+have {xs} -> : xs = [seq (i %/ $|T| ^ j %% $|T|) * $|T| ^ j | j <- iota 0 n]
+  by rewrite -val_ord_enum -map_comp; apply/eq_in_map => /= j _ {xs};
+     rewrite tnth_map tnth_ord_tuple raw_fin_decodeK.
+case: i; elim: n => //= [[] |] // n' IH m H.
+rewrite expn0 divn1 muln1 (iota_addl 1 0) -map_comp !/comp.
+have ->:
+  sumn [seq (m %/ $|T| ^ i.+1) %% $|T| * $|T| ^ i.+1 | i <- iota 0 n'] =
+  sumn [seq (m %/ $|T| %/ $|T| ^ i) %% $|T| * $|T| ^ i | i <- iota 0 n'] *
+  $|T|.
+  by elim: iota => //= j js ->; rewrite {1}expnS divnMA expnSr mulnA mulnDl.
+rewrite IH.
+- by rewrite addnC -divn_eq.
+- rewrite ltn_divLR -?expnSr //.
+  by case: $|T| H => //=; rewrite exp0n.
+Qed.
+
+End FinTuple.
+End FinTuple.
+
+Section UseFinTuple'.
+
+Variables (n : nat) (T : finType).
+
+(* tuple_finMixin could, in principle, be made Canonical to allow for folding *)
+(* Finite.enum of a finite tuple type (see comments around eqE in eqtype.v),  *)
+(* but in practice it will not work because the mixin_enum projector          *)
+(* has been burried under an opaque alias, to avoid some performance issues   *)
+(* during type inference.                                                     *)
+Definition tuple_finMixin := Eval hnf in
+      BijFinMixin (@FinTuple.fin_encodeK n T) (@FinTuple.fin_decodeK n T).
+Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.
+Canonical tuple_subFinType := Eval hnf in [subFinType of n.-tuple T].
+
+Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
+Proof. by rewrite -!raw_cardE. Qed.
+
 Lemma eq_mktuple T' (f1 f2 : 'I_n -> T') :
   f1 =1 f2 -> mktuple f1 = mktuple f2.
 Proof. by move=> eq_f; apply eq_from_tnth=> i; rewrite !tnth_map eq_f. Qed.
 
-End UseFinTuple.
+End UseFinTuple'.
 
 Notation "[ 'tuple' F | i < n ]" := (mktuple (fun i : 'I_n => F))
   (at level 0, i at level 0,

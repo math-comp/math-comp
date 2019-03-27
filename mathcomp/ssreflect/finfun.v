@@ -68,27 +68,63 @@ Section Def.
 
 Variables (aT : finType) (rT : aT -> Type).
 
-Inductive finfun_on : seq aT -> Type :=
-| finfun_nil                            : finfun_on [::]
-| finfun_cons x s of rT x & finfun_on s : finfun_on (x :: s).
+Inductive finfun_on : seq 'I_$|aT| -> Type :=
+| finfun_nil : finfun_on [::]
+| finfun_cons x s of rT (Finite.decode x) & finfun_on s : finfun_on (x :: s).
 
-Local Fixpoint finfun_rec (g : forall x, rT x) s : finfun_on s :=
-  if s is x1 :: s1 then finfun_cons (g x1) (finfun_rec g s1) else finfun_nil.
+Local Fixpoint finfun_rec A (g : forall x, A -> A * rT (Finite.decode x)) a s :
+  finfun_on s :=
+  if s isn't x1 :: s1 then finfun_nil else
+    let: (a, e) := g x1 a in finfun_cons e (finfun_rec g a s1).
 
-Local Fixpoint fun_of_fin_rec x s (f_s : finfun_on s) : x \in s -> rT x :=
+Local Fixpoint snth T (s : seq T) i : i < size s -> T :=
+  match s, i with
+  | [::], _ => False_rect _ \o notF
+  | x :: s, 0 => fun => x
+  | x :: s, i.+1 => @snth T s i
+  end.
+
+Local Fixpoint fun_of_fin_rec i s (f_s : finfun_on s) {struct f_s} :
+  forall ltis : i < size s, rT (Finite.decode (snth ltis)) :=
   if f_s is finfun_cons x1 s1 y1 f_s1 then
-    if eqP is ReflectT Dx in reflect _ Dxb return Dxb || (x \in s1) -> rT x then
-      fun=> ecast x (rT x) (esym Dx) y1
-    else fun_of_fin_rec f_s1
-  else fun isF =>  False_rect (rT x) (notF isF).
+    if i is i.+1 then fun_of_fin_rec f_s1 else fun=> y1
+  else fun isF => False_rect _ (notF isF).
 
 Variant finfun_of (ph : phant (forall x, rT x)) : predArgType :=
-  FinfunOf of finfun_on (enum aT).
+  FinfunOf of finfun_on (ord_enum $|aT|).
+
+Local Definition finfun'
+      A (g : forall x, A -> A * rT (Finite.decode x)) a c (hc : c = $|aT|) :=
+  FinfunOf
+    (Phant (forall x, rT x))
+    (ecast s (finfun_on s)
+           (let 'erefl as e in (_ = y) := hc
+            return ecast c (seq 'I_c) e (ord_enum c) = ord_enum y in
+            erefl _)
+           (finfun_rec g a (ecast c (seq 'I_c) hc (ord_enum c)))).
 
 Definition dfinfun_of ph := finfun_of ph.
 
-Definition fun_of_fin ph (f : finfun_of ph) x :=
-  let: FinfunOf f_aT := f in fun_of_fin_rec f_aT (mem_enum aT x).
+Local Lemma snthE T d (s : seq T) i (ltis : i < size s) : snth ltis = nth d s i.
+Proof. by elim: s i ltis => [| ???] []. Qed.
+
+Local Lemma fun_of_fin_subproof x :
+  Finite.decode (snth (ecast i (_ < i) (esym (size_ord_enum $|aT|))
+                             (ltn_ord (Finite.encode x)))) =
+  x.
+Proof.
+apply/raw_fin_encode_inj/val_inj.
+by rewrite raw_fin_decodeK (snthE (Finite.encode x)) -(nth_map _ 0)
+           ?size_ord_enum // val_ord_enum nth_iota.
+Qed.
+
+Local Definition fun_of_fin' ph (f : finfun_of ph) i :=
+  let: FinfunOf f_aT := f in
+  (fun_of_fin_rec f_aT (ecast i (_ < i) (esym (size_ord_enum _))
+                              (ltn_ord i))).
+
+Local Definition fun_of_fin ph (f : finfun_of ph) x : rT x :=
+  ecast x (rT x) (fun_of_fin_subproof x) (fun_of_fin' f (Finite.encode x)).
 
 End Def.
 
@@ -108,7 +144,8 @@ Notation "T ^ n" :=
 
 Local Notation finPi aT rT := (forall x : Finite.sort aT, rT x) (only parsing).
 Local Notation finfun_def :=
-  (fun aT rT g => FinfunOf (Phant (finPi aT rT)) (finfun_rec g (enum aT))).
+  (fun aT rT (g : finPi aT rT) =>
+     finfun' (fun (i : 'I_$|aT|) a => (tt, g (Finite.decode i))) tt erefl).
 
 Module Type FinfunDefSig.
 Parameter finfun : forall aT rT, finPi aT rT -> {ffun finPi aT rT}.
@@ -144,7 +181,6 @@ Example tree_step (K : tree -> Type) :=
   forall n st (t := node st) & forall i : 'I_n, K (st i), K t.
 Example tree_rect K (Kstep : tree_step K) : forall t, K t.
 Proof. by fix IHt 1 => -[n st]; apply/Kstep=> i; apply: IHt. Defined.
-
 (* An artificial example use of dependent functions.                          *)
 Inductive tri_tree n := tri_row of {ffun forall i : 'I_n, tri_tree i}.
 Fixpoint tri_size n (t : tri_tree n) :=
@@ -165,23 +201,39 @@ Implicit Type f : fT.
 Fact ffun0 (aT0 : #|aT| = 0) : fT.
 Proof. by apply/finfun=> x; have:= card0_eq aT0 x. Qed.
 
+Local Lemma finfun_recE
+      A (g : forall x, A -> A * rT x) a i s (ltis : i < size s) :
+  fun_of_fin_rec (finfun_rec (fun i => g (Finite.decode i)) a s) ltis =
+  (g (Finite.decode (snth ltis))
+     (foldl (fun a x => (g (Finite.decode x) a).1) a (take i s))).2.
+Proof. by elim: s i ltis a => // x s ih [|?] ? ? /=; case: (g _ _) => /=. Qed.
+
 Lemma ffunE g x : (finfun g : fT) x = g x.
 Proof.
-rewrite unlock /=; set s := enum aT; set s_x : mem_seq s x := mem_enum _ _.
-by elim: s s_x => //= x1 s IHs; case: eqP => [|_]; [case: x1 / | apply: IHs].
+rewrite unlock /= /fun_of_fin /= (finfun_recE (fun i _ => (tt, g i))) /=.
+by move: (snth _) (fun_of_fin_subproof _) => i; case: x /.
 Qed.
 
 Lemma ffunP (f1 f2 : fT) : (forall x, f1 x = f2 x) <-> f1 = f2.
 Proof.
-suffices ffunK f g: (forall x, f x = g x) -> f = finfun g.
+suff {f1 f2} ffunK f g: (forall x, f x = g x) -> f = finfun g.
   by split=> [/ffunK|] -> //; apply/esym/ffunK.
 case: f => f Dg; rewrite unlock; congr FinfunOf.
-have{Dg} Dg x (aTx : mem_seq (enum aT) x): g x = fun_of_fin_rec f aTx.
-  by rewrite -Dg /= (bool_irrelevance (mem_enum _ _) aTx).
-elim: (enum aT) / f (enum_uniq aT) => //= x1 s y f IHf /andP[s'x1 Us] in Dg *.
-rewrite Dg ?eqxx //=; case: eqP => // /eq_axiomK-> /= _.
-rewrite {}IHf // => x s_x; rewrite Dg ?s_x ?orbT //.
-by case: eqP (memPn s'x1 x s_x) => // _ _ /(bool_irrelevance s_x) <-.
+have{Dg} Dg i x (ltis : i < size (ord_enum $|aT|))
+            (e : Finite.decode (snth ltis) = x) :
+  g x = ecast x' (rT x') e (fun_of_fin_rec f ltis).
+  have iE: fin_encode x = i :> nat.
+    rewrite fin_encode_index -e (snthE (Finite.encode x)).
+    rewrite -(nth_map (Finite.encode x) x) // -raw_fin_decodeP.
+    rewrite index_uniq ?enum_uniq //.
+    by rewrite -cardT -raw_cardE -(size_ord_enum $|aT|).
+  case: i / iE ltis e.
+  rewrite (unlock fin_encode_unlock) -Dg /= /fun_of_fin /= => ltis e.
+  move: (ecast i (_ < i) _ _) (fun_of_fin_subproof _) => ltis'.
+  rewrite -(bool_irrelevance ltis ltis') => {ltis'} e'.
+  by rewrite (eq_irrelevance e' e).
+elim: (ord_enum $|aT|) / f Dg => // x s h f ih Dg.
+rewrite /= (Dg 0); congr finfun_cons; apply/ih => i *; exact: (Dg i.+1).
 Qed.
 
 Lemma ffunK : @cancel (finPi aT rT) fT fun_of_fin finfun.
@@ -241,6 +293,7 @@ Section InheritedStructures.
 Variable aT : finType.
 Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
 
+(* TODO: Redefine the eqType and finType instances of finfun. *)
 Local Remark eqMixin rT : Equality.mixin_of (dffun_aT rT eqType).
 Proof. exact: PcanEqMixin tfgraphK. Qed.
 Canonical finfun_eqType (rT : eqType) :=
