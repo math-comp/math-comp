@@ -2777,6 +2777,21 @@ End AllPairsDep.
 
 Arguments allpairs_dep {S T R} f s t /.
 
+Section AllPairsDepMap.
+
+Variables (S S' : Type) (T T' : S -> Type) (R : Type) (f : forall x, T x -> R).
+
+Lemma allpairs_dep_mapl (g : S' -> S) s (t : forall x : S, seq (T x)) :
+  [seq f y | x <- map g s, y <- t x] = [seq f y | x <- s, y <- t (g x)].
+Proof. by elim: s => //= x s ->. Qed.
+
+Lemma allpairs_dep_mapr (g : forall x, T' x -> T x) s
+      (t : forall x : S, seq (T' x)) :
+  [seq f y | x <- s, y <- map (g x) (t x)] = [seq f (g x y) | x <- s, y <- t x].
+Proof. by elim: s => //= x s ->; rewrite -map_comp. Qed.
+
+End AllPairsDepMap.
+
 Section AllPairsNonDep.
 
 Variables (S T R : Type) (f : S -> T -> R).
@@ -2795,6 +2810,15 @@ Section EqAllPairsDep.
 
 Variables (S : eqType) (T : S -> eqType).
 Implicit Types (R : eqType) (s : seq S) (t : forall x, seq (T x)).
+
+Lemma eq_in_allpairs R (f g : forall x, T x -> R) s t :
+  (forall x, x \in s -> {in t x, f x =1 g x}) ->
+  [seq f x y | x <- s, y <- t x] = [seq g x y | x <- s, y <- t x].
+Proof.
+elim: s => //= x s ihs e; rewrite ihs.
+by congr cat; apply/eq_in_map => y; apply: (e x); rewrite inE eqxx.
+by move=> x' x'in y'; apply: (e x' _ y'); rewrite inE x'in orbT.
+Qed.
 
 Lemma allpairsPdep R f s t (z : R) :
   reflect (exists x y, [/\ x \in s, y \in t x & z = f x y])
