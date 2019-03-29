@@ -411,10 +411,14 @@ Proof. by rewrite -tnth_nth tnth_mktuple. Qed.
 
 End MkTuple.
 
+Lemma eq_mktuple T' (f1 f2 : 'I_n -> T') :
+  f1 =1 f2 -> mktuple f1 = mktuple f2.
+Proof. by move=> eq_f; apply eq_from_tnth=> i; rewrite !tnth_map eq_f. Qed.
+
 End UseFinTuple.
 
 Notation "[ 'tuple' F | i < n ]" := (mktuple (fun i : 'I_n => F))
   (at level 0, i at level 0,
    format "[ '[hv' 'tuple'  F '/'   |  i  <  n ] ']'") : form_scope.
 
-
+Arguments eq_mktuple {n T'} [f1] f2 eq_f12.

@@ -239,11 +239,15 @@ Proof. by rewrite in_set. Qed.
 Lemma eqsVneq A B : {A = B} + {A != B}.
 Proof. exact: eqVneq. Qed.
 
+Lemma eq_finset (pA pB : pred T) : pA =1 pB -> finset pA = finset pB.
+Proof. by move=> eq_p; apply/setP => x; rewrite !(in_set, inE) eq_p. Qed.
+
 End BasicSetTheory.
 
 Definition inE := (in_set, inE).
 
 Arguments set0 {T}.
+Arguments eq_finset {T} [pA] pB eq_pAB.
 Hint Resolve in_setT : core.
 
 Notation "[ 'set' : T ]" := (setTfor (Phant T))
@@ -2211,4 +2215,3 @@ Arguments setCK {T}.
 Arguments minsetP {T P A}.
 Arguments maxsetP {T P A}.
 Prenex Implicits minset maxset.
-
