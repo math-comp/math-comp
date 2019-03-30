@@ -1,0 +1,14 @@
+; This is an alternative to the composed build
+;
+; (coqlib
+;  (name mathcomp)
+;  (public_name math-comp.mathcomp)
+;  (modules :standard)
+;  (synopsis "Mathematical Components")
+;  (flags
+;    -w -notation-overridden
+;    -w -redundant-canonical-projection
+;    -w -projection-no-head-constant
+;  ))
+;
+; (include_subdirs qualified)

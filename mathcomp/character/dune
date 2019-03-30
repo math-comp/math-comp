@@ -1,0 +1,18 @@
+(coq.theory
+ (name mathcomp.character)
+ (package coq-mathcomp-character)
+ (modules :standard)
+ (synopsis "Mathematical Components")
+ (theories mathcomp.ssreflect mathcomp.fingroup mathcomp.algebra mathcomp.field mathcomp.solvable)
+ (flags
+   -w -notation-overridden
+   -w -redundant-canonical-projection
+   -w -projection-no-head-constant
+   -w -undeclared-scope
+   -w -set-maximal-deprecated
+   -w -ambiguous-paths
+   -w -duplicate-clear
+   -w -irrelevant-reserved-notation-only-parsing
+   -w -notation-incompatible-format
+   -w -deprecated-hint-without-locality
+ ))

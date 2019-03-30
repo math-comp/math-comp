@@ -1,0 +1,20 @@
+(coq.theory
+ (name mathcomp.algebra)
+ (package coq-mathcomp-algebra)
+ (modules :standard)
+ (synopsis "Mathematical Components")
+ (theories mathcomp.ssreflect mathcomp.fingroup)
+ (flags
+   -w -projection-no-head-constant
+   -w -redundant-canonical-projection
+   -w -notation-overridden
+   -w -duplicate-clear
+   -w -ambiguous-paths
+   -w -undeclared-scope
+   -w -deprecated-hint-without-locality
+   ; -w -set-maximal-deprecated
+   ; -w -notation-incompatible-format
+   ; -w -irrelevant-format-only-parsing
+   ; -w -irrelevant-reserved-notation-only-parsing
+   ; -w -deprecated-hint-constr
+ ))

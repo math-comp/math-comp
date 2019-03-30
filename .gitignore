@@ -33,3 +33,5 @@ htmldoc/index*.*html
 htmldoc/depend
 htmldoc/depend.js
 htmldoc/*.css
+_build
+*.install
