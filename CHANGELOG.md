@@ -12,7 +12,7 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
 
 - Companion matrix of a polynomial `companionmx p` and the
   theorems: `companionmxK`, `map_mx_companion` and `companion_map_poly`
-  
+
 - `homoW_in`, `inj_homo_in`, `mono_inj_in`, `anti_mono_in`,
   `total_homo_mono_in`, `homoW`, `inj_homo`, `monoj`, `anti_mono`,
   `total_homo_mono`
@@ -35,6 +35,18 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
 - `all_iff` with notation `[<-> P0; P1; ..; Pn]` to talk about
   circular implication `P0 -> P1 -> ... -> Pn -> P0`.
   Related theorems are `all_iffLR` and `all_iffP`
+
+- support for casts in map comprehension notations, e.g.,
+  `[seq E : T | s <- s]`.
+
+- a predicate `all2`, a parallel double `seq` version of `all`.
+
+- some `perm_eq` lemmas: `perm_cat[lr]`, `perm_eq_nilP`,
+  `perm_eq_consP`, `perm_eq_flatten`.
+
+- a function `permutations` that computes a duplicate-free list
+  of all permutations of a given sequence `s` over an `eqType`, along
+  whit its theory.
 
 ### Changed
 
@@ -83,19 +95,33 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
   where `t` may depend on `i`. The notation is now primitive and
   expressed using `flatten` and `map` (see documentation of seq).
   `allpairs` now expands to this notation when fully applied.
-  Added `allpairs_dep` and made it self-expanding as well.
-  Generalized some lemmas in a backward compatible way.
-  Some strictly more general lemmas now have suffix `_dep`.
+  + Added `allpairs_dep` and made it self-expanding as well.
+  + Generalized some lemmas in a backward compatible way.
+  + Some strictly more general lemmas now have suffix `_dep`.
+  + Replaced `allpairs_comp` with its converse `map_allpairs`.
+  + Added `allpairs` extensionality lemmas for the following cases:
+    non-localised (`eq_allpairs`), dependent localised
+    (`eq_in_allpairs_dep`) and non-dependent localised
+    (`eq_in_allpairs`); as per `eq_in_map`, the latter two are
+    equivalences.
 
-- Generalised `{ffun A -> R}` to handle dependent functions, and to be
+- Generalized `{ffun A -> R}` to handle dependent functions, and to be
   structurally positive so it can be used in recursive inductive type
   definitions.
-  
+
   Minor backward incompatibilities: `fgraph f` is no longer
   a field accessor, and no longer equal to `val f` as `{ffun A -> R}` is no
   longer a `subType`; some instances of `finfun`, `ffunE`, `ffunK` may not unify
-  with a generic nondependent function type `A -> ?R` due to a bug in
+  with a generic non-dependent function type `A -> ?R` due to a bug in
   Coq version 8.9 or below.
+
+- Renamed double `seq` induction lemma from `seq2_ind` to `seq_ind2`,
+  and weakened its induction hypothesis.
+
+- Replaced the `nosimpl` in `rev` with a `Arguments simpl never`
+  directive.
+
+- Many corrections in implicits declarations.
 
 ### Renamed
 
@@ -132,6 +158,8 @@ Renamings also involve the `_in` suffix counterpart when applicable
 - Removed duplicated definitions of `tag`, `tagged` and `Tagged`
   from `eqtype.v`. They are already in `ssrfun.v`.
 
+- Miscellaneous improvements to proof scripts and file organisation.
+
 ## [1.7.0] - 2018-04-24
 
 Compatibility with Coq 8.8 and lost compatibility with
@@ -160,7 +188,7 @@ Coq <= 8.5. This release is compatible with Coq 8.6, 8.7 and 8.8.
   implicit, parameter of type `numClosedFieldType`. This could break
   some proofs.
   Every theorem from `ssrnum` that used to be in `algC` changed statement.
-  
+
 - `ltngtP`, `contra_eq`, `contra_neq`, `odd_opp`, `nth_iota`
 
 ### Added
@@ -193,7 +221,7 @@ Major reorganization of the archive.
   that is relevant to her. Note that this introduces a possible
   incompatibility for users of the previous version. A replacement
   scheme is suggested in the installation notes.
-	  
+
 - The archive is now open and based on git. Public mirror at:
   https://github.com/math-comp/math-comp
 

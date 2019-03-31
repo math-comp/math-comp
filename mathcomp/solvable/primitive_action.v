@@ -165,10 +165,8 @@ Definition ntransitive := [transitive A, on dtuple_on | to * n].
 Lemma dtuple_onP t :
   reflect (injective (tnth t) /\ forall i, tnth t i \in S) (t \in dtuple_on).
 Proof.
-rewrite inE subset_all -map_tnth_enum.
-case: (uniq _) / (injectiveP (tnth t)) => f_inj; last by right; case.
-rewrite -[all _ _]negbK -has_predC has_map has_predC negbK /=.
-by apply: (iffP allP) => [Sf|[]//]; split=> // i; rewrite Sf ?mem_enum.
+rewrite inE subset_all -forallb_tnth -[in uniq t]map_tnth_enum /=.
+by apply: (iffP andP) => -[/injectiveP-f_inj /forallP].
 Qed.
 
 Lemma n_act_dtuple t a :

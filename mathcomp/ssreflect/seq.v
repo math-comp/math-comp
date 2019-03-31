@@ -60,29 +60,37 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (*       incr_nth s i == the nat sequence s with item i incremented (s is     *)
 (*                       first padded with 0's to size i+1, if needed).       *)
 (*  ** Predicates:                                                            *)
-(*          nilp s == s is [::].                                              *)
+(*          nilp s <=> s is [::].                                             *)
 (*                 := (size s == 0).                                          *)
 (*         x \in s == x appears in s (this requires an eqType for T).         *)
 (*       index x s == the first index at which x appears in s, or size s if   *)
 (*                    x \notin s.                                             *)
-(*         has p s == the (applicative, boolean) predicate p holds for some   *)
-(*                    item in s.                                              *)
-(*         all p s == p holds for all items in s.                             *)
+(*         has a s <=> a holds for some item in s, where a is an applicative  *)
+(*                     bool predicate.                                        *)
+(*         all a s <=> a holds for all items in s.                            *)
+(*         'has_aP <-> the view reflect (exists2 x, x \in s & A x) (has a s), *)
+(*                     where aP x : reflect (A x) (a x).                      *)
+(*         'all_aP <=> the view for reflect {in s, forall x, A x} (all a s).  *)
+(*      all2 r s t <=> the (bool) relation r holds for all _respective_ items *)
+(*                    in s and t, which must also have the same size, i.e.,   *)
+(*                    for s := [:: x1; ...; x_m] and t := [:: y1; ...; y_n],  *)
+(*                    the condition [&& r x_1 y_1, ..., r x_n y_n & m == n].  *)
 (*        find p s == the index of the first item in s for which p holds,     *)
 (*                    or size s if no such item is found.                     *)
 (*       count p s == the number of items of s for which p holds.             *)
 (*   count_mem x s == the number of times x occurs in s := count (pred1 x) s. *)
-(*      constant s == all items in s are identical (trivial if s = [::])      *)
-(*          uniq s == all the items in s are pairwise different.              *)
-(*    subseq s1 s2 == s1 is a subsequence of s2, i.e., s1 = mask m s2 for     *)
+(*      constant s <=> all items in s are identical (trivial if s = [::]).    *)
+(*          uniq s <=> all the items in s are pairwise different.             *)
+(*    subseq s1 s2 <=> s1 is a subsequence of s2, i.e., s1 = mask m s2 for    *)
 (*                    some m : bitseq (see below).                            *)
-(*   perm_eq s1 s2 == s2 is a permutation of s1, i.e., s1 and s2 have the     *)
+(*   perm_eq s1 s2 <=> s2 is a permutation of s1, i.e., s1 and s2 have the    *)
 (*                    items (with the same repetitions), but possibly in a    *)
 (*                    different order.                                        *)
+(*   permutations s == a duplicate-free list of all permutations of s.        *)
 (*  perm_eql s1 s2 <-> s1 and s2 behave identically on the left of perm_eq.   *)
 (*  perm_eqr s1 s2 <-> s1 and s2 behave identically on the right of perm_eq.  *)
-(*    These left/right transitive versions of perm_eq make it easier to chain *)
-(* a sequence of equivalences.                                                *)
+(* --> These left/right transitive versions of perm_eq make it easier to      *)
+(*  chain a sequence of equivalences.                                         *)
 (*  ** Filtering:                                                             *)
 (*           filter p s == the subsequence of s consisting of all the items   *)
 (*                         for which the (boolean) predicate p holds.         *)
@@ -161,11 +169,11 @@ Require Import ssrfun ssrbool eqtype ssrnat.
 (* of two operations. "rev", whose simplifications are not natural, is        *)
 (* protected with nosimpl.                                                    *)
 (*  ** The following are equivalent:                                          *)
-(*  [<-> P0; P1; ..; Pn] == P0, P1, ..., Pn are all equivalent                *)
+(*  [<-> P0; P1; ..; Pn] <-> P0, P1, ..., Pn are all equivalent.              *)
 (*                       := P0 -> P1 -> ... -> Pn -> P0                       *)
-(*  if  T : [<-> P0; P1; ..; Pn]  is such an equivalence, and i, j are in nat *)
-(*  then T i j is a proof of the equivalence Pi <-> Pj between Pi and Pj      *)
-(*  when i (resp j) is out of bound, Pi (resp Pj) defaults to P0              *)
+(*  if T : [<-> P0; P1; ..; Pn]  is such an equivalence, and i, j are in nat  *)
+(*  then T i j is a proof of the equivalence Pi <-> Pj between Pi and Pj;     *)
+(*  when i (resp. j) is out of bounds, Pi (resp. Pj) defaults to P0.          *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -678,7 +686,7 @@ Lemma take_oversize n s : size s <= n -> take n s = s.
 Proof. by elim: s n => [|x s IHs] [|n] //= /IHs->. Qed.
 
 Lemma take_size s : take (size s) s = s.
-Proof. by rewrite take_oversize // leqnn. Qed.
+Proof. exact: take_oversize. Qed.
 
 Lemma take_cons x s :
   take n0 (x :: s) = if n0 is n.+1 then x :: (take n s) else [::].
@@ -703,8 +711,8 @@ by rewrite size_takel // ltnW.
 Qed.
 
 Lemma take_cat s1 s2 :
- take n0 (s1 ++ s2) =
-   if n0 < size s1 then take n0 s1 else s1 ++ take (n0 - size s1) s2.
+  take n0 (s1 ++ s2) =
+    if n0 < size s1 then take n0 s1 else s1 ++ take (n0 - size s1) s2.
 Proof.
 elim: s1 n0 => [|x s1 IHs] [|n] //=.
 by rewrite ltnS subSS -(fun_if (cons x)) -IHs.
@@ -713,12 +721,9 @@ Qed.
 Lemma take_size_cat n s1 s2 : size s1 = n -> take n (s1 ++ s2) = s1.
 Proof. by move <-; elim: s1 => [|x s1 IHs]; rewrite ?take0 //= IHs. Qed.
 
-Lemma takel_cat s1 :
-    n0 <= size s1 ->
-  forall s2, take n0 (s1 ++ s2) = take n0 s1.
+Lemma takel_cat s1 s2 : n0 <= size s1 -> take n0 (s1 ++ s2) = take n0 s1.
 Proof.
-move=> Hn0 s2; rewrite take_cat ltn_neqAle Hn0 andbT.
-by case: (n0 =P size s1) => //= ->; rewrite subnn take0 cats0 take_size.
+by rewrite take_cat; case: ltngtP => // <-; rewrite subnn take0 take_size cats0.
 Qed.
 
 Lemma nth_drop s i : nth (drop n0 s) i = nth s (n0 + i).
@@ -786,46 +791,7 @@ Proof. by rewrite /rot /= take0 drop0 -cats1. Qed.
 
 Fixpoint catrev s1 s2 := if s1 is x :: s1' then catrev s1' (x :: s2) else s2.
 
-End Sequences.
-
-(* rev must be defined outside a Section because Coq's end of section *)
-(* "cooking" removes the nosimpl guard.                               *)
-
-Definition rev T (s : seq T) := nosimpl (catrev s [::]).
-
-Arguments nilP {T s}.
-Arguments all_filterP {T a s}.
-
-Prenex Implicits size head ohead behead last rcons belast.
-Prenex Implicits cat take drop rev rot rotr.
-Prenex Implicits find count nth all has filter.
-
-Notation count_mem x := (count (pred_of_simpl (pred1 x))).
-
-Infix "++" := cat : seq_scope.
-
-Notation "[ 'seq' x <- s | C ]" := (filter (fun x => C%B) s)
- (at level 0, x at level 99,
-  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C ] ']'") : seq_scope.
-Notation "[ 'seq' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
- (at level 0, x at level 99,
-  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
-Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
- (at level 0, x at level 99, only parsing).
-Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
- (at level 0, x at level 99, only parsing).
-
-
-(* Double induction/recursion. *)
-Lemma seq2_ind T1 T2 (P : seq T1 -> seq T2 -> Type) :
-    P [::] [::] -> (forall x1 x2 s1 s2, P s1 s2 -> P (x1 :: s1) (x2 :: s2)) ->
-  forall s1 s2, size s1 = size s2 -> P s1 s2.
-Proof. by move=> Pnil Pcons; elim=> [|x s IHs] [] //= x2 s2 [] /IHs/Pcons. Qed.
-
-Section Rev.
-
-Variable T : Type.
-Implicit Types s t : seq T.
+Definition rev s := catrev s [::].
 
 Lemma catrev_catl s t u : catrev (s ++ t) u = catrev t (catrev s u).
 Proof. by elim: s u => /=. Qed.
@@ -848,16 +814,15 @@ Proof. by rewrite -catrev_catr -catrev_catl. Qed.
 Lemma rev_rcons s x : rev (rcons s x) = x :: rev s.
 Proof. by rewrite -cats1 rev_cat. Qed.
 
-Lemma revK : involutive (@rev T).
+Lemma revK : involutive rev.
 Proof. by elim=> //= x s IHs; rewrite rev_cons rev_rcons IHs. Qed.
 
-Lemma nth_rev x0 n s :
-  n < size s -> nth x0 (rev s) n = nth x0 s (size s - n.+1).
+Lemma nth_rev n s : n < size s -> nth (rev s) n = nth s (size s - n.+1).
 Proof.
 elim/last_ind: s => // s x IHs in n *.
 rewrite rev_rcons size_rcons ltnS subSS -cats1 nth_cat /=.
 case: n => [|n] lt_n_s; first by rewrite subn0 ltnn subnn.
-by rewrite -{2}(subnK lt_n_s) -addSnnS leq_addr /= -IHs.
+by rewrite subnSK //= leq_subr IHs.
 Qed.
 
 Lemma filter_rev a s : filter a (rev s) = rev (filter a s).
@@ -872,23 +837,43 @@ Proof. by rewrite !has_count count_rev. Qed.
 Lemma all_rev a s : all a (rev s) = all a s.
 Proof. by rewrite !all_count count_rev size_rev. Qed.
 
-Lemma take_rev s n : take n (rev s) = rev (drop (size s - n) s).
+End Sequences.
+
+Prenex Implicits size ncons nseq head ohead behead last rcons belast.
+Arguments seqn {T} n.
+Prenex Implicits cat take drop rot rotr catrev.
+Prenex Implicits find count nth all has filter.
+Arguments rev {T} s : simpl never.
+
+Arguments nilP {T s}.
+Arguments all_filterP {T a s}.
+Arguments rotK n0 {T} s : rename.
+Arguments rot_inj {n0 T} [s1 s2] eq_rot_s12 : rename.
+Arguments revK {T} s : rename.
+
+Notation count_mem x := (count (pred_of_simpl (pred1 x))).
+
+Infix "++" := cat : seq_scope.
+
+Notation "[ 'seq' x <- s | C ]" := (filter (fun x => C%B) s)
+ (at level 0, x at level 99,
+  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C ] ']'") : seq_scope.
+Notation "[ 'seq' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
+ (at level 0, x at level 99,
+  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
+Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
+ (at level 0, x at level 99, only parsing).
+Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
+ (at level 0, x at level 99, only parsing).
+
+(* Double induction/recursion. *)
+Lemma seq_ind2 {S T} (P : seq S -> seq T -> Type) :
+    P [::] [::] ->
+    (forall x y s t, size s = size t -> P s t -> P (x :: s) (y :: t)) ->
+  forall s t, size s = size t -> P s t.
 Proof.
-have /orP[le_s_n | le_n_s] := leq_total (size s) n.
-  by rewrite (eqnP le_s_n) drop0 take_oversize ?size_rev.
-rewrite -[s in LHS](cat_take_drop (size s - n)).
-by rewrite rev_cat take_size_cat // size_rev size_drop subKn.
+by move=> Pnil Pcons; elim=> [|x s IHs] [|y t] //= [eq_sz]; apply/Pcons/IHs.
 Qed.
-
-Lemma drop_rev s n : drop n (rev s) = rev (take (size s - n) s).
-Proof.
-rewrite -[s]revK take_rev !revK size_rev -minnE /minn.
-by case: ifP => // /ltnW-le_s_n; rewrite !drop_oversize ?size_rev.
-Qed.
-
-End Rev.
-
-Arguments revK {T}.
 
 (* Equality and eqType for seq.                                          *)
 
@@ -1010,55 +995,44 @@ Proof. by move=> /negPf xz /negPf yz; case: s => [|t s]//; rewrite xz yz. Qed.
 
 Section Filters.
 
-Variable a : pred T.
+Implicit Type a : pred T.
 
-Lemma hasP s : reflect (exists2 x, x \in s & a x) (has a s).
+Lemma hasP {a s} : reflect (exists2 x, x \in s & a x) (has a s).
 Proof.
 elim: s => [|y s IHs] /=; first by right; case.
-case ay: (a y); first by left; exists y; rewrite ?mem_head.
-apply: (iffP IHs) => [] [x ysx ax]; exists x => //; first exact: mem_behead.
-by case: (predU1P ysx) ax => [->|//]; rewrite ay.
+have [a_y | a'y] := @idP (a y); first by left; exists y; rewrite ?mem_head.
+apply: (iffP IHs) => -[x]; first by exists x; first apply: mem_behead.
+by case/predU1P=> [->|] //; exists x.
 Qed.
 
-Lemma hasPP s aP : (forall x, reflect (aP x) (a x)) ->
-  reflect (exists2 x, x \in s & aP x) (has a s).
-Proof. by move=> vP; apply: (iffP (hasP _)) => -[x?/vP]; exists x. Qed.
-
-Lemma hasPn s : reflect (forall x, x \in s -> ~~ a x) (~~ has a s).
+Lemma allP {a s} : reflect {in s, forall x, a x} (all a s).
 Proof.
-apply: (iffP idP) => not_a_s => [x s_x|].
-  by apply: contra not_a_s => a_x; apply/hasP; exists x.
-by apply/hasP=> [[x s_x]]; apply/negP; apply: not_a_s.
+rewrite -[all _ _]negbK -has_predC.
+apply: (iffP idP) => [s'a' x s_x | a_s]; last by apply/hasP=> /= -[x /a_s->].
+by apply: contraR s'a' => a'x; apply/hasP; exists x.
 Qed.
 
-Lemma allP s : reflect (forall x, x \in s -> a x) (all a s).
-Proof.
-elim: s => [|x s IHs]; first by left.
-rewrite /= andbC; case: IHs => IHs /=.
-  apply: (iffP idP) => [Hx y|]; last by apply; apply: mem_head.
-  by case/predU1P=> [->|Hy]; auto.
-by right=> H; case IHs => y Hy; apply H; apply: mem_behead.
-Qed.
+Lemma hasPn a s : reflect {in s, forall x, ~~ a x} (~~ has a s).
+Proof. by rewrite -all_predC; apply: allP. Qed.
 
-Lemma allPP s aP : (forall x, reflect (aP x) (a x)) ->
-  reflect (forall x, x \in s -> aP x) (all a s).
-Proof. by move=> vP; apply: (iffP (allP _)) => /(_ _ _) /vP. Qed.
+Lemma allPn a s : reflect (exists2 x, x \in s & ~~ a x) (~~ all a s).
+Proof. by rewrite -has_predC; apply: hasP. Qed.
 
-Lemma allPn s : reflect (exists2 x, x \in s & ~~ a x) (~~ all a s).
-Proof.
-elim: s => [|x s IHs]; first by right=> [[x Hx _]].
-rewrite /= andbC negb_and; case: IHs => IHs /=.
-  by left; case: IHs => y Hy Hay; exists y; first apply: mem_behead.
-apply: (iffP idP) => [|[y]]; first by exists x; rewrite ?mem_head.
-by case/predU1P=> [-> // | s_y not_a_y]; case: IHs; exists y.
-Qed.
-
-Lemma mem_filter x s : (x \in filter a s) = a x && (x \in s).
+Lemma mem_filter a x s : (x \in filter a s) = a x && (x \in s).
 Proof.
 rewrite andbC; elim: s => //= y s IHs.
 rewrite (fun_if (fun s' : seq T => x \in s')) !in_cons {}IHs.
 by case: eqP => [->|_]; case (a y); rewrite /= ?andbF.
 Qed.
+
+Variables (a : pred T) (s : seq T) (A : T -> Prop).
+Hypothesis aP : forall x, reflect (A x) (a x).
+
+Lemma hasPP : reflect (exists2 x, x \in s & A x) (has a s).
+Proof. by apply: (iffP hasP) => -[x ? /aP]; exists x. Qed.
+
+Lemma allPP : reflect {in s, forall x, A x} (all a s).
+Proof. by apply: (iffP allP) => a_s x /a_s/aP. Qed.
 
 End Filters.
 
@@ -1096,18 +1070,14 @@ End EqIn.
 
 Lemma eq_has_r s1 s2 : s1 =i s2 -> has^~ s1 =1 has^~ s2.
 Proof.
-move=> Es12 a; apply/(hasP a s1)/(hasP a s2) => [] [x Hx Hax];
- by exists x; rewrite // ?Es12 // -Es12.
+by move=> Es a; apply/hasP/hasP=> -[x sx ax]; exists x; rewrite ?Es in sx *.
 Qed.
 
 Lemma eq_all_r s1 s2 : s1 =i s2 -> all^~ s1 =1 all^~ s2.
-Proof.
-by move=> Es12 a; apply/(allP a s1)/(allP a s2) => Hs x Hx;
-  apply: Hs; rewrite Es12 in Hx *.
-Qed.
+Proof. by move=> Es a; apply/negb_inj; rewrite -!has_predC (eq_has_r Es). Qed.
 
 Lemma has_sym s1 s2 : has (mem s1) s2 = has (mem s2) s1.
-Proof. by apply/(hasP _ s2)/(hasP _ s1) => [] [x]; exists x. Qed.
+Proof. by apply/hasP/hasP=> -[x]; exists x. Qed.
 
 Lemma has_pred1 x s : has (pred1 x) s = (x \in s).
 Proof. by rewrite -(eq_has (mem_seq1^~ x)) (has_sym [:: x]) /= orbF. Qed.
@@ -1314,7 +1284,7 @@ End EqSeq.
 
 Definition inE := (mem_seq1, in_cons, inE).
 
-Prenex Implicits mem_seq1 uniq undup index.
+Prenex Implicits mem_seq1 constant uniq undup index.
 
 Arguments eqseq {T} !_ !_.
 Arguments eqseqP {T x y}.
@@ -1464,11 +1434,17 @@ apply/perm_eqP/perm_eqP=> eq23 a; apply/eqP;
   by move/(_ a)/eqP: eq23; rewrite !count_cat eqn_add2l.
 Qed.
 
+Lemma perm_catl s1 s2 s3 : perm_eq s2 s3 -> perm_eql (s1 ++ s2) (s1 ++ s3).
+Proof. by move=> eq_s23; apply/perm_eqlP; rewrite perm_cat2l. Qed.
+
 Lemma perm_cons x s1 s2 : perm_eq (x :: s1) (x :: s2) = perm_eq s1 s2.
 Proof. exact: (perm_cat2l [::x]). Qed.
 
 Lemma perm_cat2r s1 s2 s3 : perm_eq (s2 ++ s1) (s3 ++ s1) = perm_eq s2 s3.
 Proof. by do 2!rewrite perm_eq_sym perm_catC; apply: perm_cat2l. Qed.
+
+Lemma perm_catr s1 s2 s3 : perm_eq s1 s2 -> perm_eql (s1 ++ s3) (s2 ++ s3).
+Proof. by move=> eq_s12; apply/perm_eqlP; rewrite perm_cat2r. Qed.
 
 Lemma perm_catAC s1 s2 s3 : perm_eql ((s1 ++ s2) ++ s3) ((s1 ++ s3) ++ s2).
 Proof. by apply/perm_eqlP; rewrite -!catA perm_cat2l perm_catC. Qed.
@@ -1578,12 +1554,25 @@ suffices: perm_eq s (undup s) by move/perm_eq_uniq->.
 by apply/allP=> x _; apply/eqP; rewrite (count_uniq_mem x Uus) mem_undup.
 Qed.
 
+Lemma perm_eq_nilP s : reflect (s = [::]) (perm_eq s [::]).
+Proof. by case: s => [|x s]; rewrite /perm_eq /= ?eqxx; constructor. Qed.
+
+Lemma perm_eq_consP x s t :
+  reflect (exists i t1, rot i t = x :: t1 /\ perm_eq s t1)
+          (perm_eq (x :: s) t).
+Proof.
+rewrite perm_eq_sym; apply: (iffP idP) => [eq_ts | [i [t1 [Dt eq_st]]]].
+  have /rot_to[i t1 Dt]: x \in t by rewrite (perm_eq_mem eq_ts) mem_head.
+  by exists i, t1; rewrite -(perm_cons x) -Dt perm_eq_sym perm_rot.
+by rewrite -(perm_rot i) Dt perm_cons perm_eq_sym.
+Qed.
+
 Lemma catCA_perm_ind P :
     (forall s1 s2 s3, P (s1 ++ s2 ++ s3) -> P (s2 ++ s1 ++ s3)) ->
   (forall s1 s2, perm_eq s1 s2 -> P s1 -> P s2).
 Proof.
 move=> PcatCA s1 s2 eq_s12; rewrite -[s1]cats0 -[s2]cats0.
-elim: s2 nil => [| x s2 IHs] s3 in s1 eq_s12 *.
+elim: s2 nil => [|x s2 IHs] s3 in s1 eq_s12 *.
   by case: s1 {eq_s12}(perm_eq_size eq_s12).
 have /rot_to[i s' def_s1]: x \in s1 by rewrite (perm_eq_mem eq_s12) mem_head.
 rewrite -(cat_take_drop i s1) -catA => /PcatCA.
@@ -1643,13 +1632,30 @@ Qed.
 Lemma rotr_inj : injective (@rotr T n0).
 Proof. exact (can_inj rotrK). Qed.
 
+Lemma take_rev s : take n0 (rev s) = rev (drop (size s - n0) s).
+Proof.
+set m := _ - n0; rewrite -[s in LHS](cat_take_drop m) rev_cat take_cat.
+rewrite size_rev size_drop -minnE minnC ltnNge geq_minl [in take m s]/m /minn.
+by have [_|/eqnP->] := ltnP; rewrite ?subnn take0 cats0.
+Qed.
+
+Lemma drop_rev s : drop n0 (rev s) = rev (take (size s - n0) s).
+Proof.
+set m := _ - n0; rewrite -[s in LHS](cat_take_drop m) rev_cat drop_cat.
+rewrite size_rev size_drop -minnE minnC ltnNge geq_minl /= /m /minn.
+by have [_|/eqnP->] := ltnP; rewrite ?take0 // subnn drop0.
+Qed.
+
 Lemma rev_rotr s : rev (rotr n0 s) = rot n0 (rev s).
 Proof. by rewrite rev_cat -take_rev -drop_rev. Qed.
 
 Lemma rev_rot s : rev (rot n0 s) = rotr n0 (rev s).
-Proof. by rewrite (canRL revK (rev_rotr _)) revK. Qed.
+Proof. by apply: canLR revK _; rewrite rev_rotr revK. Qed.
 
 End RotrLemmas.
+
+Arguments rotrK n0 {T} s : rename.
+Arguments rotr_inj {n0 T} [s1 s2] eq_rotr_s12 : rename.
 
 Section RotCompLemmas.
 
@@ -1717,11 +1723,11 @@ Lemma mask_cons b m x s : mask (b :: m) (x :: s) = nseq b x ++ mask m s.
 Proof. by case: b. Qed.
 
 Lemma size_mask m s : size m = size s -> size (mask m s) = count id m.
-Proof. by move: m s; apply: seq2_ind => // -[] x m s /= ->. Qed.
+Proof. by move: m s; apply: seq_ind2 => // -[] x m s /= _ ->. Qed.
 
 Lemma mask_cat m1 m2 s1 s2 :
   size m1 = size s1 -> mask (m1 ++ m2) (s1 ++ s2) = mask m1 s1 ++ mask m2 s2.
-Proof. by move: m1 s1; apply: seq2_ind => // -[] m1 x1 s1 /= ->. Qed.
+Proof. by move: m1 s1; apply: seq_ind2 => // -[] m1 x1 s1 /= _ ->. Qed.
 
 Lemma has_mask_cons a b m x s :
   has a (mask (b :: m) (x :: s)) = b && a x || has a (mask m s).
@@ -1742,8 +1748,9 @@ Qed.
 
 Lemma resize_mask m s : {m1 | size m1 = size s & mask m s = mask m1 s}.
 Proof.
-by exists (take (size s) m ++ nseq (size s - size m) false);
-   elim: s m => [|x s IHs] [|b m] //=; rewrite (size_nseq, mask_false, IHs).
+exists (take (size s) m ++ nseq (size s - size m) false).
+  by elim: s m => [|x s IHs] [|b m] //=; rewrite (size_nseq, IHs).
+by elim: s m => [|x s IHs] [|b m] //=; rewrite (mask_false, IHs).
 Qed.
 
 End Mask.
@@ -1787,20 +1794,24 @@ Lemma sub0seq s : subseq [::] s. Proof. by case: s. Qed.
 
 Lemma subseq0 s : subseq s [::] = (s == [::]). Proof. by []. Qed.
 
+Lemma subseq_refl s : subseq s s.
+Proof. by elim: s => //= x s IHs; rewrite eqxx. Qed.
+Hint Resolve subseq_refl : core.
+
 Lemma subseqP s1 s2 :
   reflect (exists2 m, size m = size s2 & s1 = mask m s2) (subseq s1 s2).
 Proof.
 elim: s2 s1 => [|y s2 IHs2] [|x s1].
 - by left; exists [::].
-- by right; do 2!case.
+- by right=> -[m /eqP/nilP->].
 - by left; exists (nseq (size s2).+1 false); rewrite ?size_nseq //= mask_false.
 apply: {IHs2}(iffP (IHs2 _)) => [] [m sz_m def_s1].
   by exists ((x == y) :: m); rewrite /= ?sz_m // -def_s1; case: eqP => // ->.
 case: eqP => [_ | ne_xy]; last first.
-  by case: m def_s1 sz_m => [//|[m []//|m]] -> [<-]; exists m.
+  by case: m def_s1 sz_m => [|[] m] //; [case | move=> -> [<-]; exists m].
 pose i := index true m; have def_m_i: take i m = nseq (size (take i m)) false.
   apply/all_pred1P; apply/(all_nthP true) => j.
-  rewrite size_take ltnNge geq_min negb_or -ltnNge; case/andP=> lt_j_i _.
+  rewrite size_take ltnNge geq_min negb_or -ltnNge => /andP[lt_j_i _].
   rewrite nth_take //= -negb_add addbF -addbT -negb_eqb.
   by rewrite [_ == _](before_find _ lt_j_i).
 have lt_i_m: i < size m.
@@ -1831,10 +1842,6 @@ case: m1 => [|[] m1]; first by rewrite mask0.
 case/subseqP: (IHs m2 m1) => m sz_m def_s; apply/subseqP.
 by exists (false :: m); rewrite //= sz_m.
 Qed.
-
-Lemma subseq_refl s : subseq s s.
-Proof. by elim: s => //= x s IHs; rewrite eqxx. Qed.
-Hint Resolve subseq_refl : core.
 
 Lemma cat_subseq s1 s2 s3 s4 :
   subseq s1 s3 -> subseq s2 s4 -> subseq (s1 ++ s2) (s3 ++ s4).
@@ -1997,7 +2004,7 @@ Lemma map_rot s : map (rot n0 s) = rot n0 (map s).
 Proof. by rewrite /rot map_cat map_take map_drop. Qed.
 
 Lemma map_rotr s : map (rotr n0 s) = rotr n0 (map s).
-Proof. by apply: canRL (@rotK n0 T2) _; rewrite -map_rot rotrK. Qed.
+Proof. by apply: canRL (rotK n0) _; rewrite -map_rot rotrK. Qed.
 
 Lemma map_rev s : map (rev s) = rev (map s).
 Proof. by elim: s => //= x s IHs; rewrite !rev_cons -!cats1 map_cat IHs. Qed.
@@ -2025,6 +2032,19 @@ Notation "[ 'seq' E | i : T <- s ]" := (map (fun i : T => E) s)
 
 Notation "[ 'seq' E | i : T <- s & C ]" :=
   [seq E | i : T <- [seq i : T <- s | C]]
+  (at level 0, E at level 99, i ident, only parsing) : seq_scope.
+
+Notation "[ 'seq' E : R | i <- s ]" := (@map _ R (fun i => E) s)
+  (at level 0, E at level 99, i ident, only parsing) : seq_scope.
+
+Notation "[ 'seq' E : R | i <- s & C ]" := [seq E : R | i <- [seq i <- s | C]]
+  (at level 0, E at level 99, i ident, only parsing) : seq_scope.
+
+Notation "[ 'seq' E : R | i : T <- s ]" := (@map T R (fun i : T => E) s)
+  (at level 0, E at level 99, i ident, only parsing) : seq_scope.
+
+Notation "[ 'seq' E : R | i : T <- s & C ]" :=
+  [seq E : R | i : T <- [seq i : T <- s | C]]
   (at level 0, E at level 99, i ident, only parsing) : seq_scope.
 
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
@@ -2466,6 +2486,13 @@ Fixpoint zip (s : seq S) (t : seq T) {struct t} :=
 Definition unzip1 := map (@fst S T).
 Definition unzip2 := map (@snd S T).
 
+Fixpoint all2 (r : S -> T -> bool) s t :=
+  match s, t with
+  | [::], [::] => true
+  | x :: s, y :: t => r x y && all2 r s t
+  | _, _ => false
+  end.
+
 Lemma zip_unzip s : zip (unzip1 s) (unzip2 s) = s.
 Proof. by elim: s => [|[x y] s /= ->]. Qed.
 
@@ -2488,7 +2515,7 @@ Qed.
 
 Lemma zip_cat s1 s2 t1 t2 :
   size s1 = size t1 -> zip (s1 ++ s2) (t1 ++ t2) = zip s1 t1 ++ zip s2 t2.
-Proof. by elim: s1 t1 => [|x s IHs] [|y t] //= [/IHs->]. Qed.
+Proof. by move: s1 t1; apply: seq_ind2 => //= x y s1 t1 _ ->. Qed.
 
 Lemma nth_zip x y s t i :
   size s = size t -> nth (x, y) (zip s t) i = (nth x s i, nth y t i).
@@ -2502,21 +2529,23 @@ rewrite size_zip ltnNge geq_min.
 by elim: s t i => [|x s IHs] [|y t] [|i] //=; rewrite ?orbT -?IHs.
 Qed.
 
-Lemma zip_rcons s1 s2 z1 z2 :
-    size s1 = size s2 ->
-  zip (rcons s1 z1) (rcons s2 z2) = rcons (zip s1 s2) (z1, z2).
+Lemma zip_rcons s t x y :
+  size s = size t -> zip (rcons s x) (rcons t y) = rcons (zip s t) (x, y).
 Proof. by move=> eq_sz; rewrite -!cats1 zip_cat //= eq_sz. Qed.
 
-Lemma rev_zip s1 s2 :
-  size s1 = size s2 -> rev (zip s1 s2) = zip (rev s1) (rev s2).
+Lemma rev_zip s t : size s = size t -> rev (zip s t) = zip (rev s) (rev t).
 Proof.
-elim: s1 s2 => [|x s1 IHs] [|y s2] //= [eq_sz].
-by rewrite !rev_cons zip_rcons ?IHs ?size_rev.
+move: s t; apply: seq_ind2 => //= x y s t eq_sz IHs.
+by rewrite !rev_cons IHs zip_rcons ?size_rev.
 Qed.
+
+Lemma all2E r s t :
+  all2 r s t = (size s == size t) && all [pred xy | r xy.1 xy.2] (zip s t).
+Proof. by elim: s t => [|x s IHs] [|y t] //=; rewrite IHs andbCA. Qed.
 
 End Zip.
 
-Prenex Implicits zip unzip1 unzip2.
+Prenex Implicits zip unzip1 unzip2 all2.
 
 Section Flatten.
 
@@ -2724,6 +2753,13 @@ apply: (iffP flattenP) => [[_ /mapP[x sx ->]] | [x sx]] Axy; first by exists x.
 by exists (A x); rewrite ?map_f.
 Qed.
 
+Lemma perm_flatten (ss1 ss2 : seq (seq T)) :
+  perm_eq ss1 ss2 -> perm_eq (flatten ss1) (flatten ss2).
+Proof.
+move=> eq_ss; apply/perm_eqP=> a; apply/catCA_perm_subst: ss1 ss2 eq_ss.
+by move=> ss1 ss2 ss3; rewrite !flatten_cat !count_cat addnCA.
+Qed.
+
 End EqFlatten.
 
 Arguments flattenP {T A x}.
@@ -2751,31 +2787,51 @@ Notation "[ 'seq' E | x <- s , y <- t ]" :=
 Notation "[ 'seq' E | x : S <- s , y : T <- t ]" :=
   (flatten [seq [seq E | y : T <- t] | x : S  <- s])
   (at level 0, E at level 99, x ident, y ident, only parsing) : seq_scope.
+Notation "[ 'seq' E : R | x : S <- s , y : T <- t ]" :=
+  (flatten [seq [seq E : R | y : T <- t] | x : S  <- s])
+  (at level 0, E at level 99, x ident, y ident, only parsing) : seq_scope.
+Notation "[ 'seq' E : R | x <- s , y <- t ]" :=
+  (flatten [seq [seq E : R | y <- t] | x  <- s])
+  (at level 0, E at level 99, x ident, y ident, only parsing) : seq_scope.
 
 Section AllPairsDep.
 
-Variables (S : Type) (T : S -> Type)  (R : Type) (f : forall x, T x -> R).
-Implicit Types (s : seq S) (t : forall x, seq (T x)).
+Variables (S S' : Type) (T T' : S -> Type) (R : Type).
+Implicit Type f : forall x, T x -> R.
 
-Definition allpairs_dep s t := [seq f y | x <- s, y <- t x].
+Definition allpairs_dep f s t := [seq f x y | x <- s, y <- t x].
 
-Lemma size_allpairs_dep s t :
-  size [seq f y | x <- s, y <- t x] = sumn [seq size (t x) | x <- s].
+Lemma size_allpairs_dep f s t :
+  size [seq f x y | x <- s, y <- t x] = sumn [seq size (t x) | x <- s].
 Proof. by elim: s => //= x s IHs; rewrite size_cat size_map IHs. Qed.
 
-Lemma allpairs_cat s1 s2 t :
-  [seq f y | x <- s1 ++ s2, y <- t x] =
-    [seq f y | x <- s1, y <- t x] ++ [seq f y | x <- s2, y <- t x].
+Lemma eq_allpairs (f1 f2 : forall x, T x -> R) s t :
+    (forall x, f1 x =1 f2 x) ->
+  [seq f1 x y | x <- s, y <- t x] = [seq f2 x y | x <- s, y <- t x].
+Proof. by  move=> eq_f; rewrite (eq_map (fun x => eq_map (eq_f x) (t x))). Qed.
+
+Lemma allpairs_cat f s1 s2 t :
+  [seq f x y | x <- s1 ++ s2, y <- t x] =
+    [seq f x y | x <- s1, y <- t x] ++ [seq f x y | x <- s2, y <- t x].
 Proof. by rewrite map_cat flatten_cat. Qed.
 
-Lemma allpairs_comp R' (g : R -> R') s t :
-  [seq g (f y) | x <- s, y <- t x] =
-    [seq g r | r <- [seq f y | x <- s, y <- t x]].
-Proof. by elim: s => //= x s ->; rewrite map_cat map_comp. Qed.
+Lemma allpairs_mapl f (g : S' -> S) s t :
+  [seq f x y | x <- map g s, y <- t x] = [seq f (g x) y | x <- s, y <- t (g x)].
+Proof. by rewrite -map_comp. Qed.
+
+Lemma allpairs_mapr f (g : forall x, T' x -> T x) s t :
+  [seq f x y | x <- s, y <- map (g x) (t x)] =
+    [seq f x (g x y) | x <- s, y <- t x].
+Proof. by rewrite -(eq_map (fun=> map_comp _ _ _)). Qed.
 
 End AllPairsDep.
 
 Arguments allpairs_dep {S T R} f s t /.
+
+Lemma map_allpairs S T R R' (g : R' -> R) f s t :
+  map g [seq f x y | x : S <- s, y : T x <- t x] =
+    [seq g (f x y) | x <- s, y <- t x].
+Proof. by rewrite map_flatten allpairs_mapl allpairs_mapr. Qed.
 
 Section AllPairsNonDep.
 
@@ -2796,48 +2852,59 @@ Section EqAllPairsDep.
 Variables (S : eqType) (T : S -> eqType).
 Implicit Types (R : eqType) (s : seq S) (t : forall x, seq (T x)).
 
-Lemma allpairsPdep R f s t (z : R) :
+Lemma allpairsPdep R (f : forall x, T x -> R) s t (z : R) :
   reflect (exists x y, [/\ x \in s, y \in t x & z = f x y])
           (z \in [seq f x y | x <- s, y <- t x]).
 Proof.
-apply: (iffP flatten_mapP); first by case=> x ? /mapP[y ? ->]; exists x, y.
-by move=> [x [y [xs yt ->]]]; exists x => //; apply: map_f.
+apply: (iffP flatten_mapP); first by case=> x sx /mapP[y ty ->]; exists x, y.
+by case=> x [y [sx ty ->]]; exists x; last apply: map_f.
 Qed.
 
-Lemma allpairs_f_dep R (f : forall x, T x -> R) s t x y :
-  x \in s -> y \in t x -> f x y \in [seq f x y | x <- s, y <- t x].
-Proof. by move=> xs yt; apply/allpairsPdep; exists x, y. Qed.
+Variable R : eqType.
+Implicit Type f : forall x, T x -> R.
 
-Lemma mem_allpairs_dep R (f : forall x, T x -> R) s1 t1 s2 t2 :
-    s1 =i s2 -> (forall x, x \in s1 -> t1 x =i t2 x) ->
+Lemma allpairs_f_dep f s t x y :
+  x \in s -> y \in t x -> f x y \in [seq f x y | x <- s, y <- t x].
+Proof. by move=> sx ty; apply/allpairsPdep; exists x, y. Qed.
+
+Lemma eq_in_allpairs_dep f1 f2 s t :
+    {in s, forall x, {in t x, f1 x =1 f2 x}} <->
+  [seq f1 x y : R | x <- s, y <- t x] = [seq f2 x y | x <- s, y <- t x].
+Proof.
+split=> [eq_f | eq_fst x s_x].
+  by congr flatten; apply/eq_in_map=> x s_x; apply/eq_in_map/eq_f.
+apply/eq_in_map; apply/eq_in_map: x s_x; apply/eq_from_flatten_shape => //.
+by rewrite /shape -!map_comp; apply/eq_map=> x /=; rewrite !size_map.
+Qed.
+
+Lemma mem_allpairs_dep f s1 t1 s2 t2 :
+    s1 =i s2 -> {in s1, forall x, t1 x =i t2 x} ->
   [seq f x y | x <- s1, y <- t1 x] =i [seq f x y | x <- s2, y <- t2 x].
 Proof.
-move=> eq_s eq_t z; apply/allpairsPdep/allpairsPdep=> -[x [y [xs ys ->]]];
-by exists x, y; rewrite ?eq_s ?eq_t// -?eq_s -?eq_t// eq_s.
+move=> eq_s eq_t z; apply/allpairsPdep/allpairsPdep=> -[x [y [sx ty ->]]];
+by exists x, y; rewrite -eq_s in sx *; rewrite eq_t in ty *.
 Qed.
 
-Lemma allpairs_catr R (f : forall x, T x -> R) s t1 t2 :
+Lemma allpairs_catr f s t1 t2 :
   [seq f x y | x <- s, y <- t1 x ++ t2 x] =i
     [seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x].
 Proof.
-move=> r; rewrite mem_cat; apply/allpairsPdep/orP=> [[x [y [xs]]]|].
-  by rewrite mem_cat; case/orP; [left|right]; apply/allpairsPdep; exists x, y.
-by case=>/allpairsPdep[x [y [? yt ->]]]; exists x, y; rewrite mem_cat yt ?orbT.
+move=> z; rewrite mem_cat; apply/allpairsPdep/orP=> [[x [y [s_x]]]|].
+  by rewrite mem_cat => /orP[]; [left|right]; apply/allpairsPdep; exists x, y.
+by case=>/allpairsPdep[x [y [sx ty ->]]]; exists x, y; rewrite mem_cat ty ?orbT.
 Qed.
 
-Lemma allpairs_uniq_dep R (f : forall x, T x -> R) s t
-    (g := fun p : {x : S & T x} => f _ (tagged p)) :
-    uniq s -> (forall x, x \in s -> uniq (t x)) ->
-    {in [seq Tagged T y | x <- s, y <- t x] &, injective g} ->
+Lemma allpairs_uniq_dep f s t (st := [seq Tagged T y | x <- s, y <- t x]) :
+  let g (p : {x : S & T x}) : R := f (tag p) (tagged p) in
+    uniq s -> {in s, forall x, uniq (t x)} -> {in st &, injective g} ->
   uniq [seq f x y | x <- s, y <- t x].
 Proof.
-move=> Us Ut gI; have s_s : all (mem s) s by apply/allP.
-rewrite (allpairs_comp (fun=> Tagged T) g) map_inj_in_uniq// {f g gI R}.
-elim: {-1}s s_s Us => //= x s1 IHs /andP[xs s_s1] /andP[xNs1 Us1].
-rewrite cat_uniq {}IHs // andbT map_inj_in_uniq ?Ut //; last first.
-  by move=> y1 y2 _ _ /eqP; rewrite eq_Tagged /= => /eqP.
-apply/hasPn=> _ /allpairsPdep[x1 [y1 [xs1 ys2 ->]]].
-by apply/mapP=> [[y ty [x1_eq _]]]; move: xs1 xNs1; rewrite x1_eq => ->.
+move=> g Us Ut; rewrite -(map_allpairs g (existT T)) => /map_inj_in_uniq->{f g}.
+elim: s Us => //= x s IHs /andP[s'x Us] in st Ut *; rewrite {st}cat_uniq.
+rewrite {}IHs {Us}// ?andbT => [|x1 s_s1]; last exact/Ut/mem_behead.
+have injT: injective (existT T x) by move=> y z /eqP; rewrite eq_Tagged => /eqP.
+rewrite (map_inj_in_uniq (in2W injT)) {injT}Ut ?mem_head // has_sym has_map.
+by apply: contra s'x => /hasP[y _ /allpairsPdep[z [_ [? _ /(congr1 tag)/=->]]]].
 Qed.
 
 End EqAllPairsDep.
@@ -2846,36 +2913,110 @@ Arguments allpairsPdep {S T R f s t z}.
 
 Section EqAllPairs.
 
-Variables S T : eqType.
-Implicit Types (R : eqType) (s : seq S) (t : seq T).
+Variables S T R : eqType.
+Implicit Types (f : S -> T -> R) (s : seq S) (t : seq T).
 
-Lemma allpairsP R (f : S -> T -> R) s t z :
+Lemma allpairsP f s t (z : R) :
   reflect (exists p, [/\ p.1 \in s, p.2 \in t & z = f p.1 p.2])
           (z \in [seq f x y | x <- s, y <- t]).
 Proof.
 by apply: (iffP allpairsPdep) => [[x[y]]|[[x y]]]; [exists (x, y)|exists x, y].
 Qed.
 
-Lemma allpairs_f R (f : S -> T -> R) s t x y :
+Lemma allpairs_f f s t x y :
   x \in s -> y \in t -> f x y \in [seq f x y | x <- s, y <- t].
 Proof. exact: allpairs_f_dep. Qed.
 
-Lemma mem_allpairs R (f : S -> T -> R) s1 t1 s2 t2 : s1 =i s2 -> t1 =i t2 ->
-  [seq f x y | x <- s1, y <- t1] =i [seq f x y | x <- s2, y <- t2].
-Proof. by move=> *; apply: mem_allpairs_dep. Qed.
+Lemma eq_in_allpairs f1 f2 s t :
+    {in s & t, f1 =2 f2} <->
+  [seq f1 x y : R | x <- s, y <- t] = [seq f2 x y | x <- s, y <- t].
+Proof.
+split=> [eq_f | /eq_in_allpairs_dep-eq_f x y /eq_f/(_ y)//].
+by apply/eq_in_allpairs_dep=> x /eq_f.
+Qed.
 
-Lemma allpairs_uniq R (f : S -> T -> R) s t : uniq s -> uniq t ->
-    {in [seq (x, y) | x <- s, y <- t] &, injective (prod_curry f)} ->
+Lemma mem_allpairs f s1 t1 s2 t2 :
+    s1 =i s2 -> t1 =i t2 ->
+  [seq f x y | x <- s1, y <- t1] =i [seq f x y | x <- s2, y <- t2].
+Proof. by move=> eq_s eq_t; apply: mem_allpairs_dep. Qed.
+
+Lemma allpairs_uniq f s t (st := [seq (x, y) | x <- s, y <- t]) :
+    uniq s -> uniq t -> {in st &, injective (prod_curry f)} ->
   uniq [seq f x y | x <- s, y <- t].
 Proof.
-move=> Us Ut inj_f; apply: allpairs_uniq_dep => //.
-move=> _ _ /allpairsPdep[x [y [xs yt ->]]] /allpairsPdep[u [v [us vt ->]]]/=.
-by move=> /(inj_f (_, _) (_, _)); rewrite !allpairs_f// => /(_ isT isT)[->->].
+move=> Us Ut inj_f; rewrite -(map_allpairs (prod_curry f) (@pair S T)) -/st.
+rewrite map_inj_in_uniq // allpairs_uniq_dep {Us Ut st inj_f}//.
+by apply: in2W => -[x1 y1] [x2 y2] /= [-> ->].
 Qed.
 
 End EqAllPairs.
 
 Arguments allpairsP {S T R f s t z}.
+Arguments perm_eq_nilP {T s}.
+Arguments perm_eq_consP {T x s t}.
+
+Section Permutations.
+
+Variable T : eqType.
+
+Fixpoint permutations (s : seq T) :=
+  if s isn't x :: s1 then [:: nil] else
+  let insert_x t i := take i t ++ x :: drop i t in
+  [seq insert_x t i | t <- permutations s1, i <- iota 0 (index x t + 1)].
+
+Lemma mem_permutations s t : (t \in permutations s) = perm_eq t s.
+Proof.
+elim: s => [|x s IHs] /= in t *; first by rewrite inE (sameP perm_eq_nilP eqP).
+apply/allpairsPdep/idP=> [[t1 [i [Et1s _ ->]]] | Ets].
+  by rewrite -cat1s perm_catCA /= cat_take_drop perm_cons -IHs.
+pose i := index x t; pose t1 := take i t; pose t2 := drop i.+1 t.
+have sz_t1: size t1 = i by rewrite size_takel ?index_size.
+have t_x: x \in t by rewrite (perm_eq_mem Ets) mem_head.
+have Dt: t = t1 ++ x :: t2.
+  by rewrite -(nth_index x t_x) -drop_nth ?index_mem ?cat_take_drop.
+exists (t1 ++ t2), i; split; last by rewrite take_size_cat ?drop_size_cat.
+  by rewrite IHs -(perm_cons x) -cat1s perm_catCA /= -Dt.
+rewrite mem_iota addn1 ltnS /= /i Dt !index_cat /= eqxx addn0.
+by case: ifP; rewrite ?leq_addr.
+Qed.
+
+Lemma permutations_all_uniq s : uniq s -> all uniq (permutations s).
+Proof.
+by move=> Us; apply/allP=> t; rewrite mem_permutations => /perm_eq_uniq->.
+Qed.
+
+Lemma size_permutations s : uniq s -> size (permutations s) = (size s)`!.
+Proof.
+elim: s => //= x s IH /andP[s'x /IH-{IH}IHs]; rewrite factS -IHs mulnC.
+rewrite -(size_allpairs mem _ (x :: s)) !size_allpairs_dep.
+congr sumn; apply/eq_in_map => t; rewrite mem_permutations => Est.
+rewrite size_iota -(cats0 t) index_cat (perm_eq_mem Est) addn1 ifN //.
+by rewrite addn0 (perm_eq_size Est).
+Qed.
+
+Lemma permutations_uniq s : uniq (permutations s).
+Proof.
+elim: s => //= x s IHs.
+rewrite allpairs_uniq_dep {IHs}// => [t _ |]; first exact: iota_uniq.
+move=> _ _ /allpairsPdep[t [i [_ leix ->]]] /allpairsPdep[u [j [_ lejx ->]]] /=.
+rewrite !mem_iota /= !addn1 !ltnS in leix lejx *; set tx := {-}(_ ++ _).
+gen have Dj, Di: i t @tx leix / ((index x tx = i) * (size (take i t) = i))%type.
+  have Di: size (take i t) = i by apply/size_takel/(leq_trans leix)/index_size.
+  rewrite index_cat /= eqxx addn0 Di ifN //; apply: contraL leix => ti_x.
+  by rewrite -ltnNge -Di -{1}(cat_take_drop i t) index_cat ti_x index_mem.
+move=> eq_tu; have eq_ij: i = j by rewrite -Di eq_tu Dj.
+move/eqP: eq_tu; rewrite eqseq_cat ?Dj // eqseq_cons eqxx /= -eqseq_cat ?Dj //.
+by rewrite !cat_take_drop eq_ij => /eqP->.
+Qed.
+
+Lemma perm_permutations s t :
+  perm_eq s t -> perm_eq (permutations s) (permutations t).
+Proof.
+move=> Est; apply/uniq_perm_eq; try exact: permutations_uniq.
+by move=> u; rewrite !mem_permutations (perm_eqrP Est).
+Qed.
+
+End Permutations.
 
 Section AllIff.
 (* The Following Are Equivalent *)
@@ -2885,37 +3026,29 @@ Section AllIff.
 Inductive all_iff_and (P Q : Prop) : Prop := AllIffConj of P & Q.
 
 Definition all_iff (P0 : Prop) (Ps : seq Prop) : Prop :=
-  (fix aux (P : Prop) (Qs : seq Prop) : Prop :=
-      if Qs is Q :: Qs then all_iff_and (P -> Q) (aux Q Qs)
-      else P -> P0 : Prop) P0 Ps.
+  let fix loop (P : Prop) (Qs : seq Prop) : Prop :=
+    if Qs is Q :: Qs then all_iff_and (P -> Q) (loop Q Qs) else P -> P0 in
+  loop P0 Ps.
 
-Lemma all_iffLR P0 Ps : all_iff P0 Ps ->
-   forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
+Lemma all_iffLR P0 Ps :
+   all_iff P0 Ps -> forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
 Proof.
-have homo_ltn T (f : nat -> T) (r : T -> T -> Prop) : (* #201 *)
-  (forall y x z, r x y -> r y z -> r x z) ->
-  (forall i, r (f i) (f i.+1)) -> {homo f : i j / i < j >-> r i j}.
-  move=> rtrans rfS x y; elim: y x => // y ihy x; rewrite ltnS leq_eqVlt.
-  case/orP=> [/eqP-> // | ltxy]; apply: rtrans (rfS _); exact: ihy.
-move=> Ps_iff; have ltn_imply : {homo nth P0 Ps : m n / m < n >-> (m -> n)}.
-  apply: homo_ltn => [??? xy yz /xy /yz //|i].
-  elim: Ps i P0 Ps_iff => [|P [|/=Q Ps] IHPs] [|i]//= P0 [P0P Ps_iff]//=;
-     do ?by [rewrite nth_nil|case: Ps_iff].
-  by case: Ps_iff => [PQ Ps_iff]; apply: IHPs; split => // /P0P.
-have {ltn_imply}leq_imply : {homo nth P0 Ps : m n / m <= n >-> (m -> n)}.
-  by move=> m n; rewrite leq_eqVlt => /predU1P[->//|/ltn_imply].
-move=> [:P0ton Pnto0] [|m] [|n]//=.
-- abstract: P0ton n.
-  suff P0to0 : P0 -> nth P0 Ps 0 by move=> /P0to0; apply: leq_imply.
-  by case: Ps Ps_iff {leq_imply} => // P Ps [].
-- abstract: Pnto0 m => /(leq_imply m (maxn (size Ps) m)).
-  by rewrite nth_default ?leq_max ?leqnn // orbT ; apply.
-by move=> /Pnto0; apply: P0ton.
+move=> iffPs; have PsS n: nth P0 Ps n -> nth P0 Ps n.+1.
+  elim: n P0 Ps iffPs => [|n IHn] P0 [|P [|Q Ps]] //= [iP0P] //; first by case.
+    by rewrite nth_nil.
+  by case=> iPQ iffPs; apply: IHn; split=> // /iP0P.
+have{PsS} lePs: {homo nth P0 Ps : m n / m <= n >-> (m -> n)}.
+  by move=> m n /subnK<-; elim: {n}(n - m) => // n IHn /IHn; apply: PsS.
+move=> m n P_m; have{m P_m} hP0: P0.
+  case: m P_m => //= m /(lePs m _ (leq_maxl m (size Ps))).
+  by rewrite nth_default ?leq_maxr.
+case: n =>// n; apply: lePs 0 n (leq0n n) _.
+by case: Ps iffPs hP0 => // P Ps [].
 Qed.
 
-Lemma all_iffP P0 Ps : all_iff P0 Ps ->
-   forall m n, nth P0 (P0 :: Ps) m <-> nth P0 (P0 :: Ps) n.
-Proof. by move=> /all_iffLR iffPs m n; split => /iffPs. Qed.
+Lemma all_iffP P0 Ps :
+   all_iff P0 Ps -> forall m n, nth P0 (P0 :: Ps) m <-> nth P0 (P0 :: Ps) n.
+Proof. by move=> /all_iffLR-iffPs m n; split => /iffPs. Qed.
 
 End AllIff.
 Arguments all_iffLR {P0 Ps}.
@@ -2926,21 +3059,3 @@ Coercion all_iffP : all_iff >-> Funclass.
 Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" := (all_iff P0 (P1 :: .. [:: Pn] ..))
   (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]")
   : form_scope.
-
-Section All2.
-Context {T U : Type} (p : T -> U -> bool).
-
-Fixpoint all2 s1 s2 :=
-  match s1, s2 with
-  | [::], [::] => true
-  | x1 :: s1, x2 :: s2 => p x1 x2 && all2 s1 s2
-  | _, _ => false
-  end.
-
-Lemma all2E s1 s2 :
-  all2 s1 s2 = (size s1 == size s2) && all [pred xy | p xy.1 xy.2] (zip s1 s2).
-Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2] //=; rewrite ihs1 andbCA. Qed.
-
-End All2.
-
-Arguments all2 {T U} p !s1 !s2.
