@@ -110,6 +110,7 @@ make-coq-latest:
     - coqc --version
     - git clone -b "${CONTRIB_VERSION}" --depth 1 "${CONTRIB_URL}" /home/coq/ci
     - cd /home/coq/ci
+    - git rev-parse --verify HEAD
   except:
     - tags
     - merge_requests

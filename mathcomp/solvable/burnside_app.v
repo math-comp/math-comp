@@ -686,21 +686,21 @@ move=> p; rewrite inE.
 by do ?case/orP; move/eqP=> <- a; rewrite !(permM, permE); case: a; do 6?case.
 Qed.
 
-Definition sop (p : {perm cube}) : seq cube := val (val (val p)).
+Definition sop (p : {perm cube}) : seq cube := fgraph (val p).
 
 Lemma sop_inj : injective sop.
-Proof. by do 2!apply: (inj_comp val_inj); apply: val_inj. Qed.
+Proof. by move=> p1 p2 /val_inj/(can_inj fgraphK)/val_inj. Qed.
 
 Definition prod_tuple (t1 t2 : seq cube) :=
   map (fun n : 'I_6 => nth F0 t2 n) t1.
 
-Lemma sop_spec : forall x (n0 : 'I_6), nth F0 (sop x) n0 = x n0.
-Proof. by move=> x n0; rewrite -pvalE unlock enum_rank_ord (tnth_nth F0). Qed.
+Lemma sop_spec x (n0 : 'I_6): nth F0 (sop x) n0 = x n0.
+Proof. by rewrite nth_fgraph_ord pvalE. Qed.
 
 Lemma prod_t_correct : forall (x y : {perm cube}) (i : cube),
   (x * y) i = nth F0 (prod_tuple (sop x) (sop y)) i.
 Proof.
-move=> x y i; rewrite permM -!sop_spec (nth_map F0) // size_tuple /=.
+move=> x y i; rewrite permM -!sop_spec [RHS](nth_map F0) // size_tuple /=.
 by rewrite card_ord ltn_ord.
 Qed.
 

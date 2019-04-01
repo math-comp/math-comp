@@ -113,6 +113,14 @@
 	  Generalized some lemmas in a backward compatible way.
 	  Some strictly more general lemmas now have suffix `_dep`.
 
+	* Generalised {ffun A -> R} to handle dependent functions, and to be
+	  structurally positive so it can be used in recursive inductive type
+	  definitions. Minor backward incompatibilities: fgraph f is no longer
+	  a field accessor, and no longer equal to val f as {ffun A -> R} is no
+	  longer a subType; some instances of finfun, ffunE, ffunK may not unify
+	  with a generic nondependent function type A -> ?R due to a bug in
+	  Coq < 8.10.
+
 24/04/2018 - compatibility with Coq 8.8 and several small fixes - version 1.7
 
 	* Added compatibility with Coq 8.8 and lost compatibility with

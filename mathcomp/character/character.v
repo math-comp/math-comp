@@ -667,11 +667,13 @@ Proof. by rewrite eqr_le ltr_geF ?irr1_gt0. Qed.
 Lemma irr_neq0 i : 'chi_i != 0.
 Proof. by apply: contraNneq (irr1_neq0 i) => ->; rewrite cfunE. Qed.
 
-Definition cfIirr B (chi : 'CF(B)) : Iirr B := inord (index chi (irr B)).
+Local Remark cfIirr_key : unit. Proof. by []. Qed.
+Definition cfIirr : forall B, 'CF(B) -> Iirr B :=
+  locked_with cfIirr_key (fun B chi => inord (index chi (irr B))).
 
 Lemma cfIirrE chi : chi \in irr G -> 'chi_(cfIirr chi) = chi.
 Proof.
-move=> chi_irr; rewrite (tnth_nth 0) inordK ?nth_index //.
+move=> chi_irr; rewrite (tnth_nth 0) [cfIirr]unlock inordK ?nth_index //.
 by rewrite -index_mem size_tuple in chi_irr.
 Qed.
 
