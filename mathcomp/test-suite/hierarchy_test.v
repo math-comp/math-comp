@@ -705,15 +705,15 @@ Fail Check erefl : (_ : GRing.Field.type) = (_ : Num.NumDomain.type) :> Type.
 Fail Check erefl : (_ : GRing.Field.type) = (_ : Num.RealDomain.type) :> Type.
 
 (* fix in countalg *)
-Fail Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lmodule.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Algebra.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lalgebra.type) :> Type.
+Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.IntegralDomain.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lmodule.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Algebra.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lalgebra.type) :> Type.
 
 (* fix in finalg *)
-Fail Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Algebra.type) :> Type.
-Fail Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.UnitRing.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Algebra.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lmodule.type) :> Type.
-Fail Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.ComRing.type) :> Type.
+Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Algebra.type) :> Type.
+Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.UnitRing.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Algebra.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lalgebra.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lmodule.type) :> Type.
+Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.ComRing.type) :> Type.

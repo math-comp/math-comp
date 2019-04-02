@@ -648,9 +648,13 @@ Definition countComUnitRing_finUnitRingType :=
 Definition unitRing_countComRingType :=
   @CountRing.ComRing.Pack unitRingType xclass.
 Definition unitRing_finComRingType := @ComRing.Pack unitRingType xclass.
+Definition countUnitRing_finComRingType :=
+  @ComRing.Pack countUnitRingType xclass.
 Definition comRing_countUnitRingType :=
   @CountRing.UnitRing.Pack comRingType xclass.
 Definition comRing_finUnitRingType := @UnitRing.Pack comRingType xclass.
+Definition countComRing_finUnitRingType :=
+  @UnitRing.Pack countComRingType xclass.
 Definition finComRing_finUnitRingType := @UnitRing.Pack finComRingType xclass.
 
 End ClassDef.
@@ -718,8 +722,10 @@ Canonical countComUnitRing_finComRingType.
 Canonical countComUnitRing_finUnitRingType.
 Canonical unitRing_countComRingType.
 Canonical unitRing_finComRingType.
+Canonical countUnitRing_finComRingType.
 Canonical comRing_countUnitRingType.
 Canonical comRing_finUnitRingType.
+Canonical countComRing_finUnitRingType.
 Canonical finComRing_finUnitRingType.
 Notation finComUnitRingType := FinRing.ComUnitRing.type.
 Notation "[ 'finComUnitRingType' 'of' T ]" := (do_pack pack T)
@@ -1363,6 +1369,8 @@ Coercion finGroupType : type >-> FinGroup.type.
 Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
@@ -1453,7 +1461,8 @@ Definition unitAlg_countZmodType := @CountRing.Zmodule.Pack unitAlgType xclass.
 Definition unitAlg_finZmodType := @Zmodule.Pack unitAlgType xclass.
 Definition unitAlg_countRingType := @CountRing.Ring.Pack unitAlgType xclass.
 Definition unitAlg_finRingType := @Ring.Pack unitAlgType xclass.
-Definition unitAlg_countUnitRingType := @CountRing.UnitRing.Pack unitAlgType xclass.
+Definition unitAlg_countUnitRingType :=
+  @CountRing.UnitRing.Pack unitAlgType xclass.
 Definition unitAlg_finUnitRingType := @UnitRing.Pack unitAlgType xclass.
 Definition unitAlg_finLmodType := @Lmodule.Pack R phR unitAlgType xclass.
 Definition unitAlg_finLalgType := @Lalgebra.Pack R phR unitAlgType xclass.
@@ -1461,6 +1470,18 @@ Definition unitAlg_finAlgType := @Algebra.Pack R phR unitAlgType xclass.
 Definition unitRing_finLmodType := @Lmodule.Pack R phR unitRingType xclass.
 Definition unitRing_finLalgType := @Lalgebra.Pack R phR unitRingType xclass.
 Definition unitRing_finAlgType := @Algebra.Pack R phR unitRingType xclass.
+Definition countUnitRing_lmodType :=
+  @GRing.Lmodule.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_finLmodType :=
+  @Lmodule.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_lalgType :=
+  @GRing.Lalgebra.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_finLalgType :=
+  @Lalgebra.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_algType :=
+  @GRing.Algebra.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_finAlgType :=
+  @Algebra.Pack R phR countUnitRingType xclass.
 Definition finUnitRing_lmodType :=
   @GRing.Lmodule.Pack R phR finUnitRingType xclass.
 Definition finUnitRing_finLmodType :=
@@ -1542,6 +1563,12 @@ Canonical unitAlg_finAlgType.
 Canonical unitRing_finLmodType.
 Canonical unitRing_finLalgType.
 Canonical unitRing_finAlgType.
+Canonical countUnitRing_lmodType.
+Canonical countUnitRing_finLmodType.
+Canonical countUnitRing_lalgType.
+Canonical countUnitRing_finLalgType.
+Canonical countUnitRing_algType.
+Canonical countUnitRing_finAlgType.
 Canonical finUnitRing_lmodType.
 Canonical finUnitRing_finLmodType.
 Canonical finUnitRing_lalgType.
