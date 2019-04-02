@@ -17,7 +17,7 @@ def common_children(G):
     result = set()
     for x in G.nodes():
         for y in G.nodes():
-            if children(G,x).intersection(children(G,y)) != set():
+            if x < y and children(G,x).intersection(children(G,y)) != set():
                 result.add((x,y))
     return result
 
@@ -31,8 +31,7 @@ def print_common_children_coq_check(G):
             print ("Local Notation \"" + x + ".type\" := (" + x + ".type _).")
     print ("")
     for (x, y) in common_children(G):
-        if x < y:
-            print ("Check erefl : (_ : " + x + ".type) = (_ : " + y + ".type) :> Type.")
+        print ("Check erefl : (_ : " + x + ".type) = (_ : " + y + ".type) :> Type.")
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a check .v file \
