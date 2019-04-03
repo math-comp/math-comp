@@ -762,6 +762,8 @@ Coercion countComUnitRingType : type >-> ComUnitRing.type.
 Canonical countComUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion countIdomainType : type >-> IntegralDomain.type.
+Canonical countIdomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
 Coercion countFieldType : type >-> Field.type.

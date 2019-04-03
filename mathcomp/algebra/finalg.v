@@ -79,6 +79,8 @@ Section ClassDef.
 Record class_of M :=
   Class { base : GRing.Zmodule.class_of M; mixin : mixin_of M base }.
 Local Coercion base : class_of >-> GRing.Zmodule.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.Zmodule.class_of R :=
+  CountRing.Zmodule.Class c (mixin c).
 Local Coercion mixin : class_of >-> mixin_of.
 
 Structure type := Pack {sort; _ : class_of sort}.
@@ -94,18 +96,24 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-
-Definition join_finType := @Finite.Pack zmodType (fin_ xclass).
-
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group zmodType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition zmod_finType := @Finite.Pack zmodType (fin_ xclass).
+Definition zmod_baseFinGroupType := base_group zmodType zmodType finType.
+Definition zmod_finGroupType := fin_group zmod_baseFinGroupType zmodType.
+Definition countZmod_finType := @Finite.Pack countZmodType (fin_ xclass).
+Definition countZmod_baseFinGroupType :=
+  base_group countZmodType zmodType finType.
+Definition countZmod_finGroupType :=
+  fin_group countZmod_baseFinGroupType zmodType.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.Zmodule.class_of.
+Coercion base2 : class_of >-> CountRing.Zmodule.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
@@ -117,18 +125,21 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Canonical baseFinGroupType.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
-Canonical join_finType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
+Canonical zmod_finType.
+Canonical zmod_baseFinGroupType.
+Canonical zmod_finGroupType.
+Canonical countZmod_finType.
+Canonical countZmod_baseFinGroupType.
+Canonical countZmod_finGroupType.
 Notation finZmodType := type.
 Notation "[ 'finZmodType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finZmodType'  'of'  T ]") : form_scope.
-Coercion baseFinGroupType : type >-> FinGroup.base_type.
-Canonical baseFinGroupType.
-Coercion finGroupType : type >-> FinGroup.type.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
 Notation "[ 'baseFinGroupType' 'of' R 'for' +%R ]" :=
     (BaseFinGroupType R (groupMixin _))
   (at level 0, format "[ 'baseFinGroupType'  'of'  R  'for'  +%R ]")
@@ -136,7 +147,6 @@ Notation "[ 'baseFinGroupType' 'of' R 'for' +%R ]" :=
 Notation "[ 'finGroupType' 'of' R 'for' +%R ]" :=
     (@FinGroup.clone R _ (finGroupType _) id _ id)
   (at level 0, format "[ 'finGroupType'  'of'  R  'for'  +%R ]") : form_scope.
-Canonical countZmodType (T : type) := [countZmodType of T].
 End Exports.
 
 End Zmodule.
@@ -163,9 +173,11 @@ Section ClassDef.
 
 Record class_of R :=
   Class { base : GRing.Ring.class_of R; mixin : mixin_of R base }.
-Definition base2 R (c : class_of R) := Zmodule.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Ring.class_of.
-Local Coercion base2 : class_of >-> Zmodule.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.Ring.class_of R :=
+  CountRing.Ring.Class c (mixin c).
+Local Coercion base3 R (c : class_of R) : Zmodule.class_of R :=
+  Zmodule.Class (mixin c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -180,21 +192,30 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition join_finType := @Finite.Pack ringType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack ringType xclass.
-
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group ringType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition ring_finType := @Finite.Pack ringType (fin_ xclass).
+Definition ring_baseFinGroupType := base_group ringType zmodType finType.
+Definition ring_finGroupType := fin_group ring_baseFinGroupType zmodType.
+Definition ring_finZmodType := @Zmodule.Pack ringType xclass.
+Definition countRing_finType := @Finite.Pack countRingType (fin_ xclass).
+Definition countRing_baseFinGroupType :=
+  base_group countRingType zmodType finType.
+Definition countRing_finGroupType :=
+  fin_group countRing_baseFinGroupType zmodType.
+Definition countRing_finZmodType := @Zmodule.Pack countRingType xclass.
 
 End ClassDef.
 
 Module Import Exports.
 Coercion base : class_of >-> GRing.Ring.class_of.
-Coercion base2 : class_of >-> Zmodule.class_of.
+Coercion base2 : class_of >-> CountRing.Ring.class_of.
+Coercion base3 : class_of >-> Zmodule.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -205,23 +226,31 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
-Canonical join_finType.
-Canonical join_finZmodType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
+Canonical ring_finType.
+Canonical ring_baseFinGroupType.
+Canonical ring_finGroupType.
+Canonical ring_finZmodType.
+Canonical countRing_finType.
+Canonical countRing_baseFinGroupType.
+Canonical countRing_finGroupType.
+Canonical countRing_finZmodType.
 Notation finRingType := type.
 Notation "[ 'finRingType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finRingType'  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Canonical countZmodType (T : type) := [countZmodType of T].
-Canonical countRingType (T : type) := [countRingType of T].
 End Exports.
 
 Section Unit.
@@ -268,9 +297,11 @@ Section ClassDef.
 
 Record class_of R :=
   Class { base : GRing.ComRing.class_of R; mixin : mixin_of R base }.
-Definition base2 R (c : class_of R) := Ring.Class (mixin c).
 Local Coercion base : class_of >-> GRing.ComRing.class_of.
-Local Coercion base2 : class_of >-> Ring.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.ComRing.class_of R :=
+  CountRing.ComRing.Class c (mixin c).
+Local Coercion base3 R (c : class_of R) : Ring.class_of R :=
+  Ring.Class (mixin c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -285,24 +316,35 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition join_finType := @Finite.Pack comRingType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack comRingType xclass.
-Definition join_finRingType := @Ring.Pack comRingType xclass.
-
+Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group comRingType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition comRing_finType := @Finite.Pack comRingType (fin_ xclass).
+Definition comRing_baseFinGroupType := base_group comRingType zmodType finType.
+Definition comRing_finGroupType := fin_group comRing_baseFinGroupType zmodType.
+Definition comRing_finZmodType := @Zmodule.Pack comRingType xclass.
+Definition comRing_finRingType := @Ring.Pack comRingType xclass.
+Definition countComRing_finType := @Finite.Pack countComRingType (fin_ xclass).
+Definition countComRing_baseFinGroupType :=
+  base_group countComRingType zmodType finType.
+Definition countComRing_finGroupType :=
+  fin_group countComRing_baseFinGroupType zmodType.
+Definition countComRing_finZmodType := @Zmodule.Pack countComRingType xclass.
+Definition countComRing_finRingType := @Ring.Pack countComRingType xclass.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.ComRing.class_of.
-Coercion base2 : class_of >-> Ring.class_of.
+Coercion base2 : class_of >-> CountRing.ComRing.class_of.
+Coercion base3 : class_of >-> Ring.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -313,29 +355,39 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion comRingType : type >-> GRing.ComRing.type.
 Canonical comRingType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finRingType.
+Coercion countComRingType : type >-> CountRing.ComRing.type.
+Canonical countComRingType.
+Canonical comRing_finType.
+Canonical comRing_baseFinGroupType.
+Canonical comRing_finGroupType.
+Canonical comRing_finZmodType.
+Canonical comRing_finRingType.
+Canonical countComRing_finType.
+Canonical countComRing_baseFinGroupType.
+Canonical countComRing_finGroupType.
+Canonical countComRing_finZmodType.
+Canonical countComRing_finRingType.
 Notation finComRingType := FinRing.ComRing.type.
 Notation "[ 'finComRingType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finComRingType'  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Canonical countZmodType (T : type) := [countZmodType of T].
-Canonical countRingType (T : type) := [countRingType of T].
-Canonical countComRingType (T : type) := [countComRingType of T].
 End Exports.
 
 End ComRing.
@@ -347,9 +399,11 @@ Section ClassDef.
 
 Record class_of R :=
   Class { base : GRing.UnitRing.class_of R; mixin : mixin_of R base }.
-Definition base2 R (c : class_of R) := Ring.Class (mixin c).
 Local Coercion base : class_of >-> GRing.UnitRing.class_of.
-Local Coercion base2 : class_of >-> Ring.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.UnitRing.class_of R :=
+  CountRing.UnitRing.Class c (mixin c).
+Local Coercion base3 R (c : class_of R) : Ring.class_of R :=
+  Ring.Class (mixin c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -364,25 +418,38 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-
-Definition join_finType := @Finite.Pack unitRingType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack unitRingType xclass.
-Definition join_finRingType := @Ring.Pack unitRingType xclass.
-
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group unitRingType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition unitRing_finType := @Finite.Pack unitRingType (fin_ xclass).
+Definition unitRing_baseFinGroupType :=
+  base_group unitRingType zmodType finType.
+Definition unitRing_finGroupType :=
+  fin_group unitRing_baseFinGroupType zmodType.
+Definition unitRing_finZmodType := @Zmodule.Pack unitRingType xclass.
+Definition unitRing_finRingType := @Ring.Pack unitRingType xclass.
+Definition countUnitRing_finType :=
+  @Finite.Pack countUnitRingType (fin_ xclass).
+Definition countUnitRing_baseFinGroupType :=
+  base_group countUnitRingType zmodType finType.
+Definition countUnitRing_finGroupType :=
+  fin_group countUnitRing_baseFinGroupType zmodType.
+Definition countUnitRing_finZmodType := @Zmodule.Pack countUnitRingType xclass.
+Definition countUnitRing_finRingType := @Ring.Pack countUnitRingType xclass.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.UnitRing.class_of.
-Coercion base2 : class_of >-> Ring.class_of.
+Coercion base2 : class_of >-> CountRing.UnitRing.class_of.
+Coercion base3 : class_of >-> Ring.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -393,29 +460,39 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion unitRingType : type >-> GRing.UnitRing.type.
 Canonical unitRingType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finRingType.
+Coercion countUnitRingType : type >-> CountRing.UnitRing.type.
+Canonical countUnitRingType.
+Canonical unitRing_finType.
+Canonical unitRing_baseFinGroupType.
+Canonical unitRing_finGroupType.
+Canonical unitRing_finZmodType.
+Canonical unitRing_finRingType.
+Canonical countUnitRing_finType.
+Canonical countUnitRing_baseFinGroupType.
+Canonical countUnitRing_finGroupType.
+Canonical countUnitRing_finZmodType.
+Canonical countUnitRing_finRingType.
 Notation finUnitRingType := FinRing.UnitRing.type.
 Notation "[ 'finUnitRingType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finUnitRingType'  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Canonical countZmodType (T : type) := [countZmodType of T].
-Canonical countRingType (T : type) := [countRingType of T].
-Canonical countUnitRingType (T : type) := [countUnitRingType of T].
 End Exports.
 
 End UnitRing.
@@ -508,11 +585,13 @@ Section ClassDef.
 
 Record class_of R :=
   Class { base : GRing.ComUnitRing.class_of R; mixin : mixin_of R base }.
-Definition base2 R (c : class_of R) := ComRing.Class (mixin c).
-Definition base3 R (c : class_of R) := @UnitRing.Class R (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.ComUnitRing.class_of.
-Local Coercion base2 : class_of >-> ComRing.class_of.
-Local Coercion base3 : class_of >-> UnitRing.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.ComUnitRing.class_of R :=
+  CountRing.ComUnitRing.Class c (mixin c).
+Local Coercion base3 R (c : class_of R) : ComRing.class_of R :=
+  ComRing.Class (mixin c).
+Local Coercion base4 R (c : class_of R) : UnitRing.class_of R :=
+  @UnitRing.Class R (base c) (mixin c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -527,35 +606,64 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
 Definition finComRingType := @ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
 Definition finUnitRingType := @UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-
-Definition join_finType := @Finite.Pack comUnitRingType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack comUnitRingType xclass.
-Definition join_finRingType := @Ring.Pack comUnitRingType xclass.
-Definition join_finComRingType := @ComRing.Pack comUnitRingType xclass.
-Definition join_finUnitRingType := @UnitRing.Pack comUnitRingType xclass.
-Definition ujoin_finComRingType := @ComRing.Pack unitRingType xclass.
-Definition cjoin_finUnitRingType := @UnitRing.Pack comRingType xclass.
-Definition fcjoin_finUnitRingType := @UnitRing.Pack finComRingType xclass.
-
+Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group comUnitRingType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition comUnitRing_finType := @Finite.Pack comUnitRingType (fin_ xclass).
+Definition comUnitRing_baseFinGroupType :=
+  base_group comUnitRingType zmodType finType.
+Definition comUnitRing_finGroupType :=
+  fin_group comUnitRing_baseFinGroupType zmodType.
+Definition comUnitRing_finZmodType := @Zmodule.Pack comUnitRingType xclass.
+Definition comUnitRing_finRingType := @Ring.Pack comUnitRingType xclass.
+Definition comUnitRing_finComRingType := @ComRing.Pack comUnitRingType xclass.
+Definition comUnitRing_finUnitRingType := @UnitRing.Pack comUnitRingType xclass.
+Definition countComUnitRing_finType :=
+  @Finite.Pack countComUnitRingType (fin_ xclass).
+Definition countComUnitRing_baseFinGroupType :=
+  base_group countComUnitRingType zmodType finType.
+Definition countComUnitRing_finGroupType :=
+  fin_group countComUnitRing_baseFinGroupType zmodType.
+Definition countComUnitRing_finZmodType :=
+  @Zmodule.Pack countComUnitRingType xclass.
+Definition countComUnitRing_finRingType :=
+  @Ring.Pack countComUnitRingType xclass.
+Definition countComUnitRing_finComRingType :=
+  @ComRing.Pack countComUnitRingType xclass.
+Definition countComUnitRing_finUnitRingType :=
+  @UnitRing.Pack countComUnitRingType xclass.
+Definition unitRing_countComRingType :=
+  @CountRing.ComRing.Pack unitRingType xclass.
+Definition unitRing_finComRingType := @ComRing.Pack unitRingType xclass.
+Definition countUnitRing_finComRingType :=
+  @ComRing.Pack countUnitRingType xclass.
+Definition comRing_countUnitRingType :=
+  @CountRing.UnitRing.Pack comRingType xclass.
+Definition comRing_finUnitRingType := @UnitRing.Pack comRingType xclass.
+Definition countComRing_finUnitRingType :=
+  @UnitRing.Pack countComRingType xclass.
+Definition finComRing_finUnitRingType := @UnitRing.Pack finComRingType xclass.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.ComUnitRing.class_of.
-Coercion base2 : class_of >-> ComRing.class_of.
-Coercion base3 : class_of >-> UnitRing.class_of.
+Coercion base2 : class_of >-> CountRing.ComUnitRing.class_of.
+Coercion base3 : class_of >-> ComRing.class_of.
+Coercion base4 : class_of >-> UnitRing.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -566,44 +674,62 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion comRingType : type >-> GRing.ComRing.type.
 Canonical comRingType.
+Coercion countComRingType : type >-> CountRing.ComRing.type.
+Canonical countComRingType.
 Coercion finComRingType : type >-> ComRing.type.
 Canonical finComRingType.
 Coercion unitRingType : type >-> GRing.UnitRing.type.
 Canonical unitRingType.
+Coercion countUnitRingType : type >-> CountRing.UnitRing.type.
+Canonical countUnitRingType.
 Coercion finUnitRingType : type >-> UnitRing.type.
 Canonical finUnitRingType.
 Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finRingType.
-Canonical join_finComRingType.
-Canonical join_finUnitRingType.
-Canonical ujoin_finComRingType.
-Canonical cjoin_finUnitRingType.
-Canonical fcjoin_finUnitRingType.
+Coercion countComUnitRingType : type >-> CountRing.ComUnitRing.type.
+Canonical countComUnitRingType.
+Canonical comUnitRing_finType.
+Canonical comUnitRing_baseFinGroupType.
+Canonical comUnitRing_finGroupType.
+Canonical comUnitRing_finZmodType.
+Canonical comUnitRing_finRingType.
+Canonical comUnitRing_finComRingType.
+Canonical comUnitRing_finUnitRingType.
+Canonical countComUnitRing_finType.
+Canonical countComUnitRing_baseFinGroupType.
+Canonical countComUnitRing_finGroupType.
+Canonical countComUnitRing_finZmodType.
+Canonical countComUnitRing_finRingType.
+Canonical countComUnitRing_finComRingType.
+Canonical countComUnitRing_finUnitRingType.
+Canonical unitRing_countComRingType.
+Canonical unitRing_finComRingType.
+Canonical countUnitRing_finComRingType.
+Canonical comRing_countUnitRingType.
+Canonical comRing_finUnitRingType.
+Canonical countComRing_finUnitRingType.
+Canonical finComRing_finUnitRingType.
 Notation finComUnitRingType := FinRing.ComUnitRing.type.
 Notation "[ 'finComUnitRingType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finComUnitRingType'  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Canonical countZmodType (T : type) := [countZmodType of T].
-Canonical countRingType (T : type) := [countRingType of T].
-Canonical countUnitRingType (T : type) := [countUnitRingType of T].
-Canonical countComRingType (T : type) := [countComRingType of T].
-Canonical countComUnitRingType (T : type) := [countComUnitRingType of T].
 End Exports.
 
 End ComUnitRing.
@@ -615,9 +741,11 @@ Section ClassDef.
 
 Record class_of R :=
   Class { base : GRing.IntegralDomain.class_of R; mixin : mixin_of R base }.
-Definition base2 R (c : class_of R) := ComUnitRing.Class (mixin c).
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Local Coercion base2 : class_of >-> ComUnitRing.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.IntegralDomain.class_of R :=
+  CountRing.IntegralDomain.Class c (mixin c).
+Local Coercion base3 R (c : class_of R) : ComUnitRing.class_of R :=
+  ComUnitRing.Class (mixin c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -632,34 +760,52 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
 Definition finComRingType := @ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
 Definition finUnitRingType := @UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT xclass.
 Definition finComUnitRingType := @ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-
-Definition join_finType := @Finite.Pack idomainType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack idomainType xclass.
-Definition join_finRingType := @Ring.Pack idomainType xclass.
-Definition join_finUnitRingType := @UnitRing.Pack idomainType xclass.
-Definition join_finComRingType := @ComRing.Pack idomainType xclass.
-Definition join_finComUnitRingType := @ComUnitRing.Pack idomainType xclass.
-
+Definition countIdomainType := @CountRing.IntegralDomain.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group idomainType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition idomain_finType := @Finite.Pack idomainType (fin_ xclass).
+Definition idomain_baseFinGroupType := base_group idomainType zmodType finType.
+Definition idomain_finGroupType := fin_group idomain_baseFinGroupType zmodType.
+Definition idomain_finZmodType := @Zmodule.Pack idomainType xclass.
+Definition idomain_finRingType := @Ring.Pack idomainType xclass.
+Definition idomain_finUnitRingType := @UnitRing.Pack idomainType xclass.
+Definition idomain_finComRingType := @ComRing.Pack idomainType xclass.
+Definition idomain_finComUnitRingType := @ComUnitRing.Pack idomainType xclass.
+Definition countIdomain_finType := @Finite.Pack countIdomainType (fin_ xclass).
+Definition countIdomain_baseFinGroupType :=
+  base_group countIdomainType zmodType finType.
+Definition countIdomain_finGroupType :=
+  fin_group countIdomain_baseFinGroupType zmodType.
+Definition countIdomain_finZmodType := @Zmodule.Pack countIdomainType xclass.
+Definition countIdomain_finRingType := @Ring.Pack countIdomainType xclass.
+Definition countIdomain_finUnitRingType :=
+  @UnitRing.Pack countIdomainType xclass.
+Definition countIdomain_finComRingType := @ComRing.Pack countIdomainType xclass.
+Definition countIdomain_finComUnitRingType :=
+  @ComUnitRing.Pack countIdomainType xclass.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Coercion base2 : class_of >-> ComUnitRing.class_of.
+Coercion base2 : class_of >-> CountRing.IntegralDomain.class_of.
+Coercion base3 : class_of >-> ComUnitRing.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -670,47 +816,63 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion comRingType : type >-> GRing.ComRing.type.
 Canonical comRingType.
+Coercion countComRingType : type >-> CountRing.ComRing.type.
+Canonical countComRingType.
 Coercion finComRingType : type >-> ComRing.type.
 Canonical finComRingType.
 Coercion unitRingType : type >-> GRing.UnitRing.type.
 Canonical unitRingType.
+Coercion countUnitRingType : type >-> CountRing.UnitRing.type.
+Canonical countUnitRingType.
 Coercion finUnitRingType : type >-> UnitRing.type.
 Canonical finUnitRingType.
 Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
+Coercion countComUnitRingType : type >-> CountRing.ComUnitRing.type.
+Canonical countComUnitRingType.
 Coercion finComUnitRingType : type >-> ComUnitRing.type.
 Canonical finComUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finRingType.
-Canonical join_finComRingType.
-Canonical join_finUnitRingType.
-Canonical join_finComUnitRingType.
+Coercion countIdomainType : type >-> CountRing.IntegralDomain.type.
+Canonical countIdomainType.
+Canonical idomain_finType.
+Canonical idomain_baseFinGroupType.
+Canonical idomain_finGroupType.
+Canonical idomain_finZmodType.
+Canonical idomain_finRingType.
+Canonical idomain_finUnitRingType.
+Canonical idomain_finComRingType.
+Canonical idomain_finComUnitRingType.
+Canonical countIdomain_finType.
+Canonical countIdomain_baseFinGroupType.
+Canonical countIdomain_finGroupType.
+Canonical countIdomain_finZmodType.
+Canonical countIdomain_finRingType.
+Canonical countIdomain_finUnitRingType.
+Canonical countIdomain_finComRingType.
+Canonical countIdomain_finComUnitRingType.
 Notation finIdomainType := FinRing.IntegralDomain.type.
 Notation "[ 'finIdomainType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finIdomainType'  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Canonical countZmodType (T : type) := [countZmodType of T].
-Canonical countRingType (T : type) := [countRingType of T].
-Canonical countUnitRingType (T : type) := [countUnitRingType of T].
-Canonical countComRingType (T : type) := [countComRingType of T].
-Canonical countComUnitRingType (T : type) := [countComUnitRingType of T].
-Canonical countIdomainType (T : type) := [countIdomainType of T].
 End Exports.
 
 End IntegralDomain.
@@ -722,9 +884,11 @@ Section ClassDef.
 
 Record class_of R :=
   Class { base : GRing.Field.class_of R; mixin : mixin_of R base }.
-Definition base2 R (c : class_of R) := IntegralDomain.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Field.class_of.
-Local Coercion base2 : class_of >-> IntegralDomain.class_of.
+Local Coercion base2 R (c : class_of R) : CountRing.Field.class_of R :=
+  CountRing.Field.Class c (mixin c).
+Local Coercion base3 R (c : class_of R) : IntegralDomain.class_of R :=
+  IntegralDomain.Class (mixin c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -739,37 +903,57 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition comRingType := @GRing.ComRing.Pack cT xclass.
+Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
 Definition finComRingType := @ComRing.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
 Definition finUnitRingType := @UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT xclass.
 Definition finComUnitRingType := @ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition countIdomainType := @CountRing.IntegralDomain.Pack cT xclass.
 Definition finIdomainType := @IntegralDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
-
-Definition join_finType := @Finite.Pack fieldType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack fieldType xclass.
-Definition join_finRingType := @Ring.Pack fieldType xclass.
-Definition join_finUnitRingType := @UnitRing.Pack fieldType xclass.
-Definition join_finComRingType := @ComRing.Pack fieldType xclass.
-Definition join_finComUnitRingType := @ComUnitRing.Pack fieldType xclass.
-Definition join_finIdomainType := @IntegralDomain.Pack fieldType xclass.
-
+Definition countFieldType := @CountRing.Field.Pack cT xclass.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group fieldType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition field_finType := @Finite.Pack fieldType (fin_ xclass).
+Definition field_baseFinGroupType := base_group fieldType zmodType finType.
+Definition field_finGroupType := fin_group field_baseFinGroupType zmodType.
+Definition field_finZmodType := @Zmodule.Pack fieldType xclass.
+Definition field_finRingType := @Ring.Pack fieldType xclass.
+Definition field_finUnitRingType := @UnitRing.Pack fieldType xclass.
+Definition field_finComRingType := @ComRing.Pack fieldType xclass.
+Definition field_finComUnitRingType := @ComUnitRing.Pack fieldType xclass.
+Definition field_finIdomainType := @IntegralDomain.Pack fieldType xclass.
+Definition countField_finType := @Finite.Pack countFieldType (fin_ xclass).
+Definition countField_baseFinGroupType :=
+  base_group countFieldType zmodType finType.
+Definition countField_finGroupType :=
+  fin_group countField_baseFinGroupType zmodType.
+Definition countField_finZmodType := @Zmodule.Pack countFieldType xclass.
+Definition countField_finRingType := @Ring.Pack countFieldType xclass.
+Definition countField_finUnitRingType := @UnitRing.Pack countFieldType xclass.
+Definition countField_finComRingType := @ComRing.Pack countFieldType xclass.
+Definition countField_finComUnitRingType :=
+  @ComUnitRing.Pack countFieldType xclass.
+Definition countField_finIdomainType :=
+  @IntegralDomain.Pack countFieldType xclass.
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> GRing.Field.class_of.
-Coercion base2 : class_of >-> IntegralDomain.class_of.
+Coercion base2 : class_of >-> CountRing.Field.class_of.
+Coercion base3 : class_of >-> IntegralDomain.class_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -780,53 +964,71 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion comRingType : type >-> GRing.ComRing.type.
 Canonical comRingType.
+Coercion countComRingType : type >-> CountRing.ComRing.type.
+Canonical countComRingType.
 Coercion finComRingType : type >-> ComRing.type.
 Canonical finComRingType.
 Coercion unitRingType : type >-> GRing.UnitRing.type.
 Canonical unitRingType.
+Coercion countUnitRingType : type >-> CountRing.UnitRing.type.
+Canonical countUnitRingType.
 Coercion finUnitRingType : type >-> UnitRing.type.
 Canonical finUnitRingType.
 Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
 Canonical comUnitRingType.
+Coercion countComUnitRingType : type >-> CountRing.ComUnitRing.type.
+Canonical countComUnitRingType.
 Coercion finComUnitRingType : type >-> ComUnitRing.type.
 Canonical finComUnitRingType.
 Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
+Coercion countIdomainType : type >-> CountRing.IntegralDomain.type.
+Canonical countIdomainType.
 Coercion finIdomainType : type >-> IntegralDomain.type.
 Canonical finIdomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finRingType.
-Canonical join_finComRingType.
-Canonical join_finUnitRingType.
-Canonical join_finComUnitRingType.
-Canonical join_finIdomainType.
+Coercion countFieldType : type >-> CountRing.Field.type.
+Canonical countFieldType.
+Canonical field_finType.
+Canonical field_baseFinGroupType.
+Canonical field_finGroupType.
+Canonical field_finZmodType.
+Canonical field_finRingType.
+Canonical field_finUnitRingType.
+Canonical field_finComRingType.
+Canonical field_finComUnitRingType.
+Canonical field_finIdomainType.
+Canonical countField_finType.
+Canonical countField_baseFinGroupType.
+Canonical countField_finGroupType.
+Canonical countField_finZmodType.
+Canonical countField_finRingType.
+Canonical countField_finUnitRingType.
+Canonical countField_finComRingType.
+Canonical countField_finComUnitRingType.
+Canonical countField_finIdomainType.
 Notation finFieldType := FinRing.Field.type.
 Notation "[ 'finFieldType' 'of' T ]" := (do_pack pack T)
   (at level 0, format "[ 'finFieldType'  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Canonical countZmodType (T : type) := [countZmodType of T].
-Canonical countRingType (T : type) := [countRingType of T].
-Canonical countUnitRingType (T : type) := [countUnitRingType of T].
-Canonical countComRingType (T : type) := [countComRingType of T].
-Canonical countComUnitRingType (T : type) := [countComUnitRingType of T].
-Canonical countIdomainType (T : type) := [countIdomainType of T].
-Canonical countFieldType (T : type) := [countFieldType of T].
 End Exports.
 
 End Field.
@@ -911,9 +1113,9 @@ Variable R : ringType.
 
 Record class_of M :=
   Class { base : GRing.Lmodule.class_of R M; mixin : mixin_of M base }.
-Definition base2 R (c : class_of R) := Zmodule.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Lmodule.class_of.
-Local Coercion base2 : class_of >-> Zmodule.class_of.
+Local Coercion base2 R (c : class_of R) : Zmodule.class_of R :=
+  Zmodule.Class (mixin c).
 
 Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -928,15 +1130,18 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
-Definition join_finType := @Finite.Pack lmodType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack lmodType xclass.
-
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group lmodType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition lmod_countType := @Countable.Pack lmodType (fin_ xclass).
+Definition lmod_finType := @Finite.Pack lmodType (fin_ xclass).
+Definition lmod_baseFinGroupType := base_group lmodType zmodType finType.
+Definition lmod_finGroupType := fin_group lmod_baseFinGroupType zmodType.
+Definition lmod_countZmodType := @CountRing.Zmodule.Pack lmodType xclass.
+Definition lmod_finZmodType := @Zmodule.Pack lmodType xclass.
 
 End ClassDef.
 
@@ -953,25 +1158,27 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion lmodType : type >-> GRing.Lmodule.type.
 Canonical lmodType.
-Canonical join_finType.
-Canonical join_finZmodType.
+Canonical lmod_countType.
+Canonical lmod_finType.
+Canonical lmod_baseFinGroupType.
+Canonical lmod_finGroupType.
+Canonical lmod_countZmodType.
+Canonical lmod_finZmodType.
 Notation finLmodType R := (FinRing.Lmodule.type (Phant R)).
 Notation "[ 'finLmodType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
   (at level 0, format "[ 'finLmodType'  R  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Section counttype.
-Variables (R : ringType) (phR : phant R) (T : type phR).
-Canonical countZmodType := [countZmodType of T].
-End counttype.
 End Exports.
 
 End Lmodule.
@@ -1004,25 +1211,32 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
 Definition finLmodType := @Lmodule.Pack R phR cT xclass.
 Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass.
-
-Definition join_finType := @Finite.Pack lalgType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack lalgType xclass.
-Definition join_finLmodType := @Lmodule.Pack R phR lalgType xclass.
-Definition join_finRingType := @Ring.Pack lalgType xclass.
-Definition rjoin_finLmodType := @Lmodule.Pack R phR ringType xclass.
-Definition ljoin_finRingType := @Ring.Pack lmodType xclass.
-Definition fljoin_finRingType := @Ring.Pack finLmodType xclass.
-
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group lalgType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition lalg_countType := @Countable.Pack lalgType (fin_ xclass).
+Definition lalg_finType := @Finite.Pack lalgType (fin_ xclass).
+Definition lalg_baseFinGroupType := base_group lalgType zmodType finType.
+Definition lalg_finGroupType := fin_group lalg_baseFinGroupType zmodType.
+Definition lalg_countZmodType := @CountRing.Zmodule.Pack lalgType xclass.
+Definition lalg_finZmodType := @Zmodule.Pack lalgType xclass.
+Definition lalg_finLmodType := @Lmodule.Pack R phR lalgType xclass.
+Definition lalg_countRingType := @CountRing.Ring.Pack lalgType xclass.
+Definition lalg_finRingType := @Ring.Pack lalgType xclass.
+Definition lmod_ringType := @GRing.Ring.Pack lmodType xclass.
+Definition lmod_countRingType := @CountRing.Ring.Pack lmodType xclass.
+Definition lmod_finRingType := @Ring.Pack lmodType xclass.
+Definition finLmod_ringType := @GRing.Ring.Pack finLmodType xclass.
+Definition finLmod_countRingType := @CountRing.Ring.Pack finLmodType xclass.
+Definition finLmod_finRingType := @Ring.Pack finLmodType xclass.
 
 End ClassDef.
 
@@ -1040,12 +1254,20 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion lmodType : type >-> GRing.Lmodule.type.
@@ -1054,25 +1276,24 @@ Coercion finLmodType : type >-> Lmodule.type.
 Canonical finLmodType.
 Coercion lalgType : type >-> GRing.Lalgebra.type.
 Canonical lalgType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finLmodType.
-Canonical join_finRingType.
-Canonical rjoin_finLmodType.
-Canonical ljoin_finRingType.
-Canonical fljoin_finRingType.
+Canonical lalg_countType.
+Canonical lalg_finType.
+Canonical lalg_baseFinGroupType.
+Canonical lalg_finGroupType.
+Canonical lalg_countZmodType.
+Canonical lalg_finZmodType.
+Canonical lalg_finLmodType.
+Canonical lalg_countRingType.
+Canonical lalg_finRingType.
+Canonical lmod_ringType.
+Canonical lmod_countRingType.
+Canonical lmod_finRingType.
+Canonical finLmod_ringType.
+Canonical finLmod_countRingType.
+Canonical finLmod_finRingType.
 Notation finLalgType R := (FinRing.Lalgebra.type (Phant R)).
 Notation "[ 'finLalgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
   (at level 0, format "[ 'finLalgType'  R  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Section counttype.
-Variables (R : GRing.Ring.type) (phR : phant R) (T : type phR).
-Canonical countZmodType := [countZmodType of T].
-Canonical countRingType := [countRingType of T].
-End counttype.
 End Exports.
 
 End Lalgebra.
@@ -1103,25 +1324,29 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
 Definition finLmodType := @Lmodule.Pack R phR cT xclass.
 Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass.
 Definition finLalgType := @Lalgebra.Pack R phR cT xclass.
 Definition algType := @GRing.Algebra.Pack R phR cT xclass.
-
-Definition join_finType := @Finite.Pack algType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack algType xclass.
-Definition join_finRingType := @Ring.Pack algType xclass.
-Definition join_finLmodType := @Lmodule.Pack R phR algType xclass.
-Definition join_finLalgType := @Lalgebra.Pack R phR algType xclass.
-
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group algType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition alg_countType := @Countable.Pack algType (fin_ xclass).
+Definition alg_finType := @Finite.Pack algType (fin_ xclass).
+Definition alg_baseFinGroupType := base_group algType zmodType finType.
+Definition alg_finGroupType := fin_group alg_baseFinGroupType zmodType.
+Definition alg_countZmodType := @CountRing.Zmodule.Pack algType xclass.
+Definition alg_finZmodType := @Zmodule.Pack algType xclass.
+Definition alg_countRingType := @CountRing.Ring.Pack algType xclass.
+Definition alg_finRingType := @Ring.Pack algType xclass.
+Definition alg_finLmodType := @Lmodule.Pack R phR algType xclass.
+Definition alg_finLalgType := @Lalgebra.Pack R phR algType xclass.
 
 End ClassDef.
 
@@ -1138,12 +1363,20 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion lmodType : type >-> GRing.Lmodule.type.
@@ -1156,23 +1389,19 @@ Coercion finLalgType : type >-> Lalgebra.type.
 Canonical finLalgType.
 Coercion algType : type >-> GRing.Algebra.type.
 Canonical algType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finLmodType.
-Canonical join_finRingType.
-Canonical join_finLalgType.
+Canonical alg_countType.
+Canonical alg_finType.
+Canonical alg_baseFinGroupType.
+Canonical alg_finGroupType.
+Canonical alg_countZmodType.
+Canonical alg_finZmodType.
+Canonical alg_countRingType.
+Canonical alg_finRingType.
+Canonical alg_finLmodType.
+Canonical alg_finLalgType.
 Notation finAlgType R := (type (Phant R)).
 Notation "[ 'finAlgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
   (at level 0, format "[ 'finAlgType'  R  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Section counttype.
-Variables (R : GRing.Ring.type) (phR : phant R) (T : type phR).
-Canonical countZmodType := [countZmodType of T].
-Canonical countRingType := [countRingType of T].
-End counttype.
 End Exports.
 
 End Algebra.
@@ -1206,10 +1435,13 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT (fin_ xclass).
 Definition finType := @Finite.Pack cT (fin_ xclass).
 Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
 Definition finZmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @GRing.Ring.Pack cT xclass.
+Definition countRingType := @CountRing.Ring.Pack cT xclass.
 Definition finRingType := @Ring.Pack cT xclass.
 Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
 Definition finUnitRingType := @UnitRing.Pack cT xclass.
 Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
 Definition finLmodType := @Lmodule.Pack R phR cT xclass.
@@ -1218,28 +1450,50 @@ Definition finLalgType := @Lalgebra.Pack R phR cT xclass.
 Definition algType := @GRing.Algebra.Pack R phR cT xclass.
 Definition finAlgType := @Algebra.Pack R phR cT xclass.
 Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT xclass.
-
-Definition join_finType := @Finite.Pack unitAlgType (fin_ xclass).
-Definition join_finZmodType := @Zmodule.Pack unitAlgType xclass.
-Definition join_finRingType := @Ring.Pack unitAlgType xclass.
-Definition join_finUnitRingType := @UnitRing.Pack unitAlgType xclass.
-Definition join_finLmodType := @Lmodule.Pack R phR unitAlgType xclass.
-Definition join_finLalgType := @Lalgebra.Pack R phR unitAlgType xclass.
-Definition join_finAlgType := @Algebra.Pack R phR unitAlgType xclass.
-Definition  ljoin_finUnitRingType := @UnitRing.Pack lmodType xclass.
-Definition fljoin_finUnitRingType := @UnitRing.Pack finLmodType xclass.
-Definition  njoin_finUnitRingType := @UnitRing.Pack lalgType xclass.
-Definition fnjoin_finUnitRingType := @UnitRing.Pack finLalgType xclass.
-Definition  ajoin_finUnitRingType := @UnitRing.Pack algType xclass.
-Definition fajoin_finUnitRingType := @UnitRing.Pack finAlgType xclass.
-Definition ujoin_finLmodType := @Lmodule.Pack R phR unitRingType xclass.
-Definition ujoin_finLalgType := @Lalgebra.Pack R phR unitRingType xclass.
-Definition ujoin_finAlgType := @Algebra.Pack R phR unitRingType xclass.
-
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
-Definition join_baseFinGroupType := base_group unitAlgType zmodType finType.
-Definition join_finGroupType := fin_group join_baseFinGroupType zmodType.
+
+Definition unitAlg_countType := @Countable.Pack unitAlgType (fin_ xclass).
+Definition unitAlg_finType := @Finite.Pack unitAlgType (fin_ xclass).
+Definition unitAlg_baseFinGroupType := base_group unitAlgType zmodType finType.
+Definition unitAlg_finGroupType := fin_group unitAlg_baseFinGroupType zmodType.
+Definition unitAlg_countZmodType := @CountRing.Zmodule.Pack unitAlgType xclass.
+Definition unitAlg_finZmodType := @Zmodule.Pack unitAlgType xclass.
+Definition unitAlg_countRingType := @CountRing.Ring.Pack unitAlgType xclass.
+Definition unitAlg_finRingType := @Ring.Pack unitAlgType xclass.
+Definition unitAlg_countUnitRingType :=
+  @CountRing.UnitRing.Pack unitAlgType xclass.
+Definition unitAlg_finUnitRingType := @UnitRing.Pack unitAlgType xclass.
+Definition unitAlg_finLmodType := @Lmodule.Pack R phR unitAlgType xclass.
+Definition unitAlg_finLalgType := @Lalgebra.Pack R phR unitAlgType xclass.
+Definition unitAlg_finAlgType := @Algebra.Pack R phR unitAlgType xclass.
+Definition unitRing_finLmodType := @Lmodule.Pack R phR unitRingType xclass.
+Definition unitRing_finLalgType := @Lalgebra.Pack R phR unitRingType xclass.
+Definition unitRing_finAlgType := @Algebra.Pack R phR unitRingType xclass.
+Definition countUnitRing_lmodType :=
+  @GRing.Lmodule.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_finLmodType :=
+  @Lmodule.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_lalgType :=
+  @GRing.Lalgebra.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_finLalgType :=
+  @Lalgebra.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_algType :=
+  @GRing.Algebra.Pack R phR countUnitRingType xclass.
+Definition countUnitRing_finAlgType :=
+  @Algebra.Pack R phR countUnitRingType xclass.
+Definition finUnitRing_lmodType :=
+  @GRing.Lmodule.Pack R phR finUnitRingType xclass.
+Definition finUnitRing_finLmodType :=
+  @Lmodule.Pack R phR finUnitRingType xclass.
+Definition finUnitRing_lalgType :=
+  @GRing.Lalgebra.Pack R phR finUnitRingType xclass.
+Definition finUnitRing_finLalgType :=
+  @Lalgebra.Pack R phR finUnitRingType xclass.
+Definition finUnitRing_algType :=
+  @GRing.Algebra.Pack R phR finUnitRingType xclass.
+Definition finUnitRing_finAlgType :=
+  @Algebra.Pack R phR finUnitRingType xclass.
 
 End ClassDef.
 
@@ -1257,16 +1511,26 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
+Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
+Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
+Coercion countZmodType : type >-> CountRing.Zmodule.type.
+Canonical countZmodType.
 Coercion finZmodType : type >-> Zmodule.type.
 Canonical finZmodType.
 Coercion ringType : type >-> GRing.Ring.type.
 Canonical ringType.
+Coercion countRingType : type >-> CountRing.Ring.type.
+Canonical countRingType.
 Coercion finRingType : type >-> Ring.type.
 Canonical finRingType.
 Coercion unitRingType : type >-> GRing.UnitRing.type.
 Canonical unitRingType.
+Coercion countUnitRingType : type >-> CountRing.UnitRing.type.
+Canonical countUnitRingType.
 Coercion finUnitRingType : type >-> UnitRing.type.
 Canonical finUnitRingType.
 Coercion lmodType : type >-> GRing.Lmodule.type.
@@ -1283,34 +1547,37 @@ Coercion finAlgType : type >-> Algebra.type.
 Canonical finAlgType.
 Coercion unitAlgType : type >-> GRing.UnitAlgebra.type.
 Canonical unitAlgType.
-Canonical join_finType.
-Canonical join_finZmodType.
-Canonical join_finLmodType.
-Canonical join_finRingType.
-Canonical join_finLalgType.
-Canonical join_finAlgType.
-Canonical ljoin_finUnitRingType.
-Canonical fljoin_finUnitRingType.
-Canonical njoin_finUnitRingType.
-Canonical fnjoin_finUnitRingType.
-Canonical ajoin_finUnitRingType.
-Canonical fajoin_finUnitRingType.
-Canonical ujoin_finLmodType.
-Canonical ujoin_finLalgType.
-Canonical ujoin_finAlgType.
+Canonical unitAlg_countType.
+Canonical unitAlg_finType.
+Canonical unitAlg_baseFinGroupType.
+Canonical unitAlg_finGroupType.
+Canonical unitAlg_countZmodType.
+Canonical unitAlg_finZmodType.
+Canonical unitAlg_countRingType.
+Canonical unitAlg_finRingType.
+Canonical unitAlg_countUnitRingType.
+Canonical unitAlg_finUnitRingType.
+Canonical unitAlg_finLmodType.
+Canonical unitAlg_finLalgType.
+Canonical unitAlg_finAlgType.
+Canonical unitRing_finLmodType.
+Canonical unitRing_finLalgType.
+Canonical unitRing_finAlgType.
+Canonical countUnitRing_lmodType.
+Canonical countUnitRing_finLmodType.
+Canonical countUnitRing_lalgType.
+Canonical countUnitRing_finLalgType.
+Canonical countUnitRing_algType.
+Canonical countUnitRing_finAlgType.
+Canonical finUnitRing_lmodType.
+Canonical finUnitRing_finLmodType.
+Canonical finUnitRing_lalgType.
+Canonical finUnitRing_finLalgType.
+Canonical finUnitRing_algType.
+Canonical finUnitRing_finAlgType.
 Notation finUnitAlgType R := (type (Phant R)).
 Notation "[ 'finUnitAlgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
   (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
-Canonical baseFinGroupType.
-Canonical finGroupType.
-Canonical join_baseFinGroupType.
-Canonical join_finGroupType.
-Section counttype.
-Variables (R : GRing.UnitRing.type) (phR : phant R) (T : type phR).
-Canonical countZmodType := [countZmodType of T].
-Canonical countRingType := [countRingType of T].
-Canonical countUnitRingType := [countUnitRingType of T].
-End counttype.
 End Exports.
 
 End UnitAlgebra.
