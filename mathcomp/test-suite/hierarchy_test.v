@@ -701,8 +701,8 @@ Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Typ
 Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.ArchimedeanField.type) :> Type.
 
 (* fix in ssrnum *)
-Fail Check erefl : (_ : GRing.Field.type) = (_ : Num.NumDomain.type) :> Type.
-Fail Check erefl : (_ : GRing.Field.type) = (_ : Num.RealDomain.type) :> Type.
+Check erefl : (_ : GRing.Field.type) = (_ : Num.NumDomain.type) :> Type.
+Check erefl : (_ : GRing.Field.type) = (_ : Num.RealDomain.type) :> Type.
 
 (* fix in countalg *)
 Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.IntegralDomain.type) :> Type.
