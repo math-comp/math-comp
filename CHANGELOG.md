@@ -165,8 +165,8 @@ Coq <= 8.5. This release is compatible with Coq 8.6, 8.7 and 8.8.
 
 ### Added
 
-- iter_in, finv_in, inv_f_in, finv_inj_in, fconnect_sym_in, iter_order_in,
-  iter_finv_in, cycle_orbit_in, fpath_finv_in, fpath_finv_f_in, fpath_f_finv_in
+- `iter_in`, `finv_in`, `inv_f_in`, `finv_inj_in`, `fconnect_sym_in`, `iter_order_in`,
+  `iter_finv_in`, `cycle_orbit_in`, `fpath_finv_in`, `fpath_finv_f_in`, `fpath_f_finv_in`
 - `big_allpairs`
 - `uniqP, uniqPn`
 - `dec_factor_theorem`, `mul_bin_down`, `mul_bin_left`
@@ -224,7 +224,7 @@ Major reorganization of the archive.
   `dvdn_fact`, `prime_above`, `subKr`, `subrI`, `subIr`, `subr0_eq`,
   `divrI`, `divIr`, `divKr`, `divfI`, `divIf`, `divKf`, `impliesP`, `impliesPn`,
   `unlessL`, `unlessR`, `unless_sym`, `unlessP` (coercion), `classicW`,
-  `ltr_prod_nat
+  `ltr_prod_nat`
 - Notation `\unless C, P`
 
 ## [1.5.0] - 2014-03-12 (ssreflect + mathcomp)
