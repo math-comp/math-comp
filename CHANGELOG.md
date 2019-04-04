@@ -36,8 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Theory of lersif and intervals:
-  + Many lersif related lemmas are ported from ssrnum
+- Theory of `lersif` and intervals:
+  + Many `lersif` related lemmas are ported from `ssrnum`
   + Changed: `prev_of_itv`, `itv_decompose`, and `itv_rewrite`
   + New theory of intersections of intervals
 
