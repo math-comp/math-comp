@@ -34,9 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   circular implication `P0 -> P1 -> ... -> Pn -> P0`.
   Related theorems are `all_iffLR` and `all_iffP`
 
-- ~Extended generic theory about monotonocity (*mono* and *homo* lemmas).~
-- ~Extended theory about homo and mono for leq/or and Num.le~
-
 ### Changed
 
 - Theory of lersif and intervals:
@@ -66,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   represent the same subspace iff they differ only by a change of
   basis.
 
-- Corrected implicits and documentation of MatrixGenField.
+- Corrected implicits and documentation of `MatrixGenField`.
 
 - Rewritten proof of quantifier elimination for closed field in a
   monadic style.
@@ -74,8 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Specialized `bool_irrelevance` so that the statement reflects
   the name.
 
-- Changed the shape of the type of FieldMixin to allow one-line
-  in-proof definition of bespoke fieldType structure.
+- Changed the shape of the type of `FieldMixin` to allow one-line
+  in-proof definition of bespoke `fieldType` structure.
 
 - Refactored and extended Arguments directives to provide more
   comprehensive signature information.
