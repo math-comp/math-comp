@@ -1,5 +1,5 @@
 # Design:
-# - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.6 .)
+# - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.7 .)
 #   - choice of the OCaml compiler: var OPAM_SWITCH in {base, edge}
 #     (Dockerfile containing: "opam switch set $compiler && eval $(opam env)")
 #   - master (protected branch) => push on GitLab registry and Docker Hub
@@ -55,11 +55,6 @@ stages:
   except:
     - tags
     - merge_requests
-
-coq-8.6:
-  extends: .opam-build
-  variables:
-    OPAM_SWITCH: "base"
 
 coq-8.7:
   extends: .opam-build
@@ -130,12 +125,6 @@ make-coq-latest:
   script:
     - make -j "${NJOBS}"
     - make install
-
-ci-fourcolor-8.6:
-  extends: .ci-fourcolor
-  variables:
-    COQ_VERSION: "8.6"
-    # CONTRIB_VERSION: "v8.6"
 
 ci-fourcolor-8.7:
   extends: .ci-fourcolor

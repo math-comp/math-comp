@@ -1,8 +1,0 @@
-MLLIBEXTRA=$(shell \
-	if [ $(COQVV) = "8.6" ];\
-	   then cp $(PLUGIN)/v$(COQVV)/ssreflect_plugin.mlpack .;\
-		cp $(PLUGIN)/v$(COQVV)/ssreflect.ml4 .;\
-		cp $(PLUGIN)/v$(COQVV)/ssrbool.v $(SSR)/;\
-		cp $(PLUGIN)/v$(COQVV)/ssrfun.v $(SSR)/;\
-		cp $(PLUGIN)/v$(COQVV)/ssreflect.v $(SSR)/;\
-		echo "ssreflect_plugin.mlpack ssreflect.ml4"; fi)
