@@ -87,7 +87,7 @@ ssreflect/ssrnat.v
 ssreflect/ssrnotations.v
 ssreflect/ssrmatching.v
 ssreflect/tuple.v
-test-suite/hierarchy_test.v
+test_suite/hierarchy_test.v
 
 -I .
 -R . mathcomp
