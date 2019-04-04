@@ -8,64 +8,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added companion matrix of a polynomial `companionmx p` and the
-  theorems: companionmxK, map_mx_companion and companion_map_poly.
-- Added: homoW_in, inj_homo_in, mono_inj_in, anti_mono_in,
-  total_homo_mono_in, homoW, inj_homo, monoj, anti_mono,
-  total_homo_mono.
+- Companion matrix of a polynomial `companionmx p` and the
+  theorems: `companionmxK`, `map_mx_companion` and `companion_map_poly`
+  
+- `homoW_in`, `inj_homo_in`, `mono_inj_in`, `anti_mono_in`,
+  `total_homo_mono_in`, `homoW`, `inj_homo`, `monoj`, `anti_mono`,
+  `total_homo_mono`
 
-- Added sorted_lt_nth, ltn_index, sorted_le_nth, leq_index.
+- `sorted_lt_nth`, `ltn_index`, `sorted_le_nth`, `leq_index`.
 
-- Added [arg minr_( i < n | P ) F] and [arg maxr_( i < n | P ) F]
-  with all their variants, following the same convention as for nat.
+- `[arg minr_( i < n | P ) F]` and `[arg maxr_( i < n | P ) F]`
+  with all their variants, following the same convention as for `nat`
 
-- Added missing contra* lemma: contra_neqN, contra_neqF,
-  contra_neqT, contra_neq_eq, contra_eq_neq.
+- `contra_neqN`, `contra_neqF`, `contra_neqT`, `contra_neq_eq`, `contra_eq_neq`
 
-- Addded missing seq theorems: take_subseq, drop_subseq
+- `take_subseq`, `drop_subseq`
 
+- `big_imset_cond`,`big_map_id`, `big_image_cond`
+  `big_image`, `big_image_cond_id` and `big_image_id`
 
-- Added lemmas `big_imset_cond`,`big_map_id`, `big_image_cond`
-  `big_image`, `big_image_cond_id` and `big_image_id` for
-  completeness purposes
-
-- Added lemmas `foldrE`, `foldlE`, `foldl_idx` and `sumnE`
+- `foldrE`, `foldlE`, `foldl_idx` and `sumnE`
   to turn "seq statements" into "bigop statements"
 
-- Added all_iff, "the following are all equivalent"
-  with notation [<-> P0; P1; ..; Pn] and theorems
-  `all_iffLR` and coercion `all_iffP` (see header for doc)
-  proved by circular implication P0 -> P1 -> ... -> Pn -> P0
+- `all_iff` with notation `[<-> P0; P1; ..; Pn]`) to talk about
+  circular implication `P0 -> P1 -> ... -> Pn -> P0`.
+  Related theorems are `all_iffLR` and `all_iffP`
 
-- Extended generic theory about monotonocity (*mono* and *homo* lemmas).
-
-- Extended theory about homo and mono for leq/or and Num.le
+- ~Extended generic theory about monotonocity (*mono* and *homo* lemmas).~
+- ~Extended theory about homo and mono for leq/or and Num.le~
 
 ### Changed
 
-- Changed and extended theory of lersif and intervals:
+- Theory of lersif and intervals:
   + Many lersif related lemmas are ported from ssrnum
-  + Definitions that changed: prev_of_itv, itv_decompose, and itv_rewrite
-  + Theory of intersections of intervals is added
+  + Changed: `prev_of_itv`, `itv_decompose`, and `itv_rewrite`
+  + New theory of intersections of intervals
 
-
-- Generalized extremum_spec and its theory, added extremum and
-  extremumP, generalizing arg_min for an arbitrary eqType with an
-  order relation on it (rather than nat). Redefined arg_min and
-  arg_max with it.
+- Generalized `extremum_spec` and its theory, added `extremum` and
+  `extremumP`, generalizing `arg_min` for an arbitrary `eqType` with an
+  order relation on it (rather than `nat`). Redefined `arg_min` and
+  `arg_max` with it.
 
 - Reshuffled theorems inside files and packages:
-  + countalg goes from the field to the algebra package
-  + finalg now gets inheritance from countalg
-  + closed_field now contains the construction of algebraic closure
+  + `countalg` goes from the field to the algebra package
+  + `finalg` inherits from countalg
+  + `closed_field` contains the construction of algebraic closure
     for countable fields that used to be in countalg.
 
-- Added maximal implicits to reflection, injectivity and cancellation
+- Maximal implicits applied to reflection, injectivity and cancellation
   lemmas so that they are easier to pass to combinator lemmas such as
-  sameP, inj_eq or canLR.
+  `sameP`, `inj_eq` or `canLR`.
 
-- Added reindex_inj s shorthand for reindexing a bigop with a
-  permutation s.
+- Added `reindex_inj s` shorthand for reindexing a bigop with a
+  permutation `s`.
 
 - Added lemma `eqmxMunitP`: two matrices with the same shape
   represent the same subspace iff they differ only by a change of
@@ -93,49 +88,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Generalized some lemmas in a backward compatible way.
   Some strictly more general lemmas now have suffix `_dep`.
 
-- Generalised {ffun A -> R} to handle dependent functions, and to be
+- Generalised `{ffun A -> R}` to handle dependent functions, and to be
   structurally positive so it can be used in recursive inductive type
-  definitions. Minor backward incompatibilities: fgraph f is no longer
-  a field accessor, and no longer equal to val f as {ffun A -> R} is no
-  longer a subType; some instances of finfun, ffunE, ffunK may not unify
-  with a generic nondependent function type A -> ?R due to a bug in
-  Coq < 8.10.
+  definitions.
+  
+  Minor backward incompatibilities: `fgraph f` is no longer
+  a field accessor, and no longer equal to `val f` as `{ffun A -> R}` is no
+  longer a `subType`; some instances of `finfun`, `ffunE`, `ffunK` may not unify
+  with a generic nondependent function type `A -> ?R` due to a bug in
+  Coq version 8.9 or below.
 
 ### Renamed
 
 Renamings also involve the `_in` suffix counterpart when applicable
 
-- mono_inj -> incr_inj
-- nmono_inj -> decr_inj
-- leq_mono_inj -> incnr_inj
-- leq_nmono_inj -> decnr_inj
-- homo_inj_ltn_lt -> incnr_inj
-- nhomo_inj_ltn_lt -> decnr_inj
-- homo_inj_in_lt -> inj_homo_ltr_in
-- nhomo_inj_in_lt -> inj_nhomo_ltr_in
-- ltn_ltrW_homo -> ltnrW_homo
-- ltn_ltrW_nhomo -> ltnrW_nhomo
-- leq_lerW_mono -> lenrW_mono
-- leq_lerW_nmono -> lenrW_nmono
-- homo_leq_mono -> lenr_mono
-- nhomo_leq_mono -> lenr_nmono
-- homo_inj_lt -> inj_homo_ltr
-- nhomo_inj_lt -> inj_nhomo_ltr
-- homo_inj_ltn_lt -> inj_homo_ltnr
-- nhomo_inj_ltn_lt -> inj_nhomo_ltnr
-- homo_mono -> ler_mono
-- nhomo_mono -> ler_nmono
-- big_setIDdep -> big_setIDcond
-- sum_nat_dep_const -> sum_nat_cond_const
+- `mono_inj` -> `incr_inj`
+- `nmono_inj` -> `decr_inj`
+- `leq_mono_inj` -> `incnr_inj`
+- `leq_nmono_inj` -> `decnr_inj`
+- `homo_inj_ltn_lt` -> `incnr_inj`
+- `nhomo_inj_ltn_lt` -> `decnr_inj`
+- `homo_inj_in_lt` -> `inj_homo_ltr_in`
+- `nhomo_inj_in_lt` -> `inj_nhomo_ltr_in`
+- `ltn_ltrW_homo` -> `ltnrW_homo`
+- `ltn_ltrW_nhomo` -> `ltnrW_nhomo`
+- `leq_lerW_mono` -> `lenrW_mono`
+- `leq_lerW_nmono` -> `lenrW_nmono`
+- `homo_leq_mono` -> `lenr_mono`
+- `nhomo_leq_mono` -> `lenr_nmono`
+- `homo_inj_lt` -> `inj_homo_ltr`
+- `nhomo_inj_lt` -> `inj_nhomo_ltr`
+- `homo_inj_ltn_lt` -> `inj_homo_ltnr`
+- `nhomo_inj_ltn_lt` -> `inj_nhomo_ltnr`
+- `homo_mono` -> `ler_mono`
+- `nhomo_mono` -> `ler_nmono`
+- `big_setIDdep` -> `big_setIDcond`
+- `sum_nat_dep_const` -> `sum_nat_cond_const`
 
 ### Misc
 
-- `_ : Type` field from packed classes. This performance
+- Removed trailing `_ : Type` field from packed classes. This performance
   optimization is not strictly necessary with modern Coq versions.
 
 - Removed duplicated definitions of `tag` `tagged` and `Tagged`
-  from eqtype.v. They were already in ssrfun.v.
-
+  from `eqtype.v`. They are already in `ssrfun.v`.
 
 ## [1.7.0] - 2018-04-24
 
