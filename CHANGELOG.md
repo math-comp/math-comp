@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `foldrE`, `foldlE`, `foldl_idx` and `sumnE`
   to turn "seq statements" into "bigop statements"
 
-- `all_iff` with notation `[<-> P0; P1; ..; Pn]`) to talk about
+- `all_iff` with notation `[<-> P0; P1; ..; Pn]` to talk about
   circular implication `P0 -> P1 -> ... -> Pn -> P0`.
   Related theorems are `all_iffLR` and `all_iffP`
 
@@ -127,7 +127,7 @@ Renamings also involve the `_in` suffix counterpart when applicable
 - Removed trailing `_ : Type` field from packed classes. This performance
   optimization is not strictly necessary with modern Coq versions.
 
-- Removed duplicated definitions of `tag` `tagged` and `Tagged`
+- Removed duplicated definitions of `tag`, `tagged` and `Tagged`
   from `eqtype.v`. They are already in `ssrfun.v`.
 
 ## [1.7.0] - 2018-04-24
