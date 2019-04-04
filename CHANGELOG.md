@@ -138,95 +138,93 @@ Renamings also involve the `_in` suffix counterpart when applicable
 Compatibility with Coq 8.8 and lost compatibility with
 Coq <= 8.5. This release is compatible with Coq 8.6, 8.7 and 8.8.
 
-- Integration to Coq: ssrbool.v ssrfun.v and plugin.
-  ssrtest also moved to Coq test suite.
+- Integration to Coq: `ssrbool.v`, `ssrfun.v` and the OCaml plugin.
+  `ssrtest/` also moved to Coq test suite.
 
 - Cleaning up the github repository: the math-comp repository is
   now dedicated to the released material (as in the present
-  release). For instance, directories real-closed and odd-order now
+  release). For instance, directories `real-closed/` and `odd-order/` now
   have their own repository.
 
 ### Changed
 
-- Library refactoring: algC ssrnum: Library ssrnum.v now
-  provides an interface numClosedFieldType, which abstracts the
-  theory of algebraic numbers. In particular, Re, Im, 'i,
-  conjC, n.-root and sqrtC, previously defined in library algC.v,
+- Library refactoring: `algC` and `ssrnum`.
+  Library `ssrnum.v` provides an interface `numClosedFieldType`, which abstracts the
+  theory of algebraic numbers. In particular, `Re`, `Im`, `'i`,
+  `conjC`, `n.-root` and `sqrtC`, previously defined in library `algC.v`,
   are now part of this generic interface. In case of ambiguity,
-  a cast to type algC, of complex algebraic numbers, can be used to
+  a cast to type `algC`, of complex algebraic numbers, can be used to
   disambiguate via  typing constraints. Some theory was thus made
   more generic, and the corresponding lemmas, previously defined in
-  library algC.v (e.g. conjCK) now feature an extra, non maximal
-  implicit, parameter of type numClosedFieldType. This could break
+  library `algC.v` (e.g. `conjCK`) now feature an extra, non maximal
+  implicit, parameter of type `numClosedFieldType`. This could break
   some proofs.
-
-- numClosedFieldType (interface)
-
-- Every theorem from ssrnum that used to be in algC
-- ltngtP, contra_eq, contra_neq, odd_opp, nth_iota
+  Every theorem from `ssrnum` that used to be in `algC` changed statement.
+  
+- `ltngtP`, `contra_eq`, `contra_neq`, `odd_opp`, `nth_iota`
 
 ### Added
 
 - iter_in, finv_in, inv_f_in, finv_inj_in, fconnect_sym_in, iter_order_in,
   iter_finv_in, cycle_orbit_in, fpath_finv_in, fpath_finv_f_in, fpath_f_finv_in
-- big_allpairs
-- uniqP, uniqPn
-- dec_factor_theorem, mul_bin_down, mul_bin_left
-- abstract_context (now merged in Coq)
+- `big_allpairs`
+- `uniqP, uniqPn`
+- `dec_factor_theorem`, `mul_bin_down`, `mul_bin_left`
+- `abstract_context` (`in ssreflect.v`, now merged in Coq proper)
 
 ### Renamed
 
-- Lemma dvdn_fact was moved from library prime.v to library div.v
-- mul_Sm_binm -> mul_bin_diag
-- divn1 -> divz1 (in intdiv)
-- rootC -> nthroot
-- algRe -> Re
-- algIm -> Im
-- algCi -> imaginaryC
-- reshape_index_leq -> reshape_leq
+- Lemma `dvdn_fact` was moved from library `prime.v` to library `div.v`
+- `mul_Sm_binm -> mul_bin_diag
+- `divn1` -> `divz1` (in intdiv)
+- `rootC` -> `nthroot`
+- `algRe` -> `Re`
+- `algIm` -> `Im`
+- `algCi` -> `imaginaryC`
+- `reshape_index_leq` -> `reshape_leq`
 
 ## [1.6.0] - 2015-11-24 (ssreflect + mathcomp)
 
-Major reorganization of the archive
+Major reorganization of the archive.
 
-- Files split into sub-directories: ssreflect, algebra, fingroup,
-	  solvable, field and character. In this way the user can decide
-	  to compile only the subset of the Mathematical Components library
-	  that is relevant to her. Note that this introduces a possible
-	  incompatibility for users of the previous version. A replacement
-	  scheme is suggested in the installation notes.
+- Files split into sub-directories: `ssreflect/`, `algebra/`, `fingroup/`,
+  `solvable/`, `field/` and `character/`. In this way the user can decide
+  to compile only the subset of the Mathematical Components library
+  that is relevant to her. Note that this introduces a possible
+  incompatibility for users of the previous version. A replacement
+  scheme is suggested in the installation notes.
+	  
 - The archive is now open and based on git. Public mirror at:
-	         https://github.com/math-comp/math-comp
+  https://github.com/math-comp/math-comp
 
 - Sources of the reference manual of the Ssreflect tactic language are
-	  also open and available at:
-		https://github.com/math-comp/ssr-manual
-	  Pull requests improving the documentation are welcome.
+  also open and available at: https://github.com/math-comp/ssr-manual
+  Pull requests improving the documentation are welcome.
 
 ### Renamed
-- conjC_closed -> cfConjC_closed
-- class_transr -> class_eqP
-- cfclass_transl -> cfclass_transr
-- nontrivial_ideal -> proper_ideal
-- zchar_orthonormalP -> vchar_orthonormalP
+- `conjC_closed` -> `cfConjC_closed`
+- `class_transr` -> `class_eqP`
+- `cfclass_transl` -> `cfclass_transr`
+- `nontrivial_ideal` -> `proper_ideal`
+- `zchar_orthonormalP` -> `vchar_orthonormalP`
 
 ### Changed
-- seq_sub
-- orbit_in_transl, orbit_sym, orbit_trans, orbit_transl, orbit_transr,
-  cfAut_char, cfConjC_char, invg_lcosets, lcoset_transl, lcoset_transr,
-  rcoset_transl, rcoset_transr, mem2_last, bind_unless, unless_contra, all_and2,
-  all_and3, all_and4, all_and5, ltr0_neq0, ltr_prod, Zisometry_of_iso
+- `seq_sub`
+- `orbit_in_transl`, `orbit_sym`, `orbit_trans`, `orbit_transl`, `orbit_transr`,
+  `cfAut_char`, `cfConjC_char`, `invg_lcosets`, `lcoset_transl`, `lcoset_transr`,
+  `rcoset_transl`, `rcoset_transr`, `mem2_last`, `bind_unless`, `unless_contra`, `all_and2`,
+  `all_and3`, `all_and4`, `all_and5`, `ltr0_neq0`, `ltr_prod`, `Zisometry_of_iso`
 
 ### Added
-- adhoc_seq_sub_choiceMixin, adhoc_seq_sub_[choice|fin]Type
-- orbit_in_eqP, cards_draws, cfAut_lin_char, cfConjC_lin_char,
-	  extend_cfConjC_subset, isometry_of_free, cfAutK, cfAutVK,
-	  lcoset_eqP, rcoset_eqP, class_eqP, gFsub_trans, gFnorms,
-	  gFchar_trans, gFnormal_trans, gFnorm_trans, mem2_seq1,
-	  dvdn_fact, prime_above, subKr, subrI, subIr, subr0_eq,
-	  divrI, divIr, divKr, divfI, divIf, divKf, impliesP, impliesPn,
-	  unlessL, unlessR, unless_sym, unlessP (coercion), classicW,
-	  ltr_prod_nat
+- `adhoc_seq_sub_choiceMixin`, `adhoc_seq_sub_[choice|fin]Type`
+- `orbit_in_eqP`, `cards_draws`, `cfAut_lin_char`, `cfConjC_lin_char`,
+  `extend_cfConjC_subset`, `isometry_of_free`, `cfAutK`, `cfAutVK`,
+  `lcoset_eqP`, `rcoset_eqP`, `class_eqP`, `gFsub_trans`, `gFnorms`,
+  `gFchar_trans`, `gFnormal_trans`, `gFnorm_trans`, `mem2_seq1`,
+  `dvdn_fact`, `prime_above`, `subKr`, `subrI`, `subIr`, `subr0_eq`,
+  `divrI`, `divIr`, `divKr`, `divfI`, `divIf`, `divKf`, `impliesP`, `impliesPn`,
+  `unlessL`, `unlessR`, `unless_sym`, `unlessP` (coercion), `classicW`,
+  `ltr_prod_nat
 - Notation `\unless C, P`
 
 ## [1.5.0] - 2014-03-12 (ssreflect + mathcomp)
