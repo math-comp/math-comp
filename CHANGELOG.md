@@ -137,9 +137,8 @@ Renamings also involve the `_in` suffix counterpart when applicable
 Compatibility with Coq 8.8 and lost compatibility with
 Coq <= 8.5. This release is compatible with Coq 8.6, 8.7 and 8.8.
 
-- Integration to Coq:
-  + OCaml plugin (for Coq 8.8, plugin for 8.6 and 8.7 still in the
-    archive for backward compatibility)
+- Integration in Coq startng from version 8.7 of:
+  + OCaml plugin (plugin for 8.6 still in the archive for backward compatibility)
   + `ssreflect.v`, `ssrbool.v`, `ssrfun.v` and `ssrtest/`
 
 - Cleaning up the github repository: the math-comp repository is
