@@ -13,707 +13,701 @@ Local Notation "Falgebra.type" := (Falgebra.type _).
 Local Notation "GRing.Lmodule.type" := (GRing.Lmodule.type _).
 Local Notation "Vector.type" := (Vector.type _).
 
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : Num.NumField.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : Num.NumField.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : GRing.Lmodule.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.UnitAlgebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.DecidableField.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : GRing.Lmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FieldExt.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.DecidableField.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FieldExt.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.UnitAlgebra.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.DecidableField.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Num.RealClosedField.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Num.RealDomain.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.ClosedField.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.DecidableField.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : Num.NumDomain.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : Num.ClosedField.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : Num.NumDomain.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.Lmodule.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Falgebra.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : GRing.Lmodule.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.UnitAlgebra.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : Num.NumField.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : FieldExt.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : GRing.Lmodule.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : SplittingField.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : Num.RealClosedField.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : Finite.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Num.NumDomain.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.RealField.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.Field.type) :> Type.
-Check erefl : (_ : GRing.UnitAlgebra.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.Field.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : CountRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : GRing.DecidableField.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : FinRing.Ring.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Falgebra.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : Num.ClosedField.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.Field.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.UnitRing.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.Field.type) :> Type.
-Check erefl : (_ : Num.ClosedField.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : GRing.Lmodule.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : CountRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.Field.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : SplittingField.type) :> Type.
-Check erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.Field.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : Countable.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : FinRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : GRing.ClosedField.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : Num.NumDomain.type) = (_ : Num.NumField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.ArchimedeanField.type) :> Type.
-Check erefl : (_ : FinGroup.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.Field.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.ComRing.type) :> Type.
-Check erefl : (_ : Falgebra.type) = (_ : GRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : FieldExt.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : Finite.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.Zmodule.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.DecidableField.type) :> Type.
-Check erefl : (_ : CountRing.Ring.type) = (_ : FinGroup.type) :> Type.
-Check erefl : (_ : Equality.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : GRing.Algebra.type) = (_ : Vector.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.ComRing.type) :> Type.
-Check erefl : (_ : GRing.ComRing.type) = (_ : GRing.ComUnitRing.type) :> Type.
-Check erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.Ring.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.RealDomain.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Lalgebra.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : Num.RealClosedField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : Equality.type) :> Type.
-Check erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : FinRing.ComRing.type) = (_ : GRing.UnitRing.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.ClosedField.type) :> Type.
-Check erefl : (_ : Countable.type) = (_ : GRing.Ring.type) :> Type.
-Check erefl : (_ : Choice.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Type.
-Check erefl : (_ : GRing.Zmodule.type) = (_ : Num.ArchimedeanField.type) :> Type.
-
-(* fix in ssrnum *)
-Check erefl : (_ : GRing.Field.type) = (_ : Num.NumDomain.type) :> Type.
-Check erefl : (_ : GRing.Field.type) = (_ : Num.RealDomain.type) :> Type.
-
-(* fix in countalg *)
-Check erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.IntegralDomain.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lalgebra.type) :> Type.
-
-(* fix in finalg *)
-Check erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.UnitRing.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Algebra.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lalgebra.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lmodule.type) :> Type.
-Check erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.ComRing.type) :> Type.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : FieldExt.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Falgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lmodule.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.RealClosedField.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumDomain.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumDomain.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FieldExt.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lmodule.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.ClosedField.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : SplittingField.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Falgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lmodule.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumField.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lmodule.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lmodule.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitAlgebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumDomain.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Algebra.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lmodule.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.ClosedField.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FieldExt.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.DecidableField.type) = (_ : Num.NumDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : CountRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : CountRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitAlgebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Ring.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.RealDomain.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : Countable.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : CountRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Algebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComUnitRing.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.IntegralDomain.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.NumField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComRing.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.DecidableField.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitAlgebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Zmodule.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumDomain.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : FinRing.Lmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Finite.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComUnitRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumField.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Field.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : Finite.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ClosedField.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.ArchimedeanField.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Lalgebra.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.UnitAlgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ComRing.type) = (_ : CountRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lalgebra.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.RealClosedField.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Ring.type) = (_ : FinRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : Equality.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.Lalgebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitAlgebra.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.Lmodule.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Field.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.ComUnitRing.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinGroup.type) = (_ : FinRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Ring.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.IntegralDomain.type) = (_ : Vector.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitRing.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.Field.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.UnitRing.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : FinRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Num.NumField.type) = (_ : Num.RealDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.ArchimedeanField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.UnitAlgebra.type) = (_ : SplittingField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : CountRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.DecidableField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.IntegralDomain.type) = (_ : FinGroup.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.UnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Falgebra.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FinRing.ComRing.type) = (_ : GRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : FieldExt.type) = (_ : GRing.Zmodule.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Zmodule.type) = (_ : GRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : GRing.Zmodule.type) = (_ : Num.RealField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : FinRing.Ring.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Choice.type) = (_ : CountRing.ClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.UnitRing.type) = (_ : GRing.Algebra.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Countable.type) = (_ : GRing.ComRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : GRing.ComUnitRing.type) :> Type. Abort.
+Goal False. have := erefl : (_ : Equality.type) = (_ : Num.RealClosedField.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.Field.type) = (_ : CountRing.IntegralDomain.type) :> Type. Abort.
+Goal False. have := erefl : (_ : CountRing.ClosedField.type) = (_ : CountRing.IntegralDomain.type) :> Type. Abort.
