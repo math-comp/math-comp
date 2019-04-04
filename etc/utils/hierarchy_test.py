@@ -31,7 +31,7 @@ def print_common_children_coq_check(G):
             print ("Local Notation \"" + x + ".type\" := (" + x + ".type _).")
     print ("")
     for (x, y) in common_children(G):
-        print ("Check erefl : (_ : " + x + ".type) = (_ : " + y + ".type) :> Type.")
+        print ("Goal False. have := erefl : (_ : " + x + ".type) = (_ : " + y + ".type) :> Type. Abort.")
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a check .v file \
