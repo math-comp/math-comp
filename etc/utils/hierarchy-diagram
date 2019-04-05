@@ -40,6 +40,7 @@ raw_coercions=$(tempfile -s .out | sed s/\.out$//)
 raw_canonicals=$(tempfile -s .out | sed s/\.out$//)
 parsed_coercions=$(tempfile)
 parsed_canonicals=$(tempfile)
+opt_raw_inheritances=off
 opt_canonicals=on
 opt_coercions=off
 opt_libs=()
@@ -49,6 +50,10 @@ while [[ $# -gt 0 ]]
 do
 
 case "$1" in
+  -raw-inheritances)
+    opt_raw_inheritances=on
+    shift;
+  ;;
   -canonicals)
     opt_canonicals="$2"
     shift; shift
@@ -86,17 +91,30 @@ Redirect "$raw_coercions" Print Graph.
 Redirect "$raw_canonicals" Print Canonical Projections.
 EOT
 
+cat $raw_canonicals.out \
+| sed -n 's/^\([a-zA-Z_\.]*\)\.sort <- \([a-zA-Z_\.]*\)\.sort ( \([a-zA-Z_\.]*\)\.\([a-zA-Z_]*\) )$/\1 \2 \3 \4/p' \
+| while read -r from_module to_module proj_module projection; do
+  if [[ $from_module = $proj_module ]] || [[ $to_module = $proj_module ]]; then
+    echo $from_module $to_module $proj_module $projection
+  fi
+done > $parsed_canonicals
+
+cat $raw_coercions.out \
+| sed -n 's/^\[\([^]]*\)\] : \([a-zA-Z_\.]*\)\.type >-> \([a-zA-Z_\.]*\)\.type$/\2 \3 \1/p' > $parsed_coercions
+
+if [[ $opt_raw_inheritances != "off" ]]; then
+
+  cat $parsed_canonicals | sed 's/^\([^ ]*\) \([^ ]*\) .*$/\1\n\2/g' | sort | uniq \
+  | while read -r module; do
+    echo -n "$module "
+    sed -n "s/^\([^ ]*\) $module .*$/\1/p" $parsed_canonicals | sort | xargs
+  done
+
+else
+
 echo "digraph structures {"
 
 if [[ $opt_canonicals != "off" ]]; then
-
-  cat $raw_canonicals.out \
-  | sed -n 's/^\([a-zA-Z_\.]*\)\.sort <- \([a-zA-Z_\.]*\)\.sort ( \([a-zA-Z_\.]*\)\.\([a-zA-Z_]*\) )$/\1 \2 \3 \4/p' \
-  | while read -r from_module to_module proj_module projection; do
-    if [[ $from_module = $proj_module ]] || [[ $to_module = $proj_module ]]; then
-      echo $from_module $to_module $proj_module $projection
-    fi
-  done > $parsed_canonicals
 
   cat $parsed_canonicals | while read -r from_module to_module proj_module projection; do
     grep "^$from_module " $parsed_canonicals | ( while read -r _ middle_module _ _; do
@@ -114,8 +132,6 @@ if [[ $opt_canonicals != "off" ]]; then
 fi
 
 if [[ $opt_coercions != "off" ]]; then
-  cat $raw_coercions.out \
-  | sed -n 's/^\[\([^]]*\)\] : \([a-zA-Z_\.]*\)\.type >-> \([a-zA-Z_\.]*\)\.type$/\2 \3 \1/p' > $parsed_coercions
 
   cat $parsed_coercions | while read -r from_module to_module coercion; do
     grep "^$from_module " $parsed_coercions | ( while read -r _ middle_module _; do
@@ -132,5 +148,7 @@ if [[ $opt_coercions != "off" ]]; then
 fi
 
 echo "}"
+
+fi
 
 rm $raw_coercions.out $raw_canonicals.out $parsed_coercions $parsed_canonicals
