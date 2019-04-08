@@ -43,7 +43,7 @@ GITROOT=$(git rev-parse --show-toplevel)
 if [ $VERSION == "dev" ]
 then
 # variables useful for package construction
-  URLLINE="git: \"https://github.com/math-comp/math-comp.git\""
+  URLLINE="src: \"git+https://github.com/math-comp/math-comp.git\""
   PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $GITROOT/mathcomp/all/all.v \
         | paste -sd " " -)
   PKGPREFIX="$GITROOT/opam/extra-dev/packages"
@@ -51,14 +51,14 @@ else
   ARCHIVE=$(mktemp)
   git archive --format=tgz --output=$ARCHIVE \
       --prefix=math-comp-$TAG/ $TAG # reproduce github archive
-  SUM=$(md5sum $ARCHIVE | cut -d " " -f 1)
+  SUM=$(sha256sum $ARCHIVE | cut -d " " -f 1)
   EXTRACTED=$(mktemp -d)
   tar -C $EXTRACTED -zxvf $ARCHIVE
 # variables useful for package construction
-  URLLINE="http: \"$ARCHIVEURL\""
-  CHECKSUMLINE="checksum: \"$SUM\""
-  PKGS=$(ls -fs -d -1 $EXTRACTED/*/mathcomp/*/opam \
-        | sed -r "s?.*mathcomp/([^/]+)/opam?\1?" \
+  URLLINE="src: \"$ARCHIVEURL\""
+  CHECKSUMLINE="checksum: \"sha256=$SUM\""
+  PKGS=$(ls -fs -d -1 $EXTRACTED/*/*.opam \
+        | sed -r "s?.*coq-mathcomp-([^/]+).opam?\1?" \
         | paste -sd " " -)
   PKGPREFIX="$GITROOT/opam/released/packages"
 fi
@@ -71,16 +71,17 @@ do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    mkdir -p $pkgdir
    if [ $VERSION == "dev" ]
    then cp $GITROOT/coq-mathcomp-$pkg.opam $pkgdir/opam
-        cp $GITROOT/mathcomp/$pkg/descr $pkgdir/descr
    else git show "$BRANCH:coq-mathcomp-$pkg.opam" > $pkgdir/opam
-	git show "$BRANCH:mathcomp/$pkg/descr" > $pkgdir/descr
         sed -r "/^version/s?dev?$VERSION?" -i $pkgdir/opam
         sed -r "/^depends.*coq-mathcomp.*/s?dev?$VERSION?" -i $pkgdir/opam
    fi
-   echo $URLLINE > $pkgdir/url
+   echo "" >> $pkgdir/opam
+   echo "url {" >> $pkgdir/opam
+   echo $URLLINE >> $pkgdir/opam
    if [ $VERSION != "dev" ]
-   then echo $CHECKSUMLINE >> $pkgdir/url
+   then echo $CHECKSUMLINE >> $pkgdir/opam
    fi
+   echo "}" >> $pkgdir/opam
 done
 
 # finally test the existence of the archive

@@ -1,6 +1,0 @@
-Mathematical Components Library on Algebra
-
-This library contains definitions and theorems about discrete
-(i.e. with decidable equality) algebraic structures : ring, fields,
-ordered fields, real fields,  modules, algebras, integers, rational
-numbers, polynomials, matrices, vector spaces...
