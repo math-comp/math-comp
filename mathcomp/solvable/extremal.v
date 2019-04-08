@@ -1532,7 +1532,7 @@ Definition extremal_group_countMixin := CanCountMixin extgK.
 Canonical extremal_group_countType := CountType _ extremal_group_countMixin.
 Lemma bound_extremal_groups (c : extremal_group_type) : pickle c < 6.
 Proof. by case: c. Qed.
-Definition extremal_group_finMixin := Finite.CountMixin bound_extremal_groups.
+Definition extremal_group_finMixin := CountFinMixin bound_extremal_groups.
 Canonical extremal_group_finType :=
   FinType extremal_group_type extremal_group_finMixin.
 
