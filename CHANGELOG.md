@@ -1,6 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+Last releases: [[1.8.0] - 2019-04-08](#180---2019-04-08) and [[1.7.0] - 2018-04-24](#170---2018-04-24).
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
