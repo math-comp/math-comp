@@ -125,7 +125,9 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Coercion finType : type >-> Finite.type.
 Canonical finType.
+Coercion baseFinGroupType : type >-> FinGroup.base_type.
 Canonical baseFinGroupType.
+Coercion finGroupType : type >-> FinGroup.type.
 Canonical finGroupType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
@@ -645,13 +647,9 @@ Definition countComUnitRing_finComRingType :=
   @ComRing.Pack countComUnitRingType xclass.
 Definition countComUnitRing_finUnitRingType :=
   @UnitRing.Pack countComUnitRingType xclass.
-Definition unitRing_countComRingType :=
-  @CountRing.ComRing.Pack unitRingType xclass.
 Definition unitRing_finComRingType := @ComRing.Pack unitRingType xclass.
 Definition countUnitRing_finComRingType :=
   @ComRing.Pack countUnitRingType xclass.
-Definition comRing_countUnitRingType :=
-  @CountRing.UnitRing.Pack comRingType xclass.
 Definition comRing_finUnitRingType := @UnitRing.Pack comRingType xclass.
 Definition countComRing_finUnitRingType :=
   @UnitRing.Pack countComRingType xclass.
@@ -720,10 +718,8 @@ Canonical countComUnitRing_finZmodType.
 Canonical countComUnitRing_finRingType.
 Canonical countComUnitRing_finComRingType.
 Canonical countComUnitRing_finUnitRingType.
-Canonical unitRing_countComRingType.
 Canonical unitRing_finComRingType.
 Canonical countUnitRing_finComRingType.
-Canonical comRing_countUnitRingType.
 Canonical comRing_finUnitRingType.
 Canonical countComRing_finUnitRingType.
 Canonical finComRing_finUnitRingType.
@@ -1231,7 +1227,6 @@ Definition lalg_finZmodType := @Zmodule.Pack lalgType xclass.
 Definition lalg_finLmodType := @Lmodule.Pack R phR lalgType xclass.
 Definition lalg_countRingType := @CountRing.Ring.Pack lalgType xclass.
 Definition lalg_finRingType := @Ring.Pack lalgType xclass.
-Definition lmod_ringType := @GRing.Ring.Pack lmodType xclass.
 Definition lmod_countRingType := @CountRing.Ring.Pack lmodType xclass.
 Definition lmod_finRingType := @Ring.Pack lmodType xclass.
 Definition finLmod_ringType := @GRing.Ring.Pack finLmodType xclass.
@@ -1285,7 +1280,6 @@ Canonical lalg_finZmodType.
 Canonical lalg_finLmodType.
 Canonical lalg_countRingType.
 Canonical lalg_finRingType.
-Canonical lmod_ringType.
 Canonical lmod_countRingType.
 Canonical lmod_finRingType.
 Canonical finLmod_ringType.
