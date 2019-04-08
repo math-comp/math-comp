@@ -20,11 +20,11 @@ you can install any math-comp package via
 opam repo add coq-released https://coq.inria.fr/opam/released
 opam pin add -n coq -k version 8.8.0
 opam install coq -j3
-opam install coq-mathcomp-ssreflect.1.7.0 -j3
+opam install coq-mathcomp-ssreflect -j3
 ```
 Replace `ssreflect` here by the package you want, the dependencies will be
 installed automatically. We recommend pinning a particular version of Coq
-(here `8.8.0`).
+(we give `8.8.0` as an example, see `CHANGELOG.md` for the supported versions).
 To get the latest development version you need to execute the following:
 ```
 opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
@@ -49,7 +49,7 @@ the directory.
 ## Compilation and installation with make
 
 The instructions assume you are in the `mathcomp` directory and that
-you have a supported version of Coq: 8.6, 8.7 or 8.8.
+you have a supported version of Coq (listed in `CHANGLOG.md`).
 
 If `coqc` is in your `PATH`, then you are good to go.  Alternatively, you
 can export the `COQBIN` variable to tell `make` where the `coqc` binary is:
@@ -78,7 +78,7 @@ this file `INSTALL.md`) and that you have OPAM installed and
 configured with the standard Coq repositories.
 
 First, we recommend pinning a particular version of Coq
-(here `8.8.0`):
+(e.g. `8.8.0`):
 ```
 opam pin add -n coq -k version 8.8.0
 ```
