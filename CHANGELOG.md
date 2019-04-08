@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.8.0] - 2019-04-08
 
 Drop compatibility with Coq 8.6 (OCaml plugin removed).
 MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
@@ -64,7 +64,7 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
   + `countalg` goes from the field to the algebra package
   + `finalg` inherits from countalg
   + `closed_field` contains the construction of algebraic closure
-    for countable fields that used to be in countalg.
+    for countable fields that used to be in the file `countalg`.
 
 - Maximal implicits applied to reflection, injectivity and cancellation
   lemmas so that they are easier to pass to combinator lemmas such as
@@ -122,6 +122,8 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
   directive.
 
 - Many corrections in implicits declarations.
+
+- fixed missing joins in `ssralg`, `ssrnum`, `finalg` and `countalg`
 
 ### Renamed
 
