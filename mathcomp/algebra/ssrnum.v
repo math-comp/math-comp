@@ -417,7 +417,6 @@ Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
-Canonical join_numDomainType.
 Notation numFieldType := type.
 Notation "[ 'numFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'numFieldType'  'of'  T ]") : form_scope.
@@ -626,8 +625,7 @@ Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
-Definition join_fieldType := @GRing.Field.Pack realDomainType xclass.
-Definition join_numFieldType := @NumField.Pack realDomainType xclass.
+Definition join_realDomainType := @RealDomain.Pack numFieldType xclass.
 
 End ClassDef.
 
@@ -660,8 +658,7 @@ Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
 Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
-Canonical join_fieldType.
-Canonical join_numFieldType.
+Canonical join_realDomainType.
 Notation realFieldType := type.
 Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
