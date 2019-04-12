@@ -40,7 +40,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*                 are and e is total.                                        *)
 (*     sort e s == a permutation of the sequence s, that is e-sorted when e   *)
 (*                 is total (computed by a merge sort with the merge function *)
-(*                 above).                                                    *)
+(*                 above).  This sort function is also designed to be stable. *)
 (*   mem2 s x y == x, then y occur in the sequence (path) s; this is          *)
 (*                 non-strict: mem2 s x x = (x \in s).                        *)
 (*     next c x == the successor of the first occurrence of x in the sequence *)
@@ -375,84 +375,11 @@ Qed.
 
 End EqPath.
 
-
 (* Ordered paths and sorting. *)
 
 Section SortSeq.
 
-Variable T : eqType.
-Variable leT : rel T.
-
-Definition sorted s := if s is x :: s' then path leT x s' else true.
-
-Lemma path_sorted x s : path leT x s -> sorted s.
-Proof. by case: s => //= y s /andP[]. Qed.
-
-Lemma path_min_sorted x s :
-  {in s, forall y, leT x y} -> path leT x s = sorted s.
-Proof. by case: s => //= y s -> //; apply: mem_head. Qed.
-
-Section Transitive.
-
-Hypothesis leT_tr : transitive leT.
-
-Lemma subseq_order_path x s1 s2 :
-  subseq s1 s2 -> path leT x s2 -> path leT x s1.
-Proof.
-elim: s2 x s1 => [|y s2 IHs] x [|z s1] //= {IHs}/(IHs y).
-case: eqP => [-> | _] IHs /andP[] => [-> // | leTxy /IHs /=].
-by case/andP=> /(leT_tr leTxy)->.
-Qed.
-
-Lemma order_path_min x s : path leT x s -> all (leT x) s.
-Proof.
-move/subseq_order_path=> le_x_s; apply/allP=> y.
-by rewrite -sub1seq => /le_x_s/andP[].
-Qed.
-
-Lemma subseq_sorted s1 s2 : subseq s1 s2 -> sorted s2 -> sorted s1.
-Proof.
-case: s1 s2 => [|x1 s1] [|x2 s2] //= sub_s12 /(subseq_order_path sub_s12).
-by case: eqP => [-> | _ /andP[]].
-Qed.
-
-Lemma sorted_filter a s : sorted s -> sorted (filter a s).
-Proof. exact: subseq_sorted (filter_subseq a s). Qed.
-
-Lemma sorted_uniq : irreflexive leT -> forall s, sorted s -> uniq s.
-Proof.
-move=> leT_irr; elim=> //= x s IHs s_ord.
-rewrite (IHs (path_sorted s_ord)) andbT; apply/negP=> s_x.
-by case/allPn: (order_path_min s_ord); exists x; rewrite // leT_irr.
-Qed.
-
-Lemma eq_sorted : antisymmetric leT ->
-  forall s1 s2, sorted s1 -> sorted s2 -> perm_eq s1 s2 -> s1 = s2.
-Proof.
-move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
-  by case: {+}s2 (perm_size eq_s12).
-have s2_x1: x1 \in s2 by rewrite -(perm_mem eq_s12) mem_head.
-case: s2 s2_x1 eq_s12 ord_s2 => //= x2 s2; rewrite in_cons.
-case: eqP => [<- _| ne_x12 /= s2_x1] eq_s12 ord_s2.
-  by rewrite {IHs1}(IHs1 s2) ?(@path_sorted x1) // -(perm_cons x1).
-case: (ne_x12); apply: leT_asym; rewrite (allP (order_path_min ord_s2)) //.
-have: x2 \in x1 :: s1 by rewrite (perm_mem eq_s12) mem_head.
-case/predU1P=> [eq_x12 | s1_x2]; first by case ne_x12.
-by rewrite (allP (order_path_min ord_s1)).
-Qed.
-
-Lemma eq_sorted_irr : irreflexive leT ->
-  forall s1 s2, sorted s1 -> sorted s2 -> s1 =i s2 -> s1 = s2.
-Proof.
-move=> leT_irr s1 s2 s1_sort s2_sort eq_s12.
-have: antisymmetric leT.
-  by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); apply: leT_tr ltnm.
-by move/eq_sorted; apply=> //; apply: uniq_perm => //; apply: sorted_uniq.
-Qed.
-
-End Transitive.
-
-Hypothesis leT_total : total leT.
+Variables (T : Type) (leT : rel T).
 
 Fixpoint merge s1 :=
   if s1 is x1 :: s1' then
@@ -462,40 +389,6 @@ Fixpoint merge s1 :=
       else s1 in
     merge_s1
   else id.
-
-Lemma merge_path x s1 s2 :
-  path leT x s1 -> path leT x s2 -> path leT x (merge s1 s2).
-Proof.
-elim: s1 s2 x => //= x1 s1 IHs1.
-elim=> //= x2 s2 IHs2 x /andP[le_x_x1 ord_s1] /andP[le_x_x2 ord_s2].
-case: ifP => le_x21 /=; first by rewrite le_x_x2 {}IHs2 // le_x21.
-by rewrite le_x_x1 IHs1 //=; have:= leT_total x2 x1; rewrite le_x21 /= => ->.
-Qed.
-
-Lemma merge_sorted s1 s2 : sorted s1 -> sorted s2 -> sorted (merge s1 s2).
-Proof.
-case: s1 s2 => [|x1 s1] [|x2 s2] //= ord_s1 ord_s2.
-case: ifP => le_x21 /=.
-  by apply: (@merge_path x2 (x1 :: s1)) => //=; rewrite le_x21.
-by apply: merge_path => //=; have:= leT_total x2 x1; rewrite le_x21 /= => ->.
-Qed.
-
-Lemma perm_merge s1 s2 : perm_eql (merge s1 s2) (s1 ++ s2).
-Proof.
-apply/permPl; rewrite perm_sym; elim: s1 s2 => //= x1 s1 IHs1.
-elim=> [|x2 s2 IHs2]; rewrite /= ?cats0 //.
-case: ifP => _ /=; last by rewrite perm_cons.
-by rewrite (perm_catCA (_ :: _) [::x2]) perm_cons.
-Qed.
-
-Lemma mem_merge s1 s2 : merge s1 s2 =i s1 ++ s2.
-Proof. by apply: perm_mem; rewrite perm_merge. Qed.
-
-Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
-Proof. by apply: perm_size; rewrite perm_merge. Qed.
-
-Lemma merge_uniq s1 s2 : uniq (merge s1 s2) = uniq (s1 ++ s2).
-Proof. by apply: perm_uniq; rewrite perm_merge. Qed.
 
 Fixpoint merge_sort_push s1 ss :=
   match ss with
@@ -514,6 +407,30 @@ Fixpoint merge_sort_rec ss s :=
 
 Definition sort := merge_sort_rec [::].
 
+Definition sorted s := if s is x :: s' then path leT x s' else true.
+
+Lemma path_sorted x s : path leT x s -> sorted s.
+Proof. by case: s => //= y s /andP[]. Qed.
+
+Hypothesis leT_total : total leT.
+
+Lemma merge_path x s1 s2 :
+  path leT x s1 -> path leT x s2 -> path leT x (merge s1 s2).
+Proof.
+elim: s1 s2 x => //= x1 s1 IHs1.
+elim=> //= x2 s2 IHs2 x /andP[le_x_x1 ord_s1] /andP[le_x_x2 ord_s2].
+case: ifP => le_x21 /=; first by rewrite le_x_x2 {}IHs2 // le_x21.
+by rewrite le_x_x1 IHs1 //=; have:= leT_total x2 x1; rewrite le_x21 /= => ->.
+Qed.
+
+Lemma merge_sorted s1 s2 : sorted s1 -> sorted s2 -> sorted (merge s1 s2).
+Proof.
+case: s1 s2 => [|x1 s1] [|x2 s2] //= ord_s1 ord_s2.
+case: ifP => le_x21 /=.
+  by apply: (@merge_path x2 (x1 :: s1)) => //=; rewrite le_x21.
+by apply: merge_path => //=; have:= leT_total x2 x1; rewrite le_x21 /= => ->.
+Qed.
+
 Lemma sort_sorted s : sorted (sort s).
 Proof.
 rewrite /sort; have allss: all sorted [::] by [].
@@ -529,13 +446,151 @@ case/andP=> ord_s2 ord_ss ord_s1.
 by case: {1}s2=> /= [|_ _]; [rewrite ord_s1 | apply: IHss (merge_sorted _ _)].
 Qed.
 
+Lemma path_min_sorted x s :
+  all [pred y | leT x y] s -> path leT x s = sorted s.
+Proof. by case: s => //= y s /andP [->]. Qed.
+
+Hypothesis leT_tr : transitive leT.
+
+Lemma order_path_min x s : path leT x s -> all (leT x) s.
+Proof.
+elim: s => //= y [//|z s] ihs /andP[xy yz]; rewrite xy {}ihs//.
+by move: yz => /= /andP[/(leT_tr _)->].
+Qed.
+
+End SortSeq.
+
+Arguments order_path_min {T leT} leT_tr {x s}.
+Arguments path_min_sorted {T leT x s}.
+
+Section SortMap.
+
+Variables (T T' : Type) (f : T' -> T) (leT : rel T).
+
+Let leTf := [rel x y | leT (f x) (f y)].
+
+Lemma merge_map s1 s2 : merge leT (map f s1) (map f s2) =
+                          map f (merge leTf s1 s2).
+Proof.
+elim: s1 s2 => [ | a s1 IHs1] //=.
+elim => [| b s2 IHs2] //=; case: ifP => _; first by rewrite map_cons IHs2.
+by rewrite [RHS]map_cons -IHs1 map_cons.
+Qed.
+
+Lemma sort_map s : sort leT (map f s) = map f (sort leTf s).
+Proof.
+have map_pop s1 ss :
+  merge_sort_pop leT (map f s1) (map (map f) ss) =
+  map f (merge_sort_pop leTf s1 ss).
+  by elim: ss s1 => [|x ss IH] s1 //=; rewrite merge_map IH.
+have map_push s1 ss : merge_sort_push leT (map f s1) (map (map f) ss) =
+  map (map f) (merge_sort_push leTf s1 ss).
+  elim: ss s1 => [| [|y s2] ss IH] s1 //.
+  by rewrite 2!map_cons /= -IH -merge_map !map_cons.
+rewrite /sort -[[::]]/(map (map f) [::]).
+elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
+case: s => [|x [|y s]]; rewrite -?map_pop //= ltnS=> /ltnW sz.
+case: ifP => _; rewrite -[[:: f _; f _]]/[seq f i | i <- [:: _; _]];
+  rewrite map_push IHn //.
+Qed.
+
+Lemma sorted_map s : sorted leT (map f s) = sorted leTf s.
+Proof.
+elim: s => [|x [|y s] IH] //=.
+by rewrite -[path _ _ _]/(sorted leT (_ :: _)) -map_cons IH.
+Qed.
+
+End SortMap.
+
+Lemma rev_sorted (T : Type) (leT : rel T) s :
+  sorted leT (rev s) = sorted (fun y x => leT x y) s.
+Proof. by case: s => //= x p; rewrite -rev_path lastI rev_rcons. Qed.
+
+Section EqSortSeq.
+
+Variable T : eqType.
+Variable leT : rel T.
+
+Local Notation merge := (merge leT).
+Local Notation sort := (sort leT).
+Local Notation sorted := (sorted leT).
+
+Section Transitive.
+
+Hypothesis leT_tr : transitive leT.
+
+Lemma subseq_order_path x s1 s2 :
+  subseq s1 s2 -> path leT x s2 -> path leT x s1.
+Proof.
+elim: s2 x s1 => [|y s2 IHs] x [|z s1] //= {IHs}/(IHs y).
+case: eqP => [-> | _] IHs /andP[] => [-> // | leTxy /IHs /=].
+by case/andP=> /(leT_tr leTxy)->.
+Qed.
+
+Lemma subseq_sorted s1 s2 : subseq s1 s2 -> sorted s2 -> sorted s1.
+Proof.
+case: s1 s2 => [|x1 s1] [|x2 s2] //= sub_s12 /(subseq_order_path sub_s12).
+by case: eqP => [-> | _ /andP[]].
+Qed.
+
+Lemma sorted_filter a s : sorted s -> sorted (filter a s).
+Proof. exact: subseq_sorted (filter_subseq a s). Qed.
+
+Lemma sorted_uniq : irreflexive leT -> forall s, sorted s -> uniq s.
+Proof.
+move=> leT_irr; elim=> //= x s IHs s_ord.
+rewrite (IHs (path_sorted s_ord)) andbT; apply/negP=> s_x.
+by case/allPn: (order_path_min leT_tr s_ord); exists x; rewrite // leT_irr.
+Qed.
+
+Lemma eq_sorted : antisymmetric leT ->
+  forall s1 s2, sorted s1 -> sorted s2 -> perm_eq s1 s2 -> s1 = s2.
+Proof.
+move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
+  by case: {+}s2 (perm_size eq_s12).
+have s2_x1: x1 \in s2 by rewrite -(perm_mem eq_s12) mem_head.
+case: s2 s2_x1 eq_s12 ord_s2 => //= x2 s2; rewrite in_cons.
+case: eqP => [<- _| ne_x12 /= s2_x1] eq_s12 ord_s2.
+  by rewrite {IHs1}(IHs1 s2) ?(@path_sorted _ _ x1) // -(perm_cons x1).
+case: (ne_x12); apply: leT_asym.
+rewrite (allP (order_path_min leT_tr ord_s2)) //.
+have: x2 \in x1 :: s1 by rewrite (perm_eq_mem eq_s12) mem_head.
+case/predU1P=> [eq_x12 | s1_x2]; first by case ne_x12.
+by rewrite (allP (order_path_min leT_tr ord_s1)).
+Qed.
+
+Lemma eq_sorted_irr : irreflexive leT ->
+  forall s1 s2, sorted s1 -> sorted s2 -> s1 =i s2 -> s1 = s2.
+Proof.
+move=> leT_irr s1 s2 s1_sort s2_sort eq_s12.
+have: antisymmetric leT.
+  by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); apply: leT_tr ltnm.
+by move/eq_sorted; apply=> //; apply: uniq_perm => //; apply: sorted_uniq.
+Qed.
+
+End Transitive.
+
+Lemma perm_merge s1 s2 : perm_eql (merge s1 s2) (s1 ++ s2).
+Proof.
+apply/permPl; rewrite perm_sym; elim: s1 s2 => //= x1 s1 IHs1.
+elim=> [|x2 s2 IHs2]; rewrite /= ?cats0 //.
+case: ifP => _ /=; last by rewrite perm_cons.
+by rewrite (perm_catCA (_ :: _) [::x2]) perm_cons.
+Qed.
+
+Lemma mem_merge s1 s2 : merge s1 s2 =i s1 ++ s2.
+Proof. by apply: perm_mem; rewrite perm_merge. Qed.
+
+Lemma merge_uniq s1 s2 : uniq (merge s1 s2) = uniq (s1 ++ s2).
+Proof. by apply: perm_uniq; rewrite perm_merge. Qed.
+
 Lemma perm_sort s : perm_eql (sort s) s.
 Proof.
 rewrite /sort; apply/permPl; pose catss := foldr (@cat T) [::].
 rewrite perm_sym -{1}[s]/(catss [::] ++ s).
 elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
-have: perm_eq (catss ss ++ s) (merge_sort_pop s ss).
-  elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(permPr (IHss _)).
+have: perm_eq (catss ss ++ s) (merge_sort_pop leT s ss).
+  elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(perm_eqrP (IHss _)).
   by rewrite perm_catC catA perm_catC perm_cat2l -perm_merge.
 case: s => // x1 [//|x2 s _]; move/ltnW; move/IHn=> {n IHn}IHs.
 rewrite -{IHs}(permPr (IHs _)) ifE; set s1 := if_expr _ _ _.
@@ -550,11 +605,10 @@ Qed.
 Lemma mem_sort s : sort s =i s.
 Proof. by apply: perm_mem; rewrite perm_sort. Qed.
 
-Lemma size_sort s : size (sort s) = size s.
-Proof. by apply: perm_size; rewrite perm_sort. Qed.
-
 Lemma sort_uniq s : uniq (sort s) = uniq s.
 Proof. by apply: perm_uniq; rewrite perm_sort. Qed.
+
+Hypothesis leT_total : total leT.
 
 Lemma perm_sortP : transitive leT -> antisymmetric leT ->
   forall s1 s2, reflect (sort s1 = sort s2) (perm_eq s1 s2).
@@ -565,11 +619,22 @@ apply: eq_sorted; rewrite ?sort_sorted //.
 by rewrite perm_sort (permPl eq12) -perm_sort.
 Qed.
 
-End SortSeq.
+End EqSortSeq.
 
-Lemma rev_sorted (T : eqType) (leT : rel T) s :
-  sorted leT (rev s) = sorted (fun y x => leT x y) s.
-Proof. by case: s => //= x p; rewrite -rev_path lastI rev_rcons. Qed.
+Lemma perm_iota_sort (T : Type) (leT : rel T) x0 s :
+  {i_s | perm_eq i_s (iota 0 (size s)) & sort leT s = map (nth x0 s) i_s}.
+Proof.
+exists (sort [rel i j | leT (nth x0 s i) (nth x0 s j)] (iota 0 (size s))).
+  by rewrite perm_sort.
+by rewrite -[X in sort leT X](mkseq_nth x0) sort_map.
+Qed.
+
+Lemma size_sort (T : Type) (leT : rel T) s :
+  size (sort leT s) = size s.
+Proof.
+case: s => [| x s] //; have [s1 pp qq] := perm_iota_sort leT x (x::s).
+by rewrite qq size_map (perm_eq_size pp) size_iota.
+Qed.
 
 Lemma ltn_sorted_uniq_leq s : sorted ltn s = uniq s && sorted leq s.
 Proof.

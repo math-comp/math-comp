@@ -1766,7 +1766,7 @@ case/predU1P: b_y => [-> // | b'_y].
 have:= abelian_type_dvdn_sorted G; rewrite -def_t def_b.
 case/splitPr: b'_y => b1 b2; rewrite -cat_rcons rcons_cat map_cat !map_rcons.
 rewrite headI /= cat_path -(last_cons 2) -headI last_rcons.
-case/andP=> _ /order_path_min min_y.
+case/andP=> _ /(@order_path_min nat) min_y.
 apply: (allP (min_y _)) => [? ? ? ? dv|]; first exact: (dvdn_trans dv).
 by rewrite mem_rcons mem_head.
 Qed.
