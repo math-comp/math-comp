@@ -32,6 +32,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Arithmetic theorems: `modn_divl` and `divn_modl`.
 
+- Added map/parametricity theorems about `path`, `sort` and `sorted`:
+  `homo_path`, `mono_path`, `homo_path_in`, `mono_path_in`,
+  `homo_sorted`, `mono_sorted`, `map_merge`, `merge_map`, `map_sort`,
+  `sort_map`, `sorted_map`, `homo_sorted_in`, `mono_sorted_in`,
+  `sort_map_in`/
+
+- Added the theorem `perm_iota_sort` to express that the sorting of
+  any sequence `s` is equal to a mapping of `iota 0 (size s)` to the
+  nth elements of `s`, so that one can still reason on `nat`, even
+  though the elements of `s` are not in an `eqType`.
+
+- Added a comment in the documentation to explain `sort` is stable,
+  without proving it formally, for now.
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
@@ -44,6 +58,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `t1`, and `t2` are non-`eqType`s in `[seq E | i <- s, j <- t1 ++ t2]`.
 
 - Generalized `muln_modr` and `muln_modl` removing hypothesis `0 < p`.
+
+- Generalized `sort` to non-`eqType`s (as well as `merge`,
+  `merge_sort_push`, `merge_sort_pop`), together with all the lemmas
+  that did not really rely on an `eqType`: `size_merge`, `size_sort`,
+  `merge_path`, `merge_sorted`, `sort_sorted`, `path_min_sorted`
+  (which statement was modified to remove the dependency in `eqType`),
+  and `order_path_min`.
 
 ### Infrastructure
 

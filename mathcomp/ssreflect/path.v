@@ -159,6 +159,26 @@ End Paths.
 
 Arguments pathP {T e x p}.
 
+Section HomoPath.
+
+Variables (T T' : Type) (leT : rel T) (leT' : rel T').
+
+Lemma homo_path f x s : {homo f : x y / leT x y >-> leT' x y} ->
+  path leT x s -> path leT' (f x) [seq f x | x <- s].
+Proof.
+move=> f_homo; elim: s => //= y s IHs in x *.
+by move=> /andP[le_xy path_y_s]; rewrite f_homo//= IHs.
+Qed.
+
+Lemma mono_path f x s : {mono f : x y / leT x y >-> leT' x y} ->
+  path leT' (f x) [seq f x | x <- s] = path leT x s.
+Proof. by move=> f_mon; elim: s => //= y s IHs in x *; rewrite f_mon IHs. Qed.
+
+End HomoPath.
+
+Arguments homo_path {T T' leT leT' f x s}.
+Arguments mono_path {T T' leT leT' f x s}.
+
 Section EqPath.
 
 Variables (n0 : nat) (T : eqType) (x0_cycle : T) (e : rel T).
@@ -375,6 +395,31 @@ Qed.
 
 End EqPath.
 
+Section EqHomoPath.
+
+Variables (T T' : eqType) (leT : rel T) (leT' : rel T').
+
+Lemma homo_path_in f x s : {in x :: s &, {homo f : x y / leT x y >-> leT' x y}} ->
+  path leT x s -> path leT' (f x) [seq f x | x <- s].
+Proof.
+move=> f_homo; elim: s => //= y s IHs in x f_homo *; move=> /andP[x_y y_s].
+rewrite f_homo ?(in_cons, mem_head, eqxx, orbT) ?IHs//= => z t z_mem t_mem.
+by apply: f_homo; rewrite in_cons ?(z_mem, t_mem, orbT).
+Qed.
+
+Lemma mono_path_in f x s : {in x :: s &, {mono f : x y / leT x y >-> leT' x y}} ->
+  path leT' (f x) [seq f x | x <- s] = path leT x s.
+Proof.
+move=> f_mono; elim: s => //= y s IHs in x f_mono *.
+rewrite f_mono ?(in_cons, mem_head, eqxx, orbT) ?IHs//= => z t z_mem t_mem.
+by rewrite f_mono// in_cons ?(z_mem, t_mem, orbT).
+Qed.
+
+End EqHomoPath.
+
+Arguments homo_path_in {T T' leT leT' f x s}.
+Arguments mono_path_in {T T' leT leT' f x s}.
+
 (* Ordered paths and sorting. *)
 
 Section SortSeq.
@@ -450,6 +495,13 @@ Lemma path_min_sorted x s :
   all [pred y | leT x y] s -> path leT x s = sorted s.
 Proof. by case: s => //= y s /andP [->]. Qed.
 
+Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
+Proof.
+rewrite size_cat; elim: s1 s2 => // x s1 IH1.
+elim=> //= [|y s2 IH2]; first by rewrite addn0.
+by case: leT; rewrite /= ?IH1 ?IH2 !addnS.
+Qed.
+
 Hypothesis leT_tr : transitive leT.
 
 Lemma order_path_min x s : path leT x s -> all (leT x) s.
@@ -460,47 +512,71 @@ Qed.
 
 End SortSeq.
 
+Arguments path_sorted {T leT x s}.
 Arguments order_path_min {T leT} leT_tr {x s}.
 Arguments path_min_sorted {T leT x s}.
 
 Section SortMap.
+Variables (T T' : Type) (f : T' -> T).
 
-Variables (T T' : Type) (f : T' -> T) (leT : rel T).
+Section Monotonicity.
+Variables (leT' : rel T') (leT : rel T).
 
-Let leTf := [rel x y | leT (f x) (f y)].
+Lemma homo_sorted : {homo f : x y / leT' x y >-> leT x y} ->
+  {homo map f : s / sorted leT' s >-> sorted leT s}.
+Proof. by move=> /homo_path f_path [|//= x s]. Qed.
+
+Section Strict.
+Hypothesis f_mono : {mono f : x y / leT' x y >-> leT x y}.
+
+Lemma mono_sorted : {mono map f : s / sorted leT' s >-> sorted leT s}.
+Proof. by case=> //= x s; rewrite (mono_path f_mono). Qed.
+
+Lemma map_merge : {morph map f : s1 s2 / merge leT' s1 s2 >-> merge leT s1 s2}.
+Proof.
+elim=> //= x s1 IHs1; elim => [|y s2 IHs2] //=; rewrite f_mono.
+by case: leT'; rewrite /= ?IHs1 ?IHs2.
+Qed.
+
+Lemma map_sort : {morph map f : s1 / sort leT' s1 >-> sort leT s1}.
+Proof.
+have map_pop s1 ss : map f (merge_sort_pop leT' s1 ss) =
+                     merge_sort_pop leT (map f s1) (map (map f) ss).
+  by elim: ss s1 => //= x ss IHss s1; rewrite IHss map_merge.
+have map_push s1 ss : map (map f) (merge_sort_push leT' s1 ss) =
+                     merge_sort_push leT (map f s1) (map (map f) ss).
+  by elim: ss s1 => [|[|y s2] ss IHss s1]//=; rewrite IHss map_merge.
+move=> s; rewrite /sort -[[::] in RHS]/(map (map f) [::]).
+elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
+case: s => [|x [|y s]]/=; rewrite ?map_pop//=.
+by move=> /ltnW s_small; rewrite IHn ?map_push// f_mono//; case: leT'.
+Qed.
+
+End Strict.
+End Monotonicity.
+
+Variable (leT : rel T).
+Local Notation leTf := (relpre f leT).
 
 Lemma merge_map s1 s2 : merge leT (map f s1) (map f s2) =
                           map f (merge leTf s1 s2).
-Proof.
-elim: s1 s2 => [ | a s1 IHs1] //=.
-elim => [| b s2 IHs2] //=; case: ifP => _; first by rewrite map_cons IHs2.
-by rewrite [RHS]map_cons -IHs1 map_cons.
-Qed.
+Proof. exact/esym/map_merge. Qed.
 
 Lemma sort_map s : sort leT (map f s) = map f (sort leTf s).
-Proof.
-have map_pop s1 ss :
-  merge_sort_pop leT (map f s1) (map (map f) ss) =
-  map f (merge_sort_pop leTf s1 ss).
-  by elim: ss s1 => [|x ss IH] s1 //=; rewrite merge_map IH.
-have map_push s1 ss : merge_sort_push leT (map f s1) (map (map f) ss) =
-  map (map f) (merge_sort_push leTf s1 ss).
-  elim: ss s1 => [| [|y s2] ss IH] s1 //.
-  by rewrite 2!map_cons /= -IH -merge_map !map_cons.
-rewrite /sort -[[::]]/(map (map f) [::]).
-elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
-case: s => [|x [|y s]]; rewrite -?map_pop //= ltnS=> /ltnW sz.
-case: ifP => _; rewrite -[[:: f _; f _]]/[seq f i | i <- [:: _; _]];
-  rewrite map_push IHn //.
-Qed.
+Proof. exact/esym/map_sort. Qed.
 
 Lemma sorted_map s : sorted leT (map f s) = sorted leTf s.
-Proof.
-elim: s => [|x [|y s] IH] //=.
-by rewrite -[path _ _ _]/(sorted leT (_ :: _)) -map_cons IH.
-Qed.
+Proof. exact: mono_sorted. Qed.
 
 End SortMap.
+
+Arguments homo_sorted {T T' f leT' leT}.
+Arguments mono_sorted {T T' f leT' leT}.
+Arguments map_merge {T T' f leT' leT}.
+Arguments map_sort {T T' f leT' leT}.
+Arguments merge_map {T T' f leT}.
+Arguments sort_map {T T' f leT}.
+Arguments sorted_map {T T' f leT}.
 
 Lemma rev_sorted (T : Type) (leT : rel T) s :
   sorted leT (rev s) = sorted (fun y x => leT x y) s.
@@ -551,12 +627,11 @@ move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
 have s2_x1: x1 \in s2 by rewrite -(perm_mem eq_s12) mem_head.
 case: s2 s2_x1 eq_s12 ord_s2 => //= x2 s2; rewrite in_cons.
 case: eqP => [<- _| ne_x12 /= s2_x1] eq_s12 ord_s2.
-  by rewrite {IHs1}(IHs1 s2) ?(@path_sorted _ _ x1) // -(perm_cons x1).
-case: (ne_x12); apply: leT_asym.
-rewrite (allP (order_path_min leT_tr ord_s2)) //.
-have: x2 \in x1 :: s1 by rewrite (perm_eq_mem eq_s12) mem_head.
+  by rewrite {IHs1}(IHs1 s2) ?(@path_sorted _ leT x1) // -(perm_cons x1).
+case: (ne_x12); apply: leT_asym; rewrite (allP (order_path_min _ ord_s2))//.
+have: x2 \in x1 :: s1 by rewrite (perm_mem eq_s12) mem_head.
 case/predU1P=> [eq_x12 | s1_x2]; first by case ne_x12.
-by rewrite (allP (order_path_min leT_tr ord_s1)).
+by rewrite (allP (order_path_min _ ord_s1)).
 Qed.
 
 Lemma eq_sorted_irr : irreflexive leT ->
@@ -590,7 +665,7 @@ rewrite /sort; apply/permPl; pose catss := foldr (@cat T) [::].
 rewrite perm_sym -{1}[s]/(catss [::] ++ s).
 elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
 have: perm_eq (catss ss ++ s) (merge_sort_pop leT s ss).
-  elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(perm_eqrP (IHss _)).
+  elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(permPr (IHss _)).
   by rewrite perm_catC catA perm_catC perm_cat2l -perm_merge.
 case: s => // x1 [//|x2 s _]; move/ltnW; move/IHn=> {n IHn}IHs.
 rewrite -{IHs}(permPr (IHs _)) ifE; set s1 := if_expr _ _ _.
@@ -632,9 +707,38 @@ Qed.
 Lemma size_sort (T : Type) (leT : rel T) s :
   size (sort leT s) = size s.
 Proof.
-case: s => [| x s] //; have [s1 pp qq] := perm_iota_sort leT x (x::s).
-by rewrite qq size_map (perm_eq_size pp) size_iota.
+case: s => [|x s] //; have [s1 pp qq] := perm_iota_sort leT x (x :: s).
+by rewrite qq size_map (perm_size pp) size_iota.
 Qed.
+
+Section EqHomoSortSeq.
+Variables (T T' : eqType) (f : T' -> T) (leT' : rel T') (leT : rel T).
+Implicit Types (s : seq T').
+
+Lemma homo_sorted_in s : {in s &, {homo f : x y / leT' x y >-> leT x y}} ->
+  sorted leT' s -> sorted leT [seq f x | x <- s].
+Proof. by case: s => //= x s /homo_path_in. Qed.
+
+Lemma mono_sorted_in s : {in s &, {mono f : x y / leT' x y >-> leT x y}} ->
+  sorted leT [seq f x | x <- s] = sorted leT' s.
+Proof. by case: s => // x s /mono_path_in /= ->. Qed.
+
+Hypothesis (leT'_sym : antisymmetric leT) (leT_tr : transitive leT).
+Hypothesis (leT'_total : total leT') (leT_total : total leT).
+
+Lemma sort_map_in s : {in s &, {homo f : x y / leT' x y >-> leT x y}} ->
+  sort leT [seq f x | x <- s] = [seq f x | x <- sort leT' s].
+Proof.
+move=> fP; apply: (@eq_sorted _ leT); rewrite ?sort_sorted//; last first.
+  by rewrite perm_sort perm_map// perm_sym perm_sort.
+by rewrite homo_sorted_in ?sort_sorted// => x y; rewrite !mem_sort; apply: fP.
+Qed.
+
+End EqHomoSortSeq.
+
+Arguments homo_sorted_in {T T' f leT' leT}.
+Arguments mono_sorted_in {T T' f leT' leT}.
+Arguments sort_map_in {T T' f leT' leT}.
 
 Lemma ltn_sorted_uniq_leq s : sorted ltn s = uniq s && sorted leq s.
 Proof.
