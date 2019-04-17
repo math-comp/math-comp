@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq div choice fintype path.
 From mathcomp
-Require Import bigop ssralg finset fingroup zmodp poly.
+Require Import bigop ssralg finset fingroup poly.
 
 (******************************************************************************)
 (*                                                                            *)
