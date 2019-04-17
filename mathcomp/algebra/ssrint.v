@@ -352,7 +352,7 @@ End intUnitRing.
 Canonical int_unitRingType :=
   Eval hnf in UnitRingType int intUnitRing.comMixin.
 Canonical int_comUnitRing := Eval hnf in [comUnitRingType of int].
-Canonical int_iDomain :=
+Canonical int_idomainType :=
   Eval hnf in IdomainType int intUnitRing.idomain_axiomz.
 
 Canonical int_countZmodType := [countZmodType of int].
@@ -364,8 +364,6 @@ Canonical int_countIdomainType := [countIdomainType of int].
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
 
-Canonical int_normedType := NormedType int int (fun m => (absz m)%:Z).
-
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
 Arguments absz m%distn_scope.
@@ -375,6 +373,8 @@ Module intOrdered.
 Section intOrdered.
 Implicit Types m n p : int.
 Local Coercion Posz : nat >-> int.
+
+Local Notation normz m := (absz m)%:Z.
 
 Definition lez m n :=
   match m, n with
@@ -413,10 +413,10 @@ Qed.
 Fact lez_total m n : lez m n || lez n m.
 Proof. by move: m n => [] m [] n //=; apply: leq_total. Qed.
 
-Fact normzN m : norm (- m) = norm m.
+Fact normzN m : normz (- m) = normz m.
 Proof. by case: m => // -[]. Qed.
 
-Fact gez0_norm m : lez 0 m -> norm m = m.
+Fact gez0_norm m : lez 0 m -> normz m = m.
 Proof. by case: m. Qed.
 
 Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).
@@ -424,7 +424,7 @@ Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
 
-Definition Mixin : realLeMixin int_iDomain :=
+Definition Mixin : realLeMixin int_idomainType :=
   RealLeMixin
     lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
 
@@ -435,9 +435,8 @@ Canonical int_porderType := POrderType ring_display int intOrdered.Mixin.
 Canonical int_latticeType := LatticeType int intOrdered.Mixin.
 Canonical int_orderType := OrderType int intOrdered.lez_total.
 Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
+Canonical int_normedDomainType := NormedDomainType int int intOrdered.Mixin.
 Canonical int_realDomainType := [realDomainType of int].
-Canonical int_lmodType := LmodType int int (GRing.regular_lmodMixin _).
-Canonical int_normedModType := NormedModType int int int_numDomainType.
 
 Section intOrderedTheory.
 
@@ -1693,7 +1692,7 @@ Section NormInt.
 
 Variable R : numDomainType.
 
-Lemma intr_norm m : `|m|%:~R = `|m%:~R| :> R.
+Lemma intr_norm m : `|m|%:~R = `|m%:~R : R|.
 Proof. by rewrite {2}[m]intEsign rmorphMsign normrMsign abszE normr_nat. Qed.
 
 Lemma normrMz m (x : R) : `|x *~ m| = `|x| *~ `|m|.

@@ -343,7 +343,7 @@ Canonical rat_comUnitRing := Eval hnf in [comUnitRingType of rat].
 Fact rat_field_axiom : GRing.Field.mixin_of rat_unitRing. Proof. exact. Qed.
 
 Definition RatFieldIdomainMixin := (FieldIdomainMixin rat_field_axiom).
-Canonical rat_iDomain :=
+Canonical rat_idomainType :=
   Eval hnf in IdomainType rat (FieldIdomainMixin rat_field_axiom).
 Canonical rat_fieldType := FieldType rat rat_field_axiom.
 
@@ -568,9 +568,7 @@ Qed.
 Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite /lt_rat lt_def rat_eq. Qed.
 
-Canonical rat_normedType := NormedType rat rat normq.
-
-Definition ratLeMixin : realLeMixin rat_iDomain :=
+Definition ratLeMixin : realLeMixin rat_idomainType :=
   RealLeMixin le_rat0D le_rat0M le_rat0_anti subq_ge0
               (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
@@ -578,11 +576,10 @@ Canonical rat_porderType := POrderType ring_display rat ratLeMixin.
 Canonical rat_latticeType := LatticeType rat ratLeMixin.
 Canonical rat_orderType := OrderType rat le_rat_total.
 Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
+Canonical rat_normedDomainType := NormedDomainType rat rat ratLeMixin.
 Canonical rat_numFieldType := [numFieldType of rat].
 Canonical rat_realDomainType := [realDomainType of rat].
 Canonical rat_realFieldType := [realFieldType of rat].
-Canonical rat_lmodType := LmodType rat rat (GRing.regular_lmodMixin _).
-Canonical rat_normedModType := NormedModType rat rat rat_numDomainType.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
 Proof.

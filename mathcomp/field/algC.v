@@ -60,8 +60,7 @@ Local Open Scope ring_scope.
 (* order 2, making it into a field of complex numbers.                        *)
 Lemma ComplexNumMixin (L : closedFieldType) (conj : {rmorphism L -> L}) :
     involutive conj -> ~ conj =1 id ->
-  {numL : numMixin L |
-   forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}.
+  {numL : numMixin L | forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}.
 Proof.
 move=> conjK conj_nt.
 have nz2: 2%:R != 0 :> L.
@@ -234,9 +233,8 @@ Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
 
 Parameter numMixin : numMixin idomainType.
 Canonical porderType := POrderType ring_display type numMixin.
-Canonical normedType := NormedType type type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
-Canonical normedModType := NormedModType type type numDomainType.
+Canonical normedDomainType := NormedDomainType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
@@ -260,6 +258,7 @@ Fact conjL_nt : ~ conjL =1 id.
 Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
 Definition LnumMixin := ComplexNumMixin conjL_K conjL_nt.
+
 Definition Lnum := NumDomainType L (projT1 LnumMixin).
 Definition normK_ : forall x : Lnum, `|x| ^+ 2 = x * conjL x :=
   projT2 LnumMixin.
@@ -437,9 +436,8 @@ Qed.
 Definition numMixin : numMixin closedFieldType :=
   projT1 (ComplexNumMixin conjK conj_nt).
 Canonical porderType := POrderType ring_display type numMixin.
-Canonical normedType := NormedType type type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
-Canonical normedModType := NormedModType type type numDomainType.
+Canonical normedDomainType := NormedDomainType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
@@ -547,9 +545,8 @@ Canonical comRingType.
 Canonical comUnitRingType.
 Canonical idomainType.
 Canonical porderType.
-Canonical normedType.
 Canonical numDomainType.
-Canonical normedModType.
+Canonical normedDomainType.
 Canonical fieldType.
 Canonical numFieldType.
 Canonical decFieldType.

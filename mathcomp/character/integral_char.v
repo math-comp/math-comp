@@ -673,7 +673,7 @@ have{Qpi1} Zpi1: pi1 \in Cint.
   by rewrite Cint_rat_Aint // rpred_prod // => s _; apply: Aint_char.
 have{pi1 Zpi1} pi2_ge1: 1 <= pi2.
   have ->: pi2 = `|pi1| ^+ 2.
-    by rewrite (big_morph norm (@normrM _) (@normr1 _)) -prodrXl.
+    by rewrite (big_morph Num.norm (@normrM _) (@normr1 _)) -prodrXl.
   by rewrite Cint_normK // sqr_Cint_ge1 //; apply/prodf_neq0.
 have Sgt0: (#|S| > 0)%N by rewrite (cardD1 g) [g \in S]Sg.
 rewrite -mulr_natr -ler_pdivl_mulr ?ltr0n //.
