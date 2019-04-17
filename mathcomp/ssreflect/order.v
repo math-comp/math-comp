@@ -1212,6 +1212,7 @@ Definition choiceType := @Choice.Pack cT xclass.
 Definition countType := @Countable.Pack cT xclass.
 Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
+Definition count_porderType := @POrder.Pack disp countType xclass.
 Definition fin_porderType := @POrder.Pack disp finType xclass.
 End ClassDef.
 
@@ -1229,6 +1230,7 @@ Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
+Canonical count_porderType.
 Canonical fin_porderType.
 Notation finPOrderType := type.
 Notation "[ 'finPOrderType' 'of' T ]" :=
@@ -1283,9 +1285,15 @@ Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
 Definition latticeType := @Lattice.Pack disp cT xclass.
 Definition blatticeType := @BLattice.Pack disp cT xclass.
 Definition tblatticeType := @TBLattice.Pack disp cT xclass.
+Definition count_latticeType := @Lattice.Pack disp countType xclass.
+Definition count_blatticeType := @BLattice.Pack disp countType xclass.
+Definition count_tblatticeType := @TBLattice.Pack disp countType xclass.
 Definition fin_latticeType := @Lattice.Pack disp finType xclass.
 Definition fin_blatticeType := @BLattice.Pack disp finType xclass.
 Definition fin_tblatticeType := @TBLattice.Pack disp finType xclass.
+Definition finPOrder_latticeType := @Lattice.Pack disp finPOrderType xclass.
+Definition finPOrder_blatticeType := @BLattice.Pack disp finPOrderType xclass.
+Definition finPOrder_tblatticeType := @TBLattice.Pack disp finPOrderType xclass.
 
 End ClassDef.
 
@@ -1311,9 +1319,15 @@ Canonical finPOrderType.
 Canonical latticeType.
 Canonical blatticeType.
 Canonical tblatticeType.
+Canonical count_latticeType.
+Canonical count_blatticeType.
+Canonical count_tblatticeType.
 Canonical fin_latticeType.
 Canonical fin_blatticeType.
 Canonical fin_tblatticeType.
+Canonical finPOrder_latticeType.
+Canonical finPOrder_blatticeType.
+Canonical finPOrder_tblatticeType.
 Notation finLatticeType  := type.
 Notation "[ 'finLatticeType' 'of' T ]" :=
   (@pack T _ _ _ erefl _ _ phant_id  _ _ phant_id _ _ phant_id)
@@ -1365,8 +1379,18 @@ Definition tblatticeType := @TBLattice.Pack disp cT xclass.
 Definition finLatticeType := @FinLattice.Pack disp cT xclass.
 Definition cblatticeType := @CBLattice.Pack disp cT xclass.
 Definition ctblatticeType := @CTBLattice.Pack disp cT xclass.
-Definition fin_cblatticeType := @CBLattice.Pack disp finLatticeType xclass.
-Definition fin_ctblatticeType := @CTBLattice.Pack disp finLatticeType xclass.
+Definition count_cblatticeType := @CBLattice.Pack disp countType xclass.
+Definition count_ctblatticeType := @CTBLattice.Pack disp countType xclass.
+Definition fin_cblatticeType := @CBLattice.Pack disp finType xclass.
+Definition fin_ctblatticeType := @CTBLattice.Pack disp finType xclass.
+Definition finPOrder_cblatticeType := @CBLattice.Pack disp finPOrderType xclass.
+Definition finPOrder_ctblatticeType :=
+  @CTBLattice.Pack disp finPOrderType xclass.
+Definition finLattice_cblatticeType :=
+  @CBLattice.Pack disp finLatticeType xclass.
+Definition finLattice_ctblatticeType :=
+  @CTBLattice.Pack disp finLatticeType xclass.
+
 
 End ClassDef.
 
@@ -1398,8 +1422,14 @@ Canonical tblatticeType.
 Canonical finLatticeType.
 Canonical cblatticeType.
 Canonical ctblatticeType.
+Canonical count_cblatticeType.
+Canonical count_ctblatticeType.
 Canonical fin_cblatticeType.
 Canonical fin_ctblatticeType.
+Canonical finPOrder_cblatticeType.
+Canonical finPOrder_ctblatticeType.
+Canonical finLattice_cblatticeType.
+Canonical finLattice_ctblatticeType.
 Notation finCLatticeType  := type.
 Notation "[ 'finCLatticeType' 'of' T ]" :=
   (@pack T _ _ erefl _ _ phant_id  _ _ phant_id _ _ phant_id)
