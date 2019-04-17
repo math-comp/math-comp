@@ -2,14 +2,15 @@
 # - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.7 .)
 #   - choice of the OCaml compiler: var OPAM_SWITCH in {base, edge}
 #     (Dockerfile containing: "opam switch set $compiler && eval $(opam env)")
-#   - master (protected branch) => push on GitLab registry and Docker Hub
-#   - other branches (not tags) => push on GitLab registry
+#   - all branches (not tags) => push on GitLab registry
 #   - GitHub PRs => push on GitLab and report back thanks to @coqbot
 # - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.6)
 #   - script template foreach project (custom CONTRIB_URL, script)
 #   - jobs foreach project and Coq version (custom COQ_VERSION, CONTRIB_VERSION)
+# - deploy stage (only branch "master" and environment "deployment")
+#   - pull each built image from GitLab registry => push to Docker Hub
 #
-# Config for protected branches:
+# Config for protected environment "deployment":
 # - set vars HUB_REGISTRY, HUB_REGISTRY_USER, HUB_REGISTRY_IMAGE, HUB_TOKEN
 #
 # Remark:
@@ -25,7 +26,36 @@
 
 stages:
   - build
+  - deploy
   - test
+
+################
+#### build stage
+################
+
+# set var OPAM_SWITCH (if need be) and COQ_VERSION when using
+.make-build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    # This image will be built locally only (not pushed)
+    IMAGE: "mathcomp-dev:make_coq-${COQ_VERSION}"
+    OPAM_SWITCH: "edge"
+  before_script:
+    - echo "${OPAM_SWITCH}"
+    - echo "${COQ_VERSION}"
+  script:
+    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+  except:
+    - tags
+    - merge_requests
+
+make-coq-latest:
+  extends: .make-build
+  variables:
+    COQ_VERSION: "latest"
 
 # set var OPAM_SWITCH (if need be) when using
 .opam-build:
@@ -35,23 +65,14 @@ stages:
     - docker:dind
   variables:
     IMAGE: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_${CI_JOB_NAME}"
-    HUB_IMAGE: "${HUB_REGISTRY_IMAGE}:${CI_JOB_NAME}"
     OPAM_SWITCH: "edge"
   before_script:
+    - echo "${OPAM_SWITCH}"
     - echo "${CI_JOB_TOKEN}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
   script:
     - docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//-/:}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
     - docker push "${IMAGE}"
     - docker logout "${CI_REGISTRY}"
-    - |
-      if [ -n "${HUB_REGISTRY_IMAGE}" ]; then
-        set -e
-        echo "${HUB_TOKEN}" | docker login -u "${HUB_REGISTRY_USER}" --password-stdin "${HUB_REGISTRY}"
-        docker tag "${IMAGE}" "${HUB_IMAGE}"
-        docker push "${HUB_IMAGE}"
-        docker logout "${HUB_REGISTRY}"
-        set +e
-      fi
   except:
     - tags
     - merge_requests
@@ -68,28 +89,10 @@ coq-8.9:
 coq-dev:
   extends: .opam-build
 
-# set var OPAM_SWITCH (if need be) and COQ_VERSION when using
-.make-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  variables:
-    # This image will be built locally only (not pushed)
-    IMAGE: "mathcomp-dev:make_coq-${COQ_VERSION}"
-    OPAM_SWITCH: "edge"
-  before_script:
-  script:
-    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
-  except:
-    - tags
-    - merge_requests
+################
+##### test stage
+################
 
-make-coq-latest:
-  extends: .make-build
-  variables:
-    COQ_VERSION: "latest"
-  
 # set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
 .ci:
   stage: test
@@ -98,11 +101,14 @@ make-coq-latest:
     GIT_STRATEGY: none
   before_script:
     - cat /proc/{cpu,mem}info || true
-    # don't printenv if there are private tokens
+    # don't printenv to avoid cluttering the log
     - opam config list
     - opam repo list
     - opam list
     - coqc --version
+    - echo "${COQ_VERSION}"
+    - echo "${CONTRIB_URL}"
+    - echo "${CONTRIB_VERSION}"
     - git clone -b "${CONTRIB_VERSION}" --depth 1 "${CONTRIB_URL}" /home/coq/ci
     - cd /home/coq/ci
     - git rev-parse --verify HEAD
@@ -180,3 +186,46 @@ ci-lemma-overloading-dev:
   extends: .ci-lemma-overloading
   variables:
     COQ_VERSION: "dev"
+
+################
+### deploy stage
+################
+
+# Changes below (or jobs extending .docker-deploy) should be carefully
+# reviewed to avoid leaks of HUB_TOKEN
+.docker-deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  environment:
+    name: deployment
+    url: https://hub.docker.com/r/mathcomp/mathcomp-dev
+  variables:
+    HUB_IMAGE: "mathcomp/${CI_JOB_NAME}"
+    IMAGE_PREFIX: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}"
+  script:
+    - export IMAGE="${IMAGE_PREFIX}_${CI_JOB_NAME##*:}"
+    - echo "${IMAGE}"
+    - docker pull "${IMAGE}"
+    - echo "${HUB_IMAGE}"
+    - docker tag "${IMAGE}" "${HUB_IMAGE}"
+    - test -n "${HUB_REGISTRY}"
+    - test -n "${HUB_REGISTRY_USER}"
+    - echo "${HUB_TOKEN}" | docker login -u "${HUB_REGISTRY_USER}" --password-stdin "${HUB_REGISTRY}"
+    - docker push "${HUB_IMAGE}"
+    - docker logout "${HUB_REGISTRY}"
+  only:
+    - master
+
+mathcomp-dev:coq-8.7:
+  extends: .docker-deploy
+
+mathcomp-dev:coq-8.8:
+  extends: .docker-deploy
+
+mathcomp-dev:coq-8.9:
+  extends: .docker-deploy
+
+mathcomp-dev:coq-dev:
+  extends: .docker-deploy
