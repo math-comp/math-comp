@@ -392,12 +392,10 @@ Notation "@ 'minr' R" :=
   (@meet ring_display R) (at level 10, R at level 8, only parsing).
 
 Section Def.
-Import NumDomain.
 Context {R : numDomainType}.
-Implicit Types (x y : R) (C : bool).
+Implicit Types (x : R).
 
 Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
-
 Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
 Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
 Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
@@ -5016,9 +5014,8 @@ Qed.
 
 Fact lt_trans : transitive (lt m).
 Proof.
-move=> y x z.
-rewrite -![x < _]sub_gt0 -[y < _]sub_gt0 -[z - x](GRing.addrKA (- y)).
-rewrite opprD opprK [_ - _ + _]addrC; exact: lt0_add.
+move=> y x z; rewrite -sub_gt0 -![_ < z]sub_gt0.
+rewrite -[z - x](subrKA y) [_ - _ + _]addrC; exact: lt0_add.
 Qed.
 
 Lemma le_trans : transitive (le m).

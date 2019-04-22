@@ -868,9 +868,8 @@ Qed.
 Lemma dvdp_rat_int p q : (pZtoQ p %| pZtoQ q) = (p %| q).
 Proof.
 apply/dvdpP/Pdiv.Idomain.dvdpP=> [[/= r1 Dq] | [[/= a r] nz_a Dq]]; last first.
-  exists (a%:~R^-1 *: pZtoQ r).
-  by rewrite -scalerAl -rmorphM -Dq -{2}[a]intz scaler_int rmorphMz
-             -[X in _ *: X]scaler_int scalerK ?intr_eq0.
+  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq.
+  by rewrite -{2}[a]intz scaler_int rmorphMz -scaler_int scalerK ?intr_eq0.
 have [r [a nz_a Dr1]] := rat_poly_scale r1; exists (a, r) => //=.
 apply: (map_inj_poly _ _ : injective pZtoQ) => //; first exact: intr_inj.
 rewrite -[a]intz scaler_int rmorphMz -scaler_int /= Dq Dr1.

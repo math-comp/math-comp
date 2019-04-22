@@ -365,7 +365,6 @@ Canonical int_countComUnitRingType := [countComUnitRingType of int].
 Canonical int_countIdomainType := [countIdomainType of int].
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
-
 Notation "m - n" :=
   (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
 Arguments absz m%distn_scope.
