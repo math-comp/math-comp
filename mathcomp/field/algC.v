@@ -134,10 +134,8 @@ have normM x y : norm (x * y) = norm x * norm y.
 have normN x : norm (- x) = norm x.
   by rewrite -mulN1r normM {1}/norm iJ mulrN -expr2 sqrtK opprK mul1r.
 pose le x y := norm (y - x) == y - x; pose lt x y := (y != x) && le x y.
-have ltW x y : lt x y -> le x y by rewrite /lt => /andP [].
 have posE x: le 0 x = (norm x == x) by rewrite /le subr0.
 have leB x y: le x y = le 0 (y - x) by rewrite posE.
-have ltB x y: lt x y = lt 0 (y - x) by rewrite /lt -leB subr_eq0.
 have posP x : reflect (exists y, x = y * conj y) (le 0 x).
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
   by rewrite (normE _ _ (normK y)) rmorphM conjK (mulrC (conj _)) -expr2 normK.
@@ -258,10 +256,7 @@ Fact conjL_nt : ~ conjL =1 id.
 Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
 Definition LnumMixin := ComplexNumMixin conjL_K conjL_nt.
-
-Definition Lnum := NumDomainType L (projT1 LnumMixin).
-Definition normK_ : forall x : Lnum, `|x| ^+ 2 = x * conjL x :=
-  projT2 LnumMixin.
+Definition Lnum := NumDomainType L (sval LnumMixin).
 
 Definition QtoL := [rmorphism of @ratr [numFieldType of Lnum]].
 Notation pQtoL := (map_poly QtoL).
@@ -430,18 +425,18 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normK_ exprn_ge0.
+by rewrite -i2 rmorphX /= expr2 -{2}iL_J -(svalP LnumMixin) exprn_ge0.
 Qed.
 
 Definition numMixin : numMixin closedFieldType :=
-  projT1 (ComplexNumMixin conjK conj_nt).
+  sval (ComplexNumMixin conjK conj_nt).
 Canonical porderType := POrderType ring_display type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
 Canonical normedDomainType := NormedDomainType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
-Proof. exact: projT2 (ComplexNumMixin conjK conj_nt) u. Qed.
+Proof. exact: svalP (ComplexNumMixin conjK conj_nt) u. Qed.
 
 Lemma algebraic : integralRange (@ratr unitRingType).
 Proof.

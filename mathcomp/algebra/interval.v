@@ -209,7 +209,7 @@ Lemma lersif_distl :
 Proof. by case: b; apply lter_distl. Qed.
 
 Lemma lersif_minr :
-  (x <= (y `&` z) ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
+  (x <= y `&` z ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
 Proof. by case: b; rewrite /= ltexI. Qed.
 
 Lemma lersif_minl :
@@ -461,12 +461,9 @@ Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
 
 Lemma itvP : forall (x : R) (i : interval R), x \in i -> itv_rewrite i x.
 Proof.
-move=> x [[[] a|] [[] b|]] /itv_dec // [? ?];
-  do ?split => //; rewrite ?bound_in_itv /le_boundl /le_boundr //=;
-  do 1?[apply/negbTE; rewrite (le_gtF, lt_geF) //];
-  by [ rewrite (@le_trans _ _ x) // ltW
-     | rewrite (@lt_le_trans _ _ x)
-     | rewrite (@le_lt_trans _ _ x) // ltW ].
+move=> x [[[] a|] [[] b|]] /itv_dec [ha hb]; do !split;
+  rewrite ?bound_in_itv //=; do 1?[apply/negbTE; rewrite (le_gtF, lt_geF)];
+  by [ | apply: ltW | move: (lersif_trans ha hb) => //=; exact: ltW ].
 Qed.
 
 Arguments itvP [x i].
