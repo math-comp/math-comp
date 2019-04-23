@@ -5096,7 +5096,7 @@ Notation "`| x |" :=
   (@norm _ (@Num.NormedDomain.numDomain_normedDomainType _) x) : ring_scope.
 End Syntax.
 
-Module Theory.
+Module Import Theory.
 Export ssrnum.Num.Theory.
 
 Section NumIntegralDomainTheory.
@@ -5553,7 +5553,47 @@ Arguments nmono_in_lerif [R A f C].
 Arguments mono_lerif [R f C].
 Arguments nmono_lerif [R f C].
 
+Section RealDomainArgExtremum.
+
+Context {R : realDomainType} {I : finType} (i0 : I).
+Context (P : pred I) (F : I -> R) (Pi0 : P i0).
+
+Definition arg_minr := extremum <=%R i0 P F.
+Definition arg_maxr := extremum >=%R i0 P F.
+Definition arg_minrP : extremum_spec <=%R P F arg_minr := arg_minP F Pi0.
+Definition arg_maxrP : extremum_spec >=%R P F arg_maxr := arg_maxP F Pi0.
+
+End RealDomainArgExtremum.
+
 End Theory.
+
+Notation "[ 'arg' 'minr_' ( i < i0 | P ) F ]" :=
+    (arg_minr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 'in' A ) F ]" :=
+    [arg minr_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'minr_' ( i < i0 ) F ]" := [arg minr_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'minr_' ( i  <  i0 )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 | P ) F ]" :=
+     (arg_maxr i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  |  P )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 'in' A ) F ]" :=
+    [arg maxr_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0  'in'  A )  F ]") : form_scope.
+
+Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
 
 End Num.
 End mc_1_8.
