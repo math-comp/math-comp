@@ -4,7 +4,7 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp
 Require Import ssrfun ssrbool eqtype ssrnat seq div choice fintype.
 From mathcomp
-Require Import bigop ssralg finset fingroup zmodp ssrint ssrnum.
+Require Import bigop ssralg finset fingroup ssrnum.
 
 (*****************************************************************************)
 (* This file provide support for intervals in numerical and real domains.    *)
@@ -471,7 +471,6 @@ move=> x [[[] a|] [[] b|]] /itv_dec // [? ?];
      | rewrite (@ler_lt_trans _ x) // 1?ltrW ].
 Qed.
 
-Hint Rewrite intP : core.
 Arguments itvP [x i].
 
 Definition itv_intersection (x y : interval R) : interval R :=
