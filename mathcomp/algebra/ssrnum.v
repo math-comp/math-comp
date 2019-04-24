@@ -977,7 +977,7 @@ Variable R : rcfType.
 Lemma poly_ivt : real_closed_axiom R. Proof. by case: R => ? []. Qed.
 
 Fact sqrtr_subproof (x : R) :
-  exists2 y,  0 <= y & if 0 <= x return bool then y ^+ 2 == x else y == 0.
+  exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
 Proof.
 case x_ge0: (0 <= x); last by exists 0; rewrite ?lerr.
 have le0x1: 0 <= x + 1 by rewrite -nnegrE rpredD ?rpred1.
