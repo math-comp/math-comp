@@ -1,10 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat fintype finset.
-From mathcomp
-Require Import fingroup perm morphism.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype.
+From mathcomp Require Import finset fingroup perm morphism.
 
 (******************************************************************************)
 (* Group automorphisms and characteristic subgroups.                          *)

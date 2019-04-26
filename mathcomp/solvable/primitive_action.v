@@ -1,12 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat.
-From mathcomp
-Require Import div seq fintype tuple finset.
-From mathcomp
-Require Import fingroup action gseries.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
+From mathcomp Require Import div seq fintype tuple finset.
+From mathcomp Require Import fingroup action gseries.
 
 (******************************************************************************)
 (* n-transitive and primitive actions:                                        *)

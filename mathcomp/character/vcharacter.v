@@ -1,25 +1,12 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
-From mathcomp
-Require Import fintype tuple finfun bigop prime ssralg poly finset.
-From mathcomp
-Require Import fingroup morphism perm automorphism quotient finalg action.
-From mathcomp
-Require Import gproduct zmodp commutator cyclic center pgroup sylow frobenius.
-From mathcomp
-Require Import vector ssrnum ssrint intdiv algC algnum.
-From mathcomp
-Require Import classfun character integral_char.
-
-Set Implicit Arguments.
-Unset Strict Implicit.
-Unset Printing Implicit Defensive.
-
-Import GroupScope GRing.Theory Num.Theory.
-Local Open Scope ring_scope.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import ssralg poly finset fingroup morphism perm.
+From mathcomp Require Import automorphism quotient finalg action gproduct.
+From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
+From mathcomp Require Import frobenius vector ssrnum ssrint intdiv algC.
+From mathcomp Require Import algnum classfun character integral_char.
 
 (******************************************************************************)
 (* This file provides basic notions of virtual character theory:              *)
@@ -48,6 +35,13 @@ Local Open Scope ring_scope.
 (*  to_dirr phi i == the normal virtual character constituent of phi with an  *)
 (*                   irreducible constituent i, when i \in irr_constt phi.    *)
 (******************************************************************************)
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+
+Import GroupScope GRing.Theory Num.Theory.
+Local Open Scope ring_scope.
 
 Section Basics.
 

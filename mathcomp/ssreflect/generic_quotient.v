@@ -1,10 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-(* -*- coding : utf-8 -*- *)
-
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat choice seq fintype.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice.
+From mathcomp Require Import seq fintype.
 
 (*****************************************************************************)
 (* Provided a base type T, this files defines an interface for quotients Q   *)

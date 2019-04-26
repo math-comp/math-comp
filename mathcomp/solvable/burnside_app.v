@@ -1,10 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
-From mathcomp
-Require Import tuple finfun bigop finset fingroup action perm primitive_action.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple finfun bigop finset fingroup.
+From mathcomp Require Import action perm primitive_action.
 
 (*   Application of the Burside formula to count the number of distinct       *)
 (* colorings of the vertices of a square and a cube.                          *)

@@ -1,14 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun ssrnat eqtype seq choice div fintype.
-From mathcomp
-Require Import path bigop finset prime ssralg poly polydiv mxpoly.
-From mathcomp
-Require Import generic_quotient countalg closed_field ssrnum ssrint rat intdiv.
-From mathcomp
-Require Import algebraics_fundamentals.
+From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
+From mathcomp Require Import div fintype path bigop finset prime ssralg poly.
+From mathcomp Require Import polydiv mxpoly generic_quotient countalg ssrnum.
+From mathcomp Require Import closed_field ssrint rat intdiv.
+From mathcomp Require Import algebraics_fundamentals.
 
 (******************************************************************************)
 (* This file provides an axiomatic construction of the algebraic numbers.     *)

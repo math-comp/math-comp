@@ -1,10 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat fintype bigop finset.
-From mathcomp
-Require Import binomial fingroup morphism automorphism quotient gfunctor.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat fintype.
+From mathcomp Require Import bigop finset binomial fingroup morphism.
+From mathcomp Require Import automorphism quotient gfunctor.
 
 (******************************************************************************)
 (*   This files contains the proofs of several key properties of commutators, *)

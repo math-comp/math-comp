@@ -1,14 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq div fintype finset.
-From mathcomp
-Require Import prime fingroup morphism automorphism quotient action gproduct.
-From mathcomp
-Require Import gfunctor commutator center pgroup finmodule nilpotent sylow.
-From mathcomp
-Require Import abelian maximal.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import fintype finset prime fingroup morphism.
+From mathcomp Require Import automorphism quotient action gproduct gfunctor.
+From mathcomp Require Import commutator center pgroup finmodule nilpotent.
+From mathcomp Require Import sylow abelian maximal.
 
 (*****************************************************************************)
 (*  In this files we prove the Schur-Zassenhaus splitting and transitivity   *)
