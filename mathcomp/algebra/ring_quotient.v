@@ -38,9 +38,9 @@ From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 (*   unitRingQuotType ... u i == As in the previous cases, instance of unit   *)
 (*                               ring whose unit predicate  is obtained from  *)
 (*                               u and the inverse from i.                    *)
-(*                 idealr R S == (S : pred R) is a non-trivial, decidable,    *)
+(*                 idealr R S == S : {pred R} is a non-trivial, decidable,    *)
 (*                               right ideal of the ring R.                   *)
-(*           prime_idealr R S == (S : pred R) is a non-trivial, decidable,    *)
+(*           prime_idealr R S == S : {pred R} is a non-trivial, decidable,    *)
 (*                               right, prime ideal of the ring R.            *)
 (*                                                                            *)
 (* The formalization of ideals features the following constructions:          *)
@@ -52,22 +52,21 @@ From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 (*                             ring  R  represents  a  (right) ideal.  This   *)
 (*                             implies its being a proper_ideal.              *)
 (*                                                                            *)
-(*           MkIdeal idealS == packs   idealS : proper_ideal S   into  an     *)
-(*                             idealr S  interface structure  associating the *)
+(*           MkIdeal idealS == packs idealS : proper_ideal S into an idealr S *)
+(*                             interface structure associating the            *)
 (*                             idealr_closed   property   to  the   canonical *)
 (*                             pred_key S  (see ssrbool), which  must already *)
-(*                             be an zmodPred (see ssralg).                   *)
+(*                             be a zmodPred (see ssralg).                    *)
 (*     MkPrimeIdeal pidealS == packs  pidealS : prime_idealr_closed S  into a *)
 (*                             prime_idealr S interface structure associating *)
 (*                             the  prime_idealr_closed   property   to   the *)
 (*                             canonical pred_key S (see ssrbool), which must *)
 (*                             already be an idealr (see above).              *)
 (*          {ideal_quot kI} == quotient by the keyed (right) ideal predicate  *)
-(*                             kI of a commutative ring R. Note that we indeed*)
-(*                             only provide canonical structures of ring      *)
-(*                             quotients for the case of commutative rings,   *)
-(*                             for which a right ideal is obviously a         *)
-(*                             two-sided ideal.                               *)
+(*                             kI of a commutative ring R. Note that we only  *)
+(*                             provide canonical structures of ring quotients *)
+(*                             for commutative rings, in which a right ideal  *)
+(*                             is obviously a two-sided ideal.                *)
 (*                                                                            *)
 (* Note :                                                                     *)
 (* if (I : pred R) is a predicate over a ring R and (ideal : idealr I) is an  *)
@@ -425,13 +424,13 @@ Notation UnitRingQuotMixin Q mU mV :=
 
 Section IdealDef.
 
-Definition proper_ideal (R : ringType) (S : predPredType R) : Prop :=
+Definition proper_ideal (R : ringType) (S : {pred R}) : Prop :=
   1 \notin S /\ forall a, {in S, forall u, a * u \in S}.
 
-Definition prime_idealr_closed (R : ringType) (S : predPredType R) : Prop :=
+Definition prime_idealr_closed (R : ringType) (S : {pred R}) : Prop :=
   forall u v, u * v \in S -> (u \in S) || (v \in S).
 
-Definition idealr_closed (R : ringType) (S : predPredType R) :=
+Definition idealr_closed (R : ringType) (S : {pred R}) :=
   [/\ 0 \in S, 1 \notin S & forall a, {in S &, forall u v, a * u + v \in S}].
 
 Lemma idealr_closed_nontrivial R S : @idealr_closed R S -> proper_ideal S.
@@ -443,22 +442,22 @@ Proof. by case=> S0 _ hS; split=> // x y xS yS; rewrite -mulN1r addrC hS. Qed.
 Coercion idealr_closedB : idealr_closed >-> zmod_closed.
 Coercion idealr_closed_nontrivial : idealr_closed >-> proper_ideal.
 
-Structure idealr (R : ringType) (S : predPredType R) := MkIdeal {
+Structure idealr (R : ringType) (S : {pred R}) := MkIdeal {
   idealr_zmod :> zmodPred S;
   _ : proper_ideal S
 }.
 
-Structure prime_idealr (R : ringType) (S : predPredType R) := MkPrimeIdeal {
+Structure prime_idealr (R : ringType) (S : {pred R}) := MkPrimeIdeal {
   prime_idealr_zmod :> idealr S;
   _ : prime_idealr_closed S
 }.
 
-Definition Idealr (R : ringType) (I : predPredType R) (zmodI : zmodPred I)
+Definition Idealr (R : ringType) (I : {pred R}) (zmodI : zmodPred I)
             (kI : keyed_pred zmodI) : proper_ideal I -> idealr I.
 Proof. by move=> kI1; split => //. Qed.
 
 Section IdealTheory.
-Variables (R : ringType) (I : predPredType R)
+Variables (R : ringType) (I : {pred R})
           (idealrI : idealr I) (kI : keyed_pred idealrI).
 
 Lemma idealr1 : 1 \in kI = false.
@@ -475,7 +474,7 @@ End IdealTheory.
 
 Section PrimeIdealTheory.
 
-Variables (R : comRingType) (I : predPredType R)
+Variables (R : comRingType) (I : {pred R})
           (pidealrI : prime_idealr I) (kI : keyed_pred pidealrI).
 
 Lemma prime_idealrM u v : (u * v \in kI) = (u \in kI) || (v \in kI).
@@ -490,7 +489,7 @@ End IdealDef.
 
 Module Quotient.
 Section ZmodQuotient.
-Variables (R : zmodType) (I : predPredType R)
+Variables (R : zmodType) (I : {pred R})
           (zmodI : zmodPred I) (kI : keyed_pred zmodI).
 
 Definition equiv (x y : R) := (x - y) \in kI.
@@ -567,7 +566,7 @@ Notation "{quot I }" := (@type_of _ _ _ I (Phant _)).
 
 Section RingQuotient.
 
-Variables (R : comRingType) (I : predPredType R)
+Variables (R : comRingType) (I : {pred R})
           (idealI : idealr I) (kI : keyed_pred idealI).
 
 Local Notation type := {quot kI}.
@@ -618,7 +617,7 @@ End RingQuotient.
 
 Section IDomainQuotient.
 
-Variables (R : comRingType) (I : predPredType R)
+Variables (R : comRingType) (I : {pred R})
           (pidealI : prime_idealr I) (kI : keyed_pred pidealI).
 
 Lemma rquot_IdomainAxiom (x y : {quot kI}): x * y = 0 -> (x == 0) || (y == 0).

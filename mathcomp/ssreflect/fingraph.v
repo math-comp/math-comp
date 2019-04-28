@@ -238,7 +238,7 @@ Notation fclosure f a := (closure (coerced_frel f) a).
 Section EqConnect.
 
 Variable T : finType.
-Implicit Types (e : rel T) (a : pred T).
+Implicit Types (e : rel T) (a : {pred T}).
 
 Lemma connect_sub e e' :
   subrel e (connect e') -> subrel (connect e) (connect e').
@@ -289,7 +289,7 @@ Section Closure.
 
 Variables (T : finType) (e : rel T).
 Hypothesis sym_e : connect_sym e.
-Implicit Type a : pred T.
+Implicit Type a : {pred T}.
 
 Lemma same_connect_rev : connect e =2 connect (fun x y => e y x).
 Proof.
@@ -465,7 +465,7 @@ End Loop.
 
 Section orbit_in.
 
-Variable S : pred_sort (predPredType T).
+Variable S : {pred T}.
 
 Hypothesis f_in : {in S, forall x, f x \in S}.
 Hypothesis injf : {in S &, injective f}.
@@ -579,7 +579,7 @@ Proof. exact: eq_n_comp same_fconnect_finv. Qed.
 
 Definition order_set n : pred T := [pred x | order x == n].
 
-Lemma fcard_order_set n (a : pred T) :
+Lemma fcard_order_set n (a : {pred T}) :
   a \subset order_set n -> fclosed f a -> fcard f a * n = #|a|.
 Proof.
 move=> a_n cl_a; rewrite /n_comp_mem; set b := [predI froots f & a].
@@ -598,7 +598,8 @@ rewrite -(cardID (fconnect f x)); congr (_ + _); apply: eq_card => y.
 by congr (~~ _ && _); rewrite /= /in_mem /= symf -(root_connect symf) r_x.
 Qed.
 
-Lemma fclosed1 (a : pred T) : fclosed f a -> forall x, (x \in a) = (f x \in a).
+Lemma fclosed1 (a : {pred T}) :
+  fclosed f a -> forall x, (x \in a) = (f x \in a).
 Proof. by move=> cl_a x; apply: cl_a (eqxx _). Qed.
 
 Lemma same_fconnect1 x : fconnect f x =1 fconnect f (f x).
@@ -630,7 +631,7 @@ Proof. by rewrite /roots -fconnect_id connect_root. Qed.
 Lemma froot_id (x : T) : froot id x = x.
 Proof. by apply/eqP; apply: froots_id. Qed.
 
-Lemma fcard_id (a : pred T) : fcard id a = #|a|.
+Lemma fcard_id (a : {pred T}) : fcard id a = #|a|.
 Proof. by apply: eq_card => x; rewrite inE froots_id. Qed.
 
 End FconnectId.
@@ -694,7 +695,7 @@ Record rel_adjunction_mem m_a := RelAdjunction {
     in_mem (h x') m_a -> connect e' x' y' = connect e (h x') (h y')
 }.
 
-Variable a : pred T.
+Variable a : {pred T}.
 Hypothesis cl_a : closed e a.
 
 Local Notation rel_adjunction := (rel_adjunction_mem (mem a)).

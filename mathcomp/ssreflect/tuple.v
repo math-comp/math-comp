@@ -275,8 +275,7 @@ Variables (n : nat) (T : eqType).
 Definition tuple_eqMixin := Eval hnf in [eqMixin of n.-tuple T by <:].
 Canonical tuple_eqType := Eval hnf in EqType (n.-tuple T) tuple_eqMixin.
 
-Canonical tuple_predType :=
-  Eval hnf in mkPredType (fun t : n.-tuple T => mem_seq t).
+Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma memtE (t : n.-tuple T) : mem t = mem (tval t).
 Proof. by []. Qed.
@@ -371,7 +370,7 @@ Canonical tuple_subFinType := Eval hnf in [subFinType of n.-tuple T].
 Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
 Proof. by rewrite [#|_|]cardT enumT unlock FinTuple.size_enum. Qed.
 
-Lemma enum_tupleP (A : pred T) : size (enum A) == #|A|.
+Lemma enum_tupleP (A : {pred T}) : size (enum A) == #|A|.
 Proof. by rewrite -cardE. Qed.
 Canonical enum_tuple A := Tuple (enum_tupleP A).
 
@@ -389,7 +388,7 @@ Qed.
 
 Section ImageTuple.
 
-Variables (T' : Type) (f : T -> T') (A : pred T).
+Variables (T' : Type) (f : T -> T') (A : {pred T}).
 
 Canonical image_tuple : #|A|.-tuple T' := [tuple of image f A].
 Canonical codom_tuple : #|T|.-tuple T' := [tuple of codom f].

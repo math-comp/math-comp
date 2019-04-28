@@ -203,8 +203,7 @@ Coercion pred_of_set: set_type >-> fin_pred_sort.
 
 (* Declare pred_of_set as a canonical instance of topred, but use the         *)
 (* coercion to resolve mem A to @mem (predPredType T) (pred_of_set A).        *)
-Canonical set_predType T :=
-  Eval hnf in @mkPredType _ (unkeyed (set_type T)) (@pred_of_set T).
+Canonical set_predType T := @PredType _ (unkeyed (set_type T)) (@pred_of_set T).
 
 Section BasicSetTheory.
 
@@ -1085,7 +1084,7 @@ Notation "[ 'set' E | x : T 'in' A , y : U 'in' B & P ]" :=
   (at level 0, E, x, y at level 99, only parsing) : set_scope.
 
 (* Comprehensions over a type. *)
-Local Notation predOfType T := (sort_of_simpl_pred (@pred_of_argType T)).
+Local Notation predOfType T := (pred_of_simpl (@pred_of_argType T)).
 Notation "[ 'set' E | x : T ]" := [set E | x : T in predOfType T]
   (at level 0, E, x at level 99,
    format "[ '[hv' 'set'  E '/ '  |  x  :  T ] ']'") : set_scope.
@@ -1205,7 +1204,7 @@ apply: (iffP imageP) => [[[x1 x2] Dx12] | [x1 x2 Dx1 Dx2]] -> {y}.
 by exists (x1, x2); rewrite //= !inE Dx1.
 Qed.
 
-Lemma mem_imset (D : pred aT) x : x \in D -> f x \in f @: D.
+Lemma mem_imset (D : {pred aT}) x : x \in D -> f x \in f @: D.
 Proof. by move=> Dx; apply/imsetP; exists x. Qed.
 
 Lemma imset0 : f @: set0 = set0.
@@ -1223,12 +1222,12 @@ apply/setP => y.
 by apply/imsetP/set1P=> [[x' /set1P-> //]| ->]; exists x; rewrite ?set11.
 Qed.
 
-Lemma mem_imset2 (D : pred aT) (D2 : aT -> pred aT2) x x2 :
+Lemma mem_imset2 (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     x \in D -> x2 \in D2 x ->
   f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)).
 Proof. by move=> Dx Dx2; apply/imset2P; exists x x2. Qed.
 
-Lemma sub_imset_pre (A : pred aT) (B : pred rT) :
+Lemma sub_imset_pre (A : {pred aT}) (B : {pred rT}) :
   (f @: A \subset B) = (A \subset f @^-1: B).
 Proof.
 apply/subsetP/subsetP=> [sfAB x Ax | sAf'B fx].
@@ -1236,7 +1235,7 @@ apply/subsetP/subsetP=> [sfAB x Ax | sAf'B fx].
 by case/imsetP=> x Ax ->; move/sAf'B: Ax; rewrite inE.
 Qed.
 
-Lemma preimsetS (A B : pred rT) :
+Lemma preimsetS (A B : {pred rT}) :
   A \subset B -> (f @^-1: A) \subset (f @^-1: B).
 Proof. by move=> sAB; apply/subsetP=> y; rewrite !inE; apply: subsetP. Qed.
 
@@ -1261,7 +1260,7 @@ Proof. by apply/setP=> y; rewrite !inE. Qed.
 Lemma preimsetC (A : {set rT}) : f @^-1: (~: A) = ~: f @^-1: A.
 Proof. by apply/setP=> y; rewrite !inE. Qed.
 
-Lemma imsetS (A B : pred aT) : A \subset B -> f @: A \subset f @: B.
+Lemma imsetS (A B : {pred aT}) : A \subset B -> f @: A \subset f @: B.
 Proof.
 move=> sAB; apply/subsetP=> _ /imsetP[x Ax ->].
 by apply/imsetP; exists x; rewrite ?(subsetP sAB).
@@ -1303,27 +1302,27 @@ apply/subsetP=> _ /setIP[/imsetP[x Ax ->] /imsetP[z Bz /injf eqxz]].
 by rewrite mem_imset // inE Ax eqxz.
 Qed.
 
-Lemma imset2Sl (A B : pred aT) (C : pred aT2) :
+Lemma imset2Sl (A B : {pred aT}) (C : {pred aT2}) :
   A \subset B -> f2 @2: (A, C) \subset f2 @2: (B, C).
 Proof.
 move=> sAB; apply/subsetP=> _ /imset2P[x y Ax Cy ->].
 by apply/imset2P; exists x y; rewrite ?(subsetP sAB).
 Qed.
 
-Lemma imset2Sr (A B : pred aT2) (C : pred aT) :
+Lemma imset2Sr (A B : {pred aT2}) (C : {pred aT}) :
   A \subset B -> f2 @2: (C, A) \subset f2 @2: (C, B).
 Proof.
 move=> sAB; apply/subsetP=> _ /imset2P[x y Ax Cy ->].
 by apply/imset2P; exists x y; rewrite ?(subsetP sAB).
 Qed.
 
-Lemma imset2S (A B : pred aT) (A2 B2 : pred aT2) :
+Lemma imset2S (A B : {pred aT}) (A2 B2 : {pred aT2}) :
   A \subset B ->  A2 \subset B2 -> f2 @2: (A, A2) \subset f2 @2: (B, B2).
 Proof.  by move=> /(imset2Sl B2) sBA /(imset2Sr A)/subset_trans->. Qed.
 
 End ImsetProp.
 
-Implicit Types (f g : aT -> rT) (D : {set aT}) (R : pred rT).
+Implicit Types (f g : aT -> rT) (D : {set aT}) (R : {pred rT}).
 
 Lemma eq_preimset f g R : f =1 g -> f @^-1: R = g @^-1: R.
 Proof. by move=> eqfg; apply/setP => y; rewrite !inE eqfg. Qed.
@@ -1340,7 +1339,7 @@ move=> eqfg; apply/setP => y.
 by apply/imsetP/imsetP=> [] [x Dx ->]; exists x; rewrite ?eqfg.
 Qed.
 
-Lemma eq_in_imset2 (f g : aT -> aT2 -> rT) (D : pred aT) (D2 : pred aT2) :
+Lemma eq_in_imset2 (f g : aT -> aT2 -> rT) (D : {pred aT}) (D2 : {pred aT2}) :
   {in D & D2, f =2 g} -> f @2: (D, D2) = g @2: (D, D2).
 Proof.
 move=> eqfg; apply/setP => y.
@@ -1407,7 +1406,7 @@ Lemma big_setU1 a A F : a \notin A ->
   \big[aop/idx]_(i in a |: A) F i = aop (F a) (\big[aop/idx]_(i in A) F i).
 Proof. by move=> notAa; rewrite (@big_setD1 a) ?setU11 //= setU1K. Qed.
 
-Lemma big_imset h (A : pred I) G : {in A &, injective h} ->
+Lemma big_imset h (A : {pred I}) G : {in A &, injective h} ->
   \big[aop/idx]_(j in h @: A) G j = \big[aop/idx]_(i in A) G (h i).
 Proof.
 move=> injh; pose hA := mem (image h A).
@@ -1424,12 +1423,12 @@ symmetry; rewrite (negbTE nhAhi); apply/idP=> Ai.
 by case/imageP: nhAhi; exists i.
 Qed.
 
-Lemma big_imset_cond h (A : pred I) (P : pred J) G : {in A &, injective h} ->
+Lemma big_imset_cond h (A : {pred I}) (P : pred J) G : {in A &, injective h} ->
   \big[aop/idx]_(j in h @: A | P j) G j =
     \big[aop/idx]_(i in A | P (h i)) G (h i).
 Proof. by move=> h_inj; rewrite 2!big_mkcondr big_imset. Qed.
 
-Lemma partition_big_imset h (A : pred I) F :
+Lemma partition_big_imset h (A : {pred I}) F :
   \big[aop/idx]_(i in A) F i =
      \big[aop/idx]_(j in h @: A) \big[aop/idx]_(i in A | h i == j) F i.
 Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
@@ -1447,14 +1446,14 @@ Section Fun2Set1.
 Variables aT1 aT2 rT : finType.
 Variables (f : aT1 -> aT2 -> rT).
 
-Lemma imset2_set1l x1 (D2 : pred aT2) : f @2: ([set x1], D2) = f x1 @: D2.
+Lemma imset2_set1l x1 (D2 : {pred aT2}) : f @2: ([set x1], D2) = f x1 @: D2.
 Proof.
 apply/setP=> y; apply/imset2P/imsetP=> [[x x2 /set1P->]| [x2 Dx2 ->]].
   by exists x2.
 by exists x1 x2; rewrite ?set11.
 Qed.
 
-Lemma imset2_set1r x2 (D1 : pred aT1) : f @2: (D1, [set x2]) = f^~ x2 @: D1.
+Lemma imset2_set1r x2 (D1 : {pred aT1}) : f @2: (D1, [set x2]) = f^~ x2 @: D1.
 Proof.
 apply/setP=> y; apply/imset2P/imsetP=> [[x1 x Dx1 /set1P->]| [x1 Dx1 ->]].
   by exists x1.
@@ -1467,7 +1466,7 @@ Section CardFunImage.
 
 Variables aT aT2 rT : finType.
 Variables (f : aT -> rT) (g : rT -> aT) (f2 : aT -> aT2 -> rT).
-Variables (D : pred aT) (D2 : pred aT).
+Variables (D : {pred aT}) (D2 : {pred aT}).
 
 Lemma imset_card : #|f @: D| = #|image f D|.
 Proof. by rewrite [@imset]unlock cardsE. Qed.
@@ -1498,7 +1497,7 @@ End CardFunImage.
 
 Arguments imset_injP {aT rT f D}.
 
-Lemma on_card_preimset (aT rT : finType) (f : aT -> rT) (R : pred rT) :
+Lemma on_card_preimset (aT rT : finType) (f : aT -> rT) (R : {pred rT}) :
   {on R, bijective f} -> #|f @^-1: R| = #|R|.
 Proof.
 case=> g fK gK; rewrite -(can2_in_imset_pre gK) // card_in_imset //.
@@ -1539,7 +1538,7 @@ Section FunImageComp.
 
 Variables T T' U : finType.
 
-Lemma imset_comp (f : T' -> U) (g : T -> T') (H : pred T) :
+Lemma imset_comp (f : T' -> U) (g : T -> T') (H : {pred T}) :
   (f \o g) @: H = f @: (g @: H).
 Proof.
 apply/setP/subset_eqP/andP.
@@ -1603,7 +1602,7 @@ Notation "\bigcap_ ( i 'in' A ) F" :=
 Section BigSetOps.
 
 Variables T I : finType.
-Implicit Types (U : pred T) (P : pred I) (A B : {set I}) (F :  I -> {set T}).
+Implicit Types (U : {pred T}) (P : pred I) (A B : {set I}) (F :  I -> {set T}).
 
 (* It is very hard to use this lemma, because the unification fails to *)
 (* defer the F j pattern (even though it's a Miller pattern!).         *)
@@ -1714,7 +1713,7 @@ Variables (aT1 aT2 rT : finType) (f : aT1 -> aT2 -> rT).
 Section Curry.
 
 Variables (A1 : {set aT1}) (A2 : {set aT2}).
-Variables (D1 : pred aT1) (D2 : pred aT2).
+Variables (D1 : {pred aT1}) (D2 : {pred aT2}).
 
 Lemma curry_imset2X : f @2: (A1, A2) = prod_curry f @: (setX A1 A2).
 Proof.

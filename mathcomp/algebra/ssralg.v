@@ -851,7 +851,7 @@ Qed.
 
 Section ClosedPredicates.
 
-Variable S : predPredType V.
+Variable S : {pred V}.
 
 Definition addr_closed := 0 \in S /\ {in S &, forall u v, u + v \in S}.
 Definition oppr_closed := {in S, forall u, - u \in S}.
@@ -1418,7 +1418,7 @@ Canonical converse_ringType := RingType R^c converse_ringMixin.
 
 Section ClosedPredicates.
 
-Variable S : predPredType R.
+Variable S : {pred R}.
 
 Definition mulr_2closed := {in S &, forall u v, u * v \in S}.
 Definition mulr_closed := 1 \in S /\ mulr_2closed.
@@ -1626,7 +1626,7 @@ Proof. exact: big_endo (scalerDr a) (scaler0 a) I r P F. Qed.
 
 Section ClosedPredicates.
 
-Variable S : predPredType V.
+Variable S : {pred V}.
 
 Definition scaler_closed := forall a, {in S, forall v, a *: v \in S}.
 Definition linear_closed := forall a, {in S &, forall u v, a *: u + v \in S}.
@@ -1746,7 +1746,7 @@ Canonical regular_lalgType := LalgType R R^o (@mulrA regular_ringType).
 
 Section ClosedPredicates.
 
-Variable S : predPredType A.
+Variable S : {pred A}.
 
 Definition subalg_closed := [/\ 1 \in S, linear_closed S & mulr_2closed S].
 
@@ -2985,14 +2985,13 @@ Lemma rev_unitrP (x y : R^c) : y * x = 1 /\ x * y = 1 -> x \is a unit.
 Proof. by case=> [yx1 xy1]; apply/unitrP; exists y. Qed.
 
 Definition converse_unitRingMixin :=
-  @UnitRing.Mixin _ ((unit : pred_class) : pred R^c) _
-     mulrV mulVr rev_unitrP invr_out.
+  @UnitRing.Mixin _ (unit : {pred R^c}) _ mulrV mulVr rev_unitrP invr_out.
 Canonical converse_unitRingType := UnitRingType R^c converse_unitRingMixin.
 Canonical regular_unitRingType := [unitRingType of R^o].
 
 Section ClosedPredicates.
 
-Variables S : predPredType R.
+Variables S : {pred R}.
 
 Definition invr_closed := {in S, forall x, x^-1 \in S}.
 Definition divr_2closed := {in S &, forall x y, x / y \in S}.
@@ -3266,7 +3265,7 @@ Qed.
 
 Section ClosedPredicates.
 
-Variables S : predPredType A.
+Variables S : {pred A}.
 
 Definition divalg_closed := [/\ 1 \in S, linear_closed S & divr_2closed S].
 
@@ -3511,7 +3510,7 @@ End DefaultPred.
 
 Section ZmodulePred.
 
-Variables (V : zmodType) (S : predPredType V).
+Variables (V : zmodType) (S : {pred V}).
 
 Section Add.
 
@@ -3580,7 +3579,7 @@ End ZmodulePred.
 
 Section RingPred.
 
-Variables (R : ringType) (S : predPredType R).
+Variables (R : ringType) (S : {pred R}).
 
 Lemma rpredMsign (oppS : opprPred S) (kS : keyed_pred oppS) n x :
   ((-1) ^+ n * x \in kS) = (x \in kS).
@@ -3624,7 +3623,7 @@ End RingPred.
 
 Section LmodPred.
 
-Variables (R : ringType) (V : lmodType R) (S : predPredType V).
+Variables (R : ringType) (V : lmodType R) (S : {pred V}).
 
 Lemma rpredZsign (oppS : opprPred S) (kS : keyed_pred oppS) n u :
   ((-1) ^+ n *: u \in kS) = (u \in kS).
@@ -3645,7 +3644,7 @@ Variable R : unitRingType.
 
 Section Div.
 
-Variables (S : predPredType R) (divS : divrPred S) (kS : keyed_pred divS).
+Variables (S : {pred R}) (divS : divrPred S) (kS : keyed_pred divS).
 
 Lemma rpredVr x : x \in kS -> x^-1 \in kS.
 Proof. by rewrite !keyed_predE; case: divS x. Qed.
@@ -4792,7 +4791,7 @@ Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
 
 Section Predicates.
 
-Context (S : pred_class) (divS : @divrPred F S) (kS : keyed_pred divS).
+Context (S : {pred F}) (divS : @divrPred F S) (kS : keyed_pred divS).
 
 Lemma fpredMl x y : x \in kS -> x != 0 -> (x * y \in kS) = (y \in kS).
 Proof. by rewrite -!unitfE; apply: rpredMl. Qed.
@@ -5150,7 +5149,7 @@ Module SubType.
 
 Section Zmodule.
 
-Variables (V : zmodType) (S : predPredType V).
+Variables (V : zmodType) (S : {pred V}).
 Variables (subS : zmodPred S) (kS : keyed_pred subS).
 Variable U : subType (mem kS).
 
@@ -5175,7 +5174,7 @@ End Zmodule.
 
 Section Ring.
 
-Variables (R : ringType) (S : predPredType R).
+Variables (R : ringType) (S : {pred R}).
 Variables (ringS : subringPred S) (kS : keyed_pred ringS).
 
 Definition cast_zmodType (V : zmodType) T (VeqT : V = T :> Type) :=
@@ -5219,7 +5218,7 @@ End Ring.
 
 Section Lmodule.
 
-Variables (R : ringType) (V : lmodType R) (S : predPredType V).
+Variables (R : ringType) (V : lmodType R) (S : {pred V}).
 Variables (linS : submodPred S) (kS : keyed_pred linS).
 Variables (W : subType (mem kS)) (Z : zmodType) (ZeqW : Z = W :> Type).
 
@@ -5265,7 +5264,7 @@ Definition cast_ringType (Q : ringType) T (QeqT : Q = T :> Type) :=
   let cast rQ := let: erefl in _ = T := QeqT return Ring.class_of T in rQ in
   Ring.Pack (cast (Ring.class Q)).
 
-Variables (R : unitRingType) (S : predPredType R).
+Variables (R : unitRingType) (S : {pred R}).
 Variables (ringS : divringPred S) (kS : keyed_pred ringS).
 
 Variables (T : subType (mem kS)) (Q : ringType) (QeqT : Q = T :> Type).
@@ -5279,7 +5278,7 @@ Hypothesis val1 : val (1 : T') = 1.
 Hypothesis valM : {morph (val : T' -> R) : x y / x * y}.
 
 Fact mulVr :
-  {in (unitT : predPredType T'), left_inverse (1 : T') invT (@mul T')}.
+  {in (unitT : {pred T'}), left_inverse (1 : T') invT (@mul T')}.
 Proof. by move=> u Uu; apply: val_inj; rewrite val1 valM SubK mulVr. Qed.
 
 Fact mulrV : {in unitT, right_inverse (1 : T') invT (@mul T')}.
@@ -6249,7 +6248,7 @@ Canonical pair_unitAlgType (R : comUnitRingType) (A1 A2 : unitAlgType R) :=
 (* Testing subtype hierarchy
 Section Test0.
 
-Variables (T : choiceType) (S : predPredType T).
+Variables (T : choiceType) (S : {pred T}).
 
 Inductive B := mkB x & x \in S.
 Definition vB u := let: mkB x _ := u in x.
@@ -6264,7 +6263,7 @@ End Test0.
 
 Section Test1.
 
-Variables (R : unitRingType) (S : pred R).
+Variables (R : unitRingType) (S : {pred R}).
 Variables (ringS : divringPred S) (kS : keyed_pred ringS).
 
 Definition B_zmodMixin := [zmodMixin of B kS by <:].
@@ -6278,7 +6277,7 @@ End Test1.
 
 Section Test2.
 
-Variables (R : comUnitRingType) (A : unitAlgType R) (S : pred A).
+Variables (R : comUnitRingType) (A : unitAlgType R) (S : {pred A}).
 Variables (algS : divalgPred S) (kS : keyed_pred algS).
 
 Definition B_lmodMixin := [lmodMixin of B kS by <:].
@@ -6293,7 +6292,7 @@ End Test2.
 
 Section Test3.
 
-Variables (F : fieldType) (S : pred F).
+Variables (F : fieldType) (S : {pred F}).
 Variables (ringS : divringPred S) (kS : keyed_pred ringS).
 
 Definition B_comRingMixin := [comRingMixin of B kS by <:].

@@ -1066,7 +1066,7 @@ have [-> | nzV] := eqVneq V 0; first by rewrite cfdot0r !mul0r subrr.
 by rewrite divfK ?cfnorm_eq0 ?subrr.
 Qed.
 
-Lemma map_orthogonal M (nu : 'CF(G) -> 'CF(M)) S R (A : pred 'CF(G)) :
+Lemma map_orthogonal M (nu : 'CF(G) -> 'CF(M)) S R (A : {pred 'CF(G)}) :
   {in A &, isometry nu} -> {subset S <= A} -> {subset R <= A} ->
  orthogonal (map nu S) (map nu R) = orthogonal S R.
 Proof.
@@ -1290,7 +1290,7 @@ Section BuildIsometries.
 
 Variable (gT : finGroupType) (L G : {group gT}).
 Implicit Types (phi psi xi : 'CF(L)) (R S : seq 'CF(L)).
-Implicit Types (U : pred 'CF(L)) (W : pred 'CF(G)).
+Implicit Types (U : {pred 'CF(L)}) (W : {pred 'CF(G)}).
 
 Lemma sub_iso_to U1 U2 W1 W2 tau :
     {subset U2 <= U1} -> {subset W1 <= W2} ->

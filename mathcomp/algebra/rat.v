@@ -689,7 +689,8 @@ Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 Lemma ratr_nat n : ratr n%:R = n%:R.
 Proof. exact: (ratr_int n). Qed.
 
-Lemma rpred_rat S (ringS : @divringPred R S) (kS : keyed_pred ringS) a :
+Lemma rpred_rat (S : {pred R}) (ringS : divringPred S) (kS : keyed_pred ringS)
+                a :
   ratr a \in kS.
 Proof. by rewrite rpred_div ?rpred_int. Qed.
 

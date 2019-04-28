@@ -461,9 +461,7 @@ Section OpsTheory.
 
 Variable T : finType.
 
-Implicit Types A B C P Q : pred T.
-Implicit Types x y : T.
-Implicit Type s : seq T.
+Implicit Types (A B C : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma enumP : Finite.axiom (Finite.enum T).
 Proof. by rewrite unlock; case T => ? [? []]. Qed.
@@ -478,7 +476,7 @@ Proof. exact: filter_predT. Qed.
 Lemma mem_enum A : enum A =i A.
 Proof. by move=> x; rewrite mem_filter andbC -has_pred1 has_count enumP. Qed.
 
-Lemma enum_uniq : uniq (enum P).
+Lemma enum_uniq A : uniq (enum A).
 Proof.
 by apply/filter_uniq/count_mem_uniq => x; rewrite enumP -enumT mem_enum.
 Qed.
@@ -504,8 +502,8 @@ Qed.
 
 End EnumPick.
 
-Lemma eq_enum P Q : P =i Q -> enum P = enum Q.
-Proof. by move=> eqPQ; apply: eq_filter. Qed.
+Lemma eq_enum A B : A =i B -> enum A = enum B.
+Proof. by move=> eqAB; apply: eq_filter. Qed.
 
 Lemma eq_pick P Q : P =1 Q -> pick P = pick Q.
 Proof. by move=> eqPQ; rewrite /pick (eq_enum eqPQ). Qed.
@@ -640,17 +638,17 @@ Hint Resolve subxx_hint : core.
 Lemma subxx (pT : predType T) (pA : pT) : pA \subset pA.
 Proof. by []. Qed.
 
-Lemma eq_subset A1 A2 : A1 =i A2 -> subset (mem A1) =1 subset (mem A2).
+Lemma eq_subset A B : A =i B -> subset (mem A) =1 subset (mem B).
 Proof.
-move=> eqA12 [B]; rewrite !unlock; congr (_ == 0).
-by apply: eq_card => x; rewrite inE /= eqA12.
+move=> eqAB [C]; rewrite !unlock; congr (_ == 0).
+by apply: eq_card => x; rewrite inE /= eqAB.
 Qed.
 
-Lemma eq_subset_r B1 B2 : B1 =i B2 ->
-  (@subset T)^~ (mem B1) =1 (@subset T)^~ (mem B2).
+Lemma eq_subset_r A B :
+   A =i B -> (@subset T)^~ (mem A) =1 (@subset T)^~ (mem B).
 Proof.
-move=> eqB12 [A]; rewrite !unlock; congr (_ == 0).
-by apply: eq_card => x; rewrite !inE /= eqB12.
+move=> eqAB [C]; rewrite !unlock; congr (_ == 0).
+by apply: eq_card => x; rewrite !inE /= eqAB.
 Qed.
 
 Lemma eq_subxx A B : A =i B -> A \subset B.
@@ -746,8 +744,8 @@ move=> eAB [C]; congr (_ && _); first exact: (eq_subset eAB).
 by rewrite (eq_subset_r eAB).
 Qed.
 
-Lemma eq_proper_r A B : A =i B ->
-  (@proper T)^~ (mem A) =1 (@proper T)^~ (mem B).
+Lemma eq_proper_r A B :
+  A =i B -> (@proper T)^~ (mem A) =1 (@proper T)^~ (mem B).
 Proof.
 move=> eAB [C]; congr (_ && _); first exact: (eq_subset_r eAB).
 by rewrite (eq_subset eAB).
@@ -756,15 +754,15 @@ Qed.
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
 Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
-Lemma eq_disjoint A1 A2 : A1 =i A2 -> disjoint (mem A1) =1 disjoint (mem A2).
+Lemma eq_disjoint A B : A =i B -> disjoint (mem A) =1 disjoint (mem B).
 Proof.
-by move=> eqA12 [B]; congr (_ == 0); apply: eq_card => x; rewrite !inE eqA12.
+by move=> eqAB [C]; congr (_ == 0); apply: eq_card => x; rewrite !inE eqAB.
 Qed.
 
-Lemma eq_disjoint_r B1 B2 : B1 =i B2 ->
-  (@disjoint T)^~ (mem B1) =1 (@disjoint T)^~ (mem B2).
+Lemma eq_disjoint_r A B : A =i B ->
+  (@disjoint T)^~ (mem A) =1 (@disjoint T)^~ (mem B).
 Proof.
-by move=> eqB12 [A]; congr (_ == 0); apply: eq_card => x; rewrite !inE eqB12.
+by move=> eqAB [C]; congr (_ == 0); apply: eq_card => x; rewrite !inE eqAB.
 Qed.
 
 Lemma subset_disjoint A B : (A \subset B) = [disjoint A & [predC B]].
@@ -787,9 +785,9 @@ Proof. by move/eq_disjoint->; apply: disjoint0. Qed.
 
 Lemma disjoint1 x A : [disjoint pred1 x & A] = (x \notin A).
 Proof.
-apply/negbRL/(sameP (pred0Pn _)).
+apply/negbRL/(sameP (pred0Pn _))=> /=.
 apply: introP => [Ax | notAx [_ /andP[/eqP->]]]; last exact: negP.
-by exists x; rewrite !inE eqxx.
+by exists x; rewrite inE eqxx.
 Qed.
 
 Lemma eq_disjoint1 x A B :
@@ -863,7 +861,7 @@ Notation "'forall_ view" := (forallPP (fun _ => view))
 Section Quantifiers.
 
 Variables (T : finType) (rT : T -> eqType).
-Implicit Type (D P : pred T) (f : forall x, rT x).
+Implicit Types (D P : pred T) (f : forall x, rT x).
 
 Lemma forallP P : reflect (forall x, P x) [forall x, P x].
 Proof. exact: 'forall_idP. Qed.
@@ -1059,7 +1057,7 @@ Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
 Section Injectiveb.
 
 Variables (aT : finType) (rT : eqType) (f : aT -> rT).
-Implicit Type D : pred aT.
+Implicit Type D : {pred aT}.
 
 Definition dinjectiveb D := uniq (map f (enum D)).
 
@@ -1113,7 +1111,7 @@ Notation "[ 'seq' F | x 'in' A ]" := (image (fun x => F) A)
 Notation "[ 'seq' F | x : T 'in' A ]" := (image (fun x : T => F) A)
   (at level 0, F at level 99, x ident, only parsing) : seq_scope.
 Notation "[ 'seq' F | x : T ]" :=
-  [seq F | x : T in sort_of_simpl_pred (@pred_of_argType T)]
+  [seq F | x : T in pred_of_simpl (@pred_of_argType T)]
   (at level 0, F at level 99, x ident,
    format "'[hv' [ 'seq'  F '/ '  |  x  :  T ] ']'") : seq_scope.
 Notation "[ 'seq' F , x ]" := [seq F | x : _ ]
@@ -1124,7 +1122,7 @@ Definition codom T T' f := @image_mem T T' f (mem T).
 Section Image.
 
 Variable T : finType.
-Implicit Type A : pred T.
+Implicit Type A : {pred T}.
 
 Section SizeImage.
 
@@ -1236,7 +1234,8 @@ Prenex Implicits codom iinv.
 Arguments imageP {T T' f A y}.
 Arguments codomP {T T' f y}.
 
-Lemma flatten_imageP (aT : finType) (rT : eqType) A (P : pred aT) (y : rT) :
+Lemma flatten_imageP (aT : finType) (rT : eqType)
+                     (A : aT -> seq rT) (P : {pred aT}) (y : rT) :
   reflect (exists2 x, x \in P & y \in A x) (y \in flatten [seq A x | x in P]).
 Proof.
 by apply: (iffP flatten_mapP) => [][x Px]; exists x; rewrite ?mem_enum in Px *.
@@ -1246,7 +1245,7 @@ Arguments flatten_imageP {aT rT A P y}.
 Section CardFunImage.
 
 Variables (T T' : finType) (f : T -> T').
-Implicit Type A : pred T.
+Implicit Type A : {pred T}.
 
 Lemma leq_image_card A : #|image f A| <= #|A|.
 Proof. by rewrite (cardE A) -(size_map f) card_size. Qed.
@@ -1271,7 +1270,7 @@ Proof. by apply: card_in_image; apply: in2W. Qed.
 Lemma card_codom : #|codom f| = #|T|.
 Proof. exact: card_image. Qed.
 
-Lemma card_preim (B : pred T') : #|[preim f of B]| = #|[predI codom f & B]|.
+Lemma card_preim (B : {pred T'}) : #|[preim f of B]| = #|[predI codom f & B]|.
 Proof.
 rewrite -card_image /=; apply: eq_card => y.
 by rewrite [y \in _]image_pre !inE andbC.
@@ -1330,7 +1329,7 @@ Section EqImage.
 
 Variables (T : finType) (T' : Type).
 
-Lemma eq_image (A B : pred T) (f g : T -> T') :
+Lemma eq_image (A B : {pred T}) (f g : T -> T') :
   A =i B -> f =1 g -> image f A = image g B.
 Proof.
 by move=> eqAB eqfg; rewrite /image_mem (eq_enum eqAB) (eq_map eqfg).
@@ -1461,7 +1460,7 @@ Variable sfT : subFinType P.
 Lemma card_sub : #|sfT| = #|[pred x | P x]|.
 Proof. by rewrite -(eq_card (codom_val sfT)) (card_image val_inj). Qed.
 
-Lemma eq_card_sub (A : pred sfT) : A =i predT -> #|A| = #|[pred x | P x]|.
+Lemma eq_card_sub (A : {pred sfT}) : A =i predT -> #|A| = #|[pred x | P x]|.
 Proof. exact: eq_card_trans card_sub. Qed.
 
 End FinTypeForSub.
@@ -1695,7 +1694,7 @@ Proof. exact: inv_inj rev_ordK. Qed.
 Section EnumRank.
 
 Variable T : finType.
-Implicit Type A : pred T.
+Implicit Type A : {pred T}.
 
 Lemma enum_rank_subproof x0 A : x0 \in A -> 0 < #|A|.
 Proof. by move=> Ax0; rewrite (cardD1 x0) Ax0. Qed.
@@ -2026,7 +2025,7 @@ Variable T1 T2 : finType.
 
 Definition prod_enum := [seq (x1, x2) | x1 <- enum T1, x2 <- enum T2].
 
-Lemma predX_prod_enum (A1 : pred T1) (A2 : pred T2) :
+Lemma predX_prod_enum (A1 : {pred T1}) (A2 : {pred T2}) :
   count [predX A1 & A2] prod_enum = #|A1| * #|A2|.
 Proof.
 rewrite !cardE !size_filter -!enumT /prod_enum.
@@ -2042,13 +2041,14 @@ Qed.
 Definition prod_finMixin := Eval hnf in FinMixin prod_enumP.
 Canonical prod_finType := Eval hnf in FinType (T1 * T2) prod_finMixin.
 
-Lemma cardX (A1 : pred T1) (A2 : pred T2) : #|[predX A1 & A2]| = #|A1| * #|A2|.
+Lemma cardX (A1 : {pred T1}) (A2 : {pred T2}) :
+  #|[predX A1 & A2]| = #|A1| * #|A2|.
 Proof. by rewrite -predX_prod_enum unlock size_filter unlock. Qed.
 
 Lemma card_prod : #|{: T1 * T2}| = #|T1| * #|T2|.
 Proof. by rewrite -cardX; apply: eq_card; case. Qed.
 
-Lemma eq_card_prod (A : pred (T1 * T2)) : A =i predT -> #|A| = #|T1| * #|T2|.
+Lemma eq_card_prod (A : {pred (T1 * T2)}) : A =i predT -> #|A| = #|T1| * #|T2|.
 Proof. exact: eq_card_trans card_prod. Qed.
 
 End ProdFinType.

@@ -505,8 +505,7 @@ Qed.
 
 (* Algebraic integers. *)
 
-Definition Aint : pred_class :=
-  fun x : algC => minCpoly x \is a polyOver Cint.
+Definition Aint : {pred algC} := fun x => minCpoly x \is a polyOver Cint.
 Fact Aint_key : pred_key Aint. Proof. by []. Qed.
 Canonical Aint_keyed := KeyedPred Aint_key.
 
@@ -673,8 +672,8 @@ Lemma Aint_aut (nu : {rmorphism algC -> algC}) x :
   (nu x \in Aint) = (x \in Aint).
 Proof. by rewrite !unfold_in minCpoly_aut. Qed.
 
-Definition dvdA (e : Algebraics.divisor) : pred_class :=
-  fun z : algC => if e == 0 then z == 0 else z / e \in Aint.
+Definition dvdA (e : Algebraics.divisor) : {pred algC} :=
+  fun z => if e == 0 then z == 0 else z / e \in Aint.
 Fact dvdA_key e : pred_key (dvdA e). Proof. by []. Qed.
 Canonical dvdA_keyed e := KeyedPred (dvdA_key e).
 Delimit Scope algC_scope with A.

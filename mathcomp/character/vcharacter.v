@@ -47,7 +47,7 @@ Section Basics.
 
 Variables (gT : finGroupType) (B : {set gT}) (S : seq 'CF(B)) (A : {set gT}).
 
-Definition Zchar : pred_class :=
+Definition Zchar : {pred 'CF(B)} :=
   [pred phi in 'CF(B, A) | dec_Cint_span (in_tuple S) phi].
 Fact Zchar_key : pred_key Zchar. Proof. by []. Qed.
 Canonical Zchar_keyed := KeyedPred Zchar_key.
@@ -701,8 +701,8 @@ Qed.
 
 End MoreVchar.
 
-Definition dirr (gT : finGroupType) (B : {set gT}) : pred_class :=  
-  [pred f : 'CF(B) | (f \in irr B) || (- f \in irr B)].
+Definition dirr (gT : finGroupType) (B : {set gT}) : {pred 'CF(B)} :=  
+  [pred f | (f \in irr B) || (- f \in irr B)].
 Arguments dirr {gT}.
 
 Section Norm1vchar.

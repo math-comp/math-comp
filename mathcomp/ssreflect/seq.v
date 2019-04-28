@@ -928,14 +928,13 @@ Proof. by rewrite -size_eq0 size_filter has_count lt0n. Qed.
 Fixpoint mem_seq (s : seq T) :=
   if s is y :: s' then xpredU1 y (mem_seq s') else xpred0.
 
-Definition eqseq_class := seq T.
-Identity Coercion seq_of_eqseq : eqseq_class >-> seq.
+Definition seq_eqclass := seq T. 
+Identity Coercion seq_of_eqclass : seq_eqclass >-> seq.
+Coercion pred_of_seq (s : seq_eqclass) : {pred T} := mem_seq s.
 
-Coercion pred_of_eq_seq (s : eqseq_class) : pred_class := [eta mem_seq s].
-
-Canonical seq_predType := @mkPredType T (seq T) pred_of_eq_seq.
+Canonical seq_predType := PredType (pred_of_seq : seq T -> pred T).
 (* The line below makes mem_seq a canonical instance of topred. *)
-Canonical mem_seq_predType := mkPredType mem_seq.
+Canonical mem_seq_predType := PredType mem_seq.
 
 Lemma in_cons y s x : (x \in y :: s) = (x == y) || (x \in s).
 Proof. by []. Qed.
@@ -949,14 +948,13 @@ Proof. by rewrite in_cons orbF. Qed.
  (* to be repeated after the Section discharge. *)
 Let inE := (mem_seq1, in_cons, inE).
 
-Lemma mem_seq2 x y1 y2 : (x \in [:: y1; y2]) = xpred2 y1 y2 x.
+Lemma mem_seq2 x y z : (x \in [:: y; z]) = xpred2 y z x.
 Proof. by rewrite !inE. Qed.
 
-Lemma mem_seq3  x y1 y2 y3 : (x \in [:: y1; y2; y3]) = xpred3 y1 y2 y3 x.
+Lemma mem_seq3 x y z t : (x \in [:: y; z; t]) = xpred3 y z t x.
 Proof. by rewrite !inE. Qed.
 
-Lemma mem_seq4  x y1 y2 y3 y4 :
-  (x \in [:: y1; y2; y3; y4]) = xpred4 y1 y2 y3 y4 x.
+Lemma mem_seq4 x y z t u : (x \in [:: y; z; t; u]) = xpred4 y z t u x.
 Proof. by rewrite !inE. Qed.
 
 Lemma mem_cat x s1 s2 : (x \in s1 ++ s2) = (x \in s1) || (x \in s2).
@@ -1285,6 +1283,7 @@ Definition inE := (mem_seq1, in_cons, inE).
 Prenex Implicits mem_seq1 constant uniq undup index.
 
 Arguments eqseq {T} !_ !_.
+Arguments pred_of_seq {T} s x /.
 Arguments eqseqP {T x y}.
 Arguments hasP {T a s}.
 Arguments hasPn {T a s}.
@@ -2253,7 +2252,7 @@ Qed.
 
 Lemma perm_pmap s t : perm_eq s t -> perm_eq (pmap f s) (pmap f t).
 Proof.
-move=> eq_st; apply/(perm_map_inj (@Some_inj _)); rewrite !pmapS_filter.
+move=> eq_st; apply/(perm_map_inj Some_inj); rewrite !pmapS_filter.
 exact/perm_map/perm_filter.
 Qed.
 

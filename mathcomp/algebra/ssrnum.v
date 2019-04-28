@@ -1314,8 +1314,7 @@ Proof. by move=> m n; apply: leq_total. Qed.
 
 Section AcrossTypes.
 
-Variable D D' : pred R.
-Variable (f : R -> R').
+Variables (D D' : {pred R}) (f : R -> R').
 
 Lemma ltrW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
 Proof. exact: homoW. Qed.
@@ -1382,8 +1381,7 @@ End AcrossTypes.
 
 Section NatToR.
 
-Variable D D' : pred nat.
-Variable (f : nat -> R).
+Variables (D D' : {pred nat}) (f : nat -> R).
 
 Lemma ltnrW_homo : {homo f : m n / (m < n)%N >-> m < n} ->
   {homo f : m n / (m <= n)%N >-> m <= n}.
@@ -1471,8 +1469,7 @@ End NatToR.
 
 Section RToNat.
 
-Variable D D' : pred R.
-Variable (f : R -> nat).
+Variables (D D' : {pred R}) (f : R -> nat).
 
 Lemma ltrnW_homo : {homo f : m n / m < n >-> (m < n)%N} ->
   {homo f : m n / m <= n >-> (m <= n)%N}.
@@ -3070,7 +3067,7 @@ Proof. by move=> le_xy; rewrite ltr_neqAle !le_xy andbT. Qed.
 Lemma lerif_nat m n C : (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N.
 Proof. by rewrite /lerif !ler_nat eqr_nat. Qed.
 
-Lemma mono_in_lerif (A : pred R) (f : R -> R) C :
+Lemma mono_in_lerif (A : {pred R}) (f : R -> R) C :
    {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
 Proof.
@@ -3082,7 +3079,7 @@ Lemma mono_lerif (f : R -> R) C :
   forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
 Proof. by move=> mf x y; rewrite /lerif mf (inj_eq (incr_inj _)). Qed.
 
-Lemma nmono_in_lerif (A : pred R) (f : R -> R) C :
+Lemma nmono_in_lerif (A : {pred R}) (f : R -> R) C :
     {in A &, {mono f : x y /~ x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
 Proof.
@@ -3183,7 +3180,7 @@ move=> Rx Ry; rewrite sqrrD addrAC (mulrnDr _ 2) -lerif_subLR addrK.
 exact: real_lerif_mean_square_scaled.
 Qed.
 
-Lemma lerif_AGM_scaled (I : finType) (A : pred I) (E : I -> R) (n := #|A|) :
+Lemma lerif_AGM_scaled (I : finType) (A : {pred I}) (E : I -> R) (n := #|A|) :
     {in A, forall i, 0 <= E i *+ n} ->
   \prod_(i in A) (E i *+ n) <= (\sum_(i in A) E i) ^+ n
                             ?= iff [forall i in A, forall j in A, E i == E j].
@@ -3515,7 +3512,7 @@ rewrite mulr_natr (natrX F 2 2) -exprMn divfK ?pnatr_eq0 //.
 exact: real_lerif_AGM2_scaled.
 Qed.
 
-Lemma lerif_AGM (I : finType) (A : pred I) (E : I -> F) :
+Lemma lerif_AGM (I : finType) (A : {pred I}) (E : I -> F) :
     let n := #|A| in let mu := (\sum_(i in A) E i) / n%:R in
     {in A, forall i, 0 <= E i} ->
   \prod_(i in A) E i <= mu ^+ n
@@ -4855,7 +4852,7 @@ Qed.
 
 (* The proper form of the Arithmetic - Geometric Mean inequality. *)
 
-Lemma lerif_rootC_AGM (I : finType) (A : pred I) (n := #|A|) E :
+Lemma lerif_rootC_AGM (I : finType) (A : {pred I}) (n := #|A|) E :
     {in A, forall i, 0 <= E i} ->
   n.-root (\prod_(i in A) E i) <= (\sum_(i in A) E i) / n%:R
                              ?= iff [forall i in A, forall j in A, E i == E j].
