@@ -1,10 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat fintype bigop finset.
-From mathcomp
-Require Import fingroup morphism automorphism quotient gproduct.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype.
+From mathcomp Require Import bigop finset fingroup morphism automorphism.
+From mathcomp Require Import quotient gproduct.
 
 (******************************************************************************)
 (*   This file provides basic interfaces for the notion of "generic"          *)

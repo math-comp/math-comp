@@ -1,16 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
-From mathcomp
-Require Import fintype tuple finfun bigop prime ssralg poly finset.
-From mathcomp
-Require Import fingroup finalg zmodp cyclic.
-From mathcomp
-Require Import ssrnum ssrint polydiv rat intdiv.
-From mathcomp
-Require Import mxpoly vector falgebra fieldext separable galois algC.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import ssralg poly finset fingroup finalg zmodp cyclic.
+From mathcomp Require Import ssrnum ssrint polydiv rat intdiv mxpoly.
+From mathcomp Require Import vector falgebra fieldext separable galois algC.
 
 (******************************************************************************)
 (* This file provides few basic properties of cyclotomic polynomials.         *)

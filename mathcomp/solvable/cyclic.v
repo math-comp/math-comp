@@ -1,12 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq div fintype bigop.
-From mathcomp
-Require Import prime finset fingroup morphism perm automorphism quotient.
-From mathcomp
-Require Import gproduct ssralg finalg zmodp poly.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import fintype bigop prime finset fingroup morphism.
+From mathcomp Require Import perm automorphism quotient gproduct ssralg.
+From mathcomp Require Import finalg zmodp poly.
 
 (******************************************************************************)
 (*  Properties of cyclic groups.                                              *)

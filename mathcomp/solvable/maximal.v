@@ -1,16 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq choice div fintype.
-From mathcomp
-Require Import finfun bigop finset prime binomial fingroup morphism perm.
-From mathcomp
-Require Import automorphism quotient action commutator gproduct gfunctor.
-From mathcomp
-Require Import ssralg finalg zmodp cyclic pgroup center gseries.
-From mathcomp
-Require Import nilpotent sylow abelian finmodule.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
+From mathcomp Require Import div fintype finfun bigop finset prime binomial.
+From mathcomp Require Import fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action commutator gproduct gfunctor ssralg.
+From mathcomp Require Import finalg zmodp cyclic pgroup center gseries.
+From mathcomp Require Import nilpotent sylow abelian finmodule.
 
 (******************************************************************************)
 (*   This file establishes basic properties of several important classes of   *)

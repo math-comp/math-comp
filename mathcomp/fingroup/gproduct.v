@@ -1,10 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
-From mathcomp
-Require Import bigop finset fingroup morphism quotient action.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype bigop finset fingroup morphism.
+From mathcomp Require Import quotient action.
 
 (******************************************************************************)
 (*  Partial, semidirect, central, and direct products.                        *)

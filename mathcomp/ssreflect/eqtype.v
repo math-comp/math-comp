@@ -1,8 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrfun ssrbool.
+From mathcomp Require Import ssreflect ssrfun ssrbool.
 
 (******************************************************************************)
 (* This file defines two "base" combinatorial interfaces:                     *)

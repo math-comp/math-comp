@@ -1,14 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq div choice fintype.
-From mathcomp
-Require Import tuple finfun bigop ssralg poly polydiv.
-From mathcomp
-Require Import finset fingroup morphism quotient perm action zmodp cyclic.
-From mathcomp
-Require Import matrix mxalgebra vector falgebra fieldext separable.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple finfun bigop ssralg poly.
+From mathcomp Require Import polydiv finset fingroup morphism quotient perm.
+From mathcomp Require Import action zmodp cyclic matrix mxalgebra vector.
+From mathcomp Require Import falgebra fieldext separable.
 
 (******************************************************************************)
 (* This file develops some basic Galois field theory, defining:               *)

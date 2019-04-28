@@ -1,14 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
-From mathcomp
-Require Import fintype tuple finfun bigop prime ssralg poly polydiv finset.
-From mathcomp
-Require Import fingroup morphism perm automorphism quotient finalg action zmodp.
-From mathcomp
-Require Import commutator cyclic center pgroup matrix mxalgebra mxpoly.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import ssralg poly polydiv finset fingroup morphism.
+From mathcomp Require Import perm automorphism quotient finalg action zmodp.
+From mathcomp Require Import commutator cyclic center pgroup matrix mxalgebra.
+From mathcomp Require Import mxpoly.
 
 (******************************************************************************)
 (*  This file provides linkage between classic Group Theory and commutative   *)

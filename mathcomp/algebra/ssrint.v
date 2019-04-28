@@ -1,11 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp
-Require Import fintype finfun bigop ssralg countalg ssrnum poly.
-Import GRing.Theory Num.Theory.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
+From mathcomp Require Import fintype finfun bigop ssralg countalg ssrnum poly.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
@@ -39,11 +35,11 @@ Import GRing.Theory Num.Theory.
 (* (Posz (x - y)) and (Posz x) - (Posz y) for x, y : nat.                     *)
 (******************************************************************************)
 
-
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Import GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
 Local Open Scope int_scope.
 

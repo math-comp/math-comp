@@ -1,16 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
-From mathcomp
-Require Import fintype tuple finfun bigop prime ssralg poly finset.
-From mathcomp
-Require Import fingroup morphism perm automorphism quotient finalg action.
-From mathcomp
-Require Import gproduct zmodp commutator cyclic center pgroup sylow.
-From mathcomp
-Require Import matrix vector falgebra ssrnum algC algnum.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime.
+From mathcomp Require Import ssralg poly finset fingroup morphism perm.
+From mathcomp Require Import automorphism quotient finalg action gproduct.
+From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
+From mathcomp Require Import matrix vector falgebra ssrnum algC algnum.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)
@@ -432,7 +427,7 @@ Definition cfaithful phi := cfker phi \subset [1].
 Definition ortho_rec S1 S2 :=
   all [pred phi | all [pred psi | '[phi, psi] == 0] S2] S1.
 
-Fixpoint pair_ortho_rec S := 
+Fixpoint pair_ortho_rec S :=
   if S is psi :: S' then ortho_rec psi S' && pair_ortho_rec S' else true.
 
 (* We exclude 0 from pairwise orthogonal sets. *)
@@ -853,7 +848,7 @@ Proof.
 rewrite /cfdot rmorphM fmorphV rmorph_nat rmorph_sum; congr (_ * _).
 by apply: eq_bigr=> x _; rewrite rmorphM conjCK mulrC.
 Qed.
- 
+
 Lemma eq_cfdotr A phi psi1 psi2 :
   phi \in 'CF(G, A) -> {in A, psi1 =1 psi2} -> '[phi, psi1] = '[phi, psi2].
 Proof. by move=> Aphi /eq_cfdotl eq_dot; rewrite cfdotC eq_dot // -cfdotC. Qed.
@@ -875,7 +870,7 @@ Proof. exact: raddf_sum. Qed.
 Lemma cfdotZr a xi phi : '[xi, a *: phi] = a^* * '[xi, phi].
 Proof. by rewrite !(cfdotC xi) cfdotZl rmorphM. Qed.
 
-Lemma cfdot_cfAut (u : {rmorphism algC -> algC}) phi psi : 
+Lemma cfdot_cfAut (u : {rmorphism algC -> algC}) phi psi :
     {in image psi G, {morph u : x / x^*}} ->
   '[cfAut u phi, cfAut u psi] = u '[phi, psi].
 Proof.
@@ -1149,7 +1144,7 @@ rewrite addr0 cfdotZr mulf_eq0 conjC_eq0 cfnorm_eq0.
 by case/pred2P=> // Si0; rewrite -Si0 S_i in notS0.
 Qed.
 
-Lemma filter_pairwise_orthogonal S p : 
+Lemma filter_pairwise_orthogonal S p :
   pairwise_orthogonal S -> pairwise_orthogonal (filter p S).
 Proof.
 move=> orthoS; apply: sub_pairwise_orthogonal (orthoS).
@@ -1768,7 +1763,7 @@ Proof. by rewrite cfaithfulE cfker_quo ?cfker_normal ?trivg_quotient. Qed.
 
 (* Note that there is no requirement that K be normal in H or G. *)
 Lemma cfResQuo H K phi :
-     K \subset cfker phi -> K \subset H -> H \subset G -> 
+     K \subset cfker phi -> K \subset H -> H \subset G ->
   ('Res[H / K] (phi / K) = 'Res[H] phi / K)%CF.
 Proof.
 move=> kerK sKH sHG; apply/cfun_inP=> xb Hxb; rewrite cfResE ?quotientS //.
@@ -1796,14 +1791,14 @@ Section Product.
 
 Variable (gT : finGroupType) (G : {group gT}).
 
-Lemma cfunM_onI A B phi psi : 
+Lemma cfunM_onI A B phi psi :
   phi \in 'CF(G, A) -> psi \in 'CF(G, B) -> phi * psi \in 'CF(G, A :&: B).
 Proof.
 rewrite !cfun_onE => Aphi Bpsi; apply/subsetP=> x; rewrite !inE cfunE mulf_eq0.
 by case/norP=> /(subsetP Aphi)-> /(subsetP Bpsi).
 Qed.
 
-Lemma cfunM_on A phi psi : 
+Lemma cfunM_on A phi psi :
   phi \in 'CF(G, A) -> psi \in 'CF(G, A) -> phi * psi \in 'CF(G, A).
 Proof. by move=> Aphi Bpsi; rewrite -[A]setIid cfunM_onI. Qed.
 
@@ -2259,7 +2254,7 @@ Proof.
 case/andP=> sHG nHG; apply: (cfun_onS (class_support_sub_norm (subxx _) nHG)).
 by rewrite cfInd_on ?cfun_onG.
 Qed.
- 
+
 Lemma cfInd1 phi : H \subset G -> 'Ind[G] phi 1%g = #|G : H|%:R * phi 1%g.
 Proof.
 move=> sHG; rewrite cfIndE // natf_indexg // -mulrA mulrCA; congr (_ * _).
@@ -2315,7 +2310,7 @@ Definition cfdot_Res_r := Frobenius_reciprocity.
 Lemma cfdot_Res_l psi phi : '['Res[H] psi, phi] = '[psi, 'Ind[G] phi].
 Proof. by rewrite cfdotC cfdot_Res_r -cfdotC. Qed.
 
-Lemma cfIndM phi psi:  H \subset G -> 
+Lemma cfIndM phi psi:  H \subset G ->
      'Ind[G] (phi * ('Res[H] psi)) = 'Ind[G] phi * psi.
 Proof.
 move=> HsG; apply/cfun_inP=> x Gx; rewrite !cfIndE // !cfunE !cfIndE // -mulrA.
@@ -2496,4 +2491,3 @@ Definition conj_cfQuo := cfAutQuo conjC.
 Definition conj_cfMod := cfAutMod conjC.
 Definition conj_cfInd := cfAutInd conjC.
 Definition cfconjC_eq1 := cfAut_eq1 conjC.
-

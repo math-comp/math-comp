@@ -1,12 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrbool ssrfun eqtype ssrnat seq path div choice.
-From mathcomp
-Require Import fintype bigop ssralg finset fingroup morphism perm.
-From mathcomp
-Require Import finalg action gproduct commutator cyclic.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype bigop ssralg finset fingroup.
+From mathcomp Require Import morphism perm finalg action gproduct commutator.
+From mathcomp Require Import cyclic.
 
 (******************************************************************************)
 (*  This file regroups constructions and results that are based on the most   *)

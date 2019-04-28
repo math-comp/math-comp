@@ -1,12 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrfun ssrbool eqtype ssrnat seq div fintype tuple.
-From mathcomp
-Require Import finfun bigop fingroup perm ssralg zmodp matrix mxalgebra.
-From mathcomp
-Require Import poly polydiv.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import fintype tuple finfun bigop fingroup perm.
+From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)

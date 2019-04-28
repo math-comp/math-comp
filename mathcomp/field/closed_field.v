@@ -1,10 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp
-Require Import ssrfun ssrbool eqtype choice ssrnat seq fintype generic_quotient.
-From mathcomp
-Require Import bigop ssralg poly polydiv matrix mxpoly countalg ring_quotient.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
+From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
+From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
 
 (******************************************************************************)
 (* This files contains two main contributions:                                *)
