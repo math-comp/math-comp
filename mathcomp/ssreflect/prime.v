@@ -7,7 +7,9 @@ From mathcomp Require Import fintype div bigop.
 (* This file contains the definitions of:                                     *)
 (*        prime p <=> p is a prime.                                           *)
 (*       primes m == the sorted list of prime divisors of m > 1, else [::].   *)
-(*        pfactor == the type of prime factors, syntax (p ^ e)%pfactor.       *)
+(*    pfactor p e == the value p ^ e of a prime factor (p, e).                *)
+(*    NumFactor f == print version of a prime factor, converting the prime    *)
+(*                   component to a Num (which can print large values).       *)
 (* prime_decomp m == the list of prime factors of m > 1, sorted by primes.    *)
 (*       logn p m == the e such that (p ^ e) \in prime_decomp n, else 0.      *)
 (*  trunc_log p m == the largest e such that p ^ e <= m, or 0 if p or m is 0. *)
@@ -26,16 +28,15 @@ From mathcomp Require Import fintype div bigop.
 (*                   that (p \in \pi(n)) = (p \in primes n).                  *)
 (*         \pi(A) == the set of primes of #|A|, with A a collective predicate *)
 (*                   over a finite Type.                                      *)
-(*     -> The notation \pi(A) is implemented with a collapsible Coercion, so  *)
-(*        the type of A must coerce to finpred_class (e.g., by coercing to    *)
-(*        {set T}), not merely implement the predType interface (as seq T     *)
-(*        does).                                                              *)
-(*     -> The expression #|A| will only appear in \pi(A) after simplification *)
-(*        collapses the coercion stack, so it is advisable to do so early on. *)
+(*    -> The notation \pi(A) is implemented with a collapsible Coercion. The  *)
+(*       type of A must coerce to finpred_sort (e.g., by coercing to {set T}) *)
+(*       and not merely implement the predType interface (as seq T does).     *)
+(*    -> The expression #|A| will only appear in \pi(A) after simplification  *)
+(*       collapses the coercion, so it is advisable to do so early on.        *)
 (*     pi.-nat n <=> n > 0 and all prime divisors of n are in pi.             *)
 (*          n`_pi == the pi-part of n -- the largest pi.-nat divisor of n.    *)
 (*               := \prod_(0 <= p < n.+1 | p \in pi) p ^ logn p n.            *)
-(*     -> The nat >-> nat_pred coercion lets us write p.-nat n and n`_p.      *)
+(*    -> The nat >-> nat_pred coercion lets us write p.-nat n and n`_p.       *)
 (* In addition to the lemmas relevant to these definitions, this file also    *)
 (* contains the dvdn_sum lemma, so that bigop.v doesn't depend on div.v.      *)
 (******************************************************************************)
@@ -56,7 +57,9 @@ Unset Printing Implicit Defensive.
 (* which can then be used casually in proofs with moderately-sized numeric  *)
 (* values (indeed, the code here performs well for up to 6-digit numbers).  *)
 
-(* We start with faster mod-2 functions. *)
+Module Import PrimeDecompAux.
+
+(* We start with faster mod-2 and 2-valuation functions. *)
 
 Fixpoint edivn2 q r := if r is r'.+2 then edivn2 q.+1 r' else (q, r).
 
@@ -95,21 +98,35 @@ Variant ifnz_spec T n (x y : T) : T -> Type :=
 Lemma ifnzP T n (x y : T) : ifnz_spec n x y (ifnz n x y).
 Proof. by case: n => [|n]; [right | left]. Qed.
 
+(* The list of divisors and the Euler function are computed directly from    *)
+(* the decomposition, using a merge_sort variant sort of the divisor list.   *)
+
+Definition add_divisors f divs :=
+  let: (p, e) := f in
+  let add1 divs' := merge leq (map (NatTrec.mul p) divs') divs in
+  iter e add1 divs.
+
+Import NatTrec.
+
+Definition add_totient_factor f m := let: (p, e) := f in p.-1 * p ^ e.-1 * m.
+
+Definition cons_pfactor (p e : nat) pd := ifnz e ((p, e) :: pd) pd.
+
+Notation "p ^? e :: pd" := (cons_pfactor p e pd)
+  (at level 30, e at level 30, pd at level 60) : nat_scope.
+
+End PrimeDecompAux.
+
 (* For pretty-printing. *)
 Definition NumFactor (f : nat * nat) := ([Num of f.1], f.2).
 
 Definition pfactor p e := p ^ e.
 
-Definition cons_pfactor (p e : nat) pd := ifnz e ((p, e) :: pd) pd.
-
-Local Notation "p ^? e :: pd" := (cons_pfactor p e pd)
-  (at level 30, e at level 30, pd at level 60) : nat_scope.
-
 Section prime_decomp.
 
 Import NatTrec.
 
-Fixpoint prime_decomp_rec m k a b c e :=
+Local Fixpoint prime_decomp_rec m k a b c e :=
   let p := k.*2.+1 in
   if a is a'.+1 then
     if b - (ifnz e 1 k - c) is b'.+1 then
@@ -128,16 +145,6 @@ Definition prime_decomp n :=
   let: (b, c) := edivn (2 - bc) 2 in
   2 ^? e2 :: [rec m2.*2.+1, 1, a, b, c, 0].
 
-(* The list of divisors and the Euler function are computed directly from *)
-(* the decomposition, using a merge_sort variant sort the divisor list.   *)
-
-Definition add_divisors f divs :=
-  let: (p, e) := f in
-  let add1 divs' := merge leq (map (NatTrec.mul p) divs') divs in
-  iter e add1 divs.
-
-Definition add_totient_factor f m := let: (p, e) := f in p.-1 * p ^ e.-1 * m.
-
 End prime_decomp.
 
 Definition primes n := unzip1 (prime_decomp n).
@@ -146,18 +153,16 @@ Definition prime p := if prime_decomp p is [:: (_ , 1)] then true else false.
 
 Definition nat_pred := simpl_pred nat.
 
-Definition pi_unwrapped_arg := nat.
-Definition pi_wrapped_arg := wrapped nat.
-Coercion unwrap_pi_arg (wa : pi_wrapped_arg) : pi_unwrapped_arg := unwrap wa.
-Coercion pi_arg_of_nat (n : nat) := Wrap n : pi_wrapped_arg.
-Coercion pi_arg_of_fin_pred T pT (A : @fin_pred_sort T pT) : pi_wrapped_arg :=
-  Wrap #|A|.
-
-Definition pi_of (n : pi_unwrapped_arg) : nat_pred := [pred p in primes n].
+Definition pi_arg := nat.
+Coercion pi_arg_of_nat (n : nat) : pi_arg := n.
+Coercion pi_arg_of_fin_pred T pT (A : @fin_pred_sort T pT) : pi_arg := #|A|.
+Arguments pi_arg_of_nat n /.
+Arguments pi_arg_of_fin_pred {T pT} A /.
+Definition pi_of (n : pi_arg) : nat_pred := [pred p in primes n].
 
 Notation "\pi ( n )" := (pi_of n)
   (at level 2, format "\pi ( n )") : nat_scope.
-Notation "\p 'i' ( A )" := \pi(#|A|)
+Notation "\p 'i' ( A )" := \pi(#|A|) 
   (at level 2, format "\p 'i' ( A )") : nat_scope.
 
 Definition pdiv n := head 1 (primes n).

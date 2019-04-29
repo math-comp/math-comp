@@ -572,10 +572,10 @@ Lemma irr_of_socleK : cancel irr_of_socle W.
 Proof. by move=> Wi; rewrite /W subrK cast_ordKV enum_rankK. Qed.
 Hint Resolve socle_of_IirrK irr_of_socleK : core.
 
-Lemma irr_of_socle_bij (A : pred (Iirr G)) : {on A, bijective irr_of_socle}.
+Lemma irr_of_socle_bij (A : {pred (Iirr G)}) : {on A, bijective irr_of_socle}.
 Proof. by apply: onW_bij; exists W. Qed.
 
-Lemma socle_of_Iirr_bij (A : pred sG) : {on A, bijective W}.
+Lemma socle_of_Iirr_bij (A : {pred sG}) : {on A, bijective W}.
 Proof. by apply: onW_bij; exists irr_of_socle. Qed.
 
 End IrrClassDef.

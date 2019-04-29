@@ -1357,17 +1357,6 @@ Lemma valG : val G = G. Proof. by []. Qed.
 Lemma group1 : 1 \in G. Proof. by case/group_setP: (valP G). Qed.
 Hint Resolve group1 : core.
 
-(* Loads of silly variants to placate the incompleteness of trivial. *)
-(* An alternative would be to upgrade done, pending better support   *)
-(* in the ssreflect ML code.                                         *)
-Notation gTr := (FinGroup.sort gT).
-Notation Gcl := (pred_of_set G : pred gTr).
-Lemma group1_class1 : (1 : gTr) \in G. Proof. by []. Qed.
-Lemma group1_class2 : 1 \in Gcl. Proof. by []. Qed.
-Lemma group1_class12 : (1 : gTr) \in Gcl. Proof. by []. Qed.
-Lemma group1_eqType : (1 : gT : eqType) \in G. Proof. by []. Qed.
-Lemma group1_finType : (1 : gT : finType) \in G. Proof. by []. Qed.
-
 Lemma group1_contra x : x \notin G -> x != 1.
 Proof. by apply: contraNneq => ->. Qed.
 
@@ -1385,14 +1374,6 @@ Lemma repr_group : repr G = 1. Proof. by rewrite /repr group1. Qed.
 
 Lemma cardG_gt0 : 0 < #|G|.
 Proof. by rewrite lt0n; apply/existsP; exists (1 : gT). Qed.
-(* Workaround for the fact that the simple matching used by Trivial does not  *)
-(* always allow conversion. In particular cardG_gt0 always fails to apply to  *)
-(* subgoals that have been simplified (by /=) because type inference in the   *)
-(* notation #|G| introduces redexes of the form                               *)
-(*    Finite.sort (arg_finGroupType (FinGroup.base gT))                       *)
-(* which get collapsed to Fingroup.arg_sort (FinGroup.base gT).               *)
-Definition cardG_gt0_reduced : 0 < card (@mem gT (predPredType gT) G)
-  := cardG_gt0.
 
 Lemma indexg_gt0 A : 0 < #|G : A|.
 Proof.
@@ -1839,9 +1820,9 @@ Qed.
 
 End GroupProp.
 
-Hint Resolve group1 group1_class1 group1_class12 group1_class12 : core.
-Hint Resolve group1_eqType group1_finType : core.
-Hint Resolve cardG_gt0 cardG_gt0_reduced indexg_gt0 : core.
+Hint Extern 0 (is_true (1%g \in _)) => apply: group1 : core.
+Hint Extern 0 (is_true (0 < #|_|)) => apply: cardG_gt0 : core.
+Hint Extern 0 (is_true (0 < #|_ : _|)) => apply: indexg_gt0 : core.
 
 Notation "G :^ x" := (conjG_group G x) : Group_scope.
 
@@ -3005,7 +2986,8 @@ Notation "''C_' G [ x ]" := (setI_group G 'C[x]) : Group_scope.
 Notation "''C_' ( G ) [ x ]" := (setI_group G 'C[x])
   (only parsing) : Group_scope.
 
-Hint Resolve normG normal_refl : core.
+Hint Extern 0 (is_true (_ \subset _)) => apply: normG : core.
+Hint Extern 0 (is_true (_ <| _)) => apply: normal_refl : core.
 
 Section MinMaxGroup.
 

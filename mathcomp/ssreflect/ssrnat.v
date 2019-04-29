@@ -1382,7 +1382,7 @@ Qed.
 Section Monotonicity.
 Variable T : Type.
 
-Lemma homo_ltn_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
+Lemma homo_ltn_in (D : {pred nat}) (f : nat -> T) (r : T -> T -> Prop) :
   (forall y x z, r x y -> r y z -> r x z) ->
   {in D &, forall i j k, i < k < j -> k \in D} ->
   {in D, forall i, i.+1 \in D -> r (f i) (f i.+1)} ->
@@ -1400,7 +1400,7 @@ Lemma homo_ltn (f : nat -> T) (r : T -> T -> Prop) :
   (forall i, r (f i) (f i.+1)) -> {homo f : i j / i < j >-> r i j}.
 Proof. by move=> /(@homo_ltn_in predT f) fr fS i j; apply: fr. Qed.
 
-Lemma homo_leq_in (D : pred nat) (f : nat -> T) (r : T -> T -> Prop) :
+Lemma homo_leq_in (D : {pred nat}) (f : nat -> T) (r : T -> T -> Prop) :
   (forall x, r x x) -> (forall y x z, r x y -> r y z -> r x z) ->
   {in D &, forall i j k, i < k < j -> k \in D} ->
   {in D, forall i, i.+1 \in D -> r (f i) (f i.+1)} ->
@@ -1464,7 +1464,7 @@ Proof. exact: total_homo_mono. Qed.
 Lemma leq_nmono : {homo f : m n /~ m < n} -> {mono f : m n /~ m <= n}.
 Proof. exact: total_homo_mono. Qed.
 
-Variable (D D' : pred nat).
+Variables (D D' : {pred nat}).
 
 Lemma ltnW_homo_in : {in D & D', {homo f : m n / m < n}} ->
   {in D & D', {homo f : m n / m <= n}}.

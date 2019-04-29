@@ -266,7 +266,7 @@ Variable F : GFunctor.iso_map.
 Lemma gFsub gT (G : {group gT}) : F gT G \subset G.
 Proof. by case: F gT G. Qed.
 
-Lemma gFsub_trans gT (G : {group gT}) (A : pred_class) :
+Lemma gFsub_trans gT (G : {group gT}) (A : {pred gT}) :
   G \subset A -> F gT G \subset A.
 Proof. exact/subset_trans/gFsub. Qed.
 
@@ -297,7 +297,7 @@ Proof. exact/char_trans/gFchar. Qed.
 Lemma gFnormal_trans gT (G H : {group gT}) : H <| G -> F gT H <| G.
 Proof. exact/char_normal_trans/gFchar. Qed.
 
-Lemma gFnorm_trans gT (A : pred_class) (G : {group gT}) :
+Lemma gFnorm_trans gT (A : {pred gT}) (G : {group gT}) :
   A \subset 'N(G) -> A \subset 'N(F gT G).
 Proof. by move/subset_trans/(_ (gFnorms G)). Qed.
 

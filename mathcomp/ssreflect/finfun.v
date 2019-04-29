@@ -348,7 +348,7 @@ Section EqTheory.
 
 Variables (aT : finType) (rT : eqType).
 Notation fT := {ffun aT -> rT}.
-Implicit Types (y : rT) (D : pred aT) (R : pred rT) (f : fT).
+Implicit Types (y : rT) (D : {pred aT}) (R : {pred rT}) (f : fT).
 
 Lemma supportP y D g :
   reflect (forall x, x \notin D -> g x = y) (y.-support g \subset D).
@@ -440,7 +440,7 @@ Section FinFunTheory.
 
 Variables aT rT : finType.
 Notation fT := {ffun aT -> rT}.
-Implicit Types (D : pred aT) (R : pred rT) (F : aT -> pred rT).
+Implicit Types (D : {pred aT}) (R : {pred rT}) (F : aT -> pred rT).
 
 Lemma card_pfamily y0 D F :
   #|pfamily y0 D F| = foldr muln 1 [seq #|F x| | x in D].

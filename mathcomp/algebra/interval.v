@@ -331,7 +331,7 @@ Definition pred_of_itv (i : interval R) : pred R :=
         | BOpen_if b ub => x <= ub ?< if b
         | BInfty => true
       end].
-Canonical Structure itvPredType := Eval hnf in mkPredType pred_of_itv.
+Canonical Structure itvPredType := PredType pred_of_itv.
 
 (* we compute a set of rewrite rules associated to an interval *)
 Definition itv_rewrite (i : interval R) x : Type :=

@@ -554,13 +554,13 @@ Notation algCnumClosedField := numClosedFieldType.
 Notation Creal := (@Num.Def.Rreal numDomainType).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
-Definition Crat : pred_class := fun x : algC => ratr (getCrat x) == x.
+Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
 
 Definition floorC x := sval (floorC_subproof x).
-Definition Cint : pred_class := fun x : algC => (floorC x)%:~R == x.
+Definition Cint : {pred algC} := fun x => (floorC x)%:~R == x.
 
 Definition truncC x := if x >= 0 then `|floorC x|%N else 0%N.
-Definition Cnat : pred_class := fun x : algC => (truncC x)%:R == x.
+Definition Cnat : {pred algC} := fun x => (truncC x)%:R == x.
 
 Definition minCpoly x : {poly algC} :=
   let: exist2 p _ _ := minCpoly_subproof x in map_poly ratr p.
@@ -573,8 +573,8 @@ Lemma nCdivE (p : nat) : p = p%:R :> divisor. Proof. by []. Qed.
 Lemma zCdivE (p : int) : p = p%:~R :> divisor. Proof. by []. Qed.
 Definition CdivE := (nCdivE, zCdivE).
 
-Definition dvdC (x : divisor) : pred_class :=
-   fun y : algC => if x == 0 then y == 0 else y / x \in Cint.
+Definition dvdC (x : divisor) : {pred algC} :=
+   fun y => if x == 0 then y == 0 else y / x \in Cint.
 Notation "x %| y" := (y \in dvdC x) : C_expanded_scope.
 Notation "x %| y" := (@in_mem divisor y (mem (dvdC x))) : C_scope.
 
@@ -715,7 +715,8 @@ Proof. by move=> _ _ /CintP[m1 ->] /CintP[m2 ->]; rewrite -rmorphM !intCK. Qed.
 Lemma floorCX n : {in Cint, {morph floorC : x / x ^+ n}}.
 Proof. by move=> _ /CintP[m ->]; rewrite -rmorphX !intCK. Qed.
 
-Lemma rpred_Cint S (ringS : subringPred S) (kS : keyed_pred ringS) x :
+Lemma rpred_Cint
+        (S : {pred algC}) (ringS : subringPred S) (kS : keyed_pred ringS) x :
   x \in Cint -> x \in kS.
 Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
 
@@ -805,7 +806,8 @@ Proof. by move=> _ _ /CnatP[n1 ->] /CnatP[n2 ->]; rewrite -natrM !natCK. Qed.
 Lemma truncCX n : {in Cnat, {morph truncC : x / x ^+ n >-> (x ^ n)%N}}.
 Proof. by move=> _ /CnatP[n1 ->]; rewrite -natrX !natCK. Qed.
 
-Lemma rpred_Cnat S (ringS : semiringPred S) (kS : keyed_pred ringS) x :
+Lemma rpred_Cnat
+        (S : {pred algC}) (ringS : semiringPred S) (kS : keyed_pred ringS) x :
   x \in Cnat -> x \in kS.
 Proof. by case/CnatP=> n ->; apply: rpred_nat. Qed.
 
@@ -1110,7 +1112,8 @@ Canonical Crat_subringPred := SubringPred Crat_divring_closed.
 Canonical Crat_sdivrPred := SdivrPred Crat_divring_closed.
 Canonical Crat_divringPred := DivringPred Crat_divring_closed.
 
-Lemma rpred_Crat S (ringS : divringPred S) (kS : keyed_pred ringS) :
+Lemma rpred_Crat
+        (S : {pred algC}) (ringS : divringPred S) (kS : keyed_pred ringS) :
   {subset Crat <= kS}.
 Proof. by move=> _ /CratP[a ->]; apply: rpred_rat. Qed.
 

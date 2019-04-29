@@ -1298,13 +1298,14 @@ Qed.
 
 (* Lifting a ring predicate to polynomials. *)
 
-Definition polyOver (S : pred_class) :=
-  [qualify a p : {poly R} | all (mem S) p].
+Implicit Type S : {pred R}.
+
+Definition polyOver S := [qualify a p : {poly R} | all (mem S) p].
 
 Fact polyOver_key S : pred_key (polyOver S). Proof. by []. Qed.
 Canonical polyOver_keyed S := KeyedQualifier (polyOver_key S).
 
-Lemma polyOverS (S1 S2 : pred_class) :
+Lemma polyOverS (S1 S2 : {pred R}) :
   {subset S1 <= S2} -> {subset polyOver S1 <= polyOver S2}.
 Proof.
 by move=> sS12 p /(all_nthP 0)S1p; apply/(all_nthP 0)=> i /S1p; apply: sS12.
@@ -1313,7 +1314,7 @@ Qed.
 Lemma polyOver0 S : 0 \is a polyOver S.
 Proof. by rewrite qualifE polyseq0. Qed.
 
-Lemma polyOver_poly (S : pred_class) n E :
+Lemma polyOver_poly S n E :
   (forall i, i < n -> E i \in S) -> \poly_(i < n) E i \is a polyOver S.
 Proof.
 move=> S_E; apply/(all_nthP 0)=> i lt_i_p /=; rewrite coef_poly.
@@ -1322,7 +1323,7 @@ Qed.
 
 Section PolyOverAdd.
 
-Variables (S : predPredType R) (addS : addrPred S) (kS : keyed_pred addS).
+Variables (S : {pred R}) (addS : addrPred S) (kS : keyed_pred addS).
 
 Lemma polyOverP {p} : reflect (forall i, p`_i \in kS) (p \in polyOver kS).
 Proof.
@@ -1354,7 +1355,7 @@ Canonical polyOver_zmodPred S addS kS := ZmodPred (@polyOverNr S addS kS).
 
 Section PolyOverSemiring.
 
-Context (S : pred_class) (ringS : @semiringPred R S) (kS : keyed_pred ringS).
+Variables (S : {pred R}) (ringS : semiringPred S) (kS : keyed_pred ringS).
 
 Fact polyOver_mulr_closed : mulr_closed (polyOver kS).
 Proof.
@@ -1382,7 +1383,7 @@ End PolyOverSemiring.
 
 Section PolyOverRing.
 
-Context (S : pred_class) (ringS : @subringPred R S) (kS : keyed_pred ringS).
+Variables (S : {pred R}) (ringS : subringPred S) (kS : keyed_pred ringS).
 Canonical polyOver_smulrPred := SmulrPred (polyOver_mulr_closed kS).
 Canonical polyOver_subringPred := SubringPred (polyOver_mulr_closed kS).
 

@@ -267,10 +267,10 @@ Definition subsetv U V := (vs2mx U <= vs2mx V)%MS.
 Definition vline u := mx2vs (v2r u).
 
 (* Vspace membership is defined as line inclusion. *)
-Definition pred_of_vspace phV (U : Vector.space phV) : pred_class :=
+Definition pred_of_vspace phV (U : Vector.space phV) : {pred vT} :=
   fun v => (vs2mx (vline v) <= vs2mx U)%MS.
 Canonical vspace_predType :=
-  @mkPredType _ (unkeyed {vspace vT}) (@pred_of_vspace _).
+  @PredType _ (unkeyed {vspace vT}) (@pred_of_vspace _).
 
 Definition fullv : {vspace vT} := mx2vs 1%:M.
 Definition addv U V := mx2vs (vs2mx U + vs2mx V).
@@ -294,7 +294,7 @@ Definition basis_of U X := (span X == U) && free X.
 
 End VspaceDefs.
 
-Coercion pred_of_vspace : Vector.space >-> pred_class.
+Coercion pred_of_vspace : Vector.space >-> pred_sort.
 Notation "\dim U" := (dimv U) : nat_scope.
 Notation "U <= V" := (subsetv U V) : vspace_scope.
 Notation "U <= V <= W" := (subsetv U V && subsetv V W) : vspace_scope.
