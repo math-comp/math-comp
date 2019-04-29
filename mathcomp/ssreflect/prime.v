@@ -162,7 +162,8 @@ Definition pi_of (n : pi_arg) : nat_pred := [pred p in primes n].
 
 Notation "\pi ( n )" := (pi_of n)
   (at level 2, format "\pi ( n )") : nat_scope.
-Notation "\pi ( A )" := \pi(#|A|) (only printing) : nat_scope.
+Notation "\p 'i' ( A )" := \pi(#|A|) 
+  (at level 2, format "\p 'i' ( A )") : nat_scope.
 
 Definition pdiv n := head 1 (primes n).
 
