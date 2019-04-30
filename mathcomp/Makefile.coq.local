@@ -1,0 +1,4 @@
+test_suite/hierarchy_test.v: all/all.vo
+	mkdir -p test_suite/
+	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify \
+	  -R . mathcomp -lib all.all > test_suite/hierarchy_test.v
