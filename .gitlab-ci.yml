@@ -294,29 +294,21 @@ ci-bigenough-dev:
 ci-finmap-8.7:
   extends: .ci-finmap
   variables:
-    CONTRIB_URL: "https://github.com/ggonthier/finmap.git"
-    CONTRIB_VERSION: coq-9995-compatibility
     COQ_VERSION: "8.7"
 
 ci-finmap-8.8:
   extends: .ci-finmap
   variables:
-    CONTRIB_URL: "https://github.com/ggonthier/finmap.git"
-    CONTRIB_VERSION: coq-9995-compatibility
     COQ_VERSION: "8.8"
 
 ci-finmap-8.9:
   extends: .ci-finmap
   variables:
-    CONTRIB_URL: "https://github.com/ggonthier/finmap.git"
-    CONTRIB_VERSION: coq-9995-compatibility
     COQ_VERSION: "8.9"
 
 ci-finmap-dev:
   extends: .ci-finmap
   variables:
-    CONTRIB_URL: "https://github.com/ggonthier/finmap.git"
-    CONTRIB_VERSION: coq-9995-compatibility
     COQ_VERSION: "dev"
 
 ################
