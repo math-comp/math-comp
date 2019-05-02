@@ -17,11 +17,8 @@
 (* You should have received a copy of the GNU General Public License     *)
 (* along with this program.  If not, see <http://www.gnu.org/licenses/>. *)
 (*************************************************************************)
-
-From mathcomp
-Require Import ssreflect ssrbool eqtype ssrfun ssrnat choice seq.
-From mathcomp
-Require Import fintype tuple bigop path finset.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrfun ssrnat choice seq.
+From mathcomp Require Import fintype tuple bigop path finset.
 
 (******************************************************************************)
 (* This files definies a ordered and decidable relations on a type as         *)
@@ -1814,7 +1811,7 @@ Proof. by case=> le_xy; rewrite eq_le le_xy. Qed.
 Lemma lt_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
 Proof. by move=> le_xy; rewrite lt_neqAle !le_xy andbT. Qed.
 
-Lemma mono_in_leif (A : pred T) (f : T -> T) C :
+Lemma mono_in_leif (A : {pred T}) (f : T -> T) C :
    {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
 Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
@@ -1824,7 +1821,7 @@ Lemma mono_leif (f : T -> T) C :
   forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
 
-Lemma nmono_in_leif (A : pred T) (f : T -> T) C :
+Lemma nmono_in_leif (A : {pred T}) (f : T -> T) C :
     {in A &, {mono f : x y /~ x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
 Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
@@ -1840,8 +1837,7 @@ Section POrderMonotonyTheory.
 Context {display display' : unit}.
 Context {T : porderType display} {T' : porderType display'}.
 Implicit Types (m n p : nat) (x y z : T) (u v w : T').
-Variable D D' : pred T.
-Variable (f : T -> T').
+Variables (D D' : {pred T}) (f : T -> T').
 
 Hint Resolve lexx lt_neqAle (@le_anti _ T) (@le_anti _ T') lt_def : core.
 
@@ -2276,7 +2272,7 @@ Definition lteUx := (@leUx _ T, ltUx).
 
 Section ArgExtremum.
 
-Context (I : finType) (i0 : I) (P : pred I) (F : I -> T) (Pi0 : P i0).
+Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 
 Lemma arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
 Proof. by apply: extremumP => //; apply: le_trans. Qed.
@@ -2291,7 +2287,7 @@ Section TotalMonotonyTheory.
 
 Context {display : unit} {display' : unit}.
 Context {T : orderType display} {T' : porderType display'}.
-Variables (D : pred T) (f : T -> T').
+Variables (D : {pred T}) (f : T -> T').
 Implicit Types (x y z : T) (u v w : T').
 
 Lemma le_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
@@ -2402,15 +2398,15 @@ Proof. by rewrite lt0x; have [] := altP eqP; constructor; rewrite ?lt0x. Qed.
 Canonical join_monoid := Monoid.Law (@joinA _ _) join0x joinx0.
 Canonical join_comoid := Monoid.ComLaw (@joinC _ _).
 
-Lemma join_sup (I : finType) (j : I) (P : pred I) (F : I -> L) :
+Lemma join_sup (I : finType) (j : I) (P : {pred I}) (F : I -> L) :
    P j -> F j <= \join_(i | P i) F i.
 Proof. by move=> Pj; rewrite (bigD1 j) //= lexU2 ?lexx. Qed.
 
-Lemma join_min (I : finType) (j : I) (l : L) (P : pred I) (F : I -> L) :
+Lemma join_min (I : finType) (j : I) (l : L) (P : {pred I}) (F : I -> L) :
    P j -> l <= F j -> l <= \join_(i | P i) F i.
 Proof. by move=> Pj /le_trans -> //; rewrite join_sup. Qed.
 
-Lemma joinsP (I : finType) (u : L) (P : pred I) (F : I -> L) :
+Lemma joinsP (I : finType) (u : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> F i <= u) (\join_(i | P i) F i <= u).
 Proof.
 have -> : \join_(i | P i) F i <= u = (\big[andb/true]_(i | P i) (F i <= u)).
@@ -2449,7 +2445,7 @@ apply/joinsP => j; rewrite !inE => /predU1P [->|jr]; rewrite ?lexU2 ?lexx //.
 by rewrite join_sup ?orbT ?inE.
 Qed.
 
-Lemma joins_disjoint (I : finType) (d : L) (P : pred I) (F : I -> L) :
+Lemma joins_disjoint (I : finType) (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `&` F i = 0) -> d `&` \join_(i | P i) F i = 0.
 Proof.
 move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == 0).
@@ -2597,15 +2593,15 @@ Canonical join_muloid := Monoid.MulLaw join1x joinx1.
 Canonical join_addoid := Monoid.AddLaw (@meetUl _ L) (@meetUr _ _).
 Canonical meet_addoid := Monoid.AddLaw (@joinIl _ L) (@joinIr _ _).
 
-Lemma meets_inf (I : finType) (j : I) (P : pred I) (F : I -> L) :
+Lemma meets_inf (I : finType) (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
 Proof. exact: (@join_sup _ [tblatticeType of L^r]). Qed.
 
-Lemma meets_max (I : finType) (j : I) (u : L) (P : pred I) (F : I -> L) :
+Lemma meets_max (I : finType) (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \meet_(i | P i) F i <= u.
 Proof. exact: (@join_min _ [tblatticeType of L^r]). Qed.
 
-Lemma meetsP (I : finType) (l : L) (P : pred I) (F : I -> L) :
+Lemma meetsP (I : finType) (l : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
 Proof. exact: (@joinsP _ [tblatticeType of L^r]). Qed.
 
@@ -2621,7 +2617,7 @@ Lemma meet_seq (I : finType) (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
 Proof. exact: (@join_seq _ [tblatticeType of L^r]). Qed.
 
-Lemma meets_total (I : finType) (d : L) (P : pred I) (F : I -> L) :
+Lemma meets_total (I : finType) (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
 Proof. exact: (@joins_disjoint _ [tblatticeType of L^r]). Qed.
 
@@ -2877,11 +2873,11 @@ Proof. by rewrite !complE !leBLR joinC. Qed.
 Lemma lexC x y : (x <= ~` y) = (y <= ~` x).
 Proof. by rewrite !complE !leBRL !lex1 meetC. Qed.
 
-Lemma compl_joins (J : Type) (r : seq J) (P : pred J) (F : J -> L) :
+Lemma compl_joins (J : Type) (r : seq J) (P : {pred J}) (F : J -> L) :
    ~` (\join_(j <- r | P j) F j) = \meet_(j <- r | P j) ~` F j.
 Proof. by elim/big_rec2: _=> [|i x y ? <-]; rewrite ?compl0 ?complU. Qed.
 
-Lemma compl_meets (J : Type) (r : seq J) (P : pred J) (F : J -> L) :
+Lemma compl_meets (J : Type) (r : seq J) (P : {pred J}) (F : J -> L) :
    ~` (\meet_(j <- r | P j) F j) = \join_(j <- r | P j) ~` F j.
 Proof. by elim/big_rec2: _=> [|i x y ? <-]; rewrite ?compl1 ?complI. Qed.
 
