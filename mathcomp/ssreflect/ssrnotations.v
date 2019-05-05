@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 
+(******************************************************************************)
 (* - Reserved notation for various arithmetic and algebraic operations:       *)
 (*     e.[a1, ..., a_n] evaluation (e.g., polynomials).                       *)
 (*                 e`_i indexing (number list, integer pi-part).              *)
@@ -27,6 +28,7 @@
 (*    [rec a1, ..., an] standard shorthand for hidden recursor (see prime.v). *)
 (*   The interpretation of these notations is not defined here, but the       *)
 (*   declarations help maintain consistency across the library.               *)
+(******************************************************************************)
 
 (* Reserved notation for evaluation *)
 Reserved Notation "e .[ x ]"

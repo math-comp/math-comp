@@ -9,9 +9,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- `nonPropType`, an interface for non-`Prop` types, and `{pred T}` and
+   `relpre f r`, all of which will be in the Coq 8.11 core SSreflect library.
+
+- `deprecate old_id new_id`, notation for `new_id` that prints a deprecation
+  warning for `old_id`; `Import Deprecation.Silent` turns off those warnings,
+  `Import Deprecation.Reject` raises errors instead of only warning.
+
 ### Changed
 
+- definition of `PredType` which now takes only a `P -> pred T` function;
+  definition of `simpl_rel` to improve simplification by `inE`. Both these
+  changes will be in the Coq 8.11 SSReflect core library.
+
 ### Renamed
+
+- `leq_size_perm` -> `uniq_min_size` (permuting conclusions)
+- `perm_uniq` -> `eq_uniq` (permuting assumptions)
 
 ### Misc
 
@@ -58,7 +72,8 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
 
 - a function `permutations` that computes a duplicate-free list
   of all permutations of a given sequence `s` over an `eqType`, along
-  whit its theory.
+  with its theory: `mem_permutations`, `size_permutations`,
+  `permutations_uniq`, `permutations_all_uniq`, `perm_permutations`.
 
 ### Changed
 

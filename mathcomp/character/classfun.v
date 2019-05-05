@@ -2412,7 +2412,7 @@ Proof.
 set Su := map _ S => sSuS freeS; have uniqS := free_uniq freeS.
 have uniqSu: uniq Su by rewrite (map_inj_uniq cfAut_inj).
 have{sSuS} sSuS: {subset Su <= S} by move=> _ /mapP[phi Sphi ->]; apply: sSuS.
-have [|eqSuS _] := leq_size_perm uniqSu sSuS; first by rewrite size_map.
+have [|_ eqSuS] := uniq_min_size uniqSu sSuS; first by rewrite size_map.
 by rewrite (perm_free (uniq_perm_eq uniqSu uniqS eqSuS)).
 Qed.
 
