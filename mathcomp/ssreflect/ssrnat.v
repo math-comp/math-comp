@@ -200,7 +200,7 @@ Lemma add1n n : 1 + n = n.+1.            Proof. by []. Qed.
 
 Lemma addn0 : right_id 0 addn. Proof. by move=> n; apply/eqP; elim: n. Qed.
 
-Lemma addnS m n : m + n.+1 = (m + n).+1. Proof. by elim: m. Qed.
+Lemma addnS m n : m + n.+1 = (m + n).+1. Proof. by apply/eqP; elim: m. Qed.
 
 Lemma addSnnS m n : m.+1 + n = m + n.+1. Proof. by rewrite addnS. Qed.
 
