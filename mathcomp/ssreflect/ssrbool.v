@@ -1,6 +1,18 @@
 From mathcomp Require Import ssreflect ssrfun.
 From Coq Require Export ssrbool.
 
+(******************************************************************************)
+(* Local additions:                                                           *)
+(*      {pred T} == a type convertible to pred T but that presents the        *)
+(*                  pred_sort coercion class.                                 *)
+(*  PredType toP == the predType structure for toP : A -> pred T.             *)
+(*    relpre f r == the preimage of r by f, simplifying to r (f x) (f y).     *)
+(* --> These will become part of the core SSReflect library with Coq 8.11.    *)
+(* This file also anticipates a v8.11 change in the definition of simpl_pred  *)
+(* to T -> simpl_pred T. This change ensures that inE expands the definition  *)
+(* of r : simpl_rel along with the \in, when rewriting in y \in r x.          *)
+(******************************************************************************)
+
 Notation "{ 'pred' T }" := (pred_sort (predPredType T)) (at level 0,
   format "{ 'pred'  T }") : type_scope.
 
@@ -37,4 +49,3 @@ Notation "[ 'rel' x y 'in' A ]" := [rel x y in A & A] (at level 0,
 Notation xrelpre := (fun f (r : rel _) x y => r (f x) (f y)).
 Definition relpre {T rT} (f : T -> rT)  (r : rel rT) :=
   [rel x y | r (f x) (f y)].
-

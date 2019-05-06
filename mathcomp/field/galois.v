@@ -1332,9 +1332,9 @@ rewrite -coef_map rmorph_prod; congr (_ : {poly _})`_i.
 symmetry; rewrite (eq_big_perm (map x r)) /= ?(big_map x).
   by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
 have Uxr: uniq (map x r) by rewrite map_inj_uniq //; apply: fmorph_inj.
-have /leq_size_perm: {subset map x r <= r}.
+have /uniq_min_size: {subset map x r <= r}.
   by rewrite -map_comp => _ /codomP[b ->] /=; rewrite -galM // r_xa ?groupM.
-by rewrite (size_map x) perm_eq_sym; case=> // /uniq_perm_eq->.
+by rewrite (size_map x) perm_eq_sym; case=> // _ /uniq_perm_eq->.
 Qed.
 
 Lemma mem_galTrace K E a : galois K E -> a \in E -> galTrace K E a \in K.

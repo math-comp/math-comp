@@ -1516,26 +1516,26 @@ move=> Us1 eqs12; apply/idP/idP=> [Us2 | /eqP eq_sz12].
 by apply: (leq_size_uniq Us1) => [y|]; rewrite (eqs12, eq_sz12).
 Qed.
 
-Lemma leq_size_perm s1 s2 :
+Lemma uniq_min_size s1 s2 :
     uniq s1 -> {subset s1 <= s2} -> size s2 <= size s1 ->
-  s1 =i s2 /\ size s1 = size s2.
+  (size s1 = size s2) * (s1 =i s2).
 Proof.
 move=> Us1 ss12 le_s21; have Us2: uniq s2 := leq_size_uniq Us1 ss12 le_s21.
-suffices: s1 =i s2 by split; last by apply/eqP; rewrite -uniq_size_uniq.
+suffices: s1 =i s2 by split; first by apply/eqP; rewrite -uniq_size_uniq.
 move=> x; apply/idP/idP=> [/ss12// | s2x]; apply: contraLR le_s21 => not_s1x.
 rewrite -ltnNge (@uniq_leq_size (x :: s1)) /= ?not_s1x //.
 by apply/allP; rewrite /= s2x; apply/allP.
 Qed.
 
-Lemma perm_uniq s1 s2 : s1 =i s2 -> size s1 = size s2 -> uniq s1 = uniq s2.
+Lemma eq_uniq s1 s2 : size s1 = size s2 -> s1 =i s2 -> uniq s1 = uniq s2.
 Proof.
-move=> Es12 Esz12.
-by apply/idP/idP=> Us; rewrite (uniq_size_uniq Us) ?Esz12 ?eqxx.
+move=> eq_sz12 eq_s12.
+by apply/idP/idP=> Us; rewrite (uniq_size_uniq Us) ?eq_sz12 ?eqxx.
 Qed.
 
 Lemma perm_eq_uniq s1 s2 : perm_eq s1 s2 -> uniq s1 = uniq s2.
 Proof.
-by move=> eq_s12; apply: perm_uniq; [apply: perm_eq_mem | apply: perm_eq_size].
+by move=> eq_s12; apply/eq_uniq; [apply: perm_eq_size | apply: perm_eq_mem].
 Qed.
 
 Lemma uniq_perm_eq s1 s2 : uniq s1 -> uniq s2 -> s1 =i s2 -> perm_eq s1 s2.
@@ -3056,3 +3056,16 @@ Coercion all_iffP : all_iff >-> Funclass.
 Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" := (all_iff P0 (P1 :: .. [:: Pn] ..))
   (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]")
   : form_scope.
+
+Notation leq_size_perm :=
+  ((fun T s1 s2 Us1 ss12 les21 =>
+   let: (Esz12, Es12) :=
+     deprecate leq_size_perm uniq_min_size T s1 s2 Us1 ss12 les21
+   in conj Es12 Esz12) _ _ _)
+  (only parsing).
+Notation perm_uniq :=
+  ((fun T s1 s2 eq_s12 eq_sz12 =>
+      deprecate perm_uniq eq_uniq T s1 s2 eq_sz12 eq_s12)
+    _ _ _)
+  (only parsing).
+
