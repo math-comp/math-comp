@@ -45,7 +45,7 @@ transitivity (\sum_(1 <= i < n.+1) \sum_(1 <= k < n.+1) (p ^ k %| i)).
   by apply: andb_idr => /dvdn_leq/(leq_trans (ltn_expl _ (prime_gt1 _)))->.
 by rewrite exchange_big_nat; apply: eq_bigr => i _; rewrite divn_count_dvd.
 Qed.
- 
+
 Theorem Wilson p : p > 1 -> prime p = (p %| ((p.-1)`!).+1).
 Proof.
 have dFact n: 0 < n -> (n.-1)`! = \prod_(0 <= i < n | i != 0) i.
@@ -310,7 +310,7 @@ Qed.
 Lemma subn_exp m n k :
   m ^ k - n ^ k = (m - n) * (\sum_(i < k) m ^ (k.-1 -i) * n ^ i).
 Proof.
-case: k => [|k]; first by rewrite big_ord0.
+case: k => [|k]; first by rewrite big_ord0 muln0.
 rewrite mulnBl !big_distrr big_ord_recl big_ord_recr /= subn0 muln1.
 rewrite subnn mul1n -!expnS subnDA; congr (_ - _); apply: canRL (addnK _) _.
 congr (_ + _); apply: eq_bigr => i _.
@@ -543,4 +543,3 @@ by apply: val_inj; congr (_ :: _); apply: val_inj; rewrite /= -{1}def_n addnK.
 Qed.
 
 End Combinations.
-

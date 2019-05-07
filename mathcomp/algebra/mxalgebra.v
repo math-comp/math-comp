@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finfun bigop finset fingroup perm.
-From mathcomp Require Import  div prime binomial ssralg finalg zmodp matrix.
+From mathcomp Require Import div prime binomial ssralg finalg zmodp matrix.
 
 (*****************************************************************************)
 (* In this file we develop the rank and row space theory of matrices, based  *)
@@ -683,7 +683,7 @@ Qed.
 
 Lemma row_full_unit n (A : 'M_n) : row_full A = (A \in unitmx).
 Proof. exact: row_free_unit. Qed.
-  
+
 Lemma mxrank_unit n (A : 'M_n) : A \in unitmx -> \rank A = n.
 Proof. by rewrite -row_full_unit => /eqnP. Qed.
 
@@ -1488,7 +1488,7 @@ Proof. by rewrite unlock; apply/eqmxP; rewrite !genmxE !capmxE andbb. Qed.
 Lemma genmx_diff m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (<<A :\: B>> = A :\: B)%MS.
 Proof. by rewrite [@diffmx]unlock genmx_id. Qed.
- 
+
 Lemma diffmxSl m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) : (A :\: B <= A)%MS.
 Proof. by rewrite diffmxE capmxSl. Qed.
 
@@ -2202,7 +2202,7 @@ have p_i_gt0: p ^ _ > 0 by move=> i; rewrite expn_gt0 ltnW.
 rewrite (card_GL _ (ltn0Sn n.-1)) card_ord Fp_cast // big_add1 /=.
 pose p'gt0 m := m > 0 /\ logn p m = 0%N.
 suffices [Pgt0 p'P]: p'gt0 (\prod_(0 <= i < n.-1.+1) (p ^ i.+1 - 1))%N.
-  by rewrite lognM // p'P pfactorK //; case n.
+  by rewrite lognM // p'P pfactorK // addn0; case n.
 apply big_ind => [|m1 m2 [m10 p'm1] [m20]|i _]; rewrite {}/p'gt0 ?logn1 //.
   by rewrite muln_gt0 m10 lognM ?p'm1.
 rewrite lognE -if_neg subn_gt0 p_pr /= -{1 2}(exp1n i.+1) ltn_exp2r // p_gt1.
@@ -2269,7 +2269,7 @@ by rewrite linear_sum; apply: eq_bigr => i _; rewrite mulmxKpV.
 Qed.
 Arguments memmx_sumsP {I P n A R_}.
 
-Lemma has_non_scalar_mxP m n (R : 'A_(m, n)) : 
+Lemma has_non_scalar_mxP m n (R : 'A_(m, n)) :
     (1%:M \in R)%MS ->
   reflect (exists2 A, A \in R & ~~ is_scalar_mx A)%MS (1 < \rank R).
 Proof.
@@ -2765,5 +2765,3 @@ Lemma map_center_mx m n (E : 'A_(m, n)) : (('Z(E))^f :=: 'Z(E^f))%MS.
 Proof. by rewrite /center_mx -map_cent_mx; apply: map_capmx. Qed.
 
 End MapMatrixSpaces.
-
-
