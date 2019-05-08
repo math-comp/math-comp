@@ -1553,7 +1553,7 @@ Lemma abszN1 : `|-1%R| = 1. Proof. by []. Qed.
 Lemma absz_id m : `|(`|m|)| = `|m|. Proof. by []. Qed.
 
 Lemma abszM m1 m2 : `|(m1 * m2)%R| = `|m1| * `|m2|.
-Proof. by case: m1 m2 => [[|m1]|m1] [[|m2]|m2]; rewrite //= mulnS mulnC. Qed.
+Proof. by case: m1 m2 => [[|m1]|m1] [[|m2]|m2] //=; rewrite ?mulnS mulnC. Qed.
 
 Lemma abszX (n : nat) m : `|m ^+ n| = `|m| ^ n.
 Proof. by elim: n => // n ihn; rewrite exprS expnS abszM ihn. Qed.

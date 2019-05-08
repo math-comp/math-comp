@@ -538,7 +538,7 @@ Lemma gcdnDr m n : gcdn m (n + m) = gcdn m n.
 Proof. by rewrite addnC gcdnDl. Qed.
 
 Lemma gcdnMl n m : gcdn n (m * n) = n.
-Proof. by case: n => [|n]; rewrite gcdnE modnMl gcd0n. Qed.
+Proof. by case: n => [|n]; rewrite gcdnE modnMl // muln0. Qed.
 
 Lemma gcdnMr n m : gcdn n (n * m) = n.
 Proof. by rewrite mulnC gcdnMl. Qed.

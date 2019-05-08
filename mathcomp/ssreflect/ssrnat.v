@@ -106,6 +106,10 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+(* Disable Coq prelude hints to improve proof script robustness. *)
+
+Remove Hints plus_n_O plus_n_Sm mult_n_O mult_n_Sm : core.
+
 (* Declare legacy Arith operators in new scope. *)
 
 Delimit Scope coq_nat_scope with coq_nat.
@@ -200,7 +204,7 @@ Lemma add1n n : 1 + n = n.+1.            Proof. by []. Qed.
 
 Lemma addn0 : right_id 0 addn. Proof. by move=> n; apply/eqP; elim: n. Qed.
 
-Lemma addnS m n : m + n.+1 = (m + n).+1. Proof. by elim: m. Qed.
+Lemma addnS m n : m + n.+1 = (m + n).+1. Proof. by apply/eqP; elim: m. Qed.
 
 Lemma addSnnS m n : m.+1 + n = m + n.+1. Proof. by rewrite addnS. Qed.
 
@@ -831,7 +835,7 @@ Proof. by move=> eq_op x; apply: eq_iteri; case. Qed.
 End Iteration.
 
 Lemma iter_succn m n : iter n succn m = m + n.
-Proof. by elim: n => //= n ->. Qed.
+Proof. by rewrite addnC; elim: n => //= n ->. Qed.
 
 Lemma iter_succn_0 n : iter n succn 0 = n.
 Proof. exact: iter_succn. Qed.
@@ -1637,24 +1641,27 @@ case=> //=; elim=> //= p; case: (nat_of_pos p) => //= n [<-].
 by rewrite natTrecE addnS /= addnS {2}addnn; elim: {1 3}n.
 Qed.
 
-Lemma nat_of_succ_gt0 p : Pos.succ p = p.+1 :> nat.
+Lemma nat_of_succ_pos p : Pos.succ p = p.+1 :> nat.
 Proof. by elim: p => //= p ->; rewrite !natTrecE. Qed.
 
-Lemma nat_of_addn_gt0 p q : (p + q)%positive = p + q :> nat.
+Lemma nat_of_add_pos p q : (p + q)%positive = p + q :> nat.
 Proof.
 apply: @fst _ (Pplus_carry p q = (p + q).+1 :> nat) _.
 elim: p q => [p IHp|p IHp|] [q|q|] //=; rewrite !natTrecE //;
-  by rewrite ?IHp ?nat_of_succ_gt0 ?(doubleS, doubleD, addn1, addnS).
+  by rewrite ?IHp ?nat_of_succ_pos ?(doubleS, doubleD, addn1, addnS).
+Qed.
+
+Lemma nat_of_mul_pos p q : (p * q)%positive = p * q :> nat.
+Proof.
+elim: p => [p IHp|p IHp|] /=; rewrite ?mul1n //;
+  by rewrite ?nat_of_add_pos /= !natTrecE IHp doubleMl.
 Qed.
 
 Lemma nat_of_add_bin b1 b2 : (b1 + b2)%num = b1 + b2 :> nat.
-Proof. by case: b1 b2 => [|p] [|q] //=; apply: nat_of_addn_gt0. Qed.
+Proof. by case: b1 b2 => [|p] [|q]; rewrite ?addn0 //= nat_of_add_pos. Qed.
 
 Lemma nat_of_mul_bin b1 b2 : (b1 * b2)%num = b1 * b2 :> nat.
-Proof.
-case: b1 b2 => [|p] [|q] //=; elim: p => [p IHp|p IHp|] /=;
-  by rewrite ?(mul1n, nat_of_addn_gt0, mulSn) //= !natTrecE IHp doubleMl.
-Qed.
+Proof. by case: b1 b2 => [|p] [|q]; rewrite ?muln0 //= nat_of_mul_pos. Qed.
 
 Lemma nat_of_exp_bin n (b : N) : n ^ b = pow_N 1 muln n b.
 Proof.

@@ -497,7 +497,7 @@ Lemma all_nseqb (b : bool) x : all (nseq b x) = b ==> a x.
 Proof. by rewrite all_nseq eqb0 implybE. Qed.
 
 Lemma find_nseq n x : find (nseq n x) = ~~ a x * n.
-Proof. by elim: n => //= n ->; case: (a x). Qed.
+Proof. by elim: n => /= [|n ->]; case: (a x). Qed.
 
 Lemma nth_find s : has s -> a (nth s (find s)).
 Proof. by elim: s => //= x s IHs; case Hx: (a x). Qed.
@@ -928,7 +928,7 @@ Proof. by rewrite -size_eq0 size_filter has_count lt0n. Qed.
 Fixpoint mem_seq (s : seq T) :=
   if s is y :: s' then xpredU1 y (mem_seq s') else xpred0.
 
-Definition seq_eqclass := seq T. 
+Definition seq_eqclass := seq T.
 Identity Coercion seq_of_eqclass : seq_eqclass >-> seq.
 Coercion pred_of_seq (s : seq_eqclass) : {pred T} := mem_seq s.
 
@@ -3068,4 +3068,3 @@ Notation perm_uniq :=
       deprecate perm_uniq eq_uniq T s1 s2 eq_sz12 eq_s12)
     _ _ _)
   (only parsing).
-
