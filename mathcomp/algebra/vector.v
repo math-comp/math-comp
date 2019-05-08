@@ -1004,7 +1004,7 @@ Proof. by rewrite /free span_seq1 dim_vline; case: (~~ _). Qed.
  
 Lemma perm_free X Y : perm_eq X Y -> free X = free Y.
 Proof.
-by move=> eqX; rewrite /free (perm_eq_size eqX) (eq_span (perm_eq_mem eqX)).
+by move=> eqXY; rewrite /free (perm_size eqXY) (eq_span (perm_mem eqXY)).
 Qed.
 
 Lemma free_directv X : free X = (0 \notin X) && directv (\sum_(v <- X) <[v]>).
@@ -1061,7 +1061,7 @@ Proof. by rewrite cat_free => /and3P[]. Qed.
 
 Lemma filter_free p X : free X -> free (filter p X).
 Proof.
-rewrite -(perm_free (etrans (perm_filterC p X _) (perm_eq_refl X))).
+rewrite -(perm_free (etrans (perm_filterC p X _) (perm_refl X))).
 exact: catl_free.
 Qed.
 
@@ -1170,7 +1170,7 @@ Qed.
 Lemma perm_basis X Y U : perm_eq X Y -> basis_of U X = basis_of U Y.
 Proof.
 move=> eqXY; congr ((_ == _) && _); last exact: perm_free.
-by apply/eq_span; apply: perm_eq_mem.
+by apply/eq_span; apply: perm_mem.
 Qed.
 
 Lemma vbasisP U : basis_of U (vbasis U).

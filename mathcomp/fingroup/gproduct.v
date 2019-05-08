@@ -614,19 +614,19 @@ Lemma perm_bigcprod (I : eqType) r1 r2 (A : I -> {set gT}) G x :
   \prod_(i <- r1) x i = \prod_(i <- r2) x i.
 Proof.
 elim: r1 r2 G => [|i r1 IHr] r2 G defG Ax eq_r12.
-  by rewrite perm_eq_sym in eq_r12; rewrite (perm_eq_small _ eq_r12) ?big_nil.
-have /rot_to[n r3 Dr2]: i \in r2 by rewrite -(perm_eq_mem eq_r12) mem_head.
+  by rewrite perm_sym in eq_r12; rewrite (perm_small_eq _ eq_r12) ?big_nil.
+have /rot_to[n r3 Dr2]: i \in r2 by rewrite -(perm_mem eq_r12) mem_head.
 transitivity (\prod_(j <- rot n r2) x j).
   rewrite Dr2 !big_cons in defG Ax *; have [[_ G1 _ defG1] _ _] := cprodP defG.
   rewrite (IHr r3 G1) //; first by case/allP/andP: Ax => _ /allP.
-  by rewrite -(perm_cons i) -Dr2 perm_eq_sym perm_rot perm_eq_sym.
+  by rewrite -(perm_cons i) -Dr2 perm_sym perm_rot perm_sym.
 rewrite -{-2}(cat_take_drop n r2) in eq_r12 *.
-rewrite (eq_big_perm _ eq_r12) !big_cat /= !(big_nth i) !big_mkord in defG *.
+rewrite (perm_big _ eq_r12) !big_cat /= !(big_nth i) !big_mkord in defG *.
 have /cprodP[[G1 G2 defG1 defG2] _ /centsP-> //] := defG.
   rewrite defG2 -(bigcprodW defG2) mem_prodg // => k _; apply: Ax.
-  by rewrite (perm_eq_mem eq_r12) mem_cat orbC mem_nth.
+  by rewrite (perm_mem eq_r12) mem_cat orbC mem_nth.
 rewrite defG1 -(bigcprodW defG1) mem_prodg // => k _; apply: Ax.
-by rewrite (perm_eq_mem eq_r12) mem_cat mem_nth.
+by rewrite (perm_mem eq_r12) mem_cat mem_nth.
 Qed.
 
 Lemma reindex_bigcprod (I J : finType) (h : J -> I) P (A : I -> {set gT}) G x :
@@ -637,7 +637,7 @@ Proof.
 case=> h1 hK h1K; rewrite -!(big_filter _ P) filter_index_enum => defG Ax.
 rewrite -(big_map h P x) -(big_filter _ P) filter_map filter_index_enum.
 apply: perm_bigcprod defG _ _ => [i|]; first by rewrite mem_enum => /Ax.
-apply: uniq_perm_eq (enum_uniq P) _ _ => [|i].
+apply: uniq_perm (enum_uniq P) _ _ => [|i].
   by apply/dinjectiveP; apply: (can_in_inj hK).
 rewrite mem_enum; apply/idP/imageP=> [Pi | [j Phj ->//]].
 by exists (h1 i); rewrite ?inE h1K.

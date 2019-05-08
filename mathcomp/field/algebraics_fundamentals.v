@@ -240,8 +240,8 @@ without loss{nCq} qx0: q mon_q q_dv_p / root (q ^ FtoL) x.
 have /dvdp_prod_XsubC[m Dq]: q ^ FtoL %| p_ I by rewrite DpI dvdp_map.
 pose B := [set j in mask m (enum I)]; have{Dq} Dq: q ^ FtoL = p_ B.
   apply/eqP; rewrite -eqp_monic ?monic_map ?monic_prod_XsubC //.
-  congr (_ %= _): Dq; apply: eq_big_perm => //.
-  by rewrite uniq_perm_eq ?mask_uniq ?enum_uniq // => j; rewrite mem_enum inE.
+  congr (_ %= _): Dq; apply: perm_big => //.
+  by rewrite uniq_perm ?mask_uniq ?enum_uniq // => j; rewrite mem_enum inE.
 rewrite -!(size_map_poly FtoL) Dq -DpI (minI B) // -?Dq ?FpxF //.
 by apply/subsetP=> j; rewrite inE => /mem_mask; rewrite mem_enum.
 Qed.

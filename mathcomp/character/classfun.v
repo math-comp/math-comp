@@ -1173,7 +1173,7 @@ Qed.
 
 Lemma eq_orthonormal R S : perm_eq R S -> orthonormal R = orthonormal S.
 Proof.
-move=> eqRS; rewrite !orthonormalE (eq_all_r (perm_eq_mem eqRS)).
+move=> eqRS; rewrite !orthonormalE (eq_all_r (perm_mem eqRS)).
 by rewrite (eq_pairwise_orthogonal eqRS).
 Qed.
 
@@ -2413,7 +2413,7 @@ set Su := map _ S => sSuS freeS; have uniqS := free_uniq freeS.
 have uniqSu: uniq Su by rewrite (map_inj_uniq cfAut_inj).
 have{sSuS} sSuS: {subset Su <= S} by move=> _ /mapP[phi Sphi ->]; apply: sSuS.
 have [|_ eqSuS] := uniq_min_size uniqSu sSuS; first by rewrite size_map.
-by rewrite (perm_free (uniq_perm_eq uniqSu uniqS eqSuS)).
+by rewrite (perm_free (uniq_perm uniqSu uniqS eqSuS)).
 Qed.
 
 Lemma cfAut_on A phi : (phi^u \in 'CF(G, A)) = (phi \in 'CF(G, A)).

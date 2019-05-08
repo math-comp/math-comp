@@ -314,7 +314,7 @@ Lemma cfproj_sum_orthogonal P z phi :
     = if P phi then z phi * '[phi] else 0.
 Proof.
 move=> Sphi; have defS := perm_to_rem Sphi.
-rewrite cfdot_suml (eq_big_perm _ defS) big_cons /= cfdotZl Inu ?Z_S //.
+rewrite cfdot_suml (perm_big _ defS) big_cons /= cfdotZl Inu ?Z_S //.
 rewrite big1_seq ?addr0 // => xi; rewrite mem_rem_uniq ?inE //.
 by case/and3P=> _ neq_xi Sxi; rewrite cfdotZl Inu ?Z_S // dotSS ?mulr0.
 Qed.
@@ -412,15 +412,15 @@ Lemma vchar_orthonormalP S :
 Proof.
 move=> vcS; apply: (equivP orthonormalP).
 split=> [[uniqS oSS] | [I [b defS]]]; last first.
-  split=> [|xi1 xi2]; rewrite ?(perm_eq_mem defS).
-    rewrite (perm_eq_uniq defS) map_inj_uniq ?enum_uniq // => i j /eqP.
+  split=> [|xi1 xi2]; rewrite ?(perm_mem defS).
+    rewrite (perm_uniq defS) map_inj_uniq ?enum_uniq // => i j /eqP.
     by rewrite eq_signed_irr => /andP[_ /eqP].
   case/mapP=> [i _ ->] /mapP[j _ ->]; rewrite eq_signed_irr.
   rewrite cfdotZl cfdotZr rmorph_sign mulrA cfdot_irr -signr_addb mulr_natr.
   by rewrite mulrb andbC; case: eqP => //= ->; rewrite addbb eqxx.
 pose I := [set i | ('chi_i \in S) || (- 'chi_i \in S)].
 pose b i := - 'chi_i \in S; exists I, b.
-apply: uniq_perm_eq => // [|xi].
+apply: uniq_perm => // [|xi].
   rewrite map_inj_uniq ?enum_uniq // => i j /eqP.
   by rewrite eq_signed_irr => /andP[_ /eqP].
 apply/idP/mapP=> [Sxi | [i Ii ->{xi}]]; last first.
@@ -453,7 +453,7 @@ move=> Zphi phiN1.
 have: orthonormal phi by rewrite /orthonormal/= phiN1 eqxx.
 case/vchar_orthonormalP=> [xi /predU1P[->|] // | I [b def_phi]].
 have: phi \in (phi : seq _) := mem_head _ _.
-by rewrite (perm_eq_mem def_phi) => /mapP[i _ ->]; exists (b i), i.
+by rewrite (perm_mem def_phi) => /mapP[i _ ->]; exists (b i), i.
 Qed.
 
 Lemma zchar_small_norm phi n :

@@ -1713,11 +1713,11 @@ rewrite orderXdiv ?pfactor_dvdn ?leq_subr // -(dvdn_pmul2r m_gt0).
 by rewrite -expnS -subSn // subSS divnK pfactor_dvdn ?leq_subr.
 Qed.
 
-Lemma perm_eq_abelian_type p b G :
+Lemma abelian_type_pgroup p b G :
     p.-group G -> \big[dprod/1]_(x <- b) <[x]> = G -> 1 \notin b ->
-  perm_eq (map order b) (abelian_type G).
+  perm_eq (abelian_type G) (map order b).
 Proof.
-move: b => b1 pG defG1 ntb1.
+rewrite perm_sym; move: b => b1 pG defG1 ntb1.
 have cGG: abelian G.
   elim: (b1) {pG}G defG1 => [_ <-|x b IHb G]; first by rewrite big_nil abelian1.
   rewrite big_cons; case/dprodP=> [[_ H _ defH]] <-; rewrite defH => cxH _.
@@ -1992,8 +1992,8 @@ suffices def_atG: abelian_type K ++ abelian_type H =i abelian_type G.
   by rewrite size_abelian_type // -abelian_type_homocyclic.
 have [bK defK atK] := abelian_structure cKK.
 have [bH defH atH] := abelian_structure cHH.
-apply: perm_eq_mem; rewrite -atK -atH -map_cat.
-apply: (perm_eq_abelian_type pG); first by rewrite big_cat defK defH.
+apply/perm_mem; rewrite perm_sym -atK -atH -map_cat.
+apply: (abelian_type_pgroup pG); first by rewrite big_cat defK defH.
 have: all [pred m | m > 1] (map order (bK ++ bH)).
   by rewrite map_cat all_cat atK atH !abelian_type_gt1.
 by rewrite all_map (eq_all (@order_gt1 _)) all_predC has_pred1.

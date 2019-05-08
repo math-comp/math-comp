@@ -651,10 +651,10 @@ have prod_aq m: m %| n -> \prod_(d < n.+1 | d %| m) aq d = (q ^ m - 1)%:R.
     by rewrite !hornerE hornerXn -natrX natrB ?expn_gt0 ?prime_gt0.
   rewrite (prod_cyclotomic (dvdn_prim_root z_prim m_dv_n)).
   have def_divm: perm_eq (divisors m) [seq d <- index_iota 0 n.+1 | d %| m].
-    rewrite uniq_perm_eq ?divisors_uniq ?filter_uniq ?iota_uniq // => d.
+    rewrite uniq_perm ?divisors_uniq ?filter_uniq ?iota_uniq // => d.
     rewrite -dvdn_divisors ?(dvdn_gt0 n_gt0) // mem_filter mem_iota ltnS /=.
     by apply/esym/andb_idr=> d_dv_m; rewrite dvdn_leq ?(dvdn_trans d_dv_m).
-  rewrite (eq_big_perm _ def_divm) big_filter big_mkord horner_prod.
+  rewrite (perm_big _ def_divm) big_filter big_mkord horner_prod.
   by apply: eq_bigr => d d_dv_m; rewrite -exprM muln_divA ?divnK.
 have /rpredBl<-: (aq n %| #|G|%:R)%C.
   rewrite oG -prod_aq // (bigD1 ord_max) //= dvdC_mulr //.

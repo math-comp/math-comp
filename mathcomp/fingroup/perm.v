@@ -294,22 +294,22 @@ Proof.
 by apply/permP => z; rewrite -(permKV s z) permJ; apply/inj_tperm/perm_inj.
 Qed.
 
-Lemma tuple_perm_eqP {T : eqType} {n} {s : seq T} {t : n.-tuple T} :
+Lemma tuple_permP {T : eqType} {n} {s : seq T} {t : n.-tuple T} :
   reflect (exists p : 'S_n, s = [tuple tnth t (p i) | i < n]) (perm_eq s t).
 Proof.
 apply: (iffP idP) => [|[p ->]]; last first.
   rewrite /= (map_comp (tnth t)) -{1}(map_tnth_enum t) perm_map //.
-  apply: uniq_perm_eq => [||i]; rewrite ?enum_uniq //.
+  apply: uniq_perm => [||i]; rewrite ?enum_uniq //.
     by apply/injectiveP; apply: perm_inj.
   by rewrite mem_enum -[i](permKV p) image_f.
 case: n => [|n] in t *; last have x0 := tnth t ord0.
-  rewrite tuple0 => /perm_eq_small-> //.
+  rewrite tuple0 => /perm_small_eq-> //.
   by exists 1; rewrite [mktuple _]tuple0.
-case/(perm_eq_iotaP x0); rewrite size_tuple => Is eqIst ->{s}.
-have uniqIs: uniq Is by rewrite (perm_eq_uniq eqIst) iota_uniq.
-have szIs: size Is == n.+1 by rewrite (perm_eq_size eqIst) !size_tuple.
+case/(perm_iotaP x0); rewrite size_tuple => Is eqIst ->{s}.
+have uniqIs: uniq Is by rewrite (perm_uniq eqIst) iota_uniq.
+have szIs: size Is == n.+1 by rewrite (perm_size eqIst) !size_tuple.
 have pP i : tnth (Tuple szIs) i < n.+1.
-  by rewrite -[_ < _](mem_iota 0) -(perm_eq_mem eqIst) mem_tnth.
+  by rewrite -[_ < _](mem_iota 0) -(perm_mem eqIst) mem_tnth.
 have inj_p: injective (fun i => Ordinal (pP i)).
   by apply/injectiveP/(@map_uniq _ _ val); rewrite -map_comp map_tnth_enum.
 exists (perm inj_p); rewrite -[Is]/(tval (Tuple szIs)); congr (tval _).
@@ -577,5 +577,6 @@ End LiftPerm.
 
 Prenex Implicits lift_perm lift_permK.
 
-
+Notation tuple_perm_eqP :=
+  (deprecate tuple_perm_eqP tuple_permP) (only parsing).
 

@@ -179,9 +179,9 @@ elim: {G}#|G| {-2}G (leqnn #|G|) => [|n Hi] G cG in s1 s2 * => cs1 cs2.
 have [G1 | ntG] := boolP (G :==: 1).
   have -> : s1 = [::] by apply/eqP; rewrite -(trivg_comps cs1).
   have -> : s2 = [::] by apply/eqP; rewrite -(trivg_comps cs2).
-  by rewrite /= perm_eq_refl.
+  by rewrite /= perm_refl.
 have [sG | nsG] := boolP (simple G).
-  by rewrite (simple_compsP cs1 sG) (simple_compsP cs2 sG) perm_eq_refl.
+  by rewrite (simple_compsP cs1 sG) (simple_compsP cs2 sG) perm_refl.
 case es1: s1 cs1 => [|N1 st1] cs1.
   by move: (trivg_comps cs1); rewrite eqxx; move/negP:ntG.
 case es2: s2 cs2 => [|N2 st2] cs2 {s1 es1}.
@@ -228,9 +228,9 @@ have i3 : perm_eq fG1 fG2.
   rewrite (@perm_catCA _ [::_] [::_]) /mksrepr.
   rewrite (@section_repr_isog _ (mkSec _ _) (mkSec _ _) iso1).
   rewrite -(@section_repr_isog _ (mkSec _ _) (mkSec _ _) iso2).
-  exact: perm_eq_refl.
-apply: (perm_eq_trans i1); apply: (perm_eq_trans i3); rewrite perm_eq_sym.
-by apply: perm_eq_trans i2; apply: perm_eq_refl.
+  exact: perm_refl.
+apply: (perm_trans i1); apply: (perm_trans i3); rewrite perm_sym.
+by apply: perm_trans i2; apply: perm_refl.
 Qed.
 
 End CompositionSeries.
@@ -593,11 +593,11 @@ elim: {G} #|G| {-2}G (leqnn #|G|) => [|n Hi] G cG in s1 s2 * => hsD cs1 cs2.
 case/orP: (orbN (G :==: 1)) => [tG | ntG].
   have -> : s1 = [::] by apply/eqP; rewrite -(trivg_acomps cs1).
   have -> : s2 = [::] by apply/eqP; rewrite -(trivg_acomps cs2).
-  by rewrite /= perm_eq_refl.
+  by rewrite /= perm_refl.
 case/orP: (orbN (asimple to G))=> [sG | nsG].
   have -> : s1 = [:: 1%G ] by apply/(asimple_acompsP cs1).
   have -> : s2 = [:: 1%G ] by apply/(asimple_acompsP cs2).
-  by rewrite /= perm_eq_refl.
+  by rewrite /= perm_refl.
 case es1: s1 cs1 => [|N1 st1] cs1.
   by move: (trivg_comps cs1); rewrite eqxx; move/negP:ntG.
 case es2: s2 cs2 => [|N2 st2] cs2 {s1 es1}.
@@ -667,9 +667,9 @@ have i3 : perm_eq fG1 fG2.
   rewrite (@perm_catCA _ [::_] [::_]) /mksrepr.
   rewrite (@section_repr_isog _ (mkSec _ _) (mkSec _ _) iso1).
   rewrite -(@section_repr_isog _ (mkSec _ _) (mkSec _ _) iso2).
-  exact: perm_eq_refl.
-apply: (perm_eq_trans i1); apply: (perm_eq_trans i3); rewrite perm_eq_sym.
-by apply: perm_eq_trans i2; apply: perm_eq_refl.
+  exact: perm_refl.
+apply: (perm_trans i1); apply: (perm_trans i3); rewrite perm_sym.
+by apply: perm_trans i2; apply: perm_refl.
 Qed.
 
 End StrongJordanHolder.

@@ -1274,11 +1274,11 @@ Variable op : Monoid.com_law 1.
 Local Notation "'*%M'" := op (at level 0).
 Local Notation "x * y" := (op x y).
 
-Lemma eq_big_perm (I : eqType) r1 r2 (P : pred I) F :
+Lemma perm_big (I : eqType) r1 r2 (P : pred I) F :
     perm_eq r1 r2 ->
   \big[*%M/1]_(i <- r1 | P i) F i = \big[*%M/1]_(i <- r2 | P i) F i.
 Proof.
-move/perm_eqP; rewrite !(big_mkcond _ _ P).
+move/permP; rewrite !(big_mkcond _ _ P).
 elim: r1 r2 => [|i r1 IHr1] r2 eq_r12.
   by case: r2 eq_r12 => // i r2; move/(_ (pred1 i)); rewrite /= eqxx.
 have r2i: i \in r2 by rewrite -has_pred1 has_count -eq_r12 /= eqxx.
@@ -1290,8 +1290,8 @@ Qed.
 Lemma big_uniq (I : finType) (r : seq I) F :
   uniq r -> \big[*%M/1]_(i <- r) F i = \big[*%M/1]_(i in r) F i.
 Proof.
-move=> uniq_r; rewrite -(big_filter _ _ _ (mem r)); apply: eq_big_perm.
-by rewrite filter_index_enum uniq_perm_eq ?enum_uniq // => i; rewrite mem_enum.
+move=> uniq_r; rewrite -(big_filter _ _ _ (mem r)); apply: perm_big.
+by rewrite filter_index_enum uniq_perm ?enum_uniq // => i; rewrite mem_enum.
 Qed.
 
 Lemma big_rem (I : eqType) r x (P : pred I) F :
@@ -1299,7 +1299,7 @@ Lemma big_rem (I : eqType) r x (P : pred I) F :
   \big[*%M/1]_(y <- r | P y) F y
     = (if P x then F x else 1) * \big[*%M/1]_(y <- rem x r | P y) F y.
 Proof.
-by move/perm_to_rem/(eq_big_perm _)->; rewrite !(big_mkcond _ _ P) big_cons.
+by move/perm_to_rem/(perm_big _)->; rewrite !(big_mkcond _ _ P) big_cons.
 Qed.
 
 Lemma big_undup (I : eqType) (r : seq I) (P : pred I) F :
@@ -1316,15 +1316,15 @@ Lemma eq_big_idem (I : eqType) (r1 r2 : seq I) (P : pred I) F :
     idempotent *%M -> r1 =i r2 ->
   \big[*%M/1]_(i <- r1 | P i) F i = \big[*%M/1]_(i <- r2 | P i) F i.
 Proof.
-move=> idM eq_r; rewrite -big_undup // -(big_undup r2) //; apply/eq_big_perm.
-by rewrite uniq_perm_eq ?undup_uniq // => i; rewrite !mem_undup eq_r.
+move=> idM eq_r; rewrite -big_undup // -(big_undup r2) //; apply/perm_big.
+by rewrite uniq_perm ?undup_uniq // => i; rewrite !mem_undup eq_r.
 Qed.
 
 Lemma big_undup_iterop_count (I : eqType) (r : seq I) (P : pred I) F :
   \big[*%M/1]_(i <- undup r | P i) iterop (count_mem i r) *%M (F i) 1
     = \big[*%M/1]_(i <- r | P i) F i.
 Proof.
-rewrite -[RHS](eq_big_perm _ F (perm_undup_count _)) big_flatten big_map.
+rewrite -[RHS](perm_big _ F (perm_count_undup _)) big_flatten big_map.
 by rewrite big_mkcond; apply: eq_bigr => i _; rewrite big_nseq_cond iteropE.
 Qed.
 
@@ -1536,7 +1536,7 @@ Arguments big1_eq [R idx op I].
 Arguments big1_seq [R idx op I].
 Arguments big1 [R idx op I].
 Arguments big_pred1 [R idx op I] i [P F].
-Arguments eq_big_perm [R idx op I r1] r2 [P F].
+Arguments perm_big [R idx op I r1] r2 [P F].
 Arguments big_uniq [R idx op I] r [F].
 Arguments big_rem [R idx op I r] x [P F].
 Arguments bigID [R idx op I r].
@@ -1824,4 +1824,9 @@ Lemma biggcdn_inf (I : finType) i0 (P : pred I) F m :
 Proof. by move=> Pi0; apply: dvdn_trans; rewrite (bigD1 i0) ?dvdn_gcdl. Qed.
 Arguments biggcdn_inf [I] i0 [P F m].
 
-Unset Implicit Arguments.
+Notation "@ 'eq_big_perm'" :=
+  (deprecate eq_big_perm perm_big) (at level 10, only parsing).
+
+Notation eq_big_perm :=
+  ((fun R idx op I r1 P F r2 => @eq_big_perm R idx op I r1 r2 P F)
+        _   _  _ _  _ _ _) (only parsing).
