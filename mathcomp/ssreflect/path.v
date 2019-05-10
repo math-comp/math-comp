@@ -503,6 +503,30 @@ Fixpoint merge_sort_push s1 ss :=
   | s2 :: ss' => [::] :: merge_sort_push (merge s1 s2) ss'
   end.
 
+Definition size2s (s : seq T) n :=
+  if s isn't [::] then size s == 2^n else true.
+
+Definition nth_size2s ss n := forall m, size2s (nth [::] ss m) (n + m).
+
+Lemma nth_size2s_cons ss s n : nth_size2s (s :: ss) n -> nth_size2s ss n.+1.
+Proof. by move=> nsize2s m; rewrite addSn -addnS; apply: nsize2s. Qed.
+
+Lemma nth_size2s0 ss n : nth_size2s ss n.+1 -> nth_size2s ([::] :: ss) n.
+Proof. by move=> nsize2s [] //= m; rewrite addnS -addSn. Qed.
+
+Lemma merge_sort_push_inv ss s1 n : size s1 = 2^n ->
+  nth_size2s ss n -> nth_size2s (merge_sort_push s1 ss) n.
+Proof.
+elim: ss s1 n => [|[|t s] ss ihss] s1 n sizen.
+- move=> _ [] /=; last by move=> m; rewrite nth_nil.
+  by rewrite addn0; case: s1 sizen => //= _ s ->.
+- move=> nsize2s m; move: m (nsize2s m); case=> //= _; rewrite addn0.
+  by case: s1 sizen => //= _ s ->.
+- move=> nsize2s; move: (nsize2s 0); rewrite addn0 => /eqP /= => ssize2s.
+  apply/nth_size2s0/ihss; last by apply: nth_size2s_cons.
+  by rewrite size_merge size_cat sizen /= ssize2s expnS addnn mul2n.
+Qed.
+
 Fixpoint merge_sort_pop s1 ss :=
   if ss is s2 :: ss' then merge_sort_pop (merge s1 s2) ss' else s1.
 
