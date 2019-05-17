@@ -569,8 +569,8 @@ rewrite mem_seq1 mem_primes prime_gt0 //=.
 by apply/andP/idP=> [[pr_q q_p] | /eqP-> //]; rewrite -dvdn_prime2.
 Qed.
 
-Lemma coprime_has_primes m n : m > 0 -> n > 0 ->
-  coprime m n = ~~ has (mem (primes m)) (primes n).
+Lemma coprime_has_primes m n :
+  0 < m -> 0 < n -> coprime m n = ~~ has (mem (primes m)) (primes n).
 Proof.
 move=> m_gt0 n_gt0; apply/eqnP/hasPn=> [mn1 p | no_p_mn].
   rewrite /= !mem_primes m_gt0 n_gt0 /= => /andP[pr_p p_n].
@@ -1344,8 +1344,8 @@ Proof.
 move=> co_mn; have [-> //| m_gt0] := posnP m.
 have [->|n_gt0] := posnP n; first by rewrite !muln0.
 rewrite !totientE ?muln_gt0 ?m_gt0 //.
-have /(eq_big_perm _)->: perm_eq (primes (m * n)) (primes m ++ primes n).
-  apply: uniq_perm_eq => [||p]; first exact: primes_uniq.
+have /(perm_big _)->: perm_eq (primes (m * n)) (primes m ++ primes n).
+  apply: uniq_perm => [||p]; first exact: primes_uniq.
     by rewrite cat_uniq !primes_uniq -coprime_has_primes // co_mn.
   by rewrite mem_cat primes_mul.
 rewrite big_cat /= !big_seq.

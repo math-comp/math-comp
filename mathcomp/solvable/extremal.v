@@ -2322,7 +2322,7 @@ have{defZN2} strZN2: \big[dprod/1]_(z <- [:: xpn3; y]) <[z]> = 'Z('Ohm_2(N)).
   by rewrite unlock /= dprodg1.
 rewrite -size_abelian_type ?center_abelian //.
 have pZN2: p.-group 'Z('Ohm_2(N)) by rewrite (pgroupS _ pN) // subIset ?Ohm_sub.
-rewrite -(perm_eq_size (perm_eq_abelian_type pZN2 strZN2 _)) //= !inE.
+rewrite (perm_size (abelian_type_pgroup pZN2 strZN2 _)) //= !inE.
 rewrite !(eq_sym 1) -!order_eq1 oy orderE oX2.
 by rewrite (eqn_exp2l 2 0) // (eqn_exp2l 1 0).
 Qed.

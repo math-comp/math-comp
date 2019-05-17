@@ -465,14 +465,14 @@ Lemma im_cfclass_Iirr i :
   H <| G -> perm_eq [seq 'chi_j | j in cfclass_Iirr G i] ('chi_i ^: G)%CF.
 Proof.
 move=> nsHG; have UchiG := cfclass_uniq 'chi_i nsHG.
-apply: uniq_perm_eq; rewrite ?(map_inj_uniq irr_inj) ?enum_uniq // => phi.
+apply: uniq_perm; rewrite ?(map_inj_uniq irr_inj) ?enum_uniq // => phi.
 apply/imageP/idP=> [[j iGj ->] | /cfclassP[y]]; first by rewrite -cfclass_IirrE.
 by exists (conjg_Iirr i y); rewrite ?mem_imset ?conjg_IirrE.
 Qed.
 
 Lemma card_cfclass_Iirr i : H <| G -> #|cfclass_Iirr G i| = #|G : 'I_G['chi_i]|.
 Proof.
-move=> nsHG; rewrite -size_cfclass -(perm_eq_size (im_cfclass_Iirr i nsHG)).
+move=> nsHG; rewrite -size_cfclass -(perm_size (im_cfclass_Iirr i nsHG)).
 by rewrite size_map -cardE.
 Qed.
 
@@ -481,7 +481,7 @@ Lemma reindex_cfclass R idx (op : Monoid.com_law idx) (F : 'CF(H) -> R) i :
   \big[op/idx]_(chi <- ('chi_i ^: G)%CF) F chi
      = \big[op/idx]_(j | 'chi_j \in ('chi_i ^: G)%CF) F 'chi_j.
 Proof.
-move/im_cfclass_Iirr/(eq_big_perm _) <-; rewrite big_map big_filter /=.
+move/im_cfclass_Iirr/(perm_big _) <-; rewrite big_map big_filter /=.
 by apply: eq_bigl => j; rewrite cfclass_IirrE.
 Qed.
 

@@ -430,13 +430,13 @@ Lemma eq_sorted : antisymmetric leT ->
   forall s1 s2, sorted s1 -> sorted s2 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
 move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
-  by case: {+}s2 (perm_eq_size eq_s12).
-have s2_x1: x1 \in s2 by rewrite -(perm_eq_mem eq_s12) mem_head.
+  by case: {+}s2 (perm_size eq_s12).
+have s2_x1: x1 \in s2 by rewrite -(perm_mem eq_s12) mem_head.
 case: s2 s2_x1 eq_s12 ord_s2 => //= x2 s2; rewrite in_cons.
 case: eqP => [<- _| ne_x12 /= s2_x1] eq_s12 ord_s2.
   by rewrite {IHs1}(IHs1 s2) ?(@path_sorted x1) // -(perm_cons x1).
 case: (ne_x12); apply: leT_asym; rewrite (allP (order_path_min ord_s2)) //.
-have: x2 \in x1 :: s1 by rewrite (perm_eq_mem eq_s12) mem_head.
+have: x2 \in x1 :: s1 by rewrite (perm_mem eq_s12) mem_head.
 case/predU1P=> [eq_x12 | s1_x2]; first by case ne_x12.
 by rewrite (allP (order_path_min ord_s1)).
 Qed.
@@ -447,7 +447,7 @@ Proof.
 move=> leT_irr s1 s2 s1_sort s2_sort eq_s12.
 have: antisymmetric leT.
   by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); apply: leT_tr ltnm.
-by move/eq_sorted; apply=> //; apply: uniq_perm_eq => //; apply: sorted_uniq.
+by move/eq_sorted; apply=> //; apply: uniq_perm => //; apply: sorted_uniq.
 Qed.
 
 End Transitive.
@@ -482,20 +482,20 @@ Qed.
 
 Lemma perm_merge s1 s2 : perm_eql (merge s1 s2) (s1 ++ s2).
 Proof.
-apply/perm_eqlP; rewrite perm_eq_sym; elim: s1 s2 => //= x1 s1 IHs1.
+apply/permPl; rewrite perm_sym; elim: s1 s2 => //= x1 s1 IHs1.
 elim=> [|x2 s2 IHs2]; rewrite /= ?cats0 //.
 case: ifP => _ /=; last by rewrite perm_cons.
 by rewrite (perm_catCA (_ :: _) [::x2]) perm_cons.
 Qed.
 
 Lemma mem_merge s1 s2 : merge s1 s2 =i s1 ++ s2.
-Proof. by apply: perm_eq_mem; rewrite perm_merge. Qed.
+Proof. by apply: perm_mem; rewrite perm_merge. Qed.
 
 Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
-Proof. by apply: perm_eq_size; rewrite perm_merge. Qed.
+Proof. by apply: perm_size; rewrite perm_merge. Qed.
 
 Lemma merge_uniq s1 s2 : uniq (merge s1 s2) = uniq (s1 ++ s2).
-Proof. by apply: perm_eq_uniq; rewrite perm_merge. Qed.
+Proof. by apply: perm_uniq; rewrite perm_merge. Qed.
 
 Fixpoint merge_sort_push s1 ss :=
   match ss with
@@ -531,30 +531,30 @@ Qed.
 
 Lemma perm_sort s : perm_eql (sort s) s.
 Proof.
-rewrite /sort; apply/perm_eqlP; pose catss := foldr (@cat T) [::].
-rewrite perm_eq_sym -{1}[s]/(catss [::] ++ s).
+rewrite /sort; apply/permPl; pose catss := foldr (@cat T) [::].
+rewrite perm_sym -{1}[s]/(catss [::] ++ s).
 elim: {s}_.+1 {-2}s [::] (ltnSn (size s)) => // n IHn s ss.
 have: perm_eq (catss ss ++ s) (merge_sort_pop s ss).
-  elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(perm_eqrP (IHss _)).
+  elim: ss s => //= s2 ss IHss s1; rewrite -{IHss}(permPr (IHss _)).
   by rewrite perm_catC catA perm_catC perm_cat2l -perm_merge.
 case: s => // x1 [//|x2 s _]; move/ltnW; move/IHn=> {n IHn}IHs.
-rewrite -{IHs}(perm_eqrP (IHs _)) ifE; set s1 := if_expr _ _ _.
+rewrite -{IHs}(permPr (IHs _)) ifE; set s1 := if_expr _ _ _.
 rewrite (catA _ [:: _; _] s) {s}perm_cat2r.
-apply: (@perm_eq_trans _ (catss ss ++ s1)).
+apply: (@perm_trans _ (catss ss ++ s1)).
   by rewrite perm_cat2l /s1 -ifE; case: ifP; rewrite // (perm_catC [:: _]).
 elim: ss {x1 x2}s1 => /= [|s2 ss IHss] s1; first by rewrite cats0.
 rewrite perm_catC; case def_s2: {2}s2=> /= [|y s2']; first by rewrite def_s2.
-by rewrite catA -{IHss}(perm_eqrP (IHss _)) perm_catC perm_cat2l -perm_merge.
+by rewrite catA -{IHss}(permPr (IHss _)) perm_catC perm_cat2l -perm_merge.
 Qed.
 
 Lemma mem_sort s : sort s =i s.
-Proof. by apply: perm_eq_mem; rewrite perm_sort. Qed.
+Proof. by apply: perm_mem; rewrite perm_sort. Qed.
 
 Lemma size_sort s : size (sort s) = size s.
-Proof. by apply: perm_eq_size; rewrite perm_sort. Qed.
+Proof. by apply: perm_size; rewrite perm_sort. Qed.
 
 Lemma sort_uniq s : uniq (sort s) = uniq s.
-Proof. by apply: perm_eq_uniq; rewrite perm_sort. Qed.
+Proof. by apply: perm_uniq; rewrite perm_sort. Qed.
 
 Lemma perm_sortP : transitive leT -> antisymmetric leT ->
   forall s1 s2, reflect (sort s1 = sort s2) (perm_eq s1 s2).
@@ -562,7 +562,7 @@ Proof.
 move=> leT_tr leT_asym s1 s2.
 apply: (iffP idP) => eq12; last by rewrite -perm_sort eq12 perm_sort.
 apply: eq_sorted; rewrite ?sort_sorted //.
-by rewrite perm_sort (perm_eqlP eq12) -perm_sort.
+by rewrite perm_sort (permPl eq12) -perm_sort.
 Qed.
 
 End SortSeq.

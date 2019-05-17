@@ -95,3 +95,5 @@ test_suite/hierarchy_test.v
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -notation-overridden
+-arg -w -arg -duplicate-clear
+-arg -w -arg -ambiguous-paths

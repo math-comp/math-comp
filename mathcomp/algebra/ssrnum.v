@@ -4384,8 +4384,7 @@ have sz_p: size p = n.+1.
 pose r := sort argCle r0; have r_arg: sorted argCle r by apply: sort_sorted.
 have{Dp} Dp: p = \prod_(z <- r) ('X - z%:P).
   rewrite Dp lead_coefE sz_p coefB coefXn coefC -mulrb -mulrnA mulnb lt0n andNb.
-  rewrite subr0 eqxx scale1r; apply: eq_big_perm.
-  by rewrite perm_eq_sym perm_sort.
+  by rewrite subr0 eqxx scale1r; apply/esym/perm_big; rewrite perm_sort.
 have mem_rP z: (n > 0)%N -> reflect (z ^+ n = x) (z \in r).
   move=> n_gt0; rewrite -root_prod_XsubC -Dp rootE !hornerE hornerXn n_gt0.
   by rewrite subr_eq0; apply: eqP.

@@ -16,16 +16,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   warning for `old_id`; `Import Deprecation.Silent` turns off those warnings,
   `Import Deprecation.Reject` raises errors instead of only warning.
 
+- `filter_nseq`, `count_nseq`, `mem_nseq`,
+  `rcons_inj`, `rcons_injl`, `rcons_injr`, `nthK`, `sumn_rot`.
+
+- some `perm_eq` lemmas: `perm_cat[lr]`, `perm_nilP`,
+  `perm_consP`, `perm_has`, `perm_flatten`, `perm_sumn`.
+
+- computing (efficiently) (item, multiplicity) tallies of sequences over an
+  `eqType`: `tally s`, `incr_tally bs x`, `bs \is a wf_tally`, `tally_seq bs`.
+
 ### Changed
 
 - definition of `PredType` which now takes only a `P -> pred T` function;
   definition of `simpl_rel` to improve simplification by `inE`. Both these
   changes will be in the Coq 8.11 SSReflect core library.
 
+- definition of `permutations s` now uses an optimal algorithm (in space _and_
+  time) to generate all permutations of s back-to-front, using `tally s`.
+
 ### Renamed
 
+- `perm_eqP` -> `permP` (`seq.permP` if `perm.v` is also imported)
+- `perm_eqlP` -> `permPl`
+- `perm_eqrP` -> `permPr`
+- `perm_eqlE` -> `permEl`
+- `perm_eq_refl` -> `perm_refl`
+- `perm_eq_sym` -> `perm_sym`
+- `perm_eq_trans` -> `perm_trans`
+- `perm_eq_size` -> `perm_size`
+- `perm_eq_mem` -> `perm_mem`
+- `perm_eq_uniq` -> perm_uniq`
+- `perm_eq_rev` -> `perm_rev`
+- `perm_eq_flatten` -> `perm_flatten`
+- `perm_eq_all` -> `perm_all`
+- `perm_eq_small` -> `perm_small_eq`
+- `perm_eq_nilP` -> `perm_nilP`
+- `perm_eq_consP` -> `perm_consP`
 - `leq_size_perm` -> `uniq_min_size` (permuting conclusions)
 - `perm_uniq` -> `eq_uniq` (permuting assumptions)
+  --> beware `perm_uniq` now means `perm_eq_uniq`
+- `uniq_perm_eq` -> `uniq_perm`
+- `perm_eq_iotaP` -> `perm_iotaP`
+- `perm_undup_count` -> `perm_count_undup`
+- `tuple_perm_eqP` -> `tuple_permP`
+- `eq_big_perm` -> `perm_big`
+- `perm_eq_abelian_type` -> `abelian_type_pgroup`
 
 ### Misc
 
