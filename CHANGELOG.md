@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - `nonPropType`, an interface for non-`Prop` types, and `{pred T}` and
-   `relpre f r`, all of which will be in the Coq 8.11 core SSreflect library.
+   `relpre f r`, all of which will be in the Coq 8.10 core SSreflect library.
 
 - `deprecate old_id new_id`, notation for `new_id` that prints a deprecation
   warning for `old_id`; `Import Deprecation.Silent` turns off those warnings,
@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - definition of `PredType` which now takes only a `P -> pred T` function;
   definition of `simpl_rel` to improve simplification by `inE`. Both these
-  changes will be in the Coq 8.11 SSReflect core library.
+  changes will be in the Coq 8.10 SSReflect core library.
 
 - definition of `permutations s` now uses an optimal algorithm (in space _and_
   time) to generate all permutations of s back-to-front, using `tally s`.
@@ -45,7 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `perm_eq_trans` -> `perm_trans`
 - `perm_eq_size` -> `perm_size`
 - `perm_eq_mem` -> `perm_mem`
-- `perm_eq_uniq` -> perm_uniq`
+- `perm_eq_uniq` -> `perm_uniq`
 - `perm_eq_rev` -> `perm_rev`
 - `perm_eq_flatten` -> `perm_flatten`
 - `perm_eq_all` -> `perm_all`
