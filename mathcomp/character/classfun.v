@@ -2490,3 +2490,6 @@ Definition conj_cfQuo := cfAutQuo conjC.
 Definition conj_cfMod := cfAutMod conjC.
 Definition conj_cfInd := cfAutInd conjC.
 Definition cfconjC_eq1 := cfAut_eq1 conjC.
+
+Notation cf_triangle_lerif :=
+  (deprecate cf_triangle_lerif cf_triangle_leif) (only parsing).
