@@ -5369,13 +5369,6 @@ End NumIntegralDomainMonotonyTheory.
 Section NumDomainOperationTheory.
 Variable R : numDomainType.
 Implicit Types x y z t : R.
-Definition real_lerP := real_leP.
-Definition real_ltrP := real_ltP.
-Definition real_ltrNge := real_ltNge.
-Definition real_lerNgt := real_leNgt.
-Definition real_ltrgtP := real_ltgtP.
-Definition real_ger0P := real_ge0P.
-Definition real_ltrgt0P := real_ltgt0P.
 Definition lerif_refl x C : reflect (x <= x ?= iff C) C := leif_refl.
 Definition lerif_trans x1 x2 x3 C12 C23 :
   x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23 :=
@@ -5403,9 +5396,6 @@ Definition ler_dist_norm_add x y : `| `|x| - `|y| | <= `|x + y| :=
 Definition ler_nnorml x y : y < 0 -> `|x| <= y = false := @ler_nnorml _ _ x y.
 Definition ltr_nnorml x y : y <= 0 -> `|x| < y = false := @ltr_nnorml _ _ x y.
 Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
-Definition lerif_nat m n C :
-  (m%:R <= n%:R ?= iff C :> R) = (m <= n ?= iff C)%N :=
-  leif_nat_r _ m n C.
 Definition mono_in_lerif (A : pred R) (f : R -> R) C :
   {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)} :=
@@ -5422,25 +5412,7 @@ Definition nmono_lerif (f : R -> R) C :
   {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C) :=
   @nmono_leif _ _ f C.
-Definition lerif_subLR := leif_subLR.
-Definition lerif_subRL := leif_subRL.
-Definition lerif_add := leif_add.
-Definition lerif_sum := leif_sum.
-Definition lerif_0_sum := leif_0_sum.
-Definition real_lerif_norm := real_leif_norm.
-Definition lerif_pmul := leif_pmul.
-Definition lerif_nmul := leif_nmul.
-Definition lerif_pprod := leif_pprod.
-Definition real_lerif_mean_square_scaled := real_leif_mean_square_scaled.
-Definition real_lerif_AGM2_scaled := real_leif_AGM2_scaled.
-Definition lerif_AGM_scaled := leif_AGM_scaled.
 End NumDomainOperationTheory.
-
-Section NumFieldTheory.
-Definition real_lerif_mean_square := real_leif_mean_square.
-Definition real_lerif_AGM2 := real_leif_AGM2.
-Definition lerif_AGM := leif_AGM.
-End NumFieldTheory.
 
 Section RealDomainTheory.
 Variable R : realDomainType.
@@ -5512,8 +5484,6 @@ End RealDomainMonotony.
 Section RealDomainOperations.
 Variable R : realDomainType.
 Implicit Types x y z : R.
-Definition lerif_mean_square_scaled := leif_mean_square_scaled.
-Definition lerif_AGM2_scaled := leif_AGM2_scaled.
 Section MinMax.
 Definition minrC : @commutative R R min := @meetC _ R.
 Definition minrr : @idempotent R min := @meetxx _ R.
@@ -5564,17 +5534,6 @@ Proof. by case: (leP y); constructor. Qed.
 End MinMax.
 End RealDomainOperations.
 
-Section RealField.
-Definition lerif_mean_square := leif_mean_square.
-Definition lerif_AGM2 := leif_AGM2.
-End RealField.
-
-Section RealClosedFieldTheory.
-Definition lerif_normC_Re_Creal := leif_normC_Re_Creal.
-Definition lerif_Re_Creal := leif_Re_Creal.
-Definition lerif_rootC_AGM := leif_rootC_AGM.
-End RealClosedFieldTheory.
-
 Arguments lerifP {R x y C}.
 Arguments lerif_refl {R x C}.
 Arguments mono_in_lerif [R A f C].
@@ -5593,6 +5552,104 @@ Definition arg_minrP : extremum_spec <=%R P F arg_minr := arg_minP F Pi0.
 Definition arg_maxrP : extremum_spec >=%R P F arg_maxr := arg_maxP F Pi0.
 
 End RealDomainArgExtremum.
+
+Notation "@ 'real_lerP'" :=
+  (deprecate real_lerP real_leP) (at level 10, only parsing).
+Notation real_lerP := (@real_lerP _ _ _) (only parsing).
+Notation "@ 'real_ltrP'" :=
+  (deprecate real_ltrP real_ltP) (at level 10, only parsing).
+Notation real_ltrP := (@real_ltrP _ _ _) (only parsing).
+Notation "@ 'real_ltrNge'" :=
+  (deprecate real_ltrNge real_ltNge) (at level 10, only parsing).
+Notation real_ltrNge := (@real_ltrNge _ _ _) (only parsing).
+Notation "@ 'real_lerNgt'" :=
+  (deprecate real_lerNgt real_leNgt) (at level 10, only parsing).
+Notation real_lerNgt := (@real_lerNgt _ _ _) (only parsing).
+Notation "@ 'real_ltrgtP'" :=
+  (deprecate real_ltrgtP real_ltgtP) (at level 10, only parsing).
+Notation real_ltrgtP := (@real_ltrgtP _ _ _) (only parsing).
+Notation "@ 'real_ger0P'" :=
+  (deprecate real_ger0P real_ge0P) (at level 10, only parsing).
+Notation real_ger0P := (@real_ger0P _ _) (only parsing).
+Notation "@ 'real_ltrgt0P'" :=
+  (deprecate real_ltrgt0P real_ltgt0P) (at level 10, only parsing).
+Notation real_ltrgt0P := (@real_ltrgt0P _ _) (only parsing).
+Notation lerif_nat := (deprecate lerif_nat leif_nat_r) (only parsing).
+Notation "@ 'lerif_subLR'" :=
+  (deprecate lerif_subLR leif_subLR) (at level 10, only parsing).
+Notation lerif_subLR := (@lerif_subLR _) (only parsing).
+Notation "@ 'lerif_subRL'" :=
+  (deprecate lerif_subRL leif_subRL) (at level 10, only parsing).
+Notation lerif_subRL := (@lerif_subRL _) (only parsing).
+Notation "@ 'lerif_add'" :=
+  (deprecate lerif_add leif_add) (at level 10, only parsing).
+Notation lerif_add := (@lerif_add _ _ _ _ _ _ _) (only parsing).
+Notation "@ 'lerif_sum'" :=
+  (deprecate lerif_sum leif_sum) (at level 10, only parsing).
+Notation lerif_sum := (@lerif_sum _ _ _ _ _ _) (only parsing).
+Notation "@ 'lerif_0_sum'" :=
+  (deprecate lerif_0_sum leif_0_sum) (at level 10, only parsing).
+Notation lerif_0_sum := (@lerif_0_sum _ _ _ _ _) (only parsing).
+Notation "@ 'real_lerif_norm'" :=
+  (deprecate real_lerif_norm real_leif_norm) (at level 10, only parsing).
+Notation real_lerif_norm := (@real_lerif_norm _ _) (only parsing).
+Notation "@ 'lerif_pmul'" :=
+  (deprecate lerif_pmul leif_pmul) (at level 10, only parsing).
+Notation lerif_pmul := (@lerif_pmul _ _ _ _ _ _ _) (only parsing).
+Notation "@ 'lerif_nmul'" :=
+  (deprecate lerif_nmul leif_nmul) (at level 10, only parsing).
+Notation lerif_nmul := (@lerif_nmul _ _ _ _ _ _ _) (only parsing).
+Notation "@ 'lerif_pprod'" :=
+  (deprecate lerif_pprod leif_pprod) (at level 10, only parsing).
+Notation lerif_pprod := (@lerif_pprod _ _ _ _ _ _) (only parsing).
+Notation "@ 'real_lerif_mean_square_scaled'" :=
+  (deprecate real_lerif_mean_square_scaled real_leif_mean_square_scaled)
+  (at level 10, only parsing).
+Notation real_lerif_mean_square_scaled :=
+  (@real_lerif_mean_square_scaled _ _ _ _ _ _) (only parsing).
+Notation "@ 'real_lerif_AGM2_scaled'" :=
+  (deprecate real_lerif_AGM2_scaled real_leif_AGM2_scaled)
+  (at level 10, only parsing).
+Notation real_lerif_AGM2_scaled :=
+  (@real_lerif_AGM2_scaled _ _ _) (only parsing).
+Notation "@ 'lerif_AGM_scaled'" :=
+  (deprecate lerif_AGM_scaled leif_AGM2_scaled) (at level 10, only parsing).
+Notation lerif_AGM_scaled := (@lerif_AGM_scaled _ _ _ _) (only parsing).
+Notation "@ 'real_lerif_mean_square'" :=
+  (deprecate real_lerif_mean_square real_leif_mean_square)
+  (at level 10, only parsing).
+Notation real_lerif_mean_square :=
+  (@real_lerif_mean_square _ _ _) (only parsing).
+Notation "@ 'real_lerif_AGM2'" :=
+  (deprecate real_lerif_AGM2 real_leif_AGM2) (at level 10, only parsing).
+Notation real_lerif_AGM2 := (@real_lerif_AGM2 _ _ _) (only parsing).
+Notation "@ 'lerif_AGM'" :=
+  (deprecate lerif_AGM leif_AGM) (at level 10, only parsing).
+Notation lerif_AGM := (@lerif_AGM _ _ _ _) (only parsing).
+Notation "@ 'lerif_mean_square_scaled'" :=
+  (deprecate lerif_mean_square_scaled leif_mean_square_scaled)
+  (at level 10, only parsing).
+Notation lerif_mean_square_scaled :=
+  (@lerif_mean_square_scaled _) (only parsing).
+Notation "@ 'lerif_AGM2_scaled'" :=
+  (deprecate lerif_AGM2_scaled leif_AGM2_scaled) (at level 10, only parsing).
+Notation lerif_AGM2_scaled := (@lerif_AGM2_scaled _) (only parsing).
+Notation "@ 'lerif_mean_square'" :=
+  (deprecate lerif_mean_square leif_mean_square) (at level 10, only parsing).
+Notation lerif_mean_square := (@lerif_mean_square _) (only parsing).
+Notation "@ 'lerif_AGM2'" :=
+  (deprecate lerif_AGM2 leif_AGM2) (at level 10, only parsing).
+Notation lerif_AGM2 := (@lerif_AGM2 _) (only parsing).
+Notation "@ 'lerif_normC_Re_Creal'" :=
+  (deprecate lerif_normC_Re_Creal leif_normC_Re_Creal)
+  (at level 10, only parsing).
+Notation lerif_normC_Re_Creal := (@lerif_normC_Re_Creal _) (only parsing).
+Notation "@ 'lerif_Re_Creal'" :=
+  (deprecate lerif_Re_Creal leif_Re_Creal) (at level 10, only parsing).
+Notation lerif_Re_Creal := (@lerif_Re_Creal _) (only parsing).
+Notation "@ 'lerif_rootC_AGM'" :=
+  (deprecate lerif_rootC_AGM leif_rootC_AGM) (at level 10, only parsing).
+Notation lerif_rootC_AGM := (@lerif_rootC_AGM _ _ _ _) (only parsing).
 
 End Theory.
 
