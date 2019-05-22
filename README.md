@@ -13,7 +13,7 @@ These formal theories cover a wide spectrum of topics, ranging from the formal t
 
 ## Installation
 
-If you already have OPAM installed:
+If you already have OPAM installed (a fresh or up to date version of opam 2 is required):
 
 ```
 opam repo add coq-released https://coq.inria.fr/opam/released
