@@ -1,11 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[1.8.0] - 2019-04-08](#180---2019-04-08) and [[1.7.0] - 2018-04-24](#170---2018-04-24).
+Last releases: [[1.9.0] - 2019-05-22](#190---2019-05-22) and [[1.8.0] - 2019-04-08](#180---2019-04-08).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.9.0] - 2019-05-22
+
+MathComp 1.9.0 is compatible with Coq 8.7, 8.8, 8.9 and 8.10beta1.
+Minor releases will remain compatible with Coq 8.9 and 8.10; compatibility with earlier
+versions may be droppped.
 
 ### Added
 
@@ -63,6 +67,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `perm_eq_abelian_type` -> `abelian_type_pgroup`
 
 ### Misc
+
+- removed Coq prelude hints `plus_n_O` `plus_n_Sm` `mult_n_O` `mult_n_Sm`,
+  to improve robustness of `by ...`; scripts may need to invoke
+  `addn0`, `addnS`, `muln0` or `mulnS`
+  explicitly where these hints were used accidentally.
 
 ## [1.8.0] - 2019-04-08
 
