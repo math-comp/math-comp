@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 MathComp 1.9.0 is compatible with Coq 8.7, 8.8, 8.9 and 8.10beta1.
 Minor releases will remain compatible with Coq 8.9 and 8.10; compatibility with earlier
-versions may be droppped.
+versions may be dropped.
 
 ### Added
 
