@@ -8,11 +8,10 @@ the more recent OPAM one (version 2). The released and current dev versions are
 also available as OPAM packages.
 
 ## Compilation and installation of released and current dev version with OPAM
-If you just installed OPAM version 2 you may have to do the following. You may also want
-to read [OPAM user manual](https://opam.ocaml.org/doc/Usage.html) first. 
+If you just installed OPAM version 2 you should proceed as follows: 
 ```
 opam --version # should print 2.x.y
-opam init
+opam init -n --comp=ocaml-base-compiler.4.05.0
 eval $(opam config env)
 ```
 Once your OPAM environment is configured
@@ -31,6 +30,7 @@ To get the latest development version you need to execute the following:
 opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
 opam install coq-mathcomp-ssreflect.dev -j3
 ```
+You can learn more about OPAM by reading its [user manual](https://opam.ocaml.org/doc/Usage.html).
 
 ## Compilation and installation in a dedicated OPAM root
 
