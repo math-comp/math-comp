@@ -4,13 +4,14 @@ The library is divided into packages which group together related
 files. Each package defines a distribution and compilation unit.
 
 Packages can be compiled using the traditional make utility or
-the more recent OPAM one. The released and current dev versions are
+the more recent OPAM one (version 2). The released and current dev versions are
 also available as OPAM packages.
 
 ## Compilation and installation of released and current dev version with OPAM
-If you just installed OPAM you may have to do the following. You may also want
+If you just installed OPAM version 2 you may have to do the following. You may also want
 to read [OPAM user manual](https://opam.ocaml.org/doc/Usage.html) first. 
 ```
+opam --version # should print 2.x.y
 opam init
 eval $(opam config env)
 ```
