@@ -570,7 +570,7 @@ apply/permP=> i; case: (unliftP j i) => [i'|] ->; last first.
 apply: ord_inj; rewrite lift_perm_lift !permE /= eq_sym -if_neg neq_lift.
 rewrite fun_if -val_eqE /= def_k /bump ltn_neqAle andbC.
 case: leqP => [_ | lt_i'm] /=; last by rewrite -if_neg neq_ltn leqW.
-by rewrite add1n eqSS eq_sym; case: eqP.
+by rewrite add1n eqSS; case: eqsP.
 Qed.
 
 End LiftPerm.

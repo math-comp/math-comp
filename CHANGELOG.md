@@ -5,6 +5,13 @@ Last releases: [[1.9.0] - 2019-05-22](#190---2019-05-22) and [[1.8.0] - 2019-04-
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- `eqsP`, a view which is like `eqP`, but in addition it allows
+  simultaneous destruction of expressions of the form `x == y` and `y == x`.
+
 ## [1.9.0] - 2019-05-22
 
 MathComp 1.9.0 is compatible with Coq 8.7, 8.8, 8.9 and 8.10beta1.
