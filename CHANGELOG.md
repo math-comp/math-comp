@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- `eqsP`, a view which is like `eqP`, but in addition it allows
+- `eqPsym`, a view which is like `eqP`, but in addition it allows
   simultaneous destruction of expressions of the form `x == y` and `y == x`.
 
 ## [1.9.0] - 2019-05-22
