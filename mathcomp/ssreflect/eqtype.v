@@ -196,6 +196,15 @@ Proof. exact/eqP/eqP. Qed.
 
 Hint Resolve eq_refl eq_sym : core.
 
+Variant eq_xor_neq (T : eqType) (x y : T) : bool -> bool -> Set :=
+  | EqNotNeq of x = y : eq_xor_neq x y true true
+  | NeqNotEq of x != y : eq_xor_neq x y false false.
+
+Lemma eqVneq (T : eqType) (x y : T) : eq_xor_neq x y (y == x) (x == y).
+Proof. by rewrite eq_sym; case: (altP eqP); constructor. Qed.
+
+Arguments eqVneq {T} x y, {T x y}.
+
 Section Contrapositives.
 
 Variables (T1 T2 : eqType).
@@ -369,9 +378,6 @@ Proof. by move->; rewrite eqxx. Qed.
 
 Lemma predU1r : b -> (x == y) || b.
 Proof. by move->; rewrite orbT. Qed.
-
-Lemma eqVneq : {x = y} + {x != y}.
-Proof. by case: eqP; [left | right]. Qed.
 
 End EqPred.
 

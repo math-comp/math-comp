@@ -836,9 +836,9 @@ Qed.
 
 Lemma rank_gt0 G : ('r(G) > 0) = (G :!=: 1).
 Proof.
-case: (eqsVneq G 1) => [-> |]; first by rewrite rank1 eqxx.
-case: (trivgVpdiv G) => [-> | [p p_pr]]; first by case/eqP.
-case/Cauchy=> // x Gx oxp ->; apply: leq_trans (p_rank_le_rank p G).
+case: (eqsVneq G 1) => [-> |]; first by rewrite rank1.
+case: (trivgVpdiv G) => [/eqP->// | [p p_pr]].
+case/Cauchy=> // x Gx oxp _; apply: leq_trans (p_rank_le_rank p G).
 have EpGx: <[x]>%G \in 'E_p(G).
   by rewrite inE cycle_subG Gx abelemE // cycle_abelian -oxp exponent_dvdn.
 by apply: leq_trans (logn_le_p_rank EpGx); rewrite -orderE oxp logn_prime ?eqxx.

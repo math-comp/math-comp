@@ -340,7 +340,7 @@ have ntY: Y != 1 by apply: subG1_contra ntZ.
 have p_odd: odd p by rewrite -oZ (oddSg sZG).
 have expY: exponent Y %| p by rewrite exponent_Ohm1_class2 // nil_class2 defG'.
 rewrite (prime_nt_dvdP p_pr _ expY) -?dvdn1 -?trivg_exponent //.
-have [-> | neYG] := eqVneq Y G; first by rewrite indexgg dvd1n eqxx; split.
+have [-> | neYG] := eqVneq Y G; first by rewrite indexgg dvd1n; split.
 have sG1Z: 'Mho^1(G) \subset Z by rewrite -defPhiG (Phi_joing pG) joing_subr.
 have Z_Gp: {in G, forall x, x ^+ p \in Z}.
   by move=> x Gx; rewrite /= (subsetP sG1Z) ?(Mho_p_elt 1) ?(mem_p_elt pG).

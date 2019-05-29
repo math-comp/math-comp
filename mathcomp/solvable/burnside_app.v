@@ -371,7 +371,7 @@ Lemma F_r3 : 'Fix_to[r3] =
 Proof.
 apply/setP=> x; rewrite (sameP afix1P eqP) !inE eqperm_map /=.
 rewrite /act_f r3_inv !ffunE !permE /=.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite // {E}(eqP E)].
+by do 3![case: eqVneq=> // <-].
 Qed.
 
 Lemma card_n2 : forall x y z t : square, uniq [:: x; y; z; t] ->
@@ -950,7 +950,7 @@ Proof.
 apply sym_equal.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r05_inv !ffunE !permE /=.
 rewrite !eqxx /= !andbT /col1/col2/col3/col4/col5/col0.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF // {E}(eqP E)  ].
+by do 3![case: eqVneq; rewrite ?andbF // => <-].
 Qed.
 
 Lemma F_r50 : 'Fix_to_g[r50]=
@@ -959,7 +959,7 @@ Lemma F_r50 : 'Fix_to_g[r50]=
 Proof.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r50_inv !ffunE !permE /=.
 apply sym_equal; rewrite !eqxx /= !andbT /col1/col2/col3/col4.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF // {E}(eqP E) ].
+by do 3![case: eqVneq; rewrite ?andbF // => <-].
 Qed.
 
 Lemma F_r23 : 'Fix_to_g[r23] =
@@ -969,7 +969,7 @@ Proof.
 have r23_inv: r23^-1 = r32 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r23_inv !ffunE !permE /=.
 apply sym_equal; rewrite !eqxx /= !andbT /col1/col0/col5/col4.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // {E}(eqP E)].
+by do 3![case: eqVneq; rewrite ?andbF // => <-].
 Qed.
 
 Lemma F_r32 : 'Fix_to_g[r32] =
@@ -979,7 +979,7 @@ Proof.
 have r32_inv: r32^-1 = r23 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r32_inv !ffunE !permE /=.
 apply sym_equal; rewrite !eqxx /= !andbT /col1/col0/col5/col4.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // {E}(eqP E)].
+by do 3![case: eqVneq; rewrite ?andbF // => <-].
 Qed.
 
 Lemma F_r14 : 'Fix_to_g[r14] =
@@ -987,7 +987,7 @@ Lemma F_r14 : 'Fix_to_g[r14] =
 Proof.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r14_inv !ffunE !permE /=.
 apply sym_equal; rewrite !eqxx /= !andbT /col2/col0/col5/col3.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // {E}(eqP E)].
+by do 3![case: eqVneq; rewrite ?andbF // => <-].
 Qed.
 
 Lemma F_r41 : 'Fix_to_g[r41] =
@@ -995,7 +995,7 @@ Lemma F_r41 : 'Fix_to_g[r41] =
 Proof.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r41_inv !ffunE !permE /=.
 apply sym_equal; rewrite !eqxx /= !andbT /col2/col0/col5/col3.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // {E}(eqP E)].
+by do 3![case: eqVneq; rewrite ?andbF // => <-].
 Qed.
 
 Lemma F_r024 : 'Fix_to_g[r024] =
@@ -1005,7 +1005,7 @@ Proof.
 have r024_inv: r024^-1 = r042 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r024_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r042 : 'Fix_to_g[r042] =
@@ -1015,7 +1015,7 @@ Proof.
 have r042_inv: r042^-1 = r024 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r042_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r012 : 'Fix_to_g[r012] =
@@ -1025,7 +1025,7 @@ Proof.
 have r012_inv: r012^-1 = r021 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r012_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r021 : 'Fix_to_g[r021] =
@@ -1035,7 +1035,7 @@ Proof.
 have r021_inv: r021^-1 = r012 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r021_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r031 : 'Fix_to_g[r031] =
@@ -1045,7 +1045,7 @@ Proof.
 have r031_inv: r031^-1 = r013 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r031_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r013 : 'Fix_to_g[r013] =
@@ -1055,7 +1055,7 @@ Proof.
 have r013_inv: r013^-1 = r031 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r013_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r043 : 'Fix_to_g[r043] =
@@ -1065,7 +1065,7 @@ Proof.
 have r043_inv: r043^-1 = r034 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r043_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_r034 : 'Fix_to_g[r034] =
@@ -1075,7 +1075,7 @@ Proof.
 have r034_inv: r034^-1 = r043 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g r034_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 4![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 4![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_s1 : 'Fix_to_g[s1] =
@@ -1084,7 +1084,7 @@ Proof.
 have s1_inv: s1^-1 = s1 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g s1_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 3![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_s2 : 'Fix_to_g[s2] =
@@ -1093,7 +1093,7 @@ Proof.
 have s2_inv: s2^-1 = s2 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g s2_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 3![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_s3 : 'Fix_to_g[s3] =
@@ -1102,7 +1102,7 @@ Proof.
 have s3_inv: s3^-1 = s3 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g s3_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 3![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_s4 : 'Fix_to_g[s4] =
@@ -1111,7 +1111,7 @@ Proof.
 have s4_inv: s4^-1 = s4 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g s4_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 3![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_s5 : 'Fix_to_g[s5] =
@@ -1120,7 +1120,7 @@ Proof.
 have s5_inv: s5^-1 = s5 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g s5_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 3![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma F_s6 : 'Fix_to_g[s6] =
@@ -1129,7 +1129,7 @@ Proof.
 have s6_inv: s6^-1 = s6 by inv_tac.
 apply/setP => x; rewrite infE !inE eqperm_map2 /= /act_g s6_inv !ffunE !permE /=.
 apply sym_equal; rewrite ?eqxx /= !andbT /col0/col1/col2/col3/col4/col5.
-by do 3![rewrite eq_sym; case E: {+}(_ == _); rewrite ?andbF  // ?{E}(eqP E)].
+by do 3![case: eqVneq=> E; rewrite ?andbF // ?{}E].
 Qed.
 
 Lemma uniq4_uniq6 : forall x y z t : cube,

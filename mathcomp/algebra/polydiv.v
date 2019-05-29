@@ -2037,8 +2037,7 @@ Lemma egcdp_recP : forall k p q, q != 0 -> size q <= k -> size q <= size p ->
     [/\ size e.1 <= size q, size e.2 <= size p & gcdp p q %= e.1 * p + e.2 * q].
 Proof.
 elim=> [|k ihk] p q /= qn0; first by rewrite leqn0 size_poly_eq0 (negPf qn0).
-move=> sqSn qsp; case: (eqVneq q 0)=> q0; first by rewrite q0 eqxx in qn0.
-rewrite (negPf qn0).
+move=> sqSn qsp; rewrite (negPf qn0).
 have sp : size p > 0 by apply: leq_trans qsp; rewrite size_poly_gt0.
 case: (eqVneq (p %% q) 0) => [r0 | rn0] /=.
   rewrite r0 /egcdp_rec; case: k ihk sqSn => [|n] ihn sqSn /=.
@@ -2239,8 +2238,7 @@ Proof.
 apply/eqP/idP=> [d0|]; last first.
   case/or3P; [by move/eqP->; rewrite div0p| by move/eqP->; rewrite divp0|].
   by move/divp_small.
-case: (eqVneq p 0) => [->|pn0]; first by rewrite eqxx.
-case: (eqVneq q 0) => [-> | qn0]; first by rewrite eqxx orbT.
+case: eqVneq => // _; case: eqVneq => // qn0.
 move: (divp_eq p q); rewrite d0 mul0r add0r.
 move/(f_equal (fun x : {poly R} => size x)).
 by rewrite size_scale ?lc_expn_scalp_neq0 // => ->; rewrite ltn_modp qn0 !orbT.
@@ -3039,8 +3037,8 @@ Proof.
 move=> eqr; rewrite /gdcop; move: (size p)=> n.
 elim: n p q r eqr {1 3}p (eqpxx p) => [|n ihn] p q r eqr s esp /=.
   move: eqr; case: (eqVneq q 0)=> [-> | nq0 eqr] /=.
-    by rewrite eqp_sym eqp0; move->; rewrite eqxx eqpxx.
-  suff rn0 : r != 0 by rewrite (negPf nq0) (negPf rn0) eqpxx.
+    by rewrite eqp_sym eqp0 => ->; rewrite eqpxx.
+  suff rn0 : r != 0 by rewrite (negPf rn0) eqpxx.
   by apply: contraTneq eqr => ->; rewrite eqp0.
 rewrite (eqp_coprimepr _ eqr) (eqp_coprimepl _ esp); case: ifP=> _ //.
 by apply: ihn => //; apply: eqp_div => //; apply: eqp_gcd.
@@ -3051,8 +3049,8 @@ Proof.
 rewrite /rgdcop /gdcop; move: (size p)=> n.
 elim: n p q {1 3}p {1 3}q (eqpxx p) (eqpxx q) => [|n ihn] p q s t /= sp tq.
   move: tq; case: (eqVneq t 0)=> [-> | nt0 etq].
-    by rewrite eqp_sym eqp0; move->; rewrite eqxx eqpxx.
-  suff qn0 : q != 0 by rewrite (negPf nt0) (negPf qn0) eqpxx.
+    by rewrite eqp_sym eqp0 => ->; rewrite eqpxx.
+  suff qn0 : q != 0 by rewrite (negPf qn0) eqpxx.
   by apply: contraTneq etq => ->; rewrite eqp0.
 rewrite rcoprimep_coprimep (eqp_coprimepl t sp) (eqp_coprimepr p tq).
 case: ifP=> // _; apply: ihn => //; apply: eqp_trans (eqp_rdiv_div _ _) _.

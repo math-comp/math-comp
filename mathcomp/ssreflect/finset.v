@@ -232,13 +232,15 @@ Definition setTfor (phT : phant T) := [set x : T | true].
 Lemma in_setT x : x \in setTfor (Phant T).
 Proof. by rewrite in_set. Qed.
 
-Lemma eqsVneq A B : {A = B} + {A != B}.
-Proof. exact: eqVneq. Qed.
+Lemma eqsVneq A B : eq_xor_neq A B (B == A) (A == B).
+Proof. by apply: eqVneq. Qed.
 
 Lemma eq_finset (pA pB : pred T) : pA =1 pB -> finset pA = finset pB.
 Proof. by move=> eq_p; apply/setP => x; rewrite !(in_set, inE) eq_p. Qed.
 
 End BasicSetTheory.
+
+Arguments eqsVneq {T} A B, {T A B}.
 
 Definition inE := (in_set, inE).
 

@@ -969,7 +969,7 @@ without loss{IHa} /forallP/(_ (_, _))/= a_dvM: / [forall k, a %| M k.1 k.2]%Z.
     by exists i; rewrite mxE.
   exists R^T; last exists L^T; rewrite ?unitmx_tr //; exists d => //.
   rewrite -[M]trmxK dM !trmx_mul mulmxA; congr (_ *m _ *m _).
-  by apply/matrixP=> i1 j1; rewrite !mxE eq_sym; case: eqP => // ->.
+  by apply/matrixP=> i1 j1; rewrite !mxE; case: eqVneq => // ->.
 without loss{nz_a a_dvM} a1: M a Da / a = 1.
   pose M1 := map_mx (divz^~ a) M; case/(_ M1 1)=> // [k|L uL [R uR [d dvD dM]]].
     by rewrite !mxE Da divzz nz_a.

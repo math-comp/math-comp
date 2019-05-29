@@ -1191,7 +1191,7 @@ Proof. by rewrite -has_pred1 has_count -eqn0Ngt; apply: eqP. Qed.
 Lemma count_uniq_mem s x : uniq s -> count_mem x s = (x \in s).
 Proof.
 elim: s => //= y s IHs /andP[/negbTE s'y /IHs-> {IHs}].
-by rewrite in_cons eq_sym; case: eqP => // ->; rewrite s'y.
+by rewrite in_cons; case: eqVneq => // <-; rewrite s'y.
 Qed.
 
 Lemma filter_pred1_uniq s x : uniq s -> x \in s -> filter (pred1 x) s = [:: x].
@@ -1303,7 +1303,7 @@ Lemma rot_to s x : x \in s -> rot_to_spec s x.
 Proof.
 move=> s_x; pose i := index x s; exists i (drop i.+1 s ++ take i s).
 rewrite -cat_cons {}/i; congr cat; elim: s s_x => //= y s IHs.
-by rewrite eq_sym in_cons; case: eqP => // -> _; rewrite drop0.
+by rewrite in_cons; case: eqVneq => // -> _; rewrite drop0.
 Qed.
 
 End EqSeq.
@@ -2167,7 +2167,7 @@ Lemma nth_index_map s x0 x :
   {in s &, injective f} -> x \in s -> nth x0 s (index (f x) (map f s)) = x.
 Proof.
 elim: s => //= y s IHs inj_f s_x; rewrite (inj_in_eq inj_f) ?mem_head //.
-move: s_x; rewrite inE eq_sym; case: eqP => [-> | _] //=; apply: IHs.
+move: s_x; rewrite inE; case: eqVneq => [-> | _] //=; apply: IHs.
 by apply: sub_in2 inj_f => z; apply: predU1r.
 Qed.
 

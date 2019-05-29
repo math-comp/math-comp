@@ -368,7 +368,7 @@ Lemma nil_poly p : nilp p = (p == 0).
 Proof. exact: size_poly_eq0. Qed.
 
 Lemma poly0Vpos p : {p = 0} + {size p > 0}.
-Proof. by rewrite lt0n size_poly_eq0; apply: eqVneq. Qed.
+Proof. by rewrite lt0n size_poly_eq0; case: eqVneq; [left | right]. Qed.
 
 Lemma polySpred p : p != 0 -> size p = (size p).-1.+1.
 Proof. by rewrite -size_poly_eq0 -lt0n => /prednK. Qed.
