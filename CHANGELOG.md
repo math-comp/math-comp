@@ -7,10 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Added
+### Changed
 
-- `eqPsym`, a view which is like `eqP`, but in addition it allows
-  simultaneous destruction of expressions of the form `x == y` and `y == x`.
+- `eqVneq` lemma is changed from `{x = y} + {x != y}` to
+  `eq_xor_neq x y (y == x) (x == y)` which allows to use it as
+   a view like `eqP`, in addition providing simultaneous destruction
+   of expressions of the form `x == y` and `y == x`, while keeping
+   the ability to use it in a way it was used before.
 
 ## [1.9.0] - 2019-05-22
 

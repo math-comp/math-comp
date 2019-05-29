@@ -1392,7 +1392,7 @@ Definition diag_mx n (d : 'rV[R]_n) :=
   \matrix[diag_mx_key]_(i, j) (d 0 i *+ (i == j)).
 
 Lemma tr_diag_mx n (d : 'rV_n) : (diag_mx d)^T = diag_mx d.
-Proof. by apply/matrixP=> i j; rewrite !mxE; case: eqPsym => // ->. Qed.
+Proof. by apply/matrixP=> i j; rewrite !mxE; case: eqVneq => // ->. Qed.
 
 Lemma diag_mx_is_linear n : linear (@diag_mx n).
 Proof.
@@ -1744,7 +1744,7 @@ by rewrite eqn_leq andbC leqNgt lshift_subproof.
 Qed.
 
 Lemma tr_pid_mx m n r : (pid_mx r)^T = pid_mx r :> 'M_(n, m).
-Proof. by apply/matrixP=> i j; rewrite !mxE; case: eqPsym => // ->. Qed.
+Proof. by apply/matrixP=> i j; rewrite !mxE; case: eqVneq => // ->. Qed.
 
 Lemma pid_mx_minv m n r : pid_mx (minn m r) = pid_mx r :> 'M_(m, n).
 Proof. by apply/matrixP=> i j; rewrite !mxE leq_min ltn_ord. Qed.
