@@ -198,10 +198,10 @@ Hint Resolve eq_refl eq_sym : core.
 
 Variant eq_xor_neq_sym (T : eqType) (x y : T) : bool -> bool -> Set :=
   | EqNotNeqSym of x = y : eq_xor_neq_sym x y true true
-  | NeqNotEqSym of x <> y : eq_xor_neq_sym x y false false.
+  | NeqNotEqSym of x != y : eq_xor_neq_sym x y false false.
 
 Lemma eqPsym (T : eqType) (x y : T) : eq_xor_neq_sym x y (y == x) (x == y).
-Proof. by rewrite eq_sym; case: eqP; constructor. Qed.
+Proof. by rewrite eq_sym; case: eqP=> [|/eqP]; constructor. Qed.
 
 Arguments eqPsym {T x y}.
 
