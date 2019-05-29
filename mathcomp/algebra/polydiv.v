@@ -2238,7 +2238,7 @@ Proof.
 apply/eqP/idP=> [d0|]; last first.
   case/or3P; [by move/eqP->; rewrite div0p| by move/eqP->; rewrite divp0|].
   by move/divp_small.
-case: (eqVneq p 0) => [->//|pn0]; case: (eqVneq q 0) => [->//| qn0].
+case: eqVneq => // _; case: eqVneq => // qn0.
 move: (divp_eq p q); rewrite d0 mul0r add0r.
 move/(f_equal (fun x : {poly R} => size x)).
 by rewrite size_scale ?lc_expn_scalp_neq0 // => ->; rewrite ltn_modp qn0 !orbT.

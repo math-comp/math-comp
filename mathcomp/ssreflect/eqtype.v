@@ -201,7 +201,7 @@ Variant eq_xor_neq (T : eqType) (x y : T) : bool -> bool -> Set :=
   | NeqNotEq of x != y : eq_xor_neq x y false false.
 
 Lemma eqVneq (T : eqType) (x y : T) : eq_xor_neq x y (y == x) (x == y).
-Proof. by rewrite eq_sym; case: eqP=> [|/eqP]; constructor. Qed.
+Proof. by rewrite eq_sym; case: (altP eqP); constructor. Qed.
 
 Arguments eqVneq {T} x y, {T x y}.
 
