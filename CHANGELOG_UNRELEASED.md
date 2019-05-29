@@ -18,6 +18,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `choiceType` and codomain in an `eqType`.
   See the header of `ssreflect/finmap.v` for a detailed documentation.
 
+- Added library `multiset` which contains multiset on a `choiceType`.
+  See the header of `ssreflect/multiset.v` for a detailed documentation.
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to

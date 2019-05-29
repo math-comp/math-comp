@@ -17,3 +17,4 @@ Require Export finset.
 Require Export binomial.
 Require Export generic_quotient.
 Require Export finmap.
+Require Export multiset.
