@@ -19,6 +19,8 @@ prime.v
 tuple.v
 ssrnotations.v
 ssrmatching.v
+finmap.v
+multiset.v
 
 -I .
 -R . mathcomp.ssreflect
