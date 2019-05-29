@@ -11,7 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
-  `eq_xor_neq x y (y == x) (x == y)` which allows to use as a view and provide
-   simultaneous destruction of expressions of the form `x == y` and `y == x`,
-   while keeping the ability to use it in the way it was used before.
+  `eq_xor_neq x y (y == x) (x == y)`, on which a case analysis performs
+  simultaneous replacement of expressions of the form `x == y` and `y == x`
+  by `true` or `false`, while keeping the ability to use it in the way
+  it was used before.
 
