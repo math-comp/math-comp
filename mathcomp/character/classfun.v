@@ -2491,5 +2491,7 @@ Definition conj_cfMod := cfAutMod conjC.
 Definition conj_cfInd := cfAutInd conjC.
 Definition cfconjC_eq1 := cfAut_eq1 conjC.
 
-Notation cf_triangle_lerif :=
-  (deprecate cf_triangle_lerif cf_triangle_leif) (only parsing).
+Notation "@ 'cf_triangle_lerif'" :=
+  (deprecate cf_triangle_lerif cf_triangle_leif)
+  (at level 10, only parsing).
+Notation cf_triangle_lerif := (@cf_triangle_lerif _ _) (only parsing).
