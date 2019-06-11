@@ -826,6 +826,9 @@ Proof. by elim: n => //= n ->. Qed.
 Lemma eq_iter f f' : f =1 f' -> forall n, iter n f =1 iter n f'.
 Proof. by move=> eq_f n x; elim: n => //= n ->; rewrite eq_f. Qed.
 
+Lemma iter_fix n f x : f x = x -> iter n f x = x.
+Proof. by move=> fixf; elim: n => //= n ->. Qed.
+
 Lemma eq_iteri f f' : f =2 f' -> forall n, iteri n f =1 iteri n f'.
 Proof. by move=> eq_f n x; elim: n => //= n ->; rewrite eq_f. Qed.
 
