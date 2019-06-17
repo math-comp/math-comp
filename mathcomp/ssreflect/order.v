@@ -40,13 +40,95 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (* suffix ^c (e.g. x <=^c y) is about the converse order, in order not to     *)
 (* confuse the normal order with its converse.                                *)
 (*                                                                            *)
-(* PorderType pord_mixin == builds a porderType from a partial order mixin    *)
-(*                          containing le, lt and refl, antisym, trans of le  *)
+(* In order to build the above structures, one must provide the appropriate   *)
+(* mixin to the following structure constructors. The list of possible mixins *)
+(* is indicated after each constructor. Each mixin is documented in the next. *)
+(* paragraph.                                                                 *)
+(*                                                                            *)
+(* POrderType pord_mixin == builds a porderType from a choiceType             *)
+(*   where pord_mixin can be of types                                         *)
+(*     lePOrderMixin, ltPOrderMixin, meetJoinMixin,                           *)
+(*     leOrderMixin or ltOrderMixin,                                          *)
+(*   or computed using PCanPOrderMixin or CanPOrderMixin.                     *)
+(*                                                                            *)
 (* LatticeType lat_mixin == builds a distributive lattice from a porderType   *)
-(*                          meet and join and axioms                          *)
-(*    OrderType le_total == builds an order type from a latticeType and from  *)
-(*                          a proof of totality                               *)
-(*                  ...                                                       *)
+(*   where lat_mixin can be of types                                          *)
+(*     latticeMixin, totalLatticeMixin, meetJoinMixin,                        *)
+(*     leOrderMixin or ltOrderMixin                                           *)
+(*   or computed using IsoLatticeMixin.                                       *)
+(*                                                                            *)
+(* OrderType pord_mixin == builds a orderType from a latticeType              *)
+(*   where pord_mixin can be of types                                         *)
+(*     leOrderMixin, ltOrderMixin or orderMixin,                              *)
+(*   or computed using MonoOrderMixin.                                        *)
+(*                                                                            *)
+(* BLatticeType bot_mixin == builds a blatticeType from a latticeType         *)
+(*                            and a bottom operation                          *)
+(*                                                                            *)
+(* TBLatticeType top_mixin == builds a tblatticeType from a blatticeType      *)
+(*                            and a top operation                             *)
+(*                                                                            *)
+(* CBLatticeType compl_mixin == builds a cblatticeType from a blatticeType    *)
+(*                              and a relative complement operation           *)
+(*                                                                            *)
+(* CTBLatticeType sub_mixin == builds a cblatticeType from a blatticeType     *)
+(*                             and a total complement supplement operation    *)
+(*                                                                            *)
+(* Additionally:                                                              *)
+(* - [porderType of _] ... notations are available to recover structures on   *)
+(*    copies of the types, as in eqtype, choicetype, ssralg...                *)
+(* - [finPOrderType of _] ... notations to compute joins between finite types *)
+(*                            and ordered types                               *)
+(*                                                                            *)
+(* List of possible mixins:                                                   *)
+(*                                                                            *)
+(* - lePOrderMixin == on a choiceType, takes le, lt,                          *)
+(*                    reflexivity, antisymmetry and transitivity of le.       *)
+(*                    (can build:  porderType)                                *)
+(*                                                                            *)
+(* - ltPOrderMixin == on a choiceType, takes le, lt,                          *)
+(*                    irreflexivity and transitivity of lt.                   *)
+(*                    (can build:  porderType)                                *)
+(*                                                                            *)
+(* - meetJoinMixin == on a choiceType, takes le, lt, meet, join,              *)
+(*                    commutativity and associativity of meet and join        *)
+(*                    idempotence of meet and some De Morgan laws             *)
+(*                    (can build:  porderType, latticeType)                   *)
+(*                                                                            *)
+(* - leOrderMixin == on a choiceType, takes le, lt, meet, join                *)
+(*                   antisymmetry, transitivity and totality of le.           *)
+(*                   (can build:  porderType, latticeType, orderType)         *)
+(*                                                                            *)
+(* - ltOrderMixin == on a choiceType, takes le, lt,                           *)
+(*                   irreflexivity, transitivity and totality of lt.          *)
+(*                   (can build:  porderType, latticeType, orderType)         *)
+(*                                                                            *)
+(* - totalLatticeMixin == on a porderType T, totality of the order of T       *)
+(*                    := total (<=%O : rel T)                                 *)
+(*                   (can build: latticeType)                                 *)
+(*                                                                            *)
+(* - totalOrderMixin == on a latticeType T, totality of the order of T        *)
+(*                    := total (<=%O : rel T)                                 *)
+(*                   (can build: orderType)                                   *)
+(*    NB: this mixin is kept separate from totalLatticeMixin (even though it  *)
+(*        is convertible to it), in order to avoid ambiguous coercion paths.  *)
+(*                                                                            *)
+(* - latticeMixin == on a porderType T, takes meet, join                      *)
+(*                   commutativity and associativity of meet and join         *)
+(*                   idempotence of meet and some De Morgan laws              *)
+(*                   (can build: latticeType)                                 *)
+(*                                                                            *)
+(* - blatticeMixin, tblatticeMixin, cblatticeMixin, ctblatticeMixin           *)
+(*   == mixins with with one extra operator                                   *)
+(*      (respectively bottom, top, relative complement, and total complement  *)
+(*                                                                            *)
+(* Additionally:                                                              *)
+(* - [porderMixin of T by <:] creates an porderMixin by subtyping.            *)
+(* - [totalOrderMixin of T by <:] creates the associated totalOrderMixin.     *)
+(* - PCanPOrderMixin, CanPOrderMixin create porderMixin from cancellations    *)
+(* - MonoTotalMixin creates a totalLatticeMixin from monotonicity             *)
+(* - IsoLatticeMixin creates a latticeMixin from an ordered structure         *)
+(*   isomorphism (i.e. cancel f f', cancel f' f, {mono f : x y / x <= y})     *)
 (*                                                                            *)
 (* Over these structures, we have the following operations                    *)
 (*            x <= y <-> x is less than or equal to y.                        *)
@@ -91,9 +173,22 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (*                                                                            *)
 (* We provide the following canonical instances of ordered types              *)
 (* - porderType, latticeType, orderType, blatticeType of nat                  *)
-(* - porderType of seq (lexicographic ordering)                               *)
+(* - porderType, latticeType, orderType, blatticeType, cblatticeType,         *)
+(*   tblatticeType, ctblatticeType on T *[disp] T' a copy of T * T'           *)
+(*     using product order                                                    *)
+(* - porderType, latticeType, and orderType,  on T *lex[disp] T'              *)
+(*     another copy of T * T', with lexicographic ordering                    *)
+(* - porderType, latticeType, and orderType,  on {t : T & T' x}               *)
+(*     with lexicographic ordering                                            *)
+(* - porderType, latticeType, orderType, blatticeType, cblatticeType,         *)
+(*   tblatticeType, ctblatticeType on seq_prod disp T a copy of seq T         *)
+(*     using product order                                                    *)
+(* - porderType, latticeType, and orderType,  on seq_lex disp T               *)
+(*     another copy of seq T, with lexicographic ordering                     *)
 (*                                                                            *)
-(* leP ltP ltgtP are the three main lemmas for case analysis.                 *)
+(* On orderType leP ltP ltgtP are the three main lemmas for case analysis.    *)
+(* On porderType, one may use comparbleP comparble_leP comparble_ltP          *)
+(*   and comparble_ltgtP are the three main lemmas for case analysis.         *)
 (*                                                                            *)
 (* We also provide specialized version of some theorems from path.v.          *)
 (*                                                                            *)
@@ -368,8 +463,8 @@ Coercion choiceType : type >-> Choice.type.
 Canonical eqType.
 Canonical choiceType.
 Notation porderType := type.
-Notation porderMixin := mixin_of.
-Notation POrderMixin := Mixin.
+Notation lePOrderMixin := mixin_of.
+Notation LePOrderMixin := Mixin.
 Notation POrderType disp T m := (@pack T disp _ _ id m).
 Notation "[ 'porderType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
@@ -539,9 +634,9 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@POrder.Pack disp T b0)) :=
+Definition pack d0 b0 (m0 : mixin_of (@POrder.Pack d0 T b0)) :=
   fun bT b & phant_id (@POrder.class disp bT) b =>
-  fun disp' m & phant_id m0 m => Pack disp (@Class T b disp' m).
+  fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -561,7 +656,7 @@ Canonical porderType.
 Notation latticeType  := type.
 Notation latticeMixin := mixin_of.
 Notation LatticeMixin := Mixin.
-Notation LatticeType T m := (@pack T _ _ m _ _ id _ _ id).
+Notation LatticeType T m := (@pack T _ _ _ m _ _ id _ id).
 Notation "[ 'latticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'latticeType' 'of' T 'for' cT 'with' disp ]" :=
@@ -627,7 +722,7 @@ Notation "x `|` y" := (join x y).
 End LatticeSyntax.
 
 Module Total.
-Definition mixin_of d (T : latticeType d) := (total (<=%O : rel T)).
+Definition mixin_of d (T : latticeType d) := total (<=%O : rel T).
 Section ClassDef.
 
 Record class_of (T : Type) := Class {
@@ -650,9 +745,9 @@ Definition clone_with disp' c & phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@Lattice.Pack disp T b0)) :=
+Definition pack d0 b0 (m0 : mixin_of (@Lattice.Pack d0 T b0)) :=
   fun bT b & phant_id (@Lattice.class disp bT) b =>
-  fun disp' m & phant_id m0 m => Pack disp (@Class T b disp' m).
+  fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -672,8 +767,9 @@ Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
 Canonical latticeType.
+Notation totalOrderMixin := Total.mixin_of.
 Notation orderType  := type.
-Notation OrderType T m := (@pack T _ _ m _ _ id _ _ id).
+Notation OrderType T m := (@pack T _ _ _ m _ _ id _ id).
 Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ _ id)
   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'orderType' 'of' T 'for' cT 'with' disp ]" :=
@@ -792,9 +888,9 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@Lattice.Pack disp T b0)) :=
+Definition pack d0 b0 (m0 : mixin_of (@Lattice.Pack d0 T b0)) :=
   fun bT b & phant_id (@Lattice.class disp bT) b =>
-  fun disp' m & phant_id m0 m => Pack disp (@Class T b disp' m).
+  fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -817,7 +913,7 @@ Canonical latticeType.
 Notation blatticeType  := type.
 Notation blatticeMixin := mixin_of.
 Notation BLatticeMixin := Mixin.
-Notation BLatticeType T m := (@pack T _ _ m _ _ id _ _ id).
+Notation BLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
 Notation "[ 'blatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
   (at level 0, format "[ 'blatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'blatticeType' 'of' T 'for' cT 'with' disp ]" :=
@@ -896,9 +992,9 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@BLattice.Pack disp T b0)) :=
+Definition pack d0 b0 (m0 : mixin_of (@BLattice.Pack d0 T b0)) :=
   fun bT b & phant_id (@BLattice.class disp bT) b =>
-  fun disp' m & phant_id m0 m => Pack disp (@Class T b disp' m).
+  fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -923,7 +1019,7 @@ Canonical blatticeType.
 Notation tblatticeType  := type.
 Notation tblatticeMixin := mixin_of.
 Notation TBLatticeMixin := Mixin.
-Notation TBLatticeType T m := (@pack T _ _ m _ _ id _ _ id).
+Notation TBLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
 Notation "[ 'tblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
   (at level 0, format "[ 'tblatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'tblatticeType' 'of' T 'for' cT 'with' disp ]" :=
@@ -1004,9 +1100,9 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack b0 (m0 : mixin_of (@BLattice.Pack disp T b0)) :=
+Definition pack d0 b0 (m0 : mixin_of (@BLattice.Pack d0 T b0)) :=
   fun bT b & phant_id (@BLattice.class disp bT) b =>
-  fun disp' m & phant_id m0 m => Pack disp (@Class T b disp' m).
+  fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -1032,7 +1128,7 @@ Canonical blatticeType.
 Notation cblatticeType  := type.
 Notation cblatticeMixin := mixin_of.
 Notation CBLatticeMixin := Mixin.
-Notation CBLatticeType T m := (@pack T _ _ m _ _ id _ _ id).
+Notation CBLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
 Notation "[ 'cblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
   (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'cblatticeType' 'of' T 'for' cT 'with' disp ]" :=
@@ -1421,7 +1517,7 @@ Section ClassDef.
 Record class_of (T : Type) := Class {
   base  : FinLattice.class_of T;
   mixin_disp : unit;
-  mixin : Total.mixin_of (Lattice.Pack mixin_disp base)
+  mixin : totalOrderMixin (Lattice.Pack mixin_disp base)
 }.
 
 Local Coercion base : class_of >-> FinLattice.class_of.
@@ -1923,7 +2019,7 @@ Fact converse_le_anti : antisymmetric converse_le.
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
 Definition converse_porderMixin :=
-  POrderMixin converse_lt_def (lexx : reflexive converse_le) converse_le_anti
+  LePOrderMixin converse_lt_def (lexx : reflexive converse_le) converse_le_anti
              (fun y z x zy yx => @le_trans _ _ y x z yx zy).
 Canonical converse_porderType :=
   POrderType (converse_display disp) (T^c) converse_porderMixin.
@@ -2952,33 +3048,6 @@ End Exports.
 End TotalLatticeMixin.
 Import TotalLatticeMixin.Exports.
 
-Module LePOrderMixin.
-Section LePOrderMixin.
-Variable (T : eqType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  le_refl  : reflexive le;
-  le_anti  : antisymmetric le;
-  le_trans : transitive le;
-  lt_def   : forall x y, lt x y = (y != x) && le x y;
-}.
-
-Definition porderMixin (m : of_) : porderMixin T :=
-   POrderMixin (@lt_def m) (@le_refl m) (@le_anti m) (@le_trans m).
-
-End LePOrderMixin.
-
-Module Exports.
-Notation lePOrderMixin := of_.
-Notation LePOrderMixin := Build.
-Coercion porderMixin : lePOrderMixin >-> POrder.mixin_of.
-End Exports.
-
-End LePOrderMixin.
-Import LePOrderMixin.Exports.
-
 Module LtPOrderMixin.
 Section LtPOrderMixin.
 Variable (T : eqType).
@@ -2986,9 +3055,9 @@ Variable (T : eqType).
 Record of_ := Build {
   le : rel T;
   lt : rel T;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
-  le_def   : forall x y, le x y = (x == y) || lt x y;
 }.
 
 Variable (m : of_).
@@ -3015,15 +3084,15 @@ by move=> y x z; rewrite !le_def => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
   rewrite ?ltxy ?(lt_trans ltxy ltyz) // ?orbT.
 Qed.
 
-Definition porderMixin : porderMixin T :=
-   @POrderMixin _ (le m) (lt m) lt_def le_refl le_anti le_trans.
+Definition lePOrderMixin : lePOrderMixin T :=
+   @LePOrderMixin _ (le m) (lt m) lt_def le_refl le_anti le_trans.
 
 End LtPOrderMixin.
 
 Module Exports.
 Notation ltPOrderMixin := of_.
 Notation LtPOrderMixin := Build.
-Coercion porderMixin : ltPOrderMixin >-> POrder.mixin_of.
+Coercion lePOrderMixin : ltPOrderMixin >-> POrder.mixin_of.
 End Exports.
 
 End LtPOrderMixin.
@@ -3032,13 +3101,15 @@ Import LtPOrderMixin.Exports.
 Module MeetJoinMixin.
 Section MeetJoinMixin.
 
-Variable (disp : unit) (T : choiceType).
+Variable (T : choiceType).
 
-Record of_ (disp : unit) (T : choiceType) := Build {
+Record of_ := Build {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
+  le_def : forall x y : T, le x y = (meet x y == x);
+  lt_def : forall x y : T, lt x y = (y != x) && le x y;
   meetC : commutative meet;
   joinC : commutative join;
   meetA : associative meet;
@@ -3047,12 +3118,9 @@ Record of_ (disp : unit) (T : choiceType) := Build {
   meetKU : forall y x : T, join x (meet x y) = x;
   meetUl : left_distributive meet join;
   meetxx : idempotent meet;
-  le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (y != x) && le x y;
 }.
 
-
-Variable (m : of_ disp T).
+Variable (m : of_).
 
 Fact le_refl : reflexive (le m).
 Proof. by move=> x; rewrite le_def meetxx. Qed.
@@ -3067,10 +3135,12 @@ by rewrite -[in LHS]lexy -meetA leyz lexy.
 Qed.
 
 Definition porderMixin : lePOrderMixin T :=
-  LePOrderMixin le_refl le_anti le_trans (lt_def m).
+  LePOrderMixin (lt_def m) le_refl le_anti le_trans.
 
-Definition latticeMixin : latticeMixin (POrderType disp T porderMixin) :=
-  @LatticeMixin disp (POrderType disp T porderMixin) (meet m) (join m)
+Let T_porderType := POrderType tt T porderMixin.
+
+Definition latticeMixin : latticeMixin T_porderType :=
+  @LatticeMixin tt (POrderType tt T porderMixin) (meet m) (join m)
                 (meetC m) (joinC m) (meetA m) (joinA m)
                 (joinKI m) (meetKU m) (le_def m) (meetUl m).
 
@@ -3089,32 +3159,36 @@ Import MeetJoinMixin.Exports.
 Module LeOrderMixin.
 Section LeOrderMixin.
 
-Record of_ (disp : unit) (T : choiceType) := Build {
+Variables (T : choiceType).
+
+Record of_ := Build {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  le_anti : antisymmetric le;
-  le_trans : transitive le;
-  le_total : total le;
   lt_def : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if le x y then x else y;
   join_def : forall x y, join x y = if le y x then x else y;
+  le_anti : antisymmetric le;
+  le_trans : transitive le;
+  le_total : total le;
 }.
 
-Variable (disp : unit) (T : choiceType) (m : of_ disp T).
+Variables (m : of_).
 
 Fact le_refl : reflexive (le m).
 Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
 
-Definition T_porderType : porderType disp :=
-  POrderType
-    disp T
-    (LePOrderMixin le_refl (@le_anti _ _ m) (@le_trans _ _ m) (lt_def m)).
-Definition T_latticeType : latticeType disp :=
-  LatticeType T_porderType (le_total m : totalLatticeMixin T_porderType).
+Definition lePOrderMixin :=
+  LePOrderMixin (lt_def m) le_refl (@le_anti m) (@le_trans m).
 
-Implicit Types (x y z : T_latticeType).
+Let T_total_porderType : porderType tt := POrderType tt T lePOrderMixin.
+
+Let T_total_latticeType : latticeType tt :=
+  LatticeType T_total_porderType
+    (le_total m : totalLatticeMixin T_total_porderType).
+
+Implicit Types (x y z : T_total_latticeType).
 
 Fact meetE x y : meet m x y = x `&` y. Proof. by rewrite meet_def. Qed.
 Fact joinE x y : join m x y = x `|` y. Proof. by rewrite join_def. Qed.
@@ -3137,14 +3211,14 @@ Proof. by move=> *; rewrite meetE meetxx. Qed.
 Fact le_def x y : x <= y = (meet m x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
-Definition latticeMixin : meetJoinMixin disp T :=
-  @MeetJoinMixin
-    _ _ (le m) (lt m) (meet m) (join m)
-    meetC joinC meetA joinA joinKI meetKU meetUl meetxx le_def (lt_def m).
+Definition latticeMixin : meetJoinMixin T :=
+  @MeetJoinMixin _ (le m) (lt m) (meet m) (join m) le_def (lt_def m)
+    meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
 
-Definition totalMixin :
-  Total.mixin_of (LatticeType (POrderType disp T latticeMixin) latticeMixin)
-  := le_total m.
+Let T_porderType := POrderType tt T latticeMixin.
+Let T_latticeType : latticeType tt := LatticeType T_porderType latticeMixin.
+
+Definition totalMixin : totalOrderMixin T_latticeType := le_total m.
 
 End LeOrderMixin.
 
@@ -3152,7 +3226,7 @@ Module Exports.
 Notation leOrderMixin := of_.
 Notation LeOrderMixin := Build.
 Coercion latticeMixin : leOrderMixin >-> meetJoinMixin.
-Coercion totalMixin : leOrderMixin >-> Total.mixin_of.
+Coercion totalMixin : leOrderMixin >-> totalOrderMixin.
 End Exports.
 
 End LeOrderMixin.
@@ -3160,34 +3234,37 @@ Import LeOrderMixin.Exports.
 
 Module LtOrderMixin.
 
-Record of_ (disp : unit) (T : choiceType) := Build {
+Record of_ (T : choiceType) := Build {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  lt_irr   : irreflexive lt;
-  lt_trans : transitive lt;
-  lt_total : forall x y, x != y -> lt x y || lt y x;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt y x then x else y;
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive lt;
+  lt_total : forall x y, x != y -> lt x y || lt y x;
 }.
 
 Section LtOrderMixin.
 
-Variable (disp : unit) (T : choiceType) (m : of_ disp T).
+Variables (T : choiceType) (m : of_ T).
+
+Let T_total_porderType : porderType tt :=
+  POrderType tt T (LtPOrderMixin (le_def m) (lt_irr m) (@lt_trans _ m)).
 
 Fact le_total : total (le m).
 Proof.
-by move=> x y; rewrite !le_def (eq_sym y); case: (altP eqP); [|apply: lt_total].
+move=> x y; rewrite !le_def (eq_sym y).
+by case: (altP eqP); last exact: lt_total.
 Qed.
 
-Definition T_porderType : porderType disp :=
-  POrderType disp T (LtPOrderMixin (lt_irr m) (@lt_trans _ _ m) (le_def m)).
-Definition T_latticeType : latticeType disp :=
-  LatticeType T_porderType (le_total : totalLatticeMixin T_porderType).
+Let T_total_latticeType : latticeType tt :=
+  LatticeType T_total_porderType
+   (le_total : totalLatticeMixin T_total_porderType).
 
-Implicit Types (x y z : T_latticeType).
+Implicit Types (x y z : T_total_latticeType).
 
 Fact leP x y :
   le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
@@ -3215,15 +3292,15 @@ Proof. by move=> *; rewrite meetE meetxx. Qed.
 Fact le_def' x y : x <= y = (meet m x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
-Definition latticeMixin : meetJoinMixin disp T :=
-  @MeetJoinMixin
-    _ _ (le m) (lt m) (meet m) (join m)
-    meetC joinC meetA joinA joinKI meetKU meetUl meetxx
-    le_def' (@lt_def _ T_latticeType).
+Definition latticeMixin : meetJoinMixin T :=
+  @MeetJoinMixin _ (le m) (lt m) (meet m) (join m)
+    le_def' (@lt_def _ T_total_latticeType)
+    meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
 
-Definition totalMixin :
-  Total.mixin_of (LatticeType (POrderType disp T latticeMixin) latticeMixin)
-  := le_total.
+Let T_porderType := POrderType tt T latticeMixin.
+Let T_latticeType : latticeType tt := LatticeType T_porderType latticeMixin.
+
+Definition totalMixin : totalOrderMixin T_latticeType := le_total.
 
 End LtOrderMixin.
 
@@ -3231,11 +3308,127 @@ Module Exports.
 Notation ltOrderMixin := of_.
 Notation LtOrderMixin := Build.
 Coercion latticeMixin : ltOrderMixin >-> meetJoinMixin.
-Coercion totalMixin : ltOrderMixin >-> Total.mixin_of.
+Coercion totalMixin : ltOrderMixin >-> totalOrderMixin.
 End Exports.
 
 End LtOrderMixin.
 Import LtOrderMixin.Exports.
+
+Module CanMixin.
+Section CanMixin.
+
+Section Total.
+
+Variables (disp : unit) (T : porderType disp).
+Variables (disp' : unit) (T' : orderType disp) (f : T -> T').
+
+Lemma MonoTotal : {mono f : x y / x <= y} ->
+  totalLatticeMixin T' -> totalLatticeMixin T.
+Proof. by move=> f_mono T'_tot x y; rewrite -!f_mono le_total. Qed.
+
+End Total.
+
+Section Order.
+
+Variables (T : choiceType) (disp : unit).
+
+Section Partial.
+Variables (T' : porderType disp) (f : T -> T').
+
+Section PCan.
+Variables (f' : T' -> option T) (f_can : pcancel f f').
+
+Definition le (x y : T) := f x <= f y.
+Definition lt (x y : T) := f x < f y.
+
+Fact refl : reflexive le. Proof. by move=> ?; apply: lexx. Qed.
+Fact anti : antisymmetric le.
+Proof. by move=> x y /le_anti /(pcan_inj f_can). Qed.
+Fact trans : transitive le. Proof. by move=> y x z xy /(le_trans xy). Qed.
+Fact lt_def x y : lt x y = (y != x) && le x y.
+Proof. by rewrite /lt lt_def (inj_eq (pcan_inj f_can)). Qed.
+
+Definition PcanPOrder := LePOrderMixin lt_def refl anti trans.
+
+End PCan.
+
+Definition CanPOrder f' (f_can : cancel f f') := PcanPOrder (can_pcan f_can).
+
+End Partial.
+
+Section Total.
+
+Variables (T' : orderType disp) (f : T -> T').
+
+Section PCan.
+
+Variables (f' : T' -> option T) (f_can : pcancel f f').
+
+Let T_porderType := POrderType disp T (PcanPOrder f_can).
+
+Let total_le : total (le f).
+Proof. by apply: (@MonoTotal _ T_porderType _ f) => //; apply: le_total. Qed.
+
+Definition PcanOrder := LeOrderMixin
+  (@lt_def _ _ _ f_can) (fun _ _ => erefl) (fun _ _ => erefl)
+  (@anti _ _ _ f_can) (@trans _ _) total_le.
+
+End PCan.
+
+Definition CanOrder f' (f_can : cancel f f') := PcanOrder (can_pcan f_can).
+
+End Total.
+End Order.
+
+Section Lattice.
+
+Variables (disp : unit) (T : porderType disp).
+Variables (disp' : unit) (T' : latticeType disp) (f : T -> T').
+
+Variables (f' : T' -> T) (f_can : cancel f f') (f'_can : cancel f' f).
+Variable (f_mono : {mono f : x y / x <= y}).
+
+Definition meet (x y : T) := f' (meet (f x) (f y)).
+Definition join (x y : T) := f' (join (f x) (f y)).
+
+Lemma meetC : commutative meet. Proof. by move=> x y; rewrite /meet meetC. Qed.
+Lemma joinC : commutative join. Proof. by move=> x y; rewrite /join joinC. Qed.
+Lemma meetA : associative meet.
+Proof. by move=> y x z; rewrite /meet !f'_can meetA. Qed.
+Lemma joinA : associative join.
+Proof. by move=> y x z; rewrite /join !f'_can joinA. Qed.
+Lemma joinKI y x : meet x (join x y) = x.
+Proof. by rewrite /meet /join f'_can joinKI f_can. Qed.
+Lemma meetKI y x : join x (meet x y) = x.
+Proof. by rewrite /join /meet f'_can meetKU f_can. Qed.
+Lemma meet_eql x y : (x <= y) = (meet x y == x).
+Proof. by rewrite /meet -(can_eq f_can) f'_can eq_meetl f_mono. Qed.
+Lemma meetUl : left_distributive meet join.
+Proof. by move=> x y z; rewrite /meet /join !f'_can meetUl. Qed.
+
+Definition IsoLattice := LatticeMixin meetC joinC meetA joinA joinKI meetKI meet_eql meetUl.
+
+End Lattice.
+
+End CanMixin.
+
+Module Exports.
+Notation MonoTotalMixin := MonoTotal.
+Notation PcanPOrderMixin := PcanPOrder.
+Notation CanPOrderMixin := CanPOrder.
+Notation PcanOrderMixin := PcanOrder.
+Notation CanOrderMixin := CanOrder.
+Notation IsoLatticeMixin := IsoLattice.
+Notation "[ 'porderMixin' 'of' T 'by' <: ]" := (CanPOrder valK)
+  (at level 0, format "[ 'porderMixin'  'of'  T  'by'  <: ]",
+   only parsing) : form_scope.
+Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
+  (MonoTotal (fun _ _ => erefl) le_total)
+  (at level 0, format "[ 'totalOrderMixin'  'of'  T  'by'  <: ]",
+   only parsing) : form_scope.
+End Exports.
+End CanMixin.
+Import CanMixin.Exports.
 
 (*************)
 (* INSTANCES *)
@@ -3254,7 +3447,7 @@ Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
 Definition orderMixin :=
-  LeOrderMixin total_display anti_leq leq_trans leq_total ltn_def minnE maxnE.
+  LeOrderMixin ltn_def minnE maxnE anti_leq leq_trans leq_total.
 
 Canonical porderType := POrderType total_display nat orderMixin.
 Canonical latticeType := LatticeType nat orderMixin.
@@ -3278,14 +3471,25 @@ Definition ltEnat := ltEnat.
 End Exports.
 End NatOrder.
 
-Module ProductOrder.
-Section ProductOrder.
+Module ProdOrder.
+Section ProdOrder.
+
+Definition type (disp : unit) (T T' : Type) := (T * T')%type.
+
 Context {disp1 disp2 disp3 : unit}.
+
+Local Notation "A * B" := (type disp3 A B) : type_scope.
+
+Canonical eqType (T T' : eqType):= Eval hnf in [eqType of T * T'].
+Canonical choiceType (T T' : choiceType):= Eval hnf in [choiceType of T * T'].
+Canonical countType (T T' : countType):= Eval hnf in [countType of T * T'].
+Canonical finType (T T' : finType):= Eval hnf in [finType of T * T'].
 
 Section POrder.
 Variable (T : porderType disp1) (T' : porderType disp2).
+Implicit Types (x y : T * T').
 
-Definition le (x y : T * T') := (x.1 <= y.1) && (x.2 <= y.2).
+Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
 
 Fact refl : reflexive le.
 Proof. by move=> ?; rewrite /le !lexx. Qed.
@@ -3302,8 +3506,13 @@ rewrite /le => y x z /andP [] hxy ? /andP [] /(le_trans hxy) ->.
 by apply: le_trans.
 Qed.
 
-Definition porderMixin := LePOrderMixin refl anti trans (rrefl _).
+Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
 Canonical porderType := POrderType disp3 (T * T') porderMixin.
+
+Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2).
+Proof. by []. Qed.
+Lemma ltEprod x y : (x < y) = [&& x != y, x.1 <= y.1 & x.2 <= y.2].
+Proof. by rewrite lt_neqAle. Qed.
 
 End POrder.
 
@@ -3342,15 +3551,23 @@ Definition latticeMixin :=
   Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
 Canonical latticeType := LatticeType (T * T') latticeMixin.
 
+Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2).
+Proof. by []. Qed.
+
+Lemma joinEprod x y : x `|` y = (x.1 `|` y.1, x.2 `|` y.2).
+Proof. by []. Qed.
+
 End Lattice.
 
 Section BLattice.
 Variable (T : blatticeType disp1) (T' : blatticeType disp2).
 
-Fact le0x (x : T * T') : (0, 0) <= x.
+Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by rewrite /POrderDef.le /= /le !le0x. Qed.
 
 Canonical blatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
+
+Lemma botEprod : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
 End BLattice.
 
@@ -3362,6 +3579,8 @@ Proof. by rewrite /POrderDef.le /= /le !lex1. Qed.
 
 Canonical tblatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
 
+Lemma topEprod : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
+
 End TBLattice.
 
 Section CBLattice.
@@ -3370,14 +3589,17 @@ Implicit Types (x y : T * T').
 
 Definition sub x y := (x.1 `\` y.1, x.2 `\` y.2).
 
-Lemma subKI x y : y `&` (sub x y) = 0.
+Lemma subKI x y : y `&` sub x y = 0.
 Proof. by congr pair; rewrite subKI. Qed.
 
-Lemma joinIB x y : (x `&` y) `|` (sub x y) = x.
+Lemma joinIB x y : x `&` y `|` sub x y = x.
 Proof. by case: x => ? ?; congr pair; rewrite joinIB. Qed.
 
 Definition cblatticeMixin := CBLattice.Mixin subKI joinIB.
 Canonical cblatticeType := CBLatticeType (T * T') cblatticeMixin.
+
+Lemma subEprod x y : x `\` y = (x.1 `\` y.1, x.2 `\` y.2).
+Proof. by []. Qed.
 
 End CBLattice.
 
@@ -3385,14 +3607,15 @@ Section CTBLattice.
 Variable (T : ctblatticeType disp1) (T' : ctblatticeType disp2).
 Implicit Types (x y : T * T').
 
-Definition compl x := (~` x.1, ~` x.2).
+Definition compl x : T * T' := (~` x.1, ~` x.2).
 
 Lemma complE x : compl x = sub 1 x.
 Proof. by congr pair; rewrite complE. Qed.
 
 Definition ctblatticeMixin := CTBLattice.Mixin complE.
 Canonical ctblatticeType := CTBLatticeType (T * T') ctblatticeMixin.
-(* Let default_ctblatticeType := [default_ctblatticeType of T * T']. *)
+
+Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 
 End CTBLattice.
 
@@ -3407,9 +3630,17 @@ Canonical finClatticeType
           (T : finCLatticeType disp1) (T' : finCLatticeType disp2) :=
   [finCLatticeType of T * T'].
 
-End ProductOrder.
+End ProdOrder.
 
 Module Exports.
+
+Notation "A *[ d ] B" := (type d A B)
+  (at level 70, d at next level, format "A  *[ d ]  B") : order_scope.
+
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
 Canonical porderType.
 Canonical latticeType.
 Canonical blatticeType.
@@ -3419,26 +3650,150 @@ Canonical ctblatticeType.
 Canonical finPOrderType.
 Canonical finLatticeType.
 Canonical finClatticeType.
-End Exports.
-End ProductOrder.
 
-Module ProdLexOrder.
-Section ProdLexOrder.
-Context {disp1 disp2 disp3 : unit}.
+Definition leEprod := @leEprod.
+Definition ltEprod := @ltEprod.
+Definition meetEprod := @meetEprod.
+Definition joinEprod := @joinEprod.
+Definition botEprod := @botEprod.
+Definition topEprod := @topEprod.
+Definition subEprod := @subEprod.
+Definition complEprod := @complEprod.
+
+End Exports.
+End ProdOrder.
+Import ProdOrder.Exports.
+
+Module SigmaOrder.
+Section SigmaOrder.
+
+Context {disp1 disp2 : unit}.
 
 Section POrder.
-Variable (T : porderType disp1) (T' : porderType disp2).
-Implicit Types (x y : T * T').
 
-Definition le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
+Variable (T : porderType disp1) (T' : T -> porderType disp2).
+Implicit Types (x y : {t : T & T' t}).
+
+Definition le x y := (tag x <= tag y) &&
+  ((tag x >= tag y) ==> (tagged x <= tagged_as x y)).
+Definition lt x y := (tag x <= tag y) &&
+  ((tag x >= tag y) ==> (tagged x < tagged_as x y)).
 
 Fact refl : reflexive le.
-Proof. by move=> ?; by rewrite /le !lexx. Qed.
+Proof. by move=> [x x']; rewrite /le tagged_asE/= !lexx. Qed.
 
 Fact anti : antisymmetric le.
 Proof.
-rewrite /le => -[x x'] [y y'] /=; case_eq (y <= x); case_eq (x <= y) => //.
-by move=> //= hxy hyx /le_anti ->; move/andP/le_anti: (conj hxy hyx) => ->.
+rewrite /le => -[x x'] [y y']/=; case: comparableP => //= eq_yx.
+by case: _ / eq_yx in x' *; rewrite !tagged_asE => /le_anti ->.
+Qed.
+
+Fact trans : transitive le.
+Proof.
+move=> [y y'] [x x'] [z z'] /andP[/= lexy lexy'] /andP[/= leyz leyz'].
+rewrite /= /le (le_trans lexy) //=; apply/implyP => lezx.
+elim: _ / (@le_anti _ _ x y) in y' z' lexy' leyz' *; last first.
+  by rewrite lexy (le_trans leyz).
+elim: _ / (@le_anti _ _ x z) in z' leyz' *; last by rewrite (le_trans lexy).
+by rewrite lexx !tagged_asE/= in lexy' leyz' *; rewrite (le_trans lexy').
+Qed.
+
+Fact lt_def x y : lt x y = (y != x) && le x y.
+Proof.
+rewrite /lt /le; case: x y => [x x'] [y y']//=; rewrite andbCA.
+case: (comparableP x y) => //= xy.
+  by case: _ / xy in y' *; rewrite !tagged_asE eq_Tagged/= lt_def.
+by rewrite andbT; symmetry; apply: contraTneq xy => -[yx _]; rewrite yx ltxx.
+Qed.
+
+Definition porderMixin := LePOrderMixin lt_def refl anti trans.
+Canonical porderType := POrderType disp2 {t : T & T' t} porderMixin.
+
+Lemma leEsigma x y : x <= y =
+  (tag x <= tag y) && ((tag x >= tag y) ==> (tagged x <= tagged_as x y)).
+Proof. by []. Qed.
+
+Lemma ltEsigma x y : x < y =
+  (tag x <= tag y) && ((tag x >= tag y) ==> (tagged x < tagged_as x y)).
+Proof. by []. Qed.
+
+Lemma le_Taggedl x (u : T' (tag x)) : (Tagged T' u <= x) = (u <= tagged x).
+Proof. by case: x => [t v]/= in u *; rewrite leEsigma/= lexx/= tagged_asE. Qed.
+
+Lemma le_Taggedr x (u : T' (tag x)) : (x <= Tagged T' u) = (tagged x <= u).
+Proof. by case: x => [t v]/= in u *; rewrite leEsigma/= lexx/= tagged_asE. Qed.
+
+Lemma lt_Taggedl x (u : T' (tag x)) : (Tagged T' u < x) = (u < tagged x).
+Proof. by case: x => [t v]/= in u *; rewrite ltEsigma/= lexx/= tagged_asE. Qed.
+
+Lemma lt_Taggedr x (u : T' (tag x)) : (x < Tagged T' u) = (tagged x < u).
+Proof. by case: x => [t v]/= in u *; rewrite ltEsigma/= lexx/= tagged_asE. Qed.
+
+End POrder.
+
+Section Total.
+Variable (T : orderType disp1) (T' : T -> orderType disp2).
+Implicit Types (x y : {t : T & T' t}).
+
+Fact total : totalLatticeMixin [porderType of {t : T & T' t}].
+Proof.
+move=> x y; rewrite !leEsigma; case: (ltgtP (tag x) (tag y)) => //=.
+case: x y => [x x'] [y y']/= eqxy; elim: _ /eqxy in y' *.
+by rewrite !tagged_asE le_total.
+Qed.
+
+Canonical latticeType := LatticeType {t : T & T' t} total.
+Canonical orderType := OrderType {t : T & T' t} total.
+
+End Total.
+
+End SigmaOrder.
+
+Module Exports.
+
+Canonical porderType.
+Canonical latticeType.
+Canonical orderType.
+
+Definition leEsigma := @leEsigma.
+Definition ltEsigma := @ltEsigma.
+Definition le_Taggedl := @le_Taggedl.
+Definition lt_Taggedl := @lt_Taggedl.
+Definition le_Taggedr := @le_Taggedr.
+Definition lt_Taggedr := @lt_Taggedr.
+
+End Exports.
+End SigmaOrder.
+Import SigmaOrder.Exports.
+
+Module ProdLexOrder.
+Section ProdLexOrder.
+
+Definition type (disp : unit) (T T' : Type) := (T * T')%type.
+
+Context {disp1 disp2 disp3 : unit}.
+
+Local Notation "A * B" := (type disp3 A B) : type_scope.
+
+Canonical eqType (T T' : eqType):= Eval hnf in [eqType of T * T'].
+Canonical choiceType (T T' : choiceType):= Eval hnf in [choiceType of T * T'].
+Canonical countType (T T' : countType):= Eval hnf in [countType of T * T'].
+Canonical finType (T T' : finType):= Eval hnf in [finType of T * T'].
+
+Section POrder.
+Variable (T : porderType disp1) (T' : porderType disp2).
+
+Implicit Types (x y : T * T').
+
+Definition le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
+Definition lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
+
+Fact refl : reflexive le.
+Proof. by move=> ?; rewrite /le !lexx. Qed.
+
+Fact anti : antisymmetric le.
+Proof.
+by rewrite /le => -[x x'] [y y'] /=; case: comparableP => //= -> /le_anti->.
 Qed.
 
 Fact trans : transitive le.
@@ -3448,8 +3803,20 @@ rewrite /le (le_trans hxy) //=; apply/implyP => hzx.
 by apply/le_trans/hxy'/(le_trans hyz): (hyz' (le_trans hzx hxy)).
 Qed.
 
-Definition porderMixin := LePOrderMixin refl anti trans (rrefl _).
+Fact lt_def x y : lt x y = (y != x) && le x y.
+Proof.
+rewrite /lt /le; case: x y => [x1 x2] [y1 y2]//=; rewrite xpair_eqE.
+by case: (comparableP x1 y1); rewrite lt_def.
+Qed.
+
+Definition porderMixin := LePOrderMixin lt_def refl anti trans.
 Canonical porderType := POrderType disp3 (T * T') porderMixin.
+
+Lemma leEprodlex x y : (x <= y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
+Proof. by []. Qed.
+
+Lemma ltEprodlex x y : (x < y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
+Proof. by []. Qed.
 
 End POrder.
 
@@ -3464,50 +3831,80 @@ by apply: le_total.
 Qed.
 
 Canonical latticeType := LatticeType (T * T') total.
-Canonical totalType := LatticeType (T * T') total.
+Canonical orderType := OrderType (T * T') total.
 
 End Total.
 
 End ProdLexOrder.
 
 Module Exports.
+
+Notation "A *lex[ d ] B" := (type d A B)
+  (at level 70, d at next level, format "A  *lex[ d ]  B") : order_scope.
+
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
 Canonical porderType.
 Canonical latticeType.
-Canonical totalType.
+Canonical orderType.
+
+Definition leEprodlex := @leEprodlex.
+Definition ltEprodlex := @ltEprodlex.
+
 End Exports.
 End ProdLexOrder.
+Import ProdLexOrder.Exports.
 
 Module SeqProdOrder.
 Section SeqProdOrder.
+
+Definition type of unit := seq.
+
 Context {disp disp' : unit}.
+
+Local Notation seq := (type disp').
+
+Canonical eqType (T : eqType):= Eval hnf in [eqType of seq T].
+Canonical choiceType (T : choiceType):= Eval hnf in [choiceType of seq T].
+Canonical countType (T : countType):= Eval hnf in [countType of seq T].
 
 Section POrder.
 Variable T : porderType disp.
 Implicit Types s : seq T.
 
-Fixpoint le s1 s2 :=
-  if s1 is x1 :: s1' then
-    if s2 is x2 :: s2' then (x1 <= x2) && le s1' s2' else false
-  else
-    true.
+Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
+                     if s2 isn't x2 :: s2' then false else
+                     (x1 <= x2) && le s1' s2'.
 
-Fact refl : reflexive le.
-Proof. by elim=> //= ? ? ?; rewrite !lexx. Qed.
+Fact refl : reflexive le. Proof. by elim=> //= ? ? ?; rewrite !lexx. Qed.
 
 Fact anti : antisymmetric le.
 Proof.
-elim=> [|? ? ih] [|? ?] //=.
-by rewrite andbAC andbA andbAC -andbA => /andP [] /le_anti -> /ih ->.
+by elim=> [|x s ihs] [|y s'] //=; rewrite andbACA => /andP[/le_anti-> /ihs->].
 Qed.
 
 Fact trans : transitive le.
 Proof.
-elim=> [|y ys ih] [|x xs] [|z zs] //=.
-by case/andP => [] xy xys /andP [] /(le_trans xy) -> /(ih _ _ xys).
+elim=> [|y ys ihs] [|x xs] [|z zs] //= /andP[xy xys] /andP[yz yzs].
+by rewrite (le_trans xy)// ihs.
 Qed.
 
-Definition porderMixin := LePOrderMixin refl anti trans (rrefl _).
+Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
 Canonical porderType := POrderType disp' (seq T) porderMixin.
+
+Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
+                                if s2 isn't x2 :: s2' then false else
+                                (x1 <= x2) && (s1' <= s2' :> seq _).
+Proof. by case: s1. Qed.
+
+Lemma le0s s : [::] <= s :> seq _. Proof. by []. Qed.
+
+Lemma les0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseq. Qed.
+
+Lemma le_cons x1 s1 x2 s2 : x1 :: s1 <= x2 :: s2 :> seq _ = (x1 <= x2) && (s1 <= s2).
+Proof. by []. Qed.
 
 End POrder.
 
@@ -3523,8 +3920,7 @@ Fixpoint meet s1 s2 :=
 
 Fixpoint join s1 s2 :=
   match s1, s2 with
-    | [::], _ => s2
-    | _, [::] => s1
+    | [::], _ => s2 | _, [::] => s1
     | x1 :: s1', x2 :: s2' => (x1 `|` x2) :: join s1' s2'
   end.
 
@@ -3561,44 +3957,79 @@ Qed.
 Fact meetUl : left_distributive meet join.
 Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetUl ih. Qed.
 
-Fact le0x s : [::] <= s.
-Proof. by []. Qed.
-
 Definition latticeMixin :=
   Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
 Canonical latticeType := LatticeType (seq T) latticeMixin.
-Canonical blatticeType := BLatticeType (seq T) (BLattice.Mixin le0x).
+Canonical blatticeType := BLatticeType (seq T) (BLattice.Mixin (@le0s _)).
+
+Lemma botEseq : 0 = [::] :> seq T.
+Proof. by []. Qed.
+
+Lemma meetEseq s1 s2 : s1 `&` s2 =  [seq x.1 `&` x.2 | x <- zip s1 s2].
+Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2]//=; rewrite -ihs1. Qed.
+
+Lemma meet_cons x1 s1 x2 s2 :
+  (x1 :: s1 : seq T) `&` (x2 :: s2) = (x1 `&` x2) :: s1 `&` s2.
+Proof. by []. Qed.
+
+Lemma joinEseq s1 s2 : s1 `|` s2 =
+  match s1, s2 with
+    | [::], _ => s2 | _, [::] => s1
+    | x1 :: s1', x2 :: s2' => (x1 `|` x2) :: join s1' s2'
+  end.
+Proof. by case: s1. Qed.
+
+Lemma join_cons x1 s1 x2 s2 :
+  (x1 :: s1 : seq T) `|` (x2 :: s2) = (x1 `|` x2) :: s1 `|` s2.
+Proof. by []. Qed.
 
 End BLattice.
 
 End SeqProdOrder.
 
 Module Exports.
+
+Notation seq_prod := type.
+
 Canonical porderType.
 Canonical latticeType.
 Canonical blatticeType.
+
+Definition leEseq := @leEseq.
+Definition le0s := @le0s.
+Definition les0 := @les0.
+Definition le_cons := @le_cons.
+Definition botEseq := @botEseq.
+Definition meetEseq := @meetEseq.
+Definition meet_cons := @meet_cons.
+Definition joinEseq := @joinEseq.
+
 End Exports.
 End SeqProdOrder.
 
 Module SeqLexOrder.
 Section SeqLexOrder.
-Context {disp : unit}.
+
+Definition type of unit := seq.
+
+Context {disp disp' : unit}.
+
+Local Notation seq := (type disp').
+
+Canonical eqType (T : eqType):= Eval hnf in [eqType of seq T].
+Canonical choiceType (T : choiceType):= Eval hnf in [choiceType of seq T].
+Canonical countType (T : countType):= Eval hnf in [countType of seq T].
 
 Section POrder.
 Variable T : porderType disp.
 Implicit Types s : seq T.
 
-Fixpoint le s1 s2 :=
-  if s1 is x1 :: s1' then
-    if s2 is x2 :: s2' then
-      (x1 < x2) || (x1 == x2) && le s1' s2'
-    else
-      false
-  else
-    true.
+Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
+                     if s2 isn't x2 :: s2' then false else
+                       (x1 <= x2) && ((x1 >= x2) ==> le s1' s2').
 
 Fact refl: reflexive le.
-Proof. by elim => [|x s ih] //=; rewrite eqxx ih orbT. Qed.
+Proof. by elim => [|x s ih] //=; rewrite lexx. Qed.
 
 Fact anti: antisymmetric le.
 Proof.
@@ -3608,19 +4039,31 @@ Qed.
 
 Fact trans: transitive le.
 Proof.
-elim=> [|y sy ih] [|x sx] [|z sz] //=.
-case: (comparableP x y) => //=; case: (comparableP y z) => //=.
-- by move=> -> -> lesxsy /(ih _ _ lesxsy) ->; rewrite eqxx orbT.
-- by move=> ltyz ->; rewrite ltyz.
-- by move=> -> ->.
-- by move=> ltyz /lt_trans - /(_ _ ltyz) ->.
+elim=> [|y sy ihs] [|x sx] [|z sz] //=; case: (comparableP x y) => //= [->|xy].
+  by case: comparableP => //= _; apply: ihs.
+by move=> _ /andP[/(lt_le_trans xy) xz _]; rewrite (ltW xz)// lt_geF.
 Qed.
 
-Definition porderMixin := LePOrderMixin refl anti trans (rrefl _).
-Canonical porderType := POrderType disp (seq T) porderMixin.
+Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
+Canonical porderType := POrderType disp' (seq T) porderMixin.
 
-Fact lexi_le_head x sx y sy: x :: sx <= y :: sy -> x <= y.
-Proof. by case/orP => [/ltW|/andP [/eqP-> _]]. Qed.
+Lemma leEseqlex s1 s2 :
+   s1 <= s2 = if s1 isn't x1 :: s1' then true else
+              if s2 isn't x2 :: s2' then false else
+              (x1 <= x2) && ((x1 >= x2) ==> (s1' <= s2' :> seq T)).
+Proof. by case: s1. Qed.
+
+Lemma lexi0s s : [::] <= s :> seq T. Proof. by []. Qed.
+
+Lemma lexis0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseqlex. Qed.
+
+Lemma lexi_cons x1 s1 x2 s2 :
+  x1 :: s1 <= x2 :: s2 :> seq T =
+    (x1 <= x2) && ((x1 >= x2) ==> (s1 <= s2)).
+Proof. by []. Qed.
+
+Lemma lexi_le_head x sx y sy : x :: sx <= y :: sy :> seq T -> x <= y.
+Proof. by rewrite lexi_cons => /andP[]. Qed.
 
 End POrder.
 
@@ -3630,30 +4073,36 @@ Implicit Types s : seq T.
 
 Fact total : totalLatticeMixin [porderType of seq T].
 Proof.
-rewrite /totalLatticeMixin /= /POrderDef.le /=.
-by elim=> [|? ? ih] [|? ?] //=;case: ltgtP => //=.
+suff: total (<=%O : rel (seq T)) by [].
+by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
 Qed.
 
-Fact le0x s : [::] <= s.
-Proof. by []. Qed.
-
 Canonical latticeType := LatticeType (seq T) total.
-Canonical blatticeType := BLatticeType (seq T) (BLattice.Mixin le0x).
-Canonical totalType := LatticeType (seq T) total.
+Canonical blatticeType := BLatticeType (seq T) (BLattice.Mixin (@lexi0s _)).
+Canonical orderType := OrderType (seq T) total.
 
 End Total.
 
 End SeqLexOrder.
 
 Module Exports.
+
+Notation seq_lexi := type.
+
 Canonical porderType.
 Canonical latticeType.
 Canonical blatticeType.
-Canonical totalType.
+Canonical orderType.
+
+Definition leEseqlex := @leEseqlex.
+Definition lexi0s := @lexi0s.
+Definition lexis0 := @lexis0.
+Definition lexi_cons := @lexi_cons.
 Definition lexi_le_head := @lexi_le_head.
-Arguments lexi_le_head {disp}.
+
 End Exports.
 End SeqLexOrder.
+Import SeqLexOrder.Exports.
 
 Module Def.
 Export POrderDef.
@@ -3716,9 +4165,15 @@ Export Order.Total.Exports.
 Export Order.FinTotal.Exports.
 
 Export Order.TotalLatticeMixin.Exports.
-Export Order.LePOrderMixin.Exports.
 Export Order.LtPOrderMixin.Exports.
 Export Order.MeetJoinMixin.Exports.
 Export Order.LeOrderMixin.Exports.
 Export Order.LtOrderMixin.Exports.
 Export Order.NatOrder.Exports.
+Export Order.ProdOrder.Exports.
+Export Order.SigmaOrder.Exports.
+Export Order.ProdLexOrder.Exports.
+Export Order.SeqProdOrder.Exports.
+Export Order.SeqLexOrder.Exports.
+
+Import Order.Syntax.

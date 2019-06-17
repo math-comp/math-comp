@@ -140,7 +140,7 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record normed_mixin_of (R T : ringType) (Rorder : porderMixin R)
+Record normed_mixin_of (R T : ringType) (Rorder : lePOrderMixin R)
        (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
   := NormedMixin {
   norm_op : T -> R;
@@ -150,7 +150,7 @@ Record normed_mixin_of (R T : ringType) (Rorder : porderMixin R)
   _ : forall x, norm_op (- x) = norm_op x;
 }.
 
-Record mixin_of (R : ringType) (Rorder : porderMixin R)
+Record mixin_of (R : ringType) (Rorder : lePOrderMixin R)
        (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
        (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
   := Mixin {
@@ -167,7 +167,7 @@ Module NumDomain.
 Section ClassDef.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
-  order_mixin : porderMixin (ring_for T base);
+  order_mixin : lePOrderMixin (ring_for T base);
   normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
   mixin : mixin_of normed_mixin;
 }.
@@ -4747,17 +4747,17 @@ Qed.
 Lemma normrN x : `|- x| = `|x|.
 Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Definition porderMixin : ltPOrderMixin R :=
-  LtPOrderMixin ltrr lt_trans le_def'.
+Definition lePOrderMixin : ltPOrderMixin R :=
+  LtPOrderMixin le_def' ltrr lt_trans.
 
 Definition normedDomainMixin :
-  @normed_mixin_of R R porderMixin :=
-  @Num.NormedMixin _ _ porderMixin (norm m)
+  @normed_mixin_of R R lePOrderMixin :=
+  @Num.NormedMixin _ _ lePOrderMixin (norm m)
                    (normD m) (@norm_eq0 m) normrMn normrN.
 
 Definition numDomainMixin :
-  @mixin_of R porderMixin normedDomainMixin :=
-  @Num.Mixin _ porderMixin normedDomainMixin (@addr_gt0 m)
+  @mixin_of R lePOrderMixin normedDomainMixin :=
+  @Num.Mixin _ lePOrderMixin normedDomainMixin (@addr_gt0 m)
              (@ger_total m) (@normM m) (@le_def m).
 
 End NumMixin.
@@ -4765,7 +4765,7 @@ End NumMixin.
 Module Exports.
 Notation numMixin := of_.
 Notation NumMixin := Mixin.
-Coercion porderMixin : numMixin >-> ltPOrderMixin.
+Coercion lePOrderMixin : numMixin >-> ltPOrderMixin.
 Coercion normedDomainMixin : numMixin >-> normed_mixin_of.
 Coercion numDomainMixin : numMixin >-> mixin_of.
 End Exports.
@@ -4912,9 +4912,8 @@ Qed.
 Lemma normrN x : `|- x| = `|x|.
 Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Definition orderMixin : leOrderMixin ring_display R :=
-  LeOrderMixin ring_display
-               le_anti le_trans le_total (lt_def _) (rrefl _) (rrefl _).
+Definition orderMixin : leOrderMixin R :=
+  LeOrderMixin (lt_def _) (rrefl _) (rrefl _) le_anti le_trans le_total.
 
 Definition normedDomainMixin :
   @normed_mixin_of R R orderMixin :=
@@ -5071,9 +5070,9 @@ elim: n => [|n ih]; [rewrite le_def eqxx // | apply: (le_trans ih)].
 by rewrite le_def' -natrB // subSnn -[_%:R]subr0 -le_def' mulr1n le01.
 Qed.
 
-Definition orderMixin : ltOrderMixin ring_display R :=
-  LtOrderMixin ring_display
-               lt_irr lt_trans lt_total (le_def m) (rrefl _) (rrefl _).
+Definition orderMixin : ltOrderMixin R :=
+  LtOrderMixin (le_def m) (rrefl _) (rrefl _)
+               lt_irr lt_trans lt_total.
 
 Definition normedDomainMixin :
   @normed_mixin_of R R orderMixin :=
