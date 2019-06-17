@@ -140,7 +140,7 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record normed_mixin_of (R T : ringType) (Rorder : porderMixin R)
+Record normed_mixin_of (R T : ringType) (Rorder : lePOrderMixin R)
        (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
   := NormedMixin {
   norm_op : T -> R;
@@ -150,7 +150,7 @@ Record normed_mixin_of (R T : ringType) (Rorder : porderMixin R)
   _ : forall x, norm_op (- x) = norm_op x;
 }.
 
-Record mixin_of (R : ringType) (Rorder : porderMixin R)
+Record mixin_of (R : ringType) (Rorder : lePOrderMixin R)
        (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
        (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
   := Mixin {
@@ -167,7 +167,7 @@ Module NumDomain.
 Section ClassDef.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
-  order_mixin : porderMixin (ring_for T base);
+  order_mixin : lePOrderMixin (ring_for T base);
   normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
   mixin : mixin_of normed_mixin;
 }.
@@ -1598,6 +1598,9 @@ rewrite !realE; have [x_ge0 _|x_nge0 /= x_le0] := boolP (_ <= _); last first.
 by have [/(ger_leVge x_ge0)|_ /le_trans->] := boolP (0 <= _); rewrite ?orbT.
 Qed.
 
+Lemma real_comparable x y : x \is real -> y \is real -> x >=< y.
+Proof. exact: real_leVge. Qed.
+
 Lemma realB : {in real &, forall x y, x - y \is real}.
 Proof. exact: rpredB. Qed.
 
@@ -1624,9 +1627,9 @@ Variant ltr_xor_ge (x y : R) : R -> R -> bool -> bool -> Set :=
 Variant comparer x y : R -> R ->
   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | ComparerLt of x < y : comparer x y (y - x) (y - x)
-    false false true false true false
-  | ComparerGt of x > y : comparer x y (x - y) (x - y)
     false false false true false true
+  | ComparerGt of x > y : comparer x y (x - y) (x - y)
+    false false true false true false
   | ComparerEq of x = y : comparer x y 0 0
     true true true true false false.
 
@@ -1653,17 +1656,14 @@ Proof. by move=> x y xR yR /=; case: real_leP. Qed.
 Lemma real_leNgt : {in real &, forall x y, (x <= y) = ~~ (y < x)}.
 Proof. by move=> x y xR yR /=; case: real_leP. Qed.
 
-Lemma real_ltgtP x y :
-    x \is real -> y \is real ->
+Lemma real_ltgtP x y : x \is real -> y \is real ->
   comparer x y `|x - y| `|y - x|
-                (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
+                (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
-move=> xR yR; case: real_leP => // [le_yx|lt_xy]; last first.
-  by rewrite gt_eqF // lt_eqF // le_gtF ?ltW //; constructor.
-case: real_leP => // [le_xy|lt_yx]; last first.
-  by rewrite lt_eqF // gt_eqF //; constructor.
-have /eqP ->: x == y by rewrite eq_le le_yx le_xy.
-by rewrite subrr eqxx; constructor.
+move=> xR yR; case: comparable_ltgtP => [|xy|xy|->]; first exact: real_leVge.
+- by rewrite [`|x - y|]distrC !gtr0_norm ?subr_gt0//; constructor.
+- by rewrite [`|y - x|]distrC !gtr0_norm ?subr_gt0//; constructor.
+- by rewrite subrr normr0; constructor.
 Qed.
 
 Variant ger0_xor_lt0 (x : R) : R -> bool -> bool -> Set :=
@@ -3486,7 +3486,7 @@ Proof. exact: real_ltP. Qed.
 
 Lemma ltrgtP x y :
    comparer x y `|x - y| `|y - x| (y == x) (x == y)
-                 (x <= y) (y <= x) (x < y) (x > y) .
+                 (x >= y) (x <= y) (x > y) (x < y) .
 Proof. exact: real_ltgtP. Qed.
 
 Lemma ger0P x : ger0_xor_lt0 x `|x| (x < 0) (0 <= x).
@@ -4747,17 +4747,17 @@ Qed.
 Lemma normrN x : `|- x| = `|x|.
 Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Definition porderMixin : ltPOrderMixin R :=
-  LtPOrderMixin ltrr lt_trans le_def'.
+Definition lePOrderMixin : ltPOrderMixin R :=
+  LtPOrderMixin le_def' ltrr lt_trans.
 
 Definition normedDomainMixin :
-  @normed_mixin_of R R porderMixin :=
-  @Num.NormedMixin _ _ porderMixin (norm m)
+  @normed_mixin_of R R lePOrderMixin :=
+  @Num.NormedMixin _ _ lePOrderMixin (norm m)
                    (normD m) (@norm_eq0 m) normrMn normrN.
 
 Definition numDomainMixin :
-  @mixin_of R porderMixin normedDomainMixin :=
-  @Num.Mixin _ porderMixin normedDomainMixin (@addr_gt0 m)
+  @mixin_of R lePOrderMixin normedDomainMixin :=
+  @Num.Mixin _ lePOrderMixin normedDomainMixin (@addr_gt0 m)
              (@ger_total m) (@normM m) (@le_def m).
 
 End NumMixin.
@@ -4765,7 +4765,7 @@ End NumMixin.
 Module Exports.
 Notation numMixin := of_.
 Notation NumMixin := Mixin.
-Coercion porderMixin : numMixin >-> ltPOrderMixin.
+Coercion lePOrderMixin : numMixin >-> ltPOrderMixin.
 Coercion normedDomainMixin : numMixin >-> normed_mixin_of.
 Coercion numDomainMixin : numMixin >-> mixin_of.
 End Exports.
@@ -4912,17 +4912,13 @@ Qed.
 Lemma normrN x : `|- x| = `|x|.
 Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Definition orderMixin : leOrderMixin ring_display R :=
-  LeOrderMixin ring_display
-               le_anti le_trans le_total (lt_def _) (rrefl _) (rrefl _).
+Definition orderMixin : leOrderMixin R :=
+  LeOrderMixin (lt_def _) (rrefl _) (rrefl _) le_anti le_trans le_total.
 
-Definition normedDomainMixin :
-  @normed_mixin_of R R orderMixin :=
-  @Num.NormedMixin _ _ orderMixin (norm m)
-                   le_normD eq0_norm normrMn normrN.
+Definition normedDomainMixin : @normed_mixin_of R R orderMixin :=
+  @Num.NormedMixin _ _ orderMixin (norm m) le_normD eq0_norm normrMn normrN.
 
-Definition numMixin :
-  @mixin_of R orderMixin normedDomainMixin :=
+Definition numMixin : @mixin_of R orderMixin normedDomainMixin :=
   @Num.Mixin _ orderMixin normedDomainMixin
              lt0_add (in2W le_total) normM le_def.
 
@@ -5071,17 +5067,15 @@ elim: n => [|n ih]; [rewrite le_def eqxx // | apply: (le_trans ih)].
 by rewrite le_def' -natrB // subSnn -[_%:R]subr0 -le_def' mulr1n le01.
 Qed.
 
-Definition orderMixin : ltOrderMixin ring_display R :=
-  LtOrderMixin ring_display
-               lt_irr lt_trans lt_total (le_def m) (rrefl _) (rrefl _).
+Definition orderMixin : ltOrderMixin R :=
+  LtOrderMixin (le_def m) (rrefl _) (rrefl _)
+               lt_irr lt_trans lt_total.
 
-Definition normedDomainMixin :
-  @normed_mixin_of R R orderMixin :=
+Definition normedDomainMixin : @normed_mixin_of R R orderMixin :=
   @Num.NormedMixin _ _ orderMixin (norm m)
                    le_normD eq0_norm normrMn (@normN m).
 
-Definition numMixin :
-  @mixin_of R orderMixin normedDomainMixin :=
+Definition numMixin : @mixin_of R orderMixin normedDomainMixin :=
   @Num.Mixin _ orderMixin normedDomainMixin
              (@lt0_add m) (in2W le_total) normM le_def'.
 
