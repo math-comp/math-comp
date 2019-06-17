@@ -213,6 +213,9 @@ Definition thead (u : n.+1.-tuple T) := tnth u ord0.
 Lemma tnth0 x t : tnth [tuple of x :: t] ord0 = x.
 Proof. by []. Qed.
 
+Lemma tnthS x t i : tnth [tuple of x :: t] (lift ord0 i) = tnth t i.
+Proof. by rewrite (tnth_nth (tnth_default t i)). Qed.
+
 Lemma theadE x t : thead [tuple of x :: t] = x.
 Proof. by []. Qed.
 
@@ -230,6 +233,11 @@ Qed.
 
 Lemma tnth_map f t i : tnth [tuple of map f t] i = f (tnth t i) :> rT.
 Proof. by apply: nth_map; rewrite size_tuple. Qed.
+
+Lemma tnth_nseq x i : tnth [tuple of nseq n x] i = x.
+Proof.
+by rewrite !(tnth_nth (tnth_default (nseq_tuple x) i)) nth_nseq ltn_ord.
+Qed.
 
 End SeqTuple.
 
@@ -276,6 +284,10 @@ Definition tuple_eqMixin := Eval hnf in [eqMixin of n.-tuple T by <:].
 Canonical tuple_eqType := Eval hnf in EqType (n.-tuple T) tuple_eqMixin.
 
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
+
+Lemma eqEtuple (t1 t2 : n.-tuple T) :
+  (t1 == t2) = [forall i, tnth t1 i == tnth t2 i].
+Proof. by apply/eqP/'forall_eqP => [->|/eq_from_tnth]. Qed.
 
 Lemma memtE (t : n.-tuple T) : mem t = mem (tval t).
 Proof. by []. Qed.
