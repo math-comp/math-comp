@@ -23,9 +23,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added theorems `flatten_map1` and `allpairs_consr` in `seq.v`.
 
+- Lemmas `ltnNleqif`, `eq_leqif`, `eqTleqif` in `ssrnat`
+
+- Lemmas `eqEtupe`, `tnthS` and `tnth_nseq` in `tuple`
+
 - Ported `order.v` from the finmap library, which provides structures of ordered
   sets (`porderType`, `latticeType`, `orderType`, etc.) and its theory.
-
 
 ### Changed
 
@@ -46,7 +49,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `[arg minr_( i < n | P ) F]` and `[arg maxr_( i < n | P ) F]` notations are
     removed. Now `[arg min_( i < n | P ) F]` and `[arg max_( i < n | P ) F]`
     notations are defined in `nat_scope` (specialized for `nat`), `order_scope`
-    (general one), and `ring_scope` (specialized for `ring_display`).
+    (general one), and `ring_scope` (specialized for `ring_display`). Lemma
+    `fintype.arg_minP` is aliased to `arg_minnP` and the same for `arg_maxnP`.
   + The following lemmas are generalized, renamed, and relocated to `order.v`:
     * `ltr_def` -> `lt_def`
     * `(ger|gtr)E` -> `(ge|gt)E`
@@ -126,6 +130,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `lerif_AGM`, `relif_mean_square_scaled`, `lerif_AGM2_scaled`,
     `lerif_mean_square`, `lerif_AGM2`, `lerif_normC_Re_Creal`, `lerif_Re_Creal`,
     `lerif_rootC_AGM`.
+- The following naming inconsistencies have been fixed in `ssrnat.v`:
+  + `homo_inj_lt(_in)` -> `inj_homo_ltn(in)`
+  + `(inc|dec)r(_in)` -> `(inc|dev)n(_in)`
 
 ### Infrastructure
 
