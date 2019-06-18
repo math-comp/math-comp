@@ -187,8 +187,8 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (*     another copy of seq T, with lexicographic ordering                     *)
 (*                                                                            *)
 (* On orderType leP ltP ltgtP are the three main lemmas for case analysis.    *)
-(* On porderType, one may use comparbleP comparble_leP comparble_ltP          *)
-(*   and comparble_ltgtP are the three main lemmas for case analysis.         *)
+(* On porderType, one may use comparableP comparable_leP comparable_ltP       *)
+(*   and comparable_ltgtP are the three main lemmas for case analysis.        *)
 (*                                                                            *)
 (* We also provide specialized version of some theorems from path.v.          *)
 (*                                                                            *)
@@ -3860,7 +3860,7 @@ Import ProdLexOrder.Exports.
 Module SeqProdOrder.
 Section SeqProdOrder.
 
-Definition type of unit := seq.
+Definition type (disp : unit) T := seq T.
 
 Context {disp disp' : unit}.
 
@@ -3975,7 +3975,7 @@ Proof. by []. Qed.
 Lemma joinEseq s1 s2 : s1 `|` s2 =
   match s1, s2 with
     | [::], _ => s2 | _, [::] => s1
-    | x1 :: s1', x2 :: s2' => (x1 `|` x2) :: join s1' s2'
+    | x1 :: s1', x2 :: s2' => (x1 `|` x2) :: ((s1' : seq _) `|` s2')
   end.
 Proof. by case: s1. Qed.
 
@@ -4010,7 +4010,7 @@ End SeqProdOrder.
 Module SeqLexOrder.
 Section SeqLexOrder.
 
-Definition type of unit := seq.
+Definition type (disp : unit) T := seq T.
 
 Context {disp disp' : unit}.
 
