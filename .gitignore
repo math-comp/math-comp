@@ -22,6 +22,7 @@ mathcomp/ssrmatching.mli
 mathcomp/ssrmatching.v
 mathcomp/ssreflect_plugin.mllib
 mathcomp/ssreflect_plugin.mlpack
+mathcomp/test_suite/hierarchy_test.v
 mathcomp-*.tar.gz
 *#
 htmldoc/mathcomp.*html
