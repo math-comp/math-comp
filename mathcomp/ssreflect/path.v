@@ -164,14 +164,14 @@ Section HomoPath.
 Variables (T T' : Type) (leT : rel T) (leT' : rel T').
 
 Lemma homo_path f x s : {homo f : x y / leT x y >-> leT' x y} ->
-  path leT x s -> path leT' (f x) [seq f x | x <- s].
+  path leT x s -> path leT' (f x) (map f s).
 Proof.
 move=> f_homo; elim: s => //= y s IHs in x *.
 by move=> /andP[le_xy path_y_s]; rewrite f_homo//= IHs.
 Qed.
 
 Lemma mono_path f x s : {mono f : x y / leT x y >-> leT' x y} ->
-  path leT' (f x) [seq f x | x <- s] = path leT x s.
+  path leT' (f x) (map f s) = path leT x s.
 Proof. by move=> f_mon; elim: s => //= y s IHs in x *; rewrite f_mon IHs. Qed.
 
 End HomoPath.
@@ -400,7 +400,7 @@ Section EqHomoPath.
 Variables (T T' : eqType) (leT : rel T) (leT' : rel T').
 
 Lemma homo_path_in f x s : {in x :: s &, {homo f : x y / leT x y >-> leT' x y}} ->
-  path leT x s -> path leT' (f x) [seq f x | x <- s].
+  path leT x s -> path leT' (f x) (map f s).
 Proof.
 move=> f_homo; elim: s => //= y s IHs in x f_homo *; move=> /andP[x_y y_s].
 rewrite f_homo ?(in_cons, mem_head, eqxx, orbT) ?IHs//= => z t z_mem t_mem.
@@ -408,7 +408,7 @@ by apply: f_homo; rewrite in_cons ?(z_mem, t_mem, orbT).
 Qed.
 
 Lemma mono_path_in f x s : {in x :: s &, {mono f : x y / leT x y >-> leT' x y}} ->
-  path leT' (f x) [seq f x | x <- s] = path leT x s.
+  path leT' (f x) (map f s) = path leT x s.
 Proof.
 move=> f_mono; elim: s => //= y s IHs in x f_mono *.
 rewrite f_mono ?(in_cons, mem_head, eqxx, orbT) ?IHs//= => z t z_mem t_mem.
@@ -491,8 +491,7 @@ case/andP=> ord_s2 ord_ss ord_s1.
 by case: {1}s2=> /= [|_ _]; [rewrite ord_s1 | apply: IHss (merge_sorted _ _)].
 Qed.
 
-Lemma path_min_sorted x s :
-  all [pred y | leT x y] s -> path leT x s = sorted s.
+Lemma path_min_sorted x s : all (leT x) s -> path leT x s = sorted s.
 Proof. by case: s => //= y s /andP [->]. Qed.
 
 Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
@@ -716,18 +715,18 @@ Variables (T T' : eqType) (f : T' -> T) (leT' : rel T') (leT : rel T).
 Implicit Types (s : seq T').
 
 Lemma homo_sorted_in s : {in s &, {homo f : x y / leT' x y >-> leT x y}} ->
-  sorted leT' s -> sorted leT [seq f x | x <- s].
+  sorted leT' s -> sorted leT (map f s).
 Proof. by case: s => //= x s /homo_path_in. Qed.
 
 Lemma mono_sorted_in s : {in s &, {mono f : x y / leT' x y >-> leT x y}} ->
-  sorted leT [seq f x | x <- s] = sorted leT' s.
+  sorted leT (map f s) = sorted leT' s.
 Proof. by case: s => // x s /mono_path_in /= ->. Qed.
 
 Hypothesis (leT'_sym : antisymmetric leT) (leT_tr : transitive leT).
 Hypothesis (leT'_total : total leT') (leT_total : total leT).
 
 Lemma sort_map_in s : {in s &, {homo f : x y / leT' x y >-> leT x y}} ->
-  sort leT [seq f x | x <- s] = [seq f x | x <- sort leT' s].
+  sort leT (map f s) = map f (sort leT' s).
 Proof.
 move=> fP; apply: (@eq_sorted _ leT); rewrite ?sort_sorted//; last first.
   by rewrite perm_sort perm_map// perm_sym perm_sort.
