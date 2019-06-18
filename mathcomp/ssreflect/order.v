@@ -515,25 +515,25 @@ Variant lt_xor_ge (x y : T) : bool -> bool -> Set :=
   | LtrNotGe of x < y  : lt_xor_ge x y false true
   | GerNotLt of y <= x : lt_xor_ge x y true false.
 
-Variant comparer (x y : T) :
+Variant compare (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | ComparerEq of x = y : comparer x y
-    true true true true false false
-  | ComparerLt of x < y : comparer x y
+  | CompareLt of x < y : compare x y
     false false true false true false
-  | ComparerGt of y < x : comparer x y
-    false false false true false true.
+  | CompareGt of y < x : compare x y
+    false false false true false true
+  | CompareEq of x = y : compare x y
+    true true true true false false.
 
-Variant incomparer (x y : T) :
+Variant incompare (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | InComparerEq of x = y : incomparer x y
-    true true true true false false true true
-  | InComparerLt of x < y : incomparer x y
+  | InCompareLt of x < y : incompare x y
     false false true false true false true true
-  | InComparerGt of y < x : incomparer x y
+  | InCompareGt of y < x : incompare x y
     false false false true false true true true
-  | InComparer of x >< y : incomparer x y
-    false false false false false false false false.
+  | InCompare of x >< y : incompare x y
+    false false false false false false false false
+  | InCompareEq of x = y : incompare x y
+    true true true true false false true true.
 
 End Def.
 End POrderDef.
@@ -689,27 +689,27 @@ Variant lt_xor_ge (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
   | LtrNotGe of x < y  : lt_xor_ge x y false true x x y y
   | GerNotLt of y <= x : lt_xor_ge x y true false y y x x.
 
-Variant comparer (x y : T) :
+Variant compare (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> T -> T -> T -> T -> Set :=
-  | ComparerEq of x = y : comparer x y
-    true true true true false false x x x x
-  | ComparerLt of x < y : comparer x y
-    false false true false true false x x y y
-  | ComparerGt of y < x : comparer x y
-    false false false true false true y y x x.
+  | CompareLt of x < y : compare x y
+    false false false true false true x x y y
+  | CompareGt of y < x : compare x y
+    false false true false true false y y x x
+  | CompareEq of x = y : compare x y
+    true true true true false false x x x x.
 
-Variant incomparer (x y : T) :
+Variant incompare (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool ->
   T -> T -> T -> T -> Set :=
-  | InComparerEq of x = y : incomparer x y
-    true true true true false false true true x x x x
-  | InComparerLt of x < y : incomparer x y
-    false false true false true false true true x x y y
-  | InComparerGt of y < x : incomparer x y
-    false false false true false true true true y y x x
-  | InComparer of x >< y  : incomparer x y
+  | InCompareLt of x < y : incompare x y
+    false false false true false true true true x x y y
+  | InCompareGt of y < x : incompare x y
+    false false true false true false true true y y x x
+  | InCompare of x >< y  : incompare x y
     false false false false false false false false
-    (meet x y) (meet x y) (join x y) (join x y).
+    (meet x y) (meet x y) (join x y) (join x y)
+  | InCompareEq of x = y : incompare x y
+    true true true true false false true true x x x x.
 
 End LatticeDef.
 End LatticeDef.
@@ -1805,7 +1805,7 @@ by rewrite lt_neqAle eq_le; move: c_xy => /orP [] -> //; rewrite andbT.
 Qed.
 
 Lemma comparable_ltgtP x y : x >=< y ->
-  comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
+  compare x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
 Proof.
 rewrite />=<%O !le_eqVlt [y == x]eq_sym.
 have := (altP (x =P y), (boolP (x < y), boolP (y < x))).
@@ -1816,12 +1816,12 @@ Qed.
 
 Lemma comparable_leP x y : x >=< y -> le_xor_gt x y (x <= y) (y < x).
 Proof.
-by move=> /comparable_ltgtP [->|xy|xy]; constructor => //; rewrite ltW.
+by move=> /comparable_ltgtP [xy|xy|->]; constructor; rewrite // ltW.
 Qed.
 
 Lemma comparable_ltP x y : x >=< y -> lt_xor_ge x y (y <= x) (x < y).
 Proof.
-by move=> /comparable_ltgtP [->|xy|xy]; constructor => //; rewrite ltW.
+by move=> /comparable_ltgtP [xy|xy|->]; constructor; rewrite // ltW.
 Qed.
 
 Lemma comparable_sym x y : (y >=< x) = (x >=< y).
@@ -1839,7 +1839,7 @@ Proof. by apply: contraNF; rewrite /comparable => ->. Qed.
 Lemma incomparable_ltF x y : (x >< y) -> (x < y) = false.
 Proof. by rewrite lt_neqAle => /incomparable_leF ->; rewrite andbF. Qed.
 
-Lemma comparableP x y : incomparer x y
+Lemma comparableP x y : incompare x y
   (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y)
   (y >=< x) (x >=< y).
 Proof.
@@ -2220,28 +2220,28 @@ Proof. exact: (@leI2 _ [latticeType of L^c]). Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. exact: (@meetUr _ [latticeType of L^c]). Qed.
 
-Lemma lcomparableP x y : incomparer x y
-  (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y)
+Lemma lcomparableP x y : incompare x y
+  (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
   (y >=< x) (x >=< y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof.
-by case: (comparableP x) => [-> | hxy | hxy | hxy]; do 1?have hxy' := ltW hxy;
+by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
   rewrite ?(meetxx, joinxx, meetC y, joinC y)
           ?(meet_idPl hxy', meet_idPr hxy', join_idPl hxy', join_idPr hxy');
   constructor.
 Qed.
 
 Lemma lcomparable_ltgtP x y : x >=< y ->
-  comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y)
+  compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
            (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof. by case: (lcomparableP x) => // *; constructor. Qed.
 
 Lemma lcomparable_leP x y : x >=< y ->
   le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-Proof. by move/lcomparable_ltgtP => [->|/ltW xy|xy]; constructor => //. Qed.
+Proof. by move/lcomparable_ltgtP => [/ltW xy|xy|->]; constructor. Qed.
 
 Lemma lcomparable_ltP x y : x >=< y ->
   lt_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-Proof. by move=> /lcomparable_ltgtP [->|xy|/ltW xy]; constructor => //. Qed.
+Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 
 End LatticeTheoryJoin.
 End LatticeTheoryJoin.
@@ -2375,34 +2375,28 @@ Implicit Types (x y z : T) (u v w : T').
 
 Lemma le_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
 Proof.
-move=> mf x y; case: ltgtP; first (by move=> ->; apply/lexx); move/mf => fxy.
-- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
-- by apply/ltW.
+move=> mf x y; case: ltgtP=> [/mf/ltW//|/mf fxy|->]; last exact: lexx.
+by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
 Qed.
 
 Lemma le_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
 Proof.
-move=> mf x y; case: ltgtP; first (by move=> ->; apply/lexx); move/mf => fxy.
-- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
-- by apply/ltW.
+move=> mf x y; case: ltgtP=> [/mf/ltW//|/mf fxy|->]; last exact: lexx.
+by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
 Qed.
 
 Lemma le_mono_in :
   {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
 Proof.
-move=> mf x y Dx Dy; case: ltgtP;
-  first (by move=> ->; apply/lexx); move/mf => fxy.
-- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
-- by apply/ltW/fxy.
+move=> mf x y; case: ltgtP=> [/mf/ltW//|/mf fxy|->]; last by rewrite lexx.
+by move=> /fxy fy /fy /lt_geF.
 Qed.
 
 Lemma le_nmono_in :
   {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
 Proof.
-move=> mf x y Dx Dy; case: ltgtP;
-  first (by move=> ->; apply/lexx); move/mf => fxy.
-- by rewrite comparable_leNgt /comparable 1?(le_eqVlt (f y)) fxy ?orbT.
-- by apply/ltW/fxy.
+move=> mf x y; case: ltgtP=> [/mf/ltW//|/mf fxy|->]; last by rewrite lexx.
+by move=> /fxy fy /fy /lt_geF.
 Qed.
 
 End TotalMonotonyTheory.
@@ -2982,7 +2976,7 @@ Implicit Types (x y z : T).
 Let comparableT x y : x >=< y := m x y.
 
 Fact ltgtP x y :
-  comparer x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
+  compare x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
 Proof. exact: comparable_ltgtP. Qed.
 
 Fact leP x y : le_xor_gt x y (x <= y) (y < x).
@@ -3031,7 +3025,7 @@ move=> x y z; rewrite /meet /join.
 case: (leP y z) => yz; case: (leP y x) => xy //=; first 1 last.
 - by rewrite yz [x <= z](le_trans _ yz) ?[x <= y]ltW // lt_geF.
 - by rewrite lt_geF ?lexx // (lt_le_trans yz).
-- by rewrite lt_geF //; have [->|/lt_geF->|] := (ltgtP x z); rewrite ?lexx.
+- by rewrite lt_geF //; have [/lt_geF->| |->] := (ltgtP x z); rewrite ?lexx.
 - by have [] := (leP x z); rewrite ?xy ?yz.
 Qed.
 
@@ -3701,7 +3695,7 @@ Qed.
 Fact lt_def x y : lt x y = (y != x) && le x y.
 Proof.
 rewrite /lt /le; case: x y => [x x'] [y y']//=; rewrite andbCA.
-case: (comparableP x y) => //= xy.
+case: (comparableP x y) => //= xy; last first.
   by case: _ / xy in y' *; rewrite !tagged_asE eq_Tagged/= lt_def.
 by rewrite andbT; symmetry; apply: contraTneq xy => -[yx _]; rewrite yx ltxx.
 Qed.
@@ -4039,9 +4033,9 @@ Qed.
 
 Fact trans: transitive le.
 Proof.
-elim=> [|y sy ihs] [|x sx] [|z sz] //=; case: (comparableP x y) => //= [->|xy].
-  by case: comparableP => //= _; apply: ihs.
-by move=> _ /andP[/(lt_le_trans xy) xz _]; rewrite (ltW xz)// lt_geF.
+elim=> [|y sy ihs] [|x sx] [|z sz] //=; case: (comparableP x y) => //= [xy|->].
+  by move=> _ /andP[/(lt_le_trans xy) xz _]; rewrite (ltW xz)// lt_geF.
+by case: comparableP => //= _; apply: ihs.
 Qed.
 
 Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
