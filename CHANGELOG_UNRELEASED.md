@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     removed. Now `[arg min_( i < n | P ) F]` and `[arg max_( i < n | P ) F]`
     notations are defined in `nat_scope` (specialized for `nat`), `order_scope`
     (general one), and `ring_scope` (specialized for `ring_display`).
+    `fintype.arg_minP` is aliased to `arg_minnP` and the same for `arg_maxnP`.
   + The following lemmas are generalized, renamed, and relocated to `order.v`:
     * `ltr_def` -> `lt_def`
     * `(ger|gtr)E` -> `(ge|gt)E`
@@ -89,6 +90,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * `maxr_r` -> `elimT join_idPl`
     * `arg_minrP` -> `arg_minP`
     * `arg_maxrP` -> `arg_maxP`
+  + The following naming inconsistencies have been fixed in `ssrnat`:
+    * `homo_inj_lt(_in)` -> `inj_homo_ltn(in)`
+    * `incr(_in)` -> `incn(_in)`
+    * `decr(_in)` -> `decn(_in)`
   + Generalized the following lemmas as properties of `normedDomainType`:
     `normr0`, `normr0P`, `normr_eq0`, `distrC`, `normr_id`, `normr_ge0`,
     `normr_le0`, `normr_lt0`, `normr_gt0`, `normrE`, `normr_real`,
