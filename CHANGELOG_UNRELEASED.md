@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Ported `order.v` from the finmap library, which provides structures of ordered
   sets (`porderType`, `latticeType`, `orderType`, etc.) and its theory.
 
+- Lemmas `ltnNleqif`, `eq_leqif`, `eqTleqif` in `ssrnat`
+
+- Lemmas `eqEtupe`, `tnthS` and `tnth_nseq` in `tuple`
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
@@ -32,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `[arg minr_( i < n | P ) F]` and `[arg maxr_( i < n | P ) F]` notations are
     removed. Now `[arg min_( i < n | P ) F]` and `[arg max_( i < n | P ) F]`
     notations are defined in `nat_scope` (specialized for `nat`), `order_scope`
-    (general one), and `ring_scope` (specialized for `ring_display`).
+    (general one), and `ring_scope` (specialized for `ring_display`). Lemma
     `fintype.arg_minP` is aliased to `arg_minnP` and the same for `arg_maxnP`.
   + The following lemmas are generalized, renamed, and relocated to `order.v`:
     * `ltr_def` -> `lt_def`
@@ -84,10 +88,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * `maxr_r` -> `elimT join_idPl`
     * `arg_minrP` -> `arg_minP`
     * `arg_maxrP` -> `arg_maxP`
-  + The following naming inconsistencies have been fixed in `ssrnat`:
-    * `homo_inj_lt(_in)` -> `inj_homo_ltn(in)`
-    * `incr(_in)` -> `incn(_in)`
-    * `decr(_in)` -> `decn(_in)`
   + Generalized the following lemmas as properties of `normedDomainType`:
     `normr0`, `normr0P`, `normr_eq0`, `distrC`, `normr_id`, `normr_ge0`,
     `normr_le0`, `normr_lt0`, `normr_gt0`, `normrE`, `normr_real`,
@@ -117,6 +117,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `lerif_AGM`, `relif_mean_square_scaled`, `lerif_AGM2_scaled`,
     `lerif_mean_square`, `lerif_AGM2`, `lerif_normC_Re_Creal`, `lerif_Re_Creal`,
     `lerif_rootC_AGM`.
+- The following naming inconsistencies have been fixed in `ssrnat.v`:
+  + `homo_inj_lt(_in)` -> `inj_homo_ltn(in)`
+  + `(inc|dec)r(_in)` -> `(inc|dev)n(_in)`
 
 ### Misc
 
