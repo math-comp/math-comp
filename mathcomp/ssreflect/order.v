@@ -615,79 +615,79 @@ Reserved Notation "\join^p_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^p_ ( i  'in'  A ) '/  '  F ']'").
 
-Reserved Notation "\minlexi_ i F"
+Reserved Notation "\min^l_ i F"
   (at level 41, F at level 41, i at level 0,
-           format "'[' \minlexi_ i '/  '  F ']'").
-Reserved Notation "\minlexi_ ( i <- r | P ) F"
+           format "'[' \min^l_ i '/  '  F ']'").
+Reserved Notation "\min^l_ ( i <- r | P ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \minlexi_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( i <- r ) F"
+           format "'[' \min^l_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i <- r ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \minlexi_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( m <= i < n | P ) F"
+           format "'[' \min^l_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( m <= i < n | P ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \minlexi_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( m <= i < n ) F"
+           format "'[' \min^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( m <= i < n ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \minlexi_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( i | P ) F"
+           format "'[' \min^l_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
-           format "'[' \minlexi_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( i : t | P ) F"
+           format "'[' \min^l_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i : t | P ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\minlexi_ ( i : t ) F"
+Reserved Notation "\min^l_ ( i : t ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\minlexi_ ( i < n | P ) F"
+Reserved Notation "\min^l_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \minlexi_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( i < n ) F"
+           format "'[' \min^l_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i < n ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \minlexi_ ( i  <  n )  F ']'").
-Reserved Notation "\minlexi_ ( i 'in' A | P ) F"
+           format "'[' \min^l_ ( i  <  n )  F ']'").
+Reserved Notation "\min^l_ ( i 'in' A | P ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \minlexi_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\minlexi_ ( i 'in' A ) F"
+           format "'[' \min^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \minlexi_ ( i  'in'  A ) '/  '  F ']'").
+           format "'[' \min^l_ ( i  'in'  A ) '/  '  F ']'").
 
-Reserved Notation "\maxlexi_ i F"
+Reserved Notation "\max^l_ i F"
   (at level 41, F at level 41, i at level 0,
-           format "'[' \maxlexi_ i '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( i <- r | P ) F"
+           format "'[' \max^l_ i '/  '  F ']'").
+Reserved Notation "\max^l_ ( i <- r | P ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \maxlexi_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( i <- r ) F"
+           format "'[' \max^l_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i <- r ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \maxlexi_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( m <= i < n | P ) F"
+           format "'[' \max^l_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( m <= i < n | P ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \maxlexi_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( m <= i < n ) F"
+           format "'[' \max^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( m <= i < n ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \maxlexi_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( i | P ) F"
+           format "'[' \max^l_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
-           format "'[' \maxlexi_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( i : t | P ) F"
+           format "'[' \max^l_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i : t | P ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\maxlexi_ ( i : t ) F"
+Reserved Notation "\max^l_ ( i : t ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\maxlexi_ ( i < n | P ) F"
+Reserved Notation "\max^l_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \maxlexi_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( i < n ) F"
+           format "'[' \max^l_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i < n ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \maxlexi_ ( i  <  n )  F ']'").
-Reserved Notation "\maxlexi_ ( i 'in' A | P ) F"
+           format "'[' \max^l_ ( i  <  n )  F ']'").
+Reserved Notation "\max^l_ ( i 'in' A | P ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \maxlexi_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\maxlexi_ ( i 'in' A ) F"
+           format "'[' \max^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \maxlexi_ ( i  'in'  A ) '/  '  F ']'").
+           format "'[' \max^l_ ( i  'in'  A ) '/  '  F ']'").
 
 (* tuple extensions *)
 Lemma eqEtuple n (T : eqType) (t1 t2 : n.-tuple T) :
@@ -4080,54 +4080,54 @@ Notation maxlexi := (@join lexi_display _).
 Notation "x `&^l` y" :=  (minlexi x y).
 Notation "x `|^l` y" := (maxlexi x y).
 
-Notation "\maxlexi_ ( i <- r | P ) F" :=
+Notation "\max^l_ ( i <- r | P ) F" :=
   (\big[maxlexi/0]_(i <- r | P%B) F%O) : order_scope.
-Notation "\maxlexi_ ( i <- r ) F" :=
+Notation "\max^l_ ( i <- r ) F" :=
   (\big[maxlexi/0]_(i <- r) F%O) : order_scope.
-Notation "\maxlexi_ ( i | P ) F" :=
+Notation "\max^l_ ( i | P ) F" :=
   (\big[maxlexi/0]_(i | P%B) F%O) : order_scope.
-Notation "\maxlexi_ i F" :=
+Notation "\max^l_ i F" :=
   (\big[maxlexi/0]_i F%O) : order_scope.
-Notation "\maxlexi_ ( i : I | P ) F" :=
+Notation "\max^l_ ( i : I | P ) F" :=
   (\big[maxlexi/0]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\maxlexi_ ( i : I ) F" :=
+Notation "\max^l_ ( i : I ) F" :=
   (\big[maxlexi/0]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\maxlexi_ ( m <= i < n | P ) F" :=
+Notation "\max^l_ ( m <= i < n | P ) F" :=
  (\big[maxlexi/0]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\maxlexi_ ( m <= i < n ) F" :=
+Notation "\max^l_ ( m <= i < n ) F" :=
  (\big[maxlexi/0]_(m <= i < n) F%O) : order_scope.
-Notation "\maxlexi_ ( i < n | P ) F" :=
+Notation "\max^l_ ( i < n | P ) F" :=
  (\big[maxlexi/0]_(i < n | P%B) F%O) : order_scope.
-Notation "\maxlexi_ ( i < n ) F" :=
+Notation "\max^l_ ( i < n ) F" :=
  (\big[maxlexi/0]_(i < n) F%O) : order_scope.
-Notation "\maxlexi_ ( i 'in' A | P ) F" :=
+Notation "\max^l_ ( i 'in' A | P ) F" :=
  (\big[maxlexi/0]_(i in A | P%B) F%O) : order_scope.
-Notation "\maxlexi_ ( i 'in' A ) F" :=
+Notation "\max^l_ ( i 'in' A ) F" :=
  (\big[maxlexi/0]_(i in A) F%O) : order_scope.
 
-Notation "\minlexi_ ( i <- r | P ) F" :=
+Notation "\min^l_ ( i <- r | P ) F" :=
   (\big[minlexi/1]_(i <- r | P%B) F%O) : order_scope.
-Notation "\minlexi_ ( i <- r ) F" :=
+Notation "\min^l_ ( i <- r ) F" :=
   (\big[minlexi/1]_(i <- r) F%O) : order_scope.
-Notation "\minlexi_ ( i | P ) F" :=
+Notation "\min^l_ ( i | P ) F" :=
   (\big[minlexi/1]_(i | P%B) F%O) : order_scope.
-Notation "\minlexi_ i F" :=
+Notation "\min^l_ i F" :=
   (\big[minlexi/1]_i F%O) : order_scope.
-Notation "\minlexi_ ( i : I | P ) F" :=
+Notation "\min^l_ ( i : I | P ) F" :=
   (\big[minlexi/1]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\minlexi_ ( i : I ) F" :=
+Notation "\min^l_ ( i : I ) F" :=
   (\big[minlexi/1]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\minlexi_ ( m <= i < n | P ) F" :=
+Notation "\min^l_ ( m <= i < n | P ) F" :=
  (\big[minlexi/1]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\minlexi_ ( m <= i < n ) F" :=
+Notation "\min^l_ ( m <= i < n ) F" :=
  (\big[minlexi/1]_(m <= i < n) F%O) : order_scope.
-Notation "\minlexi_ ( i < n | P ) F" :=
+Notation "\min^l_ ( i < n | P ) F" :=
  (\big[minlexi/1]_(i < n | P%B) F%O) : order_scope.
-Notation "\minlexi_ ( i < n ) F" :=
+Notation "\min^l_ ( i < n ) F" :=
  (\big[minlexi/1]_(i < n) F%O) : order_scope.
-Notation "\minlexi_ ( i 'in' A | P ) F" :=
+Notation "\min^l_ ( i 'in' A | P ) F" :=
  (\big[minlexi/1]_(i in A | P%B) F%O) : order_scope.
-Notation "\minlexi_ ( i 'in' A ) F" :=
+Notation "\min^l_ ( i 'in' A ) F" :=
  (\big[minlexi/1]_(i in A) F%O) : order_scope.
 
 End LexiSyntax.
