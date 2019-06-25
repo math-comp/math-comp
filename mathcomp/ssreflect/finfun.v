@@ -270,6 +270,26 @@ Canonical dfinfun_finType rT :=
 
 End InheritedStructures.
 
+Section FinFunTuple.
+
+Context {T : Type} {n : nat}.
+
+Definition tuple_of_finfun (f : T ^ n) : n.-tuple T := [tuple f i | i < n].
+
+Definition finfun_of_tuple (t : n.-tuple T) : (T ^ n) := [ffun i => tnth t i].
+
+Lemma finfun_of_tupleK : cancel finfun_of_tuple tuple_of_finfun.
+Proof.
+by move=> t; apply: eq_from_tnth => i; rewrite tnth_map ffunE tnth_ord_tuple.
+Qed.
+
+Lemma tuple_of_finfunK : cancel tuple_of_finfun finfun_of_tuple.
+Proof.
+by move=> f; apply/ffunP => i; rewrite ffunE tnth_map tnth_ord_tuple.
+Qed.
+
+End FinFunTuple.
+
 Section FunPlainTheory.
 
 Variables (aT : finType) (rT : Type).
