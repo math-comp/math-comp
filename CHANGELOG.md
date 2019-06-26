@@ -119,6 +119,10 @@ MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
   with its theory: `mem_permutations`, `size_permutations`,
   `permutations_uniq`, `permutations_all_uniq`, `perm_permutations`.
 
+- `eq_mktuple`, `eq_ffun`, `eq_finset`, `eq_poly`, `ex_mx` that can be
+  used with the `under` tactic from the Coq 8.10 SSReflect plugin
+  (cf. [coq/coq#9651](https://github.com/coq/coq/pull/9651))
+
 ### Changed
 
 - Theory of `lersif` and intervals:
