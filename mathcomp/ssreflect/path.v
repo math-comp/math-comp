@@ -519,18 +519,18 @@ elim=> //= [|y s2 IH2]; first by rewrite addn0.
 by case: leT; rewrite /= ?IH1 ?IH2 !addnS.
 Qed.
 
-Hypothesis leT_tr : transitive leT.
-
-Lemma order_path_min x s : path leT x s -> all (leT x) s.
+Lemma order_path_min x s : transitive leT -> path leT x s -> all (leT x) s.
 Proof.
-elim: s => //= y [//|z s] ihs /andP[xy yz]; rewrite xy {}ihs//.
-by move: yz => /= /andP[/(leT_tr _)->].
+move=> leT_tr; elim: s => //= y [//|z s] ihs /andP[xy yz]; rewrite xy {}ihs//.
+by move: yz => /= /andP [/(leT_tr _ _ _ xy) ->].
 Qed.
+
+Hypothesis leT_tr : transitive leT.
 
 Lemma sorted_merge s t : sorted (s ++ t) -> merge s t = s ++ t.
 Proof.
 elim: s => //= x s; case: t; rewrite ?cats0 //= => y t ih hp.
-move: (order_path_min hp).
+move: (order_path_min leT_tr hp).
 by rewrite ih ?(path_sorted hp) // all_cat /= => /and3P [_ -> _].
 Qed.
 
@@ -573,7 +573,7 @@ Proof. rewrite filter_mask; exact: sorted_mask. Qed.
 End SortSeq.
 
 Arguments path_sorted {T leT x s}.
-Arguments order_path_min {T leT} leT_tr {x s}.
+Arguments order_path_min {T leT x s}.
 Arguments path_min_sorted {T leT x s}.
 Arguments merge {T} relT !s1 !s2 : rename.
 
@@ -765,20 +765,6 @@ End EqHomoSortSeq.
 
 Arguments homo_sorted_in {T T' f leT leT'}.
 Arguments mono_sorted_in {T T' f leT leT'}.
-
-Lemma sort_map_in (T T' : eqType) (f : T -> T') (leT : rel T) (leT' : rel T')
-      (leT'_sym : antisymmetric leT') (leT'_tr : transitive leT')
-      (leT_total : total leT) (leT'_total : total leT') (s : seq T) :
-  {in s &, {homo f : x y / leT x y >-> leT' x y}} ->
-  sort leT' (map f s) = map f (sort leT s).
-Proof.
-move=> fP; apply: (@eq_sorted _ leT'); rewrite ?sort_sorted//; last first.
-  by rewrite perm_sort perm_map// perm_sym perm_sort.
-rewrite (homo_sorted_in (leT := leT)) ?sort_sorted // => x y.
-rewrite !mem_sort; apply: fP.
-Qed.
-
-Arguments sort_map_in {T T' f leT leT'}.
 
 Lemma ltn_sorted_uniq_leq s : sorted ltn s = uniq s && sorted leq s.
 Proof.
