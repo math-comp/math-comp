@@ -333,6 +333,21 @@ Proof.
 by apply/eqP; elim/big_rec2: _ => // i m n _; rewrite modnDml eqn_modDl.
 Qed.
 
+Lemma prime_modn_expSn p n : prime p -> n.+1 ^ p = (n ^ p).+1 %[mod p].
+Proof.
+case: p => // p pP.
+rewrite -[(_ ^ _).+1]addn0 (expnDn 1) big_ord_recr big_ord_recl /=.
+rewrite subnn binn exp1n !mul1n addnAC -modnDmr; congr ((_ + _) %% _).
+apply/eqP/dvdn_sum => -[i ?] _; exact/dvdn_mulr/prime_dvd_bin. 
+Qed. 
+
+Lemma fermat_little a p : prime p -> a ^ p = a %[mod p].
+Proof.
+move=> pP.
+elim: a => [|a IH]; first by rewrite exp0n // prime_gt0.
+by rewrite prime_modn_expSn // -addn1 -modnDml IH modnDml addn1.
+Qed.
+
 (* Combinatorial characterizations. *)
 
 Section Combinations.
