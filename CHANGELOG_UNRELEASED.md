@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added theorem `totient_prime` in `prime.v`
 
+- Added theorems `prime_modn_expSn` and `fermat_little` in `binomial.v`
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
