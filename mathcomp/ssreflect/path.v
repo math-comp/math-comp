@@ -463,6 +463,10 @@ Fixpoint merge_sort_rec ss s :=
 
 Definition sort := merge_sort_rec [::].
 
+(* The following definition `sort_rec1` is an auxiliary function for          *)
+(* inductive reasoning on `sort`. One can rewrite `sort le s` to              *)
+(* `sort_rec1 le [::] s` by `sortE` and apply the simple structural induction *)
+(* on `s` to reason about it.                                                 *)
 Fixpoint sort_rec1 ss s :=
   if s is x :: s then sort_rec1 (merge_sort_push [:: x] ss) s else
   merge_sort_pop [::] ss.
@@ -939,7 +943,7 @@ rewrite -map_mask -filter_mask {2}mask_filter ?iota_uniq ?filter_sort //.
 move=> ? ? ?; exact/leT_tr.
 Qed.
 
-Lemma mask_sort' s m :
+Lemma sorted_mask_sort s m :
   sorted leT (mask m s) -> {m_s | mask m_s (sort leT s) = mask m s}.
 Proof. by move/(sorted_sort leT_tr) => <-; exact: mask_sort. Qed.
 
@@ -956,7 +960,8 @@ move=> t s /subseqP [m _ ->].
 case: (mask_sort leT_total leT_tr s m) => m' <-; exact: mask_subseq.
 Qed.
 
-Lemma subseq_sort' t s : subseq t s -> sorted leT t -> subseq t (sort leT s).
+Lemma sorted_subseq_sort t s :
+  subseq t s -> sorted leT t -> subseq t (sort leT s).
 Proof. by move=> subseq_ts /(sorted_sort leT_tr) <-; exact: subseq_sort. Qed.
 
 Lemma mem2_sort s x y : leT x y -> mem2 s x y -> mem2 (sort leT s) x y.
