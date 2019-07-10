@@ -1338,6 +1338,9 @@ move=> p_pr e_gt0; rewrite totientE ?expn_gt0 ?prime_gt0 //.
 by rewrite primes_exp // primes_prime // unlock /= muln1 pfactorK.
 Qed.
 
+Lemma totient_prime p : prime p -> totient p = p.-1.
+Proof. by move=> p_prime; rewrite -{1}[p]expn1 totient_pfactor // muln1. Qed.
+
 Lemma totient_coprime m n :
   coprime m n -> totient (m * n) = totient m * totient n.
 Proof.
