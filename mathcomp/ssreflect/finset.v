@@ -359,7 +359,7 @@ Lemma subsetT A : A \subset setT.
 Proof. by apply/subsetP=> x; rewrite inE. Qed.
 
 Lemma subsetT_hint mA : subset mA (mem [set: T]).
-Proof. by rewrite unlock; apply/pred0P=> x; rewrite !inE. Qed.
+Proof. by rewrite unlock; apply/pred0P=> x /!inE. Qed.
 Hint Resolve subsetT_hint : core.
 
 Lemma subTset A : (setT \subset A) = (A == setT).
@@ -393,7 +393,7 @@ Lemma in_setU1 x a B : (x \in a |: B) = (x == a) || (x \in B).
 Proof. by rewrite !inE. Qed.
 
 Lemma set_cons a s : [set x in a :: s] = a |: [set x in s].
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma setU11 x B : x \in x |: B.
 Proof. by rewrite !inE eqxx. Qed.
@@ -404,7 +404,7 @@ Proof. by move=> Bx; rewrite !inE predU1r. Qed.
 (* We need separate lemmas for the explicit enumerations since they *)
 (* associate on the left.                                           *)
 Lemma set1Ul x A b : x \in A -> x \in A :|: [set b].
-Proof. by move=> Ax; rewrite !inE Ax. Qed.
+Proof. by move=> + /!inE => ->. Qed.
 
 Lemma set1Ur A b : b \in A :|: [set b].
 Proof. by rewrite !inE eqxx orbT. Qed.
@@ -455,7 +455,7 @@ Proof. by apply/setP => x; rewrite !inE orbC. Qed.
 
 Lemma setUS A B C : A \subset B -> C :|: A \subset C :|: B.
 Proof.
-move=> sAB; apply/subsetP=> x; rewrite !inE.
+move=> sAB; apply/subsetP=> x /!inE.
 by case: (x \in C) => //; apply: (subsetP sAB).
 Qed.
 
@@ -509,7 +509,7 @@ Lemma setId2P x pA pB pC :
 Proof. by rewrite !inE; apply: and3P. Qed.
 
 Lemma setIdE A pB : [set x in A | pB x] = A :&: [set x | pB x].
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma setIP x A B : reflect (x \in A /\ x \in B) (x \in A :&: B).
 Proof. exact: (iffP (@setIdP _ _ _)). Qed.
@@ -522,7 +522,7 @@ Proof. by apply/setP => x; rewrite !inE andbC. Qed.
 
 Lemma setIS A B C : A \subset B -> C :&: A \subset C :&: B.
 Proof.
-move=> sAB; apply/subsetP=> x; rewrite !inE.
+move=> sAB; apply/subsetP=> x /!inE.
 by case: (x \in C) => //; apply: (subsetP sAB).
 Qed.
 
@@ -607,7 +607,7 @@ Lemma setC_inj : injective (@setC T).
 Proof. exact: can_inj setCK. Qed.
 
 Lemma subsets_disjoint A B : (A \subset B) = [disjoint A & ~: B].
-Proof. by rewrite subset_disjoint; apply: eq_disjoint_r => x; rewrite !inE. Qed.
+Proof. by rewrite subset_disjoint; apply: eq_disjoint_r => x /!inE. Qed.
 
 Lemma disjoints_subset A B : [disjoint A & B] = (A \subset ~: B).
 Proof. by rewrite subsets_disjoint setCK. Qed.
@@ -631,7 +631,7 @@ Lemma setICr A : A :&: ~: A = set0.
 Proof. by apply/setP=> x; rewrite !inE andbN. Qed.
 
 Lemma setC0 : ~: set0 = [set: T].
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma setCT : ~: [set: T] = set0.
 Proof. by rewrite -setC0 setCK. Qed.
@@ -657,13 +657,13 @@ Lemma setDSS A B C D : A \subset C -> D \subset B -> A :\: B \subset C :\: D.
 Proof. by move=> /(setSD B) /subset_trans sAC /(setDS C) /sAC. Qed.
 
 Lemma setD0 A : A :\: set0 = A.
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma set0D A : set0 :\: A = set0.
 Proof. by apply/setP=> x; rewrite !inE andbF. Qed.
 
 Lemma setDT A : A :\: setT = set0.
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma setTD A : setT :\: A = ~: A.
 Proof. by apply/setP=> x; rewrite !inE andbT. Qed.
@@ -708,18 +708,18 @@ Proof. by rewrite inE. Qed.
 
 Lemma powersetS A B : (powerset A \subset powerset B) = (A \subset B).
 Proof.
-apply/subsetP/idP=> [sAB | sAB C]; last by rewrite !inE => /subset_trans ->.
+apply/subsetP/idP=> [sAB | sAB C /!inE/subset_trans->//].
 by rewrite -powersetE sAB // inE.
 Qed.
 
 Lemma powerset0 : powerset set0 = [set set0] :> {set {set T}}.
-Proof. by apply/setP=> A; rewrite !inE subset0. Qed.
+Proof. by apply/setP=> A /!inE; rewrite subset0. Qed.
 
 Lemma powersetT : powerset [set: T] = [set: {set T}].
-Proof. by apply/setP=> A; rewrite !inE subsetT. Qed.
+Proof. by apply/setP=> A /!inE; rewrite subsetT. Qed.
 
 Lemma setI_powerset P A : P :&: powerset A = P ::&: A.
-Proof. by apply/setP=> B; rewrite !inE. Qed.
+Proof. by apply/setP=> B /!inE. Qed.
 
 (* cardinal lemmas for sets *)
 
@@ -745,7 +745,7 @@ Lemma card_gt0 A : (0 < #|A|) = (A != set0).
 Proof. by rewrite lt0n cards_eq0. Qed.
 
 Lemma cards0_eq A : #|A| = 0 -> A = set0.
-Proof. by move=> A_0; apply/setP=> x; rewrite inE (card0_eq A_0). Qed.
+Proof. by move=> A_0; apply/setP=> x /1inE; rewrite (card0_eq A_0). Qed.
 
 Lemma cards1 x : #|[set x]| = 1.
 Proof. by rewrite cardsE card1. Qed.
@@ -775,17 +775,17 @@ Lemma cardsCs A : #|A| = #|T| - #|~: A|.
 Proof. by rewrite -(cardsC A) addnK. Qed.
 
 Lemma cardsU1 a A : #|a |: A| = (a \notin A) + #|A|.
-Proof. by rewrite -cardU1; apply: eq_card=> x; rewrite !inE. Qed.
+Proof. by rewrite -cardU1; apply: eq_card=> x /!inE. Qed.
 
 Lemma cards2 a b : #|[set a; b]| = (a != b).+1.
-Proof. by rewrite -card2; apply: eq_card=> x; rewrite !inE. Qed.
+Proof. by rewrite -card2; apply: eq_card=> x /!inE. Qed.
 
 Lemma cardsC1 a : #|[set~ a]| = #|T|.-1.
-Proof. by rewrite -(cardC1 a); apply: eq_card=> x; rewrite !inE. Qed.
+Proof. by rewrite -(cardC1 a); apply: eq_card=> x /!inE. Qed.
 
 Lemma cardsD1 a A : #|A| = (a \in A) + #|A :\ a|.
 Proof.
-by rewrite (cardD1 a); congr (_ + _); apply: eq_card => x; rewrite !inE.
+by rewrite (cardD1 a); congr (_ + _); apply: eq_card => x /!inE.
 Qed.
 
 (* other inclusions *)
@@ -797,7 +797,7 @@ Lemma subsetIr A B : A :&: B \subset B.
 Proof. by apply/subsetP=> x; rewrite inE; case/andP. Qed.
 
 Lemma subsetUl A B : A \subset A :|: B.
-Proof. by apply/subsetP=> x; rewrite inE => ->. Qed.
+Proof. by apply/subsetP=> x /1inE ->. Qed.
 
 Lemma subsetUr A B : B \subset A :|: B.
 Proof. by apply/subsetP=> x; rewrite inE orbC => ->. Qed.
@@ -815,7 +815,7 @@ Lemma subsetDr A B : A :\: B \subset ~: B.
 Proof. by rewrite setDE subsetIr. Qed.
 
 Lemma sub1set A x : ([set x] \subset A) = (x \in A).
-Proof. by rewrite -subset_pred1; apply: eq_subset=> y; rewrite !inE. Qed.
+Proof. by rewrite -subset_pred1; apply: eq_subset=> y /!inE. Qed.
 
 Lemma cards1P A : reflect (exists x, A = [set x]) (#|A| == 1).
 Proof.
@@ -898,7 +898,7 @@ Proof. by rewrite setDE subsetI -disjoints_subset. Qed.
 
 Lemma subDset A B C : (A :\: B \subset C) = (A \subset B :|: C).
 Proof.
-apply/subsetP/subsetP=> sABC x; rewrite !inE.
+apply/subsetP/subsetP=> sABC x /!inE.
   by case Bx: (x \in B) => // Ax; rewrite sABC ?inE ?Bx.
 by case Bx: (x \in B) => //; move/sABC; rewrite inE Bx.
 Qed.
@@ -1252,25 +1252,25 @@ Lemma preimsetS (A B : {pred rT}) :
 Proof. by move=> sAB; apply/subsetP=> y; rewrite !inE; apply: subsetP. Qed.
 
 Lemma preimset0 : f @^-1: set0 = set0.
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma preimsetT : f @^-1: setT = setT.
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /!inE. Qed.
 
 Lemma preimsetI (A B : {set rT}) :
   f @^-1: (A :&: B) = (f @^-1: A) :&: (f @^-1: B).
-Proof. by apply/setP=> y; rewrite !inE. Qed.
+Proof. by apply/setP=> y /!inE. Qed.
 
 Lemma preimsetU (A B : {set rT}) :
   f @^-1: (A :|: B) = (f @^-1: A) :|: (f @^-1: B).
-Proof. by apply/setP=> y; rewrite !inE. Qed.
+Proof. by apply/setP=> y /!inE. Qed.
 
 Lemma preimsetD (A B : {set rT}) :
   f @^-1: (A :\: B) = (f @^-1: A) :\: (f @^-1: B).
-Proof. by apply/setP=> y; rewrite !inE. Qed.
+Proof. by apply/setP=> y /!inE. Qed.
 
 Lemma preimsetC (A : {set rT}) : f @^-1: (~: A) = ~: f @^-1: A.
-Proof. by apply/setP=> y; rewrite !inE. Qed.
+Proof. by apply/setP=> y /!inE. Qed.
 
 Lemma imsetS (A B : {pred aT}) : A \subset B -> f @: A \subset f @: B.
 Proof.
@@ -1390,7 +1390,7 @@ Lemma big_set0 F : \big[op/idx]_(i in set0) F i = idx.
 Proof. by apply: big_pred0 => i; rewrite inE. Qed.
 
 Lemma big_set1 a F : \big[op/idx]_(i in [set a]) F i = F a.
-Proof. by apply: big_pred1 => i; rewrite !inE. Qed.
+Proof. by apply: big_pred1 => i /!inE. Qed.
 
 Lemma big_setID A B F :
   \big[aop/idx]_(i in A) F i =
@@ -1398,7 +1398,7 @@ Lemma big_setID A B F :
          (\big[aop/idx]_(i in A :\: B) F i).
 Proof.
 rewrite (bigID (mem B)) setDE.
-by congr (aop _ _); apply: eq_bigl => i; rewrite !inE.
+by congr (aop _ _); apply: eq_bigl => i /!inE.
 Qed.
 
 Lemma big_setIDcond A B P F :
@@ -1730,7 +1730,7 @@ Variables (D1 : {pred aT1}) (D2 : {pred aT2}).
 Lemma curry_imset2X : f @2: (A1, A2) = prod_curry f @: (setX A1 A2).
 Proof.
 rewrite [@imset]unlock unlock; apply/setP=> x; rewrite !in_set; congr (x \in _).
-by apply: eq_image => u //=; rewrite !inE.
+by apply: eq_image => u //= /!inE.
 Qed.
 
 Lemma curry_imset2l : f @2: (D1, D2) = \bigcup_(x1 in D1) f x1 @: D2.
@@ -1822,7 +1822,7 @@ Lemma mem_pblock P x : (x \in pblock P x) = (x \in cover P).
 Proof.
 rewrite /pblock; apply/esym/bigcupP.
 case: pickP => /= [A /andP[PA Ax]| noA]; first by rewrite Ax; exists A.
-by rewrite inE => [[A PA Ax]]; case/andP: (noA A).
+by move=> /1inE [[A PA Ax]]; case/andP: (noA A).
 Qed.
 
 Lemma pblock_mem P x : x \in cover P -> pblock P x \in P.
@@ -1966,7 +1966,7 @@ have defD: cover P == D.
   by apply/subsetP=> x Dx; apply/bigcupP; exists (Px x); rewrite (Pxx, PPx).
 have tiP: trivIset P.
   apply/trivIsetP=> _ _ /imsetP[x Dx ->] /imsetP[y Dy ->]; apply: contraR.
-  case/pred0Pn=> z /andP[]; rewrite !inE => /andP[Dz Rxz] /andP[_ Ryz].
+  case/pred0Pn=> z /andP[] /!inE /andP[Dz Rxz] /andP[_ Ryz].
   apply/eqP/setP=> t; rewrite !inE; apply: andb_id2l => Dt.
   by rewrite (eqiR Dx Dz Dt) // (eqiR Dy Dz Dt).
 rewrite /partition tiP defD /=.

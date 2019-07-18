@@ -49,3 +49,5 @@ Notation "[ 'rel' x y 'in' A ]" := [rel x y in A & A] (at level 0,
 Notation xrelpre := (fun f (r : rel _) x y => r (f x) (f y)).
 Definition relpre {T rT} (f : T -> rT)  (r : rel rT) :=
   [rel x y | r (f x) (f y)].
+
+Notation "'1' 'inE'" := (ltac:(rewrite inE)) (at level 0) : ssripat_scope.

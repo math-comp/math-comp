@@ -600,7 +600,7 @@ Proof.
 have polyKx q i: q \is a polyOver K -> q`_i * x ^+ i \in (K * <[x ^+ i]>)%VS.
   by move/polyOverP=> Kq; rewrite memv_mul ?Kq ?memv_line.
 move=> Kp szp Dv; have /Fadjoin_poly_eq/eqP := mempx_Fadjoin Kp.
-rewrite {1}Dv {Dv} !(@horner_coef_wide _ n) ?size_poly //.
+rewrite {1}Dv {Dv} /= !(@horner_coef_wide _ n) ?size_poly //.
 move/polyKx in Kp; have /polyKx K_pv := Fadjoin_polyOver K x v.
 rewrite (directv_sum_unique Fadjoin_sum_direct) // => /eqfunP eq_pq.
 apply/polyP=> i; have [leni|?] := leqP n i; last exact: mulIf (eq_pq (Sub i _)).

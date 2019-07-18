@@ -934,7 +934,7 @@ Lemma inj_homo_in : {in D & D', injective f} ->
   {in D & D', {homo f : x y / aR x y >-> rR x y}} ->
   {in D & D', {homo f : x y / aR' x y >-> rR' x y}}.
 Proof.
-move=> fI mf x y xD yD /=; rewrite aR'E rR'E => /andP[neq_xy xy].
+move=> fI mf x y xD yD /= /[rws aR'E rR'E] /andP[neq_xy xy].
 by rewrite mf ?andbT //; apply: contra_neq neq_xy => /fI; apply.
 Qed.
 
@@ -961,10 +961,9 @@ Proof.
 move=> aR_tot mf x y xD yD.
 have [->|neq_xy] := altP (x =P y); first by rewrite ?eqxx ?aR_refl ?rR_refl.
 have [xy|] := (boolP (aR x y)); first by rewrite rRE mf ?orbT// aR'E neq_xy.
-have /orP [->//|] := aR_tot x y.
-rewrite aRE eq_sym (negPf neq_xy) /= => /mf -/(_ yD xD).
-rewrite rR'E => /andP[Nfxfy fyfx] _; apply: contra_neqF Nfxfy => fxfy.
-by apply/rR_anti; rewrite fyfx fxfy.
+have /orP [->//|/[rws aRE eq_sym (negPf neq_xy)] /=] := aR_tot x y.
+move=> /mf -/(_ yD xD) /[rw rR'E] /andP[Nfxfy fyfx] _.
+by apply: contra_neqF Nfxfy => fxfy; apply/rR_anti; rewrite fyfx fxfy.
 Qed.
 
 End InDom.
@@ -978,9 +977,7 @@ Proof. by move=> mf ???; apply: (@homoW_in D D) => // ????; apply: mf. Qed.
 Lemma inj_homo : injective f ->
   {homo f : x y / aR x y >-> rR x y} ->
   {homo f : x y / aR' x y >-> rR' x y}.
-Proof.
-by move=> fI mf ???; apply: (@inj_homo_in D D) => //????; [apply: fI|apply: mf].
-Qed.
+Proof. by move=> /in2W /(@inj_homo_in D D)/= /(_ (in2W _))/apply/in2T. Qed.
 
 Hypothesis aR_anti : antisymmetric aR.
 Hypothesis rR_anti : antisymmetric rR.
@@ -990,7 +987,7 @@ Proof. by move=> mf x y eqf; apply/aR_anti; rewrite -!mf eqf rR_refl. Qed.
 
 Lemma anti_mono : {mono f : x y / aR x y >-> rR x y} ->
                   {mono f : x y / aR' x y >-> rR' x y}.
-Proof. by move=> mf x y; rewrite rR'E aR'E mf inj_eq //; apply: mono_inj. Qed.
+Proof. by move=> mf x y /[rws rR'E aR'E mf inj_eq]//; apply: mono_inj. Qed.
 
 Lemma total_homo_mono : total aR ->
     {homo f : x y / aR' x y >-> rR' x y} ->

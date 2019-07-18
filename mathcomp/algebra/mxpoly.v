@@ -157,7 +157,7 @@ exists (u _ (lshift dp), u _ ((rshift dq) _)).
   apply/bigmax_leqP=> i _.
   have ->: cofactor Ss (s i) j0 = (cofactor S (s i) j0)%:P.
     rewrite rmorphM rmorph_sign -det_map_mx; congr (_ * \det _).
-    by apply/matrixP=> i' j'; rewrite !mxE.
+    by apply/matrixP=> i' j' /!mxE.
   apply: leq_trans (size_mul_leq _ _) (leq_trans _ (valP i)).
   by rewrite size_polyC size_polyXn addnS /= -add1n leq_add2r leq_b1.
 transitivity (\det Ss); last first.
@@ -803,7 +803,7 @@ have tensorM E n1 n2 X Y: finM E (memM (memM E n2 Y) n1 X).
     by case/mxvec_indexP=> i j; rewrite mxvecE mxE; apply: Ea.
   rewrite -[mxvec _]trmxK -trmx_mul mxvec_dotmul -mulmxA trmx_mul !mxE.
   apply: eq_bigr => i _; rewrite Da1 !mxE; congr (_ * _).
-  by apply: eq_bigr => j _; rewrite !mxE.
+  by apply: eq_bigr => j _ /!mxE.
 suffices [m [X [[u [_ Du]] idealM]]]: exists m,
   exists X, let M := memM memR m X in M 1 /\ forall y, M y -> M (q.[w] * y).
 - do [set M := memM _ m X; move: q.[w] => z] in idealM *.
@@ -1053,7 +1053,7 @@ Definition eval_mx (e : seq F) := @map_mx term F (eval e).
 Definition mx_term := @map_mx F term GRing.Const.
 
 Lemma eval_mx_term e m n (A : 'M_(m, n)) : eval_mx e (mx_term A) = A.
-Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+Proof. by apply/matrixP=> i j /!mxE. Qed.
 
 Definition mulmx_term m n p (A : 'M[term]_(m, n)) (B : 'M_(n, p)) :=
   \matrix_(i, k) (\big[Add/0]_j (A i j * B j k))%T.
@@ -1098,7 +1098,7 @@ Qed.
 
 Lemma eval_vec_mx e m n (u : 'rV_(m * n)) :
   eval_mx e (vec_mx u) = vec_mx (eval_mx e u).
-Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+Proof. by apply/matrixP=> i j /!mxE. Qed.
 
 Lemma eval_mxvec e m n (A : 'M_(m, n)) :
   eval_mx e (mxvec A) = mxvec (eval_mx e A).

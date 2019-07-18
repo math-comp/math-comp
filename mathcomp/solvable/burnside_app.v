@@ -381,7 +381,7 @@ move=> x y z t Uxt; rewrite -[n]card_ord.
 pose f (p : col_squares) := (p x, p z); rewrite -(@card_in_image _ _ f).
   rewrite -mulnn -card_prod; apply: eq_card => [] [c d] /=; apply/imageP.
   rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
-  rewrite /= !orbF !andbT; case/norP; rewrite !inE => nxzt nyzt _.
+  rewrite /= !orbF !andbT => /norP[] /!inE nxzt nyzt _.
   exists [ffun i => if pred2 x y i then c else d].
     by rewrite inE !ffunE /= !eqxx orbT (negbTE nxzt) (negbTE nyzt) !eqxx.
   by rewrite {}/f !ffunE /= eqxx (negbTE nxzt).
@@ -1171,7 +1171,7 @@ rewrite (cat_uniq [::x; y; z; t]) in Uxv; case/and3P: Uxv => _ hasxt.
 rewrite /= !inE andbT.
 move/negbTE=> nuv .
 rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
-rewrite /= !andbT orbF; case/norP; rewrite !inE => nxyz nxyt _.
+rewrite /= !andbT orbF => /norP[] /!inE nxyz nxyt _.
 move: hasxt; rewrite /= !orbF; case/norP; rewrite !inE orbA.
 case/norP  => nxyu nztu.
 rewrite orbA; case/norP=> nxyv nztv.
@@ -1229,7 +1229,7 @@ pose ff (p : col_cubes) := (p x, p t); rewrite -(@card_in_image _ _ ff); first l
 have ->:forall n, (n ^ 2)%N= (n*n)%N by move=> n0; rewrite -mulnn .
    rewrite -!card_prod; apply: eq_card => [] [c d]/=; apply/imageP.
 rewrite (cat_uniq [::x; y; z]) in Uxv; case/and3P: Uxv => Uxt hasxt nuv .
-move: hasxt; rewrite /= !orbF; case/norP; rewrite !inE => nxyzt.
+move: hasxt; rewrite /= !orbF => /norP[] /!inE nxyzt.
 case/norP => nxyzu nxyzv.
 exists [ffun i =>  if (i \in [:: x; y; z] ) then c else  d].
   rewrite !inE /= !ffunE !inE //= !eqxx !orbT !eqxx //=.
@@ -1257,7 +1257,7 @@ have ->:forall n, (n ^ 3)%N= (n*n*n)%N.
 rewrite -!card_prod. apply: eq_card => [] [[c d]e ] /=; apply/imageP.
 rewrite (cat_uniq [::x; y; z; t]) in Uxv; case/and3P: Uxv => Uxt hasxt nuv .
 rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
-rewrite /= !orbF !andbT; case/norP; rewrite !inE => nxyz nxyt _.
+rewrite /= !orbF !andbT => /norP[] /!inE nxyz nxyt _.
 move: hasxt; rewrite /= !orbF; case/norP; rewrite !inE orbA.
 case/norP => nxyu nztu.
 rewrite orbA; case/norP=> nxyv nztv.

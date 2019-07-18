@@ -209,7 +209,7 @@ Lemma addnS m n : m + n.+1 = (m + n).+1. Proof. by apply/eqP; elim: m. Qed.
 Lemma addSnnS m n : m.+1 + n = m + n.+1. Proof. by rewrite addnS. Qed.
 
 Lemma addnCA : left_commutative addn.
-Proof. by move=> m n p; elim: m => //= m; rewrite addnS => <-. Qed.
+Proof. by move=> m n p; elim: m => //= m /[rw addnS]<-. Qed.
 
 Lemma addnC : commutative addn.
 Proof. by move=> m n; rewrite -{1}[n]addn0 addnCA addn0. Qed.
@@ -352,7 +352,7 @@ Lemma eqn_leq m n : (m == n) = (m <= n <= m).
 Proof. by elim: m n => [|m IHm] []. Qed.
 
 Lemma anti_leq : antisymmetric leq.
-Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
+Proof. by move=> m n /[rw -eqn_leq] /eqP. Qed.
 
 Lemma neq_ltn m n : (m != n) = (m < n) || (n < m).
 Proof. by rewrite eqn_leq negb_and orbC -!ltnNge. Qed.
@@ -879,11 +879,11 @@ Proof. by move=> n; rewrite mulnSr muln0. Qed.
 
 Lemma mulnC : commutative muln.
 Proof.
-by move=> m n; elim: m => [|m]; rewrite (muln0, mulnS) // mulSn => ->.
+by move=> + n; elim=> [|m]; rewrite (muln0, mulnS) // mulSn => ->.
 Qed.
 
 Lemma mulnDl : left_distributive muln addn.
-Proof. by move=> m1 m2 n; elim: m1 => //= m1 IHm; rewrite -addnA -IHm. Qed.
+Proof. by move=> + m2 n; elim=> //= m1 IHm; rewrite -addnA -IHm. Qed.
 
 Lemma mulnDr : right_distributive muln addn.
 Proof. by move=> m n1 n2; rewrite !(mulnC m) mulnDl. Qed.
@@ -898,7 +898,7 @@ Lemma mulnBr : right_distributive muln subn.
 Proof. by move=> m n p; rewrite !(mulnC m) mulnBl. Qed.
 
 Lemma mulnA : associative muln.
-Proof. by move=> m n p; elim: m => //= m; rewrite mulSn mulnDl => ->. Qed.
+Proof. by move=> + n p; elim=> //= m; rewrite mulSn mulnDl => ->. Qed.
 
 Lemma mulnCA : left_commutative muln.
 Proof. by move=> m n1 n2; rewrite !mulnA (mulnC m). Qed.
@@ -1436,7 +1436,7 @@ Let gtn_neqAge x y : (y < x) = (x != y) && (y <= x).
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 Let anti_leq := anti_leq.
 Let anti_geq : antisymmetric geq.
-Proof. by move=> m n /=; rewrite andbC => /anti_leq. Qed.
+Proof. by move=> m n /= /[rw andbC] /anti_leq. Qed.
 Let leq_total := leq_total.
 
 Lemma ltnW_homo : {homo f : m n / m < n} -> {homo f : m n / m <= n}.

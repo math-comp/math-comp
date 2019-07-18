@@ -160,7 +160,7 @@ pose A3 := [set x : {perm T} | #[x] == 3]; suffices oA3: #|A :&: A3| = 8.
     rewrite inE pHallE oA p_part -natTrecE /= => /andP[sPA /eqP oP].
     apply/eqP; rewrite eqEcard -(leq_add2l 8) -{1}oA3 cardsID oA oP.
     rewrite andbT subsetD sPA; apply/exists_inP=> -[x] /= Px.
-    by rewrite inE => /eqP ox; have:= order_dvdG Px; rewrite oP ox.
+    by move=> /1inE /eqP ox; have:= order_dvdG Px; rewrite oP ox.
   have [/= P sylP] := Sylow_exists 2 [group of A].
   rewrite -(([set P] =P 'Syl_2(A)) _) ?cards1 // eqEsubset sub1set inE sylP.
   by apply/subsetP=> Q sylQ; rewrite inE -val_eqE /= !sQ2 // inE.

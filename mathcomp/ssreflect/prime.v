@@ -189,7 +189,7 @@ have leq_pd_ok m p q pd: q <= p -> pd_ok p m pd -> pd_ok q m pd.
   by case/andP=> /(leq_trans _)->.
 have apd_ok m e q p pd: lb_dvd p p || (e == 0) -> q < p ->
      pd_ok p m pd -> pd_ok q (p ^ e * m) (p ^? e :: pd).
-- case: e => [|e]; rewrite orbC /= => pr_p ltqp.
+- case: e => [|e] /[rw orbC] /= pr_p ltqp.
     by rewrite mul1n; apply: leq_pd_ok; apply: ltnW.
   by rewrite /pd_ok /pd_ord /pf_ok /= pr_p ltqp => [[<- -> ->]].
 case=> // n _; rewrite /prime_decomp.
@@ -227,7 +227,7 @@ case def_a: a => [|a'] /= in le_a_n *; rewrite !natTrecE -/p {}eq_bc_0.
     by split; rewrite /pd_ord /pf_ok /= ?muln1 ?pr_p ?leqnn.
   apply: apd_ok; rewrite // /pd_ok /= /pfactor expn1 muln1 /pd_ord /= ltpm.
   rewrite /pf_ok !andbT /=; split=> //; apply: contra leppm.
-  case/hasP=> r /=; rewrite mem_index_iota => /andP[lt1r ltrm] dvrm; apply/hasP.
+  case/hasP=> r /= /[rw mem_index_iota] /andP[lt1r ltrm] dvrm; apply/hasP.
   have [ltrp | lepr] := ltnP r p.
     by exists r; rewrite // mem_index_iota lt1r.
   case/dvdnP: dvrm => q def_q; exists q; last by rewrite def_q /= dvdn_mulr.
@@ -277,13 +277,13 @@ have next_pm: lb_dvd p.+2 m.
     by rewrite /= def_q dvdn_mull // dvdn2 /= odd_double.
   move/(congr1 (dvdn p)): def_m; rewrite -mulnn -!mul2n mulnA -mulnDl.
   rewrite dvdn_mull // dvdn_addr; last by rewrite def_q dvdn_mull.
-  case/dvdnP=> r; rewrite mul2n => def_r; move: ltdp (congr1 odd def_r).
+  case/dvdnP=> r /[rw mul2n] def_r; move: ltdp (congr1 odd def_r).
   rewrite odd_double -ltn_double {1}def_r -mul2n ltn_pmul2r //.
   by case: r def_r => [|[|[]]] //; rewrite def_d // mul1n /= odd_double.
 apply: apd_ok => //; case: a' def_a le_a_n => [|a'] def_a => [_ | lta] /=.
   rewrite /pd_ok /= /pfactor expn1 muln1 /pd_ord /= ltpm /pf_ok !andbT /=.
   split=> //; apply: contra next_pm.
-  case/hasP=> q; rewrite mem_index_iota => /andP[lt1q ltqm] dvqm; apply/hasP.
+  case/hasP=> q /[rw mem_index_iota] /andP[lt1q ltqm] dvqm; apply/hasP.
   have [ltqp | lepq] := ltnP q p.+2.
     by exists q; rewrite // mem_index_iota lt1q.
   case/dvdnP: dvqm => r def_r; exists r; last by rewrite def_r /= dvdn_mulr.
@@ -482,7 +482,7 @@ Proof. by rewrite -pi_max_pdiv mem_primes => /andP[]. Qed.
 
 Lemma max_pdiv_dvd n : max_pdiv n %| n.
 Proof.
-by case: n (pi_max_pdiv n) => [|[|n]] //; rewrite mem_primes => /andP[].
+by case: n (pi_max_pdiv n) => [|[|n]] // /[rw mem_primes] /andP[].
 Qed.
 
 Lemma pdiv_leq n : 0 < n -> pdiv n <= n.
@@ -505,8 +505,7 @@ rewrite /pdiv; apply: leq_trans (pdiv_leq (ltnW lt1d)).
 have: pdiv d \in primes m.
   by rewrite mem_primes mpos pdiv_prime // (dvdn_trans (pdiv_dvd d)).
 case: (primes m) (sorted_primes m) => //= p pm ord_pm.
-rewrite inE => /predU1P[-> //|].
-by move/(allP (order_path_min ltn_trans ord_pm)); apply: ltnW.
+by move=> /1inE /predU1P[->|/(allP (order_path_min ltn_trans ord_pm)) /ltnW].
 Qed.
 
 Lemma max_pdiv_max n p : p \in \pi(n) -> p <= max_pdiv n.

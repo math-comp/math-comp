@@ -117,7 +117,7 @@ have [w Gw Dg] := imsetP g1Gg; pose J2 (v : gT) xy := (xy.1 ^ v, xy.2 ^ v)%g.
 have J2inj: injective (J2 w).
   by apply: can_inj (J2 w^-1)%g _ => [[x y]]; rewrite /J2 /= !conjgK.
 rewrite -(card_imset _ J2inj) subset_leq_card //; apply/subsetP.
-move=> _ /imsetP[[x y] /setIdP[/andP[/= x1Gx y1Gy] Dxy1] ->]; rewrite !inE /=.
+move=> _ /imsetP[[x y] /setIdP[/andP[/= x1Gx y1Gy] Dxy1] ->] /!inE.
 rewrite !(class_sym _ (_ ^ _)) !classGidl // class_sym x1Gx class_sym y1Gy.
 by rewrite -conjMg (eqP Dxy1) /= -Dg.
 Qed.
@@ -395,7 +395,7 @@ apply: abelian_sol; have: (size (primes #|g ^: G|) <= 1)%N.
   rewrite -index_cent1 uniq_leq_size // => [/= | q].
     rewrite primes_uniq -p'natEpi ?(pnat_dvd _ p'GP) ?indexgS //.
     by rewrite subsetI sPG sub_cent1.
-  by rewrite inE => /predU1P[-> // |]; apply: pi_of_dvd; rewrite ?dvdn_indexg.
+  by move=> /1inE/predU1P[-> // |]; apply: pi_of_dvd; rewrite ?dvdn_indexg.
 rewrite leqNgt; apply: contraR => /primes_class_simple_gt1-> //.
 by rewrite !inE classG_eq1 nt_g mem_classes // (subsetP sPG).
 Qed.

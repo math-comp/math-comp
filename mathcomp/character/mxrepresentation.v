@@ -4580,7 +4580,7 @@ rewrite (reindex (fun j => irr_comp sG (rG j))) /=.
   by rewrite inE -lin_j -irr_degreeE irr_degree_abelian.
 pose sGlin := {i | i \in linear_irr sG}.
 have sG'k (i : sGlin) : G^`(1)%g \subset rker (irr_repr (val i)).
-  by case: i => i /=; rewrite !inE => lin; rewrite rker_linear //=; apply/eqP.
+  by case: i => i /= /!inE lin; rewrite rker_linear //=; apply/eqP.
 pose h' u := irr_comp sGq (quo_repr (sG'k u) nG'G).
 have irrGq u: mx_irreducible (quo_repr (sG'k u) nG'G).
   by apply/quo_mx_irr; apply: socle_irr.
@@ -5431,7 +5431,7 @@ Variable m : nat.
 Lemma val_gen_row W (i : 'I_m) : val_gen (row i W) = row i (val_gen W).
 Proof.
 rewrite val_gen_rV rowK; congr (mxvec _ *m _).
-by apply/matrixP=> j k; rewrite !mxE.
+by apply/matrixP=> j k /!mxE.
 Qed.
 
 Lemma in_gen_row W (i : 'I_m) : in_gen (row i W) = row i (in_gen W).
@@ -5571,7 +5571,7 @@ Qed.
 Lemma rstabs_in_gen m (U : 'M_(m, n)) :
   rstabs rG U \subset rstabs rGA (in_gen U).
 Proof.
-apply/subsetP=> x; rewrite !inE => /andP[Gx nUx].
+apply/subsetP=> x /!inE /andP[Gx nUx].
 by rewrite -in_genJ Gx // submx_in_gen.
 Qed.
 
@@ -5685,8 +5685,8 @@ elim: t => //=.
 - by move=> x _; rewrite eval_mx_term.
 - by move=> x _; rewrite eval_mx_term.
 - move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite -{}IH1 // -{}IH2 //.
-  by apply/rowP=> k; rewrite !mxE.
-- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k; rewrite !mxE.
+  by apply/rowP=> k /!mxE.
+- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k /!mxE.
 - move=> t1 IH1 n1 rt1; rewrite eval_mulmx eval_mx_term mul_scalar_mx.
   by rewrite scaler_nat {}IH1 //; elim: n1 => //= n1 IHn1; rewrite !mulrS IHn1.
 - by move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite eval_mulT IH1 ?IH2.

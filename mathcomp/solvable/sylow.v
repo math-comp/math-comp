@@ -97,9 +97,9 @@ have actS: [acts G, on S | 'JG].
   apply/subsetP=> x Gx; rewrite 3!inE; apply/subsetP=> P; rewrite 3!inE.
   exact: max_pgroupJ.
 have S_pG P: P \in S -> P \subset G /\ p.-group P.
-  by rewrite inE => /maxgroupp/andP[].
+  by move=> /1inE /maxgroupp/andP[].
 have SmaxN P Q: Q \in S -> Q \subset 'N(P) -> maxp 'N_G(P) Q.
-  rewrite inE => /maxgroupP[/andP[sQG pQ] maxQ] nPQ.
+  move=> /1inE /maxgroupP[/andP[sQG pQ] maxQ] nPQ.
   apply/maxgroupP; rewrite /psubgroup subsetI sQG nPQ.
   by split=> // R; rewrite subsetI -andbA andbCA => /andP[_]; apply: maxQ.
 have nrmG P: P \subset G -> P <| 'N_G(P).
@@ -126,7 +126,7 @@ have [P S_P]: exists P, P \in S.
 have trS: [transitive G, on S | 'JG].
   apply/imsetP; exists P => //; apply/eqP.
   rewrite eqEsubset andbC acts_sub_orbit // S_P; apply/subsetP=> Q S_Q.
-  have:= S_P; rewrite inE => /maxgroupP[/andP[_ pP]].
+  have /1inE /maxgroupP[/andP[_ pP]] := S_P.
   have [-> max1 | ntP _] := eqVneq P 1%G.
     move/andP/max1: (S_pG _ S_Q) => Q1.
     by rewrite (group_inj (Q1 (sub1G Q))) orbit_refl.
@@ -287,7 +287,7 @@ Proof.
 set T := [set P : {group gT} | Sylow G P].
 rewrite -{2}(@Sylow_transversal_gen T G) => [|P | q _].
 - by congr <<_>>; apply: eq_bigl => P; rewrite inE.
-- by rewrite inE => /and3P[].
+- by move=> /1inE /and3P[].
 by case: (Sylow_exists q G) => P sylP; exists P; rewrite // inE (p_Sylow sylP).
 Qed.
 

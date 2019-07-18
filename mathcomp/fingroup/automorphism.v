@@ -76,7 +76,7 @@ Lemma Aut_group_set : group_set (Aut G).
 Proof.
 apply/group_setP; split=> [|a b].
   by rewrite inE perm_on1; apply/morphicP=> ? *; rewrite !permE.
-rewrite !inE => /andP[Ga aM] /andP[Gb bM]; rewrite perm_onM //=.
+move=> /!inE /andP[Ga aM] /andP[Gb bM]; rewrite perm_onM //=.
 apply/morphicP=> x y Gx Gy; rewrite !permM (morphicP aM) //.
 by rewrite (morphicP bM) ?perm_closed.
 Qed.
@@ -95,7 +95,7 @@ Lemma ker_autm : 'ker f = 1. Proof. by move/trivgP: injm_autm. Qed.
 Lemma im_autm : f @* G = G.
 Proof.
 apply/setP=> x; rewrite morphimEdom (can_imset_pre _ (permK a)) inE.
-by have:= AutGa; rewrite inE => /andP[/perm_closed <-]; rewrite permKV.
+by have /1inE/andP[/perm_closed <-] := AutGa; rewrite permKV.
 Qed.
 
 Lemma Aut_closed x : x \in G -> a x \in G.

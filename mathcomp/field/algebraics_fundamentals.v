@@ -243,7 +243,7 @@ pose B := [set j in mask m (enum I)]; have{Dq} Dq: q ^ FtoL = p_ B.
   congr (_ %= _): Dq; apply: perm_big => //.
   by rewrite uniq_perm ?mask_uniq ?enum_uniq // => j; rewrite mem_enum inE.
 rewrite -!(size_map_poly FtoL) Dq -DpI (minI B) // -?Dq ?FpxF //.
-by apply/subsetP=> j; rewrite inE => /mem_mask; rewrite mem_enum.
+by apply/subsetP=> j /1inE /mem_mask; rewrite mem_enum.
 Qed.
 
 Lemma alg_integral (F : fieldType) (L : fieldExtType F) :
