@@ -150,7 +150,7 @@ have oA: #|A| = 12 by apply: double_inj; rewrite -mul2n card_Alt oT.
 suffices [p]: exists p, [/\ prime p, 1 < #|A|`_p < #|A| & #|'Syl_p(A)| == 1%N].
   case=> p_pr pA_int; rewrite /A; case/normal_sylowP=> P; case/pHallP.
   rewrite /= -/A => sPA pP nPA; apply/simpleP=> [] [_]; rewrite -pP in pA_int.
-  by case/(_ P)=> // defP; rewrite defP oA ?cards1 in pA_int.
+  by case/(_ P)=> // /[->]; rewrite oA ?cards1 in pA_int.
 have: #|'Syl_3(A)| \in filter [pred d | d %% 3 == 1%N] (divisors 12).
   by rewrite mem_filter -dvdn_divisors //= -oA card_Syl_dvd ?card_Syl_mod.
 rewrite /= oA mem_seq2 orbC.
@@ -160,7 +160,7 @@ pose A3 := [set x : {perm T} | #[x] == 3]; suffices oA3: #|A :&: A3| = 8.
     rewrite inE pHallE oA p_part -natTrecE /= => /andP[sPA /eqP oP].
     apply/eqP; rewrite eqEcard -(leq_add2l 8) -{1}oA3 cardsID oA oP.
     rewrite andbT subsetD sPA; apply/exists_inP=> -[x] /= Px.
-    by move=> /1inE /eqP ox; have:= order_dvdG Px; rewrite oP ox.
+    by move=> /[1inE] /eqP ox; have:= order_dvdG Px; rewrite oP ox.
   have [/= P sylP] := Sylow_exists 2 [group of A].
   rewrite -(([set P] =P 'Syl_2(A)) _) ?cards1 // eqEsubset sub1set inE sylP.
   by apply/subsetP=> Q sylQ; rewrite inE -val_eqE /= !sQ2 // inE.
@@ -336,9 +336,9 @@ have HP0 (t : {perm T}): #|[set x | t x != x]| = 0 -> rfd t = t :> bool.
 elim: #|_| {-2}p (leqnn #|[set x | p x != x]|) => {p}[|n Hrec] p Hp Hpx.
   by apply: HP0; move: Hp; case: card.
 case Ex: (pred0b (mem [set x | p x != x])); first by apply: HP0; move/eqnP: Ex.
-case/pred0Pn: Ex => x1; rewrite /= inE => Hx1.
-have nx1x: x1 != x by apply/eqP => HH; rewrite HH Hpx eqxx in Hx1.
-have npxx1: p x != x1 by apply/eqP => HH; rewrite -HH !Hpx eqxx in Hx1.
+case/pred0Pn: Ex => x1 /= /[1inE] Hx1.
+have nx1x: x1 != x by apply/eqP => /[->]; rewrite Hpx eqxx in Hx1.
+have npxx1: p x != x1 by apply/eqP => /[->]; rewrite !Hpx eqxx in nx1x.
 have npx1x: p x1 != x.
   by apply/eqP; rewrite -Hpx; move/perm_inj => HH; case/eqP: nx1x.
 pose p1 := p * tperm x1 (p x1).
@@ -355,7 +355,7 @@ have Hcp1: #|[set x | p1 x != x]| <= n.
     - rewrite eq_sym HH1 andbb; apply/eqP=> dx1.
       by rewrite dx1 HH1 dx1 eqxx in HH2.
     - by rewrite (perm_inj HH1) eqxx in HH2.
-    by move->; rewrite andbT; apply/eqP => HH3; rewrite HH3 in HH2.
+    by move->; rewrite andbT; apply/eqP => /[->].
   apply: (leq_trans (subset_leq_card F3)).
   by move: Hp; rewrite (cardD1 x1) inE Hx1.
 have ->: p = p1 * tperm x1 (p x1) by rewrite -mulgA tperm2 mulg1.

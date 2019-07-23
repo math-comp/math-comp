@@ -638,7 +638,7 @@ Lemma rstab_abelem m (A : 'M_(m, n)) : rstab rG A = 'C_G(rV_E @* rowg A).
 Proof.
 apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
 apply/eqP/centP=> cAx => [_ /morphimP[u _ Au ->]|].
-  move: Au => /1inE /submxP[u' ->] {u}.
+  move: Au => /[1inE] /submxP[u' ->] {u}.
   by apply/esym/commgP/conjg_fixP; rewrite -rVabelemJ -?mulmxA ?cAx.
 apply/row_matrixP=> i; apply: rVabelem_inj.
 by rewrite row_mul rVabelemJ // /conjg -cAx ?mulKg ?mem_morphim // inE row_sub.
@@ -646,7 +646,7 @@ Qed.
 
 Lemma rstabs_abelem m (A : 'M_(m, n)) : rstabs rG A = 'N_G(rV_E @* rowg A).
 Proof.
-apply/setP=> x /!inE; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
 by rewrite -rowgS -rVabelemS abelem_rowgJ.
 Qed.
 
@@ -699,7 +699,7 @@ Lemma rfix_abelem (H : {set gT}) :
 Proof.
 move/subsetP=> sHG; apply/eqmxP/andP; split.
   rewrite -rowgS rowg_mxK -sub_rVabelem_im // subsetI sub_rVabelem /=.
-  apply/centsP=> y /morphimP[v _] /1inE cGv ->{y} x Gx.
+  apply/centsP=> y /morphimP[v _] /[1inE] cGv ->{y} x Gx.
   by apply/commgP/conjg_fixP; rewrite /= -rVabelemJ ?sHG ?(rfix_mxP H _).
 rewrite genmxE; apply/rfix_mxP=> x Hx; apply/row_matrixP=> i.
 rewrite row_mul rowK; case/morphimP: (enum_valP i) => z Ez /setIP[_ cHz] ->.

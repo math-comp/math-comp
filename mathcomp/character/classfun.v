@@ -1058,7 +1058,7 @@ pose Z := '[Y, V] / '[V] *: V; exists (X + Z).
   rewrite /Z -{4}(addKr U V) scalerDr scalerN addrA addrC span_cons.
   by rewrite memv_add ?memvB ?memvZ ?memv_line.
 exists (Y - Z); first by rewrite addrCA !addrA addrK addrC.
-apply/orthoPl=> psi /!inE /predU1P[-> | Spsi]; last first.
+apply/orthoPl=> psi /[!inE] /predU1P[-> | Spsi]; last first.
   by rewrite cfdotBl cfdotZl (orthoPl oVS _ Spsi) mulr0 subr0 (orthoPl oYS).
 rewrite cfdotBl !cfdotDr (span_orthogonal oYS) // ?memv_span ?mem_head //.
 rewrite !cfdotZl (span_orthogonal oVS _ S_U) ?mulr0 ?memv_span ?mem_head //.
@@ -1100,7 +1100,7 @@ have [opS | not_opS] := allP; last first.
 rewrite (contra (opS _)) /= ?cfnorm_eq0 //.
 apply: (iffP IH) => [] [uniqS oSS]; last first.
   by split=> //; apply: sub_in2 oSS => psi Spsi; apply: mem_behead.
-split=> // psi xi /!inE /predU1P[-> // | Spsi].
+split=> // psi xi /[!inE] /predU1P[-> // | Spsi].
   by case/predU1P=> [-> | /opS] /eqP.
 case/predU1P=> [-> _ | Sxi /oSS-> //].
 by apply/eqP; rewrite cfdotC conjC_eq0 [_ == 0]opS.
@@ -1141,7 +1141,7 @@ have /eqP: '[S`_i, 0]_G = 0 := cfdot0r _.
 rewrite -{2}aS0 raddf_sum /= (bigD1 i) //= big1 => [|j neq_ji]; last 1 first.
   by rewrite cfdotZr oSS ?mulr0 ?mem_nth // eq_sym nth_uniq.
 rewrite addr0 cfdotZr mulf_eq0 conjC_eq0 cfnorm_eq0.
-by case/pred2P=> // Si0; rewrite -Si0 S_i in notS0.
+by case/pred2P=> // /[->]; rewrite S_i in notS0.
 Qed.
 
 Lemma filter_pairwise_orthogonal S p :

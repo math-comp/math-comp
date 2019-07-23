@@ -853,7 +853,7 @@ exists c; split=> // e Fe eq_ce i Pi.
 set r := index_enum _ in defG eq_ce.
 have: i \in r by rewrite -[r]enumT mem_enum.
 elim: r G defG eq_ce => // j r IHr G; rewrite !big_cons inE.
-case Pj: (P j); last by case: eqP (IHr G) => // eq_ij; rewrite eq_ij Pj in Pi.
+case Pj: (P j); last by case: eqP (IHr G) => // /[->]; rewrite Pj in Pi.
 case/dprodP=> [[K H defK defH] _ _]; rewrite defK defH => tiFjH eq_ce.
 suffices{i Pi IHr} eq_cej: c j = e j.
   case/predU1P=> [-> //|]; apply: IHr defH _.

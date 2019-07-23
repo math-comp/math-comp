@@ -660,7 +660,7 @@ Proof. exact: morphim_cents. Qed.
 
 Lemma morphpre_norm R : f @*^-1 'N(R) \subset 'N(f @*^-1 R).
 Proof.
-apply/subsetP=> x /!inE /andP[Dx Nfx].
+apply/subsetP=> x /[!inE] /andP[Dx Nfx].
 by rewrite -morphpreJ ?morphpreS.
 Qed.
 

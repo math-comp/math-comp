@@ -675,7 +675,8 @@ move=> eqcAB; case: (subsetP A B) (subset_eqP A B) => //= sAB.
 case: (subsetP B A) => [//|[]] x Bx; apply/idPn => Ax.
 case/idP: (ltnn #|A|); rewrite {2}eqcAB (cardD1 x B) Bx /=.
 apply: subset_leq_card; apply/subsetP=> y Ay; rewrite inE /= andbC.
-by rewrite sAB //; apply/eqP => eqyx; rewrite -eqyx Ay in Ax.
+by rewrite sAB //; apply/eqP; move=> /[->]; rewrite Ay in Ax.
+(* BUG: apply/eqP => /[->] does not work *)
 Qed.
 
 Lemma subset_leqif_card A B : A \subset B -> #|A| <= #|B| ?= iff (B \subset A).

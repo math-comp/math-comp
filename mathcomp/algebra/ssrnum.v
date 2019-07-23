@@ -1683,13 +1683,13 @@ move=> xR /(real_leVge xR); have [le_xy _|Nle_xy /= le_yx] := boolP (_ <= _).
   by rewrite ler0_norm ?ger0_norm ?subr_cp0 ?opprB //; constructor.
 have [lt_yx|] := boolP (_ < _).
   by rewrite ger0_norm ?ler0_norm ?subr_cp0 ?opprB //; constructor.
-by rewrite ltr_def le_yx andbT negbK=> /eqP exy; rewrite exy lerr in Nle_xy.
+by rewrite ltr_def le_yx andbT negbK=> /eqP/[->]; rewrite lerr in Nle_xy.
 Qed.
 
 Lemma real_ltrP x y :
     x \is real -> y \is real ->
   ltr_xor_ge x y `|x - y| `|y - x| (y <= x) (x < y).
-Proof. by move=> xR yR; case: real_lerP=> //; constructor. Qed.
+Proof. by move=> xR yR; case: real_lerP => //; constructor. Qed.
 
 Lemma real_ltrNge : {in real &, forall x y, (x < y) = ~~ (y <= x)}.
 Proof. by move=> x y xR yR /=; case: real_lerP. Qed.
@@ -4392,7 +4392,7 @@ exists r`_0 => [|z n_gt0 /(mem_rP z n_gt0) r_z].
   have sz_r: size r = n by apply: succn_inj; rewrite -sz_p Dp size_prod_XsubC.
   case: posnP => [n0 | n_gt0]; first by rewrite nth_default // sz_r n0.
   by apply/mem_rP=> //; rewrite mem_nth ?sz_r.
-case: {Dp mem_rP}r r_z r_arg => // y r1 /1inE /predU1P[-> _|r1z].
+case: {Dp mem_rP}r r_z r_arg => // y r1 /[1inE] /predU1P[-> _|r1z].
   by apply/implyP=> ->; rewrite lerr.
 by move/(order_path_min argCle_trans)/allP->.
 Qed.

@@ -124,7 +124,7 @@ Proof. by case: d => // d; rewrite -{1}[d.+1]muln1 mulKn. Qed.
 Lemma divnMl p m d : p > 0 -> p * m %/ (p * d) = m %/ d.
 Proof.
 move=> p_gt0; case: (posnP d) => [-> | d_gt0]; first by rewrite muln0.
-rewrite {2}/divn; case: edivnP => /[rw d_gt0] /= q r ->{m} lt_rd.
+rewrite {2}/divn; case: edivnP => /[1 d_gt0] /= q r ->{m} lt_rd.
 rewrite mulnDr mulnCA divnMDl; last by rewrite muln_gt0 p_gt0.
 by rewrite addnC divn_small // ltn_pmul2l.
 Qed.
@@ -346,14 +346,14 @@ Proof. by rewrite /dvdn modn2; case (odd n). Qed.
 
 Lemma dvdn_odd m n : m %| n -> odd n -> odd m.
 Proof.
-by move=> m_dv_n; apply: contraTT => /[rw -!dvdn2] /dvdn_trans->.
+by move=> m_dv_n; apply: contraTT => /[-!dvdn2] /dvdn_trans->.
 Qed.
 
 Lemma divnK d m : d %| m -> m %/ d * d = m.
 Proof. by rewrite dvdn_eq; move/eqP. Qed.
 
 Lemma leq_divLR d m n : d %| m -> (m %/ d <= n) = (m <= n * d).
-Proof. by case: d m => [|d] [|m] ///divnK=> {2}<- /[rw leq_pmul2r]. Qed.
+Proof. by case: d m => [|d] [|m] ///divnK=> {2}<- /[1 leq_pmul2r]. Qed.
 
 Lemma ltn_divRL d m n : d %| m -> (n < m %/ d) = (n * d < m).
 Proof. by move=> dv_d_m; rewrite !ltnNge leq_divLR. Qed.

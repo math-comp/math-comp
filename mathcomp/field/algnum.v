@@ -261,7 +261,7 @@ Proof.
 have s_s (i : 'I_m): s`_i \in <<s>>%VS by rewrite memv_span ?memt_nth.
 have s_Zs a: \sum_(i < m) s`_i *~ a i \in <<s>>%VS.
   by rewrite memv_suml // => i _; rewrite -scaler_int memvZ.
-case s_v: (v \in <<s>>%VS); last by right=> [[a Dv]]; rewrite Dv s_Zs in s_v.
+case s_v: (v \in <<s>>%VS); last by right=> [[a /[->]]]; rewrite s_Zs in s_v.
 pose IzT := {: 'I_m * 'I_(\dim <<s>>)}; pose Iz := 'I_#|IzT|.
 pose b := vbasis <<s>>.
 pose z_s := [seq coord b ij.2 (tnth s ij.1) | ij : IzT].
@@ -277,7 +277,7 @@ have Qz_Zs a: inQzs (\sum_(i < m) s`_i *~ a i).
   rewrite (can2_eq (@enum_rankK _) (@enum_valK _)) ffunE -scaler_int /val21.
   case Dij: (enum_val ij) => [i j1]; rewrite xpair_eqE eqxx /= eq_sym -mulrb.
   by rewrite linearZ rmorphMn rmorph_int mulrnAl; case: eqP => // ->.
-case Qz_v: (inQzs v); last by right=> [[a Dv]]; rewrite Dv Qz_Zs in Qz_v.
+case Qz_v: (inQzs v); last by right=> [[a /[->]]]; rewrite Qz_Zs in Qz_v.
 have [Qz [QzC [z1s Dz_s _]]] := num_field_exists z_s.
 have sz_z1s: size z1s = #|IzT| by rewrite -(size_map QzC) Dz_s size_map cardE.
 have xv j: {x | coord b j v = QzC x}.

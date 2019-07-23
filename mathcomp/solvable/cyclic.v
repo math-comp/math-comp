@@ -429,7 +429,7 @@ Lemma cardSg_cyclic G H K :
   cyclic G -> H \subset G -> K \subset G -> (#|H| %| #|K|) = (H \subset K).
 Proof.
 move=> cycG sHG sKG; apply/idP/idP; last exact: cardSg.
-case/cyclicP: (cyclicS sKG cycG) => x defK; rewrite {K}defK in sKG *.
+case/cyclicP: (cyclicS sKG cycG) => x /[->].
 case/dvdnP=> k ox; suffices ->: H :=: <[x ^+ k]> by apply: cycleX.
 apply/eqP; rewrite (eq_subG_cyclic cycG) ?(subset_trans (cycleX _ _)) //.
 rewrite -orderE orderXdiv orderE ox ?dvdn_mulr ?mulKn //.

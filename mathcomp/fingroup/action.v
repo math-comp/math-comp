@@ -326,11 +326,11 @@ Proof. exact: mem_imset. Qed.
 Lemma afixP A x : reflect (forall a, a \in A -> to x a = x) (x \in 'Fix_to(A)).
 Proof.
 by rewrite inE; apply: (iffP subsetP) => [+ a|+ a Aa]
-   => [/apply/1inE/eqP|/1inE->].
+   => [/apply/[1inE]/eqP|/[1inE]->].
 Qed.
 
 Lemma afixS A B : A \subset B -> 'Fix_to(B) \subset 'Fix_to(A).
-Proof. by move=> sAB; apply/subsetP=> u /!inE /(subset_trans sAB). Qed.
+Proof. by move=> sAB; apply/subsetP=> u /[!inE] /(subset_trans sAB). Qed.
 
 Lemma afixU A B : 'Fix_to(A :|: B) = 'Fix_to(A) :&: 'Fix_to(B).
 Proof. by apply/setP=> x; rewrite !inE subUset. Qed.
@@ -346,13 +346,13 @@ Proof. by move=> a /setIP[]. Qed.
 
 Lemma astab_act S a x : a \in 'C(S | to) -> x \in S -> to x a = x.
 Proof.
-move=> /!inE /andP[_ cSa] Sx; apply/eqP.
+move=> /[!inE] /andP[_ cSa] Sx; apply/eqP.
 by have:= subsetP cSa x Sx; rewrite inE.
 Qed.
 
 Lemma astabS S1 S2 : S1 \subset S2 -> 'C(S2 | to) \subset 'C(S1 | to).
 Proof.
-move=> sS12; apply/subsetP=> x /!inE /andP[->].
+move=> sS12; apply/subsetP=> x /[!inE] /andP[->].
 exact: subset_trans.
 Qed.
 
@@ -420,7 +420,7 @@ Proof.
 move=> sAD; apply/subsetP/subsetP=> [sAC x xS | sSF a aA].
   by apply/afixP=> a aA; apply: astab_act (sAC _ aA) xS.
 rewrite !inE (subsetP sAD _ aA); apply/subsetP=> x xS.
-by move/afixP/(_ _ aA): (sSF _ xS) => /1inE ->.
+by move/afixP/(_ _ aA): (sSF _ xS) => /[1inE] ->.
 Qed.
 
 Section ActsSetop.
@@ -1273,18 +1273,18 @@ Lemma astabs_subact S : 'N(S | subaction) = subact_dom :&: 'N(val @: S | to).
 Proof.
 apply/setP=> a; rewrite inE in_setI; apply: andb_id2l => sDa.
 have [Da _] := setIP sDa; rewrite !inE Da.
-apply/subsetP/subsetP=> [nSa _ /imsetP[x Sx ->] | nSa x Sx] /!inE.
-  by have /1inE /(mem_imset val) := nSa x Sx; rewrite val_subact sDa.
-have /1inE /imsetP[y Sy def_y] := nSa _ (mem_imset val Sx).
+apply/subsetP/subsetP=> [nSa _ /imsetP[x Sx ->] | nSa x Sx] /[!inE].
+  by have /[1inE] /(mem_imset val) := nSa x Sx; rewrite val_subact sDa.
+have /[1inE] /imsetP[y Sy def_y] := nSa _ (mem_imset val Sx).
 by rewrite ((_ a =P y) _) // -val_eqE val_subact sDa def_y.
 Qed.
 
 Lemma afix_subact A :
   A \subset subact_dom -> 'Fix_subaction(A) = val @^-1: 'Fix_to(A).
 Proof.
-move/subsetP=> sAD; apply/setP=> u /!inE.
+move/subsetP=> sAD; apply/setP=> u /[!inE].
 rewrite !(sameP setIidPl eqP); congr (_ == A).
-apply/setP=> a /!inE; apply: andb_id2l => Aa.
+apply/setP=> a /[!inE]; apply: andb_id2l => Aa.
 by rewrite -val_eqE val_subact sAD.
 Qed.
 
@@ -2163,7 +2163,7 @@ move=> sHR; apply/setP=> a; apply/idP/idP=> nHa; have Da := astabs_dom nHa.
   have /rcosetsP[y Ny defHy]: to^~ a @: H \in rcosets H 'N(H).
     by rewrite (astabs_act _ nHa); apply/rcosetsP; exists 1; rewrite ?mulg1.
   by rewrite (rcoset_eqP (_ : 1 \in H :* y)) -defHy -1?(gact1 Da) mem_setact.
-rewrite !inE Da; apply/subsetP=> Hx /1inE /rcosetsP[x Nx ->{Hx}].
+rewrite !inE Da; apply/subsetP=> Hx /[1inE] /rcosetsP[x Nx ->{Hx}].
 apply/imsetP; exists (to x a).
   case Rx: (x \in R); last by rewrite gact_out ?Rx.
   rewrite inE; apply/subsetP=> _ /imsetP[y Hy ->].

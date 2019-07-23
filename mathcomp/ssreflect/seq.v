@@ -988,7 +988,7 @@ Lemma mem_seq4 x y z t u : (x \in [:: y; z; t; u]) = xpred4 y z t u x.
 Proof. by rewrite !inE. Qed.
 
 Lemma mem_cat x s1 s2 : (x \in s1 ++ s2) = (x \in s1) || (x \in s2).
-Proof. by elim: s1 => //= y s1 IHs /1inE; rewrite -orbA -IHs. Qed.
+Proof. by elim: s1 => //= y s1 IHs /[1inE]; rewrite -orbA -IHs. Qed.
 
 Lemma mem_rcons s y : rcons s y =i y :: s.
 Proof. by move=> x; rewrite -cats1 /= mem_cat mem_seq1 orbC in_cons. Qed.
@@ -1073,13 +1073,13 @@ Variables a1 a2 : pred T.
 
 Lemma eq_in_filter s : {in s, a1 =1 a2} -> filter a1 s = filter a2 s.
 Proof.
-elim: s => //= x s IHs /dup eq_a -> /[rw? (mem_head, IHs)]// y s_y.
+elim: s => //= x s IHs /dup eq_a -> /[? (mem_head, IHs)]// y s_y.
 by apply: eq_a; apply: mem_behead.
 Qed.
 
 Lemma eq_in_find s : {in s, a1 =1 a2} -> find a1 s = find a2 s.
 Proof.
-elim: s => //= x s + /dup eq_a12 -> /[rw? mem_head] // => -> // y s'y.
+elim: s => //= x s + /dup eq_a12 -> /[? mem_head] // => -> // y s'y.
 by rewrite eq_a12 // mem_behead.
 Qed.
 
@@ -1535,7 +1535,7 @@ Proof. by move/perm_mem/eq_all_r. Qed.
 Lemma perm_small_eq s1 s2 : size s2 <= 1 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
 move=> s2_le1 eqs12; move/perm_size: eqs12 s2_le1 (perm_mem eqs12).
-by case: s2 s1 => [|x []] // [|y []] // _ _ /(_ x) /!inE /[rw eqxx] /eqP->.
+by case: s2 s1 => [|x []] // [|y []] // _ _ /(_ x) /[!inE] /[1 eqxx] /eqP->.
 Qed.
 
 Lemma uniq_leq_size s1 s2 : uniq s1 -> {subset s1 <= s2} -> size s1 <= size s2.
@@ -1948,7 +1948,7 @@ Qed.
 
 Lemma perm_to_rem s : x \in s -> perm_eq s (x :: rem s).
 Proof.
-elim: s => // y s IHs /1inE/= /[rws eq_sym perm_sym].
+elim: s => // y s IHs /[1inE]/= /[rw eq_sym perm_sym].
 case: eqP => [-> // | _ /IHs].
 by rewrite (perm_catCA [:: x] [:: y]) perm_cons perm_sym.
 Qed.
@@ -2138,14 +2138,14 @@ Qed.
 
 Lemma mapP s y : reflect (exists2 x, x \in s & y = f x) (y \in map f s).
 Proof.
-elim: s => [|x s IHs /= /1inE]; first by right; case.
+elim: s => [|x s IHs /= /[1inE]]; first by right; case.
 have [Dy | fx'y] := y =P f x; first by left; exists x; rewrite ?mem_head.
 by apply: (iffP IHs) => [[z]|[z /predU1P[->|]]]; exists z; do ?apply: predU1r.
 Qed.
 
 Lemma map_uniq s : uniq (map f s) -> uniq s.
 Proof.
-elim: s => //= x s IHs /andP[not_sfx /IHs->] /[rw andbT].
+elim: s => //= x s IHs /andP[not_sfx /IHs->] /[1 andbT].
 by apply: contra not_sfx => sx; apply/mapP; exists x.
 Qed.
 
@@ -2166,7 +2166,7 @@ Qed.
 Lemma nth_index_map s x0 x :
   {in s &, injective f} -> x \in s -> nth x0 s (index (f x) (map f s)) = x.
 Proof.
-elim: s => //= y s IHs inj_f /1inE s_x; rewrite (inj_in_eq inj_f) ?mem_head//.
+elim: s => //= y s IHs inj_f /[1inE] s_x; rewrite (inj_in_eq inj_f) ?mem_head//.
 case: eqVneq s_x => [-> | _] //=; apply: IHs.
 by apply: sub_in2 inj_f => z; apply: predU1r.
 Qed.
@@ -2180,7 +2180,7 @@ Lemma mem_map s x : (f x \in map f s) = (x \in s).
 Proof. by apply/mapP/idP=> [[y Hy /Hf->] //|]; exists x. Qed.
 
 Lemma index_map s x : index (f x) (map f s) = index x s.
-Proof. by rewrite /index; elim: s => //= y s + /[rw inj_eq Hf] => ->. Qed.
+Proof. by rewrite /index; elim: s => //= y s + /[1 inj_eq Hf] => ->. Qed.
 
 Lemma map_inj_uniq s : uniq (map f s) = uniq s.
 Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
@@ -2447,7 +2447,7 @@ Proof. by apply/perm_sumn; rewrite perm_rev. Qed.
 Lemma natnseq0P s : reflect (s = nseq (size s) 0) (sumn s == 0).
 Proof.
 apply: (iffP idP) => [|->]; last by rewrite sumn_nseq.
-by elim: s => //= x s IHs /[rw addn_eq0] /andP[/eqP-> /IHs <-].
+by elim: s => //= x s IHs /[1 addn_eq0] /andP[/eqP-> /IHs <-].
 Qed.
 
 Section FoldLeft.
@@ -3010,7 +3010,7 @@ move=> bs /andP[]; elim: bs => [|[x [|n]] bs IHbs] //= /andP[bs'x Ubs] bs'0.
 rewrite inE /tseq /tally /= -[n.+1]addn1 in bs'0 *.
 elim: n 1 => /= [|n IHn] m; last by rewrite eqxx IHn addnS.
 rewrite -{}[in RHS]IHbs {Ubs bs'0}// /tally /tally_seq add0n.
-elim: bs bs'x [::] => [|[y n] bs IHbs] //= /1inE /norP[y'x bs'x].
+elim: bs bs'x [::] => [|[y n] bs IHbs] //= /[1inE] /norP[y'x bs'x].
 by elim: n => [|n IHn] bs1 /=; [rewrite IHbs | rewrite eq_sym ifN // IHn].
 Qed.
 
@@ -3150,7 +3150,7 @@ rewrite {}IHbs; first 1 last; first by rewrite (perm_size (perm_tseq bsCA)).
 rewrite (map_inj_uniq (rcons_injl x)) {}IHn {Dn}//=.
 have: x \notin unzip1 bs by apply: contraL Ubs; rewrite map_cat mem_cat => ->.
 move: {bs2 m Ubs}(perms_rec n _ _ _) (_ :: bs2) => ts.
-elim: bs => [|[y [|m]] bs IHbs] //= /1inE bs2 /norP[x'y /IHbs//].
+elim: bs => [|[y [|m]] bs IHbs] //= /[1inE] bs2 /norP[x'y /IHbs//].
 rewrite cons_permsE has_cat negb_or has_map => ->.
 by apply/hasPn=> t _; apply: contra x'y => /mapP[t1 _ /rcons_inj[_ ->]].
 Qed.

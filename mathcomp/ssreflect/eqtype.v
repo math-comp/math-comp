@@ -934,7 +934,7 @@ Lemma inj_homo_in : {in D & D', injective f} ->
   {in D & D', {homo f : x y / aR x y >-> rR x y}} ->
   {in D & D', {homo f : x y / aR' x y >-> rR' x y}}.
 Proof.
-move=> fI mf x y xD yD /= /[rws aR'E rR'E] /andP[neq_xy xy].
+move=> fI mf x y xD yD /= /[rw aR'E rR'E] /andP[neq_xy xy].
 by rewrite mf ?andbT //; apply: contra_neq neq_xy => /fI; apply.
 Qed.
 
@@ -961,8 +961,8 @@ Proof.
 move=> aR_tot mf x y xD yD.
 have [->|neq_xy] := altP (x =P y); first by rewrite ?eqxx ?aR_refl ?rR_refl.
 have [xy|] := (boolP (aR x y)); first by rewrite rRE mf ?orbT// aR'E neq_xy.
-have /orP [->//|/[rws aRE eq_sym (negPf neq_xy)] /=] := aR_tot x y.
-move=> /mf -/(_ yD xD) /[rw rR'E] /andP[Nfxfy fyfx] _.
+have /orP [->//|/[rw aRE eq_sym (negPf neq_xy)] /=] := aR_tot x y.
+move=> /mf -/(_ yD xD) /[1 rR'E] /andP[Nfxfy fyfx] _.
 by apply: contra_neqF Nfxfy => fxfy; apply/rR_anti; rewrite fyfx fxfy.
 Qed.
 
@@ -987,7 +987,7 @@ Proof. by move=> mf x y eqf; apply/aR_anti; rewrite -!mf eqf rR_refl. Qed.
 
 Lemma anti_mono : {mono f : x y / aR x y >-> rR x y} ->
                   {mono f : x y / aR' x y >-> rR' x y}.
-Proof. by move=> mf x y /[rws rR'E aR'E mf inj_eq]//; apply: mono_inj. Qed.
+Proof. by move=> mf x y /[rw rR'E aR'E mf inj_eq]//; apply: mono_inj. Qed.
 
 Lemma total_homo_mono : total aR ->
     {homo f : x y / aR' x y >-> rR' x y} ->

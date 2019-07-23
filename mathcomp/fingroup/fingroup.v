@@ -1678,7 +1678,7 @@ Lemma classes_gt1 : (#|classes G| > 1) = (G :!=: 1).
 Proof.
 rewrite (cardsD1 1) classes1 ltnS lt0n cards_eq0.
 apply/set0Pn/trivgPn=> [[xG /setD1P[nt_xG]] | [x Gx ntx]].
-  by case/imsetP=> x Gx def_xG; rewrite def_xG classG_eq1 in nt_xG; exists x.
+  by case/imsetP=> x Gx /[->]; rewrite classG_eq1 in nt_xG; exists x.
 by exists (x ^: G); rewrite !inE classG_eq1 ntx; apply: mem_imset.
 Qed.
 

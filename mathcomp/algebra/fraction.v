@@ -196,8 +196,8 @@ Proof.
 move=> x; unlock inv; apply/eqmodP=> /=; rewrite equivfE /invf eq_sym.
 do 2?case: RatioP=> /= [/eqP|];
   rewrite ?mul0r ?mul1r -?equivf_def ?numer0 ?reprK //.
-  by move=> hx /eqP hx'; rewrite hx' eqxx in hx.
-by move=> /eqP ->; rewrite eqxx.
+  by move=> + /eqP /[->]; rewrite eqxx.
+by move=> /eqP->; rewrite eqxx.
 Qed.
 Canonical pi_inv_morph := PiMorph1 pi_inv.
 

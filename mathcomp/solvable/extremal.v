@@ -1810,7 +1810,7 @@ case=> [[n_gt23 xy] | [p2 Z_xxy]].
     by rewrite -order_dvdn bin2odd ?dvdn_mulr // -oZ order_dvdG in not_cyxi.
   have def_yxi: [~ y, x ^+ i] = x ^+ r.
     have:= Zyxj i; rewrite /Z cycle_traject orderE oZ p2 !inE mulg1.
-    by case/pred2P=> // cyxi; rewrite cyxi p2 eqxx in not_cyxi.
+    by case/pred2P=> // /[->]; rewrite p2 eqxx in not_cyxi.
   apply/existsP; exists (x, x ^+ (i + r %/ 2) * y); rewrite /= !xpair_eqE.
   rewrite defG x_xjy -order_dvdn ox dvdnn !eqxx andbT /=.
   rewrite expMg_Rmul /commute ?(centsP cGZ _ (Zyxj _)) ?groupX // def_yxj.

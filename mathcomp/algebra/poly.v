@@ -2465,7 +2465,7 @@ Qed.
 Theorem max_ring_poly_roots p rs :
   p != 0 -> all (root p) rs -> uniq_roots rs -> size rs < size p.
 Proof.
-move=> nz_p _ /(@uniq_roots_prod_XsubC p)[// | q def_p]; rewrite def_p in nz_p *.
+move=> nz_p _ /(@uniq_roots_prod_XsubC p)[// | q /[->]].
 have nz_q: q != 0 by apply: contraNneq nz_p => ->; rewrite mul0r.
 rewrite size_Mmonic ?monic_prod_XsubC // (polySpred nz_q) addSn /=.
 by rewrite size_prod_XsubC leq_addl.

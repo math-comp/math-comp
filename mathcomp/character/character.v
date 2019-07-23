@@ -97,7 +97,7 @@ Lemma trow0 n1 m2 n2 B : @trow n1 0 m2 n2 B = 0.
 Proof.
 elim: n1=> //= n1 IH.
 rewrite !mxE scale0r linear0.
-rewrite IH //; apply/matrixP=> i j /!mxE.
+rewrite IH //; apply/matrixP=> i j /[!mxE].
 by case: split=> *; rewrite mxE.
 Qed.
 
@@ -124,7 +124,7 @@ Lemma trow_is_linear n1 m2 n2 (A : 'rV_n1) : linear (@trow n1 A m2 n2).
 Proof.
 elim: n1 A => [|n1 IH] //= A k A1 A2 /=; first by rewrite scaler0 add0r.
 rewrite linearD /= linearZ /=.
-apply/matrixP=> i j /!mxE.
+apply/matrixP=> i j /[!mxE].
 by case: split=> a; rewrite ?IH !mxE.
 Qed.
 
@@ -145,14 +145,14 @@ Fixpoint tprod  (m1 : nat) :
 Lemma dsumx_mul m1 m2 n p A B :
   dsubmx ((A *m B) : 'M[F]_(m1 + m2, n)) = dsubmx (A : 'M_(m1 + m2, p)) *m B.
 Proof.
-apply/matrixP=> i j /!mxE; apply: eq_bigr=> k _.
+apply/matrixP=> i j /[!mxE]; apply: eq_bigr=> k _.
 by rewrite !mxE.
 Qed.
 
 Lemma usumx_mul m1 m2 n p A B :
   usubmx ((A *m B) : 'M[F]_(m1 + m2, n)) = usubmx (A : 'M_(m1 + m2, p)) *m B.
 Proof.
-by apply/matrixP=> i j /!mxE; apply: eq_bigr=> k _ /!mxE.
+by apply/matrixP=> i j /[!mxE]; apply: eq_bigr=> k _ /[!mxE].
 Qed.
 
 Let trow_mul (m1 m2 n2 p2 : nat) 
@@ -196,11 +196,11 @@ elim: m1 n1 A m2 n2 B=> [|m1 IH] n1 A m2 n2 B //=.
 rewrite !IH.
 pose A1 := A :  'M_(1 + m1, 1 + n1).
 have F1: dsubmx (rsubmx A1) = rsubmx (dsubmx A1).
-  by apply/matrixP=> i j /!mxE.
+  by apply/matrixP=> i j /[!mxE].
 have F2: rsubmx (usubmx A1) = usubmx (rsubmx A1).
-  by apply/matrixP=> i j /!mxE.
+  by apply/matrixP=> i j /[!mxE].
 have F3: lsubmx (dsubmx A1) = dsubmx (lsubmx A1).
-  by apply/matrixP=> i j /!mxE.
+  by apply/matrixP=> i j /[!mxE].
 rewrite tr_row_mx -block_mxEv -block_mxEh !(F1,F2,F3); congr block_mx.
 - by rewrite !mxE linearZ /= trmxK.
 by rewrite -trmx_dsub.
@@ -211,13 +211,13 @@ Proof.
 elim: m n => [|m IH] n //=; first by rewrite [1%:M]flatmx0.
 rewrite tprod_tr.
 set u := rsubmx _; have->: u = 0.
-  apply/matrixP=> i j /!mxE.
+  apply/matrixP=> i j /[!mxE].
   by case: i; case: j=> /= j Hj; case.
 set v := lsubmx (dsubmx _); have->: v = 0.
-  apply/matrixP=> i j /!mxE.
+  apply/matrixP=> i j /[!mxE].
   by case: i; case: j; case.
 set w := rsubmx _; have->: w = 1%:M.
-  apply/matrixP=> i j /!mxE.
+  apply/matrixP=> i j /[!mxE].
   by case: i; case: j; case.
 rewrite IH -!trowbE !linear0.
 rewrite -block_mxEv.
@@ -232,8 +232,7 @@ Proof.
 elim: m n A B => [|m IH] n A B //=.
   by rewrite [A]flatmx0 mxtrace0 mul0r.
 rewrite tprod_tr -block_mxEv mxtrace_block IH.
-rewrite linearZ /= -mulrDl; congr (_ * _).
-rewrite -trace_mx11 .
+rewrite linearZ /= -mulrDl; congr (_ * _); rewrite -trace_mx11.
 pose A1 := A : 'M_(1 + m).
 rewrite -{3}[A](@submxK _ 1 m 1 m A1).
 by rewrite (@mxtrace_block _ _ _ (ulsubmx A1)).
@@ -277,8 +276,7 @@ Lemma mx_rsim_dadd  (U V W : 'M_n) (rU rV : representation)
 Proof.
 case: rU; case: rV=> nV rV nU rU defW dxUV /=.
 have tiUV := mxdirect_addsP dxUV.
-move=> [fU def_nU]; rewrite -{nU}def_nU in rU fU * => inv_fU hom_fU.
-move=> [fV def_nV]; rewrite -{nV}def_nV in rV fV * => inv_fV hom_fV.
+move=> [fU /[<-]] inv_fU hom_fU [fV /[<-]] inv_fV hom_fV.
 pose pU := in_submod U (proj_mx U V) *m fU.
 pose pV := in_submod V (proj_mx V U) *m fV.
 exists (val_submod 1%:M *m row_mx pU pV) => [||g Gg].
@@ -985,7 +983,7 @@ Proof. by rewrite qualifE cfun1_char /= cfun11. Qed.
 Lemma lin_charM : {in G &, {morph xi : x y / (x * y)%g >-> x * y}}.
 Proof.
 move=> x y Gx Gy; case/andP: CFxi => /char_reprP[[n rG] -> /=].
-rewrite cfRepr1 pnatr_eq1 => /eqP n1; rewrite {n}n1 in rG *.
+rewrite cfRepr1 pnatr_eq1 => /eqP /[->].
 rewrite !cfunE Gx Gy groupM //= !mulr1n repr_mxM //.
 by rewrite [rG x]mx11_scalar [rG y]mx11_scalar -scalar_mxM !mxtrace_scalar.
 Qed.
@@ -1324,7 +1322,7 @@ symmetry; transitivity (\tr Qa).
   rewrite reindex_irr_class; apply: eq_bigr => i _; rewrite !mxE invgK permE.
   by rewrite inE sub1set inE -(can_eq cK) iCK //; case: ifP.
 rewrite -[Pa](mulmxK uX) -[Qa](mulKmx uX) mxtrace_mulC; congr (\tr(_ *m _)).
-rewrite -row_permE -col_permE; apply/matrixP=> i j /!mxE.
+rewrite -row_permE -col_permE; apply/matrixP=> i j /[!mxE].
 rewrite -{2}[j](permKV qa); move: {j}(_ j) => j; rewrite !permE iCK //.
 apply: stabAchi; first by case/repr_classesP: (cP j).
 by rewrite repr_irr_classK (mem_repr_classes (Gca _)).
@@ -2756,7 +2754,7 @@ Lemma cfker_center_normal phi : cfker phi <| 'Z(phi)%CF.
 Proof.
 apply: normalS (cfcenter_sub phi) (cfker_normal phi).
 rewrite /= /cfcenter; case: ifP => // Hphi; rewrite cfkerEchar //.
-apply/subsetP=> x /!inE /andP[-> /eqP->] /=.
+apply/subsetP=> x /[!inE] /andP[-> /eqP->] /=.
 by rewrite ger0_norm ?char1_ge0.
 Qed.
 

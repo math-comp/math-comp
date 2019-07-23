@@ -431,8 +431,7 @@ Proof. by apply: (iffP andP); case; move/eqP. Qed.
 
 Lemma trivg_acomps K s : acomps K s -> (K :==: 1) = (s == [::]).
 Proof.
-case/andP=> ls cs; apply/eqP/eqP; last first.
-  by move=> se; rewrite se /= in ls; apply/eqP.
+case/andP=> ls cs; apply/eqP/eqP; last by move=> /[->]; apply/eqP.
 move=> G1; case: s ls cs => // H s _ /=; case/andP; case/maxgroupP.
 by rewrite G1 sub1G andbF.
 Qed.

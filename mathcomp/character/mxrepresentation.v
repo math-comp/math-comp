@@ -3012,7 +3012,7 @@ Qed.
 Lemma mx_rsim_sym n1 n2 (rG1 : reprG n1) (rG2 : reprG n2) :
   mx_rsim rG1 rG2 ->  mx_rsim rG2 rG1.
 Proof.
-case=> B def_n1; rewrite def_n1 in rG1 B *.
+case=> B /[->].
 rewrite row_free_unit => injB homB; exists (invmx B) => // [|x Gx].
   by rewrite row_free_unit unitmx_inv.
 by apply: canRL (mulKmx injB) _; rewrite mulmxA -homB ?mulmxK.
@@ -3032,7 +3032,7 @@ Lemma mx_rsim_def n1 n2 (rG1 : reprG n1) (rG2 : reprG n2) :
   exists B, exists2 B', B' *m B = 1%:M &
     forall x, x \in G -> rG1 x = B *m rG2 x *m B'.
 Proof.
-case=> B def_n1; rewrite def_n1 in rG1 B *; rewrite row_free_unit => injB homB.
+case=> B /[->]; rewrite row_free_unit => injB homB.
 by exists B, (invmx B) => [|x Gx]; rewrite ?mulVmx // -homB // mulmxK.
 Qed.
 
@@ -3066,7 +3066,7 @@ Qed.
 Lemma mx_rsim_irr n1 n2 (rG1 : reprG n1) (rG2 : reprG n2) :
   mx_rsim rG1 rG2 -> mx_irreducible rG1 -> mx_irreducible rG2.
 Proof.
-case/mx_rsim_sym=> f def_n2; rewrite {n2}def_n2 in f rG2 * => injf homf.
+case/mx_rsim_sym=> f /[->] injf homf.
 case/mx_irrP=> n1_gt0 minG; apply/mx_irrP; split=> // U modU nzU.
 rewrite /row_full -(mxrankMfree _ injf) -genmxE.
 apply: minG; last by rewrite -mxrank_eq0 genmxE mxrankMfree // mxrank_eq0.
@@ -3078,8 +3078,7 @@ Lemma mx_rsim_abs_irr n1 n2 (rG1 : reprG n1) (rG2 : reprG n2) :
     mx_rsim rG1 rG2 ->
   mx_absolutely_irreducible rG1 = mx_absolutely_irreducible rG2.
 Proof.
-case=> f def_n2; rewrite -{n2}def_n2 in f rG2 *.
-rewrite row_free_unit => injf homf; congr (_ && (_ == _)).
+case=> f /[<-]; rewrite row_free_unit => injf homf; congr (_ && (_ == _)).
 pose Eg (g : 'M[F]_n1) := lin_mx (mulmxr (invmx g) \o mulmx g).
 have free_Ef: row_free (Eg f).
   apply/row_freeP; exists (Eg (invmx f)); apply/row_matrixP=> i.
@@ -3093,8 +3092,7 @@ Qed.
 Lemma rker_mx_rsim n1 n2 (rG1 : reprG n1) (rG2 : reprG n2) :
   mx_rsim rG1 rG2 -> rker rG1 = rker rG2.
 Proof.
-case=> f def_n2; rewrite -{n2}def_n2 in f rG2 *.
-rewrite row_free_unit => injf homf.
+case=> f /[<-]; rewrite row_free_unit => injf homf.
 apply/setP=> x; rewrite !inE !mul1mx; apply: andb_id2l => Gx.
 by rewrite -(can_eq (mulmxK injf)) homf // -scalar_mxC (can_eq (mulKmx injf)).
 Qed.
@@ -4366,7 +4364,7 @@ End IrrComponent.
 Lemma irr_comp_rsim n1 n2 rG1 rG2 :
   @mx_rsim _ G n1 rG1 n2 rG2 -> irr_comp rG1 = irr_comp rG2.
 Proof.
-case=> f eq_n12; rewrite -eq_n12 in rG2 f * => inj_f hom_f.
+case=> f /[<-] inj_f hom_f.
 congr (odflt _ _); apply: eq_pick => i; rewrite -!mxrank_eq0.
 rewrite -(mxrankMfree _ inj_f); symmetry; rewrite -(eqmxMfull _ inj_f).
 have /envelop_mxP[e ->{i}]: ('e_i \in R_G)%MS.
@@ -4580,7 +4578,7 @@ rewrite (reindex (fun j => irr_comp sG (rG j))) /=.
   by rewrite inE -lin_j -irr_degreeE irr_degree_abelian.
 pose sGlin := {i | i \in linear_irr sG}.
 have sG'k (i : sGlin) : G^`(1)%g \subset rker (irr_repr (val i)).
-  by case: i => i /= /!inE lin; rewrite rker_linear //=; apply/eqP.
+  by case: i => i /= /[!inE] lin; rewrite rker_linear //=; apply/eqP.
 pose h' u := irr_comp sGq (quo_repr (sG'k u) nG'G).
 have irrGq u: mx_irreducible (quo_repr (sG'k u) nG'G).
   by apply/quo_mx_irr; apply: socle_irr.
@@ -5431,7 +5429,7 @@ Variable m : nat.
 Lemma val_gen_row W (i : 'I_m) : val_gen (row i W) = row i (val_gen W).
 Proof.
 rewrite val_gen_rV rowK; congr (mxvec _ *m _).
-by apply/matrixP=> j k /!mxE.
+by apply/matrixP=> j k /[!mxE].
 Qed.
 
 Lemma in_gen_row W (i : 'I_m) : in_gen (row i W) = row i (in_gen W).
@@ -5571,7 +5569,7 @@ Qed.
 Lemma rstabs_in_gen m (U : 'M_(m, n)) :
   rstabs rG U \subset rstabs rGA (in_gen U).
 Proof.
-apply/subsetP=> x /!inE /andP[Gx nUx].
+apply/subsetP=> x /[!inE] /andP[Gx nUx].
 by rewrite -in_genJ Gx // submx_in_gen.
 Qed.
 
@@ -5685,8 +5683,8 @@ elim: t => //=.
 - by move=> x _; rewrite eval_mx_term.
 - by move=> x _; rewrite eval_mx_term.
 - move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite -{}IH1 // -{}IH2 //.
-  by apply/rowP=> k /!mxE.
-- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k /!mxE.
+  by apply/rowP=> k /[!mxE].
+- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k /[!mxE].
 - move=> t1 IH1 n1 rt1; rewrite eval_mulmx eval_mx_term mul_scalar_mx.
   by rewrite scaler_nat {}IH1 //; elim: n1 => //= n1 IHn1; rewrite !mulrS IHn1.
 - by move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite eval_mulT IH1 ?IH2.

@@ -1523,7 +1523,7 @@ have{nsXG} pU := pgroupS (subset_trans sUX (normal_sub nsXG)) pG.
 case gsetU1: (group_set 'Ldiv_p(U)).
   by rewrite -defU1 (OhmE 1 pU) gen_set_id // -sub_LdivT subsetIr.
 move: gsetU1; rewrite /group_set 2!inE group1 expg1n eqxx; case/subsetPn=> xy.
-case/imset2P=> x y /!inE /andP[Ux xp1] /andP[Uy yp1] ->{xy}.
+case/imset2P=> x y /[!inE] /andP[Ux xp1] /andP[Uy yp1] ->{xy}.
 rewrite groupM //= => nt_xyp; pose XY := <[x]> <*> <[y]>.
 have{yp1 nt_xyp} defXY: XY = U.
   have sXY_U: XY \subset U by rewrite join_subG !cycle_subG Ux Uy.

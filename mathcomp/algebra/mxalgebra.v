@@ -2435,7 +2435,7 @@ apply: (iffP andP) => [[nzR] | [e [nz_e Re ideR idRe]]].
   - by rewrite -{2}[A]mxvecK defA idRe mulmxA mx_rV_lin -defA /= mxvecK.
   by rewrite -{2}[A]mxvecK defA ideR mulmxA mx_rV_lin -defA /= mxvecK.
 split.
-  by apply: contraNneq nz_e => R0; rewrite R0 eqmx0 in Re; rewrite (memmx0 Re).
+   by apply: contraNneq nz_e => /[->]; move: Re => /[1eqmx0]/memmx0->.
 apply/submxP; exists (mxvec e); rewrite !mul_mx_row !{1}mul_rV_lin1.
 rewrite submxE in Re; rewrite {Re}(eqP Re).
 congr (row_mx 0 (row_mx (mxvec _) (mxvec _))); apply/row_matrixP=> i.

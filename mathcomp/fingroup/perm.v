@@ -272,8 +272,8 @@ case/andP=> /forallP-onA /injectiveP-f_inj.
 apply/ffunP=> u; rewrite ffunE -pvalE insubdK; first by rewrite ffunE valK.
 apply/injectiveP=> {u} x y; rewrite !ffunE.
 case: insubP => [u _ <-|]; case: insubP => [v _ <-|] //=; first by move/f_inj->.
-  by move=> Ay' def_y; rewrite -def_y [_ \in A]onA in Ay'.
-by move=> Ax' def_x; rewrite def_x [_ \in A]onA in Ax'.
+  by move=> Ay' /[<-]; rewrite [_ \in A]onA in Ay'.
+by move=> Ax' /[->]; rewrite [_ \in A]onA in Ax'.
 Qed.
 
 End Theory.

@@ -513,7 +513,7 @@ Lemma prime_FrobeniusP G K H :
 Proof.
 move=> ntK H_pr; have ntH: H :!=: 1 by rewrite -cardG_gt1 prime_gt1.
 have [defG | not_sdG] := eqVneq (K ><| H) G; last first.
-  by apply: (iffP andP) => [] [defG]; rewrite defG ?eqxx in not_sdG.
+  by apply: (iffP andP) => [] [/[->]]; rewrite ?eqxx in not_sdG.
 apply: (iffP (Frobenius_semiregularP defG ntK ntH)) => [regH | [_ regH x]].
   split=> //; have [x defH] := cyclicP (prime_cyclic H_pr).
   by rewrite defH cent_cycle regH // !inE defH cycle_id andbT -cycle_eq1 -defH.

@@ -348,7 +348,7 @@ by apply: cprod_exponent; rewrite cprodE.
 Qed.
 
 Lemma sub_LdivT A n : (A \subset 'Ldiv_n()) = (exponent A %| n).
-Proof. by apply/subsetP/exponentP=> eAn x /eAn /1inE /eqP. Qed.
+Proof. by apply/subsetP/exponentP=> eAn x /eAn /[1inE] /eqP. Qed.
 
 Lemma LdivT_J n x : 'Ldiv_n() :^ x = 'Ldiv_n().
 Proof.
@@ -495,7 +495,7 @@ Arguments pElemP {p A E}.
 
 Lemma pElemS p A B : A \subset B -> 'E_p(A) \subset 'E_p(B).
 Proof.
-by move=> sAB; apply/subsetP=> E /!inE /andP[/subset_trans->].
+by move=> sAB; apply/subsetP=> E /[!inE] /andP[/subset_trans->].
 Qed.
 
 Lemma pElemI p A B : 'E_p(A :&: B) = 'E_p(A) :&: subgroups B.
@@ -744,7 +744,7 @@ Qed.
 
 Lemma p_rank_geP p n G : reflect (exists E, E \in 'E_p^n(G)) (n <= 'r_p(G)).
 Proof.
-apply: (iffP idP) => [|[E] /1inE /andP[Ep_E /eqP <-]]; last first.
+apply: (iffP idP) => [|[E] /[1inE] /andP[Ep_E /eqP <-]]; last first.
   by rewrite (bigmax_sup E).
 have [D /pnElemP[sDG abelD <-]] := p_rank_witness p G.
 by case/abelem_pnElem=> // E; exists E; apply: (subsetP (pnElemS _ _ sDG)).
@@ -774,7 +774,7 @@ Qed.
 Lemma p_rank_abelem p G : p.-abelem G -> 'r_p(G) = logn p #|G|.
 Proof.
 move=> abelG; apply/eqP; rewrite eqn_leq andbC (bigmax_sup G) //.
-  by apply/bigmax_leqP=> E /1inE /andP[/lognSg->].
+  by apply/bigmax_leqP=> E /[1inE] /andP[/lognSg->].
 by rewrite inE subxx.
 Qed.
 
@@ -803,7 +803,7 @@ Qed.
 Lemma p_rank_Sylow p G H : p.-Sylow(G) H -> 'r_p(H) = 'r_p(G).
 Proof.
 move=> sylH; apply/eqP; rewrite eqn_leq (p_rankS _ (pHall_sub sylH)) /=.
-apply/bigmax_leqP=> E /1inE /andP[sEG abelE].
+apply/bigmax_leqP=> E /[1inE] /andP[sEG abelE].
 have [P sylP sEP] := Sylow_superset sEG (abelem_pgroup abelE).
 have [x _ ->] := Sylow_trans sylP sylH.
 by rewrite p_rankJ -(p_rank_abelem abelE) (p_rankS _ sEP).
@@ -889,7 +889,7 @@ Proof.
 apply: (iffP idP) => [|[E]].
   have [p _ ->] := rank_witness G; case/p_rank_geP=> E.
   by rewrite def_pnElem; case/setIP; exists E.
-case/nElemP=> p /1inE /andP[EpG_E /eqP <-].
+case/nElemP=> p /[1inE] /andP[EpG_E /eqP <-].
 by rewrite (leq_trans (logn_le_p_rank EpG_E)) ?p_rank_le_rank.
 Qed.
 
@@ -921,7 +921,7 @@ Qed.
 
 Lemma morphim_LdivT n : f @* 'Ldiv_n() \subset 'Ldiv_n().
 Proof.
-apply/subsetP=> _ /morphimP[x Dx xn ->]; rewrite inE in xn.
+apply/subsetP=> _ /morphimP[x Dx /[1inE] xn ->].
 by rewrite inE -morphX // (eqP xn) morph1.
 Qed.
 
@@ -946,7 +946,7 @@ Qed.
 Lemma morphim_pnElem p n G E :
   E \in 'E_p^n(G) -> {m | m <= n & (f @* E)%G \in 'E_p^m(f @* G)}.
 Proof.
-move=> /1inE/andP[EpE /eqP <-].
+move=> /[1inE]/andP[EpE /eqP <-].
 by exists (logn p #|f @* E|); rewrite ?logn_morphim // inE morphim_pElem /=.
 Qed.
 
@@ -1159,7 +1159,7 @@ Qed.
 
 Lemma OhmS H G : H \subset G -> 'Ohm_n(H) \subset 'Ohm_n(G).
 Proof.
-move=> sHG; apply: genS; apply/subsetP=> x /!inE /andP[Hx ->].
+move=> sHG; apply: genS; apply/subsetP=> x /[!inE] /andP[Hx ->].
 by rewrite (subsetP sHG).
 Qed.
 

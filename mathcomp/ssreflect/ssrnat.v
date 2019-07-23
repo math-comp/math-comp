@@ -209,7 +209,7 @@ Lemma addnS m n : m + n.+1 = (m + n).+1. Proof. by apply/eqP; elim: m. Qed.
 Lemma addSnnS m n : m.+1 + n = m + n.+1. Proof. by rewrite addnS. Qed.
 
 Lemma addnCA : left_commutative addn.
-Proof. by move=> m n p; elim: m => //= m /[rw addnS]<-. Qed.
+Proof. by move=> m n p; elim: m => //= m /[1 addnS]<-. Qed.
 
 Lemma addnC : commutative addn.
 Proof. by move=> m n; rewrite -{1}[n]addn0 addnCA addn0. Qed.
@@ -352,7 +352,7 @@ Lemma eqn_leq m n : (m == n) = (m <= n <= m).
 Proof. by elim: m n => [|m IHm] []. Qed.
 
 Lemma anti_leq : antisymmetric leq.
-Proof. by move=> m n /[rw -eqn_leq] /eqP. Qed.
+Proof. by move=> m n /[-1 eqn_leq] /eqP. Qed.
 
 Lemma neq_ltn m n : (m != n) = (m < n) || (n < m).
 Proof. by rewrite eqn_leq negb_and orbC -!ltnNge. Qed.
@@ -1436,7 +1436,7 @@ Let gtn_neqAge x y : (y < x) = (x != y) && (y <= x).
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 Let anti_leq := anti_leq.
 Let anti_geq : antisymmetric geq.
-Proof. by move=> m n /= /[rw andbC] /anti_leq. Qed.
+Proof. by move=> m n /= /[1 andbC] /anti_leq. Qed.
 Let leq_total := leq_total.
 
 Lemma ltnW_homo : {homo f : m n / m < n} -> {homo f : m n / m <= n}.

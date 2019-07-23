@@ -673,7 +673,7 @@ have dv_d i j: i <= j -> d j %| d i.
   exact: dvdp_trans (dvdp_gcdl _ _) IHj.
 pose I : pred {poly F} := [pred q | d (pickle q).+1 %| q].
 have I'co q i: q \notin I -> i > pickle q -> coprimep q (d i).
-  move=> /1inE I'q /dv_d/coprimep_dvdl-> //; apply: contraR I'q.
+  move=> /[1inE] I'q /dv_d/coprimep_dvdl-> //; apply: contraR I'q.
   rewrite coprimep_sym /coprimep /= pickleK /= neq_ltn.
   case: ifP => [_ _| ->]; first exact: dvdp_gcdr.
   rewrite orbF ltnS leqn0 size_poly_eq0 gcdp_eq0 -size_poly_eq0.
