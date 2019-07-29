@@ -327,6 +327,8 @@ ci-finmap-dev:
   image: docker:latest
   services:
     - docker:dind
+  variables:
+    GIT_STRATEGY: none
   environment:
     name: deployment
     url: https://hub.docker.com/r/mathcomp/mathcomp-dev
