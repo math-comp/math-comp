@@ -159,14 +159,14 @@ ci-fourcolor-dev:
     - make install
 
 ci-odd-order-8.7:
- extends: .ci-odd-order
- variables:
-   COQ_VERSION: "8.7"
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.7"
 
 ci-odd-order-8.8:
- extends: .ci-odd-order
- variables:
-   COQ_VERSION: "8.8"
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.8"
 
 ci-odd-order-dev:
   extends: .ci-odd-order
