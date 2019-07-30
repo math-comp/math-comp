@@ -143,6 +143,11 @@ ci-fourcolor-8.8:
   variables:
     COQ_VERSION: "8.8"
 
+ci-fourcolor-8.9:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.9"
+
 ci-fourcolor-dev:
   extends: .ci-fourcolor
   variables:
@@ -167,6 +172,11 @@ ci-odd-order-8.8:
   extends: .ci-odd-order
   variables:
     COQ_VERSION: "8.8"
+
+ci-odd-order-8.9:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.9"
 
 ci-odd-order-dev:
   extends: .ci-odd-order
