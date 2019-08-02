@@ -4,11 +4,12 @@
 #     (Dockerfile containing: "opam switch set $compiler && eval $(opam env)")
 #   - all branches (not tags) => push on GitLab registry
 #   - GitHub PRs => push on GitLab and report back thanks to @coqbot
-# - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.6)
+# - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.7)
 #   - script template foreach project (custom CONTRIB_URL, script)
 #   - jobs foreach project and Coq version (custom COQ_VERSION, CONTRIB_VERSION)
 # - deploy stage (only branch "master" and environment "deployment")
 #   - pull each built image from GitLab registry => push to Docker Hub
+# + scheduled build & deploy for mathcomp/mathcomp-dev:coq-dev
 #
 # Config for protected environment "deployment":
 # - set vars HUB_REGISTRY, HUB_REGISTRY_USER, HUB_REGISTRY_IMAGE, HUB_TOKEN
@@ -51,6 +52,7 @@ stages:
   except:
     - tags
     - merge_requests
+    - schedules
 
 make-coq-latest:
   extends: .make-build
@@ -77,14 +79,19 @@ make-coq-latest:
     - tags
     - merge_requests
 
-coq-8.7:
+.opam-build-once:
   extends: .opam-build
+  except:
+    - schedules
+  
+coq-8.7:
+  extends: .opam-build-once
 
 coq-8.8:
-  extends: .opam-build
+  extends: .opam-build-once
 
 coq-8.9:
-  extends: .opam-build
+  extends: .opam-build-once
 
 coq-dev:
   extends: .opam-build
@@ -116,6 +123,7 @@ coq-dev:
   except:
     - tags
     - merge_requests
+    - schedules
 
 # Guidelines to add a library to mathcomp CI:
 # - Add a hidden job (starting with a .) .ci-lib that extends the .ci job,
@@ -143,6 +151,11 @@ ci-fourcolor-8.8:
   variables:
     COQ_VERSION: "8.8"
 
+ci-fourcolor-8.9:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.9"
+
 ci-fourcolor-dev:
   extends: .ci-fourcolor
   variables:
@@ -159,14 +172,19 @@ ci-fourcolor-dev:
     - make install
 
 ci-odd-order-8.7:
- extends: .ci-odd-order
- variables:
-   COQ_VERSION: "8.7"
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.7"
 
 ci-odd-order-8.8:
- extends: .ci-odd-order
- variables:
-   COQ_VERSION: "8.8"
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-odd-order-8.9:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.9"
 
 ci-odd-order-dev:
   extends: .ci-odd-order
@@ -327,6 +345,8 @@ ci-finmap-dev:
   image: docker:latest
   services:
     - docker:dind
+  variables:
+    GIT_STRATEGY: none
   environment:
     name: deployment
     url: https://hub.docker.com/r/mathcomp/mathcomp-dev
@@ -347,14 +367,19 @@ ci-finmap-dev:
   only:
     - master
 
-mathcomp-dev:coq-8.7:
+.docker-deploy-once:
   extends: .docker-deploy
+  except:
+    - schedules
+
+mathcomp-dev:coq-8.7:
+  extends: .docker-deploy-once
 
 mathcomp-dev:coq-8.8:
-  extends: .docker-deploy
+  extends: .docker-deploy-once
 
 mathcomp-dev:coq-8.9:
-  extends: .docker-deploy
+  extends: .docker-deploy-once
 
 mathcomp-dev:coq-dev:
   extends: .docker-deploy
