@@ -345,12 +345,11 @@ ci-finmap-dev:
   image: docker:latest
   services:
     - docker:dind
-  variables:
-    GIT_STRATEGY: none
   environment:
     name: deployment
     url: https://hub.docker.com/r/mathcomp/mathcomp-dev
   variables:
+    GIT_STRATEGY: none
     HUB_IMAGE: "mathcomp/${CI_JOB_NAME}"
     IMAGE_PREFIX: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}"
   script:
