@@ -1637,12 +1637,9 @@ Lemma real_leP x y :
     x \is real -> y \is real ->
   ler_xor_gt x y `|x - y| `|y - x| (x <= y) (y < x).
 Proof.
-move=> xR /(real_leVge xR); have [le_xy _|Nle_xy /= le_yx] := boolP (_ <= _).
-  have [/(le_lt_trans le_xy)|] := boolP (_ < _); first by rewrite ltxx.
-  by rewrite ler0_norm ?ger0_norm ?subr_cp0 ?opprB //; constructor.
-have [lt_yx|] := boolP (_ < _).
-  by rewrite ger0_norm ?ler0_norm ?subr_cp0 ?opprB //; constructor.
-by rewrite lt_def le_yx andbT negbK=> /eqP exy; rewrite exy lexx in Nle_xy.
+move=> xR yR; case: (comparable_leP (real_leVge xR yR)) => xy.
+- by rewrite [`|x - y|]distrC !ger0_norm ?subr_cp0 //; constructor.
+- by rewrite [`|y - x|]distrC !gtr0_norm ?subr_cp0 //; constructor.
 Qed.
 
 Lemma real_ltP x y :
@@ -1660,7 +1657,7 @@ Lemma real_ltgtP x y : x \is real -> y \is real ->
   comparer x y `|x - y| `|y - x|
                 (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
-move=> xR yR; case: comparable_ltgtP => [|xy|xy|->]; first exact: real_leVge.
+move=> xR yR; case: (comparable_ltgtP (real_leVge xR yR)) => [?|?|->].
 - by rewrite [`|x - y|]distrC !gtr0_norm ?subr_gt0//; constructor.
 - by rewrite [`|y - x|]distrC !gtr0_norm ?subr_gt0//; constructor.
 - by rewrite subrr normr0; constructor.
