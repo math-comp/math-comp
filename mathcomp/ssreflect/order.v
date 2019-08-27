@@ -811,9 +811,9 @@ Variant lt_xor_ge (x y : T) : bool -> bool -> Set :=
 Variant compare (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | CompareLt of x < y : compare x y
-    false false true false true false
-  | CompareGt of y < x : compare x y
     false false false true false true
+  | CompareGt of y < x : compare x y
+    false false true false true false
   | CompareEq of x = y : compare x y
     true true true true false false.
 
@@ -2179,7 +2179,7 @@ by rewrite lt_neqAle eq_le; move: c_xy => /orP [] -> //; rewrite andbT.
 Qed.
 
 Lemma comparable_ltgtP x y : x >=< y ->
-  compare x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
+  compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
 rewrite />=<%O !le_eqVlt [y == x]eq_sym.
 have := (altP (x =P y), (boolP (x < y), boolP (y < x))).
@@ -2189,14 +2189,10 @@ by rewrite le_gtF // ltW.
 Qed.
 
 Lemma comparable_leP x y : x >=< y -> le_xor_gt x y (x <= y) (y < x).
-Proof.
-by move=> /comparable_ltgtP [xy|xy|->]; constructor; rewrite // ltW.
-Qed.
+Proof. by move=> /comparable_ltgtP [?|?|->]; constructor; rewrite // ltW. Qed.
 
 Lemma comparable_ltP x y : x >=< y -> lt_xor_ge x y (y <= x) (x < y).
-Proof.
-by move=> /comparable_ltgtP [xy|xy|->]; constructor; rewrite // ltW.
-Qed.
+Proof. by move=> /comparable_ltgtP [?|?|->]; constructor; rewrite // ltW. Qed.
 
 Lemma comparable_sym x y : (y >=< x) = (x >=< y).
 Proof. by rewrite /comparable orbC. Qed.
@@ -2496,7 +2492,7 @@ Proof. by rewrite meetAC meetC meetxx. Qed.
 
 Lemma lexI x y z : (x <= y `&` z) = (x <= y) && (x <= z).
 Proof.
-rewrite !leEmeet; apply/idP/idP => [/eqP<-|/andP[/eqP<- /eqP<-]].
+rewrite !leEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
   by rewrite meetA meetIK eqxx -meetA meetACA meetxx meetAC eqxx.
 by rewrite -[X in X `&` _]meetA meetIK meetA.
 Qed.
@@ -2661,27 +2657,20 @@ Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 
 Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
 
+Definition ltgtP x y := LatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
+Definition leP x y := LatticeTheoryJoin.lcomparable_leP (comparableT x y).
+Definition ltP x y := LatticeTheoryJoin.lcomparable_ltP (comparableT x y).
+
 Lemma wlog_le P :
      (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
    forall x y, P x y.
-Proof.
-move=> sP hP x y; case hxy: (x <= y); last apply/sP; apply/hP => //.
-by move/negbT: hxy; rewrite -ltNge; apply/ltW.
-Qed.
+Proof. by move=> sP hP x y; case: (leP x y) => [| /ltW] /hP // /sP. Qed.
 
 Lemma wlog_lt P :
     (forall x, P x x) ->
     (forall x y, (P y x -> P x y)) -> (forall x y, x < y -> P x y) ->
   forall x y, P x y.
-Proof.
-move=> rP sP hP x y; case hxy: (x < y); first by apply/hP.
-case hxy': (x == y); first by move/eqP: hxy' => <-; apply: rP.
-by apply/sP/hP; rewrite lt_def leNgt hxy hxy'.
-Qed.
-
-Definition ltgtP x y := LatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
-Definition leP x y := LatticeTheoryJoin.lcomparable_leP (comparableT x y).
-Definition ltP x y := LatticeTheoryJoin.lcomparable_ltP (comparableT x y).
+Proof. by move=> rP sP hP x y; case: (ltgtP x y) => [||->] // /hP // /sP. Qed.
 
 Lemma neq_lt x y : (x != y) = (x < y) || (y < x). Proof. by case: ltgtP. Qed.
 
@@ -2689,7 +2678,7 @@ Lemma lt_total x y : x != y -> (x < y) || (y < x). Proof. by case: ltgtP. Qed.
 
 Lemma eq_leLR x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
-Proof. by move=> *; apply/idP/idP; rewrite // !leNgt; apply: contra. Qed.
+Proof. by rewrite !ltNge => ? /contraTT ?; apply/idP/idP. Qed.
 
 Lemma eq_leRL x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y).
@@ -2697,7 +2686,7 @@ Proof. by move=> *; symmetry; apply: eq_leLR. Qed.
 
 Lemma eq_ltLR x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t).
-Proof. by move=> *; rewrite !ltNge; congr negb; apply: eq_leLR. Qed.
+Proof. by rewrite !leNgt => ? /contraTT ?; apply/idP/idP. Qed.
 
 Lemma eq_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
@@ -3323,7 +3312,7 @@ Implicit Types (x y z : T).
 Let comparableT x y : x >=< y := m x y.
 
 Fact ltgtP x y :
-  compare x y (y == x) (x == y) (x <= y) (y <= x) (x < y) (x > y).
+  compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof. exact: comparable_ltgtP. Qed.
 
 Fact leP x y : le_xor_gt x y (x <= y) (y < x).
