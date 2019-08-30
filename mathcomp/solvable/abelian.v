@@ -1742,8 +1742,8 @@ have cnt_b b: \big[dprod/1]_(x <- b) <[x]> = G ->
   count [pred x | #[x] == p ^ k.+1]%N b = cnt_p k b - cnt_p k.+1 b.
 - move/p_bG; elim: b => //= _ b IHb /andP[/p_natP[j ->] /IHb-> {IHb}].
   rewrite eqn_leq !leq_exp2l ?prime_gt1 // -eqn_leq pfactorK //.
-  case: ltngtP => // _ {j}; rewrite subSn // add0n; elim: b => //= y b IHb.
-  by rewrite leq_add // ltn_neqAle; case: (~~ _).
+  case: (ltngtP k.+1) => // _ {j}; rewrite subSn // add0n.
+  by elim: b => //= y b IHb; rewrite leq_add // ltn_neqAle; case: (~~ _).
 by rewrite !cnt_b // /cnt_p !(@count_logn_dprod_cycle _ _ _ G).
 Qed.
 

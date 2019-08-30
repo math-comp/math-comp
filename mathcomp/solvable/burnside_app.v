@@ -436,7 +436,7 @@ Qed.
 Lemma card_n3 : forall x y : square, x != y ->
   #|[set k : col_squares | k x == k y]| = (n ^ 3)%N.
 Proof.
-move=> x y nxy; apply/eqP; case: (ltngtP n 0) => // [|n0]; last first.
+move=> x y nxy; apply/eqP; case: (posnP n) => [n0|].
   by rewrite n0; apply/existsP=> [] [p _]; case: (p c0) => i; rewrite n0.
 move/eqn_pmul2l <-; rewrite -expnS -card_Fid Fid cardsT.
 rewrite -{1}[n]card_ord -cardX.

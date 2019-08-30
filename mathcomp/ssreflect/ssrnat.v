@@ -446,7 +446,7 @@ Variant ltn_xor_geq m n : bool -> bool -> Set :=
   | GeqNotLtn of n <= m : ltn_xor_geq m n true false.
 
 Lemma ltnP m n : ltn_xor_geq m n (n <= m) (m < n).
-Proof. by rewrite -(ltnS n); case: leqP; constructor. Qed.
+Proof. by case: leqP; constructor. Qed.
 
 Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
   | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
@@ -457,18 +457,18 @@ Proof. by case: n; constructor. Qed.
 
 Variant compare_nat m n :
    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n true false true false false false
-  | CompareNatGt of m > n : compare_nat m n false true false true false false
-  | CompareNatEq of m = n : compare_nat m n true true false false true true.
+  | CompareNatLt of m < n : compare_nat m n false false false true false true
+  | CompareNatGt of m > n : compare_nat m n false false true false true false
+  | CompareNatEq of m = n : compare_nat m n true true true true false false.
 
-Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
-                                   (n < m) (n == m) (m == n).
+Lemma ltngtP m n : compare_nat m n (n == m) (m == n) (n <= m)
+                                   (m <= n) (n < m) (m < n).
 Proof.
-rewrite !ltn_neqAle [_ == m]eq_sym; case: ltnP => [mn|].
+rewrite !ltn_neqAle [_ == n]eq_sym; case: ltnP => [nm|].
   by rewrite ltnW // gtn_eqF //; constructor.
-rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_nm eq_mn.
+rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_mn eq_nm.
   by rewrite ltn_eqF //; constructor.
-by rewrite eq_mn; constructor; apply/eqP.
+by rewrite eq_nm; constructor; apply/esym/eqP.
 Qed.
 
 (* Monotonicity lemmas *)
@@ -1795,3 +1795,17 @@ Ltac nat_congr := first
      apply: (congr1 (addn X1) _);
      symmetry
    end ].
+
+Module mc_1_9.
+
+Variant compare_nat m n :
+   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | CompareNatLt of m < n : compare_nat m n true false true false false false
+  | CompareNatGt of m > n : compare_nat m n false true false true false false
+  | CompareNatEq of m = n : compare_nat m n true true false false true true.
+
+Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
+                                   (n < m) (n == m) (m == n).
+Proof. by case: ltngtP; constructor. Qed.
+
+End mc_1_9.

@@ -579,7 +579,7 @@ Qed.
 Lemma coprime_has_primes m n :
   0 < m -> 0 < n -> coprime m n = ~~ has (mem (primes m)) (primes n).
 Proof.
-move=> m_gt0 n_gt0; apply/eqnP/hasPn=> [mn1 p | no_p_mn].
+move=> m_gt0 n_gt0; apply/eqP/hasPn=> [mn1 p | no_p_mn].
   rewrite /= !mem_primes m_gt0 n_gt0 /= => /andP[pr_p p_n].
   have:= prime_gt1 pr_p; rewrite pr_p ltnNge -mn1 /=; apply: contra => p_m.
   by rewrite dvdn_leq ?gcdn_gt0 ?m_gt0 // dvdn_gcd ?p_m.
