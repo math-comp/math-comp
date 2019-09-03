@@ -783,14 +783,13 @@ Variable (disp : unit).
 Local Notation porderType := (porderType disp).
 Variable (T : porderType).
 
-Definition le (R : porderType) : rel R := POrder.le (POrder.class R).
+Definition le : rel T := POrder.le (POrder.class T).
 Local Notation "x <= y" := (le x y) : order_scope.
 
-Definition lt (R : porderType) : rel R := POrder.lt (POrder.class R).
+Definition lt : rel T := POrder.lt (POrder.class T).
 Local Notation "x < y" := (lt x y) : order_scope.
 
-Definition comparable (R : porderType) : rel R :=
-  fun (x y : R) => (x <= y) || (y <= x).
+Definition comparable : rel T := fun (x y : T) => (x <= y) || (y <= x).
 Local Notation "x >=< y" := (comparable x y) : order_scope.
 Local Notation "x >< y" := (~~ (x >=< y)) : order_scope.
 
@@ -1487,11 +1486,11 @@ Module Import TotalSyntax.
 Fact total_display : unit. Proof. exact: tt. Qed.
 
 Notation max := (@join total_display _).
-Notation "@ 'max' R" :=
-  (@join total_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'max' T" :=
+  (@join total_display T) (at level 10, T at level 8, only parsing).
 Notation min := (@meet total_display _).
-Notation "@ 'min' R" :=
-  (@meet total_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'min' T" :=
+  (@meet total_display T) (at level 10, T at level 8, only parsing).
 
 Notation "\max_ ( i <- r | P ) F" :=
   (\big[max/0%O]_(i <- r | P%B) F%O) : order_scope.
@@ -1967,7 +1966,7 @@ Notation "x <=^c y <^c z" := ((x <=^c y) && (y <^c z)) : order_scope.
 Notation "x <^c y <^c z" := ((x <^c y) && (y <^c z)) : order_scope.
 
 Notation "x <=^c y ?= 'iff' C" := (<?=^c%O x y C) : order_scope.
-Notation "x <=^c y ?= 'iff' C :> R" := ((x : R) <=^c (y : R) ?= iff C)
+Notation "x <=^c y ?= 'iff' C :> T" := ((x : T) <=^c (y : T) ?= iff C)
   (only parsing) : order_scope.
 
 Notation ">=<^c x" := (>=<^c%O x) : order_scope.
@@ -2517,6 +2516,9 @@ Proof. by rewrite leEmeet; apply/eqP. Qed.
 Lemma meet_idPr {x y} : reflect (y `&` x = x) (x <= y).
 Proof. by rewrite meetC; apply/meet_idPl. Qed.
 
+Lemma meet_l x y : x <= y -> x `&` y = x. Proof. exact/meet_idPl. Qed.
+Lemma meet_r x y : y <= x -> x `&` y = y. Proof. exact/meet_idPr. Qed.
+
 Lemma leIidl x y : (x <= x `&` y) = (x <= y).
 Proof. by rewrite !leEmeet meetKI. Qed.
 Lemma leIidr x y : (x <= y `&` x) = (x <= y).
@@ -2581,6 +2583,9 @@ Lemma join_idPl {x y} : reflect (x `|` y = y) (x <= y).
 Proof. exact: (@meet_idPr _ [latticeType of L^c]). Qed.
 Lemma join_idPr {x y} : reflect (y `|` x = y) (x <= y).
 Proof. exact: (@meet_idPl _ [latticeType of L^c]). Qed.
+
+Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPr. Qed.
+Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPl. Qed.
 
 Lemma leUidl x y : (x `|` y <= y) = (x <= y).
 Proof. exact: (@leIidr _ [latticeType of L^c]). Qed.
@@ -2809,14 +2814,14 @@ Qed.
 Lemma leU2r_le y t x z : x `&` t = 0 -> y `|` x <= t `|` z -> x <= z.
 Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
 
-Lemma lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
+Lemma disjoint_lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
 Proof.
 move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
 by apply: (@leU2l_le x z); rewrite ?joinxx.
 Qed.
 
-Lemma lexUr z x y : x `&` z = 0 -> (x <= z `|` y) = (x <= y).
-Proof. by move=> xz0; rewrite joinC; rewrite lexUl. Qed.
+Lemma disjoint_lexUr z x y : x `&` z = 0 -> (x <= z `|` y) = (x <= y).
+Proof. by move=> xz0; rewrite joinC; rewrite disjoint_lexUl. Qed.
 
 Lemma leU2E x y z t : x `&` t = 0 -> y `&` z = 0 ->
   (x `|` y <= z `|` t) = (x <= z) && (y <= t).
@@ -2970,11 +2975,11 @@ Proof. rewrite joinC; exact: (@leU2l_le _ [tblatticeType of L^c]). Qed.
 Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
 Proof. rewrite joinC; exact: (@leU2r_le _ [tblatticeType of L^c]). Qed.
 
-Lemma lexIl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@lexUl _ [tblatticeType of L^c]). Qed.
+Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
+Proof. rewrite joinC; exact: (@disjoint_lexUl _ [tblatticeType of L^c]). Qed.
 
-Lemma lexIr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@lexUr _ [tblatticeType of L^c]). Qed.
+Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
+Proof. rewrite joinC; exact: (@disjoint_lexUr _ [tblatticeType of L^c]). Qed.
 
 Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
@@ -3943,7 +3948,7 @@ Notation "x <=^p y <^p z" := ((x <=^p y) && (y <^p z)) : order_scope.
 Notation "x <^p y <^p z" := ((x <^p y) && (y <^p z)) : order_scope.
 
 Notation "x <=^p y ?= 'iff' C" := (<?=^p%O x y C) : order_scope.
-Notation "x <=^p y ?= 'iff' C :> R" := ((x : R) <=^p (y : R) ?= iff C)
+Notation "x <=^p y ?= 'iff' C :> T" := ((x : T) <=^p (y : T) ?= iff C)
   (only parsing) : order_scope.
 
 Notation ">=<^p x" := (>=<^p%O x) : order_scope.
@@ -4052,7 +4057,7 @@ Notation "x <=^l y <^l z" := ((x <=^l y) && (y <^l z)) : order_scope.
 Notation "x <^l y <^l z" := ((x <^l y) && (y <^l z)) : order_scope.
 
 Notation "x <=^l y ?= 'iff' C" := (<?=^l%O x y C) : order_scope.
-Notation "x <=^l y ?= 'iff' C :> R" := ((x : R) <=^l (y : R) ?= iff C)
+Notation "x <=^l y ?= 'iff' C :> T" := ((x : T) <=^l (y : T) ?= iff C)
   (only parsing) : order_scope.
 
 Notation ">=<^l x" := (>=<^l%O x) : order_scope.
