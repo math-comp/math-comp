@@ -5674,5 +5674,3 @@ Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
 
 End Num.
 End mc_1_9.
-
-Export mc_1_9 mc_1_9.Num.Syntax.
