@@ -40,7 +40,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope ring_scope.
-Import Order.Theory Order.Syntax GRing.Theory Num.Theory.
+Import Order.TTheory Order.Syntax GRing.Theory Num.Theory.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
