@@ -143,6 +143,9 @@ coq-dev:
   script:
     - make -j "${NJOBS}"
     - make install
+  except:
+    - /^experiment\/order$/
+    - /^pr-(270|383)$/
 
 ci-fourcolor-8.7:
   extends: .ci-fourcolor
@@ -169,6 +172,33 @@ ci-fourcolor-dev:
   variables:
     COQ_VERSION: "dev"
 
+.ci-fourcolor-270:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/pi8027/fourcolor.git"
+    CONTRIB_VERSION: fix-mathcomp-270
+  script:
+    - make -j "${NJOBS}"
+    - make install
+  only:
+    - /^experiment\/order$/
+    - /^pr-(270|383)$/
+
+ci-fourcolor-8.7-270:
+  extends: .ci-fourcolor-270
+  variables:
+    COQ_VERSION: "8.7"
+
+ci-fourcolor-8.8-270:
+  extends: .ci-fourcolor-270
+  variables:
+    COQ_VERSION: "8.8"
+
+ci-fourcolor-dev-270:
+  extends: .ci-fourcolor-270
+  variables:
+    COQ_VERSION: "dev"
+
 # The Odd Order Theorem
 .ci-odd-order:
   extends: .ci
@@ -178,6 +208,9 @@ ci-fourcolor-dev:
   script:
     - make -j "${NJOBS}"
     - make install
+  except:
+    - /^experiment\/order$/
+    - /^pr-(270|383)$/
 
 ci-odd-order-8.7:
   extends: .ci-odd-order
@@ -201,6 +234,33 @@ ci-odd-order-8.10:
 
 ci-odd-order-dev:
   extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "dev"
+
+.ci-odd-order-270:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/pi8027/odd-order.git"
+    CONTRIB_VERSION: fix-mathcomp-270
+  script:
+    - make -j "${NJOBS}"
+    - make install
+  only:
+    - /^experiment\/order$/
+    - /^pr-(270|383)$/
+
+ci-odd-order-8.7-270:
+ extends: .ci-odd-order-270
+ variables:
+   COQ_VERSION: "8.7"
+
+ci-odd-order-8.8-270:
+ extends: .ci-odd-order-270
+ variables:
+   COQ_VERSION: "8.8"
+
+ci-odd-order-dev-270:
+  extends: .ci-odd-order-270
   variables:
     COQ_VERSION: "dev"
 
