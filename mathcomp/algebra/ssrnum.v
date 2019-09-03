@@ -125,7 +125,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import Order.Theory Order.Def Order.Syntax GRing.Theory.
+Import Order.TTheory Order.Def Order.Syntax GRing.Theory.
 
 Reserved Notation "<= y" (at level 35).
 Reserved Notation ">= y" (at level 35).
@@ -5478,12 +5478,12 @@ Implicit Types x y z : R.
 Section MinMax.
 Definition minrC : @commutative R R min := @meetC _ R.
 Definition minrr : @idempotent R min := @meetxx _ R.
-Definition minr_l x y : x <= y -> min x y = x := elimT meet_idPl.
-Definition minr_r x y : y <= x -> min x y = y := elimT meet_idPr.
+Definition minr_l x y : x <= y -> min x y = x := @meet_l _ _ x y.
+Definition minr_r x y : y <= x -> min x y = y := @meet_r _ _ x y.
 Definition maxrC : @commutative R R max := @joinC _ R.
 Definition maxrr : @idempotent R max := @joinxx _ R.
-Definition maxr_l x y : y <= x -> max x y = x := elimT join_idPr.
-Definition maxr_r x y : x <= y -> max x y = y := elimT join_idPl.
+Definition maxr_l x y : y <= x -> max x y = x := @join_l _ _ x y.
+Definition maxr_r x y : x <= y -> max x y = y := @join_r _ _ x y.
 Definition minrA x y z : min x (min y z) = min (min x y) z := meetA x y z.
 Definition minrCA : @left_commutative R R min := meetCA.
 Definition minrAC : @right_commutative R R min := meetAC.

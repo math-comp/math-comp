@@ -19,7 +19,7 @@ From mathcomp Require Import ssrint.
 (*       ratr x == generic embedding of  (r : R) into an arbitrary unitring.  *)
 (******************************************************************************)
 
-Import Order.Theory GRing.Theory Num.Theory.
+Import Order.TTheory GRing.Theory Num.Theory.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
