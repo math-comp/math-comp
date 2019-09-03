@@ -568,7 +568,7 @@ End FinFieldExists.
 
 Section FinDomain.
 
-Import order ssrnum ssrint algC cyclotomic Order.Theory Num.Theory.
+Import order ssrnum ssrint algC cyclotomic Order.TTheory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.

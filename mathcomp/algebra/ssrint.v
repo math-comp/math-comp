@@ -40,7 +40,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import Order.Theory GRing.Theory Num.Theory.
+Import Order.TTheory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
 Local Open Scope int_scope.
 
