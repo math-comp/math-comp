@@ -85,6 +85,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added lemmas on commutation with difference, big sum and prod:
   `commrB`, `commr_sum`, `commr_prod`.
 
+- Added a few basic seq lemmas about `nseq`, `take` and `drop`:
+  `nseq_addn`, `take_take`, `take_drop`, `take_addn`, `takeC`,
+  `take_nseq`, `drop_nseq`, `rev_nseq`, `take_iota`, `drop_iota`.
+
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
