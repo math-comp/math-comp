@@ -4398,7 +4398,7 @@ by move/(order_path_min argCle_trans)/allP->.
 Qed.
 
 Definition nthroot n x := let: RootCspec y _ _ := rootC_subproof n x in y.
-Notation "n .-root" := (nthroot n) (at level 2, format "n .-root") : ring_core_scope.
+Notation "n .-root" := (nthroot n) (at level 2, format "n .-root") : ring_scope.
 Notation "n .-root" := (nthroot n) (only parsing) : ring_scope.
 Notation sqrtC := 2.-root.
 
