@@ -163,10 +163,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * `minr_max(l|r)` -> `meetU(l|r)`
     * `minrP`, `maxrP` -> `leP`, `ltP`
     * `(minr|maxr)(r|C|A|CA|AC)` -> `(meet|join)(xx|C|A|CA|AC)`
-    * `minr_l` -> `elimT meet_idPl`
-    * `minr_r` -> `elimT meet_idPr`
-    * `maxr_l` -> `elimT join_idPr`
-    * `maxr_r` -> `elimT join_idPl`
+    * `minr_(l|r)` -> `meet_(l|r)`
+    * `maxr_(l|r)` -> `join_(l|r)`
     * `arg_minrP` -> `arg_minP`
     * `arg_maxrP` -> `arg_maxP`
   + Generalized the following lemmas as properties of `normedDomainType`:
