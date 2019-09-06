@@ -141,7 +141,8 @@ coq-dev:
     - make -j "${NJOBS}"
     - make install
   except:
-    - /^pr-(270|377)$/
+    - /^experiment\/order$/
+    - /^pr-(270|382)$/
 
 ci-fourcolor-8.7:
   extends: .ci-fourcolor
@@ -172,7 +173,8 @@ ci-fourcolor-dev:
     - make -j "${NJOBS}"
     - make install
   only:
-    - /^pr-(270|377)$/
+    - /^experiment\/order$/
+    - /^pr-(270|382)$/
 
 ci-fourcolor-8.7-270:
   extends: .ci-fourcolor-270
@@ -199,7 +201,8 @@ ci-fourcolor-dev-270:
     - make -j "${NJOBS}"
     - make install
   except:
-    - /^pr-(270|377)$/
+    - /^experiment\/order$/
+    - /^pr-(270|382)$/
 
 ci-odd-order-8.7:
   extends: .ci-odd-order
@@ -230,7 +233,8 @@ ci-odd-order-dev:
     - make -j "${NJOBS}"
     - make install
   only:
-    - /^pr-(270|377)$/
+    - /^experiment\/order$/
+    - /^pr-(270|382)$/
 
 ci-odd-order-8.7-270:
  extends: .ci-odd-order-270
