@@ -112,7 +112,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import Order.Theory Order.Syntax GroupScope GRing.Theory Num.Theory.
+Import Order.TTheory Order.Syntax GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation "p ^ f" := (map_poly f p) : ring_scope.
