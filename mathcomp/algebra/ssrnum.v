@@ -727,8 +727,11 @@ Section ClassDef.
 
 Record class_of R := Class {
   base   : NumDomain.class_of R;
+  nmixin_disp : unit;
+  nmixin : Order.Lattice.mixin_of (Order.POrder.Pack nmixin_disp base);
   lmixin_disp : unit;
-  lmixin : Order.DistrLattice.mixin_of (Order.POrder.Pack lmixin_disp base);
+  lmixin : Order.DistrLattice.mixin_of
+             (Order.Lattice.Pack lmixin_disp (Order.Lattice.Class nmixin));
   tmixin_disp : unit;
   tmixin : Order.Total.mixin_of
              (Order.DistrLattice.Pack
@@ -736,7 +739,10 @@ Record class_of R := Class {
 }.
 Local Coercion base : class_of >-> NumDomain.class_of.
 Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
-  @Order.Total.Class _ (Order.DistrLattice.Class (@lmixin _ c)) _ (@tmixin _ c).
+  @Order.Total.Class
+    _ (@Order.DistrLattice.Class
+         _ (Order.Lattice.Class (@nmixin _ c)) _ (@lmixin _ c))
+    _ (@tmixin _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -746,11 +752,13 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
-  fun mT ldisp l mdisp m &
+  fun mT ndisp n ldisp l mdisp m &
       phant_id (@Order.Total.class ring_display mT)
                (@Order.Total.Class
-                  T (@Order.DistrLattice.Class T b ldisp l) mdisp m) =>
-  Pack (@Class T b ldisp l mdisp  m).
+                  T (@Order.DistrLattice.Class
+                       T (@Order.Lattice.Class T b ndisp n) ldisp l)
+                  mdisp m) =>
+  Pack (@Class T b ndisp n ldisp l mdisp m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -761,10 +769,25 @@ Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
 Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition normedZmodType := NormedZmodType numDomainType cT xclass.
+Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType xclass.
+Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType xclass.
+Definition comRing_latticeType :=
+  @Order.Lattice.Pack ring_display comRingType xclass.
+Definition unitRing_latticeType :=
+  @Order.Lattice.Pack ring_display unitRingType xclass.
+Definition comUnitRing_latticeType :=
+  @Order.Lattice.Pack ring_display comUnitRingType xclass.
+Definition idomain_latticeType :=
+  @Order.Lattice.Pack ring_display idomainType xclass.
+Definition normedZmod_latticeType :=
+  @Order.Lattice.Pack ring_display normedZmodType xclass.
+Definition numDomain_latticeType :=
+  @Order.Lattice.Pack ring_display numDomainType xclass.
 Definition zmod_distrLatticeType :=
   @Order.DistrLattice.Pack ring_display zmodType xclass.
 Definition ring_distrLatticeType :=
@@ -823,12 +846,22 @@ Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
 Coercion distrLatticeType : type >-> Order.DistrLattice.type.
 Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
+Canonical zmod_latticeType.
+Canonical ring_latticeType.
+Canonical comRing_latticeType.
+Canonical unitRing_latticeType.
+Canonical comUnitRing_latticeType.
+Canonical idomain_latticeType.
+Canonical normedZmod_latticeType.
+Canonical numDomain_latticeType.
 Canonical zmod_distrLatticeType.
 Canonical ring_distrLatticeType.
 Canonical comRing_distrLatticeType.
@@ -846,7 +879,7 @@ Canonical idomain_orderType.
 Canonical normedZmod_orderType.
 Canonical numDomain_orderType.
 Notation realDomainType := type.
-Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ id)
+Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ _ _ id)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -859,8 +892,11 @@ Section ClassDef.
 
 Record class_of R := Class {
   base  : NumField.class_of R;
+  nmixin_disp : unit;
+  nmixin : Order.Lattice.mixin_of (Order.POrder.Pack nmixin_disp base);
   lmixin_disp : unit;
-  lmixin : Order.DistrLattice.mixin_of (@Order.POrder.Pack lmixin_disp R base);
+  lmixin : Order.DistrLattice.mixin_of
+             (Order.Lattice.Pack lmixin_disp (Order.Lattice.Class nmixin));
   tmixin_disp : unit;
   tmixin : Order.Total.mixin_of
              (Order.DistrLattice.Pack
@@ -878,9 +914,10 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT (b : NumField.class_of T) & phant_id (NumField.class bT) b =>
-  fun mT ldisp l tdisp t & phant_id (RealDomain.class mT)
-                                    (@RealDomain.Class T b ldisp l tdisp t) =>
-  Pack (@Class T b ldisp l tdisp t).
+  fun mT ndisp n ldisp l tdisp t
+      & phant_id (RealDomain.class mT)
+                 (@RealDomain.Class T b ndisp n ldisp l tdisp t) =>
+  Pack (@Class T b ndisp n ldisp l tdisp t).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -892,16 +929,21 @@ Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
 Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition normedZmodType := NormedZmodType numDomainType cT xclass.
+Definition field_latticeType :=
+  @Order.Lattice.Pack ring_display fieldType xclass.
 Definition field_distrLatticeType :=
   @Order.DistrLattice.Pack ring_display fieldType xclass.
 Definition field_orderType := @Order.Total.Pack ring_display fieldType xclass.
 Definition field_realDomainType := @RealDomain.Pack fieldType xclass.
+Definition numField_latticeType :=
+  @Order.Lattice.Pack ring_display numFieldType xclass.
 Definition numField_distrLatticeType :=
   @Order.DistrLattice.Pack ring_display numFieldType xclass.
 Definition numField_orderType :=
@@ -935,6 +977,8 @@ Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
 Coercion distrLatticeType : type >-> Order.DistrLattice.type.
 Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
@@ -947,14 +991,16 @@ Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
+Canonical field_latticeType.
 Canonical field_distrLatticeType.
 Canonical field_orderType.
 Canonical field_realDomainType.
+Canonical numField_latticeType.
 Canonical numField_distrLatticeType.
 Canonical numField_orderType.
 Canonical numField_realDomainType.
 Notation realFieldType := type.
-Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ id)
+Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ _ _ id)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -989,9 +1035,10 @@ Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
 Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
@@ -1022,12 +1069,14 @@ Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
 Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
 Coercion distrLatticeType : type >-> Order.DistrLattice.type.
 Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
+Coercion numDomainType : type >-> NumDomain.type.
+Canonical numDomainType.
 Coercion realDomainType : type >-> RealDomain.type.
 Canonical realDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
@@ -1077,9 +1126,10 @@ Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
+Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
 Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
+Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
@@ -1110,14 +1160,16 @@ Coercion idomainType : type >-> GRing.IntegralDomain.type.
 Canonical idomainType.
 Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
+Coercion latticeType : type >-> Order.Lattice.type.
+Canonical latticeType.
 Coercion distrLatticeType : type >-> Order.DistrLattice.type.
 Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
+Coercion numDomainType : type >-> NumDomain.type.
+Canonical numDomainType.
+Coercion realDomainType : type >-> RealDomain.type.
+Canonical realDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
 Coercion numFieldType : type >-> NumField.type.
@@ -4773,17 +4825,17 @@ Qed.
 Lemma normrN x : `|- x| = `|x|.
 Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Definition lePOrderMixin : ltPOrderMixin R :=
+Definition ltPOrderMixin : ltPOrderMixin R :=
   LtPOrderMixin le_def' ltrr lt_trans.
 
 Definition normedZmodMixin :
-  @normed_mixin_of R R lePOrderMixin :=
-  @Num.NormedMixin _ _ lePOrderMixin (norm m)
+  @normed_mixin_of R R ltPOrderMixin :=
+  @Num.NormedMixin _ _ ltPOrderMixin (norm m)
                    (normD m) (@norm_eq0 m) normrMn normrN.
 
 Definition numDomainMixin :
-  @mixin_of R lePOrderMixin normedZmodMixin :=
-  @Num.Mixin _ lePOrderMixin normedZmodMixin (@addr_gt0 m)
+  @mixin_of R ltPOrderMixin normedZmodMixin :=
+  @Num.Mixin _ ltPOrderMixin normedZmodMixin (@addr_gt0 m)
              (@ger_total m) (@normM m) (@le_def m).
 
 End NumMixin.
@@ -4791,9 +4843,11 @@ End NumMixin.
 Module Exports.
 Notation numMixin := of_.
 Notation NumMixin := Mixin.
-Coercion lePOrderMixin : numMixin >-> ltPOrderMixin.
+Coercion ltPOrderMixin : numMixin >-> Order.LtPOrderMixin.of_.
 Coercion normedZmodMixin : numMixin >-> normed_mixin_of.
 Coercion numDomainMixin : numMixin >-> mixin_of.
+Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
+  NumDomainType (POrderType ring_display T m) m.
 End Exports.
 
 End NumMixin.
@@ -4811,14 +4865,17 @@ move=> x y; move: (real (x - y)).
 by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
 Qed.
 
-Definition totalMixin :
-  Order.Total.mixin_of (DistrLatticeType R le_total) := le_total.
+Let R_distrLatticeType := DistrLatticeType (LatticeType R le_total) le_total.
+
+Definition totalMixin : Order.Total.mixin_of R_distrLatticeType := le_total.
 
 End RealMixin.
 
 Module Exports.
 Coercion le_total : real_axiom >-> totalPOrderMixin.
 Coercion totalMixin : real_axiom >-> totalOrderMixin.
+Definition RealDomainOfNumDomain (T : numDomainType) (m : real_axiom T) :=
+  [realDomainType of (OrderOfPOrder m)].
 End Exports.
 
 End RealMixin.
@@ -4910,9 +4967,14 @@ Notation realLeMixin := of_.
 Notation RealLeMixin := Mixin.
 Coercion numMixin : realLeMixin >-> NumMixin.of_.
 Coercion orderMixin : realLeMixin >-> totalPOrderMixin.
+Definition LeRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
+  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
+Definition LeRealFieldOfField (R : fieldType) (m : of_ R) :=
+  [realFieldType of [numFieldType of LeRealDomainOfIdomain m]].
 End Exports.
 
 End RealLeMixin.
+Import RealLeMixin.Exports.
 
 Module RealLtMixin.
 Section RealLtMixin.
@@ -5021,9 +5083,14 @@ Notation realLtMixin := of_.
 Notation RealLtMixin := Mixin.
 Coercion numMixin : realLtMixin >-> NumMixin.of_.
 Coercion orderMixin : realLtMixin >-> totalPOrderMixin.
+Definition LtRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
+  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
+Definition LtRealFieldOfField (R : fieldType) (m : of_ R) :=
+  [realFieldType of [numFieldType of LtRealDomainOfIdomain m]].
 End Exports.
 
 End RealLtMixin.
+Import RealLtMixin.Exports.
 
 End Num.
 

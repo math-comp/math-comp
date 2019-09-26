@@ -431,6 +431,7 @@ End intOrdered.
 End intOrdered.
 
 Canonical int_porderType := POrderType ring_display int intOrdered.Mixin.
+Canonical int_latticeType := LatticeType int intOrdered.Mixin.
 Canonical int_distrLatticeType := DistrLatticeType int intOrdered.Mixin.
 Canonical int_orderType := OrderType int intOrdered.lez_total.
 Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
