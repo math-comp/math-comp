@@ -1,0 +1,7 @@
+test_suite/hierarchy_test.v
+
+-I .
+-R . mathcomp
+
+-arg -w -arg -notation-overridden
+-arg -w -arg -ambiguous-paths

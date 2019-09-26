@@ -159,7 +159,13 @@ Tactic Notation "check_join"
       _ (_ ?Tjoin) => Tjoin | _ ?Tjoin => Tjoin | ?Tjoin => Tjoin
     end
   in
-  is_evar Tjoin;
+  match tt with
+    | _ => is_evar Tjoin
+    | _ =>
+      let Tjoin := eval simpl in (Tjoin : Type) in
+      fail "The join of" t1 "and" t2 "is a concrete type" Tjoin
+           "but is expected to be" tjoin
+  end;
   let tjoin' := type of Tjoin in
   lazymatch tjoin' with
     | tjoin => idtac

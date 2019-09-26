@@ -2,8 +2,15 @@
 
 ######################################################################
 # USAGE:                                                             #
-# The rules this-config::, this-build::, this-distclean::,           #
-# pre-makefile::, this-clean:: and __always__:: may be extended      #
+#                                                                    #
+# make all: Build the MathComp library entirely,                     #
+# make test-suite: Run the test suite,                               #
+# make only TGTS="...vo": Build the selected libraries of MathComp.  #
+#                                                                    #
+# The rules this-config::, this-build::, this-only::,                #
+# this-test-suite::, this-distclean::, pre-makefile::, this-clean::  #
+# and __always__:: may be extended.                                  #
+#                                                                    #
 # Additionally, the following variables may be customized:           #
 SUBDIRS?=
 COQBIN?=$(dir $(shell which coqtop))
@@ -14,15 +21,17 @@ COQMAKEOPTIONS?=
 COQMAKEFILEOPTIONS?=
 V?=
 VERBOSE?=V
+TGTS?=
 ######################################################################
 
 # local context: -----------------------------------------------------
-.PHONY: all config build clean distclean __always__
+.PHONY: all config build only test-suite clean distclean __always__
 .SUFFIXES:
 
 H:= $(if $(VERBOSE),,@)  # not used yet
 TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
 COQMAKE = $(MAKE) -f Makefile.coq $(COQMAKEOPTIONS)
+COQMAKE_TESTSUITE = $(MAKE) -f Makefile.test-suite.coq VDFILE=".coqdeps.test-suite" $(COQMAKEOPTIONS)
 BRANCH_coq:= $(shell $(COQBIN)coqtop -v | head -1 | grep -E '(trunk|master)' \
 	      | wc -l | sed 's/ *//g')
 
@@ -45,28 +54,49 @@ all: config build
 Makefile.coq: pre-makefile $(COQPROJECT) Makefile
 	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
 
+# Test suite ---------------------------------------------------------
+
+test_suite/hierarchy_test.v: build
+	mkdir -p test_suite
+	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp -lib all.all > test_suite/hierarchy_test.v
+
+Makefile.test-suite.coq: test_suite/hierarchy_test.v
+	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f Make.test-suite -o Makefile.test-suite.coq
+
 # Global config, build, clean and distclean --------------------------
 config: sub-config this-config
 
 build: sub-build this-build
+
+only: sub-only this-only
+
+test-suite: sub-test-suite this-test-suite
 
 clean: sub-clean this-clean
 
 distclean: sub-distclean this-distclean
 
 # Local config, build, clean and distclean ---------------------------
-.PHONY: this-config this-build this-distclean this-clean
+.PHONY: this-config this-build this-only this-test-suite this-distclean this-clean
 
 this-config:: __always__
 
 this-build:: this-config Makefile.coq
 	+$(COQMAKE)
 
+this-only:: this-config Makefile.coq
+	+$(COQMAKE) only "TGTS=$(TGTS)"
+
+this-test-suite:: Makefile.test-suite.coq
+	+$(COQMAKE_TESTSUITE)
+
 this-distclean:: this-clean
-	rm -f Makefile.coq Makefile.coq.conf Makefile.coq
+	rm -f Makefile.coq Makefile.coq.conf
+	rm -f Makefile.test-suite.coq Makefile.test-suite.coq.conf
 
 this-clean:: __always__
 	@if [ -f Makefile.coq ]; then $(COQMAKE) cleanall; fi
+	@if [ -f Makefile.test-suite.coq ]; then $(COQMAKE_TESTSUITE) cleanall; fi
 
 # Install target -----------------------------------------------------
 .PHONY: install
