@@ -62,7 +62,7 @@ Require Export Ring.
 (*                                                                            *)
 (*   maximum and minimum                                                      *)
 (*      maxn m n, minn m n                                                    *)
-(*   Note that maxn m n = m + (m - n), due to the truncating subtraction.     *)
+(*   Note that maxn m n = m + (n - m), due to the truncating subtraction.     *)
 (*   Absolute difference (linear distance) between nats is defined in the int *)
 (*   library (in the int.IntDist sublibrary), with the syntax `|m - n|. The   *)
 (*   '-' in this notation is the signed integer difference.                   *)
