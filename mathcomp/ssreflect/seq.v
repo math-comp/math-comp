@@ -2911,15 +2911,6 @@ move=> eq_s eq_t z; apply/allpairsPdep/allpairsPdep=> -[x [y [sx ty ->]]];
 by exists x, y; rewrite -eq_s in sx *; rewrite eq_t in ty *.
 Qed.
 
-Lemma allpairs_catr f s t1 t2 :
-  [seq f x y | x <- s, y <- t1 x ++ t2 x] =i
-    [seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x].
-Proof.
-move=> z; rewrite mem_cat; apply/allpairsPdep/orP=> [[x [y [s_x]]]|].
-  by rewrite mem_cat => /orP[]; [left|right]; apply/allpairsPdep; exists x, y.
-by case=>/allpairsPdep[x [y [sx ty ->]]]; exists x, y; rewrite mem_cat ty ?orbT.
-Qed.
-
 Lemma allpairs_uniq_dep f s t (st := [seq Tagged T y | x <- s, y <- t x]) :
   let g (p : {x : S & T x}) : R := f (tag p) (tagged p) in
     uniq s -> {in s, forall x, uniq (t x)} -> {in st &, injective g} ->
@@ -2934,6 +2925,15 @@ by apply: contra s'x => /hasP[y _ /allpairsPdep[z [_ [? _ /(congr1 tag)/=->]]]].
 Qed.
 
 End EqAllPairsDep.
+
+Lemma allpairs_catr
+      (S : Type) (T : S -> Type) (R : eqType) (f : forall x, T x -> R) s t1 t2 :
+  [seq f x y | x <- s, y <- t1 x ++ t2 x] =i
+  [seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x].
+Proof.
+move=> z; rewrite mem_cat; elim: s => //= x s ih.
+by rewrite map_cat !mem_cat ih !orbA; congr orb; rewrite orbAC.
+Qed.
 
 Arguments allpairsPdep {S T R f s t z}.
 
