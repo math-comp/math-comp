@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added functions `tuple_of_finfun`, `finfun_of_tuple`, and their
   "cancellation" lemmas.
 
-- Added theorem `totient_prime` in `prime.v`
+- Added theorems `totient_prime` `Euclid_dvd_prod` in `prime.v`
 
 - Added theorems `ffact_prod`,`prime_modn_expSn` and `fermat_little`
   in `binomial.v`
