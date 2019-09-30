@@ -148,6 +148,13 @@ elim: n m => [|n IHn] [|m] //=; first by rewrite ffactn1 mul1n.
 by rewrite !ffactSS IHn mulnA.
 Qed.
 
+Lemma ffact_prod n m : n ^_ m = \prod_(i < m) (n - i).
+Proof.
+elim: m n => [n | m IH [|n] //]; first by rewrite ffactn0 big_ord0.
+  by rewrite big_ord_recr /= sub0n muln0.
+by rewrite ffactSS IH big_ord_recl subn0.
+Qed.
+
 Lemma ffact_gt0 n m : (0 < n ^_ m) = (m <= n).
 Proof. by elim: n m => [|n IHn] [|m] //=; rewrite ffactSS muln_gt0 IHn. Qed.
 
