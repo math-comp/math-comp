@@ -29,3 +29,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   by `true` or `false`, while keeping the ability to use it in the way
   it was used before.
 
+- Generalized the `allpairs_catr` lemma to the case where the types of `s`,
+  `t1`, and `t2` are non-`eqType`s in `[seq E | i <- s, j <- t1 ++ t2]`.
+
