@@ -397,10 +397,9 @@ Qed.
 
 Lemma size_set_nth s n y : size (set_nth s n y) = maxn n.+1 (size s).
 Proof.
-elim: s n => [|x s IHs] [|n] //=.
-- by rewrite size_ncons addn1 maxn0.
-- by rewrite maxnE subn1.
-by rewrite IHs -add1n addn_maxr.
+rewrite maxnC; elim: s n => [|x s IHs] [|n] //=.
+- by rewrite size_ncons addn1.
+- by rewrite IHs maxnSS.
 Qed.
 
 Lemma set_nth_nil n y : set_nth [::] n y = ncons n x0 [:: y].
@@ -585,10 +584,7 @@ Lemma filter_predT s : filter predT s = s.
 Proof. by elim: s => //= x s ->. Qed.
 
 Lemma filter_predI a1 a2 s : filter (predI a1 a2) s = filter a1 (filter a2 s).
-Proof.
-elim: s => //= x s IHs; rewrite andbC IHs.
-by case: (a2 x) => //=; case (a1 x).
-Qed.
+Proof. by elim: s => //= x s ->; rewrite andbC; case: (a2 x). Qed.
 
 Lemma count_pred0 s : count pred0 s = 0.
 Proof. by rewrite -size_filter filter_pred0. Qed.
@@ -678,9 +674,7 @@ Lemma nconsK n x : cancel (ncons n x) (drop n).
 Proof. by elim: n => // -[]. Qed.
 
 Lemma drop_drop s n1 n2 : drop n1 (drop n2 s) = drop (n1 + n2) s.
-Proof.
-by elim: n2 s => [s|n2 IHn1 [|x s]]; rewrite ?drop0 ?addn0 ?addnS /=.
-Qed.
+Proof. by elim: s n2 => // x s ihs [|n2]; rewrite ?drop0 ?addn0 ?addnS /=. Qed.
 
 Fixpoint take n s {struct s} :=
   match s, n with
@@ -1007,7 +1001,7 @@ Proof. by move=> x ys'x; rewrite lastI mem_rcons mem_behead. Qed.
 
 Lemma mem_nth s n : n < size s -> nth s n \in s.
 Proof.
-by elim: s n => [|x s IHs] // [_|n sz_s]; rewrite ?mem_head // mem_behead ?IHs.
+by elim: s n => // x s IHs [_|n sz_s]; rewrite ?mem_head // mem_behead ?IHs.
 Qed.
 
 Lemma mem_take s x : x \in take n0 s -> x \in s.
@@ -1497,9 +1491,7 @@ Proof. by apply/permPl/permP=> i; rewrite count_rev. Qed.
 
 Lemma perm_filter s1 s2 a :
   perm_eq s1 s2 -> perm_eq (filter a s1) (filter a s2).
-Proof.
-by move/permP=> s12_count; apply/permP=> Q; rewrite !count_filter.
-Qed.
+Proof. by move/permP=> s12_count; apply/permP=> Q; rewrite !count_filter. Qed.
 
 Lemma perm_filterC a s : perm_eql (filter a s ++ filter (predC a) s) s.
 Proof.
@@ -1903,9 +1895,7 @@ Lemma mem_subseq s1 s2 : subseq s1 s2 -> {subset s1 <= s2}.
 Proof. by case/subseqP=> m _ -> x; apply: mem_mask. Qed.
 
 Lemma sub1seq x s : subseq [:: x] s = (x \in s).
-Proof.
-by elim: s => //= y s; rewrite inE; case: (x == y); rewrite ?sub0seq.
-Qed.
+Proof. by elim: s => //= y s; rewrite inE; case: ifP; rewrite ?sub0seq. Qed.
 
 Lemma size_subseq s1 s2 : subseq s1 s2 -> size s1 <= size s2.
 Proof. by case/subseqP=> m sz_m ->; rewrite size_mask -sz_m ?count_size. Qed.
@@ -2282,9 +2272,7 @@ by move=> gK s u; rewrite -(mem_map (pcan_inj gK)) pmap_filter // mem_filter gK.
 Qed.
 
 Lemma pmap_uniq s : uniq s -> uniq (pmap f s).
-Proof.
-by move/(filter_uniq [eta f]); rewrite -(pmap_filter fK); apply: map_uniq.
-Qed.
+Proof. move/(filter_uniq f); rewrite -(pmap_filter fK); exact: map_uniq. Qed.
 
 Lemma perm_pmap s t : perm_eq s t -> perm_eq (pmap f s) (pmap f t).
 Proof.
@@ -2458,8 +2446,7 @@ Fixpoint foldl z s := if s is x :: s' then foldl (f z x) s' else z.
 
 Lemma foldl_rev z s : foldl z (rev s) = foldr (fun x z => f z x) z s.
 Proof.
-elim/last_ind: s z => [|s x IHs] z //=.
-by rewrite rev_rcons -cats1 foldr_cat -IHs.
+by elim/last_ind: s z => // s x IHs z; rewrite rev_rcons -cats1 foldr_cat -IHs.
 Qed.
 
 Lemma foldl_cat z s1 s2 : foldl z (s1 ++ s2) = foldl (foldl z s1) s2.
@@ -2549,9 +2536,7 @@ Lemma size2_zip s t : size t <= size s -> size (zip s t) = size t.
 Proof. by elim: s t => [|x s IHs] [|y t] //= Hs; rewrite IHs. Qed.
 
 Lemma size_zip s t : size (zip s t) = minn (size s) (size t).
-Proof.
-by elim: s t => [|x s IHs] [|t2 t] //=; rewrite IHs -add1n addn_minr.
-Qed.
+Proof. by elim: s t => [|x s IHs] [|t2 t] //=; rewrite IHs minnSS. Qed.
 
 Lemma zip_cat s1 s2 t1 t2 :
   size s1 = size t1 -> zip (s1 ++ s2) (t1 ++ t2) = zip s1 t1 ++ zip s2 t2.
@@ -2652,8 +2637,7 @@ Proof. by elim: ss => // s ss /= <-; apply: filter_cat. Qed.
 Lemma rev_flatten ss :
   rev (flatten ss) = flatten (rev (map rev ss)).
 Proof.
-elim: ss => //= s ss IHss.
-by rewrite rev_cons flatten_rcons -IHss rev_cat.
+by elim: ss => //= s ss IHss; rewrite rev_cons flatten_rcons -IHss rev_cat.
 Qed.
 
 Lemma nth_shape ss i : nth 0 (shape ss) i = size (nth [::] ss i).
@@ -2764,6 +2748,10 @@ Prenex Implicits flatten shape reshape.
 Lemma map_flatten S T (f : T -> S) ss :
   map f (flatten ss) = flatten (map (map f) ss).
 Proof. by elim: ss => // s ss /= <-; apply: map_cat. Qed.
+
+Lemma flatten_map1 (S T : Type) (f : S -> T) s :
+  flatten [seq [:: f x] | x <- s] = map f s.
+Proof. by elim: s => //= s0 s ->. Qed.
 
 Lemma sumn_flatten (ss : seq (seq nat)) :
   sumn (flatten ss) = sumn (map sumn ss).
@@ -2926,14 +2914,27 @@ Qed.
 
 End EqAllPairsDep.
 
-Lemma allpairs_catr
-      (S : Type) (T : S -> Type) (R : eqType) (f : forall x, T x -> R) s t1 t2 :
+Section MemAllPairs.
+
+Variables (S : Type) (T : S -> Type) (R : eqType).
+Implicit Types (f : forall x, T x -> R) (s : seq S).
+
+Lemma allpairs_catr f s t1 t2 :
   [seq f x y | x <- s, y <- t1 x ++ t2 x] =i
   [seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x].
 Proof.
 move=> z; rewrite mem_cat; elim: s => //= x s ih.
 by rewrite map_cat !mem_cat ih !orbA; congr orb; rewrite orbAC.
 Qed.
+
+Lemma allpairs_consr f s t1 t2 :
+  [seq f x y | x <- s, y <- t1 x :: t2 x] =i
+  [seq f x (t1 x) | x <- s] ++ [seq f x y | x <- s, y <- t2 x].
+Proof.
+by move=> z; rewrite (allpairs_catr f s (fun x => [:: t1 x])) /= flatten_map1.
+Qed.
+
+End MemAllPairs.
 
 Arguments allpairsPdep {S T R f s t z}.
 
