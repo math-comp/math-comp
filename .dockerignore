@@ -8,6 +8,7 @@
 !*.opam
 !plugin
 !mathcomp
+!etc/utils/hierarchy.ml
 
 **/*.d
 **/*.vo

@@ -26,4 +26,5 @@ RUN ["/bin/bash", "--login", "-c", "set -x \
   && cd mathcomp \
   && make Makefile.coq \
   && make -f Makefile.coq -j ${NJOBS} all \
-  && make -f Makefile.coq install"]
+  && make -f Makefile.coq install \
+  && make test-suite"]

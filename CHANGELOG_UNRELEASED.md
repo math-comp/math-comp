@@ -34,3 +34,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Generalized the `allpairs_catr` lemma to the case where the types of `s`,
   `t1`, and `t2` are non-`eqType`s in `[seq E | i <- s, j <- t1 ++ t2]`.
 
+### Infrastructure
+
+- `Makefile` now supports the `test-suite` and `only` targets. Currently,
+  `make test-suite` will verify the implementation of mathematical structures
+  and their inheritances of MathComp automatically, by using the `hierarchy.ml`
+  utility. One can use the `only` target to build the sub-libraries of MathComp
+  specified by the `TGTS` variable, e.g.,
+  `make only TGTS="ssreflect/all_ssreflect.vo fingroup/all_fingroup.vo"`.
+
