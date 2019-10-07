@@ -135,6 +135,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `eqtype.v` new lemmas `contra_not_neq`, `contra_eq_not`.
 - in `order.v`, new notations `0^d` and `1^d` for bottom and top elements of
   dual lattices.
+- in `interval.v`:
+  + Intervals and their left and right bounds of `T` now have canonical ordered
+    type instances whose ordering relation is the subset relation. Since the
+    left and right bounds have the same type `itv_bound` but have different
+    orderings, aliases `itv_boundl` and `itv_boundr` of `itv_bound` are
+    introduced. They form partially ordered types if `T` is a `porderType`. If
+    `T` is a `latticeType`, they also form lattices where the join and meet are
+    intersection and convex hull respectively. If `T` is an `orderType`, they
+    are distributive, and the left and right bounds are totally ordered.
+  + New lemmas:
+    `comparable_lteifN`, `inEsubitv`, `itv_total_meet3E`, `itv_total_join3E`
 
 - in `matrix.v` new lemma `det_mx11`.
 
@@ -166,10 +177,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `order.v`, `\join^d_` and `\meet^d_` notations are now properly specialized
   for `dual_display`.
+- in `interval.v`:
+  + Many definitions and lemmas on intervals such as the membership test are
+    generalized from numeric domains to ordered types.
+  + `x <= y ?< if c` (`lersif`) has also been generalized to `porderType` and
+    replaced with `x < y ?<= if c'` (`lteif`) where `c'` is negation of `c`.
+  + The first constructor `BOpen_if` of `itv_bound` has been replaced with
+    `BClose_if` where the first argument is the negation of the original one.
 
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
+
+- in `interval.v`, we deprecate and rename the following:
+  + `subr_lersif(r0|0r|0)` -> `subr_lteif(r0|0r|0)`
+  + `lersif_(trans|anti)` -> `lteif_(trans|anti)`
+  + `lersif(01|xx|NF|S|T|F|W)` -> `lteif(01|xx|NF|S|T|F|W)`
+  + `lersif_(oppl|oppr|0oppr|oppr0|opp2|oppE)` -> `lteif_(oppl|oppr|0oppr|oppr0|opp2|oppE)`
+  + `lersif_add2(|l|r)` -> `lteif_add2(|l|r)`
+  + `lersif_sub(l|r)_add(l|r)` -> `lteif_sub(l|r)_add(l|r)`
+  + `lersif_sub_add(l|r)` -> `lteif_sub_add(l|r)`
+  + `lersif_(andb|orb|imply)` -> `lteif_(andb|orb|imply)`
+  + `ltrW_lersif` -> `ltrW_lteif`
+  + `lersif_(p|n)mul2(l|r)` -> `lteif_(p|n)mul2(l|r)`
+  + `real_lersifN` -> `real_lteifN`
+  + `real_lersif_norm(l|r)` -> `real_lteif_norm(l|r)`
+  + `lersif_nnormr` -> `lteif_nnormr`
+  + `lersifN` -> `lteifN`
+  + `lersif_norm(l|r)` -> `lteif_norm(l|r)`
+  + `lersif_distl` -> `lteif_distl`
+  + `lersif_(min|max)(l|r)` -> ` lteif_(min|max)(l|r)`
+  + `lersif_(p|n)div(l|r)_mul(l|r)` -> `lteif_(p|n)div(l|r)_mul(l|r)`
+  + `lersif_in_itv` -> `lteif_in_itv`
+  + `itv_intersection` -> `Order.meet`
+  + `itv_intersection1i` -> `itv_meet1i`
+  + `itv_intersectioni1` -> `itv_meeti1`
+  + `itv_intersectionii` -> `meetxx`
+  + `itv_intersectionC` -> `meetC`
+  + `itv_intersectionA` -> `meetA`
 
 ### Removed
 
