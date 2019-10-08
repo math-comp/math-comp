@@ -53,7 +53,7 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (*                                                                            *)
 (* LatticeType lat_mixin == builds a distributive lattice from a porderType   *)
 (*   where lat_mixin can be of types                                          *)
-(*     latticeMixin, totalLatticeMixin, meetJoinMixin,                        *)
+(*     latticeMixin, totalPOrderMixin, meetJoinMixin,                         *)
 (*     leOrderMixin or ltOrderMixin                                           *)
 (*   or computed using IsoLatticeMixin.                                       *)
 (*                                                                            *)
@@ -103,14 +103,14 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (*                   irreflexivity, transitivity and totality of lt.          *)
 (*                   (can build:  porderType, latticeType, orderType)         *)
 (*                                                                            *)
-(* - totalLatticeMixin == on a porderType T, totality of the order of T       *)
+(* - totalPOrderMixin == on a porderType T, totality of the order of T        *)
 (*                    := total (<=%O : rel T)                                 *)
 (*                   (can build: latticeType)                                 *)
 (*                                                                            *)
 (* - totalOrderMixin == on a latticeType T, totality of the order of T        *)
 (*                    := total (<=%O : rel T)                                 *)
 (*                   (can build: orderType)                                   *)
-(*    NB: this mixin is kept separate from totalLatticeMixin (even though it  *)
+(*    NB: this mixin is kept separate from totalPOrderMixin (even though it   *)
 (*        is convertible to it), in order to avoid ambiguous coercion paths.  *)
 (*                                                                            *)
 (* - latticeMixin == on a porderType T, takes meet, join                      *)
@@ -126,7 +126,7 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (* - [porderMixin of T by <:] creates an porderMixin by subtyping.            *)
 (* - [totalOrderMixin of T by <:] creates the associated totalOrderMixin.     *)
 (* - PCanPOrderMixin, CanPOrderMixin create porderMixin from cancellations    *)
-(* - MonoTotalMixin creates a totalLatticeMixin from monotonicity             *)
+(* - MonoTotalMixin creates a totalPOrderMixin from monotonicity              *)
 (* - IsoLatticeMixin creates a latticeMixin from an ordered structure         *)
 (*   isomorphism (i.e. cancel f f', cancel f' f, {mono f : x y / x <= y})     *)
 (*                                                                            *)
@@ -3306,8 +3306,8 @@ End CTBLatticeTheory.
 (* FACTORIES *)
 (*************)
 
-Module TotalLatticeMixin.
-Section TotalLatticeMixin.
+Module TotalPOrderMixin.
+Section TotalPOrderMixin.
 Import POrderDef.
 Variable (disp : unit) (T : porderType disp).
 Definition of_ := total (<=%O : rel T).
@@ -3371,17 +3371,22 @@ case: (leP y z) => yz; case: (leP y x) => xy //=; first 1 last.
 Qed.
 
 Definition latticeMixin :=
-  LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
+  @LatticeMixin _ (@POrder.Pack disp T (POrder.class T)) _ _
+                meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
 
-End TotalLatticeMixin.
+Definition orderMixin : totalOrderMixin (LatticeType _ latticeMixin) :=
+  m.
+
+End TotalPOrderMixin.
 
 Module Exports.
-Notation totalLatticeMixin := of_.
-Coercion latticeMixin : totalLatticeMixin >-> Order.Lattice.mixin_of.
+Notation totalPOrderMixin := of_.
+Coercion latticeMixin : totalPOrderMixin >-> Order.Lattice.mixin_of.
+Coercion orderMixin : totalPOrderMixin >-> totalOrderMixin.
 End Exports.
 
-End TotalLatticeMixin.
-Import TotalLatticeMixin.Exports.
+End TotalPOrderMixin.
+Import TotalPOrderMixin.Exports.
 
 Module LtPOrderMixin.
 Section LtPOrderMixin.
@@ -3521,7 +3526,7 @@ Let T_total_porderType : porderType tt := POrderType tt T lePOrderMixin.
 
 Let T_total_latticeType : latticeType tt :=
   LatticeType T_total_porderType
-    (le_total m : totalLatticeMixin T_total_porderType).
+    (le_total m : totalPOrderMixin T_total_porderType).
 
 Implicit Types (x y z : T_total_latticeType).
 
@@ -3597,7 +3602,7 @@ Qed.
 
 Let T_total_latticeType : latticeType tt :=
   LatticeType T_total_porderType
-   (le_total : totalLatticeMixin T_total_porderType).
+   (le_total : totalPOrderMixin T_total_porderType).
 
 Implicit Types (x y z : T_total_latticeType).
 
@@ -3658,7 +3663,7 @@ Variables (disp : unit) (T : porderType disp).
 Variables (disp' : unit) (T' : orderType disp) (f : T -> T').
 
 Lemma MonoTotal : {mono f : x y / x <= y} ->
-  totalLatticeMixin T' -> totalLatticeMixin T.
+  totalPOrderMixin T' -> totalPOrderMixin T.
 Proof. by move=> f_mono T'_tot x y; rewrite -!f_mono le_total. Qed.
 
 End Total.
@@ -3775,7 +3780,7 @@ End Partial.
 Section Total.
 Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
-Definition sub_TotalOrderMixin : totalLatticeMixin (sub_POrderType sT) :=
+Definition sub_TotalOrderMixin : totalPOrderMixin (sub_POrderType sT) :=
    @MonoTotalMixin _ _ _ val (fun _ _ => erefl) (@le_total _ T).
 Canonical sub_LatticeType := Eval hnf in LatticeType sT sub_TotalOrderMixin.
 Canonical sub_OrderType := Eval hnf in OrderType sT sub_TotalOrderMixin.
@@ -3789,7 +3794,7 @@ Notation "[ 'porderMixin' 'of' T 'by' <: ]" :=
   (at level 0, format "[ 'porderMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
-  (sub_TotalOrderMixin _ : totalLatticeMixin [porderType of T])
+  (sub_TotalOrderMixin _ : totalPOrderMixin [porderType of T])
   (at level 0, format "[ 'totalOrderMixin'  'of'  T  'by'  <: ]",
    only parsing) : form_scope.
 
@@ -4431,7 +4436,7 @@ Section Total.
 Variable (T : orderType disp1) (T' : T -> orderType disp2).
 Implicit Types (x y : {t : T & T' t}).
 
-Fact total : totalLatticeMixin [porderType of {t : T & T' t}].
+Fact total : totalPOrderMixin [porderType of {t : T & T' t}].
 Proof.
 move=> x y; rewrite !leEsig; case: (ltgtP (tag x) (tag y)) => //=.
 case: x y => [x x'] [y y']/= eqxy; elim: _ /eqxy in y' *.
@@ -4565,7 +4570,7 @@ Section Total.
 Variable (T : orderType disp1) (T' : orderType disp2).
 Implicit Types (x y : T * T').
 
-Fact total : totalLatticeMixin [porderType of T * T'].
+Fact total : totalPOrderMixin [porderType of T * T'].
 Proof.
 move=> x y; rewrite /POrderDef.le /= /le; case: (ltgtP x.1 y.1) => _ //=.
 by apply: le_total.
@@ -4940,7 +4945,7 @@ Section Total.
 Variable T : orderType disp.
 Implicit Types s : seq T.
 
-Fact total : totalLatticeMixin [porderType of seq T].
+Fact total : totalPOrderMixin [porderType of seq T].
 Proof.
 suff: total (<=%O : rel (seq T)) by [].
 by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
@@ -5362,7 +5367,7 @@ Section Total.
 Variables (n : nat) (T : orderType disp).
 Implicit Types (t : n.-tuple T).
 
-Definition total : totalLatticeMixin [porderType of n.-tuple T] :=
+Definition total : totalPOrderMixin [porderType of n.-tuple T] :=
    [totalOrderMixin of n.-tuple T by <:].
 Canonical latticeType := LatticeType (n.-tuple T) total.
 Canonical orderType := OrderType (n.-tuple T) total.
@@ -5526,7 +5531,7 @@ Export Order.FinCLattice.Exports.
 Export Order.Total.Exports.
 Export Order.FinTotal.Exports.
 
-Export Order.TotalLatticeMixin.Exports.
+Export Order.TotalPOrderMixin.Exports.
 Export Order.LtPOrderMixin.Exports.
 Export Order.MeetJoinMixin.Exports.
 Export Order.LeOrderMixin.Exports.
