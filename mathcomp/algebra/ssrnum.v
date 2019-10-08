@@ -1262,7 +1262,7 @@ Canonical real_divringPred := DivringPred real_divr_closed.
 End NumDomain.
 
 Lemma num_real (R : realDomainType) (x : R) : x \is real.
-Proof. by rewrite unfold_in; apply: le_total. Qed.
+Proof. exact: le_total. Qed.
 
 Fact archi_bound_subproof (R : archiFieldType) : archimedean_axiom R.
 Proof. by case: R => ? []. Qed.
@@ -1734,7 +1734,7 @@ Lemma real_wlog_ler P :
   forall a b : R, a \is real -> b \is real -> P a b.
 Proof.
 move=> sP hP a b ha hb; wlog: a b ha hb / a <= b => [hwlog|]; last exact: hP.
-by case: (real_leP ha hb)=> [/hP //|/ltW hba]; apply: sP; apply: hP.
+by case: (real_leP ha hb)=> [/hP //|/ltW hba]; apply/sP/hP.
 Qed.
 
 Lemma real_wlog_ltr P :
@@ -1743,7 +1743,7 @@ Lemma real_wlog_ltr P :
   forall a b : R, a \is real -> b \is real -> P a b.
 Proof.
 move=> rP sP hP; apply: real_wlog_ler=> // a b.
-by rewrite le_eqVlt; case: (altP (_ =P _))=> [->|] //= _ lab; apply: hP.
+rewrite le_eqVlt; case: eqVneq => [->|] //= _ lab; exact: hP.
 Qed.
 
 (* Monotony of addition *)
@@ -3042,7 +3042,7 @@ Lemma leif_pmul x1 x2 y1 y2 C1 C2 :
     0 <= x1 -> 0 <= x2 -> x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 * x2 <= y1 * y2 ?= iff (y1 * y2 == 0) || C1 && C2.
 Proof.
-move=> x1_ge0 x2_ge0 le_xy1 le_xy2; have [y_0 | ] := altP (_ =P 0).
+move=> x1_ge0 x2_ge0 le_xy1 le_xy2; have [y_0 | ] := eqVneq _ 0.
   apply/leifP; rewrite y_0 /= mulf_eq0 !eq_le x1_ge0 x2_ge0 !andbT.
   move/eqP: y_0; rewrite mulf_eq0.
   by case/pred2P=> <-; rewrite (le_xy1, le_xy2) ?orbT.
@@ -3811,7 +3811,7 @@ Variable p : {poly R}.
 
 Lemma poly_itv_bound a b : {ub | forall x, a <= x <= b -> `|p.[x]| <= ub}.
 Proof.
-have [ub le_p_ub] := poly_disk_bound p (`|a| `|` `|b|).
+have [ub le_p_ub] := poly_disk_bound p (Num.max `|a| `|b|).
 exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // lexU !ler_normr.
 by have [_|_] := ler0P x; rewrite ?ler_opp2 ?le_a_x ?le_x_b orbT.
 Qed.
@@ -4060,7 +4060,7 @@ Proof. by rewrite -normCK exprn_ge0. Qed.
 
 Lemma mul_conjC_gt0 x : (0 < x * x^*) = (x != 0).
 Proof.
-have [->|x_neq0] := altP eqP; first by rewrite rmorph0 mulr0.
+have [->|x_neq0] := eqVneq; first by rewrite rmorph0 mulr0.
 by rewrite -normCK exprn_gt0 ?normr_gt0.
 Qed.
 
@@ -4560,7 +4560,7 @@ Lemma normC_add_eq x y :
 Proof.
 move=> lin_xy; apply: sig2_eqW; pose u z := if z == 0 then 1 else z / `|z|.
 have uE z: (`|u z| = 1) * (`|z| * u z = z).
-  rewrite /u; have [->|nz_z] := altP eqP; first by rewrite normr0 normr1 mul0r.
+  rewrite /u; have [->|nz_z] := eqVneq; first by rewrite normr0 normr1 mul0r.
   by rewrite normf_div normr_id mulrCA divff ?mulr1 ?normr_eq0.
 have [->|nz_x] := eqVneq x 0; first by exists (u y); rewrite uE ?normr0 ?mul0r.
 exists (u x); rewrite uE // /u (negPf nz_x); congr (_ , _).
@@ -4573,7 +4573,7 @@ have def_xy: x * y^* = y * x^*.
   by rewrite mulrN mulrAC mulrA -mulrA mulrACA -!normCK mulNrn addNr.
 have{def_xy def2xy} def_yx: `|y * x| = y * x^*.
   by apply: (mulIf nz2); rewrite !mulr_natr mulrC normrM def2xy def_xy.
-rewrite -{1}(divfK nz_x y) (invC_norm x) mulrCA -{}def_yx !normrM invfM.
+rewrite -{1}(divfK nz_x y) invC_norm mulrCA -{}def_yx !normrM invfM.
 by rewrite mulrCA divfK ?normr_eq0 // mulrAC mulrA.
 Qed.
 
@@ -4714,9 +4714,7 @@ by rewrite -(eqP n2) -normM mul0r.
 Qed.
 
 Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
-Proof.
-by rewrite eq_sym lt_def; case: eqP => //= ->; rewrite lerr.
-Qed.
+Proof. by rewrite lt_def; case: eqVneq => //= ->; rewrite lerr. Qed.
 
 Lemma le_trans : transitive (le m).
 by move=> y x z; rewrite !le_def' => /predU1P [->|hxy] // /predU1P [<-|hyz];
@@ -4768,6 +4766,7 @@ Coercion numDomainMixin : numMixin >-> mixin_of.
 End Exports.
 
 End NumMixin.
+Import NumMixin.Exports.
 
 Module RealMixin.
 Section RealMixin.
@@ -4775,7 +4774,7 @@ Variables (R : numDomainType).
 
 Variable (real : real_axiom R).
 
-Lemma le_total : totalLatticeMixin R.
+Lemma le_total : totalPOrderMixin R.
 Proof.
 move=> x y; move: (real (x - y)).
 by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
@@ -4787,11 +4786,12 @@ Definition totalMixin :
 End RealMixin.
 
 Module Exports.
-Coercion le_total : real_axiom >-> totalLatticeMixin.
-Coercion totalMixin : real_axiom >-> Order.Total.mixin_of.
+Coercion le_total : real_axiom >-> totalPOrderMixin.
+Coercion totalMixin : real_axiom >-> totalOrderMixin.
 End Exports.
 
 End RealMixin.
+Import RealMixin.Exports.
 
 Module RealLeMixin.
 Section RealLeMixin.
@@ -4822,11 +4822,6 @@ Let leN_total x : 0 <= x \/ 0 <= - x.
 Proof. by apply/orP; rewrite le0N le0_total. Qed.
 
 Let le00 : 0 <= 0. Proof. by have:= le0_total m 0; rewrite orbb. Qed.
-Let le01 : 0 <= 1.
-Proof.
-by case/orP: (le0_total m 1)=> // ?; rewrite -[1]mul1r -mulrNN le0_mul ?le0N.
-Qed.
-Let lt01 : 0 < 1. Proof. by rewrite lt_def oner_eq0. Qed.
 
 Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
 Proof.
@@ -4870,63 +4865,20 @@ Qed.
 Fact le_total : total (le m).
 Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
-Fact lerr : reflexive (le m).
-Proof. by move=> x; move: (le_total x x); rewrite orbb. Qed.
+Definition numMixin : numMixin R :=
+  NumMixin le_normD lt0_add eq0_norm (in2W le_total) normM le_def (lt_def m).
 
-Fact le_anti : antisymmetric (le m).
-Proof.
-move=> x y /andP [].
-rewrite -sub_ge0 -(sub_ge0 _ y) -opprB le0N => hxy hxy'.
-by move/eqP: (le0_anti hxy' hxy); rewrite subr_eq0 => /eqP.
-Qed.
-
-Fact le_trans : transitive (le m).
-Proof.
-by move=> x y z hyx hxz; rewrite -sub_ge0 -(subrK x z) -addrA le0_add ?sub_ge0.
-Qed.
-
-Lemma ge0_def x : (0 <= x) = (`|x| == x).
-Proof. by rewrite le_def subr0. Qed.
-
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof.
-rewrite -mulr_natr -[RHS]mulr_natr normM.
-congr (_ * _); apply/eqP; rewrite -ge0_def.
-elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
-by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
-Qed.
-
-Lemma normrN1 : `|-1| = 1 :> R.
-Proof.
-have: `|-1| ^+ 2 == 1 :> R
-  by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
-rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
-have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
-  by rewrite lt_def; case: eqP => // ->.
-by rewrite oppr_eq0 oner_eq0 => /(lt0_add lt01); rewrite subrr lt_def eqxx.
-Qed.
-
-Lemma normrN x : `|- x| = `|x|.
-Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
-
-Definition orderMixin : leOrderMixin R :=
-  LeOrderMixin (lt_def _) (rrefl _) (rrefl _) le_anti le_trans le_total.
-
-Definition normedDomainMixin : @normed_mixin_of R R orderMixin :=
-  @Num.NormedMixin _ _ orderMixin (norm m) le_normD eq0_norm normrMn normrN.
-
-Definition numMixin : @mixin_of R orderMixin normedDomainMixin :=
-  @Num.Mixin _ orderMixin normedDomainMixin
-             lt0_add (in2W le_total) normM le_def.
+Definition orderMixin :
+  totalPOrderMixin (POrderType ring_display R numMixin) :=
+  le_total.
 
 End RealLeMixin.
 
 Module Exports.
 Notation realLeMixin := of_.
 Notation RealLeMixin := Mixin.
-Coercion orderMixin : realLeMixin >-> leOrderMixin.
-Coercion normedDomainMixin : realLeMixin >-> normed_mixin_of.
-Coercion numMixin : realLeMixin >-> mixin_of.
+Coercion numMixin : realLeMixin >-> NumMixin.of_.
+Coercion orderMixin : realLeMixin >-> totalPOrderMixin.
 End Exports.
 
 End RealLeMixin.
@@ -4959,16 +4911,11 @@ Fact lt0N x : (- x < 0) = (0 < x).
 Proof. by rewrite -sub_gt0 add0r opprK. Qed.
 Let leN_total x : 0 <= x \/ 0 <= - x.
 Proof.
-rewrite !le_def [_ == - x]eq_sym oppr_eq0 eq_sym -[0 < - x]lt0N opprK.
-apply/orP; case: (altP eqP) => //=; exact: lt0_total.
+rewrite !le_def [_ == - x]eq_sym oppr_eq0 -[0 < - x]lt0N opprK.
+apply/orP; case: (eqVneq x) => //=; exact: lt0_total.
 Qed.
 
 Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
-Let le01 : (0 <= 1).
-Proof.
-rewrite le_def eq_sym; case: (altP eqP) => // /(lt0_total m) /orP [] //= ?.
-by rewrite -[1]mul1r -mulrNN lt0_mul -?lt0N ?opprK.
-Qed.
 
 Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
 Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
@@ -5019,71 +4966,30 @@ Qed.
 
 Fact lt_def x y : (x < y) = (y != x) && (x <= y).
 Proof.
-rewrite le_def eq_sym; case: eqP => //= ->; rewrite -sub_gt0 subrr.
+rewrite le_def; case: eqVneq => //= ->; rewrite -sub_gt0 subrr.
 by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
-Qed.
-
-Fact lt_irr : irreflexive (lt m).
-Proof. by move=> x; rewrite lt_def eqxx. Qed.
-
-Fact lt_asym x y : ~~ ((x < y) && (y < x)).
-Proof.
-rewrite -[x < _]sub_gt0 -[y < _]sub_gt0 -lt0N opprB andbC.
-by apply/negP => /andP [] /lt0_ngt0; case: (_ < _).
-Qed.
-
-Fact lt_trans : transitive (lt m).
-Proof.
-move=> y x z; rewrite -sub_gt0 -![_ < z]sub_gt0.
-rewrite -[z - x](subrKA y) [_ - _ + _]addrC; exact: lt0_add.
-Qed.
-
-Lemma le_trans : transitive (le m).
-by move=> y x z; rewrite !le_def => /predU1P [->|hxy] // /predU1P [<-|hyz];
-  rewrite ?hxy ?(lt_trans hxy hyz) orbT.
-Qed.
-
-Fact lt_total x y : x != y -> (x < y) || (y < x).
-Proof.
-rewrite -subr_eq0 => /(lt0_total m).
-by rewrite -(sub_gt0 _ (x - y)) sub0r opprB !sub_gt0 orbC.
 Qed.
 
 Fact le_total : total (le m).
 Proof.
-by move=> x y; rewrite !le_def [y == x]eq_sym; case: (altP eqP) => [|/lt_total].
+move=> x y; rewrite !le_def; case: eqVneq => [->|] //=; rewrite -subr_eq0.
+by move/(lt0_total m); rewrite -(sub_gt0 _ (x - y)) sub0r opprB !sub_gt0 orbC.
 Qed.
 
-Let lt01 : 0 < 1. Proof. by rewrite lt_def oner_eq0. Qed.
+Definition numMixin : numMixin R :=
+  NumMixin le_normD (@lt0_add m) eq0_norm (in2W le_total) normM le_def' lt_def.
 
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof.
-rewrite -mulr_natr -[RHS]mulr_natr normM.
-congr (_ * _); apply/eqP; rewrite -[n%:R]subr0 -le_def'.
-elim: n => [|n ih]; [rewrite le_def eqxx // | apply: (le_trans ih)].
-by rewrite le_def' -natrB // subSnn -[_%:R]subr0 -le_def' mulr1n le01.
-Qed.
-
-Definition orderMixin : ltOrderMixin R :=
-  LtOrderMixin (le_def m) (rrefl _) (rrefl _)
-               lt_irr lt_trans lt_total.
-
-Definition normedDomainMixin : @normed_mixin_of R R orderMixin :=
-  @Num.NormedMixin _ _ orderMixin (norm m)
-                   le_normD eq0_norm normrMn (@normN m).
-
-Definition numMixin : @mixin_of R orderMixin normedDomainMixin :=
-  @Num.Mixin _ orderMixin normedDomainMixin
-             (@lt0_add m) (in2W le_total) normM le_def'.
+Definition orderMixin :
+  totalPOrderMixin (POrderType ring_display R numMixin) :=
+  le_total.
 
 End RealLtMixin.
 
 Module Exports.
 Notation realLtMixin := of_.
 Notation RealLtMixin := Mixin.
-Coercion orderMixin : realLtMixin >-> ltOrderMixin.
-Coercion normedDomainMixin : realLtMixin >-> normed_mixin_of.
-Coercion numMixin : realLtMixin >-> mixin_of.
+Coercion numMixin : realLtMixin >-> NumMixin.of_.
+Coercion orderMixin : realLtMixin >-> totalPOrderMixin.
 End Exports.
 
 End RealLtMixin.
