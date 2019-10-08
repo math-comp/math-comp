@@ -161,7 +161,7 @@ have [n ub_n]: {n | forall y, root q y -> `|y| < n}.
   have /monic_Cauchy_bound[n2 ub_n2]: (-1) ^+ d *: (q \Po - 'X) \is monic.
     rewrite monicE lead_coefZ lead_coef_comp ?size_opp ?size_polyX // -/d.
     by rewrite lead_coef_opp lead_coefX (monicP mon_q) (mulrC 1) signrMK.
-  exists (n1 `|` n2) => y; rewrite ltNge ler_normr !leUx rootE.
+  exists (Num.max n1 n2) => y; rewrite ltNge ler_normr !leUx rootE.
   apply: contraL => /orP[]/andP[] => [/ub_n1/gt_eqF->// | _ /ub_n2/gt_eqF].
   by rewrite hornerZ horner_comp !hornerE opprK mulf_eq0 signr_eq0 => /= ->.
 have [p [a nz_a Dq]] := rat_poly_scale q; pose N := Num.bound `|n * a%:~R|.
@@ -505,7 +505,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have /(find_root r.1)[n ub_rp] := xab0; exists n.
     have [M Mgt0 ubM]: {M | 0 < M & {in Iab_ n, forall a, `|r.2.[a]| <= M}}.
       have [M ubM] := poly_itv_bound r.2 (ab_ n).1 (ab_ n).2.
-      exists (1 `|` M) => [|s /ubM vM]; first by rewrite ltxU ltr01.
+      exists (Num.max 1 M) => [|s /ubM vM]; first by rewrite ltxU ltr01.
       by rewrite lexU orbC vM.
     exists (h2 / M) => [|a xn_a]; first by rewrite divr_gt0 ?invr_gt0 ?ltr0n.
     rewrite ltr_pdivr_mulr // -(ltr_add2l h2) -mulr2n -mulr_natl divff //.
