@@ -94,7 +94,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*           GRing.rreg x <-> x if right-regular, i.e., *%R x is injective.   *)
 (*               [char R] == the characteristic of R, defined as the set of   *)
 (*                           prime numbers p such that p%:R = 0 in R. The set *)
-(*                           [char p] has a most one element, and is          *)
+(*                           [char R] has at most one element, and is         *)
 (*                           implemented as a pred_nat collective predicate   *)
 (*                           (see prime.v); thus the statement p \in [char R] *)
 (*                           can be read as `R has characteristic p', while   *)
