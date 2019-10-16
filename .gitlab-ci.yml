@@ -145,7 +145,7 @@ coq-dev:
     - make install
   except:
     - /^experiment\/order$/
-    - /^pr-(270|388|389)$/
+    - /^pr-(270|388|392)$/
 
 ci-fourcolor-8.7:
   extends: .ci-fourcolor
@@ -182,7 +182,7 @@ ci-fourcolor-dev:
     - make install
   only:
     - /^experiment\/order$/
-    - /^pr-(270|388|389)$/
+    - /^pr-(270|388|392)$/
 
 ci-fourcolor-8.7-270:
   extends: .ci-fourcolor-270
@@ -210,7 +210,7 @@ ci-fourcolor-dev-270:
     - make install
   except:
     - /^experiment\/order$/
-    - /^pr-(270|388|389)$/
+    - /^pr-(270|388|392)$/
 
 ci-odd-order-8.7:
   extends: .ci-odd-order
@@ -247,7 +247,7 @@ ci-odd-order-dev:
     - make install
   only:
     - /^experiment\/order$/
-    - /^pr-(270|388|389)$/
+    - /^pr-(270|388|392)$/
 
 ci-odd-order-8.7-270:
  extends: .ci-odd-order-270

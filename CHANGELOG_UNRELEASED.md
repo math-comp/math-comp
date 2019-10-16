@@ -112,8 +112,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.
   + `numDomainType` and `realDomainType` get inheritances respectively from
     `porderType` and `orderType`.
-  + `normedDomainType` is a new structure for `numDomainType` indexed normed
-    integral domains.
+  + `normedZmodType` is a new structure for `numDomainType` indexed normed
+    additive abelian groups.
   + `[arg minr_( i < n | P ) F]` and `[arg maxr_( i < n | P ) F]` notations are
     removed. Now `[arg min_( i < n | P ) F]` and `[arg max_( i < n | P ) F]`
     notations are defined in `nat_scope` (specialized for `nat`), `order_scope`
