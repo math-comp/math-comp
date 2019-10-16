@@ -1392,6 +1392,10 @@ Proof. by apply: big_pred0 => i; rewrite inE. Qed.
 Lemma big_set1 a F : \big[op/idx]_(i in [set a]) F i = F a.
 Proof. by apply: big_pred1 => i; rewrite !inE. Qed.
 
+Lemma big_set (A : pred I) F :
+   \big[op/idx]_(i in [set i | A i]) (F i) = \big[op/idx]_(i in A) (F i).
+Proof. by apply: eq_bigl => i; rewrite inE. Qed.
+
 Lemma big_setID A B F :
   \big[aop/idx]_(i in A) F i =
      aop (\big[aop/idx]_(i in A :&: B) F i)
