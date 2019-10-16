@@ -6454,6 +6454,10 @@ Canonical pair_comUnitRingType (R1 R2 : comUnitRingType) :=
 Canonical pair_unitAlgType (R : comUnitRingType) (A1 A2 : unitAlgType R) :=
   Eval hnf in [unitAlgType R of A1 * A2].
 
+Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :
+  x *+ n = (x.1 *+ n, x.2 *+ n).
+Proof. by case: x => x y; elim: n => //= n; rewrite !mulrS => ->. Qed.
+
 (* begin hide *)
 
 (* Testing subtype hierarchy
