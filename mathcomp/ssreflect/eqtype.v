@@ -765,6 +765,9 @@ Arguments val_eqP {T P sT x y}.
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.class_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
 
+Definition void_eqMixin := PcanEqMixin (of_voidK unit).
+Canonical void_eqType := EqType void void_eqMixin.
+
 Section SigEqType.
 
 Variables (T : eqType) (P : pred T).

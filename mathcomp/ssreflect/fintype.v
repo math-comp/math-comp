@@ -1400,6 +1400,11 @@ Definition bool_finMixin := Eval hnf in FinMixin bool_enumP.
 Canonical bool_finType := Eval hnf in FinType bool bool_finMixin.
 Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
 
+Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
+Definition void_finMixin := Eval hnf in FinMixin void_enumP.
+Canonical void_finType := Eval hnf in FinType void void_finMixin.
+Lemma card_void : #|{: void}| = 0. Proof. by rewrite cardT enumT unlock. Qed.
+
 Local Notation enumF T := (Finite.enum T).
 
 Section OptionFinType.
