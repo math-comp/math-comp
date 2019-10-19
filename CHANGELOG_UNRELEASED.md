@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added a `void` notation for the `Empty_set` type of the standard library, the
+  canonical injection `of_void` and its cancellation lemma `of_voidK`, and
+  `eq`, `choice`, `count` and `fin` instances.
+
 - Added fixpoint and cofixpoint constructions to `finset`: `fixset`,
   `cofixset` and `fix_order`, with a few theorems about them
 
