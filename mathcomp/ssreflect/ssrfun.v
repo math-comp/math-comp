@@ -9,5 +9,5 @@ Notation void := Empty_set.
 
 Definition of_void T (x : void) : T := match x with end.
 
-Lemma of_voidK T : pcancel (@of_void T) [fun _ => None].
+Lemma of_voidK T : pcancel (of_void T) [fun _ => None].
 Proof. by case. Qed.
