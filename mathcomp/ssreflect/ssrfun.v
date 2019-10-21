@@ -2,6 +2,12 @@ From mathcomp Require Import ssreflect.
 From Coq Require Export ssrfun.
 From mathcomp Require Export ssrnotations.
 
+(******************************************************************************)
+(* Local additions:                                                           *)
+(*        void == a notation for the Empty_set type of the standard library.  *)
+(*   of_void T == the canonical injection void -> T.                          *)
+(******************************************************************************)
+
 Lemma Some_inj {T : nonPropType} : injective (@Some T).
 Proof. by move=> x y []. Qed.
 
