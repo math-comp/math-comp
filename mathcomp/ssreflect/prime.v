@@ -715,6 +715,9 @@ set k := logn p _; have: p ^ k %| m * n by rewrite pfactor_dvdn.
 by rewrite Gauss_dvdr ?coprime_expl // -pfactor_dvdn.
 Qed.
 
+Lemma logn_coprime p m : coprime p m -> logn p m = 0.
+Proof. by move=> coprime_pm; rewrite -[m]muln1 logn_Gauss// logn1. Qed.
+
 Lemma lognM p m n : 0 < m -> 0 < n -> logn p (m * n) = logn p m + logn p n.
 Proof.
 case p_pr: (prime p); last by rewrite /logn p_pr.
@@ -736,6 +739,29 @@ Proof.
 rewrite dvdn_eq => /eqP def_n.
 case: (posnP n) => [-> |]; first by rewrite div0n logn0.
 by rewrite -{1 3}def_n muln_gt0 => /andP[q_gt0 m_gt0]; rewrite lognM ?addnK.
+Qed.
+
+Lemma logn_gcd p m n : 0 < m -> 0 < n ->
+  logn p (gcdn m n) = minn (logn p m) (logn p n).
+Proof.
+case p_pr: (prime p); last by rewrite /logn p_pr.
+wlog le_log_mn: m n / logn p m <= logn p n => [hwlog m_gt0 n_gt0|].
+  have /orP[] := leq_total (logn p m) (logn p n) => /hwlog; first exact.
+  by rewrite gcdnC minnC; apply.
+have xlp := pfactor_coprime p_pr => /xlp[m' cpm' {1}->] /xlp[n' cpn' {1}->].
+rewrite (minn_idPl _)// -(subnK le_log_mn) expnD mulnA -muln_gcdl.
+rewrite lognM//; last first.
+  rewrite Gauss_gcdl ?coprime_expr 1?coprime_sym// gcdn_gt0.
+  by case: m' cpm' p_pr => //; rewrite /coprime gcdn0 => /eqP->.
+rewrite pfactorK// Gauss_gcdl; last by rewrite coprime_expr// coprime_sym.
+by rewrite logn_coprime// /coprime gcdnA (eqP cpm') gcd1n.
+Qed.
+
+Lemma logn_lcm p m n : 0 < m -> 0 < n ->
+  logn p (lcmn m n) = maxn (logn p m) (logn p n).
+Proof.
+move=> m_gt0 n_gt0; rewrite /lcmn logn_div ?dvdn_mull ?dvdn_gcdr//.
+by rewrite lognM// logn_gcd// -addn_min_max addnC addnK.
 Qed.
 
 Lemma dvdn_pfactor p d n : prime p ->
@@ -899,6 +925,14 @@ apply: eq_bigr => p _; rewrite ltnS lognE.
 by case: and3P => [[_ n_gt0 p_dv_n]|]; rewrite ?if_same // andbC dvdn_leq.
 Qed.
 
+Lemma eq_partn_from_log m n (pi : nat_pred) : 0 < m -> 0 < n ->
+  (forall p, p \in pi -> logn p m = logn p n) -> m`_pi = n`_pi.
+Proof.
+move=> m_gt0 n_gt0 eq_log.
+rewrite !(@widen_partn (maxn m n)) ?leq_max ?leqnn ?orbT//.
+by apply: eq_bigr => p /eq_log ->.
+Qed.
+
 Lemma partn0 pi : 0`_pi = 1.
 Proof. by apply: big1_seq => [] [|n]; rewrite andbC. Qed.
 
@@ -981,6 +1015,13 @@ Lemma partnT n : n > 0 -> n`_predT = n.
 Proof.
 move=> n_gt0; rewrite -{2}(partn_pi n_gt0) {2}/partn big_mkcond /=.
 by apply: eq_bigr => p _; rewrite -logn_gt0; case: (logn p _).
+Qed.
+
+Lemma eqn_from_log m n : 0 < m -> 0 < n ->
+  (forall p, logn p m = logn p n) -> m = n.
+Proof.
+move=> m_gt0 n_gt0 eq_log; rewrite -[m]partnT// -[n]partnT//.
+exact: eq_partn_from_log.
 Qed.
 
 Lemma partnC pi n : n > 0 -> n`_pi * n`_pi^' = n.
