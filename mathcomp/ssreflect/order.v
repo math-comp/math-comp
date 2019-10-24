@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2019 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool eqtype ssrfun ssrnat choice seq.
-From mathcomp Require Import fintype tuple bigop path finset.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple bigop finset.
 
 (******************************************************************************)
 (* This files defines a ordered and decidable relations on a type as          *)
@@ -776,8 +776,7 @@ End POrder.
 Import POrder.Exports.
 Bind Scope cpo_sort with POrder.sort.
 
-Module Import POrderDef.
-Section Def.
+Section POrderDef.
 
 Variable (disp : unit).
 Local Notation porderType := (porderType disp).
@@ -800,12 +799,12 @@ Definition leif (x y : T) C : Prop := ((x <= y) * ((x == y) = C))%type.
 Definition le_of_leif x y C (le_xy : @leif x y C) := le_xy.1 : le x y.
 
 Variant le_xor_gt (x y : T) : bool -> bool -> Set :=
-  | LerNotGt of x <= y : le_xor_gt x y true false
-  | GtrNotLe of y < x  : le_xor_gt x y false true.
+  | LeNotGt of x <= y : le_xor_gt x y true false
+  | GtNotLe of y < x  : le_xor_gt x y false true.
 
 Variant lt_xor_ge (x y : T) : bool -> bool -> Set :=
-  | LtrNotGe of x < y  : lt_xor_ge x y false true
-  | GerNotLt of y <= x : lt_xor_ge x y true false.
+  | LtNotGe of x < y  : lt_xor_ge x y false true
+  | GeNotLt of y <= x : lt_xor_ge x y true false.
 
 Variant compare (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
@@ -827,7 +826,6 @@ Variant incompare (x y : T) :
   | InCompareEq of x = y : incompare x y
     true true true true false false true true.
 
-End Def.
 End POrderDef.
 
 Prenex Implicits lt le leif.
@@ -965,7 +963,6 @@ End Exports.
 End Lattice.
 Export Lattice.Exports.
 
-Module Import LatticeDef.
 Section LatticeDef.
 Context {disp : unit}.
 Local Notation latticeType := (latticeType disp).
@@ -973,43 +970,42 @@ Context {T : latticeType}.
 Definition meet : T -> T -> T := Lattice.meet (Lattice.class T).
 Definition join : T -> T -> T := Lattice.join (Lattice.class T).
 
-Variant le_xor_gt (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
-  | LerNotGt of x <= y : le_xor_gt x y true false x x y y
-  | GtrNotLe of y < x  : le_xor_gt x y false true y y x x.
+Variant lel_xor_gt (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
+  | LelNotGt of x <= y : lel_xor_gt x y true false x x y y
+  | GtlNotLe of y < x  : lel_xor_gt x y false true y y x x.
 
-Variant lt_xor_ge (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
-  | LtrNotGe of x < y  : lt_xor_ge x y false true x x y y
-  | GerNotLt of y <= x : lt_xor_ge x y true false y y x x.
+Variant ltl_xor_ge (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
+  | LtlNotGe of x < y  : ltl_xor_ge x y false true x x y y
+  | GelNotLt of y <= x : ltl_xor_ge x y true false y y x x.
 
-Variant compare (x y : T) :
+Variant comparel (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> T -> T -> T -> T -> Set :=
-  | CompareLt of x < y : compare x y
+  | ComparelLt of x < y : comparel x y
     false false false true false true x x y y
-  | CompareGt of y < x : compare x y
+  | ComparelGt of y < x : comparel x y
     false false true false true false y y x x
-  | CompareEq of x = y : compare x y
+  | ComparelEq of x = y : comparel x y
     true true true true false false x x x x.
 
-Variant incompare (x y : T) :
+Variant incomparel (x y : T) :
   bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool ->
   T -> T -> T -> T -> Set :=
-  | InCompareLt of x < y : incompare x y
+  | InComparelLt of x < y : incomparel x y
     false false false true false true true true x x y y
-  | InCompareGt of y < x : incompare x y
+  | InComparelGt of y < x : incomparel x y
     false false true false true false true true y y x x
-  | InCompare of x >< y  : incompare x y
+  | InComparel of x >< y  : incomparel x y
     false false false false false false false false
     (meet x y) (meet x y) (join x y) (join x y)
-  | InCompareEq of x = y : incompare x y
+  | InComparelEq of x = y : incomparel x y
     true true true true false false true true x x x x.
 
-End LatticeDef.
 End LatticeDef.
 
 Module Import LatticeSyntax.
 
-Notation "x `&` y" :=  (meet x y).
-Notation "x `|` y" := (join x y).
+Notation "x `&` y" := (meet x y) : order_scope.
+Notation "x `|` y" := (join x y) : order_scope.
 
 End LatticeSyntax.
 
@@ -1147,10 +1143,8 @@ End Exports.
 End BLattice.
 Export BLattice.Exports.
 
-Module Import BLatticeDef.
 Definition bottom {disp : unit} {T : blatticeType disp} : T :=
   BLattice.bottom (BLattice.class T).
-End BLatticeDef.
 
 Module Import BLatticeSyntax.
 Notation "0" := bottom : order_scope.
@@ -1253,10 +1247,8 @@ End Exports.
 End TBLattice.
 Export TBLattice.Exports.
 
-Module Import TBLatticeDef.
 Definition top disp  {T : tblatticeType disp} : T :=
   TBLattice.top (TBLattice.class T).
-End TBLatticeDef.
 
 Module Import TBLatticeSyntax.
 
@@ -1362,13 +1354,11 @@ End Exports.
 End CBLattice.
 Export CBLattice.Exports.
 
-Module Import CBLatticeDef.
 Definition sub {disp : unit} {T : cblatticeType disp} : T -> T -> T :=
   CBLattice.sub (CBLattice.class T).
-End CBLatticeDef.
 
 Module Import CBLatticeSyntax.
-Notation "x `\` y" := (sub x y).
+Notation "x `\` y" := (sub x y) : order_scope.
 End CBLatticeSyntax.
 
 Module CTBLattice.
@@ -1464,21 +1454,17 @@ End Exports.
 End CTBLattice.
 Export CTBLattice.Exports.
 
-Module Import CTBLatticeDef.
 Definition compl {d : unit} {T : ctblatticeType d} : T -> T :=
   CTBLattice.compl (CTBLattice.class T).
-End CTBLatticeDef.
 
 Module Import CTBLatticeSyntax.
-Notation "~` A" := (compl A).
+Notation "~` A" := (compl A) : order_scope.
 End CTBLatticeSyntax.
 
-Module Import TotalDef.
 Section TotalDef.
 Context {disp : unit} {T : orderType disp} {I : finType}.
 Definition arg_min := @extremum T I <=%O.
 Definition arg_max := @extremum T I >=%O.
-End TotalDef.
 End TotalDef.
 
 Module Import TotalSyntax.
@@ -1977,8 +1963,8 @@ Notation "><^c x" := (fun y => ~~ (>=<^c%O x y)) : order_scope.
 Notation "><^c x :> T" := (><^c (x : T)) (only parsing) : order_scope.
 Notation "x ><^c y" := (~~ (><^c%O x y)) : order_scope.
 
-Notation "x `&^c` y" :=  (@meet (converse_display _) _ x y).
-Notation "x `|^c` y" := (@join (converse_display _) _ x y).
+Notation "x `&^c` y" :=  (@meet (converse_display _) _ x y) : order_scope.
+Notation "x `|^c` y" := (@join (converse_display _) _ x y) : order_scope.
 
 Local Notation "0" := bottom.
 Local Notation "1" := top.
@@ -2043,7 +2029,6 @@ End ConverseSyntax.
 
 Module Import POrderTheory.
 Section POrderTheory.
-Import POrderDef.
 
 Context {disp : unit}.
 Local Notation porderType := (porderType disp).
@@ -2538,7 +2523,6 @@ End LatticeTheoryMeet.
 
 Module Import LatticeTheoryJoin.
 Section LatticeTheoryJoin.
-Import LatticeDef.
 Context {disp : unit}.
 Local Notation latticeType := (latticeType disp).
 Context {L : latticeType}.
@@ -2604,7 +2588,7 @@ Proof. exact: (@leI2 _ [latticeType of L^c]). Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. exact: (@meetUr _ [latticeType of L^c]). Qed.
 
-Lemma lcomparableP x y : incompare x y
+Lemma lcomparableP x y : incomparel x y
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
   (y >=< x) (x >=< y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof.
@@ -2615,16 +2599,16 @@ by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
 Qed.
 
 Lemma lcomparable_ltgtP x y : x >=< y ->
-  compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
+  comparel x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
            (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof. by case: (lcomparableP x) => // *; constructor. Qed.
 
 Lemma lcomparable_leP x y : x >=< y ->
-  le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  lel_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof. by move/lcomparable_ltgtP => [/ltW xy|xy|->]; constructor. Qed.
 
 Lemma lcomparable_ltP x y : x >=< y ->
-  lt_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  ltl_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 
 End LatticeTheoryJoin.
@@ -3308,7 +3292,6 @@ End CTBLatticeTheory.
 
 Module TotalPOrderMixin.
 Section TotalPOrderMixin.
-Import POrderDef.
 Variable (disp : unit) (T : porderType disp).
 Definition of_ := total (<=%O : rel T).
 Variable (m : of_).
@@ -3607,7 +3590,7 @@ Let T_total_latticeType : latticeType tt :=
 Implicit Types (x y z : T_total_latticeType).
 
 Fact leP x y :
-  le_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  lel_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof. by apply/lcomparable_leP/le_total. Qed.
 Fact meetE x y : meet m x y = x `&` y.
 Proof. by rewrite meet_def (_ : lt m x y = (x < y)) //; case: (leP y). Qed.
@@ -3964,8 +3947,8 @@ Notation "><^p x" := (fun y => ~~ (>=<^p%O x y)) : order_scope.
 Notation "><^p x :> T" := (><^p (x : T)) (only parsing) : order_scope.
 Notation "x ><^p y" := (~~ (><^p%O x y)) : order_scope.
 
-Notation "x `&^p` y" :=  (@meet prod_display _ x y).
-Notation "x `|^p` y" := (@join prod_display _ x y).
+Notation "x `&^p` y" :=  (@meet prod_display _ x y) : order_scope.
+Notation "x `|^p` y" := (@join prod_display _ x y) : order_scope.
 
 Notation "\join^p_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
@@ -4024,8 +4007,8 @@ Fact lexi_display : unit. Proof. by []. Qed.
 Module Import LexiSyntax.
 
 Notation "<=^l%O" := (@le lexi_display _) : order_scope.
-Notation ">=^l%O" := (@ge lexi_display _)  : order_scope.
-Notation ">=^l%O" := (@ge lexi_display _)  : order_scope.
+Notation ">=^l%O" := (@ge lexi_display _) : order_scope.
+Notation ">=^l%O" := (@ge lexi_display _) : order_scope.
 Notation "<^l%O" := (@lt lexi_display _) : order_scope.
 Notation ">^l%O" := (@gt lexi_display _) : order_scope.
 Notation "<?=^l%O" := (@leif lexi_display _) : order_scope.
@@ -4076,8 +4059,8 @@ Notation "x ><^l y" := (~~ (><^l%O x y)) : order_scope.
 Notation minlexi := (@meet lexi_display _).
 Notation maxlexi := (@join lexi_display _).
 
-Notation "x `&^l` y" :=  (minlexi x y).
-Notation "x `|^l` y" := (maxlexi x y).
+Notation "x `&^l` y" :=  (minlexi x y) : order_scope.
+Notation "x `|^l` y" := (maxlexi x y) : order_scope.
 
 Notation "\max^l_ ( i <- r | P ) F" :=
   (\big[maxlexi/0]_(i <- r | P%B) F%O) : order_scope.
@@ -4211,7 +4194,7 @@ Fact meetKU y x : join x (meet x y) = x.
 Proof. by case: x => ? ?; congr pair; rewrite meetKU. Qed.
 
 Fact leEmeet x y : (x <= y) = (meet x y == x).
-Proof. by rewrite /POrderDef.le /= /le /meet eqE /= -!leEmeet. Qed.
+Proof. by rewrite eqE /= -!leEmeet. Qed.
 
 Fact meetUl : left_distributive meet join.
 Proof. by move=> ? ? ?; congr pair; rewrite meetUl. Qed.
@@ -4232,7 +4215,7 @@ Section BLattice.
 Variable (T : blatticeType disp1) (T' : blatticeType disp2).
 
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
-Proof. by rewrite /POrderDef.le /= /le !le0x. Qed.
+Proof. by rewrite /<=%O /= /le !le0x. Qed.
 
 Canonical blatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
 
@@ -4244,7 +4227,7 @@ Section TBLattice.
 Variable (T : tblatticeType disp1) (T' : tblatticeType disp2).
 
 Fact lex1 (x : T * T') : x <= (top, top).
-Proof. by rewrite /POrderDef.le /= /le !lex1. Qed.
+Proof. by rewrite /<=%O /= /le !lex1. Qed.
 
 Canonical tblatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
 
@@ -4572,8 +4555,7 @@ Implicit Types (x y : T * T').
 
 Fact total : totalPOrderMixin [porderType of T * T'].
 Proof.
-move=> x y; rewrite /POrderDef.le /= /le; case: (ltgtP x.1 y.1) => _ //=.
-by apply: le_total.
+move=> x y; rewrite /<=%O /= /le; case: ltgtP => //= _; exact: le_total.
 Qed.
 
 Canonical latticeType := LatticeType (T * T') total.
@@ -4769,8 +4751,7 @@ Proof. by elim: x y => [|? ? ih] [|? ?] //=; rewrite meetKU ih. Qed.
 
 Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof.
-rewrite /POrderDef.le /=.
-by elim: x y => [|? ? ih] [|? ?] //=; rewrite /eq_op /= leEmeet ih.
+by rewrite /<=%O /=; elim: x y => [|? ? ih] [|? ?] //=; rewrite eqE leEmeet ih.
 Qed.
 
 Fact meetUl : left_distributive meet join.
@@ -5471,16 +5452,6 @@ Canonical tlexi_finOrderType n (T : finOrderType disp) :=
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
-Module Def.
-Export POrderDef.
-Export LatticeDef.
-Export TotalDef.
-Export BLatticeDef.
-Export TBLatticeDef.
-Export CBLatticeDef.
-Export CTBLatticeDef.
-End Def.
-
 Module Syntax.
 Export POSyntax.
 Export LatticeSyntax.
@@ -5519,6 +5490,8 @@ End Theory.
 
 End Order.
 
+Export Order.Syntax.
+
 Export Order.POrder.Exports.
 Export Order.FinPOrder.Exports.
 Export Order.Lattice.Exports.
@@ -5555,5 +5528,3 @@ Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder.
 Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
 Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
 Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
-
-Import Order.Syntax.
