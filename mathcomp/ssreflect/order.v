@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2019 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple bigop finset.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
+From mathcomp Require Import path fintype tuple bigop finset div prime.
 
 (******************************************************************************)
 (* This files defines order relations. It contains several modules            *)
@@ -351,6 +351,83 @@ Reserved Notation "x <=^l y ?= 'iff' c" (at level 70, y, c at next level,
   format "x '[hv'  <=^l  y '/'  ?=  'iff'  c ']'").
 Reserved Notation "x <=^l y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^l  y '/'  ?=  'iff'  c  :> T ']'").
+
+(* Reserved notations for divisibility *)
+Reserved Notation "x %<| y"  (at level 70, no associativity).
+
+Reserved Notation "\gcd_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \gcd_ i '/  '  F ']'").
+Reserved Notation "\gcd_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \gcd_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \gcd_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \gcd_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \gcd_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \gcd_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\gcd_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\gcd_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \gcd_ ( i  <  n )  F ']'").
+Reserved Notation "\gcd_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \gcd_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \gcd_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\lcm_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \lcm_ i '/  '  F ']'").
+Reserved Notation "\lcm_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \lcm_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \lcm_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \lcm_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \lcm_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \lcm_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\lcm_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\lcm_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \lcm_ ( i  <  n )  F ']'").
+Reserved Notation "\lcm_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \lcm_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \lcm_ ( i  'in'  A ) '/  '  F ']'").
 
 (* Reserved notation for converse lattice operations. *)
 Reserved Notation "A `&^l` B"  (at level 48, left associativity).
@@ -3831,6 +3908,150 @@ Definition ltEnat := ltEnat.
 End Exports.
 End NatOrder.
 
+Module DvdSyntax.
+
+Lemma dvd_display : unit. Proof. exact: tt. Qed.
+
+Notation dvd := (@le dvd_display _).
+Notation "@ 'dvd' T" :=
+  (@le dvd_display T) (at level 10, T at level 8, only parsing).
+Notation sdvd := (@lt dvd_display _).
+Notation "@ 'sdvd' T" :=
+  (@lt dvd_display T) (at level 10, T at level 8, only parsing).
+
+Notation "x %| y" := (dvd x y) : order_scope.
+Notation "x %<| y" := (sdvd x y) (at level 70, no associativity) : order_scope.
+
+Notation gcd := (@meet dvd_display _).
+Notation "@ 'gcd' T" :=
+  (@meet dvd_display T) (at level 10, T at level 8, only parsing).
+Notation lcm := (@join dvd_display _).
+Notation "@ 'lcm' T" :=
+  (@join dvd_display T) (at level 10, T at level 8, only parsing).
+
+Notation nat0 := (@top dvd_display _).
+Notation nat1 := (@bottom dvd_display _).
+
+Notation "\gcd_ ( i <- r | P ) F" :=
+  (\big[gcd/nat0]_(i <- r | P%B) F%O) : order_scope.
+Notation "\gcd_ ( i <- r ) F" :=
+  (\big[gcd/nat0]_(i <- r) F%O) : order_scope.
+Notation "\gcd_ ( i | P ) F" :=
+  (\big[gcd/nat0]_(i | P%B) F%O) : order_scope.
+Notation "\gcd_ i F" :=
+  (\big[gcd/nat0]_i F%O) : order_scope.
+Notation "\gcd_ ( i : I | P ) F" :=
+  (\big[gcd/nat0]_(i : I | P%B) F%O) (only parsing) :
+  order_scope.
+Notation "\gcd_ ( i : I ) F" :=
+  (\big[gcd/nat0]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\gcd_ ( m <= i < n | P ) F" :=
+  (\big[gcd/nat0]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\gcd_ ( m <= i < n ) F" :=
+  (\big[gcd/nat0]_(m <= i < n) F%O) : order_scope.
+Notation "\gcd_ ( i < n | P ) F" :=
+  (\big[gcd/nat0]_(i < n | P%B) F%O) : order_scope.
+Notation "\gcd_ ( i < n ) F" :=
+  (\big[gcd/nat0]_(i < n) F%O) : order_scope.
+Notation "\gcd_ ( i 'in' A | P ) F" :=
+  (\big[gcd/nat0]_(i in A | P%B) F%O) : order_scope.
+Notation "\gcd_ ( i 'in' A ) F" :=
+  (\big[gcd/nat0]_(i in A) F%O) : order_scope.
+
+Notation "\lcm_ ( i <- r | P ) F" :=
+  (\big[lcm/nat1]_(i <- r | P%B) F%O) : order_scope.
+Notation "\lcm_ ( i <- r ) F" :=
+  (\big[lcm/nat1]_(i <- r) F%O) : order_scope.
+Notation "\lcm_ ( i | P ) F" :=
+  (\big[lcm/nat1]_(i | P%B) F%O) : order_scope.
+Notation "\lcm_ i F" :=
+  (\big[lcm/nat1]_i F%O) : order_scope.
+Notation "\lcm_ ( i : I | P ) F" :=
+  (\big[lcm/nat1]_(i : I | P%B) F%O) (only parsing) :
+  order_scope.
+Notation "\lcm_ ( i : I ) F" :=
+  (\big[lcm/nat1]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\lcm_ ( m <= i < n | P ) F" :=
+  (\big[lcm/nat1]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\lcm_ ( m <= i < n ) F" :=
+  (\big[lcm/nat1]_(m <= i < n) F%O) : order_scope.
+Notation "\lcm_ ( i < n | P ) F" :=
+  (\big[lcm/nat1]_(i < n | P%B) F%O) : order_scope.
+Notation "\lcm_ ( i < n ) F" :=
+  (\big[lcm/nat1]_(i < n) F%O) : order_scope.
+Notation "\lcm_ ( i 'in' A | P ) F" :=
+  (\big[lcm/nat1]_(i in A | P%B) F%O) : order_scope.
+Notation "\lcm_ ( i 'in' A ) F" :=
+  (\big[lcm/nat1]_(i in A) F%O) : order_scope.
+
+End DvdSyntax.
+
+Module NatDvd.
+Section NatDvd.
+
+Implicit Types m n p : nat.
+
+Lemma lcmnn n : lcmn n n = n.
+Proof. by case: n => // n; rewrite /lcmn gcdnn mulnK. Qed.
+
+Lemma le_def m n : m %| n = (gcdn m n == m)%N.
+Proof. by apply/gcdn_idPl/eqP. Qed.
+
+Lemma joinKI n m : gcdn m (lcmn m n) = m.
+Proof. by rewrite (gcdn_idPl _)// dvdn_lcml. Qed.
+
+Lemma meetKU n m : lcmn m (gcdn m n) = m.
+Proof. by rewrite (lcmn_idPl _)// dvdn_gcdl. Qed.
+
+Lemma meetUl : left_distributive gcdn lcmn.
+Proof.
+move=> [|m'] [|n'] [|p'] //=; rewrite ?lcmnn ?lcm0n ?lcmn0 ?gcd0n ?gcdn0//.
+- by rewrite gcdnC meetKU.
+- by rewrite lcmnC gcdnC meetKU.
+apply: eqn_from_log; rewrite ?(gcdn_gt0, lcmn_gt0)//= => p.
+by rewrite !(logn_gcd, logn_lcm) ?(gcdn_gt0, lcmn_gt0)// minn_maxl.
+Qed.
+
+Definition t_latticeMixin := MeetJoinMixin le_def (fun _ _ => erefl _)
+  gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
+
+Import DvdSyntax.
+Definition t := nat.
+
+Canonical eqType := [eqType of t].
+Canonical choiceType := [choiceType of t].
+Canonical countType := [countType of t].
+Canonical porderType := POrderType dvd_display t t_latticeMixin.
+Canonical latticeType := LatticeType t t_latticeMixin.
+Canonical blatticeType := BLatticeType t
+  (BLatticeMixin (dvd1n : forall m : t, (1 %| m)%N)).
+Canonical tlatticeType := TBLatticeType t
+  (TBLatticeMixin (dvdn0 : forall m : t, (m %| 0)%N)).
+
+Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
+Lemma gcdE : gcd = gcdn :> (t -> t -> t). Proof. by []. Qed.
+Lemma lcmE : lcm = lcmn :> (t -> t -> t). Proof. by []. Qed.
+Lemma nat1E : nat1 = 1%N :> t. Proof. by []. Qed.
+Lemma nat0E : nat0 = 0%N :> t. Proof. by []. Qed.
+
+End NatDvd.
+Module Exports.
+Notation natdvd := t.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical porderType.
+Canonical latticeType.
+Canonical blatticeType.
+Canonical tlatticeType.
+Definition dvdEnat := dvdE.
+Definition gcdEnat := gcdE.
+Definition lcmEnat := lcmE.
+Definition nat1E := nat1E.
+Definition nat0E := nat0E.
+End Exports.
+End NatDvd.
+
 Module BoolOrder.
 Section BoolOrder.
 Implicit Types (x y : bool).
@@ -5463,6 +5684,7 @@ Export CBLatticeSyntax.
 Export CTBLatticeSyntax.
 Export TotalSyntax.
 Export ConverseSyntax.
+Export DvdSyntax.
 End Syntax.
 
 Module LTheory.
@@ -5515,6 +5737,7 @@ Export Order.CanMixin.Exports.
 Export Order.SubOrder.Exports.
 
 Export Order.NatOrder.Exports.
+Export Order.NatDvd.Exports.
 Export Order.BoolOrder.Exports.
 Export Order.ProdOrder.Exports.
 Export Order.SigmaOrder.Exports.
