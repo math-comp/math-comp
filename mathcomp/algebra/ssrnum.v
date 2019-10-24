@@ -6,7 +6,10 @@ From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
 (* This file defines some classes to manipulate number structures, i.e        *)
-(* structures with an order and a norm.                                       *)
+(* structures with an order and a norm. To use this file, insert              *)
+(* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
+(* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)
+(* of Num.leif, etc.).                                                        *)
 (*                                                                            *)
 (*   * NumDomain (Integral domain with an order and a norm)                   *)
 (*    numDomainType == interface for a num integral domain.                   *)
