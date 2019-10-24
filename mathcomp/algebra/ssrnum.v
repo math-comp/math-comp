@@ -125,7 +125,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import Order.TTheory Order.Def Order.Syntax GRing.Theory.
+Import Order.TTheory GRing.Theory.
 
 Reserved Notation "<= y" (at level 35).
 Reserved Notation ">= y" (at level 35).
@@ -140,8 +140,8 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record normed_mixin_of (R : ringType) (T : zmodType) (Rorder : lePOrderMixin R)
-       (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
+Record normed_mixin_of (R T : zmodType) (Rorder : lePOrderMixin R)
+       (le_op := Order.POrder.le Rorder)
   := NormedMixin {
   norm_op : T -> R;
   _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
@@ -368,30 +368,30 @@ Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
   nosimpl (norm_op (NormedZmodule.class T)).
 Arguments normr {R T} x.
 
-Notation ler := (@le ring_display _) (only parsing).
+Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" :=
-  (@le ring_display R) (at level 10, R at level 8, only parsing).
-Notation ltr := (@lt ring_display _) (only parsing).
+  (@Order.le ring_display R) (at level 10, R at level 8, only parsing).
+Notation ltr := (@Order.lt ring_display _) (only parsing).
 Notation "@ 'ltr' R" :=
-  (@lt ring_display R) (at level 10, R at level 8, only parsing).
-Notation ger := (@ge ring_display _) (only parsing).
+  (@Order.lt ring_display R) (at level 10, R at level 8, only parsing).
+Notation ger := (@Order.ge ring_display _) (only parsing).
 Notation "@ 'ger' R" :=
-  (@ge ring_display R) (at level 10, R at level 8, only parsing).
-Notation gtr := (@gt ring_display _) (only parsing).
+  (@Order.ge ring_display R) (at level 10, R at level 8, only parsing).
+Notation gtr := (@Order.gt ring_display _) (only parsing).
 Notation "@ 'gtr' R" :=
-  (@gt ring_display R) (at level 10, R at level 8, only parsing).
-Notation lerif := (@leif ring_display _) (only parsing).
+  (@Order.gt ring_display R) (at level 10, R at level 8, only parsing).
+Notation lerif := (@Order.leif ring_display _) (only parsing).
 Notation "@ 'lerif' R" :=
-  (@lerif ring_display R) (at level 10, R at level 8, only parsing).
-Notation comparabler := (@comparable ring_display _) (only parsing).
+  (@Order.leif ring_display R) (at level 10, R at level 8, only parsing).
+Notation comparabler := (@Order.comparable ring_display _) (only parsing).
 Notation "@ 'comparabler' R" :=
-  (@comparable ring_display R) (at level 10, R at level 8, only parsing).
-Notation maxr := (@join ring_display _).
+  (@Order.comparable ring_display R) (at level 10, R at level 8, only parsing).
+Notation maxr := (@Order.join ring_display _).
 Notation "@ 'maxr' R" :=
-  (@join ring_display R) (at level 10, R at level 8, only parsing).
-Notation minr := (@meet ring_display _).
+  (@Order.join ring_display R) (at level 10, R at level 8, only parsing).
+Notation minr := (@Order.meet ring_display _).
 Notation "@ 'minr' R" :=
-  (@meet ring_display R) (at level 10, R at level 8, only parsing).
+  (@Order.meet ring_display R) (at level 10, R at level 8, only parsing).
 
 Section Def.
 Context {R : numDomainType}.
@@ -3546,7 +3546,7 @@ Hint Resolve num_real : core.
 Section RealDomainOperations.
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
-    (arg_min (disp := ring_display) i0 (fun i => P%B) (fun i => F))
+    (Order.arg_min (disp := ring_display) i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : ring_scope.
 
@@ -3560,7 +3560,7 @@ Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
    format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : ring_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
-     (arg_max (disp := ring_display) i0 (fun i => P%B) (fun i => F))
+     (Order.arg_max (disp := ring_display) i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : ring_scope.
 
@@ -5043,10 +5043,13 @@ Definition normedZmodMixin :
 
 Canonical normedZmodType := NormedZmoduleType R (U * V) normedZmodMixin.
 
+Lemma prod_normE (x : U * V) : `|x| = Num.max `|x.1| `|x.2|. Proof. by []. Qed.
+
 End ProdNormedZmodule.
 
 Module Exports.
 Canonical normedZmodType.
+Definition prod_normE := @prod_normE.
 End Exports.
 
 End ProdNormedZmodule.
