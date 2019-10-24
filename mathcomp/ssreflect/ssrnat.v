@@ -279,6 +279,9 @@ Proof. by move=> m; rewrite /= -{2}[n]addn0 subnDl subn0. Qed.
 Lemma addnK n : cancel (addn^~ n) (subn^~ n).
 Proof. by move=> m; rewrite /= (addnC m) addKn. Qed.
 
+Lemma addnKC n m : (n + m) - n = m.
+Proof. by rewrite addnC addnK. Qed.
+
 Lemma subSnn n : n.+1 - n = 1.
 Proof. exact (addnK n 1). Qed.
 
@@ -325,6 +328,12 @@ Lemma leqnSn n : n <= n.+1.             Proof. by elim: n. Qed.
 Hint Resolve leqnSn : core.
 Lemma leq_pred n : n.-1 <= n.           Proof. by case: n => /=. Qed.
 Lemma leqSpred n : n <= n.-1.+1.        Proof. by case: n => /=. Qed.
+
+Lemma ltn_predl n : (n.-1 < n) = (n != 0).
+Proof. by case: n => [//|n]; rewrite ltnSn. Qed.
+
+Lemma ltn_predr m n : (m < n.-1) = (m.+1 < n).
+Proof. by case: n => [//|n]; rewrite succnK. Qed.
 
 Lemma ltn_predK m n : m < n -> n.-1.+1 = n.
 Proof. by case: n. Qed.
@@ -532,6 +541,9 @@ Proof. by move=> le_pm le_pn; rewrite addnBA // addnBAC. Qed.
 Lemma subnBA m n p : p <= n -> m - (n - p) = m + p - n.
 Proof. by move=> le_pn; rewrite -{2}(subnK le_pn) subnDr. Qed.
 
+Lemma ltn_subr m n : m <= n -> (n - m < n) = (m > 0).
+Proof. by move=> le_mn; rewrite -subn_gt0 subnBA// addnKC. Qed.
+
 Lemma subKn m n : m <= n -> n - (n - m) = m.
 Proof. by move/subnBA->; rewrite addKn. Qed.
 
@@ -540,6 +552,9 @@ Proof. by rewrite -add1n => /addnBA <-. Qed.
 
 Lemma subnSK m n : m < n -> (n - m.+1).+1 = n - m.
 Proof. by move/subSn. Qed.
+
+Lemma predn_sub m n : (m - n).-1 = (m.-1 - n).
+Proof. by case: m => // m; rewrite subSKn. Qed.
 
 Lemma leq_sub2r p m n : m <= n -> m - p <= n - p.
 Proof.
@@ -563,6 +578,36 @@ Proof. by move/subnSK <-; apply: leq_sub2l. Qed.
 
 Lemma ltn_subRL m n p : (n < p - m) = (m + n < p).
 Proof. by rewrite !ltnNge leq_subLR. Qed.
+
+Lemma leq_psubRL m n p : 0 < n -> (n <= p - m) = (m + n <= p).
+Proof. by move=> /prednK<-; rewrite ltn_subRL addnS. Qed.
+
+Lemma ltn_psubLR m n p : 0 < p -> (m - n < p) = (m < n + p).
+Proof. by move=> /prednK<-; rewrite ltnS leq_subLR addnS. Qed.
+
+Lemma leq_subRL m n p : m <= p -> (n <= p - m) = (m + n <= p).
+Proof. by move=> /subnKC{2}<-; rewrite leq_add2l. Qed.
+
+Lemma ltn_subLR m n p : n <= m -> (m - n < p) = (m < n + p).
+Proof. by move=> /subnKC{2}<-; rewrite ltn_add2l. Qed.
+
+Lemma leq_subCl m n p : (m - n <= p) = (m - p <= n).
+Proof. by rewrite !leq_subLR // addnC. Qed.
+
+Lemma ltn_subCr m n p : (p < m - n) = (n < m - p).
+Proof. by rewrite !ltn_subRL // addnC. Qed.
+
+Lemma leq_psubCr m n p : 0 < p -> 0 < n -> (p <= m - n) = (n <= m - p).
+Proof. by move=> p_gt0 n_gt0; rewrite !leq_psubRL // addnC. Qed.
+
+Lemma ltn_psubCl m n p : 0 < p -> 0 < n -> (m - n < p) = (m - p < n).
+Proof. by move=> p_gt0 n_gt0; rewrite !ltn_psubLR // addnC. Qed.
+
+Lemma leq_subCr m n p : n <= m -> p <= m -> (p <= m - n) = (n <= m - p).
+Proof. by move=> np pm; rewrite !leq_subRL // addnC. Qed.
+
+Lemma ltn_subCl m n p : n <= m -> p <= m -> (m - n < p) = (m - p < n).
+Proof. by move=> nm pm; rewrite !ltn_subLR // addnC. Qed.
 
 (* Eliminating the idiom for structurally decreasing compare and subtract. *)
 Lemma subn_if_gt T m n F (E : T) :

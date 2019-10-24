@@ -30,7 +30,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `big_enum_val_cond`, `big_enum_rank_cond`,
   `big_enum_val`, `big_enum_rank`, `big_set`.
 
-- Arithmetic theorems: `modn_divl` and `divn_modl`.
+- Arithmetic theorems in ssrnat and div:
+  - some trivial results in ssrnat: `addnKC`, `ltn_predl`,
+    `ltn_predr`, `ltn_subr` and `predn_sub`,
+  - theorems about `n <=/< p +/- m` and `m +/- n <=/< p`:
+    `leq_psubRL`, `ltn_psubLR`, `leq_subRL`, `ltn_subLR`, `leq_subCl`,
+    `leq_psubCr`, `leq_subCr`, `ltn_subCr`, `ltn_psubCl` and
+    `ltn_subCl`,
+  - some commutations between modulo and division: `modn_divl` and
+    `divn_modl`,
+  - theorems about the euclidean division of additions and subtraction,
+     + without preconditions of divisibility: `edivnD`, `edivnB`,
+       `divnD`, `divnB`, `modnD`, `modnB`,
+     + with divisibility of one argument: `divnDMl`, `divnMBl`,
+       `divnBMl`, `divnBl` and `divnBr`,
+     + specialization of the former theorems for .+1 and .-1:
+       `edivnS`, `divnS`, `modnS`, `edivn_pred`, `divn_pred` and
+       `modn_pred`.
 
 ### Changed
 
@@ -53,4 +69,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   utility. One can use the `only` target to build the sub-libraries of MathComp
   specified by the `TGTS` variable, e.g.,
   `make only TGTS="ssreflect/all_ssreflect.vo fingroup/all_fingroup.vo"`.
-
