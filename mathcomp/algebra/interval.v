@@ -40,7 +40,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope ring_scope.
-Import Order.TTheory Order.Syntax GRing.Theory Num.Theory.
+Import Order.TTheory GRing.Theory Num.Theory.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
@@ -209,19 +209,19 @@ Lemma lersif_distl :
 Proof. by case: b; apply lter_distl. Qed.
 
 Lemma lersif_minr :
-  (x <= y `&` z ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
+  (x <= Num.min y z ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
 Proof. by case: b; rewrite /= ltexI. Qed.
 
 Lemma lersif_minl :
-  (y `&` z <= x ?< if b) = (y <= x ?< if b) || (z <= x ?< if b).
+  (Num.min y z <= x ?< if b) = (y <= x ?< if b) || (z <= x ?< if b).
 Proof. by case: b; rewrite /= lteIx. Qed.
 
 Lemma lersif_maxr :
-  (x <= y `|` z ?< if b) = (x <= y ?< if b) || (x <= z ?< if b).
+  (x <= Num.max y z ?< if b) = (x <= y ?< if b) || (x <= z ?< if b).
 Proof. by case: b; rewrite /= ltexU. Qed.
 
 Lemma lersif_maxl :
-  (y `|` z <= x ?< if b) = (y <= x ?< if b) && (z <= x ?< if b).
+  (Num.max y z <= x ?< if b) = (y <= x ?< if b) && (z <= x ?< if b).
 Proof. by case: b; rewrite /= lteUx. Qed.
 
 End LersifOrdered.
