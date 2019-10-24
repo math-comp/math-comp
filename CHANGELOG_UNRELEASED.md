@@ -30,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `big_enum_val_cond`, `big_enum_rank_cond`,
   `big_enum_val`, `big_enum_rank`, `big_set`.
 
+- Arithmetic theorems: `modn_divl` and `divn_modl`.
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
@@ -40,6 +42,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Generalized the `allpairs_catr` lemma to the case where the types of `s`,
   `t1`, and `t2` are non-`eqType`s in `[seq E | i <- s, j <- t1 ++ t2]`.
+
+- Generalized `muln_modr` and `muln_modl` removing hypothesis `0 < p`.
 
 ### Infrastructure
 
