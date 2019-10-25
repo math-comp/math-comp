@@ -2077,6 +2077,16 @@ Notation "[ 'seq' E : R | i : T <- s & C ]" :=
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
 
+Lemma mask_filter (T : eqType) (s : seq T) (m : bitseq) :
+  uniq s -> mask m s = [seq i <- s | i \in mask m s].
+Proof.
+elim: m s => [|[] m ih] [|x s] //=.
+- by move=> _; elim: s.
+- case/andP => /negP x_notin_s /ih {1}->; rewrite inE eqxx /=; congr cons.
+  by apply/eq_in_filter => ?; rewrite inE; case: eqP => // ->.
+- by case: ifP => [/mem_mask -> // | _ /andP [] _ /ih].
+Qed.
+
 Section FilterSubseq.
 
 Variable T : eqType.
