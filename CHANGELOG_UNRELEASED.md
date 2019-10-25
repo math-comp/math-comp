@@ -37,7 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Arithmetic theorems in ssrnat and div:
   - some trivial results in ssrnat: `ltn_predl`, `ltn_predr`,
-    `ltn_subr` and `predn_sub`,
+    `ltn_subr`, `leq_subl`, `ltn_subl` and `predn_sub`,
   - theorems about `n <=/< p +/- m` and `m +/- n <=/< p`:
     `leq_psubRL`, `ltn_psubLR`, `leq_subRL`, `ltn_subLR`, `leq_subCl`,
     `leq_psubCr`, `leq_subCr`, `ltn_subCr`, `ltn_psubCl` and
@@ -118,6 +118,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + The compatibility layer for the version 1.9 is provided as the
     `ssrnat.mc_1_9` module. One may compile proofs compatible with the version
     1.9 in newer versions by using this module.
+
+- `leq_subr` has been renamed `leq_subl` (and the latter has been reallocated)
 
 ### Removed
 

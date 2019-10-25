@@ -326,7 +326,7 @@ Hint Resolve leqnSn : core.
 Lemma leq_pred n : n.-1 <= n.           Proof. by case: n => /=. Qed.
 Lemma leqSpred n : n <= n.-1.+1.        Proof. by case: n => /=. Qed.
 
-Lemma ltn_predl n : (n.-1 < n) = (n != 0).
+Lemma ltn_predl n : (n.-1 < n) = (0 < n).
 Proof. by case: n => [//|n]; rewrite ltnSn. Qed.
 
 Lemma ltn_predr m n : (m < n.-1) = (m.+1 < n).
@@ -517,6 +517,15 @@ Proof. by rewrite -subn_eq0 -subnDA. Qed.
 Lemma leq_subr m n : n - m <= n.
 Proof. by rewrite leq_subLR leq_addl. Qed.
 
+Lemma ltn_subl m n : n < n - m = false.
+Proof. by rewrite ltnNge leq_subr. Qed.
+
+Lemma leq_subl m n : n <= n - m = (m == 0) || (n == 0).
+Proof. by case: m n => [|m] [|n]; rewrite ?subn0 ?leqnn ?ltn_subl. Qed.
+
+Lemma ltn_subr m n : n - m < n = (0 < m) && (0 < n).
+Proof. by rewrite ltnNge leq_subl negb_or !lt0n. Qed.
+
 Lemma subnKC m n : m <= n -> m + (n - m) = n.
 Proof. by elim: m n => [|m IHm] [|n] // /(IHm n) {2}<-. Qed.
 
@@ -537,9 +546,6 @@ Proof. by move=> le_pm le_pn; rewrite addnBA // addnBAC. Qed.
 
 Lemma subnBA m n p : p <= n -> m - (n - p) = m + p - n.
 Proof. by move=> le_pn; rewrite -{2}(subnK le_pn) subnDr. Qed.
-
-Lemma ltn_subr m n : m <= n -> (n - m < n) = (m > 0).
-Proof. by move=> le_mn; rewrite -subn_gt0 subnBA// addKn. Qed.
 
 Lemma subKn m n : m <= n -> n - (n - m) = m.
 Proof. by move/subnBA->; rewrite addKn. Qed.
