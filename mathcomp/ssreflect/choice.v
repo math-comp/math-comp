@@ -480,6 +480,9 @@ Canonical bitseq_choiceType := Eval hnf in [choiceType of bitseq].
 Definition unit_choiceMixin := CanChoiceMixin bool_of_unitK.
 Canonical unit_choiceType := Eval hnf in ChoiceType unit unit_choiceMixin.
 
+Definition void_choiceMixin := PcanChoiceMixin (of_voidK unit).
+Canonical void_choiceType := Eval hnf in ChoiceType void void_choiceMixin.
+
 Definition option_choiceMixin T := CanChoiceMixin (@seq_of_optK T).
 Canonical option_choiceType T :=
   Eval hnf in ChoiceType (option T) (option_choiceMixin T).
@@ -673,6 +676,9 @@ Canonical bitseq_countType :=  Eval hnf in [countType of bitseq].
 
 Definition unit_countMixin := CanCountMixin bool_of_unitK.
 Canonical unit_countType := Eval hnf in CountType unit unit_countMixin.
+
+Definition void_countMixin := PcanCountMixin (of_voidK unit).
+Canonical void_countType := Eval hnf in CountType void void_countMixin.
 
 Definition option_countMixin T := CanCountMixin (@seq_of_optK T).
 Canonical option_countType T :=

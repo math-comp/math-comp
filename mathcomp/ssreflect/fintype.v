@@ -36,8 +36,8 @@ From mathcomp Require Import path.
 (* [finMixin of T by <:] == a finType structure for T, when T has a subType   *)
 (*                   structure over an existing finType.                      *)
 (*   We define or propagate the finType structure appropriately for all basic *)
-(* types : unit, bool, option, prod, sum, sig and sigT. We also define a      *)
-(* generic type constructor for finite subtypes based on an explicit          *)
+(* types : unit, bool, void, option, prod, sum, sig and sigT. We also define  *)
+(* a generic type constructor for finite subtypes based on an explicit        *)
 (* enumeration:                                                               *)
 (*          seq_sub s == the subType of all x \in s, where s : seq T for some *)
 (*                       eqType T; seq_sub s has a canonical finType instance *)
@@ -1399,6 +1399,11 @@ Lemma bool_enumP : Finite.axiom [:: true; false]. Proof. by case. Qed.
 Definition bool_finMixin := Eval hnf in FinMixin bool_enumP.
 Canonical bool_finType := Eval hnf in FinType bool bool_finMixin.
 Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
+
+Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
+Definition void_finMixin := Eval hnf in FinMixin void_enumP.
+Canonical void_finType := Eval hnf in FinType void void_finMixin.
+Lemma card_void : #|{: void}| = 0. Proof. by rewrite cardT enumT unlock. Qed.
 
 Local Notation enumF T := (Finite.enum T).
 
