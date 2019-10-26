@@ -279,9 +279,6 @@ Proof. by move=> m; rewrite /= -{2}[n]addn0 subnDl subn0. Qed.
 Lemma addnK n : cancel (addn^~ n) (subn^~ n).
 Proof. by move=> m; rewrite /= (addnC m) addKn. Qed.
 
-Lemma addnKC n m : (n + m) - n = m.
-Proof. by rewrite addnC addnK. Qed.
-
 Lemma subSnn n : n.+1 - n = 1.
 Proof. exact (addnK n 1). Qed.
 
@@ -542,7 +539,7 @@ Lemma subnBA m n p : p <= n -> m - (n - p) = m + p - n.
 Proof. by move=> le_pn; rewrite -{2}(subnK le_pn) subnDr. Qed.
 
 Lemma ltn_subr m n : m <= n -> (n - m < n) = (m > 0).
-Proof. by move=> le_mn; rewrite -subn_gt0 subnBA// addnKC. Qed.
+Proof. by move=> le_mn; rewrite -subn_gt0 subnBA// addKn. Qed.
 
 Lemma subKn m n : m <= n -> n - (n - m) = m.
 Proof. by move/subnBA->; rewrite addKn. Qed.
