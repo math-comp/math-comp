@@ -3761,6 +3761,9 @@ Variables (subS : zmodPred S) (kS : keyed_pred subS).
 Lemma rpredB : {in kS &, forall u v, u - v \in kS}.
 Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
 
+Lemma rpredBC u v : u - v \in kS = (v - u \in kS).
+Proof. by rewrite -rpredN opprB. Qed.
+
 Lemma rpredMNn n : {in kS, forall u, u *- n \in kS}.
 Proof. by move=> u Su; rewrite /= rpredN rpredMn. Qed.
 
@@ -5800,6 +5803,7 @@ Definition rpred_sum := rpred_sum.
 Definition rpredMn := rpredMn.
 Definition rpredN := rpredN.
 Definition rpredB := rpredB.
+Definition rpredBC := rpredBC.
 Definition rpredMNn := rpredMNn.
 Definition rpredDr := rpredDr.
 Definition rpredDl := rpredDl.
