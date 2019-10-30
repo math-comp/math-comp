@@ -589,7 +589,8 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose QyNum : realLtMixin (Q y) :=
     RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _).
   pose QyOrder :=
-    OrderType (LatticeType (POrderType ring_display (Q y) QyNum) QyNum) QyNum.
+    OrderType
+      (DistrLatticeType (POrderType ring_display (Q y) QyNum) QyNum) QyNum.
   pose QyNumField := [numFieldType of NumDomainType QyOrder QyNum].
   pose Ry := [realFieldType of [realDomainType of QyNumField]].
   have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
