@@ -1546,7 +1546,7 @@ End Exports.
 End Lmodule.
 Import Lmodule.Exports.
 
-Definition scale (R : ringType) (V : lmodType R) :=
+Definition scale (R : ringType) (V : lmodType R) : R -> V -> V :=
   Lmodule.scale (Lmodule.class V).
 
 Local Notation "*:%R" := (@scale _ _).
