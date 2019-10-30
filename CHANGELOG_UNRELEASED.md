@@ -78,7 +78,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Lemmas `eqEtupe`, `tnthS` and `tnth_nseq` in `tuple`
 
 - Ported `order.v` from the finmap library, which provides structures of ordered
-  sets (`porderType`, `latticeType`, `orderType`, etc.) and its theory.
+  sets (`porderType`, `distrLatticeType`, `orderType`, etc.) and its theory.
 
 ### Changed
 
