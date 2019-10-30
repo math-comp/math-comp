@@ -1496,6 +1496,23 @@ Definition subr_lte0 := (subr_le0, subr_lt0).
 Definition subr_gte0 := (subr_ge0, subr_gt0).
 Definition subr_cp0 := (subr_lte0, subr_gte0).
 
+(* Comparability in a numDomain *)
+
+Lemma comparabler0 x : (x >=< 0)%R = (x \is Num.real).
+Proof. by rewrite comparable_sym. Qed.
+
+Lemma subr_comparable0 x y : (x - y >=< 0)%R = (x >=< y)%R.
+Proof. by rewrite /comparable subr_ge0 subr_le0. Qed.
+
+Lemma comparablerE x y : (x >=< y)%R = (x - y \is Num.real).
+Proof. by rewrite -comparabler0 subr_comparable0. Qed.
+
+Lemma  comparabler_trans : transitive (comparable : rel R).
+Proof.
+move=> y x z; rewrite !comparablerE => xBy_real yBz_real.
+by have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
+Qed.
+
 (* Ordered ring properties. *)
 
 Definition lter01 := (ler01, ltr01).
@@ -1622,9 +1639,8 @@ Proof. exact: rpredB. Qed.
 Lemma realN : {mono (@GRing.opp R) : x /  x \is real}.
 Proof. exact: rpredN. Qed.
 
-(* :TODO: add a rpredBC in ssralg *)
 Lemma realBC x y : (x - y \is real) = (y - x \is real).
-Proof. by rewrite -realN opprB. Qed.
+Proof. exact: rpredBC. Qed.
 
 Lemma realD : {in real &, forall x y, x + y \is real}.
 Proof. exact: rpredD. Qed.
