@@ -111,6 +111,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `ssrnat.mc_1_9` module. One may compile proofs compatible with the version
     1.9 in newer versions by using this module.
 
+### Removed
+
+- `fin_inj_bij` lemma is removed as a duplicate of `injF_bij` lemma
+  from `fintype` library.
+
 ### Infrastructure
 
 - `Makefile` now supports the `test-suite` and `only` targets. Currently,

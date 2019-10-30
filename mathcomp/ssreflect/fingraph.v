@@ -543,9 +543,6 @@ Lemma f_finv : cancel finv f. Proof. exact: (in1T (f_finv_in _ (in2W _))). Qed.
 
 Lemma finv_f : cancel f finv. Proof. exact: (in1T (finv_f_in _ (in2W _))). Qed.
 
-Lemma fin_inj_bij : bijective f.
-Proof. by exists finv; [apply: finv_f|apply: f_finv]. Qed.
-
 Lemma finv_bij : bijective finv.
 Proof. by exists f; [apply: f_finv|apply: finv_f]. Qed.
 
@@ -643,7 +640,7 @@ Variables (T : finType) (f f' : T -> T).
 Lemma finv_eq_can : cancel f f' -> finv f =1 f'.
 Proof.
 move=> fK; have inj_f := can_inj fK.
-by apply: bij_can_eq fK; [apply: fin_inj_bij | apply: finv_f].
+by apply: bij_can_eq fK; [apply: injF_bij | apply: finv_f].
 Qed.
 
 Hypothesis eq_f : f =1 f'.
