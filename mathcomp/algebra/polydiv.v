@@ -3243,7 +3243,7 @@ move=> hsp /=; have [->|p_neq0] := altP (p =P 0).
   by rewrite size_poly0 expr0 mulr1 dvd0p=> /(_ isT).
 have [|ncop_pq] := boolP (coprimep _ _); first by rewrite dvdp_mulr ?dvdpp.
 have g_gt1: (1 < size (gcdp p q))%N.
-  have [|//|/eqP] := ltngtP; last by rewrite -coprimep_def (negPf ncop_pq).
+  have [//||/esym/eqP] := ltngtP; last by rewrite -coprimep_def (negPf ncop_pq).
   by rewrite ltnS leqn0 size_poly_eq0 gcdp_eq0 (negPf p_neq0).
 have sd : (size (p %/ gcdp p q) < size p)%N.
   rewrite size_divp -?size_poly_eq0 -(subnKC g_gt1) // add2n /=.

@@ -138,9 +138,9 @@ Lemma oppzK : involutive oppz. Proof. by do 2?case. Qed.
 
 Lemma oppz_add : {morph oppz : m n / m + n}.
 Proof.
-move=> [[|n]|n] [[|m]|m] /=; rewrite ?NegzE ?oppzK ?addnS ?addn0 ?subn0 //;
-  rewrite ?ltnS[m <= n]leqNgt [n <= m]leqNgt; case: ltngtP=> hmn /=;
-    by rewrite ?hmn ?subnn // ?oppzK ?subSS ?subnS ?prednK // ?subn_gt0.
+by move=> [[|n]|n] [[|m]|m] /=; rewrite ?addn0 ?subn0 ?addnS //;
+  rewrite !NegzE !ltnS !subSS; case: ltngtP => [?|?|->];
+  rewrite ?subnn // ?oppzK ?subnS ?prednK // subn_gt0.
 Qed.
 
 Lemma add1Pz (n : int) : 1 + (n - 1) = n.
@@ -154,9 +154,9 @@ Qed.
 Lemma addSnz (m : nat) (n : int) : (m.+1%N) + n = 1 + (m + n).
 Proof.
 move: m n=> [|m] [] [|n] //=; rewrite ?add1n ?subn1 // !(ltnS, subSS).
-rewrite [n <= m]leqNgt; case: ltngtP=> hmn /=; rewrite ?hmn ?subnn //.
+case: ltngtP=> hnm /=; rewrite ?hnm ?subnn //.
   by rewrite subnS add1n prednK ?subn_gt0.
-by rewrite ltnS leqn0 subn_eq0 leqNgt hmn /= subnS subn1.
+by rewrite ltnS leqn0 subn_eq0 leqNgt hnm /= subnS subn1.
 Qed.
 
 Lemma addSz (m n : int) : (1 + m) + n = 1 + (m + n).

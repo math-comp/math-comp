@@ -93,6 +93,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   (which statement was modified to remove the dependency in `eqType`),
   and `order_path_min`.
 
+- `compare_nat` type family and `ltngtP` comparison predicate are changed
+  from `compare_nat m n (m <= n) (n <= m) (m < n) (n < m) (n == m) (m == n)`
+  to `compare_nat m n (n == m) (m == n) (n <= m) (m <= n) (n < m) (m < n)`,
+  to make it tries to match subterms with `m < n` first, `m <= n`, then
+  `m == n`.
+  + The compatibility layer for the version 1.9 is provided as the
+    `ssrnat.mc_1_9` module. One may compile proofs compatible with the version
+    1.9 in newer versions by using this module.
+
 ### Infrastructure
 
 - `Makefile` now supports the `test-suite` and `only` targets. Currently,

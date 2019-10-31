@@ -1004,7 +1004,7 @@ Proof. by elim: n x => //= n IHn x //=; rewrite IHn. Qed.
 
 Lemma nth_traject i n : i < n -> forall x, nth x (traject x n) i = iter i f x.
 Proof.
-elim: n => // n IHn; rewrite ltnS leq_eqVlt => le_i_n x.
+elim: n => // n IHn; rewrite ltnS => le_i_n x.
 rewrite trajectSr nth_rcons size_traject.
 by case: ltngtP le_i_n => [? _||->] //; apply: IHn.
 Qed.
@@ -1086,8 +1086,8 @@ Proof.
 move=> x; rewrite prev_nth mem_next next_nth; case p_x: (x \in p) => //.
 case def_p: p Up p_x => // [y q]; rewrite -{-1}def_p => /= /andP[not_qy Uq] p_x.
 rewrite -{2}(nth_index y p_x); congr (nth y _ _); set i := index x p.
-have: ~~ (size q < i) by rewrite -index_mem -/i def_p leqNgt in p_x.
-case: ltngtP => // [lt_i_q | ->] _; first by rewrite index_uniq.
+have: i <= size q by rewrite -index_mem -/i def_p in p_x.
+case: ltngtP => // [lt_i_q|->] _; first by rewrite index_uniq.
 by apply/eqP; rewrite nth_default // eqn_leq index_size leqNgt index_mem.
 Qed.
 
