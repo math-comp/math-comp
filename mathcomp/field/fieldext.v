@@ -108,11 +108,15 @@ Definition base1 := ComRing.Class (@comm_ext T c).
 Definition base2 := @ComUnitRing.Class T base1 c.
 Definition base3 := @IntegralDomain.Class T base2 (@idomain_ext T c).
 Definition base4 := @Field.Class T base3 (@field_ext T c).
+Definition base5 := @ComAlgebra.Class R T (@base T c) (@comm_ext T c).
+Definition base6 := @ComUnitAlgebra.Class R T base5 c.
 End Bases.
 Local Coercion base1 : class_of >-> ComRing.class_of.
 Local Coercion base2 : class_of >-> ComUnitRing.class_of.
 Local Coercion base3 : class_of >-> IntegralDomain.class_of.
 Local Coercion base4 : class_of >-> Field.class_of.
+Local Coercion base5 : class_of >-> ComAlgebra.class_of.
+Local Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
 
 Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -149,36 +153,40 @@ Definition lmodType := @Lmodule.Pack R phR cT xclass.
 Definition lalgType := @Lalgebra.Pack R phR cT xclass.
 Definition algType := @Algebra.Pack R phR cT xclass.
 Definition unitAlgType := @UnitAlgebra.Pack R phR cT xclass.
+Definition comAlgType := @ComAlgebra.Pack R phR cT xclass.
+Definition comUnitAlgType := @ComUnitAlgebra.Pack R phR cT xclass.
 Definition vectType := @Vector.Pack R phR cT xclass.
 Definition FalgType := @Falgebra.Pack R phR cT xclass.
 
 Definition Falg_comRingType := @ComRing.Pack FalgType xclass.
 Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType xclass.
+Definition Falg_comAlgType := @ComAlgebra.Pack R phR FalgType xclass.
+Definition Falg_comUnitAlgType := @ComUnitAlgebra.Pack R phR FalgType xclass.
 Definition Falg_idomainType := @IntegralDomain.Pack FalgType xclass.
 Definition Falg_fieldType := @Field.Pack FalgType xclass.
 
 Definition vect_comRingType := @ComRing.Pack vectType xclass.
 Definition vect_comUnitRingType := @ComUnitRing.Pack vectType xclass.
+Definition vect_comAlgType := @ComAlgebra.Pack R phR vectType xclass.
+Definition vect_comUnitAlgType := @ComUnitAlgebra.Pack R phR vectType xclass.
 Definition vect_idomainType := @IntegralDomain.Pack vectType xclass.
 Definition vect_fieldType := @Field.Pack vectType xclass.
 
-Definition unitAlg_comRingType := @ComRing.Pack unitAlgType xclass.
-Definition unitAlg_comUnitRingType := @ComUnitRing.Pack unitAlgType xclass.
+Definition comUnitAlg_idomainType := @IntegralDomain.Pack comUnitAlgType xclass.
+Definition comUnitAlg_fieldType := @Field.Pack comUnitAlgType xclass.
+
 Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType xclass.
 Definition unitAlg_fieldType := @Field.Pack unitAlgType xclass.
 
-Definition alg_comRingType := @ComRing.Pack algType xclass.
-Definition alg_comUnitRingType := @ComUnitRing.Pack algType xclass.
+Definition comAlg_idomainType := @IntegralDomain.Pack comAlgType xclass.
+Definition comAlg_fieldType := @Field.Pack comAlgType xclass.
+
 Definition alg_idomainType := @IntegralDomain.Pack algType xclass.
 Definition alg_fieldType := @Field.Pack algType xclass.
 
-Definition lalg_comRingType := @ComRing.Pack lalgType xclass.
-Definition lalg_comUnitRingType := @ComUnitRing.Pack lalgType xclass.
 Definition lalg_idomainType := @IntegralDomain.Pack lalgType xclass.
 Definition lalg_fieldType := @Field.Pack lalgType xclass.
 
-Definition lmod_comRingType := @ComRing.Pack lmodType xclass.
-Definition lmod_comUnitRingType := @ComUnitRing.Pack lmodType xclass.
 Definition lmod_idomainType := @IntegralDomain.Pack lmodType xclass.
 Definition lmod_fieldType := @Field.Pack lmodType xclass.
 
@@ -216,6 +224,10 @@ Coercion algType : type >-> Algebra.type.
 Canonical algType.
 Coercion unitAlgType : type >-> UnitAlgebra.type.
 Canonical unitAlgType.
+Coercion comAlgType : type >-> ComAlgebra.type.
+Canonical comAlgType.
+Coercion comUnitAlgType : type >-> ComUnitAlgebra.type.
+Canonical comUnitAlgType.
 Coercion vectType : type >-> Vector.type.
 Canonical vectType.
 Coercion FalgType : type >-> Falgebra.type.
@@ -223,26 +235,26 @@ Canonical FalgType.
 
 Canonical Falg_comRingType.
 Canonical Falg_comUnitRingType.
+Canonical Falg_comAlgType.
+Canonical Falg_comUnitAlgType.
 Canonical Falg_idomainType.
 Canonical Falg_fieldType.
 Canonical vect_comRingType.
 Canonical vect_comUnitRingType.
+Canonical vect_comAlgType.
+Canonical vect_comUnitAlgType.
 Canonical vect_idomainType.
 Canonical vect_fieldType.
-Canonical unitAlg_comRingType.
-Canonical unitAlg_comUnitRingType.
+Canonical comUnitAlg_idomainType.
+Canonical comUnitAlg_fieldType.
 Canonical unitAlg_idomainType.
 Canonical unitAlg_fieldType.
-Canonical alg_comRingType.
-Canonical alg_comUnitRingType.
+Canonical comAlg_idomainType.
+Canonical comAlg_fieldType.
 Canonical alg_idomainType.
 Canonical alg_fieldType.
-Canonical lalg_comRingType.
-Canonical lalg_comUnitRingType.
 Canonical lalg_idomainType.
 Canonical lalg_fieldType.
-Canonical lmod_comRingType.
-Canonical lmod_comUnitRingType.
 Canonical lmod_idomainType.
 Canonical lmod_fieldType.
 Notation fieldExtType R := (type (Phant R)).
