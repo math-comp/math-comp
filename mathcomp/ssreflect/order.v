@@ -4,8 +4,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime.
 
 (******************************************************************************)
-(* This files defines order relations. It contains several modules            *)
-(* implementing different theories:                                           *)
+(* This files defines types equipped with order relations.                    *)
+(* It contains several modules implementing different theories:               *)
 (*   Order.LTheory: partially ordered types and lattices excluding complement *)
 (*                  and totality related theorems.                            *)
 (*   Order.CTheory: complemented lattices including Order.LTheory.            *)
@@ -13,7 +13,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*    Order.Theory: ordered types including all of the above theory modules   *)
 (*                                                                            *)
 (* To access the definitions, notations, and the theory from, say,            *)
-(* "Order.Xyz", insert "Import Order.Xyz." on the top of your scripts.        *)
+(* "Order.Xyz", insert "Import Order.Xyz." at the top of your scripts.        *)
 (* Notations are accessible by opening the scope "order_scope" bound to the   *)
 (* delimiting key "O".                                                        *)
 (*                                                                            *)
@@ -36,13 +36,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*                                                                            *)
 (* Each of these structures take a first argument named display, of type      *)
 (* unit. Instantiating it with tt or an unknown key will lead to a default    *)
-(* display. Optionally, one can configure the display by setting one own's    *)
-(* notation on operators instantiated for their particular display.           *)
-(* One example of this is the converse display ^c, every notation with the    *)
-(* suffix ^c (e.g. x <=^c y) is about the converse order, in order not to     *)
-(* confuse the normal order with its converse.                                *)
-(*                                                                            *)
-(* Over these structures, we have the following relations                     *)
+(* display for notations, i.e. over these structures, we have:                *)
 (*            x <= y <-> x is less than or equal to y.                        *)
 (*             x < y <-> x is less than y (:= (y != x) && (x <= y)).          *)
 (*            x >= y <-> x is greater than or equal to y (:= y <= x).         *)
@@ -59,16 +53,6 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*              ~` x == the complement of x in [0, 1].                        *)
 (*   \meet_<range> e == iterated meet of a lattice with a top.                *)
 (*   \join_<range> e == iterated join of a lattice with a bottom.             *)
-(* For orderType we provide the following operations                          *)
-(*   [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject to  *)
-(*                      the condition P (i may appear in P and M), and        *)
-(*                      provided P holds for i0.                              *)
-(*   [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and     *)
-(*                      provided P holds for i0.                              *)
-(*   [arg min_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.        *)
-(*   [arg max_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.        *)
-(*   [arg min_(i < i0) M] == an i : T minimizing M, given i0 : T.             *)
-(*   [arg max_(i > i0) M] == an i : T maximizing M, given i0 : T.             *)
 (*                                                                            *)
 (* There are three distinct uses of the symbols                               *)
 (* <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><:                                *)
@@ -83,6 +67,55 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*   where ((< y) x) = (x < y) = ((<) x y),                                   *)
 (*   except that we write <%O instead of (<).                                 *)
 (*                                                                            *)
+(* Alternative notation displays can be defined by :                          *)
+(* 1. declaring a new opaque definition of type unit. Using the idiom         *)
+(*    `Lemma my_display : unit. Proof. exact: tt. Qed.`                       *)
+(* 2. using this symbol to tag canoincal porderType structures using          *)
+(*    `Canonical my_porderType := POrderType my_display my_type my_mixin`,    *)
+(* 3. declaring notations for the main operations of this library, by         *)
+(*    setting the first argument of the definition to the display, e.g.       *)
+(*    `Notation my_syndef_le x y := @le my_display _ x y` or                  *)
+(*    `Notation "x <<< y" := @lt my_display _ x y (at level ...)`             *)
+(*    Non overloaded notations will default to the default display.           *)
+(*                                                                            *)
+(* One may use displays either for convenience or to desambiguate between     *)
+(* different structures defined on copies of one. Two examples of this are    *)
+(* given in this library:                                                     *)
+(* - the converse ordered structures. If T is an ordered type (and in         *)
+(*   particular porderType d), then T^c is a copy of T with the same ordered  *)
+(*   structures but with the display (converse_display d) which prints all    *)
+(*   of the above notations with an addition ^c in the notation (<=^c ...)    *)
+(* - natural number in divisibility order. The type natdvd is a copy of nat   *)
+(*   where the canonical order is given by dvdn and meet and join by gcdn     *)
+(*   and lcmn. The display is dvd_display and overloads le using %|, lt using *)
+(*   %<| and meet and join using gcd and lcm.                                 *)
+(*                                                                            *)
+(* Beware that canonical structure inference will not try to find the copy of *)
+(* the structures that fits the display one mentioned, but will rather        *)
+(* determine which canonical structure and display to use depending on the    *)
+(* copy of the type one provided. In this sense they are merely displays      *)
+(* to inform the user of what the inferrence did, rather than additional      *)
+(* input for the inference.                                                   *)
+(*                                                                            *)
+(* Existing displays are either converse_display d (where d is a display),    *)
+(* dvd_display (both explained above), total_display (to overload meet and    *)
+(* join using min and max) ring_display (from algebra/ssrnum to change the    *)
+(* scope of the usual notations to ring_scope). We also provide lexi_display  *)
+(* and prod_display for lexicographic and product order respectively.         *)
+(* The default display is tt and users can define their own as explained      *)
+(* above.                                                                     *)
+(*                                                                            *)
+(* For orderType we provide the following operations                          *)
+(*   [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject to  *)
+(*                      the condition P (i may appear in P and M), and        *)
+(*                      provided P holds for i0.                              *)
+(*   [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and     *)
+(*                      provided P holds for i0.                              *)
+(*   [arg min_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.        *)
+(*   [arg max_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.        *)
+(*   [arg min_(i < i0) M] == an i : T minimizing M, given i0 : T.             *)
+(*   [arg max_(i > i0) M] == an i : T maximizing M, given i0 : T.             *)
+(*                                                                            *)
 (* In order to build the above structures, one must provide the appropriate   *)
 (* mixin to the following structure constructors. The list of possible mixins *)
 (* is indicated after each constructor. Each mixin is documented in the next  *)
@@ -94,6 +127,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*                       lePOrderMixin, ltPOrderMixin, meetJoinMixin,         *)
 (*                       leOrderMixin, or ltOrderMixin                        *)
 (*                     or computed using PcanPOrderMixin or CanPOrderMixin.   *)
+(*                     disp is a display as explained above                   *)
 (*                                                                            *)
 (* DistrLatticeType T lat_mixin                                               *)
 (*                  == builds a distrLatticeType from a porderType where      *)
@@ -184,7 +218,11 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*                                                                            *)
 (* We provide the following canonical instances of ordered types              *)
 (* - all possible structures on bool                                          *)
-(* - porderType, distrLatticeType, orderType, bDistrLatticeType on nat        *)
+(* - porderType, distrLatticeType, orderType and bDistrLatticeType on nat for *)
+(*   the leq order                                                            *)
+(* - porderType, distrLatticeType, bDistrLatticeType, cbDistrLatticeType,     *)
+(*   ctbDistrLatticeType on nat for the dvdn order, where meet and join       *)
+(*   are respectively gcdn and lcmn                                           *)
 (* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
 (*   tbDistrLatticeType, cbDistrLatticeType, ctbDistrLatticeType              *)
 (*   on T *prod[disp] T' a copy of T * T'                                     *)
@@ -3924,6 +3962,30 @@ Import SubOrder.Exports.
 (* INSTANCES *)
 (*************)
 
+(*******************************)
+(* Canonical structures on nat *)
+(*******************************)
+
+(******************************************************************************)
+(* This is an example of creation of multiple canonical declarations on the   *)
+(* same type, with distinct displays, on the example of natural numbers.      *)
+(* We declare two distinct canonical orders:                                  *)
+(* - leq which is total, and where meet and join are minn and maxn, on nat    *)
+(* - dvdn which is partial, and where meet and join are gcdn and lcmn,        *)
+(*   on a copy of nat we name natdiv                                          *)
+(******************************************************************************)
+
+(******************************************************************************)
+(* The Module NatOrder defines leq as the canonical order on the type nat,    *)
+(* i.e. without creating a copy. We use the predefined total_display, which   *)
+(* is designed to parse and print meet and join as minn and maxn. This looks  *)
+(* like standard canonical structure declaration, except we use a display.    *)
+(* We also use a single factory LeOrderMixin to instanciate three different   *)
+(* canonical declarations porderType, distrLatticeType, orderType             *)
+(* We finish by providing theorems to convert the operations of ordered and   *)
+(* lattice types to their definition without structure abstraction.           *)
+(******************************************************************************)
+
 Module NatOrder.
 Section NatOrder.
 
@@ -3944,8 +4006,11 @@ Canonical distrLatticeType := DistrLatticeType nat orderMixin.
 Canonical orderType := OrderType nat orderMixin.
 Canonical bDistrLatticeType := BDistrLatticeType nat (BDistrLatticeMixin leq0n).
 
-Lemma leEnat: le = leq. Proof. by []. Qed.
-Lemma ltEnat (n m : nat): (n < m) = (n < m)%N. Proof. by []. Qed.
+Lemma leEnat : le = leq. Proof. by []. Qed.
+Lemma ltEnat (n m : nat) : (n < m) = (n < m)%N. Proof. by []. Qed.
+Lemma meetEnat : meet = minn. Proof. by []. Qed.
+Lemma joinEnat : join = maxn. Proof. by []. Qed.
+Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
 Module Exports.
@@ -3955,12 +4020,25 @@ Canonical orderType.
 Canonical bDistrLatticeType.
 Definition leEnat := leEnat.
 Definition ltEnat := ltEnat.
+Definition meetEnat := meetEnat.
+Definition joinEnat := joinEnat.
+Definition botEnat := botEnat.
 End Exports.
 End NatOrder.
 
-Module DvdSyntax.
+(****************************************************************************)
+(* The Module DvdSyntax introduces a new set of notations using the newly   *)
+(* created display dvd_display. We first define the display as an opaque    *)
+(* definition of type unit, and we use it as the first argument of the      *)
+(* operator which display we want to change from the default one (here le,  *)
+(* lt, dvd sdvd, meet, join, top and bottom, as well as big op notations on *)
+(* gcd and lcm). This notations will now be used for any ordered type which *)
+(* first parameter is set to dvd_display.                                   *)
+(****************************************************************************)
 
 Lemma dvd_display : unit. Proof. exact: tt. Qed.
+
+Module DvdSyntax.
 
 Notation dvd := (@le dvd_display _).
 Notation "@ 'dvd' T" :=
@@ -3970,7 +4048,7 @@ Notation "@ 'sdvd' T" :=
   (@lt dvd_display T) (at level 10, T at level 8, only parsing).
 
 Notation "x %| y" := (dvd x y) : order_scope.
-Notation "x %<| y" := (sdvd x y) (at level 70, no associativity) : order_scope.
+Notation "x %<| y" := (sdvd x y) : order_scope.
 
 Notation gcd := (@meet dvd_display _).
 Notation "@ 'gcd' T" :=
@@ -4036,6 +4114,20 @@ Notation "\lcm_ ( i 'in' A ) F" :=
 
 End DvdSyntax.
 
+(******************************************************************************)
+(* The Module NatDvd defines dvdn as the canonical order on NatDvd.t, which   *)
+(* is abbreviated using the notation natdvd at the end of the module.         *)
+(* We use the newly defined dvd_display, described above. This looks          *)
+(* like standard canonical structure declaration, except we use a display and *)
+(* we declare it on a copy of the type.                                       *)
+(* We first recover structures that are common to both nat and natdiv         *)
+(* (eqType, choiceType, countType) through the clone mechanisms, then we use  *)
+(* a single factory MeetJoinMixin to instanciate both porderType and          *)
+(* distrLatticeType canonical structures,and end with top and bottom.         *)
+(* We finish by providing theorems to convert the operations of ordered and   *)
+(* lattice types to their definition without structure abstraction.           *)
+(******************************************************************************)
+
 Module NatDvd.
 Section NatDvd.
 
@@ -4065,7 +4157,6 @@ Qed.
 Definition t_distrLatticeMixin := MeetJoinMixin le_def (fun _ _ => erefl _)
   gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
 
-Import DvdSyntax.
 Definition t := nat.
 
 Canonical eqType := [eqType of t].
@@ -4074,11 +4165,13 @@ Canonical countType := [countType of t].
 Canonical porderType := POrderType dvd_display t t_distrLatticeMixin.
 Canonical distrLatticeType := DistrLatticeType t t_distrLatticeMixin.
 Canonical bDistrLatticeType := BDistrLatticeType t
-  (BDistrLatticeMixin (dvd1n : forall m : t, (1 %| m)%N)).
+  (BDistrLatticeMixin (dvd1n : forall m : t, 1 %| m)).
 Canonical tbDistrLatticeType := TBDistrLatticeType t
-  (TBDistrLatticeMixin (dvdn0 : forall m : t, (m %| 0)%N)).
+  (TBDistrLatticeMixin (dvdn0 : forall m : t, m %| 0)).
 
+Import DvdSyntax.
 Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
+Lemma sdvdE (m n : t) : m %<| n = (n != m) && (m %| n). Proof. by []. Qed.
 Lemma gcdE : gcd = gcdn :> (t -> t -> t). Proof. by []. Qed.
 Lemma lcmE : lcm = lcmn :> (t -> t -> t). Proof. by []. Qed.
 Lemma nat1E : nat1 = 1%N :> t. Proof. by []. Qed.
@@ -4095,12 +4188,17 @@ Canonical distrLatticeType.
 Canonical bDistrLatticeType.
 Canonical tbDistrLatticeType.
 Definition dvdEnat := dvdE.
+Definition sdvdEnat := sdvdE.
 Definition gcdEnat := gcdE.
 Definition lcmEnat := lcmE.
 Definition nat1E := nat1E.
 Definition nat0E := nat0E.
 End Exports.
 End NatDvd.
+
+(*******************************)
+(* Canonical structure on bool *)
+(*******************************)
 
 Module BoolOrder.
 Section BoolOrder.
@@ -4146,8 +4244,12 @@ Canonical finDistrLatticeType :=  [finDistrLatticeType of bool].
 Canonical finCDistrLatticeType := [finCDistrLatticeType of bool].
 Canonical finOrderType := [finOrderType of bool].
 
-Lemma leEbool: le = (leq : rel bool). Proof. by []. Qed.
+Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
 Lemma ltEbool x y : (x < y) = (x < y)%N. Proof. by []. Qed.
+Lemma andEbool : meet = andb. Proof. by []. Qed.
+Lemma orEbool : meet = andb. Proof. by []. Qed.
+Lemma subEbool x y : x `\` y = x && ~~ y. Proof. by []. Qed.
+Lemma complEbool : compl = negb. Proof. by []. Qed.
 
 End BoolOrder.
 Module Exports.
@@ -4164,8 +4266,16 @@ Canonical finOrderType.
 Canonical finCDistrLatticeType.
 Definition leEbool := leEbool.
 Definition ltEbool := ltEbool.
+Definition andEbool := andEbool.
+Definition orEbool := orEbool.
+Definition subEbool := subEbool.
+Definition complEbool := complEbool.
 End Exports.
 End BoolOrder.
+
+(*******************************)
+(* Definition of prod_display. *)
+(*******************************)
 
 Fact prod_display : unit. Proof. by []. Qed.
 
@@ -4275,6 +4385,10 @@ Notation "\meet^p_ ( i 'in' A ) F" :=
  (\big[meet/1]_(i in A) F%O) : order_scope.
 
 End ProdSyntax.
+
+(*******************************)
+(* Definition of lexi_display. *)
+(*******************************)
 
 Fact lexi_display : unit. Proof. by []. Qed.
 
@@ -4387,6 +4501,11 @@ Notation "\min^l_ ( i 'in' A ) F" :=
  (\big[minlexi/1]_(i in A) F%O) : order_scope.
 
 End LexiSyntax.
+
+(***********************************************)
+(* We declare a copy of the cartesian product, *)
+(* which has canonical product order.          *)
+(***********************************************)
 
 Module ProdOrder.
 Section ProdOrder.
@@ -4626,6 +4745,10 @@ Canonical prod_finCDistrLatticeType (T : finCDistrLatticeType disp1)
 End DefaultProdOrder.
 End DefaultProdOrder.
 
+(********************************************************)
+(* We declare lexicographic ordering on dependent pairs *)
+(********************************************************)
+
 Module SigmaOrder.
 Section SigmaOrder.
 
@@ -4764,6 +4887,11 @@ Definition botEsig := @botEsig.
 End Exports.
 End SigmaOrder.
 Import SigmaOrder.Exports.
+
+(***********************************************)
+(* We declare a copy of the cartesian product, *)
+(* which has canonical lexicographic order.    *)
+(***********************************************)
 
 Module ProdLexiOrder.
 Section ProdLexiOrder.
@@ -4939,6 +5067,11 @@ Canonical prodlexi_finOrderType (T : finOrderType disp1)
 End DefaultProdLexiOrder.
 End DefaultProdLexiOrder.
 
+(***************************************)
+(* We declare a copy of the sequences, *)
+(* which has canonical product order.  *)
+(***************************************)
+
 Module SeqProdOrder.
 Section SeqProdOrder.
 
@@ -5105,6 +5238,11 @@ Canonical seqprod_bDistrLatticeType (T : bDistrLatticeType disp) :=
 
 End DefaultSeqProdOrder.
 End DefaultSeqProdOrder.
+
+(*********************************************)
+(* We declare a copy of the sequences,       *)
+(* which has canonical lexicographic order.  *)
+(*********************************************)
 
 Module SeqLexiOrder.
 Section SeqLexiOrder.
@@ -5277,6 +5415,11 @@ Canonical seqlexi_orderType (T : orderType disp) :=
 
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
+
+(***************************************)
+(* We declare a copy of the tuples,    *)
+(* which has canonical product order.  *)
+(***************************************)
 
 Module TupleProdOrder.
 Import DefaultSeqProdOrder.
@@ -5553,6 +5696,11 @@ Canonical tprod_finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
 
 End DefaultTupleProdOrder.
 End DefaultTupleProdOrder.
+
+(*********************************************)
+(* We declare a copy of the tuples,          *)
+(* which has canonical lexicographic order.  *)
+(*********************************************)
 
 Module TupleLexiOrder.
 Section TupleLexiOrder.
