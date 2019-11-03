@@ -2251,7 +2251,7 @@ Lemma fixsetK : F fixset = fixset.
 Proof.
 suff /'exists_eqP[x /= e]: [exists k : 'I_n.+1, iterF k == iterF k.+1].
   by rewrite /fixset -(subnK (leq_ord x)) /iterF iter_add iter_fix.
-apply: contraT; rewrite negb_exists => /forallP /(_ (Ordinal _)) /= neq_iter.
+apply: contraT => /existsPn /(_ (Ordinal _)) /= neq_iter.
 suff iter_big k : k <= n.+1 -> k <= #|iter k F set0|.
   by have := iter_big _ (leqnn _); rewrite ltnNge max_card.
 elim: k => [|k IHk] k_lt //=; apply: (leq_ltn_trans (IHk (ltnW k_lt))).

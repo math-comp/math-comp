@@ -1352,7 +1352,7 @@ rewrite ltnS (cardD1x Px) in lePn; move/IHn: lePn => {n IHn}/=IH_P.
 have [/eqfun_inP c_Px'_0 | ] := boolP [forall (y | P y && (y != x)), c_ y == 0].
   exists 1; rewrite ?mem1v // (bigD1 x Px) /= rmorph1 mulr1.
   by rewrite big1 ?addr0 // => y /c_Px'_0->; rewrite mul0r.
-rewrite negb_forall_in => /exists_inP[y Px'y nz_cy].
+case/forall_inPn => y Px'y nz_cy.
 have [Py /gal_eqP/eqlfun_inP/subvPn[a Ea]] := andP Px'y.
 rewrite memv_ker !lfun_simp => nz_yxa; pose d_ y := c_ y * (y a - x a).
 have /IH_P[//|b Eb nz_sumb]: d_ y != 0 by rewrite mulf_neq0.

@@ -3193,8 +3193,7 @@ apply/lerifP; case: ifPn => [/forall_inP-Econstant | Enonconstant].
 set mu := \sum_(i in A) E i; pose En i := E i *+ n.
 pose cmp_mu s := [pred i | s * mu < s * En i].
 have{Enonconstant} has_cmp_mu e (s := (-1) ^+ e): {i | i \in A & cmp_mu s i}.
-  apply/sig2W/exists_inP; apply: contraR Enonconstant.
-  rewrite negb_exists_in => /forall_inP-mu_s_A.
+  apply/sig2W/exists_inP; apply: contraR Enonconstant => /exists_inPn-mu_s_A.
   have n_gt0 i: i \in A -> (0 < n)%N by rewrite [n](cardD1 i) => ->.
   have{mu_s_A} mu_s_A i: i \in A -> s * En i <= s * mu.
     move=> Ai; rewrite real_lerNgt ?mu_s_A ?rpredMsign ?ger0_real ?Ege0 //.
@@ -4692,7 +4691,7 @@ rewrite horner_poly (eq_bigr _ (fun _ _ => mul1r _)) in pw_0.
 have wn1: w ^+ n = 1 by apply/eqP; rewrite -subr_eq0 subrX1 pw_0 mulr0.
 suffices /existsP[i ltRwi0]: [exists i : 'I_n, 'Re (w ^+ i) < 0].
   by exists (w ^+ i) => //; rewrite exprAC wn1 expr1n.
-apply: contra_eqT (congr1 Re pw_0); rewrite negb_exists => /forallP geRw0.
+apply: contra_eqT (congr1 Re pw_0) => /existsPn geRw0.
 rewrite raddf_sum raddf0 /= (bigD1 (Ordinal (ltnW n_gt1))) //=.
 rewrite (Creal_ReP _ _) ?rpred1 // gtr_eqF ?ltr_paddr ?ltr01 //=.
 by apply: sumr_ge0 => i _; rewrite real_lerNgt ?rpred0.

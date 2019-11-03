@@ -973,6 +973,22 @@ Lemma negb_exists_in D P :
   ~~ [exists (x | D x), P x] = [forall (x | D x), ~~ P x].
 Proof. by rewrite negb_exists; apply/eq_forallb => x; rewrite [~~ _]fun_if. Qed.
 
+Lemma existsPn P :
+  reflect (forall x, ~~ P x) (~~ [exists x, P x]).
+Proof. rewrite negb_exists. exact: forallP. Qed.
+
+Lemma forallPn P :
+  reflect (exists x, ~~ P x) (~~ [forall x, P x]).
+Proof. rewrite negb_forall. exact: existsP. Qed.
+
+Lemma exists_inPn D P :
+  reflect (forall x, x \in D -> ~~ P x) (~~ [exists x in D, P x]).
+Proof. rewrite negb_exists_in. exact: forall_inP. Qed.
+
+Lemma forall_inPn D P :
+  reflect (exists2 x, x \in D & ~~ P x) (~~ [forall x in D, P x]).
+Proof. rewrite negb_forall_in. exact: exists_inP. Qed.
+
 End Quantifiers.
 
 Arguments forallP {T P}.
@@ -983,6 +999,10 @@ Arguments existsP {T P}.
 Arguments exists_eqP {T rT f1 f2}.
 Arguments exists_inP {T D P}.
 Arguments exists_eq_inP {T rT D f1 f2}.
+Arguments existsPn {T P}.
+Arguments exists_inPn {T D P}.
+Arguments forallPn {T P}.
+Arguments forall_inPn {T D P}.
 
 Notation "'exists_in_ view" := (exists_inPP _ (fun _ => view))
   (at level 4, right associativity, format "''exists_in_' view").

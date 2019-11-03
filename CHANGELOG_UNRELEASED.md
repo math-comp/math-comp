@@ -28,7 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added theorems `flatten_map1`, `allpairs_consr`, and `mask_filter` in `seq.v`.
 
 - Fintype theorems: `fintype0`, `card_le1P`, `mem_card1`,
-  `card1P`, `fintype_le1P`, `fintype1`, `fintype1P`.
+  `card1P`, `fintype_le1P`, `fintype1`, `fintype1P`,
+  `existsPn`, `exists_inPn`, `forallPn`, `forall_inPn`.
 
 - Bigop theorems: `big_rmcond`, `bigD1_seq`,
   `big_enum_val_cond`, `big_enum_rank_cond`,
