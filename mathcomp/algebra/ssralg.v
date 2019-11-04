@@ -369,7 +369,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*       comUnitAlgType R == interface type for ComUnitAlgebra structure with *)
 (*                           scalars in R; R should have a comUnitRingType    *)
 (*                           structure.                                       *)
-(*    [comAlgType R of V] == a comAlgType R structure for V created by        *)
+(* [comUnitAlgType R of V] == a comUnitAlgType R structure for V created by   *)
 (*                           merging canonical comAlgType and                 *)
 (*                           unitRingType on V.                               *)
 (*                                                                            *)
