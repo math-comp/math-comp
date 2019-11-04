@@ -948,8 +948,7 @@ move=> {A leA IHa} IHa; wlog Di: i M Da / i = 0; last rewrite {i}Di in Da.
   exists R => //; exists d; rewrite //= xrowE -!mulmxA (mulmxA L) -dM xrowE.
   by rewrite mulmxA -perm_mxM tperm2 perm_mx1 mul1mx.
 without loss /forallP a_dvM0: / [forall j, a %| M 0 j]%Z.
-  have [_|] := altP forallP; first exact; move/forallPn => /sigW/IHa IH _.
-  by apply: IH.
+  case: (altP forallP) => [_ IH|/forallPn/sigW/IHa IH _]; exact: IH.
 without loss{Da a_dvM0} Da: M / forall j, M 0 j = a.
   pose Uur := col' 0 (\row_j (1 - (M 0 j %/ a)%Z)).
   pose U : 'M_(1 + n) := block_mx 1 Uur 0 1%:M; pose M1 := M *m U.
@@ -963,8 +962,7 @@ without loss{Da a_dvM0} Da: M / forall j, M 0 j = a.
   exists L => //; exists (R * U^-1); first by rewrite unitmx_mul uR unitmx_inv.
   by exists d; rewrite //= mulmxA -dM mulmxK.
 without loss{IHa} /forallP/(_ (_, _))/= a_dvM: / [forall k, a %| M k.1 k.2]%Z.
-  have [_|] := altP forallP; first exact; move/forallPn/sigW.
-  case=> [[i j] /= a'Mij] _.
+  case: (altP forallP) => [_|/forallPn/sigW [[i j] /= a'Mij] _]; first exact.
   have [|||L uL [R uR [d dvD dM]]] := IHa _ _ M^T j; rewrite ?mxE 1?addnC //.
     by exists i; rewrite mxE.
   exists R^T; last exists L^T; rewrite ?unitmx_tr //; exists d => //.
