@@ -359,19 +359,19 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           divalg_closed coerces to all the prerequisites.  *)
 (*                                                                            *)
 (*  * ComAlgebra (commutative algebra):                                       *)
-(*       comUnitAlgType R == interface type for ComAlgebra structure with     *)
+(*           comAlgType R == interface type for ComAlgebra structure with     *)
 (*                           scalars in R; R should have a comRingType        *)
 (*                           structure.                                       *)
 (*    [comAlgType R of V] == a comAlgType R structure for V created by        *)
 (*                           merging canonical algType and comRingType on V.  *)
 (*                                                                            *)
 (*  * ComUnitAlgebra (commutative algebra with computable inverses):          *)
-(*           comAlgType R == interface type for ComUnitAlgebra structure with *)
+(*       comUnitAlgType R == interface type for ComUnitAlgebra structure with *)
 (*                           scalars in R; R should have a comUnitRingType    *)
 (*                           structure.                                       *)
 (*    [comAlgType R of V] == a comAlgType R structure for V created by        *)
-(*                           merging canonical algType and                    *)
-(*                           comUnitRingType on V.                            *)
+(*                           merging canonical comAlgType and                 *)
+(*                           unitRingType on V.                               *)
 (*                                                                            *)
 (*   In addition to this structure hierarchy, we also develop a separate,     *)
 (* parallel hierarchy for morphisms linking these structures:                 *)
@@ -3305,8 +3305,6 @@ Record class_of (T : Type) : Type := Class {
   mixin : GRing.UnitRing.mixin_of (ComRing.Pack base)
 }.
 Definition base2 R m := UnitAlgebra.Class (@mixin R m).
-(* I'm not sure this base3 is needed but can't manage to get things working *)
-(* without it                                                               *)
 Definition base3 R m := ComUnitRing.Class (@mixin R m).
 Local Coercion base : class_of >-> ComAlgebra.class_of.
 Local Coercion base2 : class_of >-> UnitAlgebra.class_of.
@@ -3320,7 +3318,7 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
-  fun bT b & phant_id (@Algebra.class R phR bT) (b : ComAlgebra.class_of R T) =>
+  fun bT b & phant_id (@ComAlgebra.class R phR bT) (b : ComAlgebra.class_of R T) =>
   fun mT m & phant_id (UnitRing.mixin (UnitRing.class mT)) m =>
   Pack (Phant R) (@Class T b m).
 
@@ -3330,7 +3328,7 @@ Definition zmodType := @Zmodule.Pack cT xclass.
 Definition ringType := @Ring.Pack cT xclass.
 Definition unitRingType := @UnitRing.Pack cT xclass.
 Definition comRingType := @ComRing.Pack cT xclass.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass. (* Coercion base3 *)
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
 Definition lmodType := @Lmodule.Pack R phR cT xclass.
 Definition lalgType := @Lalgebra.Pack R phR cT xclass.
 Definition algType := @Algebra.Pack R phR cT xclass.
@@ -3423,6 +3421,7 @@ Proof. by rewrite exprMn exprVn. Qed.
 
 Canonical regular_comUnitRingType := [comUnitRingType of R^o].
 Canonical regular_unitAlgType := [unitAlgType R of R^o].
+Canonical regular_comUnitAlgType := [comUnitAlgType R of R^o].
 
 End ComUnitRingTheory.
 

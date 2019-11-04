@@ -198,6 +198,7 @@ Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion base : class_of >-> Falgebra.class_of.
 Coercion base4 : class_of >-> Field.class_of.
+Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
 Coercion choiceType : type >-> Choice.type.
@@ -837,6 +838,8 @@ Proof. exact: mulrCA. Qed.
 
 Canonical fieldOver_algType := AlgType K_F L_F fieldOver_scaleAr.
 Canonical fieldOver_unitAlgType := [unitAlgType K_F of L_F].
+Canonical fieldOver_comAlgType := [comAlgType K_F of L_F].
+Canonical fieldOver_comUnitAlgType := [comUnitAlgType K_F of L_F].
 
 Fact fieldOver_vectMixin : Vector.mixin_of fieldOver_lmodType.
 Proof.
