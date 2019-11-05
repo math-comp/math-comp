@@ -725,16 +725,14 @@ Proof. by move <-; elim: s1 => [|x s1 IHs]; rewrite ?take0 //= IHs. Qed.
 
 Lemma takel_cat s1 s2 : n0 <= size s1 -> take n0 (s1 ++ s2) = take n0 s1.
 Proof.
-by rewrite take_cat; case: ltngtP => // <-; rewrite subnn take0 take_size cats0.
+by rewrite take_cat; case: ltngtP => // ->; rewrite subnn take0 take_size cats0.
 Qed.
 
 Lemma nth_drop s i : nth (drop n0 s) i = nth s (n0 + i).
 Proof.
-have [lt_n0_s | le_s_n0] := ltnP n0 (size s).
-  rewrite -{2}[s]cat_take_drop nth_cat size_take lt_n0_s /= addKn.
-  by rewrite ltnNge leq_addr.
-rewrite !nth_default //; first exact: leq_trans (leq_addr _ _).
-by rewrite size_drop (eqnP le_s_n0).
+rewrite -{2}[s]cat_take_drop nth_cat size_take ltnNge.
+case: ltnP => [?|le_s_n0]; rewrite ?(leq_trans le_s_n0) ?leq_addr ?addKn //=.
+by rewrite drop_oversize // !nth_default.
 Qed.
 
 Lemma nth_take i : i < n0 -> forall s, nth (take n0 s) i = nth s i.
@@ -2076,6 +2074,16 @@ Notation "[ 'seq' E : R | i : T <- s & C ]" :=
 
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
+
+Lemma mask_filter (T : eqType) (s : seq T) (m : bitseq) :
+  uniq s -> mask m s = [seq i <- s | i \in mask m s].
+Proof.
+elim: m s => [|[] m ih] [|x s] //=.
+- by move=> _; elim: s.
+- case/andP => /negP x_notin_s /ih {1}->; rewrite inE eqxx /=; congr cons.
+  by apply/eq_in_filter => ?; rewrite inE; case: eqP => // ->.
+- by case: ifP => [/mem_mask -> // | _ /andP [] _ /ih].
+Qed.
 
 Section FilterSubseq.
 

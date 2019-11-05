@@ -326,6 +326,12 @@ Hint Resolve leqnSn : core.
 Lemma leq_pred n : n.-1 <= n.           Proof. by case: n => /=. Qed.
 Lemma leqSpred n : n <= n.-1.+1.        Proof. by case: n => /=. Qed.
 
+Lemma ltn_predl n : (n.-1 < n) = (n != 0).
+Proof. by case: n => [//|n]; rewrite ltnSn. Qed.
+
+Lemma ltn_predr m n : (m < n.-1) = (m.+1 < n).
+Proof. by case: n => [//|n]; rewrite succnK. Qed.
+
 Lemma ltn_predK m n : m < n -> n.-1.+1 = n.
 Proof. by case: n. Qed.
 
@@ -440,7 +446,7 @@ Variant ltn_xor_geq m n : bool -> bool -> Set :=
   | GeqNotLtn of n <= m : ltn_xor_geq m n true false.
 
 Lemma ltnP m n : ltn_xor_geq m n (n <= m) (m < n).
-Proof. by rewrite -(ltnS n); case: leqP; constructor. Qed.
+Proof. by case: leqP; constructor. Qed.
 
 Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
   | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
@@ -451,18 +457,18 @@ Proof. by case: n; constructor. Qed.
 
 Variant compare_nat m n :
    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n true false true false false false
-  | CompareNatGt of m > n : compare_nat m n false true false true false false
-  | CompareNatEq of m = n : compare_nat m n true true false false true true.
+  | CompareNatLt of m < n : compare_nat m n false false false true false true
+  | CompareNatGt of m > n : compare_nat m n false false true false true false
+  | CompareNatEq of m = n : compare_nat m n true true true true false false.
 
-Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
-                                   (n < m) (n == m) (m == n).
+Lemma ltngtP m n : compare_nat m n (n == m) (m == n) (n <= m)
+                                   (m <= n) (n < m) (m < n).
 Proof.
-rewrite !ltn_neqAle [_ == m]eq_sym; case: ltnP => [mn|].
+rewrite !ltn_neqAle [_ == n]eq_sym; case: ltnP => [nm|].
   by rewrite ltnW // gtn_eqF //; constructor.
-rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_nm eq_mn.
+rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_mn eq_nm.
   by rewrite ltn_eqF //; constructor.
-by rewrite eq_mn; constructor; apply/eqP.
+by rewrite eq_nm; constructor; apply/esym/eqP.
 Qed.
 
 (* Monotonicity lemmas *)
@@ -532,6 +538,9 @@ Proof. by move=> le_pm le_pn; rewrite addnBA // addnBAC. Qed.
 Lemma subnBA m n p : p <= n -> m - (n - p) = m + p - n.
 Proof. by move=> le_pn; rewrite -{2}(subnK le_pn) subnDr. Qed.
 
+Lemma ltn_subr m n : m <= n -> (n - m < n) = (m > 0).
+Proof. by move=> le_mn; rewrite -subn_gt0 subnBA// addKn. Qed.
+
 Lemma subKn m n : m <= n -> n - (n - m) = m.
 Proof. by move/subnBA->; rewrite addKn. Qed.
 
@@ -540,6 +549,9 @@ Proof. by rewrite -add1n => /addnBA <-. Qed.
 
 Lemma subnSK m n : m < n -> (n - m.+1).+1 = n - m.
 Proof. by move/subSn. Qed.
+
+Lemma predn_sub m n : (m - n).-1 = (m.-1 - n).
+Proof. by case: m => // m; rewrite subSKn. Qed.
 
 Lemma leq_sub2r p m n : m <= n -> m - p <= n - p.
 Proof.
@@ -563,6 +575,36 @@ Proof. by move/subnSK <-; apply: leq_sub2l. Qed.
 
 Lemma ltn_subRL m n p : (n < p - m) = (m + n < p).
 Proof. by rewrite !ltnNge leq_subLR. Qed.
+
+Lemma leq_psubRL m n p : 0 < n -> (n <= p - m) = (m + n <= p).
+Proof. by move=> /prednK<-; rewrite ltn_subRL addnS. Qed.
+
+Lemma ltn_psubLR m n p : 0 < p -> (m - n < p) = (m < n + p).
+Proof. by move=> /prednK<-; rewrite ltnS leq_subLR addnS. Qed.
+
+Lemma leq_subRL m n p : m <= p -> (n <= p - m) = (m + n <= p).
+Proof. by move=> /subnKC{2}<-; rewrite leq_add2l. Qed.
+
+Lemma ltn_subLR m n p : n <= m -> (m - n < p) = (m < n + p).
+Proof. by move=> /subnKC{2}<-; rewrite ltn_add2l. Qed.
+
+Lemma leq_subCl m n p : (m - n <= p) = (m - p <= n).
+Proof. by rewrite !leq_subLR // addnC. Qed.
+
+Lemma ltn_subCr m n p : (p < m - n) = (n < m - p).
+Proof. by rewrite !ltn_subRL // addnC. Qed.
+
+Lemma leq_psubCr m n p : 0 < p -> 0 < n -> (p <= m - n) = (n <= m - p).
+Proof. by move=> p_gt0 n_gt0; rewrite !leq_psubRL // addnC. Qed.
+
+Lemma ltn_psubCl m n p : 0 < p -> 0 < n -> (m - n < p) = (m - p < n).
+Proof. by move=> p_gt0 n_gt0; rewrite !ltn_psubLR // addnC. Qed.
+
+Lemma leq_subCr m n p : n <= m -> p <= m -> (p <= m - n) = (n <= m - p).
+Proof. by move=> np pm; rewrite !leq_subRL // addnC. Qed.
+
+Lemma ltn_subCl m n p : n <= m -> p <= m -> (m - n < p) = (m - p < n).
+Proof. by move=> nm pm; rewrite !ltn_subLR // addnC. Qed.
 
 (* Eliminating the idiom for structurally decreasing compare and subtract. *)
 Lemma subn_if_gt T m n F (E : T) :
@@ -1762,3 +1804,17 @@ Ltac nat_congr := first
      apply: (congr1 (addn X1) _);
      symmetry
    end ].
+
+Module mc_1_9.
+
+Variant compare_nat m n :
+   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | CompareNatLt of m < n : compare_nat m n true false true false false false
+  | CompareNatGt of m > n : compare_nat m n false true false true false false
+  | CompareNatEq of m = n : compare_nat m n true true false false true true.
+
+Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
+                                   (n < m) (n == m) (m == n).
+Proof. by case: ltngtP; constructor. Qed.
+
+End mc_1_9.

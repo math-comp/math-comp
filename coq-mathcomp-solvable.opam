@@ -10,10 +10,9 @@ license: "CeCILL-B"
 
 build: [ make "-C" "mathcomp/solvable" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/solvable"  "install" ]
-remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/mathcomp/solvable'" ]
 depends: [ "coq-mathcomp-algebra" { = "dev" } ]
 
-tags: [ "keyword:finite groups" "keyword:Feit Thompson theorem" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" ]
+tags: [ "keyword:finite groups" "keyword:Feit Thompson theorem" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.solvable" ]
 authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]
 
 synopsis: "Mathematical Components Library on finite groups (II)"

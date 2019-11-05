@@ -1831,7 +1831,7 @@ case/pred2P: Z_xxy => xy; last first.
   have n_gt3: n > 3.
     case: ltngtP notXy => // [|n3]; first by rewrite ltnNge n_gt2.
     rewrite -scXG inE Gy defX cent_cycle; case/cent1P; red.
-    by rewrite (conjgC x) xy /r p2 n3.
+    by rewrite (conjgC x) xy /r p2 -n3.
   exists n => //; rewrite isogEcard card_semidihedral // oG p2 leqnn andbT.
   rewrite Grp_semidihedral //; apply/existsP=> /=.
   case/pred2P: Zy2 => y2; [exists (x, y) | exists (x, x * y)].

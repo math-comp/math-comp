@@ -1,136 +1,42 @@
 (* (c) Copyright 2006-2019 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool eqtype ssrfun ssrnat choice seq.
-From mathcomp Require Import fintype tuple bigop path finset.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
+From mathcomp Require Import path fintype tuple bigop finset div prime.
 
 (******************************************************************************)
-(* This files defines a ordered and decidable relations on a type as          *)
-(* canonical structure.  One need to import some of the following modules to  *)
-(* get the definitions, notations, and theory of such relations.              *)
-(*       Order.Def: definitions of basic operations.                          *)
-(*    Order.Syntax: fancy notations for ordering declared in the order_scope  *)
-(*                  (%O).                                                     *)
-(*   Order.LTheory: theory of partially ordered types and lattices excluding  *)
-(*                  complement and totality related theorems.                 *)
-(*   Order.CTheory: theory of complemented lattices including Order.LTheory.  *)
-(*   Order.TTheory: theory of totally ordered types including Order.LTheory.  *)
-(*    Order.Theory: theory of ordered types including all of the above        *)
-(*                  theory modules.                                           *)
+(* This files defines types equipped with order relations.                    *)
+(* It contains several modules implementing different theories:               *)
+(*   Order.LTheory: partially ordered types and lattices excluding complement *)
+(*                  and totality related theorems.                            *)
+(*   Order.CTheory: complemented lattices including Order.LTheory.            *)
+(*   Order.TTheory: totally ordered types including Order.LTheory.            *)
+(*    Order.Theory: ordered types including all of the above theory modules   *)
+(*                                                                            *)
+(* To access the definitions, notations, and the theory from, say,            *)
+(* "Order.Xyz", insert "Import Order.Xyz." at the top of your scripts.        *)
+(* Notations are accessible by opening the scope "order_scope" bound to the   *)
+(* delimiting key "O".                                                        *)
 (*                                                                            *)
 (* We provide the following structures of ordered types                       *)
-(*        porderType == the type of partially ordered types                   *)
-(*       latticeType == the type of distributive lattices                     *)
-(*      blatticeType == ... with a bottom elemnt                              *)
-(*     tblatticeType == ... with both a top and a bottom                      *)
-(*     cblatticeType == the type of sectionally complemented lattices         *)
-(*                      (lattices with a complement to, and bottom)           *)
-(*    ctblatticeType == the type of complemented lattices                     *)
-(*                      (lattices with a top, bottom, and general complement) *)
-(*         orderType == the type of totally ordered types                     *)
-(*    finPOrderType == the type of partially ordered finite types             *)
-(*    finLatticeType == the type of nonempty finite lattices                  *)
-(*   finClatticeType == the type of nonempty finite complemented lattices     *)
-(*      finOrderType == the type of nonempty totally ordered finite types     *)
+(*           porderType == the type of partially ordered types                *)
+(*     distrLatticeType == the type of distributive lattices                  *)
+(*    bDistrLatticeType == distrLatticeType with a bottom element             *)
+(*   tbDistrLatticeType == distrLatticeType with both a top and a bottom      *)
+(*   cbDistrLatticeType == the type of sectionally complemented distributive  *)
+(*                         lattices                                           *)
+(*                         (lattices with bottom and a difference operation)  *)
+(*  ctbDistrLatticeType == the type of complemented distributive lattices     *)
+(*                         (lattices with top, bottom, difference, complement)*)
+(*            orderType == the type of totally ordered types                  *)
+(*        finPOrderType == the type of partially ordered finite types         *)
+(*  finDistrLatticeType == the type of nonempty finite distributive lattices  *)
+(* finCDistrLatticeType == the type of nonempty finite complemented           *)
+(*                         distributive lattices                              *)
+(*         finOrderType == the type of nonempty totally ordered finite types  *)
 (*                                                                            *)
-(* Each of these structure take a first argument named display, of type unit  *)
-(* instanciating it with tt or an unknown key will lead to a default display. *)
-(* Optionally, one can configure the display by setting one owns notation on  *)
-(* operators instanciated for their particular display.                       *)
-(* One example of this is the converse display ^c, every notation with the    *)
-(* suffix ^c (e.g. x <=^c y) is about the converse order, in order not to     *)
-(* confuse the normal order with its converse.                                *)
-(*                                                                            *)
-(* In order to build the above structures, one must provide the appropriate   *)
-(* mixin to the following structure constructors. The list of possible mixins *)
-(* is indicated after each constructor. Each mixin is documented in the next. *)
-(* paragraph.                                                                 *)
-(*                                                                            *)
-(* POrderType pord_mixin == builds a porderType from a choiceType             *)
-(*   where pord_mixin can be of types                                         *)
-(*     lePOrderMixin, ltPOrderMixin, meetJoinMixin,                           *)
-(*     leOrderMixin or ltOrderMixin,                                          *)
-(*   or computed using PCanPOrderMixin or CanPOrderMixin.                     *)
-(*                                                                            *)
-(* LatticeType lat_mixin == builds a distributive lattice from a porderType   *)
-(*   where lat_mixin can be of types                                          *)
-(*     latticeMixin, totalPOrderMixin, meetJoinMixin,                         *)
-(*     leOrderMixin or ltOrderMixin                                           *)
-(*   or computed using IsoLatticeMixin.                                       *)
-(*                                                                            *)
-(* OrderType pord_mixin == builds a orderType from a latticeType              *)
-(*   where pord_mixin can be of types                                         *)
-(*     leOrderMixin, ltOrderMixin or orderMixin,                              *)
-(*   or computed using MonoOrderMixin.                                        *)
-(*                                                                            *)
-(* BLatticeType bot_mixin == builds a blatticeType from a latticeType         *)
-(*                            and a bottom operation                          *)
-(*                                                                            *)
-(* TBLatticeType top_mixin == builds a tblatticeType from a blatticeType      *)
-(*                            and a top operation                             *)
-(*                                                                            *)
-(* CBLatticeType compl_mixin == builds a cblatticeType from a blatticeType    *)
-(*                              and a relative complement operation           *)
-(*                                                                            *)
-(* CTBLatticeType sub_mixin == builds a cblatticeType from a blatticeType     *)
-(*                             and a total complement supplement operation    *)
-(*                                                                            *)
-(* Additionally:                                                              *)
-(* - [porderType of _] ... notations are available to recover structures on   *)
-(*    copies of the types, as in eqtype, choicetype, ssralg...                *)
-(* - [finPOrderType of _] ... notations to compute joins between finite types *)
-(*                            and ordered types                               *)
-(*                                                                            *)
-(* List of possible mixins:                                                   *)
-(*                                                                            *)
-(* - lePOrderMixin == on a choiceType, takes le, lt,                          *)
-(*                    reflexivity, antisymmetry and transitivity of le.       *)
-(*                    (can build:  porderType)                                *)
-(*                                                                            *)
-(* - ltPOrderMixin == on a choiceType, takes le, lt,                          *)
-(*                    irreflexivity and transitivity of lt.                   *)
-(*                    (can build:  porderType)                                *)
-(*                                                                            *)
-(* - meetJoinMixin == on a choiceType, takes le, lt, meet, join,              *)
-(*                    commutativity and associativity of meet and join        *)
-(*                    idempotence of meet and some De Morgan laws             *)
-(*                    (can build:  porderType, latticeType)                   *)
-(*                                                                            *)
-(* - leOrderMixin == on a choiceType, takes le, lt, meet, join                *)
-(*                   antisymmetry, transitivity and totality of le.           *)
-(*                   (can build:  porderType, latticeType, orderType)         *)
-(*                                                                            *)
-(* - ltOrderMixin == on a choiceType, takes le, lt,                           *)
-(*                   irreflexivity, transitivity and totality of lt.          *)
-(*                   (can build:  porderType, latticeType, orderType)         *)
-(*                                                                            *)
-(* - totalPOrderMixin == on a porderType T, totality of the order of T        *)
-(*                    := total (<=%O : rel T)                                 *)
-(*                   (can build: latticeType)                                 *)
-(*                                                                            *)
-(* - totalOrderMixin == on a latticeType T, totality of the order of T        *)
-(*                    := total (<=%O : rel T)                                 *)
-(*                   (can build: orderType)                                   *)
-(*    NB: this mixin is kept separate from totalPOrderMixin (even though it   *)
-(*        is convertible to it), in order to avoid ambiguous coercion paths.  *)
-(*                                                                            *)
-(* - latticeMixin == on a porderType T, takes meet, join                      *)
-(*                   commutativity and associativity of meet and join         *)
-(*                   idempotence of meet and some De Morgan laws              *)
-(*                   (can build: latticeType)                                 *)
-(*                                                                            *)
-(* - blatticeMixin, tblatticeMixin, cblatticeMixin, ctblatticeMixin           *)
-(*   == mixins with with one extra operator                                   *)
-(*      (respectively bottom, top, relative complement, and total complement  *)
-(*                                                                            *)
-(* Additionally:                                                              *)
-(* - [porderMixin of T by <:] creates an porderMixin by subtyping.            *)
-(* - [totalOrderMixin of T by <:] creates the associated totalOrderMixin.     *)
-(* - PCanPOrderMixin, CanPOrderMixin create porderMixin from cancellations    *)
-(* - MonoTotalMixin creates a totalPOrderMixin from monotonicity              *)
-(* - IsoLatticeMixin creates a latticeMixin from an ordered structure         *)
-(*   isomorphism (i.e. cancel f f', cancel f' f, {mono f : x y / x <= y})     *)
-(*                                                                            *)
-(* Over these structures, we have the following operations                    *)
+(* Each of these structures take a first argument named display, of type      *)
+(* unit. Instantiating it with tt or an unknown key will lead to a default    *)
+(* display for notations, i.e. over these structures, we have:                *)
 (*            x <= y <-> x is less than or equal to y.                        *)
 (*             x < y <-> x is less than y (:= (y != x) && (x <= y)).          *)
 (*            x >= y <-> x is greater than or equal to y (:= y <= x).         *)
@@ -147,6 +53,58 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (*              ~` x == the complement of x in [0, 1].                        *)
 (*   \meet_<range> e == iterated meet of a lattice with a top.                *)
 (*   \join_<range> e == iterated join of a lattice with a bottom.             *)
+(*                                                                            *)
+(* There are three distinct uses of the symbols                               *)
+(* <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><:                                *)
+(*    0-ary, unary (prefix), and binary (infix).                              *)
+(* 0. <%O, <=%O, >%O, >=%O, <?=%O, >=<%O, and ><%O stand respectively for     *)
+(*    lt, le, gt, ge, leif (_ <= _ ?= iff _), comparable, and incomparable.   *)
+(* 1. (< x),  (<= x), (> x), (>= x), (>=< x), and (>< x) stand respectively   *)
+(*    for (>%O x), (>=%O x), (<%O x), (<=%O x), (>=<%O x), and (><%O x).      *)
+(*    So (< x) is a predicate characterizing elements smaller than x.         *)
+(* 2. (x < y), (x <= y), ... mean what they are expected to.                  *)
+(*  These conventions are compatible with Haskell's,                          *)
+(*   where ((< y) x) = (x < y) = ((<) x y),                                   *)
+(*   except that we write <%O instead of (<).                                 *)
+(*                                                                            *)
+(* Alternative notation displays can be defined by :                          *)
+(* 1. declaring a new opaque definition of type unit. Using the idiom         *)
+(*    `Lemma my_display : unit. Proof. exact: tt. Qed.`                       *)
+(* 2. using this symbol to tag canoincal porderType structures using          *)
+(*    `Canonical my_porderType := POrderType my_display my_type my_mixin`,    *)
+(* 3. declaring notations for the main operations of this library, by         *)
+(*    setting the first argument of the definition to the display, e.g.       *)
+(*    `Notation my_syndef_le x y := @le my_display _ x y` or                  *)
+(*    `Notation "x <<< y" := @lt my_display _ x y (at level ...)`             *)
+(*    Non overloaded notations will default to the default display.           *)
+(*                                                                            *)
+(* One may use displays either for convenience or to desambiguate between     *)
+(* different structures defined on copies of one. Two examples of this are    *)
+(* given in this library:                                                     *)
+(* - the converse ordered structures. If T is an ordered type (and in         *)
+(*   particular porderType d), then T^c is a copy of T with the same ordered  *)
+(*   structures but with the display (converse_display d) which prints all    *)
+(*   of the above notations with an addition ^c in the notation (<=^c ...)    *)
+(* - natural number in divisibility order. The type natdvd is a copy of nat   *)
+(*   where the canonical order is given by dvdn and meet and join by gcdn     *)
+(*   and lcmn. The display is dvd_display and overloads le using %|, lt using *)
+(*   %<| and meet and join using gcd and lcm.                                 *)
+(*                                                                            *)
+(* Beware that canonical structure inference will not try to find the copy of *)
+(* the structures that fits the display one mentioned, but will rather        *)
+(* determine which canonical structure and display to use depending on the    *)
+(* copy of the type one provided. In this sense they are merely displays      *)
+(* to inform the user of what the inferrence did, rather than additional      *)
+(* input for the inference.                                                   *)
+(*                                                                            *)
+(* Existing displays are either converse_display d (where d is a display),    *)
+(* dvd_display (both explained above), total_display (to overload meet and    *)
+(* join using min and max) ring_display (from algebra/ssrnum to change the    *)
+(* scope of the usual notations to ring_scope). We also provide lexi_display  *)
+(* and prod_display for lexicographic and product order respectively.         *)
+(* The default display is tt and users can define their own as explained      *)
+(* above.                                                                     *)
+(*                                                                            *)
 (* For orderType we provide the following operations                          *)
 (*   [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject to  *)
 (*                      the condition P (i may appear in P and M), and        *)
@@ -158,56 +116,150 @@ From mathcomp Require Import fintype tuple bigop path finset.
 (*   [arg min_(i < i0) M] == an i : T minimizing M, given i0 : T.             *)
 (*   [arg max_(i > i0) M] == an i : T maximizing M, given i0 : T.             *)
 (*                                                                            *)
-(* There are three distinct uses of the symbols                               *)
-(* <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><:                                *)
-(*    0-ary, unary (prefix), and binary (infix).                              *)
-(* 0. <%O, <=%O, >%O, >=%O, <?=%O, >=<%O, and ><%O stand respectively for     *)
-(*    lt, le, gt, ge, leif (_ <= _ ?= iff _), comparable, and incomparable.   *)
-(* 1. (< x),  (<= x), (> x), (>= x), (>=< x), and (>< x) stand respectively   *)
-(*    for (>%O x), (>=%O x), (<%O x), (<=%O x), (>=<%O x), and (><%O x).      *)
-(*    So (< x) is a predicate characterizing elements smaller than x.         *)
-(* 2. (x < y), (x <= y), ... mean what they are expected to.                  *)
-(*  These convention are compatible with Haskell's,                           *)
-(*   where ((< y) x) = (x < y) = ((<) x y),                                   *)
-(*   except that we write <%O instead of (<).                                 *)
+(* In order to build the above structures, one must provide the appropriate   *)
+(* mixin to the following structure constructors. The list of possible mixins *)
+(* is indicated after each constructor. Each mixin is documented in the next  *)
+(* paragraph.                                                                 *)
+(*                                                                            *)
+(* POrderType disp T pord_mixin                                               *)
+(*                  == builds a porderType from a canonical choiceType        *)
+(*                     instance of T where pord_mixin can be of types         *)
+(*                       lePOrderMixin, ltPOrderMixin, meetJoinMixin,         *)
+(*                       leOrderMixin, or ltOrderMixin                        *)
+(*                     or computed using PcanPOrderMixin or CanPOrderMixin.   *)
+(*                     disp is a display as explained above                   *)
+(*                                                                            *)
+(* DistrLatticeType T lat_mixin                                               *)
+(*                  == builds a distrLatticeType from a porderType where      *)
+(*                     lat_mixin can be of types                              *)
+(*                       latticeMixin, totalPOrderMixin, meetJoinMixin,       *)
+(*                       leOrderMixin, or ltOrderMixin                        *)
+(*                     or computed using IsoLatticeMixin.                     *)
+(*                                                                            *)
+(* BLatticeType T bot_mixin                                                   *)
+(*                  == builds a bDistrLatticeType from a distrLatticeType and *)
+(*                     a bottom element                                       *)
+(*                                                                            *)
+(* TBLatticeType T top_mixin                                                  *)
+(*                  == builds a tbDistrLatticeType from a bDistrLatticeType   *)
+(*                     and a top element                                      *)
+(*                                                                            *)
+(* CBLatticeType T sub_mixin                                                  *)
+(*                  == builds a cbDistrLatticeType from a bDistrLatticeType   *)
+(*                     and a difference operation                             *)
+(*                                                                            *)
+(* CTBLatticeType T compl_mixin                                               *)
+(*                  == builds a ctbDistrLatticeType from a tbDistrLatticeType *)
+(*                     and a complement operation                             *)
+(*                                                                            *)
+(* OrderType T ord_mixin                                                      *)
+(*                  == builds an orderType from a distrLatticeType  where     *)
+(*                     ord_mixin can be of types                              *)
+(*                       leOrderMixin, ltOrderMixin, or orderMixin,           *)
+(*                     or computed using MonoTotalMixin.                      *)
+(*                                                                            *)
+(* Additionally:                                                              *)
+(* - [porderType of _] ... notations are available to recover structures on   *)
+(*    copies of the types, as in eqtype, choicetype, ssralg...                *)
+(* - [finPOrderType of _] ... notations to compute joins between finite types *)
+(*                            and ordered types                               *)
+(*                                                                            *)
+(* List of possible mixins (a.k.a. factories):                                *)
+(*                                                                            *)
+(* - lePOrderMixin == on a choiceType, takes le, lt,                          *)
+(*                    reflexivity, antisymmetry and transitivity of le.       *)
+(*                    (can build:  porderType)                                *)
+(*                                                                            *)
+(* - ltPOrderMixin == on a choiceType, takes le, lt,                          *)
+(*                    irreflexivity and transitivity of lt.                   *)
+(*                    (can build:  porderType)                                *)
+(*                                                                            *)
+(* - meetJoinMixin == on a choiceType, takes le, lt, meet, join,              *)
+(*                    commutativity and associativity of meet and join        *)
+(*                    idempotence of meet and some De Morgan laws             *)
+(*                    (can build:  porderType, distrLatticeType)              *)
+(*                                                                            *)
+(* - leOrderMixin == on a choiceType, takes le, lt, meet, join                *)
+(*                   antisymmetry, transitivity and totality of le.           *)
+(*                   (can build:  porderType, distrLatticeType, orderType)    *)
+(*                                                                            *)
+(* - ltOrderMixin == on a choiceType, takes le, lt,                           *)
+(*                   irreflexivity, transitivity and totality of lt.          *)
+(*                   (can build:  porderType, distrLatticeType, orderType)    *)
+(*                                                                            *)
+(* - totalPOrderMixin == on a porderType T, totality of the order of T        *)
+(*                    := total (<=%O : rel T)                                 *)
+(*                   (can build: distrLatticeType)                            *)
+(*                                                                            *)
+(* - totalOrderMixin == on a distrLatticeType T, totality of the order of T   *)
+(*                    := total (<=%O : rel T)                                 *)
+(*                   (can build: orderType)                                   *)
+(*    NB: this mixin is kept separate from totalPOrderMixin (even though it   *)
+(*        is convertible to it), in order to avoid ambiguous coercion paths.  *)
+(*                                                                            *)
+(* - distrLatticeMixin == on a porderType T, takes meet, join                 *)
+(*                   commutativity and associativity of meet and join         *)
+(*                   idempotence of meet and some De Morgan laws              *)
+(*                   (can build: distrLatticeType)                            *)
+(*                                                                            *)
+(* - bDistrLatticeMixin, tbDistrLatticeMixin, cbDistrLatticeMixin,            *)
+(*   ctbDistrLatticeMixin                                                     *)
+(*                == mixins with one extra operation                          *)
+(*                   (respectively bottom, top, relative complement, and      *)
+(*                    total complement)                                       *)
+(*                                                                            *)
+(* Additionally:                                                              *)
+(* - [porderMixin of T by <:] creates a porderMixin by subtyping.             *)
+(* - [totalOrderMixin of T by <:] creates the associated totalOrderMixin.     *)
+(* - PCanPOrderMixin, CanPOrderMixin create porderMixin from cancellations    *)
+(* - MonoTotalMixin creates a totalPOrderMixin from monotonicity              *)
+(* - IsoLatticeMixin creates a distrLatticeMixin from an ordered structure    *)
+(*   isomorphism (i.e., cancel f f', cancel f' f, {mono f : x y / x <= y})    *)
 (*                                                                            *)
 (* We provide the following canonical instances of ordered types              *)
-(* - all possible strucutre on bool                                           *)
-(* - porderType, latticeType, orderType, blatticeType on nat                  *)
-(* - porderType, latticeType, orderType, blatticeType, cblatticeType,         *)
-(*   tblatticeType, ctblatticeType on T *prod[disp] T' a copy of T * T'       *)
+(* - all possible structures on bool                                          *)
+(* - porderType, distrLatticeType, orderType and bDistrLatticeType on nat for *)
+(*   the leq order                                                            *)
+(* - porderType, distrLatticeType, bDistrLatticeType, cbDistrLatticeType,     *)
+(*   ctbDistrLatticeType on nat for the dvdn order, where meet and join       *)
+(*   are respectively gcdn and lcmn                                           *)
+(* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
+(*   tbDistrLatticeType, cbDistrLatticeType, ctbDistrLatticeType              *)
+(*   on T *prod[disp] T' a copy of T * T'                                     *)
 (*     using product order (and T *p T' its specialization to prod_display)   *)
-(* - porderType, latticeType, and orderType,  on T *lexi[disp] T'             *)
+(* - porderType, distrLatticeType, and orderType,  on T *lexi[disp] T'        *)
 (*     another copy of T * T', with lexicographic ordering                    *)
 (*     (and T *l T' its specialization to lexi_display)                       *)
-(* - porderType, latticeType, and orderType,  on {t : T & T' x}               *)
+(* - porderType, distrLatticeType, and orderType,  on {t : T & T' x}          *)
 (*     with lexicographic ordering                                            *)
-(* - porderType, latticeType, orderType, blatticeType, cblatticeType,         *)
-(*   tblatticeType, ctblatticeType on seqprod_with disp T a copy of seq T     *)
+(* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
+(*   cbDistrLatticeType, tbDistrLatticeType, ctbDistrLatticeType              *)
+(*   on seqprod_with disp T a copy of seq T                                   *)
 (*     using product order (and seqprod T' its specialization to prod_display)*)
-(* - porderType, latticeType, and orderType, on seqlexi_with disp T           *)
+(* - porderType, distrLatticeType, and orderType, on seqlexi_with disp T      *)
 (*     another copy of seq T, with lexicographic ordering                     *)
 (*     (and seqlexi T its specialization to lexi_display)                     *)
-(* - porderType, latticeType, orderType, blatticeType, cblatticeType,         *)
-(*   tblatticeType, ctblatticeType on n.-tupleprod[disp] a copy of n.-tuple T *)
+(* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
+(*   cbDistrLatticeType, tbDistrLatticeType, ctbDistrLatticeType              *)
+(*   on n.-tupleprod[disp] a copy of n.-tuple T                               *)
 (*     using product order (and n.-tupleprod T its specialization             *)
 (*     to prod_display)                                                       *)
-(* - porderType, latticeType, and orderType,  on n.-tuplelexi[d] T            *)
+(* - porderType, distrLatticeType, and orderType,  on n.-tuplelexi[d] T       *)
 (*     another copy of n.-tuple T, with lexicographic ordering                *)
 (*     (and n.-tuplelexi T its specialization to lexi_display)                *)
 (* and all possible finite type instances                                     *)
 (*                                                                            *)
-(* In order to get a cannoical order on prod or seq, one may import modules   *)
+(* In order to get a canonical order on prod or seq, one may import modules   *)
 (*   DefaultProdOrder or DefaultProdLexiOrder, DefaultSeqProdOrder or         *)
 (*   DefaultSeqLexiOrder, and DefaultTupleProdOrder or DefaultTupleLexiOrder. *)
 (*                                                                            *)
-(* On orderType leP ltP ltgtP are the three main lemmas for case analysis.    *)
-(* On porderType, one may use comparableP comparable_leP comparable_ltP       *)
-(*   and comparable_ltgtP are the three main lemmas for case analysis.        *)
+(* On orderType, leP ltP ltgtP are the three main lemmas for case analysis.   *)
+(* On porderType, one may use comparableP, comparable_leP, comparable_ltP,    *)
+(*   and comparable_ltgtP, which are the four main lemmas for case analysis.  *)
 (*                                                                            *)
-(* We also provide specialized version of some theorems from path.v.          *)
+(* We also provide specialized versions of some theorems from path.v.         *)
 (*                                                                            *)
-(* This file is based on prior works by                                       *)
+(* This file is based on prior work by                                        *)
 (* D. Dreyer, G. Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                 *)
 (******************************************************************************)
 
@@ -349,6 +401,83 @@ Reserved Notation "x <=^l y ?= 'iff' c" (at level 70, y, c at next level,
   format "x '[hv'  <=^l  y '/'  ?=  'iff'  c ']'").
 Reserved Notation "x <=^l y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^l  y '/'  ?=  'iff'  c  :> T ']'").
+
+(* Reserved notations for divisibility *)
+Reserved Notation "x %<| y"  (at level 70, no associativity).
+
+Reserved Notation "\gcd_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \gcd_ i '/  '  F ']'").
+Reserved Notation "\gcd_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \gcd_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \gcd_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \gcd_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \gcd_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \gcd_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\gcd_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\gcd_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \gcd_ ( i  <  n )  F ']'").
+Reserved Notation "\gcd_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \gcd_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\gcd_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \gcd_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\lcm_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \lcm_ i '/  '  F ']'").
+Reserved Notation "\lcm_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \lcm_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \lcm_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \lcm_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \lcm_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \lcm_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\lcm_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\lcm_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \lcm_ ( i  <  n )  F ']'").
+Reserved Notation "\lcm_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \lcm_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\lcm_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \lcm_ ( i  'in'  A ) '/  '  F ']'").
 
 (* Reserved notation for converse lattice operations. *)
 Reserved Notation "A `&^l` B"  (at level 48, left associativity).
@@ -834,34 +963,34 @@ Arguments gt {_ _}.
 
 Module Import POSyntax.
 
-Notation "<=%O" := le : order_scope.
-Notation ">=%O" := ge : order_scope.
-Notation "<%O" := lt : order_scope.
-Notation ">%O" := gt : order_scope.
-Notation "<?=%O" := leif : order_scope.
-Notation ">=<%O" := comparable : order_scope.
-Notation "><%O" := (fun x y => ~~ (comparable x y)) : order_scope.
+Notation "<=%O" := le : fun_scope.
+Notation ">=%O" := ge : fun_scope.
+Notation "<%O" := lt : fun_scope.
+Notation ">%O" := gt : fun_scope.
+Notation "<?=%O" := leif : fun_scope.
+Notation ">=<%O" := comparable : fun_scope.
+Notation "><%O" := (fun x y => ~~ (comparable x y)) : fun_scope.
 
 Notation "<= y" := (ge y) : order_scope.
-Notation "<= y :> T" := (<= (y : T)) : order_scope.
+Notation "<= y :> T" := (<= (y : T)) (only parsing) : order_scope.
 Notation ">= y"  := (le y) : order_scope.
-Notation ">= y :> T" := (>= (y : T)) : order_scope.
+Notation ">= y :> T" := (>= (y : T)) (only parsing) : order_scope.
 
 Notation "< y" := (gt y) : order_scope.
-Notation "< y :> T" := (< (y : T)) : order_scope.
+Notation "< y :> T" := (< (y : T)) (only parsing) : order_scope.
 Notation "> y" := (lt y) : order_scope.
-Notation "> y :> T" := (> (y : T)) : order_scope.
+Notation "> y :> T" := (> (y : T)) (only parsing) : order_scope.
 
 Notation ">=< y" := (comparable y) : order_scope.
-Notation ">=< y :> T" := (>=< (y : T)) : order_scope.
+Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : order_scope.
 
 Notation "x <= y" := (le x y) : order_scope.
-Notation "x <= y :> T" := ((x : T) <= (y : T)) : order_scope.
+Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : order_scope.
 Notation "x >= y" := (y <= x) (only parsing) : order_scope.
 Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : order_scope.
 
 Notation "x < y"  := (lt x y) : order_scope.
-Notation "x < y :> T" := ((x : T) < (y : T)) : order_scope.
+Notation "x < y :> T" := ((x : T) < (y : T)) (only parsing) : order_scope.
 Notation "x > y"  := (y < x) (only parsing) : order_scope.
 Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : order_scope.
 
@@ -888,7 +1017,7 @@ Module POCoercions.
 Coercion le_of_leif : leif >-> is_true.
 End POCoercions.
 
-Module Lattice.
+Module DistrLattice.
 Section ClassDef.
 
 Record mixin_of d (T : porderType d) := Mixin {
@@ -943,32 +1072,35 @@ Coercion porderType : type >-> POrder.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-Notation latticeType  := type.
-Notation latticeMixin := mixin_of.
-Notation LatticeMixin := Mixin.
-Notation LatticeType T m := (@pack T _ _ _ m _ _ id _ id).
-Notation "[ 'latticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'latticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+Notation distrLatticeType  := type.
+Notation distrLatticeMixin := mixin_of.
+Notation DistrLatticeMixin := Mixin.
+Notation DistrLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
+Notation "[ 'distrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
+  (at level 0, format "[ 'distrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
-Notation "[ 'latticeType' 'of' T ]" := [latticeType of T for _]
-  (at level 0, format "[ 'latticeType'  'of'  T ]") : form_scope.
-Notation "[ 'latticeType' 'of' T 'with' disp ]" :=
-  [latticeType of T for _ with disp]
-  (at level 0, format "[ 'latticeType'  'of'  T  'with' disp ]") : form_scope.
+Notation "[ 'distrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
+  (@clone_with T _ cT disp _ id)
+  (at level 0,
+   format "[ 'distrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
+Notation "[ 'distrLatticeType' 'of' T ]" := [distrLatticeType of T for _]
+  (at level 0, format "[ 'distrLatticeType'  'of'  T ]") : form_scope.
+Notation "[ 'distrLatticeType' 'of' T 'with' disp ]" :=
+  [distrLatticeType of T for _ with disp]
+  (at level 0, format "[ 'distrLatticeType'  'of'  T  'with' disp ]") :
+  form_scope.
 End Exports.
 
-End Lattice.
-Export Lattice.Exports.
+End DistrLattice.
+Export DistrLattice.Exports.
 
-Section LatticeDef.
+Section DistrLatticeDef.
 Context {disp : unit}.
-Local Notation latticeType := (latticeType disp).
-Context {T : latticeType}.
-Definition meet : T -> T -> T := Lattice.meet (Lattice.class T).
-Definition join : T -> T -> T := Lattice.join (Lattice.class T).
+Local Notation distrLatticeType := (distrLatticeType disp).
+Context {T : distrLatticeType}.
+Definition meet : T -> T -> T := DistrLattice.meet (DistrLattice.class T).
+Definition join : T -> T -> T := DistrLattice.join (DistrLattice.class T).
 
 Variant lel_xor_gt (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
   | LelNotGt of x <= y : lel_xor_gt x y true false x x y y
@@ -1000,26 +1132,26 @@ Variant incomparel (x y : T) :
   | InComparelEq of x = y : incomparel x y
     true true true true false false true true x x x x.
 
-End LatticeDef.
+End DistrLatticeDef.
 
-Module Import LatticeSyntax.
+Module Import DistrLatticeSyntax.
 
 Notation "x `&` y" := (meet x y) : order_scope.
 Notation "x `|` y" := (join x y) : order_scope.
 
-End LatticeSyntax.
+End DistrLatticeSyntax.
 
 Module Total.
-Definition mixin_of d (T : latticeType d) := total (<=%O : rel T).
+Definition mixin_of d (T : distrLatticeType d) := total (<=%O : rel T).
 Section ClassDef.
 
 Record class_of (T : Type) := Class {
-  base  : Lattice.class_of T;
+  base  : DistrLattice.class_of T;
   mixin_disp : unit;
-  mixin : mixin_of (Lattice.Pack mixin_disp base)
+  mixin : mixin_of (DistrLattice.Pack mixin_disp base)
 }.
 
-Local Coercion base : class_of >-> Lattice.class_of.
+Local Coercion base : class_of >-> DistrLattice.class_of.
 
 Structure type (d : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1033,28 +1165,28 @@ Definition clone_with disp' c & phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack d0 b0 (m0 : mixin_of (@Lattice.Pack d0 T b0)) :=
-  fun bT b & phant_id (@Lattice.class disp bT) b =>
+Definition pack d0 b0 (m0 : mixin_of (@DistrLattice.Pack d0 T b0)) :=
+  fun bT b & phant_id (@DistrLattice.class disp bT) b =>
   fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
 
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> Lattice.class_of.
+Coercion base : class_of >-> DistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-Canonical latticeType.
+Canonical distrLatticeType.
 Notation totalOrderMixin := Total.mixin_of.
 Notation orderType  := type.
 Notation OrderType T m := (@pack T _ _ _ m _ _ id _ id).
@@ -1074,7 +1206,7 @@ End Exports.
 End Total.
 Import Total.Exports.
 
-Module BLattice.
+Module BDistrLattice.
 Section ClassDef.
 Record mixin_of d (T : porderType d) := Mixin {
   bottom : T;
@@ -1082,12 +1214,12 @@ Record mixin_of d (T : porderType d) := Mixin {
 }.
 
 Record class_of (T : Type) := Class {
-  base  : Lattice.class_of T;
+  base  : DistrLattice.class_of T;
   mixin_disp : unit;
   mixin : mixin_of (POrder.Pack mixin_disp base)
 }.
 
-Local Coercion base : class_of >-> Lattice.class_of.
+Local Coercion base : class_of >-> DistrLattice.class_of.
 
 Structure type (d : unit) := Pack { sort; _ : class_of sort}.
 
@@ -1101,52 +1233,55 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack d0 b0 (m0 : mixin_of (@Lattice.Pack d0 T b0)) :=
-  fun bT b & phant_id (@Lattice.class disp bT) b =>
+Definition pack d0 b0 (m0 : mixin_of (@DistrLattice.Pack d0 T b0)) :=
+  fun bT b & phant_id (@DistrLattice.class disp bT) b =>
   fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> Lattice.class_of.
+Coercion base : class_of >-> DistrLattice.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-Canonical latticeType.
-Notation blatticeType  := type.
-Notation blatticeMixin := mixin_of.
-Notation BLatticeMixin := Mixin.
-Notation BLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
-Notation "[ 'blatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'blatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'blatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0, format "[ 'blatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+Canonical distrLatticeType.
+Notation bDistrLatticeType  := type.
+Notation bDistrLatticeMixin := mixin_of.
+Notation BDistrLatticeMixin := Mixin.
+Notation BDistrLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
+Notation "[ 'bDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
+  (at level 0, format "[ 'bDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
-Notation "[ 'blatticeType' 'of' T ]" := [blatticeType of T for _]
-  (at level 0, format "[ 'blatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'blatticeType' 'of' T 'with' disp ]" :=
-  [blatticeType of T for _ with disp]
-  (at level 0, format "[ 'blatticeType'  'of'  T  'with' disp ]") : form_scope.
+Notation "[ 'bDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
+  (@clone_with T _ cT disp _ id)
+  (at level 0,
+   format "[ 'bDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
+Notation "[ 'bDistrLatticeType' 'of' T ]" := [bDistrLatticeType of T for _]
+  (at level 0, format "[ 'bDistrLatticeType'  'of'  T ]") : form_scope.
+Notation "[ 'bDistrLatticeType' 'of' T 'with' disp ]" :=
+  [bDistrLatticeType of T for _ with disp]
+  (at level 0, format "[ 'bDistrLatticeType'  'of'  T  'with' disp ]") :
+  form_scope.
 End Exports.
 
-End BLattice.
-Export BLattice.Exports.
+End BDistrLattice.
+Export BDistrLattice.Exports.
 
-Definition bottom {disp : unit} {T : blatticeType disp} : T :=
-  BLattice.bottom (BLattice.class T).
+Definition bottom {disp : unit} {T : bDistrLatticeType disp} : T :=
+  BDistrLattice.bottom (BDistrLattice.class T).
 
-Module Import BLatticeSyntax.
+Module Import BDistrLatticeSyntax.
 Notation "0" := bottom : order_scope.
 
 Notation "\join_ ( i <- r | P ) F" :=
@@ -1174,9 +1309,9 @@ Notation "\join_ ( i 'in' A | P ) F" :=
 Notation "\join_ ( i 'in' A ) F" :=
   (\big[@join _ _/0%O]_(i in A) F%O) : order_scope.
 
-End BLatticeSyntax.
+End BDistrLatticeSyntax.
 
-Module TBLattice.
+Module TBDistrLattice.
 Section ClassDef.
 Record mixin_of d (T : porderType d) := Mixin {
   top : T;
@@ -1184,12 +1319,12 @@ Record mixin_of d (T : porderType d) := Mixin {
 }.
 
 Record class_of (T : Type) := Class {
-  base  : BLattice.class_of T;
+  base  : BDistrLattice.class_of T;
   mixin_disp : unit;
   mixin : mixin_of (POrder.Pack mixin_disp base)
 }.
 
-Local Coercion base : class_of >-> BLattice.class_of.
+Local Coercion base : class_of >-> BDistrLattice.class_of.
 
 Structure type (d : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1203,54 +1338,57 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack d0 b0 (m0 : mixin_of (@BLattice.Pack d0 T b0)) :=
-  fun bT b & phant_id (@BLattice.class disp bT) b =>
+Definition pack d0 b0 (m0 : mixin_of (@BDistrLattice.Pack d0 T b0)) :=
+  fun bT b & phant_id (@BDistrLattice.class disp bT) b =>
   fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT xclass.
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> BLattice.class_of.
+Coercion base : class_of >-> BDistrLattice.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion blatticeType : type >-> BLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
-Notation tblatticeType  := type.
-Notation tblatticeMixin := mixin_of.
-Notation TBLatticeMixin := Mixin.
-Notation TBLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
-Notation "[ 'tblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'tblatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'tblatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0, format "[ 'tblatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Notation tbDistrLatticeType  := type.
+Notation tbDistrLatticeMixin := mixin_of.
+Notation TBDistrLatticeMixin := Mixin.
+Notation TBDistrLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
+Notation "[ 'tbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
+  (at level 0, format "[ 'tbDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
-Notation "[ 'tblatticeType' 'of' T ]" := [tblatticeType of T for _]
-  (at level 0, format "[ 'tblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'tblatticeType' 'of' T 'with' disp ]" :=
-  [tblatticeType of T for _ with disp]
-  (at level 0, format "[ 'tblatticeType'  'of'  T  'with' disp ]") : form_scope.
+Notation "[ 'tbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
+  (@clone_with T _ cT disp _ id)
+  (at level 0,
+   format "[ 'tbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
+Notation "[ 'tbDistrLatticeType' 'of' T ]" := [tbDistrLatticeType of T for _]
+  (at level 0, format "[ 'tbDistrLatticeType'  'of'  T ]") : form_scope.
+Notation "[ 'tbDistrLatticeType' 'of' T 'with' disp ]" :=
+  [tbDistrLatticeType of T for _ with disp]
+  (at level 0, format "[ 'tbDistrLatticeType'  'of'  T  'with' disp ]") :
+  form_scope.
 End Exports.
 
-End TBLattice.
-Export TBLattice.Exports.
+End TBDistrLattice.
+Export TBDistrLattice.Exports.
 
-Definition top disp  {T : tblatticeType disp} : T :=
-  TBLattice.top (TBLattice.class T).
+Definition top disp  {T : tbDistrLatticeType disp} : T :=
+  TBDistrLattice.top (TBDistrLattice.class T).
 
-Module Import TBLatticeSyntax.
+Module Import TBDistrLatticeSyntax.
 
 Notation "1" := top : order_scope.
 
@@ -1279,23 +1417,23 @@ Notation "\meet_ ( i 'in' A | P ) F" :=
 Notation "\meet_ ( i 'in' A ) F" :=
  (\big[meet/1]_(i in A) F%O) : order_scope.
 
-End TBLatticeSyntax.
+End TBDistrLatticeSyntax.
 
-Module CBLattice.
+Module CBDistrLattice.
 Section ClassDef.
-Record mixin_of d (T : blatticeType d) := Mixin {
+Record mixin_of d (T : bDistrLatticeType d) := Mixin {
   sub : T -> T -> T;
   _ : forall x y, y `&` sub x y = bottom;
   _ : forall x y, (x `&` y) `|` sub x y = x
 }.
 
 Record class_of (T : Type) := Class {
-  base  : BLattice.class_of T;
+  base  : BDistrLattice.class_of T;
   mixin_disp : unit;
-  mixin : mixin_of (BLattice.Pack mixin_disp base)
+  mixin : mixin_of (BDistrLattice.Pack mixin_disp base)
 }.
 
-Local Coercion base : class_of >-> BLattice.class_of.
+Local Coercion base : class_of >-> BDistrLattice.class_of.
 
 Structure type (d : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1309,76 +1447,80 @@ Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack d0 b0 (m0 : mixin_of (@BLattice.Pack d0 T b0)) :=
-  fun bT b & phant_id (@BLattice.class disp bT) b =>
+Definition pack d0 b0 (m0 : mixin_of (@BDistrLattice.Pack d0 T b0)) :=
+  fun bT b & phant_id (@BDistrLattice.class disp bT) b =>
   fun m & phant_id m0 m => Pack disp (@Class T b d0 m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT xclass.
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> BLattice.class_of.
+Coercion base : class_of >-> BDistrLattice.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion blatticeType : type >-> BLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
-Notation cblatticeType  := type.
-Notation cblatticeMixin := mixin_of.
-Notation CBLatticeMixin := Mixin.
-Notation CBLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
-Notation "[ 'cblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'cblatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Notation cbDistrLatticeType  := type.
+Notation cbDistrLatticeMixin := mixin_of.
+Notation CBDistrLatticeMixin := Mixin.
+Notation CBDistrLatticeType T m := (@pack T _ _ _ m _ _ id _ id).
+Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
+  (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
-Notation "[ 'cblatticeType' 'of' T ]" := [cblatticeType of T for _]
-  (at level 0, format "[ 'cblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'cblatticeType' 'of' T 'with' disp ]" :=
-  [cblatticeType of T for _ with disp]
-  (at level 0, format "[ 'cblatticeType'  'of'  T  'with' disp ]") : form_scope.
+Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
+  (@clone_with T _ cT disp _ id)
+  (at level 0,
+   format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
+Notation "[ 'cbDistrLatticeType' 'of' T ]" := [cbDistrLatticeType of T for _]
+  (at level 0, format "[ 'cbDistrLatticeType'  'of'  T ]") : form_scope.
+Notation "[ 'cbDistrLatticeType' 'of' T 'with' disp ]" :=
+  [cbDistrLatticeType of T for _ with disp]
+  (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'with' disp ]") :
+  form_scope.
 End Exports.
 
-End CBLattice.
-Export CBLattice.Exports.
+End CBDistrLattice.
+Export CBDistrLattice.Exports.
 
-Definition sub {disp : unit} {T : cblatticeType disp} : T -> T -> T :=
-  CBLattice.sub (CBLattice.class T).
+Definition sub {disp : unit} {T : cbDistrLatticeType disp} : T -> T -> T :=
+  CBDistrLattice.sub (CBDistrLattice.class T).
 
-Module Import CBLatticeSyntax.
+Module Import CBDistrLatticeSyntax.
 Notation "x `\` y" := (sub x y) : order_scope.
-End CBLatticeSyntax.
+End CBDistrLatticeSyntax.
 
-Module CTBLattice.
+Module CTBDistrLattice.
 Section ClassDef.
-Record mixin_of d (T : tblatticeType d) (sub : T -> T -> T) := Mixin {
+Record mixin_of d (T : tbDistrLatticeType d) (sub : T -> T -> T) := Mixin {
    compl : T -> T;
    _ : forall x, compl x = sub top x
 }.
 
 Record class_of (T : Type) := Class {
-  base  : TBLattice.class_of T;
+  base  : TBDistrLattice.class_of T;
   mixin1_disp : unit;
-  mixin1 : CBLattice.mixin_of (BLattice.Pack mixin1_disp base);
+  mixin1 : CBDistrLattice.mixin_of (BDistrLattice.Pack mixin1_disp base);
   mixin2_disp : unit;
-  mixin2 : @mixin_of _ (TBLattice.Pack mixin2_disp base) (CBLattice.sub mixin1)
+  mixin2 : @mixin_of _ (TBDistrLattice.Pack mixin2_disp base)
+                     (CBDistrLattice.sub mixin1)
 }.
 
-Local Coercion base : class_of >-> TBLattice.class_of.
-Local Coercion base2 T (c : class_of T) : CBLattice.class_of T :=
-  CBLattice.Class (mixin1 c).
+Local Coercion base : class_of >-> TBDistrLattice.class_of.
+Local Coercion base2 T (c : class_of T) : CBDistrLattice.class_of T :=
+  CBDistrLattice.Class (mixin1 c).
 
 Structure type (d : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1393,73 +1535,76 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
-  fun bT  b  & phant_id (@TBLattice.class disp bT) b =>
-  fun disp1 m1T m1 & phant_id (@CBLattice.class disp1 m1T)
-                              (@CBLattice.Class _ _ _ m1) =>
+  fun bT  b  & phant_id (@TBDistrLattice.class disp bT) b =>
+  fun disp1 m1T m1 & phant_id (@CBDistrLattice.class disp1 m1T)
+                              (@CBDistrLattice.Class _ _ _ m1) =>
   fun disp2 m2 => Pack disp (@Class T b disp1 m1 disp2 m2).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition tblatticeType := @TBLattice.Pack disp cT xclass.
-Definition cblatticeType := @CBLattice.Pack disp cT xclass.
-Definition tbd_cblatticeType :=
-  @CBLattice.Pack disp tblatticeType xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT xclass.
+Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT xclass.
+Definition cbDistrLatticeType := @CBDistrLattice.Pack disp cT xclass.
+Definition tbd_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp tbDistrLatticeType xclass.
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> TBLattice.class_of.
-Coercion base2 : class_of >-> CBLattice.class_of.
-Coercion mixin1 : class_of >-> CBLattice.mixin_of.
+Coercion base : class_of >-> TBDistrLattice.class_of.
+Coercion base2 : class_of >-> CBDistrLattice.class_of.
+Coercion mixin1 : class_of >-> CBDistrLattice.mixin_of.
 Coercion mixin2 : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
 Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion tblatticeType : type >-> TBLattice.type.
-Coercion cblatticeType : type >-> CBLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
+Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
+Coercion cbDistrLatticeType : type >-> CBDistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
-Canonical tblatticeType.
-Canonical cblatticeType.
-Canonical tbd_cblatticeType.
-Notation ctblatticeType  := type.
-Notation ctblatticeMixin := mixin_of.
-Notation CTBLatticeMixin := Mixin.
-Notation CTBLatticeType T m := (@pack T _ _ _ id _ _ _ id _ m).
-Notation "[ 'ctblatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'ctblatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'ctblatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0, format "[ 'ctblatticeType'  'of'  T  'for'  cT  'with'  disp ]")
-  : form_scope.
-Notation "[ 'ctblatticeType' 'of' T ]" := [ctblatticeType of T for _]
-  (at level 0, format "[ 'ctblatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'ctblatticeType' 'of' T 'with' disp ]" :=
-  [ctblatticeType of T for _ with disp]
-  (at level 0, format "[ 'ctblatticeType'  'of'  T  'with' disp ]") :
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical cbDistrLatticeType.
+Canonical tbd_cbDistrLatticeType.
+Notation ctbDistrLatticeType  := type.
+Notation ctbDistrLatticeMixin := mixin_of.
+Notation CTBDistrLatticeMixin := Mixin.
+Notation CTBDistrLatticeType T m := (@pack T _ _ _ id _ _ _ id _ m).
+Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
+  (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
-Notation "[ 'default_ctblatticeType' 'of' T ]" :=
+Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
+  (@clone_with T _ cT disp _ id)
+  (at level 0,
+   format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]")
+  : form_scope.
+Notation "[ 'ctbDistrLatticeType' 'of' T ]" := [ctbDistrLatticeType of T for _]
+  (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T ]") : form_scope.
+Notation "[ 'ctbDistrLatticeType' 'of' T 'with' disp ]" :=
+  [ctbDistrLatticeType of T for _ with disp]
+  (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'with' disp ]") :
+  form_scope.
+Notation "[ 'default_ctbDistrLatticeType' 'of' T ]" :=
   (@pack T _ _ _ id _ _ id (Mixin (fun=> erefl)))
-  (at level 0, format "[ 'default_ctblatticeType'  'of'  T ]") : form_scope.
+  (at level 0, format "[ 'default_ctbDistrLatticeType'  'of'  T ]") :
+  form_scope.
 End Exports.
 
-End CTBLattice.
-Export CTBLattice.Exports.
+End CTBDistrLattice.
+Export CTBDistrLattice.Exports.
 
-Definition compl {d : unit} {T : ctblatticeType d} : T -> T :=
-  CTBLattice.compl (CTBLattice.class T).
+Definition compl {d : unit} {T : ctbDistrLatticeType d} : T -> T :=
+  CTBDistrLattice.compl (CTBDistrLattice.class T).
 
-Module Import CTBLatticeSyntax.
+Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
-End CTBLatticeSyntax.
+End CTBDistrLatticeSyntax.
 
 Section TotalDef.
 Context {disp : unit} {T : orderType disp} {I : finType}.
@@ -1473,10 +1618,10 @@ Fact total_display : unit. Proof. exact: tt. Qed.
 
 Notation max := (@join total_display _).
 Notation "@ 'max' T" :=
-  (@join total_display T) (at level 10, T at level 8, only parsing).
+  (@join total_display T) (at level 10, T at level 8, only parsing) : fun_scope.
 Notation min := (@meet total_display _).
 Notation "@ 'min' T" :=
-  (@meet total_display T) (at level 10, T at level 8, only parsing).
+  (@meet total_display T) (at level 10, T at level 8, only parsing) : fun_scope.
 
 Notation "\max_ ( i <- r | P ) F" :=
   (\big[max/0%O]_(i <- r | P%B) F%O) : order_scope.
@@ -1625,15 +1770,15 @@ End FinPOrder.
 Import FinPOrder.Exports.
 Bind Scope cpo_sort with FinPOrder.sort.
 
-Module FinLattice.
+Module FinDistrLattice.
 Section ClassDef.
 
 Record class_of (T : Type) := Class {
-  base : TBLattice.class_of T;
+  base : TBDistrLattice.class_of T;
   mixin : Finite.mixin_of (Equality.Pack base);
 }.
 
-Local Coercion base : class_of >-> TBLattice.class_of.
+Local Coercion base : class_of >-> TBDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : Finite.class_of T :=
   Finite.Class (mixin c).
 Local Coercion base3 T (c : class_of T) : FinPOrder.class_of T :=
@@ -1650,7 +1795,7 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
-  fun bT b & phant_id (@TBLattice.class disp bT) b =>
+  fun bT b & phant_id (@TBDistrLattice.class disp bT) b =>
   fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
   Pack disp (@Class T b m).
 
@@ -1660,23 +1805,27 @@ Definition countType := @Countable.Pack cT xclass.
 Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition tblatticeType := @TBLattice.Pack disp cT xclass.
-Definition count_latticeType := @Lattice.Pack disp countType xclass.
-Definition count_blatticeType := @BLattice.Pack disp countType xclass.
-Definition count_tblatticeType := @TBLattice.Pack disp countType xclass.
-Definition fin_latticeType := @Lattice.Pack disp finType xclass.
-Definition fin_blatticeType := @BLattice.Pack disp finType xclass.
-Definition fin_tblatticeType := @TBLattice.Pack disp finType xclass.
-Definition finPOrder_latticeType := @Lattice.Pack disp finPOrderType xclass.
-Definition finPOrder_blatticeType := @BLattice.Pack disp finPOrderType xclass.
-Definition finPOrder_tblatticeType := @TBLattice.Pack disp finPOrderType xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT xclass.
+Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT xclass.
+Definition count_distrLatticeType := @DistrLattice.Pack disp countType xclass.
+Definition count_bDistrLatticeType := @BDistrLattice.Pack disp countType xclass.
+Definition count_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp countType xclass.
+Definition fin_distrLatticeType := @DistrLattice.Pack disp finType xclass.
+Definition fin_bDistrLatticeType := @BDistrLattice.Pack disp finType xclass.
+Definition fin_tbDistrLatticeType := @TBDistrLattice.Pack disp finType xclass.
+Definition finPOrder_distrLatticeType :=
+  @DistrLattice.Pack disp finPOrderType xclass.
+Definition finPOrder_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finPOrderType xclass.
+Definition finPOrder_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finPOrderType xclass.
 
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> TBLattice.class_of.
+Coercion base : class_of >-> TBDistrLattice.class_of.
 Coercion base2 : class_of >-> Finite.class_of.
 Coercion base3 : class_of >-> FinPOrder.class_of.
 Coercion sort : type >-> Sortclass.
@@ -1686,48 +1835,48 @@ Coercion countType : type >-> Countable.type.
 Coercion finType : type >-> Finite.type.
 Coercion porderType : type >-> POrder.type.
 Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion tblatticeType : type >-> TBLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
+Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
 Canonical finPOrderType.
-Canonical latticeType.
-Canonical blatticeType.
-Canonical tblatticeType.
-Canonical count_latticeType.
-Canonical count_blatticeType.
-Canonical count_tblatticeType.
-Canonical fin_latticeType.
-Canonical fin_blatticeType.
-Canonical fin_tblatticeType.
-Canonical finPOrder_latticeType.
-Canonical finPOrder_blatticeType.
-Canonical finPOrder_tblatticeType.
-Notation finLatticeType  := type.
-Notation "[ 'finLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
-  (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical count_distrLatticeType.
+Canonical count_bDistrLatticeType.
+Canonical count_tbDistrLatticeType.
+Canonical fin_distrLatticeType.
+Canonical fin_bDistrLatticeType.
+Canonical fin_tbDistrLatticeType.
+Canonical finPOrder_distrLatticeType.
+Canonical finPOrder_bDistrLatticeType.
+Canonical finPOrder_tbDistrLatticeType.
+Notation finDistrLatticeType  := type.
+Notation "[ 'finDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finDistrLatticeType'  'of'  T ]") : form_scope.
 End Exports.
 
-End FinLattice.
-Export FinLattice.Exports.
+End FinDistrLattice.
+Export FinDistrLattice.Exports.
 
-Module FinCLattice.
+Module FinCDistrLattice.
 Section ClassDef.
 
 Record class_of (T : Type) := Class {
-  base  : CTBLattice.class_of T;
+  base  : CTBDistrLattice.class_of T;
   mixin : Finite.mixin_of (Equality.Pack base);
 }.
 
-Local Coercion base : class_of >-> CTBLattice.class_of.
+Local Coercion base : class_of >-> CTBDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : Finite.class_of T :=
   Finite.Class (mixin c).
-Local Coercion base3 T (c : class_of T) : FinLattice.class_of T :=
-  @FinLattice.Class T c c.
+Local Coercion base3 T (c : class_of T) : FinDistrLattice.class_of T :=
+  @FinDistrLattice.Class T c c.
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1740,7 +1889,7 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
-  fun bT b & phant_id (@CTBLattice.class disp bT) b =>
+  fun bT b & phant_id (@CTBDistrLattice.class disp bT) b =>
   fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
   Pack disp (@Class T b m).
 
@@ -1750,30 +1899,33 @@ Definition countType := @Countable.Pack cT xclass.
 Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition tblatticeType := @TBLattice.Pack disp cT xclass.
-Definition finLatticeType := @FinLattice.Pack disp cT xclass.
-Definition cblatticeType := @CBLattice.Pack disp cT xclass.
-Definition ctblatticeType := @CTBLattice.Pack disp cT xclass.
-Definition count_cblatticeType := @CBLattice.Pack disp countType xclass.
-Definition count_ctblatticeType := @CTBLattice.Pack disp countType xclass.
-Definition fin_cblatticeType := @CBLattice.Pack disp finType xclass.
-Definition fin_ctblatticeType := @CTBLattice.Pack disp finType xclass.
-Definition finPOrder_cblatticeType := @CBLattice.Pack disp finPOrderType xclass.
-Definition finPOrder_ctblatticeType :=
-  @CTBLattice.Pack disp finPOrderType xclass.
-Definition finLattice_cblatticeType :=
-  @CBLattice.Pack disp finLatticeType xclass.
-Definition finLattice_ctblatticeType :=
-  @CTBLattice.Pack disp finLatticeType xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT xclass.
+Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT xclass.
+Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT xclass.
+Definition cbDistrLatticeType := @CBDistrLattice.Pack disp cT xclass.
+Definition ctbDistrLatticeType := @CTBDistrLattice.Pack disp cT xclass.
+Definition count_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp countType xclass.
+Definition count_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp countType xclass.
+Definition fin_cbDistrLatticeType := @CBDistrLattice.Pack disp finType xclass.
+Definition fin_ctbDistrLatticeType := @CTBDistrLattice.Pack disp finType xclass.
+Definition finPOrder_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finPOrderType xclass.
+Definition finPOrder_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finPOrderType xclass.
+Definition finDistrLattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finDistrLatticeType xclass.
+Definition finDistrLattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finDistrLatticeType xclass.
 
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> CTBLattice.class_of.
+Coercion base : class_of >-> CTBDistrLattice.class_of.
 Coercion base2 : class_of >-> Finite.class_of.
-Coercion base3 : class_of >-> FinLattice.class_of.
+Coercion base3 : class_of >-> FinDistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1781,50 +1933,50 @@ Coercion countType : type >-> Countable.type.
 Coercion finType : type >-> Finite.type.
 Coercion porderType : type >-> POrder.type.
 Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion tblatticeType : type >-> TBLattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
-Coercion cblatticeType : type >-> CBLattice.type.
-Coercion ctblatticeType : type >-> CTBLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
+Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
+Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
+Coercion cbDistrLatticeType : type >-> CBDistrLattice.type.
+Coercion ctbDistrLatticeType : type >-> CTBDistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
 Canonical finPOrderType.
-Canonical latticeType.
-Canonical blatticeType.
-Canonical tblatticeType.
-Canonical finLatticeType.
-Canonical cblatticeType.
-Canonical ctblatticeType.
-Canonical count_cblatticeType.
-Canonical count_ctblatticeType.
-Canonical fin_cblatticeType.
-Canonical fin_ctblatticeType.
-Canonical finPOrder_cblatticeType.
-Canonical finPOrder_ctblatticeType.
-Canonical finLattice_cblatticeType.
-Canonical finLattice_ctblatticeType.
-Notation finCLatticeType  := type.
-Notation "[ 'finCLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
-  (at level 0, format "[ 'finCLatticeType'  'of'  T ]") : form_scope.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical finDistrLatticeType.
+Canonical cbDistrLatticeType.
+Canonical ctbDistrLatticeType.
+Canonical count_cbDistrLatticeType.
+Canonical count_ctbDistrLatticeType.
+Canonical fin_cbDistrLatticeType.
+Canonical fin_ctbDistrLatticeType.
+Canonical finPOrder_cbDistrLatticeType.
+Canonical finPOrder_ctbDistrLatticeType.
+Canonical finDistrLattice_cbDistrLatticeType.
+Canonical finDistrLattice_ctbDistrLatticeType.
+Notation finCDistrLatticeType  := type.
+Notation "[ 'finCDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finCDistrLatticeType'  'of'  T ]") : form_scope.
 End Exports.
 
-End FinCLattice.
-Export FinCLattice.Exports.
+End FinCDistrLattice.
+Export FinCDistrLattice.Exports.
 
 Module FinTotal.
 Section ClassDef.
 
 Record class_of (T : Type) := Class {
-  base  : FinLattice.class_of T;
+  base  : FinDistrLattice.class_of T;
   mixin_disp : unit;
-  mixin : totalOrderMixin (Lattice.Pack mixin_disp base)
+  mixin : totalOrderMixin (DistrLattice.Pack mixin_disp base)
 }.
 
-Local Coercion base : class_of >-> FinLattice.class_of.
+Local Coercion base : class_of >-> FinDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : Total.class_of T :=
   @Total.Class _ c _ (mixin (c := c)).
 
@@ -1839,7 +1991,7 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
-  fun bT b & phant_id (@FinLattice.class disp bT) b =>
+  fun bT b & phant_id (@FinDistrLattice.class disp bT) b =>
   fun disp' mT m & phant_id (@Total.class disp mT) (@Total.Class _ _ _ m) =>
   Pack disp (@Class T b disp' m).
 
@@ -1849,22 +2001,24 @@ Definition countType := @Countable.Pack cT xclass.
 Definition finType := @Finite.Pack cT xclass.
 Definition porderType := @POrder.Pack disp cT xclass.
 Definition finPOrderType := @FinPOrder.Pack disp cT xclass.
-Definition latticeType := @Lattice.Pack disp cT xclass.
-Definition blatticeType := @BLattice.Pack disp cT xclass.
-Definition tblatticeType := @TBLattice.Pack disp cT xclass.
-Definition finLatticeType := @FinLattice.Pack disp cT xclass.
+Definition distrLatticeType := @DistrLattice.Pack disp cT xclass.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT xclass.
+Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT xclass.
+Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT xclass.
 Definition orderType := @Total.Pack disp cT xclass.
 Definition order_countType := @Countable.Pack orderType xclass.
 Definition order_finType := @Finite.Pack orderType xclass.
 Definition order_finPOrderType := @FinPOrder.Pack disp orderType xclass.
-Definition order_blatticeType := @BLattice.Pack disp orderType xclass.
-Definition order_tblatticeType := @TBLattice.Pack disp orderType xclass.
-Definition order_finLatticeType := @FinLattice.Pack disp orderType xclass.
+Definition order_bDistrLatticeType := @BDistrLattice.Pack disp orderType xclass.
+Definition order_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp orderType xclass.
+Definition order_finDistrLatticeType :=
+  @FinDistrLattice.Pack disp orderType xclass.
 
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> FinLattice.class_of.
+Coercion base : class_of >-> FinDistrLattice.class_of.
 Coercion base2 : class_of >-> Total.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
@@ -1873,10 +2027,10 @@ Coercion countType : type >-> Countable.type.
 Coercion finType : type >-> Finite.type.
 Coercion porderType : type >-> POrder.type.
 Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion blatticeType : type >-> BLattice.type.
-Coercion tblatticeType : type >-> TBLattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
+Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
+Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
 Coercion orderType : type >-> Total.type.
 Canonical eqType.
 Canonical choiceType.
@@ -1884,17 +2038,17 @@ Canonical countType.
 Canonical finType.
 Canonical porderType.
 Canonical finPOrderType.
-Canonical latticeType.
-Canonical blatticeType.
-Canonical tblatticeType.
-Canonical finLatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical finDistrLatticeType.
 Canonical orderType.
 Canonical order_countType.
 Canonical order_finType.
 Canonical order_finPOrderType.
-Canonical order_blatticeType.
-Canonical order_tblatticeType.
-Canonical order_finLatticeType.
+Canonical order_bDistrLatticeType.
+Canonical order_tbDistrLatticeType.
+Canonical order_finDistrLatticeType.
 Notation finOrderType := type.
 Notation "[ 'finOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ _ id)
   (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
@@ -1913,36 +2067,36 @@ Local Notation "T ^c" := (converse T) (at level 2, format "T ^c") : type_scope.
 
 Module Import ConverseSyntax.
 
-Notation "<=^c%O" := (@le (converse_display _) _) : order_scope.
-Notation ">=^c%O" := (@ge (converse_display _) _)  : order_scope.
-Notation ">=^c%O" := (@ge (converse_display _) _)  : order_scope.
-Notation "<^c%O" := (@lt (converse_display _) _) : order_scope.
-Notation ">^c%O" := (@gt (converse_display _) _) : order_scope.
-Notation "<?=^c%O" := (@leif (converse_display _) _) : order_scope.
-Notation ">=<^c%O" := (@comparable (converse_display _) _) : order_scope.
+Notation "<=^c%O" := (@le (converse_display _) _) : fun_scope.
+Notation ">=^c%O" := (@ge (converse_display _) _)  : fun_scope.
+Notation ">=^c%O" := (@ge (converse_display _) _)  : fun_scope.
+Notation "<^c%O" := (@lt (converse_display _) _) : fun_scope.
+Notation ">^c%O" := (@gt (converse_display _) _) : fun_scope.
+Notation "<?=^c%O" := (@leif (converse_display _) _) : fun_scope.
+Notation ">=<^c%O" := (@comparable (converse_display _) _) : fun_scope.
 Notation "><^c%O" := (fun x y => ~~ (@comparable (converse_display _) _ x y)) :
-  order_scope.
+  fun_scope.
 
 Notation "<=^c y" := (>=^c%O y) : order_scope.
-Notation "<=^c y :> T" := (<=^c (y : T)) : order_scope.
+Notation "<=^c y :> T" := (<=^c (y : T)) (only parsing) : order_scope.
 Notation ">=^c y"  := (<=^c%O y) : order_scope.
-Notation ">=^c y :> T" := (>=^c (y : T)) : order_scope.
+Notation ">=^c y :> T" := (>=^c (y : T)) (only parsing) : order_scope.
 
 Notation "<^c y" := (>^c%O y) : order_scope.
-Notation "<^c y :> T" := (<^c (y : T)) : order_scope.
+Notation "<^c y :> T" := (<^c (y : T)) (only parsing) : order_scope.
 Notation ">^c y" := (<^c%O y) : order_scope.
-Notation ">^c y :> T" := (>^c (y : T)) : order_scope.
+Notation ">^c y :> T" := (>^c (y : T)) (only parsing) : order_scope.
 
 Notation ">=<^c y" := (>=<^c%O y) : order_scope.
-Notation ">=<^c y :> T" := (>=<^c (y : T)) : order_scope.
+Notation ">=<^c y :> T" := (>=<^c (y : T)) (only parsing) : order_scope.
 
 Notation "x <=^c y" := (<=^c%O x y) : order_scope.
-Notation "x <=^c y :> T" := ((x : T) <=^c (y : T)) : order_scope.
+Notation "x <=^c y :> T" := ((x : T) <=^c (y : T)) (only parsing) : order_scope.
 Notation "x >=^c y" := (y <=^c x) (only parsing) : order_scope.
 Notation "x >=^c y :> T" := ((x : T) >=^c (y : T)) (only parsing) : order_scope.
 
 Notation "x <^c y"  := (<^c%O x y) : order_scope.
-Notation "x <^c y :> T" := ((x : T) <^c (y : T)) : order_scope.
+Notation "x <^c y :> T" := ((x : T) <^c (y : T)) (only parsing) : order_scope.
 Notation "x >^c y"  := (y <^c x) (only parsing) : order_scope.
 Notation "x >^c y :> T" := ((x : T) >^c (y : T)) (only parsing) : order_scope.
 
@@ -2390,12 +2544,12 @@ Canonical converse_porderType :=
 End ConversePOrder.
 End ConversePOrder.
 
-Module Import ConverseLattice.
-Section ConverseLattice.
+Module Import ConverseDistrLattice.
+Section ConverseDistrLattice.
 Context {disp : unit}.
-Local Notation latticeType := (latticeType disp).
+Local Notation distrLatticeType := (distrLatticeType disp).
 
-Variable L : latticeType.
+Variable L : distrLatticeType.
 Implicit Types (x y : L).
 
 Lemma meetC : commutative (@meet _ L). Proof. by case: L => [?[? ?[]]]. Qed.
@@ -2438,18 +2592,19 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 Fact converse_leEmeet (x y : L^c) : (x <= y) = (x `|` y == x).
 Proof. by rewrite [LHS]leEjoin joinC. Qed.
 
-Definition converse_latticeMixin :=
-   @LatticeMixin _ [porderType of L^c] _ _ joinC meetC
+Definition converse_distrLatticeMixin :=
+   @DistrLatticeMixin _ [porderType of L^c] _ _ joinC meetC
   joinA meetA meetKU joinKI converse_leEmeet joinIl.
-Canonical converse_latticeType := LatticeType L^c converse_latticeMixin.
-End ConverseLattice.
-End ConverseLattice.
+Canonical converse_distrLatticeType :=
+  DistrLatticeType L^c converse_distrLatticeMixin.
+End ConverseDistrLattice.
+End ConverseDistrLattice.
 
-Module Import LatticeTheoryMeet.
-Section LatticeTheoryMeet.
+Module Import DistrLatticeTheoryMeet.
+Section DistrLatticeTheoryMeet.
 Context {disp : unit}.
-Local Notation latticeType := (latticeType disp).
-Context {L : latticeType}.
+Local Notation distrLatticeType := (distrLatticeType disp).
+Context {L : distrLatticeType}.
 Implicit Types (x y : L).
 
 (* lattice theory *)
@@ -2518,75 +2673,75 @@ Proof. by rewrite meetC eq_meetl. Qed.
 Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
 Proof. by move=> xz yt; rewrite lexI !leIx2 ?xz ?yt ?orbT //. Qed.
 
-End LatticeTheoryMeet.
-End LatticeTheoryMeet.
+End DistrLatticeTheoryMeet.
+End DistrLatticeTheoryMeet.
 
-Module Import LatticeTheoryJoin.
-Section LatticeTheoryJoin.
+Module Import DistrLatticeTheoryJoin.
+Section DistrLatticeTheoryJoin.
 Context {disp : unit}.
-Local Notation latticeType := (latticeType disp).
-Context {L : latticeType}.
+Local Notation distrLatticeType := (distrLatticeType disp).
+Context {L : distrLatticeType}.
 Implicit Types (x y : L).
 
 (* lattice theory *)
 Lemma joinAC : right_commutative (@join _ L).
-Proof. exact: (@meetAC _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetAC _ [distrLatticeType of L^c]). Qed.
 Lemma joinCA : left_commutative (@join _ L).
-Proof. exact: (@meetCA _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetCA _ [distrLatticeType of L^c]). Qed.
 Lemma joinACA : interchange (@join _ L) (@join _ L).
-Proof. exact: (@meetACA _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetACA _ [distrLatticeType of L^c]). Qed.
 
 Lemma joinxx x : x `|` x = x.
-Proof. exact: (@meetxx _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetxx _ [distrLatticeType of L^c]). Qed.
 
 Lemma joinKU y x : x `|` (x `|` y) = x `|` y.
-Proof. exact: (@meetKI _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetKI _ [distrLatticeType of L^c]). Qed.
 Lemma joinUK y x : (x `|` y) `|` y = x `|` y.
-Proof. exact: (@meetIK _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetIK _ [distrLatticeType of L^c]). Qed.
 Lemma joinKUC y x : x `|` (y `|` x) = x `|` y.
-Proof. exact: (@meetKIC _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetKIC _ [distrLatticeType of L^c]). Qed.
 Lemma joinUKC y x : y `|` x `|` y = x `|` y.
-Proof. exact: (@meetIKC _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetIKC _ [distrLatticeType of L^c]). Qed.
 
 (* interaction with order *)
 Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
-Proof. exact: (@lexI _ [latticeType of L^c]). Qed.
+Proof. exact: (@lexI _ [distrLatticeType of L^c]). Qed.
 Lemma lexUl x y z : x <= y -> x <= y `|` z.
-Proof. exact: (@leIxl _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIxl _ [distrLatticeType of L^c]). Qed.
 Lemma lexUr x y z : x <= z -> x <= y `|` z.
-Proof. exact: (@leIxr _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIxr _ [distrLatticeType of L^c]). Qed.
 Lemma lexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx2 _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIx2 _ [distrLatticeType of L^c]). Qed.
 
 Lemma leUr x y : x <= y `|` x.
-Proof. exact: (@leIr _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIr _ [distrLatticeType of L^c]). Qed.
 Lemma leUl x y : x <= x `|` y.
-Proof. exact: (@leIl _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIl _ [distrLatticeType of L^c]). Qed.
 
 Lemma join_idPl {x y} : reflect (x `|` y = y) (x <= y).
-Proof. exact: (@meet_idPr _ [latticeType of L^c]). Qed.
+Proof. exact: (@meet_idPr _ [distrLatticeType of L^c]). Qed.
 Lemma join_idPr {x y} : reflect (y `|` x = y) (x <= y).
-Proof. exact: (@meet_idPl _ [latticeType of L^c]). Qed.
+Proof. exact: (@meet_idPl _ [distrLatticeType of L^c]). Qed.
 
 Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPr. Qed.
 Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPl. Qed.
 
 Lemma leUidl x y : (x `|` y <= y) = (x <= y).
-Proof. exact: (@leIidr _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIidr _ [distrLatticeType of L^c]). Qed.
 Lemma leUidr x y : (y `|` x <= y) = (x <= y).
-Proof. exact: (@leIidl _ [latticeType of L^c]). Qed.
+Proof. exact: (@leIidl _ [distrLatticeType of L^c]). Qed.
 
 Lemma eq_joinl x y : (x `|` y == x) = (y <= x).
-Proof. exact: (@eq_meetl _ [latticeType of L^c]). Qed.
+Proof. exact: (@eq_meetl _ [distrLatticeType of L^c]). Qed.
 Lemma eq_joinr x y : (x `|` y == y) = (x <= y).
-Proof. exact: (@eq_meetr _ [latticeType of L^c]). Qed.
+Proof. exact: (@eq_meetr _ [distrLatticeType of L^c]). Qed.
 
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
-Proof. exact: (@leI2 _ [latticeType of L^c]). Qed.
+Proof. exact: (@leI2 _ [distrLatticeType of L^c]). Qed.
 
 (* Distributive lattice theory *)
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
-Proof. exact: (@meetUr _ [latticeType of L^c]). Qed.
+Proof. exact: (@meetUr _ [distrLatticeType of L^c]). Qed.
 
 Lemma lcomparableP x y : incomparel x y
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
@@ -2611,8 +2766,8 @@ Lemma lcomparable_ltP x y : x >=< y ->
   ltl_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
 Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 
-End LatticeTheoryJoin.
-End LatticeTheoryJoin.
+End DistrLatticeTheoryJoin.
+End DistrLatticeTheoryJoin.
 
 Module Import TotalTheory.
 Section TotalTheory.
@@ -2646,9 +2801,10 @@ Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 
 Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
 
-Definition ltgtP x y := LatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
-Definition leP x y := LatticeTheoryJoin.lcomparable_leP (comparableT x y).
-Definition ltP x y := LatticeTheoryJoin.lcomparable_ltP (comparableT x y).
+Definition ltgtP x y :=
+  DistrLatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
+Definition leP x y := DistrLatticeTheoryJoin.lcomparable_leP (comparableT x y).
+Definition ltP x y := DistrLatticeTheoryJoin.lcomparable_ltP (comparableT x y).
 
 Lemma wlog_le P :
      (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
@@ -2757,11 +2913,11 @@ Proof. exact: total_homo_mono_in. Qed.
 End TotalMonotonyTheory.
 End TotalTheory.
 
-Module Import BLatticeTheory.
-Section BLatticeTheory.
+Module Import BDistrLatticeTheory.
+Section BDistrLatticeTheory.
 Context {disp : unit}.
-Local Notation blatticeType := (blatticeType disp).
-Context {L : blatticeType}.
+Local Notation bDistrLatticeType := (bDistrLatticeType disp).
+Context {L : bDistrLatticeType}.
 Implicit Types (I : finType) (T : eqType) (x y z : L).
 Local Notation "0" := bottom.
 
@@ -2905,33 +3061,35 @@ case; rewrite (andbF, andbT) // => Pi /(_ isT) dy /eqP dFi.
 by rewrite meetUr dy dFi joinxx.
 Qed.
 
-End BLatticeTheory.
-End BLatticeTheory.
+End BDistrLatticeTheory.
+End BDistrLatticeTheory.
 
-Module Import ConverseTBLattice.
-Section ConverseTBLattice.
+Module Import ConverseTBDistrLattice.
+Section ConverseTBDistrLattice.
 Context {disp : unit}.
-Local Notation tblatticeType := (tblatticeType disp).
-Context {L : tblatticeType}.
+Local Notation tbDistrLatticeType := (tbDistrLatticeType disp).
+Context {L : tbDistrLatticeType}.
 
 Lemma lex1 (x : L) : x <= top. Proof. by case: L x => [?[? ?[]]]. Qed.
 
-Definition converse_blatticeMixin :=
-  @BLatticeMixin _ [latticeType of L^c] top lex1.
-Canonical converse_blatticeType := BLatticeType L^c converse_blatticeMixin.
+Definition converse_bDistrLatticeMixin :=
+  @BDistrLatticeMixin _ [distrLatticeType of L^c] top lex1.
+Canonical converse_bDistrLatticeType :=
+  BDistrLatticeType L^c converse_bDistrLatticeMixin.
 
-Definition converse_tblatticeMixin :=
-   @TBLatticeMixin _ [latticeType of L^c] (bottom : L) (@le0x _ L).
-Canonical converse_tblatticeType := TBLatticeType L^c converse_tblatticeMixin.
+Definition converse_tbDistrLatticeMixin :=
+   @TBDistrLatticeMixin _ [distrLatticeType of L^c] (bottom : L) (@le0x _ L).
+Canonical converse_tbDIstrLatticeType :=
+  TBDistrLatticeType L^c converse_tbDistrLatticeMixin.
 
-End ConverseTBLattice.
-End ConverseTBLattice.
+End ConverseTBDistrLattice.
+End ConverseTBDistrLattice.
 
-Module Import TBLatticeTheory.
-Section TBLatticeTheory.
+Module Import TBDistrLatticeTheory.
+Section TBDistrLatticeTheory.
 Context {disp : unit}.
-Local Notation tblatticeType := (tblatticeType disp).
-Context {L : tblatticeType}.
+Local Notation tbDistrLatticeType := (tbDistrLatticeType disp).
+Context {L : tbDistrLatticeType}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation "1" := top.
@@ -2939,40 +3097,44 @@ Local Notation "1" := top.
 Hint Resolve le0x lex1 : core.
 
 Lemma meetx1 : right_id 1 (@meet _ L).
-Proof. exact: (@joinx0 _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@joinx0 _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meet1x : left_id 1 (@meet _ L).
-Proof. exact: (@join0x _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join0x _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma joinx1 : right_zero 1 (@join _ L).
-Proof. exact: (@meetx0 _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@meetx0 _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma join1x : left_zero 1 (@join _ L).
-Proof. exact: (@meet0x _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@meet0x _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma le1x x : (1 <= x) = (x == 1).
-Proof. exact: (@lex0 _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@lex0 _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
-Proof. rewrite joinC; exact: (@leU2l_le _ [tblatticeType of L^c]). Qed.
+Proof. rewrite joinC; exact: (@leU2l_le _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
-Proof. rewrite joinC; exact: (@leU2r_le _ [tblatticeType of L^c]). Qed.
+Proof. rewrite joinC; exact: (@leU2r_le _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@disjoint_lexUl _ [tblatticeType of L^c]). Qed.
+Proof.
+rewrite joinC; exact: (@disjoint_lexUl _ [tbDistrLatticeType of L^c]).
+Qed.
 
 Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@disjoint_lexUr _ [tblatticeType of L^c]). Qed.
+Proof.
+rewrite joinC; exact: (@disjoint_lexUr _ [tbDistrLatticeType of L^c]).
+Qed.
 
 Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
 Proof.
-by move=> ? ?; apply: (@leU2E _ [tblatticeType of L^c]); rewrite meetC.
+by move=> ? ?; apply: (@leU2E _ [tbDistrLatticeType of L^c]); rewrite meetC.
 Qed.
 
 Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
-Proof. exact: (@join_eq0 _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join_eq0 _ [tbDistrLatticeType of L^c]). Qed.
 
 Canonical meet_monoid := Monoid.Law (@meetA _ _) meet1x meetx1.
 Canonical meet_comoid := Monoid.ComLaw (@meetC _ _).
@@ -2984,53 +3146,53 @@ Canonical meet_addoid := Monoid.AddLaw (@joinIl _ L) (@joinIr _ _).
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@join_sup _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join_sup _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@join_min _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join_min _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. exact: (@joinsP _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@joinsP _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meet_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. exact: (@join_sup_seq _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join_sup_seq _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meet_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. exact: (@join_min_seq _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join_min_seq _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \meet_(x <- r | P x) F x).
-Proof. exact: (@joinsP_seq _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@joinsP_seq _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma le_meets I (A B : {set I}) (F : I -> L) :
    A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
-Proof. exact: (@le_joins _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@le_joins _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meets_setU I (A B : {set I}) (F : I -> L) :
    \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
-Proof. exact: (@joins_setU _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@joins_setU _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meet_seq I (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof. exact: (@join_seq _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@join_seq _ [tbDistrLatticeType of L^c]). Qed.
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
-Proof. exact: (@joins_disjoint _ [tblatticeType of L^c]). Qed.
+Proof. exact: (@joins_disjoint _ [tbDistrLatticeType of L^c]). Qed.
 
-End TBLatticeTheory.
-End TBLatticeTheory.
+End TBDistrLatticeTheory.
+End TBDistrLatticeTheory.
 
-Module Import CBLatticeTheory.
-Section CBLatticeTheory.
+Module Import CBDistrLatticeTheory.
+Section CBDistrLatticeTheory.
 Context {disp : unit}.
-Local Notation cblatticeType := (cblatticeType disp).
-Context {L : cblatticeType}.
+Local Notation cbDistrLatticeType := (cbDistrLatticeType disp).
+Context {L : cbDistrLatticeType}.
 Implicit Types (x y z : L).
 Local Notation "0" := bottom.
 
@@ -3202,14 +3364,14 @@ Proof.
 by move=> ?; rewrite lt_leAnge leBRL leBLR le0x meet0x eqxx joinx0 /= lt_geF.
 Qed.
 
-End CBLatticeTheory.
-End CBLatticeTheory.
+End CBDistrLatticeTheory.
+End CBDistrLatticeTheory.
 
-Module Import CTBLatticeTheory.
-Section CTBLatticeTheory.
+Module Import CTBDistrLatticeTheory.
+Section CTBDistrLatticeTheory.
 Context {disp : unit}.
-Local Notation ctblatticeType := (ctblatticeType disp).
-Context {L : ctblatticeType}.
+Local Notation ctbDistrLatticeType := (ctbDistrLatticeType disp).
+Context {L : ctbDistrLatticeType}.
 Implicit Types (x y z : L).
 Local Notation "0" := bottom.
 Local Notation "1" := top.
@@ -3283,8 +3445,8 @@ Lemma compl_meets (J : Type) (r : seq J) (P : {pred J}) (F : J -> L) :
    ~` (\meet_(j <- r | P j) F j) = \join_(j <- r | P j) ~` F j.
 Proof. by elim/big_rec2: _=> [|i x y ? <-]; rewrite ?compl1 ?complI. Qed.
 
-End CTBLatticeTheory.
-End CTBLatticeTheory.
+End CTBDistrLatticeTheory.
+End CTBDistrLatticeTheory.
 
 (*************)
 (* FACTORIES *)
@@ -3353,18 +3515,19 @@ case: (leP y z) => yz; case: (leP y x) => xy //=; first 1 last.
 - by have [] := (leP x z); rewrite ?xy ?yz.
 Qed.
 
-Definition latticeMixin :=
-  @LatticeMixin _ (@POrder.Pack disp T (POrder.class T)) _ _
-                meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
+Definition distrLatticeMixin :=
+  @DistrLatticeMixin _ (@POrder.Pack disp T (POrder.class T)) _ _
+                     meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
 
-Definition orderMixin : totalOrderMixin (LatticeType _ latticeMixin) :=
+Definition orderMixin :
+  totalOrderMixin (DistrLatticeType _ distrLatticeMixin) :=
   m.
 
 End TotalPOrderMixin.
 
 Module Exports.
 Notation totalPOrderMixin := of_.
-Coercion latticeMixin : totalPOrderMixin >-> Order.Lattice.mixin_of.
+Coercion distrLatticeMixin : totalPOrderMixin >-> Order.DistrLattice.mixin_of.
 Coercion orderMixin : totalPOrderMixin >-> totalOrderMixin.
 End Exports.
 
@@ -3462,10 +3625,10 @@ Definition porderMixin : lePOrderMixin T :=
 
 Let T_porderType := POrderType tt T porderMixin.
 
-Definition latticeMixin : latticeMixin T_porderType :=
-  @LatticeMixin tt (POrderType tt T porderMixin) (meet m) (join m)
-                (meetC m) (joinC m) (meetA m) (joinA m)
-                (joinKI m) (meetKU m) (le_def m) (meetUl m).
+Definition distrLatticeMixin : distrLatticeMixin T_porderType :=
+  @DistrLatticeMixin tt (POrderType tt T porderMixin) (meet m) (join m)
+                     (meetC m) (joinC m) (meetA m) (joinA m)
+                     (joinKI m) (meetKU m) (le_def m) (meetUl m).
 
 End MeetJoinMixin.
 
@@ -3473,7 +3636,7 @@ Module Exports.
 Notation meetJoinMixin := of_.
 Notation MeetJoinMixin := Build.
 Coercion porderMixin : meetJoinMixin >-> lePOrderMixin.
-Coercion latticeMixin : meetJoinMixin >-> Lattice.mixin_of.
+Coercion distrLatticeMixin : meetJoinMixin >-> DistrLattice.mixin_of.
 End Exports.
 
 End MeetJoinMixin.
@@ -3507,11 +3670,11 @@ Definition lePOrderMixin :=
 
 Let T_total_porderType : porderType tt := POrderType tt T lePOrderMixin.
 
-Let T_total_latticeType : latticeType tt :=
-  LatticeType T_total_porderType
-    (le_total m : totalPOrderMixin T_total_porderType).
+Let T_total_distrLatticeType : distrLatticeType tt :=
+  DistrLatticeType T_total_porderType
+                   (le_total m : totalPOrderMixin T_total_porderType).
 
-Implicit Types (x y z : T_total_latticeType).
+Implicit Types (x y z : T_total_distrLatticeType).
 
 Fact meetE x y : meet m x y = x `&` y. Proof. by rewrite meet_def. Qed.
 Fact joinE x y : join m x y = x `|` y. Proof. by rewrite join_def. Qed.
@@ -3534,21 +3697,22 @@ Proof. by move=> *; rewrite meetE meetxx. Qed.
 Fact le_def x y : x <= y = (meet m x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
-Definition latticeMixin : meetJoinMixin T :=
+Definition distrLatticeMixin : meetJoinMixin T :=
   @MeetJoinMixin _ (le m) (lt m) (meet m) (join m) le_def (lt_def m)
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
 
-Let T_porderType := POrderType tt T latticeMixin.
-Let T_latticeType : latticeType tt := LatticeType T_porderType latticeMixin.
+Let T_porderType := POrderType tt T distrLatticeMixin.
+Let T_distrLatticeType : distrLatticeType tt :=
+  DistrLatticeType T_porderType distrLatticeMixin.
 
-Definition totalMixin : totalOrderMixin T_latticeType := le_total m.
+Definition totalMixin : totalOrderMixin T_distrLatticeType := le_total m.
 
 End LeOrderMixin.
 
 Module Exports.
 Notation leOrderMixin := of_.
 Notation LeOrderMixin := Build.
-Coercion latticeMixin : leOrderMixin >-> meetJoinMixin.
+Coercion distrLatticeMixin : leOrderMixin >-> meetJoinMixin.
 Coercion totalMixin : leOrderMixin >-> totalOrderMixin.
 End Exports.
 
@@ -3583,11 +3747,11 @@ move=> x y; rewrite !le_def (eq_sym y).
 by case: (altP eqP); last exact: lt_total.
 Qed.
 
-Let T_total_latticeType : latticeType tt :=
-  LatticeType T_total_porderType
+Let T_total_distrLatticeType : distrLatticeType tt :=
+  DistrLatticeType T_total_porderType
    (le_total : totalPOrderMixin T_total_porderType).
 
-Implicit Types (x y z : T_total_latticeType).
+Implicit Types (x y z : T_total_distrLatticeType).
 
 Fact leP x y :
   lel_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
@@ -3615,22 +3779,23 @@ Proof. by move=> *; rewrite meetE meetxx. Qed.
 Fact le_def' x y : x <= y = (meet m x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
-Definition latticeMixin : meetJoinMixin T :=
+Definition distrLatticeMixin : meetJoinMixin T :=
   @MeetJoinMixin _ (le m) (lt m) (meet m) (join m)
-    le_def' (@lt_def _ T_total_latticeType)
+    le_def' (@lt_def _ T_total_distrLatticeType)
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
 
-Let T_porderType := POrderType tt T latticeMixin.
-Let T_latticeType : latticeType tt := LatticeType T_porderType latticeMixin.
+Let T_porderType := POrderType tt T distrLatticeMixin.
+Let T_distrLatticeType : distrLatticeType tt :=
+  DistrLatticeType T_porderType distrLatticeMixin.
 
-Definition totalMixin : totalOrderMixin T_latticeType := le_total.
+Definition totalMixin : totalOrderMixin T_distrLatticeType := le_total.
 
 End LtOrderMixin.
 
 Module Exports.
 Notation ltOrderMixin := of_.
 Notation LtOrderMixin := Build.
-Coercion latticeMixin : ltOrderMixin >-> meetJoinMixin.
+Coercion distrLatticeMixin : ltOrderMixin >-> meetJoinMixin.
 Coercion totalMixin : ltOrderMixin >-> totalOrderMixin.
 End Exports.
 
@@ -3703,10 +3868,10 @@ Definition CanOrder f' (f_can : cancel f f') := PcanOrder (can_pcan f_can).
 End Total.
 End Order.
 
-Section Lattice.
+Section DistrLattice.
 
 Variables (disp : unit) (T : porderType disp).
-Variables (disp' : unit) (T' : latticeType disp) (f : T -> T').
+Variables (disp' : unit) (T' : distrLatticeType disp) (f : T -> T').
 
 Variables (f' : T' -> T) (f_can : cancel f f') (f'_can : cancel f' f).
 Variable (f_mono : {mono f : x y / x <= y}).
@@ -3729,9 +3894,10 @@ Proof. by rewrite /meet -(can_eq f_can) f'_can eq_meetl f_mono. Qed.
 Lemma meetUl : left_distributive meet join.
 Proof. by move=> x y z; rewrite /meet /join !f'_can meetUl. Qed.
 
-Definition IsoLattice := LatticeMixin meetC joinC meetA joinA joinKI meetKI meet_eql meetUl.
+Definition IsoDistrLattice :=
+  DistrLatticeMixin meetC joinC meetA joinA joinKI meetKI meet_eql meetUl.
 
-End Lattice.
+End DistrLattice.
 
 End CanMixin.
 
@@ -3741,7 +3907,7 @@ Notation PcanPOrderMixin := PcanPOrder.
 Notation CanPOrderMixin := CanPOrder.
 Notation PcanOrderMixin := PcanOrder.
 Notation CanOrderMixin := CanOrder.
-Notation IsoLatticeMixin := IsoLattice.
+Notation IsoDistrLatticeMixin := IsoDistrLattice.
 End Exports.
 End CanMixin.
 Import CanMixin.Exports.
@@ -3765,7 +3931,8 @@ Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
 Definition sub_TotalOrderMixin : totalPOrderMixin (sub_POrderType sT) :=
    @MonoTotalMixin _ _ _ val (fun _ _ => erefl) (@le_total _ T).
-Canonical sub_LatticeType := Eval hnf in LatticeType sT sub_TotalOrderMixin.
+Canonical sub_DistrLatticeType :=
+  Eval hnf in DistrLatticeType sT sub_TotalOrderMixin.
 Canonical sub_OrderType := Eval hnf in OrderType sT sub_TotalOrderMixin.
 
 End Total.
@@ -3782,7 +3949,7 @@ Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
    only parsing) : form_scope.
 
 Canonical sub_POrderType.
-Canonical sub_LatticeType.
+Canonical sub_DistrLatticeType.
 Canonical sub_OrderType.
 
 Definition leEsub := @leEsub.
@@ -3794,6 +3961,30 @@ Import SubOrder.Exports.
 (*************)
 (* INSTANCES *)
 (*************)
+
+(*******************************)
+(* Canonical structures on nat *)
+(*******************************)
+
+(******************************************************************************)
+(* This is an example of creation of multiple canonical declarations on the   *)
+(* same type, with distinct displays, on the example of natural numbers.      *)
+(* We declare two distinct canonical orders:                                  *)
+(* - leq which is total, and where meet and join are minn and maxn, on nat    *)
+(* - dvdn which is partial, and where meet and join are gcdn and lcmn,        *)
+(*   on a copy of nat we name natdiv                                          *)
+(******************************************************************************)
+
+(******************************************************************************)
+(* The Module NatOrder defines leq as the canonical order on the type nat,    *)
+(* i.e. without creating a copy. We use the predefined total_display, which   *)
+(* is designed to parse and print meet and join as minn and maxn. This looks  *)
+(* like standard canonical structure declaration, except we use a display.    *)
+(* We also use a single factory LeOrderMixin to instanciate three different   *)
+(* canonical declarations porderType, distrLatticeType, orderType             *)
+(* We finish by providing theorems to convert the operations of ordered and   *)
+(* lattice types to their definition without structure abstraction.           *)
+(******************************************************************************)
 
 Module NatOrder.
 Section NatOrder.
@@ -3811,23 +4002,203 @@ Definition orderMixin :=
   LeOrderMixin ltn_def minnE maxnE anti_leq leq_trans leq_total.
 
 Canonical porderType := POrderType total_display nat orderMixin.
-Canonical latticeType := LatticeType nat orderMixin.
+Canonical distrLatticeType := DistrLatticeType nat orderMixin.
 Canonical orderType := OrderType nat orderMixin.
-Canonical blatticeType := BLatticeType nat (BLatticeMixin leq0n).
+Canonical bDistrLatticeType := BDistrLatticeType nat (BDistrLatticeMixin leq0n).
 
-Lemma leEnat: le = leq. Proof. by []. Qed.
-Lemma ltEnat (n m : nat): (n < m) = (n < m)%N. Proof. by []. Qed.
+Lemma leEnat : le = leq. Proof. by []. Qed.
+Lemma ltEnat (n m : nat) : (n < m) = (n < m)%N. Proof. by []. Qed.
+Lemma meetEnat : meet = minn. Proof. by []. Qed.
+Lemma joinEnat : join = maxn. Proof. by []. Qed.
+Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
 Module Exports.
 Canonical porderType.
-Canonical latticeType.
+Canonical distrLatticeType.
 Canonical orderType.
-Canonical blatticeType.
+Canonical bDistrLatticeType.
 Definition leEnat := leEnat.
 Definition ltEnat := ltEnat.
+Definition meetEnat := meetEnat.
+Definition joinEnat := joinEnat.
+Definition botEnat := botEnat.
 End Exports.
 End NatOrder.
+
+(****************************************************************************)
+(* The Module DvdSyntax introduces a new set of notations using the newly   *)
+(* created display dvd_display. We first define the display as an opaque    *)
+(* definition of type unit, and we use it as the first argument of the      *)
+(* operator which display we want to change from the default one (here le,  *)
+(* lt, dvd sdvd, meet, join, top and bottom, as well as big op notations on *)
+(* gcd and lcm). This notations will now be used for any ordered type which *)
+(* first parameter is set to dvd_display.                                   *)
+(****************************************************************************)
+
+Lemma dvd_display : unit. Proof. exact: tt. Qed.
+
+Module DvdSyntax.
+
+Notation dvd := (@le dvd_display _).
+Notation "@ 'dvd' T" :=
+  (@le dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+Notation sdvd := (@lt dvd_display _).
+Notation "@ 'sdvd' T" :=
+  (@lt dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+
+Notation "x %| y" := (dvd x y) : order_scope.
+Notation "x %<| y" := (sdvd x y) : order_scope.
+
+Notation gcd := (@meet dvd_display _).
+Notation "@ 'gcd' T" :=
+  (@meet dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+Notation lcm := (@join dvd_display _).
+Notation "@ 'lcm' T" :=
+  (@join dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+
+Notation nat0 := (@top dvd_display _).
+Notation nat1 := (@bottom dvd_display _).
+
+Notation "\gcd_ ( i <- r | P ) F" :=
+  (\big[gcd/nat0]_(i <- r | P%B) F%O) : order_scope.
+Notation "\gcd_ ( i <- r ) F" :=
+  (\big[gcd/nat0]_(i <- r) F%O) : order_scope.
+Notation "\gcd_ ( i | P ) F" :=
+  (\big[gcd/nat0]_(i | P%B) F%O) : order_scope.
+Notation "\gcd_ i F" :=
+  (\big[gcd/nat0]_i F%O) : order_scope.
+Notation "\gcd_ ( i : I | P ) F" :=
+  (\big[gcd/nat0]_(i : I | P%B) F%O) (only parsing) :
+  order_scope.
+Notation "\gcd_ ( i : I ) F" :=
+  (\big[gcd/nat0]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\gcd_ ( m <= i < n | P ) F" :=
+  (\big[gcd/nat0]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\gcd_ ( m <= i < n ) F" :=
+  (\big[gcd/nat0]_(m <= i < n) F%O) : order_scope.
+Notation "\gcd_ ( i < n | P ) F" :=
+  (\big[gcd/nat0]_(i < n | P%B) F%O) : order_scope.
+Notation "\gcd_ ( i < n ) F" :=
+  (\big[gcd/nat0]_(i < n) F%O) : order_scope.
+Notation "\gcd_ ( i 'in' A | P ) F" :=
+  (\big[gcd/nat0]_(i in A | P%B) F%O) : order_scope.
+Notation "\gcd_ ( i 'in' A ) F" :=
+  (\big[gcd/nat0]_(i in A) F%O) : order_scope.
+
+Notation "\lcm_ ( i <- r | P ) F" :=
+  (\big[lcm/nat1]_(i <- r | P%B) F%O) : order_scope.
+Notation "\lcm_ ( i <- r ) F" :=
+  (\big[lcm/nat1]_(i <- r) F%O) : order_scope.
+Notation "\lcm_ ( i | P ) F" :=
+  (\big[lcm/nat1]_(i | P%B) F%O) : order_scope.
+Notation "\lcm_ i F" :=
+  (\big[lcm/nat1]_i F%O) : order_scope.
+Notation "\lcm_ ( i : I | P ) F" :=
+  (\big[lcm/nat1]_(i : I | P%B) F%O) (only parsing) :
+  order_scope.
+Notation "\lcm_ ( i : I ) F" :=
+  (\big[lcm/nat1]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\lcm_ ( m <= i < n | P ) F" :=
+  (\big[lcm/nat1]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\lcm_ ( m <= i < n ) F" :=
+  (\big[lcm/nat1]_(m <= i < n) F%O) : order_scope.
+Notation "\lcm_ ( i < n | P ) F" :=
+  (\big[lcm/nat1]_(i < n | P%B) F%O) : order_scope.
+Notation "\lcm_ ( i < n ) F" :=
+  (\big[lcm/nat1]_(i < n) F%O) : order_scope.
+Notation "\lcm_ ( i 'in' A | P ) F" :=
+  (\big[lcm/nat1]_(i in A | P%B) F%O) : order_scope.
+Notation "\lcm_ ( i 'in' A ) F" :=
+  (\big[lcm/nat1]_(i in A) F%O) : order_scope.
+
+End DvdSyntax.
+
+(******************************************************************************)
+(* The Module NatDvd defines dvdn as the canonical order on NatDvd.t, which   *)
+(* is abbreviated using the notation natdvd at the end of the module.         *)
+(* We use the newly defined dvd_display, described above. This looks          *)
+(* like standard canonical structure declaration, except we use a display and *)
+(* we declare it on a copy of the type.                                       *)
+(* We first recover structures that are common to both nat and natdiv         *)
+(* (eqType, choiceType, countType) through the clone mechanisms, then we use  *)
+(* a single factory MeetJoinMixin to instanciate both porderType and          *)
+(* distrLatticeType canonical structures,and end with top and bottom.         *)
+(* We finish by providing theorems to convert the operations of ordered and   *)
+(* lattice types to their definition without structure abstraction.           *)
+(******************************************************************************)
+
+Module NatDvd.
+Section NatDvd.
+
+Implicit Types m n p : nat.
+
+Lemma lcmnn n : lcmn n n = n.
+Proof. by case: n => // n; rewrite /lcmn gcdnn mulnK. Qed.
+
+Lemma le_def m n : m %| n = (gcdn m n == m)%N.
+Proof. by apply/gcdn_idPl/eqP. Qed.
+
+Lemma joinKI n m : gcdn m (lcmn m n) = m.
+Proof. by rewrite (gcdn_idPl _)// dvdn_lcml. Qed.
+
+Lemma meetKU n m : lcmn m (gcdn m n) = m.
+Proof. by rewrite (lcmn_idPl _)// dvdn_gcdl. Qed.
+
+Lemma meetUl : left_distributive gcdn lcmn.
+Proof.
+move=> [|m'] [|n'] [|p'] //=; rewrite ?lcmnn ?lcm0n ?lcmn0 ?gcd0n ?gcdn0//.
+- by rewrite gcdnC meetKU.
+- by rewrite lcmnC gcdnC meetKU.
+apply: eqn_from_log; rewrite ?(gcdn_gt0, lcmn_gt0)//= => p.
+by rewrite !(logn_gcd, logn_lcm) ?(gcdn_gt0, lcmn_gt0)// minn_maxl.
+Qed.
+
+Definition t_distrLatticeMixin := MeetJoinMixin le_def (fun _ _ => erefl _)
+  gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
+
+Definition t := nat.
+
+Canonical eqType := [eqType of t].
+Canonical choiceType := [choiceType of t].
+Canonical countType := [countType of t].
+Canonical porderType := POrderType dvd_display t t_distrLatticeMixin.
+Canonical distrLatticeType := DistrLatticeType t t_distrLatticeMixin.
+Canonical bDistrLatticeType := BDistrLatticeType t
+  (BDistrLatticeMixin (dvd1n : forall m : t, 1 %| m)).
+Canonical tbDistrLatticeType := TBDistrLatticeType t
+  (TBDistrLatticeMixin (dvdn0 : forall m : t, m %| 0)).
+
+Import DvdSyntax.
+Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
+Lemma sdvdE (m n : t) : m %<| n = (n != m) && (m %| n). Proof. by []. Qed.
+Lemma gcdE : gcd = gcdn :> (t -> t -> t). Proof. by []. Qed.
+Lemma lcmE : lcm = lcmn :> (t -> t -> t). Proof. by []. Qed.
+Lemma nat1E : nat1 = 1%N :> t. Proof. by []. Qed.
+Lemma nat0E : nat0 = 0%N :> t. Proof. by []. Qed.
+
+End NatDvd.
+Module Exports.
+Notation natdvd := t.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical porderType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Definition dvdEnat := dvdE.
+Definition sdvdEnat := sdvdE.
+Definition gcdEnat := gcdE.
+Definition lcmEnat := lcmE.
+Definition nat1E := nat1E.
+Definition nat0E := nat0E.
+End Exports.
+End NatDvd.
+
+(*******************************)
+(* Canonical structure on bool *)
+(*******************************)
 
 Module BoolOrder.
 Section BoolOrder.
@@ -3857,76 +4228,89 @@ Definition orderMixin :=
   LeOrderMixin ltn_def andbE orbE anti leq_trans leq_total.
 
 Canonical porderType := POrderType total_display bool orderMixin.
-Canonical latticeType := LatticeType bool orderMixin.
+Canonical distrLatticeType := DistrLatticeType bool orderMixin.
 Canonical orderType := OrderType bool orderMixin.
-Canonical blatticeType := BLatticeType bool
-  (@BLatticeMixin _ _ false (fun b : bool => leq0n b)).
-Canonical tblatticeType := TBLatticeType bool (@TBLatticeMixin _ _ true leq_b1).
-Canonical cblatticeType := CBLatticeType bool
-   (@CBLatticeMixin _ _ (fun x y => x && ~~ y) subKI joinIB).
-Canonical ctblatticeType := CTBLatticeType bool
-   (@CTBLatticeMixin _ _ sub negb (fun x => erefl : ~~ x = sub true x)).
+Canonical bDistrLatticeType := BDistrLatticeType bool
+  (@BDistrLatticeMixin _ _ false (fun b : bool => leq0n b)).
+Canonical tbDistrLatticeType :=
+  TBDistrLatticeType bool (@TBDistrLatticeMixin _ _ true leq_b1).
+Canonical cbDistrLatticeType := CBDistrLatticeType bool
+   (@CBDistrLatticeMixin _ _ (fun x y => x && ~~ y) subKI joinIB).
+Canonical ctbDistrLatticeType := CTBDistrLatticeType bool
+   (@CTBDistrLatticeMixin _ _ sub negb (fun x => erefl : ~~ x = sub true x)).
 
 Canonical finPOrderType := [finPOrderType of bool].
-Canonical finLatticeType :=  [finLatticeType of bool].
-Canonical finClatticeType := [finCLatticeType of bool].
+Canonical finDistrLatticeType :=  [finDistrLatticeType of bool].
+Canonical finCDistrLatticeType := [finCDistrLatticeType of bool].
 Canonical finOrderType := [finOrderType of bool].
 
-Lemma leEbool: le = (leq : rel bool). Proof. by []. Qed.
+Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
 Lemma ltEbool x y : (x < y) = (x < y)%N. Proof. by []. Qed.
+Lemma andEbool : meet = andb. Proof. by []. Qed.
+Lemma orEbool : meet = andb. Proof. by []. Qed.
+Lemma subEbool x y : x `\` y = x && ~~ y. Proof. by []. Qed.
+Lemma complEbool : compl = negb. Proof. by []. Qed.
 
 End BoolOrder.
 Module Exports.
 Canonical porderType.
-Canonical latticeType.
+Canonical distrLatticeType.
 Canonical orderType.
-Canonical blatticeType.
-Canonical cblatticeType.
-Canonical tblatticeType.
-Canonical ctblatticeType.
+Canonical bDistrLatticeType.
+Canonical cbDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical ctbDistrLatticeType.
 Canonical finPOrderType.
-Canonical finLatticeType.
+Canonical finDistrLatticeType.
 Canonical finOrderType.
-Canonical finClatticeType.
+Canonical finCDistrLatticeType.
 Definition leEbool := leEbool.
 Definition ltEbool := ltEbool.
+Definition andEbool := andEbool.
+Definition orEbool := orEbool.
+Definition subEbool := subEbool.
+Definition complEbool := complEbool.
 End Exports.
 End BoolOrder.
+
+(*******************************)
+(* Definition of prod_display. *)
+(*******************************)
 
 Fact prod_display : unit. Proof. by []. Qed.
 
 Module Import ProdSyntax.
 
-Notation "<=^p%O" := (@le prod_display _) : order_scope.
-Notation ">=^p%O" := (@ge prod_display _)  : order_scope.
-Notation ">=^p%O" := (@ge prod_display _)  : order_scope.
-Notation "<^p%O" := (@lt prod_display _) : order_scope.
-Notation ">^p%O" := (@gt prod_display _) : order_scope.
-Notation "<?=^p%O" := (@leif prod_display _) : order_scope.
-Notation ">=<^p%O" := (@comparable prod_display _) : order_scope.
+Notation "<=^p%O" := (@le prod_display _) : fun_scope.
+Notation ">=^p%O" := (@ge prod_display _)  : fun_scope.
+Notation ">=^p%O" := (@ge prod_display _)  : fun_scope.
+Notation "<^p%O" := (@lt prod_display _) : fun_scope.
+Notation ">^p%O" := (@gt prod_display _) : fun_scope.
+Notation "<?=^p%O" := (@leif prod_display _) : fun_scope.
+Notation ">=<^p%O" := (@comparable prod_display _) : fun_scope.
 Notation "><^p%O" := (fun x y => ~~ (@comparable prod_display _ x y)) :
-  order_scope.
+  fun_scope.
 
 Notation "<=^p y" := (>=^p%O y) : order_scope.
-Notation "<=^p y :> T" := (<=^p (y : T)) : order_scope.
+Notation "<=^p y :> T" := (<=^p (y : T)) (only parsing) : order_scope.
 Notation ">=^p y"  := (<=^p%O y) : order_scope.
-Notation ">=^p y :> T" := (>=^p (y : T)) : order_scope.
+Notation ">=^p y :> T" := (>=^p (y : T)) (only parsing) : order_scope.
 
 Notation "<^p y" := (>^p%O y) : order_scope.
-Notation "<^p y :> T" := (<^p (y : T)) : order_scope.
+Notation "<^p y :> T" := (<^p (y : T)) (only parsing) : order_scope.
 Notation ">^p y" := (<^p%O y) : order_scope.
-Notation ">^p y :> T" := (>^p (y : T)) : order_scope.
+Notation ">^p y :> T" := (>^p (y : T)) (only parsing) : order_scope.
 
 Notation ">=<^p y" := (>=<^p%O y) : order_scope.
-Notation ">=<^p y :> T" := (>=<^p (y : T)) : order_scope.
+Notation ">=<^p y :> T" := (>=<^p (y : T)) (only parsing) : order_scope.
 
 Notation "x <=^p y" := (<=^p%O x y) : order_scope.
-Notation "x <=^p y :> T" := ((x : T) <=^p (y : T)) : order_scope.
+Notation "x <=^p y :> T" := ((x : T) <=^p (y : T)) (only parsing) : order_scope.
 Notation "x >=^p y" := (y <=^p x) (only parsing) : order_scope.
 Notation "x >=^p y :> T" := ((x : T) >=^p (y : T)) (only parsing) : order_scope.
 
 Notation "x <^p y"  := (<^p%O x y) : order_scope.
-Notation "x <^p y :> T" := ((x : T) <^p (y : T)) : order_scope.
+Notation "x <^p y :> T" := ((x : T) <^p (y : T)) (only parsing) : order_scope.
 Notation "x >^p y"  := (y <^p x) (only parsing) : order_scope.
 Notation "x >^p y :> T" := ((x : T) >^p (y : T)) (only parsing) : order_scope.
 
@@ -4002,40 +4386,44 @@ Notation "\meet^p_ ( i 'in' A ) F" :=
 
 End ProdSyntax.
 
+(*******************************)
+(* Definition of lexi_display. *)
+(*******************************)
+
 Fact lexi_display : unit. Proof. by []. Qed.
 
 Module Import LexiSyntax.
 
-Notation "<=^l%O" := (@le lexi_display _) : order_scope.
-Notation ">=^l%O" := (@ge lexi_display _) : order_scope.
-Notation ">=^l%O" := (@ge lexi_display _) : order_scope.
-Notation "<^l%O" := (@lt lexi_display _) : order_scope.
-Notation ">^l%O" := (@gt lexi_display _) : order_scope.
-Notation "<?=^l%O" := (@leif lexi_display _) : order_scope.
-Notation ">=<^l%O" := (@comparable lexi_display _) : order_scope.
+Notation "<=^l%O" := (@le lexi_display _) : fun_scope.
+Notation ">=^l%O" := (@ge lexi_display _) : fun_scope.
+Notation ">=^l%O" := (@ge lexi_display _) : fun_scope.
+Notation "<^l%O" := (@lt lexi_display _) : fun_scope.
+Notation ">^l%O" := (@gt lexi_display _) : fun_scope.
+Notation "<?=^l%O" := (@leif lexi_display _) : fun_scope.
+Notation ">=<^l%O" := (@comparable lexi_display _) : fun_scope.
 Notation "><^l%O" := (fun x y => ~~ (@comparable lexi_display _ x y)) :
-  order_scope.
+  fun_scope.
 
 Notation "<=^l y" := (>=^l%O y) : order_scope.
-Notation "<=^l y :> T" := (<=^l (y : T)) : order_scope.
+Notation "<=^l y :> T" := (<=^l (y : T)) (only parsing) : order_scope.
 Notation ">=^l y"  := (<=^l%O y) : order_scope.
-Notation ">=^l y :> T" := (>=^l (y : T)) : order_scope.
+Notation ">=^l y :> T" := (>=^l (y : T)) (only parsing) : order_scope.
 
 Notation "<^l y" := (>^l%O y) : order_scope.
-Notation "<^l y :> T" := (<^l (y : T)) : order_scope.
+Notation "<^l y :> T" := (<^l (y : T)) (only parsing) : order_scope.
 Notation ">^l y" := (<^l%O y) : order_scope.
-Notation ">^l y :> T" := (>^l (y : T)) : order_scope.
+Notation ">^l y :> T" := (>^l (y : T)) (only parsing) : order_scope.
 
 Notation ">=<^l y" := (>=<^l%O y) : order_scope.
-Notation ">=<^l y :> T" := (>=<^l (y : T)) : order_scope.
+Notation ">=<^l y :> T" := (>=<^l (y : T)) (only parsing) : order_scope.
 
 Notation "x <=^l y" := (<=^l%O x y) : order_scope.
-Notation "x <=^l y :> T" := ((x : T) <=^l (y : T)) : order_scope.
+Notation "x <=^l y :> T" := ((x : T) <=^l (y : T)) (only parsing) : order_scope.
 Notation "x >=^l y" := (y <=^l x) (only parsing) : order_scope.
 Notation "x >=^l y :> T" := ((x : T) >=^l (y : T)) (only parsing) : order_scope.
 
 Notation "x <^l y"  := (<^l%O x y) : order_scope.
-Notation "x <^l y :> T" := ((x : T) <^l (y : T)) : order_scope.
+Notation "x <^l y :> T" := ((x : T) <^l (y : T)) (only parsing) : order_scope.
 Notation "x >^l y"  := (y <^l x) (only parsing) : order_scope.
 Notation "x >^l y :> T" := ((x : T) >^l (y : T)) (only parsing) : order_scope.
 
@@ -4114,6 +4502,11 @@ Notation "\min^l_ ( i 'in' A ) F" :=
 
 End LexiSyntax.
 
+(***********************************************)
+(* We declare a copy of the cartesian product, *)
+(* which has canonical product order.          *)
+(***********************************************)
+
 Module ProdOrder.
 Section ProdOrder.
 
@@ -4168,8 +4561,8 @@ Proof. by rewrite ltEprod negb_and. Qed.
 
 End POrder.
 
-Section Lattice.
-Variable (T : latticeType disp1) (T' : latticeType disp2).
+Section DistrLattice.
+Variable (T : distrLatticeType disp1) (T' : distrLatticeType disp2).
 Implicit Types (x y : T * T').
 
 Definition meet x y := (x.1 `&` y.1, x.2 `&` y.2).
@@ -4199,9 +4592,9 @@ Proof. by rewrite eqE /= -!leEmeet. Qed.
 Fact meetUl : left_distributive meet join.
 Proof. by move=> ? ? ?; congr pair; rewrite meetUl. Qed.
 
-Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
-Canonical latticeType := LatticeType (T * T') latticeMixin.
+Definition distrLatticeMixin :=
+  DistrLattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
+Canonical distrLatticeType := DistrLatticeType (T * T') distrLatticeMixin.
 
 Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2).
 Proof. by []. Qed.
@@ -4209,34 +4602,36 @@ Proof. by []. Qed.
 Lemma joinEprod x y : x `|` y = (x.1 `|` y.1, x.2 `|` y.2).
 Proof. by []. Qed.
 
-End Lattice.
+End DistrLattice.
 
-Section BLattice.
-Variable (T : blatticeType disp1) (T' : blatticeType disp2).
+Section BDistrLattice.
+Variable (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2).
 
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by rewrite /<=%O /= /le !le0x. Qed.
 
-Canonical blatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
+Canonical bDistrLatticeType :=
+  BDistrLatticeType (T * T') (BDistrLattice.Mixin le0x).
 
 Lemma botEprod : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
-End BLattice.
+End BDistrLattice.
 
-Section TBLattice.
-Variable (T : tblatticeType disp1) (T' : tblatticeType disp2).
+Section TBDistrLattice.
+Variable (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2).
 
 Fact lex1 (x : T * T') : x <= (top, top).
 Proof. by rewrite /<=%O /= /le !lex1. Qed.
 
-Canonical tblatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
+Canonical tbDistrLatticeType :=
+  TBDistrLatticeType (T * T') (TBDistrLattice.Mixin lex1).
 
 Lemma topEprod : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
 
-End TBLattice.
+End TBDistrLattice.
 
-Section CBLattice.
-Variable (T : cblatticeType disp1) (T' : cblatticeType disp2).
+Section CBDistrLattice.
+Variable (T : cbDistrLatticeType disp1) (T' : cbDistrLatticeType disp2).
 Implicit Types (x y : T * T').
 
 Definition sub x y := (x.1 `\` y.1, x.2 `\` y.2).
@@ -4247,16 +4642,16 @@ Proof. by congr pair; rewrite subKI. Qed.
 Lemma joinIB x y : x `&` y `|` sub x y = x.
 Proof. by case: x => ? ?; congr pair; rewrite joinIB. Qed.
 
-Definition cblatticeMixin := CBLattice.Mixin subKI joinIB.
-Canonical cblatticeType := CBLatticeType (T * T') cblatticeMixin.
+Definition cbDistrLatticeMixin := CBDistrLattice.Mixin subKI joinIB.
+Canonical cbDistrLatticeType := CBDistrLatticeType (T * T') cbDistrLatticeMixin.
 
 Lemma subEprod x y : x `\` y = (x.1 `\` y.1, x.2 `\` y.2).
 Proof. by []. Qed.
 
-End CBLattice.
+End CBDistrLattice.
 
-Section CTBLattice.
-Variable (T : ctblatticeType disp1) (T' : ctblatticeType disp2).
+Section CTBDistrLattice.
+Variable (T : ctbDistrLatticeType disp1) (T' : ctbDistrLatticeType disp2).
 Implicit Types (x y : T * T').
 
 Definition compl x : T * T' := (~` x.1, ~` x.2).
@@ -4264,44 +4659,45 @@ Definition compl x : T * T' := (~` x.1, ~` x.2).
 Lemma complE x : compl x = sub 1 x.
 Proof. by congr pair; rewrite complE. Qed.
 
-Definition ctblatticeMixin := CTBLattice.Mixin complE.
-Canonical ctblatticeType := CTBLatticeType (T * T') ctblatticeMixin.
+Definition ctbDistrLatticeMixin := CTBDistrLattice.Mixin complE.
+Canonical ctbDistrLatticeType :=
+  CTBDistrLatticeType (T * T') ctbDistrLatticeMixin.
 
 Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 
-End CTBLattice.
+End CTBDistrLattice.
 
 Canonical finPOrderType (T : finPOrderType disp1)
   (T' : finPOrderType disp2) := [finPOrderType of T * T'].
 
-Canonical finLatticeType (T : finLatticeType disp1)
-  (T' : finLatticeType disp2) := [finLatticeType of T * T'].
+Canonical finDistrLatticeType (T : finDistrLatticeType disp1)
+  (T' : finDistrLatticeType disp2) := [finDistrLatticeType of T * T'].
 
-Canonical finClatticeType (T : finCLatticeType disp1)
-  (T' : finCLatticeType disp2) := [finCLatticeType of T * T'].
+Canonical finCDistrLatticeType (T : finCDistrLatticeType disp1)
+  (T' : finCDistrLatticeType disp2) := [finCDistrLatticeType of T * T'].
 
 End ProdOrder.
 
 Module Exports.
 
-Notation "T *p[ d ] T'" := (type d T T')
-  (at level 70, d at next level, format "T  *p[ d ]  T'") : order_scope.
+Notation "T *prod[ d ] T'" := (type d T T')
+  (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
 Notation "T *p T'" := (type prod_display T T')
-  (at level 70, format "T  *p  T'") : order_scope.
+  (at level 70, format "T  *p  T'") : type_scope.
 
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
-Canonical tblatticeType.
-Canonical cblatticeType.
-Canonical ctblatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical cbDistrLatticeType.
+Canonical ctbDistrLatticeType.
 Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finClatticeType.
+Canonical finDistrLatticeType.
+Canonical finCDistrLatticeType.
 
 Definition leEprod := @leEprod.
 Definition ltEprod := @ltEprod.
@@ -4324,29 +4720,34 @@ Context {disp1 disp2 : unit}.
 
 Canonical prod_porderType (T : porderType disp1) (T' : porderType disp2) :=
   [porderType of T * T' for [porderType of T *p T']].
-Canonical prod_latticeType (T : latticeType disp1) (T' : latticeType disp2) :=
-  [latticeType of T * T' for [latticeType of T *p T']].
-Canonical prod_blatticeType
-    (T : blatticeType disp1) (T' : blatticeType disp2) :=
-  [blatticeType of T * T' for [blatticeType of T *p T']].
-Canonical prod_tblatticeType
-    (T : tblatticeType disp1) (T' : tblatticeType disp2) :=
-  [tblatticeType of T * T' for [tblatticeType of T *p T']].
-Canonical prod_cblatticeType
-    (T : cblatticeType disp1) (T' : cblatticeType disp2) :=
-  [cblatticeType of T * T' for [cblatticeType of T *p T']].
-Canonical prod_ctblatticeType
-    (T : ctblatticeType disp1) (T' : ctblatticeType disp2) :=
-  [ctblatticeType of T * T' for [ctblatticeType of T *p T']].
+Canonical prod_distrLatticeType
+    (T : distrLatticeType disp1) (T' : distrLatticeType disp2) :=
+  [distrLatticeType of T * T' for [distrLatticeType of T *p T']].
+Canonical prod_bDistrLatticeType
+    (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
+  [bDistrLatticeType of T * T' for [bDistrLatticeType of T *p T']].
+Canonical prod_tbDistrLatticeType
+    (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :=
+  [tbDistrLatticeType of T * T' for [tbDistrLatticeType of T *p T']].
+Canonical prod_cbDistrLatticeType
+    (T : cbDistrLatticeType disp1) (T' : cbDistrLatticeType disp2) :=
+  [cbDistrLatticeType of T * T' for [cbDistrLatticeType of T *p T']].
+Canonical prod_ctbDistrLatticeType
+    (T : ctbDistrLatticeType disp1) (T' : ctbDistrLatticeType disp2) :=
+  [ctbDistrLatticeType of T * T' for [ctbDistrLatticeType of T *p T']].
 Canonical prod_finPOrderType (T : finPOrderType disp1)
   (T' : finPOrderType disp2) := [finPOrderType of T * T'].
-Canonical prod_finLatticeType (T : finLatticeType disp1)
-  (T' : finLatticeType disp2) := [finLatticeType of T * T'].
-Canonical prod_finClatticeType (T : finCLatticeType disp1)
-  (T' : finCLatticeType disp2) := [finCLatticeType of T * T'].
+Canonical prod_finDistrLatticeType (T : finDistrLatticeType disp1)
+  (T' : finDistrLatticeType disp2) := [finDistrLatticeType of T * T'].
+Canonical prod_finCDistrLatticeType (T : finCDistrLatticeType disp1)
+  (T' : finCDistrLatticeType disp2) := [finCDistrLatticeType of T * T'].
 
 End DefaultProdOrder.
 End DefaultProdOrder.
+
+(********************************************************)
+(* We declare lexicographic ordering on dependent pairs *)
+(********************************************************)
 
 Module SigmaOrder.
 Section SigmaOrder.
@@ -4426,12 +4827,12 @@ case: x y => [x x'] [y y']/= eqxy; elim: _ /eqxy in y' *.
 by rewrite !tagged_asE le_total.
 Qed.
 
-Canonical latticeType := LatticeType {t : T & T' t} total.
+Canonical distrLatticeType := DistrLatticeType {t : T & T' t} total.
 Canonical orderType := OrderType {t : T & T' t} total.
 
 End Total.
 
-Section FinLattice.
+Section FinDistrLattice.
 Variable (T : finOrderType disp1) (T' : T -> finOrderType disp2).
 
 Fact le0x (x : {t : T & T' t}) : Tagged T' (0 : T' 0) <= x.
@@ -4439,7 +4840,8 @@ Proof.
 rewrite leEsig /=; case: comparableP (le0x (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE le0x.
 Qed.
-Canonical blatticeType := BLatticeType {t : T & T' t} (BLattice.Mixin le0x).
+Canonical bDistrLatticeType :=
+  BDistrLatticeType {t : T & T' t} (BDistrLattice.Mixin le0x).
 
 Lemma botEsig : 0 = Tagged T' (0 : T' 0). Proof. by []. Qed.
 
@@ -4448,16 +4850,17 @@ Proof.
 rewrite leEsig /=; case: comparableP (lex1 (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE lex1.
 Qed.
-Canonical tblatticeType := TBLatticeType {t : T & T' t} (TBLattice.Mixin lex1).
+Canonical tbDistrLatticeType :=
+  TBDistrLatticeType {t : T & T' t} (TBDistrLattice.Mixin lex1).
 
 Lemma topEsig : 1 = Tagged T' (1 : T' 1). Proof. by []. Qed.
 
-End FinLattice.
+End FinDistrLattice.
 
 Canonical finPOrderType (T : finPOrderType disp1)
     (T' : T -> finPOrderType disp2) := [finPOrderType of {t : T & T' t}].
-Canonical finLatticeType (T : finOrderType disp1)
-  (T' : T -> finOrderType disp2) := [finLatticeType of {t : T & T' t}].
+Canonical finDistrLatticeType (T : finOrderType disp1)
+  (T' : T -> finOrderType disp2) := [finDistrLatticeType of {t : T & T' t}].
 Canonical finOrderType (T : finOrderType disp1)
   (T' : T -> finOrderType disp2) := [finOrderType of {t : T & T' t}].
 
@@ -4466,10 +4869,10 @@ End SigmaOrder.
 Module Exports.
 
 Canonical porderType.
-Canonical latticeType.
+Canonical distrLatticeType.
 Canonical orderType.
 Canonical finPOrderType.
-Canonical finLatticeType.
+Canonical finDistrLatticeType.
 Canonical finOrderType.
 
 Definition leEsig := @leEsig.
@@ -4484,6 +4887,11 @@ Definition botEsig := @botEsig.
 End Exports.
 End SigmaOrder.
 Import SigmaOrder.Exports.
+
+(***********************************************)
+(* We declare a copy of the cartesian product, *)
+(* which has canonical lexicographic order.    *)
+(***********************************************)
 
 Module ProdLexiOrder.
 Section ProdLexiOrder.
@@ -4558,38 +4966,40 @@ Proof.
 move=> x y; rewrite /<=%O /= /le; case: ltgtP => //= _; exact: le_total.
 Qed.
 
-Canonical latticeType := LatticeType (T * T') total.
+Canonical distrLatticeType := DistrLatticeType (T * T') total.
 Canonical orderType := OrderType (T * T') total.
 
 End Total.
 
-Section FinLattice.
+Section FinDistrLattice.
 Variable (T : finOrderType disp1) (T' : finOrderType disp2).
 
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !le0x implybT. Qed.
-Canonical blatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
+Canonical bDistrLatticeType :=
+  BDistrLatticeType (T * T') (BDistrLattice.Mixin le0x).
 
 Lemma botEprodlexi : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
 Fact lex1 (x : T * T') : x <= (1, 1) :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !lex1 implybT. Qed.
-Canonical tblatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
+Canonical tbDistrLatticeType :=
+  TBDistrLatticeType (T * T') (TBDistrLattice.Mixin lex1).
 
 Lemma topEprodlexi : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
 
-End FinLattice.
+End FinDistrLattice.
 
 Canonical finPOrderType (T : finPOrderType disp1)
     (T' : finPOrderType disp2) := [finPOrderType of T * T'].
-Canonical finLatticeType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finLatticeType of T * T'].
+Canonical finDistrLatticeType (T : finOrderType disp1)
+  (T' : finOrderType disp2) := [finDistrLatticeType of T * T'].
 Canonical finOrderType (T : finOrderType disp1)
   (T' : finOrderType disp2) := [finOrderType of T * T'].
 
 Lemma sub_prod_lexi d (T : POrder.Exports.porderType disp1)
                       (T' : POrder.Exports.porderType disp2) :
-   subrel (<=%O : rel (T *p[d] T')) (<=%O : rel (T * T')).
+   subrel (<=%O : rel (T *prod[d] T')) (<=%O : rel (T * T')).
 Proof.
 by case=> [x1 x2] [y1 y2]; rewrite leEprod leEprodlexi /=; case: comparableP.
 Qed.
@@ -4598,22 +5008,22 @@ End ProdLexiOrder.
 
 Module Exports.
 
-Notation "T *l[ d ] T'" := (type d T T')
-  (at level 70, d at next level, format "T  *l[ d ]  T'") : order_scope.
+Notation "T *lexi[ d ] T'" := (type d T T')
+  (at level 70, d at next level, format "T  *lexi[ d ]  T'") : type_scope.
 Notation "T *l T'" := (type lexi_display T T')
-  (at level 70, format "T  *l  T'") : order_scope.
+  (at level 70, format "T  *l  T'") : type_scope.
 
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
-Canonical latticeType.
+Canonical distrLatticeType.
 Canonical orderType.
-Canonical blatticeType.
-Canonical tblatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
 Canonical finPOrderType.
-Canonical finLatticeType.
+Canonical finDistrLatticeType.
 Canonical finOrderType.
 
 Definition leEprodlexi := @leEprodlexi.
@@ -4635,27 +5045,32 @@ Context {disp1 disp2 : unit}.
 Canonical prodlexi_porderType
     (T : porderType disp1) (T' : porderType disp2) :=
   [porderType of T * T' for [porderType of T *l T']].
-Canonical prodlexi_latticeType
+Canonical prodlexi_distrLatticeType
     (T : orderType disp1) (T' : orderType disp2) :=
-  [latticeType of T * T' for [latticeType of T *l T']].
+  [distrLatticeType of T * T' for [distrLatticeType of T *l T']].
 Canonical prodlexi_orderType
     (T : orderType disp1) (T' : orderType disp2) :=
   [orderType of T * T' for [orderType of T *l T']].
-Canonical prodlexi_blatticeType
+Canonical prodlexi_bDistrLatticeType
     (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  [blatticeType of T * T' for [blatticeType of T *l T']].
-Canonical prodlexi_tblatticeType
+  [bDistrLatticeType of T * T' for [bDistrLatticeType of T *l T']].
+Canonical prodlexi_tbDistrLatticeType
     (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  [tblatticeType of T * T' for [tblatticeType of T *l T']].
+  [tbDistrLatticeType of T * T' for [tbDistrLatticeType of T *l T']].
 Canonical prodlexi_finPOrderType (T : finPOrderType disp1)
   (T' : finPOrderType disp2) := [finPOrderType of T * T'].
-Canonical prodlexi_finLatticeType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finLatticeType of T * T'].
+Canonical prodlexi_finDistrLatticeType (T : finOrderType disp1)
+  (T' : finOrderType disp2) := [finDistrLatticeType of T * T'].
 Canonical prodlexi_finOrderType (T : finOrderType disp1)
   (T' : finOrderType disp2) := [finOrderType of T * T'].
 
 End DefaultProdLexiOrder.
 End DefaultProdLexiOrder.
+
+(***************************************)
+(* We declare a copy of the sequences, *)
+(* which has canonical product order.  *)
+(***************************************)
 
 Module SeqProdOrder.
 Section SeqProdOrder.
@@ -4709,8 +5124,8 @@ Proof. by []. Qed.
 
 End POrder.
 
-Section BLattice.
-Variable T : latticeType disp.
+Section BDistrLattice.
+Variable T : distrLatticeType disp.
 Implicit Types s : seq T.
 
 Fixpoint meet s1 s2 :=
@@ -4757,10 +5172,11 @@ Qed.
 Fact meetUl : left_distributive meet join.
 Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetUl ih. Qed.
 
-Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
-Canonical latticeType := LatticeType (seq T) latticeMixin.
-Canonical blatticeType := BLatticeType (seq T) (BLattice.Mixin (@le0s _)).
+Definition distrLatticeMixin :=
+  DistrLattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
+Canonical distrLatticeType := DistrLatticeType (seq T) distrLatticeMixin.
+Canonical bDistrLatticeType :=
+  BDistrLatticeType (seq T) (BDistrLattice.Mixin (@le0s _)).
 
 Lemma botEseq : 0 = [::] :> seq T.
 Proof. by []. Qed.
@@ -4783,7 +5199,7 @@ Lemma join_cons x1 s1 x2 s2 :
   (x1 :: s1 : seq T) `|` (x2 :: s2) = (x1 `|` x2) :: s1 `|` s2.
 Proof. by []. Qed.
 
-End BLattice.
+End BDistrLattice.
 
 End SeqProdOrder.
 
@@ -4793,8 +5209,8 @@ Notation seqprod_with := type.
 Notation seqprod := (type prod_display).
 
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
 
 Definition leEseq := @leEseq.
 Definition le0s := @le0s.
@@ -4815,13 +5231,18 @@ Context {disp : unit}.
 
 Canonical seqprod_porderType (T : porderType disp) :=
   [porderType of seq T for [porderType of seqprod T]].
-Canonical seqprod_latticeType (T : latticeType disp) :=
-  [latticeType of seq T for [latticeType of seqprod T]].
-Canonical seqprod_blatticeType (T : blatticeType disp) :=
-  [blatticeType of seq T for [blatticeType of seqprod T]].
+Canonical seqprod_distrLatticeType (T : distrLatticeType disp) :=
+  [distrLatticeType of seq T for [distrLatticeType of seqprod T]].
+Canonical seqprod_bDistrLatticeType (T : bDistrLatticeType disp) :=
+  [bDistrLatticeType of seq T for [bDistrLatticeType of seqprod T]].
 
 End DefaultSeqProdOrder.
 End DefaultSeqProdOrder.
+
+(*********************************************)
+(* We declare a copy of the sequences,       *)
+(* which has canonical lexicographic order.  *)
+(*********************************************)
 
 Module SeqLexiOrder.
 Section SeqLexiOrder.
@@ -4932,8 +5353,9 @@ suff: total (<=%O : rel (seq T)) by [].
 by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
 Qed.
 
-Canonical latticeType := LatticeType (seq T) total.
-Canonical blatticeType := BLatticeType (seq T) (BLattice.Mixin (@lexi0s _)).
+Canonical distrLatticeType := DistrLatticeType (seq T) total.
+Canonical bDistrLatticeType :=
+  BDistrLatticeType (seq T) (BDistrLattice.Mixin (@lexi0s _)).
 Canonical orderType := OrderType (seq T) total.
 
 End Total.
@@ -4953,8 +5375,8 @@ Notation seqlexi_with := type.
 Notation seqlexi := (type lexi_display).
 
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
 Canonical orderType.
 
 Definition leEseqlexi := @leEseqlexi.
@@ -4984,15 +5406,20 @@ Context {disp : unit}.
 
 Canonical seqlexi_porderType (T : porderType disp) :=
   [porderType of seq T for [porderType of seqlexi T]].
-Canonical seqlexi_latticeType (T : orderType disp) :=
-  [latticeType of seq T for [latticeType of seqlexi T]].
-Canonical seqlexi_blatticeType (T : orderType disp) :=
-  [blatticeType of seq T for [blatticeType of seqlexi T]].
+Canonical seqlexi_distrLatticeType (T : orderType disp) :=
+  [distrLatticeType of seq T for [distrLatticeType of seqlexi T]].
+Canonical seqlexi_bDistrLatticeType (T : orderType disp) :=
+  [bDistrLatticeType of seq T for [bDistrLatticeType of seqlexi T]].
 Canonical seqlexi_orderType (T : orderType disp) :=
   [orderType of seq T for [orderType of seqlexi T]].
 
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
+
+(***************************************)
+(* We declare a copy of the tuples,    *)
+(* which has canonical product order.  *)
+(***************************************)
 
 Module TupleProdOrder.
 Import DefaultSeqProdOrder.
@@ -5039,8 +5466,8 @@ Proof. by rewrite lt_neqAle leEtprod eqEtuple negb_forall. Qed.
 
 End POrder.
 
-Section Lattice.
-Variables (n : nat) (T : latticeType disp).
+Section DistrLattice.
+Variables (n : nat) (T : distrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
 Definition meet t1 t2 : n.-tuple T :=
@@ -5094,9 +5521,9 @@ move=> t1 t2 t3; apply: eq_from_tnth => i.
 by rewrite !(tnth_meet, tnth_join) meetUl.
 Qed.
 
-Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
-Canonical latticeType := LatticeType (n.-tuple T) latticeMixin.
+Definition distrLatticeMixin :=
+  DistrLattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet meetUl.
+Canonical distrLatticeType := DistrLatticeType (n.-tuple T) distrLatticeMixin.
 
 Lemma meetEtprod t1 t2 :
   t1 `&` t2 = [tuple of [seq x.1 `&` x.2 | x <- zip t1 t2]].
@@ -5106,36 +5533,38 @@ Lemma joinEtprod t1 t2 :
   t1 `|` t2 = [tuple of [seq x.1 `|` x.2 | x <- zip t1 t2]].
 Proof. by []. Qed.
 
-End Lattice.
+End DistrLattice.
 
-Section BLattice.
-Variables (n : nat) (T : blatticeType disp).
+Section BDistrLattice.
+Variables (n : nat) (T : bDistrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq le0x. Qed.
 
-Canonical blatticeType := BLatticeType (n.-tuple T) (BLattice.Mixin le0x).
+Canonical bDistrLatticeType :=
+  BDistrLatticeType (n.-tuple T) (BDistrLattice.Mixin le0x).
 
 Lemma botEtprod : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
 
-End BLattice.
+End BDistrLattice.
 
-Section TBLattice.
-Variables (n : nat) (T : tblatticeType disp).
+Section TBDistrLattice.
+Variables (n : nat) (T : tbDistrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact lex1 t : t <= [tuple of nseq n 1] :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq lex1. Qed.
 
-Canonical tblatticeType := TBLatticeType (n.-tuple T) (TBLattice.Mixin lex1).
+Canonical tbDistrLatticeType :=
+  TBDistrLatticeType (n.-tuple T) (TBDistrLattice.Mixin lex1).
 
 Lemma topEtprod : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
 
-End TBLattice.
+End TBDistrLattice.
 
-Section CBLattice.
-Variables (n : nat) (T : cblatticeType disp).
+Section CBDistrLattice.
+Variables (n : nat) (T : cbDistrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
 Definition sub t1 t2 : n.-tuple T :=
@@ -5157,16 +5586,18 @@ Proof.
 by apply: eq_from_tnth => i; rewrite tnth_join tnth_meet tnth_sub joinIB.
 Qed.
 
-Definition cblatticeMixin := CBLattice.Mixin subKI joinIB.
-Canonical cblatticeType := CBLatticeType (n.-tuple T) cblatticeMixin.
+Definition cbDistrLatticeMixin := CBDistrLattice.Mixin subKI joinIB.
+Canonical cbDistrLatticeType :=
+  CBDistrLatticeType (n.-tuple T) cbDistrLatticeMixin.
 
-Lemma subEtprod t1 t2 : t1 `\` t2 =  [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
+Lemma subEtprod t1 t2 :
+  t1 `\` t2 = [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
 Proof. by []. Qed.
 
-End CBLattice.
+End CBDistrLattice.
 
-Section CTBLattice.
-Variables (n : nat) (T : ctblatticeType disp).
+Section CTBDistrLattice.
+Variables (n : nat) (T : ctbDistrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
 Definition compl t : n.-tuple T := map_tuple compl t.
@@ -5179,45 +5610,47 @@ Proof.
 by apply: eq_from_tnth => i; rewrite tnth_compl tnth_sub complE tnth_nseq.
 Qed.
 
-Definition ctblatticeMixin := CTBLattice.Mixin complE.
-Canonical ctblatticeType := CTBLatticeType (n.-tuple T) ctblatticeMixin.
+Definition ctbDistrLatticeMixin := CTBDistrLattice.Mixin complE.
+Canonical ctbDistrLatticeType :=
+  CTBDistrLatticeType (n.-tuple T) ctbDistrLatticeMixin.
 
 Lemma complEtprod t : ~` t = [tuple of [seq ~` x | x <- t]].
 Proof. by []. Qed.
 
-End CTBLattice.
+End CTBDistrLattice.
 
 Canonical finPOrderType n (T : finPOrderType disp) :=
   [finPOrderType of n.-tuple T].
 
-Canonical finLatticeType n (T : finLatticeType disp) :=
-  [finLatticeType of n.-tuple T].
+Canonical finDistrLatticeType n (T : finDistrLatticeType disp) :=
+  [finDistrLatticeType of n.-tuple T].
 
-Canonical finClatticeType n (T : finCLatticeType disp) :=
-  [finCLatticeType of n.-tuple T].
+Canonical finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
+  [finCDistrLatticeType of n.-tuple T].
 
 End TupleProdOrder.
 
 Module Exports.
 
 Notation "n .-tupleprod[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tupleprod[ disp ]") : order_scope.
+  (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
+  type_scope.
 Notation "n .-tupleprod" := (n.-tupleprod[prod_display])
-  (at level 2, format "n .-tupleprod") : order_scope.
+  (at level 2, format "n .-tupleprod") : type_scope.
 
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
-Canonical latticeType.
-Canonical blatticeType.
-Canonical tblatticeType.
-Canonical cblatticeType.
-Canonical ctblatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical cbDistrLatticeType.
+Canonical ctbDistrLatticeType.
 Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finClatticeType.
+Canonical finDistrLatticeType.
+Canonical finCDistrLatticeType.
 
 Definition leEtprod := @leEtprod.
 Definition ltEtprod := @ltEtprod.
@@ -5243,25 +5676,31 @@ Context {disp : unit}.
 
 Canonical tprod_porderType n (T : porderType disp) :=
   [porderType of n.-tuple T for [porderType of n.-tupleprod T]].
-Canonical tprod_latticeType n (T : latticeType disp) :=
-  [latticeType of n.-tuple T for [latticeType of n.-tupleprod T]].
-Canonical tprod_blatticeType n (T : blatticeType disp) :=
-  [blatticeType of n.-tuple T for [blatticeType of n.-tupleprod T]].
-Canonical tprod_tblatticeType n (T : tblatticeType disp) :=
-  [tblatticeType of n.-tuple T for [tblatticeType of n.-tupleprod T]].
-Canonical tprod_cblatticeType n (T : cblatticeType disp) :=
-  [cblatticeType of n.-tuple T for [cblatticeType of n.-tupleprod T]].
-Canonical tprod_ctblatticeType n (T : ctblatticeType disp) :=
-  [ctblatticeType of n.-tuple T for [ctblatticeType of n.-tupleprod T]].
+Canonical tprod_distrLatticeType n (T : distrLatticeType disp) :=
+  [distrLatticeType of n.-tuple T for [distrLatticeType of n.-tupleprod T]].
+Canonical tprod_bDistrLatticeType n (T : bDistrLatticeType disp) :=
+  [bDistrLatticeType of n.-tuple T for [bDistrLatticeType of n.-tupleprod T]].
+Canonical tprod_tbDistrLatticeType n (T : tbDistrLatticeType disp) :=
+  [tbDistrLatticeType of n.-tuple T for [tbDistrLatticeType of n.-tupleprod T]].
+Canonical tprod_cbDistrLatticeType n (T : cbDistrLatticeType disp) :=
+  [cbDistrLatticeType of n.-tuple T for [cbDistrLatticeType of n.-tupleprod T]].
+Canonical tprod_ctbDistrLatticeType n (T : ctbDistrLatticeType disp) :=
+  [ctbDistrLatticeType of n.-tuple T for
+                       [ctbDistrLatticeType of n.-tupleprod T]].
 Canonical tprod_finPOrderType n (T : finPOrderType disp) :=
    [finPOrderType of n.-tuple T].
-Canonical tprod_finLatticeType n (T : finLatticeType disp) :=
-  [finLatticeType of n.-tuple T].
-Canonical tprod_finClatticeType n (T : finCLatticeType disp) :=
-  [finCLatticeType of n.-tuple T].
+Canonical tprod_finDistrLatticeType n (T : finDistrLatticeType disp) :=
+  [finDistrLatticeType of n.-tuple T].
+Canonical tprod_finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
+  [finCDistrLatticeType of n.-tuple T].
 
 End DefaultTupleProdOrder.
 End DefaultTupleProdOrder.
+
+(*********************************************)
+(* We declare a copy of the tuples,          *)
+(* which has canonical lexicographic order.  *)
+(*********************************************)
 
 Module TupleLexiOrder.
 Section TupleLexiOrder.
@@ -5299,9 +5738,9 @@ rewrite [_ <= _]lexi_cons; apply: (iffP idP) => [|[k leif_xt12]].
   case: comparableP => //= [ltx12 _|-> /IHn[k kP]].
     exists ord0 => i; rewrite leqn0 => /eqP/(@ord_inj n.+1 i ord0)->.
     by apply/leifP; rewrite !tnth0.
-  exists (lift ord0 k) => i; case: (unliftP ord0 i) => [j ->|-> _]; last first.
-    by apply/leifP; rewrite !tnth0 eqxx.
-  by rewrite !ltnS => /kP; rewrite !tnthS.
+  exists (lift ord0 k) => i; case: (unliftP ord0 i) => [j ->|-> _].
+    by rewrite !ltnS => /kP; rewrite !tnthS.
+  by apply/leifP; rewrite !tnth0 eqxx.
 have /= := leif_xt12 ord0 isT; rewrite !tnth0 => leif_x12.
 rewrite leif_x12/=; move: leif_x12 leif_xt12 => /leifP.
 case: (unliftP ord0 k) => {k} [k-> /eqP<-{x2}|-> /lt_geF->//] leif_xt12.
@@ -5320,9 +5759,9 @@ rewrite [_ < _]ltxi_cons; apply: (iffP idP) => [|[k leif_xt12]].
   case: (comparableP x1 x2) => //= [ltx12 _|-> /IHn[k kP]].
     exists ord0 => i; rewrite leqn0 => /eqP/(@ord_inj n.+1 i ord0)->.
     by apply/leifP; rewrite !tnth0.
-  exists (lift ord0 k) => i; case: (unliftP ord0 i) => {i} [i ->|-> _]; last first.
-    by apply/leifP; rewrite !tnth0 eqxx.
-  by rewrite !ltnS => /kP; rewrite !tnthS.
+  exists (lift ord0 k) => i; case: (unliftP ord0 i) => {i} [i ->|-> _].
+    by rewrite !ltnS => /kP; rewrite !tnthS.
+  by apply/leifP; rewrite !tnth0 eqxx.
 have /= := leif_xt12 ord0 isT; rewrite !tnth0 => leif_x12.
 rewrite leif_x12/=; move: leif_x12 leif_xt12 => /leifP.
 case: (unliftP ord0 k) => {k} [k-> /eqP<-{x2}|-> /lt_geF->//] leif_xt12.
@@ -5350,41 +5789,43 @@ Implicit Types (t : n.-tuple T).
 
 Definition total : totalPOrderMixin [porderType of n.-tuple T] :=
    [totalOrderMixin of n.-tuple T by <:].
-Canonical latticeType := LatticeType (n.-tuple T) total.
+Canonical distrLatticeType := DistrLatticeType (n.-tuple T) total.
 Canonical orderType := OrderType (n.-tuple T) total.
 
 End Total.
 
-Section BLattice.
+Section BDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
 Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
 
-Canonical blatticeType := BLatticeType (n.-tuple T) (BLattice.Mixin le0x).
+Canonical bDistrLatticeType :=
+  BDistrLatticeType (n.-tuple T) (BDistrLattice.Mixin le0x).
 
 Lemma botEtlexi : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
 
-End BLattice.
+End BDistrLattice.
 
-Section TBLattice.
+Section TBDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact lex1 t : t <= [tuple of nseq n 1].
 Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
 
-Canonical tblatticeType := TBLatticeType (n.-tuple T) (TBLattice.Mixin lex1).
+Canonical tbDistrLatticeType :=
+  TBDistrLatticeType (n.-tuple T) (TBDistrLattice.Mixin lex1).
 
 Lemma topEtlexi : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
 
-End TBLattice.
+End TBDistrLattice.
 
 Canonical finPOrderType n (T : finPOrderType disp) :=
   [finPOrderType of n.-tuple T].
-Canonical finLatticeType n (T : finOrderType disp) :=
-  [finLatticeType of n.-tuple T].
+Canonical finDistrLatticeType n (T : finOrderType disp) :=
+  [finDistrLatticeType of n.-tuple T].
 Canonical finOrderType n (T : finOrderType disp) :=
   [finOrderType of n.-tuple T].
 
@@ -5397,7 +5838,8 @@ End TupleLexiOrder.
 Module Exports.
 
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") : order_scope.
+  (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
+  order_scope.
 Notation "n .-tuplelexi" := (n.-tuplelexi[lexi_display])
   (at level 2, format "n .-tuplelexi") : order_scope.
 
@@ -5406,12 +5848,12 @@ Canonical choiceType.
 Canonical countType.
 Canonical finType.
 Canonical porderType.
-Canonical latticeType.
+Canonical distrLatticeType.
 Canonical orderType.
-Canonical blatticeType.
-Canonical tblatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
 Canonical finPOrderType.
-Canonical finLatticeType.
+Canonical finDistrLatticeType.
 Canonical finOrderType.
 
 Definition lexi_tupleP := @lexi_tupleP.
@@ -5434,18 +5876,18 @@ Context {disp : unit}.
 
 Canonical tlexi_porderType n (T : porderType disp) :=
   [porderType of n.-tuple T for [porderType of n.-tuplelexi T]].
-Canonical tlexi_latticeType n (T : orderType disp) :=
-  [latticeType of n.-tuple T for [latticeType of n.-tuplelexi T]].
-Canonical tlexi_blatticeType n (T : finOrderType disp) :=
-  [blatticeType of n.-tuple T for [blatticeType of n.-tuplelexi T]].
-Canonical tlexi_tblatticeType n (T : finOrderType disp) :=
-  [tblatticeType of n.-tuple T for [tblatticeType of n.-tuplelexi T]].
+Canonical tlexi_distrLatticeType n (T : orderType disp) :=
+  [distrLatticeType of n.-tuple T for [distrLatticeType of n.-tuplelexi T]].
+Canonical tlexi_bDistrLatticeType n (T : finOrderType disp) :=
+  [bDistrLatticeType of n.-tuple T for [bDistrLatticeType of n.-tuplelexi T]].
+Canonical tlexi_tbDistrLatticeType n (T : finOrderType disp) :=
+  [tbDistrLatticeType of n.-tuple T for [tbDistrLatticeType of n.-tuplelexi T]].
 Canonical tlexi_orderType n (T : orderType disp) :=
   [orderType of n.-tuple T for [orderType of n.-tuplelexi T]].
 Canonical tlexi_finPOrderType n (T : finPOrderType disp) :=
   [finPOrderType of n.-tuple T].
-Canonical tlexi_finLatticeType n (T : finOrderType disp) :=
-  [finLatticeType of n.-tuple T].
+Canonical tlexi_finDistrLatticeType n (T : finOrderType disp) :=
+  [finDistrLatticeType of n.-tuple T].
 Canonical tlexi_finOrderType n (T : finOrderType disp) :=
   [finOrderType of n.-tuple T].
 
@@ -5454,13 +5896,14 @@ End DefaultTupleLexiOrder.
 
 Module Syntax.
 Export POSyntax.
-Export LatticeSyntax.
-Export BLatticeSyntax.
-Export TBLatticeSyntax.
-Export CBLatticeSyntax.
-Export CTBLatticeSyntax.
+Export DistrLatticeSyntax.
+Export BDistrLatticeSyntax.
+Export TBDistrLatticeSyntax.
+Export CBDistrLatticeSyntax.
+Export CTBDistrLatticeSyntax.
 Export TotalSyntax.
 Export ConverseSyntax.
+Export DvdSyntax.
 End Syntax.
 
 Module LTheory.
@@ -5468,16 +5911,16 @@ Export POCoercions.
 Export ConversePOrder.
 Export POrderTheory.
 
-Export ConverseLattice.
-Export LatticeTheoryMeet.
-Export LatticeTheoryJoin.
-Export BLatticeTheory.
-Export ConverseTBLattice.
-Export TBLatticeTheory.
+Export ConverseDistrLattice.
+Export DistrLatticeTheoryMeet.
+Export DistrLatticeTheoryJoin.
+Export BDistrLatticeTheory.
+Export ConverseTBDistrLattice.
+Export TBDistrLatticeTheory.
 End LTheory.
 
 Module CTheory.
-Export LTheory CBLatticeTheory CTBLatticeTheory.
+Export LTheory CBDistrLatticeTheory CTBDistrLatticeTheory.
 End CTheory.
 
 Module TTheory.
@@ -5494,13 +5937,13 @@ Export Order.Syntax.
 
 Export Order.POrder.Exports.
 Export Order.FinPOrder.Exports.
-Export Order.Lattice.Exports.
-Export Order.BLattice.Exports.
-Export Order.TBLattice.Exports.
-Export Order.FinLattice.Exports.
-Export Order.CBLattice.Exports.
-Export Order.CTBLattice.Exports.
-Export Order.FinCLattice.Exports.
+Export Order.DistrLattice.Exports.
+Export Order.BDistrLattice.Exports.
+Export Order.TBDistrLattice.Exports.
+Export Order.FinDistrLattice.Exports.
+Export Order.CBDistrLattice.Exports.
+Export Order.CTBDistrLattice.Exports.
+Export Order.FinCDistrLattice.Exports.
 Export Order.Total.Exports.
 Export Order.FinTotal.Exports.
 
@@ -5513,6 +5956,7 @@ Export Order.CanMixin.Exports.
 Export Order.SubOrder.Exports.
 
 Export Order.NatOrder.Exports.
+Export Order.NatDvd.Exports.
 Export Order.BoolOrder.Exports.
 Export Order.ProdOrder.Exports.
 Export Order.SigmaOrder.Exports.

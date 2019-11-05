@@ -94,7 +94,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*           GRing.rreg x <-> x if right-regular, i.e., *%R x is injective.   *)
 (*               [char R] == the characteristic of R, defined as the set of   *)
 (*                           prime numbers p such that p%:R = 0 in R. The set *)
-(*                           [char p] has a most one element, and is          *)
+(*                           [char R] has at most one element, and is         *)
 (*                           implemented as a pred_nat collective predicate   *)
 (*                           (see prime.v); thus the statement p \in [char R] *)
 (*                           can be read as `R has characteristic p', while   *)
@@ -1546,7 +1546,7 @@ End Exports.
 End Lmodule.
 Import Lmodule.Exports.
 
-Definition scale (R : ringType) (V : lmodType R) :=
+Definition scale (R : ringType) (V : lmodType R) : R -> V -> V :=
   Lmodule.scale (Lmodule.class V).
 
 Local Notation "*:%R" := (@scale _ _).
@@ -3554,6 +3554,9 @@ Variables (subS : zmodPred S) (kS : keyed_pred subS).
 
 Lemma rpredB : {in kS &, forall u v, u - v \in kS}.
 Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
+
+Lemma rpredBC u v : u - v \in kS = (v - u \in kS).
+Proof. by rewrite -rpredN opprB. Qed.
 
 Lemma rpredMNn n : {in kS, forall u, u *- n \in kS}.
 Proof. by move=> u Su; rewrite /= rpredN rpredMn. Qed.
@@ -5593,6 +5596,7 @@ Definition rpred_sum := rpred_sum.
 Definition rpredMn := rpredMn.
 Definition rpredN := rpredN.
 Definition rpredB := rpredB.
+Definition rpredBC := rpredBC.
 Definition rpredMNn := rpredMNn.
 Definition rpredDr := rpredDr.
 Definition rpredDl := rpredDl.

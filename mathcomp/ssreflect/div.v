@@ -185,12 +185,55 @@ move/leq_divRL=> -> le_de.
 by apply: leq_trans (leq_trunc_div m e); apply: leq_mul.
 Qed.
 
-Lemma leq_divDl p m n : (m + n) %/ p <= m %/ p + n %/ p + 1.
+Lemma edivnD m n d (offset := m %% d + n %% d >= d) : 0 < d ->
+   edivn (m + n) d = (m %/ d + n %/ d + offset, m %% d + n %% d - offset * d).
 Proof.
-have [-> //| p_gt0] := posnP p; rewrite -ltnS -addnS ltn_divLR // ltnW //.
-rewrite {1}(divn_eq n p) {1}(divn_eq m p) addnACA !mulnDl -3!addnS leq_add2l.
-by rewrite mul2n -addnn -addSn leq_add // ltn_mod.
+rewrite {}/offset; case: d => // d _; rewrite /divn !modn_def.
+case: (edivnP m d.+1) (edivnP n d.+1) => [/= q r -> r_lt] [/= p s -> s_lt].
+rewrite addnACA -mulnDl; have [r_le s_le] := (ltnW r_lt, ltnW s_lt).
+have [d_ge|d_lt] := leqP; first by rewrite addn0 mul0n subn0 edivn_eq.
+rewrite addn1 mul1n -{1}(subnKC d_lt) addnA -mulSnr edivn_eq//.
+by rewrite ltn_subLR// -addnS leq_add.
 Qed.
+
+Lemma divnD m n d : 0 < d ->
+  (m + n) %/ d = (m %/ d) + (n %/ d) + (m %% d + n %% d >= d).
+Proof. by move=> /(@edivnD m n); rewrite edivn_def => -[]. Qed.
+
+Lemma modnD m n d : 0 < d ->
+  (m + n) %% d = m %% d + n %% d - (m %% d + n %% d >= d) * d.
+Proof. by move=> /(@edivnD m n); rewrite edivn_def => -[]. Qed.
+
+Lemma leqDmod m n d : 0 < d ->
+  (d <= m %% d + n %% d) = ((m + n) %% d < n %% d).
+Proof.
+move=> d_gt0; rewrite modnD//.
+have [d_le|_] := leqP d; last by rewrite subn0 ltnNge leq_addl.
+by rewrite -(ltn_add2r d) mul1n (subnK d_le) addnC ltn_add2l ltn_pmod.
+Qed.
+
+Lemma divnB n m d : 0 < d ->
+  (m - n) %/ d = (m %/ d) - (n %/ d) - (m %% d < n %% d).
+Proof.
+move=> d_gt0; have [mn|/ltnW nm] := leqP m n.
+  by rewrite (eqP mn) (eqP (leq_div2r _ _)) ?div0n.
+by rewrite -[in m %/ d](subnK nm) divnD// addnAC addnK leqDmod ?subnK ?addnK.
+Qed.
+
+Lemma modnB m n d : 0 < d -> n <= m ->
+  (m - n) %% d = (m %% d < n %% d) * d + m %% d - n %% d.
+Proof.
+move=> d_gt0 nm; rewrite -[in m %% _](subnK nm) -leqDmod// modnD//.
+have [d_le|_] := leqP d; last by rewrite mul0n add0n subn0 addnK.
+by rewrite mul1n addnBA// addnC !addnK.
+Qed.
+
+Lemma edivnB m n d (offset := m %% d < n %% d) : 0 < d -> n <= m ->
+   edivn (m - n) d = (m %/ d - n %/ d - offset, offset * d + m %% d - n %% d).
+Proof. by move=> d_gt0 le_nm; rewrite edivn_def divnB// modnB. Qed.
+
+Lemma leq_divDl p m n : (m + n) %/ p <= m %/ p + n %/ p + 1.
+Proof. by have [->//|p_gt0] := posnP p; rewrite divnD// !leq_add// leq_b1. Qed.
 
 Lemma geq_divBl k m p : k %/ p - m %/ p <= (k - m) %/ p + 1.
 Proof.
@@ -220,14 +263,22 @@ case: (posnP d) => [-> | d_gt0]; first by rewrite muln0.
 by rewrite {1}(divn_eq m d) addnA -mulnDl modn_def edivn_eq // ltn_mod.
 Qed.
 
-Lemma muln_modr {p m d} : 0 < p -> p * (m %% d) = (p * m) %% (p * d).
+Lemma muln_modr p m d : p * (m %% d) = (p * m) %% (p * d).
 Proof.
-move=> p_gt0; apply: (@addnI (p * (m %/ d * d))).
+have [->//|p_gt0] := posnP p; apply: (@addnI (p * (m %/ d * d))).
 by rewrite -mulnDr -divn_eq mulnCA -(divnMl p_gt0) -divn_eq.
 Qed.
 
-Lemma muln_modl {p m d} : 0 < p -> (m %% d) * p = (m * p) %% (d * p).
+Lemma muln_modl p m d : (m %% d) * p = (m * p) %% (d * p).
 Proof. by rewrite -!(mulnC p); apply: muln_modr. Qed.
+
+Lemma modn_divl m n d : (m %/ d) %% n = m %% (n * d) %/ d.
+Proof.
+case: d n => [|d] [|n] //; rewrite [in LHS]/divn [in LHS]modn_def.
+case: (edivnP m d.+1) edivnP => [/= _ r -> le_rd] [/= q s -> le_sn].
+rewrite mulnDl -mulnA -addnA modnMDl modn_small ?divnMDl ?divn_small ?addn0//.
+by rewrite mulSnr -addnS leq_add ?leq_mul2r.
+Qed.
 
 Lemma modnDl m d : d + m = m %[mod d].
 Proof. by rewrite -{1}[d]mul1n modnMDl. Qed.
@@ -428,6 +479,9 @@ Qed.
 Lemma dvdn_exp2r m n k : m %| n -> m ^ k %| n ^ k.
 Proof. by case/dvdnP=> q ->; rewrite expnMn dvdn_mull. Qed.
 
+Lemma divn_modl m n d : d %| n -> (m %% n) %/ d = (m %/ d) %% (n %/ d).
+Proof. by move=> dvd_dn; rewrite modn_divl divnK. Qed.
+
 Lemma dvdn_addr m d n : d %| m -> (d %| m + n) = (d %| n).
 Proof. by case/dvdnP=> q ->; rewrite /dvdn modnMDl. Qed.
 
@@ -467,11 +521,64 @@ Proof.
 by move=> le_mn; rewrite -{1}[n]add0n -{1}(subnK le_mn) eqn_modDr mod0n.
 Qed.
 
+Lemma divnDMl q m d : 0 < d -> (m + q * d) %/ d = (m %/ d) + q.
+Proof. by move=> d_gt0; rewrite addnC divnMDl// addnC. Qed.
+
+Lemma divnMBl q m d : 0 < d -> (q * d - m) %/ d = q - (m %/ d) - (~~ (d %| m)).
+Proof. by move=> d_gt0; rewrite divnB// mulnK// modnMl lt0n. Qed.
+
+Lemma divnBMl q m d : (m - q * d) %/ d = (m %/ d) - q.
+Proof. by case: d => [|d]//=; rewrite divnB// mulnK// modnMl ltn0 subn0. Qed.
+
 Lemma divnDl m n d : d %| m -> (m + n) %/ d = m %/ d + n %/ d.
 Proof. by case: d => // d /divnK{1}<-; rewrite divnMDl. Qed.
 
 Lemma divnDr m n d : d %| n -> (m + n) %/ d = m %/ d + n %/ d.
 Proof. by move=> dv_n; rewrite addnC divnDl // addnC. Qed.
+
+Lemma divnBl m n d : d %| m -> (m - n) %/ d = m %/ d - (n %/ d) - (~~ (d %| n)).
+Proof. by case: d => [|d] // /divnK {1}<-; rewrite divnMBl. Qed.
+
+Lemma divnBr m n d : d %| n -> (m - n) %/ d = m %/ d - n %/ d.
+Proof. by case: d => [|d]// /divnK {1}<-; rewrite divnBMl. Qed.
+
+Lemma edivnS m d : 0 < d -> edivn m.+1 d =
+  if d %| m.+1 then ((m %/ d).+1, 0) else (m %/ d, (m %% d).+1).
+Proof.
+case: d => [|[|d]] //= _; first by rewrite edivn_def modn1 dvd1n !divn1.
+rewrite -addn1 /dvdn modn_def edivnD//= (@modn_small 1)// (@divn_small 1)//.
+rewrite addn1 addn0 ltnS; case: (ltngtP _ d.+1) => [ | |->].
+- by rewrite addn0 mul0n subn0.
+- by rewrite ltnNge -ltnS ltn_pmod.
+- by rewrite addn1 mul1n subnn.
+Qed.
+
+Lemma modnS m d : m.+1 %% d = if d %| m.+1 then 0 else (m %% d).+1.
+Proof. by case: d => [|d]//; rewrite modn_def edivnS//; case: ifP. Qed.
+
+Lemma divnS m d : 0 < d -> m.+1 %/ d = (d %| m.+1) + m %/ d.
+Proof. by move=> d_gt0; rewrite /divn edivnS//; case: ifP. Qed.
+
+Lemma divn_pred m d : m.-1 %/ d = (m %/ d) - (d %| m).
+Proof.
+by case: d m => [|d] [|m]; rewrite ?divn1 ?dvd1n ?subn1//= divnS// addnC addnK.
+Qed.
+
+Lemma modn_pred m d : d != 1 -> 0 < m ->
+  m.-1 %% d = if d %| m then d.-1 else (m %% d).-1.
+Proof.
+rewrite -subn1; case: d m => [|[|d]] [|m]//= _ _.
+  by rewrite ?modn1 ?dvd1n ?modn0 ?subn1.
+rewrite modnB// (@modn_small 1)// [_ < _]leqn0 /dvdn mulnbl/= subn1.
+by case: ifP => // /eqP->; rewrite addn0.
+Qed.
+
+Lemma edivn_pred m d : d != 1 -> 0 < m ->
+  edivn m.-1 d = if d %| m then ((m %/ d).-1, d.-1) else (m %/ d, (m %% d).-1).
+Proof.
+move=> d_neq1 m_gt0; rewrite edivn_def divn_pred modn_pred//.
+by case: ifP; rewrite ?subn0 ?subn1.
+Qed.
 
 (***********************************************************************)
 (*   A function that computes the gcd of 2 numbers                     *)

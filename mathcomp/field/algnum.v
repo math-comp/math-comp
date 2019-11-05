@@ -824,7 +824,7 @@ rewrite /orderC; case: pickP => /= [k /eqP Dp_k | no_k]; last first.
   rewrite mem_primes => /and3P[q_pr _ q_dv_m].
   rewrite lognE q_pr m_gt0 q_dv_m /=; move: (logn q _) => k.
   rewrite !mulnA expnS leq_mul //.
-  case: (ltngtP q) => // [|q_gt2 | ->]; first by rewrite ltnNge prime_gt1.
+  case: (ltngtP q 2) (prime_gt1 q_pr) => // [q_gt2|->] _.
     rewrite mul1n mulnAC mulnn -{1}[q]muln1 leq_mul ?expn_gt0 ?prime_gt0 //.
     by rewrite -(subnKC q_gt2) (ltn_exp2l 1).
   by rewrite !muln1 -expnS (ltn_exp2l 0).

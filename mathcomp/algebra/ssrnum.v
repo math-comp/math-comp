@@ -6,7 +6,10 @@ From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
 (* This file defines some classes to manipulate number structures, i.e        *)
-(* structures with an order and a norm.                                       *)
+(* structures with an order and a norm. To use this file, insert              *)
+(* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
+(* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)
+(* of Num.leif, etc.).                                                        *)
 (*                                                                            *)
 (*   * NumDomain (Integral domain with an order and a norm)                   *)
 (*    numDomainType == interface for a num integral domain.                   *)
@@ -369,29 +372,29 @@ Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
 Arguments normr {R T} x.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
-Notation "@ 'ler' R" :=
-  (@Order.le ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'ler' R" := (@Order.le ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation ltr := (@Order.lt ring_display _) (only parsing).
-Notation "@ 'ltr' R" :=
-  (@Order.lt ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'ltr' R" := (@Order.lt ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation ger := (@Order.ge ring_display _) (only parsing).
-Notation "@ 'ger' R" :=
-  (@Order.ge ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'ger' R" := (@Order.ge ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation gtr := (@Order.gt ring_display _) (only parsing).
-Notation "@ 'gtr' R" :=
-  (@Order.gt ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'gtr' R" := (@Order.gt ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation lerif := (@Order.leif ring_display _) (only parsing).
-Notation "@ 'lerif' R" :=
-  (@Order.leif ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'lerif' R" := (@Order.leif ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation comparabler := (@Order.comparable ring_display _) (only parsing).
-Notation "@ 'comparabler' R" :=
-  (@Order.comparable ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation maxr := (@Order.join ring_display _).
-Notation "@ 'maxr' R" :=
-  (@Order.join ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'maxr' R" := (@Order.join ring_display R)
+    (at level 10, R at level 8, only parsing) : fun_scope.
 Notation minr := (@Order.meet ring_display _).
-Notation "@ 'minr' R" :=
-  (@Order.meet ring_display R) (at level 10, R at level 8, only parsing).
+Notation "@ 'minr' R" := (@Order.meet ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 
 Section Def.
 Context {R : numDomainType}.
@@ -439,34 +442,34 @@ Import Def Keys.
 
 Notation "`| x |" := (norm x) : ring_scope.
 
-Notation "<=%R" := le : ring_scope.
-Notation ">=%R" := ge : ring_scope.
-Notation "<%R" := lt : ring_scope.
-Notation ">%R" := gt : ring_scope.
-Notation "<?=%R" := leif : ring_scope.
-Notation ">=<%R" := comparable : ring_scope.
-Notation "><%R" := (fun x y => ~~ (comparable x y)) : ring_scope.
+Notation "<=%R" := le : fun_scope.
+Notation ">=%R" := ge : fun_scope.
+Notation "<%R" := lt : fun_scope.
+Notation ">%R" := gt : fun_scope.
+Notation "<?=%R" := leif : fun_scope.
+Notation ">=<%R" := comparable : fun_scope.
+Notation "><%R" := (fun x y => ~~ (comparable x y)) : fun_scope.
 
 Notation "<= y" := (ge y) : ring_scope.
-Notation "<= y :> T" := (<= (y : T)) : ring_scope.
+Notation "<= y :> T" := (<= (y : T)) (only parsing) : ring_scope.
 Notation ">= y"  := (le y) : ring_scope.
-Notation ">= y :> T" := (>= (y : T)) : ring_scope.
+Notation ">= y :> T" := (>= (y : T)) (only parsing) : ring_scope.
 
 Notation "< y" := (gt y) : ring_scope.
-Notation "< y :> T" := (< (y : T)) : ring_scope.
+Notation "< y :> T" := (< (y : T)) (only parsing) : ring_scope.
 Notation "> y" := (lt y) : ring_scope.
-Notation "> y :> T" := (> (y : T)) : ring_scope.
+Notation "> y :> T" := (> (y : T)) (only parsing) : ring_scope.
 
 Notation ">=< y" := (comparable y) : ring_scope.
-Notation ">=< y :> T" := (>=< (y : T)) : ring_scope.
+Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
 
 Notation "x <= y" := (le x y) : ring_scope.
-Notation "x <= y :> T" := ((x : T) <= (y : T)) : ring_scope.
+Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : ring_scope.
 Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
 Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
 
 Notation "x < y"  := (lt x y) : ring_scope.
-Notation "x < y :> T" := ((x : T) < (y : T)) : ring_scope.
+Notation "x < y :> T" := ((x : T) < (y : T)) (only parsing) : ring_scope.
 Notation "x > y"  := (y < x) (only parsing) : ring_scope.
 Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
 
@@ -725,14 +728,15 @@ Section ClassDef.
 Record class_of R := Class {
   base   : NumDomain.class_of R;
   lmixin_disp : unit;
-  lmixin : Order.Lattice.mixin_of (Order.POrder.Pack lmixin_disp base);
+  lmixin : Order.DistrLattice.mixin_of (Order.POrder.Pack lmixin_disp base);
   tmixin_disp : unit;
   tmixin : Order.Total.mixin_of
-             (Order.Lattice.Pack tmixin_disp (Order.Lattice.Class lmixin));
+             (Order.DistrLattice.Pack
+                tmixin_disp (Order.DistrLattice.Class lmixin));
 }.
 Local Coercion base : class_of >-> NumDomain.class_of.
 Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
-  @Order.Total.Class _ (Order.Lattice.Class (@lmixin _ c)) _ (@tmixin _ c).
+  @Order.Total.Class _ (Order.DistrLattice.Class (@lmixin _ c)) _ (@tmixin _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -745,7 +749,7 @@ Definition pack :=
   fun mT ldisp l mdisp m &
       phant_id (@Order.Total.class ring_display mT)
                (@Order.Total.Class
-                  T (@Order.Lattice.Class T b ldisp l) mdisp m) =>
+                  T (@Order.DistrLattice.Class T b ldisp l) mdisp m) =>
   Pack (@Class T b ldisp l mdisp  m).
 
 Definition eqType := @Equality.Pack cT xclass.
@@ -757,24 +761,26 @@ Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
 Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
-Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType xclass.
-Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType xclass.
-Definition comRing_latticeType :=
-  @Order.Lattice.Pack ring_display comRingType xclass.
-Definition unitRing_latticeType :=
-  @Order.Lattice.Pack ring_display unitRingType xclass.
-Definition comUnitRing_latticeType :=
-  @Order.Lattice.Pack ring_display comUnitRingType xclass.
-Definition idomain_latticeType :=
-  @Order.Lattice.Pack ring_display idomainType xclass.
-Definition normedZmod_latticeType :=
-  @Order.Lattice.Pack ring_display normedZmodType xclass.
-Definition numDomain_latticeType :=
-  @Order.Lattice.Pack ring_display numDomainType xclass.
+Definition zmod_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display zmodType xclass.
+Definition ring_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display ringType xclass.
+Definition comRing_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display comRingType xclass.
+Definition unitRing_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display unitRingType xclass.
+Definition comUnitRing_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display comUnitRingType xclass.
+Definition idomain_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display idomainType xclass.
+Definition normedZmod_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display normedZmodType xclass.
+Definition numDomain_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display numDomainType xclass.
 Definition zmod_orderType := @Order.Total.Pack ring_display zmodType xclass.
 Definition ring_orderType := @Order.Total.Pack ring_display ringType xclass.
 Definition comRing_orderType :=
@@ -817,20 +823,20 @@ Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
+Coercion distrLatticeType : type >-> Order.DistrLattice.type.
+Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
-Canonical zmod_latticeType.
-Canonical ring_latticeType.
-Canonical comRing_latticeType.
-Canonical unitRing_latticeType.
-Canonical comUnitRing_latticeType.
-Canonical idomain_latticeType.
-Canonical normedZmod_latticeType.
-Canonical numDomain_latticeType.
+Canonical zmod_distrLatticeType.
+Canonical ring_distrLatticeType.
+Canonical comRing_distrLatticeType.
+Canonical unitRing_distrLatticeType.
+Canonical comUnitRing_distrLatticeType.
+Canonical idomain_distrLatticeType.
+Canonical normedZmod_distrLatticeType.
+Canonical numDomain_distrLatticeType.
 Canonical zmod_orderType.
 Canonical ring_orderType.
 Canonical comRing_orderType.
@@ -854,10 +860,11 @@ Section ClassDef.
 Record class_of R := Class {
   base  : NumField.class_of R;
   lmixin_disp : unit;
-  lmixin : Order.Lattice.mixin_of (@Order.POrder.Pack lmixin_disp R base);
+  lmixin : Order.DistrLattice.mixin_of (@Order.POrder.Pack lmixin_disp R base);
   tmixin_disp : unit;
   tmixin : Order.Total.mixin_of
-             (Order.Lattice.Pack tmixin_disp (Order.Lattice.Class lmixin));
+             (Order.DistrLattice.Pack
+                tmixin_disp (Order.DistrLattice.Class lmixin));
 }.
 Local Coercion base : class_of >-> NumField.class_of.
 Local Coercion base2 R (c : class_of R) : RealDomain.class_of R :=
@@ -885,18 +892,18 @@ Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
-Definition field_latticeType :=
-  @Order.Lattice.Pack ring_display fieldType xclass.
+Definition field_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display fieldType xclass.
 Definition field_orderType := @Order.Total.Pack ring_display fieldType xclass.
 Definition field_realDomainType := @RealDomain.Pack fieldType xclass.
-Definition numField_latticeType :=
-  @Order.Lattice.Pack ring_display numFieldType xclass.
+Definition numField_distrLatticeType :=
+  @Order.DistrLattice.Pack ring_display numFieldType xclass.
 Definition numField_orderType :=
   @Order.Total.Pack ring_display numFieldType xclass.
 Definition numField_realDomainType := @RealDomain.Pack numFieldType xclass.
@@ -928,8 +935,8 @@ Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
+Coercion distrLatticeType : type >-> Order.DistrLattice.type.
+Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
 Coercion realDomainType : type >-> RealDomain.type.
@@ -940,10 +947,10 @@ Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
-Canonical field_latticeType.
+Canonical field_distrLatticeType.
 Canonical field_orderType.
 Canonical field_realDomainType.
-Canonical numField_latticeType.
+Canonical numField_distrLatticeType.
 Canonical numField_orderType.
 Canonical numField_realDomainType.
 Notation realFieldType := type.
@@ -983,7 +990,7 @@ Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
@@ -1017,8 +1024,8 @@ Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
+Coercion distrLatticeType : type >-> Order.DistrLattice.type.
+Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
 Coercion realDomainType : type >-> RealDomain.type.
@@ -1071,7 +1078,7 @@ Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
 Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
@@ -1107,8 +1114,8 @@ Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
 Coercion realDomainType : type >-> RealDomain.type.
 Canonical realDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
+Coercion distrLatticeType : type >-> Order.DistrLattice.type.
+Canonical distrLatticeType.
 Coercion orderType : type >-> Order.Total.type.
 Canonical orderType.
 Coercion fieldType : type >-> GRing.Field.type.
@@ -1489,6 +1496,23 @@ Definition subr_lte0 := (subr_le0, subr_lt0).
 Definition subr_gte0 := (subr_ge0, subr_gt0).
 Definition subr_cp0 := (subr_lte0, subr_gte0).
 
+(* Comparability in a numDomain *)
+
+Lemma comparabler0 x : (x >=< 0)%R = (x \is Num.real).
+Proof. by rewrite comparable_sym. Qed.
+
+Lemma subr_comparable0 x y : (x - y >=< 0)%R = (x >=< y)%R.
+Proof. by rewrite /comparable subr_ge0 subr_le0. Qed.
+
+Lemma comparablerE x y : (x >=< y)%R = (x - y \is Num.real).
+Proof. by rewrite -comparabler0 subr_comparable0. Qed.
+
+Lemma  comparabler_trans : transitive (comparable : rel R).
+Proof.
+move=> y x z; rewrite !comparablerE => xBy_real yBz_real.
+by have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
+Qed.
+
 (* Ordered ring properties. *)
 
 Definition lter01 := (ler01, ltr01).
@@ -1615,9 +1639,8 @@ Proof. exact: rpredB. Qed.
 Lemma realN : {mono (@GRing.opp R) : x /  x \is real}.
 Proof. exact: rpredN. Qed.
 
-(* :TODO: add a rpredBC in ssralg *)
 Lemma realBC x y : (x - y \is real) = (y - x \is real).
-Proof. by rewrite -realN opprB. Qed.
+Proof. exact: rpredBC. Qed.
 
 Lemma realD : {in real &, forall x y, x + y \is real}.
 Proof. exact: rpredD. Qed.
@@ -4682,8 +4705,8 @@ Record of_ := Mixin {
 
 Variable (m : of_).
 
-Local Notation "x <= y" := (le m x y).
-Local Notation "x < y" := (lt m x y).
+Local Notation "x <= y" := (le m x y) : ring_scope.
+Local Notation "x < y" := (lt m x y) : ring_scope.
 Local Notation "`| x |" := (norm m x) : ring_scope.
 
 Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
@@ -4789,7 +4812,7 @@ by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
 Qed.
 
 Definition totalMixin :
-  Order.Total.mixin_of (LatticeType R le_total) := le_total.
+  Order.Total.mixin_of (DistrLatticeType R le_total) := le_total.
 
 End RealMixin.
 
@@ -4821,8 +4844,8 @@ Record of_ := Mixin {
 
 Variable (m : of_).
 
-Local Notation "x <= y" := (le m x y).
-Local Notation "x < y" := (lt m x y).
+Local Notation "x <= y" := (le m x y) : ring_scope.
+Local Notation "x < y" := (lt m x y) : ring_scope.
 Local Notation "`| x |" := (norm m x) : ring_scope.
 
 Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
@@ -4911,8 +4934,8 @@ Record of_ := Mixin {
 
 Variable (m : of_).
 
-Local Notation "x < y" := (lt m x y).
-Local Notation "x <= y" := (le m x y).
+Local Notation "x < y" := (lt m x y) : ring_scope.
+Local Notation "x <= y" := (le m x y) : ring_scope.
 Local Notation "`| x |" := (norm m x) : ring_scope.
 
 Fact lt0N x : (- x < 0) = (0 < x).
@@ -5513,101 +5536,108 @@ Definition arg_maxrP : extremum_spec >=%R P F arg_maxr := arg_maxP F Pi0.
 End RealDomainArgExtremum.
 
 Notation "@ 'real_lerP'" :=
-  (deprecate real_lerP real_leP) (at level 10, only parsing).
+  (deprecate real_lerP real_leP) (at level 10, only parsing) : fun_scope.
 Notation real_lerP := (@real_lerP _ _ _) (only parsing).
 Notation "@ 'real_ltrP'" :=
-  (deprecate real_ltrP real_ltP) (at level 10, only parsing).
+  (deprecate real_ltrP real_ltP) (at level 10, only parsing) : fun_scope.
 Notation real_ltrP := (@real_ltrP _ _ _) (only parsing).
 Notation "@ 'real_ltrNge'" :=
-  (deprecate real_ltrNge real_ltNge) (at level 10, only parsing).
+  (deprecate real_ltrNge real_ltNge) (at level 10, only parsing) : fun_scope.
 Notation real_ltrNge := (@real_ltrNge _ _ _) (only parsing).
 Notation "@ 'real_lerNgt'" :=
-  (deprecate real_lerNgt real_leNgt) (at level 10, only parsing).
+  (deprecate real_lerNgt real_leNgt) (at level 10, only parsing) : fun_scope.
 Notation real_lerNgt := (@real_lerNgt _ _ _) (only parsing).
 Notation "@ 'real_ltrgtP'" :=
-  (deprecate real_ltrgtP real_ltgtP) (at level 10, only parsing).
+  (deprecate real_ltrgtP real_ltgtP) (at level 10, only parsing) : fun_scope.
 Notation real_ltrgtP := (@real_ltrgtP _ _ _) (only parsing).
 Notation "@ 'real_ger0P'" :=
-  (deprecate real_ger0P real_ge0P) (at level 10, only parsing).
+  (deprecate real_ger0P real_ge0P) (at level 10, only parsing) : fun_scope.
 Notation real_ger0P := (@real_ger0P _ _) (only parsing).
 Notation "@ 'real_ltrgt0P'" :=
-  (deprecate real_ltrgt0P real_ltgt0P) (at level 10, only parsing).
+  (deprecate real_ltrgt0P real_ltgt0P) (at level 10, only parsing) : fun_scope.
 Notation real_ltrgt0P := (@real_ltrgt0P _ _) (only parsing).
 Notation lerif_nat := (deprecate lerif_nat leif_nat_r) (only parsing).
 Notation "@ 'lerif_subLR'" :=
-  (deprecate lerif_subLR leif_subLR) (at level 10, only parsing).
+  (deprecate lerif_subLR leif_subLR) (at level 10, only parsing) : fun_scope.
 Notation lerif_subLR := (@lerif_subLR _) (only parsing).
 Notation "@ 'lerif_subRL'" :=
-  (deprecate lerif_subRL leif_subRL) (at level 10, only parsing).
+  (deprecate lerif_subRL leif_subRL) (at level 10, only parsing) : fun_scope.
 Notation lerif_subRL := (@lerif_subRL _) (only parsing).
 Notation "@ 'lerif_add'" :=
-  (deprecate lerif_add leif_add) (at level 10, only parsing).
+  (deprecate lerif_add leif_add) (at level 10, only parsing) : fun_scope.
 Notation lerif_add := (@lerif_add _ _ _ _ _ _ _) (only parsing).
 Notation "@ 'lerif_sum'" :=
-  (deprecate lerif_sum leif_sum) (at level 10, only parsing).
+  (deprecate lerif_sum leif_sum) (at level 10, only parsing) : fun_scope.
 Notation lerif_sum := (@lerif_sum _ _ _ _ _ _) (only parsing).
 Notation "@ 'lerif_0_sum'" :=
-  (deprecate lerif_0_sum leif_0_sum) (at level 10, only parsing).
+  (deprecate lerif_0_sum leif_0_sum) (at level 10, only parsing) : fun_scope.
 Notation lerif_0_sum := (@lerif_0_sum _ _ _ _ _) (only parsing).
 Notation "@ 'real_lerif_norm'" :=
-  (deprecate real_lerif_norm real_leif_norm) (at level 10, only parsing).
+  (deprecate real_lerif_norm real_leif_norm)
+  (at level 10, only parsing) : fun_scope.
 Notation real_lerif_norm := (@real_lerif_norm _ _) (only parsing).
 Notation "@ 'lerif_pmul'" :=
-  (deprecate lerif_pmul leif_pmul) (at level 10, only parsing).
+  (deprecate lerif_pmul leif_pmul) (at level 10, only parsing) : fun_scope.
 Notation lerif_pmul := (@lerif_pmul _ _ _ _ _ _ _) (only parsing).
 Notation "@ 'lerif_nmul'" :=
-  (deprecate lerif_nmul leif_nmul) (at level 10, only parsing).
+  (deprecate lerif_nmul leif_nmul) (at level 10, only parsing) : fun_scope.
 Notation lerif_nmul := (@lerif_nmul _ _ _ _ _ _ _) (only parsing).
 Notation "@ 'lerif_pprod'" :=
-  (deprecate lerif_pprod leif_pprod) (at level 10, only parsing).
+  (deprecate lerif_pprod leif_pprod) (at level 10, only parsing) : fun_scope.
 Notation lerif_pprod := (@lerif_pprod _ _ _ _ _ _) (only parsing).
 Notation "@ 'real_lerif_mean_square_scaled'" :=
   (deprecate real_lerif_mean_square_scaled real_leif_mean_square_scaled)
-  (at level 10, only parsing).
+  (at level 10, only parsing) : fun_scope.
 Notation real_lerif_mean_square_scaled :=
   (@real_lerif_mean_square_scaled _ _ _ _ _ _) (only parsing).
 Notation "@ 'real_lerif_AGM2_scaled'" :=
   (deprecate real_lerif_AGM2_scaled real_leif_AGM2_scaled)
-  (at level 10, only parsing).
+  (at level 10, only parsing) : fun_scope.
 Notation real_lerif_AGM2_scaled :=
   (@real_lerif_AGM2_scaled _ _ _) (only parsing).
 Notation "@ 'lerif_AGM_scaled'" :=
-  (deprecate lerif_AGM_scaled leif_AGM2_scaled) (at level 10, only parsing).
+  (deprecate lerif_AGM_scaled leif_AGM2_scaled)
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_AGM_scaled := (@lerif_AGM_scaled _ _ _ _) (only parsing).
 Notation "@ 'real_lerif_mean_square'" :=
   (deprecate real_lerif_mean_square real_leif_mean_square)
-  (at level 10, only parsing).
+  (at level 10, only parsing) : fun_scope.
 Notation real_lerif_mean_square :=
   (@real_lerif_mean_square _ _ _) (only parsing).
 Notation "@ 'real_lerif_AGM2'" :=
-  (deprecate real_lerif_AGM2 real_leif_AGM2) (at level 10, only parsing).
+  (deprecate real_lerif_AGM2 real_leif_AGM2)
+  (at level 10, only parsing) : fun_scope.
 Notation real_lerif_AGM2 := (@real_lerif_AGM2 _ _ _) (only parsing).
 Notation "@ 'lerif_AGM'" :=
-  (deprecate lerif_AGM leif_AGM) (at level 10, only parsing).
+  (deprecate lerif_AGM leif_AGM) (at level 10, only parsing) : fun_scope.
 Notation lerif_AGM := (@lerif_AGM _ _ _ _) (only parsing).
 Notation "@ 'lerif_mean_square_scaled'" :=
   (deprecate lerif_mean_square_scaled leif_mean_square_scaled)
-  (at level 10, only parsing).
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_mean_square_scaled :=
   (@lerif_mean_square_scaled _) (only parsing).
 Notation "@ 'lerif_AGM2_scaled'" :=
-  (deprecate lerif_AGM2_scaled leif_AGM2_scaled) (at level 10, only parsing).
+  (deprecate lerif_AGM2_scaled leif_AGM2_scaled)
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_AGM2_scaled := (@lerif_AGM2_scaled _) (only parsing).
 Notation "@ 'lerif_mean_square'" :=
-  (deprecate lerif_mean_square leif_mean_square) (at level 10, only parsing).
+  (deprecate lerif_mean_square leif_mean_square)
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_mean_square := (@lerif_mean_square _) (only parsing).
 Notation "@ 'lerif_AGM2'" :=
-  (deprecate lerif_AGM2 leif_AGM2) (at level 10, only parsing).
+  (deprecate lerif_AGM2 leif_AGM2) (at level 10, only parsing) : fun_scope.
 Notation lerif_AGM2 := (@lerif_AGM2 _) (only parsing).
 Notation "@ 'lerif_normC_Re_Creal'" :=
   (deprecate lerif_normC_Re_Creal leif_normC_Re_Creal)
-  (at level 10, only parsing).
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_normC_Re_Creal := (@lerif_normC_Re_Creal _) (only parsing).
 Notation "@ 'lerif_Re_Creal'" :=
-  (deprecate lerif_Re_Creal leif_Re_Creal) (at level 10, only parsing).
+  (deprecate lerif_Re_Creal leif_Re_Creal)
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_Re_Creal := (@lerif_Re_Creal _) (only parsing).
 Notation "@ 'lerif_rootC_AGM'" :=
-  (deprecate lerif_rootC_AGM leif_rootC_AGM) (at level 10, only parsing).
+  (deprecate lerif_rootC_AGM leif_rootC_AGM)
+  (at level 10, only parsing) : fun_scope.
 Notation lerif_rootC_AGM := (@lerif_rootC_AGM _ _ _ _) (only parsing).
 
 End Theory.

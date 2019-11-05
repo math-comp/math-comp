@@ -36,8 +36,8 @@ From mathcomp Require Import path.
 (* [finMixin of T by <:] == a finType structure for T, when T has a subType   *)
 (*                   structure over an existing finType.                      *)
 (*   We define or propagate the finType structure appropriately for all basic *)
-(* types : unit, bool, option, prod, sum, sig and sigT. We also define a      *)
-(* generic type constructor for finite subtypes based on an explicit          *)
+(* types : unit, bool, void, option, prod, sum, sig and sigT. We also define  *)
+(* a generic type constructor for finite subtypes based on an explicit        *)
 (* enumeration:                                                               *)
 (*          seq_sub s == the subType of all x \in s, where s : seq T for some *)
 (*                       eqType T; seq_sub s has a canonical finType instance *)
@@ -590,6 +590,8 @@ Qed.
 Lemma card0_eq A : #|A| = 0 -> A =i pred0.
 Proof. by move=> A0 x; apply/idP => Ax; rewrite (cardD1 x) Ax in A0. Qed.
 
+Lemma fintype0 : T -> #|T| <> 0. Proof. by move=> x /card0_eq/(_ x). Qed.
+
 Lemma pred0P P : reflect (P =1 pred0) (pred0b P).
 Proof. by apply: (iffP eqP); [apply: card0_eq | apply: eq_card0]. Qed.
 
@@ -602,6 +604,43 @@ Qed.
 
 Lemma card_gt0P A : reflect (exists i, i \in A) (#|A| > 0).
 Proof. by rewrite lt0n; apply: pred0Pn. Qed.
+
+Lemma card_le1P {A} : reflect {in A, forall x, A =i pred1 x} (#|A| <= 1).
+Proof.
+apply: (iffP idP) => [A1 x xA y|]; last first.
+  by have [/= x xA /(_ _ xA)/eq_card1->|/eq_card0->//] := pickP (mem A).
+move: A1; rewrite (cardD1 x) xA ltnS leqn0 => /eqP/card0_eq/(_ y).
+by rewrite !inE; have [->|]:= eqP.
+Qed.
+
+Lemma mem_card1 A : #|A| = 1 -> {x | A =i pred1 x}.
+Proof.
+move=> A1; have /card_gt0P/sigW[x xA]: #|A| > 0 by rewrite A1.
+by exists x; apply/card_le1P; rewrite ?A1.
+Qed.
+
+Lemma card1P A : reflect (exists x, A =i pred1 x) (#|A| == 1).
+Proof.
+by apply: (iffP idP) => [/eqP/mem_card1[x inA]|[x /eq_card1/eqP//]]; exists x.
+Qed.
+
+Lemma fintype_le1P : reflect (forall x, all_equal_to x) (#|T| <= 1).
+Proof.
+apply: (iffP card_le1P)=> [inT x y|all_eq x _ y]; last first.
+  by rewrite (all_eq x) !inE eqxx.
+by suff: y \in T by rewrite (inT x)// => /eqP.
+Qed.
+
+Lemma fintype1 : #|T| = 1 -> {x : T | all_equal_to x}.
+Proof.
+by move=> /mem_card1[x ex]; exists x => y; suff: y \in T by rewrite ex => /eqP.
+Qed.
+
+Lemma fintype1P : reflect (exists x, all_equal_to x) (#|T| == 1).
+Proof.
+apply: (iffP idP) => [/eqP/fintype1|] [x eqx]; first by exists x.
+by apply/card1P; exists x => y; rewrite eqx !inE eqxx.
+Qed.
 
 Lemma subsetE A B : (A \subset B) = pred0b [predD A & B].
 Proof. by rewrite unlock. Qed.
@@ -828,6 +867,10 @@ Hint Resolve subxx_hint : core.
 
 Arguments pred0P {T P}.
 Arguments pred0Pn {T P}.
+Arguments card_le1P {T A}.
+Arguments card1P {T A}.
+Arguments fintype_le1P {T}.
+Arguments fintype1P {T}.
 Arguments subsetP {T A B}.
 Arguments subsetPn {T A B}.
 Arguments subset_eqP {T A B}.
@@ -1356,6 +1399,11 @@ Lemma bool_enumP : Finite.axiom [:: true; false]. Proof. by case. Qed.
 Definition bool_finMixin := Eval hnf in FinMixin bool_enumP.
 Canonical bool_finType := Eval hnf in FinType bool bool_finMixin.
 Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
+
+Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
+Definition void_finMixin := Eval hnf in FinMixin void_enumP.
+Canonical void_finType := Eval hnf in FinType void void_finMixin.
+Lemma card_void : #|{: void}| = 0. Proof. by rewrite cardT enumT unlock. Qed.
 
 Local Notation enumF T := (Finite.enum T).
 

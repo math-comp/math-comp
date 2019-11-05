@@ -93,6 +93,9 @@ coq-8.8:
 coq-8.9:
   extends: .opam-build-once
 
+coq-8.10:
+  extends: .opam-build-once
+
 coq-dev:
   extends: .opam-build
 
@@ -142,7 +145,7 @@ coq-dev:
     - make install
   except:
     - /^experiment\/order$/
-    - /^pr-(270|388|392)$/
+    - /^pr-(270|388|402)$/
 
 ci-fourcolor-8.7:
   extends: .ci-fourcolor
@@ -159,6 +162,11 @@ ci-fourcolor-8.9:
   variables:
     COQ_VERSION: "8.9"
 
+ci-fourcolor-8.10:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.10"
+
 ci-fourcolor-dev:
   extends: .ci-fourcolor
   variables:
@@ -174,7 +182,7 @@ ci-fourcolor-dev:
     - make install
   only:
     - /^experiment\/order$/
-    - /^pr-(270|388|392)$/
+    - /^pr-(270|388|402)$/
 
 ci-fourcolor-8.7-270:
   extends: .ci-fourcolor-270
@@ -202,7 +210,7 @@ ci-fourcolor-dev-270:
     - make install
   except:
     - /^experiment\/order$/
-    - /^pr-(270|388|392)$/
+    - /^pr-(270|388|402)$/
 
 ci-odd-order-8.7:
   extends: .ci-odd-order
@@ -219,6 +227,11 @@ ci-odd-order-8.9:
   variables:
     COQ_VERSION: "8.9"
 
+ci-odd-order-8.10:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.10"
+
 ci-odd-order-dev:
   extends: .ci-odd-order
   variables:
@@ -234,7 +247,7 @@ ci-odd-order-dev:
     - make install
   only:
     - /^experiment\/order$/
-    - /^pr-(270|388|392)$/
+    - /^pr-(270|388|402)$/
 
 ci-odd-order-8.7-270:
  extends: .ci-odd-order-270
@@ -271,6 +284,11 @@ ci-lemma-overloading-8.9:
   variables:
     COQ_VERSION: "8.9"
 
+ci-lemma-overloading-8.10:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.10"
+
 ci-lemma-overloading-dev:
   extends: .ci-lemma-overloading
   variables:
@@ -300,6 +318,11 @@ ci-bigenough-8.9:
   extends: .ci-bigenough
   variables:
     COQ_VERSION: "8.9"
+
+ci-bigenough-8.9:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.10"
 
 ci-bigenough-dev:
   extends: .ci-bigenough
@@ -389,6 +412,11 @@ ci-finmap-8.9:
   variables:
     COQ_VERSION: "8.9"
 
+ci-finmap-8.10:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.10"
+
 ci-finmap-dev:
   extends: .ci-finmap
   variables:
@@ -438,6 +466,9 @@ mathcomp-dev:coq-8.8:
   extends: .docker-deploy-once
 
 mathcomp-dev:coq-8.9:
+  extends: .docker-deploy-once
+
+mathcomp-dev:coq-8.10:
   extends: .docker-deploy-once
 
 mathcomp-dev:coq-dev:
