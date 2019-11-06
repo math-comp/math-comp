@@ -34,7 +34,7 @@ installation instructions in other scenarios.
 - The [Mathematical Components Book](https://math-comp.github.io/mcb/)
   provides a comprehensive introduction to the library.
 - The [MathComp wiki](https://github.com/math-comp/math-comp/wiki)
-  contains many useful information, including including a list of
+  contains many useful information, including a list of
   [tutorials](https://github.com/math-comp/math-comp/wiki/tutorials).
 - Experienced users hang around at
   [StackOverflow](https://stackoverflow.com/questions/tagged/ssreflect)
