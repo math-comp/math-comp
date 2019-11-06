@@ -73,6 +73,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `filter_sort`, `mask_sort`, `sorted_mask_sort`, `subseq_sort`,
   `sorted_subseq_sort`, and `mem2_sort`.
 
+- New algebraic interfaces : comAlgebra and comUnitAlgebra for
+  commutative and commutative-unitary algebras.
+
+- Initial property for polynomials in algebras:
+  New canonical lrMoprphism `horner_alg` evaluating a polynomial in an element
+  of an algebra. The theory include the lemmas `in_alg_comm`, `horner_algC`,
+  `horner_algX`, `poly_alg_initial`.
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to

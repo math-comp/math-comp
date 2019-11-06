@@ -370,6 +370,8 @@ Definition lmodType := @Lmodule.Pack F phF cT xclass.
 Definition lalgType := @Lalgebra.Pack F phF cT xclass.
 Definition algType := @Algebra.Pack F phF cT xclass.
 Definition unitAlgType := @UnitAlgebra.Pack F phF cT xclass.
+Definition comAlgType := @ComAlgebra.Pack F phF cT xclass.
+Definition comUnitAlgType := @ComUnitAlgebra.Pack F phF cT xclass.
 Definition vectType := @Vector.Pack F phF cT xclass.
 Definition FalgType := @Falgebra.Pack F phF cT xclass.
 Definition fieldExtType := @FieldExt.Pack F phF cT xclass.
@@ -405,8 +407,12 @@ Coercion lalgType : type >-> Lalgebra.type.
 Canonical lalgType.
 Coercion algType : type >-> Algebra.type.
 Canonical algType.
+Coercion comAlgType : type >-> ComAlgebra.type.
+Canonical comAlgType.
 Coercion unitAlgType : type >-> UnitAlgebra.type.
 Canonical unitAlgType.
+Coercion comUnitAlgType : type >-> ComUnitAlgebra.type.
+Canonical comUnitAlgType.
 Coercion vectType : type >-> Vector.type.
 Canonical vectType.
 Coercion FalgType : type >-> Falgebra.type.

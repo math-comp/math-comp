@@ -74,6 +74,9 @@ From mathcomp Require Import fintype bigop div ssralg countalg binomial tuple.
 (*      horner_eval u == the function mapping p to p.[u]; this function can   *)
 (*                       only be used for u in a commutative ring, so it is   *)
 (*                       always a linear ring morphism from {poly R} to R.    *)
+(*       horner_alg a == given a in some R-algebra A, the function evaluating *)
+(*                       a polynomial p at a; it is always a linear ring      *)
+(*                       morphism from {poly R} to A.                         *)
 (*     diff_roots x y == x and y are distinct roots; if R is a field, this    *)
 (*                       just means x != y, but this concept is generalized   *)
 (*                       to the case where R is only a ring with units (i.e., *)
@@ -2060,6 +2063,7 @@ Canonical polynomial_comRingType :=
 Canonical poly_algType := Eval hnf in CommAlgType R {poly R}.
 Canonical polynomial_algType :=
   Eval hnf in [algType R of polynomial R for poly_algType].
+Canonical poly_comAlgType := Eval hnf in [comAlgType R of {poly R}].
 
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
 Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
@@ -2090,6 +2094,50 @@ Canonical horner_eval_additive x := Additive (horner_eval_is_lrmorphism x).
 Canonical horner_eval_rmorphism x := RMorphism (horner_eval_is_lrmorphism x).
 Canonical horner_eval_linear x := AddLinear (horner_eval_is_lrmorphism x).
 Canonical horner_eval_lrmorphism x := [lrmorphism of horner_eval x].
+
+Section HornerAlg.
+
+Variable A : algType R. (* For univariate polys, commutativity is not needed *)
+
+Section Defs.
+
+Variable a : A.
+
+Lemma in_alg_comm : commr_rmorph (in_alg A) a.
+Proof. move=> r /=; by rewrite /GRing.comm comm_alg. Qed.
+
+Definition horner_alg := horner_morph in_alg_comm.
+
+Lemma horner_algC c : horner_alg c%:P = c%:A.
+Proof. exact: horner_morphC. Qed.
+
+Lemma horner_algX : horner_alg 'X = a.
+Proof. exact:  horner_morphX. Qed.
+
+Fact horner_alg_is_lrmorphism : lrmorphism horner_alg.
+Proof.
+rewrite /horner_alg; split=> [|c p]; last by rewrite linearZ /= mulr_algl.
+split=> [p q|]; first by rewrite rmorphB.
+split=> [p q|]; last by rewrite rmorph1.
+by rewrite rmorphM.
+Qed.
+Canonical horner_alg_additive := Additive horner_alg_is_lrmorphism.
+Canonical horner_alg_rmorphism := RMorphism horner_alg_is_lrmorphism.
+Canonical horner_alg_linear := AddLinear horner_alg_is_lrmorphism.
+Canonical horner_alg_lrmorphism := [lrmorphism of horner_alg].
+
+End Defs.
+
+Variable (pf : {lrmorphism {poly R} -> A}).
+
+Lemma poly_alg_initial : pf =1 horner_alg (pf 'X).
+Proof.
+apply: poly_ind => [|p a IHp]; first by rewrite !rmorph0.
+rewrite !rmorphD !rmorphM /= -{}IHp horner_algC ?horner_algX.
+by rewrite -alg_polyC rmorph_alg.
+Qed.
+
+End HornerAlg.
 
 Fact comp_poly_multiplicative q : multiplicative (comp_poly q).
 Proof.

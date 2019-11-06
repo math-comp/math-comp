@@ -358,6 +358,21 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           property, provided S's key is a divringPred;     *)
 (*                           divalg_closed coerces to all the prerequisites.  *)
 (*                                                                            *)
+(*  * ComAlgebra (commutative algebra):                                       *)
+(*           comAlgType R == interface type for ComAlgebra structure with     *)
+(*                           scalars in R; R should have a comRingType        *)
+(*                           structure.                                       *)
+(*    [comAlgType R of V] == a comAlgType R structure for V created by        *)
+(*                           merging canonical algType and comRingType on V.  *)
+(*                                                                            *)
+(*  * ComUnitAlgebra (commutative algebra with computable inverses):          *)
+(*       comUnitAlgType R == interface type for ComUnitAlgebra structure with *)
+(*                           scalars in R; R should have a comUnitRingType    *)
+(*                           structure.                                       *)
+(* [comUnitAlgType R of V] == a comUnitAlgType R structure for V created by   *)
+(*                           merging canonical comAlgType and                 *)
+(*                           unitRingType on V.                               *)
+(*                                                                            *)
 (*   In addition to this structure hierarchy, we also develop a separate,     *)
 (* parallel hierarchy for morphisms linking these structures:                 *)
 (*                                                                            *)
@@ -2680,6 +2695,79 @@ End Exports.
 End Algebra.
 Import Algebra.Exports.
 
+Module ComAlgebra.
+
+Section ClassDef.
+
+Variable R : ringType.
+
+Record class_of (T : Type) : Type := Class {
+  base : Algebra.class_of R T;
+  mixin : commutative (Ring.mul base)
+}.
+Definition base2 R m := ComRing.Class (@mixin R m).
+Local Coercion base : class_of >-> Algebra.class_of.
+Local Coercion base2 : class_of >-> ComRing.class_of.
+
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
+Local Coercion sort : type >-> Sortclass.
+Variable (phR : phant R) (T : Type) (cT : type phR).
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
+Notation xclass := (class : class_of xT).
+
+Definition pack :=
+  fun bT b & phant_id (@Algebra.class R phR bT) (b : Algebra.class_of R T) =>
+  fun mT m & phant_id (ComRing.mixin (ComRing.class mT)) m =>
+  Pack (Phant R) (@Class T b m).
+
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lalgType := @Lalgebra.Pack R phR cT xclass.
+Definition algType := @Algebra.Pack R phR cT xclass.
+Definition lmod_comRingType := @Lmodule.Pack R phR comRingType xclass.
+Definition lalg_comRingType := @Lalgebra.Pack R phR comRingType xclass.
+Definition alg_comRingType := @Algebra.Pack R phR comRingType xclass.
+
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> Algebra.class_of.
+Coercion base2 : class_of >-> ComRing.class_of.
+Coercion sort : type >-> Sortclass.
+Bind Scope ring_scope with sort.
+Coercion eqType : type >-> Equality.type.
+Canonical eqType.
+Coercion choiceType : type >-> Choice.type.
+Canonical choiceType.
+Coercion zmodType : type >-> Zmodule.type.
+Canonical zmodType.
+Coercion ringType : type >-> Ring.type.
+Canonical ringType.
+Coercion comRingType : type >-> ComRing.type.
+Canonical comRingType.
+Coercion lmodType : type >-> Lmodule.type.
+Canonical lmodType.
+Coercion lalgType : type >-> Lalgebra.type.
+Canonical lalgType.
+Coercion algType : type >-> Algebra.type.
+Canonical algType.
+Canonical lmod_comRingType.
+Canonical lalg_comRingType.
+Canonical alg_comRingType.
+
+Notation comAlgType R := (type (Phant R)).
+Notation "[ 'comAlgType' R 'of' T ]" := (@pack _ (Phant R) T _ _ id _ _ id)
+  (at level 0, format "[ 'comAlgType'  R  'of'  T ]") : form_scope.
+End Exports.
+
+End ComAlgebra.
+Import ComAlgebra.Exports.
+
 Section AlgebraTheory.
 
 Variables (R : comRingType) (A : algType R).
@@ -2693,6 +2781,9 @@ Proof. by rewrite -scalerAl scalerAr. Qed.
 
 Lemma mulr_algr a x : x * a%:A = a *: x.
 Proof. by rewrite -scalerAr mulr1. Qed.
+
+Lemma comm_alg a x : comm a%:A x.
+Proof. by rewrite /comm mulr_algr mulr_algl. Qed.
 
 Lemma exprZn k x n : (k *: x) ^+ n = k ^+ n *: x ^+ n.
 Proof.
@@ -2718,6 +2809,7 @@ Proof. by rewrite scaler_prod prodr_const. Qed.
 
 Canonical regular_comRingType := [comRingType of R^o].
 Canonical regular_algType := CommAlgType R R^o.
+Canonical regular_comAlgType := [comAlgType R of R^o].
 
 Variables (U : lmodType R) (a : A) (f : {linear U -> A}).
 
@@ -3202,6 +3294,105 @@ End Exports.
 End UnitAlgebra.
 Import UnitAlgebra.Exports.
 
+Module ComUnitAlgebra.
+
+Section ClassDef.
+
+Variable R : ringType.
+
+Record class_of (T : Type) : Type := Class {
+  base : ComAlgebra.class_of R T;
+  mixin : GRing.UnitRing.mixin_of (ComRing.Pack base)
+}.
+Definition base2 R m := UnitAlgebra.Class (@mixin R m).
+Definition base3 R m := ComUnitRing.Class (@mixin R m).
+Local Coercion base : class_of >-> ComAlgebra.class_of.
+Local Coercion base2 : class_of >-> UnitAlgebra.class_of.
+Local Coercion base3 : class_of >-> ComUnitRing.class_of.
+
+Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
+Local Coercion sort : type >-> Sortclass.
+Variable (phR : phant R) (T : Type) (cT : type phR).
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+Let xT := let: Pack T _ := cT in T.
+Notation xclass := (class : class_of xT).
+
+Definition pack :=
+  fun bT b & phant_id (@ComAlgebra.class R phR bT) (b : ComAlgebra.class_of R T) =>
+  fun mT m & phant_id (UnitRing.mixin (UnitRing.class mT)) m =>
+  Pack (Phant R) (@Class T b m).
+
+Definition eqType := @Equality.Pack cT xclass.
+Definition choiceType := @Choice.Pack cT xclass.
+Definition zmodType := @Zmodule.Pack cT xclass.
+Definition ringType := @Ring.Pack cT xclass.
+Definition unitRingType := @UnitRing.Pack cT xclass.
+Definition comRingType := @ComRing.Pack cT xclass.
+Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
+Definition lmodType := @Lmodule.Pack R phR cT xclass.
+Definition lalgType := @Lalgebra.Pack R phR cT xclass.
+Definition algType := @Algebra.Pack R phR cT xclass.
+Definition comAlgType := @ComAlgebra.Pack R phR cT xclass.
+Definition unitAlgType := @UnitAlgebra.Pack R phR cT xclass.
+Definition comalg_unitRingType := @ComAlgebra.Pack R phR unitRingType xclass.
+Definition comalg_comUnitRingType :=
+  @ComAlgebra.Pack R phR comUnitRingType xclass.
+Definition comalg_unitAlgType := @ComAlgebra.Pack R phR unitAlgType xclass.
+Definition unitalg_comRingType := @UnitAlgebra.Pack R phR comRingType xclass.
+Definition unitalg_comUnitRingType :=
+  @UnitAlgebra.Pack R phR comUnitRingType xclass.
+Definition lmod_comUnitRingType := @Lmodule.Pack R phR comUnitRingType xclass.
+Definition lalg_comUnitRingType := @Lalgebra.Pack R phR comUnitRingType xclass.
+Definition alg_comUnitRingType := @Algebra.Pack R phR comUnitRingType xclass.
+
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> ComAlgebra.class_of.
+Coercion base2 : class_of >-> UnitAlgebra.class_of.
+Coercion sort : type >-> Sortclass.
+Bind Scope ring_scope with sort.
+Coercion eqType : type >-> Equality.type.
+Canonical eqType.
+Coercion choiceType : type >-> Choice.type.
+Canonical choiceType.
+Coercion zmodType : type >-> Zmodule.type.
+Canonical zmodType.
+Coercion ringType : type >-> Ring.type.
+Canonical ringType.
+Coercion unitRingType : type >-> UnitRing.type.
+Canonical unitRingType.
+Coercion comRingType : type >-> ComRing.type.
+Canonical comRingType.
+Coercion comUnitRingType : type >-> ComUnitRing.type.
+Canonical comUnitRingType.
+Coercion lmodType : type >-> Lmodule.type.
+Canonical lmodType.
+Coercion lalgType : type >-> Lalgebra.type.
+Canonical lalgType.
+Coercion algType : type >-> Algebra.type.
+Canonical algType.
+Coercion comAlgType : type >-> ComAlgebra.type.
+Canonical comAlgType.
+Coercion unitAlgType : type >-> UnitAlgebra.type.
+Canonical unitAlgType.
+Canonical comalg_unitRingType.
+Canonical comalg_comUnitRingType.
+Canonical comalg_unitAlgType.
+Canonical unitalg_comRingType.
+Canonical unitalg_comUnitRingType.
+Canonical lmod_comUnitRingType.
+Canonical lalg_comUnitRingType.
+Canonical alg_comUnitRingType.
+
+Notation comUnitAlgType R := (type (Phant R)).
+Notation "[ 'comUnitAlgType' R 'of' T ]" := (@pack _ (Phant R) T _ _ id _ _ id)
+  (at level 0, format "[ 'comUnitAlgType'  R  'of'  T ]") : form_scope.
+End Exports.
+
+End ComUnitAlgebra.
+Import ComUnitAlgebra.Exports.
+
 Section ComUnitRingTheory.
 
 Variable R : comUnitRingType.
@@ -3230,6 +3421,7 @@ Proof. by rewrite exprMn exprVn. Qed.
 
 Canonical regular_comUnitRingType := [comUnitRingType of R^o].
 Canonical regular_unitAlgType := [unitAlgType R of R^o].
+Canonical regular_comUnitAlgType := [comUnitAlgType R of R^o].
 
 End ComUnitRingTheory.
 
@@ -5754,6 +5946,7 @@ Definition signrZK := signrZK.
 Definition scalerCA := scalerCA.
 Definition scalerAr := scalerAr.
 Definition mulr_algr := mulr_algr.
+Definition comm_alg := comm_alg.
 Definition exprZn := exprZn.
 Definition scaler_prodl := scaler_prodl.
 Definition scaler_prodr := scaler_prodr.
@@ -5797,8 +5990,9 @@ End GRing.
 
 Export Zmodule.Exports Ring.Exports Lmodule.Exports Lalgebra.Exports.
 Export Additive.Exports RMorphism.Exports Linear.Exports LRMorphism.Exports.
-Export ComRing.Exports Algebra.Exports UnitRing.Exports UnitAlgebra.Exports.
-Export ComUnitRing.Exports IntegralDomain.Exports Field.Exports.
+Export Algebra.Exports UnitRing.Exports UnitAlgebra.Exports.
+Export ComRing.Exports ComAlgebra.Exports ComUnitRing.Exports.
+Export ComUnitAlgebra.Exports IntegralDomain.Exports Field.Exports.
 Export DecidableField.Exports ClosedField.Exports.
 Export Pred.Exports SubType.Exports.
 Notation QEdecFieldMixin := QEdecFieldMixin.
