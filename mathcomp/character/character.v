@@ -2930,7 +2930,7 @@ have [-> | ntG] := eqsVneq G [1]; first by exists 0; apply: cfker_sub.
 have{pG} [[p_pr _ _] pZ] := (pgroup_pdiv pG ntG, pgroupS (center_sub G) pG).
 have ntZ: 'Z(G) != [1] by rewrite center_nil_eq1.
 have{pZ} oZ: #|Z| = p by apply: Ohm1_cyclic_pgroup_prime.
-apply/existsP; apply: contraR ntZ; rewrite negb_exists => /forallP-not_ffulG.
+apply/existsP; apply: contraR ntZ => /existsPn-not_ffulG.
 rewrite -Ohm1_eq1 -subG1 /= -/Z -(TI_cfker_irr G); apply/bigcapsP=> i _.
 rewrite prime_meetG ?oZ // setIC meet_Ohm1 // meet_center_nil ?cfker_normal //.
 by rewrite -subG1 not_ffulG.

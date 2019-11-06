@@ -609,7 +609,7 @@ Arguments rV_subP {m1 m2 n A B}.
 
 Lemma row_subPn m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (exists i, ~~ (row i A <= B)%MS) (~~ (A <= B)%MS).
-Proof. by rewrite (sameP row_subP forallP) negb_forall; apply: existsP. Qed.
+Proof. by rewrite (sameP row_subP forallP); apply: forallPn. Qed.
 
 Lemma sub_rVP n (u v : 'rV_n) : reflect (exists a, u = a *: v) (u <= v)%MS.
 Proof.

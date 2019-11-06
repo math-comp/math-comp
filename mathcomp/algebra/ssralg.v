@@ -4625,9 +4625,7 @@ Proof. by move=> x0 y0; rewrite mulf_eq0; apply/norP. Qed.
 
 Lemma prodf_neq0 (I : finType) (P : pred I) (F : I -> R) :
   reflect (forall i, P i -> (F i != 0)) (\prod_(i | P i) F i != 0).
-Proof.
-by rewrite (sameP (prodf_eq0 _ _) exists_inP) negb_exists_in; apply: forall_inP.
-Qed.
+Proof. by rewrite (sameP (prodf_eq0 _ _) exists_inP); apply: exists_inPn. Qed.
 
 Lemma prodf_seq_neq0 I r (P : pred I) (F : I -> R) :
   (\prod_(i <- r | P i) F i != 0) = all (fun i => P i ==> (F i != 0)) r.

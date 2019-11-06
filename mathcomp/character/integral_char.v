@@ -687,7 +687,7 @@ Theorem nonlinear_irr_vanish gT (G : {group gT}) i :
   'chi[G]_i 1%g > 1 -> exists2 x, x \in G & 'chi_i x = 0.
 Proof.
 move=> chi1gt1; apply/exists_eq_inP; apply: contraFT (ltr_geF chi1gt1).
-rewrite negb_exists_in => /forall_inP-nz_chi.
+move/exists_inPn => -nz_chi.
 rewrite -(norm_Cnat (Cnat_irr1 i)) -(@expr_le1 _ 2) ?normr_ge0 //.
 rewrite -(ler_add2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
 rewrite (cfnormE (cfun_onG _)) mulVKf ?neq0CG // (big_setD1 1%g) //=.
