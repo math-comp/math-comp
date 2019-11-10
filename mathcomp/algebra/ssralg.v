@@ -1101,6 +1101,13 @@ Proof. exact/commrN/commr1. Qed.
 Lemma commrD x y z : comm x y -> comm x z -> comm x (y + z).
 Proof. by rewrite /comm mulrDl mulrDr => -> ->. Qed.
 
+Lemma commr_sum (I : Type) (s : seq I) (P : pred I) (F : I -> R) x :
+  (forall i, P i -> comm x (F i)) -> comm x (\sum_(i <- s | P i) F i).
+Proof.
+move=> H; rewrite /comm mulr_suml mulr_sumr.
+by apply eq_bigr => i /H.
+Qed.
+
 Lemma commrMn x y n : comm x y -> comm x (y *+ n).
 Proof.
 rewrite /comm => com_xy.
@@ -1109,6 +1116,15 @@ Qed.
 
 Lemma commrM x y z : comm x y -> comm x z -> comm x (y * z).
 Proof. by move=> com_xy; rewrite /comm mulrA com_xy -!mulrA => ->. Qed.
+
+Lemma commr_prod (I : Type) (s : seq I) (P : pred I) (F : I -> R) x :
+  (forall i, P i -> comm x (F i)) -> comm x (\prod_(i <- s | P i) F i).
+Proof.
+move=> H; rewrite /comm.
+elim: s => [|s0 s IHs]; first by rewrite !big_nil commr1.
+rewrite big_cons; case: (boolP (P s0)); last by rewrite IHs.
+by rewrite mulrA => /H ->; rewrite -!mulrA IHs.
+Qed.
 
 Lemma commr_nat x n : comm x n%:R.
 Proof. exact/commrMn/commr1. Qed.
