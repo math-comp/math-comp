@@ -576,7 +576,7 @@ Canonical rat_porderType := POrderType ring_display rat ratLeMixin.
 Canonical rat_distrLatticeType := DistrLatticeType rat ratLeMixin.
 Canonical rat_orderType := OrderType rat le_rat_total.
 Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
-Canonical rat_normedZmodType := NormedZmoduleType rat rat ratLeMixin.
+Canonical rat_normedZmodType := NormedZmodType rat rat ratLeMixin.
 Canonical rat_numFieldType := [numFieldType of rat].
 Canonical rat_realDomainType := [realDomainType of rat].
 Canonical rat_realFieldType := [realFieldType of rat].
@@ -811,7 +811,7 @@ Qed.
 
 Require setoid_ring.Field_theory setoid_ring.Field_tac.
 
-Lemma rat_field_theory : 
+Lemma rat_field_theory :
   Field_theory.field_theory 0%Q 1%Q addq mulq subq oppq divq invq eq.
 Proof.
 split => //; first exact rat_ring_theory.

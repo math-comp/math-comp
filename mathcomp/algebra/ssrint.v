@@ -434,7 +434,7 @@ Canonical int_porderType := POrderType ring_display int intOrdered.Mixin.
 Canonical int_distrLatticeType := DistrLatticeType int intOrdered.Mixin.
 Canonical int_orderType := OrderType int intOrdered.lez_total.
 Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
-Canonical int_normedZmodType := NormedZmoduleType int int intOrdered.Mixin.
+Canonical int_normedZmodType := NormedZmodType int int intOrdered.Mixin.
 Canonical int_realDomainType := [realDomainType of int].
 
 Section intOrderedTheory.
