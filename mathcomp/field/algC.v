@@ -232,7 +232,7 @@ Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
 Parameter numMixin : numMixin idomainType.
 Canonical porderType := POrderType ring_display type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
-Canonical normedZmodType := NormedZmoduleType type type numMixin.
+Canonical normedZmodType := NormedZmodType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
@@ -432,7 +432,7 @@ Definition numMixin : numMixin closedFieldType :=
   sval (ComplexNumMixin conjK conj_nt).
 Canonical porderType := POrderType ring_display type numMixin.
 Canonical numDomainType := NumDomainType type numMixin.
-Canonical normedZmodType := NormedZmoduleType type type numMixin.
+Canonical normedZmodType := NormedZmodType type type numMixin.
 Canonical numFieldType := [numFieldType of type].
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
