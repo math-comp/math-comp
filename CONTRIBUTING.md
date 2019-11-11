@@ -8,7 +8,7 @@ integrated to the library.
 This file is not comprehensive yet and might still contain mistakes or
 unclear indications, please consider contributing.
 
-## Proof style.
+## Proof style
 ### General guidelines
 - **A line should have no more than 80 characters**. If a line is
 longer than that, it should be cut semantically. If there is no way to
@@ -57,12 +57,12 @@ We write
   tactic. (* third subgoal is the main one *)
   ```
 
-## Statements of lemmas, theorems and definitions.
+## Statements of lemmas, theorems and definitions
 
 - Universal quantifications with dependent variable should appear on the left hand side of the colon, until we reach the first non dependent variables. e.g.
   `Lemma example x y : x < y -> x >= y = false`
 
-### Term style.
+### Term style
 - Operators are surrounded by space, for example `n*m` should be written `n * m`.
 This particular example can be problematic if matrix.v is imported because then, `M *m N` is matrix product.
 
@@ -77,21 +77,21 @@ This particular example can be problematic if matrix.v is imported because then,
   + Polynomials should be named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
   + Matrices should be named `A`, `B`, ..., `M`, `N`, ...
 
-### Naming conventions (Non exhaustive)
-#### Names in the library usually obey one of following the convention
+### Naming conventions for lemmas (non exhaustive)
+#### Names in the library usually obey one of the following conventions
  - `(condition_)?mainSymbol_suffixes`
  - `mainSymbol_suffixes(_condition)?`
 Or in the presence of a property denoted by a nary or unary predicate:
  - `naryPredicate_mainSymbol+`
  - `mainSymbol_unaryPredicate`
-#### Where :
- - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object ofstudy, head symbol or not. It is usually either
-  - one of the main symbols of the theory at hand. For example, it will be `opp`, `add`, `mul`, etc...
-  - or a special "canonical" operation, such as a ring morphism or a
-    subtype predicate. e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc ...
+#### Where:
+ - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either
+   + one of the main symbols of the theory at hand. For example, it will be `opp`, `add`, `mul`, etc., or
+   + a special "canonical" operation, such as a ring morphism or a
+     subtype predicate. e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc.
  - "condition" is used when the lemma applies under some hypothesis.
- - "suffixes" are there to refine what shape and/or what other symbols  the lemma has. It can either be the name of a symbol ("add", "mul",  etc...), or the (short) name of a predicate ("`inj`" for "`injectivity`", "`id`" for "identity", ...) or an abbreviation.
-Abbreviations are in the header of the file which introduce them. We list here the main abbreviations.
+ - "suffixes" are there to refine what shape and/or what other symbols  the lemma has. It can either be the name of a symbol ("add", "mul", etc.), or the (short) name of a predicate ("`inj`" for "`injectivity`", "`id`" for "identity", etc.) or an abbreviation.
+Abbreviations are in the header of the file which introduces them. We list here the main abbreviations.
   - `A` -- associativity, as in `andbA : associative andb.`
   - `AC` -- right commutativity.
   - `ACA` -- self-interchange (inner commutativity), e.g., `orbACA : (a || b) || (c || d) = (a || c) || (b || d).`
@@ -130,7 +130,29 @@ Abbreviations are in the header of the file which introduce them. We list here t
 #### Typical search pattern
 `Search _ "prefix" "suffix"* (symbol|pattern)* in library.`
 
-## Doc style.
+### Naming conventions for definitions (non exhaustive)	
+
+- Structure for types
+  - Mixed case, the first letter lowercase and the first letter of each internal word capitalized, end with `Type`
+  - e.g., `unitRingType`
+- Packed classes
+  - Mixed case, the first letter of each internal word capitalized, end with `Type`
+  - e.g., `UnitRingType`
+- Mixins
+  - Mixed case, the first letter of each internal word capitalised, end with `Mixin`
+  - e.g., `UnitRingMixin`
+- Coq Modules:
+  - Mixed case, the first letter of each internal word capitalized
+  - e.g., `NumDomain` in `ssrnum.v`
+
+#### Abbreviations
+- The following are considered as single words and are abbreviated when used as prefixes
+  - Z-module becomes `zmod`/`Zmod`, e.g., `ZmodType` in `ssralg.v`, `normedZmodType` in `ssrnum.v`
+  - L-module becomes `lmod`/`Lmod`
+  - L-algebra becomes `lalg`/`Lalg`
+- Partial order is abbreviated to `porder` or `POrder`, e.g., `porderType`, `CanPOrderMixin` in `order.v`
+
+## Doc style
 ### Header documentary comments
 We try to document types, definitions and notations precisely, but only describe
 the lemmas and theorems in general terms, because we don't want to discourage users
