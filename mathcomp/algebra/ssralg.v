@@ -1102,13 +1102,13 @@ Lemma commrD x y z : comm x y -> comm x z -> comm x (y + z).
 Proof. by rewrite /comm mulrDl mulrDr => -> ->. Qed.
 
 Lemma commrB x y z : comm x y -> comm x z -> comm x (y - z).
-Proof. by move=> com_xy com_xz; apply commrD => //; apply commrN. Qed.
+Proof. by move=> com_xy com_xz; apply: commrD => //; apply: commrN. Qed.
 
 Lemma commr_sum (I : Type) (s : seq I) (P : pred I) (F : I -> R) x :
   (forall i, P i -> comm x (F i)) -> comm x (\sum_(i <- s | P i) F i).
 Proof.
 move=> comm_x_F; rewrite /comm mulr_suml mulr_sumr.
-by apply eq_bigr => i /comm_x_F.
+by apply: eq_bigr => i /comm_x_F.
 Qed.
 
 Lemma commrMn x y n : comm x y -> comm x (y *+ n).
