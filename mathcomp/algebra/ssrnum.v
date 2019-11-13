@@ -64,7 +64,7 @@ From mathcomp Require Import ssralg poly.
 (*   * ArchiField (A Real Field with the archimedean axiom)                   *)
 (*   archiFieldType == interface for an archimedean field.                    *)
 (*   ArchiFieldType T r                                                       *)
-(*                  == packs the archimeadean axiom r into an archiFieldType. *)
+(*                  == packs the archimedean axiom r into an archiFieldType.  *)
 (*                     The carrier T must have a real field type structure.   *)
 (*   [archiFieldType of T for S]                                              *)
 (*                  == T-clone of the archiFieldType structure S.             *)
