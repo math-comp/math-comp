@@ -5031,7 +5031,6 @@ End RealLtMixin.
 Reserved Notation "'{nonneg' R }" (at level 0, format "'{nonneg'  R }").
 Reserved Notation "x %:nng" (at level 0, format "x %:nng").
 Reserved Notation "x %:nngnum" (at level 0, format "x %:nngnum").
-Reserved Notation "[ge0 'of' x ]" (format "[ge0 'of'  x ]").
 Module Nonneg.
 Section nonnegative_numbers.
 
@@ -5044,6 +5043,7 @@ Hint Extern 0 ((0%R <= _)%O = true) => exact: nngnum_ge0 : core.
 Local Notation "'{nonneg' R }" := (nngnum_of (@Phant R)).
 Definition NngNum (R : numDomainType) x x_ge0 : {nonneg R} :=
   @NngNumDef _ (Phant R) x x_ge0.
+Arguments NngNum {R}.
 
 Local Notation "x %:nngnum" := (num_of_nng x) : ring_scope.
 Definition nng_of_num (R : numDomainType) (x : {nonneg R})
@@ -5067,32 +5067,42 @@ Proof. by move=> x y; apply/real_comparable; apply/ger0_real. Qed.
 
 Canonical nngnum_latticeType := DistrLatticeType {nonneg R} nngnum_le_total.
 Canonical nngnum_orderType := OrderType {nonneg R} nngnum_le_total.
+
 End Order.
+
+End nonnegative_numbers.
+
+Module Exports.
+Arguments NngNum {R}.
+Notation "'{nonneg' R }" := (nngnum_of (@Phant R)) : type_scope.
+Notation "x %:nngnum" := (num_of_nng x) : ring_scope.
+Hint Extern 0 ((0%R <= _)%O = true) => exact: nngnum_ge0 : core.
+Notation "x %:nng" := (nng_of_num (Phantom _ x)) : ring_scope.
+Canonical nngnum_subType.
+Canonical nngnum_eqType.
+Canonical nngnum_choiceType.
+Canonical nngnum_porderType.
+Canonical nngnum_latticeType.
+Canonical nngnum_orderType.
+End Exports.
+
+End Nonneg.
+Export Nonneg.Exports.
 
 Section NngNum.
 Context {R : numDomainType}.
 Implicit Types a : R.
 Implicit Types x y : {nonneg R}.
+Import Nonneg.
 
-Definition nngnum_gt0_def x (phx : phantom R x%:nngnum) := nngnum_ge0 x.
+Canonical addr_nngnum x y := NngNum (x%:nngnum + y%:nngnum) (addr_ge0 x y).
 
-Lemma add_nng_ge0 x y : 0 <= x%:nngnum + y%:nngnum.
-Proof. exact: addr_ge0. Qed.
-Canonical addr_nngnum x y := NngNum (add_nng_ge0 x y).
+Canonical mulr_nngnum x y := NngNum (x%:nngnum * y%:nngnum) (mulr_ge0 x y).
 
-Lemma mul_nng_ge0 x y : 0 <= x%:nngnum * y%:nngnum.
-Proof. exact: mulr_ge0. Qed.
-Canonical mulr_nngnum x y := NngNum (mul_nng_ge0 x y).
+Canonical mulrn_nngnum x n := NngNum (x%:nngnum *+ n) (mulrn_wge0 n x).
 
-Lemma muln_nng_nngnum x n : 0 <= x%:nngnum *+ n.+1.
-Proof. by rewrite pmulrn_lge0. Qed.
-Canonical mulrn_nngnum x n := NngNum (muln_nng_nngnum x n).
-
-Lemma zero_nng_ge0 : 0 <= 0 :> R. Proof. by []. Qed.
-Canonical zeror_nngnum := NngNum zero_nng_ge0.
-
-Lemma one_nng_ge0 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
-Canonical oner_nngnum := NngNum one_nng_ge0.
+Canonical zeror_nngnum := @NngNum R 0 (lexx 0).
+Canonical oner_nngnum := @NngNum R 1 ler01.
 
 Lemma nngnum_lt0 x : (x%:nngnum < 0 :> R) = false.
 Proof. by rewrite le_gtF. Qed.
@@ -5111,26 +5121,26 @@ Proof. by []. Qed.
 
 Lemma nng_lexU a x y : a <= (maxr x y)%:nngnum = (a <= x%:nngnum) || (a <= y%:nngnum).
 Proof.
-case: (lcomparable_ltgtP (comparableT x y)) => [?|?|<-]; last by rewrite orbb.
-rewrite orb_idl // => /le_trans; apply; exact/ltW.
+case: (leP x y)=> ?.
+rewrite orb_idl // => /le_trans; exact.
 rewrite orb_idr // => /le_trans; apply; exact/ltW.
 Qed.
 
 Lemma nng_leUx a x y : (maxr x y)%:nngnum <= a = (x%:nngnum <= a) && (y%:nngnum <= a).
 Proof.
-case: (lcomparable_ltgtP (comparableT x y)) => [?|?|<-]; last by rewrite andbb.
-by rewrite andb_idl //; apply/le_trans/ltW.
-by rewrite andb_idr //; apply/le_trans/ltW.
+case: (leP x y)=> ?.
+rewrite andb_idl //; exact/le_trans.
+rewrite andb_idr //; exact/le_trans/ltW.
 Qed.
 
 Lemma nng_ltUx a x y : (maxr x y)%:nngnum < a = (x%:nngnum < a) && (y%:nngnum < a).
 Proof.
-case: (lcomparable_ltgtP (comparableT x y)) => [?|?|<-]; last by rewrite andbb.
-rewrite andb_idl //; exact/lt_trans.
+case: leP=> ?.
+rewrite andb_idl //; exact/le_lt_trans.
 rewrite andb_idr //; exact/lt_trans.
 Qed.
 
-Canonical absr_nngnum a := NngNum (normr_ge0 a).
+Canonical normr_nngnum (V : normedZmodType R) (x : V) := NngNum `|x| (normr_ge0 x).
 
 Lemma nng_abs_eq0 a : (`|a|%:nng == 0%:nng) = (a == 0).
 Proof. by rewrite -normr_eq0. Qed.
@@ -5146,42 +5156,15 @@ Lemma nng_abs_lt a x : 0 <= a -> (`|a|%:nng < x) = (a < x%:nngnum).
 Proof.
 by move=> ?; rewrite lt_neqAle nng_abs_le // lt_neqAle nng_eq /= ger0_norm.
 Qed.
-End NngNum.
 
-End nonnegative_numbers.
-
-Section nonnegative_numbers_lemmas.
-Local Notation "'{nonneg' R }" := (nngnum_of (@Phant R)).
-Local Notation "x %:nngnum" := (num_of_nng x) : ring_scope.
-Local Notation "x %:nng" := (nng_of_num (Phantom _ x)) : ring_scope.
-
-Lemma nonneg_maxr (K : numFieldType) (a : K) (x y : {nonneg K}) : a != 0 ->
-  `|a| * (maxr x y)%:nngnum =
+Lemma nonneg_maxr a x y : `|a| * (maxr x y)%:nngnum =
   (maxr (`|a| * x%:nngnum)%:nng (`|a| * y%:nngnum)%:nng)%:nngnum.
 Proof.
-move=> a0; rewrite /maxr /= /Order.TotalPOrderMixin.join /=; case: ifPn => yx /=.
-- rewrite ifT //=; apply ler_pmul => //; exact: nngnum_ge0.
-- rewrite ifF //=; apply/negbTE; apply: contra yx.
-  by rewrite nng_le /= -ler_pdivl_mull ?normr_gt0 // mulrA mulVr ?unitfE ?normr_eq0 // mul1r.
+move: x y; apply: wlog_le => x y hxy; first by rewrite joinC hxy joinC.
+rewrite !join_r //; exact/ler_wpmul2l.
 Qed.
 
-End nonnegative_numbers_lemmas.
-
-Module Exports.
-Notation "'{nonneg' R }" := (nngnum_of (@Phant R)).
-Notation "x %:nngnum" := (num_of_nng x) : ring_scope.
-Hint Extern 0 ((0%R <= _)%O = true) => exact: nngnum_ge0 : core.
-Notation "x %:nng" := (nng_of_num (Phantom _ x)) : ring_scope.
-Notation "[ge0 'of' x ]" := (nngnum_gt0_def (Phantom _ x)).
-Canonical nngnum_subType.
-Canonical nngnum_eqType.
-Canonical nngnum_choiceType.
-Canonical nngnum_porderType.
-Canonical nngnum_latticeType.
-Canonical nngnum_orderType.
-End Exports.
-
-End Nonneg.
+End NngNum.
 
 (*************)
 (* INSTANCES *)
@@ -5190,64 +5173,34 @@ End Nonneg.
 Module ProdNormedZmodule.
 Section ProdNormedZmodule.
 Context {R : numDomainType} {U V : normedZmodType R}.
-Import Nonneg Nonneg.Exports.
 
-Let norm' (x : U * V) : {nonneg R} :=
-  Num.max (`| `| x.1 | |%:nng) (`| `|x.2| |%:nng).
-
-Definition norm (x : U * V) : R := (norm' x)%:nngnum.
+Definition norm (x : U * V) : R := (Num.max (`| x.1 |%:nng) (`|x.2|%:nng))%:nngnum.
 
 Lemma normD x y : norm (x + y) <= norm x + norm y.
 Proof.
-rewrite /norm /norm' /= nng_leUx /= !normr_id; apply/andP; split.
-- case: (leP `| `|x.1| |%:nng) => [|/ltW];
-    rewrite nng_abs_le ?normr_ge0 //= normr_id => ?;
-      case: (leP `| `|y.1| |%:nng) => [|/ltW];
-        rewrite nng_abs_le ?normr_ge0 //= normr_id => ?;
-        by rewrite (le_trans (ler_norm_add _ _)) // ler_add.
-- case: (leP `| `|x.1| |%:nng) => [|/ltW];
-    rewrite nng_abs_le ?normr_ge0 //= normr_id => ?.
-  + case: (leP `| `|y.1| |%:nng) => [|/ltW];
-      rewrite nng_abs_le ?normr_ge0 //= 2!normr_id => ?;
-      by rewrite (le_trans (ler_norm_add _ _)) // ler_add.
-  + case: (leP `| `|y.1| |%:nng) => [|/ltW];
-      rewrite nng_abs_le ?normr_ge0 //= 2!normr_id => ?;
-      by rewrite (le_trans (ler_norm_add _ _)) // ?(ler_add2,ler_add).
-Qed.
-
-Let norm'_eq0 x : norm' x = 0%:nng -> x = 0.
-Proof.
-rewrite /norm' /= => /eqP; rewrite nng_eq0 /= eq_le => /andP[].
-rewrite nng_leUx => /andP[] /=.
-rewrite 2!normr_le0 2!normr_eq0 => /eqP x10 /eqP x20 _.
-by rewrite (surjective_pairing x) x10 x20.
+rewrite /norm nng_leUx /=; apply/andP; split;
+  case: leP => [|/ltW] Hx; case: leP => [|/ltW] Hy;
+  exact/(le_trans (ler_norm_add _ _))/ler_add.
 Qed.
 
 Lemma norm_eq0 x : norm x = 0 -> x = 0.
-Proof. by rewrite /norm => /eqP; rewrite -nng_eq0 => /eqP/norm'_eq0. Qed.
-
-Let norm'0 : norm' 0 = 0%:nng.
 Proof.
-by rewrite /norm' /=; apply/val_inj => /=; rewrite join_l //= ?normr_id ?normr0.
+case: x=> x1 x2 /eqP; rewrite eq_le nng_leUx 2!normr_le0 -andbA /=.
+by case/and3P => /eqP -> /eqP ->.
 Qed.
 
 Lemma normMn x n : norm (x *+ n) = (norm x) *+ n.
 Proof.
-elim: n => [|n ih]; first by rewrite /norm !mulr0n /= norm'0.
-rewrite !mulrS; apply/eqP; rewrite eq_le; apply/andP; split.
-  rewrite -ih; exact/normD.
-rewrite /norm; have [/eqP/norm'_eq0->|x0] := boolP (norm' x == 0%:nng).
-  by rewrite !(mul0rn,addr0,norm'0).
-rewrite -nng_abs_le; last by rewrite addr_ge0 // mulrn_wge0.
-rewrite /norm' /= pairMnE /= -!mulrS; case: (leP `| `|x.1| |%:nng).
-- by rewrite [in X in X -> _]nng_abs_le ?ger0_norm //= normr_id => ?;
-    rewrite join_r nng_le /= ?(normrMn,normr_id,ler_muln2r) /=.
-- by rewrite nng_abs_lt ?normr_ge0 //=; rewrite !normr_id => ?;
-    rewrite join_l nng_le /= ?(normrMn,normr_id,ler_muln2r) //= ?ltW.
+by rewrite /norm pairMnE /=; case: leP => [|/ltW];
+  rewrite nng_le /= !normrMn ler_muln2r => /predU1P [->|];
+  rewrite ?mulr0n // -nng_le; [case: leP | case: ltP].
 Qed.
 
 Lemma normrN x : norm (- x) = norm x.
-Proof. by rewrite /norm /norm' !normrN. Qed.
+Proof.
+by rewrite /norm /=; case: leP => [|/ltW];
+  rewrite nng_le /= !normrN -nng_le; [case: leP | case: ltP].
+Qed.
 
 Definition normedZmodMixin :
   @Num.normed_mixin_of R [zmodType of U * V] (Num.NumDomain.class R) :=
@@ -5256,7 +5209,7 @@ Definition normedZmodMixin :
 Canonical normedZmodType := NormedZmoduleType R (U * V) normedZmodMixin.
 
 Lemma prod_normE (x : normedZmodType) :
-  `| x | = (Num.max `| `| x.1 | |%:nng `| `|x.2| |%:nng)%:nngnum.
+  `| x | = (Num.max `| x.1 |%:nng `|x.2|%:nng)%:nngnum.
 Proof. by []. Qed.
 
 End ProdNormedZmodule.
