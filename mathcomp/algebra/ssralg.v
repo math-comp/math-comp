@@ -6155,8 +6155,8 @@ Canonical regular_algType.
 Canonical regular_unitRingType.
 Canonical regular_comUnitRingType.
 Canonical regular_unitAlgType.
-Canonical regular_comAlgType
-Canonical regular_comUnitAlgType
+Canonical regular_comAlgType.
+Canonical regular_comUnitAlgType.
 Canonical regular_idomainType.
 Canonical regular_fieldType.
 
