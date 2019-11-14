@@ -453,10 +453,10 @@ Qed.
 End FinSplittingField.
 
 Section FinFieldExists.
-(* While he existence of finite splitting fields and of finite fields of      *)
+(* While the existence of finite splitting fields and of finite fields of     *)
 (* arbitrary prime power order is mathematically straightforward, it is       *)
 (* technically challenging to formalize in Coq. The Coq typechecker performs  *)
-(* poorly for the spme of the deeply nested dependent types used in the       *)
+(* poorly for some of the deeply nested dependent types used in the           *)
 (* construction, such as polynomials over extensions of extensions of finite  *)
 (* fields. Any conversion in a nested structure parameter incurs a huge       *)
 (* overhead as it is shared across term comparison by call-by-need evalution. *)
