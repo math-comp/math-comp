@@ -34,7 +34,7 @@ From mathcomp Require Import ssralg finalg countalg.
 (*               'I_p if p > 1, and convertible to 'I_p if p is of the form   *)
 (*               n.+2.                                                        *)
 (*       Zp p == the subgroup of integers mod (max p 1) in 'Z_p; this is thus *)
-(*               is thus all of 'Z_p if p > 1, and else the trivial group.    *)
+(*               all of 'Z_p if p > 1, and else the trivial group.            *)
 (* units_Zp p == the group of all units of 'Z_p -- i.e., the group of         *)
 (*               (multiplicative) automorphisms of Zp p.                      *)
 (* We show that Zp and units_Zp are abelian, and compute their orders.        *)
