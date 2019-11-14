@@ -1831,6 +1831,14 @@ move=> Ax0; exists (enum_rank_in Ax0) => [i _|]; last exact: enum_rankK_in.
 exact: enum_valK_in.
 Qed.
 
+Lemma eq_enum_rank_in (x0 y0 : T) A (Ax0 : x0 \in A) (Ay0 : y0 \in A) :
+  {in A, enum_rank_in Ax0 =1 enum_rank_in Ay0}.
+Proof. by move=> x xA; apply: enum_val_inj; rewrite !enum_rankK_in. Qed.
+
+Lemma enum_rank_in_inj (x0 y0 : T) A (Ax0 : x0 \in A) (Ay0 : y0 \in A) :
+  {in A &, forall x y, enum_rank_in Ax0 x = enum_rank_in Ay0 y -> x = y}.
+Proof. by move=> x y xA yA /(congr1 enum_val); rewrite !enum_rankK_in. Qed.
+
 Lemma enum_rank_bij : bijective enum_rank.
 Proof. by move: enum_rankK enum_valK; exists (@enum_val T). Qed.
 
@@ -2002,6 +2010,12 @@ Proof. by rewrite ltn_add2l. Qed.
 
 Definition lshift m n (i : 'I_m) := Ordinal (lshift_subproof n i).
 Definition rshift m n (i : 'I_n) := Ordinal (rshift_subproof m i).
+
+Lemma lshift_inj m n : injective (@lshift m n).
+Proof. by move=> ? ? /(f_equal val) /= /val_inj. Qed.
+
+Lemma rshift_inj m n : injective (@rshift m n).
+Proof. by move=> ? ? /(f_equal val) /addnI /val_inj. Qed.
 
 Lemma split_subproof m n (i : 'I_(m + n)) : i >= m -> i - m < n.
 Proof. by move/subSn <-; rewrite leq_subLR. Qed.
