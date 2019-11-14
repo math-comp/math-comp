@@ -82,6 +82,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   of an algebra. The theory include the lemmas `in_alg_comm`, `horner_algC`,
   `horner_algX`, `poly_alg_initial`.
 
+- Added lemmas on commutation with difference, big sum and prod:
+  `commrB`, `commr_sum`, `commr_prod`.
+
 ### Changed
 
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
