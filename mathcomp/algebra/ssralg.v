@@ -409,7 +409,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*  [rmorphism of f as g] == an f-clone of the rmorphism structure of g.      *)
 (*       [rmorphism of f] == a clone of an existing additive structure on f.  *)
 (*  -> If R and S are UnitRings the f also maps units to units and inverses   *)
-(*     of units to inverses; if R is a field then f if a field isomorphism    *)
+(*     of units to inverses; if R is a field then f is a field isomorphism    *)
 (*     between R and its image.                                               *)
 (*  -> As rmorphism coerces to both additive and multiplicative, all          *)
 (*     structures for f can be built from a single proof of rmorphism f.      *)
