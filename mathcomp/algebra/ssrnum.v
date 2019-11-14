@@ -26,7 +26,7 @@ From mathcomp Require Import ssralg poly.
 (*   normedZmodType R                                                         *)
 (*                  == interface for a normed Zmodule structure indexed by    *)
 (*                     numDomainType R.                                       *)
-(*   NormedZmoduleType R T m                                                  *)
+(*   NormedZmodType R T m                                                  *)
 (*                  == pack the normed Zmodule mixin into a normedZmodType.   *)
 (*                     The carrier T must have an integral domain structure.  *)
 (*   [normedZmodType R of T for S]                                            *)
@@ -64,7 +64,7 @@ From mathcomp Require Import ssralg poly.
 (*   * ArchiField (A Real Field with the archimedean axiom)                   *)
 (*   archiFieldType == interface for an archimedean field.                    *)
 (*   ArchiFieldType T r                                                       *)
-(*                  == packs the archimeadean axiom r into an archiFieldType. *)
+(*                  == packs the archimedean axiom r into an archiFieldType.  *)
 (*                     The carrier T must have a real field type structure.   *)
 (*   [archiFieldType of T for S]                                              *)
 (*                  == T-clone of the archiFieldType structure S.             *)
@@ -310,8 +310,8 @@ Canonical zmodType.
 Coercion numDomain_normedZmodType : NumDomain.type >-> type.
 Canonical numDomain_normedZmodType.
 Notation normedZmodType R := (type (Phant R)).
-Notation NormedZmoduleType R T m := (@pack _ (Phant R) T _ m).
-Notation NormedZmoduleMixin := Mixin.
+Notation NormedZmodType R T m := (@pack _ (Phant R) T _ m).
+Notation NormedZmodMixin := Mixin.
 Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
   (@clone _ (Phant R) T cT _ idfun)
   (at level 0, format "[ 'normedZmodType'  R  'of'  T  'for'  cT ]") :
@@ -548,7 +548,7 @@ Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
 Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
+Definition normedZmodType := NormedZmodType numDomainType cT xclass.
 Definition porder_fieldType := @GRing.Field.Pack porderType xclass.
 Definition normedZmod_fieldType :=
   @GRing.Field.Pack normedZmodType xclass.
@@ -648,7 +648,7 @@ Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
 Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
-Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
+Definition normedZmodType := NormedZmodType numDomainType cT xclass.
 Definition porder_decFieldType := @GRing.DecidableField.Pack porderType xclass.
 Definition normedZmod_decFieldType :=
   @GRing.DecidableField.Pack normedZmodType xclass.
@@ -764,7 +764,7 @@ Definition porderType := @Order.POrder.Pack ring_display cT xclass.
 Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
 Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
+Definition normedZmodType := NormedZmodType numDomainType cT xclass.
 Definition zmod_distrLatticeType :=
   @Order.DistrLattice.Pack ring_display zmodType xclass.
 Definition ring_distrLatticeType :=
@@ -897,7 +897,7 @@ Definition orderType := @Order.Total.Pack ring_display cT xclass.
 Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
-Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
+Definition normedZmodType := NormedZmodType numDomainType cT xclass.
 Definition field_distrLatticeType :=
   @Order.DistrLattice.Pack ring_display fieldType xclass.
 Definition field_orderType := @Order.Total.Pack ring_display fieldType xclass.
@@ -996,7 +996,7 @@ Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition realFieldType := @RealField.Pack cT xclass.
-Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
+Definition normedZmodType := NormedZmodType numDomainType cT xclass.
 
 End ClassDef.
 
@@ -1084,7 +1084,7 @@ Definition realDomainType := @RealDomain.Pack cT xclass.
 Definition fieldType := @GRing.Field.Pack cT xclass.
 Definition numFieldType := @NumField.Pack cT xclass.
 Definition realFieldType := @RealField.Pack cT xclass.
-Definition normedZmodType := NormedZmoduleType numDomainType cT xclass.
+Definition normedZmodType := NormedZmodType numDomainType cT xclass.
 
 End ClassDef.
 
@@ -5064,7 +5064,7 @@ Definition normedZmodMixin :
   @normed_mixin_of R [zmodType of U * V] (Num.RealDomain.class R) :=
   @Num.NormedMixin _ _ _ norm normD norm_eq0 normrMn normrN.
 
-Canonical normedZmodType := NormedZmoduleType R (U * V) normedZmodMixin.
+Canonical normedZmodType := NormedZmodType R (U * V) normedZmodMixin.
 
 Lemma prod_normE (x : U * V) : `|x| = Num.max `|x.1| `|x.2|. Proof. by []. Qed.
 
