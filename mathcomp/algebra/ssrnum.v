@@ -5025,59 +5025,6 @@ End Exports.
 
 End RealLtMixin.
 
-(*************)
-(* INSTANCES *)
-(*************)
-
-Module ProdNormedZmodule.
-Section ProdNormedZmodule.
-
-Context {R : realDomainType} {U V : normedZmodType R}.
-
-Definition norm (x : U * V) := Num.max `|x.1| `|x.2|.
-
-Lemma normD x y : norm (x + y) <= norm x + norm y.
-Proof.
-apply: le_trans (leU2 (ler_norm_add x.1 y.1) (ler_norm_add x.2 y.2)) _.
-rewrite /norm; case: (leP `|_|) => [|/ltW] Hx; case: (leP `|_|) => [|/ltW] Hy;
-  by [case: leP (ler_add Hx Hy) | case: leP; rewrite (ler_add2l, ler_add2r)].
-Qed.
-
-Lemma norm_eq0 x : norm x = 0 -> x = 0.
-Proof.
-by rewrite /norm; case: leP=> [|/ltW] le_x xnorm0;
-  move: le_x; rewrite xnorm0 normr_le0 => /eqP;
-  move/normr0_eq0: xnorm0; case: x => /= ? ? -> ->.
-Qed.
-
-Lemma normrMn x n : norm (x *+ n) = norm x *+ n.
-Proof.
-by rewrite pairMnE /norm /= !normrMn; case: leP => [|/ltW];
-  rewrite ler_muln2r => /predU1P [->|]; rewrite ?mulr0n //;
-  case: ltgtP => // ->.
-Qed.
-
-Lemma normrN x : norm (- x) = norm x.
-Proof. by rewrite /norm /= !normrN. Qed.
-
-Definition normedZmodMixin :
-  @normed_mixin_of R [zmodType of U * V] (Num.RealDomain.class R) :=
-  @Num.NormedMixin _ _ _ norm normD norm_eq0 normrMn normrN.
-
-Canonical normedZmodType := NormedZmodType R (U * V) normedZmodMixin.
-
-Lemma prod_normE (x : U * V) : `|x| = Num.max `|x.1| `|x.2|. Proof. by []. Qed.
-
-End ProdNormedZmodule.
-
-Module Exports.
-Canonical normedZmodType.
-Definition prod_normE := @prod_normE.
-End Exports.
-
-End ProdNormedZmodule.
-Export ProdNormedZmodule.Exports.
-
 End Num.
 
 Export Num.NumDomain.Exports Num.NormedZmodule.Exports.
@@ -5088,7 +5035,6 @@ Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
 Export Num.NumMixin.Exports Num.RealMixin.Exports.
 Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
-Export Num.ProdNormedZmodule.Exports.
 
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
 
