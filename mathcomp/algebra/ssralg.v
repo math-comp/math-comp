@@ -5653,6 +5653,9 @@ Definition commr1 := commr1.
 Definition commrN := commrN.
 Definition commrN1 := commrN1.
 Definition commrD := commrD.
+Definition commrB := commrB.
+Definition commr_sum := commr_sum.
+Definition commr_prod := commr_prod.
 Definition commrMn := commrMn.
 Definition commrM := commrM.
 Definition commr_nat := commr_nat.
@@ -6152,6 +6155,8 @@ Canonical regular_algType.
 Canonical regular_unitRingType.
 Canonical regular_comUnitRingType.
 Canonical regular_unitAlgType.
+Canonical regular_comAlgType.
+Canonical regular_comUnitAlgType.
 Canonical regular_idomainType.
 Canonical regular_fieldType.
 
