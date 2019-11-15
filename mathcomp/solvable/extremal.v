@@ -2039,7 +2039,7 @@ have [n oG] := p_natP pG; right; rewrite p2 cG /= in oG *.
 rewrite oG (@leq_exp2l 2 4) //.
 rewrite /extremal2 /extremal_class oG pfactorKpdiv // in cG.
 case: andP cG => [[n_gt1 isoG] _ | _]; last first.
-  by rewrite leq_eqVlt; case: (3 < n); case: eqP => //= <-; do 2?case: ifP.
+  by case: (ltngtP 3 n) => //= <-; do 2?case: ifP.
 have [[x y] genG _] := generators_2dihedral n_gt1 isoG.
 have [_ _ _ [_ _ maxG]] := dihedral2_structure n_gt1 genG isoG.
 rewrite 2!ltn_neqAle n_gt1 !(eq_sym _ n).

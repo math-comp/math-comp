@@ -241,7 +241,7 @@ Qed.
 
 Lemma leq_rmodp m d : size (rmodp m d) <= size m.
 Proof.
-case: (ltnP (size m) (size d)) => [|h]; first by move/rmodp_small->.
+have [/rmodp_small -> //|h] := ltnP (size m) (size d).
 have [->|d0] := eqVneq d 0; first by rewrite rmodp0.
 by apply: leq_trans h; apply: ltnW; rewrite ltn_rmodp.
 Qed.
@@ -1106,7 +1106,7 @@ Qed.
 Lemma dvdp_leq p q : q != 0 -> p %| q -> size p <= size q.
 Proof.
 move=> nq0 /modp_eq0P.
-by case: ltngtP => // /modp_small -> /eqP; rewrite (negPf nq0).
+by case: leqP => // /modp_small -> /eqP; rewrite (negPf nq0).
 Qed.
 
 Lemma eq_dvdp c quo q p : c != 0 -> c *: p = quo * q -> q %| p.
@@ -1359,24 +1359,16 @@ by rewrite /eqp (dvdp_trans Dp) // (dvdp_trans qD).
 Qed.
 
 Lemma eqp_ltrans : left_transitive (@eqp R).
-Proof.
-by move=> p q r pq; apply/idP/idP; apply: eqp_trans; rewrite // eqp_sym.
-Qed.
+Proof. exact: sym_left_transitive eqp_sym eqp_trans. Qed.
 
 Lemma eqp_rtrans : right_transitive (@eqp R).
-Proof. by move=> x y xy z; rewrite eqp_sym (eqp_ltrans xy) eqp_sym. Qed.
+Proof. exact: sym_right_transitive eqp_sym eqp_trans. Qed.
 
 Lemma eqp0 p : (p %= 0) = (p == 0).
-Proof.
-have [->|Ep] := eqVneq; first by rewrite ?eqpxx.
-by apply/negP => /andP [_]; rewrite /dvdp modp0 (negPf Ep).
-Qed.
+Proof. by apply/idP/eqP => [/andP [_ /dvd0pP] | -> //]. Qed.
 
 Lemma eqp01 : 0 %= (1 : {poly R}) = false.
-Proof.
-case: eqpP => // -[[c1 c2]] /andP [c1n0 c2n0] /= /esym /eqP.
-by rewrite scaler0 alg_polyC polyC_eq0 (negPf c2n0).
-Qed.
+Proof. by rewrite eqp_sym eqp0 oner_eq0. Qed.
 
 Lemma eqp_scale p c : c != 0 -> c *: p %= p.
 Proof.
@@ -1597,12 +1589,12 @@ Proof.
 have [r] := ubnP (minn (size q) (size p)); elim: r => // r IHr in p q *.
 have [-> | nz_p] := eqVneq p 0; first by rewrite gcd0p dvdpp andbT.
 have [-> | nz_q] := eqVneq q 0; first by rewrite gcdp0 dvdpp /=.
-rewrite ltnS gcdpE minnC /minn; case: ltnP => [lt_pq | le_pq] le_qr.
-  suffices /IHr/andP[E1 E2]: minn (size p) (size (q %% p)) < r.
-    by rewrite E2 (dvdp_mod _ E2).
+rewrite ltnS gcdpE; case: leqP => [le_pq | lt_pq] le_qr.
+  suffices /IHr/andP[E1 E2]: minn (size q) (size (p %% q)) < r.
+    by rewrite E2 andbT (dvdp_mod _ E2).
   by rewrite gtn_min orbC (leq_trans _ le_qr) ?ltn_modp.
-suffices /IHr/andP[E1 E2]: minn (size q) (size (p %% q)) < r.
-  by rewrite E2 andbT (dvdp_mod _ E2).
+suffices /IHr/andP[E1 E2]: minn (size p) (size (q %% p)) < r.
+  by rewrite E2 (dvdp_mod _ E2).
 by rewrite gtn_min orbC (leq_trans _ le_qr) ?ltn_modp.
 Qed.
 
@@ -1623,10 +1615,10 @@ apply/idP/andP=> [dv_pmn | []].
 have [r] := ubnP (minn (size n) (size m)); elim: r => // r IHr in m n *.
 have [-> | nz_m] := eqVneq m 0; first by rewrite gcd0p.
 have [-> | nz_n] := eqVneq n 0; first by rewrite gcdp0.
-rewrite gcdpE minnC ltnS /minn; case: ltnP => [lt_mn | le_nm] le_r dv_m dv_n.
-  apply: IHr => //; last by rewrite -(dvdp_mod _ dv_m).
+rewrite gcdpE ltnS; case: leqP => [le_nm | lt_mn] le_r dv_m dv_n.
+  apply: IHr => //; last by rewrite -(dvdp_mod _ dv_n).
   by rewrite gtn_min orbC (leq_trans _ le_r) ?ltn_modp.
-apply: IHr => //; last by rewrite -(dvdp_mod _ dv_n).
+apply: IHr => //; last by rewrite -(dvdp_mod _ dv_m).
 by rewrite gtn_min orbC (leq_trans _ le_r) ?ltn_modp.
 Qed.
 
@@ -1702,11 +1694,8 @@ Proof. by move/dvdp_gcd_idl; exact/eqp_trans/gcdpC. Qed.
 
 Lemma gcdp_exp p k l : gcdp (p ^+ k) (p ^+ l) %= p ^+ minn k l.
 Proof.
-wlog leqmn: k l / k <= l.
-  move=> hwlog; case: (leqP k l); first exact: hwlog.
-  by move/ltnW; rewrite minnC; move/hwlog; apply/eqp_trans/gcdpC.
-rewrite (minn_idPl leqmn); move/subnK: leqmn<-; rewrite exprD.
-by apply: eqp_trans (gcdp_mull _ _) _; apply: eqpxx.
+case: leqP => [|/ltnW] /subnK <-; rewrite exprD; first exact: gcdp_mull.
+exact/(eqp_trans (gcdpC _ _))/gcdp_mull.
 Qed.
 
 Lemma gcdp_eq0 p q : gcdp p q == 0 = (p == 0) && (q == 0).
@@ -1730,40 +1719,33 @@ by rewrite -(eqp_dvdr _ eqr) dvdp_gcdl (eqp_dvdr _ eqr) dvdp_gcdl.
 Qed.
 
 Lemma eqp_gcd p1 p2 q1 q2 : p1 %= p2 -> q1 %= q2 -> gcdp p1 q1 %= gcdp p2 q2.
-Proof.
-move=> e1 e2.
-by apply: eqp_trans (eqp_gcdr _ e2); apply: eqp_trans (eqp_gcdl _ e1).
-Qed.
+Proof. move=> e1 e2; exact: eqp_trans (eqp_gcdr _ e2) (eqp_gcdl _ e1). Qed.
 
 Lemma eqp_rgcd_gcd p q : rgcdp p q %= gcdp p q.
 Proof.
 move: {2}(minn (size p) (size q)) (leqnn (minn (size p) (size q))) => n.
 elim: n p q => [p q|n ihn p q hs].
-  rewrite leqn0 /minn; case: ltnP => _; rewrite size_poly_eq0; move/eqP->.
+  rewrite leqn0; case: ltnP => _; rewrite size_poly_eq0; move/eqP->.
     by rewrite gcd0p rgcd0p eqpxx.
   by rewrite gcdp0 rgcdp0 eqpxx.
 have [-> | pn0] := eqVneq p 0; first by rewrite gcd0p rgcd0p eqpxx.
 have [-> | qn0] := eqVneq q 0; first by rewrite gcdp0 rgcdp0 eqpxx.
-rewrite gcdpE rgcdpE; case: ltnP => sp.
+rewrite gcdpE rgcdpE; case: ltnP hs => sp hs.
   have e := eqp_rmod_mod q p; apply/eqp_trans/ihn: (eqp_gcdl p e).
-  rewrite (eqp_size e) geq_min -ltnS (leq_trans _ hs) //.
-  by rewrite (minn_idPl (ltnW _)) ?ltn_modp.
+  by rewrite (eqp_size e) geq_min -ltnS (leq_trans _ hs) ?ltn_modp.
 have e := eqp_rmod_mod p q; apply/eqp_trans/ihn: (eqp_gcdl q e).
-rewrite (eqp_size e) geq_min -ltnS (leq_trans _ hs) //.
-by rewrite (minn_idPr _) ?ltn_modp.
-Qed.
-
-Lemma gcdp_modr m n : gcdp m (n %% m) %= gcdp m n.
-Proof.
-have [-> | mn0] := eqVneq m 0; first by rewrite modp0 eqpxx.
-have : (lead_coef m) ^+ (scalp n m) != 0 by rewrite expf_neq0 // lead_coef_eq0.
-move/(gcdp_scaler m n); apply/eqp_trans.
-by rewrite divp_eq eqp_sym gcdp_addl_mul.
+by rewrite (eqp_size e) geq_min -ltnS (leq_trans _ hs) ?ltn_modp.
 Qed.
 
 Lemma gcdp_modl m n : gcdp (m %% n) n %= gcdp m n.
 Proof.
-apply: eqp_trans (gcdpC _ _); apply: eqp_trans (gcdp_modr _ _); exact: gcdpC.
+have [/modp_small -> // | lenm] := ltnP (size m) (size n).
+by rewrite (gcdpE m n) ltnNge lenm.
+Qed.
+
+Lemma gcdp_modr m n : gcdp m (n %% m) %= gcdp m n.
+Proof.
+apply: eqp_trans (gcdpC _ _); apply: eqp_trans (gcdp_modl _ _); exact: gcdpC.
 Qed.
 
 Lemma gcdp_def d m n :
@@ -2798,10 +2780,7 @@ by rewrite modp_scaler ?eqpxx // mulf_eq0 negb_or invr_eq0 c1n0.
 Qed.
 
 Lemma eqp_mod p1 p2 q1 q2 : p1 %= p2 -> q1 %= q2 -> p1 %% q1 %= p2 %% q2.
-Proof.
-move=> e1 e2; apply: eqp_trans (eqp_modpr _ e2).
-by apply: eqp_trans (eqp_modpl _ e1); apply: eqpxx.
-Qed.
+Proof. move=> e1 e2; exact: eqp_trans (eqp_modpl _ e1) (eqp_modpr _ e2). Qed.
 
 Lemma eqp_divr (d m n : {poly F}) : m %= n -> (d %/ m) %= (d %/ n).
 Proof.
@@ -2811,10 +2790,7 @@ by rewrite divp_scaler ?eqp_scale // ?invr_eq0 mulf_eq0 negb_or invr_eq0 c1n0.
 Qed.
 
 Lemma eqp_div p1 p2 q1 q2 : p1 %= p2 -> q1 %= q2 -> p1 %/ q1 %= p2 %/ q2.
-Proof.
-move=> e1 e2; apply: eqp_trans (eqp_divr _ e2).
-by apply: eqp_trans (eqp_divl _ e1); apply: eqpxx.
-Qed.
+Proof. move=> e1 e2; exact: eqp_trans (eqp_divl _ e1) (eqp_divr _ e2). Qed.
 
 Lemma eqp_gdcor p q r : q %= r -> gdcop p q %= gdcop p r.
 Proof.
@@ -2847,26 +2823,16 @@ case: ifP=> // _; apply: ihn => //; apply: eqp_trans (eqp_rdiv_div _ _) _.
 by apply: eqp_div => //; apply: eqp_trans (eqp_rgcd_gcd _ _) _; apply: eqp_gcd.
 Qed.
 
-Lemma modp_opp p q : (- p) %% q = - (p %% q).
-Proof.
-have [-> | qn0] := eqVneq q 0; first by rewrite !modp0.
-by apply: IdomainUnit.modp_opp; rewrite unitfE lead_coef_eq0.
-Qed.
-
-Lemma divp_opp p q : (- p) %/ q = - (p %/ q).
-Proof.
-have [-> | qn0] := eqVneq q 0; first by rewrite !divp0 oppr0.
-by apply: IdomainUnit.divp_opp; rewrite unitfE lead_coef_eq0.
-Qed.
-
 Lemma modp_add d p q : (p + q) %% d = p %% d + q %% d.
 Proof.
 have [-> | dn0] := eqVneq d 0; first by rewrite !modp0.
 by apply: IdomainUnit.modp_add; rewrite unitfE lead_coef_eq0.
 Qed.
 
-Lemma modNp p q : (- p) %% q = - (p %% q).
+Lemma modp_opp p q : (- p) %% q = - (p %% q).
 Proof. by apply/eqP; rewrite -addr_eq0 -modp_add addNr mod0p. Qed.
+
+Lemma modNp p q : (- p) %% q = - (p %% q). Proof. exact: modp_opp. Qed.
 
 Lemma divp_add d p q : (p + q) %/ d = p %/ d + q %/ d.
 Proof.
@@ -2874,15 +2840,16 @@ have [-> | dn0] := eqVneq d 0; first by rewrite !divp0 addr0.
 by apply: IdomainUnit.divp_add; rewrite unitfE lead_coef_eq0.
 Qed.
 
-Lemma divp_addl_mul_small d q r :
-  size r < size d -> (q * d + r) %/ d = q.
+Lemma divp_opp p q : (- p) %/ q = - (p %/ q).
+Proof. by apply/eqP; rewrite -addr_eq0 -divp_add addNr div0p. Qed.
+
+Lemma divp_addl_mul_small d q r : size r < size d -> (q * d + r) %/ d = q.
 Proof.
 move=> srd; rewrite divp_add (divp_small srd) addr0 mulpK //.
 by rewrite -size_poly_gt0; apply: leq_trans srd.
 Qed.
 
-Lemma modp_addl_mul_small d q r :
-  size r < size d -> (q * d + r) %% d = r.
+Lemma modp_addl_mul_small d q r : size r < size d -> (q * d + r) %% d = r.
 Proof. by move=> srd; rewrite modp_add modp_mull add0r modp_small. Qed.
 
 Lemma divp_addl_mul d q r : d != 0 -> (q * d + r) %/ d = q + r %/ d.

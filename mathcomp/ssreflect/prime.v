@@ -583,7 +583,7 @@ move=> m_gt0 n_gt0; apply/eqP/hasPn=> [mn1 p | no_p_mn].
   rewrite /= !mem_primes m_gt0 n_gt0 /= => /andP[pr_p p_n].
   have:= prime_gt1 pr_p; rewrite pr_p ltnNge -mn1 /=; apply: contra => p_m.
   by rewrite dvdn_leq ?gcdn_gt0 ?m_gt0 // dvdn_gcd ?p_m.
-case: (ltngtP (gcdn m n) 1) => //; first by rewrite ltnNge gcdn_gt0 ?m_gt0.
+apply/eqP; rewrite eqn_leq gcdn_gt0 m_gt0 andbT leqNgt; apply/negP.
 move/pdiv_prime; set p := pdiv _ => pr_p.
 move/implyP: (no_p_mn p); rewrite /= !mem_primes m_gt0 n_gt0 pr_p /=.
 by rewrite !(dvdn_trans (pdiv_dvd _)) // (dvdn_gcdl, dvdn_gcdr).
@@ -956,8 +956,7 @@ Proof. by rewrite ltn_neqAle part_gt0 andbT eq_sym p_part_eq1 negbK. Qed.
 
 Lemma primes_part pi n : primes n`_pi = filter (mem pi) (primes n).
 Proof.
-have ltnT := ltn_trans.
-case: (posnP n) => [-> | n_gt0]; first by rewrite partn0.
+have ltnT := ltn_trans; have [->|n_gt0] := posnP n; first by rewrite partn0.
 apply: (eq_sorted_irr ltnT ltnn); rewrite ?(sorted_primes, sorted_filter) //.
 move=> p; rewrite mem_filter /= !mem_primes n_gt0 part_gt0 /=.
 apply/andP/and3P=> [[p_pr] | [pi_p p_pr dv_p_n]].
@@ -1194,15 +1193,14 @@ Lemma part_pnat_id pi n : pi.-nat n -> n`_pi = n.
 Proof.
 case/andP=> n_gt0 pi_n.
 rewrite -{2}(partnT n_gt0) /partn big_mkcond; apply: eq_bigr=> p _.
-case: (posnP (logn p n)) => [-> |]; first by rewrite if_same.
+have [->|] := posnP (logn p n); first by rewrite if_same.
 by rewrite logn_gt0 => /(allP pi_n)/= ->.
 Qed.
 
 Lemma part_p'nat pi n : pi^'.-nat n -> n`_pi = 1.
 Proof.
 case/andP=> n_gt0 pi'_n; apply: big1_seq => p /andP[pi_p _].
-case: (posnP (logn p n)) => [-> //|].
-by rewrite logn_gt0; move/(allP pi'_n); case/negP.
+by have [-> //|] := posnP (logn p n); rewrite logn_gt0; case/(allP pi'_n)/negP.
 Qed.
 
 Lemma partn_eq1 pi n : n > 0 -> (n`_pi == 1) = pi^'.-nat n.

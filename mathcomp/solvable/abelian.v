@@ -2064,12 +2064,12 @@ apply: eq_bigr => p _; transitivity (p ^ logn p #[x])%N.
 suffices lti_lnO e: (i < lnO p e _ G) = (e < logn p #[x]).
   congr (p ^ _)%N; apply/eqP; rewrite eqn_leq andbC; apply/andP; split.
     by apply/bigmax_leqP=> e; rewrite lti_lnO.
-  case: (posnP (logn p #[x])) => [-> // | logx_gt0].
+  have [-> //|logx_gt0] := posnP (logn p #[x]).
   have lexpG: (logn p #[x]).-1 < logn p #|G|.
     by rewrite prednK // dvdn_leq_log ?order_dvdG.
   by rewrite (@bigmax_sup _ (Ordinal lexpG)) ?(prednK, lti_lnO).
 rewrite /lnO -(count_logn_dprod_cycle _ _ defG).
-case: (ltnP e _) (b_sorted p) => [lt_e_x | le_x_e].
+case: (ltnP e) (b_sorted p) => [lt_e_x | le_x_e].
   rewrite -(cat_take_drop i.+1 b) -map_rev rev_cat !map_cat cat_path.
   case/andP=> _ ordb; rewrite count_cat ((count _ _ =P i.+1) _) ?leq_addr //.
   rewrite -{2}(size_takel ltib) -all_count.

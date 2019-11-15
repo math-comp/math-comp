@@ -4556,10 +4556,10 @@ Module NatOrder.
 Section NatOrder.
 
 Lemma minnE x y : minn x y = if (x <= y)%N then x else y.
-Proof. by case: leqP => [/minn_idPl|/ltnW /minn_idPr]. Qed.
+Proof. by case: leqP. Qed.
 
 Lemma maxnE x y : maxn x y = if (y <= x)%N then x else y.
-Proof. by case: leqP => [/maxn_idPl|/ltnW/maxn_idPr]. Qed.
+Proof. by case: leqP. Qed.
 
 Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.

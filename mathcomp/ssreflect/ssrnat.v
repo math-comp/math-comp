@@ -474,47 +474,6 @@ Arguments ltP {m n}.
 Lemma lt_irrelevance m n lt_mn1 lt_mn2 : lt_mn1 = lt_mn2 :> (m < n)%coq_nat.
 Proof. exact: (@le_irrelevance m.+1). Qed.
 
-(* Comparison predicates. *)
-
-Variant leq_xor_gtn m n : bool -> bool -> Set :=
-  | LeqNotGtn of m <= n : leq_xor_gtn m n true false
-  | GtnNotLeq of n < m  : leq_xor_gtn m n false true.
-
-Lemma leqP m n : leq_xor_gtn m n (m <= n) (n < m).
-Proof.
-by rewrite ltnNge; case le_mn: (m <= n); constructor; rewrite // ltnNge le_mn.
-Qed.
-
-Variant ltn_xor_geq m n : bool -> bool -> Set :=
-  | LtnNotGeq of m < n  : ltn_xor_geq m n false true
-  | GeqNotLtn of n <= m : ltn_xor_geq m n true false.
-
-Lemma ltnP m n : ltn_xor_geq m n (n <= m) (m < n).
-Proof. by case: leqP; constructor. Qed.
-
-Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
-  | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
-  | PosNotEq0 of n > 0 : eqn0_xor_gt0 n false true.
-
-Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
-Proof. by case: n; constructor. Qed.
-
-Variant compare_nat m n :
-   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n false false false true false true
-  | CompareNatGt of m > n : compare_nat m n false false true false true false
-  | CompareNatEq of m = n : compare_nat m n true true true true false false.
-
-Lemma ltngtP m n : compare_nat m n (n == m) (m == n) (n <= m)
-                                   (m <= n) (n < m) (m < n).
-Proof.
-rewrite !ltn_neqAle [_ == n]eq_sym; case: ltnP => [nm|].
-  by rewrite ltnW // gtn_eqF //; constructor.
-rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_mn eq_nm.
-  by rewrite ltn_eqF //; constructor.
-by rewrite eq_nm; constructor; apply/esym/eqP.
-Qed.
-
 (* Monotonicity lemmas *)
 
 Lemma leq_add2l p m n : (p + m <= p + n) = (m <= n).
@@ -656,13 +615,6 @@ Proof. by move=> np pm; rewrite !leq_subRL // addnC. Qed.
 Lemma ltn_subCl m n p : n <= m -> p <= m -> (m - n < p) = (m - p < n).
 Proof. by move=> nm pm; rewrite !ltn_subLR // addnC. Qed.
 
-(* Eliminating the idiom for structurally decreasing compare and subtract. *)
-Lemma subn_if_gt T m n F (E : T) :
-  (if m.+1 - n is m'.+1 then F m' else E) = (if n <= m then F (m - n) else E).
-Proof.
-by case: leqP => [le_nm | /eqnP-> //]; rewrite -{1}(subnK le_nm) -addSn addnK.
-Qed.
-
 (* Max and min. *)
 
 Definition maxn m n := if m < n then n else m.
@@ -673,10 +625,13 @@ Lemma max0n : left_id 0 maxn.  Proof. by case. Qed.
 Lemma maxn0 : right_id 0 maxn. Proof. by []. Qed.
 
 Lemma maxnC : commutative maxn.
-Proof. by move=> m n; rewrite /maxn; case ltngtP. Qed.
+Proof. by rewrite /maxn; elim=> [|m ih] [] // n; rewrite !ltnS -!fun_if ih. Qed.
 
 Lemma maxnE m n : maxn m n = m + (n - m).
-Proof. by rewrite /maxn addnC; case: leqP => [/eqnP->|/ltnW/subnK]. Qed.
+Proof.
+rewrite /maxn; elim: m n => [|m ih] [|n]; rewrite ?addn0 //.
+by rewrite ltnS subSS addSn -ih; case: leq.
+Qed.
 
 Lemma maxnAC : right_commutative maxn.
 Proof. by move=> m n p; rewrite !maxnE -!addnA !subnDA -!maxnE maxnC. Qed.
@@ -727,10 +682,10 @@ Lemma min0n : left_zero 0 minn. Proof. by case. Qed.
 Lemma minn0 : right_zero 0 minn. Proof. by []. Qed.
 
 Lemma minnC : commutative minn.
-Proof. by move=> m n; rewrite /minn; case ltngtP. Qed.
+Proof. by rewrite /minn; elim=> [|m ih] [] // n; rewrite !ltnS -!fun_if ih. Qed.
 
 Lemma addn_min_max m n : minn m n + maxn m n = m + n.
-Proof. by rewrite /minn /maxn; case: ltngtP => // [_|->] //; apply: addnC. Qed.
+Proof. by rewrite /minn /maxn; case: (m < n) => //; exact: addnC. Qed.
 
 Lemma minnE m n : minn m n = m - (m - n).
 Proof. by rewrite -(subnDl n) -maxnE -addn_min_max addnK minnC. Qed.
@@ -765,7 +720,8 @@ Lemma leq_min m n1 n2 : (m <= minn n1 n2) = (m <= n1) && (m <= n2).
 Proof.
 wlog le_n21: n1 n2 / n2 <= n1.
   by case/orP: (leq_total n2 n1) => ?; last rewrite minnC andbC; auto.
-by rewrite /minn ltnNge le_n21 /= andbC; case: leqP => // /leq_trans->.
+rewrite /minn ltnNge le_n21 /=; case le_m_n1: (m <= n1) => //=.
+apply/contraFF: le_m_n1 => /leq_trans; exact.
 Qed.
 
 Lemma gtn_min m n1 n2 : (m > minn n1 n2) = (m > n1) || (m > n2).
@@ -819,6 +775,61 @@ Qed.
 
 Lemma minn_maxr : right_distributive minn maxn.
 Proof. by move=> m n1 n2; rewrite !(minnC m) minn_maxl. Qed.
+
+(* Comparison predicates. *)
+
+Variant leq_xor_gtn m n : nat -> nat -> nat -> nat -> bool -> bool -> Set :=
+  | LeqNotGtn of m <= n : leq_xor_gtn m n m m n n true false
+  | GtnNotLeq of n < m  : leq_xor_gtn m n n n m m false true.
+
+Lemma leqP m n : leq_xor_gtn m n (minn n m) (minn m n) (maxn n m) (maxn m n)
+                                 (m <= n) (n < m).
+Proof.
+rewrite (minnC m) /minn (maxnC m) /maxn ltnNge.
+by case le_mn: (m <= n); constructor; rewrite //= ltnNge le_mn.
+Qed.
+
+Variant ltn_xor_geq m n : nat -> nat -> nat -> nat -> bool -> bool -> Set :=
+  | LtnNotGeq of m < n  : ltn_xor_geq m n m m n n false true
+  | GeqNotLtn of n <= m : ltn_xor_geq m n n n m m true false.
+
+Lemma ltnP m n : ltn_xor_geq m n (minn n m) (minn m n) (maxn n m) (maxn m n)
+                                 (n <= m) (m < n).
+Proof. by case: leqP; constructor. Qed.
+
+Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
+  | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
+  | PosNotEq0 of n > 0 : eqn0_xor_gt0 n false true.
+
+Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
+Proof. by case: n; constructor. Qed.
+
+Variant compare_nat m n : nat -> nat -> nat -> nat ->
+                          bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | CompareNatLt of m < n :
+      compare_nat m n m m n n false false false true false true
+  | CompareNatGt of m > n :
+      compare_nat m n n n m m false false true false true false
+  | CompareNatEq of m = n :
+      compare_nat m n m m m m true true true true false false.
+
+Lemma ltngtP m n :
+  compare_nat m n (minn n m) (minn m n) (maxn n m) (maxn m n)
+                  (n == m) (m == n) (n <= m) (m <= n) (n < m) (m < n).
+Proof.
+rewrite !ltn_neqAle [_ == n]eq_sym; have [mn|] := ltnP m n.
+  by rewrite ltnW // gtn_eqF //; constructor.
+rewrite leq_eqVlt; case: ltnP; rewrite ?(orbT, orbF) => //= lt_nm eq_nm.
+  by rewrite ltn_eqF //; constructor.
+by rewrite eq_nm (eqP eq_nm); constructor.
+Qed.
+
+(* Eliminating the idiom for structurally decreasing compare and subtract. *)
+Lemma subn_if_gt T m n F (E : T) :
+  (if m.+1 - n is m'.+1 then F m' else E) = (if n <= m then F (m - n) else E).
+Proof.
+by have [le_nm|/eqnP-> //] := leqP; rewrite -{1}(subnK le_nm) -addSn addnK.
+Qed.
 
 (* Getting a concrete value from an abstract existence proof. *)
 
@@ -1872,3 +1883,38 @@ Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
 Proof. by case: ltngtP; constructor. Qed.
 
 End mc_1_9.
+
+Module mc_1_10.
+
+Variant leq_xor_gtn m n : bool -> bool -> Set :=
+  | LeqNotGtn of m <= n : leq_xor_gtn m n true false
+  | GtnNotLeq of n < m  : leq_xor_gtn m n false true.
+
+Lemma leqP m n : leq_xor_gtn m n (m <= n) (n < m).
+Proof. by case: leqP; constructor. Qed.
+
+Variant ltn_xor_geq m n : bool -> bool -> Set :=
+  | LtnNotGeq of m < n  : ltn_xor_geq m n false true
+  | GeqNotLtn of n <= m : ltn_xor_geq m n true false.
+
+Lemma ltnP m n : ltn_xor_geq m n (n <= m) (m < n).
+Proof. by case: ltnP; constructor. Qed.
+
+Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
+  | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
+  | PosNotEq0 of n > 0 : eqn0_xor_gt0 n false true.
+
+Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
+Proof. by case: n; constructor. Qed.
+
+Variant compare_nat m n :
+   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | CompareNatLt of m < n : compare_nat m n false false false true false true
+  | CompareNatGt of m > n : compare_nat m n false false true false true false
+  | CompareNatEq of m = n : compare_nat m n true true true true false false.
+
+Lemma ltngtP m n : compare_nat m n (n == m) (m == n) (n <= m)
+                                   (m <= n) (n < m) (m < n).
+Proof. by case: ltngtP; constructor. Qed.
+
+End mc_1_10.

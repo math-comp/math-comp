@@ -887,9 +887,7 @@ Lemma all_rev a s : all a (rev s) = all a s.
 Proof. by rewrite !all_count count_rev size_rev. Qed.
 
 Lemma rev_nseq n x : rev (nseq n x) = nseq n x.
-Proof.
-by elim: n => [// | n IHn]; rewrite -{1}(addn1 n) nseq_addn rev_cat IHn.
-Qed.
+Proof. by elim: n => // n IHn; rewrite -{1}(addn1 n) nseq_addn rev_cat IHn. Qed.
 
 End Sequences.
 
@@ -1736,14 +1734,14 @@ Proof. exact (can_inj rotrK). Qed.
 Lemma take_rev s : take n0 (rev s) = rev (drop (size s - n0) s).
 Proof.
 set m := _ - n0; rewrite -[s in LHS](cat_take_drop m) rev_cat take_cat.
-rewrite size_rev size_drop -minnE minnC ltnNge geq_minl [in take m s]/m /minn.
+rewrite size_rev size_drop -minnE minnC leq_min ltnn /m.
 by have [_|/eqnP->] := ltnP; rewrite ?subnn take0 cats0.
 Qed.
 
 Lemma drop_rev s : drop n0 (rev s) = rev (take (size s - n0) s).
 Proof.
 set m := _ - n0; rewrite -[s in LHS](cat_take_drop m) rev_cat drop_cat.
-rewrite size_rev size_drop -minnE minnC ltnNge geq_minl /= /m /minn.
+rewrite size_rev size_drop -minnE minnC leq_min ltnn /m.
 by have [_|/eqnP->] := ltnP; rewrite ?take0 // subnn drop0.
 Qed.
 
@@ -2411,11 +2409,10 @@ Proof.
 by move/subnKC <-; rewrite addSnnS iota_add nth_cat size_iota ltnn subnn.
 Qed.
 
-Lemma mem_iota m n i : (i \in iota m n) = (m <= i) && (i < m + n).
+Lemma mem_iota m n i : (i \in iota m n) = (m <= i < m + n).
 Proof.
 elim: n m => [|n IHn] /= m; first by rewrite addn0 ltnNge andbN.
-rewrite -addSnnS leq_eqVlt in_cons eq_sym.
-by case: eqP => [->|_]; [rewrite leq_addr | apply: IHn].
+by rewrite in_cons IHn addnS ltnS; case: ltngtP => // ->; rewrite leq_addr.
 Qed.
 
 Lemma iota_uniq m n : uniq (iota m n).
@@ -2423,16 +2420,15 @@ Proof. by elim: n m => //= n IHn m; rewrite mem_iota ltnn /=. Qed.
 
 Lemma take_iota k m n : take k (iota m n) = iota m (minn k n).
 Proof.
-rewrite /minn; case: ltnP => [lt_k_n|le_n_k].
-  by elim: k n lt_k_n m => [|k IHk] [|n]//= H m; rewrite IHk.
+have [lt_k_n|le_n_k] := ltnP.
+  by elim: k n lt_k_n m => [|k IHk] [|n] //= H m; rewrite IHk.
 by apply: take_oversize; rewrite size_iota.
 Qed.
 
 Lemma drop_iota k m n : drop k (iota m n) = iota (m + k) (n - k).
 Proof.
-by elim: k m n => [|k IHk] m [|n]//=; rewrite ?addn0// IHk addSn addnS subSS.
+by elim: k m n => [|k IHk] m [|n] //=; rewrite ?addn0 // IHk addnS subSS.
 Qed.
-
 
 (* Making a sequence of a specific length, using indexes to compute items. *)
 

@@ -93,6 +93,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `Num` module. However, instances of the number structures may require
     changes.
 
+- Extended comparison predicates `leqP`, `ltnP`, and `ltngtP` in ssrnat to
+  allow case analysis on `minn` and `maxn`.
+  + The compatibility layer for the version 1.10 is provided as the
+    `ssrnat.mc_1_10` module. One may compile proofs compatible with the version
+    1.10 in newer versions by using this module.
+
 ### Renamed
 
 - `real_lerP` -> `real_leP`
