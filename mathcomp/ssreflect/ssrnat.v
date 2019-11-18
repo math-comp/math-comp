@@ -326,10 +326,10 @@ Hint Resolve leqnSn : core.
 Lemma leq_pred n : n.-1 <= n.           Proof. by case: n => /=. Qed.
 Lemma leqSpred n : n <= n.-1.+1.        Proof. by case: n => /=. Qed.
 
-Lemma ltn_predl n : (n.-1 < n) = (0 < n).
+Lemma ltn_predL n : (n.-1 < n) = (0 < n).
 Proof. by case: n => [//|n]; rewrite ltnSn. Qed.
 
-Lemma ltn_predr m n : (m < n.-1) = (m.+1 < n).
+Lemma ltn_predRL m n : (m < n.-1) = (m.+1 < n).
 Proof. by case: n => [//|n]; rewrite succnK. Qed.
 
 Lemma ltn_predK m n : m < n -> n.-1.+1 = n.
