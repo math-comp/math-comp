@@ -277,6 +277,10 @@ Lemma cat_cons x s1 s2 : (x :: s1) ++ s2 = x :: s1 ++ s2. Proof. by []. Qed.
 Lemma cat_nseq n x s : nseq n x ++ s = ncons n x s.
 Proof. by elim: n => //= n ->. Qed.
 
+Lemma nseq_addn n1 n2 x :
+  nseq (n1 + n2) x = nseq n1 x ++ nseq n2 x.
+Proof. by rewrite cat_nseq /nseq /ncons iter_add. Qed.
+
 Lemma cats0 s : s ++ [::] = s.
 Proof. by elim: s => //= x s ->. Qed.
 
@@ -742,6 +746,40 @@ move=> lt_i_n0 s; case lt_n0_s: (n0 < size s).
 by rewrite -{1}[s]cats0 take_cat lt_n0_s /= cats0.
 Qed.
 
+Lemma take_take i j : i <= j -> forall s, take i (take j s) = take i s.
+Proof.
+move=> ij s; elim: s i j ij => [// | a s IHs] [|i] [|j] //=.
+by rewrite ltnS => /IHs ->.
+Qed.
+
+Lemma take_drop i j s : take i (drop j s) = drop j (take (i + j) s).
+Proof. by rewrite addnC; elim: s i j => // x s IHs [|i] [|j] /=. Qed.
+
+Lemma take_addn i j s : take (i + j) s = take i s ++ take j (drop i s).
+Proof.
+elim: i j s => [|i IHi] [|j] [|a s] //; first by rewrite take0 addn0 cats0.
+by rewrite addSn /= IHi.
+Qed.
+
+Lemma takeC i j s : take i (take j s) = take j (take i s).
+Proof.
+wlog i_le_j : i j / i <= j.
+  by move=> Hwlog; case: (leqP i j) => [|/ltnW] /Hwlog ->.
+rewrite take_take // [RHS]take_oversize // (leq_trans _ i_le_j) //.
+elim: i s {i_le_j} => [|i IHi] s; first by rewrite take0.
+by case: s => [|a s]//; rewrite /= ltnS.
+Qed.
+
+Lemma take_nseq i j x : i <= j -> take i (nseq j x) = nseq i x.
+Proof. by move=>/subnKC <-; rewrite nseq_addn take_size_cat // size_nseq. Qed.
+
+Lemma drop_nseq i j x : drop i (nseq j x) = nseq (j - i) x.
+Proof.
+case: (leqP i j) => [/subnKC {1}<-|/ltnW j_le_i].
+  by rewrite nseq_addn drop_size_cat // size_nseq.
+by rewrite drop_oversize ?size_nseq // (eqP j_le_i).
+Qed.
+
 (* drop_nth and take_nth below do NOT use the default n0, because the "n"  *)
 (* can be inferred from the condition, whereas the nth default value x0    *)
 (* will have to be given explicitly (and this will provide "d" as well).   *)
@@ -833,6 +871,11 @@ Proof. by rewrite !has_count count_rev. Qed.
 
 Lemma all_rev a s : all a (rev s) = all a s.
 Proof. by rewrite !all_count count_rev size_rev. Qed.
+
+Lemma rev_nseq n x : rev (nseq n x) = nseq n x.
+Proof.
+by elim: n => [// | n IHn]; rewrite -{1}(addn1 n) nseq_addn rev_cat IHn.
+Qed.
 
 End Sequences.
 
@@ -1183,7 +1226,7 @@ Proof. by rewrite -has_pred1 has_count -eqn0Ngt; apply: eqP. Qed.
 Lemma count_uniq_mem s x : uniq s -> count_mem x s = (x \in s).
 Proof.
 elim: s => //= y s IHs /andP[/negbTE s'y /IHs-> {IHs}].
-by rewrite in_cons; case: eqVneq => // <-; rewrite s'y.
+by rewrite in_cons; case: (eqVneq y x) => // <-; rewrite s'y.
 Qed.
 
 Lemma filter_pred1_uniq s x : uniq s -> x \in s -> filter (pred1 x) s = [:: x].
@@ -1321,7 +1364,7 @@ Section NthTheory.
 Lemma nthP (T : eqType) (s : seq T) x x0 :
   reflect (exists2 i, i < size s & nth x0 s i = x) (x \in s).
 Proof.
-apply: (iffP idP) => [|[n Hn <-]]; last by apply mem_nth.
+apply: (iffP idP) => [|[n Hn <-]]; last exact: mem_nth.
 by exists (index x s); [rewrite index_mem | apply nth_index].
 Qed.
 
@@ -2342,6 +2385,19 @@ Qed.
 
 Lemma iota_uniq m n : uniq (iota m n).
 Proof. by elim: n m => //= n IHn m; rewrite mem_iota ltnn /=. Qed.
+
+Lemma take_iota k m n : take k (iota m n) = iota m (minn k n).
+Proof.
+rewrite /minn; case: ltnP => [lt_k_n|le_n_k].
+  by elim: k n lt_k_n m => [|k IHk] [|n]//= H m; rewrite IHk.
+by apply: take_oversize; rewrite size_iota.
+Qed.
+
+Lemma drop_iota k m n : drop k (iota m n) = iota (m + k) (n - k).
+Proof.
+by elim: k m n => [|k IHk] m [|n]//=; rewrite ?addn0// IHk addSn addnS subSS.
+Qed.
+
 
 (* Making a sequence of a specific length, using indexes to compute items. *)
 
