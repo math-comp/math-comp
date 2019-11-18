@@ -559,6 +559,10 @@ Proof. by move=> Ea s; rewrite !has_count (eq_count Ea). Qed.
 Lemma eq_all a1 a2 : a1 =1 a2 -> all a1 =1 all a2.
 Proof. by move=> Ea s; rewrite !all_count (eq_count Ea). Qed.
 
+Lemma all_filter (p q : pred T) xs :
+  all p (filter q xs) = all [pred i | q i ==> p i] xs.
+Proof. by elim: xs => //= x xs <-; case: (q x). Qed.
+
 Section SubPred.
 
 Variable (a1 a2 : pred T).
@@ -2303,6 +2307,10 @@ Proof. by elim: s => //= x s <-; rewrite -{3}(fK x); case: (f _). Qed.
 Lemma pmap_cat s t : pmap (s ++ t) = pmap s ++ pmap t.
 Proof. by elim: s => //= x s ->; case/f: x. Qed.
 
+Lemma all_pmap (p : pred rT) s :
+  all p (pmap s) = all [pred i | oapp p true (f i)] s.
+Proof. by elim: s => //= x s <-; case: f. Qed.
+
 End Pmap.
 
 Section EqPmap.
@@ -2978,6 +2986,8 @@ Qed.
 
 End EqAllPairsDep.
 
+Arguments allpairsPdep {S T R f s t z}.
+
 Section MemAllPairs.
 
 Variables (S : Type) (T : S -> Type) (R : eqType).
@@ -3000,7 +3010,22 @@ Qed.
 
 End MemAllPairs.
 
-Arguments allpairsPdep {S T R f s t z}.
+Lemma all_allpairsP
+      (S : eqType) (T : S -> eqType) (R : Type)
+      (p : pred R) (f : forall x : S, T x -> R)
+      (s : seq S) (t : forall x : S, seq (T x)) :
+  reflect (forall (x : S) (y : T x), x \in s -> y \in t x -> p (f x y))
+          (all p [seq f x y | x <- s, y <- t x]).
+Proof.
+elim: s => [|x s IHs]; first by constructor.
+rewrite /= all_cat all_map /preim.
+apply/(iffP andP)=> [[/allP /= ? ? x' y x'_in_xs]|p_xs_t].
+  by move: x'_in_xs y; rewrite inE => /predU1P [-> //|? ?]; exact: IHs.
+split; first by apply/allP => ?; exact/p_xs_t/mem_head.
+by apply/IHs => x' y x'_in_s; apply: p_xs_t; rewrite inE x'_in_s orbT.
+Qed.
+
+Arguments all_allpairsP {S T R p f s t}.
 
 Section EqAllPairs.
 

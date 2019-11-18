@@ -25,7 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added theorems `ffact_prod`, `prime_modn_expSn` and `fermat_little`
   in `binomial.v`
 
-- Added theorems `flatten_map1`, `allpairs_consr`, and `mask_filter` in `seq.v`.
+- Added theorems `flatten_map1`, `allpairs_consr`, `mask_filter`,
+  `all_filter`, `all_pmap`, and `all_allpairsP` in `seq.v`.
 
 - Fintype theorems: `fintype0`, `card_le1P`, `mem_card1`,
   `card1P`, `fintype_le1P`, `fintype1`, `fintype1P`,
