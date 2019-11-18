@@ -89,6 +89,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `nseq_addn`, `take_take`, `take_drop`, `take_addn`, `takeC`,
   `take_nseq`, `drop_nseq`, `rev_nseq`, `take_iota`, `drop_iota`.
 
+- Added ssrfun theorem `inj_compr`.
 
 ### Changed
 
