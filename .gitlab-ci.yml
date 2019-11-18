@@ -70,6 +70,7 @@ make-coq-latest:
   script:
     - docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//-/:}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
     - docker push "${IMAGE}"
+    - docker run --mount "type=bind,source=$(pwd),target=/home/coq/mathcomp" -w /home/coq/mathcomp -t "${IMAGE}" /bin/bash --login -c "set -x; cd mathcomp; make test-suite"
     - docker logout "${CI_REGISTRY}"
   except:
     - tags

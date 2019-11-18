@@ -1,0 +1,22 @@
+OUTPUT_TESTS=test_suite/output.v
+
+OUTPUT_ARTIFACTS=$(OUTPUT_TESTS:%.v=%.v.out.new)
+
+COQ_VERSION=$(shell $(COQC) -print-version | cut -d ' ' -f 1 | cut -d '.' -f 1-2)
+
+# Given a file f we compare its compilation output f.out.new with
+# f.out.COQ_VERSION (or f.out if f.out.COQ_VERSION does not exist)
+post-all:: $(OUTPUT_ARTIFACTS)
+	@for f in $(OUTPUT_TESTS); do\
+	  if [ -e $$f.out.$(COQ_VERSION) ]; then REFERENCE=$$f.out.$(COQ_VERSION);\
+	  else REFERENCE=$$f.out; fi;\
+	  diff -u $$REFERENCE $$f.out.new > /dev/null;\
+	  if [ $$? -ne 0 ]; \
+	    then echo "Output of file $$f differs!";\
+		diff -u $$REFERENCE $$f.out.new;\
+		exit 1;\
+	  fi;\
+	done
+
+$(OUTPUT_ARTIFACTS): %.v.out.new: %.v all/all.vo
+	$(COQC) $(COQFLAGS) $(COQLIBS) $< > $<.out.new

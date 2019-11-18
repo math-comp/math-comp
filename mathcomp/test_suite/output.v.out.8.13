@@ -1,0 +1,49 @@
+cyclic_pgroup_Aut_structure :
+forall [gT : finGroupType] [p : nat] [G : {group gT}],
+p.-group G ->
+cyclic G ->
+G != 1 :> {set gT} ->
+let q := #|G| in
+let n := (logn p q).-1 in
+let A := Aut G in
+let P := 'O_p(A) in
+let F := 'O_p^'(A) in
+exists m : {perm gT} -> 'Z_q,
+  [/\ [/\ {in A & G, forall (a : {perm gT}) (x : gT), x ^+ m a = a x},
+          m 1 = 1%R /\ {in A &, {morph m : a b / a * b >-> (a * b)%R}},
+          {in A &, injective m} /\ [seq m x | x in A] =i GRing.unit,
+          forall k : nat, {in A, {morph m : a / a ^+ k >-> (a ^+ k)%R}}
+        & {in A, {morph m : a / a^-1 >-> (a^-1)%R}}],
+      [/\ abelian A, cyclic F, #|F| = p.-1
+        & [faithful F, on 'Ohm_1(G) | [Aut G]]]
+    & if n == 0
+      then A = F
+      else
+       exists t : perm_for_finType gT,
+         [/\ t \in A, #[t] = 2, m t = (-1)%R
+           & if odd p
+             then
+              [/\ cyclic A /\ cyclic P,
+                  exists s : perm_for_finType gT,
+                    [/\ s \in A, #[s] = (p ^ n)%N, m s = (p.+1%:R)%R
+                      & P = <[s]>]
+                & exists s0 : perm_for_finType gT,
+                    [/\ s0 \in A, #[s0] = p, m s0 = ((p ^ n).+1%:R)%R
+                      & 'Ohm_1(P) = <[s0]>]]
+             else
+              if n == 1
+              then A = <[t]>
+              else
+               exists s : perm_for_finType gT,
+                 [/\ s \in A, #[s] = (2 ^ n.-1)%N, 
+                    m s = (5%:R)%R, <[s]> \x <[t]> = A
+                   & exists s0 : perm_for_finType gT,
+                       [/\ s0 \in A, #[s0] = 2, m s0 = ((2 ^ n).+1%:R)%R,
+                           m (s0 * t) = ((2 ^ n).-1%:R)%R
+                         & 'Ohm_1(<[s]>) = <[s0]>]]]]
+
+cyclic_pgroup_Aut_structure is not universe polymorphic
+Arguments cyclic_pgroup_Aut_structure [gT] [p]%nat_scope [G]%Group_scope _ _
+  _
+cyclic_pgroup_Aut_structure is opaque
+Expands to: Constant mathcomp.solvable.extremal.cyclic_pgroup_Aut_structure
