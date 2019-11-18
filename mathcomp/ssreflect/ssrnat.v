@@ -517,14 +517,14 @@ Proof. by rewrite -subn_eq0 -subnDA. Qed.
 Lemma leq_subr m n : n - m <= n.
 Proof. by rewrite leq_subLR leq_addl. Qed.
 
-Lemma ltn_subl m n : n < n - m = false.
+Lemma ltn_subrR m n : (n < n - m) = false.
 Proof. by rewrite ltnNge leq_subr. Qed.
 
-Lemma leq_subl m n : n <= n - m = (m == 0) || (n == 0).
-Proof. by case: m n => [|m] [|n]; rewrite ?subn0 ?leqnn ?ltn_subl. Qed.
+Lemma leq_subrR m n : (n <= n - m) = (m == 0) || (n == 0).
+Proof. by case: m n => [|m] [|n]; rewrite ?subn0 ?leqnn ?ltn_subrR. Qed.
 
-Lemma ltn_subr m n : n - m < n = (0 < m) && (0 < n).
-Proof. by rewrite ltnNge leq_subl negb_or !lt0n. Qed.
+Lemma ltn_subrL m n : (n - m < n) = (0 < m) && (0 < n).
+Proof. by rewrite ltnNge leq_subrR negb_or !lt0n. Qed.
 
 Lemma subnKC m n : m <= n -> m + (n - m) = n.
 Proof. by elim: m n => [|m IHm] [|n] // /(IHm n) {2}<-. Qed.

@@ -96,25 +96,30 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `AC` -- right commutativity.
   - `ACA` -- self-interchange (inner commutativity), e.g., `orbACA : (a || b) || (c || d) = (a || c) || (b || d).`
   - `b` -- a boolean argument, as in `andbb : idempotent andb.`
-  - `C` -- commutativity, as in `andbC : commutative andb`,
+  - `C` -- commutativity, as in `andbC : commutative andb.`
         -- alternatively, predicate or set complement, as in `predC.`
   - `CA` -- left commutativity.
   - `D` -- predicate or set difference, as in `predD.`
-  - `E` -- elimination lemma, as in `negbFE : ~~ b = false -> b`.
+  - `E` -- elimination lemma, as in `negbFE : ~~ b = false -> b.`
   - `F` or `f` -- boolean false, as in `andbF : b && false = false.`
-  - `g` -- a group argument
-  - `I` -- left/right injectivity, as in `addbI : right_injective addb` 
+  - `F` -- alternatively, about a finite type.
+  - `g` -- a group argument.
+  - `I` -- left/right injectivity, as in `addbI : right_injective addb.`
         -- alternatively predicate or set intersection, as in `predI.`
-  - `l` -- a left-hand operation, as `andb_orl : left_distributive andb orb.`
+  - `l` -- the left-hand of an operation, as in `andb_orl : left_distributive andb orb.`
+  - `L` -- the left-hand of a relation, as in `ltn_subrL : n - m < n = (0 < m) && (0 < n).`
+  - `LR` -- moving an operator from the left-hand to the right-hand of an relation, as in `leq_subLR : (m - n <= p) = (m <= n + p).`
   - `N` or `n` -- boolean negation, as in `andbN : a && (~~ a) = false.`
-  - `n` -- alternatively, it is a natural number argument,
+  - `n` -- alternatively, it is a natural number argument.
   - `N` -- alternatively ring negation, as in `mulNr : (- x) * y = - (x * y).`
   - `P` -- a characteristic property, often a reflection lemma, as in
      `andP : reflect (a /\ b) (a && b)`.
   - `r` -- a right-hand operation, as `orb_andr : right_distributive orb andb.`
-      -- alternatively, it is a ring argument
+      -- alternatively, it is a ring argument.
+  - `R` -- the right-hand of a relation, as in `ltn_subrR : n < n - m = false`.
+  - `RL` -- moving an operator from the right-hand to the left-hand of an relation, as in `ltn_subRL : (n < p - m) = (m + n < p).`
   - `T` or `t` -- boolean truth, as in `andbT: right_id true andb.`
-        -- alternatively, total set
+  - `T` -- alternatively, total set.
   - `U` -- predicate or set union, as in `predU`.
   - `W` -- weakening, as in `in1W : {in D, forall x, P} -> forall x, P.`
   - `0` -- ring or nat 0, or empty set, as in `addr0 : x + 0 = x.`
@@ -126,11 +131,11 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `V` -- multiplicative inverse, as in `mulVr : x^-1 * x = 1.`
   - `X` -- exponentiation, as in `rmorphX : f (x ^+ n) = f x ^+ n.`
   - `Z` -- (left) module scaling, as in `linearZ : f (a *: v)  = s *: f v.`
-  - `z` -- an int argument
+  - `z` -- an int argument.
 #### Typical search pattern
 `Search _ "prefix" "suffix"* (symbol|pattern)* in library.`
 
-### Naming conventions for definitions (non exhaustive)	
+### Naming conventions for definitions (non exhaustive)
 
 - Structure for types
   - Mixed case, the first letter lowercase and the first letter of each internal word capitalized, end with `Type`
