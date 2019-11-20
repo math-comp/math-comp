@@ -37,8 +37,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `big_enum_val`, `big_enum_rank`, `big_set`.
 
 - Arithmetic theorems in ssrnat and div:
-  - some trivial results in ssrnat: `ltn_predl`, `ltn_predr`,
-    `ltn_subr` and `predn_sub`,
+  - some trivial results in ssrnat: `ltn_predL`, `ltn_predRL`,
+    `ltn_subrR`, `leq_subrR`, `ltn_subrL` and `predn_sub`,
   - theorems about `n <=/< p +/- m` and `m +/- n <=/< p`:
     `leq_psubRL`, `ltn_psubLR`, `leq_subRL`, `ltn_subLR`, `leq_subCl`,
     `leq_psubCr`, `leq_subCr`, `ltn_subCr`, `ltn_psubCl` and
