@@ -128,7 +128,7 @@ endif
 %.vo: __always__ Makefile.coq
 	+$(COQMAKE) $@
 
-doc:
+doc: __always__ Makefile.coq
 	mkdir -p _build_doc/
 	cp -r $(COQFILES) -t _build_doc/ --parents
 	cp Make Makefile* _build_doc
