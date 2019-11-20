@@ -116,7 +116,7 @@ Lemma subnormalP H G :
   reflect (exists2 s, normal.-series H s & last H s = G) (H <|<| G).
 Proof.
 apply: (iffP andP) => [[sHG snHG] | [s Hsn <-{G}]].
-  elim: {G}#|G| {-2}G sHG snHG => [|m IHm] G sHG.
+  move: #|G| snHG => m; elim: m => [|m IHm] in G sHG *.
     by exists [::]; last by apply/eqP; rewrite eq_sym.
   rewrite iterSr => /IHm[|s Hsn defG].
     by rewrite sub_gen // class_supportEr (bigD1 1) //= conjsg1 subsetUl.
@@ -125,10 +125,10 @@ apply: (iffP andP) => [[sHG snHG] | [s Hsn <-{G}]].
   by rewrite norms_gen ?class_support_norm.
 set f := fun _ => <<_>>; have idf: iter _ f H == H.
   by elim=> //= m IHm; rewrite (eqP IHm) /f class_support_id genGid.
-elim: {s}(size s) {-2}s (eqxx (size s)) Hsn => [[] //= | m IHm s].
-case/lastP: s => // s G; rewrite size_rcons last_rcons -cats1 cat_path /=.
-set K := last H s => def_m /and3P[Hsn /andP[sKG nKG] _].
-have:= sKG; rewrite subEproper; case/predU1P=> [<-|prKG]; first exact: IHm.
+have [m] := ubnP (size s); elim: m s Hsn => // m IHm /lastP[//|s G].
+rewrite size_rcons last_rcons rcons_path /= ltnS.
+set K := last H s => /andP[Hsn /andP[sKG nKG]] lt_s_m.
+have:= sKG; rewrite subEproper => /predU1P[<-|prKG]; first exact: IHm.
 pose L := [group of f G].
 have sHK: H \subset K by case/IHm: Hsn.
 have sLK: L \subset K by rewrite gen_subG class_support_sub_norm.
@@ -136,7 +136,8 @@ rewrite -(subnK (proper_card (sub_proper_trans sLK prKG))) iter_add iterSr.
 have defH: H = setIgr L H by rewrite -sub_setIgr ?sub_gen ?sub_class_support.
 have: normal.-series H (map (setIgr L) s) by rewrite defH path_setIgr.
 case/IHm=> [|_]; first by rewrite size_map.
-by rewrite {1 2}defH last_map (subset_trans sHK) //= (setIidPr sLK) => /eqP->.
+rewrite [in last _]defH last_map (subset_trans sHK) //=.
+by rewrite (setIidPr sLK) => /eqP->.
 Qed.
 
 Lemma subnormal_refl G : G <|<| G.
@@ -513,7 +514,7 @@ Qed.
 Lemma chief_series_exists H G :
   H <| G -> {s | (G.-chief).-series 1%G s & last 1%G s = H}.
 Proof.
-elim: {H}_.+1 {-2}H (ltnSn #|H|) => // m IHm U leUm nsUG.
+have [m] := ubnP #|H|; elim: m H => // m IHm U leUm nsUG.
 have [-> | ntU] := eqVneq U 1%G; first by exists [::].
 have [V maxV]: {V : {group gT} | maxnormal V U G}.
   by apply: ex_maxgroup; exists 1%G; rewrite proper1G ntU norms1.

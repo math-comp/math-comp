@@ -877,9 +877,9 @@ Lemma mxrank_leqif_sup m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
 Proof.
 move=> sAB; split; first by rewrite mxrankS.
 apply/idP/idP=> [| sBA]; last by rewrite eqn_leq !mxrankS.
-case/submxP: sAB => D ->; rewrite -{-2}(mulmx_base B) mulmxA.
+case/submxP: sAB => D ->; set r := \rank B; rewrite -(mulmx_base B) mulmxA.
 rewrite mxrankMfree // => /row_fullP[E kE].
-by rewrite -{1}[row_base B]mul1mx -kE -(mulmxA E) (mulmxA _ E) submxMl.
+by rewrite -[rB in _ *m rB]mul1mx -kE -(mulmxA E) (mulmxA _ E) submxMl.
 Qed.
 
 Lemma mxrank_leqif_eq m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -1100,7 +1100,7 @@ Lemma sub_sumsmxP P m n (A : 'M_(m, n)) (B_ : I -> 'M_n) :
 Proof.
 apply: (iffP idP) => [| [u_ ->]]; last first.
   by apply: summx_sub_sums => i _; apply: submxMl.
-elim: {P}_.+1 {-2}P A (ltnSn #|P|) => // b IHb P A.
+have [b] := ubnP #|P|; elim: b => // b IHb in P A *.
 case: (pickP P) => [i Pi | P0 _]; last first.
   rewrite big_pred0 //; move/submx0null->.
   by exists (fun _ => 0); rewrite big_pred0.
@@ -1579,7 +1579,9 @@ Qed.
 
 Lemma proj_mx_proj n (U V : 'M_n) :
   let P := proj_mx U V in (U :&: V = 0)%MS -> P *m P = P.
-Proof. by move=> P dxUV; rewrite -{-2}[P]mul1mx proj_mx_id ?proj_mx_sub. Qed.
+Proof.
+by move=> P dxUV; rewrite -[P in P *m _]mul1mx proj_mx_id ?proj_mx_sub ?mul1mx.
+Qed.
 
 (* Completing a partially injective matrix to get a unit matrix. *)
 
@@ -1845,7 +1847,8 @@ rewrite /TIsum; apply: (iffP eqnP) => /= [dxS i Pi | dxS].
   set Si' := (\sum_(j | _) unwrap (S_ j))%MS.
   have: mxdirect (unwrap (S_ i) + Si') by apply/eqnP; rewrite /= -!(bigD1 i).
   by rewrite mxdirect_addsE => /and3P[-> _ /eqP].
-elim: _.+1 {-2 4}P (subxx P) (ltnSn #|P|) => // m IHm Q; move/subsetP=> sQP.
+set Q := P; have [m] := ubnP #|Q|; have: Q \subset P by [].
+elim: m Q => // m IHm Q /subsetP-sQP.
 case: (pickP Q) => [i Qi | Q0]; last by rewrite !big_pred0 ?mxrank0.
 rewrite (cardD1x Qi) !((bigD1 i) Q) //=.
 move/IHm=> <- {IHm}/=; last by apply/subsetP=> j /andP[/sQP].
@@ -1946,7 +1949,7 @@ Proof. by apply: (iffP (rowV0Pn _)) => [] [v]; move/eigenspaceP; exists v. Qed.
 Lemma mxdirect_sum_eigenspace (P : pred I) a_ :
   {in P &, injective a_} -> mxdirect (\sum_(i | P i) eigenspace (a_ i)).
 Proof.
-elim: {P}_.+1 {-2}P (ltnSn #|P|) => // m IHm P lePm inj_a.
+have [m] := ubnP #|P|; elim: m P => // m IHm P lePm inj_a.
 apply/mxdirect_sumsP=> i Pi; apply/eqP/rowV0P => v.
 rewrite sub_capmx => /andP[/eigenspaceP def_vg].
 set Vi' := (\sum_(i | _) _)%MS => Vi'v.
@@ -2109,9 +2112,9 @@ Proof.
 case: n => // n' _; set n := n'.+1; set p := #|F|.
 rewrite big_nat_rev big_add1 -triangular_sum expn_sum -big_split /=.
 pose fr m := [pred A : 'M[F]_(m, n) | \rank A == m].
-set m := {-7}n; transitivity #|fr m|.
+set m := n; rewrite [in m.+1]/m; transitivity #|fr m|.
   by rewrite cardsT /= card_sub; apply: eq_card => A; rewrite -row_free_unit.
-elim: m (leqnn m : m <= n) => [_|m IHm]; last move/ltnW=> le_mn.
+have: m <= n by []; elim: m => [_ | m IHm /ltnW-le_mn].
   rewrite (@eq_card1 _ (0 : 'M_(0, n))) ?big_geq //= => A.
   by rewrite flatmx0 !inE !eqxx.
 rewrite big_nat_recr // -{}IHm //= !subSS mulnBr muln1 -expnD subnKC //.
@@ -2453,7 +2456,7 @@ Definition cent_mx_fun (B : 'M[F]_n) := R *m lin_mx (mulmxr B \- mulmx B).
 Lemma cent_mx_fun_is_linear : linear cent_mx_fun.
 Proof.
 move=> a A B; apply/row_matrixP=> i; rewrite linearP row_mul mul_rV_lin.
-rewrite /= {-3}[row]lock row_mul mul_rV_lin -lock row_mul mul_rV_lin.
+rewrite /= [row i _ as v in a *: v]row_mul mul_rV_lin row_mul mul_rV_lin.
 by rewrite -linearP -(linearP [linear of mulmx _ \- mulmxr _]).
 Qed.
 Canonical cent_mx_fun_additive := Additive cent_mx_fun_is_linear.

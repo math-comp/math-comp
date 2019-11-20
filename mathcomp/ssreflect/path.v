@@ -882,10 +882,11 @@ by rewrite ihss !size_cat size_merge size_cat -addnA addnCA -size_cat.
 Qed.
 
 Lemma sort_stable s :
-  sorted leT' s ->
+    sorted leT' s ->
   sorted [rel x y | leT x y && (leT y x ==> leT' x y)] (sort leT s).
 Proof.
-case: {-2}s (erefl s) => // x _ -> sorted_s; rewrite -(mkseq_nth x s) sort_map.
+move=> sorted_s; case Ds: s => // [x s1]; rewrite -{s1}Ds.
+rewrite -(mkseq_nth x s) sort_map.
 apply/(homo_sorted_in (f := nth x s)): (sort_iota_stable x s (size s)).
 move=> /= y z; rewrite !mem_sort !mem_iota !leq0n add0n /= => y_le_s z_le_s.
 case/andP => -> /= /implyP yz; apply/implyP => /yz {yz} y_le_z.
@@ -916,7 +917,7 @@ Qed.
 
 Lemma filter_sort p s : filter p (sort leT s) = sort leT (filter p s).
 Proof.
-case: {-2}s (erefl s) => // x _ ->.
+case Ds: s => // [x s1]; rewrite -{s1}Ds.
 rewrite -(mkseq_nth x s) !(filter_map, sort_map).
 congr map; apply/(@eq_sorted_irr _ (le_lex x s)) => //.
 - by move=> ?; rewrite /= ltnn implybF andbN.
@@ -935,7 +936,7 @@ Variables (leT_total : total leT) (leT_tr : transitive leT).
 Lemma mask_sort s m :
   {m_s : bitseq | mask m_s (sort leT s) = sort leT (mask m s)}.
 Proof.
-case: {-2}s (erefl s) => [|x _ ->]; first by case: m; exists [::].
+case Ds: {-}s => [|x s1]; [by rewrite Ds; case: m; exists [::] | clear s1 Ds].
 rewrite -(mkseq_nth x s) -map_mask !sort_map.
 exists [seq i \in mask m (iota 0 (size s)) |
             i <- sort (xrelpre (nth x s) leT) (iota 0 (size s))].
@@ -1059,8 +1060,8 @@ Qed.
 Lemma looping_uniq x n : uniq (traject f x n.+1) = ~~ looping x n.
 Proof.
 rewrite /looping; elim: n x => [|n IHn] x //.
-rewrite {-3}[n.+1]lock /= -lock {}IHn -iterSr -negb_or inE; congr (~~ _).
-apply: orb_id2r => /trajectP no_loop.
+rewrite [n.+1 in LHS]lock [iter]lock /= -!lock {}IHn -iterSr -negb_or inE.
+congr (~~ _); apply: orb_id2r => /trajectP no_loop.
 apply/idP/eqP => [/trajectP[m le_m_n def_x] | {1}<-]; last first.
   by rewrite iterSr -last_traject mem_last.
 have loop_m: looping x m.+1 by rewrite /looping iterSr -def_x mem_head.
@@ -1084,9 +1085,9 @@ Hypothesis Up : uniq p.
 Lemma prev_next : cancel (next p) (prev p).
 Proof.
 move=> x; rewrite prev_nth mem_next next_nth; case p_x: (x \in p) => //.
-case def_p: p Up p_x => // [y q]; rewrite -{-1}def_p => /= /andP[not_qy Uq] p_x.
-rewrite -{2}(nth_index y p_x); congr (nth y _ _); set i := index x p.
-have: i <= size q by rewrite -index_mem -/i def_p in p_x.
+case Dp: p Up p_x => // [y q]; rewrite [uniq _]/= -Dp => /andP[q'y Uq] p_x.
+rewrite -[RHS](nth_index y p_x); congr (nth y _ _); set i := index x p.
+have: i <= size q by rewrite -index_mem -/i Dp in p_x.
 case: ltngtP => // [lt_i_q|->] _; first by rewrite index_uniq.
 by apply/eqP; rewrite nth_default // eqn_leq index_size leqNgt index_mem.
 Qed.
@@ -1103,7 +1104,7 @@ Qed.
 
 Lemma cycle_next : fcycle (next p) p.
 Proof.
-case def_p: {-2}p Up => [|x q] Uq //.
+case def_p: p Up => [|x q] Uq //; rewrite -[in next _]def_p.
 apply/(pathP x)=> i; rewrite size_rcons => le_i_q.
 rewrite -cats1 -cat_cons nth_cat le_i_q /= next_nth {}def_p mem_nth //.
 rewrite index_uniq // nth_cat /= ltn_neqAle andbC -ltnS le_i_q.

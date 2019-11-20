@@ -3185,7 +3185,7 @@ Lemma lerif_AGM_scaled (I : finType) (A : {pred I}) (E : I -> R) (n := #|A|) :
   \prod_(i in A) (E i *+ n) <= (\sum_(i in A) E i) ^+ n
                             ?= iff [forall i in A, forall j in A, E i == E j].
 Proof.
-elim: {A}_.+1 {-2}A (ltnSn #|A|) => // m IHm A leAm in E n * => Ege0.
+have [m leAm] := ubnP #|A|; elim: m => // m IHm in A leAm E n * => Ege0.
 apply/lerifP; case: ifPn => [/forall_inP-Econstant | Enonconstant].
   have [i /= Ai | A0] := pickP (mem A); last by rewrite [n]eq_card0 ?big_pred0.
   have /eqfun_inP-E_i := Econstant i Ai; rewrite -(eq_bigr _ E_i) sumr_const.
@@ -4990,8 +4990,9 @@ Qed.
 Lemma normC_sub_eq x y :
   `|x - y| = `|x| - `|y| -> {t | `|t| == 1 & (x, y) = (`|x| * t, `|y| * t)}.
 Proof.
-rewrite -{-1}(subrK y x) => /(canLR (subrK _))/esym-Dx; rewrite Dx.
-by have [t ? [Dxy Dy]] := normC_add_eq Dx; exists t; rewrite // mulrDl -Dxy -Dy.
+set z := x - y; rewrite -(subrK y x) -/z => /(canLR (subrK _))/esym-Dx.
+have [t t_1 [Dz Dy]] := normC_add_eq Dx.
+by exists t; rewrite // Dx mulrDl -Dz -Dy.
 Qed.
 
 End ClosedFieldTheory.

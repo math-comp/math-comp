@@ -202,12 +202,12 @@ have{def_m bc def_bc ltc2 ltbc3}:
    let kb := (ifnz e k 1).*2 in
    [&& k > 0, p < m, lb_dvd p m, c < kb & lb_dvd p p || (e == 0)]
     /\ m + (b * kb + c).*2 = p ^ 2 + (a * p).*2.
-- rewrite -{-2}def_m; split=> //=; last first.
+- rewrite -def_m [in lb_dvd _ _]def_m; split=> //=; last first.
     by rewrite -def_bc addSn -doubleD 2!addSn -addnA subnKC // addnC.
   rewrite ltc2 /lb_dvd /index_iota /= dvdn2 -def_m.
   by rewrite [_.+2]lock /= odd_double.
-move: {2}a.+1 (ltnSn a) => n; clearbody k e.
-elim: n => // n IHn in a k p m b c e *; rewrite ltnS => le_a_n [].
+have [n] := ubnP a.
+elim: n => // n IHn in a (k) p m b c (e) * => /ltnSE-le_a_n [].
 set kb := _.*2; set d := _ + c => /and5P[lt0k ltpm leppm ltc pr_p def_m].
 have def_k1: k.-1.+1 = k := ltn_predK lt0k.
 have def_kb1: kb.-1.+1 = kb by rewrite /kb -def_k1; case e.
@@ -618,17 +618,17 @@ Lemma lognE p m :
   logn p m = if [&& prime p, 0 < m & p %| m] then (logn p (m %/ p)).+1 else 0.
 Proof.
 rewrite /logn /dvdn; case p_pr: (prime p) => //.
-rewrite /divn modn_def; case def_m: {2 3}m => [|m'] //=.
+case def_m: m => // [m']; rewrite !andTb [LHS]/= -def_m /divn modn_def.
 case: edivnP def_m => [[|q] [|r] -> _] // def_m; congr _.+1; rewrite [_.1]/=.
 have{m def_m}: q < m'.
   by rewrite -ltnS -def_m addn0 mulnC -{1}[q.+1]mul1n ltn_pmul2r // prime_gt1.
-elim: {m' q}_.+1 {-2}m' q.+1 (ltnSn m') (ltn0Sn q) => // s IHs.
-case=> [[]|r] //= m; rewrite ltnS => lt_rs m_gt0 le_mr.
-rewrite -{3}[m]prednK //=; case: edivnP => [[|q] [|_] def_q _] //.
-have{def_q} lt_qm': q < m.-1.
-  by rewrite -[q.+1]muln1 -ltnS prednK // def_q addn0 ltn_pmul2l // prime_gt1.
-have{le_mr} le_m'r: m.-1 <= r by rewrite -ltnS prednK.
-by rewrite (IHs r) ?(IHs m.-1) // ?(leq_trans lt_qm', leq_trans _ lt_rs).
+elim/ltn_ind: m' {q}q.+1 (ltn0Sn q) => -[_ []|r IHr m] //= m_gt0 le_mr.
+rewrite -[m in logn_rec _ _ m]prednK //=.
+case: edivnP => [[|q] [|_] def_q _] //; rewrite addn0 in def_q.
+have{def_q} lt_qm1: q < m.-1.
+  by rewrite -[q.+1]muln1 -ltnS prednK // def_q ltn_pmul2l // prime_gt1.
+have{le_mr} le_m1r: m.-1 <= r by rewrite -ltnS prednK.
+by rewrite (IHr r) ?(IHr m.-1) // (leq_trans lt_qm1).
 Qed.
 
 Lemma logn_gt0 p n : (0 < logn p n) = (p \in primes n).
@@ -803,9 +803,10 @@ Lemma trunc_log_bounds p n :
   1 < p -> 0 < n -> let k := trunc_log p n in p ^ k <= n < p ^ k.+1.
 Proof.
 rewrite {+}/trunc_log => p_gt1; have p_gt0 := ltnW p_gt1.
-elim: n {-2 5}n (leqnn n) => [|m IHm] [|n] //=; rewrite ltnS => le_n_m _.
+set loop := (loop in loop n n); set m := n; rewrite [in n in loop m n]/m.
+have: m <= n by []; elim: n m => [|n IHn] [|m] //= /ltnSE-le_m_n _.
 have [le_p_n | // ] := leqP p _; rewrite 2!expnSr -leq_divRL -?ltn_divLR //.
-by apply: IHm; rewrite ?divn_gt0 // -ltnS (leq_trans (ltn_Pdiv _ _)).
+by apply: IHn; rewrite ?divn_gt0 // -ltnS (leq_trans (ltn_Pdiv _ _)).
 Qed.
 
 Lemma trunc_log_ltn p n : 1 < p -> n < p ^ (trunc_log p n).+1.
@@ -1368,7 +1369,7 @@ Qed.
 
 Lemma totient_count_coprime n : totient n = \sum_(0 <= d < n) coprime n d.
 Proof.
-elim: {n}_.+1 {-2}n (ltnSn n) => // m IHm n; rewrite ltnS => le_n_m.
+elim/ltn_ind: n => // n IHn.
 case: (leqP n 1) => [|lt1n]; first by rewrite unlock; case: (n) => [|[]].
 pose p := pdiv n; have p_pr: prime p by apply: pdiv_prime.
 have p1 := prime_gt1 p_pr; have p0 := ltnW p1.
@@ -1378,11 +1379,10 @@ have [n0 np0 np'0]: [/\ n > 0, np > 0 & np' > 0] by rewrite ltnW ?part_gt0.
 have def_n: n = np * np' by rewrite partnC.
 have lnp0: 0 < logn p n by rewrite lognE p_pr n0 pdiv_dvd.
 pose in_mod k (k0 : k > 0) d := Ordinal (ltn_pmod d k0).
-rewrite {1}def_n totient_coprime // {IHm}(IHm np') ?big_mkord; last first.
-  apply: leq_trans le_n_m; rewrite def_n ltn_Pmull //.
-  by rewrite /np p_part -(expn0 p) ltn_exp2l.
+rewrite {1}def_n totient_coprime // {IHn}(IHn np') ?big_mkord; last first.
+  by rewrite def_n ltn_Pmull // /np p_part -(expn0 p) ltn_exp2l.
 have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
-  rewrite {1}[np]p_part totient_pfactor //=; set q := p ^ _.
+  rewrite [np in LHS]p_part totient_pfactor //=; set q := p ^ _.
   apply: (@addnI (1 * q)); rewrite -mulnDl [1 + _]prednK // mul1n.
   have def_np: np = p * q by rewrite -expnS prednK // -p_part.
   pose mulp := [fun d : 'I_q => in_mod _ np0 (p * d)].

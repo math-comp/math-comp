@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added a `void` notation for the `Empty_set` type of the standard library, the
   canonical injection `of_void` and its cancellation lemma `of_voidK`, and
   `eq`, `choice`, `count` and `fin` instances.
+  
+- Added `ltn_ind` general induction principle for `nat` variables, helper lemmas `ubnP`, `ltnSE`, ubnPleq, ubnPgeq and ubnPeq, in support of a generalized induction idiom for `nat` measures that does not rely on the `{-2}` numerical occurrence selector, and purged this idiom from the `mathcomp` library (see below).
 
 - Added fixpoint and cofixpoint constructions to `finset`: `fixset`,
   `cofixset` and `fix_order`, with a few theorems about them
@@ -84,6 +86,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Replaced the legacy generalised induction idiom with a more robust one
+that does not rely on the `{-2}` numerical occurrence selector, using
+new `ssrnat` helper lemmas `ltn_ind`, `ubnP`, `ubnPleq`,  ...., (see above). The new idiom is documented in `ssrnat`.
+   This change anticipates an expected evolution of `fintype` to integrate `finmap`. It is likely that the new definition of the `#|A|` notation will hide multiple occurrences of `A`, which will break the `{-2}` induction idiom. Client libraries should update before the 1.11 release.
+   
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
   `eq_xor_neq x y (y == x) (x == y)`, on which a case analysis performs
   simultaneous replacement of expressions of the form `x == y` and `y == x`

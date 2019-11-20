@@ -465,18 +465,18 @@ Arguments dpair {eT}.
 Lemma prod_tpermP s :
   {ts : seq (T * T) | s = \prod_(t <- ts) tperm t.1 t.2 & all dpair ts}.
 Proof.
-elim: {s}_.+1 {-2}s (ltnSn #|[pred x | s x != x]|) => // n IHn s.
-rewrite ltnS => le_s_n; case: (pickP (fun x => s x != x)) => [x s_x | s_id].
-  have [|ts def_s ne_ts] := IHn (tperm x (s^-1 x) * s).
-    rewrite (cardD1 x) !inE s_x in le_s_n; apply: leq_ltn_trans le_s_n.
-    apply: subset_leq_card; apply/subsetP=> y.
-    rewrite !inE permM permE /= -(canF_eq (permK _)).
-    have [-> | ne_yx] := altP (y =P x); first by rewrite permKV eqxx.
-    by case: (s y =P x) => // -> _; rewrite eq_sym.
+have [n] := ubnP #|[pred x | s x != x]|; elim: n s => // n IHn s /ltnSE-le_s_n.
+case: (pickP (fun x => s x != x)) => [x s_x | s_id]; last first.
+  exists nil; rewrite // big_nil; apply/permP=> x.
+  by apply/eqP/idPn; rewrite perm1 s_id.
+have [|ts def_s ne_ts] := IHn (tperm x (s^-1 x) * s); last first.
   exists ((x, s^-1 x) :: ts); last by rewrite /= -(canF_eq (permK _)) s_x.
   by rewrite big_cons -def_s mulgA tperm2 mul1g.
-exists nil; rewrite // big_nil; apply/permP=> x.
-by apply/eqP/idPn; rewrite perm1 s_id.
+rewrite (cardD1 x) !inE s_x in le_s_n; apply: leq_ltn_trans le_s_n.
+apply: subset_leq_card; apply/subsetP=> y.
+rewrite !inE permM permE /= -(canF_eq (permK _)).
+have [-> | ne_yx] := altP (y =P x); first by rewrite permKV eqxx.
+by case: (s y =P x) => // -> _; rewrite eq_sym.
 Qed.
 
 Lemma odd_perm_prod ts :

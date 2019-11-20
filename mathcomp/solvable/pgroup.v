@@ -623,8 +623,8 @@ Proof. by rewrite /psubgroup sub1G pgroup1. Qed.
 
 Lemma Cauchy p G : prime p -> p %| #|G| -> {x | x \in G & #[x] = p}.
 Proof.
-move=> p_pr; elim: {G}_.+1 {-2}G (ltnSn #|G|) => // n IHn G.
-rewrite ltnS => leGn pG; pose xpG := [pred x in G | #[x] == p].
+move=> p_pr; have [n] := ubnP #|G|; elim: n G => // n IHn G /ltnSE-leGn pG.
+pose xpG := [pred x in G | #[x] == p].
 have [x /andP[Gx /eqP] | no_x] := pickP xpG; first by exists x.
 have{pG n leGn IHn} pZ: p %| #|'C_G(G)|.
   suffices /dvdn_addl <-:  p %| #|G :\: 'C(G)| by rewrite cardsID.

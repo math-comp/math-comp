@@ -2163,7 +2163,7 @@ case: (pickP (fun i : 'I_N => B ^+ i.+1 \subset B ^+ i)) => [n fixBn | no_fix].
   elim: {2}(n : nat) => [|m IHm]; first by rewrite mulg1.
   by apply: subset_trans fixBn; rewrite !expgSr mulgA mulSg.
 suffices: N < #|B ^+ N| by rewrite ltnNge max_card.
-elim: {-2}N (leqnn N) => [|n IHn] lt_nN; first by rewrite cards1.
+have [] := ubnPgeq N; elim=> [|n IHn] lt_nN; first by rewrite cards1.
 apply: leq_ltn_trans (IHn (ltnW lt_nN)) (proper_card _).
 by rewrite /proper (no_fix (Ordinal lt_nN)) expgS mulUg mul1g subsetUl.
 Qed.

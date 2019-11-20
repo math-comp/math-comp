@@ -1406,7 +1406,7 @@ Definition perm_eq s1 s2 :=
 Lemma permP s1 s2 : reflect (count^~ s1 =1 count^~ s2) (perm_eq s1 s2).
 Proof.
 apply: (iffP allP) => /= [eq_cnt1 a | eq_cnt x _]; last exact/eqP.
-elim: {a}_.+1 {-2}a (ltnSn (count a (s1 ++ s2))) => // n IHn a le_an.
+have [n le_an] := ubnP (count a (s1 ++ s2)); elim: n => // n IHn in a le_an *. 
 have [/eqP|] := posnP (count a (s1 ++ s2)).
   by rewrite count_cat addn_eq0; do 2!case: eqP => // ->.
 rewrite -has_count => /hasP[x s12x a_x]; pose a' := predD1 a x.

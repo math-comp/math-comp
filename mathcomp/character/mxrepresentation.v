@@ -1887,7 +1887,7 @@ Qed.
 Lemma mx_reducible_semisimple V :
   mxmodule V -> mx_completely_reducible V -> classically (mxsemisimple V).
 Proof.
-move=> modV redV [] // nssimV; move: {-1}_.+1 (ltnSn (\rank V)) => r leVr.
+move=> modV redV [] // nssimV; have [r leVr] := ubnP (\rank V).
 elim: r => // r IHr in V leVr modV redV nssimV.
 have [V0 | nzV] := eqVneq V 0.
   by rewrite nssimV ?V0 //; apply: mxsemisimple0.
@@ -3212,8 +3212,8 @@ Lemma mxtrace_dsum_mod (I : finType) (P : pred I) U W
     let S := (\sum_(i | P i) U i)%MS in (S :=: W)%MS -> mxdirect S -> 
   {in G, forall x, \sum_(i | P i) \tr (sr (modU i) x) = \tr (sr modW x)}.
 Proof.
-move=> /= sumS dxS x Gx.
-elim: {P}_.+1 {-2}P (ltnSn #|P|) => // m IHm P lePm in W modW sumS dxS *.
+move=> /= sumS dxS x Gx; have [m lePm] := ubnP #|P|.
+elim: m => // m IHm in P lePm W modW sumS dxS *.
 have [j /= Pj | P0] := pickP P; last first.
   case: sumS (_ x); rewrite !big_pred0 // mxrank0 => <- _ rWx.
   by rewrite [rWx]flatmx0 linear0.
@@ -3781,7 +3781,8 @@ Lemma mx_JordanHolder U V compU compV :
   m = size V  /\ (exists p : 'S_m, forall i : 'I_m,
      mx_rsim (@series_repr U i compU) (@series_repr V (p i) compV)).
 Proof.
-elim: {U}(size U) {-2}U V (eqxx (size U)) compU compV => /= [|r IHr] U V.
+move Dr: {-}(size U) => r; move/eqP in Dr.
+elim: r U V Dr compU compV => /= [|r IHr] U V.
   move/nilP->; case/lastP: V => [|V Vm] /= ? compVm; rewrite ?last_rcons => Vm0.
     by split=> //; exists 1%g; case.
   by case/mx_series_rcons: (compVm) => _ _ []; rewrite -(lt_eqmx Vm0) ltmx0.
@@ -4796,7 +4797,7 @@ Qed.
 Lemma dec_mxsimple_exists (U : 'M_n) :
   mxmodule rG U -> U != 0 -> {V | mxsimple rG V & V <= U}%MS.
 Proof.
-elim: {U}_.+1 {-2}U (ltnSn (\rank U)) => // m IHm U leUm modU nzU.
+have [m] := ubnP (\rank U); elim: m U => // m IHm U leUm modU nzU.
 have [nsimU | simU] := mxnonsimpleP nzU; last first.
   by exists U; first apply/mxsimpleP.
 move: (xchooseP nsimU); move: (xchoose _) => W /and4P[modW sWU nzW ltWU].
@@ -4807,7 +4808,7 @@ Qed.
 Lemma dec_mx_reducible_semisimple U :
   mxmodule rG U -> mx_completely_reducible rG U -> mxsemisimple rG U.
 Proof.
-elim: {U}_.+1 {-2}U (ltnSn (\rank U)) => // m IHm U leUm modU redU.
+have [m] := ubnP (\rank U); elim: m U => // m IHm U leUm modU redU.
 have [U0 | nzU] := eqVneq U 0.
   have{U0} U0: (\sum_(i < 0) 0 :=: U)%MS by rewrite big_ord0 U0.
   by apply: (intro_mxsemisimple U0); case.
@@ -4833,8 +4834,9 @@ have [n0 | n_gt0] := posnP n.
 have n2_gt0: n ^ 2 > 0 by rewrite muln_gt0 n_gt0.
 pose span Ms := (\sum_(M <- Ms) component_mx rG M)%MS.
 have: {in [::], forall M, mxsimple rG M} by [].
-elim: _.+1 {-2}nil (ltnSn (n - \rank (span nil))) => // m IHm Ms Ms_ge_n simMs.
-rewrite ltnS in Ms_ge_n; pose V := span Ms; pose Vt := mx_term V.
+have [m] := ubnP (n - \rank (span [::])).
+elim: m [::] => // m IHm Ms /ltnSE-Ms_ge_n simMs.
+pose V := span Ms; pose Vt := mx_term V.
 pose Ut i := vec_mx (row_var F (n * n) i); pose Zt := mx_term (0 : 'M[F]_n).
 pose exU i f := Exists_row_form (n * n) i (~ submx_form (Ut i) Zt /\ f (Ut i)).
 pose meetUVf U := exU 1%N (fun W => submx_form W Vt /\ submx_form W U)%T.

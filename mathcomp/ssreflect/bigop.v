@@ -1392,10 +1392,10 @@ Lemma partition_big (I J : finType) (P : pred I) p (Q : pred J) F :
 Proof.
 move=> Qp; transitivity (\big[*%M/1]_(i | P i && Q (p i)) F i).
   by apply: eq_bigl => i; case Pi: (P i); rewrite // Qp.
-elim: {Q Qp}_.+1 {-2}Q (ltnSn #|Q|) => // n IHn Q.
-case: (pickP Q) => [j Qj | Q0 _]; last first.
+have [n leQn] := ubnP #|Q|; elim: n => // n IHn in Q {Qp} leQn *.
+case: (pickP Q) => [j Qj | Q0]; last first.
   by rewrite !big_pred0 // => i; rewrite Q0 andbF.
-rewrite ltnS (cardD1x j Qj) (bigD1 j) //; move/IHn=> {n IHn} <-.
+rewrite (bigD1 j) // -IHn; last by rewrite ltnS (cardD1x j Qj) in leQn.
 rewrite (bigID (fun i => p i == j)); congr (_ * _); apply: eq_bigl => i.
   by case: eqP => [-> | _]; rewrite !(Qj, simpm).
 by rewrite andbA.
@@ -1408,14 +1408,13 @@ Lemma reindex_onto (I J : finType) (h : J -> I) h' (P : pred I) F :
   \big[*%M/1]_(i | P i) F i =
     \big[*%M/1]_(j | P (h j) && (h' (h j) == j)) F (h j).
 Proof.
-move=> h'K; elim: {P}_.+1 {-3}P h'K (ltnSn #|P|) => //= n IHn P h'K.
-case: (pickP P) => [i Pi | P0 _]; last first.
+move=> h'K; have [n lePn] := ubnP #|P|; elim: n => // n IHn in P h'K lePn *.
+case: (pickP P) => [i Pi | P0]; last first.
   by rewrite !big_pred0 // => j; rewrite P0.
-rewrite ltnS (cardD1x i Pi); move/IHn {n IHn} => IH.
 rewrite (bigD1 i Pi) (bigD1 (h' i)) h'K ?Pi ?eq_refl //=; congr (_ * _).
-rewrite {}IH => [|j]; [apply: eq_bigl => j | by case/andP; auto].
-rewrite andbC -andbA (andbCA (P _)); case: eqP => //= hK; congr (_ && ~~ _).
-by apply/eqP/eqP=> [<-|->] //; rewrite h'K.
+rewrite {}IHn => [|j /andP[]|]; [|by auto | by rewrite (cardD1x i) in lePn]. 
+apply: eq_bigl => j; rewrite andbC -andbA (andbCA (P _)); case: eqP => //= hK.
+by congr (_ && ~~ _); apply/eqP/eqP=> [<-|->] //; rewrite h'K.
 Qed.
 Arguments reindex_onto [I J] h h' [P F].
 

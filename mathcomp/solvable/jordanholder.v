@@ -174,8 +174,7 @@ Qed.
 Lemma JordanHolderUniqueness (G : gTg) (s1 s2 : seq gTg) :
   comps G s1 -> comps G s2 -> perm_eq (mkfactors G s1) (mkfactors G s2).
 Proof.
-elim: {G}#|G| {-2}G (leqnn #|G|) => [|n Hi] G cG in s1 s2 * => cs1 cs2.
-  by rewrite leqNgt cardG_gt0 in cG.
+have [n] := ubnP #|G|; elim: n G => // n Hi G in s1 s2 * => /ltnSE-cG cs1 cs2.
 have [G1 | ntG] := boolP (G :==: 1).
   have -> : s1 = [::] by apply/eqP; rewrite -(trivg_comps cs1).
   have -> : s2 = [::] by apply/eqP; rewrite -(trivg_comps cs2).
@@ -188,10 +187,10 @@ case es2: s2 cs2 => [|N2 st2] cs2 {s1 es1}.
   by move: (trivg_comps cs2); rewrite eqxx; move/negP:ntG.
 case/andP: cs1 => /= lst1; case/andP=> maxN_1 pst1.
 case/andP: cs2 => /= lst2; case/andP=> maxN_2 pst2.
-have cN1 : #|N1| <= n.
-  by rewrite -ltnS (leq_trans _ cG) ?proper_card ?(maxnormal_proper maxN_1).
-have cN2 : #|N2| <= n.
-  by rewrite -ltnS (leq_trans _ cG) ?proper_card ?(maxnormal_proper maxN_2).
+have cN1 : #|N1| < n.
+  by rewrite (leq_trans _ cG) ?proper_card ?(maxnormal_proper maxN_1).
+have cN2 : #|N2| < n.
+  by rewrite (leq_trans _ cG) ?proper_card ?(maxnormal_proper maxN_2).
 case: (N1 =P N2) {s2 es2} => [eN12 |].
   by rewrite eN12 /= perm_cons Hi // /comps ?lst2 //= -eN12 lst1.
 move/eqP; rewrite -val_eqE /=; move/eqP=> neN12.
@@ -588,8 +587,7 @@ Lemma StrongJordanHolderUniqueness (G : {group rT}) (s1 s2 : seq {group rT}) :
     G \subset D -> acomps to G s1 -> acomps to G s2 -> 
   perm_eq (mkfactors G s1) (mkfactors G s2).
 Proof.
-elim: {G} #|G| {-2}G (leqnn #|G|) => [|n Hi] G cG in s1 s2 * => hsD cs1 cs2.
-  by rewrite leqNgt cardG_gt0 in cG.
+have [n] := ubnP #|G|; elim: n G => // n Hi G in s1 s2 * => cG hsD cs1 cs2.
 case/orP: (orbN (G :==: 1)) => [tG | ntG].
   have -> : s1 = [::] by apply/eqP; rewrite -(trivg_acomps cs1).
   have -> : s2 = [::] by apply/eqP; rewrite -(trivg_acomps cs2).
@@ -608,10 +606,10 @@ have sN1D : N1 \subset D.
   by apply: subset_trans hsD; apply: maxainv_sub maxN_1.
 have sN2D : N2 \subset D.
   by apply: subset_trans hsD; apply: maxainv_sub maxN_2.
-have cN1 : #|N1| <= n.
-  by rewrite -ltnS (leq_trans _ cG) ?proper_card ?(maxainv_proper maxN_1).
-have cN2 : #|N2| <= n.
-  by rewrite -ltnS (leq_trans _ cG) ?proper_card ?(maxainv_proper maxN_2).
+have cN1 : #|N1| < n.
+  by rewrite -ltnS (leq_trans _ cG) ?ltnS ?proper_card ?(maxainv_proper maxN_1).
+have cN2 : #|N2| < n.
+  by rewrite -ltnS (leq_trans _ cG) ?ltnS ?proper_card ?(maxainv_proper maxN_2).
 case: (N1 =P N2) {s2 es2} => [eN12 |].
   by rewrite eN12 /= perm_cons Hi // /acomps ?lst2 //= -eN12 lst1.
 move/eqP; rewrite -val_eqE /=; move/eqP=> neN12.

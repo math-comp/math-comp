@@ -149,7 +149,7 @@ Qed.
 Lemma Cintr_Cyclotomic n z :
   n.-primitive_root z -> pZtoC 'Phi_n = cyclotomic z n.
 Proof.
-elim: {n}_.+1 {-2}n z (ltnSn n) => // m IHm n z0 le_mn prim_z0.
+elim/ltn_ind: n z => n IHn z0 prim_z0.
 rewrite /'Phi_n; case: (C_prim_root_exists _) => z /=.
 have n_gt0 := prim_order_gt0 prim_z0; rewrite prednK // => prim_z.
 have [uDn _ inDn] := divisors_correct n_gt0.
@@ -159,8 +159,7 @@ have defXn1: cyclotomic z n * pZtoC q = 'X^n - 1.
   rewrite (prod_cyclotomic prim_z) (big_rem n) ?inDn //=.
   rewrite divnn n_gt0 rmorph_prod /=; congr (_ * _).
   apply: eq_big_seq => d; rewrite mem_rem_uniq ?inE //= inDn => /andP[n'd ddvn].
-  rewrite -IHm ?dvdn_prim_root // -ltnS (leq_ltn_trans _ le_mn) //.
-  by rewrite ltn_neqAle n'd dvdn_leq.
+  by rewrite -IHn ?dvdn_prim_root // ltn_neqAle n'd dvdn_leq.
 have mapXn1 (R1 R2 : ringType) (f : {rmorphism R1 -> R2}):
   map_poly f ('X^n - 1) = 'X^n - 1.
 - by rewrite rmorphB /= rmorph1 map_polyXn.
@@ -263,8 +262,7 @@ have co_fg (R : idomainType): n%:R != 0 :> R -> @coprimep R (intrp f) (intrp g).
 suffices fzk0: root (pZtoC f) zk.
   have [] // := negP (coprimep_root (co_fg _ _) fzk0).
   by rewrite pnatr_eq0 -lt0n.
-move: gzk0 cokn; rewrite {zk}Dzk; elim: {k}_.+1 {-2}k (ltnSn k) => // m IHm k.
-rewrite ltnS => lekm gzk0 cokn.
+move: gzk0 cokn; rewrite {zk}Dzk; elim/ltn_ind: k => k IHk gzk0 cokn.
 have [|k_gt1] := leqP k 1; last have [p p_pr /dvdnP[k1 Dk]] := pdivP k_gt1.
   rewrite -[leq k 1](mem_iota 0 2) !inE => /pred2P[k0 | ->]; last first.
     by rewrite -Df dv_pf.
@@ -287,8 +285,8 @@ suffices: coprimep (pZtoC f) (pZtoC (g \Po 'X^p)).
   rewrite -exprM -Dk [_ == 0]gzk0 implybF => /negP[].
   have: root pz (z ^+ k1).
     by rewrite root_cyclotomic // prim_root_exp_coprime.
-  rewrite -Dpz -Dfg rmorphM rootM => /orP[] //= /IHm-> //.
-  rewrite (leq_trans _ lekm) // -[k1]muln1 Dk ltn_pmul2l ?prime_gt1 //.
+  rewrite -Dpz -Dfg rmorphM rootM => /orP[] //= /IHk-> //.
+  rewrite -[k1]muln1 Dk ltn_pmul2l ?prime_gt1 //.
   by have:= ltnW k_gt1; rewrite Dk muln_gt0 => /andP[].
 suffices: coprimep f (g \Po 'X^p).
   case/Bezout_coprimepP=> [[u v]]; rewrite -size_poly_eq1.

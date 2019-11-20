@@ -90,11 +90,12 @@ Qed.
 Lemma codeK : cancel code decode.
 Proof.
 elim=> //= v s IHs; rewrite -[_ * _]prednK ?muln_gt0 ?expn_gt0 //=.
-rewrite -{3}[v]addn0; elim: v {1 4}0 => [|v IHv {IHs}] q.
-  rewrite mul1n /= -{1}addnn -{4}IHs; move: (_ s) {IHs} => n.
-  by elim: {1 3}n => //=; case: n.
+set two := 2; rewrite -[v in RHS]addn0; elim: v 0 => [|v IHv {IHs}] q.
+  rewrite mul1n add0n /= -{}[in RHS]IHs; case: (code s) => // u; pose n := u.+1.
+  by transitivity [rec q, n + u.+1, n.*2]; [rewrite addnn | elim: n => //=].
 rewrite expnS -mulnA mul2n -{1}addnn -[_ * _]prednK ?muln_gt0 ?expn_gt0 //.
-by rewrite doubleS addSn /= addSnnS; elim: {-2}_.-1 => //=.
+set u := _.-1 in IHv *; set n := u; rewrite [in u1 in _ + u1]/n.
+by rewrite [in RHS]addSnnS -{}IHv; elim: n.
 Qed.
 
 Lemma ltn_code s : all (fun j => j < code s) s.

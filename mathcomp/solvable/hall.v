@@ -31,8 +31,8 @@ Implicit Type gT : finGroupType.
 Theorem SchurZassenhaus_split gT (G H : {group gT}) :
   Hall G H -> H <| G -> [splits G, over H].
 Proof.
-move: {2}_.+1 (ltnSn #|G|) => n; elim: n => // n IHn in gT G H *.
-rewrite ltnS => Gn hallH nsHG; have [sHG nHG] := andP nsHG.
+have [n] := ubnP #|G|; elim: n => // n IHn in gT G H * => /ltnSE-Gn hallH nsHG.
+have [sHG nHG] := andP nsHG.
 have [-> | [p pr_p pH]] := trivgVpdiv H.
   by apply/splitsP; exists G; rewrite inE -subG1 subsetIl mul1g eqxx.
 have [P sylP] := Sylow_exists p H.
@@ -102,8 +102,9 @@ Theorem SchurZassenhaus_trans_sol gT (H K K1 : {group gT}) :
     coprime #|H| #|K| -> #|K1| = #|K| ->
   exists2 x, x \in H & K1 :=: K :^ x.
 Proof.
-move: {2}_.+1 (ltnSn #|H|) => n; elim: n => // n IHn in gT H K K1 *.
-rewrite ltnS => leHn solH nHK; have [-> | ] := eqsVneq H 1.
+have [n] := ubnP #|H|.
+elim: n => // n IHn in gT H K K1 * => /ltnSE-leHn solH nHK.
+have [-> | ] := eqsVneq H 1.
   rewrite mul1g => sK1K _ eqK1K; exists 1; first exact: set11.
   by apply/eqP; rewrite conjsg1 eqEcard sK1K eqK1K /=.
 pose G := (H <*> K)%G.
@@ -150,9 +151,8 @@ Lemma SchurZassenhaus_trans_actsol gT (G A B : {group gT}) :
     coprime #|G| #|A| -> #|A| = #|B| ->
   exists2 x, x \in G & B :=: A :^ x.
 Proof.
-set AG := A <*> G; move: {2}_.+1 (ltnSn #|AG|) => n.
-elim: n => // n IHn in gT A B G AG *.
-rewrite ltnS => leAn solA nGA sB_AG coGA oAB.
+set AG := A <*> G; have [n] := ubnP #|AG|.
+elim: n => // n IHn in gT A B G AG * => /ltnSE-leAn solA nGA sB_AG coGA oAB.
 have [A1 | ntA] := eqsVneq A 1.
   by exists 1; rewrite // conjsg1 A1 (@card1_trivg _ B) // -oAB A1 cards1.
 have [M [sMA nsMA ntM]] := solvable_norm_abelem solA (normal_refl A) ntA.
@@ -218,8 +218,7 @@ Lemma Hall_exists_subJ pi gT (G : {group gT}) :
                 & forall K : {group gT}, K \subset G -> pi.-group K ->
                   exists2 x, x \in G & K \subset H :^ x.
 Proof.
-move: {2}_.+1 (ltnSn #|G|) => n.
-elim: n gT G => // n IHn gT G; rewrite ltnS => leGn solG.
+have [n] := ubnP #|G|; elim: n gT G => // n IHn gT G /ltnSE-leGn solG.
 have [-> | ntG] := eqsVneq G 1.
   exists 1%G => [|_ /trivGP-> _]; last by exists 1; rewrite ?set11 ?sub1G.
   by rewrite pHallE sub1G cards1 part_p'nat.
@@ -581,8 +580,8 @@ Proposition coprime_Hall_subset pi (gT : finGroupType) (A G X : {group gT}) :
     X \subset G -> pi.-group X -> A \subset 'N(X) ->
   exists H : {group gT}, [/\ pi.-Hall(G) H, A \subset 'N(H) & X \subset H].
 Proof.
-move: {2}_.+1 (ltnSn #|G|) => n.
-elim: n => // n IHn in gT A G X * => leGn nGA coGA solG sXG piX nXA.
+have [n] := ubnP #|G|.
+elim: n => // n IHn in gT A G X * => /ltnSE-leGn nGA coGA solG sXG piX nXA.
 have [G1 | ntG] := eqsVneq G 1.
   case: (coprime_Hall_exists pi nGA) => // H hallH nHA.
   by exists H; split; rewrite // (subset_trans sXG) // G1 sub1G.

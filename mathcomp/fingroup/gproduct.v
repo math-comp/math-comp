@@ -591,8 +591,8 @@ Proof.
 apply: (iffP eqP) => [defG i j Pi Pj neq_ij | cHH].
   rewrite (bigD1 j) // (bigD1 i) /= ?cprodA in defG; last exact/andP.
   by case/cprodP: defG => [[K _ /cprodP[//]]].
-set Q := P; have: subpred Q P by [].
-elim: {Q}_.+1 {-2}Q (ltnSn #|Q|) => // n IHn Q leQn sQP.
+set Q := P; have sQP: subpred Q P by []; have [n leQn] := ubnP #|Q|.
+elim: n => // n IHn in (Q) leQn sQP *.
 have [i Qi | Q0] := pickP Q; last by rewrite !big_pred0.
 rewrite (cardD1x Qi) add1n ltnS !(bigD1 i Qi) /= in leQn *.
 rewrite {}IHn {n leQn}// => [|j /andP[/sQP //]].
@@ -620,7 +620,7 @@ transitivity (\prod_(j <- rot n r2) x j).
   rewrite Dr2 !big_cons in defG Ax *; have [[_ G1 _ defG1] _ _] := cprodP defG.
   rewrite (IHr r3 G1) //; first by case/allP/andP: Ax => _ /allP.
   by rewrite -(perm_cons i) -Dr2 perm_sym perm_rot perm_sym.
-rewrite -{-2}(cat_take_drop n r2) in eq_r12 *.
+rewrite -(cat_take_drop n r2) [in LHS]cat_take_drop in eq_r12 *.
 rewrite (perm_big _ eq_r12) !big_cat /= !(big_nth i) !big_mkord in defG *.
 have /cprodP[[G1 G2 defG1 defG2] _ /centsP-> //] := defG.
   rewrite defG2 -(bigcprodW defG2) mem_prodg // => k _; apply: Ax.
@@ -763,8 +763,8 @@ Proof.
 apply: (iffP eqP) => [defG i Pi | dxG].
   rewrite !(bigD1 i Pi) /= in defG; have [[_ G' _ defG'] _ _ _] := dprodP defG.
   by apply/dprodYP; rewrite -defG defG' bigprodGE (bigdprodWY defG').
-set Q := P; have: subpred Q P by [].
-elim: {Q}_.+1 {-2}Q (ltnSn #|Q|) => // n IHn Q leQn sQP.
+set Q := P; have sQP: subpred Q P by []; have [n leQn] := ubnP #|Q|.
+elim: n => // n IHn in (Q) leQn sQP *.
 have [i Qi | Q0] := pickP Q; last by rewrite !big_pred0.
 rewrite (cardD1x Qi) add1n ltnS !(bigD1 i Qi) /= in leQn *.
 rewrite {}IHn {n leQn}// => [|j /andP[/sQP //]].
@@ -820,8 +820,8 @@ Lemma bigcprod_coprime_dprod (I : finType) (P : pred I) (A : I -> {set gT}) G :
     (forall i j, P i -> P j -> i != j -> coprime #|A i| #|A j|) ->
   \big[dprod/1]_(i | P i) A i = G.
 Proof.
-move=> defG coA; set Q := P in defG *; have: subpred Q P by [].
-elim: {Q}_.+1 {-2}Q (ltnSn #|Q|) => // m IHm Q leQm in G defG * => sQP.
+move=> defG coA; set Q := P in defG *; have sQP: subpred Q P by [].
+have [m leQm] := ubnP #|Q|; elim: m => // m IHm in (Q) leQm G defG sQP *.
 have [i Qi | Q0] := pickP Q; last by rewrite !big_pred0 in defG *.
 move: defG; rewrite !(bigD1 i Qi) /= => /cprodP[[Hi Gi defAi defGi] <-].
 rewrite defAi defGi => cHGi.

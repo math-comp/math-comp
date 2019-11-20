@@ -575,9 +575,9 @@ suffices{k k_gt0 le_k_n2} defGn2: <[x ^+ p]> \x <[y]> = 'Ohm_(n.-2)(G).
   rewrite -subSn // -subSS def_n1 def_n => -> /=; rewrite subnSK // subn2.
   by apply/eqP; rewrite eqEsubset OhmS ?Ohm_sub //= -{1}Ohm_id OhmS ?Ohm_leq.
 rewrite dprodEY //=; last by apply/trivgP; rewrite -tiXY setSI ?cycleX.
-apply/eqP; rewrite eqEsubset join_subG !cycle_subG /= {-2}(OhmE _ pG) -/r.
-rewrite def_n (subsetP (Ohm_leq G (ltn0Sn _))) // mem_gen /=; last first.
-  by rewrite !inE -order_dvdn oxp groupX /=.
+apply/eqP; rewrite eqEsubset join_subG !cycle_subG /= [in y \in _]def_n.
+rewrite (subsetP (Ohm_leq G (ltn0Sn _)) y) //= (OhmE _ pG) -/r.
+rewrite mem_gen /=; last by rewrite !inE -order_dvdn oxp groupX /=.
 rewrite gen_subG /= cent_joinEr // -defXY; apply/subsetP=> uv; case/setIP.
 case/imset2P=> u v Xu Yv ->{uv}; rewrite /r inE def_n expnS expgM.
 case/lcosetP: (XYp u v Xu Yv) => _ /cycleP[j ->] ->.
@@ -786,8 +786,8 @@ have defK: K = [set w].
   apply/eqP; rewrite eqEsubset sub1set Kw andbT subDset setUC.
   apply/subsetP=> uivj; have: uivj \in B by rewrite inE.
   rewrite -{1}defB => /imset2P[_ _ /cycleP[i ->] /cycleP[j ->] ->] {uivj}.
-  rewrite !inE sqrB -{-1}[j]odd_double_half.
-  case: (odd j); rewrite -order_dvdn ?ov // ou -def2r -mul2n dvdn_pmul2l //.
+  rewrite !inE sqrB; set b := odd j; rewrite -[j]odd_double_half -/b.
+  case: b; rewrite -order_dvdn ?ov // ou -def2r -mul2n dvdn_pmul2l //.
   case/dvdnP=> k ->{i}; apply/orP.
   rewrite add0n -[j./2]odd_double_half addnC doubleD -!muln2 -mulnA.
   rewrite -(expg_mod_order v) ov modnMDl; case: (odd _); last first.

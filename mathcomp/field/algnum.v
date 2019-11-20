@@ -439,7 +439,7 @@ have nu_inj n y: nu (Sinj (ext n) y) = Sinj (ext n) (Saut (ext n) y).
   rewrite /nu; case: (mem_ext _ _ _); move: _.+1 => n1 y1 Dy /=.
   without loss /subnK Dn1: n n1 y y1 Dy / (n <= n1)%N.
     by move=> IH; case/orP: (leq_total n n1) => /IH => [/(_ y) | /(_ y1)]->.
-  elim: {n}(_ - n)%N {-1}n => [|k IHk] n in Dn1 y Dy *.
+  move: (n1 - n)%N => k in Dn1; elim: k => [|k IHk] in n Dn1 y Dy *.
     by move: y1 Dy; rewrite -Dn1 => y1  /fmorph_inj ->.
   rewrite addSnnS in Dn1; move/IHk: Dn1 => /=.
   case: (unpickle _) => [z|] /=; last exact.
