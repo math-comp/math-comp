@@ -373,6 +373,26 @@ ci-finmap-dev:
   variables:
     COQ_VERSION: "dev"
 
+# The FCSL-PCM library
+.ci-fcsl-pcm:
+  extends: .ci
+  variables:
+    CONTRIB_URL: "https://github.com/imdea-software/fcsl-pcm.git"
+    CONTRIB_VERSION: master
+  script:
+    - opam pin add -n -k path coq-fcsl-pcm .
+    - opam install -y -v -j "${NJOBS}" coq-fcsl-pcm
+
+ci-fcsl-pcm-8.10:
+  extends: .ci-fcsl-pcm
+  variables:
+    COQ_VERSION: "8.10"
+
+ci-fcsl-pcm-dev:
+  extends: .ci-fcsl-pcm
+  variables:
+    COQ_VERSION: "dev"
+
 ################
 ### deploy stage
 ################
