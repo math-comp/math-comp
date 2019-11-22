@@ -32,7 +32,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Fintype theorems: `fintype0`, `card_le1P`, `mem_card1`,
   `card1P`, `fintype_le1P`, `fintype1`, `fintype1P`,
-  `existsPn`, `exists_inPn`, `forallPn`, `forall_inPn`.
+  `existsPn`, `exists_inPn`, `forallPn`, `forall_inPn`,
+  `eq_enum_rank_in`, `enum_rank_in_inj`, `lshift_inj`, and
+  `rshift_inj`.
 
 - Bigop theorems: `big_rmcond`, `bigD1_seq`,
   `big_enum_val_cond`, `big_enum_rank_cond`,
