@@ -1,6 +1,8 @@
 *.d
 *.vo
 *.vio
+*.vos
+*.vok
 *.cm*
 *~
 *.glob
