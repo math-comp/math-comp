@@ -482,9 +482,9 @@ Lemma extendDerivation_horner p :
   extendDerivation K p.[x] = (map_poly D p).[x] + p^`().[x] * Dx K.
 Proof.
 move=> Kp sepKx; have:= separable_root_der; rewrite {}sepKx /= => nz_pKx'x.
-rewrite {-1}(divp_eq p (minPoly K x)) lfunE /= Fadjoin_poly_mod // raddfD /=.
-rewrite {1}(Derivation_mul_poly derD) ?divp_polyOver ?minPolyOver //.
-rewrite derivD derivM !{1}hornerD !{1}hornerM minPolyxx !{1}mulr0 !{1}add0r.
+rewrite [in RHS](divp_eq p (minPoly K x)) lfunE /= Fadjoin_poly_mod ?raddfD //=.
+rewrite (Derivation_mul_poly derD) ?divp_polyOver ?minPolyOver //.
+rewrite derivM !{1}hornerD !{1}hornerM minPolyxx !{1}mulr0 !{1}add0r.
 rewrite mulrDl addrA [_ + (_ * _ * _)]addrC {2}/Dx -mulrA -/Dx.
 by rewrite [_ / _]mulrC (mulVKf nz_pKx'x) mulrN addKr.
 Qed.
@@ -528,12 +528,14 @@ have DK_0: (K <= lker D)%VS.
   apply/subvP=> v Kv; rewrite memv_ker lfunE /= Fadjoin_polyC //.
   by rewrite derivC horner0.
 have Dder: Derivation <<K; x>> D.
-  apply/allP=> u /vbasis_mem Kx_u; apply/allP=> v /vbasis_mem Kx_v.
-  rewrite !lfunE /= -{-2}(Fadjoin_poly_eq Kx_u) -{-3}(Fadjoin_poly_eq Kx_v).
+  apply/allP=> u /vbasis_mem Kx_u; apply/allP=> v /vbasis_mem Kx_v; apply/eqP.
+  rewrite !lfunE /=; set Px := Fadjoin_poly K x.
+  set Px_u := Px u; rewrite -(Fadjoin_poly_eq Kx_u) -/Px -/Px_u.
+  set Px_v := Px v; rewrite -(Fadjoin_poly_eq Kx_v) -/Px -/Px_v.
   rewrite -!hornerM -hornerD -derivM.
-  rewrite Fadjoin_poly_mod ?rpredM ?Fadjoin_polyOver //.
-  rewrite {2}(divp_eq (_ * _) (minPoly K x)) derivD derivM pKx'_0 mulr0 addr0.
-  by rewrite hornerD hornerM minPolyxx mulr0 add0r.
+  rewrite /Px Fadjoin_poly_mod ?rpredM ?Fadjoin_polyOver //.
+  rewrite [in RHS](divp_eq (Px_u * Px_v) (minPoly K x)) derivD derivM.
+  by rewrite pKx'_0 mulr0 addr0 hornerD hornerM minPolyxx mulr0 add0r.
 have{Dder DK_0}: x \in lker D by apply: subvP Kx_x; apply: derKx_0.
 apply: contraLR => K'x; rewrite memv_ker lfunE /= Fadjoin_polyX //.
 by rewrite derivX hornerC oner_eq0.

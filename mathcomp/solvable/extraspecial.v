@@ -420,7 +420,7 @@ have iC1U (U : {group gT}) x:
   by rewrite -norm_joinEl ?cardSg ?join_subG ?(subset_trans sUG).
 have oCG (U : {group gT}):
   Z \subset U -> U \subset G -> #|'C_G(U)| = (p * #|G : U|)%N.
-- elim: {U}_.+1 {-2}U (ltnSn #|U|) => // m IHm U leUm sZU sUG.
+- have [m] := ubnP #|U|; elim: m U => // m IHm U leUm sZU sUG.
   have [<- | neZU] := eqVneq Z U.
     by rewrite -oZ Lagrange // (setIidPl _) // centsC subsetIr.
   have{neZU} [x Gx not_cUx]: exists2 x, x \in G & x \notin 'C(U).

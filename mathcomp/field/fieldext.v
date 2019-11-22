@@ -555,8 +555,8 @@ Qed.
 
 Lemma Fadjoin_sum_direct : directv sumKx.
 Proof.
-rewrite directvE /=; case Dn: {-2}n (leqnn n) => // [m] {Dn}.
-elim: m => [|m IHm] ltm1n; rewrite ?big_ord1 // !(big_ord_recr m.+1) /=.
+rewrite directvE /=; case: (ubnPgeq n) (isT : n > 0) => -[//|m] ltmn _.
+elim: m ltmn => [|m IHm] ltm1n; rewrite ?big_ord1 // !(big_ord_recr m.+1) /=.
 do [move/(_ (ltnW ltm1n))/eqP; set S := (\sum_i _)%VS] in IHm *.
 rewrite -IHm dimv_add_leqif; apply/subvP=> z; rewrite memv_cap => /andP[Sz].
 case/memv_cosetP=> y Ky Dz; rewrite memv0 Dz mulf_eq0 expf_eq0 /=.

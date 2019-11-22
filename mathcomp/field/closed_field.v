@@ -878,10 +878,11 @@ have Kclosed: GRing.ClosedField.axiom Kfield.
     apply/eqP; rewrite EtoKeq0 (eq_map_poly (toEleS _ _ _ _)) map_poly_comp Dpj.
     rewrite -rootE -[pj]minXpE ?ext1root // -Dpj size_map_poly.
     by rewrite size_addl ?size_polyXn ltnS ?size_opp ?size_poly.
-  rewrite {w}/pj; elim: {-9}j lemj => // k IHk lemSk.
-  move: lemSk (lemSk); rewrite {1}leq_eqVlt ltnS => /predU1P[<- | lemk] lemSk.
-    rewrite {k IHk lemSk}(eq_map_poly (toEeq m _)) map_poly_id //= /incEp.
-    by rewrite codeK eqxx pickleK.
+  rewrite {w}/pj; set j0 := (j in tagged (E_ _) j).
+  elim: {+}j lemj => // k IHk lemSk; rewrite {}/j0 in IHk *.
+  have:= lemSk; rewrite leq_eqVlt ltnS => /predU1P[Dm | lemk].
+    rewrite -{}Dm in lemSk *; rewrite {k IHk lemSk}(eq_map_poly (toEeq m _)).
+    by rewrite map_poly_id //= /incEp codeK eqxx pickleK.
   rewrite (eq_map_poly (toEleS _ _ _ _)) map_poly_comp {}IHk //= /incEp codeK.
   by rewrite -if_neg neq_ltn lemk.
 suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.

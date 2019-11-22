@@ -1172,14 +1172,14 @@ Qed.
 Lemma multiplicity_XsubC p a :
   {m | exists2 q, (p != 0) ==> ~~ root q a & p = q * ('X - a%:P) ^+ m}.
 Proof.
-elim: {p}(size p) {-2}p (eqxx (size p)) => [|n IHn] p.
-  by rewrite size_poly_eq0 => ->; exists 0%N, p; rewrite ?mulr1.
-have [/sig_eqW[{p}p ->] sz_p | nz_pa] := altP (factor_theorem p a); last first.
-  by exists 0%N, p; rewrite ?mulr1 ?nz_pa ?implybT.
-have nz_p: p != 0 by apply: contraTneq sz_p => ->; rewrite mul0r size_poly0.
-rewrite size_Mmonic ?monicXsubC // size_XsubC addn2 eqSS in sz_p.
-have [m /sig2_eqW[q nz_qa Dp]] := IHn p sz_p; rewrite nz_p /= in nz_qa.
-by exists m.+1, q; rewrite ?nz_qa ?implybT // exprSr mulrA -Dp.
+have [n le_p_n] := ubnP (size p); elim: n => // n IHn in p le_p_n *.
+have [-> | nz_p /=] := eqVneq p 0; first by exists 0%N, 0; rewrite ?mul0r.
+have [/sig_eqW[p1 Dp] | nz_pa] := altP (factor_theorem p a); last first.
+  by exists 0%N, p; rewrite ?mulr1.
+have nz_p1: p1 != 0 by apply: contraNneq nz_p => p1_0; rewrite Dp p1_0 mul0r.
+have /IHn[m /sig2_eqW[q nz_qa Dp1]]: size p1 < n.
+  by rewrite Dp size_Mmonic ?monicXsubC // size_XsubC addn2 in le_p_n. 
+by exists m.+1, q; [rewrite nz_p1 in nz_qa | rewrite exprSr mulrA -Dp1].
 Qed.
 
 (* Roots of unity. *)
@@ -2691,17 +2691,15 @@ Proof.
 pose polyT (p : seq F) := (foldr (fun c f => f * 'X_0 + c%:T) (0%R)%:T p)%T.
 have eval_polyT (q : {poly F}) x : GRing.eval [:: x] (polyT q) = q.[x].
   by rewrite /horner; elim: (val q) => //= ? ? ->.
-elim: size {-2}p (leqnn (size p)) => {p} [p|n IHn p].
-  by move=> /size_poly_leq0P->; exists [::], 0; rewrite mul0r eqxx.
+have [n] := ubnP (size p); elim: n => // n IHn in p *.
 have /decPcases /= := @satP F [::] ('exists 'X_0, polyT p == 0%T).
 case: ifP => [_ /sig_eqW[x]|_ noroot]; last first.
   exists [::], p; rewrite big_nil mulr1; split => // p_neq0 x.
   by apply/negP=> /rootP rpx; apply noroot; exists x; rewrite eval_polyT.
-rewrite eval_polyT => /rootP /factor_theorem /sig_eqW [q ->].
-have [->|q_neq0] := eqVneq q 0; first by exists [::], 0; rewrite !mul0r eqxx.
-rewrite size_mul ?polyXsubC_eq0 // ?size_XsubC addn2 /= ltnS => sq_le_n.
-have [] // := IHn q => s [r [-> nr]]; exists (s ++ [::x]), r.
-by rewrite big_cat /= big_seq1 mulrA.
+rewrite eval_polyT => /rootP/factor_theorem/sig_eqW[p1 ->].
+have [->|nz_p1] := eqVneq p1 0; first by exists [::], 0; rewrite !mul0r eqxx.
+rewrite size_Mmonic ?monicXsubC // size_XsubC addn2 => /IHn[s [q [-> irr_q]]].
+by exists (rcons s x), q; rewrite -cats1 big_cat big_seq1 mulrA.
 Qed.
 
 End DecField.
@@ -2717,7 +2715,7 @@ Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1%N).
 Proof.
 have [-> | nz_p] := eqVneq p 0.
   by rewrite size_poly0; left; exists 0; rewrite root0.
-rewrite neq_ltn {1}polySpred //=.
+rewrite neq_ltn [in _ < 1]polySpred //=.
 apply: (iffP idP) => [p_gt1 | [a]]; last exact: root_size_gt1.
 pose n := (size p).-1; have n_gt0: n > 0 by rewrite -ltnS -polySpred.
 have [a Dan] := closedF (fun i => - p`_i / lead_coef p) n_gt0.

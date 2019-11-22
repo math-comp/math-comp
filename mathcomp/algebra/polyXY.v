@@ -374,7 +374,7 @@ move=> nz_px [q nz_q qx0].
 have [/size1_polyC Dp | p_gt1] := leqP (size p) 1.
   by rewrite {}/pEx Dp map_polyC hornerC map_poly_eq0 in nz_px *; exists p`_0.
 have nz_p: p != 0 by rewrite -size_poly_gt0 ltnW.
-elim: {q}_.+1 {-2}q (ltnSn (size q)) => // m IHm q le_qm in nz_q qx0 *.
+have [m le_qm] := ubnP (size q); elim: m => // m IHm in q le_qm nz_q qx0 *.
 have nz_q1: q^:P != 0 by rewrite map_poly_eq0.
 have sz_q1: size q^:P = size q by rewrite size_map_polyC.
 have q1_gt1: size q^:P > 1.

@@ -179,13 +179,13 @@ have{Ss u} ->: Ss = Ss_ dS.
       by rewrite ltn_subRL (leq_trans _ k_ge_dS) // addnC ltn_add2l.
   by rewrite insubdK //; case: (split i) => {i}i;
      rewrite !mxE coefMXn; case: leqP.
-elim: {-2}dS (leqnn dS) (dS_gt0) => // dj IHj dj_lt_dS _.
-pose j1 := Ordinal dj_lt_dS; pose rj0T (A : 'M[{poly R}]_dS) := row j0 A^T.
+case: (ubnPgeq dS) (dS_gt0); elim=> // dj IHj ltjS _; pose j1 := Ordinal ltjS.
+pose rj0T (A : 'M[{poly R}]_dS) := row j0 A^T.
 have: rj0T (Ss_ dj.+1) = 'X^dj *: rj0T (S_ j1) + 1 *: rj0T (Ss_ dj).
   apply/rowP=> i; apply/polyP=> k; rewrite scale1r !(Sylvester_mxE, mxE) eqxx.
   rewrite coefD coefXnM coefC !coef_poly ltnS subn_eq0 ltn_neqAle andbC.
   case: (leqP k dj) => [k_le_dj | k_gt_dj] /=; last by rewrite addr0.
-  rewrite Sylvester_mxE insubdK; last exact: leq_ltn_trans (dj_lt_dS).
+  rewrite Sylvester_mxE insubdK; last exact: leq_ltn_trans (ltjS).
   by case: eqP => [-> | _]; rewrite (addr0, add0r).
 rewrite -det_tr => /determinant_multilinear->;
   try by apply/matrixP=> i j; rewrite !mxE eq_sym (negPf (neq_lift _ _)).
@@ -858,8 +858,8 @@ have{mon_p pw0 intRp intRq}: genI S.
   split; set S1 := _ ++ _; first exists p.
     split=> // i; rewrite -[p]coefK coef_poly; case: ifP => // lt_i_p.
     by apply: genS; rewrite mem_cat orbC mem_nth.
-  have: all (mem S1) S1 by apply/allP.
-  elim: {-1}S1 => //= y S2 IH /andP[S1y S12]; split; last exact: IH.
+  set S2 := S1; have: all (mem S1) S2 by apply/allP.
+  elim: S2 => //= y S2 IH /andP[S1y S12]; split; last exact: IH.
   have{q S S1 IH S1y S12 intRp intRq} [q mon_q qx0]: integralOver RtoK y.
     by move: S1y; rewrite mem_cat => /orP[]; [apply: intRq | apply: intRp].
   exists (map_poly RtoK q); split=> // [|i]; first exact: monic_map.

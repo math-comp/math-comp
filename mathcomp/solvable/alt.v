@@ -329,47 +329,32 @@ Lemma rfd_odd (p : {perm T}) : p x = x -> rfd p = p :> bool.
 Proof.
 have rfd1: rfd 1 = 1.
   by apply/permP => u; apply: val_inj; rewrite permE /= if_same !perm1.
-have HP0 (t : {perm T}): #|[set x | t x != x]| = 0 -> rfd t = t :> bool.
-- move=> Ht; suff ->: t = 1 by rewrite rfd1 !odd_perm1.
-  apply/permP => z; rewrite perm1; apply/eqP/wlog_neg => nonfix_z.
-  by rewrite (cardD1 z) inE nonfix_z in Ht.
-elim: #|_| {-2}p (leqnn #|[set x | p x != x]|) => {p}[|n Hrec] p Hp Hpx.
-  by apply: HP0; move: Hp; case: card.
-case Ex: (pred0b (mem [set x | p x != x])); first by apply: HP0; move/eqnP: Ex.
-case/pred0Pn: Ex => x1; rewrite /= inE => Hx1.
-have nx1x: x1 != x by apply/eqP => HH; rewrite HH Hpx eqxx in Hx1.
-have npxx1: p x != x1 by apply/eqP => HH; rewrite -HH !Hpx eqxx in Hx1.
-have npx1x: p x1 != x.
-  by apply/eqP; rewrite -Hpx; move/perm_inj => HH; case/eqP: nx1x.
+have [n] := ubnP #|[set x | p x != x]|; elim: n p => // n IHn p le_p_n px_x.
+have [p_id | [x1 Hx1]] := set_0Vmem [set x | p x != x].
+  suffices ->: p = 1 by rewrite rfd1 !odd_perm1.
+  by apply/permP => z; apply: contraFeq (in_set0 z); rewrite perm1 -p_id inE.
+have nx1x: x1 != x by apply: contraTneq Hx1 => ->; rewrite inE px_x eqxx.
+have npxx1: p x != x1 by apply: contraNneq nx1x => <-; rewrite px_x.
+have npx1x: p x1 != x by rewrite -px_x (inj_eq perm_inj).
 pose p1 := p * tperm x1 (p x1).
-have Hp1: p1 x = x.
-  by rewrite /p1 permM; case tpermP => // [<-|]; [rewrite Hpx | move/perm_inj].
-have Hcp1: #|[set x | p1 x != x]| <= n.
-  have F1 y: p y = y -> p1 y = y.
-    move=> Hy; rewrite /p1 permM Hy.
-    by case: tpermP => [<-|/(canLR (permK p))<-|] //; apply/(canLR (permK p)).
-  have F2: p1 x1 = x1 by rewrite /p1 permM tpermR.
-  have F3: [set x | p1 x != x] \subset [predD1 [set x | p x != x] & x1].
-    apply/subsetP => z; rewrite !inE permM.
-    case tpermP => HH1 HH2.
-    - rewrite eq_sym HH1 andbb; apply/eqP=> dx1.
-      by rewrite dx1 HH1 dx1 eqxx in HH2.
-    - by rewrite (perm_inj HH1) eqxx in HH2.
-    by move->; rewrite andbT; apply/eqP => HH3; rewrite HH3 in HH2.
-  apply: (leq_trans (subset_leq_card F3)).
-  by move: Hp; rewrite (cardD1 x1) inE Hx1.
-have ->: p = p1 * tperm x1 (p x1) by rewrite -mulgA tperm2 mulg1.
-rewrite odd_permM odd_tperm eq_sym Hx1 morphM; last 2 first.
-- by rewrite 2!inE; apply/astab1P.
-- by rewrite 2!inE; apply/astab1P; rewrite -{1}Hpx /= /aperm -permM.
-rewrite odd_permM Hrec //=; congr (_ (+) _).
+have fix_p1 y: p y = y -> p1 y = y.
+  by move=> pyy; rewrite permM; have [<-|/perm_inj<-|] := tpermP; rewrite ?pyy.
+have p1x_x: p1 x = x by apply: fix_p1.
+have{le_p_n} lt_p1_n: #|[set x | p1 x != x]| < n.
+  move: le_p_n; rewrite ltnS (cardsD1 x1) Hx1; apply/leq_trans/subset_leq_card.
+  rewrite subsetD1 inE permM tpermR eqxx andbT.
+  by apply/subsetP=> y; rewrite !inE; apply: contraNneq=> /fix_p1->.
+transitivity (p1 (+) true); last first.
+  by rewrite odd_permM odd_tperm -Hx1 inE eq_sym addbK.
+have ->: p = p1 * tperm x1 (p x1) by rewrite -tpermV mulgK.
+rewrite morphM; last 2 first; first by rewrite 2!inE; apply/astab1P.
+  by rewrite 2!inE; apply/astab1P; rewrite -[RHS]p1x_x permM px_x.
+rewrite odd_permM IHn //=; congr (_ (+) _).
 pose x2 : T' := Sub x1 nx1x; pose px2 : T' := Sub (p x1) npx1x.
-suff ->: rfd (tperm x1 (p x1)) = tperm x2 px2.
-  by rewrite odd_tperm -val_eqE eq_sym.
+suffices ->: rfd (tperm x1 (p x1)) = tperm x2 px2.
+  by rewrite odd_tperm eq_sym; rewrite inE in Hx1.
 apply/permP => z; apply/val_eqP; rewrite permE /= tpermD // eqxx.
-case: (tpermP x2) => [->|->|HH1 HH2]; rewrite /x2 ?tpermL ?tpermR 1?tpermD //.
-  by apply/eqP=> HH3; case: HH1; apply: val_inj.
-by apply/eqP => HH3; case: HH2; apply: val_inj.
+by rewrite !permE /= -!val_eqE /= !(fun_if sval) /=.
 Qed.
 
 Lemma rfd_iso : 'C_('Alt_T)[x | 'P] \isog 'Alt_T'.

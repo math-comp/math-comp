@@ -909,7 +909,7 @@ wlog Dj: j M nzMij / j = 0; last rewrite {j}Dj in nzMij.
      by rewrite xcolE unitmx_mul uR unitmx_perm.
   by rewrite xcolE !mulmxA -dM xcolE -mulmxA -perm_mxM tperm2 perm_mx1 mulmx1.
 move Da: (M i 0) nzMij => a nz_a.
-elim: {a}_.+1 {-2}a (ltnSn `|a|) => // A IHa a leA in m n M i Da nz_a le_mn *.
+have [A leA] := ubnP `|a|; elim: A => // A IHa in a leA m n M i Da nz_a le_mn *.
 wlog [j a'Mij]: m n M i Da le_mn / {j | ~~ (a %| M i j)%Z}; last first.
   have nz_j: j != 0 by apply: contraNneq a'Mij => ->; rewrite Da.
   case: n => [[[]//]|n] in j le_mn nz_j M a'Mij Da *.

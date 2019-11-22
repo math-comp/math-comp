@@ -648,7 +648,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [p]: exists p, [&& p \is monic, root p z & p \is a polyOver (sQ (z_ n))].
     have [p mon_p pz0] := algC z; exists (p ^ QtoC).
     by rewrite map_monic mon_p pz0 -(pQof (z_ n)); apply/polyOver_poly.
-  elim: {p}_.+1 {-2}p n (ltnSn (size p)) => // d IHd p n lepd pz0.
+  have [d lepd] := ubnP (size p); elim: d => // d IHd in p n lepd * => pz0.
   have [t [t_C t_z gal_t]]: exists t, [/\ z_ n \in sQ t, z \in sQ t & is_Gal t].
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.

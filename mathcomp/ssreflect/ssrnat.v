@@ -400,6 +400,51 @@ Proof. by move=> lt_mn /ltnW; apply: leq_trans. Qed.
 Lemma leq_total m n : (m <= n) || (m >= n).
 Proof. by rewrite -implyNb -ltnNge; apply/implyP; apply: ltnW. Qed.
 
+(* Helper lemmas to support generalized induction over a nat measure.         *)
+(* The idiom for a proof by induction over a measure Mxy : nat involving      *)
+(* variables x, y, ... (e.g., size x + size y) is                             *)
+(*   have [m leMn] := ubnP Mxy; elim: n => // n IHn in x y ... leMn ... *.    *)
+(* after which the current goal (possibly modified by generalizations in the  *)
+(* in ... part) can be proven with the extra context assumptions              *)
+(*  n : nat                                                                   *)
+(*  IHn : forall x y ..., Mxy < n -> ... -> the_initial_goal                  *)
+(*  leMn : Mxy < n.+1                                                         *)
+(* This is preferable to the legacy idiom relying on numerical occurrence     *)
+(* selection, which is fragile if there can be multiple occurrences of x, y,  *)
+(* ... in the measure expression Mxy (e.g., in #|y| with x : finType and      *)
+(* y : {set x}).                                                              *)
+(*  The leMn statement is convertible to Mxy <= n; if it is necessary to      *)
+(* have _exactly_ leMn : Mxy <= n, the ltnSE helper lemma may be used as      *)
+(* follows                                                                    *)
+(*   have [m] := ubnP Mxy; elim: n => // n IHn in x y ... * => /ltnSE-leMn.   *)
+(*  We also provide alternative helper lemmas for proofs where the upper      *)
+(* bound appears in the goal, and we assume nonstrict (in)equality.           *)
+(* In either case the proof will have to dispatch an Mxy = 0 case.            *)
+(*  have [m defM] := ubnPleq Mxy; elim: n => [|n IHn] in x y ... defM ... *.  *)
+(* yields two subgoals, in which Mxy has been replaced by 0 and n.+1,         *)
+(* with the extra assumption defM : Mxy <= 0 / Mxy <= n.+1, respectively.     *)
+(* The second goal also has the inductive assumption                          *)
+(*   IHn : forall x y ..., Mxy <= n -> ... -> the_initial_goal[n / Mxy].      *)
+(* Using ubnPgeq or ubnPeq instead of ubnPleq yields assumptions with         *)
+(* Mxy >= 0/n.+1 or Mxy == 0/n.+1 instead of Mxy <= 0/n.+1, respectively.     *)
+(* These introduce a different kind of induction; for example ubnPgeq M lets  *)
+(* us remember that n < M throughout the induction.                           *)
+(*   Finally, the ltn_ind lemma provides a generalized induction view for a   *)
+(* property of a single integer (i.e., the case Mxy := x).                    *)
+Lemma ubnP m : {n | m < n}.             Proof. by exists m.+1. Qed.
+Lemma ltnSE m n : m < n.+1 -> m <= n.   Proof. by []. Qed.
+Variant ubn_leq_spec m : nat -> Type := UbnLeq n of m <= n : ubn_leq_spec m n.
+Variant ubn_geq_spec m : nat -> Type := UbnGeq n of m >= n : ubn_geq_spec m n.
+Variant ubn_eq_spec m : nat -> Type := UbnEq n of m == n : ubn_eq_spec m n.
+Lemma ubnPleq m : ubn_leq_spec m m.    Proof. by []. Qed.
+Lemma ubnPgeq m : ubn_geq_spec m m.    Proof. by []. Qed.
+Lemma ubnPeq m : ubn_eq_spec m m.      Proof. by []. Qed.
+Lemma ltn_ind P : (forall n, (forall m, m < n -> P m) -> P n) -> forall n, P n.
+Proof.
+move=> accP M; have [n leMn] := ubnP M; elim: n => // n IHn in M leMn *.
+by apply/accP=> p /leq_trans/(_ leMn)/IHn.
+Qed.
+
 (* Link to the legacy comparison predicates. *)
 
 Lemma leP m n : reflect (m <= n)%coq_nat (m <= n).
@@ -412,15 +457,14 @@ Arguments leP {m n}.
 
 Lemma le_irrelevance m n le_mn1 le_mn2 : le_mn1 = le_mn2 :> (m <= n)%coq_nat.
 Proof.
-elim: {n}n.+1 {-1}n (erefl n.+1) => // n IHn _ [<-] in le_mn1 le_mn2 *.
-pose def_n2 := erefl n; transitivity (eq_ind _ _ le_mn2 _ def_n2) => //.
-move def_n1: {1 4 5 7}n le_mn1 le_mn2 def_n2 => n1 le_mn1.
-case: n1 / le_mn1 def_n1 => [|n1 le_mn1] def_n1 [|n2 le_mn2] def_n2.
-- by rewrite [def_n2]eq_axiomK.
-- by move/leP: (le_mn2); rewrite -{1}def_n2 ltnn.
-- by move/leP: (le_mn1); rewrite {1}def_n2 ltnn.
-case: def_n2 (def_n2) => ->{n2} def_n2 in le_mn2 *.
-by rewrite [def_n2]eq_axiomK /=; congr le_S; apply: IHn.
+elim/ltn_ind: n => n IHn in le_mn1 le_mn2 *; set n1 := n in le_mn1 *.
+pose def_n : n = n1 := erefl n; transitivity (eq_ind _ _ le_mn2 _ def_n) => //.
+case: n1 / le_mn1 le_mn2 => [|n1 le_mn1] {n}[|n le_mn2] in (def_n) IHn *.
+- by rewrite [def_n]eq_axiomK.
+- by case/leP/idPn: (le_mn2); rewrite -def_n ltnn.
+- by case/leP/idPn: (le_mn1); rewrite def_n ltnn.
+case: def_n (def_n) => <-{n1} def_n in le_mn1 *.
+by rewrite [def_n]eq_axiomK /=; congr le_S; apply: IHn.
 Qed.
 
 Lemma ltP m n : reflect (m < n)%coq_nat (m < n).
@@ -1681,7 +1725,7 @@ Definition bin_of_nat n0 := if n0 is n.+1 then Npos (pos_of_nat n n) else 0%num.
 Lemma bin_of_natK : cancel bin_of_nat nat_of_bin.
 Proof.
 have sub2nn n : n.*2 - n = n by rewrite -addnn addKn.
-case=> //= n; rewrite -{3}[n]sub2nn.
+case=> //= n; rewrite -[n in RHS]sub2nn.
 by elim: n {2 4}n => // m IHm [|[|n]] //=; rewrite IHm // natTrecE sub2nn.
 Qed.
 

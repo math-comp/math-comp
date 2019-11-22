@@ -508,13 +508,13 @@ suffices [le_i_ti le_ti_ni]: i <= tnth t i /\ tnth t i <= i + n.
   by rewrite /sub_mn inordK ?subnKC // ltnS leq_subLR.
 pose y0 := tnth t i; rewrite (tnth_nth y0) -(nth_map _ (val i)) ?size_tuple //.
 case def_e: (map _ _) => [|x e] /=; first by rewrite nth_nil ?leq_addr.
-rewrite def_e in inc_t; split.
-  case: {-2}i; rewrite /= -{1}(size_tuple t) -(size_map val) def_e.
-  elim=> //= j IHj lt_j_t; apply: leq_trans (pathP (val i) inc_t _ lt_j_t).
-  by rewrite ltnS IHj 1?ltnW.
+set nth_i := nth (i : nat); rewrite def_e in inc_t; split.
+  have: i < size (x :: e) by rewrite -def_e size_map size_tuple ltn_ord.
+  elim: (val i) => //= j IHj lt_j_e.
+  by apply: leq_trans (pathP (val i) inc_t _ lt_j_e); rewrite ltnS IHj 1?ltnW.
 move: (_ - _) (subnK (valP i)) => k /=.
-elim: k {-2}(val i) => /= [|k IHk] j def_m; rewrite -ltnS -addSn.
-  by rewrite [j.+1]def_m -def_e (nth_map y0) ?ltn_ord // size_tuple -def_m.
+elim: k (val i) => /= [|k IHk] j; rewrite -ltnS -addSn ?add0n => def_m.
+  by rewrite def_m -def_e /nth_i (nth_map y0) ?ltn_ord // size_tuple -def_m.
 rewrite (leq_trans _ (IHk _ _)) -1?addSnnS //; apply: (pathP _ inc_t).
 rewrite -ltnS (leq_trans (leq_addl k _)) // -addSnnS def_m.
 by rewrite -(size_tuple t) -(size_map val) def_e.

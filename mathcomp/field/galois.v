@@ -561,7 +561,7 @@ have [[p F0p splitLp] [autL DautL]] := (splittingFieldP, enum_AEnd).
 suffices{K} autL_px q: q != 0 -> q %| q1 -> size q > 1 -> has (fx_root q) autL.
   set q := minPoly K x; have: q \is monic := monic_minPoly K x.
   have: q %| q1 by rewrite minPolyS // sub1v.
-  elim: {q}_.+1 {-2}q (ltnSn (size q)) => // d IHd q leqd q_dv_q1 mon_q.
+  have [d] := ubnP (size q); elim: d q => // d IHd q leqd q_dv_q1 mon_q.
   have nz_q: q != 0 := monic_neq0 mon_q.
   have [|q_gt1|q_1] := ltngtP (size q) 1; last first; last by rewrite polySpred.
     by exists nil; rewrite big_nil -eqp_monic ?monic1 // -size_poly_eq1 q_1.
@@ -571,7 +571,7 @@ suffices{K} autL_px q: q != 0 -> q %| q1 -> size q > 1 -> has (fx_root q) autL.
   have q2_dv_q1: q2 %| q1 by rewrite (dvdp_trans _ q_dv_q1) // Dq dvdp_mulr.
   rewrite Dq; have [r /eqP->] := IHd q2 leqd q2_dv_q1 mon_q2.
   by exists (f x :: r); rewrite big_cons mulrC.
-elim: {q}_.+1 {-2}q (ltnSn (size q)) => // d IHd q leqd nz_q q_dv_q1 q_gt1.
+have [d] := ubnP (size q); elim: d q => // d IHd q leqd nz_q q_dv_q1 q_gt1.
 without loss{d leqd IHd nz_q q_gt1} irr_q: q q_dv_q1 / irreducible_poly q.
   move=> IHq; apply: wlog_neg => not_autLx_q; apply: IHq => //.
   split=> // q2 q2_neq1 q2_dv_q; rewrite -dvdp_size_eqp // eqn_leq dvdp_leq //=.
@@ -645,9 +645,10 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
 pose f1 := (inLz^-1 \o f \o inLz)%VF; have /kHomP[fM fFid] := homLf.
 have Df1 u: inLz (f1 u) = f (inLz u).
   rewrite !comp_lfunE limg_lfunVK //= -[limg _]/(asval imL).
-  have [r def_pz defLz] := splitLpz.
-  have []: all (mem r) r /\ inLz u \in imL by split; first apply/allP.
-  rewrite -{1}defLz; elim/last_ind: {-1}r {u}(inLz u) => [|r1 y IHr1] u.
+  have [r def_pz defLz] := splitLpz; set r1 := r.
+  have: inLz u \in <<1 & r1>>%VS by rewrite defLz.
+  have: all (mem r) r1 by apply/allP.
+  elim/last_ind: r1 {u}(inLz u) => [|r1 y IHr1] u.
     by rewrite Fadjoin_nil => _ Fu; rewrite fFid // (subvP (sub1v _)).
   rewrite all_rcons adjoin_rcons => /andP[rr1 ry] /Fadjoin_polyP[pu r1pu ->].
   rewrite (kHom_horner homLf) -defLz; last exact: seqv_sub_adjoin; last first.
@@ -1353,7 +1354,7 @@ Lemma gal_independent_contra E (P : pred (gal_of E)) (c_ : gal_of E -> L) x :
     P x -> c_ x != 0 ->
   exists2 a, a \in E & \sum_(y | P y) c_ y * y a != 0.
 Proof.
-elim: {P}_.+1 c_ x {-2}P (ltnSn #|P|) => // n IHn c_ x P lePn Px nz_cx.
+have [n] := ubnP #|P|; elim: n c_ x P => // n IHn c_ x P lePn Px nz_cx.
 rewrite ltnS (cardD1x Px) in lePn; move/IHn: lePn => {n IHn}/=IH_P.
 have [/eqfun_inP c_Px'_0 | ] := boolP [forall (y | P y && (y != x)), c_ y == 0].
   exists 1; rewrite ?mem1v // (bigD1 x Px) /= rmorph1 mulr1.

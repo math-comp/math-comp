@@ -993,7 +993,7 @@ Lemma card_subcent_extraspecial U :
   U \subset G -> #|'C_G(U)| = (#|'Z(G) :&: U| * #|G : U|)%N.
 Proof.
 move=> sUG; rewrite setIAC (setIidPr sUG).
-elim: {U}_.+1 {-2}U (ltnSn #|U|) sUG => // m IHm U leUm sUG.
+have [m leUm] := ubnP #|U|; elim: m => // m IHm in U leUm sUG *.
 have [cUG | not_cUG]:= orP (orbN (G \subset 'C(U))).
   by rewrite !(setIidPl _) ?Lagrange // centsC.
 have{not_cUG} [x Gx not_cUx] := subsetPn not_cUG.
@@ -1183,7 +1183,7 @@ Theorem extraspecial_structure S : p.-group S -> extraspecial S ->
   {Es | all (fun E => (#|E| == p ^ 3)%N && ('Z(E) == 'Z(S))) Es
       & \big[cprod/1%g]_(E <- Es) E \* 'Z(S) = S}.
 Proof.
-elim: {S}_.+1 {-2}S (ltnSn #|S|) => // m IHm S leSm pS esS.
+have [m] := ubnP #|S|; elim: m S => // m IHm S leSm pS esS.
 have [x Z'x]: {x | x \in S :\: 'Z(S)}.
   apply/sigW/set0Pn; rewrite -subset0 subDset setU0.
   apply: contra (extraspecial_nonabelian esS) => sSZ.
@@ -1210,11 +1210,11 @@ Let oZ := card_center_extraspecial pS esS.
 (* This is Aschbacher (23.10)(2). *)
 Lemma card_extraspecial : {n | n > 0 & #|S| = (p ^ n.*2.+1)%N}.
 Proof.
-exists (logn p #|S|)./2.
+set T := S; exists (logn p #|T|)./2.
   rewrite half_gt0 ltnW // -(leq_exp2l _ _ (prime_gt1 p_pr)) -card_pgroup //.
   exact: min_card_extraspecial.
-have [Es] := extraspecial_structure pS esS.
-elim: Es {3 4 5}S => [_ _ <-| E s IHs T] /=.
+have [Es] := extraspecial_structure pS esS; rewrite -[in RHS]/T.
+elim: Es T => [_ _ <-| E s IHs T] /=.
   by rewrite big_nil cprod1g oZ (pfactorK 1).
 rewrite -andbA big_cons -cprodA; case/and3P; move/eqP=> oEp3; move/eqP=> defZE.
 move/IHs=> {IHs}IHs; case/cprodP=> [[_ U _ defU]]; rewrite defU => defT cEU.
@@ -1233,8 +1233,8 @@ have [Es] := extraspecial_structure pS esS.
 elim: Es S oZ => [T _ _ <-| E s IHs T oZT] /=.
   rewrite big_nil cprod1g (center_idP (center_abelian T)).
   by apply/Aut_sub_fullP=> // g injg gZ; exists g.
-rewrite -andbA big_cons -cprodA; case/and3P; move/eqP=> oE; move/eqP=> defZE.
-move=> es_s; case/cprodP=> [[_ U _ defU]]; rewrite defU => defT cEU.
+rewrite -andbA big_cons -cprodA => /and3P[/eqP-oE /eqP-defZE es_s].
+case/cprodP=> -[_ U _ defU]; rewrite defU => defT cEU.
 have sUT: U \subset T by rewrite -defT mulG_subr.
 have sZU: 'Z(T) \subset U.
   by case/cprodP: defU => [[V _ -> _] <- _]; apply: mulG_subr.

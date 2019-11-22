@@ -238,8 +238,8 @@ apply/idP/mapP=> {s}/= [nilG | [n _ Ln1]]; last first.
   rewrite -subG1 {}Ln1; elim: n => // n IHn.
   by rewrite (subset_trans sHR) ?commSg.
 pose m := #|G|.-1; exists m; first by rewrite mem_iota /= prednK.
-rewrite ['L__(G)]card_le1_trivg //= -(subnn m).
-elim: {-2}m => [|n]; [by rewrite subn0 prednK | rewrite lcnSn subnS].
+set n := m; rewrite ['L__(G)]card_le1_trivg //= -(subnn m) -[m in _ - m]/n.
+elim: n => [|n]; [by rewrite subn0 prednK | rewrite lcnSn subnS].
 case: (eqsVneq 'L_n.+1(G) 1) => [-> | ntLn]; first by rewrite comm1G cards1.
 case: (m - n) => [|m' /= IHn]; first by rewrite leqNgt cardG_gt1 ntLn.
 rewrite -ltnS (leq_trans (proper_card _) IHn) //.
@@ -464,8 +464,8 @@ Qed.
 
 Lemma ucn_lcnP n G : ('L_n.+1(G) == 1) = ('Z_n(G) == G).
 Proof.
-rewrite !eqEsubset sub1G ucn_sub /= andbT -(ucn0 G).
-elim: {1 3}n 0 (addn0 n) => [j <- //|i IHi j].
+rewrite !eqEsubset sub1G ucn_sub /= andbT -(ucn0 G); set i := (n in LHS).
+have: i + 0 = n by [rewrite addn0]; elim: i 0 => [j <- //|i IHi j].
 rewrite addSnnS => /IHi <- {IHi}; rewrite ucnSn lcnSn.
 rewrite -sub_morphim_pre ?gFsub_trans ?gFnorm_trans // subsetI.
 by rewrite morphimS ?gFsub // quotient_cents2 ?gFsub_trans ?gFnorm_trans.
@@ -611,8 +611,8 @@ Qed.
 
 Lemma nilpotent_subnormal G H : nilpotent G -> H \subset G -> H <|<| G.
 Proof.
-move=> nilG; elim: {H}_.+1 {-2}H (ltnSn (#|G| - #|H|)) => // m IHm H.
-rewrite ltnS => leGHm sHG.
+move=> nilG; have [m] := ubnP (#|G| - #|H|).
+elim: m H => // m IHm H /ltnSE-leGHm sHG.
 have [->|] := eqVproper sHG; first exact: subnormal_refl.
 move/(nilpotent_proper_norm nilG); set K := 'N_G(H) => prHK.
 have snHK: H <|<| K by rewrite normal_subnormal ?normalSG.

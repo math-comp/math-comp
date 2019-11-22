@@ -514,7 +514,7 @@ Qed.
 
 Lemma nil_Zgroup_cyclic G : Zgroup G -> nilpotent G -> cyclic G.
 Proof.
-elim: {G}_.+1 {-2}G (ltnSn #|G|) => // n IHn G; rewrite ltnS => leGn ZgG nilG.
+have [n] := ubnP #|G|; elim: n G => // n IHn G /ltnSE-leGn ZgG nilG.
 have [->|[p pr_p pG]] := trivgVpdiv G; first by rewrite -cycle1 cycle_cyclic.
 have /dprodP[_ defG Cpp' _] := nilpotent_pcoreC p nilG.
 have /cyclicP[x def_p]: cyclic 'O_p(G).
@@ -567,9 +567,8 @@ Theorem Baer_Suzuki x G :
     x \in G -> (forall y, y \in G -> p.-group <<[set x; x ^ y]>>) ->
   x \in 'O_p(G).
 Proof.
-elim: {G}_.+1 {-2}G x (ltnSn #|G|) => // n IHn G x; rewrite ltnS.
-set E := x ^: G => leGn Gx pE.
-have{pE} pE: {in E &, forall x1 x2, p.-group <<[set x1; x2]>>}.
+have [n] := ubnP #|G|; elim: n G x => // n IHn G x /ltnSE-leGn Gx pE.
+set E := x ^: G; have{pE} pE: {in E &, forall x1 x2, p.-group <<[set x1; x2]>>}.
   move=> _ _ /imsetP[y1 Gy1 ->] /imsetP[y2 Gy2 ->].
   rewrite -(mulgKV y1 y2) conjgM -2!conjg_set1 -conjUg genJ pgroupJ.
   by rewrite pE // groupMl ?groupV.
