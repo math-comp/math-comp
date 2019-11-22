@@ -17,3 +17,7 @@ Definition of_void T (x : void) : T := match x with end.
 
 Lemma of_voidK T : pcancel (of_void T) [fun _ => None].
 Proof. by case. Qed.
+
+Lemma inj_compr A B C (f : B -> A) (h : C -> B) :
+   injective (f \o h) -> injective h.
+Proof. by move=> fh_inj x y /(congr1 f) /fh_inj. Qed.
