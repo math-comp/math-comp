@@ -136,7 +136,7 @@ doc: __always__ Makefile.coq
 	. ../etc/utils/builddoc_lib.sh; \
 		cd _build_doc && mangle_sources $(COQFILES)
 	+cd _build_doc && $(COQMAKE)
-	[ ! -f .Makefile.coq.d ] || cp .coqdeps.d .Makefile.coq.d #can be removed when coq-8.10 compatibility is dropped
+	cd _build_doc && if [ ! -f .Makefile.coq.d ] ; then cp .coqdeps.d .Makefile.coq.d ; fi #can be removed when coq-8.10 compatibility is dropped
 	cd _build_doc && grep -v vio: .Makefile.coq.d > depend
 	cd _build_doc && cat depend | ../../etc/buildlibgraph $(COQFILES) > htmldoc/depend.js
 	cd _build_doc && $(COQBIN)coqdoc -t "Mathematical Components" \
