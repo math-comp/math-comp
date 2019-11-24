@@ -2257,7 +2257,7 @@ suff iter_big k : k <= n.+1 -> k <= #|iter k F set0|.
 elim: k => [|k IHk] k_lt //=; apply: (leq_ltn_trans (IHk (ltnW k_lt))).
 by rewrite proper_card// properEneq// subset_iterS neq_iter.
 Qed.
-Hint Resolve fixsetK.
+Hint Resolve fixsetK : core.
 
 Lemma minset_fix : minset [pred X | F X == X] fixset.
 Proof.
@@ -2338,7 +2338,7 @@ Hypothesis (F_mono : {homo F : X Y / X \subset Y}).
 Definition funsetC X := ~: (F (~: X)).
 Lemma funsetC_mono : {homo funsetC : X Y / X \subset Y}.
 Proof. by move=> *; rewrite subCset setCK F_mono// subCset setCK. Qed.
-Hint Resolve funsetC_mono.
+Hint Resolve funsetC_mono : core.
 
 Definition cofixset := ~: fixset funsetC.
 
