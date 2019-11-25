@@ -58,8 +58,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
        `edivnS`, `divnS`, `modnS`, `edivn_pred`, `divn_pred` and
        `modn_pred`.
 
-- Added map/parametricity theorems about `path`, `sort` and `sorted`:
-
 - Added `mem2E` in `path.v`.
 
 - Added `sort_rec1` and `sortE` to help inductive reasoning on `sort`.
