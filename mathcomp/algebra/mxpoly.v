@@ -307,16 +307,16 @@ Implicit Types p q : {poly R}.
 Definition char_poly_mx := 'X%:M - map_mx (@polyC R) A.
 Definition char_poly := \det char_poly_mx.
 
-Let diagA := [seq A i i | i : 'I_n].
+Let diagA := [seq A i i | i <- index_enum _ & true].
 Let size_diagA : size diagA = n.
-Proof. by rewrite size_image card_ord. Qed.
+Proof. by rewrite -[n]card_ord size_map; have [e _ _ []] := big_enumP. Qed.
 
 Let split_diagA :
   exists2 q, \prod_(x <- diagA) ('X - x%:P) + q = char_poly & size q <= n.-1.
 Proof.
 rewrite [char_poly](bigD1 1%g) //=; set q := \sum_(s | _) _; exists q.
-  congr (_ + _); rewrite odd_perm1 mul1r big_map enumT; apply: eq_bigr => i _.
-  by rewrite !mxE perm1 eqxx.
+  congr (_ + _); rewrite odd_perm1 mul1r big_map big_filter /=.
+  by apply: eq_bigr => i _; rewrite !mxE perm1 eqxx.
 apply: leq_trans {q}(size_sum _ _ _) _; apply/bigmax_leqP=> s nt_s.
 have{nt_s} [i nfix_i]: exists i, s i != i.
   apply/existsP; rewrite -negb_forall; apply: contra nt_s => s_1.
@@ -329,7 +329,7 @@ apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
     by rewrite -subn1 -addnS leq_subLR addnA leq_add.
   rewrite !mxE eq_sym !inE; case: (s j == j); first by rewrite polyseqXsubC.
   by rewrite sub0r size_opp size_polyC leq_b1.
-rewrite -{8}[n]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
+rewrite -[n in n.-1]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
 apply: subset_leq_card; apply/subsetP=> j; move/(_ =P j)=> fix_j.
 rewrite !inE -{1}fix_j (inj_eq perm_inj) orbb.
 by apply: contraNneq nfix_i => <-; rewrite fix_j.
@@ -354,7 +354,7 @@ Proof.
 move=> n_gt0; have [q <- lt_q_n] := split_diagA; set p := \prod_(x <- _) _.
 rewrite coefD {q lt_q_n}(nth_default 0 lt_q_n) addr0.
 have{n_gt0} ->: p`_n.-1 = ('X * p)`_n by rewrite coefXM eqn0Ngt n_gt0.
-have ->: \tr A = \sum_(x <- diagA) x by rewrite big_map enumT.
+have ->: \tr A = \sum_(x <- diagA) x by rewrite big_map big_filter.
 rewrite -size_diagA {}/p; elim: diagA => [|x d IHd].
   by rewrite !big_nil mulr1 coefX oppr0.
 rewrite !big_cons coefXM mulrBl coefB IHd opprD addrC; congr (- _ + _).

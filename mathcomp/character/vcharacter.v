@@ -464,7 +464,7 @@ Proof.
 move=> Zphi def_n lt_n_4.
 pose S := [seq '[phi, 'chi_i] *: 'chi_i | i in irr_constt phi].
 have def_phi: phi = \sum_(xi <- S) xi.
-  rewrite big_map /= big_filter big_mkcond {1}[phi]cfun_sum_cfdot.
+  rewrite big_image big_mkcond {1}[phi]cfun_sum_cfdot.
   by apply: eq_bigr => i _; rewrite if_neg; case: eqP => // ->; rewrite scale0r.
 have orthS: orthonormal S.
   apply/orthonormalP; split=> [|_ _ /mapP[i phi_i ->] /mapP[j _ ->]].

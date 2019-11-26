@@ -481,7 +481,7 @@ Lemma reindex_cfclass R idx (op : Monoid.com_law idx) (F : 'CF(H) -> R) i :
   \big[op/idx]_(chi <- ('chi_i ^: G)%CF) F chi
      = \big[op/idx]_(j | 'chi_j \in ('chi_i ^: G)%CF) F 'chi_j.
 Proof.
-move/im_cfclass_Iirr/(perm_big _) <-; rewrite big_map big_filter /=.
+move/im_cfclass_Iirr/(perm_big _) <-; rewrite big_image /=.
 by apply: eq_bigl => j; rewrite cfclass_IirrE.
 Qed.
 
@@ -1174,7 +1174,7 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID (mem (codom mmLth))) /=.
   rewrite ler_paddr ?sumr_ge0 // => [i _|].
     by rewrite char1_ge0 ?rpredZ_Cnat ?Cnat_cfdot_char ?cfInd_char ?irr_char.
-  rewrite -big_uniq //= big_map big_filter -sumr_const ler_sum // => i _.
+  rewrite -big_uniq //= big_image -sumr_const ler_sum // => i _.
   rewrite cfunE -[in rhs in _ <= rhs](cfRes1 L) -cfdot_Res_r mmLthL cfRes1.
   by rewrite DthL cfdotZr rmorph_nat cfnorm_irr mulr1.
 constructor 2; exists e; first by exists p0.

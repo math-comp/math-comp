@@ -386,8 +386,8 @@ rewrite -card_uniq_tuples.
 have bijFF: {on (_ : pred _), bijective (@Finfun D T)}.
   by exists fgraph => x _; [apply: FinfunK | apply: fgraphK].
 rewrite -(on_card_preimset (bijFF _)); apply: eq_card => /= t.
-rewrite !inE -(big_andE predT) -big_filter big_all -all_map.
-by rewrite -[injectiveb _]/(uniq _) [map _ _]codom_ffun FinfunK.
+rewrite !inE -(big_andE predT) -big_image /= big_all.
+by rewrite -[t in RHS]FinfunK -codom_ffun.
 Qed.
 
 Lemma card_inj_ffuns D T :

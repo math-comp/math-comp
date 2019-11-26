@@ -56,7 +56,7 @@ have Q_Xn1: ('X^n - 1 : {poly Qn}) \is a polyOver 1%AS.
 have splitXn1: splittingFieldFor 1 ('X^n - 1) {:Qn}.
   pose r := codom (fun i : 'I_n => w ^+ i).
   have Dr: 'X^n - 1 = \prod_(y <- r) ('X - y%:P).
-    by rewrite -(factor_Xn_sub_1 prim_w) big_mkord big_map enumT.
+    by rewrite -(factor_Xn_sub_1 prim_w) big_mkord big_image.
   exists r; first by rewrite -Dr eqpxx.
   apply/eqP; rewrite eqEsubv subvf -genQn adjoin_seqSr //; apply/allP=> /=.
   by rewrite andbT -root_prod_XsubC -Dr; apply/unity_rootP/prim_expr_order.
@@ -657,7 +657,7 @@ have Qpi1: pi1 \in Crat.
     have /vlineP[q ->] := mem_galNorm galQn (memvf a).
     by rewrite rmorphZ_num rmorph1 mulr1 Crat_rat.
   rewrite /galNorm rmorph_prod -/calG imItoQ big_imset //=.
-  rewrite /pi1 -(eq_bigl _ _ imItoS) -big_uniq // big_map big_filter /=.
+  rewrite /pi1 -(eq_bigl _ _ imItoS) -big_uniq // big_image /=.
   apply: eq_bigr => k _; have [nuC DnuC] := gQnC (ItoQ k); rewrite DnuC Da.
   have [r ->] := char_sum_irr Nchi; rewrite !sum_cfunE rmorph_sum.
   apply: eq_bigr => i _; have /QnGg[b Db] := irr_char i.

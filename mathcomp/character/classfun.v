@@ -528,8 +528,7 @@ Qed.
 Lemma cfun_on_sum A :
   'CF(G, A) = (\sum_(xG in classes G | xG \subset A) <['1_xG]>)%VS.
 Proof.
-rewrite ['CF(G, A)]span_def big_map big_filter.
-by apply: eq_bigl => xG; rewrite !inE.
+by rewrite ['CF(G, A)]span_def big_image; apply: eq_bigl => xG; rewrite !inE.
 Qed.
 
 Lemma cfun_onP A phi :
@@ -2047,15 +2046,14 @@ Lemma cfBigdprodEi i (phi : 'CF(A i)) x :
     P i -> (forall j, P j -> x j \in A j) ->
   cfBigdprodi phi (\prod_(j | P j) x j)%g = phi (x i).
 Proof.
-set r := enum P => Pi /forall_inP; have r_i: i \in r by rewrite mem_enum.
-have:= bigdprodWcp defG; rewrite -big_andE -!(big_filter _ P) filter_index_enum.
-rewrite -/r big_all => defGr /allP Ax.
-rewrite (perm_bigcprod defGr Ax (perm_to_rem r_i)) big_cons cfDprodEl ?Pi //.
-- by rewrite cfRes_id.
-- by rewrite Ax.
-rewrite big_seq group_prod // => j; rewrite mem_rem_uniq ?enum_uniq //.
-case/andP=> i'j /= r_j; apply/mem_gen/bigcupP; exists j; last exact: Ax.
-by rewrite -[P j](mem_enum P) r_j.
+have [r big_r [Ur mem_r] _] := big_enumP P => Pi AxP.
+have:= bigdprodWcp defG; rewrite -!big_r => defGr.
+have{AxP} [r_i Axr]: i \in r /\ {in r, forall j, x j \in A j}.
+  by split=> [|j]; rewrite mem_r // => /AxP.
+rewrite (perm_bigcprod defGr Axr (perm_to_rem r_i)) big_cons.
+rewrite cfDprodEl ?Pi ?cfRes_id ?Axr // big_seq group_prod // => j.
+rewrite mem_rem_uniq // => /andP[i'j /= r_j].
+by apply/mem_gen/bigcupP; exists j; [rewrite -mem_r r_j | apply: Axr].
 Qed.
 
 Lemma cfBigdprodi_iso i : P i -> isometry (@cfBigdprodi i).

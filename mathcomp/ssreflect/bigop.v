@@ -545,20 +545,35 @@ Canonical bigop_unlock := Unlockable BigOp.bigopE.
 
 Definition index_iota m n := iota m (n - m).
 
-Definition index_enum (T : finType) := Finite.enum T.
-
 Lemma mem_index_iota m n i : i \in index_iota m n = (m <= i < n).
 Proof.
 rewrite mem_iota; case le_m_i: (m <= i) => //=.
 by rewrite -leq_subLR subSn // -subn_gt0 -subnDA subnKC // subn_gt0.
 Qed.
 
+(* Legacy mathcomp scripts have been relying on the fact that enum A and      *)
+(* filter A (index_enum T) are convertible. This is likely to change in the   *)
+(* next mathcomp release when enum, pick, subset and card are generalised to  *)
+(* predicates with finite support in a choiceType - in fact the two will only *)
+(* be equal up to permutation in this new theory.                             *)
+(*  It is therefore advisable to stop relying on this, and use the new        *)
+(* facilities provided in this library: lemmas big_enumP, big_enum, big_image *)
+(* and such. Users wishing to test compliance should change the Defined in    *)
+(* index_enum_key to Qed, and comment out the filter_index_enum compatibility *)
+(* definition below (or Import Deprecation.Reject).                           *)
+Fact index_enum_key : unit. Proof. split. Defined. (* Qed. *)
+Definition index_enum (T : finType) :=
+  locked_with index_enum_key (Finite.enum T).
+
+Lemma deprecated_filter_index_enum T P : filter P (index_enum T) = enum P.
+Proof. by rewrite [index_enum T]unlock. Qed.
+
 Lemma mem_index_enum T i : i \in index_enum T.
-Proof. by rewrite -[index_enum T]enumT mem_enum. Qed.
+Proof. by rewrite [index_enum T]unlock -enumT mem_enum. Qed.
 Hint Resolve mem_index_enum : core.
 
-Lemma filter_index_enum T P : filter P (index_enum T) = enum P.
-Proof. by []. Qed.
+Lemma index_enum_uniq T : uniq (index_enum T).
+Proof. by rewrite [index_enum T]unlock -enumT enum_uniq. Qed.
 
 Notation "\big [ op / idx ]_ ( i <- r | P ) F" :=
   (bigop idx r (fun i => BigBody i op P%B F)) : big_scope.
@@ -872,10 +887,6 @@ rewrite -big_filter -(big_filter r2) filter_cat.
 by rewrite has_count -size_filter; case: filter.
 Qed.
 
-Lemma big_const_seq r (P : pred I) x :
-  \big[op/idx]_(i <- r | P i) x = iter (count P r) (op x) idx.
-Proof. by rewrite unlock; elim: r => //= i r ->; case: (P i). Qed.
-
 End SeqExtension.
 
 Lemma big_map_id J (h : J -> R) r (P : pred R) :
@@ -971,7 +982,7 @@ Lemma big_mkord n (P : pred nat) F :
   \big[op/idx]_(0 <= i < n | P i) F i = \big[op/idx]_(i < n | P i) F i.
 Proof.
 rewrite /index_iota subn0 -(big_map (@nat_of_ord n)).
-by congr bigop; rewrite /index_enum unlock val_ord_enum.
+by congr bigop; rewrite /index_enum 2!unlock val_ord_enum.
 Qed.
 
 Lemma big_nat_widen m n1 n2 (P : pred nat) F :
@@ -1070,9 +1081,62 @@ rewrite big_ltn // big_add1 /= big_mkord; congr op.
 by apply: eq_bigr => i _; rewrite eqFG.
 Qed.
 
-Lemma big_const (I : finType) (A : pred I) x :
+Lemma big_nseq_cond I n a (P : pred I) F :
+  \big[op/idx]_(i <- nseq n a | P i) F i
+    = if P a then iter n (op (F a)) idx else idx.
+Proof. by rewrite unlock; elim: n => /= [|n ->]; case: (P a). Qed.
+
+Lemma big_nseq I n a (F : I -> R):
+  \big[op/idx]_(i <- nseq n a) F i = iter n (op (F a)) idx.
+Proof. exact: big_nseq_cond. Qed.
+
+End Extensionality.
+
+Variant big_enum_spec (I : finType) (P : pred I) : seq I -> Type :=
+  BigEnumSpec e of
+    forall R idx op (F : I -> R),
+      \big[op/idx]_(i <- e) F i = \big[op/idx]_(i | P i) F i
+  & uniq e /\ (forall i, i \in e = P i)
+  & (let cP := [pred i | P i] in perm_eq e (enum cP) /\ size e = #|cP|)
+  : big_enum_spec P e.
+
+(*   This lemma can be used to introduce an enumeration into a non-abelian    *)
+(* bigop, in one of three ways:                                               *)
+(*   have [e big_e [Ue mem_e] [e_enum size_e]] := big_enumP P.                *)
+(* gives a permutation e of enum P alongside a equation big_e for converting  *)
+(* between bigops iterating on (i <- e) and ones on (i | P i). Usually not    *)
+(* all properties of e are needed, but see below the big_distr_big_dep proof  *)
+(* where most are.                                                            *)
+(*   rewrite -big_filter; have [e ...] := big_enumP.                          *)
+(* uses big_filter to do this conversion first, and then abstracts the        *)
+(* resulting filter P (index_enum T) enumeration as an e with the same        *)
+(* properties (see big_enum_cond below for an example of this usage).         *)
+(*   Finally                                                                  *)
+(*   rewrite -big_filter; case def_e: _ / big_enumP => [e ...]                *)
+(* does the same while remembering the definition of e.                       *)
+
+Lemma big_enumP I P : big_enum_spec P (filter P (index_enum I)).
+Proof.
+set e := filter P _; have Ue: uniq e by apply/filter_uniq/index_enum_uniq.
+have mem_e i: i \in e = P i by rewrite mem_filter mem_index_enum andbT.
+split=> // [R idx op F | cP]; first by rewrite big_filter.
+suffices De: perm_eq e (enum cP) by rewrite (perm_size De) cardE.
+by apply/uniq_perm=> // [|i]; rewrite ?enum_uniq ?mem_enum ?mem_e.
+Qed.
+
+Section BigConst.
+
+Variables (R : Type) (idx : R) (op : R -> R -> R).
+
+Lemma big_const_seq I r (P : pred I) x :
+  \big[op/idx]_(i <- r | P i) x = iter (count P r) (op x) idx.
+Proof. by rewrite unlock; elim: r => //= i r ->; case: (P i). Qed.
+
+Lemma big_const (I : finType) (A : {pred I}) x :
   \big[op/idx]_(i in A) x = iter #|A| (op x) idx.
-Proof. by rewrite big_const_seq -size_filter cardE. Qed.
+Proof.
+by have [e <- _ [_ <-]] := big_enumP A; rewrite big_const_seq count_predT.
+Qed.
 
 Lemma big_const_nat m n x :
   \big[op/idx]_(m <= i < n) x = iter (n - m) (op x) idx.
@@ -1082,33 +1146,7 @@ Lemma big_const_ord n x :
   \big[op/idx]_(i < n) x = iter n (op x) idx.
 Proof. by rewrite big_const card_ord. Qed.
 
-Lemma big_nseq_cond I n a (P : pred I) F :
-  \big[op/idx]_(i <- nseq n a | P i) F i = if P a then iter n (op (F a)) idx else idx.
-Proof. by rewrite unlock; elim: n => /= [|n ->]; case: (P a). Qed.
-
-Lemma big_nseq I n a (F : I -> R):
-  \big[op/idx]_(i <- nseq n a) F i = iter n (op (F a)) idx.
-Proof. exact: big_nseq_cond. Qed.
-
-Lemma big_image_cond I (J : finType) (h : J -> I) (A : pred J) (P : pred I) F :
-  \big[op/idx]_(i <- [seq h j | j in A] | P i) F i
-     = \big[op/idx]_(j in A | P (h j)) F (h j).
-Proof. by rewrite big_map big_filter_cond. Qed.
-
-Lemma big_image I (J : finType) (h : J -> I) (A : pred J) F :
-  \big[op/idx]_(i <- [seq h j | j in A]) F i = \big[op/idx]_(j in A) F (h j).
-Proof. by rewrite big_map big_filter. Qed.
-
-Lemma big_image_cond_id (J : finType) (h : J -> R) (A : pred J) (P : pred R) :
-  \big[op/idx]_(i <- [seq h j | j in A] | P i) i
-     = \big[op/idx]_(j in A | P (h j)) h j.
-Proof. exact: big_image_cond. Qed.
-
-Lemma big_image_id (J : finType) (h : J -> R) (A : pred J) :
-  \big[op/idx]_(i <- [seq h j | j in A]) i = \big[op/idx]_(j in A) h j.
-Proof. exact: big_image. Qed.
-
-End Extensionality.
+End BigConst.
 
 Section MonoidProperties.
 
@@ -1214,7 +1252,10 @@ Proof. exact: big_allpairs_dep. Qed.
 
 Lemma big_pred1_eq (I : finType) (i : I) F :
   \big[*%M/1]_(j | j == i) F j = F i.
-Proof. by rewrite -big_filter filter_index_enum enum1 big_seq1. Qed.
+Proof.
+have [e1 <- _ [e_enum _]] := big_enumP (pred1 i).
+by rewrite (perm_small_eq _ e_enum) enum1 ?big_seq1.
+Qed.
 
 Lemma big_pred1 (I : finType) i (P : pred I) F :
   P =1 pred1 i -> \big[*%M/1]_(j | P j) F j = F i.
@@ -1251,7 +1292,7 @@ Lemma big_sumType (I1 I2 : finType) (P : pred (I1 + I2)) F :
         (\big[*%M/1]_(i | P (inl _ i)) F (inl _ i))
       * (\big[*%M/1]_(i | P (inr _ i)) F (inr _ i)).
 Proof.
-by rewrite /index_enum {1}[@Finite.enum]unlock /= big_cat !big_map.
+by rewrite ![index_enum _]unlock [@Finite.enum in LHS]unlock big_cat !big_map.
 Qed.
 
 Lemma big_split_ord m n (P : pred 'I_(m + n)) F :
@@ -1261,8 +1302,8 @@ Lemma big_split_ord m n (P : pred 'I_(m + n)) F :
 Proof.
 rewrite -(big_map _ _ (lshift n) _ P F) -(big_map _ _ (@rshift m _) _ P F).
 rewrite -big_cat; congr bigop; apply: (inj_map val_inj).
-rewrite /index_enum -!enumT val_enum_ord map_cat -map_comp val_enum_ord.
-rewrite -map_comp (map_comp (addn m)) val_enum_ord.
+rewrite map_cat -!map_comp (map_comp (addn m)) /=.
+rewrite ![index_enum _]unlock unlock !val_ord_enum.
 by rewrite -iota_addl addn0 iota_add.
 Qed.
 
@@ -1295,11 +1336,21 @@ rewrite mulmCA; congr (_ * _); rewrite -big_cat; apply: IHr1 => a.
 by move/(_ a): eq_r12; rewrite !count_cat /= addnCA; apply: addnI.
 Qed.
 
+Lemma big_enum_cond (I : finType) (A : {pred I}) (P : pred I) F :
+  \big[*%M/1]_(i <- enum A | P i) F i = \big[*%M/1]_(i in A | P i) F i.
+Proof.
+by rewrite -big_filter_cond; have [e _ _ [/perm_big->]] := big_enumP.
+Qed.
+
+Lemma big_enum (I : finType) (A : {pred I}) F :
+  \big[*%M/1]_(i <- enum A) F i = \big[*%M/1]_(i in A) F i.
+Proof. by rewrite big_enum_cond big_andbC. Qed.
+
 Lemma big_uniq (I : finType) (r : seq I) F :
   uniq r -> \big[*%M/1]_(i <- r) F i = \big[*%M/1]_(i in r) F i.
 Proof.
-move=> uniq_r; rewrite -(big_filter _ _ _ (mem r)); apply: perm_big.
-by rewrite filter_index_enum uniq_perm ?enum_uniq // => i; rewrite mem_enum.
+move=> uniq_r; rewrite -big_enum; apply: perm_big.
+by rewrite uniq_perm ?enum_uniq // => i; rewrite mem_enum.
 Qed.
 
 Lemma big_rem (I : eqType) r x (P : pred I) F :
@@ -1402,6 +1453,24 @@ by rewrite andbA.
 Qed.
 
 Arguments partition_big [I J P] p Q [F].
+
+Lemma big_image_cond I (J : finType) (h : J -> I) (A : pred J) (P : pred I) F :
+  \big[*%M/1]_(i <- [seq h j | j in A] | P i) F i
+     = \big[*%M/1]_(j in A | P (h j)) F (h j).
+Proof. by rewrite big_map big_enum_cond. Qed.
+
+Lemma big_image I (J : finType) (h : J -> I) (A : pred J) F :
+  \big[*%M/1]_(i <- [seq h j | j in A]) F i = \big[*%M/1]_(j in A) F (h j).
+Proof. by rewrite big_map big_enum. Qed.
+
+Lemma big_image_cond_id (J : finType) (h : J -> R) (A : pred J) (P : pred R) :
+  \big[*%M/1]_(i <- [seq h j | j in A] | P i) i
+    = \big[*%M/1]_(j in A | P (h j)) h j.
+Proof. exact: big_image_cond. Qed.
+
+Lemma big_image_id (J : finType) (h : J -> R) (A : pred J) :
+  \big[*%M/1]_(i <- [seq h j | j in A]) i = \big[*%M/1]_(j in A) h j.
+Proof. exact: big_image. Qed.
 
 Lemma reindex_onto (I J : finType) (h : J -> I) h' (P : pred I) F :
    (forall i, P i -> h (h' i) = i) ->
@@ -1635,13 +1704,11 @@ Lemma big_distr_big_dep (I J : finType) j0 (P : pred I) (Q : I -> pred J) F :
      \big[+%M/0]_(f in pfamily j0 P Q) \big[*%M/1]_(i | P i) F i (f i).
 Proof.
 pose fIJ := {ffun I -> J}; pose Pf := pfamily j0 (_ : seq I) Q.
-rewrite -big_filter filter_index_enum; set r := enum P; symmetry.
-transitivity (\big[+%M/0]_(f in Pf r) \big[*%M/1]_(i <- r) F i (f i)).
-  apply: eq_big => f; last by rewrite -big_filter filter_index_enum.
-  by apply: eq_forallb => i; rewrite /= mem_enum.
-have: uniq r by apply: enum_uniq.
-elim: {P}r => /= [_ | i r IHr].
-  rewrite (big_pred1 [ffun => j0]) ?big_nil //= => f.
+have [r big_r [Ur mem_r] _] := big_enumP P.
+symmetry; transitivity (\big[+%M/0]_(f in Pf r) \big[*%M/1]_(i <- r) F i (f i)).
+  by apply: eq_big => // f; apply: eq_forallb => i; rewrite /= mem_r.
+rewrite -{P mem_r}big_r; elim: r Ur => /= [_ | i r IHr].
+  rewrite (big_pred1 [ffun=> j0]) ?big_nil //= => f.
   apply/familyP/eqP=> /= [Df |->{f} i]; last by rewrite ffunE !inE.
   by apply/ffunP=> i; rewrite ffunE; apply/eqP/Df.
 case/andP=> /negbTE nri; rewrite big_cons big_distrl => {IHr}/IHr <-.
@@ -1674,14 +1741,16 @@ Lemma bigA_distr_big_dep (I J : finType) (Q : I -> pred J) F :
   \big[*%M/1]_i \big[+%M/0]_(j | Q i j) F i j
     = \big[+%M/0]_(f in family Q) \big[*%M/1]_i F i (f i).
 Proof.
-case: (pickP J) => [j0 _ | J0]; first exact: (big_distr_big_dep j0).
-rewrite {1 4}/index_enum -enumT; case: (enum I) (mem_enum I) => [I0 | i r _].
-  have f0: I -> J by move=> i; have:= I0 i.
-  rewrite (big_pred1 (finfun f0)) ?big_nil // => g.
-  by apply/familyP/eqP=> _; first apply/ffunP; move => i; have:= I0 i.
-have Q0 i': Q i' =1 pred0 by move=> j; have:= J0 j.
-rewrite big_cons /= big_pred0 // mul0m big_pred0 // => f.
-by apply/familyP=> /(_ i); rewrite [_ \in _]Q0.
+have [j _ | J0] := pickP J; first by rewrite (big_distr_big_dep j).
+have Q0 i: Q i =i pred0 by move=> /J0/esym/notF[].
+transitivity (iter #|I| ( *%M 0) 1).
+  by rewrite -big_const; apply/eq_bigr=> i; have /(big_pred0 _)-> := Q0 i.  
+have [i _ | I0] := pickP I.
+  rewrite (cardD1 i) //= mul0m big_pred0 // => f.
+  by apply/familyP=> /(_ i); rewrite Q0.
+have f: I -> J by move=> /I0/esym/notF[].
+rewrite eq_card0 // (big_pred1 (finfun f)) ?big_pred0 // => g.
+by apply/familyP/eqP=> _; first apply/ffunP; move=> /I0/esym/notF[].
 Qed.
 
 Lemma bigA_distr_big (I J : finType) (Q : pred J) (F : I -> J -> R) :
@@ -1874,3 +1943,7 @@ Notation "@ 'eq_big_perm'" :=
 Notation eq_big_perm :=
   ((fun R idx op I r1 P F r2 => @eq_big_perm R idx op I r1 r2 P F)
         _   _  _ _  _ _ _) (only parsing).
+
+Notation filter_index_enum :=
+  ((fun _ => @deprecated_filter_index_enum _)
+     (deprecate filter_index_enum big_enumP)) (only parsing).

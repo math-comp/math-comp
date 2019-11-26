@@ -2091,7 +2091,7 @@ Lemma mxdirect_delta n f : {in P &, injective f} ->
 Proof.
 pose fP := image f P => Uf; have UfP: uniq fP by apply/dinjectiveP.
 suffices /mxdirectP : mxdirect (\sum_i <<delta_mx 0 i : 'rV[F]_n>>).
-  rewrite /= !(bigID [mem fP] predT) -!big_uniq //= !big_map !big_filter.
+  rewrite /= !(bigID [mem fP] predT) -!big_uniq //= !big_map !big_enum.
   by move/mxdirectP; rewrite mxdirect_addsE => /andP[].
 apply/mxdirectP=> /=; transitivity (mxrank (1%:M : 'M[F]_n)).
   apply/eqmx_rank; rewrite submx1 mx1_sum_delta summx_sub_sums // => i _.

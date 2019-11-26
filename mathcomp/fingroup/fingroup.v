@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div path bigop prime finset.
+From mathcomp Require Import fintype div path tuple bigop prime finset.
 
 (******************************************************************************)
 (* This file defines the main interface for finite groups :                   *)
@@ -858,14 +858,13 @@ Lemma prodsgP (I : finType) (P : pred I) (A : I -> {set gT}) x :
   reflect (exists2 c, forall i, P i -> c i \in A i & x = \prod_(i | P i) c i)
           (x \in \prod_(i | P i) A i).
 Proof.
-rewrite -big_filter filter_index_enum; set r := enum P.
-pose inA c := all (fun i => c i \in A i); set piAx := x \in _.
-suffices IHr: reflect (exists2 c, inA c r & x = \prod_(i <- r) c i) piAx.
-  apply: (iffP IHr) => -[c inAc ->]; do [exists c; last by rewrite big_filter].
-    by move=> i Pi; rewrite (allP inAc) ?mem_enum.
-  by apply/allP=> i; rewrite mem_enum => /inAc.
-have: uniq r by rewrite enum_uniq.
-elim: {P}r x @piAx => /= [x _ | i r IHr x /andP[r'i /IHr{IHr}IHr]].
+have [r big_r [Ur mem_r] _] := big_enumP P.
+pose inA c := all (fun i => c i \in A i); rewrite -big_r; set piAx := x \in _.
+suffices{big_r} IHr: reflect (exists2 c, inA c r & x = \prod_(i <- r) c i) piAx.
+  apply: (iffP IHr) => -[c inAc ->]; do [exists c; last by rewrite big_r].
+    by move=> i Pi; rewrite (allP inAc) ?mem_r.
+  by apply/allP=> i; rewrite mem_r => /inAc.
+elim: {P mem_r}r x @piAx Ur => /= [x _ | i r IHr x /andP[r'i /IHr{IHr}IHr]].
   by rewrite unlock; apply: (iffP set1P) => [-> | [] //]; exists (fun=> x).
 rewrite big_cons; apply: (iffP idP) => [|[c /andP[Aci Ac] ->]]; last first.
   by rewrite big_cons mem_mulg //; apply/IHr=> //; exists c.
@@ -2174,19 +2173,14 @@ Lemma gen_prodgP A x :
 Proof.
 apply: (iffP idP) => [|[n [c Ac ->]]]; last first.
   by apply: group_prod => i _; rewrite mem_gen ?Ac.
-have [n ->] := gen_expgs A; rewrite /expgn /expgn_rec Monoid.iteropE.
-have ->: n = count 'I_n (index_enum _).
-  by rewrite -size_filter filter_index_enum -cardT card_ord.
-rewrite -big_const_seq; case/prodsgP=> /= c Ac def_x.
+have [n ->] := gen_expgs A; rewrite /expgn /expgn_rec Monoid.iteropE /=.
+rewrite -[n]card_ord -big_const => /prodsgP[/= c Ac def_x]. 
 have{Ac def_x} ->: x = \prod_(i | c i \in A) c i.
   rewrite big_mkcond {x}def_x; apply: eq_bigr => i _.
   by case/setU1P: (Ac i isT) => -> //; rewrite if_same.
-rewrite -big_filter; set e := filter _ _; case def_e: e => [|i e'].
-  by exists 0; exists (fun _ => 1) => [[] // |]; rewrite big_nil big_ord0.
-rewrite -{e'}def_e (big_nth i) big_mkord.
-exists (size e); exists (c \o nth i e \o val) => // j /=.
-have: nth i e j \in e by rewrite mem_nth.
-by rewrite mem_filter; case/andP.
+have [e <- [_ /= mem_e] _] := big_enumP [preim c of A].
+pose t := in_tuple e; rewrite -[e]/(val t) big_tuple.
+by exists (size e), (c \o tnth t) => // i; rewrite -mem_e mem_tnth.
 Qed.
 
 Lemma genD A B : A \subset <<A :\: B>> -> <<A :\: B>> = <<A>>.

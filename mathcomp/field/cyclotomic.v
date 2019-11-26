@@ -39,8 +39,9 @@ Proof. exact: monic_prod_XsubC. Qed.
 
 Lemma size_cyclotomic z n : size (cyclotomic z n) = (totient n).+1.
 Proof.
-rewrite /cyclotomic -big_filter filter_index_enum size_prod_XsubC; congr _.+1.
-rewrite -cardE -sum1_card totient_count_coprime -big_mkcond big_mkord.
+rewrite /cyclotomic -big_filter size_prod_XsubC; congr _.+1.
+case: big_enumP => _ _ _ [_ ->].
+rewrite totient_count_coprime -big_mkcond big_mkord -sum1_card.
 by apply: eq_bigl => k; rewrite coprime_sym.
 Qed.
 
@@ -63,14 +64,13 @@ Let n_gt0 := prim_order_gt0 prim_z.
 
 Lemma root_cyclotomic x : root (cyclotomic z n) x = n.-primitive_root x.
 Proof.
-rewrite /cyclotomic -big_filter filter_index_enum.
-rewrite -(big_map _ xpredT (fun y => 'X - y%:P)) root_prod_XsubC.
+transitivity (x \in [seq z ^+ i | i : 'I_n in [pred i : 'I_n | coprime i n]]).
+  by rewrite -root_prod_XsubC big_image.
 apply/imageP/idP=> [[k co_k_n ->] | prim_x].
   by rewrite prim_root_exp_coprime.
 have [k Dx] := prim_rootP prim_z (prim_expr_order prim_x).
-exists (Ordinal (ltn_pmod k n_gt0)) => /=.
-  by rewrite unfold_in /= coprime_modl -(prim_root_exp_coprime k prim_z) -Dx.
-by rewrite prim_expr_mod.
+exists (Ordinal (ltn_pmod k n_gt0)) => /=; last by rewrite prim_expr_mod.
+by rewrite inE coprime_modl -(prim_root_exp_coprime k prim_z) -Dx.
 Qed.
 
 Lemma prod_cyclotomic :
@@ -212,9 +212,7 @@ Proof.
 have [-> | n_gt0] := posnP n; first by rewrite Cyclotomic0 polyseq1.
 have [z prim_z] := C_prim_root_exists n_gt0.
 rewrite -(size_map_inj_poly (can_inj intCK)) //.
-rewrite (Cintr_Cyclotomic prim_z) -[_ n]big_filter filter_index_enum.
-rewrite size_prod_XsubC -cardE totient_count_coprime big_mkord -big_mkcond /=.
-by rewrite (eq_card (fun _ => coprime_sym _ _)) sum1_card.
+by rewrite (Cintr_Cyclotomic prim_z) size_cyclotomic.
 Qed.
 
 Lemma minCpoly_cyclotomic n z :
@@ -252,8 +250,8 @@ have [zk gzk0]: exists zk, root (pZtoC g) zk.
   by exists rg`_0; rewrite Dg root_prod_XsubC mem_nth.
 have [k cokn Dzk]: exists2 k, coprime k n & zk = z ^+ k.
   have: root pz zk by rewrite -Dpz -Dfg rmorphM rootM gzk0 orbT.
-  rewrite -[pz]big_filter -(big_map _ xpredT (fun a => 'X - a%:P)).
-  by rewrite root_prod_XsubC => /imageP[k]; exists k.
+  rewrite -[pz](big_image _ _ _ (fun r => 'X - r%:P)) root_prod_XsubC.
+  by case/imageP=> k; exists k.
 have co_fg (R : idomainType): n%:R != 0 :> R -> @coprimep R (intrp f) (intrp g).
   move=> nz_n; have: separable_poly (intrp ('X^n - 1) : {poly R}).
     by rewrite rmorphB rmorph1 /= map_polyXn separable_Xn_sub_1.

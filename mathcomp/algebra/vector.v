@@ -1879,7 +1879,7 @@ Variable (K : fieldType) (vT : vectType K).
 Lemma sumv_pi_sum (I : finType) (P : pred I) Vs v (V : {vspace vT})
                   (defV : V = (\sum_(i | P i) Vs i)%VS) :
   v \in V -> \sum_(i | P i) sumv_pi_for defV i v = v :> vT.
-Proof. by apply: sumv_pi_uniq_sum; apply: enum_uniq. Qed.
+Proof. by apply: sumv_pi_uniq_sum; have [e _ []] := big_enumP. Qed.
 
 Lemma sumv_pi_nat_sum m n (P : pred nat) Vs v (V : {vspace vT})
                       (defV : V = (\sum_(m <= i < n | P i) Vs i)%VS) :
