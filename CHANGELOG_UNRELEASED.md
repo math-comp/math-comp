@@ -36,9 +36,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `eq_enum_rank_in`, `enum_rank_in_inj`, `lshift_inj`, and
   `rshift_inj`.
 
-- Bigop theorems: `big_rmcond`, `bigD1_seq`,
+- Bigop theorems: `index_enum_uniq`, `big_rmcond`, `bigD1_seq`,
   `big_enum_val_cond`, `big_enum_rank_cond`,
-  `big_enum_val`, `big_enum_rank`, `big_set`.
+  `big_enum_val`, `big_enum_rank`, `big_set`,
+  `big_enumP`, `big_enum_cond`, `big_enum`
 
 - Arithmetic theorems in ssrnat and div:
   - some trivial results in ssrnat: `ltn_predL`, `ltn_predRL`,
@@ -101,7 +102,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Replaced the legacy generalised induction idiom with a more robust one
 that does not rely on the `{-2}` numerical occurrence selector, using
 new `ssrnat` helper lemmas `ltn_ind`, `ubnP`, `ubnPleq`,  ...., (see above). The new idiom is documented in `ssrnat`.
-   This change anticipates an expected evolution of `fintype` to integrate `finmap`. It is likely that the new definition of the `#|A|` notation will hide multiple occurrences of `A`, which will break the `{-2}` induction idiom. Client libraries should update before the 1.11 release.
+   This change anticipates an expected evolution of `fintype` to integrate `finmap`. It is likely that the new definition of the `#|A|` notation will hide multiple occurrences of `A`, which will break the `{-2}` induction idiom. Client libraries should update before the 1.11 release (see [PR #434](https://github.com/math-comp/math-comp/pull/434) for examples).
+   
+ - Replaced the use of the accidental convertibility between `enum A` and 
+   `filter A (index_enum T)` with more explicit lemmas `big_enumP`, `big_enum`, `big_enum_cond`, `big_image` added to the `bigop` library, and deprecated the `filter_index_enum` lemma that states the corresponding equality. Both convertibility and equality may no longer hold in future `mathcomp` releases when sets over `finType`s are generalised to finite sets over `choiceType`s, so client libraries should stop relying on this identity. File `bigop.v` has some boilerplate to help with the port; also see [PR #441](https://github.com/math-comp/math-comp/pull/441) for examples.
+   
+ - Restricted `big_image`, `big_image_cond`, `big_image_id` and `big_image_cond_id`
+ to `bigop`s over _abelian_ monoids, anticipating the change in the definition of `enum`. This may introduce some incompatibilities - non-abelian instances should be dealt with a combination of `big_map` and `big_enumP`.
    
 - `eqVneq` lemma is changed from `{x = y} + {x != y}` to
   `eq_xor_neq x y (y == x) (x == y)`, on which a case analysis performs

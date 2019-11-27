@@ -216,7 +216,8 @@ have FpxF q: Fpx (q ^ FtoL) = root (q ^ FtoL) x.
 pose p_ (I : {set 'I_n}) := \prod_(i <- enum I) ('X - (r`_i)%:P).
 have{px0 Dp} /ex_minset[I /minsetP[/andP[FpI pIx0] minI]]: exists I, Fpx (p_ I).
   exists setT; suffices ->: p_ setT = p ^ FtoL by rewrite FpxF.
-  by rewrite Dp (big_nth 0) big_mkord /p_ (eq_enum (in_set _)) big_filter.
+  rewrite Dp (big_nth 0) big_mkord /p_ big_enum /=.
+  by apply/eq_bigl=> i; rewrite inE.
 have{p} [p DpI]: {p | p_ I = p ^ FtoL}.
   exists (p_ I ^ (fun y => if isF y is left Fy then sval (sig_eqW Fy) else 0)).
   rewrite -map_poly_comp map_poly_id // => y /(allP FpI) /=.

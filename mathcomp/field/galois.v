@@ -448,14 +448,15 @@ pose mkf (z : L) := 'X - z%:P.
 exists (\prod_i \prod_(j < \dim {:L} | j < size (r i)) mkf (r i)`_j).
   apply: rpred_prod => i _; rewrite big_ord_narrow /= /r; case: sigW => rs /=.
   by rewrite (big_nth 0) big_mkord => /eqP <- {rs}; apply: minPolyOver.
-rewrite pair_big_dep /= -big_filter filter_index_enum -(big_map _ xpredT mkf).
+rewrite pair_big_dep /= -big_filter -(big_map _ xpredT mkf).
 set rF := map _ _; exists rF; first exact: eqpxx.
 apply/eqP; rewrite eqEsubv subvf -(span_basis (vbasisP {:L})).
 apply/span_subvP=> _ /tnthP[i ->]; set x := tnth _ i.
 have /tnthP[j ->]: x \in in_tuple (r i).
   by rewrite -root_prod_XsubC /r; case: sigW => _ /=/eqP<-; apply: root_minPoly.
-apply/seqv_sub_adjoin/imageP; rewrite (tnth_nth 0) /in_mem/=.
-by exists (i, widen_ord (sz_r i) j) => /=.
+apply/seqv_sub_adjoin/mapP; rewrite (tnth_nth 0).
+exists (i, widen_ord (sz_r i) j) => //.
+by rewrite mem_filter /= ltn_ord mem_index_enum.
 Qed.
 
 Fact regular_splittingAxiom F : SplittingField.axiom (regular_fieldExtType F).

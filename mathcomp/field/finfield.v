@@ -99,7 +99,7 @@ set n := #|F|; set oppX := - 'X; set pF := LHS.
 have le_oppX_n: size oppX <= n by rewrite size_opp size_polyX finRing_gt1.
 have: size pF = (size (enum F)).+1 by rewrite -cardE size_addl size_polyXn.
 move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
-  by rewrite enumT lead_coefDl ?size_polyXn // lead_coefXn scale1r.
+  by rewrite big_enum lead_coefDl ?size_polyXn // lead_coefXn scale1r.
 by apply/allP=> x _; rewrite rootE !hornerE hornerXn expf_card subrr.
 Qed.
 
@@ -186,7 +186,7 @@ Canonical fieldExt_finFieldType fT := [finFieldType of fT].
 Lemma finField_splittingField_axiom fT : SplittingField.axiom fT.
 Proof.
 exists ('X^#|fT| - 'X); first by rewrite rpredB 1?rpredX ?polyOverX.
-exists (enum fT); first by rewrite enumT finField_genPoly eqpxx.
+exists (enum fT); first by rewrite big_enum finField_genPoly eqpxx.
 by apply/vspaceP=> x; rewrite memvf seqv_sub_adjoin ?mem_enum.
 Qed.
 
@@ -363,9 +363,10 @@ without loss {K} ->: K / K = 1%AS.
   by move=> IH_K; apply: galoisS (IH_K _ (erefl _)); rewrite sub1v subvf.
 apply/splitting_galoisField; pose finL := FinFieldExtType L.
 exists ('X^#|finL| - 'X); split; first by rewrite rpredB 1?rpredX ?polyOverX.
-  rewrite (finField_genPoly finL) -big_filter.
+  rewrite (finField_genPoly finL) -big_enum /=.
   by rewrite separable_prod_XsubC ?(enum_uniq finL).
-exists (enum finL); first by rewrite enumT (finField_genPoly finL) eqpxx.
+exists (enum finL).
+  by rewrite (@big_enum _ _ _ _ finL) (finField_genPoly finL) eqpxx.
 by apply/vspaceP=> x; rewrite memvf seqv_sub_adjoin ?(mem_enum finL).
 Qed.
 
@@ -390,7 +391,7 @@ have idfP x: reflect (f x = x) (x \in 1%VS).
     rewrite /q rmorphB /= map_polyXn map_polyX.
     by rewrite rootE !(hornerE, hornerXn) [x ^+ _]xFx subrr.
   have{q} ->: q = \prod_(z <- [seq b%:A | b : F]) ('X - z%:P).
-    rewrite /q finField_genPoly rmorph_prod big_map enumT.
+    rewrite /q finField_genPoly rmorph_prod big_image /=.
     by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
   by rewrite root_prod_XsubC => /mapP[a]; exists a.
 have fM: rmorphism f.

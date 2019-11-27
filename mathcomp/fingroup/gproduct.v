@@ -634,13 +634,13 @@ Lemma reindex_bigcprod (I J : finType) (h : J -> I) P (A : I -> {set gT}) G x :
     {in SimplPred P, forall i, x i \in A i} ->
   \prod_(i | P i) x i = \prod_(j | P (h j)) x (h j).
 Proof.
-case=> h1 hK h1K; rewrite -!(big_filter _ P) filter_index_enum => defG Ax.
-rewrite -(big_map h P x) -(big_filter _ P) filter_map filter_index_enum.
-apply: perm_bigcprod defG _ _ => [i|]; first by rewrite mem_enum => /Ax.
-apply: uniq_perm (enum_uniq P) _ _ => [|i].
-  by apply/dinjectiveP; apply: (can_in_inj hK).
-rewrite mem_enum; apply/idP/imageP=> [Pi | [j Phj ->//]].
-by exists (h1 i); rewrite ?inE h1K.
+case=> h1 hK h1K defG Ax; have [e big_e [Ue mem_e] _] := big_enumP P.
+rewrite -!big_e in defG *; rewrite -(big_map h P x) -[RHS]big_filter filter_map.
+apply: perm_bigcprod defG _ _ => [i|]; first by rewrite mem_e => /Ax.
+have [r _ [Ur /= mem_r] _] := big_enumP; apply: uniq_perm Ue _ _ => [|i].
+  by rewrite map_inj_in_uniq // => i j; rewrite !mem_r ; apply: (can_in_inj hK).
+rewrite mem_e; apply/idP/mapP=> [Pi|[j r_j ->]]; last by rewrite -mem_r.
+by exists (h1 i); rewrite ?mem_r h1K.
 Qed.
 
 (* Direct product *)
@@ -849,18 +849,20 @@ Lemma mem_bigdprod (I : finType) (P : pred I) F G x :
                 forall i, P i -> e i = c i].
 Proof.
 move=> defG; rewrite -(bigdprodW defG) => /prodsgP[c Fc ->].
-exists c; split=> // e Fe eq_ce i Pi.
-set r := index_enum _ in defG eq_ce.
-have: i \in r by rewrite -[r]enumT mem_enum.
-elim: r G defG eq_ce => // j r IHr G; rewrite !big_cons inE.
-case Pj: (P j); last by case: eqP (IHr G) => // eq_ij; rewrite eq_ij Pj in Pi.
-case/dprodP=> [[K H defK defH] _ _]; rewrite defK defH => tiFjH eq_ce.
-suffices{i Pi IHr} eq_cej: c j = e j.
-  case/predU1P=> [-> //|]; apply: IHr defH _.
+have [r big_r [_ mem_r] _] := big_enumP P.
+exists c; split=> // e Fe eq_ce i Pi; rewrite -!{}big_r in defG eq_ce.
+have{Pi}: i \in r by rewrite mem_r.
+have{mem_r}: all P r by apply/allP=> j; rewrite mem_r.
+elim: r G defG eq_ce => // j r IHr G.
+rewrite !big_cons inE /= => /dprodP[[K H defK defH] _ _].
+rewrite defK defH => tiFjH eq_ce /andP[Pj Pr].
+suffices{i IHr} eq_cej: c j = e j.
+  case/predU1P=> [-> //|]; apply: IHr defH _ Pr.
   by apply: (mulgI (c j)); rewrite eq_ce eq_cej.
 rewrite !(big_nth j) !big_mkord in defH eq_ce.
-move/(congr1 (divgr K H)) : eq_ce; move/bigdprodW: defH => defH.
-by rewrite !divgrMid // -?defK -?defH ?mem_prodg // => *; rewrite ?Fc ?Fe.
+move/(congr1 (divgr K H)): eq_ce; move/bigdprodW: defH => defH.
+move/(all_nthP j) in Pr.
+by rewrite !divgrMid // -?defK -?defH ?mem_prodg // => *; rewrite ?Fc ?Fe ?Pr.
 Qed.
 
 End InternalProd.

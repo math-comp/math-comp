@@ -922,7 +922,10 @@ by rewrite size_XsubC.
 Qed.
 
 Lemma size_exp_XsubC n a : size (('X - a%:P) ^+ n) = n.+1.
-Proof. by rewrite -[n]card_ord -prodr_const size_prod_XsubC cardE enumT. Qed.
+Proof.
+rewrite -[n]card_ord -prodr_const -big_filter size_prod_XsubC.
+by have [e _ _ [_ ->]] := big_enumP.
+Qed.
 
 (* Some facts about regular elements. *)
 
