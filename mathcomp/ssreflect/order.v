@@ -65,7 +65,8 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* This first argument named either d, disp or display, of type unit,         *)
 (* configures the printing of notations.                                      *)
 (* Instantiating d with tt or an unknown key will lead to a default           *)
-(* display for notations, i.e. over these structures, we have:                *)
+(* display for notations, i.e. we have:                                       *)
+(* For x, y of type T, where T is canonically a porderType d:                 *)
 (*            x <= y <-> x is less than or equal to y.                        *)
 (*             x < y <-> x is less than y (:= (y != x) && (x <= y)).          *)
 (*            x >= y <-> x is greater than or equal to y (:= y <= x).         *)
@@ -73,18 +74,23 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*   x <= y ?= iff C <-> x is less than y, or equal iff C is true.            *)
 (*           x >=< y <-> x and y are comparable (:= (x <= y) || (y <= x)).    *)
 (*            x >< y <-> x and y are incomparable (:= ~~ x >=< y).            *)
-(* For lattices we provide the following operations                           *)
+(* For x, y of type T, where T is canonically a distrLatticeType d:           *)
 (*           x `&` y == the meet of x and y.                                  *)
 (*           x `|` y == the join of x and y.                                  *)
+(* In a type T, where T is canonically a bDistrLatticeType d:                 *)
 (*                 0 == the bottom element.                                   *)
-(*                 1 == the top element.                                      *)
-(*           x `\` y == the (sectional) complement of y in [0, x].            *)
-(*              ~` x == the complement of x in [0, 1].                        *)
-(*   \meet_<range> e == iterated meet of a lattice with a top.                *)
 (*   \join_<range> e == iterated join of a lattice with a bottom.             *)
+(* In a type T, where T is canonically a tbDistrLatticeType d:                *)
+(*                 1 == the top element.                                      *)
+(*   \meet_<range> e == iterated meet of a lattice with a top.                *)
+(* For x, y of type T, where T is canonically a cbDistrLatticeType d:         *)
+(*           x `\` y == the (sectional) complement of y in [0, x].            *)
+(* For x of type T, where T is canonically a ctbDistrLatticeType d:           *)
+(*              ~` x == the complement of x in [0, 1].                        *)
 (*                                                                            *)
 (* There are three distinct uses of the symbols                               *)
-(* <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><                                 *)
+(*   <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><                               *)
+(*   in the default display:                                                  *)
 (* they can be 0-ary, unary (prefix), and binary (infix).                     *)
 (* 0. <%O, <=%O, >%O, >=%O, <?=%O, >=<%O, and ><%O stand respectively for     *)
 (*    lt, le, gt, ge, leif (_ <= _ ?= iff _), comparable, and incomparable.   *)
@@ -99,7 +105,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* Alternative notation displays can be defined by :                          *)
 (* 1. declaring a new opaque definition of type unit. Using the idiom         *)
 (*    `Lemma my_display : unit. Proof. exact: tt. Qed.`                       *)
-(* 2. using this symbol to tag canoincal porderType structures using          *)
+(* 2. using this symbol to tag canonical porderType structures using          *)
 (*    `Canonical my_porderType := POrderType my_display my_type my_mixin`,    *)
 (* 3. declaring notations for the main operations of this library, by         *)
 (*    setting the first argument of the definition to the display, e.g.       *)
@@ -108,7 +114,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*    Non overloaded notations will default to the default display.           *)
 (*                                                                            *)
 (* One may use displays either for convenience or to desambiguate between     *)
-(* different structures defined on "copies" of a type.                        *)
+(* different structures defined on "copies" of a type (as explained below.)   *)
 (* We provide the following "copies" of types,                                *)
 (* the first one is a *documented example*                                    *)
 (*            natdvd := nat                                                   *)
@@ -238,7 +244,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*                                                                            *)
 (* Additionally:                                                              *)
 (* - [porderType of _] ... notations are available to recover structures on   *)
-(*    copies of the types, as in eqtype, choicetype, ssralg...                *)
+(*    "copies" of the types, as in eqtype, choicetype, ssralg...              *)
 (* - [finPOrderType of _] ... notations to compute joins between finite types *)
 (*                            and ordered types                               *)
 (*                                                                            *)
@@ -303,27 +309,27 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*   are respectively gcdn and lcmn                                           *)
 (* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
 (*   tbDistrLatticeType, cbDistrLatticeType, ctbDistrLatticeType              *)
-(*   on T *prod[disp] T' a copy of T * T'                                     *)
+(*   on T *prod[disp] T' a "copy" of T * T'                                   *)
 (*     using product order (and T *p T' its specialization to prod_display)   *)
 (* - porderType, distrLatticeType, and orderType,  on T *lexi[disp] T'        *)
-(*     another copy of T * T', with lexicographic ordering                    *)
+(*     another "copy" of T * T', with lexicographic ordering                  *)
 (*     (and T *l T' its specialization to lexi_display)                       *)
 (* - porderType, distrLatticeType, and orderType,  on {t : T & T' x}          *)
 (*     with lexicographic ordering                                            *)
 (* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
 (*   cbDistrLatticeType, tbDistrLatticeType, ctbDistrLatticeType              *)
-(*   on seqprod_with disp T a copy of seq T                                   *)
+(*   on seqprod_with disp T a "copy" of seq T                                 *)
 (*     using product order (and seqprod T' its specialization to prod_display)*)
 (* - porderType, distrLatticeType, and orderType, on seqlexi_with disp T      *)
-(*     another copy of seq T, with lexicographic ordering                     *)
+(*     another "copy" of seq T, with lexicographic ordering                   *)
 (*     (and seqlexi T its specialization to lexi_display)                     *)
 (* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
 (*   cbDistrLatticeType, tbDistrLatticeType, ctbDistrLatticeType              *)
-(*   on n.-tupleprod[disp] a copy of n.-tuple T                               *)
+(*   on n.-tupleprod[disp] a "copy" of n.-tuple T                             *)
 (*     using product order (and n.-tupleprod T its specialization             *)
 (*     to prod_display)                                                       *)
 (* - porderType, distrLatticeType, and orderType,  on n.-tuplelexi[d] T       *)
-(*     another copy of n.-tuple T, with lexicographic ordering                *)
+(*     another "copy" of n.-tuple T, with lexicographic ordering              *)
 (*     (and n.-tuplelexi T its specialization to lexi_display)                *)
 (* and all possible finite type instances                                     *)
 (*                                                                            *)
@@ -4050,12 +4056,12 @@ Import SubOrder.Exports.
 (* We declare two distinct canonical orders:                                  *)
 (* - leq which is total, and where meet and join are minn and maxn, on nat    *)
 (* - dvdn which is partial, and where meet and join are gcdn and lcmn,        *)
-(*   on a copy of nat we name natdiv                                          *)
+(*   on a "copy" of nat we name natdiv                                        *)
 (******************************************************************************)
 
 (******************************************************************************)
 (* The Module NatOrder defines leq as the canonical order on the type nat,    *)
-(* i.e. without creating a copy. We use the predefined total_display, which   *)
+(* i.e. without creating a "copy". We use the predefined total_display, which *)
 (* is designed to parse and print meet and join as minn and maxn. This looks  *)
 (* like standard canonical structure declaration, except we use a display.    *)
 (* We also use a single factory LeOrderMixin to instanciate three different   *)
@@ -4197,7 +4203,7 @@ End DvdSyntax.
 (* is abbreviated using the notation natdvd at the end of the module.         *)
 (* We use the newly defined dvd_display, described above. This looks          *)
 (* like standard canonical structure declaration, except we use a display and *)
-(* we declare it on a copy of the type.                                       *)
+(* we declare it on a "copy" of the type.                                     *)
 (* We first recover structures that are common to both nat and natdiv         *)
 (* (eqType, choiceType, countType) through the clone mechanisms, then we use  *)
 (* a single factory MeetJoinMixin to instanciate both porderType and          *)
@@ -4580,10 +4586,10 @@ Notation "\min^l_ ( i 'in' A ) F" :=
 
 End LexiSyntax.
 
-(***********************************************)
-(* We declare a copy of the cartesian product, *)
-(* which has canonical product order.          *)
-(***********************************************)
+(*************************************************)
+(* We declare a "copy" of the cartesian product, *)
+(* which has canonical product order.            *)
+(*************************************************)
 
 Module ProdOrder.
 Section ProdOrder.
@@ -4966,10 +4972,10 @@ End Exports.
 End SigmaOrder.
 Import SigmaOrder.Exports.
 
-(***********************************************)
-(* We declare a copy of the cartesian product, *)
-(* which has canonical lexicographic order.    *)
-(***********************************************)
+(*************************************************)
+(* We declare a "copy" of the cartesian product, *)
+(* which has canonical lexicographic order.      *)
+(*************************************************)
 
 Module ProdLexiOrder.
 Section ProdLexiOrder.
@@ -5145,10 +5151,10 @@ Canonical prodlexi_finOrderType (T : finOrderType disp1)
 End DefaultProdLexiOrder.
 End DefaultProdLexiOrder.
 
-(***************************************)
-(* We declare a copy of the sequences, *)
-(* which has canonical product order.  *)
-(***************************************)
+(*****************************************)
+(* We declare a "copy" of the sequences, *)
+(* which has canonical product order.    *)
+(*****************************************)
 
 Module SeqProdOrder.
 Section SeqProdOrder.
@@ -5318,7 +5324,7 @@ End DefaultSeqProdOrder.
 End DefaultSeqProdOrder.
 
 (*********************************************)
-(* We declare a copy of the sequences,       *)
+(* We declare a "copy" of the sequences,     *)
 (* which has canonical lexicographic order.  *)
 (*********************************************)
 
@@ -5495,7 +5501,7 @@ End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
 
 (***************************************)
-(* We declare a copy of the tuples,    *)
+(* We declare a "copy" of the tuples,  *)
 (* which has canonical product order.  *)
 (***************************************)
 
@@ -5776,7 +5782,7 @@ End DefaultTupleProdOrder.
 End DefaultTupleProdOrder.
 
 (*********************************************)
-(* We declare a copy of the tuples,          *)
+(* We declare a "copy" of the tuples,        *)
 (* which has canonical lexicographic order.  *)
 (*********************************************)
 
