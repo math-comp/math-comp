@@ -255,7 +255,7 @@ Qed.
 Lemma p2group_abelian P : p.-group P -> logn p #|P| <= 2 -> abelian P.
 Proof.
 move=> pP lePp2; pose Z := 'Z(P); have sZP: Z \subset P := center_sub P.
-case: (eqVneq Z 1); first by move/(trivg_center_pgroup pP)->; apply: abelian1.
+have [/(trivg_center_pgroup pP) ->|] := eqVneq Z 1; first exact: abelian1.
 case/(pgroup_pdiv (pgroupS sZP pP)) => p_pr _ [k oZ].
 apply: cyclic_center_factor_abelian.
 have [->|] := eqVneq (P / Z) 1; first exact: cyclic1.

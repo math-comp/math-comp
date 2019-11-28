@@ -1774,7 +1774,7 @@ Lemma real_wlog_ltr P :
   forall a b : R, a \is real -> b \is real -> P a b.
 Proof.
 move=> rP sP hP; apply: real_wlog_ler=> // a b.
-rewrite le_eqVlt; case: eqVneq => [->|] //= _ lab; exact: hP.
+by rewrite le_eqVlt; case: eqVneq => [->|] //= _ /hP.
 Qed.
 
 (* Monotony of addition *)
@@ -5003,7 +5003,7 @@ Qed.
 
 Fact le_total : total (le m).
 Proof.
-move=> x y; rewrite !le_def; case: eqVneq => [->|] //=; rewrite -subr_eq0.
+move=> x y; rewrite !le_def; have [->|] //= := eqVneq; rewrite -subr_eq0.
 by move/(lt0_total m); rewrite -(sub_gt0 _ (x - y)) sub0r opprB !sub_gt0 orbC.
 Qed.
 

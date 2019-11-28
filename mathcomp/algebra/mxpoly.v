@@ -184,9 +184,9 @@ pose rj0T (A : 'M[{poly R}]_dS) := row j0 A^T.
 have: rj0T (Ss_ dj.+1) = 'X^dj *: rj0T (S_ j1) + 1 *: rj0T (Ss_ dj).
   apply/rowP=> i; apply/polyP=> k; rewrite scale1r !(Sylvester_mxE, mxE) eqxx.
   rewrite coefD coefXnM coefC !coef_poly ltnS subn_eq0 ltn_neqAle andbC.
-  case: (leqP k dj) => [k_le_dj | k_gt_dj] /=; last by rewrite addr0.
+  have [k_le_dj | k_gt_dj] /= := leqP k dj; last by rewrite addr0.
   rewrite Sylvester_mxE insubdK; last exact: leq_ltn_trans (ltjS).
-  by case: eqP => [-> | _]; rewrite (addr0, add0r).
+  by have [->|] := eqP; rewrite (addr0, add0r).
 rewrite -det_tr => /determinant_multilinear->;
   try by apply/matrixP=> i j; rewrite !mxE eq_sym (negPf (neq_lift _ _)).
 have [dj0 | dj_gt0] := posnP dj; rewrite ?dj0 !mul1r.
@@ -320,7 +320,7 @@ rewrite [char_poly](bigD1 1%g) //=; set q := \sum_(s | _) _; exists q.
 apply: leq_trans {q}(size_sum _ _ _) _; apply/bigmax_leqP=> s nt_s.
 have{nt_s} [i nfix_i]: exists i, s i != i.
   apply/existsP; rewrite -negb_forall; apply: contra nt_s => s_1.
-  by apply/eqP; apply/permP=> i; apply/eqP; rewrite perm1 (forallP s_1).
+  by apply/eqP/permP=> i; apply/eqP; rewrite perm1 (forallP s_1).
 apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
   rewrite -sum1_card (@big_mkcond nat) /= size_Msign.
   apply: (big_ind2 (fun p m => size p <= m.+1)) => [| p mp q mq IHp IHq | j _].
@@ -330,7 +330,7 @@ apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
   rewrite !mxE eq_sym !inE; case: (s j == j); first by rewrite polyseqXsubC.
   by rewrite sub0r size_opp size_polyC leq_b1.
 rewrite -[n in n.-1]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
-apply: subset_leq_card; apply/subsetP=> j; move/(_ =P j)=> fix_j.
+apply/subset_leq_card/subsetP=> j /(_ =P j) fix_j.
 rewrite !inE -{1}fix_j (inj_eq perm_inj) orbb.
 by apply: contraNneq nfix_i => <-; rewrite fix_j.
 Qed.
@@ -503,9 +503,8 @@ Local Notation Ad := (powers_mx A d).
 
 Lemma mxminpoly_nonconstant : d > 0.
 Proof.
-rewrite /d; case: ex_minnP; case=> //; rewrite leqn0 mxrank_eq0; move/eqP.
-move/row_matrixP; move/(_ 0); move/eqP; rewrite rowK row0 mxvec_eq0.
-by rewrite -mxrank_eq0 mxrank1.
+rewrite /d; case: ex_minnP => -[] //; rewrite leqn0 mxrank_eq0; move/eqP.
+by move/row_matrixP/(_ 0)/eqP; rewrite rowK row0 mxvec_eq0 -mxrank_eq0 mxrank1.
 Qed.
 
 Lemma minpoly_mx1 : (1%:M \in Ad)%MS.
@@ -515,9 +514,8 @@ Qed.
 
 Lemma minpoly_mx_free : row_free Ad.
 Proof.
-have:= mxminpoly_nonconstant; rewrite /d; case: ex_minnP; case=> // d' _.
-move/(_ d'); move/implyP; rewrite ltnn implybF -ltnS ltn_neqAle.
-by rewrite rank_leq_row andbT negbK.
+have:= mxminpoly_nonconstant; rewrite /d; case: ex_minnP => -[] // d' _ /(_ d').
+by move/implyP; rewrite ltnn implybF -ltnS ltn_neqAle rank_leq_row andbT negbK.
 Qed.
 
 Lemma horner_mx_mem p : (horner_mx A p \in Ad)%MS.
@@ -554,7 +552,7 @@ Qed.
 
 Lemma minpoly_mx_ring : mxring Ad.
 Proof.
-apply/andP; split; first by apply/mulsmx_subP; apply: minpoly_mxM.
+apply/andP; split; first exact/mulsmx_subP/minpoly_mxM.
 apply/mxring_idP; exists 1%:M; split=> *; rewrite ?mulmx1 ?mul1mx //.
   by rewrite -mxrank_eq0 mxrank1.
 exact: minpoly_mx1.
@@ -620,7 +618,7 @@ by rewrite -rmorphM horner_mx_C -rmorphD /= scalar_mx_is_scalar.
 Qed.
 
 Lemma mxminpoly_dvd_char : p_A %| char_poly A.
-Proof. by apply: mxminpoly_min; apply: Cayley_Hamilton. Qed.
+Proof. exact/mxminpoly_min/Cayley_Hamilton. Qed.
 
 Lemma eigenvalue_root_min a : eigenvalue A a = root p_A a.
 Proof.
@@ -826,7 +824,7 @@ pose gen1 x E y := exists2 r, pXin E r & y = r.[x]; pose gen := foldr gen1 memR.
 have gen1S (E : K -> Prop) x y: E 0 -> E y -> gen1 x E y.
   by exists y%:P => [i|]; rewrite ?hornerC ?coefC //; case: ifP.
 have genR S y: memR y -> gen S y.
-  by elim: S => //= x S IH in y * => /IH; apply: gen1S; apply: IH.
+  by elim: S => //= x S IH in y * => /IH; apply/gen1S/IH.
 have gen0 := genR _ 0 memR0; have gen_1 := genR _ 1 memR1.
 have{gen1S} genS S y: y \in S -> gen S y.
   elim: S => //= x S IH /predU1P[-> | /IH//]; last exact: gen1S.

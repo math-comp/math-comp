@@ -243,7 +243,7 @@ Lemma in_setT x : x \in setTfor (Phant T).
 Proof. by rewrite in_set. Qed.
 
 Lemma eqsVneq A B : eq_xor_neq A B (B == A) (A == B).
-Proof. by apply: eqVneq. Qed.
+Proof. exact: eqVneq. Qed.
 
 Lemma eq_finset (pA pB : pred T) : pA =1 pB -> finset pA = finset pB.
 Proof. by move=> eq_p; apply/setP => x; rewrite !(in_set, inE) eq_p. Qed.
@@ -862,7 +862,7 @@ Proof. by case/orP; apply: subset_trans; rewrite (subsetIl, subsetIr). Qed.
 
 Lemma subsetI A B C : (A \subset B :&: C) = (A \subset B) && (A \subset C).
 Proof.
-rewrite !(sameP setIidPl eqP) setIA; have [-> //| ] := altP (A :&: B =P A).
+rewrite !(sameP setIidPl eqP) setIA; have [-> //|] := eqVneq (A :&: B) A.
 by apply: contraNF => /eqP <-; rewrite -setIA -setIIl setIAC.
 Qed.
 
@@ -1428,7 +1428,7 @@ Proof.
 move=> injh; pose hA := mem (image h A).
 have [x0 Ax0 | A0] := pickP A; last first.
   by rewrite !big_pred0 // => x; apply/imsetP=> [[i]]; rewrite unfold_in A0.
-rewrite (eq_bigl hA) => [|j]; last by apply/imsetP/imageP.
+rewrite (eq_bigl hA) => [|j]; last exact/imsetP/imageP.
 pose h' j := if insub j : {? j | hA j} is Some u then iinv (svalP u) else x0.
 rewrite (reindex_onto h h') => [|j hAj]; rewrite {}/h'; last first.
   by rewrite (insubT hA hAj) f_iinv.

@@ -2404,7 +2404,7 @@ Lemma comparable_ltgtP x y : x >=< y ->
   compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
 rewrite />=<%O !le_eqVlt [y == x]eq_sym.
-have := (altP (x =P y), (boolP (x < y), boolP (y < x))).
+have := (eqVneq x y, (boolP (x < y), boolP (y < x))).
 move=> [[->//|neq_xy /=] [[] xy [] //=]] ; do ?by rewrite ?ltxx; constructor.
   by rewrite ltxx in xy.
 by rewrite le_gtF // ltW.
@@ -3065,7 +3065,7 @@ Variant eq0_xor_gt0 x : bool -> bool -> Set :=
   | POsNotEq0 : 0 < x -> eq0_xor_gt0 x false true.
 
 Lemma posxP x : eq0_xor_gt0 x (x == 0) (0 < x).
-Proof. by rewrite lt0x; have [] := altP eqP; constructor; rewrite ?lt0x. Qed.
+Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
 
 Canonical join_monoid := Monoid.Law (@joinA _ _) join0x joinx0.
 Canonical join_comoid := Monoid.ComLaw (@joinC _ _).
@@ -3430,7 +3430,7 @@ Proof. by rewrite subUx subxx join0x. Qed.
 
 Lemma disj_le x y : x `&` y == 0 -> x <= y = (x == 0).
 Proof.
-have [->|x_neq0] := altP (x =P 0); first by rewrite le0x.
+have [->|x_neq0] := eqVneq x 0; first by rewrite le0x.
 by apply: contraTF => lexy; rewrite (meet_idPl _).
 Qed.
 
@@ -3826,10 +3826,7 @@ Let T_total_porderType : porderType tt :=
   POrderType tt T (LtPOrderMixin (le_def m) (lt_irr m) (@lt_trans _ m)).
 
 Fact le_total : total (le m).
-Proof.
-move=> x y; rewrite !le_def (eq_sym y).
-by case: (altP eqP); last exact: lt_total.
-Qed.
+Proof. by move=> x y; rewrite !le_def; case: eqVneq; last exact: lt_total. Qed.
 
 Let T_total_distrLatticeType : distrLatticeType tt :=
   DistrLatticeType T_total_porderType

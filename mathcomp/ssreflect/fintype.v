@@ -694,7 +694,7 @@ Lemma eq_subxx A B : A =i B -> A \subset B.
 Proof. by move/eq_subset->. Qed.
 
 Lemma subset_predT A : A \subset T.
-Proof. by apply/subsetP. Qed.
+Proof. exact/subsetP. Qed.
 
 Lemma predT_subset A : T \subset A -> forall x, x \in A.
 Proof. by move/subsetP=> allA x; apply: allA. Qed.
@@ -1240,7 +1240,7 @@ Lemma image_f A x : x \in A -> f x \in image f A.
 Proof. by move=> Ax; apply/imageP; exists x. Qed.
 
 Lemma codom_f x : f x \in codom f.
-Proof. by apply: image_f. Qed.
+Proof. exact: image_f. Qed.
 
 Lemma image_codom A : {subset image f A <= codom f}.
 Proof. by move=> _ /imageP[x _ ->]; apply: codom_f. Qed.

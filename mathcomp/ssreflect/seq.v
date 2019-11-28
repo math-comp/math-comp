@@ -429,7 +429,7 @@ Qed.
 Lemma set_set_nth s n1 y1 n2 y2 (s2 := set_nth s n2 y2) :
   set_nth (set_nth s n1 y1) n2 y2 = if n1 == n2 then s2 else set_nth s2 n1 y1.
 Proof.
-have [-> | ne_n12] := altP eqP.
+have [-> | ne_n12] := eqVneq.
   apply: eq_from_nth => [|i _]; first by rewrite !size_set_nth maxnA maxnn.
   by do 2!rewrite !nth_set_nth /=; case: eqP.
 apply: eq_from_nth => [|i _]; first by rewrite !size_set_nth maxnCA.
@@ -2239,7 +2239,7 @@ Lemma nth_index_map s x0 x :
   {in s &, injective f} -> x \in s -> nth x0 s (index (f x) (map f s)) = x.
 Proof.
 elim: s => //= y s IHs inj_f s_x; rewrite (inj_in_eq inj_f) ?mem_head //.
-move: s_x; rewrite inE; case: eqVneq => [-> | _] //=; apply: IHs.
+move: s_x; rewrite inE; have [-> // | _] := eqVneq; apply: IHs.
 by apply: sub_in2 inj_f => z; apply: predU1r.
 Qed.
 

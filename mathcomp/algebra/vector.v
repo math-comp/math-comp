@@ -205,7 +205,7 @@ by exists (fun r => sval (r2vP r)) => r; case: (r2vP r).
 Qed.
 Definition r2v := sval r2v_subproof.
 
-Lemma r2vK : cancel r2v v2r.   Proof. exact: (svalP r2v_subproof). Qed.
+Lemma r2vK : cancel r2v v2r.   Proof. exact: svalP r2v_subproof. Qed.
 Lemma r2v_inj : injective r2v. Proof. exact: can_inj r2vK. Qed.
 Lemma v2rK : cancel v2r r2v.   Proof. by have/bij_can_sym:= r2vK; apply. Qed.
 Lemma v2r_inj : injective v2r. Proof. exact: can_inj v2rK. Qed.
@@ -437,11 +437,11 @@ Canonical memv_addrPred U := AddrPred (memv_submod_closed U).
 Canonical memv_zmodPred U := ZmodPred (memv_submod_closed U).
 Canonical memv_submodPred U := SubmodPred (memv_submod_closed U).
 
-Lemma mem0v U : 0 \in U. Proof. exact : rpred0. Qed.
+Lemma mem0v U : 0 \in U. Proof. exact: rpred0. Qed.
 Lemma memvN U v : (- v \in U) = (v \in U). Proof. exact: rpredN. Qed.
-Lemma memvD U : {in U &, forall u v, u + v \in U}. Proof. exact : rpredD. Qed.
-Lemma memvB U : {in U &, forall u v, u - v \in U}. Proof. exact : rpredB. Qed.
-Lemma memvZ U k : {in U, forall v, k *: v \in U}. Proof. exact : rpredZ. Qed.
+Lemma memvD U : {in U &, forall u v, u + v \in U}. Proof. exact: rpredD. Qed.
+Lemma memvB U : {in U &, forall u v, u - v \in U}. Proof. exact: rpredB. Qed.
+Lemma memvZ U k : {in U, forall v, k *: v \in U}. Proof. exact: rpredZ. Qed.
 
 Lemma memv_suml I r (P : pred I) vs U :
   (forall i, P i -> vs i \in U) -> \sum_(i <- r | P i) vs i \in U.
@@ -900,7 +900,7 @@ have: \sum_(j | P j) [eta us with i |-> - v] j = 0.
   rewrite (bigD1 i) //= eqxx {1}Dv addrC -sumrB big1 // => j /andP[_ i'j].
   by rewrite (negPf i'j) subrr.
 move/dxU/(_ i Pi); rewrite /= eqxx -oppr_eq0 => -> // j Pj.
-by have [-> | i'j] := altP eqP; rewrite ?memvN // Uu ?Pj.
+by have [-> | i'j] := eqVneq; rewrite ?memvN // Uu ?Pj.
 Qed.
 
 Lemma directv_sum_unique {Us : I -> {vspace vT}} :
@@ -1170,7 +1170,7 @@ Qed.
 Lemma perm_basis X Y U : perm_eq X Y -> basis_of U X = basis_of U Y.
 Proof.
 move=> eqXY; congr ((_ == _) && _); last exact: perm_free.
-by apply/eq_span; apply: perm_mem.
+exact/eq_span/perm_mem.
 Qed.
 
 Lemma vbasisP U : basis_of U (vbasis U).
@@ -1182,7 +1182,7 @@ by rewrite row_base_free !eq_row_base submx_refl.
 Qed.
 
 Lemma vbasis_mem v U : v \in (vbasis U) -> v \in U.
-Proof. exact: (basis_mem (vbasisP _)). Qed.
+Proof. exact: basis_mem (vbasisP _). Qed.
 
 Lemma coord_vbasis v U :
   v \in U -> v = \sum_(i < \dim U) coord (vbasis U) i v *: (vbasis U)`_i.
@@ -1829,7 +1829,7 @@ Proof. by rewrite addv_pi2_id ?memv_pi2. Qed.
 
 Lemma addv_pi1_pi2 U V w :
   w \in (U + V)%VS -> addv_pi1 U V w + addv_pi2 U V w = w.
-Proof. by rewrite -addv_diff; apply: daddv_pi_add; apply: capv_diff. Qed.
+Proof. by rewrite -addv_diff; exact/daddv_pi_add/capv_diff. Qed.
 
 Section Sumv_Pi.
 
@@ -2044,4 +2044,3 @@ by apply/ffunP=> i; rewrite (lfunE (Linear lhsZ)) !ffunE sol_u.
 Qed.
 
 End Solver.
-

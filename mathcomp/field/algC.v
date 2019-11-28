@@ -166,7 +166,7 @@ have normD x y : le (norm (x + y)) (norm x + norm y).
     have [-> | nz_u u_ge0 v_ge0] := eqVneq u 0; first by rewrite add0r.
     by have /andP[]: lt 0 (u + v) by rewrite sposDl // /lt nz_u.
   have le_sqr u v: conj u = u -> le 0 v -> le (u ^+ 2) (v ^+ 2) -> le u v.
-    move=> Ru v_ge0; have [-> // | nz_u] := eqVneq u 0.
+    case: (eqVneq u 0) => [-> //|nz_u Ru v_ge0].
     have [u_gt0 | u_le0 _] := boolP (lt 0 u).
       by rewrite leB (leB u) subr_sqr mulrC addrC; apply: sposM; apply: sposDl.
     rewrite leB posD // posE normN -addr_eq0; apply/eqP.
@@ -931,7 +931,7 @@ Qed.
 
 Lemma dvdCP x y : reflect (exists2 z, z \in Cint & y = z * x) (x %| y)%C.
 Proof.
-rewrite unfold_in; have [-> | nz_x] := altP eqP.
+rewrite unfold_in; have [-> | nz_x] := eqVneq.
   by apply: (iffP eqP) => [-> | [z _ ->]]; first exists 0; rewrite ?mulr0.
 apply: (iffP idP) => [Zyx | [z Zz ->]]; last by rewrite mulfK.
 by exists (y / x); rewrite ?divfK.
@@ -990,7 +990,7 @@ Canonical dvdC_zmodPred x := ZmodPred (dvdC_zmod x).
 Lemma dvdC_nat (p n : nat) : (p %| n)%C = (p %| n)%N.
 Proof.
 rewrite unfold_in CintEge0 ?divr_ge0 ?invr_ge0 ?ler0n // !pnatr_eq0.
-have [-> | nz_p] := altP eqP; first by rewrite dvd0n.
+have [-> | nz_p] := eqVneq; first by rewrite dvd0n.
 apply/CnatP/dvdnP=> [[q def_q] | [q ->]]; exists q.
   by apply/eqP; rewrite -eqC_nat natrM -def_q divfK ?pnatr_eq0.
 by rewrite [num in num / _]natrM mulfK ?pnatr_eq0.

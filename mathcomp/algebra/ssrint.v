@@ -743,7 +743,7 @@ Lemma commrMz (x y : R) n : GRing.comm x y -> GRing.comm x (y *~ n).
 Proof. by rewrite /GRing.comm=> com_xy; rewrite mulrzAr mulrzAl com_xy. Qed.
 
 Lemma commr_int (x : R) n : GRing.comm x n%:~R.
-Proof. by apply: commrMz; apply: commr1. Qed.
+Proof. exact/commrMz/commr1. Qed.
 
 End Zintmul1rMorph.
 
@@ -1070,7 +1070,7 @@ Qed.
 Lemma exprzDr x (ux : x \is a GRing.unit) m n : x ^ (m + n) = x ^ m * x ^ n.
 Proof.
 move: n m; apply: wlog_le=> n m hnm.
-  by rewrite addrC hnm commrXz //; apply: commr_sym; apply: commrXz.
+  by rewrite addrC hnm commrXz //; exact/commr_sym/commrXz.
 case: (intP m) hnm=> {m} [|m|m]; rewrite ?mul1r ?add0r //;
  case: (intP n)=> {n} [|n|n _]; rewrite ?mulr1 ?addr0 //;
    do ?by rewrite exprzD_ss.
@@ -1115,14 +1115,11 @@ Proof. by rewrite exprz_pmulzl // exp1rz. Qed.
 
 Lemma exprzMzl x m n (ux : x \is a GRing.unit) (um : m%:~R \is a @GRing.unit R):
    (x *~ m) ^ n = (m%:~R ^ n) * x ^ n :> R.
-Proof.
-rewrite -[x *~ _]mulrzl exprMz_comm //.
-by apply: commr_sym; apply: commr_int.
-Qed.
+Proof. rewrite -[x *~ _]mulrzl exprMz_comm //; exact/commr_sym/commr_int. Qed.
 
 Lemma expNrz x n : (- x) ^ n = (-1) ^ n * x ^ n :> R.
 Proof.
-case: n=> [] n; rewrite ?NegzE; first by apply: exprNn.
+case: n=> [] n; rewrite ?NegzE; first exact: exprNn.
 by rewrite -!exprz_inv !invrN invr1; apply: exprNn.
 Qed.
 
@@ -1182,7 +1179,7 @@ Lemma expfz_n0addr x m n : m + n != 0 -> x ^ (m + n) = x ^ m * x ^ n.
 Proof.
 have [-> hmn|nx0 _] := eqVneq x 0; last exact: expfzDr.
 rewrite !exp0rz (negPf hmn).
-case: (altP (m =P 0)) hmn=> [->|]; rewrite (mul0r, mul1r) //.
+case: (eqVneq m 0) hmn => [->|]; rewrite (mul0r, mul1r) //.
 by rewrite add0r=> /negPf->.
 Qed.
 
@@ -1190,7 +1187,7 @@ Lemma expfzMl x y n : (x * y) ^ n = x ^ n * y ^ n.
 Proof.
 have [->|/negPf n0] := eqVneq n 0; first by rewrite !expr0z mulr1.
 case: (boolP ((x * y) == 0)); rewrite ?mulf_eq0.
-  by case/orP=> /eqP->; rewrite ?(mul0r, mulr0, exp0rz, n0).
+  by case/pred2P=> ->; rewrite ?(mul0r, mulr0, exp0rz, n0).
 by case/norP=> x0 y0; rewrite exprzMl ?unitfE.
 Qed.
 
@@ -1228,7 +1225,7 @@ Lemma ler_wniexpz2l x (x0 : 0 <= x) (x1 : x <= 1) :
 Proof.
 move=> [] m [] n; rewrite ?NegzE -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 rewrite ler_opp2 lez_nat -?invr_expz=> hmn; move: (x0).
-rewrite le0r=> /orP [/eqP->|lx0]; first by rewrite !exp0rz invr0.
+rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
 by rewrite lef_pinv -?topredE /= ?exprz_gt0 // ler_wiexpn2l.
 Qed.
 
@@ -1318,9 +1315,9 @@ Qed.
 
 Lemma pexpIrz n (n0 : n != 0) : {in >= 0 &, injective ((@exprz R)^~ n)}.
 Proof.
-move=> x y; rewrite ![_ \in _]le0r=> /orP [/eqP-> _ /eqP|hx].
+move=> x y; rewrite ![_ \in _]le0r=> /predU1P [-> _ /eqP|hx].
   by rewrite exp0rz ?(negPf n0) eq_sym expfz_eq0=> /andP [_ /eqP->].
-case/orP=> [/eqP-> /eqP|hy].
+case/predU1P=> [-> /eqP|hy].
   by rewrite exp0rz ?(negPf n0) expfz_eq0=> /andP [_ /eqP].
 move=> /(f_equal ( *%R^~ (y ^ (- n)))) /eqP.
 rewrite -expfzDr ?(gt_eqF hy) // subrr expr0z -exprz_inv -expfzMl.
@@ -1330,9 +1327,9 @@ Qed.
 
 Lemma nexpIrz n (n0 : n != 0) : {in <= 0 &, injective ((@exprz R)^~ n)}.
 Proof.
-move=> x y; rewrite ![_ \in _]le_eqVlt => /orP [/eqP -> _ /eqP|hx].
+move=> x y; rewrite ![_ \in _]le_eqVlt => /predU1P [-> _ /eqP|hx].
   by rewrite exp0rz ?(negPf n0) eq_sym expfz_eq0=> /andP [_ /eqP->].
-case/orP=> [/eqP -> /eqP|hy].
+case/predU1P=> [-> /eqP|hy].
   by rewrite exp0rz ?(negPf n0) expfz_eq0=> /andP [_ /eqP].
 move=> /(f_equal ( *%R^~ (y ^ (- n)))) /eqP.
 rewrite -expfzDr ?(lt_eqF hy) // subrr expr0z -exprz_inv -expfzMl.

@@ -1240,8 +1240,7 @@ Proof.
 by move=> reg_x; elim: n => [|n]; [apply: lreg1 | rewrite exprS; apply: lregM].
 Qed.
 
-Lemma lreg_sign n : lreg ((-1) ^+ n : R).
-Proof. by apply: lregX; apply: lregN; apply: lreg1. Qed.
+Lemma lreg_sign n : lreg ((-1) ^+ n : R). Proof. exact/lregX/lregN/lreg1. Qed.
 
 Lemma prodr_const (I : finType) (A : pred I) (x : R) :
   \prod_(i in A) x = x ^+ #|A|.
@@ -2554,7 +2553,7 @@ Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
 
 Lemma exprMn n : {morph (fun x => x ^+ n) : x y / x * y}.
-Proof. by move=> x y; apply: exprMn_comm; apply: mulrC. Qed.
+Proof. by move=> x y; exact/exprMn_comm/mulrC. Qed.
 
 Lemma prodrXl n I r (P : pred I) (F : I -> R) :
   \prod_(i <- r | P i) F i ^+ n = (\prod_(i <- r | P i) F i) ^+ n.
@@ -3413,7 +3412,7 @@ Variable R : comUnitRingType.
 Implicit Types x y : R.
 
 Lemma unitrM x y : (x * y \in unit) = (x \in unit) && (y \in unit).
-Proof. by apply: unitrM_comm; apply: mulrC. Qed.
+Proof. exact/unitrM_comm/mulrC. Qed.
 
 Lemma unitrPr x : reflect (exists y, x * y = 1) (x \in unit).
 Proof.
@@ -4501,7 +4500,7 @@ apply/existsP/idP=> [[p] | true_at_P].
   rewrite ((big_morph qev) true andb) //= big_andE /=.
   case/andP=> /forallP-eq_p_P.
   rewrite (@eq_pick _ _ P) => [|i]; first by case: pick.
-  by move/(_ i): eq_p_P => /=; case: (p i) => //=; move/negbTE.
+  by move/(_ i): eq_p_P => /=; case: (p i) => //= /negPf.
 exists [ffun i => P i] => /=; apply/andP; split.
   rewrite ((big_morph qev) true andb) //= big_andE /=.
   by apply/forallP=> i; rewrite /= ffunE; case Pi: (P i) => //=; apply: negbT.
@@ -4863,8 +4862,8 @@ Definition divfK := mulfVK.
 
 Lemma invfM : {morph @inv F : x y / x * y}.
 Proof.
-move=> x y; case: (eqVneq x 0) => [-> |nzx]; first by rewrite !(mul0r, invr0).
-case: (eqVneq y 0) => [-> |nzy]; first by rewrite !(mulr0, invr0).
+move=> x y; have [->|nzx] := eqVneq x 0; first by rewrite !(mul0r, invr0).
+have [->|nzy] := eqVneq y 0; first by rewrite !(mulr0, invr0).
 by rewrite mulrC invrM ?unitfE.
 Qed.
 
@@ -4877,7 +4876,7 @@ Proof. by move=> nz_x y; rewrite invf_div mulrC divfK. Qed.
 Lemma expfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof.
 move/subnK=> <-; rewrite addnA addnK !exprD.
-have [-> | nz_x] := altP eqP; first by rewrite !mulr0 !mul0r.
+have [-> | nz_x] := eqVneq; first by rewrite !mulr0 !mul0r.
 by rewrite mulfK ?expf_neq0.
 Qed.
 
@@ -4922,7 +4921,7 @@ Variables (R : ringType) (f : {rmorphism F -> R}).
 
 Lemma fmorph_eq0 x : (f x == 0) = (x == 0).
 Proof.
-have [-> | nz_x] := altP (x =P _); first by rewrite rmorph0 eqxx.
+have [-> | nz_x] := eqVneq x; first by rewrite rmorph0 eqxx.
 apply/eqP; move/(congr1 ( *%R (f x^-1)))/eqP.
 by rewrite -rmorphM mulVf // mulr0 rmorph1 ?oner_eq0.
 Qed.
@@ -4947,7 +4946,7 @@ Variables (R : unitRingType) (f : {rmorphism F -> R}).
 
 Lemma fmorph_unit x : (f x \in unit) = (x != 0).
 Proof.
-have [-> |] := altP (x =P _); first by rewrite rmorph0 unitr0.
+have [-> |] := eqVneq x; first by rewrite rmorph0 unitr0.
 by rewrite -unitfE; apply: rmorph_unit.
 Qed.
 
@@ -4980,14 +4979,14 @@ Proof. by move=> nz_a; apply: can_inj (scalerK nz_a). Qed.
 
 Lemma scaler_eq0 a v : (a *: v == 0) = (a == 0) || (v == 0).
 Proof.
-have [-> | nz_a] := altP (a =P _); first by rewrite scale0r eqxx.
+have [-> | nz_a] := eqVneq a; first by rewrite scale0r eqxx.
 by rewrite (can2_eq (scalerK nz_a) (scalerKV nz_a)) scaler0.
 Qed.
 
 Lemma rpredZeq S (modS : submodPred S) (kS : keyed_pred modS) a v :
   (a *: v \in kS) = (a == 0) || (v \in kS).
 Proof.
-have [-> | nz_a] := altP eqP; first by rewrite scale0r rpred0.
+have [-> | nz_a] := eqVneq; first by rewrite scale0r rpred0.
 by apply/idP/idP; first rewrite -{2}(scalerK nz_a v); apply: rpredZ.
 Qed.
 
@@ -5204,7 +5203,7 @@ suffices or_wf fs : let ofs := foldr Or False fs in
 - apply: or_wf.
   suffices map_proj_wf bcs: let mbcs := map (proj n) bcs in
     all dnf_rterm bcs -> all (@qf_form _) mbcs && all (@rformula _) mbcs.
-    by apply: map_proj_wf; apply: qf_to_dnf_rterm.
+    by apply/map_proj_wf/qf_to_dnf_rterm.
   elim: bcs => [|bc bcs ihb] bcsr //= /andP[rbc rbcs].
   by rewrite andbAC andbA wf_proj //= andbC ihb.
 elim: fs => //= g gs ihg; rewrite -andbA => /and4P[-> qgs -> rgs] /=.

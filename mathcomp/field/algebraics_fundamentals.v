@@ -582,7 +582,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose abs v := if le 0 v then v else - v.
   have absN v: abs (- v) = abs v.
     rewrite /abs /le !(eq_sym 0) oppr_eq0 opprK posN.
-    have [-> | /posVneg/orP[v_gt0 | v_lt0]] := altP eqP; first by rewrite oppr0.
+    have [-> | /posVneg/orP[v_gt0 | v_lt0]] := eqVneq; first by rewrite oppr0.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
