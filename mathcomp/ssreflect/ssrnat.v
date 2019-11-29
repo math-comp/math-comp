@@ -891,6 +891,7 @@ Section Iteration.
 Variable T : Type.
 Implicit Types m n : nat.
 Implicit Types x y : T.
+Implicit Types S : {pred T}.
 
 Definition iter n f x :=
   let fix loop m := if m is i.+1 then f (loop i) else x in loop n.
@@ -926,6 +927,9 @@ Proof. by move=> eq_f n x; elim: n => //= n ->; rewrite eq_f. Qed.
 
 Lemma eq_iterop n op op' : op =2 op' -> iterop n op =2 iterop n op'.
 Proof. by move=> eq_op x; apply: eq_iteri; case. Qed.
+
+Lemma iter_in f S i : {homo f : x / x \in S} -> {homo iter i f : x / x \in S}.
+Proof. by move=> f_in x xS; elim: i => [|i /f_in]. Qed.
 
 End Iteration.
 

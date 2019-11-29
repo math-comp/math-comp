@@ -157,6 +157,10 @@ Qed.
 
 End Paths.
 
+Lemma cycle_catC (T : Type) (e : rel T) (p q : seq T) :
+  cycle e (p ++ q) = cycle e (q ++ p).
+Proof. by rewrite -rot_size_cat rot_cycle. Qed.
+
 Arguments pathP {T e x p}.
 
 Section HomoPath.
@@ -1010,6 +1014,13 @@ rewrite trajectSr nth_rcons size_traject.
 by case: ltngtP le_i_n => [? _||->] //; apply: IHn.
 Qed.
 
+Lemma trajectD m n x :
+  traject x (m + n) = traject x m ++ traject (iter m f x) n.
+Proof. by elim: m => //m IHm in x *; rewrite addSn !trajectS IHm -iterSr. Qed.
+
+Lemma take_traject n k x : k <= n -> take k (traject x n) = traject x k.
+Proof. by move=> /subnKC<-; rewrite trajectD take_size_cat ?size_traject. Qed.
+
 End Trajectory.
 
 Section EqTrajectory.
@@ -1022,13 +1033,13 @@ Proof. by move/eq_frel/eq_path. Qed.
 Lemma eq_fcycle f' : f =1 f' -> fcycle f =1 fcycle f'.
 Proof. by move/eq_frel/eq_cycle. Qed.
 
+Lemma fpathE x p : fpath f x p -> p = traject f (f x) (size p).
+Proof. by elim: p => //= y p IHp in x * => /andP[/eqP{y}<- /IHp<-]. Qed.
+
 Lemma fpathP x p : reflect (exists n, p = traject f (f x) n) (fpath f x p).
 Proof.
-elim: p x => [|y p IHp] x; first by left; exists 0.
-rewrite /= andbC; case: IHp => [fn_p | not_fn_p]; last first.
-  by right=> [] [[//|n]] [<- fn_p]; case: not_fn_p; exists n.
-apply: (iffP eqP) => [-> | [[] // _ []//]].
-by have [n ->] := fn_p; exists n.+1.
+apply: (iffP idP) => [/fpathE->|[n->]]; first by exists (size p).
+by elim: n => //= n IHn in x *; rewrite eqxx IHn.
 Qed.
 
 Lemma fpath_traject x n : fpath f x (traject f (f x) n).
@@ -1075,6 +1086,25 @@ Arguments fpathP {T f x p}.
 Arguments loopingP {T f x n}.
 Arguments trajectP {T f x n y}.
 Prenex Implicits traject.
+
+Section Fcycle.
+Variables (T : eqType) (f : T -> T) (p : seq T) (f_p : fcycle f p).
+
+Lemma nextE (x : T) (p_x : x \in p) : next p x = f x.
+Proof. exact/esym/eqP/(next_cycle f_p). Qed.
+
+Lemma mem_fcycle : {homo f : x / x \in p}.
+Proof. by move=> x xp; rewrite -nextE// mem_next. Qed.
+
+Lemma inj_cycle : {in p &, injective f}.
+Proof.
+apply: can_in_inj (iter (size p).-1 f) _ => x /rot_to[i q rip].
+have /fpathE qxE : fcycle f (x :: q) by rewrite -rip rot_cycle.
+have -> : size p = size (rcons q x) by rewrite size_rcons -(size_rot i) rip.
+by rewrite -iterSr -last_traject prednK -?qxE ?size_rcons// last_rcons.
+Qed.
+
+End Fcycle.
 
 Section UniqCycle.
 
