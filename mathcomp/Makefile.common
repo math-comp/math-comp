@@ -146,4 +146,4 @@ doc: __always__ Makefile.coq
 	cp ../etc/artwork/coqdoc.css _build_doc/htmldoc
 
 doc-clean:
-	rm -r _build_doc/
+	rm -rf _build_doc/
