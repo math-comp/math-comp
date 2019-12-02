@@ -1,5 +1,4 @@
 opam-version: "2.0"
-name: "coq-mathcomp-fingroup"
 version: "dev"
 maintainer: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 
@@ -10,7 +9,7 @@ license: "CeCILL-B"
 
 build: [ make "-C" "mathcomp/fingroup" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/fingroup" "install" ]
-depends: [ "coq-mathcomp-ssreflect" { = "dev" } ]
+depends: [ "coq-mathcomp-ssreflect" { = version } ]
 
 tags: [ "keyword:finite groups" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.fingroup" ]
 authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]

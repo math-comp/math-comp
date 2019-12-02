@@ -72,8 +72,7 @@ do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    if [ $VERSION == "dev" ]
    then cp $GITROOT/coq-mathcomp-$pkg.opam $pkgdir/opam
    else git show "$BRANCH:coq-mathcomp-$pkg.opam" > $pkgdir/opam
-        sed -r "/^version/s?dev?$VERSION?" -i $pkgdir/opam
-        sed -r "/^depends.*coq-mathcomp.*/s?dev?$VERSION?" -i $pkgdir/opam
+        sed -r "/^version/d" -i $pkgdir/opam
    fi
    echo "" >> $pkgdir/opam
    echo "url {" >> $pkgdir/opam
