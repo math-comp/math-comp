@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Arithmetic theorems in ssrnat, div and prime about `logn`,
+    `coprime`, `gcd`, `lcm` and `partn`: `logn_coprime`, `logn_gcd`,
+    `logn_lcm`, `eq_partn_from_log` and `eqn_from_log`.
 
 - Lemmas `ltnNleqif`, `eq_leqif`, `eqTleqif` in `ssrnat`
 
@@ -115,4 +118,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Infrastructure
 
 ### Misc
-
