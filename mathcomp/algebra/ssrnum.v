@@ -26,7 +26,7 @@ From mathcomp Require Import ssralg poly.
 (*   normedZmodType R                                                         *)
 (*                  == interface for a normed Zmodule structure indexed by    *)
 (*                     numDomainType R.                                       *)
-(*   NormedZmodType R T m                                                  *)
+(*   NormedZmodType R T m                                                     *)
 (*                  == pack the normed Zmodule mixin into a normedZmodType.   *)
 (*                     The carrier T must have an integral domain structure.  *)
 (*   [normedZmodType R of T for S]                                            *)
@@ -5039,7 +5039,7 @@ Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
 
 (* compatibility module *)
-Module mc_1_9.
+Module mc_1_10.
 Module Num.
 (* If you failed to process the next line in the PG or the CoqIDE, replace    *)
 (* all the "ssrnum.Num" with "Top.Num" in this module to process them, and    *)
@@ -5617,4 +5617,4 @@ Notation "[ 'arg' 'maxr_' ( i > i0 ) F ]" := [arg maxr_(i > i0 | true) F]
    format "[ 'arg'  'maxr_' ( i  >  i0 ) F ]") : form_scope.
 
 End Num.
-End mc_1_9.
+End mc_1_10.

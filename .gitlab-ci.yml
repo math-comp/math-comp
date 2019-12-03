@@ -145,7 +145,7 @@ coq-dev:
     - make install
   except:
     - /^experiment\/order$/
-    - /^pr-(270|388|402|419)$/
+    - /^pr-(270|388|402|419|446)$/
 
 ci-fourcolor-8.7:
   extends: .ci-fourcolor
@@ -182,7 +182,7 @@ ci-fourcolor-dev:
     - make install
   only:
     - /^experiment\/order$/
-    - /^pr-(270|388|402|419)$/
+    - /^pr-(270|388|402|419|446)$/
 
 ci-fourcolor-8.7-270:
   extends: .ci-fourcolor-270
@@ -193,6 +193,16 @@ ci-fourcolor-8.8-270:
   extends: .ci-fourcolor-270
   variables:
     COQ_VERSION: "8.8"
+
+ci-fourcolor-8.9-270:
+  extends: .ci-fourcolor-270
+  variables:
+    COQ_VERSION: "8.9"
+
+ci-fourcolor-8.10-270:
+  extends: .ci-fourcolor-270
+  variables:
+    COQ_VERSION: "8.10"
 
 ci-fourcolor-dev-270:
   extends: .ci-fourcolor-270
@@ -210,7 +220,7 @@ ci-fourcolor-dev-270:
     - make install
   except:
     - /^experiment\/order$/
-    - /^pr-(270|388|402|419)$/
+    - /^pr-(270|388|402|419|446)$/
 
 ci-odd-order-8.7:
   extends: .ci-odd-order
@@ -247,7 +257,7 @@ ci-odd-order-dev:
     - make install
   only:
     - /^experiment\/order$/
-    - /^pr-(270|388|402|419)$/
+    - /^pr-(270|388|402|419|446)$/
 
 ci-odd-order-8.7-270:
  extends: .ci-odd-order-270
@@ -258,6 +268,16 @@ ci-odd-order-8.8-270:
  extends: .ci-odd-order-270
  variables:
    COQ_VERSION: "8.8"
+
+ci-odd-order-8.9-270:
+ extends: .ci-odd-order-270
+ variables:
+   COQ_VERSION: "8.9"
+
+ci-odd-order-8.10-270:
+ extends: .ci-odd-order-270
+ variables:
+   COQ_VERSION: "8.10"
 
 ci-odd-order-dev-270:
   extends: .ci-odd-order-270
