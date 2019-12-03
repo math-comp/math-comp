@@ -86,10 +86,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `ler_norm_sum`, `ler_norm_sub`, `ler_dist_add`, `ler_sub_norm_add`,
     `ler_sub_dist`, `ler_dist_dist`, `ler_dist_norm_add`, `ler_nnorml`,
     `ltr_nnorml`, `lter_nnormr`.
-  + The compatibility layer for the version 1.9 is provided as the
-    `ssrnum.mc_1_9` module. One may compile proofs compatible with the version
-    1.9 in newer versions by using the `mc_1_9.Num` module instead of the `Num`
-    module. However, instances of the number structures may require changes.
+  + The compatibility layer for the version 1.10 is provided as the
+    `ssrnum.mc_1_10` module. One may compile proofs compatible with the version
+    1.10 in newer versions by using the `mc_1_10.Num` module instead of the
+    `Num` module. However, instances of the number structures may require
+    changes.
 
 ### Renamed
 
