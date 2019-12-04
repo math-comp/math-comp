@@ -1662,8 +1662,8 @@ Arguments big_enum_val [R idx op I A] F.
 Arguments big_enum_rank [R idx op I A x] xA F.
 Arguments pair_big_dep [R idx op I J].
 Arguments pair_big [R idx op I J].
-Arguments big_allpairs_dep [R idx op I1 I2 J h r1 r2 F].
-Arguments big_allpairs [R idx op I1 I2 r1 r2 F].
+Arguments big_allpairs_dep {R idx op I1 I2 J h r1 r2 F}.
+Arguments big_allpairs {R idx op I1 I2 r1 r2 F}.
 Arguments exchange_big_dep [R idx op I J rI rJ P Q] xQ [F].
 Arguments exchange_big_dep_nat [R idx op m1 n1 m2 n2 P Q] xQ [F].
 Arguments big_ord_recl [R idx op].
