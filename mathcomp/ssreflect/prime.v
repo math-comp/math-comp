@@ -715,6 +715,9 @@ set k := logn p _; have: p ^ k %| m * n by rewrite pfactor_dvdn.
 by rewrite Gauss_dvdr ?coprime_expl // -pfactor_dvdn.
 Qed.
 
+Lemma logn_coprime p m : coprime p m -> logn p m = 0.
+Proof. by move=> coprime_pm; rewrite -[m]muln1 logn_Gauss// logn1. Qed.
+
 Lemma lognM p m n : 0 < m -> 0 < n -> logn p (m * n) = logn p m + logn p n.
 Proof.
 case p_pr: (prime p); last by rewrite /logn p_pr.
@@ -899,6 +902,13 @@ apply: eq_bigr => p _; rewrite ltnS lognE.
 by case: and3P => [[_ n_gt0 p_dv_n]|]; rewrite ?if_same // andbC dvdn_leq.
 Qed.
 
+Lemma eq_partn_from_log m n (pi : nat_pred) : 0 < m -> 0 < n ->
+  {in pi, logn^~ m =1 logn^~ n} -> m`_pi = n`_pi.
+Proof.
+move=> m0 n0 eq_log; rewrite !(@widen_partn (maxn m n)) ?leq_maxl ?leq_maxr//.
+by apply: eq_bigr => p /eq_log ->.
+Qed.
+
 Lemma partn0 pi : 0`_pi = 1.
 Proof. by apply: big1_seq => [] [|n]; rewrite andbC. Qed.
 
@@ -983,6 +993,11 @@ move=> n_gt0; rewrite -{2}(partn_pi n_gt0) {2}/partn big_mkcond /=.
 by apply: eq_bigr => p _; rewrite -logn_gt0; case: (logn p _).
 Qed.
 
+Lemma eqn_from_log m n : 0 < m -> 0 < n -> logn^~ m =1 logn^~ n -> m = n.
+Proof.
+by move=> ? ? /(@in1W _ predT)/eq_partn_from_log; rewrite !partnT// => ->.
+Qed.
+
 Lemma partnC pi n : n > 0 -> n`_pi * n`_pi^' = n.
 Proof.
 move=> n_gt0; rewrite -{3}(partnT n_gt0) /partn.
@@ -1046,6 +1061,20 @@ rewrite -(dvdn_pmul2r (part_gt0 pi^' d)) partnC //.
 apply/dvdn_biggcdP=> i Pi; rewrite -(partnC pi (F_gt0 i Pi)) dvdn_mul //.
   by rewrite (@biggcdn_inf _ i).
 by rewrite partn_dvd ?F_gt0 // (@biggcdn_inf _ i).
+Qed.
+
+Lemma logn_gcd p m n : 0 < m -> 0 < n ->
+  logn p (gcdn m n) = minn (logn p m) (logn p n).
+Proof.
+move=> m_gt0 n_gt0; case p_pr: (prime p); last by rewrite /logn p_pr.
+by apply: (@expnI p); rewrite ?prime_gt1// expn_min -!p_part partn_gcd.
+Qed.
+
+Lemma logn_lcm p m n : 0 < m -> 0 < n ->
+  logn p (lcmn m n) = maxn (logn p m) (logn p n).
+Proof.
+move=> m_gt0 n_gt0; rewrite /lcmn logn_div ?dvdn_mull ?dvdn_gcdr//.
+by rewrite lognM// logn_gcd// -addn_min_max addnC addnK.
 Qed.
 
 Lemma sub_in_pnat pi rho n :

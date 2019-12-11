@@ -1700,7 +1700,7 @@ Definition clone c of phant_id class c := @Pack phR T c.
 Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
-Definition pack T b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0) mul0) :=
+Definition pack b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0) mul0) :=
   fun bT b & phant_id (Ring.class bT) (b : Ring.class_of T) =>
   fun mT m & phant_id (@Lmodule.class R phR mT) (@Lmodule.Class R T b m) =>
   fun ax & phant_id axT ax =>
@@ -3761,6 +3761,9 @@ Variables (subS : zmodPred S) (kS : keyed_pred subS).
 Lemma rpredB : {in kS &, forall u v, u - v \in kS}.
 Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
 
+Lemma rpredBC u v : u - v \in kS = (v - u \in kS).
+Proof. by rewrite -rpredN opprB. Qed.
+
 Lemma rpredMNn n : {in kS, forall u, u *- n \in kS}.
 Proof. by move=> u Su; rewrite /= rpredN rpredMn. Qed.
 
@@ -5800,6 +5803,7 @@ Definition rpred_sum := rpred_sum.
 Definition rpredMn := rpredMn.
 Definition rpredN := rpredN.
 Definition rpredB := rpredB.
+Definition rpredBC := rpredBC.
 Definition rpredMNn := rpredMNn.
 Definition rpredDr := rpredDr.
 Definition rpredDl := rpredDl.
@@ -6453,6 +6457,10 @@ Canonical pair_comUnitRingType (R1 R2 : comUnitRingType) :=
 
 Canonical pair_unitAlgType (R : comUnitRingType) (A1 A2 : unitAlgType R) :=
   Eval hnf in [unitAlgType R of A1 * A2].
+
+Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :
+  x *+ n = (x.1 *+ n, x.2 *+ n).
+Proof. by case: x => x y; elim: n => //= n; rewrite !mulrS => ->. Qed.
 
 (* begin hide *)
 

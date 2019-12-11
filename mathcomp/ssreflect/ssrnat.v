@@ -1450,6 +1450,15 @@ Proof. by case=> le_ab; rewrite eqn_leq le_ab. Qed.
 Lemma ltn_leqif a b C : a <= b ?= iff C -> (a < b) = ~~ C.
 Proof. by move=> le_ab; rewrite ltnNge (geq_leqif le_ab). Qed.
 
+Lemma ltnNleqif x y C : x <= y ?= iff ~~ C -> (x < y) = C.
+Proof. by move=> /ltn_leqif; rewrite negbK. Qed.
+
+Lemma eq_leqif x y C : x <= y ?= iff C -> (x == y) = C.
+Proof. by move=> /leqifP; case: C ltngtP => [] []. Qed.
+
+Lemma eqTleqif x y C : x <= y ?= iff C -> C -> x = y.
+Proof. by move=> /eq_leqif<-/eqP. Qed.
+
 Lemma leqif_add m1 n1 C1 m2 n2 C2 :
     m1 <= n1 ?= iff C1 -> m2 <= n2 ?= iff C2 ->
   m1 + m2 <= n1 + n2 ?= iff C1 && C2.
@@ -1538,21 +1547,21 @@ Let leq_total := leq_total.
 Lemma ltnW_homo : {homo f : m n / m < n} -> {homo f : m n / m <= n}.
 Proof. exact: homoW. Qed.
 
-Lemma homo_inj_lt : injective f -> {homo f : m n / m <= n} ->
+Lemma inj_homo_ltn : injective f -> {homo f : m n / m <= n} ->
   {homo f : m n / m < n}.
 Proof. exact: inj_homo. Qed.
 
 Lemma ltnW_nhomo : {homo f : m n /~ m < n} -> {homo f : m n /~ m <= n}.
 Proof. exact: homoW. Qed.
 
-Lemma nhomo_inj_lt : injective f -> {homo f : m n /~ m <= n} ->
+Lemma inj_nhomo_ltn : injective f -> {homo f : m n /~ m <= n} ->
   {homo f : m n /~ m < n}.
 Proof. exact: inj_homo. Qed.
 
-Lemma incrn_inj : {mono f : m n / m <= n} -> injective f.
+Lemma incn_inj : {mono f : m n / m <= n} -> injective f.
 Proof. exact: mono_inj. Qed.
 
-Lemma decrn_inj : {mono f : m n /~ m <= n} -> injective f.
+Lemma decn_inj : {mono f : m n /~ m <= n} -> injective f.
 Proof. exact: mono_inj. Qed.
 
 Lemma leqW_mono : {mono f : m n / m <= n} -> {mono f : m n / m < n}.
@@ -1577,21 +1586,21 @@ Lemma ltnW_nhomo_in : {in D & D', {homo f : m n /~ m < n}} ->
                  {in D & D', {homo f : m n /~ m <= n}}.
 Proof. exact: homoW_in. Qed.
 
-Lemma homo_inj_lt_in : {in D & D', injective f} ->
+Lemma inj_homo_ltn_in : {in D & D', injective f} ->
                         {in D & D', {homo f : m n / m <= n}} ->
   {in D & D', {homo f : m n / m < n}}.
 Proof. exact: inj_homo_in. Qed.
 
-Lemma nhomo_inj_lt_in : {in D & D', injective f} ->
+Lemma inj_nhomo_ltn_in : {in D & D', injective f} ->
                         {in D & D', {homo f : m n /~ m <= n}} ->
   {in D & D', {homo f : m n /~ m < n}}.
 Proof. exact: inj_homo_in. Qed.
 
-Lemma incrn_inj_in : {in D &, {mono f : m n / m <= n}} ->
+Lemma incn_inj_in : {in D &, {mono f : m n / m <= n}} ->
   {in D &, injective f}.
 Proof. exact: mono_inj_in. Qed.
 
-Lemma decrn_inj_in : {in D &, {mono f : m n /~ m <= n}} ->
+Lemma decn_inj_in : {in D &, {mono f : m n /~ m <= n}} ->
   {in D &, injective f}.
 Proof. exact: mono_inj_in. Qed.
 
