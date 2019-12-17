@@ -82,6 +82,8 @@ make-coq-latest:
 .opam-build-once:
   extends: .opam-build
   except:
+    - tags
+    - merge_requests
     - schedules
   
 coq-8.7:
@@ -144,6 +146,9 @@ coq-dev:
     - make -j "${NJOBS}"
     - make install
   except:
+    - tags
+    - merge_requests
+    - schedules
     - /^experiment\/order$/
     - /^pr-(270|388|402|419|446)$/
 
@@ -219,6 +224,9 @@ ci-fourcolor-dev-270:
     - make -j "${NJOBS}"
     - make install
   except:
+    - tags
+    - merge_requests
+    - schedules
     - /^experiment\/order$/
     - /^pr-(270|388|402|419|446)$/
 
