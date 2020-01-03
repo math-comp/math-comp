@@ -637,7 +637,7 @@ Lemma rowV0P m n (A : 'M_(m, n)) :
 Proof.
 rewrite -[A == 0]negbK; case: rowV0Pn => IH.
   by right; case: IH => v svA nzv IH; case/eqP: nzv; apply: IH.
-by left=> v svA; apply/eqP; apply/idPn=> nzv; case: IH; exists v.
+by left=> v svA; apply/eqP/idPn=> nzv; case: IH; exists v.
 Qed.
 
 Lemma submx_full m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -687,8 +687,7 @@ Proof. exact: row_free_unit. Qed.
 Lemma mxrank_unit n (A : 'M_n) : A \in unitmx -> \rank A = n.
 Proof. by rewrite -row_full_unit => /eqnP. Qed.
 
-Lemma mxrank1 n : \rank (1%:M : 'M_n) = n.
-Proof. by apply: mxrank_unit; apply: unitmx1. Qed.
+Lemma mxrank1 n : \rank (1%:M : 'M_n) = n. Proof. exact: mxrank_unit. Qed.
 
 Lemma mxrank_delta m n i j : \rank (delta_mx i j : 'M_(m, n)) = 1%N.
 Proof.
@@ -799,7 +798,7 @@ Qed.
 
 Lemma eq_row_base m n (A : 'M_(m, n)) : (row_base A :=: A)%MS.
 Proof.
-apply/eqmxP; apply/andP; split; apply/submxP.
+apply/eqmxP/andP; split; apply/submxP.
   exists (pid_mx (\rank A) *m invmx (col_ebase A)).
   by rewrite -{8}[A]mulmx_ebase !mulmxA mulmxKV // pid_mx_id.
 exists (col_ebase A *m pid_mx (\rank A)).
@@ -857,7 +856,7 @@ by rewrite qidmx_eq1 row_full_unit unitmx1 => /eqP.
 Qed.
 
 Lemma genmx_id m n (A : 'M_(m, n)) : (<<<<A>>>> = <<A>>)%MS.
-Proof. by apply: eq_genmx; apply: genmxE. Qed.
+Proof. exact/eq_genmx/genmxE. Qed.
 
 Lemma row_base_free m n (A : 'M_(m, n)) : row_free (row_base A).
 Proof. by apply/eqnP; rewrite eq_row_base. Qed.
@@ -1229,8 +1228,8 @@ Proof.
 rewrite /equivmx qidmx_eq1 /qidmx /capmx_witness.
 rewrite -sub1mx; case s1A: (1%:M <= A)%MS => /=; last first.
   rewrite !genmxE submx_refl /= -negb_add; apply: contra {s1A}(negbT s1A).
-  case: eqP => [<- _| _]; first by rewrite genmxE.
-  by case: eqP A => //= -> A; move/eqP->; rewrite pid_mx_1.
+  have [<- | _] := eqP; first by rewrite genmxE.
+  by case: eqP A => //= -> A /eqP ->; rewrite pid_mx_1.
 case: (m =P n) => [-> | ne_mn] in A s1A *.
   by rewrite conform_mx_id submx_refl pid_mx_1 eqxx.
 by rewrite nonconform_mx ?submx1 ?s1A ?eqxx //; case: eqP.
@@ -1395,7 +1394,7 @@ rewrite (capmxC A B) capmxC; wlog idA: m1 m3 A C / qidmx A.
   apply: capmx_norm_eq; first by rewrite !qidmx_cap andbAC.
   by apply/andP; split; rewrite !sub_capmx andbAC -!sub_capmx.
 rewrite -!(capmxC A) [in @capmx m1]unlock idA capmx_nop_id.
-have [eqBC |] :=eqVneq (qidmx B) (qidmx C).
+have [eqBC|] := eqVneq (qidmx B) (qidmx C).
   rewrite (@capmx_eq_norm n) ?capmx_nopP // capmx_eq_norm //.
   by apply: capmx_norm_eq; rewrite ?qidmx_cap ?capmxS ?capmx_nopP.
 by rewrite !unlock capmx_nopP capmx_nop_id; do 2?case: (qidmx _) => //.
@@ -2206,7 +2205,7 @@ rewrite (card_GL _ (ltn0Sn n.-1)) card_ord Fp_cast // big_add1 /=.
 pose p'gt0 m := m > 0 /\ logn p m = 0%N.
 suffices [Pgt0 p'P]: p'gt0 (\prod_(0 <= i < n.-1.+1) (p ^ i.+1 - 1))%N.
   by rewrite lognM // p'P pfactorK // addn0; case n.
-apply big_ind => [|m1 m2 [m10 p'm1] [m20]|i _]; rewrite {}/p'gt0 ?logn1 //.
+apply: big_ind => [|m1 m2 [m10 p'm1] [m20]|i _]; rewrite {}/p'gt0 ?logn1 //.
   by rewrite muln_gt0 m10 lognM ?p'm1.
 rewrite lognE -if_neg subn_gt0 p_pr /= -{1 2}(exp1n i.+1) ltn_exp2r // p_gt1.
 by rewrite dvdn_subr ?dvdn_exp // gtnNdvd.
@@ -2243,7 +2242,7 @@ Lemma memmx_eqP m1 m2 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) :
   reflect (forall A, (A \in R1) = (A \in R2)) (R1 == R2)%MS.
 Proof.
 apply: (iffP eqmxP) => [eqR12 A | eqR12]; first by rewrite eqR12.
-by apply/eqmxP; apply/rV_eqP=> vA; rewrite -(vec_mxK vA) eqR12.
+by apply/eqmxP/rV_eqP=> vA; rewrite -(vec_mxK vA) eqR12.
 Qed.
 Arguments memmx_eqP {m1 m2 n R1 R2}.
 
@@ -2360,7 +2359,7 @@ Arguments mulsmxP {m1 m2 n A R1 R2}.
 Lemma mulsmxA m1 m2 m3 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) (R3 : 'A_(m3, n)) :
   (R1 * (R2 * R3) = R1 * R2 * R3)%MS.
 Proof.
-rewrite -(genmx_muls (_ * _)%MS) -genmx_muls; apply/genmxP; apply/andP; split.
+rewrite -(genmx_muls (_ * _)%MS) -genmx_muls; apply/genmxP/andP; split.
   apply/mulsmx_subP=> A1 A23 R_A1; case/mulsmxP=> A2 R_A2 [A3 R_A3 ->{A23}].
   by rewrite !linear_sum summx_sub //= => i _; rewrite mulmxA !mem_mulsmx.
 apply/mulsmx_subP=> _ A3 /mulsmxP[A1 R_A1 [A2 R_A2 ->]] R_A3.

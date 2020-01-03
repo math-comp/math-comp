@@ -258,9 +258,9 @@ case Hcard1: (#|H| == 1%N); move/eqP: Hcard1 => Hcard1.
   by left; apply: card1_trivg; rewrite Hcard1.
 right; case Hcard60: (#|H| == 60%N); move/eqP: Hcard60 => Hcard60.
   by apply/eqP; rewrite eqEcard Hcard60 F1 andbT; case/andP: Hnorm.
-have Hcard20: #|H| = 20; last clear Hcard1 Hcard60.
+have {Hcard1 Hcard60} Hcard20: #|H| = 20.
   have Hdiv: 20 %| #|H| by apply: FF => // HH; case Hcard1; rewrite HH cards1.
-  case H20: (#|H| == 20); first by apply/eqP.
+  case H20: (#|H| == 20); first exact/eqP.
   case: Hcard60; case/andP: Hnorm; move/cardSg; rewrite F1 => Hdiv1 _.
   by case/dvdnP: Hdiv H20 Hdiv1 => n ->; move: n; do 4!case=> //.
 have prime_5: prime 5 by [].
@@ -272,7 +272,7 @@ have nSyl5: #|'Syl_5(H)| = 1%N.
 case: (Sylow_exists 5 H) => S; case/pHallP=> sSH oS.
 have{oS} oS: #|S| = 5 by rewrite oS p_part Hcard20.
 suff: 20 %| #|S| by rewrite oS.
-apply FF => [|S1]; last by rewrite S1 cards1 in oS.
+apply: FF => [|S1]; last by rewrite S1 cards1 in oS.
 apply: char_normal_trans Hnorm; apply: lone_subgroup_char => // Q sQH isoQS.
 rewrite subEproper; apply/norP=> [[nQS _]]; move: nSyl5.
 rewrite (cardsD1 S) (cardsD1 Q) 4!{1}inE nQS !pHallE sQH sSH Hcard20 p_part.
@@ -362,8 +362,7 @@ Proof.
 have rgd_x p: rgd p x = x by rewrite permE /= insubF //= eqxx.
 have rfd_rgd p: rfd (rgd p) = p.
   apply/permP => [[z Hz]]; apply/val_eqP; rewrite !permE.
-  rewrite /= [rgd _ _]permE /= insubF eq_refl // permE /=.
-  by rewrite (@insubT _ (xpredC1 x) _ _ Hz).
+  by rewrite /= [rgd _ _]permE /= insubF eqxx // permE /= insubT.
 have sSd: 'C_('Alt_T)[x | 'P] \subset 'dom rfd.
   by apply/subsetP=> p; rewrite !inE /=; case/andP.
 apply/isogP; exists [morphism of restrm sSd rfd] => /=; last first.
@@ -449,7 +448,7 @@ have Hreg g z: g \in H -> g z = z -> g = 1.
   by rewrite memJ_norm ?(subsetP nH).
 clear K F8 F12 F13 Ksub F14.
 have Hcard: 5 < #|H|.
-  apply: (leq_trans oT); apply dvdn_leq; first by apply: cardG_gt0.
+  apply: (leq_trans oT); apply: dvdn_leq; first exact: cardG_gt0.
   by rewrite -cardsT (atrans_dvd F5).
 case Eh: (pred0b [predD1 H & 1]).
   by move: Hcard; rewrite /pred0b in Eh; rewrite (cardD1 1) group1 (eqP Eh).

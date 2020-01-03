@@ -161,7 +161,7 @@ Lemma zmod1gE : 1%g = 0 :> U.            Proof. by []. Qed.
 Lemma zmodVgE x : x^-1%g = - x.          Proof. by []. Qed.
 Lemma zmodMgE x y : (x * y)%g = x + y.   Proof. by []. Qed.
 Lemma zmodXgE n x : (x ^+ n)%g = x *+ n. Proof. by []. Qed.
-Lemma zmod_mulgC x y : commute x y.      Proof. exact: GRing.addrC. Qed.
+Lemma zmod_mulgC x y : commute x y.      Proof. exact: addrC. Qed.
 Lemma zmod_abelian (A : {set U}) : abelian A.
 Proof. by apply/centsP=> x _ y _; apply: zmod_mulgC. Qed.
 
@@ -524,17 +524,17 @@ Canonical unit_subFinType := Eval hnf in [subFinType of uT].
 
 Definition unit1 := Unit phR (@GRing.unitr1 _).
 Lemma unit_inv_proof u : (val u)^-1 \is a GRing.unit.
-Proof. by rewrite GRing.unitrV ?(valP u). Qed.
+Proof. by rewrite unitrV ?(valP u). Qed.
 Definition unit_inv u := Unit phR (unit_inv_proof u).
 Lemma unit_mul_proof u v : val u * val v \is a GRing.unit.
-Proof. by rewrite (GRing.unitrMr _ (valP u)) ?(valP v). Qed.
+Proof. by rewrite (unitrMr _ (valP u)) ?(valP v). Qed.
 Definition unit_mul u v := Unit phR (unit_mul_proof u v).
 Lemma unit_muluA : associative unit_mul.
-Proof. by move=> u v w; apply: val_inj; apply: GRing.mulrA. Qed.
+Proof. by move=> u v w; apply/val_inj/mulrA. Qed.
 Lemma unit_mul1u : left_id unit1 unit_mul.
-Proof. by move=> u; apply: val_inj; apply: GRing.mul1r. Qed.
+Proof. by move=> u; apply/val_inj/mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
-Proof. by move=> u; apply: val_inj; apply: GRing.mulVr (valP u). Qed.
+Proof. by move=> u; apply/val_inj/(mulVr (valP u)). Qed.
 
 Definition unit_GroupMixin := FinGroup.Mixin unit_muluA unit_mul1u unit_mulVu.
 Canonical unit_baseFinGroupType :=
@@ -551,12 +551,12 @@ Definition unit_act x u := x * val u.
 Lemma unit_actE x u : unit_act x u = x * val u. Proof. by []. Qed.
 
 Canonical unit_action :=
-  @TotalAction _ _ unit_act (@GRing.mulr1 _) (fun _ _ _ => GRing.mulrA _ _ _).
+  @TotalAction _ _ unit_act (@mulr1 _) (fun _ _ _ => mulrA _ _ _).
 Lemma unit_is_groupAction : @is_groupAction _ R setT setT unit_action.
 Proof.
 move=> u _ /=; rewrite inE; apply/andP; split.
   by apply/subsetP=> x _; rewrite inE.
-by apply/morphicP=> x y _ _; rewrite !actpermE /= [_ u]GRing.mulrDl.
+by apply/morphicP=> x y _ _; rewrite !actpermE /= [_ u]mulrDl.
 Qed.
 Canonical unit_groupAction := GroupAction unit_is_groupAction.
 

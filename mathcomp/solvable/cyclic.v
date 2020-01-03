@@ -587,7 +587,7 @@ Variable u : {unit 'Z_#[a]}.
 Lemma injm_cyclem : 'injm (cyclem (val u) a).
 Proof.
 apply/subsetP=> x /setIdP[ax]; rewrite !inE -order_dvdn.
-case: (eqVneq a 1) => [a1 | nta]; first by rewrite a1 cycle1 inE in ax.
+have [a1 | nta] := eqVneq a 1; first by rewrite a1 cycle1 inE in ax.
 rewrite -order_eq1 -dvdn1; move/eqnP: (valP u) => /= <-.
 by rewrite dvdn_gcd {2}Zp_cast ?order_gt1 // order_dvdG.
 Qed.
@@ -616,7 +616,7 @@ Canonical Zp_unit_morphism := Morphism Zp_unitmM.
 
 Lemma injm_Zp_unitm : 'injm Zp_unitm.
 Proof.
-case: (eqVneq a 1) => [a1 | nta].
+have [a1 | nta] := eqVneq a 1.
   by rewrite subIset //= card_le1_trivg ?subxx // card_units_Zp a1 order1.
 apply/subsetP=> /= u /morphpreP[_ /set1P/= um1].
 have{um1}: Zp_unitm u a == Zp_unitm 1 a by rewrite um1 morph1.

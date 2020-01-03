@@ -67,7 +67,7 @@ exists (SplittingFieldType _ _ Qn_ax).
   apply: separable_Xn_sub_1; rewrite -(fmorph_eq0 QnC) rmorph_nat.
   by rewrite pnatr_eq0 -lt0n cardG_gt0.
 exists QnC => [// nuQn|].
-  by apply: (extend_algC_subfield_aut QnC [rmorphism of nuQn]).
+  exact: (extend_algC_subfield_aut QnC [rmorphism of nuQn]).
 rewrite span_seq1 in genQn.
 exists w => // hT H phi Nphi x x_dv_n.
 apply: sig_eqW; have [rH ->] := char_reprP Nphi.
@@ -372,7 +372,7 @@ Proof.
 move: {2}_.+1 (ltnSn #|G|) => n; elim: n => // n IHn in gT G *.
 rewrite ltnS => leGn piGle2; have [simpleG | ] := boolP (simple G); last first.
   rewrite negb_forall_in => /exists_inP[N sNG]; rewrite eq_sym.
-  have [-> | ] := altP (N =P G).
+  have [->|] := eqVneq N G.
     rewrite groupP /= genGid normG andbT eqb_id negbK => /eqP->.
     exact: solvable1.
   rewrite [N == G]eqEproper sNG eqbF_neg !negbK => ltNG /and3P[grN].

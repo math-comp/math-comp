@@ -1480,7 +1480,7 @@ Proof.
 move=> h'K; have [n lePn] := ubnP #|P|; elim: n => // n IHn in P h'K lePn *.
 case: (pickP P) => [i Pi | P0]; last first.
   by rewrite !big_pred0 // => j; rewrite P0.
-rewrite (bigD1 i Pi) (bigD1 (h' i)) h'K ?Pi ?eq_refl //=; congr (_ * _).
+rewrite (bigD1 i Pi) (bigD1 (h' i)) h'K ?Pi ?eqxx //=; congr (_ * _).
 rewrite {}IHn => [|j /andP[]|]; [|by auto | by rewrite (cardD1x i) in lePn]. 
 apply: eq_bigl => j; rewrite andbC -andbA (andbCA (P _)); case: eqP => //= hK.
 by congr (_ && ~~ _); apply/eqP/eqP=> [<-|->] //; rewrite h'K.

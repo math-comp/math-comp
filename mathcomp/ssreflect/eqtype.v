@@ -916,9 +916,9 @@ Hypothesis aR'E : forall x y, aR' x y = (x != y) && (aR x y).
 Hypothesis rR'E : forall x y, rR' x y = (x != y) && (rR x y).
 
 Let aRE x y : aR x y = (x == y) || (aR' x y).
-Proof. by rewrite aR'E; case: (altP eqP) => //= ->; apply: aR_refl. Qed.
+Proof. by rewrite aR'E; case: eqVneq => //= ->; apply: aR_refl. Qed.
 Let rRE x y : rR x y = (x == y) || (rR' x y).
-Proof. by rewrite rR'E; case: (altP eqP) => //= ->; apply: rR_refl. Qed.
+Proof. by rewrite rR'E; case: eqVneq => //= ->; apply: rR_refl. Qed.
 
 Section InDom.
 Variable D : pred aT.
@@ -962,7 +962,7 @@ Lemma total_homo_mono_in : total aR ->
    {in D &, {mono f : x y / aR x y >-> rR x y}}.
 Proof.
 move=> aR_tot mf x y xD yD.
-have [->|neq_xy] := altP (x =P y); first by rewrite ?eqxx ?aR_refl ?rR_refl.
+have [->|neq_xy] := eqVneq x y; first by rewrite ?eqxx ?aR_refl ?rR_refl.
 have [xy|] := (boolP (aR x y)); first by rewrite rRE mf ?orbT// aR'E neq_xy.
 have /orP [->//|] := aR_tot x y.
 rewrite aRE eq_sym (negPf neq_xy) /= => /mf -/(_ yD xD).

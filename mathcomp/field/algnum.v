@@ -247,7 +247,7 @@ have: root (map_poly (nu \o QnC) (minPoly 1%AS x)) (nu (QnC x)).
   by rewrite fmorph_root root_minPoly.
 rewrite map_Qnum_poly ?minPolyOver // Hrs.
 rewrite [map_poly _ _](_:_ = \prod_(y <- map QnC rs) ('X - y%:P)); last first.
-  rewrite big_map rmorph_prod; apply eq_bigr => i _.
+  rewrite big_map rmorph_prod; apply: eq_bigr => i _.
   by rewrite rmorphB /= map_polyX map_polyC.
 rewrite root_prod_XsubC.
 by case/mapP => y _ ?; exists y.

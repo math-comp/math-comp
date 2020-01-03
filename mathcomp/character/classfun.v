@@ -943,7 +943,7 @@ Lemma cfCauchySchwarz phi psi :
   `|'[phi, psi]| ^+ 2 <= '[phi] * '[psi] ?= iff ~~ free (phi :: psi).
 Proof.
 rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC.
-have [-> | nz_psi] /= := altP (psi =P 0).
+have [-> | nz_psi] /= := eqVneq psi 0.
   by apply/leifP; rewrite !cfdot0r normCK mul0r mulr0.
 without loss ophi: phi / '[phi, psi] = 0.
   move=> IHo; pose a := '[phi, psi] / '[psi]; pose phi1 := phi - a *: psi.
@@ -978,7 +978,7 @@ rewrite (mono_leif (ler_pmul2r _)) ?ltr0n //.
 have:= leif_trans (leif_Re_Creal '[phi, psi]) (cfCauchySchwarz_sqrt phi psi).
 congr (_ <= _ ?= iff _); apply: andb_id2r.
 rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC.
-have [-> | nz_psi] := altP (psi =P 0); first by rewrite cfdot0r coord0.
+have [-> | nz_psi] := eqVneq psi 0; first by rewrite cfdot0r coord0.
 case/vlineP=> [x ->]; rewrite cfdotZl linearZ pmulr_lge0 ?cfnorm_gt0 //=.
 by rewrite (coord_free 0) ?seq1_free // eqxx mulr1.
 Qed.
@@ -1186,7 +1186,7 @@ rewrite orthonormalE; have [/= normS | not_normS] := allP; last first.
   by right=> [[_ o1S]]; case: not_normS => phi Sphi; rewrite /= o1S ?eqxx.
 apply: (iffP (pairwise_orthogonalP S)) => [] [uniqS oSS].
   split=> // [|phi psi]; first by case/andP: uniqS.
-  by have [-> _ /normS/eqP | /oSS] := altP eqP.
+  by have [-> _ /normS/eqP | /oSS] := eqVneq.
 split=> // [|phi psi Sphi Spsi /negbTE]; last by rewrite oSS // => ->.
 by rewrite /= (contra (normS _)) // cfdot0r eq_sym oner_eq0.
 Qed.
@@ -1497,7 +1497,7 @@ by rewrite -!cfMorphE // eq_phi.
 Qed.
 
 Lemma cfMorph_eq1 phi : (cfMorph phi == 1) = (phi == 1).
-Proof. by apply: rmorph_eq1; apply: cfMorph_inj. Qed.
+Proof. exact/rmorph_eq1/cfMorph_inj. Qed.
 
 Lemma cfker_morph phi : cfker (cfMorph phi) = G :&: f @*^-1 (cfker phi).
 Proof.
@@ -1526,7 +1526,7 @@ Lemma sub_morphim_cfker phi (A : {set aT}) :
 Proof. by move=> sAG; rewrite sub_cfker_morph ?sAG. Qed.
 
 Lemma cforder_morph phi : #[cfMorph phi]%CF = #[phi]%CF.
-Proof. by apply: cforder_inj_rmorph; apply: cfMorph_inj. Qed.
+Proof. exact/cforder_inj_rmorph/cfMorph_inj. Qed.
 
 End Main.
 
@@ -1607,7 +1607,7 @@ Qed.
 Lemma cfIsom_inj : injective (cfIsom isoGR). Proof. exact: can_inj cfIsomK. Qed.
 
 Lemma cfIsom_eq1 phi : (cfIsom isoGR phi == 1) = (phi == 1).
-Proof. by apply: rmorph_eq1; apply: cfIsom_inj. Qed.
+Proof. exact/rmorph_eq1/cfIsom_inj. Qed.
 
 Lemma cforder_isom phi : #[cfIsom isoGR phi]%CF = #[phi]%CF.
 Proof. exact: cforder_inj_rmorph cfIsom_inj. Qed.
@@ -1860,7 +1860,7 @@ by rewrite quotientK ?(subset_trans skerH) // -group_modr //= setIC tiKH mul1g.
 Qed.
 
 Lemma cforder_sdprod phi : #[cfSdprod phi]%CF = #[phi]%CF.
-Proof. by apply: cforder_inj_rmorph cfSdprod_inj. Qed.
+Proof. exact: cforder_inj_rmorph cfSdprod_inj. Qed.
 
 End SDproduct.
 

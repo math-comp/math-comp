@@ -1311,7 +1311,7 @@ Definition subfx_poly_inv (q : {poly F}) : {poly F} :=
 Let subfx_poly_invE q : iotaPz (subfx_poly_inv q) = (iotaPz q)^-1.
 Proof.
 rewrite /subfx_poly_inv.
-have [-> | nzq] := altP eqP; first by rewrite rmorph0 invr0.
+have [-> | nzq] := eqVneq; first by rewrite rmorph0 invr0.
 rewrite [nth]lock -[_^-1]mul1r; apply: canRL (mulfK nzq) _; rewrite -rmorphM /=.
 have rz0: iotaPz (gdcop q p0) = 0.
   by apply/rootP; rewrite gdcop_map root_gdco ?map_poly_eq0 // p0z0 nzq.

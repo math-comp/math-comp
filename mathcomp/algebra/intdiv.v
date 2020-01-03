@@ -164,7 +164,7 @@ Proof. by case: m => n; rewrite (modNz_nat, modz_nat) ?modn1. Qed.
 Lemma divz1 m : (m %/ 1)%Z = m. Proof. by rewrite -{1}[m]mulr1 mulzK. Qed.
 
 Lemma divzz d : (d %/ d)%Z = (d != 0).
-Proof. by have [-> // | d_nz] := altP eqP; rewrite -{1}[d]mul1r mulzK. Qed.
+Proof. by have [-> // | d_nz] := eqVneq; rewrite -{1}[d]mul1r mulzK. Qed.
 
 Lemma ltz_pmod m d : d > 0 -> (m %% d)%Z < d.
 Proof.
@@ -453,7 +453,7 @@ Proof. by move=> dv_n; rewrite addrC divzDl // addrC. Qed.
 
 Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> ((m%:~R / d%:~R : rat) \is a Qint).
 Proof.
-case/dvdzP=> z ->; rewrite rmorphM /=; case: (altP (d =P 0)) => [->|dn0].
+case/dvdzP=> z ->; rewrite rmorphM /=; have [->|dn0] := eqVneq d 0.
   by rewrite mulr0 mul0r.
 by rewrite mulfK ?intr_eq0 // rpred_int.
 Qed.
@@ -564,7 +564,7 @@ Variant egcdz_spec m n : int * int -> Type :=
 
 Lemma egcdzP m n : egcdz_spec m n (egcdz m n).
 Proof.
-rewrite /egcdz; have [-> | m_nz] := altP eqP.
+rewrite /egcdz; have [-> | m_nz] := eqVneq.
   by split; [rewrite -abszEsign gcd0z | rewrite coprimezE absz_sign].
 have m_gt0 : (`|m| > 0)%N by rewrite absz_gt0.
 case: egcdnP (coprime_egcdn `|n| m_gt0) => //= u v Duv _ co_uv; split.
@@ -706,7 +706,7 @@ Qed.
 Lemma dvdz_contents a p : (a %| zcontents p)%Z = (p \is a polyOver (dvdz a)).
 Proof.
 rewrite dvdzE abszM absz_sg lead_coef_eq0.
-have [-> | nz_p] := altP eqP; first by rewrite mul0n dvdn0 rpred0.
+have [-> | nz_p] := eqVneq; first by rewrite mul0n dvdn0 rpred0.
 rewrite mul1n; apply/dvdn_biggcdP/(all_nthP 0)=> a_dv_p i ltip /=.
   exact: (a_dv_p (Ordinal ltip)).
 exact: a_dv_p.
@@ -751,14 +751,14 @@ Qed.
 
 Lemma sgz_lead_primitive p : sgz (lead_coef (zprimitive p)) = (p != 0).
 Proof.
-have [-> | nz_p] := altP eqP; first by rewrite zprimitive0 lead_coef0.
+have [-> | nz_p] := eqVneq; first by rewrite zprimitive0 lead_coef0.
 apply: (@mulfI _ (sgz (zcontents p))); first by rewrite sgz_eq0 zcontents_eq0.
 by rewrite -sgzM mulr1 -lead_coefZ -zpolyEprim sgz_contents.
 Qed.
 
 Lemma zcontents_primitive p : zcontents (zprimitive p) = (p != 0).
 Proof.
-have [-> | nz_p] := altP eqP; first by rewrite zprimitive0 zcontents0.
+have [-> | nz_p] := eqVneq; first by rewrite zprimitive0 zcontents0.
 apply: (@mulfI _ (zcontents p)); first by rewrite zcontents_eq0.
 by rewrite mulr1 -zcontentsZ -zpolyEprim.
 Qed.

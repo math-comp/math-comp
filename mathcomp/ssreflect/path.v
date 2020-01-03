@@ -368,7 +368,7 @@ Proof.
 elim: s => [| h s]; first by case: ifP.
 rewrite mem2_cons => ->.
 do 2 rewrite inE (fun_if subseq) !if_arg !sub1seq /=.
-by case: eqVneq => [->|]; case: eqVneq.
+by have [->|] := eqVneq; case: eqVneq.
 Qed.
 
 Variant split2r x y : seq T -> Type :=
@@ -916,7 +916,7 @@ Let le_lex_transitive x sT : transitive (le_lex x sT).
 Proof.
 move=> ? ? ? /andP [xy /implyP xy'] /andP [yz /implyP yz'].
 rewrite /= (leT_tr xy yz) /=; apply/implyP => zx.
-by apply/ltn_trans: (xy' (leT_tr yz zx)) (yz' (leT_tr zx xy)).
+exact: ltn_trans (xy' (leT_tr yz zx)) (yz' (leT_tr zx xy)).
 Qed.
 
 Lemma filter_sort p s : filter p (sort leT s) = sort leT (filter p s).

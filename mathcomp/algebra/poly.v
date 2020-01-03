@@ -399,9 +399,9 @@ Lemma leq_sizeP p i : reflect (forall j, i <= j -> p`_j = 0) (size p <= i).
 Proof.
 apply: (iffP idP) => [hp j hij| hp].
   by apply: nth_default; apply: leq_trans hij.
-case p0: (p == 0); first by rewrite (eqP p0) size_poly0.
-move: (lead_coef_eq0 p); rewrite p0 leqNgt; move/negbT; apply: contra => hs.
-by apply/eqP; apply: hp; rewrite -ltnS (ltn_predK hs).
+case: (eqVneq p) (lead_coef_eq0 p) => [->|p0]; first by rewrite size_poly0.
+rewrite leqNgt; apply/contraFN => hs.
+by apply/eqP/hp; rewrite -ltnS (ltn_predK hs).
 Qed.
 
 (* Size, leading coef, morphism properties of coef *)
@@ -817,7 +817,7 @@ Lemma size_polyXn n : size 'X^n = n.+1.
 Proof. by rewrite polyseqXn size_rcons size_nseq. Qed.
 
 Lemma commr_polyXn p n : GRing.comm p 'X^n.
-Proof. by apply: commrX; apply: commr_polyX. Qed.
+Proof. exact/commrX/commr_polyX. Qed.
 
 Lemma lead_coefXn n : lead_coef 'X^n = 1.
 Proof. by rewrite /lead_coef nth_last polyseqXn last_rcons. Qed.
@@ -976,7 +976,7 @@ Lemma rreg_div0 q r d :
   (q * d + r == 0) = (q == 0) && (r == 0).
 Proof.
 move=> reg_d lt_r_d; rewrite addrC addr_eq0.
-have [-> | nz_q] := altP (q =P 0); first by rewrite mul0r oppr0.
+have [-> | nz_q] := eqVneq q 0; first by rewrite mul0r oppr0.
 apply: contraTF lt_r_d => /eqP->; rewrite -leqNgt size_opp.
 rewrite size_proper_mul ?mulIr_eq0 ?lead_coef_eq0 //.
 by rewrite (polySpred nz_q) leq_addl.
@@ -1250,14 +1250,14 @@ Lemma prim_order_dvd i : (n %| i) = (z ^+ i == 1).
 Proof.
 move: n_gt0; rewrite -prim_expr_mod /dvdn -(ltn_mod i).
 case: {i}(i %% n)%N => [|i] lt_i; first by rewrite !eqxx.
-case/andP: prim_z => _ /forallP/(_ (Ordinal (ltnW lt_i))).
-by move/eqP; rewrite unity_rootE eqn_leq andbC leqNgt lt_i.
+case/andP: prim_z => _ /forallP/(_ (Ordinal (ltnW lt_i)))/eqP.
+by rewrite unity_rootE eqn_leq andbC leqNgt lt_i.
 Qed.
 
 Lemma eq_prim_root_expr i j : (z ^+ i == z ^+ j) = (i == j %[mod n]).
 Proof.
 wlog le_ji: i j / j <= i.
-  move=> IH; case: (leqP j i); last move/ltnW; move/IH=> //.
+  move=> IH; case: (leqP j i) => [|/ltnW] /IH //.
   by rewrite eq_sym (eq_sym (j %% n)%N).
 rewrite -{1}(subnKC le_ji) exprD -prim_expr_mod eqn_mod_dvd //.
 rewrite prim_order_dvd; apply/eqP/eqP=> [|->]; last by rewrite mulr1.
@@ -1557,7 +1557,7 @@ Lemma derivn_poly0 p n : size p <= n -> p^`(n) = 0.
 Proof.
 move=> le_p_n; apply/polyP=> i; rewrite coef_derivn.
 rewrite nth_default; first by rewrite mul0rn coef0.
-by apply: leq_trans le_p_n _; apply leq_addr.
+exact/(leq_trans le_p_n)/leq_addr.
 Qed.
 
 Lemma lt_size_deriv (p : {poly R}) : p != 0 -> size p^`() < size p.
@@ -1646,7 +1646,7 @@ Lemma nderivn_poly0 p n : size p <= n -> p^`N(n) = 0.
 Proof.
 move=> le_p_n; apply/polyP=> i; rewrite coef_nderivn.
 rewrite nth_default; first by rewrite mul0rn coef0.
-by apply: leq_trans le_p_n _; apply leq_addr.
+exact/(leq_trans le_p_n)/leq_addr.
 Qed.
 
 Lemma nderiv_taylor p x h :
@@ -1655,7 +1655,7 @@ Proof.
 move/commrX=> cxh; elim/poly_ind: p => [|p c IHp].
   by rewrite size_poly0 big_ord0 horner0.
 rewrite hornerMXaddC size_MXaddC.
-have [-> | nz_p] := altP (p =P 0).
+have [-> | nz_p] := eqVneq p 0.
   rewrite horner0 !simp; have [-> | _] := c =P 0; first by rewrite big_ord0.
   by rewrite size_poly0 big_ord_recl big_ord0 nderivn0 hornerC !simp.
 rewrite big_ord_recl nderivn0 !simp hornerMXaddC addrAC; congr (_ + _).
@@ -2410,11 +2410,11 @@ Theorem max_poly_roots p rs :
 Proof.
 elim: rs p => [p pn0 _ _ | r rs ihrs p pn0] /=; first by rewrite size_poly_gt0.
 case/andP => rpr arrs /andP [rnrs urs]; case/factor_theorem: rpr => q epq.
-case: (altP (q =P 0)) => [q0 | ?]; first by move: pn0; rewrite epq q0 mul0r eqxx.
+have [q0 | ?] := eqVneq q 0; first by move: pn0; rewrite epq q0 mul0r eqxx.
 have -> : size p = (size q).+1.
    by rewrite epq size_Mmonic ?monicXsubC // size_XsubC addnC.
 suff /eq_in_all h : {in rs, root q =1 root p} by apply: ihrs => //; rewrite h.
-move=> x xrs; rewrite epq rootM root_XsubC orbC; case: (altP (x =P r)) => // exr.
+move=> x xrs; rewrite epq rootM root_XsubC orbC; case: (eqVneq x r) => // exr.
 by move: rnrs; rewrite -exr xrs.
 Qed.
 
@@ -2698,7 +2698,7 @@ have [n] := ubnP (size p); elim: n => // n IHn in p *.
 have /decPcases /= := @satP F [::] ('exists 'X_0, polyT p == 0%T).
 case: ifP => [_ /sig_eqW[x]|_ noroot]; last first.
   exists [::], p; rewrite big_nil mulr1; split => // p_neq0 x.
-  by apply/negP=> /rootP rpx; apply noroot; exists x; rewrite eval_polyT.
+  by apply/negP=> /rootP rpx; apply: noroot; exists x; rewrite eval_polyT.
 rewrite eval_polyT => /rootP/factor_theorem/sig_eqW[p1 ->].
 have [->|nz_p1] := eqVneq p1 0; first by exists [::], 0; rewrite !mul0r eqxx.
 rewrite size_Mmonic ?monicXsubC // size_XsubC addn2 => /IHn[s [q [-> irr_q]]].
@@ -2757,7 +2757,7 @@ Lemma closed_field_poly_normal p :
   {r : seq F | p = lead_coef p *: \prod_(z <- r) ('X - z%:P)}.
 Proof.
 apply: sig_eqW; have [r [q [->]]] /= := dec_factor_theorem p.
-have [->|] := altP eqP; first by exists [::]; rewrite mul0r lead_coef0 scale0r.
+have [->|] := eqVneq; first by exists [::]; rewrite mul0r lead_coef0 scale0r.
 have [[x rqx ? /(_ isT x) /negP /(_ rqx)] //|] := altP (closed_rootP q).
 rewrite negbK => /size_poly1P [c c_neq0-> _ _]; exists r.
 rewrite mul_polyC lead_coefZ (monicP _) ?mulr1 //.

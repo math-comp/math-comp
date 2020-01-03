@@ -475,7 +475,7 @@ have [|ts def_s ne_ts] := IHn (tperm x (s^-1 x) * s); last first.
 rewrite (cardD1 x) !inE s_x in le_s_n; apply: leq_ltn_trans le_s_n.
 apply: subset_leq_card; apply/subsetP=> y.
 rewrite !inE permM permE /= -(canF_eq (permK _)).
-have [-> | ne_yx] := altP (y =P x); first by rewrite permKV eqxx.
+have [-> | ne_yx] := eqVneq y x; first by rewrite permKV eqxx.
 by case: (s y =P x) => // -> _; rewrite eq_sym.
 Qed.
 

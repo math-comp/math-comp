@@ -199,7 +199,7 @@ move=> linL; apply/eqP; rewrite eqEsubset sub_rowg_mx andbT.
 apply/subsetP=> v; rewrite inE genmxE => /submxP[u ->{v}].
 rewrite mulmx_sum_row group_prod // => i _.
 rewrite rowK; move: (enum_val i) (enum_valP i) => v Lv.
-case: (eqVneq (u 0 i) 0) => [->|]; first by rewrite scale0r group1.
+have [->|] := eqVneq (u 0 i) 0; first by rewrite scale0r group1.
 by rewrite -unitfE => aP; rewrite ((actsP linL) (FinRing.Unit _ aP)) ?inE.
 Qed.
 

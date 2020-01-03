@@ -132,7 +132,7 @@ Qed.
 Lemma kHom_inv K E f : kHom K E f -> {in E, {morph f : x / x^-1}}.
 Proof.
 case/kHomP=> fM idKf x Ex.
-case (eqVneq x 0) => [-> | nz_x]; first by rewrite linear0 invr0 linear0.
+have [-> | nz_x] := eqVneq x 0; first by rewrite linear0 invr0 linear0.
 have fxV: f x * f x^-1 = 1 by rewrite -fM ?rpredV ?divff // idKf ?mem1v.
 have Ufx: f x \is a GRing.unit by apply/unitrPr; exists (f x^-1).
 by apply: (mulrI Ufx); rewrite divrr.
@@ -1014,8 +1014,8 @@ Lemma galois_connection K E (A : {set gal_of E}):
   (K <= E)%VS -> (A \subset 'Gal(E / K)) = (K <= fixedField A)%VS.
 Proof.
 move=> sKE; apply/idP/idP => [/fixedFieldS | /(galS E)].
-  by apply: subv_trans; apply galois_connection_subv.
-by apply: subset_trans; apply: galois_connection_subset.
+  exact/subv_trans/galois_connection_subv.
+exact/subset_trans/galois_connection_subset.
 Qed.
 
 Definition galTrace U V a := \sum_(x in 'Gal(V / U)) (x a).
@@ -1047,7 +1047,7 @@ Qed.
 
 Lemma galNormX n : {morph galNorm U V : a / a ^+ n}.
 Proof.
-move=> a; elim: n => [|n IHn]; first by apply: galNorm1.
+move=> a; elim: n => [|n IHn]; first exact: galNorm1.
 by rewrite !exprS galNormM IHn.
 Qed.
 
@@ -1309,7 +1309,7 @@ Qed.
 Lemma galois_fixedField K E :
   reflect (fixedField 'Gal(E / K) = K) (galois K E).
 Proof.
-apply (iffP idP) => [/and3P[sKE /separableP sepKE nKE] | fixedKE].
+apply: (iffP idP) => [/and3P[sKE /separableP sepKE nKE] | fixedKE].
   apply/eqP; rewrite eqEsubv galois_connection_subv ?andbT //.
   apply/subvP=> a /mem_fixedFieldP[Ea fixEa]; rewrite -adjoin_deg_eq1.
   have [r /allP Er splitKa] := normalFieldP nKE a Ea.

@@ -79,10 +79,10 @@ Fact fracq_subproof : forall x : int * int,
   let d := if x.2 == 0 then 1 else (`|x.2| %/ gcdn `|x.1| `|x.2|)%:Z in
   (0 < d) && (coprime `|n| `|d|).
 Proof.
-move=> [m n] /=; case: (altP (n =P 0))=> [//|n0].
+move=> [m n] /=; have [//|n0] := eqVneq n 0.
 rewrite ltz_nat divn_gt0 ?gcdn_gt0 ?absz_gt0 ?n0 ?orbT //.
 rewrite dvdn_leq ?absz_gt0 ?dvdn_gcdr //= !abszM absz_sign mul1n.
-have [->|m0] := altP (m =P 0); first by rewrite div0n gcd0n divnn absz_gt0 n0.
+have [->|m0] := eqVneq m 0; first by rewrite div0n gcd0n divnn absz_gt0 n0.
 move: n0 m0; rewrite -!absz_gt0 absz_nat.
 move: `|_|%N `|_|%N => {m n} [|m] [|n] // _ _.
 rewrite /coprime -(@eqn_pmul2l (gcdn m.+1 n.+1)) ?gcdn_gt0 //.
@@ -142,7 +142,7 @@ Definition oneq := fracq (1, 1).
 Fact frac0q x : fracq (0, x) = zeroq.
 Proof.
 apply: val_inj; rewrite //= div0n !gcd0n !mulr0 !divnn.
-by have [//|x_neq0] := altP eqP; rewrite absz_gt0 x_neq0.
+by have [//|x_neq0] := eqVneq; rewrite absz_gt0 x_neq0.
 Qed.
 
 Fact fracq0  x : fracq (x, 0) = zeroq. Proof. exact/eqP. Qed.
@@ -174,7 +174,7 @@ Proof. by rewrite abszE normr_denq. Qed.
 Lemma rat_eq x y : (x == y) = (numq x * denq y == numq y * denq x).
 Proof.
 symmetry; rewrite rat_eqE andbC.
-have [->|] /= := altP (denq _ =P _); first by rewrite (inj_eq (mulIf _)).
+have [->|] /= := eqVneq (denq _); first by rewrite (inj_eq (mulIf _)).
 apply: contraNF => /eqP hxy; rewrite -absz_denq -[X in _ == X]absz_denq.
 rewrite eqz_nat /= eqn_dvd.
 rewrite -(@Gauss_dvdr _ `|numq x|) 1?coprime_sym ?coprime_num_den // andbC.
@@ -192,7 +192,7 @@ Qed.
 
 Fact fracq_eq0 x : (fracq x == zeroq) = (x.1 == 0) || (x.2 == 0).
 Proof.
-move: x=> [n d] /=; have [->|d0] := altP (d =P 0).
+move: x=> [n d] /=; have [->|d0] := eqVneq d 0.
   by rewrite fracq0 eqxx orbT.
 by rewrite orbF fracq_eq ?d0 //= mulr1 mul0r.
 Qed.
@@ -333,7 +333,7 @@ rewrite !(mulq_frac, invq_frac) ?denq_neq0 //.
 by apply/eqP; rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= mulr1 mul1r mulrC.
 Qed.
 
-Fact invq0 : invq 0 = 0. Proof. by apply/eqP. Qed.
+Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
 Definition RatFieldUnitMixin := FieldUnitMixin mulVq invq0.
 Canonical rat_unitRing :=
@@ -550,8 +550,8 @@ Qed.
 Lemma normr_num_div n d : `|numq (n%:~R / d%:~R)| = numq (`|n|%:~R / `|d|%:~R).
 Proof.
 rewrite (normrEsg n) (normrEsg d) !rmorphM /= invfM mulrACA !sgr_def.
-have [->|n_neq0] := altP eqP; first by rewrite mul0r mulr0.
-have [->|d_neq0] := altP eqP; first by rewrite invr0 !mulr0.
+have [->|n_neq0] := eqVneq; first by rewrite mul0r mulr0.
+have [->|d_neq0] := eqVneq; first by rewrite invr0 !mulr0.
 rewrite !intr_sign invr_sign -signr_addb numq_sign_mul -numq_div_lt0 //.
 by apply: (canRL (signrMK _)); rewrite mulz_sign_abs.
 Qed.
@@ -680,7 +680,7 @@ Canonical Qnat_semiringPred := SemiringPred Qnat_semiring_closed.
 End QnatPred.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
-Proof. by apply: char0_natf_div; apply: char_num. Qed.
+Proof. exact/char0_natf_div/char_num. Qed.
 
 Section InRing.
 
@@ -814,7 +814,7 @@ Require setoid_ring.Field_theory setoid_ring.Field_tac.
 Lemma rat_field_theory :
   Field_theory.field_theory 0%Q 1%Q addq mulq subq oppq divq invq eq.
 Proof.
-split => //; first exact rat_ring_theory.
+split => //; first exact: rat_ring_theory.
 by move=> p /eqP p_neq0; rat_to_ring; rewrite mulVf.
 Qed.
 

@@ -31,7 +31,7 @@ Qed.
 Lemma fact_prod n : n`! = \prod_(1 <= i < n.+1) i.
 Proof.
 elim: n => [|n IHn] //; first by rewrite big_nil.
-by apply sym_equal; rewrite factS IHn // !big_add1 big_nat_recr //= mulnC.
+by apply/esym; rewrite factS IHn // !big_add1 big_nat_recr //= mulnC.
 Qed.
 
 Lemma logn_fact p n : prime p -> logn p n`! = \sum_(1 <= k < n.+1) n %/ p ^ k.
@@ -114,7 +114,7 @@ rewrite [mFpM _ _]mFp1 (bigD1 Fpn1) -?mFpA -/mFpM; last first.
 rewrite (reindex_onto vFp vFp) -/mFpM => [|i]; last by do 3!case/andP; auto.
 rewrite (eq_bigl (xpredD1 ltv Fp0)) => [|i]; last first.
   rewrite andbC -!andbA -2!negb_or -vFpId orbC -leq_eqVlt.
-  rewrite andbA -ltnNge; symmetry; case: (altP eqP) => [->|ni0].
+  rewrite andbA -ltnNge; symmetry; have [->|ni0] := eqVneq.
     by case: eqP => // E; rewrite ?E !andbF.
   by rewrite vFpK //eqxx vFp0.
 rewrite -{2}[mFp]/mFpM -[mFpM _ _]big_split -/mFpM.

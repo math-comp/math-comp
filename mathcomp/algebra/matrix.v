@@ -1197,7 +1197,7 @@ Definition nz_row m n (A : 'M_(m, n)) :=
 Lemma nz_row_eq0 m n (A : 'M_(m, n)) : (nz_row A == 0) = (A == 0).
 Proof.
 rewrite /nz_row; symmetry; case: pickP => [i /= nzAi | Ai0].
-  by rewrite (negbTE nzAi); apply: contraTF nzAi => /eqP->; rewrite row0 eqxx.
+  by rewrite (negPf nzAi); apply: contraTF nzAi => /eqP->; rewrite row0 eqxx.
 by rewrite eqxx; apply/eqP/row_matrixP=> i; move/eqP: (Ai0 i) ->; rewrite row0.
 Qed.
 
@@ -1289,7 +1289,7 @@ Lemma matrix_sum_delta A :
 Proof.
 apply/matrixP=> i j.
 rewrite summxE (bigD1 i) // summxE (bigD1 j) //= !mxE !eqxx mulr1.
-rewrite !big1 ?addr0 //= => [i' | j']; rewrite eq_sym => /negbTE diff.
+rewrite !big1 ?addr0 //= => [i' | j']; rewrite eq_sym => /negPf diff.
   by rewrite summxE big1 // => j' _; rewrite !mxE diff mulr0.
 by rewrite !mxE eqxx diff mulr0.
 Qed.
@@ -1406,7 +1406,7 @@ Lemma diag_mx_sum_delta n (d : 'rV_n) :
 Proof.
 apply/matrixP=> i j; rewrite summxE (bigD1 i) //= !mxE eqxx /=.
 rewrite eq_sym mulr_natr big1 ?addr0 // => i' ne_i'i.
-by rewrite !mxE eq_sym (negbTE ne_i'i) mulr0.
+by rewrite !mxE eq_sym (negPf ne_i'i) mulr0.
 Qed.
 
 (* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
@@ -1563,7 +1563,7 @@ Qed.
 Lemma rowE m n i (A : 'M_(m, n)) : row i A = delta_mx 0 i *m A.
 Proof.
 apply/rowP=> j; rewrite !mxE (bigD1 i) //= mxE !eqxx mul1r.
-by rewrite big1 ?addr0 // => i' ne_i'i; rewrite mxE /= (negbTE ne_i'i) mul0r.
+by rewrite big1 ?addr0 // => i' ne_i'i; rewrite mxE /= (negPf ne_i'i) mul0r.
 Qed.
 
 Lemma row_mul m n p (i : 'I_m) A (B : 'M_(n, p)) :
@@ -1581,7 +1581,7 @@ Lemma mul_delta_mx_cond m n p (j1 j2 : 'I_n) (i1 : 'I_m) (k2 : 'I_p) :
 Proof.
 apply/matrixP=> i k; rewrite !mxE (bigD1 j1) //=.
 rewrite mulmxnE !mxE !eqxx andbT -natrM -mulrnA !mulnb !andbA andbAC.
-by rewrite big1 ?addr0 // => j; rewrite !mxE andbC -natrM; move/negbTE->.
+by rewrite big1 ?addr0 // => j; rewrite !mxE andbC -natrM; move/negPf->.
 Qed.
 
 Lemma mul_delta_mx m n p (j : 'I_n) (i : 'I_m) (k : 'I_p) :
@@ -1590,20 +1590,20 @@ Proof. by rewrite mul_delta_mx_cond eqxx. Qed.
 
 Lemma mul_delta_mx_0 m n p (j1 j2 : 'I_n) (i1 : 'I_m) (k2 : 'I_p) :
   j1 != j2 -> delta_mx i1 j1 *m delta_mx j2 k2 = 0.
-Proof. by rewrite mul_delta_mx_cond => /negbTE->. Qed.
+Proof. by rewrite mul_delta_mx_cond => /negPf->. Qed.
 
 Lemma mul_diag_mx m n d (A : 'M_(m, n)) :
   diag_mx d *m A = \matrix_(i, j) (d 0 i * A i j).
 Proof.
 apply/matrixP=> i j; rewrite !mxE (bigD1 i) //= mxE eqxx big1 ?addr0 // => i'.
-by rewrite mxE eq_sym mulrnAl => /negbTE->.
+by rewrite mxE eq_sym mulrnAl => /negPf->.
 Qed.
 
 Lemma mul_mx_diag m n (A : 'M_(m, n)) d :
   A *m diag_mx d = \matrix_(i, j) (A i j * d 0 j).
 Proof.
 apply/matrixP=> i j; rewrite !mxE (bigD1 j) //= mxE eqxx big1 ?addr0 // => i'.
-by rewrite mxE eq_sym mulrnAr; move/negbTE->.
+by rewrite mxE eq_sym mulrnAr; move/negPf->.
 Qed.
 
 Lemma mulmx_diag n (d e : 'rV_n) :
@@ -1761,7 +1761,7 @@ have [le_n_i | lt_i_n] := leqP n i.
   by rewrite -pid_mx_minh !mxE leq_min ltnNge le_n_i andbF mul0r.
 rewrite (bigD1 (Ordinal lt_i_n)) //= big1 ?addr0 => [|j].
   by rewrite !mxE eqxx /= -natrM mulnb andbCA.
-by rewrite -val_eqE /= !mxE eq_sym -natrM => /negbTE->.
+by rewrite -val_eqE /= !mxE eq_sym -natrM => /negPf->.
 Qed.
 
 Lemma pid_mx_id m n p r :
@@ -2309,7 +2309,7 @@ Proof.
 rewrite [\det _](bigD1 s) //= big1 => [|i _]; last by rewrite /= !mxE eqxx.
 rewrite mulr1 big1 ?addr0 => //= t Dst.
 case: (pickP (fun i => s i != t i)) => [i ist | Est].
-  by rewrite (bigD1 i) // mulrCA /= !mxE (negbTE ist) mul0r.
+  by rewrite (bigD1 i) // mulrCA /= !mxE (negPf ist) mul0r.
 by case/eqP: Dst; apply/permP => i; move/eqP: (Est i).
 Qed.
 
@@ -2368,9 +2368,9 @@ Proof.
 rewrite /(\det _) (bigD1 1%g) //= addrC big1 => [|p p1].
   by rewrite add0r odd_perm1 mul1r; apply: eq_bigr => i; rewrite perm1 mxE eqxx.
 have{p1}: ~~ perm_on set0 p.
-  apply: contra p1; move/subsetP=> p1; apply/eqP; apply/permP=> i.
-  by rewrite perm1; apply/eqP; apply/idPn; move/p1; rewrite inE.
-case/subsetPn=> i; rewrite !inE eq_sym; move/negbTE=> p_i _.
+  apply: contra p1; move/subsetP=> p1; apply/eqP/permP=> i.
+  by rewrite perm1; apply/eqP/idPn; move/p1; rewrite inE.
+case/subsetPn=> i; rewrite !inE eq_sym; move/negPf=> p_i _.
 by rewrite (bigD1 i) //= mulrCA mxE p_i mul0r.
 Qed.
 
@@ -2441,13 +2441,13 @@ Proof. by apply/matrixP=> i j; rewrite !mxE cofactorZ. Qed.
 (* Cramer Rule : adjugate on the left *)
 Lemma mul_mx_adj n (A : 'M[R]_n) : A *m \adj A = (\det A)%:M.
 Proof.
-apply/matrixP=> i1 i2; rewrite !mxE; case Di: (i1 == i2).
-  rewrite (eqP Di) (expand_det_row _ i2) //=.
+apply/matrixP=> i1 i2; rewrite !mxE; have [->|Di] := eqVneq.
+  rewrite (expand_det_row _ i2) //=.
   by apply: eq_bigr => j _; congr (_ * _); rewrite mxE.
 pose B := \matrix_(i, j) (if i == i2 then A i1 j else A i j).
-have EBi12: B i1 =1 B i2 by move=> j; rewrite /= !mxE Di eq_refl.
-rewrite -[_ *+ _](determinant_alternate (negbT Di) EBi12) (expand_det_row _ i2).
-apply: eq_bigr => j _; rewrite !mxE eq_refl; congr (_ * (_ * _)).
+have EBi12: B i1 =1 B i2 by move=> j; rewrite /= !mxE eqxx (negPf Di).
+rewrite -[_ *+ _](determinant_alternate Di EBi12) (expand_det_row _ i2).
+apply: eq_bigr => j _; rewrite !mxE eqxx; congr (_ * (_ * _)).
 apply: eq_bigr => s _; congr (_ * _); apply: eq_bigr => i _.
 by rewrite !mxE eq_sym -if_neg neq_lift.
 Qed.
@@ -2488,7 +2488,7 @@ elim: n1 => [|n1 IHn1] in Aul Aur *.
   by do 2![rewrite !mxE; case: splitP => [[]|k] //=; move/val_inj=> <- {k}].
 rewrite (expand_det_col _ (lshift n2 0)) big_split_ord /=.
 rewrite addrC big1 1?simp => [|i _]; last by rewrite block_mxEdl mxE simp.
-rewrite (expand_det_col _ 0) big_distrl /=; apply eq_bigr=> i _.
+rewrite (expand_det_col _ 0) big_distrl /=; apply: eq_bigr=> i _.
 rewrite block_mxEul -!mulrA; do 2!congr (_ * _).
 by rewrite col'_col_mx !col'Kl raddf0 row'Ku row'_row_mx IHn1.
 Qed.

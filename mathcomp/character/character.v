@@ -491,7 +491,7 @@ Proof. by rewrite cfunE cfuniE ?normal1 // inE mulr_natr. Qed.
 Lemma cfReprReg : cfRepr (regular_repr algCF G) = cfReg G.
 Proof.
 apply/cfun_inP=> x Gx; rewrite cfRegE.
-have [-> | ntx] := altP (x =P 1%g); first by rewrite cfRepr1.
+have [-> | ntx] := eqVneq x 1%g; first by rewrite cfRepr1.
 rewrite cfunE Gx [\tr _]big1 // => i _; rewrite 2!mxE /=.
 rewrite -(inj_eq enum_val_inj) gring_indexK ?groupM ?enum_valP //.
 by rewrite eq_mulVg1 mulKg (negbTE ntx).
@@ -714,7 +714,7 @@ Qed.
 
 Lemma xcfun_id i j : ('chi_i).['e_j]%CF = 'chi_i 1%g *+ (i == j).
 Proof.
-have [<-{j} | /xcfun_annihilate->//] := altP eqP; last exact: Wedderburn_id_mem.
+have [<-{j} | /xcfun_annihilate->//] := eqVneq; last exact: Wedderburn_id_mem.
 by rewrite -xcfunG // repr_mx1 -(xcfun_mul_id _ (envelop_mx1 _)) mulmx1.
 Qed.
 
@@ -1204,7 +1204,7 @@ transitivity (('chi_i).[e j *m aG y]%CF / 'chi_j 1%g).
   rewrite mulmx_suml raddf_sum big_distrl; apply: eq_bigr => x Gx /=.
   rewrite -scalemxAl xcfunZr -repr_mxM // xcfunG ?groupM // mulrAC mulrC.
   by congr (_ * _); rewrite mulrC mulKf ?irr1_neq0.
-rewrite mulr_natl mulrb; have [<-{j} | neq_ij] := altP eqP.
+rewrite mulr_natl mulrb; have [<-{j} | neq_ij] := eqVneq.
   by congr (_ / _); rewrite xcfun_mul_id ?envelop_mx_id ?xcfunG.
 rewrite (xcfun_annihilate neq_ij) ?mul0r //.
 case/andP: (Wedderburn_ideal (W j)) => _; apply: submx_trans.
@@ -1284,7 +1284,7 @@ transitivity ((#|'C_G[repr (y ^: G)]|%:R *: (X' *m X)) i_y i_x).
 rewrite mulmx1C // !mxE -!divg_index !(index_cent1, =^~ indexgI).
 rewrite (class_eqP (mem_repr y _)) ?class_refl // mulr_natr.
 rewrite (can_in_eq class_IirrK) ?mem_classes //.
-have [-> | not_yGx] := altP eqP; first by rewrite class_refl.
+have [-> | not_yGx] := eqVneq; first by rewrite class_refl.
 by rewrite [x \in _](contraNF _ not_yGx) // => /class_eqP->.
 Qed.
 
@@ -1450,7 +1450,7 @@ rewrite -!eq_scale_irr; apply/eqP/idP; last first.
   case/orP; first by case/andP=> /eqP-> /eqP->.
   case/orP=> /and3P[/eqP-> /eqP-> /eqP->]; first by rewrite addrC.
   by rewrite !scaleNr !addNr.
-have [-> /addrI/eqP-> // | /= ] := altP eqP.
+have [-> /addrI/eqP-> // | /=] := eqVneq.
 rewrite eq_scale_irr => /norP[/negP nz_a /negPf neq_ir].
 move/(congr1 (cfdotr 'chi__))/esym/eqP => /= eq_cfdot.
 move: {eq_cfdot}(eq_cfdot i) (eq_cfdot r); rewrite eq_sym !cfdotDl !cfdotZl.
@@ -2412,7 +2412,7 @@ Implicit Types G H : {group gT}.
 Lemma lin_irr_der1 G i :
    ('chi_i \is a linear_char) = (G^`(1)%g \subset cfker 'chi[G]_i).
 Proof.
-apply/idP/idP=> [|sG'K]; first by apply: lin_char_der1.
+apply/idP/idP=> [|sG'K]; first exact: lin_char_der1.
 have nsG'G: G^`(1) <| G := der_normal 1 G.
 rewrite qualifE irr_char -[i](quo_IirrK nsG'G) // mod_IirrE //=.
 by rewrite cfModE // morph1 lin_char1 //; apply/char_abelianP/der_abelian.
@@ -2832,8 +2832,7 @@ Proof.
 apply/eqP; rewrite eqEsubset; rewrite cfcenter_subset_center ?irr_char //.
 apply/subsetP=> _ /setIP[/morphimP[x /= _ Gx ->] cGx]; rewrite mem_quotient //=.
 rewrite -irrRepr cfker_repr cfcenter_repr inE Gx in cGx *.
-apply: mx_abs_irr_cent_scalar 'Chi_i _ _ _.
-  by apply: groupC; apply: socle_irr.
+apply: mx_abs_irr_cent_scalar 'Chi_i _ _ _; first exact/groupC/socle_irr.
 have nKG: G \subset 'N(rker 'Chi_i) by apply: rker_norm.
 (* GG -- locking here is critical to prevent Coq kernel divergence. *)
 apply/centgmxP=> y Gy; rewrite [eq]lock -2?(quo_repr_coset (subxx _) nKG) //.

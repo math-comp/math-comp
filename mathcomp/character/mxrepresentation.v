@@ -1592,7 +1592,7 @@ Lemma mxsimple_exists m (U : 'M_(m, n)) :
 Proof.
 move=> modU nzU [] // simU; move: {2}_.+1 (ltnSn (\rank U)) => r leUr.
 elim: r => // r IHr in m U leUr modU nzU simU.
-have genU := genmxE U; apply simU; exists <<U>>%MS; last by rewrite genU.
+have genU := genmxE U; apply: (simU); exists <<U>>%MS; last by rewrite genU.
 apply/mxsimpleP; split; rewrite ?(eqmx_eq0 genU) ?(eqmx_module genU) //.
 case=> V; rewrite !genU=> /and4P[modV sVU nzV ltVU]; case: notF.
 apply: IHr nzV _ => // [|[W simW sWV]]; first exact: leq_trans ltVU _.
@@ -1891,7 +1891,7 @@ move=> modV redV [] // nssimV; have [r leVr] := ubnP (\rank V).
 elim: r => // r IHr in V leVr modV redV nssimV.
 have [V0 | nzV] := eqVneq V 0.
   by rewrite nssimV ?V0 //; apply: mxsemisimple0.
-apply (mxsimple_exists modV nzV) => [[U simU sUV]]; have [modU nzU _] := simU.
+apply: (mxsimple_exists modV nzV) => [[U simU sUV]]; have [modU nzU _] := simU.
 have [W modW defUW dxUW] := redV U modU sUV.
 have sWV: (W <= V)%MS by rewrite -defUW addsmxSr.
 apply: IHr (mx_reducibleS modW sWV redV) _ => // [|ssimW].
@@ -3492,8 +3492,7 @@ rewrite -defW; apply/sumsmx_subP=> j _; set x := x_ W j.
 have{Gx_} Gx: x \in G by rewrite Gx_.
 apply: submx_trans (submxMr _ sMU) _; apply: (mxmoduleP modU).
 rewrite inE -val_Clifford_act Gx //; set Wx := 'Cl%act W x.
-have [-> //= | neWxW] := eqVneq Wx W.
-case: (simM) => _ /negP[]; rewrite -submx0.
+case: (eqVneq Wx W) (simM) => [-> //=|] neWxW [_ /negP[]]; rewrite -submx0.
 rewrite (canF_eq (actKin 'Cl Gx)) in neWxW.
 rewrite -(component_mx_disjoint _ _ neWxW); try exact: socle_simple.
 rewrite sub_capmx {1}(submx_trans sMU sUW) val_Clifford_act ?groupV //.
@@ -5838,7 +5837,7 @@ have: mx_subseries (aG F) U /\ path ltmx 0 U by [].
 pose f : {rmorphism F0 -> F} := [rmorphism of idfun].
 elim: m F U f => [|m IHm] F U f [modU ltU].
   by rewrite addn0 (leq_trans (max_size_mx_series ltU)) ?rank_leq_row.
-rewrite addnS ltnNge -implybF; apply/implyP=> le_nG_Um; apply nosplit.
+rewrite addnS ltnNge -implybF; apply/implyP=> le_nG_Um; apply: nosplit.
 exists F => //; case=> [|n] rG irrG; first by case/mx_irrP: irrG.
 apply/idPn=> nabsG; pose cG := ('C(enveloping_algebra_mx rG))%MS.
 have{nabsG} [A]: exists2 A, (A \in cG)%MS & ~~ is_scalar_mx A.
