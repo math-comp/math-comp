@@ -1216,35 +1216,35 @@ Context {T : latticeType}.
 Definition meet : T -> T -> T := Lattice.meet (Lattice.class T).
 Definition join : T -> T -> T := Lattice.join (Lattice.class T).
 
-Variant lel_xor_gt (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
-  | LelNotGt of x <= y : lel_xor_gt x y true false x x y y
-  | GtlNotLe of y < x  : lel_xor_gt x y false true y y x x.
+Variant lel_xor_gt (x y : T) : T -> T -> T -> T -> bool -> bool -> Set :=
+  | LelNotGt of x <= y : lel_xor_gt x y x x y y true false
+  | GtlNotLe of y < x  : lel_xor_gt x y y y x x false true.
 
-Variant ltl_xor_ge (x y : T) : bool -> bool -> T -> T -> T -> T -> Set :=
-  | LtlNotGe of x < y  : ltl_xor_ge x y false true x x y y
-  | GelNotLt of y <= x : ltl_xor_ge x y true false y y x x.
+Variant ltl_xor_ge (x y : T) : T -> T -> T -> T -> bool -> bool -> Set :=
+  | LtlNotGe of x < y  : ltl_xor_ge x y x x y y false true
+  | GelNotLt of y <= x : ltl_xor_ge x y y y x x true false.
 
 Variant comparel (x y : T) :
-  bool -> bool -> bool -> bool -> bool -> bool -> T -> T -> T -> T -> Set :=
+  T -> T -> T -> T -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | ComparelLt of x < y : comparel x y
-    false false false true false true x x y y
+    x x y y false false false true false true
   | ComparelGt of y < x : comparel x y
-    false false true false true false y y x x
+    y y x x false false true false true false
   | ComparelEq of x = y : comparel x y
-    true true true true false false x x x x.
+    x x x x true true true true false false.
 
 Variant incomparel (x y : T) :
-  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool ->
-  T -> T -> T -> T -> Set :=
+  T -> T -> T -> T ->
+  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | InComparelLt of x < y : incomparel x y
-    false false false true false true true true x x y y
+    x x y y false false false true false true true true
   | InComparelGt of y < x : incomparel x y
-    false false true false true false true true y y x x
+    y y x x false false true false true false true true
   | InComparel of x >< y  : incomparel x y
-    false false false false false false false false
     (meet x y) (meet x y) (join x y) (join x y)
+    false false false false false false false false
   | InComparelEq of x = y : incomparel x y
-    true true true true false false true true x x x x.
+    x x x x true true true true false false true true.
 
 End LatticeDef.
 
@@ -3218,8 +3218,8 @@ Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
 Proof. exact: (@leI2 _ [latticeType of L^d]). Qed.
 
 Lemma lcomparableP x y : incomparel x y
-  (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
-  (y >=< x) (x >=< y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  (y `&` x) (x `&` y) (y `|` x) (x `|` y)
+  (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y) (y >=< x) (x >=< y).
 Proof.
 by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
   rewrite ?(meetxx, joinxx, meetC y, joinC y)
@@ -3228,16 +3228,16 @@ by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
 Qed.
 
 Lemma lcomparable_ltgtP x y : x >=< y ->
-  comparel x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
-           (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  comparel x y (y `&` x) (x `&` y) (y `|` x) (x `|` y)
+               (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof. by case: (lcomparableP x) => // *; constructor. Qed.
 
 Lemma lcomparable_leP x y : x >=< y ->
-  lel_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  lel_xor_gt x y (y `&` x) (x `&` y) (y `|` x) (x `|` y) (x <= y) (y < x).
 Proof. by move/lcomparable_ltgtP => [/ltW xy|xy|->]; constructor. Qed.
 
 Lemma lcomparable_ltP x y : x >=< y ->
-  ltl_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
+  ltl_xor_ge x y (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
 Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 
 End LatticeTheoryJoin.

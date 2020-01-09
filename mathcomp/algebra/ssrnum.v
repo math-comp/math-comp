@@ -3823,17 +3823,13 @@ Lemma oppr_min : {morph -%R : x y / min x y >-> max x y : R}.
 Proof. by move=> x y; rewrite -[max _ _]opprK oppr_max !opprK. Qed.
 
 Lemma addr_minl : @left_distributive R R +%R min.
-Proof.
-by move=> x y z; case: leP; case: leP => //; rewrite lter_add2; case: leP.
-Qed.
+Proof. by move=> x y z; case: (leP (_ + _)); rewrite lter_add2; case: leP. Qed.
 
 Lemma addr_minr : @right_distributive R R +%R min.
 Proof. by move=> x y z; rewrite !(addrC x) addr_minl. Qed.
 
 Lemma addr_maxl : @left_distributive R R +%R max.
-Proof.
-by move=> x y z; case: leP; case: leP => //; rewrite lter_add2; case: leP.
-Qed.
+Proof. by move=> x y z; case: (leP (_ + _)); rewrite lter_add2; case: leP. Qed.
 
 Lemma addr_maxr : @right_distributive R R +%R max.
 Proof. by move=> x y z; rewrite !(addrC x) addr_maxl. Qed.
@@ -3841,7 +3837,7 @@ Proof. by move=> x y z; rewrite !(addrC x) addr_maxl. Qed.
 Lemma minr_pmulr x y z : 0 <= x -> x * min y z = min (x * y) (x * z).
 Proof.
 case: sgrP=> // hx _; first by rewrite hx !mul0r meetxx.
-by case: leP; case: leP => //; rewrite lter_pmul2l //; case: leP.
+by case: (leP (_ * _)); rewrite lter_pmul2l //; case: leP.
 Qed.
 
 Lemma minr_nmulr x y z : x <= 0 -> x * min y z = max (x * y) (x * z).
