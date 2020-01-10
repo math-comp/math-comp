@@ -2204,10 +2204,10 @@ Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 Notation "x `&^d` y" :=  (@meet (dual_display _) _ x y) : order_scope.
 Notation "x `|^d` y" := (@join (dual_display _) _ x y) : order_scope.
 
-Local Notation "0" := bottom.
-Local Notation "1" := top.
-Local Notation join := (@join (dual_display _) _).
-Local Notation meet := (@meet (dual_display _) _).
+Notation dual_bottom := (@bottom (dual_display _)).
+Notation dual_top := (@top (dual_display _)).
+Notation dual_join := (@join (dual_display _) _).
+Notation dual_meet := (@meet (dual_display _) _).
 
 Notation "\join^d_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
@@ -2604,6 +2604,8 @@ Module Import DualPOrder.
 Section DualPOrder.
 Canonical dual_eqType (T : eqType) := EqType T [eqMixin of T^d].
 Canonical dual_choiceType (T : choiceType) := [choiceType of T^d].
+Canonical dual_countType (T : countType) := [countType of T^d].
+Canonical dual_finType (T : finType) := [finType of T^d].
 
 Context {disp : unit}.
 Local Notation porderType := (porderType disp).
@@ -2625,7 +2627,14 @@ Definition dual_porderMixin :=
 Canonical dual_porderType :=
   POrderType (dual_display disp) (T^d) dual_porderMixin.
 
+Lemma leEdual (x y : T) : (x <=^d y :> T^d) = (y <= x). Proof. by []. Qed.
+Lemma ltEdual (x y : T) : (x <^d y :> T^d) = (y < x). Proof. by []. Qed.
+
 End DualPOrder.
+
+Canonical dual_finPOrderType d (T : finPOrderType d) :=
+  [finPOrderType of T^d].
+
 End DualPOrder.
 
 Module Import DualDistrLattice.
@@ -2681,6 +2690,10 @@ Definition dual_distrLatticeMixin :=
   joinA meetA meetKU joinKI dual_leEmeet joinIl.
 Canonical dual_distrLatticeType :=
   DistrLatticeType L^d dual_distrLatticeMixin.
+
+Lemma meetEdual x y : ((x : L^d) `&^d` y) = (x `|` y). Proof. by []. Qed.
+Lemma joinEdual x y : ((x : L^d) `|^d` y) = (x `&` y). Proof. by []. Qed.
+
 End DualDistrLattice.
 End DualDistrLattice.
 
@@ -3166,7 +3179,14 @@ Definition dual_tbDistrLatticeMixin :=
 Canonical dual_tbDIstrLatticeType :=
   TBDistrLatticeType L^d dual_tbDistrLatticeMixin.
 
+Lemma botEdual : (dual_bottom : L^d) = 1 :> L. Proof. by []. Qed.
+Lemma topEdual : (dual_top : L^d) = 0 :> L. Proof. by []. Qed.
+
 End DualTBDistrLattice.
+
+Canonical dual_finDistrLatticeType d (T : finDistrLatticeType d) :=
+  [finDistrLatticeType of T^d].
+
 End DualTBDistrLattice.
 
 Module Import TBDistrLatticeTheory.
@@ -5975,6 +5995,24 @@ Canonical tlexi_finOrderType n (T : finOrderType disp) :=
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
+Module Import DualOrder.
+Section DualOrder.
+Context {disp : unit}.
+Local Notation orderType := (orderType disp).
+
+Variable O : orderType.
+
+Lemma dual_totalMixin : totalOrderMixin [distrLatticeType of O^d].
+Proof. by move=> x y; rewrite le_total. Qed.
+Canonical dual_orderType := OrderType O^d dual_totalMixin.
+
+End DualOrder.
+
+Canonical dual_finOrderType d (T : finOrderType d) :=
+  [finOrderType of T^d].
+
+End DualOrder.
+
 Module Syntax.
 Export POSyntax.
 Export DistrLatticeSyntax.
@@ -5998,6 +6036,7 @@ Export DistrLatticeTheoryJoin.
 Export BDistrLatticeTheory.
 Export DualTBDistrLattice.
 Export TBDistrLatticeTheory.
+Export DualOrder.
 End LTheory.
 
 Module CTheory.
