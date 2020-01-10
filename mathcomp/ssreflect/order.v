@@ -2147,10 +2147,10 @@ Export FinTotal.Exports.
 
 Definition dual T : Type := T.
 Definition dual_display : unit -> unit. Proof. exact. Qed.
-Local Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
 
 Module Import DualSyntax.
 
+Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
 Notation "<=^d%O" := (@le (dual_display _) _) : fun_scope.
 Notation ">=^d%O" := (@ge (dual_display _) _)  : fun_scope.
 Notation ">=^d%O" := (@ge (dual_display _) _)  : fun_scope.
