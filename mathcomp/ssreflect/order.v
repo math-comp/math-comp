@@ -122,12 +122,12 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*                      divisibility predicate dvdn.                          *)
 (*                      Notation %|, %<|, gcd, lcm are used instead of        *)
 (*                      <=, <, meet and join.                                 *)
-(*              T^c  := converse T,                                           *)
-(*                      where converse is a new definition for (fun T => T)   *)
+(*              T^d  := dual T,                                               *)
+(*                      where dual is a new definition for (fun T => T)       *)
 (*                   == a "copy" of T, such that if T is canonically ordered, *)
-(*                      then T^c is canonically ordered with the converse     *)
-(*                      order, and displayed with an extra ^c in the notation *)
-(*                      i.e. <=^c, <^c, >=<^c, ><^c, `&`^c, `|`^c are         *)
+(*                      then T^d is canonically ordered with the dual         *)
+(*                      order, and displayed with an extra ^d in the notation *)
+(*                      i.e. <=^d, <^d, >=<^d, ><^d, `&`^d, `|`^d are         *)
 (*                      used and displayed instead of                         *)
 (*                      <=, <, >=<, ><, `&`, `|`                              *)
 (*     T *prod[d] T' := T * T'                                                *)
@@ -180,7 +180,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* to inform the user of what the inferrence did, rather than additional      *)
 (* input for the inference.                                                   *)
 (*                                                                            *)
-(* Existing displays are either converse_display d (where d is a display),    *)
+(* Existing displays are either dual_display d (where d is a display),        *)
 (* dvd_display (both explained above), total_display (to overload meet and    *)
 (* join using min and max) ring_display (from algebra/ssrnum to change the    *)
 (* scope of the usual notations to ring_scope). We also provide lexi_display  *)
@@ -375,44 +375,44 @@ Reserved Notation "A `|` B" (at level 52, left associativity).
 Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
-(* Notations for converse partial and total order *)
-Reserved Notation "x <=^c y" (at level 70, y at next level).
-Reserved Notation "x >=^c y" (at level 70, y at next level, only parsing).
-Reserved Notation "x <^c y" (at level 70, y at next level).
-Reserved Notation "x >^c y" (at level 70, y at next level, only parsing).
-Reserved Notation "x <=^c y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^c y :> T" (at level 70, y at next level, only parsing).
-Reserved Notation "x <^c y :> T" (at level 70, y at next level).
-Reserved Notation "x >^c y :> T" (at level 70, y at next level, only parsing).
-Reserved Notation "<=^c y" (at level 35).
-Reserved Notation ">=^c y" (at level 35).
-Reserved Notation "<^c y" (at level 35).
-Reserved Notation ">^c y" (at level 35).
-Reserved Notation "<=^c y :> T" (at level 35, y at next level).
-Reserved Notation ">=^c y :> T" (at level 35, y at next level).
-Reserved Notation "<^c y :> T" (at level 35, y at next level).
-Reserved Notation ">^c y :> T" (at level 35, y at next level).
-Reserved Notation "x >=<^c y" (at level 70, no associativity).
-Reserved Notation ">=<^c x" (at level 35).
-Reserved Notation ">=<^c y :> T" (at level 35, y at next level).
-Reserved Notation "x ><^c y" (at level 70, no associativity).
-Reserved Notation "><^c x" (at level 35).
-Reserved Notation "><^c y :> T" (at level 35, y at next level).
+(* Notations for dual partial and total order *)
+Reserved Notation "x <=^d y" (at level 70, y at next level).
+Reserved Notation "x >=^d y" (at level 70, y at next level, only parsing).
+Reserved Notation "x <^d y" (at level 70, y at next level).
+Reserved Notation "x >^d y" (at level 70, y at next level, only parsing).
+Reserved Notation "x <=^d y :> T" (at level 70, y at next level).
+Reserved Notation "x >=^d y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x <^d y :> T" (at level 70, y at next level).
+Reserved Notation "x >^d y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "<=^d y" (at level 35).
+Reserved Notation ">=^d y" (at level 35).
+Reserved Notation "<^d y" (at level 35).
+Reserved Notation ">^d y" (at level 35).
+Reserved Notation "<=^d y :> T" (at level 35, y at next level).
+Reserved Notation ">=^d y :> T" (at level 35, y at next level).
+Reserved Notation "<^d y :> T" (at level 35, y at next level).
+Reserved Notation ">^d y :> T" (at level 35, y at next level).
+Reserved Notation "x >=<^d y" (at level 70, no associativity).
+Reserved Notation ">=<^d x" (at level 35).
+Reserved Notation ">=<^d y :> T" (at level 35, y at next level).
+Reserved Notation "x ><^d y" (at level 70, no associativity).
+Reserved Notation "><^d x" (at level 35).
+Reserved Notation "><^d y :> T" (at level 35, y at next level).
 
-Reserved Notation "x <=^c y <=^c z" (at level 70, y, z at next level).
-Reserved Notation "x <^c y <=^c z" (at level 70, y, z at next level).
-Reserved Notation "x <=^c y <^c z" (at level 70, y, z at next level).
-Reserved Notation "x <^c y <^c z" (at level 70, y, z at next level).
-Reserved Notation "x <=^c y ?= 'iff' c" (at level 70, y, c at next level,
-  format "x '[hv'  <=^c  y '/'  ?=  'iff'  c ']'").
-Reserved Notation "x <=^c y ?= 'iff' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <=^c  y '/'  ?=  'iff'  c  :> T ']'").
+Reserved Notation "x <=^d y <=^d z" (at level 70, y, z at next level).
+Reserved Notation "x <^d y <=^d z" (at level 70, y, z at next level).
+Reserved Notation "x <=^d y <^d z" (at level 70, y, z at next level).
+Reserved Notation "x <^d y <^d z" (at level 70, y, z at next level).
+Reserved Notation "x <=^d y ?= 'iff' c" (at level 70, y, c at next level,
+  format "x '[hv'  <=^d  y '/'  ?=  'iff'  c ']'").
+Reserved Notation "x <=^d y ?= 'iff' c :> T" (at level 70, y, c at next level,
+  format "x '[hv'  <=^d  y '/'  ?=  'iff'  c  :> T ']'").
 
-(* Reserved notation for converse lattice operations. *)
-Reserved Notation "A `&^c` B"  (at level 48, left associativity).
-Reserved Notation "A `|^c` B" (at level 52, left associativity).
-Reserved Notation "A `\^c` B" (at level 50, left associativity).
-Reserved Notation "~^c` A" (at level 35, right associativity).
+(* Reserved notation for dual lattice operations. *)
+Reserved Notation "A `&^d` B"  (at level 48, left associativity).
+Reserved Notation "A `|^d` B" (at level 52, left associativity).
+Reserved Notation "A `\^d` B" (at level 50, left associativity).
+Reserved Notation "~^d` A" (at level 35, right associativity).
 
 (* Reserved notations for product ordering of prod or seq *)
 Reserved Notation "x <=^p y" (at level 70, y at next level).
@@ -447,7 +447,7 @@ Reserved Notation "x <=^p y ?= 'iff' c" (at level 70, y, c at next level,
 Reserved Notation "x <=^p y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^p  y '/'  ?=  'iff'  c  :> T ']'").
 
-(* Reserved notation for converse lattice operations. *)
+(* Reserved notation for dual lattice operations. *)
 Reserved Notation "A `&^p` B"  (at level 48, left associativity).
 Reserved Notation "A `|^p` B" (at level 52, left associativity).
 Reserved Notation "A `\^p` B" (at level 50, left associativity).
@@ -563,7 +563,7 @@ Reserved Notation "\lcm_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \lcm_ ( i  'in'  A ) '/  '  F ']'").
 
-(* Reserved notation for converse lattice operations. *)
+(* Reserved notation for dual lattice operations. *)
 Reserved Notation "A `&^l` B"  (at level 48, left associativity).
 Reserved Notation "A `|^l` B" (at level 52, left associativity).
 Reserved Notation "A `\^l` B" (at level 50, left associativity).
@@ -680,79 +680,79 @@ Reserved Notation "\min_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \min_ ( i  'in'  A ) '/  '  F ']'").
 
-Reserved Notation "\meet^c_ i F"
+Reserved Notation "\meet^d_ i F"
   (at level 41, F at level 41, i at level 0,
-           format "'[' \meet^c_ i '/  '  F ']'").
-Reserved Notation "\meet^c_ ( i <- r | P ) F"
+           format "'[' \meet^d_ i '/  '  F ']'").
+Reserved Notation "\meet^d_ ( i <- r | P ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \meet^c_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( i <- r ) F"
+           format "'[' \meet^d_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( i <- r ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \meet^c_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( m <= i < n | P ) F"
+           format "'[' \meet^d_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( m <= i < n | P ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \meet^c_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( m <= i < n ) F"
+           format "'[' \meet^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( m <= i < n ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \meet^c_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( i | P ) F"
+           format "'[' \meet^d_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
-           format "'[' \meet^c_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( i : t | P ) F"
+           format "'[' \meet^d_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( i : t | P ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\meet^c_ ( i : t ) F"
+Reserved Notation "\meet^d_ ( i : t ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\meet^c_ ( i < n | P ) F"
+Reserved Notation "\meet^d_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \meet^c_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( i < n ) F"
+           format "'[' \meet^d_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( i < n ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \meet^c_ ( i  <  n )  F ']'").
-Reserved Notation "\meet^c_ ( i 'in' A | P ) F"
+           format "'[' \meet^d_ ( i  <  n )  F ']'").
+Reserved Notation "\meet^d_ ( i 'in' A | P ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \meet^c_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^c_ ( i 'in' A ) F"
+           format "'[' \meet^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^d_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \meet^c_ ( i  'in'  A ) '/  '  F ']'").
+           format "'[' \meet^d_ ( i  'in'  A ) '/  '  F ']'").
 
-Reserved Notation "\join^c_ i F"
+Reserved Notation "\join^d_ i F"
   (at level 41, F at level 41, i at level 0,
-           format "'[' \join^c_ i '/  '  F ']'").
-Reserved Notation "\join^c_ ( i <- r | P ) F"
+           format "'[' \join^d_ i '/  '  F ']'").
+Reserved Notation "\join^d_ ( i <- r | P ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \join^c_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( i <- r ) F"
+           format "'[' \join^d_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( i <- r ) F"
   (at level 41, F at level 41, i, r at level 50,
-           format "'[' \join^c_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( m <= i < n | P ) F"
+           format "'[' \join^d_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( m <= i < n | P ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \join^c_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( m <= i < n ) F"
+           format "'[' \join^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( m <= i < n ) F"
   (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \join^c_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( i | P ) F"
+           format "'[' \join^d_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
-           format "'[' \join^c_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( i : t | P ) F"
+           format "'[' \join^d_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( i : t | P ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\join^c_ ( i : t ) F"
+Reserved Notation "\join^d_ ( i : t ) F"
   (at level 41, F at level 41, i at level 50,
            only parsing).
-Reserved Notation "\join^c_ ( i < n | P ) F"
+Reserved Notation "\join^d_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \join^c_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( i < n ) F"
+           format "'[' \join^d_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( i < n ) F"
   (at level 41, F at level 41, i, n at level 50,
-           format "'[' \join^c_ ( i  <  n )  F ']'").
-Reserved Notation "\join^c_ ( i 'in' A | P ) F"
+           format "'[' \join^d_ ( i  <  n )  F ']'").
+Reserved Notation "\join^d_ ( i 'in' A | P ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \join^c_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\join^c_ ( i 'in' A ) F"
+           format "'[' \join^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\join^d_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
-           format "'[' \join^c_ ( i  'in'  A ) '/  '  F ']'").
+           format "'[' \join^d_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\meet^p_ i F"
   (at level 41, F at level 41, i at level 0,
@@ -2141,125 +2141,125 @@ End Exports.
 End FinTotal.
 Export FinTotal.Exports.
 
-(************)
-(* CONVERSE *)
-(************)
+(********)
+(* DUAL *)
+(********)
 
-Definition converse T : Type := T.
-Definition converse_display : unit -> unit. Proof. exact. Qed.
-Local Notation "T ^c" := (converse T) (at level 2, format "T ^c") : type_scope.
+Definition dual T : Type := T.
+Definition dual_display : unit -> unit. Proof. exact. Qed.
+Local Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
 
-Module Import ConverseSyntax.
+Module Import DualSyntax.
 
-Notation "<=^c%O" := (@le (converse_display _) _) : fun_scope.
-Notation ">=^c%O" := (@ge (converse_display _) _)  : fun_scope.
-Notation ">=^c%O" := (@ge (converse_display _) _)  : fun_scope.
-Notation "<^c%O" := (@lt (converse_display _) _) : fun_scope.
-Notation ">^c%O" := (@gt (converse_display _) _) : fun_scope.
-Notation "<?=^c%O" := (@leif (converse_display _) _) : fun_scope.
-Notation ">=<^c%O" := (@comparable (converse_display _) _) : fun_scope.
-Notation "><^c%O" := (fun x y => ~~ (@comparable (converse_display _) _ x y)) :
+Notation "<=^d%O" := (@le (dual_display _) _) : fun_scope.
+Notation ">=^d%O" := (@ge (dual_display _) _)  : fun_scope.
+Notation ">=^d%O" := (@ge (dual_display _) _)  : fun_scope.
+Notation "<^d%O" := (@lt (dual_display _) _) : fun_scope.
+Notation ">^d%O" := (@gt (dual_display _) _) : fun_scope.
+Notation "<?=^d%O" := (@leif (dual_display _) _) : fun_scope.
+Notation ">=<^d%O" := (@comparable (dual_display _) _) : fun_scope.
+Notation "><^d%O" := (fun x y => ~~ (@comparable (dual_display _) _ x y)) :
   fun_scope.
 
-Notation "<=^c y" := (>=^c%O y) : order_scope.
-Notation "<=^c y :> T" := (<=^c (y : T)) (only parsing) : order_scope.
-Notation ">=^c y"  := (<=^c%O y) : order_scope.
-Notation ">=^c y :> T" := (>=^c (y : T)) (only parsing) : order_scope.
+Notation "<=^d y" := (>=^d%O y) : order_scope.
+Notation "<=^d y :> T" := (<=^d (y : T)) (only parsing) : order_scope.
+Notation ">=^d y"  := (<=^d%O y) : order_scope.
+Notation ">=^d y :> T" := (>=^d (y : T)) (only parsing) : order_scope.
 
-Notation "<^c y" := (>^c%O y) : order_scope.
-Notation "<^c y :> T" := (<^c (y : T)) (only parsing) : order_scope.
-Notation ">^c y" := (<^c%O y) : order_scope.
-Notation ">^c y :> T" := (>^c (y : T)) (only parsing) : order_scope.
+Notation "<^d y" := (>^d%O y) : order_scope.
+Notation "<^d y :> T" := (<^d (y : T)) (only parsing) : order_scope.
+Notation ">^d y" := (<^d%O y) : order_scope.
+Notation ">^d y :> T" := (>^d (y : T)) (only parsing) : order_scope.
 
-Notation ">=<^c y" := (>=<^c%O y) : order_scope.
-Notation ">=<^c y :> T" := (>=<^c (y : T)) (only parsing) : order_scope.
+Notation ">=<^d y" := (>=<^d%O y) : order_scope.
+Notation ">=<^d y :> T" := (>=<^d (y : T)) (only parsing) : order_scope.
 
-Notation "x <=^c y" := (<=^c%O x y) : order_scope.
-Notation "x <=^c y :> T" := ((x : T) <=^c (y : T)) (only parsing) : order_scope.
-Notation "x >=^c y" := (y <=^c x) (only parsing) : order_scope.
-Notation "x >=^c y :> T" := ((x : T) >=^c (y : T)) (only parsing) : order_scope.
+Notation "x <=^d y" := (<=^d%O x y) : order_scope.
+Notation "x <=^d y :> T" := ((x : T) <=^d (y : T)) (only parsing) : order_scope.
+Notation "x >=^d y" := (y <=^d x) (only parsing) : order_scope.
+Notation "x >=^d y :> T" := ((x : T) >=^d (y : T)) (only parsing) : order_scope.
 
-Notation "x <^c y"  := (<^c%O x y) : order_scope.
-Notation "x <^c y :> T" := ((x : T) <^c (y : T)) (only parsing) : order_scope.
-Notation "x >^c y"  := (y <^c x) (only parsing) : order_scope.
-Notation "x >^c y :> T" := ((x : T) >^c (y : T)) (only parsing) : order_scope.
+Notation "x <^d y"  := (<^d%O x y) : order_scope.
+Notation "x <^d y :> T" := ((x : T) <^d (y : T)) (only parsing) : order_scope.
+Notation "x >^d y"  := (y <^d x) (only parsing) : order_scope.
+Notation "x >^d y :> T" := ((x : T) >^d (y : T)) (only parsing) : order_scope.
 
-Notation "x <=^c y <=^c z" := ((x <=^c y) && (y <=^c z)) : order_scope.
-Notation "x <^c y <=^c z" := ((x <^c y) && (y <=^c z)) : order_scope.
-Notation "x <=^c y <^c z" := ((x <=^c y) && (y <^c z)) : order_scope.
-Notation "x <^c y <^c z" := ((x <^c y) && (y <^c z)) : order_scope.
+Notation "x <=^d y <=^d z" := ((x <=^d y) && (y <=^d z)) : order_scope.
+Notation "x <^d y <=^d z" := ((x <^d y) && (y <=^d z)) : order_scope.
+Notation "x <=^d y <^d z" := ((x <=^d y) && (y <^d z)) : order_scope.
+Notation "x <^d y <^d z" := ((x <^d y) && (y <^d z)) : order_scope.
 
-Notation "x <=^c y ?= 'iff' C" := (<?=^c%O x y C) : order_scope.
-Notation "x <=^c y ?= 'iff' C :> T" := ((x : T) <=^c (y : T) ?= iff C)
+Notation "x <=^d y ?= 'iff' C" := (<?=^d%O x y C) : order_scope.
+Notation "x <=^d y ?= 'iff' C :> T" := ((x : T) <=^d (y : T) ?= iff C)
   (only parsing) : order_scope.
 
-Notation ">=<^c x" := (>=<^c%O x) : order_scope.
-Notation ">=<^c x :> T" := (>=<^c (x : T)) (only parsing) : order_scope.
-Notation "x >=<^c y" := (>=<^c%O x y) : order_scope.
+Notation ">=<^d x" := (>=<^d%O x) : order_scope.
+Notation ">=<^d x :> T" := (>=<^d (x : T)) (only parsing) : order_scope.
+Notation "x >=<^d y" := (>=<^d%O x y) : order_scope.
 
-Notation "><^c x" := (fun y => ~~ (>=<^c%O x y)) : order_scope.
-Notation "><^c x :> T" := (><^c (x : T)) (only parsing) : order_scope.
-Notation "x ><^c y" := (~~ (><^c%O x y)) : order_scope.
+Notation "><^d x" := (fun y => ~~ (>=<^d%O x y)) : order_scope.
+Notation "><^d x :> T" := (><^d (x : T)) (only parsing) : order_scope.
+Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
-Notation "x `&^c` y" :=  (@meet (converse_display _) _ x y) : order_scope.
-Notation "x `|^c` y" := (@join (converse_display _) _ x y) : order_scope.
+Notation "x `&^d` y" :=  (@meet (dual_display _) _ x y) : order_scope.
+Notation "x `|^d` y" := (@join (dual_display _) _ x y) : order_scope.
 
 Local Notation "0" := bottom.
 Local Notation "1" := top.
-Local Notation join := (@join (converse_display _) _).
-Local Notation meet := (@meet (converse_display _) _).
+Local Notation join := (@join (dual_display _) _).
+Local Notation meet := (@meet (dual_display _) _).
 
-Notation "\join^c_ ( i <- r | P ) F" :=
+Notation "\join^d_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
-Notation "\join^c_ ( i <- r ) F" :=
+Notation "\join^d_ ( i <- r ) F" :=
   (\big[join/0]_(i <- r) F%O) : order_scope.
-Notation "\join^c_ ( i | P ) F" :=
+Notation "\join^d_ ( i | P ) F" :=
   (\big[join/0]_(i | P%B) F%O) : order_scope.
-Notation "\join^c_ i F" :=
+Notation "\join^d_ i F" :=
   (\big[join/0]_i F%O) : order_scope.
-Notation "\join^c_ ( i : I | P ) F" :=
+Notation "\join^d_ ( i : I | P ) F" :=
   (\big[join/0]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\join^c_ ( i : I ) F" :=
+Notation "\join^d_ ( i : I ) F" :=
   (\big[join/0]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\join^c_ ( m <= i < n | P ) F" :=
+Notation "\join^d_ ( m <= i < n | P ) F" :=
  (\big[join/0]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\join^c_ ( m <= i < n ) F" :=
+Notation "\join^d_ ( m <= i < n ) F" :=
  (\big[join/0]_(m <= i < n) F%O) : order_scope.
-Notation "\join^c_ ( i < n | P ) F" :=
+Notation "\join^d_ ( i < n | P ) F" :=
  (\big[join/0]_(i < n | P%B) F%O) : order_scope.
-Notation "\join^c_ ( i < n ) F" :=
+Notation "\join^d_ ( i < n ) F" :=
  (\big[join/0]_(i < n) F%O) : order_scope.
-Notation "\join^c_ ( i 'in' A | P ) F" :=
+Notation "\join^d_ ( i 'in' A | P ) F" :=
  (\big[join/0]_(i in A | P%B) F%O) : order_scope.
-Notation "\join^c_ ( i 'in' A ) F" :=
+Notation "\join^d_ ( i 'in' A ) F" :=
  (\big[join/0]_(i in A) F%O) : order_scope.
 
-Notation "\meet^c_ ( i <- r | P ) F" :=
+Notation "\meet^d_ ( i <- r | P ) F" :=
   (\big[meet/1]_(i <- r | P%B) F%O) : order_scope.
-Notation "\meet^c_ ( i <- r ) F" :=
+Notation "\meet^d_ ( i <- r ) F" :=
   (\big[meet/1]_(i <- r) F%O) : order_scope.
-Notation "\meet^c_ ( i | P ) F" :=
+Notation "\meet^d_ ( i | P ) F" :=
   (\big[meet/1]_(i | P%B) F%O) : order_scope.
-Notation "\meet^c_ i F" :=
+Notation "\meet^d_ i F" :=
   (\big[meet/1]_i F%O) : order_scope.
-Notation "\meet^c_ ( i : I | P ) F" :=
+Notation "\meet^d_ ( i : I | P ) F" :=
   (\big[meet/1]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\meet^c_ ( i : I ) F" :=
+Notation "\meet^d_ ( i : I ) F" :=
   (\big[meet/1]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\meet^c_ ( m <= i < n | P ) F" :=
+Notation "\meet^d_ ( m <= i < n | P ) F" :=
  (\big[meet/1]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\meet^c_ ( m <= i < n ) F" :=
+Notation "\meet^d_ ( m <= i < n ) F" :=
  (\big[meet/1]_(m <= i < n) F%O) : order_scope.
-Notation "\meet^c_ ( i < n | P ) F" :=
+Notation "\meet^d_ ( i < n | P ) F" :=
  (\big[meet/1]_(i < n | P%B) F%O) : order_scope.
-Notation "\meet^c_ ( i < n ) F" :=
+Notation "\meet^d_ ( i < n ) F" :=
  (\big[meet/1]_(i < n) F%O) : order_scope.
-Notation "\meet^c_ ( i 'in' A | P ) F" :=
+Notation "\meet^d_ ( i 'in' A | P ) F" :=
  (\big[meet/1]_(i in A | P%B) F%O) : order_scope.
-Notation "\meet^c_ ( i 'in' A ) F" :=
+Notation "\meet^d_ ( i 'in' A ) F" :=
  (\big[meet/1]_(i in A) F%O) : order_scope.
 
-End ConverseSyntax.
+End DualSyntax.
 
 (**********)
 (* THEORY *)
@@ -2600,36 +2600,36 @@ Arguments nmono_in_leif [disp T A f C].
 Arguments mono_leif [disp T f C].
 Arguments nmono_leif [disp T f C].
 
-Module Import ConversePOrder.
-Section ConversePOrder.
-Canonical converse_eqType (T : eqType) := EqType T [eqMixin of T^c].
-Canonical converse_choiceType (T : choiceType) := [choiceType of T^c].
+Module Import DualPOrder.
+Section DualPOrder.
+Canonical dual_eqType (T : eqType) := EqType T [eqMixin of T^d].
+Canonical dual_choiceType (T : choiceType) := [choiceType of T^d].
 
 Context {disp : unit}.
 Local Notation porderType := (porderType disp).
 Variable T : porderType.
 
-Definition converse_le (x y : T) := (y <= x).
-Definition converse_lt (x y : T) := (y < x).
+Definition dual_le (x y : T) := (y <= x).
+Definition dual_lt (x y : T) := (y < x).
 
-Lemma converse_lt_def (x y : T) :
-  converse_lt x y = (y != x) && (converse_le x y).
+Lemma dual_lt_def (x y : T) :
+  dual_lt x y = (y != x) && (dual_le x y).
 Proof. by apply: lt_neqAle. Qed.
 
-Fact converse_le_anti : antisymmetric converse_le.
+Fact dual_le_anti : antisymmetric dual_le.
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
-Definition converse_porderMixin :=
-  LePOrderMixin converse_lt_def (lexx : reflexive converse_le) converse_le_anti
+Definition dual_porderMixin :=
+  LePOrderMixin dual_lt_def (lexx : reflexive dual_le) dual_le_anti
              (fun y z x zy yx => @le_trans _ _ y x z yx zy).
-Canonical converse_porderType :=
-  POrderType (converse_display disp) (T^c) converse_porderMixin.
+Canonical dual_porderType :=
+  POrderType (dual_display disp) (T^d) dual_porderMixin.
 
-End ConversePOrder.
-End ConversePOrder.
+End DualPOrder.
+End DualPOrder.
 
-Module Import ConverseDistrLattice.
-Section ConverseDistrLattice.
+Module Import DualDistrLattice.
+Section DualDistrLattice.
 Context {disp : unit}.
 Local Notation distrLatticeType := (distrLatticeType disp).
 
@@ -2673,16 +2673,16 @@ Proof. by move=> x y z; rewrite meetC meetUl ![_ `&` x]meetC. Qed.
 Lemma joinIl : left_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 
-Fact converse_leEmeet (x y : L^c) : (x <= y) = (x `|` y == x).
+Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
 Proof. by rewrite [LHS]leEjoin joinC. Qed.
 
-Definition converse_distrLatticeMixin :=
-   @DistrLatticeMixin _ [porderType of L^c] _ _ joinC meetC
-  joinA meetA meetKU joinKI converse_leEmeet joinIl.
-Canonical converse_distrLatticeType :=
-  DistrLatticeType L^c converse_distrLatticeMixin.
-End ConverseDistrLattice.
-End ConverseDistrLattice.
+Definition dual_distrLatticeMixin :=
+   @DistrLatticeMixin _ [porderType of L^d] _ _ joinC meetC
+  joinA meetA meetKU joinKI dual_leEmeet joinIl.
+Canonical dual_distrLatticeType :=
+  DistrLatticeType L^d dual_distrLatticeMixin.
+End DualDistrLattice.
+End DualDistrLattice.
 
 Module Import DistrLatticeTheoryMeet.
 Section DistrLatticeTheoryMeet.
@@ -2769,63 +2769,63 @@ Implicit Types (x y : L).
 
 (* lattice theory *)
 Lemma joinAC : right_commutative (@join _ L).
-Proof. exact: (@meetAC _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetAC _ [distrLatticeType of L^d]). Qed.
 Lemma joinCA : left_commutative (@join _ L).
-Proof. exact: (@meetCA _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetCA _ [distrLatticeType of L^d]). Qed.
 Lemma joinACA : interchange (@join _ L) (@join _ L).
-Proof. exact: (@meetACA _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetACA _ [distrLatticeType of L^d]). Qed.
 
 Lemma joinxx x : x `|` x = x.
-Proof. exact: (@meetxx _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetxx _ [distrLatticeType of L^d]). Qed.
 
 Lemma joinKU y x : x `|` (x `|` y) = x `|` y.
-Proof. exact: (@meetKI _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetKI _ [distrLatticeType of L^d]). Qed.
 Lemma joinUK y x : (x `|` y) `|` y = x `|` y.
-Proof. exact: (@meetIK _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetIK _ [distrLatticeType of L^d]). Qed.
 Lemma joinKUC y x : x `|` (y `|` x) = x `|` y.
-Proof. exact: (@meetKIC _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetKIC _ [distrLatticeType of L^d]). Qed.
 Lemma joinUKC y x : y `|` x `|` y = x `|` y.
-Proof. exact: (@meetIKC _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetIKC _ [distrLatticeType of L^d]). Qed.
 
 (* interaction with order *)
 Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
-Proof. exact: (@lexI _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@lexI _ [distrLatticeType of L^d]). Qed.
 Lemma lexUl x y z : x <= y -> x <= y `|` z.
-Proof. exact: (@leIxl _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIxl _ [distrLatticeType of L^d]). Qed.
 Lemma lexUr x y z : x <= z -> x <= y `|` z.
-Proof. exact: (@leIxr _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIxr _ [distrLatticeType of L^d]). Qed.
 Lemma lexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx2 _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIx2 _ [distrLatticeType of L^d]). Qed.
 
 Lemma leUr x y : x <= y `|` x.
-Proof. exact: (@leIr _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIr _ [distrLatticeType of L^d]). Qed.
 Lemma leUl x y : x <= x `|` y.
-Proof. exact: (@leIl _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIl _ [distrLatticeType of L^d]). Qed.
 
 Lemma join_idPl {x y} : reflect (x `|` y = y) (x <= y).
-Proof. exact: (@meet_idPr _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meet_idPr _ [distrLatticeType of L^d]). Qed.
 Lemma join_idPr {x y} : reflect (y `|` x = y) (x <= y).
-Proof. exact: (@meet_idPl _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meet_idPl _ [distrLatticeType of L^d]). Qed.
 
 Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPr. Qed.
 Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPl. Qed.
 
 Lemma leUidl x y : (x `|` y <= y) = (x <= y).
-Proof. exact: (@leIidr _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIidr _ [distrLatticeType of L^d]). Qed.
 Lemma leUidr x y : (y `|` x <= y) = (x <= y).
-Proof. exact: (@leIidl _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leIidl _ [distrLatticeType of L^d]). Qed.
 
 Lemma eq_joinl x y : (x `|` y == x) = (y <= x).
-Proof. exact: (@eq_meetl _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@eq_meetl _ [distrLatticeType of L^d]). Qed.
 Lemma eq_joinr x y : (x `|` y == y) = (x <= y).
-Proof. exact: (@eq_meetr _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@eq_meetr _ [distrLatticeType of L^d]). Qed.
 
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
-Proof. exact: (@leI2 _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@leI2 _ [distrLatticeType of L^d]). Qed.
 
 (* Distributive lattice theory *)
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
-Proof. exact: (@meetUr _ [distrLatticeType of L^c]). Qed.
+Proof. exact: (@meetUr _ [distrLatticeType of L^d]). Qed.
 
 Lemma lcomparableP x y : incomparel x y
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
@@ -3148,26 +3148,26 @@ Qed.
 End BDistrLatticeTheory.
 End BDistrLatticeTheory.
 
-Module Import ConverseTBDistrLattice.
-Section ConverseTBDistrLattice.
+Module Import DualTBDistrLattice.
+Section DualTBDistrLattice.
 Context {disp : unit}.
 Local Notation tbDistrLatticeType := (tbDistrLatticeType disp).
 Context {L : tbDistrLatticeType}.
 
 Lemma lex1 (x : L) : x <= top. Proof. by case: L x => [?[? ?[]]]. Qed.
 
-Definition converse_bDistrLatticeMixin :=
-  @BDistrLatticeMixin _ [distrLatticeType of L^c] top lex1.
-Canonical converse_bDistrLatticeType :=
-  BDistrLatticeType L^c converse_bDistrLatticeMixin.
+Definition dual_bDistrLatticeMixin :=
+  @BDistrLatticeMixin _ [distrLatticeType of L^d] top lex1.
+Canonical dual_bDistrLatticeType :=
+  BDistrLatticeType L^d dual_bDistrLatticeMixin.
 
-Definition converse_tbDistrLatticeMixin :=
-   @TBDistrLatticeMixin _ [distrLatticeType of L^c] (bottom : L) (@le0x _ L).
-Canonical converse_tbDIstrLatticeType :=
-  TBDistrLatticeType L^c converse_tbDistrLatticeMixin.
+Definition dual_tbDistrLatticeMixin :=
+   @TBDistrLatticeMixin _ [distrLatticeType of L^d] (bottom : L) (@le0x _ L).
+Canonical dual_tbDIstrLatticeType :=
+  TBDistrLatticeType L^d dual_tbDistrLatticeMixin.
 
-End ConverseTBDistrLattice.
-End ConverseTBDistrLattice.
+End DualTBDistrLattice.
+End DualTBDistrLattice.
 
 Module Import TBDistrLatticeTheory.
 Section TBDistrLatticeTheory.
@@ -3181,44 +3181,44 @@ Local Notation "1" := top.
 Hint Resolve le0x lex1 : core.
 
 Lemma meetx1 : right_id 1 (@meet _ L).
-Proof. exact: (@joinx0 _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@joinx0 _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meet1x : left_id 1 (@meet _ L).
-Proof. exact: (@join0x _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join0x _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma joinx1 : right_zero 1 (@join _ L).
-Proof. exact: (@meetx0 _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@meetx0 _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma join1x : left_zero 1 (@join _ L).
-Proof. exact: (@meet0x _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@meet0x _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma le1x x : (1 <= x) = (x == 1).
-Proof. exact: (@lex0 _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@lex0 _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
-Proof. rewrite joinC; exact: (@leU2l_le _ [tbDistrLatticeType of L^c]). Qed.
+Proof. rewrite joinC; exact: (@leU2l_le _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
-Proof. rewrite joinC; exact: (@leU2r_le _ [tbDistrLatticeType of L^c]). Qed.
+Proof. rewrite joinC; exact: (@leU2r_le _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
 Proof.
-rewrite joinC; exact: (@disjoint_lexUl _ [tbDistrLatticeType of L^c]).
+rewrite joinC; exact: (@disjoint_lexUl _ [tbDistrLatticeType of L^d]).
 Qed.
 
 Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
 Proof.
-rewrite joinC; exact: (@disjoint_lexUr _ [tbDistrLatticeType of L^c]).
+rewrite joinC; exact: (@disjoint_lexUr _ [tbDistrLatticeType of L^d]).
 Qed.
 
 Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
 Proof.
-by move=> ? ?; apply: (@leU2E _ [tbDistrLatticeType of L^c]); rewrite meetC.
+by move=> ? ?; apply: (@leU2E _ [tbDistrLatticeType of L^d]); rewrite meetC.
 Qed.
 
 Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
-Proof. exact: (@join_eq0 _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join_eq0 _ [tbDistrLatticeType of L^d]). Qed.
 
 Canonical meet_monoid := Monoid.Law (@meetA _ _) meet1x meetx1.
 Canonical meet_comoid := Monoid.ComLaw (@meetC _ _).
@@ -3230,44 +3230,44 @@ Canonical meet_addoid := Monoid.AddLaw (@joinIl _ L) (@joinIr _ _).
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@join_sup _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join_sup _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@join_min _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join_min _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. exact: (@joinsP _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@joinsP _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meet_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. exact: (@join_sup_seq _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join_sup_seq _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meet_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. exact: (@join_min_seq _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join_min_seq _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \meet_(x <- r | P x) F x).
-Proof. exact: (@joinsP_seq _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@joinsP_seq _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma le_meets I (A B : {set I}) (F : I -> L) :
    A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
-Proof. exact: (@le_joins _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@le_joins _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meets_setU I (A B : {set I}) (F : I -> L) :
    \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
-Proof. exact: (@joins_setU _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@joins_setU _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meet_seq I (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof. exact: (@join_seq _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@join_seq _ [tbDistrLatticeType of L^d]). Qed.
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
-Proof. exact: (@joins_disjoint _ [tbDistrLatticeType of L^c]). Qed.
+Proof. exact: (@joins_disjoint _ [tbDistrLatticeType of L^d]). Qed.
 
 End TBDistrLatticeTheory.
 End TBDistrLatticeTheory.
@@ -5983,20 +5983,20 @@ Export TBDistrLatticeSyntax.
 Export CBDistrLatticeSyntax.
 Export CTBDistrLatticeSyntax.
 Export TotalSyntax.
-Export ConverseSyntax.
+Export DualSyntax.
 Export DvdSyntax.
 End Syntax.
 
 Module LTheory.
 Export POCoercions.
-Export ConversePOrder.
+Export DualPOrder.
 Export POrderTheory.
 
-Export ConverseDistrLattice.
+Export DualDistrLattice.
 Export DistrLatticeTheoryMeet.
 Export DistrLatticeTheoryJoin.
 Export BDistrLatticeTheory.
-Export ConverseTBDistrLattice.
+Export DualTBDistrLattice.
 Export TBDistrLatticeTheory.
 End LTheory.
 
