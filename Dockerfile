@@ -29,7 +29,7 @@ RUN ["/bin/bash", "--login", "-c", "set -x \
   && opam pin add -n -k path coq-mathcomp-field . \
   && opam pin add -n -k path coq-mathcomp-character . \
   && opam install -y -v -j ${NJOBS} coq-mathcomp-character \
-  && opam clean -a -s --logs"]
+  && opam clean -a -c -s --logs"]
 
 FROM coqorg/base:bare
 

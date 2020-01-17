@@ -21,7 +21,7 @@ RUN ["/bin/bash", "--login", "-c", "set -x \
   && opam repository add --all-switches --set-default coq-core-dev https://coq.inria.fr/opam/core-dev \
   && opam update -y \
   && opam config list && opam repo list && opam list && coqc --version \
-  && opam clean -a -s --logs \
+  && opam clean -a -c -s --logs \
   && sudo chown -R coq:coq /home/coq/mathcomp \
   && cd mathcomp \
   && make Makefile.coq \
