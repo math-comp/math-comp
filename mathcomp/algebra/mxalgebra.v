@@ -1998,7 +1998,7 @@ Arguments capmx_idPr {F n m1 m2 A B}.
 Arguments capmx_idPl {F n m1 m2 A B}.
 Arguments bigcapmx_inf [F I] i0 [P m n A_ B].
 Arguments sub_bigcapmxP {F I P m n A B_}.
-Arguments mxrank_injP {F m n} p [A f].
+Arguments mxrank_injP {F m n} p {A f}.
 Arguments mxdirectP {F n S}.
 Arguments mxdirect_addsP {F m1 m2 n A B}.
 Arguments mxdirect_sumsP {F I P n A_}.
@@ -2619,7 +2619,7 @@ Notation "''Z' ( R )" := (center_mx R) : matrix_set_scope.
 
 Arguments memmx_subP {F m1 m2 n R1 R2}.
 Arguments memmx_eqP {F m1 m2 n R1 R2}.
-Arguments memmx_addsP {F m1 m2 n} A [R1 R2].
+Arguments memmx_addsP {F m1 m2 n} A {R1 R2}.
 Arguments memmx_sumsP {F I P n A R_}.
 Arguments mulsmx_subP {F m1 m2 m n R1 R2 R}.
 Arguments mulsmxP {F m1 m2 n A R1 R2}.

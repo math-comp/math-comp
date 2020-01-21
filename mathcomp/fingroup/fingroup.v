@@ -1839,8 +1839,8 @@ Arguments trivgP {gT G}.
 Arguments trivGP {gT G}.
 Arguments lcoset_eqP {gT G x y}.
 Arguments rcoset_eqP {gT G x y}.
-Arguments mulGidPl [gT G H].
-Arguments mulGidPr [gT G H].
+Arguments mulGidPl {gT G H}.
+Arguments mulGidPr {gT G H}.
 Arguments comm_group_setP {gT G H}.
 Arguments class_eqP {gT G x y}.
 Arguments repr_classesP {gT G xG}.
