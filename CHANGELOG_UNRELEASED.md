@@ -22,6 +22,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added lemmas `hasNfind`, `memNindex` and `findP` in `seq`
 
+- Added lemmas `foldr_rcons`, `foldl_rcons`, `scanl_rcons` and
+  `nth_cons_scanl` in `seq`
+
 ### Changed
 
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.
