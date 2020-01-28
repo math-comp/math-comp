@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Ported `order.v` from the finmap library, which provides structures of ordered
   sets (`porderType`, `distrLatticeType`, `orderType`, etc.) and its theory.
 
+- Added lemmas `hasNfind`, `memNindex` and `findP` in `seq`
+
 ### Changed
 
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.
