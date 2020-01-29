@@ -298,10 +298,11 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* - totalOrderMixin == on a distrLatticeType T, totality of the order of T   *)
 (*                    := total (<=%O : rel T)                                 *)
 (*                   (can build: orderType)                                   *)
-(*    NB: this mixin is kept separate from totalPOrderMixin (even though it   *)
-(*        is convertible to it), in order to avoid ambiguous coercion paths.  *)
+(*    NB: the above three mixins are kept separate from each other (even      *)
+(*        though they are convertible), in order to avoid ambiguous coercion  *)
+(*        paths.                                                              *)
 (*                                                                            *)
-(* - distrLatticeMixin == on a porderType T, takes meet, join                 *)
+(* - distrLatticeMixin == on a latticeType T, takes meet, join                *)
 (*                   commutativity and associativity of meet and join         *)
 (*                   idempotence of meet and some De Morgan laws              *)
 (*                   (can build: distrLatticeType)                            *)
@@ -320,37 +321,51 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* - IsoLatticeMixin creates a distrLatticeMixin from an ordered structure    *)
 (*   isomorphism (i.e., cancel f f', cancel f' f, {mono f : x y / x <= y})    *)
 (*                                                                            *)
+(* List of "big pack" notations:                                              *)
+(* - DistrLatticeOfChoiceType builds a distrLatticeType from a choiceType and *)
+(*   a meetJoinMixin.                                                         *)
+(* - OrderOfChoiceType builds an orderType from a choiceType, and a           *)
+(*   leOrderMixin or a ltOrderMixin.                                          *)
+(* - OrderOfPOrder builds an orderType from a porderType and a                *)
+(*   totalPOrderMixin.                                                        *)
+(* - OrderOfLattice builds an orderType from a latticeType and a              *)
+(*   totalLatticeMixin.                                                       *)
+(* NB: These big pack notations should be used only to construct instances on *)
+(*     the fly, e.g., in the middle of a proof, and should not be used to     *)
+(*     declare canonical instances. See field/algebraics_fundamentals.v for   *)
+(*     an example usage.                                                      *)
+(*                                                                            *)
 (* We provide the following canonical instances of ordered types              *)
 (* - all possible structures on bool                                          *)
-(* - porderType, distrLatticeType, orderType and bDistrLatticeType on nat for *)
-(*   the leq order                                                            *)
-(* - porderType, distrLatticeType, bDistrLatticeType, cbDistrLatticeType,     *)
-(*   ctbDistrLatticeType on nat for the dvdn order, where meet and join       *)
-(*   are respectively gcdn and lcmn                                           *)
-(* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
+(* - porderType, latticeType, distrLatticeType, orderType and                 *)
+(*   bDistrLatticeType on nat for the leq order                               *)
+(* - porderType, latticeType, distrLatticeType, bDistrLatticeType,            *)
+(*   cbDistrLatticeType, ctbDistrLatticeType on nat for the dvdn order, where *)
+(*   meet and join are respectively gcdn and lcmn                             *)
+(* - porderType, latticeType, distrLatticeType, orderType, bDistrLatticeType, *)
 (*   tbDistrLatticeType, cbDistrLatticeType, ctbDistrLatticeType              *)
 (*   on T *prod[disp] T' a "copy" of T * T'                                   *)
 (*     using product order (and T *p T' its specialization to prod_display)   *)
-(* - porderType, distrLatticeType, and orderType,  on T *lexi[disp] T'        *)
-(*     another "copy" of T * T', with lexicographic ordering                  *)
+(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
+(*     T *lexi[disp] T' another "copy" of T * T', with lexicographic ordering *)
 (*     (and T *l T' its specialization to lexi_display)                       *)
-(* - porderType, distrLatticeType, and orderType,  on {t : T & T' x}          *)
-(*     with lexicographic ordering                                            *)
-(* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
+(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
+(*     {t : T & T' x} with lexicographic ordering                             *)
+(* - porderType, latticeType, distrLatticeType, orderType, bDistrLatticeType, *)
 (*   cbDistrLatticeType, tbDistrLatticeType, ctbDistrLatticeType              *)
 (*   on seqprod_with disp T a "copy" of seq T                                 *)
 (*     using product order (and seqprod T' its specialization to prod_display)*)
-(* - porderType, distrLatticeType, and orderType, on seqlexi_with disp T      *)
-(*     another "copy" of seq T, with lexicographic ordering                   *)
-(*     (and seqlexi T its specialization to lexi_display)                     *)
-(* - porderType, distrLatticeType, orderType, bDistrLatticeType,              *)
+(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
+(*     seqlexi_with disp T another "copy" of seq T, with lexicographic        *)
+(*     ordering (and seqlexi T its specialization to lexi_display)            *)
+(* - porderType, latticeType, distrLatticeType, orderType, bDistrLatticeType, *)
 (*   cbDistrLatticeType, tbDistrLatticeType, ctbDistrLatticeType              *)
 (*   on n.-tupleprod[disp] a "copy" of n.-tuple T                             *)
 (*     using product order (and n.-tupleprod T its specialization             *)
 (*     to prod_display)                                                       *)
-(* - porderType, distrLatticeType, and orderType,  on n.-tuplelexi[d] T       *)
-(*     another "copy" of n.-tuple T, with lexicographic ordering              *)
-(*     (and n.-tuplelexi T its specialization to lexi_display)                *)
+(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
+(*     n.-tuplelexi[d] T another "copy" of n.-tuple T, with lexicographic     *)
+(*     ordering (and n.-tuplelexi T its specialization to lexi_display)       *)
 (* and all possible finite type instances                                     *)
 (*                                                                            *)
 (* In order to get a canonical order on prod or seq, one may import modules   *)
@@ -4269,7 +4284,7 @@ Notation leOrderMixin := of_.
 Notation LeOrderMixin := Build.
 Coercion distrLatticeMixin : leOrderMixin >-> meetJoinMixin.
 Coercion totalMixin : leOrderMixin >-> totalOrderMixin.
-Definition LeOrderOfChoiceType disp (T : choiceType) (m : of_ T) :=
+Definition OrderOfChoiceType disp (T : choiceType) (m : of_ T) :=
    OrderType (DistrLatticeOfChoiceType disp m) m.
 End Exports.
 
@@ -4296,62 +4311,40 @@ Record of_ := Build {
 
 Variables (m : of_).
 
-Let T_total_porderType : porderType tt :=
-  POrderType tt T (LtPOrderMixin (le_def m) (lt_irr m) (@lt_trans m)).
+Fact lt_def x y : lt m x y = (y != x) && le m x y.
+Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact le_total : totalPOrderMixin T_total_porderType.
+Fact meet_def_le x y : meet m x y = if le m x y then x else y.
+Proof. by rewrite meet_def le_def; case: eqP => //= ->; rewrite lt_irr. Qed.
+
+Fact join_def_le x y : join m x y = if le m y x then x else y.
+Proof. by rewrite join_def le_def; case: eqP => //= ->; rewrite lt_irr. Qed.
+
+Fact le_anti : antisymmetric (le m).
 Proof.
-by move=> x y; rewrite /<=%O /= !le_def; case: eqVneq; last exact: lt_total.
+move=> x y; rewrite !le_def; case: eqVneq => //= _ /andP [] hxy.
+by move/(lt_trans hxy); rewrite lt_irr.
 Qed.
 
-Let T_orderType := OrderOfPOrder le_total.
+Fact le_trans : transitive (le m).
+Proof.
+move=> y x z; rewrite !le_def; case: eqVneq => [->|_] //=.
+by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
+Qed.
 
-Implicit Types (x y z : T_orderType).
+Fact le_total : total (le m).
+Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
 
-Fact leP x y :
-  lel_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-Proof. by apply/lcomparable_leP/le_total. Qed.
-Fact meetE x y : meet m x y = x `&` y.
-Proof. by rewrite meet_def (_ : lt m x y = (x < y)) //; case: (leP y). Qed.
-Fact joinE x y : join m x y = x `|` y.
-Proof. by rewrite join_def (_ : lt m y x = (y < x)) //; case: leP. Qed.
-Fact meetC : commutative (meet m).
-Proof. by move=> *; rewrite !meetE meetC. Qed.
-Fact joinC : commutative (join m).
-Proof. by move=> *; rewrite !joinE joinC. Qed.
-Fact meetA : associative (meet m).
-Proof. by move=> *; rewrite !meetE meetA. Qed.
-Fact joinA : associative (join m).
-Proof. by move=> *; rewrite !joinE joinA. Qed.
-Fact joinKI y x : meet m x (join m x y) = x.
-Proof. by rewrite meetE joinE joinKI. Qed.
-Fact meetKU y x : join m x (meet m x y) = x.
-Proof. by rewrite meetE joinE meetKU. Qed.
-Fact meetUl : left_distributive (meet m) (join m).
-Proof. by move=> *; rewrite !meetE !joinE meetUl. Qed.
-Fact meetxx : idempotent (meet m).
-Proof. by move=> *; rewrite meetE meetxx. Qed.
-Fact le_def' x y : x <= y = (meet m x y == x).
-Proof. by rewrite meetE (eq_meetl x y). Qed.
-
-Definition distrLatticeMixin : meetJoinMixin T :=
-  @MeetJoinMixin _ (le m) (lt m) (meet m) (join m)
-    le_def' (@lt_def _ T_orderType)
-    meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
-
-Let T_distrLatticeType := DistrLatticeOfChoiceType tt distrLatticeMixin.
-
-Definition totalMixin : totalOrderMixin T_distrLatticeType := le_total.
+Definition orderMixin : leOrderMixin T :=
+  @LeOrderMixin _ (le m) (lt m) (meet m) (join m)
+                lt_def meet_def_le join_def_le le_anti le_trans le_total.
 
 End LtOrderMixin.
 
 Module Exports.
 Notation ltOrderMixin := of_.
 Notation LtOrderMixin := Build.
-Coercion distrLatticeMixin : ltOrderMixin >-> meetJoinMixin.
-Coercion totalMixin : ltOrderMixin >-> totalOrderMixin.
-Definition LtOrderOfChoiceType disp (T : choiceType) (m : of_ T) :=
-   OrderType (DistrLatticeOfChoiceType disp m) m.
+Coercion orderMixin : ltOrderMixin >-> leOrderMixin.
 End Exports.
 
 End LtOrderMixin.
