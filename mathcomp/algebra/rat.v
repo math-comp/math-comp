@@ -573,6 +573,7 @@ Definition ratLeMixin : realLeMixin rat_idomainType :=
               (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
 Canonical rat_porderType := POrderType ring_display rat ratLeMixin.
+Canonical rat_latticeType := LatticeType rat ratLeMixin.
 Canonical rat_distrLatticeType := DistrLatticeType rat ratLeMixin.
 Canonical rat_orderType := OrderType rat le_rat_total.
 Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
