@@ -167,16 +167,16 @@ Section HomoPath.
 
 Variables (T T' : Type) (f : T -> T') (leT : rel T) (leT' : rel T').
 
+Lemma path_map x s : path leT' (f x) (map f s) = path (relpre f leT') x s.
+Proof. by elim: s x => //= y s IHs x; rewrite -IHs. Qed.
+
 Lemma homo_path x s : {homo f : x y / leT x y >-> leT' x y} ->
   path leT x s -> path leT' (f x) (map f s).
-Proof.
-move=> f_homo; elim: s => //= y s IHs in x *.
-by move=> /andP[le_xy path_y_s]; rewrite f_homo//= IHs.
-Qed.
+Proof. by move=> f_homo xs; rewrite path_map (sub_path _ xs). Qed.
 
 Lemma mono_path x s : {mono f : x y / leT x y >-> leT' x y} ->
   path leT' (f x) (map f s) = path leT x s.
-Proof. by move=> f_mon; elim: s => //= y s IHs in x *; rewrite f_mon IHs. Qed.
+Proof. by move=> f_mon; rewrite path_map; apply: eq_path. Qed.
 
 End HomoPath.
 
@@ -190,6 +190,12 @@ Implicit Type p : seq T.
 
 Variant split x : seq T -> seq T -> seq T -> Type :=
   Split p1 p2 : split x (rcons p1 x ++ p2) p1 p2.
+
+Lemma eq_path_in e' x s : {in x :: s &, e =2 e'} -> path e x s = path e' x s.
+Proof.
+elim: s x => //= y s IHs x ee'; rewrite ee' ?(in_cons,eqxx,orbT)//.
+by rewrite IHs// => z t zys tys; rewrite ee'// in_cons (zys, tys) orbT.
+Qed.
 
 Lemma splitP p x (i := index x p) :
   x \in p -> split x p (take i p) (drop i.+1 p).
@@ -412,21 +418,20 @@ Section EqHomoPath.
 
 Variables (T : eqType) (T' : Type) (f : T -> T') (leT : rel T) (leT' : rel T').
 
+Lemma sub_path_in (e e' : rel T) x s : {in x :: s &, subrel e e'} ->
+   path e x s -> path e' x s.
+Proof.
+elim: s x => //= y s IHs x ee' /andP[/ee'->//=]; rewrite ?(eqxx,in_cons,orbT)//.
+by apply: IHs => z t zys tys; apply: ee'; rewrite in_cons (zys, tys) orbT.
+Qed.
+
 Lemma homo_path_in x s : {in x :: s &, {homo f : x y / leT x y >-> leT' x y}} ->
   path leT x s -> path leT' (f x) (map f s).
-Proof.
-move=> f_homo; elim: s => //= y s IHs in x f_homo *; move=> /andP[x_y y_s].
-rewrite f_homo ?(in_cons, mem_head, eqxx, orbT) ?IHs//= => z t z_mem t_mem.
-by apply: f_homo; rewrite in_cons ?(z_mem, t_mem, orbT).
-Qed.
+Proof. by move=> f_homo xs; rewrite path_map (sub_path_in _ xs). Qed.
 
 Lemma mono_path_in x s : {in x :: s &, {mono f : x y / leT x y >-> leT' x y}} ->
   path leT' (f x) (map f s) = path leT x s.
-Proof.
-move=> f_mono; elim: s => //= y s IHs in x f_mono *.
-rewrite f_mono ?(in_cons, mem_head, eqxx, orbT) ?IHs//= => z t z_mem t_mem.
-by rewrite f_mono// in_cons ?(z_mem, t_mem, orbT).
-Qed.
+Proof. by move=> f_mono; rewrite path_map; apply: eq_path_in. Qed.
 
 End EqHomoPath.
 
@@ -535,6 +540,12 @@ Qed.
 
 Hypothesis leT_tr : transitive leT.
 
+Lemma path_sortedE x s : path leT x s = (all (leT x) s && sorted s).
+Proof.
+apply/idP/idP => [xs|/andP[/path_min_sorted<-//]].
+by rewrite order_path_min//; apply: path_sorted xs.
+Qed.
+
 Lemma sorted_merge s t : sorted (s ++ t) -> merge s t = s ++ t.
 Proof.
 elim: s => //= x s; case: t; rewrite ?cats0 //= => y t ih hp.
@@ -632,6 +643,10 @@ Proof. exact/esym/map_sort. Qed.
 Lemma sorted_map s : sorted leT (map f s) = sorted leTf s.
 Proof. exact: mono_sorted. Qed.
 
+Lemma sub_sorted (leT' : rel T) :
+  subrel leT leT' -> forall s, sorted leT s -> sorted leT' s.
+Proof. by move=> leTT'; case => //; apply: sub_path. Qed.
+
 End SortMap.
 
 Arguments homo_sorted {T T' f leT' leT}.
@@ -650,6 +665,10 @@ Section EqSortSeq.
 
 Variable T : eqType.
 Variable leT : rel T.
+
+Lemma sub_sorted_in (leT' : rel T) (s : seq T) :
+  {in s &, subrel leT leT'} -> sorted leT s -> sorted leT' s.
+Proof. by case: s => //; apply: sub_path_in. Qed.
 
 Local Notation merge := (merge leT).
 Local Notation sort := (sort leT).

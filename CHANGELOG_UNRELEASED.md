@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   sets (`porderType`, `latticeType`, `distrLatticeType`, `orderType`, etc.) and
   its theory.
 
+- Lemmas `path_map`, `eq_path_in`, `sub_path_in`, `path_sortedE`,
+  `sub_sorted` and `sub_sorted_in` in `path` (and refactored related proofs)
+
 ### Changed
 
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.
