@@ -455,7 +455,7 @@ Arguments catcomp {A B C} g f x /.
 Notation "f1 \o f2" := (comp f1 f2) : fun_scope.
 Notation "f1 \; f2" := (catcomp f1 f2) : fun_scope.
 
-Notation "[ 'eta' f ]" := (fun x => f x) : fun_scope.
+Notation "[ 'eta' f ]" := (fun x => f x) (only parsing): fun_scope.
 
 Notation "'fun' => E" := (fun _ => E) : fun_scope.
 
