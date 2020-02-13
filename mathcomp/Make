@@ -92,6 +92,7 @@ ssreflect/mini_ssrfun.v
 ssreflect/mini_ssrbool.v
 ssreflect/mini_eqtype.v
 ssreflect/mini_ssrnat.v
+ssreflect/mini_seq.v
 ssreflect/mini_ssreflect.v
 
 -I .

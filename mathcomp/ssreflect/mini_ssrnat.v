@@ -1520,3 +1520,16 @@ Lemma homo_leq (f : nat -> T) (r : T -> T -> Prop) :
 Proof. by move=> rrefl /(@homo_leq_in predT f r) fr fS i j; apply: fr. Qed.
 
 End Monotonicity.
+
+Ltac nat_congr := first
+ [ apply: (congr1 succn _)
+ | apply: (congr1 predn _)
+ | apply: (congr1 (addn _) _)
+ | apply: (congr1 (subn _) _)
+ | apply: (congr1 (addn^~ _) _)
+ | match goal with |- (?X1 + ?X2 = ?X3) =>
+     symmetry;
+     rewrite -1?(addnC X1) -?(addnCA X1);
+     apply: (congr1 (addn X1) _);
+     symmetry
+   end ].
