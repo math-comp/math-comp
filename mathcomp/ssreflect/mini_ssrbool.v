@@ -434,7 +434,7 @@ Reserved Notation "[ /\ P1 , P2 , P3 , P4 & P5 ]" (at level 0, format
 
 Reserved Notation "[ \/ P1 | P2 ]" (at level 0, only parsing).
 Reserved Notation "[ \/ P1 , P2 | P3 ]" (at level 0, format
-  "'[hv' [ \/ '['  P1 , '/'  P2 ']' '/ '  |  P3 ] ']'"), only parsing.
+  "'[hv' [ \/ '['  P1 , '/'  P2 ']' '/ '  |  P3 ] ']'", only parsing).
 Reserved Notation "[ \/ P1 , P2 , P3 | P4 ]" (at level 0, format
   "'[hv' [ \/ '['  P1 , '/'  P2 , '/'  P3 ']' '/ '  |  P4 ] ']'", only parsing).
 
@@ -448,7 +448,7 @@ Reserved Notation "[ || b1 , b2 , .. , bn | c ]" (at level 0, format
 
 Reserved Notation "[ ==> b1 => c ]" (at level 0, only parsing).
 Reserved Notation "[ ==> b1 , b2 , .. , bn => c ]" (at level 0, format
-  "'[hv' [ ==> '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/'  =>  c ] ']'", only parsing.
+  "'[hv' [ ==> '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/'  =>  c ] ']'", only parsing).
 
 (**  Shorter delimiter  **)
 Delimit Scope bool_scope with B.

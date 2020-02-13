@@ -20,5 +20,12 @@ tuple.v
 ssrnotations.v
 ssrmatching.v
 
+mini_ssrfun.v
+mini_ssrbool.v
+mini_eqtype.v
+mini_ssrnat.v
+mini_seq.v
+mini_ssreflect.v
+
 -I .
 -R . mathcomp.ssreflect
