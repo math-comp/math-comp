@@ -88,6 +88,9 @@ ssreflect/ssrnotations.v
 ssreflect/ssrmatching.v
 ssreflect/tuple.v
 
+ssreflect/mini_ssrbool.v
+ssreflect/mini_ssrnat.v
+
 -I .
 -R . mathcomp
 
