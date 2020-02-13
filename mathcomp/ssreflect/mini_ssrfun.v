@@ -308,8 +308,8 @@ Delimit Scope pair_scope with PAIR.
 Open Scope pair_scope.
 
 (**  Notations for pair/conjunction projections  **)
-Notation "p .1" := (fst p) : pair_scope.
-Notation "p .2" := (snd p) : pair_scope.
+Notation "p .1" := (fst p) (only parsing) : pair_scope.
+Notation "p .2" := (snd p) (only parsing) : pair_scope.
 
 Coercion pair_of_and P Q (PandQ : P /\ Q) := (proj1 PandQ, proj2 PandQ).
 
@@ -368,8 +368,8 @@ Delimit Scope fun_scope with FUN.
 Open Scope fun_scope.
 
 (**  Notations for argument transpose  **)
-Notation "f ^~ y" := (fun x => f x y) : fun_scope.
-Notation "@^~ x" := (fun f => f x) : fun_scope.
+Notation "f ^~ y" := (fun x => f x y) (only parsing) : fun_scope.
+Notation "@^~ x" := (fun f => f x) (only parsing) : fun_scope.
 
 (**
  Definitions and notation for explicit functions with simplification,
@@ -457,7 +457,7 @@ Notation "f1 \; f2" := (catcomp f1 f2) : fun_scope.
 
 Notation "[ 'eta' f ]" := (fun x => f x) (only parsing): fun_scope.
 
-Notation "'fun' => E" := (fun _ => E) : fun_scope.
+Notation "'fun' => E" := (fun _ => E) (only parsing) : fun_scope.
 
 Notation id := (fun x => x).
 Notation "@ 'id' T" := (fun x : T => x) (only parsing) : fun_scope.

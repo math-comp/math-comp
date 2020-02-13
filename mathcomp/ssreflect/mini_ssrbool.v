@@ -426,29 +426,29 @@ Reserved Notation "{ 'on' cd , 'bijective' f }" (at level 0, f at level 8,
 
 Reserved Notation "[ /\ P1 & P2 ]" (at level 0, only parsing).
 Reserved Notation "[ /\ P1 , P2 & P3 ]" (at level 0, format
-  "'[hv' [ /\ '['  P1 , '/'  P2 ']' '/ '  &  P3 ] ']'").
+  "'[hv' [ /\ '['  P1 , '/'  P2 ']' '/ '  &  P3 ] ']'", only parsing).
 Reserved Notation "[ /\ P1 , P2 , P3 & P4 ]" (at level 0, format
-  "'[hv' [ /\ '['  P1 , '/'  P2 , '/'  P3 ']' '/ '  &  P4 ] ']'").
+  "'[hv' [ /\ '['  P1 , '/'  P2 , '/'  P3 ']' '/ '  &  P4 ] ']'", only parsing).
 Reserved Notation "[ /\ P1 , P2 , P3 , P4 & P5 ]" (at level 0, format
-  "'[hv' [ /\ '['  P1 , '/'  P2 , '/'  P3 , '/'  P4 ']' '/ '  &  P5 ] ']'").
+  "'[hv' [ /\ '['  P1 , '/'  P2 , '/'  P3 , '/'  P4 ']' '/ '  &  P5 ] ']'", only parsing).
 
 Reserved Notation "[ \/ P1 | P2 ]" (at level 0, only parsing).
 Reserved Notation "[ \/ P1 , P2 | P3 ]" (at level 0, format
-  "'[hv' [ \/ '['  P1 , '/'  P2 ']' '/ '  |  P3 ] ']'").
+  "'[hv' [ \/ '['  P1 , '/'  P2 ']' '/ '  |  P3 ] ']'"), only parsing.
 Reserved Notation "[ \/ P1 , P2 , P3 | P4 ]" (at level 0, format
-  "'[hv' [ \/ '['  P1 , '/'  P2 , '/'  P3 ']' '/ '  |  P4 ] ']'").
+  "'[hv' [ \/ '['  P1 , '/'  P2 , '/'  P3 ']' '/ '  |  P4 ] ']'", only parsing).
 
 Reserved Notation "[ && b1 & c ]" (at level 0, only parsing).
 Reserved Notation "[ && b1 , b2 , .. , bn & c ]" (at level 0, format
-  "'[hv' [ && '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/ '  &  c ] ']'").
+  "'[hv' [ && '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/ '  &  c ] ']'", only parsing).
 
 Reserved Notation "[ || b1 | c ]" (at level 0, only parsing).
 Reserved Notation "[ || b1 , b2 , .. , bn | c ]" (at level 0, format
-  "'[hv' [ || '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/ '  |  c ] ']'").
+  "'[hv' [ || '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/ '  |  c ] ']'", only parsing).
 
 Reserved Notation "[ ==> b1 => c ]" (at level 0, only parsing).
 Reserved Notation "[ ==> b1 , b2 , .. , bn => c ]" (at level 0, format
-  "'[hv' [ ==> '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/'  =>  c ] ']'").
+  "'[hv' [ ==> '['  b1 , '/'  b2 , '/'  .. , '/'  bn ']' '/'  =>  c ] ']'", only parsing.
 
 (**  Shorter delimiter  **)
 Delimit Scope bool_scope with B.
@@ -798,24 +798,24 @@ Inductive or4 (P1 P2 P3 P4 : Prop) : Prop :=
   Or41 of P1 | Or42 of P2 | Or43 of P3 | Or44 of P4.
 
 Notation "[ /\ P1 & P2 ]" := (and P1 P2) (only parsing) : type_scope.
-Notation "[ /\ P1 , P2 & P3 ]" := (and3 P1 P2 P3) : type_scope.
-Notation "[ /\ P1 , P2 , P3 & P4 ]" := (and4 P1 P2 P3 P4) : type_scope.
-Notation "[ /\ P1 , P2 , P3 , P4 & P5 ]" := (and5 P1 P2 P3 P4 P5) : type_scope.
+Notation "[ /\ P1 , P2 & P3 ]" := (and3 P1 P2 P3) (only parsing) : type_scope.
+Notation "[ /\ P1 , P2 , P3 & P4 ]" := (and4 P1 P2 P3 P4) (only parsing) : type_scope.
+Notation "[ /\ P1 , P2 , P3 , P4 & P5 ]" := (and5 P1 P2 P3 P4 P5) (only parsing) : type_scope.
 
 Notation "[ \/ P1 | P2 ]" := (or P1 P2) (only parsing) : type_scope.
-Notation "[ \/ P1 , P2 | P3 ]" := (or3 P1 P2 P3) : type_scope.
-Notation "[ \/ P1 , P2 , P3 | P4 ]" := (or4 P1 P2 P3 P4) : type_scope.
+Notation "[ \/ P1 , P2 | P3 ]" := (or3 P1 P2 P3) (only parsing) : type_scope.
+Notation "[ \/ P1 , P2 , P3 | P4 ]" := (or4 P1 P2 P3 P4) (only parsing) : type_scope.
 
 Notation "[ && b1 & c ]" := (b1 && c) (only parsing) : bool_scope.
 Notation "[ && b1 , b2 , .. , bn & c ]" := (b1 && (b2 && .. (bn && c) .. ))
-  : bool_scope.
+(only parsing) : bool_scope.
 
 Notation "[ || b1 | c ]" := (b1 || c) (only parsing) : bool_scope.
 Notation "[ || b1 , b2 , .. , bn | c ]" := (b1 || (b2 || .. (bn || c) .. ))
-  : bool_scope.
+(only parsing) : bool_scope.
 
 Notation "[ ==> b1 , b2 , .. , bn => c ]" :=
-   (b1 ==> (b2 ==> .. (bn ==> c) .. )) : bool_scope.
+   (b1 ==> (b2 ==> .. (bn ==> c) .. )) (only parsing) : bool_scope.
 Notation "[ ==> b1 => c ]" := (b1 ==> c) (only parsing) : bool_scope.
 
 Section AllAnd.
