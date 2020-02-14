@@ -26,6 +26,7 @@ mini_eqtype.v
 mini_ssrnat.v
 mini_seq.v
 mini_ssreflect.v
+mini_div.v
 
 -I .
 -R . mathcomp.ssreflect
