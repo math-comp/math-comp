@@ -2120,11 +2120,11 @@ End Map.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
   (at level 0, E at level 99, i ident,
-   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s ] ']'") : seq_scope.
+   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s ] ']'", only parsing) : seq_scope.
 
 Notation "[ 'seq' E | i <- s & C ]" := [seq E | i <- [seq i <- s | C]]
   (at level 0, E at level 99, i ident,
-   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s '/ '  &  C ] ']'") : seq_scope.
+   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s '/ '  &  C ] ']'", only parsing) : seq_scope.
 
 Notation "[ 'seq' E | i : T <- s ]" := (map (fun i : T => E) s)
   (at level 0, E at level 99, i ident, only parsing) : seq_scope.
@@ -2903,7 +2903,7 @@ Arguments flatten_mapP {S T A s y}.
 Notation "[ 'seq' E | x <- s , y <- t ]" :=
   (flatten [seq [seq E | y <- t] | x <- s])
   (at level 0, E at level 99, x ident, y ident,
-   format "[ '[hv' 'seq'  E '/ '  |  x  <-  s , '/   '  y  <-  t ] ']'")
+   format "[ '[hv' 'seq'  E '/ '  |  x  <-  s , '/   '  y  <-  t ] ']'", only parsing)
    : seq_scope.
 Notation "[ 'seq' E | x : S <- s , y : T <- t ]" :=
   (flatten [seq [seq E | y : T <- t] | x : S  <- s])
