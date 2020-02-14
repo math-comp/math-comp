@@ -718,56 +718,37 @@ Lemma inv_bij : bijective f. Proof. by exists f. Qed.
 
 End Involutions.
 
-Section OperationProperties.
+Notation left_id e op := (forall x, op e x = x) (only parsing).
+Notation right_id e op := (forall x, op x e = x) (only parsing).
+Notation left_zero z op := (forall x, op z x = z) (only parsing).
+Notation right_zero z op := (forall x, op x z = z) (only parsing).
+Notation left_inverse e inv op := (forall x, op (inv x) x = e) (only parsing).
+Notation right_inverse e inv op := (forall x, op x (inv x) = e) (only parsing).
 
-Variables S T R : Type.
+Notation right_commutative op := (forall x y z, op (op x y) z = op (op x z) y) (only parsing).
+Notation left_distributive op add :=
+  (forall x y z, op (add x y) z = add (op x z) (op y z)) (only parsing).
 
-Section SopTisR.
-Implicit Type op :  S -> T -> R.
-Definition left_inverse e inv op := forall x, op (inv x) x = e.
-Definition right_inverse e inv op := forall x, op x (inv x) = e.
-Definition left_injective op := forall x, injective (op^~ x).
-Definition right_injective op := forall y, injective (op y).
-End SopTisR.
+Notation left_commutative op := (forall x y z, op x (op y z) = op y (op x z)) (only parsing).
+Notation commutative op := (forall x y, op x y = op y x) (only parsing).
+Notation idempotent op := (forall x, op x x = x) (only parsing).
+Notation associative op := (forall x y z, op x (op y z) = op (op x y) z) (only parsing).
+Notation right_distributive op add :=
+  (forall x y z, op x (add y z) = add (op x y) (op x z)) (only parsing).
+Notation self_inverse e op := (forall x, op x x = e) (only parsing).
 
+Notation left_injective op := (forall x, injective (op^~ x)) (only parsing).
+Notation right_injective op := (forall y, injective (op y)) (only parsing).
 
-Section SopTisS.
-Implicit Type op :  S -> T -> S.
-Definition right_id e op := forall x, op x e = x.
-Definition left_zero z op := forall x, op z x = z.
-Definition right_commutative op := forall x y z, op (op x y) z = op (op x z) y.
-Definition left_distributive op add :=
-  forall x y z, op (add x y) z = add (op x z) (op y z).
-Definition right_loop inv op := forall y, cancel (op^~ y) (op^~ (inv y)).
-Definition rev_right_loop inv op := forall y, cancel (op^~ (inv y)) (op^~ y).
-End SopTisS.
+Notation right_loop inv op := (forall y, cancel (op^~ y) (op^~ (inv y))) (only parsing).
+Notation rev_right_loop inv op := (forall y, cancel (op^~ (inv y)) (op^~ y)) (only parsing).
 
-Section SopTisT.
-Implicit Type op :  S -> T -> T.
-Definition left_id e op := forall x, op e x = x.
-Definition right_zero z op := forall x, op x z = z.
-Definition left_commutative op := forall x y z, op x (op y z) = op y (op x z).
-Definition right_distributive op add :=
-  forall x y z, op x (add y z) = add (op x y) (op x z).
-Definition left_loop inv op := forall x, cancel (op x) (op (inv x)).
-Definition rev_left_loop inv op := forall x, cancel (op (inv x)) (op x).
-End SopTisT.
+Notation left_loop inv op := (forall x, cancel (op x) (op (inv x))) (only parsing).
+Notation rev_left_loop inv op := (forall x, cancel (op (inv x)) (op x)) (only parsing).
 
-Section SopSisT.
-Implicit Type op :  S -> S -> T.
-Definition self_inverse e op := forall x, op x x = e.
-Definition commutative op := forall x y, op x y = op y x.
-End SopSisT.
+Notation interchange op1 op2 :=
+  (forall x y z t, op1 (op2 x y) (op2 z t) = op2 (op1 x z) (op1 y t)) (only parsing).
 
-Section SopSisS.
-Implicit Type op :  S -> S -> S.
-Definition idempotent op := forall x, op x x = x.
-Definition associative op := forall x y z, op x (op y z) = op (op x y) z.
-Definition interchange op1 op2 :=
-  forall x y z t, op1 (op2 x y) (op2 z t) = op2 (op1 x z) (op1 y t).
-End SopSisS.
-
-End OperationProperties.
 
 From mathcomp Require Export ssreflect ssrnotations.
 
