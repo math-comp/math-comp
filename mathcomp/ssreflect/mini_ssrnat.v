@@ -1258,7 +1258,7 @@ Proof. by elim: n => // n IHn; rewrite expnS odd_mul {}IHn orbC; case odd. Qed.
 
 Fixpoint double_rec n := if n is n'.+1 then (double_rec n').+2 else 0.
 Definition double := nosimpl double_rec.
-Notation "n .*2" := (double n) : nat_scope.
+Notation "n .*2" := (double n) (only parsing) : nat_scope.
 
 Lemma doubleE : double = double_rec. Proof. by []. Qed.
 
@@ -1311,8 +1311,8 @@ Proof. by rewrite -!muln2 mulnA. Qed.
 (* Halving. *)
 
 Fixpoint half (n : nat) : nat := if n is n'.+1 then uphalf n' else n
-with   uphalf (n : nat) : nat := if n is n'.+1 then n'./2.+1 else n
-where "n ./2" := (half n) : nat_scope.
+with   uphalf (n : nat) : nat := if n is n'.+1 then (half n').+1 else n.
+Notation "n ./2" := (half n) (only parsing) : nat_scope.
 
 Lemma doubleK : cancel double half.
 Proof. by elim=> //= n ->. Qed.
