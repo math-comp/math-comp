@@ -302,7 +302,7 @@ Proof. by rewrite -subnS. Qed.
 Definition leq m n := m - n == 0.
 
 Notation "m <= n" := (leq m n) : nat_scope.
-Notation "m < n"  := (m.+1 <= n) : nat_scope.
+Notation "m < n"  := (m.+1 <= n) (only parsing) : nat_scope.
 Notation "m >= n" := (n <= m) (only parsing) : nat_scope.
 Notation "m > n"  := (n < m) (only parsing)  : nat_scope.
 
