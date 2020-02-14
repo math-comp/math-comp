@@ -267,7 +267,7 @@ Reserved Notation "{ 'mono' f : x y / a }" (at level 0, f at level 99,
 Reserved Notation "{ 'mono' f : x y /~ a }" (at level 0, f at level 99,
   x ident, y ident, format "{ 'mono'  f  :  x  y  /~  a }").
 
-Reserved Notation "@ 'id' T" (at level 10, T at level 8, format "@ 'id'  T").
+Reserved Notation "@ 'id' T" (at level 10, T at level 8, format "@ 'id'  T", only parsing).
 Reserved Notation "@ 'sval'" (at level 10, format "@ 'sval'").
 
 (**
@@ -459,7 +459,7 @@ Notation "[ 'eta' f ]" := (fun x => f x) (only parsing): fun_scope.
 
 Notation "'fun' => E" := (fun _ => E) (only parsing) : fun_scope.
 
-Notation id := (fun x => x).
+Notation id := (fun x => x) (only parsing).
 Notation "@ 'id' T" := (fun x : T => x) (only parsing) : fun_scope.
 
 Definition idfun T x : T := x.
