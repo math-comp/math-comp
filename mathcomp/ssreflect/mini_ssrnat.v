@@ -312,9 +312,9 @@ Definition ltn := [rel m n | m < n].
 Definition gtn := [rel m n | m > n].
 
 Notation "m <= n <= p" := ((m <= n) && (n <= p)) : nat_scope.
-Notation "m < n <= p" := ((m < n) && (n <= p)) : nat_scope.
-Notation "m <= n < p" := ((m <= n) && (n < p)) : nat_scope.
-Notation "m < n < p" := ((m < n) && (n < p)) : nat_scope.
+Notation "m < n <= p" := ((m < n) && (n <= p))  (only parsing) : nat_scope.
+Notation "m <= n < p" := ((m <= n) && (n < p))  (only parsing) : nat_scope.
+Notation "m < n < p" := ((m < n) && (n < p))  (only parsing) : nat_scope.
 
 Lemma ltnS m n : (m < n.+1) = (m <= n). Proof. by []. Qed.
 Lemma leq0n n : 0 <= n.                 Proof. by []. Qed.
