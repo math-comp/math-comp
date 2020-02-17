@@ -1342,7 +1342,7 @@ Lemma poly_ivt : real_closed_axiom R. Proof. by case: R => ? []. Qed.
 Fact sqrtr_subproof (x : R) :
   exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
 Proof.
-case x_ge0: (0 <= x); last by exists 0; rewrite ?lerr.
+case x_ge0: (0 <= x); last by exists 0.
 have le0x1: 0 <= x + 1 by rewrite -nnegrE rpredD ?rpred1.
 have [|y /andP[y_ge0 _]] := @poly_ivt ('X^2 - x%:P) _ _ le0x1.
   rewrite !hornerE -subr_ge0 add0r opprK x_ge0 -expr2 sqrrD mulr1.
