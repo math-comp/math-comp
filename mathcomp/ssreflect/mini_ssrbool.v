@@ -932,6 +932,9 @@ Arguments implyP {b1 b2}.
 Prenex Implicits idP idPn negP negPn negPf.
 Prenex Implicits andP and3P and4P and5P orP or3P or4P nandP norP implyP.
 
+(** abbrev for apply: (iffP idP) *)
+Ltac prove_reflect := apply: (iffP idP).
+
 (**  Shorter, more systematic names for the boolean connectives laws.        **)
 
 Lemma andTb : left_id true andb.       Proof. by []. Qed.
