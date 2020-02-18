@@ -97,6 +97,7 @@ ssreflect/mini_ssreflect.v
 ssreflect/mini_div.v
 ssreflect/mini_path.v
 ssreflect/mini_prime.v
+ssreflect/mini_sum.v
 
 -I .
 -R . mathcomp
