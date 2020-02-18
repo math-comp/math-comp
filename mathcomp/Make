@@ -95,6 +95,8 @@ ssreflect/mini_ssrnat.v
 ssreflect/mini_seq.v
 ssreflect/mini_ssreflect.v
 ssreflect/mini_div.v
+ssreflect/mini_path.v
+ssreflect/mini_prime.v
 
 -I .
 -R . mathcomp

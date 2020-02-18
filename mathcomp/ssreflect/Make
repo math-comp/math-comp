@@ -29,7 +29,6 @@ mini_ssreflect.v
 mini_div.v
 mini_path.v
 mini_prime.v
-mini_bigop.v
 
 -I .
 -R . mathcomp.ssreflect
