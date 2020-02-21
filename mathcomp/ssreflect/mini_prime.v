@@ -1,8 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import mini_ssreflect mini_ssrfun mini_ssrbool.
-From mathcomp Require Import mini_eqtype mini_ssrnat mini_seq mini_path.
-From mathcomp Require Import mini_div.
+From mathcomp Require Import ssreflect mini_ssrfun mini_ssrbool mini_eqtype.
+From mathcomp Require Import mini_ssrnat mini_seq mini_path mini_div.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)
