@@ -385,6 +385,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+Local Set Primitive Projections.
 
 Delimit Scope order_scope with O.
 Local Open Scope order_scope.
@@ -962,10 +963,10 @@ Section ClassDef.
 Record mixin_of (T : eqType) := Mixin {
   le : rel T;
   lt : rel T;
-  _  : forall x y, lt x y = (y != x) && (le x y);
-  _  : reflexive     le;
-  _  : antisymmetric le;
-  _  : transitive    le
+  lt_def   : forall x y, lt x y = (y != x) && (le x y);
+  lexx     : reflexive     le;
+  le_anti  : antisymmetric le;
+  le_trans : transitive    le
 }.
 
 Record class_of T := Class {
@@ -975,17 +976,17 @@ Record class_of T := Class {
 
 Local Coercion base : class_of >-> Choice.class_of.
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (Choice.class bT) b =>
@@ -1142,13 +1143,13 @@ Section ClassDef.
 Record mixin_of d (T : porderType d) := Mixin {
   meet : T -> T -> T;
   join : T -> T -> T;
-  _ : commutative meet;
-  _ : commutative join;
-  _ : associative meet;
-  _ : associative join;
-  _ : forall y x, meet x (join x y) = x;
-  _ : forall y x, join x (meet x y) = x;
-  _ : forall x y, (x <= y) = (meet x y == x);
+  meetC   : commutative meet;
+  joinC   : commutative join;
+  meetA   : associative meet;
+  joinA   : associative join;
+  joinKI  : forall y x, meet x (join x y) = x;
+  meetKU  : forall y x, join x (meet x y) = x;
+  leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
 
 Record class_of (T : Type) := Class {
@@ -1159,17 +1160,17 @@ Record class_of (T : Type) := Class {
 
 Local Coercion base : class_of >-> POrder.class_of.
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack disp0 (T0 : porderType disp0) (m0 : mixin_of T0) :=
   fun bT b & phant_id (@POrder.class disp bT) b =>
@@ -1259,7 +1260,7 @@ Module BLattice.
 Section ClassDef.
 Record mixin_of d (T : porderType d) := Mixin {
   bottom : T;
-  _ : forall x, bottom <= x;
+  le0x : forall x, bottom <= x;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1270,17 +1271,17 @@ Record class_of (T : Type) := Class {
 
 Local Coercion base : class_of >-> Lattice.class_of.
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack disp0 (T0 : latticeType disp0) (m0 : mixin_of T0) :=
   fun bT b & phant_id (@Lattice.class disp bT) b =>
@@ -1363,7 +1364,7 @@ Module TBLattice.
 Section ClassDef.
 Record mixin_of d (T : porderType d) := Mixin {
   top : T;
-  _ : forall x, x <= top;
+  lex1 : forall x, x <= top;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1374,17 +1375,17 @@ Record class_of (T : Type) := Class {
 
 Local Coercion base : class_of >-> BLattice.class_of.
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack disp0 (T0 : bLatticeType disp0) (m0 : mixin_of T0) :=
   fun bT b & phant_id (@BLattice.class disp bT) b =>
@@ -1469,7 +1470,7 @@ Module DistrLattice.
 Section ClassDef.
 
 Record mixin_of d (T : latticeType d) := Mixin {
-  _ : @left_distributive T T meet join;
+  meetUl : @left_distributive T T meet join;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1480,17 +1481,17 @@ Record class_of (T : Type) := Class {
 
 Local Coercion base : class_of >-> Lattice.class_of.
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack disp0 (T0 : latticeType disp0) (m0 : mixin_of T0) :=
   fun bT b & phant_id (@Lattice.class disp bT) b =>
@@ -1550,15 +1551,15 @@ Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : BLattice.class_of T :=
   BLattice.Class (mixin c).
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@DistrLattice.class disp bT) b =>
@@ -1612,15 +1613,15 @@ Local Coercion base : class_of >-> BDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : TBLattice.class_of T :=
   TBLattice.Class (mixin c).
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@BDistrLattice.class disp bT) b =>
@@ -1674,8 +1675,8 @@ Module CBDistrLattice.
 Section ClassDef.
 Record mixin_of d (T : bDistrLatticeType d) := Mixin {
   sub : T -> T -> T;
-  _ : forall x y, y `&` sub x y = bottom;
-  _ : forall x y, (x `&` y) `|` sub x y = x
+  subKI : forall x y, y `&` sub x y = bottom;
+  joinIB : forall x y, (x `&` y) `|` sub x y = x
 }.
 
 Record class_of (T : Type) := Class {
@@ -1686,17 +1687,17 @@ Record class_of (T : Type) := Class {
 
 Local Coercion base : class_of >-> BDistrLattice.class_of.
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT)c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack disp0 (T0 : bDistrLatticeType disp0) (m0 : mixin_of T0) :=
   fun bT b & phant_id (@BDistrLattice.class disp bT) b =>
@@ -1763,7 +1764,7 @@ Module CTBDistrLattice.
 Section ClassDef.
 Record mixin_of d (T : tbDistrLatticeType d) (sub : T -> T -> T) := Mixin {
    compl : T -> T;
-   _ : forall x, compl x = sub top x
+   complE : forall x, compl x = sub top x
 }.
 
 Record class_of (T : Type) := Class {
@@ -1779,17 +1780,17 @@ Local Coercion base : class_of >-> TBDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : CBDistrLattice.class_of T :=
   CBDistrLattice.Class (mixin1 c).
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
+Definition clone c of phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c of phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT  b  & phant_id (@TBDistrLattice.class disp bT) b =>
@@ -1886,17 +1887,17 @@ Record class_of (T : Type) := Class {
 
 Local Coercion base : class_of >-> DistrLattice.class_of.
 
-Structure type (d : unit) := Pack { sort; _ : class_of sort }.
+Structure type (d : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c & phant_id class c := @Pack disp T c.
-Definition clone_with disp' c & phant_id class c := @Pack disp' T c.
+Definition clone c & phant_id (class cT) c := @Pack disp T c.
+Definition clone_with disp' c & phant_id (class cT) c := @Pack disp' T c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack disp0 (T0 : distrLatticeType disp0) (m0 : mixin_of T0) :=
   fun bT b & phant_id (@DistrLattice.class disp bT) b =>
@@ -2057,15 +2058,15 @@ Local Coercion base : class_of >-> POrder.class_of.
 Local Coercion base2 T (c : class_of T) : Finite.class_of T :=
   Finite.Class (mixin c).
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@POrder.class disp bT) b =>
@@ -2118,15 +2119,15 @@ Local Coercion base : class_of >-> TBLattice.class_of.
 Local Coercion base2 T (c : class_of T) : FinPOrder.class_of T :=
   @FinPOrder.Class T c (mixin c).
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@TBLattice.class disp bT) b =>
@@ -2205,15 +2206,15 @@ Local Coercion base : class_of >-> TBDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : FinLattice.class_of T :=
   @FinLattice.Class T c (mixin c).
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@TBDistrLattice.class disp bT) b =>
@@ -2317,15 +2318,15 @@ Local Coercion base : class_of >-> CTBDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : FinDistrLattice.class_of T :=
   @FinDistrLattice.Class T c (mixin c).
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@CTBDistrLattice.class disp bT) b =>
@@ -2436,15 +2437,15 @@ Local Coercion base : class_of >-> FinDistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : Total.class_of T :=
   @Total.Class _ c _ (mixin (c := c)).
 
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+Structure type (disp : unit) :=
+  Pack { sort; #[canonical(false)] class : class_of sort }.
 
 Local Coercion sort : type >-> Sortclass.
 
 Variables (T : Type) (disp : unit) (cT : type disp).
 
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+Notation xclass := (class cT : class_of xT).
 
 Definition pack :=
   fun bT b & phant_id (@FinDistrLattice.class disp bT) b =>
