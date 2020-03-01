@@ -108,13 +108,23 @@ let map_of_inheritances (inhs : (string * string * string) list) =
   recur MapS.empty inhs
 ;;
 
-let is_transitive inhs =
-  let key_subset m m' = MapS.for_all (fun k _ -> MapS.mem k m') m in
-  MapS.for_all
-    (fun kl ml ->
-       MapS.for_all
-         (fun kr _ -> match MapS.find_opt kr inhs with
-              None -> true | Some mr -> key_subset ml mr) ml) inhs
+(* Computes transitive closure by the Floyd-Warshall algorithm *)
+let transitive_closure inhs =
+  MapS.fold
+    (fun j _ inhs' ->
+       let mj =
+         match MapS.find_opt j inhs' with None -> MapS.empty | Some mj -> mj
+       in
+       MapS.map (fun mi ->
+         match MapS.find_opt j mi with
+           | None -> mi
+           | Some i_j ->
+             MapS.merge (fun _ i_k j_k ->
+               match i_k, j_k with
+                 | Some i_k, _ -> Some i_k
+                 | None, Some j_k -> Some (i_j ^ "; " ^ j_k)
+                 | None, None -> None) mi mj) inhs')
+    inhs inhs
 ;;
 
 let minimalize inhs m =
@@ -249,7 +259,8 @@ Redirect %S Print Graph.
   let coercions = parse_coercions tmp_coercions in
   (* Output *)
   if !opt_verify then
-    print_verifier !opt_imports (map_of_inheritances canonicals)
+    print_verifier !opt_imports
+      (transitive_closure (map_of_inheritances canonicals))
   else begin
     let print_graph opt inhs =
       if opt <> "off" then
@@ -261,8 +272,10 @@ Redirect %S Print Graph.
           inhs
     in
     print_endline "digraph structures {";
-    print_graph !opt_canonicals (map_of_inheritances canonicals);
-    print_graph !opt_coercions (map_of_inheritances coercions);
+    print_graph !opt_canonicals
+      (transitive_closure (map_of_inheritances canonicals));
+    print_graph !opt_coercions
+      (transitive_closure (map_of_inheritances coercions));
     print_endline "}"
   end;
   Sys.remove tmp_canonicals;
