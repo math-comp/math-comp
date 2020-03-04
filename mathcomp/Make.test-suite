@@ -1,6 +1,7 @@
 test_suite/test_hierarchy_all.v
 test_suite/test_ssrAC.v
 test_suite/test_guard.v
+test_suite/test_order_conv.v
 test_suite/test_regular_conv.v
 
 -I .
