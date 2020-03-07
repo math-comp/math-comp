@@ -2,7 +2,7 @@
  (name mathcomp.solvable)
  (package coq-mathcomp-solvable)
  (modules :standard)
- (synopsis "Mathematical Components")
+ (synopsis "Mathematical Components Library on finite groups (II)")
  (theories mathcomp.ssreflect mathcomp.fingroup mathcomp.algebra)
  (flags
    -w -notation-overridden

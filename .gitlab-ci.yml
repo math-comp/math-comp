@@ -79,6 +79,19 @@ make-coq-latest:
       - tags
       - merge_requests
 
+.dune-build:
+  stage: build
+  image: coqorg/coq:dev-ocaml-4.13.1-flambda
+  script:
+    - opam switch "$COMPILER_EDGE"
+    - opam install -y dune
+    - opam pin -y add dune git+https://github.com/Alizter/dune#coq-compose.git
+    - cd mathcomp && dune build
+  except:
+    - tags
+    - merge_requests
+    - schedules
+
 .opam-build-once:
   extends: .opam-build
   except:
@@ -101,6 +114,9 @@ coq-8.15:
 
 coq-dev:
   extends: .opam-build
+
+coq-dev:dune:
+  extends: .dune-build
 
 ################
 ##### test stage

@@ -2,7 +2,7 @@
  (name mathcomp.ssreflect)
  (package coq-mathcomp-ssreflect)
  (modules :standard)
- (synopsis "Mathematical Components")
+ (synopsis "Small Scale Reflection")
  (flags
    -w -projection-no-head-constant
    -w -redundant-canonical-projection

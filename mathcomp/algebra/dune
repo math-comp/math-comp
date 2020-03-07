@@ -2,7 +2,7 @@
  (name mathcomp.algebra)
  (package coq-mathcomp-algebra)
  (modules :standard)
- (synopsis "Mathematical Components")
+ (synopsis "Mathematical Components Library on Albegra")
  (theories mathcomp.ssreflect mathcomp.fingroup)
  (flags
    -w -projection-no-head-constant

@@ -2,7 +2,7 @@
  (name mathcomp.character)
  (package coq-mathcomp-character)
  (modules :standard)
- (synopsis "Mathematical Components")
+ (synopsis "Mathematical Components Library on character theory")
  (theories mathcomp.ssreflect mathcomp.fingroup mathcomp.algebra mathcomp.field mathcomp.solvable)
  (flags
    -w -notation-overridden

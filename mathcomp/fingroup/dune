@@ -2,7 +2,7 @@
  (name mathcomp.fingroup)
  (package coq-mathcomp-fingroup)
  (modules :standard)
- (synopsis "Mathematical Components")
+ (synopsis "Mathematical Components Library on finite groups")
  (theories mathcomp.ssreflect)
  (flags
    -w -notation-overridden

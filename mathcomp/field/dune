@@ -2,7 +2,7 @@
  (name mathcomp.field)
  (package coq-mathcomp-field)
  (modules :standard)
- (synopsis "Mathematical Components")
+ (synopsis "Mathematical Components Library on Fields")
  (theories mathcomp.ssreflect mathcomp.fingroup mathcomp.algebra mathcomp.solvable)
  (flags
    -w -projection-no-head-constant
