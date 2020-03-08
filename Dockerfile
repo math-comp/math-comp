@@ -5,18 +5,12 @@ WORKDIR /home/coq/mathcomp
 
 COPY . .
 
-ARG compiler="base"
-# other possible value: "edge"
-
 RUN ["/bin/bash", "--login", "-c", "set -x \
-  && declare -A switch_table \
-  && switch_table=( [\"base\"]=\"${COMPILER}\" [\"edge\"]=\"${COMPILER_EDGE}\" ) \
-  && opam_switch=\"${switch_table[${compiler}]}\" \
-  && [ -n \"opam_switch\" ] \
-  && opam switch set ${opam_switch} \
+  && [ -n \"${COMPILER_EDGE}\" ] \
+  && opam switch set \"${COMPILER_EDGE}\" \
   && eval $(opam env) \
-  && unset \"switch_table[${compiler}]\" \
-  && for sw in \"${switch_table[@]}\"; do if [ -n \"$sw\" ]; then opam switch remove -y \"${sw}\"; fi; done \
+  && [ -n \"${COMPILER}\" ] \
+  && opam switch remove -y \"${COMPILER}\" \
   && opam repository add --all-switches --set-default coq-extra-dev https://coq.inria.fr/opam/extra-dev \
   && opam repository add --all-switches --set-default coq-core-dev https://coq.inria.fr/opam/core-dev \
   && opam update -y \
@@ -33,6 +27,7 @@ RUN ["/bin/bash", "--login", "-c", "set -x \
 
 FROM coqorg/base:bare
 
+ENV COMPILER=""
 ENV MATHCOMP_VERSION="dev"
 ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
 

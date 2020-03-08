@@ -1,7 +1,5 @@
 # Design:
 # - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.7 .)
-#   - choice of the OCaml compiler: var OPAM_SWITCH in {base, edge}
-#     (Dockerfile containing: "opam switch set $compiler && eval $(opam env)")
 #   - all branches (not tags) => push on GitLab registry
 #   - GitHub PRs => push on GitLab and report back thanks to @coqbot
 # - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.7)
@@ -43,12 +41,11 @@ stages:
   variables:
     # This image will be built locally only (not pushed)
     IMAGE: "mathcomp-dev:make_coq-${COQ_VERSION}"
-    OPAM_SWITCH: "edge"
   before_script:
     - echo "${OPAM_SWITCH}"
     - echo "${COQ_VERSION}"
   script:
-    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" -t "${IMAGE}" .
   except:
     - tags
     - merge_requests
@@ -67,7 +64,6 @@ make-coq-latest:
     - docker:dind
   variables:
     IMAGE: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_${CI_JOB_NAME}"
-    OPAM_SWITCH: "edge"
   before_script:
     - echo "${OPAM_SWITCH}"
     - echo "${CI_JOB_TOKEN}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
@@ -85,7 +81,7 @@ make-coq-latest:
     - tags
     - merge_requests
     - schedules
-  
+
 coq-8.7:
   extends: .opam-build-once
 
