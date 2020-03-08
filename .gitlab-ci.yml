@@ -221,16 +221,6 @@ ci-odd-order-dev:
     - opam pin add -n -k path coq-lemma-overloading .
     - opam install -y -v -j "${NJOBS}" coq-lemma-overloading
 
-ci-lemma-overloading-8.8:
-  extends: .ci-lemma-overloading
-  variables:
-    COQ_VERSION: "8.8"
-
-ci-lemma-overloading-8.9:
-  extends: .ci-lemma-overloading
-  variables:
-    COQ_VERSION: "8.9"
-
 ci-lemma-overloading-8.10:
   extends: .ci-lemma-overloading
   variables:
