@@ -168,7 +168,7 @@ Section HomoPath.
 Variables (T T' : Type) (f : T -> T') (leT : rel T) (leT' : rel T').
 
 Lemma path_map x s : path leT' (f x) (map f s) = path (relpre f leT') x s.
-Proof. by elim: s x => //= y s IHs x; rewrite -IHs. Qed.
+Proof. by elim: s x => //= y s <-. Qed.
 
 Lemma homo_path x s : {homo f : x y / leT x y >-> leT' x y} ->
   path leT x s -> path leT' (f x) (map f s).
@@ -190,12 +190,6 @@ Implicit Type p : seq T.
 
 Variant split x : seq T -> seq T -> seq T -> Type :=
   Split p1 p2 : split x (rcons p1 x ++ p2) p1 p2.
-
-Lemma eq_path_in e' x s : {in x :: s &, e =2 e'} -> path e x s = path e' x s.
-Proof.
-elim: s x => //= y s IHs x ee'; rewrite ee' ?(in_cons,eqxx,orbT)//.
-by rewrite IHs// => z t zys tys; rewrite ee'// in_cons (zys, tys) orbT.
-Qed.
 
 Lemma splitP p x (i := index x p) :
   x \in p -> split x p (take i p) (drop i.+1 p).
@@ -425,6 +419,10 @@ elim: s x => //= y s IHs x ee' /andP[/ee'->//=]; rewrite ?(eqxx,in_cons,orbT)//.
 by apply: IHs => z t zys tys; apply: ee'; rewrite in_cons (zys, tys) orbT.
 Qed.
 
+Lemma eq_path_in (e e' : rel T) x s : {in x :: s &, e =2 e'} ->
+  path e x s = path e' x s.
+Proof. by move=> ee'; apply/idP/idP => /sub_path_in->// y z /ee' P/P->. Qed.
+
 Lemma homo_path_in x s : {in x :: s &, {homo f : x y / leT x y >-> leT' x y}} ->
   path leT x s -> path leT' (f x) (map f s).
 Proof. by move=> f_homo xs; rewrite path_map (sub_path_in _ xs). Qed.
@@ -540,7 +538,7 @@ Qed.
 
 Hypothesis leT_tr : transitive leT.
 
-Lemma path_sortedE x s : path leT x s = (all (leT x) s && sorted s).
+Lemma path_sortedE x s : path leT x s = all (leT x) s && sorted s.
 Proof.
 apply/idP/idP => [xs|/andP[/path_min_sorted<-//]].
 by rewrite order_path_min//; apply: path_sorted xs.
