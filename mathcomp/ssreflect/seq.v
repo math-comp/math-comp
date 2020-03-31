@@ -3430,21 +3430,6 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
 Ltac tfae := do !apply: AllIffConj.
 
 (* Temporary backward compatibility. *)
-Notation perm_eqP := (deprecate perm_eqP permP) (only parsing).
-Notation perm_eqlP := (deprecate perm_eqlP permPl) (only parsing).
-Notation perm_eqrP := (deprecate perm_eqrP permPr) (only parsing).
-Notation perm_eqlE := (deprecate perm_eqlE permEl _ _ _) (only parsing).
-Notation perm_eq_refl := (deprecate perm_eq_refl perm_refl _) (only parsing).
-Notation perm_eq_sym := (deprecate perm_eq_sym perm_sym _) (only parsing).
-Notation "@ 'perm_eq_trans'" := (deprecate perm_eq_trans perm_trans)
-  (at level 10, only parsing).
-Notation perm_eq_trans := (@perm_eq_trans _ _ _ _) (only parsing).
-Notation perm_eq_size := (deprecate perm_eq_size perm_size _ _ _)
-  (only parsing).
-Notation perm_eq_mem := (deprecate perm_eq_mem perm_mem _ _ _)
-  (only parsing).
-Notation perm_eq_uniq := (deprecate perm_eq_uniq perm_uniq _ _ _)
-  (only parsing).
 Notation perm_eq_rev := (deprecate perm_eq_rev perm_rev _)
   (only parsing).
 Notation perm_eq_flatten := (deprecate perm_eq_flatten perm_flatten _ _ _)

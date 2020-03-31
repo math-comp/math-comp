@@ -576,7 +576,3 @@ Qed.
 End LiftPerm.
 
 Prenex Implicits lift_perm lift_permK.
-
-Notation tuple_perm_eqP :=
-  (deprecate tuple_perm_eqP tuple_permP) (only parsing).
-
