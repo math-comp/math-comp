@@ -24,6 +24,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Lemmas `path_map`, `eq_path_in`, `sub_path_in`, `path_sortedE`,
   `sub_sorted` and `sub_sorted_in` in `path` (and refactored related proofs)
 
+- Added lemmas `hasNfind`, `memNindex` and `findP` in `seq`
+
+- Added lemmas `foldr_rcons`, `foldl_rcons`, `scanl_rcons` and
+  `nth_cons_scanl` in `seq`
+
 ### Changed
 
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.

@@ -530,6 +530,9 @@ Proof. by elim: s => //= x s IHs; case a_x: (a x). Qed.
 Lemma before_find s i : i < find s -> a (nth s i) = false.
 Proof. by elim: s i => //= x s IHs; case: ifP => // a'x [|i] // /(IHs i). Qed.
 
+Lemma hasNfind s : ~~ has s -> find s = size s.
+Proof. by rewrite has_find; case: ltngtP (find_size s). Qed.
+
 Lemma filter_cat s1 s2 : filter (s1 ++ s2) = filter s1 ++ filter s2.
 Proof. by elim: s1 => //= x s1 ->; case (a x). Qed.
 
@@ -929,6 +932,23 @@ Proof.
 by move=> Pnil Pcons; elim=> [|x s IHs] [|y t] //= [eq_sz]; apply/Pcons/IHs.
 Qed.
 
+Section FindSpec.
+Variable (T : Type) (a : {pred T}) (s : seq T).
+
+Variant find_spec : bool -> nat -> Type :=
+| NotFound of ~~ has a s : find_spec false (size s)
+| Found (i : nat) of i < size s & (forall x0, a (nth x0 s i)) &
+  (forall x0 j, j < i -> a (nth x0 s j) = false) : find_spec true i.
+
+Lemma findP : find_spec (has a s) (find a s).
+Proof.
+have [a_s|aNs] := boolP (has a s); last by rewrite hasNfind//; constructor.
+by constructor=> [|x0|x0]; rewrite -?has_find ?nth_find//; apply: before_find.
+Qed.
+
+End FindSpec.
+Arguments findP {T}.
+
 Section RotRcons.
 
 Variable T : Type.
@@ -1303,6 +1323,9 @@ Proof. by rewrite /index find_size. Qed.
 
 Lemma index_mem x s : (index x s < size s) = (x \in s).
 Proof. by rewrite -has_pred1 has_find. Qed.
+
+Lemma memNindex x s :  x \notin s -> index x s = size s.
+Proof. by rewrite -has_pred1 => /hasNfind. Qed.
 
 Lemma nth_index x s : x \in s -> nth s (index x s) = x.
 Proof. by rewrite -has_pred1 => /(nth_find x0)/eqP. Qed.
@@ -2499,6 +2522,9 @@ Variables (R : Type) (f : T2 -> R -> R) (z0 : R).
 Lemma foldr_cat s1 s2 : foldr f z0 (s1 ++ s2) = foldr f (foldr f z0 s2) s1.
 Proof. by elim: s1 => //= x s1 ->. Qed.
 
+Lemma foldr_rcons s x : foldr f z0 (rcons s x) = foldr f (f x z0) s.
+Proof. by rewrite -cats1 foldr_cat. Qed.
+
 Lemma foldr_map s : foldr f z0 (map h s) = foldr (fun x z => f (h x) z) z0 s.
 Proof. by elim: s => //= x s ->. Qed.
 
@@ -2553,6 +2579,9 @@ Proof.
 by rewrite -(revK (s1 ++ s2)) foldl_rev rev_cat foldr_cat -!foldl_rev !revK.
 Qed.
 
+Lemma foldl_rcons z s x : foldl z (rcons s x) = f (foldl z s) x.
+Proof. by rewrite -cats1 foldl_cat. Qed.
+
 End FoldLeft.
 
 Section Scan.
@@ -2583,9 +2612,17 @@ Lemma scanl_cat x s1 s2 :
   scanl x (s1 ++ s2) = scanl x s1 ++ scanl (foldl g x s1) s2.
 Proof. by elim: s1 x => //= y s1 IHs1 x; rewrite IHs1. Qed.
 
+Lemma scanl_rcons x s1 y  :
+  scanl x (rcons s1 y) =  rcons (scanl x s1) (foldl g x (rcons s1 y)).
+Proof. by rewrite -!cats1 scanl_cat foldl_cat. Qed.
+
+Lemma nth_cons_scanl s n : n <= size s ->
+  forall x, nth x1 (x :: scanl x s) n = foldl g x (take n s).
+Proof. by elim: s n => [|y s IHs] [|n] Hn x //=; rewrite IHs. Qed.
+
 Lemma nth_scanl s n : n < size s ->
   forall x, nth x1 (scanl x s) n = foldl g x (take n.+1 s).
-Proof. by elim: s n => [|y s IHs] [|n] Hn x //=; rewrite ?take0 ?IHs. Qed.
+Proof. by move=> n_lt x; rewrite -nth_cons_scanl. Qed.
 
 Lemma scanlK :
   (forall x, cancel (g x) (f x)) -> forall x, cancel (scanl x) (pairmap x).
