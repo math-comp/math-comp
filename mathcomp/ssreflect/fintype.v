@@ -2037,7 +2037,7 @@ Proof.
 (* match representation is changed to omit these then this proof could reduce *)
 (* to by rewrite /split; case: ltnP; [left | right. rewrite subnKC].          *)
 set lt_i_m := i < m; rewrite /split.
-by case: {-}_ lt_i_m / ltnP; [left | right; rewrite subnKC].
+by case: _ _ _ _ {-}_ lt_i_m / ltnP; [left | right; rewrite subnKC].
 Qed.
 
 Definition unsplit {m n} (jk : 'I_m + 'I_n) :=

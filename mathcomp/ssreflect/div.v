@@ -120,7 +120,7 @@ Proof. by case: d => // d; rewrite -[n in n %/ _]muln1 mulKn. Qed.
 
 Lemma divnMl p m d : p > 0 -> p * m %/ (p * d) = m %/ d.
 Proof.
-move=> p_gt0; case: (posnP d) => [-> | d_gt0]; first by rewrite muln0.
+move=> p_gt0; have [->|d_gt0] := posnP d; first by rewrite muln0.
 rewrite [RHS]/divn; case: edivnP; rewrite d_gt0 /= => q r ->{m} lt_rd.
 rewrite mulnDr mulnCA divnMDl; last by rewrite muln_gt0 p_gt0.
 by rewrite addnC divn_small // ltn_pmul2l.
@@ -544,9 +544,9 @@ Lemma edivnS m d : 0 < d -> edivn m.+1 d =
 Proof.
 case: d => [|[|d]] //= _; first by rewrite edivn_def modn1 dvd1n !divn1.
 rewrite -addn1 /dvdn modn_def edivnD//= (@modn_small 1)// (@divn_small 1)//.
-rewrite addn1 addn0 ltnS; case: (ltngtP _ d.+1) => [ | |->].
-- by rewrite addn0 mul0n subn0.
+rewrite addn1 addn0 ltnS; have [||<-] := ltngtP d.+1.
 - by rewrite ltnNge -ltnS ltn_pmod.
+- by rewrite addn0 mul0n subn0.
 - by rewrite addn1 mul1n subnn.
 Qed.
 
@@ -656,10 +656,7 @@ Lemma gcdn_idPr {m n} : reflect (gcdn m n = n) (n %| m).
 Proof. by rewrite gcdnC; apply: gcdn_idPl. Qed.
 
 Lemma expn_min e m n : e ^ minn m n = gcdn (e ^ m) (e ^ n).
-Proof.
-rewrite /minn; case: leqP; [rewrite gcdnC | move/ltnW];
-  by move/(dvdn_exp2l e)/gcdn_idPl.
-Qed.
+Proof. by case: leqP => [|/ltnW] /(dvdn_exp2l e) /gcdn_idPl; rewrite gcdnC. Qed.
 
 Lemma gcdn_modr m n : gcdn m (n %% m) = gcdn m n.
 Proof. by rewrite [in RHS](divn_eq n m) gcdnMDl. Qed.
@@ -863,10 +860,7 @@ Lemma lcmn_idPl {m n} : reflect (lcmn m n = m) (n %| m).
 Proof. by rewrite lcmnC; apply: lcmn_idPr. Qed.
 
 Lemma expn_max e m n : e ^ maxn m n = lcmn (e ^ m) (e ^ n).
-Proof.
-rewrite /maxn; case: leqP; [rewrite lcmnC | move/ltnW];
- by move/(dvdn_exp2l e)/lcmn_idPr.
-Qed.
+Proof. by case: leqP => [|/ltnW] /(dvdn_exp2l e) /lcmn_idPl; rewrite lcmnC. Qed.
 
 (* Coprime factors *)
 
