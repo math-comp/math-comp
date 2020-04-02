@@ -1937,13 +1937,6 @@ Lemma biggcdn_inf (I : finType) i0 (P : pred I) F m :
 Proof. by move=> Pi0; apply: dvdn_trans; rewrite (bigD1 i0) ?dvdn_gcdl. Qed.
 Arguments biggcdn_inf [I] i0 [P F m].
 
-Notation "@ 'eq_big_perm'" :=
-  (deprecate eq_big_perm perm_big) (at level 10, only parsing).
-
-Notation eq_big_perm :=
-  ((fun R idx op I r1 P F r2 => @eq_big_perm R idx op I r1 r2 P F)
-        _   _  _ _  _ _ _) (only parsing).
-
 Notation filter_index_enum :=
   ((fun _ => @deprecated_filter_index_enum _)
      (deprecate filter_index_enum big_enumP)) (only parsing).

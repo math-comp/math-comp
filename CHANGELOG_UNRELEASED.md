@@ -162,6 +162,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+The following were deprecated since release 1.9.0
+- `tuple_perm_eqP` (use `tuple_permP` instead, from `perm.v`)
+- `eq_big_perm` (use `perm_big` instead, from `bigop.v`)
+- `perm_eqP` (use `permP` instead, from seq.v)
+- `perm_eqlP` (use `permPl` instead)
+- `perm_eqrP` (use `permPr` instead)
+- `perm_eqlE` (use `permEl` instead)
+- `perm_eq_refl` (use `perm_refl` instead)
+- `perm_eq_sym` (use `perm_sym` instead)
+- `perm_eq_trans` (use `perm_trans` instead)
+- `perm_eq_size` (use `perm_size` instead)
+- `perm_eq_mem` (use `perm_mem` instead)
+- `perm_eq_uniq` (use `perm_uniq` instead)
+
 ### Infrastructure
 
 ### Misc
