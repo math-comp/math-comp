@@ -90,7 +90,7 @@ Require Export Ring.
 (*   V (infix) -- disjunction, as in                                          *)
 (*      leq_eqVlt : (m <= n) = (m == n) || (m < n).                           *)
 (*   X - exponentiation, as in lognX : logn p (m ^ n) = logn p m * n in       *)
-(*         file prime.v (the suffix is not used in ths file).                 *)
+(*         file prime.v (the suffix is not used in the file).                 *)
 (* Suffixes that abbreviate operations (D, B, M and X) are used to abbreviate *)
 (* second-rank operations in equational lemma names that describe left-hand   *)
 (* sides (e.g., mulnDl); they are not used to abbreviate the main operation   *)
@@ -1531,7 +1531,7 @@ Section NatToNat.
 Variable (f : nat -> nat).
 
 (****************************************************************************)
-(* This listing of "Let"s factor out the required premices for the          *)
+(* This listing of "Let"s factor out the required premises for the          *)
 (* subsequent lemmas, putting them in the context so that "done" solves the *)
 (* goals quickly                                                            *)
 (****************************************************************************)
@@ -1634,7 +1634,7 @@ Module NatTrec.
 
 (*   Usage:                                             *)
 (*     Import NatTrec.                                  *)
-(*        in section definining functions, rebinds all  *)
+(*        in section defining functions, rebinds all    *)
 (*        non-tail recursive operators.                 *)
 (*     rewrite !trecE.                                  *)
 (*        in the correctness proof, restores operators  *)
@@ -1782,7 +1782,7 @@ End NumberInterpretation.
 (*     Num 1 072 399                                    *)
 (*        to create large numbers for test cases        *)
 (* Eval compute in [Num of some expression]             *)
-(*        to display the resut of an expression that    *)
+(*        to display the result of an expression that   *)
 (*        returns a larger integer.                     *)
 
 Record number : Type := Num {bin_of_number :> N}.

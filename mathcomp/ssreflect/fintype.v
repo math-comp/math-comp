@@ -108,7 +108,7 @@ From mathcomp Require Import path.
 (*     invF inj_f y == the x such that f x = y, for inj_j : injective f with  *)
 (*                     f : T -> T.                                            *)
 (*  dinjectiveb A f <=> the restriction of f : T -> R to A is injective       *)
-(*                     (this is a bolean predicate, R must be an eqType).     *)
+(*                     (this is a boolean predicate, R must be an eqType).    *)
 (*     injectiveb f <=> f : T -> R is injective (boolean predicate).          *)
 (*         pred0b A <=> no x : T satisfies x \in A.                           *)
 (*    [forall x, P] <=> P (in which x can appear) is true for all values of x *)

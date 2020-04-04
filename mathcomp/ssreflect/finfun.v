@@ -39,7 +39,7 @@ From mathcomp Require Import fintype tuple.
 (*                     limitations referred to above.                         *)
 (*        ffun0 aT0 == the trivial finfun, from a proof aT0 that #|aT| = 0.   *)
 (*   f \in family F == f belongs to the family F (f x \in F x for all x)      *)
-(*   There are addidional operations for non-dependent finite functions,      *)
+(*   There are additional operations for non-dependent finite functions,      *)
 (* i.e., f in {ffun aT -> rT}.                                                *)
 (*    [ffun x => E] := finfun (fun x => E).                                   *)
 (*                     The type of E must not depend on x; this restriction   *)
@@ -155,7 +155,7 @@ Proof. by fix IHt 2 => n [st]; apply/Kstep=> i; apply: IHt. Defined.
 Set Elimination Schemes.
 (* End example. *) *)
 
-(* The correspondance between finfun_of and CiC dependent functions.          *)
+(* The correspondence between finfun_of and CiC dependent functions.          *)
 Section DepPlainTheory.
 Variables (aT : finType) (rT : aT -> Type).
 Notation fT := {ffun finPi aT rT}.

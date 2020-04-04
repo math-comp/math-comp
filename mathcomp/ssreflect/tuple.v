@@ -373,7 +373,7 @@ Variables (n : nat) (T : finType).
 (* tuple_finMixin could, in principle, be made Canonical to allow for folding *)
 (* Finite.enum of a finite tuple type (see comments around eqE in eqtype.v),  *)
 (* but in practice it will not work because the mixin_enum projector          *)
-(* has been burried under an opaque alias, to avoid some performance issues   *)
+(* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
 Definition tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
 Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.

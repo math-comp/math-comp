@@ -52,7 +52,7 @@ Reserved Notation "x ^- n" (at level 29, left associativity).
 Reserved Notation "x *: A" (at level 40).
 Reserved Notation "A :* x" (at level 40).
 
-(* Reserved notation for set-theretic operations. *)
+(* Reserved notation for set-theoretic operations. *)
 Reserved Notation "A :&: B"  (at level 48, left associativity).
 Reserved Notation "A :|: B" (at level 52, left associativity).
 Reserved Notation "a |: A" (at level 52, left associativity).

@@ -10,7 +10,7 @@ From mathcomp Require Import seq fintype.
 (* provide a helper to quotient T by a decidable equivalence relation (e     *)
 (* : rel T) if T is a choiceType (or encodable as a choiceType modulo e).    *)
 (*                                                                           *)
-(* See "Pragamatic Quotient Types in Coq", proceedings of ITP2013,           *)
+(* See "Pragmatic Quotient Types in Coq", proceedings of ITP2013,            *)
 (* by Cyril Cohen.                                                           *)
 (*                                                                           *)
 (* *** Generic Quotienting ***                                               *)
@@ -263,7 +263,7 @@ Hypothesis pi_r : {mono \pi : x y / r x y >-> rq x y}.
 Hypothesis pi_h : forall (x : T), \pi_qU (h x) = hq (\pi_qT x).
 Variables (a b : T) (x : equal_to (\pi_qT a)) (y : equal_to (\pi_qT b)).
 
-(* Internal Lemmmas : do not use directly *)
+(* Internal Lemmas : do not use directly *)
 Lemma pi_morph1 : \pi (f a) = fq (equal_val x). Proof. by rewrite !piE. Qed.
 Lemma pi_morph2 : \pi (g a b) = gq (equal_val x) (equal_val y). Proof. by rewrite !piE. Qed.
 Lemma pi_mono1 : p a = pq (equal_val x). Proof. by rewrite !piE. Qed.
@@ -294,7 +294,7 @@ Notation PiMono2 pi_r :=
 Notation PiMorph11 pi_f :=
   (fun a (x : {pi a}) => EqualTo (pi_morph11 pi_f a x)).
 
-(* lifiting helpers *)
+(* lifting helpers *)
 Notation lift_op1 Q f := (locked (fun x : Q => \pi_Q (f (repr x)) : Q)).
 Notation lift_op2 Q g := 
   (locked (fun x y : Q => \pi_Q (g (repr x) (repr y)) : Q)).

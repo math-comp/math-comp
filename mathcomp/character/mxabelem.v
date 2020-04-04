@@ -11,7 +11,7 @@ From mathcomp Require Import mxalgebra mxrepresentation.
 (******************************************************************************)
 (*   This file completes the theory developed in mxrepresentation.v with the  *)
 (* construction and properties of linear representations over finite fields,  *)
-(* and in particular the correspondance between internal action on a (normal) *)
+(* and in particular the correspondence between internal action on a (normal) *)
 (* elementary abelian p-subgroup and a linear representation on an Fp-module. *)
 (*   We provide the following next constructions for a finite field F:        *)
 (*        'Zm%act == the action of {unit F} on 'M[F]_(m, n).                  *)

@@ -100,7 +100,7 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*         \adj A == the adjugate matrix of A (\adj A i j = cofactor j i A).  *)
 (*   A \in unitmx == A is invertible (R must be a comUnitRingType).           *)
 (*        invmx A == the inverse matrix of A if A \in unitmx A, otherwise A.  *)
-(* The following operations provide a correspondance between linear functions *)
+(* The following operations provide a correspondence between linear functions *)
 (* and matrices:                                                              *)
 (*     lin1_mx f == the m x n matrix that emulates via right product          *)
 (*                  a (linear) function f : 'rV_m -> 'rV_n on ROW VECTORS     *)
@@ -1837,7 +1837,7 @@ Lemma mulmx_block m1 m2 n1 n2 p1 p2 (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
                (Adl *m Bul + Adr *m Bdl) (Adl *m Bur + Adr *m Bdr).
 Proof. by rewrite mul_col_mx !mul_row_block. Qed.
 
-(* Correspondance between matrices and linear function on row vectors. *) 
+(* Correspondence between matrices and linear function on row vectors. *)
 Section LinRowVector.
 
 Variables m n : nat.
@@ -1856,7 +1856,7 @@ Qed.
 
 End LinRowVector.
 
-(* Correspondance between matrices and linear function on matrices. *) 
+(* Correspondence between matrices and linear function on matrices. *)
 Section LinMatrix.
 
 Variables m1 n1 m2 n2 : nat.
@@ -1959,7 +1959,7 @@ by congr (_ + _); apply: eq_bigr => i _; rewrite (block_mxEul, block_mxEdr).
 Qed.
 
 (* The matrix ring structure requires a strutural condition (dimension of the *)
-(* form n.+1) to statisfy the nontriviality condition we have imposed.        *)
+(* form n.+1) to satisfy the nontriviality condition we have imposed.         *)
 Section MatrixRing.
 
 Variable n' : nat.

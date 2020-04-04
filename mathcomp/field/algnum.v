@@ -17,7 +17,7 @@ From mathcomp Require Import cyclotomic.
 (*  x \in Cint_span X <=> x is a Z-linear combination of elements of          *)
 (*                        X : seq algC.                                       *)
 (*         x \in Aint <=> x : algC is an algebraic integer, i.e., the (monic) *)
-(*                        polynomial of x over Q has integer coeficients.     *)
+(*                        polynomial of x over Q has integer coefficients.    *)
 (*         (e %| a)%A <=> e divides a with respect to algebraic integers,     *)
 (*        (e %| a)%Ax     i.e., a is in the algebraic integer ideal generated *)
 (*                        by e. This is is notation for a \in dvdA e, where   *)
