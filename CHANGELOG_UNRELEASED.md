@@ -34,6 +34,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   reordering reordering)`, `op.[AC patternshape reordering]`, `op.[ACl
   reordering]` and `op.[ACof reordering reordering]`.
 
+- Added definition `cast_perm` with a group morphism canonical
+  structure, and lemmas `permX_fix`, `imset_perm1`, `permS0`,
+  `permS1`, `cast_perm_id`, `cast_ord_permE`, `cast_permE`,
+  `cast_permK`, `cast_permKV`, `cast_perm_inj`, `cast_perm_morphM`,
+  and `isom_cast_perm` in `perm` and `restr_perm_commute` in `action`
+
+- Added `card_porbit_neq0`, `porbitP`, and `porbitPmin` in `perm`
+
+- Added definition `Sym` with a group set canonical structure and
+  lemmas `card_Sn` and `card_Sym` in `perm` and `SymE` in `action`
+
 ### Changed
 
 - Reorganized the algebraic hierarchy and the theory of `ssrnum.v`.
@@ -173,6 +184,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `take_addn` -> `takeD`
   + `rot_addn` -> `rotD`
   + `nseq_addn` -> `nseqD`
+- Replaced `cycle` by `orbit` in `perm/action`:
+  + `pcycle` -> `porbit`
+  + `pcycles` -> `porbits`
+  + `pcycleE` -> `porbitE`
+  + `pcycle_actperm` -> `porbit_actperm`
+  + `mem_pcycle` -> `mem_porbit`
+  + `pcycle_id` -> `porbit_id`
+  + `uniq_traject_pcycle` -> `uniq_traject_porbit`
+  + `pcycle_traject` -> `porbit_traject`
+  + `iter_pcycle` -> `iter_porbit`
+  + `eq_pcycle_mem` -> `eq_porbit_mem`
+  + `pcycle_sym` -> `porbit_sym`
+  + `pcycle_perm` -> `porbit_perm`
+  + `ncycles_mul_tperm` -> `porbits_mul_tperm`
 
 ### Removed
 

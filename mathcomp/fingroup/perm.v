@@ -1,29 +1,34 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype tuple finfun bigop finset binomial.
-From mathcomp Require Import fingroup.
+From mathcomp Require Import fingroup morphism.
 
 (******************************************************************************)
 (* This file contains the definition and properties associated to the group   *)
 (* of permutations of an arbitrary finite type.                               *)
-(*     {perm T} == the type of permutations of a finite type T, i.e.,         *)
-(*                 injective (finite) functions from T to T. Permutations     *)
-(*                 coerce to CiC functions.                                   *)
-(*         'S_n == the set of all permutations of 'I_n, i.e., of {0,.., n-1}  *)
-(*  perm_on A u == u is a permutation with support A, i.e., u only displaces  *)
-(*                 elements of A (u x != x implies x \in A).                  *)
-(*    tperm x y == the transposition of x, y.                                 *)
-(*    aperm x s == the image of x under the action of the permutation s.      *)
-(*              := s x                                                        *)
-(*   pcycle s x == the set of all elements that are in the same cycle of the  *)
-(*                 permutation s as x, i.e., {x, s x, (s ^+ 2) x, ...}.       *)
-(*    pcycles s == the set of all the cycles of the permutation s.            *)
-(*   (s : bool) == s is an odd permutation (the coercion is called odd_perm). *)
-(*      dpair u == u is a pair (x, y) of distinct objects (i.e., x != y).     *)
+(*        {perm T} == the type of permutations of a finite type T, i.e.,      *)
+(*                    injective (finite) functions from T to T. Permutations  *)
+(*                    coerce to CiC functions.                                *)
+(*            'S_n == the set of all permutations of 'I_n, i.e., of           *)
+(*                    {0,.., n-1}                                             *)
+(*     perm_on A u == u is a permutation with support A, i.e., u only         *)
+(*                    displaces elements of A (u x != x implies x \in A).     *)
+(*       tperm x y == the transposition of x, y.                              *)
+(*       aperm x s == the image of x under the action of the permutation s.   *)
+(*                 := s x                                                     *)
+(* cast_perm Emn s == the 'S_m permutation cast as a 'S_n permutation using   *)
+(*                    Emn : m = n                                             *)
+(*      porbit s x == the set of all elements that are in the same cycle of   *)
+(*                    the permutation s as x, i.e., {x, s x, (s ^+ 2) x, ...}.*)
+(*       porbits s == the set of all the cycles of the permutation s.         *)
+(*      (s : bool) == s is an odd permutation (the coercion is called         *)
+(*                    odd_perm).                                              *)
+(*         dpair u == u is a pair (x, y) of distinct objects (i.e., x != y).  *)
+(*           Sym S == the set of permutations with support S                  *)
 (* lift_perm i j s == the permutation obtained by lifting s : 'S_n.-1 over    *)
-(*                 (i |-> j), that maps i to j and lift i k to lift j (s k).  *)
+(*                    (i |-> j), that maps i to j and lift i k to             *)
+(*                    lift j (s k).                                           *)
 (* Canonical structures are defined allowing permutations to be an eqType,    *)
 (* choiceType, countType, finType, subType, finGroupType; permutations with   *)
 (* composition form a group, therefore inherit all generic group notations:   *)
@@ -162,9 +167,6 @@ Canonical perm_of_finGroupType := Eval hnf in [finGroupType of {perm T} ].
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
 
-Lemma imset_perm1 (S : {set T}) : [set fun_of_perm 1 x | x in S] = S.
-Proof. by rewrite -[RHS]imset_id; apply eq_imset => x; rewrite perm1. Qed.
-
 Lemma permM s t x : (s * t) x = t (s x).
 Proof. by rewrite permE. Qed.
 
@@ -181,7 +183,7 @@ Lemma permX s x n : (s ^+ n) x = iter n s x.
 Proof. by elim: n => [|n /= <-]; rewrite ?perm1 // -permM expgSr. Qed.
 
 Lemma permX_fix s x n : s x = x -> (s ^+ n) x = x.
-Proof using.
+Proof.
 move=> Hs; elim: n => [|n IHn]; first by rewrite expg0 perm1.
 by rewrite expgS permM Hs.
 Qed.
@@ -217,6 +219,9 @@ Proof.
 move=> Su; rewrite -preim_permV; apply/setP=> x.
 by rewrite !inE -(perm_closed _ Su) permKV.
 Qed.
+
+Lemma imset_perm1 (S : {set T}) : [set (1 : {perm T}) x | x in S] = S.
+Proof. apply: im_perm_on; exact: perm_on1. Qed.
 
 Lemma tperm_proof x y : involutive [fun z => z with x |-> y, y |-> x].
 Proof.
@@ -332,31 +337,31 @@ Variable T : finType.
 
 Implicit Types (s t u v : {perm T}) (x y z a b : T).
 
-(* Note that pcycle s x is the orbit of x by <[s]> under the action aperm. *)
-(* Hence, the pcycle lemmas below are special cases of more general lemmas *)
+(* Note that porbit s x is the orbit of x by <[s]> under the action aperm. *)
+(* Hence, the porbit lemmas below are special cases of more general lemmas *)
 (* on orbits that will be stated in action.v.                              *)
-(*   Defining pcycle directly here avoids a dependency of matrix.v on      *)
+(*   Defining porbit directly here avoids a dependency of matrix.v on      *)
 (* action.v and hence morphism.v.                                          *)
 
 Definition aperm x s := s x.
-Definition pcycle s x := aperm x @: <[s]>.
-Definition pcycles s := pcycle s @: T.
-Definition odd_perm (s : perm_type T) := odd #|T| (+) odd #|pcycles s|.
+Definition porbit s x := aperm x @: <[s]>.
+Definition porbits s := porbit s @: T.
+Definition odd_perm (s : perm_type T) := odd #|T| (+) odd #|porbits s|.
 
 Lemma apermE x s : aperm x s = s x. Proof. by []. Qed.
 
-Lemma mem_pcycle s i x : (s ^+ i) x \in pcycle s x.
+Lemma mem_porbit s i x : (s ^+ i) x \in porbit s x.
 Proof. by rewrite (mem_imset (aperm x)) ?mem_cycle. Qed.
 
-Lemma pcycle_id s x : x \in pcycle s x.
-Proof. by rewrite -{1}[x]perm1 (mem_pcycle s 0). Qed.
+Lemma porbit_id s x : x \in porbit s x.
+Proof. by rewrite -{1}[x]perm1 (mem_porbit s 0). Qed.
 
-Lemma card_pcycle_neq0 s x : #|pcycle s x| != 0.
-Proof using.
-by rewrite -lt0n card_gt0; apply/set0Pn; exists x; exact: pcycle_id.
+Lemma card_porbit_neq0 s x : #|porbit s x| != 0.
+Proof.
+by rewrite -lt0n card_gt0; apply/set0Pn; exists x; exact: porbit_id.
 Qed.
 
-Lemma uniq_traject_pcycle s x : uniq (traject s x #|pcycle s x|).
+Lemma uniq_traject_porbit s x : uniq (traject s x #|porbit s x|).
 Proof.
 case def_n: #|_| => // [n]; rewrite looping_uniq.
 apply: contraL (card_size (traject s x n)) => /loopingP t_sx.
@@ -364,54 +369,54 @@ rewrite -ltnNge size_traject -def_n ?subset_leq_card //.
 by apply/subsetP=> _ /imsetP[_ /cycleP[i ->] ->]; rewrite /aperm permX t_sx.
 Qed.
 
-Lemma pcycle_traject s x : pcycle s x =i traject s x #|pcycle s x|.
+Lemma porbit_traject s x : porbit s x =i traject s x #|porbit s x|.
 Proof.
 apply: fsym; apply/subset_cardP.
-  by rewrite (card_uniqP _) ?size_traject ?uniq_traject_pcycle.
-by apply/subsetP=> _ /trajectP[i _ ->]; rewrite -permX mem_pcycle.
+  by rewrite (card_uniqP _) ?size_traject ?uniq_traject_porbit.
+by apply/subsetP=> _ /trajectP[i _ ->]; rewrite -permX mem_porbit.
 Qed.
 
-Lemma iter_pcycle s x : iter #|pcycle s x| s x = x.
+Lemma iter_porbit s x : iter #|porbit s x| s x = x.
 Proof.
-case def_n: #|_| (uniq_traject_pcycle s x) => [//|n] Ut.
+case def_n: #|_| (uniq_traject_porbit s x) => [//|n] Ut.
 have: looping s x n.+1.
-  by rewrite -def_n -[looping _ _ _]pcycle_traject -permX mem_pcycle.
+  by rewrite -def_n -[looping _ _ _]porbit_traject -permX mem_porbit.
 rewrite /looping => /trajectP[[|i] //= lt_i_n /perm_inj eq_i_n_sx].
 move: lt_i_n; rewrite ltnS ltn_neqAle andbC => /andP[le_i_n /negP[]].
 by rewrite -(nth_uniq x _ _ Ut) ?size_traject ?nth_traject // eq_i_n_sx.
 Qed.
 
-Lemma eq_pcycle_mem s x y : (pcycle s x == pcycle s y) = (x \in pcycle s y).
+Lemma eq_porbit_mem s x y : (porbit s x == porbit s y) = (x \in porbit s y).
 Proof.
-apply/eqP/idP=> [<- | /imsetP[si s_si ->]]; first exact: pcycle_id.
+apply/eqP/idP=> [<- | /imsetP[si s_si ->]]; first exact: porbit_id.
 apply/setP => z; apply/imsetP/imsetP=> [] [sj s_sj ->].
   by exists (si * sj); rewrite ?groupM /aperm ?permM.
 exists (si^-1 * sj); first by rewrite groupM ?groupV.
 by rewrite /aperm permM permK.
 Qed.
 
-Lemma pcycle_sym s x y : (x \in pcycle s y) = (y \in pcycle s x).
-Proof. by rewrite -!eq_pcycle_mem eq_sym. Qed.
+Lemma porbit_sym s x y : (x \in porbit s y) = (y \in porbit s x).
+Proof. by rewrite -!eq_porbit_mem eq_sym. Qed.
 
-Lemma pcycle_perm s i x : pcycle s ((s ^+ i) x) = pcycle s x.
-Proof. by apply/eqP; rewrite eq_pcycle_mem mem_pcycle. Qed.
+Lemma porbit_perm s i x : porbit s ((s ^+ i) x) = porbit s x.
+Proof. by apply/eqP; rewrite eq_porbit_mem mem_porbit. Qed.
 
-Lemma pcyclePmin s x y :
-  y \in pcycle s x -> exists2 i, i < #[s] & y = (s ^+ i) x.
-Proof using. by move=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i. Qed.
+Lemma porbitPmin s x y :
+  y \in porbit s x -> exists2 i, i < #[s] & y = (s ^+ i) x.
+Proof. by move=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i. Qed.
 
-Lemma pcycleP s x y :
-  reflect (exists i, y = (s ^+ i) x) (y \in pcycle s x).
-Proof using.
-apply (iffP idP) => [/pcyclePmin [i _ ->]| [i ->]]; last exact: mem_pcycle.
+Lemma porbitP s x y :
+  reflect (exists i, y = (s ^+ i) x) (y \in porbit s x).
+Proof.
+apply (iffP idP) => [/porbitPmin [i _ ->]| [i ->]]; last exact: mem_porbit.
 by exists i.
 Qed.
 
-Lemma ncycles_mul_tperm s x y : let t := tperm x y in
-  #|pcycles (t * s)| + (x \notin pcycle s y).*2 = #|pcycles s| + (x != y).
+Lemma porbits_mul_tperm s x y : let t := tperm x y in
+  #|porbits (t * s)| + (x \notin porbit s y).*2 = #|porbits s| + (x != y).
 Proof.
-pose xf a b u := find (pred2 a b) (traject u (u a) #|pcycle u a|).
-have xf_size a b u: xf a b u <= #|pcycle u a|.
+pose xf a b u := find (pred2 a b) (traject u (u a) #|porbit u a|).
+have xf_size a b u: xf a b u <= #|porbit u a|.
   by rewrite (leq_trans (find_size _ _)) ?size_traject.
 have lt_xf a b u n : n < xf a b u -> ~~ pred2 a b ((u ^+ n.+1) a).
   move=> lt_n; apply: contraFN (before_find (u a) lt_n).
@@ -424,11 +429,11 @@ have tXC a b u n: n <= xf a b u -> (t a b u ^+ n.+1) b = (u ^+ n.+1) a.
   rewrite !(expgSr _ n.+1) !permM {}IHn 1?ltnW //; congr (u _).
   by case/lt_xf/norP: lt_n_f => ne_a ne_b; rewrite tpermD // eq_sym.
 have eq_xf a b u: pred2 a b ((u ^+ (xf a b u).+1) a).
-  have ua_a: a \in pcycle u (u a) by rewrite pcycle_sym (mem_pcycle _ 1).
-  have has_f: has (pred2 a b) (traject u (u a) #|pcycle u (u a)|).
-    by apply/hasP; exists a; rewrite /= ?eqxx -?pcycle_traject.
+  have ua_a: a \in porbit u (u a) by rewrite porbit_sym (mem_porbit _ 1).
+  have has_f: has (pred2 a b) (traject u (u a) #|porbit u (u a)|).
+    by apply/hasP; exists a; rewrite /= ?eqxx -?porbit_traject.
   have:= nth_find (u a) has_f; rewrite has_find size_traject in has_f.
-  rewrite -eq_pcycle_mem in ua_a.
+  rewrite -eq_porbit_mem in ua_a.
   by rewrite nth_traject // -iterSr -permX -(eqP ua_a).
 have xfC a b u: xf b a (t a b u) = xf a b u.
   without loss lt_a: a b u / xf b a (t a b u) < xf a b u.
@@ -436,33 +441,33 @@ have xfC a b u: xf b a (t a b u) = xf a b u.
     by case: (ltngtP m n) => // ltx; [apply: IHab | rewrite -[m]IHab tC tK].
   by move/lt_xf: (lt_a); rewrite -(tXC a b) 1?ltnW //= orbC [_ || _]eq_xf.
 pose ts := t x y s; rewrite /= -[_ * s]/ts.
-pose dp u := #|pcycles u :\ pcycle u y :\ pcycle u x|.
-rewrite !(addnC #|_|) (cardsD1 (pcycle ts y)) mem_imset ?inE //.
-rewrite (cardsD1 (pcycle ts x)) inE mem_imset ?inE //= -/(dp ts) {}/ts.
-rewrite (cardsD1 (pcycle s y)) (cardsD1 (pcycle s x)) !(mem_imset, inE) //.
-rewrite -/(dp s) !addnA !eq_pcycle_mem andbT; congr (_ + _); last first.
+pose dp u := #|porbits u :\ porbit u y :\ porbit u x|.
+rewrite !(addnC #|_|) (cardsD1 (porbit ts y)) mem_imset ?inE //.
+rewrite (cardsD1 (porbit ts x)) inE mem_imset ?inE //= -/(dp ts) {}/ts.
+rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(mem_imset, inE) //.
+rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   wlog suffices: s / dp s <= dp (t x y s).
     by move=> IHs; apply/eqP; rewrite eqn_leq -{2}(tK x y s) !IHs.
   apply/subset_leq_card/subsetP=> {dp} C.
   rewrite !inE andbA andbC !(eq_sym C) => /and3P[/imsetP[z _ ->{C}]].
-  rewrite 2!eq_pcycle_mem => sxz syz.
-  suffices ts_z: pcycle (t x y s) z = pcycle s z.
-    by rewrite -ts_z !eq_pcycle_mem {1 2}ts_z sxz syz mem_imset ?inE.
+  rewrite 2!eq_porbit_mem => sxz syz.
+  suffices ts_z: porbit (t x y s) z = porbit s z.
+    by rewrite -ts_z !eq_porbit_mem {1 2}ts_z sxz syz mem_imset ?inE.
   suffices exp_id n: ((t x y s) ^+ n) z = (s ^+ n) z.
     apply/setP=> u; apply/idP/idP=> /imsetP[_ /cycleP[i ->] ->].
-      by rewrite /aperm exp_id mem_pcycle.
-    by rewrite /aperm -exp_id mem_pcycle.
+      by rewrite /aperm exp_id mem_porbit.
+    by rewrite /aperm -exp_id mem_porbit.
   elim: n => // n IHn; rewrite !expgSr !permM {}IHn tpermD //.
-    by apply: contraNneq sxz => ->; apply: mem_pcycle.
-  by apply: contraNneq syz => ->; apply: mem_pcycle.
-case: eqP {dp} => [<- | ne_xy]; first by rewrite /t tperm1 mul1g pcycle_id.
-suff ->: (x \in pcycle (t x y s) y) = (x \notin pcycle s y) by case: (x \in _).
+    by apply: contraNneq sxz => ->; apply: mem_porbit.
+  by apply: contraNneq syz => ->; apply: mem_porbit.
+case: eqP {dp} => [<- | ne_xy]; first by rewrite /t tperm1 mul1g porbit_id.
+suff ->: (x \in porbit (t x y s) y) = (x \notin porbit s y) by case: (x \in _).
 without loss xf_x: s x y ne_xy / (s ^+ (xf x y s).+1) x = x.
   move=> IHs; have ne_yx := nesym ne_xy; have:= eq_xf x y s; set n := xf x y s.
   case/pred2P=> [|snx]; first exact: IHs.
-  by rewrite -[x \in _]negbK ![x \in _]pcycle_sym -{}IHs ?xfC ?tXC // tC tK.
-rewrite -{1}xf_x -(tXC _ _ _ _ (leqnn _)) mem_pcycle; symmetry.
-rewrite -eq_pcycle_mem eq_sym eq_pcycle_mem pcycle_traject.
+  by rewrite -[x \in _]negbK ![x \in _]porbit_sym -{}IHs ?xfC ?tXC // tC tK.
+rewrite -{1}xf_x -(tXC _ _ _ _ (leqnn _)) mem_porbit; symmetry.
+rewrite -eq_porbit_mem eq_sym eq_porbit_mem porbit_traject.
 apply/trajectP=> [[n _ snx]].
 have: looping s x (xf x y s).+1 by rewrite /looping -permX xf_x inE eqxx.
 move/loopingP/(_ n); rewrite -{n}snx.
@@ -473,12 +478,12 @@ Qed.
 Lemma odd_perm1 : odd_perm 1 = false.
 Proof.
 rewrite /odd_perm card_imset ?addbb // => x y; move/eqP.
-by rewrite eq_pcycle_mem /pcycle cycle1 imset_set1 /aperm perm1; move/set1P.
+by rewrite eq_porbit_mem /porbit cycle1 imset_set1 /aperm perm1; move/set1P.
 Qed.
 
 Lemma odd_mul_tperm x y s : odd_perm (tperm x y * s) = (x != y) (+) odd_perm s.
 Proof.
-rewrite addbC -addbA -[~~ _]oddb -oddD -ncycles_mul_tperm.
+rewrite addbC -addbA -[~~ _]oddb -oddD -porbits_mul_tperm.
 by rewrite oddD odd_double addbF.
 Qed.
 
@@ -529,7 +534,25 @@ End PermutationParity.
 
 Coercion odd_perm : perm_type >-> bool.
 Arguments dpair {eT}.
-Prenex Implicits pcycle dpair pcycles aperm.
+Prenex Implicits porbit dpair porbits aperm.
+
+Section Symmetry.
+
+Variables (T : finType) (S : {set T}).
+
+Definition Sym : {set {perm T}} := [set s | perm_on S s].
+
+Lemma Sym_group_set : group_set Sym.
+Proof.
+apply/group_setP; split => [| s t]; rewrite !inE;
+   [exact: perm_on1 | exact: perm_onM].
+Qed.
+Canonical Sym_group : {group {perm T}} := Group Sym_group_set.
+
+Lemma card_Sym : #|Sym| = #|S|`!.
+Proof. by rewrite cardsE /= card_perm. Qed.
+
+End Symmetry.
 
 Section LiftPerm.
 (* Somewhat more specialised constructs for permutations on ordinals. *)
@@ -609,8 +632,11 @@ Qed.
 
 End LiftPerm.
 
+Prenex Implicits lift_perm lift_permK.
+
 Lemma permS0 (g : 'S_0) : g = 1%g.
 Proof. by apply permP => x; case x. Qed.
+
 Lemma permS1 (g : 'S_1) : g = 1%g.
 Proof.
 apply/permP => i; rewrite perm1.
@@ -624,11 +650,11 @@ Definition cast_perm m n (eq_mn : m = n) (s : 'S_m) :=
   let: erefl in _ = n := eq_mn return 'S_n in s.
 
 Lemma cast_perm_id n eq_n s : cast_perm eq_n s = s :> 'S_n.
-Proof using. by apply/permP => i; rewrite /cast_perm /= eq_axiomK. Qed.
+Proof. by apply/permP => i; rewrite /cast_perm /= eq_axiomK. Qed.
 
 Lemma cast_ord_permE m n eq_m_n (s : 'S_m) i :
   @cast_ord m n eq_m_n (s i) = (cast_perm eq_m_n s) (cast_ord eq_m_n i).
-Proof using. by subst m; rewrite cast_perm_id !cast_ord_id. Qed.
+Proof. by subst m; rewrite cast_perm_id !cast_ord_id. Qed.
 
 Lemma cast_permE m n (eq_m_n : m = n) (s : 'S_m) (i : 'I_n) :
   cast_ord eq_m_n (s (cast_ord (esym eq_m_n) i)) = cast_perm eq_m_n s i.
@@ -636,23 +662,23 @@ Proof. by rewrite cast_ord_permE cast_ordKV. Qed.
 
 Lemma cast_permK m n eq_m_n :
   cancel (@cast_perm m n eq_m_n) (cast_perm (esym eq_m_n)).
-Proof using. by subst m. Qed.
+Proof. by subst m. Qed.
 
 Lemma cast_permKV m n eq_m_n :
   cancel (cast_perm (esym eq_m_n)) (@cast_perm m n eq_m_n).
-Proof using. by subst m. Qed.
+Proof. by subst m. Qed.
 
 Lemma cast_perm_inj m n eq_m_n : injective (@cast_perm m n eq_m_n).
-Proof using. exact: can_inj (cast_permK eq_m_n). Qed.
+Proof. exact: can_inj (cast_permK eq_m_n). Qed.
 
 Lemma cast_perm_morphM m n eq_m_n :
   {morph @cast_perm m n eq_m_n : x y / x * y >-> x * y}.
-Proof using. by subst m. Qed.
+Proof. by subst m. Qed.
 Canonical morph_of_cast_perm m n eq_m_n :=
   Morphism (D := setT) (in2W (@cast_perm_morphM m n eq_m_n)).
 
 Lemma isom_cast_perm m n eq_m_n : isom setT setT (@cast_perm m n eq_m_n).
-Proof using.
+Proof.
 subst m.
 apply/isomP; split.
 - apply/injmP=> i j _ _; exact: cast_perm_inj.
@@ -661,3 +687,21 @@ apply/isomP; split.
 Qed.
 
 End CastSn.
+
+Notation tuple_perm_eqP :=
+  (deprecate tuple_perm_eqP tuple_permP) (only parsing).
+Notation pcycle := (deprecate pcycle porbit _) (only parsing).
+Notation pcycles := (deprecate pcycles porbits _) (only parsing).
+Notation mem_pcycle := (deprecate mem_pcycle mem_porbit _) (only parsing).
+Notation pcycle_id := (deprecate pcycle_id porbit_id _) (only parsing).
+Notation uniq_traject_pcycle :=
+  (deprecate uniq_traject_pcycle uniq_traject_porbit _) (only parsing).
+Notation pcycle_traject := (deprecate pcycle_traject porbit_traject _)
+  (only parsing).
+Notation iter_pcycle := (deprecate iter_pcycle iter_porbit _) (only parsing).
+Notation eq_pcycle_mem := (deprecate eq_pcycle_mem eq_porbit_mem _)
+  (only parsing).
+Notation pcycle_sym := (deprecate pcycle_sym porbit_sym _) (only parsing).
+Notation pcycle_perm := (deprecate pcycle_perm porbit_perm _) (only parsing).
+Notation ncycles_mul_tperm := (deprecate ncycles_mul_tperm porbits_mul_tperm _)
+  (only parsing).

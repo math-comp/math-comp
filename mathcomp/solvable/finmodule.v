@@ -480,8 +480,8 @@ Let n_ x := #|<[g]> : H :* x|.
 
 Lemma mulg_exp_card_rcosets x : x * (g ^+ n_ x) \in H :* x.
 Proof.
-rewrite /n_ /indexg -orbitRs -pcycle_actperm ?inE //.
-rewrite -{2}(iter_pcycle (actperm 'Rs g) (H :* x)) -permX -morphX ?inE //.
+rewrite /n_ /indexg -orbitRs -porbit_actperm ?inE //.
+rewrite -{2}(iter_porbit (actperm 'Rs g) (H :* x)) -permX -morphX ?inE //.
 by rewrite actpermE //= rcosetE -rcosetM rcoset_refl.
 Qed.
 
@@ -540,12 +540,12 @@ Lemma transfer_cycle_expansion :
 Proof.
 pose Y := \bigcup_(x in X) [set x * g ^+ i | i : 'I_(n_ x)].
 pose rY := transversal_repr 1 Y.
-pose pcyc x := pcycle (actperm 'Rs g) (H :* x).
+pose pcyc x := porbit (actperm 'Rs g) (H :* x).
 pose traj x := traject (actperm 'Rs g) (H :* x) #|pcyc x|.
 have Hgr_eq x: H_g_rcosets x = pcyc x.
-  by rewrite /H_g_rcosets -orbitRs -pcycle_actperm ?inE.
-have pcyc_eq x: pcyc x =i traj x by apply: pcycle_traject.
-have uniq_traj x: uniq (traj x) by apply: uniq_traject_pcycle.
+  by rewrite /H_g_rcosets -orbitRs -porbit_actperm ?inE.
+have pcyc_eq x: pcyc x =i traj x by apply: porbit_traject.
+have uniq_traj x: uniq (traj x) by apply: uniq_traject_porbit.
 have n_eq x: n_ x = #|pcyc x| by rewrite -Hgr_eq.
 have size_traj x: size (traj x) = n_ x by rewrite n_eq size_traject.
 have nth_traj x j: j < n_ x -> nth (H :* x) (traj x) j = H :* (x * g ^+ j).
@@ -590,7 +590,7 @@ rewrite conjgE invgK -{1}[H :* x]rcoset1 -{1}(expg0 g).
 elim: {1 3}n 0%N (addn0 n) => [|m IHm] i def_i /=.
   rewrite big_seq1 {i}[i]def_i rYE // ?def_n //.
   rewrite -(mulgA _ _ g) -rcosetM -expgSr -[(H :* x) :* _]rcosetE.
-  rewrite -actpermE morphX ?inE // permX // -{2}def_n n_eq iter_pcycle mulgA.
+  rewrite -actpermE morphX ?inE // permX // -{2}def_n n_eq iter_porbit mulgA.
   by rewrite -[H :* x]rcoset1 (rYE _ 0%N) ?mulg1.
 rewrite big_cons rYE //; last by rewrite def_n -def_i ltnS leq_addl.
 rewrite permE /= rcosetE -rcosetM -(mulgA _ _ g) -expgSr.
