@@ -2634,7 +2634,7 @@ Prenex Implicits mask map pmap foldr foldl scanl pairmap.
 
 Section Zip.
 
-Variables S T : Type.
+Variables (S T : Type) (r : S -> T -> bool).
 
 Fixpoint zip (s : seq S) (t : seq T) {struct t} :=
   match s, t with
@@ -2645,10 +2645,10 @@ Fixpoint zip (s : seq S) (t : seq T) {struct t} :=
 Definition unzip1 := map (@fst S T).
 Definition unzip2 := map (@snd S T).
 
-Fixpoint all2 (r : S -> T -> bool) s t :=
+Fixpoint all2 s t :=
   match s, t with
   | [::], [::] => true
-  | x :: s, y :: t => r x y && all2 r s t
+  | x :: s, y :: t => r x y && all2 s t
   | _, _ => false
   end.
 
@@ -2696,8 +2696,8 @@ move: s t; apply: seq_ind2 => //= x y s t eq_sz IHs.
 by rewrite !rev_cons IHs zip_rcons ?size_rev.
 Qed.
 
-Lemma all2E r s t :
-  all2 r s t = (size s == size t) && all [pred xy | r xy.1 xy.2] (zip s t).
+Lemma all2E s t :
+  all2 s t = (size s == size t) && all [pred xy | r xy.1 xy.2] (zip s t).
 Proof. by elim: s t => [|x s IHs] [|y t] //=; rewrite IHs andbCA. Qed.
 
 End Zip.
