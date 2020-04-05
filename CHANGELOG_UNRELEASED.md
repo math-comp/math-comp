@@ -250,6 +250,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
    Its name will become `prodrMn` in the next release when this name will become available (cf. Renamed section)
 
 - in `polydiv.v`, new lemma `dvdpNl`.
+- in `perm.v` new lemma `permS01`.
 
 ### Changed
 

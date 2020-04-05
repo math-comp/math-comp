@@ -640,6 +640,9 @@ Proof. by move=> g; apply/permP; case. Qed.
 Lemma permS1 : all_equal_to (1 : 'S_1).
 Proof. by move=> g; apply/permP => i; rewrite !ord1. Qed.
 
+Lemma permS01 n : n <= 1 -> all_equal_to (1 : 'S_n).
+Proof. by case: n => [|[|]//=] _ g; rewrite (permS0, permS1). Qed.
+
 Section CastSn.
 
 Definition cast_perm m n (eq_mn : m = n) (s : 'S_m) :=
