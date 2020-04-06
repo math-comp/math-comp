@@ -38,7 +38,8 @@ From mathcomp Require Import cyclic.
 (* rcosets_cycle_partition), and for any transversal X of HG :* <[g]> the     *)
 (* function r mapping x : gT to rcosets (H :* x) <[g]> is (constructively) a  *)
 (* bijection from X to the <[g]>-orbit partition of HG, and Lemma             *)
-(* transfer_pcycle_def gives a simplified expansion of the transfer morphism. *)
+(* transfer_cycle_expansion gives a simplified expansion of the transfer      *)
+(* morphism.                                                                  *)
 (******************************************************************************)
 
 Set Implicit Arguments.
