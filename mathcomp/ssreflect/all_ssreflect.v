@@ -17,3 +17,4 @@ Require Export finset.
 Require Export order.
 Require Export binomial.
 Require Export generic_quotient.
+Require Export ssrAC.

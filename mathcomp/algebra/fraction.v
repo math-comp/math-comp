@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import choice tuple bigop ssralg poly polydiv.
+From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
 From mathcomp Require Import generic_quotient.
 
 (* This file builds the field of fraction of any integral domain. *)
@@ -157,13 +157,10 @@ Definition add := lift_op2 {fraction R} addf.
 
 Lemma pi_add : {morph \pi : x y / addf x y >-> add x y}.
 Proof.
-move=> x y; unlock add; apply/eqmodP; rewrite /= equivfE.
-rewrite /addf /= !numden_Ratio ?mulf_neq0 ?domP //.
-rewrite mulrDr mulrDl eq_sym; apply/eqP.
-rewrite !mulrA ![_ * \n__]mulrC !mulrA equivf_l.
-congr (_ + _); first by rewrite -mulrA mulrCA !mulrA.
-rewrite -!mulrA [X in _ * X]mulrCA !mulrA equivf_l.
-by rewrite mulrC !mulrA -mulrA mulrC mulrA.
+move=> x y; unlock add; apply/eqmodP; rewrite /= equivfE /addf /=.
+rewrite !numden_Ratio ?mulf_neq0 ?domP // mulrDr mulrDl; apply/eqP.
+symmetry; rewrite (AC (2*2)%AC (3*1*2*4)%AC) (AC (2*2)%AC (3*2*1*4)%AC)/=.
+by rewrite !equivf_l (ACl ((2*3)*(1*4))%AC) (ACl ((2*3)*(4*1))%AC)/=.
 Qed.
 Canonical pi_add_morph := PiMorph2 pi_add.
 
@@ -183,8 +180,7 @@ Lemma pi_mul : {morph \pi : x y / mulf x y >-> mul x y}.
 Proof.
 move=> x y; unlock mul; apply/eqmodP=> /=.
 rewrite equivfE /= /addf /= !numden_Ratio ?mulf_neq0 ?domP //.
-rewrite mulrAC !mulrA -mulrA equivf_r -equivf_l.
-by rewrite mulrA ![_ * \d_y]mulrC !mulrA.
+by rewrite mulrACA !equivf_r mulrACA.
 Qed.
 Canonical pi_mul_morph := PiMorph2 pi_mul.
 
@@ -204,8 +200,8 @@ Canonical pi_inv_morph := PiMorph1 pi_inv.
 Lemma addA : associative add.
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> z; rewrite !piE.
-rewrite /addf /= !numden_Ratio ?mulf_neq0 ?domP // !mulrDl !mulrA !addrA.
-by congr (\pi (Ratio (_ + _ + _) _)); rewrite mulrAC.
+rewrite /addf /= !numden_Ratio ?mulf_neq0 ?domP // !mulrDl.
+by rewrite !mulrA !addrA ![_ * _ * \d_x]mulrAC.
 Qed.
 
 Lemma addC : commutative add.
@@ -252,13 +248,8 @@ Lemma mul_addl : left_distributive mul add.
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> z; apply/eqP.
 rewrite !piE /equivf /mulf /addf !numden_Ratio ?mulf_neq0 ?domP //; apply/eqP.
-rewrite !(mulrDr, mulrDl) !mulrA; congr (_ * _ + _ * _).
-  rewrite ![_ * \n_z]mulrC -!mulrA; congr (_ * _).
-  rewrite ![\d_y * _]mulrC !mulrA; congr (_ * _ * _).
-  by rewrite [X in _ = X]mulrC mulrA.
-rewrite ![_ * \n_z]mulrC -!mulrA; congr (_ * _).
-rewrite ![\d_x * _]mulrC !mulrA; congr (_ * _ * _).
-by rewrite -mulrA mulrC [X in X * _] mulrC.
+rewrite !(mulrDr, mulrDl) (AC (3*(2*2))%AC (4*2*7*((1*3)*(6*5)))%AC)/=.
+by rewrite [X in _ + X](AC (3*(2*2))%AC (4*6*7*((1*3)*(2*5)))%AC)/=.
 Qed.
 
 Lemma nonzero1 : 1%:F != 0%:F :> type.

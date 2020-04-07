@@ -1,6 +1,7 @@
 all_ssreflect.v
 eqtype.v
 seq.v
+ssrAC.v
 ssrbool.v
 ssreflect.v
 ssrfun.v
