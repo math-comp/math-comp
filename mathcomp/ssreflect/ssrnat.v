@@ -1245,19 +1245,19 @@ Fixpoint odd n := if n is n'.+1 then ~~ odd n' else false.
 
 Lemma oddb (b : bool) : odd b = b. Proof. by case: b. Qed.
 
-Lemma odd_add m n : odd (m + n) = odd m (+) odd n.
+Lemma oddD m n : odd (m + n) = odd m (+) odd n.
 Proof. by elim: m => [|m IHn] //=; rewrite -addTb IHn addbA addTb. Qed.
 
-Lemma odd_sub m n : n <= m -> odd (m - n) = odd m (+) odd n.
+Lemma oddB m n : n <= m -> odd (m - n) = odd m (+) odd n.
 Proof.
-by move=> le_nm; apply: (@canRL bool) (addbK _) _; rewrite -odd_add subnK.
+by move=> le_nm; apply: (@canRL bool) (addbK _) _; rewrite -oddD subnK.
 Qed.
 
 Lemma odd_opp i m : odd m = false -> i <= m -> odd (m - i) = odd i.
-Proof. by move=> oddm le_im; rewrite (odd_sub (le_im)) oddm. Qed.
+Proof. by move=> oddm le_im; rewrite (oddB (le_im)) oddm. Qed.
 
 Lemma odd_mul m n : odd (m * n) = odd m && odd n.
-Proof. by elim: m => //= m IHm; rewrite odd_add -addTb andb_addl -IHm. Qed.
+Proof. by elim: m => //= m IHm; rewrite oddD -addTb andb_addl -IHm. Qed.
 
 Lemma odd_exp m n : odd (m ^ n) = (n == 0) || odd m.
 Proof. by elim: n => // n IHn; rewrite expnS odd_mul {}IHn orbC; case odd. Qed.
@@ -1304,7 +1304,7 @@ Lemma leq_Sdouble m n : (m.*2 <= n.*2.+1) = (m <= n).
 Proof. by rewrite leqNgt ltn_Sdouble -leqNgt. Qed.
 
 Lemma odd_double n : odd n.*2 = false.
-Proof. by rewrite -addnn odd_add addbb. Qed.
+Proof. by rewrite -addnn oddD addbb. Qed.
 
 Lemma double_gt0 n : (0 < n.*2) = (0 < n).
 Proof. by case: n. Qed.
@@ -1918,3 +1918,7 @@ Lemma ltngtP m n : compare_nat m n (n == m) (m == n) (n <= m)
 Proof. by case: ltngtP; constructor. Qed.
 
 End mc_1_10.
+
+(* Temporary backward compatibility. *)
+Notation odd_add := (deprecate odd_add oddD _) (only parsing).
+Notation odd_sub := (deprecate odd_sub oddB _) (only parsing).

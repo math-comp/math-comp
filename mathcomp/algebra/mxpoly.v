@@ -469,7 +469,7 @@ rewrite big_ord_recr big_ord_recl/= big1 ?add0r //=; last first.
 rewrite !mxE ?subnn -horner_coef0 /= hornerMXaddC.
 rewrite !(eqxx, mulr0, add0r, addr0, subr0, rmorphN, opprK)/=.
 rewrite mulrC /cofactor; congr (_ * 'X + _).
-  rewrite /cofactor -signr_odd odd_add addbb mul1r; congr (\det _).
+  rewrite /cofactor -signr_odd oddD addbb mul1r; congr (\det _).
   apply/matrixP => i j; rewrite !mxE -val_eqE coefD coefMX coefC.
   by rewrite /= /bump /= !add1n !eqSS addr0.
 rewrite /cofactor [X in \det X](_ : _ = D _).

@@ -164,6 +164,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The following naming inconsistencies have been fixed in `ssrnat.v`:
   + `homo_inj_lt(_in)` -> `inj_homo_ltn(in)`
   + `(inc|dec)r(_in)` -> `(inc|dev)n(_in)`
+- switching long suffixes to short suffixes
+  + `odd_add` -> `oddD`
+  + `odd_sub` -> `oddB`
+  + `take_addn` -> `takeD`
+  + `rot_addn` -> `rotD`
+  + `nseq_addn` -> `nseqD`
 
 ### Removed
 
