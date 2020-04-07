@@ -18,7 +18,7 @@ Unset Printing Implicit Defensive.
 (* [tuple x1; ..; xn] == the explicit n.-tuple <x1; ..; xn>.                  *)
 (*  [tuple E | i < n] == the n.-tuple with general term E (i : 'I_n is bound  *)
 (*                       in E).                                               *)
-(*        tcast Emn t == the m-tuple t cast as an n-tuple using Emn : m = n.  *)
+(*        tcast Emn t == the m.-tuple t cast as an n-tuple using Emn : m = n. *)
 (* As n.-tuple T coerces to seq t, all seq operations (size, nth, ...) can be *)
 (* applied to t : n.-tuple T; we provide a few specialized instances when     *)
 (* avoids the need for a default value.                                       *)

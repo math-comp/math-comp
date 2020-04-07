@@ -47,7 +47,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*  predU1 a P, predD1 P a == applicative versions of the above.              *)
 (*              frel f == the relation associated with f : T -> T.            *)
 (*                     := [rel x y | f x == y].                               *)
-(*       invariant k f == elements of T whose k-class is f-invariant.         *)
+(*       invariant f k == elements of T whose k-class is f-invariant.         *)
 (*                     := [pred x | k (f x) == k x] with f : T -> T.          *)
 (*  [fun x : T => e0 with a1 |-> e1, .., a_n |-> e_n]                         *)
 (*  [eta f with a1 |-> e1, .., a_n |-> e_n] ==                                *)

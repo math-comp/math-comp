@@ -129,7 +129,7 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (* - The Cramer rule : mul_mx_adj & mul_adj_mx.                               *)
 (* Finally, as an example of the use of block products, we program and prove  *)
 (* the correctness of a classical linear algebra algorithm:                   *)
-(*    cormenLUP A == the triangular decomposition (L, U, P) of a nontrivial   *)
+(*   cormen_lup A == the triangular decomposition (L, U, P) of a nontrivial   *)
 (*                   square matrix A into a lower triagular matrix L with 1s  *)
 (*                   on the main diagonal, an upper matrix U, and a           *)
 (*                   permutation matrix P, such that P * A = L * U.           *)
