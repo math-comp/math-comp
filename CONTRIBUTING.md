@@ -9,7 +9,11 @@ This file is not comprehensive yet and might still contain mistakes or
 unclear indications, please consider contributing.
 
 ## Proof style
+
 ### General guidelines
+- One important guideline is to structure proofs in blocks, i.e.,
+  forward steps, to limit the scope of errors.
+  + See [G. Gonthier, A. Mahboubi, "An introduction to small scale reflection in Coq", p.103](https://doi.org/10.6092/issn.1972-5787/1979) for an illustration
 - **A line should have no more than 80 characters**. If a line is
 longer than that, it should be cut semantically. If there is no way to
 make a semantic cut (e.g. the user provides an explicit term that is
@@ -19,6 +23,10 @@ make it readable.
 - Lines that close a goal must start with a terminator (`by` or
   `exact`). You should consider using an editor that highlight those
   terminators in a specific color (e.g. red).
+- Chaining too many optional rewrites makes error detection hard. The idiom is
+  ```
+  rewrite conditional_rule ?simplify_side_condition // next_rule.
+  ```
 
 ### Spaces
 We write
@@ -66,6 +74,14 @@ We write
 - Operators are surrounded by space, for example `n*m` should be written `n * m`.
 This particular example can be problematic if matrix.v is imported because then, `M *m N` is matrix product.
 
+### Statement-macros
+
+- There is a number of "macros" that are available to state lemmas, like `commutative`, `associative`,...
+  (see [`ssrfun.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrfun.v))
+
+- There are also macros that are available to to localize a statement, like `{in A, P}`,...
+  (see [`ssrbool.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrbool.v))
+
 ### Naming of variables
 - Variable names follow the following conventions.
   + Hypothesis should not be named `H`, `H'`,... (these collide with
@@ -76,6 +92,7 @@ This particular example can be problematic if matrix.v is imported because then,
   + Elements of another ring should be named `x`, `y`, `z`, `u`, `v`, `w`, ...
   + Polynomials should be named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
   + Matrices should be named `A`, `B`, ..., `M`, `N`, ...
+  + Polymorphic variables should be named `x`, ...
 
 ### Naming conventions for lemmas (non exhaustive)
 #### Names in the library usually obey one of the following conventions
