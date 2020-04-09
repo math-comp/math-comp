@@ -53,7 +53,8 @@ Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
-Local Hint Resolve (intr_inj : injective ZtoC) : core.
+Local Definition intr_inj_ZtoC := (intr_inj : injective ZtoC).
+Local Hint Resolve intr_inj_ZtoC : core.
 Local Notation QtoCm := [rmorphism of QtoC].
 
 (* Number fields and rational spans. *)

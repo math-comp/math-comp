@@ -610,7 +610,8 @@ Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
-Local Hint Resolve (intr_inj : injective ZtoC) : core.
+Let intr_inj_ZtoC := (intr_inj : injective ZtoC).
+Local Hint Resolve intr_inj_ZtoC : core.
 
 (* Specialization of a few basic ssrnum order lemmas. *)
 
