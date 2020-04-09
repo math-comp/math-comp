@@ -452,8 +452,8 @@ Qed.
 
 Lemma odd_mul_tperm x y s : odd_perm (tperm x y * s) = (x != y) (+) odd_perm s.
 Proof.
-rewrite addbC -addbA -[~~ _]oddb -odd_add -ncycles_mul_tperm.
-by rewrite odd_add odd_double addbF.
+rewrite addbC -addbA -[~~ _]oddb -oddD -ncycles_mul_tperm.
+by rewrite oddD odd_double addbF.
 Qed.
 
 Lemma odd_tperm x y : odd_perm (tperm x y) = (x != y).
@@ -490,7 +490,7 @@ Lemma odd_permM : {morph odd_perm : s1 s2 / s1 * s2 >-> s1 (+) s2}.
 Proof.
 move=> s1 s2; case: (prod_tpermP s1) => ts1 ->{s1} dts1.
 case: (prod_tpermP s2) => ts2 ->{s2} dts2.
-by rewrite -big_cat !odd_perm_prod ?all_cat ?dts1 // size_cat odd_add.
+by rewrite -big_cat !odd_perm_prod ?all_cat ?dts1 // size_cat oddD.
 Qed.
 
 Lemma odd_permV s : odd_perm s^-1 = odd_perm s.

@@ -329,7 +329,7 @@ Proof. by rewrite [in RHS](divn_eq m 2) modn2 muln2 addnC half_bit_double. Qed.
 
 Lemma odd_mod m d : odd d = false -> odd (m %% d) = odd m.
 Proof.
-by move=> d_even; rewrite [in RHS](divn_eq m d) odd_add odd_mul d_even andbF.
+by move=> d_even; rewrite [in RHS](divn_eq m d) oddD odd_mul d_even andbF.
 Qed.
 
 Lemma modnXm m n a : (a %% n) ^ m = a ^ m %[mod n].

@@ -174,7 +174,6 @@ ci-fourcolor-dev:
   variables:
     COQ_VERSION: "dev"
 
-
 # The Odd Order Theorem
 .ci-odd-order:
   extends: .ci

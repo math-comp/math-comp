@@ -282,7 +282,7 @@ Lemma cat_cons x s1 s2 : (x :: s1) ++ s2 = x :: s1 ++ s2. Proof. by []. Qed.
 Lemma cat_nseq n x s : nseq n x ++ s = ncons n x s.
 Proof. by elim: n => //= n ->. Qed.
 
-Lemma nseq_addn n1 n2 x :
+Lemma nseqD n1 n2 x :
   nseq (n1 + n2) x = nseq n1 x ++ nseq n2 x.
 Proof. by rewrite cat_nseq /nseq /ncons iter_add. Qed.
 
@@ -772,7 +772,7 @@ Qed.
 Lemma take_drop i j s : take i (drop j s) = drop j (take (i + j) s).
 Proof. by rewrite addnC; elim: s i j => // x s IHs [|i] [|j] /=. Qed.
 
-Lemma take_addn i j s : take (i + j) s = take i s ++ take j (drop i s).
+Lemma takeD i j s : take (i + j) s = take i s ++ take j (drop i s).
 Proof.
 elim: i j s => [|i IHi] [|j] [|a s] //; first by rewrite take0 addn0 cats0.
 by rewrite addSn /= IHi.
@@ -788,12 +788,12 @@ by case: s => [|a s]//; rewrite /= ltnS.
 Qed.
 
 Lemma take_nseq i j x : i <= j -> take i (nseq j x) = nseq i x.
-Proof. by move=>/subnKC <-; rewrite nseq_addn take_size_cat // size_nseq. Qed.
+Proof. by move=>/subnKC <-; rewrite nseqD take_size_cat // size_nseq. Qed.
 
 Lemma drop_nseq i j x : drop i (nseq j x) = nseq (j - i) x.
 Proof.
 case: (leqP i j) => [/subnKC {1}<-|/ltnW j_le_i].
-  by rewrite nseq_addn drop_size_cat // size_nseq.
+  by rewrite nseqD drop_size_cat // size_nseq.
 by rewrite drop_oversize ?size_nseq // (eqP j_le_i).
 Qed.
 
@@ -890,7 +890,7 @@ Lemma all_rev a s : all a (rev s) = all a s.
 Proof. by rewrite !all_count count_rev size_rev. Qed.
 
 Lemma rev_nseq n x : rev (nseq n x) = nseq n x.
-Proof. by elim: n => // n IHn; rewrite -{1}(addn1 n) nseq_addn rev_cat IHn. Qed.
+Proof. by elim: n => // n IHn; rewrite -[in LHS]addn1 nseqD rev_cat IHn. Qed.
 
 End Sequences.
 
@@ -1784,7 +1784,7 @@ Section RotCompLemmas.
 Variable T : Type.
 Implicit Type s : seq T.
 
-Lemma rot_addn m n s : m + n <= size s -> rot (m + n) s = rot m (rot n s).
+Lemma rotD m n s : m + n <= size s -> rot (m + n) s = rot m (rot n s).
 Proof.
 move=> sz_s; rewrite {1}/rot -[take _ s](cat_take_drop n).
 rewrite 5!(catA, =^~ rot_size_cat) !cat_take_drop.
@@ -1792,13 +1792,13 @@ by rewrite size_drop !size_takel ?leq_addl ?addnK.
 Qed.
 
 Lemma rotS n s : n < size s -> rot n.+1 s = rot 1 (rot n s).
-Proof. exact: (@rot_addn 1). Qed.
+Proof. exact: (@rotD 1). Qed.
 
 Lemma rot_add_mod m n s : n <= size s -> m <= size s ->
   rot m (rot n s) = rot (if m + n <= size s then m + n else m + n - size s) s.
 Proof.
-move=> Hn Hm; case: leqP => [/rot_addn // | /ltnW Hmn]; symmetry.
-by rewrite -{2}(rotK n s) /rotr -rot_addn size_rot addnBA ?subnK ?addnK.
+move=> Hn Hm; case: leqP => [/rotD // | /ltnW Hmn]; symmetry.
+by rewrite -{2}(rotK n s) /rotr -rotD size_rot addnBA ?subnK ?addnK.
 Qed.
 
 Lemma rot_rot m n s : rot m (rot n s) = rot n (rot m s).
@@ -3340,7 +3340,7 @@ have take'x t i: i <= index x t -> i <= size t /\ x \notin take i t.
 pose xrot t i := rot i (x :: t); pose xrotV t := index x (rev (rot 1 t)).
 have xrotK t: {in le_x t, cancel (xrot t) xrotV}.
   move=> i; rewrite mem_iota addn1 /xrotV => /take'x[le_i_t ti'x].
-  rewrite -rot_addn ?rev_cat //= rev_cons cat_rcons index_cat mem_rev size_rev.
+  rewrite -rotD ?rev_cat //= rev_cons cat_rcons index_cat mem_rev size_rev.
   by rewrite ifN // size_takel //= eqxx addn0.
 apply/uniq_perm=> [||t]; first exact: permutations_uniq.
   apply/allpairs_uniq_dep=> [|t _|]; rewrite ?permutations_uniq ?iota_uniq //.
@@ -3426,6 +3426,9 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
 Ltac tfae := do !apply: AllIffConj.
 
 (* Temporary backward compatibility. *)
+Notation take_addn := (deprecate take_addn takeD _) (only parsing).
+Notation rot_addn := (deprecate rot_addn rotD _) (only parsing).
+Notation nseq_addn := (deprecate nseq_addn nseqD _) (only parsing).
 Notation perm_eq_rev := (deprecate perm_eq_rev perm_rev _)
   (only parsing).
 Notation perm_eq_flatten := (deprecate perm_eq_flatten perm_flatten _ _ _)

@@ -2395,7 +2395,7 @@ rewrite (reindex (lift_perm i0 j0)); last first.
   by rewrite lift_perm_lift -si0 permE ulsfK.
 rewrite /cofactor big_distrr /=.
 apply: eq_big => [s | s _]; first by rewrite lift_perm_id eqxx.
-rewrite -signr_odd mulrA -signr_addb odd_add -odd_lift_perm; congr (_ * _).
+rewrite -signr_odd mulrA -signr_addb oddD -odd_lift_perm; congr (_ * _).
 case: (pickP 'I_n) => [k0 _ | n0]; last first.
   by rewrite !big1 // => [j /unlift_some[i] | i _]; have:= n0 i.
 rewrite (reindex (lift i0)).
