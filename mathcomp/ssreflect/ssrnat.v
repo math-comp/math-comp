@@ -90,7 +90,7 @@ Require Export Ring.
 (*   V (infix) -- disjunction, as in                                          *)
 (*      leq_eqVlt : (m <= n) = (m == n) || (m < n).                           *)
 (*   X - exponentiation, as in lognX : logn p (m ^ n) = logn p m * n in       *)
-(*         file prime.v (the suffix is not used in the file).                 *)
+(*         file prime.v (the suffix is not used in this file).                 *)
 (* Suffixes that abbreviate operations (D, B, M and X) are used to abbreviate *)
 (* second-rank operations in equational lemma names that describe left-hand   *)
 (* sides (e.g., mulnDl); they are not used to abbreviate the main operation   *)
