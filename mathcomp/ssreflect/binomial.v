@@ -5,10 +5,10 @@ From mathcomp Require Import div fintype tuple finfun bigop prime finset.
 
 (******************************************************************************)
 (* This files contains the definition of:                                     *)
-(*   'C(n, m) == the binomial coeficient n choose m.                          *)
+(*   'C(n, m) == the binomial coefficient n choose m.                         *)
 (*     n ^_ m == the falling (or lower) factorial of n with m terms, i.e.,    *)
 (*               the product n * (n - 1) * ... * (n - m + 1).                 *)
-(*               Note that n ^_ m = 0 if m > n, and 'C(n, m) = n ^_ m %/ m/!. *)
+(*               Note that n ^_ m = 0 if m > n, and 'C(n, m) = n ^_ m %/ m`!. *)
 (*                                                                            *)
 (* In additions to the properties of these functions, we prove a few seminal  *)
 (* results such as triangular_sum, Wilson and Pascal; their proofs are good   *)

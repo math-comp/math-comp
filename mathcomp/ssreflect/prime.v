@@ -47,7 +47,7 @@ Unset Printing Implicit Defensive.
 
 (* The complexity of any arithmetic operation with the Peano representation *)
 (* is pretty dreadful, so using algorithms for "harder" problems such as    *)
-(* factoring, that are geared for efficient artihmetic leads to dismal      *)
+(* factoring, that are geared for efficient arithmetic leads to dismal      *)
 (* performance -- it takes a significant time, for instance, to compute the *)
 (* divisors of just a two-digit number. On the other hand, for Peano        *)
 (* integers, prime factoring (and testing) is linear-time with a small      *)

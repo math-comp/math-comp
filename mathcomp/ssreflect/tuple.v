@@ -13,12 +13,12 @@ Unset Printing Implicit Defensive.
 (*       [tuple of s] == the tuple whose underlying sequence (value) is s.    *)
 (*                       The size of s must be known: specifically, Coq must  *)
 (*                       be able to infer a Canonical tuple projecting on s.  *)
-(*         in_tuple s == the (size s)-tuple with value s.                     *)
+(*         in_tuple s == the (size s).-tuple with value s.                    *)
 (*            [tuple] == the empty tuple.                                     *)
 (* [tuple x1; ..; xn] == the explicit n.-tuple <x1; ..; xn>.                  *)
 (*  [tuple E | i < n] == the n.-tuple with general term E (i : 'I_n is bound  *)
 (*                       in E).                                               *)
-(*        tcast Emn t == the m-tuple t cast as an n-tuple using Emn : m = n.  *)
+(*        tcast Emn t == the m.-tuple t cast as an n.-tuple using Emn : m = n.*)
 (* As n.-tuple T coerces to seq t, all seq operations (size, nth, ...) can be *)
 (* applied to t : n.-tuple T; we provide a few specialized instances when     *)
 (* avoids the need for a default value.                                       *)
@@ -373,7 +373,7 @@ Variables (n : nat) (T : finType).
 (* tuple_finMixin could, in principle, be made Canonical to allow for folding *)
 (* Finite.enum of a finite tuple type (see comments around eqE in eqtype.v),  *)
 (* but in practice it will not work because the mixin_enum projector          *)
-(* has been burried under an opaque alias, to avoid some performance issues   *)
+(* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
 Definition tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
 Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.

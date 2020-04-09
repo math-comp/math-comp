@@ -776,7 +776,7 @@ Qed.
 (* has to apply it to the natural numbers corresponding to the line, e.g.    *)
 (* `orbitPcycle 0 2 : fcycle f (orbit x) <-> exists k, iter k.+1 f x = x`.   *)
 (* examples of this are in order_id_cycle and fconnnect_f.                   *)
-(* One may also use lemma all_iffLR to get a one sided impliciation, as in   *)
+(* One may also use lemma all_iffLR to get a one sided implication, as in    *)
 (* orderPcycle.                                                              *)
 (*****************************************************************************)
 Lemma orbitPcycle {x} : [<->

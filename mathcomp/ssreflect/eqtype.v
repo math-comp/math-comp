@@ -38,7 +38,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*         x != y :> T <=> x and y compare unequal at type T.                 *)
 (*             x =P y  :: a proof of reflect (x = y) (x == y); x =P y coerces *)
 (*                     to x == y -> x = y.                                    *)
-(*               eq_op == the boolean relation behing the == notation.        *)
+(*               eq_op == the boolean relation behind the == notation.        *)
 (*             pred1 a == the singleton predicate [pred x | x == a].          *)
 (* pred2, pred3, pred4 == pair, triple, quad predicates.                      *)
 (*            predC1 a == [pred x | x != a].                                  *)
@@ -47,7 +47,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*  predU1 a P, predD1 P a == applicative versions of the above.              *)
 (*              frel f == the relation associated with f : T -> T.            *)
 (*                     := [rel x y | f x == y].                               *)
-(*       invariant k f == elements of T whose k-class is f-invariant.         *)
+(*       invariant f k == elements of T whose k-class is f-invariant.         *)
 (*                     := [pred x | k (f x) == k x] with f : T -> T.          *)
 (*  [fun x : T => e0 with a1 |-> e1, .., a_n |-> e_n]                         *)
 (*  [eta f with a1 |-> e1, .., a_n |-> e_n] ==                                *)
@@ -73,7 +73,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*                insub x = Some u with val u = x if P x,                     *)
 (*                          None if ~~ P x                                    *)
 (*             The insubP lemma encapsulates this dichotomy.                  *)
-(*             P should be infered from the expected return type.             *)
+(*             P should be inferred from the expected return type.            *)
 (*  innew x == total (non-option) variant of insub when P = predT.            *)
 (* {? x | P} == option {x | P} (syntax for casting insub x).                  *)
 (* insubd u0 x == the generic projection with default value u0.               *)
@@ -92,7 +92,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*   [subType for S_val by Srect], [newType for S_val by Srect]               *)
 (*     variants of the above where the eliminator is explicitly provided.     *)
 (*     Here S no longer needs to be syntactically identical to {x | P x} or   *)
-(*     wrapped T, but it must have a derived constructor S_Sub statisfying an *)
+(*     wrapped T, but it must have a derived constructor S_Sub satisfying an  *)
 (*     eliminator Srect identical to the one the Coq Inductive command would  *)
 (*     have generated, and S_val (S_Sub x Px) (resp. S_val (S_sub x) for the  *)
 (*     newType form) must be convertible to x.                                *)
@@ -437,7 +437,7 @@ End Endo.
 
 Variable aT : Type.
 
-(* The invariant of an function f wrt a projection k is the pred of points *)
+(* The invariant of a function f wrt a projection k is the pred of points  *)
 (* that have the same projection as their image.                           *)
 
 Definition invariant (rT : eqType) f (k : aT -> rT) :=

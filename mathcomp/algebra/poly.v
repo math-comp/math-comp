@@ -10,7 +10,7 @@ From mathcomp Require Import fintype bigop div ssralg countalg binomial tuple.
 (*                                                                            *)
 (*           {poly R} == the type of polynomials with coefficients of type R, *)
 (*                       represented as lists with a non zero last element    *)
-(*                       (big endian representation); the coeficient type R   *)
+(*                       (big endian representation); the coefficient type R  *)
 (*                       must have a canonical ringType structure cR. In fact *)
 (*                       {poly R} denotes the concrete type polynomial cR; R  *)
 (*                       is just a phantom argument that lets type inference  *)

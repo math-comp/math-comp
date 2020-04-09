@@ -83,7 +83,7 @@ Qed.
 Section GenericClassSums.
 
 (* This is Isaacs, Theorem (2.4), generalized to an arbitrary field, and with *)
-(* the combinatorial definition of the coeficients exposed.                   *)
+(* the combinatorial definition of the coefficients exposed.                  *)
 (* This part could move to mxrepresentation.*)
 
 Variable (gT : finGroupType) (G : {group gT}) (F : fieldType).
