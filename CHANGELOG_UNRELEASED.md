@@ -35,8 +35,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   reordering]` and `op.[ACof reordering reordering]`.
 
 - Added definition `cast_perm` with a group morphism canonical
-  structure, and lemmas `permX_fix`, `imset_perm1`, `permS0`,
-  `permS1`, `cast_perm_id`, `cast_ord_permE`, `cast_permE`,
+  structure, and lemmas `permX_fix`, `imset_perm1`, `permS0`, `permS1`,
+  `permSleq1` `cast_perm_id`, `cast_ord_permE`, `cast_permE`,
   `cast_perm_comp`, `cast_permK`, `cast_permKV`, `cast_perm_inj`,
   `cast_perm_sym`,`cast_perm_morphM`, and `isom_cast_perm` in `perm`
   and `restr_perm_commute` in `action`.
@@ -45,6 +45,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added definition `Sym` with a group set canonical structure and
   lemmas `card_Sn` and `card_Sym` in `perm` and `SymE` in `action`
+
+- Added lemma `ord1` in `fintype`, it is the same as `zmodp.ord1`,
+  except `fintype.ord1` does not rely on `'I_n` zmodType structure.
 
 ### Changed
 

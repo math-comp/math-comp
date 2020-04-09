@@ -2100,6 +2100,9 @@ Arguments sub_ord {n'}.
 Arguments sub_ordK {n'}.
 Arguments inord_val {n'}.
 
+Lemma ord1 : all_equal_to (ord0 : 'I_1).
+Proof. by case=> [[] // ?]; apply: val_inj. Qed.
+
 (* Product of two fintypes which is a fintype *)
 Section ProdFinType.
 
