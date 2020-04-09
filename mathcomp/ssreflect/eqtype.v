@@ -437,7 +437,7 @@ End Endo.
 
 Variable aT : Type.
 
-(* The invariant of an function f wrt a projection k is the pred of points *)
+(* The invariant of a function f wrt a projection k is the pred of points  *)
 (* that have the same projection as their image.                           *)
 
 Definition invariant (rT : eqType) f (k : aT -> rT) :=
