@@ -1682,13 +1682,11 @@ Proof. exact: im_perm_on (restr_perm_on p). Qed.
 
 Lemma restr_perm_commute s : commute (restr_perm s) s.
 Proof.
-case: (boolP (s \in 'N(S | 'P))) =>
-    [HC | /triv_restr_perm ->]; last exact: (commute_sym (commute1 _)).
-apply/permP => x; case: (boolP (x \in S)) => Hx; rewrite !permM.
-- by rewrite !restr_permE //; move: HC => /astabsP/(_ x)/= ->.
-- have:= restr_perm_on s => /out_perm Hout.
-  rewrite (Hout _ Hx) {}Hout //.
-  by move: Hx; apply contra; move: HC => /astabsP/(_ x)/= ->.
+have [sC|/triv_restr_perm->] := boolP (s \in 'N(S | 'P)); last first.
+  exact: (commute_sym (commute1 _)).
+apply/permP => x; have /= xsS := astabsP sC x; rewrite !permM.
+have [xS|xNS] := boolP (x \in S); first by rewrite ?(restr_permE) ?xsS.
+by rewrite !(out_perm (restr_perm_on _)) ?xsS.
 Qed.
 
 End RestrictPerm.
@@ -1699,10 +1697,9 @@ Variables (T : finType) (S : {set T}).
 
 Lemma SymE : Sym S = 'C(~: S | 'P).
 Proof.
-apply/setP => s; rewrite inE; apply/idP/astabP => [Hperm x | Hstab].
-- by rewrite inE /= apermE => /out_perm; apply.
-- apply/subsetP => x; rewrite unfold_in; apply contraR => H.
-  by move/(_ x): Hstab; rewrite inE /= apermE => ->.
+apply/setP => s; rewrite inE; apply/idP/astabP => [sS x|/= S_id].
+  by rewrite inE /= apermE => /out_perm->.
+by apply/subsetP => x; move=> /(contra_neqN (S_id _)); rewrite inE negbK.
 Qed.
 
 End Symmetry.

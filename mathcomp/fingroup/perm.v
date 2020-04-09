@@ -634,14 +634,12 @@ End LiftPerm.
 
 Prenex Implicits lift_perm lift_permK.
 
-Lemma permS0 (g : 'S_0) : g = 1%g.
-Proof. by apply permP => x; case x. Qed.
+Lemma permS0 : all_equal_to (1 : 'S_0).
+Proof. by move=> g; apply/permP; case. Qed.
 
-Lemma permS1 (g : 'S_1) : g = 1%g.
+Lemma permS1 : all_equal_to (1 : 'S_1).
 Proof.
-apply/permP => i; rewrite perm1.
-case: (g i) => a Ha; case: i => b Hb.
-by apply val_inj => /=; case: a b Ha Hb => [|a] [|b].
+by move=> g; apply/permP => i; apply: val_inj; do ![case: (X in val X); case].
 Qed.
 
 Section CastSn.
@@ -657,8 +655,12 @@ Lemma cast_ord_permE m n eq_m_n (s : 'S_m) i :
 Proof. by subst m; rewrite cast_perm_id !cast_ord_id. Qed.
 
 Lemma cast_permE m n (eq_m_n : m = n) (s : 'S_m) (i : 'I_n) :
-  cast_ord eq_m_n (s (cast_ord (esym eq_m_n) i)) = cast_perm eq_m_n s i.
+  cast_perm eq_m_n s i = cast_ord eq_m_n (s (cast_ord (esym eq_m_n) i)).
 Proof. by rewrite cast_ord_permE cast_ordKV. Qed.
+
+Lemma cast_perm_comp m n p (eq_m_n : m = n) (eq_n_p : n = p) s :
+  cast_perm eq_n_p (cast_perm eq_m_n s) = cast_perm (etrans eq_m_n eq_n_p) s.
+Proof. by case: _ / eq_n_p. Qed.
 
 Lemma cast_permK m n eq_m_n :
   cancel (@cast_perm m n eq_m_n) (cast_perm (esym eq_m_n)).
@@ -668,6 +670,10 @@ Lemma cast_permKV m n eq_m_n :
   cancel (cast_perm (esym eq_m_n)) (@cast_perm m n eq_m_n).
 Proof. by subst m. Qed.
 
+Lemma cast_perm_sym m n (eq_m_n : m = n) s t :
+  s = cast_perm eq_m_n t -> t = cast_perm (esym eq_m_n) s.
+Proof. by move/(canLR (cast_permK _)). Qed.
+
 Lemma cast_perm_inj m n eq_m_n : injective (@cast_perm m n eq_m_n).
 Proof. exact: can_inj (cast_permK eq_m_n). Qed.
 
@@ -675,15 +681,13 @@ Lemma cast_perm_morphM m n eq_m_n :
   {morph @cast_perm m n eq_m_n : x y / x * y >-> x * y}.
 Proof. by subst m. Qed.
 Canonical morph_of_cast_perm m n eq_m_n :=
-  Morphism (D := setT) (in2W (@cast_perm_morphM m n eq_m_n)).
+  @Morphism _ _ setT (cast_perm eq_m_n) (in2W (@cast_perm_morphM m n eq_m_n)).
 
 Lemma isom_cast_perm m n eq_m_n : isom setT setT (@cast_perm m n eq_m_n).
 Proof.
-subst m.
-apply/isomP; split.
-- apply/injmP=> i j _ _; exact: cast_perm_inj.
-- apply/setP => /= s; rewrite !inE.
-  by apply/imsetP; exists s; rewrite ?inE.
+case: {n} _ / eq_m_n; apply/isomP; split.
+  exact/injmP/(in2W (@cast_perm_inj _ _ _)).
+by apply/setP => /= s; rewrite !inE; apply/imsetP; exists s; rewrite ?inE.
 Qed.
 
 End CastSn.
