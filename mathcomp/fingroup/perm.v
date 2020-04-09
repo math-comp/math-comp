@@ -634,12 +634,12 @@ End LiftPerm.
 
 Prenex Implicits lift_perm lift_permK.
 
-Lemma permS0 (g : 'S_0) : g = 1%g. Proof. by apply/permP => - []. Qed.
+Lemma permS0 : all_equal_to (1 : 'S_0).
+Proof. by move=> g; apply/permP; case. Qed.
 
-Lemma permS1 (g : 'S_1) : g = 1%g.
+Lemma permS1 : all_equal_to (1 : 'S_1).
 Proof.
-apply/permP => i; apply: val_inj.
-by case: (X in val X) (X in val X) => [[]//= _] [[]//= _].
+by move=> g; apply/permP => i; apply: val_inj; do ![case: (X in val X); case].
 Qed.
 
 Section CastSn.
