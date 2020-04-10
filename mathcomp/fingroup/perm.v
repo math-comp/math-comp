@@ -638,9 +638,7 @@ Lemma permS0 : all_equal_to (1 : 'S_0).
 Proof. by move=> g; apply/permP; case. Qed.
 
 Lemma permS1 : all_equal_to (1 : 'S_1).
-Proof.
-by move=> g; apply/permP => i; apply: val_inj; do ![case: (X in val X); case].
-Qed.
+Proof. by move=> g; apply/permP => i; rewrite !ord1. Qed.
 
 Section CastSn.
 

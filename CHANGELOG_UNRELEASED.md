@@ -158,6 +158,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   variant which does not require an `eqType` is currently named
   `big_uncond` (cf Added) but it will be renamed `big_mkcond` in the
   next release.
+- Added lemma `ord1` in `fintype`, it is the same as `zmodp.ord1`,
+  except `fintype.ord1` does not rely on `'I_n` zmodType structure.
+
+### Changed
 
 - in `order.v`, `\join^d_` and `\meet^d_` notations are now properly specialized
   for `dual_display`.
