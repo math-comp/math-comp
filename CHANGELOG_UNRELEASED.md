@@ -143,6 +143,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `ssrnat.mc_1_10` module. One may compile proofs compatible with the version
     1.10 in newer versions by using this module.
 
+- The definition of `all2` was slightly altered for a better interaction with
+  the guard condition (#469)
+
 ### Renamed
 
 - `real_lerP` -> `real_leP`
