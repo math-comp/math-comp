@@ -165,8 +165,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `lerif_mean_square`, `lerif_AGM2`, `lerif_normC_Re_Creal`, `lerif_Re_Creal`,
     `lerif_rootC_AGM`.
 - The following naming inconsistencies have been fixed in `ssrnat.v`:
-  + `homo_inj_lt(_in)` -> `inj_homo_ltn(in)`
-  + `(inc|dec)r(_in)` -> `(inc|dev)n(_in)`
+  + `homo_inj_lt(_in)` -> `inj_homo_ltn(_in)`
+  + `(inc|dec)r_inj(_in)` -> `(inc|dec)n_inj(_in)`
 - switching long suffixes to short suffixes
   + `odd_add` -> `oddD`
   + `odd_sub` -> `oddB`

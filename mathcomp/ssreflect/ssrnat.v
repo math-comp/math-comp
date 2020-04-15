@@ -1922,3 +1922,24 @@ End mc_1_10.
 (* Temporary backward compatibility. *)
 Notation odd_add := (deprecate odd_add oddD _) (only parsing).
 Notation odd_sub := (deprecate odd_sub oddB _) (only parsing).
+
+Notation "@ 'homo_inj_lt'" :=
+  (deprecate homo_inj_lt inj_homo_ltn) (at level 10, only parsing) : fun_scope.
+Notation homo_inj_lt := (@homo_inj_lt _) (only parsing).
+Notation "@ 'homo_inj_lt_in'" :=
+  (deprecate homo_inj_lt_in inj_homo_ltn_in) (at level 10, only parsing) : fun_scope.
+Notation homo_inj_lt_in := (@homo_inj_lt_in _ _ _) (only parsing).
+
+Notation "@ 'incr_inj'" :=
+  (deprecate incr_inj incn_inj) (at level 10, only parsing) : fun_scope.
+Notation incr_inj := (@incr_inj _) (only parsing).
+Notation "@ 'incr_inj_in'" :=
+  (deprecate incr_inj_in incn_inj_in) (at level 10, only parsing) : fun_scope.
+Notation incr_inj_in := (@incr_inj_in _ _) (only parsing).
+
+Notation "@ 'decr_inj'" :=
+  (deprecate decr_inj decn_inj) (at level 10, only parsing) : fun_scope.
+Notation decr_inj := (@decr_inj _) (only parsing).
+Notation "@ 'decr_inj_in'" :=
+  (deprecate decr_inj_in decn_inj_in) (at level 10, only parsing) : fun_scope.
+Notation decr_inj_in := (@decr_inj_in _ _) (only parsing).
