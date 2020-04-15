@@ -1607,7 +1607,7 @@ Qed.
 
 Canonical perm_action := Action aperm_is_action.
 
-Lemma pcycleE a : pcycle a = orbit perm_action <[a]>%g.
+Lemma porbitE a : porbit a = orbit perm_action <[a]>%g.
 Proof. by []. Qed.
 
 Lemma perm_act1P a : reflect (forall x, aperm x a = x) (a == 1).
@@ -1643,11 +1643,11 @@ move=> sAD x; rewrite morphimEsub // /orbit -imset_comp.
 by apply: eq_imset => a //=; rewrite actpermK.
 Qed.
 
-Lemma pcycle_actperm (a : aT) :
-   a \in D -> pcycle (actperm to a) =1 orbit to <[a]>.
+Lemma porbit_actperm (a : aT) :
+   a \in D -> porbit (actperm to a) =1 orbit to <[a]>.
 Proof.
 move=> Da x.
-by rewrite pcycleE -orbit_morphim_actperm ?cycle_subG ?morphim_cycle.
+by rewrite porbitE -orbit_morphim_actperm ?cycle_subG ?morphim_cycle.
 Qed.
 
 End ActpermOrbits.
@@ -1680,7 +1680,29 @@ Proof. by rewrite ker_actperm astab_actby setIT (setIidPr (astab_sub _ _)). Qed.
 Lemma im_restr_perm p : restr_perm p @: S = S.
 Proof. exact: im_perm_on (restr_perm_on p). Qed.
 
+Lemma restr_perm_commute s : commute (restr_perm s) s.
+Proof.
+have [sC|/triv_restr_perm->] := boolP (s \in 'N(S | 'P)); last first.
+  exact: (commute_sym (commute1 _)).
+apply/permP => x; have /= xsS := astabsP sC x; rewrite !permM.
+have [xS|xNS] := boolP (x \in S); first by rewrite ?(restr_permE) ?xsS.
+by rewrite !(out_perm (restr_perm_on _)) ?xsS.
+Qed.
+
 End RestrictPerm.
+
+Section Symmetry.
+
+Variables (T : finType) (S : {set T}).
+
+Lemma SymE : Sym S = 'C(~: S | 'P).
+Proof.
+apply/setP => s; rewrite inE; apply/idP/astabP => [sS x|/= S_id].
+  by rewrite inE /= apermE => /out_perm->.
+by apply/subsetP => x; move=> /(contra_neqN (S_id _)); rewrite inE negbK.
+Qed.
+
+End Symmetry.
 
 Section AutIn.
 
@@ -2373,7 +2395,7 @@ exact: (morph_afix (gact_stable to1) (injmP injh)).
 Qed.
 
 Lemma morph_gact_irr A M :
-    A \subset D1 -> M \subset R1 -> 
+    A \subset D1 -> M \subset R1 ->
   acts_irreducibly (f @* A) (h @* M) to2 = acts_irreducibly A M to1.
 Proof.
 move=> sAD1 sMR1.
@@ -2707,4 +2729,6 @@ Arguments aut_groupAction {gT} G%g.
 Notation "[ 'Aut' G ]" := (aut_action G) : action_scope.
 Notation "[ 'Aut' G ]" := (aut_groupAction G) : groupAction_scope.
 
-
+Notation pcycleE := (deprecate pcycleE porbitE _) (only parsing).
+Notation pcycle_actperm := (deprecate pcycle_actperm porbit_actperm _)
+  (only parsing).
