@@ -49,8 +49,9 @@ then
   PKGPREFIX="$GITROOT/opam/extra-dev/packages"
 else
   ARCHIVE=$(mktemp)
+  PREFIX=$(echo math-comp-$TAG | sed "s/\+/-/")
   git archive --format=tgz --output=$ARCHIVE \
-      --prefix=math-comp-$TAG/ $TAG # reproduce github archive
+      --prefix=$PREFIX/ $TAG # reproduce github archive
   SUM=$(sha256sum $ARCHIVE | cut -d " " -f 1)
   EXTRACTED=$(mktemp -d)
   tar -C $EXTRACTED -zxvf $ARCHIVE
