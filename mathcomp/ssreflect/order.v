@@ -3549,6 +3549,10 @@ Lemma botEdual : (dual_bottom : L^d) = 1 :> L. Proof. by []. Qed.
 Lemma topEdual : (dual_top : L^d) = 0 :> L. Proof. by []. Qed.
 
 End DualTBLattice.
+
+Canonical dual_finLatticeType d (T : finLatticeType d) :=
+  [finLatticeType of T^d].
+
 End DualTBLattice.
 
 Module Import TBLatticeTheory.
@@ -3682,10 +3686,11 @@ Context {L : tbDistrLatticeType}.
 Canonical dual_bDistrLatticeType := [bDistrLatticeType of L^d].
 Canonical dual_tbDistrLatticeType := [tbDistrLatticeType of L^d].
 
+End DualTBDistrLattice.
+
 Canonical dual_finDistrLatticeType d (T : finDistrLatticeType d) :=
   [finDistrLatticeType of T^d].
 
-End DualTBDistrLattice.
 End DualTBDistrLattice.
 
 Module Import TBDistrLatticeTheory.
