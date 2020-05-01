@@ -1212,12 +1212,20 @@ Lemma big_mkcondl I r (P Q : pred I) F :
      \big[*%M/1]_(i <- r | Q i) (if P i then F i else 1).
 Proof. by rewrite big_andbC big_mkcondr. Qed.
 
-Lemma big_rmcond (I : eqType) (r : seq I) (P : pred I) F :
+Lemma big_uncond I (r : seq I) (P : pred I) F :
+  (forall i, ~~ P i -> F i = 1) ->
+  \big[*%M/1]_(i <- r | P i) F i = \big[*%M/1]_(i <- r) F i.
+Proof.
+move=> F_eq1; rewrite big_mkcond; apply: eq_bigr => i.
+by case: (P i) (F_eq1 i) => // ->.
+Qed.
+
+Lemma big_rmcond_in (I : eqType) (r : seq I) (P : pred I) F :
   (forall i, i \in r -> ~~ P i -> F i = 1) ->
   \big[*%M/1]_(i <- r | P i) F i = \big[*%M/1]_(i <- r) F i.
 Proof.
-move=> Fidx; rewrite big_mkcond big_seq_cond [in RHS]big_seq_cond ?big_mkcondr.
-by apply: eq_bigr => i /Fidx {Fidx}; case: (P i) => // ->.
+move=> F_eq1; rewrite big_seq_cond [RHS]big_seq_cond !big_mkcondl big_uncond//.
+by move=> i /F_eq1; case: ifP => // _ ->.
 Qed.
 
 Lemma big_cat I r1 r2 (P : pred I) F :
@@ -1945,3 +1953,11 @@ Arguments biggcdn_inf [I] i0 [P F m].
 Notation filter_index_enum :=
   ((fun _ => @deprecated_filter_index_enum _)
      (deprecate filter_index_enum big_enumP)) (only parsing).
+
+Notation big_rmcond :=
+  ((fun _ _ _ _ => @big_rmcond_in _ _ _ _)
+     (deprecate big_rmcond big_rmcond_in)) (only parsing).
+
+Notation big_uncond_in :=
+  ((fun _ _ _ _ => @big_rmcond_in _ _ _ _)
+     (deprecate big_uncond_in big_rmcond_in)) (only parsing).

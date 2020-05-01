@@ -43,6 +43,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `poly.v`, new lemma `commr_horner`.
 
+- in `bigop.v` new lemma `big_uncond`. The ideal name is `big_rmcond`
+  but it has just been deprecated from its previous meaning (see
+  Changed section) so as to reuse it in next mathcomp release.
+
+- in `bigop.v` new lemma `big_uncond_in` is a new alias of
+  `big_rmcond_in` for the sake of uniformity, but it is already
+  deprecated and will be removed two releases from now.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
@@ -60,7 +68,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The `dual_*` notations such as `dual_le` in order.v are now qualified with the
   `Order` module.
 
+- Lemma `big_rmcond` is deprecated and has been renamed
+  `big_rmcomd_in` (and aliased `big_uncond_in`, see Added). The
+  variant which does not require an `eqType` is currently named
+  `big_uncond` (cf Added) but it will be renamed `big_mkcond` in the
+  next release.
+
+
 ### Renamed
+
+- `big_rmcond` -> `big_rmcond_in` (cf Changed section)
 
 ### Removed
 
