@@ -937,20 +937,6 @@ Reserved Notation "\max^l_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \max^l_ ( i  'in'  A ) '/  '  F ']'").
 
-(* tuple extensions *)
-Lemma eqEtuple n (T : eqType) (t1 t2 : n.-tuple T) :
-  (t1 == t2) = [forall i, tnth t1 i == tnth t2 i].
-Proof. by apply/eqP/'forall_eqP => [->|/eq_from_tnth]. Qed.
-
-Lemma tnth_nseq n T x (i : 'I_n) : @tnth n T [tuple of nseq n x] i = x.
-Proof.
-by rewrite !(tnth_nth (tnth_default (nseq_tuple n x) i)) nth_nseq ltn_ord.
-Qed.
-
-Lemma tnthS n T x (t : n.-tuple T) i :
-   tnth [tuple of x :: t] (lift ord0 i) = tnth t i.
-Proof. by rewrite (tnth_nth (tnth_default t i)). Qed.
-
 Module Order.
 
 (**************)
