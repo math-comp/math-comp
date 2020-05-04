@@ -25,6 +25,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
 
+- Added a factory `distrLatticePOrderMixin` in order.v to build a
+  `distrLatticeType` from a `porderType`.
+
+### Changed
+
+- In the definition of structures in order.v, displays are removed from
+  parameters of mixins and fields of classes internally and now only appear in
+  parameters of structures. Consequently, each mixin is now parameterized by a
+  class rather than a structure, and the corresponding factory parameterized by
+  a structure is provided to replace the use of the mixin. These factories have
+  the same names as in the mixins before this change except that `bLatticeMixin`
+  and `tbLatticeMixin` have been renamed to `bottomMixin` and `topMixin`
+  respectively.
+
 ### Renamed
 
 ### Removed
