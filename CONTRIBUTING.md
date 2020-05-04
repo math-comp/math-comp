@@ -87,7 +87,7 @@ This particular example can be problematic if matrix.v is imported because then,
   + Hypothesis should not be named `H`, `H'`,... (these collide with
   subgroup variable conventions) but have meaningful names. For
   example, an hypothesis `n > 0` should be named `n_gt0`.
-  + Induction Hypotheses are prefixed by `IH` or `ih` (e.g. induction hypothesis on `n` is called `IH`).
+  + Induction Hypotheses are prefixed by `IH` or `ih` (e.g. induction hypothesis on `n` is called `IHn`).
   + Natural numbers and integers should be named `m`, `n`, `p`, `d`, ...
   + Elements of another ring should be named `x`, `y`, `z`, `u`, `v`, `w`, ...
   + Polynomials should be named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
@@ -98,9 +98,10 @@ This particular example can be problematic if matrix.v is imported because then,
 #### Names in the library usually obey one of the following conventions
  - `(condition_)?mainSymbol_suffixes`
  - `mainSymbol_suffixes(_condition)?`
-Or in the presence of a property denoted by a nary or unary predicate:
+Or in the presence of a property denoted by an n-ary or unary predicate:
  - `naryPredicate_mainSymbol+`
  - `mainSymbol_unaryPredicate`
+
 #### Where:
  - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either
    + one of the main symbols of the theory at hand. For example, it will be `opp`, `add`, `mul`, etc., or
@@ -149,6 +150,10 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `X` -- exponentiation, as in `rmorphX : f (x ^+ n) = f x ^+ n.`
   - `Z` -- (left) module scaling, as in `linearZ : f (a *: v)  = s *: f v.`
   - `z` -- an int argument.
+
+#### Special naming conventions (non exhaustive)
+- For the infix membership predicate `_ \in _`, the prefix `in_` is used for lemmas that unfold specific predicates, possibly propagating the infix membership (e.g, `in_cons` or `in_set0`). These lemmas are generally part of the `inE` multirule. Other lemmas involving the infix membership predicated use the generic prefix `mem_` (e.g., `mem_head` or `mem_map`).
+
 #### Typical search pattern
 `Search _ "prefix" "suffix"* (symbol|pattern)* in library.`
 
