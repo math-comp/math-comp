@@ -103,6 +103,9 @@ This release is compatible with Coq versions 8.7, 8.8, 8.9 and 8.10.
     * `maxr_min(l|r)` -> `joinI(l|r)`
     * `minr_max(l|r)` -> `meetU(l|r)`
     * `minrP`, `maxrP` -> `leP`, `ltP`
+
+      Replacing `minrP` and `maxrP` with `leP` and `ltP` may require to provide some arguments explicitly.
+      The former ones respectively try to match with `minr` and `maxr` first but the latter ones try that in the order of `<`, `<=`, `maxr`, and `minr`.
     * `(minr|maxr)(r|C|A|CA|AC)` -> `(meet|join)(xx|C|A|CA|AC)`
     * `minr_(l|r)` -> `meet_(l|r)`
     * `maxr_(l|r)` -> `join_(l|r)`
@@ -119,37 +122,6 @@ This release is compatible with Coq versions 8.7, 8.8, 8.9 and 8.10.
     1.10 in newer versions by using the `mc_1_10.Num` module instead of the
     `Num` module. However, instances of the number structures may require
     changes.
-  + In the development process of this version of Mathematical Components, the
-    ordering of arguments of comparison predicates `lcomparableP`,
-    `(lcomparable_)ltgtP`, `(lcomparable_)leP`, and `(lcomparable_)ltP` in
-    `order.v` has been changed as follows. This is a potential source of
-    incompatibilities.
-    * before the change:
-      ```
-      lcomparableP x y : incomparel x y
-        (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
-        (y >=< x) (x >=< y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-      ltgtP x y : comparel x y
-        (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
-        (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-      leP x y :
-        lel_xor_gt x y (x <= y) (y < x) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-      ltP x y :
-        ltl_xor_ge x y (y <= x) (x < y) (y `&` x) (x `&` y) (y `|` x) (x `|` y).
-      ```
-    * after the change:
-      ```
-      lcomparableP x y : incomparel x y
-        (y `&` x) (x `&` y) (y `|` x) (x `|` y)
-        (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y) (y >=< x) (x >=< y).
-      ltgtP x y : comparel x y
-        (y `&` x) (x `&` y) (y `|` x) (x `|` y)
-        (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
-      leP x y :
-        lel_xor_gt x y (y `&` x) (x `&` y) (y `|` x) (x `|` y) (x <= y) (y < x).
-      ltP x y :
-        ltl_xor_ge x y (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
-      ```
 
 - Extended comparison predicates `leqP`, `ltnP`, and `ltngtP` in ssrnat to
   allow case analysis on `minn` and `maxn`.
