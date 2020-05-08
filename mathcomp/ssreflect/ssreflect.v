@@ -44,6 +44,13 @@ Global Set Bullet Behavior "None".
 (*                       (also swap and perserves let bindings)               *)
 (*     => /dup        := => x; have copy := x; move: copy x                   *)
 (*                       (also copies and preserves let bindings)             *)
+(*   - discharge in intro pattern                                             *)
+(*     (limited to 3 variable names, local definitions or local assumptions)  *)
+(*     => /[: x @y z] := move: x @y z                                         *)
+(*   - rewrite an equation in up to 7 context hypothesis                      *)
+(*     (local definitions or local assumptions, that are not section hyps)    *)
+(*     => /[-> in x0 .. x6] := move=> e; rewrite  {}e in x0 .. x6 *           *)
+(*     => /[<- in x0 .. x6] := move=> e; rewrite -{}e in x0 .. x6 *           *)
 (******************************************************************************)
 
 Module NonPropType.
@@ -169,5 +176,100 @@ Notation dup := (ltac:(move;
     let x := fresh "_top_" in move=> x;
     let copy := fresh "_top" in have copy := x; move: copy x
   end)).
+
+
+Notation "'[' ':' x0 ']'" :=
+  (ltac:(move: x0)) (at level 0, x0 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 ']'" :=
+  (ltac:(move: @x0)) (at level 0, x0 at level 0) : ssripat_scope.
+
+
+Notation "'[' ':' x0 x1 ']'" :=
+  (ltac:(move: x0 x1)) (at level 0, x0, x1 at level 0) : ssripat_scope.
+Notation "'[' ':' x0 '@' x1 ']'" :=
+  (ltac:(move: x0 @x1)) (at level 0, x0, x1 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 x1 ']'" :=
+  (ltac:(move: @x0 x1)) (at level 0, x0, x1 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 '@' x1 ']'" :=
+  (ltac:(move: @x0 @x1)) (at level 0, x0, x1 at level 0) : ssripat_scope.
+
+Notation "'[' ':' x0 x1 x2 ']'" :=
+  (ltac:(move: x0 x1 x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' x0 x1 '@' x2 ']'" :=
+  (ltac:(move: x0 x1 @x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' x0 '@' x1 x2 ']'" :=
+  (ltac:(move: x0 @x1 x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' x0 '@' x1 '@' x2 ']'" :=
+  (ltac:(move: x0 @x1 @x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 x1 x2 ']'" :=
+  (ltac:(move: @x0 x1 x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 x1 '@' x2 ']'" :=
+  (ltac:(move: @x0 x1 @x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 '@' x1 x2 ']'" :=
+  (ltac:(move: @x0 @x1 x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+Notation "'[' ':' '@' x0 '@' x1 '@' x2 ']'" :=
+  (ltac:(move: @x0 @x1 @x2)) (at level 0, x0, x1, x2 at level 0) : ssripat_scope.
+
+Notation "[ '<-' 'in' x0 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 *]))
+(at level 0, x0 ident) : ssripat_scope.
+Notation "[ '<-' 'in' x0 x1 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 x1 *]))
+(at level 0, x0 ident, x1 ident) : ssripat_scope.
+Notation "[ '<-' 'in' x0 x1 x2 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 x1 x2 *]))
+(at level 0, x0 ident, x1 ident, x2 ident) : ssripat_scope.
+Notation "[ '<-' 'in' x0 x1 x2 x3 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 x1 x2 x3 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident) : ssripat_scope.
+Notation "[ '<-' 'in' x0 x1 x2 x3 x4 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 x1 x2 x3 x4 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident, x4 ident) : ssripat_scope.
+Notation "[ '<-' 'in' x0 x1 x2 x3 x4 x5 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 x1 x2 x3 x4 x5 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident, x4 ident,
+ x5 ident) : ssripat_scope.
+Notation "[ '<-' 'in' x0 x1 x2 x3 x4 x5 x6 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> r; do [case: _ / r] in x0 x1 x2 x3 x4 x5 x6 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident, x4 ident,
+ x5 ident, x6 ident) : ssripat_scope.
+
+Notation "[ '->' 'in' x0 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 *]))
+(at level 0, x0 ident) : ssripat_scope.
+Notation "[ '->' 'in' x0 x1 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 x1 *]))
+(at level 0, x0 ident, x1 ident) : ssripat_scope.
+Notation "[ '->' 'in' x0 x1 x2 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 x1 x2 *]))
+(at level 0, x0 ident, x1 ident, x2 ident) : ssripat_scope.
+Notation "[ '->' 'in' x0 x1 x2 x3 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 x1 x2 x3 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident) : ssripat_scope.
+Notation "[ '->' 'in' x0 x1 x2 x3 x4 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 x1 x2 x3 x4 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident, x4 ident) : ssripat_scope.
+Notation "[ '->' 'in' x0 x1 x2 x3 x4 x5 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 x1 x2 x3 x4 x5 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident, x4 ident,
+ x5 ident) : ssripat_scope.
+Notation "[ '->' 'in' x0 x1 x2 x3 x4 x5 x6 ]" :=
+  (ltac:(let r := fresh "_top" in
+         do [move=> /esym r; do [case: _ / r] in x0 x1 x2 x3 x4 x5 x6 *]))
+(at level 0, x0 ident, x1 ident, x2 ident, x3 ident, x4 ident,
+ x5 ident, x6 ident) : ssripat_scope.
 
 End ipat.
