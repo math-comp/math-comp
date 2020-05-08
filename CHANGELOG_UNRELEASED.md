@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added intro pattern ltac views (rewrite, dup, swap, apply):
+  `/[1 rules]`, `/[-1 rules]`,  `/[! rules]`, `/[-! rules]`,
+  `/[? rules]`, `/[-? rules]`, `/[/def]`, `/apply`, `/swap`, `/dup`,
+  `/[: x @y z]`, `/[-> in x0 .. x6]`, and `/[<- in x0 .. x6]`.
+
 ### Changed
 
 ### Renamed

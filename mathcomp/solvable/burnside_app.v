@@ -21,7 +21,7 @@ Proof.
 move=> gT s G Us sG sT to.
 rewrite big_uniq // -(card_uniqP Us) (eq_card sG) -Frobenius_Cauchy.
   by apply: eq_big => // p _; rewrite setTI.
-by apply/actsP=> ? _ ?; rewrite !inE.
+by apply/actsP=> ? _ ? /[!inE].
 Qed.
 
 Arguments burnside_formula {gT}.
@@ -128,7 +128,7 @@ Qed.
 
 Lemma rot_is_rot : rot = rotations.
 Proof.
-apply/setP=> r; apply/idP/idP; last by move/rotations_is_rot; rewrite inE.
+apply/setP=> r; apply/idP/idP; last by move/rotations_is_rot /[1inE].
 rewrite !inE => h.
 have -> : r = r1 ^+ (r c0) by apply: rot_eq_c0; rewrite // -rot_r1.
 have e2: 2 = r2 c0 by rewrite permE /=.
@@ -230,7 +230,7 @@ Definition is_iso (p : {perm square}) := forall ci, p (opp ci) = opp (p ci).
 
 Lemma isometries_iso : forall p, p \in isometries -> is_iso p.
 Proof.
-move=> p; rewrite inE.
+move=> p /[1inE].
 by do ?case/orP; move/eqP=> -> a; rewrite !permE; case: a; do 4?case.
 Qed.
 
@@ -381,11 +381,11 @@ move=> x y z t Uxt; rewrite -[n]card_ord.
 pose f (p : col_squares) := (p x, p z); rewrite -(@card_in_image _ _ f).
   rewrite -mulnn -card_prod; apply: eq_card => [] [c d] /=; apply/imageP.
   rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
-  rewrite /= !orbF !andbT; case/norP; rewrite !inE => nxzt nyzt _.
+  rewrite /= !orbF !andbT; case/norP => /[!inE] nxzt nyzt _.
   exists [ffun i => if pred2 x y i then c else d].
     by rewrite inE !ffunE /= !eqxx orbT (negbTE nxzt) (negbTE nyzt) !eqxx.
   by rewrite {}/f !ffunE /= eqxx (negbTE nxzt).
-move=> p1 p2; rewrite !inE.
+move=> p1 p2 /[!inE].
 case/andP=> p1y p1t; case/andP=> p2y p2t [px pz].
 have eqp12: all (fun i => p1 i == p2 i) [:: x; y; z; t].
   by rewrite /= -(eqP p1y) -(eqP p1t) -(eqP p2y) -(eqP p2t) px pz !eqxx.
@@ -674,13 +674,13 @@ Definition is_iso3 (p : {perm cube}) := forall fi, p (s0 fi) = s0 (p fi).
 
 Lemma dir_iso_iso3 : forall p, p \in dir_iso3  -> is_iso3 p.
 Proof.
-move=> p; rewrite inE.
+move=> p /[1inE].
 by do ?case/orP; move/eqP=> <- a; rewrite !permE; case: a; do 6?case.
 Qed.
 
 Lemma iso3_ndir : forall p, p \in dir_iso3  -> is_iso3 (s0 * p).
 Proof.
-move=> p; rewrite inE.
+move=> p /[1inE].
 by do ?case/orP; move/eqP=> <- a; rewrite !(permM, permE); case: a; do 6?case.
 Qed.
 
@@ -834,9 +834,9 @@ Canonical diso_group3 := Group group_set_diso3.
 Lemma gen_diso3 :  dir_iso3 = <<[set r05; r14]>>.
 Proof.
 apply/setP; apply/subset_eqP; apply/andP; split; first last.
-  by rewrite gen_subG; apply/subsetP => x; rewrite !inE;
+  by rewrite gen_subG; apply/subsetP => x /[!inE];
     case/orP; move/eqP ->; rewrite eqxx !orbT.
-apply/subsetP => x; rewrite !inE.
+apply/subsetP => x /[!inE].
 have -> : s05 = r05 * r05  by iso_tac.
 have -> : s14 = r14 * r14  by iso_tac.
 have -> : s23 = r14 * r14 * r05 * r05 by iso_tac.
@@ -1158,7 +1158,7 @@ move=> x y z t  Uxt. rewrite -[n]card_ord .
 case: (uniq4_uniq6 Uxt) => u; case=> v Uxv.
 pose ff (p : col_cubes) := (p x, p z, p u , p v).
 rewrite -(@card_in_image _ _ ff); first last.
-  move=> p1 p2; rewrite !inE.
+  move=> p1 p2 /[!inE].
   case/andP=> p1y p1t; case/andP=> p2y p2t  [px pz] pu pv.
   have eqp12: all (fun i => p1 i == p2 i) [:: x; y; z; t; u; v].
    by rewrite /= -(eqP p1y) -(eqP p1t) -(eqP p2y) -(eqP p2t) px pz pu pv !eqxx.
@@ -1171,7 +1171,7 @@ rewrite (cat_uniq [::x; y; z; t]) in Uxv; case/and3P: Uxv => _ hasxt.
 rewrite /= !inE andbT.
 move/negbTE=> nuv .
 rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
-rewrite /= !andbT orbF; case/norP; rewrite !inE => nxyz nxyt _.
+rewrite /= !andbT orbF; case/norP => /[!inE] nxyz nxyt _.
 move: hasxt; rewrite /= !orbF; case/norP; rewrite !inE orbA.
 case/norP  => nxyu nztu.
 rewrite orbA; case/norP=> nxyv nztv.
@@ -1192,7 +1192,7 @@ move=> x y z t Uxt; rewrite -[n]card_ord .
 case: (uniq4_uniq6 Uxt) => u; case=> v Uxv.
 pose ff (p : col_cubes) := (p x, p u , p v);
    rewrite -(@card_in_image _ _ ff); first last.
-  move=> p1 p2; rewrite !inE.
+  move=> p1 p2 /[!inE].
   case/andP; case/andP => p1xy p1yz p1zt.
   case/andP; case/andP => p2xy p2yz p2zt [px pu] pv.
   have eqp12: all (fun i => p1 i == p2 i) [:: x; y; z; t; u; v].
@@ -1218,7 +1218,7 @@ Lemma card_n2_3 : forall x y z t u v: cube, uniq [:: x; y; z; t; u; v] ->
 Proof.
 move=> x y z t u v  Uxv; rewrite -[n]card_ord .
 pose ff (p : col_cubes) := (p x, p t); rewrite -(@card_in_image _ _ ff); first last.
-  move=> p1 p2; rewrite !inE.
+  move=> p1 p2 /[!inE].
   case/andP; case/andP; case/andP => p1xy p1yz p1tu p1uv.
   case/andP; case/andP; case/andP => p2xy p2yz p2tu p2uv [px pu].
   have eqp12: all (fun i => p1 i == p2 i) [:: x; y; z; t; u; v].
@@ -1229,7 +1229,7 @@ pose ff (p : col_cubes) := (p x, p t); rewrite -(@card_in_image _ _ ff); first l
 have ->:forall n, (n ^ 2)%N= (n*n)%N by move=> n0; rewrite -mulnn .
    rewrite -!card_prod; apply: eq_card => [] [c d]/=; apply/imageP.
 rewrite (cat_uniq [::x; y; z]) in Uxv; case/and3P: Uxv => Uxt hasxt nuv .
-move: hasxt; rewrite /= !orbF; case/norP; rewrite !inE => nxyzt.
+move: hasxt; rewrite /= !orbF; case/norP => /[!inE] nxyzt.
 case/norP => nxyzu nxyzv.
 exists [ffun i =>  if (i \in [:: x; y; z] ) then c else  d].
   rewrite !inE /= !ffunE !inE //= !eqxx !orbT !eqxx //=.
@@ -1244,7 +1244,7 @@ Proof.
 move=> x y z t u v  Uxv; rewrite -[n]card_ord .
 pose ff (p : col_cubes) := (p x, p z, p u).
 rewrite -(@card_in_image _ _ ff); first last.
-  move=> p1 p2; rewrite !inE.
+  move=> p1 p2 /[!inE].
   case/andP; case/andP =>  p1xy p1zt p1uv.
   case/andP; case/andP => p2xy p2zt p2uv  [px pz] pu.
   have eqp12: all (fun i => p1 i == p2 i) [:: x; y; z; t; u; v].
@@ -1257,7 +1257,7 @@ have ->:forall n, (n ^ 3)%N= (n*n*n)%N.
 rewrite -!card_prod. apply: eq_card => [] [[c d]e ] /=; apply/imageP.
 rewrite (cat_uniq [::x; y; z; t]) in Uxv; case/and3P: Uxv => Uxt hasxt nuv .
 rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
-rewrite /= !orbF !andbT; case/norP; rewrite !inE => nxyz nxyt _.
+rewrite /= !orbF !andbT; case/norP => /[!inE] nxyz nxyt _.
 move: hasxt; rewrite /= !orbF; case/norP; rewrite !inE orbA.
 case/norP => nxyu nztu.
 rewrite orbA; case/norP=> nxyv nztv.

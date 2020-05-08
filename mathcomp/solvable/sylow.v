@@ -126,7 +126,7 @@ have [P S_P]: exists P, P \in S.
 have trS: [transitive G, on S | 'JG].
   apply/imsetP; exists P => //; apply/eqP.
   rewrite eqEsubset andbC acts_sub_orbit // S_P; apply/subsetP=> Q S_Q.
-  have:= S_P; rewrite inE => /maxgroupP[/andP[_ pP]].
+  have /[1inE] /maxgroupP[/andP[_ pP]] := S_P.
   have [-> max1 | ntP _] := eqVneq P 1%G.
     move/andP/max1: (S_pG _ S_Q) => Q1.
     by rewrite (group_inj (Q1 (sub1G Q))) orbit_refl.
@@ -175,7 +175,7 @@ Proof. by case Sylow's_theorem. Qed.
 Lemma Sylow_trans P Q :
   p.-Sylow(G) P -> p.-Sylow(G) Q -> exists2 x, x \in G & Q :=: P :^ x.
 Proof.
-move=> sylP sylQ; have:= (atransP2 Syl_trans) P Q; rewrite !inE.
+move=> sylP sylQ; have /[!inE] := (atransP2 Syl_trans) P Q.
 by case=> // x Gx ->; exists x.
 Qed.
 
@@ -286,7 +286,7 @@ Lemma Sylow_gen G : <<\bigcup_(P : {group gT} | Sylow G P) P>> = G.
 Proof.
 set T := [set P : {group gT} | Sylow G P].
 rewrite -{2}(@Sylow_transversal_gen T G) => [|P | q _].
-- by congr <<_>>; apply: eq_bigl => P; rewrite inE.
+- by congr <<_>>; apply: eq_bigl => P /[1inE].
 - by rewrite inE => /and3P[].
 by case: (Sylow_exists q G) => P sylP; exists P; rewrite // inE (p_Sylow sylP).
 Qed.
@@ -619,7 +619,7 @@ have{n leGn IHn nDG} pN: p.-group <<'N_E(D)>>.
   have Ex1y: x1 ^ y \in E.
     by rewrite -mem_conjgV (normsP nEG) // groupV; case/setIP: Ny.
   apply: pgroupS (genS _) (pE _ _ Ex1 Ex1y).
-  by apply/subsetP=> u; rewrite !inE.
+  by apply/subsetP=> u /[!inE].
 have [y1 Ny1 Py1]: exists2 y1, y1 \in 'N_E(D) & y1 \notin P.
   case sNN: ('N_<<B>>('N_<<B>>(D)) \subset 'N_<<B>>(D)).
     exists y0 => //; have By0: y0 \in <<B>> by rewrite mem_gen ?setU11.

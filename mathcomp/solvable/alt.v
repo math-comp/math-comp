@@ -73,7 +73,7 @@ Qed.
 Lemma card_Sym : #|'Sym_T| = n`!.
 Proof.
 rewrite -[n]cardsE -card_perm; apply: eq_card => p.
-by apply/idP/subsetP=> [? ?|]; rewrite !inE.
+by apply/idP/subsetP=> [? ?|] /[!inE].
 Qed.
 
 Lemma card_Alt : 1 < n -> (2 * #|'Alt_T|)%N = n`!.
@@ -86,7 +86,7 @@ Proof.
 apply/imsetP; pose t1 := [tuple of enum T].
 have dt1: t1 \in n.-dtuple(setT) by rewrite inE enum_uniq; apply/subsetP.
 exists t1 => //; apply/setP=> t; apply/idP/imsetP=> [|[a _ ->{t}]]; last first.
-  by apply: n_act_dtuple => //; apply/astabsP=> x; rewrite !inE.
+  by apply: n_act_dtuple => //; apply/astabsP=> x /[!inE].
 case/dtuple_onP=> injt _; have injf := inj_comp injt enum_rank_inj.
 exists (perm injf); first by rewrite inE.
 apply: eq_from_tnth => i; rewrite tnth_map /= [aperm _ _]permE; congr tnth.
@@ -101,7 +101,7 @@ case/imsetP: tr_m2; case/tupleP=> x; case/tupleP=> y t.
 rewrite !dtuple_on_add 2![x \in _]inE inE negb_or /= -!andbA.
 case/and4P=> nxy ntx nty dt _; apply/imsetP; exists t => //; apply/setP=> u.
 apply/idP/imsetP=> [|[a _ ->{u}]]; last first.
-  by apply: n_act_dtuple => //; apply/astabsP=> z; rewrite !inE.
+  by apply: n_act_dtuple => //; apply/astabsP=> z /[!inE].
 case/(atransP2 tr_m dt)=> /= a _ ->{u}.
 case odd_a: (odd_perm a); last by exists a => //; rewrite !inE /= odd_a.
 exists (tperm x y * a); first by rewrite !inE /= odd_permM odd_tperm nxy odd_a.
@@ -343,7 +343,7 @@ have p1x_x: p1 x = x by apply: fix_p1.
 have{le_p_n} lt_p1_n: #|[set x | p1 x != x]| < n.
   move: le_p_n; rewrite ltnS (cardsD1 x1) Hx1; apply/leq_trans/subset_leq_card.
   rewrite subsetD1 inE permM tpermR eqxx andbT.
-  by apply/subsetP=> y; rewrite !inE; apply: contraNneq=> /fix_p1->.
+  by apply/subsetP=> y /[!inE]; apply: contraNneq=> /fix_p1->.
 transitivity (p1 (+) true); last first.
   by rewrite odd_permM odd_tperm -Hx1 inE eq_sym addbK.
 have ->: p = p1 * tperm x1 (p x1) by rewrite -tpermV mulgK.
@@ -364,7 +364,7 @@ have rfd_rgd p: rfd (rgd p) = p.
   apply/permP => [[z Hz]]; apply/val_eqP; rewrite !permE.
   by rewrite /= [rgd _ _]permE /= insubF eqxx // permE /= insubT.
 have sSd: 'C_('Alt_T)[x | 'P] \subset 'dom rfd.
-  by apply/subsetP=> p; rewrite !inE /=; case/andP.
+  by apply/subsetP=> p /[!inE]/=; case/andP.
 apply/isogP; exists [morphism of restrm sSd rfd] => /=; last first.
   rewrite morphim_restrm setIid; apply/setP=> z; apply/morphimP/idP=> [[p _]|].
     case/setIP; rewrite Alt_even => Hp; move/astab1P=> Hp1 ->.

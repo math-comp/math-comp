@@ -549,7 +549,7 @@ Proof. by rewrite !cardE !size_filter count_predC. Qed.
 Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
 case Ax: (x \in A).
-  by apply: eq_card => y; rewrite inE /=; case: eqP => // ->.
+  by apply: eq_card => y /[1inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC.
 rewrite [#|predI _ _|]eq_card0 => [|y /=]; first exact: eq_card.
 by rewrite !inE; case: eqP => // ->.
@@ -564,10 +564,10 @@ Proof. by rewrite -(cardC (pred1 x)) card1. Qed.
 Lemma cardD1 x A : #|A| = (x \in A) + #|[predD1 A & x]|.
 Proof.
 case Ax: (x \in A); last first.
-  by apply: eq_card => y; rewrite !inE /=; case: eqP => // ->.
+  by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC /=.
 rewrite [#|predI _ _|]eq_card0 => [|y]; last by rewrite !inE; case: eqP.
-by apply: eq_card => y; rewrite !inE; case: eqP => // ->.
+by apply: eq_card => y /[!inE]; case: eqP => // ->.
 Qed.
 
 Lemma max_card A : #|A| <= #|T|.

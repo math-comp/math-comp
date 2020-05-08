@@ -144,7 +144,7 @@ have rV2V_K: cancel rV2V V2rV.
   by move=> rv; apply/rowP=> i; rewrite mxE coord_sum_free.
 rewrite -[n]mul1n -card_matrix -(card_imset _ (can_inj rV2V_K)).
 apply: eq_card => v; apply/idP/imsetP=> [/coord_vbasis-> | [rv _ ->]].
-  by exists (V2rV v) => //; apply: eq_bigr => i _; rewrite mxE.
+  by exists (V2rV v) => //; apply: eq_bigr => i _ /[1mxE].
 by apply: (@rpred_sum vT) => i _; rewrite rpredZ ?vbasis_mem ?memt_nth.
 Qed.
 
@@ -609,7 +609,7 @@ pose C u := 'C[ofG u]%AS; pose Q := 'C(L)%AS; pose q := (p ^ \dim Q)%N.
 have defC u: 'C[u] =i projG (C u).
   by move=> v; rewrite cent1E !inE (sameP cent1vP eqP).
 have defQ: 'Z(G) =i projG Q.
-  move=> u; rewrite !inE.
+  move=> u /[!inE].
   apply/centP/centvP=> cGu v _; last exact/val_inj/cGu/memvf.
   by have [-> | /inG/cGu[]] := eqVneq v 0; first by rewrite commr0.
 have q_gt1: (1 < q)%N by rewrite (ltn_exp2l 0) ?prime_gt1 ?adim_gt0.

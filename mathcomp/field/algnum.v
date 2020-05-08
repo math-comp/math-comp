@@ -635,7 +635,7 @@ have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
 move=> mulS S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
   case/S_P: Sx => {x}x ->; rewrite big1 ?isAlgInt0 // => i _.
-  by have /rowP/(_ i) := v0; rewrite !mxE => ->; rewrite mul0rz.
+  by have /rowP/(_ i)/[!mxE] -> := v0; rewrite mul0rz.
 have sYS (i : 'I_n): x * Y`_i \in S.
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
 pose A := \matrix_(i, j < n) sval (sig_eqW (S_P _ (sYS j))) i.

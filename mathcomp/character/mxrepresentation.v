@@ -434,7 +434,7 @@ Canonical rcenter_group := Group rcenter_group_set.
 
 Lemma rcenter_normal : rcenter <| G.
 Proof.
-rewrite /normal /rcenter {1}setIdE subsetIl; apply/subsetP=> x Gx; rewrite inE.
+rewrite /normal /rcenter {1}setIdE subsetIl; apply/subsetP=> x Gx /[1inE].
 apply/subsetP=> _ /imsetP[y /setIdP[Gy /is_scalar_mxP[c rGy]] ->].
 rewrite inE !repr_mxM ?groupM ?groupV //= mulmxA rGy scalar_mxC repr_mxKV //.
 exact: scalar_mx_is_scalar.
@@ -674,7 +674,7 @@ Proof. exact: quo_mx_coset. Qed.
 
 Lemma rcent_quo A : rcent rGH A = (rcent rG A / H)%g.
 Proof.
-apply/setP=> Hx; rewrite !inE.
+apply/setP=> Hx /[!inE].
 apply/andP/idP=> [[]|]; case/morphimP=> x Nx Gx ->{Hx}.
   by rewrite quo_repr_coset // => cAx; rewrite mem_morphim // inE Gx.
 by case/setIdP: Gx => Gx cAx; rewrite quo_repr_coset ?mem_morphim.
@@ -682,7 +682,7 @@ Qed.
 
 Lemma rstab_quo m (U : 'M_(m, n)) : rstab rGH U = (rstab rG U / H)%g.
 Proof.
-apply/setP=> Hx; rewrite !inE.
+apply/setP=> Hx /[!inE].
 apply/andP/idP=> [[]|]; case/morphimP=> x Nx Gx ->{Hx}.
   by rewrite quo_repr_coset // => nUx; rewrite mem_morphim // inE Gx.
 by case/setIdP: Gx => Gx nUx; rewrite quo_repr_coset ?mem_morphim.
@@ -2710,14 +2710,14 @@ Qed.
 Lemma rstab_submod m (W : 'M_(m, \rank U)) :
   rstab rU W = rstab rG (val_submod W).
 Proof.
-apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
 by rewrite -(inj_eq val_submod_inj) val_submodJ.
 Qed.
 
 Lemma rstabs_submod m (W : 'M_(m, \rank U)) :
   rstabs rU W = rstabs rG (val_submod W).
 Proof.
-apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
 by rewrite -val_submodS val_submodJ.
 Qed.
 
@@ -2738,7 +2738,7 @@ Qed.
 Lemma rstabs_factmod m (W : 'M_(m, \rank (cokermx U))) :
   rstabs rU' W = rstabs rG (U + val_factmod W)%MS.
 Proof.
-apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
 rewrite addsmxMr addsmx_sub (submx_trans (mxmoduleP Umod x Gx)) ?addsmxSl //.
 rewrite -val_factmodS val_factmodJ //= val_factmodS; apply/idP/idP=> nWx.
   rewrite (submx_trans (addsmxSr U _)) // -(in_factmodsK (addsmxSl U _)) //.
@@ -2872,7 +2872,7 @@ Qed.
 
 Lemma rstabs_quo m (U : 'M_(m, n)) : rstabs rGH U = (rstabs rG U / H)%g.
 Proof.
-apply/setP=> Hx; rewrite !inE; apply/andP/idP=> [[]|] /morphimP[x Nx Gx ->{Hx}].
+apply/setP=> Hx /[!inE]; apply/andP/idP=> [[]|] /morphimP[x Nx Gx ->{Hx}].
   by rewrite quo_repr_coset // => nUx; rewrite mem_morphim // inE Gx.
 by case/setIdP: Gx => Gx nUx; rewrite quo_repr_coset ?mem_morphim.
 Qed.
@@ -3378,7 +3378,7 @@ apply: mxsimple_exists (mxmodule1 rH) nz1 _ _ => [[M simM _]].
 pose W1 := PackSocle (component_socle sH simM).
 have [X sXG [def1 _]] := Clifford_basis simM; move/subsetP: sXG => sXG.
 apply/imsetP; exists W1; first by rewrite inE.
-symmetry; apply/setP=> W; rewrite inE; have simW := socle_simple W.
+symmetry; apply/setP=> W /[1inE]; have simW := socle_simple W.
 have:= submx1 (socle_base W); rewrite -def1 -[(\sum_(x in X) _)%MS]mulmx1.
 case/(hom_mxsemisimple_iso simW) => [x Xx _ | | x Xx isoMxW].
 - by apply: Clifford_simple; rewrite ?sXG.
@@ -3455,13 +3455,13 @@ Qed.
 Lemma Clifford_astab : H <*> 'C_G(H) \subset 'C([set: sH] | 'Cl).
 Proof.
 rewrite join_subG !subsetI sHG subsetIl /=; apply/andP; split.
-  apply/subsetP=> h Hh; have Gh := subsetP sHG h Hh; rewrite inE.
+  apply/subsetP=> h Hh /[1inE]; have Gh := subsetP sHG h Hh.
   apply/subsetP=> W _; have simW := socle_simple W; have [modW _ _] := simW.
   have simWh: mxsimple rH (socle_base W *m rG h) by apply: Clifford_simple.
   rewrite inE -val_eqE /= PackSocleK eq_sym.
   apply/component_mx_isoP; rewrite ?subgK //; apply: component_mx_iso => //.
   by apply: submx_trans (component_mx_id simW); move/mxmoduleP: modW => ->.
-apply/subsetP=> z cHz; have [Gz _] := setIP cHz; rewrite inE.
+apply/subsetP=> z cHz /[1inE]; have [Gz _] := setIP cHz.
 apply/subsetP=> W _; have simW := socle_simple W; have [modW _ _] := simW.
 have simWz: mxsimple rH (socle_base W *m rG z) by apply: Clifford_simple.
 rewrite inE -val_eqE /= PackSocleK eq_sym.
@@ -3470,7 +3470,7 @@ Qed.
 
 Lemma Clifford_astab1 (W : sH) : 'C[W | 'Cl] = rstabs rG W.
 Proof.
-apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
 rewrite sub1set inE (sameP eqP socleP) !val_Clifford_act //.
 rewrite andb_idr // => sWxW; rewrite -mxrank_leqif_sup //.
 by rewrite mxrankMfree ?repr_mx_free.
@@ -3974,7 +3974,7 @@ Proof. by move=> x Gx; apply: subsetP; apply: class_subG. Qed.
 Lemma classg_base_free : row_free classg_base.
 Proof.
 rewrite -kermx_eq0; apply/rowV0P=> v /sub_kermxP; rewrite mulmx_sum_row => v0.
-apply/rowP=> k; rewrite mxE.
+apply/rowP=> k /[1mxE].
 have [x Gx def_k] := imsetP (enum_valP k).
 transitivity (@gring_proj F _ G x (vec_mx 0) 0 0); last first.
   by rewrite !linear0 !mxE.
@@ -4580,7 +4580,7 @@ rewrite (reindex (fun j => irr_comp sG (rG j))) /=.
   by rewrite inE -lin_j -irr_degreeE irr_degree_abelian.
 pose sGlin := {i | i \in linear_irr sG}.
 have sG'k (i : sGlin) : G^`(1)%g \subset rker (irr_repr (val i)).
-  by case: i => i /=; rewrite !inE => lin; rewrite rker_linear //=; apply/eqP.
+  by case: i => i /= /[!inE] lin; rewrite rker_linear //=; apply/eqP.
 pose h' u := irr_comp sGq (quo_repr (sG'k u) nG'G).
 have irrGq u: mx_irreducible (quo_repr (sG'k u) nG'G).
   by apply/quo_mx_irr; apply: socle_irr.
@@ -5423,7 +5423,7 @@ Prenex Implicits val_genK in_genK.
 
 Lemma val_gen_rV (w : 'rV_nA) :
   val_gen w = mxvec (\matrix_j val (w 0 j)) *m base.
-Proof. by apply/rowP=> j; rewrite mxE. Qed.
+Proof. by apply/rowP=> j /[1mxE]. Qed.
 
 Section Bijection2.
 
@@ -5432,7 +5432,7 @@ Variable m : nat.
 Lemma val_gen_row W (i : 'I_m) : val_gen (row i W) = row i (val_gen W).
 Proof.
 rewrite val_gen_rV rowK; congr (mxvec _ *m _).
-by apply/matrixP=> j k; rewrite !mxE.
+by apply/matrixP=> j k /[!mxE].
 Qed.
 
 Lemma in_gen_row W (i : 'I_m) : in_gen (row i W) = row i (in_gen W).
@@ -5442,7 +5442,7 @@ Lemma row_gen_sum_mxval W (i : 'I_m) :
   row i (val_gen W) = \sum_j row (gen_base 0 j) (mxval (W i j)).
 Proof.
 rewrite -val_gen_row [row i W]row_sum_delta val_gen_sum.
-apply: eq_bigr => /= j _; rewrite mxE; move: {W i}(W i j) => x.
+apply: eq_bigr => /= j _ /[1mxE]; move: {W i}(W i j) => x.
 have ->: x = \sum_k gen (val x 0 k) * inFA (delta_mx 0 k).
   case: x => u; apply: mxval_inj; rewrite {1}[u]row_sum_delta.
   rewrite mxval_sum [mxval _]horner_rVpoly mulmx_suml linear_sum /=.
@@ -5565,21 +5565,21 @@ Qed.
 
 Lemma rstab_in_gen m (U : 'M_(m, n)) : rstab rGA (in_gen U) = rstab rG U.
 Proof.
-apply/setP=> x; rewrite !inE; case Gx: (x \in G) => //=.
+apply/setP=> x /[!inE]; case Gx: (x \in G) => //=.
 by rewrite -in_genJ // (inj_eq (can_inj in_genK)).
 Qed.
 
 Lemma rstabs_in_gen m (U : 'M_(m, n)) :
   rstabs rG U \subset rstabs rGA (in_gen U).
 Proof.
-apply/subsetP=> x; rewrite !inE => /andP[Gx nUx].
+apply/subsetP=> x /[!inE] /andP[Gx nUx].
 by rewrite -in_genJ Gx // submx_in_gen.
 Qed.
 
 Lemma rstabs_rowval_gen m (U : 'M_(m, nA)) :
   rstabs rG (rowval_gen U) = rstabs rGA U.
 Proof.
-apply/setP=> x; rewrite !inE; case Gx: (x \in G) => //=.
+apply/setP=> x /[!inE]; case Gx: (x \in G) => //=.
 by rewrite submx_rowval_gen in_genJ // (eqmxMr _ (rowval_genK U)).
 Qed.
 
@@ -5686,8 +5686,8 @@ elim: t => //=.
 - by move=> x _; rewrite eval_mx_term.
 - by move=> x _; rewrite eval_mx_term.
 - move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite -{}IH1 // -{}IH2 //.
-  by apply/rowP=> k; rewrite !mxE.
-- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k; rewrite !mxE.
+  by apply/rowP=> k /[!mxE].
+- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k /[!mxE].
 - move=> t1 IH1 n1 rt1; rewrite eval_mulmx eval_mx_term mul_scalar_mx.
   by rewrite scaler_nat {}IH1 //; elim: n1 => //= n1 IHn1; rewrite !mulrS IHn1.
 - by move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite eval_mulT IH1 ?IH2.

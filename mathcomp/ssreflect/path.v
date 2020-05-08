@@ -252,7 +252,7 @@ Qed.
 Lemma mem_next p x : (next p x \in p) = (x \in p).
 Proof.
 rewrite next_nth; case p_x: (x \in p) => //.
-case: p (index x p) p_x => [|y0 p'] //= i _; rewrite inE.
+case: p (index x p) p_x => [|y0 p'] //= i _ /[1inE].
 have [lt_ip | ge_ip] := ltnP i (size p'); first by rewrite orbC mem_nth.
 by rewrite nth_default ?eqxx.
 Qed.
@@ -277,7 +277,7 @@ Proof. by case/andP. Qed.
 
 Lemma next_cycle p x : cycle e p -> x \in p -> e x (next p x).
 Proof.
-case: p => //= y0 p; elim: p {1 3 5}y0 => [|z p IHp] y /=; rewrite inE.
+case: p => //= y0 p; elim: p {1 3 5}y0 => [|z p IHp] y /= /[1inE].
   by rewrite andbT; case: (x =P y) => // ->.
 by case/andP=> eyz /IHp; case: (x =P y) => // ->.
 Qed.

@@ -1452,7 +1452,7 @@ have [w [Ew nzw] uM]: {w : #|A|.-tuple L | nzE w & M w \in unitmx}.
   congr (_ != 0): nzS; rewrite [_ - _]mx11_scalar det_scalar !mxE opprB /=.
   rewrite -big_uniq // big_cons /= cx_n1 mulN1r addrC; congr (_ + _).
   rewrite (big_nth 1%g) big_mkord; apply: eq_bigr => j _.
-  by rewrite /c_ index_uniq // valK; congr (_ * _); rewrite !mxE.
+  by rewrite /c_ index_uniq // valK; congr (_ * _) => /[!mxE].
 exists w => [//|]; split=> [||gA].
 - by congr (_ \in unitmx): uM; apply/matrixP=> i j; rewrite !mxE -enum_val_nth.
 - apply/directv_sum_independent=> kw_ Kw_kw sum_kw_0 j _.
@@ -1460,7 +1460,7 @@ exists w => [//|]; split=> [||gA].
   pose kv := \col_i k_ i.
   transitivity (kv j 0 * tnth w j); first by rewrite !mxE.
   suffices{j}/(canRL (mulKmx uM))->: M w *m kv = 0 by rewrite mulmx0 mxE mul0r.
-  apply/colP=> i; rewrite !mxE; pose Ai := nth 1%g (enum A) i.
+  apply/colP=> i /[!mxE]; pose Ai := nth 1%g (enum A) i.
   transitivity (Ai (\sum_j kw_ j)); last by rewrite sum_kw_0 rmorph0.
   rewrite rmorph_sum; apply: eq_bigr => j _; rewrite !mxE /= -/Ai.
   rewrite Dk_ mulrC rmorphM /=; congr (_ * _).
@@ -1473,7 +1473,7 @@ apply/subvP=> w0 Ew0; apply/memv_sumP.
 pose wv := \col_(i < #|A|) enum_val i w0; pose v := invmx (M w) *m wv.
 exists (fun i => tnth w i * v i 0) => [i _|]; last first.
   transitivity (wv (iG 1%g) 0); first by rewrite mxE enum_rankK_in ?gal_id.
-  rewrite -[wv](mulKVmx uM) -/v; rewrite mxE; apply: eq_bigr => i _.
+  rewrite -[wv](mulKVmx uM) -/v mxE; apply: eq_bigr => i _.
   by congr (_ * _); rewrite !mxE -enum_val_nth enum_rankK_in ?gal_id.
 rewrite mulrC memv_mul ?memv_line //; apply/fixedFieldP=> [|x Gx].
   rewrite mxE rpred_sum // => j _; rewrite !mxE rpredM //; last exact: memv_gal.
@@ -1485,7 +1485,7 @@ rewrite mulrC memv_mul ?memv_line //; apply/fixedFieldP=> [|x Gx].
 suffices{i} {2}<-: map_mx x v = v by rewrite [map_mx x v i 0]mxE.
 have uMx: map_mx x (M w) \in unitmx by rewrite map_unitmx.
 rewrite map_mxM map_invmx /=; apply: canLR {uMx}(mulKmx uMx) _.
-apply/colP=> i; rewrite !mxE; pose ix := iG (enum_val i * x)%g.
+apply/colP=> i /[!mxE]; pose ix := iG (enum_val i * x)%g.
 have Dix b: b \in E -> enum_val ix b = x (enum_val i b).
   by move=> Eb; rewrite enum_rankK_in ?groupM ?enum_valP // galM ?lfunE.
 transitivity ((M w *m v) ix 0); first by rewrite mulKVmx // mxE Dix.

@@ -968,7 +968,7 @@ without loss{IHa} /forallP/(_ (_, _))/= a_dvM: / [forall k, a %| M k.1 k.2]%Z.
     by exists i; rewrite mxE.
   exists R^T; last exists L^T; rewrite ?unitmx_tr //; exists d => //.
   rewrite -[M]trmxK dM !trmx_mul mulmxA; congr (_ *m _ *m _).
-  by apply/matrixP=> i1 j1; rewrite !mxE; case: eqVneq => // ->.
+  by apply/matrixP=> i1 j1 /[!mxE]; case: eqVneq => // ->.
 without loss{nz_a a_dvM} a1: M a Da / a = 1.
   pose M1 := map_mx (divz^~ a) M; case/(_ M1 1)=> // [k|L uL [R uR [d dvD dM]]].
     by rewrite !mxE Da divzz nz_a.
@@ -1048,7 +1048,7 @@ have{kerGu} defS: map_mx intr (rsubmx G'lr) *m T = S.
 pose vv := \row_j coord (vbasis <<s>>) j v.
 have uS: row_full S.
   apply/row_fullP; exists (\matrix_(i, j) coord s j (vbasis <<s>>)`_i).
-  apply/matrixP=> j1 j2; rewrite !mxE.
+  apply/matrixP=> j1 j2 /[!mxE].
   rewrite -(coord_free _ _ (basis_free (vbasisP _))).
   rewrite -!tnth_nth (coord_span (vbasis_mem (mem_tnth j1 _))) linear_sum.
   by apply: eq_bigr => i _; rewrite !mxE (tnth_nth 0) !linearZ.
@@ -1060,7 +1060,7 @@ case Zv: (map_mx denq (vv *m pinvmx T) == const_mx 1).
     rewrite {1}(coord_vbasis s_v); apply: eq_bigr => j _; congr (_ *: _).
     have ->: map_mx intr a = vv *m pinvmx T *m map_mx intr (dsubmx Gud).
       rewrite map_mxM /=; congr (_ *m _); apply/rowP=> i; rewrite 2!mxE numqE.
-      by have /eqP/rowP/(_ i) := Zv; rewrite !mxE => ->; rewrite mulr1.
+      by have /eqP/rowP/(_ i)/[!mxE]-> := Zv; rewrite mulr1.
     by rewrite -(mulmxA _ _ S) mulmxKpV ?mxE // -eqST submx_full.
   rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => j _; congr (_ *: _).
   rewrite linear_sum mxE; apply: eq_bigr => i _.
