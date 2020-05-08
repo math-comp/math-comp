@@ -544,7 +544,7 @@ Definition Sym : {set {perm T}} := [set s | perm_on S s].
 
 Lemma Sym_group_set : group_set Sym.
 Proof.
-apply/group_setP; split => [| s t]; rewrite !inE;
+apply/group_setP; split => [| s t] /[!inE];
    [exact: perm_on1 | exact: perm_onM].
 Qed.
 Canonical Sym_group : {group {perm T}} := Group Sym_group_set.
@@ -687,7 +687,7 @@ Lemma isom_cast_perm m n eq_m_n : isom setT setT (@cast_perm m n eq_m_n).
 Proof.
 case: {n} _ / eq_m_n; apply/isomP; split.
   exact/injmP/(in2W (@cast_perm_inj _ _ _)).
-by apply/setP => /= s; rewrite !inE; apply/imsetP; exists s; rewrite ?inE.
+by apply/setP => /= s /[!inE]; apply/imsetP; exists s; rewrite ?inE.
 Qed.
 
 End CastSn.

@@ -856,7 +856,7 @@ have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
   apply: sig_eqW; have /memv_sumP[y Fy ->]: x \in SbL by rewrite defL memvf.
   have /fin_all_exists[r Dr] i: exists r, y i = r *: (bL`_i : L_F).
     by have /memv_cosetP[a Fa ->] := Fy i isT; exists (Subvs Fa).
-  by exists (\row_i r i); apply: eq_bigr => i _; rewrite mxE.
+  by exists (\row_i r i); apply: eq_bigr => i _ /[1mxE].
 pose v2r x := sval (v2rP x).
 have v2rK: cancel v2r (Linear r2v_lin) by rewrite /v2r => x; case: (v2rP x).
 suffices r2vK: cancel r2v v2r.
@@ -1023,9 +1023,9 @@ have v2rK: cancel v2r r2v.
     (* The -/m takes 8s, and without it then apply: eq_bigr takes 12s. *)
     (* The time drops to 2s with  a -[GRing.Field.ringType F]/(F : fieldType) *)
   apply: eq_bigr => i _; rewrite mxvecK; congr (_ *: _ : L).
-  by rewrite (coordF (coord bL i x)); apply: eq_bigr => j _; rewrite mxE.
+  by rewrite (coordF (coord bL i x)); apply: eq_bigr => j _ /[1mxE].
 exists (m * n)%N, v2r => //; exists r2v => // r.
-apply: (canLR vec_mxK); apply/matrixP=> i j; rewrite mxE.
+apply: (canLR vec_mxK); apply/matrixP=> i j /[1mxE].
 by rewrite !coord_sum_free ?(basis_free (vbasisP _)).
 Qed.
 

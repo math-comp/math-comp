@@ -213,7 +213,7 @@ Qed.
 
 Lemma dtuple_on_subset n (S1 S2 : {set sT}) t :
   S1 \subset S2 -> t \in n.-dtuple(S1) -> t \in n.-dtuple(S2).
-Proof. by move=> sS12; rewrite !inE => /andP[-> /subset_trans]; apply. Qed.
+Proof. by move=> sS12 /[!inE] /andP[-> /subset_trans]; apply. Qed.
 
 Lemma n_act_add n x (t : n.-tuple sT) a :
   n_act to [tuple of x :: t] a = [tuple of to x a :: n_act to t a].
@@ -236,7 +236,7 @@ have ext_t t: t \in dtuple_on m S ->
 - move=> dt.
   have [sSt | /subsetPn[x Sx ntx]] := boolP (S \subset t); last first.
     by exists x; rewrite dtuple_on_add andbA /= Sx ntx.
-  case/imsetP: tr_m1 dt => t1; rewrite !inE => /andP[Ut1 St1] _ /andP[Ut _].
+  case/imsetP: tr_m1 dt => t1 /[!inE] /andP[Ut1 St1] _ /andP[Ut _].
   have /subset_leq_card := subset_trans St1 sSt.
   by rewrite !card_uniq_tuple // ltnn.
 case/imsetP: (tr_m1); case/tupleP=> [x t]; rewrite dtuple_on_add.

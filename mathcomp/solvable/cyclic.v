@@ -373,7 +373,7 @@ Proof.
 move=> sHa; apply: lone_subgroup_char => // J sJa isoJH.
 have dvHa: #|H| %| #[a] by apply: cardSg.
 have{dvHa} /setP Huniq := esym (cycle_sub_group dvHa).
-move: (Huniq H) (Huniq J); rewrite !inE /=.
+move: (Huniq H) (Huniq J) => /[!inE]/=.
 by rewrite sHa sJa (card_isog isoJH) eqxx => /eqP<- /eqP<-.
 Qed.
 
@@ -665,7 +665,7 @@ have [lea1 | lt1a] := leqP #[a] 1.
   rewrite /order card_le1_trivg // cards1 (@eq_card1 _ 1) // => x.
   by rewrite !inE -cycle_eq1 eq_sym.
 rewrite -(card_injm (injm_invm (injm_Zpm a))) /= ?im_Zpm; last first.
-  by apply/subsetP=> x; rewrite inE; apply: cycle_generator.
+  by apply/subsetP=> x /[1inE]; apply: cycle_generator.
 rewrite -card_units_Zp // cardsE card_sub morphim_invmE; apply: eq_card => /= d.
 by rewrite !inE /= qualifE /= /Zp lt1a inE /= generator_coprime {1}Zp_cast.
 Qed.
@@ -690,7 +690,7 @@ pose h (x : gT) : 'I_#|G|.+1 := inord #[x].
 symmetry; rewrite -{1}sum1_card (partition_big h xpredT) //=.
 apply: eq_bigr => d _; set Gd := finset _.
 rewrite -sum_nat_const sum1dep_card -sum1_card (_ : finset _ = Gd); last first.
-  apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
+  apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
   by rewrite /eq_op /= inordK // ltnS subset_leq_card ?cycle_subG.
 rewrite (partition_big_imset cycle) {}/Gd; apply: eq_bigr => C /=.
 case/imsetP=> x /setIdP[Gx /eqP <-] -> {C d}.

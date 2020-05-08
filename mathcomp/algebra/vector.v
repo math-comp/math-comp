@@ -410,7 +410,7 @@ Qed.
 
 Let lin_b2mx n (X : n.-tuple vT) k :  
   \sum_(i < n) k i *: X`_i = r2v (\row_i k i *m b2mx X).
-Proof. by rewrite -mul_b2mx; apply: eq_bigr => i _; rewrite mxE. Qed.
+Proof. by rewrite -mul_b2mx; apply: eq_bigr => i _ /[1mxE]. Qed.
 
 Let free_b2mx n (X : n.-tuple vT) : free X = row_free (b2mx X).
 Proof. by rewrite /free /dimv span_b2mx genmxE size_tuple. Qed.
@@ -1935,7 +1935,7 @@ exists (fun w => \row_i coord (vbasis U) i (vsval w)).
   by move=> k w1 w2; apply/rowP=> i; rewrite !mxE linearP.
 exists (fun rw : 'rV_(\dim U) => vsproj (\sum_i rw 0 i *: (vbasis U)`_i)).
   move=> w /=; congr (vsproj _ = w): (vsvalK w).
-  by rewrite {1}(coord_vbasis (subvsP w)); apply: eq_bigr => i _; rewrite mxE.
+  by rewrite {1}(coord_vbasis (subvsP w)); apply: eq_bigr => i _ /[1mxE].
 move=> rw; apply/rowP=> i; rewrite mxE vsprojK.
   by rewrite coord_sum_free ?(basis_free (vbasisP U)).
 by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.

@@ -117,7 +117,7 @@ have [w Gw Dg] := imsetP g1Gg; pose J2 (v : gT) xy := (xy.1 ^ v, xy.2 ^ v)%g.
 have J2inj: injective (J2 w).
   by apply: can_inj (J2 w^-1)%g _ => [[x y]]; rewrite /J2 /= !conjgK.
 rewrite -(card_imset _ J2inj) subset_leq_card //; apply/subsetP.
-move=> _ /imsetP[[x y] /setIdP[/andP[/= x1Gx y1Gy] Dxy1] ->]; rewrite !inE /=.
+move=> _ /imsetP[[x y] /setIdP[/andP[/= x1Gx y1Gy] Dxy1] ->] /[!inE]/=.
 rewrite !(class_sym _ (_ ^ _)) !classGidl // class_sym x1Gx class_sym y1Gy.
 by rewrite -conjMg (eqP Dxy1) /= -Dg.
 Qed.
@@ -589,7 +589,7 @@ have pa_dv_ZiG: (p ^ a %| #|G : 'Z(G)|)%N.
   exact: dvd_irr1_index_center.
 have [sPG pP p'PiG] := and3P sylP.
 have ZchiP: 'Res[P] 'chi_i \in 'CF(P, P :&: 'Z(G)).
-  apply/cfun_onP=> x; rewrite inE; have [Px | /cfun0->//] := boolP (x \in P).
+  apply/cfun_onP=> x /[1inE]; have [Px | /cfun0->//] := boolP (x \in P).
   rewrite /= -(cfcenter_fful_irr fful_i) cfResE //.
   apply: coprime_degree_support_cfcenter.
   rewrite Dchi1 coprime_expl // prime_coprime // -p'natE //.

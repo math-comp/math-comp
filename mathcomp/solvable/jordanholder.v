@@ -247,7 +247,7 @@ Variable to : groupAction A D.
 Lemma gactsP (G : {set rT}) : reflect {acts A, on G | to} [acts A, on G | to].
 Proof.
 apply: (iffP idP) => [nGA x|nGA]; first exact: acts_act.
-apply/subsetP=> a Aa; rewrite !inE; rewrite Aa.
+apply/subsetP=> a Aa /[!inE]; rewrite Aa.
 by  apply/subsetP=> x; rewrite inE nGA.
 Qed.
 
@@ -268,7 +268,7 @@ Lemma gactsI (N1 N2 : {set rT}) :
   [acts A, on N1 | to] -> [acts A, on N2 | to] -> [acts A, on N1 :&: N2 | to].
 Proof.
 move=> aAN1 aAN2.
-apply/subsetP=> x Ax; rewrite !inE Ax /=; apply/subsetP=> y Ny; rewrite inE.
+apply/subsetP=> x Ax; rewrite !inE Ax /=; apply/subsetP=> y Ny /[1inE].
 case/setIP: Ny=> N1y N2y; rewrite inE ?astabs_act  ?N1y ?N2y //.
 - by move/subsetP: aAN2; move/(_ x Ax).
 - by move/subsetP: aAN1; move/(_ x Ax).
@@ -314,7 +314,7 @@ Lemma qacts_cosetpre (H : {group rT}) (K' : {group coset_of H}) :
 Proof.
 move=> sHD aH aK'; apply/subsetP=> x Ax; move: (Ax) (subsetP aK').
 rewrite -{1}(acts_qact_doms sHD aH) => qdx; move/(_ x qdx) => nx.
-rewrite !inE Ax; apply/subsetP=> y; case/morphpreP=> Ny /= K'Hy; rewrite inE.
+rewrite !inE Ax; apply/subsetP=> y; case/morphpreP=> Ny /= K'Hy /[1inE].
 apply/morphpreP; split; first by rewrite acts_qact_dom_norm.
 by move/gastabsP: nx; move/(_  qdx (coset H y)); rewrite K'Hy qactE.
 Qed.
@@ -522,8 +522,8 @@ have: K' :=: 1%G \/ K' :=: (G / H).
     by rewrite astabs_act // (subsetP aK) //; apply: (subsetP h).
   by apply/subsetP=> t; rewrite qact_domE // inE; case/andP.
 case; last first.
-  move/quotient_injG; rewrite !inE /=; move/(_ nKH nHG)=> c; move: nsGK.
-  by rewrite c subxx.
+  move=> /quotient_injG /[!inE]/= /(_ nKH nHG) c.
+  by rewrite c subxx in nsGK.
 rewrite /= -trivg_quotient => tK'; apply: (congr1 (@gval _)); move: tK'.
 by apply: (@quotient_injG _ H); rewrite ?inE /= ?normal_refl.
 Qed.
@@ -635,7 +635,7 @@ have nNN1 : N <| N1.
 have nNN2 : N <| N2.
   by apply: (normalS _ _ nNG); rewrite ?subsetIr ?normal_sub.
 have aN : [ acts A, on N1 :&: N2 | to].
-  apply/subsetP=> x Ax; rewrite !inE Ax /=; apply/subsetP=> y Ny; rewrite inE.
+  apply/subsetP=> x Ax; rewrite !inE Ax /=; apply/subsetP=> y Ny /[1inE].
   case/setIP: Ny=> N1y N2y. rewrite inE ?astabs_act  ?N1y ?N2y //.
     by move/subsetP: aN2; move/(_ x Ax).
   by move/subsetP: aN1; move/(_ x Ax).

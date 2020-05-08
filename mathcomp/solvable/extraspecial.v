@@ -69,8 +69,8 @@ Canonical action := Action actP.
 
 Lemma gactP : is_groupAction [set: 'Z_p * 'Z_p] action.
 Proof.
-move=> k _ /=; rewrite inE.
-apply/andP; split; first by apply/subsetP=> ij _; rewrite inE.
+move=> k _ /= /[1inE].
+apply/andP; split; first by apply/subsetP=> ij _ /[1inE].
 apply/morphicP=> /= [[i1 j1] [i2 j2] _ _].
 by rewrite !permE /= mulrDr -addrA (addrCA i2) (addrA i1).
 Qed.

@@ -304,7 +304,7 @@ Qed.
 Lemma morphpreMl R S :
   R \subset f @* D -> f @*^-1 (R * S) = f @*^-1 R * f @*^-1 S.
 Proof.
-move=> sRfD; apply/setP=> x; rewrite !inE.
+move=> sRfD; apply/setP=> x /[!inE].
 apply/andP/imset2P=> [[Dx] | [y z]]; last first.
   rewrite !inE => /andP[Dy Rfy] /andP[Dz Rfz] ->.
   by rewrite ?(groupM, morphM, mem_imset2).
@@ -364,7 +364,7 @@ Lemma morphpreI R S : f @*^-1 (R :&: S) = f @*^-1 R :&: f @*^-1 S.
 Proof. by rewrite -setIIr -preimsetI. Qed.
 
 Lemma morphpreD R S : f @*^-1 (R :\: S) = f @*^-1 R :\: f @*^-1 S.
-Proof. by apply/setP=> x; rewrite !inE; case: (x \in D). Qed.
+Proof. by apply/setP=> x /[!inE]; case: (x \in D). Qed.
 
 (* kernel, domain properties *)
 
@@ -396,7 +396,7 @@ Proof. by move=> Dx Dy eqfxy; apply/rcosetP; apply/rcoset_kerP. Qed.
 
 Lemma ker_norm : D \subset 'N('ker f).
 Proof.
-apply/subsetP=> x Dx; rewrite inE; apply/subsetP=> _ /imsetP[y Ky ->].
+apply/subsetP=> x Dx /[1inE]; apply/subsetP=> _ /imsetP[y Ky ->].
 by rewrite !inE groupJ ?morphJ // ?dom_ker //= mker ?conj1g.
 Qed.
 
@@ -465,7 +465,7 @@ Qed.
 
 Lemma morphimK A : A \subset D -> f @*^-1 (f @* A) = 'ker f * A.
 Proof.
-move=> sAD; apply/setP=> x; rewrite !inE.
+move=> sAD; apply/setP=> x /[!inE].
 apply/idP/idP=> [/andP[Dx /morphimP[y Dy Ay eqxy]] | /imset2P[z y Kz Ay ->{x}]].
   rewrite -(mulgKV y x) mem_mulg // !inE !(groupM, morphM, groupV) //.
   by rewrite morphV //= eqxy mulgV.
@@ -660,7 +660,7 @@ Proof. exact: morphim_cents. Qed.
 
 Lemma morphpre_norm R : f @*^-1 'N(R) \subset 'N(f @*^-1 R).
 Proof.
-apply/subsetP=> x; rewrite !inE => /andP[Dx Nfx].
+apply/subsetP=> x /[!inE] /andP[Dx Nfx].
 by rewrite -morphpreJ ?morphpreS.
 Qed.
 
@@ -898,7 +898,7 @@ by apply/setP=> x; apply/imsetP/idP=> [[y By ->]|Bx]; last exists x.
 Qed.
 
 Lemma morphpre_idm A B : idm A @*^-1 B = A :&: B.
-Proof. by apply/setP=> x; rewrite !inE. Qed.
+Proof. by apply/setP=> x /[!inE]. Qed.
 
 Lemma im_idm A : idm A @* A = A.
 Proof. exact: morphim_idm. Qed.
@@ -980,12 +980,12 @@ Canonical triv_morph A := Morphism (@trivm_morphM A).
 
 Lemma morphim_trivm (G H : {group aT}) : trivm G @* H = 1.
 Proof.
-apply/setP=> /= y; rewrite inE; apply/idP/eqP=> [|->]; first by case/morphimP.
+apply/setP=> /= y /[1inE]; apply/idP/eqP=> [|->]; first by case/morphimP.
 by apply/morphimP; exists (1 : aT); rewrite /= ?group1.
 Qed.
 
 Lemma ker_trivm (G : {group aT}) : 'ker (trivm G) = G.
-Proof. by apply/setIidPl/subsetP=> x _; rewrite !inE /=. Qed.
+Proof. by apply/setIidPl/subsetP=> x _ /[!inE]/=. Qed.
 
 End TrivMorphism.
 
@@ -1071,7 +1071,7 @@ Qed.
 
 Lemma morphpre_factm (C : {set rT}) : ff @*^-1 C =  q @* (f @*^-1 C).
 Proof.
-apply/setP=> y; rewrite !inE /=; apply/andP/morphimP=> [[]|[x Hx]]; last first.
+apply/setP=> y /[!inE]/=; apply/andP/morphimP=> [[]|[x Hx]]; last first.
   by case/morphpreP=> Gx Cfx ->; rewrite factmE ?mem_imset ?inE ?Hx.
 case/morphimP=> x Hx Gx ->; rewrite factmE //.
 by exists x; rewrite // !inE Gx.

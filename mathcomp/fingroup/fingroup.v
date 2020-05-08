@@ -664,7 +664,7 @@ Lemma repr_set1 x : repr [set x] = x.
 Proof. by apply/set1P/card_mem_repr; rewrite cards1. Qed.
 
 Lemma repr_set0 : repr set0 = 1.
-Proof. by rewrite /repr; case: pickP => [x|_]; rewrite !inE. Qed.
+Proof. by rewrite /repr; case: pickP => [x|_] /[!inE]. Qed.
 
 End Repr.
 
@@ -703,7 +703,7 @@ Proof. by move=> A; apply/setP=> x; rewrite !inE invgK. Qed.
 
 Lemma set_invgM : {morph set_invg : A B / set_mulg A B >-> set_mulg B A}.
 Proof.
-move=> A B; apply/setP=> z; rewrite inE.
+move=> A B; apply/setP=> z /[1inE].
 apply/imset2P/imset2P=> [[x y Ax By /(canRL invgK)->] | [y x]].
   by exists y^-1 x^-1; rewrite ?invMg // inE invgK.
 by rewrite !inE => By1 Ax1 ->; exists x^-1 y^-1; rewrite ?invMg.
@@ -1159,7 +1159,7 @@ Qed.
 
 Lemma classVg x A : x^-1 ^: A = (x ^: A)^-1.
 Proof.
-apply/setP=> xy; rewrite inE; apply/imsetP/imsetP=> [] [y Ay def_xy].
+apply/setP=> xy /[1inE]; apply/imsetP/imsetP=> [] [y Ay def_xy].
   by rewrite def_xy conjVg invgK; exists y.
 by rewrite -[xy]invgK def_xy -conjVg; exists y.
 Qed.
@@ -1284,7 +1284,7 @@ Canonical one_group := group group_set_one.
 Canonical set1_group := @group [set 1] group_set_one.
 
 Lemma group_setT (phT : phant gT) : group_set (setTfor phT).
-Proof. by apply/group_setP; split=> [|x y _ _]; rewrite inE. Qed.
+Proof. by apply/group_setP; split=> [|x y _ _] /[1inE]. Qed.
 
 Canonical setT_group phT := group (group_setT phT).
 
@@ -2351,7 +2351,7 @@ Qed.
 
 Lemma commGC A B : [~: A, B] = [~: B, A].
 Proof.
-rewrite -[[~: A, B]]genV; congr <<_>>; apply/setP=> z; rewrite inE.
+rewrite -[[~: A, B]]genV; congr <<_>>; apply/setP=> z /[1inE].
 by apply/imset2P/imset2P=> [] [x y Ax Ay]; last rewrite -{1}(invgK z);
   rewrite -invg_comm => /invg_inj->; exists y x.
 Qed.
@@ -2738,7 +2738,7 @@ Proof. by rewrite (bigcap_min 1) ?conjsg1. Qed.
 
 Lemma gcore_norm A G : G \subset 'N(gcore A G).
 Proof.
-apply/subsetP=> x Gx; rewrite inE; apply/bigcapsP=> y Gy.
+apply/subsetP=> x Gx /[1inE]; apply/bigcapsP=> y Gy.
 by rewrite sub_conjg -conjsgM bigcap_inf ?groupM ?groupV.
 Qed.
 
@@ -2798,7 +2798,7 @@ Proof. by rewrite !cent1E eq_sym. Qed.
 Canonical centraliser_group A : {group _} := Eval hnf in [group of 'C(A)].
 
 Lemma cent_set1 x : 'C([set x]) = 'C[x].
-Proof. by apply: big_pred1 => y /=; rewrite inE. Qed.
+Proof. by apply: big_pred1 => y /= /[1inE]. Qed.
 
 Lemma cent1J x y : 'C[x ^ y] = 'C[x] :^ y.
 Proof. by rewrite -conjg_set1 normJ. Qed.
@@ -2823,7 +2823,7 @@ Proof. by rewrite -cent_set1 cent1T. Qed.
 
 Lemma cent_sub A : 'C(A) \subset 'N(A).
 Proof.
-apply/subsetP=> x /centP cAx; rewrite inE.
+apply/subsetP=> x /centP cAx /[1inE].
 by apply/subsetP=> _ /imsetP[y Ay ->]; rewrite /conjg -cAx ?mulKg.
 Qed.
 

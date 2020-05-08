@@ -97,8 +97,8 @@ Lemma trow0 n1 m2 n2 B : @trow n1 0 m2 n2 B = 0.
 Proof.
 elim: n1=> //= n1 IH.
 rewrite !mxE scale0r linear0.
-rewrite IH //; apply/matrixP=> i j; rewrite !mxE.
-by case: split=> *; rewrite mxE.
+rewrite IH //; apply/matrixP=> i j /[!mxE].
+by case: split=> * /[1mxE].
 Qed.
 
 Definition trowb n1 m2 n2 B A :=  @trow n1 A m2 n2 B.
@@ -124,7 +124,7 @@ Lemma trow_is_linear n1 m2 n2 (A : 'rV_n1) : linear (@trow n1 A m2 n2).
 Proof.
 elim: n1 A => [|n1 IH] //= A k A1 A2 /=; first by rewrite scaler0 add0r.
 rewrite linearD /= linearZ /=.
-apply/matrixP=> i j; rewrite !mxE.
+apply/matrixP=> i j /[!mxE].
 by case: split=> a; rewrite ?IH !mxE.
 Qed.
 
@@ -145,14 +145,14 @@ Fixpoint tprod  (m1 : nat) :
 Lemma dsumx_mul m1 m2 n p A B :
   dsubmx ((A *m B) : 'M[F]_(m1 + m2, n)) = dsubmx (A : 'M_(m1 + m2, p)) *m B.
 Proof.
-apply/matrixP=> i j; rewrite !mxE; apply: eq_bigr=> k _.
+apply/matrixP=> i j /[!mxE]; apply: eq_bigr=> k _.
 by rewrite !mxE.
 Qed.
 
 Lemma usumx_mul m1 m2 n p A B :
   usubmx ((A *m B) : 'M[F]_(m1 + m2, n)) = usubmx (A : 'M_(m1 + m2, p)) *m B.
 Proof.
-by apply/matrixP=> i j; rewrite !mxE; apply: eq_bigr=> k _; rewrite !mxE.
+by apply/matrixP=> i j /[!mxE]; apply: eq_bigr=> k _ /[!mxE].
 Qed.
 
 Let trow_mul (m1 m2 n2 p2 : nat) 
@@ -196,11 +196,11 @@ elim: m1 n1 A m2 n2 B=> [|m1 IH] n1 A m2 n2 B //=.
 rewrite !IH.
 pose A1 := A :  'M_(1 + m1, 1 + n1).
 have F1: dsubmx (rsubmx A1) = rsubmx (dsubmx A1).
-  by apply/matrixP=> i j; rewrite !mxE.
+  by apply/matrixP=> i j /[!mxE].
 have F2: rsubmx (usubmx A1) = usubmx (rsubmx A1).
-  by apply/matrixP=> i j; rewrite !mxE.
+  by apply/matrixP=> i j /[!mxE].
 have F3: lsubmx (dsubmx A1) = dsubmx (lsubmx A1).
-  by apply/matrixP=> i j; rewrite !mxE.
+  by apply/matrixP=> i j /[!mxE].
 rewrite tr_row_mx -block_mxEv -block_mxEh !(F1,F2,F3); congr block_mx.
 - by rewrite !mxE linearZ /= trmxK.
 by rewrite -trmx_dsub.
@@ -211,13 +211,13 @@ Proof.
 elim: m n => [|m IH] n //=; first by rewrite [1%:M]flatmx0.
 rewrite tprod_tr.
 set u := rsubmx _; have->: u = 0.
-  apply/matrixP=> i j; rewrite !mxE.
+  apply/matrixP=> i j /[!mxE].
   by case: i; case: j=> /= j Hj; case.
 set v := lsubmx (dsubmx _); have->: v = 0.
-  apply/matrixP=> i j; rewrite !mxE.
+  apply/matrixP=> i j /[!mxE].
   by case: i; case: j; case.
 set w := rsubmx _; have->: w = 1%:M.
-  apply/matrixP=> i j; rewrite !mxE.
+  apply/matrixP=> i j /[!mxE].
   by case: i; case: j; case.
 rewrite IH -!trowbE !linear0.
 rewrite -block_mxEv.
@@ -1323,7 +1323,7 @@ symmetry; transitivity (\tr Qa).
   rewrite reindex_irr_class; apply: eq_bigr => i _; rewrite !mxE invgK permE.
   by rewrite inE sub1set inE -(can_eq cK) iCK //; case: ifP.
 rewrite -[Pa](mulmxK uX) -[Qa](mulKmx uX) mxtrace_mulC; congr (\tr(_ *m _)).
-rewrite -row_permE -col_permE; apply/matrixP=> i j; rewrite !mxE.
+rewrite -row_permE -col_permE; apply/matrixP=> i j /[!mxE].
 rewrite -{2}[j](permKV qa); move: {j}(_ j) => j; rewrite !permE iCK //.
 apply: stabAchi; first by case/repr_classesP: (cP j).
 by rewrite repr_irr_classK (mem_repr_classes (Gca _)).
@@ -1614,7 +1614,7 @@ Lemma cfkerE chi :
     chi \is a character ->
   cfker chi = G :&: \bigcap_(i in irr_constt chi) cfker 'chi_i.
 Proof.
-move=> Nchi; rewrite cfkerEchar //; apply/setP=> x; rewrite !inE.
+move=> Nchi; rewrite cfkerEchar //; apply/setP=> x /[!inE].
 apply: andb_id2l => Gx; rewrite {1 2}[chi]cfun_sum_constt !sum_cfunE.
 apply/eqP/bigcapP=> [Kx i Ci | Kx]; last first.
   by apply: eq_bigr => i /Kx Kx_i; rewrite !cfunE cfker1.
@@ -2511,7 +2511,7 @@ do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].
     apply: can_inj (insubd one) _ => u; apply: val_inj.
     by rewrite insubdK /= ?irrK //; apply: cFlin.
   rewrite -(card_image inj_cFI) -card_lin_irr.
-  apply/eq_card=> i; rewrite inE; apply/codomP/idP=> [[u ->] | /inT[u Du]].
+  apply/eq_card=> i /[1inE]; apply/codomP/idP=> [[u ->] | /inT[u Du]].
     by rewrite /= irrK; apply: cFlin.
   by exists u; apply: irr_inj; rewrite /= irrK.
 apply/eqP; rewrite eqn_dvd; apply/andP; split.
@@ -2720,7 +2720,7 @@ Lemma cfcenter_repr n (rG : mx_representation algCF G n) :
   'Z(cfRepr rG)%CF = rcenter rG.
 Proof.
 rewrite /cfcenter /rcenter cfRepr_char /=.
-apply/setP=> x; rewrite !inE; apply/andb_id2l=> Gx.
+apply/setP=> x /[!inE]; apply/andb_id2l=> Gx.
 apply/eqP/is_scalar_mxP=> [|[c rG_c]].
   by case/max_cfRepr_norm_scalar=> // c; exists c.
 rewrite -(sqrCK (char1_ge0 (cfRepr_char rG))) normC_def; congr (sqrtC _).
@@ -2755,7 +2755,7 @@ Lemma cfker_center_normal phi : cfker phi <| 'Z(phi)%CF.
 Proof.
 apply: normalS (cfcenter_sub phi) (cfker_normal phi).
 rewrite /= /cfcenter; case: ifP => // Hphi; rewrite cfkerEchar //.
-apply/subsetP=> x; rewrite !inE => /andP[-> /eqP->] /=.
+apply/subsetP=> x /[!inE] /andP[-> /eqP->] /=.
 by rewrite ger0_norm ?char1_ge0.
 Qed.
 
@@ -2803,7 +2803,7 @@ have sZG: Z \subset G by apply: cfcenter_sub.
 have ->: cfker chi = cfker xi.
   rewrite -(setIidPr (normal_sub (cfker_center_normal _))) -/Z.
   rewrite !cfkerEchar // ?lin_charW //= -/Z.
-  apply/setP=> x; rewrite !inE; apply: andb_id2l => Zx.
+  apply/setP=> x /[!inE]; apply: andb_id2l => Zx.
   rewrite (subsetP sZG) //= -!(cfResE chi sZG) ?group1 // def_chi !cfunE.
   by rewrite (inj_eq (mulfI _)) ?char1_eq0.
 have: abelian (Z / cfker xi) by rewrite sub_der1_abelian ?lin_char_der1.

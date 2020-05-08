@@ -1457,7 +1457,7 @@ have{nil_classY pY sXW sZY sZCA} defW: W = <[x]> * Z.
   rewrite -[W](setIidPr (Ohm_sub _ _)) /= -/Y {1}defY -group_modl //= -/Y -/W.
   congr (_ * _); apply/eqP; rewrite eqEsubset {1}[Z](OhmE 1 pA).
   rewrite subsetI setIAC subIset //; first by rewrite sZCA -[Z]Ohm_id OhmS.
-  rewrite sub_gen ?setIS //; apply/subsetP=> w Ww; rewrite inE.
+  rewrite sub_gen ?setIS //; apply/subsetP=> w Ww /[1inE].
   by apply/eqP; apply: exponentP w Ww; apply: exponent_Ohm1_class2.
 have{sXG sAG} sXAG: XA \subset G by rewrite join_subG sXG.
 have{sXAG} nilXA: nilpotent XA := nilpotentS sXAG (pgroup_nil pG).
@@ -1523,7 +1523,7 @@ have{nsXG} pU := pgroupS (subset_trans sUX (normal_sub nsXG)) pG.
 case gsetU1: (group_set 'Ldiv_p(U)).
   by rewrite -defU1 (OhmE 1 pU) gen_set_id // -sub_LdivT subsetIr.
 move: gsetU1; rewrite /group_set 2!inE group1 expg1n eqxx; case/subsetPn=> xy.
-case/imset2P=> x y; rewrite !inE => /andP[Ux xp1] /andP[Uy yp1] ->{xy}.
+case/imset2P=> x y /[!inE] /andP[Ux xp1] /andP[Uy yp1] ->{xy}.
 rewrite groupM //= => nt_xyp; pose XY := <[x]> <*> <[y]>.
 have{yp1 nt_xyp} defXY: XY = U.
   have sXY_U: XY \subset U by rewrite join_subG !cycle_subG Ux Uy.

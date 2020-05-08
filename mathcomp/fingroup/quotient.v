@@ -740,7 +740,7 @@ Lemma qisom_isog : [set: coset_of G] \isog [set: coset_of H].
 Proof. exact: isom_isog qisom_isom. Qed.
 
 Lemma qisom_inj : injective qisom.
-Proof. by move=> x y; apply: (injmP injm_qisom); rewrite inE. Qed.
+Proof. by move=> x y; apply: (injmP injm_qisom) => /[1inE]. Qed.
 
 Lemma morphim_qisom_inj : injective (fun Gx => qisom @* Gx).
 Proof.

@@ -598,7 +598,7 @@ have partG: partition (gval K |: (H^# :^: K)) G.
   apply: Frobenius_partition; apply/andP; rewrite defG; split=> //.
   by apply/Frobenius_actionP; apply: HasFrobeniusAction FrobG.
 have{FrobG} [ffulG transG regG ntH [u Su defH]]:= FrobG.
-apply/setP=> x; rewrite !inE; have [-> | ntx] := eqVneq; first exact: group1.
+apply/setP=> x /[!inE]; have [-> | ntx] := eqVneq; first exact: group1.
 rewrite /= -(cover_partition partG) /cover.
 have neKHy y: gval K <> H^# :^ y.
   by move/setP/(_ 1); rewrite group1 conjD1g setD11.

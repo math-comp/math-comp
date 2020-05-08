@@ -3489,7 +3489,7 @@ Lemma le_joins I (A B : {set I}) (F : I -> L) :
 Proof.
 move=> AsubB; rewrite -(setID B A).
 rewrite [X in _ <= X](eq_bigl [predU B :&: A & B :\: A]); last first.
-  by move=> i; rewrite !inE.
+  by move=> i /[!inE].
 rewrite bigU //=; last by rewrite -setI_eq0 setDE setIACA setICr setI0.
 by rewrite lexU2 // (setIidPr _) // lexx.
 Qed.
@@ -3498,18 +3498,18 @@ Lemma joins_setU I (A B : {set I}) (F : I -> L) :
    \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
 Proof.
 apply/eqP; rewrite eq_le leUx !le_joins ?subsetUl ?subsetUr ?andbT //.
-apply/joinsP => i; rewrite inE; move=> /orP.
+apply/joinsP => i /[1inE]; move=> /orP.
 by case=> ?; rewrite lexU2 //; [rewrite join_sup|rewrite orbC join_sup].
 Qed.
 
 Lemma join_seq I (r : seq I) (F : I -> L) :
    \join_(i <- r) F i = \join_(i in r) F i.
 Proof.
-rewrite [RHS](eq_bigl (mem [set i | i \in r])); last by move=> i; rewrite !inE.
+rewrite [RHS](eq_bigl (mem [set i | i \in r])); last by move=> i /[!inE].
 elim: r => [|i r ihr]; first by rewrite big_nil big1 // => i; rewrite ?inE.
 rewrite big_cons {}ihr; apply/eqP; rewrite eq_le set_cons.
 rewrite leUx join_sup ?inE ?eqxx // le_joins //= ?subsetUr //.
-apply/joinsP => j; rewrite !inE => /predU1P [->|jr]; rewrite ?lexU2 ?lexx //.
+apply/joinsP => j /[!inE] /predU1P [->|jr]; rewrite ?lexU2 ?lexx //.
 by rewrite join_sup ?orbT ?inE.
 Qed.
 

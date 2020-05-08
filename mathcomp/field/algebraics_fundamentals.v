@@ -217,7 +217,7 @@ pose p_ (I : {set 'I_n}) := \prod_(i <- enum I) ('X - (r`_i)%:P).
 have{px0 Dp} /ex_minset[I /minsetP[/andP[FpI pIx0] minI]]: exists I, Fpx (p_ I).
   exists setT; suffices ->: p_ setT = p ^ FtoL by rewrite FpxF.
   rewrite Dp (big_nth 0) big_mkord /p_ big_enum /=.
-  by apply/eq_bigl=> i; rewrite inE.
+  by apply/eq_bigl=> i /[1inE].
 have{p} [p DpI]: {p | p_ I = p ^ FtoL}.
   exists (p_ I ^ (fun y => if isF y is left Fy then sval (sig_eqW Fy) else 0)).
   rewrite -map_poly_comp map_poly_id // => y /(allP FpI) /=.
@@ -244,7 +244,7 @@ pose B := [set j in mask m (enum I)]; have{Dq} Dq: q ^ FtoL = p_ B.
   congr (_ %= _): Dq; apply: perm_big => //.
   by rewrite uniq_perm ?mask_uniq ?enum_uniq // => j; rewrite mem_enum inE.
 rewrite -!(size_map_poly FtoL) Dq -DpI (minI B) // -?Dq ?FpxF //.
-by apply/subsetP=> j; rewrite inE => /mem_mask; rewrite mem_enum.
+by apply/subsetP=> j /[1inE] /mem_mask; rewrite mem_enum.
 Qed.
 
 Lemma alg_integral (F : fieldType) (L : fieldExtType F) :

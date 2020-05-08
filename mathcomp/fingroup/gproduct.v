@@ -137,12 +137,12 @@ Proof. by move/setP/(_ 1); rewrite inE group1. Qed.
 
 Lemma mulg0 : right_zero (@set0 gT) mulg.
 Proof.
-by move=> A; apply/setP=> x; rewrite inE; apply/imset2P=> [[y z]]; rewrite inE.
+by move=> A; apply/setP=> x /[1inE]; apply/imset2P=> [[y z]] /[1inE].
 Qed.
 
 Lemma mul0g : left_zero (@set0 gT) mulg.
 Proof.
-by move=> A; apply/setP=> x; rewrite inE; apply/imset2P=> [[y z]]; rewrite inE.
+by move=> A; apply/setP=> x /[1inE]; apply/imset2P=> [[y z]] /[1inE].
 Qed.
 
 Lemma pprodP A B G :
@@ -1004,7 +1004,7 @@ Canonical prod_group := FinGroupType extprod_mulVg.
 Lemma group_setX (H1 : {group gT1}) (H2 : {group gT2}) : group_set (setX H1 H2).
 Proof.
 apply/group_setP; split; first by rewrite inE !group1.
-case=> [x1 x2] [y1 y2]; rewrite !inE; case/andP=> Hx1 Hx2; case/andP=> Hy1 Hy2.
+case=> [x1 x2] [y1 y2] /[!inE]; case/andP=> Hx1 Hx2; case/andP=> Hy1 Hy2.
 by rewrite /= !groupM.
 Qed.
 
@@ -1050,7 +1050,7 @@ Lemma morphim_fstX (H1: {set gT1}) (H2 : {group gT2}) :
 Proof.
 apply/eqP; rewrite eqEsubset morphimE setTI /=.
 apply/andP; split; apply/subsetP=> x.
-  by case/imsetP=> x0; rewrite inE; move/andP=> [Hx1 _] ->.
+  by case/imsetP=> x0 /[1inE]; move/andP=> [Hx1 _] ->.
 move=> Hx1; apply/imsetP; exists (x, 1); last by trivial.
 by rewrite in_setX Hx1 /=.
 Qed.
@@ -1060,7 +1060,7 @@ Lemma morphim_sndX (H1: {group gT1}) (H2 : {set gT2}) :
 Proof.
 apply/eqP; rewrite eqEsubset morphimE setTI /=.
 apply/andP; split; apply/subsetP=> x.
-  by case/imsetP=> x0; rewrite inE; move/andP=> [_ Hx2] ->.
+  by case/imsetP=> x0 /[1inE]; move/andP=> [_ Hx2] ->.
 move=> Hx2; apply/imsetP; exists (1, x); last by [].
 by rewrite in_setX Hx2 andbT.
 Qed.
@@ -1068,7 +1068,7 @@ Qed.
 Lemma setX_prod (H1 : {set gT1}) (H2 : {set gT2}) :
   setX H1 1 * setX 1 H2 = setX H1 H2.
 Proof.
-apply/setP=> [[x y]]; rewrite !inE /=.
+apply/setP=> [[x y]] /[!inE]/=.
 apply/imset2P/andP=> [[[x1 u1] [v1 y1]] | [Hx Hy]].
   rewrite !inE /= => /andP[Hx1 /eqP->] /andP[/eqP-> Hx] [-> ->].
   by rewrite mulg1 mul1g.
@@ -1080,7 +1080,7 @@ Lemma setX_dprod (H1 : {group gT1}) (H2 : {group gT2}) :
   setX H1 1 \x setX 1 H2 = setX H1 H2.
 Proof.
 rewrite dprodE ?setX_prod //.
-  apply/centsP=> [[x u]]; rewrite !inE /= => /andP[/eqP-> _] [v y].
+  apply/centsP=> [[x u]] /[!inE]/= /andP[/eqP-> _] [v y].
   by rewrite !inE /= => /andP[_ /eqP->]; congr (_, _); rewrite ?mul1g ?mulg1.
 apply/trivgP; apply/subsetP=> [[x y]]; rewrite !inE /= -!andbA.
 by case/and4P=> _ /eqP-> /eqP->; rewrite eqxx.
@@ -1286,7 +1286,7 @@ have ssGR := subsetP sGR; apply/setP=> a; apply/idP/idP=> [cGa|].
   rewrite mem_morphpre ?(astab_dom cGa) //.
   apply/centP=> _ /morphimP[x Rx Gx ->]; symmetry.
   by rewrite conjgC -sdpair_act ?(astab_act cGa)  ?(astab_dom cGa).
-case/morphpreP=> Da cGa; rewrite !inE Da; apply/subsetP=> x Gx; rewrite inE.
+case/morphpreP=> Da cGa; rewrite !inE Da; apply/subsetP=> x Gx /[1inE].
 apply/eqP; apply: (injmP injm_sdpair1); rewrite ?gact_stable ?ssGR //=.
 by rewrite sdpair_act ?ssGR // /conjg -(centP cGa) ?mulKg ?mem_morphim ?ssGR.
 Qed.

@@ -538,14 +538,14 @@ rewrite -card_sorted_tuples -!sum1dep_card (reindex f_add) /=.
 pose sub_mn (i j : In1) := Ordinal (leq_ltn_trans (leq_subr i j) (valP j)).
 exists (fun t : m.-tuple In1 => [tuple of pairmap sub_mn x0 t]) => /= t inc_t.
   apply: val_inj => /=; have{inc_t}: path leq x0 (map val (f_add t)).
-    by move: inc_t; rewrite inE /=; case: map.
+    by move: inc_t => /[1inE]/=; case: map.
   rewrite [map _ _]/=; elim: {t}(val t) (x0) => //= x t IHt s.
   case/andP=> le_s_sx /IHt->; congr (_ :: _); apply: val_inj => /=.
   move: le_s_sx; rewrite val_insubd.
   case le_sx_n: (_ < n.+1); first by rewrite addKn.
   by case: (val s) le_sx_n; rewrite ?ltn_ord.
 apply: val_inj => /=; have{inc_t}: path leq x0 (map val t).
-  by move: inc_t; rewrite inE /=; case: map.
+  by move: inc_t => /[1inE]/=; case: map.
 elim: {t}(val t) (x0) => //= x t IHt s /andP[le_s_sx inc_t].
 suffices ->: add_mn s (sub_mn s x) = x by rewrite IHt.
 by apply: val_inj; rewrite /add_mn /= subnKC ?inord_val.

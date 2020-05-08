@@ -1492,7 +1492,7 @@ Lemma reindex (I J : finType) (h : J -> I) (P : pred I) F :
   \big[*%M/1]_(i | P i) F i = \big[*%M/1]_(j | P (h j)) F (h j).
 Proof.
 case=> h' hK h'K; rewrite (reindex_onto h h' h'K).
-by apply: eq_bigl => j; rewrite !inE; case Pi: (P _); rewrite //= hK ?eqxx.
+by apply: eq_bigl => j /[!inE]; case Pi: (P _); rewrite //= hK ?eqxx.
 Qed.
 Arguments reindex [I J] h [P F].
 
