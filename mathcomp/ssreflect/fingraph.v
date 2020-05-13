@@ -413,7 +413,7 @@ Lemma orbit_uniq x : uniq (orbit x).
 Proof.
 rewrite /orbit -orderSpred looping_uniq; set n := (order x).-1.
 apply: contraFN (ltnn n) => /trajectP[i lt_i_n eq_fnx_fix].
-rewrite {1}/n orderSpred /order -(size_traject f x n).
+rewrite orderSpred -(size_traject f x n).
 apply: (leq_trans (subset_leq_card _) (card_size _)); apply/subsetP=> z.
 rewrite inE fconnect_orbit => /trajectP[j le_jn ->{z}].
 rewrite -orderSpred -/n ltnS leq_eqVlt in le_jn.
@@ -440,10 +440,7 @@ Lemma findex0 x : findex x x = 0.
 Proof. by rewrite /findex /orbit -orderSpred /= eqxx. Qed.
 
 Lemma findex_eq0 x y : (findex x y == 0) = (x == y).
-Proof.
-apply/idP/idP; last by move=> /eqP ->; rewrite findex0.
-by rewrite /findex /orbit -orderSpred /=; case: (x == y).
-Qed.
+Proof. by rewrite /findex /orbit -orderSpred /=; case: (x == y). Qed.
 
 Lemma fconnect_invariant (T' : eqType) (k : T -> T') :
   invariant f k =1 xpredT -> forall x y, fconnect f x y -> k x = k y.
@@ -491,8 +488,8 @@ Proof.
 suff Sf : {in S &, forall x y, fconnect f x y -> fconnect f y x}.
   by move=> *; apply/idP/idP=> /Sf->.
 move=> x _ xS _ /connectP [p f_p ->]; elim: p => //= y p IHp in x xS f_p *.
-move: f_p; rewrite -{2}(finv_f_in xS) => /andP[/eqP <- /(IHp _ (f_in xS))].
-by move=> /connect_trans -> //; apply: fconnect_finv.
+case/andP: f_p => /eqP <- /(IHp _ (f_in xS)) /connect_trans -> //.
+by apply: (connect_trans (fconnect_finv _)); rewrite finv_f_in.
 Qed.
 
 Lemma iter_order_in : {in S, forall x, iter (order x) f x = x}.
@@ -501,8 +498,8 @@ Proof. by move=> x xS; rewrite -orderSpred iterS; apply: f_finv_in. Qed.
 Lemma iter_finv_in n :
   {in S, forall x, n <= order x -> iter n finv x = iter (order x - n) f x}.
 Proof.
-move=> x xS; rewrite -{2}[x]iter_order_in => // /subnKC {1}<-; move: (_ - n).
-move=> m; rewrite iter_add; elim: n => // n {2}<-.
+move=> x xS; rewrite -[x in LHS]iter_order_in => // /subnKC {1}<-.
+move: (_ - n) => m; rewrite iter_add; elim: n => // n {2}<-.
 by rewrite iterSr /= finv_f_in // -iter_add iter_in.
 Qed.
 
@@ -586,9 +583,9 @@ Lemma fcard_order_set n (a : {pred T}) :
   a \subset order_set n -> fclosed f a -> fcard f a * n = #|a|.
 Proof.
 move=> a_n cl_a; rewrite /n_comp_mem; set b := [predI froots f & a].
-symmetry; transitivity #|preim (froot f) b|.
+suff <-: #|preim (froot f) b| = #|b| * n.
   apply: eq_card => x; rewrite !inE (roots_root fconnect_sym).
-  by rewrite -(closed_connect cl_a (connect_root _ x)).
+  exact/esym/(closed_connect cl_a)/connect_root.
 have{cl_a a_n} (x): b x -> froot f x = x /\ order x = n.
   by case/andP=> /eqP-> /(subsetP a_n)/eqnP->.
 elim: {a b}#|b| {1 3 4}b (eqxx #|b|) => [|m IHm] b def_m f_b.
@@ -705,7 +702,7 @@ Lemma fcycle_consEflatten : exists k, x :: p = flatten (nseq k.+1 (orbit x)).
 Proof.
 move: f_p; rewrite fcycle_consE; elim/ltn_ind: (size p) => n IHn t_cycle.
 have := order_le_cycle t_cycle (mem_head _ _); rewrite size_traject.
-case: ltngtP => //; last by move<-; exists 0; rewrite /= cats0.
+case: ltngtP => [||<-] //; last by exists 0; rewrite /= cats0.
 rewrite ltnS => n_ge _; have := t_cycle.
 rewrite -(subnKC n_ge) -addnS trajectD.
 rewrite (iter_order_in (mem_fcycle f_p) (inj_cycle f_p)) ?mem_head//.

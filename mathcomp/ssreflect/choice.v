@@ -82,7 +82,7 @@ Definition decode n := if n is 0 then [::] else [rec 0, n.-1, n.-1].
 Lemma decodeK : cancel decode code.
 Proof.
 have m2s: forall n, n.*2 - n = n by move=> n; rewrite -addnn addnK.
-case=> //= n; rewrite -[n.+1]mul1n -(expn0 2) -{3}[n]m2s.
+case=> //= n; rewrite -[n.+1]mul1n -(expn0 2) -[n in RHS]m2s.
 elim: n {2 4}n {1 3}0 => [|q IHq] [|[|r]] v //=; rewrite {}IHq ?mul1n ?m2s //.
 by rewrite expnSr -mulnA mul2n.
 Qed.
@@ -336,10 +336,9 @@ Lemma eq_xchoose P Q exP exQ : P =1 Q -> @xchoose P exP = @xchoose Q exQ.
 Proof.
 rewrite /xchoose => eqPQ.
 case: (xchoose_subproof exP) => x; case: (xchoose_subproof exQ) => y /=.
-case: ex_minnP => n; case: ex_minnP => m.
-rewrite -(extensional eqPQ) {1}(extensional eqPQ).
-move=> Qm minPm Pn minQn; suffices /eqP->: m == n by move=> -> [].
-by rewrite eqn_leq minQn ?minPm.
+case: ex_minnP => n; rewrite -(extensional eqPQ) => Pn minQn.
+case: ex_minnP => m; rewrite !(extensional eqPQ) => Qm minPm.
+by case: (eqVneq m n) => [-> -> [] //|]; rewrite eqn_leq minQn ?minPm.
 Qed.
 
 Lemma sigW P : (exists x, P x) -> {x | P x}.

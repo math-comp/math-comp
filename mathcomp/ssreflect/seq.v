@@ -351,7 +351,7 @@ Lemma last_ind P :
 Proof.
 move=> Hnil Hlast s; rewrite -(cat0s s).
 elim: s [::] Hnil => [|x s2 IHs] s1 Hs1; first by rewrite cats0.
-by rewrite -cat_rcons; auto.
+by rewrite -cat_rcons; apply/IHs/Hlast.
 Qed.
 
 (* Sequence indexing. *)
@@ -433,8 +433,7 @@ have [-> | ne_n12] := eqVneq.
   apply: eq_from_nth => [|i _]; first by rewrite !size_set_nth maxnA maxnn.
   by do 2!rewrite !nth_set_nth /=; case: eqP.
 apply: eq_from_nth => [|i _]; first by rewrite !size_set_nth maxnCA.
-do 2!rewrite !nth_set_nth /=; case: eqP => // ->.
-by rewrite eq_sym -if_neg ne_n12.
+by do 2!rewrite !nth_set_nth /=; case: eqP => // ->; case: eqVneq ne_n12.
 Qed.
 
 (* find, count, has, all. *)
@@ -751,7 +750,7 @@ Qed.
 
 Lemma nth_drop s i : nth (drop n0 s) i = nth s (n0 + i).
 Proof.
-rewrite -{2}[s]cat_take_drop nth_cat size_take ltnNge.
+rewrite -[s in RHS]cat_take_drop nth_cat size_take ltnNge.
 case: ltnP => [?|le_s_n0]; rewrite ?(leq_trans le_s_n0) ?leq_addr ?addKn //=.
 by rewrite drop_oversize // !nth_default.
 Qed.
@@ -759,8 +758,8 @@ Qed.
 Lemma nth_take i : i < n0 -> forall s, nth (take n0 s) i = nth s i.
 Proof.
 move=> lt_i_n0 s; case lt_n0_s: (n0 < size s).
-  by rewrite -{2}[s]cat_take_drop nth_cat size_take lt_n0_s /= lt_i_n0.
-by rewrite -{1}[s]cats0 take_cat lt_n0_s /= cats0.
+  by rewrite -[s in RHS]cat_take_drop nth_cat size_take lt_n0_s /= lt_i_n0.
+by rewrite -[s in LHS]cats0 take_cat lt_n0_s /= cats0.
 Qed.
 
 Lemma take_take i j : i <= j -> forall s, take i (take j s) = take i s.
@@ -815,7 +814,7 @@ Lemma rot0 s : rot 0 s = s.
 Proof. by rewrite /rot drop0 take0 cats0. Qed.
 
 Lemma size_rot s : size (rot n0 s) = size s.
-Proof. by rewrite -{2}[s]cat_take_drop /rot !size_cat addnC. Qed.
+Proof. by rewrite -[s in RHS]cat_take_drop /rot !size_cat addnC. Qed.
 
 Lemma rot_oversize n s : size s <= n -> rot n s = s.
 Proof. by move=> le_s_n; rewrite /rot take_oversize ?drop_oversize. Qed.
@@ -989,7 +988,7 @@ Fixpoint eqseq s1 s2 {struct s2} :=
 Lemma eqseqP : Equality.axiom eqseq.
 Proof.
 move; elim=> [|x1 s1 IHs] [|x2 s2]; do [by constructor | simpl].
-case: (x1 =P x2) => [<-|neqx]; last by right; case.
+have [<-|neqx] := x1 =P x2; last by right; case.
 by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
@@ -1371,7 +1370,7 @@ by rewrite !inE (ltn_trans ltij ltjs) ltn_eqF //=; case.
 Qed.
 
 Lemma mem_rot s : rot n0 s =i s.
-Proof. by move=> x; rewrite -{2}(cat_take_drop n0 s) !mem_cat /= orbC. Qed.
+Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. by apply: inj_eq; apply: rot_inj. Qed.
@@ -1442,7 +1441,7 @@ Qed.
 End NthTheory.
 
 Lemma set_nth_default T s (y0 x0 : T) n : n < size s -> nth x0 s n = nth y0 s n.
-Proof. by elim: s n => [|y s' IHs] [|n] /=; auto. Qed.
+Proof. by elim: s n => [|y s' IHs] [|n] //= /IHs. Qed.
 
 Lemma headI T s (x : T) : rcons s x = head x s :: behead (rcons s x).
 Proof. by case: s. Qed.
@@ -1748,7 +1747,7 @@ Lemma rotrK : cancel (@rotr T n0) (rot n0).
 Proof.
 move=> s; have [lt_n0s | ge_n0s] := ltnP n0 (size s).
   by rewrite -{1}(subKn (ltnW lt_n0s)) -{1}[size s]size_rotr; apply: rotK.
-by rewrite -{2}(rot_oversize ge_n0s) /rotr (eqnP ge_n0s) rot0.
+by rewrite -[in RHS](rot_oversize ge_n0s) /rotr (eqnP ge_n0s) rot0.
 Qed.
 
 Lemma rotr_inj : injective (@rotr T n0).
@@ -1786,7 +1785,7 @@ Implicit Type s : seq T.
 
 Lemma rotD m n s : m + n <= size s -> rot (m + n) s = rot m (rot n s).
 Proof.
-move=> sz_s; rewrite {1}/rot -[take _ s](cat_take_drop n).
+move=> sz_s; rewrite [LHS]/rot -[take _ s](cat_take_drop n).
 rewrite 5!(catA, =^~ rot_size_cat) !cat_take_drop.
 by rewrite size_drop !size_takel ?leq_addl ?addnK.
 Qed.
@@ -1944,7 +1943,7 @@ exists (take i m ++ drop i.+1 m).
   rewrite size_cat size_take size_drop lt_i_m.
   by rewrite sz_m in lt_i_m *; rewrite subnKC.
 rewrite {s1 def_s1}[s1](congr1 behead def_s1).
-rewrite -[s2](cat_take_drop i) -{1}[m](cat_take_drop i) {}def_m_i -cat_cons.
+rewrite -[s2](cat_take_drop i) -[m in LHS](cat_take_drop i) {}def_m_i -cat_cons.
 have sz_i_s2: size (take i s2) = i by apply: size_takel; rewrite sz_m in lt_i_m.
 rewrite lastI cat_rcons !mask_cat ?size_nseq ?size_belast ?mask_false //=.
 by rewrite (drop_nth true) // nth_index -?index_mem.
@@ -3176,7 +3175,7 @@ Lemma incr_tallyP x : {homo incr_tally^~ x : bs / bs \in wf_tally}.
 Proof.
 move=> bs /andP[]; rewrite unfold_in.
 elim: bs => [|[y [|n]] bs IHbs] //= /andP[bs'y Ubs]; rewrite inE /= => bs'0.
-rewrite eq_sym; case: ifP => [/eqP<- | y'x] /=; first by rewrite bs'y Ubs.
+have [<- | y'x] /= := eqVneq y; first by rewrite bs'y Ubs.
 rewrite -andbA {}IHbs {Ubs bs'0}// andbT.
 elim: bs bs'y => [|b bs IHbs] /=; rewrite inE ?y'x // => /norP[b'y bs'y].
 by case: ifP => _; rewrite /= inE negb_or ?y'x // b'y IHbs.
