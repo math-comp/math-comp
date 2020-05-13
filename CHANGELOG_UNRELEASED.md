@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `finset.v`, new lemmas: `properC`, `properCr`, `properCl`
 - in `ssrnat.v`, new lemmas: `subn_minl`, `subn_maxl`
 - in `ssrnat.v`, new lemma: `oddS`
+- in `ssrnat.v`, new lemmas: `subnA`, `addnBn`, `addnCAC`, `addnACl`
 - in `finset.v`, new lemmas: `mem_imset_eq`, `mem_imset2_eq`.
   These lemmas will lose the `_eq` suffix in the next release, when the shortende names will become availabe (cf. Renamed section)
 
