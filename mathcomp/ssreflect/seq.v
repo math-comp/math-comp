@@ -615,14 +615,12 @@ Proof. by rewrite -size_filter filter_predT. Qed.
 Lemma count_predUI a1 a2 s :
   count (predU a1 a2) s + count (predI a1 a2) s = count a1 s + count a2 s.
 Proof.
-elim: s => //= x s IHs; rewrite /= addnCA -addnA IHs addnA addnC.
-by rewrite -!addnA; do 2 nat_congr; case (a1 x); case (a2 x).
+elim: s => //= x s IHs; rewrite /= addnACA [RHS]addnACA IHs.
+by case: (a1 x) => //; rewrite addn0.
 Qed.
 
 Lemma count_predC a s : count a s + count (predC a) s = size s.
-Proof.
-by elim: s => //= x s IHs; rewrite addnCA -addnA IHs addnA addn_negb.
-Qed.
+Proof. by elim: s => //= x s IHs; rewrite addnACA IHs; case: (a _). Qed.
 
 Lemma count_filter a1 a2 s : count a1 (filter a2 s) = count (predI a1 a2) s.
 Proof. by rewrite -!size_filter filter_predI. Qed.
@@ -1373,7 +1371,7 @@ Lemma mem_rot s : rot n0 s =i s.
 Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
-Proof. by apply: inj_eq; apply: rot_inj. Qed.
+Proof. exact/inj_eq/rot_inj. Qed.
 
 End EqSeq.
 
@@ -1967,7 +1965,7 @@ Qed.
 Lemma cat_subseq s1 s2 s3 s4 :
   subseq s1 s3 -> subseq s2 s4 -> subseq (s1 ++ s2) (s3 ++ s4).
 Proof.
-case/subseqP=> m1 sz_m1 ->; case/subseqP=> m2 sz_m2 ->; apply/subseqP.
+case/subseqP=> m1 sz_m1 -> /subseqP [m2 sz_m2 ->]; apply/subseqP.
 by exists (m1 ++ m2); rewrite ?size_cat ?mask_cat ?sz_m1 ?sz_m2.
 Qed.
 
@@ -2132,9 +2130,7 @@ Lemma map_mask m s : map (mask m s) = mask m (map s).
 Proof. by elim: m s => [|[|] m IHm] [|x p] //=; rewrite IHm. Qed.
 
 Lemma inj_map : injective f -> injective map.
-Proof.
-by move=> injf; elim=> [|y1 s1 IHs] [|y2 s2] //= [/injf-> /IHs->].
-Qed.
+Proof. by move=> injf; elim=> [|y1 s1 IHs] [|y2 s2] //= [/injf-> /IHs->]. Qed.
 
 End Map.
 
@@ -2419,9 +2415,7 @@ Lemma size_iota m n : size (iota m n) = n.
 Proof. by elim: n m => //= n IHn m; rewrite IHn. Qed.
 
 Lemma iota_add m n1 n2 : iota m (n1 + n2) = iota m n1 ++ iota (m + n1) n2.
-Proof.
-by elim: n1 m => //= [|n1 IHn1] m; rewrite ?addn0 // -addSnnS -IHn1.
-Qed.
+Proof. by elim: n1 m => [|n1 IHn1] m; rewrite ?addn0 // -addSnnS /= -IHn1. Qed.
 
 Lemma iota_addl m1 m2 n : iota (m1 + m2) n = map (addn m1) (iota m2 n).
 Proof. by elim: n m2 => //= n IHn m2; rewrite -addnS IHn. Qed.

@@ -747,9 +747,7 @@ by move=> x y xp yp; rewrite (orbitE fcycle_undup)// ?mem_rot ?mem_undup.
 Qed.
 
 Lemma eq_order_cycle : {in p &, forall x y, order y = order x}.
-Proof.
-by move=> x y xp yp; rewrite !(order_cycle fcycle_undup) ?mem_undup.
-Qed.
+Proof. by move=> x y xp yp; rewrite !(order_cycle fcycle_undup) ?mem_undup. Qed.
 
 Lemma iter_order_cycle : {in p &, forall x y, iter (order x) f y = y}.
 Proof.

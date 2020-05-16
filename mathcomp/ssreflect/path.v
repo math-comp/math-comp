@@ -1167,7 +1167,7 @@ Qed.
 Lemma cycle_from_next : (forall x, x \in p -> e x (next p x)) -> cycle e p.
 Proof.
 case: p (next p) cycle_next => //= [x q] n; rewrite -(belast_rcons x q x).
-move: {q}(rcons q x) => q n_q; move/allP.
+move: {q}(rcons q x) => q n_q /allP.
 by elim: q x n_q => //= _ q IHq x /andP[/eqP <- n_q] /andP[-> /IHq->].
 Qed.
 

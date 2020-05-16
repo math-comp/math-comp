@@ -737,9 +737,7 @@ Proof. by []. Qed.
 
 Lemma properP A B :
   reflect (A \subset B /\ (exists2 x, x \in B & x \notin A)) (A \proper B).
-Proof.
-by rewrite properE; apply: (iffP andP) => [] [-> /subsetPn].
-Qed.
+Proof. by rewrite properE; apply: (iffP andP) => [] [-> /subsetPn]. Qed.
 
 Lemma proper_sub A B : A \proper B -> A \subset B.
 Proof. by case/andP. Qed.

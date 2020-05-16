@@ -80,8 +80,7 @@ have vFpV i: i != Fp0 -> mFp (vFp i) i = Fp1.
   rewrite coprime_sym prime_coprime //; apply/negP=> /(dvdn_leq i_gt0).
   by rewrite leqNgt ltn_ord.
 have vFp0 i: i != Fp0 -> vFp i != Fp0.
-  move/vFpV=> inv_i; apply/eqP=> vFp0.
-  by have:= congr1 val inv_i; rewrite vFp0 /= mod0n.
+  by move/vFpV; apply/contra_eq_neq => ->; rewrite -val_eqE /= mul0n mod0n.
 have vFpK: {in predC1 Fp0, involutive vFp}.
   move=> i n0i; rewrite /= -[vFp _]mFp1r -(vFpV _ n0i) mFpA.
   by rewrite vFpV (vFp0, mFp1).
@@ -113,7 +112,7 @@ rewrite [mFpM _ _]mFp1 (bigD1 Fpn1) -?mFpA -/mFpM; last first.
   by rewrite [ltv _]ltn_neqAle vFpId eqxx orbT eq_sym eqF1n1.
 rewrite (reindex_onto vFp vFp) -/mFpM => [|i]; last by do 3!case/andP; auto.
 rewrite (eq_bigl (xpredD1 ltv Fp0)) => [|i]; last first.
-  rewrite andbC -!andbA -2!negb_or -vFpId orbC -leq_eqVlt andbA -ltnNge.
+  rewrite andbC -!andbA -2!negb_or -vFpId orbC -leq_eqVlt -ltnNge.
   have [->|ni0] := eqVneq i; last by rewrite vFpK // eqxx vFp0.
   by case: eqP => // ->; rewrite !andbF.
 rewrite -{2}[mFp]/mFpM -[mFpM _ _]big_split -/mFpM.

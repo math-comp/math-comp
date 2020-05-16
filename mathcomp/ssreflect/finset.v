@@ -900,7 +900,7 @@ Lemma subDset A B C : (A :\: B \subset C) = (A \subset B :|: C).
 Proof.
 apply/subsetP/subsetP=> sABC x; rewrite !inE.
   by case Bx: (x \in B) => // Ax; rewrite sABC ?inE ?Bx.
-by case Bx: (x \in B) => //; move/sABC; rewrite inE Bx.
+by case Bx: (x \in B) => // /sABC; rewrite inE Bx.
 Qed.
 
 Lemma subsetDP A B C :

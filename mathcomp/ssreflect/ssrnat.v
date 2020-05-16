@@ -560,9 +560,7 @@ Lemma predn_sub m n : (m - n).-1 = (m.-1 - n).
 Proof. by case: m => // m; rewrite subSKn. Qed.
 
 Lemma leq_sub2r p m n : m <= n -> m - p <= n - p.
-Proof.
-by move=> le_mn; rewrite leq_subLR (leq_trans le_mn) // -leq_subLR.
-Qed.
+Proof. by move=> le_mn; rewrite leq_subLR (leq_trans le_mn) // -leq_subLR. Qed.
 
 Lemma leq_sub2l p m n : m <= n -> p - n <= p - m.
 Proof.
@@ -1283,7 +1281,7 @@ Lemma muln2 m : m * 2 = m.*2.
 Proof. by rewrite mulnC mul2n. Qed.
 
 Lemma doubleD m n : (m + n).*2 = m.*2 + n.*2.
-Proof. by rewrite -!addnn -!addnA (addnCA n). Qed.
+Proof. by rewrite -!mul2n mulnDr. Qed.
 
 Lemma doubleB m n : (m - n).*2 = m.*2 - n.*2.
 Proof. by elim: m n => [|m IHm] []. Qed.
@@ -1704,7 +1702,7 @@ Notation natTrecE := NatTrec.trecE.
 Lemma eq_binP : Equality.axiom N.eqb.
 Proof.
 move=> p q; apply: (iffP idP) => [|<-]; last by case: p => //; elim.
-by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //=; case/IHp=> ->.
+by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //= /IHp [->].
 Qed.
 
 Canonical bin_nat_eqMixin := EqMixin eq_binP.
@@ -1813,9 +1811,7 @@ Proof. exact: mk_srt add0n addnC addnA mul1n mul0n mulnC mulnA mulnDl. Qed.
 
 Lemma nat_semi_morph :
   semi_morph 0 1 addn muln (@eq _) 0%num 1%num Nplus Nmult pred1 nat_of_bin.
-Proof.
-by move: nat_of_add_bin nat_of_mul_bin; split=> //= m n; move/eqP->.
-Qed.
+Proof. by move: nat_of_add_bin nat_of_mul_bin; split=> //= m n /eqP ->. Qed.
 
 Lemma nat_power_theory : power_theory 1 muln (@eq _) nat_of_bin expn.
 Proof. by split; apply: nat_of_exp_bin. Qed.

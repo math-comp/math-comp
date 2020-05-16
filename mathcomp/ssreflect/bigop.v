@@ -949,9 +949,7 @@ Proof. by move=> ge_m_n; rewrite /index_iota (eqnP ge_m_n) big_nil. Qed.
 Lemma big_ltn_cond m n (P : pred nat) F :
     m < n -> let x := \big[op/idx]_(m.+1 <= i < n | P i) F i in
   \big[op/idx]_(m <= i < n | P i) F i = if P m then op (F m) x else x.
-Proof.
-by case: n => [//|n] le_m_n; rewrite /index_iota subSn // big_cons.
-Qed.
+Proof. by case: n => [//|n] le_m_n; rewrite /index_iota subSn // big_cons. Qed.
 
 Lemma big_ltn m n F :
      m < n ->
@@ -1329,7 +1327,7 @@ Lemma perm_big (I : eqType) r1 r2 (P : pred I) F :
 Proof.
 move/permP; rewrite !(big_mkcond _ _ P).
 elim: r1 r2 => [|i r1 IHr1] r2 eq_r12.
-  by case: r2 eq_r12 => // i r2; move/(_ (pred1 i)); rewrite /= eqxx.
+  by case: r2 eq_r12 => // i r2 /(_ (pred1 i)); rewrite /= eqxx.
 have r2i: i \in r2 by rewrite -has_pred1 has_count -eq_r12 /= eqxx.
 case/splitPr: r2 / r2i => [r3 r4] in eq_r12 *; rewrite big_cat /= !big_cons.
 rewrite mulmCA; congr (_ * _); rewrite -big_cat; apply: IHr1 => a.

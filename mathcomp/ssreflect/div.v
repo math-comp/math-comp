@@ -330,9 +330,7 @@ by move=> d_even; rewrite [in RHS](divn_eq m d) oddD odd_mul d_even andbF.
 Qed.
 
 Lemma modnXm m n a : (a %% n) ^ m = a ^ m %[mod n].
-Proof.
-by elim: m => // m IHm; rewrite !expnS -modnMmr IHm modnMml modnMmr.
-Qed.
+Proof. by elim: m => // m IHm; rewrite !expnS -modnMmr IHm modnMml modnMmr. Qed.
 
 (** Divisibility **)
 
@@ -390,9 +388,7 @@ Lemma dvdn2 n : (2 %| n) = ~~ odd n.
 Proof. by rewrite /dvdn modn2; case (odd n). Qed.
 
 Lemma dvdn_odd m n : m %| n -> odd n -> odd m.
-Proof.
-by move=> m_dv_n; apply: contraTT; rewrite -!dvdn2 => /dvdn_trans->.
-Qed.
+Proof. by move=> m_dv_n; apply: contraTT; rewrite -!dvdn2 => /dvdn_trans->. Qed.
 
 Lemma divnK d m : d %| m -> m %/ d * d = m.
 Proof. by rewrite dvdn_eq; move/eqP. Qed.
@@ -715,9 +711,9 @@ have m_gt0: 0 < m by rewrite addn_gt0 r_gt0 orbT.
 have d_gt0: 0 < d by rewrite gcdn_gt0 m_gt0.
 move/IHq=> {IHq} IHq le_kn_r le_kr_n def_d; apply: IHq => //; rewrite -/d.
   by rewrite mulnDl leq_add // -mulnA leq_mul2l le_kr_n orbT.
-apply: (@addIn d); rewrite -!addnA addnn addnCA mulnDr -addnA addnCA.
-rewrite /km mulnDl mulnCA mulnA -addnA; congr (_ + _).
-by rewrite -def_d addnC -addnA -mulnDl -mulnDr addn_negb -mul2n.
+apply: (@addIn d); rewrite mulnDr -addnA addnACA -def_d addnACA mulnA.
+rewrite -!mulnDl -mulnDr -addnA [kr * _]mulnC; congr addn.
+by rewrite addnC addn_negb muln1 mul2n addnn.
 Qed.
 
 Lemma Bezoutl m n : m > 0 -> {a | a < m & m %| gcdn m n + a * n}.
