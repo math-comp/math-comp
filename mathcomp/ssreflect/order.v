@@ -4566,12 +4566,13 @@ Canonical bDistrLatticeType := [bDistrLatticeType of nat].
 Canonical orderType := OrderType nat orderMixin.
 
 Lemma leEnat : le = leq. Proof. by []. Qed.
-Lemma ltEnat (n m : nat) : (n < m) = (n < m)%N. Proof. by []. Qed.
+Lemma ltEnat : lt = ltn. Proof. by []. Qed.
 Lemma meetEnat : meet = minn. Proof. by []. Qed.
 Lemma joinEnat : join = maxn. Proof. by []. Qed.
 Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
+
 Module Exports.
 Canonical porderType.
 Canonical latticeType.
@@ -4586,6 +4587,84 @@ Definition joinEnat := joinEnat.
 Definition botEnat := botEnat.
 End Exports.
 End NatOrder.
+
+Module NatMonotonyTheory.
+Section NatMonotonyTheory.
+Import NatOrder.Exports.
+
+Context {disp : unit} {T : porderType disp}.
+Variables (D : {pred nat}) (f : nat -> T).
+Hypothesis Dconvex : {in D &, forall i j k, i < k < j -> k \in D}.
+
+Lemma homo_ltn_lt_in : {in D, forall i, i.+1 \in D -> f i < f i.+1} ->
+  {in D &, {homo f : i j / i < j}}.
+Proof. by apply: homo_ltn_in Dconvex; apply: lt_trans. Qed.
+
+Lemma incn_inP : {in D, forall i, i.+1 \in D -> f i < f i.+1} ->
+  {in D &, {mono f : i j / i <= j}}.
+Proof. by move=> f_inc; apply/le_mono_in/homo_ltn_lt_in. Qed.
+
+Lemma nondecn_inP : {in D, forall i, i.+1 \in D -> f i <= f i.+1} ->
+  {in D &, {homo f : i j / i <= j}}.
+Proof. by apply: homo_leq_in Dconvex => //; apply: le_trans. Qed.
+
+Lemma nhomo_ltn_lt_in : {in D, forall i, i.+1 \in D -> f i > f i.+1} ->
+  {in D &, {homo f : i j /~ i < j}}.
+Proof.
+move=> f_dec; apply: homo_sym_in.
+by apply: homo_ltn_in Dconvex f_dec => ? ? ? ? /lt_trans->.
+Qed.
+
+Lemma decn_inP : {in D, forall i, i.+1 \in D -> f i > f i.+1} ->
+  {in D &, {mono f : i j /~ i <= j}}.
+Proof. by move=> f_dec; apply/le_nmono_in/nhomo_ltn_lt_in. Qed.
+
+Lemma nonincn_inP : {in D, forall i, i.+1 \in D -> f i >= f i.+1} ->
+  {in D &, {homo f : i j /~ i <= j}}.
+Proof.
+move=> /= f_dec; apply: homo_sym_in.
+by apply: homo_leq_in Dconvex f_dec => //= ? ? ? ? /le_trans->.
+Qed.
+
+Lemma homo_ltn_lt : (forall i, f i < f i.+1) -> {homo f : i j / i < j}.
+Proof. by apply: homo_ltn; apply: lt_trans. Qed.
+
+Lemma incnP : (forall i, f i < f i.+1) -> {mono f : i j / i <= j}.
+Proof. by move=> f_inc; apply/le_mono/homo_ltn_lt. Qed.
+
+Lemma nondecnP : (forall i, f i <= f i.+1) -> {homo f : i j / i <= j}.
+Proof. by apply: homo_leq => //; apply: le_trans. Qed.
+
+Lemma nhomo_ltn_lt : (forall i, f i > f i.+1) -> {homo f : i j /~ i < j}.
+Proof.
+move=> f_dec; apply: homo_sym.
+by apply: homo_ltn f_dec => ? ? ? ? /lt_trans->.
+Qed.
+
+Lemma decnP : (forall i, f i > f i.+1) -> {mono f : i j /~ i <= j}.
+Proof. by move=> f_dec; apply/le_nmono/nhomo_ltn_lt. Qed.
+
+Lemma nonincnP : (forall i, f i >= f i.+1) -> {homo f : i j /~ i <= j}.
+Proof.
+move=> /= f_dec; apply: homo_sym.
+by apply: homo_leq f_dec => //= ? ? ? ? /le_trans->.
+Qed.
+
+End NatMonotonyTheory.
+Arguments homo_ltn_lt_in {disp T} [D f].
+Arguments incn_inP {disp T} [D f].
+Arguments nondecn_inP {disp T} [D f].
+Arguments nhomo_ltn_lt_in {disp T} [D f].
+Arguments decn_inP {disp T} [D f].
+Arguments nonincn_inP {disp T} [D f].
+Arguments homo_ltn_lt {disp T} [f].
+Arguments incnP {disp T} [f].
+Arguments nondecnP {disp T} [f].
+Arguments nhomo_ltn_lt {disp T} [f].
+Arguments decnP {disp T} [f].
+Arguments nonincnP {disp T} [f].
+
+End NatMonotonyTheory.
 
 (****************************************************************************)
 (* The Module DvdSyntax introduces a new set of notations using the newly   *)
@@ -6676,6 +6755,7 @@ Export Order.CanMixin.Exports.
 Export Order.SubOrder.Exports.
 
 Export Order.NatOrder.Exports.
+Export Order.NatMonotonyTheory.
 Export Order.NatDvd.Exports.
 Export Order.BoolOrder.Exports.
 Export Order.ProdOrder.Exports.
