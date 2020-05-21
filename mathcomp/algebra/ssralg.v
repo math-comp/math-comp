@@ -764,9 +764,6 @@ Proof. by rewrite opprD addrA addrK. Qed.
 Lemma subrKA z x y : (x - z) + (z + y) = x + y.
 Proof. by rewrite addrA addrNK. Qed.
 
-Lemma subr_trans z x y : (x - z) + (z - y) = x - y.
-Proof. by rewrite addrA addrNK. Qed.
-
 Lemma addr0_eq x y : x + y = 0 -> - x = y.
 Proof. by rewrite -[-x]addr0 => <-; rewrite addKr. Qed.
 

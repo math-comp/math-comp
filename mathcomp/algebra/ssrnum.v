@@ -3754,11 +3754,29 @@ Proof. by rewrite lter_norml !lter_sub_addl. Qed.
 
 Definition lter_distl := (ler_distl, ltr_distl).
 
-Lemma ltr_distW x y e : `|x - y| < e -> y - e < x.
+Lemma ltr_dist_addl x y e : `|x - y| < e -> x < y + e.
 Proof. by rewrite ltr_distl => /andP[]. Qed.
 
-Lemma ler_distW x y e : `|x - y| <= e -> y - e <= x.
+Lemma ler_dist_addl x y e : `|x - y| <= e -> x <= y + e.
 Proof. by rewrite ler_distl => /andP[]. Qed.
+
+Lemma ltr_distr_addl x y e : `|x - y| < e -> y < x + e.
+Proof. by rewrite distrC => /ltr_dist_addl. Qed.
+
+Lemma ler_distr_addl x y e : `|x - y| <= e -> y <= x + e.
+Proof. by rewrite distrC => /ler_dist_addl. Qed.
+
+Lemma ltr_dist_subl x y e : `|x - y| < e -> x - e < y.
+Proof. by move/ltr_dist_addl; rewrite -ltr_subl_addr. Qed.
+
+Lemma ler_dist_subl x y e : `|x - y| <= e -> x - e <= y.
+Proof. by move/ler_dist_addl; rewrite -ler_subl_addr. Qed.
+
+Lemma ltr_distr_subr x y e : `|x - y| < e -> y - e < x.
+Proof. by rewrite distrC => /ltr_dist_subl. Qed.
+
+Lemma ler_distr_subr x y e : `|x - y| <= e -> y - e <= x.
+Proof. by rewrite distrC => /ler_dist_subl. Qed.
 
 Lemma exprn_even_ge0 n x : ~~ odd n -> 0 <= x ^+ n.
 Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
