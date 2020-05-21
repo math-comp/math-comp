@@ -3754,6 +3754,12 @@ Proof. by rewrite lter_norml !lter_sub_addl. Qed.
 
 Definition lter_distl := (ler_distl, ltr_distl).
 
+Lemma ltr_distW x y e : `|x - y| < e -> y - e < x.
+Proof. by rewrite ltr_distl => /andP[]. Qed.
+
+Lemma ler_distW x y e : `|x - y| <= e -> y - e <= x.
+Proof. by rewrite ler_distl => /andP[]. Qed.
+
 Lemma exprn_even_ge0 n x : ~~ odd n -> 0 <= x ^+ n.
 Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
 

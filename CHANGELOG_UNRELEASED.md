@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- lemma `subr_trans` in `ssralg` and lemmas `ltr_distW` and `ler_distW` in `ssrnum`
+
 ### Changed
 
 ### Renamed
