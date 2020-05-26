@@ -912,6 +912,7 @@ Arguments subsetPn {T A B}.
 Arguments subset_eqP {T A B}.
 Arguments card_uniqP {T s}.
 Arguments card_geqP {T A n}.
+Arguments card_gt0P {T A}.
 Arguments card_gt1P {T A}.
 Arguments card_gt2P {T A}.
 Arguments properP {T A B}.
