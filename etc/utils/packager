@@ -36,7 +36,7 @@ fi
 # verify whether $TAG exists
 git rev-parse --verify $TAG
 
-ARCHIVEURL="http://github.com/math-comp/math-comp/archive/$TAG.tar.gz"
+ARCHIVEURL="https://github.com/math-comp/math-comp/archive/$TAG.tar.gz"
 GITROOT=$(git rev-parse --show-toplevel)
 
 # we build the url file content and the list of packages, and where to put them
