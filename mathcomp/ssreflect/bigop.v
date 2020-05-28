@@ -854,7 +854,7 @@ Proof. by rewrite unlock; elim: r => //= j r ->. Qed.
 Lemma big_nth x0 r (P : pred I) F :
   \big[op/idx]_(i <- r | P i) F i
      = \big[op/idx]_(0 <= i < size r | P (nth x0 r i)) (F (nth x0 r i)).
-Proof. by rewrite -{1}(mkseq_nth x0 r) big_map /index_iota subn0. Qed.
+Proof. by rewrite -[r in LHS](mkseq_nth x0) big_map /index_iota subn0. Qed.
 
 Lemma big_hasC r (P : pred I) F :
   ~~ has P r -> \big[op/idx]_(i <- r | P i) F i = idx.
@@ -949,9 +949,7 @@ Proof. by move=> ge_m_n; rewrite /index_iota (eqnP ge_m_n) big_nil. Qed.
 Lemma big_ltn_cond m n (P : pred nat) F :
     m < n -> let x := \big[op/idx]_(m.+1 <= i < n | P i) F i in
   \big[op/idx]_(m <= i < n | P i) F i = if P m then op (F m) x else x.
-Proof.
-by case: n => [//|n] le_m_n; rewrite /index_iota subSn // big_cons.
-Qed.
+Proof. by case: n => [//|n] le_m_n; rewrite /index_iota subSn // big_cons. Qed.
 
 Lemma big_ltn m n F :
      m < n ->
@@ -1329,7 +1327,7 @@ Lemma perm_big (I : eqType) r1 r2 (P : pred I) F :
 Proof.
 move/permP; rewrite !(big_mkcond _ _ P).
 elim: r1 r2 => [|i r1 IHr1] r2 eq_r12.
-  by case: r2 eq_r12 => // i r2; move/(_ (pred1 i)); rewrite /= eqxx.
+  by case: r2 eq_r12 => // i r2 /(_ (pred1 i)); rewrite /= eqxx.
 have r2i: i \in r2 by rewrite -has_pred1 has_count -eq_r12 /= eqxx.
 case/splitPr: r2 / r2i => [r3 r4] in eq_r12 *; rewrite big_cat /= !big_cons.
 rewrite mulmCA; congr (_ * _); rewrite -big_cat; apply: IHr1 => a.
@@ -1548,10 +1546,10 @@ Lemma pair_big_dep (I J : finType) (P : pred I) (Q : I -> pred J) F :
   \big[*%M/1]_(i | P i) \big[*%M/1]_(j | Q i j) F i j =
     \big[*%M/1]_(p | P p.1 && Q p.1 p.2) F p.1 p.2.
 Proof.
-rewrite (partition_big (fun p => p.1) P) => [|j]; last by case/andP.
-apply: eq_bigr => i /= Pi; rewrite (reindex_onto (pair i) (fun p => p.2)).
+rewrite (partition_big fst P) => [|j]; last by case/andP.
+apply: eq_bigr => i /= Pi; rewrite (reindex_onto (pair i) snd).
    by apply: eq_bigl => j; rewrite !eqxx [P i]Pi !andbT.
-by case=> i' j /=; case/andP=> _ /=; move/eqP->.
+by case=> i' j /= /andP [_] /eqP ->.
 Qed.
 
 Lemma pair_big (I J : finType) (P : pred I) (Q : pred J) F :

@@ -409,7 +409,7 @@ Lemma bij_eq : bijective f -> forall x y, (f x == f y) = (x == y).
 Proof. by move/bij_inj; apply: inj_eq. Qed.
 
 Lemma can2_eq : cancel f g -> cancel g f -> forall x y, (f x == y) = (x == g y).
-Proof. by move=> fK gK x y; rewrite -{1}[y]gK; apply: can_eq. Qed.
+Proof. by move=> fK gK x y; rewrite -[y in LHS]gK; apply: can_eq. Qed.
 
 Lemma inj_in_eq :
   {in D &, injective f} -> {in D &, forall x y, (f x == f y) = (x == y)}.

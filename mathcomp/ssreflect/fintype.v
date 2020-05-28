@@ -737,9 +737,7 @@ Proof. by []. Qed.
 
 Lemma properP A B :
   reflect (A \subset B /\ (exists2 x, x \in B & x \notin A)) (A \proper B).
-Proof.
-by rewrite properE; apply: (iffP andP) => [] [-> /subsetPn].
-Qed.
+Proof. by rewrite properE; apply: (iffP andP) => [] [-> /subsetPn]. Qed.
 
 Lemma proper_sub A B : A \proper B -> A \subset B.
 Proof. by case/andP. Qed.
@@ -1440,7 +1438,7 @@ Definition option_finMixin := Eval hnf in FinMixin option_enumP.
 Canonical option_finType := Eval hnf in FinType (option T) option_finMixin.
 
 Lemma card_option : #|{: option T}| = #|T|.+1.
-Proof. by rewrite !cardT !enumT {1}unlock /= !size_map. Qed.
+Proof. by rewrite !cardT !enumT [in LHS]unlock /= !size_map. Qed.
 
 End OptionFinType.
 
@@ -1714,7 +1712,7 @@ Proof. by apply: val_inj; apply: nth_enum_ord. Qed.
 
 Lemma index_enum_ord (i : 'I_n) : index i (enum 'I_n) = i.
 Proof.
-by rewrite -{1}(nth_ord_enum i i) index_uniq ?(enum_uniq, size_enum_ord).
+by rewrite -[in LHS](nth_ord_enum i i) index_uniq ?(enum_uniq, size_enum_ord).
 Qed.
 
 End OrdinalEnum.
@@ -2158,7 +2156,7 @@ Canonical tag_finType := Eval hnf in FinType {i : I & T_ i} tag_finMixin.
 Lemma card_tagged :
   #|{: {i : I & T_ i}}| = sumn (map (fun i => #|T_ i|) (enum I)).
 Proof.
-rewrite cardE !enumT {1}unlock size_flatten /shape -map_comp.
+rewrite cardE !enumT [in LHS]unlock size_flatten /shape -map_comp.
 by congr (sumn _); apply: eq_map => i; rewrite /= size_map -enumT -cardE.
 Qed.
 
@@ -2184,7 +2182,6 @@ Definition sum_finMixin := Eval hnf in UniqFinMixin sum_enum_uniq mem_sum_enum.
 Canonical sum_finType := Eval hnf in FinType (T1 + T2) sum_finMixin.
 
 Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
-Proof. by rewrite !cardT !enumT {1}unlock size_cat !size_map. Qed.
-
+Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
 
 End SumFinType.

@@ -351,8 +351,8 @@ rewrite count_filter -(@eq_count _ (pred1 t)) => [|s /=]; last first.
   by rewrite isSome_insub; case: eqP=> // ->.
 elim: n t t_n => [|m IHm] [|x t] //= {IHm}/IHm; move: (iter m _ _) => em IHm.
 transitivity (x \in T : nat); rewrite // -mem_enum codomE.
-elim: (fintype.enum T)  (enum_uniq T) => //= y e IHe /andP[/negPf ney].
-rewrite count_cat count_map inE /preim /= {1}/eq_op /= eq_sym => /IHe->.
+elim: (fintype.enum T) (enum_uniq T) => //= y e IHe /andP[/negPf ney].
+rewrite count_cat count_map inE /preim /= [in LHS]/eq_op /= eq_sym => /IHe->.
 by case: eqP => [->|_]; rewrite ?(ney, count_pred0, IHm).
 Qed.
 

@@ -129,7 +129,7 @@ Proof. by case: p => //= x p; rewrite rcons_path andbC. Qed.
 Lemma rot_cycle p : cycle (rot n0 p) = cycle p.
 Proof.
 case: n0 p => [|n] [|y0 p] //=; first by rewrite /rot /= cats0.
-rewrite /rot /= -{3}(cat_take_drop n p) -cats1 -catA cat_path.
+rewrite /rot /= -[p in RHS](cat_take_drop n) -cats1 -catA cat_path.
 case: (drop n p) => [|z0 q]; rewrite /= -cats1 !cat_path /= !andbT andbC //.
 by rewrite last_cat; repeat bool_congr.
 Qed.
@@ -1167,14 +1167,14 @@ Qed.
 Lemma cycle_from_next : (forall x, x \in p -> e x (next p x)) -> cycle e p.
 Proof.
 case: p (next p) cycle_next => //= [x q] n; rewrite -(belast_rcons x q x).
-move: {q}(rcons q x) => q n_q; move/allP.
+move: {q}(rcons q x) => q n_q /allP.
 by elim: q x n_q => //= _ q IHq x /andP[/eqP <- n_q] /andP[-> /IHq->].
 Qed.
 
 Lemma cycle_from_prev : (forall x, x \in p -> e (prev p x) x) -> cycle e p.
 Proof.
-move=> e_p; apply: cycle_from_next => x p_x.
-by rewrite -{1}[x]prev_next e_p ?mem_next.
+move=> e_p; apply: cycle_from_next => x.
+by rewrite -mem_next => /e_p; rewrite prev_next.
 Qed.
 
 Lemma next_rot : next (rot n0 p) =1 next p.
@@ -1221,7 +1221,7 @@ by case: q => // y q; rewrite !rev_cons !(=^~ rcons_cons, rotr1_rcons) /= eqxx.
 Qed.
 
 Lemma next_rev p : uniq p -> next (rev p) =1 prev p.
-Proof. by move=> Up x; rewrite -{2}[p]revK prev_rev // rev_uniq. Qed.
+Proof. by move=> Up x; rewrite -[p in RHS]revK prev_rev // rev_uniq. Qed.
 
 End UniqCycleRev.
 
@@ -1246,7 +1246,7 @@ Variables (T T' : eqType) (h : T' -> T) (e : rel T) (e' : rel T').
 Hypothesis Ih : injective h.
 
 Lemma mem2_map x' y' p' : mem2 (map h p') (h x') (h y') = mem2 p' x' y'.
-Proof. by rewrite {1}/mem2 (index_map Ih) -map_drop mem_map. Qed.
+Proof. by rewrite [LHS]/mem2 (index_map Ih) -map_drop mem_map. Qed.
 
 Lemma next_map p : uniq p -> forall x, next (map h p) (h x) = h (next p x).
 Proof.
@@ -1259,7 +1259,7 @@ Qed.
 
 Lemma prev_map p : uniq p -> forall x, prev (map h p) (h x) = h (prev p x).
 Proof.
-move=> Up x; rewrite -{1}[x](next_prev Up) -(next_map Up).
+move=> Up x; rewrite -[x in LHS](next_prev Up) -(next_map Up).
 by rewrite prev_next ?map_inj_uniq.
 Qed.
 
