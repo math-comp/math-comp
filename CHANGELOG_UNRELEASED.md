@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 - Added lemmas about monotony of functions `nat -> T` where `T` is an
-  ordered type and `homo_ltn_lt_in`, `incn_inP`, `nondecn_inP`,
+  ordered type: `homo_ltn_lt_in`, `incn_inP`, `nondecn_inP`,
   `nhomo_ltn_lt_in`, `decn_inP`, `nonincn_inP`, `homo_ltn_lt`,
   `incnP`, `nondecnP`, `nhomo_ltn_lt`, `decnP`, `nonincnP` in file
   `order.v`.
