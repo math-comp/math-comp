@@ -1043,8 +1043,8 @@ Variant lt_xor_ge (x y : T) :
   | LtNotGe of x < y  : lt_xor_ge x y x x y y false true
   | GeNotLt of y <= x : lt_xor_ge x y y y x x true false.
 
-Definition min x y := if x <= y then x else y.
-Definition max x y := if y <= x then x else y.
+Definition min x y := if x < y then x else y.
+Definition max x y := if x < y then y else x.
 
 Variant compare (x y : T) :
    T -> T -> T -> T ->
@@ -1074,6 +1074,8 @@ End POrderDef.
 Prenex Implicits lt le leif.
 Arguments ge {_ _}.
 Arguments gt {_ _}.
+Arguments min {_ _}.
+Arguments max {_ _}.
 
 Module Import POSyntax.
 
@@ -4068,32 +4070,30 @@ Proof. by move=> x y; rewrite /join; have [] := ltgtP. Qed.
 
 Fact meetA : associative meet.
 Proof.
-move=> x y z; rewrite /meet /min.
-case: (leP y z) => yz; case: (leP x y) => xy //=.
-- by rewrite (le_trans xy).
-- by rewrite yz.
-by rewrite !lt_geF // (lt_trans yz).
+move=> x y z; rewrite /meet /min !(fun_if, if_arg).
+case: (leP z y) (leP y x) (leP z x) => [] zy [] yx [] zx//=.
+  by have := le_lt_trans (le_trans zy yx) zx; rewrite ltxx.
+by apply/eqP; rewrite eq_le zx ltW// (lt_trans yx).
 Qed.
 
 Fact joinA : associative join.
 Proof.
-move=> x y z; rewrite /join /max.
-case: (leP z y) => yz; case: (leP y x) => xy //=.
-- by rewrite (le_trans yz).
-- by rewrite yz.
-by rewrite !lt_geF // (lt_trans xy).
+move=> x y z; rewrite /meet /min !(fun_if, if_arg).
+case: (leP z y) (leP y x) (leP z x) => [] zy [] yx [] zx//=.
+  by have := le_lt_trans (le_trans zy yx) zx; rewrite ltxx.
+by apply/eqP; rewrite eq_le zx ltW// (lt_trans yx).
 Qed.
 
 Fact joinKI y x : meet x (join x y) = x.
 Proof.
-rewrite /meet /join /min /max.
-by case: (leP y x) => // yx; rewrite ?lexx ?ltW.
+rewrite /meet /join /min /max !(fun_if, if_arg).
+by have []// := ltgtP x y; rewrite ltxx.
 Qed.
 
 Fact meetKU y x : join x (meet x y) = x.
 Proof.
-rewrite /meet /join /min /max.
-by case: (leP x y) => // xy; rewrite ?lexx ?ltW.
+rewrite /meet /join /min /max !(fun_if, if_arg).
+by have []// := ltgtP x y; rewrite ltxx.
 Qed.
 
 Fact leEmeet x y : (x <= y) = (meet x y == x).
@@ -4243,8 +4243,8 @@ Record of_ := Build {
   meet : T -> T -> T;
   join : T -> T -> T;
   lt_def : forall x y, lt x y = (y != x) && le x y;
-  meet_def : forall x y, meet x y = if le x y then x else y;
-  join_def : forall x y, join x y = if le y x then x else y;
+  meet_def : forall x y, meet x y = if lt x y then x else y;
+  join_def : forall x y, join x y = if lt x y then y else x;
   le_anti : antisymmetric le;
   le_trans : transitive le;
   le_total : total le;
@@ -4318,7 +4318,7 @@ Record of_ := Build {
   join : T -> T -> T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
-  join_def : forall x y, join x y = if lt y x then x else y;
+  join_def : forall x y, join x y = if lt x y then y else x;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
   lt_total : forall x y, x != y -> lt x y || lt y x;
@@ -4329,11 +4329,11 @@ Variables (m : of_).
 Fact lt_def x y : lt m x y = (y != x) && le m x y.
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact meet_def_le x y : meet m x y = if le m x y then x else y.
-Proof. by rewrite meet_def le_def; case: eqP => //= ->; rewrite lt_irr. Qed.
+Fact meet_def_le x y : meet m x y = if lt m x y then x else y.
+Proof. by rewrite meet_def lt_def; case: eqP. Qed.
 
-Fact join_def_le x y : join m x y = if le m y x then x else y.
-Proof. by rewrite join_def le_def; case: eqP => //= ->; rewrite lt_irr. Qed.
+Fact join_def_le x y : join m x y = if lt m x y then y else x.
+Proof. by rewrite join_def lt_def; case: eqP. Qed.
 
 Fact le_anti : antisymmetric (le m).
 Proof.
@@ -4571,17 +4571,12 @@ Section NatOrder.
 
 Lemma nat_display : unit. Proof. exact: tt. Qed.
 
-Lemma minnE x y : minn x y = if (x <= y)%N then x else y.
-Proof. by case: leqP. Qed.
-
-Lemma maxnE x y : maxn x y = if (y <= x)%N then x else y.
-Proof. by case: leqP. Qed.
-
 Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
 Definition orderMixin :=
-  LeOrderMixin ltn_def minnE maxnE anti_leq leq_trans leq_total.
+  LeOrderMixin ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
+               anti_leq leq_trans leq_total.
 
 Canonical porderType := POrderType nat_display nat orderMixin.
 Canonical latticeType := LatticeType nat orderMixin.
@@ -4592,8 +4587,8 @@ Canonical orderType := OrderType nat orderMixin.
 
 Lemma leEnat : le = leq. Proof. by []. Qed.
 Lemma ltEnat : lt = ltn. Proof. by []. Qed.
-Lemma meetEnat : meet = minn. Proof. by []. Qed.
-Lemma joinEnat : join = maxn. Proof. by []. Qed.
+Lemma minEnat : min = minn. Proof. by []. Qed.
+Lemma maxEnat : max = maxn. Proof. by []. Qed.
 Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
@@ -4607,8 +4602,8 @@ Canonical bDistrLatticeType.
 Canonical orderType.
 Definition leEnat := leEnat.
 Definition ltEnat := ltEnat.
-Definition meetEnat := meetEnat.
-Definition joinEnat := joinEnat.
+Definition minEnat := minEnat.
+Definition maxEnat := maxEnat.
 Definition botEnat := botEnat.
 End Exports.
 End NatOrder.
@@ -4877,10 +4872,10 @@ Implicit Types (x y : bool).
 
 Fact bool_display : unit. Proof. exact: tt. Qed.
 
-Fact andbE x y : x && y = if (x <= y)%N then x else y.
+Fact andbE x y : x && y = if (x < y)%N then x else y.
 Proof. by case: x y => [] []. Qed.
 
-Fact orbE x y : x || y = if (y <= x)%N then x else y.
+Fact orbE x y : x || y = if (x < y)%N then y else x.
 Proof. by case: x y => [] []. Qed.
 
 Fact ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
