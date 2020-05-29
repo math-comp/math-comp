@@ -186,14 +186,14 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* input for the inference.                                                   *)
 (*                                                                            *)
 (* Existing displays are either dual_display d (where d is a display),        *)
-(* dvd_display (both explained above), total_display (to overload meet and    *)
-(* join using min and max) ring_display (from algebra/ssrnum to change the    *)
-(* scope of the usual notations to ring_scope). We also provide lexi_display  *)
-(* and prod_display for lexicographic and product order respectively.         *)
+(* dvd_display (both explained above), ring_display (from algebra/ssrnum      *)
+(* to change the scope of the usual notations to ring_scope). We also provide *)
+(* lexi_display and prod_display for lexicographic and product order          *)
+(* respectively.                                                              *)
 (* The default display is tt and users can define their own as explained      *)
 (* above.                                                                     *)
 (*                                                                            *)
-(* For orderType we provide the following operations (in total_display)       *)
+(* For porderType we provide the following operations                         *)
 (*   [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject to  *)
 (*                      the condition P (i may appear in P and M), and        *)
 (*                      provided P holds for i0.                              *)
@@ -204,6 +204,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*   [arg min_(i < i0) M] == an i : T minimizing M, given i0 : T.             *)
 (*   [arg max_(i > i0) M] == an i : T maximizing M, given i0 : T.             *)
 (* with head symbols Order.arg_min and Order.arg_max                          *)
+(* The user may use extremumP or extremum_inP to eliminate them.              *)
 (*                                                                            *)
 (* In order to build the above structures, one must provide the appropriate   *)
 (* mixin to the following structure constructors. The list of possible mixins *)
@@ -1032,33 +1033,41 @@ Definition leif (x y : T) C : Prop := ((x <= y) * ((x == y) = C))%type.
 
 Definition le_of_leif x y C (le_xy : @leif x y C) := le_xy.1 : le x y.
 
-Variant le_xor_gt (x y : T) : bool -> bool -> Set :=
-  | LeNotGt of x <= y : le_xor_gt x y true false
-  | GtNotLe of y < x  : le_xor_gt x y false true.
+Variant le_xor_gt (x y : T) :
+  T -> T -> T -> T -> bool -> bool -> Set :=
+  | LeNotGt of x <= y : le_xor_gt x y x x y y true false
+  | GtNotLe of y < x  : le_xor_gt x y y y x x false true.
 
-Variant lt_xor_ge (x y : T) : bool -> bool -> Set :=
-  | LtNotGe of x < y  : lt_xor_ge x y false true
-  | GeNotLt of y <= x : lt_xor_ge x y true false.
+Variant lt_xor_ge (x y : T) :
+  T -> T -> T -> T -> bool -> bool -> Set :=
+  | LtNotGe of x < y  : lt_xor_ge x y x x y y false true
+  | GeNotLt of y <= x : lt_xor_ge x y y y x x true false.
+
+Definition min x y := if x <= y then x else y.
+Definition max x y := if y <= x then x else y.
 
 Variant compare (x y : T) :
-  bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+   T -> T -> T -> T ->
+   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | CompareLt of x < y : compare x y
-    false false false true false true
+    x x y y false false false true false true
   | CompareGt of y < x : compare x y
-    false false true false true false
+    y y x x false false true false true false
   | CompareEq of x = y : compare x y
-    true true true true false false.
+    x x x x true true true true false false.
 
 Variant incompare (x y : T) :
+   T -> T -> T -> T ->
   bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | InCompareLt of x < y : incompare x y
-    false false false true false true true true
+    x x y y false false false true false true true true
   | InCompareGt of y < x : incompare x y
-    false false true false true false true true
-  | InCompare of x >< y : incompare x y
+    y y x x false false true false true false true true
+  | InCompare of x >< y  : incompare x y
+    (min y x) (min x y) (max y x) (max x y)
     false false false false false false false false
   | InCompareEq of x = y : incompare x y
-    true true true true false false true true.
+    x x x x true true true true false false true true.
 
 End POrderDef.
 
@@ -1202,35 +1211,39 @@ Context {T : latticeType}.
 Definition meet : T -> T -> T := Lattice.meet (Lattice.class T).
 Definition join : T -> T -> T := Lattice.join (Lattice.class T).
 
-Variant lel_xor_gt (x y : T) : T -> T -> T -> T -> bool -> bool -> Set :=
-  | LelNotGt of x <= y : lel_xor_gt x y x x y y true false
-  | GtlNotLe of y < x  : lel_xor_gt x y y y x x false true.
+Variant lel_xor_gt (x y : T) :
+  T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
+  | LelNotGt of x <= y : lel_xor_gt x y x x y y x x y y true false
+  | GtlNotLe of y < x  : lel_xor_gt x y y y x x y y x x false true.
 
-Variant ltl_xor_ge (x y : T) : T -> T -> T -> T -> bool -> bool -> Set :=
-  | LtlNotGe of x < y  : ltl_xor_ge x y x x y y false true
-  | GelNotLt of y <= x : ltl_xor_ge x y y y x x true false.
+Variant ltl_xor_ge (x y : T) :
+  T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
+  | LtlNotGe of x < y  : ltl_xor_ge x y x x y y x x y y false true
+  | GelNotLt of y <= x : ltl_xor_ge x y y y x x y y x x true false.
 
 Variant comparel (x y : T) :
-  T -> T -> T -> T -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+   T -> T -> T -> T -> T -> T -> T -> T ->
+   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | ComparelLt of x < y : comparel x y
-    x x y y false false false true false true
+    x x y y x x y y false false false true false true
   | ComparelGt of y < x : comparel x y
-    y y x x false false true false true false
+    y y x x y y x x false false true false true false
   | ComparelEq of x = y : comparel x y
-    x x x x true true true true false false.
+    x x x x x x x x true true true true false false.
 
 Variant incomparel (x y : T) :
-  T -> T -> T -> T ->
+  T -> T -> T -> T -> T -> T -> T -> T ->
   bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
   | InComparelLt of x < y : incomparel x y
-    x x y y false false false true false true true true
+    x x y y x x y y false false false true false true true true
   | InComparelGt of y < x : incomparel x y
-    y y x x false false true false true false true true
+    y y x x y y x x false false true false true false true true
   | InComparel of x >< y  : incomparel x y
-    (meet x y) (meet x y) (join x y) (join x y)
+    (min y x) (min x y) (max y x) (max x y)
+    (meet y x) (meet x y) (join y x) (join x y)
     false false false false false false false false
   | InComparelEq of x = y : incomparel x y
-    x x x x true true true true false false true true.
+    x x x x x x x x true true true true false false true true.
 
 End LatticeDef.
 
@@ -1935,15 +1948,6 @@ Definition arg_max := @extremum T I >=%O.
 End TotalDef.
 
 Module Import TotalSyntax.
-
-Fact total_display : unit. Proof. exact: tt. Qed.
-
-Notation max := (@join total_display _).
-Notation "@ 'max' T" :=
-  (@join total_display T) (at level 10, T at level 8, only parsing) : fun_scope.
-Notation min := (@meet total_display _).
-Notation "@ 'min' T" :=
-  (@meet total_display T) (at level 10, T at level 8, only parsing) : fun_scope.
 
 Notation "\max_ ( i <- r | P ) F" :=
   (\big[max/0%O]_(i <- r | P%B) F%O) : order_scope.
@@ -2777,19 +2781,22 @@ by rewrite lt_neqAle eq_le; move: c_xy => /orP [] -> //; rewrite andbT.
 Qed.
 
 Lemma comparable_ltgtP x y : x >=< y ->
-  compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
+  compare x y (min y x) (min x y) (max y x) (max x y)
+  (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
-rewrite />=<%O !le_eqVlt [y == x]eq_sym.
+rewrite /min /max />=<%O !le_eqVlt [y == x]eq_sym.
 have := (eqVneq x y, (boolP (x < y), boolP (y < x))).
 move=> [[->//|neq_xy /=] [[] xy [] //=]] ; do ?by rewrite ?ltxx; constructor.
   by rewrite ltxx in xy.
 by rewrite le_gtF // ltW.
 Qed.
 
-Lemma comparable_leP x y : x >=< y -> le_xor_gt x y (x <= y) (y < x).
+Lemma comparable_leP x y : x >=< y ->
+  le_xor_gt x y (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
 Proof. by move=> /comparable_ltgtP [?|?|->]; constructor; rewrite // ltW. Qed.
 
-Lemma comparable_ltP x y : x >=< y -> lt_xor_ge x y (y <= x) (x < y).
+Lemma comparable_ltP x y : x >=< y ->
+  lt_xor_ge x y (min y x) (min x y) (max y x) (max x y) (y <= x) (x < y).
 Proof. by move=> /comparable_ltgtP [?|?|->]; constructor; rewrite // ltW. Qed.
 
 Lemma comparable_sym x y : (y >=< x) = (x >=< y).
@@ -2808,6 +2815,7 @@ Lemma incomparable_ltF x y : (x >< y) -> (x < y) = false.
 Proof. by rewrite lt_neqAle => /incomparable_leF ->; rewrite andbF. Qed.
 
 Lemma comparableP x y : incompare x y
+  (min y x) (min x y) (max y x) (max x y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
   (y >=< x) (x >=< y).
 Proof.
@@ -3204,26 +3212,30 @@ Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
 Proof. exact: (@leI2 _ [latticeType of L^d]). Qed.
 
 Lemma lcomparableP x y : incomparel x y
+  (min y x) (min x y) (max y x) (max x y)
   (y `&` x) (x `&` y) (y `|` x) (x `|` y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y) (y >=< x) (x >=< y).
 Proof.
 by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
-  rewrite ?(meetxx, joinxx, meetC y, joinC y)
-          ?(meet_idPl hxy', meet_idPr hxy', join_idPl hxy', join_idPr hxy');
-  constructor.
+   rewrite ?(meetxx, joinxx);
+   rewrite ?(meet_idPl hxy', meet_idPr hxy', join_idPl hxy', join_idPr hxy');
+   constructor.
 Qed.
 
 Lemma lcomparable_ltgtP x y : x >=< y ->
-  comparel x y (y `&` x) (x `&` y) (y `|` x) (x `|` y)
+  comparel x y (min y x) (min x y) (max y x) (max x y)
+               (y `&` x) (x `&` y) (y `|` x) (x `|` y)
                (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof. by case: (lcomparableP x) => // *; constructor. Qed.
 
 Lemma lcomparable_leP x y : x >=< y ->
-  lel_xor_gt x y (y `&` x) (x `&` y) (y `|` x) (x `|` y) (x <= y) (y < x).
+  lel_xor_gt x y (min y x) (min x y) (max y x) (max x y)
+                 (y `&` x) (x `&` y) (y `|` x) (x `|` y) (x <= y) (y < x).
 Proof. by move/lcomparable_ltgtP => [/ltW xy|xy|->]; constructor. Qed.
 
 Lemma lcomparable_ltP x y : x >=< y ->
-  ltl_xor_ge x y (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
+  ltl_xor_ge x y (min y x) (min x y) (max y x) (max x y)
+                 (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
 Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 
 End LatticeTheoryJoin.
@@ -3356,6 +3368,9 @@ Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx, ltIx).
 Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
+
+Lemma meetEtotal x y : x `&` y = min x y. Proof. by case: leP. Qed.
+Lemma joinEtotal x y : x `|` y = max x y. Proof. by case: leP. Qed.
 
 Section ArgExtremum.
 
@@ -4034,14 +4049,16 @@ Implicit Types (x y z : T).
 Let comparableT x y : x >=< y := m x y.
 
 Fact ltgtP x y :
-  compare x y (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
+  compare x y (min y x) (min x y) (max y x) (max x y)
+              (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof. exact: comparable_ltgtP. Qed.
 
-Fact leP x y : le_xor_gt x y (x <= y) (y < x).
+Fact leP x y : le_xor_gt x y
+  (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
 Proof. exact: comparable_leP. Qed.
 
-Definition meet x y := if x <= y then x else y.
-Definition join x y := if y <= x then x else y.
+Definition meet := @min _ T.
+Definition join := @max _ T.
 
 Fact meetC : commutative meet.
 Proof. by move=> x y; rewrite /meet; have [] := ltgtP. Qed.
@@ -4051,7 +4068,8 @@ Proof. by move=> x y; rewrite /join; have [] := ltgtP. Qed.
 
 Fact meetA : associative meet.
 Proof.
-move=> x y z; rewrite /meet; case: (leP y z) => yz; case: (leP x y) => xy //=.
+move=> x y z; rewrite /meet /min.
+case: (leP y z) => yz; case: (leP x y) => xy //=.
 - by rewrite (le_trans xy).
 - by rewrite yz.
 by rewrite !lt_geF // (lt_trans yz).
@@ -4059,17 +4077,24 @@ Qed.
 
 Fact joinA : associative join.
 Proof.
-move=> x y z; rewrite /join; case: (leP z y) => yz; case: (leP y x) => xy //=.
+move=> x y z; rewrite /join /max.
+case: (leP z y) => yz; case: (leP y x) => xy //=.
 - by rewrite (le_trans yz).
 - by rewrite yz.
 by rewrite !lt_geF // (lt_trans xy).
 Qed.
 
 Fact joinKI y x : meet x (join x y) = x.
-Proof. by rewrite /meet /join; case: (leP y x) => yx; rewrite ?lexx ?ltW. Qed.
+Proof.
+rewrite /meet /join /min /max.
+by case: (leP y x) => // yx; rewrite ?lexx ?ltW.
+Qed.
 
 Fact meetKU y x : join x (meet x y) = x.
-Proof. by rewrite /meet /join; case: (leP x y) => yx; rewrite ?lexx ?ltW. Qed.
+Proof.
+rewrite /meet /join /min /max.
+by case: (leP x y) => // xy; rewrite ?lexx ?ltW.
+Qed.
 
 Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite /meet; case: leP => ?; rewrite ?eqxx ?lt_eqF. Qed.
@@ -4079,8 +4104,7 @@ Definition latticeMixin :=
                 meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Definition totalLatticeMixin :
-  totalLatticeMixin (LatticeType T latticeMixin) :=
-  m.
+  totalLatticeMixin (LatticeType T latticeMixin) := m.
 
 End TotalPOrderMixin.
 
@@ -4534,9 +4558,8 @@ Import SubOrder.Exports.
 
 (******************************************************************************)
 (* The Module NatOrder defines leq as the canonical order on the type nat,    *)
-(* i.e. without creating a "copy". We use the predefined total_display, which *)
-(* is designed to parse and print meet and join as minn and maxn. This looks  *)
-(* like standard canonical structure declaration, except we use a display.    *)
+(* i.e. without creating a "copy". We define and use nat_display and proceed  *)
+(* like standard canonical structure declaration, except we use this display. *)
 (* We also use a single factory LeOrderMixin to instantiate three different   *)
 (* canonical declarations porderType, distrLatticeType, orderType             *)
 (* We finish by providing theorems to convert the operations of ordered and   *)
@@ -4545,6 +4568,8 @@ Import SubOrder.Exports.
 
 Module NatOrder.
 Section NatOrder.
+
+Lemma nat_display : unit. Proof. exact: tt. Qed.
 
 Lemma minnE x y : minn x y = if (x <= y)%N then x else y.
 Proof. by case: leqP. Qed.
@@ -4558,7 +4583,7 @@ Proof. by rewrite ltn_neqAle eq_sym. Qed.
 Definition orderMixin :=
   LeOrderMixin ltn_def minnE maxnE anti_leq leq_trans leq_total.
 
-Canonical porderType := POrderType total_display nat orderMixin.
+Canonical porderType := POrderType nat_display nat orderMixin.
 Canonical latticeType := LatticeType nat orderMixin.
 Canonical bLatticeType := BLatticeType nat (BLatticeMixin leq0n).
 Canonical distrLatticeType := DistrLatticeType nat orderMixin.
@@ -4850,6 +4875,8 @@ Module BoolOrder.
 Section BoolOrder.
 Implicit Types (x y : bool).
 
+Fact bool_display : unit. Proof. exact: tt. Qed.
+
 Fact andbE x y : x && y = if (x <= y)%N then x else y.
 Proof. by case: x y => [] []. Qed.
 
@@ -4870,7 +4897,7 @@ Lemma joinIB x y : (x && y) || sub x y = x. Proof. by case: x y => [] []. Qed.
 Definition orderMixin :=
   LeOrderMixin ltn_def andbE orbE anti leq_trans leq_total.
 
-Canonical porderType := POrderType total_display bool orderMixin.
+Canonical porderType := POrderType bool_display bool orderMixin.
 Canonical latticeType := LatticeType bool orderMixin.
 Canonical bLatticeType :=
   BLatticeType bool (@BLatticeMixin _ _ false leq0n).
