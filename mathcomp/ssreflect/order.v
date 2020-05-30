@@ -74,6 +74,8 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* For x, y of type T, where T is canonically a porderType d:                 *)
 (*            x <= y <-> x is less than or equal to y.                        *)
 (*             x < y <-> x is less than y (:= (y != x) && (x <= y)).          *)
+(*           min x y <-> if x < y then x else y                               *)
+(*           max x y <-> if x < y then y else x                               *)
 (*            x >= y <-> x is greater than or equal to y (:= y <= x).         *)
 (*             x > y <-> x is greater than y (:= y < x).                      *)
 (*   x <= y ?= iff C <-> x is less than y, or equal iff C is true.            *)

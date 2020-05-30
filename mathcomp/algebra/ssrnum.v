@@ -5619,6 +5619,7 @@ Ltac mexact x := by mapply x.
 Local Notation min := minr.
 Local Notation max := maxr.
 
+Lemma minrC : @commutative R R min. Proof. mexact @minC. Qed.
 Lemma minrr : @idempotent R min. Proof. mexact @minxx. Qed.
 Lemma minr_l x y : x <= y -> min x y = x. Proof. mexact @min_l. Qed.
 Lemma minr_r x y : y <= x -> min x y = y. Proof. mexact @min_r. Qed.
