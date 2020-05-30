@@ -389,10 +389,10 @@ Notation "@ 'lerif' R" := (@Order.leif ring_display R)
 Notation comparabler := (@Order.comparable ring_display _) (only parsing).
 Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
-Notation maxr := (@Order.join ring_display _).
+Notation maxr := (@Order.max ring_display _).
 Notation "@ 'maxr' R" := (@Order.join ring_display R)
     (at level 10, R at level 8, only parsing) : fun_scope.
-Notation minr := (@Order.meet ring_display _).
+Notation minr := (@Order.min ring_display _).
 Notation "@ 'minr' R" := (@Order.meet ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
 
@@ -1550,6 +1550,8 @@ Definition subr_cp0 := (subr_lte0, subr_gte0).
 
 (* Comparability in a numDomain *)
 
+Lemma comparable0r x : (0 >=< x)%R = (x \is Num.real). Proof. by []. Qed.
+
 Lemma comparabler0 x : (x >=< 0)%R = (x \is Num.real).
 Proof. by rewrite comparable_sym. Qed.
 
@@ -1676,11 +1678,7 @@ Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) h /h; rewrite !ler_opp2. Qed.
 
 Lemma real_leVge x y : x \is real -> y \is real -> (x <= y) || (y <= x).
-Proof.
-rewrite !realE; have [x_ge0 _|x_nge0 /= x_le0] := boolP (_ <= _); last first.
-  by have [/(le_trans x_le0)->|_ /(ler_leVge x_le0) //] := boolP (0 <= _).
-by have [/(ger_leVge x_ge0)|_ /le_trans->] := boolP (0 <= _); rewrite ?orbT.
-Qed.
+Proof. by rewrite -comparabler0 -comparable0r => /comparabler_trans P/P. Qed.
 
 Lemma real_comparable x y : x \is real -> y \is real -> x >=< y.
 Proof. exact: real_leVge. Qed.
@@ -1699,35 +1697,37 @@ Proof. exact: rpredD. Qed.
 
 (* dichotomy and trichotomy *)
 
-Variant ler_xor_gt (x y : R) : R -> R -> bool -> bool -> Set :=
-  | LerNotGt of x <= y : ler_xor_gt x y (y - x) (y - x) true false
-  | GtrNotLe of y < x  : ler_xor_gt x y (x - y) (x - y) false true.
+Variant ler_xor_gt (x y : R) : R -> R -> R -> R -> R -> R ->
+    bool -> bool -> Set :=
+  | LerNotGt of x <= y : ler_xor_gt x y x x y y (y - x) (y - x) true false
+  | GtrNotLe of y < x  : ler_xor_gt x y y y x x (x - y) (x - y) false true.
 
-Variant ltr_xor_ge (x y : R) : R -> R -> bool -> bool -> Set :=
-  | LtrNotGe of x < y  : ltr_xor_ge x y (y - x) (y - x) false true
-  | GerNotLt of y <= x : ltr_xor_ge x y (x - y) (x - y) true false.
+Variant ltr_xor_ge (x y : R) : R -> R -> R -> R -> R -> R ->
+    bool -> bool -> Set :=
+  | LtrNotGe of x < y  : ltr_xor_ge x y x x y y (y - x) (y - x) false true
+  | GerNotLt of y <= x : ltr_xor_ge x y y y x x (x - y) (x - y) true false.
 
-Variant comparer x y : R -> R ->
-  bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | ComparerLt of x < y : comparer x y (y - x) (y - x)
+Variant comparer x y : R -> R -> R -> R -> R -> R ->
+    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | ComparerLt of x < y : comparer x y x x y y (y - x) (y - x)
     false false false true false true
-  | ComparerGt of x > y : comparer x y (x - y) (x - y)
+  | ComparerGt of x > y : comparer x y y y x x (x - y) (x - y)
     false false true false true false
-  | ComparerEq of x = y : comparer x y 0 0
+  | ComparerEq of x = y : comparer x y x x x x 0 0
     true true true true false false.
 
-Lemma real_leP x y :
-    x \is real -> y \is real ->
-  ler_xor_gt x y `|x - y| `|y - x| (x <= y) (y < x).
+Lemma real_leP x y : x \is real -> y \is real ->
+  ler_xor_gt x y (min y x) (min x y) (max y x) (max x y)
+                 `|x - y| `|y - x| (x <= y) (y < x).
 Proof.
 move=> xR yR; case: (comparable_leP (real_leVge xR yR)) => xy.
 - by rewrite [`|x - y|]distrC !ger0_norm ?subr_cp0 //; constructor.
 - by rewrite [`|y - x|]distrC !gtr0_norm ?subr_cp0 //; constructor.
 Qed.
 
-Lemma real_ltP x y :
-    x \is real -> y \is real ->
-  ltr_xor_ge x y `|x - y| `|y - x| (y <= x) (x < y).
+Lemma real_ltP x y : x \is real -> y \is real ->
+  ltr_xor_ge x y (min y x) (min x y) (max y x) (max x y)
+             `|x - y| `|y - x| (y <= x) (x < y).
 Proof. by move=> xR yR; case: real_leP=> //; constructor. Qed.
 
 Lemma real_ltNge : {in real &, forall x y, (x < y) = ~~ (y <= x)}.
@@ -1737,46 +1737,52 @@ Lemma real_leNgt : {in real &, forall x y, (x <= y) = ~~ (y < x)}.
 Proof. by move=> x y xR yR /=; case: real_leP. Qed.
 
 Lemma real_ltgtP x y : x \is real -> y \is real ->
-  comparer x y `|x - y| `|y - x|
-                (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
+  comparer x y (min y x) (min x y) (max y x) (max x y) `|x - y| `|y - x|
+               (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
-move=> xR yR; case: (comparable_ltgtP (real_leVge xR yR)) => [?|?|->].
-- by rewrite [`|x - y|]distrC !gtr0_norm ?subr_gt0//; constructor.
+move=> xR yR; case: (comparable_ltgtP (real_leVge yR xR)) => [?|?|->].
 - by rewrite [`|y - x|]distrC !gtr0_norm ?subr_gt0//; constructor.
+- by rewrite [`|x - y|]distrC !gtr0_norm ?subr_gt0//; constructor.
 - by rewrite subrr normr0; constructor.
 Qed.
 
-Variant ger0_xor_lt0 (x : R) : R -> bool -> bool -> Set :=
-  | Ger0NotLt0 of 0 <= x : ger0_xor_lt0 x x false true
-  | Ltr0NotGe0 of x < 0  : ger0_xor_lt0 x (- x) true false.
+Variant ger0_xor_lt0 (x : R) : R -> R -> R -> R -> R ->
+    bool -> bool -> Set :=
+  | Ger0NotLt0 of 0 <= x : ger0_xor_lt0 x 0 0 x x x false true
+  | Ltr0NotGe0 of x < 0  : ger0_xor_lt0 x x x 0 0 (- x) true false.
 
-Variant ler0_xor_gt0 (x : R) : R -> bool -> bool -> Set :=
-  | Ler0NotLe0 of x <= 0 : ler0_xor_gt0 x (- x) false true
-  | Gtr0NotGt0 of 0 < x  : ler0_xor_gt0 x x true false.
+Variant ler0_xor_gt0 (x : R) : R -> R -> R -> R -> R ->
+   bool -> bool -> Set :=
+  | Ler0NotLe0 of x <= 0 : ler0_xor_gt0 x x x 0 0 (- x) false true
+  | Gtr0NotGt0 of 0 < x  : ler0_xor_gt0 x 0 0 x x x true false.
 
-Variant comparer0 x :
-               R -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | ComparerGt0 of 0 < x : comparer0 x x false false false true false true
-  | ComparerLt0 of x < 0 : comparer0 x (- x) false false true false true false
-  | ComparerEq0 of x = 0 : comparer0 x 0 true true true true false false.
+Variant comparer0 x : R -> R -> R -> R -> R ->
+    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | ComparerGt0 of 0 < x : comparer0 x 0 0 x x x false false false true false true
+  | ComparerLt0 of x < 0 : comparer0 x x x 0 0 (- x) false false true false true false
+  | ComparerEq0 of x = 0 : comparer0 x 0 0 0 0 0 true true true true false false.
 
-Lemma real_ge0P x : x \is real -> ger0_xor_lt0 x `|x| (x < 0) (0 <= x).
+Lemma real_ge0P x : x \is real -> ger0_xor_lt0 x
+   (min 0 x) (min x 0) (max 0 x) (max x 0)
+  `|x| (x < 0) (0 <= x).
 Proof.
-move=> hx; rewrite -{2}[x]subr0; case: real_ltP;
+move=> hx; rewrite -[X in `|X|]subr0; case: real_leP;
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
-Lemma real_le0P x : x \is real -> ler0_xor_gt0 x `|x| (0 < x) (x <= 0).
+Lemma real_le0P x : x \is real -> ler0_xor_gt0 x
+  (min 0 x) (min x 0) (max 0 x) (max x 0)
+  `|x| (0 < x) (x <= 0).
 Proof.
-move=> hx; rewrite -{2}[x]subr0; case: real_ltP;
+move=> hx; rewrite -[X in `|X|]subr0; case: real_ltP;
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
-Lemma real_ltgt0P x :
-     x \is real ->
-  comparer0 x `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
+Lemma real_ltgt0P x : x \is real ->
+  comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+            `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof.
-move=> hx; rewrite -{2}[x]subr0; case: real_ltgtP;
+move=> hx; rewrite -[X in `|X|]subr0; case: (@real_ltgtP 0 x);
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
@@ -2766,6 +2772,111 @@ Proof. by rewrite -invr_gt1 ?invr_gt0 ?unitrV // invrK. Qed.
 Definition invr_lte1 := (invr_le1, invr_lt1).
 Definition invr_cp1 := (invr_gte1, invr_lte1).
 
+(* max and min *)
+
+Lemma addr_min_max x y : min x y + max x y = x + y.
+Proof. by rewrite /min /max; case: ifP => //; rewrite addrC. Qed.
+
+Lemma addr_max_min x y : max x y + min x y = x + y.
+Proof. by rewrite addrC addr_min_max. Qed.
+
+Lemma minr_to_max x y : min x y = x + y - max x y.
+Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
+
+Lemma maxr_to_min x y : max x y = x + y - min x y.
+Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
+
+Lemma real_oppr_max : {in real &, {morph -%R : x y / max x y >-> min x y : R}}.
+Proof.
+move=> x y x_real y_real; rewrite !(fun_if, if_arg) ltr_opp2.
+by case: real_ltgtP => // ->.
+Qed.
+
+Lemma real_oppr_min : {in real &, {morph -%R : x y / min x y >-> max x y : R}}.
+Proof.
+by move=> x y xr yr; rewrite -[RHS]opprK real_oppr_max ?realN// !opprK.
+Qed.
+
+Lemma real_addr_minl : {in real & real & real, @left_distributive R R +%R min}.
+Proof.
+by move=> x y z xr yr zr; case: (@real_leP (_ + _)); rewrite ?realD//;
+   rewrite lter_add2; case: real_leP.
+Qed.
+
+Lemma real_addr_minr : {in real & real & real, @right_distributive R R +%R min}.
+Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_minl. Qed.
+
+Lemma real_addr_maxl : {in real & real & real, @left_distributive R R +%R max}.
+Proof.
+by move=> x y z xr yr zr; case: (@real_leP (_ + _)); rewrite ?realD//;
+   rewrite lter_add2; case: real_leP.
+Qed.
+
+Lemma real_addr_maxr : {in real & real & real, @right_distributive R R +%R max}.
+Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_maxl. Qed.
+
+Lemma minr_pmulr x y z : 0 <= x -> x * min y z = min (x * y) (x * z).
+Proof.
+have [|x_gt0||->]// := comparableP x; last by rewrite !mul0r minxx.
+by rewrite !(fun_if, if_arg) lter_pmul2l//; case: (y < z).
+Qed.
+
+Lemma maxr_pmulr x y z : 0 <= x -> x * max y z = max (x * y) (x * z).
+Proof.
+have [|x_gt0||->]// := comparableP x; last by rewrite !mul0r maxxx.
+by rewrite !(fun_if, if_arg) lter_pmul2l//; case: (y < z).
+Qed.
+
+Lemma real_maxr_nmulr x y z : x <= 0 -> y \is real -> z \is real ->
+  x * max y z = min (x * y) (x * z).
+Proof.
+move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN real_oppr_max// -mulNr.
+by rewrite minr_pmulr ?oppr_ge0// !(mulNr, mulrN, opprK).
+Qed.
+
+Lemma real_minr_nmulr x y z :  x <= 0 -> y \is real -> z \is real ->
+  x * min y z = max (x * y) (x * z).
+Proof.
+move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN real_oppr_min// -mulNr.
+by rewrite maxr_pmulr ?oppr_ge0// !(mulNr, mulrN, opprK).
+Qed.
+
+Lemma minr_pmull x y z : 0 <= x -> min y z * x = min (y * x) (z * x).
+Proof. by move=> *; rewrite mulrC minr_pmulr // ![_ * x]mulrC. Qed.
+
+Lemma maxr_pmull x y z : 0 <= x -> max y z * x = max (y * x) (z * x).
+Proof. by move=> *; rewrite mulrC maxr_pmulr // ![_ * x]mulrC. Qed.
+
+Lemma real_minr_nmull x y z : x <= 0 -> y \is real -> z \is real ->
+  min y z * x = max (y * x) (z * x).
+Proof. by move=> *; rewrite mulrC real_minr_nmulr // ![_ * x]mulrC. Qed.
+
+Lemma real_maxr_nmull x y z : x <= 0 -> y \is real -> z \is real ->
+  max y z * x = min (y * x) (z * x).
+Proof. by move=> *; rewrite mulrC real_maxr_nmulr // ![_ * x]mulrC. Qed.
+
+Lemma real_maxrN x : x \is real -> max x (- x) = `|x|.
+Proof.
+move=> x_real; rewrite /max.
+by case: real_ge0P => // [/ge0_cp [] | /lt0_cp []];
+   case: (@real_leP (- x) x); rewrite ?realN.
+Qed.
+
+Lemma real_maxNr x : x \is real -> max (- x) x = `|x|.
+Proof.
+by move=> x_real; rewrite comparable_maxC ?real_maxrN ?real_comparable ?realN.
+Qed.
+
+Lemma real_minrN x : x \is real -> min x (- x) = - `|x|.
+Proof.
+by move=> x_real; rewrite -[LHS]opprK real_oppr_min ?opprK ?real_maxNr ?realN.
+Qed.
+
+Lemma real_minNr x : x \is real ->  min (- x) x = - `|x|.
+Proof.
+by move=> x_real; rewrite -[LHS]opprK real_oppr_min ?opprK ?real_maxrN ?realN.
+Qed.
+
 (* norm *)
 
 Lemma real_ler_norm x : x \is real -> x <= `|x|.
@@ -3594,25 +3705,30 @@ Implicit Types x y z t : R.
 Lemma num_real x : x \is real. Proof. exact: num_real. Qed.
 Hint Resolve num_real : core.
 
-Lemma lerP x y : ler_xor_gt x y `|x - y| `|y - x| (x <= y) (y < x).
+Lemma lerP x y : ler_xor_gt x y (min y x) (min x y) (max y x) (max x y)
+                                `|x - y| `|y - x| (x <= y) (y < x).
 Proof. exact: real_leP. Qed.
 
-Lemma ltrP x y : ltr_xor_ge x y `|x - y| `|y - x| (y <= x) (x < y).
+Lemma ltrP x y : ltr_xor_ge x y (min y x) (min x y) (max y x) (max x y)
+                                `|x - y| `|y - x| (y <= x) (x < y).
 Proof. exact: real_ltP. Qed.
 
 Lemma ltrgtP x y :
-   comparer x y `|x - y| `|y - x| (y == x) (x == y)
+   comparer x y  (min y x) (min x y) (max y x) (max x y)
+                 `|x - y| `|y - x| (y == x) (x == y)
                  (x >= y) (x <= y) (x > y) (x < y) .
 Proof. exact: real_ltgtP. Qed.
 
-Lemma ger0P x : ger0_xor_lt0 x `|x| (x < 0) (0 <= x).
+Lemma ger0P x : ger0_xor_lt0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+                                `|x| (x < 0) (0 <= x).
 Proof. exact: real_ge0P. Qed.
 
-Lemma ler0P x : ler0_xor_gt0 x `|x| (0 < x) (x <= 0).
+Lemma ler0P x : ler0_xor_gt0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+                                `|x| (0 < x) (x <= 0).
 Proof. exact: real_le0P. Qed.
 
-Lemma ltrgt0P x :
-  comparer0 x `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
+Lemma ltrgt0P x : comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+  `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof. exact: real_ltgt0P. Qed.
 
 (* sign *)
@@ -3862,93 +3978,40 @@ Proof. exact: real_leif_AGM2_scaled. Qed.
 
 Section MinMax.
 
-(* GG: Many of the first lemmas hold unconditionally, and others hold for    *)
-(* the real subset of a general domain.                                      *)
-
-Lemma addr_min_max x y : min x y + max x y = x + y.
-Proof.
-case: (lerP x y)=> [| /ltW] hxy;
-  first by rewrite (meet_idPl hxy) (join_idPl hxy).
-by rewrite (meet_idPr hxy) (join_idPr hxy) addrC.
-Qed.
-
-Lemma addr_max_min x y : max x y + min x y = x + y.
-Proof. by rewrite addrC addr_min_max. Qed.
-
-Lemma minr_to_max x y : min x y = x + y - max x y.
-Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
-
-Lemma maxr_to_min x y : max x y = x + y - min x y.
-Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
-
 Lemma oppr_max : {morph -%R : x y / max x y >-> min x y : R}.
-Proof.
-by move=> x y; case: leP; rewrite -lter_opp2 => hxy;
-  rewrite ?(meet_idPr hxy) ?(meet_idPl (ltW hxy)).
-Qed.
+Proof. by move=> x y; apply: real_oppr_max. Qed.
 
-Lemma oppr_min : {morph -%R : x y / min x y >-> max x y : R}.
-Proof. by move=> x y; rewrite -[max _ _]opprK oppr_max !opprK. Qed.
+Lemma oppr_min : {in real &, {morph -%R : x y / min x y >-> max x y : R}}.
+Proof. by move=> x y; apply: real_oppr_min. Qed.
 
 Lemma addr_minl : @left_distributive R R +%R min.
-Proof. by move=> x y z; case: (leP (_ + _)); rewrite lter_add2; case: leP. Qed.
+Proof. by move=> x y z; apply: real_addr_minl. Qed.
 
 Lemma addr_minr : @right_distributive R R +%R min.
-Proof. by move=> x y z; rewrite !(addrC x) addr_minl. Qed.
+Proof. by move=> x y z; apply: real_addr_minr. Qed.
 
 Lemma addr_maxl : @left_distributive R R +%R max.
-Proof. by move=> x y z; case: (leP (_ + _)); rewrite lter_add2; case: leP. Qed.
+Proof. by move=> x y z; apply: real_addr_maxl. Qed.
 
 Lemma addr_maxr : @right_distributive R R +%R max.
-Proof. by move=> x y z; rewrite !(addrC x) addr_maxl. Qed.
-
-Lemma minr_pmulr x y z : 0 <= x -> x * min y z = min (x * y) (x * z).
-Proof.
-case: sgrP=> // hx _; first by rewrite hx !mul0r meetxx.
-by case: (leP (_ * _)); rewrite lter_pmul2l //; case: leP.
-Qed.
+Proof. by move=> x y z; apply: real_addr_maxr. Qed.
 
 Lemma minr_nmulr x y z : x <= 0 -> x * min y z = max (x * y) (x * z).
-Proof.
-move=> hx; rewrite -[_ * _]opprK -mulNr minr_pmulr ?oppr_cp0 //.
-by rewrite oppr_min !mulNr !opprK.
-Qed.
-
-Lemma maxr_pmulr x y z : 0 <= x -> x * max y z = max (x * y) (x * z).
-Proof.
-move=> hx; rewrite -[_ * _]opprK -mulrN oppr_max minr_pmulr //.
-by rewrite oppr_min !mulrN !opprK.
-Qed.
+Proof. by move=> x_le0; apply: real_minr_nmulr. Qed.
 
 Lemma maxr_nmulr x y z : x <= 0 -> x * max y z = min (x * y) (x * z).
-Proof.
-move=> hx; rewrite -[_ * _]opprK -mulrN oppr_max minr_nmulr //.
-by rewrite oppr_max !mulrN !opprK.
-Qed.
-
-Lemma minr_pmull x y z : 0 <= x -> min y z * x = min (y * x) (z * x).
-Proof. by move=> *; rewrite mulrC minr_pmulr // ![_ * x]mulrC. Qed.
+Proof. by move=> x_le0; apply: real_maxr_nmulr. Qed.
 
 Lemma minr_nmull x y z : x <= 0 -> min y z * x = max (y * x) (z * x).
-Proof. by move=> *; rewrite mulrC minr_nmulr // ![_ * x]mulrC. Qed.
-
-Lemma maxr_pmull x y z : 0 <= x -> max y z * x = max (y * x) (z * x).
-Proof. by move=> *; rewrite mulrC maxr_pmulr // ![_ * x]mulrC. Qed.
+Proof. by move=> x_le0; apply: real_minr_nmull. Qed.
 
 Lemma maxr_nmull x y z : x <= 0 -> max y z * x = min (y * x) (z * x).
-Proof. by move=> *; rewrite mulrC maxr_nmulr // ![_ * x]mulrC. Qed.
+Proof. by move=> x_le0; apply: real_maxr_nmull. Qed.
 
-Lemma maxrN x : max x (- x) = `|x|.
-Proof. by case: ger0P=> [/ge0_cp [] | /lt0_cp []]; case: (leP (- x) x). Qed.
-
-Lemma maxNr x : max (- x) x = `|x|.
-Proof. by rewrite joinC maxrN. Qed.
-
-Lemma minrN x : min x (- x) = - `|x|.
-Proof. by rewrite -[min _ _]opprK oppr_min opprK maxNr. Qed.
-
-Lemma minNr x : min (- x) x = - `|x|.
-Proof. by rewrite -[min _ _]opprK oppr_min opprK maxrN. Qed.
+Lemma maxrN x : max x (- x) = `|x|.   Proof. exact: real_maxrN. Qed.
+Lemma maxNr x : max (- x) x = `|x|.   Proof. exact: real_maxNr. Qed.
+Lemma minrN x : min x (- x) = - `|x|. Proof. exact: real_minrN. Qed.
+Lemma minNr x : min (- x) x = - `|x|. Proof. exact: real_minNr. Qed.
 
 End MinMax.
 
@@ -3959,7 +4022,7 @@ Variable p : {poly R}.
 Lemma poly_itv_bound a b : {ub | forall x, a <= x <= b -> `|p.[x]| <= ub}.
 Proof.
 have [ub le_p_ub] := poly_disk_bound p (Num.max `|a| `|b|).
-exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // lexU !ler_normr.
+exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // le_maxr !ler_normr.
 by have [_|_] := ler0P x; rewrite ?ler_opp2 ?le_a_x ?le_x_b orbT.
 Qed.
 
@@ -5231,7 +5294,11 @@ Definition normr_lt0 x : `|x| < 0 = false := normr_lt0 x.
 Definition normr_gt0 x : (`|x| > 0) = (x != 0) := normr_gt0 x.
 Definition normrE := (normr_id, normr0, @normr1 R, @normrN1 R, normr_ge0,
                       normr_eq0, normr_lt0, normr_le0, normr_gt0, normrN).
+Definition minr x y := if x <= y then x else y.
+Definition maxr x y := if x <= y then y else x.
 End NumIntegralDomainTheory.
+Arguments minr {_}.
+Arguments maxr {_}.
 
 Section NumIntegralDomainMonotonyTheory.
 Variables R R' : numDomainType.
@@ -5543,52 +5610,87 @@ Section RealDomainOperations.
 Variable R : realDomainType.
 Implicit Types x y z : R.
 Section MinMax.
-Definition minrC : @commutative R R min := @meetC _ R.
-Definition minrr : @idempotent R min := @meetxx _ R.
-Definition minr_l x y : x <= y -> min x y = x := @meet_l _ _ x y.
-Definition minr_r x y : y <= x -> min x y = y := @meet_r _ _ x y.
-Definition maxrC : @commutative R R max := @joinC _ R.
-Definition maxrr : @idempotent R max := @joinxx _ R.
-Definition maxr_l x y : y <= x -> max x y = x := @join_l _ _ x y.
-Definition maxr_r x y : x <= y -> max x y = y := @join_r _ _ x y.
-Definition minrA x y z : min x (min y z) = min (min x y) z := meetA x y z.
-Definition minrCA : @left_commutative R R min := meetCA.
-Definition minrAC : @right_commutative R R min := meetAC.
-Definition maxrA x y z : max x (max y z) = max (max x y) z := joinA x y z.
-Definition maxrCA : @left_commutative R R max := joinCA.
-Definition maxrAC : @right_commutative R R max := joinAC.
-Definition eqr_minl x y : (min x y == x) = (x <= y) := eq_meetl x y.
-Definition eqr_minr x y : (min x y == y) = (y <= x) := eq_meetr x y.
-Definition eqr_maxl x y : (max x y == x) = (y <= x) := eq_joinl x y.
-Definition eqr_maxr x y : (max x y == y) = (x <= y) := eq_joinr x y.
-Definition ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z) := lexI x y z.
-Definition ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x) := leIx x y z.
-Definition ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z) := lexU x y z.
-Definition ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x) := leUx y z x.
-Definition ltr_minr x y z : (x < min y z) = (x < y) && (x < z) := ltxI x y z.
-Definition ltr_minl x y z : (min y z < x) = (y < x) || (z < x) := ltIx x y z.
-Definition ltr_maxr x y z : (x < max y z) = (x < y) || (x < z) := ltxU x y z.
-Definition ltr_maxl x y z : (max y z < x) = (y < x) && (z < x) := ltUx x y z.
+
+Let mrE x y : ((minr x y = min x y) * (maxr x y = max x y))%type.
+Proof. by rewrite /minr /min /maxr /max; case: comparableP. Qed.
+Ltac mapply x := do ?[rewrite !mrE|apply: x|move=> ?].
+Ltac mexact x := by mapply x.
+
+Local Notation min := minr.
+Local Notation max := maxr.
+
+Lemma minrr : @idempotent R min. Proof. mexact @minxx. Qed.
+Lemma minr_l x y : x <= y -> min x y = x. Proof. mexact @min_l. Qed.
+Lemma minr_r x y : y <= x -> min x y = y. Proof. mexact @min_r. Qed.
+Lemma maxrC : @commutative R R max. Proof. mexact @maxC. Qed.
+Lemma maxrr : @idempotent R max. Proof. mexact @maxxx. Qed.
+Lemma maxr_l x y : y <= x -> max x y = x. Proof. mexact @max_l. Qed.
+Lemma maxr_r x y : x <= y -> max x y = y. Proof. mexact @max_r. Qed.
+
+Lemma minrA x y z : min x (min y z) = min (min x y) z.
+Proof. mexact @minA. Qed.
+
+Lemma minrCA : @left_commutative R R min. Proof. mexact @minCA. Qed.
+Lemma minrAC : @right_commutative R R min. Proof. mexact @minAC. Qed.
+Lemma maxrA x y z : max x (max y z) = max (max x y) z.
+Proof. mexact @maxA. Qed.
+
+Lemma maxrCA : @left_commutative R R max. Proof. mexact @maxCA. Qed.
+Lemma maxrAC : @right_commutative R R max. Proof. mexact @maxAC. Qed.
+Lemma eqr_minl x y : (min x y == x) = (x <= y). Proof. mexact @eq_minl. Qed.
+Lemma eqr_minr x y : (min x y == y) = (y <= x). Proof. mexact @eq_minr. Qed.
+Lemma eqr_maxl x y : (max x y == x) = (y <= x). Proof. mexact @eq_maxl. Qed.
+Lemma eqr_maxr x y : (max x y == y) = (x <= y). Proof. mexact @eq_maxr. Qed.
+
+Lemma ler_minr x y z : (x <= min y z) = (x <= y) && (x <= z).
+Proof. mexact @le_minr. Qed.
+
+Lemma ler_minl x y z : (min y z <= x) = (y <= x) || (z <= x).
+Proof. mexact @le_minl. Qed.
+
+Lemma ler_maxr x y z : (x <= max y z) = (x <= y) || (x <= z).
+Proof. mexact @le_maxr. Qed.
+
+Lemma ler_maxl x y z : (max y z <= x) = (y <= x) && (z <= x).
+Proof. mexact @le_maxl. Qed.
+
+Lemma ltr_minr x y z : (x < min y z) = (x < y) && (x < z).
+Proof. mexact @lt_minr. Qed.
+
+Lemma ltr_minl x y z : (min y z < x) = (y < x) || (z < x).
+Proof. mexact @lt_minl. Qed.
+
+Lemma ltr_maxr x y z : (x < max y z) = (x < y) || (x < z).
+Proof. mexact @lt_maxr. Qed.
+
+Lemma ltr_maxl x y z : (max y z < x) = (y < x) && (z < x).
+Proof. mexact @lt_maxl. Qed.
+
 Definition lter_minr := (ler_minr, ltr_minr).
 Definition lter_minl := (ler_minl, ltr_minl).
 Definition lter_maxr := (ler_maxr, ltr_maxr).
 Definition lter_maxl := (ler_maxl, ltr_maxl).
-Definition minrK x y : max (min x y) x = x := meetUKC y x.
-Definition minKr x y : min y (max x y) = y := joinKIC x y.
-Definition maxr_minl : @left_distributive R R max min := @joinIl _ R.
-Definition maxr_minr : @right_distributive R R max min := @joinIr _ R.
-Definition minr_maxl : @left_distributive R R min max := @meetUl _ R.
-Definition minr_maxr : @right_distributive R R min max := @meetUr _ R.
+
+Lemma minrK x y : max (min x y) x = x. Proof. mexact @minxK. Qed.
+Lemma minKr x y : min y (max x y) = y. Proof. mexact @maxKx. Qed.
+
+Lemma maxr_minl : @left_distributive R R max min. Proof. mexact @max_minl. Qed.
+Lemma maxr_minr : @right_distributive R R max min. Proof. mexact @max_minr. Qed.
+Lemma minr_maxl : @left_distributive R R min max. Proof. mexact @min_maxl. Qed.
+Lemma minr_maxr : @right_distributive R R min max. Proof. mexact @min_maxr. Qed.
+
 Variant minr_spec x y : bool -> bool -> R -> Type :=
 | Minr_r of x <= y : minr_spec x y true false x
 | Minr_l of y < x : minr_spec x y false true y.
 Lemma minrP x y : minr_spec x y (x <= y) (y < x) (min x y).
-Proof. by case: leP; constructor. Qed.
+Proof. by rewrite mrE; case: leP; constructor. Qed.
+
 Variant maxr_spec x y : bool -> bool -> R -> Type :=
 | Maxr_r of y <= x : maxr_spec x y true false x
 | Maxr_l of x < y : maxr_spec x y false true y.
 Lemma maxrP x y : maxr_spec x y (y <= x) (x < y) (max x y).
-Proof. by case: (leP y); constructor. Qed.
+Proof. by rewrite mrE; case: (leP y); constructor. Qed.
+
 End MinMax.
 End RealDomainOperations.
 

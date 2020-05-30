@@ -1076,6 +1076,7 @@ Arguments ge {_ _}.
 Arguments gt {_ _}.
 Arguments min {_ _}.
 Arguments max {_ _}.
+Arguments comparable {_ _}.
 
 Module Import POSyntax.
 
@@ -2654,7 +2655,7 @@ Context {disp : unit}.
 Local Notation porderType := (porderType disp).
 Context {T : porderType}.
 
-Implicit Types x y : T.
+Implicit Types (x y : T) (s : seq T).
 
 Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
 Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
@@ -2752,8 +2753,7 @@ Proof. by rewrite andbC lt_le_asym. Qed.
 
 Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
-Lemma lt_sorted_uniq_le (s : seq T) :
-   sorted lt s = uniq s && sorted le s.
+Lemma lt_sorted_uniq_le s : sorted lt s = uniq s && sorted le s.
 Proof.
 case: s => //= n s; elim: s n => //= m s IHs n.
 rewrite inE lt_neqAle negb_or IHs -!andbA.
@@ -2762,12 +2762,11 @@ rewrite andbF; apply/and5P=> [[ne_nm lenm _ _ le_ms]]; case/negP: ne_nm.
 by rewrite eq_le lenm /=; apply: (allP (order_path_min le_trans le_ms)).
 Qed.
 
-Lemma eq_sorted_lt (s1 s2 : seq T) :
-  sorted lt s1 -> sorted lt s2 -> s1 =i s2 -> s1 = s2.
+Lemma eq_sorted_lt s1 s2 : sorted lt s1 -> sorted lt s2 -> s1 =i s2 -> s1 = s2.
 Proof. by apply: eq_sorted_irr => //; apply: lt_trans. Qed.
 
-Lemma eq_sorted_le (s1 s2 : seq T) :
-   sorted le s1 -> sorted le s2 -> perm_eq s1 s2 -> s1 = s2.
+Lemma eq_sorted_le s1 s2 : sorted le s1 -> sorted le s2 ->
+  perm_eq s1 s2 -> s1 = s2.
 Proof. by apply: eq_sorted; [apply: le_trans|apply: le_anti]. Qed.
 
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
@@ -2878,6 +2877,220 @@ Proof. by move=> /leifP; case: C comparableP => [] []. Qed.
 
 Lemma eqTleif x y C : x <= y ?= iff C -> C -> x = y.
 Proof. by move=> /eq_leif<-/eqP. Qed.
+
+(* min and max *)
+
+Lemma min_l x y : x <= y -> min x y = x. Proof. by case: comparableP. Qed.
+Lemma min_r x y : y <= x -> min x y = y. Proof. by case: comparableP. Qed.
+Lemma max_l x y : y <= x -> max x y = x. Proof. by case: comparableP. Qed.
+Lemma max_r x y : x <= y -> max x y = y. Proof. by case: comparableP. Qed.
+
+Lemma minxx : idempotent (min : T -> T -> T).
+Proof. by rewrite /min => x; rewrite ltxx. Qed.
+
+Lemma maxxx : idempotent (max : T -> T -> T).
+Proof. by rewrite /max => x; rewrite ltxx. Qed.
+
+Lemma eq_minl x y : (min x y == x) = (x <= y).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
+
+Lemma eq_maxr x y : (max x y == y) = (x <= y).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
+
+Lemma comparable_minl x y z : x >=< z -> y >=< z -> min x y >=< z.
+Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+
+Lemma comparable_minr x y z : z >=< x -> z >=< y -> z >=< min x y.
+Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+
+Lemma comparable_maxl x y z : x >=< z -> y >=< z -> max x y >=< z.
+Proof. by move=> cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+
+Lemma comparable_maxr x y z : z >=< x -> z >=< y -> z >=< max x y.
+Proof. by move=> cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+
+Section Comparable2.
+Variables (z x y : T) (cmp_xy : x >=< y).
+
+Lemma comparable_minC : min x y = min y x.
+Proof. by case: comparableP cmp_xy. Qed.
+
+Lemma comparable_maxC : max x y = max y x.
+Proof. by case: comparableP cmp_xy. Qed.
+
+Lemma comparable_eq_minr : (min x y == y) = (y <= x).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_eq_maxl : (max x y == x) = (y <= x).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_le_minr : (z <= min x y) = (z <= x) && (z <= y).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
+  by case: (comparableP z) => // [/lt_trans xlt/xlt|->] /ltW.
+Qed.
+
+Lemma comparable_le_minl : (min x y <= z) = (x <= z) || (y <= z).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/le_trans/ltW.
+Qed.
+
+Lemma comparable_lt_minr : (z < min x y) = (z < x) && (z < y).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
+  by case: (comparableP z) => // /lt_trans xlt/xlt.
+Qed.
+
+Lemma comparable_lt_minl : (min x y < z) = (x < z) || (y < z).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/lt_trans.
+Qed.
+
+Lemma comparable_le_maxr : (z <= max x y) = (z <= x) || (z <= y).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]// /le_trans->//; apply/ltW.
+Qed.
+
+Lemma comparable_le_maxl : (max x y <= z) = (x <= z) && (y <= z).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
+  by case: (comparableP z) => // [ylt /lt_trans /(_ _)/ltW|->/ltW]->.
+Qed.
+
+Lemma comparable_lt_maxr : (z < max x y) = (z < x) || (z < y).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]// /lt_trans->.
+Qed.
+
+Lemma comparable_lt_maxl : (max x y < z) = (x < z) && (y < z).
+Proof.
+case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
+by case: (comparableP z) => // ylt /lt_trans->.
+Qed.
+
+Lemma comparable_minxK : max (min x y) x = x.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_minKx : max y (min x y) = y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_maxxK : min (max x y) x = x.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_maxKx : min y (max x y) = y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+
+End Comparable2.
+
+Section Comparable3.
+Variables (x y z : T) (cmp_xy : x >=< y) (cmp_xz : x >=< z) (cmp_yz : y >=< z).
+Let P := comparableP.
+
+Lemma comparable_minA : min x (min y z) = min (min x y) z.
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
+move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
+- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
+- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
+- by have := lt_trans xy xz; rewrite yz ltxx.
+Qed.
+
+Lemma comparable_maxA : max x (max y z) = max (max x y) z.
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
+move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
+- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
+- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
+- by have := lt_trans xy xz; rewrite yz ltxx.
+Qed.
+
+Lemma comparable_max_minl : max (min x y) z = min (max x z) (max y z).
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
+move: (P x y) (P x z) (P y z).
+move=> [xy|xy|xy|<-] [xz|xz|xz|<-] [yz|yz|yz|//->]//= _; rewrite ?ltxx//.
+- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
+- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
+Qed.
+
+Lemma comparable_min_maxl : min (max x y) z = max (min x z) (min y z).
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
+move: (P x y) (P x z) (P y z).
+move=> [xy|xy|xy|<-] [xz|xz|xz|<-] []yz//= _; rewrite ?ltxx//.
+- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
+- by have := lt_trans xy yz; rewrite ltxx.
+- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
+- by have := lt_trans xy xz; rewrite yz ltxx.
+Qed.
+
+End Comparable3.
+
+Lemma comparable_minAC x y z : x >=< y -> x >=< z -> y >=< z ->
+  min (min x y) z = min (min x z) y.
+Proof.
+move=> xy xz yz; rewrite -comparable_minA// [min y z]comparable_minC//.
+by rewrite comparable_minA// 1?comparable_sym.
+Qed.
+
+Lemma comparable_maxAC x y z : x >=< y -> x >=< z -> y >=< z ->
+  max (max x y) z = max (max x z) y.
+Proof.
+move=> xy xz yz; rewrite -comparable_maxA// [max y z]comparable_maxC//.
+by rewrite comparable_maxA// 1?comparable_sym.
+Qed.
+
+Lemma comparable_minCA x y z : x >=< y -> x >=< z -> y >=< z ->
+  min x (min y z) = min y (min x z).
+Proof.
+move=> xy xz yz; rewrite comparable_minA// [min x y]comparable_minC//.
+by rewrite -comparable_minA// 1?comparable_sym.
+Qed.
+
+Lemma comparable_maxCA x y z : x >=< y -> x >=< z -> y >=< z ->
+  max x (max y z) = max y (max x z).
+Proof.
+move=> xy xz yz; rewrite comparable_maxA// [max x y]comparable_maxC//.
+by rewrite -comparable_maxA// 1?comparable_sym.
+Qed.
+
+Lemma comparable_minACA x y z t :
+    x >=< y -> x >=< z -> x >=< t -> y >=< z -> y >=< t -> z >=< t ->
+  min (min x y) (min z t) = min (min x z) (min y t).
+Proof.
+move=> xy xz xt yz yt zt; rewrite comparable_minA// ?comparable_minl//.
+rewrite [min _ z]comparable_minAC// -comparable_minA// ?comparable_minl//.
+by rewrite comparable_sym.
+Qed.
+
+Lemma comparable_maxACA x y z t :
+    x >=< y -> x >=< z -> x >=< t -> y >=< z -> y >=< t -> z >=< t ->
+  max (max x y) (max z t) = max (max x z) (max y t).
+Proof.
+move=> xy xz xt yz yt zt; rewrite comparable_maxA// ?comparable_maxl//.
+rewrite [max _ z]comparable_maxAC// -comparable_maxA// ?comparable_maxl//.
+by rewrite comparable_sym.
+Qed.
+
+Lemma comparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
+  max x (min y z) = min (max x y) (max x z).
+Proof.
+move=> xy xz yz; rewrite ![max x _]comparable_maxC// ?comparable_minr//.
+by rewrite comparable_max_minl// 1?comparable_sym.
+Qed.
+
+Lemma comparable_min_maxr x y z : x >=< y -> x >=< z -> y >=< z ->
+  min x (max y z) = max (min x y) (min x z).
+Proof.
+move=> xy xz yz; rewrite ![min x _]comparable_minC// ?comparable_maxr//.
+by rewrite comparable_min_maxl// 1?comparable_sym.
+Qed.
+
+(* monotonicity *)
 
 Lemma mono_in_leif (A : {pred T}) (f : T -> T) C :
    {in A &, {mono f : x y / x <= y}} ->
@@ -3276,7 +3489,7 @@ Section TotalTheory.
 Context {disp : unit}.
 Local Notation orderType := (orderType disp).
 Context {T : orderType}.
-Implicit Types (x y z t : T).
+Implicit Types (x y z t : T) (s : seq T).
 
 Lemma le_total : total (<=%O : rel T). Proof. by case: T => [? [?]]. Qed.
 Hint Resolve le_total : core.
@@ -3288,13 +3501,14 @@ Hint Resolve ge_total : core.
 Lemma comparableT x y : x >=< y. Proof. exact: le_total. Qed.
 Hint Resolve comparableT : core.
 
-Lemma sort_le_sorted (s : seq T) : sorted <=%O (sort <=%O s).
+Lemma sort_le_sorted s : sorted <=%O (sort <=%O s).
 Proof. exact: sort_sorted. Qed.
+Hint Resolve sort_le_sorted : core.
 
-Lemma sort_lt_sorted (s : seq T) : sorted lt (sort le s) = uniq s.
+Lemma sort_lt_sorted s : sorted lt (sort le s) = uniq s.
 Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
 
-Lemma sort_le_id (s : seq T) : sorted le s -> sort le s = s.
+Lemma sort_le_id s : sorted le s -> sort le s = s.
 Proof.
 by move=> ss; apply: eq_sorted_le; rewrite ?sort_le_sorted // perm_sort.
 Qed.
@@ -3340,19 +3554,91 @@ Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
 
 (* interaction with lattice operations *)
 
+Lemma meetEtotal x y : x `&` y = min x y. Proof. by case: leP. Qed.
+Lemma joinEtotal x y : x `|` y = max x y. Proof. by case: leP. Qed.
+
+Lemma minC : commutative (min : T -> T -> T).
+Proof. by move=> x y; apply: comparable_minC. Qed.
+
+Lemma maxC : commutative (max : T -> T -> T).
+Proof. by move=> x y; apply: comparable_maxC. Qed.
+
+Lemma minA : associative (min : T -> T -> T).
+Proof. by move=> x y z; apply: comparable_minA. Qed.
+
+Lemma maxA : associative (max : T -> T -> T).
+Proof. by move=> x y z; apply: comparable_maxA. Qed.
+
+Lemma minAC : right_commutative (min : T -> T -> T).
+Proof. by move=> x y z; apply: comparable_minAC. Qed.
+
+Lemma maxAC : right_commutative (max : T -> T -> T).
+Proof. by move=> x y z; apply: comparable_maxAC. Qed.
+
+Lemma minCA : left_commutative (min : T -> T -> T).
+Proof. by move=> x y z; apply: comparable_minCA. Qed.
+
+Lemma maxCA : left_commutative (max : T -> T -> T).
+Proof. by move=> x y z; apply: comparable_maxCA. Qed.
+
+Lemma minACA : interchange (min : T -> T -> T) min.
+Proof. by move=> x y z t; apply: comparable_minACA. Qed.
+
+Lemma maxACA : interchange (max : T -> T -> T) max.
+Proof. by move=> x y z t; apply: comparable_maxACA. Qed.
+
+Lemma eq_minr x y : (min x y == y) = (y <= x).
+Proof. exact: comparable_eq_minr. Qed.
+
+Lemma eq_maxl x y : (max x y == x) = (y <= x).
+Proof. exact: comparable_eq_maxl. Qed.
+
+Lemma le_minr z x y : (z <= min x y) = (z <= x) && (z <= y).
+Proof. exact: comparable_le_minr. Qed.
+
+Lemma le_minl z x y : (min x y <= z) = (x <= z) || (y <= z).
+Proof. exact: comparable_le_minl. Qed.
+
+Lemma lt_minr z x y : (z < min x y) = (z < x) && (z < y).
+Proof. exact: comparable_lt_minr. Qed.
+
+Lemma lt_minl z x y : (min x y < z) = (x < z) || (y < z).
+Proof. exact: comparable_lt_minl. Qed.
+
+Lemma le_maxr z x y : (z <= max x y) = (z <= x) || (z <= y).
+Proof. exact: comparable_le_maxr. Qed.
+
+Lemma le_maxl z x y : (max x y <= z) = (x <= z) && (y <= z).
+Proof. exact: comparable_le_maxl. Qed.
+
+Lemma lt_maxr z x y : (z < max x y) = (z < x) || (z < y).
+Proof. exact: comparable_lt_maxr. Qed.
+
+Lemma lt_maxl z x y : (max x y < z) = (x < z) && (y < z).
+Proof. exact: comparable_lt_maxl. Qed.
+
+Lemma minxK x y : max (min x y) x = x. Proof. exact: comparable_minxK. Qed.
+Lemma minKx x y : max y (min x y) = y. Proof. exact: comparable_minKx. Qed.
+Lemma maxxK x y : min (max x y) x = x. Proof. exact: comparable_maxxK. Qed.
+Lemma maxKx x y : min y (max x y) = y. Proof. exact: comparable_maxKx. Qed.
+
+Lemma max_minl : left_distributive (max : T -> T -> T) min.
+Proof. by move=> x y z; apply: comparable_max_minl. Qed.
+
+Lemma min_maxl : left_distributive (min : T -> T -> T) max.
+Proof. by move=> x y z; apply: comparable_min_maxl. Qed.
+
+Lemma max_minr : right_distributive (max : T -> T -> T) min.
+Proof. by move=> x y z; apply: comparable_max_minr. Qed.
+
+Lemma min_maxr : right_distributive (min : T -> T -> T) max.
+Proof. by move=> x y z; apply: comparable_min_maxr. Qed.
+
 Lemma leIx x y z : (meet y z <= x) = (y <= x) || (z <= x).
-Proof.
-by case: (leP y z) => hyz; case: leP => ?;
-  rewrite ?(orbT, orbF) //=; apply/esym/negbTE;
-  rewrite -ltNge ?(lt_le_trans _ hyz) ?(lt_trans _ hyz).
-Qed.
+Proof. by rewrite meetEtotal le_minl. Qed.
 
 Lemma lexU x y z : (x <= join y z) = (x <= y) || (x <= z).
-Proof.
-by case: (leP y z) => hyz; case: leP => ?;
-  rewrite ?(orbT, orbF) //=; apply/esym/negbTE;
-  rewrite -ltNge ?(le_lt_trans hyz) ?(lt_trans hyz).
-Qed.
+Proof. by rewrite joinEtotal le_maxr. Qed.
 
 Lemma ltxI x y z : (x < meet y z) = (x < y) && (x < z).
 Proof. by rewrite !ltNge leIx negb_or. Qed.
@@ -3370,9 +3656,6 @@ Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx, ltIx).
 Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
-
-Lemma meetEtotal x y : x `&` y = min x y. Proof. by case: leP. Qed.
-Lemma joinEtotal x y : x `|` y = max x y. Proof. by case: leP. Qed.
 
 Section ArgExtremum.
 
