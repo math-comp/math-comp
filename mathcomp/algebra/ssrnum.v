@@ -3778,6 +3778,12 @@ Proof. by rewrite distrC => /ltr_dist_subl. Qed.
 Lemma ler_distr_subr x y e : `|x - y| <= e -> y - e <= x.
 Proof. by rewrite distrC => /ler_dist_subl. Qed.
 
+Lemma norm_lt_eqF (x y : R) : `|x| < y -> (x == - y = false) * (x == y = false).
+Proof.
+move=> x1; split; last by rewrite lt_eqF // (le_lt_trans (ler_norm _) x1).
+by move: x1; rewrite ltr_norml => /andP[? ?]; rewrite gt_eqF.
+Qed.
+
 Lemma exprn_even_ge0 n x : ~~ odd n -> 0 <= x ^+ n.
 Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
 
