@@ -196,10 +196,10 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* above.                                                                     *)
 (*                                                                            *)
 (* For porderType we provide the following operations                         *)
-(*   [arg minr_(i < i0 | P) M] == a value i : T minimizing M : R, subject to  *)
+(*   [arg min_(i < i0 | P) M] == a value i : T minimizing M : R, subject to   *)
 (*                      the condition P (i may appear in P and M), and        *)
 (*                      provided P holds for i0.                              *)
-(*   [arg maxr_(i > i0 | P) M] == a value i maximizing M subject to P and     *)
+(*   [arg max_(i > i0 | P) M] == a value i maximizing M subject to P and      *)
 (*                      provided P holds for i0.                              *)
 (*   [arg min_(i < i0 in A) M] == an i \in A minimizing M if i0 \in A.        *)
 (*   [arg max_(i > i0 in A) M] == an i \in A maximizing M if i0 \in A.        *)
@@ -718,6 +718,43 @@ Reserved Notation "\min_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \min_ ( i  'in'  A ) '/  '  F ']'").
 
+Reserved Notation "\max_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \max_ i '/  '  F ']'").
+Reserved Notation "\max_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\max_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\max_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\max_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \max_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\max_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\max_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\max_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max_ ( i  <  n )  F ']'").
+Reserved Notation "\max_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\max_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max_ ( i  'in'  A ) '/  '  F ']'").
+
 Reserved Notation "\meet^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \meet^d_ i '/  '  F ']'").
@@ -792,6 +829,80 @@ Reserved Notation "\join^d_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^d_ ( i  'in'  A ) '/  '  F ']'").
 
+Reserved Notation "\min^d_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \min^d_ i '/  '  F ']'").
+Reserved Notation "\min^d_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^d_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^d_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^d_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \min^d_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\min^d_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\min^d_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^d_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^d_ ( i  <  n )  F ']'").
+Reserved Notation "\min^d_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\min^d_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^d_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\max^d_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \max^d_ i '/  '  F ']'").
+Reserved Notation "\max^d_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^d_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^d_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^d_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \max^d_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\max^d_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50,
+           only parsing).
+Reserved Notation "\max^d_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^d_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^d_ ( i  <  n )  F ']'").
+Reserved Notation "\max^d_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\max^d_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^d_ ( i  'in'  A ) '/  '  F ']'").
+
 Reserved Notation "\meet^p_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \meet^p_ i '/  '  F ']'").
@@ -865,80 +976,6 @@ Reserved Notation "\join^p_ ( i 'in' A | P ) F"
 Reserved Notation "\join^p_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^p_ ( i  'in'  A ) '/  '  F ']'").
-
-Reserved Notation "\min^l_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \min^l_ i '/  '  F ']'").
-Reserved Notation "\min^l_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \min^l_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \min^l_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \min^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \min^l_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \min^l_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
-Reserved Notation "\min^l_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
-Reserved Notation "\min^l_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \min^l_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \min^l_ ( i  <  n )  F ']'").
-Reserved Notation "\min^l_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \min^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \min^l_ ( i  'in'  A ) '/  '  F ']'").
-
-Reserved Notation "\max^l_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \max^l_ i '/  '  F ']'").
-Reserved Notation "\max^l_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \max^l_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \max^l_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \max^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \max^l_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \max^l_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
-Reserved Notation "\max^l_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
-Reserved Notation "\max^l_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \max^l_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \max^l_ ( i  <  n )  F ']'").
-Reserved Notation "\max^l_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \max^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \max^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Module Order.
 
@@ -1066,10 +1103,12 @@ Variant incompare (x y : T) :
   | InCompareGt of y < x : incompare x y
     y y x x false false true false true false true true
   | InCompare of x >< y  : incompare x y
-    (min y x) (min x y) (max y x) (max x y)
-    false false false false false false false false
+    x y y x false false false false false false false false
   | InCompareEq of x = y : incompare x y
     x x x x true true true true false false true true.
+
+Definition arg_min {I : finType} := @extremum T I le.
+Definition arg_max {I : finType}  := @extremum T I ge.
 
 End POrderDef.
 
@@ -1129,6 +1168,34 @@ Notation "x >=< y" := (comparable x y) : order_scope.
 Notation ">< x" := (fun y => ~~ (comparable x y)) : order_scope.
 Notation ">< x :> T" := (>< (x : T)) (only parsing) : order_scope.
 Notation "x >< y" := (~~ (comparable x y)) : order_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
+    (arg_min i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : order_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
+    [arg min_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : order_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : order_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
+     (arg_max i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : order_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
+    [arg max_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : order_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : order_scope.
 
 End POSyntax.
 
@@ -1244,8 +1311,7 @@ Variant incomparel (x y : T) :
   | InComparelGt of y < x : incomparel x y
     y y x x y y x x false false true false true false true true
   | InComparel of x >< y  : incomparel x y
-    (min y x) (min x y) (max y x) (max x y)
-    (meet y x) (meet x y) (join y x) (join x y)
+    x y y x (meet y x) (meet x y) (join y x) (join x y)
     false false false false false false false false
   | InComparelEq of x = y : incomparel x y
     x x x x x x x x true true true true false false true true.
@@ -1946,96 +2012,6 @@ End Exports.
 End Total.
 Import Total.Exports.
 
-Section TotalDef.
-Context {disp : unit} {T : orderType disp} {I : finType}.
-Definition arg_min := @extremum T I <=%O.
-Definition arg_max := @extremum T I >=%O.
-End TotalDef.
-
-Module Import TotalSyntax.
-
-Notation "\max_ ( i <- r | P ) F" :=
-  (\big[max/0%O]_(i <- r | P%B) F%O) : order_scope.
-Notation "\max_ ( i <- r ) F" :=
-  (\big[max/0%O]_(i <- r) F%O) : order_scope.
-Notation "\max_ ( i | P ) F" :=
-  (\big[max/0%O]_(i | P%B) F%O) : order_scope.
-Notation "\max_ i F" :=
-  (\big[max/0%O]_i F%O) : order_scope.
-Notation "\max_ ( i : I | P ) F" :=
-  (\big[max/0%O]_(i : I | P%B) F%O) (only parsing) :
-  order_scope.
-Notation "\max_ ( i : I ) F" :=
-  (\big[max/0%O]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\max_ ( m <= i < n | P ) F" :=
-  (\big[max/0%O]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\max_ ( m <= i < n ) F" :=
-  (\big[max/0%O]_(m <= i < n) F%O) : order_scope.
-Notation "\max_ ( i < n | P ) F" :=
-  (\big[max/0%O]_(i < n | P%B) F%O) : order_scope.
-Notation "\max_ ( i < n ) F" :=
-  (\big[max/0%O]_(i < n) F%O) : order_scope.
-Notation "\max_ ( i 'in' A | P ) F" :=
-  (\big[max/0%O]_(i in A | P%B) F%O) : order_scope.
-Notation "\max_ ( i 'in' A ) F" :=
-  (\big[max/0%O]_(i in A) F%O) : order_scope.
-
-Notation "\min_ ( i <- r | P ) F" :=
-  (\big[min/1%O]_(i <- r | P%B) F%O) : order_scope.
-Notation "\min_ ( i <- r ) F" :=
-  (\big[min/1%O]_(i <- r) F%O) : order_scope.
-Notation "\min_ ( i | P ) F" :=
-  (\big[min/1%O]_(i | P%B) F%O) : order_scope.
-Notation "\min_ i F" :=
-  (\big[min/1%O]_i F%O) : order_scope.
-Notation "\min_ ( i : I | P ) F" :=
-  (\big[min/1%O]_(i : I | P%B) F%O) (only parsing) :
-  order_scope.
-Notation "\min_ ( i : I ) F" :=
-  (\big[min/1%O]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\min_ ( m <= i < n | P ) F" :=
-  (\big[min/1%O]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\min_ ( m <= i < n ) F" :=
-  (\big[min/1%O]_(m <= i < n) F%O) : order_scope.
-Notation "\min_ ( i < n | P ) F" :=
-  (\big[min/1%O]_(i < n | P%B) F%O) : order_scope.
-Notation "\min_ ( i < n ) F" :=
-  (\big[min/1%O]_(i < n) F%O) : order_scope.
-Notation "\min_ ( i 'in' A | P ) F" :=
-  (\big[min/1%O]_(i in A | P%B) F%O) : order_scope.
-Notation "\min_ ( i 'in' A ) F" :=
-  (\big[min/1%O]_(i in A) F%O) : order_scope.
-
-Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
-    (arg_min i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : order_scope.
-
-Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
-    [arg min_(i < i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : order_scope.
-
-Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : order_scope.
-
-Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
-     (arg_max i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : order_scope.
-
-Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
-    [arg max_(i > i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : order_scope.
-
-Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : order_scope.
-
-End TotalSyntax.
-
 (**********)
 (* FINITE *)
 (**********)
@@ -2586,13 +2562,15 @@ Notation "><^d x" := (fun y => ~~ (>=<^d%O x y)) : order_scope.
 Notation "><^d x :> T" := (><^d (x : T)) (only parsing) : order_scope.
 Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
-Notation "x `&^d` y" :=  (@meet (dual_display _) _ x y) : order_scope.
-Notation "x `|^d` y" := (@join (dual_display _) _ x y) : order_scope.
-
 Notation dual_bottom := (@bottom (dual_display _)).
 Notation dual_top := (@top (dual_display _)).
 Notation dual_join := (@join (dual_display _) _).
 Notation dual_meet := (@meet (dual_display _) _).
+Notation dual_max := (@max (dual_display _) _).
+Notation dual_min := (@min (dual_display _) _).
+
+Notation "x `&^d` y" :=  (@meet (dual_display _) _ x y) : order_scope.
+Notation "x `|^d` y" := (@join (dual_display _) _ x y) : order_scope.
 
 Notation "\join^d_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
@@ -2824,8 +2802,8 @@ Lemma comparableP x y : incompare x y
 Proof.
 rewrite ![y >=< _]comparable_sym; have [c_xy|i_xy] := boolP (x >=< y).
   by case: (comparable_ltgtP c_xy) => ?; constructor.
-by rewrite ?incomparable_eqF ?incomparable_leF ?incomparable_ltF //
-           1?comparable_sym //; constructor.
+by rewrite /min /max ?incomparable_eqF ?incomparable_leF;
+   rewrite ?incomparable_ltF// 1?comparable_sym //; constructor.
 Qed.
 
 Lemma le_comparable (x y : T) : x <= y -> x >=< y.
@@ -2882,6 +2860,24 @@ Proof. by move=> /eq_leif<-/eqP. Qed.
 
 (* min and max *)
 
+Lemma minElt x y : min x y = if x < y then x else y. Proof. by []. Qed.
+Lemma maxElt x y : max x y = if x < y then y else x. Proof. by []. Qed.
+
+Lemma minEle x y : min x y = if x <= y then x else y.
+Proof. by case: comparableP. Qed.
+
+Lemma maxEle x y : max x y = if x <= y then y else x.
+Proof. by case: comparableP. Qed.
+
+Lemma comparable_minEgt x y : x >=< y -> min x y = if x > y then y else x.
+Proof. by case: comparableP. Qed.
+Lemma comparable_maxEgt x y : x >=< y -> max x y = if x > y then x else y.
+Proof. by case: comparableP. Qed.
+Lemma comparable_minEge x y : x >=< y -> min x y = if x >= y then y else x.
+Proof. by case: comparableP. Qed.
+Lemma comparable_maxEge x y : x >=< y -> max x y = if x >= y then x else y.
+Proof. by case: comparableP. Qed.
+
 Lemma min_l x y : x <= y -> min x y = x. Proof. by case: comparableP. Qed.
 Lemma min_r x y : y <= x -> min x y = y. Proof. by case: comparableP. Qed.
 Lemma max_l x y : y <= x -> max x y = x. Proof. by case: comparableP. Qed.
@@ -2898,6 +2894,24 @@ Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
 
 Lemma eq_maxr x y : (max x y == y) = (x <= y).
 Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
+
+Lemma min_idPl x y : reflect (min x y = x) (x <= y).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_minl. Qed.
+
+Lemma max_idPr x y : reflect (max x y = y) (x <= y).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_maxr. Qed.
+
+Lemma min_minKx x y : min (min x y) y = min x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+
+Lemma min_minxK x y : min x (min x y) = min x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+
+Lemma max_maxKx x y : max (max x y) y = max x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+
+Lemma max_maxxK x y : max x (max x y) = max x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
 
 Lemma comparable_minl x y z : x >=< z -> y >=< z -> min x y >=< z.
 Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
@@ -2925,6 +2939,12 @@ Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
 
 Lemma comparable_eq_maxl : (max x y == x) = (y <= x).
 Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_min_idPr : reflect (min x y = y) (y <= x).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_minr. Qed.
+
+Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_maxl. Qed.
 
 Lemma comparable_le_minr : (z <= min x y) = (z <= x) && (z <= y).
 Proof.
@@ -2974,16 +2994,16 @@ case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
 by case: (comparableP z) => // ylt /lt_trans->.
 Qed.
 
-Lemma comparable_minxK : max (min x y) x = x.
+Lemma comparable_minxK : max (min x y) y = y.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
 
-Lemma comparable_minKx : max y (min x y) = y.
+Lemma comparable_minKx : max x (min x y) = x.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
 
-Lemma comparable_maxxK : min (max x y) x = x.
+Lemma comparable_maxxK : min (max x y) y = y.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
 
-Lemma comparable_maxKx : min y (max x y) = y.
+Lemma comparable_maxKx : min x (max x y) = x.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
 
 End Comparable2.
@@ -3091,6 +3111,24 @@ Proof.
 move=> xy xz yz; rewrite ![min x _]comparable_minC// ?comparable_maxr//.
 by rewrite comparable_min_maxl// 1?comparable_sym.
 Qed.
+
+Section ArgExtremum.
+
+Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
+Hypothesis F_comparable : {in P &, forall i j, F i >=< F j}.
+
+Lemma comparable_arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
+Proof.
+by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: lexx|apply: le_trans].
+Qed.
+
+Lemma comparable_arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
+Proof.
+apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: lexx|exact: ge_trans|].
+by move=> x y xP yP; rewrite orbC [_ || _]F_comparable.
+Qed.
+
+End ArgExtremum.
 
 (* monotonicity *)
 
@@ -3200,6 +3238,10 @@ Arguments mono_in_leif [disp T A f C].
 Arguments nmono_in_leif [disp T A f C].
 Arguments mono_leif [disp T f C].
 Arguments nmono_leif [disp T f C].
+Arguments min_idPl {disp T x y}.
+Arguments max_idPr {disp T x y}.
+Arguments comparable_min_idPr {disp T x y _}.
+Arguments comparable_max_idPl {disp T x y _}.
 
 Module Import DualPOrder.
 Section DualPOrder.
@@ -3458,6 +3500,9 @@ Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 End LatticeTheoryJoin.
 End LatticeTheoryJoin.
 
+Arguments meet_idPl {disp L x y}.
+Arguments join_idPl {disp L x y}.
+
 Module Import DistrLatticeTheory.
 Section DistrLatticeTheory.
 Context {disp : unit}.
@@ -3554,10 +3599,17 @@ Lemma eq_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
 Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
 
-(* interaction with lattice operations *)
+(* max and min is join and meet *)
 
 Lemma meetEtotal x y : x `&` y = min x y. Proof. by case: leP. Qed.
 Lemma joinEtotal x y : x `|` y = max x y. Proof. by case: leP. Qed.
+
+(* max and min theory *)
+
+Lemma minEgt x y : min x y = if x > y then y else x. Proof. by case: ltP. Qed.
+Lemma maxEgt x y : max x y = if x > y then x else y. Proof. by case: ltP. Qed.
+Lemma minEge x y : min x y = if x >= y then y else x. Proof. by case: leP. Qed.
+Lemma maxEge x y : max x y = if x >= y then x else y. Proof. by case: leP. Qed.
 
 Lemma minC : commutative (min : T -> T -> T).
 Proof. by move=> x y; apply: comparable_minC. Qed.
@@ -3595,6 +3647,12 @@ Proof. exact: comparable_eq_minr. Qed.
 Lemma eq_maxl x y : (max x y == x) = (y <= x).
 Proof. exact: comparable_eq_maxl. Qed.
 
+Lemma min_idPr x y : reflect (min x y = y) (y <= x).
+Proof. exact: comparable_min_idPr. Qed.
+
+Lemma max_idPl x y : reflect (max x y = x) (y <= x).
+Proof. exact: comparable_max_idPl. Qed.
+
 Lemma le_minr z x y : (z <= min x y) = (z <= x) && (z <= y).
 Proof. exact: comparable_le_minr. Qed.
 
@@ -3619,10 +3677,10 @@ Proof. exact: comparable_lt_maxr. Qed.
 Lemma lt_maxl z x y : (max x y < z) = (x < z) && (y < z).
 Proof. exact: comparable_lt_maxl. Qed.
 
-Lemma minxK x y : max (min x y) x = x. Proof. exact: comparable_minxK. Qed.
-Lemma minKx x y : max y (min x y) = y. Proof. exact: comparable_minKx. Qed.
-Lemma maxxK x y : min (max x y) x = x. Proof. exact: comparable_maxxK. Qed.
-Lemma maxKx x y : min y (max x y) = y. Proof. exact: comparable_maxKx. Qed.
+Lemma minxK x y : max (min x y) y = y. Proof. exact: comparable_minxK. Qed.
+Lemma minKx x y : max x (min x y) = x. Proof. exact: comparable_minKx. Qed.
+Lemma maxxK x y : min (max x y) y = y. Proof. exact: comparable_maxxK. Qed.
+Lemma maxKx x y : min x (max x y) = x. Proof. exact: comparable_maxKx. Qed.
 
 Lemma max_minl : left_distributive (max : T -> T -> T) min.
 Proof. by move=> x y z; apply: comparable_max_minl. Qed.
@@ -3663,9 +3721,6 @@ Section ArgExtremum.
 
 Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 
-Definition arg_minnP := arg_minP.
-Definition arg_maxnP := arg_maxP.
-
 Lemma arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
 Proof. by apply: extremumP => //; apply: le_trans. Qed.
 
@@ -3675,6 +3730,10 @@ Proof. by apply: extremumP => //; [apply: ge_refl | apply: ge_trans]. Qed.
 End ArgExtremum.
 
 End TotalTheory.
+
+Arguments min_idPr {disp T x y}.
+Arguments max_idPl {disp T x y}.
+
 Section TotalMonotonyTheory.
 
 Context {disp : unit} {disp' : unit}.
@@ -5402,61 +5461,11 @@ Notation "><^l x" := (fun y => ~~ (>=<^l%O x y)) : order_scope.
 Notation "><^l x :> T" := (><^l (x : T)) (only parsing) : order_scope.
 Notation "x ><^l y" := (~~ (><^l%O x y)) : order_scope.
 
-Notation minlexi := (@meet lexi_display _).
-Notation maxlexi := (@join lexi_display _).
+Notation meetlexi := (@meet lexi_display _).
+Notation joinlexi := (@join lexi_display _).
 
-Notation "x `&^l` y" :=  (minlexi x y) : order_scope.
-Notation "x `|^l` y" := (maxlexi x y) : order_scope.
-
-Notation "\max^l_ ( i <- r | P ) F" :=
-  (\big[maxlexi/0]_(i <- r | P%B) F%O) : order_scope.
-Notation "\max^l_ ( i <- r ) F" :=
-  (\big[maxlexi/0]_(i <- r) F%O) : order_scope.
-Notation "\max^l_ ( i | P ) F" :=
-  (\big[maxlexi/0]_(i | P%B) F%O) : order_scope.
-Notation "\max^l_ i F" :=
-  (\big[maxlexi/0]_i F%O) : order_scope.
-Notation "\max^l_ ( i : I | P ) F" :=
-  (\big[maxlexi/0]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\max^l_ ( i : I ) F" :=
-  (\big[maxlexi/0]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\max^l_ ( m <= i < n | P ) F" :=
- (\big[maxlexi/0]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\max^l_ ( m <= i < n ) F" :=
- (\big[maxlexi/0]_(m <= i < n) F%O) : order_scope.
-Notation "\max^l_ ( i < n | P ) F" :=
- (\big[maxlexi/0]_(i < n | P%B) F%O) : order_scope.
-Notation "\max^l_ ( i < n ) F" :=
- (\big[maxlexi/0]_(i < n) F%O) : order_scope.
-Notation "\max^l_ ( i 'in' A | P ) F" :=
- (\big[maxlexi/0]_(i in A | P%B) F%O) : order_scope.
-Notation "\max^l_ ( i 'in' A ) F" :=
- (\big[maxlexi/0]_(i in A) F%O) : order_scope.
-
-Notation "\min^l_ ( i <- r | P ) F" :=
-  (\big[minlexi/1]_(i <- r | P%B) F%O) : order_scope.
-Notation "\min^l_ ( i <- r ) F" :=
-  (\big[minlexi/1]_(i <- r) F%O) : order_scope.
-Notation "\min^l_ ( i | P ) F" :=
-  (\big[minlexi/1]_(i | P%B) F%O) : order_scope.
-Notation "\min^l_ i F" :=
-  (\big[minlexi/1]_i F%O) : order_scope.
-Notation "\min^l_ ( i : I | P ) F" :=
-  (\big[minlexi/1]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\min^l_ ( i : I ) F" :=
-  (\big[minlexi/1]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\min^l_ ( m <= i < n | P ) F" :=
- (\big[minlexi/1]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\min^l_ ( m <= i < n ) F" :=
- (\big[minlexi/1]_(m <= i < n) F%O) : order_scope.
-Notation "\min^l_ ( i < n | P ) F" :=
- (\big[minlexi/1]_(i < n | P%B) F%O) : order_scope.
-Notation "\min^l_ ( i < n ) F" :=
- (\big[minlexi/1]_(i < n) F%O) : order_scope.
-Notation "\min^l_ ( i 'in' A | P ) F" :=
- (\big[minlexi/1]_(i in A | P%B) F%O) : order_scope.
-Notation "\min^l_ ( i 'in' A ) F" :=
- (\big[minlexi/1]_(i in A) F%O) : order_scope.
+Notation "x `&^l` y" :=  (meetlexi x y) : order_scope.
+Notation "x `|^l` y" := (joinlexi x y) : order_scope.
 
 End LexiSyntax.
 
@@ -6997,7 +7006,6 @@ Export BLatticeSyntax.
 Export TBLatticeSyntax.
 Export CBDistrLatticeSyntax.
 Export CTBDistrLatticeSyntax.
-Export TotalSyntax.
 Export DualSyntax.
 Export DvdSyntax.
 End Syntax.

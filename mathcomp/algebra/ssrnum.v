@@ -84,8 +84,7 @@ From mathcomp Require Import ssralg poly.
 (* and ><) and lattice operations (meet and join) defined in order.v are      *)
 (* redefined for the ring_display in the ring_scope (%R). 0-ary ordering      *)
 (* symbols for the ring_display have the suffix "%R", e.g., <%R. All the      *)
-(* other ordering notations are the same as order.v. The meet and join        *)
-(* operators for the ring_display are Num.min and Num.max.                    *)
+(* other ordering notations are the same as order.v.                          *)
 (*                                                                            *)
 (* Over these structures, we have the following operations                    *)
 (*             `|x| == norm of x.                                             *)
@@ -2877,6 +2876,24 @@ Proof.
 by move=> x_real; rewrite -[LHS]opprK real_oppr_min ?opprK ?real_maxrN ?realN.
 Qed.
 
+Section RealDomainArgExtremum.
+
+Context {I : finType} (i0 : I).
+Context (P : pred I) (F : I -> R) (Pi0 : P i0).
+Hypothesis F_real : {in P, forall i, F i \is real}.
+
+Lemma real_arg_minP : extremum_spec <=%R P F [arg min_(i < i0 | P i) F i].
+Proof.
+by apply: comparable_arg_minP => // i j iP jP; rewrite real_comparable ?F_real.
+Qed.
+
+Lemma real_arg_maxP : extremum_spec >=%R P F [arg max_(i > i0 | P i) F i].
+Proof.
+by apply: comparable_arg_maxP => // i j iP jP; rewrite real_comparable ?F_real.
+Qed.
+
+End RealDomainArgExtremum.
+
 (* norm *)
 
 Lemma real_ler_norm x : x \is real -> x <= `|x|.
@@ -3981,7 +3998,7 @@ Section MinMax.
 Lemma oppr_max : {morph -%R : x y / max x y >-> min x y : R}.
 Proof. by move=> x y; apply: real_oppr_max. Qed.
 
-Lemma oppr_min : {in real &, {morph -%R : x y / min x y >-> max x y : R}}.
+Lemma oppr_min : {morph -%R : x y / min x y >-> max x y : R}.
 Proof. by move=> x y; apply: real_oppr_min. Qed.
 
 Lemma addr_minl : @left_distributive R R +%R min.
@@ -5239,7 +5256,15 @@ Module Num.
 (* revert them in order to compile and commit.  This problem will be solved   *)
 (* in Coq 8.10.  See also: https://github.com/math-comp/math-comp/pull/270.   *)
 Export ssrnum.Num.
-Import ssrnum.Num.Def.
+
+Module Import Def.
+Export ssrnum.Num.Def.
+Definition minr {R : numDomainType} (x y : R) := if x <= y then x else y.
+Definition maxr {R : numDomainType} (x y : R) := if x <= y then y else x.
+End Def.
+
+Notation min := minr.
+Notation max := maxr.
 
 Module Import Syntax.
 Notation "`| x |" :=
@@ -5294,11 +5319,7 @@ Definition normr_lt0 x : `|x| < 0 = false := normr_lt0 x.
 Definition normr_gt0 x : (`|x| > 0) = (x != 0) := normr_gt0 x.
 Definition normrE := (normr_id, normr0, @normr1 R, @normrN1 R, normr_ge0,
                       normr_eq0, normr_lt0, normr_le0, normr_gt0, normrN).
-Definition minr x y := if x <= y then x else y.
-Definition maxr x y := if x <= y then y else x.
 End NumIntegralDomainTheory.
-Arguments minr {_}.
-Arguments maxr {_}.
 
 Section NumIntegralDomainMonotonyTheory.
 Variables R R' : numDomainType.
@@ -5611,13 +5632,10 @@ Variable R : realDomainType.
 Implicit Types x y z : R.
 Section MinMax.
 
-Let mrE x y : ((minr x y = min x y) * (maxr x y = max x y))%type.
+Let mrE x y : ((min x y = Order.min x y) * (maxr x y = Order.max x y))%type.
 Proof. by rewrite /minr /min /maxr /max; case: comparableP. Qed.
 Ltac mapply x := do ?[rewrite !mrE|apply: x|move=> ?].
 Ltac mexact x := by mapply x.
-
-Local Notation min := minr.
-Local Notation max := maxr.
 
 Lemma minrC : @commutative R R min. Proof. mexact @minC. Qed.
 Lemma minrr : @idempotent R min. Proof. mexact @minxx. Qed.
@@ -5672,8 +5690,8 @@ Definition lter_minl := (ler_minl, ltr_minl).
 Definition lter_maxr := (ler_maxr, ltr_maxr).
 Definition lter_maxl := (ler_maxl, ltr_maxl).
 
-Lemma minrK x y : max (min x y) x = x. Proof. mexact @minxK. Qed.
-Lemma minKr x y : min y (max x y) = y. Proof. mexact @maxKx. Qed.
+Lemma minrK x y : max (min x y) x = x. Proof. rewrite minrC; mexact @minxK. Qed.
+Lemma minKr x y : min y (max x y) = y. Proof. rewrite maxrC; mexact @maxKx. Qed.
 
 Lemma maxr_minl : @left_distributive R R max min. Proof. mexact @max_minl. Qed.
 Lemma maxr_minr : @right_distributive R R max min. Proof. mexact @max_minr. Qed.

@@ -1888,7 +1888,7 @@ Arguments bigmax_sup [I] i0 [P m F].
 Lemma bigmax_eq_arg (I : finType) i0 (P : pred I) F :
   P i0 -> \max_(i | P i) F i = F [arg max_(i > i0 | P i) F i].
 Proof.
-move=> Pi0; case: arg_maxP => //= i Pi maxFi.
+move=> Pi0; case: arg_maxnP => //= i Pi maxFi.
 by apply/eqP; rewrite eqn_leq leq_bigmax_cond // andbT; apply/bigmax_leqP.
 Qed.
 Arguments bigmax_eq_arg [I] i0 [P F].
@@ -1897,7 +1897,7 @@ Lemma eq_bigmax_cond (I : finType) (A : pred I) F :
   #|A| > 0 -> {i0 | i0 \in A & \max_(i in A) F i = F i0}.
 Proof.
 case: (pickP A) => [i0 Ai0 _ | ]; last by move/eq_card0->.
-by exists [arg max_(i > i0 in A) F i]; [case: arg_maxP | apply: bigmax_eq_arg].
+by exists [arg max_(i > i0 in A) F i]; [case: arg_maxnP | apply: bigmax_eq_arg].
 Qed.
 
 Lemma eq_bigmax (I : finType) F : #|I| > 0 -> {i0 : I | \max_i F i = F i0}.

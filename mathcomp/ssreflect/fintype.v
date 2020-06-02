@@ -1636,10 +1636,10 @@ Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat) (Pi0 : P i0).
 Definition arg_min := extremum leq i0 P F.
 Definition arg_max := extremum geq i0 P F.
 
-Lemma arg_minP : extremum_spec leq P F arg_min.
+Lemma arg_minnP : extremum_spec leq P F arg_min.
 Proof. by apply: extremumP => //; [apply: leq_trans|apply: leq_total]. Qed.
 
-Lemma arg_maxP : extremum_spec geq P F arg_max.
+Lemma arg_maxnP : extremum_spec geq P F arg_max.
 Proof.
 apply: extremumP => //; first exact: leqnn.
   by move=> n m p mn np; apply: leq_trans mn.
@@ -1649,6 +1649,13 @@ Qed.
 End ArgMinMax.
 
 End Extrema.
+
+Notation "@ 'arg_minP'" :=
+  (deprecate arg_minP arg_minnP) (at level 10, only parsing) : fun_scope.
+Notation arg_minP := (@arg_minP _ _ _) (only parsing).
+Notation "@ 'arg_maxP'" :=
+  (deprecate arg_maxP arg_maxnP) (at level 10, only parsing) : fun_scope.
+Notation arg_maxP := (@arg_maxP _ _ _) (only parsing).
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
