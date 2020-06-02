@@ -1,15 +1,19 @@
 {
-  nixpkgs ? (fetchTarball https://github.com/CohenCyril/nixpkgs/archive/mathcomp-1.11.tar.gz),
-  config ? (pkgs: {}),
+  nixpkgs ? (if builtins.pathExists ./nixpkgs.nix then import ./nixpkgs.nix
+             else fetchTarball https://github.com/CohenCyril/nixpkgs/archive/mathcomp-fix-rec.tar.gz),
+  config ? (if builtins.pathExists ./config.nix then import ./config.nix else {}),
   withEmacs ? false,
   print-env ? false,
-  package ? "mathcomp.single"
+  package ? (if builtins.pathExists ./package.nix then import ./package.nix else "mathcomp-fast"),
+  src ? (if builtins.pathExists ./package.nix then ./. else false)
 }:
 with builtins;
 let
   cfg-fun = if isFunction config then config else (pkgs: config);
-  pkgs = import nixpkgs {
-    config.packageOverrides = pkgs: with pkgs.lib;
+  pkg-src = if src == false then {}
+            else { ${if package == "mathcomp.single" then "mathcomp" else package} = src; };
+  pkgs = if isAttrs nixpkgs then nixpkgs else import nixpkgs {
+    overlays = [ (pkgs: super-pkgs: with pkgs.lib;
       let coqPackages = with pkgs; {
         "8.7" = coqPackages_8_7;
         "8.8" = coqPackages_8_8;
@@ -18,32 +22,59 @@ let
         "8.11" = coqPackages_8_11;
         "default" = coqPackages_8_10;
       }.${(cfg-fun pkgs).coq or "default"}.overrideScope'
-        (self: super:
+        (coqPackages: super-coqPackages:
           let
-            all-pkgs = pkgs // { coqPackages = self; };
-            cfg = { ${if package == "mathcomp.single" then "mathcomp" else package} = ./.; } // {
+            all-pkgs = pkgs // { inherit coqPackages; };
+            cfg = pkg-src // {
               mathcomp-fast = {
                 src = ./.;
-                propagatedBuildInputs = with self; ([ mathcomp ] ++ mathcomp-extra-fast);
+                propagatedBuildInputs = with coqPackages; ([ mathcomp ] ++ mathcomp-extra-fast);
               };
               mathcomp-full = {
                 src = ./.;
-                propagatedBuildInputs = with self; ([ mathcomp ] ++ mathcomp-extra-all);
+                propagatedBuildInputs = with coqPackages; ([ mathcomp ] ++ mathcomp-extra-all);
               };
             } // (cfg-fun all-pkgs);
           in {
-            # mathcomp-extra-config = lib.recursiveUpdate super.mathcomp-extra-config {
-            #   for-coq-and-mc.${self.coq.coq-version}.${self.mathcomp.version} =
-            #     removeAttrs cfg ["mathcomp" "coq"];
-            # };
-            mathcomp = if cfg?mathcomp then self.mathcomp_ cfg.mathcomp else super.mathcomp;
+            mathcomp-extra-config =
+              let mec = super-coqPackages.mathcomp-extra-config; in
+              lib.recursiveUpdate mec {
+                initial = {
+                  # fixing mathcomp analysis to depend on real-closed
+                  mathcomp-analysis = {version, coqPackages} @ args:
+                    let mca = mec.initial.mathcomp-analysis args; in
+                    mca // (
+                      if elem version [ "master" "cauchy_etoile" "holomorphy" ]
+                      then {
+                        propagatedBuildInputs = mca.propagatedBuildInputs ++
+                                                [coqPackages.mathcomp-real-closed];
+                      } else {});
+                };
+                for-coq-and-mc.${coqPackages.coq.coq-version}.${coqPackages.mathcomp.version} =
+                  (super-coqPackages.mathcomp-extra-config.${coqPackages.coq.coq-version}.${coqPackages.mathcomp.version} or {}) //
+                  (removeAttrs cfg [ "mathcomp" "coq" "mathcomp-fast" "mathcomp-full" ]);
+              };
+            mathcomp = if cfg?mathcomp then coqPackages.mathcomp_ cfg.mathcomp else super-coqPackages.mathcomp;
           } // mapAttrs
             (package: version: coqPackages.mathcomp-extra package version)
             (removeAttrs cfg ["mathcomp" "coq"])
         ); in {
           coqPackages = coqPackages.filterPackages coqPackages.coq coqPackages;
           coq = coqPackages.coq;
-        };
+          mc-clean = src: {
+            version = baseNameOf src;
+            src = cleanSourceWith {
+              src = cleanSource src;
+              filter = path: type: let baseName = baseNameOf (toString path); in ! (
+                hasSuffix ".aux" baseName ||
+                hasSuffix ".d" baseName ||
+                hasSuffix ".vo" baseName ||
+                hasSuffix ".glob" baseName ||
+                elem baseName ["Makefile.coq" "Makefile.coq.conf" ".mailmap" ".git"]
+              );
+            };
+          };
+        })];
   };
 
   mathcompnix = ./.;
@@ -57,10 +88,13 @@ let
       for x in $propagatedBuildInputs; do printf "  "; echo $x | cut -d "-" -f "2-"; done
       echo "you can pass option --arg config '{coq = \"x.y\"; math-comp = \"x.y.z\";}' to nix-shell to change coq and/or math-comp versions"
     }
+    printEnv () {
+      for x in $buildInputs; do echo $x; done
+      for x in $propagatedBuildInputs; do echo $x; done
+    }
     cachixEnv () {
       echo "Pushing environement to cachix"
-      for x in $buildInputs; do printf "  "; echo $x | cachix push math-comp; done
-      for x in $propagatedBuildInputs; do printf "  "; echo $x | cachix push math-comp; done
+      printEnv | cachix push math-comp
     }
     nixDefault () {
       cat $mathcompnix/default.nix
