@@ -49,3 +49,39 @@ Notation "[ 'rel' x y 'in' A ]" := [rel x y in A & A] (at level 0,
 Notation xrelpre := (fun f (r : rel _) x y => r (f x) (f y)).
 Definition relpre {T rT} (f : T -> rT)  (r : rel rT) :=
   [rel x y | r (f x) (f y)].
+
+Section HomoMonoMorphismFlip.
+Variables (aT rT : Type) (aR : rel aT) (rR : rel rT) (f : aT -> rT).
+Variable (aD aD' : {pred aT}).
+
+Lemma homo_sym : {homo f : x y / aR x y >-> rR x y} ->
+  {homo f : y x / aR x y >-> rR x y}.
+Proof. by move=> fR y x; apply: fR. Qed.
+
+Lemma mono_sym : {mono f : x y / aR x y >-> rR x y} ->
+  {mono f : y x / aR x y >-> rR x y}.
+Proof. by move=> fR y x; apply: fR. Qed.
+
+Lemma homo_sym_in : {in aD &, {homo f : x y / aR x y >-> rR x y}} ->
+  {in aD &, {homo f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+Lemma mono_sym_in : {in aD &, {mono f : x y / aR x y >-> rR x y}} ->
+  {in aD &, {mono f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+Lemma homo_sym_in11 : {in aD & aD', {homo f : x y / aR x y >-> rR x y}} ->
+  {in aD' & aD, {homo f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+Lemma mono_sym_in11 : {in aD & aD', {mono f : x y / aR x y >-> rR x y}} ->
+  {in aD' & aD, {mono f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+End HomoMonoMorphismFlip.
+Arguments homo_sym {aT rT} [aR rR f].
+Arguments mono_sym {aT rT} [aR rR f].
+Arguments homo_sym_in {aT rT} [aR rR f aD].
+Arguments mono_sym_in {aT rT} [aR rR f aD].
+Arguments homo_sym_in11 {aT rT} [aR rR f aD aD'].
+Arguments mono_sym_in11 {aT rT} [aR rR f aD aD'].
