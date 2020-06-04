@@ -86,7 +86,7 @@ Arguments mono_sym_in {aT rT} [aR rR f aD].
 Arguments homo_sym_in11 {aT rT} [aR rR f aD aD'].
 Arguments mono_sym_in11 {aT rT} [aR rR f aD aD'].
 
-Section onW_can.
+Section CancelOn.
 
 Variables (aT rT : predArgType) (aD : {pred aT}) (rD : {pred rT}).
 Variables (f : aT -> rT) (g : rT -> aT).
@@ -100,24 +100,24 @@ Proof. by move=> fgK x xrD xaD; apply: fgK. Qed.
 Lemma in_onW_can : cancel g f -> {in rD, {on aD, cancel g & f}}.
 Proof. by move=> fgK x xrD xaD; apply: fgK. Qed.
 
-Lemma onT_can : (forall x, g x \in aD) -> {on aD, cancel g & f} -> cancel g f.
+Lemma onS_can : (forall x, g x \in aD) -> {on aD, cancel g & f} -> cancel g f.
 Proof. by move=> mem_g fgK x; apply: fgK. Qed.
 
-Lemma onT_can_in : {homo g : x / x \in rD >-> x \in aD} ->
+Lemma onS_can_in : {homo g : x / x \in rD >-> x \in aD} ->
   {in rD, {on aD, cancel g & f}} -> {in rD, cancel g f}.
 Proof. by move=> mem_g fgK x x_rD; apply/fgK/mem_g. Qed.
 
-Lemma in_onT_can : (forall x, g x \in aD) ->
+Lemma in_onS_can : (forall x, g x \in aD) ->
   {in rT, {on aD, cancel g & f}} -> cancel g f.
 Proof. by move=> mem_g fgK x; apply/fgK. Qed.
 
-End onW_can.
+End CancelOn.
 Arguments onW_can {aT rT} aD {f g}.
 Arguments onW_can_in {aT rT} aD {rD f g}.
 Arguments in_onW_can {aT rT} aD rD {f g}.
-Arguments onT_can {aT rT} aD {f g}.
-Arguments onW_can_in {aT rT} aD {rD f g}.
-Arguments in_onT_can {aT rT} aD {f g}.
+Arguments onS_can {aT rT} aD {f g}.
+Arguments onS_can_in {aT rT} aD {rD f g}.
+Arguments in_onS_can {aT rT} aD {f g}.
 
 Section MonoHomoMorphismTheory_in.
 
@@ -173,18 +173,17 @@ Section inj_can_sym_in_on.
 Variables (aT rT : predArgType) (aD : {pred aT}) (rD : {pred rT}).
 Variables (f : aT -> rT) (g : rT -> aT).
 
-Lemma inj_can_sym_in_on : {homo f : x / x \in aD >-> x \in rD} ->
-  {in aD, {on rD, cancel f & g}} ->
-  {in [pred x | x \in rD & g x \in aD], injective g} ->
-  {in rD, {on aD, cancel g & f}}.
+Lemma inj_can_sym_in_on :
+    {homo f : x / x \in aD >-> x \in rD} -> {in aD, {on rD, cancel f & g}} ->
+  {in rD &, {on aD &, injective g}} -> {in rD, {on aD, cancel g & f}}.
 Proof. by move=> fD fK gI x x_rD gx_aD; apply: gI; rewrite ?inE ?fK ?fD. Qed.
 
 Lemma inj_can_sym_on : {in aD, cancel f g} ->
-  {in [pred x | g x \in aD], injective g} -> {on aD, cancel g & f}.
+  {on aD &, injective g} -> {on aD, cancel g & f}.
 Proof. by move=> fK gI x gx_aD; apply: gI; rewrite ?inE ?fK. Qed.
 
 Lemma inj_can_sym_in : {homo f \o g : x / x \in rD} -> {on rD, cancel f & g} ->
-  {in rD, injective g} ->  {in rD, cancel g f}.
+  {in rD &, injective g} ->  {in rD, cancel g f}.
 Proof. by move=> fgD fK gI x x_rD; apply: gI; rewrite ?fK ?fgD. Qed.
 
 End inj_can_sym_in_on.
