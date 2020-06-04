@@ -65,9 +65,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrbool.v`
   + lemmas about the `cancel` predicate and `{in _, _}`/`{on _, _}` notations:
     * `onW_can`, `onW_can_in`, `in_onW_can`, `onT_can`, `onT_can_in`, `in_onT_can`
-  + lemmas about monotone functions and the `{in _, _}` notation:
-    * `homoRL_in`, `homoLR_in`, `homo_mono_in`, `monoLR_in`, `monoRL_in`,
-      `can_mono_in`
   + lemmas about the `cancel` predicate and injective functions:
     * `inj_can_sym_in_on`, `inj_can_sym_on`, `inj_can_sym_in`
 
@@ -106,6 +103,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lexU` -> `le_maxr`
   + `ltxU` -> `lt_maxr`
   + `lexU` -> `le_maxr`
+
+- in `ssrbool.v`
+  + lemmas about monotone functions and the `{in _, _}` notation:
+    * `homoRL_in`, `homoLR_in`, `homo_mono_in`, `monoLR_in`, `monoRL_in`, `can_mono_in`
 
 ### Renamed
 
