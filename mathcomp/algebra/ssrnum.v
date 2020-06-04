@@ -2924,10 +2924,10 @@ Proof. by move=> ?; rewrite real_ltr_distl // => /andP[]. Qed.
 Lemma real_ler_distl_addr x y e : x - y \is real -> `|x - y| <= e -> x <= y + e.
 Proof. by move=> ?; rewrite real_ler_distl // => /andP[]. Qed.
 
-Lemma real_ltr_distl_addrC x y e : x - y \is real -> `|x - y| < e -> y < x + e.
+Lemma real_ltr_distlC_addr x y e : x - y \is real -> `|x - y| < e -> y < x + e.
 Proof. by rewrite realBC (distrC x) => ? /real_ltr_distl_addr; apply. Qed.
 
-Lemma real_ler_distl_addrC x y e : x - y \is real -> `|x - y| <= e -> y <= x + e.
+Lemma real_ler_distlC_addr x y e : x - y \is real -> `|x - y| <= e -> y <= x + e.
 Proof. by rewrite realBC distrC => ? /real_ler_distl_addr; apply. Qed.
 
 Lemma real_ltr_distl_subl x y e : x - y \is real -> `|x - y| < e -> x - e < y.
@@ -2936,10 +2936,10 @@ Proof. by move/real_ltr_distl_addr; rewrite ltr_sub_addr; apply. Qed.
 Lemma real_ler_distl_subl x y e : x - y \is real -> `|x - y| <= e -> x - e <= y.
 Proof. by move/real_ler_distl_addr; rewrite ler_sub_addr; apply. Qed.
 
-Lemma real_ltr_distl_sublC x y e : x - y \is real -> `|x - y| < e -> y - e < x.
+Lemma real_ltr_distlC_subl x y e : x - y \is real -> `|x - y| < e -> y - e < x.
 Proof. by rewrite realBC distrC => ? /real_ltr_distl_subl; apply. Qed.
 
-Lemma real_ler_distl_sublC x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
+Lemma real_ler_distlC_subl x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
 Proof. by rewrite realBC distrC => ? /real_ler_distl_subl; apply. Qed.
 
 (* GG: pointless duplication }-( *)
@@ -3804,11 +3804,11 @@ Proof. exact: real_ltr_distl_addr. Qed.
 Lemma ler_distl_addr x y e : `|x - y| <= e -> x <= y + e.
 Proof. exact: real_ler_distl_addr. Qed.
 
-Lemma ltr_distl_addrC x y e : `|x - y| < e -> y < x + e.
-Proof. exact: real_ltr_distl_addrC. Qed.
+Lemma ltr_distlC_addr x y e : `|x - y| < e -> y < x + e.
+Proof. exact: real_ltr_distlC_addr. Qed.
 
-Lemma ler_distl_addrC x y e : `|x - y| <= e -> y <= x + e.
-Proof. exact: real_ler_distl_addrC. Qed.
+Lemma ler_distlC_addr x y e : `|x - y| <= e -> y <= x + e.
+Proof. exact: real_ler_distlC_addr. Qed.
 
 Lemma ltr_distl_subl x y e : `|x - y| < e -> x - e < y.
 Proof. exact: real_ltr_distl_subl. Qed.
@@ -3816,11 +3816,11 @@ Proof. exact: real_ltr_distl_subl. Qed.
 Lemma ler_distl_subl x y e : `|x - y| <= e -> x - e <= y.
 Proof. exact: real_ler_distl_subl. Qed.
 
-Lemma ltr_distl_sublC x y e : `|x - y| < e -> y - e < x.
-Proof. exact: real_ltr_distl_sublC. Qed.
+Lemma ltr_distlC_subl x y e : `|x - y| < e -> y - e < x.
+Proof. exact: real_ltr_distlC_subl. Qed.
 
-Lemma ler_distl_subrC x y e : `|x - y| <= e -> y - e <= x.
-Proof. exact: real_ler_distl_sublC. Qed.
+Lemma ler_distlC_subr x y e : `|x - y| <= e -> y - e <= x.
+Proof. exact: real_ler_distlC_subl. Qed.
 
 Lemma exprn_even_ge0 n x : ~~ odd n -> 0 <= x ^+ n.
 Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
