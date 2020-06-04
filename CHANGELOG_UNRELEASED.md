@@ -49,6 +49,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `finset.v`, new lemmas: `mem_imset_eq`, `mem_imset2_eq`.
   These lemmas will lose the `_eq` suffix in the next release, when the shortende names will become available (cf. Renamed section)
 
+- in `ssrbool.v`
+  + generic lemmas about interaction between `{in _, _}` and `{on _,  _}`:
+    `in_on1P`, `in_on1lP`, `in_on2P`, `on1W_in`, `on1lW_in`, `on2W_in`,
+    `in_on1W`, `in_on1lW`, `in_on2W`, `on1S`, `on1lS`, `on2S`,
+    `on1S_in`, `on1lS_in`, `on2S_in`, `in_on1S`, `in_on1lS`, `in_on2S`.
+
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
 
