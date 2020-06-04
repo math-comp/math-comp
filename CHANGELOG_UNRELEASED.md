@@ -11,10 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - in `ssrnum.v`, new lemmas:
-  + `gt_norm_eqF`
-  + `{real_,}gtr_norm`, `{real_,}gtrNnorm`, `{real_,}ger_norm`, `{real_,}gerNnorm`
-  + `{real_,}ltr_dist_addl`, `{real_,}ler_dist_addl`, `{real_,}ltr_distr_addl`, `{real_,}ler_distr_addl`,
-    `{real_,}ltr_dist_subl`, `{real_,}ler_dist_subl`, `{real_,}ltr_distr_subr`, `{real_,}ler_distr_subr`
+  + `{real_,}ltr_normlW`, `{real_,}ltrNnormlW`, `{real_,}ler_normlW`, `{real_,}lerNnormlW`
+  + `{real_,}ltr_distl_addr`, `{real_,}ler_distl_addr`, `{real_,}ltr_distl_addrC`, `{real_,}ler_distl_addrC`,
+    `{real_,}ltr_distl_subl`, `{real_,}ler_distl_subl`, `{real_,}ltr_distl_sublC`, `{real_,}ler_distl_sublC`
 
 ### Changed
 

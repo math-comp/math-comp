@@ -2896,16 +2896,16 @@ Qed.
 
 Definition real_lter_normr := (real_ler_normr, real_ltr_normr).
 
-Lemma real_gtr_norm x y : x \is real -> `|x| < y -> x < y.
+Lemma real_ltr_normlW x y : x \is real -> `|x| < y -> x < y.
 Proof. by move=> ?; case/real_ltr_normlP. Qed.
 
-Lemma real_gtrNnorm x y : x \is real -> `|x| < y -> - y < x.
+Lemma real_ltrNnormlW x y : x \is real -> `|x| < y -> - y < x.
 Proof. by move=> ?; case/real_ltr_normlP => //; rewrite ltr_oppl. Qed.
 
-Lemma real_ger_norm x y : x \is real -> `|x| <= y -> x <= y.
+Lemma real_ler_normlW x y : x \is real -> `|x| <= y -> x <= y.
 Proof. by move=> ?; case/real_ler_normlP. Qed.
 
-Lemma real_gerNnorm x y : x \is real -> `|x| <= y -> - y <= x.
+Lemma real_lerNnormlW x y : x \is real -> `|x| <= y -> - y <= x.
 Proof. by move=> ?; case/real_ler_normlP => //; rewrite ler_oppl. Qed.
 
 Lemma real_ler_distl x y e :
@@ -2918,29 +2918,29 @@ Proof. by move=> Rxy; rewrite real_lter_norml // !lter_sub_addl. Qed.
 
 Definition real_lter_distl := (real_ler_distl, real_ltr_distl).
 
-Lemma real_ltr_dist_addl x y e : x - y \is real -> `|x - y| < e -> x < y + e.
+Lemma real_ltr_distl_addr x y e : x - y \is real -> `|x - y| < e -> x < y + e.
 Proof. by move=> ?; rewrite real_ltr_distl // => /andP[]. Qed.
 
-Lemma real_ler_dist_addl x y e : x - y \is real -> `|x - y| <= e -> x <= y + e.
+Lemma real_ler_distl_addr x y e : x - y \is real -> `|x - y| <= e -> x <= y + e.
 Proof. by move=> ?; rewrite real_ler_distl // => /andP[]. Qed.
 
-Lemma real_ltr_distr_addl x y e : x - y \is real -> `|x - y| < e -> y < x + e.
-Proof. by rewrite realBC (distrC x) => ? /real_ltr_dist_addl; apply. Qed.
+Lemma real_ltr_distl_addrC x y e : x - y \is real -> `|x - y| < e -> y < x + e.
+Proof. by rewrite realBC (distrC x) => ? /real_ltr_distl_addr; apply. Qed.
 
-Lemma real_ler_distr_addl x y e : x - y \is real -> `|x - y| <= e -> y <= x + e.
-Proof. by rewrite realBC distrC => ? /real_ler_dist_addl; apply. Qed.
+Lemma real_ler_distl_addrC x y e : x - y \is real -> `|x - y| <= e -> y <= x + e.
+Proof. by rewrite realBC distrC => ? /real_ler_distl_addr; apply. Qed.
 
-Lemma real_ltr_dist_subl x y e : x - y \is real -> `|x - y| < e -> x - e < y.
-Proof. by move/real_ltr_dist_addl; rewrite ltr_sub_addr; apply. Qed.
+Lemma real_ltr_distl_subl x y e : x - y \is real -> `|x - y| < e -> x - e < y.
+Proof. by move/real_ltr_distl_addr; rewrite ltr_sub_addr; apply. Qed.
 
-Lemma real_ler_dist_subl x y e : x - y \is real -> `|x - y| <= e -> x - e <= y.
-Proof. by move/real_ler_dist_addl; rewrite ler_sub_addr; apply. Qed.
+Lemma real_ler_distl_subl x y e : x - y \is real -> `|x - y| <= e -> x - e <= y.
+Proof. by move/real_ler_distl_addr; rewrite ler_sub_addr; apply. Qed.
 
-Lemma real_ltr_distr_subr x y e : x - y \is real -> `|x - y| < e -> y - e < x.
-Proof. by rewrite realBC distrC => ? /real_ltr_dist_subl; apply. Qed.
+Lemma real_ltr_distl_sublC x y e : x - y \is real -> `|x - y| < e -> y - e < x.
+Proof. by rewrite realBC distrC => ? /real_ltr_distl_subl; apply. Qed.
 
-Lemma real_ler_distr_subr x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
-Proof. by rewrite realBC distrC => ? /real_ler_dist_subl; apply. Qed.
+Lemma real_ler_distl_sublC x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
+Proof. by rewrite realBC distrC => ? /real_ler_distl_subl; apply. Qed.
 
 (* GG: pointless duplication }-( *)
 Lemma eqr_norm_id x : (`|x| == x) = (0 <= x). Proof. by rewrite ger0_def. Qed.
@@ -3774,59 +3774,53 @@ Lemma ltr_normlP x y : reflect ((-x < y) * (x < y)) (`|x| < y).
 Proof. exact: real_ltr_normlP. Qed.
 Arguments ltr_normlP {x y}.
 
-Lemma gtr_norm x y : `|x| < y -> x < y. Proof. exact: real_gtr_norm. Qed.
+Lemma ltr_normlW x y : `|x| < y -> x < y. Proof. exact: real_ltr_normlW. Qed.
 
-Lemma gtrNnorm x y : `|x| < y -> - y < x. Proof. exact: real_gtrNnorm. Qed.
+Lemma ltrNnormlW x y : `|x| < y -> - y < x. Proof. exact: real_ltrNnormlW. Qed.
 
-Lemma ger_norm x y : `|x| <= y -> x <= y. Proof. exact: real_ger_norm. Qed.
+Lemma ler_normlW x y : `|x| <= y -> x <= y. Proof. exact: real_ler_normlW. Qed.
 
-Lemma gerNnorm x y : `|x| <= y -> - y <= x. Proof. exact: real_gerNnorm. Qed.
+Lemma lerNnormlW x y : `|x| <= y -> - y <= x. Proof. exact: real_lerNnormlW. Qed.
 
 Lemma ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y).
-Proof. by rewrite leNgt ltr_norml negb_and -!leNgt orbC ler_oppr. Qed.
+Proof. exact: real_ler_normr. Qed.
 
 Lemma ltr_normr x y : (x < `|y|) = (x < y) || (x < - y).
-Proof. by rewrite ltNge ler_norml negb_and -!ltNge orbC ltr_oppr. Qed.
+Proof. exact: real_ltr_normr. Qed.
 
 Definition lter_normr := (ler_normr, ltr_normr).
 
 Lemma ler_distl x y e : (`|x - y| <= e) = (y - e <= x <= y + e).
-Proof. by rewrite lter_norml !lter_sub_addl. Qed.
+Proof. exact: real_ler_distl. Qed.
 
 Lemma ltr_distl x y e : (`|x - y| < e) = (y - e < x < y + e).
-Proof. by rewrite lter_norml !lter_sub_addl. Qed.
+Proof. exact: real_ltr_distl. Qed.
 
 Definition lter_distl := (ler_distl, ltr_distl).
 
-Lemma ltr_dist_addl x y e : `|x - y| < e -> x < y + e.
-Proof. exact: real_ltr_dist_addl. Qed.
+Lemma ltr_distl_addr x y e : `|x - y| < e -> x < y + e.
+Proof. exact: real_ltr_distl_addr. Qed.
 
-Lemma ler_dist_addl x y e : `|x - y| <= e -> x <= y + e.
-Proof. exact: real_ler_dist_addl. Qed.
+Lemma ler_distl_addr x y e : `|x - y| <= e -> x <= y + e.
+Proof. exact: real_ler_distl_addr. Qed.
 
-Lemma ltr_distr_addl x y e : `|x - y| < e -> y < x + e.
-Proof. exact: real_ltr_distr_addl. Qed.
+Lemma ltr_distl_addrC x y e : `|x - y| < e -> y < x + e.
+Proof. exact: real_ltr_distl_addrC. Qed.
 
-Lemma ler_distr_addl x y e : `|x - y| <= e -> y <= x + e.
-Proof. exact: real_ler_distr_addl. Qed.
+Lemma ler_distl_addrC x y e : `|x - y| <= e -> y <= x + e.
+Proof. exact: real_ler_distl_addrC. Qed.
 
-Lemma ltr_dist_subl x y e : `|x - y| < e -> x - e < y.
-Proof. exact: real_ltr_dist_subl. Qed.
+Lemma ltr_distl_subl x y e : `|x - y| < e -> x - e < y.
+Proof. exact: real_ltr_distl_subl. Qed.
 
-Lemma ler_dist_subl x y e : `|x - y| <= e -> x - e <= y.
-Proof. exact: real_ler_dist_subl. Qed.
+Lemma ler_distl_subl x y e : `|x - y| <= e -> x - e <= y.
+Proof. exact: real_ler_distl_subl. Qed.
 
-Lemma ltr_distr_subr x y e : `|x - y| < e -> y - e < x.
-Proof. exact: real_ltr_distr_subr. Qed.
+Lemma ltr_distl_sublC x y e : `|x - y| < e -> y - e < x.
+Proof. exact: real_ltr_distl_sublC. Qed.
 
-Lemma ler_distr_subr x y e : `|x - y| <= e -> y - e <= x.
-Proof. exact: real_ler_distr_subr. Qed.
-
-Lemma gt_norm_eqF (x y : R) : `|x| < y -> (x == - y = false) * (x == y = false).
-Proof.
-move=> x1; split; last by rewrite lt_eqF // (le_lt_trans (ler_norm _) x1).
-by move: x1; rewrite ltr_norml => /andP[? ?]; rewrite gt_eqF.
-Qed.
+Lemma ler_distl_subrC x y e : `|x - y| <= e -> y - e <= x.
+Proof. exact: real_ler_distl_sublC. Qed.
 
 Lemma exprn_even_ge0 n x : ~~ odd n -> 0 <= x ^+ n.
 Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
