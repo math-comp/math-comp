@@ -124,7 +124,9 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `g` -- a group argument.
   - `I` -- left/right injectivity, as in `addbI : right_injective addb.`
         -- alternatively predicate or set intersection, as in `predI.`
-  - `l` -- the left-hand of an operation, as in `andb_orl : left_distributive andb orb.`
+  - `l` -- the left-hand of an operation, as in
+    + `andb_orl : left_distributive andb orb.`
+    + ``ltr_norml x y : (`|x| < y) = (- y < x < y).``
   - `L` -- the left-hand of a relation, as in `ltn_subrL : n - m < n = (0 < m) && (0 < n).`
   - `LR` -- moving an operator from the left-hand to the right-hand of an relation, as in `leq_subLR : (m - n <= p) = (m <= n + p).`
   - `N` or `n` -- boolean negation, as in `andbN : a && (~~ a) = false.`
@@ -132,8 +134,10 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `N` -- alternatively ring negation, as in `mulNr : (- x) * y = - (x * y).`
   - `P` -- a characteristic property, often a reflection lemma, as in
      `andP : reflect (a /\ b) (a && b)`.
-  - `r` -- a right-hand operation, as `orb_andr : right_distributive orb andb.`
-      -- alternatively, it is a ring argument.
+  - `r` -- a right-hand operation, as in
+    + `orb_andr : right_distributive orb andb.`
+    + ``ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y).``
+    + alternatively, it is a ring argument.
   - `R` -- the right-hand of a relation, as in `ltn_subrR : n < n - m = false`.
   - `RL` -- moving an operator from the right-hand to the left-hand of an relation, as in `ltn_subRL : (n < p - m) = (m + n < p).`
   - `T` or `t` -- boolean truth, as in `andbT: right_id true andb.`
