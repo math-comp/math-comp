@@ -27,21 +27,17 @@ installation instructions in other scenarios.
 ## How to get help
 
 - The [website](http://math-comp.github.io/math-comp/) of the MathComp library
-  contains links to the HTML documentation of each file.
-- The [ssreflect mailing
-  list](https://sympa.inria.fr/sympa/info/ssreflect) is the primary
+  contains:
+  + links to the [HTML documentation of each file](https://math-comp.github.io/htmldoc/index.html)
+  + a list of [tutorials](https://math-comp.github.io/documentation.html)
+- The [ssreflect mailing list](https://sympa.inria.fr/sympa/info/ssreflect) is the primary
   venue for help and questions about the library.
 - The [Mathematical Components Book](https://math-comp.github.io/mcb/)
   provides a comprehensive introduction to the library.
-- The [MathComp wiki](https://github.com/math-comp/math-comp/wiki)
-  contains many useful information, including a list of
-  [tutorials](https://github.com/math-comp/math-comp/wiki/tutorials).
 - Experienced users hang around at
   [StackOverflow](https://stackoverflow.com/questions/tagged/ssreflect)
   listening to the `ssreflect` and `coq` tags.
 
 ## Publications and Tools using MathComp
 
-A collection of [papers](https://github.com/math-comp/math-comp/wiki/Publications) 
-using the Mathematical Components library can be found on the
-[wiki](https://github.com/math-comp/math-comp/wiki).
+[A collection of papers using the Mathematical Components library](https://math-comp.github.io/papers.html)
