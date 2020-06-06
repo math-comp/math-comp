@@ -1007,108 +1007,6 @@ Notation "'exists_in_ view" := (exists_inPP _ (fun _ => view))
 Notation "'forall_in_ view" := (forall_inPP _ (fun _ => view))
   (at level 4, right associativity, format "''forall_in_' view").
 
-Section Extrema.
-
-Variant extremum_spec {T : eqType} (ord : rel T) {I : finType}
-  (P : pred I) (F : I -> T) : I -> Type :=
-  ExtremumSpec (i : I) of P i & (forall j : I, P j -> ord (F i) (F j)) :
-                   extremum_spec ord P F i.
-
-Let arg_pred {T : eqType} ord {I : finType} (P : pred I) (F : I -> T) :=
-  [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
-
-Section Extremum.
-
-Context {T : eqType} {I : finType} (ord : rel T).
-Context (i0 : I) (P : pred I) (F : I -> T).
-
-Hypothesis ord_refl : reflexive ord.
-Hypothesis ord_trans : transitive ord.
-Hypothesis ord_total : total ord.
-
-Definition extremum := odflt i0 (pick (arg_pred ord P F)).
-
-Hypothesis Pi0 : P i0.
-
-Lemma extremumP : extremum_spec ord P F extremum.
-Proof.
-rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
-  by split=> // j; apply/implyP.
-have := sort_sorted ord_total [seq F i | i <- enum P].
-set s := sort _ _ => ss; have s_gt0 : size s > 0
-   by rewrite size_sort size_map -cardE; apply/card_gt0P; exists i0.
-pose t0 := nth (F i0) s 0; have: t0 \in s by rewrite mem_nth.
-rewrite mem_sort => /mapP/sig2_eqW[it0]; rewrite mem_enum => it0P def_t0.
-have /negP[/=] := no_i it0; rewrite [P _]it0P/=; apply/'forall_implyP=> j Pj.
-have /(nthP (F i0))[k g_lt <-] : F j \in s by rewrite mem_sort map_f ?mem_enum.
-by rewrite -def_t0 sorted_le_nth.
-Qed.
-
-End Extremum.
-
-Notation "[ 'arg[' ord ]_( i < i0 | P ) F ]" :=
-    (extremum ord i0 (fun i => P%B) (fun i => F))
-  (at level 0, ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0  |  P )  F ]") : nat_scope.
-
-Notation "[ 'arg[' ord ]_( i < i0 'in' A ) F ]" :=
-    [arg[ord]_(i < i0 | i \in A) F]
-  (at level 0, ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : nat_scope.
-
-Notation "[ 'arg[' ord ]_( i < i0 ) F ]" := [arg[ord]_(i < i0 | true) F]
-  (at level 0, ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : nat_scope.
-
-Section ArgMinMax.
-
-Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat) (Pi0 : P i0).
-
-Definition arg_min := extremum leq i0 P F.
-Definition arg_max := extremum geq i0 P F.
-
-Lemma arg_minP : extremum_spec leq P F arg_min.
-Proof. by apply: extremumP => //; [apply: leq_trans|apply: leq_total]. Qed.
-
-Lemma arg_maxP : extremum_spec geq P F arg_max.
-Proof.
-apply: extremumP => //; first exact: leqnn.
-  by move=> n m p mn np; apply: leq_trans mn.
-by move=> ??; apply: leq_total.
-Qed.
-
-End ArgMinMax.
-
-End Extrema.
-
-Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
-    (arg_min i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : nat_scope.
-
-Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
-    [arg min_(i < i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : nat_scope.
-
-Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : nat_scope.
-
-Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
-     (arg_max i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : nat_scope.
-
-Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
-    [arg max_(i > i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : nat_scope.
-
-Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : nat_scope.
-
 (**********************************************************************)
 (*                                                                    *)
 (*  Boolean injectivity test for functions with a finType domain      *)
@@ -1614,6 +1512,20 @@ Definition adhoc_seq_sub_finType :=
 
 End SeqSubType.
 
+Section SeqReplace.
+Variables (T : eqType).
+Implicit Types (s : seq T).
+
+Lemma seq_sub_default s : size s > 0 -> seq_sub s.
+Proof. by case: s => // x s _; exists x; rewrite mem_head. Qed.
+
+Lemma seq_subE s (s_gt0 : size s > 0) :
+  s = map val (map (insubd (seq_sub_default s_gt0)) s : seq (seq_sub s)).
+Proof. by rewrite -map_comp map_id_in// => x x_in_s /=; rewrite insubdK. Qed.
+
+End SeqReplace.
+Notation in_sub_seq s_gt0 := (insubd (seq_sub_default s_gt0)).
+
 Section SeqFinType.
 
 Variables (T : choiceType) (s : seq T).
@@ -1634,6 +1546,144 @@ Qed.
 
 End SeqFinType.
 
+Section Extrema.
+
+Variant extremum_spec {T : eqType} (ord : rel T) {I : finType}
+  (P : pred I) (F : I -> T) : I -> Type :=
+  ExtremumSpec (i : I) of P i & (forall j : I, P j -> ord (F i) (F j)) :
+                   extremum_spec ord P F i.
+
+Let arg_pred {T : eqType} ord {I : finType} (P : pred I) (F : I -> T) :=
+  [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
+
+Section Extremum.
+
+Context {T : eqType} {I : finType} (ord : rel T).
+Context (i0 : I) (P : pred I) (F : I -> T).
+
+Definition extremum := odflt i0 (pick (arg_pred ord P F)).
+
+Hypothesis ord_refl : reflexive ord.
+Hypothesis ord_trans : transitive ord.
+Hypothesis ord_total : total ord.
+Hypothesis Pi0 : P i0.
+
+Lemma extremumP : extremum_spec ord P F extremum.
+Proof.
+rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
+  by split=> // j; apply/implyP.
+have := sort_sorted ord_total [seq F i | i <- enum P].
+set s := sort _ _ => ss; have s_gt0 : size s > 0
+   by rewrite size_sort size_map -cardE; apply/card_gt0P; exists i0.
+pose t0 := nth (F i0) s 0; have: t0 \in s by rewrite mem_nth.
+rewrite mem_sort => /mapP/sig2_eqW[it0]; rewrite mem_enum => it0P def_t0.
+have /negP[/=] := no_i it0; rewrite [P _]it0P/=; apply/'forall_implyP=> j Pj.
+have /(nthP (F i0))[k g_lt <-] : F j \in s by rewrite mem_sort map_f ?mem_enum.
+by rewrite -def_t0 sorted_le_nth.
+Qed.
+
+End Extremum.
+
+Section ExtremumIn.
+
+Context {T : eqType} {I : finType} (ord : rel T).
+Context (i0 : I) (P : pred I) (F : I -> T).
+
+Hypothesis ord_refl : {in P, reflexive (relpre F ord)}.
+Hypothesis ord_trans : {in P & P & P, transitive (relpre F ord)}.
+Hypothesis ord_total : {in P &, total (relpre F ord)}.
+Hypothesis Pi0 : P i0.
+
+Lemma extremum_inP : extremum_spec ord P F (extremum ord i0 P F).
+Proof.
+rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
+  by split=> // j; apply/implyP.
+pose TP := seq_sub [seq F i | i <- enum P].
+have FPP (iP : {i | P i}) : F (proj1_sig iP) \in [seq F i | i <- enum P].
+  by rewrite map_f// mem_enum; apply: valP.
+pose FP := SeqSub (FPP _).
+have []//= := @extremumP _ _ (relpre val ord) (exist P i0 Pi0) xpredT FP.
+- by move=> [/= _/mapP[i iP ->]]; apply: ord_refl; rewrite mem_enum in iP.
+- move=> [/= _/mapP[j jP ->]] [/= _/mapP[i iP ->]] [/= _/mapP[k kP ->]].
+  by apply: ord_trans; rewrite !mem_enum in iP jP kP.
+- move=> [/= _/mapP[i iP ->]] [/= _/mapP[j jP ->]].
+  by apply: ord_total; rewrite !mem_enum in iP jP.
+- rewrite /FP => -[/= i Pi] _ /(_ (exist _ _ _))/= ordF.
+  have /negP/negP/= := no_i i; rewrite Pi/= negb_forall => /existsP/sigW[j].
+  by rewrite negb_imply => /andP[Pj]; rewrite ordF.
+Qed.
+
+End ExtremumIn.
+
+Notation "[ 'arg[' ord ]_( i < i0 | P ) F ]" :=
+    (extremum ord i0 (fun i => P%B) (fun i => F))
+  (at level 0, ord, i, i0 at level 10,
+   format "[ 'arg[' ord ]_( i  <  i0  |  P )  F ]") : nat_scope.
+
+Notation "[ 'arg[' ord ]_( i < i0 'in' A ) F ]" :=
+    [arg[ord]_(i < i0 | i \in A) F]
+  (at level 0, ord, i, i0 at level 10,
+   format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : nat_scope.
+
+Notation "[ 'arg[' ord ]_( i < i0 ) F ]" := [arg[ord]_(i < i0 | true) F]
+  (at level 0, ord, i, i0 at level 10,
+   format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : nat_scope.
+
+Section ArgMinMax.
+
+Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat) (Pi0 : P i0).
+
+Definition arg_min := extremum leq i0 P F.
+Definition arg_max := extremum geq i0 P F.
+
+Lemma arg_minnP : extremum_spec leq P F arg_min.
+Proof. by apply: extremumP => //; [apply: leq_trans|apply: leq_total]. Qed.
+
+Lemma arg_maxnP : extremum_spec geq P F arg_max.
+Proof.
+apply: extremumP => //; first exact: leqnn.
+  by move=> n m p mn np; apply: leq_trans mn.
+by move=> ??; apply: leq_total.
+Qed.
+
+End ArgMinMax.
+
+End Extrema.
+
+Notation "@ 'arg_minP'" :=
+  (deprecate arg_minP arg_minnP) (at level 10, only parsing) : fun_scope.
+Notation arg_minP := (@arg_minP _ _ _) (only parsing).
+Notation "@ 'arg_maxP'" :=
+  (deprecate arg_maxP arg_maxnP) (at level 10, only parsing) : fun_scope.
+Notation arg_maxP := (@arg_maxP _ _ _) (only parsing).
+
+Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
+    (arg_min i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : nat_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
+    [arg min_(i < i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : nat_scope.
+
+Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : nat_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
+     (arg_max i0 (fun i => P%B) (fun i => F))
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : nat_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
+    [arg max_(i > i0 | i \in A) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : nat_scope.
+
+Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
+  (at level 0, i, i0 at level 10,
+   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : nat_scope.
 
 (**********************************************************************)
 (*                                                                    *)

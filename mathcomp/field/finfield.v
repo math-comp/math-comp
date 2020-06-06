@@ -506,7 +506,7 @@ have [r r_dv_p irr_r]: {r | r %| p & irreducible_poly r}.
   pose rVp (v : 'rV_n) (r := rVpoly v) := (1 < size r) && (r %| p).
   have [v0 Dp]: {v0 | rVpoly v0 = p & rVp v0}.
     by exists (poly_rV p); rewrite /rVp poly_rV_K ?C'p /=.
-  case/(arg_minP (size \o rVpoly))=> /= v; set r := rVpoly v.
+  case/(arg_minnP (size \o rVpoly))=> /= v; set r := rVpoly v.
   case/andP=> C'r r_dv_p min_r; exists r => //; split=> // q C'q q_dv_r.
   have nz_r: r != 0 by rewrite -size_poly_gt0 ltnW.
   have le_q_r: size q <= size r by rewrite dvdp_leq.

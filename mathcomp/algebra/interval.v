@@ -210,19 +210,19 @@ Proof. by case: b; apply lter_distl. Qed.
 
 Lemma lersif_minr :
   (x <= Num.min y z ?< if b) = (x <= y ?< if b) && (x <= z ?< if b).
-Proof. by case: b; rewrite /= ltexI. Qed.
+Proof. by case: b; rewrite /= (le_minr, lt_minr). Qed.
 
 Lemma lersif_minl :
   (Num.min y z <= x ?< if b) = (y <= x ?< if b) || (z <= x ?< if b).
-Proof. by case: b; rewrite /= lteIx. Qed.
+Proof. by case: b; rewrite /= (le_minl, lt_minl). Qed.
 
 Lemma lersif_maxr :
   (x <= Num.max y z ?< if b) = (x <= y ?< if b) || (x <= z ?< if b).
-Proof. by case: b; rewrite /= ltexU. Qed.
+Proof. by case: b; rewrite /= (le_maxr, lt_maxr). Qed.
 
 Lemma lersif_maxl :
   (Num.max y z <= x ?< if b) = (y <= x ?< if b) && (z <= x ?< if b).
-Proof. by case: b; rewrite /= lteUx. Qed.
+Proof. by case: b; rewrite /= (le_maxl, lt_maxl). Qed.
 
 End LersifOrdered.
 
