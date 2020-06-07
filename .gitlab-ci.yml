@@ -97,6 +97,10 @@ coq-8.10:
 coq-8.11:
   extends: .opam-build-once
 
+coq-8.12:
+  # to be replaced with .opam-build-once when 8.12.0 available
+  extends: .opam-build
+
 coq-dev:
   extends: .opam-build
 
@@ -232,6 +236,11 @@ ci-lemma-overloading-8.11:
   extends: .ci-lemma-overloading
   variables:
     COQ_VERSION: "8.11"
+
+ci-lemma-overloading-8.12:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.12"
 
 ci-lemma-overloading-dev:
   extends: .ci-lemma-overloading
@@ -437,6 +446,10 @@ mathcomp-dev:coq-8.10:
 
 mathcomp-dev:coq-8.11:
   extends: .docker-deploy-once
+
+mathcomp-dev:coq-8.12:
+  # to be replaced with .docker-deploy-once when 8.12.0 available
+  extends: .docker-deploy
 
 mathcomp-dev:coq-dev:
   extends: .docker-deploy
