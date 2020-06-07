@@ -625,7 +625,7 @@ by apply: (iffP idP) => [/eqP/mem_card1[x inA]|[x /eq_card1/eqP//]]; exists x.
 Qed.
 
 Lemma card_le1_eqP A :
-  reflect {in A&, forall x, all_equal_to x} (#|A| <= 1).
+  reflect {in A &, forall x, all_equal_to x} (#|A| <= 1).
 Proof.
 apply: (iffP card_le1P) => [Ale1 x y xA yA /=|all_eq x xA y].
   by apply/eqP; rewrite -[_ == _]/(y \in pred1 x) -Ale1.
@@ -633,7 +633,7 @@ by rewrite inE; case: (altP (y =P x)) => [->//|]; exact/contra_neqF/all_eq.
 Qed.
 
 Lemma fintype_le1P : reflect (forall x : T, all_equal_to x) (#|T| <= 1).
-Proof. apply: (iffP (card_le1_eqP {:T})); [exact: in2T|exact: in2W]. Qed.
+Proof. apply: (iffP (card_le1_eqP {:T})); [exact: in2T | exact: in2W]. Qed.
 
 Lemma fintype1 : #|T| = 1 -> {x : T | all_equal_to x}.
 Proof.
@@ -807,10 +807,10 @@ Lemma card_gt1P A :
   reflect (exists x y, [/\ x \in A, y \in A & x != y]) (1 < #|A|).
 Proof.
 apply: (iffP card_geqP) => [[s] []|[x] [y] [xA yA xDy]].
-- case: s => [|a [|b [|]]] //=; rewrite inE andbT => aDb _ subD.
-  by exists a; exists b; rewrite aDb !subD ?inE ?eqxx ?orbT.
-- exists [:: x;y]; rewrite /= !inE xDy ; split => // z.
-  by rewrite !inE; case/pred2P => ->.
+  case: s => [|a [|b []]]//=; rewrite inE andbT => aDb _ subD.
+  by exists a, b; rewrite aDb !subD ?inE ?eqxx ?orbT.
+exists [:: x; y]; rewrite /= !inE xDy.
+by split=> // z; rewrite !inE => /pred2P[]->.
 Qed.
 
 Lemma card_gt2P A :
@@ -818,11 +818,11 @@ Lemma card_gt2P A :
           (2 < #|A|).
 Proof.
 apply: (iffP card_geqP) => [[s] []|[x] [y] [z] [[xD yD zD] [xDy xDz yDz]]].
-- case: s => [|x [|y [|z [|]]]] //=; rewrite !inE !andbT negb_or -andbA.
+  case: s => [|x [|y [|z []]]]//=; rewrite !inE !andbT negb_or -andbA.
   case/and3P => xDy xDz yDz _ subA.
-  by exists x;exists y;exists z; rewrite xDy yDz eq_sym xDz !subA ?inE ?eqxx ?orbT.
-- exists [:: x;y;z]; rewrite /= !inE negb_or xDy xDz eq_sym yDz; split => // u.
-  by rewrite !inE => /or3P [] /eqP->.
+  by exists x, y, z; rewrite xDy yDz eq_sym xDz !subA ?inE ?eqxx ?orbT.
+exists [:: x; y; z]; rewrite /= !inE negb_or xDy xDz eq_sym yDz; split=> // u.
+by rewrite !inE => /or3P [] /eqP->.
 Qed.
 
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].

@@ -611,7 +611,7 @@ Proof. by apply: same_connect1r x => /=. Qed.
 Lemma fcard_gt0P (a : {pred T}) : 
   fclosed f a -> reflect (exists x, x \in a) (0 < fcard f a).
 Proof.
-move => clfA; apply: (iffP card_gt0P) => [[x /andP[]]|[x xA]]; first by exists x.
+move=> clfA; apply: (iffP card_gt0P) => [[x /andP[]]|[x xA]]; first by exists x.
 exists (froot f x); rewrite inE roots_root /=; last exact: fconnect_sym.
 by rewrite -(closed_connect clfA (connect_root _ x)).
 Qed.
@@ -622,7 +622,7 @@ Lemma fcard_gt1P (A : {pred T}) :
           (1 < fcard f A).
 Proof.
 move=> clAf; apply: (iffP card_gt1P) => [|[x] [xA [y yA not_xfy]]]. 
-  move => [x] [y] [/andP [/= rfx xA]] [/andP[/= rfy yA] xDy].
+  move=> [x] [y] [/andP [/= rfx xA]] [/andP[/= rfy yA] xDy].
   by exists x; try exists y; rewrite // -root_connect // (eqP rfx) (eqP rfy).
 exists (froot f x), (froot f y); rewrite !inE !roots_root ?root_connect //=.
 by split => //; rewrite -(closed_connect clAf (connect_root _ _)).
