@@ -11,20 +11,21 @@ jobs:
         coq: [ "8.11", "8.10", "8.9", "8.8", "8.7" ]
     steps:
       - name: Get branch shortname
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: branch-short-name
-      - name: Get repo name
-        run: echo "##[set-output name=repo;]$(echo $GITHUB_REPOSITORY | cut -d/ -f1)"
-        id: repo-name
-      - name: Get repo lowercase name
-        run: echo "##[set-output name=repo;]$(echo $GITHUB_REPOSITORY | cut -d/ -f1 | tr '[:upper:]' '[:lower:]')"
-        id: repo-lowercase-name
+        run: echo "##[set-output name=name;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: branch-short
+      - name: Get owner name
+        run: echo "##[set-output name=name;]$(echo $GITHUB_REPOSITORY | cut -d/ -f1)"
+        id: owner
+      - name: Get owner lowercase name
+        run: echo "##[set-output name=name;]$(echo $GITHUB_REPOSITORY | cut -d/ -f1 | tr '[:upper:]' '[:lower:]')"
+        id: owner-lowercase
       - uses: cachix/install-nix-action@v8
       - uses: cachix/cachix-action@v6
+        if: steps.owner.outputs.name == "mathcomp" || steps.owner.outputs.name == "CyrilCohen"
         with:
           # Name of a cachix cache to push and pull/substitute
-          name: ${{ steps.repo-lowercase-name.outputs.repo }}
+          name: ${{ steps.owner-lowercase.outputs.name }}
           # Authentication token for Cachix, needed only for private cache access
           signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
       # building fake mathcomp-fast target
-      - run: nix-build https://github.com/math-comp/math-comp-nix/archive/master.tar.gz --arg config '{coq = "${{ matrix.coq }}"; mathcomp = "${{ steps.repo-name.outputs.repo }}/${{ steps.branch-short-name.outputs.branch }}";}' --argstr package mathcomp
+      - run: nix-build https://github.com/math-comp/math-comp-nix/archive/master.tar.gz --arg config '{coq = "${{ matrix.coq }}"; mathcomp = "${{ steps.owner.outputs.name }}/${{ steps.branch-short.outputs.name }}";}' --argstr package mathcomp
