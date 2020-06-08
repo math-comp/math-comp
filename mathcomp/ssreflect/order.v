@@ -415,13 +415,13 @@ Reserved Notation "~` A" (at level 35, right associativity).
 
 (* Notations for dual partial and total order *)
 Reserved Notation "x <=^d y" (at level 70, y at next level).
-Reserved Notation "x >=^d y" (at level 70, y at next level, only parsing).
+Reserved Notation "x >=^d y" (at level 70, y at next level).
 Reserved Notation "x <^d y" (at level 70, y at next level).
-Reserved Notation "x >^d y" (at level 70, y at next level, only parsing).
+Reserved Notation "x >^d y" (at level 70, y at next level).
 Reserved Notation "x <=^d y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^d y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x >=^d y :> T" (at level 70, y at next level).
 Reserved Notation "x <^d y :> T" (at level 70, y at next level).
-Reserved Notation "x >^d y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x >^d y :> T" (at level 70, y at next level).
 Reserved Notation "<=^d y" (at level 35).
 Reserved Notation ">=^d y" (at level 35).
 Reserved Notation "<^d y" (at level 35).
@@ -454,13 +454,13 @@ Reserved Notation "~^d` A" (at level 35, right associativity).
 
 (* Reserved notations for product ordering of prod or seq *)
 Reserved Notation "x <=^p y" (at level 70, y at next level).
-Reserved Notation "x >=^p y" (at level 70, y at next level, only parsing).
+Reserved Notation "x >=^p y" (at level 70, y at next level).
 Reserved Notation "x <^p y" (at level 70, y at next level).
-Reserved Notation "x >^p y" (at level 70, y at next level, only parsing).
+Reserved Notation "x >^p y" (at level 70, y at next level).
 Reserved Notation "x <=^p y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^p y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x >=^p y :> T" (at level 70, y at next level).
 Reserved Notation "x <^p y :> T" (at level 70, y at next level).
-Reserved Notation "x >^p y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x >^p y :> T" (at level 70, y at next level).
 Reserved Notation "<=^p y" (at level 35).
 Reserved Notation ">=^p y" (at level 35).
 Reserved Notation "<^p y" (at level 35).
@@ -493,13 +493,13 @@ Reserved Notation "~^p` A" (at level 35, right associativity).
 
 (* Reserved notations for lexicographic ordering of prod or seq *)
 Reserved Notation "x <=^l y" (at level 70, y at next level).
-Reserved Notation "x >=^l y" (at level 70, y at next level, only parsing).
+Reserved Notation "x >=^l y" (at level 70, y at next level).
 Reserved Notation "x <^l y" (at level 70, y at next level).
-Reserved Notation "x >^l y" (at level 70, y at next level, only parsing).
+Reserved Notation "x >^l y" (at level 70, y at next level).
 Reserved Notation "x <=^l y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^l y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x >=^l y :> T" (at level 70, y at next level).
 Reserved Notation "x <^l y :> T" (at level 70, y at next level).
-Reserved Notation "x >^l y :> T" (at level 70, y at next level, only parsing).
+Reserved Notation "x >^l y :> T" (at level 70, y at next level).
 Reserved Notation "<=^l y" (at level 35).
 Reserved Notation ">=^l y" (at level 35).
 Reserved Notation "<^l y" (at level 35).
@@ -546,11 +546,9 @@ Reserved Notation "\gcd_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \gcd_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\gcd_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\gcd_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -583,11 +581,9 @@ Reserved Notation "\lcm_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \lcm_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\lcm_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\lcm_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -626,11 +622,9 @@ Reserved Notation "\meet_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \meet_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\meet_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\meet_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \meet_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -663,11 +657,9 @@ Reserved Notation "\join_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \join_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\join_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\join_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \join_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -700,11 +692,9 @@ Reserved Notation "\min_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \min_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\min_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\min_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \min_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -737,11 +727,9 @@ Reserved Notation "\max_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \max_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\max_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\max_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -774,11 +762,9 @@ Reserved Notation "\meet^d_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \meet^d_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\meet^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\meet^d_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \meet^d_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -811,11 +797,9 @@ Reserved Notation "\join^d_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \join^d_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\join^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\join^d_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \join^d_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -848,11 +832,9 @@ Reserved Notation "\min^d_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \min^d_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\min^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\min^d_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \min^d_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -885,11 +867,9 @@ Reserved Notation "\max^d_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \max^d_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\max^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\max^d_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \max^d_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -922,11 +902,9 @@ Reserved Notation "\meet^p_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \meet^p_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\meet^p_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\meet^p_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \meet^p_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -959,11 +937,9 @@ Reserved Notation "\join^p_ ( i | P ) F"
   (at level 41, F at level 41, i at level 50,
            format "'[' \join^p_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\join^p_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
-           only parsing).
+  (at level 41, F at level 41, i at level 50).
 Reserved Notation "\join^p_ ( i < n | P ) F"
   (at level 41, F at level 41, i, n at level 50,
            format "'[' \join^p_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -3160,7 +3136,9 @@ Context {T : porderType disp} {T' : porderType disp'}.
 Implicit Types (m n p : nat) (x y z : T) (u v w : T').
 Variables (D D' : {pred T}) (f : T -> T').
 
-Hint Resolve lexx lt_neqAle (@le_anti _ T) (@le_anti _ T') lt_def : core.
+Let leT_anti := @le_anti _ T.
+Let leT'_anti := @le_anti _ T'.
+Hint Resolve lexx lt_neqAle lt_def : core.
 
 Let ge_antiT : antisymmetric (>=%O : rel T).
 Proof. by move=> ? ? /le_anti. Qed.
@@ -3741,8 +3719,12 @@ Context {T : orderType disp} {T' : porderType disp'}.
 Variables (D : {pred T}) (f : T -> T').
 Implicit Types (x y z : T) (u v w : T').
 
-Hint Resolve (@le_anti _ T) (@le_anti _ T') (@lt_neqAle _ T) : core.
-Hint Resolve (@lt_neqAle _ T') (@lt_def _ T) (@le_total _ T) : core.
+Let leT_anti    := @le_anti _ T.
+Let leT'_anti   := @le_anti _ T'.
+Let ltT_neqAle  := @lt_neqAle _ T.
+Let ltT'_neqAle := @lt_neqAle _ T'.
+Let ltT_def     := @lt_def _ T.
+Let leT_total   := @le_total _ T.
 
 Lemma le_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
 Proof. exact: total_homo_mono. Qed.
@@ -4869,8 +4851,7 @@ Notation "[ 'porderMixin' 'of' T 'by' <: ]" :=
 
 Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
   (sub_TotalOrderMixin _ : totalPOrderMixin [porderType of T])
-  (at level 0, format "[ 'totalOrderMixin'  'of'  T  'by'  <: ]",
-   only parsing) : form_scope.
+  (at level 0, only parsing) : form_scope.
 
 Canonical sub_POrderType.
 Canonical sub_LatticeType.

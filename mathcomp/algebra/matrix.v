@@ -148,19 +148,19 @@ Local Open Scope ring_scope.
 Reserved Notation "''M_' n"     (at level 8, n at level 2, format "''M_' n").
 Reserved Notation "''rV_' n"    (at level 8, n at level 2, format "''rV_' n").
 Reserved Notation "''cV_' n"    (at level 8, n at level 2, format "''cV_' n").
-Reserved Notation "''M_' ( n )" (at level 8, only parsing).
+Reserved Notation "''M_' ( n )" (at level 8). (* only parsing *)
 Reserved Notation "''M_' ( m , n )" (at level 8, format "''M_' ( m ,  n )").
-Reserved Notation "''M[' R ]_ n"    (at level 8, n at level 2, only parsing).
-Reserved Notation "''rV[' R ]_ n"   (at level 8, n at level 2, only parsing).
-Reserved Notation "''cV[' R ]_ n"   (at level 8, n at level 2, only parsing).
-Reserved Notation "''M[' R ]_ ( n )"     (at level 8, only parsing).
-Reserved Notation "''M[' R ]_ ( m , n )" (at level 8, only parsing).
+Reserved Notation "''M[' R ]_ n"    (at level 8, n at level 2). (* only parsing *)
+Reserved Notation "''rV[' R ]_ n"   (at level 8, n at level 2). (* only parsing *)
+Reserved Notation "''cV[' R ]_ n"   (at level 8, n at level 2). (* only parsing *)
+Reserved Notation "''M[' R ]_ ( n )"     (at level 8). (* only parsing *)
+Reserved Notation "''M[' R ]_ ( m , n )" (at level 8). (* only parsing *)
 
 Reserved Notation "\matrix_ i E" 
   (at level 36, E at level 36, i at level 2,
    format "\matrix_ i  E").
 Reserved Notation "\matrix_ ( i < n ) E"
-  (at level 36, E at level 36, i, n at level 50, only parsing).
+  (at level 36, E at level 36, i, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j ) E"
   (at level 36, E at level 36, i, j at level 50,
    format "\matrix_ ( i ,  j )  E").
@@ -168,19 +168,19 @@ Reserved Notation "\matrix[ k ]_ ( i , j ) E"
   (at level 36, E at level 36, i, j at level 50,
    format "\matrix[ k ]_ ( i ,  j )  E").
 Reserved Notation "\matrix_ ( i < m , j < n ) E"
-  (at level 36, E at level 36, i, m, j, n at level 50, only parsing).
+  (at level 36, E at level 36, i, m, j, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j < n ) E"
-  (at level 36, E at level 36, i, j, n at level 50, only parsing).
+  (at level 36, E at level 36, i, j, n at level 50). (* only parsing *)
 Reserved Notation "\row_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\row_ j  E").
 Reserved Notation "\row_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50, only parsing).
+  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
 Reserved Notation "\col_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\col_ j  E").
 Reserved Notation "\col_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50, only parsing).
+  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
 
 Reserved Notation "x %:M"   (at level 8, format "x %:M").
 Reserved Notation "A *m B" (at level 40, left associativity, format "A  *m  B").
@@ -248,8 +248,8 @@ Notation "''cV_' n" := 'M_(n, 1) : type_scope.
 Notation "''M_' n" := 'M_(n, n) : type_scope.
 Notation "''M_' ( n )" := 'M_n (only parsing) : type_scope.
 
-Notation "\matrix[ k ]_ ( i , j ) E" := (matrix_of_fun k (fun i j => E))
-  (at level 36, E at level 36, i, j at level 50): ring_scope.
+Notation "\matrix[ k ]_ ( i , j ) E" := (matrix_of_fun k (fun i j => E)) :
+   ring_scope.
 
 Notation "\matrix_ ( i < m , j < n ) E" :=
   (@matrix_of_fun _ m n matrix_key (fun i j => E)) (only parsing) : ring_scope.
@@ -1579,7 +1579,7 @@ Qed.
 Lemma mul_delta_mx_cond m n p (j1 j2 : 'I_n) (i1 : 'I_m) (k2 : 'I_p) :
   delta_mx i1 j1 *m delta_mx j2 k2 = delta_mx i1 k2 *+ (j1 == j2).
 Proof.
-apply/matrixP=> i k; rewrite !mxE (bigD1 j1) //=.
+apply/matrixP => i k; rewrite !mxE (bigD1 j1) //=.
 rewrite mulmxnE !mxE !eqxx andbT -natrM -mulrnA !mulnb !andbA andbAC.
 by rewrite big1 ?addr0 // => j; rewrite !mxE andbC -natrM; move/negPf->.
 Qed.

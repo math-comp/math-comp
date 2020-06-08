@@ -1579,7 +1579,7 @@ Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R V v}.
-Hint Resolve @ler01 @ltr01 ltr0Sn ler0n : core.
+Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
 Hint Extern 0 (is_true (0 <= norm _)) => exact: normr_ge0 : core.
 
 Section NumDomainOperationTheory.
@@ -3821,7 +3821,8 @@ Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
 
 Variable R : realDomainType.
 Implicit Types x y z t : R.
-Hint Resolve (@num_real R) : core.
+Let numR_real := @num_real R.
+Hint Resolve numR_real : core.
 
 Lemma sgr_cp0 x :
   ((sg x == 1) = (0 < x)) *

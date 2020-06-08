@@ -40,6 +40,16 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Reserved Notation "n %:Z" (at level 2, left associativity, format "n %:Z").
+Reserved Notation "n = m :> 'in' 't'"
+  (at level 70, m at next level, format "n  =  m  :>  'in' 't'").
+Reserved Notation "n == m :> 'in' 't'"
+  (at level 70, m at next level, format "n  ==  m  :>  'in' 't'").
+Reserved Notation "n != m :> 'in' 't'"
+  (at level 70, m at next level, format "n  !=  m  :>  'in' 't'").
+Reserved Notation "n <> m :> 'in' 't'"
+  (at level 70, m at next level, format "n  <>  m  :>  'in' 't'").
+
 Import Order.TTheory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
 Local Open Scope int_scope.
@@ -50,19 +60,13 @@ Variant int : Set := Posz of nat | Negz of nat.
 (* the Coq module system.                                                     *)
 (* Coercion Posz : nat >-> int. *)
 
-Notation "n %:Z" := (Posz n)
-  (at level 2, left associativity, format "n %:Z", only parsing) : int_scope.
-Notation "n %:Z" := (Posz n)
-  (at level 2, left associativity, format "n %:Z", only parsing) : ring_scope.
+Notation "n %:Z" := (Posz n) (only parsing) : int_scope.
+Notation "n %:Z" := (Posz n) (only parsing) : ring_scope.
 
-Notation "n = m :> 'in' 't'" := (Posz n = Posz m)
-  (at level 70, m at next level, format "n  =  m  :>  'in' 't'") : ring_scope.
-Notation "n == m :> 'in' 't'" := (Posz n == Posz m)
-  (at level 70, m at next level, format "n  ==  m  :>  'in' 't'") : ring_scope.
-Notation "n != m :> 'in' 't'" := (Posz n != Posz m)
-  (at level 70, m at next level, format "n  !=  m  :>  'in' 't'") : ring_scope.
-Notation "n <> m :> 'in' 't'" := (Posz n <> Posz m)
-  (at level 70, m at next level, format "n  <>  m  :>  'in' 't'") : ring_scope.
+Notation "n = m :> 'in' 't'"  := (Posz n = Posz m) : ring_scope.
+Notation "n == m :> 'in' 't'" := (Posz n == Posz m) : ring_scope.
+Notation "n != m :> 'in' 't'" := (Posz n != Posz m) : ring_scope.
+Notation "n <> m :> 'in' 't'" := (Posz n <> Posz m) : ring_scope.
 
 Definition natsum_of_int (m : int) : nat + nat :=
   match m with Posz p => inl _ p | Negz n => inr _ n end.
