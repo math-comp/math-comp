@@ -173,6 +173,16 @@ ci-fourcolor-8.10:
   variables:
     COQ_VERSION: "8.10"
 
+ci-fourcolor-8.11:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.11"
+
+ci-fourcolor-8.12:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.12"
+
 ci-fourcolor-dev:
   extends: .ci-fourcolor
   variables:
@@ -211,6 +221,16 @@ ci-odd-order-8.10:
   extends: .ci-odd-order
   variables:
     COQ_VERSION: "8.10"
+
+ci-odd-order-8.11:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.11"
+
+ci-odd-order-8.12:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.12"
 
 ci-odd-order-dev:
   extends: .ci-odd-order
@@ -276,6 +296,16 @@ ci-bigenough-8.10:
   extends: .ci-bigenough
   variables:
     COQ_VERSION: "8.10"
+
+ci-bigenough-8.11:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.11"
+
+ci-bigenough-8.12:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.12"
 
 ci-bigenough-dev:
   extends: .ci-bigenough
@@ -370,6 +400,16 @@ ci-finmap-8.10:
   variables:
     COQ_VERSION: "8.10"
 
+ci-finmap-8.11:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.11"
+
+ci-finmap-8.12:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.12"
+
 ci-finmap-dev:
   extends: .ci-finmap
   variables:
@@ -389,6 +429,16 @@ ci-fcsl-pcm-8.10:
   extends: .ci-fcsl-pcm
   variables:
     COQ_VERSION: "8.10"
+
+ci-fcsl-pcm-8.11:
+  extends: .ci-fcsl-pcm
+  variables:
+    COQ_VERSION: "8.11"
+
+ci-fcsl-pcm-8.10:
+  extends: .ci-fcsl-pcm
+  variables:
+    COQ_VERSION: "8.11"
 
 ci-fcsl-pcm-dev:
   extends: .ci-fcsl-pcm
