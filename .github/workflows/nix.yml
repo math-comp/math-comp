@@ -21,7 +21,7 @@ jobs:
         id: owner-lowercase
       - uses: cachix/install-nix-action@v8
       - uses: cachix/cachix-action@v6
-        if: steps.owner.outputs.name == "mathcomp" || steps.owner.outputs.name == "CyrilCohen"
+        if: steps.owner.outputs.name == 'mathcomp' || steps.owner.outputs.name == 'CyrilCohen'
         with:
           # Name of a cachix cache to push and pull/substitute
           name: ${{ steps.owner-lowercase.outputs.name }}
