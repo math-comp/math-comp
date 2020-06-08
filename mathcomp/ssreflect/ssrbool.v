@@ -11,7 +11,15 @@ From Coq Require Export ssrbool.
 (* This file also anticipates a v8.11 change in the definition of simpl_pred  *)
 (* to T -> simpl_pred T. This change ensures that inE expands the definition  *)
 (* of r : simpl_rel along with the \in, when rewriting in y \in r x.          *)
+(*                                                                            *)
+(* This file also anticipates v8.13 additions as well as a generalization in  *)
+(* the statments of `homoRL_in`, `homoLR_in`, `homo_mono_in`, `monoLR_in`,    *)
+(* monoRL_in, and can_mono_in.                                                *)
 (******************************************************************************)
+
+(******************)
+(* v8.11 addtions *)
+(******************)
 
 Notation "{ 'pred' T }" := (pred_sort (predPredType T)) (at level 0,
   format "{ 'pred'  T }") : type_scope.
@@ -49,6 +57,10 @@ Notation "[ 'rel' x y 'in' A ]" := [rel x y in A & A] (at level 0,
 Notation xrelpre := (fun f (r : rel _) x y => r (f x) (f y)).
 Definition relpre {T rT} (f : T -> rT)  (r : rel rT) :=
   [rel x y | r (f x) (f y)].
+
+(******************)
+(* v8.13 addtions *)
+(******************)
 
 Section HomoMonoMorphismFlip.
 Variables (aT rT : Type) (aR : rel aT) (rR : rel rT) (f : aT -> rT).
@@ -190,4 +202,3 @@ End inj_can_sym_in_on.
 Arguments inj_can_sym_in_on {aT rT aD rD f g}.
 Arguments inj_can_sym_on {aT rT aD f g}.
 Arguments inj_can_sym_in {aT rT rD f g}.
-
