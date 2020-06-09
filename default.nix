@@ -111,5 +111,7 @@ let
 in
 if pkgs.lib.trivial.inNixShell then pkg.overrideAttrs (old: {
   inherit shellHook mathcompnix;
-  buildInputs = (old.buildInputs or []) ++ pkgs.lib.optional withEmacs emacs;
+  buildInputs = (old.buildInputs or []) ++
+                pkgs.lib.optional withEmacs emacs ++
+                [ pkgs.lua pkgs.sedutil ];
 }) else pkg
