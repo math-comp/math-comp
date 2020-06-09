@@ -5,7 +5,7 @@ maintainer: "Mathematical Components <mathcomp-dev@sympa.inria.fr>"
 homepage: "https://math-comp.github.io/"
 bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
-license: "CeCILL-B"
+license: "CECILL-B"
 
 build: [ make "-C" "mathcomp/character" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/character" "install" ]
