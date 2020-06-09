@@ -117,7 +117,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* 3. declaring notations for the main operations of this library, by         *)
 (*    setting the first argument of the definition to the display, e.g.       *)
 (*    `Notation my_syndef_le x y := @Order.le my_display _ x y.` or           *)
-(*    `Notation "x <<< y" := @Order.lt my_display _ x y (at level ...).`      *)
+(*    `Notation "x <=< y" := @Order.lt my_display _ x y (at level ...).`      *)
 (*    Non overloaded notations will default to the default display.           *)
 (*                                                                            *)
 (* One may use displays either for convenience or to disambiguate between     *)
