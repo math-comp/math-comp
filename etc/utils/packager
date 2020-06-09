@@ -80,6 +80,7 @@ do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    echo $URLLINE >> $pkgdir/opam
    if [ $VERSION != "dev" ]
    then echo $CHECKSUMLINE >> $pkgdir/opam
+        sed -r "s/\|[[:space:]]*\(=[[:space:]]*\"dev\"[[:space:]]*\)//" -i $pkgdir/opam
    fi
    echo "}" >> $pkgdir/opam
 done
