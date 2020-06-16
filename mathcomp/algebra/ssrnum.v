@@ -2016,6 +2016,11 @@ Lemma ler_sum I (r : seq I) (P : pred I) (F G : I -> R) :
   \sum_(i <- r | P i) F i <= \sum_(i <- r | P i) G i.
 Proof. exact: (big_ind2 _ (lexx _) ler_add). Qed.
 
+Lemma ler_sum_nat (m n : nat) (F G : nat -> R) :
+  (forall i, (m <= i < n)%N -> F i <= G i) ->
+  \sum_(m <= i < n) F i <= \sum_(m <= i < n) G i.
+Proof. by move=> le_FG; rewrite !big_nat ler_sum. Qed.
+
 Lemma psumr_eq0 (I : eqType) (r : seq I) (P : pred I) (F : I -> R) :
     (forall i, P i -> 0 <= F i) ->
   (\sum_(i <- r | P i) (F i) == 0) = (all (fun i => (P i) ==> (F i == 0)) r).
