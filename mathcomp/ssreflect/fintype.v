@@ -814,7 +814,7 @@ by split=> // z; rewrite !inE => /pred2P[]->.
 Qed.
 
 Lemma card_gt2P A :
-  reflect (exists x y z, [/\ x \in A, y \in A & z \in A] /\ [/\ x!=y, y!=z & z!=x])
+  reflect (exists x y z, [/\ x \in A, y \in A & z \in A] /\ [/\ x != y, y != z & z != x])
           (2 < #|A|).
 Proof.
 apply: (iffP card_geqP) => [[s] []|[x] [y] [z] [[xD yD zD] [xDy xDz yDz]]].
