@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path bigop finset prime order ssralg.
 From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
@@ -60,17 +61,19 @@ Declare Scope C_expanded_scope.
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
-(* The Num mixin for an algebraically closed field with an automorphism of    *)
-(* order 2, making it into a field of complex numbers.                        *)
-Lemma ComplexNumMixin (L : closedFieldType) (conj : {rmorphism L -> L}) :
-    involutive conj -> ~ conj =1 id ->
-  {numL : numMixin L | forall x : NumDomainType L numL, `|x| ^+ 2 = x * conj x}.
+HB.factory Record IsComplex L of GRing.ClosedField L  := {
+  conj :  {rmorphism L -> L};
+  conjK : involutive conj;
+  conj_nt : ~ conj =1 id
+}.
+
+HB.builders Context L of IsComplex L.
+
+Lemma nz2: 2 != 0 :> L.
 Proof.
-move=> conjK conj_nt.
-have nz2: 2%:R != 0 :> L.
   apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
-    by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
+    by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl pmulrn char2 mul0r.
   have{} char2: 2%N \in [char L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
@@ -84,24 +87,46 @@ have nz2: 2%:R != 0 :> L.
   have Db2: b ^+ 2 + b = a.
     rewrite -Frobenius_autE // rmorphD addrACA Dw /= Frobenius_autE -rmorphX.
     by rewrite -rmorphD Dw rmorphM aJ eJ -mulrDl -{1}[e]opp_id addKr mul1r.
-  have /eqP[] := oner_eq0 L; apply: (addrI b); rewrite addr0 -{2}bJ.
+  have /eqP[] := oner_eq0 [ringType of L];
+    apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
-    rewrite mulrDl 2!mulrDr -/a addrA addr_eq0 opp_id (mulrC e) -addrA.
+    (* FIX ME : had to add pattern selection *)
+    rewrite mulrDl 2![_ * (b + _)]mulrDr -/a.
+    rewrite addrA addr_eq0 opp_id (mulrC e) -addrA.
     by rewrite -mulrDr eJ addrAC -{2}[e]opp_id subrr add0r mulr1 Db2.
   rewrite mulf_eq0 !addr_eq0 !opp_id => /pred2P[] -> //.
   by rewrite {2}eJ rmorphD rmorph1.
-have mul2I: injective (fun z : L => z *+ 2).
+Qed.
+
+Lemma mul2I: injective (fun z : L => z *+ 2).
+Proof.
+  have nz2 := nz2.
   by move=> x y; rewrite /= -mulr_natl -(mulr_natl y) => /mulfI->.
-pose sqrt x : L := sval (sig_eqW (@solve_monicpoly _ 2%N (nth 0 [:: x]) isT)).
-have sqrtK x: sqrt x ^+ 2 = x.
+Qed.
+
+Definition sqrt x : L :=
+  sval (sig_eqW (@solve_monicpoly _ 2%N (nth 0 [:: x]) isT)).
+
+Lemma sqrtK x: sqrt x ^+ 2 = x.
+Proof.
   rewrite /sqrt; case: sig_eqW => /= y ->.
   by rewrite !big_ord_recl big_ord0 /= mulr1 mul0r !addr0.
-have sqrtE x y: y ^+ 2 = x -> {b : bool | y = (-1) ^+ b * sqrt x}.
+Qed.
+
+Lemma sqrtE x y: y ^+ 2 = x -> {b : bool | y = (-1) ^+ b * sqrt x}.
+Proof.
   move=> Dx; exists (y != sqrt x); apply/eqP; rewrite mulr_sign if_neg.
   by case: ifPn => //; apply/implyP; rewrite implyNb -eqf_sqr Dx sqrtK.
-pose i := sqrt (- 1).
-have sqrMi x: (i * x) ^+ 2 = - x ^+ 2 by rewrite exprMn sqrtK mulN1r.
-have iJ : conj i = - i.
+Qed.
+
+Definition i := sqrt (- 1).
+
+Lemma sqrMi x: (i * x) ^+ 2 = - x ^+ 2.
+Proof. by rewrite exprMn sqrtK mulN1r. Qed.
+
+Lemma iJ : conj i = - i.
+Proof.
+  have nz2 := nz2.
   have /sqrtE[b]: conj i ^+ 2 = - 1 by rewrite -rmorphX sqrtK rmorphN1.
   rewrite mulr_sign -/i; case: b => // Ri.
   case: conj_nt => z; wlog zJ: z / conj z = - z.
@@ -116,7 +141,8 @@ have iJ : conj i = - i.
       rewrite fmorph_div rmorphMn zJ mulNrn invrN mulrN -mulNr rmorphB opprB.
       by rewrite conjK.
     rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl addrACA.
-    by rewrite subrr addr0 -mulr2n -mulr_natr mulfK ?Neq0 ?sqrtK.
+    (* FIX ME : had to add the explicit pattern *)
+    by rewrite subrr addr0 -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
   suffices u0: u = 0 by rewrite -Dz u0 add0r rmorphX rmorphM Rv zJ mulNr sqrrN.
   suffices [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
     apply: mul2I; rewrite mul0rn mulr2n -{2}Ru.
@@ -126,29 +152,64 @@ have iJ : conj i = - i.
   rewrite -mulrnDl -(mul0rn _ 2) (inj_eq mul2I) /= -[rhs in _ + rhs]opprK.
   rewrite -sqrMi subr_eq0 eqf_sqr -mulNr !mulrA.
   by case/pred2P=> ->; [exists false | exists true]; rewrite mulr_sign.
-pose norm x := sqrt x * conj (sqrt x).
-have normK x : norm x ^+ 2 = x * conj x by rewrite exprMn -rmorphX sqrtK.
-have normE x y : y ^+ 2 = x -> norm x = y * conj y.
+Qed.
+
+Definition norm x := sqrt x * conj (sqrt x).
+
+Lemma normK x : norm x ^+ 2 = x * conj x.
+Proof.
+  by rewrite exprMn -rmorphX sqrtK.
+Qed.
+
+Lemma normE x y : y ^+ 2 = x -> norm x = y * conj y.
+Proof.
   rewrite /norm => /sqrtE[b /(canLR (signrMK b)) <-].
   by rewrite !rmorphM rmorph_sign mulrACA -mulrA signrMK.
-have norm_eq0 x : norm x = 0 -> x = 0.
+Qed.
+
+Lemma norm_eq0 x : norm x = 0 -> x = 0.
+Proof.
   by move/eqP; rewrite mulf_eq0 fmorph_eq0 -mulf_eq0 -expr2 sqrtK => /eqP.
-have normM x y : norm (x * y) = norm x * norm y.
+Qed.
+
+Lemma normM x y : norm (x * y) = norm x * norm y.
+Proof.
   by rewrite mulrACA -rmorphM; apply: normE; rewrite exprMn !sqrtK.
-have normN x : norm (- x) = norm x.
+Qed.
+
+Lemma normN x : norm (- x) = norm x.
+Proof.
   by rewrite -mulN1r normM {1}/norm iJ mulrN -expr2 sqrtK opprK mul1r.
-pose le x y := norm (y - x) == y - x; pose lt x y := (y != x) && le x y.
-have posE x: le 0 x = (norm x == x) by rewrite /le subr0.
-have leB x y: le x y = le 0 (y - x) by rewrite posE.
-have posP x : reflect (exists y, x = y * conj y) (le 0 x).
+Qed.
+
+Definition le x y := norm (y - x) == y - x.
+Definition lt x y := (y != x) && le x y.
+
+Lemma posE x: le 0 x = (norm x == x).
+Proof. by rewrite /le subr0. Qed.
+
+Lemma leB x y: le x y = le 0 (y - x).
+Proof. by rewrite posE. Qed.
+
+Lemma posP x : reflect (exists y, x = y * conj y) (le 0 x).
+Proof.
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
-  by rewrite (normE _ _ (normK y)) rmorphM conjK (mulrC (conj _)) -expr2 normK.
-have posJ x : le 0 x -> conj x = x.
+  by rewrite (normE (normK y)) rmorphM conjK (mulrC (conj _)) -expr2 normK.
+Qed.
+
+Lemma posJ x : le 0 x -> conj x = x.
+Proof.
   by case/posP=> {x}u ->; rewrite rmorphM conjK mulrC.
-have pos_linear x y : le 0 x -> le 0 y -> le x y || le y x.
+Qed.
+
+Lemma pos_linear x y : le 0 x -> le 0 y -> le x y || le y x.
+Proof.
   move=> pos_x pos_y; rewrite leB -opprB orbC leB !posE normN -eqf_sqr.
   by rewrite normK rmorphB !posJ ?subrr.
-have sposDl x y : lt 0 x -> le 0 y -> lt 0 (x + y).
+Qed.
+
+Lemma sposDl x y : lt 0 x -> le 0 y -> lt 0 (x + y).
+Proof.
   have sqrtJ z : le 0 z -> conj (sqrt z) = sqrt z.
     rewrite posE -{2}[z]sqrtK -subr_eq0 -mulrBr mulf_eq0 subr_eq0.
     by case/pred2P=> ->; rewrite ?rmorph0.
@@ -161,9 +222,15 @@ have sposDl x y : lt 0 x -> le 0 y -> lt 0 (x + y).
   rewrite -normK expf_eq0 //=; apply: contraNneq nz_x => /norm_eq0 w0.
   rewrite -[x]sqrtK expf_eq0 /= -/u -(inj_eq mul2I) !mulr2n -{2}(rmorph0 conj).
   by rewrite -w0 rmorphD rmorphM iJ uJ vJ mulNr addrACA subrr addr0.
-have sposD x y : lt 0 x -> lt 0 y -> lt 0 (x + y).
+Qed.
+
+Lemma sposD x y : lt 0 x -> lt 0 y -> lt 0 (x + y).
+Proof.
   by move=> x_gt0 /andP[_]; apply: sposDl.
-have normD x y : le (norm (x + y)) (norm x + norm y).
+Qed.
+
+Lemma normD x y : le (norm (x + y)) (norm x + norm y).
+Proof.
   have sposM u v: lt 0 u -> le 0 (u * v) -> le 0 v.
     by rewrite /lt !posE normM andbC => /andP[/eqP-> /mulfI/inj_eq->].
   have posD u v: le 0 u -> le 0 v -> le 0 (u + v).
@@ -188,8 +255,17 @@ have normD x y : le (norm (x + y)) (norm x + norm y).
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
   rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
   by rewrite (mulrC x) (mulrC y).
-by exists (NumMixin normD sposD norm_eq0 pos_linear normM (rrefl _) (rrefl _)).
 Qed.
+
+HB.instance Definition _ :=
+  Num.IntegralDomain_IsNumDomain.Build L normD sposD norm_eq0
+         pos_linear normM (fun x y => erefl (le x y))
+                          (fun x y => erefl (lt x y)).
+
+HB.instance Definition _ :=
+  Num.NumField_IsImaginary.Build L (sqrtK _) normK.
+
+HB.end.
 
 Module Algebraics.
 
@@ -197,52 +273,11 @@ Module Type Specification.
 
 Parameter type : Type.
 
-Parameter eqMixin : Equality.class_of type.
-Canonical eqType := EqType type eqMixin.
+Parameter conjMixin : Num.ClosedField type.
 
-Parameter choiceMixin : Choice.mixin_of type.
-Canonical choiceType := ChoiceType type choiceMixin.
+Parameter IsCountable : Countable type.
 
-Parameter countMixin : Countable.mixin_of type.
-Canonical countType := CountType type countMixin.
-
-Parameter zmodMixin : GRing.Zmodule.mixin_of type.
-Canonical zmodType := ZmodType type zmodMixin.
-Canonical countZmodType := [countZmodType of type].
-
-Parameter ringMixin : GRing.Ring.mixin_of zmodType.
-Canonical ringType := RingType type ringMixin.
-Canonical countRingType := [countRingType of type].
-
-Parameter unitRingMixin : GRing.UnitRing.mixin_of ringType.
-Canonical unitRingType := UnitRingType type unitRingMixin.
-
-Axiom mulC : @commutative ringType ringType *%R.
-Canonical comRingType := ComRingType type mulC.
-Canonical comUnitRingType := [comUnitRingType of type].
-
-Axiom idomainAxiom : GRing.IntegralDomain.axiom ringType.
-Canonical idomainType := IdomainType type idomainAxiom.
-
-Axiom fieldMixin : GRing.Field.mixin_of unitRingType.
-Canonical fieldType := FieldType type fieldMixin.
-
-Parameter decFieldMixin : GRing.DecidableField.mixin_of unitRingType.
-Canonical decFieldType := DecFieldType type decFieldMixin.
-
-Axiom closedFieldAxiom : GRing.ClosedField.axiom ringType.
-Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
-
-Parameter numMixin : numMixin idomainType.
-Canonical porderType := POrderType ring_display type numMixin.
-Canonical numDomainType := NumDomainType type numMixin.
-Canonical normedZmodType := NormedZmodType type type numMixin.
-Canonical numFieldType := [numFieldType of type].
-
-Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
-Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
-
-Axiom algebraic : integralRange (@ratr unitRingType).
+Axiom algebraic : integralRange (@ratr (Num.ClosedField.Pack conjMixin)).
 
 End Specification.
 
@@ -259,10 +294,14 @@ Proof. exact: s2valP (tagged Fundamental_Theorem_of_Algebraics). Qed.
 Fact conjL_nt : ~ conjL =1 id.
 Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
-Definition LnumMixin := ComplexNumMixin conjL_K conjL_nt.
-Definition Lnum := NumDomainType L (sval LnumMixin).
+Definition L' : Type := eta L.
+HB.instance Definition _ := GRing.ClosedField.on L'.
+HB.instance Definition _ := IsComplex.Build L' conjL_K conjL_nt.
 
-Definition QtoL := [rmorphism of @ratr [numFieldType of Lnum]].
+Notation cfType := [the Num.ClosedField.type of L'].
+
+Definition QtoL := [rmorphism of @ratr cfType].
+
 Notation pQtoL := (map_poly QtoL).
 
 Definition rootQtoL p_j :=
@@ -270,19 +309,16 @@ Definition rootQtoL p_j :=
   (sval (closed_field_poly_normal (pQtoL p_j.1)))`_p_j.2.
 
 Definition eq_root p_j q_k := rootQtoL p_j == rootQtoL q_k.
+
 Fact eq_root_is_equiv : equiv_class_of eq_root.
 Proof. by rewrite /eq_root; split=> [ ? | ? ? | ? ? ? ] // /eqP->. Qed.
 Canonical eq_root_equiv := EquivRelPack eq_root_is_equiv.
+
 Definition type : Type := {eq_quot eq_root}%qT.
 
-Definition eqMixin : Equality.class_of type := EquivQuot.eqMixin _.
-Canonical eqType := EqType type eqMixin.
-
-Definition choiceMixin : Choice.mixin_of type := EquivQuot.choiceMixin _.
-Canonical choiceType := ChoiceType type choiceMixin.
-
-Definition countMixin : Countable.mixin_of type := CanCountMixin reprK.
-Canonical countType := CountType type countMixin.
+HB.instance Definition _ : EqQuotient _ eq_root type := EqQuotient.on type.
+HB.instance Definition _ := Choice.on type.
+HB.instance Definition _ : IsCountable type := CanCountMixin reprK.
 
 Definition CtoL (u : type) := rootQtoL (repr u).
 
@@ -332,9 +368,7 @@ Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K add0r. Qed.
 Fact addN : left_inverse zero opp add.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K addNr. Qed.
 
-Definition zmodMixin := ZmodMixin addA addC add0 addN.
-Canonical zmodType := ZmodType type zmodMixin.
-Canonical countZmodType := [countZmodType of type].
+HB.instance Definition _ := GRing.IsZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_additive : additive CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
@@ -359,32 +393,24 @@ Proof. by move=> u v w; apply: CtoL_inj; rewrite !LtoC_K mulrDl. Qed.
 Fact one_nz : one != 0 :> type.
 Proof. by rewrite -(inj_eq CtoL_inj) !LtoC_K oner_eq0. Qed.
 
-Definition ringMixin := ComRingMixin mulA mulC mul1 mulD one_nz.
-Canonical ringType := RingType type ringMixin.
-Canonical comRingType := ComRingType type mulC.
-Canonical countRingType := [countRingType of type].
+HB.instance Definition _ := 
+  GRing.Zmodule_IsComRing.Build type mulA mulC mul1 mulD one_nz.
 
 Fact CtoL_is_multiplicative : multiplicative CtoL.
 Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
 Canonical CtoL_rmorphism := AddRMorphism CtoL_is_multiplicative.
 
-Fact mulVf : GRing.Field.axiom inv.
+Fact mulVf u :  u != 0 -> inv u * u = 1.
 Proof.
-move=> u; rewrite -(inj_eq CtoL_inj) rmorph0 => nz_u.
+rewrite -(inj_eq CtoL_inj) rmorph0 => nz_u.
 by apply: CtoL_inj; rewrite !LtoC_K mulVf.
 Qed.
+
 Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
 
-Definition unitRingMixin := FieldUnitMixin mulVf inv0.
-Canonical unitRingType := UnitRingType type unitRingMixin.
-Canonical comUnitRingType := [comUnitRingType of type].
+HB.instance Definition _ := GRing.ComRing_IsField.Build type mulVf inv0.
 
-Definition fieldMixin := FieldMixin mulVf inv0.
-Definition idomainAxiom := FieldIdomainMixin fieldMixin.
-Canonical idomainType := IdomainType type idomainAxiom.
-Canonical fieldType := FieldType type fieldMixin.
-
-Fact closedFieldAxiom : GRing.ClosedField.axiom ringType.
+Fact closedFieldAxiom : GRing.closed_field_axiom [the ringType of type].
 Proof.
 move=> n a n_gt0; pose p := 'X^n - \poly_(i < n) CtoL (a i).
 have Ap: {in p : seq L, integralRange QtoL}.
@@ -402,9 +428,7 @@ rewrite horner_poly rmorph_sum; apply: eq_bigr => k _.
 by rewrite rmorphM rmorphX /= LtoC_K.
 Qed.
 
-Definition decFieldMixin := closed_field_QEMixin closedFieldAxiom.
-Canonical decFieldType := DecFieldType type decFieldMixin.
-Canonical closedFieldType := ClosedFieldType type closedFieldAxiom.
+HB.instance Definition _ := Field_IsAlgClosed.Build type closedFieldAxiom.
 
 Fact conj_subproof u : integralOver QtoL (conjL (CtoL u)).
 Proof.
@@ -412,12 +436,14 @@ have [p mon_p pu0] := CtoL_P u; exists p => //.
 rewrite -(fmorph_root conjL) conjL_K map_poly_id // => _ /(nthP 0)[j _ <-].
 by rewrite coef_map fmorph_rat.
 Qed.
+
 Fact conj_is_rmorphism : rmorphism (fun u => LtoC (conj_subproof u)).
 Proof.
 do 2?split=> [u v|]; apply: CtoL_inj; last by rewrite !LtoC_K rmorph1.
 - by rewrite LtoC_K 3!{1}rmorphB /= !LtoC_K.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
 Qed.
+
 Definition conj : {rmorphism type -> type} := RMorphism conj_is_rmorphism.
 Lemma conjK : involutive conj.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
@@ -428,41 +454,39 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   have [i] := @solve_monicpoly _ 2%N (nth 0 [:: -1 : type]) isT.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
-have/lt_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-by rewrite -i2 rmorphX /= expr2 -{2}iL_J -(svalP LnumMixin) exprn_ge0.
+have/lt_geF/idP[] := @ltr01 cfType; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
+by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
-Definition numMixin : numMixin closedFieldType :=
-  sval (ComplexNumMixin conjK conj_nt).
-Canonical porderType := POrderType ring_display type numMixin.
-Canonical numDomainType := NumDomainType type numMixin.
-Canonical normedZmodType := NormedZmodType type type numMixin.
-Canonical numFieldType := [numFieldType of type].
+HB.instance Definition _ := IsComplex.Build type conjK conj_nt.
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
-Proof. exact: svalP (ComplexNumMixin conjK conj_nt) u. Qed.
+Proof. by apply: (@normCK [the numClosedFieldType of type]). Qed.
 
-Lemma algebraic : integralRange (@ratr unitRingType).
+Definition conjMixin := Num.ClosedField.on type.
+
+Lemma algebraic : integralRange (@ratr [the unitRingType of type]).
 Proof.
 move=> u; have [p mon_p pu0] := CtoL_P u; exists p => {mon_p}//.
 rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
-Definition conjMixin :=
-  ImaginaryMixin (svalP (imaginary_exists closedFieldType))
-                 (fun x => esym (normK x)).
-Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
+Definition IsCountable := Countable.on type.
 
 End Implementation.
 
 Definition divisor := Implementation.type.
+
+#[export] HB.instance Definition _ := Implementation.conjMixin.
+#[export] HB.instance Definition _ := Implementation.IsCountable.
 
 Module Internals.
 
 Import Implementation.
 
 Local Notation algC := type.
+
 Local Notation "z ^*" := (conj z) (at level 2, format "z ^*") : ring_scope.
 Local Notation QtoC := (ratr : rat -> algC).
 Local Notation QtoCm := [rmorphism of QtoC].
@@ -531,37 +555,16 @@ Delimit Scope C_scope with C.
 Delimit Scope C_core_scope with Cc.
 Delimit Scope C_expanded_scope with Cx.
 Open Scope C_core_scope.
+Notation algCeq := [the eqType of type].
+Notation algCzmod := [the zmodType of type].
+Notation algCring := [the ringType of type].
+Notation algCuring := [the unitRingType of type].
+Notation algCnum := [the numDomainType of type].
+Notation algCfield := [the fieldType of type].
+Notation algCnumField := [the numFieldType of type].
+Notation algCnumClosedField := [the numClosedFieldType of type].
 
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical zmodType.
-Canonical countZmodType.
-Canonical ringType.
-Canonical countRingType.
-Canonical unitRingType.
-Canonical comRingType.
-Canonical comUnitRingType.
-Canonical idomainType.
-Canonical porderType.
-Canonical numDomainType.
-Canonical normedZmodType.
-Canonical fieldType.
-Canonical numFieldType.
-Canonical decFieldType.
-Canonical closedFieldType.
-Canonical numClosedFieldType.
-
-Notation algCeq := eqType.
-Notation algCzmod := zmodType.
-Notation algCring := ringType.
-Notation algCuring := unitRingType.
-Notation algCnum := numDomainType.
-Notation algCfield := fieldType.
-Notation algCnumField := numFieldType.
-Notation algCnumClosedField := numClosedFieldType.
-
-Notation Creal := (@Num.Def.Rreal numDomainType).
+Notation Creal := (@Num.Def.Rreal algCnum).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
@@ -595,9 +598,13 @@ Notation "x != y %[mod e ]" := (~~ (x == y %[mod e])%C) : C_scope.
 
 End Exports.
 
+Module HBExports. HB.reexport. End HBExports.
+
 End Algebraics.
 
 Export Algebraics.Exports.
+
+Export Algebraics.HBExports.
 
 Section AlgebraicsTheory.
 
@@ -628,7 +635,7 @@ Definition Cchar : [char algC] =i pred0 := @char_num _.
 (* manifest rationals, such as 3^-1 + 7%:%^-1 < 2%:%^-1 :> algC.              *)
 (* Missing norm and integer exponent, due to gaps in ssrint and rat.          *)
 Definition CratrE :=
-  let CnF := Algebraics.Implementation.numFieldType in
+  let CnF := [numClosedFieldType of algC] in
   let QtoCm := ratr_rmorphism CnF in
   ((rmorph0 QtoCm, rmorph1 QtoCm, rmorphMn QtoCm, rmorphN QtoCm, rmorphD QtoCm),
    (rmorphM QtoCm, rmorphX QtoCm, fmorphV QtoCm),
@@ -636,7 +643,7 @@ Definition CratrE :=
    =^~ (@ler_rat CnF, @ltr_rat CnF, (inj_eq (fmorph_inj QtoCm)))).
 
 Definition CintrE :=
-  let CnF := Algebraics.Implementation.numFieldType in
+  let CnF := [numFieldType of algC] in
   let ZtoCm := intmul1_rmorphism CnF in
   ((rmorph0 ZtoCm, rmorph1 ZtoCm, rmorphMn ZtoCm, rmorphN ZtoCm, rmorphD ZtoCm),
    (rmorphM ZtoCm, rmorphX ZtoCm),

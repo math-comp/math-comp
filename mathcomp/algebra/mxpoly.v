@@ -930,7 +930,8 @@ apply/eqmxP/andP; split; last first.
   apply/sub_kermxP/eqmx0P; rewrite !addsmxMr [in X in (_ + X)%MS]mulrC.
   by rewrite !rmorphM/= !mulmxA !mulmx_ker !mul0mx !addsmx0 submx_refl.
 move: cpq => /(congr1 (horner_mx g))/=; rewrite rmorph1 rmorphD/=.
-rewrite -[X in (X <= _)%MS]mulr1 => <-; rewrite mulrDr mulrC addrC.
+(* FIXME: rewrite pattern *)
+rewrite -[X in (X <= _)%MS]mulr1 => <-; rewrite mulrDr [p * u]mulrC addrC.
 rewrite addmx_sub_adds//; apply/sub_kermxP; rewrite mulmxE -mulrA -rmorphM.
   by rewrite mulrAC [q * p]mulrC rmorphM/= mulrA -!mulmxE mulmx_ker mul0mx.
 rewrite -[_ * _ * q]mulrA [u * _]mulrC.
@@ -1385,11 +1386,11 @@ Qed.
 Lemma eval_mxrank e r m n (A : 'M_(m, n)) :
   qf_eval e (mxrank_form r A) = (\rank (eval_mx e A) == r).
 Proof.
-elim: m r n A => [|m IHm] r [|n] A /=; try by case r.
-rewrite GRing.eval_Pick /mxrank unlock /=; set pf := fun _ => _.
+elim: m r n A => [|m IHm] r [|n] A /=; try by case r; rewrite unlock.
+rewrite GRing.eval_Pick !unlock /=; set pf := fun _ => _.
 rewrite -(@eq_pick _ pf) => [|k]; rewrite {}/pf ?mxE // eq_sym.
 case: pick => [[i j]|] //=; set B := _ - _; have:= mxrankE B.
-case: (Gaussian_elimination B) r => [[_ _] _] [|r] //= <-; rewrite {}IHm eqSS.
+case: (Gaussian_elimination_ B) r => [[_ _] _] [|r] //= <-; rewrite {}IHm eqSS.
 by congr (\rank _ == r); apply/matrixP=> k l; rewrite !(mxE, big_ord1) !tpermR.
 Qed.
 
@@ -1626,8 +1627,9 @@ Implicit Types (W : 'M[F]_(k, m)).
 Lemma sub_kermxpoly_conjmx V f p W : stablemx V f -> row_free V ->
   (W <= kermxpoly (conjmx V f) p)%MS = (W *m V <= kermxpoly f p)%MS.
 Proof.
-case: n m => [|n'] [|m']// in V f W * => fV rfV; rewrite ?thinmx0//.
-   by rewrite mul0mx !sub0mx.
+case: n m => [|n'] [|m'] in V f W * => fV rfV; rewrite ?thinmx0//.
+  by rewrite /row_free mxrank.unlock in rfV.
+  by rewrite mul0mx !sub0mx.
 apply/sub_kermxP/sub_kermxP; rewrite horner_mx_conj//; last first.
   by move=> /(congr1 (mulmxr (pinvmx V)))/=; rewrite mul0mx !mulmxA.
 move=> /(congr1 (mulmxr V))/=; rewrite ![W *m _]mulmxA ?mul0mx mulmxKpV//.
@@ -1908,7 +1910,8 @@ Qed.
 Lemma diagonalizable_conj_diag m n (V : 'M[F]_(m, n)) (d : 'rV[F]_n) :
   stablemx V (diag_mx d) -> row_free V -> diagonalizable (conjmx V (diag_mx d)).
 Proof.
-case: m n => [|m] [|n]// in V d * => Vd rdV; rewrite ?thinmx0//=.
+case: m n => [|m] [|n] in V d * => Vd rdV; rewrite ?thinmx0//=.
+  by rewrite /row_free mxrank.unlock in rdV.
 apply/diagonalizableP; pose u := undup [seq d 0 i | i <- enum 'I_n.+1].
 exists u; first by rewrite undup_uniq.
 by rewrite (dvdp_trans (mxminpoly_conj _ _))// mxminpoly_diag.

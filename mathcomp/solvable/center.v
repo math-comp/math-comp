@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import fintype bigop finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient action gproduct gfunctor.
@@ -314,9 +315,10 @@ by rewrite inE /= Zx groupV (subsetP sgzZZ) ?mem_morphim.
 Qed.
 
 Fact cprod_by_key : unit. Proof. by []. Qed.
-Definition cprod_by_def := subFinGroupType [group of setX H K / kerHK].
+Definition cprod_by_def := [the finGroupType of subg_of [group of setX H K / kerHK]].
 Definition cprod_by := locked_with cprod_by_key cprod_by_def.
-Local Notation C := [set: FinGroup.arg_sort (FinGroup.base cprod_by)].
+Local Notation C := [set: FinGroup.sort cprod_by].
+(*FIXME : Check if we need arg_sort instead of sort*)
 
 Definition in_cprod : gTH * gTK -> cprod_by :=
   let: tt as k := cprod_by_key return _ -> locked_with k cprod_by_def in

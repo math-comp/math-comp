@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype tuple finfun bigop finset binomial.
 From mathcomp Require Import fingroup morphism.
@@ -53,25 +54,8 @@ Identity Coercion type_of_perm : perm_of >-> perm_type.
 
 Notation pT := (perm_of (Phant T)).
 
-Canonical perm_subType := Eval hnf in [subType for pval].
-Definition perm_eqMixin := Eval hnf in [eqMixin of perm_type by <:].
-Canonical perm_eqType := Eval hnf in EqType perm_type perm_eqMixin.
-Definition perm_choiceMixin := [choiceMixin of perm_type by <:].
-Canonical perm_choiceType := Eval hnf in ChoiceType perm_type perm_choiceMixin.
-Definition perm_countMixin := [countMixin of perm_type by <:].
-Canonical perm_countType := Eval hnf in CountType perm_type perm_countMixin.
-Canonical perm_subCountType := Eval hnf in [subCountType of perm_type].
-Definition perm_finMixin := [finMixin of perm_type by <:].
-Canonical perm_finType := Eval hnf in FinType perm_type perm_finMixin.
-Canonical perm_subFinType := Eval hnf in [subFinType of perm_type].
-
-Canonical perm_for_subType := Eval hnf in [subType of pT].
-Canonical perm_for_eqType := Eval hnf in [eqType of pT].
-Canonical perm_for_choiceType := Eval hnf in [choiceType of pT].
-Canonical perm_for_countType := Eval hnf in [countType of pT].
-Canonical perm_for_subCountType := Eval hnf in [subCountType of pT].
-Canonical perm_for_finType := Eval hnf in [finType of pT].
-Canonical perm_for_subFinType := Eval hnf in [subFinType of pT].
+HB.instance Definition _ := [IsSUB for pval].
+HB.instance Definition _ := [Finite of perm_type by <:].
 
 Lemma perm_proof (f : T -> T) : injective f -> injectiveb (finfun f).
 Proof.
@@ -91,28 +75,11 @@ Bind Scope group_scope with perm_of.
 Notation "''S_' n" := {perm 'I_n}
   (at level 8, n at level 2, format "''S_' n").
 
-Local Notation fun_of_perm_def := (fun T (u : perm_type T) => val u : T -> T).
-Local Notation perm_def := (fun T f injf => Perm (@perm_proof T f injf)).
+HB.lock Definition perm T f injf := Perm (@perm_proof T f injf).
+Canonical perm_unlock := Unlockable perm.unlock.
 
-Module Type PermDefSig.
-Parameter fun_of_perm : forall T, perm_type T -> T -> T.
-Parameter perm : forall (T : finType) (f : T -> T), injective f -> {perm T}.
-Axiom fun_of_permE : fun_of_perm = fun_of_perm_def.
-Axiom permE : perm = perm_def.
-End PermDefSig.
-
-Module PermDef : PermDefSig.
-Definition fun_of_perm := fun_of_perm_def.
-Definition perm := perm_def.
-Lemma fun_of_permE : fun_of_perm = fun_of_perm_def. Proof. by []. Qed.
-Lemma permE : perm = perm_def. Proof. by []. Qed.
-End PermDef.
-
-Notation fun_of_perm := PermDef.fun_of_perm.
-Notation "@ 'perm'" := (@PermDef.perm) (at level 10, format "@ 'perm'").
-Notation perm := (@PermDef.perm _ _).
-Canonical fun_of_perm_unlock := Unlockable PermDef.fun_of_permE.
-Canonical perm_unlock := Unlockable PermDef.permE.
+HB.lock Definition fun_of_perm T (u : perm_type T) : T -> T := val u.
+Canonical fun_of_perm_unlock := Unlockable fun_of_perm.unlock.
 Coercion fun_of_perm : perm_type >-> Funclass.
 
 Section Theory.
@@ -154,15 +121,8 @@ Proof. by move=> s; apply/permP=> x; rewrite !permE /= permE f_iinv. Qed.
 Lemma perm_mulP : associative perm_mul.
 Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 
-Definition perm_of_baseFinGroupMixin : FinGroup.mixin_of (perm_type T) :=
-  FinGroup.Mixin perm_mulP perm_oneP perm_invP.
-Canonical perm_baseFinGroupType :=
-  Eval hnf in BaseFinGroupType (perm_type T) perm_of_baseFinGroupMixin.
-Canonical perm_finGroupType := @FinGroupType perm_baseFinGroupType perm_invP.
-
-Canonical perm_of_baseFinGroupType :=
-  Eval hnf in [baseFinGroupType of {perm T}].
-Canonical perm_of_finGroupType := Eval hnf in [finGroupType of {perm T} ].
+HB.instance Definition _ := IsMulGroup.Build (perm_type T)
+  perm_mulP perm_oneP perm_invP.
 
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
@@ -337,27 +297,31 @@ exists (perm inj_p); rewrite -[Is]/(tval (Tuple szIs)); congr (tval _).
 by apply: eq_from_tnth => i; rewrite tnth_map tnth_mktuple permE (tnth_nth x0).
 Qed.
 
+(* Note that porbit s x is the orbit of x by <[s]> under the action aperm. *)
+(* Hence, the porbit lemmas below are special cases of more general lemmas *)
+(* on orbits that will be stated in action.v.                              *)
+(*   Defining porbit directly here avoids a dependency of matrix.v on      *)
+(* action.v and hence morphism.v.                                          *)
+Definition aperm (T : finType) x (s : {perm T}) := s x.
+
+HB.lock
+Definition porbit (T : finType) (s : {perm T}) x := aperm x @: <[s]>.
+Canonical porbit_unlockable := Unlockable porbit.unlock.
+
+Definition porbits (T : finType) (s : {perm T}) := porbit s @: T.
+
 Section PermutationParity.
 
 Variable T : finType.
 
 Implicit Types (s t u v : {perm T}) (x y z a b : T).
 
-(* Note that porbit s x is the orbit of x by <[s]> under the action aperm. *)
-(* Hence, the porbit lemmas below are special cases of more general lemmas *)
-(* on orbits that will be stated in action.v.                              *)
-(*   Defining porbit directly here avoids a dependency of matrix.v on      *)
-(* action.v and hence morphism.v.                                          *)
-
-Definition aperm x s := s x.
-Definition porbit s x := aperm x @: <[s]>.
-Definition porbits s := porbit s @: T.
 Definition odd_perm (s : perm_type T) := odd #|T| (+) odd #|porbits s|.
 
 Lemma apermE x s : aperm x s = s x. Proof. by []. Qed.
 
 Lemma mem_porbit s i x : (s ^+ i) x \in porbit s x.
-Proof. by rewrite (imset_f (aperm x)) ?mem_cycle. Qed.
+Proof. by rewrite [@porbit]unlock (imset_f (aperm x)) ?mem_cycle. Qed.
 
 Lemma porbit_id s x : x \in porbit s x.
 Proof. by rewrite -{1}[x]perm1 (mem_porbit s 0). Qed.
@@ -371,7 +335,7 @@ Lemma uniq_traject_porbit s x : uniq (traject s x #|porbit s x|).
 Proof.
 case def_n: #|_| => // [n]; rewrite looping_uniq.
 apply: contraL (card_size (traject s x n)) => /loopingP t_sx.
-rewrite -ltnNge size_traject -def_n ?subset_leq_card //.
+rewrite -ltnNge size_traject -def_n ?subset_leq_card // porbit.unlock.
 by apply/subsetP=> _ /imsetP[_ /cycleP[i ->] ->]; rewrite /aperm permX t_sx.
 Qed.
 
@@ -394,7 +358,8 @@ Qed.
 
 Lemma eq_porbit_mem s x y : (porbit s x == porbit s y) = (x \in porbit s y).
 Proof.
-apply/eqP/idP=> [<- | /imsetP[si s_si ->]]; first exact: porbit_id.
+apply/eqP/idP; first by move<-; exact: porbit_id.
+rewrite porbit.unlock => /imsetP[si s_si ->].
 apply/setP => z; apply/imsetP/imsetP=> [] [sj s_sj ->].
   by exists (si * sj); rewrite ?groupM /aperm ?permM.
 exists (si^-1 * sj); first by rewrite groupM ?groupV.
@@ -409,7 +374,9 @@ Proof. by apply/eqP; rewrite eq_porbit_mem mem_porbit. Qed.
 
 Lemma porbitPmin s x y :
   y \in porbit s x -> exists2 i, i < #[s] & y = (s ^+ i) x.
-Proof. by move=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i. Qed.
+Proof.
+by rewrite porbit.unlock=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i.
+Qed.
 
 Lemma porbitP s x y :
   reflect (exists i, y = (s ^+ i) x) (y \in porbit s x).
@@ -430,10 +397,13 @@ rewrite /porbits; apply/setP => y.
 by apply/imsetP/imsetP => -[x _ ->{y}]; exists x; rewrite // porbitV.
 Qed.
 
+Lemma porbit_setP s t x : porbit s x =i porbit t x <-> porbit s x = porbit t x.
+Proof. by rewrite porbit.unlock; exact: setP. Qed.
+
 Lemma porbits_mul_tperm s x y : let t := tperm x y in
   #|porbits (t * s)| + (x \notin porbit s y).*2 = #|porbits s| + (x != y).
 Proof.
-pose xf a b u := find (pred2 a b) (traject u (u a) #|porbit u a|).
+pose xf a b u := seq.find (pred2 a b) (traject u (u a) #|porbit u a|).
 have xf_size a b u: xf a b u <= #|porbit u a|.
   by rewrite (leq_trans (find_size _ _)) ?size_traject.
 have lt_xf a b u n : n < xf a b u -> ~~ pred2 a b ((u ^+ n.+1) a).
@@ -472,8 +442,8 @@ rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   suffices ts_z: porbit (t x y s) z = porbit s z.
     by rewrite -ts_z !eq_porbit_mem {1 2}ts_z sxz syz imset_f ?inE.
   suffices exp_id n: ((t x y s) ^+ n) z = (s ^+ n) z.
-    apply/setP=> u; apply/idP/idP=> /imsetP[_ /cycleP[i ->] ->].
-      by rewrite /aperm exp_id mem_porbit.
+    apply/porbit_setP => u; apply/idP/idP=> /porbitP[i ->].
+      by rewrite /aperm exp_id mem_porbit. 
     by rewrite /aperm -exp_id mem_porbit.
   elim: n => // n IHn; rewrite !expgSr !permM {}IHn tpermD //.
     by apply: contraNneq sxz => ->; apply: mem_porbit.
@@ -495,8 +465,8 @@ Qed.
 
 Lemma odd_perm1 : odd_perm 1 = false.
 Proof.
-rewrite /odd_perm card_imset ?addbb // => x y; move/eqP.
-by rewrite eq_porbit_mem /porbit cycle1 imset_set1 /aperm perm1; move/set1P.
+rewrite /odd_perm card_imset ?addbb // => x y; move/eqP; rewrite eq_porbit_mem.
+by rewrite porbit.unlock cycle1 imset_set1 /aperm perm1 inE=> /eqP.
 Qed.
 
 Lemma odd_mul_tperm x y s : odd_perm (tperm x y * s) = (x != y) (+) odd_perm s.
@@ -638,7 +608,7 @@ elim: {k}(k : nat) {1 3}k (erefl (k : nat)) => [|m IHm] k def_k.
   by rewrite (_ : k = ord0) ?lift_perm1 ?odd_perm1 //; apply: val_inj.
 have le_mn: m < n.+1 by [rewrite -def_k ltnW]; pose j := Ordinal le_mn.
 rewrite -(mulg1 1)%g -(lift_permM _ j) odd_permM {}IHm // addbC.
-rewrite (_ : _ 1 = tperm j k); first by rewrite odd_tperm neq_ltn def_k leqnn.
+rewrite (_ : _ 1 = tperm j k); first by rewrite odd_tperm neq_ltn/= def_k leqnn.
 apply/permP=> i; case: (unliftP j i) => [i'|] ->; last first.
   by rewrite lift_perm_id tpermL.
 apply: ord_inj; rewrite lift_perm_lift !permE /= eq_sym -if_neg neq_lift.

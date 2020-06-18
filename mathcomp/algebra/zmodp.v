@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From HB Require Import structures.
+From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq div.
 From mathcomp Require Import fintype bigop finset prime fingroup.
 From mathcomp Require Import ssralg finalg countalg.
 
@@ -100,11 +101,10 @@ Qed.
 Lemma Zp_addC : commutative Zp_add.
 Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
 
-Definition Zp_zmodMixin := ZmodMixin Zp_addA Zp_addC Zp_add0z Zp_addNz.
-Canonical Zp_zmodType := Eval hnf in ZmodType 'I_p Zp_zmodMixin.
-Canonical Zp_finZmodType := Eval hnf in [finZmodType of 'I_p].
-Canonical Zp_baseFinGroupType := Eval hnf in [baseFinGroupType of 'I_p for +%R].
-Canonical Zp_finGroupType := Eval hnf in [finGroupType of 'I_p for +%R].
+HB.instance Definition _ :=
+  GRing.IsZmodule.Build 'I_p Zp_addA Zp_addC Zp_add0z Zp_addNz.
+
+HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 
 (* Ring operations *)
 
@@ -215,20 +215,12 @@ Local Notation p := p'.+2.
 
 Lemma Zp_nontrivial : Zp1 != 0 :> 'I_p. Proof. by []. Qed.
 
-Definition Zp_ringMixin :=
-  ComRingMixin (@Zp_mulA _) (@Zp_mulC _) (@Zp_mul1z _) (@Zp_mul_addl _)
-               Zp_nontrivial.
-Canonical Zp_ringType := Eval hnf in RingType 'I_p Zp_ringMixin.
-Canonical Zp_finRingType := Eval hnf in [finRingType of 'I_p].
-Canonical Zp_comRingType := Eval hnf in ComRingType 'I_p (@Zp_mulC _).
-Canonical Zp_finComRingType := Eval hnf in [finComRingType of 'I_p].
-
-Definition Zp_unitRingMixin :=
-  ComUnitRingMixin (@Zp_mulVz _) (@Zp_intro_unit _) (@Zp_inv_out _).
-Canonical Zp_unitRingType := Eval hnf in UnitRingType 'I_p Zp_unitRingMixin.
-Canonical Zp_finUnitRingType := Eval hnf in [finUnitRingType of 'I_p].
-Canonical Zp_comUnitRingType := Eval hnf in [comUnitRingType of 'I_p].
-Canonical Zp_finComUnitRingType := Eval hnf in [finComUnitRingType of 'I_p].
+HB.instance Definition _ := 
+  GRing.Zmodule_IsComRing.Build 'I_p
+    (@Zp_mulA _) (@Zp_mulC _) (@Zp_mul1z _) (@Zp_mul_addl _) Zp_nontrivial.
+HB.instance Definition _ :=
+  GRing.ComRing_HasMulInverse.Build 'I_p 
+    (@Zp_mulVz _) (@Zp_intro_unit _) (@Zp_inv_out _).
 
 Lemma Zp_nat n : n%:R = inZp n :> 'I_p.
 Proof. by apply: val_inj; rewrite [n%:R]Zp_mulrn /= modnMml mul1n. Qed.
@@ -283,11 +275,15 @@ Proof. by move=> p_gt1; rewrite -Zp_nat_mod ?modnn. Qed.
 
 Lemma unitZpE x : p > 1 -> ((x%:R : 'Z_p) \is a GRing.unit) = coprime p x.
 Proof.
-by move=> p_gt1; rewrite qualifE /= val_Zp_nat ?Zp_cast ?coprime_modr.
+move=> p_gt1; rewrite qualifE /=.
+(* FIXME : must add this unfold *)
+rewrite /GRing.unit_subdef /=.
+by rewrite val_Zp_nat ?Zp_cast ?coprime_modr.
 Qed.
 
 Lemma Zp_group_set : group_set Zp.
 Proof. by rewrite /Zp; case: (p > 1); apply: groupP. Qed.
+(* FIX ME : is this ok something similar is done in fingroup *)
 Canonical Zp_group := Group Zp_group_set.
 
 Lemma card_Zp : p > 0 -> #|Zp| = p.
@@ -298,6 +294,7 @@ Qed.
 
 Lemma mem_Zp x : p > 1 -> x \in Zp. Proof. by rewrite /Zp => ->. Qed.
 
+(* FIXME : not sure this is still good *)
 Canonical units_Zp_group := [group of units_Zp].
 
 Lemma card_units_Zp : p > 0 -> #|units_Zp| = totient p.
@@ -350,29 +347,17 @@ Proof. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
 
 End F_prime.
 
-Lemma Fp_fieldMixin : GRing.Field.mixin_of [the unitRingType of 'F_p].
+Lemma Fp_fieldMixin : GRing.ComUnitRing_IsField 'F_p.
 Proof.
-move=> x nzx; rewrite qualifE /= prime_coprime ?gtnNdvd ?lt0n //.
+constructor => x nzx.
+(* FIXME: remove the subdef *)
+rewrite qualifE /GRing.unit_subdef/=.
+rewrite prime_coprime ?gtnNdvd ?lt0n //.
 case: (ltnP 1 p) => [lt1p | ]; last by case: p => [|[|p']].
 by rewrite Zp_cast ?prime_gt1 ?pdiv_prime.
 Qed.
 
-Definition Fp_idomainMixin := FieldIdomainMixin Fp_fieldMixin.
-
-Canonical Fp_idomainType := Eval hnf in IdomainType 'F_p  Fp_idomainMixin.
-Canonical Fp_finIdomainType := Eval hnf in [finIdomainType of 'F_p].
-Canonical Fp_fieldType := Eval hnf in FieldType 'F_p Fp_fieldMixin.
-Canonical Fp_finFieldType := Eval hnf in [finFieldType of 'F_p].
-Canonical Fp_decFieldType :=
-  Eval hnf in [decFieldType of 'F_p for Fp_finFieldType].
+HB.instance Definition _ := Fp_fieldMixin.
+HB.instance Definition _ := FinRing.IsField.Build 'F_p.
 
 End PrimeField.
-
-Canonical Zp_countZmodType m := [countZmodType of 'I_m.+1].
-Canonical Zp_countRingType m := [countRingType of 'I_m.+2].
-Canonical Zp_countComRingType m := [countComRingType of 'I_m.+2].
-Canonical Zp_countUnitRingType m := [countUnitRingType of 'I_m.+2].
-Canonical Zp_countComUnitRingType m := [countComUnitRingType of 'I_m.+2].
-Canonical Fp_countIdomainType p := [countIdomainType of 'F_p].
-Canonical Fp_countFieldType p := [countFieldType of 'F_p].
-Canonical Fp_countDecFieldType p := [countDecFieldType of 'F_p].

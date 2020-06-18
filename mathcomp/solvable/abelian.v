@@ -1,9 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From HB Require Import structures.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path choice.
 From mathcomp Require Import div fintype finfun bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism action.
-From mathcomp Require Import quotient gfunctor gproduct ssralg finalg zmodp.
+From mathcomp Require Import quotient gfunctor gproduct ssralg countalg finalg zmodp.
 From mathcomp Require Import cyclic pgroup gseries nilpotent sylow.
 
 (******************************************************************************)

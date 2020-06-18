@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop ssralg poly.
 From mathcomp Require Import polydiv finset fingroup morphism quotient perm.
@@ -329,111 +330,32 @@ Arguments kHomP {F L K V f}.
 Arguments kAHomP {F L U V f}.
 Arguments kHom_lrmorphism {F L f}.
 
-Module SplittingField.
-
-Import GRing.
-
-Section ClassDef.
-
-Variable F : fieldType.
-
-Definition axiom (L : fieldExtType F) :=
+Definition splitting_field_axiom (F : fieldType) (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
-Set Primitive Projections.
-Record class_of (L : Type) : Type :=
-  Class {base : FieldExt.class_of F L; mixin : axiom (FieldExt.Pack _ base)}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> FieldExt.class_of.
+HB.mixin Record FieldExt_IsSplittingField
+    (F : fieldType) L of FieldExt F L := {
+  splittingFieldP_subproof : splitting_field_axiom [the fieldExtType _ of L]
+}.
 
-Structure type (phF : phant F) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variable (phF : phant F) (T : Type) (cT : type phF).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+#[mathcomp(axiom="splitting_field_axiom"), infer(F), short(type="splittingFieldType")]
+HB.structure Definition SplittingField F :=
+ { T of FieldExt_IsSplittingField F T & FieldExt F T }.
 
-Definition clone c of phant_id class c := @Pack phF T c.
 
-Definition pack b0 (ax0 : axiom (@FieldExt.Pack F (Phant F) T b0)) :=
- fun bT b & phant_id (@FieldExt.class F phF bT) b =>
- fun   ax & phant_id ax0 ax => Pack (Phant F) (@Class T b ax).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @Zmodule.Pack cT class.
-Definition ringType := @Ring.Pack cT class.
-Definition unitRingType := @UnitRing.Pack cT class.
-Definition comRingType := @ComRing.Pack cT class.
-Definition comUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @IntegralDomain.Pack cT class.
-Definition fieldType := @Field.Pack cT class.
-Definition lmodType := @Lmodule.Pack F phF cT class.
-Definition lalgType := @Lalgebra.Pack F phF cT class.
-Definition algType := @Algebra.Pack F phF cT class.
-Definition unitAlgType := @UnitAlgebra.Pack F phF cT class.
-Definition comAlgType := @ComAlgebra.Pack F phF cT class.
-Definition comUnitAlgType := @ComUnitAlgebra.Pack F phF cT class.
-Definition vectType := @Vector.Pack F phF cT class.
-Definition FalgType := @Falgebra.Pack F phF cT class.
-Definition fieldExtType := @FieldExt.Pack F phF cT class.
-
-End ClassDef.
-
-Module Exports.
-
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion base : class_of >-> FieldExt.class_of.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> Ring.type.
-Canonical ringType.
-Coercion unitRingType : type >-> UnitRing.type.
-Canonical unitRingType.
-Coercion comRingType : type >-> ComRing.type.
-Canonical comRingType.
-Coercion comUnitRingType : type >-> ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> IntegralDomain.type.
-Canonical idomainType.
-Coercion fieldType : type >-> Field.type.
-Canonical fieldType.
-Coercion lmodType : type >-> Lmodule.type.
-Canonical lmodType.
-Coercion lalgType : type >-> Lalgebra.type.
-Canonical lalgType.
-Coercion algType : type >-> Algebra.type.
-Canonical algType.
-Coercion comAlgType : type >-> ComAlgebra.type.
-Canonical comAlgType.
-Coercion unitAlgType : type >-> UnitAlgebra.type.
-Canonical unitAlgType.
-Coercion comUnitAlgType : type >-> ComUnitAlgebra.type.
-Canonical comUnitAlgType.
-Coercion vectType : type >-> Vector.type.
-Canonical vectType.
-Coercion FalgType : type >-> Falgebra.type.
-Canonical FalgType.
-Coercion fieldExtType : type >-> FieldExt.type.
-Canonical fieldExtType.
-
-Notation splittingFieldType F := (type (Phant F)).
-Notation SplittingFieldType F L ax := (@pack _ (Phant F) L _ ax _ _ id _ id).
+Module SplittingFieldExports.
+Bind Scope ring_scope with SplittingField.sort.
 Notation "[ 'splittingFieldType' F 'of' L 'for' K ]" :=
-  (@clone _ (Phant F) L K _ idfun)
+  (SplittingField.clone F L K)
   (at level 0, format "[ 'splittingFieldType'  F  'of'  L  'for'  K ]")
   : form_scope.
 Notation "[ 'splittingFieldType' F 'of' L ]" :=
-  (@clone _ (Phant F) L _ _ id)
+  [splittingFieldType F of L for _]
   (at level 0, format "[ 'splittingFieldType'  F  'of'  L ]") : form_scope.
+End SplittingFieldExports.
+HB.export SplittingFieldExports.
 
-End Exports.
-End SplittingField.
-Export SplittingField.Exports.
-
+(* FIXME: add factory *)
 Lemma normal_field_splitting (F : fieldType) (L : fieldExtType F) :
   (forall (K : {subfield L}) x,
     exists r, minPoly K x == \prod_(y <- r) ('X - y%:P)) ->
@@ -459,14 +381,18 @@ exists (i, widen_ord (sz_r i) j) => //.
 by rewrite mem_filter /= ltn_ord mem_index_enum.
 Qed.
 
-Fact regular_splittingAxiom F : SplittingField.axiom (regular_fieldExtType F).
+HB.instance Definition _ (F : fieldType) := GRing.Field.on (F^o).
+
+(* FIXME: add factory *)
+Fact regular_splittingAxiom (F : fieldType) :
+  SplittingField.axiom [the fieldExtType F of F^o].
 Proof.
 exists 1; first exact: rpred1.
 by exists [::]; [rewrite big_nil eqpxx | rewrite Fadjoin_nil regular_fullv].
 Qed.
 
-Canonical regular_splittingFieldType (F : fieldType) :=
-  SplittingFieldType F F^o (regular_splittingAxiom F).
+HB.instance Definition _ (F : fieldType) :=
+  FieldExt_IsSplittingField.Build F F^o (regular_splittingAxiom F).
 
 Section SplittingFieldTheory.
 
@@ -476,7 +402,7 @@ Implicit Types (U V W : {vspace L}).
 Implicit Types (K M E : {subfield L}).
 
 Lemma splittingFieldP : SplittingField.axiom L.
-Proof. by case: L => ? []. Qed.
+Proof. exact: splittingFieldP_subproof. Qed.
 
 Lemma splittingPoly : 
   {p : {poly L} | p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}}.
@@ -488,7 +414,8 @@ apply: sig2_eqW; have [p F0p [rs splitLp genLrs]] := splittingFieldP.
 by exists (p, rs); rewrite // /factF F0p splitLp.
 Qed.
 
-Fact fieldOver_splitting E : SplittingField.axiom (fieldOver_fieldExtType E).
+Fact fieldOver_splitting E :
+  SplittingField.axiom [the fieldExtType _ of fieldOver E].
 Proof.
 have [p Fp [r Dp defL]] := splittingFieldP; exists p.
   apply/polyOverP=> j; rewrite trivial_fieldOver.
@@ -499,8 +426,9 @@ rewrite defL0; have: x \in <<1 & r>>%VS by rewrite defL (@memvf _ L).
 apply: subvP; apply/Fadjoin_seqP; rewrite -memvE -defL0 mem1v.
 by split=> // y r_y; rewrite -defL0 seqv_sub_adjoin.
 Qed.
-Canonical fieldOver_splittingFieldType E :=
-  SplittingFieldType (subvs_of E) (fieldOver E) (fieldOver_splitting E).
+
+HB.instance Definition _ E := FieldExt_IsSplittingField.Build
+  [the fieldType of subvs_of E] (fieldOver E) (fieldOver_splitting E).
 
 Lemma enum_AEnd : {kAutL : seq 'AEnd(L) | forall f, f \in kAutL}.
 Proof.
@@ -585,7 +513,7 @@ without loss{d leqd IHd nz_q q_gt1} irr_q: q q_dv_q1 / irreducible_poly q.
 have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
   {inLz : 'AHom(L, Lz) & {z : Lz | root (map_poly inLz q) z}}}.
 - have [Lz0 _ [z qz0 defLz]] := irredp_FAdjoin irr_q.
-  pose Lz := baseField_extFieldType Lz0.
+  pose Lz := [the fieldExtType _ of baseFieldType Lz0].
   pose inLz : {rmorphism L -> Lz} := [rmorphism of in_alg Lz0].
   have inLzL_linear: linear (locked inLz).
     move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.
@@ -690,12 +618,8 @@ Implicit Types (U V W : {vspace L}) (K M E : {subfield L}).
 Definition inAEnd f := SeqSub (svalP (enum_AEnd L) f).
 Fact inAEndK : cancel inAEnd val. Proof. by []. Qed.
 
-Definition AEnd_countMixin := Eval hnf in CanCountMixin inAEndK.
-Canonical AEnd_countType := Eval hnf in CountType 'AEnd(L) AEnd_countMixin.
-Canonical AEnd_subCountType := Eval hnf in [subCountType of 'AEnd(L)].
-Definition AEnd_finMixin := Eval hnf in CanFinMixin inAEndK.
-Canonical AEnd_finType := Eval hnf in FinType 'AEnd(L) AEnd_finMixin.
-Canonical AEnd_subFinType := Eval hnf in [subFinType of 'AEnd(L)].
+HB.instance Definition _ := Countable.copy 'AEnd(L) (can_type inAEndK).
+HB.instance Definition _ : IsFinite 'AEnd(L) := CanFinMixin inAEndK.
 
 (* the group operation is the categorical composition operation *)
 Definition comp_AEnd (f g : 'AEnd(L)) : 'AEnd(L) := (g \o f)%AF.
@@ -709,11 +633,8 @@ Proof. by move=> f; apply/val_inj/comp_lfun1r. Qed.
 Fact comp_AEndK : left_inverse \1%AF (@inv_ahom _ L) comp_AEnd.
 Proof.  by move=> f; apply/val_inj; rewrite /= lker0_compfV ?AEnd_lker0. Qed.
 
-Definition AEnd_baseFinGroupMixin :=
-  FinGroup.Mixin comp_AEndA comp_AEnd1l comp_AEndK.
-Canonical AEnd_baseFinGroupType :=
-  BaseFinGroupType 'AEnd(L) AEnd_baseFinGroupMixin.
-Canonical AEnd_finGroupType := FinGroupType comp_AEndK.
+HB.instance Definition _:= IsMulGroup.Build 'AEnd(L)
+  comp_AEndA comp_AEnd1l comp_AEndK.
 
 Definition kAEnd U V := [set f : 'AEnd(L) | kAut U V f].
 Definition kAEndf U := kAEnd U {:L}.
@@ -781,14 +702,8 @@ Definition gal_sgval x := let: Gal u := x in u.
 Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
 Let gal_sgval_inj := can_inj gal_sgvalK.
 
-Definition gal_eqMixin := CanEqMixin gal_sgvalK.
-Canonical gal_eqType := Eval hnf in EqType gal_of gal_eqMixin.
-Definition gal_choiceMixin := CanChoiceMixin gal_sgvalK.
-Canonical gal_choiceType := Eval hnf in ChoiceType gal_of gal_choiceMixin.
-Definition gal_countMixin := CanCountMixin gal_sgvalK.
-Canonical gal_countType := Eval hnf in CountType gal_of gal_countMixin.
-Definition gal_finMixin := CanFinMixin gal_sgvalK.
-Canonical gal_finType := Eval hnf in FinType gal_of gal_finMixin.
+HB.instance Definition _ := Countable.copy gal_of (can_type gal_sgvalK).
+HB.instance Definition _ : IsFinite gal_of := CanFinMixin gal_sgvalK.
 
 Definition gal_one := Gal 1%g.
 Definition gal_inv x := Gal (gal_sgval x)^-1.
@@ -800,11 +715,7 @@ Proof. by move=> x; apply/gal_sgval_inj/mulVg. Qed.
 Fact gal_mulP : associative gal_mul.
 Proof. by move=> x y z; apply/gal_sgval_inj/mulgA. Qed.
 
-Definition gal_finGroupMixin :=
-  FinGroup.Mixin gal_mulP gal_oneP gal_invP.
-Canonical gal_finBaseGroupType :=
-  Eval hnf in BaseFinGroupType gal_of gal_finGroupMixin.
-Canonical gal_finGroupType := Eval hnf in FinGroupType gal_invP.
+HB.instance Definition _ := IsMulGroup.Build gal_of gal_mulP gal_oneP gal_invP.
 
 Coercion gal_repr u : 'AEnd(L) := repr (sgval (gal_sgval u)).
 

@@ -195,7 +195,21 @@ Lemma stable_rowg_mxK (L : {group rVn}) :
   [acts setT, on L | 'Zm] -> rowg (rowg_mx L) = L.
 Proof.
 move=> linL; apply/eqP; rewrite eqEsubset sub_rowg_mx andbT.
-apply/subsetP=> v; rewrite inE genmxE => /submxP[u ->{v}].
+apply/subsetP=> v; rewrite inE.
+(* FIXME: slow conversion *)
+(* have :  *)
+(*     set_type *)
+(*     (matrix_matrix__canonical__fintype_Finite *)
+(*        (FinRing_Field__to__fintype_Finite F)  *)
+(*        (S O) n) *)
+(*        = *)
+(*     GroupSet.sort *)
+(*     (fingroup_FinGroup__to__fingroup_BaseFinGroup *)
+(*        (matrix_matrix__canonical__fingroup_FinGroup *)
+(*           (FinRing_Field__to__FinRing_Zmodule F)  *)
+(*           (S O) n)). *)
+(* Time by []. *)
+rewrite genmxE => /submxP[u ->{v}].
 rewrite mulmx_sum_row group_prod // => i _.
 rewrite rowK; move: (enum_val i) (enum_valP i) => v Lv.
 have [->|] := eqVneq (u 0 i) 0; first by rewrite scale0r group1.
@@ -422,7 +436,7 @@ Variables p m n : nat.
 Local Notation Mmn := 'M['F_p]_(m, n).
 
 Lemma mx_Fp_abelem : prime p -> p.-abelem [set: Mmn].
-Proof. exact: fin_Fp_lmod_abelem. Qed.
+Proof. exact: fin_Fp_lmod_abelem. Qed.  (* FIXME: much slower *)
 
 Lemma mx_Fp_stable (L : {group Mmn}) : [acts setT, on L | 'Zm].
 Proof.

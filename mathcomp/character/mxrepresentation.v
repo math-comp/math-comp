@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
 From mathcomp Require Import ssralg poly polydiv finset fingroup morphism.
@@ -354,6 +355,7 @@ apply/group_setP; rewrite inE group1 repr_mx1 mulmx1; split=> //= x y.
 case/setIdP=> Gx cUx; case/setIdP=> Gy cUy; rewrite inE repr_mxM ?groupM //.
 by rewrite mulmxA (eqP cUx).
 Qed.
+
 Canonical rstab_group := Group rstab_group_set.
 
 End Stabiliser.
@@ -456,8 +458,7 @@ Lemma repr_mxMr : {in G &, {morph rG : x y / (x * y)%g >-> x * y}}.
 Proof. exact: repr_mxM. Qed.
 
 Lemma repr_mxVr : {in G, {morph rG : x / (x^-1)%g >-> x^-1}}.
-Proof. exact: repr_mxV.
- Qed.
+Proof. exact: repr_mxV. Qed.
 
 Lemma repr_mx_unitr x : x \in G -> rG x \is a GRing.unit.
 Proof. exact: repr_mx_unit. Qed.
@@ -711,7 +712,8 @@ End Quotient.
 Section Regular.
 
 Variables (gT : finGroupType) (G : {group gT}).
-Local Notation nG := #|pred_of_set (gval G)|.
+Definition gcard := #|G|. (* hides the projections to set *)
+Local Notation nG := gcard.
 
 Definition gring_index (x : gT) := enum_rank_in (group1 G) x.
 
@@ -1153,7 +1155,7 @@ Lemma add_sub_fact_mod m (W : 'M_(m, n)) :
   val_submod (in_submod W) + val_factmod (in_factmod W) = W.
 Proof.
 rewrite /val_submod /val_factmod /= -!mulmxA -mulmxDr.
-rewrite addrC (mulmxA (pid_mx _)) pid_mx_id // (mulmxA (col_ebase _)).
+rewrite addrC ![in X in X + _](mulmxA (pid_mx _)) pid_mx_id // (mulmxA (col_ebase _)).
 rewrite (mulmxA _ _ (row_ebase _)) mulmx_ebase.
 rewrite (mulmxA (pid_mx _)) pid_mx_id // mulmxA -mulmxDl -mulmxDr.
 by rewrite subrK mulmx1 mulmxA mulmxKV ?row_ebase_unit.
@@ -2140,25 +2142,18 @@ rewrite /socle_val /= in e0W *; rewrite -(nth_map _ 0) ?nth_index //.
 by rewrite -(size_map component_mx) index_mem.
 Qed.
 
-Canonical socle_subType := SubType _ _ _ socle_sort_rect PackSocleK.
-Definition socle_eqMixin := Eval hnf in [eqMixin of sG by <:].
-Canonical socle_eqType := Eval hnf in EqType sG socle_eqMixin.
-Definition socle_choiceMixin := Eval hnf in [choiceMixin of sG by <:].
-Canonical socle_choiceType := ChoiceType sG socle_choiceMixin.
+HB.instance Definition _ := IsSUB.Build _ _ sG socle_sort_rect PackSocleK.
+HB.instance Definition _ := [Choice of sG by <:].
 
 Lemma socleP (W W' : sG) : reflect (W = W') (W == W')%MS.
 Proof. by rewrite (sameP genmxP eqP) !{1}genmx_component; apply: (W =P _). Qed.
 
-Fact socle_finType_subproof :
+Fact socle_can_subproof :
   cancel (fun W => SeqSub (socle_mem W)) (fun s => PackSocle (valP s)).
 Proof. by move=> W /=; apply: val_inj; rewrite /= PackSocleK. Qed.
 
-Definition socle_countMixin := CanCountMixin socle_finType_subproof.
-Canonical socle_countType := CountType sG socle_countMixin.
-Canonical socle_subCountType := [subCountType of sG].
-Definition socle_finMixin := CanFinMixin socle_finType_subproof.
-Canonical socle_finType := FinType sG socle_finMixin.
-Canonical socle_subFinType := [subFinType of sG].
+HB.instance Definition _ : IsCountable sG := CanCountMixin socle_can_subproof.
+HB.instance Definition _ : IsFinite sG := CanFinMixin socle_can_subproof.
 
 End SocleDef.
 
@@ -2910,7 +2905,8 @@ by rewrite -(morphim_mx_abs_irr _ nHG) splitG //; apply/morphim_mx_irr.
 Qed.
 
 Lemma coset_splitting_field gT (H : {set gT}) :
-  group_closure_field gT -> group_closure_field (coset_groupType H).
+  group_closure_field gT ->
+  group_closure_field [the finGroupType of coset_of H].
 Proof.
 move=> split_gT Gbar; have ->: Gbar = (coset H @*^-1 Gbar / H)%G.
   by apply: val_inj; rewrite /= /quotient morphpreK ?sub_im_coset.
@@ -3330,7 +3326,7 @@ have [|XG [defX1 dxX1]] := sum_mxsimple_direct_sub simMG (_ : _ :=: 1%:M)%MS.
     rewrite -submx0; apply/sumsmx_subP; move/(_ 1%g (erefl _)); apply: negP.
     by rewrite submx0 repr_mx1 mulmx1; case simM.
   apply/mxmoduleP=> x Gx; rewrite sumsmxMr; apply/sumsmx_subP=> [[y Gy]] /= _.
-  by rewrite (sumsmx_sup (subg G (y * x))) // subgK ?groupM // -mulmxA repr_mxM.
+  by rewrite (sumsmx_sup (subg G (y * x)))// subgK ?groupM// -mulmxA repr_mxM.
 exists (val @: XG); first by apply/subsetP=> ?; case/imsetP=> [[x Gx]] _ ->.
 have bij_val: {on val @: XG, bijective (@sgval _ G)}.
   exists (subg G) => [g _ | x]; first exact: sgvalK.
@@ -3863,7 +3859,7 @@ Section Regular.
 Variables (gT : finGroupType) (G : {group gT}).
 Local Notation nG := #|pred_of_set (gval G)|.
 
-Local Notation rF := (GRing.Field.comUnitRingType F) (only parsing).
+Local Notation rF := ([comUnitRingType of F]).
 Local Notation aG := (regular_repr rF G).
 Local Notation R_G := (group_ring rF G).
 
@@ -4093,6 +4089,7 @@ rewrite [1%irr]unlock PackSocleK; apply/eqmxP.
 rewrite (component_mx_id principal_comp_subproof) andbT.
 have [I [W isoW ->]] := component_mx_def principal_comp_subproof.
 apply/sumsmx_subP=> i _; have [f _ hom_f <-]:= isoW i.
+(* FIX ME : this takes time *)
 by apply/rfix_mxP=> x Gx; rewrite -(hom_mxP hom_f) // (rfix_mxP G _).
 Qed.
 
@@ -4590,7 +4587,7 @@ exists (fun i => oapp h' [1 sGq]%irr (insub i)) => [j | i] lin_i.
   exists g => [||G'x]; last 1 [case/morphimP=> x _ Gx ->] || by [].
   by rewrite quo_repr_coset ?hom_g.
 rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
-set u := exist _ _ _; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
+set u := Sub i lin_i; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
 have [g lin_g inj_g hom_g] := rsim_irr_comp sGq F'Gq (irrGq u).
 exists g => [||x Gx]; last 1 [have:= hom_g (coset _ x)] || by [].
 by rewrite quo_repr_coset; first by apply; rewrite mem_quotient.
@@ -4785,7 +4782,7 @@ have qev_nsim u: qev (row_env [:: u]) nsimUt = nsim n (vec_mx u).
   do 2!bool_congr; apply: andb_id2l => sUV.
   by rewrite ltn_neqAle andbC !mxrank_leqif_sup.
 have n2gt0: n ^ 2 > 0.
-  by move: nzU; rewrite muln_gt0 -mxrank_eq0; case: posnP (U) => // ->.
+  by move: nzU; rewrite muln_gt0 -mxrank_eq0 unlock; case: posnP (U) => // ->.
 apply: (iffP satP) => [|[V nsimV]].
   by case/Exists_rowP=> // v; move/qevP; rewrite qev_nsim; exists (vec_mx v).
 apply/Exists_rowP=> //; exists (mxvec V); apply/qevP.
@@ -5074,11 +5071,10 @@ Hypotheses (irrG : irr rG) (cGA : centgmx rG A).
 Notation FA := (gen_of irrG cGA).
 Let inFA := Gen irrG cGA.
 
-Canonical gen_subType := Eval hnf in [newType for rVval : FA -> 'rV_d].
-Definition gen_eqMixin := Eval hnf in [eqMixin of FA by <:].
-Canonical gen_eqType := Eval hnf in EqType FA gen_eqMixin.
-Definition gen_choiceMixin := [choiceMixin of FA by <:].
-Canonical gen_choiceType := Eval hnf in ChoiceType FA gen_choiceMixin.
+(* FIXME: embed the hnf in HB.instance *)
+Definition rVval_IsSUB := Eval hnf in [IsNew for rVval : FA -> 'rV_d].
+#[export] HB.instance Definition _ := rVval_IsSUB.
+#[export] HB.instance Definition _ := [Choice of FA by <:].
 
 Definition gen0 := inFA 0.
 Definition genN (x : FA) := inFA (- val x).
@@ -5096,8 +5092,8 @@ Proof. by move=> x; apply: val_inj; rewrite /= add0r. Qed.
 Lemma gen_addNr : left_inverse gen0 genN genD.
 Proof. by move=> x; apply: val_inj; rewrite /= addNr. Qed.
 
-Definition gen_zmodMixin := ZmodMixin gen_addA gen_addC gen_add0r gen_addNr.
-Canonical gen_zmodType := Eval hnf in ZmodType FA gen_zmodMixin.
+#[export] HB.instance Definition _ := GRing.IsZmodule.Build FA
+  gen_addA gen_addC gen_add0r gen_addNr.
 
 Definition pval (x : FA) := rVpoly (val x).
 
@@ -5169,10 +5165,8 @@ Qed.
 Lemma gen_ntriv : gen1 != 0.
 Proof. by rewrite -(inj_eq mxval_inj) mxval_gen1 mxval0 oner_eq0. Qed.
 
-Definition gen_ringMixin :=
-  ComRingMixin gen_mulA gen_mulC gen_mul1r gen_mulDr gen_ntriv.
-Canonical gen_ringType := Eval hnf in RingType FA gen_ringMixin.
-Canonical gen_comRingType := Eval hnf in ComRingType FA gen_mulC.
+#[export] HB.instance Definition _ := GRing.Zmodule_IsComRing.Build FA
+    gen_mulA gen_mulC gen_mul1r gen_mulDr gen_ntriv.
 
 Lemma mxval1 : mxval 1 = 1%:M. Proof. exact: mxval_gen1. Qed.
 
@@ -5194,9 +5188,9 @@ apply/row_subP=> k; rewrite rowK memmx_cent_envelop; apply/centgmxP => g Gg /=.
 by rewrite !mulmxE commrX // /GRing.comm -mulmxE (centgmxP cGA).
 Qed.
 
-Lemma gen_mulVr : GRing.Field.axiom genV.
+Lemma gen_mulVr x : x != 0 -> genV x * x = 1.
 Proof.
-move=> x; rewrite -(inj_eq mxval_inj) mxval0.
+rewrite -(inj_eq mxval_inj) mxval0.
 move/(mx_Schur irrG (mxval_centg x)) => u_x.
 by apply: mxval_inj; rewrite mxvalM mxval_genV mxval1 mulVmx.
 Qed.
@@ -5204,15 +5198,8 @@ Qed.
 Lemma gen_invr0 : genV 0 = 0.
 Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 
-Definition gen_unitRingMixin := FieldUnitMixin gen_mulVr gen_invr0.
-Canonical gen_unitRingType :=
-  Eval hnf in UnitRingType FA gen_unitRingMixin.
-Canonical gen_comUnitRingType := Eval hnf in [comUnitRingType of FA].
-Definition gen_fieldMixin :=
-  @FieldMixin _ _ _ _ : GRing.Field.mixin_of gen_unitRingType.
-Definition gen_idomainMixin := FieldIdomainMixin gen_fieldMixin.
-Canonical gen_idomainType := Eval hnf in IdomainType FA gen_idomainMixin.
-Canonical gen_fieldType := Eval hnf in FieldType FA gen_fieldMixin.
+#[export] HB.instance Definition _ := GRing.ComRing_IsField.Build FA
+  gen_mulVr gen_invr0.
 
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.
 Proof. exact: mxval_genV. Qed.
@@ -5290,7 +5277,7 @@ Definition subbase nA (B : 'rV_nA) : 'M_(nA * d, n) :=
   \matrix_ik mxvec (\matrix_(i, k) (row (B 0 i) (A ^+ k))) 0 ik.
 
 Lemma gen_dim_ex_proof : exists nA, [exists B : 'rV_nA, row_free (subbase B)].
-Proof. by exists 0%N; apply/existsP; exists 0. Qed.
+Proof. by exists 0%N; apply/existsP; exists 0; rewrite /row_free unlock. Qed.
 
 Lemma gen_dim_ub_proof nA :
   [exists B : 'rV_nA, row_free (subbase B)] -> (nA <= n)%N.
@@ -5736,15 +5723,15 @@ Qed.
 
 Definition gen_sat e f := GRing.sat (gen_env e) (gen_form (GRing.to_rform f)).
 
-Lemma gen_satP : GRing.DecidableField.axiom gen_sat.
+(* FIXME : why this MathCompCompatDecidableField *)
+Lemma gen_satP :
+  GRing.MathCompCompatDecidableField.DecidableField.axiom gen_sat.
 Proof.
 move=> e f; have [tor rto] := GRing.to_rformP e f.
 exact: (iffP (sat_gen_form e (GRing.to_rform_rformula f))).
 Qed.
 
-Definition gen_decFieldMixin := DecFieldMixin gen_satP.
-
-Canonical gen_decFieldType := Eval hnf in DecFieldType FA gen_decFieldMixin.
+#[export] HB.instance Definition _ := GRing.Field_IsDec.Build FA gen_satP.
 
 End DecideGenField.
 
@@ -5756,22 +5743,8 @@ Variables (rG : mx_representation F G n) (A : 'M[F]_n).
 Hypotheses (irrG : mx_irreducible rG) (cGA : centgmx rG A).
 Notation FA := (gen_of irrG cGA).
 
-(* This should be [countMixin of FA by <:]*)
-Definition gen_countMixin := (sub_countMixin (gen_subType irrG cGA)).
-Canonical gen_countType := Eval hnf in CountType FA gen_countMixin.
-Canonical gen_subCountType := Eval hnf in [subCountType of FA].
-Definition gen_finMixin := [finMixin of FA by <:].
-Canonical gen_finType := Eval hnf in FinType FA gen_finMixin.
-Canonical gen_subFinType := Eval hnf in [subFinType of FA].
-Canonical gen_finZmodType := Eval hnf in [finZmodType of FA].
-Canonical gen_baseFinGroupType := Eval hnf in [baseFinGroupType of FA for +%R].
-Canonical gen_finGroupType := Eval hnf in [finGroupType of FA for +%R].
-Canonical gen_finRingType := Eval hnf in [finRingType of FA].
-Canonical gen_finComRingType := Eval hnf in [finComRingType of FA].
-Canonical gen_finUnitRingType := Eval hnf in [finUnitRingType of FA].
-Canonical gen_finComUnitRingType := Eval hnf in [finComUnitRingType of FA].
-Canonical gen_finIdomainType := Eval hnf in [finIdomainType of FA].
-Canonical gen_finFieldType := Eval hnf in [finFieldType of FA].
+#[export] HB.instance Definition _ := [Finite of FA by <:].
+#[export] HB.instance Definition _ := [finGroupMixin of FA for +%R].
 
 Lemma card_gen : #|{:FA}| = (#|F| ^ degree_mxminpoly A)%N.
 Proof. by rewrite card_sub card_mx mul1n. Qed.
@@ -5779,6 +5752,14 @@ Proof. by rewrite card_sub card_mx mul1n. Qed.
 End FiniteGenField.
 
 End MatrixGenField.
+
+Module MatrixGenFieldExports.
+
+HB.reexport.
+
+End MatrixGenFieldExports.
+
+Export MatrixGenFieldExports.
 
 Bind Scope ring_scope with gen_of.
 Arguments rVval {F gT G%G n'%N rG A%R irrG cGA} x%R : rename.
@@ -5789,31 +5770,6 @@ Arguments in_gen {F gT G n' rG A} irrG cGA {m} W.
 Arguments in_genK {F gT G n' rG A} irrG cGA {m} W : rename.
 Arguments val_genK {F gT G n' rG A irrG cGA m} W : rename.
 Prenex Implicits gen_env gen_term gen_form gen_sat.
-
-Canonical gen_subType.
-Canonical gen_eqType.
-Canonical gen_choiceType.
-Canonical gen_countType.
-Canonical gen_subCountType.
-Canonical gen_finType.
-Canonical gen_subFinType.
-Canonical gen_zmodType.
-Canonical gen_finZmodType.
-Canonical gen_baseFinGroupType.
-Canonical gen_finGroupType.
-Canonical gen_ringType.
-Canonical gen_finRingType.
-Canonical gen_comRingType.
-Canonical gen_finComRingType.
-Canonical gen_unitRingType.
-Canonical gen_finUnitRingType.
-Canonical gen_comUnitRingType.
-Canonical gen_finComUnitRingType.
-Canonical gen_idomainType.
-Canonical gen_finIdomainType.
-Canonical gen_fieldType.
-Canonical gen_finFieldType.
-Canonical gen_decFieldType.
 
 (* Classical splitting and closure field constructions provide convenient     *)
 (* packaging for the pointwise construction.                                  *)
@@ -5841,7 +5797,8 @@ have{nabsG} [A]: exists2 A, (A \in cG)%MS & ~~ is_scalar_mx A.
   by apply: contra nabsG; apply: cent_mx_scalar_abs_irr.
 rewrite {cG}memmx_cent_envelop -mxminpoly_linear_is_scalar -ltnNge => cGA.
 move/(non_linear_gen_reducible irrG cGA).
-set F' := gen_fieldType _ _; set rG' := @map_repr _ F' _ _ _ _ rG.
+(* FIXME: _ matches a generated constant *)
+set F' := _ irrG cGA; set rG' := @map_repr _ F' _ _ _ _ rG.
 move: F' (gen_rmorphism _ _ : {rmorphism F -> F'}) => F' f' in rG' * => irrG'.
 pose U' := [seq map_mx f' Ui | Ui <- U].
 have modU': mx_subseries (aG F') U'.

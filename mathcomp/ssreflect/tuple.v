@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 From mathcomp Require Import seq choice fintype path.
 
@@ -59,7 +60,7 @@ Variables (n : nat) (T : Type).
 
 Structure tuple_of : Type := Tuple {tval :> seq T; _ : size tval == n}.
 
-Canonical tuple_subType := Eval hnf in [subType for tval].
+HB.instance Definition _ := [IsSUB for tval].
 
 Implicit Type t : tuple_of.
 
@@ -304,9 +305,8 @@ Section EqTuple.
 
 Variables (n : nat) (T : eqType).
 
-Definition tuple_eqMixin := Eval hnf in [eqMixin of n.-tuple T by <:].
-Canonical tuple_eqType := Eval hnf in EqType (n.-tuple T) tuple_eqMixin.
-
+HB.instance Definition tuple_HasDecEq : HasDecEq (n.-tuple T) :=
+  [HasDecEq of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
@@ -345,20 +345,11 @@ Qed.
 
 End EqTuple.
 
-Definition tuple_choiceMixin n (T : choiceType) :=
-  [choiceMixin of n.-tuple T by <:].
-
-Canonical tuple_choiceType n (T : choiceType) :=
-  Eval hnf in ChoiceType (n.-tuple T) (tuple_choiceMixin n T).
-
-Definition tuple_countMixin n (T : countType) :=
-  [countMixin of n.-tuple T by <:].
-
-Canonical tuple_countType n (T : countType) :=
-  Eval hnf in CountType (n.-tuple T) (tuple_countMixin n T).
-
-Canonical tuple_subCountType n (T : countType) :=
-  Eval hnf in [subCountType of n.-tuple T].
+(* TODO: try to factor this into a single instance *)
+HB.instance Definition tuple_HasChoice n (T : choiceType) :=
+  [HasChoice of n.-tuple T by <:].
+HB.instance Definition tuple_IsCountable n (T : countType) :=
+  [IsCountable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
 Section FinTupleSig.
@@ -408,9 +399,8 @@ Variables (n : nat) (T : finType).
 (* but in practice it will not work because the mixin_enum projector          *)
 (* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
-Definition tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
-Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.
-Canonical tuple_subFinType := Eval hnf in [subFinType of n.-tuple T].
+HB.instance Definition tuple_finMixin : IsFinite (n.-tuple T) :=
+  FinMixin (@FinTuple.enumP n T).
 
 Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
 Proof. by rewrite [#|_|]cardT enumT unlock FinTuple.size_enum. Qed.
@@ -472,7 +462,7 @@ Variables (n : nat) (T : Type).
 
 Structure bseq_of : Type := Bseq {bseqval :> seq T; _ : size bseqval <= n}.
 
-Canonical bseq_subType := Eval hnf in [subType for bseqval].
+HB.instance Definition _ := [IsSUB for bseqval].
 
 Implicit Type bs : bseq_of.
 
@@ -642,11 +632,8 @@ Proof. by move=> s; apply: val_inj; case: s => [[]]. Qed.
 
 End SeqBseq.
 
-Definition bseq_eqMixin n (T : eqType) :=
-  Eval hnf in [eqMixin of n.-bseq T by <:].
-
-Canonical bseq_eqType n (T : eqType) :=
-  Eval hnf in EqType (n.-bseq T) (bseq_eqMixin n T).
+HB.instance Definition bseq_HasDecEq n (T : eqType) :=
+  [HasDecEq of n.-bseq T by <:].
 
 Canonical bseq_predType n (T : eqType) :=
   Eval hnf in PredType (fun t : n.-bseq T => mem_seq t).
@@ -654,20 +641,11 @@ Canonical bseq_predType n (T : eqType) :=
 Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
 Proof. by []. Qed.
 
-Definition bseq_choiceMixin n (T : choiceType) :=
-  [choiceMixin of n.-bseq T by <:].
+HB.instance Definition bseq_HasChoice n (T : choiceType) :=
+  [HasChoice of n.-bseq T by <:].
 
-Canonical bseq_choiceType n (T : choiceType) :=
-  Eval hnf in ChoiceType (n.-bseq T) (bseq_choiceMixin n T).
-
-Definition bseq_countMixin n (T : countType) :=
-  [countMixin of n.-bseq T by <:].
-
-Canonical bseq_countType n (T : countType) :=
-  Eval hnf in CountType (n.-bseq T) (bseq_countMixin n T).
-
-Canonical bseq_subCountType n (T : countType) :=
-  Eval hnf in [subCountType of n.-bseq T].
+HB.instance Definition bseq_IsCountable n (T : countType) :=
+  [IsCountable of n.-bseq T by <:].
 
 Definition bseq_tagged_tuple n T (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
   Tagged _ (in_tuple s : (Ordinal (size_bseq s : size s < n.+1)).-tuple _).
@@ -697,11 +675,6 @@ Proof. exact/Bijective/bseq_tagged_tupleK/tagged_tuple_bseqK. Qed.
 
 #[global] Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
 
-Definition bseq_finMixin n (T : finType) :=
+#[non_forgetful_inheritance]
+HB.instance Definition bseq_IsFinite n (T : finType) : IsFinite (n.-bseq T) :=
   CanFinMixin (@bseq_tagged_tupleK n T).
-
-Canonical bseq_finType n (T : finType) :=
-  Eval hnf in FinType (n.-bseq T) (bseq_finMixin n T).
-
-Canonical bseq_subFinType n (T : finType) :=
-  Eval hnf in [subFinType of n.-bseq T].

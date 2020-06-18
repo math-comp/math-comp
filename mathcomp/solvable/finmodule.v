@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype bigop ssralg finset fingroup.
 From mathcomp Require Import morphism perm finalg action gproduct commutator.
@@ -60,9 +61,10 @@ Bind Scope ring_scope with fmod_of.
 
 Section OneFinMod.
 
+(* TODO: understand why FinGroup has to be changed to BaseFinGroup here. *)
 Let f2sub (gT : finGroupType) (A : {group gT}) (abA : abelian A) :=
-  fun u : fmod_of abA => let : Fmod x Ax := u in Subg Ax : FinGroup.arg_sort _.
-Local Coercion f2sub : fmod_of >-> FinGroup.arg_sort.
+  fun u : fmod_of abA => let : Fmod x Ax := u in Subg Ax : BaseFinGroup.arg_sort _.
+Local Coercion f2sub : fmod_of >-> BaseFinGroup.arg_sort.
 
 Variables (gT : finGroupType) (A : {group gT}) (abelA : abelian A).
 Local Notation fmodA := (fmod_of abelA).
@@ -71,20 +73,14 @@ Implicit Types (x y z : gT) (u v w : fmodA).
 Let sub2f (s : [subg A]) := Fmod abelA (valP s).
 
 Definition fmval u := val (f2sub u).
-Canonical fmod_subType := [subType for fmval].
-Local Notation valA := (@val _ _ fmod_subType) (only parsing).
-Definition fmod_eqMixin := Eval hnf in [eqMixin of fmodA by <:].
-Canonical fmod_eqType := Eval hnf in EqType fmodA fmod_eqMixin.
-Definition fmod_choiceMixin := [choiceMixin of fmodA by <:].
-Canonical fmod_choiceType := Eval hnf in ChoiceType fmodA fmod_choiceMixin.
-Definition fmod_countMixin := [countMixin of fmodA by <:].
-Canonical fmod_countType := Eval hnf in CountType fmodA fmod_countMixin.
-Canonical fmod_subCountType := Eval hnf in [subCountType of fmodA].
-Definition fmod_finMixin := [finMixin of fmodA by <:].
-Canonical fmod_finType := Eval hnf in FinType fmodA fmod_finMixin.
-Canonical fmod_subFinType := Eval hnf in [subFinType of fmodA].
+#[export]
+HB.instance Definition _ := [IsSUB for fmval].
+Local Notation valA := (val: fmodA -> gT) (only parsing).
+#[export]
+HB.instance Definition _ := [Finite of fmodA by <:].
 
 Definition fmod x := sub2f (subg A x).
+
 Definition actr u x := if x \in 'N(A) then fmod (fmval u ^ x) else u.
 
 Definition fmod_opp u := sub2f u^-1.
@@ -102,14 +98,12 @@ Proof. by move=> u; apply: val_inj; apply: mulVg. Qed.
 Fact fmod_addrC : commutative fmod_add.
 Proof. by case=> x Ax [y Ay]; apply: val_inj; apply: (centsP abelA). Qed.
 
-Definition fmod_zmodMixin := 
-  ZmodMixin fmod_addrA fmod_addrC fmod_add0r fmod_addNr.
-Canonical fmod_zmodType := Eval hnf in ZmodType fmodA fmod_zmodMixin.
-Canonical fmod_finZmodType := Eval hnf in [finZmodType of fmodA].
-Canonical fmod_baseFinGroupType :=
-  Eval hnf in [baseFinGroupType of fmodA for +%R].
-Canonical fmod_finGroupType :=
-  Eval hnf in [finGroupType of fmodA for +%R].
+#[export]
+HB.instance Definition _ :=
+  GRing.IsZmodule.Build fmodA fmod_addrA fmod_addrC fmod_add0r fmod_addNr.
+(* TODO: Should IsZmodule and the like be exported from ssralg *)
+#[export]
+HB.instance Definition _ := [finGroupMixin of fmodA for +%R].
 
 Lemma fmodP u : val u \in A. Proof. exact: valP. Qed.
 Lemma fmod_inj : injective fmval. Proof. exact: val_inj. Qed.
@@ -226,19 +220,13 @@ Notation "u ^@ x" := (actr u x) : ring_scope.
 Notation "''M'" := actr_action (at level 8) : action_scope.
 Notation "''M'" := actr_groupAction : groupAction_scope.
 
+Module Exports.
+HB.reexport FiniteModule.
+End Exports.
+
 End FiniteModule.
 
-Canonical FiniteModule.fmod_subType.
-Canonical FiniteModule.fmod_eqType.
-Canonical FiniteModule.fmod_choiceType.
-Canonical FiniteModule.fmod_countType.
-Canonical FiniteModule.fmod_finType.
-Canonical FiniteModule.fmod_subCountType.
-Canonical FiniteModule.fmod_subFinType.
-Canonical FiniteModule.fmod_zmodType.
-Canonical FiniteModule.fmod_finZmodType.
-Canonical FiniteModule.fmod_baseFinGroupType.
-Canonical FiniteModule.fmod_finGroupType.
+HB.export FiniteModule.Exports.
 
 Arguments FiniteModule.fmodK {gT A} abelA [x] Ax.
 Arguments FiniteModule.fmvalK {gT A abelA} x.
@@ -535,7 +523,7 @@ Lemma sum_index_rcosets_cycle : (\sum_(x in X) n_ x)%N = #|G : H|.
 Proof. by rewrite [#|G : H|](card_partition partHGg) -defHgX big_imset. Qed.
 
 Lemma transfer_cycle_expansion :
-   transfer g = \sum_(x in X) fmalpha ((g ^+ n_ x) ^ x^-1).
+   transfer g = \sum_(x in X) fmalpha ((g ^+ n_ x) ^ (x^-1)).
 Proof.
 pose Y := \bigcup_(x in X) [set x * g ^+ i | i : 'I_(n_ x)].
 pose rY := transversal_repr 1 Y.

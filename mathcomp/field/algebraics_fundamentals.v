@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
@@ -265,7 +266,8 @@ have maxn3 n1 n2 n3: {m | [/\ n1 <= m, n2 <= m & n3 <= m]%N}.
   by exists (maxn n1 (maxn n2 n3)); apply/and3P; rewrite -!geq_max.
 have [C [/= QtoC algC]] := countable_algebraic_closure [countFieldType of rat].
 exists C; have [i Di2] := GRing.imaginary_exists C.
-pose Qfield := fieldExtType rat; pose Cmorph (L : Qfield) := {rmorphism L -> C}.
+pose Qfield := fieldExtType rat.
+pose Cmorph (L : Qfield) := {rmorphism L -> C}.
 have charQ (L : Qfield): [char L] =i pred0 := ftrans (char_lalg L) (char_num _).
 have sepQ  (L : Qfield) (K E : {subfield L}): separable K E.
   by apply/separableP=> u _; apply: charf0_separable.
@@ -585,10 +587,12 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
-  pose Ry := LtRealFieldOfField
-               (RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _)).
-  have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
-  by exists (ArchiFieldType Ry archiRy); apply: [rmorphism of idfun].
+  pose RyM := Num.IntegralDomain_IsLtReal.Build (Q y) posD
+                posM posNneg posB posVneg absN absE (rrefl _).
+  pose Ry : realFieldType := HB.pack (Q y) RyM.
+  have QisArchi : Num.RealField_IsArchimedean Ry.
+    by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
+  exists (HB.pack_for archiFieldType _ QisArchi); apply: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
     exists 0, [archiFieldType of rat], f.
@@ -651,7 +655,9 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [t [t_C t_z gal_t]]: exists t, [/\ z_ n \in sQ t, z \in sQ t & is_Gal t].
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
-  pose Qt := SplittingFieldType rat (Q t) gal_t; have /QtoQ[CnQt CnQtE] := t_C.
+  pose QtMixin := FieldExt_IsSplittingField.Build _ (Q t) gal_t.
+  pose Qt : splittingFieldType rat := HB.pack (Q t) QtMixin.
+  have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
   pose Cn : {subfield Qt} := <<Rn; i_t>>%AS.
   have defCn: Cn = limg CnQt :> {vspace Q t} by rewrite /= -aimg_adjoin defRi.
@@ -678,8 +684,11 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [sRCn sCnRz]: (Rn <= Cn)%VS /\ (Cn <= Rz)%VS by rewrite !subv_adjoin.
   have sRnRz := subv_trans sRCn sCnRz.
   have{gal_z} galRz: galois Rn Rz.
-    apply/and3P; split=> //; apply/splitting_normalField=> //.
-    pose u : SplittingFieldType rat (Q z) gal_z := inQ z z.
+    apply/and3P; split=> //; first by apply: sepQ.
+    apply/splitting_normalField=> //.
+    pose QzMixin := FieldExt_IsSplittingField.Build _ (Q z) gal_z.
+    pose Qz : splittingFieldType _ := HB.pack (Q z) QzMixin.
+    pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
       by rewrite coef_map linearZZ rmorph1 rpredZ ?rpred1.

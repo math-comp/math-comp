@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype div tuple finfun bigop ssralg.
 From mathcomp Require Import finalg zmodp matrix vector poly.
@@ -96,127 +97,60 @@ Notation "\dim_ E V" := (divn (\dim V) (\dim E))
 Import GRing.Theory.
 
 (* Finite dimensional algebra *)
-Module Falgebra.
+#[short(type="FalgType")]
+HB.structure Definition Falgebra (R : ringType) :=
+  { A of Vector R A & GRing.UnitAlgebra R A }.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
-Section DefaultBase.
+HB.factory Record Algebra_IsFalgebra (K : fieldType) A
+           of Vector K A & GRing.Algebra K A := {}.
 
-Variables (K : fieldType) (A : algType K).
+HB.builders Context K A of Algebra_IsFalgebra K A.
+  Let vA := [the Vector.type K of A].
+  Let am u := linfun (u \o* idfun : vA -> vA).
+  Let uam := [pred u | lker (am u) == 0%VS].
+  Let vam := [fun u => if u \in uam then (am u)^-1%VF 1 else u].
 
-Lemma BaseMixin : Vector.mixin_of A -> GRing.UnitRing.mixin_of A.
-Proof.
-move=> vAm; pose vA := VectType K A vAm.
-pose am u := linfun (u \o* idfun : vA -> vA).
-have amE u v : am u v = v * u by rewrite lfunE.
-pose uam := [pred u | lker (am u) == 0%VS].
-pose vam := [fun u => if u \in uam then (am u)^-1%VF 1 else u].
-have vamKl: {in uam, left_inverse 1 vam *%R}.
-  by move=> u Uu; rewrite /= Uu -amE lker0_lfunVK.
-exists uam vam => // [u Uu | u v [_ uv1] | u /negbTE/= -> //].
-  by apply/(lker0P Uu); rewrite !amE -mulrA vamKl // mul1r mulr1.
-by apply/lker0P=> w1 w2 /(congr1 (am v)); rewrite !amE -!mulrA uv1 !mulr1.
-Qed.
+  Lemma amE u v : am u v = v * u. Proof. by rewrite lfunE. Qed.
 
-Definition BaseType T :=
-  fun c vAm & phant_id c (GRing.UnitRing.Class (BaseMixin vAm)) =>
-  fun (vT : vectType K) & phant vT
-     & phant_id (Vector.mixin (Vector.class vT)) vAm =>
-  @GRing.UnitRing.Pack T c.
+  Lemma mulVr : {in uam, left_inverse 1 vam *%R}.
+  Proof. by move=> u Uu; rewrite /= Uu -amE lker0_lfunVK. Qed.
 
-End DefaultBase.
+  Lemma divrr : {in uam, right_inverse 1 vam *%R}.
+  Proof.
+  by move=> u Uu; apply/(lker0P Uu); rewrite !amE -mulrA mulVr // mul1r mulr1.
+  Qed.
 
-Section ClassDef.
-Variable R : ringType.
-Implicit Type phR : phant R.
+  Lemma unitrP : forall x y, y * x = 1 /\ x * y = 1 -> uam x.
+  Proof.
+  move=> u v [_ uv1].
+  by apply/lker0P=> w1 w2 /(congr1 (am v)); rewrite !amE -!mulrA uv1 !mulr1.
+  Qed.
 
-Set Primitive Projections.
-Record class_of A := Class {
-  base1 : GRing.UnitAlgebra.class_of R A;
-  mixin : Vector.mixin_of (GRing.Lmodule.Pack _ base1)
-}.
-Unset Primitive Projections.
-Local Coercion base1 : class_of >-> GRing.UnitAlgebra.class_of.
-Definition base2 A c := @Vector.Class _ _ (@base1 A c) (mixin c).
-Local Coercion base2 : class_of >-> Vector.class_of.
+  Lemma invr_out : {in [predC uam], vam =1 id}.
+  Proof. by move=> u /negbTE/= ->. Qed.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
+  HB.instance Definition _ := GRing.Ring_HasMulInverse.Build A
+    mulVr divrr unitrP invr_out.
+HB.end.
 
-Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c := cT return class_of cT in c.
-
-Definition pack :=
-  fun bT b & phant_id (@GRing.UnitAlgebra.class R phR bT)
-                      (b : GRing.UnitAlgebra.class_of R T) =>
-  fun mT m & phant_id (@Vector.class R phR mT) (@Vector.Class R T b m) =>
-  Pack (Phant R) (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
-Definition algType := @GRing.Algebra.Pack R phR cT class.
-Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT class.
-Definition vectType := @Vector.Pack R phR cT class.
-Definition vect_ringType := @GRing.Ring.Pack vectType class.
-Definition vect_unitRingType := @GRing.UnitRing.Pack vectType class.
-Definition vect_lalgType := @GRing.Lalgebra.Pack R phR vectType class.
-Definition vect_algType := @GRing.Algebra.Pack R phR vectType class.
-Definition vect_unitAlgType := @GRing.UnitAlgebra.Pack R phR vectType class.
-
-End ClassDef.
-
-Module Exports.
-
-Coercion base1 : class_of >-> GRing.UnitAlgebra.class_of.
-Coercion base2 : class_of >-> Vector.class_of.
-Coercion sort : type >-> Sortclass.
+Module FalgebraExports.
 Bind Scope ring_scope with sort.
-Coercion eqType : type >->  Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion lmodType : type>->  GRing.Lmodule.type.
-Canonical lmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion lalgType : type >-> GRing.Lalgebra.type.
-Canonical lalgType.
-Coercion algType : type >-> GRing.Algebra.type.
-Canonical algType.
-Coercion unitAlgType : type >-> GRing.UnitAlgebra.type.
-Canonical unitAlgType.
-Coercion vectType : type >-> Vector.type.
-Canonical vectType.
-Canonical vect_ringType.
-Canonical vect_unitRingType.
-Canonical vect_lalgType.
-Canonical vect_algType.
-Canonical vect_unitAlgType.
-Notation FalgType R := (type (Phant R)).
-Notation "[ 'FalgType' R 'of' A ]" := (@pack _ (Phant R) A _ _ id _ _ id)
-  (at level 0, format "[ 'FalgType'  R  'of'  A ]") : form_scope.
-Notation "[ 'FalgType' R 'of' A 'for' vT ]" :=
-  (@pack _ (Phant R) A _ _ id vT _ idfun)
-  (at level 0, format "[ 'FalgType'  R  'of'  A  'for'  vT ]") : form_scope.
-Notation FalgUnitRingType T := (@BaseType _ _ T _ _ id _ (Phant T) id).
-End Exports.
-
-End Falgebra.
-Export Falgebra.Exports.
+Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L _)
+  (at level 0, format "[ 'FalgType'  F  'of'  L ]") : form_scope.
+Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L L')
+  (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
+Notation FalgUnitRingType T := (Algebra_IsFalgebra.Build _ T).
+End FalgebraExports.
+HB.export FalgebraExports.
 
 Notation "1" := (vline 1) : vspace_scope.
 
-Canonical matrix_FalgType (K : fieldType) n := [FalgType K of 'M[K]_n.+1].
+HB.instance Definition _ (K : fieldType) n :=
+  Algebra_IsFalgebra.Build K 'M[K]_n.+1.
 
-Canonical regular_FalgType (R : comUnitRingType) := [FalgType R of R^o].
+HB.instance Definition _ (R : comUnitRingType) := GRing.UnitAlgebra.on R^o.
+(* FIXME: builds a FalgType R R^o, works but couldn't it look nicer? *)
 
 Lemma regular_fullv (K : fieldType) : (fullv = 1 :> {vspace K^o})%VS.
 Proof. by apply/esym/eqP; rewrite eqEdim subvf dim_vline oner_eq0 dimvf. Qed.
@@ -224,9 +158,10 @@ Proof. by apply/esym/eqP; rewrite eqEdim subvf dim_vline oner_eq0 dimvf. Qed.
 Section Proper.
 
 Variables (R : ringType) (aT : FalgType R).
-Import Vector.InternalTheory.
 
-Lemma FalgType_proper : Vector.dim aT > 0.
+Import VectorInternalTheory.
+
+Lemma FalgType_proper : dim aT > 0.
 Proof.
 rewrite lt0n; apply: contraNneq (oner_neq0 aT) => aT0.
 by apply/eqP/v2r_inj; do 2!move: (v2r _); rewrite aT0 => u v; rewrite !thinmx0.
@@ -241,9 +176,8 @@ Section FalgLfun.
 Variable (R : comRingType) (aT : FalgType R).
 Implicit Types f g : 'End(aT).
 
-Canonical Falg_fun_ringType := lfun_ringType (FalgType_proper aT).
-Canonical Falg_fun_lalgType := lfun_lalgType (FalgType_proper aT).
-Canonical Falg_fun_algType := lfun_algType (FalgType_proper aT).
+HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
+  (lfun_algType (FalgType_proper aT)).
 
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
 Lemma lfun_compE f g : (g \o f)%VF = f * g. Proof. by []. Qed.
@@ -278,11 +212,8 @@ Qed.
 Lemma lfun_invr_out f : lker f != 0%VS -> lfun_invr f = f.
 Proof. by rewrite /lfun_invr => /negPf->. Qed.
 
-Definition lfun_unitRingMixin :=
-  UnitRingMixin lfun_mulRVr lfun_mulrRV lfun_unitrP lfun_invr_out.
-Canonical lfun_unitRingType := UnitRingType 'End(aT) lfun_unitRingMixin.
-Canonical lfun_unitAlgType := [unitAlgType K of 'End(aT)].
-Canonical Falg_fun_FalgType := [FalgType K of 'End(aT)].
+HB.instance Definition _ := GRing.Ring_HasMulInverse.Build 'End(aT)
+  lfun_mulRVr lfun_mulrRV lfun_unitrP lfun_invr_out.
 
 Lemma lfun_invE f : lker f == 0%VS -> f^-1%VF = f^-1.
 Proof. by rewrite /f^-1 /= /lfun_invr => ->. Qed.
@@ -586,15 +517,13 @@ Structure aspace := ASpace {asval :> {vspace aT}; _ : is_aspace asval}.
 Definition aspace_of of phant aT := aspace.
 Local Notation "{ 'aspace' T }" := (aspace_of (Phant T)) : type_scope.
 
-Canonical aspace_subType := Eval hnf in [subType for asval].
-Definition aspace_eqMixin := [eqMixin of aspace by <:].
-Canonical aspace_eqType := Eval hnf in EqType aspace aspace_eqMixin.
-Definition aspace_choiceMixin := [choiceMixin of aspace by <:].
-Canonical aspace_choiceType := Eval hnf in ChoiceType aspace aspace_choiceMixin.
+HB.instance Definition _ := [IsSUB for asval].
+HB.instance Definition _ := [Equality of aspace by <:].
+HB.instance Definition _ := [Choice of aspace by <:].
 
-Canonical aspace_of_subType := Eval hnf in [subType of {aspace aT}].
-Canonical aspace_of_eqType := Eval hnf in [eqType of {aspace aT}].
-Canonical aspace_of_choiceType := Eval hnf in [choiceType of {aspace aT}].
+HB.instance Definition _ := SUB.on {aspace aT}.
+HB.instance Definition _ := Equality.on {aspace aT}.
+HB.instance Definition _ := Choice.on {aspace aT}.
 
 Definition clone_aspace U (A : {aspace aT}) :=
   fun algU & phant_id algU (valP A) =>  @ASpace U algU : {aspace aT}.
@@ -792,7 +721,7 @@ by rewrite memv_cap memv_algid centv_algid.
 Qed.
 
 Lemma Falgebra_FieldMixin :
-  GRing.IntegralDomain.axiom aT -> GRing.Field.mixin_of aT.
+  GRing.integral_domain_axiom aT -> GRing.field_axiom aT.
 Proof.
 move=> domT u nz_u; apply/unitrP.
 have kerMu: lker (amulr u) == 0%VS.
@@ -807,7 +736,7 @@ Qed.
 
 Section SkewField.
 
-Hypothesis fieldT : GRing.Field.mixin_of aT.
+Hypothesis fieldT : GRing.field_axiom aT.
 
 Lemma skew_field_algid1 A : algid A = 1.
 Proof. by rewrite (unitr_algid1 (memv_algid A)) ?fieldT ?algid_neq0. Qed.
@@ -1021,7 +950,7 @@ Section SubFalgType.
 Variable (K : fieldType) (aT : FalgType K) (A : {aspace aT}).
 
 Definition subvs_one := Subvs (memv_algid A).
-Definition subvs_mul (u v : subvs_of A) := 
+Definition subvs_mul (u v : subvs_of A) :=
   Subvs (subv_trans (memv_mul (subvsP u) (subvsP v)) (asubv _)).
 
 Fact subvs_mulA : associative subvs_mul.
@@ -1035,22 +964,20 @@ Proof. move=> x y z; apply/val_inj/mulrDl. Qed.
 Fact subvs_mulDr : right_distributive subvs_mul +%R.
 Proof. move=> x y z; apply/val_inj/mulrDr. Qed.
 
-Definition subvs_ringMixin :=
-  RingMixin subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr
-            (algid_neq0 _).
-Canonical subvs_ringType := Eval hnf in RingType (subvs_of A) subvs_ringMixin.
+HB.instance Definition _ := GRing.Zmodule_IsRing.Build (subvs_of A)
+  subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr (algid_neq0 _).
 
 Lemma subvs_scaleAl k (x y : subvs_of A) : k *: (x * y) = (k *: x) * y.
 Proof. exact/val_inj/scalerAl. Qed.
-Canonical subvs_lalgType := Eval hnf in LalgType K (subvs_of A) subvs_scaleAl.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build K (subvs_of A)
+  subvs_scaleAl.
 
 Lemma subvs_scaleAr k (x y : subvs_of A) : k *: (x * y) = x * (k *: y).
 Proof. exact/val_inj/scalerAr. Qed.
-Canonical subvs_algType := Eval hnf in AlgType K (subvs_of A) subvs_scaleAr.
+HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build K (subvs_of A)
+  subvs_scaleAr.
 
-Canonical subvs_unitRingType := Eval hnf in FalgUnitRingType (subvs_of A).
-Canonical subvs_unitAlgType := Eval hnf in [unitAlgType K of subvs_of A].
-Canonical subvs_FalgType := Eval hnf in [FalgType K of subvs_of A].
+HB.instance Definition _ := FalgUnitRingType (subvs_of A).
 
 Implicit Type w : subvs_of A.
 
@@ -1105,12 +1032,9 @@ Qed.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
 
-Canonical ahom_subType := Eval hnf in [subType for ahval].
-Definition ahom_eqMixin := [eqMixin of ahom by <:].
-Canonical ahom_eqType := Eval hnf in EqType ahom ahom_eqMixin.
-
-Definition ahom_choiceMixin := [choiceMixin of ahom by <:].
-Canonical ahom_choiceType := Eval hnf in ChoiceType ahom ahom_choiceMixin.
+HB.instance Definition _ := [IsSUB for ahval].
+HB.instance Definition _ := [Equality of ahom by <:].
+HB.instance Definition _ := [Choice of ahom by <:].
 
 Fact linfun_is_ahom (f : {lrmorphism aT -> rT}) : ahom_in {:aT} (linfun f).
 Proof. by apply/ahom_inP; split=> [x y|]; rewrite !lfunE ?rmorphM ?rmorph1. Qed.

@@ -1,0 +1,151 @@
+# This is a basic workflow to help you get started with Actions
+
+name: nix CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: "**"
+  pull_request:
+    branches: [ hierarchy-builder ]
+
+jobs:
+  hb:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bundle: [ "coq-8.13" ]
+    steps:
+    - name: Cachix install
+      uses: cachix/install-nix-action@v12
+    - name: Cachix setup
+      uses: cachix/cachix-action@v8
+      with:
+        name: math-comp
+        extraPullNames: coq
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Dependencies
+      run: nix-build --argstr job "_deps" --argstr bundle ${{ matrix.bundle }}
+    - name: Build HB
+      run: nix-build --argstr job "hierarchy-builder" --argstr bundle ${{ matrix.bundle }}
+
+  hb-shim:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bundle: [ "coq-8.13" ]
+    steps:
+    - name: Cachix install
+      uses: cachix/install-nix-action@v12
+    - name: Cachix setup
+      uses: cachix/cachix-action@v8
+      with:
+        name: math-comp
+        extraPullNames: coq
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Dependencies
+      run: nix-build --argstr job "_deps" --argstr bundle ${{ matrix.bundle }}
+    - name: Build HB shim
+      run: nix-build --argstr job "hierarchy-builder-shim" --argstr bundle ${{ matrix.bundle }}
+
+  mathcomp:
+    runs-on: ubuntu-latest
+    needs: hb
+    strategy:
+      fail-fast: false
+      matrix:
+        bundle: [ "coq-8.13" ]
+    steps:
+    - name: Cachix install
+      uses: cachix/install-nix-action@v12
+    - name: Cachix setup
+      uses: cachix/cachix-action@v8
+      with:
+        name: math-comp
+        extraPullNames: coq
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Dependencies
+      run: nix-build --argstr job "_deps" --argstr bundle ${{ matrix.bundle }}
+    - name: Hiearchy builder
+      run: nix-build --argstr job "hierarchy-builder" --argstr bundle ${{ matrix.bundle }}
+    - name: Build mathcomp on HB
+      run: nix-build --argstr job "mathcomp-single" --argstr bundle ${{ matrix.bundle }}
+
+  mathcomp-planB-src:
+    runs-on: ubuntu-latest
+    needs: hb
+    strategy:
+      fail-fast: false
+      matrix:
+        bundle: [ "coq-8.13" ]
+    steps:
+    - name: Cachix install
+      uses: cachix/install-nix-action@v12
+    - name: Cachix setup
+      uses: cachix/cachix-action@v8
+      with:
+        name: math-comp
+        extraPullNames: coq
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Dependencies
+      run: nix-build --argstr job "_deps" --argstr bundle ${{ matrix.bundle }}
+    - name: Hiearchy builder
+      run: nix-build --argstr job "hierarchy-builder" --argstr bundle ${{ matrix.bundle }}
+    - name: Build planB sources
+      run: nix-build --argstr job "mathcomp-single-planB-src" --argstr bundle ${{ matrix.bundle }}
+    - name: Save planB sources as a GH artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: planB-sources
+        path: |
+          result/mathcomp
+          ! result/**/*.vo
+
+  mathcomp-planB:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        bundle: [ "coq-8.13" ]
+    needs:
+    - hb-shim
+    - mathcomp-planB-src
+    steps:
+    - name: Cachix install
+      uses: cachix/install-nix-action@v12
+    - name: Cachix setup
+      uses: cachix/cachix-action@v8
+      with:
+        name: math-comp
+        extraPullNames: coq
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Dependencies
+      run: nix-build --argstr job "_deps" --argstr bundle ${{ matrix.bundle }}
+    - name: Hiearchy builder
+      run: nix-build --argstr job "hierarchy-builder-shim" --argstr bundle ${{ matrix.bundle }}
+    - name: Build plan B sources
+      run: nix-build --argstr job "mathcomp-single-planB-src" --argstr bundle ${{ matrix.bundle }}
+    - name: Build plan B
+      run: nix-build --argstr job "mathcomp-single-planB" --argstr bundle ${{ matrix.bundle }}

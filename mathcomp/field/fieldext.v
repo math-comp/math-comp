@@ -1,9 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg finalg.
-From mathcomp Require Import zmodp matrix vector falgebra poly polydiv mxpoly.
-From mathcomp Require Import generic_quotient.
+From mathcomp Require Import choice fintype tuple finfun bigop ssralg countalg.
+From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
+From mathcomp Require Import mxpoly generic_quotient.
 
 (******************************************************************************)
 (*  * Finite dimensional field extentions                                     *)
@@ -85,199 +86,24 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
-Module FieldExt.
+#[infer(R), short(type="fieldExtType")]
+HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
+  GRing.Ring_HasCommutativeMul T & GRing.Field T}.
 
-Import GRing.
-
-Section FieldExt.
-
-Variable R : ringType.
-
-Set Primitive Projections.
-Record class_of T := Class {
-  base : Falgebra.class_of R T;
-  comm_ext : commutative (Ring.mul base);
-  idomain_ext : IntegralDomain.axiom (Ring.Pack base);
-  field_ext : Field.mixin_of (UnitRing.Pack base)
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> Falgebra.class_of.
-
-Section Bases.
-Variables (T : Type) (c : class_of T).
-Definition base1 := ComRing.Class (@comm_ext T c).
-Definition base2 := @ComUnitRing.Class T base1 c.
-Definition base3 := @IntegralDomain.Class T base2 (@idomain_ext T c).
-Definition base4 := @Field.Class T base3 (@field_ext T c).
-Definition base5 := @ComAlgebra.Class R T (@base T c) (@comm_ext T c).
-Definition base6 := @ComUnitAlgebra.Class R T base5 c.
-End Bases.
-Local Coercion base1 : class_of >-> ComRing.class_of.
-Local Coercion base2 : class_of >-> ComUnitRing.class_of.
-Local Coercion base3 : class_of >-> IntegralDomain.class_of.
-Local Coercion base4 : class_of >-> Field.class_of.
-Local Coercion base5 : class_of >-> ComAlgebra.class_of.
-Local Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
-
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-
-Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c :=  cT return class_of cT in c.
-
-Definition pack :=
-  fun (bT : Falgebra.type phR) b
-    & phant_id (Falgebra.class bT : Falgebra.class_of R bT)
-               (b : Falgebra.class_of R T) =>
-  fun mT Cm IDm Fm
-    & phant_id (GRing.ComRing.mixin (Field.class mT)) Cm
-    & phant_id (GRing.IntegralDomain.mixin (Field.class mT)) IDm
-    & phant_id (GRing.Field.mixin (Field.class mT)) Fm =>
-    Pack phR (@Class T b Cm IDm Fm).
-
-Definition pack_eta K :=
-  let cK := Field.class K in let Cm := ComRing.mixin cK in
-  let IDm := IntegralDomain.mixin cK in let Fm := Field.mixin cK in
-  fun (bT : Falgebra.type phR) b & phant_id (Falgebra.class bT) b =>
-  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @Zmodule.Pack cT class.
-Definition ringType := @Ring.Pack cT class.
-Definition unitRingType := @UnitRing.Pack cT class.
-Definition comRingType := @ComRing.Pack cT class.
-Definition comUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @IntegralDomain.Pack cT class.
-Definition fieldType := @Field.Pack cT class.
-Definition lmodType := @Lmodule.Pack R phR cT class.
-Definition lalgType := @Lalgebra.Pack R phR cT class.
-Definition algType := @Algebra.Pack R phR cT class.
-Definition unitAlgType := @UnitAlgebra.Pack R phR cT class.
-Definition comAlgType := @ComAlgebra.Pack R phR cT class.
-Definition comUnitAlgType := @ComUnitAlgebra.Pack R phR cT class.
-Definition vectType := @Vector.Pack R phR cT class.
-Definition FalgType := @Falgebra.Pack R phR cT class.
-
-Definition Falg_comRingType := @ComRing.Pack FalgType class.
-Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType class.
-Definition Falg_comAlgType := @ComAlgebra.Pack R phR FalgType class.
-Definition Falg_comUnitAlgType := @ComUnitAlgebra.Pack R phR FalgType class.
-Definition Falg_idomainType := @IntegralDomain.Pack FalgType class.
-Definition Falg_fieldType := @Field.Pack FalgType class.
-
-Definition vect_comRingType := @ComRing.Pack vectType class.
-Definition vect_comUnitRingType := @ComUnitRing.Pack vectType class.
-Definition vect_comAlgType := @ComAlgebra.Pack R phR vectType class.
-Definition vect_comUnitAlgType := @ComUnitAlgebra.Pack R phR vectType class.
-Definition vect_idomainType := @IntegralDomain.Pack vectType class.
-Definition vect_fieldType := @Field.Pack vectType class.
-
-Definition comUnitAlg_idomainType := @IntegralDomain.Pack comUnitAlgType class.
-Definition comUnitAlg_fieldType := @Field.Pack comUnitAlgType class.
-
-Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType class.
-Definition unitAlg_fieldType := @Field.Pack unitAlgType class.
-
-Definition comAlg_idomainType := @IntegralDomain.Pack comAlgType class.
-Definition comAlg_fieldType := @Field.Pack comAlgType class.
-
-Definition alg_idomainType := @IntegralDomain.Pack algType class.
-Definition alg_fieldType := @Field.Pack algType class.
-
-Definition lalg_idomainType := @IntegralDomain.Pack lalgType class.
-Definition lalg_fieldType := @Field.Pack lalgType class.
-
-Definition lmod_idomainType := @IntegralDomain.Pack lmodType class.
-Definition lmod_fieldType := @Field.Pack lmodType class.
-
-End FieldExt.
-
-Module Exports.
-
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion base : class_of >-> Falgebra.class_of.
-Coercion base4 : class_of >-> Field.class_of.
-Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> Ring.type.
-Canonical ringType.
-Coercion unitRingType : type >-> UnitRing.type.
-Canonical unitRingType.
-Coercion comRingType : type >-> ComRing.type.
-Canonical comRingType.
-Coercion comUnitRingType : type >-> ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> IntegralDomain.type.
-Canonical idomainType.
-Coercion fieldType : type >-> Field.type.
-Canonical fieldType.
-Coercion lmodType : type >-> Lmodule.type.
-Canonical lmodType.
-Coercion lalgType : type >-> Lalgebra.type.
-Canonical lalgType.
-Coercion algType : type >-> Algebra.type.
-Canonical algType.
-Coercion unitAlgType : type >-> UnitAlgebra.type.
-Canonical unitAlgType.
-Coercion comAlgType : type >-> ComAlgebra.type.
-Canonical comAlgType.
-Coercion comUnitAlgType : type >-> ComUnitAlgebra.type.
-Canonical comUnitAlgType.
-Coercion vectType : type >-> Vector.type.
-Canonical vectType.
-Coercion FalgType : type >-> Falgebra.type.
-Canonical FalgType.
-
-Canonical Falg_comRingType.
-Canonical Falg_comUnitRingType.
-Canonical Falg_comAlgType.
-Canonical Falg_comUnitAlgType.
-Canonical Falg_idomainType.
-Canonical Falg_fieldType.
-Canonical vect_comRingType.
-Canonical vect_comUnitRingType.
-Canonical vect_comAlgType.
-Canonical vect_comUnitAlgType.
-Canonical vect_idomainType.
-Canonical vect_fieldType.
-Canonical comUnitAlg_idomainType.
-Canonical comUnitAlg_fieldType.
-Canonical unitAlg_idomainType.
-Canonical unitAlg_fieldType.
-Canonical comAlg_idomainType.
-Canonical comAlg_fieldType.
-Canonical alg_idomainType.
-Canonical alg_fieldType.
-Canonical lalg_idomainType.
-Canonical lalg_fieldType.
-Canonical lmod_idomainType.
-Canonical lmod_fieldType.
-Notation fieldExtType R := (type (Phant R)).
-
-Notation "[ 'fieldExtType' F 'of' L ]" :=
-  (@pack _ (Phant F) L _ _ id _ _ _ _ id id id)
+Module FieldExtExports.
+Bind Scope ring_scope with FieldExt.sort.
+Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone F L _)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
-
-Notation "[ 'fieldExtType' F 'of' L 'for' K ]" :=
-  (@pack_eta _ (Phant F) L K _ _ id _ id)
+Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone F L K)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
-
-Notation "{ 'subfield' L }" := (@aspace_of _ (FalgType _) (Phant L))
+Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
+  (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)
   (at level 0, format "{ 'subfield'  L }") : type_scope.
+End FieldExtExports.
+HB.export FieldExtExports.
 
-End Exports.
-End FieldExt.
-Export FieldExt.Exports.
-
-Canonical regular_fieldExtType (F : fieldType) := [fieldExtType F of F^o for F].
+(* FIXME: strange way to build a FieldExt *)
+HB.instance Definition _ (F : fieldType) := GRing.Field.on F^o.
 
 Section FieldExtTheory.
 
@@ -387,21 +213,14 @@ Canonical aspace_subalgPred K := SubalgPred (memv_submod_closed K).
 Canonical aspace_divringPred K := DivringPred (aspace_divr_closed K).
 Canonical aspace_divalgPred K := DivalgPred (memv_submod_closed K).
 
-Definition subvs_mulC K := [comRingMixin of subvs_of K by <:].
-Canonical subvs_comRingType K :=
-  Eval hnf in ComRingType (subvs_of K) (@subvs_mulC K).
-Canonical subvs_comUnitRingType K :=
-  Eval hnf in [comUnitRingType of subvs_of K].
-Definition subvs_mul_eq0 K := [idomainMixin of subvs_of K by <:].
-Canonical subvs_idomainType K :=
-  Eval hnf in IdomainType (subvs_of K) (@subvs_mul_eq0 K).
-Lemma subvs_fieldMixin K : GRing.Field.mixin_of (@subvs_idomainType K).
+HB.instance Definition _ K := [comRingMixin of subvs_of K by <:].
+HB.instance Definition _ K := [idomainMixin of subvs_of K by <:].
+Lemma subvs_fieldMixin K : GRing.field_axiom [the idomainType of subvs_of K].
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.
 Qed.
-Canonical subvs_fieldType K :=
-  Eval hnf in FieldType (subvs_of K) (@subvs_fieldMixin K).
-Canonical subvs_fieldExtType K := Eval hnf in [fieldExtType F0 of subvs_of K].
+HB.instance Definition _ K := GRing.IsField.Build (subvs_of K)
+  (@subvs_fieldMixin K).
 
 Lemma polyOver_subvs {K} {p : {poly L}} :
   reflect (exists q : {poly subvs_of K}, p = map_poly vsval q)
@@ -796,15 +615,7 @@ Definition fieldOver of {vspace L} : Type := L.
 Local Notation K_F := (subvs_of F).
 Local Notation L_F := (fieldOver F).
 
-Canonical fieldOver_eqType := [eqType of L_F].
-Canonical fieldOver_choiceType := [choiceType of L_F].
-Canonical fieldOver_zmodType := [zmodType of L_F].
-Canonical fieldOver_ringType := [ringType of L_F].
-Canonical fieldOver_unitRingType := [unitRingType of L_F].
-Canonical fieldOver_comRingType := [comRingType of L_F].
-Canonical fieldOver_comUnitRingType := [comUnitRingType of L_F].
-Canonical fieldOver_idomainType := [idomainType of L_F].
-Canonical fieldOver_fieldType := [fieldType of L_F].
+HB.instance Definition _ := GRing.Field.on L_F.
 
 Definition fieldOver_scale (a : K_F) (u : L_F) : L_F := vsval a * u.
 Local Infix "*F:" := fieldOver_scale (at level 40).
@@ -821,11 +632,8 @@ Proof. exact: mulrDr. Qed.
 Fact fieldOver_scaleDl v a b : (a + b) *F: v = a *F: v + b *F: v.
 Proof. exact: mulrDl. Qed.
 
-Definition fieldOver_lmodMixin :=
-  LmodMixin fieldOver_scaleA fieldOver_scale1
-            fieldOver_scaleDr fieldOver_scaleDl.
-
-Canonical fieldOver_lmodType := LmodType K_F L_F fieldOver_lmodMixin.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build _ L_F
+  fieldOver_scaleA fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl.
 
 Lemma fieldOver_scaleE a (u : L) : a *: (u : L_F) = vsval a * u.
 Proof. by []. Qed.
@@ -833,17 +641,16 @@ Proof. by []. Qed.
 Fact fieldOver_scaleAl a u v : a *F: (u * v) = (a *F: u) * v.
 Proof. exact: mulrA. Qed.
 
-Canonical fieldOver_lalgType := LalgType K_F L_F fieldOver_scaleAl.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build _ L_F
+  fieldOver_scaleAl.
 
 Fact fieldOver_scaleAr a u v : a *F: (u * v) = u * (a *F: v).
 Proof. exact: mulrCA. Qed.
 
-Canonical fieldOver_algType := AlgType K_F L_F fieldOver_scaleAr.
-Canonical fieldOver_unitAlgType := [unitAlgType K_F of L_F].
-Canonical fieldOver_comAlgType := [comAlgType K_F of L_F].
-Canonical fieldOver_comUnitAlgType := [comUnitAlgType K_F of L_F].
+HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ L_F
+  fieldOver_scaleAr.
 
-Fact fieldOver_vectMixin : Vector.mixin_of fieldOver_lmodType.
+Fact fieldOver_vectMixin : Lmodule_HasFinDim [the ringType of K_F] L_F.
 Proof.
 have [bL [_ nz_bL] [defL dxSbL]] := field_module_semisimple (subvf (F * _)).
 do [set n := \dim_F {:L} in bL nz_bL *; set SbL := (\sum_i _)%VS] in defL dxSbL.
@@ -867,9 +674,7 @@ move=> r; apply/rowP=> i; apply/val_inj/(mulIf (nz_bLi i))/eqP; move: i isT.
 by apply/forall_inP; move/directv_sum_unique: dxSbL => <- //; apply/eqP/v2rK.
 Qed.
 
-Canonical fieldOver_vectType := VectType K_F L_F fieldOver_vectMixin.
-Canonical fieldOver_FalgType := [FalgType K_F of L_F].
-Canonical fieldOver_fieldExtType := [fieldExtType K_F of L_F].
+HB.instance Definition _ := fieldOver_vectMixin.
 
 Implicit Types (V : {vspace L}) (E : {subfield L}).
 
@@ -961,15 +766,7 @@ Variables (F0 : fieldType) (F : fieldExtType F0) (L : fieldExtType F).
 Definition baseField_type of phant L : Type := L.
 Notation L0 := (baseField_type (Phant (FieldExt.sort L))).
 
-Canonical baseField_eqType := [eqType of L0].
-Canonical baseField_choiceType := [choiceType of L0].
-Canonical baseField_zmodType := [zmodType of L0].
-Canonical baseField_ringType := [ringType of L0].
-Canonical baseField_unitRingType := [unitRingType of L0].
-Canonical baseField_comRingType := [comRingType of L0].
-Canonical baseField_comUnitRingType := [comUnitRingType of L0].
-Canonical baseField_idomainType := [idomainType of L0].
-Canonical baseField_fieldType := [fieldType of L0].
+HB.instance Definition _ := GRing.Field.on L0.
 
 Definition baseField_scale (a : F0) (u : L0) : L0 := in_alg F a *: u.
 Local Infix "*F0:" := baseField_scale (at level 40).
@@ -986,11 +783,8 @@ Proof. exact: scalerDr. Qed.
 Fact baseField_scaleDl v a b : (a + b) *F0: v = a *F0: v + b *F0: v.
 Proof. by rewrite -scalerDl -rmorphD. Qed.
 
-Definition baseField_lmodMixin :=
-  LmodMixin baseField_scaleA baseField_scale1
-            baseField_scaleDr baseField_scaleDl.
-
-Canonical baseField_lmodType := LmodType F0 L0 baseField_lmodMixin.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build _ L0
+  baseField_scaleA baseField_scale1 baseField_scaleDr baseField_scaleDl.
 
 Lemma baseField_scaleE a (u : L) : a *: (u : L0) = a%:A *: u.
 Proof. by []. Qed.
@@ -998,19 +792,20 @@ Proof. by []. Qed.
 Fact baseField_scaleAl a (u v : L0) : a *F0: (u * v) = (a *F0: u) * v.
 Proof. exact: scalerAl. Qed.
 
-Canonical baseField_lalgType := LalgType F0 L0 baseField_scaleAl.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build _ L0
+  baseField_scaleAl.
 
 Fact baseField_scaleAr a u v : a *F0: (u * v) = u * (a *F0: v).
 Proof. exact: scalerAr. Qed.
 
-Canonical baseField_algType := AlgType F0 L0 baseField_scaleAr.
-Canonical baseField_unitAlgType := [unitAlgType F0 of L0].
+HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ L0
+  baseField_scaleAr.
 
 Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
 Let coordF (x : F) := (coord_vbasis (memvf x)).
 
-Fact baseField_vectMixin : Vector.mixin_of baseField_lmodType.
+Fact baseField_vectMixin : Lmodule_HasFinDim [the fieldType of F0] L0.
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
@@ -1031,9 +826,7 @@ apply: (canLR vec_mxK); apply/matrixP=> i j; rewrite mxE.
 by rewrite !coord_sum_free ?(basis_free (vbasisP _)).
 Qed.
 
-Canonical baseField_vectType := VectType F0 L0 baseField_vectMixin.
-Canonical baseField_FalgType := [FalgType F0 of L0].
-Canonical baseField_extFieldType := [fieldExtType F0 of L0].
+HB.instance Definition _ := baseField_vectMixin.
 
 Let F0ZEZ a x v : a *: ((x *: v : L) : L0)  = (a *: x) *: v.
 Proof. by rewrite [a *: _]scalerA -scalerAl mul1r. Qed.
@@ -1076,17 +869,32 @@ by apply/prodvP=> u v; rewrite !mem_baseVspace; apply: memvM.
 Qed.
 Canonical baseAspace E := ASpace (baseAspace_suproof E).
 
-Fact refBaseField_key : unit. Proof. by []. Qed.
-Definition refBaseField := locked_with refBaseField_key (baseAspace 1).
-Canonical refBaseField_unlockable := [unlockable of refBaseField].
-Notation F1 := refBaseField.
+End BaseField.
+
+Notation baseFieldType L := (baseField_type (Phant L)).
+
+HB.lock Definition refBaseField (F0 : fieldType) (F : fieldExtType F0)
+  (L : fieldExtType F) := baseAspace (1%AS : {aspace L}).
+Canonical refBaseField_unlockable := Unlockable refBaseField.unlock.
+
+Section RefBaseField.
+
+Variables (F0 : fieldType) (F : fieldExtType F0) (L : fieldExtType F).
+
+Notation F1 := (refBaseField L).
+Notation F1unlock := refBaseField.unlock.
+Notation L0 := (baseFieldType L).
+
+Let n := \dim {:F}.
+Let bF : n.-tuple F := vbasis {:F}.
+Let coordF (x : F) := (coord_vbasis (memvf x)).
 
 Lemma dim_refBaseField : \dim F1 = n.
-Proof. by rewrite [F1]unlock dim_baseVspace dimv1 mul1n. Qed.
+Proof. by rewrite F1unlock dim_baseVspace dimv1 mul1n. Qed.
 
 Lemma baseVspace_module V (V0 := baseVspace V) : (F1 * V0 <= V0)%VS.
 Proof.
-apply/prodvP=> u v; rewrite [F1]unlock !mem_baseVspace => /vlineP[x ->] Vv.
+apply/prodvP=> u v; rewrite F1unlock !mem_baseVspace => /vlineP[x ->] Vv.
 by rewrite -(@scalerAl F L) mul1r; apply: memvZ.
 Qed.
 
@@ -1109,11 +917,11 @@ move=> v; rewrite -{1}(field_module_eq modM0) -(mem_vspaceOver M0) {}/V.
 move: (vspaceOver F1 M0) => M.
 apply/idP/idP=> [/coord_vbasis|/coord_span]->; apply/memv_suml=> i _.
   rewrite /(_ *: _) /= /fieldOver_scale; case: (coord _ i _) => /= x.
-  rewrite {1}[F1]unlock mem_baseVspace => /vlineP[{}x ->].
+  rewrite {1}F1unlock mem_baseVspace => /vlineP[{}x ->].
   by rewrite -(@scalerAl F L) mul1r memvZ ?memv_span ?memt_nth.
 move: (coord _ i _) => x; rewrite -[_`_i]mul1r scalerAl -tnth_nth.
 have F1x: x%:A \in F1.
-  by rewrite [F1]unlock mem_baseVspace (@memvZ F L) // mem1v.
+  by rewrite F1unlock mem_baseVspace (@memvZ F L) // mem1v.
 by congr (_ \in M): (memvZ (Subvs F1x) (vbasis_mem (mem_tnth i _))).
 Qed.
 
@@ -1126,9 +934,7 @@ rewrite /is_aspace has_algid1 -?memE0 ?mem1v //.
 by apply/prodvP=> u v; rewrite -!memE0; apply: memvM.
 Qed.
 
-End BaseField.
-
-Notation baseFieldType L := (baseField_type (Phant L)).
+End RefBaseField.
 
 (* Base of fieldOver, finally. *)
 Section MoreFieldOver.
@@ -1195,10 +1001,11 @@ Canonical equiv_subfext_equiv := EquivRelPack equiv_subfext_is_equiv.
 Canonical equiv_subfext_encModRel := defaultEncModRel equiv_subfext.
 
 Definition subFExtend := {eq_quot equiv_subfext}.
-Canonical subFExtend_eqType := [eqType of subFExtend].
-Canonical subFExtend_choiceType := [choiceType of subFExtend].
-Canonical subFExtend_quotType := [quotType of subFExtend].
-Canonical subFExtend_eqQuotType := [eqQuotType equiv_subfext of subFExtend].
+
+HB.instance Definition _ := Choice.on subFExtend.
+HB.instance Definition _ := Quotient.on subFExtend.
+HB.instance Definition _ : EqQuotient 'M[F]_(1, n) equiv_subfext subFExtend :=
+  EqQuotient.on subFExtend.
 
 Definition subfx_inj := lift_fun1 subFExtend iotaFz.
 
@@ -1243,9 +1050,8 @@ Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 Fact addfxN : left_inverse subfext0 subfext_opp subfext_add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
-Definition subfext_zmodMixin :=  ZmodMixin addfxA addfxC add0fx addfxN.
-Canonical subfext_zmodType :=
-  Eval hnf in ZmodType subFExtend subfext_zmodMixin.
+HB.instance Definition _ := GRing.IsZmodule.Build subFExtend
+  addfxA addfxC add0fx addfxN.
 
 Let poly_rV_modp_K q : rVpoly (poly_rV (q %% p0) : 'rV[F]_n) = q %% p0.
 Proof. by apply: poly_rV_K; rewrite -ltnS -polySpred // ltn_modp. Qed.
@@ -1300,10 +1106,8 @@ rewrite !piE /equiv_subfext /iotaFz !linear0.
 by rewrite poly_rV_K ?rmorph1 ?oner_eq0 // size_poly1.
 Qed.
 
-Definition subfext_comRingMixin :=
-  ComRingMixin mulfxA mulfxC mul1fx mulfx_addl nonzero1fx.
-Canonical subfext_Ring := Eval hnf in RingType subFExtend subfext_comRingMixin.
-Canonical subfext_comRing := Eval hnf in ComRingType subFExtend mulfxC.
+HB.instance Definition _ := GRing.Zmodule_IsComRing.Build subFExtend
+  mulfxA mulfxC mul1fx mulfx_addl nonzero1fx.
 
 Definition subfx_poly_inv (q : {poly F}) : {poly F} :=
   if iotaPz q == 0 then 0 else
@@ -1335,8 +1139,7 @@ by rewrite 2!{1}poly_rV_modp_K 2!{1}iotaPz_modp !subfx_poly_invE iotaPz_repr.
 Qed.
 Canonical pi_subfext_inv_morph := PiMorph1 pi_subfext_inv.
 
-Fact subfx_fieldAxiom :
-  GRing.Field.axiom (subfext_inv : subFExtend -> subFExtend).
+Fact subfx_fieldAxiom : forall x, x != 0 -> subfext_inv x * x = 1.
 Proof.
 elim/quotW=> x; apply: contraNeq; rewrite !piE /equiv_subfext /iotaFz !linear0.
 apply: contraR => nz_x; rewrite poly_rV_K ?size_poly1 // !poly_rV_modp_K.
@@ -1349,16 +1152,8 @@ apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !linear0.
 by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !linear0.
 Qed.
 
-Definition subfext_unitRingMixin := FieldUnitMixin subfx_fieldAxiom subfx_inv0.
-Canonical subfext_unitRingType :=
-  Eval hnf in UnitRingType subFExtend subfext_unitRingMixin.
-Canonical subfext_comUnitRing := Eval hnf in [comUnitRingType of subFExtend].
-Definition subfext_fieldMixin := @FieldMixin _ _ subfx_fieldAxiom subfx_inv0.
-Definition subfext_idomainMixin := FieldIdomainMixin subfext_fieldMixin.
-Canonical subfext_idomainType :=
-  Eval hnf in IdomainType subFExtend subfext_idomainMixin.
-Canonical subfext_fieldType :=
-  Eval hnf in FieldType subFExtend subfext_fieldMixin.
+HB.instance Definition _ := GRing.ComRing_IsField.Build subFExtend
+  subfx_fieldAxiom subfx_inv0.
 
 Fact subfx_inj_is_rmorphism : rmorphism subfx_inj.
 Proof.
@@ -1405,18 +1200,19 @@ Fact subfx_scalerDr : right_distributive subfx_scale +%R.
 Proof. by move=> a; apply: mulrDr. Qed.
 Fact subfx_scalerDl x : {morph subfx_scale^~ x : a b / a + b}.
 Proof. by move=> a b; rewrite /subfx_scale rmorphD mulrDl. Qed.
-Definition subfx_lmodMixin :=
-  LmodMixin subfx_scalerA subfx_scaler1r subfx_scalerDr subfx_scalerDl.
-Canonical subfx_lmodType := LmodType F subFExtend subfx_lmodMixin.
 
-Fact subfx_scaleAl : GRing.Lalgebra.axiom ( *%R : subFExtend -> _).
-Proof. by move=> a; apply: mulrA. Qed.
-Canonical subfx_lalgType := LalgType F subFExtend subfx_scaleAl.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build _ subFExtend
+  subfx_scalerA subfx_scaler1r subfx_scalerDr subfx_scalerDl.
 
-Fact subfx_scaleAr : GRing.Algebra.axiom subfx_lalgType.
-Proof. by move=> a; apply: mulrCA. Qed.
-Canonical subfx_algType := AlgType F subFExtend subfx_scaleAr.
-Canonical subfext_unitAlgType := [unitAlgType F of subFExtend].
+Fact subfx_scaleAl a u v : subfx_scale a (u * v) = (subfx_scale a u) * v.
+Proof. exact: mulrA. Qed.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build _ subFExtend
+  subfx_scaleAl.
+
+Fact subfx_scaleAr a u v : subfx_scale a (u * v) = u * (subfx_scale a v).
+Proof. exact: mulrCA. Qed.
+HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ subFExtend
+  subfx_scaleAr.
 
 Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
@@ -1477,7 +1273,7 @@ Hypothesis irr_p : irreducible_poly p.
 Let nz_p : p != 0. Proof. exact: irredp_neq0. Qed.
 
 (* The Vector axiom requires irreducibility. *)
-Lemma min_subfx_vectAxiom : Vector.axiom (size p).-1 subfx_lmodType.
+Lemma min_subfx_vect : vector_axiom_def (size p).-1 (Phant subFExtend).
 Proof.
 move/subfx_irreducibleP: irr_p => /=/(_ nz_p) min_p; set d := (size p).-1.
 have Dd: d.+1 = size p by rewrite polySpred.
@@ -1496,10 +1292,8 @@ rewrite leqNgt implybNN -Dd ltnS size_poly linearB subr_eq0 /=.
 by move/eqP/(can_inj rVpolyK).
 Qed.
 
-Definition SubfxVectMixin := VectMixin min_subfx_vectAxiom.
-Definition SubfxVectType := VectType F subFExtend SubfxVectMixin.
-Definition SubfxFalgType := Eval simpl in [FalgType F of SubfxVectType].
-Definition SubFieldExtType := Eval simpl in [fieldExtType F of SubfxFalgType].
+Definition SubfxVect := Lmodule_HasFinDim.Build _ subFExtend min_subfx_vect.
+Definition SubFieldExtType : fieldExtType F := HB.pack subFExtend SubfxVect.
 
 End Irreducible.
 
@@ -1512,7 +1306,7 @@ Lemma irredp_FAdjoin (F : fieldType) (p : {poly F}) :
   {L : fieldExtType F & \dim {:L} = (size p).-1 &
     {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}.
 Proof.
-case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n].
+case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [the vectType F of 'rV_n].
 have Dn: n.+1 = size p := ltn_predK p_gt1.
 have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn.
 suffices [L dimL [toPF [toL toPF_K toL_K]]]:
@@ -1549,18 +1343,19 @@ have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
-pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
-pose rL := ComRingType (RingType vL mulM) mulC.
-have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: toPinj.
+pose mulM := GRing.Zmodule_IsComRing.Build _ mulA mulC mul1 mulD nzL1.
+pose rL : comRingType := HB.pack vL mulM.
+have mulZlM : GRing.Lmodule_IsLalgebra F rL.
+  constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
-have mulZr: GRing.Algebra.axiom (LalgType F rL mulZl).
-  by move=> a x y; rewrite !(mulrC x) scalerAl.
-pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
-pose uaL := [unitAlgType F of AlgType F urL mulZr].
-pose faL := [FalgType F of uaL].
-have unitE: GRing.Field.mixin_of urL.
-  move=> x nz_x; apply/unitrP; set q := toPF x.
+pose laL : lalgType F := HB.pack rL mulZlM.
+have mulZrM : GRing.Lalgebra_IsAlgebra F laL.
+  by constructor => a x y; rewrite !(mulrC x) scalerAl.
+pose aL : algType F := HB.pack laL mulZrM.
+pose uLM := Algebra_IsFalgebra.Build F aL.
+pose cuL : comUnitRingType := HB.pack aL uLM.
+have unitM : GRing.ComUnitRing_IsField cuL.
+  constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
     apply: contraLR (leq_gcdpr p nz_q) => /irr_p/implyP.
@@ -1569,10 +1364,8 @@ have unitE: GRing.Field.mixin_of urL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose ucrL := [comUnitRingType of ComRingType urL mulC].
-have mul0 := GRing.Field.IdomainMixin unitE.
-pose fL := FieldType (IdomainType ucrL mul0) unitE.
-exists [fieldExtType F of faL for fL]; first by rewrite dimvf; apply: mul1n.
+pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
+exists feL; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
 have toLlin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
@@ -1583,67 +1376,65 @@ Qed.
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.
   In Coq 8.4 Qed takes about 18s.
   In Coq 8.7, everything seems to be all right *)
-(*
-Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) :
-    irreducible_poly p ->
-  {L : fieldExtType F & Vector.dim L = (size p).-1 &
-    {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}.
-Proof.
-case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n].
-have Dn: n.+1 = size p := ltn_predK p_gt1.
-have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn.
-pose toL q : vL := poly_rV (q %% p).
-have toL_K q : rVpoly (toL q) = q %% p.
-  by rewrite poly_rV_K // -ltnS Dn ?ltn_modp -?Dn.
-pose mul (x y : vL) : vL := toL (rVpoly x * rVpoly y).
-pose L1 : vL := poly_rV 1.
-have L1K: rVpoly L1 = 1 by rewrite poly_rV_K // size_poly1 -ltnS Dn.
-have mulC: commutative mul by rewrite /mul => x y; rewrite mulrC.
-have mulA: associative mul.
-  by move=> x y z; rewrite -!(mulC z) /mul !toL_K /toL !modp_mul mulrCA.
-have mul1: left_id L1 mul.
-  move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS.
-  by rewrite size_poly.
-have mulD: left_distributive mul +%R.
-  move=> x y z; apply: canLR rVpolyK _.
-  by rewrite !raddfD mulrDl /= !toL_K /toL modpD.
-have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0.
-pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
-pose rL := ComRingType (RingType vL mulM) mulC.
-have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: canRL rVpolyK _.
-  by rewrite !linearZ /= toL_K -scalerAl modpZl.
-have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
-  by move=> a x y; rewrite !(mulrC x) scalerAl.
-pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
-pose uaL := [unitAlgType F of AlgType F urL mulZr].
-pose faL := [FalgType F of uaL].
-have unitE: GRing.Field.mixin_of urL.
-  move=> x nz_x; apply/unitrP; set q := rVpoly x.
-  have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x.
-  have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
-    have /contraR := irr_p _ _ (dvdp_gcdl p q); apply.
-    have: size (gcdp p q) <= size q by apply: leq_gcdpr.
-    rewrite leqNgt; apply: contra; move/eqp_size ->.
-    by rewrite (polySpred nz_p) ltnS size_poly.
-  suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
-  congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1).
-  by rewrite -mulNr modp_addl_mul_small ?size_poly1.
-pose ucrL := [comUnitRingType of ComRingType urL mulC].
-pose fL := FieldType (IdomainType ucrL (GRing.Field.IdomainMixin unitE)) unitE.
-exists [fieldExtType F of faL for fL]; first exact: mul1n.
-pose z : vL := toL 'X; set iota := in_alg _.
-have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
-  elim/poly_ind: q => [|a q IHq].
-    by rewrite map_poly0 horner0 linear0 mod0p.
-  rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
-  rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first.
-    by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW.
-  by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul.
-exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0.
-apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP.
-exists (map_poly iota (rVpoly x)).
-  by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v.
-by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly.
-Qed.
-*)
+(* Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) : *)
+(*     irreducible_poly p -> *)
+(*   {L : fieldExtType F & \dim {: L} = (size p).-1 & *)
+(*     {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}. *)
+(* Proof. *)
+(* case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n]. *)
+(* have Dn: n.+1 = size p := ltn_predK p_gt1. *)
+(* have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn. *)
+(* pose toL q : vL := poly_rV (q %% p). *)
+(* have toL_K q : rVpoly (toL q) = q %% p. *)
+(*   by rewrite poly_rV_K // -ltnS Dn ?ltn_modp -?Dn. *)
+(* pose mul (x y : vL) : vL := toL (rVpoly x * rVpoly y). *)
+(* pose L1 : vL := poly_rV 1. *)
+(* have L1K: rVpoly L1 = 1 by rewrite poly_rV_K // size_poly1 -ltnS Dn. *)
+(* have mulC: commutative mul by rewrite /mul => x y; rewrite mulrC. *)
+(* have mulA: associative mul. *)
+(*   by move=> x y z; rewrite -!(mulC z) /mul !toL_K /toL !modp_mul mulrCA. *)
+(* have mul1: left_id L1 mul. *)
+(*   move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS. *)
+(*   by rewrite size_poly. *)
+(* have mulD: left_distributive mul +%R. *)
+(*   move=> x y z; apply: canLR rVpolyK _. *)
+(*   by rewrite !raddfD mulrDl /= !toL_K /toL modpD. *)
+(* have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0. *)
+(* pose mulM := GRing.Zmodule_IsComRing.Build vL mulA mulC mul1 mulD nzL1. *)
+(* pose rL := ComRingType vL mulM. *)
+(* have mulZlM : GRing.Lmodule_IsLalgebra F rL. *)
+(*   constructor => a x y; apply: canRL rVpolyK _. *)
+(*   by rewrite !linearZ /= toL_K -scalerAl modpZl. *)
+(* pose laL := LalgType F rL mulZlM. *)
+(* have mulZrM : GRing.Lalgebra_IsAlgebra F laL. *)
+(*   by constructor => a x y; rewrite !(mulrC x) scalerAl. *)
+(* pose aL := AlgType F laL mulZrM. *)
+(* pose uLM := Algebra_IsFalgebra.Build F aL. *)
+(* pose cuL := ComUnitRingType uLM _. *)
+(* have unitM : GRing.ComUnitRing_IsField cuL. *)
+(*   constructor => x nz_x; apply/unitrP; set q := rVpoly x. *)
+(*   have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x. *)
+(*   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q. *)
+(*     have /contraR := irr_p _ _ (dvdp_gcdl p q); apply. *)
+(*     have: size (gcdp p q) <= size q by apply: leq_gcdpr. *)
+(*     rewrite leqNgt; apply: contra; move/eqp_size ->. *)
+(*     by rewrite (polySpred nz_p) ltnS size_poly. *)
+(*   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC. *)
+(*   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1). *)
+(*   by rewrite -mulNr modp_addl_mul_small ?size_poly1. *)
+(* pose feL := FieldExtType _ unitM _. *)
+(* exists feL; first by rewrite dimvf; apply: mul1n. *)
+(* pose z : vL := toL 'X; set iota := in_alg _. *)
+(* have q_z q: rVpoly (map_poly iota q).[z] = q %% p. *)
+(*   elim/poly_ind: q => [|a q IHq]. *)
+(*     by rewrite map_poly0 horner0 linear0 mod0p. *)
+(*   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=. *)
+(*   rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first. *)
+(*     by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW. *)
+(*   by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul. *)
+(* exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0. *)
+(* apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP. *)
+(* exists (map_poly iota (rVpoly x)). *)
+(*   by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v. *)
+(* by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly. *)
+(* Qed. *)

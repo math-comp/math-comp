@@ -300,7 +300,7 @@ Lemma eqz_modDr p m n d : (m + p == n + p %[mod d])%Z = (m == n %[mod d])%Z.
 Proof. by rewrite -!(addrC p) eqz_modDl. Qed.
 
 Lemma modzMml m n d : ((m %% d)%Z * n = m * n %[mod d])%Z.
-Proof. by rewrite {2}(divz_eq m d) mulrDl mulrAC modzMDl. Qed.
+Proof. by rewrite {2}(divz_eq m d) [in RHS]mulrDl mulrAC modzMDl. Qed.  (* FIXME: rewrite pattern *)
 
 Lemma modzMmr m n d : (m * (n %% d)%Z = m * n %[mod d])%Z.
 Proof. by rewrite !(mulrC m) modzMml. Qed.

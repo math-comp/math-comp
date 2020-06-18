@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype prime finset fingroup morphism.
 From mathcomp Require Import automorphism.
@@ -58,17 +59,8 @@ Definition coset_range := [pred B in rcosets H 'N(A)].
 Record coset_of : Type :=
   Coset { set_of_coset :> GroupSet.sort gT; _ : coset_range set_of_coset }.
 
-Canonical coset_subType := Eval hnf in [subType for set_of_coset].
-Definition coset_eqMixin := Eval hnf in [eqMixin of coset_of by <:].
-Canonical coset_eqType := Eval hnf in EqType coset_of coset_eqMixin.
-Definition coset_choiceMixin := [choiceMixin of coset_of by <:].
-Canonical coset_choiceType := Eval hnf in ChoiceType coset_of coset_choiceMixin.
-Definition coset_countMixin := [countMixin of coset_of by <:].
-Canonical coset_countType := Eval hnf in CountType coset_of coset_countMixin.
-Canonical coset_subCountType := Eval hnf in [subCountType of coset_of].
-Definition coset_finMixin := [finMixin of coset_of by <:].
-Canonical coset_finType := Eval hnf in FinType coset_of coset_finMixin.
-Canonical coset_subFinType := Eval hnf in [subFinType of coset_of].
+HB.instance Definition _ := [IsSUB for set_of_coset].
+#[hnf] HB.instance Definition _ := [Finite of coset_of by <:].
 
 (* We build a new (canonical) structure of groupType for cosets.              *)
 (* When A is a group, this is the largest possible quotient 'N(A) / A.        *)
@@ -111,12 +103,8 @@ rewrite invg_rcoset -mulgA (mulgA H) mulGid.
 by rewrite norm_rlcoset ?nNH // -lcosetM mulVg mul1g.
 Qed.
 
-Definition coset_of_groupMixin :=
-  FinGroup.Mixin coset_mulP coset_oneP coset_invP.
-
-Canonical coset_baseGroupType :=
-  Eval hnf in BaseFinGroupType coset_of coset_of_groupMixin.
-Canonical coset_groupType := FinGroupType coset_invP.
+HB.instance Definition _ :=
+  IsMulGroup.Build coset_of coset_mulP coset_oneP coset_invP.
 
 (* Projection of the initial group type over the cosets groupType.  *)
 

@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
 From mathcomp Require Import path div fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset gproduct fingroup morphism.
@@ -476,7 +477,7 @@ apply: mx_rsim_trans (mx_rsim_sym (rsim_submod1 (mxmodule1 rG) _)) _ => //.
 apply: mx_rsim_dsum (modW) _ defS dxS _ => i.
 rewrite /W /standard_irr_coef /modW /soc; case: pickP => [Wi|_] /=; last first.
   rewrite /muln_grepr big_ord0.
-  by exists 0 => [||x _]; rewrite ?mxrank0 ?mulmx0 ?mul0mx.
+  by exists 0 => [||x _]; rewrite /row_free ?mxrank0 ?mulmx0 ?mul0mx.
 by move/eqP=> <-; apply: mx_rsim_socle; apply: rsim_irr_comp (socle_irr Wi).
 Qed.
 
@@ -586,12 +587,9 @@ Arguments socle_of_Iirr {gT G%G} i%R.
 Notation "''Chi_' i" := (irr_repr (socle_of_Iirr i))
   (at level 8, i at level 2, format "''Chi_' i").
 
-Fact irr_key : unit. Proof. by []. Qed.
-Definition irr_def gT B : (Nirr B).-tuple 'CF(B) :=
+HB.lock Definition irr gT B : (Nirr B).-tuple 'CF(B) :=
    let irr_of i := 'Res[B, <<B>>] (@cfRepr gT _ _ 'Chi_(inord i)) in
    [tuple of mkseq irr_of (Nirr B)].
-Definition irr := locked_with irr_key irr_def.
-
 Arguments irr {gT} B%g.
 
 Notation "''chi_' i" :=  (tnth (irr _) i%R)
@@ -615,7 +613,7 @@ Proof. by move/Iirr1_neq0; exists (inord 1). Qed.
 
 Lemma irrRepr i : cfRepr 'Chi_i = 'chi_i.
 Proof.
-rewrite [@irr]unlock (tnth_nth 0) nth_mkseq // -[<<G>>]/(gval _) genGidG.
+rewrite irr.unlock (tnth_nth 0) nth_mkseq // -[<<G>>]/(gval _) genGidG.
 by rewrite cfRes_id inord_val.
 Qed.
 
@@ -2502,8 +2500,8 @@ have mulA: associative mul by move=> u v w; apply: cFinj; rewrite !cFmul mulrA.
 have mul1: left_id one mul by move=> u; apply: cFinj; rewrite cFmul cFone mul1r.
 have mulV: left_inverse one inv mul.
   by move=> u; apply: cFinj; rewrite cFmul cFinv cFone mulVr ?lin_char_unitr.
-pose linGm := FinGroup.Mixin mulA mul1 mulV.
-pose linG := @FinGroupType (BaseFinGroupType linT linGm) mulV.
+pose imA := IsMulGroup.Build linT mulA mul1 mulV.
+pose linG : finGroupType := HB.pack linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
   by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
 do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].
@@ -2557,12 +2555,9 @@ End DerivedGroup.
 Arguments irr_prime_injP {gT G i}.
 
 (* Determinant characters and determinential order. *)
-Section DetOrder.
-
-Variables (gT : finGroupType) (G : {group gT}).
-
 Section DetRepr.
 
+Variables (gT : finGroupType) (G : {group gT}).
 Variables (n : nat) (rG : mx_representation [fieldType of algC] G n).
 
 Definition det_repr_mx x : 'M_1 := (\det (rG x))%:M.
@@ -2583,20 +2578,29 @@ Qed.
 
 End DetRepr.
 
-Definition cfDet phi := \prod_i detRepr 'Chi_i ^+ truncC '[phi, 'chi[G]_i].
+HB.lock
+Definition cfDet (gT : finGroupType) (G : {group gT}) phi :=
+  \prod_i detRepr 'Chi_i ^+ truncC '[phi, 'chi[G]_i].
+Canonical cfDet_unlockable := Unlockable cfDet.unlock.
+
+Section DetOrder.
+
+Variables (gT : finGroupType) (G : {group gT}).
+
+Local Notation cfDet := (@cfDet gT G).
 
 Lemma cfDet_lin_char phi : cfDet phi \is a linear_char.
-Proof. by apply: rpred_prod => i _; apply: rpredX; apply: detRepr_lin_char. Qed.
+Proof. by rewrite unlock; apply: rpred_prod => i _; apply: rpredX; apply: detRepr_lin_char. Qed.
 
 Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
-move=> phi psi Nphi Npsi; rewrite /= -big_split; apply: eq_bigr => i _ /=.
+move=> phi psi Nphi Npsi; rewrite unlock /= -big_split; apply: eq_bigr => i _ /=.
 by rewrite -exprD cfdotDl truncCD ?nnegrE ?Cnat_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
-Proof. by rewrite /cfDet big1 // => i _; rewrite cfdot0l truncC0. Qed.
+Proof. by rewrite unlock big1 // => i _; rewrite cfdot0l truncC0. Qed.
 
 Lemma cfDetMn k :
   {in character, {morph cfDet : phi / phi *+ k >-> phi ^+ k}}.
@@ -2605,10 +2609,10 @@ move=> phi Nphi; elim: k => [|k IHk]; rewrite ?cfDet0 // mulrS exprS -{}IHk.
 by rewrite cfDetD ?rpredMn.
 Qed.
 
-Lemma cfDetRepr n rG : cfDet (cfRepr rG) = @detRepr n rG.
+Lemma cfDetRepr n rG : cfDet (cfRepr rG) = @detRepr _ _ n rG.
 Proof.
 transitivity (\prod_W detRepr (socle_repr W) ^+ standard_irr_coef rG W).
-  rewrite (reindex _ (socle_of_Iirr_bij _)) /cfDet /=.
+  rewrite (reindex _ (socle_of_Iirr_bij _)) unlock /=.
   apply: eq_bigr => i _; congr (_ ^+ _).
   rewrite (cfRepr_sim (mx_rsim_standard rG)) cfRepr_standard.
   rewrite cfdot_suml (bigD1 i) ?big1 //= => [|j i'j]; last first.
@@ -2684,7 +2688,7 @@ Lemma cfDetIsom aT rT (G : {group aT}) (R : {group rT})
                 (f : {morphism G >-> rT}) (isoGR : isom G R f) phi :
   cfDet (cfIsom isoGR phi) = cfIsom isoGR (cfDet phi).
 Proof.
-rewrite rmorph_prod /cfDet (reindex (isom_Iirr isoGR)); last first.
+rewrite unlock rmorph_prod (reindex (isom_Iirr isoGR)); last first.
   by exists (isom_Iirr (isom_sym isoGR)) => i; rewrite ?isom_IirrK ?isom_IirrKV.
 apply: eq_bigr => i; rewrite -!cfDetRepr !irrRepr isom_IirrE rmorphX cfIsom_iso.
 by rewrite /= ![in cfIsom _]unlock cfDetMorph ?cfRes_char ?cfDetRes ?irr_char.
