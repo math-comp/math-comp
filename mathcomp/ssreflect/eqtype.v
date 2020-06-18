@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool.
+From HB Require Import structures.
 
 (******************************************************************************)
 (* This file defines two "base" combinatorial interfaces:                     *)
@@ -118,42 +119,21 @@ Unset Printing Implicit Defensive.
 Declare Scope eq_scope.
 Declare Scope fun_delta_scope.
 
-Module Equality.
+Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
-Definition axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
+HB.mixin Record is_eqType T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 
-Structure mixin_of T := Mixin {op : rel T; _ : axiom op}.
-Notation class_of := mixin_of (only parsing).
+#[mathcomp(axiom="eq_axiom")]
+HB.structure Definition Equality := { T of is_eqType T }.
 
-Section ClassDef.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-
-Definition class := let: Pack _ c := cT return class_of cT in c.
-
-Definition clone := fun c & cT -> T & phant_id (@Pack T c) cT => Pack c.
-
-End ClassDef.
-
-Module Exports.
-Coercion sort : type >-> Sortclass.
-Notation eqType := type.
-Notation EqMixin := Mixin.
-Notation EqType T m := (@Pack T m).
-Notation "[ 'eqMixin' 'of' T ]" := (class _ : mixin_of T)
+Notation eqType := Equality.type.
+Notation EqMixin := Equality.Mixin.
+Notation "[ 'eqMixin' 'of' T ]" := (Equality.class _ : Equality.mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T ]") : form_scope.
-Notation "[ 'eqType' 'of' T 'for' C ]" := (@clone T C _ idfun id)
+Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
-Notation "[ 'eqType' 'of' T ]" := (@clone T _ _ id id)
+Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
   (at level 0, format "[ 'eqType'  'of'  T ]") : form_scope.
-End Exports.
-
-End Equality.
-Export Equality.Exports.
-
-Definition eq_op T := Equality.op (Equality.class T).
 
 (* eqE is a generic lemma that can be used to fold back recursive comparisons *)
 (* after using partial evaluation to simplify comparisons on concrete         *)
@@ -166,12 +146,10 @@ Definition eq_op T := Equality.op (Equality.class T).
 (* comparison function, and so is incompatible with PcanEqMixin and the like  *)
 (* - this is why the tree_eqMixin for GenTree.tree in library choice is not   *)
 (* declared Canonical.                                                        *)
-Lemma eqE T x : eq_op x = Equality.op (Equality.class T) x.
+Lemma eqE T x : eq_op x = is_eqType.eq_op (Equality.class T) x.
 Proof. by []. Qed.
 
-Lemma eqP T : Equality.axiom (@eq_op T).
-Proof. by case: T => ? []. Qed.
-Arguments eqP {T x y}.
+Arguments eqP {T x y} : rename.
 
 Delimit Scope eq_scope with EQ.
 Open Scope eq_scope.
@@ -188,8 +166,6 @@ Notation "x =P y" := (eqP : reflect (x = y) (x == y))
   (at level 70, no associativity) : eq_scope.
 Notation "x =P y :> T" := (eqP : reflect (x = y :> T) (x == y :> T))
   (at level 70, y at next level, no associativity) : eq_scope.
-
-Prenex Implicits eq_op eqP.
 
 Lemma eq_refl (T : eqType) (x : T) : x == x. Proof. exact/eqP. Qed.
 Notation eqxx := eq_refl.
@@ -319,13 +295,12 @@ End EqTypePredSig.
 Module MakeEqTypePred (eqmod : EqTypePredSig).
 Coercion eqmod.sort : eqType >-> predArgType.
 End MakeEqTypePred.
-Module Export EqTypePred := MakeEqTypePred Equality.
+Module Export EqTypePred := MakeEqTypePred eqtype.Equality.
 
 Lemma unit_eqP : Equality.axiom (fun _ _ : unit => true).
 Proof. by do 2!case; left. Qed.
 
-Definition unit_eqMixin := EqMixin unit_eqP.
-Canonical unit_eqType := Eval hnf in EqType unit unit_eqMixin.
+HB.instance Definition unit_eqMixin := is_eqType.Build unit unit_eqP.
 
 (* Comparison for booleans. *)
 
@@ -335,8 +310,7 @@ Definition eqb b := addb (~~ b).
 Lemma eqbP : Equality.axiom eqb.
 Proof. by do 2!case; constructor. Qed.
 
-Canonical bool_eqMixin := EqMixin eqbP.
-Canonical bool_eqType := Eval hnf in EqType bool bool_eqMixin.
+HB.instance Definition bool_eqMixin := is_eqType.Build bool eqbP.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
@@ -542,40 +516,47 @@ End ComparableType.
 Definition eq_comparable (T : eqType) : comparable T :=
   fun x y => decP (x =P y).
 
+HB.mixin Record is_SUB (T : Type) (P : pred T) (sub_sort : indexed Type) := SubType {
+  val_subdef : sub_sort -> T;
+  Sub : forall x, P x -> sub_sort;
+  Sub_rect : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
+  SubK_subproof : forall x Px, val_subdef (@Sub x Px) = x
+}.
+
+HB.structure Definition SUB (T : Type) (P : pred T) := { S of is_SUB T P S }.
+
+Notation subType := SUB.type.
+
+HB.structure Definition subEquality T (P : pred T) :=
+  { sT of Equality sT & is_SUB T P sT}.
+
+Notation subEqType := subEquality.type.
+Notation val := (is_SUB.val_subdef (SUB.class _)).
+Notation "\val" := (is_SUB.val_subdef (SUB.class _)) (only parsing).
+Notation "\val" := (is_SUB.val_subdef _) (only printing).
+
 Section SubType.
 
 Variables (T : Type) (P : pred T).
-
-Structure subType : Type := SubType {
-  sub_sort :> Type;
-  val : sub_sort -> T;
-  Sub : forall x, P x -> sub_sort;
-  _ : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
-  _ : forall x Px, val (@Sub x Px) = x
-}.
 
 (* Generic proof that the second property holds by conversion.                *)
 (* The vrefl_rect alias is used to flag generic proofs of the first property. *)
 Lemma vrefl : forall x, P x -> x = x. Proof. by []. Qed.
 Definition vrefl_rect := vrefl.
 
-Definition clone_subType U v :=
-  fun sT & sub_sort sT -> U =>
-  fun c Urec cK (sT' := @SubType U v c Urec cK) & phant_id sT' sT => sT'.
-
 Section Theory.
 
-Variable sT : subType.
+Variable sT : subType P.
 
-Local Notation val := (@val sT).
-Local Notation Sub x Px := (@Sub sT x Px).
+Local Notation val := (is_SUB.val_subdef (SUB.class sT)).
+Local Notation Sub := (@Sub _ _ sT).
+
+Lemma SubK x Px : val (@Sub x Px) = x. Proof. exact: SubK_subproof. Qed.
 
 Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
 
 Lemma SubP u : Sub_spec u.
-Proof. by case: sT Sub_spec SubSpec u => /= U _ mkU rec _. Qed.
-
-Lemma SubK x Px : val (Sub x Px) = x. Proof. by case: sT. Qed.
+Proof. by elim/(@Sub_rect _ _ sT) : u. Qed. (* BUG in elim? sT could be inferred from u *)
 
 Definition insub x := if idP is ReflectT Px then Some (Sub x Px) else None.
 
@@ -624,7 +605,7 @@ Lemma val_insubd u0 x : val (insubd u0 x) = if P x then x else val u0.
 Proof. by rewrite /insubd; case: insubP => [u -> | /negPf->]. Qed.
 
 Lemma insubdK u0 : {in P, cancel (insubd u0) val}.
-Proof. by move=> x Px; rewrite /= val_insubd [P x]Px. Qed.
+Proof. by move=> x Px; rewrite val_insubd [P x]Px. Qed.
 
 Let insub_eq_aux x isPx : P x = isPx -> option sT :=
   if isPx as b return _ = b -> _ then fun Px => Some (Sub x Px) else fun=> None.
@@ -640,12 +621,10 @@ End Theory.
 
 End SubType.
 
-Arguments SubType {T P} sub_sort val Sub rec SubK.
-Arguments val {T P sT} u : rename.
+(* Arguments val {T P sT} u : rename. *)
 Arguments Sub {T P sT} x Px : rename.
 Arguments vrefl {T P} x Px.
 Arguments vrefl_rect {T P} x Px.
-Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
 Arguments insub {T P sT} x.
 Arguments insubd {T P sT} u0 x.
 Arguments insubT [T] P [sT x].
@@ -664,6 +643,10 @@ Local Notation inlined_new_rect :=
 Reserved Notation "[ 'subType' 'for' v ]"
   (at level 0, format "[ 'subType'  'for'  v ]").
 
+  (* HB: bug; TODO: check whether it is current *)
+Notation SubType T v s sr sk :=
+  (@SUB.Pack _ _ T (@SUB.Class _ _ T (@is_SUB.phant_Build _ _ T v s sr sk))).
+
 Notation "[ 'subType' 'for' v ]" := (SubType _ v _ inlined_sub_rect vrefl_rect)
  (only parsing) : form_scope.
 
@@ -673,15 +656,22 @@ Notation "[ 'subType' 'for' v ]" := (SubType _ v _ _ vrefl_rect)
 Notation "[ 'subType' 'for' v 'by' rec ]" := (SubType _ v _ rec vrefl)
  (at level 0, format "[ 'subType'  'for'  v  'by'  rec ]") : form_scope.
 
-Notation "[ 'subType' 'of' U 'for' v ]" := (clone_subType U v id idfun)
+ (*
+Notation "[ 'subType' 'of' U 'for' v ]" := (SUB.clone U v id idfun)
  (at level 0, format "[ 'subType'  'of'  U  'for'  v ]") : form_scope.
+*)
 
-Notation "[ 'subType' 'of' U ]" := (clone_subType U _ id id)
+Notation "[ 'subType' 'of' U ]" := (SUB.clone _ _ U _)
  (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
 
-Definition NewType T U v c Urec :=
+Notation BuildSubTypeFor T v := (@is_SUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect).
+
+Notation "[ 'subMixin' 'for' v ]" := (BuildSubTypeFor _ v)
+  (at level 0, format "[ 'subMixin'  'for'  v ]") : form_scope.
+
+Definition NewType T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  SubType U v (fun x _ => c x) Urec'.
+  SubType U v (fun x _ => c x) Urec' sk.
 Arguments NewType [T U].
 
 Reserved Notation "[ 'newType' 'for' v ]" (at level 0, format "[ 'newType'  'for'  v ]").
@@ -721,8 +711,14 @@ End SigProj.
 
 Prenex Implicits svalP s2val s2valP s2valP'.
 
-Canonical sig_subType T (P : pred T) : subType [eta P] :=
-  Eval hnf in [subType for @sval T [eta [eta P]]].
+(* BUG: coq-elpi: destructuring let in glob2term NYI *)
+Definition sig_is_SUB T (P : pred T) :=
+  BuildSubTypeFor (sig P) sval.
+Section HB.
+Variable T : Type.
+Variable P : pred T.
+HB.instance (sig P) (sig_is_SUB P).
+End HB.
 
 (* Shorthand for sigma types over collective predicates. *)
 Notation "{ x 'in' A }" := {x | x \in A}
@@ -772,34 +768,39 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-Definition sub_eqMixin := EqMixin val_eqP.
-Canonical sub_eqType := Eval hnf in EqType sT sub_eqMixin.
+(* turn into a factory *)
+Definition sub_eqMixin := is_eqType.Build sT val_eqP.
 
-Definition SubEqMixin :=
+(*
   (let: SubType _ v _ _ _ as sT' := sT
-     return ev_ax sT' val -> Equality.class_of sT' in
+     return ev_ax sT' val -> Equality.mixin_of sT' in
    fun vP : ev_ax _ v => EqMixin vP
    ) val_eqP.
-
-Lemma val_eqE (u v : sT) : (val u == val v) = (u == v).
-Proof. by []. Qed.
+*)
 
 End SubEqType.
 
+Lemma val_eqE (T : eqType) (P : pred T) (sT : subEqType P)
+   (u v : sT) : (val u == val v) = (u == v).
+Proof. exact/val_eqP/eqP. Qed.
+
+Notation SubEqMixin sT := (is_eqType.Build (sT : Type) (@val_eqP _ _ _)).
+
 Arguments val_eqP {T P sT x y}.
 
-Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.class_of T)
+Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin T)
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Definition void_eqMixin := PcanEqMixin (of_voidK unit).
-Canonical void_eqType := EqType void void_eqMixin.
+HB.instance void void_eqMixin. (* TODO: PcanEqMixin should become a factory *)
 
 Section SigEqType.
 
 Variables (T : eqType) (P : pred T).
-
+Set Printing All.
 Definition sig_eqMixin := Eval hnf in [eqMixin of {x | P x} by <:].
-Canonical sig_eqType := Eval hnf in EqType {x | P x} sig_eqMixin.
+
+HB.instance ({x | P x}) sig_eqMixin.
 
 End SigEqType.
 
@@ -816,7 +817,7 @@ by do 2!move/eqP->.
 Qed.
 
 Canonical prod_eqMixin := EqMixin pair_eqP.
-Canonical prod_eqType := Eval hnf in EqType (T1 * T2) prod_eqMixin.
+HB.instance ((T1 * T2)%type) prod_eqMixin.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
 
@@ -854,7 +855,7 @@ case=> [x|] [y|] /=; by [constructor | apply: (iffP eqP) => [|[]] ->].
 Qed.
 
 Canonical option_eqMixin := EqMixin opt_eqP.
-Canonical option_eqType := Eval hnf in EqType (option T) option_eqMixin.
+HB.instance (option T) option_eqMixin.
 
 End OptionEqType.
 
@@ -892,7 +893,7 @@ by apply: (iffP eqP) => [->|<-]; rewrite tagged_asE.
 Qed.
 
 Canonical tag_eqMixin := EqMixin tag_eqP.
-Canonical tag_eqType := Eval hnf in EqType {i : I & T_ i} tag_eqMixin.
+HB.instance ({i : I & T_ i}) tag_eqMixin.
 
 Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 
@@ -922,7 +923,7 @@ Lemma sum_eqP : Equality.axiom sum_eq.
 Proof. case=> x [] y /=; by [right | apply: (iffP eqP) => [->|[->]]]. Qed.
 
 Canonical sum_eqMixin := EqMixin sum_eqP.
-Canonical sum_eqType := Eval hnf in EqType (T1 + T2) sum_eqMixin.
+HB.instance ((T1 + T2)%type) sum_eqMixin.
 
 Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 
