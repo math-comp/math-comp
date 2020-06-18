@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool.
+From HB Require Import structures.
 
 (******************************************************************************)
 (* This file defines two "base" combinatorial interfaces:                     *)
@@ -115,42 +116,43 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Module Equality.
+Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
-Definition axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
+HB.mixin Record eq_axioms T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 
-Structure mixin_of T := Mixin {op : rel T; _ : axiom op}.
-Notation class_of := mixin_of (only parsing).
+HB.structure Definition Equality := { T of eq_axioms T }.
 
-Section ClassDef.
+Module Export BackwardCompatEq.
+  Module Equality.
+  Notation axiom := eq_axiom.
+  Notation axioms T := (eq_axioms T).
+  Notation mixin_of T := (eq_axioms T).
+  Notation class_of T := (eqtype.Equality.axioms T).
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
+  (* TODO: build the phant thingy in HB + variant with more/less implicits *)
+  Notation Mixin := (eq_axioms.Axioms_ _).
 
-Definition class := let: Pack _ c := cT return class_of cT in c.
+  (* TODO: build this in HB *)
+  Section ClassDef.
+  Variables (T : Type) (cT : Equality.type).
+  Definition clone := fun c & cT -> T & phant_id (@Equality.Pack T c) cT => Equality.Pack c.
+  End ClassDef.
 
-Definition clone := fun c & cT -> T & phant_id (@Pack T c) cT => Pack c.
+  End Equality.
 
-End ClassDef.
+  (* TODO: build this in HB *)
+  Coercion Equality.eq_axioms_mixin : eqtype.Equality.axioms >-> eq_axioms.axioms_.
+End BackwardCompatEq.
+Import eqtype.Equality.
 
-Module Exports.
-Coercion sort : type >-> Sortclass.
-Notation eqType := type.
-Notation EqMixin := Mixin.
-Notation EqType T m := (@Pack T m).
-Notation "[ 'eqMixin' 'of' T ]" := (class _ : mixin_of T)
+Notation eqType := Equality.type.
+Notation EqMixin := Equality.Mixin.
+Notation "[ 'eqMixin' 'of' T ]" := (Equality.class _ : Equality.mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T ]") : form_scope.
-Notation "[ 'eqType' 'of' T 'for' C ]" := (@clone T C _ idfun id)
+Notation "[ 'eqType' 'of' T 'for' C ]" := (@Equality.clone T C _ idfun id)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
-Notation "[ 'eqType' 'of' T ]" := (@clone T _ _ id id)
+Notation "[ 'eqType' 'of' T ]" := (@Equality.clone T _ _ id id)
   (at level 0, format "[ 'eqType'  'of'  T ]") : form_scope.
-End Exports.
-
-End Equality.
-Export Equality.Exports.
-
-Definition eq_op T := Equality.op (Equality.class T).
 
 (* eqE is a generic lemma that can be used to fold back recursive comparisons *)
 (* after using partial evaluation to simplify comparisons on concrete         *)
@@ -163,12 +165,10 @@ Definition eq_op T := Equality.op (Equality.class T).
 (* comparison function, and so is incompatible with PcanEqMixin and the like  *)
 (* - this is why the tree_eqMixin for GenTree.tree in library choice is not   *)
 (* declared Canonical.                                                        *)
-Lemma eqE T x : eq_op x = Equality.op (Equality.class T) x.
+Lemma eqE T x : eq_op x = eq_axioms.eq_op (Equality.class T) x.
 Proof. by []. Qed.
 
-Lemma eqP T : Equality.axiom (@eq_op T).
-Proof. by case: T => ? []. Qed.
-Arguments eqP {T x y}.
+Arguments eqP {T x y} : rename.
 
 Delimit Scope eq_scope with EQ.
 Open Scope eq_scope.
@@ -185,8 +185,6 @@ Notation "x =P y" := (eqP : reflect (x = y) (x == y))
   (at level 70, no associativity) : eq_scope.
 Notation "x =P y :> T" := (eqP : reflect (x = y :> T) (x == y :> T))
   (at level 70, y at next level, no associativity) : eq_scope.
-
-Prenex Implicits eq_op eqP.
 
 Lemma eq_refl (T : eqType) (x : T) : x == x. Proof. exact/eqP. Qed.
 Notation eqxx := eq_refl.
@@ -310,13 +308,12 @@ End EqTypePredSig.
 Module MakeEqTypePred (eqmod : EqTypePredSig).
 Coercion eqmod.sort : eqType >-> predArgType.
 End MakeEqTypePred.
-Module Export EqTypePred := MakeEqTypePred Equality.
+Module Export EqTypePred := MakeEqTypePred eqtype.Equality.
 
 Lemma unit_eqP : Equality.axiom (fun _ _ : unit => true).
 Proof. by do 2!case; left. Qed.
 
-Definition unit_eqMixin := EqMixin unit_eqP.
-Canonical unit_eqType := Eval hnf in EqType unit unit_eqMixin.
+HB.instance Definition unit_eqMixin := eq_axioms.Build unit unit_eqP.
 
 (* Comparison for booleans. *)
 
@@ -326,8 +323,7 @@ Definition eqb b := addb (~~ b).
 Lemma eqbP : Equality.axiom eqb.
 Proof. by do 2!case; constructor. Qed.
 
-Canonical bool_eqMixin := EqMixin eqbP.
-Canonical bool_eqType := Eval hnf in EqType bool bool_eqMixin.
+HB.instance Definition bool_eqMixin := eq_axioms.Build bool eqbP.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
@@ -758,12 +754,11 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-Definition sub_eqMixin := EqMixin val_eqP.
-Canonical sub_eqType := Eval hnf in EqType sT sub_eqMixin.
+HB.instance Definition sub_eqMixin := eq_axioms.Build (sub_sort sT) val_eqP.
 
 Definition SubEqMixin :=
   (let: SubType _ v _ _ _ as sT' := sT
-     return ev_ax sT' val -> Equality.class_of sT' in
+     return ev_ax sT' val -> Equality.mixin_of sT' in
    fun vP : ev_ax _ v => EqMixin vP
    ) val_eqP.
 
@@ -774,17 +769,18 @@ End SubEqType.
 
 Arguments val_eqP {T P sT x y}.
 
-Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.class_of T)
+Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Definition void_eqMixin := PcanEqMixin (of_voidK unit).
-Canonical void_eqType := EqType void void_eqMixin.
+HB.instance void void_eqMixin. (* TODO: PcanEqMixin should become a factory *)
 
 Section SigEqType.
 
 Variables (T : eqType) (P : pred T).
 
 Definition sig_eqMixin := Eval hnf in [eqMixin of {x | P x} by <:].
+#[verbose] HB.instance ({x | is_true (P x)}) sig_eqMixin.
 Canonical sig_eqType := Eval hnf in EqType {x | P x} sig_eqMixin.
 
 End SigEqType.
