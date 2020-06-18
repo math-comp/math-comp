@@ -130,12 +130,12 @@ rewrite [@gtype _]unlock; apply: intro_isoGrp => [|rT H].
     rewrite -morphV -?morphM ?inE //=; congr (sdpair1 _ (_, _)) => /=.
       by rewrite mulr1 mulKg.
     by rewrite mulVg.
-  have def_xi i: x ^+ i = sdpair1 _ (0, i%:R)%R.
+  have def_xi i: x ^+ i = sdpair1 actp (0, i%:R)%R.  (* FIXME: had to explicitly give actp (instead of _) *)
     rewrite -morphX ?inE //; congr (sdpair1 _ _).
     by apply/eqP; rewrite /eq_op /= !morphX ?inE ?expg1n //=.
-  have def_yi i: y ^+ i = sdpair2 _ i%:R.
+  have def_yi i: y ^+ i = sdpair2 actp i%:R.  (* FIXME: had to explicitly give actp (instead of _) *)
     by rewrite -morphX ?inE //.
-  have def_zi i: z ^+ i = sdpair1 _ (i%:R, 0)%R.
+  have def_zi i: z ^+ i = sdpair1 actp (i%:R, 0)%R.  (* FIXME: had to explicitly give actp (instead of _) *)
     rewrite def_z -morphX ?inE //; congr (sdpair1 _ _).
     by apply/eqP; rewrite /eq_op /= !morphX ?inE ?expg1n ?andbT //=.
   rewrite def_xi def_yi char_Zp ?morph1 //.

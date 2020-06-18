@@ -1609,7 +1609,7 @@ Qed.
 Canonical perm_action := Action aperm_is_action.
 
 Lemma porbitE a : porbit a = orbit perm_action <[a]>%g.
-Proof. by []. Qed.
+Proof. by rewrite unlock. Qed.
 
 Lemma perm_act1P a : reflect (forall x, aperm x a = x) (a == 1).
 Proof.
@@ -1798,7 +1798,9 @@ Proof.
 apply: sub_isom; rewrite ?restr_perm_Aut ?injm_Aut_isom //=.
 rewrite -(im_Aut_isom injf sGD) -!morphim_comp.
 apply: eq_in_morphim; last exact: isom_restr_perm.
-apply/setP=> a; rewrite 2!in_setI; apply: andb_id2r => AutGa.
+(* TODO: investigate why rewrite does not match in the same order *)
+apply/setP=> a; rewrite in_setI [in RHS]in_setI; apply: andb_id2r => AutGa.
+(* the middle rewrite was rewrite 2!in_setI *)
 rewrite /= inE andbC inE (Aut_restr_perm sHG) //=.
 by symmetry; rewrite inE AutGa inE astabs_Aut_isom.
 Qed.
@@ -2113,7 +2115,9 @@ Qed.
 
 Lemma gacts_char G M :
   G \subset D -> M \char R -> {acts G, on group M | to}.
-Proof. by move=> sGD charM; split; rewrite (acts_char, char_sub). Qed.
+(* TODO: investigate why rewrite does not match in the same order *)
+Proof. by move=> sGD charM; split; rewrite ?acts_char// char_sub. Qed.
+(* was ending with  rewrite (acts_char, char_sub)// *)
 
 Section Restrict.
 

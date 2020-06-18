@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype tuple.
 
@@ -101,26 +102,15 @@ Notation "{ 'ffun' fT }" := (finfun_of (Phant fT))
 Notation "{ 'dffun' fT }" := (dfinfun_of (Phant fT))
   (at level 0, format "{ 'dffun'  '[hv' fT ']' }") : type_scope.
 
-Definition exp_finIndexType := ordinal_finType.
+Definition exp_finIndexType n := [finType of 'I_n].
 Notation "T ^ n" :=
   (@finfun_of (exp_finIndexType n) (fun=> T) (Phant _)) : type_scope.
 
 Local Notation finPi aT rT := (forall x : Finite.sort aT, rT x) (only parsing).
-Local Notation finfun_def :=
-  (fun aT rT g => FinfunOf (Phant (finPi aT rT)) (finfun_rec g (enum aT))).
 
-Module Type FinfunDefSig.
-Parameter finfun : forall aT rT, finPi aT rT -> {ffun finPi aT rT}.
-Axiom finfunE : finfun = finfun_def.
-End FinfunDefSig.
-
-Module FinfunDef : FinfunDefSig.
-Definition finfun := finfun_def.
-Lemma finfunE : finfun = finfun_def. Proof. by []. Qed.
-End FinfunDef.
-
-Notation finfun := FinfunDef.finfun.
-Canonical finfun_unlock := Unlockable FinfunDef.finfunE.
+HB.lock Definition finfun aT rT g :=
+  FinfunOf (Phant (finPi aT rT)) (finfun_rec g (enum aT)).
+Canonical finfun_unlock := Unlockable finfun.unlock.
 Arguments finfun {aT rT} g.
 
 Notation "[ 'ffun' x : aT => E ]" := (finfun (fun x : aT => E))
@@ -240,33 +230,28 @@ Section InheritedStructures.
 Variable aT : finType.
 Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
 
-Local Remark eqMixin rT : Equality.mixin_of (dffun_aT rT eqType).
+Local Remark dffun_HasDecEq rT : HasDecEq (dffun_aT rT eqType).
 Proof. exact: PcanEqMixin tfgraphK. Qed.
-Canonical finfun_eqType (rT : eqType) :=
-  EqType {ffun aT -> rT} (eqMixin (fun=> rT)).
-Canonical dfinfun_eqType rT :=
-  EqType (dffun_aT rT eqType) (eqMixin rT).
+HB.instance Definition _ rT := dffun_HasDecEq rT.
+HB.instance Definition _ (rT : eqType) :=
+  Equality.copy {ffun aT -> rT} {dffun forall _, rT}.
 
-Local Remark choiceMixin rT : Choice.mixin_of (dffun_aT rT choiceType).
+Local Remark dffun_HasChoice rT : HasChoice (dffun_aT rT choiceType).
 Proof. exact: PcanChoiceMixin tfgraphK. Qed.
-Canonical finfun_choiceType (rT : choiceType) :=
-  ChoiceType {ffun aT -> rT} (choiceMixin (fun=> rT)).
-Canonical dfinfun_choiceType rT :=
-  ChoiceType (dffun_aT rT choiceType) (choiceMixin rT).
+HB.instance Definition _ rT := dffun_HasChoice rT.
+HB.instance Definition _ (rT : choiceType) :=
+  Choice.copy {ffun aT -> rT} {dffun forall _, rT}.
 
-Local Remark countMixin rT : Countable.mixin_of (dffun_aT rT countType).
+Local Remark dffun_IsCountable rT : IsCountable (dffun_aT rT countType).
 Proof. exact: PcanCountMixin tfgraphK. Qed.
-Canonical finfun_countType (rT : countType) :=
-  CountType {ffun aT -> rT} (countMixin (fun => rT)).
-Canonical dfinfun_countType rT :=
-  CountType (dffun_aT rT countType) (countMixin rT).
+HB.instance Definition _ rT := dffun_IsCountable rT.
+HB.instance Definition _ (rT : countType) :=
+  Countable.copy {ffun aT -> rT} {dffun forall _, rT}.
 
-Local Definition finMixin rT :=
+HB.instance Definition _ rT : IsFinite (dffun_aT rT finType) :=
   PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT rT finType) _ _).
-Canonical finfun_finType (rT : finType) :=
-  FinType {ffun aT -> rT} (finMixin (fun=> rT)).
-Canonical dfinfun_finType rT :=
-  FinType (dffun_aT rT finType) (finMixin rT).
+HB.instance Definition _ (rT : finType) : IsFinite {ffun aT -> rT} :=
+  PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT (fun=> rT) finType) _ _).
 
 End InheritedStructures.
 

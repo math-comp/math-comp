@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finset tuple.
 From mathcomp Require Import div ssralg countalg binomial.
@@ -133,17 +134,18 @@ Variable R : ringType.
 (* Defines a polynomial as a sequence with <> 0 last element *)
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
 
-Canonical polynomial_subType := Eval hnf in [subType for polyseq].
-Definition polynomial_eqMixin := Eval hnf in [eqMixin of polynomial by <:].
-Canonical polynomial_eqType := Eval hnf in EqType polynomial polynomial_eqMixin.
-Definition polynomial_choiceMixin := [choiceMixin of polynomial by <:].
-Canonical polynomial_choiceType :=
-  Eval hnf in ChoiceType polynomial polynomial_choiceMixin.
+HB.instance Definition _ := [IsSUB for polyseq].
+HB.instance Definition _ := [Choice of polynomial by <:].
 
 Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
 
 Definition poly_of of phant R := polynomial.
 Identity Coercion type_poly_of : poly_of >-> polynomial.
+
+Local Notation "{poly}" := (poly_of (Phant R)).
+
+HB.instance Definition _ := SUB.on {poly}.
+HB.instance Definition _ := Choice.on {poly}.
 
 Definition coefp i (p : poly_of (Phant R)) := p`_i.
 
@@ -158,19 +160,10 @@ Arguments poly_inj {R} [p1%R p2%R] : rename.
 Arguments coefp {R} i%N / p%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)) : type_scope.
 
-Definition poly_countMixin (R : countRingType) :=
-  [countMixin of polynomial R by <:].
-Canonical polynomial_countType R := CountType _ (poly_countMixin R).
-Canonical poly_countType (R : countRingType) := [countType of {poly R}].
-
 Section PolynomialTheory.
 
 Variable R : ringType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
-
-Canonical poly_subType := Eval hnf in [subType of {poly R}].
-Canonical poly_eqType := Eval hnf in [eqType of {poly R}].
-Canonical poly_choiceType := Eval hnf in [choiceType of {poly R}].
 
 Definition lead_coef p := p`_(size p).-1.
 Lemma lead_coefE p : lead_coef p = p`_(size p).-1. Proof. by []. Qed.
@@ -337,12 +330,9 @@ move=> p; apply/polyP=> i.
 by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
-Definition poly_zmodMixin :=
-  ZmodMixin add_polyA add_polyC add_poly0 add_polyN.
-
-Canonical poly_zmodType := Eval hnf in ZmodType {poly R} poly_zmodMixin.
-Canonical polynomial_zmodType :=
-  Eval hnf in ZmodType (polynomial R) poly_zmodMixin.
+HB.instance Definition _ := GRing.IsZmodule.Build (polynomial R)
+  add_polyA add_polyC add_poly0 add_polyN.
+HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
 Lemma polyC0 : 0%:P = 0 :> {poly R}. Proof. by []. Qed.
@@ -547,12 +537,9 @@ Qed.
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
-Definition poly_ringMixin :=
-  RingMixin mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
-
-Canonical poly_ringType := Eval hnf in RingType {poly R} poly_ringMixin.
-Canonical polynomial_ringType :=
-  Eval hnf in RingType (polynomial R) poly_ringMixin.
+HB.instance Definition _ := GRing.Zmodule_IsRing.Build (polynomial R)
+  mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
+HB.instance Definition _ := GRing.Ring.on {poly R}.
 
 Lemma polyC1 : 1%:P = 1 :> {poly R}. Proof. by []. Qed.
 
@@ -683,17 +670,11 @@ Proof. by move=> a b /=; rewrite !scale_polyE raddfD mulrDl. Qed.
 Fact scale_polyAl a p q : scale_poly a (p * q) = scale_poly a p * q.
 Proof. by rewrite !scale_polyE mulrA. Qed.
 
-Definition poly_lmodMixin :=
-  LmodMixin scale_polyA scale_1poly scale_polyDr scale_polyDl.
-
-Canonical poly_lmodType :=
-  Eval hnf in LmodType R {poly R} poly_lmodMixin.
-Canonical polynomial_lmodType :=
-  Eval hnf in LmodType R (polynomial R) poly_lmodMixin.
-Canonical poly_lalgType :=
-  Eval hnf in LalgType R {poly R} scale_polyAl.
-Canonical polynomial_lalgType :=
-  Eval hnf in LalgType R (polynomial R) scale_polyAl.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R (polynomial R)
+  scale_polyA scale_1poly scale_polyDr scale_polyDl.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build R (polynomial R)
+  scale_polyAl.
+HB.instance Definition _ := GRing.Lalgebra.on {poly R}.
 
 Lemma mul_polyC a p : a%:P * p = a *: p.
 Proof. by rewrite -scale_polyE. Qed.
@@ -1742,13 +1723,6 @@ Arguments polyOverP {R S0 addS kS p} : rename.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
 Arguments eq_poly {R n} [E1] E2 eq_E12.
 
-Canonical polynomial_countZmodType (R : countRingType) :=
-  [countZmodType of polynomial R].
-Canonical poly_countZmodType (R : countRingType) := [countZmodType of {poly R}].
-Canonical polynomial_countRingType (R : countRingType) :=
-  [countRingType of polynomial R].
-Canonical poly_countRingType (R : countRingType) := [countRingType of {poly R}].
-
 (* Container morphism. *)
 Section MapPoly.
 
@@ -2373,13 +2347,10 @@ apply/polyP=> i; rewrite coefM coefMr.
 by apply: eq_bigr => j _; rewrite mulrC.
 Qed.
 
-Canonical poly_comRingType := Eval hnf in ComRingType {poly R} poly_mul_comm.
-Canonical polynomial_comRingType :=
-  Eval hnf in ComRingType (polynomial R) poly_mul_comm.
-Canonical poly_algType := Eval hnf in CommAlgType R {poly R}.
-Canonical polynomial_algType :=
-  Eval hnf in [algType R of polynomial R for poly_algType].
-Canonical poly_comAlgType := Eval hnf in [comAlgType R of {poly R}].
+HB.instance Definition _ := GRing.Ring_HasCommutativeMul.Build (polynomial R)
+  poly_mul_comm.
+HB.instance Definition _ := GRing.Lalgebra_isComAlgebra.Build R (polynomial R).
+HB.instance Definition _ := GRing.ComAlgebra.on {poly R}.
 
 Lemma coef_prod_XsubC (ps : seq R) (n : nat) :
   (n <= size ps)%N ->
@@ -2551,11 +2522,6 @@ Definition derivCE := (derivE, deriv_exp).
 
 End PolynomialComRing.
 
-Canonical polynomial_countComRingType (R : countComRingType) :=
-  [countComRingType of polynomial R].
-Canonical poly_countComRingType (R : countComRingType) :=
-  [countComRingType of {poly R}].
-
 Section PolynomialIdomain.
 
 (* Integral domain structure on poly *)
@@ -2600,25 +2566,13 @@ Qed.
 Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
 Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
-Definition poly_comUnitMixin :=
-  ComUnitRingMixin poly_mulVp poly_intro_unit poly_inv_out.
+HB.instance Definition _ := GRing.ComRing_HasMulInverse.Build (polynomial R)
+  poly_mulVp poly_intro_unit poly_inv_out.
+HB.instance Definition _ := GRing.ComUnitRing.on {poly R}.
 
-Canonical poly_unitRingType :=
-  Eval hnf in UnitRingType {poly R} poly_comUnitMixin.
-Canonical polynomial_unitRingType :=
-  Eval hnf in [unitRingType of polynomial R for poly_unitRingType].
-
-Canonical poly_unitAlgType := Eval hnf in [unitAlgType R of {poly R}].
-Canonical polynomial_unitAlgType := Eval hnf in [unitAlgType R of polynomial R].
-
-Canonical poly_comUnitRingType := Eval hnf in [comUnitRingType of {poly R}].
-Canonical polynomial_comUnitRingType :=
-  Eval hnf in [comUnitRingType of polynomial R].
-
-Canonical poly_idomainType :=
-  Eval hnf in IdomainType {poly R} poly_idomainAxiom.
-Canonical polynomial_idomainType :=
-  Eval hnf in [idomainType of polynomial R for poly_idomainType].
+HB.instance Definition _ := GRing.ComUnitRing_IsIntegral.Build (polynomial R)
+  poly_idomainAxiom.
+HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 
 Lemma poly_unitE p :
   (p \in GRing.unit) = (size p == 1%N) && (p`_0 \in GRing.unit).
@@ -2796,18 +2750,28 @@ Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
 
-Canonical polynomial_countUnitRingType (R : countIdomainType) :=
-  [countUnitRingType of polynomial R].
-Canonical poly_countUnitRingType (R : countIdomainType) :=
-  [countUnitRingType of {poly R}].
-Canonical polynomial_countComUnitRingType (R : countIdomainType) :=
-  [countComUnitRingType of polynomial R].
-Canonical poly_countComUnitRingType (R : countIdomainType) :=
-  [countComUnitRingType of {poly R}].
-Canonical polynomial_countIdomainType (R : countIdomainType) :=
-  [countIdomainType of polynomial R].
-Canonical poly_countIdomainType (R : countIdomainType) :=
-  [countIdomainType of {poly R}].
+(* FIXME: these are seamingly artifical ways to close the inheritance graph *)
+(*    We make parameters more and more precise to trigger completion by HB  *)
+
+HB.instance Definition _ (R : countRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countComRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countComRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countUnitRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countUnitRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countComUnitRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countComUnitRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countIdomainType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countIdomainType) := Countable.on {poly R}.
 
 Section MapFieldPoly.
 
@@ -3090,7 +3054,7 @@ Module PreClosedField.
 Section UseAxiom.
 
 Variable F : fieldType.
-Hypothesis closedF : GRing.ClosedField.axiom F.
+Hypothesis closedF : GRing.closed_field_axiom F.
 Implicit Type p : {poly F}.
 
 Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1%N).

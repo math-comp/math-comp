@@ -50,7 +50,7 @@ End Ring.
 Lemma separable_Xn_sub_1 (R : idomainType) n :
   n%:R != 0 :> R -> @separable_poly R ('X^n - 1).
 Proof.
-case: n => [/eqP// | n nz_n]; rewrite /separable_poly linearB /= derivC subr0.
+case: n => [/eqP// | n nz_n]; rewrite unlock linearB /= derivC subr0.
 rewrite derivXn -scaler_nat coprimepZr //= exprS -scaleN1r coprimep_sym.
 by rewrite coprimep_addl_mul coprimepZr ?coprimep1 // (signr_eq0 _ 1).
 Qed.

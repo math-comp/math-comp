@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From HB Require Import structures.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice div.
 From mathcomp Require Import fintype bigop prime finset fingroup morphism.
 From mathcomp Require Import perm automorphism quotient gproduct ssralg.
 From mathcomp Require Import finalg zmodp poly.
@@ -824,8 +825,8 @@ have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
-pose sgT := BaseFinGroupType _ (FinGroup.Mixin sG_Ag sG_1g sG_Vg).
-pose gT := @FinGroupType sgT sG_Vg.
+pose ssMG := IsMulGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
+pose gT : finGroupType := HB.pack (seq_sub rs) ssMG.
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
   by split=> [ri1 | ->]; first apply: val_inj.

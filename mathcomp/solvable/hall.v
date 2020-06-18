@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From HB Require Import structures.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div choice.
 From mathcomp Require Import fintype finset prime fingroup morphism.
 From mathcomp Require Import automorphism quotient action gproduct gfunctor.
 From mathcomp Require Import commutator center pgroup finmodule nilpotent.
@@ -763,7 +764,7 @@ have nH': 'N(H') = setT.
   by rewrite -actsEsd // acts_actby subxx /= (setIidPr sHN).
 have: 'dom (coset H' \o inA \o invm iAq) = Aq.
   by rewrite ['dom _]morphpre_invm /= nH' morphpreT.
-case/domP=> qA [def_qA ker_qA _ im_qA].
+case/domP=> /= qA [def_qA ker_qA _ im_qA].
 have{coHA} coHA': coprime #|H'| #|A'| by rewrite !card_injm.
 have{ker_qA} injAq: 'injm qA.
   rewrite {}ker_qA !ker_comp ker_coset morphpre_invm -morphpreIim /= setIC.
@@ -772,7 +773,7 @@ have{im_qA} im_Aq : qA @* Aq = A' / H'.
   by rewrite {}im_qA !morphim_comp im_invm.
 have: 'dom (quotm (sdpair1_morphism <[nNA]>) nsHN \o invm iGq) = Gq.
   by rewrite ['dom _]morphpre_invm /= quotientInorm.
-case/domP=> qG [def_qG ker_qG _ im_qG].
+case/domP=> /= qG [def_qG ker_qG _ im_qG].
 have{ker_qG} injGq: 'injm qG.
   rewrite {}ker_qG ker_comp ker_quotm morphpre_invm (trivgP injG).
   by rewrite quotient1 morphim1.

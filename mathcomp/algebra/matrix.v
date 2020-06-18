@@ -1,8 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finfun bigop finset fingroup perm order.
-From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
+From mathcomp Require Import div prime binomial ssralg countalg finalg zmodp.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
@@ -285,21 +286,31 @@ Variant matrix : predArgType := Matrix of {ffun 'I_m * 'I_n -> R}.
 
 Definition mx_val A := let: Matrix g := A in g.
 
-Canonical matrix_subType := Eval hnf in [newType for mx_val].
-
-Fact matrix_key : unit. Proof. by []. Qed.
-Definition matrix_of_fun_def F := Matrix [ffun ij => F ij.1 ij.2].
-Definition matrix_of_fun k := locked_with k matrix_of_fun_def.
-Canonical matrix_unlockable k := [unlockable fun matrix_of_fun k].
+HB.instance Definition _ := [IsNew for mx_val].
 
 Definition fun_of_matrix A (i : 'I_m) (j : 'I_n) := mx_val A (i, j).
 
 Coercion fun_of_matrix : matrix >-> Funclass.
 
+End MatrixDef.
+
+Fact matrix_key : unit. Proof. by []. Qed.
+
+HB.lock
+Definition matrix_of_fun R (m n : nat) (k : unit) (F : 'I_m -> 'I_n -> R) :=
+  @Matrix R m n [ffun ij => F ij.1 ij.2].
+Canonical matrix_unlockable := Unlockable matrix_of_fun.unlock.
+
+Section MatrixDef2.
+
+Variable R : Type.
+Variables m n : nat.
+Implicit Type F : 'I_m -> 'I_n -> R.
+
 Lemma mxE k F : matrix_of_fun k F =2 F.
 Proof. by move=> i j; rewrite unlock /fun_of_matrix /= ffunE. Qed.
 
-Lemma matrixP (A B : matrix) : A =2 B <-> A = B.
+Lemma matrixP (A B : matrix R m n) : A =2 B <-> A = B.
 Proof.
 rewrite /fun_of_matrix; split=> [/= eqAB | -> //].
 by apply/val_inj/ffunP=> [[i j]]; apply: eqAB.
@@ -308,7 +319,7 @@ Qed.
 Lemma eq_mx k F1 F2 : (F1 =2 F2) -> matrix_of_fun k F1 = matrix_of_fun k F2.
 Proof. by move=> eq_F; apply/matrixP => i j; rewrite !mxE eq_F. Qed.
 
-End MatrixDef.
+End MatrixDef2.
 
 Arguments eq_mx {R m n k} [F1] F2 eq_F12.
 
@@ -349,26 +360,10 @@ Notation "\row_ ( j < n ) E" := (@matrix_of_fun _ 1 n matrix_key (fun _ j => E))
   (only parsing) : ring_scope.
 Notation "\row_ j E" := (\row_(j < _) E) : ring_scope.
 
-Definition matrix_eqMixin (R : eqType) m n :=
-  Eval hnf in [eqMixin of 'M[R]_(m, n) by <:].
-Canonical matrix_eqType (R : eqType) m n:=
-  Eval hnf in EqType 'M[R]_(m, n) (matrix_eqMixin R m n).
-Definition matrix_choiceMixin (R : choiceType) m n :=
-  [choiceMixin of 'M[R]_(m, n) by <:].
-Canonical matrix_choiceType (R : choiceType) m n :=
-  Eval hnf in ChoiceType 'M[R]_(m, n) (matrix_choiceMixin R m n).
-Definition matrix_countMixin (R : countType) m n :=
-  [countMixin of 'M[R]_(m, n) by <:].
-Canonical matrix_countType (R : countType) m n :=
-  Eval hnf in CountType 'M[R]_(m, n) (matrix_countMixin R m n).
-Canonical matrix_subCountType (R : countType) m n :=
-  Eval hnf in [subCountType of 'M[R]_(m, n)].
-Definition matrix_finMixin (R : finType) m n :=
-  [finMixin of 'M[R]_(m, n) by <:].
-Canonical matrix_finType (R : finType) m n :=
-  Eval hnf in FinType 'M[R]_(m, n) (matrix_finMixin R m n).
-Canonical matrix_subFinType (R : finType) m n :=
-  Eval hnf in [subFinType of 'M[R]_(m, n)].
+HB.instance Definition _ (R : eqType) m n := [Equality of 'M[R]_(m, n) by <:].
+HB.instance Definition _ (R : choiceType) m n := [Choice of 'M[R]_(m, n) by <:].
+HB.instance Definition _ (R : countType) m n := [Countable of 'M[R]_(m, n) by <:].
+HB.instance Definition _ (R : finType) m n := [Finite of 'M[R]_(m, n) by <:].
 
 Lemma card_mx (F : finType) m n : (#|{: 'M[F]_(m, n)}| = #|F| ^ (m * n))%N.
 Proof. by rewrite card_sub card_ffun card_prod !card_ord. Qed.
@@ -1634,9 +1629,8 @@ Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 Lemma addNmx : left_inverse (const_mx 0) oppmx addmx.
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
-Definition matrix_zmodMixin := ZmodMixin addmxA addmxC add0mx addNmx.
-
-Canonical matrix_zmodType := Eval hnf in ZmodType 'M[V]_(m, n) matrix_zmodMixin.
+HB.instance Definition _ := GRing.IsZmodule.Build 'M[V]_(m, n)
+  addmxA addmxC add0mx addNmx.
 
 Lemma mulmxnE A d i j : (A *+ d) i j = A i j *+ d.
 Proof. by elim: d => [|d IHd]; rewrite ?mulrS mxE ?IHd. Qed.
@@ -2111,16 +2105,6 @@ Arguments is_trig_mxP {V m n A}.
 Arguments scalar_mx {V n}.
 Arguments is_scalar_mxP {V n A}.
 
-Section FinZmodMatrix.
-Variables (V : finZmodType) (m n : nat).
-Local Notation MV := 'M[V]_(m, n).
-
-Canonical matrix_finZmodType := Eval hnf in [finZmodType of MV].
-Canonical matrix_baseFinGroupType :=
-  Eval hnf in [baseFinGroupType of MV for +%R].
-Canonical matrix_finGroupType := Eval hnf in [finGroupType of MV for +%R].
-End FinZmodMatrix.
-
 (* Parametricity over the additive structure. *)
 Section MapZmodMatrix.
 
@@ -2183,11 +2167,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
-Definition matrix_lmodMixin :=
-  LmodMixin scalemxA scale1mx scalemxDr scalemxDl.
-
-Canonical matrix_lmodType :=
-  Eval hnf in LmodType R 'M[R]_(m, n) matrix_lmodMixin.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R 'M[R]_(m, n)
+  scalemxA scale1mx scalemxDr scalemxDl.
 
 Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
 Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
@@ -2853,12 +2834,10 @@ Local Notation n := n'.+1.
 Lemma matrix_nonzero1 : 1%:M != 0 :> 'M[R]_n.
 Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 
-Definition matrix_ringMixin :=
-  RingMixin (@mulmxA n n n n) (@mul1mx n n) (@mulmx1 n n)
-            (@mulmxDl n n n) (@mulmxDr n n n) matrix_nonzero1.
-
-Canonical matrix_ringType := Eval hnf in RingType 'M[R]_n matrix_ringMixin.
-Canonical matrix_lAlgType := Eval hnf in LalgType R 'M[R]_n (@scalemxAl n n n).
+HB.instance Definition _ := GRing.Zmodule_IsRing.Build 'M[R]_n (@mulmxA n n n n)
+  (@mul1mx n n) (@mulmx1 n n) (@mulmxDl n n n) (@mulmxDr n n n) matrix_nonzero1.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build R 'M[R]_n
+  (@scalemxAl n n n).
 
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
@@ -2970,16 +2949,29 @@ Proof.
 by apply/matrixP=> k i /[!mxE]; apply: eq_bigr => j _ /[!mxE].
 Qed.
 
-Canonical matrix_countZmodType (M : countZmodType) m n :=
-  [countZmodType of 'M[M]_(m, n)].
-Canonical matrix_countRingType (R : countRingType) n :=
-  [countRingType of 'M[R]_n.+1].
-Canonical matrix_finLmodType (R : finRingType) m n :=
-  [finLmodType R of 'M[R]_(m, n)].
-Canonical matrix_finRingType (R : finRingType) n' :=
-  Eval hnf in [finRingType of 'M[R]_n'.+1].
-Canonical matrix_finLalgType (R : finRingType) n' :=
-  [finLalgType R of 'M[R]_n'.+1].
+HB.instance Definition _ (M : countZmodType) m n :=
+  [Countable of 'M[M]_(m, n) by <:].
+HB.instance Definition _ (R : countRingType) n :=
+  [Countable of 'M[R]_n.+1 by <:].
+
+Section FinZmodMatrix.
+Variables (V : finZmodType) (m n : nat).
+Local Notation MV := 'M[V]_(m, n).
+
+HB.instance Definition _ := [Finite of MV by <:].
+
+#[compress_coercions]
+HB.instance Definition _ := [finGroupMixin of MV for +%R].
+
+End FinZmodMatrix.
+
+#[compress_coercions]
+HB.instance Definition _ (R : finRingType) (m n : nat) :=
+  FinRing.Zmodule.on 'M[R]_(m, n).
+
+#[compress_coercions]
+HB.instance Definition _ (R : finRingType) n :=
+  [Finite of 'M[R]_n.+1 by <:].
 
 (* Parametricity over the algebra structure. *)
 Section MapRingMatrix.
@@ -3215,8 +3207,8 @@ Section MatrixAlgType.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-Canonical matrix_algType :=
-  Eval hnf in AlgType R 'M[R]_n (fun k => scalemxAr k).
+HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build R 'M[R]_n
+  (fun k => scalemxAr k).
 
 End MatrixAlgType.
 
@@ -3492,8 +3484,8 @@ Arguments comm_mx_scalar {R n}.
 Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
 
-Canonical matrix_finAlgType (R : finComRingType) n' :=
-  [finAlgType R of 'M[R]_n'.+1].
+HB.instance Definition _ (R : finComRingType) (n' : nat) :=
+  [Finite of 'M[R]_n'.+1 by <:].
 
 #[global] Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
@@ -3604,11 +3596,8 @@ End Defs.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-Definition matrix_unitRingMixin :=
-  UnitRingMixin (@mulVmx n) (@mulmxV n) (@intro_unitmx n) (@invmx_out n).
-Canonical matrix_unitRing :=
-  Eval hnf in UnitRingType 'M[R]_n matrix_unitRingMixin.
-Canonical matrix_unitAlg := Eval hnf in [unitAlgType R of 'M[R]_n].
+HB.instance Definition _ := GRing.Ring_HasMulInverse.Build 'M[R]_n
+  (@mulVmx n) (@mulmxV n) (@intro_unitmx n) (@invmx_out n).
 
 (* Lemmas requiring that the coefficients are in a unit ring *)
 
@@ -3654,16 +3643,15 @@ rewrite [RHS](mulmx_block (invmx Aul)) !(mulmx0, mul0mx, add0r, addr0).
 by rewrite !mulVmx// -?scalar_mx_block.
 Qed.
 
-Canonical matrix_countUnitRingType (R : countComUnitRingType) n :=
-  [countUnitRingType of 'M[R]_n.+1].
+HB.instance Definition _ (R : countComUnitRingType) (n' : nat) :=
+  [Countable of 'M[R]_n'.+1 by <:].
 
+HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
+  [Finite of 'M[R]_n.+1 by <:].
 (* Finite inversible matrices and the general linear group. *)
 Section FinUnitMatrix.
 
 Variables (n : nat) (R : finComUnitRingType).
-
-Canonical matrix_finUnitRingType n' :=
-  Eval hnf in [finUnitRingType of 'M[R]_n'.+1].
 
 Definition GLtype of phant R := {unit 'M[R]_n.-1.+1}.
 
@@ -3681,20 +3669,16 @@ Notation "{ ''GL_' n ( p ) }" := {'GL_n['F_p]}
   (at level 0, n at level 2, p at level 10,
     format "{ ''GL_' n ( p ) }") : type_scope.
 
+HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
+  [IsSUB of {'GL_n[R]} for GLval].
+
 Section GL_unit.
 
 Variables (n : nat) (R : finComUnitRingType).
 
-Canonical GL_subType := [subType of {'GL_n[R]} for GLval].
-Definition GL_eqMixin := Eval hnf in [eqMixin of {'GL_n[R]} by <:].
-Canonical GL_eqType := Eval hnf in EqType {'GL_n[R]} GL_eqMixin.
-Canonical GL_choiceType := Eval hnf in [choiceType of {'GL_n[R]}].
-Canonical GL_countType := Eval hnf in [countType of {'GL_n[R]}].
-Canonical GL_subCountType := Eval hnf in [subCountType of {'GL_n[R]}].
-Canonical GL_finType := Eval hnf in [finType of {'GL_n[R]}].
-Canonical GL_subFinType := Eval hnf in [subFinType of {'GL_n[R]}].
-Canonical GL_baseFinGroupType := Eval hnf in [baseFinGroupType of {'GL_n[R]}].
-Canonical GL_finGroupType := Eval hnf in [finGroupType of {'GL_n[R]}].
+HB.instance Definition _ := [Finite of {'GL_n[R]} by <:].
+HB.instance Definition _ := FinGroup.on {'GL_n[R]}.
+
 Definition GLgroup of phant R := [set: {'GL_n[R]}].
 Canonical GLgroup_group ph := Eval hnf in [group of GLgroup ph].
 

@@ -1,10 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism presentation.
 From mathcomp Require Import quotient action commutator gproduct gfunctor.
-From mathcomp Require Import ssralg finalg zmodp cyclic pgroup center gseries.
+From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup center gseries.
 From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
 
 (******************************************************************************)
@@ -91,14 +92,27 @@ by case: pickP => [op /andP[] | _] //=; rewrite group1.
 Qed.
 
 Definition gact := (base_act \ act_dom)%gact.
-Fact gtype_key : unit. Proof. by []. Qed.
-Definition gtype := locked_with gtype_key (sdprod_groupType gact).
+
+End Construction.
+
+HB.lock Definition gtype q p e := [the finGroupType of sdprod_by (gact q p e)].
+Canonical gtype_unlockable := Unlockable gtype.unlock.
+
+Section ConstructionCont.
+
+Variables q p e : nat.
+Let a : 'Z_p := Zp1.
+Let b : 'Z_q := Zp1.
+Local Notation B := <[b]>.
+Local Notation gtype := (gtype q p e) (only parsing).
+Local Notation gact := (gact q p e) (only parsing).
+Local Notation aut_of := (aut_of q p e) (only parsing).
 
 Hypotheses (p_gt1 : p > 1) (q_gt1 : q > 1).
 
 Lemma card : #|[set: gtype]| = (p * q)%N.
 Proof.
-rewrite [gtype]unlock -(sdprod_card (sdprod_sdpair _)).
+rewrite [gtype.body]unlock -(sdprod_card (sdprod_sdpair _)).
 rewrite !card_injm ?injm_sdpair1 ?injm_sdpair2 //.
 by rewrite mulnC -!orderE !order_Zp1 !Zp_cast.
 Qed.
@@ -106,7 +120,7 @@ Qed.
 Lemma Grp : (exists s, [/\ s \in Aut B, #[s] %| p & s b = b ^+ e]) ->
   [set: gtype] \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ e)).
 Proof.
-rewrite [gtype]unlock => [[s [AutBs dvd_s_p sb]]].
+rewrite [gtype.body]unlock => [[s [AutBs dvd_s_p sb]]].
 have memB: _ \in B by move=> c; rewrite -Zp_cycle inE.
 have Aa: a \in <[a]> by rewrite !cycle_id.
 have [oa ob]: #[a] = p /\ #[b] = q by rewrite !order_Zp1 !Zp_cast.
@@ -136,7 +150,7 @@ rewrite im_xsdprodm !morphim_cycle //= !eltm_id -norm_joinEr //.
 by rewrite norms_cycle xy mem_cycle.
 Qed.
 
-End Construction.
+End ConstructionCont.
 
 End Extremal.
 
@@ -153,10 +167,12 @@ Definition dihedral_gtype := gtype q 2 q.-1.
 Definition semidihedral_gtype := gtype q 2 (q %/ p).-1.
 Definition quaternion_kernel :=
   <<[set u | u ^+ 2 == 1] :\: [set u ^+ 2 | u in [set: gtype q 4 q.-1]]>>.
-Definition quaternion_gtype :=
-  locked_with gtype_key (coset_groupType quaternion_kernel).
 
 End SpecializeExtremals.
+
+HB.lock Definition quaternion_gtype n :=
+  [the finGroupType of coset_of (quaternion_kernel n)].
+Canonical quaternion_unlock := Unlockable quaternion_gtype.unlock.
 
 Notation "''Mod_' m" := (modular_gtype m) : type_scope.
 Notation "''Mod_' m" := [set: gsort 'Mod_m] : group_scope.
@@ -742,7 +758,7 @@ have def_q : m %/ pdiv m = q
   by rewrite /m -(ltn_predK n_gt2) pdiv_pfactor // expnS mulKn.
 have r_gt1 : r > 1 by rewrite (ltn_exp2l 0) // -(subnKC n_gt2).
 have def2r : (2 * r)%N = q by rewrite -expnS /q -(subnKC n_gt2).
-rewrite /GrpQ [@quaternion_gtype _]unlock /quaternion_kernel {}def_q.
+rewrite /GrpQ [quaternion_gtype]unlock /quaternion_kernel {}def_q.
 set B := [set: _]; have: B \homg Grp (u : v : (u ^+ q, v ^+ 4, u ^ v = u^-1)).
   by rewrite -Grp_ext_dihedral ?homg_refl.
 have: #|B| = (q * 4)%N by rewrite card_ext_dihedral // mulnC -muln2 -mulnA.
@@ -1095,6 +1111,8 @@ rewrite !isoMt //; split=> // C; case/cyclicP=> z ->{C} sCG iCG.
 rewrite [X]defU // defU -?cycle_subG //.
 by apply: double_inj; rewrite -muln2 -iCG Lagrange // oG -mul2n.
 Qed.
+
+(* HERE BOOM *)
 
 Theorem quaternion_structure :
     n > 2 -> extremal_generators G 2 n (x, y) -> G \isog 'Q_m ->
@@ -1517,19 +1535,11 @@ Lemma cancel_index_extremal_groups :
 Proof. by case. Qed.
 Local Notation extgK := cancel_index_extremal_groups.
 
-Import choice.
+#[export]
+HB.instance Definition _ := Countable.copy extremal_group_type (can_type extgK).
 
-Definition extremal_group_eqMixin := CanEqMixin extgK.
-Canonical extremal_group_eqType := EqType _ extremal_group_eqMixin.
-Definition extremal_group_choiceMixin := CanChoiceMixin extgK.
-Canonical extremal_group_choiceType := ChoiceType _ extremal_group_choiceMixin.
-Definition extremal_group_countMixin := CanCountMixin extgK.
-Canonical extremal_group_countType := CountType _ extremal_group_countMixin.
 Lemma bound_extremal_groups (c : extremal_group_type) : pickle c < 6.
 Proof. by case: c. Qed.
-Definition extremal_group_finMixin := Finite.CountMixin bound_extremal_groups.
-Canonical extremal_group_finType :=
-  FinType extremal_group_type extremal_group_finMixin.
 
 Definition extremal_class (A : {set gT}) :=
   let m := #|A| in let p := pdiv m in let n := logn p m in

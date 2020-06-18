@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finfun tuple.
 From mathcomp Require Import ssralg matrix mxalgebra zmodp.
@@ -107,73 +108,38 @@ Delimit Scope vspace_scope with VS.
 Import GRing.Theory.
 
 (* Finite dimension vector space *)
-Module Vector.
-
-Section ClassDef.
-Variable R : ringType.
-
-Definition axiom_def n (V : lmodType R) of phant V :=
+Definition vector_axiom_def (R : ringType) n (V : lmodType R) of phant V :=
   {v2r : V -> 'rV[R]_n | linear v2r & bijective v2r}.
 
-Inductive mixin_of (V : lmodType R) := Mixin dim & axiom_def dim (Phant V).
+HB.mixin Record Lmodule_HasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V :=
+  { dim : nat;
+    vector_subdef : vector_axiom_def dim (Phant V) }.
 
-Set Primitive Projections.
-Record class_of V := Class {
-  base : GRing.Lmodule.class_of R V;
-  mixin : mixin_of (GRing.Lmodule.Pack _ base)
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> GRing.Lmodule.class_of.
+#[mathcomp(axiom="vector_axiom_def"), infer(R), short(type="vectType")]
+HB.structure Definition Vector (R : ringType) :=
+  { V of Lmodule_HasFinDim R V & GRing.Lmodule R V }.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c := cT return class_of cT in c.
-Definition clone c of phant_id class c := @Pack phR T c.
-Definition dim := let: Mixin n _ := mixin class in n.
+(* FIXME: Vector.axiom requires a phantom type *
+ * -> a shortand notation is used instead      *)
+Notation vector_axiom n V := (Vector.axiom n (Phant V)).
+Arguments dim {R} s.
 
-Definition pack b0 (m0 : mixin_of (@GRing.Lmodule.Pack R _ T b0)) :=
-  fun bT b & phant_id (@GRing.Lmodule.class _ phR bT) b =>
-  fun    m & phant_id m0 m => Pack phR (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
-
-End ClassDef.
-Notation axiom n V := (axiom_def n (Phant V)).
-
+(* FIXME: S/space and H/hom were defined behind the module Vector *
+ * Perhaps we should change their names to avoid conflits.        *)
 Section OtherDefs.
-Local Coercion sort : type >-> Sortclass.
-Local Coercion dim : type >-> nat.
-Inductive space (K : fieldType) (vT : type (Phant K)) (phV : phant vT) :=
+Local Coercion dim : Vector.type_ >-> nat.
+Inductive space (K : fieldType) (vT : Vector.type K) (phV : phant vT) :=
   Space (mx : 'M[K]_vT) & <<mx>>%MS == mx.
-Inductive hom (R : ringType) (vT wT : type (Phant R)) :=
+Inductive hom (R : ringType) (vT wT : Vector.type R) :=
   Hom of 'M[R]_(vT, wT).
 End OtherDefs.
+(* /FIXME *)
 
-Module Import Exports.
-
-Coercion base : class_of >-> GRing.Lmodule.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType: type >->  Equality.type.
-Bind Scope ring_scope with sort.
-Canonical eqType.
-Coercion choiceType: type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType: type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion lmodType: type>->  GRing.Lmodule.type.
-Canonical lmodType.
-Notation vectType R := (@type _ (Phant R)).
-Notation VectType R V mV :=
-   (@pack _ (Phant R) V _ mV _ _ id _ id).
-Notation VectMixin := Mixin.
-Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@clone _ (Phant R) T cT _ idfun)
+Module Import VectorExports.
+Bind Scope ring_scope with Vector.sort.
+Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone [the ringType of R] T cT)
   (at level 0, format "[ 'vectType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'vectType' R 'of' T ]" := (@clone _ (Phant R) T _ _ idfun)
+Notation "[ 'vectType' R 'of' T ]" := [vectType R of T for _]
   (at level 0, format "[ 'vectType'  R  'of'  T ]") : form_scope.
 
 Notation "{ 'vspace' vT }" := (space (Phant vT)) : type_scope.
@@ -187,17 +153,17 @@ Bind Scope vspace_scope with space.
 Delimit Scope lfun_scope with VF.
 Bind Scope lfun_scope with hom.
 
-End Exports.
+End VectorExports.
 
 (* The contents of this module exposes the matrix encodings, and should       *)
 (* therefore not be used outside of the vector library implementation.        *)
-Module InternalTheory.
+Module VectorInternalTheory.
 
 Section Iso.
 Variables (R : ringType) (vT rT : vectType R).
-Local Coercion dim : vectType >-> nat.
+Local Coercion dim : Vector.type_ >-> nat.
 
-Fact v2r_subproof : axiom vT vT. Proof. by case: vT => T [bT []]. Qed.
+Fact v2r_subproof : vector_axiom vT vT. Proof. exact: vector_subdef. Qed.
 Definition v2r := s2val v2r_subproof.
 
 Let v2r_bij : bijective v2r := s2valP' v2r_subproof.
@@ -220,7 +186,7 @@ End Iso.
 
 Section Vspace.
 Variables (K : fieldType) (vT : vectType K).
-Local Coercion dim : vectType >-> nat.
+Local Coercion dim : Vector.type_ >-> nat.
 
 Definition b2mx n (X : n.-tuple vT) := \matrix_i v2r (tnth X i).
 Lemma b2mxK n (X : n.-tuple vT) i : r2v (row i (b2mx X)) = X`_i.
@@ -234,7 +200,7 @@ Fact mx2vs_subproof m (A : 'M[K]_(m, vT)) : <<(<<A>>)>>%MS == <<A>>%MS.
 Proof. by rewrite genmx_id. Qed.
 Definition mx2vs {m} A : {vspace vT} := Space _ (@mx2vs_subproof m A).
 
-Canonical space_subType := [subType for @vs2mx (Phant vT)].
+HB.instance Definition _ := [IsSUB of {vspace vT} for (@vs2mx (Phant vT))].
 Lemma vs2mxK : cancel vs2mx mx2vs.
 Proof. by move=> v; apply: val_inj; rewrite /= gen_vs2mx. Qed.
 Lemma mx2vsK m (M : 'M_(m, vT)) : (vs2mx (mx2vs M) :=: M)%MS.
@@ -244,34 +210,30 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
-Canonical hom_subType := [newType for f2mx].
+HB.instance Definition _ : IsSUB _ _ 'Hom(aT, rT) := [IsNew for f2mx].
 End Hom.
 
 Arguments mx2vs {K vT m%N} A%MS.
 Prenex Implicits v2r r2v v2rK r2vK b2mx vs2mx vs2mxK f2mx.
 
-End InternalTheory.
+End VectorInternalTheory.
 
-End Vector.
-Export Vector.Exports.
-Import Vector.InternalTheory.
+Export VectorExports.
+Import VectorInternalTheory.
 
 Section VspaceDefs.
 
 Variables (K : fieldType) (vT : vectType K).
 Implicit Types (u : vT) (X : seq vT) (U V : {vspace vT}).
 
-Definition space_eqMixin := Eval hnf in [eqMixin of {vspace vT} by <:].
-Canonical space_eqType := EqType {vspace vT} space_eqMixin.
-Definition space_choiceMixin := Eval hnf in [choiceMixin of {vspace vT} by <:].
-Canonical space_choiceType := ChoiceType {vspace vT} space_choiceMixin.
+HB.instance Definition _ := [Choice of {vspace vT} by <:].
 
 Definition dimv U := \rank (vs2mx U).
 Definition subsetv U V := (vs2mx U <= vs2mx V)%MS.
 Definition vline u := mx2vs (v2r u).
 
 (* Vspace membership is defined as line inclusion. *)
-Definition pred_of_vspace phV (U : Vector.space phV) : {pred vT} :=
+Definition pred_of_vspace phV (U : space phV) : {pred vT} :=
   fun v => (vs2mx (vline v) <= vs2mx U)%MS.
 Canonical vspace_predType :=
   @PredType _ (unkeyed {vspace vT}) (@pred_of_vspace _).
@@ -298,7 +260,7 @@ Definition basis_of U X := (span X == U) && free X.
 
 End VspaceDefs.
 
-Coercion pred_of_vspace : Vector.space >-> pred_sort.
+Coercion pred_of_vspace : space >-> pred_sort.
 Notation "\dim U" := (dimv U) : nat_scope.
 Notation "U <= V" := (subsetv U V) : vspace_scope.
 Notation "U <= V <= W" := (subsetv U V && subsetv V W) : vspace_scope.
@@ -412,7 +374,7 @@ rewrite mulmx_sum_row linear_sum; apply: eq_bigr => i _.
 by rewrite row_b2mx linearZ /= v2rK.
 Qed.
 
-Let lin_b2mx n (X : n.-tuple vT) k :  
+Let lin_b2mx n (X : n.-tuple vT) k :
   \sum_(i < n) k i *: X`_i = r2v (\row_i k i *m b2mx X).
 Proof. by rewrite -mul_b2mx; apply: eq_bigr => i _; rewrite mxE. Qed.
 
@@ -534,7 +496,7 @@ Proof. by rewrite addvC; apply: addv_idPl. Qed.
 
 Lemma addvv : idempotent addV.
 Proof. by move=> U; apply/addv_idPl. Qed.
- 
+
 Lemma add0v : left_id 0%VS addV.
 Proof. by move=> U; apply/addv_idPr/sub0v. Qed.
 
@@ -585,7 +547,7 @@ Lemma memv_sumr P vs (Us : I -> {vspace vT}) :
   \sum_(i | P i) vs i \in (\sum_(i | P i) Us i)%VS.
 Proof. by move=> Uv; apply/rpred_sum=> i Pi; apply/(sumv_sup i Pi)/Uv. Qed.
 
-Lemma memv_sumP {P} {Us : I -> {vspace vT}} {v} : 
+Lemma memv_sumP {P} {Us : I -> {vspace vT}} {v} :
   reflect (exists2 vs, forall i, P i ->  vs i \in Us i
                      & v = \sum_(i | P i) vs i)
           (v \in \sum_(i | P i) Us i)%VS.
@@ -713,7 +675,7 @@ Proof. by rewrite /dimv vs2mx0 mxrank0. Qed.
 Lemma dimv_eq0 U :  (\dim U == 0%N) = (U == 0%VS).
 Proof. by rewrite /dimv /= mxrank_eq0 {2}/eq_op /= linear0 genmx0. Qed.
 
-Lemma dimvf : \dim {:vT} = Vector.dim vT.
+Lemma dimvf : \dim {:vT} = dim vT.
 Proof.  by rewrite /dimv vs2mxF mxrank1. Qed.
 
 Lemma dim_vline v : \dim <[v]> = (v != 0).
@@ -756,7 +718,7 @@ rewrite -dimv_eq0 -(eqn_add2l (\dim (U :&: V))) addn0 dimv_cap_compl eq_sym.
 by rewrite (dimv_leqif_eq (capvSl _ _)) (sameP capv_idPl eqP).
 Qed.
 
-Lemma dimv_leq_sum I r (P : pred I) (Us : I -> {vspace vT}) : 
+Lemma dimv_leq_sum I r (P : pred I) (Us : I -> {vspace vT}) :
   \dim (\sum_(i <- r | P i) Us i) <= \sum_(i <- r | P i) \dim (Us i).
 Proof.
 elim/big_rec2: _ => [|i d vs _ le_vs_d]; first by rewrite dim_vline eqxx.
@@ -1005,7 +967,7 @@ Proof. by rewrite /free span_nil dimv0. Qed.
 
 Lemma seq1_free v : free [:: v] = (v != 0).
 Proof. by rewrite /free span_seq1 dim_vline; case: (~~ _). Qed.
- 
+
 Lemma perm_free X Y : perm_eq X Y -> free X = free Y.
 Proof.
 by move=> eqXY; rewrite /free (perm_size eqXY) (eq_span (perm_mem eqXY)).
@@ -1023,7 +985,7 @@ Qed.
 Lemma free_not0 v X : free X -> v \in X -> v != 0.
 Proof. by rewrite free_directv andbC => /andP[_ /memPn]; apply. Qed.
 
-Lemma freeP n (X : n.-tuple vT) :  
+Lemma freeP n (X : n.-tuple vT) :
   reflect (forall k, \sum_(i < n) k i *: X`_i = 0 -> (forall i, k i = 0))
           (free X).
 Proof.
@@ -1034,14 +996,14 @@ rewrite -kermx_eq0; apply/rowV0P=> rk /sub_kermxP kt0.
 by apply/rowP=> i; rewrite mxE {}t_free // mul_b2mx kt0 linear0.
 Qed.
 
-Lemma coord_free n (X : n.-tuple vT) (i j : 'I_n) :  
+Lemma coord_free n (X : n.-tuple vT) (i j : 'I_n) :
   free X -> coord X j (X`_i) = (i == j)%:R.
 Proof.
 rewrite unlock free_b2mx => /row_freeP[Ct CtK]; rewrite -row_b2mx.
 by rewrite -row_mul -[pinvmx _]mulmx1 -CtK 2!mulmxA mulmxKpV // CtK !mxE.
 Qed.
 
-Lemma coord_sum_free n (X : n.-tuple vT) k j : 
+Lemma coord_sum_free n (X : n.-tuple vT) k j :
   free X -> coord X j (\sum_(i < n) k i *: X`_i) = k j.
 Proof.
 move=> Xfree; rewrite linear_sum (bigD1 j) ?linearZ //= coord_free // eqxx.
@@ -1147,7 +1109,7 @@ Proof. by move/basis_free/free_not0; apply. Qed.
 Lemma basis_mem x U X : basis_of U X -> x \in X -> x \in U.
 Proof. by move/span_basis=> <- /memv_span. Qed.
 
-Lemma cat_basis U V X Y : 
+Lemma cat_basis U V X Y :
   directv (U + V) -> basis_of U X -> basis_of V Y -> basis_of (U + V) (X ++ Y).
 Proof.
 move=> dxUV /andP[/eqP defU freeX] /andP[/eqP defV freeY].
@@ -1201,7 +1163,7 @@ Lemma span_bigcat :
 Proof. by rewrite (big_morph _ span_cat span_nil). Qed.
 
 Lemma bigcat_free :
-    directv (\sum_(i | P i) <<Xs i>>) -> 
+    directv (\sum_(i | P i) <<Xs i>>) ->
   (forall i, P i -> free (Xs i)) -> free (\big[cat/[::]]_(i | P i) Xs i).
 Proof.
 rewrite /free directvE /= span_bigcat => /directvP-> /= freeXs.
@@ -1210,7 +1172,7 @@ by apply/eqP/eq_bigr=> i /freeXs/eqP.
 Qed.
 
 Lemma bigcat_basis Us (U := (\sum_(i | P i) Us i)%VS) :
-    directv U -> (forall i, P i -> basis_of (Us i) (Xs i)) -> 
+    directv U -> (forall i, P i -> basis_of (Us i) (Xs i)) ->
   basis_of U (\big[cat/[::]]_(i | P i) Xs i).
 Proof.
 move=> dxU XsUs; rewrite /basis_of span_bigcat.
@@ -1262,7 +1224,7 @@ Definition fun_of_lfun_def aT rT (f : 'Hom(aT, rT)) :=
 Definition fun_of_lfun := locked_with lfun_key fun_of_lfun_def.
 Canonical fun_of_lfun_unlockable := [unlockable fun fun_of_lfun].
 Definition linfun_def aT rT (f : aT -> rT) :=
-  Vector.Hom (lin1_mx (v2r \o f \o r2v)).
+  Hom (lin1_mx (v2r \o f \o r2v)).
 Definition linfun := locked_with lfun_key linfun_def.
 Canonical linfun_unlockable := [unlockable fun linfun].
 
@@ -1272,7 +1234,7 @@ Definition comp_lfun aT vT rT (f : 'Hom(vT, rT)) (g : 'Hom(aT, vT)) :=
 
 End LfunDefs.
 
-Coercion fun_of_lfun : Vector.hom >-> Funclass.
+Coercion fun_of_lfun : hom >-> Funclass.
 Notation "\1" := (@id_lfun _ _) : lfun_scope.
 Notation "f \o g" := (comp_lfun f g) : lfun_scope.
 
@@ -1281,7 +1243,7 @@ Section LfunVspaceDefs.
 Variable K : fieldType.
 Implicit Types aT rT : vectType K.
 
-Definition inv_lfun aT rT (f : 'Hom(aT, rT)) := Vector.Hom (pinvmx (f2mx f)).
+Definition inv_lfun aT rT (f : 'Hom(aT, rT)) := Hom (pinvmx (f2mx f)).
 Definition lker aT rT (f : 'Hom(aT, rT)) := mx2vs (kermx (f2mx f)).
 Fact lfun_img_key : unit. Proof. by []. Qed.
 Definition lfun_img_def aT rT f (U : {vspace aT}) : {vspace rT} :=
@@ -1304,10 +1266,7 @@ Section LfunZmodType.
 Variables (R : ringType) (aT rT : vectType R).
 Implicit Types f g h : 'Hom(aT, rT).
 
-Definition lfun_eqMixin := Eval hnf in [eqMixin of 'Hom(aT, rT) by <:].
-Canonical lfun_eqType := EqType 'Hom(aT, rT) lfun_eqMixin.
-Definition lfun_choiceMixin := [choiceMixin of 'Hom(aT, rT) by <:].
-Canonical lfun_choiceType := ChoiceType 'Hom(aT, rT) lfun_choiceMixin.
+HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
 
 Fact lfun_is_linear f : linear f.
 Proof. by rewrite unlock; apply: linearP. Qed.
@@ -1345,8 +1304,8 @@ Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
 
-Definition lfun_zmodMixin := ZmodMixin lfun_addA lfun_addC lfun_add0 lfun_addN.
-Canonical lfun_zmodType := Eval hnf in ZmodType 'Hom(aT, rT) lfun_zmodMixin.
+HB.instance Definition _ := GRing.IsZmodule.Build 'Hom(aT, rT)
+  lfun_addA lfun_addC lfun_add0 lfun_addN.
 
 Lemma zero_lfunE x : (0 : 'Hom(aT, rT)) x = 0. Proof. exact: lfunE. Qed.
 Lemma add_lfunE f g x : (f + g) x = f x + g x. Proof. exact: lfunE. Qed.
@@ -1379,24 +1338,24 @@ Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDr. Qed.
 Fact lfun_scaleDl f k1 k2 : (k1 + k2) *:l f = k1 *:l f + k2 *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDl. Qed.
 
-Definition lfun_lmodMixin := 
-  LmodMixin lfun_scaleA lfun_scale1 lfun_scaleDr lfun_scaleDl.
-Canonical lfun_lmodType := Eval hnf in LmodType R 'Hom(aT, rT) lfun_lmodMixin.
+HB.instance Definition _ :=
+  GRing.Zmodule_IsLmodule.Build _ 'Hom(aT, rT)
+    lfun_scaleA lfun_scale1 lfun_scaleDr lfun_scaleDl.
 
 Lemma scale_lfunE k f x : (k *: f) x = k *: f x. Proof. exact: lfunE. Qed.
 
-Fact lfun_vect_iso : Vector.axiom (Vector.dim aT * Vector.dim rT) 'Hom(aT, rT).
+Fact lfun_vect_iso : vector_axiom (dim aT * dim rT) 'Hom(aT, rT).
 Proof.
 exists (mxvec \o f2mx) => [a f g|].
-  rewrite /= -linearP /= -[A in _ = mxvec A]/(f2mx (Vector.Hom _)).
+  rewrite /= -linearP /= -[A in _ = mxvec A]/(f2mx (Hom _)).
   congr (mxvec (f2mx _)); apply/lfunP=> v; do 2!rewrite lfunE /=.
   by rewrite unlock /= -linearP mulmxDr scalemxAr.
-exists (Vector.Hom \o vec_mx) => [[A]|A] /=; last exact: vec_mxK.
+apply: Bijective (Hom \o vec_mx) _ _ => [[A]|A] /=; last exact: vec_mxK.
 by rewrite mxvecK.
 Qed.
 
-Definition lfun_vectMixin := VectMixin lfun_vect_iso.
-Canonical lfun_vectType := VectType R 'Hom(aT, rT) lfun_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ 'Hom(aT, rT)
+  lfun_vect_iso.
 
 End LfunVectType.
 
@@ -1732,7 +1691,7 @@ Section LfunAlgebra.
 (* algebra structure). Also note that the unit ring structure is missing.     *)
 
 Variables (R : comRingType) (vT : vectType R).
-Hypothesis vT_proper : Vector.dim vT > 0.
+Hypothesis vT_proper : dim vT > 0.
 
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
 Proof.
@@ -1742,19 +1701,30 @@ Qed.
 
 Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
 
-Definition lfun_comp_ringMixin :=
-  RingMixin comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr
-            lfun1_neq0.
-Definition lfun_comp_ringType := RingType 'End(vT) lfun_comp_ringMixin.
+(* FIXME: as explained above, the following structures should not be declared *
+ * as canonical, so mixins and structures are built separately, and we        *
+ * don't use HB.instance Definition _ := ...                                  *
+ *  This is ok, but maybe we could introduce an alias                         *)
+Definition lfun_comp_ringMixin := GRing.Zmodule_IsRing.Build 'End(vT)
+  comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
+Definition lfun_comp_ringType : ringType :=
+  HB.pack 'End(vT) lfun_comp_ringMixin.
 
-(* In the standard endomorphism ring product is categorical composition.     *)
-Definition lfun_ringMixin : GRing.Ring.mixin_of (lfun_zmodType vT vT) :=
-  GRing.converse_ringMixin lfun_comp_ringType.
-Definition lfun_ringType := Eval hnf in RingType 'End(vT) lfun_ringMixin.
-Definition lfun_lalgType := Eval hnf in [lalgType R of 'End(vT)
-  for LalgType R lfun_ringType (fun k x y => comp_lfunZr k y x)].
-Definition lfun_algType := Eval hnf in [algType R of 'End(vT)
-  for AlgType R _ (fun k (x y : lfun_lalgType) => comp_lfunZl k y x)].
+(* In the standard endomorphism ring product is categorical composition. *)
+Definition lfun_ringMixin : GRing.Zmodule_IsRing 'End(vT) :=
+  GRing.Ring.on (lfun_comp_ringType^c).
+Definition lfun_ringType : ringType :=
+  HB.pack 'End(vT) lfun_ringMixin.
+
+Definition lfun_lalgMixin := GRing.Lmodule_IsLalgebra.Build R lfun_ringType
+  (fun k x y => comp_lfunZr k y x).
+Definition lfun_lalgType : lalgType R :=
+  HB.pack 'End(vT) lfun_ringType lfun_lalgMixin.
+
+Definition lfun_algMixin := GRing.Lalgebra_IsAlgebra.Build R lfun_lalgType
+  (fun k x y => comp_lfunZl k y x).
+Definition lfun_algType : algType R :=
+  HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
 
 End LfunAlgebra.
 
@@ -1763,7 +1733,7 @@ Section Projection.
 Variables (K : fieldType) (vT : vectType K).
 Implicit Types U V : {vspace vT}.
 
-Definition daddv_pi U V := Vector.Hom (proj_mx (vs2mx U) (vs2mx V)).
+Definition daddv_pi U V := Hom (proj_mx (vs2mx U) (vs2mx V)).
 Definition projv U := daddv_pi U U^C.
 Definition addv_pi1 U V := daddv_pi (U :\: V) V.
 Definition addv_pi2 U V := daddv_pi V (U :\: V).
@@ -1897,16 +1867,11 @@ Variable (K : fieldType) (vT : vectType K) (U : {vspace vT}).
 
 Inductive subvs_of : predArgType := Subvs u & u \in U.
 
-Definition vsval w := let: Subvs u _ := w in u.
-Canonical subvs_subType := Eval hnf in [subType for vsval].
-Definition subvs_eqMixin := Eval hnf in [eqMixin of subvs_of by <:].
-Canonical subvs_eqType := Eval hnf in EqType subvs_of subvs_eqMixin.
-Definition subvs_choiceMixin := [choiceMixin of subvs_of by <:].
-Canonical subvs_choiceType := ChoiceType subvs_of subvs_choiceMixin.
-Definition subvs_zmodMixin := [zmodMixin of subvs_of by <:].
-Canonical subvs_zmodType := ZmodType subvs_of subvs_zmodMixin.
-Definition subvs_lmodMixin := [lmodMixin of subvs_of by <:].
-Canonical subvs_lmodType := LmodType K subvs_of subvs_lmodMixin.
+Definition vsval w : vT := let: Subvs u _ := w in u.
+HB.instance Definition _ := [IsSUB of subvs_of for vsval].
+HB.instance Definition _ := [Choice of subvs_of by <:].
+HB.instance Definition _ := [zmodMixin of subvs_of by <:].
+HB.instance Definition _ := [lmodMixin of subvs_of by <:].
 
 Lemma subvsP w : vsval w \in U. Proof. exact: valP. Qed.
 Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
@@ -1931,7 +1896,7 @@ Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
 Canonical vsproj_additive := Additive vsproj_is_linear.
 Canonical vsproj_linear := AddLinear vsproj_is_linear.
 
-Fact subvs_vect_iso : Vector.axiom (\dim U) subvs_of.
+Fact subvs_vect_iso : vector_axiom (\dim U) subvs_of.
 Proof.
 exists (fun w => \row_i coord (vbasis U) i (vsval w)).
   by move=> k w1 w2; apply/rowP=> i; rewrite !mxE linearP.
@@ -1943,8 +1908,7 @@ move=> rw; apply/rowP=> i; rewrite mxE vsprojK.
 by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.
 Qed.
 
-Definition subvs_vectMixin :=  VectMixin subvs_vect_iso.
-Canonical subvs_vectType := VectType K subvs_of subvs_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build K subvs_of subvs_vect_iso.
 
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.
@@ -1957,13 +1921,12 @@ Variables (R : ringType) (m n : nat).
 
 (* The apparently useless => /= in line 1 of the proof performs some evar     *)
 (* expansions that the Ltac interpretation of exists is incapable of doing.   *)
-Fact matrix_vect_iso : Vector.axiom (m * n) 'M[R]_(m, n).
+Fact matrix_vect_iso : vector_axiom (m * n) 'M[R]_(m, n).
 Proof.
 exists mxvec => /=; first exact: linearP.
 by exists vec_mx; [apply: mxvecK | apply: vec_mxK].
 Qed.
-Definition matrix_vectMixin := VectMixin matrix_vect_iso.
-Canonical matrix_vectType := VectType R 'M[R]_(m, n) matrix_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ 'M[R]_(m, n) matrix_vect_iso.
 
 End MatrixVectType.
 
@@ -1972,13 +1935,12 @@ Section RegularVectType.
 
 Variable R : ringType.
 
-Fact regular_vect_iso : Vector.axiom 1 R^o.
+Fact regular_vect_iso : vector_axiom 1 R^o.
 Proof.
 exists (fun a => a%:M) => [a b c|]; first by rewrite rmorphD scale_scalar_mx.
 by exists (fun A : 'M_1 => A 0 0) => [a | A]; rewrite ?mxE // -mx11_scalar.
 Qed.
-Definition regular_vectMixin := VectMixin regular_vect_iso.
-Canonical regular_vectType := VectType R R^o regular_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ R^o regular_vect_iso.
 
 End RegularVectType.
 
@@ -1987,7 +1949,7 @@ Section ProdVector.
 
 Variables (R : ringType) (vT1 vT2 : vectType R).
 
-Fact pair_vect_iso : Vector.axiom (Vector.dim vT1 + Vector.dim vT2) (vT1 * vT2).
+Fact pair_vect_iso : vector_axiom (dim vT1 + dim vT2) (vT1 * vT2).
 Proof.
 pose p2r (u : vT1 * vT2) := row_mx (v2r u.1) (v2r u.2).
 pose r2p w := (r2v (lsubmx w) : vT1, r2v (rsubmx w) : vT2).
@@ -1996,8 +1958,8 @@ have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
 have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
 by exists p2r; [apply: (@can2_linear _ _ _ (Linear r2p_lin)) | exists r2p].
 Qed.
-Definition pair_vectMixin := VectMixin pair_vect_iso.
-Canonical pair_vectType := VectType R (vT1 * vT2) pair_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ (vT1 * vT2)%type
+  pair_vect_iso.
 
 End ProdVector.
 
@@ -2007,7 +1969,7 @@ Section FunVectType.
 Variable (I : finType) (R : ringType) (vT : vectType R).
 
 (* Type unification with exist is again a problem in this proof. *)
-Fact ffun_vect_iso : Vector.axiom (#|I| * Vector.dim vT) {ffun I -> vT}.
+Fact ffun_vect_iso : vector_axiom (#|I| * dim vT) {ffun I -> vT}.
 Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
 exists fr => /= [k f g|].
@@ -2018,13 +1980,13 @@ exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.
 Qed.
 
-Definition ffun_vectMixin := VectMixin ffun_vect_iso.
-Canonical ffun_vectType := VectType R {ffun I -> vT} ffun_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ {ffun I -> vT}
+  ffun_vect_iso.
 
 End FunVectType.
 
-Canonical exp_vectType (K : fieldType) (vT : vectType K) n :=
-  [vectType K of vT ^ n].
+HB.instance Definition _ (K : fieldType) (vT : vectType K) n :=
+  Vector.on (vT ^ n)%type.
 
 (* Solving a tuple of linear equations. *)
 Section Solver.
@@ -2036,7 +1998,7 @@ Let lhsf u := finfun ((tnth lhs)^~ u).
 Definition vsolve_eq U := finfun (tnth rhs) \in (linfun lhsf @: U)%VS.
 
 Lemma vsolve_eqP (U : {vspace vT}) :
-  reflect (exists2 u, u \in U & forall i, tnth lhs i u = tnth rhs i) 
+  reflect (exists2 u, u \in U & forall i, tnth lhs i u = tnth rhs i)
           (vsolve_eq U).
 Proof.
 have lhsZ: linear lhsf by move=> a u v; apply/ffunP=> i; rewrite !ffunE linearP.

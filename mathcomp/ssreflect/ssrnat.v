@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
 Require Import BinNat.
 Require BinPos Ndec.
@@ -182,8 +183,7 @@ move=> n m; apply: (iffP idP) => [|<-]; last by elim n.
 by elim: n m => [|n IHn] [|m] //= /IHn->.
 Qed.
 
-Canonical nat_eqMixin := EqMixin eqnP.
-Canonical nat_eqType := Eval hnf in EqType nat nat_eqMixin.
+HB.instance Definition _ := HasDecEq.Build nat eqnP.
 
 Arguments eqn !m !n.
 Arguments eqnP {x y}.
@@ -1921,8 +1921,7 @@ move=> p q; apply: (iffP idP) => [|<-]; last by case: p => //; elim.
 by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //= /IHp [->].
 Qed.
 
-Canonical bin_nat_eqMixin := EqMixin eq_binP.
-Canonical bin_nat_eqType := Eval hnf in EqType N bin_nat_eqMixin.
+HB.instance Definition _ := HasDecEq.Build N eq_binP.
 
 Arguments N.eqb !n !m.
 
@@ -2013,9 +2012,9 @@ Definition extend_number (nn : number) m := Num (nn * 1000 + bin_of_nat m).
 
 Coercion extend_number : number >-> Funclass.
 
-Canonical number_subType := [newType for bin_of_number].
-Definition number_eqMixin := Eval hnf in [eqMixin of number by <:].
-Canonical number_eqType := Eval hnf in EqType number number_eqMixin.
+Definition number_subType := Eval hnf in [IsNew for bin_of_number].
+HB.instance Definition _ := number_subType.
+HB.instance Definition _ := [Equality of number by <:].
 
 Notation "[ 'Num' 'of' e ]" := (Num (bin_of_nat e))
   (at level 0, format "[ 'Num'  'of'  e ]") : nat_scope.

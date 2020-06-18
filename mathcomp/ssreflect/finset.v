@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop.
 
@@ -122,17 +123,9 @@ Definition finfun_of_set A := let: FinSet f := A in f.
 Definition set_of of phant T := set_type.
 Identity Coercion type_of_set_of : set_of >-> set_type.
 
-Canonical set_subType := Eval hnf in [newType for finfun_of_set].
-Definition set_eqMixin := Eval hnf in [eqMixin of set_type by <:].
-Canonical set_eqType := Eval hnf in EqType set_type set_eqMixin.
-Definition set_choiceMixin := [choiceMixin of set_type by <:].
-Canonical set_choiceType := Eval hnf in ChoiceType set_type set_choiceMixin.
-Definition set_countMixin := [countMixin of set_type by <:].
-Canonical set_countType := Eval hnf in CountType set_type set_countMixin.
-Canonical set_subCountType := Eval hnf in [subCountType of set_type].
-Definition set_finMixin := [finMixin of set_type by <:].
-Canonical set_finType := Eval hnf in FinType set_type set_finMixin.
-Canonical set_subFinType := Eval hnf in [subFinType of set_type].
+Definition set_IsSUB := Eval hnf in [IsNew for finfun_of_set].
+HB.instance Definition _ := set_IsSUB.
+HB.instance Definition _ := [Finite of set_type by <:].
 
 End SetType.
 
@@ -161,32 +154,19 @@ Notation "A :!=: B" := (A != B :> {set _})
 Notation "A :=P: B" := (A =P B :> {set _})
   (at level 70, no associativity, only parsing) : set_scope.
 
-Local Notation finset_def := (fun T P => @FinSet T (finfun P)).
 
-Local Notation pred_of_set_def := (fun T (A : set_type T) => val A : _ -> _).
+HB.lock
+Definition finset (T : finType) (P : pred T) : {set T} := @FinSet T (finfun P).
+Canonical finset_unlock := Unlockable finset.unlock.
 
-Module Type SetDefSig.
-Parameter finset : forall T : finType, pred T -> {set T}.
-Parameter pred_of_set : forall T, set_type T -> fin_pred_sort (predPredType T).
 (* The weird type of pred_of_set is imposed by the syntactic restrictions on  *)
 (* coercion declarations; it is unfortunately not possible to use a functor   *)
 (* to retype the declaration, because this triggers an ugly bug in the Coq    *)
 (* coercion chaining code.                                                    *)
-Axiom finsetE : finset = finset_def.
-Axiom pred_of_setE : pred_of_set = pred_of_set_def.
-End SetDefSig.
-
-Module SetDef : SetDefSig.
-Definition finset := finset_def.
-Definition pred_of_set := pred_of_set_def.
-Lemma finsetE : finset = finset_def. Proof. by []. Qed.
-Lemma pred_of_setE : pred_of_set = pred_of_set_def. Proof. by []. Qed.
-End SetDef.
-
-Notation finset := SetDef.finset.
-Notation pred_of_set := SetDef.pred_of_set.
-Canonical finset_unlock := Unlockable SetDef.finsetE.
-Canonical pred_of_set_unlock := Unlockable SetDef.pred_of_setE.
+HB.lock
+Definition pred_of_set T (A : set_type T) : fin_pred_sort (predPredType T)
+:= val A.
+Canonical pred_of_set_unlock := Unlockable pred_of_set.unlock.
 
 Notation "[ 'set' x : T | P ]" := (finset (fun x : T => P%B))
   (at level 0, x at level 99, only parsing) : set_scope.
@@ -227,13 +207,7 @@ Section BasicSetTheory.
 Variable T : finType.
 Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
-Canonical set_of_subType := Eval hnf in [subType of {set T}].
-Canonical set_of_eqType := Eval hnf in [eqType of {set T}].
-Canonical set_of_choiceType := Eval hnf in [choiceType of {set T}].
-Canonical set_of_countType := Eval hnf in [countType of {set T}].
-Canonical set_of_subCountType := Eval hnf in [subCountType of {set T}].
-Canonical set_of_finType := Eval hnf in [finType of {set T}].
-Canonical set_of_subFinType := Eval hnf in [subFinType of {set T}].
+HB.instance Definition _ := Finite.on {set T}.
 
 Lemma in_set pA x : x \in finset pA = pA x.
 Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
@@ -259,8 +233,6 @@ End BasicSetTheory.
 
 Arguments eqsVneq {T} A B, {T A B}.
 
-Definition inE := (in_set, inE).
-
 Arguments set0 {T}.
 Arguments eq_finset {T} [pA] pB eq_pAB.
 #[global] Hint Resolve in_setT : core.
@@ -270,12 +242,14 @@ Notation "[ 'set' : T ]" := (setTfor (Phant T))
 
 Notation setT := [set: _] (only parsing).
 
+HB.lock
+Definition set1 (T : finType) (a : T) := [set x | x == a].
+
 Section setOpsDefs.
 
 Variable T : finType.
 Implicit Types (a x : T) (A B D : {set T}) (P : {set {set T}}).
 
-Definition set1 a := [set x | x == a].
 Definition setU A B := [set x | (x \in A) || (x \in B)].
 Definition setI A B := [set x in A | x \in B].
 Definition setC A := [set x | x \notin A].
@@ -339,10 +313,10 @@ Lemma subset_leqif_cards A B : A \subset B -> (#|A| <= #|B| ?= iff (A == B)).
 Proof. by move=> sAB; rewrite eqEsubset sAB; apply: subset_leqif_card. Qed.
 
 Lemma in_set0 x : x \in set0 = false.
-Proof. by rewrite inE. Qed.
+Proof. by rewrite in_set. Qed.
 
 Lemma sub0set A : set0 \subset A.
-Proof. by apply/subsetP=> x; rewrite inE. Qed.
+Proof. by apply/subsetP=> x; rewrite in_set. Qed.
 
 Lemma subset0 A : (A \subset set0) = (A == set0).
 Proof. by rewrite eqEsubset sub0set andbT. Qed.
@@ -355,21 +329,21 @@ Proof. by rewrite -!proper0 => sAB /proper_sub_trans->. Qed.
 
 Lemma set_0Vmem A : (A = set0) + {x : T | x \in A}.
 Proof.
-case: (pickP [in A]) => [x Ax | A0]; [by right; exists x | left].
-by apply/setP=> x; rewrite inE; apply: A0.
+case: (pickP (mem A)) => [x Ax | A0]; [by right; exists x | left].
+by apply/setP=> x; rewrite in_set; apply: A0.
 Qed.
 
-Lemma set_enum A : [set:: enum A] = A.
-Proof. by apply/setP=> x; rewrite inE mem_enum. Qed.
+Lemma set_enum A : [set x | x \in enum A] = A.
+Proof. by apply/setP => x; rewrite in_set mem_enum. Qed.
 
 Lemma enum_set0 : enum set0 = [::] :> seq T.
 Proof. by rewrite (eq_enum (in_set _)) enum0. Qed.
 
 Lemma subsetT A : A \subset setT.
-Proof. by apply/subsetP=> x; rewrite inE. Qed.
+Proof. by apply/subsetP=> x; rewrite in_set. Qed.
 
 Lemma subsetT_hint mA : subset mA (mem [set: T]).
-Proof. by rewrite unlock; apply/pred0P=> x; rewrite !inE. Qed.
+Proof. by rewrite unlock; apply/pred0P=> x; rewrite !inE in_set. Qed.
 Hint Resolve subsetT_hint : core.
 
 Lemma subTset A : (setT \subset A) = (A == setT).
@@ -379,22 +353,24 @@ Lemma properT A : (A \proper setT) = (A != setT).
 Proof. by rewrite properEneq subsetT andbT. Qed.
 
 Lemma set1P x a : reflect (x = a) (x \in [set a]).
-Proof. by rewrite inE; apply: eqP. Qed.
+Proof. by rewrite set1.unlock in_set; apply: eqP. Qed.
 
 Lemma enum_setT : enum [set: T] = Finite.enum T.
 Proof. by rewrite (eq_enum (in_set _)) enumT. Qed.
 
 Lemma in_set1 x a : (x \in [set a]) = (x == a).
-Proof. exact: in_set. Qed.
+Proof. by rewrite set1.unlock in_set. Qed.
+
+Definition inE := (in_set, in_set1, inE).
 
 Lemma set11 x : x \in [set x].
-Proof. by rewrite inE. Qed.
+Proof. by rewrite !inE. Qed.
 
 Lemma set1_inj : injective (@set1 T).
 Proof. by move=> a b eqsab; apply/set1P; rewrite -eqsab set11. Qed.
 
 Lemma enum_set1 a : enum [set a] = [:: a].
-Proof. by rewrite (eq_enum (in_set _)) enum1. Qed.
+Proof. by rewrite set1.unlock (eq_enum (in_set _)) enum1. Qed.
 
 Lemma setU1P x a B : reflect (x = a \/ x \in B) (x \in a |: B).
 Proof. by rewrite !inE; apply: predU1P. Qed.
@@ -730,7 +706,7 @@ by rewrite -powersetE sAB // inE.
 Qed.
 
 Lemma powerset0 : powerset set0 = [set set0] :> {set {set T}}.
-Proof. by apply/setP=> A; rewrite !inE subset0. Qed.
+Proof. by apply/setP=> A; rewrite set1.unlock !inE subset0. Qed.
 
 Lemma powersetT : powerset [set: T] = [set: {set T}].
 Proof. by apply/setP=> A; rewrite !inE subsetT. Qed.
@@ -765,7 +741,7 @@ Lemma cards0_eq A : #|A| = 0 -> A = set0.
 Proof. by move=> A_0; apply/setP=> x; rewrite inE (card0_eq A_0). Qed.
 
 Lemma cards1 x : #|[set x]| = 1.
-Proof. by rewrite cardsE card1. Qed.
+Proof. by rewrite set1.unlock cardsE card1. Qed.
 
 Lemma cardsUI A B : #|A :|: B| + #|A :&: B| = #|A| + #|B|.
 Proof. by rewrite !cardsE cardUI. Qed.
@@ -863,7 +839,7 @@ by case: posnP => // A0; rewrite (cards0_eq A0) sub0set.
 Qed.
 
 Lemma powerset1 x : powerset [set x] = [set set0; [set x]].
-Proof. by apply/setP=> A; rewrite !inE subset1 orbC. Qed.
+Proof. by apply/setP=> A; rewrite inE subset1 orbC set1.unlock !inE. Qed.
 
 Lemma setIidPl A B : reflect (A :&: B = A) (A \subset B).
 Proof.
@@ -1070,32 +1046,15 @@ End CartesianProd.
 
 Arguments setXP {fT1 fT2 A1 A2 x1 x2}.
 
-Local Notation imset_def :=
-  (fun (aT rT : finType) f mD => [set y in @image_mem aT rT f mD]).
-Local Notation imset2_def :=
-  (fun (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) =>
-     [set y : rT in [seq uncurry f u | u in [pred u | D1 u.1 & D2 u.1 u.2]]]).
+HB.lock
+Definition imset (aT rT : finType) f mD := [set y in @image_mem aT rT f mD].
+Canonical imset_unlock := Unlockable imset.unlock.
 
-Module Type ImsetSig.
-Parameter imset : forall aT rT : finType,
- (aT -> rT) -> mem_pred aT -> {set rT}.
-Parameter imset2 : forall aT1 aT2 rT : finType,
- (aT1 -> aT2 -> rT) -> mem_pred aT1 -> (aT1 -> mem_pred aT2) -> {set rT}.
-Axiom imsetE : imset = imset_def.
-Axiom imset2E : imset2 = imset2_def.
-End ImsetSig.
+HB.lock
+Definition imset2 (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) :=
+  [set y in @image_mem _ rT (uncurry f) (mem [pred u | D1 u.1 & D2 u.1 u.2])].
+Canonical imset2_unlock := Unlockable imset2.unlock.
 
-Module Imset : ImsetSig.
-Definition imset := imset_def.
-Definition imset2 := imset2_def.
-Lemma imsetE : imset = imset_def. Proof. by []. Qed.
-Lemma imset2E : imset2 = imset2_def. Proof. by []. Qed.
-End Imset.
-
-Notation imset := Imset.imset.
-Notation imset2 := Imset.imset2.
-Canonical imset_unlock := Unlockable Imset.imsetE.
-Canonical imset2_unlock := Unlockable Imset.imset2E.
 Definition preimset (aT : finType) rT f (R : mem_pred rT) :=
   [set x : aT | in_mem (f x) R].
 
@@ -1476,7 +1435,7 @@ move=> injh; pose hA := mem (image h A).
 rewrite (eq_bigl hA) => [|j]; last exact/imsetP/imageP.
 pose h' := omap (fun u : {j | hA j} => iinv (svalP u)) \o insub.
 rewrite (reindex_omap h h') => [|j hAj]; rewrite {}/h'/= ?insubT/= ?f_iinv//.
-apply: eq_bigl => i; case: insubP => [u -> /= def_u | nhAhi]; last first.
+apply: eq_bigl => i; case: insubP => [u /= -> def_u | nhAhi]; last first.
   by apply/andP/idP => [[]//| Ai]; case/imageP: nhAhi; exists i.
 set i' := iinv _; have Ai' : i' \in A := mem_iinv (svalP u).
 by apply/eqP/idP => [[<-] // | Ai]; congr Some; apply: injh; rewrite ?f_iinv.
@@ -1509,8 +1468,7 @@ transitivity (\big[add/zero]_(f0 in (imset f (mem setT)))
   by apply/imsetP; exists (FinSet b).
 rewrite big_imset; last by case=> g; case=> h _ _; rewrite /f => /= ->.
 apply: congr_big => //; case=> g; first exact: in_setT.
-move=> _; apply: eq_bigr => i _; congr (if _ then _ else _).
-by rewrite SetDef.pred_of_setE.
+by move=> _; apply: eq_bigr => i _; congr (if _ then _ else _); rewrite unlock.
 Qed.
 
 Arguments big_setID [R idx aop I A].
@@ -2199,12 +2157,12 @@ case/and3P=> /eqP <- tiP notP0; apply/and3P; split; first exact/and3P.
   by apply/bigcupP; exists (pblock P x); rewrite ?pblock_mem //.
 apply/forall_inP=> B PB; have /set0Pn[x Bx]: B != set0 := memPn notP0 B PB.
 apply/cards1P; exists (odflt x [pick y in pblock P x]); apply/esym/eqP.
-rewrite eqEsubset sub1set inE -andbA; apply/andP; split.
+rewrite eqEsubset sub1set !inE -andbA; apply/andP; split.
   by apply/imset_f/bigcupP; exists B.
 rewrite (def_pblock tiP PB Bx); case def_y: _ / pickP => [y By | /(_ x)/idP//].
 rewrite By /=; apply/subsetP=> _ /setIP[/imsetP[z Pz ->]].
 case: {1}_ / pickP => [t zPt Bt | /(_ z)/idP[]]; last by rewrite mem_pblock.
-by rewrite -(same_pblock tiP zPt) (def_pblock tiP PB Bt) def_y set11.
+by rewrite -(same_pblock tiP zPt) (def_pblock tiP PB Bt) def_y inE.
 Qed.
 
 Section Transversals.
