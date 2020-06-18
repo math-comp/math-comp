@@ -834,7 +834,8 @@ apply: (iffP idP) => [|[x ->]]; last by rewrite cards1.
 by have [[|x []]// _] := cards_eqP; exists x; apply/setP => y; rewrite !inE.
 Qed.
 
-Lemma cards2P A : reflect (exists x y : T, x != y /\ A = [set x; y]) (#|A| == 2).
+Lemma cards2P A : reflect (exists x y : T, x != y /\ A = [set x; y])
+                          (#|A| == 2).
 Proof.
 apply: (iffP idP) => [|[x] [y] [xy ->]]; last by rewrite cards2 xy.
 have [[|x [|y []]]//=] := cards_eqP; rewrite !inE andbT => neq_xy.
