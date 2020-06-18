@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype tuple.
 
@@ -101,7 +102,7 @@ Notation "{ 'ffun' fT }" := (finfun_of (Phant fT))
 Notation "{ 'dffun' fT }" := (dfinfun_of (Phant fT))
   (at level 0, format "{ 'dffun'  '[hv' fT ']' }") : type_scope.
 
-Definition exp_finIndexType := ordinal_finType.
+Definition exp_finIndexType n := [finType of 'I_n].
 Notation "T ^ n" :=
   (@finfun_of (exp_finIndexType n) (fun=> T) (Phant _)) : type_scope.
 
@@ -242,31 +243,47 @@ Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
 
 Local Remark eqMixin rT : Equality.mixin_of (dffun_aT rT eqType).
 Proof. exact: PcanEqMixin tfgraphK. Qed.
-Canonical finfun_eqType (rT : eqType) :=
-  EqType {ffun aT -> rT} (eqMixin (fun=> rT)).
-Canonical dfinfun_eqType rT :=
-  EqType (dffun_aT rT eqType) (eqMixin rT).
+
+Section dep_eqType.
+Variable rT : aT -> eqType.
+HB.instance (dffun_aT rT eqType) (eqMixin rT).
+End dep_eqType.
+
+Section simpl_eqType.
+Variable rT : eqType.
+HB.instance ({ffun aT -> rT}) (eqMixin (fun=> rT)).
+End simpl_eqType.
 
 Local Remark choiceMixin rT : Choice.mixin_of (dffun_aT rT choiceType).
 Proof. exact: PcanChoiceMixin tfgraphK. Qed.
-Canonical finfun_choiceType (rT : choiceType) :=
-  ChoiceType {ffun aT -> rT} (choiceMixin (fun=> rT)).
-Canonical dfinfun_choiceType rT :=
-  ChoiceType (dffun_aT rT choiceType) (choiceMixin rT).
+
+Section dep_choiceType.
+Variable rT : aT -> choiceType.
+HB.instance (dffun_aT rT choiceType) (choiceMixin rT).
+End dep_choiceType.
+
+Section simpl_choiceType.
+Variable rT : choiceType.
+HB.instance ({ffun aT -> rT}) (choiceMixin (fun=> rT)).
+End simpl_choiceType.
 
 Local Remark countMixin rT : Countable.mixin_of (dffun_aT rT countType).
 Proof. exact: PcanCountMixin tfgraphK. Qed.
-Canonical finfun_countType (rT : countType) :=
-  CountType {ffun aT -> rT} (countMixin (fun => rT)).
-Canonical dfinfun_countType rT :=
-  CountType (dffun_aT rT countType) (countMixin rT).
 
-Local Definition finMixin rT :=
+Section dep_countType.
+Variable rT : aT -> countType.
+HB.instance (dffun_aT rT countType) (countMixin rT).
+End dep_countType.
+
+Section simpl_countType.
+Variable rT : countType.
+HB.instance ({ffun aT -> rT}) (countMixin (fun=> rT)).
+End simpl_countType.
+
+HB.instance Definition dffun_finMixin rT : is_finite (dffun_aT rT finType) :=
   PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT rT finType) _ _).
-Canonical finfun_finType (rT : finType) :=
-  FinType {ffun aT -> rT} (finMixin (fun=> rT)).
-Canonical dfinfun_finType rT :=
-  FinType (dffun_aT rT finType) (finMixin rT).
+HB.instance Definition ffun_finMixin (rT : finType) : is_finite {ffun aT -> rT} :=
+  PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT (fun=> rT) finType) _ _).
 
 End InheritedStructures.
 

@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 
 (******************************************************************************)
@@ -1012,7 +1013,7 @@ by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
 Canonical seq_eqMixin := EqMixin eqseqP.
-Canonical seq_eqType := Eval hnf in EqType (seq T) seq_eqMixin.
+HB.instance (seq T) seq_eqMixin.
 
 Lemma eqseqE : eqseq = eq_op. Proof. by []. Qed.
 
@@ -2692,7 +2693,7 @@ End PmapSub.
 
 Section EqPmapSub.
 
-Variables (T : eqType) (p : pred T) (sT : subType p).
+Variables (T : eqType) (p : pred T) (sT : subEqType p).
 
 Let insT : T -> option sT := insub.
 
