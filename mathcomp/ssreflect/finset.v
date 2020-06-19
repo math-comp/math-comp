@@ -352,6 +352,9 @@ case: (pickP (mem A)) => [x Ax | A0]; [by right; exists x | left].
 by apply/setP=> x; rewrite inE; apply: A0.
 Qed.
 
+Lemma set_enum A : [set x | x \in enum A] = A.
+Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
+
 Lemma enum_set0 : enum set0 = [::] :> seq T.
 Proof. by rewrite (eq_enum (in_set _)) enum0. Qed.
 
@@ -817,11 +820,26 @@ Proof. by rewrite setDE subsetIr. Qed.
 Lemma sub1set A x : ([set x] \subset A) = (x \in A).
 Proof. by rewrite -subset_pred1; apply: eq_subset=> y; rewrite !inE. Qed.
 
+Variant cards_eq_spec A : seq T -> {set T} -> nat -> Type :=
+| CardEq (s : seq T) & uniq s : cards_eq_spec A s [set x | x \in s] (size s).
+
+Lemma cards_eqP A : cards_eq_spec A (enum A) A #|A|.
+Proof.
+by move: (enum A) (cardE A) (set_enum A) (enum_uniq A) => s -> <-; constructor.
+Qed.
+
 Lemma cards1P A : reflect (exists x, A = [set x]) (#|A| == 1).
 Proof.
 apply: (iffP idP) => [|[x ->]]; last by rewrite cards1.
-rewrite eq_sym eqn_leq card_gt0 => /andP[/set0Pn[x Ax] leA1].
-by exists x; apply/eqP; rewrite eq_sym eqEcard sub1set Ax cards1 leA1.
+by have [[|x []]// _] := cards_eqP; exists x; apply/setP => y; rewrite !inE.
+Qed.
+
+Lemma cards2P A : reflect (exists x y : T, x != y /\ A = [set x; y])
+                          (#|A| == 2).
+Proof.
+apply: (iffP idP) => [|[x] [y] [xy ->]]; last by rewrite cards2 xy.
+have [[|x [|y []]]//=] := cards_eqP; rewrite !inE andbT => neq_xy.
+by exists x, y; split=> //; apply/setP => z; rewrite !inE.
 Qed.
 
 Lemma subset1 A x : (A \subset [set x]) = (A == [set x]) || (A == set0).

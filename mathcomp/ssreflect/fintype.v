@@ -624,12 +624,16 @@ Proof.
 by apply: (iffP idP) => [/eqP/mem_card1[x inA]|[x /eq_card1/eqP//]]; exists x.
 Qed.
 
-Lemma fintype_le1P : reflect (forall x, all_equal_to x) (#|T| <= 1).
+Lemma card_le1_eqP A :
+  reflect {in A &, forall x, all_equal_to x} (#|A| <= 1).
 Proof.
-apply: (iffP card_le1P)=> [inT x y|all_eq x _ y]; last first.
-  by rewrite (all_eq x) !inE eqxx.
-by suff: y \in T by rewrite (inT x)// => /eqP.
+apply: (iffP card_le1P) => [Ale1 x y xA yA /=|all_eq x xA y].
+  by apply/eqP; rewrite -[_ == _]/(y \in pred1 x) -Ale1.
+by rewrite inE; case: (altP (y =P x)) => [->//|]; exact/contra_neqF/all_eq.
 Qed.
+
+Lemma fintype_le1P : reflect (forall x : T, all_equal_to x) (#|T| <= 1).
+Proof. apply: (iffP (card_le1_eqP {:T})); [exact: in2T | exact: in2W]. Qed.
 
 Lemma fintype1 : #|T| = 1 -> {x : T | all_equal_to x}.
 Proof.
@@ -788,6 +792,40 @@ move=> eAB [C]; congr (_ && _); first exact: (eq_subset_r eAB).
 by rewrite (eq_subset eAB).
 Qed.
 
+Lemma card_geqP {A n} :
+  reflect (exists s, [/\ uniq s, size s = n & {subset s <= A}]) (n <= #|A|).
+Proof.
+apply: (iffP idP) => [n_le_A|[s] [uniq_s size_s /subsetP subA]]; last first.
+  by rewrite -size_s -(card_uniqP _ uniq_s); exact: subset_leq_card.
+exists (take n (enum A)); rewrite take_uniq ?enum_uniq // size_take.
+split => //; last by move => x /mem_take; rewrite mem_enum.
+case: (ltnP n (size (enum A))) => // size_A.
+by apply/eqP; rewrite eqn_leq size_A -cardE n_le_A.
+Qed.
+
+Lemma card_gt1P A :
+  reflect (exists x y, [/\ x \in A, y \in A & x != y]) (1 < #|A|).
+Proof.
+apply: (iffP card_geqP) => [[s] []|[x] [y] [xA yA xDy]].
+  case: s => [|a [|b []]]//=; rewrite inE andbT => aDb _ subD.
+  by exists a, b; rewrite aDb !subD ?inE ?eqxx ?orbT.
+exists [:: x; y]; rewrite /= !inE xDy.
+by split=> // z; rewrite !inE => /pred2P[]->.
+Qed.
+
+Lemma card_gt2P A :
+  reflect (exists x y z,
+              [/\ x \in A, y \in A & z \in A] /\ [/\ x != y, y != z & z != x])
+          (2 < #|A|).
+Proof.
+apply: (iffP card_geqP) => [[s] []|[x] [y] [z] [[xD yD zD] [xDy xDz yDz]]].
+  case: s => [|x [|y [|z []]]]//=; rewrite !inE !andbT negb_or -andbA.
+  case/and3P => xDy xDz yDz _ subA.
+  by exists x, y, z; rewrite xDy yDz eq_sym xDz !subA ?inE ?eqxx ?orbT.
+exists [:: x; y; z]; rewrite /= !inE negb_or xDy xDz eq_sym yDz; split=> // u.
+by rewrite !inE => /or3P [] /eqP->.
+Qed.
+
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
 Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
@@ -866,6 +904,7 @@ Hint Resolve subxx_hint : core.
 Arguments pred0P {T P}.
 Arguments pred0Pn {T P}.
 Arguments card_le1P {T A}.
+Arguments card_le1_eqP {T A}.
 Arguments card1P {T A}.
 Arguments fintype_le1P {T}.
 Arguments fintype1P {T}.
@@ -873,6 +912,10 @@ Arguments subsetP {T A B}.
 Arguments subsetPn {T A B}.
 Arguments subset_eqP {T A B}.
 Arguments card_uniqP {T s}.
+Arguments card_geqP {T A n}.
+Arguments card_gt0P {T A}.
+Arguments card_gt1P {T A}.
+Arguments card_gt2P {T A}.
 Arguments properP {T A B}.
 
 (**********************************************************************)

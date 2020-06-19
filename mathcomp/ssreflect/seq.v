@@ -2008,6 +2008,12 @@ Proof. by rewrite -cats1 prefix_subseq. Qed.
 Lemma subseq_uniq s1 s2 : subseq s1 s2 -> uniq s2 -> uniq s1.
 Proof. by case/subseqP=> m _ -> Us2; apply: mask_uniq. Qed.
 
+Lemma take_uniq s n : uniq s -> uniq (take n s).
+Proof. exact/subseq_uniq/take_subseq. Qed.
+
+Lemma drop_uniq s n : uniq s -> uniq (drop n s).
+Proof. exact/subseq_uniq/drop_subseq. Qed.
+
 End Subseq.
 
 Prenex Implicits subseq.
