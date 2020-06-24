@@ -1823,7 +1823,7 @@ Lemma prod_nat_const n : \prod_(i in A) n = n ^ #|A|.
 Proof. by rewrite big_const -Monoid.iteropE. Qed.
 
 Lemma sum_nat_const_nat n1 n2 n : \sum_(n1 <= i < n2) n = (n2 - n1) * n.
-Proof. by rewrite big_const_nat; elim: (_ - _) => //= ? ->. Qed.
+Proof. by rewrite big_const_nat iter_addn_0 mulnC. Qed.
 
 Lemma prod_nat_const_nat n1 n2 n : \prod_(n1 <= i < n2) n = n ^ (n2 - n1).
 Proof. by rewrite big_const_nat -Monoid.iteropE. Qed.
