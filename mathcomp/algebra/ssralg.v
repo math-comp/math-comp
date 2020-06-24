@@ -835,6 +835,9 @@ Qed.
 Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
 Proof. by rewrite -!mulrnA mulnC. Qed.
 
+Lemma iter_addr_0 n (m : V) : iter n (+%R m) 0 = m *+ n.
+Proof. by elim: n => //= n ->; rewrite mulrS. Qed.
+
 Lemma sumrN I r P (F : I -> V) :
   (\sum_(i <- r | P i) - F i = - (\sum_(i <- r | P i) F i)).
 Proof. by rewrite (big_morph _ opprD oppr0). Qed.
@@ -855,6 +858,9 @@ Proof. by rewrite (big_morph _ (mulrnDr x) (erefl _)). Qed.
 Lemma sumr_const (I : finType) (A : pred I) (x : V) :
   \sum_(i in A) x = x *+ #|A|.
 Proof. by rewrite big_const -iteropE. Qed.
+
+Lemma sumr_const_nat (m n : nat) (x : V) : \sum_(n <= i < m) x = x *+ (m - n).
+Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
 Lemma telescope_sumr n m (f : nat -> V) : n <= m ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
