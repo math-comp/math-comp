@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `card_le1_eqP` (generalizes `fintype_le1P`),
 - in `finset.v`, neq lemmas: `set_enum`, `cards_eqP`, `cards2P`
 - in `fingraph.v`, new lemmas: `fcard_gt0P`, `fcard_gt1P`
-
+- in `finset.v`, new lemmas: `properC`, `properCr`, `properCl`
 
 ### Changed
 

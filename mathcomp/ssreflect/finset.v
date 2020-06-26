@@ -639,6 +639,9 @@ Proof. by apply/setP=> x; rewrite !inE. Qed.
 Lemma setCT : ~: [set: T] = set0.
 Proof. by rewrite -setC0 setCK. Qed.
 
+Lemma properC A B : (~: B \proper ~: A) = (A \proper B).
+Proof. by rewrite !properE !setCS. Qed.
+
 (* difference *)
 
 Lemma setDP A B x : reflect (x \in A /\ x \notin B) (x \in A :\: B).
@@ -981,6 +984,12 @@ Qed.
 
 Lemma properD A B C : (A \proper B :\: C) -> (A \proper B) && [disjoint A & C].
 Proof. by rewrite setDE disjoints_subset => /properI/andP[-> /proper_sub]. Qed.
+
+Lemma properCr A B : (A \proper ~: B) = (B \proper ~: A).
+Proof. by rewrite -properC setCK. Qed.
+
+Lemma properCl A B : (~: A \proper B) = (~: B \proper A).
+Proof. by rewrite -properC setCK. Qed.
 
 End setOps.
 
