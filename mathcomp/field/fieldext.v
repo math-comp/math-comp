@@ -130,9 +130,11 @@ Definition pack :=
   fun (bT : Falgebra.type phR) b
     & phant_id (Falgebra.class bT : Falgebra.class_of R bT)
                (b : Falgebra.class_of R T) =>
-  fun mT Cm IDm Fm & phant_id (Field.class mT) (@Field.Class T
-        (@IntegralDomain.Class T (@ComUnitRing.Class T (@ComRing.Class T b
-          Cm) b) IDm) Fm) => Pack phR (@Class T b Cm IDm Fm).
+  fun mT Cm IDm Fm
+    & phant_id (GRing.ComRing.mixin (Field.class mT)) Cm
+    & phant_id (GRing.IntegralDomain.mixin (Field.class mT)) IDm
+    & phant_id (GRing.Field.mixin (Field.class mT)) Fm =>
+    Pack phR (@Class T b Cm IDm Fm).
 
 Definition pack_eta K :=
   let cK := Field.class K in let Cm := ComRing.mixin cK in
@@ -261,7 +263,7 @@ Canonical lmod_fieldType.
 Notation fieldExtType R := (type (Phant R)).
 
 Notation "[ 'fieldExtType' F 'of' L ]" :=
-  (@pack _ (Phant F) L _ _ id _ _ _ _ id)
+  (@pack _ (Phant F) L _ _ id _ _ _ _ id id id)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
 
 Notation "[ 'fieldExtType' F 'of' L 'for' K ]" :=
