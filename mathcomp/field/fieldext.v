@@ -104,19 +104,13 @@ Local Coercion base : class_of >-> Falgebra.class_of.
 
 Section Bases.
 Variables (T : Type) (c : class_of T).
-Definition base1 := ComRing.Class (@comm_ext T c).
-Definition base2 := @ComUnitRing.Class T base1 c.
-Definition base3 := @IntegralDomain.Class T base2 (@idomain_ext T c).
-Definition base4 := @Field.Class T base3 (@field_ext T c).
-Definition base5 := @ComAlgebra.Class R T (@base T c) (@comm_ext T c).
-Definition base6 := @ComUnitAlgebra.Class R T base5 c.
+Definition base1 := @ComUnitAlgebra.Class R T (@base T c) (@comm_ext T c).
+Definition base2 := @IntegralDomain.Class T base1 (@idomain_ext T c).
+Definition base3 := @Field.Class T base2 (@field_ext T c).
 End Bases.
-Local Coercion base1 : class_of >-> ComRing.class_of.
-Local Coercion base2 : class_of >-> ComUnitRing.class_of.
-Local Coercion base3 : class_of >-> IntegralDomain.class_of.
-Local Coercion base4 : class_of >-> Field.class_of.
-Local Coercion base5 : class_of >-> ComAlgebra.class_of.
-Local Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
+Local Coercion base1 : class_of >-> ComUnitAlgebra.class_of.
+Local Coercion base2 : class_of >-> IntegralDomain.class_of.
+Local Coercion base3 : class_of >-> Field.class_of.
 
 Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -199,8 +193,8 @@ Module Exports.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion base : class_of >-> Falgebra.class_of.
-Coercion base4 : class_of >-> Field.class_of.
-Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
+Coercion base1 : class_of >-> ComUnitAlgebra.class_of.
+Coercion base3 : class_of >-> Field.class_of.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
 Coercion choiceType : type >-> Choice.type.
