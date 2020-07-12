@@ -94,23 +94,23 @@ Section FieldExt.
 Variable R : ringType.
 
 Record class_of T := Class {
-  base : Falgebra.class_of R T;
-  comm_ext : commutative (Ring.mul base);
-  idomain_ext : IntegralDomain.axiom (Ring.Pack base);
-  field_ext : Field.mixin_of (UnitRing.Pack base)
+  base : Field.class_of T;
+  lmod_ext : Lmodule.mixin_of R (Zmodule.Pack base);
+  lalg_ext :
+    @Lalgebra.axiom R (Lmodule.Pack _ (Lmodule.Class lmod_ext)) (Ring.mul base);
+  alg_ext : Algebra.axiom (Lalgebra.Pack _ (@Lalgebra.Class _ _ _ _ lalg_ext));
+  vect_ext : Vector.mixin_of (Lmodule.Pack _ (Lmodule.Class lmod_ext))
 }.
 
-Local Coercion base : class_of >-> Falgebra.class_of.
+Local Coercion base : class_of >-> Field.class_of.
 
-Section Bases.
-Variables (T : Type) (c : class_of T).
-Definition base1 := @ComUnitAlgebra.Class R T (@base T c) (@comm_ext T c).
-Definition base2 := @IntegralDomain.Class T base1 (@idomain_ext T c).
-Definition base3 := @Field.Class T base2 (@field_ext T c).
-End Bases.
+Definition base1 (T : Type) (c : class_of T) :=
+  @ComUnitAlgebra.Class R T c (lmod_ext c) (@lalg_ext T c) (@alg_ext T c).
+Definition base2 (T : Type) (c : class_of T) :=
+  @Falgebra.Class R T (base1 c) (vect_ext c).
+
 Local Coercion base1 : class_of >-> ComUnitAlgebra.class_of.
-Local Coercion base2 : class_of >-> IntegralDomain.class_of.
-Local Coercion base3 : class_of >-> Field.class_of.
+Local Coercion base2 : class_of >-> Falgebra.class_of.
 
 Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -121,20 +121,13 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 
 Definition pack :=
-  fun (bT : Falgebra.type phR) b
-    & phant_id (Falgebra.class bT : Falgebra.class_of R bT)
-               (b : Falgebra.class_of R T) =>
-  fun mT Cm IDm Fm
-    & phant_id (GRing.ComRing.mixin (Field.class mT)) Cm
-    & phant_id (GRing.IntegralDomain.mixin (Field.class mT)) IDm
-    & phant_id (GRing.Field.mixin (Field.class mT)) Fm =>
-    Pack phR (@Class T b Cm IDm Fm).
-
-Definition pack_eta K :=
-  let cK := Field.class K in let Cm := ComRing.mixin cK in
-  let IDm := IntegralDomain.mixin cK in let Fm := Field.mixin cK in
-  fun (bT : Falgebra.type phR) b & phant_id (Falgebra.class bT) b =>
-  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm).
+  fun (bT : fieldType) b & phant_id (Field.class bT) (b : Field.class_of T) =>
+  fun (mT : Falgebra.type phR) Lmm Lam Am Vm
+    & phant_id (Lmodule.mixin (Falgebra.class mT)) Lmm
+    & phant_id (@Lalgebra.ext _ _ (Falgebra.class mT)) Lam
+    & phant_id (@Algebra.mixin _ _ (Falgebra.class mT)) Am
+    & phant_id (Vector.mixin (Falgebra.class mT)) Vm =>
+    Pack phR (@Class T b Lmm Lam Am Vm).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -192,9 +185,9 @@ Module Exports.
 
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
-Coercion base : class_of >-> Falgebra.class_of.
+Coercion base : class_of >-> Field.class_of.
 Coercion base1 : class_of >-> ComUnitAlgebra.class_of.
-Coercion base3 : class_of >-> Field.class_of.
+Coercion base2 : class_of >-> Falgebra.class_of.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
 Coercion choiceType : type >-> Choice.type.
@@ -257,12 +250,8 @@ Canonical lmod_fieldType.
 Notation fieldExtType R := (type (Phant R)).
 
 Notation "[ 'fieldExtType' F 'of' L ]" :=
-  (@pack _ (Phant F) L _ _ id _ _ _ _ id id id)
+  (@pack _ (Phant F) L _ _ id _ _ _ _ _ id id id id)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
-
-Notation "[ 'fieldExtType' F 'of' L 'for' K ]" :=
-  (@pack_eta _ (Phant F) L K _ _ id _ id)
-  (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
 
 Notation "{ 'subfield' L }" := (@aspace_of _ (FalgType _) (Phant L))
   (at level 0, format "{ 'subfield'  L }") : type_scope.
@@ -271,7 +260,7 @@ End Exports.
 End FieldExt.
 Export FieldExt.Exports.
 
-Canonical regular_fieldExtType (F : fieldType) := [fieldExtType F of F^o for F].
+Canonical regular_fieldExtType (F : fieldType) := [fieldExtType F of F^o].
 
 Section FieldExtTheory.
 
@@ -384,8 +373,11 @@ Canonical aspace_divalgPred K := DivalgPred (memv_submod_closed K).
 Definition subvs_mulC K := [comRingMixin of subvs_of K by <:].
 Canonical subvs_comRingType K :=
   Eval hnf in ComRingType (subvs_of K) (@subvs_mulC K).
+Canonical subvs_comAlgType K := Eval hnf in [comAlgType F0 of subvs_of K].
 Canonical subvs_comUnitRingType K :=
   Eval hnf in [comUnitRingType of subvs_of K].
+Canonical subvs_comUnitAlgType K :=
+  Eval hnf in [comUnitAlgType F0 of subvs_of K].
 Definition subvs_mul_eq0 K := [idomainMixin of subvs_of K by <:].
 Canonical subvs_idomainType K :=
   Eval hnf in IdomainType (subvs_of K) (@subvs_mul_eq0 K).
@@ -999,6 +991,8 @@ Proof. exact: scalerAr. Qed.
 
 Canonical baseField_algType := AlgType F0 L0 baseField_scaleAr.
 Canonical baseField_unitAlgType := [unitAlgType F0 of L0].
+Canonical baseField_comAlgType := [comAlgType F0 of L0].
+Canonical baseField_comUnitAlgType := [comUnitAlgType F0 of L0].
 
 Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
@@ -1551,7 +1545,8 @@ have mulZl: GRing.Lalgebra.axiom mul.
 have mulZr: GRing.Algebra.axiom (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
 pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
-pose uaL := [unitAlgType F of AlgType F urL mulZr].
+pose ucrL := [comUnitRingType of urL].
+pose uaL := [unitAlgType F of ucrL].
 pose faL := [FalgType F of uaL].
 have unitE: GRing.Field.mixin_of urL.
   move=> x nz_x; apply/unitrP; set q := toPF x.
@@ -1563,10 +1558,9 @@ have unitE: GRing.Field.mixin_of urL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modp_add mulrC.
   by rewrite modp_mull add0r.
-pose ucrL := [comUnitRingType of ComRingType urL mulC].
 have mul0 := GRing.Field.IdomainMixin unitE.
-pose fL := FieldType (IdomainType ucrL mul0) unitE.
-exists [fieldExtType F of faL for fL]; first by rewrite dimvf; apply: mul1n.
+pose fL := FieldType (IdomainType faL mul0) unitE.
+exists [fieldExtType F of fL]; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
 have toLlin: linear toL.
@@ -1611,7 +1605,8 @@ have mulZl: GRing.Lalgebra.axiom mul.
 have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
 pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
-pose uaL := [unitAlgType F of AlgType F urL mulZr].
+pose ucrL := [comUnitRingType of urL].
+pose uaL := [unitAlgType F of ucrL].
 pose faL := [FalgType F of uaL].
 have unitE: GRing.Field.mixin_of urL.
   move=> x nz_x; apply/unitrP; set q := rVpoly x.
@@ -1624,9 +1619,8 @@ have unitE: GRing.Field.mixin_of urL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1).
   by rewrite -mulNr modp_addl_mul_small ?size_poly1.
-pose ucrL := [comUnitRingType of ComRingType urL mulC].
-pose fL := FieldType (IdomainType ucrL (GRing.Field.IdomainMixin unitE)) unitE.
-exists [fieldExtType F of faL for fL]; first exact: mul1n.
+pose fL := FieldType (IdomainType faL (GRing.Field.IdomainMixin unitE)) unitE.
+exists [fieldExtType F of fL]; first exact: mul1n.
 pose z : vL := toL 'X; set iota := in_alg _.
 have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
   elim/poly_ind: q => [|a q IHq].

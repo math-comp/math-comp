@@ -1407,7 +1407,7 @@ Variable R : unitRingType.
 
 Record class_of M :=
   Class { base : GRing.UnitAlgebra.class_of R M; mixin : mixin_of M base }.
-Definition base2 M (c : class_of M) := Algebra.Class (mixin c).
+Definition base2 M (c : class_of M) := @Algebra.Class _ _ (base c) (mixin c).
 Definition base3 M (c : class_of M) := @UnitRing.Class _ (base c) (mixin c).
 
 Local Coercion base : class_of >-> GRing.UnitAlgebra.class_of.

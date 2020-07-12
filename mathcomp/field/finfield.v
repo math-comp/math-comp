@@ -261,8 +261,12 @@ Canonical primeChar_unitAlgType (R : unitRingType) charRp :=
   [unitAlgType 'F_p of type R charRp].
 Canonical primeChar_comRingType (R : comRingType) charRp :=
   [comRingType of type R charRp].
+Canonical primeChar_comAlgType (R : comRingType) charRp :=
+  [comAlgType 'F_p of type R charRp].
 Canonical primeChar_comUnitRingType (R : comUnitRingType) charRp :=
   [comUnitRingType of type R charRp].
+Canonical primeChar_comUnitAlgType (R : comUnitRingType) charRp :=
+  [comUnitAlgType 'F_p of type R charRp].
 Canonical primeChar_idomainType (R : idomainType) charRp :=
   [idomainType of type R charRp].
 Canonical primeChar_fieldType (F : fieldType) charFp :=
@@ -337,7 +341,7 @@ Local Notation F := (type _ charFp).
 Canonical primeChar_finFieldType := [finFieldType of F].
 (* We need to use the eta-long version of the constructor here as projections *)
 (* of the Canonical fieldType of F cannot be computed syntactically.          *)
-Canonical primeChar_fieldExtType := [fieldExtType 'F_p of F for F0].
+Canonical primeChar_fieldExtType := [fieldExtType 'F_p of F].
 Canonical primeChar_splittingFieldType := FinSplittingFieldType 'F_p F.
 
 End FinField.
@@ -500,7 +504,7 @@ suffices [L [ys Dp]]: {L : fieldExtType F & splits L p^%:A}.
   by case/memv_imgP=> v Lzs_v; rewrite memvf lfunE => /val_inj->.
 move: {2}_.+1 (ltnSn (size p)) => n; elim: n => // n IHn in F p nz_p * => lbn.
 have [Cp|C'p] := leqP (size p) 1.
-  pose L := [fieldExtType F of F^o for F]; exists L, [::].
+  pose L := [fieldExtType F of F^o]; exists L, [::].
   by rewrite big_nil -size_poly_eq1 size_map_poly eqn_leq Cp size_poly_gt0.
 have [r r_dv_p irr_r]: {r | r %| p & irreducible_poly r}.
   pose rVp (v : 'rV_n) (r := rVpoly v) := (1 < size r) && (r %| p).
