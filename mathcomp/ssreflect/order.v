@@ -2484,22 +2484,33 @@ Export FinTotal.Exports.
 Definition dual T : Type := T.
 Definition dual_display : unit -> unit. Proof. exact. Qed.
 
+Notation dual_le := (@le (dual_display _) _).
+Notation dual_lt := (@lt (dual_display _) _).
+Notation dual_comparable := (@comparable (dual_display _) _).
+Notation dual_ge := (@ge (dual_display _) _).
+Notation dual_gt := (@gt (dual_display _) _).
+Notation dual_leif := (@leif (dual_display _) _).
+Notation dual_max := (@max (dual_display _) _).
+Notation dual_min := (@min (dual_display _) _).
+Notation dual_meet := (@meet (dual_display _) _).
+Notation dual_join := (@join (dual_display _) _).
+Notation dual_bottom := (@bottom (dual_display _) _).
+Notation dual_top := (@top (dual_display _) _).
+
 Module Import DualSyntax.
 
 Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
-Notation "<=^d%O" := (@le (dual_display _) _) : fun_scope.
-Notation ">=^d%O" := (@ge (dual_display _) _)  : fun_scope.
-Notation ">=^d%O" := (@ge (dual_display _) _)  : fun_scope.
-Notation "<^d%O" := (@lt (dual_display _) _) : fun_scope.
-Notation ">^d%O" := (@gt (dual_display _) _) : fun_scope.
-Notation "<?=^d%O" := (@leif (dual_display _) _) : fun_scope.
-Notation ">=<^d%O" := (@comparable (dual_display _) _) : fun_scope.
-Notation "><^d%O" := (fun x y => ~~ (@comparable (dual_display _) _ x y)) :
-  fun_scope.
+Notation "<=^d%O" := dual_le : fun_scope.
+Notation ">=^d%O" := dual_ge : fun_scope.
+Notation "<^d%O" := dual_lt : fun_scope.
+Notation ">^d%O" := dual_gt : fun_scope.
+Notation "<?=^d%O" := dual_leif : fun_scope.
+Notation ">=<^d%O" := dual_comparable : fun_scope.
+Notation "><^d%O" := (fun x y => ~~ dual_comparable x y) : fun_scope.
 
 Notation "<=^d y" := (>=^d%O y) : order_scope.
 Notation "<=^d y :> T" := (<=^d (y : T)) (only parsing) : order_scope.
-Notation ">=^d y"  := (<=^d%O y) : order_scope.
+Notation ">=^d y" := (<=^d%O y) : order_scope.
 Notation ">=^d y :> T" := (>=^d (y : T)) (only parsing) : order_scope.
 
 Notation "<^d y" := (>^d%O y) : order_scope.
@@ -2515,9 +2526,9 @@ Notation "x <=^d y :> T" := ((x : T) <=^d (y : T)) (only parsing) : order_scope.
 Notation "x >=^d y" := (y <=^d x) (only parsing) : order_scope.
 Notation "x >=^d y :> T" := ((x : T) >=^d (y : T)) (only parsing) : order_scope.
 
-Notation "x <^d y"  := (<^d%O x y) : order_scope.
+Notation "x <^d y" := (<^d%O x y) : order_scope.
 Notation "x <^d y :> T" := ((x : T) <^d (y : T)) (only parsing) : order_scope.
-Notation "x >^d y"  := (y <^d x) (only parsing) : order_scope.
+Notation "x >^d y" := (y <^d x) (only parsing) : order_scope.
 Notation "x >^d y :> T" := ((x : T) >^d (y : T)) (only parsing) : order_scope.
 
 Notation "x <=^d y <=^d z" := ((x <=^d y) && (y <=^d z)) : order_scope.
@@ -2537,15 +2548,8 @@ Notation "><^d x" := (fun y => ~~ (>=<^d%O x y)) : order_scope.
 Notation "><^d x :> T" := (><^d (x : T)) (only parsing) : order_scope.
 Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
-Notation dual_bottom := (@bottom (dual_display _)).
-Notation dual_top := (@top (dual_display _)).
-Notation dual_join := (@join (dual_display _) _).
-Notation dual_meet := (@meet (dual_display _) _).
-Notation dual_max := (@max (dual_display _) _).
-Notation dual_min := (@min (dual_display _) _).
-
-Notation "x `&^d` y" :=  (@meet (dual_display _) _ x y) : order_scope.
-Notation "x `|^d` y" := (@join (dual_display _) _ x y) : order_scope.
+Notation "x `&^d` y" := (dual_meet x y) : order_scope.
+Notation "x `|^d` y" := (dual_join x y) : order_scope.
 
 Notation "\join^d_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
@@ -3228,19 +3232,15 @@ Canonical dual_finType (T : finType) := [finType of T^d].
 Context {disp : unit}.
 Variable T : porderType disp.
 
-Definition dual_le (x y : T) := (y <= x).
-Definition dual_lt (x y : T) := (y < x).
-
-Lemma dual_lt_def (x y : T) :
-  dual_lt x y = (y != x) && (dual_le x y).
+Lemma dual_lt_def (x y : T) : gt x y = (y != x) && ge x y.
 Proof. by apply: lt_neqAle. Qed.
 
-Fact dual_le_anti : antisymmetric dual_le.
+Fact dual_le_anti : antisymmetric (@ge _ T).
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
 Definition dual_porderMixin :=
-  POrder.Mixin dual_lt_def (lexx : reflexive dual_le) dual_le_anti
-               (fun y z x zy yx => @le_trans _ _ y x z yx zy).
+  @POrder.Mixin _ _ ge gt dual_lt_def (lexx : reflexive ge) dual_le_anti
+                (fun y z x zy yx => @le_trans _ _ y x z yx zy).
 Canonical dual_porderType :=
   POrderType (dual_display disp) T^d dual_porderMixin.
 

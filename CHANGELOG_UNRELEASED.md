@@ -22,15 +22,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `finset.v`, new lemmas: `properC`, `properCr`, `properCl`
 - in `ssrnat.v`, new lemmas: `subn_minl`, `subn_maxl`
 
-### Changed
-
-- in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
-- in `ssrAC.v`, fix `non-reversible-notation` warnings
-
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
 
 ### Changed
+
+- in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
+- in `ssrAC.v`, fix `non-reversible-notation` warnings
 
 - In the definition of structures in order.v, displays are removed from
   parameters of mixins and fields of classes internally and now only appear in
@@ -40,6 +38,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   the same names as in the mixins before this change except that `bLatticeMixin`
   and `tbLatticeMixin` have been renamed to `bottomMixin` and `topMixin`
   respectively.
+
+- The `dual_*` notations such as `dual_le` in order.v are now qualified with the
+  `Order` module.
 
 ### Renamed
 
