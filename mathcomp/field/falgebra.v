@@ -473,8 +473,8 @@ Proof. by case: n => //; rewrite prodv1. Qed.
 Lemma expv0n n : (0 ^+ n = if n is _.+1 then 0 else 1)%VS.
 Proof. by case: n => // n; rewrite expvSl prod0v. Qed.
 
-Lemma expv1n n : (1 ^+ n = 1)%VS.
-Proof. by elim: n => // n IHn; rewrite expvSl IHn prodv1. Qed.
+Lemma expv1n : left_zero 1%VS expv.
+Proof. by elim=> // n IHn; rewrite expvSl IHn prodv1. Qed.
 
 Lemma expvD U m n : (U ^+ (m + n) = U ^+ m * U ^+ n)%VS.
 Proof. by elim: m => [|m IHm]; rewrite ?prod1v // !expvSl IHm prodvA. Qed.

@@ -248,8 +248,8 @@ Proof. by case: tpermP. Qed.
 Lemma tpermD x y z : x != z -> y != z -> tperm x y z = z.
 Proof. by case: tpermP => // ->; rewrite eqxx. Qed.
 
-Lemma tpermC x y : tperm x y = tperm y x.
-Proof. by apply/permP => z; do 2![case: tpermP => //] => ->. Qed.
+Lemma tpermC : commutative tperm.
+Proof. by move=> x y; apply/permP => z; do 2![case: tpermP => //] => ->. Qed.
 
 Lemma tperm1 x : tperm x x = 1.
 Proof. by apply/permP => z; rewrite perm1; case: tpermP. Qed.

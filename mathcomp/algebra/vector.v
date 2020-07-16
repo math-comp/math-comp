@@ -681,9 +681,9 @@ apply/vs2mxP; rewrite vs2mxD -gen_vs2mx -genmx_adds !genmxE submx1 sub1mx.
 exact: addsmx_compl_full.
 Qed.
 
-Lemma capv_compl U : (U :&: U^C = 0)%VS.
+Lemma capv_compl : right_inverse (0 : {vspace vT})%VS complv capv.
 Proof.
-apply/val_inj; rewrite [val]/= vs2mx0 vs2mxI -gen_vs2mx -genmx_cap.
+move=> U; apply/val_inj; rewrite [val]/= vs2mx0 vs2mxI -gen_vs2mx -genmx_cap.
 by rewrite capmx_compl genmx0.
 Qed.
 

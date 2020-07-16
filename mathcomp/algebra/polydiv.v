@@ -140,10 +140,10 @@ Definition rdvdp p q := rmodp q p == 0.
 Lemma redivp_def p q : redivp p q = (rscalp p q, rdivp p q, rmodp p q).
 Proof. by rewrite /rscalp /rdivp /rmodp; case: (redivp p q) => [[]] /=. Qed.
 
-Lemma rdiv0p p : rdivp 0 p = 0.
+Lemma rdiv0p : left_zero 0 rdivp.
 Proof.
-rewrite /rdivp unlock; case: ifP => // Hp; rewrite /redivp_rec !size_poly0.
-by rewrite polySpred ?Hp.
+move=> p; rewrite /rdivp unlock; case: ifP => // Hp.
+by rewrite /redivp_rec !size_poly0 polySpred ?Hp.
 Qed.
 
 Lemma rdivp0 p : rdivp p 0 = 0. Proof. by rewrite /rdivp unlock eqxx. Qed.
@@ -190,10 +190,10 @@ apply: leq_trans (size_scale_leq _ _) _.
 by rewrite size_polyXn -subSn // leq_subLR -add1n leq_add.
 Qed.
 
-Lemma rmod0p p : rmodp 0 p = 0.
+Lemma rmod0p : left_zero 0 rmodp.
 Proof.
-rewrite /rmodp unlock; case: ifP => // Hp; rewrite /redivp_rec !size_poly0.
-by rewrite polySpred ?Hp.
+move=> p; rewrite /rmodp unlock; case: ifP => // Hp.
+by rewrite /redivp_rec !size_poly0 polySpred ?Hp.
 Qed.
 
 Lemma rmodp0 p : rmodp p 0 = p. Proof. by rewrite /rmodp unlock eqxx. Qed.
@@ -995,8 +995,8 @@ Qed.
 
 Lemma modp_mulr d p : (d * p) %% d = 0. Proof. by rewrite mulrC modp_mull. Qed.
 
-Lemma modpp d : d %% d = 0.
-Proof. by rewrite -[d in d %% _]mul1r modp_mull. Qed.
+Lemma modpp : self_inverse 0 (@modp R).
+Proof. by move=> d; rewrite -[d in d %% _]mul1r modp_mull. Qed.
 
 Lemma ltn_modp p q : (size (p %% q) < size q) = (q != 0).
 Proof.
