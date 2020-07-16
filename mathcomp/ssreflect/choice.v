@@ -180,7 +180,7 @@ Fixpoint encode t : seq (nat + T) :=
   | Node n f => inl _ n.+1 :: rcons (flatten (map encode f)) (inl _ 0)
   end.
 
-Definition decode_step c fs := 
+Definition decode_step c fs :=
   match c with
   | inr x => (Leaf x :: fs.1, fs.2)
   | inl 0 => ([::], fs.1 :: fs.2)
@@ -247,78 +247,74 @@ End Gentree.
 (* choiceType because in practice the base type of an Equality/Choice subType *)
 (* is always an Equality/Choice Type).                                        *)
 
-Module Choice.
-
-Section ClassDef.
-
-Record mixin_of T := Mixin {
+HB.mixin Record has_choice T := Mixin {
   find : pred T -> nat -> option T;
-  _ : forall P n x, find P n = Some x -> P x;
-  _ : forall P : pred T, (exists x, P x) -> exists n, find P n;
-  _ : forall P Q : pred T, P =1 Q -> find P =1 find Q
+  choice_correct_subdef {P n x} : find P n = Some x -> is_true (P x);
+  choice_complete_subdef {P : pred T} : (exists x, is_true (P x)) ->
+        exists n, is_true (isSome (find P n));
+  choice_extensional_subdef {P Q : pred T} : P =1 Q -> find P =1 find Q
 }.
+HB.structure Definition Choice := { T of has_choice T & is_eqType T}.
 
-Record class_of T := Class {base : Equality.class_of T; mixin : mixin_of T}.
-Local Coercion base : class_of >->  Equality.class_of.
+Module Export BackwardCompatChoice.
+  Module Choice.
+  Notation axioms T := (has_choice T).
+  Notation mixin_of T := (has_choice T).
+  Notation class_of T := (choice.Choice.axioms T).
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+  (* TODO: build the phant thingy in HB + variant with more/less implicits *)
+  Notation Mixin := (has_choice.Axioms_ _).
 
-Definition pack m :=
-  fun b bT & phant_id (Equality.class bT) b => Pack (@Class T b m).
+  (* TODO: build this in HB *)
+  Section ClassDef.
+  Variables (T : Type) (cT : Choice.type).
+  Definition clone := fun c & cT -> T & phant_id (@Choice.Pack T c) cT => Choice.Pack c.
+  End ClassDef.
 
-(* Inheritance *)
-Definition eqType := @Equality.Pack cT xclass.
 
-End ClassDef.
+  Module InternalTheory.
 
-Module Import Exports.
-Coercion base : class_of >-> Equality.class_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Notation choiceType := type.
-Notation choiceMixin := mixin_of.
-Notation ChoiceType T m := (@pack T m _ _ id).
-Notation "[ 'choiceType' 'of' T 'for' cT ]" :=  (@clone T cT _ idfun)
-  (at level 0, format "[ 'choiceType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'choiceType' 'of' T ]" := (@clone T _ _ id)
+
+  Notation correct := choice_correct_subdef.
+  Arguments correct {_ _ _ _}.
+
+  Notation complete := choice_complete_subdef.
+  Arguments complete {_ _}.
+
+  Notation extensional := choice_extensional_subdef.
+  Arguments extensional {_ _ _}.
+
+  Section InternalTheory.
+
+  Variable T : Choice.type.
+  Implicit Types P Q : pred T.
+
+  Fact xchoose_subproof P exP :
+    {x | find P (ex_minn (@choice_complete_subdef _ P exP)) = Some x}.
+  Proof.
+  case: (ex_minnP (complete exP)) => n.
+  by case: (find P n) => // x; exists x.
+  Qed.
+
+  End InternalTheory.
+  End InternalTheory.
+  End Choice.
+
+  (* TODO: build this in HB *)
+  Coercion Choice.has_choice_mixin : choice.Choice.axioms >-> has_choice.axioms_.
+End BackwardCompatChoice.
+Import choice.Choice.
+
+Notation choiceType := Choice.type.
+Notation ChoiceMixin := Choice.Mixin.
+Notation choiceMixin T := (Choice.mixin_of T).
+Notation "[ 'choiceMixin' 'of' T ]" := (Choice.class _ : Choice.mixin_of T)
+  (at level 0, format "[ 'choiceMixin'  'of'  T ]") : form_scope.
+Notation "[ 'choiceType' 'of' T 'for' C ]" := (@Choice.clone T C _ idfun id)
+  (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
+Notation "[ 'choiceType' 'of' T ]" := (@Choice.clone T _ _ id id)
   (at level 0, format "[ 'choiceType'  'of'  T ]") : form_scope.
 
-End Exports.
-
-Module InternalTheory.
-Section InternalTheory.
-(* Inner choice function. *)
-Definition find T := find (mixin (class T)).
-
-Variable T : choiceType.
-Implicit Types P Q : pred T.
-
-Lemma correct P n x : find P n = Some x -> P x.
-Proof. by case: T => _ [_ []] //= in P n x *. Qed.
-
-Lemma complete P : (exists x, P x) -> (exists n, find P n).
-Proof. by case: T => _ [_ []] //= in P *. Qed.
-
-Lemma extensional P Q : P =1 Q -> find P =1 find Q.
-Proof. by case: T => _ [_ []] //= in P Q *. Qed.
-
-Fact xchoose_subproof P exP : {x | find P (ex_minn (@complete P exP)) = Some x}.
-Proof.
-by case: (ex_minnP (complete exP)) => n; case: (find P n) => // x; exists x.
-Qed.
-
-End InternalTheory.
-End InternalTheory.
-
-End Choice.
-Export Choice.Exports.
 
 Section ChoiceTheory.
 
@@ -435,7 +431,7 @@ elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
 rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
 by case: find => /=.
 Qed.
-#[verbose] HB.instance (seq (Choice.sort T)) seq_choiceMixin.
+HB.instance (seq (Choice.sort T)) seq_choiceMixin.
 
 End OneType.
 
@@ -462,8 +458,7 @@ rewrite (@extensional _ _ (ft sQ nt)) => [|i].
   by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
 by congr (omap _ _); apply: extensional => x /=.
 Qed.
-Canonical tagged_choiceType :=
-  Eval hnf in ChoiceType {i : I & T_ i} tagged_choiceMixin.
+HB.instance ({i : Choice.sort I & Choice.sort (T_ i)}) tagged_choiceMixin.
 
 End TagChoice.
 
@@ -474,37 +469,52 @@ exists f => [P n m | P [n Pn] | P Q eqPQ n] /=; last by rewrite eqPQ.
   by case: ifP => // Pn [<-].
 by exists n; rewrite Pn.
 Qed.
-Canonical nat_choiceType := Eval hnf in ChoiceType nat nat_choiceMixin.
+HB.instance nat nat_choiceMixin.
 
 Definition bool_choiceMixin := CanChoiceMixin oddb.
-Canonical bool_choiceType := Eval hnf in ChoiceType bool bool_choiceMixin.
-Canonical bitseq_choiceType := Eval hnf in [choiceType of bitseq].
+HB.instance bool bool_choiceMixin.
+Definition bitseq_choiceMixin := [choiceMixin of bitseq].
+HB.instance bitseq bitseq_choiceMixin.
 
 Definition unit_choiceMixin := CanChoiceMixin bool_of_unitK.
-Canonical unit_choiceType := Eval hnf in ChoiceType unit unit_choiceMixin.
+HB.instance unit unit_choiceMixin.
 
 Definition void_choiceMixin := PcanChoiceMixin (of_voidK unit).
-Canonical void_choiceType := Eval hnf in ChoiceType void void_choiceMixin.
+HB.instance void void_choiceMixin.
 
-Definition option_choiceMixin T := CanChoiceMixin (@seq_of_optK T).
-Canonical option_choiceType T :=
-  Eval hnf in ChoiceType (option T) (option_choiceMixin T).
+(* We should be able to do: *)
+(* HB.instance Definition option_choiceMixin T : has_choice (option (Choice.sort T)) := *)
+(*    CanChoiceMixin (@seq_of_optK (Choice.sort T)). *)
 
-Definition sig_choiceMixin T (P : pred T) : choiceMixin {x | P x} :=
-   sub_choiceMixin _.
-Canonical sig_choiceType T (P : pred T) :=
- Eval hnf in ChoiceType {x | P x} (sig_choiceMixin P).
+Section OptionChoiceType.
+Variable T : choiceType.
+Definition option_choiceMixin := CanChoiceMixin (@seq_of_optK T).
+HB.instance (option (Choice.sort T)) option_choiceMixin.
+End OptionChoiceType.
 
-Definition prod_choiceMixin T1 T2 := CanChoiceMixin (@tag_of_pairK T1 T2).
-Canonical prod_choiceType T1 T2 :=
-  Eval hnf in ChoiceType (T1 * T2) (prod_choiceMixin T1 T2).
+Section SigChoiceType.
+Variables (T : choiceType) (P : pred T).
+Definition sig_choiceMixin : choiceMixin {x | P x} := sub_choiceMixin _.
+HB.instance ({x | is_true (P x)}) sig_choiceMixin.
+End SigChoiceType.
 
-Definition sum_choiceMixin T1 T2 := PcanChoiceMixin (@opair_of_sumK T1 T2).
-Canonical sum_choiceType T1 T2 :=
-  Eval hnf in ChoiceType (T1 + T2) (sum_choiceMixin T1 T2).
+Section ProdChoiceType.
+Variables (T1 T2 : choiceType).
+Definition prod_choiceMixin := CanChoiceMixin (@tag_of_pairK T1 T2).
+HB.instance ((Choice.sort T1 * Choice.sort T2)%type) prod_choiceMixin.
+End ProdChoiceType.
 
-Definition tree_choiceMixin T := PcanChoiceMixin (GenTree.codeK T).
-Canonical tree_choiceType T := ChoiceType (GenTree.tree T) (tree_choiceMixin T).
+Section SumChoiceType.
+Variables (T1 T2 : choiceType).
+Definition sum_choiceMixin := PcanChoiceMixin (@opair_of_sumK T1 T2).
+HB.instance ((Choice.sort T1 + Choice.sort T2)%type) sum_choiceMixin.
+End SumChoiceType.
+
+Section TreeChoiceType.
+Variable T : choiceType.
+Definition tree_choiceMixin := PcanChoiceMixin (GenTree.codeK T).
+HB.instance (GenTree.tree (Choice.sort T)) tree_choiceMixin.
+End TreeChoiceType.
 
 End ChoiceTheory.
 

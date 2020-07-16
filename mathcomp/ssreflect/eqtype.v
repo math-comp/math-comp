@@ -118,19 +118,19 @@ Unset Printing Implicit Defensive.
 
 Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
-HB.mixin Record eq_axioms T := { eq_op : rel T; eqP : eq_axiom eq_op }.
+HB.mixin Record is_eqType T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 
-HB.structure Definition Equality := { T of eq_axioms T }.
+HB.structure Definition Equality := { T of is_eqType T }.
 
 Module Export BackwardCompatEq.
   Module Equality.
   Notation axiom := eq_axiom.
-  Notation axioms T := (eq_axioms T).
-  Notation mixin_of T := (eq_axioms T).
+  Notation axioms T := (is_eqType T).
+  Notation mixin_of T := (is_eqType T).
   Notation class_of T := (eqtype.Equality.axioms T).
 
   (* TODO: build the phant thingy in HB + variant with more/less implicits *)
-  Notation Mixin := (eq_axioms.Axioms_ _).
+  Notation Mixin := (is_eqType.Axioms_ _).
 
   (* TODO: build this in HB *)
   Section ClassDef.
@@ -141,7 +141,7 @@ Module Export BackwardCompatEq.
   End Equality.
 
   (* TODO: build this in HB *)
-  Coercion Equality.eq_axioms_mixin : eqtype.Equality.axioms >-> eq_axioms.axioms_.
+  Coercion Equality.is_eqType_mixin : eqtype.Equality.axioms >-> is_eqType.axioms_.
 End BackwardCompatEq.
 Import eqtype.Equality.
 
@@ -165,7 +165,7 @@ Notation "[ 'eqType' 'of' T ]" := (@Equality.clone T _ _ id id)
 (* comparison function, and so is incompatible with PcanEqMixin and the like  *)
 (* - this is why the tree_eqMixin for GenTree.tree in library choice is not   *)
 (* declared Canonical.                                                        *)
-Lemma eqE T x : eq_op x = eq_axioms.eq_op (Equality.class T) x.
+Lemma eqE T x : eq_op x = is_eqType.eq_op (Equality.class T) x.
 Proof. by []. Qed.
 
 Arguments eqP {T x y} : rename.
@@ -313,7 +313,7 @@ Module Export EqTypePred := MakeEqTypePred eqtype.Equality.
 Lemma unit_eqP : Equality.axiom (fun _ _ : unit => true).
 Proof. by do 2!case; left. Qed.
 
-HB.instance Definition unit_eqMixin := eq_axioms.Build unit unit_eqP.
+HB.instance Definition unit_eqMixin := is_eqType.Build unit unit_eqP.
 
 (* Comparison for booleans. *)
 
@@ -323,7 +323,7 @@ Definition eqb b := addb (~~ b).
 Lemma eqbP : Equality.axiom eqb.
 Proof. by do 2!case; constructor. Qed.
 
-HB.instance Definition bool_eqMixin := eq_axioms.Build bool eqbP.
+HB.instance Definition bool_eqMixin := is_eqType.Build bool eqbP.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
@@ -754,7 +754,7 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-HB.instance Definition sub_eqMixin := eq_axioms.Build (sub_sort sT) val_eqP.
+HB.instance Definition sub_eqMixin := is_eqType.Build (sub_sort sT) val_eqP.
 
 Definition SubEqMixin :=
   (let: SubType _ v _ _ _ as sT' := sT
