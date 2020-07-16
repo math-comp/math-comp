@@ -780,8 +780,7 @@ Section SigEqType.
 Variables (T : eqType) (P : pred T).
 
 Definition sig_eqMixin := Eval hnf in [eqMixin of {x | P x} by <:].
-#[verbose] HB.instance ({x | is_true (P x)}) sig_eqMixin.
-Canonical sig_eqType := Eval hnf in EqType {x | P x} sig_eqMixin.
+HB.instance ({x | is_true (P x)}) sig_eqMixin.
 
 End SigEqType.
 
@@ -798,7 +797,7 @@ by do 2!move/eqP->.
 Qed.
 
 Canonical prod_eqMixin := EqMixin pair_eqP.
-Canonical prod_eqType := Eval hnf in EqType (T1 * T2) prod_eqMixin.
+HB.instance ((Equality.sort T1 * Equality.sort T2)%type) prod_eqMixin.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
 
@@ -836,7 +835,7 @@ case=> [x|] [y|] /=; by [constructor | apply: (iffP eqP) => [|[]] ->].
 Qed.
 
 Canonical option_eqMixin := EqMixin opt_eqP.
-Canonical option_eqType := Eval hnf in EqType (option T) option_eqMixin.
+HB.instance (option (Equality.sort T)) option_eqMixin.
 
 End OptionEqType.
 
@@ -874,7 +873,7 @@ by apply: (iffP eqP) => [->|<-]; rewrite tagged_asE.
 Qed.
 
 Canonical tag_eqMixin := EqMixin tag_eqP.
-Canonical tag_eqType := Eval hnf in EqType {i : I & T_ i} tag_eqMixin.
+HB.instance ({i : Equality.sort I & Equality.sort (T_ i)}) tag_eqMixin.
 
 Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 
@@ -904,7 +903,7 @@ Lemma sum_eqP : Equality.axiom sum_eq.
 Proof. case=> x [] y /=; by [right | apply: (iffP eqP) => [->|[->]]]. Qed.
 
 Canonical sum_eqMixin := EqMixin sum_eqP.
-Canonical sum_eqType := Eval hnf in EqType (T1 + T2) sum_eqMixin.
+HB.instance ((Equality.sort T1 + Equality.sort T2)%type) sum_eqMixin.
 
 Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 

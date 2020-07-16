@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
+From HB Require Import structures.
 
 (******************************************************************************)
 (* The seq type is the ssreflect type for sequences; it is an alias for the   *)
@@ -991,7 +992,7 @@ by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
 Canonical seq_eqMixin := EqMixin eqseqP.
-Canonical seq_eqType := Eval hnf in EqType (seq T) seq_eqMixin.
+HB.instance (seq (Equality.sort T)) seq_eqMixin.
 
 Lemma eqseqE : eqseq = eq_op. Proof. by []. Qed.
 

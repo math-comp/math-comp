@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+From HB Require Import structures.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)
@@ -201,8 +202,11 @@ End Def.
 End GenTree.
 Arguments GenTree.codeK : clear implicits.
 
-Definition tree_eqMixin (T : eqType) := PcanEqMixin (GenTree.codeK T).
-Canonical tree_eqType (T : eqType) := EqType (GenTree.tree T) (tree_eqMixin T).
+Section Gentree.
+Variable (T : eqType).
+Definition tree_eqMixin := PcanEqMixin (GenTree.codeK T).
+HB.instance (GenTree.tree (Equality.sort T)) tree_eqMixin.
+End Gentree.
 
 (* Structures for Types with a choice function, and for Types with countably  *)
 (* many elements. The two concepts are closely linked: we indeed make         *)
@@ -408,8 +412,7 @@ Section SubChoice.
 Variables (P : pred T) (sT : subType P).
 
 Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
-Definition sub_choiceClass := @Choice.Class sT (sub_eqMixin sT) sub_choiceMixin.
-Canonical sub_choiceType := Choice.Pack sub_choiceClass.
+(* HB.instance (@sub_sort (Choice.sort T) P sT) sub_choiceMixin. *)
 
 End SubChoice.
 
@@ -432,7 +435,7 @@ elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
 rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
 by case: find => /=.
 Qed.
-Canonical seq_choiceType := Eval hnf in ChoiceType (seq T) seq_choiceMixin.
+#[verbose] HB.instance (seq (Choice.sort T)) seq_choiceMixin.
 
 End OneType.
 
