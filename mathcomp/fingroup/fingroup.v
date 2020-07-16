@@ -440,8 +440,8 @@ Lemma expg1 x : x ^+ 1 = x. Proof. by []. Qed.
 Lemma expgS x n : x ^+ n.+1 = x * x ^+ n.
 Proof. by case: n => //; rewrite mulg1. Qed.
 
-Lemma expg1n n : 1 ^+ n = 1 :> T.
-Proof. by elim: n => // n IHn; rewrite expgS mul1g. Qed.
+Lemma expg1n : left_zero (1 : T) expgn.
+Proof. by elim=> // n IHn; rewrite expgS mul1g. Qed.
 
 Lemma expgD x n m : x ^+ (n + m) = x ^+ n * x ^+ m.
 Proof. by elim: n => [|n IHn]; rewrite ?mul1g // !expgS IHn mulgA. Qed.
@@ -455,8 +455,8 @@ elim: m => [|m IHm]; first by rewrite muln0 expg0.
 by rewrite mulnS expgD IHm expgS.
 Qed.
 
-Lemma expgAC x m n : x ^+ m ^+ n = x ^+ n ^+ m.
-Proof. by rewrite -!expgM mulnC. Qed.
+Lemma expgAC : right_commutative (@expgn T).
+Proof. by move=> x m n; rewrite -!expgM mulnC. Qed.
 
 Definition commute x y := x * y = y * x.
 
@@ -545,14 +545,14 @@ Proof. by rewrite mulKVg. Qed.
 Lemma conjgCV x y : x * y = y ^ x^-1 * x.
 Proof. by rewrite -mulgA mulgKV invgK. Qed.
 
-Lemma conjg1 x : x ^ 1 = x.
-Proof. by rewrite conjgE commute1 mulKg. Qed.
+Lemma conjg1 : right_id (1 : T) conjg.
+Proof. by move=> x; rewrite conjgE commute1 mulKg. Qed.
 
-Lemma conj1g x : 1 ^ x = 1.
-Proof. by rewrite conjgE mul1g mulVg. Qed.
+Lemma conj1g : left_zero (1 : T) conjg.
+Proof. by move=> x; rewrite conjgE mul1g mulVg. Qed.
 
-Lemma conjMg x y z : (x * y) ^ z = x ^ z * y ^ z.
-Proof. by rewrite !conjgE !mulgA mulgK. Qed.
+Lemma conjMg : left_distributive (@conjg T) mulg.
+Proof. by move=> x y z; rewrite !conjgE !mulgA mulgK. Qed.
 
 Lemma conjgM x y z : x ^ (y * z) = (x ^ y) ^ z.
 Proof. by rewrite !conjgE invMg !mulgA. Qed.
@@ -560,8 +560,8 @@ Proof. by rewrite !conjgE invMg !mulgA. Qed.
 Lemma conjVg x y : x^-1 ^ y = (x ^ y)^-1.
 Proof. by rewrite !conjgE !invMg invgK mulgA. Qed.
 
-Lemma conjJg x y z : (x ^ y) ^ z = (x ^ z) ^ y ^ z.
-Proof. by rewrite 2!conjMg conjVg. Qed.
+Lemma conjJg : left_distributive (@conjg T) conjg.
+Proof. by move=> x y z; rewrite 2!conjMg conjVg. Qed.
 
 Lemma conjXg x y n : (x ^+ n) ^ y = (x ^ y) ^+ n.
 Proof. by elim: n => [|n IHn]; rewrite ?conj1g // !expgS conjMg IHn. Qed.
@@ -595,8 +595,8 @@ Proof. by rewrite -mulgA !mulKVg. Qed.
 Lemma commgCV x y : x * y = [~ x^-1, y^-1] * (y * x).
 Proof. by rewrite commgEl !mulgA !invgK !mulgKV. Qed.
 
-Lemma conjRg x y z : [~ x, y] ^ z = [~ x ^ z, y ^ z].
-Proof. by rewrite !conjMg !conjVg. Qed.
+Lemma conjRg : left_distributive (@conjg T) commg.
+Proof. by move=> x y z; rewrite !conjMg !conjVg. Qed.
 
 Lemma invg_comm x y : [~ x, y]^-1 = [~ y, x].
 Proof. by rewrite commgEr conjVg invMg invgK. Qed.
@@ -610,11 +610,11 @@ Proof. by rewrite -eq_mulVg1 eq_sym; apply: eqP. Qed.
 Lemma commg1_sym x y : ([~ x, y] == 1 :> T) = ([~ y, x] == 1 :> T).
 Proof. by rewrite -invg_comm (inv_eq invgK) invg1. Qed.
 
-Lemma commg1 x : [~ x, 1] = 1.
-Proof. exact/eqP/commgP. Qed.
+Lemma commg1 : right_zero (1 : T) commg.
+Proof. by move=> x; exact/eqP/commgP. Qed.
 
-Lemma comm1g x : [~ 1, x] = 1.
-Proof. by rewrite -invg_comm commg1 invg1. Qed.
+Lemma comm1g : left_zero (1 : T) commg.
+Proof. by move=> x; rewrite -invg_comm commg1 invg1. Qed.
 
 Lemma commgg x : [~ x, x] = 1.
 Proof. exact/eqP/commgP. Qed.
@@ -622,8 +622,8 @@ Proof. exact/eqP/commgP. Qed.
 Lemma commgXg x n : [~ x, x ^+ n] = 1.
 Proof. exact/eqP/commgP/commuteX. Qed.
 
-Lemma commgVg x : [~ x, x^-1] = 1.
-Proof. exact/eqP/commgP/commuteV. Qed.
+Lemma commgVg : right_inverse (1 : T) invg commg.
+Proof. move=> x; exact/eqP/commgP/commuteV. Qed.
 
 Lemma commgXVg x n : [~ x, x ^- n] = 1.
 Proof. exact/eqP/commgP/commuteV/commuteX. Qed.
@@ -895,10 +895,10 @@ Proof. by move=> B1; rewrite -{1}(mulg1 A) mulgS ?sub1set. Qed.
 Lemma mulg_subr A B : 1 \in A -> B \subset A * B.
 Proof. by move=> A1; rewrite -{1}(mul1g B) mulSg ?sub1set. Qed.
 
-Lemma mulUg A B C : (A :|: B) * C = (A * C) :|: (B * C).
+Lemma mulUg : left_distributive mulg (@setU gT).
 Proof. exact: imset2Ul. Qed.
 
-Lemma mulgU A B C : A * (B :|: C) = (A * B) :|: (A * C).
+Lemma mulgU : right_distributive mulg (@setU gT).
 Proof. exact: imset2Ur. Qed.
 
 (* Set (pointwise) inverse. *)
@@ -1099,17 +1099,17 @@ Proof. by rewrite -(conjSg _ B x) conjsgKV. Qed.
 Lemma conjg_set1 x y : [set x] :^ y = [set x ^ y].
 Proof. by rewrite [_ :^ _]imset_set1. Qed.
 
-Lemma conjs1g x : 1 :^ x = 1.
-Proof. by rewrite conjg_set1 conj1g. Qed.
+Lemma conjs1g : left_zero 1 (@conjugate gT).
+Proof. by move=> x; rewrite conjg_set1 conj1g. Qed.
 
 Lemma conjsg_eq1 A x : (A :^ x == 1%g) = (A == 1%g).
 Proof. by rewrite (canF_eq (conjsgK x)) conjs1g. Qed.
 
-Lemma conjsMg A B x : (A * B) :^ x = A :^ x * B :^ x.
-Proof. by rewrite !conjsgE !mulgA rcosetK. Qed.
+Lemma conjsMg : left_distributive (@conjugate gT) mulg.
+Proof. by move=> A B x; rewrite !conjsgE !mulgA rcosetK. Qed.
 
-Lemma conjIg A B x : (A :&: B) :^ x = A :^ x :&: B :^ x.
-Proof. by rewrite !conjg_preim preimsetI. Qed.
+Lemma conjIg : left_distributive conjugate (@setI gT).
+Proof. by move=> A B x; rewrite !conjg_preim preimsetI. Qed.
 
 Lemma conj0g x : set0 :^ x = set0.
 Proof. exact: imset0. Qed.
@@ -2201,8 +2201,8 @@ Proof.
 by apply/eqP; rewrite eqEsubset sub_conjg !gen_subG conjSg -?sub_conjg !sub_gen.
 Qed.
 
-Lemma conjYg A B z : (A <*> B) :^z = A :^ z <*> B :^ z.
-Proof. by rewrite -genJ conjUg. Qed.
+Lemma conjYg : left_distributive conjugate (@joing gT).
+Proof. by move=> A B z; rewrite -genJ conjUg. Qed.
 
 Lemma genD1 A x : x \in <<A :\ x>> -> <<A :\ x>> = <<A>>.
 Proof.
@@ -2351,16 +2351,16 @@ Proof.
 by move=> sAG sBG; apply: subset_trans (der1_subG G); apply: commgSS.
 Qed.
 
-Lemma commGC A B : [~: A, B] = [~: B, A].
+Lemma commGC : commutative (@commutator gT).
 Proof.
-rewrite -[[~: A, B]]genV; congr <<_>>; apply/setP=> z; rewrite inE.
+move=> A B; rewrite -[[~: A, B]]genV; congr <<_>>; apply/setP=> z; rewrite inE.
 by apply/imset2P/imset2P=> [] [x y Ax Ay]; last rewrite -{1}(invgK z);
   rewrite -invg_comm => /invg_inj->; exists y x.
 Qed.
 
-Lemma conjsRg A B x : [~: A, B] :^ x = [~: A :^ x, B :^ x].
+Lemma conjsRg : left_distributive conjugate (@commutator gT).
 Proof.
-wlog suffices: A B x / [~: A, B] :^ x \subset [~: A :^ x, B :^ x].
+move=> A B x; wlog suffices: A B x / [~: A, B] :^ x \subset [~: A :^ x, B :^ x].
   move=> subJ; apply/eqP; rewrite eqEsubset subJ /= -sub_conjgV.
   by rewrite -{2}(conjsgK x A) -{2}(conjsgK x B).
 rewrite -genJ gen_subG; apply/subsetP=> _ /imsetP[_ /imset2P[y z Ay Bz ->] ->].

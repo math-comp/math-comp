@@ -89,10 +89,8 @@ Proof.
 by rewrite {3}[d]intEsign !mulr_sign; case: ifP => -> //; rewrite divzN opprK.
 Qed.
 
-Lemma div0z d : (0 %/ d)%Z = 0.
-Proof.
-by rewrite -(canLR (signrMK _) (divz_abs _ _)) (divz_nat 0) div0n mulr0.
-Qed.
+Lemma div0z : left_zero 0 divz.
+Proof. by move=> d; rewrite /divz /= div0n mulr0. Qed.
 
 Lemma divNz_nat m d : (d > 0)%N -> (Negz m %/ d)%Z = - (m %/ d).+1%:Z.
 Proof. by case: d => // d _; apply: mul1r. Qed.
@@ -126,7 +124,10 @@ by rewrite lez_nat ltn_mod.
 Qed.
 
 Lemma divz0 m : (m %/ 0)%Z = 0. Proof. by case: m. Qed.
-Lemma mod0z d : (0 %% d)%Z = 0. Proof. by rewrite /modz div0z mul0r subrr. Qed.
+
+Lemma mod0z : left_zero 0 modz.
+Proof. by move=> d; rewrite /modz div0z mul0r subrr. Qed.
+
 Lemma modz0 m : (m %% 0)%Z = m. Proof. by rewrite /modz mulr0 subr0. Qed.
 
 Lemma divz_small m d : 0 <= m < `|d|%:Z -> (m %/ d)%Z = 0.
@@ -271,8 +272,8 @@ Proof. by rewrite -{1}[d]mul1r modzMDl. Qed.
 Lemma modzDr m d : (m + d = m %[mod d])%Z.
 Proof. by rewrite addrC modzDl. Qed.
 
-Lemma modzz d : (d %% d)%Z = 0.
-Proof. by rewrite -{1}[d]addr0 modzDl mod0z. Qed.
+Lemma modzz : self_inverse 0 modz.
+Proof. by move=> d; rewrite -{1}[d]addr0 modzDl mod0z. Qed.
 
 Lemma modzMl p d : (p * d %% d)%Z = 0.
 Proof. by rewrite -[p * d]addr0 modzMDl mod0z. Qed.

@@ -283,24 +283,22 @@ Definition seqn := seqn_rec id.
 Fixpoint cat s1 s2 := if s1 is x :: s1' then x :: s1' ++ s2 else s2
 where "s1 ++ s2" := (cat s1 s2) : seq_scope.
 
-Lemma cat0s s : [::] ++ s = s. Proof. by []. Qed.
+Lemma cat0s : left_id [::] cat. Proof. by []. Qed.
 Lemma cat1s x s : [:: x] ++ s = x :: s. Proof. by []. Qed.
 Lemma cat_cons x s1 s2 : (x :: s1) ++ s2 = x :: s1 ++ s2. Proof. by []. Qed.
 
 Lemma cat_nseq n x s : nseq n x ++ s = ncons n x s.
 Proof. by elim: n => //= n ->. Qed.
 
-Lemma nseqD n1 n2 x : nseq (n1 + n2) x = nseq n1 x ++ nseq n2 x.
-Proof. by rewrite cat_nseq /nseq /ncons iterD. Qed.
+Lemma nseqD x : {morph nseq^~ x : n1 n2 / n1 + n2 >-> n1 ++ n2}.
+Proof. by move=> n1 n2; rewrite cat_nseq /nseq /ncons iterD. Qed.
 
-Lemma cats0 s : s ++ [::] = s.
-Proof. by elim: s => //= x s ->. Qed.
+Lemma cats0 : right_id [::] cat. Proof. by elim=> //= x s ->. Qed.
 
-Lemma catA s1 s2 s3 : s1 ++ s2 ++ s3 = (s1 ++ s2) ++ s3.
-Proof. by elim: s1 => //= x s1 ->. Qed.
+Lemma catA : associative cat. Proof. by elim=> //= ? ? IH ? ?; rewrite IH. Qed.
 
-Lemma size_cat s1 s2 : size (s1 ++ s2) = size s1 + size s2.
-Proof. by elim: s1 => //= x s1 ->. Qed.
+Lemma size_cat : {morph size : s1 s2 / s1 ++ s2 >-> s1 + s2}.
+Proof. by elim=> //= _ ? IH ?; rewrite IH. Qed.
 
 Lemma cat_nilp s1 s2 : nilp (s1 ++ s2) = nilp s1 && nilp s2.
 Proof. by case: s1. Qed.
@@ -333,8 +331,8 @@ Proof. by elim: s x => [|y s IHs] x //=; rewrite IHs. Qed.
 Lemma last_cat x s1 s2 : last x (s1 ++ s2) = last (last x s1) s2.
 Proof. by elim: s1 x => [|y s1 IHs] x //=; rewrite IHs. Qed.
 
-Lemma last_rcons x s z : last x (rcons s z) = z.
-Proof. by rewrite -cats1 last_cat. Qed.
+Lemma last_rcons x s : cancel (rcons s) (last x).
+Proof. by move=> z; rewrite -cats1 last_cat. Qed.
 
 Lemma belast_cat x s1 s2 :
   belast x (s1 ++ s2) = belast x s1 ++ belast (last x s1) s2.
@@ -542,8 +540,8 @@ Proof. by elim: s i => //= x s IHs; case: ifP => // a'x [|i] // /(IHs i). Qed.
 Lemma hasNfind s : ~~ has s -> find s = size s.
 Proof. by rewrite has_find; case: ltngtP (find_size s). Qed.
 
-Lemma filter_cat s1 s2 : filter (s1 ++ s2) = filter s1 ++ filter s2.
-Proof. by elim: s1 => //= x s1 ->; case (a x). Qed.
+Lemma filter_cat : {morph filter : s1 s2 / s1 ++ s2}.
+Proof. by elim=> //= x s1 IHs1 s2; rewrite IHs1; case: ifP. Qed.
 
 Lemma filter_rcons s x :
   filter (rcons s x) = if a x then rcons (filter s) x else filter s.
@@ -983,11 +981,11 @@ Lemma rcons_inj s1 s2 x1 x2 :
   rcons s1 x1 = rcons s2 x2 :> seq T -> (s1, x1) = (s2, x2).
 Proof. by rewrite -!rot1_cons => /rot_inj[-> ->]. Qed.
 
-Lemma rcons_injl x : injective (rcons^~ x).
-Proof. by move=> s1 s2 /rcons_inj[]. Qed.
+Lemma rcons_injl : left_injective (@rcons T).
+Proof. by move=> x s1 s2 /rcons_inj[]. Qed.
 
-Lemma rcons_injr s : injective (rcons s).
-Proof. by move=> x1 x2 /rcons_inj[]. Qed.
+Lemma rcons_injr : right_injective (@rcons T).
+Proof. by move=> s x1 x2 /rcons_inj[]. Qed.
 
 End RotRcons.
 
@@ -2741,8 +2739,8 @@ End EqPmapSub.
 
 Fixpoint iota m n := if n is n'.+1 then m :: iota m.+1 n' else [::].
 
-Lemma size_iota m n : size (iota m n) = n.
-Proof. by elim: n m => //= n IHn m; rewrite IHn. Qed.
+Lemma size_iota m : cancel (iota m) size.
+Proof. by move=> n; elim: n m => //= n IHn m; rewrite IHn. Qed.
 
 Lemma iotaD m n1 n2 : iota m (n1 + n2) = iota m n1 ++ iota (m + n1) n2.
 Proof. by elim: n1 m => [|n1 IHn1] m; rewrite ?addn0 // -addSnnS /= -IHn1. Qed.
@@ -2802,8 +2800,8 @@ Variables (T : Type) (x0 : T).
 
 Definition mkseq f n : seq T := map f (iota 0 n).
 
-Lemma size_mkseq f n : size (mkseq f n) = n.
-Proof. by rewrite size_map size_iota. Qed.
+Lemma size_mkseq f : cancel (mkseq f) size.
+Proof. by move=> n; rewrite size_map size_iota. Qed.
 
 Lemma eq_mkseq f g : f =1 g -> mkseq f =1 mkseq g.
 Proof. by move=> Efg n; apply: eq_map Efg _. Qed.

@@ -90,7 +90,7 @@ Require Export Ring.
 (*   V (infix) -- disjunction, as in                                          *)
 (*      leq_eqVlt : (m <= n) = (m == n) || (m < n).                           *)
 (*   X - exponentiation, as in lognX : logn p (m ^ n) = logn p m * n in       *)
-(*         file prime.v (the suffix is not used in this file).                 *)
+(*         file prime.v (the suffix is not used in this file).                *)
 (* Suffixes that abbreviate operations (D, B, M and X) are used to abbreviate *)
 (* second-rank operations in equational lemma names that describe left-hand   *)
 (* sides (e.g., mulnDl); they are not used to abbreviate the main operation   *)
@@ -1156,14 +1156,14 @@ Proof. by rewrite iter_muln muln1. Qed.
 
 Lemma exp0n n : 0 < n -> 0 ^ n = 0. Proof. by case: n => [|[]]. Qed.
 
-Lemma exp1n n : 1 ^ n = 1.
-Proof. by elim: n => // n; rewrite expnS mul1n. Qed.
+Lemma exp1n : left_zero 1 expn.
+Proof. by elim=> // n; rewrite expnS mul1n. Qed.
 
 Lemma expnD m n1 n2 : m ^ (n1 + n2) = m ^ n1 * m ^ n2.
 Proof. by elim: n1 => [|n1 IHn]; rewrite !(mul1n, expnS) // IHn mulnA. Qed.
 
-Lemma expnMn m1 m2 n : (m1 * m2) ^ n = m1 ^ n * m2 ^ n.
-Proof. by elim: n => // n IHn; rewrite !expnS IHn -!mulnA (mulnCA m2). Qed.
+Lemma expnMn : left_distributive expn muln.
+Proof. by move=> m1 m2; elim=> // n IHn; rewrite !expnS IHn mulnACA. Qed.
 
 Lemma expnM m n1 n2 : m ^ (n1 * n2) = (m ^ n1) ^ n2.
 Proof.
@@ -1171,8 +1171,8 @@ elim: n1 => [|n1 IHn]; first by rewrite exp1n.
 by rewrite expnD expnS expnMn IHn.
 Qed.
 
-Lemma expnAC m n1 n2 : (m ^ n1) ^ n2 = (m ^ n2) ^ n1.
-Proof. by rewrite -!expnM mulnC. Qed.
+Lemma expnAC : right_commutative expn.
+Proof. by move=> m n1 n2; rewrite -!expnM mulnC. Qed.
 
 Lemma expn_gt0 m n : (0 < m ^ n) = (0 < m) || (n == 0).
 Proof.
@@ -1376,8 +1376,7 @@ Proof. by elim=> //= n ->. Qed.
 Definition half_double := doubleK.
 Definition double_inj := can_inj doubleK.
 
-Lemma uphalf_double n : uphalf n.*2 = n.
-Proof. by elim: n => //= n ->. Qed.
+Lemma uphalf_double : cancel double uphalf. Proof. by elim=> //= n ->. Qed.
 
 Lemma uphalf_half n : uphalf n = odd n + n./2.
 Proof. by elim: n => //= n ->; rewrite addnA addn_negb. Qed.

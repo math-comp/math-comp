@@ -1447,8 +1447,8 @@ Lemma traject_iteri x n :
   traject x n = iteri n (fun i => rcons^~ (iter i f x)) [::].
 Proof. by elim: n => //= n <-; rewrite -trajectSr. Qed.
 
-Lemma size_traject x n : size (traject x n) = n.
-Proof. by elim: n x => //= n IHn x //=; rewrite IHn. Qed.
+Lemma size_traject x : cancel (traject x) size.
+Proof. by move=> n; elim: n x => //= n IHn x; rewrite IHn. Qed.
 
 Lemma nth_traject i n : i < n -> forall x, nth x (traject x n) i = iter i f x.
 Proof.

@@ -3718,8 +3718,8 @@ Proof. by move=> x y z; rewrite !meetA [X in X `&` _]meetC. Qed.
 Lemma meetACA : interchange (@meet _ L) (@meet _ L).
 Proof. by move=> x y z t; rewrite !meetA [X in X `&` _]meetAC. Qed.
 
-Lemma meetxx x : x `&` x = x.
-Proof. by rewrite -[X in _ `&` X](meetKU x) joinKI. Qed.
+Lemma meetxx : idempotent (@meet _ L).
+Proof. by move=> x; rewrite -[X in _ `&` X](meetKU x) joinKI. Qed.
 
 Lemma meetKI y x : x `&` (x `&` y) = x `&` y.
 Proof. by rewrite meetA meetxx. Qed.
@@ -3792,7 +3792,7 @@ Proof. exact: (@meetCA _ [latticeType of L^d]). Qed.
 Lemma joinACA : interchange (@join _ L) (@join _ L).
 Proof. exact: (@meetACA _ [latticeType of L^d]). Qed.
 
-Lemma joinxx x : x `|` x = x.
+Lemma joinxx : idempotent (@join _ L).
 Proof. exact: (@meetxx _ [latticeType of L^d]). Qed.
 
 Lemma joinKU y x : x `|` (x `|` y) = x `|` y.
@@ -4603,7 +4603,8 @@ Lemma leBx x y : x `\` y <= x.
 Proof. by rewrite -{2}[x](joinIB y) lexU2 // lexx orbT. Qed.
 Hint Resolve leBx : core.
 
-Lemma subxx x : x `\` x = 0. Proof. by have := subKI x x; rewrite meet_r. Qed.
+Lemma subxx : self_inverse (0 : L) sub.
+Proof. by move=> x; have := subKI x x; rewrite meet_r. Qed.
 
 Lemma leBl z x y : x <= y -> x `\` z <= y `\` z.
 Proof.
@@ -4632,9 +4633,9 @@ apply/idP/idP; first by move=> /join_r <-; rewrite joinA subKU joinAC leUr.
 by rewrite -{1}[x](joinIB y) => /(leU2r_le (subIK _ _)).
 Qed.
 
-Lemma subUx x y z : (x `|` y) `\` z = (x `\` z) `|` (y `\` z).
+Lemma subUx : @left_distributive L L sub join.
 Proof.
-apply/eqP; rewrite eq_le leUx !leBl ?leUr ?leUl ?andbT //.
+move=> x y z; apply/eqP; rewrite eq_le leUx !leBl ?leUr ?leUl ?andbT //.
 by rewrite leBLR joinA subKU joinAC subKU joinAC -joinA leUr.
 Qed.
 
@@ -4675,15 +4676,15 @@ rewrite leBRL leIx2 ?leBx //= meetUr meetAC subIK -meetA subIK.
 by rewrite meet0x meetx0 joinx0.
 Qed.
 
-Lemma subx0 x : x `\` 0 = x.
-Proof. by apply/eqP; rewrite eq_sub join0x meetx0 lexx eqxx. Qed.
+Lemma subx0 : right_id (0 : L) sub.
+Proof. by move=> x; apply/eqP; rewrite eq_sub join0x meetx0 lexx eqxx. Qed.
 
-Lemma sub0x x : 0 `\` x = 0.
-Proof. by apply/eqP; rewrite eq_sub joinx0 meet0x lexx eqxx le0x. Qed.
+Lemma sub0x : left_zero (0 : L) sub.
+Proof. by move=> x; apply/eqP; rewrite eq_sub joinx0 meet0x lexx eqxx le0x. Qed.
 
-Lemma subIx x y z : (x `&` y) `\` z = (x `\` z) `&` (y `\` z).
+Lemma subIx : @left_distributive L L sub meet.
 Proof.
-apply/eqP; rewrite eq_sub joinIr ?leI2 ?subKU ?leUr ?leBx //=.
+move=> x y z; apply/eqP; rewrite eq_sub joinIr ?leI2 ?subKU ?leUr ?leBx //=.
 by rewrite -meetA subIK meetx0.
 Qed.
 
@@ -4774,17 +4775,17 @@ Proof. by rewrite !complE subxU. Qed.
 Lemma complI  x y : ~` (x `&` y) = ~` x `|` ~` y.
 Proof. by rewrite !complE subxI. Qed.
 
-Lemma joinxC  x :  x `|` ~` x = 1.
-Proof. by rewrite complE subKU joinx1. Qed.
+Lemma joinxC : right_inverse (1 : L) compl join.
+Proof. by move=> x; rewrite complE subKU joinx1. Qed.
 
-Lemma joinCx  x : ~` x `|` x = 1.
-Proof. by rewrite joinC joinxC. Qed.
+Lemma joinCx : left_inverse (1 : L) compl join.
+Proof. by move=> x; rewrite joinC joinxC. Qed.
 
-Lemma meetxC  x :  x `&` ~` x = 0.
-Proof. by rewrite complE subKI. Qed.
+Lemma meetxC : right_inverse (0 : L) compl meet.
+Proof. by move=> x; rewrite complE subKI. Qed.
 
-Lemma meetCx  x : ~` x `&` x = 0.
-Proof. by rewrite meetC meetxC. Qed.
+Lemma meetCx : left_inverse (0 : L) compl meet.
+Proof. by move=> x; rewrite meetC meetxC. Qed.
 
 Lemma compl1 : ~` 1 = 0 :> L.
 Proof. by rewrite complE subxx. Qed.
@@ -5918,8 +5919,8 @@ Section NatDvd.
 
 Implicit Types m n p : nat.
 
-Lemma lcmnn n : lcmn n n = n.
-Proof. by case: n => // n; rewrite /lcmn gcdnn mulnK. Qed.
+Lemma lcmnn : idempotent lcmn.
+Proof. by case=> // n; rewrite /lcmn gcdnn mulnK. Qed.
 
 Lemma le_def m n : m %| n = (gcdn m n == m)%N.
 Proof. by apply/gcdn_idPl/eqP. Qed.
@@ -7013,8 +7014,8 @@ Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetA ih. Qed.
 Fact joinA : associative join.
 Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite joinA ih. Qed.
 
-Fact meetss s : meet s s = s.
-Proof. by elim: s => [|? ? ih] //=; rewrite meetxx ih. Qed.
+Fact meetss : idempotent meet.
+Proof. by elim=> [|? ? ih] //=; rewrite meetxx ih. Qed.
 
 Fact joinKI y x : meet x (join x y) = x.
 Proof.

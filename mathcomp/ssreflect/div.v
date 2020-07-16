@@ -84,9 +84,9 @@ Proof. by rewrite /divn modn_def; case: (edivn m d). Qed.
 Lemma divn_eq m d : m = m %/ d * d + m %% d.
 Proof. by rewrite /divn modn_def; case: edivnP. Qed.
 
-Lemma div0n d : 0 %/ d = 0. Proof. by case: d. Qed.
+Lemma div0n : left_zero 0 divn. Proof. by case. Qed.
 Lemma divn0 m : m %/ 0 = 0. Proof. by []. Qed.
-Lemma mod0n d : 0 %% d = 0. Proof. by case: d. Qed.
+Lemma mod0n : left_zero 0 modn. Proof. by case. Qed.
 Lemma modn0 m : m %% 0 = m. Proof. by []. Qed.
 
 Lemma divn_small m d : m < d -> m %/ d = 0.
@@ -245,8 +245,8 @@ rewrite [in RHS](divn_eq m (n.+1 * p.+1)) mulnA mulnAC !divnMDl //.
 by rewrite [_ %/ p.+1]divn_small ?addn0 // ltn_divLR // mulnC ltn_mod.
 Qed.
 
-Lemma divnAC m n p : m %/ n %/ p =  m %/ p %/ n.
-Proof. by rewrite -!divnMA mulnC. Qed.
+Lemma divnAC : right_commutative divn.
+Proof. by move=> m n p; rewrite -!divnMA mulnC. Qed.
 
 Lemma modn_small m d : m < d -> m %% d = m.
 Proof. by move=> lt_md; rewrite [RHS](divn_eq m d) divn_small. Qed.
@@ -260,14 +260,14 @@ have [->|d_gt0] := posnP d; first by rewrite muln0.
 by rewrite [in LHS](divn_eq m d) addnA -mulnDl modn_def edivn_eq // ltn_mod.
 Qed.
 
-Lemma muln_modr p m d : p * (m %% d) = (p * m) %% (p * d).
+Lemma muln_modr : right_distributive muln modn.
 Proof.
-have [->//|p_gt0] := posnP p; apply: (@addnI (p * (m %/ d * d))).
+move=> p m d; have [->//|p_gt0] := posnP p; apply: (@addnI (p * (m %/ d * d))).
 by rewrite -mulnDr -divn_eq mulnCA -(divnMl p_gt0) -divn_eq.
 Qed.
 
-Lemma muln_modl p m d : (m %% d) * p = (m * p) %% (d * p).
-Proof. by rewrite -!(mulnC p); apply: muln_modr. Qed.
+Lemma muln_modl : left_distributive muln modn.
+Proof. by move=> m d p; rewrite -!(mulnC p); apply: muln_modr. Qed.
 
 Lemma modn_divl m n d : (m %/ d) %% n = m %% (n * d) %/ d.
 Proof.
@@ -282,7 +282,8 @@ Proof. by rewrite -[m %% _](modnMDl 1) mul1n. Qed.
 
 Lemma modnDr m d : m + d = m %[mod d]. Proof. by rewrite addnC modnDl. Qed.
 
-Lemma modnn d : d %% d = 0. Proof. by rewrite [d %% d](modnDr 0) mod0n. Qed.
+Lemma modnn : self_inverse 0 modn.
+Proof. by move=> d; rewrite [d %% d](modnDr 0) mod0n. Qed.
 
 Lemma modnMl p d : p * d %% d = 0.
 Proof. by rewrite -[p * d]addn0 modnMDl mod0n. Qed.
