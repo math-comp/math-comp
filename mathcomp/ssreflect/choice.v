@@ -408,7 +408,7 @@ Section SubChoice.
 Variables (P : pred T) (sT : subType P).
 
 Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
-(* HB.instance (@sub_sort (Choice.sort T) P sT) sub_choiceMixin. *)
+HB.instance (@sub_sort (Choice.sort T) P sT) sub_choiceMixin.
 
 End SubChoice.
 
@@ -523,71 +523,70 @@ Notation "[ 'choiceMixin' 'of' T 'by' <: ]" :=
   (sub_choiceMixin _ : choiceMixin T)
   (at level 0, format "[ 'choiceMixin'  'of'  T  'by'  <: ]") : form_scope.
 
-Module Countable.
-
-Record mixin_of (T : Type) : Type := Mixin {
+HB.mixin Record is_countable (T : Type) : Type := {
   pickle : T -> nat;
   unpickle : nat -> option T;
   pickleK : pcancel pickle unpickle
 }.
 
-Definition EqMixin T m := PcanEqMixin (@pickleK T m).
-Definition ChoiceMixin T m := PcanChoiceMixin (@pickleK T m).
+(* [TODO1] Idea: don't alias, and use directly the mixin as the type of f, in that
+   case the redundancy check of #49 should be relaxed.
+   Moreover if we alias, we have to make an alias for each "target" while
+   we could just one a single builder section. *)
+HB.factory Definition equality_of_countable T := is_countable T.
+HB.builders Context T (f : equality_of_countable T).
 
-Section ClassDef.
+  Definition eqType : is_eqType T :=
+    PcanEqMixin (is_countable.pickleK f). (* TODO: when the factory is an alias we have to shadow axioms *)
+  HB.instance T eqType. (* TODO: even if eqType is not built with a builder, its type
+                          annotation give us enough info (the key and the mixin) *)
 
-Record class_of T := Class { base : Choice.class_of T; mixin : mixin_of T }.
-Local Coercion base : class_of >-> Choice.class_of.
+HB.end.
 
-Structure type : Type := Pack {sort : Type; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
+HB.factory Definition choice_of_countable T := is_countable T.
+HB.builders Context T (f : choice_of_countable T).
 
-Definition pack m :=
-  fun bT b & phant_id (Choice.class bT) b => Pack (@Class T b m).
+  Definition choiceType : has_choice T :=
+    PcanChoiceMixin (is_countable.pickleK f).
+  HB.instance T choiceType.
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
+HB.end.
 
-End ClassDef.
+(* TODO after TODO1: when is_countable builds equality and choice, we can
+   omit Choice T from this structure. *)
+HB.structure Definition Countable := { T of Choice T & is_countable T }.
 
-Module Exports.
-Coercion base : class_of >-> Choice.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
+Module Export BackwardCompatCountable.
+  Module Countable.
+  Notation axioms T := (is_countable T).
+  Notation mixin_of T := (is_countable T).
+  Notation class_of T := (choice.Countable.axioms T).
+
+  (* TODO: build the phant thingy in HB + variant with more/less implicits *)
+  Notation Mixin := (is_countable.Axioms_ _).
+
+  (* TODO: build this in HB *)
+  Section ClassDef.
+  Variables (T : Type) (cT : Countable.type).
+  Definition clone := fun c & phant_id (@Countable.Pack T c) cT => Countable.Pack c.
+  End ClassDef.
+
+  End Countable.
+
+End BackwardCompatCountable.
+
+Import choice.Countable.
 Notation countType := type.
-Notation CountType T m := (@pack T m _ _ id).
-Notation CountMixin := Mixin.
-Notation CountChoiceMixin := ChoiceMixin.
-Notation "[ 'countType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
- (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'countType' 'of' T ]" := (@clone T _ _ id)
+Notation CountMixin := Countable.Mixin.
+Notation countMixin T := (Countable.mixin_of T).
+Notation "[ 'countType' 'of' T 'for' cT ]" := (@Countable.clone T cT idfun)
+(at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'countType' 'of' T ]" := (@Countable.clone T _ id)
   (at level 0, format "[ 'countType'  'of'  T ]") : form_scope.
-
-End Exports.
-
-End Countable.
-Export Countable.Exports.
-
-Definition unpickle T := Countable.unpickle (Countable.class T).
-Definition pickle T := Countable.pickle (Countable.class T).
-Arguments unpickle {T} n.
-Arguments pickle {T} x.
 
 Section CountableTheory.
 
 Variable T : countType.
-
-Lemma pickleK : @pcancel nat T pickle unpickle.
-Proof. exact: Countable.pickleK. Qed.
 
 Definition pickle_inv n :=
   obind (fun x : T => if pickle x == n then Some x else None) (unpickle n).
@@ -604,8 +603,9 @@ Lemma pcan_pickleK sT f f' :
   @pcancel T sT f f' -> pcancel (pickle \o f) (pcomp f' unpickle).
 Proof. by move=> fK x; rewrite /pcomp pickleK /= fK. Qed.
 
-Definition PcanCountMixin sT f f' (fK : pcancel f f') :=
-  @CountMixin sT _ _ (pcan_pickleK fK).
+(* TODO: implement HB.instance T factory / structures. (build instances up to structure1 .. structuren) *)
+Definition PcanCountMixin sT (f : sT -> T) f' (fK : pcancel f f') :=
+  @CountMixin _ (pcan_pickleK fK).
 
 Definition CanCountMixin sT f f' (fK : cancel f f') :=
   @PcanCountMixin sT _ _ (can_pcan fK).
@@ -617,8 +617,8 @@ Definition unpickle_seq n := Some (pmap (@unpickle T) (CodeSeq.decode n)).
 Lemma pickle_seqK : pcancel pickle_seq unpickle_seq.
 Proof. by move=> s; rewrite /unpickle_seq CodeSeq.codeK (map_pK pickleK). Qed.
 
-Definition seq_countMixin := CountMixin pickle_seqK.
-Canonical seq_countType := Eval hnf in CountType (seq T) seq_countMixin.
+HB.instance Definition seq_countMixin :=
+  is_countable.Build (seq (Countable.sort T)) pickle_seqK.
 
 End CountableTheory.
 
@@ -627,7 +627,7 @@ Notation "[ 'countMixin' 'of' T 'by' <: ]" :=
   (at level 0, format "[ 'countMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Arguments pickle_inv {T} n.
-Arguments pickleK {T} x.
+Arguments pickleK {T} x : rename.
 Arguments pickleK_inv {T} x.
 Arguments pickle_invK {T} n : rename.
 
