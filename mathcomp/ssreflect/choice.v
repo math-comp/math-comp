@@ -639,19 +639,23 @@ Import Countable.
 Structure subCountType : Type :=
   SubCountType {subCount_sort :> subType P; _ : mixin_of subCount_sort}.
 
-Coercion sub_countType (sT : subCountType) :=
-  Eval hnf in pack (let: SubCountType _ m := sT return mixin_of sT in m) id.
-Canonical sub_countType.
+Section Hack.
+Variable sT : subCountType.
+Definition sub_is_countable : is_countable sT := (let: SubCountType _ m := sT return mixin_of sT in m).
+HB.instance (sub_sort (subCount_sort sT)) sub_is_countable.
+Definition sub_countType := [the countType of sT : Type].
+End Hack.
+Coercion sub_countType : subCountType >-> countType.
 
 Definition pack_subCountType U :=
   fun sT cT & sub_sort sT * sort cT -> U * U =>
-  fun b m   & phant_id (Class b m) (class cT) => @SubCountType sT m.
+  fun ch eq co & phant_id (Class ch eq co) (class cT) => @SubCountType sT co.
 
 End SubCountType.
 
 (* This assumes that T has both countType and subType structures. *)
 Notation "[ 'subCountType' 'of' T ]" :=
-    (@pack_subCountType _ _ T _ _ id _ _ id)
+    (@pack_subCountType _ _ T _ _ id _ _ _ id)
   (at level 0, format "[ 'subCountType'  'of'  T ]") : form_scope.
 
 Section TagCountType.
