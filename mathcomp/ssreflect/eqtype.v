@@ -140,8 +140,6 @@ Module Export BackwardCompatEq.
 
   End Equality.
 
-  (* TODO: build this in HB *)
-  Coercion Equality.is_eqType_mixin : eqtype.Equality.axioms >-> is_eqType.axioms_.
 End BackwardCompatEq.
 Import eqtype.Equality.
 

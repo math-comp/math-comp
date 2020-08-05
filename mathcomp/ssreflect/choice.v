@@ -299,9 +299,6 @@ Module Export BackwardCompatChoice.
   End InternalTheory.
   End InternalTheory.
   End Choice.
-
-  (* TODO: build this in HB *)
-  Coercion Choice.has_choice_mixin : choice.Choice.axioms >-> has_choice.axioms_.
 End BackwardCompatChoice.
 Import choice.Choice.
 
@@ -563,7 +560,7 @@ Module Export BackwardCompatCountable.
   Notation class_of T := (choice.Countable.axioms T).
 
   (* TODO: build the phant thingy in HB + variant with more/less implicits *)
-  Notation Mixin := (is_countable.Axioms_ _).
+  Notation Mixin := (is_countable.Axioms_ _ _).
 
   (* TODO: build this in HB *)
   Section ClassDef.
@@ -574,11 +571,13 @@ Module Export BackwardCompatCountable.
   End Countable.
 
 End BackwardCompatCountable.
-
+Print Graph.
 Import choice.Countable.
 Notation countType := type.
 Notation CountMixin := Countable.Mixin.
 Notation countMixin T := (Countable.mixin_of T).
+Notation "[ 'countMixin' 'of' T ]" := (Countable.class _ : Countable.mixin_of T)
+  (at level 0, format "[ 'countMixin'  'of'  T ]") : form_scope.
 Notation "[ 'countType' 'of' T 'for' cT ]" := (@Countable.clone T cT idfun)
 (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'countType' 'of' T ]" := (@Countable.clone T _ id)
@@ -605,7 +604,7 @@ Proof. by move=> fK x; rewrite /pcomp pickleK /= fK. Qed.
 
 (* TODO: implement HB.instance T factory / structures. (build instances up to structure1 .. structuren) *)
 Definition PcanCountMixin sT (f : sT -> T) f' (fK : pcancel f f') :=
-  @CountMixin _ (pcan_pickleK fK).
+  CountMixin (pcan_pickleK fK).
 
 Definition CanCountMixin sT f f' (fK : cancel f f') :=
   @PcanCountMixin sT _ _ (can_pcan fK).
@@ -674,7 +673,7 @@ by case=> i x; rewrite /unpickle_tagged CodeSeq.codeK /= pickleK /= pickleK.
 Qed.
 
 Definition tag_countMixin := CountMixin pickle_taggedK.
-Canonical tag_countType := Eval hnf in CountType {i : I & T_ i} tag_countMixin.
+HB.instance ({i : Countable.sort I & Countable.sort (T_ i)}) tag_countMixin.
 
 End TagCountType.
 
@@ -685,37 +684,48 @@ Implicit Type T : countType.
 
 Lemma nat_pickleK : pcancel id (@Some nat). Proof. by []. Qed.
 Definition nat_countMixin := CountMixin nat_pickleK.
-Canonical nat_countType := Eval hnf in CountType nat nat_countMixin.
+HB.instance nat nat_countMixin.
 
 Definition bool_countMixin := CanCountMixin oddb.
-Canonical bool_countType := Eval hnf in CountType bool bool_countMixin.
-Canonical bitseq_countType :=  Eval hnf in [countType of bitseq].
+HB.instance bool bool_countMixin.
+Definition bitseq_countMixin := [countMixin of bitseq].
+HB.instance bitseq bitseq_countMixin.
 
 Definition unit_countMixin := CanCountMixin bool_of_unitK.
-Canonical unit_countType := Eval hnf in CountType unit unit_countMixin.
+HB.instance unit unit_countMixin.
 
 Definition void_countMixin := PcanCountMixin (of_voidK unit).
-Canonical void_countType := Eval hnf in CountType void void_countMixin.
+HB.instance void void_countMixin.
 
-Definition option_countMixin T := CanCountMixin (@seq_of_optK T).
-Canonical option_countType T :=
-  Eval hnf in CountType (option T) (option_countMixin T).
+Section option_countMixin.
+Variable (T : countType).
+Definition option_countMixin := CanCountMixin (@seq_of_optK T).
+HB.instance (option (Countable.sort T)) option_countMixin.
+End option_countMixin.
 
-Definition sig_countMixin T (P : pred T) := [countMixin of {x | P x} by <:].
-Canonical sig_countType T (P : pred T) :=
-  Eval hnf in CountType {x | P x} (sig_countMixin P).
-Canonical sig_subCountType T (P : pred T) :=
-  Eval hnf in [subCountType of {x | P x}].
+Section sig_countMixin.
+Variable (T : countType) (P : pred T).
+Definition sig_countMixin := [countMixin of {x | P x} by <:].
+HB.instance ({x | is_true (P x)}) sig_countMixin.
+Canonical sig_subCountType := Eval hnf in [subCountType of {x | P x}].
+End sig_countMixin.
 
-Definition prod_countMixin T1 T2 := CanCountMixin (@tag_of_pairK T1 T2).
-Canonical prod_countType T1 T2 :=
-  Eval hnf in CountType (T1 * T2) (prod_countMixin T1 T2).
+Section prod_countMixin.
+Variable (T1 T2 : countType).
+Definition prod_countMixin := CanCountMixin (@tag_of_pairK T1 T2).
+HB.instance ((Countable.sort T1 * Countable.sort T2)%type) prod_countMixin.
+End prod_countMixin.
 
-Definition sum_countMixin T1 T2 := PcanCountMixin (@opair_of_sumK T1 T2).
-Canonical sum_countType T1 T2 :=
-  Eval hnf in CountType (T1 + T2) (sum_countMixin T1 T2).
+Section sum_countMixin.
+Variable (T1 T2 : countType).
+Definition sum_countMixin := PcanCountMixin (@opair_of_sumK T1 T2).
+HB.instance ((Countable.sort T1 + Countable.sort T2)%type) sum_countMixin.
+End sum_countMixin.
 
-Definition tree_countMixin T := PcanCountMixin (GenTree.codeK T).
-Canonical tree_countType T := CountType (GenTree.tree T) (tree_countMixin T).
+Section tree_countMixin.
+Variable (T : countType).
+Definition tree_countMixin := PcanCountMixin (GenTree.codeK T).
+HB.instance (GenTree.tree (Countable.sort T)) tree_countMixin.
+End tree_countMixin.
 
 End CountableDataTypes.
