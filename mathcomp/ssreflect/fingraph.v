@@ -621,8 +621,8 @@ Lemma fcard_gt1P (A : {pred T}) :
   reflect (exists2 x, x \in A & exists2 y, y \in A & ~~ fconnect f x y)
           (1 < fcard f A).
 Proof.
-move=> clAf; apply: (iffP card_gt1P) => [|[x] [xA [y yA not_xfy]]]. 
-  move=> [x] [y] [/andP [/= rfx xA]] [/andP[/= rfy yA] xDy].
+move=> clAf; apply: (iffP card_gt1P) => [|[x xA [y yA not_xfy]]].
+  move=> [x [y [/andP [/= rfx xA] /andP[/= rfy yA] xDy]]].
   by exists x; try exists y; rewrite // -root_connect // (eqP rfx) (eqP rfy).
 exists (froot f x), (froot f y); rewrite !inE !roots_root ?root_connect //=.
 by split => //; rewrite -(closed_connect clAf (connect_root _ _)).
