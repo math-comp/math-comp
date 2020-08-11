@@ -61,9 +61,9 @@ Delimit Scope AC_scope with AC.
 
 Definition change_type ty ty' (x : ty) (strategy : ty = ty') : ty' :=
  ecast ty ty strategy x.
-Notation simplrefl := (ltac: (simpl; reflexivity)).
-Notation cbvrefl := (ltac: (cbv; reflexivity)).
-Notation vmrefl := (ltac: (vm_compute; reflexivity)).
+Notation simplrefl := (ltac: (simpl; reflexivity)) (only parsing).
+Notation cbvrefl := (ltac: (cbv; reflexivity)) (only parsing).
+Notation vmrefl := (ltac: (vm_compute; reflexivity)) (only parsing).
 
 Module AC.
 
@@ -215,27 +215,33 @@ Notation AC_check_pattern :=
       else tryif vm_compute; reflexivity then idtac
       else fail 2 "AC: mismatch between shape" pat "=" pat' "and reordering" ord
     | |- ?G => fail 3 "AC: no pattern to check" G
-  end)).
+  end))
+  (only parsing).
 
 Notation opACof law p s :=
 ((fun T idx op assoc lid rid comm => (change_type (@AC.direct T idx
    (@Monoid.ComLaw _ _ (@Monoid.Law _ idx op assoc lid rid) comm)
    p%AC s%AC AC_check_pattern) cbvrefl)) _ _ law
-(Monoid.mulmA _) (Monoid.mul1m _) (Monoid.mulm1 _) (Monoid.mulmC _)).
+(Monoid.mulmA _) (Monoid.mul1m _) (Monoid.mulm1 _) (Monoid.mulmC _))
+(only parsing).
 
-Notation opAC op  p s := (opACof op (AC.pattern p%AC) s%AC).
-Notation opACl op s := (opAC op (AC.Leaf_of_nat (size (AC.serial s%AC))) s%AC).
+Notation opAC op  p s := (opACof op (AC.pattern p%AC) s%AC) (only parsing).
+Notation opACl op s := (opAC op (AC.Leaf_of_nat (size (AC.serial s%AC))) s%AC)
+  (only parsing).
 
 Notation "op .[ 'ACof' p s ]" := (opACof op p s)
-  (at level 2, p at level 1, left associativity).
+  (at level 2, p at level 1, left associativity, only parsing).
 Notation "op .[ 'AC' p s ]" := (opAC op p s)
-  (at level 2, p at level 1, left associativity).
+  (at level 2, p at level 1, left associativity, only parsing).
 Notation "op .[ 'ACl' s ]" := (opACl op s)
-  (at level 2, left associativity).
+  (at level 2, left associativity, only parsing).
 
 Notation AC_strategy :=
-  (ltac: (cbv -[Monoid.com_operator Monoid.operator]; reflexivity)).
+  (ltac: (cbv -[Monoid.com_operator Monoid.operator]; reflexivity))
+  (only parsing).
 Notation ACof p s := (change_type
-  (@AC.direct _ _ _  p%AC s%AC AC_check_pattern) AC_strategy).
-Notation AC p s := (ACof (AC.pattern p%AC) s%AC).
-Notation ACl s := (AC (AC.Leaf_of_nat (size (AC.serial s%AC))) s%AC).
+  (@AC.direct _ _ _  p%AC s%AC AC_check_pattern) AC_strategy)
+  (only parsing).
+Notation AC p s := (ACof (AC.pattern p%AC) s%AC) (only parsing).
+Notation ACl s := (AC (AC.Leaf_of_nat (size (AC.serial s%AC))) s%AC)
+  (only parsing).
