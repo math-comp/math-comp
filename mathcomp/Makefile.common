@@ -56,11 +56,10 @@ Makefile.coq: pre-makefile $(COQPROJECT) Makefile
 
 # Test suite ---------------------------------------------------------
 
-test_suite/hierarchy_test.v: build
-	mkdir -p test_suite
-	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp -lib all.all > test_suite/hierarchy_test.v
+test_suite/test_hierarchy_all.v: build
+	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp -lib all.all > test_suite/test_hierarchy_all.v
 
-Makefile.test-suite.coq: test_suite/hierarchy_test.v
+Makefile.test-suite.coq: test_suite/test_hierarchy_all.v
 	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f Make.test-suite -o Makefile.test-suite.coq
 
 # Global config, build, clean and distclean --------------------------
@@ -127,6 +126,9 @@ endif
 # Make of individual .vo ---------------------------------------------
 %.vo: __always__ Makefile.coq
 	+$(COQMAKE) $@
+
+test_suite/%.vo: __always__ Makefile.test-suite.coq
+	+$(COQMAKE_TESTSUITE) $@
 
 doc: __always__ Makefile.coq
 	mkdir -p _build_doc/

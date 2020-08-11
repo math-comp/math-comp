@@ -161,8 +161,8 @@ Tactic Notation "check_join"
   let T1 := open_constr:(_ : t1) in
   let T2 := open_constr:(_ : t2) in
   match tt with
-    | _ => unify ((id : t1 -> Type) T1) ((id : t2 -> Type) T2)
-    | _ => fail "There is no join of" t1 "and" t2
+    | _ => unify ((fun x : t1 => x : Type) T1) ((fun x : t2 => x : Type) T2)
+    | _ => fail "There is no join of" t1 "and" t2 "but is expected to be" tjoin
   end;
   let Tjoin :=
     lazymatch T1 with
@@ -239,7 +239,7 @@ let () =
          String.concat " "
            (List.map (fun (path, log) -> Printf.sprintf "-R %S %S" path log)
               !opt_libmaps))
-        [||]
+        (Unix.environment ())
     in
     Printf.fprintf coqtop_in {|
 Set Printing Width 4611686018427387903.
@@ -251,8 +251,11 @@ Redirect %S Print Graph.
       (List.hd (String.split_on_char '.' tmp_canonicals))
       (List.hd (String.split_on_char '.' tmp_coercions));
     close_out coqtop_in;
-    try while true do ignore (input_line coqtop_out) done
-      with End_of_file -> ignore (Unix.close_process_full coqtop_ch)
+    try
+      while true do ignore (input_line coqtop_out) done
+    with End_of_file ->
+      if Unix.close_process_full coqtop_ch <> WEXITED 0 then
+        failwith "Failed to invoke coqtop."
   end;
   (* Parsing *)
   let canonicals = parse_canonicals tmp_canonicals in
