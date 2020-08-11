@@ -38,10 +38,14 @@ Definition SimplRel {T} (r : rel T) : simpl_rel T := fun x => SimplPred (r x).
 Coercion rel_of_simpl_rel T (sr : simpl_rel T) : rel T := sr.
 Arguments rel_of_simpl_rel {T} sr x / y : rename.
 
+(* Required to avoid an incompatible format warning with coq-8.12 *)
+Reserved Notation "[ 'rel' x y : T | E ]" (at level 0, x ident, y ident,
+  format "'[hv' [ 'rel'  x  y  :  T  | '/ '  E ] ']'").
+
 Notation "[ 'rel' x y | E ]" := (SimplRel (fun x y => E%B)) (at level 0,
   x ident, y ident, format "'[hv' [ 'rel'  x  y  | '/ '  E ] ']'") : fun_scope.
-Notation "[ 'rel' x y : T | E ]" := (SimplRel (fun x y : T => E%B)) (at level 0,
-  x ident, y ident, only parsing) : fun_scope.
+Notation "[ 'rel' x y : T | E ]" := (SimplRel (fun x y : T => E%B)) 
+  (only parsing) : fun_scope.
 Notation "[ 'rel' x y 'in' A & B | E ]" :=
   [rel x y | (x \in A) && (y \in B) && E] (at level 0, x ident, y ident,
   format "'[hv' [ 'rel'  x  y  'in'  A  &  B  | '/ '  E ] ']'") : fun_scope.
