@@ -142,7 +142,8 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record normed_mixin_of (R T : zmodType) (Rorder : lePOrderMixin R)
+Record normed_mixin_of (R T : zmodType)
+       (Rorder : Order.POrder.mixin_of (Equality.class R))
        (le_op := Order.POrder.le Rorder)
   := NormedMixin {
   norm_op : T -> R;
@@ -152,7 +153,8 @@ Record normed_mixin_of (R T : zmodType) (Rorder : lePOrderMixin R)
   _ : forall x, norm_op (- x) = norm_op x;
 }.
 
-Record mixin_of (R : ringType) (Rorder : lePOrderMixin R)
+Record mixin_of (R : ringType)
+       (Rorder : Order.POrder.mixin_of (Equality.class R))
        (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
        (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
   := Mixin {
@@ -169,7 +171,7 @@ Module NumDomain.
 Section ClassDef.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
-  order_mixin : lePOrderMixin (ring_for T base);
+  order_mixin : Order.POrder.mixin_of (Equality.class (ring_for T base));
   normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
   mixin : mixin_of normed_mixin;
 }.
@@ -726,22 +728,13 @@ Section ClassDef.
 
 Record class_of R := Class {
   base   : NumDomain.class_of R;
-  nmixin_disp : unit;
-  nmixin : Order.Lattice.mixin_of (Order.POrder.Pack nmixin_disp base);
-  lmixin_disp : unit;
-  lmixin : Order.DistrLattice.mixin_of
-             (Order.Lattice.Pack lmixin_disp (Order.Lattice.Class nmixin));
-  tmixin_disp : unit;
-  tmixin : Order.Total.mixin_of
-             (Order.DistrLattice.Pack
-                tmixin_disp (Order.DistrLattice.Class lmixin));
+  nmixin : Order.Lattice.mixin_of base;
+  lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
+  tmixin : Order.Total.mixin_of base;
 }.
 Local Coercion base : class_of >-> NumDomain.class_of.
 Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
-  @Order.Total.Class
-    _ (@Order.DistrLattice.Class
-         _ (Order.Lattice.Class (@nmixin _ c)) _ (@lmixin _ c))
-    _ (@tmixin _ c).
+  @Order.Total.Class _ (@Order.DistrLattice.Class _ _ (lmixin c)) (@tmixin _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -751,13 +744,11 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
-  fun mT ndisp n ldisp l mdisp m &
+  fun mT n l m &
       phant_id (@Order.Total.class ring_display mT)
-               (@Order.Total.Class
-                  T (@Order.DistrLattice.Class
-                       T (@Order.Lattice.Class T b ndisp n) ldisp l)
-                  mdisp m) =>
-  Pack (@Class T b ndisp n ldisp l mdisp m).
+               (@Order.Total.Class T (@Order.DistrLattice.Class
+                                        T (@Order.Lattice.Class T b n) l) m) =>
+  Pack (@Class T b n l m).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -878,7 +869,7 @@ Canonical idomain_orderType.
 Canonical normedZmod_orderType.
 Canonical numDomain_orderType.
 Notation realDomainType := type.
-Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ _ _ id)
+Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ id)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -891,19 +882,13 @@ Section ClassDef.
 
 Record class_of R := Class {
   base  : NumField.class_of R;
-  nmixin_disp : unit;
-  nmixin : Order.Lattice.mixin_of (Order.POrder.Pack nmixin_disp base);
-  lmixin_disp : unit;
-  lmixin : Order.DistrLattice.mixin_of
-             (Order.Lattice.Pack lmixin_disp (Order.Lattice.Class nmixin));
-  tmixin_disp : unit;
-  tmixin : Order.Total.mixin_of
-             (Order.DistrLattice.Pack
-                tmixin_disp (Order.DistrLattice.Class lmixin));
+  nmixin : Order.Lattice.mixin_of base;
+  lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
+  tmixin : Order.Total.mixin_of base;
 }.
 Local Coercion base : class_of >-> NumField.class_of.
 Local Coercion base2 R (c : class_of R) : RealDomain.class_of R :=
-  RealDomain.Class (@tmixin R c).
+  @RealDomain.Class _ _ (nmixin c) (lmixin c) (@tmixin R c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -913,10 +898,9 @@ Let xT := let: Pack T _ := cT in T.
 Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT (b : NumField.class_of T) & phant_id (NumField.class bT) b =>
-  fun mT ndisp n ldisp l tdisp t
-      & phant_id (RealDomain.class mT)
-                 (@RealDomain.Class T b ndisp n ldisp l tdisp t) =>
-  Pack (@Class T b ndisp n ldisp l tdisp t).
+  fun mT n l t
+      & phant_id (RealDomain.class mT) (@RealDomain.Class T b n l t) =>
+  Pack (@Class T b n l t).
 
 Definition eqType := @Equality.Pack cT xclass.
 Definition choiceType := @Choice.Pack cT xclass.
@@ -999,7 +983,7 @@ Canonical numField_distrLatticeType.
 Canonical numField_orderType.
 Canonical numField_realDomainType.
 Notation realFieldType := type.
-Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ _ _ _ id)
+Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ id)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -5014,17 +4998,12 @@ move=> x y; move: (real (x - y)).
 by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
 Qed.
 
-Let R_distrLatticeType := DistrLatticeType (LatticeType R le_total) le_total.
-
-Definition totalMixin : Order.Total.mixin_of R_distrLatticeType := le_total.
-
 End RealMixin.
 
 Module Exports.
 Coercion le_total : real_axiom >-> totalPOrderMixin.
-Coercion totalMixin : real_axiom >-> totalOrderMixin.
 Definition RealDomainOfNumDomain (T : numDomainType) (m : real_axiom T) :=
-  [realDomainType of (OrderOfPOrder m)].
+  [realDomainType of OrderOfPOrder m].
 End Exports.
 
 End RealMixin.
