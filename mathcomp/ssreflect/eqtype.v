@@ -120,23 +120,14 @@ Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
 HB.mixin Record is_eqType T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 
+#[mathcomp(axiom="eq_axiom")]
 HB.structure Definition Equality := { T of is_eqType T }.
 
 Module Export BackwardCompatEq.
   Module Equality.
-  Notation axiom := eq_axiom.
-  Notation axioms T := (is_eqType T).
-  Notation mixin_of T := (is_eqType T).
-  Notation class_of T := (eqtype.Equality.axioms T).
 
   (* TODO: build the phant thingy in HB + variant with more/less implicits *)
   Notation Mixin := (is_eqType.Axioms_ _).
-
-  (* TODO: build this in HB *)
-  Section ClassDef.
-  Variables (T : Type) (cT : Equality.type).
-  Definition clone := fun c & cT -> T & phant_id (@Equality.Pack T c) cT => Equality.Pack c.
-  End ClassDef.
 
   End Equality.
 
@@ -147,9 +138,9 @@ Notation eqType := Equality.type.
 Notation EqMixin := Equality.Mixin.
 Notation "[ 'eqMixin' 'of' T ]" := (Equality.class _ : Equality.mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T ]") : form_scope.
-Notation "[ 'eqType' 'of' T 'for' C ]" := (@Equality.clone T C _ idfun id)
+Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
-Notation "[ 'eqType' 'of' T ]" := (@Equality.clone T _ _ id id)
+Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
   (at level 0, format "[ 'eqType'  'of'  T ]") : form_scope.
 
 (* eqE is a generic lemma that can be used to fold back recursive comparisons *)
