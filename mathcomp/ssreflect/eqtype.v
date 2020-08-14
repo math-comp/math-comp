@@ -743,7 +743,7 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-HB.instance Definition sub_eqMixin := is_eqType.Build (sub_sort sT) val_eqP.
+HB.instance Definition sub_eqMixin := is_eqType.Build sT val_eqP.
 
 Definition SubEqMixin :=
   (let: SubType _ v _ _ _ as sT' := sT
@@ -769,7 +769,7 @@ Section SigEqType.
 Variables (T : eqType) (P : pred T).
 
 Definition sig_eqMixin := Eval hnf in [eqMixin of {x | P x} by <:].
-HB.instance ({x | is_true (P x)}) sig_eqMixin.
+HB.instance ({x | P x}) sig_eqMixin.
 
 End SigEqType.
 
@@ -786,7 +786,7 @@ by do 2!move/eqP->.
 Qed.
 
 Canonical prod_eqMixin := EqMixin pair_eqP.
-HB.instance ((Equality.sort T1 * Equality.sort T2)%type) prod_eqMixin.
+HB.instance ((T1 * T2)%type) prod_eqMixin.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
 
@@ -824,7 +824,7 @@ case=> [x|] [y|] /=; by [constructor | apply: (iffP eqP) => [|[]] ->].
 Qed.
 
 Canonical option_eqMixin := EqMixin opt_eqP.
-HB.instance (option (Equality.sort T)) option_eqMixin.
+HB.instance (option T) option_eqMixin.
 
 End OptionEqType.
 
@@ -862,7 +862,7 @@ by apply: (iffP eqP) => [->|<-]; rewrite tagged_asE.
 Qed.
 
 Canonical tag_eqMixin := EqMixin tag_eqP.
-HB.instance ({i : Equality.sort I & Equality.sort (T_ i)}) tag_eqMixin.
+HB.instance ({i : I & T_ i}) tag_eqMixin.
 
 Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 
@@ -892,7 +892,7 @@ Lemma sum_eqP : Equality.axiom sum_eq.
 Proof. case=> x [] y /=; by [right | apply: (iffP eqP) => [->|[->]]]. Qed.
 
 Canonical sum_eqMixin := EqMixin sum_eqP.
-HB.instance ((Equality.sort T1 + Equality.sort T2)%type) sum_eqMixin.
+HB.instance ((T1 + T2)%type) sum_eqMixin.
 
 Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 

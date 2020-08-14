@@ -205,7 +205,7 @@ Arguments GenTree.codeK : clear implicits.
 Section Gentree.
 Variable (T : eqType).
 Definition tree_eqMixin := PcanEqMixin (GenTree.codeK T).
-HB.instance (GenTree.tree (Equality.sort T)) tree_eqMixin.
+HB.instance (GenTree.tree T) tree_eqMixin.
 End Gentree.
 
 (* Structures for Types with a choice function, and for Types with countably  *)
@@ -249,9 +249,8 @@ End Gentree.
 
 HB.mixin Record has_choice T := Mixin {
   find : pred T -> nat -> option T;
-  choice_correct_subdef {P n x} : find P n = Some x -> is_true (P x);
-  choice_complete_subdef {P : pred T} : (exists x, is_true (P x)) ->
-        exists n, is_true (isSome (find P n));
+  choice_correct_subdef {P n x} : find P n = Some x -> P x;
+  choice_complete_subdef {P : pred T} : (exists x, P x) -> exists n, find P n;
   choice_extensional_subdef {P Q : pred T} : P =1 Q -> find P =1 find Q
 }.
 HB.structure Definition Choice := { T of has_choice T & is_eqType T}.
@@ -405,7 +404,7 @@ Section SubChoice.
 Variables (P : pred T) (sT : subType P).
 
 Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
-HB.instance (@sub_sort (Choice.sort T) P sT) sub_choiceMixin.
+HB.instance (sub_sort sT) sub_choiceMixin.
 
 End SubChoice.
 
@@ -428,7 +427,7 @@ elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
 rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
 by case: find => /=.
 Qed.
-HB.instance (seq (Choice.sort T)) seq_choiceMixin.
+HB.instance (seq T) seq_choiceMixin.
 
 End OneType.
 
@@ -455,7 +454,7 @@ rewrite (@extensional _ _ (ft sQ nt)) => [|i].
   by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
 by congr (omap _ _); apply: extensional => x /=.
 Qed.
-HB.instance ({i : Choice.sort I & Choice.sort (T_ i)}) tagged_choiceMixin.
+HB.instance ({i : I & T_ i}) tagged_choiceMixin.
 
 End TagChoice.
 
@@ -486,31 +485,31 @@ HB.instance void void_choiceMixin.
 Section OptionChoiceType.
 Variable T : choiceType.
 Definition option_choiceMixin := CanChoiceMixin (@seq_of_optK T).
-HB.instance (option (Choice.sort T)) option_choiceMixin.
+HB.instance (option T) option_choiceMixin.
 End OptionChoiceType.
 
 Section SigChoiceType.
 Variables (T : choiceType) (P : pred T).
 Definition sig_choiceMixin : choiceMixin {x | P x} := sub_choiceMixin _.
-HB.instance ({x | is_true (P x)}) sig_choiceMixin.
+HB.instance ({x | P x}) sig_choiceMixin.
 End SigChoiceType.
 
 Section ProdChoiceType.
 Variables (T1 T2 : choiceType).
 Definition prod_choiceMixin := CanChoiceMixin (@tag_of_pairK T1 T2).
-HB.instance ((Choice.sort T1 * Choice.sort T2)%type) prod_choiceMixin.
+HB.instance ((T1 * T2)%type) prod_choiceMixin.
 End ProdChoiceType.
 
 Section SumChoiceType.
 Variables (T1 T2 : choiceType).
 Definition sum_choiceMixin := PcanChoiceMixin (@opair_of_sumK T1 T2).
-HB.instance ((Choice.sort T1 + Choice.sort T2)%type) sum_choiceMixin.
+HB.instance ((T1 + T2)%type) sum_choiceMixin.
 End SumChoiceType.
 
 Section TreeChoiceType.
 Variable T : choiceType.
 Definition tree_choiceMixin := PcanChoiceMixin (GenTree.codeK T).
-HB.instance (GenTree.tree (Choice.sort T)) tree_choiceMixin.
+HB.instance (GenTree.tree T) tree_choiceMixin.
 End TreeChoiceType.
 
 End ChoiceTheory.
@@ -616,8 +615,7 @@ Definition unpickle_seq n := Some (pmap (@unpickle T) (CodeSeq.decode n)).
 Lemma pickle_seqK : pcancel pickle_seq unpickle_seq.
 Proof. by move=> s; rewrite /unpickle_seq CodeSeq.codeK (map_pK pickleK). Qed.
 
-HB.instance Definition seq_countMixin :=
-  is_countable.Build (seq (Countable.sort T)) pickle_seqK.
+HB.instance Definition seq_countMixin := is_countable.Build (seq T) pickle_seqK.
 
 End CountableTheory.
 
@@ -641,7 +639,7 @@ Structure subCountType : Type :=
 Section Hack.
 Variable sT : subCountType.
 Definition sub_is_countable : is_countable sT := (let: SubCountType _ m := sT return mixin_of sT in m).
-HB.instance (sub_sort (subCount_sort sT)) sub_is_countable.
+HB.instance (sub_sort sT) sub_is_countable.
 Definition sub_countType := [the countType of sT : Type].
 End Hack.
 Coercion sub_countType : subCountType >-> countType.
@@ -673,7 +671,7 @@ by case=> i x; rewrite /unpickle_tagged CodeSeq.codeK /= pickleK /= pickleK.
 Qed.
 
 Definition tag_countMixin := CountMixin pickle_taggedK.
-HB.instance ({i : Countable.sort I & Countable.sort (T_ i)}) tag_countMixin.
+HB.instance ({i : I & T_ i}) tag_countMixin.
 
 End TagCountType.
 
@@ -700,32 +698,32 @@ HB.instance void void_countMixin.
 Section option_countMixin.
 Variable (T : countType).
 Definition option_countMixin := CanCountMixin (@seq_of_optK T).
-HB.instance (option (Countable.sort T)) option_countMixin.
+HB.instance (option T) option_countMixin.
 End option_countMixin.
 
 Section sig_countMixin.
 Variable (T : countType) (P : pred T).
 Definition sig_countMixin := [countMixin of {x | P x} by <:].
-HB.instance ({x | is_true (P x)}) sig_countMixin.
+HB.instance ({x | P x}) sig_countMixin.
 Canonical sig_subCountType := Eval hnf in [subCountType of {x | P x}].
 End sig_countMixin.
 
 Section prod_countMixin.
 Variable (T1 T2 : countType).
 Definition prod_countMixin := CanCountMixin (@tag_of_pairK T1 T2).
-HB.instance ((Countable.sort T1 * Countable.sort T2)%type) prod_countMixin.
+HB.instance ((T1 * T2)%type) prod_countMixin.
 End prod_countMixin.
 
 Section sum_countMixin.
 Variable (T1 T2 : countType).
 Definition sum_countMixin := PcanCountMixin (@opair_of_sumK T1 T2).
-HB.instance ((Countable.sort T1 + Countable.sort T2)%type) sum_countMixin.
+HB.instance ((T1 + T2)%type) sum_countMixin.
 End sum_countMixin.
 
 Section tree_countMixin.
 Variable (T : countType).
 Definition tree_countMixin := PcanCountMixin (GenTree.codeK T).
-HB.instance (GenTree.tree (Countable.sort T)) tree_countMixin.
+HB.instance (GenTree.tree T) tree_countMixin.
 End tree_countMixin.
 
 End CountableDataTypes.

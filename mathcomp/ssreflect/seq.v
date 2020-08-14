@@ -992,7 +992,7 @@ by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
 Canonical seq_eqMixin := EqMixin eqseqP.
-HB.instance (seq (Equality.sort T)) seq_eqMixin.
+HB.instance (seq T) seq_eqMixin.
 
 Lemma eqseqE : eqseq = eq_op. Proof. by []. Qed.
 
