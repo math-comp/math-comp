@@ -673,6 +673,13 @@ Proof. by move=> m1 m2 n; rewrite !maxnE subnDr addnAC. Qed.
 Lemma addn_maxr : right_distributive addn maxn.
 Proof. by move=> m n1 n2; rewrite !(addnC m) addn_maxl. Qed.
 
+Lemma subn_maxl : left_distributive subn maxn.
+Proof.
+move=> m n p; apply/eqP.
+rewrite eqn_leq !geq_max !leq_sub2r leq_max ?leqnn ?andbT ?orbT // /maxn.
+by case: (_ < _); rewrite leqnn // orbT.
+Qed.
+
 Lemma min0n : left_zero 0 minn. Proof. by case. Qed.
 Lemma minn0 : right_zero 0 minn. Proof. by []. Qed.
 
@@ -733,6 +740,13 @@ Proof. by move=> m1 m2 n; rewrite !minnE subnDl addnBA ?leq_subr. Qed.
 
 Lemma addn_minl : left_distributive addn minn.
 Proof. by move=> m1 m2 n; rewrite -!(addnC n) addn_minr. Qed.
+
+Lemma subn_minl : left_distributive subn minn.
+Proof.
+move=> m n p; apply/eqP.
+rewrite eqn_leq !leq_min !leq_sub2r geq_min ?leqnn ?orbT //= /minn.
+by case: (_ < _); rewrite leqnn // orbT.
+Qed.
 
 Lemma minnSS m n : minn m.+1 n.+1 = (minn m n).+1.
 Proof. by rewrite -(addn_minr 1). Qed.
