@@ -1513,6 +1513,77 @@ rewrite -[4]/(2 * 2) -mulnA mul2n -addnn sqrnD; apply/leqifP.
 by rewrite ltn_add2r eqn_add2r ltn_neqAle !nat_Cauchy; case: eqVneq.
 Qed.
 
+Section ContraLeq.
+Implicit Types (b : bool) (m n : nat) (P : Prop).
+
+Lemma contraTleq b m n : (n < m -> ~~ b) -> (b -> m <= n).
+Proof. by rewrite ltnNge; apply: contraTT. Qed.
+
+Lemma contraTltn b m n : (n <= m -> ~~ b) -> (b -> m < n).
+Proof. by rewrite ltnNge; apply: contraTN. Qed.
+
+Lemma contraPleq P m n : (n < m -> ~ P) -> (P -> m <= n).
+Proof. by rewrite ltnNge; apply: contraPT. Qed.
+
+Lemma contraPltn P m n : (n <= m -> ~ P) -> (P -> m < n).
+Proof. by rewrite ltnNge; apply: contraPN. Qed.
+
+Lemma contraNleq b m n : (n < m -> b) -> (~~ b -> m <= n).
+Proof. by rewrite ltnNge; apply: contraNT. Qed.
+
+Lemma contraNltn b m n : (n <= m -> b) -> (~~ b -> m < n).
+Proof. by rewrite ltnNge; apply: contraNN. Qed.
+
+Lemma contra_not_leq P m n : (n < m -> P) -> (~ P -> m <= n).
+Proof. by rewrite ltnNge; apply: contra_notT. Qed.
+
+Lemma contra_not_ltn P m n : (n <= m -> P) -> (~ P -> m < n).
+Proof. by rewrite ltnNge; apply: contra_notN. Qed.
+
+Lemma contraFleq b m n : (n < m -> b) -> (b = false -> m <= n).
+Proof. by rewrite ltnNge; apply: contraFT. Qed.
+
+Lemma contraFltn b m n : (n <= m -> b) -> (b = false -> m < n).
+Proof. by rewrite ltnNge; apply: contraFN. Qed.
+
+Lemma contra_leqT b m n : (~~ b -> m < n) -> (n <= m -> b).
+Proof. by rewrite ltnNge; apply: contraTT. Qed.
+
+Lemma contra_ltnT b m n : (~~ b -> m <= n) -> (n < m -> b).
+Proof. by rewrite ltnNge; apply: contraNT. Qed.
+
+Lemma contra_leqN b m n : (b -> m < n) -> (n <= m -> ~~ b).
+Proof. by rewrite ltnNge; apply: contraTN. Qed.
+
+Lemma contra_ltnN b m n : (b -> m <= n) -> (n < m -> ~~ b).
+Proof. by rewrite ltnNge; apply: contraNN. Qed.
+
+Lemma contra_leq_not P m n : (P -> m < n) -> (n <= m -> ~ P).
+Proof. by rewrite ltnNge; apply: contraTnot. Qed.
+
+Lemma contra_ltn_not P m n : (P -> m <= n) -> (n < m -> ~ P).
+Proof. by rewrite ltnNge; apply: contraNnot. Qed.
+
+Lemma contra_leqF b m n : (b -> m < n) -> (n <= m -> b = false).
+Proof. by rewrite ltnNge; apply: contraTF. Qed.
+
+Lemma contra_ltnF b m n : (b -> m <= n) -> (n < m -> b = false).
+Proof. by rewrite ltnNge; apply: contraNF. Qed.
+
+Lemma contra_leq m n p q : (q < p -> n < m) -> (m <= n -> p <= q).
+Proof. by rewrite !ltnNge; apply: contraTT. Qed.
+
+Lemma contra_leq_ltn m n p q : (q <= p -> n < m) -> (m <= n -> p < q).
+Proof. by rewrite !ltnNge; apply: contraTN. Qed.
+
+Lemma contra_ltn_leq m n p q : (q < p -> n <= m) -> (m < n -> p <= q).
+Proof. by rewrite !ltnNge; apply: contraNT. Qed.
+
+Lemma contra_ltn m n p q : (q <= p -> n <= m) -> (m < n -> p < q).
+Proof. by rewrite !ltnNge; apply: contraNN. Qed.
+
+End ContraLeq.
+
 Section Monotonicity.
 Variable T : Type.
 
