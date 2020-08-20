@@ -1700,7 +1700,7 @@ Arguments rootP {R p x}.
 Arguments rootPf {R p x}.
 Arguments rootPt {R p x}.
 Arguments unity_rootP {R n z}.
-Arguments polyOverP {R S0 addS kS p}.
+Arguments polyOverP {R S0 addS kS p} : rename.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
 Arguments eq_poly {R n} [E1] E2 eq_E12.
 
