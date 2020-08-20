@@ -123,17 +123,6 @@ HB.mixin Record is_eqType T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 #[mathcomp(axiom="eq_axiom")]
 HB.structure Definition Equality := { T of is_eqType T }.
 
-Module Export BackwardCompatEq.
-  Module Equality.
-
-  (* TODO: build the phant thingy in HB + variant with more/less implicits *)
-  Notation Mixin := (is_eqType.Axioms_ _).
-
-  End Equality.
-
-End BackwardCompatEq.
-Import eqtype.Equality.
-
 Notation eqType := Equality.type.
 Notation EqMixin := Equality.Mixin.
 Notation "[ 'eqMixin' 'of' T ]" := (Equality.class _ : Equality.mixin_of T)

@@ -253,26 +253,13 @@ HB.mixin Record has_choice T := Mixin {
   choice_complete_subdef {P : pred T} : (exists x, P x) -> exists n, find P n;
   choice_extensional_subdef {P Q : pred T} : P =1 Q -> find P =1 find Q
 }.
+#[mathcomp]
 HB.structure Definition Choice := { T of has_choice T & is_eqType T}.
 
-Module Export BackwardCompatChoice.
+Module Export ChoiceNamespace.
   Module Choice.
-  Notation axioms T := (has_choice T).
-  Notation mixin_of T := (has_choice T).
-  Notation class_of T := (choice.Choice.axioms T).
-
-  (* TODO: build the phant thingy in HB + variant with more/less implicits *)
-  Notation Mixin := (has_choice.Axioms_ _).
-
-  (* TODO: build this in HB *)
-  Section ClassDef.
-  Variables (T : Type) (cT : Choice.type).
-  Definition clone := fun c & cT -> T & phant_id (@Choice.Pack T c) cT => Choice.Pack c.
-  End ClassDef.
-
 
   Module InternalTheory.
-
 
   Notation correct := choice_correct_subdef.
   Arguments correct {_ _ _ _}.
@@ -298,7 +285,7 @@ Module Export BackwardCompatChoice.
   End InternalTheory.
   End InternalTheory.
   End Choice.
-End BackwardCompatChoice.
+End ChoiceNamespace.
 Import choice.Choice.
 
 Notation choiceType := Choice.type.
