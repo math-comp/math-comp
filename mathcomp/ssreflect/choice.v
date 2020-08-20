@@ -537,28 +537,9 @@ HB.end.
 
 (* TODO after TODO1: when is_countable builds equality and choice, we can
    omit Choice T from this structure. *)
+#[mathcomp]
 HB.structure Definition Countable := { T of Choice T & is_countable T }.
 
-Module Export BackwardCompatCountable.
-  Module Countable.
-  Notation axioms T := (is_countable T).
-  Notation mixin_of T := (is_countable T).
-  Notation class_of T := (choice.Countable.axioms T).
-
-  (* TODO: build the phant thingy in HB + variant with more/less implicits *)
-  Notation Mixin := (is_countable.Axioms_ _ _).
-
-  (* TODO: build this in HB *)
-  Section ClassDef.
-  Variables (T : Type) (cT : Countable.type).
-  Definition clone := fun c & phant_id (@Countable.Pack T c) cT => Countable.Pack c.
-  End ClassDef.
-
-  End Countable.
-
-End BackwardCompatCountable.
-Print Graph.
-Import choice.Countable.
 Notation countType := type.
 Notation CountMixin := Countable.Mixin.
 Notation countMixin T := (Countable.mixin_of T).
