@@ -92,7 +92,7 @@ apply: (@equivP (exists2 x1, x1 \in a & dfs_path v1 x1 y)); last first.
   case/andP=> a_x1 g_p1 /andP[not_p1x _] /subsetP p_p1 p1y not_pv.
   exists x1 => //; exists p1 => //.
   rewrite disjoint_sym disjoint_cons not_p1x disjoint_sym.
-  by move: not_pv; rewrite disjoint_cons => /andP[_ /disjoint_trans->].
+  by move: not_pv; rewrite disjoint_cons => /andP[_ /disjointWl->].
 have{neq_yx not_vy}: y \notin v1 by apply/norP.
 have{le_v'_n not_vx}: #|T| <= #|v1| + n by rewrite cardU1 not_vx addSnnS.
 elim: {x v}a v1 => [|x a IHa] v /= le_v'_n not_vy.
@@ -104,7 +104,7 @@ apply: {IHa}(equivP (IHa _ _ not_v2y)).
   by rewrite (leq_trans le_v'_n) // leq_add2r subset_leq_card.
 split=> [] [x1 a_x1 [p g_p p_y not_pv]].
   exists x1; [exact: predU1r | exists p => //].
-  by rewrite disjoint_sym (disjoint_trans v2v) // disjoint_sym.
+  by rewrite disjoint_sym (disjointWl v2v) // disjoint_sym.
 suffices not_p1v2: [disjoint x1 :: p & v2].
   case/predU1P: a_x1 => [def_x1 | ]; last by exists x1; last exists p.
   case/pred0Pn: not_p1v2; exists x; rewrite /= def_x1 mem_head /=.
