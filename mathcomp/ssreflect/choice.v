@@ -636,12 +636,11 @@ Import Countable.
 Structure subCountType : Type :=
   SubCountType {subCount_sort :> subType P; _ : mixin_of subCount_sort}.
 
-Section Hack.
-Variable sT : subCountType.
-Definition sub_is_countable : is_countable sT := (let: SubCountType _ m := sT return mixin_of sT in m).
-HB.instance (sub_sort sT) sub_is_countable.
-Definition sub_countType := [the countType of sT : Type].
-End Hack.
+HB.instance
+  Definition sub_is_countable (sT : subCountType) : is_countable sT :=
+    let: SubCountType _ m := sT return mixin_of sT in m.
+
+Definition sub_countType (sT : subCountType) := [the countType of sT : Type].
 Coercion sub_countType : subCountType >-> countType.
 
 Definition pack_subCountType U :=
