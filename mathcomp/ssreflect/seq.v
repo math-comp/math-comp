@@ -132,6 +132,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*                    i.e. self expanding definition for                      *)
 (*                      [seq f x y | x <- s, y <- t]                          *)
 (*               := [:: f x_1 y_1; ...; f x_1 y_m; f x_2 y_1; ...; f x_n y_m] *)
+(*     allrel r s := all id [seq r x y | x <- xs, y <- xs]                    *)
+(*                == the proposition r x y holds for all possible x, y in xs  *)
 (*        map f s == the sequence [:: f x_1, ..., f x_n].                     *)
 (*      pmap pf s == the sequence [:: y_i1, ..., y_ik] where i1 < ... < ik,   *)
 (*                   pf x_i = Some y_i, and pf x_j = None iff j is not in     *)
@@ -2474,6 +2476,12 @@ Proof.
 by apply: (@eq_from_nth _ x0); rewrite size_mkseq // => i Hi; rewrite nth_mkseq.
 Qed.
 
+Variant mkseq_spec s : seq T -> Type :=
+| MapIota n f : s = mkseq f n -> mkseq_spec s (mkseq f n).
+
+Lemma mkseqP s : mkseq_spec s s.
+Proof. by rewrite -[s]mkseq_nth; constructor. Qed.
+
 End MakeSeq.
 
 Section MakeEqSeq.
@@ -3137,6 +3145,48 @@ End EqAllPairs.
 Arguments allpairsP {S T R f s t z}.
 Arguments perm_nilP {T s}.
 Arguments perm_consP {T x s t}.
+
+Section AllRel.
+
+Definition allrel {T : Type} (r : rel T) xs :=
+   all id [seq r x y | x <- xs, y <- xs].
+
+Lemma allrel0 (T : Type) (r : rel T) : allrel r [::].
+Proof. by []. Qed.
+
+Lemma allrel_map (T T' : Type) (f : T' -> T) (r : rel T) xs :
+  allrel r (map f xs) = allrel (relpre f r) xs.
+Proof. by rewrite /allrel allpairs_mapl allpairs_mapr. Qed.
+
+Lemma allrelP {T : eqType} {r : rel T} {xs : seq T} :
+  reflect {in xs &, forall x y, r x y} (allrel r xs).
+Proof. exact: all_allpairsP. Qed.
+
+Variable (T : nonPropType) (r : rel T).
+Implicit Types (xs : seq T) (x y z : T).
+Hypothesis (rxx : reflexive r) (rsym : symmetric r).
+
+Lemma allrel1 x : allrel r [:: x].
+Proof. by rewrite /allrel/= rxx. Qed.
+
+Lemma allrel2 x y : allrel r [:: x; y] = r x y.
+Proof. by rewrite /allrel/= !rxx [r y x]rsym !(andbT, andbb). Qed.
+
+Lemma allrel_cons x xs :
+  allrel r (x :: xs) = all (r x) xs && allrel r xs.
+Proof.
+case: (mkseqP x (_ :: _)) => -[//|n] f [-> ->].
+rewrite !allrel_map all_map; apply/allrelP/andP => /= [rf|].
+  split; first by apply/allP => i iP /=; rewrite rf// in_cons iP orbT.
+  by apply/allrelP => i j iP jP /=; rewrite rf// in_cons (iP, jP) orbT.
+move=> [/allP/= rf0 /allrelP/= rf] i j; rewrite !in_cons.
+by move=> /predU1P[->|iP] /predU1P[->|jP]//=; rewrite 2?(rf0, rsym)//= rf.
+Qed.
+
+End AllRel.
+
+Arguments allrel {T} r xs.
+Arguments allrelP {T r xs}.
 
 Section Permutations.
 
