@@ -14,6 +14,7 @@ Require Export interval.
 Require Export matrix.
 Require Export mxpoly.
 Require Export mxalgebra.
+Require Export mxred.
 Require Export vector.
 Require Export ring_quotient.
 Require Export fraction.
