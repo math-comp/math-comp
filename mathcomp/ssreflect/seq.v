@@ -2996,9 +2996,20 @@ Lemma all2E s t :
   all2 s t = (size s == size t) && all [pred xy | r xy.1 xy.2] (zip s t).
 Proof. by elim: s t => [|x s IHs] [|y t] //=; rewrite IHs andbCA. Qed.
 
+Lemma zip_map I f g (s : seq I) :
+  zip (map f s) (map g s) = [seq (f i, g i) | i <- s].
+Proof. by elim: s => //= i s ->. Qed.
+
 End Zip.
 
 Prenex Implicits zip unzip1 unzip2 all2.
+
+Lemma eqseq_all (T : eqType) (s t : seq T) : (s == t) = all2 eq_op s t.
+Proof. by elim: s t => [|x s +] [|y t]//= => <-. Qed.
+
+Lemma eq_map_all I (T : eqType) (f g : I -> T) (s : seq I) :
+  (map f s == map g s) = all [pred xy | xy.1 == xy.2] [seq (f i, g i) | i <- s].
+Proof. by rewrite eqseq_all all2E !size_map eqxx zip_map. Qed.
 
 Section Flatten.
 

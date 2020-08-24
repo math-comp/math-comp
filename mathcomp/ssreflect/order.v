@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2019 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import path fintype tuple bigop finset div prime.
+From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 
 (******************************************************************************)
 (* This files defines types equipped with order relations.                    *)
@@ -360,6 +360,10 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (* - all possible structures on bool                                          *)
 (* - porderType, latticeType, distrLatticeType, orderType and bLatticeType    *)
 (*   on nat for the leq order                                                 *)
+(* - porderType, latticeType, distrLatticeType, orderType and finPOrderType   *)
+(*   on 'I_n and bLatticeType, tbLatticeType, bDistrLatticeType,              *)
+(*   tbDistrLatticeType, finLatticeType, finDistrLatticeType and finOrderType *)
+(*   on 'I_n.+1 (to guarantee it is nonempty).                                *)
 (* - porderType, latticeType, distrLatticeType, bLatticeType, tbLatticeType,  *)
 (*   on nat for the dvdn order, where meet and join are respectively gcdn and *)
 (*   lcmn                                                                     *)
@@ -399,6 +403,11 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*                                                                            *)
 (* We also provide specialized versions of some theorems from path.v.         *)
 (*                                                                            *)
+(* We provide Order.enum_val, Order.enum_rank, and Order.enum_rank_in, which  *)
+(* are monotonous variations of enum_val, enum_rank, and enum_rank_in         *)
+(* whenever the type is porderType, and their monotonicity is provided if     *)
+(* this order is total. The theory is in the module Order (Order.enum_valK,   *)
+(* Order.enum_rank_inK, etc) but Order.Enum can be imported to shorten these. *)
 (* This file is based on prior work by                                        *)
 (* D. Dreyer, G. Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                 *)
 (******************************************************************************)
@@ -5673,6 +5682,74 @@ Definition nat0E := nat0E.
 End Exports.
 End NatDvd.
 
+(***********************************)
+(* Canonical structures on ordinal *)
+(***********************************)
+
+Module OrdinalOrder.
+Section OrdinalOrder.
+Import NatOrder.
+
+Lemma ord_display : unit. Proof. exact: tt. Qed.
+
+Section PossiblyTrivial.
+Variable (n : nat).
+
+Definition porderMixin := [porderMixin of 'I_n by <:].
+Canonical porderType := POrderType ord_display 'I_n (porderMixin).
+
+Definition orderMixin := [totalOrderMixin of 'I_n by <:].
+Canonical latticeType := LatticeType 'I_n orderMixin.
+Canonical distrLatticeType := DistrLatticeType 'I_n orderMixin.
+Canonical orderType  := OrderType 'I_n orderMixin.
+Canonical finPOrderType := [finPOrderType of 'I_n].
+
+Lemma leEord : (le : rel 'I_n) = leq. Proof. by []. Qed.
+Lemma ltEord : (lt : rel 'I_n) = (fun m n => m < n)%N. Proof. by []. Qed.
+End PossiblyTrivial.
+
+Section NonTrivial.
+Variable (n' : nat).
+Let n := n'.+1.
+
+Canonical bLatticeType :=
+   BLatticeType 'I_n (BottomMixin (leq0n : forall x, ord0 <= x)).
+Canonical bDistrLatticeType := [bDistrLatticeType of 'I_n].
+Canonical tbLatticeType :=
+   TBLatticeType 'I_n (TopMixin (@leq_ord _ : forall x, x <= ord_max)).
+Canonical tbDistrLatticeType := [tbDistrLatticeType of 'I_n].
+Canonical finLatticeType := [finLatticeType of 'I_n].
+Canonical finDistrLatticeType := [finDistrLatticeType of 'I_n].
+Canonical finOrderType := [finOrderType of 'I_n].
+
+Lemma botEord : 0%O = ord0. Proof. by []. Qed.
+Lemma topEord : 1%O = ord_max. Proof. by []. Qed.
+
+End NonTrivial.
+
+End OrdinalOrder.
+
+Module Exports.
+Canonical porderType.
+Canonical latticeType.
+Canonical bLatticeType.
+Canonical tbLatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical orderType.
+Canonical finPOrderType.
+Canonical finLatticeType.
+Canonical finDistrLatticeType.
+Canonical finOrderType.
+
+Definition leEord := leEord.
+Definition ltEord := ltEord.
+Definition botEord := botEord.
+Definition topEord := topEord.
+End Exports.
+End OrdinalOrder.
+
 (*******************************)
 (* Canonical structure on bool *)
 (*******************************)
@@ -7456,6 +7533,241 @@ Canonical dual_finOrderType d (T : finOrderType d) :=
 
 End DualOrder.
 
+Notation enum A := (sort <=%O (enum A)).
+
+Section Enum.
+Variables (d : unit) (T : finPOrderType d).
+
+Lemma cardE (A : {pred T}) : #|A| = size (enum A).
+Proof. by rewrite size_sort cardE. Qed.
+
+Lemma mem_enum (A : {pred T}) : enum A =i A.
+Proof. by move=> x; rewrite mem_sort mem_enum. Qed.
+
+Lemma enum_uniq (A : {pred T}) : uniq (enum A).
+Proof. by rewrite sort_uniq enum_uniq. Qed.
+
+Lemma cardT : #|T| = size (enum T).
+Proof. by rewrite cardT size_sort. Qed.
+
+Lemma enumT : enum T = sort <=%O (Finite.enum T).
+Proof. by rewrite enumT. Qed.
+
+Lemma enum0 : enum (pred0 : {pred T}) = [::].
+Proof. by rewrite enum0. Qed.
+
+Lemma enum1 (x : T) : enum (pred1 x) = [:: x].
+Proof. by rewrite enum1. Qed.
+
+Lemma eq_enum (A B : {pred T}) : A =i B -> enum A = enum B.
+Proof. by move=> /eq_enum->. Qed.
+
+Lemma eq_cardT (A : {pred T}) : A =i predT -> #|A| = size (enum T).
+Proof. by move=> /eq_enum<-; rewrite cardE. Qed.
+
+Lemma set_enum (A : {set T}) : [set x in enum A] = A.
+Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
+
+Lemma enum_set0 : enum (set0 : {set T}) = [::].
+Proof. by rewrite enum_set0. Qed.
+
+Lemma enum_setT : enum [set: T] = sort <=%O (Finite.enum T).
+Proof. by rewrite enum_setT. Qed.
+
+Lemma enum_set1 (a : T) : enum [set a] = [:: a].
+Proof. by rewrite enum_set1. Qed.
+
+End Enum.
+
+Section Ordinal.
+Import OrdinalOrder.Exports.
+
+Lemma enum_ord n : enum 'I_n = fintype.enum 'I_n.
+Proof.
+rewrite (sorted_sort le_trans)// -(@sorted_map _ _ (val : 'I_n -> nat))/=.
+by rewrite val_enum_ord iota_sorted.
+Qed.
+
+Lemma val_enum_ord n : [seq val i | i <- enum 'I_n] = iota 0 n.
+Proof. by rewrite enum_ord val_enum_ord. Qed.
+
+Lemma size_enum_ord n : size (enum 'I_n) = n.
+Proof. by rewrite -cardE card_ord. Qed.
+
+Lemma nth_enum_ord (n : nat) (i0 : 'I_n) (m : nat) :
+  (m < n)%N -> nth i0 (enum 'I_n) m = m :> nat.
+Proof. by move=> lemn; rewrite enum_ord nth_enum_ord. Qed.
+
+Lemma nth_ord_enum (n : nat) (i0 i : 'I_n) : nth i0 (enum 'I_n) i = i.
+Proof. by rewrite enum_ord nth_ord_enum. Qed.
+
+Lemma index_enum_ord (n : nat) (i : 'I_n) : index i (enum 'I_n) = i.
+Proof. by rewrite enum_ord index_enum_ord. Qed.
+
+End Ordinal.
+
+Lemma mono_sorted_enum d d' (T : finPOrderType d)
+    (T' : porderType d') (f : T -> T') :
+    total (<=%O : rel T) -> {mono f : x y / (x <= y)%O} ->
+  sorted <=%O [seq f x | x <- Order.enum T].
+Proof.
+move=> /sort_sorted ss_sorted lef; wlog [x0 x'0] : / (T * T')%type.
+  by case: (Order.enum T) => // x ? => /(_ (x, f x)).
+rewrite (sorted_pairwise le_trans).
+apply/(pairwiseP x'0) => i j; rewrite !inE !size_map -!Order.cardT.
+move=> ilt jlt ij; rewrite !(nth_map x0) -?Order.cardT// lef.
+by rewrite (sorted_leq_nth le_trans le_refl) ?inE -?Order.cardT// 1?ltnW.
+Qed.
+
+Lemma mono_unique d (T T' : finPOrderType d) (f g : T -> T') :
+    total (<=%O : rel T) -> (#|T'| <= #|T|)%N ->
+    {mono f : x y / x <= y} -> {mono g : x y / x <= y} ->
+  f =1 g.
+Proof.
+move=> le_total leT'T lef leg x0; move: {+}x0.
+suff: finfun f = finfun g by move=> /ffunP + x => /(_ x); rewrite !ffunE.
+apply: (can_inj fgraphK); apply/val_inj => /=; rewrite !codomE.
+under eq_map do rewrite ffunE; under [RHS]eq_map do rewrite ffunE.
+have [finj ginj] := (inc_inj lef, inc_inj leg).
+have [f' fK f'K] := inj_card_bij finj leT'T.
+have [g' gK g'K] := inj_card_bij ginj leT'T.
+apply/eqP; have : [seq f i | i <- Order.enum T] = [seq g i | i <- Order.enum T].
+  apply: (@sorted_eq _ <=%O le_trans le_anti); rewrite ?mono_sorted_enum//.
+  apply: uniq_perm; rewrite ?map_inj_uniq ?sort_uniq ?fintype.enum_uniq//.
+  move=> x; apply/mapP/mapP => -[y _ ->].
+    by exists (g' (f y)); rewrite ?Order.mem_enum.
+  by exists (f' (g y)); rewrite ?Order.mem_enum.
+move=> /eqP; rewrite !eq_map_all all_map [in X in _ -> X]all_map.
+by have /permPl/perm_all-> := perm_sort <=%O (fintype.enum T).
+Qed.
+
+Module Import EnumVal.
+Section EnumVal.
+Import OrdinalOrder.Exports.
+Variables (d : unit) (T : finPOrderType d).
+Implicit Types (x : T) (A : {pred T}).
+
+Definition enum_rank_in x0 A (Ax0 : x0 \in A) x :=
+  insubd (Ordinal (@enum_rank_subproof _ x0 A Ax0)) (index x (enum A)).
+
+Definition enum_rank x := @enum_rank_in x T (erefl true) x.
+
+Definition enum_val A i := nth (@enum_default _ A i) (enum A) i.
+Prenex Implicits enum_val.
+
+Lemma enum_valP A i : @enum_val A i \in A.
+Proof.
+suff: enum_val i \in enum A by rewrite mem_enum.
+by apply: mem_nth; rewrite -cardE.
+Qed.
+
+Lemma enum_val_nth A x i : @enum_val A i = nth x (enum A) i.
+Proof. by apply: set_nth_default; rewrite cardE in i *. Qed.
+
+Lemma nth_enum_rank_in x00 x0 A Ax0 :
+  {in A, cancel (@enum_rank_in x0 A Ax0) (nth x00 (enum A))}.
+Proof.
+move=> x Ax; rewrite /= insubdK ?nth_index ?mem_enum //.
+by rewrite cardE [_ \in _]index_mem mem_enum.
+Qed.
+
+Lemma nth_enum_rank x0 : cancel enum_rank (nth x0 (enum T)).
+Proof. by move=> x; apply: nth_enum_rank_in. Qed.
+
+Lemma enum_rankK_in x0 A Ax0 :
+   {in A, cancel (@enum_rank_in x0 A Ax0) enum_val}.
+Proof. by move=> x; apply: nth_enum_rank_in. Qed.
+
+Lemma enum_rankK : cancel enum_rank enum_val.
+Proof. by move=> x; apply: enum_rankK_in. Qed.
+
+Lemma enum_valK_in x0 A Ax0 : cancel enum_val (@enum_rank_in x0 A Ax0).
+Proof.
+move=> x; apply: ord_inj; rewrite insubdK; last first.
+  by rewrite cardE [_ \in _]index_mem mem_nth // -cardE.
+by rewrite index_uniq ?enum_uniq // -cardE.
+Qed.
+
+Lemma enum_valK : cancel enum_val enum_rank.
+Proof. by move=> x; apply: enum_valK_in. Qed.
+
+Lemma enum_rank_inj : injective enum_rank.
+Proof. exact: can_inj enum_rankK. Qed.
+
+Lemma enum_val_inj A : injective (@enum_val A).
+Proof. by move=> i; apply: can_inj (enum_valK_in (enum_valP i)) (i). Qed.
+
+Lemma enum_val_bij_in x0 A : x0 \in A -> {on A, bijective (@enum_val A)}.
+Proof.
+move=> Ax0; exists (enum_rank_in Ax0) => [i _|]; last exact: enum_rankK_in.
+exact: enum_valK_in.
+Qed.
+
+Lemma eq_enum_rank_in (x0 y0 : T) A (Ax0 : x0 \in A) (Ay0 : y0 \in A) :
+  {in A, enum_rank_in Ax0 =1 enum_rank_in Ay0}.
+Proof. by move=> x xA; apply: enum_val_inj; rewrite !enum_rankK_in. Qed.
+
+Lemma enum_rank_in_inj (x0 y0 : T) A (Ax0 : x0 \in A) (Ay0 : y0 \in A) :
+  {in A &, forall x y, enum_rank_in Ax0 x = enum_rank_in Ay0 y -> x = y}.
+Proof. by move=> x y xA yA /(congr1 enum_val); rewrite !enum_rankK_in. Qed.
+
+Lemma enum_rank_bij : bijective enum_rank.
+Proof. by move: enum_rankK enum_valK; exists (@enum_val T). Qed.
+
+Lemma enum_val_bij : bijective (@enum_val T).
+Proof. by move: enum_rankK enum_valK; exists enum_rank. Qed.
+
+Section total.
+(* We circumvent a shortcomming of finOrderType *)
+(* which requires the type to be nonempty and we do not want to rule this out *)
+Hypothesis (leT_total : total (<=%O : rel T)).
+
+Lemma le_enum_val A : {mono @enum_val A : i j / i <= j}.
+Proof.
+apply: le_mono => i j le_ij.
+rewrite /enum_val (set_nth_default (enum_default j)) -?cardE//.
+apply: (sorted_ltn_nth lt_trans); rewrite -?topredE/= -?cardE//.
+by rewrite lt_sorted_uniq_le enum_uniq/= sort_sorted.
+Qed.
+
+Lemma le_enum_rank_in x0 A (Ax0 : x0 \in A) :
+  {in A &, {mono enum_rank_in Ax0 : x y / x <= y}}.
+Proof.
+apply: can_mono_in (@in2W _ _ predT predT _ (@le_enum_val A)) => //.
+exact/onW_can_in/enum_rankK_in.
+Qed.
+
+Lemma le_enum_rank : {mono enum_rank : i j / i <= j}.
+Proof. exact: can_mono enum_rankK (@le_enum_val predT). Qed.
+
+End total.
+End EnumVal.
+Arguments enum_val {d T A}.
+Arguments enum_rank {d T}.
+End EnumVal.
+
+Notation enum_val := enum_val.
+Notation enum_rank_in := enum_rank_in.
+Notation enum_rank := enum_rank.
+Notation enum_valP := enum_valP.
+Notation enum_val_nth := enum_val_nth.
+Notation nth_enum_rank_in := nth_enum_rank_in.
+Notation nth_enum_rank := nth_enum_rank.
+Notation enum_rankK_in := enum_rankK_in.
+Notation enum_rankK := enum_rankK.
+Notation enum_valK_in := enum_valK_in.
+Notation enum_valK := enum_valK.
+Notation enum_rank_inj := enum_rank_inj.
+Notation enum_val_inj := enum_val_inj.
+Notation enum_val_bij_in := enum_val_bij_in.
+Notation eq_enum_rank_in := eq_enum_rank_in.
+Notation enum_rank_in_inj := enum_rank_in_inj.
+Notation enum_rank_bij := enum_rank_bij.
+Notation enum_val_bij := enum_val_bij.
+Notation le_enum_val := le_enum_val.
+Notation le_enum_rank_in := le_enum_rank_in.
+Notation le_enum_rank := le_enum_rank.
+
 Module Syntax.
 Export POSyntax.
 Export LatticeSyntax.
@@ -7538,6 +7850,7 @@ Export Order.SubOrder.Exports.
 Export Order.NatOrder.Exports.
 Export Order.NatMonotonyTheory.
 Export Order.NatDvd.Exports.
+Export Order.OrdinalOrder.Exports.
 Export Order.BoolOrder.Exports.
 Export Order.ProdOrder.Exports.
 Export Order.SigmaOrder.Exports.
