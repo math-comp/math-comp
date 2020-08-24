@@ -607,6 +607,18 @@ Proof. by split_mxE. Qed.
 Lemma col_mx_const a : col_mx (const_mx a) (const_mx a) = const_mx a.
 Proof. by split_mxE. Qed.
 
+Lemma row_usubmx A i : row i (usubmx A) = row (lshift m2 i) A.
+Proof. by apply/rowP=> j; rewrite !mxE; congr (A _ _); apply/val_inj. Qed.
+
+Lemma row_dsubmx A i : row i (dsubmx A) = row (rshift m1 i) A.
+Proof. by apply/rowP=> j; rewrite !mxE; congr (A _ _); apply/val_inj. Qed.
+
+Lemma col_lsubmx A i : col i (lsubmx A) = col (lshift n2 i) A.
+Proof. by apply/colP=> j; rewrite !mxE; congr (A _ _); apply/val_inj. Qed.
+
+Lemma col_rsubmx A i : col i (rsubmx A) = col (rshift n1 i) A.
+Proof. by apply/colP=> j; rewrite !mxE; congr (A _ _); apply/val_inj. Qed.
+
 End CutPaste.
 
 Lemma trmx_lsub m n1 n2 (A : 'M_(m, n1 + n2)) : (lsubmx A)^T = usubmx A^T.
