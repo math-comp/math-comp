@@ -81,6 +81,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * `mxOver S` is a sub Z-module if `S` is.
     * `mxOver S` is a semiring for square matrices if `S` is.
     * `mxOver S` is a subring for square matrices if `S` is.
+- in `matrix.v` new lemmas about `map_mx`: `map_mx_id`, `map_mx_comp`,
+  `eq_in_map_mx`, `eq_map_mx` and `map_mx_id_in`.
 
 ### Changed
 
