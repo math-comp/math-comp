@@ -59,6 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `allrel_map`, `allrelP` and `allrel0`.
   + lemmas `allrel1`, `allrel2` and `allrel_cons`,
     under assumptions of reflexivity and symmetry of `r`.
+- in `mxpoly.v`, new lemmas `mxminpoly_minP` and `dvd_mxminpoly`.
 
 ### Changed
 
