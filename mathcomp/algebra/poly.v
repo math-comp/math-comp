@@ -1093,6 +1093,12 @@ Proof. by rewrite /comm_poly !hornerC !simp. Qed.
 Lemma comm_polyX x : comm_poly 'X x.
 Proof. by rewrite /comm_poly !hornerX. Qed.
 
+Lemma commr_horner a b p : GRing.comm a b -> comm_coef p a -> GRing.comm a p.[b].
+Proof.
+move=> cab cpa; rewrite horner_coef; apply: commr_sum => i _.
+by apply: commrM => //; apply: commrX.
+Qed.
+
 Lemma hornerM_comm p q x : comm_poly q x -> (p * q).[x] = p.[x] * q.[x].
 Proof.
 move=> comm_qx.

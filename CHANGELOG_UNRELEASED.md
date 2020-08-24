@@ -38,6 +38,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `scalar_mx_is_diag`, `is_scalar_mx_is_diag`, `scalar_mx_is_trig` and
   `is_scalar_mx_is_trig`.
 
+- in `poly.v`, new lemma `commr_horner`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
