@@ -2108,6 +2108,23 @@ Proof. by move=> ? ? /(f_equal val) /= /val_inj. Qed.
 Lemma rshift_inj m n : injective (@rshift m n).
 Proof. by move=> ? ? /(f_equal val) /addnI /val_inj. Qed.
 
+Lemma eq_lshift m n i j : (@lshift m n i == @lshift m n j) = (i == j).
+Proof. by rewrite (inj_eq (@lshift_inj _ _)). Qed.
+
+Lemma eq_rshift m n i j : (@rshift m n i == @rshift m n j) = (i == j).
+Proof. by rewrite (inj_eq (@rshift_inj _ _)). Qed.
+
+Lemma eq_lrshift m n i j : (@lshift m n i == @rshift m n j) = false.
+Proof.
+apply/eqP=> /(congr1 val)/= def_i; have := ltn_ord i.
+by rewrite def_i -ltn_subRL subnn.
+Qed.
+
+Lemma eq_rlshift m n i j : (@rshift m n i == @lshift m n j) = false.
+Proof. by rewrite eq_sym eq_lrshift. Qed.
+
+Definition eq_shift := (eq_lshift, eq_rshift, eq_lrshift, eq_rlshift).
+
 Lemma split_subproof m n (i : 'I_(m + n)) : i >= m -> i - m < n.
 Proof. by move/subSn <-; rewrite leq_subLR. Qed.
 
@@ -2131,6 +2148,13 @@ set lt_i_m := i < m; rewrite /split.
 by case: _ _ _ _ {-}_ lt_i_m / ltnP; [left | right; rewrite subnKC].
 Qed.
 
+Variant split_ord_spec m n (i : 'I_(m + n)) : 'I_m + 'I_n -> bool -> Type :=
+  | SplitOrdLo (j : 'I_m) of i = lshift _ j : split_ord_spec i (inl _ j) true
+  | SplitOrdHi (k : 'I_n) of i = rshift _ k : split_ord_spec i (inr _ k) false.
+
+Lemma split_ordP m n (i : 'I_(m + n)) : split_ord_spec i (split i) (i < m).
+Proof. by case: splitP; [left|right]; apply: val_inj. Qed.
+
 Definition unsplit {m n} (jk : 'I_m + 'I_n) :=
   match jk with inl j => lshift n j | inr k => rshift m k end.
 
@@ -2138,12 +2162,11 @@ Lemma ltn_unsplit m n (jk : 'I_m + 'I_n) : (unsplit jk < m) = jk.
 Proof. by case: jk => [j|k]; rewrite /= ?ltn_ord // ltnNge leq_addr. Qed.
 
 Lemma splitK {m n} : cancel (@split m n) unsplit.
-Proof. by move=> i; apply: val_inj; case: splitP. Qed.
+Proof. by move=> i; case: split_ordP. Qed.
 
 Lemma unsplitK {m n} : cancel (@unsplit m n) split.
 Proof.
-move=> jk; have:= ltn_unsplit jk.
-by do [case: splitP; case: jk => //= i j] => [|/addnI] => /ord_inj->.
+by move=> [j|k]; case: split_ordP => ? /eqP; rewrite eq_shift// => /eqP->.
 Qed.
 
 Section OrdinalPos.

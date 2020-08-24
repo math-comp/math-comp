@@ -29,6 +29,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v` new lemma `sig_big_dep`, analogous to `pair_big_dep`
   but with an additional dependency in the index types `I` and `J`.
+- in `fintype.v` adds lemma `split_ordP`, a variant of `splitP` which
+  introduces ordinal equalities between the index and
+  `lshift`/`rshift`, rather than equalities in `nat`, which in some
+  proofs makes the reasoning easier (cf `matrix.v`), especially
+  together with the new lemma `eq_shift` (which is a multi-rule for new
+  lemmas `eq_lshift`, `eq_rshift`, `eq_lrshift` and `eq_rlshift`).
 
 - in `matrix.v` new definitions `is_diag_mx` and `is_trig_mx`
   characterizing respectively diagonal and lower triangular matrices.
