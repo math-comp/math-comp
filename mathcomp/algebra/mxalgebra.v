@@ -831,6 +831,9 @@ exists (col_ebase A *m pid_mx (\rank A)).
 by rewrite mulmxA -(mulmxA _ _ (pid_mx _)) pid_mx_id // mulmx_ebase.
 Qed.
 
+Lemma row_base0 (m n : nat) : row_base (0 : 'M[F]_(m, n)) = 0.
+Proof. by apply/eqmx0P; rewrite !eq_row_base !sub0mx. Qed.
+
 Let qidmx_eq1 n (A : 'M_n) : qidmx A = (A == 1%:M).
 Proof. by rewrite /qidmx eqxx pid_mx_1. Qed.
 
@@ -1200,11 +1203,22 @@ apply: (iffP submxP) => [[D ->]|]; first by rewrite -mulmxA mulmx_ker mulmx0.
 by move/mulmxKV_ker; exists (B *m col_ebase A).
 Qed.
 
+Lemma sub_kermx p m n (A : 'M_(m, n)) (B : 'M_(p, m)) :
+  (B <= kermx A)%MS = (B *m A == 0).
+Proof. exact/sub_kermxP/eqP. Qed.
+
+Lemma kermx0 m n : (kermx (0 : 'M_(m, n)) :=: 1%:M)%MS.
+Proof. by apply/eqmxP; rewrite submx1/= sub_kermx mulmx0. Qed.
+
+Lemma mulmx_free_eq0 m n p (A : 'M_(m, n)) (B : 'M_(n, p)) :
+  row_free B -> (A *m B == 0) = (A == 0).
+Proof. by rewrite -sub_kermx -kermx_eq0 => /eqP->; rewrite submx0. Qed.
+
 Lemma mulmx0_rank_max m n p (A : 'M_(m, n)) (B : 'M_(n, p)) :
   A *m B = 0 -> \rank A + \rank B <= n.
 Proof.
 move=> AB0; rewrite -{3}(subnK (rank_leq_row B)) leq_add2r.
-by rewrite -mxrank_ker mxrankS //; apply/sub_kermxP.
+by rewrite -mxrank_ker mxrankS // sub_kermx AB0.
 Qed.
 
 Lemma mxrank_Frobenius m n p q (A : 'M_(m, n)) B (C : 'M_(p, q)) :
@@ -1218,7 +1232,7 @@ set C1 := _ *m C; rewrite -{2}(subnKC (rank_leq_row C1)) leq_add2l -mxrank_ker.
 rewrite -(mxrankMfree _ (row_base_free (A *m B))).
 have: (row_base (A *m B) <= row_base B)%MS by rewrite !eq_row_base submxMl.
 case/submxP=> D defD; rewrite defD mulmxA mxrankMfree ?mxrankS //.
-by apply/sub_kermxP; rewrite -mulmxA (mulmxA D) -defD -/C2 mulmx_ker.
+by rewrite sub_kermx -mulmxA (mulmxA D) -defD -/C2 mulmx_ker.
 Qed.
 
 Lemma mxrank_mul_min m n p (A : 'M_(m, n)) (B : 'M_(n, p)) :
@@ -1244,7 +1258,7 @@ apply/idP/andP=> [sAI | [/submxP[B' ->{A}] /submxP[C' eqBC']]].
    rewrite -{1}[K]hsubmxK mul_row_col; move/(canRL (addrK _))->.
    by rewrite add0r -mulNmx submxMl.
 have: (row_mx B' (- C') <= kermx (col_mx B C))%MS.
-  by apply/sub_kermxP; rewrite mul_row_col eqBC' mulNmx subrr.
+  by rewrite sub_kermx mul_row_col eqBC' mulNmx subrr.
 case/submxP=> D; rewrite -[kermx _]hsubmxK mul_mx_row.
 by case/eq_row_mx=> -> _; rewrite -mulmxA submxMl.
 Qed.
@@ -1476,11 +1490,9 @@ apply/eqP; set K := kermx B; set C := (A :&: K)%MS.
 rewrite -(eqmxMr B (eq_row_base A)); set K' := _ *m B.
 rewrite -{2}(subnKC (rank_leq_row K')) -mxrank_ker eqn_add2l.
 rewrite -(mxrankMfree _ (row_base_free A)) mxrank_leqif_sup.
-  rewrite sub_capmx -(eq_row_base A) submxMl.
-  by apply/sub_kermxP; rewrite -mulmxA mulmx_ker.
+  by rewrite sub_capmx -(eq_row_base A) submxMl sub_kermx -mulmxA mulmx_ker/=.
 have /submxP[C' defC]: (C <= row_base A)%MS by rewrite eq_row_base capmxSl.
-rewrite defC submxMr //; apply/sub_kermxP.
-by rewrite mulmxA -defC; apply/sub_kermxP; rewrite capmxSr.
+by rewrite defC submxMr // sub_kermx mulmxA -defC -sub_kermx capmxSr.
 Qed.
 
 Lemma mxrank_injP m n p (A : 'M_(m, n)) (f : 'M_(n, p)) :
@@ -1962,10 +1974,7 @@ Definition eigenvalue : pred F := fun a => eigenspace a != 0.
 
 Lemma eigenspaceP a m (W : 'M_(m, n)) :
   reflect (W *m g = a *: W) (W <= eigenspace a)%MS.
-Proof.
-rewrite (sameP (sub_kermxP _ _) eqP).
-by rewrite mulmxBr subr_eq0 mul_mx_scalar; apply: eqP.
-Qed.
+Proof. by rewrite sub_kermx mulmxBr subr_eq0 mul_mx_scalar; apply/eqP. Qed.
 
 Lemma eigenvalueP a :
   reflect (exists2 v : 'rV_n, v *m g = a *: v & v != 0) (eigenvalue a).
