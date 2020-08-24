@@ -8,6 +8,7 @@ interval.v
 matrix.v
 mxalgebra.v
 mxpoly.v
+mxred.v
 polydiv.v
 poly.v
 polyXY.v
@@ -19,6 +20,8 @@ ssrint.v
 ssrnum.v
 vector.v
 zmodp.v
+sesquilinear.v
+spectral.v
 
 -R . mathcomp.algebra
 

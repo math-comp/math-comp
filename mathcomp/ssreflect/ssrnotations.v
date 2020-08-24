@@ -79,9 +79,9 @@ Reserved Notation "''C_' ( A ) [ x ]" (at level 8).
 Reserved Notation "''C_' ( B ) ( A )" (at level 8).
 
 (* Reserved notation for Euclidean division and divisibility. *)
-Reserved Notation "m %/ d" (at level 40, no associativity). 
-Reserved Notation "m %% d" (at level 40, no associativity). 
-Reserved Notation "m %| d" (at level 70, no associativity). 
+Reserved Notation "m %/ d" (at level 40, no associativity).
+Reserved Notation "m %% d" (at level 40, no associativity).
+Reserved Notation "m %| d" (at level 70, no associativity).
 Reserved Notation "m = n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  =  n '/'  %[mod  d ] ']'").
 Reserved Notation "m == n %[mod d ]" (at level 70, n at next level,
@@ -109,3 +109,8 @@ Reserved Notation "x < y :> T" (at level 70, y at next level).
 Reserved Notation "x > y :> T" (at level 70, y at next level).
 Reserved Notation "x <= y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=  y '/'  ?=  'iff'  c  :> T ']'").
+
+(* Reserved notation for dot product. *)
+Reserved Notation "'[ u , v ]"
+  (at level 2, format "'[hv' ''[' u , '/ '  v ] ']'").
+Reserved Notation "'[ u ]" (at level 2, format "''[' u ]").
