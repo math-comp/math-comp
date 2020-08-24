@@ -408,6 +408,15 @@ From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 (* whenever the type is porderType, and their monotonicity is provided if     *)
 (* this order is total. The theory is in the module Order (Order.enum_valK,   *)
 (* Order.enum_rank_inK, etc) but Order.Enum can be imported to shorten these. *)
+(******************************************************************************)
+(* We provide an opaque monotonous bijection tagnat.sig / tagnat.rank between *)
+(* the finite types {i : 'I_n & 'I_(p_ i)} and 'I_(\sum_i p_ i):              *)
+(*  tagnat.sig  : 'I_(\sum_i p_ i) -> {i : 'I_n & 'I_(p_ i)}                  *)
+(*  tagnat.rank : {i : 'I_n & 'I_(p_ i)} -> 'I_(\sum_i p_ i)                  *)
+(*  tagnat.sig1 : 'I_(\sum_i p_ i) -> 'I_n                                    *)
+(*  tagnat.sig2 : forall p : 'I_(\sum_i p_ i), 'I_(p_ (tagnat.sig1 p))        *)
+(*  tagnat.Rank : forall i, 'I_(p_ i) -> 'I_(\sum_i p_ i)                     *)
+(******************************************************************************)
 (* This file is based on prior work by                                        *)
 (* D. Dreyer, G. Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                 *)
 (******************************************************************************)
@@ -7641,6 +7650,7 @@ move=> /eqP; rewrite !eq_map_all all_map [in X in _ -> X]all_map.
 by have /permPl/perm_all-> := perm_sort <=%O (fintype.enum T).
 Qed.
 
+(* This module should be exported on demand, as in module tagnat below *)
 Module Import EnumVal.
 Section EnumVal.
 Import OrdinalOrder.Exports.
@@ -7866,3 +7876,131 @@ Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder.
 Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
 Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
 Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
+
+Import Order.Theory.
+
+Module tagnat.
+Section tagnat.
+Import Order.EnumVal.
+
+Context {n : nat} {p_ : 'I_n -> nat}.
+
+Local Notation ordsum := 'I_(\sum_i p_ i)%N.
+Local Notation T := {i & 'I_(p_ i)}.
+
+Implicit Types (i : 'I_n) (s : ordsum) (p : T).
+
+Lemma card : #|{: T}| = \sum_i p_ i.
+Proof.
+rewrite card_tagged sumnE/= big_map big_enum.
+by apply: eq_bigr => i _; rewrite card_ord.
+Qed.
+
+Definition sig : ordsum -> T  := enum_val \o (cast_ord (esym card)).
+Definition rank : T -> ordsum := (cast_ord card) \o enum_rank.
+
+Lemma sigK : cancel sig rank.
+Proof.
+by move=> s; rewrite /sig/rank/= enum_valK cast_ord_comp cast_ord_id.
+Qed.
+Lemma sig_inj : injective sig. Proof. exact: can_inj sigK. Qed.
+
+Lemma rankK : cancel rank sig.
+Proof.
+by move=> p; rewrite /sig/rank/= cast_ord_comp cast_ord_id enum_rankK.
+Qed.
+Lemma rank_inj : injective rank. Proof. exact: can_inj rankK. Qed.
+
+Definition sig1 s : 'I_n             := tag (sig s).
+Definition sig2 s : 'I_(p_ (sig1 s)) := tagged (sig s).
+Definition Rank i (j : 'I_(p_ i))    := rank (Tagged _ j).
+
+Lemma sigE12 s : sig s = @Tagged _ (sig1 s) _ (sig2 s).
+Proof. by rewrite /sig1 /sig2; case: sig. Qed.
+
+Lemma rankE p : rank p = @Rank (tag p) (tagged p). Proof. by case: p. Qed.
+
+Lemma sig2K s : Rank (sig2 s) = s. Proof. by rewrite -rankE sigK. Qed.
+
+Lemma Rank1K i0 (k : 'I_(p_ i0)) : sig1 (Rank k) = i0.
+Proof. by rewrite /sig1 /Rank/= rankK/=. Qed.
+
+Lemma Rank2K i0 (k : 'I_(p_ i0)) :
+  sig2 (Rank k) = cast_ord (congr1 p_ (esym (Rank1K k))) k.
+Proof. by apply: val_inj; rewrite /sig2/sig1/Rank/= rankK. Qed.
+#[local] Hint Resolve sigK rankK : core.
+
+Lemma rank_bij : bijective rank. Proof. by exists sig. Qed.
+Lemma sig_bij  : bijective sig.  Proof. by exists rank. Qed.
+
+Lemma rank_bij_on : {on [pred _ | true], bijective rank}.
+Proof. exact/onW_bij/rank_bij. Qed.
+
+Lemma sig_bij_on : {on [pred _ | true], bijective sig}.
+Proof. exact/onW_bij/sig_bij. Qed.
+
+Lemma le_sig : {mono sig : i j / i <= j}.
+Proof. by move=> i j; rewrite /sig/= le_enum_val//; apply: le_total. Qed.
+
+Lemma le_sig1 : {homo sig1 : i j / i <= j}.
+Proof. by move=> i j; rewrite /sig1/= -le_sig leEsig/=; case: leP. Qed.
+
+Lemma le_rank : {mono rank : p q / p <= q}.
+Proof. exact: can_mono le_sig. Qed.
+
+Lemma le_Rank i : {mono @Rank i : j k / j <= k}.
+Proof. by move=> j k; rewrite /Rank le_rank/= leEsig/= tagged_asE lexx. Qed.
+
+Lemma lt_sig : {mono sig : i j / i < j}.
+Proof. by move=> i j; rewrite !ltNge le_sig. Qed.
+
+Lemma lt_rank : {mono rank : p q / p < q}.
+Proof. by move=> p q; rewrite !ltNge le_rank. Qed.
+
+Lemma lt_Rank i : {mono @Rank i : j k / j < k}.
+Proof. by move=> j k; rewrite !ltNge le_Rank. Qed.
+
+Lemma eq_Rank i i' (j : 'I_(p_ i)) (j': 'I_(p_ i')) :
+  (Rank j == Rank j' :> nat) = (i == i') && (j == j' :> nat).
+Proof.
+rewrite val_eqE /Rank -(can_eq sigK) !rankK.
+case: (i =P i') => ii' /=; last by case: eqVneq => // -[].
+by case: _ / ii' in j' *; rewrite eq_Tagged.
+Qed.
+
+Lemma rankEsum p : rank p = \sum_(i < n | (i < tag p)%N) p_ i + tagged p :> nat.
+Proof.
+pose sum p := \sum_(i < n | (i < tag p)%N) p_ i + tagged p.
+rewrite -/(sum _); have sumlt : forall p, (sum p < \sum_i p_ i)%N.
+  rewrite /sum => -[/= i j].
+  rewrite [X in (_ < X)%N](bigID [pred i' : 'I__ | (i' < i)%N])/= ltn_add2l.
+  by rewrite (bigD1 i) ?ltnn//= ltn_addr.
+suff: rank =1 (fun p => Ordinal (sumlt p)) by move=> /(_ p)/(congr1 val).
+apply: (Order.mono_unique _ _ le_rank) => //=.
+- exact: le_total.
+- by rewrite card card_ord.
+apply: le_mono => /= -[i j] -[i' j']; rewrite ltEsig/= !ltEord/= /sum leEord/=.
+case: (ltngtP i i') => //= [ltii' _|/val_inj ii']; last first.
+  by rewrite -ii' in j' *; rewrite tagged_asE => ltjj'; rewrite ltn_add2l.
+rewrite ltn_addr// (@leq_trans (\sum_(i0 < n | (i0 < i)%N) p_ i0 + p_ i))%N//.
+  by rewrite ltn_add2l.
+rewrite [X in (_ <= X)%N](bigID [pred i' : 'I__ | (i' < i)%N])/=.
+rewrite leq_add//; last first.
+  by rewrite (bigD1 i) ?ltnn ?ltii'//= leq_addr.
+rewrite [X in (_ <= X)%N](eq_bigl [pred k : 'I_n | (k < i)%N])// => k/=.
+by case: (ltnP k i); rewrite ?andbF// => /ltn_trans->.
+Qed.
+
+Lemma RankEsum i j : @Rank i j = \sum_(k < n | (k < i)%N) p_ k + j :> nat.
+Proof. by rewrite /Rank rankEsum/=. Qed.
+
+Lemma rect s : s = \sum_(i < n | (i < sig1 s)%N) p_ i + sig2 s :> nat.
+Proof. by rewrite -[s]sigK rankEsum /= sigK. Qed.
+
+Lemma eqRank (i0 j : nat) (li0 : (i0 < n)%N) (lj : (j < p_ (Ordinal li0))%N) :
+  (\sum_(i < n | (i < i0)%N) p_ i) + j = Rank (Ordinal lj) :> nat.
+Proof. by rewrite RankEsum. Qed.
+
+End tagnat.
+End tagnat.
+Arguments tagnat.Rank {n p_}.

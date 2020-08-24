@@ -52,6 +52,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `enum_val_bij`, `le_enum_val`, `le_enum_rank_in`, and
     `le_enum_rank`.  They are all accessible via module `Order` if one
     chooses not to import `Order.EnumVal`.
+  + a new module `tagnat` which provides a monotonous bijection
+    between the finite ordered types `{i : 'I_n & 'I_(p_ i)}`
+    (canonically ordered lexicographically), and `'I_(\sum_i p_ i)`,
+    via the functions `sig` and `rank`. We provide direct access to
+    the components of the former type via the functions `sig1`, `sig2`
+    and `Rank`. We provide the following lemmas on these definitions:
+    `card`, `sigK`, `sig_inj`, `rankK`, `rank_inj`, `sigE12`,
+    `rankE`, `sig2K`, `Rank1K`, `Rank2K`, `rank_bij`, `sig_bij `,
+    `rank_bij_on`, `sig_bij_on`, `le_sig`, `le_sig1`, `le_rank`,
+    `le_Rank`, `lt_sig`, `lt_rank`, `lt_Rank`, `eq_Rank`, `rankEsum`,
+    `RankEsum`, `rect`, and `eqRank`.
+
+- in `matrix.v`, seven new definitions:
+  + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations
+    `\mxblock_(i < m, j < n) B_ i j`, `\mxcol_(i < m) B_ i`,
+    `\mxrow_(j < n) B_ j`, and `\mxdiag_(i < n) B_ i` (and variants
+    without explicit `< n`), to form big matrices described by blocks.
+  + `submxblock`, `submxcol` and `submxrow` to extract blocks from the
+    former constructions. There is no analogous for `mxdiag` because
+    one can simply apply `submxblock A i i`.
+  + We provide the following lemmas on these definitions:
+    `mxblockEh`, `mxblockEv`, `submxblockEh`, `submxblockEv`,
+    `mxblockK`, `mxrowK`, `mxcolK`, `submxrow_matrix`,
+    `submxcol_matrix`, `submxblockK`, `submxrowK`, `submxcolK`,
+    `mxblockP`, `mxrowP`, `mxcolP`, `eq_mxblockP`, `eq_mxblock`,
+    `eq_mxrowP`, `eq_mxrow`, `eq_mxcolP`, `eq_mxcol`, `row_mxrow`,
+    `col_mxrow`, `row_mxcol`, `col_mxcol`, `row_mxblock`,
+    `col_mxblock`, `tr_mxblock`, `tr_mxrow`, `tr_mxcol`,
+    `tr_submxblock`, `tr_submxrow`, `tr_submxcol`, `mxsize_recl`,
+    `mxrow_recl`, `mxcol_recu`, `mxblock_recl`, `mxblock_recu`,
+    `mxblock_recul`, `mxrowEblock`, `mxcolEblock`, `mxEmxrow`,
+    `mxEmxcol`, `mxEmxblock`, `mxrowD`, `mxrowN`, `mxrowB`, `mxrow0`,
+    `mxrow_const`, `mxrow_sum`, `submxrowD`, `submxrowN`, `submxrowB`,
+    `submxrow0`, `submxrow_sum`, `mul_mxrow`, `mul_submxrow`,
+    `mxcolD`, `mxcolN`, `mxcolB`, `mxcol0`, `mxcol_const`,
+    `mxcol_sum`, `submxcolD`, `submxcolN`, `submxcolB`, `submxcol0`,
+    `submxcol_sum`, `mxcol_mul`, `submxcol_mul`, `mxblockD`,
+    `mxblockN`, `mxblockB`, `mxblock0`, `mxblock_const`,
+    `mxblock_sum`, `submxblockD`, `submxblockN`, `submxblockB`,
+    `submxblock0`, `submxblock_sum`, `mul_mxrow_mxcol`,
+    `mul_mxcol_mxrow`, `mul_mxrow_mxblock`, `mul_mxblock_mxrow`,
+    `mul_mxblock`, `is_trig_mxblockP`, `is_trig_mxblock`,
+    `is_diag_mxblockP`, `is_diag_mxblock`, `submxblock_diag`,
+    `eq_mxdiagP`, `eq_mxdiag`, `mxdiagD`, `mxdiagN`, `mxdiagB`,
+    `mxdiag0`, `mxdiag_sum`, `tr_mxdiag`, `row_mxdiag`, `col_mxdiag`,
+    `mxdiag_recl`, `mxtrace_mxblock`, `mxdiagZ`, `diag_mxrow`,
+    `mxtrace_mxdiag`, `mul_mxdiag_mxcol`, `mul_mxrow_mxdiag`,
+    `mul_mxblock_mxdiag`, and `mul_mxdiag_mxblock`.
+   + adding missing lemmas `trmx_conform` and `eq_castmx`.
+
+- in `mxalgegra.v`,
+  + Lemmas about rank of block matrices with `0`s inside
+    `rank_col_mx0`, `rank_col_0mx`, `rank_row_mx0`, `rank_row_0mx`,
+    `rank_diag_block_mx`, and `rank_mxdiag`.
+  + we provide an equality of spaces `eqmx_col` between `\mxcol_i V_
+    i` and the sum of spaces `\sum_i <<V_ i>>)%MS`.
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
