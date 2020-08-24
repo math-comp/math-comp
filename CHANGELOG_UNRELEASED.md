@@ -104,6 +104,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `mxpoly.v` new lemmas `horner_mx_diag`, `char_poly_trig`,
    `root_mxminpoly`, and `mxminpoly_diag`
+- in `mxalgebra.v`, new lemma `sub_sums_genmxP` (generalizes `sub_sumsmxP`).
 
 ### Changed
 
