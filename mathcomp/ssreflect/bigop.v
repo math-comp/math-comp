@@ -1536,14 +1536,26 @@ do 2!rewrite (big_addn _ _ 0) big_mkord; rewrite (reindex_inj rev_ord_inj) /=.
 by apply: eq_big => [i | i _]; rewrite /= -addSn subnDr addnC addnBA.
 Qed.
 
+Lemma sig_big_dep (I : finType) (J : I -> finType)
+    (P : pred I) (Q : forall {i}, pred (J i)) (F : forall {i}, J i -> R) :
+  \big[op/idx]_(i | P i) \big[op/idx]_(j : J i | Q j) F j =
+  \big[op/idx]_(p : {i & J i} | P (tag p) && Q (tagged p)) F (tagged p).
+Proof.
+pose s := [seq Tagged J j | i <- index_enum I, j <- index_enum (J i)].
+rewrite [LHS]big_mkcond big_mkcondl [RHS]big_mkcond -[RHS](@perm_big _ s).
+  rewrite big_allpairs_dep/=; apply: eq_bigr => i _; rewrite -big_mkcond/=.
+  by case: P; rewrite // big1.
+rewrite uniq_perm ?index_enum_uniq//.
+  by rewrite allpairs_uniq_dep// => [|i|[i j] []]; rewrite ?index_enum_uniq.
+by move=> [i j]; rewrite ?mem_index_enum; apply/allpairsPdep; exists i, j.
+Qed.
+
 Lemma pair_big_dep (I J : finType) (P : pred I) (Q : I -> pred J) F :
   \big[*%M/1]_(i | P i) \big[*%M/1]_(j | Q i j) F i j =
     \big[*%M/1]_(p | P p.1 && Q p.1 p.2) F p.1 p.2.
 Proof.
-rewrite (partition_big fst P) => [|j]; last by case/andP.
-apply: eq_bigr => i /= Pi; rewrite (reindex_onto (pair i) snd).
-   by apply: eq_bigl => j; rewrite !eqxx [P i]Pi !andbT.
-by case=> i' j /= /andP [_] /eqP ->.
+rewrite sig_big_dep; apply: (reindex (fun x => Tagged (fun=> J) x.2)).
+by exists (fun x => (projT1 x, projT2 x)) => -[].
 Qed.
 
 Lemma pair_big (I J : finType) (P : pred I) (Q : pred J) F :
@@ -1652,6 +1664,7 @@ Arguments big_enum_val_cond [R idx op I A] P F.
 Arguments big_enum_rank_cond [R idx op I A x] xA P F.
 Arguments big_enum_val [R idx op I A] F.
 Arguments big_enum_rank [R idx op I A x] xA F.
+Arguments sig_big_dep [R idx op I J].
 Arguments pair_big_dep [R idx op I J].
 Arguments pair_big [R idx op I J].
 Arguments big_allpairs_dep {R idx op I1 I2 J h r1 r2 F}.
