@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `fingraph.v`, new lemmas: `fcard_gt0P`, `fcard_gt1P`
 - in `finset.v`, new lemmas: `properC`, `properCr`, `properCl`
 - in `ssrnat.v`, new lemmas: `subn_minl`, `subn_maxl`
+- in `ssrnat.v`, new lemma: `oddS`
+
 
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.

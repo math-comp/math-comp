@@ -1252,6 +1252,8 @@ Proof. by rewrite mulnC mulnbl. Qed.
 
 Fixpoint odd n := if n is n'.+1 then ~~ odd n' else false.
 
+Lemma oddS n : odd n.+1 = ~~ odd n. Proof. by []. Qed.
+
 Lemma oddb (b : bool) : odd b = b. Proof. by case: b. Qed.
 
 Lemma oddD m n : odd (m + n) = odd m (+) odd n.
