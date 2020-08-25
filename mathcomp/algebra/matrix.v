@@ -1191,6 +1191,30 @@ Lemma block_mx_eq0 m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2)) :
   [&& Aul == 0, Aur == 0, Adl == 0 & Adr == 0].
 Proof. by rewrite col_mx_eq0 !row_mx_eq0 !andbA. Qed.
 
+Lemma matrix_eq0 m n (A : 'M_(m, n)) :
+  (A == 0) = [forall i, forall j, A i j == 0].
+Proof.
+apply/eqP/'forall_'forall_eqP => [-> i j|A_eq0]; first by rewrite !mxE.
+by apply/matrixP => i j; rewrite A_eq0 !mxE.
+Qed.
+
+Lemma matrix0Pn m n (A : 'M_(m, n)) : reflect (exists i j, A i j != 0) (A != 0).
+Proof.
+by rewrite matrix_eq0; apply/(iffP forallPn) => -[i /forallPn]; exists i.
+Qed.
+
+Lemma rV0Pn n (v : 'rV_n) : reflect (exists i, v 0 i != 0) (v != 0).
+Proof.
+apply: (iffP (matrix0Pn _)) => [[i [j]]|[j]]; last by exists 0, j.
+by rewrite ord1; exists j.
+Qed.
+
+Lemma cV0Pn n (v : 'cV_n) : reflect (exists i, v i 0 != 0) (v != 0).
+Proof.
+apply: (iffP (matrix0Pn _)) => [[i] [j]|[i]]; last by exists i, 0.
+by rewrite ord1; exists i.
+Qed.
+
 Definition nz_row m n (A : 'M_(m, n)) :=
   oapp (fun i => row i A) 0 [pick i | row i A != 0].
 
@@ -2830,9 +2854,7 @@ have{IHn} w_ j : exists w : 'rV_n.+1, [/\ w != 0, w 0 j = 0 & w *m A' = 0].
   rewrite (reindex_onto (lift j) (odflt k \o unlift j)) /= => [|k'].
     by apply: eq_big => k'; rewrite ?mxE liftK eq_sym neq_lift eqxx.
   by rewrite eq_sym; case/unlift_some=> ? ? ->.
-have [w0 [nz_w0 w00_0 w0A']] := w_ 0; pose a0 := (w0 *m vA) 0 0.
-have [j {nz_w0}/= nz_w0j | w00] := pickP [pred j | w0 0 j != 0]; last first.
-  by case/eqP: nz_w0; apply/rowP=> j; rewrite mxE; move/eqP: (w00 j).
+have [w0 [/rV0Pn[j nz_w0j] w00_0 w0A']] := w_ 0; pose a0 := (w0 *m vA) 0 0.
 have{w_} [wj [nz_wj wj0_0 wjA']] := w_ j; pose aj := (wj *m vA) 0 0.
 have [aj0 | nz_aj] := eqVneq aj 0.
   exists wj => //; rewrite defA (@mul_mx_row _ _ _ 1) [_ *m _]mx11_scalar -/aj.
