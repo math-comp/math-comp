@@ -5,7 +5,7 @@
 ##### Things done/to do
 
 <!-- please fill in the following checklist -->
-- [ ] added corresponding entries in `CHANGELOG_UNRELEASED.md`
+- [ ] added corresponding entries in `CHANGELOG_UNRELEASED.md` (do not edit former entries)
 - [ ] added corresponding documentation in the headers
 <!-- Cross-out the above items using ~crossed out item~ if they happen not to be relevent -->
 <!-- You may also add more items to explain what you did and what remains to do -->
