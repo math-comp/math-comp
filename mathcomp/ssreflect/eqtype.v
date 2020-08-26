@@ -507,40 +507,37 @@ End ComparableType.
 Definition eq_comparable (T : eqType) : comparable T :=
   fun x y => decP (x =P y).
 
+HB.mixin Record is_SUB (T : Type) (P : pred T) (sub_sort : indexed Type) := SubType {
+  val : sub_sort -> T;
+  Sub : forall x, P x -> sub_sort;
+  Sub_rect : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
+  SubK : forall x Px, val (@Sub x Px) = x
+}.
+
+HB.structure Definition SUB (T : Type) (P : pred T) := { S of is_SUB T P S }.
+
+Notation subType := SUB.type.
+
 Section SubType.
 
 Variables (T : Type) (P : pred T).
-
-Structure subType : Type := SubType {
-  sub_sort :> Type;
-  val : sub_sort -> T;
-  Sub : forall x, P x -> sub_sort;
-  _ : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
-  _ : forall x Px, val (@Sub x Px) = x
-}.
 
 (* Generic proof that the second property holds by conversion.                *)
 (* The vrefl_rect alias is used to flag generic proofs of the first property. *)
 Lemma vrefl : forall x, P x -> x = x. Proof. by []. Qed.
 Definition vrefl_rect := vrefl.
 
-Definition clone_subType U v :=
-  fun sT & sub_sort sT -> U =>
-  fun c Urec cK (sT' := @SubType U v c Urec cK) & phant_id sT' sT => sT'.
-
 Section Theory.
 
-Variable sT : subType.
+Variable sT : subType P.
 
-Local Notation val := (@val sT).
-Local Notation Sub x Px := (@Sub sT x Px).
+Local Notation val := (@val _ _ sT).
+Local Notation Sub := (@Sub _ _ sT).
 
 Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
 
 Lemma SubP u : Sub_spec u.
-Proof. by case: sT Sub_spec SubSpec u => /= U _ mkU rec _. Qed.
-
-Lemma SubK x Px : val (Sub x Px) = x. Proof. by case: sT. Qed.
+Proof. by elim/(@Sub_rect _ _ sT) : u. Qed. (* BUG in elim? sT could be inferred from u *)
 
 Definition insub x := if idP is ReflectT Px then Some (Sub x Px) else None.
 
@@ -605,12 +602,10 @@ End Theory.
 
 End SubType.
 
-Arguments SubType {T P} sub_sort val Sub rec SubK.
 Arguments val {T P sT} u : rename.
 Arguments Sub {T P sT} x Px : rename.
 Arguments vrefl {T P} x Px.
 Arguments vrefl_rect {T P} x Px.
-Arguments clone_subType [T P] U v [sT] _ [c Urec cK].
 Arguments insub {T P sT} x.
 Arguments insubd {T P sT} u0 x.
 Arguments insubT [T] P [sT x].
@@ -626,6 +621,10 @@ Local Notation inlined_sub_rect :=
 Local Notation inlined_new_rect :=
   (fun K K_S u => let (x) as u return K u := u in K_S x).
 
+  (* HB: bug *)
+Notation SubType T v s sr sk :=
+  (@SUB.Pack _ _ T (@SUB.Class _ _ T (@is_SUB.phant_Build _ _ T v s sr sk))).
+
 Notation "[ 'subType' 'for' v ]" := (SubType _ v _ inlined_sub_rect vrefl_rect)
  (at level 0, only parsing) : form_scope.
 
@@ -635,15 +634,19 @@ Notation "[ 'sub' 'Type' 'for' v ]" := (SubType _ v _ _ vrefl_rect)
 Notation "[ 'subType' 'for' v 'by' rec ]" := (SubType _ v _ rec vrefl)
  (at level 0, format "[ 'subType'  'for'  v  'by'  rec ]") : form_scope.
 
-Notation "[ 'subType' 'of' U 'for' v ]" := (clone_subType U v id idfun)
+ (*
+Notation "[ 'subType' 'of' U 'for' v ]" := (SUB.clone U v id idfun)
  (at level 0, format "[ 'subType'  'of'  U  'for'  v ]") : form_scope.
+*)
 
-Notation "[ 'subType' 'of' U ]" := (clone_subType U _ id id)
+Notation "[ 'subType' 'of' U ]" := (SUB.clone _ _ U _)
  (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
 
-Definition NewType T U v c Urec :=
+Notation BuildSubTypeFor T v := (@is_SUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect).
+
+Definition NewType T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  SubType U v (fun x _ => c x) Urec'.
+  SubType U v (fun x _ => c x) Urec' sk.
 Arguments NewType [T U].
 
 Notation "[ 'newType' 'for' v ]" := (NewType v _ inlined_new_rect vrefl_rect)
@@ -681,8 +684,14 @@ End SigProj.
 
 Prenex Implicits svalP s2val s2valP s2valP'.
 
-Canonical sig_subType T (P : pred T) : subType [eta P] :=
-  Eval hnf in [subType for @sval T [eta [eta P]]].
+(* BUG: coq-elpi: destructuring let in glob2term NYI *)
+Definition sig_is_SUB T (P : pred T) :=
+  BuildSubTypeFor (sig P) sval.
+Section HB.
+Variable T : Type.
+Variable P : pred T.
+HB.instance (sig P) (sig_is_SUB P).
+End HB.
 
 (* Shorthand for sigma types over collective predicates. *)
 Notation "{ x 'in' A }" := {x | x \in A}
@@ -734,20 +743,22 @@ Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
 HB.instance Definition sub_eqMixin := is_eqType.Build sT val_eqP.
 
-Definition SubEqMixin :=
+(*
   (let: SubType _ v _ _ _ as sT' := sT
      return ev_ax sT' val -> Equality.mixin_of sT' in
    fun vP : ev_ax _ v => EqMixin vP
    ) val_eqP.
-
+*)
 Lemma val_eqE (u v : sT) : (val u == val v) = (u == v).
 Proof. by []. Qed.
 
 End SubEqType.
 
+Notation SubEqMixin sT := (is_eqType.Build sT (@val_eqP _ _ _)).
+
 Arguments val_eqP {T P sT x y}.
 
-Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin _ : Equality.mixin_of T)
+Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin T)
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Definition void_eqMixin := PcanEqMixin (of_voidK unit).
