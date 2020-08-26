@@ -391,7 +391,7 @@ Section SubChoice.
 Variables (P : pred T) (sT : subType P).
 
 Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
-HB.instance (sub_sort sT) sub_choiceMixin.
+HB.instance sT sub_choiceMixin.
 
 End SubChoice.
 
@@ -612,7 +612,7 @@ Definition sub_countType (sT : subCountType) := [the countType of sT : Type].
 Coercion sub_countType : subCountType >-> countType.
 
 Definition pack_subCountType U :=
-  fun sT cT & sub_sort sT * sort cT -> U * U =>
+  fun sT cT & SUB.sort sT * sort cT -> U * U =>
   fun ch eq co & phant_id (Class ch eq co) (class cT) => @SubCountType sT co.
 
 End SubCountType.
