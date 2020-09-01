@@ -137,6 +137,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   dual lattices.
 - in `finset.v` new lemma `disjoints1`
 - in `fintype.v` new lemmas: `disjointFr`, `disjointFl`, `disjointWr`, `disjointW`
+- in `fintype.v`, new (pigeonhole) lemmas `leq_card_in`, `leq_card`,
+  and `inj_leq`.
+
+- in `matrix.v`, new definition `mxsub`, `rowsub` and `colsub`,
+  corresponding to arbitrary submatrices/reindexation of a matrix.
+  + We provide the theorems `x?(row|col)(_perm|')?Esub`, `t?permEsub`
+    `[lrud]submxEsub`, `(ul|ur|dl|dr)submxEsub` for compatibility with
+    ad-hoc submatrices/permutations.
+  + We provide a new, configurable, induction lemma `mxsub_ind`.
+  + We provide the basic theory `mxsub_id`, `eq_mxsub`, `eq_rowsub`,
+    `eq_colsub`, `mxsub_eq_id`, `mxsub_eq_colsub`, `mxsub_eq_rowsub`,
+    `mxsub_ffunl`, `mxsub_ffunr`, `mxsub_ffun`, `mxsub_const`,
+    `mxsub_comp`, `rowsub_comp`, `colsub_comp`, `mxsubrc`, `mxsubcr`,
+    `trmx_mxsub`, `row_mxsub`, `col_mxsub`, `row_rowsub`,
+    `col_colsub`, and `map_mxsub`, `pid_mxErow` and `pid_mxEcol`.
+  + Interaction with `castmx` through lemmas `rowsub_cast`,
+    `colsub_cast`, `mxsub_cast`, and `castmxEsub`.
+  + `(mx|row|col)sub` are canonically additive and linear.
+  + Interaction with `mulmx` through lemmas `mxsub_mul`,
+    `mul_rowsub_mx`, `mulmx_colsub`, and `rowsubE`.
+
+- in `mxalgebra.v`, new lemma `rowsub_sub`, `eq_row_full`,
+  `row_full_castmx`, `row_free_castmx`, `rowsub_comp_sub`,
+  `submx_rowsub`, `eqmx_rowsub_comp_perm`, `eqmx_rowsub_comp`,
+  `eqmx_rowsub`, `row_freePn`, and `negb_row_free`.
+
 
 - in `interval.v`:
   + Intervals and their bounds of `T` now have canonical ordered type instances
