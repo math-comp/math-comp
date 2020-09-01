@@ -1539,7 +1539,7 @@ Qed.
 Lemma sig_big_dep (I : finType) (J : I -> finType)
     (P : pred I) (Q : forall {i}, pred (J i)) (F : forall {i}, J i -> R) :
   \big[op/idx]_(i | P i) \big[op/idx]_(j : J i | Q j) F j =
-  \big[op/idx]_(p : {i & J i} | P (tag p) && Q (tagged p)) F (tagged p).
+  \big[op/idx]_(p : {i : I & J i} | P (tag p) && Q (tagged p)) F (tagged p).
 Proof.
 pose s := [seq Tagged J j | i <- index_enum I, j <- index_enum (J i)].
 rewrite [LHS]big_mkcond big_mkcondl [RHS]big_mkcond -[RHS](@perm_big _ s).
