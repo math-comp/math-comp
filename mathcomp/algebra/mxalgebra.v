@@ -47,6 +47,10 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp matrix.
 (*                   consists of all v such that A *m v = 0 (it consists of  *)
 (*                   the inverse of row_ebase A, with the leftmost \rank A   *)
 (*                   columns zeroed out).                                    *)
+(*   maxrankfun A == injective function f so that rowsub f A is a submatrix  *)
+(*                   of A with the same rank as A.                           *)
+(* fullrankfun fA == injective function f so that rowsub f A is row full,    *)
+(*                   where fA is a proof of row_full A                       *)
 (* eigenvalue g a <=> a is an eigenvalue of the square matrix g.             *)
 (* eigenspace g a == a square matrix whose row space is the eigenspace of    *)
 (*                   the eigenvalue a of g (or 0 if a is not an eigenvalue). *)
@@ -1765,6 +1769,87 @@ have{defUf} defV: (V :=: U *m f)%MS.
 have injfU: \rank (U *m f) = \rank U by rewrite -defV eqrUV.
 by have [g injg defUg] := complete_unitmx injfU; exists g; rewrite -?defUg.
 Qed.
+
+(* maximal rank and full rank submatrices *)
+
+Section MaxRankSubMatrix.
+Variables (m n : nat) (A : 'M_(m, n)).
+
+Definition maxrankfun : 'I_m ^ \rank A :=
+  [arg max_(f > finfun (widen_ord (rank_leq_row A))) \rank (rowsub f A)].
+Local Notation mxf := maxrankfun.
+
+Lemma maxrowsub_free : row_free (rowsub mxf A).
+Proof.
+rewrite /mxf; case: arg_maxnP => //= f _ fM; apply/negP => /negP rfA.
+have [i NriA] : exists i, ~~ (row i A <= rowsub f A)%MS.
+  by apply/row_subPn; apply: contraNN rfA => /mxrankS; rewrite row_leq_rank.
+have [j rjfA] : exists j, (row (f j) A <= rowsub (f \o lift j) A)%MS.
+  case/row_freePn: rfA => j.
+  by rewrite row_rowsub row'Esub -mxsub_comp; exists j.
+pose g : 'I_m ^ \rank A := finfun [eta f with j |-> i].
+suff: (rowsub f A < rowsub g A)%MS by rewrite ltmxErank andbC ltnNge fM.
+rewrite ltmxE; apply/andP; split; last first.
+  apply: contra NriA; apply: submx_trans.
+  by rewrite (eq_row_sub j)// row_rowsub ffunE/= eqxx.
+apply/row_subP => k; rewrite !row_rowsub.
+have [->|/negPf eq_kjF] := eqVneq k j; last first.
+  by rewrite (eq_row_sub k)// row_rowsub ffunE/= eq_kjF.
+rewrite (submx_trans rjfA)// (submx_rowsub (lift j))// => l /=.
+by rewrite ffunE/= eq_sym (negPf (neq_lift _ _)).
+Qed.
+
+Lemma eq_maxrowsub : (rowsub mxf A :=: A)%MS.
+Proof.
+apply/eqmxP; rewrite -(eq_leqif (mxrank_leqif_eq _))//.
+  exact: maxrowsub_free.
+apply/row_subP => i; apply/submxP; exists (delta_mx 0 (mxf i)).
+by rewrite -rowE; apply/rowP => j; rewrite !mxE.
+Qed.
+
+Lemma maxrankfun_inj : injective mxf.
+Proof.
+move=> i j eqAij; have /row_free_inj := maxrowsub_free.
+move=> /(_ 1%N) /(_ (delta_mx 0 i) (delta_mx 0 j)).
+rewrite -!rowE !row_rowsub eqAij => /(_ erefl) /matrixP /(_ 0 i) /eqP.
+by rewrite !mxE eqxx/=; case: (i =P j); rewrite // oner_eq0.
+Qed.
+
+Variable (rkA : row_full A).
+
+Lemma maxrowsub_full : row_full (rowsub mxf A).
+Proof. by rewrite /row_full eq_maxrowsub. Qed.
+Hint Resolve maxrowsub_full : core.
+
+Definition fullrankfun : 'I_m ^ n := finfun (mxf \o cast_ord (esym (eqP rkA))).
+Local Notation frf := fullrankfun.
+
+Lemma fullrowsub_full : row_full (rowsub frf A).
+Proof.
+by rewrite mxsub_ffunl rowsub_comp rowsub_cast esymK row_full_castmx.
+Qed.
+
+Lemma fullrowsub_unit : rowsub frf A \in unitmx.
+Proof. by rewrite -row_full_unit fullrowsub_full. Qed.
+
+Lemma fullrowsub_free : row_free (rowsub frf A).
+Proof.  by rewrite row_free_unit fullrowsub_unit. Qed.
+
+Lemma mxrank_fullrowsub : \rank (rowsub frf A) = n.
+Proof. exact/eqP/fullrowsub_full. Qed.
+
+Lemma eq_fullrowsub : (rowsub frf A :=: A)%MS.
+Proof.
+rewrite mxsub_ffunl rowsub_comp rowsub_cast esymK.
+exact: (eqmx_trans (eqmx_cast _ _) eq_maxrowsub).
+Qed.
+
+Lemma fullrankfun_inj : injective frf.
+Proof.
+by move=> i j; rewrite !ffunE => /maxrankfun_inj /(congr1 val)/= /val_inj.
+Qed.
+
+End MaxRankSubMatrix.
 
 Section SumExpr.
 
