@@ -2074,6 +2074,12 @@ Qed.
 Lemma neq_lift n (h : 'I_n) i : h != lift h i.
 Proof. exact: neq_bump. Qed.
 
+Lemma eq_liftF n (h : 'I_n) i : (h == lift h i) = false.
+Proof. exact/negbTE/neq_lift. Qed.
+
+Lemma lift_eqF n (h : 'I_n) i : (lift h i == h) = false.
+Proof. by rewrite eq_sym eq_liftF. Qed.
+
 Lemma unlift_none n (h : 'I_n) : unlift h h = None.
 Proof. by case: unliftP => // j Dh; case/eqP: (neq_lift h j). Qed.
 

@@ -722,7 +722,7 @@ Lemma irr_free : free (irr G).
 Proof.
 apply/freeP=> s s0 i; apply: (mulIf (irr1_neq0 i)).
 rewrite mul0r -(raddf0 (xcfun_r_additive 'e_i)) -{}s0 raddf_sum /=.
-rewrite (bigD1 i) //= -tnth_nth xcfunZl xcfun_id eqxx big1 ?addr0 // => j ne_ji.
+rewrite (bigD1 i)//= -tnth_nth xcfunZl xcfun_id eqxx big1 ?addr0 // => j ne_ji.
 by rewrite -tnth_nth xcfunZl xcfun_id (negbTE ne_ji) mulr0.
 Qed.
 
