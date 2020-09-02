@@ -157,28 +157,49 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Definition count_axiom (T : eqType) e := forall x : T, count_mem x e = 1.
+Definition finite_axiom (T : eqType) e := forall x : T, count_mem x e = 1.
 
-HB.mixin Record is_Countable T of is_eqType T := {
-  mixin_enum : seq T;
-  mixin_axiom : count_axiom mixin_enum;
+HB.mixin Record is_finite (T : Type) of (Equality T) := {
+  enum_subdef : seq T;
+  enumP_subdef : finite_axiom enum_subdef
 }.
 
-#[mathcomp(axiom="count_axiom")]
-HB.structure Definition Countable := { T of is_Countable T & is_eqType T }.
+#[mathcomp]
+HB.structure Definition Finite :=
+  {T of is_eqType T & is_finite T & is_countable T & has_choice T }.
 
+Module Export FiniteNES.
 Module Finite.
+Notation enum := enum_subdef.
+Notation enumP := enumP_subdef.
+Notation axiom := finite_axiom.
+Notation EnumMixin m := (@is_finite.Build _ _ m).
 
-Section RawMixin.
-
-Variable T : eqType.
-
-Lemma uniq_enumP e : uniq e -> e =i T -> count_axiom e.
+Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 
-End RawMixin.
+Section WithCountType.
+Variable (T : countType).
 
-Notation countType := Countable.type.
+Definition UniqMixin e Ue eT := @is_finite.Build T e (uniq_enumP Ue eT).
+
+Variable n : nat.
+
+Definition count_enum := pmap (@pickle_inv T) (iota 0 n).
+
+Hypothesis ubT : forall x : T, pickle x < n.
+
+Lemma count_enumP : axiom count_enum.
+Proof.
+apply: uniq_enumP (pmap_uniq (@pickle_invK T) (iota_uniq _ _)) _ => x.
+by rewrite mem_pmap -pickleK_inv map_f // mem_iota ubT.
+Qed.
+
+Definition CountMixin := EnumMixin count_enumP.
+
+End WithCountType.
+End Finite.
+End FiniteNES.
 
 Section Mixins.
 
@@ -186,7 +207,7 @@ Variable T : countType.
 
 Definition EnumMixin :=
   let: Countable.Pack _ (Countable.Class _ m) as cT := T
-  return forall e : seq cT, count_axiom e -> mixin_of cT in
+    return forall e : seq cT, axiom e -> mixin_of cT in
   @Mixin (EqType _ _) m.
 
 Definition UniqMixin e Ue eT := @EnumMixin e (uniq_enumP Ue eT).

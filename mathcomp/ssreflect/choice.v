@@ -511,6 +511,7 @@ HB.mixin Record is_countable (T : Type) : Type := {
   unpickle : nat -> option T;
   pickleK : pcancel pickle unpickle
 }.
+Arguments is_countable.axioms_ T%type_scope.
 
 (* [TODO1] Idea: don't alias, and use directly the mixin as the type of f, in that
    case the redundancy check of #49 should be relaxed.
@@ -648,49 +649,36 @@ Section CountableDataTypes.
 Implicit Type T : countType.
 
 Lemma nat_pickleK : pcancel id (@Some nat). Proof. by []. Qed.
-Definition nat_countMixin := CountMixin nat_pickleK.
-HB.instance nat nat_countMixin.
+HB.instance
+Definition nat_countMixin : is_countable nat := CountMixin nat_pickleK.
 
-Definition bool_countMixin := CanCountMixin oddb.
-HB.instance bool bool_countMixin.
-Definition bitseq_countMixin := [countMixin of bitseq].
-HB.instance bitseq bitseq_countMixin.
+HB.instance
+Definition bool_countMixin : is_countable bool := CanCountMixin oddb.
+HB.instance
+Definition bitseq_countMixin : is_countable bitseq := [countMixin of bitseq].
 
-Definition unit_countMixin := CanCountMixin bool_of_unitK.
-HB.instance unit unit_countMixin.
+HB.instance
+Definition unit_countMixin : is_countable unit := CanCountMixin bool_of_unitK.
 
-Definition void_countMixin := PcanCountMixin (of_voidK unit).
-HB.instance void void_countMixin.
+HB.instance
+Definition void_countMixin : is_countable void := PcanCountMixin (of_voidK unit).
 
-Section option_countMixin.
-Variable (T : countType).
-Definition option_countMixin := CanCountMixin (@seq_of_optK T).
-HB.instance (option T) option_countMixin.
-End option_countMixin.
+HB.instance Definition option_countMixin T : is_countable (option T) :=
+  CanCountMixin (@seq_of_optK T).
 
-Section sig_countMixin.
-Variable (T : countType) (P : pred T).
-Definition sig_countMixin := [countMixin of {x | P x} by <:].
-HB.instance ({x | P x}) sig_countMixin.
-Canonical sig_subCountType := Eval hnf in [subCountType of {x | P x}].
-End sig_countMixin.
+HB.instance Definition sig_countMixin T (P : pred T) :=
+  [countMixin of {x | P x} by <:].
 
-Section prod_countMixin.
-Variable (T1 T2 : countType).
-Definition prod_countMixin := CanCountMixin (@tag_of_pairK T1 T2).
-HB.instance ((T1 * T2)%type) prod_countMixin.
-End prod_countMixin.
+HB.instance
+Definition prod_countMixin T1 T2 : is_countable (T1 * T2)%type :=
+  CanCountMixin (@tag_of_pairK T1 T2).
 
-Section sum_countMixin.
-Variable (T1 T2 : countType).
-Definition sum_countMixin := PcanCountMixin (@opair_of_sumK T1 T2).
-HB.instance ((T1 + T2)%type) sum_countMixin.
-End sum_countMixin.
+HB.instance
+Definition sum_countMixin T1 T2 : is_countable (T1 + T2)%type :=
+  PcanCountMixin (@opair_of_sumK T1 T2).
 
-Section tree_countMixin.
-Variable (T : countType).
-Definition tree_countMixin := PcanCountMixin (GenTree.codeK T).
-HB.instance (GenTree.tree T) tree_countMixin.
-End tree_countMixin.
+HB.instance
+Definition tree_countMixin T : is_countable (GenTree.tree T) :=
+   PcanCountMixin (GenTree.codeK T).
 
 End CountableDataTypes.
