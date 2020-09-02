@@ -2,6 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import path.
+From HB Require Import structures.
 
 (******************************************************************************)
 (*    The Finite interface describes Types with finitely many elements,       *)
@@ -156,24 +157,28 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Definition count_axiom (T : eqType) e := forall x : T, count_mem x e = 1.
+
+HB.mixin Record is_Countable T of is_eqType T := {
+  mixin_enum : seq T;
+  mixin_axiom : count_axiom mixin_enum;
+}.
+
+#[mathcomp(axiom="count_axiom")]
+HB.structure Definition Countable := { T of is_Countable T & is_eqType T }.
+
 Module Finite.
 
 Section RawMixin.
 
 Variable T : eqType.
 
-Definition axiom e := forall x : T, count_mem x e = 1.
-
-Lemma uniq_enumP e : uniq e -> e =i T -> axiom e.
+Lemma uniq_enumP e : uniq e -> e =i T -> count_axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 
-Record mixin_of := Mixin {
-  mixin_base : Countable.mixin_of T;
-  mixin_enum : seq T;
-  _ : axiom mixin_enum
-}.
-
 End RawMixin.
+
+Notation countType := Countable.type.
 
 Section Mixins.
 
@@ -181,7 +186,7 @@ Variable T : countType.
 
 Definition EnumMixin :=
   let: Countable.Pack _ (Countable.Class _ m) as cT := T
-    return forall e : seq cT, axiom e -> mixin_of cT in
+  return forall e : seq cT, count_axiom e -> mixin_of cT in
   @Mixin (EqType _ _) m.
 
 Definition UniqMixin e Ue eT := @EnumMixin e (uniq_enumP Ue eT).
