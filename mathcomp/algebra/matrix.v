@@ -2603,6 +2603,16 @@ Lemma det_lblock n1 n2 Aul (Adl : 'M[R]_(n2, n1)) Adr :
   \det (block_mx Aul 0 Adl Adr) = \det Aul * \det Adr.
 Proof. by rewrite -det_tr tr_block_mx trmx0 det_ublock !det_tr. Qed.
 
+Lemma det_trig n (A : 'M[R]_n) : is_trig_mx A -> \det A = \prod_(i < n) A i i.
+Proof.
+elim: n => [|n IHn] in A * => /is_trig_mxP Atrig; rewrite ?big_ord0 ?det_mx00//.
+rewrite -[n.+1]/(1 + n)%N in A Atrig *; rewrite big_ord_recl -[A in LHS]submxK.
+have -> : ursubmx A = 0 by apply/matrixP => i j; rewrite !mxE Atrig//= ord1.
+rewrite det_lblock IHn; last by apply/is_trig_mxP => *; rewrite !mxE Atrig.
+rewrite [ulsubmx A]mx11_scalar det_scalar1 !mxE !lshift0; congr (_ * _).
+by apply: eq_bigr => i; rewrite !mxE !rshift1.
+Qed.
+
 End ComMatrix.
 
 Arguments lin_mul_row {R m n} u.

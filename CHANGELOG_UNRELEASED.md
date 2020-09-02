@@ -84,6 +84,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `matrix.v` new lemmas about `map_mx`: `map_mx_id`, `map_mx_comp`,
   `eq_in_map_mx`, `eq_map_mx` and `map_mx_id_in`.
 
+- in `matrix.v` new lemma `det_trig`
+
+- in `mxpoly.v` new lemmas `horner_mx_diag`, `char_poly_trig`,
+   `root_mxminpoly`, and `mxminpoly_diag`
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
