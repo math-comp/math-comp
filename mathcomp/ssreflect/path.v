@@ -193,10 +193,7 @@ Variant split x : seq T -> seq T -> seq T -> Type :=
 
 Lemma splitP p x (i := index x p) :
   x \in p -> split x p (take i p) (drop i.+1 p).
-Proof.
-move=> p_x; have lt_ip: i < size p by rewrite index_mem.
-by rewrite -{1}(cat_take_drop i p) (drop_nth x lt_ip) -cat_rcons nth_index.
-Qed.
+Proof. by rewrite -has_pred1 => /split_find[? ? ? /eqP->]; constructor. Qed.
 
 Variant splitl x1 x : seq T -> Type :=
   Splitl p1 p2 of last x1 p1 = x : splitl x1 x (p1 ++ p2).
