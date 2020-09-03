@@ -60,6 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `allrel1`, `allrel2` and `allrel_cons`,
     under assumptions of reflexivity and symmetry of `r`.
 - in `mxpoly.v`, new lemmas `mxminpoly_minP` and `dvd_mxminpoly`.
+- in `mxalgebra.v` new lemmas `row_base0`, `sub_kermx`, `kermx0` and
+  `mulmx_free_eq0`.
 
 ### Changed
 
