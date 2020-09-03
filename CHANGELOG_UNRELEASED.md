@@ -41,6 +41,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `cV0Pn` to characterize nonzero matrices and find a nonzero
   coefficient.
 
+- in `poly.v`, new lemma `commr_horner`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
