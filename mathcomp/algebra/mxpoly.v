@@ -598,6 +598,15 @@ Qed.
 Lemma mxminpoly_min p : horner_mx A p = 0 -> p_A %| p.
 Proof. by move=> pA0; rewrite /dvdp -horner_mxK pA0 mx_inv_horner0. Qed.
 
+Lemma mxminpoly_minP p : reflect (horner_mx A p = 0) (p_A %| p).
+Proof.
+apply: (iffP idP); last exact: mxminpoly_min.
+by move=> /Pdiv.Field.dvdpP[q ->]; rewrite rmorphM/= mx_root_minpoly mulr0.
+Qed.
+
+Lemma dvd_mxminpoly p : (p_A %| p) = (horner_mx A p == 0).
+Proof. exact/mxminpoly_minP/eqP. Qed.
+
 Lemma horner_rVpoly_inj : injective (horner_mx A \o rVpoly : 'rV_d -> 'M_n).
 Proof.
 apply: can_inj (poly_rV \o mx_inv_horner) _ => u /=.
