@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
+- in `order.v`:
+  + lemmas `contraP_le`, `contra_not_le`
 
 - in `bigop.v` new lemma `sig_big_dep`, analogous to `pair_big_dep`
   but with an additional dependency in the index types `I` and `J`.

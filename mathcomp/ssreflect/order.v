@@ -3563,6 +3563,12 @@ Lemma eq_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
 Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
 
+Lemma contraP_le (P : Prop) x y : (y < x -> ~ P) -> (P -> x <= y).
+Proof. by rewrite leNgt; exact: contraPN. Qed.
+
+Lemma contra_not_le (P : Prop) x y : (y < x -> P) -> (~ P -> x <= y).
+Proof. by rewrite leNgt; exact: contra_notN. Qed.
+
 (* max and min is join and meet *)
 
 Lemma meetEtotal x y : x `&` y = min x y. Proof. by case: leP. Qed.
