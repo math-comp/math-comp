@@ -573,8 +573,7 @@ Proof. by apply/matrixP=> i j; rewrite mxE row_mxEr. Qed.
 
 Lemma hsubmxK A : row_mx (lsubmx A) (rsubmx A) = A.
 Proof.
-apply/matrixP=> i j; rewrite !mxE.
-by case: splitP => k Dk //=; rewrite !mxE //=; congr (A _ _); apply: val_inj.
+by apply/matrixP=> i j; rewrite !mxE; case: split_ordP => k ->; rewrite !mxE.
 Qed.
 
 Lemma col_mxEu A1 A2 i j : col_mx A1 A2 (lshift m2 i) j = A1 i j.
@@ -706,12 +705,10 @@ Proof. by apply/matrixP=> i j; rewrite !(col_mxEd, mxE). Qed.
 Lemma col'Kl m n1 n2 j1 (A1 : 'M_(m, n1.+1)) (A2 : 'M_(m, n2)) :
   col' (lshift n2 j1) (row_mx A1 A2) = row_mx (col' j1 A1) A2.
 Proof.
-apply/matrixP=> i /= j; symmetry; rewrite 2!mxE.
-case: splitP => j' def_j'.
-  rewrite mxE -(row_mxEl _ A2); congr (row_mx _ _ _); apply: ord_inj.
-  by rewrite /= def_j'.
+apply/matrixP=> i /= j; symmetry; rewrite 2!mxE; case: split_ordP => j' ->.
+  by rewrite mxE -(row_mxEl _ A2); congr (row_mx _ _ _); apply: ord_inj.
 rewrite -(row_mxEr A1); congr (row_mx _ _ _); apply: ord_inj => /=.
-by rewrite /bump def_j' -ltnS -addSn ltn_addr.
+by rewrite /bump -ltnS -addSn ltn_addr.
 Qed.
 
 Lemma row'Ku m1 m2 n i1 (A1 : 'M_(m1.+1, n)) (A2 : 'M_(m2, n)) :
@@ -1554,9 +1551,8 @@ Proof. by apply/rowP=> j; rewrite ord1 mxE. Qed.
 
 Lemma scalar_mx_block n1 n2 a : a%:M = block_mx a%:M 0 0 a%:M :> 'M_(n1 + n2).
 Proof.
-apply/matrixP=> i j; rewrite !mxE -val_eqE /=.
-by do 2![case: splitP => ? ->; rewrite !mxE];
-  rewrite ?eqn_add2l // -?(eq_sym (n1 + _)%N) eqn_leq leqNgt lshift_subproof.
+apply/matrixP=> i j; rewrite !mxE.
+by do 2![case: split_ordP => ? ->; rewrite !mxE]; rewrite ?eq_shift.
 Qed.
 
 (* Matrix multiplication using bigops. *)
@@ -1806,21 +1802,20 @@ Proof. by apply/matrixP=> i j; rewrite !mxE ltn_ord andbT. Qed.
 Lemma pid_mx_row n r : pid_mx r = row_mx 1%:M 0 :> 'M_(r, r + n).
 Proof.
 apply/matrixP=> i j; rewrite !mxE ltn_ord andbT.
-case: splitP => j' ->; rewrite !mxE // .
-by rewrite eqn_leq andbC leqNgt lshift_subproof.
+by case: split_ordP => j' ->; rewrite !mxE// (val_eqE (lshift n i)) eq_shift.
 Qed.
 
 Lemma pid_mx_col m r : pid_mx r = col_mx 1%:M 0 :> 'M_(r + m, r).
 Proof.
 apply/matrixP=> i j; rewrite !mxE andbC.
-by case: splitP => i' ->; rewrite !mxE // eq_sym.
+by case: split_ordP => ? ->; rewrite !mxE//.
 Qed.
 
 Lemma pid_mx_block m n r : pid_mx r = block_mx 1%:M 0 0 0 :> 'M_(r + m, r + n).
 Proof.
 apply/matrixP=> i j; rewrite !mxE row_mx0 andbC.
-case: splitP => i' ->; rewrite !mxE //; case: splitP => j' ->; rewrite !mxE //=.
-by rewrite eqn_leq andbC leqNgt lshift_subproof.
+do ![case: split_ordP => ? ->; rewrite !mxE//].
+by rewrite (val_eqE (lshift n _)) eq_shift.
 Qed.
 
 Lemma tr_pid_mx m n r : (pid_mx r)^T = pid_mx r :> 'M_(n, m).
@@ -2841,8 +2836,7 @@ have [{detA0}A'0 | nzA'] := eqVneq (row 0 (\adj A)) 0; last first.
 pose A' := col' 0 A; pose vA := col 0 A.
 have defA: A = row_mx vA A'.
   apply/matrixP=> i j; rewrite !mxE.
-  case: splitP => j' def_j; rewrite mxE; congr (A i _); apply: val_inj => //=.
-  by rewrite def_j [j']ord1.
+  by case: split_ordP => j' ->; rewrite !mxE ?ord1; congr (A i _); apply: val_inj.
 have{IHn} w_ j : exists w : 'rV_n.+1, [/\ w != 0, w 0 j = 0 & w *m A' = 0].
   have [|wj nzwj wjA'0] := IHn (row' j A').
     by apply/eqP; move/rowP/(_ j)/eqP: A'0; rewrite !mxE mulf_eq0 signr_eq0.
