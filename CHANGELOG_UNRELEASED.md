@@ -37,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `is_diag_mx_is_trig`, `diag_mx_trig`, `mx0_is_trig`,
   `scalar_mx_is_diag`, `is_scalar_mx_is_diag`, `scalar_mx_is_trig` and
   `is_scalar_mx_is_trig`.
+- in `matrix.v`, new lemmas `matrix_eq0`, `matrix0Pn`, `rV0Pn` and
+  `cV0Pn` to characterize nonzero matrices and find a nonzero
+  coefficient.
 
 ### Changed
 

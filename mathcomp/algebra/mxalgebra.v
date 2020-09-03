@@ -2155,9 +2155,7 @@ rewrite -sum1_card (partition_big lsubmx nzC) => [|A]; last first.
   rewrite -[A]hsubmxK v0 -[n.+1]/(1 + n)%N -col_mx0.
   rewrite -[rsubmx _]vsubmxK -det_tr tr_row_mx !tr_col_mx !trmx0.
   by rewrite det_lblock [0]mx11_scalar det_scalar1 mxE mul0r.
-rewrite -sum_nat_const; apply: eq_bigr; rewrite /= -[n.+1]/(1 + n)%N => v nzv.
-case: (pickP (fun i => v i 0 != 0)) => [k nza | v0]; last first.
-  by case/eqP: nzv; apply/colP=> i; move/eqP: (v0 i); rewrite mxE.
+rewrite -sum_nat_const; apply: eq_bigr => /= v /cV0Pn[k nza].
 have xrkK: involutive (@xrow F _ _ 0 k).
   by move=> m A /=; rewrite /xrow -row_permM tperm2 row_perm1.
 rewrite (reindex_inj (inv_inj (xrkK (1 + n)%N))) /= -[n.+1]/(1 + n)%N.
