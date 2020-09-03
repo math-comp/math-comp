@@ -30,6 +30,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `bigop.v` new lemma `sig_big_dep`, analogous to `pair_big_dep`
   but with an additional dependency in the index types `I` and `J`.
 
+- in `matrix.v` new definitions `is_diag_mx` and `is_trig_mx`
+  characterizing respectively diagonal and lower triangular matrices.
+  We provide the new lemmas `row_diag_mx`, `is_diag_mxP`, `diag_mxP`,
+  `diag_mx_is_diag`, `mx0_is_diag`, `is_trig_mxP`,
+  `is_diag_mx_is_trig`, `diag_mx_trig`, `mx0_is_trig`,
+  `scalar_mx_is_diag`, `is_scalar_mx_is_diag`, `scalar_mx_is_trig` and
+  `is_scalar_mx_is_trig`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12

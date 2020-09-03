@@ -1409,6 +1409,50 @@ rewrite eq_sym mulr_natr big1 ?addr0 // => i' ne_i'i.
 by rewrite !mxE eq_sym (negPf ne_i'i) mulr0.
 Qed.
 
+Lemma row_diag_mx n (d : 'rV_n) i :
+  row i (diag_mx d) = d 0 i *: delta_mx 0 i.
+Proof. by apply/rowP => j; rewrite !mxE eqxx eq_sym mulr_natr. Qed.
+
+Definition is_diag_mx m n (A : 'M[R]_(m, n)) :=
+  [forall i : 'I__, forall j : 'I__, (i != j :> nat) ==> (A i j == 0)].
+
+Lemma is_diag_mxP m n (A : 'M[R]_(m, n)) :
+  reflect (forall i j : 'I__, i != j :> nat -> A i j = 0) (is_diag_mx A).
+Proof. by apply: (iffP 'forall_'forall_implyP) => /(_ _ _ _)/eqP. Qed.
+
+Lemma diag_mxP n (A : 'M[R]_n) :
+  reflect (exists d : 'rV_n, A = diag_mx d) (is_diag_mx A).
+Proof.
+apply: (iffP (is_diag_mxP _)) => [Adiag|[d ->] i j neq_ij]; last first.
+  by rewrite !mxE -val_eqE (negPf neq_ij).
+exists (\row_i A i i); apply/matrixP => i j; rewrite !mxE.
+by case: (altP (i =P j)) => [->|/Adiag->].
+Qed.
+
+Lemma diag_mx_is_diag n (r : 'rV[R]_n) : is_diag_mx (diag_mx r).
+Proof. by apply/diag_mxP; eexists. Qed.
+
+Lemma mx0_is_diag m n : is_diag_mx (0 : 'M[R]_(m, n)).
+Proof. by apply/is_diag_mxP => i j _; rewrite mxE. Qed.
+
+Definition is_trig_mx m n (A : 'M[R]_(m, n)) :=
+  [forall i : 'I__, forall j : 'I__, (i < j)%N ==> (A i j == 0)].
+
+Lemma is_trig_mxP m n (A : 'M[R]_(m, n)) :
+  reflect (forall i j : 'I__, (i < j)%N -> A i j = 0) (is_trig_mx A).
+Proof. by apply: (iffP 'forall_'forall_implyP) => /(_ _ _ _)/eqP. Qed.
+
+Lemma is_diag_mx_is_trig m n (A : 'M[R]_(m, n)) : is_diag_mx A -> is_trig_mx A.
+Proof.
+by move=> /is_diag_mxP A_eq0; apply/is_trig_mxP=> i j lt_ij; rewrite A_eq0// ltn_eqF.
+Qed.
+
+Lemma diag_mx_is_trig n (r : 'rV[R]_n) : is_trig_mx (diag_mx r).
+Proof. exact/is_diag_mx_is_trig/diag_mx_is_diag. Qed.
+
+Lemma mx0_is_trig m n : is_trig_mx (0 : 'M[R]_(m, n)).
+Proof. by apply/is_trig_mxP => i j _; rewrite mxE. Qed.
+
 (* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
 Section ScalarMx.
 
@@ -1464,6 +1508,18 @@ Proof. by apply/is_scalar_mxP; exists a. Qed.
 
 Lemma mx0_is_scalar : is_scalar_mx 0.
 Proof. by apply/is_scalar_mxP; exists 0; rewrite raddf0. Qed.
+
+Lemma scalar_mx_is_diag a : is_diag_mx (a%:M).
+Proof. by rewrite -diag_const_mx diag_mx_is_diag. Qed.
+
+Lemma is_scalar_mx_is_diag A : is_scalar_mx A -> is_diag_mx A.
+Proof. by move=> /is_scalar_mxP[a ->]; apply: scalar_mx_is_diag. Qed.
+
+Lemma scalar_mx_is_trig a : is_trig_mx (a%:M).
+Proof. by rewrite is_diag_mx_is_trig// scalar_mx_is_diag. Qed.
+
+Lemma is_scalar_mx_is_trig A : is_scalar_mx A -> is_trig_mx A.
+Proof. by move=> /is_scalar_mx_is_diag /is_diag_mx_is_trig. Qed.
 
 End ScalarMx.
 
@@ -2055,6 +2111,13 @@ Prenex Implicits mulmx mxtrace determinant cofactor adjugate.
 
 Arguments is_scalar_mxP {R n A}.
 Arguments mul_delta_mx {R m n p}.
+Arguments is_diag_mx {R m n}.
+Arguments is_diag_mxP {R m n A}.
+Arguments is_trig_mx {R m n}.
+Arguments is_trig_mxP {R m n A}.
+
+Hint Resolve scalar_mx_is_diag scalar_mx_is_trig : core.
+Hint Resolve diag_mx_is_diag diag_mx_is_trig : core.
 
 Notation "a %:M" := (scalar_mx a) : ring_scope.
 Notation "A *m B" := (mulmx A B) : ring_scope.
