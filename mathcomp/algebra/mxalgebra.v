@@ -490,6 +490,17 @@ rewrite -{4}[B]mulmx_ebase -!mulmxA mulKmx //.
 by rewrite (mulmxA (pid_mx _)) pid_mx_id // !mulmxA -{}defA mulmxKV.
 Qed.
 
+Lemma mulmxVp m n (A : 'M[F]_(m, n)) : row_free A -> A *m pinvmx A = 1%:M.
+Proof.
+move=> fA; rewrite -[X in X *m _]mulmx_ebase !mulmxA mulmxK ?row_ebase_unit//.
+rewrite -[X in X *m _]mulmxA mul_pid_mx !minnn (minn_idPr _) ?rank_leq_col//.
+by rewrite (eqP fA) pid_mx_1 mulmx1 mulmxV ?col_ebase_unit.
+Qed.
+
+Lemma mulmxKp p m n (B : 'M[F]_(m, n)) : row_free B ->
+  cancel ((@mulmx _ p _ _)^~ B) (mulmx^~ (pinvmx B)).
+Proof. by move=> ? A; rewrite -mulmxA mulmxVp ?mulmx1. Qed.
+
 Lemma submxP m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (exists D, A = D *m B) (A <= B)%MS.
 Proof.
@@ -714,6 +725,21 @@ Proof. by rewrite /ltmx sub1mx submx1. Qed.
 
 Lemma lt1mx m n (A : 'M_(m, n)) : (1%:M < A)%MS = false.
 Proof. by rewrite /ltmx submx1 andbF. Qed.
+
+Lemma pinvmxE n (A : 'M[F]_n) : A \in unitmx -> pinvmx A = invmx A.
+Proof.
+move=> A_unit; apply: (@row_free_inj _ _ _ A); rewrite ?row_free_unit//.
+by rewrite -[pinvmx _]mul1mx mulmxKpV ?sub1mx ?row_full_unit// mulVmx.
+Qed.
+
+Lemma mulVpmx m n (A : 'M[F]_(m, n)) : row_full A -> pinvmx A *m A = 1%:M.
+Proof. by move=> fA; rewrite -[pinvmx _]mul1mx mulmxKpV// sub1mx. Qed.
+
+Lemma pinvmx_free m n (A : 'M[F]_(m, n)) : row_full A -> row_free (pinvmx A).
+Proof. by move=> /mulVpmx pAA1; apply/row_freeP; exists A. Qed.
+
+Lemma pinvmx_full m n (A : 'M[F]_(m, n)) : row_free A -> row_full (pinvmx A).
+Proof. by move=> /mulmxVp ApA1; apply/row_fullP; exists A. Qed.
 
 Lemma eqmxP m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   reflect (A :=: B)%MS (A == B)%MS.

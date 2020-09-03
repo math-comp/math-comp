@@ -40,6 +40,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `matrix.v`, new lemmas `matrix_eq0`, `matrix0Pn`, `rV0Pn` and
   `cV0Pn` to characterize nonzero matrices and find a nonzero
   coefficient.
+- in `mxalgebra.v`, completed the theory of `pinvmx` in corner cases,
+  using lemmas: `mulmxVp`, `mulmxKp`, `pinvmxE`, `mulVpmx`,
+  `pinvmx_free`, and `pinvmx_full`.
 
 - in `poly.v`, new lemma `commr_horner`.
 
