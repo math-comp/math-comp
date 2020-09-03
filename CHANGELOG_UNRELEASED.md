@@ -51,6 +51,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `pinvmx_free`, and `pinvmx_full`.
 
 - in `poly.v`, new lemma `commr_horner`.
+- in `seq.v`, new lemma `mkseqP` to abstract a sequence `s` with
+  `mkseq f n`, where `f` and `n` are fresh variables.
+
+- in `seq.v`, new high-order predicate `allrel r s` which
+  asserts that a relation `r` holds on all pairs of elements of `s`, and
+  + lemmas `allrel_map`, `allrelP` and `allrel0`.
+  + lemmas `allrel1`, `allrel2` and `allrel_cons`,
+    under assumptions of reflexivity and symmetry of `r`.
 
 ### Changed
 
