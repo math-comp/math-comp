@@ -100,6 +100,7 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*         \adj A == the adjugate matrix of A (\adj A i j = cofactor j i A).  *)
 (*   A \in unitmx == A is invertible (R must be a comUnitRingType).           *)
 (*        invmx A == the inverse matrix of A if A \in unitmx A, otherwise A.  *)
+(* A \is a mxOver S == the matrix A has its coefficients in S.                *)
 (* The following operations provide a correspondence between linear functions *)
 (* and matrices:                                                              *)
 (*     lin1_mx f == the m x n matrix that emulates via right product          *)
@@ -156,7 +157,7 @@ Reserved Notation "''cV[' R ]_ n"   (at level 8, n at level 2). (* only parsing 
 Reserved Notation "''M[' R ]_ ( n )"     (at level 8). (* only parsing *)
 Reserved Notation "''M[' R ]_ ( m , n )" (at level 8). (* only parsing *)
 
-Reserved Notation "\matrix_ i E" 
+Reserved Notation "\matrix_ i E"
   (at level 36, E at level 36, i at level 2,
    format "\matrix_ i  E").
 Reserved Notation "\matrix_ ( i < n ) E"
@@ -1296,7 +1297,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
-Definition matrix_lmodMixin := 
+Definition matrix_lmodMixin :=
   LmodMixin scalemxA scale1mx scalemxDr scalemxDl.
 
 Canonical matrix_lmodType :=
@@ -1822,7 +1823,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE; case: eqVneq => // ->. Qed.
 
 Lemma pid_mx_minv m n r : pid_mx (minn m r) = pid_mx r :> 'M_(m, n).
 Proof. by apply/matrixP=> i j; rewrite !mxE leq_min ltn_ord. Qed.
- 
+
 Lemma pid_mx_minh m n r : pid_mx (minn n r) = pid_mx r :> 'M_(m, n).
 Proof. by apply: trmx_inj; rewrite !tr_pid_mx pid_mx_minv. Qed.
 
@@ -2236,7 +2237,7 @@ Proof.
 by move=> def_gf; apply/matrixP=> i j; rewrite !mxE -map_delta_mx -def_gf mxE.
 Qed.
 
-Lemma map_lin_mx m1 n1 m2 n2 (g : 'M_(m1, n1) -> 'M_(m2, n2)) gf : 
+Lemma map_lin_mx m1 n1 m2 n2 (g : 'M_(m1, n1) -> 'M_(m2, n2)) gf :
   (forall A, (g A)^f = gf A^f) -> (lin_mx g)^f = lin_mx gf.
 Proof.
 move=> def_gf; apply: map_lin1_mx => A /=.
@@ -2502,7 +2503,7 @@ rewrite -tr_row' -tr_col' det_tr; congr (\det _).
 by apply/matrixP=> ? ?; rewrite !mxE.
 Qed.
 
-Lemma cofactorZ n a (A : 'M[R]_n) i j : 
+Lemma cofactorZ n a (A : 'M[R]_n) i j :
   cofactor (a *: A) i j = a ^+ n.-1 * cofactor A i j.
 Proof. by rewrite {1}/cofactor !linearZ detZ mulrCA mulrA. Qed.
 
@@ -2895,7 +2896,7 @@ Qed.
 
 Lemma map_mx_inv n' (A : 'M_n'.+1) : A^-1^f = A^f^-1.
 Proof. exact: map_invmx. Qed.
-  
+
 Lemma map_mx_eq0 m n (A : 'M_(m, n)) : (A^f == 0) = (A == 0).
 Proof. by rewrite -(inj_eq map_mx_inj) raddf0. Qed.
 
@@ -2982,3 +2983,141 @@ by case: unliftP => [j'|] ->; [apply: Uu | rewrite /= mxE].
 Qed.
 
 End CormenLUP.
+
+Section mxOver.
+Section mxOverType.
+Context {m n : nat} {T : Type}.
+Implicit Types (S : {pred T}).
+
+Definition mxOver (S : {pred T}) :=
+  [qualify a M : 'M[T]_(m, n) | [forall i, [forall j, M i j \in S]]].
+
+Fact mxOver_key S : pred_key (mxOver S). Proof. by []. Qed.
+Canonical mxOver_keyed S := KeyedQualifier (mxOver_key S).
+
+Lemma mxOverP {S : {pred T}} {M : 'M[T]__} :
+  reflect (forall i j, M i j \in S) (M \is a mxOver S).
+Proof. exact/'forall_forallP. Qed.
+
+Lemma mxOverS (S1 S2 : {pred T}) :
+  {subset S1 <= S2} -> {subset mxOver S1 <= mxOver S2}.
+Proof. by move=> sS12 M /mxOverP S1M; apply/mxOverP=> i j; apply/sS12/S1M. Qed.
+
+Lemma mxOver_const c S : c \in S -> const_mx c \is a mxOver S.
+Proof. by move=> cS; apply/mxOverP => i j; rewrite !mxE. Qed.
+
+Lemma mxOver_constE c S : (m > 0)%N -> (n > 0)%N ->
+  (const_mx c \is a mxOver S) = (c \in S).
+Proof.
+move=> m_gt0 n_gt0; apply/idP/idP; last exact: mxOver_const.
+by move=> /mxOverP /(_ (Ordinal m_gt0) (Ordinal n_gt0)); rewrite mxE.
+Qed.
+
+End mxOverType.
+
+Lemma thinmxOver {n : nat} {T : Type} (M : 'M[T]_(n, 0)) S : M \is a mxOver S.
+Proof. by apply/mxOverP => ? []. Qed.
+
+Lemma flatmxOver {n : nat} {T : Type} (M : 'M[T]_(0, n)) S : M \is a mxOver S.
+Proof. by apply/mxOverP => - []. Qed.
+
+Section mxOverZmodule.
+Context {M : zmodType} {m n : nat}.
+Implicit Types (S : {pred M}).
+
+Lemma mxOver0 S : 0 \in S -> 0 \is a @mxOver m n _ S.
+Proof. exact: mxOver_const. Qed.
+
+Section mxOverAdd.
+Variables (S : {pred M}) (addS : addrPred S) (kS : keyed_pred addS).
+Fact mxOver_add_subproof : addr_closed (@mxOver m n _ kS).
+Proof.
+split=> [|p q Sp Sq]; first by rewrite mxOver0 // ?rpred0.
+by apply/mxOverP=> i j; rewrite mxE rpredD // !(mxOverP _).
+Qed.
+Canonical mxOver_addrPred := AddrPred mxOver_add_subproof.
+End mxOverAdd.
+
+Section mxOverOpp.
+Variables (S : {pred M}) (oppS : opprPred S) (kS : keyed_pred oppS).
+Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ kS).
+Proof. by move=> A /mxOverP SA; apply/mxOverP=> i j; rewrite mxE rpredN. Qed.
+Canonical mxOver_opprPred := OpprPred mxOver_opp_subproof.
+End mxOverOpp.
+
+Canonical mxOver_zmodPred (S : {pred M}) (zmodS : zmodPred S)
+  (kS : keyed_pred zmodS) := ZmodPred (@mxOver_opp_subproof _ _ kS).
+
+End mxOverZmodule.
+
+Section mxOverRing.
+Context {R : ringType} {m n : nat}.
+
+Lemma mxOver_scalar S c : 0 \in S -> c \in S -> c%:M \is a @mxOver n n R S.
+Proof. by move=> S0 cS; apply/mxOverP => i j; rewrite !mxE; case: eqP. Qed.
+
+Lemma mxOver_scalarE S c : (n > 0)%N ->
+  (c%:M \is a @mxOver n n R S) = ((n > 1) ==> (0 \in S)) && (c \in S).
+Proof.
+case: n => [|[|k]]//= _.
+   by apply/mxOverP/idP => [/(_ ord0 ord0)|cij i j]; rewrite ?mxE ?ord1.
+apply/mxOverP/andP => [cij|[S0 cij] i j]; last by rewrite !mxE; case: eqP.
+by split; [have := cij 0 1|have := cij 0 0]; rewrite !mxE.
+Qed.
+
+Section mxOverScale.
+Variables (S : {pred R}) (mulS : mulrPred S) (kS : keyed_pred mulS).
+Lemma mxOverZ : {in kS & mxOver kS, forall a : R, forall v : 'M[R]_(m, n),
+        a *: v \is a mxOver kS}.
+Proof.
+by move=> a v aS /mxOverP vS; apply/mxOverP => i j; rewrite !mxE rpredM.
+Qed.
+End mxOverScale.
+
+Lemma mxOver_diag (S : {pred R}) k (D : 'rV[R]_k) :
+   0 \in S -> D \is a mxOver S -> diag_mx D \is a mxOver S.
+Proof.
+move=> S0 DS; apply/mxOverP => i j; rewrite !mxE.
+by case: eqP => //; rewrite (mxOverP DS).
+Qed.
+
+Lemma mxOver_diagE (S : {pred R}) k (D : 'rV[R]_k) : k > 0 ->
+  (diag_mx D \is a mxOver S) = ((k > 1) ==> (0 \in S)) && (D \is a mxOver S).
+Proof.
+case: k => [|[|k]]//= in D * => _.
+  by rewrite [diag_mx _]mx11_scalar [D in RHS]mx11_scalar !mxE.
+apply/idP/andP => [/mxOverP DS|[S0 DS]]; last exact: mxOver_diag.
+split; first by have := DS 0 1; rewrite !mxE.
+by apply/mxOverP => i j; have := DS j j; rewrite ord1 !mxE eqxx.
+Qed.
+
+Section mxOverMul.
+
+Variables (S : predPredType R) (ringS : semiringPred S) (kS : keyed_pred ringS).
+
+Lemma mxOverM p q r : {in mxOver kS & mxOver kS,
+  forall u : 'M[R]_(p, q), forall v : 'M[R]_(q, r), u *m v \is a mxOver kS}.
+Proof.
+move=> M N /mxOverP MS /mxOverP NS; apply/mxOverP => i j.
+by rewrite !mxE rpred_sum // => k _; rewrite rpredM.
+Qed.
+
+End mxOverMul.
+End mxOverRing.
+
+Section mxRingOver.
+Context {R : ringType} {n : nat}.
+
+Section semiring.
+Variables (S : {pred R}) (ringS : semiringPred S) (kS : keyed_pred ringS).
+Fact mxOver_mul_subproof : mulr_closed (@mxOver n.+1 n.+1 _ kS).
+Proof. by split; rewrite ?mxOver_scalar ?rpred0 ?rpred1//; apply: mxOverM. Qed.
+Canonical mxOver_mulrPred := MulrPred mxOver_mul_subproof.
+Canonical mxOver_semiringPred := SemiringPred mxOver_mul_subproof.
+End semiring.
+
+Canonical mxOver_subringPred (S : {pred R}) (ringS : subringPred S)
+   (kS : keyed_pred ringS):= SubringPred (mxOver_mul_subproof kS).
+
+End mxRingOver.
+End mxOver.

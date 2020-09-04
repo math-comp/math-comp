@@ -71,6 +71,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `fintype.v` new lemmas `eq_liftF` and `lift_eqF`.
 
+- in `matrix.v` new predicate `mxOver S` qualified with `\is a`, and
+  + new lemmas: `mxOverP`, `mxOverS`, `mxOver_const`, `mxOver_constE`,
+    `thinmxOver`, `flatmxOver`, `mxOver_scalar`, `mxOver_scalarE`,
+    `mxOverZ`, `mxOverM`, `mxOver_diag`, `mxOver_diagE`.
+  + new canonical structures:
+    * `mxOver S` is closed under addition if `S` is.
+    * `mxOver S` is closed under negation if `S` is.
+    * `mxOver S` is a sub Z-module if `S` is.
+    * `mxOver S` is a semiring for square matrices if `S` is.
+    * `mxOver S` is a subring for square matrices if `S` is.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
