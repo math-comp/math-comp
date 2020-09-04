@@ -62,6 +62,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `mxpoly.v`, new lemmas `mxminpoly_minP` and `dvd_mxminpoly`.
 - in `mxalgebra.v` new lemmas `row_base0`, `sub_kermx`, `kermx0` and
   `mulmx_free_eq0`.
+- in `bigop.v` new lemma `reindex_omap` generalizes `reindex_onto`
+  to the case where the inverse function to `h` is partial (i.e. with
+  codomain `option J`, to cope with a potentially empty `J`.
+
+- in `bigop.v` new lemma `bigD1_ord` takes out an element in the
+  middle of a `\big_(i < n)` and reindexes the remainder using `lift`.
+
+- in `fintype.v` new lemmas `eq_liftF` and `lift_eqF`.
 
 ### Changed
 

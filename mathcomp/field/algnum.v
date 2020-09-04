@@ -150,8 +150,8 @@ Lemma mem_Crat_span s : {subset s <= Crat_span s}.
 Proof.
 move=> _ /(nthP 0)[ix ltxs <-]; pose i0 := Ordinal ltxs.
 apply/Crat_spanP; exists [ffun i => (i == i0)%:R].
-rewrite (bigD1 i0) //= ffunE eqxx // rmorph1 mul1r.
-by rewrite big1 ?addr0 // => i; rewrite ffunE rmorph_nat mulr_natl => /negbTE->.
+rewrite (bigD1_ord i0) //= ffunE eqxx // rmorph1 mul1r.
+by rewrite big1 ?addr0 // => i; rewrite ffunE rmorph_nat mulr_natl lift_eqF.
 Qed.
 
 Fact Crat_span_zmod_closed s : zmod_closed (Crat_span s).

@@ -1453,17 +1453,13 @@ Lemma big_imset h (A : {pred I}) G : {in A &, injective h} ->
   \big[aop/idx]_(j in h @: A) G j = \big[aop/idx]_(i in A) G (h i).
 Proof.
 move=> injh; pose hA := mem (image h A).
-have [x0 Ax0 | A0] := pickP A; last first.
-  by rewrite !big_pred0 // => x; apply/imsetP=> [[i]]; rewrite unfold_in A0.
 rewrite (eq_bigl hA) => [|j]; last exact/imsetP/imageP.
-pose h' j := if insub j : {? j | hA j} is Some u then iinv (svalP u) else x0.
-rewrite (reindex_onto h h') => [|j hAj]; rewrite {}/h'; last first.
-  by rewrite (insubT hA hAj) f_iinv.
-apply: eq_bigl => i; case: insubP => [u -> /= def_u | nhAhi].
-  set i' := iinv _; have Ai' : i' \in A := mem_iinv (svalP u).
-  by apply/eqP/idP=> [<- // | Ai]; apply: injh; rewrite ?f_iinv.
-symmetry; rewrite (negbTE nhAhi); apply/idP=> Ai.
-by case/imageP: nhAhi; exists i.
+pose h' := omap (fun u : {j | hA j} => iinv (svalP u)) \o insub.
+rewrite (reindex_omap h h') => [|j hAj]; rewrite {}/h'/= ?insubT/= ?f_iinv//.
+apply: eq_bigl => i; case: insubP => [u -> /= def_u | nhAhi]; last first.
+  by apply/andP/idP => [[]//| Ai]; case/imageP: nhAhi; exists i.
+set i' := iinv _; have Ai' : i' \in A := mem_iinv (svalP u).
+by apply/eqP/idP => [[<-] // | Ai]; congr Some; apply: injh; rewrite ?f_iinv.
 Qed.
 
 Lemma big_imset_cond h (A : {pred I}) (P : pred J) G : {in A &, injective h} ->

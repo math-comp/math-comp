@@ -1309,10 +1309,10 @@ Lemma matrix_sum_delta A :
   A = \sum_(i < m) \sum_(j < n) A i j *: delta_mx i j.
 Proof.
 apply/matrixP=> i j.
-rewrite summxE (bigD1 i) // summxE (bigD1 j) //= !mxE !eqxx mulr1.
-rewrite !big1 ?addr0 //= => [i' | j']; rewrite eq_sym => /negPf diff.
-  by rewrite summxE big1 // => j' _; rewrite !mxE diff mulr0.
-by rewrite !mxE eqxx diff mulr0.
+rewrite summxE (bigD1_ord i) // summxE (bigD1_ord j) //= !mxE !eqxx mulr1.
+rewrite !big1 ?addr0 //= => [i' | j'] _.
+  by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
+by rewrite !mxE eqxx eq_liftF mulr0.
 Qed.
 
 End RingModule.
@@ -1425,9 +1425,8 @@ Canonical diag_mx_linear n := Linear (@diag_mx_is_linear n).
 Lemma diag_mx_sum_delta n (d : 'rV_n) :
   diag_mx d = \sum_i d 0 i *: delta_mx i i.
 Proof.
-apply/matrixP=> i j; rewrite summxE (bigD1 i) //= !mxE eqxx /=.
-rewrite eq_sym mulr_natr big1 ?addr0 // => i' ne_i'i.
-by rewrite !mxE eq_sym (negPf ne_i'i) mulr0.
+apply/matrixP=> i j; rewrite summxE (bigD1_ord i) //= !mxE eqxx /=.
+by rewrite eq_sym mulr_natr big1 ?addr0 // => i'; rewrite !mxE eq_liftF mulr0.
 Qed.
 
 Lemma row_diag_mx n (d : 'rV_n) i :
@@ -1638,8 +1637,8 @@ Qed.
 
 Lemma rowE m n i (A : 'M_(m, n)) : row i A = delta_mx 0 i *m A.
 Proof.
-apply/rowP=> j; rewrite !mxE (bigD1 i) //= mxE !eqxx mul1r.
-by rewrite big1 ?addr0 // => i' ne_i'i; rewrite mxE /= (negPf ne_i'i) mul0r.
+apply/rowP=> j; rewrite !mxE (bigD1_ord i) //= mxE !eqxx mul1r.
+by rewrite big1 ?addr0 // => i'; rewrite mxE /= lift_eqF mul0r.
 Qed.
 
 Lemma row_mul m n p (i : 'I_m) A (B : 'M_(n, p)) :
@@ -1655,9 +1654,9 @@ Qed.
 Lemma mul_delta_mx_cond m n p (j1 j2 : 'I_n) (i1 : 'I_m) (k2 : 'I_p) :
   delta_mx i1 j1 *m delta_mx j2 k2 = delta_mx i1 k2 *+ (j1 == j2).
 Proof.
-apply/matrixP => i k; rewrite !mxE (bigD1 j1) //=.
+apply/matrixP => i k; rewrite !mxE (bigD1_ord j1) //=.
 rewrite mulmxnE !mxE !eqxx andbT -natrM -mulrnA !mulnb !andbA andbAC.
-by rewrite big1 ?addr0 // => j; rewrite !mxE andbC -natrM; move/negPf->.
+by rewrite big1 ?addr0 // => j; rewrite !mxE andbC -natrM lift_eqF.
 Qed.
 
 Lemma mul_delta_mx m n p (j : 'I_n) (i : 'I_m) (k : 'I_p) :
@@ -2844,10 +2843,8 @@ have{IHn} w_ j : exists w : 'rV_n.+1, [/\ w != 0, w 0 j = 0 & w *m A' = 0].
   rewrite !mxE unlift_none -wjA'0; split=> //.
     apply: contraNneq nzwj => w0; apply/eqP/rowP=> k'.
     by move/rowP/(_ (lift j k')): w0; rewrite !mxE liftK.
-  apply/rowP=> k; rewrite !mxE (bigD1 j) //= mxE unlift_none mul0r add0r.
-  rewrite (reindex_onto (lift j) (odflt k \o unlift j)) /= => [|k'].
-    by apply: eq_big => k'; rewrite ?mxE liftK eq_sym neq_lift eqxx.
-  by rewrite eq_sym; case/unlift_some=> ? ? ->.
+  apply/rowP=> k; rewrite !mxE (bigD1_ord j) //= mxE unlift_none mul0r add0r.
+  by apply: eq_big => //= k'; rewrite !mxE/= liftK.
 have [w0 [/rV0Pn[j nz_w0j] w00_0 w0A']] := w_ 0; pose a0 := (w0 *m vA) 0 0.
 have{w_} [wj [nz_wj wj0_0 wjA']] := w_ j; pose aj := (wj *m vA) 0 0.
 have [aj0 | nz_aj] := eqVneq aj 0.

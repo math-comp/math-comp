@@ -188,7 +188,7 @@ have: rj0T (Ss_ dj.+1) = 'X^dj *: rj0T (S_ j1) + 1 *: rj0T (Ss_ dj).
   rewrite Sylvester_mxE insubdK; last exact: leq_ltn_trans (ltjS).
   by have [->|] := eqP; rewrite (addr0, add0r).
 rewrite -det_tr => /determinant_multilinear->;
-  try by apply/matrixP=> i j; rewrite !mxE eq_sym (negPf (neq_lift _ _)).
+  try by apply/matrixP=> i j; rewrite !mxE lift_eqF.
 have [dj0 | dj_gt0] := posnP dj; rewrite ?dj0 !mul1r.
   rewrite !det_tr det_map_mx addrC (expand_det_col _ j0) big1 => [|i _].
     rewrite add0r; congr (\det _)%:P.
