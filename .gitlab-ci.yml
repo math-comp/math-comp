@@ -98,8 +98,12 @@ coq-8.11:
   extends: .opam-build-once
 
 coq-8.12:
-  # to be replaced with .opam-build-once when 8.12.0 available
-  extends: .opam-build
+  extends: .opam-build-once
+
+# to uncomment when 8.13+alpha available
+# coq-8.13:
+#   # to be replaced with .opam-build-once when 8.13.0 available
+#   extends: .opam-build
 
 coq-dev:
   extends: .opam-build
@@ -448,8 +452,12 @@ mathcomp-dev:coq-8.11:
   extends: .docker-deploy-once
 
 mathcomp-dev:coq-8.12:
-  # to be replaced with .docker-deploy-once when 8.12.0 available
-  extends: .docker-deploy
+  extends: .docker-deploy-once
+
+# to uncomment when 8.13+alpha available
+# mathcomp-dev:coq-8.13:
+#   # to be replaced with .docker-deploy-once when 8.13.0 available
+#   extends: .docker-deploy
 
 mathcomp-dev:coq-dev:
   extends: .docker-deploy
