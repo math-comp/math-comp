@@ -1033,6 +1033,30 @@ End MapMatrix.
 
 Arguments map_mx {aT rT} f {m n} A.
 
+Section MultipleMapMatrix.
+Local Notation "M ^ phi" := (map_mx phi M).
+
+Lemma map_mx_id (R : Type) m n (M : 'M[R]_(m,n)) : M ^ id = M.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma map_mx_comp (R S T : Type) m n (M : 'M[R]_(m,n))
+      (f : R -> S) (g : S -> T) : M ^ (g \o f) = (M ^ f) ^ g.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma eq_in_map_mx (R S : Type) m n (M : 'M[R]_(m,n)) (g f : R -> S) :
+  (forall i j, f (M i j) = g (M i j)) <-> M ^ f = M ^ g.
+Proof. by rewrite -matrixP; split => fg i j; have := fg i j; rewrite !mxE. Qed.
+
+Lemma eq_map_mx (R S : Type) m n (M : 'M[R]_(m,n)) (g f : R -> S) :
+  f =1 g -> M ^ f = M ^ g.
+Proof.  by move=> eq_fg; apply/eq_in_map_mx. Qed.
+
+Lemma map_mx_id_in (R : Type) m n (M : 'M[R]_(m,n)) (f : R -> R) :
+  (forall i j, f (M i j) = M i j) -> M ^ f = M.
+Proof. by rewrite -[RHS]map_mx_id -eq_in_map_mx. Qed.
+
+End MultipleMapMatrix.
+
 (*****************************************************************************)
 (********************* Matrix Zmodule (additive) structure *******************)
 (*****************************************************************************)
