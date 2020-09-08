@@ -210,6 +210,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`, `subset_maskP`.
   - in `fintype.v`, added `mask_enum_ord`.
   - in `bigop.v`, added `big_mask_tuple` and `big_mask`.
+- in `mxalgebra.v`, new notation `stablemx V f` asserting that `f`
+  stabilizes `V`, with new theorems: `eigenvectorP`, `eqmx_stable`,
+  `stablemx_row_base`, `stablemx_full`, `stablemxM`, `stablemxD`,
+  `stablemxN`, `stablemxC`, `stablemx0`, `stableDmx`, `stableNmx`,
+  `stable0mx`, `stableCmx`, `stablemx_sums`, and `stablemx_unit`.
+
+- in `mxpoly.v`, new lemma `horner_mx_stable`.
 
 ### Changed
 
