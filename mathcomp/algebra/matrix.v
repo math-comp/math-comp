@@ -1100,28 +1100,33 @@ End MapMatrix.
 Arguments map_mx {aT rT} f {m n} A.
 
 Section MultipleMapMatrix.
+Context {R S T : Type} {m n : nat}.
 Local Notation "M ^ phi" := (map_mx phi M).
 
-Lemma map_mx_id (R : Type) m n (M : 'M[R]_(m,n)) : M ^ id = M.
+Lemma map_mx_comp (f : R -> S) (g : S -> T)
+  (M : 'M_(m, n)) : M ^ (g \o f) = (M ^ f) ^ g.
 Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
 
-Lemma map_mx_comp (R S T : Type) m n (M : 'M[R]_(m,n))
-      (f : R -> S) (g : S -> T) : M ^ (g \o f) = (M ^ f) ^ g.
-Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+Lemma eq_in_map_mx (g f : R -> S) (M : 'M_(m, n)) :
+  (forall i j, f (M i j) = g (M i j)) -> M ^ f = M ^ g.
+Proof. by move=> fg; apply/matrixP => i j; rewrite !mxE. Qed.
 
-Lemma eq_in_map_mx (R S : Type) m n (M : 'M[R]_(m,n)) (g f : R -> S) :
-  (forall i j, f (M i j) = g (M i j)) <-> M ^ f = M ^ g.
-Proof. by rewrite -matrixP; split => fg i j; have := fg i j; rewrite !mxE. Qed.
+Lemma eq_map_mx (g f : R -> S) : f =1 g ->
+  forall (M : 'M_(m, n)), M ^ f = M ^ g.
+Proof. by move=> eq_fg M; apply/eq_in_map_mx. Qed.
 
-Lemma eq_map_mx (R S : Type) m n (M : 'M[R]_(m,n)) (g f : R -> S) :
-  f =1 g -> M ^ f = M ^ g.
-Proof.  by move=> eq_fg; apply/eq_in_map_mx. Qed.
-
-Lemma map_mx_id_in (R : Type) m n (M : 'M[R]_(m,n)) (f : R -> R) :
+Lemma map_mx_id_in (f : R -> R) (M : 'M_(m, n)) :
   (forall i j, f (M i j) = M i j) -> M ^ f = M.
-Proof. by rewrite -[RHS]map_mx_id -eq_in_map_mx. Qed.
+Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma map_mx_id (f : R -> R) : f =1 id -> forall M : 'M_(m, n), M ^ f = M.
+Proof. by move=> fid M; rewrite map_mx_id_in. Qed.
 
 End MultipleMapMatrix.
+Arguments eq_map_mx {R S m n} g [f].
+Arguments eq_in_map_mx {R S m n} g [f M].
+Arguments map_mx_id_in {R m n} [f M].
+Arguments map_mx_id {R m n} [f].
 
 (*****************************************************************************)
 (********************* Matrix Zmodule (additive) structure *******************)
