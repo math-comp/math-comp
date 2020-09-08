@@ -268,8 +268,11 @@ Section HornerMx.
 
 Variables (R : comRingType) (n' : nat).
 Local Notation n := n'.+1.
+Implicit Types (A B : 'M[R]_n) (p q : {poly R}).
+
+Section OneMatrix.
+
 Variable A : 'M[R]_n.
-Implicit Types p q : {poly R}.
 
 Definition horner_mx := horner_morph (comm_mxC^~ A).
 Canonical horner_mx_additive := [additive of horner_mx].
@@ -299,10 +302,9 @@ apply: eq_bigr => i _.
 by rewrite valK !linearZ rmorphX /= horner_mx_X rowK /= mxvecK.
 Qed.
 
-End HornerMx.
+End OneMatrix.
 
-Lemma horner_mx_diag (R : comRingType) (n' : nat)
-    (d : 'rV[R]_n'.+1) (p : {poly R}) :
+Lemma horner_mx_diag (d : 'rV[R]_n) (p : {poly R}) :
   horner_mx (diag_mx d) p = diag_mx (map_mx (horner p) d).
 Proof.
 apply/matrixP => i j; rewrite !mxE.
@@ -312,6 +314,19 @@ rewrite (bigD1 j)//= ihp mxE ?eqxx mulr1n -mulrnAl big1 ?addr0//.
   by case: (altP (i =P j)) => [->|]; rewrite /= !(mulr1n, addr0, mul0r).
 by move=> k /negPf nkF; rewrite mxE nkF mulr0.
 Qed.
+
+Lemma comm_mx_horner A B p : comm_mx A B -> comm_mx A (horner_mx B p).
+Proof.
+by move=> fg; apply: commr_horner => // i; rewrite coef_map; apply/commCmx.
+Qed.
+
+Lemma comm_horner_mx A B p : comm_mx A B -> comm_mx (horner_mx A p) B.
+Proof. by move=> ?; apply/comm_mx_sym/comm_mx_horner/comm_mx_sym. Qed.
+
+Lemma comm_horner_mx2 A p q : GRing.comm (horner_mx A p) (horner_mx A q).
+Proof. exact/comm_mx_horner/comm_horner_mx. Qed.
+
+End HornerMx.
 
 Lemma horner_mx_stable (K : fieldType) m n p
     (V : 'M[K]_(n.+1, m.+1)) (f : 'M_m.+1) :
@@ -827,6 +842,14 @@ Lemma kermxpoly_min n (g : 'M_n.+1) p :
   mxminpoly g %| p -> (kermxpoly g p :=: 1)%MS.
 Proof. by rewrite /kermxpoly => /mxminpoly_minP ->; apply: kermx0. Qed.
 
+Lemma comm_mx_stable_kermxpoly n (f g : 'M_n) (p : {poly K}) : comm_mx f g ->
+  stablemx (kermxpoly f p) g.
+Proof.
+case: n => [|n] in f g *; first by rewrite !thinmx0.
+move=> fg; rewrite /kermxpoly; apply: comm_mx_stable_ker.
+by apply/comm_mx_sym/comm_mx_horner/comm_mx_sym.
+Qed.
+
 Lemma mxdirect_kermxpoly n (g : 'M_n) (p q : {poly K}) :
   coprimep p q -> (kermxpoly g p :&: kermxpoly g q = 0)%MS.
 Proof.
@@ -925,9 +948,12 @@ Lemma eigenpolyP n (g : 'M_n) (p : {poly K}) :
   reflect (exists2 v : 'rV_n, (v <= kermxpoly g p)%MS & v != 0) (eigenpoly g p).
 Proof. exact: rowV0Pn. Qed.
 
-Lemma eigenvalue_poly n a (f : 'M_n) :
-  eigenvalue f a = eigenpoly f ('X - a%:P).
+Lemma eigenvalue_poly n a (f : 'M_n) : eigenvalue f a = eigenpoly f ('X - a%:P).
 Proof. by rewrite /eigenpoly /eigenvalue eigenspace_poly. Qed.
+
+Lemma comm_mx_stable_geigenspace n (f g : 'M_n) a : comm_mx f g ->
+  stablemx (geigenspace f a) g.
+Proof. exact: comm_mx_stable_kermxpoly. Qed.
 
 End KernelLemmas.
 
@@ -936,7 +962,9 @@ Variables (aF rF : fieldType) (f : {rmorphism aF -> rF}).
 
 Lemma map_kermxpoly (n : nat) (g : 'M_n) (p : {poly aF}) :
   map_mx f (kermxpoly g p) = kermxpoly (map_mx f g) (map_poly f p).
-Proof. by case: n => [|n] in g *; rewrite ?thinmx0// map_kermx map_horner_mx. Qed.
+Proof.
+by case: n => [|n] in g *; rewrite ?thinmx0// map_kermx map_horner_mx.
+Qed.
 
 Lemma map_geigenspace (n : nat) (g : 'M_n) (a : aF) :
   map_mx f (geigenspace g a) = geigenspace (map_mx f g) (f a).
@@ -947,20 +975,6 @@ Lemma eigenpoly_map n (g : 'M_n) (p : {poly aF}) :
 Proof. by rewrite /eigenpoly -map_kermxpoly map_mx_eq0. Qed.
 
 End MapKermxPoly.
-
-Section CommmxPoly.
-
-Lemma comm_mx_horner (R : comRingType) (n' : nat) (A B : 'M[R]_n'.+1)
-  (p : {poly R}) : comm_mx A B -> comm_mx A (horner_mx B p).
-Proof.
-by move=> fg; apply: commr_horner => // i; rewrite coef_map; apply/commCmx.
-Qed.
-
-Lemma horner_mxC (R : comRingType) (n' : nat) (A : 'M_n'.+1) (p q : {poly R}) :
-  GRing.comm (horner_mx A p) (horner_mx A p).
-Proof. exact/comm_mx_horner/comm_mx_sym/comm_mx_horner. Qed.
-
-End CommmxPoly.
 
 Section IntegralOverRing.
 
