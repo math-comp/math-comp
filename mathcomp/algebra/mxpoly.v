@@ -271,7 +271,7 @@ Local Notation n := n'.+1.
 Variable A : 'M[R]_n.
 Implicit Types p q : {poly R}.
 
-Definition horner_mx := horner_morph (fun a => scalar_mx_comm a A).
+Definition horner_mx := horner_morph (comm_mxC^~ A).
 Canonical horner_mx_additive := [additive of horner_mx].
 Canonical horner_mx_rmorphism := [rmorphism of horner_mx].
 
@@ -938,6 +938,20 @@ Lemma eigenpoly_map n (g : 'M_n) (p : {poly aF}) :
 Proof. by rewrite /eigenpoly -map_kermxpoly map_mx_eq0. Qed.
 
 End MapKermxPoly.
+
+Section CommmxPoly.
+
+Lemma comm_mx_horner (R : comRingType) (n' : nat) (A B : 'M[R]_n'.+1)
+  (p : {poly R}) : comm_mx A B -> comm_mx A (horner_mx B p).
+Proof.
+by move=> fg; apply: commr_horner => // i; rewrite coef_map; apply/commCmx.
+Qed.
+
+Lemma horner_mxC (R : comRingType) (n' : nat) (A : 'M_n'.+1) (p q : {poly R}) :
+  GRing.comm (horner_mx A p) (horner_mx A p).
+Proof. exact/comm_mx_horner/comm_mx_sym/comm_mx_horner. Qed.
+
+End CommmxPoly.
 
 Section IntegralOverRing.
 

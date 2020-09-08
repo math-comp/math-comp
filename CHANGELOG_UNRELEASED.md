@@ -206,6 +206,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * application of kernel lemmas `mxdirect_sum_geigenspace`,
     * new lemmas: `eigenpolyP`, `eigenvalue_poly`, `eigenspace_sub_geigen`,
   + new `map_mx` lemmas: `map_kermxpoly`, `map_geigenspace`, `eigenpoly_map`.
+- in `matrix.v`, added `comm_mx` and `comm_mxb` the propositional and
+  boolean versions of matrix commutation, `comm_mx A B` is
+  definitionally equal to `GRing.comm A B` when `A B : 'M_n.+1`, this
+  is witnessed by the lemma `comm_mxE`.  New notation `all_comm_mx`
+  stands for `allrel comm_mxb`. New lemmas `comm_mx_sym`, `comm_mx_refl`,
+  `comm_mx0`, `comm0mx`, `comm_mx1`, `comm1mx`, `comm_mxN`, `comm_mxN1`,
+  `comm_mxD`, `comm_mxB`, `comm_mx_sum`, `comm_mxP`, `all_comm_mxP`,
+  `all_comm_mx1`, `all_comm_mx2P`, `all_comm_mx_cons`, `comm_mxC`,
+  `commCmx`, `comm_mx_horner`, and `horner_mxC`. The common arguments
+  of these lemmas `R` and `n` are maximal implicits.
 
   - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`, `subset_maskP`.
   - in `fintype.v`, added `mask_enum_ord`.
@@ -254,6 +264,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `BLeft x` and `BRight x` respectively mean close and open bounds as left bounds,
     and they respectively mean open and close bounds as right bounds.
     This change gives us the canonical "left to right" ordering of interval bounds.
+- In `matrix.v`, generalized `diag_mx_comm` and `scalar_mx_comm` to
+  all `n`, instead of `n'.+1`, thanks to `commmmx`.
 
 - in `interval.v`:
   + Lemmas `mid_in_itv(|oo|cc)` have been generalized from `realFieldType` to
@@ -314,6 +326,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `itv_intersectionii` (use `meetxx` instead)
   + `itv_intersectionC` (use `meetC` instead)
   + `itv_intersectionA` (use `meetA` instead)
+
+- in `mxpoly.v`, we deprecate `scalar_mx_comm`, and advise to use
+  `comm_mxC` instead (with maximal implicit arguments `R` and `n`).
 
 ### Infrastructure
 
