@@ -91,6 +91,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `matrix.v` new lemma `mul_rVP`.
 
+- in `matrix.v`:
+  + new inductions lemmas: `row_ind`, `col_ind`, `mx_ind`, `sqmx_ind`,
+    `ringmx_ind`, `trigmx_ind`, `trigsqmx_ind`, `diagmx_ind`,
+    `diagsqmx_ind`.
+  + missing lemma `trmx_eq0`
+  + new lemmas about diagonal and triangular matrices: `mx11_is_diag`,
+    `mx11_is_trig`, `diag_mx_row`, `is_diag_mxEtrig`, `is_diag_trmx`,
+    `ursubmx_trig`, `dlsubmx_diag`, `ulsubmx_trig`, `drsubmx_trig`,
+    `ulsubmx_diag`, `drsubmx_diag`, `is_trig_block_mx`,
+    `is_diag_block_mx`, and `det_trig`.
+
+- in `mxpoly.v` new lemmas `horner_mx_diag`, `char_poly_trig`,
+   `root_mxminpoly`, and `mxminpoly_diag`
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12

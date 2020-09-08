@@ -297,6 +297,18 @@ Qed.
 
 End HornerMx.
 
+Lemma horner_mx_diag (R : comRingType) (n' : nat)
+    (d : 'rV[R]_n'.+1) (p : {poly R}) :
+  horner_mx (diag_mx d) p = diag_mx (map_mx (horner p) d).
+Proof.
+apply/matrixP => i j; rewrite !mxE.
+elim/poly_ind: p => [|p c ihp]; first by rewrite rmorph0 horner0 mxE mul0rn.
+rewrite !hornerE mulrnDl rmorphD rmorphM /= horner_mx_X horner_mx_C !mxE.
+rewrite (bigD1 j)//= ihp mxE ?eqxx mulr1n -mulrnAl big1 ?addr0//.
+  by case: (altP (i =P j)) => [->|]; rewrite /= !(mulr1n, addr0, mul0r).
+by move=> k /negPf nkF; rewrite mxE nkF mulr0.
+Qed.
+
 Prenex Implicits horner_mx powers_mx.
 
 Section CharPoly.
@@ -432,6 +444,14 @@ congr (_ == 0); rewrite horner_sum; apply: eq_bigr => s _.
 rewrite hornerM horner_exp !hornerE; congr (_ * _).
 rewrite (big_morph _ (fun p q => hornerM p q a) (hornerC 1 a)).
 by apply: eq_bigr => i _; rewrite !mxE !(hornerE, hornerMn).
+Qed.
+
+Lemma char_poly_trig {R : comRingType} n (A : 'M[R]_n) : is_trig_mx A ->
+  char_poly A = \prod_(i < n) ('X - (A i i)%:P).
+Proof.
+move=> /is_trig_mxP Atrig; rewrite /char_poly det_trig.
+  by apply: eq_bigr => i; rewrite !mxE eqxx.
+by apply/is_trig_mxP => i j lt_ij; rewrite !mxE -val_eqE ltn_eqF ?Atrig ?subrr.
 Qed.
 
 Definition companionmx {R : ringType} (p : seq R) (d := (size p).-1) :=
@@ -643,13 +663,31 @@ rewrite !hornerE rmorphD rmorphM /= horner_mx_X horner_mx_C scalerDl.
 by rewrite -scalerA mulmxDr mul_mx_scalar mulmxA -IHp -scalemxAl Av_av.
 Qed.
 
+Lemma root_mxminpoly a : root p_A a = root (char_poly A) a.
+Proof. by rewrite -eigenvalue_root_min eigenvalue_root_char. Qed.
+
 End MinPoly.
 
+Lemma mxminpoly_diag {F : fieldType} {n} (d : 'rV[F]_n.+1)
+    (u := undup [seq d 0 i | i <- enum 'I_n.+1]) :
+  mxminpoly (diag_mx d) = \prod_(r <- u) ('X - r%:P).
+Proof.
+apply/eqP; rewrite -eqp_monic ?mxminpoly_monic ?monic_prod_XsubC// /eqp.
+rewrite mxminpoly_min/=; last first.
+  rewrite horner_mx_diag; apply/matrixP => i j; rewrite !mxE horner_prod.
+  case: (altP (i =P j)) => [->|neq_ij//]; rewrite mulr1n.
+  rewrite (bigD1_seq (d 0 j)) ?undup_uniq ?mem_undup ?map_f// /=.
+  by rewrite hornerD hornerN hornerX hornerC subrr mul0r.
+apply: uniq_roots_dvdp; last by rewrite uniq_rootsE undup_uniq.
+apply/allP => x; rewrite mem_undup root_mxminpoly char_poly_trig//.
+rewrite -(big_map _ predT (fun x => _ - x%:P)) root_prod_XsubC.
+by move=> /mapP[i _ ->]; apply/mapP; exists i; rewrite ?(mxE, eqxx).
+Qed.
 Prenex Implicits degree_mxminpoly mxminpoly mx_inv_horner.
 
 Arguments mx_inv_hornerK {F n' A} [B] AnB.
 Arguments horner_rVpoly_inj {F n' A} [u1 u2] eq_u12A : rename.
-          
+
 (* Parametricity. *)
 Section MapRingMatrix.
 
