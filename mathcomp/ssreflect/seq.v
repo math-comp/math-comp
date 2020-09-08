@@ -755,6 +755,16 @@ case: ltnP => [?|le_s_n0]; rewrite ?(leq_trans le_s_n0) ?leq_addr ?addKn //=.
 by rewrite drop_oversize // !nth_default.
 Qed.
 
+Lemma find_ltn p s i : has p (take i s) -> find p s < i.
+Proof. by elim: s i => [|y s ihs] [|i]//=; case: (p _) => //= /ihs. Qed.
+
+Lemma has_take p s i : has p s -> has p (take i s) = (find p s < i).
+Proof. by elim: s i => [|y s ihs] [|i]//=; case: (p _) => //= /ihs ->. Qed.
+
+Lemma has_take_leq (p : pred T) (s : seq T) i : i <= size s ->
+  has p (take i s) = (find p s < i).
+Proof. by elim: s i => [|y s ihs] [|i]//=; case: (p _) => //= /ihs ->. Qed.
+
 Lemma nth_take i : i < n0 -> forall s, nth (take n0 s) i = nth s i.
 Proof.
 move=> lt_i_n0 s; case lt_n0_s: (n0 < size s).
@@ -1331,6 +1341,15 @@ Lemma index_cat x s1 s2 :
  index x (s1 ++ s2) = if x \in s1 then index x s1 else size s1 + index x s2.
 Proof. by rewrite /index find_cat has_pred1. Qed.
 
+Lemma index_ltn x s i : x \in take i s -> index x s < i.
+Proof. by rewrite -has_pred1; apply: find_ltn. Qed.
+
+Lemma in_take x s i : x \in s -> (x \in take i s) = (index x s < i).
+Proof. by rewrite -?has_pred1; apply: has_take. Qed.
+
+Lemma in_take_leq x s i : i <= size s -> (x \in take i s) = (index x s < i).
+Proof. by rewrite -?has_pred1; apply: has_take_leq. Qed.
+
 Lemma nthK s: uniq s -> {in gtn (size s), cancel (nth s) (index^~ s)}.
 Proof.
 elim: s => //= x s IHs /andP[s'x Us] i; rewrite inE ltnS eq_sym -if_neg.
@@ -1454,6 +1473,42 @@ Definition bitseq := seq bool.
 Canonical bitseq_eqType := Eval hnf in [eqType of bitseq].
 Canonical bitseq_predType := Eval hnf in [predType of bitseq].
 
+(* Generalized versions of splitP (from path.v): split_find_nth and split_find  *)
+Section FindNth.
+Variables (T : Type).
+Implicit Types (x : T) (p : pred T) (s : seq T).
+
+Variant split_find_nth_spec p : seq T -> seq T -> seq T -> T -> Type :=
+  FindNth x s1 s2 of p x & ~~ has p s1 :
+    split_find_nth_spec p (rcons s1 x ++ s2) s1 s2 x.
+
+Lemma split_find_nth x0 p s (i := find p s) :
+  has p s -> split_find_nth_spec p s (take i s) (drop i.+1 s) (nth x0 s i).
+Proof.
+move=> p_s; rewrite -[X in split_find_nth_spec _ X](cat_take_drop i s).
+rewrite (drop_nth x0 _) -?has_find// -cat_rcons.
+by constructor; [apply: nth_find | rewrite has_take -?leqNgt].
+Qed.
+
+Variant split_find_spec p : seq T -> seq T -> seq T -> Type :=
+  FindSplit x s1 s2 of p x & ~~ has p s1 :
+    split_find_spec p (rcons s1 x ++ s2) s1 s2.
+
+Lemma split_find p s (i := find p s) :
+  has p s -> split_find_spec p s (take i s) (drop i.+1 s).
+Proof.
+by case: s => // x ? in i * => ?; case: split_find_nth => //; constructor.
+Qed.
+
+Lemma nth_rcons_cat_find x0 p s1 s2 x (s := rcons s1 x ++ s2) :
+   p x -> ~~ has p s1 -> nth x0 s (find p s) = x.
+Proof.
+move=> pz pNs1; rewrite /s  cat_rcons find_cat (negPf pNs1).
+by rewrite nth_cat/= pz addn0 subnn ltnn.
+Qed.
+
+End FindNth.
+
 (* Incrementing the ith nat in a seq nat, padding with 0's if needed. This  *)
 (* allows us to use nat seqs as bags of nats.                               *)
 
@@ -1500,7 +1555,7 @@ Definition perm_eq s1 s2 :=
 Lemma permP s1 s2 : reflect (count^~ s1 =1 count^~ s2) (perm_eq s1 s2).
 Proof.
 apply: (iffP allP) => /= [eq_cnt1 a | eq_cnt x _]; last exact/eqP.
-have [n le_an] := ubnP (count a (s1 ++ s2)); elim: n => // n IHn in a le_an *. 
+have [n le_an] := ubnP (count a (s1 ++ s2)); elim: n => // n IHn in a le_an *.
 have [/eqP|] := posnP (count a (s1 ++ s2)).
   by rewrite count_cat addn_eq0; do 2!case: eqP => // ->.
 rewrite -has_count => /hasP[x s12x a_x]; pose a' := predD1 a x.
@@ -2984,7 +3039,7 @@ Lemma allpairs_mapr f (g : forall x, T' x -> T x) s t :
   [seq f x y | x <- s, y <- map (g x) (t x)] =
     [seq f x (g x y) | x <- s, y <- t x].
 Proof. by rewrite -(eq_map (fun=> map_comp _ _ _)). Qed.
-	
+
 End AllPairsDep.
 
 Arguments allpairs_dep {S T R} f s t /.

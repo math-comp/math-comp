@@ -85,6 +85,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `eq_in_map_mx`, `eq_map_mx` and `map_mx_id_in`.
 - in `matrix.v`, new lemmas `row_usubmx`, `row_dsubmx`, `col_lsubmx`,
   and `col_rsubmx`.
+- in `seq.v` new lemmas `find_ltn`, `has_take`, `has_take_leq`,
+  `index_ltn`, `in_take`, `in_take_leq`, `split_find_nth`,
+  `split_find` and `nth_rcons_cat_find`.
 
 ### Changed
 
