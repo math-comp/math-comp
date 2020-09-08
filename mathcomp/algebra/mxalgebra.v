@@ -1122,20 +1122,28 @@ Lemma eqmx_sums P n (A B : I -> 'M[F]_n) :
   (\sum_(i | P i) A i :=: \sum_(i | P i) B i)%MS.
 Proof. by move=> eqAB; apply/eqmxP; rewrite !sumsmxS // => i; move/eqAB->. Qed.
 
-Lemma sub_sumsmxP P m n (A : 'M_(m, n)) (B_ : I -> 'M_n) :
-  reflect (exists u_, A = \sum_(i | P i) u_ i *m B_ i)
-          (A <= \sum_(i | P i) B_ i)%MS.
+Lemma sub_sums_genmxP P m n p (A : 'M_(m, p)) (B_ : I -> 'M_(n, p)) :
+  reflect (exists u_ : I -> 'M_(m, n), A = \sum_(i | P i) u_ i *m B_ i)
+          (A <= \sum_(i | P i) <<B_ i>>)%MS.
 Proof.
 apply: (iffP idP) => [| [u_ ->]]; last first.
-  by apply: summx_sub_sums => i _; apply: submxMl.
+  by apply: summx_sub_sums => i _; rewrite genmxE; apply: submxMl.
 have [b] := ubnP #|P|; elim: b => // b IHb in P A *.
 case: (pickP P) => [i Pi | P0 _]; last first.
   rewrite big_pred0 //; move/submx0null->.
   by exists (fun _ => 0); rewrite big_pred0.
-rewrite (cardD1x Pi) (bigD1 i) //= => /IHb{b IHb} /= IHi /sub_addsmxP[u ->].
+rewrite (cardD1x Pi) (bigD1 i) //= => /IHb{b IHb} /= IHi.
+rewrite (adds_eqmx (genmxE _) (eqmx_refl _)) => /sub_addsmxP[u ->].
 have [u_ ->] := IHi _ (submxMl u.2 _).
-exists [eta u_ with i |-> u.1]; rewrite (bigD1 i Pi) /= eqxx; congr (_ + _).
+exists [eta u_ with i |-> u.1]; rewrite (bigD1 i Pi)/= eqxx; congr (_ + _).
 by apply: eq_bigr => j /andP[_ /negPf->].
+Qed.
+
+Lemma sub_sumsmxP P m n (A : 'M_(m, n)) (B_ : I -> 'M_n) :
+  reflect (exists u_, A = \sum_(i | P i) u_ i *m B_ i)
+          (A <= \sum_(i | P i) B_ i)%MS.
+Proof.
+by rewrite -(eqmx_sums (fun _ _ => genmxE _)); apply/sub_sums_genmxP.
 Qed.
 
 Lemma sumsmxMr_gen P m n A (B : 'M[F]_(m, n)) :
