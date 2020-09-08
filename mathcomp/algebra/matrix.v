@@ -1678,6 +1678,9 @@ apply/rowP=> j; rewrite !mxE (bigD1_ord i) //= mxE !eqxx mul1r.
 by rewrite big1 ?addr0 // => i'; rewrite mxE /= lift_eqF mul0r.
 Qed.
 
+Lemma mul_rVP m n A B :((@mulmx 1 m n)^~ A =1 mulmx^~ B) <-> (A = B).
+Proof. by split=> [eqAB|->//]; apply/row_matrixP => i; rewrite !rowE eqAB. Qed.
+
 Lemma row_mul m n p (i : 'I_m) A (B : 'M_(n, p)) :
   row i (A *m B) = row i A *m B.
 Proof. by rewrite !rowE mulmxA. Qed.

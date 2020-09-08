@@ -89,6 +89,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `index_ltn`, `in_take`, `in_take_leq`, `split_find_nth`,
   `split_find` and `nth_rcons_cat_find`.
 
+- in `matrix.v` new lemma `mul_rVP`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
