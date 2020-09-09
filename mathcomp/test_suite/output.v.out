@@ -1,5 +1,5 @@
 cyclic_pgroup_Aut_structure :
-forall [gT : finGroupType] [p : nat] [G : {group gT}],
+forall (gT : finGroupType) (p : nat) (G : {group gT}),
 p.-group G ->
 cyclic G ->
 G != 1 :> {set gT} ->
@@ -42,7 +42,7 @@ exists m : {perm gT} -> 'Z_q,
                            m (s0 * t) = ((2 ^ n).-1%:R)%R
                          & 'Ohm_1(<[s]>) = <[s0]>]]]]
 
-cyclic_pgroup_Aut_structure is not universe polymorphic
-Arguments cyclic_pgroup_Aut_structure [gT] [p]%nat_scope [G]%Group_scope
+Arguments gT, p, G are implicit
+Argument scopes are [_ nat_scope Group_scope _ _ _]
 cyclic_pgroup_Aut_structure is opaque
 Expands to: Constant mathcomp.solvable.extremal.cyclic_pgroup_Aut_structure
