@@ -10,7 +10,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Added contrapostion lemmas involving propositions: `contra_not`, `contraPnot`, `contraTnot`, `contraNnot`, `contraPT`, `contra_notT`, `contra_notN`, `contraPN`, `contraFnot`, `contraPF` and `contra_notF` in ssrbool.v and `contraPeq`, `contra_not_eq`, `contraPneq`, and `contra_neq_not` in eqtype.v
+- Added contraposition lemmas involving propositions: `contra_not`, `contraPnot`, `contraTnot`, `contraNnot`, `contraPT`, `contra_notT`, `contra_notN`, `contraPN`, `contraFnot`, `contraPF` and `contra_notF` in ssrbool.v and `contraPeq`, `contra_not_eq`, `contraPneq`, and `contra_neq_not` in eqtype.v
+- Contraposition lemmas involving inequalities:
+  + in `order.v`:
+    `comparable_contraTle`, `comparable_contraTlt`, `comparable_contraNle`, `comparable_contraNlt`, `comparable_contraFle`, `comparable_contraFlt`,
+    `contra_leT`, `contra_ltT`, `contra_leN`, `contra_ltN`, `contra_leF`, `contra_ltF`,
+    `comparable_contra_leq_le`, `comparable_contra_leq_lt`, `comparable_contra_ltn_le`, `comparable_contra_ltn_lt`,
+    `contra_le_leq`, `contra_le_ltn`, `contra_lt_leq`, `contra_lt_ltn`,
+    `comparable_contra_le`, `comparable_contra_le_lt`, `comparable_contra_lt_le`, `comparable_contra_lt`,
+    `contraTle`, `contraTlt`, `contraNle`, `contraNlt`, `contraFle`, `contraFlt`,
+    `contra_leq_le`, `contra_leq_lt`, `contra_ltn_le`, `contra_ltn_lt`,
+    `contra_le`, `contra_le_lt`, `contra_lt_le`, `contra_lt`,
+    `contra_le_not`, `contra_lt_not`,
+    `comparable_contraPle`, `comparable_contraPlt`, `comparable_contra_not_le`, `comparable_contra_not_lt`,
+    `contraPle`, `contraPlt`, `contra_not_le`, `contra_not_lt`
+  + in `ssrnat.v`:
+    `contraTleq`, `contraTltn`, `contraNleq`, `contraNltn`, `contraFleq`, `contraFltn`,
+    `contra_leqT`, `contra_ltnT`, `contra_leqN`, `contra_ltnN`, `contra_leqF`, `contra_ltnF`,
+    `contra_leq`, `contra_ltn`, `contra_leq_ltn`, `contra_ltn_leq`,
+    `contraPleq`, `contraPltn`, `contra_not_leq`, `contra_not_ltn`, `contra_leq_not`, `contra_ltn_not`
 - in `ssralg.v`, new lemma `sumr_const_nat` and `iter_addr_0`
 - in `ssrnum.v`, new lemma `ler_sum_nat`
 

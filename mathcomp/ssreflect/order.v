@@ -3130,6 +3130,111 @@ Lemma nmono_leif (f : T -> T) C :
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
 
 End POrderTheory.
+
+Section ContraTheory.
+Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
+Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
+
+Lemma comparable_contraTle b x y : x >=< y -> (y < x -> ~~ b) -> (b -> x <= y).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma comparable_contraTlt b x y : x >=< y -> (y <= x -> ~~ b) -> (b -> x < y).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma comparable_contraPle P x y : x >=< y -> (y < x -> ~ P) -> (P -> x <= y).
+Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+
+Lemma comparable_contraPlt P x y : x >=< y -> (y <= x -> ~ P) -> (P -> x < y).
+Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+
+Lemma comparable_contraNle b x y : x >=< y -> (y < x -> b) -> (~~ b -> x <= y).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma comparable_contraNlt b x y : x >=< y -> (y <= x -> b) -> (~~ b -> x < y).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma comparable_contra_not_le P x y : x >=< y -> (y < x -> P) -> (~ P -> x <= y).
+Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+
+Lemma comparable_contra_not_lt P x y : x >=< y -> (y <= x -> P) -> (~ P -> x < y).
+Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+
+Lemma comparable_contraFle b x y : x >=< y -> (y < x -> b) -> (b = false -> x <= y).
+Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
+
+Lemma comparable_contraFlt b x y : x >=< y -> (y <= x -> b) -> (b = false -> x < y).
+Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
+
+Lemma contra_leT b x y : (~~ b -> x < y) -> (y <= x -> b).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma contra_ltT b x y : (~~ b -> x <= y) -> (y < x -> b).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma contra_leN b x y : (b -> x < y) -> (y <= x -> ~~ b).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma contra_ltN b x y : (b -> x <= y) -> (y < x -> ~~ b).
+Proof. by case: comparableP; case: b. Qed.
+
+Lemma contra_le_not P x y : (P -> x < y) -> (y <= x -> ~ P).
+Proof. by case: comparableP => // _ PF _ /PF. Qed.
+
+Lemma contra_lt_not P x y : (P -> x <= y) -> (y < x -> ~ P).
+Proof. by case: comparableP => // _ PF _ /PF. Qed.
+
+Lemma contra_leF b x y : (b -> x < y) -> (y <= x -> b = false).
+Proof. by case: comparableP; case: b => // _ /implyP. Qed.
+
+Lemma contra_ltF b x y : (b -> x <= y) -> (y < x -> b = false).
+Proof. by case: comparableP; case: b => // _ /implyP. Qed.
+
+Lemma comparable_contra_leq_le m n x y : x >=< y ->
+  (y < x -> (n < m)%N) -> ((m <= n)%N -> x <= y).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma comparable_contra_leq_lt m n x y : x >=< y ->
+  (y <= x -> (n < m)%N) -> ((m <= n)%N -> x < y).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma comparable_contra_ltn_le m n x y : x >=< y ->
+  (y < x -> (n <= m)%N) -> ((m < n)%N -> x <= y).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma comparable_contra_ltn_lt m n x y : x >=< y ->
+  (y <= x -> (n <= m)%N) -> ((m < n)%N -> x < y).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma contra_le_leq x y m n : ((n < m)%N -> y < x) -> (x <= y -> (m <= n)%N).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma contra_le_ltn x y m n : ((n <= m)%N -> y < x) -> (x <= y -> (m < n)%N).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma contra_lt_leq x y m n : ((n < m)%N -> y <= x) -> (x < y -> (m <= n)%N).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma contra_lt_ltn x y m n : ((n <= m)%N -> y <= x) -> (x < y -> (m < n)%N).
+Proof. by case: comparableP; case: ltngtP. Qed.
+
+Lemma comparable_contra_le x y z t : z >=< t ->
+  (t < z -> y < x) -> (x <= y -> z <= t).
+Proof. by do 2![case: comparableP => //= ?]. Qed.
+
+Lemma comparable_contra_le_lt x y z t : z >=< t ->
+  (t <= z -> y < x) -> (x <= y -> z < t).
+Proof. by do 2![case: comparableP => //= ?]. Qed.
+
+Lemma comparable_contra_lt_le x y z t : z >=< t ->
+  (t < z -> y <= x) -> (x < y -> z <= t).
+Proof. by do 2![case: comparableP => //= ?]. Qed.
+
+Lemma comparable_contra_lt x y z t : z >=< t ->
+ (t <= z -> y <= x) -> (x < y -> z < t).
+Proof. by do 2![case: comparableP => //= ?]. Qed.
+
+End ContraTheory.
+
 Section POrderMonotonyTheory.
 
 Context {disp disp' : unit}.
@@ -3695,8 +3800,75 @@ End ArgExtremum.
 
 End TotalTheory.
 
+Hint Resolve le_total : core.
+Hint Resolve ge_total : core.
+Hint Resolve comparableT : core.
+Hint Resolve sort_le_sorted : core.
+
 Arguments min_idPr {disp T x y}.
 Arguments max_idPl {disp T x y}.
+
+(* contra lemmas *)
+
+Section ContraTheory.
+Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : orderType disp2}.
+Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
+
+Lemma contraTle b z t : (t < z -> ~~ b) -> (b -> z <= t).
+Proof. exact: comparable_contraTle. Qed.
+
+Lemma contraTlt b z t : (t <= z -> ~~ b) -> (b -> z < t).
+Proof. exact: comparable_contraTlt. Qed.
+
+Lemma contraPle P z t : (t < z -> ~ P) -> (P -> z <= t).
+Proof. exact: comparable_contraPle. Qed.
+
+Lemma contraPlt P z t : (t <= z -> ~ P) -> (P -> z < t).
+Proof. exact: comparable_contraPlt. Qed.
+
+Lemma contraNle b z t : (t < z -> b) -> (~~ b -> z <= t).
+Proof. exact: comparable_contraNle. Qed.
+
+Lemma contraNlt b z t : (t <= z -> b) -> (~~ b -> z < t).
+Proof. exact: comparable_contraNlt. Qed.
+
+Lemma contra_not_le P z t : (t < z -> P) -> (~ P -> z <= t).
+Proof. exact: comparable_contra_not_le. Qed.
+
+Lemma contra_not_lt P z t : (t <= z -> P) -> (~ P -> z < t).
+Proof. exact: comparable_contra_not_lt. Qed.
+
+Lemma contraFle b z t : (t < z -> b) -> (b = false -> z <= t).
+Proof. exact: comparable_contraFle. Qed.
+
+Lemma contraFlt b z t : (t <= z -> b) -> (b = false -> z < t).
+Proof. exact: comparable_contraFlt. Qed.
+
+Lemma contra_leq_le m n z t : (t < z -> (n < m)%N) -> ((m <= n)%N -> z <= t).
+Proof. exact: comparable_contra_leq_le. Qed.
+
+Lemma contra_leq_lt m n z t : (t <= z -> (n < m)%N) -> ((m <= n)%N -> z < t).
+Proof. exact: comparable_contra_leq_lt. Qed.
+
+Lemma contra_ltn_le m n z t : (t < z -> (n <= m)%N) -> ((m < n)%N -> z <= t).
+Proof. exact: comparable_contra_ltn_le. Qed.
+
+Lemma contra_ltn_lt m n z t : (t <= z -> (n <= m)%N) -> ((m < n)%N -> z < t).
+Proof. exact: comparable_contra_ltn_lt. Qed.
+
+Lemma contra_le x y z t : (t < z -> y < x) -> (x <= y -> z <= t).
+Proof. exact: comparable_contra_le. Qed.
+
+Lemma contra_le_lt x y z t : (t <= z -> y < x) -> (x <= y -> z < t).
+Proof. exact: comparable_contra_le_lt. Qed.
+
+Lemma contra_lt_le x y z t : (t < z -> y <= x) -> (x < y -> z <= t).
+Proof. exact: comparable_contra_lt_le. Qed.
+
+Lemma contra_lt x y z t : (t <= z -> y <= x) -> (x < y -> z < t).
+Proof. exact: comparable_contra_lt. Qed.
+
+End ContraTheory.
 
 Section TotalMonotonyTheory.
 
