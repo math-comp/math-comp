@@ -301,7 +301,7 @@ apply/andP; split.
   apply/abelemP=> //; rewrite [abelian _]quotient_cents2 ?joing_subl //.
   split=> // _ /morphimP[x Nx Px ->] /=.
   rewrite -morphX //= coset_id // (MhoE 1 pP) joing_idr expn1.
-  by rewrite mem_gen //; apply/setUP; right; apply: mem_imset.
+  by rewrite mem_gen //; apply/setUP; right; apply: imset_f.
 rewrite -quotient_cents2 // [_ \subset 'C(_)]abP (MhoE 1 pP) gen_subG /=.
 apply/subsetP=> _ /imsetP[x Px ->]; rewrite expn1.
 have nPhi_x: x \in 'N('Phi(P)) by apply: (subsetP nPhiP).
@@ -731,7 +731,7 @@ rewrite -{1}defG' gen_subG; apply/subsetP=> _ /imset2P[x y Gx Gy ->].
 have Zxy: [~ x, y] \in 'Z(G) by rewrite -defG' mem_commg.
 have Zxp: x ^+ p \in 'Z(G).
   rewrite -defPhi (Phi_joing pG) (MhoE 1 pG) joing_idr mem_gen // !inE.
-  by rewrite expn1 orbC (mem_imset (expgn^~ p)).
+  by rewrite expn1 orbC (imset_f (expgn^~ p)).
 rewrite mem_morphpre /= ?defG' ?Zxy // inE -commXg; last first.
   by red; case/setIP: Zxy => _ /centP->.
 by apply/commgP; red; case/setIP: Zxp => _ /centP->.
@@ -1157,7 +1157,7 @@ have defS: <<X>> = S.
   apply: Phi_nongen; apply/eqP; rewrite eqEsubset join_subG sPS sXS -joing_idr.
   rewrite -genM_join sub_gen // -quotientSK ?quotient_gen // -defSb genS //.
   apply/subsetP=> xb Xxb; apply/imsetP; rewrite (setIidPr nPX).
-  by exists (repr xb); rewrite /= ?coset_reprK //; apply: mem_imset.
+  by exists (repr xb); rewrite /= ?coset_reprK //; apply: imset_f.
 pose f (a : {perm gT}) := [ffun x => if x \in X then x^-1 * a x else 1].
 have injf: {in A &, injective f}.
   move=> _ _ /morphimP[y nSy Ry ->] /morphimP[z nSz Rz ->].

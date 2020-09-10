@@ -351,7 +351,7 @@ Definition odd_perm (s : perm_type T) := odd #|T| (+) odd #|porbits s|.
 Lemma apermE x s : aperm x s = s x. Proof. by []. Qed.
 
 Lemma mem_porbit s i x : (s ^+ i) x \in porbit s x.
-Proof. by rewrite (mem_imset (aperm x)) ?mem_cycle. Qed.
+Proof. by rewrite (imset_f (aperm x)) ?mem_cycle. Qed.
 
 Lemma porbit_id s x : x \in porbit s x.
 Proof. by rewrite -{1}[x]perm1 (mem_porbit s 0). Qed.
@@ -442,9 +442,9 @@ have xfC a b u: xf b a (t a b u) = xf a b u.
   by move/lt_xf: (lt_a); rewrite -(tXC a b) 1?ltnW //= orbC [_ || _]eq_xf.
 pose ts := t x y s; rewrite /= -[_ * s]/ts.
 pose dp u := #|porbits u :\ porbit u y :\ porbit u x|.
-rewrite !(addnC #|_|) (cardsD1 (porbit ts y)) mem_imset ?inE //.
-rewrite (cardsD1 (porbit ts x)) inE mem_imset ?inE //= -/(dp ts) {}/ts.
-rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(mem_imset, inE) //.
+rewrite !(addnC #|_|) (cardsD1 (porbit ts y)) imset_f ?inE //.
+rewrite (cardsD1 (porbit ts x)) inE imset_f ?inE //= -/(dp ts) {}/ts.
+rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(imset_f, inE) //.
 rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   wlog suffices: s / dp s <= dp (t x y s).
     by move=> IHs; apply/eqP; rewrite eqn_leq -{2}(tK x y s) !IHs.
@@ -452,7 +452,7 @@ rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   rewrite !inE andbA andbC !(eq_sym C) => /and3P[/imsetP[z _ ->{C}]].
   rewrite 2!eq_porbit_mem => sxz syz.
   suffices ts_z: porbit (t x y s) z = porbit s z.
-    by rewrite -ts_z !eq_porbit_mem {1 2}ts_z sxz syz mem_imset ?inE.
+    by rewrite -ts_z !eq_porbit_mem {1 2}ts_z sxz syz imset_f ?inE.
   suffices exp_id n: ((t x y s) ^+ n) z = (s ^+ n) z.
     apply/setP=> u; apply/idP/idP=> /imsetP[_ /cycleP[i ->] ->].
       by rewrite /aperm exp_id mem_porbit.

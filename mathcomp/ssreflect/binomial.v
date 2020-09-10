@@ -424,7 +424,7 @@ rewrite (reindex (fun p : {ffun _} => [ffun i => f0 (p i)])) /=; last first.
     by rewrite ffunE eqxx.
   rewrite -im_f0 => /andP[/andP[/ffun_onP f_ffun /injectiveP injf] /eqP im_f].
   apply/ffunP=> i; rewrite !ffunE /ff0'; case: pickP => [y /eqP //|].
-  have /imsetP[j _ eq_f0j_fi]: f i \in f0 @: 'I_k by rewrite -im_f mem_imset.
+  have /imsetP[j _ eq_f0j_fi]: f i \in f0 @: 'I_k by rewrite -im_f imset_f.
   by move/(_ j)/eqP.
 rewrite -ffactnn -card_inj_ffuns -sum1dep_card; apply: eq_bigl => p.
 rewrite -andbA.
@@ -434,10 +434,10 @@ set f := finfun _.
 have injf: injective f by move=> i j; rewrite !ffunE => /inj_f0; apply: inj_p.
 have imIkf : imIk f == A.
   rewrite eqEcard card_imset // cardAk card_ord leqnn andbT -im_f0.
-  by apply/subsetP=> x /imsetP[i _ ->]; rewrite ffunE mem_imset.
+  by apply/subsetP=> x /imsetP[i _ ->]; rewrite ffunE imset_f.
 split; [|exact/injectiveP|exact: imIkf].
 apply/ffun_onP => x; apply: (subsetP AsubB).
-by rewrite -(eqP imIkf) mem_imset.
+by rewrite -(eqP imIkf) imset_f.
 Qed.
 
 Lemma card_draws T k : #|[set A : {set T} | #|A| == k]| = 'C(#|T|, k).

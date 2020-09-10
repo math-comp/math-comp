@@ -1246,7 +1246,7 @@ apply: (iffP imageP) => [[[x1 x2] Dx12] | [x1 x2 Dx1 Dx2]] -> {y}.
 by exists (x1, x2); rewrite //= !inE Dx1.
 Qed.
 
-Lemma mem_imset (D : {pred aT}) x : x \in D -> f x \in f @: D.
+Lemma imset_f (D : {pred aT}) x : x \in D -> f x \in f @: D.
 Proof. by move=> Dx; apply/imsetP; exists x. Qed.
 
 Lemma imset0 : f @: set0 = set0.
@@ -1255,7 +1255,7 @@ Proof. by apply/setP => y; rewrite inE; apply/imsetP=> [[x]]; rewrite inE. Qed.
 Lemma imset_eq0 (A : {set aT}) : (f @: A == set0) = (A == set0).
 Proof.
 have [-> | [x Ax]] := set_0Vmem A; first by rewrite imset0 !eqxx.
-by rewrite -!cards_eq0 (cardsD1 x) Ax (cardsD1 (f x)) mem_imset.
+by rewrite -!cards_eq0 (cardsD1 x) Ax (cardsD1 (f x)) imset_f.
 Qed.
 
 Lemma imset_set1 x : f @: [set x] = [set f x].
@@ -1273,7 +1273,7 @@ Lemma sub_imset_pre (A : {pred aT}) (B : {pred rT}) :
   (f @: A \subset B) = (A \subset f @^-1: B).
 Proof.
 apply/subsetP/subsetP=> [sfAB x Ax | sAf'B fx].
-  by rewrite inE sfAB ?mem_imset.
+  by rewrite inE sfAB ?imset_f.
 by case/imsetP=> x Ax ->; move/sAf'B: Ax; rewrite inE.
 Qed.
 
@@ -1313,7 +1313,7 @@ Lemma imset_proper (A B : {set aT}) :
 Proof.
 move=> injf /properP[sAB [x Bx nAx]]; rewrite properE imsetS //=.
 apply: contra nAx => sfBA.
-have: f x \in f @: A by rewrite (subsetP sfBA) ?mem_imset.
+have: f x \in f @: A by rewrite (subsetP sfBA) ?imset_f.
 by case/imsetP=> y Ay /injf-> //; apply: subsetP sAB y Ay.
 Qed.
 
@@ -1341,7 +1341,7 @@ Proof.
 move=> injf; apply/eqP; rewrite eqEsubset subsetI.
 rewrite 2?imsetS (andTb, subsetIl, subsetIr) //=.
 apply/subsetP=> _ /setIP[/imsetP[x Ax ->] /imsetP[z Bz /injf eqxz]].
-by rewrite mem_imset // inE Ax eqxz.
+by rewrite imset_f // inE Ax eqxz.
 Qed.
 
 Lemma imset2Sl (A B : {pred aT}) (C : {pred aT2}) :
@@ -1585,7 +1585,7 @@ Lemma imset_comp (f : T' -> U) (g : T -> T') (H : {pred T}) :
 Proof.
 apply/setP/subset_eqP/andP.
 split; apply/subsetP=> _ /imsetP[x0 Hx0 ->]; apply/imsetP.
-  by exists (g x0); first apply: mem_imset.
+  by exists (g x0); first apply: imset_f.
 by move/imsetP: Hx0 => [x1 Hx1 ->]; exists x1.
 Qed.
 
@@ -1766,14 +1766,14 @@ Qed.
 Lemma curry_imset2l : f @2: (D1, D2) = \bigcup_(x1 in D1) f x1 @: D2.
 Proof.
 apply/setP=> y; apply/imset2P/bigcupP => [[x1 x2 Dx1 Dx2 ->{y}] | [x1 Dx1]].
-  by exists x1; rewrite // mem_imset.
+  by exists x1; rewrite // imset_f.
 by case/imsetP=> x2 Dx2 ->{y}; exists x1 x2.
 Qed.
 
 Lemma curry_imset2r : f @2: (D1, D2) = \bigcup_(x2 in D2) f^~ x2 @: D1.
 Proof.
 apply/setP=> y; apply/imset2P/bigcupP => [[x1 x2 Dx1 Dx2 ->{y}] | [x2 Dx2]].
-  by exists x2; rewrite // (mem_imset (f^~ x2)).
+  by exists x2; rewrite // (imset_f (f^~ x2)).
 by case/imsetP=> x1 Dx1 ->{y}; exists x1 x2.
 Qed.
 
@@ -1898,7 +1898,7 @@ Lemma cover_imset J F : cover (F @: J) = \bigcup_(i in J) F i.
 Proof.
 apply/setP=> x.
 apply/bigcupP/bigcupP=> [[_ /imsetP[i Ji ->]] | [i]]; first by exists i.
-by exists (F i); first apply: mem_imset.
+by exists (F i); first apply: imset_f.
 Qed.
 
 Lemma trivIimset J F (P := F @: J) :
@@ -1986,7 +1986,7 @@ Hypothesis eqiR : {in D & &, equivalence_rel R}.
 
 Let Pxx x : x \in D -> x \in Px x.
 Proof. by move=> Dx; rewrite !inE Dx (eqiR Dx Dx). Qed.
-Let PPx x : x \in D -> Px x \in P := fun Dx => mem_imset _ Dx.
+Let PPx x : x \in D -> Px x \in P := fun Dx => imset_f _ Dx.
 
 Lemma equivalence_partitionP : partition P D.
 Proof.
@@ -2058,7 +2058,7 @@ case/and3P=> /eqP <- tiP notP0; apply/and3P; split; first exact/and3P.
 apply/forall_inP=> B PB; have /set0Pn[x Bx]: B != set0 := memPn notP0 B PB.
 apply/cards1P; exists (odflt x [pick y in pblock P x]); apply/esym/eqP.
 rewrite eqEsubset sub1set inE -andbA; apply/andP; split.
-  by apply/mem_imset/bigcupP; exists B.
+  by apply/imset_f/bigcupP; exists B.
 rewrite (def_pblock tiP PB Bx); case def_y: _ / pickP => [y By | /(_ x)/idP//].
 rewrite By /=; apply/subsetP=> _ /setIP[/imsetP[z Pz ->]].
 case: {1}_ / pickP => [t zPt Bt | /(_ z)/idP[]]; last by rewrite mem_pblock.
@@ -2381,3 +2381,5 @@ Qed.
 End Greatest.
 
 End SetFixpoint.
+
+Notation mem_imset := ((fun aT rT D x f xD => deprecate mem_imset imset_f aT rT f D x xD) _ _ _ _).

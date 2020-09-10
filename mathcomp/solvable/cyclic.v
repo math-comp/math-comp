@@ -716,7 +716,7 @@ apply/setP=> C; apply/idP/imsetP=> [| [gC GdC ->{C}]].
   case/imsetP=> x /setIdP[_ oxd] ->; exists <[x]>%G => //.
   by rewrite -def_Gd inE -Zp_cycle subsetT.
 have:= GdC; rewrite -def_Gd => /setIdP[_ /eqP <-].
-by rewrite (set1P GdC) /= mem_imset // inE eqxx (mem_cycle x1).
+by rewrite (set1P GdC) /= imset_f // inE eqxx (mem_cycle x1).
 Qed.
 
 Section FieldMulCyclic.
@@ -742,7 +742,7 @@ elim/big_ind2: _ => // [m1 n1 m2 n2 | d _]; first exact: leq_add.
 set Gd := _ @: _; case: (set_0Vmem Gd) => [-> | [C]]; first by rewrite cards0.
 rewrite {}/Gd => /imsetP[x /setIdP[Gx /eqP <-] _ {C d}].
 rewrite order_dvdG // (@eq_card1 _ <[x]>) ?mul1n // => C.
-apply/idP/eqP=> [|-> {C}]; last by rewrite mem_imset // inE Gx eqxx.
+apply/idP/eqP=> [|-> {C}]; last by rewrite imset_f // inE Gx eqxx.
 by case/imsetP=> y /setIdP[Gy /eqP/ucG->].
 Qed.
 

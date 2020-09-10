@@ -298,7 +298,7 @@ Lemma setactE S a : to^* S a = [set to x a | x in S].
 Proof. by []. Qed.
 
 Lemma mem_setact S a x : x \in S -> to x a \in to^* S a.
-Proof. exact: mem_imset. Qed.
+Proof. exact: imset_f. Qed.
 
 Lemma card_setact S a : #|to^* S a| = #|S|.
 Proof. by apply: card_imset; apply: act_inj. Qed.
@@ -321,7 +321,7 @@ Lemma orbitP A x y :
 Proof. by apply: (iffP imsetP) => [] [a]; exists a. Qed.
 
 Lemma mem_orbit A x a : a \in A -> to x a \in orbit to A x.
-Proof. exact: mem_imset. Qed.
+Proof. exact: imset_f. Qed.
 
 Lemma afixP A x : reflect (forall a, a \in A -> to x a = x) (x \in 'Fix_to(A)).
 Proof.
@@ -607,9 +607,9 @@ Qed.
 Lemma orbit1P G x : reflect (orbit to G x = [set x]) (x \in 'Fix_to(G)).
 Proof.
 apply: (iffP afixP) => [xfix | xfix a Ga].
-  apply/eqP; rewrite eq_sym eqEsubset sub1set -{1}[x]act1 mem_imset //=.
+  apply/eqP; rewrite eq_sym eqEsubset sub1set -{1}[x]act1 imset_f //=.
   by apply/subsetP=> y; case/imsetP=> a Ga ->; rewrite inE xfix.
-by apply/set1P; rewrite -xfix mem_imset.
+by apply/set1P; rewrite -xfix imset_f.
 Qed.
 
 Lemma card_orbit1 G x : #|orbit to G x| = 1%N -> orbit to G x = [set x].
@@ -645,9 +645,9 @@ have sXS: X \subset S := transversal_sub trXP.
 split=> // [x y Xx Xy /= | x Sx].
   have Sx := subsetP sXS x Xx.
   rewrite -(inj_in_eq (pblock_inj trXP)) // eq_pblock ?defS //.
-  by rewrite (def_pblock tiP (mem_imset _ Sx)) ?orbit_refl.
+  by rewrite (def_pblock tiP (imset_f _ Sx)) ?orbit_refl.
 have /imsetP[y Xy defxG]: orbit to G x \in pblock P @: X.
-  by rewrite (pblock_transversal trXP) ?mem_imset.
+  by rewrite (pblock_transversal trXP) ?imset_f.
 suffices /orbitP[a Ga def_y]: y \in orbit to G x by exists a; rewrite ?def_y.
 by rewrite defxG mem_pblock defS (subsetP sXS).
 Qed.
@@ -719,7 +719,7 @@ Lemma acts_orbit G x : G \subset D -> [acts G, on orbit to G x | to].
 Proof.
 move/subsetP=> sGD; apply/subsetP=> a Ga; rewrite !inE sGD //.
 apply/subsetP=> _ /imsetP[b Gb ->].
-by rewrite inE -actMin ?sGD // mem_imset ?groupM.
+by rewrite inE -actMin ?sGD // imset_f ?groupM.
 Qed.
 
 Lemma acts_subnorm_fix A : [acts 'N_D(A), on 'Fix_to(D :&: A) | to].
@@ -731,7 +731,7 @@ by rewrite /= (afixP Cx) // memJ_norm // groupV (subsetP (normsGI _ _) _ nAa).
 Qed.
 
 Lemma atrans_orbit G x : [transitive G, on orbit to G x | to].
-Proof. by apply: mem_imset; apply: orbit_refl. Qed.
+Proof. by apply: imset_f; apply: orbit_refl. Qed.
 
 Section OrbitStabilizer.
 
@@ -846,7 +846,7 @@ Lemma atrans_acts_in G S :
   G \subset D -> [transitive G, on S | to] -> [acts G, on S | to].
 Proof.
 move=> sGD transG; apply/subsetP=> a Ga; rewrite !inE (subsetP sGD) //.
-by apply/subsetP=> x /(atransPin sGD transG) <-; rewrite inE mem_imset.
+by apply/subsetP=> x /(atransPin sGD transG) <-; rewrite inE imset_f.
 Qed.
 
 Lemma subgroup_transitivePin G H S x :
@@ -1030,7 +1030,7 @@ Proof. by move=> GtrS x y /(atransP GtrS) <- /imsetP. Qed.
 Lemma atrans_acts G S : [transitive G, on S | to] -> [acts G, on S | to].
 Proof.
 move=> GtrS; apply/subsetP=> a Ga; rewrite !inE.
-by apply/subsetP=> x /(atransP GtrS) <-; rewrite inE mem_imset.
+by apply/subsetP=> x /(atransP GtrS) <-; rewrite inE imset_f.
 Qed.
 
 Lemma atrans_supgroup G H S :
@@ -1052,11 +1052,11 @@ apply/idP/andP=> [GtrS | [nSG]].
   apply/andP; split=> //; apply/subsetP=> _ /imsetP[x Sx ->].
   by rewrite inE (atransP GtrS).
 rewrite eqn_leq andbC lt0n => /andP[/existsP[X /imsetP[x Sx X_Gx]]].
-rewrite (cardD1 X) {X}X_Gx mem_imset // ltnS leqn0 => /eqP GtrS.
+rewrite (cardD1 X) {X}X_Gx imset_f // ltnS leqn0 => /eqP GtrS.
 apply/imsetP; exists x => //; apply/eqP.
 rewrite eqEsubset acts_sub_orbit // Sx andbT.
 apply/subsetP=> y Sy; have:= card0_eq GtrS (orbit to G y).
-by rewrite !inE /= mem_imset // andbT => /eqP <-; apply: orbit_refl.
+by rewrite !inE /= imset_f // andbT => /eqP <-; apply: orbit_refl.
 Qed.
 
 Lemma atrans_dvd G S : [transitive G, on S | to] -> #|S| %| #|G|.
@@ -1107,7 +1107,7 @@ have:= sHC; rewrite subsetI sub_astab1 => /andP[sHG cHx].
 have Tx: x \in T by rewrite inE Sx.
 apply: (iffP idP) => [trN | trC].
   apply/setP=> Ha; apply/setIdP/imsetP=> [[]|[a Ca ->{Ha}]]; last first.
-    by rewrite conj_subG //; case/setIP: Ca => Ga _; rewrite mem_imset.
+    by rewrite conj_subG //; case/setIP: Ca => Ga _; rewrite imset_f.
   case/imsetP=> a Ga ->{Ha}; rewrite subsetI !sub_conjg => /andP[_ sHCa].
   have Txa: to x a^-1 \in T.
     by rewrite inE -sub_astab1 astab1_act actGS ?Sx ?groupV.
@@ -1117,7 +1117,7 @@ apply: (iffP idP) => [trN | trC].
 apply/imsetP; exists x => //; apply/setP=> y; apply/idP/idP=> [Ty|].
   have [Sy cHy]:= setIP Ty; have [a Ga defy] := atransP2 trGS Sx Sy.
   have: H :^ a^-1 \in H :^: C.
-    rewrite -trC inE subsetI mem_imset 1?conj_subG ?groupV // sub_conjgV.
+    rewrite -trC inE subsetI imset_f 1?conj_subG ?groupV // sub_conjgV.
     by rewrite -astab1_act -defy sub_astab1.
   case/imsetP=> b /setIP[Gb /astab1P cxb] defHb.
   rewrite defy -{1}cxb -actM mem_orbit // inE groupM //.
@@ -1267,7 +1267,7 @@ apply/setP=> a; rewrite inE in_setI; apply: andb_id2l => sDa.
 have [Da _] := setIP sDa; rewrite !inE Da.
 apply/subsetP/subsetP=> [cSa _ /imsetP[x Sx ->] | cSa x Sx]; rewrite !inE.
   by have:= cSa x Sx; rewrite inE -val_eqE val_subact sDa.
-by have:= cSa _ (mem_imset val Sx); rewrite inE -val_eqE val_subact sDa.
+by have:= cSa _ (imset_f val Sx); rewrite inE -val_eqE val_subact sDa.
 Qed.
 
 Lemma astabs_subact S : 'N(S | subaction) = subact_dom :&: 'N(val @: S | to).
@@ -1275,8 +1275,8 @@ Proof.
 apply/setP=> a; rewrite inE in_setI; apply: andb_id2l => sDa.
 have [Da _] := setIP sDa; rewrite !inE Da.
 apply/subsetP/subsetP=> [nSa _ /imsetP[x Sx ->] | nSa x Sx]; rewrite !inE.
-  by have:= nSa x Sx; rewrite inE => /(mem_imset val); rewrite val_subact sDa.
-have:= nSa _ (mem_imset val Sx); rewrite inE => /imsetP[y Sy def_y].
+  by have:= nSa x Sx; rewrite inE => /(imset_f val); rewrite val_subact sDa.
+have:= nSa _ (imset_f val Sx); rewrite inE => /imsetP[y Sy def_y].
 by rewrite ((_ a =P y) _) // -val_eqE val_subact sDa def_y.
 Qed.
 
@@ -1316,9 +1316,9 @@ Canonical quotient_action := [action of qact].
 Lemma acts_qact_dom : [acts qact_dom, on 'N(H) | to].
 Proof.
 apply/subsetP=> a nNa; rewrite !inE (astabs_dom nNa); apply/subsetP=> x Nx.
-have: H :* x \in rcosets H 'N(H) by rewrite -rcosetE mem_imset.
+have: H :* x \in rcosets H 'N(H) by rewrite -rcosetE imset_f.
 rewrite inE -(astabs_act _ nNa) => /rcosetsP[y Ny defHy].
-have: to x a \in H :* y by rewrite -defHy (mem_imset (to^~a)) ?rcoset_refl.
+have: to x a \in H :* y by rewrite -defHy (imset_f (to^~a)) ?rcoset_refl.
 by apply: subsetP; rewrite mul_subG ?sub1set ?normG.
 Qed.
 
@@ -1328,11 +1328,11 @@ Lemma qactEcond x a :
     = coset H (if a \in qact_dom then to x a else x).
 Proof.
 move=> Nx; apply: val_inj; rewrite val_subact //= qact_subdomE.
-have: H :* x \in rcosets H 'N(H) by rewrite -rcosetE mem_imset.
+have: H :* x \in rcosets H 'N(H) by rewrite -rcosetE imset_f.
 case nNa: (a \in _); rewrite // -(astabs_act _ nNa).
 rewrite !val_coset ?(acts_act acts_qact_dom nNa) //=.
 case/rcosetsP=> y Ny defHy; rewrite defHy; apply: rcoset_eqP.
-by rewrite rcoset_sym -defHy (mem_imset (_^~_)) ?rcoset_refl.
+by rewrite rcoset_sym -defHy (imset_f (_^~_)) ?rcoset_refl.
 Qed.
 
 Lemma qactE x a :
@@ -1580,7 +1580,7 @@ Proof.
 move=> sAB; apply/setP=> x; rewrite !inE /morphim (setIidPr sAB).
 apply/subsetP/subsetP=> [cAx _ /imsetP[a Aa ->] | cfAx a Aa].
   by move/cAx: Aa; rewrite !inE.
-by rewrite inE; move/(_ (f a)): cfAx; rewrite inE mem_imset // => ->.
+by rewrite inE; move/(_ (f a)): cfAx; rewrite inE imset_f // => ->.
 Qed.
 
 Lemma astab_comp S : 'C(S | comp_action) = f @*^-1 'C(S | to).
@@ -2163,7 +2163,7 @@ rewrite eqEcard (card_preimset _ (act_inj _ _)) leqnn andbT.
 apply/subsetP=> x Nx; rewrite inE; move/(astabs_act (H :* x)): HDa.
 rewrite mem_rcosets mulSGid ?normG // Nx => /rcosetsP[y Ny defHy].
 suffices: to x a \in H :* y by apply: subsetP; rewrite mul_subG ?sub1set ?normG.
-by rewrite -defHy; apply: mem_imset; apply: rcoset_refl.
+by rewrite -defHy; apply: imset_f; apply: rcoset_refl.
 Qed.
 
 Lemma qact_is_groupAction : is_groupAction (R / H) (to / H).
@@ -2326,12 +2326,12 @@ Lemma morph_astabs : f @* 'N(S | to1) = 'N(h @: S | to2).
 Proof.
 apply/setP=> fx; apply/morphimP/idP=> [[x D1x nSx ->] | nSx].
   rewrite 2!inE -{1}defD2 mem_morphim //=; apply/subsetP=> _ /imsetP[u Su ->].
-  by rewrite inE -hfJ ?mem_imset // (astabs_act _ nSx).
+  by rewrite inE -hfJ ?imset_f // (astabs_act _ nSx).
 have [|x D1x _ def_fx] := morphimP (_ : fx \in f @* D1).
   by rewrite defD2 (astabs_dom nSx).
 exists x => //; rewrite !inE D1x; apply/subsetP=> u Su.
 have /imsetP[u' Su' /injh def_u']: h (to1 u x) \in h @: S.
-  by rewrite hfJ // -def_fx (astabs_act _ nSx) mem_imset.
+  by rewrite hfJ // -def_fx (astabs_act _ nSx) imset_f.
 by rewrite inE def_u' ?actsDR ?(subsetP sSR).
 Qed.
 
@@ -2344,13 +2344,13 @@ have [|x D1x _ def_fx] := morphimP (_ : fx \in f @* D1).
   by rewrite defD2 (astab_dom cSx).
 exists x => //; rewrite !inE D1x; apply/subsetP=> u Su.
 rewrite inE -(inj_in_eq injh) ?actsDR ?(subsetP sSR) ?hfJ //.
-by rewrite -def_fx (astab_act cSx) ?mem_imset.
+by rewrite -def_fx (astab_act cSx) ?imset_f.
 Qed.
 
 Lemma morph_afix : h @: 'Fix_(S | to1)(A) = 'Fix_(h @: S | to2)(f @* A).
 Proof.
 apply/setP=> hu; apply/imsetP/setIP=> [[u /setIP[Su cAu] ->]|].
-  split; first by rewrite mem_imset.
+  split; first by rewrite imset_f.
   by apply/afixP=> _ /morphimP[x D1x Ax ->]; rewrite -hfJ ?(afixP cAu).
 case=> /imsetP[u Su ->] /afixP c_hu_fA; exists u; rewrite // inE Su.
 apply/afixP=> x Ax; have Dx := subsetP sAD1 x Ax.
@@ -2498,7 +2498,7 @@ by rewrite -groupV -{1 3}(mulg1 G) rcoset_sym -sub1set -mulGS -!rcosetE.
 Qed.
 
 Lemma atransR G : [transitive G, on G | 'R].
-Proof. by rewrite /atrans -{1}(mul1g G) -orbitR mem_imset. Qed.
+Proof. by rewrite /atrans -{1}(mul1g G) -orbitR imset_f. Qed.
 
 Lemma faithfulR G : [faithful G, on G | 'R].
 Proof. by rewrite /faithful astabR subsetIr. Qed.
@@ -2555,7 +2555,7 @@ Lemma afixRs_rcosets A G : 'Fix_(rcosets G A | 'Rs)(G) = rcosets G 'N_A(G).
 Proof.
 apply/setP=> Gx; apply/setIP/rcosetsP=> [[/rcosetsP[x Ax ->]]|[x]].
   by rewrite sub_afixRs_norm => Nx; exists x; rewrite // inE Ax.
-by case/setIP=> Ax Nx ->; rewrite -{1}rcosetE mem_imset // sub_afixRs_norm.
+by case/setIP=> Ax Nx ->; rewrite -{1}rcosetE imset_f // sub_afixRs_norm.
 Qed.
 
 Lemma astab1Rs G : 'C[G : {set gT} | 'Rs] = G.
@@ -2669,7 +2669,7 @@ Proof. by apply: acts_sum_card_orbit; apply/actsP=> x Gx y; apply: groupJr. Qed.
 Lemma class_formula : \sum_(C in classes G) #|G : 'C_G[repr C]| = #|G|.
 Proof.
 rewrite -sum_card_class; apply: eq_bigr => _ /imsetP[x Gx ->].
-have: x \in x ^: G by rewrite -{1}(conjg1 x) mem_imset.
+have: x \in x ^: G by rewrite -{1}(conjg1 x) imset_f.
 by case/mem_repr/imsetP=> y Gy ->; rewrite index_cent1 classGidl.
 Qed.
 
@@ -2687,7 +2687,7 @@ rewrite -sum_card_class -sum1_card (leqif_sum cGgt0).
 apply/abelian_classP/forall_inP=> [cGG _ /imsetP[x Gx ->]| cGG x Gx].
   by rewrite cGG ?cards1.
 apply/esym/eqP; rewrite eqEcard sub1set cards1 class_refl leq_eqVlt cGG //.
-exact: mem_imset.
+exact: imset_f.
 Qed.
 
 End CardClass.

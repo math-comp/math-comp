@@ -223,7 +223,7 @@ Proof. by rewrite /morphim setIA setIid. Qed.
 Lemma morphpreIim R : f @*^-1 (f @* D :&: R) = f @*^-1 R.
 Proof.
 apply/setP=> x; rewrite morphimEdom !inE.
-by case Dx: (x \in D); rewrite // mem_imset.
+by case Dx: (x \in D); rewrite // imset_f.
 Qed.
 
 Lemma morphimIim A : f @* D :&: f @* A = f @* A.
@@ -276,7 +276,7 @@ Proof.
 wlog suffices: A / f @* A^-1 \subset (f @* A)^-1.
   by move=> IH; apply/eqP; rewrite eqEsubset IH -invSg invgK -{1}(invgK A) IH.
 apply/subsetP=> _ /morphimP[x Dx Ax' ->]; rewrite !inE in Ax' *.
-by rewrite -morphV // mem_imset // inE groupV Dx.
+by rewrite -morphV // imset_f // inE groupV Dx.
 Qed.
 
 Lemma morphpreV R : f @*^-1 R^-1 = (f @*^-1 R)^-1.
@@ -290,9 +290,9 @@ Proof.
 move=> sAD; rewrite /morphim setIC -group_modl // (setIidPr sAD).
 apply/setP=> fxy; apply/idP/idP.
   case/imsetP=> _ /imset2P[x y Ax /setIP[Dy By] ->] ->{fxy}.
-  by rewrite morphM // (subsetP sAD, mem_imset2) // mem_imset // inE By.
+  by rewrite morphM // (subsetP sAD, mem_imset2) // imset_f // inE By.
 case/imset2P=> _ _ /imsetP[x Ax ->] /morphimP[y Dy By ->] ->{fxy}.
-by rewrite -morphM // (subsetP sAD, mem_imset) // mem_mulg // inE By.
+by rewrite -morphM // (subsetP sAD, imset_f) // mem_mulg // inE By.
 Qed.
 
 Lemma morphimMr A B : B \subset D -> f @* (A * B) = f @* A * f @* B.
@@ -409,7 +409,7 @@ move=> sKG; apply/eqP; rewrite eqEsubset morphimI setIC.
 apply/subsetP=> _ /setIP[/morphimP[x Dx Ax ->] /morphimP[z Dz Gz]].
 case/ker_rcoset=> {Dz}// y Ky def_x.
 have{z Gz y Ky def_x} Gx: x \in G by rewrite def_x groupMl // (subsetP sKG).
-by rewrite mem_imset ?inE // Dx Gx Ax.
+by rewrite imset_f ?inE // Dx Gx Ax.
 Qed.
 
 Lemma morphimIG A G : 'ker f \subset G -> f @* (A :&: G) = f @* A :&: f @* G.
@@ -442,8 +442,8 @@ Qed.
 Lemma morphim_groupset G : group_set (f @* G).
 Proof.
 apply/group_setP; split=> [|_ _ /morphimP[x Dx Gx ->] /morphimP[y Dy Gy ->]].
-  by rewrite -morph1 mem_imset ?group1.
-by rewrite -morphM ?mem_imset ?inE ?groupM.
+  by rewrite -morph1 imset_f ?group1.
+by rewrite -morphM ?imset_f ?inE ?groupM.
 Qed.
 
 Canonical morphpre_group fPh M :=
@@ -470,7 +470,7 @@ apply/idP/idP=> [/andP[Dx /morphimP[y Dy Ay eqxy]] | /imset2P[z y Kz Ay ->{x}]].
   rewrite -(mulgKV y x) mem_mulg // !inE !(groupM, morphM, groupV) //.
   by rewrite morphV //= eqxy mulgV.
 have [Dy Dz]: y \in D /\ z \in D by rewrite (subsetP sAD) // dom_ker.
-by rewrite groupM // morphM // mker // mul1g mem_imset // inE Dy.
+by rewrite groupM // morphM // mker // mul1g imset_f // inE Dy.
 Qed.
 
 Lemma morphimGK G : 'ker f \subset G -> G \subset D -> f @*^-1 (f @* G) = G.
@@ -608,7 +608,7 @@ rewrite morphim_gen; last first; last congr <<_>>.
 apply/setP=> fz; apply/morphimP/imset2P=> [[z _] | [fx fy]].
   case/imset2P=> x y Ax By -> -> {z fz}.
   have Dx := sAD x Ax; have Dy := sBD y By.
-  by exists (f x) (f y); rewrite ?(mem_imset, morphR) // ?(inE, Dx, Dy).
+  by exists (f x) (f y); rewrite ?(imset_f, morphR) // ?(inE, Dx, Dy).
 case/morphimP=> x Dx Ax ->{fx}; case/morphimP=> y Dy By ->{fy} -> {fz}.
 by exists [~ x, y]; rewrite ?(inE, morphR, groupR, mem_imset2).
 Qed.
@@ -1072,7 +1072,7 @@ Qed.
 Lemma morphpre_factm (C : {set rT}) : ff @*^-1 C =  q @* (f @*^-1 C).
 Proof.
 apply/setP=> y; rewrite !inE /=; apply/andP/morphimP=> [[]|[x Hx]]; last first.
-  by case/morphpreP=> Gx Cfx ->; rewrite factmE ?mem_imset ?inE ?Hx.
+  by case/morphpreP=> Gx Cfx ->; rewrite factmE ?imset_f ?inE ?Hx.
 case/morphimP=> x Hx Gx ->; rewrite factmE //.
 by exists x; rewrite // !inE Gx.
 Qed.
@@ -1268,7 +1268,7 @@ apply: (iffP eqP) => [eqfGH | [injf <-]]; last first.
   by rewrite -injmD1 // morphimEsub ?subsetDl.
 split.
   apply/subsetP=> x /morphpreP[Gx fx1]; have: f x \notin H^# by rewrite inE fx1.
-  by apply: contraR => ntx; rewrite -eqfGH mem_imset // inE ntx.
+  by apply: contraR => ntx; rewrite -eqfGH imset_f // inE ntx.
 rewrite morphimEdom -{2}(setD1K (group1 G)) imsetU eqfGH.
 by rewrite imset_set1 morph1 setD1K.
 Qed.
@@ -1501,7 +1501,7 @@ Lemma ker_subg : 'ker (subg G) = 1. Proof. exact/trivgP. Qed.
 Lemma im_subg : subg G @* G = [subg G].
 Proof.
 apply/eqP; rewrite -subTset morphimEdom.
-by apply/subsetP=> u _; rewrite -(sgvalK u) mem_imset ?subgP.
+by apply/subsetP=> u _; rewrite -(sgvalK u) imset_f ?subgP.
 Qed.
 
 Lemma sgval_sub A : sgval @* A \subset G.
