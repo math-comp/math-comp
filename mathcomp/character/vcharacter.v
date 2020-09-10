@@ -696,7 +696,7 @@ have [j def_chi_j]: {j | 'chi_j = phi}.
 exists j; rewrite ?cfkerEirr def_chi_j //; apply/subsetP => x /setDP[Gx notHx].
 rewrite inE cfunE def_phi // cfunE -/a cfun1E // Gx mulr1 cfIndE //.
 rewrite big1 ?mulr0 ?add0r // => y Gy; apply/theta0/(contra _ notHx) => Hxy.
-by rewrite -(conjgK y x) cover_imset -class_supportEr mem_imset2 ?groupV.
+by rewrite -(conjgK y x) cover_imset -class_supportEr imset2_f ?groupV.
 Qed.
 
 End MoreVchar.

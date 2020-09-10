@@ -1544,7 +1544,7 @@ have{genXp minU xp1 sVU ltVU} expVp: exponent V %| p.
 have{A pA defA1 sX'A V expVp} Zxy: [~ x, y] \in Z.
   rewrite -defA1 (OhmE 1 pA) mem_gen // !inE (exponentP expVp).
     by rewrite (subsetP sX'A) //= mem_commg ?(subsetP sUX).
-  by rewrite groupMl -1?[x^-1]conjg1 mem_gen // mem_imset2 // ?groupV cycle_id.
+  by rewrite groupMl -1?[x^-1]conjg1 mem_gen // imset2_f // ?groupV cycle_id.
 have{Zxy sUX cZX} cXYxy: [~ x, y] \in 'C(XY).
   by rewrite centsC in cZX; rewrite defXY (subsetP (centS sUX)) ?(subsetP cZX).
 rewrite -defU1 exponent_Ohm1_class2 // nil_class2 -defXY der1_joing_cycles //.

@@ -181,7 +181,7 @@ Lemma commg_subr G H : ([~: G, H] \subset H) = (G \subset 'N(H)).
 Proof.
 rewrite gen_subG; apply/subsetP/subsetP=> [sRH x Gx | nGH xy].
   rewrite inE; apply/subsetP=> _ /imsetP[y Ky ->].
-  by rewrite conjg_Rmul groupMr // sRH // mem_imset2 ?groupV.
+  by rewrite conjg_Rmul groupMr // sRH // imset2_f ?groupV.
 case/imset2P=> x y Gx Hy ->{xy}.
 by rewrite commgEr groupMr // memJ_norm (groupV, nGH).
 Qed.
@@ -254,7 +254,7 @@ Proof.
 have R_C := sameP trivgP commG1P.
 rewrite -subG1 R_C gen_subG -{}R_C gen_subG.
 apply: (iffP subsetP) => [cABC x y z Ax By Cz | cABC xyz].
-  by apply/set1P; rewrite cABC // !mem_imset2.
+  by apply/set1P; rewrite cABC // !imset2_f.
 by case/imset2P=> _ z /imset2P[x y Ax By ->] Cz ->; rewrite cABC.
 Qed.
 

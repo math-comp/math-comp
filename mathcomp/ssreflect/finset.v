@@ -1264,7 +1264,7 @@ apply/setP => y.
 by apply/imsetP/set1P=> [[x' /set1P-> //]| ->]; exists x; rewrite ?set11.
 Qed.
 
-Lemma mem_imset2 (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
+Lemma imset2_f (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     x \in D -> x2 \in D2 x ->
   f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)).
 Proof. by move=> Dx Dx2; apply/imset2P; exists x x2. Qed.
@@ -2382,4 +2382,7 @@ End Greatest.
 
 End SetFixpoint.
 
-Notation mem_imset := ((fun aT rT D x f xD => deprecate mem_imset imset_f aT rT f D x xD) _ _ _ _).
+Notation mem_imset := 
+  ((fun aT rT D x f xD => deprecate mem_imset imset_f aT rT f D x xD) _ _ _ _).
+Notation mem_imset2 := ((fun aT aT2 rT D D2 x x2 f xD xD2 => 
+  deprecate mem_imset2 imset2_f aT aT2 rT f D D2 x x2 xD xD2) _ _ _ _ _ _ _).

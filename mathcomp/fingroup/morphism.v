@@ -290,7 +290,7 @@ Proof.
 move=> sAD; rewrite /morphim setIC -group_modl // (setIidPr sAD).
 apply/setP=> fxy; apply/idP/idP.
   case/imsetP=> _ /imset2P[x y Ax /setIP[Dy By] ->] ->{fxy}.
-  by rewrite morphM // (subsetP sAD, mem_imset2) // imset_f // inE By.
+  by rewrite morphM // (subsetP sAD, imset2_f) // imset_f // inE By.
 case/imset2P=> _ _ /imsetP[x Ax ->] /morphimP[y Dy By ->] ->{fxy}.
 by rewrite -morphM // (subsetP sAD, imset_f) // mem_mulg // inE By.
 Qed.
@@ -307,7 +307,7 @@ Proof.
 move=> sRfD; apply/setP=> x; rewrite !inE.
 apply/andP/imset2P=> [[Dx] | [y z]]; last first.
   rewrite !inE => /andP[Dy Rfy] /andP[Dz Rfz] ->.
-  by rewrite ?(groupM, morphM, mem_imset2).
+  by rewrite ?(groupM, morphM, imset2_f).
 case/imset2P=> fy fz Rfy Rfz def_fx.
 have /morphimP[y Dy _ def_fy]: fy \in f @* D := subsetP sRfD fy Rfy.
 exists y (y^-1 * x); last by rewrite mulKVg.
@@ -610,7 +610,7 @@ apply/setP=> fz; apply/morphimP/imset2P=> [[z _] | [fx fy]].
   have Dx := sAD x Ax; have Dy := sBD y By.
   by exists (f x) (f y); rewrite ?(imset_f, morphR) // ?(inE, Dx, Dy).
 case/morphimP=> x Dx Ax ->{fx}; case/morphimP=> y Dy By ->{fy} -> {fz}.
-by exists [~ x, y]; rewrite ?(inE, morphR, groupR, mem_imset2).
+by exists [~ x, y]; rewrite ?(inE, morphR, groupR, imset2_f).
 Qed.
 
 Lemma morphim_norm A : f @* 'N(A) \subset 'N(f @* A).

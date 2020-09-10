@@ -131,7 +131,7 @@ Lemma cycleM a b :
 Proof.
 move=> cab co_ab; apply/eqP; rewrite eqEsubset -(cent_joinEl (cents_cycle cab)).
 rewrite join_subG {3}cab !cycleMsub // 1?coprime_sym //.
-by rewrite -genM_join cycle_subG mem_gen // mem_imset2 ?cycle_id.
+by rewrite -genM_join cycle_subG mem_gen // imset2_f ?cycle_id.
 Qed.
 
 Lemma cyclicM A B :

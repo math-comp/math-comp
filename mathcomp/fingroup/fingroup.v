@@ -1168,14 +1168,14 @@ Proof. exact: imset_f. Qed.
 
 Lemma memJ_class_support A B x y :
    x \in A -> y \in B -> x ^ y \in class_support A B.
-Proof. by move=> Ax By; apply: mem_imset2. Qed.
+Proof. by move=> Ax By; apply: imset2_f. Qed.
 
 Lemma class_supportM A B C :
   class_support A (B * C) = class_support (class_support A B) C.
 Proof.
 apply/setP=> x; apply/imset2P/imset2P=> [[a y Aa] | [y c]].
   case/mulsgP=> b c Bb Cc -> ->{x y}.
-  by exists (a ^ b) c; rewrite ?(mem_imset2, conjgM).
+  by exists (a ^ b) c; rewrite ?(imset2_f, conjgM).
 case/imset2P=> a b Aa Bb -> Cc ->{x y}.
 by exists a (b * c); rewrite ?(mem_mulg, conjgM).
 Qed.
@@ -2326,7 +2326,7 @@ by apply: eq_bigr => i _; rewrite genGidG.
 Qed.
 
 Lemma mem_commg A B x y : x \in A -> y \in B -> [~ x, y] \in [~: A, B].
-Proof. by move=> Ax By; rewrite mem_gen ?mem_imset2. Qed.
+Proof. by move=> Ax By; rewrite mem_gen ?imset2_f. Qed.
 
 Lemma commSg A B C : A \subset B -> [~: A, C] \subset [~: B, C].
 Proof. by move=> sAC; rewrite genS ?imset2S. Qed.
