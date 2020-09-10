@@ -128,6 +128,7 @@ coq-dev:
     - git rev-parse --verify HEAD
     - git describe --all --long --abbrev=40 --always --dirty
     - pwd
+  script:
     - cd mathcomp
     - make test-suite
   except:
