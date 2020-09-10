@@ -1249,6 +1249,11 @@ Qed.
 Lemma imset_f (D : {pred aT}) x : x \in D -> f x \in f @: D.
 Proof. by move=> Dx; apply/imsetP; exists x. Qed.
 
+Lemma mem_imset_eq (D : {pred aT}) x : injective f -> f x \in f @: D = (x \in D).
+Proof.
+by move=> f_inj; apply/imsetP/idP;[case=> [y] ? /f_inj -> | move=> ?; exists x].
+Qed.
+
 Lemma imset0 : f @: set0 = set0.
 Proof. by apply/setP => y; rewrite inE; apply/imsetP=> [[x]]; rewrite inE. Qed.
 
@@ -1268,6 +1273,14 @@ Lemma imset2_f (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     x \in D -> x2 \in D2 x ->
   f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)).
 Proof. by move=> Dx Dx2; apply/imset2P; exists x x2. Qed.
+
+Lemma mem_imset2_eq (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
+    injective2 f2 ->
+  f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)) = ((x \in D) && (x2 \in D2 x)).
+Proof.
+move=> inj2_f; apply/imset2P/andP => [|[xD xD2]]; last by exists x x2.
+by move => [x' x2' xD xD2 eq_f2]; case: (inj2_f _ _ _ _ eq_f2) => -> ->.
+Qed.
 
 Lemma sub_imset_pre (A : {pred aT}) (B : {pred rT}) :
   (f @: A \subset B) = (A \subset f @^-1: B).
