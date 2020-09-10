@@ -340,16 +340,16 @@ Variable F : fieldType.
 Definition axiom (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
+Set Primitive Projections.
 Record class_of (L : Type) : Type :=
-  Class {base : FieldExt.class_of F L; _ : axiom (FieldExt.Pack _ base)}.
+  Class {base : FieldExt.class_of F L; mixin : axiom (FieldExt.Pack _ base)}.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> FieldExt.class_of.
 
 Structure type (phF : phant F) := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variable (phF : phant F) (T : Type) (cT : type phF).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
 Definition clone c of phant_id class c := @Pack phF T c.
 
@@ -357,24 +357,24 @@ Definition pack b0 (ax0 : axiom (@FieldExt.Pack F (Phant F) T b0)) :=
  fun bT b & phant_id (@FieldExt.class F phF bT) b =>
  fun   ax & phant_id ax0 ax => Pack (Phant F) (@Class T b ax).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @Ring.Pack cT xclass.
-Definition unitRingType := @UnitRing.Pack cT xclass.
-Definition comRingType := @ComRing.Pack cT xclass.
-Definition comUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @IntegralDomain.Pack cT xclass.
-Definition fieldType := @Field.Pack cT xclass.
-Definition lmodType := @Lmodule.Pack F phF cT xclass.
-Definition lalgType := @Lalgebra.Pack F phF cT xclass.
-Definition algType := @Algebra.Pack F phF cT xclass.
-Definition unitAlgType := @UnitAlgebra.Pack F phF cT xclass.
-Definition comAlgType := @ComAlgebra.Pack F phF cT xclass.
-Definition comUnitAlgType := @ComUnitAlgebra.Pack F phF cT xclass.
-Definition vectType := @Vector.Pack F phF cT xclass.
-Definition FalgType := @Falgebra.Pack F phF cT xclass.
-Definition fieldExtType := @FieldExt.Pack F phF cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @Zmodule.Pack cT class.
+Definition ringType := @Ring.Pack cT class.
+Definition unitRingType := @UnitRing.Pack cT class.
+Definition comRingType := @ComRing.Pack cT class.
+Definition comUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @IntegralDomain.Pack cT class.
+Definition fieldType := @Field.Pack cT class.
+Definition lmodType := @Lmodule.Pack F phF cT class.
+Definition lalgType := @Lalgebra.Pack F phF cT class.
+Definition algType := @Algebra.Pack F phF cT class.
+Definition unitAlgType := @UnitAlgebra.Pack F phF cT class.
+Definition comAlgType := @ComAlgebra.Pack F phF cT class.
+Definition comUnitAlgType := @ComUnitAlgebra.Pack F phF cT class.
+Definition vectType := @Vector.Pack F phF cT class.
+Definition FalgType := @Falgebra.Pack F phF cT class.
+Definition fieldExtType := @FieldExt.Pack F phF cT class.
 
 End ClassDef.
 

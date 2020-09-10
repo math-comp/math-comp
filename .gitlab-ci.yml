@@ -82,12 +82,6 @@ make-coq-latest:
     - merge_requests
     - schedules
 
-coq-8.7:
-  extends: .opam-build-once
-
-coq-8.8:
-  extends: .opam-build-once
-
 coq-8.9:
   extends: .opam-build-once
 
@@ -173,16 +167,6 @@ test-coq-8.9:
   variables:
     COQ_VERSION: "8.9"
 
-test-coq-8.8:
-  extends: .test-once
-  variables:
-    COQ_VERSION: "8.8"
-
-test-coq-8.7:
-  extends: .test-once
-  variables:
-    COQ_VERSION: "8.7"
-
 # set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
 .ci:
   stage: test
@@ -228,16 +212,6 @@ test-coq-8.7:
     - merge_requests
     - schedules
 
-ci-fourcolor-8.7:
-  extends: .ci-fourcolor
-  variables:
-    COQ_VERSION: "8.7"
-
-ci-fourcolor-8.8:
-  extends: .ci-fourcolor
-  variables:
-    COQ_VERSION: "8.8"
-
 ci-fourcolor-8.9:
   extends: .ci-fourcolor
   variables:
@@ -276,16 +250,6 @@ ci-fourcolor-dev:
     - tags
     - merge_requests
     - schedules
-
-ci-odd-order-8.7:
-  extends: .ci-odd-order
-  variables:
-    COQ_VERSION: "8.7"
-
-ci-odd-order-8.8:
-  extends: .ci-odd-order
-  variables:
-    COQ_VERSION: "8.8"
 
 ci-odd-order-8.9:
   extends: .ci-odd-order
@@ -352,16 +316,6 @@ ci-lemma-overloading-dev:
     - opam pin add -n -k path coq-mathcomp-bigenough .
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-bigenough
 
-ci-bigenough-8.7:
-  extends: .ci-bigenough
-  variables:
-    COQ_VERSION: "8.7"
-
-ci-bigenough-8.8:
-  extends: .ci-bigenough
-  variables:
-    COQ_VERSION: "8.8"
-
 ci-bigenough-8.9:
   extends: .ci-bigenough
   variables:
@@ -397,16 +351,6 @@ ci-bigenough-dev:
 #     - opam pin add -n -k path coq-mathcomp-real-closed .
 #     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-real-closed
 #     - opam install -y -v -j "${NJOBS}" coq-mathcomp-real-closed
-# 
-# ci-real-closed-8.7:
-#   extends: .ci-real-closed
-#   variables:
-#     COQ_VERSION: "8.7"
-# 
-# ci-real-closed-8.8:
-#   extends: .ci-real-closed
-#   variables:
-#     COQ_VERSION: "8.8"
 # 
 # ci-real-closed-8.9:
 #   extends: .ci-real-closed
@@ -454,16 +398,6 @@ ci-bigenough-dev:
     - opam pin add -n -k path coq-mathcomp-finmap .
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-finmap
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-finmap
-
-ci-finmap-8.7:
-  extends: .ci-finmap
-  variables:
-    COQ_VERSION: "8.7"
-
-ci-finmap-8.8:
-  extends: .ci-finmap
-  variables:
-    COQ_VERSION: "8.8"
 
 ci-finmap-8.9:
   extends: .ci-finmap
@@ -556,12 +490,6 @@ ci-fcsl-pcm-dev:
   extends: .docker-deploy
   except:
     - schedules
-
-mathcomp-dev:coq-8.7:
-  extends: .docker-deploy-once
-
-mathcomp-dev:coq-8.8:
-  extends: .docker-deploy-once
 
 mathcomp-dev:coq-8.9:
   extends: .docker-deploy-once

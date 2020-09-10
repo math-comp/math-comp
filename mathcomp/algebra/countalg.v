@@ -62,8 +62,10 @@ Module Zmodule.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of M :=
   Class { base : GRing.Zmodule.class_of M; mixin : mixin_of M }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.Zmodule.class_of.
 Local Coercion mixin : class_of >-> mixin_of.
 
@@ -72,15 +74,13 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.Zmodule.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
 
-Definition join_countType := @Countable.Pack zmodType (cnt_ xclass).
+Definition join_countType := @Countable.Pack zmodType (cnt_ class).
 
 End ClassDef.
 
@@ -110,7 +110,9 @@ Module Ring.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R := Class { base : GRing.Ring.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := Zmodule.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.Ring.class_of.
 Local Coercion base2 : class_of >-> Zmodule.class_of.
@@ -120,17 +122,15 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.Ring.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition join_countType := @Countable.Pack ringType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack ringType xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition join_countType := @Countable.Pack ringType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack ringType class.
 
 End ClassDef.
 
@@ -165,8 +165,10 @@ Module ComRing.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.ComRing.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := Ring.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.ComRing.class_of.
 Local Coercion base2 : class_of >-> Ring.class_of.
@@ -176,20 +178,18 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.ComRing.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition join_countType := @Countable.Pack comRingType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack comRingType xclass.
-Definition join_countRingType := @Ring.Pack comRingType xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition join_countType := @Countable.Pack comRingType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack comRingType class.
+Definition join_countRingType := @Ring.Pack comRingType class.
 
 End ClassDef.
 
@@ -229,8 +229,10 @@ Module UnitRing.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.UnitRing.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := Ring.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.UnitRing.class_of.
 Local Coercion base2 : class_of >-> Ring.class_of.
@@ -240,21 +242,19 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.UnitRing.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
 
-Definition join_countType := @Countable.Pack unitRingType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack unitRingType xclass.
-Definition join_countRingType := @Ring.Pack unitRingType xclass.
+Definition join_countType := @Countable.Pack unitRingType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack unitRingType class.
+Definition join_countRingType := @Ring.Pack unitRingType class.
 
 End ClassDef.
 
@@ -294,8 +294,10 @@ Module ComUnitRing.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.ComUnitRing.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := ComRing.Class (base c) (mixin c).
 Definition base3 R (c : class_of R) := @UnitRing.Class R (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.ComUnitRing.class_of.
@@ -307,31 +309,28 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.ComUnitRing.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
 
-Definition join_countType := @Countable.Pack comUnitRingType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack comUnitRingType xclass.
-Definition join_countRingType := @Ring.Pack comUnitRingType xclass.
-Definition join_countComRingType := @ComRing.Pack comUnitRingType xclass.
-Definition join_countUnitRingType := @UnitRing.Pack comUnitRingType xclass.
-Definition ujoin_countComRingType := @ComRing.Pack unitRingType xclass.
-Definition cjoin_countUnitRingType := @UnitRing.Pack comRingType xclass.
-Definition ccjoin_countUnitRingType :=
-  @UnitRing.Pack countComRingType xclass.
+Definition join_countType := @Countable.Pack comUnitRingType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack comUnitRingType class.
+Definition join_countRingType := @Ring.Pack comUnitRingType class.
+Definition join_countComRingType := @ComRing.Pack comUnitRingType class.
+Definition join_countUnitRingType := @UnitRing.Pack comUnitRingType class.
+Definition ujoin_countComRingType := @ComRing.Pack unitRingType class.
+Definition cjoin_countUnitRingType := @UnitRing.Pack comRingType class.
+Definition ccjoin_countUnitRingType := @UnitRing.Pack countComRingType class.
 
 End ClassDef.
 
@@ -385,8 +384,10 @@ Module IntegralDomain.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.IntegralDomain.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := ComUnitRing.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
 Local Coercion base2 : class_of >-> ComUnitRing.class_of.
@@ -396,30 +397,28 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.IntegralDomain.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
 
-Definition join_countType := @Countable.Pack idomainType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack idomainType xclass.
-Definition join_countRingType := @Ring.Pack idomainType xclass.
-Definition join_countUnitRingType := @UnitRing.Pack idomainType xclass.
-Definition join_countComRingType := @ComRing.Pack idomainType xclass.
-Definition join_countComUnitRingType := @ComUnitRing.Pack idomainType xclass.
+Definition join_countType := @Countable.Pack idomainType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack idomainType class.
+Definition join_countRingType := @Ring.Pack idomainType class.
+Definition join_countUnitRingType := @UnitRing.Pack idomainType class.
+Definition join_countComRingType := @ComRing.Pack idomainType class.
+Definition join_countComUnitRingType := @ComUnitRing.Pack idomainType class.
 
 End ClassDef.
 
@@ -474,8 +473,10 @@ Module Field.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.Field.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := IntegralDomain.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.Field.class_of.
 Local Coercion base2 : class_of >-> IntegralDomain.class_of.
@@ -485,33 +486,31 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.Field.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition countIdomainType := @IntegralDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition countIdomainType := @IntegralDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
 
-Definition join_countType := @Countable.Pack fieldType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack fieldType xclass.
-Definition join_countRingType := @Ring.Pack fieldType xclass.
-Definition join_countUnitRingType := @UnitRing.Pack fieldType xclass.
-Definition join_countComRingType := @ComRing.Pack fieldType xclass.
-Definition join_countComUnitRingType := @ComUnitRing.Pack fieldType xclass.
-Definition join_countIdomainType := @IntegralDomain.Pack fieldType xclass.
+Definition join_countType := @Countable.Pack fieldType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack fieldType class.
+Definition join_countRingType := @Ring.Pack fieldType class.
+Definition join_countUnitRingType := @UnitRing.Pack fieldType class.
+Definition join_countComRingType := @ComRing.Pack fieldType class.
+Definition join_countComUnitRingType := @ComUnitRing.Pack fieldType class.
+Definition join_countIdomainType := @IntegralDomain.Pack fieldType class.
 
 End ClassDef.
 
@@ -571,8 +570,10 @@ Module DecidableField.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.DecidableField.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := Field.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.DecidableField.class_of.
 Local Coercion base2 : class_of >-> Field.class_of.
@@ -582,37 +583,34 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.DecidableField.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition countIdomainType := @IntegralDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition countFieldType := @Field.Pack cT xclass.
-Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition countIdomainType := @IntegralDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition countFieldType := @Field.Pack cT class.
+Definition decFieldType := @GRing.DecidableField.Pack cT class.
 
-Definition join_countType := @Countable.Pack decFieldType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack decFieldType xclass.
-Definition join_countRingType := @Ring.Pack decFieldType xclass.
-Definition join_countUnitRingType := @UnitRing.Pack decFieldType xclass.
-Definition join_countComRingType := @ComRing.Pack decFieldType xclass.
-Definition join_countComUnitRingType :=
-  @ComUnitRing.Pack decFieldType xclass.
-Definition join_countIdomainType := @IntegralDomain.Pack decFieldType xclass.
-Definition join_countFieldType := @Field.Pack decFieldType xclass.
+Definition join_countType := @Countable.Pack decFieldType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack decFieldType class.
+Definition join_countRingType := @Ring.Pack decFieldType class.
+Definition join_countUnitRingType := @UnitRing.Pack decFieldType class.
+Definition join_countComRingType := @ComRing.Pack decFieldType class.
+Definition join_countComUnitRingType := @ComUnitRing.Pack decFieldType class.
+Definition join_countIdomainType := @IntegralDomain.Pack decFieldType class.
+Definition join_countFieldType := @Field.Pack decFieldType class.
 
 End ClassDef.
 
@@ -677,8 +675,10 @@ Module ClosedField.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.ClosedField.class_of R; mixin : mixin_of R }.
+Unset Primitive Projections.
 Definition base2 R (c : class_of R) := DecidableField.Class (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.ClosedField.class_of.
 Local Coercion base2 : class_of >-> DecidableField.class_of.
@@ -688,42 +688,37 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.ClosedField.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (cnt_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition countIdomainType := @IntegralDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition countFieldType := @Field.Pack cT xclass.
-Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
-Definition countDecFieldType := @DecidableField.Pack cT xclass.
-Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (cnt_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition countIdomainType := @IntegralDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition countFieldType := @Field.Pack cT class.
+Definition decFieldType := @GRing.DecidableField.Pack cT class.
+Definition countDecFieldType := @DecidableField.Pack cT class.
+Definition closedFieldType := @GRing.ClosedField.Pack cT class.
 
-Definition join_countType := @Countable.Pack closedFieldType (cnt_ xclass).
-Definition join_countZmodType := @Zmodule.Pack closedFieldType xclass.
-Definition join_countRingType := @Ring.Pack closedFieldType xclass.
-Definition join_countUnitRingType := @UnitRing.Pack closedFieldType xclass.
-Definition join_countComRingType := @ComRing.Pack closedFieldType xclass.
-Definition join_countComUnitRingType :=
-  @ComUnitRing.Pack closedFieldType xclass.
-Definition join_countIdomainType :=
-  @IntegralDomain.Pack closedFieldType xclass.
-Definition join_countFieldType := @Field.Pack closedFieldType xclass.
-Definition join_countDecFieldType :=
-  @DecidableField.Pack closedFieldType xclass.
+Definition join_countType := @Countable.Pack closedFieldType (cnt_ class).
+Definition join_countZmodType := @Zmodule.Pack closedFieldType class.
+Definition join_countRingType := @Ring.Pack closedFieldType class.
+Definition join_countUnitRingType := @UnitRing.Pack closedFieldType class.
+Definition join_countComRingType := @ComRing.Pack closedFieldType class.
+Definition join_countComUnitRingType := @ComUnitRing.Pack closedFieldType class.
+Definition join_countIdomainType := @IntegralDomain.Pack closedFieldType class.
+Definition join_countFieldType := @Field.Pack closedFieldType class.
+Definition join_countDecFieldType := @DecidableField.Pack closedFieldType class.
 
 End ClassDef.
 

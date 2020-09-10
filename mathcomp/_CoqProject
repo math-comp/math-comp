@@ -5,3 +5,4 @@
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -notation-overridden
 -arg -w -arg -duplicate-clear
+-arg -w -arg +non-primitive-record
