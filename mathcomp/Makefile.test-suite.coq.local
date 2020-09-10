@@ -16,5 +16,5 @@ post-all:: $(OUTPUT_ARTIFACTS)
 	  fi;\
 	done
 
-$(OUTPUT_ARTIFACTS): %.v.out.new: %.v all/all.vo
+$(OUTPUT_ARTIFACTS): %.v.out.new: %.v
 	$(COQC) $(COQFLAGS) $(COQLIBS) $< > $<.out.new
