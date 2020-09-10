@@ -170,8 +170,19 @@ HB.structure Definition Finite :=
 
 Module Export FiniteNES.
 Module Finite.
-Notation enum := enum_subdef.
-Notation enumP := enumP_subdef.
+
+(* TODO: we could add this sealing pattern to HB or as a coq-elpi app *)
+Module Type EnumSig.
+Parameter enum : forall cT : type, seq cT.
+Axiom enumDef : enum = @enum_subdef.
+End EnumSig.
+
+Module EnumDef : EnumSig.
+Definition enum := @enum_subdef.
+Definition enumDef := erefl enum.
+End EnumDef.
+
+Notation enum := EnumDef.enum.
 Notation axiom := finite_axiom.
 Notation EnumMixin m := (@is_finite.Build _ _ m).
 
@@ -201,6 +212,8 @@ End WithCountType.
 End Finite.
 End FiniteNES.
 
+
+(*
 Section Mixins.
 
 Variable T : countType.
@@ -226,8 +239,8 @@ Qed.
 
 Definition CountMixin := EnumMixin count_enumP.
 
-End Mixins.
-
+End Mixins. *)
+(*
 Section ClassDef.
 
 Record class_of T := Class {
@@ -269,28 +282,14 @@ Coercion countType : type >-> Countable.type.
 Canonical countType.
 Notation finType := type.
 Notation FinType T m := (@pack T _ m _ _ id _ id).
-Notation FinMixin := EnumMixin.
-Notation UniqFinMixin := UniqMixin.
-Notation "[ 'finType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
+*)
+Notation FinMixin x := (Finite.EnumMixin x).
+Notation UniqFinMixin := Finite.UniqMixin.
+Notation finType := Finite.type.
+Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T cT)
   (at level 0, format "[ 'finType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'finType' 'of' T ]" := (@clone T _ _ id)
+Notation "[ 'finType' 'of' T ]" := (Finite.clone T _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
-End Exports.
-
-Module Type EnumSig.
-Parameter enum : forall cT : type, seq cT.
-Axiom enumDef : enum = fun cT => mixin_enum (class cT).
-End EnumSig.
-
-Module EnumDef : EnumSig.
-Definition enum cT := mixin_enum (class cT).
-Definition enumDef := erefl enum.
-End EnumDef.
-
-Notation enum := EnumDef.enum.
-
-End Finite.
-Export Finite.Exports.
 
 Canonical finEnum_unlock := Unlockable Finite.EnumDef.enumDef.
 
@@ -490,7 +489,7 @@ Variable T : finType.
 Implicit Types (A B C : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma enumP : Finite.axiom (Finite.enum T).
-Proof. by rewrite unlock; case T => ? [? []]. Qed.
+Proof. by rewrite unlock; apply: enumP_subdef. Qed.
 
 Section EnumPick.
 
@@ -1376,7 +1375,10 @@ End EqImage.
 (* Standard finTypes *)
 
 Lemma unit_enumP : Finite.axiom [::tt]. Proof. by case. Qed.
-Definition unit_finMixin := Eval hnf in FinMixin unit_enumP.
+
+HB.instance Definition unit_finMixin : is_finite unit :=
+  FinMixin unit_enumP.
+
 Canonical unit_finType := Eval hnf in FinType unit unit_finMixin.
 Lemma card_unit : #|{: unit}| = 1. Proof. by rewrite cardT enumT unlock. Qed.
 
