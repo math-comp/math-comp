@@ -11,8 +11,7 @@ post-all:: $(OUTPUT_ARTIFACTS)
 	  if [ -e $$f.out.$(COQ_VERSION) ]; then REFERENCE=$$f.out.$(COQ_VERSION);\
 	  else REFERENCE=$$f.out; fi;\
 	  if ! diff -q "$$REFERENCE" "$$f.out.new"; \
-	    then echo "Output of file $$f differs!";\
-		diff -u $$REFERENCE $$f.out.new;\
+	    then diff -u "$$REFERENCE" "$$f.out.new"; \
 		exit 1;\
 	  fi;\
 	done
