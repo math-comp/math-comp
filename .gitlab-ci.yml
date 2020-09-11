@@ -147,11 +147,11 @@ test-coq-dev:
   variables:
     COQ_VERSION: "dev"
 
-test-coq-8.13:
-  # to be replaced with .test-once (to disable this nightly build) when 8.13.0 is released
-  extends: .test
-  variables:
-    COQ_VERSION: "8.13"
+# test-coq-8.13:
+#   # to be replaced with .test-once (to disable this nightly build) when 8.13.0 is released
+#   extends: .test
+#   variables:
+#     COQ_VERSION: "8.13"
 
 test-coq-8.12:
   extends: .test-once
