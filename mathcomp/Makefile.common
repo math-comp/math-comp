@@ -56,7 +56,13 @@ Makefile.coq: pre-makefile $(COQPROJECT) Makefile
 
 # Test suite ---------------------------------------------------------
 
-test_suite/test_hierarchy_all.v: build
+ifneq "$(TEST_SKIP_BUILD)" ""
+TEST_DEP :=
+else
+TEST_DEP := build
+endif
+
+test_suite/test_hierarchy_all.v: $(TEST_DEP)
 	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp -lib all.all > test_suite/test_hierarchy_all.v
 
 Makefile.test-suite.coq: test_suite/test_hierarchy_all.v

@@ -129,7 +129,7 @@ coq-dev:
     - pwd
   script:
     - cd mathcomp
-    - make test-suite
+    - make test-suite TEST_SKIP_BUILD=1
   except:
     - tags
     - merge_requests
