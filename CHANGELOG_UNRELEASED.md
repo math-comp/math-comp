@@ -136,16 +136,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `order.v`, new notations `0^d` and `1^d` for bottom and top elements of
   dual lattices.
 - in `interval.v`:
-  + Intervals and their left and right bounds of `T` now have canonical ordered
-    type instances whose ordering relation is the subset relation. Since the
-    left and right bounds have the same type `itv_bound` but have different
-    orderings, aliases `itv_boundl` and `itv_boundr` of `itv_bound` are
-    introduced. They form partially ordered types if `T` is a `porderType`. If
-    `T` is a `latticeType`, they also form lattices where the join and meet are
-    intersection and convex hull respectively. If `T` is an `orderType`, they
-    are distributive, and the left and right bounds are totally ordered.
-  + New lemmas:
-    `comparable_lteifN`, `inEsubitv`, `itv_total_meet3E`, `itv_total_join3E`
+  + Intervals and their bounds of `T` now have canonical ordered type instances
+    whose ordering relations are the subset relation and the left to right
+    ordering respectively. They form partially ordered types if `T` is a
+    `porderType`. If `T` is a `latticeType`, they also form `tbLatticeType`
+    where the join and meet are intersection and convex hull respectively. If
+    `T` is an `orderType`, they are distributive, and the interval bounds are
+    totally ordered. (cf Changed section)
+  + New lemmas: `comparable_lteifN`, `itv_total_meet3E`, `itv_total_join3E`,
+    `itv_total_meetsE`, `itv_total_joinsE`
 
 - in `matrix.v` new lemma `det_mx11`.
 
@@ -182,8 +181,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     generalized from numeric domains to ordered types.
   + `x <= y ?< if c` (`lersif`) has also been generalized to `porderType` and
     replaced with `x < y ?<= if c'` (`lteif`) where `c'` is negation of `c`.
-  + The first constructor `BOpen_if` of `itv_bound` has been replaced with
-    `BClose_if` where the first argument is the negation of the original one.
+  + Interval bounds `itv_bound : T -> Type` are redefined with two constructors
+    `BRight_if of bool & T` and `BRInfty_if of bool`. `BRight_if true x` and
+    `BRight_if close x` respectively mean open and close bounds as left bounds,
+    and their meanings as right bounds are opposite. `BRInfty_if true` and
+    `BRInfty_if false` respectively means positive and negative infinity. This
+    change gives us the canonical "left to right" ordering of interval bounds.
 
 ### Renamed
 
@@ -210,8 +213,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lersif_(p|n)div(l|r)_mul(l|r)` -> `lteif_(p|n)div(l|r)_mul(l|r)`
   + `lersif_in_itv` -> `lteif_in_itv`
   + `itv_intersection` -> `Order.meet`
-  + `itv_intersection1i` -> `itv_meet1i`
-  + `itv_intersectioni1` -> `itv_meeti1`
+  + `itv_intersection1i` -> `meet1x`
+  + `itv_intersectioni1` -> `meetx1`
   + `itv_intersectionii` -> `meetxx`
   + `itv_intersectionC` -> `meetC`
   + `itv_intersectionA` -> `meetA`

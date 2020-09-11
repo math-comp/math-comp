@@ -135,54 +135,54 @@ Proof. by rewrite comparable_lteifN ?comparableT. Qed.
 
 End LteifTotal.
 
-Variant itv_bound (T : Type) : Type := BClose_if of bool & T | BInfty.
-Definition itv_boundl := itv_bound.
-Definition itv_boundr := itv_bound.
-Notation BOpen := (BClose_if false).
-Notation BClose := (BClose_if true).
-Variant interval (T : Type) := Interval of itv_boundl T & itv_boundr T.
+Variant itv_bound (T : Type) : Type :=
+  BRight_if of bool & T | BRInfty_if of bool.
+Notation BLeft := (BRight_if false).
+Notation BRight := (BRight_if true).
+Notation "'-oo'" := (BRInfty_if _ false) (at level 0) : order_scope.
+Notation "'+oo'" := (BRInfty_if _ true) (at level 0) : order_scope.
+Variant interval (T : Type) := Interval of itv_bound T & itv_bound T.
 
 (* We provide the 9 following notations to help writing formal intervals *)
-Notation "`[ a , b ]" := (Interval (BClose a) (BClose b))
+Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b))
   (at level 0, a, b at level 9 , format "`[ a ,  b ]") : order_scope.
-Notation "`] a , b ]" := (Interval (BOpen a) (BClose b))
+Notation "`] a , b ]" := (Interval (BRight a) (BRight b))
   (at level 0, a, b at level 9 , format "`] a ,  b ]") : order_scope.
-Notation "`[ a , b [" := (Interval (BClose a) (BOpen b))
+Notation "`[ a , b [" := (Interval (BLeft a) (BLeft b))
   (at level 0, a, b at level 9 , format "`[ a ,  b [") : order_scope.
-Notation "`] a , b [" := (Interval (BOpen a) (BOpen b))
+Notation "`] a , b [" := (Interval (BRight a) (BLeft b))
   (at level 0, a, b at level 9 , format "`] a ,  b [") : order_scope.
-Notation "`] '-oo' , b ]" := (Interval (BInfty _) (BClose b))
+Notation "`] '-oo' , b ]" := (Interval -oo (BRight b))
   (at level 0, b at level 9 , format "`] '-oo' ,  b ]") : order_scope.
-Notation "`] '-oo' , b [" := (Interval (BInfty _) (BOpen b))
+Notation "`] '-oo' , b [" := (Interval -oo (BLeft b))
   (at level 0, b at level 9 , format "`] '-oo' ,  b [") : order_scope.
-Notation "`[ a , '+oo' [" := (Interval (BClose a) (BInfty _))
+Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo)
   (at level 0, a at level 9 , format "`[ a ,  '+oo' [") : order_scope.
-Notation "`] a , '+oo' [" := (Interval (BOpen a) (BInfty _))
+Notation "`] a , '+oo' [" := (Interval (BRight a) +oo)
   (at level 0, a at level 9 , format "`] a ,  '+oo' [") : order_scope.
-Notation "`] -oo , '+oo' [" := (Interval (BInfty _) (BInfty _))
+Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
   (at level 0, format "`] -oo ,  '+oo' [") : order_scope.
 
-Notation "`[ a , b ]" := (Interval (BClose a) (BClose b))
+Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b))
   (at level 0, a, b at level 9 , format "`[ a ,  b ]") : ring_scope.
-Notation "`] a , b ]" := (Interval (BOpen a) (BClose b))
+Notation "`] a , b ]" := (Interval (BRight a) (BRight b))
   (at level 0, a, b at level 9 , format "`] a ,  b ]") : ring_scope.
-Notation "`[ a , b [" := (Interval (BClose a) (BOpen b))
+Notation "`[ a , b [" := (Interval (BLeft a) (BLeft b))
   (at level 0, a, b at level 9 , format "`[ a ,  b [") : ring_scope.
-Notation "`] a , b [" := (Interval (BOpen a) (BOpen b))
+Notation "`] a , b [" := (Interval (BRight a) (BLeft b))
   (at level 0, a, b at level 9 , format "`] a ,  b [") : ring_scope.
-Notation "`] '-oo' , b ]" := (Interval (BInfty _) (BClose b))
+Notation "`] '-oo' , b ]" := (Interval -oo (BRight b))
   (at level 0, b at level 9 , format "`] '-oo' ,  b ]") : ring_scope.
-Notation "`] '-oo' , b [" := (Interval (BInfty _) (BOpen b))
+Notation "`] '-oo' , b [" := (Interval -oo (BLeft b))
   (at level 0, b at level 9 , format "`] '-oo' ,  b [") : ring_scope.
-Notation "`[ a , '+oo' [" := (Interval (BClose a) (BInfty _))
+Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo)
   (at level 0, a at level 9 , format "`[ a ,  '+oo' [") : ring_scope.
-Notation "`] a , '+oo' [" := (Interval (BOpen a) (BInfty _))
+Notation "`] a , '+oo' [" := (Interval (BRight a) +oo)
   (at level 0, a at level 9 , format "`] a ,  '+oo' [") : ring_scope.
-Notation "`] -oo , '+oo' [" := (Interval (BInfty _) (BInfty _))
+Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
   (at level 0, format "`] -oo ,  '+oo' [") : ring_scope.
 
-Fact itv_boundl_display (disp : unit) : unit. Proof. exact. Qed.
-Fact itv_boundr_display (disp : unit) : unit. Proof. exact. Qed.
+Fact itv_bound_display (disp : unit) : unit. Proof. exact. Qed.
 Fact interval_display (disp : unit) : unit. Proof. exact. Qed.
 
 Section IntervalEq.
@@ -191,22 +191,20 @@ Variable T : eqType.
 
 Definition eq_itv_bound (b1 b2 : itv_bound T) : bool :=
   match b1, b2 with
-    | BClose_if a x, BClose_if b y => (a == b) && (x == y)
-    | BInfty, BInfty => true
+    | BRight_if a x, BRight_if b y => (a == b) && (x == y)
+    | BRInfty_if a, BRInfty_if b => a == b
     | _, _ => false
   end.
 
 Lemma eq_itv_boundP : Equality.axiom eq_itv_bound.
 Proof.
 move=> b1 b2; apply: (iffP idP).
-- by move: b1 b2 => [a x|][b y|] => //= /andP [] /eqP -> /eqP ->.
+- by move: b1 b2 => [a x|a][b y|b] => //= [/andP [/eqP -> /eqP ->]|/eqP ->].
 - by move=> <-; case: b1 => //= a x; rewrite !eqxx.
 Qed.
 
 Canonical itv_bound_eqMixin := EqMixin eq_itv_boundP.
 Canonical itv_bound_eqType := EqType (itv_bound T) itv_bound_eqMixin.
-Canonical itv_boundl_eqType := [eqType of itv_boundl T].
-Canonical itv_boundr_eqType := [eqType of itv_boundr T].
 
 Definition eqitv (x y : interval T) : bool :=
   let: Interval x x' := x in
@@ -231,9 +229,9 @@ Variable T : choiceType.
 
 Lemma itv_bound_can :
   cancel (fun b : itv_bound T =>
-            match b with BInfty => None | BClose_if b x => Some (b, x) end)
+            match b with BRight_if b x => (b, Some x) | BRInfty_if b => (b, None) end)
          (fun b =>
-            match b with None => BInfty _ | Some (b, x) => BClose_if b x end).
+            match b with (b, Some x) => BRight_if b x | (b, None) => BRInfty_if _ b end).
 Proof. by case. Qed.
 
 Lemma interval_can :
@@ -249,24 +247,16 @@ Canonical itv_bound_choiceType (T : choiceType) :=
   ChoiceType (itv_bound T) (CanChoiceMixin (@itv_bound_can T)).
 Canonical interval_choiceType (T : choiceType) :=
   ChoiceType (interval T) (CanChoiceMixin (@interval_can T)).
-Canonical itv_boundl_choiceType (T : choiceType) :=
-  [choiceType of itv_boundl T].
-Canonical itv_boundr_choiceType (T : choiceType) :=
-  [choiceType of itv_boundr T].
 
 Canonical itv_bound_countType (T : countType) :=
   CountType (itv_bound T) (CanCountMixin (@itv_bound_can T)).
 Canonical interval_countType (T : countType) :=
   CountType (interval T) (CanCountMixin (@interval_can T)).
-Canonical itv_boundl_countType (T : countType) := [countType of itv_boundl T].
-Canonical itv_boundr_countType (T : countType) := [countType of itv_boundr T].
 
 Canonical itv_bound_finType (T : finType) :=
   FinType (itv_bound T) (CanFinMixin (@itv_bound_can T)).
 Canonical interval_finType (T : finType) :=
   FinType (interval T) (CanFinMixin (@interval_can T)).
-Canonical itv_boundl_finType (T : finType) := [finType of itv_boundl T].
-Canonical itv_boundr_finType (T : finType) := [finType of itv_boundr T].
 
 End Exports.
 
@@ -278,172 +268,46 @@ Section IntervalPOrder.
 Variable (disp : unit) (T : porderType disp).
 Implicit Types (x y z : T) (i : interval T).
 
-Definition pred_of_itv i : pred T :=
-  [pred x | let: Interval l u := i in
-      match l with
-        | BClose_if b lb => lb < x ?<= if b
-        | BInfty => true
-      end &&
-      match u with
-        | BClose_if b ub => x < ub ?<= if b
-        | BInfty => true
-      end].
-
-Canonical Structure itvPredType := PredType pred_of_itv.
-
-(* we compute a set of rewrite rules associated to an interval *)
-Definition itv_rewrite i x : Type :=
-  let: Interval l u := i in
-    (match l with
-       | BClose a => (a <= x) * (x < a = false)
-       | BOpen a => (a <= x) * (a < x) * (x <= a = false) * (x < a = false)
-       | BInfty => forall x : T, x == x
-     end *
-     match u with
-       | BClose b => (x <= b) * (b < x = false)
-       | BOpen b => (x <= b) * (x < b) * (b <= x = false) * (b < x = false)
-       | BInfty => forall x : T, x == x
-     end *
-     match l, u with
-       | BClose a, BClose b =>
-         (a <= b) * (b < a = false) * (a \in `[a, b]) * (b \in `[a, b])
-       | BClose a, BOpen b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
-         * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
-       | BOpen a, BClose b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
-         * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
-       | BOpen a, BOpen b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
-         * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
-       | _, _ => forall x : T, x == x
-     end)%type.
-
-Definition itv_decompose i x : Prop :=
-  let: Interval l u := i in
-  ((match l with
-    | BClose_if b lb => (lb < x ?<= if b) : Prop
-    | BInfty => True
-  end : Prop) *
-  (match u with
-    | BClose_if b ub => (x < ub ?<= if b) : Prop
-    | BInfty => True
-  end : Prop))%type.
-
-Lemma itv_dec : forall x i, reflect (itv_decompose i x) (x \in i).
-Proof. by move=> ? [[? ?|][? ?|]]; apply: (iffP andP); case. Qed.
-
-Arguments itv_dec {x i}.
-
-Definition le_boundl (b1 b2 : itv_boundl T) :=
+Definition le_bound (b1 b2 : itv_bound T) :=
   match b1, b2 with
-    | BClose_if b1 x1, BClose_if b2 x2 => x1 < x2 ?<= if b2 ==> b1
-    | BClose_if _ _, BInfty => false
-    | _, _ => true
+    | -oo, _ | _, +oo => true
+    | BRight_if b1 x1, BRight_if b2 x2 => x1 < x2 ?<= if b1 ==> b2
+    | _, _ => false
   end.
 
-Definition le_boundr (b1 b2 : itv_boundr T) :=
+Definition lt_bound (b1 b2 : itv_bound T) :=
   match b1, b2 with
-    | BClose_if b1 x1, BClose_if b2 x2 => x1 < x2 ?<= if b1 ==> b2
-    | BInfty, BClose_if _ _ => false
-    | _, _ => true
+    | -oo, +oo | -oo, BRight_if _ _ | BRight_if _ _, +oo => true
+    | BRight_if b1 x1, BRight_if b2 x2 => x1 < x2 ?<= if ~~ b1 && b2
+    | _, _ => false
   end.
 
-Lemma itv_boundlr bl br x :
-  (x \in Interval bl br) =
-  (le_boundl bl (BClose x)) && (le_boundr (BClose x) br).
-Proof. by case: bl br => [? ?|][]. Qed.
+Lemma lt_bound_def b1 b2 : lt_bound b1 b2 = (b2 != b1) && le_bound b1 b2.
+Proof. by case: b1 b2 => [[]?|[]][[]?|[]] //=; rewrite lt_def. Qed.
 
-Lemma le_boundl_refl : reflexive le_boundl.
-Proof. by move=> [[] b|]; rewrite /le_boundl /= ?lerr. Qed.
+Lemma le_bound_refl : reflexive le_bound.
+Proof. by move=> [[]?|[]] /=. Qed.
 
-Lemma le_boundr_refl : reflexive le_boundr.
-Proof. by move=> [[] b|]; rewrite /le_boundr /= ?lerr. Qed.
+Lemma le_bound_anti : antisymmetric le_bound.
+Proof. by case=> [[]?|[]] [[]?|[]] //=; case: comparableP => // ->. Qed.
 
-Hint Resolve le_boundl_refl le_boundr_refl : core.
-
-Lemma le_boundl_anti : antisymmetric le_boundl.
-Proof. by case=> [[]?|][[]?|] //=; case: comparableP => // ->. Qed.
-
-Lemma le_boundl_converse_anti : antisymmetric (fun b => le_boundl ^~ b).
-Proof. by move=> ? ? /le_boundl_anti. Qed.
-
-Lemma le_boundr_anti : antisymmetric le_boundr.
-Proof. by case=> [[]?|][[]?|] //=; case: comparableP => // ->. Qed.
-
-Lemma le_boundl_trans : transitive le_boundl.
+Lemma le_bound_trans : transitive le_bound.
 Proof.
-by move=> [[] x|][[] y|][[] z|] lexy leyz //;
+by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
   apply: (lteif_imply _ (lteif_trans lexy leyz)).
 Qed.
 
-Lemma le_boundl_converse_trans : transitive (fun b => le_boundl ^~ b).
-Proof. move=> ? ? ? ? /le_boundl_trans; exact. Qed.
+Definition itv_bound_porderMixin :=
+  LePOrderMixin lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
+Canonical itv_bound_porderType :=
+  POrderType (itv_bound_display disp) (itv_bound T) itv_bound_porderMixin.
 
-Lemma le_boundr_trans : transitive le_boundr.
-Proof.
-by move=> [[] x|][[] y|][[] z|] lexy leyz //;
-  apply: (lteif_imply _ (lteif_trans lexy leyz)).
-Qed.
-
-Lemma le_boundl_bb x b1 b2 :
-  le_boundl (BClose_if b1 x) (BClose_if b2 x) = (b2 ==> b1).
-Proof. by rewrite /le_boundl lteifxx. Qed.
-
-Lemma le_boundr_bb x b1 b2 :
-  le_boundr (BClose_if b1 x) (BClose_if b2 x) = (b1 ==> b2).
-Proof. by rewrite /le_boundr lteifxx. Qed.
-
-Lemma itv_xx x bl br :
-  Interval (BClose_if bl x) (BClose_if br x) =i
-  if bl && br then pred1 x else pred0.
-Proof. by move: bl br => [][] y /=; rewrite !inE lteif_anti /=. Qed.
-
-Lemma itv_gte ba xa bb xb :
-  xb < xa ?<= if ~~ (ba && bb) ->
-  Interval (BClose_if ba xa) (BClose_if bb xb) =i pred0.
-Proof.
-move=> ? y; rewrite itv_boundlr inE /=.
-by apply/negP => /andP [] lexay /(lteif_trans lexay); rewrite lteifNF.
-Qed.
-
-Lemma boundl_in_itv : forall ba xa b,
-  xa \in Interval (BClose_if ba xa) b =
-  if ba then le_boundr (BClose xa) b else false.
-Proof. by move=> [] xa [b xb|]; rewrite inE lteifxx. Qed.
-
-Lemma boundr_in_itv : forall bb xb a,
-  xb \in Interval a (BClose_if bb xb) =
-  if bb then le_boundl a (BClose xb) else false.
-Proof. by move=> [] xb [b xa|]; rewrite inE lteifxx /= ?andbT ?andbF. Qed.
-
-Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
-
-Lemma itvP : forall x i, x \in i -> itv_rewrite i x.
-Proof.
-move=> x [[[] a|][[] b|]] /itv_dec [ha hb]; do !split;
-  rewrite ?bound_in_itv //=; do 1?[apply/negbTE; rewrite (le_gtF, lt_geF)];
-  by [| apply: ltW | move: (lteif_trans ha hb) => //=; exact: ltW].
-Qed.
-
-Arguments itvP [x i].
-
-Definition itv_boundl_porderMixin :=
-  @LePOrderMixin
-    (itv_boundl_eqType T) (fun b => le_boundl^~ b) _ (fun _ _ => erefl)
-    le_boundl_refl le_boundl_converse_anti le_boundl_converse_trans.
-Canonical itv_boundl_porderType :=
-  POrderType (itv_boundl_display disp) (itv_boundl T) itv_boundl_porderMixin.
-
-Definition itv_boundr_porderMixin :=
-  LePOrderMixin (fun _ _ => erefl)
-                le_boundr_refl le_boundr_anti le_boundr_trans.
-Canonical itv_boundr_porderType :=
-  POrderType (itv_boundr_display disp) (itv_boundr T) itv_boundr_porderMixin.
+Lemma le_bound_bb x b1 b2 : (BRight_if b1 x <= BRight_if b2 x) = (b1 ==> b2).
+Proof. by rewrite /<=%O /= lteifxx. Qed.
 
 Definition subitv i1 i2 :=
   match i1, i2 with
-    | Interval a1 b1, Interval a2 b2 => (a1 <= a2) && (b1 <= b2)
+    | Interval a1 b1, Interval a2 b2 => (a2 <= a1) && (b1 <= b2)
   end.
 
 Lemma subitv_refl : reflexive subitv.
@@ -457,7 +321,7 @@ Qed.
 Lemma subitv_trans : transitive subitv.
 Proof.
 case=> [yl yr][xl xr][zl zr] /andP [Hl Hr] /andP [Hl' Hr'] /=.
-by rewrite (le_trans Hl Hl') (le_trans Hr Hr').
+by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
 Qed.
 
 Definition interval_porderMixin :=
@@ -465,37 +329,135 @@ Definition interval_porderMixin :=
 Canonical interval_porderType :=
   POrderType (interval_display disp) (interval T) interval_porderMixin.
 
+Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
+
+Canonical Structure itvPredType := PredType pred_of_itv.
+
+Lemma itv_boundlr bl br x :
+  (x \in Interval bl br) = (bl <= BLeft x) && (BRight x <= br).
+Proof. by []. Qed.
+
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
 Proof.
-by case: i1 i2 => [[b2 l2|][b2' u2|]][[b1 l1|][b1' u1|]]
+by case: i1 i2 => [[b2 l2|[]][b2' u2|[]]][[b1 l1|[]][b1' u1|[]]]
           /andP [] /= ha hb x /andP [ha' hb']; apply/andP; split => //;
   (apply/lteif_imply: (lteif_trans ha ha'); case: b1 b2 ha ha' => [][]) ||
   (apply/lteif_imply: (lteif_trans hb' hb); case: b1' b2' hb hb' => [][]).
 Qed.
 
-Lemma subitvPr (a : itv_boundl T) (b1 b2 : itv_boundr T) :
-  le_boundr b1 b2 -> {subset (Interval a b1) <= (Interval a b2)}.
-Proof. by move=> leb; apply: subitvP; rewrite /<=%O /= lexx. Qed.
+Lemma subitvEl (a1 a2 b : itv_bound T) :
+  (Interval a1 b <= Interval a2 b) = (a2 <= a1).
+Proof. by rewrite [LHS]/<=%O /= lexx andbT. Qed.
 
-Lemma subitvPl (a1 a2 : itv_boundl T) (b : itv_boundr T) :
-  le_boundl a2 a1 -> {subset (Interval a1 b) <= (Interval a2 b)}.
-Proof. by move=> lea; apply: subitvP; rewrite /<=%O /= lexx andbT. Qed.
+Lemma subitvEr (a b1 b2 : itv_bound T) :
+  (Interval a b1 <= Interval a b2) = (b1 <= b2).
+Proof. by rewrite [LHS]/<=%O /= lexx. Qed.
 
-Lemma inEsubitv x i : (x \in i) = (`[x, x] <= i).
-Proof. by rewrite inE /=; case: i => [[[]?|][[]?|]]. Qed.
+Lemma subitvPl (a1 a2 b : itv_bound T) :
+  a2 <= a1 -> {subset Interval a1 b <= Interval a2 b}.
+Proof. by move=> lea; apply: subitvP; rewrite subitvEl. Qed.
+
+Lemma subitvPr (a b1 b2 : itv_bound T) :
+  b1 <= b2 -> {subset Interval a b1 <= Interval a b2}.
+Proof. by move=> leb; apply: subitvP; rewrite subitvEr. Qed.
+
+Definition itv_decompose i x : Prop :=
+  let: Interval l u := i in
+  (match l return Prop with
+     | BRight_if b lb => lb < x ?<= if ~~ b
+     | BRInfty_if b => ~~ b
+   end *
+   match u return Prop with
+     | BRight_if b ub => x < ub ?<= if b
+     | BRInfty_if b => b
+   end)%type.
+
+Lemma itv_dec : forall x i, reflect (itv_decompose i x) (x \in i).
+Proof. by move=> ? [[? ?|[]][? ?|[]]]; apply: (iffP andP); case. Qed.
+
+Arguments itv_dec {x i}.
+
+Lemma itv_xx x bl br :
+  Interval (BRight_if bl x) (BRight_if br x) =i
+  if ~~ bl && br then pred1 x else pred0.
+Proof.
+by move=> y; rewrite itv_boundlr lteif_anti implybF eq_sym; case: (~~ _ && _).
+Qed.
+
+Lemma itv_gte ba xa bb xb :
+  xb < xa ?<= if ba || ~~ bb ->
+  Interval (BRight_if ba xa) (BRight_if bb xb) =i pred0.
+Proof.
+move=> ? y; apply/negP; rewrite inE /= itv_boundlr.
+case/andP => lexay /(lteif_trans lexay).
+by rewrite implybF lteifNF //= negb_and negbK.
+Qed.
+
+Lemma boundl_in_itv : forall ba xa b,
+  xa \in Interval (BRight_if ba xa) b =
+  if ba then false else BRight xa <= b.
+Proof. by case=> xa [b xb|[]]; rewrite itv_boundlr /<=%O /= ?(lexx, ltxx). Qed.
+
+Lemma boundr_in_itv : forall bb xb a,
+  xb \in Interval a (BRight_if bb xb) =
+  if bb then a <= BLeft xb else false.
+Proof.
+by case=> xb [b xa|[]]; rewrite itv_boundlr andbC /<=%O /= ?(lexx, ltxx).
+Qed.
+
+Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
+
+(* we compute a set of rewrite rules associated to an interval *)
+Definition itv_rewrite i x : Type :=
+  let: Interval l u := i in
+    (match l with
+       | BLeft a => (a <= x) * (x < a = false)
+       | BRight a => (a <= x) * (a < x) * (x <= a = false) * (x < a = false)
+       | -oo => forall x : T, x == x
+       | +oo => forall x : T, x == x (* ? *)
+     end *
+     match u with
+       | BRight b => (x <= b) * (b < x = false)
+       | BLeft b => (x <= b) * (x < b) * (b <= x = false) * (b < x = false)
+       | +oo => forall x : T, x == x
+       | -oo => forall x : T, x == x (* ? *)
+     end *
+     match l, u with
+       | BLeft a, BRight b =>
+         (a <= b) * (b < a = false) * (a \in `[a, b]) * (b \in `[a, b])
+       | BLeft a, BLeft b =>
+         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
+       | BRight a, BRight b =>
+         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
+       | BRight a, BLeft b =>
+         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
+       | _, _ => forall x : T, x == x
+     end)%type.
+
+Lemma itvP : forall x i, x \in i -> itv_rewrite i x.
+Proof.
+move=> x [[[]a|[]][[]b|[]]] /andP [] ha hb; do !split;
+  rewrite ?bound_in_itv //=; do 1?[apply/negbTE; rewrite (le_gtF, lt_geF)];
+  try by [| apply: ltW | move: (lteif_trans ha hb) => //=; exact: ltW].
+Qed.
+
+Arguments itvP [x i].
 
 Lemma lteif_in_itv ba bb xa xb x :
-  x \in Interval (BClose_if ba xa) (BClose_if bb xb) ->
-        xa < xb ?<= if ba && bb.
+  x \in Interval (BRight_if ba xa) (BRight_if bb xb) ->
+  xa < xb ?<= if ~~ ba && bb.
 Proof. by case: ba bb => [][] /itvP /= ->. Qed.
 
 Lemma ltr_in_itv ba bb xa xb x :
-  ~~ (ba && bb) -> x \in Interval (BClose_if ba xa) (BClose_if bb xb) ->
+  ba || ~~ bb -> x \in Interval (BRight_if ba xa) (BRight_if bb xb) ->
   xa < xb.
-Proof. by move=> /negbTE bab /lteif_in_itv; rewrite bab. Qed.
+Proof. by case: ba bb => [][] // _ /itvP ->. Qed.
 
 Lemma ler_in_itv ba bb xa xb x :
-  x \in Interval (BClose_if ba xa) (BClose_if bb xb) -> xa <= xb.
+  x \in Interval (BRight_if ba xa) (BRight_if bb xb) -> xa <= xb.
 Proof. by move/lteif_in_itv/lteifW. Qed.
 
 End IntervalPOrder.
@@ -503,180 +465,118 @@ End IntervalPOrder.
 Section IntervalLattice.
 
 Variable (disp : unit) (T : latticeType disp).
-Implicit Types (x y z : T) (i : interval T).
+Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
-Definition itv_boundl_meet (bl br : itv_boundl T) : itv_boundl T :=
+Definition bound_meet bl br : itv_bound T :=
   match bl, br with
-    | BInfty, _ => br | _, BInfty => bl
-    | BClose_if xb x, BClose_if yb y =>
-      BClose_if ((~~ (x <= y) || yb) && (~~ (y <= x) || xb)) (x `|` y)
+    | -oo, _ | _, -oo => -oo
+    | +oo, b | b, +oo => b
+    | BRight_if xb x, BRight_if yb y =>
+      BRight_if ((~~ (x <= y) || xb) && (~~ (y <= x) || yb)) (x `&` y)
   end.
 
-Definition itv_boundr_meet (bl br : itv_boundr T) : itv_boundr T :=
+Definition bound_join bl br : itv_bound T :=
   match bl, br with
-    | BInfty, _ => br | _, BInfty => bl
-    | BClose_if xb x, BClose_if yb y =>
-      BClose_if ((~~ (x <= y) || xb) && (~~ (y <= x) || yb)) (x `&` y)
+    | -oo, b | b, -oo => b
+    | +oo, _ | _, +oo => +oo
+    | BRight_if xb x, BRight_if yb y =>
+      BRight_if ((x <= y) && yb || (y <= x) && xb) (x `|` y)
   end.
 
-Definition itv_boundl_join (bl br : itv_boundl T) : itv_bound T :=
-  match bl, br with
-    | BInfty, _ | _, BInfty => BInfty _
-    | BClose_if xb x, BClose_if yb y =>
-      BClose_if ((x <= y) && xb || (y <= x) && yb) (x `&` y)
-  end.
-
-Definition itv_boundr_join (bl br : itv_boundr T) : itv_bound T :=
-  match bl, br with
-    | BInfty, _ | _, BInfty => BInfty _
-    | BClose_if xb x, BClose_if yb y =>
-      BClose_if ((x <= y) && yb || (y <= x) && xb) (x `|` y)
-  end.
-
-Lemma itv_boundl_meetC : commutative itv_boundl_meet.
+Lemma bound_meetC : commutative bound_meet.
 Proof.
-by case=> [? ?|][? ?|] //=; rewrite joinC; congr BClose_if;
-  case: lcomparableP; rewrite ?andbT // 1?andbC.
+case=> [? ?|[]][? ?|[]] //=; rewrite meetC; congr BRight_if.
+by case: lcomparableP; rewrite ?andbT // andbC.
 Qed.
 
-Lemma itv_boundr_meetC : commutative itv_boundr_meet.
+Lemma bound_joinC : commutative bound_join.
 Proof.
-by case=> [? ?|][? ?|] //=; rewrite meetC; congr BClose_if;
-  case: lcomparableP; rewrite ?andbT // 1?andbC.
+case=> [? ?|[]][? ?|[]] //=; rewrite joinC; congr BRight_if.
+by case: lcomparableP; rewrite ?orbF // orbC.
 Qed.
 
-Lemma itv_boundl_joinC : commutative itv_boundl_join.
+Lemma bound_meetA : associative bound_meet.
 Proof.
-by case=> [? ?|][? ?|] //=; rewrite meetC; congr BClose_if;
-  case: lcomparableP; rewrite ?orbF // 1?orbC.
-Qed.
-
-Lemma itv_boundr_joinC : commutative itv_boundr_join.
-Proof.
-by case=> [? ?|][? ?|] //=; rewrite joinC; congr BClose_if;
-  case: lcomparableP; rewrite ?orbF // 1?orbC.
-Qed.
-
-Lemma itv_boundl_meetA : associative itv_boundl_meet.
-Proof.
-case=> [? x|][? y|][? z|]//; congr BClose_if; rewrite ?leUx ?joinA //.
+case=> [? x|[]][? y|[]][? z|[]] //=; rewrite !lexI meetA; congr BRight_if.
 by case: (lcomparableP x y) => [|||->]; case: (lcomparableP y z) => [|||->];
   case: (lcomparableP x z) => [|||//<-] //=;
-  case: (lcomparableP x y) => //=; case: (lcomparableP y z) => //=;
-  rewrite ?orbT ?andbT ?lexx ?andbA.
+  case: (lcomparableP x y) => //=; case: (lcomparableP y z);
+  rewrite //= ?orbT ?andbT ?lexx ?andbA.
 Qed.
 
-Lemma itv_boundr_meetA : associative itv_boundr_meet.
+Lemma bound_joinA : associative bound_join.
 Proof.
-case=> [? x|][? y|][? z|]//; congr BClose_if; rewrite ?lexI ?meetA //.
+case=> [? x|[]][? y|[]][? z|[]] //=; rewrite !leUx joinA //.
 by case: (lcomparableP x y) => [|||->]; case: (lcomparableP y z) => [|||->];
   case: (lcomparableP x z) => [|||//<-] //=;
-  case: (lcomparableP x y) => //=; case: (lcomparableP y z) => //=;
-  rewrite ?orbT ?andbT ?lexx ?andbA.
+  case: (lcomparableP x y) => //=; case: (lcomparableP y z);
+  rewrite //= ?andbF ?orbF ?lexx ?orbA.
 Qed.
 
-Lemma itv_boundl_joinA : associative itv_boundl_join.
+Lemma bound_meetKU b2 b1 : bound_join b1 (bound_meet b1 b2) = b1.
 Proof.
-case=> [? x|][? y|][? z|]//; congr BClose_if; rewrite ?lexI ?meetA //.
-by case: (lcomparableP x y) => [|||->]; case: (lcomparableP y z) => [|||->];
-  case: (lcomparableP x z) => [|||//<-] //=;
-  case: (lcomparableP x y) => //=; case: (lcomparableP y z) => //=;
-  rewrite ?andbF ?orbF ?lexx ?orbA.
-Qed.
-
-Lemma itv_boundr_joinA : associative itv_boundr_join.
-Proof.
-case=> [? x|][? y|][? z|]//; congr BClose_if; rewrite ?leUx ?joinA //.
-by case: (lcomparableP x y) => [|||->]; case: (lcomparableP y z) => [|||->];
-  case: (lcomparableP x z) => [|||//<-] //=;
-  case: (lcomparableP x y) => //=; case: (lcomparableP y z) => //=;
-  rewrite ?andbF ?orbF ?lexx ?orbA.
-Qed.
-
-Lemma itv_boundl_meetKU b2 b1 : itv_boundl_join b1 (itv_boundl_meet b1 b2) = b1.
-Proof.
-case: b1 b2 => [? ?|][? ?|] //=; congr BClose_if;
-  rewrite ?joinKI ?meetxx ?leUl ?leUx ?lexx ?orbb //=.
-by case: lcomparableP; rewrite ?orbb ?orbF ?andKb.
-Qed.
-
-Lemma itv_boundr_meetKU b2 b1 : itv_boundr_join b1 (itv_boundr_meet b1 b2) = b1.
-Proof.
-case: b1 b2 => [? ?|][? ?|] //=; congr BClose_if;
-  rewrite ?meetKU ?joinxx ?leIl ?lexI ?lexx ?orbb //.
+case: b1 b2 => [? ?|[]][? ?|[]] //=; congr BRight_if;
+  rewrite ?meetKU ?joinxx ?leIl ?lexI ?lexx ?orbb //=.
 by case: lcomparableP; rewrite ?andbT /= ?orbb ?andbK.
 Qed.
 
-Lemma itv_boundl_joinKI b2 b1 : itv_boundl_meet b1 (itv_boundl_join b1 b2) = b1.
+Lemma bound_joinKI b2 b1 : bound_meet b1 (bound_join b1 b2) = b1.
 Proof.
-case: b1 b2 => [? ?|][? ?|] //=; congr BClose_if;
-  rewrite ?meetKU // leIl lexI lexx.
-by case: lcomparableP; rewrite ?orbF ?andbb /= ?orbK.
-Qed.
-
-Lemma itv_boundr_joinKI b2 b1 : itv_boundr_meet b1 (itv_boundr_join b1 b2) = b1.
-Proof.
-case: b1 b2 => [? ?|][? ?|] //=; congr BClose_if;
-  rewrite ?joinKI // leUl leUx lexx.
+case: b1 b2 => [? ?|[]][? ?|[]] //=; congr BRight_if;
+  rewrite ?joinKI ?meetxx ?leUl ?leUx ?lexx ?andbb //=.
 by case: lcomparableP; rewrite ?andbT ?andbb ?orKb.
 Qed.
 
-Lemma itv_boundl_leEmeet b1 b2 :
-  le_boundl b2 b1 = (itv_boundl_meet b1 b2 == b1).
+Lemma bound_leEmeet b1 b2 : (b1 <= b2) = (bound_meet b1 b2 == b1).
 Proof.
-by case: b1 b2 => [[]?|][[]?|] //=;
-  rewrite /eq_op /= ?eqxx // eq_joinl; case: lcomparableP.
+by case: b1 b2 => [[]?|[]][[]?|[]] //=;
+  rewrite [LHS]/<=%O /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
 Qed.
 
-Lemma itv_boundr_leEmeet b1 b2 :
-  le_boundr b1 b2 = (itv_boundr_meet b1 b2 == b1).
-Proof.
-by case: b1 b2 => [[]?|][[]?|] //=;
-  rewrite /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
-Qed.
+Definition itv_bound_latticeMixin :=
+  LatticeMixin bound_meetC bound_joinC bound_meetA bound_joinA
+               bound_joinKI bound_meetKU bound_leEmeet.
+Canonical itv_bound_latticeType :=
+  LatticeType (itv_bound T) itv_bound_latticeMixin.
 
-Definition itv_boundl_latticeMixin :=
-  LatticeMixin itv_boundl_meetC itv_boundl_joinC
-               itv_boundl_meetA itv_boundl_joinA
-               itv_boundl_joinKI itv_boundl_meetKU itv_boundl_leEmeet.
-Canonical itv_boundl_latticeType :=
-  LatticeType (itv_boundl T) itv_boundl_latticeMixin.
+Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
 
-Definition itv_boundr_latticeMixin :=
-  LatticeMixin itv_boundr_meetC itv_boundr_joinC
-               itv_boundr_meetA itv_boundr_joinA
-               itv_boundr_joinKI itv_boundr_meetKU itv_boundr_leEmeet.
-Canonical itv_boundr_latticeType :=
-  LatticeType (itv_boundr T) itv_boundr_latticeMixin.
+Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
+
+Canonical itv_bound_bLatticeType :=
+  BLatticeType (itv_bound T) (BottomMixin bound_le0x).
+
+Canonical itv_bound_tbLatticeType :=
+  TBLatticeType (itv_bound T) (TopMixin bound_lex1).
 
 Definition itv_meet i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
-  let: Interval b2l b2r := i2 in Interval (b1l `&` b2l) (b1r `&` b2r).
+  let: Interval b2l b2r := i2 in Interval (b1l `|` b2l) (b1r `&` b2r).
 
 Definition itv_join i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
-  let: Interval b2l b2r := i2 in Interval (b1l `|` b2l) (b1r `|` b2r).
+  let: Interval b2l b2r := i2 in Interval (b1l `&` b2l) (b1r `|` b2r).
 
 Lemma itv_meetC : commutative itv_meet.
-Proof. by case=> [? ?][? ?]; congr Interval; rewrite meetC. Qed.
+Proof. by case=> [? ?][? ?] /=; rewrite meetC joinC. Qed.
 
 Lemma itv_joinC : commutative itv_join.
-Proof. by case=> [? ?][? ?]; congr Interval; rewrite joinC. Qed.
+Proof. by case=> [? ?][? ?] /=; rewrite meetC joinC. Qed.
 
 Lemma itv_meetA : associative itv_meet.
-Proof. by case=> [? ?][? ?][? ?]; rewrite /= !meetA. Qed.
+Proof. by case=> [? ?][? ?][? ?] /=; rewrite meetA joinA. Qed.
 
 Lemma itv_joinA : associative itv_join.
-Proof. by case=> [? ?][? ?][? ?]; rewrite /= !joinA. Qed.
+Proof. by case=> [? ?][? ?][? ?] /=; rewrite meetA joinA. Qed.
 
 Lemma itv_meetKU i2 i1 : itv_join i1 (itv_meet i1 i2) = i1.
-Proof. by case: i1 i2 => [? ?][? ?]; rewrite /= !meetKU. Qed.
+Proof. by case: i1 i2 => [? ?][? ?] /=; rewrite meetKU joinKI. Qed.
 
 Lemma itv_joinKI i2 i1 : itv_meet i1 (itv_join i1 i2) = i1.
-Proof. by case: i1 i2 => [? ?][? ?]; rewrite /= !joinKI. Qed.
+Proof. by case: i1 i2 => [? ?][? ?] /=; rewrite meetKU joinKI. Qed.
 
 Lemma itv_leEmeet i1 i2 : (i1 <= i2) = (itv_meet i1 i2 == i1).
-Proof. by case: i1 i2 => [? ?][? ?]; rewrite /<=%O /eq_op /= !leEmeet. Qed.
+Proof. by case: i1 i2 => [? ?][? ?]; rewrite /eq_op /= eq_meetl eq_joinl. Qed.
 
 Definition interval_latticeMixin :=
   LatticeMixin itv_meetC itv_joinC itv_meetA itv_joinA
@@ -684,17 +584,18 @@ Definition interval_latticeMixin :=
 Canonical interval_latticeType :=
   LatticeType (interval T) interval_latticeMixin.
 
-Definition itv_meet1i : left_id `]-oo, +oo[ Order.meet.
-Proof. by case=> i []. Qed.
+Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
 
-Definition itv_meeti1 : right_id `]-oo, +oo[ Order.meet.
-Proof. by case=> [[? ?|][? ?|]]. Qed.
+Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
 
-Canonical itv_intersection_monoid := Monoid.Law itv_meetA itv_meet1i itv_meeti1.
-Canonical itv_intersection_comoid := Monoid.ComLaw itv_meetC.
+Canonical interval_bLatticeType :=
+  BLatticeType (interval T) (BottomMixin itv_le0x).
+
+Canonical interval_tbLatticeType :=
+  TBLatticeType (interval T) (TopMixin itv_lex1).
 
 Lemma in_itv_meet x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
-Proof. by rewrite !inEsubitv lexI. Qed.
+Proof. exact: lexI. Qed.
 
 End IntervalLattice.
 
@@ -703,58 +604,45 @@ Section IntervalTotal.
 Variable (disp : unit) (T : orderType disp).
 Implicit Types (x y z : T) (i : interval T).
 
-Lemma le_boundl_total : total (@le_boundl _ T).
-Proof. by move=> [[]l|] [[]r|] //=; case: (ltgtP l r). Qed.
+Lemma itv_bound_totalMixin : totalLatticeMixin [latticeType of itv_bound T].
+Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
 
-Lemma le_boundr_total : total (@le_boundr _ T).
-Proof. by move=> [[]l|] [[]r|] //=; case: (ltgtP l r). Qed.
-
-Definition itv_boundl_totalMixin : totalLatticeMixin _ :=
-  fun b1 b2 => le_boundl_total b2 b1.
-
-Canonical itv_boundl_distrLatticeType :=
-  DistrLatticeType (itv_boundl T) itv_boundl_totalMixin.
-Canonical itv_boundl_orderType :=
-  OrderType (itv_boundl T) itv_boundl_totalMixin.
-
-Canonical itv_boundr_distrLatticeType :=
-  DistrLatticeType (itv_boundr T) (le_boundr_total : totalLatticeMixin _).
-Canonical itv_boundr_orderType := OrderType (itv_boundr T) le_boundr_total.
+Canonical itv_bound_distrLatticeType :=
+  DistrLatticeType (itv_bound T) itv_bound_totalMixin.
+Canonical itv_bound_bDistrLatticeType := [bDistrLatticeType of itv_bound T].
+Canonical itv_bound_tbDistrLatticeType := [tbDistrLatticeType of itv_bound T].
+Canonical itv_bound_orderType := OrderType (itv_bound T) itv_bound_totalMixin.
 
 Lemma itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
 Proof.
-by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= !meetUl.
+by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
 Qed.
 
 Canonical interval_distrLatticeType :=
   DistrLatticeType (interval T) (DistrLatticeMixin itv_meetUl).
+Canonical interval_bDistrLatticeType := [bDistrLatticeType of interval T].
+Canonical interval_tbDistrLatticeType := [tbDistrLatticeType of interval T].
 
 Lemma itv_splitU (xc : T) bc a b : xc \in Interval a b ->
   forall y, y \in Interval a b =
-    (y \in Interval a (BClose_if (~~ bc) xc))
-    || (y \in Interval (BClose_if bc xc) b).
+    (y \in Interval a (BRight_if bc xc)) ||
+    (y \in Interval (BRight_if bc xc) b).
 Proof.
 move=> xc_in y; move: xc_in.
-rewrite !itv_boundlr [le_boundr (BClose _) (BClose_if _ _)]/=
-        [le_boundr]lock /= lteifN -lock.
-case/andP => leaxc lexcb;
-  case: (boolP (le_boundl a _)) => leay; case: (boolP (le_boundr _ b)) => leyb;
-  rewrite /= (andbT, andbF) ?orbF ?orNb //=;
-  [apply/esym/negbF | apply/esym/negbTE].
-- by case: b lexcb leyb => //= bb b; rewrite -lteifN => lexcb leyb;
-    apply/lteif_imply: (lteif_trans lexcb leyb); rewrite andbN.
-- case: a leaxc leay => //= ab a leaxc;
-    apply/contra => /(lteif_trans leaxc); apply/lteif_imply.
-  by rewrite implybE negb_and orbC orbA orbN.
+rewrite !itv_boundlr ![BRight_if _ _ <= BRight_if _ _]/<=%O /= lteifN.
+case/andP => leaxc lexcb; case: (leP a) => leay; case: (leP _ b) => leyb;
+  rewrite ?andbT ?andbF ?orbF ?orbN //=; [apply/esym/negbTE | apply/esym/negbF].
+- by rewrite -lteifN; apply/lteif_imply: (le_lt_trans lexcb leyb).
+- by apply/lteif_imply: (lt_le_trans leay leaxc).
 Qed.
 
 Lemma itv_splitU2 x a b : x \in Interval a b ->
   forall y, y \in Interval a b =
-    [|| (y \in Interval a (BOpen x)), (y == x)
-      | (y \in Interval (BOpen x) b)].
+    [|| (y \in Interval a (BLeft x)), (y == x)
+      | (y \in Interval (BRight x) b)].
 Proof.
-move=> xab y; rewrite (itv_splitU true xab y); congr (_ || _).
-rewrite (@itv_splitU x false _ _ _ y); first by rewrite itv_xx inE.
+move=> xab y; rewrite (itv_splitU false xab y); congr (_ || _).
+rewrite (@itv_splitU x true _ _ _ y); first by rewrite itv_xx inE.
 by move: xab; rewrite boundl_in_itv itv_boundlr => /andP [].
 Qed.
 
@@ -765,16 +653,16 @@ rewrite !inE /eq_op; case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r] /=.
 case: (leP b2l b1l); case: (leP b3l b2l); case: (leP b3l b1l);
   case: (leP b1r b2r); case: (leP b2r b3r); case: (leP b1r b3r);
   rewrite ?eqxx ?andbT ?orbT //= => b13r b23r b12r b31l b32l b21l.
+- by case: leP b13r (lt_trans b23r b12r).
 - by case: leP b31l (le_trans b32l b21l).
 - by case: leP b31l (le_trans b32l b21l).
 - by case: leP b31l (le_trans b32l b21l).
+- by case: leP b13r (lt_trans b23r b12r).
 - by case: leP b13r (le_trans b12r b23r).
 - by case: leP b13r (le_trans b12r b23r).
-- by case: leP b13r (lt_trans b23r b12r).
 - by case: leP b31l (lt_trans b21l b32l).
 - by case: leP b31l (lt_trans b21l b32l).
 - by case: leP b31l (lt_trans b21l b32l).
-- by case: leP b13r (lt_trans b23r b12r).
 Qed.
 
 Lemma itv_total_join3E i1 i2 i3 :
@@ -784,16 +672,48 @@ rewrite !inE /eq_op; case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r] /=.
 case: (leP b2l b1l); case: (leP b3l b2l); case: (leP b3l b1l);
   case: (leP b1r b2r); case: (leP b2r b3r); case: (leP b1r b3r);
   rewrite ?eqxx ?andbT ?orbT //= => b13r b23r b12r b31l b32l b21l.
-- by case: leP b13r (le_trans b12r b23r).
 - by case: leP b31l (le_trans b32l b21l).
 - by case: leP b31l (le_trans b32l b21l).
 - by case: leP b31l (le_trans b32l b21l).
-- by case: leP b13r (le_trans b12r b23r).
 - by case: leP b13r (lt_trans b23r b12r).
 - by case: leP b13r (lt_trans b23r b12r).
+- by case: leP b13r (le_trans b12r b23r).
+- by case: leP b13r (le_trans b12r b23r).
 - by case: leP b31l (lt_trans b21l b32l).
 - by case: leP b31l (lt_trans b21l b32l).
-- by case: leP b31l (lt_trans b21l b32l).
+- by case: leP b13r (le_trans b12r b23r).
+Qed.
+
+Lemma itv_total_meetsE (S : Type) (s : seq S) (f : S -> interval T) :
+  \meet_(ix <- s) f ix \in
+  `]-oo, +oo[ :: [seq f ix `&` f ix' | ix <- s, ix' <- s].
+Proof.
+case: s => [|x s]; rewrite ?big_nil // inE; apply/orP; right.
+elim: s x => [|y s ih] x; rewrite !big_cons;
+  first by rewrite big_nil meetx1 inE meetxx.
+move: (itv_total_meet3E (f x) (f y) (\meet_(ix <- s) f ix)).
+rewrite meetA 3!inE => /or3P [] /eqP ->.
+- by rewrite /= !inE eqxx orbT.
+- move: (ih x); rewrite big_cons 2!allpairs_consr 2!mem_cat allpairs_consr /=.
+  by rewrite !(mem_cat, inE) -!orbA => /or4P [] ->; rewrite ?orbT.
+- move: (ih y); rewrite big_cons 2!allpairs_consr 2!mem_cat allpairs_consr /=.
+  by rewrite !(mem_cat, inE) -!orbA => /or4P [] ->; rewrite ?orbT.
+Qed.
+
+Lemma itv_total_joinsE (S : Type) (s : seq S) (f : S -> interval T) :
+  \join_(ix <- s) f ix \in
+  Interval +oo -oo :: [seq f ix `|` f ix' | ix <- s, ix' <- s].
+Proof.
+case: s => [|x s]; rewrite ?big_nil // inE; apply/orP; right.
+elim: s x => [|y s ih] x; rewrite !big_cons;
+  first by rewrite big_nil joinx0 inE joinxx.
+move: (itv_total_join3E (f x) (f y) (\join_(ix <- s) f ix)).
+rewrite joinA 3!inE => /or3P [] /eqP ->.
+- by rewrite /= !inE eqxx orbT.
+- move: (ih x); rewrite big_cons 2!allpairs_consr 2!mem_cat allpairs_consr /=.
+  by rewrite !(mem_cat, inE) -!orbA => /or4P [] ->; rewrite ?orbT.
+- move: (ih y); rewrite big_cons 2!allpairs_consr 2!mem_cat allpairs_consr /=.
+  by rewrite !(mem_cat, inE) -!orbA => /or4P [] ->; rewrite ?orbT.
 Qed.
 
 End IntervalTotal.
@@ -947,20 +867,21 @@ Variable R : numFieldType.
 Implicit Types x : R.
 
 Lemma mem0_itvcc_xNx x : (0 \in `[-x, x]) = (0 <= x).
-Proof. by rewrite !inE /= oppr_le0 andbb. Qed.
+Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
 
 Lemma mem0_itvoo_xNx x : 0 \in `](-x), x[ = (0 < x).
-Proof. by rewrite !inE /= oppr_lt0 andbb. Qed.
+Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
 
-Lemma itv_splitI : forall a b x,
-  x \in Interval a b =
-  (x \in Interval a (BInfty _)) && (x \in Interval (BInfty _) b).
-Proof. by move=> [? ?|] [? ?|] ?; rewrite !inE ?andbT. Qed.
+Lemma itv_splitI a b x :
+  x \in Interval a b = (x \in Interval a +oo) && (x \in Interval -oo b).
+Proof. by rewrite !itv_boundlr ?andbT. Qed.
 
 Lemma oppr_itv ba bb (xa xb x : R) :
-  (-x \in Interval (BClose_if ba xa) (BClose_if bb xb)) =
-  (x \in Interval (BClose_if bb (-xb)) (BClose_if ba (-xa))).
-Proof. by rewrite !inE lteif_oppr andbC lteif_oppl. Qed.
+  (-x \in Interval (BRight_if ba xa) (BRight_if bb xb)) =
+  (x \in Interval (BRight_if (~~ bb) (- xb)) (BRight_if (~~ ba) (-xa))).
+Proof.
+by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteif_oppl lteif_oppr.
+Qed.
 
 Lemma oppr_itvoo (a b x : R) : (-x \in `]a, b[) = (x \in `](-b), (-a)[).
 Proof. exact: oppr_itv. Qed.
@@ -982,8 +903,8 @@ Variable R : realFieldType.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
-Lemma mid_in_itv : forall ba bb (xa xb : R), xa < xb ?<= if ba && bb
-  -> mid xa xb \in Interval (BClose_if ba xa) (BClose_if bb xb).
+Lemma mid_in_itv : forall ba bb (xa xb : R), xa < xb ?<= if ~~ ba && bb ->
+  mid xa xb \in Interval (BRight_if ba xa) (BRight_if bb xb).
 Proof.
 by move=> [] [] xa xb /= ?; apply/itv_dec=> /=; rewrite ?midf_lte // ?ltW.
 Qed.
@@ -1204,12 +1125,10 @@ Section IntervalPo.
 
 Variable R : numDomainType.
 
-Local Notation BOpen_if b x := (BClose_if (~~ b) x) (only parsing).
-
 Lemma lersif_in_itv ba bb (xa xb x : R) :
-  x \in Interval (BOpen_if ba xa) (BOpen_if bb xb) ->
-        xa <= xb ?< if ba || bb.
-Proof. by move/lteif_in_itv; rewrite negb_or. Qed.
+  x \in Interval (BRight_if ba xa) (BRight_if bb xb) ->
+        xa <= xb ?< if ba || ~~ bb.
+Proof. by move/lteif_in_itv; rewrite negb_or negbK. Qed.
 
 End IntervalPo.
 
@@ -1577,14 +1496,6 @@ Notation lersif_ndivr_mull :=
 
 (* IntervalPo *)
 
-(* `BOpen_if` has been deprecated, but `deprecate` does not accept a          *)
-(* constructor that takes arguments.                                          *)
-Notation "@ 'BOpen_if'" := (fun T b x => @BClose_if T (~~ b) x)
-(*  ((fun _ T b x => @BClose_if T (~~ b) x) (deprecate BOpen_if BClose_if))   *)
-                             (at level 10, only parsing).
-
-Notation BOpen_if := (@BOpen_if _).
-
 Notation "@ 'lersif_in_itv'" :=
   ((fun _ => @mc_1_11.lersif_in_itv) (deprecate lersif_in_itv lteif_in_itv))
     (at level 10, only parsing).
@@ -1602,13 +1513,15 @@ Notation "@ 'itv_intersection'" :=
 Notation itv_intersection := (@itv_intersection _) (only parsing).
 
 Notation "@ 'itv_intersection1i'" :=
-  ((fun _ => @itv_meet1i _) (deprecate itv_intersection1i itv_meet1i))
+  ((fun _ (R : realDomainType) => @meet1x _ [tbLatticeType of interval R])
+     (deprecate itv_intersection1i meet1x))
     (at level 10, only parsing) : fun_scope.
 
 Notation itv_intersection1i := (@itv_intersection1i _) (only parsing).
 
 Notation "@ 'itv_intersectioni1'" :=
-  ((fun _ => @itv_meeti1 _) (deprecate itv_intersectioni1 itv_meeti1))
+  ((fun _ (R : realDomainType) => @meetx1 _ [tbLatticeType of interval R])
+     (deprecate itv_intersectioni1 meetx1))
     (at level 10, only parsing) : fun_scope.
 
 Notation itv_intersectioni1 := (@itv_intersectioni1 _) (only parsing).
