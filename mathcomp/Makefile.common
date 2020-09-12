@@ -63,7 +63,14 @@ TEST_DEP := build
 endif
 
 test_suite/test_hierarchy_all.v: $(TEST_DEP)
-	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp -lib all.all > test_suite/test_hierarchy_all.v
+	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp \
+		-lib all_ssreflect \
+		-lib all_algebra \
+		-lib all_field \
+		-lib all_character \
+		-lib all_fingroup \
+		-lib all_solvable \
+		> test_suite/test_hierarchy_all.v
 
 Makefile.test-suite.coq: test_suite/test_hierarchy_all.v
 	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f Make.test-suite -o Makefile.test-suite.coq
