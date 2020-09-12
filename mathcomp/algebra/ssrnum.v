@@ -1779,6 +1779,26 @@ move=> hx; rewrite -[X in `|X|]subr0; case: (@real_ltgtP 0 x);
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
+Lemma max_real : {in real &, forall x y, max x y \is real}.
+Proof. by move=> x y ? ?; case: real_leP. Qed.
+
+Lemma min_real : {in real &, forall x y, min x y \is real}.
+Proof. by move=> x y ? ?; case: real_leP. Qed.
+
+Lemma bigmax_real I x0 (r : seq I) (P : pred I) (f : I -> R):
+  x0 \is real -> {in P, forall t : I, f t \is real} ->
+  \big[max/x0]_(t <- r | P t) f t \is real.
+Proof.
+by move=> x0r Pr; elim/big_rec : _ => // i x Pi xr; rewrite max_real ?Pr.
+Qed.
+
+Lemma bigmin_real I x0 (r : seq I) (P : pred I) (f : I -> R):
+  x0 \is real -> {in P, forall t : I, f t \is real} ->
+  \big[min/x0]_(t <- r | P t) f t \is real.
+Proof.
+by move=> x0r Pr; elim/big_rec : _ => // i x Pi xr; rewrite min_real ?Pr.
+Qed.
+
 Lemma real_neqr_lt : {in real &, forall x y, (x != y) = (x < y) || (y < x)}.
 Proof. by move=> * /=; case: real_ltgtP. Qed.
 
