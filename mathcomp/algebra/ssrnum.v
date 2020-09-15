@@ -1786,8 +1786,8 @@ Lemma min_real : {in real &, forall x y, min x y \is real}.
 Proof. by move=> x y ? ?; case: real_leP. Qed.
 
 Lemma bigmax_real I x0 (r : seq I) (P : pred I) (f : I -> R):
-  x0 \is real -> {in P, forall t : I, f t \is real} ->
-  \big[max/x0]_(t <- r | P t) f t \is real.
+  x0 \is real -> {in P, forall i : I, f i \is real} ->
+  \big[max/x0]_(i <- r | P i) f i \is real.
 Proof.
 by move=> x0r Pr; elim/big_rec : _ => // i x Pi xr; rewrite max_real ?Pr.
 Qed.

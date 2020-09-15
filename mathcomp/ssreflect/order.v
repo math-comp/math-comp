@@ -1146,7 +1146,7 @@ Notation "< y :> T" := (< (y : T)) (only parsing) : order_scope.
 Notation "> y" := (lt y) : order_scope.
 Notation "> y :> T" := (> (y : T)) (only parsing) : order_scope.
 
-Notation ">=< y" := (comparable y) : order_scope.
+Notation ">=< y" := ([pred x | comparable x y]) : order_scope.
 Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : order_scope.
 
 Notation "x <= y" := (le x y) : order_scope.
@@ -1172,7 +1172,7 @@ Notation "x < y ?<= 'if' C" := (lteif x y C) : order_scope.
 Notation "x < y ?<= 'if' C :> T" := ((x : T) < (y : T) ?<= if C)
   (only parsing) : order_scope.
 
-Notation ">=< x" := (comparable x) : order_scope.
+Notation ">=< x" := ([pred y | comparable y x]) : order_scope.
 Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : order_scope.
 Notation "x >=< y" := (comparable x y) : order_scope.
 
@@ -3230,6 +3230,16 @@ Lemma nmono_leif (f : T -> T) C :
     {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+
+Section comparable_big.
+Variables op : T -> T -> T.
+Hypothesis op_comparable : forall z, {in >=< z &, forall x y, op x y >=< z}.
+
+Lemma comparable_big x x0 I (P : pred I) F (s : seq I) :
+  x0 >=< x -> {in P, forall t, F t >=< x} ->
+  \big[op/x0]_(i <- s | P i) F i >=< x.
+Proof. by move=> ? ?; elim/big_ind : _ => // y z; exact: op_comparable. Qed.
+End comparable_big.
 
 End POrderTheory.
 

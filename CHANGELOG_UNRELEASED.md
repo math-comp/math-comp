@@ -32,7 +32,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssralg.v`, new lemma `sumr_const_nat` and `iter_addr_0`
 - in `ssrnum.v`, new lemma `ler_sum_nat`
 - in `ssrnum.v`, new lemmas `max_real`, `min_real`, `bigmax_real`, `bigmin_real`
-`
+- in `order.v`, new lemms `comparable_big`
+
 - in `seq.v`, new lemmas: `take_uniq`, `drop_uniq`
 - in `fintype.v`, new lemmas: `card_geqP`, `card_gt1P`, `card_gt2P`,
   `card_le1_eqP` (generalizes `fintype_le1P`),
