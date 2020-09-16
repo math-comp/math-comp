@@ -220,10 +220,13 @@ Lemma contraFeq b x y : (x != y -> b) -> b = false -> x = y.
 Proof. by move=> imp /negbT; apply: contraNeq. Qed.
 
 Lemma contraPeq P x y : (x != y -> ~ P) -> P -> x = y.
-Proof. by move => imp HP; apply: contraTeq isT => /imp /(_ HP). Qed.
+Proof. by move=> imp HP; apply: contraTeq isT => /imp /(_ HP). Qed.
 
 Lemma contra_not_eq P x y : (x != y -> P) -> ~ P -> x = y.
-Proof. by move => imp; apply: contraPeq => /imp HP /(_ HP). Qed.
+Proof. by move=> imp; apply: contraPeq => /imp HP /(_ HP). Qed.
+
+Lemma contra_not_neq P x y : (x = y -> P) -> ~ P -> x != y.
+Proof. by move=> imp; apply: contra_notN => /eqP. Qed.
 
 Lemma contraTneq b x y : (x = y -> ~~ b) -> b -> x != y.
 Proof. by move=> imp; apply: contraTN => /eqP. Qed.
@@ -235,7 +238,7 @@ Lemma contraFneq b x y : (x = y -> b) -> b = false -> x != y.
 Proof. by move=> imp /negbT; apply: contraNneq. Qed.
 
 Lemma contraPneq P x y : (x = y -> ~ P) -> P -> x != y.
-Proof. by move => imp; apply: contraPN => /eqP. Qed.
+Proof. by move=> imp; apply: contraPN => /eqP. Qed.
 
 Lemma contra_eqN b x y : (b -> x != y) -> x = y -> ~~ b.
 Proof. by move=> imp /eqP; apply: contraL. Qed.
@@ -255,8 +258,11 @@ Proof. by move=> imp; apply: contraNF => /imp->. Qed.
 Lemma contra_neqT b x y : (~~ b -> x = y) -> x != y -> b.
 Proof. by move=> imp; apply: contraNT => /imp->. Qed.
 
+Lemma contra_eq_not P x y : (P -> x != y) -> x = y -> ~ P.
+Proof. by move=> imp /eqP; apply: contraTnot. Qed.
+
 Lemma contra_neq_not P x y : (P -> x = y) -> x != y -> ~ P.
-Proof. by move => imp;apply: contraNnot => /imp->. Qed.
+Proof. by move=> imp;apply: contraNnot => /imp->. Qed.
 
 Lemma contra_eq z1 z2 x1 x2 : (x1 != x2 -> z1 != z2) -> z1 = z2 -> x1 = x2.
 Proof. by move=> imp /eqP; apply: contraTeq. Qed.
