@@ -391,7 +391,6 @@ Section SubChoice.
 Variables (P : pred T) (sT : subType P).
 
 Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
-HB.instance sT sub_choiceMixin.
 
 End SubChoice.
 
@@ -475,12 +474,6 @@ Definition option_choiceMixin := CanChoiceMixin (@seq_of_optK T).
 HB.instance (option T) option_choiceMixin.
 End OptionChoiceType.
 
-Section SigChoiceType.
-Variables (T : choiceType) (P : pred T).
-Definition sig_choiceMixin : choiceMixin {x | P x} := sub_choiceMixin _.
-HB.instance ({x | P x}) sig_choiceMixin.
-End SigChoiceType.
-
 Section ProdChoiceType.
 Variables (T1 T2 : choiceType).
 Definition prod_choiceMixin := CanChoiceMixin (@tag_of_pairK T1 T2).
@@ -500,6 +493,18 @@ HB.instance (GenTree.tree T) tree_choiceMixin.
 End TreeChoiceType.
 
 End ChoiceTheory.
+
+
+HB.structure Definition subChoice T (P : pred T) :=
+  { sT of Choice sT & is_SUB T P sT}.
+
+Notation subChoiceType := subChoice.type.
+
+Section SigChoiceType.
+Variables (T : choiceType) (P : pred T).
+Definition sig_choiceMixin : choiceMixin {x | P x}. Admitted.
+HB.instance ({x | P x}) sig_choiceMixin.
+End SigChoiceType.
 
 Prenex Implicits xchoose choose.
 Notation "[ 'choiceMixin' 'of' T 'by' <: ]" :=
@@ -597,30 +602,15 @@ Arguments pickleK {T} x : rename.
 Arguments pickleK_inv {T} x.
 Arguments pickle_invK {T} n : rename.
 
-Section SubCountType.
+HB.structure Definition subCountable T (P : pred T) :=
+  { sT of Countable sT & is_SUB T P sT}.
 
-Variables (T : choiceType) (P : pred T).
-Import Countable.
-
-Structure subCountType : Type :=
-  SubCountType {subCount_sort :> subType P; _ : mixin_of subCount_sort}.
-
-HB.instance
-  Definition sub_is_countable (sT : subCountType) : is_countable sT :=
-    let: SubCountType _ m := sT return mixin_of sT in m.
-
-Definition sub_countType (sT : subCountType) := [the countType of sT : Type].
-Coercion sub_countType : subCountType >-> countType.
-
-Definition pack_subCountType U :=
-  fun sT cT & SUB.sort sT * sort cT -> U * U =>
-  fun ch eq co & phant_id (Class ch eq co) (class cT) => @SubCountType sT co.
-
-End SubCountType.
+Notation subCountType := subCountable.type.
 
 (* This assumes that T has both countType and subType structures. *)
+(* TODO: replace with trivial pack *)
 Notation "[ 'subCountType' 'of' T ]" :=
-    (@pack_subCountType _ _ T _ _ id _ _ _ id)
+    (subCountable.clone _ _ T _)
   (at level 0, format "[ 'subCountType'  'of'  T ]") : form_scope.
 
 Section TagCountType.

@@ -518,6 +518,11 @@ HB.structure Definition SUB (T : Type) (P : pred T) := { S of is_SUB T P S }.
 
 Notation subType := SUB.type.
 
+HB.structure Definition subEquality T (P : pred T) :=
+  { sT of Equality sT & is_SUB T P sT}.
+
+Notation subEqType := subEquality.type.
+
 Section SubType.
 
 Variables (T : Type) (P : pred T).
@@ -741,7 +746,8 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-HB.instance Definition sub_eqMixin := is_eqType.Build sT val_eqP.
+(* turn into a factory *)
+Definition sub_eqMixin := is_eqType.Build sT val_eqP.
 
 (*
   (let: SubType _ v _ _ _ as sT' := sT
@@ -749,12 +755,14 @@ HB.instance Definition sub_eqMixin := is_eqType.Build sT val_eqP.
    fun vP : ev_ax _ v => EqMixin vP
    ) val_eqP.
 *)
-Lemma val_eqE (u v : sT) : (val u == val v) = (u == v).
-Proof. by []. Qed.
 
 End SubEqType.
 
-Notation SubEqMixin sT := (is_eqType.Build sT (@val_eqP _ _ _)).
+Lemma val_eqE (T : eqType) (P : pred T) (sT : subEqType P)
+   (u v : sT) : (val u == val v) = (u == v).
+Proof. exact/val_eqP/eqP. Qed.
+
+Notation SubEqMixin sT := (is_eqType.Build (sT : Type) (@val_eqP _ _ _)).
 
 Arguments val_eqP {T P sT x y}.
 
@@ -767,8 +775,9 @@ HB.instance void void_eqMixin. (* TODO: PcanEqMixin should become a factory *)
 Section SigEqType.
 
 Variables (T : eqType) (P : pred T).
-
+Set Printing All.
 Definition sig_eqMixin := Eval hnf in [eqMixin of {x | P x} by <:].
+
 HB.instance ({x | P x}) sig_eqMixin.
 
 End SigEqType.

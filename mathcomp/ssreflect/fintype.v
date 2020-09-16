@@ -1376,20 +1376,15 @@ End EqImage.
 
 Lemma unit_enumP : Finite.axiom [::tt]. Proof. by case. Qed.
 
-HB.instance Definition unit_finMixin : is_finite unit :=
-  FinMixin unit_enumP.
-
-Canonical unit_finType := Eval hnf in FinType unit unit_finMixin.
+HB.instance Definition unit_finMixin : is_finite unit := FinMixin unit_enumP.
 Lemma card_unit : #|{: unit}| = 1. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma bool_enumP : Finite.axiom [:: true; false]. Proof. by case. Qed.
-Definition bool_finMixin := Eval hnf in FinMixin bool_enumP.
-Canonical bool_finType := Eval hnf in FinType bool bool_finMixin.
+HB.instance Definition bool_finMixin : is_finite bool := FinMixin bool_enumP.
 Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
-Definition void_finMixin := Eval hnf in FinMixin void_enumP.
-Canonical void_finType := Eval hnf in FinType void void_finMixin.
+HB.instance Definition void_finMixin : is_finite void := FinMixin void_enumP.
 Lemma card_void : #|{: void}| = 0. Proof. by rewrite cardT enumT unlock. Qed.
 
 Local Notation enumF T := (Finite.enum T).
@@ -1403,8 +1398,8 @@ Definition option_enum := None :: map some (enumF T).
 Lemma option_enumP : Finite.axiom option_enum.
 Proof. by case=> [x|]; rewrite /= count_map (count_pred0, enumP). Qed.
 
-Definition option_finMixin := Eval hnf in FinMixin option_enumP.
-Canonical option_finType := Eval hnf in FinType (option T) option_finMixin.
+HB.instance
+Definition option_finMixin : is_finite (option T) := FinMixin option_enumP.
 
 Lemma card_option : #|{: option T}| = #|T|.+1.
 Proof. by rewrite !cardT !enumT [in LHS]unlock /= !size_map. Qed.
@@ -1427,31 +1422,18 @@ Definition CanFinMixin g (fK : cancel f g) := PcanFinMixin (can_pcan fK).
 
 End TransferFinType.
 
+#[mathcomp]
+HB.structure Definition subFinite (T : Type) (P : pred T) :=
+  { sT of Finite sT & is_SUB T P sT }.
+
+Notation subFinType := subFinite.type.
+
 Section SubFinType.
 
 Variables (T : choiceType) (P : pred T).
 Import Finite.
 
-Structure subFinType := SubFinType {
-  subFin_sort :> subType P;
-  _ : mixin_of (sub_eqType subFin_sort)
-}.
-
-Definition pack_subFinType U :=
-  fun cT b m & phant_id (class cT) (@Class U b m) =>
-  fun sT m'  & phant_id m' m => @SubFinType sT m'.
-
-Implicit Type sT : subFinType.
-
-Definition subFin_mixin sT :=
-  let: SubFinType _ m := sT return mixin_of (sub_eqType sT) in m.
-
-Coercion subFinType_subCountType sT := @SubCountType _ _ sT (subFin_mixin sT).
-Canonical subFinType_subCountType.
-
-Coercion subFinType_finType sT :=
-  Pack (@Class sT (sub_choiceClass sT) (subFin_mixin sT)).
-Canonical subFinType_finType.
+Implicit Type sT : subFinType P.
 
 Lemma codom_val sT x : (x \in codom (val : sT -> T)) = P x.
 Proof.
@@ -1461,12 +1443,13 @@ Qed.
 End SubFinType.
 
 (* This assumes that T has both finType and subCountType structures. *)
-Notation "[ 'subFinType' 'of' T ]" := (@pack_subFinType _ _ T _ _ _ id _ _ id)
+(* this is not a clone, but a pack without mixin *)
+Notation "[ 'subFinType' 'of' T ]" := (subFinite.clone _ _ T _)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
 Section FinTypeForSub.
 
-Variables (T : finType) (P : pred T) (sT : subCountType P).
+Variables (T : finType) (P : pred T) (sT : subEqType P).
 
 Definition sub_enum : seq sT := pmap insub (enumF T).
 

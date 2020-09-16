@@ -2402,7 +2402,7 @@ End PmapSub.
 
 Section EqPmapSub.
 
-Variables (T : eqType) (p : pred T) (sT : subType p).
+Variables (T : eqType) (p : pred T) (sT : subEqType p).
 
 Let insT : T -> option sT := insub.
 
