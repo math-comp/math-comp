@@ -132,6 +132,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `big_rmcond_in` for the sake of uniformity, but it is already
   deprecated and will be removed two releases from now.
 
+- in `eqtype.v` new lemmas `contra_not_neq`, `contra_eq_not`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
