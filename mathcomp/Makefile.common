@@ -56,11 +56,26 @@ Makefile.coq: pre-makefile $(COQPROJECT) Makefile
 
 # Test suite ---------------------------------------------------------
 
-test_suite/test_hierarchy_all.v: build
-	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify -R . mathcomp -lib all.all > test_suite/test_hierarchy_all.v
+ifneq "$(TEST_SKIP_BUILD)" ""
+TEST_DEP :=
+MATHCOMP_PATH := -R test_suite mathcomp.test_suite
+else
+TEST_DEP := build
+MATHCOMP_PATH := -R . mathcomp
+endif
+
+test_suite/test_hierarchy_all.v: $(TEST_DEP)
+	COQBIN=$(COQBIN) ocaml ../etc/utils/hierarchy.ml -verify $(MATHCOMP_PATH) \
+		-lib all_ssreflect \
+		-lib all_algebra \
+		-lib all_field \
+		-lib all_character \
+		-lib all_fingroup \
+		-lib all_solvable \
+		> test_suite/test_hierarchy_all.v
 
 Makefile.test-suite.coq: test_suite/test_hierarchy_all.v
-	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f Make.test-suite -o Makefile.test-suite.coq
+	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f Make.test-suite $(MATHCOMP_PATH) -o Makefile.test-suite.coq
 
 # Global config, build, clean and distclean --------------------------
 config: sub-config this-config
