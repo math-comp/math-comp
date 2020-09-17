@@ -468,6 +468,9 @@ Reserved Notation "A `|^d` B" (at level 52, left associativity).
 Reserved Notation "A `\^d` B" (at level 50, left associativity).
 Reserved Notation "~^d` A" (at level 35, right associativity).
 
+Reserved Notation "0^d" (at level 0).
+Reserved Notation "1^d" (at level 0).
+
 (* Reserved notations for product ordering of prod or seq *)
 Reserved Notation "x <=^p y" (at level 70, y at next level).
 Reserved Notation "x >=^p y" (at level 70, y at next level).
@@ -2550,6 +2553,16 @@ Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
 Notation "x `&^d` y" := (dual_meet x y) : order_scope.
 Notation "x `|^d` y" := (dual_join x y) : order_scope.
+
+Notation "0^d" := dual_bottom : order_scope.
+Notation "1^d" := dual_top : order_scope.
+
+(* The following Local Notations are here to define the \join^d_ and \meet^d_ *)
+(* notations later. Do not remove them.                                       *)
+Local Notation "0" := dual_bottom.
+Local Notation "1" := dual_top.
+Local Notation join := dual_join.
+Local Notation meet := dual_meet.
 
 Notation "\join^d_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.

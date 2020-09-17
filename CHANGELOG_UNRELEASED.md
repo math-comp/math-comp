@@ -133,6 +133,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   deprecated and will be removed two releases from now.
 
 - in `eqtype.v` new lemmas `contra_not_neq`, `contra_eq_not`.
+- in `order.v`, new notations `0^d` and `1^d` for bottom and top elements of
+  dual lattices.
 
 ### Changed
 
@@ -157,6 +159,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `big_uncond` (cf Added) but it will be renamed `big_mkcond` in the
   next release.
 
+- in `order.v`, `\join^d_` and `\meet^d_` notations are now properly specialized
+  for `dual_display`.
 
 ### Renamed
 
