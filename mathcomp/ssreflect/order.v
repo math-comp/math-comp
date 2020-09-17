@@ -55,6 +55,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*   @Order.ge          disp T     == >=%O    (in fun_scope)                  *)
 (*   @Order.gt          disp T     == >%O     (in fun_scope)                  *)
 (*   @Order.leif        disp T     == <?=%O   (in fun_scope)                  *)
+(*   @Order.lteif       disp T     == <?<=%O  (in fun_scope)                  *)
 (* For latticeType T                                                          *)
 (*   @Order.meet        disp T x y == x `&` y (in order_scope)                *)
 (*   @Order.join        disp T x y == x `|` y (in order_scope)                *)
@@ -79,6 +80,7 @@ From mathcomp Require Import path fintype tuple bigop finset div prime.
 (*            x >= y <-> x is greater than or equal to y (:= y <= x).         *)
 (*             x > y <-> x is greater than y (:= y < x).                      *)
 (*   x <= y ?= iff C <-> x is less than y, or equal iff C is true.            *)
+(*    x < y ?<= if C <-> x is smaller than y, and strictly if C is false.     *)
 (*           x >=< y <-> x and y are comparable (:= (x <= y) || (y <= x)).    *)
 (*            x >< y <-> x and y are incomparable (:= ~~ x >=< y).            *)
 (* For x, y of type T, where T is canonically a latticeType d:                *)
@@ -423,6 +425,11 @@ Reserved Notation "x >< y" (at level 70, no associativity).
 Reserved Notation ">< x" (at level 35).
 Reserved Notation ">< y :> T" (at level 35, y at next level).
 
+Reserved Notation "x < y ?<= 'if' c" (at level 70, y, c at next level,
+  format "x '[hv'  <  y '/'  ?<=  'if'  c ']'").
+Reserved Notation "x < y ?<= 'if' c :> T" (at level 70, y, c at next level,
+  format "x '[hv'  <  y '/'  ?<=  'if'  c  :> T ']'").
+
 (* Reserved notation for lattice operations. *)
 Reserved Notation "A `&` B"  (at level 48, left associativity).
 Reserved Notation "A `|` B" (at level 52, left associativity).
@@ -461,6 +468,10 @@ Reserved Notation "x <=^d y ?= 'iff' c" (at level 70, y, c at next level,
   format "x '[hv'  <=^d  y '/'  ?=  'iff'  c ']'").
 Reserved Notation "x <=^d y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^d  y '/'  ?=  'iff'  c  :> T ']'").
+Reserved Notation "x <^d y ?<= 'if' c" (at level 70, y, c at next level,
+  format "x '[hv'  <^d  y '/'  ?<=  'if'  c ']'").
+Reserved Notation "x <^d y ?<= 'if' c :> T" (at level 70, y, c at next level,
+  format "x '[hv'  <^d  y '/'  ?<=  'if'  c  :> T ']'").
 
 (* Reserved notation for dual lattice operations. *)
 Reserved Notation "A `&^d` B"  (at level 48, left associativity).
@@ -1065,6 +1076,8 @@ Definition leif (x y : T) C : Prop := ((x <= y) * ((x == y) = C))%type.
 
 Definition le_of_leif x y C (le_xy : @leif x y C) := le_xy.1 : le x y.
 
+Definition lteif x y C := if C then x <= y else x < y.
+
 Variant le_xor_gt (x y : T) :
   T -> T -> T -> T -> bool -> bool -> Set :=
   | LeNotGt of x <= y : le_xor_gt x y x x y y true false
@@ -1105,7 +1118,7 @@ Definition arg_max {I : finType}  := @extremum T I ge.
 
 End POrderDef.
 
-Prenex Implicits lt le leif.
+Prenex Implicits lt le leif lteif.
 Arguments ge {_ _}.
 Arguments gt {_ _}.
 Arguments min {_ _}.
@@ -1119,6 +1132,7 @@ Notation ">=%O" := ge : fun_scope.
 Notation "<%O" := lt : fun_scope.
 Notation ">%O" := gt : fun_scope.
 Notation "<?=%O" := leif : fun_scope.
+Notation "<?<=%O" := lteif : fun_scope.
 Notation ">=<%O" := comparable : fun_scope.
 Notation "><%O" := (fun x y => ~~ (comparable x y)) : fun_scope.
 
@@ -1152,6 +1166,10 @@ Notation "x < y < z" := ((x < y) && (y < z)) : order_scope.
 
 Notation "x <= y ?= 'iff' C" := (leif x y C) : order_scope.
 Notation "x <= y ?= 'iff' C :> T" := ((x : T) <= (y : T) ?= iff C)
+  (only parsing) : order_scope.
+
+Notation "x < y ?<= 'if' C" := (lteif x y C) : order_scope.
+Notation "x < y ?<= 'if' C :> T" := ((x : T) < (y : T) ?<= if C)
   (only parsing) : order_scope.
 
 Notation ">=< x" := (comparable x) : order_scope.
@@ -2493,6 +2511,7 @@ Notation dual_comparable := (@comparable (dual_display _) _).
 Notation dual_ge := (@ge (dual_display _) _).
 Notation dual_gt := (@gt (dual_display _) _).
 Notation dual_leif := (@leif (dual_display _) _).
+Notation dual_lteif := (@lteif (dual_display _) _).
 Notation dual_max := (@max (dual_display _) _).
 Notation dual_min := (@min (dual_display _) _).
 Notation dual_meet := (@meet (dual_display _) _).
@@ -2508,6 +2527,7 @@ Notation ">=^d%O" := dual_ge : fun_scope.
 Notation "<^d%O" := dual_lt : fun_scope.
 Notation ">^d%O" := dual_gt : fun_scope.
 Notation "<?=^d%O" := dual_leif : fun_scope.
+Notation "<?<=^d%O" := dual_lteif : fun_scope.
 Notation ">=<^d%O" := dual_comparable : fun_scope.
 Notation "><^d%O" := (fun x y => ~~ dual_comparable x y) : fun_scope.
 
@@ -2541,6 +2561,10 @@ Notation "x <^d y <^d z" := ((x <^d y) && (y <^d z)) : order_scope.
 
 Notation "x <=^d y ?= 'iff' C" := (<?=^d%O x y C) : order_scope.
 Notation "x <=^d y ?= 'iff' C :> T" := ((x : T) <=^d (y : T) ?= iff C)
+  (only parsing) : order_scope.
+
+Notation "x <^d y ?<= 'if' C" := (<?<=^d%O x y C) : order_scope.
+Notation "x <^d y ?<= 'if' C :> T" := ((x : T) <^d (y : T) ?<= if C)
   (only parsing) : order_scope.
 
 Notation ">=<^d x" := (>=<^d%O x) : order_scope.
@@ -2808,6 +2832,8 @@ Proof. by case: comparableP. Qed.
 Lemma gt_comparable (x y : T) : y < x -> x >=< y.
 Proof. by case: comparableP. Qed.
 
+(* leif *)
+
 Lemma leifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
 Proof.
 rewrite /leif le_eqVlt; apply: (iffP idP)=> [|[]].
@@ -2847,6 +2873,50 @@ Proof. by move=> /leifP; case: C comparableP => [] []. Qed.
 
 Lemma eqTleif x y C : x <= y ?= iff C -> C -> x = y.
 Proof. by move=> /eq_leif<-/eqP. Qed.
+
+(* lteif *)
+
+Lemma lteif_trans x y z C1 C2 :
+  x < y ?<= if C1 -> y < z ?<= if C2 -> x < z ?<= if C1 && C2.
+Proof.
+case: C1 C2 => [][];
+  [exact: le_trans | exact: le_lt_trans | exact: lt_le_trans | exact: lt_trans].
+Qed.
+
+Lemma lteif_anti C1 C2 x y :
+  (x < y ?<= if C1) && (y < x ?<= if C2) = C1 && C2 && (x == y).
+Proof. by case: C1 C2 => [][]; rewrite lte_anti. Qed.
+
+Lemma lteifxx x C : (x < x ?<= if C) = C.
+Proof. by case: C; rewrite /= ltexx. Qed.
+
+Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
+Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
+
+Lemma lteifS x y C : x < y -> x < y ?<= if C.
+Proof. by case: C => //= /ltW. Qed.
+
+Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
+
+Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
+
+Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
+Proof. by case=> [][] /=; case: comparableP. Qed.
+
+Lemma lteif_andb x y : {morph lteif x y : p q / p && q}.
+Proof. by case=> [][] /=; case: comparableP. Qed.
+
+Lemma lteif_imply C1 C2 x y : C1 ==> C2 -> x < y ?<= if C1 -> x < y ?<= if C2.
+Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
+
+Lemma lteifW C x y : x < y ?<= if C -> x <= y.
+Proof. by case: C => // /ltW. Qed.
+
+Lemma ltrW_lteif C x y : x < y -> x < y ?<= if C.
+Proof. by case: C => // /ltW. Qed.
+
+Lemma lteifN C x y : x < y ?<= if ~~ C -> ~~ (y < x ?<= if C).
+Proof. by case: C => /=; case: comparableP. Qed.
 
 (* min and max *)
 
@@ -2995,6 +3065,25 @@ Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
 
 Lemma comparable_maxKx : min x (max x y) = x.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+
+Lemma comparable_lteifNE C : x >=< y -> x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Proof. by case: C => /=; case: comparableP. Qed.
+
+Lemma comparable_lteif_minr C :
+  (z < Order.min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. by case: C; rewrite /= (comparable_le_minr, comparable_lt_minr). Qed.
+
+Lemma comparable_lteif_minl C :
+  (Order.min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. by case: C; rewrite /= (comparable_le_minl, comparable_lt_minl). Qed.
+
+Lemma comparable_lteif_maxr C :
+  (z < Order.max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. by case: C; rewrite /= (comparable_le_maxr, comparable_lt_maxr). Qed.
+
+Lemma comparable_lteif_maxl C :
+  (Order.max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. by case: C; rewrite /= (comparable_le_maxl, comparable_lt_maxl). Qed.
 
 End Comparable2.
 
@@ -3798,6 +3887,27 @@ Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx, ltIx).
 Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
+
+(* lteif *)
+
+Lemma lteifNE x y C : x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Proof. by case: C => /=; case: leP. Qed.
+
+Lemma lteif_minr z x y C :
+  (z < Order.min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. by case: C; rewrite /= (le_minr, lt_minr). Qed.
+
+Lemma lteif_minl z x y C :
+  (Order.min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. by case: C; rewrite /= (le_minl, lt_minl). Qed.
+
+Lemma lteif_maxr z x y C :
+  (z < Order.max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. by case: C; rewrite /= (le_maxr, lt_maxr). Qed.
+
+Lemma lteif_maxl z x y C :
+  (Order.max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. by case: C; rewrite /= (le_maxl, lt_maxl). Qed.
 
 Section ArgExtremum.
 

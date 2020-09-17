@@ -135,6 +135,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `eqtype.v` new lemmas `contra_not_neq`, `contra_eq_not`.
 - in `order.v`, new notations `0^d` and `1^d` for bottom and top elements of
   dual lattices.
+
 - in `interval.v`:
   + Intervals and their bounds of `T` now have canonical ordered type instances
     whose ordering relations are the subset relation and the left to right
@@ -143,8 +144,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     where the join and meet are intersection and convex hull respectively. If
     `T` is an `orderType`, they are distributive, and the interval bounds are
     totally ordered. (cf Changed section)
-  + New lemmas: `comparable_lteifN`, `itv_total_meet3E`, `itv_total_join3E`,
-    `itv_total_meetsE`, `itv_total_joinsE`
+  + New lemmas: `bound_ltxx`, `subitvE`, `in_itv`, `itv_ge`, `in_itvI`,
+    `itv_total_meet3E`, and `itv_total_join3E`.
+- in `order.v`:
+  + new definition `lteif` and notations `<?<=%O`, `<?<=^d%O`, `_ < _ ?<= if _`,
+    and `_ <^d _ ?<= if _` (cf Changed section).
+  + new lemmas `lteifN`, `comparable_lteifNE`, and
+    `comparable_lteif_(min|max)(l|r)`.
+- in `ssrnum.v`, new lemma `real_lteif_distl`.
 
 - in `matrix.v` new lemma `det_mx11`.
 
@@ -176,50 +183,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `order.v`, `\join^d_` and `\meet^d_` notations are now properly specialized
   for `dual_display`.
+
 - in `interval.v`:
+  + `x <= y ?< if c` (`lersif`) has been generalized to `porderType`, relocated
+    to `order.v`, and replaced with `x < y ?<= if c'` (`lteif`) where `c'` is
+    negation of `c`.
   + Many definitions and lemmas on intervals such as the membership test are
     generalized from numeric domains to ordered types.
-  + `x <= y ?< if c` (`lersif`) has also been generalized to `porderType` and
-    replaced with `x < y ?<= if c'` (`lteif`) where `c'` is negation of `c`.
-  + Interval bounds `itv_bound : T -> Type` are redefined with two constructors
-    `BRight_if of bool & T` and `BRInfty_if of bool`. `BRight_if true x` and
-    `BRight_if close x` respectively mean open and close bounds as left bounds,
-    and their meanings as right bounds are opposite. `BRInfty_if true` and
-    `BRInfty_if false` respectively means positive and negative infinity. This
-    change gives us the canonical "left to right" ordering of interval bounds.
+  + Interval bounds `itv_bound : Type -> Type` are redefined with two constructors
+    `BSide : bool -> T -> itv_bound T` and `BInfty : bool -> itv_bound T`.
+    New notations `BLeft` and `BRight` are aliases for `BSide true` and `BSide false` respectively.
+    `BInfty false` and `BInfty true` respectively means positive and negative infinity.
+    `BLeft x` and `BRight x` respectively mean close and open bounds as left bounds,
+    and they respectively mean open and close bounds as right bounds.
+    This change gives us the canonical "left to right" ordering of interval bounds.
 
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
 
-- in `interval.v`, we deprecate and rename the following:
-  + `subr_lersif(r0|0r|0)` -> `subr_lteif(r0|0r|0)`
+- in `interval.v`, we deprecate, rename, and relocate to `order.v` the following:
   + `lersif_(trans|anti)` -> `lteif_(trans|anti)`
-  + `lersif(01|xx|NF|S|T|F|W)` -> `lteif(01|xx|NF|S|T|F|W)`
+  + `lersif(xx|NF|S|T|F|W)` -> `lteif(xx|NF|S|T|F|W)`
+  + `lersif_(andb|orb|imply)` -> `lteif_(andb|orb|imply)`
+  + `ltrW_lersif` -> `ltrW_lteif`
+  + `lersifN` -> `lteifNE`
+  + `lersif_(min|max)(l|r)` -> ` lteif_(min|max)(l|r)`
+
+- in `interval.v`, we deprecate, rename, and relocate to `ssrnum.v` the following:
+  + `subr_lersif(r0|0r|0)` -> `subr_lteif(r0|0r|0)`
+  + `lersif01` -> `lteif01`
   + `lersif_(oppl|oppr|0oppr|oppr0|opp2|oppE)` -> `lteif_(oppl|oppr|0oppr|oppr0|opp2|oppE)`
   + `lersif_add2(|l|r)` -> `lteif_add2(|l|r)`
   + `lersif_sub(l|r)_add(l|r)` -> `lteif_sub(l|r)_add(l|r)`
   + `lersif_sub_add(l|r)` -> `lteif_sub_add(l|r)`
-  + `lersif_(andb|orb|imply)` -> `lteif_(andb|orb|imply)`
-  + `ltrW_lersif` -> `ltrW_lteif`
   + `lersif_(p|n)mul2(l|r)` -> `lteif_(p|n)mul2(l|r)`
-  + `real_lersifN` -> `real_lteifN`
+  + `real_lersifN` -> `real_lteifNE`
   + `real_lersif_norm(l|r)` -> `real_lteif_norm(l|r)`
   + `lersif_nnormr` -> `lteif_nnormr`
-  + `lersifN` -> `lteifN`
   + `lersif_norm(l|r)` -> `lteif_norm(l|r)`
   + `lersif_distl` -> `lteif_distl`
-  + `lersif_(min|max)(l|r)` -> ` lteif_(min|max)(l|r)`
   + `lersif_(p|n)div(l|r)_mul(l|r)` -> `lteif_(p|n)div(l|r)_mul(l|r)`
+
+- in `interval.v`, we deprecate and replace the following:
   + `lersif_in_itv` -> `lteif_in_itv`
-  + `itv_intersection` -> `Order.meet`
-  + `itv_intersection1i` -> `meet1x`
-  + `itv_intersectioni1` -> `meetx1`
-  + `itv_intersectionii` -> `meetxx`
-  + `itv_intersectionC` -> `meetC`
-  + `itv_intersectionA` -> `meetA`
+  + `itv_gte` -> `itv_ge`
+  + `l(t|e)r_in_itv` -> `lt_in_itv`
 
 ### Removed
+
+- in `interval.v`, we remove the following:
+  + `le_bound(l|r)` (use `Order.le` instead)
+  + `le_bound(l|r)_refl` (use `lexx` instead)
+  + `le_bound(l|r)_anti` (use `eq_le` instead)
+  + `le_bound(l|r)_trans` (use `le_trans` instead)
+  + `le_bound(l|r)_bb` (use `bound_lexx` instead)
+  + `le_bound(l|r)_total` (use `le_total` instead)
+
+- in `interval.v`, we deprecate the following:
+  + `itv_intersection` (use `Order.meet` instead)
+  + `itv_intersection1i` (use `meet1x` instead)
+  + `itv_intersectioni1` (use `meetx1` instead)
+  + `itv_intersectionii` (use `meetxx` instead)
+  + `itv_intersectionC` (use `meetC` instead)
+  + `itv_intersectionA` (use `meetA` instead)
 
 ### Infrastructure
 
