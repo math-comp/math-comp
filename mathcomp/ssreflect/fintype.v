@@ -1447,9 +1447,10 @@ End SubFinType.
 Notation "[ 'subFinType' 'of' T ]" := (subFinite.clone _ _ T _)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
-Section FinTypeForSub.
+HB.factory
+Record FinTypeForSub (T : finType) P sT of SubCountable T P sT := { }.
 
-Variables (T : finType) (P : pred T) (sT : subEqType P).
+HB.builders Context (T : finType) P sT of FinTypeForSub T P sT.
 
 Definition sub_enum : seq sT := pmap insub (enumF T).
 
@@ -1468,10 +1469,13 @@ Qed.
 (* We can't declare a canonical structure here because we've already *)
 (* stated that subType_sort and FinType.sort unify via to the        *)
 (* subType_finType structure.                                        *)
+HB.instance Definition SubFinMixin := UniqFinMixin sub_enum_uniq mem_sub_enum.
+HB.end.
 
 Definition SubFinMixin := UniqFinMixin sub_enum_uniq mem_sub_enum.
 Definition SubFinMixin_for (eT : eqType) of phant eT :=
   eq_rect _ Finite.mixin_of SubFinMixin eT.
+Section FinTypeForSub.
 
 Variable sfT : subFinType P.
 
