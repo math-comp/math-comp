@@ -602,15 +602,15 @@ Arguments pickleK {T} x : rename.
 Arguments pickleK_inv {T} x.
 Arguments pickle_invK {T} n : rename.
 
-HB.structure Definition subCountable T (P : pred T) :=
+HB.structure Definition SubCountable T (P : pred T) :=
   { sT of Countable sT & is_SUB T P sT}.
 
-Notation subCountType := subCountable.type.
+Notation subCountType := SubCountable.type.
 
 (* This assumes that T has both countType and subType structures. *)
 (* TODO: replace with trivial pack *)
 Notation "[ 'subCountType' 'of' T ]" :=
-    (subCountable.clone _ _ T _)
+    (SubCountable.clone _ _ T _)
   (at level 0, format "[ 'subCountType'  'of'  T ]") : form_scope.
 
 Section TagCountType.
