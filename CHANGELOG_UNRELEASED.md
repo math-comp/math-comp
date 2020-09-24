@@ -161,6 +161,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   (e.g. with `raddf_eq0`), and lemma `inj_row_free` characterizing
   `row_free` matrices `A`  through `v *m A = 0 -> v = 0` for all `v`.
 
+- in `ssralg.v`, new lemma `mulrIb`.
 
 ### Changed
 

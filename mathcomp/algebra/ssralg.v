@@ -835,6 +835,9 @@ Qed.
 Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
 Proof. by rewrite -!mulrnA mulnC. Qed.
 
+Lemma mulrIb (x : V) : x != 0 -> injective (fun b : bool => x *+ b).
+Proof. by move=> x_neq0 [[]|[/esym|]]// /eqP; rewrite (negPf x_neq0). Qed.
+
 Lemma iter_addr_0 n (m : V) : iter n (+%R m) 0 = m *+ n.
 Proof. by elim: n => //= n ->; rewrite mulrS. Qed.
 
