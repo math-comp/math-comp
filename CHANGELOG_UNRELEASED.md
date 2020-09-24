@@ -136,6 +136,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `order.v`, new notations `0^d` and `1^d` for bottom and top elements of
   dual lattices.
 
+- in `matrix.v` new lemma `det_mx11`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
