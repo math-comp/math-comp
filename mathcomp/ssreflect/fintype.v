@@ -192,7 +192,7 @@ Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 Section WithCountType.
 Variable (T : countType).
 
-Definition UniqMixin e Ue eT := @is_finite.Build T e (uniq_enumP Ue eT).
+Definition UniqMixin e Ue (eT : e =i T) :=@is_finite.Build T e (uniq_enumP Ue eT).
 
 Variable n : nat.
 
