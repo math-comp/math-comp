@@ -31,8 +31,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `contraPleq`, `contraPltn`, `contra_not_leq`, `contra_not_ltn`, `contra_leq_not`, `contra_ltn_not`
 - in `ssralg.v`, new lemma `sumr_const_nat` and `iter_addr_0`
 - in `ssrnum.v`, new lemma `ler_sum_nat`
-- in `ssrnum.v`, new lemmas `max_real`, `min_real`, `bigmax_real`, `bigmin_real`
-- in `order.v`, new lemms `comparable_big`
+- in `ssrnum.v`, new lemmas `big_real`, `sum_real`, `prod_real`,
+  `max_real`, `min_real`, and `bigmax_real`, `bigmin_real`.
+- in `order.v`, new lemmas `comparable_bigl` and `comparable_bigr`.
 
 - in `seq.v`, new lemmas: `take_uniq`, `drop_uniq`
 - in `fintype.v`, new lemmas: `card_geqP`, `card_gt1P`, `card_gt2P`,
@@ -264,6 +265,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The `class_of` records of structures are turned into primitive records to
   prevent prevent potential issues of ambiguous paths and convertibility of
   structure instances.
+- In `order.v`, rephrased `comparable_(min|max)[rl]` in terms of
+  `{in _, forall x y, _}`, hence reordering the arguments. Made them
+  hints for smoother combination with `comparable_big[lr]`.
+
 
 ### Renamed
 

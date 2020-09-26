@@ -2973,17 +2973,17 @@ Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
 Lemma max_maxxK x y : max x (max x y) = max x y.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
 
-Lemma comparable_minl x y z : x >=< z -> y >=< z -> min x y >=< z.
-Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Lemma comparable_minl z : {in >=< z &, forall x y, min x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
 
-Lemma comparable_minr x y z : z >=< x -> z >=< y -> z >=< min x y.
-Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Lemma comparable_minr z : {in >=<%O z &, forall x y, z >=< min x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
 
-Lemma comparable_maxl x y z : x >=< z -> y >=< z -> max x y >=< z.
-Proof. by move=> cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Lemma comparable_maxl z : {in >=< z &, forall x y, max x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
 
-Lemma comparable_maxr x y z : z >=< x -> z >=< y -> z >=< max x y.
-Proof. by move=> cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Lemma comparable_maxr z : {in >=<%O z &, forall x y, z >=< max x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
 
 Section Comparable2.
 Variables (z x y : T) (cmp_xy : x >=< y).
@@ -3165,7 +3165,7 @@ Lemma comparable_minACA x y z t :
 Proof.
 move=> xy xz xt yz yt zt; rewrite comparable_minA// ?comparable_minl//.
 rewrite [min _ z]comparable_minAC// -comparable_minA// ?comparable_minl//.
-by rewrite comparable_sym.
+by rewrite inE comparable_sym.
 Qed.
 
 Lemma comparable_maxACA x y z t :
@@ -3174,7 +3174,7 @@ Lemma comparable_maxACA x y z t :
 Proof.
 move=> xy xz xt yz yt zt; rewrite comparable_maxA// ?comparable_maxl//.
 rewrite [max _ z]comparable_maxAC// -comparable_maxA// ?comparable_maxl//.
-by rewrite comparable_sym.
+by rewrite inE comparable_sym.
 Qed.
 
 Lemma comparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
@@ -3226,22 +3226,23 @@ Lemma nmono_in_leif (A : {pred T}) (f : T -> T) C :
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
 Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
 
-Lemma nmono_leif (f : T -> T) C :
-    {mono f : x y /~ x <= y} ->
+Lemma nmono_leif (f : T -> T) C : {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
 
-Section comparable_big.
-Variables op : T -> T -> T.
-Hypothesis op_comparable : forall z, {in >=< z &, forall x y, op x y >=< z}.
+Lemma comparable_bigl x x0 op I (P : pred I) F (s : seq I) :
+  {in >=< x &, forall y z, op y z >=< x} -> x0 >=< x ->
+  {in P, forall i, F i >=< x} -> \big[op/x0]_(i <- s | P i) F i >=< x.
+Proof. by move=> *; elim/big_ind : _. Qed.
 
-Lemma comparable_big x x0 I (P : pred I) F (s : seq I) :
-  x0 >=< x -> {in P, forall t, F t >=< x} ->
-  \big[op/x0]_(i <- s | P i) F i >=< x.
-Proof. by move=> ? ?; elim/big_ind : _ => // y z; exact: op_comparable. Qed.
-End comparable_big.
+Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
+  {in >=<%O x &, forall y z, x >=< op y z} -> x >=< x0 ->
+  {in P, forall i, x >=< F i} -> x >=< \big[op/x0]_(i <- s | P i) F i.
+Proof. by move=> *; elim/big_ind : _. Qed.
 
 End POrderTheory.
+Hint Resolve comparable_minr comparable_minl : core.
+Hint Resolve comparable_maxr comparable_maxl : core.
 
 Section ContraTheory.
 Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.

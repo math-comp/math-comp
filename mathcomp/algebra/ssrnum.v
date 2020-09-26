@@ -1479,6 +1479,19 @@ rewrite sqrf_eq1 => /orP[/eqP //|]; rewrite -ger0_def le0r oppr_eq0 oner_eq0.
 by move/(addr_gt0 ltr01); rewrite subrr ltxx.
 Qed.
 
+Lemma big_real x0 op I (P : pred I) F (s : seq I) :
+  {in real &, forall x y, op x y \is real} -> x0 \is real ->
+  {in P, forall i, F i \is real} -> \big[op/x0]_(i <- s | P i) F i \is real.
+Proof. exact: comparable_bigr. Qed.
+
+Lemma sum_real I (P : pred I) (F : I -> R) (s : seq I) :
+  {in P, forall i, F i \is real} -> \sum_(i <- s | P i) F i \is real.
+Proof. by apply/big_real; [apply: rpredD | apply: rpred0]. Qed.
+
+Lemma prod_real I (P : pred I) (F : I -> R) (s : seq I) :
+  {in P, forall i, F i \is real} -> \prod_(i <- s | P i) F i \is real.
+Proof. by apply/big_real; [apply: rpredM | apply: rpred1]. Qed.
+
 Section NormedZmoduleTheory.
 
 Variable V : normedZmodType R.
@@ -1780,24 +1793,20 @@ by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
 Lemma max_real : {in real &, forall x y, max x y \is real}.
-Proof. by move=> x y ? ?; case: real_leP. Qed.
+Proof. exact: comparable_maxr. Qed.
 
 Lemma min_real : {in real &, forall x y, min x y \is real}.
-Proof. by move=> x y ? ?; case: real_leP. Qed.
+Proof. exact: comparable_minr. Qed.
 
 Lemma bigmax_real I x0 (r : seq I) (P : pred I) (f : I -> R):
   x0 \is real -> {in P, forall i : I, f i \is real} ->
   \big[max/x0]_(i <- r | P i) f i \is real.
-Proof.
-by move=> x0r Pr; elim/big_rec : _ => // i x Pi xr; rewrite max_real ?Pr.
-Qed.
+Proof. exact/big_real/max_real. Qed.
 
 Lemma bigmin_real I x0 (r : seq I) (P : pred I) (f : I -> R):
-  x0 \is real -> {in P, forall t : I, f t \is real} ->
-  \big[min/x0]_(t <- r | P t) f t \is real.
-Proof.
-by move=> x0r Pr; elim/big_rec : _ => // i x Pi xr; rewrite min_real ?Pr.
-Qed.
+  x0 \is real -> {in P, forall i : I, f i \is real} ->
+  \big[min/x0]_(i <- r | P i) f i \is real.
+Proof. exact/big_real/min_real. Qed.
 
 Lemma real_neqr_lt : {in real &, forall x y, (x != y) = (x < y) || (y < x)}.
 Proof. by move=> * /=; case: real_ltgtP. Qed.
