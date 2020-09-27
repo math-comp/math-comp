@@ -435,10 +435,10 @@ ci-fcsl-pcm-8.11:
   variables:
     COQ_VERSION: "8.11"
 
-ci-fcsl-pcm-8.10:
+ci-fcsl-pcm-8.12:
   extends: .ci-fcsl-pcm
   variables:
-    COQ_VERSION: "8.11"
+    COQ_VERSION: "8.12"
 
 ci-fcsl-pcm-dev:
   extends: .ci-fcsl-pcm
