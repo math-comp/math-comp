@@ -124,21 +124,21 @@ Let allQ2 f'' := {all2 Q2 f''}.
 Lemma in_on1P : {in D1, {on D2, allQ1 f}} <->
                 {in [pred x in D1 | f x \in D2], allQ1 f}.
 Proof.
-split => allf x; have := allf x; rewrite inE => Q1f; first by case/andP.
+split => allf x; have /[!inE] Q1f := allf x; first by case/andP.
 by move=> ? ?; apply: Q1f; apply/andP.
 Qed.
 
 Lemma in_on1lP : {in D1, {on D2, allQ1l f & h}} <->
                 {in [pred x in D1 | f x \in D2], allQ1l f h}.
 Proof.
-split => allf x; have := allf x; rewrite inE => Q1f; first by case/andP.
+split => allf x; have /[!inE] Q1f := allf x; first by case/andP.
 by move=> ? ?; apply: Q1f; apply/andP.
 Qed.
 
 Lemma in_on2P : {in D1 &, {on D2 &, allQ2 f}} <->
                 {in [pred x in D1 | f x \in D2] &, allQ2 f}.
 Proof.
-split => allf x y; have := allf x y; rewrite !inE => Q2f.
+split => allf x y; have /[!inE] Q2f := allf x y.
   by move=> /andP[? ?] /andP[? ?]; apply: Q2f.
 by move=> ? ? ? ?; apply: Q2f; apply/andP.
 Qed.

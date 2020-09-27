@@ -1315,7 +1315,7 @@ Proof. by move=> subseq_ts /(sorted_sort leT_tr) <-; exact: subseq_sort. Qed.
 
 Lemma mem2_sort s x y : leT x y -> mem2 s x y -> mem2 (sort leT s) x y.
 Proof.
-move=> lexy; rewrite !mem2E => /subseq_sort.
+move=> lexy /[!mem2E] /subseq_sort.
 by case: eqP => // _; rewrite {1}/sort /= lexy /=.
 Qed.
 

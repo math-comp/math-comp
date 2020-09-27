@@ -599,7 +599,7 @@ have SmulX (i : 'I_m): {in S, forall x, x * X`_i \in S}.
       apply/familyP=> i1; rewrite inE ffunE /= fun_if fiK.
       by case: eqP => [-> // | _]; apply: fP.
     rewrite (bigD1 i isT) ffunE /= eqxx fiK; congr (_ * _).
-    by apply: eq_bigr => i1; rewrite ffunE /= => /negPf->.
+    by apply: eq_bigr => i1 /[!ffunE]/= /negPf->.
   have [/monicP ] := (minCpoly_monic X`_i, root_minCpoly X`_i).
   rewrite /root horner_coef lead_coefE -(subnKC (size_minCpoly _)) subn2.
   rewrite big_ord_recr /= addrC addr_eq0 => ->; rewrite mul1r => /eqP->.
@@ -612,7 +612,7 @@ have SmulX (i : 'I_m): {in S, forall x, x * X`_i \in S}.
     apply/familyP=> i1; rewrite inE ffunE /= fun_if eK.
     by case: eqP => [-> // | _]; apply: fP.
   rewrite (bigD1 i isT) ffunE /= eqxx eK; congr (_ * _).
-  by apply: eq_bigr => i1; rewrite ffunE /= => /negPf->.
+  by apply: eq_bigr => i1 /[!ffunE] /= /negPf->.
 exists S; last by exists (Tagged (fun n => n.-tuple _) [tuple of Y]).
 split=> [|x Xx]; last first.
   by rewrite -[x]mul1r -(nth_index 0 Xx) (SmulX (Ordinal _)) // ltnS index_size.
@@ -638,7 +638,7 @@ have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
 move=> mulS S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
   case/S_P: Sx => {}x ->; rewrite big1 ?isAlgInt0 // => i _.
-  by have /rowP/(_ i) := v0; rewrite !mxE => ->; rewrite mul0rz.
+  by have /rowP/(_ i)/[!mxE] -> := v0; rewrite mul0rz.
 have sYS (i : 'I_n): x * Y`_i \in S.
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
 pose A := \matrix_(i, j < n) sval (sig_eqW (S_P _ (sYS j))) i.

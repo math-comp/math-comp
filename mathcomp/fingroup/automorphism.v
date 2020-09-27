@@ -95,7 +95,7 @@ Lemma ker_autm : 'ker f = 1. Proof. by move/trivgP: injm_autm. Qed.
 Lemma im_autm : f @* G = G.
 Proof.
 apply/setP=> x; rewrite morphimEdom (can_imset_pre _ (permK a)) inE.
-by have:= AutGa; rewrite inE => /andP[/perm_closed <-]; rewrite permKV.
+by have /[1!inE] /andP[/perm_closed <-] := AutGa; rewrite permKV.
 Qed.
 
 Lemma Aut_closed x : x \in G -> a x \in G.
@@ -324,7 +324,7 @@ Canonical conj_aut_morphism := Morphism conj_aut_morphM.
 
 Lemma ker_conj_aut : 'ker conj_aut = 'C(G).
 Proof.
-apply/setP=> x; rewrite inE; case nGx: (x \in 'N(G)); last first.
+apply/setP=> x /[1!inE]; case nGx: (x \in 'N(G)); last first.
   by symmetry; apply/idP=> cGx; rewrite (subsetP (cent_sub G)) in nGx.
 rewrite 2!inE /=; apply/eqP/centP=> [cx1 y Gy | cGx].
   by rewrite /commute (conjgC y) -norm_conj_autE // cx1 perm1.

@@ -955,16 +955,15 @@ Variable D' : pred aT.
 Lemma homoW_in : {in D & D', {homo f : x y / aR' x y >-> rR' x y}} ->
                  {in D & D', {homo f : x y / aR x y >-> rR x y}}.
 Proof.
-move=> mf x y xD yD /=; rewrite aRE => /orP[/eqP->|/mf];
-by rewrite rRE ?eqxx // orbC => ->.
+by move=> mf x y xD yD /[!aRE]/orP[/eqP->|/mf]; rewrite rRE ?eqxx// orbC => ->.
 Qed.
 
 Lemma inj_homo_in : {in D & D', injective f} ->
   {in D & D', {homo f : x y / aR x y >-> rR x y}} ->
   {in D & D', {homo f : x y / aR' x y >-> rR' x y}}.
 Proof.
-move=> fI mf x y xD yD /=; rewrite aR'E rR'E => /andP[neq_xy xy].
-by rewrite mf ?andbT //; apply: contra_neq neq_xy => /fI; apply.
+move=> fI mf x y xD yD /[!(aR'E, rR'E)] /andP[neq_xy xy].
+by rewrite mf ?andbT//; apply: contra_neq neq_xy; apply: fI.
 Qed.
 
 End DifferentDom.

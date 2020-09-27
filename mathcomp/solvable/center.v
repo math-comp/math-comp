@@ -309,7 +309,7 @@ Proof.
 rewrite -(center_dprod (setX_dprod H K)) -morphim_pairg1 -morphim_pair1g.
 rewrite -!injm_center ?subsetT ?injm_pair1g ?injm_pairg1 //=.
 rewrite morphim_pairg1 morphim_pair1g setX_dprod.
-apply/subsetP=> [[x y]]; rewrite inE => /andP[Zx /eqP->].
+apply/subsetP=> [[x y]] /[1!inE] /andP[Zx /eqP->].
 by rewrite inE /= Zx groupV (subsetP sgzZZ) ?mem_morphim.
 Qed.
 

@@ -348,7 +348,7 @@ by apply: cprod_exponent; rewrite cprodE.
 Qed.
 
 Lemma sub_LdivT A n : (A \subset 'Ldiv_n()) = (exponent A %| n).
-Proof. by apply/subsetP/exponentP=> eAn x /eAn; rewrite inE => /eqP. Qed.
+Proof. by apply/subsetP/exponentP=> eAn x /eAn /[1!inE] /eqP. Qed.
 
 Lemma LdivT_J n x : 'Ldiv_n() :^ x = 'Ldiv_n().
 Proof.
@@ -495,7 +495,7 @@ Arguments pElemP {p A E}.
 
 Lemma pElemS p A B : A \subset B -> 'E_p(A) \subset 'E_p(B).
 Proof.
-by move=> sAB; apply/subsetP=> E; rewrite !inE => /andP[/subset_trans->].
+by move=> sAB; apply/subsetP=> E /[!inE] /andP[/subset_trans->].
 Qed.
 
 Lemma pElemI p A B : 'E_p(A :&: B) = 'E_p(A) :&: subgroups B.
@@ -709,7 +709,7 @@ Qed.
 Lemma pmaxElemS p A B :
   A \subset B -> 'E*_p(B) :&: subgroups A \subset 'E*_p(A).
 Proof.
-move=> sAB; apply/subsetP=> E; rewrite !inE.
+move=> sAB; apply/subsetP=> E /[!inE].
 case/andP=> /maxgroupP[/pElemP[_ abelE] maxE] sEA.
 apply/maxgroupP; rewrite inE sEA; split=> // D EpD.
 by apply: maxE; apply: subsetP EpD; apply: pElemS.
@@ -774,7 +774,7 @@ Qed.
 Lemma p_rank_abelem p G : p.-abelem G -> 'r_p(G) = logn p #|G|.
 Proof.
 move=> abelG; apply/eqP; rewrite eqn_leq andbC (bigmax_sup G) //.
-  by apply/bigmax_leqP=> E; rewrite inE => /andP[/lognSg->].
+  by apply/bigmax_leqP=> E /[1!inE] /andP[/lognSg->].
 by rewrite inE subxx.
 Qed.
 
@@ -803,7 +803,7 @@ Qed.
 Lemma p_rank_Sylow p G H : p.-Sylow(G) H -> 'r_p(H) = 'r_p(G).
 Proof.
 move=> sylH; apply/eqP; rewrite eqn_leq (p_rankS _ (pHall_sub sylH)) /=.
-apply/bigmax_leqP=> E; rewrite inE => /andP[sEG abelE].
+apply/bigmax_leqP=> E /[1!inE] /andP[sEG abelE].
 have [P sylP sEP] := Sylow_superset sEG (abelem_pgroup abelE).
 have [x _ ->] := Sylow_trans sylP sylH.
 by rewrite p_rankJ -(p_rank_abelem abelE) (p_rankS _ sEP).
@@ -889,7 +889,7 @@ Proof.
 apply: (iffP idP) => [|[E]].
   have [p _ ->] := rank_witness G; case/p_rank_geP=> E.
   by rewrite def_pnElem; case/setIP; exists E.
-case/nElemP=> p; rewrite inE => /andP[EpG_E /eqP <-].
+case/nElemP=> p /[1!inE] /andP[EpG_E /eqP <-].
 by rewrite (leq_trans (logn_le_p_rank EpG_E)) ?p_rank_le_rank.
 Qed.
 
@@ -1159,13 +1159,13 @@ Qed.
 
 Lemma OhmS H G : H \subset G -> 'Ohm_n(H) \subset 'Ohm_n(G).
 Proof.
-move=> sHG; apply: genS; apply/subsetP=> x; rewrite !inE => /andP[Hx ->].
+move=> sHG; apply: genS; apply/subsetP=> x /[!inE] /andP[Hx ->].
 by rewrite (subsetP sHG).
 Qed.
 
 Lemma OhmE p G : p.-group G -> 'Ohm_n(G) = <<'Ldiv_(p ^ n)(G)>>.
 Proof.
-move=> pG; congr <<_>>; apply/setP=> x; rewrite !inE; apply: andb_id2l => Gx.
+move=> pG; congr <<_>>; apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
 have [-> | ntx] := eqVneq x 1; first by rewrite !expg1n.
 by rewrite (pdiv_p_elt (mem_p_elt pG Gx)).
 Qed.
@@ -1344,8 +1344,7 @@ Implicit Types (A B C : {set gT}) (D G H E : {group gT}).
 
 Lemma Ohm0 G : 'Ohm_0(G) = 1.
 Proof.
-apply/trivgP; rewrite /= gen_subG.
-by apply/subsetP=> x /setIdP[_]; rewrite inE.
+by apply/trivgP; rewrite /= gen_subG; apply/subsetP=> x /setIdP[_] /[1!inE].
 Qed.
 
 Lemma Ohm_leq m n G : m <= n -> 'Ohm_m(G) \subset 'Ohm_n(G).

@@ -364,7 +364,7 @@ Lemma morphpreI R S : f @*^-1 (R :&: S) = f @*^-1 R :&: f @*^-1 S.
 Proof. by rewrite -setIIr -preimsetI. Qed.
 
 Lemma morphpreD R S : f @*^-1 (R :\: S) = f @*^-1 R :\: f @*^-1 S.
-Proof. by apply/setP=> x; rewrite !inE; case: (x \in D). Qed.
+Proof. by apply/setP=> x /[!inE]; case: (x \in D). Qed.
 
 (* kernel, domain properties *)
 
@@ -396,7 +396,7 @@ Proof. by move=> Dx Dy eqfxy; apply/rcosetP; apply/rcoset_kerP. Qed.
 
 Lemma ker_norm : D \subset 'N('ker f).
 Proof.
-apply/subsetP=> x Dx; rewrite inE; apply/subsetP=> _ /imsetP[y Ky ->].
+apply/subsetP=> x Dx /[1!inE]; apply/subsetP=> _ /imsetP[y Ky ->].
 by rewrite !inE groupJ ?morphJ // ?dom_ker //= mker ?conj1g.
 Qed.
 
@@ -660,8 +660,7 @@ Proof. exact: morphim_cents. Qed.
 
 Lemma morphpre_norm R : f @*^-1 'N(R) \subset 'N(f @*^-1 R).
 Proof.
-apply/subsetP=> x; rewrite !inE => /andP[Dx Nfx].
-by rewrite -morphpreJ ?morphpreS.
+by apply/subsetP=> x /[!inE] /andP[Dx Nfx]; rewrite -morphpreJ ?morphpreS.
 Qed.
 
 Lemma morphpre_norms R S : R \subset 'N(S) -> f @*^-1 R \subset 'N(f @*^-1 S).
@@ -1071,7 +1070,7 @@ Qed.
 
 Lemma morphpre_factm (C : {set rT}) : ff @*^-1 C =  q @* (f @*^-1 C).
 Proof.
-apply/setP=> y; rewrite !inE /=; apply/andP/morphimP=> [[]|[x Hx]]; last first.
+apply/setP=> y /[!inE]/=; apply/andP/morphimP=> [[]|[x Hx]]; last first.
   by case/morphpreP=> Gx Cfx ->; rewrite factmE ?imset_f ?inE ?Hx.
 case/morphimP=> x Hx Gx ->; rewrite factmE //.
 by exists x; rewrite // !inE Gx.

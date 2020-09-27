@@ -258,7 +258,7 @@ Proof. by apply/setP=> x; rewrite !inE linear0 eqxx andbT. Qed.
 Lemma inertia_add phi psi : 'I[phi] :&: 'I[psi] \subset 'I[phi + psi].
 Proof.
 rewrite !['I[_]]setIdE -setIIr setIS //.
-by apply/subsetP=> x; rewrite !inE linearD /= => /andP[/eqP-> /eqP->].
+by apply/subsetP=> x /[!(inE, linearD)]/= /andP[/eqP-> /eqP->].
 Qed.
 
 Lemma inertia_sum I r (P : pred I) (Phi : I -> 'CF(H)) :
@@ -293,7 +293,7 @@ Proof. by rewrite inertia1 => /normal_norm/setIidPl. Qed.
 Lemma inertia_mul phi psi : 'I[phi] :&: 'I[psi] \subset 'I[phi * psi].
 Proof.
 rewrite !['I[_]]setIdE -setIIr setIS //.
-by apply/subsetP=> x; rewrite !inE rmorphM /= => /andP[/eqP-> /eqP->].
+by apply/subsetP=> x /[!(inE, rmorphM)]/= /andP[/eqP-> /eqP->].
 Qed.
 
 Lemma inertia_prod I r (P : pred I) (Phi : I -> 'CF(H)) :
@@ -690,7 +690,7 @@ Proof.
 have [[_ defS] [injg <-]] := (isomP isoH, isomP isoG).
 rewrite morphimEdom (eq_in_imset eq_hg) -morphimEsub // in defS.
 rewrite /inertia !setIdE morphimIdom setIA -{1}defS -injm_norm ?injmI //.
-apply/setP=> gy; rewrite !inE; apply: andb_id2l => /morphimP[y Gy nHy ->] {gy}.
+apply/setP=> gy /[!inE]; apply: andb_id2l => /morphimP[y Gy nHy ->] {gy}.
 rewrite cfConjgIsom // -sub1set -morphim_set1 // injmSK ?sub1set //= inE.
 apply/eqP/eqP=> [Iphi_y | -> //].
 by apply/cfun_inP=> x Hx; rewrite -!(cfIsomE isoH) ?Iphi_y.
@@ -1558,7 +1558,7 @@ have actIirrK: is_action G (@conjg_Iirr _ K).
 pose ito := Action actIirrK; pose cto := ('Js \ (subsetT G))%act.
 have acts_Js : [acts G, on classes K | 'Js].
   apply/subsetP=> y Gy; have nKy := subsetP nKG y Gy.
-  rewrite !inE; apply/subsetP=> _ /imsetP[z Gz ->]; rewrite !inE /=.
+  rewrite !inE; apply/subsetP=> _ /imsetP[z Gz ->] /[!inE]/=.
   rewrite -class_rcoset norm_rlcoset // class_lcoset.
   by apply: imset_f; rewrite memJ_norm.
 have acts_cto : [acts G, on classes K | cto] by rewrite astabs_ract subsetIidl.

@@ -829,7 +829,7 @@ have sAY_AM: (AY <= A * M)%VS by rewrite [AY]big_cons subv_add ?prodvSr.
 have dxAY: directv AY.
   rewrite directvE /= !big_cons [_ == _]directv_addE dxAX directvE eqxx /=.
   rewrite -/(sumA X) eqEsubv sub0v andbT -limg_amulr.
-  apply/subvP=> _ /memv_capP[/memv_imgP[a Aa ->]]; rewrite lfunE /= => AXay.
+  apply/subvP=> _ /memv_capP[/memv_imgP[a Aa ->]]/[!lfunE]/= AXay.
   rewrite memv0 (mulIr_eq0 a (mulIr _)) ?fieldT //.
   apply: contraR notAXy => /fieldT-Ua; rewrite -[y](mulKr Ua) /sumA.
   by rewrite -big_distrr -(prodv_id A) /= -prodvA big_distrr memv_mul ?memvV.

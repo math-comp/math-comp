@@ -130,7 +130,7 @@ set f := fun _ => <<_>>; have idf: iter _ f H == H.
 have [m] := ubnP (size s); elim: m s Hsn => // m IHm /lastP[//|s G].
 rewrite size_rcons last_rcons rcons_path /= ltnS.
 set K := last H s => /andP[Hsn /andP[sKG nKG]] lt_s_m.
-have:= sKG; rewrite subEproper => /predU1P[<-|prKG]; first exact: IHm.
+have /[1!subEproper]/predU1P[<-|prKG] := sKG; first exact: IHm.
 pose L := [group of f G].
 have sHK: H \subset K by case/IHm: Hsn.
 have sLK: L \subset K by rewrite gen_subG class_support_sub_norm.
@@ -195,7 +195,7 @@ Proof.
 case/subnormalP=> s Hs <-{G}.
 elim/last_ind: s Hs => [|s G IHs]; first by left.
 rewrite last_rcons -cats1 cat_path /= andbT; set K := last H s.
-case/andP=> Hs nsKG; have:= normal_sub nsKG; rewrite subEproper.
+case/andP=> Hs nsKG; have /[1!subEproper] := normal_sub nsKG.
 case/predU1P=> [<- | prKG]; [exact: IHs | right; exists K; split=> //].
 by apply/subnormalP; exists s.
 Qed.
@@ -204,7 +204,7 @@ Lemma subnormalEl G H : H <|<| G ->
   H :=: G \/ (exists K : {group gT}, [/\ H <| K, K <|<| G & H \proper K]).
 Proof.
 case/subnormalP=> s Hs <-{G}; elim: s H Hs => /= [|K s IHs] H; first by left.
-case/andP=> nsHK Ks; have:= normal_sub nsHK; rewrite subEproper.
+case/andP=> nsHK Ks; have /[1!subEproper] := normal_sub nsHK.
 case/predU1P=> [-> | prHK]; [exact: IHs | right; exists K; split=> //].
 by apply/subnormalP; exists s.
 Qed.

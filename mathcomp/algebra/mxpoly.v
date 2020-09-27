@@ -179,7 +179,7 @@ Lemma Sylvester_mxE (i j : 'I_dS) :
   let S_ r k := r`_(j - k) *+ (k <= j) in
   Sylvester_mx i j = match split i with inl k => S_ p k | inr k => S_ q k end.
 Proof.
-move=> S_; rewrite mxE; case: {i}(split i) => i; rewrite !mxE /=;
+move=> S_ /[1!mxE]; case: {i}(split i) => i /[!mxE]/=;
   by rewrite rVpoly_delta coefXnM ltnNge if_neg -mulrb.
 Qed.
 
@@ -1160,7 +1160,7 @@ exists m, X => y; rewrite -/M; split=> [/defM[a [M2a]] | [q Sq]] -> {y}.
 have M_0: M 0 by exists 0; split=> [i|]; rewrite ?mul0mx mxE.
 have M_D: propD M.
   move=> _ _ [a [Fa ->]] [b [Fb ->]]; exists (a + b).
-  by rewrite mulmxDl !mxE; split=> // i; rewrite mxE; apply: memRD.
+  by rewrite mulmxDl !mxE; split=> // i /[1!mxE]; apply: memRD.
 have{M_0 M_D} Msum := big_ind _ M_0 M_D.
 rewrite horner_coef; apply: (Msum) => i _; case: i q`_i {Sq}(Sq i) => /=.
 elim: {q}(size q) => // n IHn i i_le_n y Sy.
