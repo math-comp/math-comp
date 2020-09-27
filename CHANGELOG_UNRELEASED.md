@@ -269,6 +269,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `{in _, forall x y, _}`, hence reordering the arguments. Made them
   hints for smoother combination with `comparable_big[lr]`.
 
+- In `order.v`,
+  + `>=< y` stands for `[pred x | x >=< y]`
+  + `>< y`  stands for `[pred x | x >< y]`
+  + and the same holds for the dual `>=<^d`, `><^d`, the product
+  `>=<^p`, `><^p`, and lexicographic `>=<^l`, `><^l`.
+  The previous meanings can be obtained through `>=<%O x` and `><%O x`.
+
 
 ### Renamed
 
