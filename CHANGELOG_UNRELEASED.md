@@ -32,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssralg.v`, new lemma `sumr_const_nat` and `iter_addr_0`
 - in `ssrnum.v`, new lemma `ler_sum_nat`
 - in `ssrnum.v`, new lemmas `big_real`, `sum_real`, `prod_real`,
-  `max_real`, `min_real`, and `bigmax_real`, `bigmin_real`.
+  `max_real`, `min_real`, `bigmax_real`, and `bigmin_real`.
 - in `order.v`, new lemmas `comparable_bigl` and `comparable_bigr`.
 
 - in `seq.v`, new lemmas: `take_uniq`, `drop_uniq`
