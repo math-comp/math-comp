@@ -255,6 +255,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + Lemmas `mid_in_itv(|oo|cc)` have been generalized from `realFieldType` to
     `numFieldType`.
 
+- The `class_of` records of structures are turned into primitive records to
+  prevent prevent potential issues of ambiguous paths and convertibility of
+  structure instances.
+
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
