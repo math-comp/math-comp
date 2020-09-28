@@ -2666,6 +2666,9 @@ Proof. by rewrite -{1}(mulr1 a) -scale_scalar_mx detZ det1 mulr1. Qed.
 Lemma det_scalar1 a : \det (a%:M : 'M[R]_1) = a.
 Proof. exact: det_scalar. Qed.
 
+Lemma det_mx11  (M : 'M[R]_1) : \det M = M 0 0.
+Proof. by rewrite {1}[M]mx11_scalar det_scalar. Qed.
+
 Lemma det_mulmx n (A B : 'M[R]_n) : \det (A *m B) = \det A * \det B.
 Proof.
 rewrite big_distrl /=.
@@ -2820,8 +2823,8 @@ Proof. by rewrite -det_tr tr_block_mx trmx0 det_ublock !det_tr. Qed.
 Lemma det_trig n (A : 'M[R]_n) : is_trig_mx A -> \det A = \prod_(i < n) A i i.
 Proof.
 elim/trigsqmx_ind => [|k x c B Bt IHB]; first by rewrite ?big_ord0 ?det_mx00.
-rewrite det_lblock big_ord_recl [x]mx11_scalar det_scalar IHB//; congr (_ * _).
-  by rewrite -[ord0](lshift0 _ 0) block_mxEul mxE.
+rewrite det_lblock big_ord_recl det_mx11 IHB//; congr (_ * _).
+  by rewrite -[ord0](lshift0 _ 0) block_mxEul.
 by apply: eq_bigr => i; rewrite -!rshift1 block_mxEdr.
 Qed.
 
