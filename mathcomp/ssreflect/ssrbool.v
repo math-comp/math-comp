@@ -108,11 +108,8 @@ Local Notation "{ 'all1' P }" := (forall x, P x : Prop) (at level 0).
 Local Notation "{ 'all2' P }" := (forall x y, P x y : Prop) (at level 0).
 
 Variables T1 T2 T3 : predArgType.
-Variables (D1 D1' : {pred T1}) (D2 : {pred T2}) (D3 : {pred T3}).
-Variables (d1 d1' : mem_pred T1) (d2 d2' : mem_pred T2) (d3 d3' : mem_pred T3).
-Variables (f f' : T1 -> T2) (g : T2 -> T1) (h : T3).
-Variables (P1 : T1 -> Prop) (P2 : T1 -> T2 -> Prop).
-Variable P3 : T1 -> T2 -> T3 -> Prop.
+Variables (D1 : {pred T1}) (D2 : {pred T2}).
+Variables (f : T1 -> T2) (h : T3).
 Variable Q1 : (T1 -> T2) -> T1 -> Prop.
 Variable Q1l : (T1 -> T2) -> T3 -> T1 -> Prop.
 Variable Q2 : (T1 -> T2) -> T1 -> T1 -> Prop.
@@ -352,4 +349,3 @@ Proof. by case: b => // /(_ isT). Qed.
 Lemma contra_notF P b : (b -> P) -> ~ P -> b = false.
 Proof. by case: b => // /(_ isT). Qed.
 End Contra.
-
