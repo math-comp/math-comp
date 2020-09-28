@@ -80,11 +80,11 @@ From mathcomp Require Import ssralg poly.
 (*   [rcfType of T for S]                                                     *)
 (*                  == T-clone of the realClosedFieldType structure S.        *)
 (*                                                                            *)
-(* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _, >=<,    *)
-(* and ><) and lattice operations (meet and join) defined in order.v are      *)
-(* redefined for the ring_display in the ring_scope (%R). 0-ary ordering      *)
-(* symbols for the ring_display have the suffix "%R", e.g., <%R. All the      *)
-(* other ordering notations are the same as order.v.                          *)
+(* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _,         *)
+(* _ < _ ?<= if _, >=<, and ><) and lattice operations (meet and join)        *)
+(* defined in order.v are redefined for the ring_display in the ring_scope    *)
+(* (%R). 0-ary ordering symbols for the ring_display have the suffix "%R",    *)
+(* e.g., <%R. All the other ordering notations are the same as order.v.       *)
 (*                                                                            *)
 (* Over these structures, we have the following operations                    *)
 (*             `|x| == norm of x.                                             *)
@@ -387,6 +387,9 @@ Notation "@ 'gtr' R" := (@Order.gt ring_display R)
 Notation lerif := (@Order.leif ring_display _) (only parsing).
 Notation "@ 'lerif' R" := (@Order.leif ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
+Notation lterif := (@Order.lteif ring_display _) (only parsing).
+Notation "@ 'lteif' R" := (@Order.lteif ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
 Notation comparabler := (@Order.comparable ring_display _) (only parsing).
 Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
@@ -416,6 +419,7 @@ Notation lt := ltr (only parsing).
 Notation ge := ger (only parsing).
 Notation gt := gtr (only parsing).
 Notation leif := lerif (only parsing).
+Notation lteif := lterif (only parsing).
 Notation comparable := comparabler (only parsing).
 Notation sg := sgr.
 Notation max := maxr.
@@ -448,6 +452,7 @@ Notation ">=%R" := ge : fun_scope.
 Notation "<%R" := lt : fun_scope.
 Notation ">%R" := gt : fun_scope.
 Notation "<?=%R" := leif : fun_scope.
+Notation "<?<=%R" := lteif : fun_scope.
 Notation ">=<%R" := comparable : fun_scope.
 Notation "><%R" := (fun x y => ~~ (comparable x y)) : fun_scope.
 
@@ -481,6 +486,10 @@ Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
 
 Notation "x <= y ?= 'iff' C" := (lerif x y C) : ring_scope.
 Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
+  (only parsing) : ring_scope.
+
+Notation "x < y ?<= 'if' C" := (lterif x y C) : ring_scope.
+Notation "x < y ?<= 'if' C :> R" := ((x : R) < (y : R) ?<= if C)
   (only parsing) : ring_scope.
 
 Notation ">=< x" := (comparable x) : ring_scope.
@@ -3313,6 +3322,94 @@ congr (leif _ _ _): (leif_pmul Ei_ge0 m1ge0 (leE12 i Pi) le_m12).
 by rewrite mulf_eq0 -!orbA; congr (_ || _); rewrite !orb_andr orbA orbb.
 Qed.
 
+(* lteif *)
+
+Lemma subr_lteifr0 C x y : (y - x < 0 ?<= if C) = (y < x ?<= if C).
+Proof. by case: C => /=; rewrite subr_lte0. Qed.
+
+Lemma subr_lteif0r C x y : (0 < y - x ?<= if C) = (x < y ?<= if C).
+Proof. by case: C => /=; rewrite subr_gte0. Qed.
+
+Definition subr_lteif0 := (subr_lteifr0, subr_lteif0r).
+
+Lemma lteif01 C : 0 < 1 ?<= if C :> R.
+Proof. by case: C; rewrite /= lter01. Qed.
+
+Lemma lteif_oppl C x y : - x < y ?<= if C = (- y < x ?<= if C).
+Proof. by case: C; rewrite /= lter_oppl. Qed.
+
+Lemma lteif_oppr C x y : x < - y ?<= if C = (y < - x ?<= if C).
+Proof. by case: C; rewrite /= lter_oppr. Qed.
+
+Lemma lteif_0oppr C x : 0 < - x ?<= if C = (x < 0 ?<= if C).
+Proof. by case: C; rewrite /= (oppr_ge0, oppr_gt0). Qed.
+
+Lemma lteif_oppr0 C x : - x < 0 ?<= if C = (0 < x ?<= if C).
+Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
+
+Lemma lteif_opp2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
+Proof. by case: C => ? ?; rewrite /= lter_opp2. Qed.
+
+Definition lteif_oppE := (lteif_0oppr, lteif_oppr0, lteif_opp2).
+
+Lemma lteif_add2l C x : {mono +%R x : y z / y < z ?<= if C}.
+Proof. by case: C => ? ?; rewrite /= lter_add2. Qed.
+
+Lemma lteif_add2r C x : {mono +%R^~ x : y z / y < z ?<= if C}.
+Proof. by case: C => ? ?; rewrite /= lter_add2. Qed.
+
+Definition lteif_add2 := (lteif_add2l, lteif_add2r).
+
+Lemma lteif_subl_addr C x y z : (x - y < z ?<= if C) = (x < z + y ?<= if C).
+Proof. by case: C; rewrite /= lter_sub_addr. Qed.
+
+Lemma lteif_subr_addr C x y z : (x < y - z ?<= if C) = (x + z < y ?<= if C).
+Proof. by case: C; rewrite /= lter_sub_addr. Qed.
+
+Definition lteif_sub_addr := (lteif_subl_addr, lteif_subr_addr).
+
+Lemma lteif_subl_addl C x y z : (x - y < z ?<= if C) = (x < y + z ?<= if C).
+Proof. by case: C; rewrite /= lter_sub_addl. Qed.
+
+Lemma lteif_subr_addl C x y z : (x < y - z ?<= if C) = (z + x < y ?<= if C).
+Proof. by case: C; rewrite /= lter_sub_addl. Qed.
+
+Definition lteif_sub_addl := (lteif_subl_addl, lteif_subr_addl).
+
+Lemma lteif_pmul2l C x : 0 < x -> {mono *%R x : y z / y < z ?<= if C}.
+Proof. by case: C => ? ? ?; rewrite /= lter_pmul2l. Qed.
+
+Lemma lteif_pmul2r C x : 0 < x -> {mono *%R^~ x : y z / y < z ?<= if C}.
+Proof. by case: C => ? ? ?; rewrite /= lter_pmul2r. Qed.
+
+Lemma lteif_nmul2l C x : x < 0 -> {mono *%R x : y z /~ y < z ?<= if C}.
+Proof. by case: C => ? ? ?; rewrite /= lter_nmul2l. Qed.
+
+Lemma lteif_nmul2r C x : x < 0 -> {mono *%R^~ x : y z /~ y < z ?<= if C}.
+Proof. by case: C => ? ? ?; rewrite /= lter_nmul2r. Qed.
+
+Lemma lteif_nnormr C x y : y < 0 ?<= if ~~ C -> (`|x| < y ?<= if C) = false.
+Proof. by case: C => ?; rewrite /= lter_nnormr. Qed.
+
+Lemma real_lteifNE x y C : x \is Num.real -> y \is Num.real ->
+  x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Proof. by move=> ? ?; rewrite comparable_lteifNE ?real_comparable. Qed.
+
+Lemma real_lteif_norml C x y :
+  x \is Num.real ->
+  (`|x| < y ?<= if C) = ((- y < x ?<= if C) && (x < y ?<= if C)).
+Proof. by case: C => ?; rewrite /= real_lter_norml. Qed.
+
+Lemma real_lteif_normr C x y :
+  y \is Num.real ->
+  (x < `|y| ?<= if C) = ((x < y ?<= if C) || (x < - y ?<= if C)).
+Proof. by case: C => ?; rewrite /= real_lter_normr. Qed.
+
+Lemma real_lteif_distl C x y e :
+  x - y \is real ->
+  (`|x - y| < e ?<= if C) = (y - e < x ?<= if C) && (x < y + e ?<= if C).
+Proof. by case: C => /= ?; rewrite real_lter_distl. Qed.
+
 (* Mean inequalities. *)
 
 Lemma real_leif_mean_square_scaled x y :
@@ -3621,17 +3718,51 @@ Proof. by rewrite !(fun_if GRing.inv) !(invr0, invrN, invr1). Qed.
 Lemma sgrV x : sgr x^-1 = sgr x.
 Proof. by rewrite /sgr invr_eq0 invr_lt0. Qed.
 
+(* lteif *)
+
+Lemma lteif_pdivl_mulr C z x y :
+  0 < z -> x < y / z ?<= if C = (x * z < y ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_pdivl_mulr. Qed.
+
+Lemma lteif_pdivr_mulr C z x y :
+  0 < z -> y / z < x ?<= if C = (y < x * z ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_pdivr_mulr. Qed.
+
+Lemma lteif_pdivl_mull C z x y :
+  0 < z -> x < z^-1 * y ?<= if C = (z * x < y ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_pdivl_mull. Qed.
+
+Lemma lteif_pdivr_mull C z x y :
+  0 < z -> z^-1 * y < x ?<= if C = (y < z * x ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_pdivr_mull. Qed.
+
+Lemma lteif_ndivl_mulr C z x y :
+  z < 0 -> x < y / z ?<= if C = (y < x * z ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_ndivl_mulr. Qed.
+
+Lemma lteif_ndivr_mulr C z x y :
+  z < 0 -> y / z < x ?<= if C = (x * z < y ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_ndivr_mulr. Qed.
+
+Lemma lteif_ndivl_mull C z x y :
+  z < 0 -> x < z^-1 * y ?<= if C = (y < z * x ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_ndivl_mull. Qed.
+
+Lemma lteif_ndivr_mull C z x y :
+  z < 0 -> z^-1 * y < x ?<= if C = (z * x < y ?<= if C).
+Proof. by case: C => ? /=; rewrite lter_ndivr_mull. Qed.
+
 (* Interval midpoint. *)
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
-Lemma midf_le x y : x <= y -> (x <= mid x y) * (mid x y  <= y).
+Lemma midf_le x y : x <= y -> (x <= mid x y) * (mid x y <= y).
 Proof.
 move=> lexy; rewrite ler_pdivl_mulr ?ler_pdivr_mulr ?ltr0Sn //.
 by rewrite !mulrDr !mulr1 ler_add2r ler_add2l.
 Qed.
 
-Lemma midf_lt x y : x < y -> (x < mid x y) * (mid x y  < y).
+Lemma midf_lt x y : x < y -> (x < mid x y) * (mid x y < y).
 Proof.
 move=> ltxy; rewrite ltr_pdivl_mulr ?ltr_pdivr_mulr ?ltr0Sn //.
 by rewrite !mulrDr !mulr1 ltr_add2r ltr_add2l.
@@ -3968,6 +4099,20 @@ Proof. by move=> even_n; rewrite real_exprn_odd_le0 ?num_real. Qed.
 
 Lemma exprn_odd_lt0 n x : odd n -> (x ^+ n < 0) = (x < 0).
 Proof. by move=> even_n; rewrite real_exprn_odd_lt0 ?num_real. Qed.
+
+(* lteif *)
+
+Lemma lteif_norml C x y :
+  (`|x| < y ?<= if C) = (- y < x ?<= if C) && (x < y ?<= if C).
+Proof. by case: C; rewrite /= lter_norml. Qed.
+
+Lemma lteif_normr C x y :
+  (x < `|y| ?<= if C) = (x < y ?<= if C) || (x < - y ?<= if C).
+Proof. by case: C; rewrite /= lter_normr. Qed.
+
+Lemma lteif_distl C x y e :
+  (`|x - y| < e ?<= if C) = (y - e < x ?<= if C) && (x < y + e ?<= if C).
+Proof. by case: C; rewrite /= lter_distl. Qed.
 
 (* Special lemmas for squares. *)
 
