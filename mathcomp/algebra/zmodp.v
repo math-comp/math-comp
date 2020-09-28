@@ -181,8 +181,10 @@ Arguments Zp1 {p'}.
 Arguments inZp {p'} i.
 Arguments valZpK {p'} x.
 
+(* We redefine fintype.ord1 to specialize it with 0 instead of ord0 *)
+(* since 'I_n is now canonically a zmodType  *)
 Lemma ord1 : all_equal_to (0 : 'I_1).
-Proof. by case=> [[] // ?]; apply: val_inj. Qed.
+Proof. exact: ord1. Qed.
 
 Lemma lshift0 m n : lshift m (0 : 'I_n.+1) = (0 : 'I_(n + m).+1).
 Proof. exact: val_inj. Qed.
