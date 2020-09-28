@@ -1878,6 +1878,9 @@ Proof. by rewrite -[0]subr0 raddfB subrr. Qed.
 Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
 Proof. by move=> /inj_eq <-; rewrite raddf0. Qed.
 
+Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
+Proof. by move=> fI x y eqxy; apply/subr0_eq/fI; rewrite raddfB eqxy subrr. Qed.
+
 Lemma raddfN : {morph f : x / - x}.
 Proof. by move=> x /=; rewrite -sub0r raddfB raddf0 sub0r. Qed.
 
@@ -4933,10 +4936,7 @@ by rewrite -rmorphM mulVf // mulr0 rmorph1 ?oner_eq0.
 Qed.
 
 Lemma fmorph_inj : injective f.
-Proof.
-move=> x y eqfxy; apply/eqP; rewrite -subr_eq0 -fmorph_eq0 rmorphB //.
-by rewrite eqfxy subrr.
-Qed.
+Proof. by apply/raddf_inj => x /eqP; rewrite fmorph_eq0 => /eqP. Qed.
 
 Lemma fmorph_eq1 x : (f x == 1) = (x == 1).
 Proof. by rewrite -(inj_eq fmorph_inj) rmorph1. Qed.
@@ -5899,6 +5899,7 @@ Definition size_sol := size_sol.
 Definition solve_monicpoly := solve_monicpoly.
 Definition raddf0 := raddf0.
 Definition raddf_eq0 := raddf_eq0.
+Definition raddf_inj := raddf_inj.
 Definition raddfN := raddfN.
 Definition raddfD := raddfD.
 Definition raddfB := raddfB.

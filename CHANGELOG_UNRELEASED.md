@@ -137,6 +137,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   dual lattices.
 
 - in `matrix.v` new lemma `det_mx11`.
+- in `ssralg.v`, new lemma `raddf_inj`, characterizing injectivity for
+  additive maps.
+- in `mxalgebra.v`, new lemma `row_free_injr` which duplicates
+  `row_free_inj` but exposing `mulmxr` for compositionality purposes
+  (e.g. with `raddf_eq0`), and lemma `inj_row_free` characterizing
+  `row_free` matrices `A`  through `v *m A = 0 -> v = 0` for all `v`.
+
 
 ### Changed
 

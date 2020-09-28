@@ -686,6 +686,11 @@ case/row_freeP=> A' AK; apply: can_inj (mulmx^~ A') _ => B.
 by rewrite -mulmxA AK mulmx1.
 Qed.
 
+(* A variant of row_free_inj that exposes mulmxr, an alias for mulmx^~ *)
+(* but which is canonically additive *)
+Definition row_free_injr m n p A : row_free A -> injective (@mulmxr A) :=
+  @row_free_inj m n p A.
+
 Lemma row_free_unit n (A : 'M_n) : row_free A = (A \in unitmx).
 Proof.
 apply/row_fullP/idP=> [[A'] | uA]; first by case/mulmx1_unit.
@@ -1221,6 +1226,13 @@ Proof. by apply/eqmxP; rewrite submx1/= sub_kermx mulmx0. Qed.
 Lemma mulmx_free_eq0 m n p (A : 'M_(m, n)) (B : 'M_(n, p)) :
   row_free B -> (A *m B == 0) = (A == 0).
 Proof. by rewrite -sub_kermx -kermx_eq0 => /eqP->; rewrite submx0. Qed.
+
+Lemma inj_row_free m n (A : 'M_(m, n)) :
+  (forall v : 'rV_m, v *m A = 0 -> v = 0) -> row_free A.
+Proof.
+move=> Ainj; rewrite -kermx_eq0; apply/eqP/row_matrixP => i.
+by rewrite row0; apply/Ainj; rewrite -row_mul mulmx_ker row0.
+Qed.
 
 Lemma mulmx0_rank_max m n p (A : 'M_(m, n)) (B : 'M_(n, p)) :
   A *m B = 0 -> \rank A + \rank B <= n.
