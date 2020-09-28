@@ -940,6 +940,9 @@ Proof. by rewrite disjoints_subset -setD_eq0 setDE setCK. Qed.
 Lemma disjoint_setI0 A B : [disjoint A & B] -> A :&: B = set0.
 Proof. by rewrite -setI_eq0; move/eqP. Qed.
 
+Lemma disjoints1 A x : [disjoint [set x] & A] = (x \notin A).
+Proof. by rewrite (@eq_disjoint1 _ x) // => y; rewrite !inE. Qed.
+
 Lemma subsetD1 A B x : (A \subset B :\ x) = (A \subset B) && (x \notin A).
 Proof. by rewrite setDE subsetI subsetC sub1set inE. Qed.
 

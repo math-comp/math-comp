@@ -461,7 +461,7 @@ Section OpsTheory.
 
 Variable T : finType.
 
-Implicit Types (A B C : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
+Implicit Types (A B C D: {pred T}) (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma enumP : Finite.axiom (Finite.enum T).
 Proof. by rewrite unlock; case T => ? [? []]. Qed.
@@ -848,9 +848,24 @@ Proof.
 by rewrite subset_disjoint; apply: eq_disjoint_r => x; rewrite !inE /= negbK.
 Qed.
 
-Lemma disjoint_trans A B C :
+Lemma disjointFr A B x : [disjoint A & B] -> x \in A -> x \in B = false.
+Proof. by move/pred0P/(_ x) => /=; case: (x \in A). Qed.
+
+Lemma disjointFl A B x : [disjoint A & B] -> x \in B -> x \in A = false.
+Proof. rewrite disjoint_sym; exact: disjointFr. Qed.
+
+Lemma disjointWl A B C :
    A \subset B -> [disjoint B & C] -> [disjoint A & C].
 Proof. by rewrite 2!disjoint_subset; apply: subset_trans. Qed.
+
+Lemma disjointWr A B C : A \subset B -> [disjoint C & B] -> [disjoint C & A].
+Proof. rewrite ![[disjoint C & _]]disjoint_sym. exact:disjointWl. Qed.
+
+Lemma disjointW A B C D :
+  A \subset B -> C \subset D -> [disjoint B & D] -> [disjoint A & C].
+Proof.
+by move=> subAB subCD BD; apply/(disjointWl subAB)/(disjointWr subCD).
+Qed.
 
 Lemma disjoint0 A : [disjoint pred0 & A].
 Proof. exact/pred0P. Qed.
@@ -888,9 +903,8 @@ Proof. exact: disjointU1. Qed.
 
 Lemma disjoint_has s A : [disjoint s & A] = ~~ has (mem A) s.
 Proof.
-rewrite -(@eq_has _ (mem (enum A))) => [|x]; last exact: mem_enum.
-rewrite has_sym has_filter -filter_predI -has_filter has_count -eqn0Ngt.
-by rewrite -size_filter /disjoint /pred0b unlock.
+apply/negbRL; apply/pred0Pn/hasP => [[x /andP[]]|[x]]; exists x => //.
+exact/andP.
 Qed.
 
 Lemma disjoint_cat s1 s2 A :
@@ -898,6 +912,9 @@ Lemma disjoint_cat s1 s2 A :
 Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
+
+Notation disjoint_trans := 
+  (deprecate disjoint_trans disjointWl _ _ _ _) (only parsing).
 
 Hint Resolve subxx_hint : core.
 

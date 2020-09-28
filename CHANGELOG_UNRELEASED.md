@@ -135,6 +135,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `eqtype.v` new lemmas `contra_not_neq`, `contra_eq_not`.
 - in `order.v`, new notations `0^d` and `1^d` for bottom and top elements of
   dual lattices.
+- in `finset.v` new lemma `disjoints1`
+- in `fintype.v` new lemmas: `disjointFr`, `disjointFl`, `disjointWr`, `disjointW`
 
 - in `interval.v`:
   + Intervals and their bounds of `T` now have canonical ordered type instances
@@ -190,6 +192,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `order.v`, `\join^d_` and `\meet^d_` notations are now properly specialized
   for `dual_display`.
+- in `fintype.v`, rename `disjoint_trans` to `disjointWl`
 
 - in `interval.v`:
   + `x <= y ?< if c` (`lersif`) has been generalized to `porderType`, relocated
