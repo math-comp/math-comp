@@ -325,7 +325,7 @@ Lemma qacts_coset (H K : {group rT}) :
 Proof.
 move=> sHD aK.
 apply/subsetP=> x qdx; rewrite inE qdx inE; apply/subsetP=> y.
-case/morphimP=> z Nz Kz /= e; rewrite e inE qactE // mem_imset // inE.
+case/morphimP=> z Nz Kz /= e; rewrite e inE qactE // imset_f // inE.
 move/gactsP: aK; move/(_ x (subsetP (qact_dom_doms sHD) _ qdx) z); rewrite Kz.
 move->; move/acts_act: (acts_qact_dom to H); move/(_ x qdx z).
 by rewrite Nz andbT.

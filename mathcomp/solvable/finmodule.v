@@ -462,8 +462,8 @@ apply: (addrI (\sum_(Hx in HG) fmalpha (repr Hx * (rX Hx)^-1))).
 rewrite {1}(reindex_acts 'Rs _ Gg) ?actsRs_rcosets // -!big_split /=.
 apply: eq_bigr => _ /rcosetsP[x Gx ->]; rewrite !rcosetE -!rcosetM.
 case: repr_rcosetP => h1 Hh1; case: repr_rcosetP => h2 Hh2.
-have: H :* (x * g) \in rcosets H G by rewrite -rcosetE mem_imset ?groupM.
-have: H :* x \in rcosets H G by rewrite -rcosetE mem_imset.
+have: H :* (x * g) \in rcosets H G by rewrite -rcosetE imset_f ?groupM.
+have: H :* x \in rcosets H G by rewrite -rcosetE imset_f.
 case/mem_rX/rcosetP=> h3 Hh3 -> /mem_rX/rcosetP[h4 Hh4 ->].
 rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3) !(mulKVg, invMg).
 by rewrite addrC -!zmodMgE -!morphM ?groupM ?groupV // -!mulgA !mulKg.
@@ -512,12 +512,12 @@ Let sXG : {subset X <= G}. Proof. exact/subsetP/(transversal_sub trX). Qed.
 Lemma rcosets_cycle_transversal : H_g_rcosets @: X = HGg.
 Proof.
 have sHXgHGg x: x \in X -> H_g_rcosets x \in HGg.
-  by move/sXG=> Gx; apply: mem_imset; rewrite -rcosetE mem_imset.
+  by move/sXG=> Gx; apply: imset_f; rewrite -rcosetE imset_f.
 apply/setP=> Hxg; apply/imsetP/idP=> [[x /sHXgHGg HGgHxg -> //] | HGgHxg].
 have [_ /rcosetsP[z Gz ->] ->] := imsetP HGgHxg.
 pose Hzg := H :* z * <[g]>; pose x := transversal_repr 1 X Hzg.
 have HGgHzg: Hzg \in HG :* <[g]>.
-  by rewrite mem_mulg ?set11 // -rcosetE mem_imset.
+  by rewrite mem_mulg ?set11 // -rcosetE imset_f.
 have Hzg_x: x \in Hzg by rewrite (repr_mem_pblock trX).
 exists x; first by rewrite (repr_mem_transversal trX).
 case/mulsgP: Hzg_x => y u /rcoset_eqP <- /(orbit_act 'Rs) <- -> /=.
@@ -567,7 +567,7 @@ have trY: is_transversal Y HG G.
   have eq_xx': x = x'.
     apply: (pblock_inj trX) => //; have /andP[/and3P[_ tiX _] _] := trX.
     have HGgHyg: H :* y * <[g]> \in HG :* <[g]>.
-      by rewrite mem_mulg ?set11 // -rcosetE mem_imset ?(subsetP sYG).
+      by rewrite mem_mulg ?set11 // -rcosetE imset_f ?(subsetP sYG).
     rewrite !(def_pblock tiX HGgHyg) //.
       by rewrite -[x'](mulgK (g ^+ j)) mem_mulg // groupV mem_cycle.
     by rewrite -[x](mulgK (g ^+ i)) mem_mulg ?rcoset_refl // groupV mem_cycle.
@@ -578,7 +578,7 @@ have rYE x i : x \in X -> i < n_ x -> rY (H :* x :* g ^+ i) = x * g ^+ i.
   move=> Xx lt_i_x; rewrite -rcosetM; apply: (canLR_in (pblockK trY 1)).
     by apply/bigcupP; exists x => //; apply/imsetP; exists (Ordinal lt_i_x).
   apply/esym/def_pblock; last exact: rcoset_refl; first by case/and3P: partHG.
-  by rewrite -rcosetE mem_imset ?groupM ?groupX // sXG.
+  by rewrite -rcosetE imset_f ?groupM ?groupX // sXG.
 rewrite (transfer_indep trY Gg) /V -/rY (set_partition_big _ partHGg) /=.
 rewrite -defHgX big_imset /=; last first.
   apply/imset_injP; rewrite defHgX (card_transversal trX) defHGg.

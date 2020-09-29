@@ -1369,7 +1369,7 @@ move=> sAH sBK; rewrite [f @* _]morphimEsub /=; last first.
   by rewrite norm_joinEr // mulgSS.
 apply/setP=> y; apply/imsetP/idP=> [[_ /mulsgP[x a Ax Ba ->] ->{y}] |].
   have Hx := subsetP sAH x Ax; have Ka := subsetP sBK a Ba.
-  by rewrite pprodmE // mem_imset2 ?mem_morphim.
+  by rewrite pprodmE // imset2_f ?mem_morphim.
 case/mulsgP=> _ _ /morphimP[x Hx Ax ->] /morphimP[a Ka Ba ->] ->{y}.
 by exists (x * a); rewrite ?mem_mulg ?pprodmE.
 Qed.
@@ -1391,7 +1391,7 @@ apply/andP/imset2P=> [[/mulsgP[x a Hx Ka ->{y}]]|[x a Hx]].
   rewrite pprodmE // => fxa1.
   by exists x a^-1; rewrite ?invgK // inE groupVr ?morphV // eq_mulgV1 invgK.
 case/setIdP=> Kx /eqP fx ->{y}.
-by rewrite mem_imset2 ?pprodmE ?groupV ?morphV // fx mulgV.
+by rewrite imset2_f ?pprodmE ?groupV ?morphV // fx mulgV.
 Qed.
 
 Lemma injm_pprodm :

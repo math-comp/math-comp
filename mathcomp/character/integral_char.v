@@ -465,9 +465,9 @@ transitivity ('chi_i x * 'chi_i (x^-1)%g *+ #|h x|); last first.
       by rewrite mulf_neq0 // lin_char_neq0 /= ?cfcenter_fful_irr.
     rewrite -[z](mulKg u) -cGz // -conjMg /h classGidl {u Gu}//.
     apply/eqP/setP=> w; apply/mulsgP/mulsgP=> [][_ z1 /imsetP[v Gv ->] Zz1 ->].
-      exists (x ^ v)%g (z * z1)%g; rewrite ?mem_imset ?groupM //.
+      exists (x ^ v)%g (z * z1)%g; rewrite ?imset_f ?groupM //.
       by rewrite conjMg -mulgA /(z ^ v)%g cGz // mulKg.
-    exists ((x * z) ^ v)%g (z^-1 * z1)%g; rewrite ?mem_imset ?groupM ?groupV //.
+    exists ((x * z) ^ v)%g (z^-1 * z1)%g; rewrite ?imset_f ?groupM ?groupV //.
     by rewrite conjMg -mulgA /(z ^ v)%g cGz // mulKg mulKVg.
   rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -exprMn.
   by rewrite (normC_lin_char lin_lambda) ?mulr1 //= cfcenter_fful_irr.

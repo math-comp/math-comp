@@ -1142,7 +1142,7 @@ Proof. by rewrite conjDg conjs1g. Qed.
 (* Classes; not much for now. *)
 
 Lemma memJ_class x y A : y \in A -> x ^ y \in x ^: A.
-Proof. exact: mem_imset. Qed.
+Proof. exact: imset_f. Qed.
 
 Lemma classS x A B : A \subset B -> x ^: A \subset x ^: B.
 Proof. exact: imsetS. Qed.
@@ -1164,18 +1164,18 @@ by rewrite -[xy]invgK def_xy -conjVg; exists y.
 Qed.
 
 Lemma mem_classes x A : x \in A -> x ^: A \in classes A.
-Proof. exact: mem_imset. Qed.
+Proof. exact: imset_f. Qed.
 
 Lemma memJ_class_support A B x y :
    x \in A -> y \in B -> x ^ y \in class_support A B.
-Proof. by move=> Ax By; apply: mem_imset2. Qed.
+Proof. by move=> Ax By; apply: imset2_f. Qed.
 
 Lemma class_supportM A B C :
   class_support A (B * C) = class_support (class_support A B) C.
 Proof.
 apply/setP=> x; apply/imset2P/imset2P=> [[a y Aa] | [y c]].
   case/mulsgP=> b c Bb Cc -> ->{x y}.
-  by exists (a ^ b) c; rewrite ?(mem_imset2, conjgM).
+  by exists (a ^ b) c; rewrite ?(imset2_f, conjgM).
 case/imset2P=> a b Aa Bb -> Cc ->{x y}.
 by exists a (b * c); rewrite ?(mem_mulg, conjgM).
 Qed.
@@ -1376,7 +1376,7 @@ Proof. by rewrite lt0n; apply/existsP; exists (1 : gT). Qed.
 Lemma indexg_gt0 A : 0 < #|G : A|.
 Proof.
 rewrite lt0n; apply/existsP; exists A.
-by rewrite -{2}[A]mulg1 -rcosetE; apply: mem_imset.
+by rewrite -{2}[A]mulg1 -rcosetE; apply: imset_f.
 Qed.
 
 Lemma trivgP : reflect (G :=: 1) (G \subset [1]).
@@ -1677,7 +1677,7 @@ Proof.
 rewrite (cardsD1 1) classes1 ltnS lt0n cards_eq0.
 apply/set0Pn/trivgPn=> [[xG /setD1P[nt_xG]] | [x Gx ntx]].
   by case/imsetP=> x Gx def_xG; rewrite def_xG classG_eq1 in nt_xG; exists x.
-by exists (x ^: G); rewrite !inE classG_eq1 ntx; apply: mem_imset.
+by exists (x ^: G); rewrite !inE classG_eq1 ntx; apply: imset_f.
 Qed.
 
 Lemma mem_class_support A x : x \in A -> x \in class_support A G.
@@ -2326,7 +2326,7 @@ by apply: eq_bigr => i _; rewrite genGidG.
 Qed.
 
 Lemma mem_commg A B x y : x \in A -> y \in B -> [~ x, y] \in [~: A, B].
-Proof. by move=> Ax By; rewrite mem_gen ?mem_imset2. Qed.
+Proof. by move=> Ax By; rewrite mem_gen ?imset2_f. Qed.
 
 Lemma commSg A B C : A \subset B -> [~: A, C] \subset [~: B, C].
 Proof. by move=> sAC; rewrite genS ?imset2S. Qed.

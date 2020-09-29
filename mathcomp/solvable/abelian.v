@@ -1153,7 +1153,7 @@ Proof.
 rewrite morphim_gen ?genS //; last by rewrite -gen_subG Ohm_sub.
 apply/subsetP=> fx /morphimP[x Gx]; rewrite inE Gx /=.
 case/OhmPredP=> p p_pr xpn_1 -> {fx}.
-rewrite inE morphimEdom mem_imset //=; apply/OhmPredP; exists p => //.
+rewrite inE morphimEdom imset_f //=; apply/OhmPredP; exists p => //.
 by rewrite -morphX // xpn_1 morph1.
 Qed.
 
@@ -1251,7 +1251,7 @@ move=> pG; apply/eqP; rewrite eqEsubset !gen_subG; apply/andP.
 do [split; apply/subsetP=> xpn; case/imsetP=> x] => [|Gx ->]; last first.
   by rewrite Mho_p_elt ?(mem_p_elt pG).
 case/setIdP=> Gx _ ->; have [-> | ntx] := eqVneq x 1; first by rewrite expg1n.
-by rewrite (pdiv_p_elt (mem_p_elt pG Gx) ntx) mem_gen //; apply: mem_imset.
+by rewrite (pdiv_p_elt (mem_p_elt pG Gx) ntx) mem_gen //; apply: imset_f.
 Qed.
 
 Lemma MhoEabelian p G :
@@ -1260,7 +1260,7 @@ Proof.
 move=> pG cGG; rewrite (MhoE pG); rewrite gen_set_id //; apply/group_setP.
 split=> [|xn yn]; first by apply/imsetP; exists 1; rewrite ?expg1n.
 case/imsetP=> x Gx ->; case/imsetP=> y Gy ->.
-by rewrite -expgMn; [apply: mem_imset; rewrite groupM | apply: (centsP cGG)].
+by rewrite -expgMn; [apply: imset_f; rewrite groupM | apply: (centsP cGG)].
 Qed.
 
 Lemma trivg_Mho G : 'Mho^n(G) == 1 -> 'Ohm_n(G) == G.
@@ -1269,7 +1269,7 @@ rewrite -subG1 gen_subG eqEsubset Ohm_sub /= => Gp1.
 rewrite -{1}(Sylow_gen G) genS //; apply/bigcupsP=> P.
 case/SylowP=> p p_pr /and3P[sPG pP _]; apply/subsetP=> x Px.
 have Gx := subsetP sPG x Px; rewrite inE Gx //=.
-rewrite (sameP eqP set1P) (subsetP Gp1) ?mem_gen //; apply: mem_imset.
+rewrite (sameP eqP set1P) (subsetP Gp1) ?mem_gen //; apply: imset_f.
 by rewrite inE Gx; apply: pgroup_p (mem_p_elt pP Px).
 Qed.
 
@@ -1277,7 +1277,7 @@ Lemma Mho_p_cycle p x : p.-elt x -> 'Mho^n(<[x]>) = <[x ^+ (p ^ n)]>.
 Proof.
 move=> p_x.
 apply/eqP; rewrite (MhoE p_x) eqEsubset cycle_subG mem_gen; last first.
-  by apply: mem_imset; apply: cycle_id.
+  by apply: imset_f; apply: cycle_id.
 rewrite gen_subG andbT; apply/subsetP=> _ /imsetP[_ /cycleP[k ->] ->].
 by rewrite -expgM mulnC expgM mem_cycle.
 Qed.

@@ -134,7 +134,7 @@ Proof.
 move=> x y /=; wlog Ay: x y / y \in A.
   by move=> IH eqfxy; case: ifP (eqfxy); [symmetry | case: ifP => //]; auto.
 rewrite Ay; case: ifP => [Ax | nAx def_x]; first exact: injf.
-by case/negP: nAx; rewrite def_x (subsetP sBf) ?mem_imset.
+by case/negP: nAx; rewrite def_x (subsetP sBf) ?imset_f.
 Qed.
 
 Definition perm_in := perm perm_in_inj.

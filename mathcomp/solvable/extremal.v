@@ -792,7 +792,7 @@ have defK: K = [set w].
   rewrite add0n -[j./2]odd_double_half addnC doubleD -!muln2 -mulnA.
   rewrite -(expg_mod_order v) ov modnMDl; case: (odd _); last first.
     right; rewrite mulg1 /r -(subnKC n_gt2) expnSr mulnA expgM.
-    by apply: mem_imset; rewrite inE.
+    by apply: imset_f; rewrite inE.
   rewrite (inj_eq (mulIg _)) -expg_mod_order ou -[k]odd_double_half.
   rewrite addnC -muln2 mulnDl -mulnA def2r modnMDl -ou expg_mod_order.
   case: (odd k); [left | right]; rewrite ?mul1n ?mul1g //.
@@ -996,7 +996,7 @@ have defG': G^`(1) = <[x ^+ 2]>.
   by rewrite -def2q -def2r mulnA mulnK.
 have defG1: 'Mho^1(G) = <[x ^+ 2]>.
   apply/eqP; rewrite (MhoE _ pG) eqEsubset !gen_subG sub1set andbC.
-  rewrite mem_gen; last exact: mem_imset.
+  rewrite mem_gen; last exact: imset_f.
   apply/subsetP=> z2; case/imsetP=> z Gz ->{z2}.
   case Xz: (z \in X); last by rewrite -{1}(oX' z) ?expg_order ?group1 // inE Xz.
   by case/cycleP: Xz => i ->; rewrite expgAC mem_cycle.
@@ -1195,7 +1195,7 @@ have defG': G^`(1) = <[x ^+ 2]>.
   by rewrite -def2q -def2r mulnA mulnK.
 have defG1: 'Mho^1(G) = <[x ^+ 2]>.
   apply/eqP; rewrite (MhoE _ pG) eqEsubset !gen_subG sub1set andbC.
-  rewrite mem_gen; last exact: mem_imset.
+  rewrite mem_gen; last exact: imset_f.
   apply/subsetP=> z2; case/imsetP=> z Gz ->{z2}.
   case Xz: (z \in X).
     by case/cycleP: Xz => i ->; rewrite -expgM mulnC expgM mem_cycle.
@@ -1373,7 +1373,7 @@ have defG': G^`(1) = <[x ^+ 2]>.
   by rewrite -def2q -def2r mulnA mulnK.
 have defG1: 'Mho^1(G) = <[x ^+ 2]>.
   apply/eqP; rewrite (MhoE _ pG) eqEsubset !gen_subG sub1set andbC.
-  rewrite mem_gen; last exact: mem_imset.
+  rewrite mem_gen; last exact: imset_f.
   apply/subsetP=> z2; case/imsetP=> z Gz ->{z2}.
   case Xz: (z \in X).
     by case/cycleP: Xz => i ->; rewrite -expgM mulnC expgM mem_cycle.

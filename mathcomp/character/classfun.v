@@ -2355,7 +2355,7 @@ Proof.
 have [[injg defR] [injh defS]] := (isomP isoG, isomP isoH).
 rewrite !morphimEdom in defS defR; apply/cfun_inP=> s.
 rewrite -{1}defS => /imsetP[x Hx ->] {s}; have Gx := subsetP sHG x Hx.
-rewrite {1}eq_hg ?(cfResE, cfIsomE) // -defS -?eq_hg ?mem_imset // -defR.
+rewrite {1}eq_hg ?(cfResE, cfIsomE) // -defS -?eq_hg ?imset_f // -defR.
 by rewrite (eq_in_imset eq_hg) imsetS.
 Qed.
 

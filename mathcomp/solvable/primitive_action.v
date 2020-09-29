@@ -80,7 +80,7 @@ apply/forallP/maximal_eqP=> /= [primG | [_ maxCx] Q].
       case/imsetP=> _ /imsetP[b Hb ->] ->.
       by rewrite !(actsP (atrans_acts trG)) //; apply: subsetP Hb.
     case: (atransP2 trG Sx Sy) => a Ga ->.
-    by exists ((to^*)%act X a); apply: mem_imset; rewrite // orbit_refl.
+    by exists ((to^*)%act X a); apply: imset_f; rewrite // orbit_refl.
   apply/trivIsetP=> _ _ /imsetP[a Ga ->] /imsetP[b Gb ->].
   apply: contraR => /exists_inP[_ /imsetP[_ /imsetP[a1 Ha1 ->] ->]].
   case/imsetP=> _ /imsetP[b1 Hb1 ->] /(canLR (actK _ _)) /(canLR (actK _ _)).
@@ -95,7 +95,7 @@ have QX: X \in Q by rewrite pblock_mem ?defS.
 have toX Y a: Y \in Q -> a \in G -> to x a \in Y -> sto X a = Y.
   move=> QY Ga Yxa; rewrite -(contraNeq (trivIsetP tIQ Y (sto X a) _ _)) //.
     by rewrite (actsP actQ).
-  by apply/existsP; exists (to x a); rewrite /= Yxa; apply: mem_imset.
+  by apply/existsP; exists (to x a); rewrite /= Yxa; apply: imset_f.
 have defQ: Q = orbit (to^*)%act G X.
   apply/eqP; rewrite eqEsubset andbC acts_sub_orbit // QX.
   apply/subsetP=> Y QY.
@@ -245,7 +245,7 @@ apply/imsetP; exists t => //.
 apply/setP=> u; apply/idP/imsetP=> [du | [a Ga ->{u}]].
   case: (ext_t u du) => y; rewrite tr_xt.
   by case/imsetP=> a Ga [_ def_u]; exists a => //; apply: val_inj.
-have: n_act to xt a \in dtuple_on _ S by rewrite tr_xt mem_imset.
+have: n_act to xt a \in dtuple_on _ S by rewrite tr_xt imset_f.
 by rewrite n_act_add dtuple_on_add; case/and3P.
 Qed.
 

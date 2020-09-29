@@ -301,7 +301,7 @@ Lemma quotient_setIpre A D : (A :&: coset H @*^-1 D) / H = A / H :&: D.
 Proof. exact: morphim_setIpre. Qed.
 
 Lemma mem_quotient x G : x \in G -> coset H x \in G / H.
-Proof. by move=> Gx; rewrite -imset_coset mem_imset. Qed.
+Proof. by move=> Gx; rewrite -imset_coset imset_f. Qed.
 
 Lemma quotientS A B : A \subset B -> A / H \subset B / H.
 Proof. exact: morphimS. Qed.

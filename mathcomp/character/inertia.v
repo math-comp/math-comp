@@ -396,7 +396,7 @@ apply: (iffP imageP) => [[_ /rcosetsP[y Ay ->] ->] | [y Ay ->]].
 without loss nHy: y Ay / y \in 'N(H).
   have [nHy | /cfConjgEout->] := boolP (y \in 'N(H)); first exact.
   by move/(_ 1%g); rewrite !group1 !cfConjgJ1; apply.
-exists ('I_A[phi] :* y); first by rewrite -rcosetE mem_imset.
+exists ('I_A[phi] :* y); first by rewrite -rcosetE imset_f.
 case: repr_rcosetP => z /setIP[_ /setIdP[nHz /eqP Tz]].
 by rewrite cfConjgMnorm ?Tz.
 Qed.
@@ -467,7 +467,7 @@ Proof.
 move=> nsHG; have UchiG := cfclass_uniq 'chi_i nsHG.
 apply: uniq_perm; rewrite ?(map_inj_uniq irr_inj) ?enum_uniq // => phi.
 apply/imageP/idP=> [[j iGj ->] | /cfclassP[y]]; first by rewrite -cfclass_IirrE.
-by exists (conjg_Iirr i y); rewrite ?mem_imset ?conjg_IirrE.
+by exists (conjg_Iirr i y); rewrite ?imset_f ?conjg_IirrE.
 Qed.
 
 Lemma card_cfclass_Iirr i : H <| G -> #|cfclass_Iirr G i| = #|G : 'I_G['chi_i]|.
@@ -1560,7 +1560,7 @@ have acts_Js : [acts G, on classes K | 'Js].
   apply/subsetP=> y Gy; have nKy := subsetP nKG y Gy.
   rewrite !inE; apply/subsetP=> _ /imsetP[z Gz ->]; rewrite !inE /=.
   rewrite -class_rcoset norm_rlcoset // class_lcoset.
-  by apply: mem_imset; rewrite memJ_norm.
+  by apply: imset_f; rewrite memJ_norm.
 have acts_cto : [acts G, on classes K | cto] by rewrite astabs_ract subsetIidl.
 pose m := #|'Fix_(classes K | cto)[x]|.
 have def_m: #|'Fix_ito[x]| = m.
@@ -1573,7 +1573,7 @@ apply: contraR => notKx; apply/cards1P; exists 1%g; apply/esym/eqP.
 rewrite eqEsubset !(sub1set, inE) classes1 /= conjs1g eqxx /=.
 apply/subsetP=> _ /setIP[/imsetP[y Ky ->] /afix1P /= cyKx].
 have /imsetP[z Kz def_yx]: y ^ x \in y ^: K.
-  by rewrite -cyKx; apply: mem_imset; apply: class_refl.
+  by rewrite -cyKx; apply: imset_f; apply: class_refl.
 rewrite inE classG_eq1; apply: contraR notKx => nty.
 rewrite -(groupMr x (groupVr Kz)).
 apply: (subsetP (regK y _)); first exact/setD1P.

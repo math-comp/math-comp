@@ -851,7 +851,7 @@ have trNPA: A :^: AG ::&: N = A :^: N.
   pose NG := 'N_G(P); have sNG_G : NG \subset G := subsetIl _ _.
   have nNGA: A \subset 'N(NG) by rewrite normsI ?norms_norm.
   apply/setP=> Ax; apply/setIdP/imsetP=> [[]|[x Nx ->{Ax}]]; last first.
-    by rewrite conj_subG //; case/setIP: Nx => AGx; rewrite mem_imset.
+    by rewrite conj_subG //; case/setIP: Nx => AGx; rewrite imset_f.
   have ->: N = A <*> NG by rewrite /N /AG !norm_joinEl // -group_modl.
   have coNG_A := coprimeSg sNG_G coGA; case/imsetP=> x AGx ->{Ax}.
   case/SchurZassenhaus_trans_actsol; rewrite ?cardJg // => y Ny /= ->.

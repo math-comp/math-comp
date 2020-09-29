@@ -40,7 +40,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `finset.v`, new lemmas: `properC`, `properCr`, `properCl`
 - in `ssrnat.v`, new lemmas: `subn_minl`, `subn_maxl`
 - in `ssrnat.v`, new lemma: `oddS`
-
+- in `finset.v`, new lemmas: `mem_imset_eq`, `mem_imset2_eq`.
+  These lemmas will lose the `_eq` suffix in the next release, when the shortende names will become availabe (cf. Renamed section)
 
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
@@ -241,6 +242,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
+- `mem_imset` -> `imset_f` (with deprecation alias, cf. Added section)
+- `mem_imset2` -> imset2_f` (with deprecation alias, cf. Added section)
 
 - in `interval.v`, we deprecate, rename, and relocate to `order.v` the following:
   + `lersif_(trans|anti)` -> `lteif_(trans|anti)`

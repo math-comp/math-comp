@@ -200,7 +200,7 @@ Proof.
 move=> cHK; apply/setP=> z; rewrite {3}/center centM !inE.
 have cKH: H \subset 'C(K) by rewrite centsC.
 apply/imset2P/and3P=> [[x y /setIP[Hx cHx] /setIP[Ky cKy] ->{z}]| []].
-  by rewrite mem_imset2 ?groupM // ?(subsetP cHK) ?(subsetP cKH).
+  by rewrite imset2_f ?groupM // ?(subsetP cHK) ?(subsetP cKH).
 case/imset2P=> x y Hx Ky ->{z}.
 rewrite groupMr => [cHx|]; last exact: subsetP Ky.
 rewrite groupMl => [cKy|]; last exact: subsetP Hx.
