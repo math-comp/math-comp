@@ -191,6 +191,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   (e.g. with `raddf_eq0`), and lemma `inj_row_free` characterizing
   `row_free` matrices `A`  through `v *m A = 0 -> v = 0` for all `v`.
 
+- in `mxpoly.v`,
+  + new definitions `kermxpoly g p` (the kernel of polynomial $p(g)$).
+    * new elementary theorems: `kermxpolyC`, `kermxpoly1`,
+      `kermxpolyX`, `kermxpoly_min`
+    * kernel lemmas: `mxdirect_kermxpoly`, `kermxpolyM`,
+      `kermxpoly_prod`, and `mxdirect_sum_kermx`
+    * correspondance between `eigenspace` and `kermxpoly`: `eigenspace_poly`
+  + generalized eigenspace `geigenspace` and a generalization of eigenvalues
+    called `eigenpoly g` (i.e. polynomials such that `kermxpoly g p`
+    is nonzero, e.g. eigen polynomials of degree 1 are of the form
+    `'X - a%:P` where `a` are eigenvalues), and
+    * correspondance with `kermx`: `geigenspaceE`,
+    * application of kernel lemmas `mxdirect_sum_geigenspace`,
+    * new lemmas: `eigenpolyP`, `eigenvalue_poly`, `eigenspace_sub_geigen`,
+  + new `map_mx` lemmas: `map_kermxpoly`, `map_geigenspace`, `eigenpoly_map`.
 
 ### Changed
 

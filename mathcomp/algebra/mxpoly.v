@@ -30,6 +30,10 @@ From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
 (* degree_mxminpoly A == the (positive) degree of mxminpoly A.                *)
 (* mx_inv_horner A == the inverse of horner_mx A for polynomials of degree    *)
 (*                  smaller than degree_mxminpoly A.                          *)
+(*    kermxpoly g p == the kernel of p(g)                                     *)
+(*  geigenspace g a == the generalized eigenspace of g for eigenvalue a       *)
+(*                  := kermxpoly g ('X ^ n - a%:P) where g : 'M_n             *)
+(*  eigenpoly g p <=> p is an eigen polynomial for g, i.e. kermxpoly g p != 0 *)
 (*  integralOver RtoK u <-> u is in the integral closure of the image of R    *)
 (*                  under RtoK : R -> K, i.e. u is a root of the image of a   *)
 (*                  monic polynomial in R.                                    *)
@@ -785,6 +789,155 @@ by rewrite /mx_inv_horner degree_mxminpoly_map.
 Qed.
 
 End MapField.
+
+Section KernelLemmas.
+
+Variable K : fieldType.
+
+(* convertible to kermx (horner_mx g p) when n = n.+1 *)
+Definition kermxpoly n (g : 'M_n) (p : {poly K}) : 'M_n :=
+  kermx ((if n is n.+1 then horner_mx^~ p : 'M_n.+1 -> 'M_n.+1 else \0) g).
+
+Lemma kermxpolyC n (g : 'M_n) c : c != 0 -> kermxpoly g c%:P = 0.
+Proof.
+move=> c_neq0; case: n => [|n] in g *; first by rewrite thinmx0.
+apply/eqP; rewrite /kermxpoly horner_mx_C kermx_eq0 row_free_unit.
+by rewrite -scalemx1 scaler_unit ?unitmx1// unitfE.
+Qed.
+
+Lemma kermxpoly1 n (g : 'M_n) : kermxpoly g 1 = 0.
+Proof. by rewrite kermxpolyC ?oner_eq0. Qed.
+
+Lemma kermxpolyX n (g : 'M_n) : kermxpoly g 'X = kermx g.
+Proof.
+case: n => [|n] in g *; first by rewrite !thinmx0.
+by rewrite /kermxpoly horner_mx_X.
+Qed.
+
+Lemma kermxpoly_min n (g : 'M_n.+1) p :
+  mxminpoly g %| p -> (kermxpoly g p :=: 1)%MS.
+Proof. by rewrite /kermxpoly => /mxminpoly_minP ->; apply: kermx0. Qed.
+
+Lemma mxdirect_kermxpoly n (g : 'M_n) (p q : {poly K}) :
+  coprimep p q -> (kermxpoly g p :&: kermxpoly g q = 0)%MS.
+Proof.
+case: n => [|n] in g *; first by rewrite thinmx0 ?cap0mx ?submx_refl.
+move=> /Bezout_eq1_coprimepP [[/= u v]]; rewrite mulrC [v * _]mulrC => cpq.
+apply/eqP/rowV0P => x.
+rewrite sub_capmx => /andP[/sub_kermxP xgp0 /sub_kermxP xgq0].
+move: cpq => /(congr1 (mulmx x \o horner_mx g))/=.
+rewrite !(rmorphM, rmorphD, rmorph1, mulmx1, mulmxDr, mulmxA).
+by rewrite xgp0 xgq0 !mul0mx add0r.
+Qed.
+
+Lemma kermxpolyM n (g : 'M_n) (p q : {poly K}) : coprimep p q ->
+  (kermxpoly g (p * q) :=: kermxpoly g p + kermxpoly g q)%MS.
+Proof.
+case: n => [|n] in g *; first by rewrite !thinmx0.
+move=> /Bezout_eq1_coprimepP [[/= u v]]; rewrite mulrC [v * _]mulrC => cpq.
+apply/eqmxP/andP; split; last first.
+  apply/sub_kermxP/eqmx0P; rewrite !addsmxMr [in X in (_ + X)%MS]mulrC.
+  by rewrite !rmorphM/= !mulmxA !mulmx_ker !mul0mx !addsmx0 submx_refl.
+move: cpq => /(congr1 (horner_mx g))/=; rewrite rmorph1 rmorphD/=.
+rewrite -[X in (X <= _)%MS]mulr1 => <-; rewrite mulrDr mulrC addrC.
+rewrite addmx_sub_adds//; apply/sub_kermxP; rewrite mulmxE -mulrA -rmorphM.
+  by rewrite mulrAC [q * p]mulrC rmorphM/= mulrA -!mulmxE mulmx_ker mul0mx.
+rewrite -[_ * _ * q]mulrA [u * _]mulrC.
+by rewrite rmorphM mulrA -!mulmxE mulmx_ker mul0mx.
+Qed.
+
+Lemma kermxpoly_prod n (g : 'M_n)
+    (I : finType) (P : {pred I}) (p_ : I -> {poly K}) :
+  {in P &, forall i j, j != i -> coprimep (p_ i) (p_ j)} ->
+  (kermxpoly g (\prod_(i | P i) p_ i) :=: \sum_(i | P i) kermxpoly g (p_ i))%MS.
+Proof.
+move=> p_coprime; elim: index_enum (index_enum_uniq I).
+  by rewrite !big_nil ?kermxpoly1 ?submx_refl//.
+move=> j js ihjs /= /andP[jNjs js_uniq]; apply/eqmxP.
+rewrite !big_cons; case: ifP => [Pj|PNj]; rewrite ?ihjs ?submx_refl//.
+suff cjjs: coprimep (p_ j) (\prod_(i <- js | P i) p_ i).
+  by rewrite !kermxpolyM// !(adds_eqmx (eqmx_refl _) (ihjs _)) ?submx_refl.
+rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//; last first.
+  by move=> p q; rewrite coprimep_mulr.
+apply/allP => i i_js; apply/implyP => Pi; apply: p_coprime => //.
+by apply: contraNneq jNjs => <-.
+Qed.
+
+Lemma mxdirect_sum_kermx n (g : 'M_n)
+    (I : finType) (P : {pred I}) (p_ : I -> {poly K}) :
+  {in P &, forall i j, j != i -> coprimep (p_ i) (p_ j)} ->
+  mxdirect (\sum_(i | P i) kermxpoly g (p_ i))%MS.
+Proof.
+move=> p_coprime; apply/mxdirect_sumsP => i Pi; apply/eqmx0P.
+have cpNi : {in [pred j | P j && (j != i)] &,
+    forall j k : I, k != j -> coprimep (p_ j) (p_ k)}.
+  by move=> j k /andP[Pj _] /andP[Pk _]; apply: p_coprime.
+rewrite -!(cap_eqmx (eqmx_refl _) (kermxpoly_prod g _))//.
+rewrite mxdirect_kermxpoly ?submx_refl//.
+rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//; last first.
+  by move=> p q; rewrite coprimep_mulr.
+by apply/allP => j _; apply/implyP => /andP[Pj neq_ji]; apply: p_coprime.
+Qed.
+
+Lemma eigenspace_poly n a (f : 'M_n) :
+  eigenspace f a = kermxpoly f ('X - a%:P).
+Proof.
+case: n => [|m] in a f *; first by rewrite !thinmx0.
+by congr (kermx _); rewrite rmorphB /= ?horner_mx_X ?horner_mx_C.
+Qed.
+
+Definition geigenspace n (g : 'M_n) a := kermxpoly g (('X - a%:P) ^+ n).
+
+Lemma geigenspaceE n' (g : 'M_n'.+1) a :
+  geigenspace g a = kermx ((g - a%:M) ^+ n'.+1).
+Proof.
+by rewrite /geigenspace /kermxpoly rmorphX rmorphB /= horner_mx_X horner_mx_C.
+Qed.
+
+Lemma eigenspace_sub_geigen n (g : 'M_n) a :
+  (eigenspace g a <= geigenspace g a)%MS.
+Proof.
+case: n => [|n] in g *; rewrite ?thinmx0 ?sub0mx// geigenspaceE.
+by apply/sub_kermxP; rewrite exprS mulmxA mulmx_ker mul0mx.
+Qed.
+
+Lemma mxdirect_sum_geigenspace
+    (I : finType) (n : nat) (g : 'M_n) (P : {pred I}) (a_ : I -> K) :
+  {in P &, injective a_} -> mxdirect (\sum_(i | P i) geigenspace g (a_ i)).
+Proof.
+move=> /inj_in_eq eq_a; apply: mxdirect_sum_kermx => i j Pi Pj Nji.
+by rewrite coprimep_expr ?coprimep_expl// coprimep_XsubC root_XsubC eq_a.
+Qed.
+
+Definition eigenpoly n (g : 'M_n) : pred {poly K} :=
+  (fun p => kermxpoly g p != 0).
+
+Lemma eigenpolyP n (g : 'M_n) (p : {poly K}) :
+  reflect (exists2 v : 'rV_n, (v <= kermxpoly g p)%MS & v != 0) (eigenpoly g p).
+Proof. exact: rowV0Pn. Qed.
+
+Lemma eigenvalue_poly n a (f : 'M_n) :
+  eigenvalue f a = eigenpoly f ('X - a%:P).
+Proof. by rewrite /eigenpoly /eigenvalue eigenspace_poly. Qed.
+
+End KernelLemmas.
+
+Section MapKermxPoly.
+Variables (aF rF : fieldType) (f : {rmorphism aF -> rF}).
+
+Lemma map_kermxpoly (n : nat) (g : 'M_n) (p : {poly aF}) :
+  map_mx f (kermxpoly g p) = kermxpoly (map_mx f g) (map_poly f p).
+Proof. by case: n => [|n] in g *; rewrite ?thinmx0// map_kermx map_horner_mx. Qed.
+
+Lemma map_geigenspace (n : nat) (g : 'M_n) (a : aF) :
+  map_mx f (geigenspace g a) = geigenspace (map_mx f g) (f a).
+Proof. by rewrite map_kermxpoly rmorphX rmorphB /= map_polyX map_polyC. Qed.
+
+Lemma eigenpoly_map n (g : 'M_n) (p : {poly aF}) :
+  eigenpoly (map_mx f g) (map_poly f p) = eigenpoly g p.
+Proof. by rewrite /eigenpoly -map_kermxpoly map_mx_eq0. Qed.
+
+End MapKermxPoly.
 
 Section IntegralOverRing.
 
