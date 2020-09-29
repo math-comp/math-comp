@@ -222,6 +222,12 @@ Proof. by move=> m n p; rewrite (addnC n) addnCA addnC. Qed.
 Lemma addnAC : right_commutative addn.
 Proof. by move=> m n p; rewrite -!addnA (addnC n). Qed.
 
+Lemma addnCAC m n p : m + n + p = p + n + m.
+Proof. by rewrite addnC addnA addnAC. Qed.
+
+Lemma addnACl m n p: m + n + p = n + (p + m).
+Proof. by rewrite (addnC m) addnC addnCA. Qed.
+
 Lemma addnACA : interchange addn addn.
 Proof. by move=> m n p q; rewrite -!addnA (addnCA n). Qed.
 
@@ -530,6 +536,9 @@ Proof. by rewrite ltnNge leq_subrR negb_or !lt0n. Qed.
 Lemma subnKC m n : m <= n -> m + (n - m) = n.
 Proof. by elim: m n => [|m IHm] [|n] // /(IHm n) {2}<-. Qed.
 
+Lemma addnBn m n : m + (n - m) = m - n + n.
+Proof. by elim: m n => [|m IHm] [|n] //; rewrite addSn addnS IHm. Qed.
+
 Lemma subnK m n : m <= n -> (n - m) + m = n.
 Proof. by rewrite addnC; apply: subnKC. Qed.
 
@@ -547,6 +556,9 @@ Proof. by move=> le_pm le_pn; rewrite addnBA // addnBAC. Qed.
 
 Lemma subnBA m n p : p <= n -> m - (n - p) = m + p - n.
 Proof. by move=> le_pn; rewrite -[in RHS](subnK le_pn) subnDr. Qed.
+
+Lemma subnA m n p : p <= n -> n <= m -> m - (n - p) = m - n + p.
+Proof. by move=> le_pn lr_nm; rewrite addnBAC // subnBA. Qed.
 
 Lemma subKn m n : m <= n -> n - (n - m) = m.
 Proof. by move/subnBA->; rewrite addKn. Qed.
