@@ -1281,6 +1281,9 @@ apply: (iffP eqP) => [eqfA |]; last exact: card_in_image.
 by apply/dinjectiveP; apply/card_uniqP; rewrite size_map -cardE.
 Qed.
 
+Lemma leq_card_in A : {in A &, injective f} -> #|A| <= #|T'|.
+Proof. by move=> /card_in_image <-; rewrite max_card. Qed.
+
 Hypothesis injf : injective f.
 
 Lemma card_image A : #|image f A| = #|A|.
@@ -1295,6 +1298,8 @@ rewrite -card_image /=; apply: eq_card => y.
 by rewrite [y \in _]image_pre !inE andbC.
 Qed.
 
+Lemma leq_card : #|T| <= #|T'|. Proof. exact: (leq_card_in (in2W _)). Qed.
+
 Hypothesis card_range : #|T| = #|T'|.
 
 Lemma inj_card_onto y : y \in codom f.
@@ -1308,6 +1313,8 @@ Qed.
 End CardFunImage.
 
 Arguments image_injP {T T' f A}.
+Arguments leq_card_in [T T'] f.
+Arguments leq_card [T T'] f.
 
 Section FinCancel.
 
@@ -1865,6 +1872,10 @@ Qed.
 
 Lemma rev_ord_inj {n} : injective (@rev_ord n).
 Proof. exact: inv_inj rev_ordK. Qed.
+
+Lemma inj_leq m n (f : 'I_m -> 'I_n) : injective f -> m <= n.
+Proof. by move=> /leq_card; rewrite !card_ord. Qed.
+Arguments inj_leq [m n] f _.
 
 (* bijection between any finType T and the Ordinal finType of its cardinal *)
 Section EnumRank.
