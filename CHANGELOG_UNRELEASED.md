@@ -234,6 +234,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     and they respectively mean open and close bounds as right bounds.
     This change gives us the canonical "left to right" ordering of interval bounds.
 
+- in `interval.v`:
+  + Lemmas `mid_in_itv(|oo|cc)` have been generalized from `realFieldType` to
+    `numFieldType`.
+
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
