@@ -582,7 +582,7 @@ Import GRing.Theory Num.Theory.
 
 Section IntervalNumDomain.
 
-Variable R : numFieldType.
+Variable R : numDomainType.
 Implicit Types x : R.
 
 Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
@@ -614,7 +614,7 @@ End IntervalNumDomain.
 
 Section IntervalField.
 
-Variable R : realFieldType.
+Variable R : numFieldType.
 
 Local Notation mid x y := ((x + y) / 2%:R).
 
