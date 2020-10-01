@@ -1854,17 +1854,33 @@ move=> Hn Hm; case: leqP => [/rotD // | /ltnW Hmn]; symmetry.
 by rewrite -{2}(rotK n s) /rotr -rotD size_rot addnBA ?subnK ?addnK.
 Qed.
 
-Lemma rot_rot m n s : rot m (rot n s) = rot n (rot m s).
+Lemma rot_minn n s : rot n s = rot (minn n (size s)) s.
 Proof.
-case: (ltnP (size s) m) => Hm.
-  by rewrite !(@rot_oversize T m) ?size_rot 1?ltnW.
-case: (ltnP (size s) n) => Hn.
-  by rewrite !(@rot_oversize T n) ?size_rot 1?ltnW.
-by rewrite !rot_add_mod 1?addnC.
+by case: (leqP n (size s)) => // /leqW ?; rewrite rot_size rot_oversize.
 Qed.
 
+Definition rot_add s n m (k := size s) (p := minn m k + minn n k) :=
+  locked (if p <= k then p else p - k).
+
+Lemma leq_rot_add n m s : rot_add s n m <= size s.
+Proof.
+by unlock rot_add; case: ifP; rewrite // leq_subLR leq_add // geq_minr.
+Qed.
+
+Lemma rot_addC n m s : rot_add s n m = rot_add s m n.
+Proof. by unlock rot_add; rewrite ![minn n _ + _]addnC. Qed.
+
+Lemma rot_rot_add n m s : rot m (rot n s) = rot (rot_add s n m) s.
+Proof.
+unlock rot_add.
+by rewrite (rot_minn n) (rot_minn m) rot_add_mod ?size_rot ?geq_minr.
+Qed.
+
+Lemma rot_rot m n s : rot m (rot n s) = rot n (rot m s).
+Proof. by rewrite rot_rot_add rot_addC -rot_rot_add. Qed.
+
 Lemma rot_rotr m n s : rot m (rotr n s) = rotr n (rot m s).
-Proof. by rewrite {2}/rotr size_rot rot_rot. Qed.
+Proof. by rewrite [RHS]/rotr size_rot rot_rot. Qed.
 
 Lemma rotr_rotr m n s : rotr m (rotr n s) = rotr n (rotr m s).
 Proof. by rewrite /rotr !size_rot rot_rot. Qed.

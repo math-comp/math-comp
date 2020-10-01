@@ -251,6 +251,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `polydiv.v`, new lemma `dvdpNl`.
 
+- in `seq.v`, new definition `rot_add` and new lemmas `rot_minn`, `leq_rot_add`, `rot_addC`, `rot_rot_add`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
