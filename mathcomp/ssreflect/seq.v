@@ -1395,6 +1395,17 @@ Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. exact/inj_eq/rot_inj. Qed.
 
+Lemma eqseq_pivot s1 s2 s3 s4 x :
+  uniq (s3 ++ x :: s4) -> s1 ++ x :: s2 == s3 ++ x :: s4 = (s1 == s3) && (s2 == s4).
+Proof.
+move=> uniq34; apply/idP/idP => [E|/andP [/eqP-> /eqP->] //].
+suff S : size s1 = size s3 by rewrite eqseq_cat // eqseq_cons eqxx in E.
+gen have I,I1 : s3 s4 uniq34 {E} / size s3 = index x (s3 ++ x :: s4).
+  rewrite index_cat index_head addn0 ifN //.
+  by apply: contraTN uniq34 => x_s3; rewrite cat_uniq /= x_s3 /= andbF.
+by rewrite I1 -(eqP E) -I // (eqP E).
+Qed.
+
 End EqSeq.
 
 Section RotIndex.
@@ -1936,6 +1947,13 @@ Proof. by case: b. Qed.
 Lemma has_mask a m s : has a (mask m s) -> has a s.
 Proof. by apply/contraTT; rewrite -!all_predC; apply: all_mask. Qed.
 
+Lemma rev_mask m s : size m = size s -> rev (mask m s) = mask (rev m) (rev s).
+Proof.
+move: m s; apply: seq_ind2 => //= b x m s ? IH.
+rewrite fun_if !rev_cons -!cats1 IH // mask_cat ?size_rev //.
+by case: b => //=; rewrite cats0.
+Qed.
+
 Lemma mask_rot m s : size m = size s ->
    mask (rot n0 m) (rot n0 s) = rot (count id (take n0 m)) (mask m s).
 Proof.
@@ -2106,6 +2124,31 @@ Lemma undup_subseq s : subseq (undup s) s.
 Proof.
 elim: s => //= x s; case: (_ \in _); last by rewrite eqxx.
 by case: (undup s) => //= y u; case: (_ == _) => //=; apply: cons_subseq.
+Qed.
+
+Lemma subseq_rev s1 s2 : subseq (rev s1) (rev s2) = subseq s1 s2.
+Proof.
+wlog suff W : s1 s2 / subseq s1 s2 -> subseq (rev s1) (rev s2).
+  by apply/idP/idP => /W //; rewrite !revK.
+move/subseqP => [m size_m mask_m]; apply/subseqP.
+by exists (rev m); rewrite ?size_rev // -rev_mask // -mask_m.
+Qed.
+
+Lemma subseq_cat2l (s s1 s2 : seq T) :
+  subseq (s ++ s1) (s ++ s2) = subseq s1 s2.
+Proof. by elim: s => // x s IHs; rewrite !cat_cons /= eqxx. Qed.
+
+Lemma subseq_cat2r (s s1 s2 : seq T) :
+  subseq (s1 ++ s) (s2 ++ s) = subseq s1 s2.
+Proof. by rewrite -subseq_rev !rev_cat subseq_cat2l subseq_rev. Qed.
+
+Lemma subseq_rot p s n :
+  subseq p s -> exists2 k, k <= n & subseq (rot k p) (rot n s).
+Proof.
+move => /subseqP [m size_m ->].
+exists (count id (take n m)); last by rewrite -mask_rot // mask_subseq.
+apply: leq_trans (count_size _ _) _; rewrite size_take.
+by case: (ltnP n (size m)).
 Qed.
 
 End Subseq.
@@ -2298,6 +2341,16 @@ apply/eqP; rewrite -size_subseq_leqif ?subseq_filter ?(introT allP) //.
 apply/eqP/esym/perm_size.
 rewrite uniq_perm ?filter_uniq ?(subseq_uniq ss12) // => x.
 by rewrite mem_filter; apply: andb_idr; apply: (mem_subseq ss12).
+Qed.
+
+Lemma subseq_pivot (s1 s2 s3 s4 : seq T) x (s := s3 ++ x :: s4) :
+  uniq s -> subseq (s1 ++ x :: s2) s -> subseq s1 s3 /\ subseq s2 s4.
+Proof.
+move => uniq_s sub_s'_s; have uniq_s' := subseq_uniq sub_s'_s uniq_s.
+have/eqP {sub_s'_s uniq_s} := subseq_uniqP _ uniq_s sub_s'_s.
+rewrite !filter_cat /= mem_cat inE eqxx orbT /= => E.
+move: (E); rewrite eqseq_pivot -?(eqP E) // => /andP [/eqP -> /eqP ->].
+by rewrite !filter_subseq.
 Qed.
 
 Lemma perm_to_subseq s1 s2 :

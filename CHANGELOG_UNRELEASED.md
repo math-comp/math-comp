@@ -268,6 +268,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, new lemmas `sub_cycle(_in)`, `eq_cycle_in`,
   `(path|sorted)_(mask|filter)_in`, `rev_cycle`, `cycle_map`,
   `(homo|mono)_cycle(_in)`.
+- in `seq.v` new lemmas `eqseq_pivot`, `rev_mask`, `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, `subseq_pivot`.
+
 
 ### Changed
 
