@@ -1089,6 +1089,10 @@ Proof. by elim: m => [|m IHm]; rewrite ?mul1r // !exprS -mulrA -IHm. Qed.
 Lemma exprSr x n : x ^+ n.+1 = x ^+ n * x.
 Proof. by rewrite -addn1 exprD expr1. Qed.
 
+Lemma expr_sum x (I : Type) (s : seq I) (P : pred I) F : 
+  x ^+ (\sum_(i <- s | P i) F i) = \prod_(i <- s | P i) x ^+ F i :> R.
+Proof. exact: (big_morph _ (exprD _)). Qed.
+
 Lemma commr_sym x y : comm x y -> comm y x. Proof. by []. Qed.
 Lemma commr_refl x : comm x x. Proof. by []. Qed.
 
@@ -1263,12 +1267,17 @@ rewrite -sum1_card; elim/big_rec3: _ => [|i x n _ _ ->]; first by rewrite mulr1.
 by rewrite exprS !mulrA mulN1r !mulNr commrX //; apply: commrN1.
 Qed.
 
-Lemma prodrMn n (I : finType) (A : pred I) (F : I -> R) :
-  \prod_(i in A) (F i *+ n) = \prod_(i in A) F i *+ n ^ #|A|.
+Lemma prodr_natmul (I : Type) (s : seq I) (P : pred I) 
+              (F : I -> R) (g : I -> nat) : 
+  \prod_(i <- s | P i) (F i *+ g i) =
+  \prod_(i <- s | P i) (F i) *+ \prod_(i <- s | P i) g i.
 Proof.
-rewrite -sum1_card; elim/big_rec3: _ => // i x m _ _ ->.
-by rewrite mulrnAr mulrnAl expnS mulrnA.
+by elim/big_rec3: _ => // i y1 y2 y3 _ ->; rewrite mulrnAr mulrnAl -mulrnA.
 Qed.
+
+Lemma prodrMn_const n (I : finType) (A : pred I) (F : I -> R) :
+  \prod_(i in A) (F i *+ n) = \prod_(i in A) F i *+ n ^ #|A|.
+Proof. by rewrite prodr_natmul prod_nat_const. Qed.
 
 Lemma natr_prod I r P (F : I -> nat) :
   (\prod_(i <- r | P i) F i)%:R = \prod_(i <- r | P i) (F i)%:R :> R.
@@ -5654,6 +5663,7 @@ Definition expr0n := expr0n.
 Definition expr1n := expr1n.
 Definition exprD := exprD.
 Definition exprSr := exprSr.
+Definition expr_sum := expr_sum.
 Definition commr_sym := commr_sym.
 Definition commr_refl := commr_refl.
 Definition commr0 := commr0.
@@ -5742,7 +5752,8 @@ Definition exprMn := exprMn.
 Definition prodrXl := prodrXl.
 Definition prodrXr := prodrXr.
 Definition prodrN := prodrN.
-Definition prodrMn := prodrMn.
+Definition prodrMn_const := prodrMn_const.
+Definition prodr_natmul := prodr_natmul.
 Definition natr_prod := natr_prod.
 Definition prodr_undup_exp_count := prodr_undup_exp_count.
 Definition exprDn := exprDn.
@@ -6006,6 +6017,9 @@ Definition imaginary_exists := imaginary_exists.
 
 Notation null_fun V := (null_fun V) (only parsing).
 Notation in_alg A := (in_alg_loc A).
+
+Notation prodrMn :=
+ (fun n A F => deprecate prodrMn prodrMn_const _ n _ A F) (only parsing).
 
 End Theory.
 

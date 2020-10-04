@@ -41,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrnat.v`, new lemmas: `subn_minl`, `subn_maxl`
 - in `ssrnat.v`, new lemma: `oddS`
 - in `finset.v`, new lemmas: `mem_imset_eq`, `mem_imset2_eq`.
-  These lemmas will lose the `_eq` suffix in the next release, when the shortende names will become availabe (cf. Renamed section)
+  These lemmas will lose the `_eq` suffix in the next release, when the shortende names will become available (cf. Renamed section)
 
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
@@ -191,6 +191,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `row_free` matrices `A`  through `v *m A = 0 -> v = 0` for all `v`.
 
 
+- in `ssralg.v`: 
+   + Lemma `expr_sum` : equivalent for ring of `expn_sum`
+   + Lemma `prodr_natmul` : generalization of `prodrMn_const`.
+   Its name will become `prodrMn` in the next release when this name will become available (cf. Renamed section)
+
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
@@ -272,6 +278,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lersif_in_itv` -> `lteif_in_itv`
   + `itv_gte` -> `itv_ge`
   + `l(t|e)r_in_itv` -> `lt_in_itv`
+
+- in `ssralg.v`
+  + `prodrMn` has been renamed `prodrMn_const` (with deprecation alias, cf. Added section)
 
 ### Removed
 
