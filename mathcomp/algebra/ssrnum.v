@@ -169,12 +169,14 @@ Local Notation ring_for T b := (@GRing.Ring.Pack T b).
 Module NumDomain.
 
 Section ClassDef.
+Set Primitive Projections.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
   order_mixin : Order.POrder.mixin_of (Equality.class (ring_for T base));
   normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
   mixin : mixin_of normed_mixin;
 }.
+Unset Primitive Projections.
 
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
 Local Coercion order_base T (class_of_T : class_of T) :=
@@ -184,8 +186,6 @@ Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition clone c of phant_id class c := @Pack T c.
 Definition pack (b0 : GRing.IntegralDomain.class_of _) om0
            (nm0 : @normed_mixin_of (ring_for T b0) (ring_for T b0) om0)
@@ -197,21 +197,21 @@ Definition pack (b0 : GRing.IntegralDomain.class_of _) om0
   fun m & phant_id m0 m =>
   @Pack T (@Class T b om nm m).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition porder_zmodType := @GRing.Zmodule.Pack porderType xclass.
-Definition porder_ringType := @GRing.Ring.Pack porderType xclass.
-Definition porder_comRingType := @GRing.ComRing.Pack porderType xclass.
-Definition porder_unitRingType := @GRing.UnitRing.Pack porderType xclass.
-Definition porder_comUnitRingType := @GRing.ComUnitRing.Pack porderType xclass.
-Definition porder_idomainType := @GRing.IntegralDomain.Pack porderType xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition porder_zmodType := @GRing.Zmodule.Pack porderType class.
+Definition porder_ringType := @GRing.Ring.Pack porderType class.
+Definition porder_comRingType := @GRing.ComRing.Pack porderType class.
+Definition porder_unitRingType := @GRing.UnitRing.Pack porderType class.
+Definition porder_comUnitRingType := @GRing.ComUnitRing.Pack porderType class.
+Definition porder_idomainType := @GRing.IntegralDomain.Pack porderType class.
 
 End ClassDef.
 
@@ -264,10 +264,12 @@ Section ClassDef.
 
 Variable R : numDomainType.
 
+Set Primitive Projections.
 Record class_of (T : Type) := Class {
   base : GRing.Zmodule.class_of T;
   mixin : @normed_mixin_of R (@GRing.Zmodule.Pack T base) (NumDomain.class R);
 }.
+Unset Primitive Projections.
 
 Local Coercion base : class_of >-> GRing.Zmodule.class_of.
 Local Coercion mixin : class_of >-> normed_mixin_of.
@@ -280,15 +282,13 @@ Variables (phR : phant R) (T : Type) (cT : type phR).
 
 Definition class := let: Pack _ c := cT return class_of cT in c.
 Definition clone c of phant_id class c := @Pack phR T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition pack b0 (m0 : @normed_mixin_of R (@GRing.Zmodule.Pack T b0)
                                           (NumDomain.class R)) :=
   Pack phR (@Class T b0 m0).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
 
 End ClassDef.
 
@@ -330,26 +330,24 @@ Section NumDomain_joins.
 
 Variables (T : Type) (cT : type).
 
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class cT : class_of xT).
-
+Notation class := (class cT).
 (* Definition normedZmodType : normedZmodType cT := *)
 (*   @NormedZmodule.Pack *)
 (*      cT (Phant cT) cT *)
-(*      (NormedZmodule.Class (NumDomain.normed_mixin xclass)). *)
+(*      (NormedZmodule.Class (NumDomain.normed_mixin class)). *)
 Notation normedZmodType := (NormedZmodule.numDomain_normedZmodType cT).
 Definition normedZmod_ringType :=
-  @GRing.Ring.Pack normedZmodType xclass.
+  @GRing.Ring.Pack normedZmodType class.
 Definition normedZmod_comRingType :=
-  @GRing.ComRing.Pack normedZmodType xclass.
+  @GRing.ComRing.Pack normedZmodType class.
 Definition normedZmod_unitRingType :=
-  @GRing.UnitRing.Pack normedZmodType xclass.
+  @GRing.UnitRing.Pack normedZmodType class.
 Definition normedZmod_comUnitRingType :=
-  @GRing.ComUnitRing.Pack normedZmodType xclass.
+  @GRing.ComUnitRing.Pack normedZmodType class.
 Definition normedZmod_idomainType :=
-  @GRing.IntegralDomain.Pack normedZmodType xclass.
+  @GRing.IntegralDomain.Pack normedZmodType class.
 Definition normedZmod_porderType :=
-  @Order.POrder.Pack ring_display normedZmodType xclass.
+  @Order.POrder.Pack ring_display normedZmodType class.
 
 End NumDomain_joins.
 
@@ -528,10 +526,12 @@ Module NumField.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R := Class {
   base  : NumDomain.class_of R;
   mixin : GRing.Field.mixin_of (num_for R base);
 }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> NumDomain.class_of.
 Local Coercion base2 R (c : class_of R) : GRing.Field.class_of _ :=
   GRing.Field.Class (@mixin _ c).
@@ -540,29 +540,26 @@ Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
   fun mT m & phant_id (GRing.Field.mixin (GRing.Field.class mT)) m =>
   Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition normedZmodType := NormedZmodType numDomainType cT xclass.
-Definition porder_fieldType := @GRing.Field.Pack porderType xclass.
-Definition normedZmod_fieldType :=
-  @GRing.Field.Pack normedZmodType xclass.
-Definition numDomain_fieldType := @GRing.Field.Pack numDomainType xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition numDomainType := @NumDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition porder_fieldType := @GRing.Field.Pack porderType class.
+Definition normedZmod_fieldType := @GRing.Field.Pack normedZmodType class.
+Definition numDomain_fieldType := @GRing.Field.Pack numDomainType class.
 
 End ClassDef.
 
@@ -617,12 +614,14 @@ Record imaginary_mixin_of (R : numDomainType) := ImaginaryMixin {
   _ : forall x, x * conj_op x = `|x| ^+ 2;
 }.
 
+Set Primitive Projections.
 Record class_of R := Class {
   base : NumField.class_of R;
   decField_mixin : GRing.DecidableField.mixin_of (num_for R base);
   closedField_axiom : GRing.ClosedField.axiom (num_for R base);
   conj_mixin  : imaginary_mixin_of (num_for R base);
 }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> NumField.class_of.
 Local Coercion base2 R (c : class_of R) : GRing.ClosedField.class_of R :=
   @GRing.ClosedField.Class
@@ -633,8 +632,6 @@ Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition clone := fun b & phant_id class (b : class_of T) => Pack b.
 Definition pack :=
   fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
@@ -644,35 +641,35 @@ Definition pack :=
                     _ (@GRing.DecidableField.Class _ b dec) closed) =>
   fun mc => Pack (@Class T b dec closed mc).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition numFieldType := @NumField.Pack cT xclass.
-Definition decFieldType := @GRing.DecidableField.Pack cT xclass.
-Definition closedFieldType := @GRing.ClosedField.Pack cT xclass.
-Definition normedZmodType := NormedZmodType numDomainType cT xclass.
-Definition porder_decFieldType := @GRing.DecidableField.Pack porderType xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition numDomainType := @NumDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition numFieldType := @NumField.Pack cT class.
+Definition decFieldType := @GRing.DecidableField.Pack cT class.
+Definition closedFieldType := @GRing.ClosedField.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition porder_decFieldType := @GRing.DecidableField.Pack porderType class.
 Definition normedZmod_decFieldType :=
-  @GRing.DecidableField.Pack normedZmodType xclass.
+  @GRing.DecidableField.Pack normedZmodType class.
 Definition numDomain_decFieldType :=
-  @GRing.DecidableField.Pack numDomainType xclass.
+  @GRing.DecidableField.Pack numDomainType class.
 Definition numField_decFieldType :=
-  @GRing.DecidableField.Pack numFieldType xclass.
-Definition porder_closedFieldType := @GRing.ClosedField.Pack porderType xclass.
+  @GRing.DecidableField.Pack numFieldType class.
+Definition porder_closedFieldType := @GRing.ClosedField.Pack porderType class.
 Definition normedZmod_closedFieldType :=
-  @GRing.ClosedField.Pack normedZmodType xclass.
+  @GRing.ClosedField.Pack normedZmodType class.
 Definition numDomain_closedFieldType :=
-  @GRing.ClosedField.Pack numDomainType xclass.
+  @GRing.ClosedField.Pack numDomainType class.
 Definition numField_closedFieldType :=
-  @GRing.ClosedField.Pack numFieldType xclass.
+  @GRing.ClosedField.Pack numFieldType class.
 
 End ClassDef.
 
@@ -735,12 +732,14 @@ Module RealDomain.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R := Class {
   base   : NumDomain.class_of R;
   nmixin : Order.Lattice.mixin_of base;
   lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
   tmixin : Order.Total.mixin_of base;
 }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> NumDomain.class_of.
 Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
   @Order.Total.Class _ (@Order.DistrLattice.Class _ _ (lmixin c)) (@tmixin _ c).
@@ -749,8 +748,6 @@ Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
   fun mT n l m &
@@ -759,64 +756,64 @@ Definition pack :=
                                         T (@Order.Lattice.Class T b n) l) m) =>
   Pack (@Class T b n l m).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
-Definition orderType := @Order.Total.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition normedZmodType := NormedZmodType numDomainType cT xclass.
-Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType xclass.
-Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition latticeType := @Order.Lattice.Pack ring_display cT class.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
+Definition orderType := @Order.Total.Pack ring_display cT class.
+Definition numDomainType := @NumDomain.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType class.
+Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType class.
 Definition comRing_latticeType :=
-  @Order.Lattice.Pack ring_display comRingType xclass.
+  @Order.Lattice.Pack ring_display comRingType class.
 Definition unitRing_latticeType :=
-  @Order.Lattice.Pack ring_display unitRingType xclass.
+  @Order.Lattice.Pack ring_display unitRingType class.
 Definition comUnitRing_latticeType :=
-  @Order.Lattice.Pack ring_display comUnitRingType xclass.
+  @Order.Lattice.Pack ring_display comUnitRingType class.
 Definition idomain_latticeType :=
-  @Order.Lattice.Pack ring_display idomainType xclass.
+  @Order.Lattice.Pack ring_display idomainType class.
 Definition normedZmod_latticeType :=
-  @Order.Lattice.Pack ring_display normedZmodType xclass.
+  @Order.Lattice.Pack ring_display normedZmodType class.
 Definition numDomain_latticeType :=
-  @Order.Lattice.Pack ring_display numDomainType xclass.
+  @Order.Lattice.Pack ring_display numDomainType class.
 Definition zmod_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display zmodType xclass.
+  @Order.DistrLattice.Pack ring_display zmodType class.
 Definition ring_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display ringType xclass.
+  @Order.DistrLattice.Pack ring_display ringType class.
 Definition comRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display comRingType xclass.
+  @Order.DistrLattice.Pack ring_display comRingType class.
 Definition unitRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display unitRingType xclass.
+  @Order.DistrLattice.Pack ring_display unitRingType class.
 Definition comUnitRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display comUnitRingType xclass.
+  @Order.DistrLattice.Pack ring_display comUnitRingType class.
 Definition idomain_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display idomainType xclass.
+  @Order.DistrLattice.Pack ring_display idomainType class.
 Definition normedZmod_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display normedZmodType xclass.
+  @Order.DistrLattice.Pack ring_display normedZmodType class.
 Definition numDomain_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display numDomainType xclass.
-Definition zmod_orderType := @Order.Total.Pack ring_display zmodType xclass.
-Definition ring_orderType := @Order.Total.Pack ring_display ringType xclass.
+  @Order.DistrLattice.Pack ring_display numDomainType class.
+Definition zmod_orderType := @Order.Total.Pack ring_display zmodType class.
+Definition ring_orderType := @Order.Total.Pack ring_display ringType class.
 Definition comRing_orderType :=
-  @Order.Total.Pack ring_display comRingType xclass.
+  @Order.Total.Pack ring_display comRingType class.
 Definition unitRing_orderType :=
-  @Order.Total.Pack ring_display unitRingType xclass.
+  @Order.Total.Pack ring_display unitRingType class.
 Definition comUnitRing_orderType :=
-  @Order.Total.Pack ring_display comUnitRingType xclass.
+  @Order.Total.Pack ring_display comUnitRingType class.
 Definition idomain_orderType :=
-  @Order.Total.Pack ring_display idomainType xclass.
+  @Order.Total.Pack ring_display idomainType class.
 Definition normedZmod_orderType :=
-  @Order.Total.Pack ring_display normedZmodType xclass.
+  @Order.Total.Pack ring_display normedZmodType class.
 Definition numDomain_orderType :=
-  @Order.Total.Pack ring_display numDomainType xclass.
+  @Order.Total.Pack ring_display numDomainType class.
 
 End ClassDef.
 
@@ -889,12 +886,14 @@ Module RealField.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R := Class {
   base  : NumField.class_of R;
   nmixin : Order.Lattice.mixin_of base;
   lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
   tmixin : Order.Total.mixin_of base;
 }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> NumField.class_of.
 Local Coercion base2 R (c : class_of R) : RealDomain.class_of R :=
   @RealDomain.Class _ _ (nmixin c) (lmixin c) (@tmixin R c).
@@ -903,44 +902,42 @@ Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition pack :=
   fun bT (b : NumField.class_of T) & phant_id (NumField.class bT) b =>
   fun mT n l t
       & phant_id (RealDomain.class mT) (@RealDomain.Class T b n l t) =>
   Pack (@Class T b n l t).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
-Definition orderType := @Order.Total.Pack ring_display cT xclass.
-Definition realDomainType := @RealDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition numFieldType := @NumField.Pack cT xclass.
-Definition normedZmodType := NormedZmodType numDomainType cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition numDomainType := @NumDomain.Pack cT class.
+Definition latticeType := @Order.Lattice.Pack ring_display cT class.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
+Definition orderType := @Order.Total.Pack ring_display cT class.
+Definition realDomainType := @RealDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition numFieldType := @NumField.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
 Definition field_latticeType :=
-  @Order.Lattice.Pack ring_display fieldType xclass.
+  @Order.Lattice.Pack ring_display fieldType class.
 Definition field_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display fieldType xclass.
-Definition field_orderType := @Order.Total.Pack ring_display fieldType xclass.
-Definition field_realDomainType := @RealDomain.Pack fieldType xclass.
+  @Order.DistrLattice.Pack ring_display fieldType class.
+Definition field_orderType := @Order.Total.Pack ring_display fieldType class.
+Definition field_realDomainType := @RealDomain.Pack fieldType class.
 Definition numField_latticeType :=
-  @Order.Lattice.Pack ring_display numFieldType xclass.
+  @Order.Lattice.Pack ring_display numFieldType class.
 Definition numField_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display numFieldType xclass.
+  @Order.DistrLattice.Pack ring_display numFieldType class.
 Definition numField_orderType :=
-  @Order.Total.Pack ring_display numFieldType xclass.
-Definition numField_realDomainType := @RealDomain.Pack numFieldType xclass.
+  @Order.Total.Pack ring_display numFieldType class.
+Definition numField_realDomainType := @RealDomain.Pack numFieldType class.
 
 End ClassDef.
 
@@ -1003,39 +1000,41 @@ Module ArchimedeanField.
 
 Section ClassDef.
 
-Record class_of R :=
-  Class { base : RealField.class_of R; _ : archimedean_axiom (num_for R base) }.
+Set Primitive Projections.
+Record class_of R := Class {
+  base : RealField.class_of R;
+  mixin : archimedean_axiom (num_for R base)
+}.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> RealField.class_of.
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
   fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
-Definition orderType := @Order.Total.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition realDomainType := @RealDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition numFieldType := @NumField.Pack cT xclass.
-Definition realFieldType := @RealField.Pack cT xclass.
-Definition normedZmodType := NormedZmodType numDomainType cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition latticeType := @Order.Lattice.Pack ring_display cT class.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
+Definition orderType := @Order.Total.Pack ring_display cT class.
+Definition numDomainType := @NumDomain.Pack cT class.
+Definition realDomainType := @RealDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition numFieldType := @NumField.Pack cT class.
+Definition realFieldType := @RealField.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
 
 End ClassDef.
 
@@ -1094,39 +1093,41 @@ Module RealClosedField.
 
 Section ClassDef.
 
-Record class_of R :=
-  Class { base : RealField.class_of R; _ : real_closed_axiom (num_for R base) }.
+Set Primitive Projections.
+Record class_of R := Class {
+  base : RealField.class_of R;
+  mixin : real_closed_axiom (num_for R base)
+}.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> RealField.class_of.
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 Definition clone c of phant_id class c := @Pack T c.
 Definition pack b0 (m0 : real_closed_axiom (num_for T b0)) :=
   fun bT b & phant_id (RealField.class bT) b =>
   fun    m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition porderType := @Order.POrder.Pack ring_display cT xclass.
-Definition latticeType := @Order.Lattice.Pack ring_display cT xclass.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT xclass.
-Definition orderType := @Order.Total.Pack ring_display cT xclass.
-Definition numDomainType := @NumDomain.Pack cT xclass.
-Definition realDomainType := @RealDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition numFieldType := @NumField.Pack cT xclass.
-Definition realFieldType := @RealField.Pack cT xclass.
-Definition normedZmodType := NormedZmodType numDomainType cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition porderType := @Order.POrder.Pack ring_display cT class.
+Definition latticeType := @Order.Lattice.Pack ring_display cT class.
+Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
+Definition orderType := @Order.Total.Pack ring_display cT class.
+Definition numDomainType := @NumDomain.Pack cT class.
+Definition realDomainType := @RealDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition numFieldType := @NumField.Pack cT class.
+Definition realFieldType := @RealField.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
 
 End ClassDef.
 

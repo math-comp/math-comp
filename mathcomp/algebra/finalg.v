@@ -74,8 +74,10 @@ Module Zmodule.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of M :=
   Class { base : GRing.Zmodule.class_of M; mixin : mixin_of M base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.Zmodule.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.Zmodule.class_of R :=
   CountRing.Zmodule.Class c (mixin c).
@@ -86,22 +88,20 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.Zmodule.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition zmod_finType := @Finite.Pack zmodType (fin_ xclass).
+Definition zmod_finType := @Finite.Pack zmodType (fin_ class).
 Definition zmod_baseFinGroupType := base_group zmodType zmodType finType.
 Definition zmod_finGroupType := fin_group zmod_baseFinGroupType zmodType.
-Definition countZmod_finType := @Finite.Pack countZmodType (fin_ xclass).
+Definition countZmod_finType := @Finite.Pack countZmodType (fin_ class).
 Definition countZmod_baseFinGroupType :=
   base_group countZmodType zmodType finType.
 Definition countZmod_finGroupType :=
@@ -171,8 +171,10 @@ Module Ring.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.Ring.class_of R; mixin : mixin_of R base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.Ring.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.Ring.class_of R :=
   CountRing.Ring.Class c (mixin c).
@@ -184,31 +186,29 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.Ring.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition ring_finType := @Finite.Pack ringType (fin_ xclass).
+Definition ring_finType := @Finite.Pack ringType (fin_ class).
 Definition ring_baseFinGroupType := base_group ringType zmodType finType.
 Definition ring_finGroupType := fin_group ring_baseFinGroupType zmodType.
-Definition ring_finZmodType := @Zmodule.Pack ringType xclass.
-Definition countRing_finType := @Finite.Pack countRingType (fin_ xclass).
+Definition ring_finZmodType := @Zmodule.Pack ringType class.
+Definition countRing_finType := @Finite.Pack countRingType (fin_ class).
 Definition countRing_baseFinGroupType :=
   base_group countRingType zmodType finType.
 Definition countRing_finGroupType :=
   fin_group countRing_baseFinGroupType zmodType.
-Definition countRing_finZmodType := @Zmodule.Pack countRingType xclass.
+Definition countRing_finZmodType := @Zmodule.Pack countRingType class.
 
 End ClassDef.
 
@@ -295,8 +295,10 @@ Module ComRing.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.ComRing.class_of R; mixin : mixin_of R base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.ComRing.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.ComRing.class_of R :=
   CountRing.ComRing.Class c (mixin c).
@@ -308,36 +310,34 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.ComRing.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @CountRing.ComRing.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition comRing_finType := @Finite.Pack comRingType (fin_ xclass).
+Definition comRing_finType := @Finite.Pack comRingType (fin_ class).
 Definition comRing_baseFinGroupType := base_group comRingType zmodType finType.
 Definition comRing_finGroupType := fin_group comRing_baseFinGroupType zmodType.
-Definition comRing_finZmodType := @Zmodule.Pack comRingType xclass.
-Definition comRing_finRingType := @Ring.Pack comRingType xclass.
-Definition countComRing_finType := @Finite.Pack countComRingType (fin_ xclass).
+Definition comRing_finZmodType := @Zmodule.Pack comRingType class.
+Definition comRing_finRingType := @Ring.Pack comRingType class.
+Definition countComRing_finType := @Finite.Pack countComRingType (fin_ class).
 Definition countComRing_baseFinGroupType :=
   base_group countComRingType zmodType finType.
 Definition countComRing_finGroupType :=
   fin_group countComRing_baseFinGroupType zmodType.
-Definition countComRing_finZmodType := @Zmodule.Pack countComRingType xclass.
-Definition countComRing_finRingType := @Ring.Pack countComRingType xclass.
+Definition countComRing_finZmodType := @Zmodule.Pack countComRingType class.
+Definition countComRing_finRingType := @Ring.Pack countComRingType class.
 
 End ClassDef.
 
@@ -397,8 +397,10 @@ Module UnitRing.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.UnitRing.class_of R; mixin : mixin_of R base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.UnitRing.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.UnitRing.class_of R :=
   CountRing.UnitRing.Class c (mixin c).
@@ -410,39 +412,37 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.UnitRing.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition unitRing_finType := @Finite.Pack unitRingType (fin_ xclass).
+Definition unitRing_finType := @Finite.Pack unitRingType (fin_ class).
 Definition unitRing_baseFinGroupType :=
   base_group unitRingType zmodType finType.
 Definition unitRing_finGroupType :=
   fin_group unitRing_baseFinGroupType zmodType.
-Definition unitRing_finZmodType := @Zmodule.Pack unitRingType xclass.
-Definition unitRing_finRingType := @Ring.Pack unitRingType xclass.
+Definition unitRing_finZmodType := @Zmodule.Pack unitRingType class.
+Definition unitRing_finRingType := @Ring.Pack unitRingType class.
 Definition countUnitRing_finType :=
-  @Finite.Pack countUnitRingType (fin_ xclass).
+  @Finite.Pack countUnitRingType (fin_ class).
 Definition countUnitRing_baseFinGroupType :=
   base_group countUnitRingType zmodType finType.
 Definition countUnitRing_finGroupType :=
   fin_group countUnitRing_baseFinGroupType zmodType.
-Definition countUnitRing_finZmodType := @Zmodule.Pack countUnitRingType xclass.
-Definition countUnitRing_finRingType := @Ring.Pack countUnitRingType xclass.
+Definition countUnitRing_finZmodType := @Zmodule.Pack countUnitRingType class.
+Definition countUnitRing_finRingType := @Ring.Pack countUnitRingType class.
 
 End ClassDef.
 
@@ -583,8 +583,10 @@ Module ComUnitRing.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.ComUnitRing.class_of R; mixin : mixin_of R base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.ComUnitRing.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.ComUnitRing.class_of R :=
   CountRing.ComUnitRing.Class c (mixin c).
@@ -598,60 +600,58 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.ComUnitRing.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
-Definition finComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
-Definition finUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @CountRing.ComRing.Pack cT class.
+Definition finComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT class.
+Definition finUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition comUnitRing_finType := @Finite.Pack comUnitRingType (fin_ xclass).
+Definition comUnitRing_finType := @Finite.Pack comUnitRingType (fin_ class).
 Definition comUnitRing_baseFinGroupType :=
   base_group comUnitRingType zmodType finType.
 Definition comUnitRing_finGroupType :=
   fin_group comUnitRing_baseFinGroupType zmodType.
-Definition comUnitRing_finZmodType := @Zmodule.Pack comUnitRingType xclass.
-Definition comUnitRing_finRingType := @Ring.Pack comUnitRingType xclass.
-Definition comUnitRing_finComRingType := @ComRing.Pack comUnitRingType xclass.
-Definition comUnitRing_finUnitRingType := @UnitRing.Pack comUnitRingType xclass.
+Definition comUnitRing_finZmodType := @Zmodule.Pack comUnitRingType class.
+Definition comUnitRing_finRingType := @Ring.Pack comUnitRingType class.
+Definition comUnitRing_finComRingType := @ComRing.Pack comUnitRingType class.
+Definition comUnitRing_finUnitRingType := @UnitRing.Pack comUnitRingType class.
 Definition countComUnitRing_finType :=
-  @Finite.Pack countComUnitRingType (fin_ xclass).
+  @Finite.Pack countComUnitRingType (fin_ class).
 Definition countComUnitRing_baseFinGroupType :=
   base_group countComUnitRingType zmodType finType.
 Definition countComUnitRing_finGroupType :=
   fin_group countComUnitRing_baseFinGroupType zmodType.
 Definition countComUnitRing_finZmodType :=
-  @Zmodule.Pack countComUnitRingType xclass.
+  @Zmodule.Pack countComUnitRingType class.
 Definition countComUnitRing_finRingType :=
-  @Ring.Pack countComUnitRingType xclass.
+  @Ring.Pack countComUnitRingType class.
 Definition countComUnitRing_finComRingType :=
-  @ComRing.Pack countComUnitRingType xclass.
+  @ComRing.Pack countComUnitRingType class.
 Definition countComUnitRing_finUnitRingType :=
-  @UnitRing.Pack countComUnitRingType xclass.
-Definition unitRing_finComRingType := @ComRing.Pack unitRingType xclass.
+  @UnitRing.Pack countComUnitRingType class.
+Definition unitRing_finComRingType := @ComRing.Pack unitRingType class.
 Definition countUnitRing_finComRingType :=
-  @ComRing.Pack countUnitRingType xclass.
-Definition comRing_finUnitRingType := @UnitRing.Pack comRingType xclass.
+  @ComRing.Pack countUnitRingType class.
+Definition comRing_finUnitRingType := @UnitRing.Pack comRingType class.
 Definition countComRing_finUnitRingType :=
-  @UnitRing.Pack countComRingType xclass.
-Definition finComRing_finUnitRingType := @UnitRing.Pack finComRingType xclass.
+  @UnitRing.Pack countComRingType class.
+Definition finComRing_finUnitRingType := @UnitRing.Pack finComRingType class.
 
 End ClassDef.
 
@@ -733,8 +733,10 @@ Module IntegralDomain.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.IntegralDomain.class_of R; mixin : mixin_of R base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.IntegralDomain.class_of R :=
   CountRing.IntegralDomain.Class c (mixin c).
@@ -746,53 +748,51 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.IntegralDomain.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
-Definition finComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
-Definition finUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT xclass.
-Definition finComUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition countIdomainType := @CountRing.IntegralDomain.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @CountRing.ComRing.Pack cT class.
+Definition finComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT class.
+Definition finUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT class.
+Definition finComUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition countIdomainType := @CountRing.IntegralDomain.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition idomain_finType := @Finite.Pack idomainType (fin_ xclass).
+Definition idomain_finType := @Finite.Pack idomainType (fin_ class).
 Definition idomain_baseFinGroupType := base_group idomainType zmodType finType.
 Definition idomain_finGroupType := fin_group idomain_baseFinGroupType zmodType.
-Definition idomain_finZmodType := @Zmodule.Pack idomainType xclass.
-Definition idomain_finRingType := @Ring.Pack idomainType xclass.
-Definition idomain_finUnitRingType := @UnitRing.Pack idomainType xclass.
-Definition idomain_finComRingType := @ComRing.Pack idomainType xclass.
-Definition idomain_finComUnitRingType := @ComUnitRing.Pack idomainType xclass.
-Definition countIdomain_finType := @Finite.Pack countIdomainType (fin_ xclass).
+Definition idomain_finZmodType := @Zmodule.Pack idomainType class.
+Definition idomain_finRingType := @Ring.Pack idomainType class.
+Definition idomain_finUnitRingType := @UnitRing.Pack idomainType class.
+Definition idomain_finComRingType := @ComRing.Pack idomainType class.
+Definition idomain_finComUnitRingType := @ComUnitRing.Pack idomainType class.
+Definition countIdomain_finType := @Finite.Pack countIdomainType (fin_ class).
 Definition countIdomain_baseFinGroupType :=
   base_group countIdomainType zmodType finType.
 Definition countIdomain_finGroupType :=
   fin_group countIdomain_baseFinGroupType zmodType.
-Definition countIdomain_finZmodType := @Zmodule.Pack countIdomainType xclass.
-Definition countIdomain_finRingType := @Ring.Pack countIdomainType xclass.
+Definition countIdomain_finZmodType := @Zmodule.Pack countIdomainType class.
+Definition countIdomain_finRingType := @Ring.Pack countIdomainType class.
 Definition countIdomain_finUnitRingType :=
-  @UnitRing.Pack countIdomainType xclass.
-Definition countIdomain_finComRingType := @ComRing.Pack countIdomainType xclass.
+  @UnitRing.Pack countIdomainType class.
+Definition countIdomain_finComRingType := @ComRing.Pack countIdomainType class.
 Definition countIdomain_finComUnitRingType :=
-  @ComUnitRing.Pack countIdomainType xclass.
+  @ComUnitRing.Pack countIdomainType class.
 
 End ClassDef.
 
@@ -876,8 +876,10 @@ Module Field.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of R :=
   Class { base : GRing.Field.class_of R; mixin : mixin_of R base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.Field.class_of.
 Local Coercion base2 R (c : class_of R) : CountRing.Field.class_of R :=
   CountRing.Field.Class c (mixin c).
@@ -889,58 +891,56 @@ Local Coercion sort : type >-> Sortclass.
 Definition pack := gen_pack Pack Class GRing.Field.class.
 Variable cT : type.
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition comRingType := @GRing.ComRing.Pack cT xclass.
-Definition countComRingType := @CountRing.ComRing.Pack cT xclass.
-Definition finComRingType := @ComRing.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
-Definition finUnitRingType := @UnitRing.Pack cT xclass.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT xclass.
-Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT xclass.
-Definition finComUnitRingType := @ComUnitRing.Pack cT xclass.
-Definition idomainType := @GRing.IntegralDomain.Pack cT xclass.
-Definition countIdomainType := @CountRing.IntegralDomain.Pack cT xclass.
-Definition finIdomainType := @IntegralDomain.Pack cT xclass.
-Definition fieldType := @GRing.Field.Pack cT xclass.
-Definition countFieldType := @CountRing.Field.Pack cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition comRingType := @GRing.ComRing.Pack cT class.
+Definition countComRingType := @CountRing.ComRing.Pack cT class.
+Definition finComRingType := @ComRing.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT class.
+Definition finUnitRingType := @UnitRing.Pack cT class.
+Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
+Definition countComUnitRingType := @CountRing.ComUnitRing.Pack cT class.
+Definition finComUnitRingType := @ComUnitRing.Pack cT class.
+Definition idomainType := @GRing.IntegralDomain.Pack cT class.
+Definition countIdomainType := @CountRing.IntegralDomain.Pack cT class.
+Definition finIdomainType := @IntegralDomain.Pack cT class.
+Definition fieldType := @GRing.Field.Pack cT class.
+Definition countFieldType := @CountRing.Field.Pack cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition field_finType := @Finite.Pack fieldType (fin_ xclass).
+Definition field_finType := @Finite.Pack fieldType (fin_ class).
 Definition field_baseFinGroupType := base_group fieldType zmodType finType.
 Definition field_finGroupType := fin_group field_baseFinGroupType zmodType.
-Definition field_finZmodType := @Zmodule.Pack fieldType xclass.
-Definition field_finRingType := @Ring.Pack fieldType xclass.
-Definition field_finUnitRingType := @UnitRing.Pack fieldType xclass.
-Definition field_finComRingType := @ComRing.Pack fieldType xclass.
-Definition field_finComUnitRingType := @ComUnitRing.Pack fieldType xclass.
-Definition field_finIdomainType := @IntegralDomain.Pack fieldType xclass.
-Definition countField_finType := @Finite.Pack countFieldType (fin_ xclass).
+Definition field_finZmodType := @Zmodule.Pack fieldType class.
+Definition field_finRingType := @Ring.Pack fieldType class.
+Definition field_finUnitRingType := @UnitRing.Pack fieldType class.
+Definition field_finComRingType := @ComRing.Pack fieldType class.
+Definition field_finComUnitRingType := @ComUnitRing.Pack fieldType class.
+Definition field_finIdomainType := @IntegralDomain.Pack fieldType class.
+Definition countField_finType := @Finite.Pack countFieldType (fin_ class).
 Definition countField_baseFinGroupType :=
   base_group countFieldType zmodType finType.
 Definition countField_finGroupType :=
   fin_group countField_baseFinGroupType zmodType.
-Definition countField_finZmodType := @Zmodule.Pack countFieldType xclass.
-Definition countField_finRingType := @Ring.Pack countFieldType xclass.
-Definition countField_finUnitRingType := @UnitRing.Pack countFieldType xclass.
-Definition countField_finComRingType := @ComRing.Pack countFieldType xclass.
+Definition countField_finZmodType := @Zmodule.Pack countFieldType class.
+Definition countField_finRingType := @Ring.Pack countFieldType class.
+Definition countField_finUnitRingType := @UnitRing.Pack countFieldType class.
+Definition countField_finComRingType := @ComRing.Pack countFieldType class.
 Definition countField_finComUnitRingType :=
-  @ComUnitRing.Pack countFieldType xclass.
+  @ComUnitRing.Pack countFieldType class.
 Definition countField_finIdomainType :=
-  @IntegralDomain.Pack countFieldType xclass.
+  @IntegralDomain.Pack countFieldType class.
 
 End ClassDef.
 
@@ -1066,17 +1066,16 @@ Module DecField.
 Section Joins.
 
 Variable cT : Field.type.
-Let xT := let: Field.Pack T _ := cT in T. 
-Let xclass : Field.class_of xT := Field.class cT.
+Let class : Field.class_of cT := Field.class cT.
 
 Definition type := Eval hnf in DecFieldType cT (DecidableFieldMixin cT).
-Definition finType := @Finite.Pack type (fin_ xclass).
-Definition finZmodType := @Zmodule.Pack type xclass.
-Definition finRingType := @Ring.Pack type xclass.
-Definition finUnitRingType := @UnitRing.Pack type xclass.
-Definition finComRingType := @ComRing.Pack type xclass.
-Definition finComUnitRingType := @ComUnitRing.Pack type xclass.
-Definition finIdomainType := @IntegralDomain.Pack type xclass.
+Definition finType := @Finite.Pack type (fin_ class).
+Definition finZmodType := @Zmodule.Pack type class.
+Definition finRingType := @Ring.Pack type class.
+Definition finUnitRingType := @UnitRing.Pack type class.
+Definition finComRingType := @ComRing.Pack type class.
+Definition finComUnitRingType := @ComUnitRing.Pack type class.
+Definition finIdomainType := @IntegralDomain.Pack type class.
 Definition baseFinGroupType := base_group type finZmodType finZmodType.
 Definition finGroupType := fin_group baseFinGroupType cT.
 
@@ -1105,8 +1104,10 @@ Section ClassDef.
 
 Variable R : ringType.
 
+Set Primitive Projections.
 Record class_of M :=
   Class { base : GRing.Lmodule.class_of R M; mixin : mixin_of M base }.
+Unset Primitive Projections.
 Local Coercion base : class_of >-> GRing.Lmodule.class_of.
 Local Coercion base2 R (c : class_of R) : Zmodule.class_of R :=
   Zmodule.Class (mixin c).
@@ -1116,26 +1117,24 @@ Local Coercion sort : type >-> Sortclass.
 Variables (phR : phant R) (cT : type phR).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Definition pack := gen_pack (Pack phR) Class (@GRing.Lmodule.class R phR).
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition lmod_countType := @Countable.Pack lmodType (fin_ xclass).
-Definition lmod_finType := @Finite.Pack lmodType (fin_ xclass).
+Definition lmod_countType := @Countable.Pack lmodType (fin_ class).
+Definition lmod_finType := @Finite.Pack lmodType (fin_ class).
 Definition lmod_baseFinGroupType := base_group lmodType zmodType finType.
 Definition lmod_finGroupType := fin_group lmod_baseFinGroupType zmodType.
-Definition lmod_countZmodType := @CountRing.Zmodule.Pack lmodType xclass.
-Definition lmod_finZmodType := @Zmodule.Pack lmodType xclass.
+Definition lmod_countZmodType := @CountRing.Zmodule.Pack lmodType class.
+Definition lmod_finZmodType := @Zmodule.Pack lmodType class.
 
 End ClassDef.
 
@@ -1184,8 +1183,10 @@ Section ClassDef.
 
 Variable R : ringType.
 
+Set Primitive Projections.
 Record class_of M :=
   Class { base : GRing.Lalgebra.class_of R M; mixin : mixin_of M base }.
+Unset Primitive Projections.
 Definition base2 M (c : class_of M) := Ring.Class (mixin c).
 Definition base3 M (c : class_of M) := @Lmodule.Class _ _ (base c) (mixin c).
 Local Coercion base : class_of >-> GRing.Lalgebra.class_of.
@@ -1197,39 +1198,37 @@ Local Coercion sort : type >-> Sortclass.
 Variables (phR : phant R) (cT : type phR).
 Definition pack := gen_pack (Pack phR) Class (@GRing.Lalgebra.class R phR).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
-Definition finLmodType := @Lmodule.Pack R phR cT xclass.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
+Definition finLmodType := @Lmodule.Pack R phR cT class.
+Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition lalg_countType := @Countable.Pack lalgType (fin_ xclass).
-Definition lalg_finType := @Finite.Pack lalgType (fin_ xclass).
+Definition lalg_countType := @Countable.Pack lalgType (fin_ class).
+Definition lalg_finType := @Finite.Pack lalgType (fin_ class).
 Definition lalg_baseFinGroupType := base_group lalgType zmodType finType.
 Definition lalg_finGroupType := fin_group lalg_baseFinGroupType zmodType.
-Definition lalg_countZmodType := @CountRing.Zmodule.Pack lalgType xclass.
-Definition lalg_finZmodType := @Zmodule.Pack lalgType xclass.
-Definition lalg_finLmodType := @Lmodule.Pack R phR lalgType xclass.
-Definition lalg_countRingType := @CountRing.Ring.Pack lalgType xclass.
-Definition lalg_finRingType := @Ring.Pack lalgType xclass.
-Definition lmod_countRingType := @CountRing.Ring.Pack lmodType xclass.
-Definition lmod_finRingType := @Ring.Pack lmodType xclass.
-Definition finLmod_ringType := @GRing.Ring.Pack finLmodType xclass.
-Definition finLmod_countRingType := @CountRing.Ring.Pack finLmodType xclass.
-Definition finLmod_finRingType := @Ring.Pack finLmodType xclass.
+Definition lalg_countZmodType := @CountRing.Zmodule.Pack lalgType class.
+Definition lalg_finZmodType := @Zmodule.Pack lalgType class.
+Definition lalg_finLmodType := @Lmodule.Pack R phR lalgType class.
+Definition lalg_countRingType := @CountRing.Ring.Pack lalgType class.
+Definition lalg_finRingType := @Ring.Pack lalgType class.
+Definition lmod_countRingType := @CountRing.Ring.Pack lmodType class.
+Definition lmod_finRingType := @Ring.Pack lmodType class.
+Definition finLmod_ringType := @GRing.Ring.Pack finLmodType class.
+Definition finLmod_countRingType := @CountRing.Ring.Pack finLmodType class.
+Definition finLmod_finRingType := @Ring.Pack finLmodType class.
 
 End ClassDef.
 
@@ -1297,8 +1296,10 @@ Section ClassDef.
 
 Variable R : ringType.
 
+Set Primitive Projections.
 Record class_of M :=
   Class { base : GRing.Algebra.class_of R M; mixin : mixin_of M base }.
+Unset Primitive Projections.
 Definition base2 M (c : class_of M) := Lalgebra.Class (mixin c).
 Local Coercion base : class_of >-> GRing.Algebra.class_of.
 Local Coercion base2 : class_of >->Lalgebra.class_of.
@@ -1308,37 +1309,35 @@ Local Coercion sort : type >-> Sortclass.
 Variables (phR : phant R) (cT : type phR).
 Definition pack := gen_pack (Pack phR) Class (@GRing.Algebra.class R phR).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
-Definition finLmodType := @Lmodule.Pack R phR cT xclass.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass.
-Definition finLalgType := @Lalgebra.Pack R phR cT xclass.
-Definition algType := @GRing.Algebra.Pack R phR cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
+Definition finLmodType := @Lmodule.Pack R phR cT class.
+Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
+Definition finLalgType := @Lalgebra.Pack R phR cT class.
+Definition algType := @GRing.Algebra.Pack R phR cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition alg_countType := @Countable.Pack algType (fin_ xclass).
-Definition alg_finType := @Finite.Pack algType (fin_ xclass).
+Definition alg_countType := @Countable.Pack algType (fin_ class).
+Definition alg_finType := @Finite.Pack algType (fin_ class).
 Definition alg_baseFinGroupType := base_group algType zmodType finType.
 Definition alg_finGroupType := fin_group alg_baseFinGroupType zmodType.
-Definition alg_countZmodType := @CountRing.Zmodule.Pack algType xclass.
-Definition alg_finZmodType := @Zmodule.Pack algType xclass.
-Definition alg_countRingType := @CountRing.Ring.Pack algType xclass.
-Definition alg_finRingType := @Ring.Pack algType xclass.
-Definition alg_finLmodType := @Lmodule.Pack R phR algType xclass.
-Definition alg_finLalgType := @Lalgebra.Pack R phR algType xclass.
+Definition alg_countZmodType := @CountRing.Zmodule.Pack algType class.
+Definition alg_finZmodType := @Zmodule.Pack algType class.
+Definition alg_countRingType := @CountRing.Ring.Pack algType class.
+Definition alg_finRingType := @Ring.Pack algType class.
+Definition alg_finLmodType := @Lmodule.Pack R phR algType class.
+Definition alg_finLalgType := @Lalgebra.Pack R phR algType class.
 
 End ClassDef.
 
@@ -1405,8 +1404,10 @@ Section ClassDef.
 
 Variable R : unitRingType.
 
+Set Primitive Projections.
 Record class_of M :=
   Class { base : GRing.UnitAlgebra.class_of R M; mixin : mixin_of M base }.
+Unset Primitive Projections.
 Definition base2 M (c : class_of M) := Algebra.Class (mixin c).
 Definition base3 M (c : class_of M) := @UnitRing.Class _ (base c) (mixin c).
 
@@ -1419,73 +1420,71 @@ Local Coercion sort : type >-> Sortclass.
 Variables (phR : phant R) (cT : type phR).
 Definition pack := gen_pack (Pack phR) Class (@GRing.UnitAlgebra.class R phR).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (fin_ xclass).
-Definition finType := @Finite.Pack cT (fin_ xclass).
-Definition zmodType := @GRing.Zmodule.Pack cT xclass.
-Definition countZmodType := @CountRing.Zmodule.Pack cT xclass.
-Definition finZmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @GRing.Ring.Pack cT xclass.
-Definition countRingType := @CountRing.Ring.Pack cT xclass.
-Definition finRingType := @Ring.Pack cT xclass.
-Definition unitRingType := @GRing.UnitRing.Pack cT xclass.
-Definition countUnitRingType := @CountRing.UnitRing.Pack cT xclass.
-Definition finUnitRingType := @UnitRing.Pack cT xclass.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT xclass.
-Definition finLmodType := @Lmodule.Pack R phR cT xclass.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT xclass.
-Definition finLalgType := @Lalgebra.Pack R phR cT xclass.
-Definition algType := @GRing.Algebra.Pack R phR cT xclass.
-Definition finAlgType := @Algebra.Pack R phR cT xclass.
-Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT xclass.
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (fin_ class).
+Definition finType := @Finite.Pack cT (fin_ class).
+Definition zmodType := @GRing.Zmodule.Pack cT class.
+Definition countZmodType := @CountRing.Zmodule.Pack cT class.
+Definition finZmodType := @Zmodule.Pack cT class.
+Definition ringType := @GRing.Ring.Pack cT class.
+Definition countRingType := @CountRing.Ring.Pack cT class.
+Definition finRingType := @Ring.Pack cT class.
+Definition unitRingType := @GRing.UnitRing.Pack cT class.
+Definition countUnitRingType := @CountRing.UnitRing.Pack cT class.
+Definition finUnitRingType := @UnitRing.Pack cT class.
+Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
+Definition finLmodType := @Lmodule.Pack R phR cT class.
+Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
+Definition finLalgType := @Lalgebra.Pack R phR cT class.
+Definition algType := @GRing.Algebra.Pack R phR cT class.
+Definition finAlgType := @Algebra.Pack R phR cT class.
+Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT class.
 Definition baseFinGroupType := base_group cT zmodType finType.
 Definition finGroupType := fin_group baseFinGroupType zmodType.
 
-Definition unitAlg_countType := @Countable.Pack unitAlgType (fin_ xclass).
-Definition unitAlg_finType := @Finite.Pack unitAlgType (fin_ xclass).
+Definition unitAlg_countType := @Countable.Pack unitAlgType (fin_ class).
+Definition unitAlg_finType := @Finite.Pack unitAlgType (fin_ class).
 Definition unitAlg_baseFinGroupType := base_group unitAlgType zmodType finType.
 Definition unitAlg_finGroupType := fin_group unitAlg_baseFinGroupType zmodType.
-Definition unitAlg_countZmodType := @CountRing.Zmodule.Pack unitAlgType xclass.
-Definition unitAlg_finZmodType := @Zmodule.Pack unitAlgType xclass.
-Definition unitAlg_countRingType := @CountRing.Ring.Pack unitAlgType xclass.
-Definition unitAlg_finRingType := @Ring.Pack unitAlgType xclass.
+Definition unitAlg_countZmodType := @CountRing.Zmodule.Pack unitAlgType class.
+Definition unitAlg_finZmodType := @Zmodule.Pack unitAlgType class.
+Definition unitAlg_countRingType := @CountRing.Ring.Pack unitAlgType class.
+Definition unitAlg_finRingType := @Ring.Pack unitAlgType class.
 Definition unitAlg_countUnitRingType :=
-  @CountRing.UnitRing.Pack unitAlgType xclass.
-Definition unitAlg_finUnitRingType := @UnitRing.Pack unitAlgType xclass.
-Definition unitAlg_finLmodType := @Lmodule.Pack R phR unitAlgType xclass.
-Definition unitAlg_finLalgType := @Lalgebra.Pack R phR unitAlgType xclass.
-Definition unitAlg_finAlgType := @Algebra.Pack R phR unitAlgType xclass.
-Definition unitRing_finLmodType := @Lmodule.Pack R phR unitRingType xclass.
-Definition unitRing_finLalgType := @Lalgebra.Pack R phR unitRingType xclass.
-Definition unitRing_finAlgType := @Algebra.Pack R phR unitRingType xclass.
+  @CountRing.UnitRing.Pack unitAlgType class.
+Definition unitAlg_finUnitRingType := @UnitRing.Pack unitAlgType class.
+Definition unitAlg_finLmodType := @Lmodule.Pack R phR unitAlgType class.
+Definition unitAlg_finLalgType := @Lalgebra.Pack R phR unitAlgType class.
+Definition unitAlg_finAlgType := @Algebra.Pack R phR unitAlgType class.
+Definition unitRing_finLmodType := @Lmodule.Pack R phR unitRingType class.
+Definition unitRing_finLalgType := @Lalgebra.Pack R phR unitRingType class.
+Definition unitRing_finAlgType := @Algebra.Pack R phR unitRingType class.
 Definition countUnitRing_lmodType :=
-  @GRing.Lmodule.Pack R phR countUnitRingType xclass.
+  @GRing.Lmodule.Pack R phR countUnitRingType class.
 Definition countUnitRing_finLmodType :=
-  @Lmodule.Pack R phR countUnitRingType xclass.
+  @Lmodule.Pack R phR countUnitRingType class.
 Definition countUnitRing_lalgType :=
-  @GRing.Lalgebra.Pack R phR countUnitRingType xclass.
+  @GRing.Lalgebra.Pack R phR countUnitRingType class.
 Definition countUnitRing_finLalgType :=
-  @Lalgebra.Pack R phR countUnitRingType xclass.
+  @Lalgebra.Pack R phR countUnitRingType class.
 Definition countUnitRing_algType :=
-  @GRing.Algebra.Pack R phR countUnitRingType xclass.
+  @GRing.Algebra.Pack R phR countUnitRingType class.
 Definition countUnitRing_finAlgType :=
-  @Algebra.Pack R phR countUnitRingType xclass.
+  @Algebra.Pack R phR countUnitRingType class.
 Definition finUnitRing_lmodType :=
-  @GRing.Lmodule.Pack R phR finUnitRingType xclass.
+  @GRing.Lmodule.Pack R phR finUnitRingType class.
 Definition finUnitRing_finLmodType :=
-  @Lmodule.Pack R phR finUnitRingType xclass.
+  @Lmodule.Pack R phR finUnitRingType class.
 Definition finUnitRing_lalgType :=
-  @GRing.Lalgebra.Pack R phR finUnitRingType xclass.
+  @GRing.Lalgebra.Pack R phR finUnitRingType class.
 Definition finUnitRing_finLalgType :=
-  @Lalgebra.Pack R phR finUnitRingType xclass.
+  @Lalgebra.Pack R phR finUnitRingType class.
 Definition finUnitRing_algType :=
-  @GRing.Algebra.Pack R phR finUnitRingType xclass.
+  @GRing.Algebra.Pack R phR finUnitRingType class.
 Definition finUnitRing_finAlgType :=
-  @Algebra.Pack R phR finUnitRingType xclass.
+  @Algebra.Pack R phR finUnitRingType class.
 
 End ClassDef.
 

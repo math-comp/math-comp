@@ -204,10 +204,12 @@ End Mixins.
 
 Section ClassDef.
 
+Set Primitive Projections.
 Record class_of T := Class {
   base : Choice.class_of T;
   mixin : mixin_of (Equality.Pack base)
 }.
+Unset Primitive Projections.
 Definition base2 T c := Countable.Class (@base T c) (mixin_base (mixin c)).
 Local Coercion base : class_of >-> Choice.class_of.
 
@@ -216,16 +218,14 @@ Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Definition clone c of phant_id class c := @Pack T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
 
 Definition pack b0 (m0 : mixin_of (EqType T b0)) :=
   fun bT b & phant_id (Choice.class bT) b =>
   fun m & phant_id m0 m => Pack (@Class T b m).
 
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition countType := @Countable.Pack cT (base2 xclass).
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT (base2 class).
 
 End ClassDef.
 
