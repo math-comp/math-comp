@@ -1119,6 +1119,8 @@ Proof. by rewrite -all_predC; apply: allP. Qed.
 Lemma allPn a s : reflect (exists2 x, x \in s & ~~ a x) (~~ all a s).
 Proof. by rewrite -has_predC; apply: hasP. Qed.
 
+Lemma allss s : all (mem s) s. Proof. exact/allP. Qed.
+
 Lemma mem_filter a x s : (x \in filter a s) = a x && (x \in s).
 Proof.
 rewrite andbC; elim: s => //= y s IHs.
@@ -1920,15 +1922,17 @@ Lemma mask_cat m1 m2 s1 s2 :
   size m1 = size s1 -> mask (m1 ++ m2) (s1 ++ s2) = mask m1 s1 ++ mask m2 s2.
 Proof. by move: m1 s1; apply: seq_ind2 => // -[] m1 x1 s1 /= _ ->. Qed.
 
+Lemma all_mask a m s : all a s -> all a (mask m s).
+Proof.
+by elim: m s => [|[] m IHm] [|x s] //= /andP [? /IHm ->]; rewrite ?andbT.
+Qed.
+
 Lemma has_mask_cons a b m x s :
   has a (mask (b :: m) (x :: s)) = b && a x || has a (mask m s).
 Proof. by case: b. Qed.
 
 Lemma has_mask a m s : has a (mask m s) -> has a s.
-Proof.
-elim: m s => [|b m IHm] [|x s] //; rewrite has_mask_cons /= andbC.
-by case: (a x) => //= /IHm.
-Qed.
+Proof. by apply/contraTT; rewrite -!all_predC; apply: all_mask. Qed.
 
 Lemma mask_rot m s : size m = size s ->
    mask (rot n0 m) (rot n0 s) = rot (count id (take n0 m)) (mask m s).
