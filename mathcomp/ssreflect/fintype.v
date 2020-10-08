@@ -1447,10 +1447,10 @@ End SubFinType.
 Notation "[ 'subFinType' 'of' T ]" := (subFinite.clone _ _ T _)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
-HB.factory
-Record FinTypeForSub (T : finType) P sT of SubCountable T P sT := { }.
+HB.factory Record FinTypeForSub (T : finType) P (sT : indexed Type)
+  of SubCountable T P sT := { }.
 
-HB.builders Context (T : finType) P sT of FinTypeForSub T P sT.
+HB.builders Context (T : finType) (P : pred T) (sT : indexed Type) (a : FinTypeForSub T P sT).
 
 Definition sub_enum : seq sT := pmap insub (enumF T).
 
@@ -1466,18 +1466,13 @@ rewrite pmap_filter; last exact: insubK.
 by apply: eq_filter => x; apply: isSome_insub.
 Qed.
 
-(* We can't declare a canonical structure here because we've already *)
-(* stated that subType_sort and FinType.sort unify via to the        *)
-(* subType_finType structure.                                        *)
-HB.instance Definition SubFinMixin := UniqFinMixin sub_enum_uniq mem_sub_enum.
+HB.instance Definition SubFinMixin : is_finite sT :=
+  UniqFinMixin sub_enum_uniq mem_sub_enum.
 HB.end.
 
-Definition SubFinMixin := UniqFinMixin sub_enum_uniq mem_sub_enum.
-Definition SubFinMixin_for (eT : eqType) of phant eT :=
-  eq_rect _ Finite.mixin_of SubFinMixin eT.
-Section FinTypeForSub.
+Section FinTypeForSubTheory.
 
-Variable sfT : subFinType P.
+Variables (T : finType) (P : pred T) (sfT : subFinType P).
 
 Lemma card_sub : #|sfT| = #|[pred x | P x]|.
 Proof. by rewrite -(eq_card (codom_val sfT)) (card_image val_inj). Qed.
@@ -1485,31 +1480,32 @@ Proof. by rewrite -(eq_card (codom_val sfT)) (card_image val_inj). Qed.
 Lemma eq_card_sub (A : {pred sfT}) : A =i predT -> #|A| = #|[pred x | P x]|.
 Proof. exact: eq_card_trans card_sub. Qed.
 
-End FinTypeForSub.
+End FinTypeForSubTheory.
 
 (* This assumes that T has a subCountType structure over a type that  *)
-(* has a finType structure.                                           *)
-Notation "[ 'finMixin' 'of' T 'by' <: ]" :=
-    (SubFinMixin_for (Phant T) (erefl _))
-  (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope.
+(* has a finType structure.            (*                                *) *)
+(* Notation "[ 'finMixin' 'of' T 'by' <: ]" := *)
+(*     (SubFinMixin_for (Phant T) (erefl _)) *)
+(*   (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope. *)
 
-(* Regression for the subFinType stack
-Record myb : Type := MyB {myv : bool; _ : ~~ myv}.
-Canonical myb_sub := Eval hnf in [subType for myv].
-Definition myb_eqm := Eval hnf in [eqMixin of myb by <:].
-Canonical myb_eq := Eval hnf in EqType myb myb_eqm.
-Definition myb_chm := [choiceMixin of myb by <:].
-Canonical myb_ch := Eval hnf in ChoiceType myb myb_chm.
-Definition myb_cntm := [countMixin of myb by <:].
-Canonical myb_cnt := Eval hnf in CountType myb myb_cntm.
-Canonical myb_scnt := Eval hnf in [subCountType of myb].
-Definition myb_finm := [finMixin of myb by <:].
-Canonical myb_fin := Eval hnf in FinType myb myb_finm.
-Canonical myb_sfin := Eval hnf in [subFinType of myb].
-Print Canonical Projections.
-Print myb_finm.
-Print myb_cntm.
-*)
+Import String.
+Local Open Scope string.
+
+(* Regression for the subFinType stack *)
+(* Record myb : Type := MyB {myv : bool; _ : ~~ myv}. *)
+(* HB.instance Definition myb_sub := [subType for myv]. *)
+(* HB.instance Definition myb_eqm : is_eqType myb := [eqMixin of myb by <:]. *)
+(* HB.instance Definition myb_chm := [choiceMixin of myb by <:]. *)
+(* Canonical myb_ch := Eval hnf in ChoiceType myb myb_chm. *)
+(* Definition myb_cntm := [countMixin of myb by <:]. *)
+(* Canonical myb_cnt := Eval hnf in CountType myb myb_cntm. *)
+(* Canonical myb_scnt := Eval hnf in [subCountType of myb]. *)
+(* Definition myb_finm := [finMixin of myb by <:]. *)
+(* Canonical myb_fin := Eval hnf in FinType myb myb_finm. *)
+(* Canonical myb_sfin := Eval hnf in [subFinType of myb]. *)
+(* Print Canonical Projections. *)
+(* Print myb_finm. *)
+(* Print myb_cntm. *)
 
 Section CardSig.
 
