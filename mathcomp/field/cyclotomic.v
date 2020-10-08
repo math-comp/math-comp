@@ -50,10 +50,9 @@ End Ring.
 Lemma separable_Xn_sub_1 (R : idomainType) n :
   n%:R != 0 :> R -> @separable_poly R ('X^n - 1).
 Proof.
-case: n => [/eqP// | n nz_n]; rewrite /separable_poly linearB /=.
-rewrite derivC subr0 derivXn -scaler_nat coprimep_scaler //= exprS -scaleN1r.
-rewrite coprimep_sym coprimep_addl_mul coprimep_scaler ?coprimep1 //.
-by rewrite (signr_eq0 _ 1).
+case: n => [/eqP// | n nz_n]; rewrite /separable_poly linearB /= derivC subr0.
+rewrite derivXn -scaler_nat coprimepZr //= exprS -scaleN1r coprimep_sym.
+by rewrite coprimep_addl_mul coprimepZr ?coprimep1 // (signr_eq0 _ 1).
 Qed.
 
 Section Field.
@@ -188,7 +187,7 @@ have injf: injective (f e).
   rewrite modnMml -mulnA -modnMmr -{1}(mul1n e).
   by rewrite (chinese_modr co_e_n 0) modnMmr muln1 modn_small.
 rewrite [_ n](reindex_inj injf); apply: eq_big => k /=.
-  by rewrite coprime_modl coprime_mull co_e_n andbT.
+  by rewrite coprime_modl coprimeMl co_e_n andbT.
 by rewrite prim_expr_mod // mulnC exprM -Dz0.
 Qed.
 
@@ -269,7 +268,7 @@ have [|k_gt1] := leqP k 1; last have [p p_pr /dvdnP[k1 Dk]] := pdivP k_gt1.
   rewrite k0 /coprime gcd0n in cokn; rewrite (eqP cokn).
   rewrite -(size_map_inj_poly (can_inj intCK)) // -Df -Dpf.
   by rewrite -(subnKC g_gt1) -(subnKC (size_minCpoly z)) !addnS.
-move: cokn; rewrite Dk coprime_mull => /andP[cok1n].
+move: cokn; rewrite Dk coprimeMl => /andP[cok1n].
 rewrite prime_coprime // (dvdn_charf (char_Fp p_pr)) => /co_fg {co_fg}.
 have charFpX: p \in [char {poly 'F_p}].
   by rewrite (rmorph_char (polyC_rmorphism _)) ?char_Fp.

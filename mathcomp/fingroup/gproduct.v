@@ -829,7 +829,7 @@ have{defGi} defGi: \big[dprod/1]_(j | Q j && (j != i)) A j = Gi.
   by apply: IHm => [||j /andP[/sQP]] //; rewrite (cardD1x Qi) in leQm.
 rewrite defGi dprodE // coprime_TIg // -defAi -(bigdprod_card defGi).
 elim/big_rec: _ => [|j n /andP[neq_ji Qj] IHn]; first exact: coprimen1.
-by rewrite coprime_mulr coprime_sym coA ?sQP.
+by rewrite coprimeMr coprime_sym coA ?sQP.
 Qed.
 
 Lemma mem_dprod G A B x : A \x B = G -> x \in G ->

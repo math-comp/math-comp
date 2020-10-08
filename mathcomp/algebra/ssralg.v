@@ -4693,7 +4693,7 @@ Lemma natf_neq0 n : (n%:R != 0 :> R) = [char R]^'.-nat n.
 Proof.
 have [-> | /prod_prime_decomp->] := posnP n; first by rewrite eqxx.
 rewrite !big_seq; elim/big_rec: _ => [|[p e] s /=]; first by rewrite oner_eq0.
-case/mem_prime_decomp=> p_pr _ _; rewrite pnat_mul pnat_exp eqn0Ngt orbC => <-.
+case/mem_prime_decomp=> p_pr _ _; rewrite pnatM pnatX eqn0Ngt orbC => <-.
 by rewrite natrM natrX mulf_eq0 expf_eq0 negb_or negb_and pnatE ?inE p_pr.
 Qed.
 

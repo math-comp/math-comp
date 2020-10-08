@@ -1005,24 +1005,17 @@ Lemma expr1z x : x ^ 1 = x. Proof. by []. Qed.
 Lemma exprN1 x : x ^ (-1) = x^-1. Proof. by []. Qed.
 
 Lemma invr_expz x n : (x ^ n)^-1 = x ^ (- n).
-Proof.
-by case: (intP n)=> // [|m]; rewrite ?opprK ?expr0z ?invr1 // invrK.
-Qed.
+Proof. by case: (intP n)=> // [|m]; rewrite ?opprK ?expr0z ?invr1 // invrK. Qed.
 
 Lemma exprz_inv x n : (x^-1) ^ n = x ^ (- n).
-Proof.
-by case: (intP n)=> // m; rewrite -[_ ^ (- _)]exprVn ?opprK ?invrK.
-Qed.
+Proof. by case: (intP n)=> // m; rewrite -[_ ^ (- _)]exprVn ?opprK ?invrK. Qed.
 
 Lemma exp1rz n : 1 ^ n = 1 :> R.
-Proof.
-by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: expr1n.
-Qed.
+Proof. by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: expr1n. Qed.
 
 Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: exprS. Qed.
 
-Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x.
-Proof. exact: exprSr. Qed.
+Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x. Proof. exact: exprSr. Qed.
 
 Fact exprzD_nat x (m n : nat) : x ^ (m%:Z + n) = x ^ m * x ^ n.
 Proof. exact: exprD. Qed.
@@ -1682,7 +1675,7 @@ Proof.
 wlog le_n21: n1 n2 / n2 <= n1.
   move=> IH; case/orP: (leq_total n2 n1) => /IH //.
   by rewrite (addnC (n2 ^ 2)) (mulnC n2) distnC.
-by rewrite distnEl ?sqrn_sub ?subnK ?nat_Cauchy.
+by rewrite distnEl ?sqrnB ?subnK ?nat_Cauchy.
 Qed.
 
 End Distn.
@@ -1718,11 +1711,8 @@ Implicit Types p q r : {poly R}.
 Lemma coefMrz : forall p n i, (p *~ n)`_i = (p`_i *~ n).
 Proof. by move=> p [] n i; rewrite ?NegzE (coefMNn, coefMn). Qed.
 
-Lemma polyC_mulrz : forall n, {morph (@polyC R) : c / c *~ n}.
-Proof.
-move=> [] n c; rewrite ?NegzE -?pmulrn ?polyC_muln //.
-by rewrite polyC_opp mulrNz polyC_muln nmulrn.
-Qed.
+Lemma polyCMz : forall n, {morph (@polyC R) : c / c *~ n}.
+Proof. by case/intP => // n c; rewrite ?mulrNz -!pmulrn ?polyCN ?polyCMn. Qed.
 
 Lemma hornerMz : forall n (p : {poly R}) x, (p *~ n).[x] = p.[x] *~ n.
 Proof. by case=> *; rewrite ?NegzE ?mulNzr ?(hornerN, hornerMn). Qed.
@@ -1740,7 +1730,7 @@ Section PolyZintOIdom.
 Variable R : realDomainType.
 
 Lemma mulpz (p : {poly R}) (n : int) : p *~ n = n%:~R *: p.
-Proof. by rewrite -[p *~ n]mulrzl -mul_polyC polyC_mulrz polyC1. Qed.
+Proof. by rewrite -[p *~ n]mulrzl -mul_polyC polyCMz polyC1. Qed.
 
 End PolyZintOIdom.
 
@@ -1787,3 +1777,7 @@ Lemma rpredXsign R S (divS : @divrPred R S) (kS : keyed_pred divS) n x :
 Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
+
+Notation "@ 'polyC_mulrz'" :=
+  (deprecate polyC_mulrz polyCMz) (at level 10, only parsing) : fun_scope.
+Notation polyC_mulrz := (@polyC_mulrz _) (only parsing).

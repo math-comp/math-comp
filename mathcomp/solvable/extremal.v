@@ -350,7 +350,7 @@ have os: #[s] = (p ^ (n - e0))%N.
   case/dvdn_pfactor=> // d; rewrite leq_eqVlt.
   case/predU1P=> [-> // | lt_d os]; case/idPn: (p_gt1); rewrite -os0.
   by rewrite order_gt1 negbK -order_dvdn os dvdn_exp2l // -ltnS -subSn.
-have p_s: p.-elt s by rewrite /p_elt os pnat_exp ?pnat_id.
+have p_s: p.-elt s by rewrite /p_elt os pnatX ?pnat_id.
 have defS1: 'Ohm_1(<[s]>) = <[s0]>.
   apply/eqP; rewrite eq_sym eqEcard cycle_subG -orderE os0.
   rewrite (Ohm1_cyclic_pgroup_prime _ p_s) ?cycle_cyclic ?leqnn ?cycle_eq1 //=.
@@ -398,7 +398,7 @@ Lemma extremal_generators_facts gT (G : {group gT}) p n x y :
       <[x]> * <[y]> = G & <[y]> \subset 'N(<[x]>)].
 Proof.
 move=> p_pr [oG Gx ox] /setDP[Gy notXy].
-have pG: p.-group G by rewrite /pgroup oG pnat_exp pnat_id.
+have pG: p.-group G by rewrite /pgroup oG pnatX pnat_id.
 have maxX: maximal <[x]> G.
   rewrite p_index_maximal -?divgS ?cycle_subG // -orderE oG ox.
   case: (n) oG => [|n' _]; last by rewrite -expnB ?subSnn ?leqnSn ?prime_gt0.
@@ -438,7 +438,7 @@ rewrite /modular_gtype def_p def_q def_r; apply: Extremal.Grp => //.
 set B := <[_]>; have Bb: Zp1 \in B by apply: cycle_id.
 have oB: #|B| = q by rewrite -orderE order_Zp1 Zp_cast.
 have cycB: cyclic B by rewrite cycle_cyclic.
-have pB: p.-group B by rewrite /pgroup oB pnat_exp ?pnat_id.
+have pB: p.-group B by rewrite /pgroup oB pnatX ?pnat_id.
 have ntB: B != 1 by rewrite -cardG_gt1 oB.
 have [] := cyclic_pgroup_Aut_structure pB cycB ntB.
 rewrite oB pfactorK //= -/B -(expg_znat r.+1 Bb) oB => mB [[def_mB _ _ _ _] _].
@@ -711,7 +711,7 @@ rewrite !expnS !mulKn // -!expnS /=; set q := (2 ^ _)%N.
 have q_gt1: q > 1 by rewrite (ltn_exp2l 0).
 apply: Extremal.Grp => //; set B := <[_]>.
 have oB: #|B| = q by rewrite -orderE order_Zp1 Zp_cast.
-have pB: 2.-group B by rewrite /pgroup oB pnat_exp.
+have pB: 2.-group B by rewrite /pgroup oB pnatX.
 have ntB: B != 1 by rewrite -cardG_gt1 oB.
 have [] := cyclic_pgroup_Aut_structure pB (cycle_cyclic _) ntB.
 rewrite oB /= pfactorK //= -/B => m [[def_m _ _ _ _] _].
@@ -1133,7 +1133,7 @@ have def_ur: {in G, forall t, #[t] = 2 -> t = u ^+ r}.
   move=> t Gt /= ot; case Ut: (t \in <[u]>); last first.
     move/eqP: ot; rewrite eqn_dvd order_dvdn -order_eq1 U'2 ?our //.
     by rewrite defUv inE Ut.
-  have p2u: 2.-elt u by rewrite /p_elt ou pnat_exp.
+  have p2u: 2.-elt u by rewrite /p_elt ou pnatX.
   have: t \in 'Ohm_1(<[u]>).
     by rewrite (OhmE _ p2u) mem_gen // !inE Ut -order_dvdn ot.
   rewrite (Ohm_p_cycle _ p2u) ou pfactorK // subn1 -/r cycle_traject our !inE.
@@ -1338,7 +1338,7 @@ have xy2: (x * y) ^+ 2 = x ^+ r.
 have oxy: #[x * y] = 4 by rewrite (@orderXprime _ 2 2) ?xy2.
 have r_gt2: r > 2 by rewrite (ltn_exp2l 1) // -(subnKC n_gt3).
 have coXr1: coprime #[x] (2 ^ (n - 3)).-1.
-  rewrite ox coprime_expl // -(@coprime_pexpl (n - 3)) ?coprimenP ?subn_gt0 //.
+  rewrite ox coprimeXl // -(@coprime_pexpl (n - 3)) ?coprimenP ?subn_gt0 //.
   by rewrite expn_gt0.
 have def2r1: (2 * (2 ^ (n - 3)).-1).+1 = r.-1.
   rewrite -!subn1 mulnBr -expnS [_.+1]subnSK ?(ltn_exp2l 0) //.
@@ -1584,11 +1584,11 @@ Lemma odd_not_extremal2 : odd #|G| -> ~~ extremal2 G.
 Proof.
 rewrite /extremal2 /extremal_class; case: logn => // n'.
 case: andP => [[n_gt1 isoG] | _].
-  by rewrite (card_isog isoG) card_2dihedral ?odd_exp.
+  by rewrite (card_isog isoG) card_2dihedral ?oddX.
 case: andP => [[n_gt2 isoG] | _].
-  by rewrite (card_isog isoG) card_quaternion ?odd_exp.
+  by rewrite (card_isog isoG) card_quaternion ?oddX.
 case: andP => [[n_gt3 isoG] | _].
-  by rewrite (card_isog isoG) card_semidihedral ?odd_exp.
+  by rewrite (card_isog isoG) card_semidihedral ?oddX.
 by case: ifP.
 Qed.
 
@@ -1784,7 +1784,7 @@ have[i def_yp]: exists i, y ^- p = x ^+ i.
 have p_i: p %| i.
   apply: contraR notXy; rewrite -prime_coprime // => co_p_j.
   have genX: generator X (y ^- p).
-    by rewrite def_yp defX generator_coprime ox coprime_expl.
+    by rewrite def_yp defX generator_coprime ox coprimeXl.
   rewrite -scXG (setIidPl _) // centsC ((X :=P: _) genX) cycle_subG groupV.
   rewrite /= -(defG 0%N) mul1g centY inE -defX (subsetP cXX) ?X_Gp //.
   by rewrite (subsetP (cycle_abelian y)) ?mem_cycle.
@@ -1877,7 +1877,7 @@ have modM1 (M : {group gT}):
   have n_gt2: n > 2 by apply: leq_trans (leq_addl _ _) n_gt23.
   have def_n: n = (n - 3).+3 by rewrite -{1}(subnKC n_gt2).
   have oM: #|M| = (q ^ n)%N by rewrite (card_isog isoM) card_modular_group.
-  have pM: q.-group M by rewrite /pgroup oM pnat_exp pnat_id.
+  have pM: q.-group M by rewrite /pgroup oM pnatX pnat_id.
   have def_q: q = p; last rewrite {q q_pr}def_q in oM pM isoM n_gt23.
     by apply/eqP; rewrite eq_sym [p == q](pgroupP pM) // -iUM dvdn_indexg.
   have [[x y] genM modM] := generators_modular_group p_pr n_gt2 isoM.

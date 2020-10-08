@@ -117,7 +117,7 @@ have [sMG nMG] := andP nsMG; rewrite -defG => sK1G coHK oK1K.
 have nMsG (L : {set gT}): L \subset G -> L \subset 'N(M).
   by move/subset_trans->.
 have [coKM coHMK]: coprime #|M| #|K| /\ coprime #|H / M| #|K|.
-  by apply/andP; rewrite -coprime_mull card_quotient ?nMsG ?Lagrange.
+  by apply/andP; rewrite -coprimeMl card_quotient ?nMsG ?Lagrange.
 have oKM (K' : {group gT}): K' \subset G -> #|K'| = #|K| -> #|K' / M| = #|K|.
   move=> sK'G oK'.
   rewrite -quotientMidr -?norm_joinEl ?card_quotient ?nMsG //; last first.
@@ -248,7 +248,7 @@ have{pi'Hb'} pi'H': pi^'.-nat #|G : H|.
   by rewrite -(divnMl (cardG_gt0 M)) !Lagrange.
 have [pi_p | pi'p] := boolP (p \in pi).
   exists H => //; apply/and3P; split=> //; rewrite /pgroup.
-  by rewrite -(Lagrange sMH) -card_quotient // pnat_mul -def_H (pi_pnat pM).
+  by rewrite -(Lagrange sMH) -card_quotient // pnatM -def_H (pi_pnat pM).
 have [ltHG | leGH {n IHn leGn transH}] := ltnP #|H| #|G|.
   case: (IHn _ H (leq_trans ltHG leGn)) => [|H1]; first exact: solvableS solG.
   case/and3P=> sH1H piH1 pi'H1' transH1.
@@ -256,7 +256,7 @@ have [ltHG | leGH {n IHn leGn transH}] := ltnP #|H| #|G|.
   exists H1 => [|K sKG piK].
     apply/and3P; split => //.
     rewrite -divgS // -(Lagrange sHG) -(Lagrange sH1H) -mulnA.
-    by rewrite mulKn // pnat_mul pi'H1'.
+    by rewrite mulKn // pnatM pi'H1'.
   case: (transH K sKG piK) => x Gx def_K.
   case: (transH1 (K :^ x^-1)%G) => [||y Hy def_K1].
   - by rewrite sub_conjgV.
@@ -608,7 +608,7 @@ have{nHAq} nHMA: A \subset 'N(HM).
   by rewrite -(quotientSGK nMA) ?normsG ?quotient_normG -?defHM //; apply/andP.
 case/orP: (orbN (p \in pi)) => pi_p.
   exists HM; split=> //; apply/and3P; split; rewrite /pgroup //.
-  by rewrite -(Lagrange sMHM) pnat_mul -card_quotient // -defHM (pi_pnat pM).
+  by rewrite -(Lagrange sMHM) pnatM -card_quotient // -defHM (pi_pnat pM).
 case: (ltnP #|HM| #|G|) => [ltHG | leGHM {n IHn leGn}].
   case: (IHn _ A HM X (leq_trans ltHG leGn)) => // [||H [hallH nHA sXH]].
   - exact: coprimeSg coGA.
@@ -617,7 +617,7 @@ case: (ltnP #|HM| #|G|) => [ltHG | leGHM {n IHn leGn}].
   have sHG: H \subset G by apply: subset_trans sHMG.
   exists H; split=> //; apply/and3P; split=> //.
   rewrite -divgS // -(Lagrange sHMG) -(Lagrange sHHM) -mulnA mulKn //.
-  by rewrite pnat_mul pi'H'.
+  by rewrite pnatM pi'H'.
 have{leGHM nHMA sHMG sMHM sXHM pi'HM'} eqHMG: HM = G.
   by apply/eqP; rewrite -val_eqE eqEcard sHMG.
 have pi'M: pi^'.-group M by rewrite /pgroup (pi_pnat pM).

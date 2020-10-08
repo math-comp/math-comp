@@ -132,7 +132,7 @@ have:= sKG; rewrite subEproper => /predU1P[<-|prKG]; first exact: IHm.
 pose L := [group of f G].
 have sHK: H \subset K by case/IHm: Hsn.
 have sLK: L \subset K by rewrite gen_subG class_support_sub_norm.
-rewrite -(subnK (proper_card (sub_proper_trans sLK prKG))) iter_add iterSr.
+rewrite -(subnK (proper_card (sub_proper_trans sLK prKG))) iterD iterSr.
 have defH: H = setIgr L H by rewrite -sub_setIgr ?sub_gen ?sub_class_support.
 have: normal.-series H (map (setIgr L) s) by rewrite defH path_setIgr.
 case/IHm=> [|_]; first by rewrite size_map.

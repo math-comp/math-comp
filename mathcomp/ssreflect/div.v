@@ -326,7 +326,7 @@ Proof. by rewrite [in RHS](divn_eq m 2) modn2 muln2 addnC half_bit_double. Qed.
 
 Lemma odd_mod m d : odd d = false -> odd (m %% d) = odd m.
 Proof.
-by move=> d_even; rewrite [in RHS](divn_eq m d) oddD odd_mul d_even andbF.
+by move=> d_even; rewrite [in RHS](divn_eq m d) oddD oddM d_even andbF.
 Qed.
 
 Lemma modnXm m n a : (a %% n) ^ m = a ^ m %[mod n].
@@ -937,33 +937,33 @@ Qed.
 Lemma Gauss_gcdl p m n : coprime p n -> gcdn p (m * n) = gcdn p m.
 Proof. by move=> co_pn; rewrite mulnC Gauss_gcdr. Qed.
 
-Lemma coprime_mulr p m n : coprime p (m * n) = coprime p m && coprime p n.
+Lemma coprimeMr p m n : coprime p (m * n) = coprime p m && coprime p n.
 Proof.
 case co_pm: (coprime p m) => /=; first by rewrite /coprime Gauss_gcdr.
 apply/eqP=> co_p_mn; case/eqnP: co_pm; apply gcdn_def => // d dv_dp dv_dm.
 by rewrite -co_p_mn dvdn_gcd dv_dp dvdn_mulr.
 Qed.
 
-Lemma coprime_mull p m n : coprime (m * n) p = coprime m p && coprime n p.
-Proof. by rewrite -!(coprime_sym p) coprime_mulr. Qed.
+Lemma coprimeMl p m n : coprime (m * n) p = coprime m p && coprime n p.
+Proof. by rewrite -!(coprime_sym p) coprimeMr. Qed.
 
 Lemma coprime_pexpl k m n : 0 < k -> coprime (m ^ k) n = coprime m n.
 Proof.
 case: k => // k _; elim: k => [|k IHk]; first by rewrite expn1.
-by rewrite expnS coprime_mull -IHk; case coprime.
+by rewrite expnS coprimeMl -IHk; case coprime.
 Qed.
 
 Lemma coprime_pexpr k m n : 0 < k -> coprime m (n ^ k) = coprime m n.
 Proof. by move=> k_gt0; rewrite !(coprime_sym m) coprime_pexpl. Qed.
 
-Lemma coprime_expl k m n : coprime m n -> coprime (m ^ k) n.
+Lemma coprimeXl k m n : coprime m n -> coprime (m ^ k) n.
 Proof. by case: k => [|k] co_pm; rewrite ?coprime1n // coprime_pexpl. Qed.
 
-Lemma coprime_expr k m n : coprime m n -> coprime m (n ^ k).
-Proof. by rewrite !(coprime_sym m); apply: coprime_expl. Qed.
+Lemma coprimeXr k m n : coprime m n -> coprime m (n ^ k).
+Proof. by rewrite !(coprime_sym m); apply: coprimeXl. Qed.
 
 Lemma coprime_dvdl m n p : m %| n -> coprime n p -> coprime m p.
-Proof. by case/dvdnP=> d ->; rewrite coprime_mull => /andP[]. Qed.
+Proof. by case/dvdnP=> d ->; rewrite coprimeMl => /andP[]. Qed.
 
 Lemma coprime_dvdr m n p : m %| n -> coprime p n -> coprime p m.
 Proof. by rewrite !(coprime_sym p); apply: coprime_dvdl. Qed.
@@ -1040,3 +1040,12 @@ by rewrite chinese_modl chinese_modr !modn_mod !eqxx.
 Qed.
 
 End Chinese.
+
+Notation "@ 'coprime_expl'" :=
+  (deprecate coprime_expl coprimeXl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'coprime_expr'" :=
+  (deprecate coprime_expr coprimeXr) (at level 10, only parsing) : fun_scope.
+Notation coprime_mull := (deprecate coprime_mull coprimeMl) (only parsing).
+Notation coprime_mulr := (deprecate coprime_mulr coprimeMr) (only parsing).
+Notation coprime_expl := (fun k => @coprime_expl k _ _) (only parsing).
+Notation coprime_expr := (fun k => @coprime_expr k _ _) (only parsing).

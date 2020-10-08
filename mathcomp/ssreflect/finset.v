@@ -2289,7 +2289,7 @@ Definition fixset := iterF n.
 Lemma fixsetK : F fixset = fixset.
 Proof.
 suff /'exists_eqP[x /= e]: [exists k : 'I_n.+1, iterF k == iterF k.+1].
-  by rewrite /fixset -(subnK (leq_ord x)) /iterF iter_add iter_fix.
+  by rewrite /fixset -(subnK (leq_ord x)) /iterF iterD iter_fix.
 apply: contraT => /existsPn /(_ (Ordinal _)) /= neq_iter.
 suff iter_big k : k <= n.+1 -> k <= #|iter k F set0|.
   by have := iter_big _ (leqnn _); rewrite ltnNge max_card.
@@ -2312,7 +2312,7 @@ Proof. by rewrite iter_fix. Qed.
 Lemma iter_sub_fix k : iterF k \subset fixset.
 Proof.
 have [/subset_iter //|/ltnW/subnK<-] := leqP k n;
-by rewrite /iterF iter_add fixsetKn.
+by rewrite /iterF iterD fixsetKn.
 Qed.
 
 Lemma fix_order_proof x : x \in fixset -> exists n, x \in iterF n.
@@ -2396,6 +2396,8 @@ End Greatest.
 End SetFixpoint.
 
 Notation mem_imset := 
-  ((fun aT rT D x f xD => deprecate mem_imset imset_f aT rT f D x xD) _ _ _ _).
+  ((fun aT rT D x f xD => deprecate mem_imset imset_f aT rT f D x xD) _ _ _ _)
+  (only parsing).
 Notation mem_imset2 := ((fun aT aT2 rT D D2 x x2 f xD xD2 => 
-  deprecate mem_imset2 imset2_f aT aT2 rT f D D2 x x2 xD xD2) _ _ _ _ _ _ _).
+  deprecate mem_imset2 imset2_f aT aT2 rT f D D2 x x2 xD xD2) _ _ _ _ _ _ _)
+  (only parsing).

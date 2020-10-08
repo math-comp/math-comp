@@ -136,7 +136,7 @@ Qed.
 Lemma max_size_evalC u x : size u.[x%:P] <= sizeY u.
 Proof.
 rewrite horner_coef (leq_trans (size_sum _ _ _)) //; apply/bigmax_leqP=> i _.
-rewrite (leq_trans (size_mul_leq _ _)) // -polyC_exp size_polyC addnC -subn1.
+rewrite (leq_trans (size_mul_leq _ _)) // -polyCX size_polyC addnC -subn1.
 by rewrite (leq_trans _ (max_size_coefXY _ i)) // leq_subLR leq_add2r leq_b1.
 Qed.
 
@@ -192,7 +192,7 @@ Lemma horner_swapXY u x : (swapXY u).[x%:P] = u ^ eval x.
 Proof.
 apply/polyP=> i /=; rewrite coef_map /= /eval horner_coef coef_sum -sizeYE.
 rewrite (horner_coef_wide _ (max_size_coefXY u i)); apply: eq_bigr=> j _.
-by rewrite -polyC_exp coefMC coef_swapXY.
+by rewrite -polyCX coefMC coef_swapXY.
 Qed.
 
 Lemma horner_polyC u x : u.[x%:P] = swapXY u ^ eval x.
@@ -228,7 +228,7 @@ Proof. by rewrite -!size_poly_eq0 size_poly_XmY. Qed.
 
 Lemma lead_coef_poly_XaY p : lead_coef (poly_XaY p) = (lead_coef p)%:P.
 Proof.
-rewrite lead_coef_comp ?size_XaddC // -['Y]opprK -polyC_opp lead_coefXsubC.
+rewrite lead_coef_comp ?size_XaddC // -['Y]opprK -polyCN lead_coefXsubC.
 by rewrite expr1n mulr1 lead_coef_map_inj //; apply: polyC_inj.
 Qed.
 

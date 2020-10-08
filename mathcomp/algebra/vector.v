@@ -1491,7 +1491,7 @@ move=> eq_fg; apply/vspaceP=> y.
 by apply/memv_imgP/memv_imgP=> [][x Vx ->]; exists x; rewrite ?eq_fg.
 Qed.
 
-Lemma limg_add f : {morph lfun_img f : U V / U + V}%VS.
+Lemma limgD f : {morph lfun_img f : U V / U + V}%VS.
 Proof.
 move=> U V; apply/eqP; rewrite unlock eqEsubv /subsetv /= -genmx_adds.
 by rewrite !genmxE !(eqmxMr _ (genmxE _)) !addsmxMr submx_refl.
@@ -1499,7 +1499,7 @@ Qed.
 
 Lemma limg_sum f I r (P : pred I) Us :
   (f @: (\sum_(i <- r | P i) Us i) = \sum_(i <- r | P i) f @: Us i)%VS.
-Proof. exact: (big_morph _ (limg_add f) (limg0 f)). Qed.
+Proof. exact: (big_morph _ (limgD f) (limg0 f)). Qed.
 
 Lemma limg_cap f U V : (f @: (U :&: V) <= f @: U :&: f @: V)%VS.
 Proof. by rewrite subv_cap !limgS ?capvSl ?capvSr. Qed.
@@ -1551,7 +1551,7 @@ Proof. by apply: (iffP subvP) => E x /E/eqlfunP. Qed.
 
 Lemma limg_ker_compl f U : (f @: (U :\: lker f) = f @: U)%VS.
 Proof.
-rewrite -{2}(addv_diff_cap U (lker f)) limg_add; apply/esym/addv_idPl.
+rewrite -{2}(addv_diff_cap U (lker f)) limgD; apply/esym/addv_idPl.
 by rewrite (subv_trans _ (sub0v _)) // subv0 -lkerE capvSr.
 Qed.
 
@@ -1701,7 +1701,7 @@ Proof. by move=> sVW; rewrite addvS // limgS // capvS. Qed.
 
 Lemma lpreimK f W : (W <= limg f)%VS -> (f @: (f @^-1: W))%VS = W.
 Proof.
-move=> sWf; rewrite limg_add (capv_idPl sWf) // -limg_comp.
+move=> sWf; rewrite limgD (capv_idPl sWf) // -limg_comp.
 have /eqP->: (f @: lker f == 0)%VS by rewrite -lkerE.
 have /andP[/eqP defW _] := vbasisP W; rewrite addv0 -defW limg_span.
 rewrite map_id_in // => x Xx; rewrite lfunE /= limg_lfunVK //.
@@ -2044,3 +2044,7 @@ by apply/ffunP=> i; rewrite (lfunE (Linear lhsZ)) !ffunE sol_u.
 Qed.
 
 End Solver.
+
+Notation "@ 'limg_add'" :=
+  (deprecate limg_add limgD) (at level 10, only parsing) : fun_scope.
+Notation limg_add := (@limg_add _ _ _) (only parsing).

@@ -160,7 +160,7 @@ have [n ub_n]: {n | forall y, root q y -> `|y| < n}.
   have [n1 ub_n1] := monic_Cauchy_bound mon_q.
   have /monic_Cauchy_bound[n2 ub_n2]: (-1) ^+ d *: (q \Po - 'X) \is monic.
     rewrite monicE lead_coefZ lead_coef_comp ?size_opp ?size_polyX // -/d.
-    by rewrite lead_coef_opp lead_coefX (monicP mon_q) (mulrC 1) signrMK.
+    by rewrite lead_coefN lead_coefX (monicP mon_q) (mulrC 1) signrMK.
   exists (Num.max n1 n2) => y; rewrite ltNge ler_normr !leUx rootE.
   apply: contraL => /orP[]/andP[] => [/ub_n1/gt_eqF->// | _ /ub_n2/gt_eqF].
   by rewrite hornerZ horner_comp !hornerE opprK mulf_eq0 signr_eq0 => /= ->.
@@ -171,7 +171,7 @@ right=> [[y Dx]]; case: xa'x; exists y => //.
 have{x Dx qx0} qy0: root q y by rewrite Dx fmorph_root in qx0.
 have /dvdzP[b Da]: (denq y %| a)%Z.
   have /Gauss_dvdzl <-: coprimez (denq y) (numq y ^+ d).
-    by rewrite coprimez_sym coprimez_expl //; apply: coprime_num_den.
+    by rewrite coprimez_sym coprimezXl //; apply: coprime_num_den.
   pose p1 : {poly int} := a *: 'X^d - p.
   have Dp1: p1 ^ intr = a%:~R *: ('X^d - q).
     by rewrite rmorphB linearZ /= map_polyXn scalerBr Dq scalerKV ?intr_eq0.
@@ -231,7 +231,7 @@ without loss mon_q: q nCq q_dv_p / q \is monic.
   move=> IHq; pose a := lead_coef q; pose q1 := a^-1 *: q.
   have nz_a: a != 0 by rewrite lead_coef_eq0 (dvdpN0 q_dv_p) ?monic_neq0.
   have /IHq IHq1: q1 \is monic by rewrite monicE lead_coefZ mulVf.
-  by rewrite -IHq1 ?size_scale ?dvdp_scalel ?invr_eq0.
+  by rewrite -IHq1 ?size_scale ?dvdpZl ?invr_eq0.
 without loss{nCq} qx0: q mon_q q_dv_p / root (q ^ FtoL) x.
   have /dvdpP[q1 Dp] := q_dv_p; rewrite DpI Dp rmorphM rootM -implyNb in pIx0.
   have mon_q1: q1 \is monic by rewrite Dp monicMr in mon_p.
@@ -515,7 +515,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   have ab_le m n: (m <= n)%N -> (ab_ n).2 \in Iab_ m.
     move/subnKC=> <-; move: {n}(n - m)%N => n; rewrite /ab_.
     have /(findP m)[/(findP n)[[_ _]]] := xab0.
-    rewrite /find -iter_add -!/(find _ _) -!/(ab_ _) addnC !inE.
+    rewrite /find -iterD -!/(find _ _) -!/(ab_ _) addnC !inE.
     by move: (ab_ _) => /= ab_mn le_ab_mn [/le_trans->].
   pose lt v w := 0 < nlim (w - v) (n_ (w - v)).
   have posN v: lt 0 (- v) = lt v 0 by rewrite /lt subr0 add0r.
@@ -723,7 +723,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have mon_p: p \is monic.
       have mon_pw: pw \is monic := monic_minPoly _ _.
       rewrite map_monic mulNr -mulrN monicMl // monicE.
-      rewrite !(lead_coef_opp, lead_coef_comp) ?size_opp ?size_polyX //.
+      rewrite !(lead_coefN, lead_coef_comp) ?size_opp ?size_polyX //.
       by rewrite lead_coefX sz_pw -signr_odd odd_2'nat oddPG mulrN1 opprK.
     have Dp0: p.[0] = - ofQ t pw.[0] ^+ 2.
       rewrite -(rmorph0 (ofQ t)) horner_map hornerM rmorphM.

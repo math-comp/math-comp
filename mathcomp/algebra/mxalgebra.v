@@ -2581,8 +2581,8 @@ rewrite mulmx_suml linear_sum summx_sub //= => i _.
 by rewrite -mulmxA !mem_mulsmx.
 Qed.
 
-Lemma mulsmx_addl m1 m2 m3 n
-                 (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) (R3 : 'A_(m3, n)) :
+Lemma mulsmxDl m1 m2 m3 n
+               (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) (R3 : 'A_(m3, n)) :
   ((R1 + R2) * R3 = R1 * R3 + R2 * R3)%MS.
 Proof.
 rewrite -(genmx_muls R2 R3) -(genmx_muls R1 R3) -genmx_muls -genmx_adds.
@@ -2591,8 +2591,8 @@ apply/mulsmx_subP=> _ A3 /memmx_addsP[A [R_A1 R_A2 ->]] R_A3.
 by rewrite mulmxDl linearD addmx_sub_adds ?mem_mulsmx.
 Qed.
 
-Lemma mulsmx_addr m1 m2 m3 n
-                  (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) (R3 : 'A_(m3, n)) :
+Lemma mulsmxDr m1 m2 m3 n
+               (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) (R3 : 'A_(m3, n)) :
   (R1 * (R2 + R3) = R1 * R2 + R1 * R3)%MS.
 Proof.
 rewrite -(genmx_muls R1 R3) -(genmx_muls R1 R2) -genmx_muls -genmx_adds.
@@ -2857,7 +2857,7 @@ set pAnz := [pred k | A k.1 k.2 != 0].
 rewrite (@eq_pick _ _ pAnz) => [|k]; last by rewrite /= mxE fmorph_eq0.
 case: {+}(pick _) => [[i j]|]; last by rewrite !map_mx1.
 rewrite mxE -fmorphV  -map_xcol -map_xrow -map_dlsubmx -map_drsubmx.
-rewrite -map_ursubmx -map_mxZ -map_mxM -map_mx_sub {}IHm /=.
+rewrite -map_ursubmx -map_mxZ -map_mxM -map_mxB {}IHm /=.
 case: {+}(Gaussian_elimination _) => [[L U] r] /=; rewrite map_xrow map_xcol.
 by rewrite !(@map_block_mx _ _ f 1 _ 1) !map_mx0 ?map_mx1 ?map_scalar_mx.
 Qed.
@@ -2952,7 +2952,7 @@ by rewrite -!map_capmx !map_submx -!diffmxE andbb.
 Qed.
 
 Lemma map_eigenspace n (g : 'M_n) a : (eigenspace g a)^f = eigenspace g^f (f a).
-Proof. by rewrite map_kermx map_mx_sub ?map_scalar_mx. Qed.
+Proof. by rewrite map_kermx map_mxB ?map_scalar_mx. Qed.
 
 Lemma eigenvalue_map n (g : 'M_n) a : eigenvalue g^f (f a) = eigenvalue g a.
 Proof. by rewrite /eigenvalue -map_eigenspace map_mx_eq0. Qed.
@@ -2972,12 +2972,18 @@ Qed.
 
 Lemma map_cent_mx m n (E : 'A_(m, n)) : ('C(E)%MS)^f = 'C(E^f)%MS.
 Proof.
-rewrite map_kermx //; congr (kermx _); apply: map_lin_mx => // A.
-rewrite map_mxM //; congr (_ *m _); apply: map_lin_mx => //= B.
-by rewrite map_mx_sub ? map_mxM.
+rewrite map_kermx; congr kermx; apply: map_lin_mx => A; rewrite map_mxM.
+by congr (_ *m _); apply: map_lin_mx => B; rewrite map_mxB ?map_mxM.
 Qed.
 
 Lemma map_center_mx m n (E : 'A_(m, n)) : (('Z(E))^f :=: 'Z(E^f))%MS.
 Proof. by rewrite /center_mx -map_cent_mx; apply: map_capmx. Qed.
 
 End MapMatrixSpaces.
+
+Notation "@ 'mulsmx_addl'" :=
+  (deprecate mulsmx_addl mulsmxDl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'mulsmx_addr'" :=
+  (deprecate mulsmx_addr mulsmxDr) (at level 10, only parsing) : fun_scope.
+Notation mulsmx_addl := (@mulsmx_addl _ _ _ _ _) (only parsing).
+Notation mulsmx_addr := (@mulsmx_addr _ _ _ _ _) (only parsing).

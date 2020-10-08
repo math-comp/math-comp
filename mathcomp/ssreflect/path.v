@@ -865,7 +865,7 @@ apply: ihss.
   rewrite (perm_mem perm_s2) mem_iota => /andP [] _ hy'.
   apply/allP => n; rewrite (perm_mem perm_s1) mem_iota => /andP [].
   by rewrite -cat_cons size_cat addnC => /(leq_trans hy').
-- rewrite /= perm_ss andbT perm_merge size_merge size_cat iota_add perm_cat //.
+- rewrite /= perm_ss andbT perm_merge size_merge size_cat iotaD perm_cat //.
   by rewrite addnC -size_cat.
 Qed.
 
@@ -880,7 +880,7 @@ apply: ihss => /=.
   apply/allP => m'; rewrite (perm_mem perm_s2) mem_iota => /andP [_ hm'].
   apply/allP => n; rewrite (perm_mem perm_s1) mem_iota -cat_cons size_cat.
   by rewrite addnC => /andP [] /(leq_trans hm').
-- rewrite perm_ss andbT perm_merge size_merge size_cat iota_add perm_cat //.
+- rewrite perm_ss andbT perm_merge size_merge size_cat iotaD perm_cat //.
   by rewrite addnC -size_cat.
 Qed.
 
