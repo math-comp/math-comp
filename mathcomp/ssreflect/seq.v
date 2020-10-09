@@ -1943,6 +1943,14 @@ Proof. by case: b. Qed.
 Lemma mem_mask x m s : x \in mask m s -> x \in s.
 Proof. by rewrite -!has_pred1 => /has_mask. Qed.
 
+Lemma in_mask x m s : uniq s -> x \in s ->
+  (x \in mask m s) = nth false m (index x s).
+Proof.
+elim: s m => [|y s IHs] [|[] m]//= /andP[yNs s_uniq]; rewrite ?in_cons eq_sym;
+have [<-|neq_xy]//= := altP eqP => x_s; do ?by rewrite IHs.
+by apply: contraNF yNs => /mem_mask.
+Qed.
+
 Lemma mask_uniq s : uniq s -> forall m, uniq (mask m s).
 Proof.
 elim: s => [|x s IHs] Uxs [|b m] //=.
@@ -2059,6 +2067,13 @@ Qed.
 Lemma subseq_cons s x : subseq s (x :: s).
 Proof. exact: suffix_subseq [:: x] s. Qed.
 
+Lemma cons_subseq s1 s2 x : subseq (x :: s1) s2 -> subseq s1 s2.
+Proof.
+elim: s2 s1 => [|y s2 IHs2] [|z s1]//= in x *.
+by have [<-|neq_xy] := altP eqP => [|/IHs2] zs1_s2;
+   case: ifP => // _; apply: IHs2 zs1_s2.
+Qed.
+
 Lemma subseq_rcons s x : subseq s (rcons s x).
 Proof. by rewrite -cats1 prefix_subseq. Qed.
 
@@ -2070,6 +2085,14 @@ Proof. exact/subseq_uniq/take_subseq. Qed.
 
 Lemma drop_uniq s n : uniq s -> uniq (drop n s).
 Proof. exact/subseq_uniq/drop_subseq. Qed.
+
+Lemma undup_subseq s : subseq (undup s) s.
+Proof.
+elim: s => //= x s IHs; have [xs|xNs] := boolP (x \in s); last by rewrite eqxx.
+have: x \in undup s by rewrite mem_undup.
+case: (undup s) => [|y u]//= in IHs * => _; case: eqP => // _.
+exact: cons_subseq IHs.
+Qed.
 
 End Subseq.
 
@@ -2270,6 +2293,18 @@ elim Ds2: s2 s1 => [|y s2' IHs] [|x s1] //=; try by exists s2; rewrite Ds2.
 case: eqP => [-> | _] /IHs[s3 perm_s2] {IHs}.
   by exists s3; rewrite perm_cons.
 by exists (rcons s3 y); rewrite -cat_cons -perm_rcons -!cats1 catA perm_cat2r.
+Qed.
+
+Lemma subset_maskP s1 s2 : uniq s1 -> {subset s1 <= s2} ->
+  exists2 m : seq bool, size m = size s2 & perm_eq s1 (mask m s2).
+Proof.
+move=> s1_uniq sub_s1_s2; pose s1' := [seq x <- undup s2 | x \in s1].
+have /subseqP[m sm s1'_eq] : subseq s1' s2.
+  by apply: subseq_trans (undup_subseq _); apply: filter_subseq.
+exists m => //; rewrite -s1'_eq; apply: uniq_perm => //.
+  by rewrite filter_uniq ?undup_uniq.
+move=> x; rewrite mem_filter mem_undup.
+by have [x_s1|//] := boolP (x \in s1); rewrite sub_s1_s2.
 Qed.
 
 End FilterSubseq.

@@ -1832,6 +1832,13 @@ Proof.
 by rewrite -[in LHS](nth_ord_enum i i) index_uniq ?(enum_uniq, size_enum_ord).
 Qed.
 
+Lemma mask_enum_ord m :
+  mask m (enum 'I_n) = [seq i <- enum 'I_n | nth false m (val i)].
+Proof.
+rewrite mask_filter ?enum_uniq//; apply: eq_filter => i.
+by rewrite in_mask ?enum_uniq ?mem_enum// index_enum_ord.
+Qed.
+
 End OrdinalEnum.
 
 Lemma widen_ord_proof n m (i : 'I_n) : n <= m -> i < m.

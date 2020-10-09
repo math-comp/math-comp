@@ -1013,13 +1013,25 @@ Qed.
 Lemma big_ord0 P F : \big[op/idx]_(i < 0 | P i) F i = idx.
 Proof. by rewrite big_pred0 => [|[]]. Qed.
 
-Lemma big_tnth I r (P : pred I) F :
-  let r_ := tnth (in_tuple r) in
-  \big[op/idx]_(i <- r | P i) F i
-     = \big[op/idx]_(i < size r | P (r_ i)) (F (r_ i)).
+Lemma big_mask_tuple I n m (t : n.-tuple I) (P : pred I) F :
+  \big[op/idx]_(i <- mask m t | P i) F i
+    = \big[op/idx]_(i < n | nth false m i && P (tnth t i)) F (tnth t i).
 Proof.
-case: r => /= [|x0 r]; first by rewrite big_nil big_ord0.
-by rewrite (big_nth x0) big_mkord; apply: eq_big => i; rewrite (tnth_nth x0).
+rewrite [t in LHS]tuple_map_ord/= -map_mask big_map.
+by rewrite mask_enum_ord big_filter_cond/= enumT.
+Qed.
+
+Lemma big_mask I r m (P : pred I) (F : I -> R) (r_ := tnth (in_tuple r)) :
+  \big[op/idx]_(i <- mask m r | P i) F i
+    = \big[op/idx]_(i < size r | nth false m i && P (r_ i)) F (r_ i).
+Proof. exact: (big_mask_tuple _ (in_tuple r)). Qed.
+
+Lemma big_tnth I r (P : pred I) F (r_ := tnth (in_tuple r)) :
+  \big[op/idx]_(i <- r | P i) F i
+    = \big[op/idx]_(i < size r | P (r_ i)) (F (r_ i)).
+Proof.
+rewrite /= -[r in LHS](mask_true (leqnn (size r))) big_mask//.
+by apply: eq_bigl => i /=; rewrite nth_nseq ltn_ord.
 Qed.
 
 Lemma big_index_uniq (I : eqType) (r : seq I) (E : 'I_(size r) -> R) :

@@ -207,6 +207,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * new lemmas: `eigenpolyP`, `eigenvalue_poly`, `eigenspace_sub_geigen`,
   + new `map_mx` lemmas: `map_kermxpoly`, `map_geigenspace`, `eigenpoly_map`.
 
+  - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`, `subset_maskP`.
+  - in `fintype.v`, added `mask_enum_ord`.
+  - in `bigop.v`, added `big_mask_tuple` and `big_mask`.
+
 ### Changed
 
 - in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
