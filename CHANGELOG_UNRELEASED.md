@@ -228,7 +228,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `commCmx`. The common arguments of these lemmas `R` and `n` are
   maximal implicits.
 
-  - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`, `subset_maskP`.
+  - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`,
+    `subset_maskP`, `subset_subseqP`, `count_rem`, `count_mem_rem`,
+    `rem_cons`, `remE`,  `subseq_rem` and `leq_count_uniq`.
   - in `fintype.v`, added `mask_enum_ord`.
   - in `bigop.v`, added `big_mask_tuple` and `big_mask`.
 - in `mxalgebra.v`, new notation `stablemx V f` asserting that `f`

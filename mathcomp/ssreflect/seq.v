@@ -1271,6 +1271,13 @@ elim: s => //= y s IHs /andP[/negbTE s'y /IHs-> {IHs}].
 by rewrite in_cons; case: (eqVneq y x) => // <-; rewrite s'y.
 Qed.
 
+Lemma leq_uniq_count s1 s2 : uniq s1 -> {subset s1 <= s2} ->
+  (forall x, count_mem x s1 <= count_mem x s2).
+Proof.
+move=> s1_uniq s1_s2 x; rewrite count_uniq_mem//.
+by case: (boolP (_ \in _)) => // /s1_s2/count_memPn/eqP; rewrite -lt0n.
+Qed.
+
 Lemma filter_pred1_uniq s x : uniq s -> x \in s -> filter (pred1 x) s = [:: x].
 Proof.
 move=> uniq_s s_x; rewrite (all_pred1P _ _ (filter_all _ _)).
@@ -1395,6 +1402,9 @@ Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. exact/inj_eq/rot_inj. Qed.
 
+Lemma drop_index s (n := index x0 s) : x0 \in s -> drop n s = x0 :: drop n.+1 s.
+Proof. by move=> xs; rewrite (drop_nth x0) ?index_mem ?nth_index. Qed.
+
 (* lemmas about the pivot pattern [_ ++ _ :: _] *)
 
 Lemma index_pivot x s1 s2 (s := s1 ++ x :: s2) : x \notin s1 ->
@@ -1454,9 +1464,7 @@ Implicit Types x y z : T.
 
 Lemma rot_index s x (i := index x s) : x \in s ->
   rot i s = x :: (drop i.+1 s ++ take i s).
-Proof.
-by move=> x_s; rewrite /rot (drop_nth x) ?index_mem ?nth_index// cat_cons.
-Qed.
+Proof. by move=> x_s; rewrite /rot drop_index ?cat_cons. Qed.
 
 Variant rot_to_spec s x := RotToSpec i s' of rot i s = x :: s'.
 
@@ -2203,16 +2211,21 @@ Variables (T : eqType) (x : T).
 
 Fixpoint rem s := if s is y :: t then (if y == x then t else y :: rem t) else s.
 
+Lemma rem_cons y s : rem (y :: s) = if y == x then s else y :: rem s.
+Proof. by []. Qed.
+
+Lemma remE s : rem s = take (index x s) s ++ drop (index x s).+1 s.
+Proof. by elim: s => //= y s ->; case: eqVneq; rewrite ?drop0. Qed.
+
 Lemma rem_id s : x \notin s -> rem s = s.
 Proof.
-by elim: s => //= y s IHs /norP[neq_yx /IHs->]; rewrite eq_sym (negbTE neq_yx).
+by move=> xNs; rewrite remE memNindex ?drop_oversize ?take_oversize ?cats0.
 Qed.
 
 Lemma perm_to_rem s : x \in s -> perm_eq s (x :: rem s).
 Proof.
-elim: s => // y s IHs; rewrite inE /= eq_sym perm_sym.
-case: eqP => [-> // | _ /IHs].
-by rewrite (perm_catCA [:: x] [:: y]) perm_cons perm_sym.
+move=> xs; rewrite remE -[X in perm_eq X](cat_take_drop (index x s)).
+by rewrite drop_index// -cat1s perm_catCA cat1s.
 Qed.
 
 Lemma size_rem s : x \in s -> size (rem s) = (size s).-1.
@@ -2241,6 +2254,19 @@ Proof. by move/rem_filter=> -> y; rewrite mem_filter. Qed.
 
 Lemma mem_rem_uniqF s : uniq s -> x \in rem s = false.
 Proof. by move/mem_rem_uniq->; rewrite inE eqxx. Qed.
+
+Lemma count_rem P s : count P (rem s) = count P s - (x \in s) && P x.
+Proof.
+have [xs|xNs]/= := boolP (x \in s); last by rewrite subn0 rem_id//.
+rewrite -[s in RHS](cat_take_drop (index x s)) drop_index// remE !count_cat/=.
+by rewrite addnCA addKn.
+Qed.
+
+Lemma count_mem_rem y s : count_mem y (rem s) = count_mem y s - (x == y).
+Proof.
+rewrite count_rem/=; have [->|] := eqVneq y x; last by rewrite andbF subn0.
+by have [|/count_memPn->] := boolP (x \in _).
+Qed.
 
 End Rem.
 
@@ -2347,8 +2373,12 @@ Notation "[ 'seq' E : R | i : T <- s & C ]" :=
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
 
-Lemma mask_filter (T : eqType) (s : seq T) (m : bitseq) :
-  uniq s -> mask m s = [seq i <- s | i \in mask m s].
+Section MiscMask.
+
+Variable (T : eqType).
+Implicit Types (s : seq T) (m : bitseq).
+
+Lemma mask_filter s m : uniq s -> mask m s = [seq i <- s | i \in mask m s].
 Proof.
 elim: m s => [|[] m ih] [|x s] //=.
 - by move=> _; elim: s.
@@ -2356,6 +2386,29 @@ elim: m s => [|[] m ih] [|x s] //=.
   by apply/eq_in_filter => ?; rewrite inE; case: eqP => // ->.
 - by case: ifP => [/mem_mask -> // | _ /andP [] _ /ih].
 Qed.
+
+Lemma subset_maskP s1 s2 : (forall x, count_mem x s1 <= count_mem x s2) ->
+  exists2 m : bitseq, size m = size s2 & perm_eq s1 (mask m s2).
+Proof.
+move=> s1_le; suff [m mP]: exists m, perm_eq s1 (mask m s2).
+  by have [m' sm' eqm] := resize_mask m s2; exists m'; rewrite -?eqm.
+elim: s2 => [|x s2 IHs]//= in s1 s1_le *.
+  by exists [::]; apply/allP => x _/=; rewrite eqn_leq s1_le.
+have [xs1|xNs1] := boolP (x \in s1).
+  have [y|m s1s2] := IHs (rem x s1); first by rewrite count_mem_rem leq_subLR.
+  by exists (true :: m); rewrite (permPl (perm_to_rem xs1)) perm_cons.
+have [y|m s1s2] := IHs s1; last by exists (false :: m).
+have [<-|xNy] := eqVneq x y; first by rewrite (count_memPn xNs1).
+by have := s1_le y; rewrite (negPf xNy).
+Qed.
+
+Lemma subset_subseqP s1 s2 : (forall x, count_mem x s1 <= count_mem x s2) ->
+  exists2 t, subseq t s2 & perm_eq s1 t.
+Proof.
+by move=> /subset_maskP[m]; exists (mask m s2); rewrite ?mask_subseq.
+Qed.
+
+End MiscMask.
 
 Section FilterSubseq.
 
@@ -2403,15 +2456,15 @@ case: eqP => [-> | _] /IHs[s3 perm_s2] {IHs}.
 by exists (rcons s3 y); rewrite -cat_cons -perm_rcons -!cats1 catA perm_cat2r.
 Qed.
 
-Lemma subset_maskP s1 s2 : uniq s1 -> {subset s1 <= s2} ->
-  exists2 m : seq bool, size m = size s2 & perm_eq s1 (mask m s2).
+Lemma subseq_rem s1 s2 x : subseq s1 s2 -> subseq (rem x s1) (rem x s2).
 Proof.
-move=> s1_uniq sub_s1_s2; pose s1' := [seq x <- undup s2 | x \in s1].
-have /subseqP[m sm s1'_eq] : subseq s1' s2.
-  by apply: subseq_trans (undup_subseq _); apply: filter_subseq.
-exists m; rewrite // -s1'_eq; apply: uniq_perm => // [|x].
-  by rewrite filter_uniq ?undup_uniq.
-by rewrite mem_filter mem_undup; have [/sub_s1_s2|] := boolP (x \in s1).
+elim: s2 x s1 => [|x2 s2 IHs1] x [|x1 s1]//=; first by rewrite sub0seq.
+have [->|Nx12] := eqVneq x1 x2; first by case: eqP => //= _ /IHs1; rewrite eqxx.
+have [->|Nx1] := eqVneq x x1.
+  rewrite eq_sym (negPf Nx12) => /(IHs1 x1).
+  by rewrite rem_cons eqxx => /subseq_trans->//; apply: subseq_cons.
+move=> /(IHs1 x); rewrite rem_cons eq_sym (negPf Nx1) => /subseq_trans->//.
+by have [->|Nx2] := eqVneq x x2; [apply: rem_subseq|apply: subseq_cons].
 Qed.
 
 End FilterSubseq.
