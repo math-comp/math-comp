@@ -275,6 +275,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + and the same holds for the dual `>=<^d`, `><^d`, the product
   `>=<^p`, `><^p`, and lexicographic `>=<^l`, `><^l`.
   The previous meanings can be obtained through `>=<%O x` and `><%O x`.
+- In `srnum.v`,
+  + `>=< y` stands for `[pred x | x >=< y]`
 
 
 ### Renamed

@@ -464,9 +464,6 @@ Notation "< y :> T" := (< (y : T)) (only parsing) : ring_scope.
 Notation "> y" := (lt y) : ring_scope.
 Notation "> y :> T" := (> (y : T)) (only parsing) : ring_scope.
 
-Notation ">=< y" := (comparable y) : ring_scope.
-Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
-
 Notation "x <= y" := (le x y) : ring_scope.
 Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : ring_scope.
 Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
@@ -490,12 +487,12 @@ Notation "x < y ?<= 'if' C" := (lterif x y C) : ring_scope.
 Notation "x < y ?<= 'if' C :> R" := ((x : R) < (y : R) ?<= if C)
   (only parsing) : ring_scope.
 
-Notation ">=< x" := (comparable x) : ring_scope.
-Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : ring_scope.
+Notation ">=< y" := [pred x | comparable x y] : ring_scope.
+Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
 Notation "x >=< y" := (comparable x y) : ring_scope.
 
-Notation ">< x" := (fun y => ~~ (comparable x y)) : ring_scope.
-Notation ">< x :> T" := (>< (x : T)) (only parsing) : ring_scope.
+Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
+Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
 Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
 
 Canonical Rpos_keyed.
