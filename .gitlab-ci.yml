@@ -47,9 +47,12 @@ stages:
   script:
     - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" -t "${IMAGE}" .
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 make-coq-latest:
   extends: .make-build
@@ -72,15 +75,19 @@ make-coq-latest:
     - docker push "${IMAGE}"
     - docker logout "${CI_REGISTRY}"
   except:
-    - tags
-    - merge_requests
+    refs:
+      - tags
+      - merge_requests
 
 .opam-build-once:
   extends: .opam-build
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 coq-8.9:
   extends: .opam-build-once
@@ -125,16 +132,20 @@ coq-dev:
     - cd mathcomp
     - make test-suite TEST_SKIP_BUILD=1
   except:
-    - tags
-    - merge_requests
+    refs:
+      - tags
+      - merge_requests
 
 # run "make test-suite" only for push pipelines (not for scheduled pipelines)
 .test-once:
   extends: .test
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 test-coq-dev:
   extends: .test
@@ -188,9 +199,12 @@ test-coq-8.9:
     - git rev-parse --verify HEAD
     - git describe --all --long --abbrev=40 --always --dirty
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 # Guidelines to add a library to mathcomp CI:
 # - Add a hidden job (starting with a .) .ci-lib that extends the .ci job,
@@ -207,10 +221,6 @@ test-coq-8.9:
   script:
     - make -j "${NJOBS}"
     - make install
-  except:
-    - tags
-    - merge_requests
-    - schedules
 
 ci-fourcolor-8.9:
   extends: .ci-fourcolor
@@ -246,10 +256,6 @@ ci-fourcolor-dev:
   script:
     - make -j "${NJOBS}"
     - make install
-  except:
-    - tags
-    - merge_requests
-    - schedules
 
 ci-odd-order-8.9:
   extends: .ci-odd-order
@@ -484,12 +490,16 @@ ci-fcsl-pcm-dev:
     - docker push "${HUB_IMAGE}"
     - docker logout "${HUB_REGISTRY}"
   only:
-    - master
+    refs:
+      - master
 
 .docker-deploy-once:
   extends: .docker-deploy
   except:
-    - schedules
+    refs:
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 mathcomp-dev:coq-8.9:
   extends: .docker-deploy-once
