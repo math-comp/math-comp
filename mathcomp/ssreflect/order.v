@@ -1287,9 +1287,8 @@ Record mixin_of (T0 : Type) (b : POrder.class_of T0)
   _ : commutative join;
   _ : associative meet;
   _ : associative join;
-  _ : forall y x, meet x (join x y) = x;
-  _ : forall y x, join x (meet x y) = x;
   _ : forall x y, (x <= y) = (meet x y == x);
+  _ : forall x y, (y <= x) = (join x y == x);
 }.
 
 Set Primitive Projections.
@@ -3734,34 +3733,18 @@ Lemma joinC : commutative (@join _ L). Proof. by case: L => [?[?[]]]. Qed.
 Lemma meetA : associative (@meet _ L). Proof. by case: L => [?[?[]]]. Qed.
 Lemma joinA : associative (@join _ L). Proof. by case: L => [?[?[]]]. Qed.
 
-Lemma joinKI y x : x `&` (x `|` y) = x.
-Proof. by case: L x y => [?[?[]]]. Qed.
-Lemma meetKU y x : x `|` (x `&` y) = x.
-Proof. by case: L x y => [?[?[]]]. Qed.
-
-Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite joinC joinKI. Qed.
-Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite meetC meetKU. Qed.
-
-Lemma meetUK x y : (x `&` y) `|` y = y.
-Proof. by rewrite joinC meetC meetKU. Qed.
-Lemma joinIK x y : (x `|` y) `&` y = y.
-Proof. by rewrite joinC meetC joinKI. Qed.
-
-Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
-Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite joinC joinIK. Qed.
-
 Lemma leEmeet x y : (x <= y) = (x `&` y == x).
 Proof. by case: L x y => [?[?[]]]. Qed.
 
-Lemma leEjoin x y : (x <= y) = (x `|` y == y).
-Proof. by rewrite leEmeet; apply/eqP/eqP => <-; rewrite (joinKI, meetUK). Qed.
+Let geEjoin x y : (x >= y) = (x `|` y == x).
+Proof. by case: L x y => [?[?[]]]. Qed.
 
-Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
-Proof. by rewrite [LHS]leEjoin joinC. Qed.
+Lemma leEjoin x y : (x <= y) = (x `|` y == y).
+Proof. by rewrite joinC geEjoin. Qed.
 
 Definition dual_latticeMixin :=
-  @Lattice.Mixin _ (POrder.class [porderType of L^d]) _ _ joinC meetC
-                 joinA meetA meetKU joinKI dual_leEmeet.
+  @Lattice.Mixin _ (POrder.class [porderType of L^d]) _ _
+                 joinC meetC joinA meetA geEjoin leEmeet.
 
 Canonical dual_latticeType := LatticeType L^d dual_latticeMixin.
 
@@ -3776,7 +3759,8 @@ Section LatticeTheoryMeet.
 Context {disp : unit} {L : latticeType disp}.
 Implicit Types (x y : L).
 
-(* lattice theory *)
+(* meet semilattice theory *)
+
 Lemma meetAC : right_commutative (@meet _ L).
 Proof. by move=> x y z; rewrite -!meetA [X in _ `&` X]meetC. Qed.
 Lemma meetCA : left_commutative (@meet _ L).
@@ -3785,7 +3769,7 @@ Lemma meetACA : interchange (@meet _ L) (@meet _ L).
 Proof. by move=> x y z t; rewrite !meetA [X in X `&` _]meetAC. Qed.
 
 Lemma meetxx x : x `&` x = x.
-Proof. by rewrite -[X in _ `&` X](meetKU x) joinKI. Qed.
+Proof. by apply/eqP; rewrite -leEmeet. Qed.
 
 Lemma meetKI y x : x `&` (x `&` y) = x `&` y.
 Proof. by rewrite meetA meetxx. Qed.
@@ -3842,6 +3826,18 @@ Proof. by rewrite meetC eq_meetl. Qed.
 Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
 Proof. by move=> xz yt; rewrite lexI !leIx2 ?xz ?yt ?orbT //. Qed.
 
+(* lattice theory *)
+
+Lemma meetKU y x : x `|` (x `&` y) = x.
+Proof. by apply/eqP; rewrite joinC -leEjoin meetC leEmeet -meetA meetxx. Qed.
+
+Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite meetC meetKU. Qed.
+
+Lemma meetUK x y : (x `&` y) `|` y = y.
+Proof. by rewrite joinC meetC meetKU. Qed.
+
+Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
+
 End LatticeTheoryMeet.
 End LatticeTheoryMeet.
 
@@ -3850,7 +3846,8 @@ Section LatticeTheoryJoin.
 Context {disp : unit} {L : latticeType disp}.
 Implicit Types (x y : L).
 
-(* lattice theory *)
+(* join semilattice theory *)
+
 Lemma joinAC : right_commutative (@join _ L).
 Proof. exact: (@meetAC _ [latticeType of L^d]). Qed.
 Lemma joinCA : left_commutative (@join _ L).
@@ -3905,6 +3902,19 @@ Proof. exact: (@eq_meetr _ [latticeType of L^d]). Qed.
 
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
 Proof. exact: (@leI2 _ [latticeType of L^d]). Qed.
+
+(* lattice theory *)
+
+Lemma joinKI y x : x `&` (x `|` y) = x.
+Proof. exact: (@meetKU _ [latticeType of L^d]). Qed.
+Lemma joinKIC y x : x `&` (y `|` x) = x.
+Proof. exact: (@meetKUC _ [latticeType of L^d]). Qed.
+Lemma joinIK x y : (x `|` y) `&` y = y.
+Proof. exact: (@meetUK _ [latticeType of L^d]). Qed.
+Lemma joinIKC x y : (y `|` x) `&` y = y.
+Proof. exact: (@meetUKC _ [latticeType of L^d]). Qed.
+
+(* comparison predicates *)
 
 Lemma lcomparableP x y : incomparel x y
   (min y x) (min x y) (max y x) (max x y)
@@ -5228,10 +5238,18 @@ Record of_ := Build {
   leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
 
-Definition latticeMixin (m : of_) :=
-  @Lattice.Mixin
-    T _ (meet m) (join m)
-    (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (leEmeet m).
+Variable (m : of_).
+
+Lemma geEjoin (x y : T) : (x >= y) = (join m x y == x).
+Proof.
+rewrite (leEmeet m); apply/eqP/eqP => <-.
+  by rewrite (meetC m) (meetKU m).
+by rewrite (joinC m) (joinKI m).
+Qed.
+
+Definition latticeMixin :=
+  @Lattice.Mixin T _ (meet m) (join m)
+                 (meetC m) (joinC m) (meetA m) (joinA m) (leEmeet m) geEjoin.
 
 End LatticeMixin.
 
@@ -6724,7 +6742,7 @@ Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite eqE /= -!leEmeet. Qed.
 
 Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet.
+  LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
 Canonical latticeType := LatticeType (T * T') latticeMixin.
 
 Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2). Proof. by []. Qed.
@@ -6739,7 +6757,7 @@ Variable (T : bLatticeType disp1) (T' : bLatticeType disp2).
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by rewrite /<=%O /= /le !le0x. Qed.
 
-Canonical bLatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
+Canonical bLatticeType := BLatticeType (T * T') (BottomMixin le0x).
 
 Lemma botEprod : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
@@ -6751,7 +6769,7 @@ Variable (T : tbLatticeType disp1) (T' : tbLatticeType disp2).
 Fact lex1 (x : T * T') : x <= (top, top).
 Proof. by rewrite /<=%O /= /le !lex1. Qed.
 
-Canonical tbLatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
+Canonical tbLatticeType := TBLatticeType (T * T') (TopMixin lex1).
 
 Lemma topEprod : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
 
@@ -7002,7 +7020,7 @@ rewrite leEsig /=; case: comparableP (le0x (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE le0x.
 Qed.
 Canonical bLatticeType :=
-  BLatticeType {t : T & T' t} (BLattice.Mixin le0x).
+  BLatticeType {t : T & T' t} (BottomMixin le0x).
 Canonical bDistrLatticeType := [bDistrLatticeType of {t : T & T' t}].
 
 Lemma botEsig : 0 = Tagged T' (0 : T' 0). Proof. by []. Qed.
@@ -7013,7 +7031,7 @@ rewrite leEsig /=; case: comparableP (lex1 (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE lex1.
 Qed.
 Canonical tbLatticeType :=
-  TBLatticeType {t : T & T' t} (TBLattice.Mixin lex1).
+  TBLatticeType {t : T & T' t} (TopMixin lex1).
 Canonical tbDistrLatticeType := [tbDistrLatticeType of {t : T & T' t}].
 
 Lemma topEsig : 1 = Tagged T' (1 : T' 1). Proof. by []. Qed.
@@ -7148,14 +7166,14 @@ Variable (T : finOrderType disp1) (T' : finOrderType disp2).
 
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !le0x implybT. Qed.
-Canonical bLatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
+Canonical bLatticeType := BLatticeType (T * T') (BottomMixin le0x).
 Canonical bDistrLatticeType := [bDistrLatticeType of T * T'].
 
 Lemma botEprodlexi : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
 Fact lex1 (x : T * T') : x <= (1, 1) :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !lex1 implybT. Qed.
-Canonical tbLatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
+Canonical tbLatticeType := TBLatticeType (T * T') (TopMixin lex1).
 Canonical tbDistrLatticeType := [tbDistrLatticeType of T * T'].
 
 Lemma topEprodlexi : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
@@ -7359,7 +7377,7 @@ by rewrite /<=%O /=; elim: x y => [|? ? ih] [|? ?] //=; rewrite eqE leEmeet ih.
 Qed.
 
 Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet.
+  LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
 Canonical latticeType := LatticeType (seq T) latticeMixin.
 
 Lemma meetEseq s1 s2 : s1 `&` s2 =  [seq x.1 `&` x.2 | x <- zip s1 s2].
@@ -7380,7 +7398,7 @@ Lemma join_cons x1 s1 x2 s2 :
   (x1 :: s1 : seq T) `|` (x2 :: s2) = (x1 `|` x2) :: s1 `|` s2.
 Proof. by []. Qed.
 
-Canonical bLatticeType := BLatticeType (seq T) (BLattice.Mixin (@le0s _)).
+Canonical bLatticeType := BLatticeType (seq T) (BottomMixin (@le0s _)).
 
 Lemma botEseq : 0 = [::] :> seq T.
 Proof. by []. Qed.
@@ -7559,7 +7577,7 @@ Qed.
 
 Canonical latticeType := LatticeType (seq T) total.
 Canonical bLatticeType :=
-  BLatticeType (seq T) (BLattice.Mixin (@lexi0s _)).
+  BLatticeType (seq T) (BottomMixin (@lexi0s _)).
 Canonical distrLatticeType := DistrLatticeType (seq T) total.
 Canonical bDistrLatticeType := [bDistrLatticeType of seq T].
 Canonical orderType := OrderType (seq T) total.
@@ -7728,7 +7746,7 @@ by rewrite tnth_meet leEmeet.
 Qed.
 
 Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet.
+  LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
 Canonical latticeType := LatticeType (n.-tuple T) latticeMixin.
 
 Lemma meetEtprod t1 t2 :
@@ -7748,7 +7766,7 @@ Implicit Types (t : n.-tuple T).
 Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq le0x. Qed.
 
-Canonical bLatticeType := BLatticeType (n.-tuple T) (BLattice.Mixin le0x).
+Canonical bLatticeType := BLatticeType (n.-tuple T) (BottomMixin le0x).
 
 Lemma botEtprod : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
 
@@ -7762,7 +7780,7 @@ Fact lex1 t : t <= [tuple of nseq n 1] :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq lex1. Qed.
 
 Canonical tbLatticeType :=
-  TBLatticeType (n.-tuple T) (TBLattice.Mixin lex1).
+  TBLatticeType (n.-tuple T) (TopMixin lex1).
 
 Lemma topEtprod : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
 
@@ -8042,7 +8060,7 @@ Implicit Types (t : n.-tuple T).
 Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
 Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
 
-Canonical bLatticeType := BLatticeType (n.-tuple T) (BLattice.Mixin le0x).
+Canonical bLatticeType := BLatticeType (n.-tuple T) (BottomMixin le0x).
 Canonical bDistrLatticeType := [bDistrLatticeType of n.-tuple T].
 
 Lemma botEtlexi : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
@@ -8057,7 +8075,7 @@ Fact lex1 t : t <= [tuple of nseq n 1].
 Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
 
 Canonical tbLatticeType :=
-  TBLatticeType (n.-tuple T) (TBLattice.Mixin lex1).
+  TBLatticeType (n.-tuple T) (TopMixin lex1).
 Canonical tbDistrLatticeType := [tbDistrLatticeType of n.-tuple T].
 
 Lemma topEtlexi : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
