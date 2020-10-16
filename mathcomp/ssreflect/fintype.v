@@ -1483,29 +1483,28 @@ Proof. exact: eq_card_trans card_sub. Qed.
 End FinTypeForSubTheory.
 
 (* This assumes that T has a subCountType structure over a type that  *)
-(* has a finType structure.            (*                                *) *)
-(* Notation "[ 'finMixin' 'of' T 'by' <: ]" := *)
-(*     (SubFinMixin_for (Phant T) (erefl _)) *)
-(*   (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope. *)
+(* has a finType structure.                                           *)
+Notation "[ 'finMixin' 'of' T 'by' <: ]" := (FinTypeForSub.Build _ _ T)
+   (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Import String.
 Local Open Scope string.
 
 (* Regression for the subFinType stack *)
-(* Record myb : Type := MyB {myv : bool; _ : ~~ myv}. *)
-(* HB.instance Definition myb_sub := [subType for myv]. *)
-(* HB.instance Definition myb_eqm : is_eqType myb := [eqMixin of myb by <:]. *)
-(* HB.instance Definition myb_chm := [choiceMixin of myb by <:]. *)
-(* Canonical myb_ch := Eval hnf in ChoiceType myb myb_chm. *)
-(* Definition myb_cntm := [countMixin of myb by <:]. *)
-(* Canonical myb_cnt := Eval hnf in CountType myb myb_cntm. *)
-(* Canonical myb_scnt := Eval hnf in [subCountType of myb]. *)
-(* Definition myb_finm := [finMixin of myb by <:]. *)
-(* Canonical myb_fin := Eval hnf in FinType myb myb_finm. *)
-(* Canonical myb_sfin := Eval hnf in [subFinType of myb]. *)
-(* Print Canonical Projections. *)
-(* Print myb_finm. *)
-(* Print myb_cntm. *)
+Record myb : Type := MyB {myv : bool; _ : ~~ myv}.
+Definition myb_sub : is_SUB bool (fun x => ~~ x) myb := BuildSubTypeFor _ myv.
+HB.instance myb myb_sub.
+HB.instance Definition myb_eqm : is_eqType myb := [eqMixin of myb by <:].
+HB.instance Definition myb_chm := [choiceMixin of myb by <:].
+HB.instance Definition myb_cntm := [countMixin of myb by <:].
+
+Definition myb_finm := [finMixin of myb by <:].
+
+Canonical myb_fin := Eval hnf in FinType myb myb_finm.
+Canonical myb_sfin := Eval hnf in [subFinType of myb].
+Print Canonical Projections.
+Print myb_finm.
+Print myb_cntm.
 
 Section CardSig.
 
