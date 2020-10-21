@@ -173,7 +173,7 @@ Module Finite.
 
 (* TODO: we could add this sealing pattern to HB or as a coq-elpi app *)
 Module Type EnumSig.
-Parameter enum : forall cT : type, seq cT.
+Parameter enum : forall cT : Finite.type, seq cT.
 Axiom enumDef : enum = @enum_subdef.
 End EnumSig.
 
@@ -1487,32 +1487,23 @@ End FinTypeForSubTheory.
 Notation "[ 'finMixin' 'of' T 'by' <: ]" := (FinTypeForSub.Build _ _ T)
    (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope.
 
-Import String.
-Local Open Scope string.
-
-(* Regression for the subFinType stack *)
+(* Regression for the subFinType stack
 Record myb : Type := MyB {myv : bool; _ : ~~ myv}.
 Definition myb_sub : is_SUB bool (fun x => ~~ x) myb := BuildSubTypeFor _ myv.
 HB.instance myb myb_sub.
 HB.instance Definition myb_eqm : is_eqType myb := [eqMixin of myb by <:].
 HB.instance Definition myb_chm := [choiceMixin of myb by <:].
 HB.instance Definition myb_cntm := [countMixin of myb by <:].
-
-Definition myb_finm := [finMixin of myb by <:].
-
-Canonical myb_fin := Eval hnf in FinType myb myb_finm.
-Canonical myb_sfin := Eval hnf in [subFinType of myb].
-Print Canonical Projections.
-Print myb_finm.
-Print myb_cntm.
+HB.instance Definition myb_finm := [finMixin of myb by <:].
+Check [subFinType of myb].
+Check [finType of myb].
+*)
 
 Section CardSig.
 
 Variables (T : finType) (P : pred T).
 
-Definition sig_finMixin := [finMixin of {x | P x} by <:].
-Canonical sig_finType := Eval hnf in FinType {x | P x} sig_finMixin.
-Canonical sig_subFinType := Eval hnf in [subFinType of {x | P x}].
+HB.instance Definition sig_finMixin := [finMixin of {x | P x} by <:].
 
 Lemma card_sig : #|{: {x | P x}}| = #|[pred x | P x]|.
 Proof. exact: card_sub. Qed.
@@ -1526,9 +1517,9 @@ Variables (T : eqType) (s : seq T).
 
 Record seq_sub : Type := SeqSub {ssval : T; ssvalP : in_mem ssval (@mem T _ s)}.
 
-Canonical seq_sub_subType := Eval hnf in [subType for ssval].
-Definition seq_sub_eqMixin := Eval hnf in [eqMixin of seq_sub by <:].
-Canonical seq_sub_eqType := Eval hnf in EqType seq_sub seq_sub_eqMixin.
+Definition seq_sub_subMixin := [subMixin for ssval]. (* TODO: let (,) in Elpi *)
+#[verbose] HB.instance seq_sub seq_sub_subMixin.
+HB.instance Definition seq_sub_eqMixin : is_eqType seq_sub := [eqMixin of seq_sub by <:]. (* TODO: omit type and see bug *)
 
 Definition seq_sub_enum : seq seq_sub := undup (pmap insub s).
 
@@ -1553,15 +1544,17 @@ Qed.
 Definition seq_sub_countMixin := CountMixin seq_sub_pickleK.
 Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
 Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
-Definition seq_sub_finMixin := Finite.Mixin seq_sub_countMixin seq_sub_axiom.
+Definition seq_sub_finMixin := Finite.Mixin seq_sub_axiom.
 
 (* Beware: these are not the canonical instances, as they are not consistent  *)
 (* with the generic sub_choiceType canonical instance.                        *)
 Definition adhoc_seq_sub_choiceMixin := PcanChoiceMixin seq_sub_pickleK.
 Definition adhoc_seq_sub_choiceType :=
-  Eval hnf in ChoiceType seq_sub adhoc_seq_sub_choiceMixin.
+  Eval hnf in Choice.pack seq_sub adhoc_seq_sub_choiceMixin.
+Definition adhoc_seq_sub_countType :=
+  [countType of seq_sub for Countable.pack adhoc_seq_sub_choiceType seq_sub_countMixin].
 Definition adhoc_seq_sub_finType :=
-  [finType of seq_sub for FinType adhoc_seq_sub_choiceType seq_sub_finMixin].
+  [finType of seq_sub for Finite.pack adhoc_seq_sub_countType seq_sub_finMixin].
 
 End SeqSubType.
 
@@ -1584,13 +1577,9 @@ Section SeqFinType.
 Variables (T : choiceType) (s : seq T).
 Local Notation sT := (seq_sub s).
 
-Definition seq_sub_choiceMixin := [choiceMixin of sT by <:].
-Canonical seq_sub_choiceType := Eval hnf in ChoiceType sT seq_sub_choiceMixin.
-
-Canonical seq_sub_countType := Eval hnf in CountType sT (seq_sub_countMixin s).
-Canonical seq_sub_subCountType := Eval hnf in [subCountType of sT].
-Canonical seq_sub_finType := Eval hnf in FinType sT (seq_sub_finMixin s).
-Canonical seq_sub_subFinType := Eval hnf in [subFinType of sT].
+HB.instance Definition seq_sub_choiceMixin := [choiceMixin of sT by <:].
+HB.instance Definition seq_sub_countMixin_fixme : is_countable sT := seq_sub_countMixin s.
+HB.instance Definition seq_sub_finMixin_fixme : is_finite sT := seq_sub_finMixin s.
 
 Lemma card_seq_sub : uniq s -> #|{:sT}| = size s.
 Proof.

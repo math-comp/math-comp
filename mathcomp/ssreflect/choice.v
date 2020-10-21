@@ -286,7 +286,6 @@ Module Export ChoiceNamespace.
   End InternalTheory.
   End Choice.
 End ChoiceNamespace.
-Import choice.Choice.
 
 Notation choiceType := Choice.type.
 Notation ChoiceMixin := Choice.Mixin.
@@ -453,7 +452,7 @@ by exists n; rewrite Pn.
 Qed.
 HB.instance nat nat_choiceMixin.
 
-Definition bool_choiceMixin := CanChoiceMixin oddb.
+Definition bool_choiceMixin : has_choice bool := CanChoiceMixin oddb.
 HB.instance bool bool_choiceMixin.
 Definition bitseq_choiceMixin := [choiceMixin of bitseq].
 HB.instance bitseq bitseq_choiceMixin.
@@ -546,14 +545,14 @@ HB.end.
 #[mathcomp]
 HB.structure Definition Countable := { T of Choice T & is_countable T }.
 
-Notation countType := type.
+Notation countType := Countable.type.
 Notation CountMixin := Countable.Mixin.
 Notation countMixin T := (Countable.mixin_of T).
 Notation "[ 'countMixin' 'of' T ]" := (Countable.class _ : Countable.mixin_of T)
   (at level 0, format "[ 'countMixin'  'of'  T ]") : form_scope.
-Notation "[ 'countType' 'of' T 'for' cT ]" := (@Countable.clone T cT idfun)
+Notation "[ 'countType' 'of' T 'for' cT ]" := (Countable.clone T cT)
 (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'countType' 'of' T ]" := (@Countable.clone T _ id)
+Notation "[ 'countType' 'of' T ]" := (Countable.clone T _)
   (at level 0, format "[ 'countType'  'of'  T ]") : form_scope.
 
 Section CountableTheory.

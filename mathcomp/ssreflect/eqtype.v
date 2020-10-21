@@ -591,7 +591,7 @@ Lemma val_insubd u0 x : val (insubd u0 x) = if P x then x else val u0.
 Proof. by rewrite /insubd; case: insubP => [u -> | /negPf->]. Qed.
 
 Lemma insubdK u0 : {in P, cancel (insubd u0) val}.
-Proof. by move=> x Px; rewrite /= val_insubd [P x]Px. Qed.
+Proof. by move=> x Px; rewrite val_insubd [P x]Px. Qed.
 
 Let insub_eq_aux x isPx : P x = isPx -> option sT :=
   if isPx as b return _ = b -> _ then fun Px => Some (Sub x Px) else fun=> None.
@@ -648,6 +648,9 @@ Notation "[ 'subType' 'of' U ]" := (SUB.clone _ _ U _)
  (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
 
 Notation BuildSubTypeFor T v := (@is_SUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect).
+
+Notation "[ 'subMixin' 'for' v ]" := (BuildSubTypeFor _ v)
+  (at level 0, format "[ 'subMixin'  'for'  v ]") : form_scope.
 
 Definition NewType T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
