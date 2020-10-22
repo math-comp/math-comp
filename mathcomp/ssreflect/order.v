@@ -419,7 +419,7 @@ Reserved Notation ">= y :> T" (at level 35, y at next level).
 Reserved Notation "< y :> T" (at level 35, y at next level).
 Reserved Notation "> y :> T" (at level 35, y at next level).
 Reserved Notation "x >=< y" (at level 70, no associativity).
-Reserved Notation ">=< x" (at level 35).
+Reserved Notation ">=< y" (at level 35).
 Reserved Notation ">=< y :> T" (at level 35, y at next level).
 Reserved Notation "x >< y" (at level 70, no associativity).
 Reserved Notation ">< x" (at level 35).
@@ -454,7 +454,7 @@ Reserved Notation ">=^d y :> T" (at level 35, y at next level).
 Reserved Notation "<^d y :> T" (at level 35, y at next level).
 Reserved Notation ">^d y :> T" (at level 35, y at next level).
 Reserved Notation "x >=<^d y" (at level 70, no associativity).
-Reserved Notation ">=<^d x" (at level 35).
+Reserved Notation ">=<^d y" (at level 35).
 Reserved Notation ">=<^d y :> T" (at level 35, y at next level).
 Reserved Notation "x ><^d y" (at level 70, no associativity).
 Reserved Notation "><^d x" (at level 35).
@@ -1146,9 +1146,6 @@ Notation "< y :> T" := (< (y : T)) (only parsing) : order_scope.
 Notation "> y" := (lt y) : order_scope.
 Notation "> y :> T" := (> (y : T)) (only parsing) : order_scope.
 
-Notation ">=< y" := (comparable y) : order_scope.
-Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : order_scope.
-
 Notation "x <= y" := (le x y) : order_scope.
 Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : order_scope.
 Notation "x >= y" := (y <= x) (only parsing) : order_scope.
@@ -1172,12 +1169,12 @@ Notation "x < y ?<= 'if' C" := (lteif x y C) : order_scope.
 Notation "x < y ?<= 'if' C :> T" := ((x : T) < (y : T) ?<= if C)
   (only parsing) : order_scope.
 
-Notation ">=< x" := (comparable x) : order_scope.
-Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : order_scope.
+Notation ">=< y" := [pred x | comparable x y] : order_scope.
+Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : order_scope.
 Notation "x >=< y" := (comparable x y) : order_scope.
 
-Notation ">< x" := (fun y => ~~ (comparable x y)) : order_scope.
-Notation ">< x :> T" := (>< (x : T)) (only parsing) : order_scope.
+Notation ">< y" := [pred x | ~~ comparable x y] : order_scope.
+Notation ">< y :> T" := (>< (y : T)) (only parsing) : order_scope.
 Notation "x >< y" := (~~ (comparable x y)) : order_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
@@ -2541,9 +2538,6 @@ Notation "<^d y :> T" := (<^d (y : T)) (only parsing) : order_scope.
 Notation ">^d y" := (<^d%O y) : order_scope.
 Notation ">^d y :> T" := (>^d (y : T)) (only parsing) : order_scope.
 
-Notation ">=<^d y" := (>=<^d%O y) : order_scope.
-Notation ">=<^d y :> T" := (>=<^d (y : T)) (only parsing) : order_scope.
-
 Notation "x <=^d y" := (<=^d%O x y) : order_scope.
 Notation "x <=^d y :> T" := ((x : T) <=^d (y : T)) (only parsing) : order_scope.
 Notation "x >=^d y" := (y <=^d x) (only parsing) : order_scope.
@@ -2568,11 +2562,11 @@ Notation "x <^d y ?<= 'if' C :> T" := ((x : T) <^d (y : T) ?<= if C)
   (only parsing) : order_scope.
 
 Notation ">=<^d x" := (>=<^d%O x) : order_scope.
-Notation ">=<^d x :> T" := (>=<^d (x : T)) (only parsing) : order_scope.
+Notation ">=<^d y :> T" := (>=<^d (y : T)) (only parsing) : order_scope.
 Notation "x >=<^d y" := (>=<^d%O x y) : order_scope.
 
-Notation "><^d x" := (fun y => ~~ (>=<^d%O x y)) : order_scope.
-Notation "><^d x :> T" := (><^d (x : T)) (only parsing) : order_scope.
+Notation "><^d y" := [pred x | ~~ dual_comparable x y] : order_scope.
+Notation "><^d y :> T" := (><^d (y : T)) (only parsing) : order_scope.
 Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
 Notation "x `&^d` y" := (dual_meet x y) : order_scope.
@@ -2973,17 +2967,17 @@ Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
 Lemma max_maxxK x y : max x (max x y) = max x y.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
 
-Lemma comparable_minl x y z : x >=< z -> y >=< z -> min x y >=< z.
-Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Lemma comparable_minl z : {in >=< z &, forall x y, min x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
 
-Lemma comparable_minr x y z : z >=< x -> z >=< y -> z >=< min x y.
-Proof. by move=> cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Lemma comparable_minr z : {in >=<%O z &, forall x y, z >=< min x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
 
-Lemma comparable_maxl x y z : x >=< z -> y >=< z -> max x y >=< z.
-Proof. by move=> cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Lemma comparable_maxl z : {in >=< z &, forall x y, max x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
 
-Lemma comparable_maxr x y z : z >=< x -> z >=< y -> z >=< max x y.
-Proof. by move=> cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Lemma comparable_maxr z : {in >=<%O z &, forall x y, z >=< max x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
 
 Section Comparable2.
 Variables (z x y : T) (cmp_xy : x >=< y).
@@ -3165,7 +3159,7 @@ Lemma comparable_minACA x y z t :
 Proof.
 move=> xy xz xt yz yt zt; rewrite comparable_minA// ?comparable_minl//.
 rewrite [min _ z]comparable_minAC// -comparable_minA// ?comparable_minl//.
-by rewrite comparable_sym.
+by rewrite inE comparable_sym.
 Qed.
 
 Lemma comparable_maxACA x y z t :
@@ -3174,7 +3168,7 @@ Lemma comparable_maxACA x y z t :
 Proof.
 move=> xy xz xt yz yt zt; rewrite comparable_maxA// ?comparable_maxl//.
 rewrite [max _ z]comparable_maxAC// -comparable_maxA// ?comparable_maxl//.
-by rewrite comparable_sym.
+by rewrite inE comparable_sym.
 Qed.
 
 Lemma comparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
@@ -3226,12 +3220,23 @@ Lemma nmono_in_leif (A : {pred T}) (f : T -> T) C :
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
 Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
 
-Lemma nmono_leif (f : T -> T) C :
-    {mono f : x y /~ x <= y} ->
+Lemma nmono_leif (f : T -> T) C : {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
 
+Lemma comparable_bigl x x0 op I (P : pred I) F (s : seq I) :
+  {in >=< x &, forall y z, op y z >=< x} -> x0 >=< x ->
+  {in P, forall i, F i >=< x} -> \big[op/x0]_(i <- s | P i) F i >=< x.
+Proof. by move=> *; elim/big_ind : _. Qed.
+
+Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
+  {in >=<%O x &, forall y z, x >=< op y z} -> x >=< x0 ->
+  {in P, forall i, x >=< F i} -> x >=< \big[op/x0]_(i <- s | P i) F i.
+Proof. by move=> *; elim/big_ind : _. Qed.
+
 End POrderTheory.
+Hint Resolve comparable_minr comparable_minl : core.
+Hint Resolve comparable_maxr comparable_maxl : core.
 
 Section ContraTheory.
 Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
@@ -5785,9 +5790,6 @@ Notation "<^p y :> T" := (<^p (y : T)) (only parsing) : order_scope.
 Notation ">^p y" := (<^p%O y) : order_scope.
 Notation ">^p y :> T" := (>^p (y : T)) (only parsing) : order_scope.
 
-Notation ">=<^p y" := (>=<^p%O y) : order_scope.
-Notation ">=<^p y :> T" := (>=<^p (y : T)) (only parsing) : order_scope.
-
 Notation "x <=^p y" := (<=^p%O x y) : order_scope.
 Notation "x <=^p y :> T" := ((x : T) <=^p (y : T)) (only parsing) : order_scope.
 Notation "x >=^p y" := (y <=^p x) (only parsing) : order_scope.
@@ -5807,12 +5809,12 @@ Notation "x <=^p y ?= 'iff' C" := (<?=^p%O x y C) : order_scope.
 Notation "x <=^p y ?= 'iff' C :> T" := ((x : T) <=^p (y : T) ?= iff C)
   (only parsing) : order_scope.
 
-Notation ">=<^p x" := (>=<^p%O x) : order_scope.
-Notation ">=<^p x :> T" := (>=<^p (x : T)) (only parsing) : order_scope.
+Notation ">=<^p y" := [pred x | >=<^p%O x y] : order_scope.
+Notation ">=<^p y :> T" := (>=<^p (y : T)) (only parsing) : order_scope.
 Notation "x >=<^p y" := (>=<^p%O x y) : order_scope.
 
-Notation "><^p x" := (fun y => ~~ (>=<^p%O x y)) : order_scope.
-Notation "><^p x :> T" := (><^p (x : T)) (only parsing) : order_scope.
+Notation "><^p y" := [pred x | ~~ (>=<^p%O x y)] : order_scope.
+Notation "><^p y :> T" := (><^p (y : T)) (only parsing) : order_scope.
 Notation "x ><^p y" := (~~ (><^p%O x y)) : order_scope.
 
 Notation "x `&^p` y" :=  (@meet prod_display _ x y) : order_scope.
@@ -5898,9 +5900,6 @@ Notation "<^l y :> T" := (<^l (y : T)) (only parsing) : order_scope.
 Notation ">^l y" := (<^l%O y) : order_scope.
 Notation ">^l y :> T" := (>^l (y : T)) (only parsing) : order_scope.
 
-Notation ">=<^l y" := (>=<^l%O y) : order_scope.
-Notation ">=<^l y :> T" := (>=<^l (y : T)) (only parsing) : order_scope.
-
 Notation "x <=^l y" := (<=^l%O x y) : order_scope.
 Notation "x <=^l y :> T" := ((x : T) <=^l (y : T)) (only parsing) : order_scope.
 Notation "x >=^l y" := (y <=^l x) (only parsing) : order_scope.
@@ -5920,12 +5919,12 @@ Notation "x <=^l y ?= 'iff' C" := (<?=^l%O x y C) : order_scope.
 Notation "x <=^l y ?= 'iff' C :> T" := ((x : T) <=^l (y : T) ?= iff C)
   (only parsing) : order_scope.
 
-Notation ">=<^l x" := (>=<^l%O x) : order_scope.
-Notation ">=<^l x :> T" := (>=<^l (x : T)) (only parsing) : order_scope.
+Notation ">=<^l y" := [pred x | >=<^l%O x y] : order_scope.
+Notation ">=<^l y :> T" := (>=<^l (y : T)) (only parsing) : order_scope.
 Notation "x >=<^l y" := (>=<^l%O x y) : order_scope.
 
-Notation "><^l x" := (fun y => ~~ (>=<^l%O x y)) : order_scope.
-Notation "><^l x :> T" := (><^l (x : T)) (only parsing) : order_scope.
+Notation "><^l y" := [pred x | ~~ (>=<^l%O x y)] : order_scope.
+Notation "><^l y :> T" := (><^l (y : T)) (only parsing) : order_scope.
 Notation "x ><^l y" := (~~ (><^l%O x y)) : order_scope.
 
 Notation meetlexi := (@meet lexi_display _).

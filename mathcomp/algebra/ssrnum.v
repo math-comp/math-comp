@@ -464,9 +464,6 @@ Notation "< y :> T" := (< (y : T)) (only parsing) : ring_scope.
 Notation "> y" := (lt y) : ring_scope.
 Notation "> y :> T" := (> (y : T)) (only parsing) : ring_scope.
 
-Notation ">=< y" := (comparable y) : ring_scope.
-Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
-
 Notation "x <= y" := (le x y) : ring_scope.
 Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : ring_scope.
 Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
@@ -490,12 +487,12 @@ Notation "x < y ?<= 'if' C" := (lterif x y C) : ring_scope.
 Notation "x < y ?<= 'if' C :> R" := ((x : R) < (y : R) ?<= if C)
   (only parsing) : ring_scope.
 
-Notation ">=< x" := (comparable x) : ring_scope.
-Notation ">=< x :> T" := (>=< (x : T)) (only parsing) : ring_scope.
+Notation ">=< y" := [pred x | comparable x y] : ring_scope.
+Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
 Notation "x >=< y" := (comparable x y) : ring_scope.
 
-Notation ">< x" := (fun y => ~~ (comparable x y)) : ring_scope.
-Notation ">< x :> T" := (>< (x : T)) (only parsing) : ring_scope.
+Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
+Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
 Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
 
 Canonical Rpos_keyed.
@@ -1479,6 +1476,19 @@ rewrite sqrf_eq1 => /orP[/eqP //|]; rewrite -ger0_def le0r oppr_eq0 oner_eq0.
 by move/(addr_gt0 ltr01); rewrite subrr ltxx.
 Qed.
 
+Lemma big_real x0 op I (P : pred I) F (s : seq I) :
+  {in real &, forall x y, op x y \is real} -> x0 \is real ->
+  {in P, forall i, F i \is real} -> \big[op/x0]_(i <- s | P i) F i \is real.
+Proof. exact: comparable_bigr. Qed.
+
+Lemma sum_real I (P : pred I) (F : I -> R) (s : seq I) :
+  {in P, forall i, F i \is real} -> \sum_(i <- s | P i) F i \is real.
+Proof. by apply/big_real; [apply: rpredD | apply: rpred0]. Qed.
+
+Lemma prod_real I (P : pred I) (F : I -> R) (s : seq I) :
+  {in P, forall i, F i \is real} -> \prod_(i <- s | P i) F i \is real.
+Proof. by apply/big_real; [apply: rpredM | apply: rpred1]. Qed.
+
 Section NormedZmoduleTheory.
 
 Variable V : normedZmodType R.
@@ -1778,6 +1788,22 @@ Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: (@real_ltgtP 0 x);
 by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
+
+Lemma max_real : {in real &, forall x y, max x y \is real}.
+Proof. exact: comparable_maxr. Qed.
+
+Lemma min_real : {in real &, forall x y, min x y \is real}.
+Proof. exact: comparable_minr. Qed.
+
+Lemma bigmax_real I x0 (r : seq I) (P : pred I) (f : I -> R):
+  x0 \is real -> {in P, forall i : I, f i \is real} ->
+  \big[max/x0]_(i <- r | P i) f i \is real.
+Proof. exact/big_real/max_real. Qed.
+
+Lemma bigmin_real I x0 (r : seq I) (P : pred I) (f : I -> R):
+  x0 \is real -> {in P, forall i : I, f i \is real} ->
+  \big[min/x0]_(i <- r | P i) f i \is real.
+Proof. exact/big_real/min_real. Qed.
 
 Lemma real_neqr_lt : {in real &, forall x y, (x != y) = (x < y) || (y < x)}.
 Proof. by move=> * /=; case: real_ltgtP. Qed.
