@@ -116,6 +116,7 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `b` -- a boolean argument, as in `andbb : idempotent andb.`
   - `C` -- commutativity, as in `andbC : commutative andb.`
         -- alternatively, predicate or set complement, as in `predC.`
+        -- alternatively, constant.
   - `CA` -- left commutativity.
   - `D` -- predicate or set difference, as in `predD.`
   - `E` -- elimination lemma, as in `negbFE : ~~ b = false -> b.`
