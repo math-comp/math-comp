@@ -110,6 +110,9 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*   A \in unitmx == A is invertible (R must be a comUnitRingType).           *)
 (*        invmx A == the inverse matrix of A if A \in unitmx A, otherwise A.  *)
 (* A \is a mxOver S == the matrix A has its coefficients in S.                *)
+(*     comm_mx A B := A *m B = B *m A                                         *)
+(*    comm_mxb A B := A *m B == B *m A                                        *)
+(*  all_comm_mx As := allrel comm_mxb                                         *)
 (* The following operations provide a correspondence between linear functions *)
 (* and matrices:                                                              *)
 (*     lin1_mx f == the m x n matrix that emulates via right product          *)
@@ -2711,6 +2714,89 @@ Qed.
 
 End MapRingMatrix.
 
+Section CommMx.
+(***********************************************************************)
+(************* Commutation property specialized to 'M[R]_n *************)
+(***********************************************************************)
+(* GRing.comm is bound to (non trivial) rings, and matrices form a     *)
+(* (non trivial) ring only when they are square and of manifestly      *)
+(* positive size. However during proofs in endomorphism reduction, we  *)
+(* take restrictions, which are matrices of size #|V| (with V a matrix *)
+(* space) and it becomes cumbersome to state commutation between       *)
+(* restrictions, unless we relax the setting, and this relaxation      *)
+(* corresponds to comm_mx A B := A *m B = B *m A.                      *)
+(* As witnessed by comm_mxE, when A and B have type 'M_n.+1,           *)
+(*   comm_mx A B is convertible to GRing.comm A B.                     *)
+(* The boolean version comm_mxb is designed to be used with seq.allrel *)
+(***********************************************************************)
+
+Context {R : ringType} {n : nat}.
+Implicit Types (f g p : 'M[R]_n) (fs : seq 'M[R]_n) (d : 'rV[R]_n) (I : Type).
+
+Definition comm_mx  f g : Prop := f *m g =  g *m f.
+Definition comm_mxb f g : bool := f *m g == g *m f.
+
+Lemma comm_mx_sym f g : comm_mx f g -> comm_mx g f.
+Proof. by rewrite /comm_mx. Qed.
+
+Lemma comm_mx_refl f : comm_mx f f. Proof. by []. Qed.
+
+Lemma comm_mx0 f : comm_mx f 0. Proof. by rewrite /comm_mx mulmx0 mul0mx. Qed.
+Lemma comm0mx f : comm_mx 0 f. Proof. by rewrite /comm_mx mulmx0 mul0mx. Qed.
+
+Lemma comm_mx1 f : comm_mx f 1%:M.
+Proof. by rewrite /comm_mx mulmx1 mul1mx. Qed.
+
+Lemma comm1mx f : comm_mx 1%:M f.
+Proof. by rewrite /comm_mx mulmx1 mul1mx. Qed.
+
+Hint Resolve comm_mx0 comm0mx comm_mx1 comm1mx : core.
+
+Lemma comm_mxN f g : comm_mx f g -> comm_mx f (- g).
+Proof. by rewrite /comm_mx mulmxN mulNmx => ->. Qed.
+
+Lemma comm_mxN1 f : comm_mx f (- 1%:M). Proof. exact/comm_mxN/comm_mx1. Qed.
+
+Lemma comm_mxD f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g + g').
+Proof. by rewrite /comm_mx mulmxDl mulmxDr => -> ->. Qed.
+
+Lemma comm_mxB f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g - g').
+Proof. by move=> fg fg'; apply/comm_mxD => //; apply/comm_mxN. Qed.
+
+Lemma comm_mxM f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g *m g').
+Proof. by rewrite /comm_mx mulmxA => ->; rewrite -!mulmxA => ->. Qed.
+
+Lemma comm_mx_sum I (s : seq I) (P : pred I) (F : I -> 'M[R]_n) (f : 'M[R]_n) :
+  (forall i : I, P i -> comm_mx f (F i)) -> comm_mx f (\sum_(i <- s | P i) F i).
+Proof. by move=> comm_mxfF; elim/big_ind: _ => // g h; apply: comm_mxD. Qed.
+
+Lemma comm_mxP f g : reflect (comm_mx f g) (comm_mxb f g).
+Proof. exact: eqP. Qed.
+
+Notation all_comm_mx := (allrel comm_mxb).
+
+Lemma all_comm_mxP fs :
+  reflect {in fs &, forall f g, f *m g = g *m f} (all_comm_mx fs).
+Proof. by apply: (iffP allrelP) => fsP ? ? ? ?; apply/eqP/fsP. Qed.
+
+Lemma all_comm_mx1 f : all_comm_mx [:: f].
+Proof. by rewrite /comm_mxb allrel1. Qed.
+
+Lemma all_comm_mx2P f g : reflect (f *m g = g *m f) (all_comm_mx [:: f; g]).
+Proof.
+by rewrite /comm_mxb; apply: (iffP and4P) => [[_/eqP//]|->]; rewrite ?eqxx.
+Qed.
+
+Lemma all_comm_mx_cons f fs :
+  all_comm_mx (f :: fs) = all (comm_mxb f) fs && all_comm_mx fs.
+Proof. by rewrite /comm_mxb [LHS]allrel_cons. Qed.
+
+End CommMx.
+Notation all_comm_mx := (allrel comm_mxb).
+
+Lemma comm_mxE (R : ringType) (n : nat) : @comm_mx R n.+1 = @GRing.comm _.
+Proof. by []. Qed.
+
 Section ComMatrix.
 (* Lemmas for matrices with coefficients in a commutative ring *)
 Variable R : comRingType.
@@ -2792,7 +2878,7 @@ Proof.
 by rewrite !mulmx_diag; congr (diag_mx _); apply/rowP=> i; rewrite !mxE mulrC.
 Qed.
 
-Lemma diag_mx_comm n' (d e : 'rV[R]_n'.+1) : GRing.comm (diag_mx d) (diag_mx e).
+Lemma diag_mx_comm n (d e : 'rV[R]_n) : comm_mx (diag_mx d) (diag_mx e).
 Proof. exact: diag_mxC. Qed.
 
 Lemma scalar_mxC m n a (A : 'M[R]_(m, n)) : A *m a%:M = a%:M *m A.
@@ -2800,11 +2886,14 @@ Proof.
 by apply: trmx_inj; rewrite trmx_mul tr_scalar_mx !mul_scalar_mx linearZ.
 Qed.
 
-Lemma scalar_mx_comm n' a (A : 'M[R]_n'.+1) : GRing.comm A a%:M.
-Proof. exact: scalar_mxC. Qed.
-
 Lemma mul_mx_scalar m n a (A : 'M[R]_(m, n)) : A *m a%:M = a *: A.
 Proof. by rewrite scalar_mxC mul_scalar_mx. Qed.
+
+Lemma comm_mxC n a (A : 'M[R]_n) : comm_mx A a%:M.
+Proof. by rewrite /comm_mx mul_mx_scalar mul_scalar_mx. Qed.
+
+Lemma commCmx n a (A : 'M[R]_n) : comm_mx a%:M A.
+Proof. exact/comm_mx_sym/comm_mxC. Qed.
 
 Lemma mxtrace_mulC m n (A : 'M[R]_(m, n)) B :
    \tr (A *m B) = \tr (B *m A).
@@ -3051,9 +3140,18 @@ End ComMatrix.
 
 Arguments lin_mul_row {R m n} u.
 Arguments lin_mulmx {R m n p} A.
+Arguments comm_mxC {R n}.
+Arguments commCmx {R n}.
+Arguments diag_mx_comm {R n}.
 
 Canonical matrix_finAlgType (R : finComRingType) n' :=
   [finAlgType R of 'M[R]_n'.+1].
+
+Hint Resolve comm_mxC commCmx : core.
+
+Notation "@ 'scalar_mx_comm'" := (deprecate scalar_mx_comm comm_mxC)
+  (at level 10, only parsing) : fun_scope.
+Notation scalar_mx_comm := (@scalar_mx_comm _ _) (only parsing).
 
 (*****************************************************************************)
 (********************** Matrix unit ring and inverse matrices ****************)
