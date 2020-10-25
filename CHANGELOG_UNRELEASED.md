@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `contra_leq`, `contra_ltn`, `contra_leq_ltn`, `contra_ltn_leq`,
     `contraPleq`, `contraPltn`, `contra_not_leq`, `contra_not_ltn`, `contra_leq_not`, `contra_ltn_not`
 - in `ssralg.v`, new lemma `sumr_const_nat` and `iter_addr_0`
+- in `ssralg.v`, new lemmas `iter_addr`, `iter_mulr`, `iter_mulr_1`, and `prodr_const_nat`.
 - in `ssrnum.v`, new lemma `ler_sum_nat`
 - in `ssrnum.v`, new lemmas `big_real`, `sum_real`, `prod_real`,
   `max_real`, `min_real`, `bigmax_real`, and `bigmin_real`.

@@ -835,8 +835,11 @@ Qed.
 Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
 Proof. by rewrite -!mulrnA mulnC. Qed.
 
-Lemma iter_addr_0 n (m : V) : iter n (+%R m) 0 = m *+ n.
-Proof. by elim: n => //= n ->; rewrite mulrS. Qed.
+Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
+Proof. by elim: n => [|n ih]; rewrite ?add0r //= ih mulrS addrA. Qed.
+
+Lemma iter_addr_0 n x : iter n (+%R x) 0 = x *+ n.
+Proof. by rewrite iter_addr addr0. Qed.
 
 Lemma sumrN I r P (F : I -> V) :
   (\sum_(i <- r | P i) - F i = - (\sum_(i <- r | P i) F i)).
@@ -855,11 +858,10 @@ Lemma sumrMnr x I r P (F : I -> nat) :
   \sum_(i <- r | P i) x *+ F i = x *+ (\sum_(i <- r | P i) F i).
 Proof. by rewrite (big_morph _ (mulrnDr x) (erefl _)). Qed.
 
-Lemma sumr_const (I : finType) (A : pred I) (x : V) :
-  \sum_(i in A) x = x *+ #|A|.
+Lemma sumr_const (I : finType) (A : pred I) x : \sum_(i in A) x = x *+ #|A|.
 Proof. by rewrite big_const -iteropE. Qed.
 
-Lemma sumr_const_nat (m n : nat) (x : V) : \sum_(n <= i < m) x = x *+ (m - n).
+Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
 Lemma telescope_sumr n m (f : nat -> V) : n <= m ->
@@ -1248,9 +1250,17 @@ Qed.
 
 Lemma lreg_sign n : lreg ((-1) ^+ n : R). Proof. exact/lregX/lregN/lreg1. Qed.
 
-Lemma prodr_const (I : finType) (A : pred I) (x : R) :
-  \prod_(i in A) x = x ^+ #|A|.
+Lemma iter_mulr n x y : iter n ( *%R x) y = x ^+ n * y.
+Proof. by elim: n => [|n ih]; rewrite ?expr0 ?mul1r //= ih exprS -mulrA. Qed.
+
+Lemma iter_mulr_1 n x : iter n ( *%R x) 1 = x ^+ n.
+Proof. by rewrite iter_mulr mulr1. Qed.
+
+Lemma prodr_const (I : finType) (A : pred I) x : \prod_(i in A) x = x ^+ #|A|.
 Proof. by rewrite big_const -iteropE. Qed.
+
+Lemma prodr_const_nat n m x : \prod_(n <= i < m) x = x ^+ (m - n).
+Proof. by rewrite big_const_nat -iteropE. Qed.
 
 Lemma prodrXr x I r P (F : I -> nat) :
   \prod_(i <- r | P i) x ^+ F i = x ^+ (\sum_(i <- r | P i) F i).
@@ -5604,6 +5614,7 @@ Definition sumrB := sumrB.
 Definition sumrMnl := sumrMnl.
 Definition sumrMnr := sumrMnr.
 Definition sumr_const := sumr_const.
+Definition sumr_const_nat := sumr_const_nat.
 Definition telescope_sumr := telescope_sumr.
 Definition mulr0n := mulr0n.
 Definition mulr1n := mulr1n.
@@ -5619,6 +5630,8 @@ Definition mulrnBl := mulrnBl.
 Definition mulrnBr := mulrnBr.
 Definition mulrnA := mulrnA.
 Definition mulrnAC := mulrnAC.
+Definition iter_addr := iter_addr.
+Definition iter_addr_0 := iter_addr_0.
 Definition mulrA := mulrA.
 Definition mul1r := mul1r.
 Definition mulr1 := mulr1.
@@ -5733,7 +5746,10 @@ Definition addrr_char2 := addrr_char2.
 Definition oppr_char2 := oppr_char2.
 Definition addrK_char2 := addrK_char2.
 Definition addKr_char2 := addKr_char2.
+Definition iter_mulr := iter_mulr.
+Definition iter_mulr_1 := iter_mulr_1.
 Definition prodr_const := prodr_const.
+Definition prodr_const_nat := prodr_const_nat.
 Definition mulrC := mulrC.
 Definition mulrCA := mulrCA.
 Definition mulrAC := mulrAC.
