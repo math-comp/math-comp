@@ -100,6 +100,8 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp matrix.
 (*                   mxsum_expr. The structure also recognizes sums of       *)
 (*                   matrix ranks, so that lemmas concerning the rank of     *)
 (*                   direct sums can be used bidirectionally.                *)
+(* stablemx V f <=> the matrix f represents an endomorphism that preserves V *)
+(*               := (V *m f <= V)%MS                                         *)
 (* The next set of definitions let us represent F-algebras using matrices:   *)
 (*   'A[F]_(m, n) == the type of matrices encoding (sub)algebras of square   *)
 (*                   n x n matrices, via mxvec; as in the matrix type        *)
@@ -239,6 +241,8 @@ Definition eqmx m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :=
             ((A <= C) = (B <= C)) * ((C <= A) = (C <= B)))%MS.
 Arguments eqmx {m1%N m2%N n%N} A%MS B%MS.
 Local Notation "A :=: B" := (eqmx A B) : matrix_set_scope.
+
+Notation stablemx V f := (V%MS *m f%R <= V%MS)%MS.
 
 Section LtmxIdentities.
 
@@ -2067,6 +2071,10 @@ Lemma eigenvalueP a :
   reflect (exists2 v : 'rV_n, v *m g = a *: v & v != 0) (eigenvalue a).
 Proof. by apply: (iffP (rowV0Pn _)) => [] [v]; move/eigenspaceP; exists v. Qed.
 
+Lemma eigenvectorP {v : 'rV_n} :
+  reflect (exists a, (v <= eigenspace a)%MS) (stablemx v g).
+Proof. by apply: (iffP (sub_rVP _ _)) => -[a] /eigenspaceP; exists a. Qed.
+
 Lemma mxdirect_sum_eigenspace (P : pred I) a_ :
   {in P &, injective a_} -> mxdirect (\sum_(i | P i) eigenspace (a_ i)).
 Proof.
@@ -2205,6 +2213,66 @@ Notation "\bigcap_ ( i 'in' A | P ) B" :=
   (\big[capmx/1%:M]_(i in A | P%B) B%MS) : matrix_set_scope.
 Notation "\bigcap_ ( i 'in' A ) B" :=
   (\big[capmx/1%:M]_(i in A) B%MS) : matrix_set_scope.
+
+Notation stablemx V f := (V%MS *m f%R <= V%MS)%MS.
+
+Section Stability.
+
+Variable (F : fieldType).
+
+Lemma eqmx_stable m m' n (V : 'M[F]_(m, n)) (V' : 'M[F]_(m', n)) (f : 'M[F]_n) :
+  (V :=: V')%MS -> stablemx V f = stablemx V' f.
+Proof. by move=> eqVV'; rewrite (eqmxMr _ eqVV') eqVV'. Qed.
+
+Section FixedDim.
+
+Variables (m n : nat) (V W : 'M[F]_(m, n)) (f g : 'M[F]_n).
+
+Lemma stablemx_row_base : (stablemx (row_base V) f) = (stablemx V f).
+Proof. by apply: eqmx_stable; apply: eq_row_base. Qed.
+
+Lemma stablemx_full : row_full V -> stablemx V f. Proof. exact: submx_full. Qed.
+
+Lemma stablemxM : stablemx V f -> stablemx V g -> stablemx V (f *m g).
+Proof. by move=> f_stab /(submx_trans _)->//; rewrite mulmxA submxMr. Qed.
+
+Lemma stablemxD : stablemx V f -> stablemx V g -> stablemx V (f + g).
+Proof. by move=> f_stab g_stab; rewrite mulmxDr addmx_sub. Qed.
+
+Lemma stablemxN : stablemx V (- f) = stablemx V f.
+Proof. by rewrite mulmxN eqmx_opp. Qed.
+
+Lemma stablemxC x : stablemx V x%:M.
+Proof. by rewrite mul_mx_scalar scalemx_sub. Qed.
+
+Lemma stablemx0 : stablemx V 0. Proof. by rewrite mulmx0 sub0mx. Qed.
+
+Lemma stableDmx : stablemx V f -> stablemx W f -> stablemx (V + W)%MS f.
+Proof. by move=> fV fW; rewrite addsmxMr addsmxS. Qed.
+
+Lemma stableNmx : stablemx (- V) f = stablemx V f.
+Proof. by rewrite mulNmx !eqmx_opp. Qed.
+
+Lemma stable0mx : stablemx (0 : 'M_(m, n)) f. Proof. by rewrite mul0mx. Qed.
+
+End FixedDim.
+
+Lemma stableCmx (m n : nat) x (f : 'M[F]_(m, n)) : stablemx x%:M f.
+Proof.
+have [->|x_neq0] := eqVneq x 0; first by rewrite mul_scalar_mx scale0r sub0mx.
+by rewrite -![x%:M]scalemx1 eqmx_scale// submx_full// -sub1mx.
+Qed.
+
+Lemma stablemx_sums (n : nat) (I : finType) (V_ : I -> 'M[F]_n) (f : 'M_n) :
+  (forall i, stablemx (V_ i) f) -> stablemx (\sum_i V_ i)%MS f.
+Proof.
+by move=> fV; rewrite sumsmxMr; apply/sumsmx_subP => i; rewrite (sumsmx_sup i).
+Qed.
+
+Lemma stablemx_unit (n : nat) (V f : 'M[F]_n) : V \in unitmx -> stablemx V f.
+Proof. by move=> Vunit; rewrite submx_full ?row_full_unit. Qed.
+
+End Stability.
 
 Section DirectSums.
 Variables (F : fieldType) (I : finType) (P : pred I).

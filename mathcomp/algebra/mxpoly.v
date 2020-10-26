@@ -313,6 +313,15 @@ rewrite (bigD1 j)//= ihp mxE ?eqxx mulr1n -mulrnAl big1 ?addr0//.
 by move=> k /negPf nkF; rewrite mxE nkF mulr0.
 Qed.
 
+Lemma horner_mx_stable (K : fieldType) m n p
+    (V : 'M[K]_(n.+1, m.+1)) (f : 'M_m.+1) :
+  stablemx V f -> stablemx V (horner_mx f p).
+Proof.
+move=> V_fstab; elim/poly_ind: p => [|p c]; first by rewrite rmorph0 stablemx0.
+move=> fp_stable; rewrite rmorphD rmorphM/= horner_mx_X horner_mx_C.
+by rewrite stablemxD ?stablemxM ?fp_stable ?stablemxC.
+Qed.
+
 Prenex Implicits horner_mx powers_mx.
 
 Section CharPoly.
