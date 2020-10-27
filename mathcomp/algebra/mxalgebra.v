@@ -2272,6 +2272,30 @@ Qed.
 Lemma stablemx_unit (n : nat) (V f : 'M[F]_n) : V \in unitmx -> stablemx V f.
 Proof. by move=> Vunit; rewrite submx_full ?row_full_unit. Qed.
 
+Section Commutation.
+
+Variable (n : nat).
+Implicit Types (f g : 'M[F]_n).
+
+Lemma comm_mx_stable (f g : 'M[F]_n) : comm_mx f g -> stablemx f g.
+Proof. by move=> comm_fg; rewrite [_ *m _]comm_fg mulmx_sub. Qed.
+
+Lemma comm_mx_stable_ker (f g : 'M[F]_n) :
+  comm_mx f g -> stablemx (kermx f) g.
+Proof.
+move=> comm_fg; apply/sub_kermxP.
+by rewrite -mulmxA -[g *m _]comm_fg mulmxA mulmx_ker mul0mx.
+Qed.
+
+Lemma comm_mx_stable_eigenspace (f g : 'M[F]_n) a :
+  comm_mx f g -> stablemx (eigenspace f a) g.
+Proof.
+move=> cfg; rewrite comm_mx_stable_ker//.
+by apply/comm_mx_sym/comm_mxB => //; apply:comm_mxC.
+Qed.
+
+End Commutation.
+
 End Stability.
 
 Section DirectSums.

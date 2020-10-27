@@ -217,9 +217,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   stands for `allrel comm_mxb`. New lemmas `comm_mx_sym`, `comm_mx_refl`,
   `comm_mx0`, `comm0mx`, `comm_mx1`, `comm1mx`, `comm_mxN`, `comm_mxN1`,
   `comm_mxD`, `comm_mxB`, `comm_mx_sum`, `comm_mxP`, `all_comm_mxP`,
-  `all_comm_mx1`, `all_comm_mx2P`, `all_comm_mx_cons`, `comm_mxC`,
-  `commCmx`, `comm_mx_horner`, and `horner_mxC`. The common arguments
-  of these lemmas `R` and `n` are maximal implicits.
+  `all_comm_mx1`, `all_comm_mx2P`, `all_comm_mx_cons`, `comm_mxC`, and
+  `commCmx`. The common arguments of these lemmas `R` and `n` are
+  maximal implicits.
 
   - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`, `subset_maskP`.
   - in `fintype.v`, added `mask_enum_ord`.
@@ -231,6 +231,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `stable0mx`, `stableCmx`, `stablemx_sums`, and `stablemx_unit`.
 
 - in `mxpoly.v`, new lemma `horner_mx_stable`.
+- in `mxalgebra.v`, added `comm_mx_stable`, `comm_mx_stable_ker`, and
+  `comm_mx_stable_eigenspace`.
+- in `mxpoly.v`, added `comm_mx_horner`, `comm_horner_mx`,
+  `comm_horner_mx2`, `horner_mx_stable`, `comm_mx_stable_kermxpoly`,
+  and `comm_mx_stable_geigenspace`.
 
 ### Changed
 
