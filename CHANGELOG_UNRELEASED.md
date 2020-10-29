@@ -242,6 +242,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
    + Lemma `prodr_natmul` : generalization of `prodrMn_const`.
    Its name will become `prodrMn` in the next release when this name will become available (cf. Renamed section)
 
+- in `polydiv.v`, new lemma `dvdpNl`.
 
 ### Changed
 
@@ -344,8 +345,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `itv_gte` -> `itv_ge`
   + `l(t|e)r_in_itv` -> `lt_in_itv`
 
+- in `ssrnat.v`
+  + `iter_add` -> `iterD`
+  + `maxn_mul(l|r)` -> `maxnM(l|r)`
+  + `minn_mul(l|r)` -> `minnM(l|r)`
+  + `odd_(opp|mul|exp)` -> `odd(N|M|X)`
+  + `sqrn_sub` -> `sqrnB`
+
+- in `seq.v`, `iota_add(|l)` -> `iotaD(|l)`
+
+- in `div.v`
+  + `coprime_mul(l|r)` -> `coprimeM(l|r)`
+  + `coprime_exp(l|r)` -> `coprimeX(l|r)`
+
+- in `fintype.v`
+  + `bump_addl` -> `bumpDl`
+  + `unbump_addl` -> `unbumpDl`
+
+- in `bigop.v`, `mulm_add(l|r)` -> `mulmD(l|r)`
+
+- in `prime.v`
+  + `primes_(mul|exp)` -> `primes(M|X)`
+  + `pnat_(mul|exp)` -> `pnat(M|X)`
+
 - in `ssralg.v`
   + `prodrMn` has been renamed `prodrMn_const` (with deprecation alias, cf. Added section)
+
+- in `poly.v`
+  + `polyC_(add|opp|sub|muln|mul|exp|inv)` -> `polyC(D|N|B|Mn|M|X|V)`
+  + `lead_coef_opp` -> `lead_coefN`
+  + `derivn_sub` -> `derivnB`
+
+- in `polydiv.v`
+  + `rdivp_add(l|r)` -> `rdivpD(l|r)`
+  + `rmodp_add` -> `rmodpD`
+  + `dvdp_scale(l|r)` -> `dvdpZ(l|r)`
+  + `dvdp_opp` -> `dvdpNl`
+  + `coprimep_scale(l|r)` -> `coprimepZ(l|r)`
+  + `coprimep_mul(l|r)` -> `coprimepM(l|r)`
+  + `coprimep_exp(l|r)` -> `coprimepX(l|r)`
+  + `modp_scale(l|r)` -> `modpZ(l|r)`
+  + `modp_(opp|add|scalel|scaler)` -> `modp(N|D|Zl|Zr)`
+  + `divp_(opp|add|scalel|scaler)` -> `divp(N|D|Zl|Zr)`
+
+- in `matrix.v`, `map_mx_sub` -> `map_mxB`
+
+- in `mxalgebra.v`, `mulsmx_add(l|r)` -> `mulsmxD(l|r)`
+
+- in `vector.v`, `limg_add` -> `limgD`
+
+- in `ssrint.v`, `polyC_mulrz` -> `polyCMz`
+
+- in `intdiv.v`
+  + `coprimez_mul(l|r)` -> `coprimezM(l|r)`
+  + `coprimez_exp(l|r)` -> `coprimezX(l|r)`
 
 ### Removed
 
