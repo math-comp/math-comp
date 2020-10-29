@@ -1434,7 +1434,12 @@ Proof. by move=> cn0; exact/eqp_dvdr/eqp_scale. Qed.
 Lemma dvdpZl c m n : c != 0 -> (c *: m %| n) = (m %| n).
 Proof. by move=> cn0; exact/eqp_dvdl/eqp_scale. Qed.
 
-Lemma dvdpN d p : d %| (- p) = (d %| p).
+Lemma dvdpNl d p : (- d) %| p = (d %| p).
+Proof.
+by rewrite -scaleN1r; apply/eqp_dvdl/eqp_scale; rewrite oppr_eq0 oner_neq0.
+Qed.
+
+Lemma dvdpNr d p : d %| (- p) = (d %| p).
 Proof. by apply: eqp_dvdr; rewrite -scaleN1r eqp_scale ?oppr_eq0 ?oner_eq0. Qed.
 
 Lemma eqp_mul2r r p q : r != 0 -> (p * r %= q * r) = (p %= q).
@@ -2358,7 +2363,7 @@ Notation "@ 'dvdp_scalel'" :=
 Notation "@ 'dvdp_scaler'" :=
   (deprecate dvdp_scaler dvdpZr) (at level 10, only parsing) : fun_scope.
 Notation "@ 'dvdp_opp'" :=
-  (deprecate dvdp_opp dvdpN) (at level 10, only parsing) : fun_scope.
+  (deprecate dvdp_opp dvdpNr) (at level 10, only parsing) : fun_scope.
 Notation "@ 'coprimep_scalel'" :=
   (deprecate coprimep_scalel coprimepZl) (at level 10, only parsing) : fun_scope.
 Notation "@ 'coprimep_scaler'" :=
