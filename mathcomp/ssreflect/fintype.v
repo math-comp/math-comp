@@ -1300,7 +1300,9 @@ Qed.
 
 Lemma leq_card : #|T| <= #|T'|. Proof. exact: (leq_card_in (in2W _)). Qed.
 
-Hypothesis card_range : #|T| = #|T'|.
+Hypothesis card_range : #|T| >= #|T'|.
+
+Let eq_card : #|T| = #|T'|. Proof. by apply/eqP; rewrite eqn_leq leq_card. Qed.
 
 Lemma inj_card_onto y : y \in codom f.
 Proof. by move: y; apply/subset_cardP; rewrite ?card_codom ?subset_predT. Qed.
