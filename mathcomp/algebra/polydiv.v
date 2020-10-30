@@ -365,7 +365,7 @@ elim: (size m) 0%N 0 {1 4 6}m (leqnn (size m)) => [|n IHn] k q r Hr /=.
   by rewrite size_poly0 size_poly_gt0.
 case: ltnP => Hlt Heq; first by constructor.
 apply/IHn=> [|Cda]; last first.
-  rewrite mulrDl addrAC -addrA subrK exprSr polyC_mul mulrA Heq //.
+  rewrite mulrDl addrAC -addrA subrK exprSr polyCM mulrA Heq //.
   by rewrite mulrDl -mulrA Cda mulrA.
 apply/leq_sizeP => j Hj; rewrite coefB coefMC -scalerAl coefZ coefXnM.
 rewrite ltn_subRL ltnNge (leq_trans Hr) /=; last first.
@@ -465,7 +465,7 @@ suff:
   by rewrite rreg_size ?ltn_rmodp //; exact: rregX.
 rewrite mulrDl addrAC mulNr -!mulrA polyC_exp -(commrX (m-v) Cdl).
 rewrite -polyC_exp mulrA -mulrDl -rdivp_eq // [(_ ^+ (m - k))%:P]polyC_exp.
-rewrite -(commrX (m-k) Cdl) -polyC_exp mulrA -he -!mulrA -!polyC_mul -/v.
+rewrite -(commrX (m-k) Cdl) -polyC_exp mulrA -he -!mulrA -!polyCM -/v.
 by rewrite -!exprD addnC subnK ?leq_maxl // addnC subnK ?subrr ?leq_maxr.
 Qed.
 
@@ -553,15 +553,15 @@ case: (monic_comreg mond)=> Hc Hr; rewrite [r in _ * _ + r]rdivp_eq addrA.
 by rewrite -mulrDl rdivp_addl_mul_small // ltn_rmodp monic_neq0.
 Qed.
 
-Lemma rdivp_addl q r : rdvdp d q -> rdivp (q + r) d = rdivp q d + rdivp r d.
+Lemma rdivpDl q r : rdvdp d q -> rdivp (q + r) d = rdivp q d + rdivp r d.
 Proof.
 case: (monic_comreg mond)=> Hc Hr; rewrite [r in q + r]rdivp_eq addrA.
 rewrite [q in q + _ + _]rdivp_eq; move/rmodp_eq0P->.
 by rewrite addr0 -mulrDl rdivp_addl_mul_small // ltn_rmodp monic_neq0.
 Qed.
 
-Lemma rdivp_addr q r : rdvdp d r -> rdivp (q + r) d = rdivp q d + rdivp r d.
-Proof. by rewrite addrC; move/rdivp_addl->; rewrite addrC. Qed.
+Lemma rdivpDr q r : rdvdp d r -> rdivp (q + r) d = rdivp q d + rdivp r d.
+Proof. by rewrite addrC; move/rdivpDl->; rewrite addrC. Qed.
 
 Lemma rdivp_mull p : rdivp (p * d) d = p.
 Proof. by rewrite -[p * d]addr0 rdivp_addl_mul rdiv0p addr0. Qed.
@@ -581,7 +581,7 @@ Proof.
 by move=> Hd; case: (monic_comreg mond)=> Hc Hr; rewrite /rmodp redivp_eq.
 Qed.
 
-Lemma rmodp_add p q : rmodp (p + q) d = rmodp p d + rmodp q d.
+Lemma rmodpD p q : rmodp (p + q) d = rmodp p d + rmodp q d.
 Proof.
 rewrite [p in LHS]rdivp_eq [q in LHS]rdivp_eq addrACA -mulrDl.
 rewrite rmodp_addl_mul_small //; apply: (leq_ltn_trans (size_add _ _)).
@@ -590,7 +590,7 @@ Qed.
 
 Lemma rmodp_mulmr p q : rmodp (p * (rmodp q d)) d = rmodp (p * q) d.
 Proof.
-by rewrite [q in RHS]rdivp_eq mulrDr rmodp_add mulrA rmodp_mull add0r.
+by rewrite [q in RHS]rdivp_eq mulrDr rmodpD mulrA rmodp_mull add0r.
 Qed.
 
 Lemma rdvdpp : rdvdp d d.
@@ -623,6 +623,19 @@ Lemma rdivpK p : rdvdp d p -> (rdivp p d) * d = p.
 Proof. by move=> dvddp; rewrite [RHS]rdivp_eq rmodp_eq0 ?addr0. Qed.
 
 End MonicDivisor.
+
+Notation "@ 'rdivp_addl'" :=
+  (deprecate rdivp_addl rdivpDl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'rdivp_addr'" :=
+  (deprecate rdivp_addr rdivpDr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'rmodp_add'" :=
+  (deprecate rmodp_add rmodpD) (at level 10, only parsing) : fun_scope.
+Notation rdivp_addl :=
+  (fun d_monic => @rdivp_addl _ _ d_monic _) (only parsing).
+Notation rdivp_addr :=
+  (fun d_monic q => @rdivp_addr _ _ d_monic q _) (only parsing).
+Notation rmodp_add := (@rmodp_add _ _) (only parsing).
+
 End RingMonic.
 
 Module Ring.
@@ -824,7 +837,7 @@ rewrite unlock ud redivp_def; constructor => //.
   rewrite -scalerAl -scalerDr -mul_polyC.
   have hn0 : (lead_coef d ^+ rscalp m d)%:P != 0.
     by rewrite polyC_eq0; apply: expf_neq0.
-  apply: (mulfI hn0); rewrite !mulrA -exprVn !polyC_exp -exprMn -polyC_mul.
+  apply: (mulfI hn0); rewrite !mulrA -exprVn !polyC_exp -exprMn -polyCM.
   by rewrite divrr // expr1n mul1r -polyC_exp mul_polyC rdivp_eq.
 move=> dn0; rewrite size_scale ?ltn_rmodp // -exprVn expf_eq0 negb_and.
 by rewrite invr_eq0 cdn0 orbT.
@@ -1415,13 +1428,18 @@ suff Hmn m n: m %= n -> (m %| p) -> (n %| p).
 by rewrite /eqp; case/andP=> dd' d'd dp; apply: (dvdp_trans d'd).
 Qed.
 
-Lemma dvdp_scaler c m n : c != 0 -> m %| c *: n = (m %| n).
+Lemma dvdpZr c m n : c != 0 -> m %| c *: n = (m %| n).
 Proof. by move=> cn0; exact/eqp_dvdr/eqp_scale. Qed.
 
-Lemma dvdp_scalel c m n : c != 0 -> (c *: m %| n) = (m %| n).
+Lemma dvdpZl c m n : c != 0 -> (c *: m %| n) = (m %| n).
 Proof. by move=> cn0; exact/eqp_dvdl/eqp_scale. Qed.
 
-Lemma dvdp_opp d p : d %| (- p) = (d %| p).
+Lemma dvdpNl d p : (- d) %| p = (d %| p).
+Proof.
+by rewrite -scaleN1r; apply/eqp_dvdl/eqp_scale; rewrite oppr_eq0 oner_neq0.
+Qed.
+
+Lemma dvdpNr d p : d %| (- p) = (d %| p).
 Proof. by apply: eqp_dvdr; rewrite -scaleN1r eqp_scale ?oppr_eq0 ?oner_eq0. Qed.
 
 Lemma eqp_mul2r r p q : r != 0 -> (p * r %= q * r) = (p %= q).
@@ -1660,7 +1678,7 @@ rewrite (polySpred mn0) addSn /= -[n in _ <= n]add0n leq_add2r -ltnS.
 rewrite -polySpred //= leq_eqVlt ltnS size_poly_leq0 (negPf mn0) orbF.
 case/size_poly1P=> c cn0 -> {mn0 m}; rewrite mul_polyC.
 suff -> : n %% (c *: n) = 0 by rewrite gcd0p; apply: eqp_scale.
-by apply/modp_eq0P; rewrite dvdp_scalel.
+by apply/modp_eq0P; rewrite dvdpZl.
 Qed.
 
 Lemma gcdp_mulr m n : gcdp n (n * m) %= n.
@@ -1670,8 +1688,8 @@ Lemma gcdp_scalel c m n : c != 0 -> gcdp (c *: m) n %= gcdp m n.
 Proof.
 move=> cn0; rewrite /eqp dvdp_gcd [gcdp m n %| _]dvdp_gcd !dvdp_gcdr !andbT.
 apply/andP; split; last first.
-  by apply: dvdp_trans (dvdp_gcdl _ _) _; rewrite dvdp_scaler.
-by apply: dvdp_trans (dvdp_gcdl _ _) _; rewrite dvdp_scalel.
+  by apply: dvdp_trans (dvdp_gcdl _ _) _; rewrite dvdpZr.
+by apply: dvdp_trans (dvdp_gcdl _ _) _; rewrite dvdpZl.
 Qed.
 
 Lemma gcdp_scaler c m n : c != 0 -> gcdp m (c *: n) %= gcdp m n.
@@ -1764,10 +1782,10 @@ Proof. by rewrite /coprimep=> /eqP. Qed.
 Lemma coprimep_def p q : coprimep p q = (size (gcdp p q) == 1%N).
 Proof. done. Qed.
 
-Lemma coprimep_scalel c m n : c != 0 -> coprimep (c *: m) n = coprimep m n.
+Lemma coprimepZl c m n : c != 0 -> coprimep (c *: m) n = coprimep m n.
 Proof. by move=> ?; rewrite !coprimep_def (eqp_size (gcdp_scalel _ _ _)). Qed.
 
-Lemma coprimep_scaler c m n: c != 0 -> coprimep m (c *: n) = coprimep m n.
+Lemma coprimepZr c m n: c != 0 -> coprimep m (c *: n) = coprimep m n.
 Proof. by move=> ?; rewrite !coprimep_def (eqp_size (gcdp_scaler _ _ _)). Qed.
 
 Lemma coprimepp p : coprimep p p = (size p == 1%N).
@@ -1981,7 +1999,7 @@ Qed.
 Lemma Gauss_gcdpl p m n : coprimep p n -> gcdp p (m * n) %= gcdp p m.
 Proof. by move=> co_pn; rewrite mulrC Gauss_gcdpr. Qed.
 
-Lemma coprimep_mulr p q r : coprimep p (q * r) = (coprimep p q && coprimep p r).
+Lemma coprimepMr p q r : coprimep p (q * r) = (coprimep p q && coprimep p r).
 Proof.
 apply/coprimepP/andP=> [hp | [/coprimepP-hq hr]].
   by split; apply/coprimepP=> d dp dq; rewrite hp //;
@@ -1991,8 +2009,8 @@ rewrite Gauss_dvdpl in dqr; first exact: hq.
 by move/coprimep_dvdr: hr; apply.
 Qed.
 
-Lemma coprimep_mull p q r: coprimep (q * r) p = (coprimep q p && coprimep r p).
-Proof. by rewrite ![coprimep _ p]coprimep_sym coprimep_mulr. Qed.
+Lemma coprimepMl p q r: coprimep (q * r) p = (coprimep q p && coprimep r p).
+Proof. by rewrite ![coprimep _ p]coprimep_sym coprimepMr. Qed.
 
 Lemma modp_coprime k u n : k != 0 -> (k * u) %% n %= 1 -> coprimep k n.
 Proof.
@@ -2005,7 +2023,7 @@ Qed.
 Lemma coprimep_pexpl k m n : 0 < k -> coprimep (m ^+ k) n = coprimep m n.
 Proof.
 case: k => // k _; elim: k => [|k IHk]; first by rewrite expr1.
-by rewrite exprS coprimep_mull -IHk andbb.
+by rewrite exprS coprimepMl -IHk andbb.
 Qed.
 
 Lemma coprimep_pexpr k m n : 0 < k -> coprimep m (n ^+ k) = coprimep m n.
@@ -2108,8 +2126,8 @@ have dn0 : d != 0 by rewrite gcdp_eq0 negb_and nn0 orbT.
 have c1n0 : c1 != 0 by rewrite !expf_neq0 // lead_coef_eq0.
 have c2n0 : c2 != 0 by rewrite !expf_neq0 // lead_coef_eq0.
 have c2k_n0 : c2 ^+ k != 0 by rewrite !expf_neq0 // lead_coef_eq0.
-rewrite -(@dvdp_scaler (c1 ^+ k)) ?expf_neq0 ?lead_coef_eq0 //.
-rewrite -(@dvdp_scalel (c2 ^+ k)) // -!exprZn def_m def_n !exprMn.
+rewrite -(@dvdpZr (c1 ^+ k)) ?expf_neq0 ?lead_coef_eq0 //.
+rewrite -(@dvdpZl (c2 ^+ k)) // -!exprZn def_m def_n !exprMn.
 rewrite dvdp_mul2r ?expf_neq0 //.
 have: coprimep (m' ^+ k) (n' ^+ k).
   by rewrite coprimep_pexpl // coprimep_pexpr // coprimep_div_gcd ?mn0.
@@ -2120,8 +2138,8 @@ have /size_poly1P [c cn0 em'] : size m' == 1%N.
   have := hc _ (dvdpp _) hd; rewrite -size_poly_eq1.
   rewrite polySpred; last by rewrite expf_eq0 negb_and m'_n0 orbT.
   by rewrite size_exp eqSS muln_eq0 orbC eqn0Ngt k_gt0 /= -eqSS -polySpred.
-rewrite -(@dvdp_scalel c2) // def_m em' mul_polyC dvdp_scalel //.
-by rewrite -(@dvdp_scaler c1) // def_n dvdp_mull.
+rewrite -(@dvdpZl c2) // def_m em' mul_polyC dvdpZl //.
+by rewrite -(@dvdpZr c1) // def_n dvdp_mull.
 Qed.
 
 Lemma root_gcd p q x : root (gcdp p q) x = root p x && root q x.
@@ -2285,7 +2303,7 @@ Qed.
 Lemma coprimep_XsubC p c : coprimep p ('X - c%:P) = ~~ root p c.
 Proof.
 rewrite -coprimep_modl modp_XsubC /root -alg_polyC.
-have [-> | /coprimep_scalel->] := eqVneq; last exact: coprime1p.
+have [-> | /coprimepZl->] := eqVneq; last exact: coprime1p.
 by rewrite scale0r /coprimep gcd0p size_XsubC.
 Qed.
 
@@ -2339,6 +2357,28 @@ End IDomainPseudoDivision.
 
 Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp : core.
 Hint Resolve dvdp0 : core.
+
+Notation "@ 'dvdp_scalel'" :=
+  (deprecate dvdp_scalel dvdpZl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'dvdp_scaler'" :=
+  (deprecate dvdp_scaler dvdpZr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'dvdp_opp'" :=
+  (deprecate dvdp_opp dvdpNr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'coprimep_scalel'" :=
+  (deprecate coprimep_scalel coprimepZl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'coprimep_scaler'" :=
+  (deprecate coprimep_scaler coprimepZr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'coprimep_mull'" :=
+  (deprecate coprimep_mull coprimepMl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'coprimep_mulr'" :=
+  (deprecate coprimep_mulr coprimepMr) (at level 10, only parsing) : fun_scope.
+Notation dvdp_scalel := (@dvdp_scalel _ _) (only parsing).
+Notation dvdp_scaler := (@dvdp_scaler _ _) (only parsing).
+Notation dvdp_opp := (@dvdp_opp _) (only parsing).
+Notation coprimep_scalel := (@coprimep_scalel _ _) (only parsing).
+Notation coprimep_scaler := (@coprimep_scaler _ _) (only parsing).
+Notation coprimep_mull := (@coprimep_mull _) (only parsing).
+Notation coprimep_mulr := (@coprimep_mulr _) (only parsing).
 
 End CommonIdomain.
 
@@ -2461,7 +2501,7 @@ move=> ulcq /eqp_eq; move/(congr1 ( *:%R (lead_coef q)^-1 )).
 by rewrite !scalerA mulrC divrr // scale1r mulrC.
 Qed.
 
-Lemma modp_scalel c p : (c *: p) %% d = c *: (p %% d).
+Lemma modpZl c p : (c *: p) %% d = c *: (p %% d).
 Proof.
 have [-> | cn0] := eqVneq c 0; first by rewrite !scale0r mod0p.
 have e : (c *: p) = (c *: (p %/ d)) * d + c *: (p %% d).
@@ -2472,7 +2512,7 @@ rewrite size_polyC cn0 addSn add0n /= ltn_modp -lead_coef_eq0.
 by apply: contraTneq ulcd => ->; rewrite unitr0.
 Qed.
 
-Lemma divp_scalel c p : (c *: p) %/ d = c *: (p %/ d).
+Lemma divpZl c p : (c *: p) %/ d = c *: (p %/ d).
 Proof.
 have [-> | cn0] := eqVneq c 0; first by rewrite !scale0r div0p.
 have e : (c *: p) = (c *: (p %/ d)) * d + c *: (p %% d).
@@ -2486,22 +2526,22 @@ Qed.
 Lemma eqp_modpl p q : p %= q -> (p %% d) %= (q %% d).
 Proof.
 case/eqpP=> [[c1 c2]] /andP /= [c1n0 c2n0 e].
-by apply/eqpP; exists (c1, c2); rewrite ?c1n0 //= -!modp_scalel e.
+by apply/eqpP; exists (c1, c2); rewrite ?c1n0 //= -!modpZl e.
 Qed.
 
 Lemma eqp_divl p q : p %= q -> (p %/ d) %= (q %/ d).
 Proof.
 case/eqpP=> [[c1 c2]] /andP /= [c1n0 c2n0 e].
-by apply/eqpP; exists (c1, c2); rewrite ?c1n0 // -!divp_scalel e.
+by apply/eqpP; exists (c1, c2); rewrite ?c1n0 // -!divpZl e.
 Qed.
 
-Lemma modp_opp p : (- p) %% d = - (p %% d).
-Proof. by rewrite -mulN1r -[RHS]mulN1r -polyC_opp !mul_polyC modp_scalel. Qed.
+Lemma modpN p : (- p) %% d = - (p %% d).
+Proof. by rewrite -mulN1r -[RHS]mulN1r -polyCN !mul_polyC modpZl. Qed.
 
-Lemma divp_opp p : (- p) %/ d = - (p %/ d).
-Proof. by rewrite -mulN1r -[RHS]mulN1r -polyC_opp !mul_polyC divp_scalel. Qed.
+Lemma divpN p : (- p) %/ d = - (p %/ d).
+Proof. by rewrite -mulN1r -[RHS]mulN1r -polyCN !mul_polyC divpZl. Qed.
 
-Lemma modp_add p q : (p + q) %% d = p %% d + q %% d.
+Lemma modpD p q : (p + q) %% d = p %% d + q %% d.
 Proof.
 have/edivpP [] // : (p + q) = (p %/ d + q %/ d) * d + (p %% d + q %% d).
   by rewrite mulrDl addrACA -!divp_eq.
@@ -2510,7 +2550,7 @@ rewrite gtn_max !ltn_modp andbb -lead_coef_eq0.
 by apply: contraTneq ulcd => ->; rewrite unitr0.
 Qed.
 
-Lemma divp_add p q : (p + q) %/ d = p %/ d + q %/ d.
+Lemma divpD p q : (p + q) %/ d = p %/ d + q %/ d.
 Proof.
 have/edivpP [] // : (p + q) = (p %/ d + q %/ d) * d + (p %% d + q %% d).
   by rewrite mulrDl addrACA -!divp_eq.
@@ -2527,16 +2567,14 @@ Qed.
 
 Lemma mulKp q : (d * q) %/ d = q. Proof. by rewrite mulrC; apply: mulpK. Qed.
 
-Lemma divp_addl_mul_small q r :
-  size r < size d -> (q * d + r) %/ d = q.
-Proof. by move=> srd; rewrite divp_add (divp_small srd) addr0 mulpK. Qed.
+Lemma divp_addl_mul_small q r : size r < size d -> (q * d + r) %/ d = q.
+Proof. by move=> srd; rewrite divpD (divp_small srd) addr0 mulpK. Qed.
 
-Lemma modp_addl_mul_small q r :
-  size r < size d -> (q * d + r) %% d = r.
-Proof. by move=> srd; rewrite modp_add modp_mull add0r modp_small. Qed.
+Lemma modp_addl_mul_small q r : size r < size d -> (q * d + r) %% d = r.
+Proof. by move=> srd; rewrite modpD modp_mull add0r modp_small. Qed.
 
 Lemma divp_addl_mul q r : (q * d + r) %/ d = q + r %/ d.
-Proof. by rewrite divp_add mulpK. Qed.
+Proof. by rewrite divpD mulpK. Qed.
 
 Lemma divpp : d %/ d = 1. Proof. by rewrite -[d in d %/ _]mul1r mulpK. Qed.
 
@@ -2584,7 +2622,7 @@ Lemma divp_mulCA p q : d %| p -> d %| q -> p * (q %/ d) = q * (p %/ d).
 Proof. by move=> hdp hdq; rewrite mulrC divp_mulAC // divp_mulA. Qed.
 
 Lemma modp_mul p q : (p * (q %% d)) %% d = (p * q) %% d.
-Proof. by rewrite [q in RHS]divp_eq mulrDr modp_add mulrA modp_mull add0r. Qed.
+Proof. by rewrite [q in RHS]divp_eq mulrDr modpD mulrA modp_mull add0r. Qed.
 
 End UnitDivisor.
 
@@ -2644,7 +2682,7 @@ Qed.
 Lemma divpAC p q : lead_coef p \in GRing.unit -> q %/ d %/ p = q %/ p %/ d.
 Proof. by move=> ulcp; rewrite !divp_divl // mulrC. Qed.
 
-Lemma modp_scaler c p : c \in GRing.unit -> p %% (c *: d) = (p %% d).
+Lemma modpZr c p : c \in GRing.unit -> p %% (c *: d) = (p %% d).
 Proof.
 case: (eqVneq d 0) => [-> | dn0 cn0]; first by rewrite scaler0 !modp0.
 have e : p = (c^-1 *: (p %/ d)) * (c *: d) + (p %% d).
@@ -2654,7 +2692,7 @@ suff s : size (p %% d) < size (c *: d).
 by rewrite size_scale ?ltn_modp //; apply: contraTneq cn0 => ->; rewrite unitr0.
 Qed.
 
-Lemma divp_scaler c p : c \in GRing.unit -> p %/ (c *: d) = c^-1 *: (p %/ d).
+Lemma divpZr c p : c \in GRing.unit -> p %/ (c *: d) = c^-1 *: (p %/ d).
 Proof.
 case: (eqVneq d 0) => [-> | dn0 cn0]; first by rewrite scaler0 !divp0 scaler0.
 have e : p = (c^-1 *: (p %/ d)) * (c *: d) + (p %% d).
@@ -2665,6 +2703,31 @@ by rewrite size_scale ?ltn_modp //; apply: contraTneq cn0 => ->; rewrite unitr0.
 Qed.
 
 End MoreUnitDivisor.
+
+Notation "@ 'modp_scalel'" :=
+  (deprecate modp_scalel modpZl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'modp_scaler'" :=
+  (deprecate modp_scaler modpZr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'modp_opp'" :=
+  (deprecate modp_opp modpN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'modp_add'" :=
+  (deprecate modp_add modpD) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_scalel'" :=
+  (deprecate divp_scalel divpZl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_scaler'" :=
+  (deprecate divp_scaler divpZr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_opp'" :=
+  (deprecate divp_opp divpN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_add'" :=
+  (deprecate divp_add divpD) (at level 10, only parsing) : fun_scope.
+Notation modp_scalel := (@modp_scalel _ _) (only parsing).
+Notation modp_scaler := (fun d_unit => @modp_scaler _ _ d_unit _) (only parsing).
+Notation modp_opp := (@modp_opp _ _) (only parsing).
+Notation modp_add := (@modp_add _ _) (only parsing).
+Notation divp_scalel := (@divp_scalel _ _) (only parsing).
+Notation divp_scaler := (fun d_unit => @divp_scaler _ _ d_unit _) (only parsing).
+Notation divp_opp := (@divp_opp _ _) (only parsing).
+Notation divp_add := (@divp_add _ _) (only parsing).
 
 End IdomainUnit.
 
@@ -2724,10 +2787,10 @@ case/IdomainUnit.ulc_eqpP; first by rewrite unitfE lead_coef_eq0.
 by move=> c nz_c ->; exists c.
 Qed.
 
-Lemma modp_scalel c p q : (c *: p) %% q = c *: (p %% q).
+Lemma modpZl c p q : (c *: p) %% q = c *: (p %% q).
 Proof.
 have [-> | qn0] := eqVneq q 0; first by rewrite !modp0.
-by apply: IdomainUnit.modp_scalel; rewrite unitfE lead_coef_eq0.
+by apply: IdomainUnit.modpZl; rewrite unitfE lead_coef_eq0.
 Qed.
 
 Lemma mulpK p q : q != 0 -> p * q %/ q = p.
@@ -2736,13 +2799,13 @@ Proof. by move=> qn0; rewrite IdomainUnit.mulpK // unitfE lead_coef_eq0. Qed.
 Lemma mulKp p q : q != 0 -> q * p %/ q = p.
 Proof. by rewrite mulrC; apply: mulpK. Qed.
 
-Lemma divp_scalel c p q : (c *: p) %/ q = c *: (p %/ q).
+Lemma divpZl c p q : (c *: p) %/ q = c *: (p %/ q).
 Proof.
 have [-> | qn0] := eqVneq q 0; first by rewrite !divp0 scaler0.
-by apply: IdomainUnit.divp_scalel; rewrite unitfE lead_coef_eq0.
+by apply: IdomainUnit.divpZl; rewrite unitfE lead_coef_eq0.
 Qed.
 
-Lemma modp_scaler c p d : c != 0 -> p %% (c *: d) = (p %% d).
+Lemma modpZr c p d : c != 0 -> p %% (c *: d) = (p %% d).
 Proof.
 case: (eqVneq d 0) => [-> | dn0 cn0]; first by rewrite scaler0 !modp0.
 have e : p = (c^-1 *: (p %/ d)) * (c *: d) + (p %% d).
@@ -2751,7 +2814,7 @@ suff s : size (p %% d) < size (c *: d) by rewrite (modpP e s).
 by rewrite size_scale ?ltn_modp.
 Qed.
 
-Lemma divp_scaler c p d : c != 0 -> p %/ (c *: d) = c^-1 *: (p %/ d).
+Lemma divpZr c p d : c != 0 -> p %/ (c *: d) = c^-1 *: (p %/ d).
 Proof.
 case: (eqVneq d 0) => [-> | dn0 cn0]; first by rewrite scaler0 !divp0 scaler0.
 have e : p = (c^-1 *: (p %/ d)) * (c *: d) + (p %% d).
@@ -2763,20 +2826,20 @@ Qed.
 Lemma eqp_modpl d p q : p %= q -> (p %% d) %= (q %% d).
 Proof.
 case/eqpP=> [[c1 c2]] /andP /= [c1n0 c2n0 e].
-by apply/eqpP; exists (c1, c2); rewrite ?c1n0 // -!modp_scalel e.
+by apply/eqpP; exists (c1, c2); rewrite ?c1n0 // -!modpZl e.
 Qed.
 
 Lemma eqp_divl d p q : p %= q -> (p %/ d) %= (q %/ d).
 Proof.
 case/eqpP=> [[c1 c2]] /andP /= [c1n0 c2n0 e].
-by apply/eqpP; exists (c1, c2); rewrite ?c1n0 // -!divp_scalel e.
+by apply/eqpP; exists (c1, c2); rewrite ?c1n0 // -!divpZl e.
 Qed.
 
 Lemma eqp_modpr d p q : p %= q -> (d %% p) %= (d %% q).
 Proof.
 case/eqpP=> [[c1 c2]] /andP [c1n0 c2n0 e].
 have -> : p = (c1^-1 * c2) *: q by rewrite -scalerA -e scalerA mulVf // scale1r.
-by rewrite modp_scaler ?eqpxx // mulf_eq0 negb_or invr_eq0 c1n0.
+by rewrite modpZr ?eqpxx // mulf_eq0 negb_or invr_eq0 c1n0.
 Qed.
 
 Lemma eqp_mod p1 p2 q1 q2 : p1 %= p2 -> q1 %= q2 -> p1 %% q1 %= p2 %% q2.
@@ -2786,7 +2849,7 @@ Lemma eqp_divr (d m n : {poly F}) : m %= n -> (d %/ m) %= (d %/ n).
 Proof.
 case/eqpP=> [[c1 c2]] /andP [c1n0 c2n0 e].
 have -> : m = (c1^-1 * c2) *: n by rewrite -scalerA -e scalerA mulVf // scale1r.
-by rewrite divp_scaler ?eqp_scale // ?invr_eq0 mulf_eq0 negb_or invr_eq0 c1n0.
+by rewrite divpZr ?eqp_scale // ?invr_eq0 mulf_eq0 negb_or invr_eq0 c1n0.
 Qed.
 
 Lemma eqp_div p1 p2 q1 q2 : p1 %= p2 -> q1 %= q2 -> p1 %/ q1 %= p2 %/ q2.
@@ -2823,37 +2886,37 @@ case: ifP=> // _; apply: ihn => //; apply: eqp_trans (eqp_rdiv_div _ _) _.
 by apply: eqp_div => //; apply: eqp_trans (eqp_rgcd_gcd _ _) _; apply: eqp_gcd.
 Qed.
 
-Lemma modp_add d p q : (p + q) %% d = p %% d + q %% d.
+Lemma modpD d p q : (p + q) %% d = p %% d + q %% d.
 Proof.
 have [-> | dn0] := eqVneq d 0; first by rewrite !modp0.
-by apply: IdomainUnit.modp_add; rewrite unitfE lead_coef_eq0.
+by apply: IdomainUnit.modpD; rewrite unitfE lead_coef_eq0.
 Qed.
 
-Lemma modp_opp p q : (- p) %% q = - (p %% q).
-Proof. by apply/eqP; rewrite -addr_eq0 -modp_add addNr mod0p. Qed.
+Lemma modpN p q : (- p) %% q = - (p %% q).
+Proof. by apply/eqP; rewrite -addr_eq0 -modpD addNr mod0p. Qed.
 
-Lemma modNp p q : (- p) %% q = - (p %% q). Proof. exact: modp_opp. Qed.
+Lemma modNp p q : (- p) %% q = - (p %% q). Proof. exact: modpN. Qed.
 
-Lemma divp_add d p q : (p + q) %/ d = p %/ d + q %/ d.
+Lemma divpD d p q : (p + q) %/ d = p %/ d + q %/ d.
 Proof.
 have [-> | dn0] := eqVneq d 0; first by rewrite !divp0 addr0.
-by apply: IdomainUnit.divp_add; rewrite unitfE lead_coef_eq0.
+by apply: IdomainUnit.divpD; rewrite unitfE lead_coef_eq0.
 Qed.
 
-Lemma divp_opp p q : (- p) %/ q = - (p %/ q).
-Proof. by apply/eqP; rewrite -addr_eq0 -divp_add addNr div0p. Qed.
+Lemma divpN p q : (- p) %/ q = - (p %/ q).
+Proof. by apply/eqP; rewrite -addr_eq0 -divpD addNr div0p. Qed.
 
 Lemma divp_addl_mul_small d q r : size r < size d -> (q * d + r) %/ d = q.
 Proof.
-move=> srd; rewrite divp_add (divp_small srd) addr0 mulpK //.
-by rewrite -size_poly_gt0; apply: leq_trans srd.
+move=> srd; rewrite divpD (divp_small srd) addr0 mulpK // -size_poly_gt0.
+exact: leq_trans srd.
 Qed.
 
 Lemma modp_addl_mul_small d q r : size r < size d -> (q * d + r) %% d = r.
-Proof. by move=> srd; rewrite modp_add modp_mull add0r modp_small. Qed.
+Proof. by move=> srd; rewrite modpD modp_mull add0r modp_small. Qed.
 
 Lemma divp_addl_mul d q r : d != 0 -> (q * d + r) %/ d = q + r %/ d.
-Proof. by move=> dn0; rewrite divp_add mulpK. Qed.
+Proof. by move=> dn0; rewrite divpD mulpK. Qed.
 
 Lemma divpp d : d != 0 -> d %/ d = 1.
 Proof.
@@ -2962,9 +3025,7 @@ by rewrite -size_poly_gt0; apply: leq_trans srd.
 Qed.
 
 Lemma modp_mul p q m : (p * (q %% m)) %% m = (p * q) %% m.
-Proof.
-by rewrite [in RHS](divp_eq q m) mulrDr modp_add mulrA modp_mull add0r.
-Qed.
+Proof. by rewrite [in RHS](divp_eq q m) mulrDr modpD mulrA modp_mull add0r. Qed.
 
 Lemma dvdpP p q : reflect (exists qq, p = qq * q) (q %| p).
 Proof.
@@ -3130,6 +3191,31 @@ Proof. by rewrite /gdcop gdcop_rec_map !size_map_poly. Qed.
 End FieldMap.
 
 End FieldDivision.
+
+Notation "@ 'modp_scalel'" :=
+  (deprecate modp_scalel modpZl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'modp_scaler'" :=
+  (deprecate modp_scaler modpZr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'modp_opp'" :=
+  (deprecate modp_opp modpN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'modp_add'" :=
+  (deprecate modp_add modpD) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_scalel'" :=
+  (deprecate modp_scalel divpZl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_scaler'" :=
+  (deprecate modp_scaler divpZr) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_opp'" :=
+  (deprecate modp_opp divpN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'divp_add'" :=
+  (deprecate modp_add divpD) (at level 10, only parsing) : fun_scope.
+Notation modp_scalel := (@modp_scalel _) (only parsing).
+Notation modp_scaler := (@modp_scaler _ _) (only parsing).
+Notation modp_opp := (@modp_opp _) (only parsing).
+Notation modp_add := (@modp_add _) (only parsing).
+Notation divp_scalel := (@divp_scalel _) (only parsing).
+Notation divp_scaler := (@divp_scaler _ _) (only parsing).
+Notation divp_opp := (@divp_opp _) (only parsing).
+Notation divp_add := (@divp_add _) (only parsing).
 
 End Field.
 

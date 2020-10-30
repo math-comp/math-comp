@@ -142,7 +142,7 @@ Proof. by move=> Ux; rewrite /= Zp_mulC Zp_mulVz. Qed.
 Lemma Zp_intro_unit x y : Zp_mul y x = Zp1 -> coprime p x.
 Proof.
 case=> yx1; have:= coprimen1 p.
-by rewrite -coprime_modr -yx1 coprime_modr coprime_mulr; case/andP.
+by rewrite -coprime_modr -yx1 coprime_modr coprimeMr; case/andP.
 Qed.
 
 Lemma Zp_inv_out x : ~~ coprime p x -> Zp_inv x = x.

@@ -1492,7 +1492,7 @@ have kerN_mu_t: N \subset cfker (mu / 'chi_t)%R.
   by rewrite /= uNlam tNlam divrr ?lin_char_unitr ?cfker_cfun1.
 have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
   suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
-    by rewrite (coprime_dvdr dv_o_mu_t) // coprime_mulr o_mu co_e_lam.
+    by rewrite (coprime_dvdr dv_o_mu_t) // coprimeMr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
   rewrite invr_lin_char // !cfunE exprMn -rmorphX {2}mulnC.
   by rewrite !(dvdn_cforderP _) ?conjC1 ?mulr1 // dvdn_mulr.
@@ -1513,7 +1513,7 @@ Corollary extend_solvable_coprime_irr G N t (theta := 'chi[N]_t) :
                 d = c].
 Proof.
 set e := #|G : N|; set f := truncC _ => nsNG solG IGtheta.
-rewrite coprime_mulr => /andP[co_e_th co_e_f].
+rewrite coprimeMr => /andP[co_e_th co_e_f].
 have [sNG nNG] := andP nsNG; pose lambda := cfDet theta.
 have lin_lam: lambda \is a linear_char := cfDet_lin_char theta.
 have IGlam: G \subset 'I[lambda].

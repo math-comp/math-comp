@@ -2041,20 +2041,20 @@ Qed.
 Lemma unbumpK {h} : {in predC1 h, cancel (unbump h) (bump h)}.
 Proof. by move=> i /negbTE-neq_h_i; rewrite unbumpKcond neq_h_i. Qed.
 
-Lemma bump_addl h i k : bump (k + h) (k + i) = k + bump h i.
+Lemma bumpDl h i k : bump (k + h) (k + i) = k + bump h i.
 Proof. by rewrite /bump leq_add2l addnCA. Qed.
 
 Lemma bumpS h i : bump h.+1 i.+1 = (bump h i).+1.
 Proof. exact: addnS. Qed.
 
-Lemma unbump_addl h i k : unbump (k + h) (k + i) = k + unbump h i.
+Lemma unbumpDl h i k : unbump (k + h) (k + i) = k + unbump h i.
 Proof.
 apply: (can_inj (bumpK (k + h))).
-by rewrite bump_addl !unbumpKcond eqn_add2l addnCA.
+by rewrite bumpDl !unbumpKcond eqn_add2l addnCA.
 Qed.
 
 Lemma unbumpS h i : unbump h.+1 i.+1 = (unbump h i).+1.
-Proof. exact: unbump_addl 1. Qed.
+Proof. exact: unbumpDl 1. Qed.
 
 Lemma leq_bump h i j : (i <= bump h j) = (unbump h i <= j).
 Proof.
@@ -2238,7 +2238,7 @@ Proof. by rewrite /inord /insubd valK. Qed.
 Lemma enum_ordS : enum 'I_n = ord0 :: map (lift ord0) (enum 'I_n').
 Proof.
 apply: (inj_map val_inj); rewrite val_enum_ord /= -map_comp.
-by rewrite (map_comp (addn 1)) val_enum_ord -iota_addl.
+by rewrite (map_comp (addn 1)) val_enum_ord -iotaDl.
 Qed.
 
 Lemma lift_max (i : 'I_n') : lift ord_max i = i :> nat.
@@ -2345,3 +2345,6 @@ Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
 Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
 
 End SumFinType.
+
+Notation bump_addl := (deprecate bump_addl bumpDl) (only parsing).
+Notation unbump_addl := (deprecate unbump_addl unbumpDl) (only parsing).

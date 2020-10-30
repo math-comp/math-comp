@@ -284,9 +284,8 @@ Lemma cat_cons x s1 s2 : (x :: s1) ++ s2 = x :: s1 ++ s2. Proof. by []. Qed.
 Lemma cat_nseq n x s : nseq n x ++ s = ncons n x s.
 Proof. by elim: n => //= n ->. Qed.
 
-Lemma nseqD n1 n2 x :
-  nseq (n1 + n2) x = nseq n1 x ++ nseq n2 x.
-Proof. by rewrite cat_nseq /nseq /ncons iter_add. Qed.
+Lemma nseqD n1 n2 x : nseq (n1 + n2) x = nseq n1 x ++ nseq n2 x.
+Proof. by rewrite cat_nseq /nseq /ncons iterD. Qed.
 
 Lemma cats0 s : s ++ [::] = s.
 Proof. by elim: s => //= x s ->. Qed.
@@ -2504,15 +2503,15 @@ Fixpoint iota m n := if n is n'.+1 then m :: iota m.+1 n' else [::].
 Lemma size_iota m n : size (iota m n) = n.
 Proof. by elim: n m => //= n IHn m; rewrite IHn. Qed.
 
-Lemma iota_add m n1 n2 : iota m (n1 + n2) = iota m n1 ++ iota (m + n1) n2.
+Lemma iotaD m n1 n2 : iota m (n1 + n2) = iota m n1 ++ iota (m + n1) n2.
 Proof. by elim: n1 m => [|n1 IHn1] m; rewrite ?addn0 // -addSnnS /= -IHn1. Qed.
 
-Lemma iota_addl m1 m2 n : iota (m1 + m2) n = map (addn m1) (iota m2 n).
+Lemma iotaDl m1 m2 n : iota (m1 + m2) n = map (addn m1) (iota m2 n).
 Proof. by elim: n m2 => //= n IHn m2; rewrite -addnS IHn. Qed.
 
 Lemma nth_iota p m n i : i < n -> nth p (iota m n) i = m + i.
 Proof.
-by move/subnKC <-; rewrite addSnnS iota_add nth_cat size_iota ltnn subnn.
+by move/subnKC <-; rewrite addSnnS iotaD nth_cat size_iota ltnn subnn.
 Qed.
 
 Lemma mem_iota m n i : (i \in iota m n) = (m <= i < m + n).
@@ -2583,7 +2582,7 @@ elim: t => [|x t IHt] in s It Est *.
 have /rot_to[k s1 Ds]: x \in s by rewrite (perm_mem Est) mem_head.
 have [|Is1 eqIst1 Ds1] := IHt s1; first by rewrite -(perm_cons x) -Ds perm_rot.
 exists (rotr k (0 :: map succn Is1)).
-  by rewrite perm_rot /It /= perm_cons (iota_addl 1) perm_map.
+  by rewrite perm_rot /It /= perm_cons (iotaDl 1) perm_map.
 by rewrite map_rotr /= -map_comp -(@eq_map _ _ (nth x0 t)) // -Ds1 -Ds rotK.
 Qed.
 
@@ -3581,3 +3580,6 @@ Notation uniq_perm_eq := (deprecate uniq_perm_eq uniq_perm _ _ _)
 Notation perm_eq_iotaP := (deprecate perm_eq_iotaP perm_iotaP) (only parsing).
 Notation perm_undup_count := (deprecate perm_undup_count perm_count_undup _ _)
   (only parsing).
+
+Notation iota_add := (deprecate iota_add iotaD) (only parsing).
+Notation iota_addl := (deprecate iota_addl iotaDl) (only parsing).

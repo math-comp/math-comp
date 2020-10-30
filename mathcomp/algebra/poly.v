@@ -428,26 +428,25 @@ Lemma coef_sum I (r : seq I) (P : pred I) (F : I -> {poly R}) k :
   (\sum_(i <- r | P i) F i)`_k = \sum_(i <- r | P i) (F i)`_k.
 Proof. exact: (raddf_sum (coefp_additive k)). Qed.
 
-Lemma polyC_add : {morph polyC : a b / a + b}.
+Lemma polyCD : {morph polyC : a b / a + b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefD !coefC ?addr0. Qed.
 
-Lemma polyC_opp : {morph polyC : c / - c}.
+Lemma polyCN : {morph polyC : c / - c}.
 Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
 
-Lemma polyC_sub : {morph polyC : a b / a - b}.
-Proof. by move=> a b; rewrite polyC_add polyC_opp. Qed.
+Lemma polyCB : {morph polyC : a b / a - b}.
+Proof. by move=> a b; rewrite polyCD polyCN. Qed.
 
-Canonical polyC_additive := Additive polyC_sub.
+Canonical polyC_additive := Additive polyCB.
 
-Lemma polyC_muln n : {morph polyC : c / c *+ n}.
-Proof. exact: raddfMn. Qed.
+Lemma polyCMn n : {morph polyC : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
 Lemma size_opp p : size (- p) = size p.
 Proof.
 by apply/eqP; rewrite eqn_leq -{3}(opprK p) -[-%R]/opp_poly unlock !size_poly.
 Qed.
 
-Lemma lead_coef_opp p : lead_coef (- p) = - lead_coef p.
+Lemma lead_coefN p : lead_coef (- p) = - lead_coef p.
 Proof. by rewrite /lead_coef size_opp coefN. Qed.
 
 Lemma size_add p q : size (p + q) <= maxn (size p) (size q).
@@ -621,15 +620,14 @@ rewrite coefMr big_ord_recl subn0.
 by rewrite big1 => [|j _]; rewrite coefC !simp.
 Qed.
 
-Lemma polyC_mul : {morph polyC : a b / a * b}.
+Lemma polyCM : {morph polyC : a b / a * b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefCM !coefC ?simp. Qed.
 
 Fact polyC_multiplicative : multiplicative polyC.
-Proof. by split; first apply: polyC_mul. Qed.
+Proof. by split; first apply: polyCM. Qed.
 Canonical polyC_rmorphism := AddRMorphism polyC_multiplicative.
 
-Lemma polyC_exp n : {morph polyC : c / c ^+ n}.
-Proof. exact: rmorphX. Qed.
+Lemma polyC_exp n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphX. Qed.
 
 Lemma size_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
 Proof.
@@ -665,7 +663,7 @@ by case: leqP => // le_p_n; rewrite nth_default ?mulr0.
 Qed.
 
 Fact scale_polyA a b p : scale_poly a (scale_poly b p) = scale_poly (a * b) p.
-Proof. by rewrite !scale_polyE mulrA polyC_mul. Qed.
+Proof. by rewrite !scale_polyE mulrA polyCM. Qed.
 
 Fact scale_1poly : left_id 1 scale_poly.
 Proof. by move=> p; rewrite scale_polyE mul1r. Qed.
@@ -761,9 +759,7 @@ by elim: {p}(p : seq R) => //= p c IHp; rewrite cons_poly_def; apply: Kcons.
 Qed.
 
 Lemma polyseqXsubC a : 'X - a%:P = [:: - a; 1] :> seq R.
-Proof.
-by rewrite -['X]mul1r -polyC_opp -cons_poly_def polyseq_cons polyseq1.
-Qed.
+Proof. by rewrite -['X]mul1r -polyCN -cons_poly_def polyseq_cons polyseq1. Qed.
 
 Lemma size_XsubC a : size ('X - a%:P) = 2%N.
 Proof. by rewrite polyseqXsubC. Qed.
@@ -843,7 +839,7 @@ Lemma poly_def n E : \poly_(i < n) E i = \sum_(i < n) E i *: 'X^i.
 Proof.
 rewrite unlock; elim: n => [|n IHn] in E *; first by rewrite big_ord0.
 rewrite big_ord_recl /= cons_poly_def addrC expr0 alg_polyC.
-congr (_ + _); rewrite (iota_addl 1 0) -map_comp IHn big_distrl /=.
+congr (_ + _); rewrite (iotaDl 1 0) -map_comp IHn big_distrl /=.
 by apply: eq_bigr => i _; rewrite -scalerAl exprSr.
 Qed.
 
@@ -1065,7 +1061,7 @@ Proof. by elim/big_rec2: _ => [|i _ p _ <-]; rewrite (horner0, hornerD). Qed.
 Lemma hornerCM a p x : (a%:P * p).[x] = a * p.[x].
 Proof.
 elim/poly_ind: p => [|p c IHp]; first by rewrite !(mulr0, horner0).
-by rewrite mulrDr mulrA -polyC_mul !hornerMXaddC IHp mulrDr mulrA.
+by rewrite mulrDr mulrA -polyCM !hornerMXaddC IHp mulrDr mulrA.
 Qed.
 
 Lemma hornerZ c p x : (c *: p).[x] = c * p.[x].
@@ -1528,7 +1524,7 @@ Proof. by case: n => // n; rewrite derivSn derivC linear0. Qed.
 Lemma derivnD n : {morph derivn n : p q / p + q}.
 Proof. exact: linearD. Qed.
 
-Lemma derivn_sub n : {morph derivn n : p q / p - q}.
+Lemma derivnB n : {morph derivn n : p q / p - q}.
 Proof. exact: linearB. Qed.
 
 Lemma derivnMn n m p : (p *+ m)^`(n) = p^`(n) *+ m.
@@ -2219,7 +2215,7 @@ Definition poly_inv p := if p \in poly_unit then (p`_0)^-1%:P else p.
 Fact poly_mulVp : {in poly_unit, left_inverse 1 poly_inv *%R}.
 Proof.
 move=> p Up; rewrite /poly_inv Up.
-by case/andP: Up => /size_poly1P[c _ ->]; rewrite coefC -polyC_mul => /mulVr->.
+by case/andP: Up => /size_poly1P[c _ ->]; rewrite coefC -polyCM => /mulVr->.
 Qed.
 
 Fact poly_intro_unit p q : q * p = 1 -> p \in poly_unit.
@@ -2264,7 +2260,7 @@ Proof. by []. Qed.
 Lemma poly_invE p : p ^-1 = if p \in GRing.unit then (p`_0)^-1%:P else p.
 Proof. by []. Qed.
 
-Lemma polyC_inv c : c%:P^-1 = (c^-1)%:P.
+Lemma polyCV c : c%:P^-1 = (c^-1)%:P.
 Proof.
 have [/rmorphV-> // | nUc] := boolP (c \in GRing.unit).
 by rewrite !invr_out // poly_unitE coefC (negbTE nUc) andbF.
@@ -2771,3 +2767,28 @@ by rewrite monic_prod => // i; rewrite monicXsubC.
 Qed.
 
 End ClosedField.
+
+Notation "@ 'polyC_add'" :=
+  (deprecate polyC_add polyCD) (at level 10, only parsing) : fun_scope.
+Notation "@ 'polyC_opp'" :=
+  (deprecate polyC_opp polyCN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'polyC_sub'" :=
+  (deprecate polyC_sub polyCB) (at level 10, only parsing) : fun_scope.
+Notation "@ 'polyC_muln'" :=
+  (deprecate polyC_muln polyCMn) (at level 10, only parsing) : fun_scope.
+Notation "@ 'polyC_mul'" :=
+  (deprecate polyC_mul polyCM) (at level 10, only parsing) : fun_scope.
+Notation "@ 'polyC_inv'" :=
+  (deprecate polyC_inv polyCV) (at level 10, only parsing) : fun_scope.
+Notation "@ 'lead_coef_opp'" :=
+  (deprecate lead_coef_opp lead_coefN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'derivn_sub'" :=
+  (deprecate derivn_sub derivnB) (at level 10, only parsing) : fun_scope.
+Notation polyC_add := (@polyC_add _) (only parsing).
+Notation polyC_opp := (@polyC_opp _) (only parsing).
+Notation polyC_sub := (@polyC_sub _) (only parsing).
+Notation polyC_muln := (@polyC_muln _) (only parsing).
+Notation polyC_mul := (@polyC_mul _) (only parsing).
+Notation polyC_inv := (@polyC_inv _) (only parsing).
+Notation lead_coef_opp := (@lead_coef_opp _) (only parsing).
+Notation derivn_sub := (@derivn_sub _) (only parsing).

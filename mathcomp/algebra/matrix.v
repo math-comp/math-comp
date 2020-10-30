@@ -1699,12 +1699,12 @@ Proof. by apply/matrixP=> i j; rewrite !mxE raddfN. Qed.
 Lemma map_mxD A B : (A + B)^f = A^f + B^f.
 Proof. by apply/matrixP=> i j; rewrite !mxE raddfD. Qed.
 
-Lemma map_mx_sub A B : (A - B)^f = A^f - B^f.
+Lemma map_mxB A B : (A - B)^f = A^f - B^f.
 Proof. by rewrite map_mxD map_mxN. Qed.
 
 Definition map_mx_sum := big_morph _ map_mxD map_mx0.
 
-Canonical map_mx_additive := Additive map_mx_sub.
+Canonical map_mx_additive := Additive map_mxB.
 
 End MapZmodMatrix.
 
@@ -2691,7 +2691,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE cofactor_map_mx. Qed.
 End FixedSize.
 
 Lemma map_copid_mx n r : (copid_mx r)^f = copid_mx r :> 'M_n.
-Proof. by rewrite map_mx_sub map_mx1 map_pid_mx. Qed.
+Proof. by rewrite map_mxB map_mx1 map_pid_mx. Qed.
 
 Lemma map_mx_is_multiplicative n' (n := n'.+1) :
   multiplicative (map_mx f : 'M_n -> 'M_n).
@@ -3687,3 +3687,7 @@ Canonical mxOver_subringPred (S : {pred R}) (ringS : subringPred S)
 
 End mxRingOver.
 End mxOver.
+
+Notation "@ 'map_mx_sub'" :=
+  (deprecate map_mx_sub map_mxB) (at level 10, only parsing) : fun_scope.
+Notation map_mx_sub := (fun f => @map_mx_sub _ _ f) (only parsing).

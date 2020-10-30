@@ -177,7 +177,7 @@ have [-> | nt_x] := eqVneq x 1.
 apply: (iffP idP) => [/eqP | [p p_pr /eqP x_pn]].
   by exists (pdiv #[x]); rewrite ?pdiv_prime ?order_gt1.
 rewrite (@pdiv_p_elt p) //; rewrite -order_dvdn in x_pn.
-by rewrite [p_elt _ _](pnat_dvd x_pn) // pnat_exp pnat_id.
+by rewrite [p_elt _ _](pnat_dvd x_pn) // pnatX pnat_id.
 Qed.
 
 Lemma Mho_p_elt (p : nat) x : x \in A -> p.-elt x -> x ^+ (p ^ n) \in Mho.
@@ -390,7 +390,7 @@ Proof. by rewrite /abelem pgroup1 abelian1 exponent1 dvd1n. Qed.
 Lemma abelemE p G : prime p -> p.-abelem G = abelian G && (exponent G %| p).
 Proof.
 move=> p_pr; rewrite /abelem -pnat_exponent andbA -!(andbC (_ %| _)).
-by case: (dvdn_pfactor _ 1 p_pr) => // [[k _ ->]]; rewrite pnat_exp pnat_id.
+by case: (dvdn_pfactor _ 1 p_pr) => // [[k _ ->]]; rewrite pnatX pnat_id.
 Qed.
 
 Lemma abelemP p G :
@@ -2177,4 +2177,3 @@ Lemma fin_ring_char_abelem p (R : finRingType) :
 Proof. exact: fin_lmod_char_abelem [finLmodType R of R^o]. Qed.
 
 End FimModAbelem.
-

@@ -4908,8 +4908,7 @@ Proof.
 rewrite map_kermx //; congr (kermx _); apply: map_lin1_mx => //= v.
 rewrite map_mxvec map_mxM; congr (mxvec (_ *m _)); last first.
   by apply: map_lin1_mx => //= u; rewrite map_mxM map_vec_mx.
-apply/row_matrixP=> i.
-by rewrite -map_row !rowK map_mxvec map_mx_sub map_mx1.
+by apply/row_matrixP=> i; rewrite -map_row !rowK map_mxvec map_mxB map_mx1.
 Qed.
 
 Lemma rcent_map A : rcent rGf A^f = rcent rG A.
@@ -4990,7 +4989,7 @@ rewrite {1}in_submodE mulmxA -in_submodE -in_submodJ; last first.
   by rewrite genmxE -(in_factmod_addsK _ V^f) submxMr.
 congr (in_submod _ _); rewrite -in_factmodJ // in_factmodE mulmxA -in_factmodE.
 apply/eqP; rewrite -subr_eq0 -def_rGf -!map_mxM -linearB in_factmod_eq0.
-rewrite -map_mx_sub map_submx -in_factmod_eq0 linearB.
+rewrite -map_mxB map_submx -in_factmod_eq0 linearB.
 rewrite /= (in_factmodJ modU) // val_factmodK.
 rewrite [valUV]val_factmodE mulmxA -val_factmodE val_factmodK.
 rewrite -val_submodE in_submodK ?subrr //.

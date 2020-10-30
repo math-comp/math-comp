@@ -469,7 +469,7 @@ Local Notation rVn := 'rV['F_p](gval E).
 Lemma dim_abelemE : n = logn p #|E|.
 Proof.
 rewrite /n'; have [_ _ [k ->]] :=  pgroup_pdiv pE ntE.
-by rewrite /pdiv primes_exp ?primes_prime // pfactorK.
+by rewrite /pdiv primesX ?primes_prime // pfactorK.
 Qed.
 
 Lemma card_abelem_rV : #|rVn| = #|E|.

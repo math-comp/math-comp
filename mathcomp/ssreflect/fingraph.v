@@ -499,8 +499,8 @@ Lemma iter_finv_in n :
   {in S, forall x, n <= order x -> iter n finv x = iter (order x - n) f x}.
 Proof.
 move=> x xS; rewrite -[x in LHS]iter_order_in => // /subnKC {1}<-.
-move: (_ - n) => m; rewrite iter_add; elim: n => // n {2}<-.
-by rewrite iterSr /= finv_f_in // -iter_add iter_in.
+move: (_ - n) => m; rewrite iterD; elim: n => // n {2}<-.
+by rewrite iterSr /= finv_f_in // -iterD iter_in.
 Qed.
 
 Lemma cycle_orbit_in : {in S, forall x, (fcycle f) (orbit x)}.
@@ -810,8 +810,8 @@ tfae=> [xorbit_cycle|||[k fkx]|fx y z|/injectivePcycle//].
 - apply: (@iter_order_cycle (traject f x k.+1)); rewrite /= ?mem_head//.
   by apply/fpathP; exists k.+1; rewrite trajectSr -iterSr fkx.
 - rewrite -!fconnect_orbit => /iter_findex <- /iter_findex <-.
-  move=> /(congr1 (iter (order x).-1 f)); rewrite  -!iterSr !orderSpred.
-  by rewrite -!iter_add ![order _ + _]addnC !iter_add fx.
+  move/(congr1 (iter (order x).-1 f)).
+  by rewrite -!iterSr !orderSpred -!iterD ![order _ + _]addnC !iterD fx.
 Qed.
 
 Lemma order_id_cycle x : fcycle f (orbit x) -> order (f x) = order x.

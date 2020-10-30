@@ -200,7 +200,7 @@ Lemma eval_sumpT (p q : polyF) (e : seq F) :
 Proof.
 elim: p q => [|a p Hp] q /=; first by rewrite add0r.
 case: q => [|b q] /=; first by rewrite addr0.
-rewrite Hp mulrDl -!addrA; congr (_ + _); rewrite polyC_add addrC -addrA.
+rewrite Hp mulrDl -!addrA; congr (_ + _); rewrite polyCD addrC -addrA.
 by congr (_ + _); rewrite addrC.
 Qed.
 
@@ -220,15 +220,12 @@ Lemma eval_mulpT (p q : polyF) (e : seq F) :
 Proof.
 elim: p q=> [|a p Hp] q /=; first by rewrite mul0r.
 rewrite eval_sumpT /= Hp addr0 mulrDl addrC mulrAC; congr (_ + _).
-elim: q=> [|b q Hq] /=; first by rewrite mulr0.
-by rewrite Hq polyC_mul mulrDr mulrA.
+by elim: q=> [|b q Hq] /=; rewrite ?mulr0 // Hq polyCM mulrDr mulrA.
 Qed.
 
 Lemma rpoly_map_mul (t : tF) (p : polyF) (rt : rterm t) :
   rpoly [seq (t * x)%T | x <- p] = rpoly p.
-Proof.
-by rewrite /rpoly all_map /= (@eq_all _ _ (@rterm _)) // => x; rewrite /= rt.
-Qed.
+Proof. by rewrite /rpoly all_map; apply/eq_all => x; rewrite /= rt. Qed.
 
 Lemma rmulpT (p q : polyF) : rpoly p -> rpoly q -> rpoly (mulpT p q).
 Proof.
@@ -242,7 +239,7 @@ Definition opppT : polyF -> polyF := map (GRing.Mul (- 1%T)%T).
 Lemma eval_opppT (p : polyF) (e : seq F) :
   eval_poly e (opppT p) = - eval_poly e p.
 Proof.
-by elim: p; rewrite /= ?oppr0 // => ? ? ->; rewrite !mulNr opprD polyC_opp mul1r.
+by elim: p; rewrite /= ?oppr0 // => ? ? ->; rewrite !mulNr opprD polyCN mul1r.
 Qed.
 
 Definition natmulpT n : polyF -> polyF := map (GRing.Mul n%:R%T).
@@ -251,7 +248,7 @@ Lemma eval_natmulpT  (p : polyF) (n : nat) (e : seq F) :
   eval_poly e (natmulpT n p) = (eval_poly e p) *+ n.
 Proof.
 elim: p; rewrite //= ?mul0rn // => c p ->.
-rewrite mulrnDl mulr_natl polyC_muln; congr (_ + _).
+rewrite mulrnDl mulr_natl polyCMn; congr (_ + _).
 by rewrite -mulr_natl mulrAC -mulrA mulr_natl mulrC.
 Qed.
 

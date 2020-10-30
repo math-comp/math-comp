@@ -267,7 +267,7 @@ Qed.
 
 Lemma card_p2group_abelian P : prime p -> #|P| = (p ^ 2)%N -> abelian P.
 Proof.
-move=> primep oP; have pP: p.-group P by rewrite /pgroup oP pnat_exp pnat_id.
+move=> primep oP; have pP: p.-group P by rewrite /pgroup oP pnatX pnat_id.
 by rewrite (p2group_abelian pP) // oP pfactorK.
 Qed.
 

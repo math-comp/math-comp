@@ -341,7 +341,7 @@ have p_dvd_supp_g i: ~~ p_dv1 i && (i != 0) -> 'chi_i g = 0.
     rewrite fful_i subG1 -(isog_eq1 (isog_center (quotient1_isog G))) /=.
     by rewrite trivZ.
   rewrite coprime_degree_support_cfcenter ?trivZi ?inE //.
-  by rewrite -/m Dm irr1_degree natCK coprime_sym coprime_expl.
+  by rewrite -/m Dm irr1_degree natCK coprime_sym coprimeXl.
 pose alpha := \sum_(i | p_dv1 i && (i != 0)) 'chi_i 1%g / p%:R * 'chi_i g.
 have nz_p: p%:R != 0 :> algC by rewrite pnatr_eq0 -lt0n prime_gt0.
 have Dalpha: alpha = - 1 / p%:R.
@@ -592,7 +592,7 @@ have ZchiP: 'Res[P] 'chi_i \in 'CF(P, P :&: 'Z(G)).
   apply/cfun_onP=> x; rewrite inE; have [Px | /cfun0->//] := boolP (x \in P).
   rewrite /= -(cfcenter_fful_irr fful_i) cfResE //.
   apply: coprime_degree_support_cfcenter.
-  rewrite Dchi1 coprime_expl // prime_coprime // -p'natE //.
+  rewrite Dchi1 coprimeXl // prime_coprime // -p'natE //.
   apply: pnat_dvd p'PiG; rewrite -index_cent1 indexgS // subsetI sPG.
   by rewrite sub_cent1 (subsetP cPP).
 have /andP[_ nZG] := center_normal G; have nZP := subset_trans sPG nZG.

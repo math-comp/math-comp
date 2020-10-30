@@ -890,7 +890,7 @@ rewrite !big_cons; case: ifP => [Pj|PNj]; rewrite ?ihjs ?submx_refl//.
 suff cjjs: coprimep (p_ j) (\prod_(i <- js | P i) p_ i).
   by rewrite !kermxpolyM// !(adds_eqmx (eqmx_refl _) (ihjs _)) ?submx_refl.
 rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//; last first.
-  by move=> p q; rewrite coprimep_mulr.
+  by move=> p q; rewrite coprimepMr.
 apply/allP => i i_js; apply/implyP => Pi; apply: p_coprime => //.
 by apply: contraNneq jNjs => <-.
 Qed.
@@ -907,7 +907,7 @@ have cpNi : {in [pred j | P j && (j != i)] &,
 rewrite -!(cap_eqmx (eqmx_refl _) (kermxpoly_prod g _))//.
 rewrite mxdirect_kermxpoly ?submx_refl//.
 rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//; last first.
-  by move=> p q; rewrite coprimep_mulr.
+  by move=> p q; rewrite coprimepMr.
 by apply/allP => j _; apply/implyP => /andP[Pj neq_ji]; apply: p_coprime.
 Qed.
 

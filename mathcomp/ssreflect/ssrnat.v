@@ -939,7 +939,7 @@ Proof. by elim: n => //= n <-. Qed.
 
 Lemma iterS n f x : iter n.+1 f x = f (iter n f x). Proof. by []. Qed.
 
-Lemma iter_add n m f x : iter (n + m) f x = iter n f (iter m f x).
+Lemma iterD n m f x : iter (n + m) f x = iter n f (iter m f x).
 Proof. by elim: n => //= n ->. Qed.
 
 Lemma iteriS n f x : iteri n.+1 f x = f n (iteri n f x).
@@ -1114,17 +1114,17 @@ move=> lt_mn1 lt_mn2; apply (@leq_ltn_trans (m1 * n2)).
 by rewrite ltn_pmul2r // (leq_trans _ lt_mn2).
 Qed.
 
-Lemma maxn_mulr : right_distributive muln maxn.
+Lemma maxnMr : right_distributive muln maxn.
 Proof. by case=> // m n1 n2; rewrite /maxn (fun_if (muln _)) ltn_pmul2l. Qed.
 
-Lemma maxn_mull : left_distributive muln maxn.
-Proof. by move=> m1 m2 n; rewrite -!(mulnC n) maxn_mulr. Qed.
+Lemma maxnMl : left_distributive muln maxn.
+Proof. by move=> m1 m2 n; rewrite -!(mulnC n) maxnMr. Qed.
 
-Lemma minn_mulr : right_distributive muln minn.
+Lemma minnMr : right_distributive muln minn.
 Proof. by case=> // m n1 n2; rewrite /minn (fun_if (muln _)) ltn_pmul2l. Qed.
 
-Lemma minn_mull : left_distributive muln minn.
-Proof. by move=> m1 m2 n; rewrite -!(mulnC n) minn_mulr. Qed.
+Lemma minnMl : left_distributive muln minn.
+Proof. by move=> m1 m2 n; rewrite -!(mulnC n) minnMr. Qed.
 
 (* Exponentiation. *)
 
@@ -1276,14 +1276,14 @@ Proof.
 by move=> le_nm; apply: (@canRL bool) (addbK _) _; rewrite -oddD subnK.
 Qed.
 
-Lemma odd_opp i m : odd m = false -> i <= m -> odd (m - i) = odd i.
-Proof. by move=> oddm le_im; rewrite (oddB (le_im)) oddm. Qed.
+Lemma oddN i m : odd m = false -> i <= m -> odd (m - i) = odd i.
+Proof. by move=> oddm /oddB ->; rewrite oddm. Qed.
 
-Lemma odd_mul m n : odd (m * n) = odd m && odd n.
+Lemma oddM m n : odd (m * n) = odd m && odd n.
 Proof. by elim: m => //= m IHm; rewrite oddD -addTb andb_addl -IHm. Qed.
 
-Lemma odd_exp m n : odd (m ^ n) = (n == 0) || odd m.
-Proof. by elim: n => // n IHn; rewrite expnS odd_mul {}IHn orbC; case odd. Qed.
+Lemma oddX m n : odd (m ^ n) = (n == 0) || odd m.
+Proof. by elim: n => // n IHn; rewrite expnS oddM {}IHn orbC; case odd. Qed.
 
 (* Doubling. *)
 
@@ -1405,7 +1405,7 @@ rewrite -!mulnn mul2n mulnDr !mulnDl (mulnC n) -!addnA.
 by congr (_ + _); rewrite addnA addnn addnC.
 Qed.
 
-Lemma sqrn_sub m n : n <= m -> (m - n) ^ 2 = m ^ 2 + n ^ 2 - 2 * (m * n).
+Lemma sqrnB m n : n <= m -> (m - n) ^ 2 = m ^ 2 + n ^ 2 - 2 * (m * n).
 Proof.
 move/subnK <-; rewrite addnK sqrnD -addnA -addnACA -addnA.
 by rewrite addnn -mul2n -mulnDr -mulnDl addnK.
@@ -1414,7 +1414,7 @@ Qed.
 Lemma sqrnD_sub m n : n <= m -> (m + n) ^ 2 - 4 * (m * n) = (m - n) ^ 2.
 Proof.
 move=> le_nm; rewrite -[4]/(2 * 2) -mulnA mul2n -addnn subnDA.
-by rewrite sqrnD addnK sqrn_sub.
+by rewrite sqrnD addnK sqrnB.
 Qed.
 
 Lemma subn_sqr m n : m ^ 2 - n ^ 2 = (m - n) * (m + n).
@@ -1516,7 +1516,7 @@ Proof.
 without loss le_nm: m n / n <= m.
   by have [?|/ltnW ?] := leqP n m; last rewrite eq_sym addnC (mulnC m); apply.
 apply/leqifP; have [-> | ne_mn] := eqVneq; first by rewrite addnn mul2n.
-by rewrite -subn_gt0 -sqrn_sub // sqrn_gt0 subn_gt0 ltn_neqAle eq_sym ne_mn.
+by rewrite -subn_gt0 -sqrnB // sqrn_gt0 subn_gt0 ltn_neqAle eq_sym ne_mn.
 Qed.
 
 Lemma nat_AGM2 m n : 4 * (m * n) <= (m + n) ^ 2 ?= iff (m == n).
@@ -2035,3 +2035,19 @@ Notation decr_inj := (@decr_inj _) (only parsing).
 Notation "@ 'decr_inj_in'" :=
   (deprecate decr_inj_in decn_inj_in) (at level 10, only parsing) : fun_scope.
 Notation decr_inj_in := (@decr_inj_in _ _) (only parsing).
+
+Notation "@ 'iter_add'" :=
+  (deprecate iter_add iterD) (at level 10, only parsing) : fun_scope.
+Notation "@ 'odd_opp'" :=
+  (deprecate odd_opp oddN) (at level 10, only parsing) : fun_scope.
+Notation "@ 'sqrn_sub'" :=
+  (deprecate sqrn_sub sqrnB) (at level 10, only parsing) : fun_scope.
+Notation iter_add := (@iter_add _) (only parsing).
+Notation maxn_mulr := (deprecate maxn_mulr maxnMr) (only parsing).
+Notation maxn_mull := (deprecate maxn_mull maxnMl) (only parsing).
+Notation minn_mulr := (deprecate minn_mulr minnMr) (only parsing).
+Notation minn_mull := (deprecate minn_mull minnMl) (only parsing).
+Notation odd_opp := (@odd_opp _ _) (only parsing).
+Notation odd_mul := (deprecate odd_mul oddM) (only parsing).
+Notation odd_exp := (deprecate odd_exp oddX) (only parsing).
+Notation sqrn_sub := (@sqrn_sub _ _) (only parsing).

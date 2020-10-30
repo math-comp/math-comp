@@ -834,7 +834,7 @@ Lemma card_p3group_extraspecial E :
   prime p -> #|E| = (p ^ 3)%N -> #|'Z(E)| = p -> extraspecial E.
 Proof.
 move=> p_pr oEp3 oZp; have p_gt0 := prime_gt0 p_pr.
-have pE: p.-group E by rewrite /pgroup oEp3 pnat_exp pnat_id.
+have pE: p.-group E by rewrite /pgroup oEp3 pnatX pnat_id.
 have pEq: p.-group (E / 'Z(E))%g by rewrite quotient_pgroup.
 have /andP[sZE nZE] := center_normal E.
 have oEq: #|E / 'Z(E)|%g = (p ^ 2)%N.
@@ -1248,7 +1248,7 @@ have [p2 | odd_p] := even_prime p_pr.
   suffices <-: restr_perm 'Z(E) @* Aut E = Aut 'Z(E) by apply: Aut_in_isog.
   apply/eqP; rewrite eqEcard restr_perm_Aut ?center_sub //=.
   by rewrite card_Aut_cyclic ?prime_cyclic ?oZE // {1}p2 cardG_gt0.
-have pE: p.-group E by rewrite /pgroup oE pnat_exp pnat_id.
+have pE: p.-group E by rewrite /pgroup oE pnatX pnat_id.
 have nZE: E \subset 'N('Z(E)) by rewrite normal_norm ?center_normal.
 have esE: extraspecial E := card_p3group_extraspecial p_pr oE oZE.
 have [[defPhiE defE'] prZ] := esE.
@@ -1303,7 +1303,7 @@ pose f := Morphism fM; have fK: f @* K = K.
   apply/setP=> u; rewrite morphimEdom.
   apply/imsetP/idP=> [[v Kv ->] | Ku]; first exact: groupX.
   exists (u ^+ expg_invn K (val k)); first exact: groupX.
-  rewrite /f /= expgAC expgK // oK coprime_expl // -unitZpE //.
+  rewrite /f /= expgAC expgK // oK coprimeXl // -unitZpE //.
   by case: (k) => /=; rewrite orderE -defZ oZE => j; rewrite natr_Zp.
 have fMact: {in K & <[x]>, morph_act 'J 'J f (idm <[x]>)}.
   by move=> u v _ _; rewrite /= conjXg.

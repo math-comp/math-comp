@@ -1290,8 +1290,8 @@ Qed.
 
 Fact mulfx_addl : left_distributive subfext_mul subfext_add.
 Proof.
-elim/quotW=> x; elim/quotW=> y; elim/quotW=> w; rewrite !piE /subfx_mul_rep.
-by rewrite linearD /= mulrDl modp_add linearD.
+elim/quotW=> x; elim/quotW=> y; elim/quotW=> w.
+by rewrite !piE /subfx_mul_rep linearD /= mulrDl modpD linearD.
 Qed.
 
 Fact nonzero1fx : subfext1 != subfext0.
@@ -1378,7 +1378,7 @@ Definition subfx_root := subfx_eval 'X.
 Lemma subfx_eval_is_rmorphism : rmorphism subfx_eval.
 Proof.
 do 2?split=> [x y|] /=; apply/eqP; rewrite piE.
-- by rewrite -linearB modp_add modNp.
+- by rewrite -linearB modpD modNp.
 - by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
 by rewrite modp_small // size_poly1 -subn_gt0 subn1.
 Qed.
@@ -1529,7 +1529,7 @@ suffices [L dimL [toPF [toL toPF_K toL_K]]]:
   elim/poly_ind: q => [|a q IHq].
     by rewrite map_poly0 horner0 linear0 mod0p.
   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
-  rewrite linearZ /= -(rmorph1 toL) toL_K -modp_scalel alg_polyC modp_add.
+  rewrite linearZ /= -(rmorph1 toL) toL_K -modpZl alg_polyC modpD.
   congr (_ + _); rewrite -toL_K rmorphM /= -/z; congr (toPF (_ * z)).
   by apply: (can_inj toPF_K); rewrite toL_K.
 pose toL q : vL := poly_rV (q %% p); pose toPF (x : vL) := rVpoly x.
@@ -1547,13 +1547,13 @@ have mul1: left_id L1 mul.
   by move=> x; apply: toPinj; rewrite mulC !toL_K modp_mul mulr1 -toL_K toPF_K.
 have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
-  by rewrite !toL_K /toPF raddfD mulrDl modp_add.
+  by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
 pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
 pose rL := ComRingType (RingType vL mulM) mulC.
 have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: toPinj; rewrite toL_K /toPF !linearZ /= -!/(toPF _).
-  by rewrite toL_K -scalerAl modp_scalel.
+  move=> a x y; apply: toPinj.
+  by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
 have mulZr: GRing.Algebra.axiom (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
 pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
@@ -1567,7 +1567,7 @@ have unitE: GRing.Field.mixin_of urL.
     rewrite dvdp_gcdl -ltnNge /= => /eqp_size->.
     by rewrite (polySpred nz_p) ltnS size_poly.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
-  apply: toPinj; rewrite !toL_K -upq1 modp_mul modp_add mulrC.
+  apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
 pose ucrL := [comUnitRingType of ComRingType urL mulC].
 have mul0 := GRing.Field.IdomainMixin unitE.
@@ -1575,8 +1575,7 @@ pose fL := FieldType (IdomainType ucrL mul0) unitE.
 exists [fieldExtType F of faL for fL]; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
-have toLlin: linear toL.
-  by move=> a q1 q2; rewrite -linearP -modp_scalel -modp_add.
+have toLlin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
 do ?split; try exact: toLlin; move=> q r /=.
 by apply: toPinj; rewrite !toL_K modp_mul -!(mulrC r) modp_mul.
 Qed.
@@ -1607,13 +1606,13 @@ have mul1: left_id L1 mul.
   by rewrite size_poly.
 have mulD: left_distributive mul +%R.
   move=> x y z; apply: canLR rVpolyK _.
-  by rewrite !raddfD mulrDl /= !toL_K /toL modp_add.
+  by rewrite !raddfD mulrDl /= !toL_K /toL modpD.
 have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0.
 pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
 pose rL := ComRingType (RingType vL mulM) mulC.
 have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: canRL rVpolyK _; rewrite !linearZ /= toL_K.
-  by rewrite -scalerAl modp_scalel.
+  move=> a x y; apply: canRL rVpolyK _.
+  by rewrite !linearZ /= toL_K -scalerAl modpZl.
 have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
   by move=> a x y; rewrite !(mulrC x) scalerAl.
 pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
@@ -1638,7 +1637,7 @@ have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
   elim/poly_ind: q => [|a q IHq].
     by rewrite map_poly0 horner0 linear0 mod0p.
   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
-  rewrite linearZ /= L1K alg_polyC modp_add; congr (_ + _); last first.
+  rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first.
     by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW.
   by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul.
 exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0.

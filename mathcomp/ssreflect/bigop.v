@@ -443,13 +443,20 @@ Lemma addmCA : left_commutative add. Proof. exact: mulmCA. Qed.
 Lemma addmAC : right_commutative add. Proof. exact: mulmAC. Qed.
 Lemma add0m : left_id idm add. Proof. exact: mul1m. Qed.
 Lemma addm0 : right_id idm add. Proof. exact: mulm1. Qed.
-Lemma mulm_addl : left_distributive mul add. Proof. by case add. Qed.
-Lemma mulm_addr : right_distributive mul add. Proof. by case add. Qed.
+Lemma mulmDl : left_distributive mul add. Proof. by case add. Qed.
+Lemma mulmDr : right_distributive mul add. Proof. by case add. Qed.
 End Add.
 
 Definition simpm := (mulm1, mulm0, mul1m, mul0m, mulmA).
 
 End Theory.
+
+Notation "@ 'mulm_addl'" :=
+  (deprecate mulm_addl mulmDl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'mulm_addr'" :=
+  (deprecate mulm_addr mulmDr) (at level 10, only parsing) : fun_scope.
+Notation mulm_addl := (@mulm_addl _ _ _) (only parsing).
+Notation mulm_addr := (@mulm_addr _ _ _) (only parsing).
 
 End Theory.
 Include Theory.
@@ -483,7 +490,7 @@ Canonical addn_addoid := AddLaw mulnDl mulnDr.
 
 Canonical maxn_monoid := Law maxnA max0n maxn0.
 Canonical maxn_comoid := ComLaw maxnC.
-Canonical maxn_addoid := AddLaw maxn_mull maxn_mulr.
+Canonical maxn_addoid := AddLaw maxnMl maxnMr.
 
 Canonical gcdn_monoid := Law gcdnA gcd0n gcdn0.
 Canonical gcdn_comoid := ComLaw gcdnC.
@@ -954,7 +961,7 @@ Lemma big_addn m n a (P : pred nat) F :
   \big[op/idx]_(m + a <= i < n | P i) F i =
      \big[op/idx]_(m <= i < n - a | P (i + a)) F (i + a).
 Proof.
-rewrite /index_iota -subnDA addnC iota_addl big_map.
+rewrite /index_iota -subnDA addnC iotaDl big_map.
 by apply: eq_big => ? *; rewrite addnC.
 Qed.
 
@@ -1277,7 +1284,7 @@ Lemma big_cat_nat n m p (P : pred nat) F : m <= n -> n <= p ->
   \big[*%M/1]_(m <= i < p | P i) F i =
    (\big[*%M/1]_(m <= i < n | P i) F i) * (\big[*%M/1]_(n <= i < p | P i) F i).
 Proof.
-move=> le_mn le_np; rewrite -big_cat -{2}(subnKC le_mn) -iota_add subnDA.
+move=> le_mn le_np; rewrite -big_cat -{2}(subnKC le_mn) -iotaD subnDA.
 by rewrite subnKC // leq_sub.
 Qed.
 
@@ -1315,8 +1322,7 @@ Proof.
 rewrite -(big_map _ _ (lshift n) _ P F) -(big_map _ _ (@rshift m _) _ P F).
 rewrite -big_cat; congr bigop; apply: (inj_map val_inj).
 rewrite map_cat -!map_comp (map_comp (addn m)) /=.
-rewrite ![index_enum _]unlock unlock !val_ord_enum.
-by rewrite -iota_addl addn0 iota_add.
+by rewrite ![index_enum _]unlock unlock !val_ord_enum -iotaDl addn0 iotaD.
 Qed.
 
 Lemma big_flatten I rr (P : pred I) F :
@@ -1739,11 +1745,11 @@ Local Notation "x + y" := (plus x y).
 
 Lemma big_distrl I r a (P : pred I) F :
   \big[+%M/0]_(i <- r | P i) F i * a = \big[+%M/0]_(i <- r | P i) (F i * a).
-Proof. by rewrite (big_endo ( *%M^~ a)) ?mul0m // => x y; apply: mulm_addl. Qed.
+Proof. by rewrite (big_endo ( *%M^~ a)) ?mul0m // => x y; apply: mulmDl. Qed.
 
 Lemma big_distrr I r a (P : pred I) F :
   a * \big[+%M/0]_(i <- r | P i) F i = \big[+%M/0]_(i <- r | P i) (a * F i).
-Proof. by rewrite big_endo ?mulm0 // => x y; apply: mulm_addr. Qed.
+Proof. by rewrite big_endo ?mulm0 // => x y; apply: mulmDr. Qed.
 
 Lemma big_distrlr I J rI rJ (pI : pred I) (pJ : pred J) F G :
   (\big[+%M/0]_(i <- rI | pI i) F i) * (\big[+%M/0]_(j <- rJ | pJ j) G j)

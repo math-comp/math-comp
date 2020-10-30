@@ -601,11 +601,11 @@ Proof. by rewrite /gcdz abszM => /Gauss_gcdr->. Qed.
 Lemma Gauss_gcdzl p m n : coprimez p n -> gcdz p (m * n) = gcdz p m.
 Proof. by move=> co_pn; rewrite mulrC Gauss_gcdzr. Qed.
 
-Lemma coprimez_mulr p m n : coprimez p (m * n) = coprimez p m && coprimez p n.
-Proof. by rewrite -coprime_mulr -abszM. Qed.
+Lemma coprimezMr p m n : coprimez p (m * n) = coprimez p m && coprimez p n.
+Proof. by rewrite -coprimeMr -abszM. Qed.
 
-Lemma coprimez_mull p m n : coprimez (m * n) p = coprimez m p && coprimez n p.
-Proof. by rewrite -coprime_mull -abszM. Qed.
+Lemma coprimezMl p m n : coprimez (m * n) p = coprimez m p && coprimez n p.
+Proof. by rewrite -coprimeMl -abszM. Qed.
 
 Lemma coprimez_pexpl k m n : (0 < k)%N -> coprimez (m ^+ k) n = coprimez m n.
 Proof. by rewrite /coprimez /gcdz abszX; apply: coprime_pexpl. Qed.
@@ -613,11 +613,11 @@ Proof. by rewrite /coprimez /gcdz abszX; apply: coprime_pexpl. Qed.
 Lemma coprimez_pexpr k m n : (0 < k)%N -> coprimez m (n ^+ k) = coprimez m n.
 Proof. by move=> k_gt0; rewrite !(coprimez_sym m) coprimez_pexpl. Qed.
 
-Lemma coprimez_expl k m n : coprimez m n -> coprimez (m ^+ k) n.
-Proof. by rewrite /coprimez /gcdz abszX; apply: coprime_expl. Qed.
+Lemma coprimezXl k m n : coprimez m n -> coprimez (m ^+ k) n.
+Proof. by rewrite /coprimez /gcdz abszX; apply: coprimeXl. Qed.
 
-Lemma coprimez_expr k m n : coprimez m n -> coprimez m (n ^+ k).
-Proof. by rewrite !(coprimez_sym m); apply: coprimez_expl. Qed.
+Lemma coprimezXr k m n : coprimez m n -> coprimez m (n ^+ k).
+Proof. by rewrite !(coprimez_sym m); apply: coprimezXl. Qed.
 
 Lemma coprimez_dvdl m n p : (m %| n)%N -> coprimez n p -> coprimez m p.
 Proof. exact: coprime_dvdl. Qed.
@@ -878,7 +878,7 @@ Lemma dvdpP_rat_int p q :
   {p1 : {poly int} & {a | a != 0 & p = a *: pZtoQ p1} & {r | q = p1 * r}}.
 Proof.
 have{p} [p [a nz_a ->]] := rat_poly_scale p.
-rewrite dvdp_scalel ?invr_eq0 ?intr_eq0 // dvdp_rat_int => dv_p_q.
+rewrite dvdpZl ?invr_eq0 ?intr_eq0 // dvdp_rat_int => dv_p_q.
 exists (zprimitive p); last exact: dvdpP_int.
 have [-> | nz_p] := eqVneq p 0.
   by exists 1; rewrite ?oner_eq0 // zprimitive0 map_poly0 !scaler0.
@@ -1074,3 +1074,12 @@ rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
   by apply: (row_free_inj uT); rewrite mul1mx mulmxKpV.
 by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
 Qed.
+
+Notation "@ 'coprimez_expl'" :=
+  (deprecate coprimez_expl coprimezXl) (at level 10, only parsing) : fun_scope.
+Notation "@ 'coprimez_expr'" :=
+  (deprecate coprimez_expr coprimezXr) (at level 10, only parsing) : fun_scope.
+Notation coprimez_mull := (deprecate coprimez_mull coprimezMl) (only parsing).
+Notation coprimez_mulr := (deprecate coprimez_mulr coprimezMr) (only parsing).
+Notation coprimez_expl := (fun k => @coprimez_expl k _ _) (only parsing).
+Notation coprimez_expr := (fun k => @coprimez_expr k _ _) (only parsing).

@@ -228,7 +228,7 @@ Proof. by rewrite -!size_poly_eq0 size_poly_XmY. Qed.
 
 Lemma lead_coef_poly_XaY p : lead_coef (poly_XaY p) = (lead_coef p)%:P.
 Proof.
-rewrite lead_coef_comp ?size_XaddC // -['Y]opprK -polyC_opp lead_coefXsubC.
+rewrite lead_coef_comp ?size_XaddC // -['Y]opprK -polyCN lead_coefXsubC.
 by rewrite expr1n mulr1 lead_coef_map_inj //; apply: polyC_inj.
 Qed.
 

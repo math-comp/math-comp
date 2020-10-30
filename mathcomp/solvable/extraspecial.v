@@ -182,7 +182,7 @@ by exists 1%R; rewrite ?inE.
 Qed.
 
 Lemma pX1p2_pgroup : p.-group p^{1+2}.
-Proof. by rewrite /pgroup card_pX1p2 pnat_exp pnat_id. Qed.
+Proof. by rewrite /pgroup card_pX1p2 pnatX pnat_id. Qed.
 
 (* This is part of the existence half of Aschbacher ex. (8.7)(1) *)
 Lemma pX1p2_extraspecial : extraspecial p^{1+2}.
@@ -207,7 +207,7 @@ have ->: p^{1+2} = 'Ohm_1(p^{1+2}).
   case/existsP: (isoGrp_hom Grp_pX1p2) => [[x y]] /=.
   case/eqP=> <- xp yp _ _; rewrite joing_idl joing_idr genS //.
   by rewrite subsetI subset_gen subUset !sub1set !inE xp yp!eqxx.
-rewrite exponent_Ohm1_class2 ?card_pX1p2 ?odd_exp // nil_class2.
+rewrite exponent_Ohm1_class2 ?card_pX1p2 ?oddX // nil_class2.
 by have [[_ ->] _ ] := pX1p2_extraspecial.
 Qed.
 
@@ -217,7 +217,7 @@ Lemma isog_pX1p2 (gT : finGroupType) (G : {group gT}) :
 Proof.
 move=> esG expGp oG; apply/(isoGrpP _ Grp_pX1p2).
 rewrite card_pX1p2; split=> //.
-have pG: p.-group G by rewrite /pgroup oG pnat_exp pnat_id.
+have pG: p.-group G by rewrite /pgroup oG pnatX pnat_id.
 have oZ := card_center_extraspecial pG esG.
 have [x Gx notZx]: exists2 x, x \in G & x \notin 'Z(G).
   apply/subsetPn; rewrite proper_subn // properEcard center_sub oZ oG.
@@ -283,7 +283,7 @@ by rewrite oG oZ IHn -expnD mulKn ?prime_gt0.
 Qed.
 
 Lemma pX1p2n_pgroup n : prime p -> p.-group p^{1+2*n}.
-Proof. by move=> p_pr; rewrite /pgroup card_pX1p2n // pnat_exp pnat_id. Qed.
+Proof. by move=> p_pr; rewrite /pgroup card_pX1p2n // pnatX pnat_id. Qed.
 
 (* This is part of the existence half of Aschbacher (23.13) *)
 Lemma exponent_pX1p2n n : prime p -> odd p -> exponent p^{1+2*n} = p.
@@ -526,7 +526,7 @@ Lemma isog_pX1p2n n (gT : finGroupType) (G : {group gT}) :
 Proof.
 move=> p_pr esG oG expG; have p_gt1 := prime_gt1 p_pr.
 have not_le_p3_p: ~~ (p ^ 3 <= p) by rewrite (leq_exp2l 3 1).
-have pG: p.-group G by rewrite /pgroup oG pnat_exp pnat_id.
+have pG: p.-group G by rewrite /pgroup oG pnatX pnat_id.
 have oZ := card_center_extraspecial pG esG.
 have{pG esG} [Es p3Es defG] := extraspecial_structure pG esG.
 set Z := 'Z(G) in oZ defG p3Es.
@@ -614,7 +614,7 @@ by rewrite -muln_divA // mulnC -(expnD 2 2).
 Qed.
 
 Lemma DnQ_pgroup n : 2.-group 'D^n*Q.
-Proof. by rewrite /pgroup card_DnQ pnat_exp. Qed.
+Proof. by rewrite /pgroup card_DnQ pnatX. Qed.
 
 (* Final part of the existence half of Aschbacher (23.14). *)
 Lemma DnQ_extraspecial n : extraspecial 'D^n*Q.
@@ -659,7 +659,7 @@ Proof.
 elim: n G => [|n IHn] G oG esG.
   case/negP: (extraspecial_nonabelian esG).
   by rewrite cyclic_abelian ?prime_cyclic ?oG.
-have pG: 2.-group G by rewrite /pgroup oG pnat_exp.
+have pG: 2.-group G by rewrite /pgroup oG pnatX.
 have oZ:= card_center_extraspecial pG esG.
 have: 'Z(G) \subset 'Ohm_1(G).
   apply/subsetP=> z Zz; rewrite (OhmE _ pG) mem_gen //.
@@ -705,7 +705,7 @@ have AutZin2_1p2: Aut_in (Aut 2^{1+2}) 'Z(2^{1+2}) \isog Aut 'Z(2^{1+2}).
 have [isoR | isoR] := IHn R oR esR.
   by left; case: pX1p2S => gz isoZ; rewrite (isog_cprod_by _ defG).
 have n_gt0: n > 0.
-  have pR: 2.-group R by rewrite /pgroup oR pnat_exp.
+  have pR: 2.-group R by rewrite /pgroup oR pnatX.
   have:= min_card_extraspecial pR esR.
   by rewrite oR leq_exp2l // ltnS (leq_double 1).
 case: DnQ_P isoR => gR isoZR /=; rewrite isog_sym; case/isogP=> fR injfR im_fR.
@@ -742,7 +742,7 @@ elim: n => [|n IHn]; first by rewrite p_rank_abelem ?prime_abelem ?card_pX1p2n.
 have oDDn: #|'D^n.+1| = (2 ^ n.+1.*2.+1)%N by apply: card_pX1p2n.
 have esDDn: extraspecial 'D^n.+1 by apply: pX1p2n_extraspecial.
 do [case: pX1p2S => gz isoZ; set DDn := [set: _]] in oDDn esDDn *.
-have pDDn: 2.-group DDn by rewrite /pgroup oDDn pnat_exp.
+have pDDn: 2.-group DDn by rewrite /pgroup oDDn pnatX.
 apply/eqP; rewrite eqn_leq; apply/andP; split.
   have [E EprE]:= p_rank_witness 2 [group of DDn].
   have [sEDDn abelE <-] := pnElemP EprE; have [pE cEE _]:= and3P abelE.

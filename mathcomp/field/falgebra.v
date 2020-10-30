@@ -1173,11 +1173,11 @@ by rewrite -aimgM limgS // [rhs in (_ <= rhs)%VS]agenvEl addvSr.
 Qed.
 
 Lemma aimg_adjoin (f : ahom aT rT) U x : (f @: <<U; x>> = <<f @: U; f x>>)%VS.
-Proof. by rewrite aimg_agen limg_add limg_line. Qed.
+Proof. by rewrite aimg_agen limgD limg_line. Qed.
 
 Lemma aimg_adjoin_seq (f : ahom aT rT) U xs :
   (f @: <<U & xs>> = <<f @: U & map f xs>>)%VS.
-Proof. by rewrite aimg_agen limg_add limg_span. Qed.
+Proof. by rewrite aimg_agen limgD limg_span. Qed.
 
 Fact ker_sub_ahom_is_aspace (f g : ahom aT rT) :
   is_aspace (lker (ahval f - ahval g)).
