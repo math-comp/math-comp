@@ -938,7 +938,7 @@ Lemma mxdirect_sum_geigenspace
   {in P &, injective a_} -> mxdirect (\sum_(i | P i) geigenspace g (a_ i)).
 Proof.
 move=> /inj_in_eq eq_a; apply: mxdirect_sum_kermx => i j Pi Pj Nji.
-by rewrite coprimepXr ?coprimepXl// coprimep_XsubC root_XsubC eq_a.
+by rewrite coprimep_expr ?coprimep_expl// coprimep_XsubC root_XsubC eq_a.
 Qed.
 
 Definition eigenpoly n (g : 'M_n) : pred {poly K} :=

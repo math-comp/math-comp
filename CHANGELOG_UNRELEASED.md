@@ -372,7 +372,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `prodrMn` has been renamed `prodrMn_const` (with deprecation alias, cf. Added section)
 
 - in `poly.v`
-  + `polyC_(add|opp|sub|muln|mul|exp|inv)` -> `polyC(D|N|B|Mn|M|X|V)`
+  + `polyC_(add|opp|sub|muln|mul|inv)` -> `polyC(D|N|B|Mn|M|V)`
   + `lead_coef_opp` -> `lead_coefN`
   + `derivn_sub` -> `derivnB`
 
@@ -383,7 +383,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `dvdp_opp` -> `dvdpNl`
   + `coprimep_scale(l|r)` -> `coprimepZ(l|r)`
   + `coprimep_mul(l|r)` -> `coprimepM(l|r)`
-  + `coprimep_exp(l|r)` -> `coprimepX(l|r)`
   + `modp_scale(l|r)` -> `modpZ(l|r)`
   + `modp_(opp|add|scalel|scaler)` -> `modp(N|D|Zl|Zr)`
   + `divp_(opp|add|scalel|scaler)` -> `divp(N|D|Zl|Zr)`

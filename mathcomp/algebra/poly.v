@@ -627,7 +627,7 @@ Fact polyC_multiplicative : multiplicative polyC.
 Proof. by split; first apply: polyCM. Qed.
 Canonical polyC_rmorphism := AddRMorphism polyC_multiplicative.
 
-Lemma polyCX n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphX. Qed.
+Lemma polyC_exp n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphX. Qed.
 
 Lemma size_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
 Proof.
@@ -2778,8 +2778,6 @@ Notation "@ 'polyC_muln'" :=
   (deprecate polyC_muln polyCMn) (at level 10, only parsing) : fun_scope.
 Notation "@ 'polyC_mul'" :=
   (deprecate polyC_mul polyCM) (at level 10, only parsing) : fun_scope.
-Notation "@ 'polyC_exp'" :=
-  (deprecate polyC_exp polyCX) (at level 10, only parsing) : fun_scope.
 Notation "@ 'polyC_inv'" :=
   (deprecate polyC_inv polyCV) (at level 10, only parsing) : fun_scope.
 Notation "@ 'lead_coef_opp'" :=
@@ -2791,7 +2789,6 @@ Notation polyC_opp := (@polyC_opp _) (only parsing).
 Notation polyC_sub := (@polyC_sub _) (only parsing).
 Notation polyC_muln := (@polyC_muln _) (only parsing).
 Notation polyC_mul := (@polyC_mul _) (only parsing).
-Notation polyC_exp := (@polyC_exp _) (only parsing).
 Notation polyC_inv := (@polyC_inv _) (only parsing).
 Notation lead_coef_opp := (@lead_coef_opp _) (only parsing).
 Notation derivn_sub := (@derivn_sub _) (only parsing).
