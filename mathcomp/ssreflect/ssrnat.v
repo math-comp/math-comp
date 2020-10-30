@@ -1128,7 +1128,7 @@ Proof. by move=> m1 m2 n; rewrite -!(mulnC n) minnMr. Qed.
 
 Lemma iterM (T : Type) (n m : nat) (f : T -> T) :
   iter (n * m) f =1 iter n (iter m f).
-Proof. by move=> x; elim: n => //= n <-; rewrite mulSn iter_add. Qed.
+Proof. by move=> x; elim: n => //= n <-; rewrite mulSn iterD. Qed.
 
 (* Exponentiation. *)
 
