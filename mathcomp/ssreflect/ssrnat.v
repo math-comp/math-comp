@@ -1126,6 +1126,10 @@ Proof. by case=> // m n1 n2; rewrite /minn (fun_if (muln _)) ltn_pmul2l. Qed.
 Lemma minnMl : left_distributive muln minn.
 Proof. by move=> m1 m2 n; rewrite -!(mulnC n) minnMr. Qed.
 
+Lemma iterM (T : Type) (n m : nat) (f : T -> T) :
+  iter (n * m) f =1 iter n (iter m f).
+Proof. by move=> x; elim: n => //= n <-; rewrite mulSn iter_add. Qed.
+
 (* Exponentiation. *)
 
 Definition expn_rec m n := iterop n muln m 1.
@@ -1219,6 +1223,10 @@ Proof. by move=> e_gt0; rewrite !eqn_leq !leq_exp2r. Qed.
 
 Lemma expIn e : e > 0 -> injective (expn^~ e).
 Proof. by move=> e_gt1 m n /eqP; rewrite eqn_exp2r // => /eqP. Qed.
+
+Lemma iterX (T : Type) (n m : nat) (f : T -> T) :
+  iter (n ^ m) f =1 iter m (iter n) f.
+Proof. elim: m => //= m ihm x; rewrite expnS iterM; exact/eq_iter. Qed.
 
 (* Factorial. *)
 
