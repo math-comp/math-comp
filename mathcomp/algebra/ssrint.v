@@ -1708,31 +1708,25 @@ Implicit Types m n : int.
 Implicit Types i j k : nat.
 Implicit Types p q r : {poly R}.
 
-Lemma coefMrz : forall p n i, (p *~ n)`_i = (p`_i *~ n).
-Proof. by move=> p [] n i; rewrite ?NegzE (coefMNn, coefMn). Qed.
+Lemma coefMrz p n i : (p *~ n)`_i = (p`_i *~ n).
+Proof. by case: n => n; rewrite ?NegzE (coefMNn, coefMn). Qed.
 
-Lemma polyCMz : forall n, {morph (@polyC R) : c / c *~ n}.
-Proof. by case/intP => // n c; rewrite ?mulrNz -!pmulrn ?polyCN ?polyCMn. Qed.
+Lemma polyCMz n : {morph (@polyC R) : c / c *~ n}.
+Proof. by case: (intP n) => // n' c; rewrite ?mulrNz ?polyCN polyCMn. Qed.
 
-Lemma hornerMz : forall n (p : {poly R}) x, (p *~ n).[x] = p.[x] *~ n.
-Proof. by case=> *; rewrite ?NegzE ?mulNzr ?(hornerN, hornerMn). Qed.
+Lemma hornerMz n p x : (p *~ n).[x] = p.[x] *~ n.
+Proof. by case: n => n; rewrite ?NegzE ?mulNzr ?(hornerN, hornerMn). Qed.
 
-Lemma horner_int : forall n x, (n%:~R : {poly R}).[x] = n%:~R.
-Proof. by move=> n x; rewrite hornerMz hornerC. Qed.
+Lemma horner_int n x : (n%:~R : {poly R}).[x] = n%:~R.
+Proof. by rewrite hornerMz hornerC. Qed.
 
-Lemma derivMz : forall n p, (p *~ n)^`() = p^`() *~ n.
-Proof. by move=> [] n p; rewrite ?NegzE -?pmulrn (derivMn, derivMNn). Qed.
+Lemma derivMz n p : (p *~ n)^`() = p^`() *~ n.
+Proof. by case: n => n; rewrite ?NegzE -?pmulrn (derivMn, derivMNn). Qed.
+
+Lemma mulpz p n : p *~ n = n%:~R *: p.
+Proof. by rewrite -mul_polyC polyCMz polyC1 mulrzl. Qed.
 
 End PolyZintRing.
-
-Section PolyZintOIdom.
-
-Variable R : realDomainType.
-
-Lemma mulpz (p : {poly R}) (n : int) : p *~ n = n%:~R *: p.
-Proof. by rewrite -[p *~ n]mulrzl -mul_polyC polyCMz polyC1. Qed.
-
-End PolyZintOIdom.
 
 Section ZnatPred.
 
