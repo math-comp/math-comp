@@ -454,7 +454,7 @@ Qed.
 Lemma eq_primes m n : (primes m =i primes n) <-> (primes m = primes n).
 Proof.
 split=> [eqpr| -> //].
-by apply: (eq_sorted_irr ltn_trans ltnn); rewrite ?sorted_primes.
+by apply: (irr_sorted_eq ltn_trans ltnn); rewrite ?sorted_primes.
 Qed.
 
 Lemma primes_uniq n : uniq (primes n).
@@ -565,7 +565,7 @@ Qed.
 
 Lemma primes_prime p : prime p -> primes p = [::p].
 Proof.
-move=> pr_p; apply: (eq_sorted_irr ltn_trans ltnn) => // [|q].
+move=> pr_p; apply: (irr_sorted_eq ltn_trans ltnn) => // [|q].
   exact: sorted_primes.
 rewrite mem_seq1 mem_primes prime_gt0 //=.
 by apply/andP/idP=> [[pr_q q_p] | /eqP-> //]; rewrite -dvdn_prime2.
@@ -862,7 +862,7 @@ Proof. by move=> eq_pi n; rewrite 3!inE /= eq_pi. Qed.
 
 Lemma eq_piP m n : \pi(m) =i \pi(n) <-> \pi(m) = \pi(n).
 Proof.
-rewrite /pi_of; have eqs := eq_sorted_irr ltn_trans ltnn.
+rewrite /pi_of; have eqs := irr_sorted_eq ltn_trans ltnn.
 by split=> [|-> //] /(eqs _ _ (sorted_primes m) (sorted_primes n)) ->.
 Qed.
 
@@ -954,7 +954,7 @@ Proof. by rewrite ltn_neqAle part_gt0 andbT eq_sym p_part_eq1 negbK. Qed.
 Lemma primes_part pi n : primes n`_pi = filter (mem pi) (primes n).
 Proof.
 have ltnT := ltn_trans; have [->|n_gt0] := posnP n; first by rewrite partn0.
-apply: (eq_sorted_irr ltnT ltnn); rewrite ?(sorted_primes, sorted_filter) //.
+apply: (irr_sorted_eq ltnT ltnn); rewrite ?(sorted_primes, sorted_filter) //.
 move=> p; rewrite mem_filter /= !mem_primes n_gt0 part_gt0 /=.
 apply/andP/and3P=> [[p_pr] | [pi_p p_pr dv_p_n]].
   rewrite /partn; apply big_ind => [|n1 n2 IHn1 IHn2|q pi_q].
@@ -970,7 +970,7 @@ Qed.
 
 Lemma filter_pi_of n m : n < m -> filter \pi(n) (index_iota 0 m) = primes n.
 Proof.
-move=> lt_n_m; have ltnT := ltn_trans; apply: (eq_sorted_irr ltnT ltnn).
+move=> lt_n_m; have ltnT := ltn_trans; apply: (irr_sorted_eq ltnT ltnn).
 - by rewrite sorted_filter // iota_ltn_sorted.
 - exact: sorted_primes.
 move=> p; rewrite mem_filter mem_index_iota /= mem_primes; case: and3P => //.

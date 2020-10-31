@@ -2741,7 +2741,7 @@ Proof. by rewrite andbC lt_le_asym. Qed.
 
 Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
-Lemma lt_sorted_uniq_le s : sorted lt s = uniq s && sorted le s.
+Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
 Proof.
 case: s => //= n s; elim: s n => //= m s IHs n.
 rewrite inE lt_neqAle negb_or IHs -!andbA.
@@ -2750,12 +2750,15 @@ rewrite andbF; apply/and5P=> [[ne_nm lenm _ _ le_ms]]; case/negP: ne_nm.
 by rewrite eq_le lenm /=; apply: (allP (order_path_min le_trans le_ms)).
 Qed.
 
-Lemma eq_sorted_lt s1 s2 : sorted lt s1 -> sorted lt s2 -> s1 =i s2 -> s1 = s2.
-Proof. by apply: eq_sorted_irr => //; apply: lt_trans. Qed.
+Lemma lt_sorted_eq s1 s2 : sorted <%O s1 -> sorted <%O s2 -> s1 =i s2 -> s1 = s2.
+Proof. by apply: irr_sorted_eq => //; apply: lt_trans. Qed.
 
-Lemma eq_sorted_le s1 s2 : sorted le s1 -> sorted le s2 ->
-  perm_eq s1 s2 -> s1 = s2.
-Proof. by apply: eq_sorted; [apply: le_trans|apply: le_anti]. Qed.
+Lemma le_sorted_eq s1 s2 :
+  sorted <=%O s1 -> sorted <=%O s2 -> perm_eq s1 s2 -> s1 = s2.
+Proof. exact/sorted_eq/le_anti/le_trans. Qed.
+
+Lemma sort_le_id s : sorted <=%O s -> sort <=%O s = s.
+Proof. exact/sorted_sort/le_trans. Qed.
 
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
 Proof.
@@ -3419,6 +3422,13 @@ Proof. exact: anti_mono_in. Qed.
 
 End POrderMonotonyTheory.
 
+Notation "@ 'eq_sorted_lt'" := (deprecate eq_sorted_lt lt_sorted_eq)
+  (at level 10, only parsing) : fun_scope.
+Notation "@ 'eq_sorted_le'" := (deprecate eq_sorted_le le_sorted_eq)
+  (at level 10, only parsing) : fun_scope.
+Notation eq_sorted_lt := (@eq_sorted_lt _ _ _ _) (only parsing).
+Notation eq_sorted_le := (@eq_sorted_le _ _ _ _) (only parsing).
+
 End POrderTheory.
 
 Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
@@ -3728,13 +3738,8 @@ Lemma sort_le_sorted s : sorted <=%O (sort <=%O s).
 Proof. exact: sort_sorted. Qed.
 Hint Resolve sort_le_sorted : core.
 
-Lemma sort_lt_sorted s : sorted lt (sort le s) = uniq s.
+Lemma sort_lt_sorted s : sorted <%O (sort <=%O s) = uniq s.
 Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
-
-Lemma sort_le_id s : sorted le s -> sort le s = s.
-Proof.
-by move=> ss; apply: eq_sorted_le; rewrite ?sort_le_sorted // perm_sort.
-Qed.
 
 Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 

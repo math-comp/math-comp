@@ -804,7 +804,7 @@ rewrite (IHs (path_sorted s_ord)) andbT; apply/negP=> s_x.
 by case/allPn: (order_path_min leT_tr s_ord); exists x; rewrite // leT_irr.
 Qed.
 
-Lemma eq_sorted : antisymmetric leT ->
+Lemma sorted_eq : antisymmetric leT ->
   forall s1 s2, sorted s1 -> sorted s2 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
 move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
@@ -819,13 +819,13 @@ case/predU1P=> [eq_x12 | s1_x2]; first by case ne_x12.
 by rewrite (allP (order_path_min _ ord_s1)).
 Qed.
 
-Lemma eq_sorted_irr : irreflexive leT ->
+Lemma irr_sorted_eq : irreflexive leT ->
   forall s1 s2, sorted s1 -> sorted s2 -> s1 =i s2 -> s1 = s2.
 Proof.
 move=> leT_irr s1 s2 s1_sort s2_sort eq_s12.
 have: antisymmetric leT.
   by move=> m n /andP[? ltnm]; case/idP: (leT_irr m); apply: leT_tr ltnm.
-by move/eq_sorted; apply=> //; apply: uniq_perm => //; apply: sorted_uniq.
+by move/sorted_eq; apply=> //; apply: uniq_perm => //; apply: sorted_uniq.
 Qed.
 
 End Transitive.
@@ -867,7 +867,7 @@ Lemma perm_sortP :
 Proof.
 move=> leT_total leT_tr leT_asym s1 s2.
 apply: (iffP idP) => eq12; last by rewrite -perm_sort eq12 perm_sort.
-apply: eq_sorted; rewrite ?sort_sorted //.
+apply: sorted_eq; rewrite ?sort_sorted //.
 by rewrite perm_sort (permPl eq12) -perm_sort.
 Qed.
 
@@ -1038,7 +1038,7 @@ Lemma filter_sort p s : filter p (sort leT s) = sort leT (filter p s).
 Proof.
 case Ds: s => // [x s1]; rewrite -{s1}Ds.
 rewrite -(mkseq_nth x s) !(filter_map, sort_map).
-congr map; apply/(@eq_sorted_irr _ (le_lex x s)) => //.
+congr map; apply/(@irr_sorted_eq _ (le_lex x s)) => //.
 - by move=> ?; rewrite /= ltnn implybF andbN.
 - exact/sorted_filter/sort_stable/iota_ltn_sorted/ltn_trans.
 - exact/sort_stable/sorted_filter/iota_ltn_sorted/ltn_trans/ltn_trans.
@@ -1461,3 +1461,12 @@ by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
 Qed.
 
 End Monotonicity.
+
+Notation "@ 'eq_sorted'" :=
+  (deprecate eq_sorted sorted_eq) (at level 10, only parsing) : fun_scope.
+Notation "@ 'eq_sorted_irr'" := (deprecate eq_sorted_irr irr_sorted_eq)
+  (at level 10, only parsing) : fun_scope.
+Notation eq_sorted :=
+  (fun le_tr le_asym => @eq_sorted _ _ le_tr le_asym _ _) (only parsing).
+Notation eq_sorted_irr :=
+  (fun le_tr le_irr => @eq_sorted_irr _ _ le_tr le_irr _ _) (only parsing).

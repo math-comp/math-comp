@@ -468,7 +468,7 @@ have ft_m: #|f_t t| = m.
   rewrite cardsE (card_uniqP _) ?size_tuple // -(map_inj_uniq val_inj).
   exact: (sorted_uniq ltn_trans ltnn).
 rewrite ft_m eqxx -val_eqE val_fA // -(inj_eq (inj_map val_inj)) /=.
-apply/eqP/(eq_sorted_irr ltn_trans ltnn) => // y.
+apply/eqP/(irr_sorted_eq ltn_trans ltnn) => // y.
 by apply/mapP/mapP=> [] [x t_x ->]; exists x; rewrite // mem_enum inE in t_x *.
 Qed.
 
