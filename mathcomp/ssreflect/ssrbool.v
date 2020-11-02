@@ -102,30 +102,136 @@ Arguments mono_sym_in {aT rT} [aR rR f aD].
 Arguments homo_sym_in11 {aT rT} [aR rR f aD aD'].
 Arguments mono_sym_in11 {aT rT} [aR rR f aD aD'].
 
+Section LocalGlobal.
+
+Local Notation "{ 'all1' P }" := (forall x, P x : Prop) (at level 0).
+Local Notation "{ 'all2' P }" := (forall x y, P x y : Prop) (at level 0).
+
+Variables T1 T2 T3 : predArgType.
+Variables (D1 : {pred T1}) (D2 : {pred T2}).
+Variables (f : T1 -> T2) (h : T3).
+Variable Q1 : (T1 -> T2) -> T1 -> Prop.
+Variable Q1l : (T1 -> T2) -> T3 -> T1 -> Prop.
+Variable Q2 : (T1 -> T2) -> T1 -> T1 -> Prop.
+Let allQ1 f'' := {all1 Q1 f''}.
+Let allQ1l f'' h' := {all1 Q1l f'' h'}.
+Let allQ2 f'' := {all2 Q2 f''}.
+
+Lemma in_on1P : {in D1, {on D2, allQ1 f}} <->
+                {in [pred x in D1 | f x \in D2], allQ1 f}.
+Proof.
+split => allf x; have := allf x; rewrite inE => Q1f; first by case/andP.
+by move=> ? ?; apply: Q1f; apply/andP.
+Qed.
+
+Lemma in_on1lP : {in D1, {on D2, allQ1l f & h}} <->
+                {in [pred x in D1 | f x \in D2], allQ1l f h}.
+Proof.
+split => allf x; have := allf x; rewrite inE => Q1f; first by case/andP.
+by move=> ? ?; apply: Q1f; apply/andP.
+Qed.
+
+Lemma in_on2P : {in D1 &, {on D2 &, allQ2 f}} <->
+                {in [pred x in D1 | f x \in D2] &, allQ2 f}.
+Proof.
+split => allf x y; have := allf x y; rewrite !inE => Q2f.
+  by move=> /andP[? ?] /andP[? ?]; apply: Q2f.
+by move=> ? ? ? ?; apply: Q2f; apply/andP.
+Qed.
+
+Lemma on1W_in : {in D1, allQ1 f} -> {in D1, {on D2, allQ1 f}}.
+Proof. by move=> D1f ? /D1f. Qed.
+
+Lemma on1lW_in : {in D1, allQ1l f h} -> {in D1, {on D2, allQ1l f & h}}.
+Proof. by move=> D1f ? /D1f. Qed.
+
+Lemma on2W_in : {in D1 &, allQ2 f} -> {in D1 &, {on D2 &, allQ2 f}}.
+Proof. by move=> D1f ? ? ? ? ? ?; apply: D1f. Qed.
+
+Lemma in_on1W : allQ1 f -> {in D1, {on D2, allQ1 f}}.
+Proof. by move=> allf ? ? ?; apply: allf. Qed.
+
+Lemma in_on1lW : allQ1l f h -> {in D1, {on D2, allQ1l f & h}}.
+Proof. by move=> allf ? ? ?; apply: allf. Qed.
+
+Lemma in_on2W : allQ2 f -> {in D1 &, {on D2 &, allQ2 f}}.
+Proof. by move=> allf ? ? ? ? ? ?; apply: allf. Qed.
+
+Lemma on1S : (forall x, f x \in D2) -> {on D2, allQ1 f} -> allQ1 f.
+Proof. by move=> ? fD1 ?; apply: fD1. Qed.
+
+Lemma on1lS : (forall x, f x \in D2) -> {on D2, allQ1l f & h} -> allQ1l f h.
+Proof. by move=> ? fD1 ?; apply: fD1. Qed.
+
+Lemma on2S : (forall x, f x \in D2) -> {on D2 &, allQ2 f} -> allQ2 f.
+Proof. by move=> ? fD1 ? ?; apply: fD1. Qed.
+
+Lemma on1S_in : {homo f : x / x \in D1 >-> x \in D2} ->
+  {in D1, {on D2, allQ1 f}} -> {in D1, allQ1 f}.
+Proof. by move=> fD fD1 ? ?; apply/fD1/fD. Qed.
+
+Lemma on1lS_in : {homo f : x / x \in D1 >-> x \in D2} ->
+  {in D1, {on D2, allQ1l f & h}} -> {in D1, allQ1l f h}.
+Proof. by move=> fD fD1 ? ?; apply/fD1/fD. Qed.
+
+Lemma on2S_in : {homo f : x / x \in D1 >-> x \in D2} ->
+  {in D1 &, {on D2 &, allQ2 f}} -> {in D1 &, allQ2 f}.
+Proof. by move=> fD fD1 ? ? ? ?; apply: fD1 => //; apply: fD. Qed.
+
+Lemma in_on1S : (forall x, f x \in D2) -> {in T1, {on D2, allQ1 f}} -> allQ1 f.
+Proof. by move=> fD2 fD1 ?; apply: fD1. Qed.
+
+Lemma in_on1lS : (forall x, f x \in D2) ->
+  {in T1, {on D2, allQ1l f & h}} -> allQ1l f h.
+Proof. by move=> fD2 fD1 ?; apply: fD1. Qed.
+
+Lemma in_on2S : (forall x, f x \in D2) ->
+  {in T1 &, {on D2 &, allQ2 f}} -> allQ2 f.
+Proof. by move=> fD2 fD1 ? ?; apply: fD1. Qed.
+
+End LocalGlobal.
+Arguments in_on1P  {T1 T2 D1 D2 f Q1}.
+Arguments in_on1lP {T1 T2 T3 D1 D2 f h Q1l}.
+Arguments in_on2P  {T1 T2 D1 D2 f Q2}.
+Arguments on1W_in  {T1 T2 D1} D2 {f Q1}.
+Arguments on1lW_in {T1 T2 T3 D1} D2 {f h Q1l}.
+Arguments on2W_in  {T1 T2 D1} D2 {f Q2}.
+Arguments in_on1W  {T1 T2} D1 D2 {f Q1}.
+Arguments in_on1lW {T1 T2 T3} D1 D2 {f h Q1l}.
+Arguments in_on2W  {T1 T2} D1 D2 {f Q2}.
+Arguments on1S     {T1 T2} D2 {f Q1}.
+Arguments on1lS    {T1 T2 T3} D2 {f h Q1l}.
+Arguments on2S     {T1 T2} D2 {f Q2}.
+Arguments on1S_in  {T1 T2 D1} D2 {f Q1}.
+Arguments on1lS_in {T1 T2 T3 D1} D2 {f h Q1l}.
+Arguments on2S_in  {T1 T2 D1} D2 {f Q2}.
+Arguments in_on1S  {T1 T2} D2 {f Q1}.
+Arguments in_on1lS {T1 T2 T3} D2 {f h Q1l}.
+Arguments in_on2S  {T1 T2} D2 {f Q2}.
+
 Section CancelOn.
 
 Variables (aT rT : predArgType) (aD : {pred aT}) (rD : {pred rT}).
 Variables (f : aT -> rT) (g : rT -> aT).
 
-Lemma onW_can : cancel g f -> {on aD, cancel g & f}.
-Proof. by move=> fgK x xaD; apply: fgK. Qed.
+Lemma onW_can : cancel g f -> {on aD, cancel g & f}. Proof. exact: on1lW. Qed.
 
 Lemma onW_can_in : {in rD, cancel g f} -> {in rD, {on aD, cancel g & f}}.
-Proof. by move=> fgK x xrD xaD; apply: fgK. Qed.
+Proof. exact: on1lW_in. Qed.
 
 Lemma in_onW_can : cancel g f -> {in rD, {on aD, cancel g & f}}.
-Proof. by move=> fgK x xrD xaD; apply: fgK. Qed.
+Proof. exact: in_on1lW. Qed.
 
 Lemma onS_can : (forall x, g x \in aD) -> {on aD, cancel g & f} -> cancel g f.
-Proof. by move=> mem_g fgK x; apply: fgK. Qed.
+Proof. exact: on1lS. Qed.
 
 Lemma onS_can_in : {homo g : x / x \in rD >-> x \in aD} ->
   {in rD, {on aD, cancel g & f}} -> {in rD, cancel g f}.
-Proof. by move=> mem_g fgK x x_rD; apply/fgK/mem_g. Qed.
+Proof. exact: on1lS_in. Qed.
 
 Lemma in_onS_can : (forall x, g x \in aD) ->
   {in rT, {on aD, cancel g & f}} -> cancel g f.
-Proof. by move=> mem_g fgK x; apply/fgK. Qed.
+Proof. exact: in_on1lS. Qed.
 
 End CancelOn.
 Arguments onW_can {aT rT} aD {f g}.
@@ -243,4 +349,3 @@ Proof. by case: b => // /(_ isT). Qed.
 Lemma contra_notF P b : (b -> P) -> ~ P -> b = false.
 Proof. by case: b => // /(_ isT). Qed.
 End Contra.
-
