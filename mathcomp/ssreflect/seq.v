@@ -1395,15 +1395,30 @@ Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. exact/inj_eq/rot_inj. Qed.
 
-Lemma eqseq_pivot s1 s2 s3 s4 x :
-  uniq (s3 ++ x :: s4) -> s1 ++ x :: s2 == s3 ++ x :: s4 = (s1 == s3) && (s2 == s4).
+
+Lemma eqseq_pivot x s1 s2 s3 s4 : x \notin s1 -> x \notin s3 ->
+   s1 ++ x :: s2 == s3 ++ x :: s4 = (s1 == s3) && (s2 == s4).
 Proof.
-move=> uniq34; apply/idP/idP => [E|/andP [/eqP-> /eqP->] //].
+move=> xNs1 xNs3; apply/idP/idP => [E|/andP [/eqP-> /eqP->] //].
 suff S : size s1 = size s3 by rewrite eqseq_cat // eqseq_cons eqxx in E.
-gen have I,I1 : s3 s4 uniq34 {E} / size s3 = index x (s3 ++ x :: s4).
-  rewrite index_cat index_head addn0 ifN //.
-  by apply: contraTN uniq34 => x_s3; rewrite cat_uniq /= x_s3 /= andbF.
-by rewrite I1 -(eqP E) -I // (eqP E).
+gen have I,I1 : s1 s2 xNs1 {E} / size s1 = index x (s1 ++ x :: s2).
+  by rewrite index_cat (negPf xNs1) index_head addn0.
+by rewrite I1 (eqP E) -I.
+Qed.
+
+Lemma eqseq_pivot_uniqr x s1 s2 s3 s4 (s := s3 ++ x :: s4) :
+  uniq s -> s1 ++ x :: s2 == s = (s1 == s3) && (s2 == s4).
+Proof.
+move=> /= uniq_s; apply/idP/idP => [/eqP E|/andP [/eqP-> /eqP->] //=].
+have N1 p1 p2 : uniq (p1 ++ x :: p2) -> x \notin p1.
+  by rewrite cat_uniq /=; case (_ \in p1); rewrite //= andbF.
+by rewrite -(@eqseq_pivot x) ?E // ?(N1 s3 s4) // (N1 s1 s2) ?E.
+Qed.
+
+Lemma eqseq_pivot_uniql x s1 s2 s3 s4 (s := s1 ++ x :: s2) :
+  uniq s -> s == s3 ++ x :: s4 = (s1 == s3) && (s2 == s4).
+Proof.
+by move=> ?; rewrite eq_sym eqseq_pivot_uniqr// [_ == s1]eq_sym [_ == s2]eq_sym.
 Qed.
 
 End EqSeq.
@@ -1485,7 +1500,7 @@ Definition bitseq := seq bool.
 Canonical bitseq_eqType := Eval hnf in [eqType of bitseq].
 Canonical bitseq_predType := Eval hnf in [predType of bitseq].
 
-(* Generalized versions of splitP (from path.v): split_find_nth and split_find  *)
+(* Generalizations of splitP (from path.v): split_find_nth and split_find *)
 Section FindNth.
 Variables (T : Type).
 Implicit Types (x : T) (p : pred T) (s : seq T).
@@ -1937,6 +1952,10 @@ Lemma mask_cat m1 m2 s1 s2 :
   size m1 = size s1 -> mask (m1 ++ m2) (s1 ++ s2) = mask m1 s1 ++ mask m2 s2.
 Proof. by move: m1 s1; apply: seq_ind2 => // -[] m1 x1 s1 /= _ ->. Qed.
 
+Lemma mask_rcons b m x s : size m = size s ->
+  mask (rcons m b) (rcons s x) = mask m s ++ nseq b x.
+Proof. by move=> ms; rewrite -!cats1 mask_cat//; case: b. Qed.
+
 Lemma all_mask a m s : all a s -> all a (mask m s).
 Proof. by elim: s m => [|x s IHs] [|[] m]//= /andP[ax /IHs->]; rewrite ?ax. Qed.
 
@@ -1949,9 +1968,8 @@ Proof. by apply/contraTT; rewrite -!all_predC; apply: all_mask. Qed.
 
 Lemma rev_mask m s : size m = size s -> rev (mask m s) = mask (rev m) (rev s).
 Proof.
-move: m s; apply: seq_ind2 => //= b x m s ? IH.
-rewrite fun_if !rev_cons -!cats1 IH // mask_cat ?size_rev //.
-by case: b => //=; rewrite cats0.
+move: m s; apply: seq_ind2 => //= b x m s eq_size_sm IH.
+by case: b; rewrite !rev_cons mask_rcons ?IH ?size_rev// (cats1, cats0).
 Qed.
 
 Lemma mask_rot m s : size m = size s ->
@@ -2343,13 +2361,13 @@ rewrite uniq_perm ?filter_uniq ?(subseq_uniq ss12) // => x.
 by rewrite mem_filter; apply: andb_idr; apply: (mem_subseq ss12).
 Qed.
 
-Lemma subseq_pivot (s1 s2 s3 s4 : seq T) x (s := s3 ++ x :: s4) :
+Lemma uniq_subseq_pivot (s1 s2 s3 s4 : seq T) x (s := s3 ++ x :: s4) :
   uniq s -> subseq (s1 ++ x :: s2) s -> subseq s1 s3 /\ subseq s2 s4.
 Proof.
 move => uniq_s sub_s'_s; have uniq_s' := subseq_uniq sub_s'_s uniq_s.
 have/eqP {sub_s'_s uniq_s} := subseq_uniqP _ uniq_s sub_s'_s.
-rewrite !filter_cat /= mem_cat inE eqxx orbT /= => E.
-move: (E); rewrite eqseq_pivot -?(eqP E) // => /andP [/eqP -> /eqP ->].
+rewrite !filter_cat /= mem_cat inE eqxx orbT /=.
+rewrite eqseq_pivot_uniql // => /andP [/eqP -> /eqP ->].
 by rewrite !filter_subseq.
 Qed.
 

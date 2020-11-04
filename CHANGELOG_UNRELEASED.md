@@ -270,6 +270,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `(homo|mono)_cycle(_in)`.
 - in `seq.v` new lemmas `eqseq_pivot`, `rev_mask`, `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, `subseq_pivot`.
 
+- in `seq.v` new lemmas `eqseq_pivot`, `eqseq_pivot_uniql`, `eqseq_pivot_uniqr`,
+  `mask_rcons, `rev_mask`, `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, and
+  `uniq_subseq_pivot`.
 
 ### Changed
 
