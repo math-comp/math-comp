@@ -431,6 +431,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `mxpoly.v`, we deprecate `scalar_mx_comm`, and advise to use
   `comm_mxC` instead (with maximal implicit arguments `R` and `n`).
 
+- in `ssrnat.v`, we remove the compatibility module `mc_1_9`.
+
 ### Infrastructure
 
 ### Misc
