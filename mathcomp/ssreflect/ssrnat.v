@@ -1970,20 +1970,6 @@ Ltac nat_congr := first
      symmetry
    end ].
 
-Module mc_1_9.
-
-Variant compare_nat m n :
-   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n true false true false false false
-  | CompareNatGt of m > n : compare_nat m n false true false true false false
-  | CompareNatEq of m = n : compare_nat m n true true false false true true.
-
-Lemma ltngtP m n : compare_nat m n (m <= n) (n <= m) (m < n)
-                                   (n < m) (n == m) (m == n).
-Proof. by case: ltngtP; constructor. Qed.
-
-End mc_1_9.
-
 Module mc_1_10.
 
 Variant leq_xor_gtn m n : bool -> bool -> Set :=
