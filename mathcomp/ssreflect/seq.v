@@ -1623,6 +1623,10 @@ Proof. by apply/permPl; rewrite -!catA perm_cat2l perm_catC. Qed.
 Lemma perm_catCA s1 s2 s3 : perm_eql (s1 ++ s2 ++ s3) (s2 ++ s1 ++ s3).
 Proof. by apply/permPl; rewrite !catA perm_cat2r perm_catC. Qed.
 
+Lemma perm_catACA s1 s2 s3 s4 :
+  perm_eql ((s1 ++ s2) ++ (s3 ++ s4)) ((s1 ++ s3) ++ (s2 ++ s4)).
+Proof. by apply/permPl; rewrite perm_catAC !catA perm_catAC. Qed.
+
 Lemma perm_rcons x s : perm_eql (rcons s x) (x :: s).
 Proof. by move=> /= s2; rewrite -cats1 perm_catC. Qed.
 
@@ -3063,15 +3067,44 @@ Lemma size_allpairs_dep f s t :
   size [seq f x y | x <- s, y <- t x] = sumn [seq size (t x) | x <- s].
 Proof. by elim: s => //= x s IHs; rewrite size_cat size_map IHs. Qed.
 
+Lemma allpairs0l f t : [seq f x y | x <- [::], y <- t x] = [::].
+Proof. by []. Qed.
+
+Lemma allpairs0r f s : [seq f x y | x <- s, y <- [::]] = [::].
+Proof. by elim: s. Qed.
+
+Lemma allpairs1l f x t :
+   [seq f x y | x <- [:: x], y <- t x] = [seq f x y | y <- t x].
+Proof. exact: cats0. Qed.
+
+Lemma allpairs1r f s y :
+  [seq f x y | x <- s, y <- [:: y x]] = [seq f x (y x) | x <- s].
+Proof. exact: flatten_map1. Qed.
+
+Lemma allpairs_cons f x s t :
+  [seq f x y | x <- x :: s, y <- t x] =
+    [seq f x y | y <- t x] ++ [seq f x y | x <- s, y <- t x].
+Proof. by []. Qed.
+
 Lemma eq_allpairs (f1 f2 : forall x, T x -> R) s t :
     (forall x, f1 x =1 f2 x) ->
   [seq f1 x y | x <- s, y <- t x] = [seq f2 x y | x <- s, y <- t x].
-Proof. by  move=> eq_f; rewrite (eq_map (fun x => eq_map (eq_f x) (t x))). Qed.
+Proof. by move=> eq_f; rewrite (eq_map (fun x => eq_map (eq_f x) (t x))). Qed.
+
+Lemma eq_allpairsr (f : forall x, T x -> R) s t1 t2 : (forall x, t1 x = t2 x) ->
+  [seq f x y | x <- s, y <- t1 x] = [seq f x y | x <- s, y <- t2 x].
+(* From Coq 8.10 Proof. by move=> eq_t; under eq_map do rewrite eq_t. Qed. *)
+Proof. by move=> eq_t; congr flatten; apply: eq_map => x; rewrite eq_t. Qed.
 
 Lemma allpairs_cat f s1 s2 t :
   [seq f x y | x <- s1 ++ s2, y <- t x] =
     [seq f x y | x <- s1, y <- t x] ++ [seq f x y | x <- s2, y <- t x].
 Proof. by rewrite map_cat flatten_cat. Qed.
+
+Lemma allpairs_rcons f x s t :
+  [seq f x y | x <- rcons s x, y <- t x] =
+    [seq f x y | x <- s, y <- t x] ++ [seq f x y | y <- t x].
+Proof. by rewrite -cats1 allpairs_cat allpairs1l. Qed.
 
 Lemma allpairs_mapl f (g : S' -> S) s t :
   [seq f x y | x <- map g s, y <- t x] = [seq f (g x) y | x <- s, y <- t (g x)].
@@ -3165,20 +3198,43 @@ Section MemAllPairs.
 Variables (S : Type) (T : S -> Type) (R : eqType).
 Implicit Types (f : forall x, T x -> R) (s : seq S).
 
-Lemma allpairs_catr f s t1 t2 :
-  [seq f x y | x <- s, y <- t1 x ++ t2 x] =i
-  [seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x].
+Lemma perm_allpairs_catr f s t1 t2 :
+  perm_eql [seq f x y | x <- s, y <- t1 x ++ t2 x]
+           ([seq f x y | x <- s, y <- t1 x] ++ [seq f x y | x <- s, y <- t2 x]).
 Proof.
-move=> z; rewrite mem_cat; elim: s => //= x s ih.
-by rewrite map_cat !mem_cat ih !orbA; congr orb; rewrite orbAC.
+apply/permPl; rewrite perm_sym; elim: s => //= x s ihs.
+by rewrite perm_catACA perm_cat ?map_cat.
 Qed.
 
-Lemma allpairs_consr f s t1 t2 :
-  [seq f x y | x <- s, y <- t1 x :: t2 x] =i
-  [seq f x (t1 x) | x <- s] ++ [seq f x y | x <- s, y <- t2 x].
+Lemma mem_allpairs_catr f s y0 t :
+  [seq f x y | x <- s, y <- y0 x ++ t x] =i
+    [seq f x y | x <- s, y <- y0 x] ++ [seq f x y | x <- s, y <- t x].
+Proof. exact/perm_mem/permPl/perm_allpairs_catr. Qed.
+
+Lemma perm_allpairs_consr f s y0 t :
+  perm_eql [seq f x y | x <- s, y <- y0 x :: t x]
+           ([seq f x (y0 x) | x <- s] ++ [seq f x y | x <- s, y <- t x]).
 Proof.
-by move=> z; rewrite (allpairs_catr f s (fun x => [:: t1 x])) /= flatten_map1.
+by apply/permPl; rewrite (perm_allpairs_catr _ _ (fun=> [:: _])) allpairs1r.
 Qed.
+
+Lemma mem_allpairs_consr f s t y0 :
+  [seq f x y | x <- s, y <- y0 x :: t x] =i
+  [seq f x (y0 x) | x <- s] ++ [seq f x y | x <- s, y <- t x].
+Proof. exact/perm_mem/permPl/perm_allpairs_consr. Qed.
+
+Lemma allpairs_rconsr f s y0 t :
+  perm_eql [seq f x y | x <- s, y <- rcons (t x) (y0 x)]
+           ([seq f x y | x <- s, y <- t x] ++ [seq f x (y0 x) | x <- s]).
+Proof.
+apply/permPl; rewrite -(eq_allpairsr _ _ (fun=> cats1 _ _)).
+by rewrite perm_allpairs_catr allpairs1r.
+Qed.
+
+Lemma mem_allpairs_rconsr f s t y0 :
+  [seq f x y | x <- s, y <- rcons (t x) (y0 x)] =i
+    ([seq f x y | x <- s, y <- t x] ++ [seq f x (y0 x) | x <- s]).
+Proof. exact/perm_mem/permPl/allpairs_rconsr. Qed.
 
 End MemAllPairs.
 
@@ -3596,6 +3652,12 @@ Notation uniq_perm_eq := (deprecate uniq_perm_eq uniq_perm _ _ _)
 Notation perm_eq_iotaP := (deprecate perm_eq_iotaP perm_iotaP) (only parsing).
 Notation perm_undup_count := (deprecate perm_undup_count perm_count_undup _ _)
   (only parsing).
-
 Notation iota_add := (deprecate iota_add iotaD) (only parsing).
 Notation iota_addl := (deprecate iota_addl iotaDl) (only parsing).
+
+Notation allpairs_catr :=
+  (deprecate allpairs_catr mem_allpairs_catr _ _ _) (only parsing).
+Notation allpairs_consr :=
+  (deprecate allpairs_consr mem_allpairs_consr _ _ _) (only parsing).
+Notation perm_allpairs_rconsr :=
+  (deprecate perm_allpairs_rconsr allpairs_rconsr _ _ _) (only parsing).

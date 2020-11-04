@@ -244,7 +244,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `comm_horner_mx2`, `horner_mx_stable`, `comm_mx_stable_kermxpoly`,
   and `comm_mx_stable_geigenspace`.
 
-- in `ssralg.v`: 
+- in `ssralg.v`:
    + Lemma `expr_sum` : equivalent for ring of `expn_sum`
    + Lemma `prodr_natmul` : generalization of `prodrMn_const`.
    Its name will become `prodrMn` in the next release when this name will become available (cf. Renamed section)
@@ -252,7 +252,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `polydiv.v`, new lemma `dvdpNl`.
 - in `perm.v` new lemma `permS01`.
 
-- in `seq.v`, new definition `rot_add` and new lemmas `rot_minn`, `leq_rot_add`, `rot_addC`, `rot_rot_add`.
+- in `seq.v`, new definition `rot_add` and new lemmas `rot_minn`,
+  `leq_rot_add`, `rot_addC`, `rot_rot_add`.
+
+- in `seq.v`, new lemmas `perm_catACA`, `allpairs0l`, `allpairs0r`,
+  `allpairs1l`, `allpairs1r`, `allpairs_cons`, `eq_allpairsr`,
+  `allpairs_rcons`, `perm_allpairs_catr`, `perm_allpairs_consr`,
+  `mem_allpairs_rconsr`, and `allpairs_rconsr` (with the alias
+  `perm_allpairs_rconsr` for the sake of uniformity, but which is
+  already deprecated in favor of `allpairs_rconsr`, cf renamed
+  section).
 
 ### Changed
 
@@ -366,7 +375,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `odd_(opp|mul|exp)` -> `odd(N|M|X)`
   + `sqrn_sub` -> `sqrnB`
 
-- in `seq.v`, `iota_add(|l)` -> `iotaD(|l)`
+- in `seq.v`,
+  + `iota_add(|l)` -> `iotaD(|l)`
+  + `allpairs_(cons|cat)r` -> `mem_allpairs_(cons|cat)r`
+    (`allpairs_consr` and `allpairs_catr` are now deprecated alias,
+    and will be attributed to the new `perm_allpairs_catr`).
 
 - in `div.v`
   + `coprime_mul(l|r)` -> `coprimeM(l|r)`
