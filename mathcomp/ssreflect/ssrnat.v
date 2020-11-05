@@ -2030,13 +2030,14 @@ Notation "@ 'decr_inj_in'" :=
   (deprecate decr_inj_in decn_inj_in) (at level 10, only parsing) : fun_scope.
 Notation decr_inj_in := (@decr_inj_in _ _) (only parsing).
 
-Notation "@ 'iter_add'" :=
-  (deprecate iter_add iterD) (at level 10, only parsing) : fun_scope.
 Notation "@ 'odd_opp'" :=
   (deprecate odd_opp oddN) (at level 10, only parsing) : fun_scope.
 Notation "@ 'sqrn_sub'" :=
   (deprecate sqrn_sub sqrnB) (at level 10, only parsing) : fun_scope.
-Notation iter_add := (@iter_add _) (only parsing).
+
+#[deprecated(since="mathcomp 1.12.0", note="Use iterD instead.")]
+Notation iter_add := iterD (only parsing).
+
 Notation maxn_mulr := (deprecate maxn_mulr maxnMr) (only parsing).
 Notation maxn_mull := (deprecate maxn_mull maxnMl) (only parsing).
 Notation minn_mulr := (deprecate minn_mulr minnMr) (only parsing).
