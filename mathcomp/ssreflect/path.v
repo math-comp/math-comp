@@ -227,7 +227,7 @@ Proof. by move=> Pxs; rewrite filter_mask; exact: path_mask_in. Qed.
 Lemma cycle_mask_in m s : all P s -> cycle leT s -> cycle leT (mask m s).
 Proof.
 case: (resize_mask m s) => {m} m sizeE ->.
-elim: m s sizeE => [|[]m ih] [|x s] //= [sizeE] /andP [Px Ps].
+elim: m s sizeE => [|[] m ih] [|x s] //= [sizeE] /andP[Px Ps].
 - rewrite -!cats1 -(mask_cat [:: true] [:: x]) //.
   by apply: path_mask_in; rewrite /= all_cat /= Px Ps.
 - move=> xsx; apply: ih => // {sizeE}; case: s xsx Ps => //= y s.

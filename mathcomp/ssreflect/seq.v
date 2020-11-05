@@ -1923,9 +1923,7 @@ Lemma mask_cat m1 m2 s1 s2 :
 Proof. by move: m1 s1; apply: seq_ind2 => // -[] m1 x1 s1 /= _ ->. Qed.
 
 Lemma all_mask a m s : all a s -> all a (mask m s).
-Proof.
-by elim: m s => [|[] m IHm] [|x s] //= /andP [? /IHm ->]; rewrite ?andbT.
-Qed.
+Proof. by elim: s m => [|x s IHs] [|[] m]//= /andP[ax /IHs->]; rewrite ?ax. Qed.
 
 Lemma has_mask_cons a b m x s :
   has a (mask (b :: m) (x :: s)) = b && a x || has a (mask m s).
