@@ -321,6 +321,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `>=< y` stands for `[pred x | x >=< y]`
 
 - in `ssrint.v`, generalized `mulpz` for any `ringType`.
+- In `fintype.v`, lemmas `inj_card_onto` and `inj_card_bij` take a
+  weaker hypothesis (i.e. `#|T| >= #|T'|` instead of `#|T| = #|T'|`
+  thanks to `leq_card` under injectivity assumption).
 
 ### Renamed
 
