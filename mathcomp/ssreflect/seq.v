@@ -1395,12 +1395,13 @@ Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. exact/inj_eq/rot_inj. Qed.
 
+(* lemmas about the pivot pattern [_ ++ _ :: _] *)
 
-Lemma index_pivot x s1 s2 (s := s1 ++ x :: s2) : x \notin s1 -> 
+Lemma index_pivot x s1 s2 (s := s1 ++ x :: s2) : x \notin s1 ->
   index x s = size s1.
 Proof. by rewrite index_cat/= eqxx addn0; case: ifPn. Qed.
 
-Lemma take_pivot x s2 s1 (s := s1 ++ x :: s2) : x \notin s1 -> 
+Lemma take_pivot x s2 s1 (s := s1 ++ x :: s2) : x \notin s1 ->
   take (index x s) s = s1.
 Proof. by move=> /index_pivot->; rewrite take_size_cat. Qed.
 
@@ -1419,7 +1420,7 @@ Lemma eqseq_pivot2r x s1 s2 s3 s4 : x \notin s2 -> x \notin s4 ->
   (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
 Proof.
 move=> xNs2 xNs4; rewrite -(can_eq revK) !rev_pivot.
-by rewrite eqseq_pivot2l ?mem_rev// !(can_eq revK) andbC.
+by rewrite eqseq_pivot2l ?mem_rev // !(can_eq revK) andbC.
 Qed.
 
 Lemma eqseq_pivotl x s1 s2 s3 s4 : x \notin s1 -> x \notin s2 ->
@@ -2394,7 +2395,7 @@ Proof.
 move => uniq_s sub_s'_s; have uniq_s' := subseq_uniq sub_s'_s uniq_s.
 have/eqP {sub_s'_s uniq_s} := subseq_uniqP _ uniq_s sub_s'_s.
 rewrite !filter_cat /= mem_cat inE eqxx orbT /=.
-rewrite eqseq_pivot_uniql // => /andP [/eqP -> /eqP ->].
+rewrite uniq_eqseq_pivotl // => /andP [/eqP -> /eqP ->].
 by rewrite !filter_subseq.
 Qed.
 
