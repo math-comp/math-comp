@@ -1396,29 +1396,57 @@ Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. exact/inj_eq/rot_inj. Qed.
 
 
-Lemma eqseq_pivot x s1 s2 s3 s4 : x \notin s1 -> x \notin s3 ->
-   s1 ++ x :: s2 == s3 ++ x :: s4 = (s1 == s3) && (s2 == s4).
+Lemma index_pivot x s1 s2 (s := s1 ++ x :: s2) : x \notin s1 -> 
+  index x s = size s1.
+Proof. by rewrite index_cat/= eqxx addn0; case: ifPn. Qed.
+
+Lemma take_pivot x s2 s1 (s := s1 ++ x :: s2) : x \notin s1 -> 
+  take (index x s) s = s1.
+Proof. by move=> /index_pivot->; rewrite take_size_cat. Qed.
+
+Lemma rev_pivot x s1 s2 : rev (s1 ++ x :: s2) = rev s2 ++ x :: rev s1.
+Proof. by rewrite rev_cat rev_cons cat_rcons. Qed.
+
+Lemma eqseq_pivot2l x s1 s2 s3 s4 : x \notin s1 -> x \notin s3 ->
+  (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
 Proof.
-move=> xNs1 xNs3; apply/idP/idP => [E|/andP [/eqP-> /eqP->] //].
-suff S : size s1 = size s3 by rewrite eqseq_cat // eqseq_cons eqxx in E.
-gen have I,I1 : s1 s2 xNs1 {E} / size s1 = index x (s1 ++ x :: s2).
-  by rewrite index_cat (negPf xNs1) index_head addn0.
-by rewrite I1 (eqP E) -I.
+move=> xNs1 xNs3; apply/idP/idP => [E|/andP[/eqP-> /eqP->]//].
+suff S : size s1 = size s3 by rewrite eqseq_cat// eqseq_cons eqxx in E.
+by rewrite -(index_pivot s2 xNs1) (eqP E) index_pivot.
 Qed.
 
-Lemma eqseq_pivot_uniqr x s1 s2 s3 s4 (s := s3 ++ x :: s4) :
-  uniq s -> s1 ++ x :: s2 == s = (s1 == s3) && (s2 == s4).
+Lemma eqseq_pivot2r x s1 s2 s3 s4 : x \notin s2 -> x \notin s4 ->
+  (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
 Proof.
-move=> /= uniq_s; apply/idP/idP => [/eqP E|/andP [/eqP-> /eqP->] //=].
-have N1 p1 p2 : uniq (p1 ++ x :: p2) -> x \notin p1.
-  by rewrite cat_uniq /=; case (_ \in p1); rewrite //= andbF.
-by rewrite -(@eqseq_pivot x) ?E // ?(N1 s3 s4) // (N1 s1 s2) ?E.
+move=> xNs2 xNs4; rewrite -(can_eq revK) !rev_pivot.
+by rewrite eqseq_pivot2l ?mem_rev// !(can_eq revK) andbC.
 Qed.
 
-Lemma eqseq_pivot_uniql x s1 s2 s3 s4 (s := s1 ++ x :: s2) :
-  uniq s -> s == s3 ++ x :: s4 = (s1 == s3) && (s2 == s4).
+Lemma eqseq_pivotl x s1 s2 s3 s4 : x \notin s1 -> x \notin s2 ->
+  (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
 Proof.
-by move=> ?; rewrite eq_sym eqseq_pivot_uniqr// [_ == s1]eq_sym [_ == s2]eq_sym.
+move=> xNs1 xNs2; apply/idP/idP => [E|/andP[/eqP-> /eqP->]//].
+rewrite -(@eqseq_pivot2l x)//; have /eqP/(congr1 (count_mem x)) := E.
+rewrite !count_cat/= eqxx !addnS (count_memPn _ _ xNs1) (count_memPn _ _ xNs2).
+by move=> -[/esym/eqP]; rewrite addn_eq0 => /andP[/eqP/count_memPn].
+Qed.
+
+Lemma eqseq_pivotr x s1 s2 s3 s4 : x \notin s3 -> x \notin s4 ->
+  (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
+Proof.
+by move=> *; rewrite eq_sym eqseq_pivotl// [s3 == _]eq_sym [s4 == _]eq_sym.
+Qed.
+
+Lemma uniq_eqseq_pivotl x s1 s2 s3 s4 : uniq (s1 ++ x :: s2) ->
+  (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
+Proof.
+by rewrite uniq_catC/= mem_cat => /andP[/norP[? ?] _]; rewrite eqseq_pivotl.
+Qed.
+
+Lemma uniq_eqseq_pivotr x s1 s2 s3 s4 : uniq (s3 ++ x :: s4) ->
+  (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
+Proof.
+by move=> ?; rewrite eq_sym uniq_eqseq_pivotl// [s3 == _]eq_sym [s4 == _]eq_sym.
 Qed.
 
 End EqSeq.
@@ -2165,8 +2193,7 @@ Lemma subseq_rot p s n :
 Proof.
 move => /subseqP [m size_m ->].
 exists (count id (take n m)); last by rewrite -mask_rot // mask_subseq.
-apply: leq_trans (count_size _ _) _; rewrite size_take.
-by case: (ltnP n (size m)).
+by rewrite (leq_trans (count_size _ _))// size_take; case: ltnP.
 Qed.
 
 End Subseq.
