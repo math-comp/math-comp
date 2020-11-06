@@ -2035,7 +2035,8 @@ Notation "@ 'odd_opp'" :=
 Notation "@ 'sqrn_sub'" :=
   (deprecate sqrn_sub sqrnB) (at level 10, only parsing) : fun_scope.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use iterD instead.")]
+(* TODO: restore when Coq 8.10 is no longer supported                *)
+(* #[deprecated(since="mathcomp 1.13.0", note="Use iterD instead.")] *)
 Notation iter_add := iterD (only parsing).
 
 Notation maxn_mulr := (deprecate maxn_mulr maxnMr) (only parsing).
