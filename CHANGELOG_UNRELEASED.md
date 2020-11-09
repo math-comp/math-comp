@@ -221,12 +221,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   boolean versions of matrix commutation, `comm_mx A B` is
   definitionally equal to `GRing.comm A B` when `A B : 'M_n.+1`, this
   is witnessed by the lemma `comm_mxE`.  New notation `all_comm_mx`
-  stands for `allrel comm_mxb`. New lemmas `comm_mx_sym`, `comm_mx_refl`,
-  `comm_mx0`, `comm0mx`, `comm_mx1`, `comm1mx`, `comm_mxN`, `comm_mxN1`,
-  `comm_mxD`, `comm_mxB`, `comm_mx_sum`, `comm_mxP`, `all_comm_mxP`,
-  `all_comm_mx1`, `all_comm_mx2P`, `all_comm_mx_cons`, `comm_mxC`, and
-  `commCmx`. The common arguments of these lemmas `R` and `n` are
-  maximal implicits.
+  stands for `allrel comm_mxb`. New lemmas `comm_mx_sym`,
+  `comm_mx_refl`, `comm_mx0`, `comm0mx`, `comm_mx1`, `comm1mx`,
+  `comm_mxN`, `comm_mxN1`, `comm_mxD`, `comm_mxB`, `comm_mx_sum`,
+  `comm_mxP`, `all_comm_mxP`, `all_comm_mx1`, `all_comm_mx2P`,
+  `all_comm_mx_cons`, `comm_mx_scalar`, and `comm_scalar_mx`. The
+  common arguments of these lemmas `R` and `n` are maximal implicits.
 
   - in `seq.v`, added `in_mask`, `cons_subseq`, `undup_subseq`, `subset_maskP`.
   - in `fintype.v`, added `mask_enum_ord`.

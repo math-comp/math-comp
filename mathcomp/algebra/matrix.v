@@ -2889,11 +2889,11 @@ Qed.
 Lemma mul_mx_scalar m n a (A : 'M[R]_(m, n)) : A *m a%:M = a *: A.
 Proof. by rewrite scalar_mxC mul_scalar_mx. Qed.
 
-Lemma comm_mxC n a (A : 'M[R]_n) : comm_mx A a%:M.
+Lemma comm_mx_scalar n a (A : 'M[R]_n) : comm_mx A a%:M.
 Proof. by rewrite /comm_mx mul_mx_scalar mul_scalar_mx. Qed.
 
-Lemma commCmx n a (A : 'M[R]_n) : comm_mx a%:M A.
-Proof. exact/comm_mx_sym/comm_mxC. Qed.
+Lemma comm_scalar_mx n a (A : 'M[R]_n) : comm_mx a%:M A.
+Proof. exact/comm_mx_sym/comm_mx_scalar. Qed.
 
 Lemma mxtrace_mulC m n (A : 'M[R]_(m, n)) B :
    \tr (A *m B) = \tr (B *m A).
@@ -3140,16 +3140,16 @@ End ComMatrix.
 
 Arguments lin_mul_row {R m n} u.
 Arguments lin_mulmx {R m n p} A.
-Arguments comm_mxC {R n}.
-Arguments commCmx {R n}.
+Arguments comm_mx_scalar {R n}.
+Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
 
 Canonical matrix_finAlgType (R : finComRingType) n' :=
   [finAlgType R of 'M[R]_n'.+1].
 
-Hint Resolve comm_mxC commCmx : core.
+Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
-Notation "@ 'scalar_mx_comm'" := (deprecate scalar_mx_comm comm_mxC)
+Notation "@ 'scalar_mx_comm'" := (deprecate scalar_mx_comm comm_mx_scalar)
   (at level 10, only parsing) : fun_scope.
 Notation scalar_mx_comm := (@scalar_mx_comm _ _) (only parsing).
 

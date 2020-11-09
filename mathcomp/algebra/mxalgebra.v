@@ -2291,7 +2291,7 @@ Lemma comm_mx_stable_eigenspace (f g : 'M[F]_n) a :
   comm_mx f g -> stablemx (eigenspace f a) g.
 Proof.
 move=> cfg; rewrite comm_mx_stable_ker//.
-by apply/comm_mx_sym/comm_mxB => //; apply:comm_mxC.
+by apply/comm_mx_sym/comm_mxB => //; apply:comm_mx_scalar.
 Qed.
 
 End Commutation.
