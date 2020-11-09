@@ -1,15 +1,15 @@
 # Design:
-# - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.7 .)
+# - build stage (e.g. docker build -t mathcomp-dev:$IID_$SLUG_coq-8.12 .)
 #   - all branches (not tags) => push on GitLab registry
 #   - GitHub PRs => push on GitLab and report back thanks to @coqbot
 # - test stage (image: mathcomp-dev:$IID_$SLUG_coq-8.7)
 #   - script template foreach project (custom CONTRIB_URL, script)
 #   - jobs foreach project and Coq version (custom COQ_VERSION, CONTRIB_VERSION)
-# - deploy stage (only branch "master" and environment "deployment")
+# - deploy stage (only branch "master" and environment deployments "mathcomp/*")
 #   - pull each built image from GitLab registry => push to Docker Hub
 # + scheduled build & deploy for mathcomp/mathcomp-dev:coq-dev
 #
-# Config for protected environment "deployment":
+# Config for protected environment deployments "mathcomp/*":
 # - set vars HUB_REGISTRY, HUB_REGISTRY_USER, HUB_REGISTRY_IMAGE, HUB_TOKEN
 #
 # Remark:
@@ -47,9 +47,12 @@ stages:
   script:
     - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" -t "${IMAGE}" .
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 make-coq-latest:
   extends: .make-build
@@ -72,15 +75,19 @@ make-coq-latest:
     - docker push "${IMAGE}"
     - docker logout "${CI_REGISTRY}"
   except:
-    - tags
-    - merge_requests
+    refs:
+      - tags
+      - merge_requests
 
 .opam-build-once:
   extends: .opam-build
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 coq-8.9:
   extends: .opam-build-once
@@ -125,16 +132,20 @@ coq-dev:
     - cd mathcomp
     - make test-suite TEST_SKIP_BUILD=1
   except:
-    - tags
-    - merge_requests
+    refs:
+      - tags
+      - merge_requests
 
 # run "make test-suite" only for push pipelines (not for scheduled pipelines)
 .test-once:
   extends: .test
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 test-coq-dev:
   extends: .test
@@ -188,9 +199,12 @@ test-coq-8.9:
     - git rev-parse --verify HEAD
     - git describe --all --long --abbrev=40 --always --dirty
   except:
-    - tags
-    - merge_requests
-    - schedules
+    refs:
+      - tags
+      - merge_requests
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
 # Guidelines to add a library to mathcomp CI:
 # - Add a hidden job (starting with a .) .ci-lib that extends the .ci job,
@@ -207,10 +221,6 @@ test-coq-8.9:
   script:
     - make -j "${NJOBS}"
     - make install
-  except:
-    - tags
-    - merge_requests
-    - schedules
 
 ci-fourcolor-8.9:
   extends: .ci-fourcolor
@@ -246,10 +256,6 @@ ci-fourcolor-dev:
   script:
     - make -j "${NJOBS}"
     - make install
-  except:
-    - tags
-    - merge_requests
-    - schedules
 
 ci-odd-order-8.9:
   extends: .ci-odd-order
@@ -466,14 +472,15 @@ ci-fcsl-pcm-dev:
   services:
     - docker:dind
   environment:
-    name: deployment
+    # here, CI_JOB_NAME must not contain any ':', hence the use of '_'
+    name: "mathcomp/${CI_JOB_NAME}"
     url: https://hub.docker.com/r/mathcomp/mathcomp-dev
   variables:
     GIT_STRATEGY: none
-    HUB_IMAGE: "mathcomp/${CI_JOB_NAME}"
     IMAGE_PREFIX: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}"
   script:
-    - export IMAGE="${IMAGE_PREFIX}_${CI_JOB_NAME##*:}"
+    - export IMAGE="${IMAGE_PREFIX}_${CI_JOB_NAME##*_}"
+    - export HUB_IMAGE="mathcomp/${CI_JOB_NAME/_/:}"
     - echo "${IMAGE}"
     - docker pull "${IMAGE}"
     - echo "${HUB_IMAGE}"
@@ -484,29 +491,33 @@ ci-fcsl-pcm-dev:
     - docker push "${HUB_IMAGE}"
     - docker logout "${HUB_REGISTRY}"
   only:
-    - master
+    refs:
+      - master
 
 .docker-deploy-once:
   extends: .docker-deploy
   except:
-    - schedules
+    refs:
+      - schedules
+    variables:
+      - $CRON_MODE == "nightly"
 
-mathcomp-dev:coq-8.9:
+mathcomp-dev_coq-8.9:
   extends: .docker-deploy-once
 
-mathcomp-dev:coq-8.10:
+mathcomp-dev_coq-8.10:
   extends: .docker-deploy-once
 
-mathcomp-dev:coq-8.11:
+mathcomp-dev_coq-8.11:
   extends: .docker-deploy-once
 
-mathcomp-dev:coq-8.12:
+mathcomp-dev_coq-8.12:
   extends: .docker-deploy-once
 
 # to uncomment when 8.13+alpha available
-# mathcomp-dev:coq-8.13:
+# mathcomp-dev_coq-8.13:
 #   # to be replaced with .docker-deploy-once when 8.13.0 available
 #   extends: .docker-deploy
 
-mathcomp-dev:coq-dev:
+mathcomp-dev_coq-dev:
   extends: .docker-deploy
