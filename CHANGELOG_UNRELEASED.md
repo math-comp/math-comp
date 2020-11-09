@@ -256,7 +256,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- in ssrbool.v, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
+- in `ssrbool.v`, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
 - in `ssrAC.v`, fix `non-reversible-notation` warnings
 
 - In the definition of structures in order.v, displays are removed from
@@ -329,7 +329,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
 - `mem_imset` -> `imset_f` (with deprecation alias, cf. Added section)
-- `mem_imset2` -> imset2_f` (with deprecation alias, cf. Added section)
+- `mem_imset2` -> `imset2_f` (with deprecation alias, cf. Added section)
 
 - in `interval.v`, we deprecate, rename, and relocate to `order.v` the following:
   + `lersif_(trans|anti)` -> `lteif_(trans|anti)`
