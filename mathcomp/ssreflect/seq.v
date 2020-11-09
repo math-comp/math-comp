@@ -2387,23 +2387,37 @@ elim: m s => [|[] m ih] [|x s] //=.
 - by case: ifP => [/mem_mask -> // | _ /andP [] _ /ih].
 Qed.
 
-Lemma count_maskP s1 s2 : (forall x, count_mem x s1 <= count_mem x s2) ->
-  exists2 m : bitseq, size m = size s2 & perm_eq s1 (mask m s2).
+Lemma leq_count_mask P m s : count P (mask m s) <= count P s.
 Proof.
-move=> s1_le; suff [m mP]: exists m, perm_eq s1 (mask m s2).
+by elim: s m => [|x s IHs] [|[] m]//=;
+   rewrite ?leq_add2l (leq_trans (IHs _)) ?leq_addl.
+Qed.
+
+Lemma leq_count_subseq P s1 s2 : subseq s1 s2 -> count P s1 <= count P s2.
+Proof. by move=> /subseqP[m _ ->]; rewrite leq_count_mask. Qed.
+
+Lemma count_maskP s1 s2 :
+  (forall x, count_mem x s1 <= count_mem x s2) <->
+    exists2 m : bitseq, size m = size s2 & perm_eq s1 (mask m s2).
+Proof.
+split=> [s1_le|[m _ /allP/(_ _ _)/eqP s1ms2 x]]; last first.
+  have [xs1|/count_memPn->//] := boolP (x \in s1).
+  by rewrite s1ms2 ?mem_cat ?xs1// leq_count_mask.
+suff [m mP]: exists m, perm_eq s1 (mask m s2).
   by have [m' sm' eqm] := resize_mask m s2; exists m'; rewrite -?eqm.
 elim: s2 => [|x s2 IHs]//= in s1 s1_le *.
   by exists [::]; apply/allP => x _/=; rewrite eqn_leq s1_le.
 have [y|m s1s2] := IHs (rem x s1); first by rewrite count_mem_rem leq_subLR.
-exists ((x \in s1) :: m); case: (boolP (x \in s1)).
-  by move/perm_to_rem/permPl->; rewrite perm_cons.
-by rewrite -(permPr s1s2); move/rem_id->.
+exists ((x \in s1) :: m); have [|/rem_id<-//] := boolP (x \in s1).
+by move/perm_to_rem/permPl->; rewrite perm_cons.
 Qed.
 
-Lemma count_subseqP s1 s2 : (forall x, count_mem x s1 <= count_mem x s2) ->
-  exists2 t, subseq t s2 & perm_eq s1 t.
+Lemma count_subseqP s1 s2 :
+  (forall x, count_mem x s1 <= count_mem x s2) <->
+    exists2 s, subseq s s2 & perm_eq s1 s.
 Proof.
-by move=> /count_maskP[m]; exists (mask m s2); rewrite ?mask_subseq.
+rewrite count_maskP; split=> [[m _]|[_/subseqP[m sm ->]]]; last by exists m.
+by exists (mask m s2); rewrite ?mask_subseq.
 Qed.
 
 End MiscMask.
@@ -2458,8 +2472,8 @@ Lemma subseq_rem x : {homo rem x : s1 s2 / @subseq T s1 s2}.
 Proof.
 move=> s1 s2; elim: s2 s1 => [|x2 s2 IHs2] [|x1 s1]; rewrite ?sub0seq //=.
 have [->|_] := eqVneq x1 x2; first by case: eqP => //= _ /IHs2; rewrite eqxx.
-move/IHs2/subseq_trans=> -> //.
-have [->|_] := eqVneq x x2; [apply: rem_subseq|apply: subseq_cons].
+move=> /IHs2/subseq_trans->//.
+by have [->|_] := eqVneq x x2; [apply: rem_subseq|apply: subseq_cons].
 Qed.
 
 End FilterSubseq.
