@@ -89,9 +89,6 @@ make-coq-latest:
     variables:
       - $CRON_MODE == "nightly"
 
-coq-8.9:
-  extends: .opam-build-once
-
 coq-8.10:
   extends: .opam-build-once
 
@@ -173,11 +170,6 @@ test-coq-8.10:
   variables:
     COQ_VERSION: "8.10"
 
-test-coq-8.9:
-  extends: .test-once
-  variables:
-    COQ_VERSION: "8.9"
-
 # set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
 .ci:
   stage: test
@@ -222,11 +214,6 @@ test-coq-8.9:
     - make -j "${NJOBS}"
     - make install
 
-ci-fourcolor-8.9:
-  extends: .ci-fourcolor
-  variables:
-    COQ_VERSION: "8.9"
-
 ci-fourcolor-8.10:
   extends: .ci-fourcolor
   variables:
@@ -256,11 +243,6 @@ ci-fourcolor-dev:
   script:
     - make -j "${NJOBS}"
     - make install
-
-ci-odd-order-8.9:
-  extends: .ci-odd-order
-  variables:
-    COQ_VERSION: "8.9"
 
 ci-odd-order-8.10:
   extends: .ci-odd-order
@@ -322,11 +304,6 @@ ci-lemma-overloading-dev:
     - opam pin add -n -k path coq-mathcomp-bigenough .
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-bigenough
 
-ci-bigenough-8.9:
-  extends: .ci-bigenough
-  variables:
-    COQ_VERSION: "8.9"
-
 ci-bigenough-8.10:
   extends: .ci-bigenough
   variables:
@@ -358,11 +335,6 @@ ci-bigenough-dev:
 #     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-real-closed
 #     - opam install -y -v -j "${NJOBS}" coq-mathcomp-real-closed
 # 
-# ci-real-closed-8.9:
-#   extends: .ci-real-closed
-#   variables:
-#     COQ_VERSION: "8.9"
-# 
 # ci-real-closed-dev:
 #   extends: .ci-real-closed
 #   variables:
@@ -379,16 +351,6 @@ ci-bigenough-dev:
 #     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-analysis
 #     - opam install -y -v -j "${NJOBS}" coq-mathcomp-analysis
 # 
-# ci-analysis-8.8:
-#   extends: .ci-analysis
-#   variables:
-#     COQ_VERSION: "8.8"
-# 
-# ci-analysis-8.9:
-#   extends: .ci-analysis
-#   variables:
-#     COQ_VERSION: "8.9"
-# 
 # ci-analysis-dev:
 #   extends: .ci-analysis
 #   variables:
@@ -404,11 +366,6 @@ ci-bigenough-dev:
     - opam pin add -n -k path coq-mathcomp-finmap .
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-finmap
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-finmap
-
-ci-finmap-8.9:
-  extends: .ci-finmap
-  variables:
-    COQ_VERSION: "8.9"
 
 ci-finmap-8.10:
   extends: .ci-finmap
@@ -501,9 +458,6 @@ ci-fcsl-pcm-dev:
       - schedules
     variables:
       - $CRON_MODE == "nightly"
-
-mathcomp-dev_coq-8.9:
-  extends: .docker-deploy-once
 
 mathcomp-dev_coq-8.10:
   extends: .docker-deploy-once

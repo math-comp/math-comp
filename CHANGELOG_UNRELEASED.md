@@ -58,6 +58,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
 
+- Added intro pattern ltac views for dup, swap, apply:
+  `/[apply]`, `/[swap]` and `/[dup]`.
+
 - in `bigop.v` new lemma `sig_big_dep`, analogous to `pair_big_dep`
   but with an additional dependency in the index types `I` and `J`.
 - in `fintype.v` adds lemma `split_ordP`, a variant of `splitP` which

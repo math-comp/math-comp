@@ -1678,7 +1678,7 @@ Hint Resolve real1 : core.
 Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
-Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) h /h; rewrite !ler_opp2. Qed.
+Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !ler_opp2. Qed.
 
 Lemma real_leVge x y : x \is real -> y \is real -> (x <= y) || (y <= x).
 Proof. by rewrite -comparabler0 -comparable0r => /comparabler_trans P/P. Qed.
