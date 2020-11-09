@@ -1434,9 +1434,7 @@ Qed.
 
 Lemma eqseq_pivotr x s1 s2 s3 s4 : x \notin s3 -> x \notin s4 ->
   (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
-Proof.
-by move=> *; rewrite eq_sym eqseq_pivotl// [s3 == _]eq_sym [s4 == _]eq_sym.
-Qed.
+Proof. by move=> *; rewrite eq_sym eqseq_pivotl//; case: eqVneq => /=. Qed.
 
 Lemma uniq_eqseq_pivotl x s1 s2 s3 s4 : uniq (s1 ++ x :: s2) ->
   (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
@@ -1446,9 +1444,7 @@ Qed.
 
 Lemma uniq_eqseq_pivotr x s1 s2 s3 s4 : uniq (s3 ++ x :: s4) ->
   (s1 ++ x :: s2 == s3 ++ x :: s4) = (s1 == s3) && (s2 == s4).
-Proof.
-by move=> ?; rewrite eq_sym uniq_eqseq_pivotl// [s3 == _]eq_sym [s4 == _]eq_sym.
-Qed.
+Proof. by move=> ?; rewrite eq_sym uniq_eqseq_pivotl//; case: eqVneq => /=. Qed.
 
 End EqSeq.
 
@@ -2177,16 +2173,13 @@ Lemma subseq_rev s1 s2 : subseq (rev s1) (rev s2) = subseq s1 s2.
 Proof.
 wlog suff W : s1 s2 / subseq s1 s2 -> subseq (rev s1) (rev s2).
   by apply/idP/idP => /W //; rewrite !revK.
-move/subseqP => [m size_m mask_m]; apply/subseqP.
-by exists (rev m); rewrite ?size_rev // -rev_mask // -mask_m.
+by case/subseqP => m size_m ->; rewrite rev_mask // mask_subseq.
 Qed.
 
-Lemma subseq_cat2l (s s1 s2 : seq T) :
-  subseq (s ++ s1) (s ++ s2) = subseq s1 s2.
+Lemma subseq_cat2l s s1 s2 : subseq (s ++ s1) (s ++ s2) = subseq s1 s2.
 Proof. by elim: s => // x s IHs; rewrite !cat_cons /= eqxx. Qed.
 
-Lemma subseq_cat2r (s s1 s2 : seq T) :
-  subseq (s1 ++ s) (s2 ++ s) = subseq s1 s2.
+Lemma subseq_cat2r s s1 s2 : subseq (s1 ++ s) (s2 ++ s) = subseq s1 s2.
 Proof. by rewrite -subseq_rev !rev_cat subseq_cat2l subseq_rev. Qed.
 
 Lemma subseq_rot p s n :

@@ -274,7 +274,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `mask_rcons, `rev_mask`, `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, and
 - in `seq.v` new lemmas `index_pivot`, `take_pivot`, `rev_pivot`,
   `eqseq_pivot2l`, `eqseq_pivot2r`, `eqseq_pivotl`, `eqseq_pivotr`
-  `uniq_eqseq_pivotl`, `uniq_eqseq_pivotr`, `mask_rcons, `rev_mask`,
+  `uniq_eqseq_pivotl`, `uniq_eqseq_pivotr`, `mask_rcons`, `rev_mask`,
   `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, and
   `uniq_subseq_pivot`.
 
