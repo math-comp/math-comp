@@ -257,8 +257,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `seq.v`, new lemmas `allss` and `all_mask`.
 
 - in `path.v`, new lemmas `sub_cycle(_in)`, `eq_cycle_in`,
-  `(path|cycle|sorted)_(mask|filter)_in`, `cycle_(mask|filter)_in`, `rev_cycle`,
-  `cycle_map`, `(homo|mono)_cycle(_in)`.
+  `(path|sorted)_(mask|filter)_in`, `rev_cycle`, `cycle_map`,
+  `(homo|mono)_cycle(_in)`.
 
 ### Changed
 

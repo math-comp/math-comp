@@ -224,21 +224,6 @@ Lemma path_filter_in x a s :
   all P (x :: s) -> path leT x s -> path leT x (filter a s).
 Proof. by move=> Pxs; rewrite filter_mask; exact: path_mask_in. Qed.
 
-Lemma cycle_mask_in m s : all P s -> cycle leT s -> cycle leT (mask m s).
-Proof.
-case: (resize_mask m s) => {m} m sizeE ->.
-elim: m s sizeE => [|[] m ih] [|x s] //= [sizeE] /andP[Px Ps].
-- rewrite -!cats1 -(mask_cat [:: true] [:: x]) //.
-  by apply: path_mask_in; rewrite /= all_cat /= Px Ps.
-- move=> xsx; apply: ih => // {sizeE}; case: s xsx Ps => //= y s.
-  rewrite !rcons_path => /and3P [xy -> sx] /andP [Py Ps] /=.
-  apply: leT_tr sx xy => //.
-  by elim: s y Ps Py => //= z s ih y /andP [Pz Ps] _; apply: ih.
-Qed.
-
-Lemma cycle_filter_in a s : all P s -> cycle leT s -> cycle leT (filter a s).
-Proof. move=> Ps; rewrite filter_mask; exact: cycle_mask_in. Qed.
-
 Lemma sorted_mask_in m s : all P s -> sorted leT s -> sorted leT (mask m s).
 Proof.
 elim: m s => [|[] m ih] [|x s] //= Pxs; first exact: path_mask_in.
@@ -263,12 +248,6 @@ Proof. exact/path_mask_in/all_predT. Qed.
 Lemma path_filter x a s : path leT x s -> path leT x (filter a s).
 Proof. by rewrite filter_mask; exact: path_mask. Qed.
 
-Lemma cycle_mask m s : cycle leT s -> cycle leT (mask m s).
-Proof. exact/cycle_mask_in/all_predT. Qed.
-
-Lemma cycle_filter a s : cycle leT s -> cycle leT (filter a s).
-Proof. move=> Ps; rewrite filter_mask; exact: cycle_mask. Qed.
-
 Lemma sorted_mask m s : sorted leT s -> sorted leT (mask m s).
 Proof. exact/sorted_mask_in/all_predT. Qed.
 
@@ -284,14 +263,10 @@ Arguments path_sorted {T e x s}.
 Arguments path_min_sorted {T e x s}.
 Arguments path_mask_in {T P leT} leT_tr {x m s}.
 Arguments path_filter_in {T P leT} leT_tr {x a s}.
-Arguments cycle_mask_in {T P leT} leT_tr {m s}.
-Arguments cycle_filter_in {T P leT} leT_tr {a s}.
 Arguments sorted_mask_in {T P leT} leT_tr {m s}.
 Arguments sorted_filter_in {T P leT} leT_tr {a s}.
 Arguments path_mask {T leT} leT_tr {x} m {s}.
 Arguments path_filter {T leT} leT_tr {x} a {s}.
-Arguments cycle_mask {T leT} leT_tr m {s}.
-Arguments cycle_filter {T leT} leT_tr a {s}.
 Arguments sorted_mask {T leT} leT_tr m {s}.
 Arguments sorted_filter {T leT} leT_tr a {s}.
 
