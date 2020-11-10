@@ -371,21 +371,77 @@ ci-finmap-8.10:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "8.10"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-671$/
 
 ci-finmap-8.11:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "8.11"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-671$/
 
 ci-finmap-8.12:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "8.12"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-671$/
 
 ci-finmap-dev:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "dev"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-671$/
+
+ci-finmap-8.10-671:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.10"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "join_idP"
+  only:
+    - /^pr-671$/
+
+ci-finmap-8.11-671:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.11"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "join_idP"
+  only:
+    - /^pr-671$/
+
+ci-finmap-8.12-671:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.12"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "join_idP"
+  only:
+    - /^pr-671$/
+
+ci-finmap-dev-671:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "dev"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "join_idP"
+  only:
+    - /^pr-671$/
 
 # The FCSL-PCM library
 .ci-fcsl-pcm:
