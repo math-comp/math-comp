@@ -329,11 +329,57 @@ ci-real-closed-8.13:
   extends: .ci-real-closed
   variables:
     COQ_VERSION: "8.13"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-(464|697)$/
 
 ci-real-closed-dev:
   extends: .ci-real-closed
   variables:
     COQ_VERSION: "dev"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-(464|697)$/
+
+ci-real-closed-8.11-464:
+  extends: .ci-real-closed
+  variables:
+    COQ_VERSION: "8.11"
+    CONTRIB_URL: "https://github.com/pi8027/real-closed.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
+
+ci-real-closed-8.12-464:
+  extends: .ci-real-closed
+  variables:
+    COQ_VERSION: "8.12"
+    CONTRIB_URL: "https://github.com/pi8027/real-closed.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
+
+ci-real-closed-8.13-464:
+  extends: .ci-real-closed
+  variables:
+    COQ_VERSION: "8.13"
+    CONTRIB_URL: "https://github.com/pi8027/real-closed.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
+
+ci-real-closed-dev-464:
+  extends: .ci-real-closed
+  variables:
+    COQ_VERSION: "dev"
+    CONTRIB_URL: "https://github.com/pi8027/real-closed.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
 
 # The finmap library
 .ci-finmap:
@@ -350,11 +396,57 @@ ci-finmap-8.13:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "8.13"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-(464|697)$/
 
 ci-finmap-dev:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "dev"
+  except:
+    - tags
+    - merge_requests
+    - schedules
+    - /^pr-(464|697)$/
+
+ci-finmap-8.11-464:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.11"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
+
+ci-finmap-8.12-464:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.12"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
+
+ci-finmap-8.13-464:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.13"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
+
+ci-finmap-dev-464:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "dev"
+    CONTRIB_URL: "https://github.com/pi8027/finmap.git"
+    CONTRIB_VERSION: "semilattices"
+  only:
+    - /^pr-(464|697)$/
 
 # The multinomials library
 .ci-multinomials:
