@@ -231,7 +231,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - in `seq.v`, added `drop_index`, `in_mask`, `cons_subseq`,
     `undup_subseq`, `leq_count_mask`, `leq_count_subseq`,
     `count_maskP`, `count_subseqP`, `count_rem`, `count_mem_rem`,
-    `rem_cons`, `remE`,  `subseq_rem` and `leq_count_uniq`.
+    `rem_cons`, `remE`, `subseq_rem`, `leq_uniq_countP`, and
+    `leq_uniq_count`.
   - in `fintype.v`, added `mask_enum_ord`.
   - in `bigop.v`, added `big_mask_tuple` and `big_mask`.
 - in `mxalgebra.v`, new notation `stablemx V f` asserting that `f`
