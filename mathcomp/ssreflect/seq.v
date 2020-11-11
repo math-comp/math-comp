@@ -2382,10 +2382,10 @@ rewrite uniq_perm ?filter_uniq ?(subseq_uniq ss12) // => x.
 by rewrite mem_filter; apply: andb_idr; apply: (mem_subseq ss12).
 Qed.
 
-Lemma uniq_subseq_pivot (s1 s2 s3 s4 : seq T) x (s := s3 ++ x :: s4) :
+Lemma uniq_subseq_pivot x (s1 s2 s3 s4 : seq T) (s := s3 ++ x :: s4) :
   uniq s -> subseq (s1 ++ x :: s2) s = (subseq s1 s3 && subseq s2 s4).
 Proof.
-move=> uniq_s; apply/idP/idP => [sub_s'_s|/andP[? ?]]; last first. 
+move=> uniq_s; apply/idP/idP => [sub_s'_s|/andP[? ?]]; last first.
   by rewrite cat_subseq //= eqxx.
 have uniq_s' := subseq_uniq sub_s'_s uniq_s.
 have/eqP {sub_s'_s uniq_s} := subseq_uniqP _ uniq_s sub_s'_s.
