@@ -263,6 +263,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   already deprecated in favor of `allpairs_rconsr`, cf renamed
   section).
 
+- in `seq.v`, new lemmas `allss` and `all_mask`.
+
+- in `path.v`, new lemmas `sub_cycle(_in)`, `eq_cycle_in`,
+  `(path|sorted)_(mask|filter)_in`, `rev_cycle`, `cycle_map`,
+  `(homo|mono)_cycle(_in)`.
+
 ### Changed
 
 - in `ssrbool.v`, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
@@ -333,6 +339,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `fintype.v`, lemmas `inj_card_onto` and `inj_card_bij` take a
   weaker hypothesis (i.e. `#|T| >= #|T'|` instead of `#|T| = #|T'|`
   thanks to `leq_card` under injectivity assumption).
+
+- in `path.v`, generalized lemmas `sub_path_in`, `sub_sorted_in`, and
+  `eq_path_in` for non-`eqType`s.
 
 ### Renamed
 
