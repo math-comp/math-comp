@@ -2185,7 +2185,7 @@ Proof. by rewrite -subseq_rev !rev_cat subseq_cat2l subseq_rev. Qed.
 Lemma subseq_rot p s n :
   subseq p s -> exists2 k, k <= n & subseq (rot k p) (rot n s).
 Proof.
-move => /subseqP [m size_m ->].
+move=> /subseqP[m size_m ->].
 exists (count id (take n m)); last by rewrite -mask_rot // mask_subseq.
 by rewrite (leq_trans (count_size _ _))// size_take; case: ltnP.
 Qed.
@@ -2383,9 +2383,11 @@ by rewrite mem_filter; apply: andb_idr; apply: (mem_subseq ss12).
 Qed.
 
 Lemma uniq_subseq_pivot (s1 s2 s3 s4 : seq T) x (s := s3 ++ x :: s4) :
-  uniq s -> subseq (s1 ++ x :: s2) s -> subseq s1 s3 /\ subseq s2 s4.
+  uniq s -> subseq (s1 ++ x :: s2) s = (subseq s1 s3 && subseq s2 s4).
 Proof.
-move => uniq_s sub_s'_s; have uniq_s' := subseq_uniq sub_s'_s uniq_s.
+move=> uniq_s; apply/idP/idP => [sub_s'_s|/andP[? ?]]; last first. 
+  by rewrite cat_subseq //= eqxx.
+have uniq_s' := subseq_uniq sub_s'_s uniq_s.
 have/eqP {sub_s'_s uniq_s} := subseq_uniqP _ uniq_s sub_s'_s.
 rewrite !filter_cat /= mem_cat inE eqxx orbT /=.
 rewrite uniq_eqseq_pivotl // => /andP [/eqP -> /eqP ->].
