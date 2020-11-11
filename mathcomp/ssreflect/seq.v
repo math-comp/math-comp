@@ -3748,7 +3748,9 @@ Notation uniq_perm_eq := (deprecate uniq_perm_eq uniq_perm _ _ _)
 Notation perm_eq_iotaP := (deprecate perm_eq_iotaP perm_iotaP) (only parsing).
 Notation perm_undup_count := (deprecate perm_undup_count perm_count_undup _ _)
   (only parsing).
-Notation iota_add := (deprecate iota_add iotaD) (only parsing).
+(* TODO: restore when Coq 8.10 is no longer supported                *)
+(* #[deprecated(since="mathcomp 1.13.0", note="Use iotaD instead.")] *)
+Notation iota_add := iotaD (only parsing).
 Notation iota_addl := (deprecate iota_addl iotaDl) (only parsing).
 
 Notation allpairs_catr :=
