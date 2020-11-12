@@ -1271,6 +1271,17 @@ elim: s => //= y s IHs /andP[/negbTE s'y /IHs-> {IHs}].
 by rewrite in_cons; case: (eqVneq y x) => // <-; rewrite s'y.
 Qed.
 
+Lemma leq_uniq_countP x s1 s2 : uniq s1 ->
+  reflect (x \in s1 -> x \in s2) (count_mem x s1 <= count_mem x s2).
+Proof.
+move/count_uniq_mem->; case: (boolP (_ \in _)) => //= _; last by constructor.
+by rewrite -has_pred1 has_count; apply: (iffP idP) => //; apply.
+Qed.
+
+Lemma leq_uniq_count s1 s2 : uniq s1 -> {subset s1 <= s2} ->
+  (forall x, count_mem x s1 <= count_mem x s2).
+Proof. by move=> s1_uniq s1_s2 x; apply/leq_uniq_countP/s1_s2. Qed.
+
 Lemma filter_pred1_uniq s x : uniq s -> x \in s -> filter (pred1 x) s = [:: x].
 Proof.
 move=> uniq_s s_x; rewrite (all_pred1P _ _ (filter_all _ _)).
@@ -1395,6 +1406,9 @@ Proof. by move=> x; rewrite -[s in RHS](cat_take_drop n0) !mem_cat /= orbC. Qed.
 Lemma eqseq_rot s1 s2 : (rot n0 s1 == rot n0 s2) = (s1 == s2).
 Proof. exact/inj_eq/rot_inj. Qed.
 
+Lemma drop_index s (n := index x0 s) : x0 \in s -> drop n s = x0 :: drop n.+1 s.
+Proof. by move=> xs; rewrite (drop_nth x0) ?index_mem ?nth_index. Qed.
+
 (* lemmas about the pivot pattern [_ ++ _ :: _] *)
 
 Lemma index_pivot x s1 s2 (s := s1 ++ x :: s2) : x \notin s1 ->
@@ -1454,9 +1468,7 @@ Implicit Types x y z : T.
 
 Lemma rot_index s x (i := index x s) : x \in s ->
   rot i s = x :: (drop i.+1 s ++ take i s).
-Proof.
-by move=> x_s; rewrite /rot (drop_nth x) ?index_mem ?nth_index// cat_cons.
-Qed.
+Proof. by move=> x_s; rewrite /rot drop_index. Qed.
 
 Variant rot_to_spec s x := RotToSpec i s' of rot i s = x :: s'.
 
@@ -2203,16 +2215,19 @@ Variables (T : eqType) (x : T).
 
 Fixpoint rem s := if s is y :: t then (if y == x then t else y :: rem t) else s.
 
+Lemma rem_cons y s : rem (y :: s) = if y == x then s else y :: rem s.
+Proof. by []. Qed.
+
+Lemma remE s : rem s = take (index x s) s ++ drop (index x s).+1 s.
+Proof. by elim: s => //= y s ->; case: eqVneq; rewrite ?drop0. Qed.
+
 Lemma rem_id s : x \notin s -> rem s = s.
-Proof.
-by elim: s => //= y s IHs /norP[neq_yx /IHs->]; rewrite eq_sym (negbTE neq_yx).
-Qed.
+Proof. by elim: s => //= y s IHs /norP[neq_yx /IHs->]; case: eqVneq neq_yx. Qed.
 
 Lemma perm_to_rem s : x \in s -> perm_eq s (x :: rem s).
 Proof.
-elim: s => // y s IHs; rewrite inE /= eq_sym perm_sym.
-case: eqP => [-> // | _ /IHs].
-by rewrite (perm_catCA [:: x] [:: y]) perm_cons perm_sym.
+move=> xs; rewrite remE -[X in perm_eq X](cat_take_drop (index x s)).
+by rewrite drop_index// -cat1s perm_catCA cat1s.
 Qed.
 
 Lemma size_rem s : x \in s -> size (rem s) = (size s).-1.
@@ -2241,6 +2256,18 @@ Proof. by move/rem_filter=> -> y; rewrite mem_filter. Qed.
 
 Lemma mem_rem_uniqF s : uniq s -> x \in rem s = false.
 Proof. by move/mem_rem_uniq->; rewrite inE eqxx. Qed.
+
+Lemma count_rem P s : count P (rem s) = count P s - (x \in s) && P x.
+Proof.
+have [/perm_to_rem/permP->|xNs]/= := boolP (x \in s); first by rewrite addKn.
+by rewrite subn0 rem_id.
+Qed.
+
+Lemma count_mem_rem y s : count_mem y (rem s) = count_mem y s - (x == y).
+Proof.
+rewrite count_rem; have []//= := boolP (x \in s).
+by case: eqP => // <- /count_memPn->.
+Qed.
 
 End Rem.
 
@@ -2347,8 +2374,18 @@ Notation "[ 'seq' E : R | i : T <- s & C ]" :=
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
 
-Lemma mask_filter (T : eqType) (s : seq T) (m : bitseq) :
-  uniq s -> mask m s = [seq i <- s | i \in mask m s].
+Section MiscMask.
+
+Lemma leq_count_mask T (P : {pred T}) m s : count P (mask m s) <= count P s.
+Proof.
+by elim: s m => [|x s IHs] [|[] m]//=;
+   rewrite ?leq_add2l (leq_trans (IHs _)) ?leq_addl.
+Qed.
+
+Variable (T : eqType).
+Implicit Types (s : seq T) (m : bitseq).
+
+Lemma mask_filter s m : uniq s -> mask m s = [seq i <- s | i \in mask m s].
 Proof.
 elim: m s => [|[] m ih] [|x s] //=.
 - by move=> _; elim: s.
@@ -2356,6 +2393,33 @@ elim: m s => [|[] m ih] [|x s] //=.
   by apply/eq_in_filter => ?; rewrite inE; case: eqP => // ->.
 - by case: ifP => [/mem_mask -> // | _ /andP [] _ /ih].
 Qed.
+
+Lemma leq_count_subseq P s1 s2 : subseq s1 s2 -> count P s1 <= count P s2.
+Proof. by move=> /subseqP[m _ ->]; rewrite leq_count_mask. Qed.
+
+Lemma count_maskP s1 s2 :
+  (forall x, count_mem x s1 <= count_mem x s2) <->
+    exists2 m : bitseq, size m = size s2 & perm_eq s1 (mask m s2).
+Proof.
+split=> [s1_le|[m _ /permP s1ms2 x]]; last by rewrite s1ms2 leq_count_mask.
+suff [m mP]: exists m, perm_eq s1 (mask m s2).
+  by have [m' sm' eqm] := resize_mask m s2; exists m'; rewrite -?eqm.
+elim: s2 => [|x s2 IHs]//= in s1 s1_le *.
+  by exists [::]; apply/allP => x _/=; rewrite eqn_leq s1_le.
+have [y|m s1s2] := IHs (rem x s1); first by rewrite count_mem_rem leq_subLR.
+exists ((x \in s1) :: m); have [|/rem_id<-//] := boolP (x \in s1).
+by move/perm_to_rem/permPl->; rewrite perm_cons.
+Qed.
+
+Lemma count_subseqP s1 s2 :
+  (forall x, count_mem x s1 <= count_mem x s2) <->
+    exists2 s, subseq s s2 & perm_eq s1 s.
+Proof.
+rewrite count_maskP; split=> [[m _]|[_/subseqP[m sm ->]]]; last by exists m.
+by exists (mask m s2); rewrite ?mask_subseq.
+Qed.
+
+End MiscMask.
 
 Section FilterSubseq.
 
@@ -2403,15 +2467,12 @@ case: eqP => [-> | _] /IHs[s3 perm_s2] {IHs}.
 by exists (rcons s3 y); rewrite -cat_cons -perm_rcons -!cats1 catA perm_cat2r.
 Qed.
 
-Lemma subset_maskP s1 s2 : uniq s1 -> {subset s1 <= s2} ->
-  exists2 m : seq bool, size m = size s2 & perm_eq s1 (mask m s2).
+Lemma subseq_rem x : {homo rem x : s1 s2 / @subseq T s1 s2}.
 Proof.
-move=> s1_uniq sub_s1_s2; pose s1' := [seq x <- undup s2 | x \in s1].
-have /subseqP[m sm s1'_eq] : subseq s1' s2.
-  by apply: subseq_trans (undup_subseq _); apply: filter_subseq.
-exists m; rewrite // -s1'_eq; apply: uniq_perm => // [|x].
-  by rewrite filter_uniq ?undup_uniq.
-by rewrite mem_filter mem_undup; have [/sub_s1_s2|] := boolP (x \in s1).
+move=> s1 s2; elim: s2 s1 => [|x2 s2 IHs2] [|x1 s1]; rewrite ?sub0seq //=.
+have [->|_] := eqVneq x1 x2; first by case: eqP => //= _ /IHs2; rewrite eqxx.
+move=> /IHs2/subseq_trans->//.
+by have [->|_] := eqVneq x x2; [apply: rem_subseq|apply: subseq_cons].
 Qed.
 
 End FilterSubseq.
