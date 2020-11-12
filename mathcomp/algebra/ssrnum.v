@@ -1584,7 +1584,7 @@ Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R V v}.
 Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
-Hint Extern 0 (is_true (0 <= norm _)) => exact: normr_ge0 : core.
+Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
 Section NumDomainOperationTheory.
 
@@ -2977,7 +2977,7 @@ Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
 
 End NormedZmoduleTheory.
 
-Hint Extern 0 (is_true (norm _ \is real)) => exact: normr_real : core.
+Hint Extern 0 (is_true (norm _ \is real)) => apply: normr_real : core.
 
 Lemma real_ler_norml x y : x \is real -> (`|x| <= y) = (- y <= x <= y).
 Proof.
