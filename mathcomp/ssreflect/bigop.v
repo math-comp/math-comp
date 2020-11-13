@@ -990,7 +990,7 @@ Lemma big_nat_widen m n1 n2 (P : pred nat) F :
       = \big[op/idx]_(m <= i < n2 | P i && (i < n1)) F i.
 Proof.
 move=> len12; symmetry; rewrite -big_filter filter_predI big_filter.
-have [ltn_trans eq_by_mem] := (ltn_trans, eq_sorted_irr ltn_trans ltnn).
+have [ltn_trans eq_by_mem] := (ltn_trans, irr_sorted_eq ltn_trans ltnn).
 congr bigop; apply: eq_by_mem; rewrite ?sorted_filter ?iota_ltn_sorted // => i.
 rewrite mem_filter !mem_index_iota andbCA andbA andb_idr => // /andP[_].
 by move/leq_trans->.

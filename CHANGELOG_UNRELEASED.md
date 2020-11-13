@@ -353,6 +353,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, generalized lemmas `sub_path_in`, `sub_sorted_in`, and
   `eq_path_in` for non-`eqType`s.
 
+- in `order.v`, generalized `sort_le_id` for any `porderType`.
+
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
@@ -400,6 +402,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     (`allpairs_consr` and `allpairs_catr` are now deprecated alias,
     and will be attributed to the new `perm_allpairs_catr`).
 
+- in `path.v`, `eq_sorted(_irr)` -> `(irr_)sorted_eq`
+
 - in `div.v`
   + `coprime_mul(l|r)` -> `coprimeM(l|r)`
   + `coprime_exp(l|r)` -> `coprimeX(l|r)`
@@ -413,6 +417,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `prime.v`
   + `primes_(mul|exp)` -> `primes(M|X)`
   + `pnat_(mul|exp)` -> `pnat(M|X)`
+
+- in `order.v`, `eq_sorted_(le|lt)` -> `(le|lt)_sorted_eq`
 
 - in `ssralg.v`
   + `prodrMn` has been renamed `prodrMn_const` (with deprecation alias, cf. Added section)
