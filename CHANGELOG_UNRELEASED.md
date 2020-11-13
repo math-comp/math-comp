@@ -85,6 +85,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `nth_count_le`, `nth_count_lt`, `count_le_gt`,
     `count_lt_ge`, `sorted_filter_gt`, `sorted_filter_ge`,
     `nth_count_ge`, `nth_count_lt` and `nth_count_eq`
+  + new lemmas `(le|lt)_path_min`, `(le|lt)_path_sortedE`,
+    `(le|lt)_(path|sorted)_pairwise`, `(le|lt)_(path|sorted)_(mask|filter)`,
+    `subseq_(le|lt)_(path|sorted)`, `lt_sorted_uniq`, `sort_lt_id`,
+    `perm_sort_leP`, `filter_sort_le`, `(sorted_)(mask|subseq)_sort_le`,
+    `mem2_sort_le`.
 
 - in `matrix.v`, seven new definitions:
   + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations

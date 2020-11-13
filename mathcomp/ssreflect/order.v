@@ -2759,21 +2759,59 @@ Proof. by rewrite andbC lt_le_asym. Qed.
 
 Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
+Lemma le_path_min x s : path <=%O x s -> all (>= x) s.
+Proof. exact/order_path_min/le_trans. Qed.
+
+Lemma lt_path_min x s : path <%O x s -> all (> x) s.
+Proof. exact/order_path_min/lt_trans. Qed.
+
+Lemma le_path_sortedE x s : path <=%O x s = all (>= x) s && sorted <=%O s.
+Proof. exact/path_sortedE/le_trans. Qed.
+
+Lemma lt_path_sortedE x s : path <%O x s = all (> x) s && sorted <%O s.
+Proof. exact/path_sortedE/lt_trans. Qed.
+
+Lemma le_sorted_pairwise s : sorted <=%O s = pairwise <=%O s.
+Proof. exact/sorted_pairwise/le_trans. Qed.
+
+Lemma lt_sorted_pairwise s : sorted <%O s = pairwise <%O s.
+Proof. exact/sorted_pairwise/lt_trans. Qed.
+
+Lemma le_path_pairwise x s : path <=%O x s = pairwise <=%O (x :: s).
+Proof. exact/path_pairwise/le_trans. Qed.
+
+Lemma lt_path_pairwise x s : path <%O x s = pairwise <%O (x :: s).
+Proof. exact/path_pairwise/lt_trans. Qed.
+
 Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
 Proof.
-rewrite (sorted_pairwise le_trans) (sorted_pairwise lt_trans) uniq_pairwise.
-by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite lt_neqAle.
+rewrite le_sorted_pairwise lt_sorted_pairwise uniq_pairwise -pairwise_relI.
+by apply/eq_pairwise => ? ?; rewrite lt_neqAle.
 Qed.
 
-Lemma lt_sorted_eq s1 s2 : sorted <%O s1 -> sorted <%O s2 -> s1 =i s2 -> s1 = s2.
-Proof. by apply: irr_sorted_eq => //; apply: lt_trans. Qed.
+Lemma le_sorted_mask m s : sorted <=%O s -> sorted <=%O (mask m s).
+Proof. exact/sorted_mask/le_trans. Qed.
 
-Lemma le_sorted_eq s1 s2 :
-  sorted <=%O s1 -> sorted <=%O s2 -> perm_eq s1 s2 -> s1 = s2.
-Proof. exact/sorted_eq/le_anti/le_trans. Qed.
+Lemma lt_sorted_mask m s : sorted <%O s -> sorted <%O (mask m s).
+Proof. exact/sorted_mask/lt_trans. Qed.
 
-Lemma sort_le_id s : sorted <=%O s -> sort <=%O s = s.
-Proof. exact/sorted_sort/le_trans. Qed.
+Lemma le_sorted_filter a s : sorted <=%O s -> sorted <=%O (filter a s).
+Proof. exact/sorted_filter/le_trans. Qed.
+
+Lemma lt_sorted_filter a s : sorted <%O s -> sorted <%O (filter a s).
+Proof. exact/sorted_filter/lt_trans. Qed.
+
+Lemma le_path_mask x m s : path <=%O x s -> path <=%O x (mask m s).
+Proof. exact/path_mask/le_trans. Qed.
+
+Lemma lt_path_mask x m s : path <%O x s -> path <%O x (mask m s).
+Proof. exact/path_mask/lt_trans. Qed.
+
+Lemma le_path_filter x a s : path <=%O x s -> path <=%O x (filter a s).
+Proof. exact/path_filter/le_trans. Qed.
+
+Lemma lt_path_filter x a s : path <%O x s -> path <%O x (filter a s).
+Proof. exact/path_filter/lt_trans. Qed.
 
 Lemma le_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <=%O s ->
  {in [pred n | (n < size s)%N] &,
@@ -2783,7 +2821,7 @@ Proof. exact/sorted_ltn_nth/le_trans. Qed.
 Lemma le_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=%O s ->
   {in [pred n | (n < size s)%N] &,
     {homo nth x0 s : i j / (i <= j)%N >-> i <= j}}.
-Proof. exact: (sorted_leq_nth le_trans le_refl). Qed.
+Proof. exact/sorted_leq_nth/le_refl/le_trans. Qed.
 
 Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <%O s ->
   {in [pred n | (n < size s)%N] &,
@@ -2802,6 +2840,29 @@ Proof.
 move=> ss; have := lt_sorted_leq_nth x0 ss.
 exact: (anti_mono_in _ ltn_neqAle lt_neqAle anti_leq).
 Qed.
+
+Lemma subseq_le_path x s1 s2 : subseq s1 s2 -> path <=%O x s2 -> path <=%O x s1.
+Proof. exact/subseq_path/le_trans. Qed.
+
+Lemma subseq_lt_path x s1 s2 : subseq s1 s2 -> path <%O x s2 -> path <%O x s1.
+Proof. exact/subseq_path/lt_trans. Qed.
+
+Lemma subseq_le_sorted s1 s2 : subseq s1 s2 -> sorted <=%O s2 -> sorted <=%O s1.
+Proof. exact/subseq_sorted/le_trans. Qed.
+
+Lemma subseq_lt_sorted s1 s2 : subseq s1 s2 -> sorted <%O s2 -> sorted <%O s1.
+Proof. exact/subseq_sorted/lt_trans. Qed.
+
+Lemma lt_sorted_uniq s : sorted <%O s -> uniq s.
+Proof. exact/sorted_uniq/ltxx/lt_trans. Qed.
+
+Lemma lt_sorted_eq s1 s2 :
+  sorted <%O s1 -> sorted <%O s2 -> s1 =i s2 -> s1 = s2.
+Proof. exact/irr_sorted_eq/ltxx/lt_trans. Qed.
+
+Lemma le_sorted_eq s1 s2 :
+  sorted <=%O s1 -> sorted <=%O s2 -> perm_eq s1 s2 -> s1 = s2.
+Proof. exact/sorted_eq/le_anti/le_trans. Qed.
 
 Lemma filter_lt_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   [seq x <- s | x < nth x0 s i] = take i s.
@@ -2874,6 +2935,12 @@ Proof.
 move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_lt //.
 by apply/(all_nthP _ (filter_all (< x) _)); rewrite size_filter.
 Qed.
+
+Lemma sort_le_id s : sorted <=%O s -> sort <=%O s = s.
+Proof. exact/sorted_sort/le_trans. Qed.
+
+Lemma sort_lt_id s : sorted <%O s -> sort <%O s = s.
+Proof. exact/sorted_sort/lt_trans. Qed.
 
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
 Proof.
@@ -3848,6 +3915,30 @@ Hint Resolve sort_le_sorted : core.
 
 Lemma sort_lt_sorted s : sorted <%O (sort <=%O s) = uniq s.
 Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
+
+Lemma perm_sort_leP s1 s2 : reflect (sort <=%O s1 = sort <=%O s2) (perm_eq s1 s2).
+Proof. exact/perm_sortP/le_anti/le_trans/le_total. Qed.
+
+Lemma filter_sort_le p s : filter p (sort <=%O s) = sort <=%O (filter p s).
+Proof. exact/filter_sort/le_trans/le_total. Qed.
+
+Lemma mask_sort_le s (m : bitseq) :
+  {m_s : bitseq | mask m_s (sort <=%O s) = sort <=%O (mask m s)}.
+Proof. exact/mask_sort/le_trans/le_total. Qed.
+
+Lemma sorted_mask_sort_le s (m : bitseq) :
+  sorted <=%O (mask m s) -> {m_s : bitseq | mask m_s (sort <=%O s) = mask m s}.
+Proof. exact/sorted_mask_sort/le_trans/le_total. Qed.
+
+Lemma subseq_sort_le : {homo sort <=%O : s1 s2 / @subseq T s1 s2}.
+Proof. exact/subseq_sort/le_trans/le_total. Qed.
+
+Lemma sorted_subseq_sort_le s1 s2 :
+  subseq s1 s2 -> sorted <=%O s1 -> subseq s1 (sort <=%O s2).
+Proof. exact/sorted_subseq_sort/le_trans/le_total. Qed.
+
+Lemma mem2_sort_le s x y : x <= y -> mem2 s x y -> mem2 (sort <=%O s) x y.
+Proof. exact/mem2_sort/le_trans/le_total. Qed.
 
 Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 
