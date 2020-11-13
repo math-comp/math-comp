@@ -228,13 +228,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `commCmx`. The common arguments of these lemmas `R` and `n` are
   maximal implicits.
 
-  - in `seq.v`, added `drop_index`, `in_mask`, `cons_subseq`,
-    `undup_subseq`, `leq_count_mask`, `leq_count_subseq`,
-    `count_maskP`, `count_subseqP`, `count_rem`, `count_mem_rem`,
-    `rem_cons`, `remE`, `subseq_rem`, `leq_uniq_countP`, and
-    `leq_uniq_count`.
-  - in `fintype.v`, added `mask_enum_ord`.
-  - in `bigop.v`, added `big_mask_tuple` and `big_mask`.
+- in `seq.v`, added `drop_index`, `in_mask`, `cons_subseq`,
+  `undup_subseq`, `leq_count_mask`, `leq_count_subseq`,
+  `count_maskP`, `count_subseqP`, `count_rem`, `count_mem_rem`,
+  `rem_cons`, `remE`, `subseq_rem`, `leq_uniq_countP`, and
+  `leq_uniq_count`.
+- in `fintype.v`, added `mask_enum_ord`.
+- in `bigop.v`, added `big_mask_tuple` and `big_mask`.
 - in `mxalgebra.v`, new notation `stablemx V f` asserting that `f`
   stabilizes `V`, with new theorems: `eigenvectorP`, `eqmx_stable`,
   `stablemx_row_base`, `stablemx_full`, `stablemxM`, `stablemxD`,
@@ -272,10 +272,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, new lemmas `sub_cycle(_in)`, `eq_cycle_in`,
   `(path|sorted)_(mask|filter)_in`, `rev_cycle`, `cycle_map`,
   `(homo|mono)_cycle(_in)`.
-- in `seq.v` new lemmas `eqseq_pivot`, `rev_mask`, `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, `subseq_pivot`.
 
-- in `seq.v` new lemmas `eqseq_pivot`, `eqseq_pivot_uniql`, `eqseq_pivot_uniqr`,
-  `mask_rcons, `rev_mask`, `subseq_rev`, `subseq_cat2l`, `subseq_cat2r`, `subseq_rot`, and
 - in `seq.v` new lemmas `index_pivot`, `take_pivot`, `rev_pivot`,
   `eqseq_pivot2l`, `eqseq_pivot2r`, `eqseq_pivotl`, `eqseq_pivotr`
   `uniq_eqseq_pivotl`, `uniq_eqseq_pivotr`, `mask_rcons`, `rev_mask`,
