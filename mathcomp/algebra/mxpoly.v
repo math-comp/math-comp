@@ -274,7 +274,7 @@ Section OneMatrix.
 
 Variable A : 'M[R]_n.
 
-Definition horner_mx := horner_morph (comm_mxC^~ A).
+Definition horner_mx := horner_morph (comm_mx_scalar^~ A).
 Canonical horner_mx_additive := [additive of horner_mx].
 Canonical horner_mx_rmorphism := [rmorphism of horner_mx].
 
@@ -317,7 +317,8 @@ Qed.
 
 Lemma comm_mx_horner A B p : comm_mx A B -> comm_mx A (horner_mx B p).
 Proof.
-by move=> fg; apply: commr_horner => // i; rewrite coef_map; apply/commCmx.
+move=> fg; apply: commr_horner => // i.
+by rewrite coef_map; apply/comm_scalar_mx.
 Qed.
 
 Lemma comm_horner_mx A B p : comm_mx A B -> comm_mx (horner_mx A p) B.
