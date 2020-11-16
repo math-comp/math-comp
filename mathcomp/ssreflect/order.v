@@ -3494,6 +3494,382 @@ End Exports.
 End Total.
 Import Total.Exports.
 
+Module BTotal.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base  : Total.class_of T;
+  mixin : BPOrder.mixin_of base;
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> Total.class_of.
+Local Coercion base2 T (c : class_of T) : BDistrLattice.class_of T :=
+  @BDistrLattice.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@Total.class disp bT) b =>
+  fun mT m & phant_id (@BPOrder.class disp mT) (BPOrder.Class m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition bPOrderType := @BPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition bJoinSemilatticeType := @BJoinSemilattice.Pack disp cT class.
+Definition latticeType := @Lattice.Pack disp cT class.
+Definition bLatticeType := @BLattice.Pack disp cT class.
+Definition distrLatticeType := @DistrLattice.Pack disp cT class.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
+Definition orderType := @Total.Pack disp cT class.
+Definition bPOrder_orderType := @Total.Pack disp bPOrderType class.
+Definition bMeetSemilattice_orderType :=
+  @Total.Pack disp bMeetSemilatticeType class.
+Definition bJoinSemilattice_orderType :=
+  @Total.Pack disp bJoinSemilatticeType class.
+Definition bLattice_orderType := @Total.Pack disp bLatticeType class.
+Definition bDistrLattice_orderType := @Total.Pack disp bDistrLatticeType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> Total.class_of.
+Coercion base2 : class_of >-> BDistrLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion porderType : type >-> POrder.type.
+Coercion bPOrderType : type >-> BPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion bJoinSemilatticeType : type >-> BJoinSemilattice.type.
+Coercion latticeType : type >-> Lattice.type.
+Coercion bLatticeType : type >-> BLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
+Coercion orderType : type >-> Total.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical porderType.
+Canonical bPOrderType.
+Canonical meetSemilatticeType.
+Canonical bMeetSemilatticeType.
+Canonical joinSemilatticeType.
+Canonical bJoinSemilatticeType.
+Canonical latticeType.
+Canonical bLatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical orderType.
+Canonical bPOrder_orderType.
+Canonical bMeetSemilattice_orderType.
+Canonical bJoinSemilattice_orderType.
+Canonical bLattice_orderType.
+Canonical bDistrLattice_orderType.
+Notation bOrderType := type.
+Notation "[ 'bOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'bOrderType'  'of'  T ]") : form_scope.
+End Exports.
+
+End BTotal.
+Import BTotal.Exports.
+
+Module TTotal.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base  : Total.class_of T;
+  mixin : TPOrder.mixin_of base;
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> Total.class_of.
+Local Coercion base2 T (c : class_of T) : TDistrLattice.class_of T :=
+  @TDistrLattice.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@Total.class disp bT) b =>
+  fun mT m & phant_id (@TPOrder.class disp mT) (TPOrder.Class m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition tPOrderType := @TPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition tMeetSemilatticeType := @TMeetSemilattice.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
+Definition latticeType := @Lattice.Pack disp cT class.
+Definition tLatticeType := @TLattice.Pack disp cT class.
+Definition distrLatticeType := @DistrLattice.Pack disp cT class.
+Definition tDistrLatticeType := @TDistrLattice.Pack disp cT class.
+Definition orderType := @Total.Pack disp cT class.
+Definition tPOrder_orderType := @Total.Pack disp tPOrderType class.
+Definition tMeetSemilattice_orderType :=
+  @Total.Pack disp tMeetSemilatticeType class.
+Definition tJoinSemilattice_orderType :=
+  @Total.Pack disp tJoinSemilatticeType class.
+Definition tLattice_orderType := @Total.Pack disp tLatticeType class.
+Definition tDistrLattice_orderType := @Total.Pack disp tDistrLatticeType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> Total.class_of.
+Coercion base2 : class_of >-> TDistrLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion porderType : type >-> POrder.type.
+Coercion tPOrderType : type >-> TPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion tMeetSemilatticeType : type >-> TMeetSemilattice.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
+Coercion latticeType : type >-> Lattice.type.
+Coercion tLatticeType : type >-> TLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion tDistrLatticeType : type >-> TDistrLattice.type.
+Coercion orderType : type >-> Total.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical porderType.
+Canonical tPOrderType.
+Canonical meetSemilatticeType.
+Canonical tMeetSemilatticeType.
+Canonical joinSemilatticeType.
+Canonical tJoinSemilatticeType.
+Canonical latticeType.
+Canonical tLatticeType.
+Canonical distrLatticeType.
+Canonical tDistrLatticeType.
+Canonical orderType.
+Canonical tPOrder_orderType.
+Canonical tMeetSemilattice_orderType.
+Canonical tJoinSemilattice_orderType.
+Canonical tLattice_orderType.
+Canonical tDistrLattice_orderType.
+Notation tOrderType := type.
+Notation "[ 'tOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'tOrderType'  'of'  T ]") : form_scope.
+End Exports.
+
+End TTotal.
+Import TTotal.Exports.
+
+Module TBTotal.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base  : BTotal.class_of T;
+  mixin : TPOrder.mixin_of base;
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> BTotal.class_of.
+Local Coercion base2 T (c : class_of T) : TTotal.class_of T :=
+  @TTotal.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : TBDistrLattice.class_of T :=
+  @TBDistrLattice.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@BTotal.class disp bT) b =>
+  fun mT m & phant_id (@TPOrder.class disp mT) (TPOrder.Class m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition bPOrderType := @BPOrder.Pack disp cT class.
+Definition tPOrderType := @TPOrder.Pack disp cT class.
+Definition tbPOrderType := @TBPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
+Definition tMeetSemilatticeType := @TMeetSemilattice.Pack disp cT class.
+Definition tbMeetSemilatticeType := @TBMeetSemilattice.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition bJoinSemilatticeType := @BJoinSemilattice.Pack disp cT class.
+Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
+Definition tbJoinSemilatticeType := @TBJoinSemilattice.Pack disp cT class.
+Definition latticeType := @Lattice.Pack disp cT class.
+Definition bLatticeType := @BLattice.Pack disp cT class.
+Definition tLatticeType := @TLattice.Pack disp cT class.
+Definition tbLatticeType := @TBLattice.Pack disp cT class.
+Definition distrLatticeType := @DistrLattice.Pack disp cT class.
+Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
+Definition tDistrLatticeType := @TDistrLattice.Pack disp cT class.
+Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT class.
+Definition orderType := @Total.Pack disp cT class.
+Definition bOrderType := @BTotal.Pack disp cT class.
+Definition tOrderType := @TTotal.Pack disp cT class.
+Definition order_tbPOrderType := @TBPOrder.Pack disp orderType class.
+Definition order_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp orderType class.
+Definition order_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp orderType class.
+Definition order_tbLatticeType := @TBLattice.Pack disp orderType class.
+Definition order_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp orderType class.
+Definition bOrder_tPOrderType := @TPOrder.Pack disp bOrderType class.
+Definition bOrder_tbPOrderType := @TBPOrder.Pack disp bOrderType class.
+Definition bOrder_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp bOrderType class.
+Definition bOrder_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp bOrderType class.
+Definition bOrder_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp bOrderType class.
+Definition bOrder_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp bOrderType class.
+Definition bOrder_tLatticeType := @TLattice.Pack disp bOrderType class.
+Definition bOrder_tbLatticeType := @TBLattice.Pack disp bOrderType class.
+Definition bOrder_tDistrLatticeType :=
+  @TDistrLattice.Pack disp bOrderType class.
+Definition bOrder_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp bOrderType class.
+Definition tOrder_bPOrderType := @BPOrder.Pack disp tOrderType class.
+Definition tOrder_tbPOrderType := @TBPOrder.Pack disp tOrderType class.
+Definition tOrder_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp tOrderType class.
+Definition tOrder_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp tOrderType class.
+Definition tOrder_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp tOrderType class.
+Definition tOrder_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp tOrderType class.
+Definition tOrder_bLatticeType := @BLattice.Pack disp tOrderType class.
+Definition tOrder_tbLatticeType := @TBLattice.Pack disp tOrderType class.
+Definition tOrder_bDistrLatticeType :=
+  @BDistrLattice.Pack disp tOrderType class.
+Definition tOrder_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp tOrderType class.
+Definition tOrder_bOrderType := @BTotal.Pack disp tOrderType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> BTotal.class_of.
+Coercion base2 : class_of >-> TTotal.class_of.
+Coercion base3 : class_of >-> TBDistrLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion porderType : type >-> POrder.type.
+Coercion bPOrderType : type >-> BPOrder.type.
+Coercion tPOrderType : type >-> TPOrder.type.
+Coercion tbPOrderType : type >-> TBPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
+Coercion tMeetSemilatticeType : type >-> TMeetSemilattice.type.
+Coercion tbMeetSemilatticeType : type >-> TBMeetSemilattice.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion bJoinSemilatticeType : type >-> BJoinSemilattice.type.
+Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
+Coercion tbJoinSemilatticeType : type >-> TBJoinSemilattice.type.
+Coercion latticeType : type >-> Lattice.type.
+Coercion bLatticeType : type >-> BLattice.type.
+Coercion tLatticeType : type >-> TLattice.type.
+Coercion tbLatticeType : type >-> TBLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion bDistrLatticeType : type >-> BDistrLattice.type.
+Coercion tDistrLatticeType : type >-> TDistrLattice.type.
+Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
+Coercion orderType : type >-> Total.type.
+Coercion bOrderType : type >-> BTotal.type.
+Coercion tOrderType : type >-> TTotal.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical porderType.
+Canonical bPOrderType.
+Canonical tPOrderType.
+Canonical tbPOrderType.
+Canonical meetSemilatticeType.
+Canonical bMeetSemilatticeType.
+Canonical tMeetSemilatticeType.
+Canonical tbMeetSemilatticeType.
+Canonical joinSemilatticeType.
+Canonical bJoinSemilatticeType.
+Canonical tJoinSemilatticeType.
+Canonical tbJoinSemilatticeType.
+Canonical latticeType.
+Canonical bLatticeType.
+Canonical tLatticeType.
+Canonical tbLatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical orderType.
+Canonical bOrderType.
+Canonical tOrderType.
+Canonical order_tbPOrderType.
+Canonical order_tbMeetSemilatticeType.
+Canonical order_tbJoinSemilatticeType.
+Canonical order_tbLatticeType.
+Canonical order_tbDistrLatticeType.
+Canonical bOrder_tPOrderType.
+Canonical bOrder_tbPOrderType.
+Canonical bOrder_tMeetSemilatticeType.
+Canonical bOrder_tbMeetSemilatticeType.
+Canonical bOrder_tJoinSemilatticeType.
+Canonical bOrder_tbJoinSemilatticeType.
+Canonical bOrder_tLatticeType.
+Canonical bOrder_tbLatticeType.
+Canonical bOrder_tDistrLatticeType.
+Canonical bOrder_tbDistrLatticeType.
+Canonical tOrder_bPOrderType.
+Canonical tOrder_tbPOrderType.
+Canonical tOrder_bMeetSemilatticeType.
+Canonical tOrder_tbMeetSemilatticeType.
+Canonical tOrder_bJoinSemilatticeType.
+Canonical tOrder_tbJoinSemilatticeType.
+Canonical tOrder_bLatticeType.
+Canonical tOrder_tbLatticeType.
+Canonical tOrder_bDistrLatticeType.
+Canonical tOrder_tbDistrLatticeType.
+Canonical tOrder_bOrderType.
+Notation tbOrderType := type.
+Notation "[ 'tbOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'tbOrderType'  'of'  T ]") : form_scope.
+End Exports.
+
+End TBTotal.
+Import TBTotal.Exports.
+
 (**********)
 (* FINITE *)
 (**********)
@@ -3796,7 +4172,457 @@ End Exports.
 End FinTBPOrder.
 Import FinTBPOrder.Exports.
 
+Module FinMeetSemilattice.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : MeetSemilattice.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> MeetSemilattice.class_of.
+Local Coercion base2 T (c : class_of T) : FinPOrder.class_of T :=
+  @FinPOrder.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@MeetSemilattice.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition count_meetSemilatticeType :=
+  @MeetSemilattice.Pack disp countType class.
+Definition fin_meetSemilatticeType := @MeetSemilattice.Pack disp finType class.
+Definition finPOrder_meetSemilatticeType :=
+  @MeetSemilattice.Pack disp finPOrderType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> MeetSemilattice.class_of.
+Coercion base2 : class_of >-> FinPOrder.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical finPOrderType.
+Canonical meetSemilatticeType.
+Canonical count_meetSemilatticeType.
+Canonical fin_meetSemilatticeType.
+Canonical finPOrder_meetSemilatticeType.
+Notation finMeetSemilatticeType := type.
+Notation "[ 'finMeetSemilatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finMeetSemilatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinMeetSemilattice.
+Import FinMeetSemilattice.Exports.
+
+Module FinBMeetSemilattice.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : BMeetSemilattice.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> BMeetSemilattice.class_of.
+Local Coercion base2 T (c : class_of T) : FinMeetSemilattice.class_of T :=
+  @FinMeetSemilattice.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : FinBPOrder.class_of T :=
+  @FinBPOrder.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@BMeetSemilattice.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition bPorderType := @BPOrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition finBPOrderType := @FinBPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition count_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp countType class.
+Definition fin_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finType class.
+Definition finPOrder_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finPOrderType class.
+Definition finBPOrder_meetSemilatticeType :=
+  @MeetSemilattice.Pack disp finBPOrderType class.
+Definition finBPOrder_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finBPOrderType class.
+Definition finMeetSemilattice_bPOrderType :=
+  @BPOrder.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_finBPOrderType :=
+  @FinBPOrder.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finMeetSemilatticeType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> BMeetSemilattice.class_of.
+Coercion base2 : class_of >-> FinMeetSemilattice.class_of.
+Coercion base3 : class_of >-> FinBPOrder.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion bPorderType : type >-> BPOrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion finBPOrderType : type >-> FinBPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical bPorderType.
+Canonical finPOrderType.
+Canonical finBPOrderType.
+Canonical meetSemilatticeType.
+Canonical bMeetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical count_bMeetSemilatticeType.
+Canonical fin_bMeetSemilatticeType.
+Canonical finPOrder_bMeetSemilatticeType.
+Canonical finBPOrder_meetSemilatticeType.
+Canonical finBPOrder_bMeetSemilatticeType.
+Canonical finMeetSemilattice_bPOrderType.
+Canonical finMeetSemilattice_finBPOrderType.
+Canonical finMeetSemilattice_bMeetSemilatticeType.
+Notation finBMeetSemilatticeType := type.
+Notation "[ 'finBMeetSemilatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finBMeetSemilatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinBMeetSemilattice.
+Import FinBMeetSemilattice.Exports.
+
+Module FinJoinSemilattice.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : JoinSemilattice.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> JoinSemilattice.class_of.
+Local Coercion base2 T (c : class_of T) : FinPOrder.class_of T :=
+  @FinPOrder.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@JoinSemilattice.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition count_joinSemilatticeType :=
+  @JoinSemilattice.Pack disp countType class.
+Definition fin_joinSemilatticeType := @JoinSemilattice.Pack disp finType class.
+Definition finPOrder_joinSemilatticeType :=
+  @JoinSemilattice.Pack disp finPOrderType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> JoinSemilattice.class_of.
+Coercion base2 : class_of >-> FinPOrder.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical finPOrderType.
+Canonical joinSemilatticeType.
+Canonical count_joinSemilatticeType.
+Canonical fin_joinSemilatticeType.
+Canonical finPOrder_joinSemilatticeType.
+Notation finJoinSemilatticeType := type.
+Notation "[ 'finJoinSemilatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finJoinSemilatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinJoinSemilattice.
+Import FinJoinSemilattice.Exports.
+
+Module FinTJoinSemilattice.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : TJoinSemilattice.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> TJoinSemilattice.class_of.
+Local Coercion base2 T (c : class_of T) : FinJoinSemilattice.class_of T :=
+  @FinJoinSemilattice.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : FinTPOrder.class_of T :=
+  @FinTPOrder.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@TJoinSemilattice.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition tPOrderType := @TPOrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition finTPOrderType := @FinTPOrder.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition count_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp countType class.
+Definition fin_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finType class.
+Definition finPOrder_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finPOrderType class.
+Definition finTPOrder_joinSemilatticeType :=
+  @JoinSemilattice.Pack disp finTPOrderType class.
+Definition finTPOrder_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finTPOrderType class.
+Definition finJoinSemilattice_tPOrderType :=
+  @TPOrder.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_finTPOrderType :=
+  @FinTPOrder.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finJoinSemilatticeType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> TJoinSemilattice.class_of.
+Coercion base2 : class_of >-> FinJoinSemilattice.class_of.
+Coercion base3 : class_of >-> FinTPOrder.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion tPOrderType : type >-> TPOrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion finTPOrderType : type >-> FinTPOrder.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical tPOrderType.
+Canonical finPOrderType.
+Canonical finTPOrderType.
+Canonical joinSemilatticeType.
+Canonical tJoinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical count_tJoinSemilatticeType.
+Canonical fin_tJoinSemilatticeType.
+Canonical finPOrder_tJoinSemilatticeType.
+Canonical finTPOrder_joinSemilatticeType.
+Canonical finTPOrder_tJoinSemilatticeType.
+Canonical finJoinSemilattice_tPOrderType.
+Canonical finJoinSemilattice_finTPOrderType.
+Canonical finJoinSemilattice_tJoinSemilatticeType.
+Notation finTJoinSemilatticeType := type.
+Notation "[ 'finTJoinSemilatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finTJoinSemilatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinTJoinSemilattice.
+Import FinTJoinSemilattice.Exports.
+
 Module FinLattice.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : Lattice.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> Lattice.class_of.
+Local Coercion base2 T (c : class_of T) : FinMeetSemilattice.class_of T :=
+  @FinMeetSemilattice.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : FinJoinSemilattice.class_of T :=
+  @FinJoinSemilattice.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@Lattice.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition latticeType := @Lattice.Pack disp cT class.
+Definition count_latticeType := @Lattice.Pack disp countType class.
+Definition fin_latticeType := @Lattice.Pack disp finType class.
+Definition finPOrder_latticeType := @Lattice.Pack disp finPOrderType class.
+Definition finMeetSemilattice_joinSemilatticeType :=
+  @JoinSemilattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_latticeType :=
+  @Lattice.Pack disp finMeetSemilatticeType class.
+Definition finJoinSemilattice_meetSemilatticeType :=
+  @MeetSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_latticeType :=
+  @Lattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_finMeetSemilatticeType :=
+  @FinMeetSemilattice.Pack disp finJoinSemilatticeType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> Lattice.class_of.
+Coercion base2 : class_of >-> FinMeetSemilattice.class_of.
+Coercion base3 : class_of >-> FinJoinSemilattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion latticeType : type >-> Lattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical finPOrderType.
+Canonical meetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical joinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical latticeType.
+Canonical count_latticeType.
+Canonical fin_latticeType.
+Canonical finPOrder_latticeType.
+Canonical finMeetSemilattice_joinSemilatticeType.
+Canonical finMeetSemilattice_latticeType.
+Canonical finJoinSemilattice_meetSemilatticeType.
+Canonical finJoinSemilattice_latticeType.
+Canonical finJoinSemilattice_finMeetSemilatticeType.
+Notation finLatticeType := type.
+Notation "[ 'finLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinLattice.
+Import FinLattice.Exports.
+
+Module FinTBLattice.
 Section ClassDef.
 
 Set Primitive Projections.
@@ -3811,6 +4637,12 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> TBLattice.class_of.
 Local Coercion base2 T (c : class_of T) : FinTBPOrder.class_of T :=
   @FinTBPOrder.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : FinLattice.class_of T :=
+  @FinLattice.Class T c (mixin c).
+Local Coercion base4 T (c : class_of T) : FinBMeetSemilattice.class_of T :=
+  @FinBMeetSemilattice.Class T c (mixin c).
+Local Coercion base5 T (c : class_of T) : FinTJoinSemilattice.class_of T :=
+  @FinTJoinSemilattice.Class T c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3841,76 +4673,52 @@ Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
 Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
 Definition tMeetSemilatticeType := @TMeetSemilattice.Pack disp cT class.
 Definition tbMeetSemilatticeType := @TBMeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition finBMeetSemilatticeType := @FinBMeetSemilattice.Pack disp cT class.
 Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
 Definition bJoinSemilatticeType := @BJoinSemilattice.Pack disp cT class.
 Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
 Definition tbJoinSemilatticeType := @TBJoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition finTJoinSemilatticeType := @FinTJoinSemilattice.Pack disp cT class.
 Definition latticeType := @Lattice.Pack disp cT class.
 Definition bLatticeType := @BLattice.Pack disp cT class.
 Definition tLatticeType := @TLattice.Pack disp cT class.
 Definition tbLatticeType := @TBLattice.Pack disp cT class.
-Definition count_meetSemilatticeType :=
-  @MeetSemilattice.Pack disp countType class.
-Definition count_bMeetSemilatticeType :=
-  @BMeetSemilattice.Pack disp countType class.
+Definition finLatticeType := @FinLattice.Pack disp cT class.
 Definition count_tMeetSemilatticeType :=
   @TMeetSemilattice.Pack disp countType class.
 Definition count_tbMeetSemilatticeType :=
   @TBMeetSemilattice.Pack disp countType class.
-Definition count_joinSemilatticeType :=
-  @JoinSemilattice.Pack disp countType class.
 Definition count_bJoinSemilatticeType :=
   @BJoinSemilattice.Pack disp countType class.
-Definition count_tJoinSemilatticeType :=
-  @TJoinSemilattice.Pack disp countType class.
 Definition count_tbJoinSemilatticeType :=
   @TBJoinSemilattice.Pack disp countType class.
-Definition count_latticeType := @Lattice.Pack disp countType class.
 Definition count_bLatticeType := @BLattice.Pack disp countType class.
 Definition count_tLatticeType := @TLattice.Pack disp countType class.
 Definition count_tbLatticeType := @TBLattice.Pack disp countType class.
-Definition fin_meetSemilatticeType := @MeetSemilattice.Pack disp finType class.
-Definition fin_bMeetSemilatticeType :=
-  @BMeetSemilattice.Pack disp finType class.
 Definition fin_tMeetSemilatticeType :=
   @TMeetSemilattice.Pack disp finType class.
 Definition fin_tbMeetSemilatticeType :=
   @TBMeetSemilattice.Pack disp finType class.
-Definition fin_joinSemilatticeType := @JoinSemilattice.Pack disp finType class.
 Definition fin_bJoinSemilatticeType :=
   @BJoinSemilattice.Pack disp finType class.
-Definition fin_tJoinSemilatticeType :=
-  @TJoinSemilattice.Pack disp finType class.
 Definition fin_tbJoinSemilatticeType :=
   @TBJoinSemilattice.Pack disp finType class.
-Definition fin_latticeType := @Lattice.Pack disp finType class.
 Definition fin_bLatticeType := @BLattice.Pack disp finType class.
 Definition fin_tLatticeType := @TLattice.Pack disp finType class.
 Definition fin_tbLatticeType := @TBLattice.Pack disp finType class.
-Definition finPOrder_meetSemilatticeType :=
-  @MeetSemilattice.Pack disp finPOrderType class.
-Definition finPOrder_bMeetSemilatticeType :=
-  @BMeetSemilattice.Pack disp finPOrderType class.
 Definition finPOrder_tMeetSemilatticeType :=
   @TMeetSemilattice.Pack disp finPOrderType class.
 Definition finPOrder_tbMeetSemilatticeType :=
   @TBMeetSemilattice.Pack disp finPOrderType class.
-Definition finPOrder_joinSemilatticeType :=
-  @JoinSemilattice.Pack disp finPOrderType class.
 Definition finPOrder_bJoinSemilatticeType :=
   @BJoinSemilattice.Pack disp finPOrderType class.
-Definition finPOrder_tJoinSemilatticeType :=
-  @TJoinSemilattice.Pack disp finPOrderType class.
 Definition finPOrder_tbJoinSemilatticeType :=
   @TBJoinSemilattice.Pack disp finPOrderType class.
-Definition finPOrder_latticeType := @Lattice.Pack disp finPOrderType class.
 Definition finPOrder_bLatticeType := @BLattice.Pack disp finPOrderType class.
 Definition finPOrder_tLatticeType := @TLattice.Pack disp finPOrderType class.
 Definition finPOrder_tbLatticeType := @TBLattice.Pack disp finPOrderType class.
-Definition finBPOrder_meetSemilatticeType :=
-  @MeetSemilattice.Pack disp finBPOrderType class.
-Definition finBPOrder_bMeetSemilatticeType :=
-  @BMeetSemilattice.Pack disp finBPOrderType class.
 Definition finBPOrder_tMeetSemilatticeType :=
   @TMeetSemilattice.Pack disp finBPOrderType class.
 Definition finBPOrder_tbMeetSemilatticeType :=
@@ -3936,12 +4744,8 @@ Definition finTPOrder_tMeetSemilatticeType :=
   @TMeetSemilattice.Pack disp finTPOrderType class.
 Definition finTPOrder_tbMeetSemilatticeType :=
   @TBMeetSemilattice.Pack disp finTPOrderType class.
-Definition finTPOrder_joinSemilatticeType :=
-  @JoinSemilattice.Pack disp finTPOrderType class.
 Definition finTPOrder_bJoinSemilatticeType :=
   @BJoinSemilattice.Pack disp finTPOrderType class.
-Definition finTPOrder_tJoinSemilatticeType :=
-  @TJoinSemilattice.Pack disp finTPOrderType class.
 Definition finTPOrder_tbJoinSemilatticeType :=
   @TBJoinSemilattice.Pack disp finTPOrderType class.
 Definition finTPOrder_latticeType := @Lattice.Pack disp finTPOrderType class.
@@ -3972,11 +4776,153 @@ Definition finTBPOrder_tLatticeType :=
   @TLattice.Pack disp finTBPOrderType class.
 Definition finTBPOrder_tbLatticeType :=
   @TBLattice.Pack disp finTBPOrderType class.
+Definition finMeetSemilattice_tPOrderType :=
+  @TPOrder.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tbPOrderType :=
+  @TBPOrder.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_finTPOrderType :=
+  @FinTPOrder.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_finTBPOrderType :=
+  @FinTBPOrder.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_bLatticeType :=
+  @BLattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tLatticeType :=
+  @TLattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tbLatticeType :=
+  @TBLattice.Pack disp finMeetSemilatticeType class.
+Definition finBMeetSemilattice_tPOrderType :=
+  @TPOrder.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tbPOrderType :=
+  @TBPOrder.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_finTPOrderType :=
+  @FinTPOrder.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_finTBPOrderType :=
+  @FinTBPOrder.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_joinSemilatticeType :=
+  @JoinSemilattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_latticeType :=
+  @Lattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_bLatticeType :=
+  @BLattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tLatticeType :=
+  @TLattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tbLatticeType :=
+  @TBLattice.Pack disp finBMeetSemilatticeType class.
+Definition finJoinSemilattice_bPOrderType :=
+  @BPOrder.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tbPOrderType :=
+  @TBPOrder.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_finBPOrderType :=
+  @FinBPOrder.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_finTBPOrderType :=
+  @FinTBPOrder.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_finBMeetSemilatticeType :=
+  @FinBMeetSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_bLatticeType :=
+  @BLattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tLatticeType :=
+  @TLattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tbLatticeType :=
+  @TBLattice.Pack disp finJoinSemilatticeType class.
+Definition finTJoinSemilattice_bPOrderType :=
+  @BPOrder.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tbPOrderType :=
+  @TBPOrder.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_finBPOrderType :=
+  @FinBPOrder.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_finTBPOrderType :=
+  @FinTBPOrder.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_meetSemilatticeType :=
+  @MeetSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_finMeetSemilatticeType :=
+  @FinMeetSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_finBMeetSemilatticeType :=
+  @FinBMeetSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_latticeType :=
+  @Lattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_bLatticeType :=
+  @BLattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tLatticeType :=
+  @TLattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tbLatticeType :=
+  @TBLattice.Pack disp finTJoinSemilatticeType class.
+Definition finLattice_bPOrderType := @BPOrder.Pack disp finLatticeType class.
+Definition finLattice_tPOrderType := @TPOrder.Pack disp finLatticeType class.
+Definition finLattice_tbPOrderType := @TBPOrder.Pack disp finLatticeType class.
+Definition finLattice_finBPOrderType :=
+  @FinBPOrder.Pack disp finLatticeType class.
+Definition finLattice_finTPOrderType :=
+  @FinTPOrder.Pack disp finLatticeType class.
+Definition finLattice_finTBPOrderType :=
+  @FinTBPOrder.Pack disp finLatticeType class.
+Definition finLattice_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finLatticeType class.
+Definition finLattice_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finLatticeType class.
+Definition finLattice_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finLatticeType class.
+Definition finLattice_finBMeetSemilatticeType :=
+  @FinBMeetSemilattice.Pack disp finLatticeType class.
+Definition finLattice_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finLatticeType class.
+Definition finLattice_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finLatticeType class.
+Definition finLattice_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finLatticeType class.
+Definition finLattice_finTJoinSemilatticeType :=
+  @FinTJoinSemilattice.Pack disp finLatticeType class.
+Definition finLattice_bLatticeType := @BLattice.Pack disp finLatticeType class.
+Definition finLattice_tLatticeType := @TLattice.Pack disp finLatticeType class.
+Definition finLattice_tbLatticeType :=
+ @TBLattice.Pack disp finLatticeType class.
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> TBLattice.class_of.
 Coercion base2 : class_of >-> FinTBPOrder.class_of.
+Coercion base3 : class_of >-> FinLattice.class_of.
+Coercion base4 : class_of >-> FinBMeetSemilattice.class_of.
+Coercion base5 : class_of >-> FinTJoinSemilattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3994,14 +4940,19 @@ Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
 Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
 Coercion tMeetSemilatticeType : type >-> TMeetSemilattice.type.
 Coercion tbMeetSemilatticeType : type >-> TBMeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion finBMeetSemilatticeType : type >-> FinBMeetSemilattice.type.
 Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
 Coercion bJoinSemilatticeType : type >-> BJoinSemilattice.type.
 Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
 Coercion tbJoinSemilatticeType : type >-> TBJoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion finTJoinSemilatticeType : type >-> FinTJoinSemilattice.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion bLatticeType : type >-> BLattice.type.
 Coercion tLatticeType : type >-> TLattice.type.
 Coercion tbLatticeType : type >-> TBLattice.type.
+Coercion finLatticeType : type >-> FinLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
@@ -4018,52 +4969,40 @@ Canonical meetSemilatticeType.
 Canonical bMeetSemilatticeType.
 Canonical tMeetSemilatticeType.
 Canonical tbMeetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
 Canonical joinSemilatticeType.
 Canonical bJoinSemilatticeType.
 Canonical tJoinSemilatticeType.
 Canonical tbJoinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical latticeType.
 Canonical bLatticeType.
 Canonical tLatticeType.
 Canonical tbLatticeType.
-Canonical count_meetSemilatticeType.
-Canonical count_bMeetSemilatticeType.
+Canonical finLatticeType.
 Canonical count_tMeetSemilatticeType.
 Canonical count_tbMeetSemilatticeType.
-Canonical count_joinSemilatticeType.
 Canonical count_bJoinSemilatticeType.
-Canonical count_tJoinSemilatticeType.
 Canonical count_tbJoinSemilatticeType.
-Canonical count_latticeType.
 Canonical count_bLatticeType.
 Canonical count_tLatticeType.
 Canonical count_tbLatticeType.
-Canonical fin_meetSemilatticeType.
-Canonical fin_bMeetSemilatticeType.
 Canonical fin_tMeetSemilatticeType.
 Canonical fin_tbMeetSemilatticeType.
-Canonical fin_joinSemilatticeType.
 Canonical fin_bJoinSemilatticeType.
-Canonical fin_tJoinSemilatticeType.
 Canonical fin_tbJoinSemilatticeType.
-Canonical fin_latticeType.
 Canonical fin_bLatticeType.
 Canonical fin_tLatticeType.
 Canonical fin_tbLatticeType.
-Canonical finPOrder_meetSemilatticeType.
-Canonical finPOrder_bMeetSemilatticeType.
 Canonical finPOrder_tMeetSemilatticeType.
 Canonical finPOrder_tbMeetSemilatticeType.
-Canonical finPOrder_joinSemilatticeType.
 Canonical finPOrder_bJoinSemilatticeType.
-Canonical finPOrder_tJoinSemilatticeType.
 Canonical finPOrder_tbJoinSemilatticeType.
-Canonical finPOrder_latticeType.
 Canonical finPOrder_bLatticeType.
 Canonical finPOrder_tLatticeType.
 Canonical finPOrder_tbLatticeType.
-Canonical finBPOrder_meetSemilatticeType.
-Canonical finBPOrder_bMeetSemilatticeType.
 Canonical finBPOrder_tMeetSemilatticeType.
 Canonical finBPOrder_tbMeetSemilatticeType.
 Canonical finBPOrder_joinSemilatticeType.
@@ -4078,9 +5017,7 @@ Canonical finTPOrder_meetSemilatticeType.
 Canonical finTPOrder_bMeetSemilatticeType.
 Canonical finTPOrder_tMeetSemilatticeType.
 Canonical finTPOrder_tbMeetSemilatticeType.
-Canonical finTPOrder_joinSemilatticeType.
 Canonical finTPOrder_bJoinSemilatticeType.
-Canonical finTPOrder_tJoinSemilatticeType.
 Canonical finTPOrder_tbJoinSemilatticeType.
 Canonical finTPOrder_latticeType.
 Canonical finTPOrder_bLatticeType.
@@ -4098,15 +5035,185 @@ Canonical finTBPOrder_latticeType.
 Canonical finTBPOrder_bLatticeType.
 Canonical finTBPOrder_tLatticeType.
 Canonical finTBPOrder_tbLatticeType.
-Notation finLatticeType := type.
-Notation "[ 'finLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
-  (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
+Canonical finMeetSemilattice_tPOrderType.
+Canonical finMeetSemilattice_tbPOrderType.
+Canonical finMeetSemilattice_finTPOrderType.
+Canonical finMeetSemilattice_finTBPOrderType.
+Canonical finMeetSemilattice_tMeetSemilatticeType.
+Canonical finMeetSemilattice_tbMeetSemilatticeType.
+Canonical finMeetSemilattice_bJoinSemilatticeType.
+Canonical finMeetSemilattice_tJoinSemilatticeType.
+Canonical finMeetSemilattice_tbJoinSemilatticeType.
+Canonical finMeetSemilattice_bLatticeType.
+Canonical finMeetSemilattice_tLatticeType.
+Canonical finMeetSemilattice_tbLatticeType.
+Canonical finBMeetSemilattice_tPOrderType.
+Canonical finBMeetSemilattice_tbPOrderType.
+Canonical finBMeetSemilattice_finTPOrderType.
+Canonical finBMeetSemilattice_finTBPOrderType.
+Canonical finBMeetSemilattice_tMeetSemilatticeType.
+Canonical finBMeetSemilattice_tbMeetSemilatticeType.
+Canonical finBMeetSemilattice_joinSemilatticeType.
+Canonical finBMeetSemilattice_bJoinSemilatticeType.
+Canonical finBMeetSemilattice_tJoinSemilatticeType.
+Canonical finBMeetSemilattice_tbJoinSemilatticeType.
+Canonical finBMeetSemilattice_latticeType.
+Canonical finBMeetSemilattice_bLatticeType.
+Canonical finBMeetSemilattice_tLatticeType.
+Canonical finBMeetSemilattice_tbLatticeType.
+Canonical finJoinSemilattice_bPOrderType.
+Canonical finJoinSemilattice_tbPOrderType.
+Canonical finJoinSemilattice_finBPOrderType.
+Canonical finJoinSemilattice_finTBPOrderType.
+Canonical finJoinSemilattice_bMeetSemilatticeType.
+Canonical finJoinSemilattice_tMeetSemilatticeType.
+Canonical finJoinSemilattice_tbMeetSemilatticeType.
+Canonical finJoinSemilattice_finBMeetSemilatticeType.
+Canonical finJoinSemilattice_bJoinSemilatticeType.
+Canonical finJoinSemilattice_tbJoinSemilatticeType.
+Canonical finJoinSemilattice_bLatticeType.
+Canonical finJoinSemilattice_tLatticeType.
+Canonical finJoinSemilattice_tbLatticeType.
+Canonical finTJoinSemilattice_bPOrderType.
+Canonical finTJoinSemilattice_tbPOrderType.
+Canonical finTJoinSemilattice_finBPOrderType.
+Canonical finTJoinSemilattice_finTBPOrderType.
+Canonical finTJoinSemilattice_meetSemilatticeType.
+Canonical finTJoinSemilattice_bMeetSemilatticeType.
+Canonical finTJoinSemilattice_tMeetSemilatticeType.
+Canonical finTJoinSemilattice_tbMeetSemilatticeType.
+Canonical finTJoinSemilattice_finMeetSemilatticeType.
+Canonical finTJoinSemilattice_finBMeetSemilatticeType.
+Canonical finTJoinSemilattice_bJoinSemilatticeType.
+Canonical finTJoinSemilattice_tbJoinSemilatticeType.
+Canonical finTJoinSemilattice_latticeType.
+Canonical finTJoinSemilattice_bLatticeType.
+Canonical finTJoinSemilattice_tLatticeType.
+Canonical finTJoinSemilattice_tbLatticeType.
+Canonical finLattice_bPOrderType.
+Canonical finLattice_tPOrderType.
+Canonical finLattice_tbPOrderType.
+Canonical finLattice_finBPOrderType.
+Canonical finLattice_finTPOrderType.
+Canonical finLattice_finTBPOrderType.
+Canonical finLattice_bMeetSemilatticeType.
+Canonical finLattice_tMeetSemilatticeType.
+Canonical finLattice_tbMeetSemilatticeType.
+Canonical finLattice_finBMeetSemilatticeType.
+Canonical finLattice_bJoinSemilatticeType.
+Canonical finLattice_tJoinSemilatticeType.
+Canonical finLattice_tbJoinSemilatticeType.
+Canonical finLattice_finTJoinSemilatticeType.
+Canonical finLattice_bLatticeType.
+Canonical finLattice_tLatticeType.
+Canonical finLattice_tbLatticeType.
+Notation finTBLatticeType := type.
+Notation "[ 'finTBLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finTBLatticeType'  'of'  T ]") : form_scope.
 End Exports.
 
-End FinLattice.
-Import FinLattice.Exports.
+End FinTBLattice.
+Import FinTBLattice.Exports.
 
 Module FinDistrLattice.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : DistrLattice.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> DistrLattice.class_of.
+Local Coercion base2 T (c : class_of T) : FinLattice.class_of T :=
+  @FinLattice.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@DistrLattice.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition latticeType := @Lattice.Pack disp cT class.
+Definition finLatticeType := @FinLattice.Pack disp cT class.
+Definition distrLatticeType := @DistrLattice.Pack disp cT class.
+Definition count_distrLatticeType := @DistrLattice.Pack disp countType class.
+Definition fin_distrLatticeType := @DistrLattice.Pack disp finType class.
+Definition finPOrder_distrLatticeType :=
+  @DistrLattice.Pack disp finPOrderType class.
+Definition finMeetSemilattice_distrLatticeType :=
+  @DistrLattice.Pack disp finMeetSemilatticeType class.
+Definition finJoinSemilattice_distrLatticeType :=
+  @DistrLattice.Pack disp finJoinSemilatticeType class.
+Definition finLattice_distrLatticeType :=
+  @DistrLattice.Pack disp finLatticeType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> DistrLattice.class_of.
+Coercion base2 : class_of >-> FinLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion latticeType : type >-> Lattice.type.
+Coercion finLatticeType : type >-> FinLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical finPOrderType.
+Canonical meetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical joinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical latticeType.
+Canonical finLatticeType.
+Canonical distrLatticeType.
+Canonical count_distrLatticeType.
+Canonical fin_distrLatticeType.
+Canonical finPOrder_distrLatticeType.
+Canonical finMeetSemilattice_distrLatticeType.
+Canonical finJoinSemilattice_distrLatticeType.
+Canonical finLattice_distrLatticeType.
+Notation finDistrLatticeType := type.
+Notation "[ 'finDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finDistrLatticeType'  'of'  T ]") : form_scope.
+End Exports.
+
+End FinDistrLattice.
+Import FinDistrLattice.Exports.
+
+Module FinTBDistrLattice.
 Section ClassDef.
 
 Set Primitive Projections.
@@ -4119,8 +5226,10 @@ Record class_of (T : Type) := Class {
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> TBDistrLattice.class_of.
-Local Coercion base2 T (c : class_of T) : FinLattice.class_of T :=
-  @FinLattice.Class T c (mixin c).
+Local Coercion base2 T (c : class_of T) : FinTBLattice.class_of T :=
+  @FinTBLattice.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : FinDistrLattice.class_of T :=
+  @FinDistrLattice.Class T c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -4151,30 +5260,32 @@ Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
 Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
 Definition tMeetSemilatticeType := @TMeetSemilattice.Pack disp cT class.
 Definition tbMeetSemilatticeType := @TBMeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition finBMeetSemilatticeType := @FinBMeetSemilattice.Pack disp cT class.
 Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
 Definition bJoinSemilatticeType := @BJoinSemilattice.Pack disp cT class.
 Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
 Definition tbJoinSemilatticeType := @TBJoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition finTJoinSemilatticeType := @FinTJoinSemilattice.Pack disp cT class.
 Definition latticeType := @Lattice.Pack disp cT class.
 Definition bLatticeType := @BLattice.Pack disp cT class.
 Definition tLatticeType := @TLattice.Pack disp cT class.
 Definition tbLatticeType := @TBLattice.Pack disp cT class.
 Definition finLatticeType := @FinLattice.Pack disp cT class.
+Definition finTBLatticeType := @FinTBLattice.Pack disp cT class.
 Definition distrLatticeType := @DistrLattice.Pack disp cT class.
 Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
 Definition tDistrLatticeType := @TDistrLattice.Pack disp cT class.
 Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT class.
-Definition count_distrLatticeType := @DistrLattice.Pack disp countType class.
+Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT class.
 Definition count_bDistrLatticeType := @BDistrLattice.Pack disp countType class.
 Definition count_tDistrLatticeType := @TDistrLattice.Pack disp countType class.
 Definition count_tbDistrLatticeType :=
   @TBDistrLattice.Pack disp countType class.
-Definition fin_distrLatticeType := @DistrLattice.Pack disp finType class.
 Definition fin_bDistrLatticeType := @BDistrLattice.Pack disp finType class.
 Definition fin_tDistrLatticeType := @TDistrLattice.Pack disp finType class.
 Definition fin_tbDistrLatticeType := @TBDistrLattice.Pack disp finType class.
-Definition finPOrder_distrLatticeType :=
-  @DistrLattice.Pack disp finPOrderType class.
 Definition finPOrder_bDistrLatticeType :=
   @BDistrLattice.Pack disp finPOrderType class.
 Definition finPOrder_tDistrLatticeType :=
@@ -4205,19 +5316,96 @@ Definition finTBPOrder_tDistrLatticeType :=
   @TDistrLattice.Pack disp finTBPOrderType class.
 Definition finTBPOrder_tbDistrLatticeType :=
   @TBDistrLattice.Pack disp finTBPOrderType class.
-Definition finLattice_distrLatticeType :=
-  @DistrLattice.Pack disp finLatticeType class.
+Definition finMeetSemilattice_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finMeetSemilatticeType class.
+Definition finBMeetSemilattice_distrLatticeType :=
+  @DistrLattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finBMeetSemilatticeType class.
+Definition finJoinSemilattice_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finJoinSemilatticeType class.
+Definition finTJoinSemilattice_distrLatticeType :=
+  @DistrLattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finTJoinSemilatticeType class.
 Definition finLattice_bDistrLatticeType :=
   @BDistrLattice.Pack disp finLatticeType class.
 Definition finLattice_tDistrLatticeType :=
   @TDistrLattice.Pack disp finLatticeType class.
 Definition finLattice_tbDistrLatticeType :=
   @TBDistrLattice.Pack disp finLatticeType class.
+Definition finTBLattice_distrLatticeType :=
+  @DistrLattice.Pack disp finTBLatticeType class.
+Definition finTBLattice_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finTBLatticeType class.
+Definition finTBLattice_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finTBLatticeType class.
+Definition finTBLattice_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finTBLatticeType class.
+Definition finDistrLattice_bPOrderType :=
+  @BPOrder.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tPOrderType :=
+  @TPOrder.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tbPOrderType :=
+  @TBPOrder.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_finBPOrderType :=
+  @FinBPOrder.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_finTPOrderType :=
+  @FinTPOrder.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_finTBPOrderType :=
+  @FinTBPOrder.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_finBMeetSemilatticeType :=
+  @FinBMeetSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_finTJoinSemilatticeType :=
+  @FinTJoinSemilattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_bLatticeType :=
+  @BLattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tLatticeType :=
+  @TLattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tbLatticeType :=
+  @TBLattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_finTBLatticeType :=
+  @FinTBLattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finDistrLatticeType class.
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> TBDistrLattice.class_of.
-Coercion base2 : class_of >-> FinLattice.class_of.
+Coercion base2 : class_of >-> FinTBLattice.class_of.
+Coercion base3 : class_of >-> FinDistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -4235,19 +5423,25 @@ Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
 Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
 Coercion tMeetSemilatticeType : type >-> TMeetSemilattice.type.
 Coercion tbMeetSemilatticeType : type >-> TBMeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion finBMeetSemilatticeType : type >-> FinBMeetSemilattice.type.
 Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
 Coercion bJoinSemilatticeType : type >-> BJoinSemilattice.type.
 Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
 Coercion tbJoinSemilatticeType : type >-> TBJoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion finTJoinSemilatticeType : type >-> FinTJoinSemilattice.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion bLatticeType : type >-> BLattice.type.
 Coercion tLatticeType : type >-> TLattice.type.
 Coercion tbLatticeType : type >-> TBLattice.type.
 Coercion finLatticeType : type >-> FinLattice.type.
+Coercion finTBLatticeType : type >-> FinTBLattice.type.
 Coercion distrLatticeType : type >-> DistrLattice.type.
 Coercion bDistrLatticeType : type >-> BDistrLattice.type.
 Coercion tDistrLatticeType : type >-> TDistrLattice.type.
 Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
+Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
@@ -4264,28 +5458,31 @@ Canonical meetSemilatticeType.
 Canonical bMeetSemilatticeType.
 Canonical tMeetSemilatticeType.
 Canonical tbMeetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
 Canonical joinSemilatticeType.
 Canonical bJoinSemilatticeType.
 Canonical tJoinSemilatticeType.
 Canonical tbJoinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical latticeType.
 Canonical bLatticeType.
 Canonical tLatticeType.
 Canonical tbLatticeType.
 Canonical finLatticeType.
+Canonical finTBLatticeType.
 Canonical distrLatticeType.
 Canonical bDistrLatticeType.
 Canonical tDistrLatticeType.
 Canonical tbDistrLatticeType.
-Canonical count_distrLatticeType.
+Canonical finDistrLatticeType.
 Canonical count_bDistrLatticeType.
 Canonical count_tDistrLatticeType.
 Canonical count_tbDistrLatticeType.
-Canonical fin_distrLatticeType.
 Canonical fin_bDistrLatticeType.
 Canonical fin_tDistrLatticeType.
 Canonical fin_tbDistrLatticeType.
-Canonical finPOrder_distrLatticeType.
 Canonical finPOrder_bDistrLatticeType.
 Canonical finPOrder_tDistrLatticeType.
 Canonical finPOrder_tbDistrLatticeType.
@@ -4301,19 +5498,57 @@ Canonical finTBPOrder_distrLatticeType.
 Canonical finTBPOrder_bDistrLatticeType.
 Canonical finTBPOrder_tDistrLatticeType.
 Canonical finTBPOrder_tbDistrLatticeType.
-Canonical finLattice_distrLatticeType.
+Canonical finMeetSemilattice_bDistrLatticeType.
+Canonical finMeetSemilattice_tDistrLatticeType.
+Canonical finMeetSemilattice_tbDistrLatticeType.
+Canonical finBMeetSemilattice_distrLatticeType.
+Canonical finBMeetSemilattice_bDistrLatticeType.
+Canonical finBMeetSemilattice_tDistrLatticeType.
+Canonical finBMeetSemilattice_tbDistrLatticeType.
+Canonical finJoinSemilattice_bDistrLatticeType.
+Canonical finJoinSemilattice_tDistrLatticeType.
+Canonical finJoinSemilattice_tbDistrLatticeType.
+Canonical finTJoinSemilattice_distrLatticeType.
+Canonical finTJoinSemilattice_bDistrLatticeType.
+Canonical finTJoinSemilattice_tDistrLatticeType.
+Canonical finTJoinSemilattice_tbDistrLatticeType.
 Canonical finLattice_bDistrLatticeType.
 Canonical finLattice_tDistrLatticeType.
 Canonical finLattice_tbDistrLatticeType.
-Notation finDistrLatticeType := type.
-Notation "[ 'finDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
-  (at level 0, format "[ 'finDistrLatticeType'  'of'  T ]") : form_scope.
+Canonical finTBLattice_distrLatticeType.
+Canonical finTBLattice_bDistrLatticeType.
+Canonical finTBLattice_tDistrLatticeType.
+Canonical finTBLattice_tbDistrLatticeType.
+Canonical finDistrLattice_bPOrderType.
+Canonical finDistrLattice_tPOrderType.
+Canonical finDistrLattice_tbPOrderType.
+Canonical finDistrLattice_finBPOrderType.
+Canonical finDistrLattice_finTPOrderType.
+Canonical finDistrLattice_finTBPOrderType.
+Canonical finDistrLattice_bMeetSemilatticeType.
+Canonical finDistrLattice_tMeetSemilatticeType.
+Canonical finDistrLattice_tbMeetSemilatticeType.
+Canonical finDistrLattice_finBMeetSemilatticeType.
+Canonical finDistrLattice_bJoinSemilatticeType.
+Canonical finDistrLattice_tJoinSemilatticeType.
+Canonical finDistrLattice_tbJoinSemilatticeType.
+Canonical finDistrLattice_finTJoinSemilatticeType.
+Canonical finDistrLattice_bLatticeType.
+Canonical finDistrLattice_tLatticeType.
+Canonical finDistrLattice_tbLatticeType.
+Canonical finDistrLattice_finTBLatticeType.
+Canonical finDistrLattice_bDistrLatticeType.
+Canonical finDistrLattice_tDistrLatticeType.
+Canonical finDistrLattice_tbDistrLatticeType.
+Notation finTBDistrLatticeType := type.
+Notation "[ 'finTBDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finTBDistrLatticeType'  'of'  T ]") : form_scope.
 End Exports.
 
-End FinDistrLattice.
-Import FinDistrLattice.Exports.
+End FinTBDistrLattice.
+Import FinTBDistrLattice.Exports.
 
-Module FinCDistrLattice.
+Module FinCTBDistrLattice.
 Section ClassDef.
 
 Set Primitive Projections.
@@ -4326,8 +5561,8 @@ Record class_of (T : Type) := Class {
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> CTBDistrLattice.class_of.
-Local Coercion base2 T (c : class_of T) : FinDistrLattice.class_of T :=
-  @FinDistrLattice.Class T c (mixin c).
+Local Coercion base2 T (c : class_of T) : FinTBDistrLattice.class_of T :=
+  @FinTBDistrLattice.Class T c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -4358,20 +5593,26 @@ Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
 Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
 Definition tMeetSemilatticeType := @TMeetSemilattice.Pack disp cT class.
 Definition tbMeetSemilatticeType := @TBMeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition finBMeetSemilatticeType := @FinBMeetSemilattice.Pack disp cT class.
 Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
 Definition bJoinSemilatticeType := @BJoinSemilattice.Pack disp cT class.
 Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
 Definition tbJoinSemilatticeType := @TBJoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition finTJoinSemilatticeType := @FinTJoinSemilattice.Pack disp cT class.
 Definition latticeType := @Lattice.Pack disp cT class.
 Definition bLatticeType := @BLattice.Pack disp cT class.
 Definition tLatticeType := @TLattice.Pack disp cT class.
 Definition tbLatticeType := @TBLattice.Pack disp cT class.
 Definition finLatticeType := @FinLattice.Pack disp cT class.
+Definition finTBLatticeType := @FinTBLattice.Pack disp cT class.
 Definition distrLatticeType := @DistrLattice.Pack disp cT class.
 Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
 Definition tDistrLatticeType := @TDistrLattice.Pack disp cT class.
 Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT class.
 Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT class.
+Definition finTBDistrLatticeType := @FinTBDistrLattice.Pack disp cT class.
 Definition cbDistrLatticeType := @CBDistrLattice.Pack disp cT class.
 Definition ctbDistrLatticeType := @CTBDistrLattice.Pack disp cT class.
 Definition count_cbDistrLatticeType :=
@@ -4396,19 +5637,43 @@ Definition finTBPOrder_cbDistrLatticeType :=
   @CBDistrLattice.Pack disp finTBPOrderType class.
 Definition finTBPOrder_ctbDistrLatticeType :=
   @CTBDistrLattice.Pack disp finTBPOrderType class.
+Definition finMeetSemilattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finMeetSemilatticeType class.
+Definition finBMeetSemilattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finBMeetSemilatticeType class.
+Definition finJoinSemilattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finJoinSemilatticeType class.
+Definition finTJoinSemilattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finTJoinSemilatticeType class.
 Definition finLattice_cbDistrLatticeType :=
   @CBDistrLattice.Pack disp finLatticeType class.
 Definition finLattice_ctbDistrLatticeType :=
   @CTBDistrLattice.Pack disp finLatticeType class.
+Definition finTBLattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finTBLatticeType class.
+Definition finTBLattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finTBLatticeType class.
 Definition finDistrLattice_cbDistrLatticeType :=
   @CBDistrLattice.Pack disp finDistrLatticeType class.
 Definition finDistrLattice_ctbDistrLatticeType :=
   @CTBDistrLattice.Pack disp finDistrLatticeType class.
+Definition finTBDistrLattice_cbDistrLatticeType :=
+  @CBDistrLattice.Pack disp finTBDistrLatticeType class.
+Definition finTBDistrLattice_ctbDistrLatticeType :=
+  @CTBDistrLattice.Pack disp finTBDistrLatticeType class.
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> CTBDistrLattice.class_of.
-Coercion base2 : class_of >-> FinDistrLattice.class_of.
+Coercion base2 : class_of >-> FinTBDistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -4426,20 +5691,26 @@ Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
 Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
 Coercion tMeetSemilatticeType : type >-> TMeetSemilattice.type.
 Coercion tbMeetSemilatticeType : type >-> TBMeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion finBMeetSemilatticeType : type >-> FinBMeetSemilattice.type.
 Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
 Coercion bJoinSemilatticeType : type >-> BJoinSemilattice.type.
 Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
 Coercion tbJoinSemilatticeType : type >-> TBJoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion finTJoinSemilatticeType : type >-> FinTJoinSemilattice.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion bLatticeType : type >-> BLattice.type.
 Coercion tLatticeType : type >-> TLattice.type.
 Coercion tbLatticeType : type >-> TBLattice.type.
 Coercion finLatticeType : type >-> FinLattice.type.
+Coercion finTBLatticeType : type >-> FinTBLattice.type.
 Coercion distrLatticeType : type >-> DistrLattice.type.
 Coercion bDistrLatticeType : type >-> BDistrLattice.type.
 Coercion tDistrLatticeType : type >-> TDistrLattice.type.
 Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
 Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
+Coercion finTBDistrLatticeType : type >-> FinTBDistrLattice.type.
 Coercion cbDistrLatticeType : type >-> CBDistrLattice.type.
 Coercion ctbDistrLatticeType : type >-> CTBDistrLattice.type.
 Canonical eqType.
@@ -4458,20 +5729,26 @@ Canonical meetSemilatticeType.
 Canonical bMeetSemilatticeType.
 Canonical tMeetSemilatticeType.
 Canonical tbMeetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
 Canonical joinSemilatticeType.
 Canonical bJoinSemilatticeType.
 Canonical tJoinSemilatticeType.
 Canonical tbJoinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical latticeType.
 Canonical bLatticeType.
 Canonical tLatticeType.
 Canonical tbLatticeType.
 Canonical finLatticeType.
+Canonical finTBLatticeType.
 Canonical distrLatticeType.
 Canonical bDistrLatticeType.
 Canonical tDistrLatticeType.
 Canonical tbDistrLatticeType.
 Canonical finDistrLatticeType.
+Canonical finTBDistrLatticeType.
 Canonical cbDistrLatticeType.
 Canonical ctbDistrLatticeType.
 Canonical count_cbDistrLatticeType.
@@ -4486,17 +5763,29 @@ Canonical finTPOrder_cbDistrLatticeType.
 Canonical finTPOrder_ctbDistrLatticeType.
 Canonical finTBPOrder_cbDistrLatticeType.
 Canonical finTBPOrder_ctbDistrLatticeType.
+Canonical finMeetSemilattice_cbDistrLatticeType.
+Canonical finMeetSemilattice_ctbDistrLatticeType.
+Canonical finBMeetSemilattice_cbDistrLatticeType.
+Canonical finBMeetSemilattice_ctbDistrLatticeType.
+Canonical finJoinSemilattice_cbDistrLatticeType.
+Canonical finJoinSemilattice_ctbDistrLatticeType.
+Canonical finTJoinSemilattice_cbDistrLatticeType.
+Canonical finTJoinSemilattice_ctbDistrLatticeType.
 Canonical finLattice_cbDistrLatticeType.
 Canonical finLattice_ctbDistrLatticeType.
+Canonical finTBLattice_cbDistrLatticeType.
+Canonical finTBLattice_ctbDistrLatticeType.
 Canonical finDistrLattice_cbDistrLatticeType.
 Canonical finDistrLattice_ctbDistrLatticeType.
-Notation finCDistrLatticeType := type.
-Notation "[ 'finCDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
-  (at level 0, format "[ 'finCDistrLatticeType'  'of'  T ]") : form_scope.
+Canonical finTBDistrLattice_cbDistrLatticeType.
+Canonical finTBDistrLattice_ctbDistrLatticeType.
+Notation finCTBDistrLatticeType := type.
+Notation "[ 'finCTBDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finCTBDistrLatticeType'  'of'  T ]") : form_scope.
 End Exports.
 
-End FinCDistrLattice.
-Import FinCDistrLattice.Exports.
+End FinCTBDistrLattice.
+Import FinCTBDistrLattice.Exports.
 
 Module FinTotal.
 Section ClassDef.
@@ -4504,15 +5793,15 @@ Section ClassDef.
 Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
-  base  : FinDistrLattice.class_of T;
-  mixin : Total.mixin_of base;
+  base : Total.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
 }.
 
 Unset Primitive Projections.
 
-Local Coercion base : class_of >-> FinDistrLattice.class_of.
-Local Coercion base2 T (c : class_of T) : Total.class_of T :=
-  @Total.Class _ c (mixin (c := c)).
+Local Coercion base : class_of >-> Total.class_of.
+Local Coercion base2 T (c : class_of T) : FinDistrLattice.class_of T :=
+  @FinDistrLattice.Class T c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -4523,8 +5812,114 @@ Variables (T : Type) (disp : unit) (cT : type disp).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 
 Definition pack :=
-  fun bT b & phant_id (@FinDistrLattice.class disp bT) b =>
-  fun mT m & phant_id (@Total.class disp mT) (Total.Class m) =>
+  fun bT b & phant_id (@Total.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
+  Pack disp (@Class T b m).
+
+Definition eqType := @Equality.Pack cT class.
+Definition choiceType := @Choice.Pack cT class.
+Definition countType := @Countable.Pack cT class.
+Definition finType := @Finite.Pack cT class.
+Definition porderType := @POrder.Pack disp cT class.
+Definition finPOrderType := @FinPOrder.Pack disp cT class.
+Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition latticeType := @Lattice.Pack disp cT class.
+Definition finLatticeType := @FinLattice.Pack disp cT class.
+Definition distrLatticeType := @DistrLattice.Pack disp cT class.
+Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT class.
+Definition orderType := @Total.Pack disp cT class.
+Definition order_countType := @Countable.Pack orderType class.
+Definition order_finType := @Finite.Pack orderType class.
+Definition order_finPOrderType := @FinPOrder.Pack disp orderType class.
+Definition order_finMeetSemilatticeType :=
+  @FinMeetSemilattice.Pack disp orderType class.
+Definition order_finJoinSemilatticeType :=
+  @FinJoinSemilattice.Pack disp orderType class.
+Definition order_finLatticeType := @FinLattice.Pack disp orderType class.
+Definition order_finDistrLatticeType :=
+  @FinDistrLattice.Pack disp orderType class.
+End ClassDef.
+
+Module Exports.
+Coercion base : class_of >-> Total.class_of.
+Coercion base2 : class_of >-> FinDistrLattice.class_of.
+Coercion sort : type >-> Sortclass.
+Coercion eqType : type >-> Equality.type.
+Coercion choiceType : type >-> Choice.type.
+Coercion countType : type >-> Countable.type.
+Coercion finType : type >-> Finite.type.
+Coercion porderType : type >-> POrder.type.
+Coercion finPOrderType : type >-> FinPOrder.type.
+Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion latticeType : type >-> Lattice.type.
+Coercion finLatticeType : type >-> FinLattice.type.
+Coercion distrLatticeType : type >-> DistrLattice.type.
+Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
+Coercion orderType : type >-> Total.type.
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical finPOrderType.
+Canonical meetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical joinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical latticeType.
+Canonical finLatticeType.
+Canonical distrLatticeType.
+Canonical finDistrLatticeType.
+Canonical orderType.
+Canonical order_countType.
+Canonical order_finType.
+Canonical order_finPOrderType.
+Canonical order_finMeetSemilatticeType.
+Canonical order_finJoinSemilatticeType.
+Canonical order_finLatticeType.
+Canonical order_finDistrLatticeType.
+Notation finOrderType := type.
+Notation "[ 'finOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
+End Exports.
+End FinTotal.
+Import FinTotal.Exports.
+
+Module FinTBTotal.
+Section ClassDef.
+
+Set Primitive Projections.
+
+Record class_of (T : Type) := Class {
+  base : TBTotal.class_of T;
+  mixin : Finite.mixin_of (Equality.Pack base);
+}.
+
+Unset Primitive Projections.
+
+Local Coercion base : class_of >-> TBTotal.class_of.
+Local Coercion base2 T (c : class_of T) : FinTBDistrLattice.class_of T :=
+  @FinTBDistrLattice.Class T c (mixin c).
+Local Coercion base3 T (c : class_of T) : FinTotal.class_of T :=
+  @FinTotal.Class T c (mixin c).
+
+Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
+
+Local Coercion sort : type >-> Sortclass.
+
+Variables (T : Type) (disp : unit) (cT : type disp).
+
+Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
+
+Definition pack :=
+  fun bT b & phant_id (@TBTotal.class disp bT) b =>
+  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
   Pack disp (@Class T b m).
 
 Definition eqType := @Equality.Pack cT class.
@@ -4543,57 +5938,147 @@ Definition meetSemilatticeType := @MeetSemilattice.Pack disp cT class.
 Definition bMeetSemilatticeType := @BMeetSemilattice.Pack disp cT class.
 Definition tMeetSemilatticeType := @TMeetSemilattice.Pack disp cT class.
 Definition tbMeetSemilatticeType := @TBMeetSemilattice.Pack disp cT class.
+Definition finMeetSemilatticeType := @FinMeetSemilattice.Pack disp cT class.
+Definition finBMeetSemilatticeType := @FinBMeetSemilattice.Pack disp cT class.
 Definition joinSemilatticeType := @JoinSemilattice.Pack disp cT class.
 Definition bJoinSemilatticeType := @BJoinSemilattice.Pack disp cT class.
 Definition tJoinSemilatticeType := @TJoinSemilattice.Pack disp cT class.
 Definition tbJoinSemilatticeType := @TBJoinSemilattice.Pack disp cT class.
+Definition finJoinSemilatticeType := @FinJoinSemilattice.Pack disp cT class.
+Definition finTJoinSemilatticeType := @FinTJoinSemilattice.Pack disp cT class.
 Definition latticeType := @Lattice.Pack disp cT class.
 Definition bLatticeType := @BLattice.Pack disp cT class.
 Definition tLatticeType := @TLattice.Pack disp cT class.
 Definition tbLatticeType := @TBLattice.Pack disp cT class.
 Definition finLatticeType := @FinLattice.Pack disp cT class.
+Definition finTBLatticeType := @FinTBLattice.Pack disp cT class.
 Definition distrLatticeType := @DistrLattice.Pack disp cT class.
 Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
 Definition tDistrLatticeType := @TDistrLattice.Pack disp cT class.
 Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT class.
 Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT class.
+Definition finTBDistrLatticeType := @FinTBDistrLattice.Pack disp cT class.
 Definition orderType := @Total.Pack disp cT class.
-Definition order_countType := @Countable.Pack orderType class.
-Definition order_finType := @Finite.Pack orderType class.
-Definition order_bPOrderType := @BPOrder.Pack disp orderType class.
-Definition order_tPOrderType := @TPOrder.Pack disp orderType class.
-Definition order_tbPOrderType := @TBPOrder.Pack disp orderType class.
-Definition order_finPOrderType := @FinPOrder.Pack disp orderType class.
-Definition order_finBPOrderType := @FinBPOrder.Pack disp orderType class.
-Definition order_finTPOrderType := @FinTPOrder.Pack disp orderType class.
-Definition order_finTBPOrderType := @FinTBPOrder.Pack disp orderType class.
-Definition order_bMeetSemilatticeType :=
-  @BMeetSemilattice.Pack disp orderType class.
-Definition order_tMeetSemilatticeType :=
-  @TMeetSemilattice.Pack disp orderType class.
-Definition order_tbMeetSemilatticeType :=
-  @TBMeetSemilattice.Pack disp orderType class.
-Definition order_bJoinSemilatticeType :=
-  @BJoinSemilattice.Pack disp orderType class.
-Definition order_tJoinSemilatticeType :=
-  @TJoinSemilattice.Pack disp orderType class.
-Definition order_tbJoinSemilatticeType :=
-  @TBJoinSemilattice.Pack disp orderType class.
-Definition order_bLatticeType := @BLattice.Pack disp orderType class.
-Definition order_tLatticeType := @TLattice.Pack disp orderType class.
-Definition order_tbLatticeType := @TBLattice.Pack disp orderType class.
-Definition order_finLatticeType := @FinLattice.Pack disp orderType class.
-Definition order_bDistrLatticeType := @BDistrLattice.Pack disp orderType class.
-Definition order_tDistrLatticeType := @TDistrLattice.Pack disp orderType class.
-Definition order_tbDistrLatticeType :=
-  @TBDistrLattice.Pack disp orderType class.
-Definition order_finDistrLatticeType :=
-  @FinDistrLattice.Pack disp orderType class.
+Definition bOrderType := @BTotal.Pack disp cT class.
+Definition tOrderType := @TTotal.Pack disp cT class.
+Definition tbOrderType := @TBTotal.Pack disp cT class.
+Definition finOrderType := @FinTotal.Pack disp cT class.
+Definition count_bOrderType := @BTotal.Pack disp countType class.
+Definition count_tOrderType := @TTotal.Pack disp countType class.
+Definition count_tbOrderType := @TBTotal.Pack disp countType class.
+Definition fin_bOrderType := @BTotal.Pack disp finType class.
+Definition fin_tOrderType := @TTotal.Pack disp finType class.
+Definition fin_tbOrderType := @TBTotal.Pack disp finType class.
+Definition finPOrder_bOrderType := @BTotal.Pack disp finPOrderType class.
+Definition finPOrder_tOrderType := @TTotal.Pack disp finPOrderType class.
+Definition finPOrder_tbOrderType := @TBTotal.Pack disp finPOrderType class.
+Definition finBPOrder_orderType := @Total.Pack disp finBPOrderType class.
+Definition finBPOrder_bOrderType := @BTotal.Pack disp finBPOrderType class.
+Definition finBPOrder_tOrderType := @TTotal.Pack disp finBPOrderType class.
+Definition finBPOrder_tbOrderType := @TBTotal.Pack disp finBPOrderType class.
+Definition finBPOrder_finOrderType := @FinTotal.Pack disp finBPOrderType class.
+Definition finTPOrder_orderType := @Total.Pack disp finTPOrderType class.
+Definition finTPOrder_bOrderType := @BTotal.Pack disp finTPOrderType class.
+Definition finTPOrder_tOrderType := @TTotal.Pack disp finTPOrderType class.
+Definition finTPOrder_tbOrderType := @TBTotal.Pack disp finTPOrderType class.
+Definition finTPOrder_finOrderType := @FinTotal.Pack disp finTPOrderType class.
+Definition finTBPOrder_orderType := @Total.Pack disp finTBPOrderType class.
+Definition finTBPOrder_bOrderType := @BTotal.Pack disp finTBPOrderType class.
+Definition finTBPOrder_tOrderType := @TTotal.Pack disp finTBPOrderType class.
+Definition finTBPOrder_tbOrderType := @TBTotal.Pack disp finTBPOrderType class.
+Definition finTBPOrder_finOrderType :=
+  @FinTotal.Pack disp finTBPOrderType class.
+Definition finMeetSemilattice_bOrderType :=
+  @BTotal.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tOrderType :=
+  @TTotal.Pack disp finMeetSemilatticeType class.
+Definition finMeetSemilattice_tbOrderType :=
+  @TBTotal.Pack disp finMeetSemilatticeType class.
+Definition finBMeetSemilattice_orderType :=
+  @Total.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_bOrderType :=
+  @BTotal.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tOrderType :=
+  @TTotal.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_tbOrderType :=
+  @TBTotal.Pack disp finBMeetSemilatticeType class.
+Definition finBMeetSemilattice_finOrderType :=
+  @FinTotal.Pack disp finBMeetSemilatticeType class.
+Definition finJoinSemilattice_bOrderType :=
+  @BTotal.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tOrderType :=
+  @TTotal.Pack disp finJoinSemilatticeType class.
+Definition finJoinSemilattice_tbOrderType :=
+  @TBTotal.Pack disp finJoinSemilatticeType class.
+Definition finTJoinSemilattice_orderType :=
+  @Total.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_bOrderType :=
+  @BTotal.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tOrderType :=
+  @TTotal.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_tbOrderType :=
+  @TBTotal.Pack disp finTJoinSemilatticeType class.
+Definition finTJoinSemilattice_finOrderType :=
+  @FinTotal.Pack disp finTJoinSemilatticeType class.
+Definition finLattice_bOrderType := @BTotal.Pack disp finLatticeType class.
+Definition finLattice_tOrderType := @TTotal.Pack disp finLatticeType class.
+Definition finLattice_tbOrderType := @TBTotal.Pack disp finLatticeType class.
+Definition finTBLattice_orderType := @Total.Pack disp finTBLatticeType class.
+Definition finTBLattice_bOrderType := @BTotal.Pack disp finTBLatticeType class.
+Definition finTBLattice_tOrderType := @TTotal.Pack disp finTBLatticeType class.
+Definition finTBLattice_tbOrderType :=
+  @TBTotal.Pack disp finTBLatticeType class.
+Definition finTBLattice_finOrderType :=
+  @FinTotal.Pack disp finTBLatticeType class.
+Definition finDistrLattice_bOrderType :=
+  @BTotal.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tOrderType :=
+  @TTotal.Pack disp finDistrLatticeType class.
+Definition finDistrLattice_tbOrderType :=
+  @TBTotal.Pack disp finDistrLatticeType class.
+Definition finTBDistrLattice_orderType :=
+  @Total.Pack disp finTBDistrLatticeType class.
+Definition finTBDistrLattice_bOrderType :=
+  @BTotal.Pack disp finTBDistrLatticeType class.
+Definition finTBDistrLattice_tOrderType :=
+  @TTotal.Pack disp finTBDistrLatticeType class.
+Definition finTBDistrLattice_tbOrderType :=
+  @TBTotal.Pack disp finTBDistrLatticeType class.
+Definition finTBDistrLattice_finOrderType :=
+  @FinTotal.Pack disp finTBDistrLatticeType class.
+Definition finOrder_bPOrderType := @BPOrder.Pack disp finOrderType class.
+Definition finOrder_tPOrderType := @TPOrder.Pack disp finOrderType class.
+Definition finOrder_tbPOrderType := @TBPOrder.Pack disp finOrderType class.
+Definition finOrder_bMeetSemilatticeType :=
+  @BMeetSemilattice.Pack disp finOrderType class.
+Definition finOrder_tMeetSemilatticeType :=
+  @TMeetSemilattice.Pack disp finOrderType class.
+Definition finOrder_tbMeetSemilatticeType :=
+  @TBMeetSemilattice.Pack disp finOrderType class.
+Definition finOrder_bJoinSemilatticeType :=
+  @BJoinSemilattice.Pack disp finOrderType class.
+Definition finOrder_tJoinSemilatticeType :=
+  @TJoinSemilattice.Pack disp finOrderType class.
+Definition finOrder_tbJoinSemilatticeType :=
+  @TBJoinSemilattice.Pack disp finOrderType class.
+Definition finOrder_bLatticeType := @BLattice.Pack disp finOrderType class.
+Definition finOrder_tLatticeType := @TLattice.Pack disp finOrderType class.
+Definition finOrder_tbLatticeType := @TBLattice.Pack disp finOrderType class.
+Definition finOrder_bDistrLatticeType :=
+  @BDistrLattice.Pack disp finOrderType class.
+Definition finOrder_tDistrLatticeType :=
+  @TDistrLattice.Pack disp finOrderType class.
+Definition finOrder_tbDistrLatticeType :=
+  @TBDistrLattice.Pack disp finOrderType class.
+Definition finOrder_bOrderType := @BTotal.Pack disp finOrderType class.
+Definition finOrder_tOrderType := @TTotal.Pack disp finOrderType class.
+Definition finOrder_tbOrderType := @TBTotal.Pack disp finOrderType class.
 End ClassDef.
 
 Module Exports.
-Coercion base : class_of >-> FinDistrLattice.class_of.
-Coercion base2 : class_of >-> Total.class_of.
+Coercion base : class_of >-> TBTotal.class_of.
+Coercion base2 : class_of >-> FinTBDistrLattice.class_of.
+Coercion base3 : class_of >-> FinTotal.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -4611,21 +6096,31 @@ Coercion meetSemilatticeType : type >-> MeetSemilattice.type.
 Coercion bMeetSemilatticeType : type >-> BMeetSemilattice.type.
 Coercion tMeetSemilatticeType : type >-> TMeetSemilattice.type.
 Coercion tbMeetSemilatticeType : type >-> TBMeetSemilattice.type.
+Coercion finMeetSemilatticeType : type >-> FinMeetSemilattice.type.
+Coercion finBMeetSemilatticeType : type >-> FinBMeetSemilattice.type.
 Coercion joinSemilatticeType : type >-> JoinSemilattice.type.
 Coercion bJoinSemilatticeType : type >-> BJoinSemilattice.type.
 Coercion tJoinSemilatticeType : type >-> TJoinSemilattice.type.
 Coercion tbJoinSemilatticeType : type >-> TBJoinSemilattice.type.
+Coercion finJoinSemilatticeType : type >-> FinJoinSemilattice.type.
+Coercion finTJoinSemilatticeType : type >-> FinTJoinSemilattice.type.
 Coercion latticeType : type >-> Lattice.type.
 Coercion bLatticeType : type >-> BLattice.type.
 Coercion tLatticeType : type >-> TLattice.type.
 Coercion tbLatticeType : type >-> TBLattice.type.
 Coercion finLatticeType : type >-> FinLattice.type.
+Coercion finTBLatticeType : type >-> FinTBLattice.type.
 Coercion distrLatticeType : type >-> DistrLattice.type.
 Coercion bDistrLatticeType : type >-> BDistrLattice.type.
 Coercion tDistrLatticeType : type >-> TDistrLattice.type.
 Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
 Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
+Coercion finTBDistrLatticeType : type >-> FinTBDistrLattice.type.
 Coercion orderType : type >-> Total.type.
+Coercion bOrderType : type >-> BTotal.type.
+Coercion tOrderType : type >-> TTotal.type.
+Coercion tbOrderType : type >-> TBTotal.type.
+Coercion finOrderType : type >-> FinTotal.type.
 Canonical eqType.
 Canonical choiceType.
 Canonical countType.
@@ -4642,50 +6137,112 @@ Canonical meetSemilatticeType.
 Canonical bMeetSemilatticeType.
 Canonical tMeetSemilatticeType.
 Canonical tbMeetSemilatticeType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
 Canonical joinSemilatticeType.
 Canonical bJoinSemilatticeType.
 Canonical tJoinSemilatticeType.
 Canonical tbJoinSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical latticeType.
 Canonical bLatticeType.
 Canonical tLatticeType.
 Canonical tbLatticeType.
 Canonical finLatticeType.
+Canonical finTBLatticeType.
 Canonical distrLatticeType.
 Canonical bDistrLatticeType.
 Canonical tDistrLatticeType.
 Canonical tbDistrLatticeType.
 Canonical finDistrLatticeType.
+Canonical finTBDistrLatticeType.
 Canonical orderType.
-Canonical order_countType.
-Canonical order_finType.
-Canonical order_bPOrderType.
-Canonical order_tPOrderType.
-Canonical order_tbPOrderType.
-Canonical order_finPOrderType.
-Canonical order_finBPOrderType.
-Canonical order_finTPOrderType.
-Canonical order_finTBPOrderType.
-Canonical order_bMeetSemilatticeType.
-Canonical order_tMeetSemilatticeType.
-Canonical order_tbMeetSemilatticeType.
-Canonical order_bJoinSemilatticeType.
-Canonical order_tJoinSemilatticeType.
-Canonical order_tbJoinSemilatticeType.
-Canonical order_bLatticeType.
-Canonical order_tLatticeType.
-Canonical order_tbLatticeType.
-Canonical order_finLatticeType.
-Canonical order_bDistrLatticeType.
-Canonical order_tDistrLatticeType.
-Canonical order_tbDistrLatticeType.
-Canonical order_finDistrLatticeType.
-Notation finOrderType := type.
-Notation "[ 'finOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
-  (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
+Canonical bOrderType.
+Canonical tOrderType.
+Canonical tbOrderType.
+Canonical finOrderType.
+Canonical count_bOrderType.
+Canonical count_tOrderType.
+Canonical count_tbOrderType.
+Canonical fin_bOrderType.
+Canonical fin_tOrderType.
+Canonical fin_tbOrderType.
+Canonical finPOrder_bOrderType.
+Canonical finPOrder_tOrderType.
+Canonical finPOrder_tbOrderType.
+Canonical finBPOrder_orderType.
+Canonical finBPOrder_bOrderType.
+Canonical finBPOrder_tOrderType.
+Canonical finBPOrder_tbOrderType.
+Canonical finBPOrder_finOrderType.
+Canonical finTPOrder_orderType.
+Canonical finTPOrder_bOrderType.
+Canonical finTPOrder_tOrderType.
+Canonical finTPOrder_tbOrderType.
+Canonical finTPOrder_finOrderType.
+Canonical finTBPOrder_orderType.
+Canonical finTBPOrder_bOrderType.
+Canonical finTBPOrder_tOrderType.
+Canonical finTBPOrder_tbOrderType.
+Canonical finTBPOrder_finOrderType.
+Canonical finMeetSemilattice_bOrderType.
+Canonical finMeetSemilattice_tOrderType.
+Canonical finMeetSemilattice_tbOrderType.
+Canonical finBMeetSemilattice_orderType.
+Canonical finBMeetSemilattice_bOrderType.
+Canonical finBMeetSemilattice_tOrderType.
+Canonical finBMeetSemilattice_tbOrderType.
+Canonical finBMeetSemilattice_finOrderType.
+Canonical finJoinSemilattice_bOrderType.
+Canonical finJoinSemilattice_tOrderType.
+Canonical finJoinSemilattice_tbOrderType.
+Canonical finTJoinSemilattice_orderType.
+Canonical finTJoinSemilattice_bOrderType.
+Canonical finTJoinSemilattice_tOrderType.
+Canonical finTJoinSemilattice_tbOrderType.
+Canonical finTJoinSemilattice_finOrderType.
+Canonical finLattice_bOrderType.
+Canonical finLattice_tOrderType.
+Canonical finLattice_tbOrderType.
+Canonical finTBLattice_orderType.
+Canonical finTBLattice_bOrderType.
+Canonical finTBLattice_tOrderType.
+Canonical finTBLattice_tbOrderType.
+Canonical finTBLattice_finOrderType.
+Canonical finDistrLattice_bOrderType.
+Canonical finDistrLattice_tOrderType.
+Canonical finDistrLattice_tbOrderType.
+Canonical finTBDistrLattice_orderType.
+Canonical finTBDistrLattice_bOrderType.
+Canonical finTBDistrLattice_tOrderType.
+Canonical finTBDistrLattice_tbOrderType.
+Canonical finTBDistrLattice_finOrderType.
+Canonical finOrder_bPOrderType.
+Canonical finOrder_tPOrderType.
+Canonical finOrder_tbPOrderType.
+Canonical finOrder_bMeetSemilatticeType.
+Canonical finOrder_tMeetSemilatticeType.
+Canonical finOrder_tbMeetSemilatticeType.
+Canonical finOrder_bJoinSemilatticeType.
+Canonical finOrder_tJoinSemilatticeType.
+Canonical finOrder_tbJoinSemilatticeType.
+Canonical finOrder_bLatticeType.
+Canonical finOrder_tLatticeType.
+Canonical finOrder_tbLatticeType.
+Canonical finOrder_bDistrLatticeType.
+Canonical finOrder_tDistrLatticeType.
+Canonical finOrder_tbDistrLatticeType.
+Canonical finOrder_bOrderType.
+Canonical finOrder_tOrderType.
+Canonical finOrder_tbOrderType.
+Notation finTBOrderType := type.
+Notation "[ 'finTBOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+  (at level 0, format "[ 'finTBOrderType'  'of'  T ]") : form_scope.
 End Exports.
-End FinTotal.
-Import FinTotal.Exports.
+
+End FinTBTotal.
+Import FinTBTotal.Exports.
 
 Module Import DualOrder.
 Section DualOrder.
@@ -4731,14 +6288,37 @@ Canonical dual_tbDistrLatticeType (T : tbDistrLatticeType disp) :=
 Canonical dual_orderType (T : orderType disp) :=
   OrderType T^d ((fun x y => @Total.mixin _ (Total.class T) y x) :
                    Total.mixin_of (Lattice.class [distrLatticeType of T^d])).
+Canonical dual_bOrderType (T : tOrderType disp) := [bOrderType of T^d].
+Canonical dual_tOrderType (T : bOrderType disp) := [tOrderType of T^d].
+Canonical dual_tbOrderType (T : tbOrderType disp) := [tbOrderType of T^d].
 Canonical dual_finPOrderType (T : finPOrderType disp) :=
   [finPOrderType of T^d].
+Canonical dual_finBPOrderType (T : finTPOrderType disp) :=
+  [finBPOrderType of T^d].
+Canonical dual_finTPOrderType (T : finBPOrderType disp) :=
+  [finTPOrderType of T^d].
+Canonical dual_finTBPOrderType (T : finTBPOrderType disp) :=
+  [finTBPOrderType of T^d].
+Canonical dual_finMeetSemilatticeType (T : finJoinSemilatticeType disp) :=
+  [finMeetSemilatticeType of T^d].
+Canonical dual_finBMeetSemilatticeType (T : finTJoinSemilatticeType disp) :=
+  [finBMeetSemilatticeType of T^d].
+Canonical dual_finJoinSemilatticeType (T : finMeetSemilatticeType disp) :=
+  [finJoinSemilatticeType of T^d].
+Canonical dual_finTJoinSemilatticeType (T : finBMeetSemilatticeType disp) :=
+  [finTJoinSemilatticeType of T^d].
 Canonical dual_finLatticeType (T : finLatticeType disp) :=
   [finLatticeType of T^d].
+Canonical dual_finTBLatticeType (T : finTBLatticeType disp) :=
+  [finTBLatticeType of T^d].
 Canonical dual_finDistrLatticeType (T : finDistrLatticeType disp) :=
   [finDistrLatticeType of T^d].
+Canonical dual_finTBDistrLatticeType (T : finTBDistrLatticeType disp) :=
+  [finTBDistrLatticeType of T^d].
 Canonical dual_finOrderType (T : finOrderType disp) :=
   [finOrderType of T^d].
+Canonical dual_finTBOrderType (T : finTBOrderType disp) :=
+  [finTBOrderType of T^d].
 
 Lemma botEdual (T : bPOrderType disp) : (1 : T^d) = (0 : T). Proof. by []. Qed.
 
@@ -8268,6 +9848,7 @@ Canonical bLatticeType := [bLatticeType of nat].
 Canonical distrLatticeType := DistrLatticeType nat orderMixin.
 Canonical bDistrLatticeType := [bDistrLatticeType of nat].
 Canonical orderType := OrderType nat orderMixin.
+Canonical bOrderType := [bOrderType of nat].
 
 Lemma leEnat : le = leq. Proof. by []. Qed.
 Lemma ltEnat : lt = ltn. Proof. by []. Qed.
@@ -8289,6 +9870,7 @@ Canonical bLatticeType.
 Canonical distrLatticeType.
 Canonical bDistrLatticeType.
 Canonical orderType.
+Canonical bOrderType.
 Definition leEnat := leEnat.
 Definition ltEnat := ltEnat.
 Definition minEnat := minEnat.
@@ -8599,8 +10181,11 @@ Canonical meetSemilatticeType := MeetSemilatticeType 'I_n orderMixin.
 Canonical joinSemilatticeType := JoinSemilatticeType 'I_n orderMixin.
 Canonical latticeType := [latticeType of 'I_n].
 Canonical distrLatticeType := DistrLatticeType 'I_n orderMixin.
-Canonical orderType  := OrderType 'I_n orderMixin.
+Canonical orderType := OrderType 'I_n orderMixin.
 Canonical finPOrderType := [finPOrderType of 'I_n].
+Canonical finLatticeType := [finLatticeType of 'I_n].
+Canonical finDistrLatticeType := [finDistrLatticeType of 'I_n].
+Canonical finOrderType := [finOrderType of 'I_n].
 
 Lemma leEord : (le : rel 'I_n) = leq. Proof. by []. Qed.
 Lemma ltEord : (lt : rel 'I_n) = (fun m n => m < n)%N. Proof. by []. Qed.
@@ -8627,9 +10212,9 @@ Canonical tbLatticeType := [tbLatticeType of 'I_n].
 Canonical bDistrLatticeType := [bDistrLatticeType of 'I_n].
 Canonical tDistrLatticeType := [tDistrLatticeType of 'I_n].
 Canonical tbDistrLatticeType := [tbDistrLatticeType of 'I_n].
-Canonical finLatticeType := [finLatticeType of 'I_n].
-Canonical finDistrLatticeType := [finDistrLatticeType of 'I_n].
-Canonical finOrderType := [finOrderType of 'I_n].
+Canonical bOrderType := [bOrderType of 'I_n].
+Canonical tOrderType := [tOrderType of 'I_n].
+Canonical tbOrderType := [tbOrderType of 'I_n].
 
 Lemma botEord : 0%O = ord0. Proof. by []. Qed.
 Lemma topEord : 1%O = ord_max. Proof. by []. Qed.
@@ -8660,6 +10245,9 @@ Canonical bDistrLatticeType.
 Canonical tDistrLatticeType.
 Canonical tbDistrLatticeType.
 Canonical orderType.
+Canonical bOrderType.
+Canonical tOrderType.
+Canonical tbOrderType.
 Canonical finPOrderType.
 Canonical finLatticeType.
 Canonical finDistrLatticeType.
@@ -8723,6 +10311,9 @@ Canonical bDistrLatticeType := [bDistrLatticeType of bool].
 Canonical tDistrLatticeType := [tDistrLatticeType of bool].
 Canonical tbDistrLatticeType := [tbDistrLatticeType of bool].
 Canonical orderType := OrderType bool orderMixin.
+Canonical bOrderType := [bOrderType of bool].
+Canonical tOrderType := [tOrderType of bool].
+Canonical tbOrderType := [tbOrderType of bool].
 Canonical cbDistrLatticeType := CBDistrLatticeType bool
   (@CBDistrLatticeMixin _ _ (fun x y => x && ~~ y) subKI joinIB).
 Canonical ctbDistrLatticeType := CTBDistrLatticeType bool
@@ -8732,10 +10323,17 @@ Canonical finPOrderType := [finPOrderType of bool].
 Canonical finBPOrderType := [finBPOrderType of bool].
 Canonical finTPOrderType := [finTPOrderType of bool].
 Canonical finTBPOrderType := [finTBPOrderType of bool].
+Canonical finMeetSemilatticeType := [finMeetSemilatticeType of bool].
+Canonical finBMeetSemilatticeType := [finBMeetSemilatticeType of bool].
+Canonical finJoinSemilatticeType := [finJoinSemilatticeType of bool].
+Canonical finTJoinSemilatticeType := [finTJoinSemilatticeType of bool].
 Canonical finLatticeType :=  [finLatticeType of bool].
+Canonical finTBLatticeType :=  [finTBLatticeType of bool].
 Canonical finDistrLatticeType :=  [finDistrLatticeType of bool].
-Canonical finCDistrLatticeType := [finCDistrLatticeType of bool].
+Canonical finTBDistrLatticeType :=  [finTBDistrLatticeType of bool].
+Canonical finCTBDistrLatticeType := [finCTBDistrLatticeType of bool].
 Canonical finOrderType := [finOrderType of bool].
+Canonical finTBOrderType := [finTBOrderType of bool].
 
 Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
 Lemma ltEbool x y : (x < y) = (x < y)%N. Proof. by []. Qed.
@@ -8767,16 +10365,26 @@ Canonical bDistrLatticeType.
 Canonical tDistrLatticeType.
 Canonical tbDistrLatticeType.
 Canonical orderType.
+Canonical bOrderType.
+Canonical tOrderType.
+Canonical tbOrderType.
 Canonical cbDistrLatticeType.
 Canonical ctbDistrLatticeType.
 Canonical finPOrderType.
 Canonical finBPOrderType.
 Canonical finTPOrderType.
 Canonical finTBPOrderType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical finLatticeType.
+Canonical finTBLatticeType.
 Canonical finDistrLatticeType.
-Canonical finCDistrLatticeType.
+Canonical finTBDistrLatticeType.
+Canonical finCTBDistrLatticeType.
 Canonical finOrderType.
+Canonical finTBOrderType.
 Definition leEbool := leEbool.
 Definition ltEbool := ltEbool.
 Definition andEbool := andEbool.
@@ -9194,14 +10802,32 @@ Canonical finTPOrderType (T : finTPOrderType disp1)
 Canonical finTBPOrderType (T : finTBPOrderType disp1)
   (T' : finTBPOrderType disp2) := [finTBPOrderType of T * T'].
 
+Canonical finMeetSemilatticeType (T : finMeetSemilatticeType disp1)
+  (T' : finMeetSemilatticeType disp2) := [finMeetSemilatticeType of T * T'].
+
+Canonical finBMeetSemilatticeType (T : finBMeetSemilatticeType disp1)
+  (T' : finBMeetSemilatticeType disp2) := [finBMeetSemilatticeType of T * T'].
+
+Canonical finJoinSemilatticeType (T : finJoinSemilatticeType disp1)
+  (T' : finJoinSemilatticeType disp2) := [finJoinSemilatticeType of T * T'].
+
+Canonical finTJoinSemilatticeType (T : finTJoinSemilatticeType disp1)
+  (T' : finTJoinSemilatticeType disp2) := [finTJoinSemilatticeType of T * T'].
+
 Canonical finLatticeType (T : finLatticeType disp1)
   (T' : finLatticeType disp2) := [finLatticeType of T * T'].
+
+Canonical finTBLatticeType (T : finTBLatticeType disp1)
+  (T' : finTBLatticeType disp2) := [finTBLatticeType of T * T'].
 
 Canonical finDistrLatticeType (T : finDistrLatticeType disp1)
   (T' : finDistrLatticeType disp2) := [finDistrLatticeType of T * T'].
 
-Canonical finCDistrLatticeType (T : finCDistrLatticeType disp1)
-  (T' : finCDistrLatticeType disp2) := [finCDistrLatticeType of T * T'].
+Canonical finTBDistrLatticeType (T : finTBDistrLatticeType disp1)
+  (T' : finTBDistrLatticeType disp2) := [finTBDistrLatticeType of T * T'].
+
+Canonical finCTBDistrLatticeType (T : finCTBDistrLatticeType disp1)
+  (T' : finCTBDistrLatticeType disp2) := [finCTBDistrLatticeType of T * T'].
 
 End ProdOrder.
 
@@ -9240,9 +10866,15 @@ Canonical finPOrderType.
 Canonical finBPOrderType.
 Canonical finTPOrderType.
 Canonical finTBPOrderType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical finLatticeType.
+Canonical finTBLatticeType.
 Canonical finDistrLatticeType.
-Canonical finCDistrLatticeType.
+Canonical finTBDistrLatticeType.
+Canonical finCTBDistrLatticeType.
 
 Definition leEprod := @leEprod.
 Definition ltEprod := @ltEprod.
@@ -9327,12 +10959,24 @@ Canonical prod_finTPOrderType (T : finTPOrderType disp1)
   (T' : finTPOrderType disp2) := [finTPOrderType of T * T'].
 Canonical prod_finTBPOrderType (T : finTBPOrderType disp1)
   (T' : finTBPOrderType disp2) := [finTBPOrderType of T * T'].
+Canonical prod_finMeetSemilatticeType (T : finMeetSemilatticeType disp1)
+  (T' : finMeetSemilatticeType disp2) := [finMeetSemilatticeType of T * T'].
+Canonical prod_finBMeetSemilatticeType (T : finBMeetSemilatticeType disp1)
+  (T' : finBMeetSemilatticeType disp2) := [finBMeetSemilatticeType of T * T'].
+Canonical prod_finJoinSemilatticeType (T : finJoinSemilatticeType disp1)
+  (T' : finJoinSemilatticeType disp2) := [finJoinSemilatticeType of T * T'].
+Canonical prod_finTJoinSemilatticeType (T : finTJoinSemilatticeType disp1)
+  (T' : finTJoinSemilatticeType disp2) := [finTJoinSemilatticeType of T * T'].
 Canonical prod_finLatticeType (T : finLatticeType disp1)
   (T' : finLatticeType disp2) := [finLatticeType of T * T'].
+Canonical prod_finTBLatticeType (T : finTBLatticeType disp1)
+  (T' : finTBLatticeType disp2) := [finTBLatticeType of T * T'].
 Canonical prod_finDistrLatticeType (T : finDistrLatticeType disp1)
   (T' : finDistrLatticeType disp2) := [finDistrLatticeType of T * T'].
-Canonical prod_finCDistrLatticeType (T : finCDistrLatticeType disp1)
-  (T' : finCDistrLatticeType disp2) := [finCDistrLatticeType of T * T'].
+Canonical prod_finTBDistrLatticeType (T : finTBDistrLatticeType disp1)
+  (T' : finTBDistrLatticeType disp2) := [finTBDistrLatticeType of T * T'].
+Canonical prod_finCTBDistrLatticeType (T : finCTBDistrLatticeType disp1)
+  (T' : finCTBDistrLatticeType disp2) := [finCTBDistrLatticeType of T * T'].
 
 End DefaultProdOrder.
 End DefaultProdOrder.
@@ -9457,6 +11101,39 @@ Canonical orderType := OrderType {t : T & T' t} total.
 
 End Total.
 
+Section BTotal.
+Variable (T : bOrderType disp1) (T' : T -> bOrderType disp2).
+
+Canonical bMeetSemilatticeType := [bMeetSemilatticeType of {t : T & T' t}].
+Canonical bJoinSemilatticeType := [bJoinSemilatticeType of {t : T & T' t}].
+Canonical bLatticeType := [bLatticeType of {t : T & T' t}].
+Canonical bDistrLatticeType := [bDistrLatticeType of {t : T & T' t}].
+Canonical bOrderType := [bOrderType of {t : T & T' t}].
+
+End BTotal.
+
+Section TTotal.
+Variable (T : tOrderType disp1) (T' : T -> tOrderType disp2).
+
+Canonical tMeetSemilatticeType := [tMeetSemilatticeType of {t : T & T' t}].
+Canonical tJoinSemilatticeType := [tJoinSemilatticeType of {t : T & T' t}].
+Canonical tLatticeType := [tLatticeType of {t : T & T' t}].
+Canonical tDistrLatticeType := [tDistrLatticeType of {t : T & T' t}].
+Canonical tOrderType := [tOrderType of {t : T & T' t}].
+
+End TTotal.
+
+Section TBTotal.
+Variable (T : tbOrderType disp1) (T' : T -> tbOrderType disp2).
+
+Canonical tbMeetSemilatticeType := [tbMeetSemilatticeType of {t : T & T' t}].
+Canonical tbJoinSemilatticeType := [tbJoinSemilatticeType of {t : T & T' t}].
+Canonical tbLatticeType := [tbLatticeType of {t : T & T' t}].
+Canonical tbDistrLatticeType := [tbDistrLatticeType of {t : T & T' t}].
+Canonical tbOrderType := [tbOrderType of {t : T & T' t}].
+
+End TBTotal.
+
 Canonical finPOrderType (T : finPOrderType disp1)
   (T' : T -> finPOrderType disp2) := [finPOrderType of {t : T & T' t}].
 Canonical finBPOrderType (T : finBPOrderType disp1)
@@ -9466,27 +11143,23 @@ Canonical finTPOrderType (T : finTPOrderType disp1)
 Canonical finTBPOrderType (T : finTBPOrderType disp1)
   (T' : T -> finTBPOrderType disp2) := [finTBPOrderType of {t : T & T' t}].
 
-Section FinOrder.
+Section FinTotal.
 Variable (T : finOrderType disp1) (T' : T -> finOrderType disp2).
-
-Canonical bMeetSemilatticeType := [bMeetSemilatticeType of {t : T & T' t}].
-Canonical tMeetSemilatticeType := [tMeetSemilatticeType of {t : T & T' t}].
-Canonical tbMeetSemilatticeType := [tbMeetSemilatticeType of {t : T & T' t}].
-Canonical bJoinSemilatticeType := [bJoinSemilatticeType of {t : T & T' t}].
-Canonical tJoinSemilatticeType := [tJoinSemilatticeType of {t : T & T' t}].
-Canonical tbJoinSemilatticeType := [tbJoinSemilatticeType of {t : T & T' t}].
-Canonical bLatticeType := [bLatticeType of {t : T & T' t}].
-Canonical tLatticeType := [tLatticeType of {t : T & T' t}].
-Canonical tbLatticeType := [tbLatticeType of {t : T & T' t}].
-Canonical bDistrLatticeType := [bDistrLatticeType of {t : T & T' t}].
-Canonical tDistrLatticeType := [tDistrLatticeType of {t : T & T' t}].
-Canonical tbDistrLatticeType := [tbDistrLatticeType of {t : T & T' t}].
 
 Canonical finLatticeType := [finLatticeType of {t : T & T' t}].
 Canonical finDistrLatticeType := [finDistrLatticeType of {t : T & T' t}].
 Canonical finOrderType := [finOrderType of {t : T & T' t}].
 
-End FinOrder.
+End FinTotal.
+
+Section FinTBTotal.
+Variable (T : finTBOrderType disp1) (T' : T -> finTBOrderType disp2).
+
+Canonical finTBLatticeType := [finTBLatticeType of {t : T & T' t}].
+Canonical finTBDistrLatticeType := [finTBDistrLatticeType of {t : T & T' t}].
+Canonical finTBOrderType := [finTBOrderType of {t : T & T' t}].
+
+End FinTBTotal.
 
 End SigmaOrder.
 
@@ -9497,22 +11170,25 @@ Canonical bPOrderType.
 Canonical tPOrderType.
 Canonical tbPOrderType.
 Canonical meetSemilatticeType.
-Canonical bMeetSemilatticeType.
-Canonical tMeetSemilatticeType.
-Canonical tbMeetSemilatticeType.
 Canonical joinSemilatticeType.
-Canonical bJoinSemilatticeType.
-Canonical tJoinSemilatticeType.
-Canonical tbJoinSemilatticeType.
 Canonical latticeType.
-Canonical bLatticeType.
-Canonical tLatticeType.
-Canonical tbLatticeType.
 Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tDistrLatticeType.
-Canonical tbDistrLatticeType.
 Canonical orderType.
+Canonical bMeetSemilatticeType.
+Canonical bJoinSemilatticeType.
+Canonical bLatticeType.
+Canonical bDistrLatticeType.
+Canonical bOrderType.
+Canonical tMeetSemilatticeType.
+Canonical tJoinSemilatticeType.
+Canonical tLatticeType.
+Canonical tDistrLatticeType.
+Canonical tOrderType.
+Canonical tbMeetSemilatticeType.
+Canonical tbJoinSemilatticeType.
+Canonical tbLatticeType.
+Canonical tbDistrLatticeType.
+Canonical tbOrderType.
 Canonical finPOrderType.
 Canonical finBPOrderType.
 Canonical finTPOrderType.
@@ -9520,6 +11196,9 @@ Canonical finTBPOrderType.
 Canonical finLatticeType.
 Canonical finDistrLatticeType.
 Canonical finOrderType.
+Canonical finTBLatticeType.
+Canonical finTBDistrLatticeType.
+Canonical finTBOrderType.
 
 Definition leEsig := @leEsig.
 Definition ltEsig := @ltEsig.
@@ -9647,6 +11326,39 @@ Canonical orderType := OrderType (T * T') total.
 
 End Total.
 
+Section BTotal.
+Variable (T : bOrderType disp1) (T' : bOrderType disp2).
+
+Canonical bMeetSemilatticeType := [bMeetSemilatticeType of T * T'].
+Canonical bJoinSemilatticeType := [bJoinSemilatticeType of T * T'].
+Canonical bLatticeType := [bLatticeType of T * T'].
+Canonical bDistrLatticeType := [bDistrLatticeType of T * T'].
+Canonical bOrderType := [bOrderType of T * T'].
+
+End BTotal.
+
+Section TTotal.
+Variable (T : tOrderType disp1) (T' : tOrderType disp2).
+
+Canonical tMeetSemilatticeType := [tMeetSemilatticeType of T * T'].
+Canonical tJoinSemilatticeType := [tJoinSemilatticeType of T * T'].
+Canonical tLatticeType := [tLatticeType of T * T'].
+Canonical tDistrLatticeType := [tDistrLatticeType of T * T'].
+Canonical tOrderType := [tOrderType of T * T'].
+
+End TTotal.
+
+Section TBTotal.
+Variable (T : tbOrderType disp1) (T' : tbOrderType disp2).
+
+Canonical tbMeetSemilatticeType := [tbMeetSemilatticeType of T * T'].
+Canonical tbJoinSemilatticeType := [tbJoinSemilatticeType of T * T'].
+Canonical tbLatticeType := [tbLatticeType of T * T'].
+Canonical tbDistrLatticeType := [tbDistrLatticeType of T * T'].
+Canonical tbOrderType := [tbOrderType of T * T'].
+
+End TBTotal.
+
 Canonical finPOrderType (T : finPOrderType disp1)
     (T' : finPOrderType disp2) := [finPOrderType of T * T'].
 Canonical finBPOrderType (T : finBPOrderType disp1)
@@ -9656,26 +11368,23 @@ Canonical finTPOrderType (T : finTPOrderType disp1)
 Canonical finTBPOrderType (T : finTBPOrderType disp1)
     (T' : finTBPOrderType disp2) := [finTBPOrderType of T * T'].
 
-Section FinOrder.
+Section FinTotal.
 Variable (T : finOrderType disp1) (T' : finOrderType disp2).
 
-Canonical bMeetSemilatticeType := [bMeetSemilatticeType of T * T'].
-Canonical tMeetSemilatticeType := [tMeetSemilatticeType of T * T'].
-Canonical tbMeetSemilatticeType := [tbMeetSemilatticeType of T * T'].
-Canonical bJoinSemilatticeType := [bJoinSemilatticeType of T * T'].
-Canonical tJoinSemilatticeType := [tJoinSemilatticeType of T * T'].
-Canonical tbJoinSemilatticeType := [tbJoinSemilatticeType of T * T'].
-Canonical bLatticeType := [bLatticeType of T * T'].
-Canonical tLatticeType := [tLatticeType of T * T'].
-Canonical tbLatticeType := [tbLatticeType of T * T'].
-Canonical bDistrLatticeType := [bDistrLatticeType of T * T'].
-Canonical tDistrLatticeType := [tDistrLatticeType of T * T'].
-Canonical tbDistrLatticeType := [tbDistrLatticeType of T * T'].
 Canonical finLatticeType := [finLatticeType of T * T'].
 Canonical finDistrLatticeType := [finDistrLatticeType of T * T'].
 Canonical finOrderType := [finOrderType of T * T'].
 
-End FinOrder.
+End FinTotal.
+
+Section FinTBTotal.
+Variable (T : finTBOrderType disp1) (T' : finTBOrderType disp2).
+
+Canonical finTBLatticeType := [finTBLatticeType of T * T'].
+Canonical finTBDistrLatticeType := [finTBDistrLatticeType of T * T'].
+Canonical finTBOrderType := [finTBOrderType of T * T'].
+
+End FinTBTotal.
 
 Lemma sub_prod_lexi d (T : POrder.Exports.porderType disp1)
                       (T' : POrder.Exports.porderType disp2) :
@@ -9702,22 +11411,25 @@ Canonical bPOrderType.
 Canonical tPOrderType.
 Canonical tbPOrderType.
 Canonical meetSemilatticeType.
-Canonical bMeetSemilatticeType.
-Canonical tMeetSemilatticeType.
-Canonical tbMeetSemilatticeType.
 Canonical joinSemilatticeType.
-Canonical bJoinSemilatticeType.
-Canonical tJoinSemilatticeType.
-Canonical tbJoinSemilatticeType.
 Canonical latticeType.
-Canonical bLatticeType.
-Canonical tLatticeType.
-Canonical tbLatticeType.
 Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tDistrLatticeType.
-Canonical tbDistrLatticeType.
 Canonical orderType.
+Canonical bMeetSemilatticeType.
+Canonical bJoinSemilatticeType.
+Canonical bLatticeType.
+Canonical bDistrLatticeType.
+Canonical bOrderType.
+Canonical tMeetSemilatticeType.
+Canonical tJoinSemilatticeType.
+Canonical tLatticeType.
+Canonical tDistrLatticeType.
+Canonical tOrderType.
+Canonical tbMeetSemilatticeType.
+Canonical tbJoinSemilatticeType.
+Canonical tbLatticeType.
+Canonical tbDistrLatticeType.
+Canonical tbOrderType.
 Canonical finPOrderType.
 Canonical finBPOrderType.
 Canonical finTPOrderType.
@@ -9725,6 +11437,9 @@ Canonical finTBPOrderType.
 Canonical finLatticeType.
 Canonical finDistrLatticeType.
 Canonical finOrderType.
+Canonical finTBLatticeType.
+Canonical finTBDistrLatticeType.
+Canonical finTBOrderType.
 
 Definition leEprodlexi := @leEprodlexi.
 Definition ltEprodlexi := @ltEprodlexi.
@@ -9767,30 +11482,36 @@ Canonical prodlexi_distrLatticeType
 Canonical prodlexi_orderType
     (T : orderType disp1) (T' : orderType disp2) :=
   [orderType of T * T' for [orderType of T *l T']].
-Canonical prodlexi_bMeetSemilatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [bMeetSemilatticeType of T * T'].
-Canonical prodlexi_tMeetSemilatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tMeetSemilatticeType of T * T'].
-Canonical prodlexi_tbMeetSemilatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tbMeetSemilatticeType of T * T'].
-Canonical prodlexi_bJoinSemilatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [bJoinSemilatticeType of T * T'].
-Canonical prodlexi_tJoinSemilatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tJoinSemilatticeType of T * T'].
-Canonical prodlexi_tbJoinSemilatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tbJoinSemilatticeType of T * T'].
-Canonical prodlexi_bLatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [bLatticeType of T * T'].
-Canonical prodlexi_tLatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tLatticeType of T * T'].
-Canonical prodlexi_tbLatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tbLatticeType of T * T'].
-Canonical prodlexi_bDistrLatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [bDistrLatticeType of T * T'].
-Canonical prodlexi_tDistrLatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tDistrLatticeType of T * T'].
-Canonical prodlexi_tbDistrLatticeType (T : finOrderType disp1)
-    (T' : finOrderType disp2) := [tbDistrLatticeType of T * T'].
+Canonical prodlexi_bMeetSemilatticeType (T : bOrderType disp1)
+    (T' : bOrderType disp2) := [bMeetSemilatticeType of T * T'].
+Canonical prodlexi_bJoinSemilatticeType (T : bOrderType disp1)
+    (T' : bOrderType disp2) := [bJoinSemilatticeType of T * T'].
+Canonical prodlexi_bLatticeType (T : bOrderType disp1)
+    (T' : bOrderType disp2) := [bLatticeType of T * T'].
+Canonical prodlexi_bDistrLatticeType (T : bOrderType disp1)
+    (T' : bOrderType disp2) := [bDistrLatticeType of T * T'].
+Canonical prodlexi_bOrderType (T : bOrderType disp1)
+    (T' : bOrderType disp2) := [bOrderType of T * T'].
+Canonical prodlexi_tMeetSemilatticeType (T : tOrderType disp1)
+    (T' : tOrderType disp2) := [tMeetSemilatticeType of T * T'].
+Canonical prodlexi_tJoinSemilatticeType (T : tOrderType disp1)
+    (T' : tOrderType disp2) := [tJoinSemilatticeType of T * T'].
+Canonical prodlexi_tLatticeType (T : tOrderType disp1)
+    (T' : tOrderType disp2) := [tLatticeType of T * T'].
+Canonical prodlexi_tDistrLatticeType (T : tOrderType disp1)
+    (T' : tOrderType disp2) := [tDistrLatticeType of T * T'].
+Canonical prodlexi_tOrderType (T : tOrderType disp1)
+    (T' : tOrderType disp2) := [tOrderType of T * T'].
+Canonical prodlexi_tbMeetSemilatticeType (T : tbOrderType disp1)
+    (T' : tbOrderType disp2) := [tbMeetSemilatticeType of T * T'].
+Canonical prodlexi_tbJoinSemilatticeType (T : tbOrderType disp1)
+    (T' : tbOrderType disp2) := [tbJoinSemilatticeType of T * T'].
+Canonical prodlexi_tbLatticeType (T : tbOrderType disp1)
+    (T' : tbOrderType disp2) := [tbLatticeType of T * T'].
+Canonical prodlexi_tbDistrLatticeType (T : tbOrderType disp1)
+    (T' : tbOrderType disp2) := [tbDistrLatticeType of T * T'].
+Canonical prodlexi_tbOrderType (T : tbOrderType disp1)
+    (T' : tbOrderType disp2) := [tbOrderType of T * T'].
 Canonical prodlexi_finPOrderType (T : finPOrderType disp1)
     (T' : finPOrderType disp2) := [finPOrderType of T * T'].
 Canonical prodlexi_finBPOrderType (T : finBPOrderType disp1)
@@ -9805,6 +11526,12 @@ Canonical prodlexi_finDistrLatticeType (T : finOrderType disp1)
     (T' : finOrderType disp2) := [finDistrLatticeType of T * T'].
 Canonical prodlexi_finOrderType (T : finOrderType disp1)
     (T' : finOrderType disp2) := [finOrderType of T * T'].
+Canonical prodlexi_finTBLatticeType (T : finTBOrderType disp1)
+    (T' : finTBOrderType disp2) := [finTBLatticeType of T * T'].
+Canonical prodlexi_finTBDistrLatticeType (T : finTBOrderType disp1)
+    (T' : finTBOrderType disp2) := [finTBDistrLatticeType of T * T'].
+Canonical prodlexi_finTBOrderType (T : finTBOrderType disp1)
+    (T' : finTBOrderType disp2) := [finTBOrderType of T * T'].
 
 End DefaultProdLexiOrder.
 End DefaultProdLexiOrder.
@@ -10156,6 +11883,7 @@ Canonical bLatticeType := [bLatticeType of seq T].
 Canonical distrLatticeType := DistrLatticeType (seq T) total.
 Canonical bDistrLatticeType := [bDistrLatticeType of seq T].
 Canonical orderType := OrderType (seq T) total.
+Canonical bOrderType := [bOrderType of seq T].
 
 End Total.
 
@@ -10187,6 +11915,7 @@ Canonical bLatticeType.
 Canonical distrLatticeType.
 Canonical bDistrLatticeType.
 Canonical orderType.
+Canonical bOrderType.
 
 Definition leEseqlexi := @leEseqlexi.
 Definition lexi0s := @lexi0s.
@@ -10235,6 +11964,7 @@ Canonical seqlexi_bDistrLatticeType (T : orderType disp) :=
   [bDistrLatticeType of seq T].
 Canonical seqlexi_orderType (T : orderType disp) :=
   [orderType of seq T for [orderType of seqlexi T]].
+Canonical seqlexi_bOrderType (T : orderType disp) := [bOrderType of seq T].
 
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
@@ -10501,14 +12231,32 @@ Canonical finTPOrderType n (T : finTPOrderType disp) :=
 Canonical finTBPOrderType n (T : finTBPOrderType disp) :=
   [finTBPOrderType of n.-tuple T].
 
+Canonical finMeetSemilatticeType n (T : finMeetSemilatticeType disp) :=
+  [finMeetSemilatticeType of n.-tuple T].
+
+Canonical finBMeetSemilatticeType n (T : finBMeetSemilatticeType disp) :=
+  [finBMeetSemilatticeType of n.-tuple T].
+
+Canonical finJoinSemilatticeType n (T : finJoinSemilatticeType disp) :=
+  [finJoinSemilatticeType of n.-tuple T].
+
+Canonical finTJoinSemilatticeType n (T : finTJoinSemilatticeType disp) :=
+  [finTJoinSemilatticeType of n.-tuple T].
+
 Canonical finLatticeType n (T : finLatticeType disp) :=
   [finLatticeType of n.-tuple T].
+
+Canonical finTBLatticeType n (T : finTBLatticeType disp) :=
+  [finTBLatticeType of n.-tuple T].
 
 Canonical finDistrLatticeType n (T : finDistrLatticeType disp) :=
   [finDistrLatticeType of n.-tuple T].
 
-Canonical finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
-  [finCDistrLatticeType of n.-tuple T].
+Canonical finTBDistrLatticeType n (T : finTBDistrLatticeType disp) :=
+  [finTBDistrLatticeType of n.-tuple T].
+
+Canonical finCTBDistrLatticeType n (T : finCTBDistrLatticeType disp) :=
+  [finCTBDistrLatticeType of n.-tuple T].
 
 End TupleProdOrder.
 
@@ -10550,9 +12298,15 @@ Canonical finPOrderType.
 Canonical finBPOrderType.
 Canonical finTPOrderType.
 Canonical finTBPOrderType.
+Canonical finMeetSemilatticeType.
+Canonical finBMeetSemilatticeType.
+Canonical finJoinSemilatticeType.
+Canonical finTJoinSemilatticeType.
 Canonical finLatticeType.
+Canonical finTBLatticeType.
 Canonical finDistrLatticeType.
-Canonical finCDistrLatticeType.
+Canonical finTBDistrLatticeType.
+Canonical finCTBDistrLatticeType.
 
 Definition leEtprod := @leEtprod.
 Definition ltEtprod := @ltEtprod.
@@ -10631,12 +12385,24 @@ Canonical tprod_finTPOrderType n (T : finTPOrderType disp) :=
   [finTPOrderType of n.-tuple T].
 Canonical tprod_finTBPOrderType n (T : finTBPOrderType disp) :=
   [finTBPOrderType of n.-tuple T].
+Canonical tprod_finMeetSemilatticeType n (T : finMeetSemilatticeType disp) :=
+  [finMeetSemilatticeType of n.-tuple T].
+Canonical tprod_finBMeetSemilatticeType n (T : finBMeetSemilatticeType disp) :=
+  [finBMeetSemilatticeType of n.-tuple T].
+Canonical tprod_finJoinSemilatticeType n (T : finJoinSemilatticeType disp) :=
+  [finJoinSemilatticeType of n.-tuple T].
+Canonical tprod_finTJoinSemilatticeType n (T : finTJoinSemilatticeType disp) :=
+  [finTJoinSemilatticeType of n.-tuple T].
 Canonical tprod_finLatticeType n (T : finLatticeType disp) :=
   [finLatticeType of n.-tuple T].
+Canonical tprod_finTBLatticeType n (T : finTBLatticeType disp) :=
+  [finTBLatticeType of n.-tuple T].
 Canonical tprod_finDistrLatticeType n (T : finDistrLatticeType disp) :=
   [finDistrLatticeType of n.-tuple T].
-Canonical tprod_finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
-  [finCDistrLatticeType of n.-tuple T].
+Canonical tprod_finTBDistrLatticeType n (T : finTBDistrLatticeType disp) :=
+  [finTBDistrLatticeType of n.-tuple T].
+Canonical tprod_finCTBDistrLatticeType n (T : finCTBDistrLatticeType disp) :=
+  [finCTBDistrLatticeType of n.-tuple T].
 
 End DefaultTupleProdOrder.
 End DefaultTupleProdOrder.
@@ -10765,38 +12531,65 @@ Canonical orderType := OrderType (n.-tuple T) total.
 
 End Total.
 
-Section FinOrder.
-Variables (n : nat) (T : finOrderType disp).
+Section BTotal.
+Variable (n : nat) (T : bOrderType disp).
 
 Canonical bMeetSemilatticeType := [bMeetSemilatticeType of n.-tuple T].
-Canonical tMeetSemilatticeType := [tMeetSemilatticeType of n.-tuple T].
-Canonical tbMeetSemilatticeType := [tbMeetSemilatticeType of n.-tuple T].
 Canonical bJoinSemilatticeType := [bJoinSemilatticeType of n.-tuple T].
-Canonical tJoinSemilatticeType := [tJoinSemilatticeType of n.-tuple T].
-Canonical tbJoinSemilatticeType := [tbJoinSemilatticeType of n.-tuple T].
 Canonical bLatticeType := [bLatticeType of n.-tuple T].
-Canonical tLatticeType := [tLatticeType of n.-tuple T].
-Canonical tbLatticeType := [tbLatticeType of n.-tuple T].
 Canonical bDistrLatticeType := [bDistrLatticeType of n.-tuple T].
+Canonical bOrderType := [bOrderType of n.-tuple T].
+
+End BTotal.
+
+Section TTotal.
+Variable (n : nat) (T : tOrderType disp).
+
+Canonical tMeetSemilatticeType := [tMeetSemilatticeType of n.-tuple T].
+Canonical tJoinSemilatticeType := [tJoinSemilatticeType of n.-tuple T].
+Canonical tLatticeType := [tLatticeType of n.-tuple T].
 Canonical tDistrLatticeType := [tDistrLatticeType of n.-tuple T].
+Canonical tOrderType := [tOrderType of n.-tuple T].
+
+End TTotal.
+
+Section TBTotal.
+Variable (n : nat) (T : tbOrderType disp).
+
+Canonical tbMeetSemilatticeType := [tbMeetSemilatticeType of n.-tuple T].
+Canonical tbJoinSemilatticeType := [tbJoinSemilatticeType of n.-tuple T].
+Canonical tbLatticeType := [tbLatticeType of n.-tuple T].
 Canonical tbDistrLatticeType := [tbDistrLatticeType of n.-tuple T].
+Canonical tbOrderType := [tbOrderType of n.-tuple T].
 
-End FinOrder.
+End TBTotal.
 
-Canonical finPOrderType n (T : finPOrderType disp) :=
+Canonical finPOrderType (n : nat) (T : finPOrderType disp) :=
   [finPOrderType of n.-tuple T].
-Canonical finBPOrderType n (T : finBPOrderType disp) :=
+Canonical finBPOrderType (n : nat) (T : finBPOrderType disp) :=
   [finBPOrderType of n.-tuple T].
-Canonical finTPOrderType n (T : finTPOrderType disp) :=
+Canonical finTPOrderType (n : nat) (T : finTPOrderType disp) :=
   [finTPOrderType of n.-tuple T].
-Canonical finTBPOrderType n (T : finTBPOrderType disp) :=
+Canonical finTBPOrderType (n : nat) (T : finTBPOrderType disp) :=
   [finTBPOrderType of n.-tuple T].
-Canonical finLatticeType n (T : finOrderType disp) :=
-  [finLatticeType of n.-tuple T].
-Canonical finDistrLatticeType n (T : finOrderType disp) :=
-  [finDistrLatticeType of n.-tuple T].
-Canonical finOrderType n (T : finOrderType disp) :=
-  [finOrderType of n.-tuple T].
+
+Section FinTotal.
+Variable (n : nat) (T : finOrderType disp).
+
+Canonical finLatticeType := [finLatticeType of n.-tuple T].
+Canonical finDistrLatticeType := [finDistrLatticeType of n.-tuple T].
+Canonical finOrderType := [finOrderType of n.-tuple T].
+
+End FinTotal.
+
+Section FinTBTotal.
+Variable (n : nat) (T : finTBOrderType disp).
+
+Canonical finTBLatticeType := [finTBLatticeType of n.-tuple T].
+Canonical finTBDistrLatticeType := [finTBDistrLatticeType of n.-tuple T].
+Canonical finTBOrderType := [finTBOrderType of n.-tuple T].
+
+End FinTBTotal.
 
 Lemma sub_tprod_lexi d n (T : POrder.Exports.porderType disp) :
    subrel (<=%O : rel (n.-tupleprod[d] T)) (<=%O : rel (n.-tuple T)).
@@ -10821,22 +12614,25 @@ Canonical bPOrderType.
 Canonical tPOrderType.
 Canonical tbPOrderType.
 Canonical meetSemilatticeType.
-Canonical bMeetSemilatticeType.
-Canonical tMeetSemilatticeType.
-Canonical tbMeetSemilatticeType.
 Canonical joinSemilatticeType.
-Canonical bJoinSemilatticeType.
-Canonical tJoinSemilatticeType.
-Canonical tbJoinSemilatticeType.
 Canonical latticeType.
-Canonical bLatticeType.
-Canonical tLatticeType.
-Canonical tbLatticeType.
 Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tDistrLatticeType.
-Canonical tbDistrLatticeType.
 Canonical orderType.
+Canonical bMeetSemilatticeType.
+Canonical bJoinSemilatticeType.
+Canonical bLatticeType.
+Canonical bDistrLatticeType.
+Canonical bOrderType.
+Canonical tMeetSemilatticeType.
+Canonical tJoinSemilatticeType.
+Canonical tLatticeType.
+Canonical tDistrLatticeType.
+Canonical tOrderType.
+Canonical tbMeetSemilatticeType.
+Canonical tbJoinSemilatticeType.
+Canonical tbLatticeType.
+Canonical tbDistrLatticeType.
+Canonical tbOrderType.
 Canonical finPOrderType.
 Canonical finBPOrderType.
 Canonical finTPOrderType.
@@ -10844,6 +12640,9 @@ Canonical finTBPOrderType.
 Canonical finLatticeType.
 Canonical finDistrLatticeType.
 Canonical finOrderType.
+Canonical finTBLatticeType.
+Canonical finTBDistrLatticeType.
+Canonical finTBOrderType.
 
 Definition lexi_tupleP := @lexi_tupleP.
 Arguments lexi_tupleP {disp disp' n T t1 t2}.
@@ -10874,39 +12673,45 @@ Canonical tlexi_tbPOrderType n (T : tbPOrderType disp) :=
 Canonical tlexi_meetSemilatticeType n (T : orderType disp) :=
   [meetSemilatticeType of n.-tuple T
                        for [meetSemilatticeType of n.-tuplelexi T]].
-Canonical tlexi_bMeetSemilatticeType n (T : finOrderType disp) :=
-  [bMeetSemilatticeType of n.-tuple T].
-Canonical tlexi_tMeetSemilatticeType n (T : finOrderType disp) :=
-  [tMeetSemilatticeType of n.-tuple T].
-Canonical tlexi_tbMeetSemilatticeType n (T : finOrderType disp) :=
-  [tbMeetSemilatticeType of n.-tuple T].
 Canonical tlexi_joinSemilatticeType n (T : orderType disp) :=
   [joinSemilatticeType of n.-tuple T
                        for [joinSemilatticeType of n.-tuplelexi T]].
-Canonical tlexi_bJoinSemilatticeType n (T : finOrderType disp) :=
-  [bJoinSemilatticeType of n.-tuple T].
-Canonical tlexi_tJoinSemilatticeType n (T : finOrderType disp) :=
-  [tJoinSemilatticeType of n.-tuple T].
-Canonical tlexi_tbJoinSemilatticeType n (T : finOrderType disp) :=
-  [tbJoinSemilatticeType of n.-tuple T].
 Canonical tlexi_latticeType n (T : orderType disp) :=
   [latticeType of n.-tuple T].
-Canonical tlexi_bLatticeType n (T : finOrderType disp) :=
-  [bLatticeType of n.-tuple T].
-Canonical tlexi_tLatticeType n (T : finOrderType disp) :=
-  [tLatticeType of n.-tuple T].
-Canonical tlexi_tbLatticeType n (T : finOrderType disp) :=
-  [tbLatticeType of n.-tuple T].
 Canonical tlexi_distrLatticeType n (T : orderType disp) :=
   [distrLatticeType of n.-tuple T for [distrLatticeType of n.-tuplelexi T]].
-Canonical tlexi_bDistrLatticeType n (T : finOrderType disp) :=
-  [bDistrLatticeType of n.-tuple T].
-Canonical tlexi_tDistrLatticeType n (T : finOrderType disp) :=
-  [tDistrLatticeType of n.-tuple T].
-Canonical tlexi_tbDistrLatticeType n (T : finOrderType disp) :=
-  [tbDistrLatticeType of n.-tuple T].
 Canonical tlexi_orderType n (T : orderType disp) :=
   [orderType of n.-tuple T for [orderType of n.-tuplelexi T]].
+Canonical tlexi_bMeetSemilatticeType n (T : bOrderType disp) :=
+  [bMeetSemilatticeType of n.-tuple T].
+Canonical tlexi_bJoinSemilatticeType n (T : bOrderType disp) :=
+  [bJoinSemilatticeType of n.-tuple T].
+Canonical tlexi_bLatticeType n (T : bOrderType disp) :=
+  [bLatticeType of n.-tuple T].
+Canonical tlexi_bDistrLatticeType n (T : bOrderType disp) :=
+  [bDistrLatticeType of n.-tuple T].
+Canonical tlexi_bOrderType n (T : bOrderType disp) :=
+  [bOrderType of n.-tuple T].
+Canonical tlexi_tMeetSemilatticeType n (T : tOrderType disp) :=
+  [tMeetSemilatticeType of n.-tuple T].
+Canonical tlexi_tJoinSemilatticeType n (T : tOrderType disp) :=
+  [tJoinSemilatticeType of n.-tuple T].
+Canonical tlexi_tLatticeType n (T : tOrderType disp) :=
+  [tLatticeType of n.-tuple T].
+Canonical tlexi_tDistrLatticeType n (T : tOrderType disp) :=
+  [tDistrLatticeType of n.-tuple T].
+Canonical tlexi_tOrderType n (T : tOrderType disp) :=
+  [tOrderType of n.-tuple T].
+Canonical tlexi_tbMeetSemilatticeType n (T : tbOrderType disp) :=
+  [tbMeetSemilatticeType of n.-tuple T].
+Canonical tlexi_tbJoinSemilatticeType n (T : tbOrderType disp) :=
+  [tbJoinSemilatticeType of n.-tuple T].
+Canonical tlexi_tbLatticeType n (T : tbOrderType disp) :=
+  [tbLatticeType of n.-tuple T].
+Canonical tlexi_tbDistrLatticeType n (T : tbOrderType disp) :=
+  [tbDistrLatticeType of n.-tuple T].
+Canonical tlexi_tbOrderType n (T : tbOrderType disp) :=
+  [tbOrderType of n.-tuple T].
 Canonical tlexi_finPOrderType n (T : finPOrderType disp) :=
   [finPOrderType of n.-tuple T].
 Canonical tlexi_finBPOrderType n (T : finBPOrderType disp) :=
@@ -10921,6 +12726,12 @@ Canonical tlexi_finDistrLatticeType n (T : finOrderType disp) :=
   [finDistrLatticeType of n.-tuple T].
 Canonical tlexi_finOrderType n (T : finOrderType disp) :=
   [finOrderType of n.-tuple T].
+Canonical tlexi_finTBLatticeType n (T : finTBOrderType disp) :=
+  [finTBLatticeType of n.-tuple T].
+Canonical tlexi_finTBDistrLatticeType n (T : finTBOrderType disp) :=
+  [finTBDistrLatticeType of n.-tuple T].
+Canonical tlexi_finTBOrderType n (T : finTBOrderType disp) :=
+  [finTBOrderType of n.-tuple T].
 
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
@@ -11448,14 +13259,24 @@ Export Order.TBDistrLattice.Exports.
 Export Order.CBDistrLattice.Exports.
 Export Order.CTBDistrLattice.Exports.
 Export Order.Total.Exports.
+Export Order.BTotal.Exports.
+Export Order.TTotal.Exports.
+Export Order.TBTotal.Exports.
 Export Order.FinPOrder.Exports.
 Export Order.FinBPOrder.Exports.
 Export Order.FinTPOrder.Exports.
 Export Order.FinTBPOrder.Exports.
+Export Order.FinMeetSemilattice.Exports.
+Export Order.FinBMeetSemilattice.Exports.
+Export Order.FinJoinSemilattice.Exports.
+Export Order.FinTJoinSemilattice.Exports.
 Export Order.FinLattice.Exports.
+Export Order.FinTBLattice.Exports.
 Export Order.FinDistrLattice.Exports.
-Export Order.FinCDistrLattice.Exports.
+Export Order.FinTBDistrLattice.Exports.
+Export Order.FinCTBDistrLattice.Exports.
 Export Order.FinTotal.Exports.
+Export Order.FinTBTotal.Exports.
 
 Export Order.LePOrderMixin.Exports.
 Export Order.BottomMixin.Exports.
