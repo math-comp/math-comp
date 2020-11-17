@@ -1044,7 +1044,7 @@ Lemma sort_stable T (leT leT' : rel T) :
 Proof.
 move=> leT_total leT'_tr s sorted_s; case Ds: s => // [x s1].
 rewrite -{s1}Ds -(mkseq_nth x s) sort_map.
-have leN_total: total (xrelpre (nth x s) leT) by move=> n m; apply: leT_total.
+have leN_total: total (relpre (nth x s) leT) by move=> n m; apply: leT_total.
 apply: (homo_sorted_in _ (allss _)) (sort_iota_stable leN_total _) => /= y z.
 rewrite !mem_sort !mem_iota !leq0n add0n /= => ys zs /andP [->] /=.
 by case: (leT _ _); first apply: sorted_ltn_nth.
