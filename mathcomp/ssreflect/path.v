@@ -989,7 +989,7 @@ Section Stability_iota.
 
 Variables (leN : rel nat) (leN_total : total leN) (leN_tr : transitive leN).
 
-Let le_lex := [rel n m | leN n m && (leN m n ==> (n < m))].
+Let lt_lex := [rel n m | leN n m && (leN m n ==> (n < m))].
 
 Local Arguments iota : simpl never.
 Local Arguments size : simpl never.
@@ -997,7 +997,7 @@ Local Arguments cat : simpl never.
 
 Let push_invariant := fix push_invariant (ss : seq (seq nat)) :=
   if ss is s :: ss' then
-    sorted le_lex s && perm_eq s (iota (size (flatten ss')) (size s)) &&
+    sorted lt_lex s && perm_eq s (iota (size (flatten ss')) (size s)) &&
     push_invariant ss'
   else
     true.
@@ -1014,7 +1014,7 @@ by rewrite mem_iota size_cat addnC => /andP [] /(leq_trans n_lt).
 Qed.
 
 Let pop_stable s1 ss :
-  push_invariant (s1 :: ss) -> sorted le_lex (merge_sort_pop leN s1 ss).
+  push_invariant (s1 :: ss) -> sorted lt_lex (merge_sort_pop leN s1 ss).
 Proof.
 elim: ss s1 => [s1 /andP [] /andP [] //|s2 ss ihss s1]; rewrite /= -2!andbA.
 move=> /and5P [sorted_s1 perm_s1 sorted_s2 perm_s2 hss]; apply: ihss.
@@ -1024,7 +1024,7 @@ rewrite mem_iota (perm_all _ perm_s1) => /andP [_ n_lt]; apply/allP => p.
 by rewrite mem_iota size_cat addnC => /andP [] /(leq_trans n_lt).
 Qed.
 
-Lemma sort_iota_stable n : sorted le_lex (sort leN (iota 0 n)).
+Lemma sort_iota_stable n : sorted lt_lex (sort leN (iota 0 n)).
 Proof.
 rewrite sortE -[0]/(size (@flatten nat [::])).
 have: push_invariant [::] by [].
@@ -1056,13 +1056,13 @@ Lemma filter_sort T (leT : rel T) :
 Proof.
 move=> leT_total leT_tr p s; case Ds: s => // [x s1].
 pose leN := relpre (nth x s) leT.
-pose le_lex := [rel n m | leN n m && (leN m n ==> (n < m))].
-have le_lex_tr: transitive le_lex.
-  rewrite /le_lex /leN => ? ? ? /= /andP [xy xy'] /andP [yz yz'].
+pose lt_lex := [rel n m | leN n m && (leN m n ==> (n < m))].
+have lt_lex_tr: transitive lt_lex.
+  rewrite /lt_lex /leN => ? ? ? /= /andP [xy xy'] /andP [yz yz'].
   rewrite (leT_tr _ _ _ xy yz); apply/implyP => zx; move: xy' yz'.
   by rewrite (leT_tr _ _ _ yz zx) (leT_tr _ _ _ zx xy); apply: ltn_trans.
 rewrite -{s1}Ds -(mkseq_nth x s) !(filter_map, sort_map); congr map.
-apply/(@irr_sorted_eq _ le_lex); rewrite /le_lex /leN //=.
+apply/(@irr_sorted_eq _ lt_lex); rewrite /lt_lex /leN //=.
 - by move=> ?; rewrite /= ltnn implybF andbN.
 - exact/sorted_filter/sort_iota_stable.
 - exact/sort_stable/sorted_filter/iota_ltn_sorted/ltn_trans/ltn_trans.
