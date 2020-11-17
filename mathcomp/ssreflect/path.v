@@ -691,6 +691,19 @@ move=> leT_tr; elim: s => //= y [//|z s] ihs /andP[xy yz]; rewrite xy {}ihs//.
 by move: yz => /= /andP [/(leT_tr _ _ _ xy) ->].
 Qed.
 
+Remark size_merge_sort_push s1 :
+  let graded ss := forall i, size (nth [::] ss i) \in pred2 0 (2 ^ (i + 1)) in
+  size s1 = 2 -> {homo merge_sort_push s1 : ss / graded ss}.
+Proof.
+set n := {2}1; rewrite -[RHS]/(2 ^ n) => graded sz_s1 ss.
+elim: ss => [|s2 ss IHss] in (n) graded s1 sz_s1 * => sz_ss i //=.
+  by case: i => [|[]] //; rewrite sz_s1 inE eqxx orbT.
+case: s2 i => [|x s2] [|i] //= in sz_ss *; first by rewrite sz_s1 inE eqxx orbT.
+  exact: (sz_ss i.+1).
+rewrite addSnnS; apply: IHss i => [|i]; last by rewrite -addSnnS (sz_ss i.+1).
+by rewrite size_merge size_cat sz_s1 (eqnP (sz_ss 0)) addnn expnS mul2n.
+Qed.
+
 Hypothesis leT_tr : transitive leT.
 
 Lemma path_sortedE x s : path x s = all (leT x) s && sorted s.

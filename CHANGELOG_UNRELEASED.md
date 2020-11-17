@@ -286,6 +286,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `fullrowsub_free`, `mxrank_fullrowsub`, `eq_fullrowsub`, and
   `fullrankfun_inj`.
 
+- in `path.v`, added `size_merge_sort_push`, which documents an
+  invariant of `merge_sort_push`.
+
 ### Changed
 
 - in `ssrbool.v`, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
