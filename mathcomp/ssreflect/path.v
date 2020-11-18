@@ -419,7 +419,7 @@ Local Notation sorted := (sorted leT).
 
 Hypothesis leT_tr : transitive leT.
 
-Lemma subseq_order_path x s1 s2 : subseq s1 s2 -> path x s2 -> path x s1.
+Lemma subseq_path x s1 s2 : subseq s1 s2 -> path x s2 -> path x s1.
 Proof. by case/subseqP => m _ ->; apply/path_mask. Qed.
 
 Lemma subseq_sorted s1 s2 : subseq s1 s2 -> sorted s2 -> sorted s1.
@@ -1454,6 +1454,8 @@ Notation "@ 'ltn_index'" := (deprecate ltn_index sorted_ltn_index)
   (at level 10, only parsing) : fun_scope.
 Notation "@ 'leq_index'" := (deprecate leq_index sorted_leq_index)
   (at level 10, only parsing) : fun_scope.
+Notation "@ 'subseq_order_path'" := (deprecate subseq_order_path subseq_path)
+  (at level 10, only parsing) : fun_scope.
 
 Notation eq_sorted :=
   (fun le_tr le_asym => @eq_sorted _ _ le_tr le_asym _ _) (only parsing).
@@ -1470,3 +1472,5 @@ Notation ltn_index :=
 Notation leq_index :=
   (fun leT_tr leT_refl s_sorted =>
      @leq_index _ _ leT_tr leT_refl _ s_sorted _ _) (only parsing).
+Notation subseq_order_path :=
+  (fun leT_tr => @subseq_order_path _ _ leT_tr _ _ _) (only parsing).

@@ -425,6 +425,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `eq_sorted(_irr)` -> `(irr_)sorted_eq`
   + `sorted_(lt|le)_nth` -> `sorted_(ltn|leq)_nth`
   + `(ltn|leq)_index` -> `sorted_(ltn|leq)_index`
+  + `subseq_order_path` -> `subseq_path`
 
 - in `div.v`
   + `coprime_mul(l|r)` -> `coprimeM(l|r)`
