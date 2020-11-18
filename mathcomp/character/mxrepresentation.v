@@ -5780,7 +5780,7 @@ Canonical gen_finIdomainType := Eval hnf in [finIdomainType of FA].
 Canonical gen_finFieldType := Eval hnf in [finFieldType of FA].
 
 Lemma card_gen : #|{:FA}| = (#|F| ^ degree_mxminpoly A)%N.
-Proof. by rewrite card_sub card_matrix mul1n. Qed.
+Proof. by rewrite card_sub card_mx mul1n. Qed.
 
 End FiniteGenField.
 
