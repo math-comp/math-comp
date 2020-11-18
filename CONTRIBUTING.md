@@ -160,7 +160,8 @@ Abbreviations are in the header of the file which introduces them. We list here 
 - For the infix membership predicate `_ \in _`, the prefix `in_` is used for lemmas that unfold specific predicates, possibly propagating the infix membership (e.g, `in_cons` or `in_set0`). These lemmas are generally part of the `inE` multirule. Other lemmas involving the infix membership predicated use the generic prefix `mem_` (e.g., `mem_head` or `mem_map`).
 
 #### Typical search pattern
-`Search _ "prefix" "suffix"* (symbol|pattern)* in library.`
+- `Search _ "prefix" "suffix"* (symbol|pattern)* in library.` (for coq < 8.12)
+- `Search "prefix" "suffix"* (symbol|pattern)* inside library.` (for coq >= 8.12)
 
 ### Naming conventions for definitions (non exhaustive)
 
