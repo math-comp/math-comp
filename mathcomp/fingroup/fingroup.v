@@ -866,7 +866,7 @@ suffices{big_r} IHr: reflect (exists2 c, inA c r & x = \prod_(i <- r) c i) piAx.
   apply: (iffP IHr) => -[c inAc ->]; do [exists c; last by rewrite big_r].
     by move=> i Pi; rewrite (allP inAc) ?mem_r.
   by apply/allP=> i; rewrite mem_r => /inAc.
-elim: {P mem_r}r x @piAx Ur => /= [x _ | i r IHr x /andP[r'i /IHr{IHr}IHr]].
+elim: {P mem_r}r x @piAx Ur => /= [x _ | i r IHr x /andP[r'i /IHr{}IHr]].
   by rewrite unlock; apply: (iffP set1P) => [-> | [] //]; exists (fun=> x).
 rewrite big_cons; apply: (iffP idP) => [|[c /andP[Aci Ac] ->]]; last first.
   by rewrite big_cons mem_mulg //; apply/IHr=> //; exists c.

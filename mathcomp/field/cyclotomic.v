@@ -234,7 +234,7 @@ without loss{nz_af} [mon_f mon_g]: af f g Df Dfg / f \is monic /\ g \is monic.
   - by rewrite rmorphMz -scalerMzr scalerMzl -mulrzA cfg1.
   - by rewrite mulrzAl mulrzAr -mulrzA cfg1.
   by rewrite !(intz, =^~ scaler_int) !monicE !lead_coefZ mulrC cfg1.
-have{af Df} Df: pQtoC pf = pZtoC f.
+have{af} Df: pQtoC pf = pZtoC f.
   have:= congr1 lead_coef Df.
   rewrite lead_coefZ lead_coef_map_inj //; last exact: intr_inj.
   rewrite !(monicP _) // mulr1 Df => <-; rewrite scale1r -map_poly_comp.
@@ -289,7 +289,7 @@ suffices: coprimep (pZtoC f) (pZtoC (g \Po 'X^p)).
 suffices: coprimep f (g \Po 'X^p).
   case/Bezout_coprimepP=> [[u v]]; rewrite -size_poly_eq1.
   rewrite -(size_map_inj_poly (can_inj intCK)) // rmorphD !rmorphM /=.
-  rewrite size_poly_eq1 => {co_fg}co_fg; apply/Bezout_coprimepP.
+  rewrite size_poly_eq1 => {}co_fg; apply/Bezout_coprimepP.
   by exists (pZtoC u, pZtoC v).
 apply: contraLR co_fg => /coprimepPn[|d]; first exact: monic_neq0.
 rewrite andbC -size_poly_eq1 dvdp_gcd => /and3P[sz_d].

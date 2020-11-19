@@ -393,7 +393,7 @@ have [/= f inj_f im_f] := third_isom (joing_subl K M) nsKG nsKMG.
 rewrite quotientYidl //= -imKH -(restrm_quotientE nKH sMH) in f inj_f im_f.
 have /domP[h [_ ker_h _ im_h]]: 'dom (f \o quotm _ nsMH) = H / M.
   by rewrite ['dom _]morphpre_quotm injmK.
-have{im_h} im_h L: L \subset H -> h @* (L / M) = K <*> L / (K <*> M).
+have{} im_h L: L \subset H -> h @* (L / M) = K <*> L / (K <*> M).
   move=> sLH; have [sLG sKKM] := (subset_trans sLH sHG, joing_subl K M).
   rewrite im_h morphim_comp morphim_quotm [_ @* L]restrm_quotientE ?im_f //.
   rewrite quotientY ?(normsG sKKM) ?(subset_trans sLG) ?normal_norm //.
@@ -811,7 +811,7 @@ Proof.
 elim: r G => [|i r IHr]; rewrite !(big_nil, big_cons) //; case: ifP => _ // G.
 case/cprodP=> [[K H -> defH]]; rewrite defH => <- cKH leKH_G.
 have /implyP := leq_trans leKH_G (dvdn_leq _ (dvdn_cardMg K H)).
-rewrite muln_gt0 leq_pmul2l !cardG_gt0 //= => /(IHr H defH){defH}defH.
+rewrite muln_gt0 leq_pmul2l !cardG_gt0 //= => /(IHr H defH){}defH.
 by rewrite defH dprodE // cardMg_TI // -(bigdprod_card defH).
 Qed.
 
@@ -825,7 +825,7 @@ have [m leQm] := ubnP #|Q|; elim: m => // m IHm in (Q) leQm G defG sQP *.
 have [i Qi | Q0] := pickP Q; last by rewrite !big_pred0 in defG *.
 move: defG; rewrite !(bigD1 i Qi) /= => /cprodP[[Hi Gi defAi defGi] <-].
 rewrite defAi defGi => cHGi.
-have{defGi} defGi: \big[dprod/1]_(j | Q j && (j != i)) A j = Gi.
+have{} defGi: \big[dprod/1]_(j | Q j && (j != i)) A j = Gi.
   by apply: IHm => [||j /andP[/sQP]] //; rewrite (cardD1x Qi) in leQm.
 rewrite defGi dprodE // coprime_TIg // -defAi -(bigdprod_card defGi).
 elim/big_rec: _ => [|j n /andP[neq_ji Qj] IHn]; first exact: coprimen1.

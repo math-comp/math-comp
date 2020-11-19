@@ -1840,7 +1840,7 @@ Proof.
 have->: P = [set x in enum (mem P)] by apply/setP=> x; rewrite inE mem_enum.
 elim: {P}(enum _) (enum_uniq (mem P)) => [_ | A e IHe] /=.
   by rewrite /trivIset /cover !big_set0 cards0; left=> A; rewrite inE.
-case/andP; rewrite set_cons -(in_set (fun B => B \in e)) => PA {IHe}/IHe.
+case/andP; rewrite set_cons -(in_set (fun B => B \in e)) => PA {}/IHe.
 move: {e}[set x in e] PA => P PA IHP.
 rewrite /trivIset /cover !big_setU1 //= eq_sym.
 have:= leq_card_cover P; rewrite -(mono_leqif (leq_add2l #|A|)).
@@ -2157,7 +2157,7 @@ move=> /and3P[/eqP defG tiP notP0] /and3P[/eqP defP tiQ notQ0].
 have sQP E: E \in Q -> {subset E <= P}.
   by move=> Q_E; apply/subsetP; rewrite -defP (bigcup_max E).
 rewrite /partition cover_imset -(big_trivIset _ tiQ) defP -defG eqxx /= andbC.
-have{notQ0} notQ0: set0 \notin cover @: Q.
+have{} notQ0: set0 \notin cover @: Q.
   apply: contra notP0 => /imsetP[E Q_E E0].
   have /set0Pn[/= A E_A] := memPn notQ0 E Q_E.
   congr (_ \in P): (sQP E Q_E A E_A).

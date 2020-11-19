@@ -538,7 +538,7 @@ elim: Es {+}G => [|E Es IHs] S in n oG expG p3Es defG *.
   by rewrite isog_cyclic_card prime_cyclic ?oZ ?card_pX1p2n //=.
 rewrite big_cons -cprodA in defG; rewrite /= -andbA in p3Es.
 have [[_ T _ defT] defET cTE] := cprodP defG; rewrite defT in defET cTE defG.
-case/and3P: p3Es; move/eqP=> oE; move/eqP=> defZE; move/IHs=> {IHs}IHs.
+move: p3Es => /and3P[/eqP oE /eqP defZE /IHs{}IHs].
 have not_cEE: ~~ abelian E.
   by apply: contra not_le_p3_p => cEE; rewrite -oE -oZ -defZE (center_idP _).
 have sES: E \subset S by rewrite -defET mulG_subl.

@@ -885,7 +885,7 @@ Lemma eq_genmx m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (A :=: B -> <<A>> = <<B>>)%MS.
 Proof.
 move=> eqAB; rewrite unlock.
-have{eqAB} eqAB: equivmx A (row_full A) =1 equivmx B (row_full B).
+have{} eqAB: equivmx A (row_full A) =1 equivmx B (row_full B).
   by move=> C; rewrite /row_full /equivmx !eqAB.
 rewrite (eq_choose eqAB) (choose_id _ (genmx_witnessP B)) //.
 by rewrite -eqAB genmx_witnessP.
@@ -1379,7 +1379,7 @@ Let capmx_norm_eq m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   qidmx A = qidmx B -> (A == B)%MS -> capmx_norm A = capmx_norm B.
 Proof.
 move=> eqABid /eqmxP eqAB.
-have{eqABid eqAB} eqAB: equivmx A (qidmx A) =1 equivmx B (qidmx B).
+have{eqABid} eqAB: equivmx A (qidmx A) =1 equivmx B (qidmx B).
   by move=> C; rewrite /equivmx eqABid !eqAB.
 rewrite {1}/capmx_norm (eq_choose eqAB).
 by apply: choose_id; first rewrite -eqAB; apply: capmx_witnessP.

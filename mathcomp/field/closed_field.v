@@ -538,7 +538,7 @@ elim: t; do ?[ by move=> * //=; do ?case: (_ == _)].
 - by move=> t irt /= n rt; rewrite rpoly_map_mul ?irt //.
 - move=> t irt s irs /=; case/andP=> rt rs.
   by apply: rmulpT; rewrite ?irt ?irs //.
-- move=> t irt /= n rt; move: (irt rt)=> {rt} rt; elim: n => [|n ihn] //=.
+- move=> t irt /= n rt; move: (irt rt) => {}rt; elim: n => [|n ihn] //=.
   exact: rmulpT.
 Qed.
 
@@ -886,7 +886,7 @@ suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.
   pose Kdec := DecFieldType Kfield (closed_field_QEMixin Kclosed).
   pose KclosedField := ClosedFieldType Kdec Kclosed.
   by exists [countClosedFieldType of CountType KclosedField cntK].
-exists (EtoKM 0%N) => /= z; have [i [{z}z ->]] := KtoE z.
+exists (EtoKM 0%N) => /= z; have [i [{}z ->]] := KtoE z.
 suffices{z} /(_ z)[p mon_p]: integralRange (toE 0%N i isT).
   by rewrite -(fmorph_root (EtoKM i)) -map_poly_comp toEtoKp; exists p.
 rewrite /toE /E; clear - minXp_gt1 ext1root ext1gen.

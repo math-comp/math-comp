@@ -175,7 +175,7 @@ Proof.
 suffices ffunK f g: (forall x, f x = g x) -> f = finfun g.
   by split=> [/ffunK|] -> //; apply/esym/ffunK.
 case: f => f Dg; rewrite unlock; congr FinfunOf.
-have{Dg} Dg x (aTx : mem_seq (enum aT) x): g x = fun_of_fin_rec f aTx.
+have{} Dg x (aTx : mem_seq (enum aT) x): g x = fun_of_fin_rec f aTx.
   by rewrite -Dg /= (bool_irrelevance (mem_enum _ _) aTx).
 elim: (enum aT) / f (enum_uniq aT) => //= x1 s y f IHf /andP[s'x1 Us] in Dg *.
 rewrite Dg ?eqxx //=; case: eqP => // /eq_axiomK-> /= _.

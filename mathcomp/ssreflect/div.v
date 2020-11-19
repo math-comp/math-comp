@@ -709,7 +709,7 @@ rewrite !natTrecE; set m := _ + r; set km := _ + kn; pose d := gcdn m n.
 have ->: gcdn n r = d by rewrite [d]gcdnC gcdnMDl.
 have m_gt0: 0 < m by rewrite addn_gt0 r_gt0 orbT.
 have d_gt0: 0 < d by rewrite gcdn_gt0 m_gt0.
-move/IHq=> {IHq} IHq le_kn_r le_kr_n def_d; apply: IHq => //; rewrite -/d.
+move=> {}/IHq IHq le_kn_r le_kr_n def_d; apply: IHq => //; rewrite -/d.
   by rewrite mulnDl leq_add // -mulnA leq_mul2l le_kr_n orbT.
 apply: (@addIn d); rewrite mulnDr -addnA addnACA -def_d addnACA mulnA.
 rewrite -!mulnDl -mulnDr -addnA [kr * _]mulnC; congr addn.

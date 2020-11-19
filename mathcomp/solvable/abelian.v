@@ -299,7 +299,7 @@ rewrite partn_dvd ?exponentS ?exponent_gt0 //=; apply/dvdn_partP=> // p.
 rewrite pi_of_part ?exponent_gt0 // => /andP[_ /= pi_p].
 have sppi: {subset (p : nat_pred) <= pi} by move=> q /eqnP->.
 have [P sylP] := Sylow_exists p H; have sPH := pHall_sub sylP.
-have{sylP} sylP: p.-Sylow(G) P.
+have{} sylP: p.-Sylow(G) P.
   rewrite pHallE (subset_trans sPH) //= (card_Hall sylP) eqn_dvd andbC.
   by rewrite -{1}(partn_part _ sppi) !partn_dvd ?cardSg ?cardG_gt0.
 rewrite partn_part ?partn_biglcm //.

@@ -270,7 +270,7 @@ have nSyl5: #|'Syl_5(H)| = 1%N.
   move: (dvdn_leq  (isT: (0 < 20)%N) Hdiv).
   by move: (n) Hdiv; do 20 (case=> //).
 case: (Sylow_exists 5 H) => S; case/pHallP=> sSH oS.
-have{oS} oS: #|S| = 5 by rewrite oS p_part Hcard20.
+have{} oS: #|S| = 5 by rewrite oS p_part Hcard20.
 suff: 20 %| #|S| by rewrite oS.
 apply: FF => [|S1]; last by rewrite S1 cards1 in oS.
 apply: char_normal_trans Hnorm; apply: lone_subgroup_char => // Q sQH isoQS.

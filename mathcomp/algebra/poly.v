@@ -2510,7 +2510,7 @@ have [|q' def_q] := factor_theorem q z _; last first.
   by exists q'; rewrite big_cons mulrA -def_q.
 rewrite {p}def_p in rpz.
 elim/last_ind: rs drs rpz => [|rs t IHrs] /=; first by rewrite big_nil mulr1.
-rewrite all_rcons => /andP[/andP[/eqP czt Uzt] /IHrs {IHrs}IHrs].
+rewrite all_rcons => /andP[/andP[/eqP czt Uzt] /IHrs{}IHrs].
 rewrite -cats1 big_cat big_seq1 /= mulrA rootE hornerM_comm; last first.
   by rewrite /comm_poly hornerXsubC mulrBl mulrBr czt.
 rewrite hornerXsubC -opprB mulrN oppr_eq0 -(mul0r (t - z)).

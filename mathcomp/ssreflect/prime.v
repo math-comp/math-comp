@@ -216,13 +216,13 @@ have eq_bc_0: (b == 0) && (c == 0) = (d == 0).
 have lt1p: 1 < p by rewrite ltnS double_gt0.
 have co_p_2: coprime p 2 by rewrite /coprime gcdnC gcdnE modn2 /= odd_double.
 have if_d0: d = 0 -> [/\ m = (p + a.*2) * p, lb_dvd p p & lb_dvd p (p + a.*2)].
-  move=> d0; have{d0 def_m} def_m: m = (p + a.*2) * p.
+  move=> d0; have{d0} def_m: m = (p + a.*2) * p.
     by rewrite d0 addn0 -!mul2n mulnA -mulnDl in def_m *.
   split=> //; apply/hasPn=> r /(hasPn leppm); apply: contra => /= dv_r.
     by rewrite def_m dvdn_mull.
   by rewrite def_m dvdn_mulr.
 case def_a: a => [|a'] /= in le_a_n *; rewrite !natTrecE -/p {}eq_bc_0.
-  case: d if_d0 def_m => [[//| def_m {pr_p}pr_p pr_m'] _ | d _ def_m] /=.
+  case: d if_d0 def_m => [[//| def_m {}pr_p pr_m'] _ | d _ def_m] /=.
     rewrite def_m def_a addn0 mulnA -2!expnSr.
     by split; rewrite /pd_ord /pf_ok /= ?muln1 ?pr_p ?leqnn.
   apply: apd_ok; rewrite // /pd_ok /= /pfactor expn1 muln1 /pd_ord /= ltpm.
@@ -256,11 +256,11 @@ have ltdp: d < p.
   move/eqP: def_b'; rewrite subn_eq0 -(@leq_pmul2r kb); last first.
     by rewrite -def_kb1.
   rewrite mulnBl -def_k2 ltnS -(leq_add2r c); move/leq_trans; apply.
-  have{ltc} ltc: c < k.*2.
+  have{} ltc: c < k.*2.
     by apply: (leq_trans ltc); rewrite leq_double /kb; case e.
   rewrite -{2}(subnK (ltnW ltc)) leq_add2r leq_sub2l //.
   by rewrite -def_kb1 mulnS leq_addr.
-case def_d: d if_d0 => [|d'] => [[//|{def_m ltdp pr_p} def_m pr_p pr_m'] | _].
+case def_d: d if_d0 => [|d'] => [[//|{ltdp pr_p}def_m pr_p pr_m'] | _].
   rewrite eqxx -doubleS -addnS -def_a doubleD -addSn -/p def_m.
   rewrite mulnCA mulnC -expnSr.
   apply: IHn => {n le_a_n}//; rewrite -/p -/kb; split.

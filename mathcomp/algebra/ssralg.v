@@ -4233,22 +4233,22 @@ Proof.
 suffices eq0_ring t1: rformula (eq0_rform t1) by elim: f => //= => f1 ->.
 rewrite /eq0_rform; move: (ub_var t1) => m; set tr := _ m.
 suffices: all rterm (tr.1 :: tr.2).
-  case: tr => {t1} t1 r /= /andP[t1_r].
+  case: tr => {}t1 r /= /andP[t1_r].
   by elim: r m => [|t r IHr] m; rewrite /= ?andbT // => /andP[->]; apply: IHr.
 have: all rterm [::] by [].
 rewrite {}/tr; elim: t1 [::] => //=.
 - move=> t1 IHt1 t2 IHt2 r.
-  move/IHt1; case: to_rterm => {t1 r IHt1} t1 r /= /andP[t1_r].
-  move/IHt2; case: to_rterm => {t2 r IHt2} t2 r /= /andP[t2_r].
+  move/IHt1; case: to_rterm => {r IHt1}t1 r /= /andP[t1_r].
+  move/IHt2; case: to_rterm => {r IHt2}t2 r /= /andP[t2_r].
   by rewrite t1_r t2_r.
 - by move=> t1 IHt1 r /IHt1; case: to_rterm.
 - by move=> t1 IHt1 n r /IHt1; case: to_rterm.
 - move=> t1 IHt1 t2 IHt2 r.
-  move/IHt1; case: to_rterm => {t1 r IHt1} t1 r /= /andP[t1_r].
-  move/IHt2; case: to_rterm => {t2 r IHt2} t2 r /= /andP[t2_r].
+  move/IHt1; case: to_rterm => {r IHt1}t1 r /= /andP[t1_r].
+  move/IHt2; case: to_rterm => {r IHt2}t2 r /= /andP[t2_r].
   by rewrite t1_r t2_r.
 - move=> t1 IHt1 r.
-  by move/IHt1; case: to_rterm => {t1 r IHt1} t1 r /=; rewrite all_rcons.
+  by move/IHt1; case: to_rterm => {r IHt1}t1 r /=; rewrite all_rcons.
 - by move=> t1 IHt1 n r /IHt1; case: to_rterm.
 Qed.
 
@@ -4317,7 +4317,7 @@ elim: t r0 m => /=; try do [
   by move=> n r m hlt hub; rewrite take_size (ltn_addr _ hlt) rsub_id
 | by move=> n r m hlt hub; rewrite leq0n take_size rsub_id
 | move=> t1 IHt1 t2 IHt2 r m; rewrite geq_max; case/andP=> hub1 hub2 hmr;
-  case: to_rterm {IHt1 hub1 hmr}(IHt1 r m hub1 hmr) => t1' r1;
+  case: to_rterm {hub1 hmr}(IHt1 r m hub1 hmr) => t1' r1;
   case=> htake1 hub1' hsub1 <-;
   case: to_rterm {IHt2 hub2 hsub1}(IHt2 r1 m hub2 hsub1) => t2' r2 /=;
   rewrite geq_max; case=> htake2 -> hsub2 /= <-;
@@ -4327,8 +4327,8 @@ elim: t r0 m => /=; try do [
    first by [rewrite takel_cat // -htake1 size_take geq_min leqnn orbT];
   rewrite -(rsub_acc r1 r3 t1') {hub1'}// -{htake1}htake2 {r3}cat_take_drop;
   by elim: r2 m => //= u r2 IHr2 m; rewrite IHr2
-| do [ move=> t1 IHt1 r m; do 2!move/IHt1=> {IHt1}IHt1
-     | move=> t1 IHt1 n r m; do 2!move/IHt1=> {IHt1}IHt1];
+| do [ move=> t1 IHt1 r m; do 2!move=> /IHt1{}IHt1
+     | move=> t1 IHt1 n r m; do 2!move=> /IHt1{}IHt1];
   case: to_rterm IHt1 => t1' r1 [-> -> hsub1 <-]; split=> {hsub1}//;
   by elim: r1 m => //= u r1 IHr1 m; rewrite IHr1].
 move=> t1 IH r m letm /IH {IH} /(_ letm) {letm}.

@@ -1216,8 +1216,8 @@ set T := S; exists (logn p #|T|)./2.
 have [Es] := extraspecial_structure pS esS; rewrite -[in RHS]/T.
 elim: Es T => [_ _ <-| E s IHs T] /=.
   by rewrite big_nil cprod1g oZ (pfactorK 1).
-rewrite -andbA big_cons -cprodA; case/and3P; move/eqP=> oEp3; move/eqP=> defZE.
-move/IHs=> {IHs}IHs; case/cprodP=> [[_ U _ defU]]; rewrite defU => defT cEU.
+rewrite -andbA big_cons -cprodA => /and3P[/eqP oEp3 /eqP defZE].
+move=> /IHs{}IHs /cprodP[[_ U _ defU]]; rewrite defU => defT cEU.
 rewrite -(mulnK #|T| (cardG_gt0 (E :&: U))) -defT -mul_cardG /=.
 have ->: E :&: U = 'Z(S).
   apply/eqP; rewrite eqEsubset subsetI -{1 2}defZE subsetIl setIS //=.
@@ -1385,7 +1385,7 @@ have{CAx GAx}: <[coset A x]> <| G / A.
   by rewrite /normal cycle_subG GAx cents_norm // centsC cycle_subG.
 case/(inv_quotientN nsAG)=> B /= defB sAB nBG.
 rewrite -cycle_subG defB (maxA B) ?trivg_quotient // nBG.
-have{defB} defB : B :=: A * <[x]>.
+have{} defB : B :=: A * <[x]>.
   rewrite -quotientK ?cycle_subG ?quotient_cycle // defB quotientGK //.
   exact: normalS (normal_sub nBG) nsAG.
 apply/setIidPl; rewrite ?defB -[_ :&: _]center_prod //=.

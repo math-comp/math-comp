@@ -3468,7 +3468,7 @@ pose cmp_mu s := [pred i | s * mu < s * En i].
 have{Enonconstant} has_cmp_mu e (s := (-1) ^+ e): {i | i \in A & cmp_mu s i}.
   apply/sig2W/exists_inP; apply: contraR Enonconstant => /exists_inPn-mu_s_A.
   have n_gt0 i: i \in A -> (0 < n)%N by rewrite [n](cardD1 i) => ->.
-  have{mu_s_A} mu_s_A i: i \in A -> s * En i <= s * mu.
+  have{} mu_s_A i: i \in A -> s * En i <= s * mu.
     move=> Ai; rewrite real_leNgt ?mu_s_A ?rpredMsign ?ger0_real ?Ege0 //.
     by rewrite -(pmulrn_lge0 _ (n_gt0 i Ai)) -sumrMnl sumr_ge0.
   have [_ /esym/eqfun_inP] := leif_sum (fun i Ai => leif_eq (mu_s_A i Ai)).
@@ -4305,7 +4305,7 @@ Qed.
 
 Lemma sqrtrM a b : 0 <= a -> sqrt (a * b) = sqrt a * sqrt b.
 Proof.
-case: (sqrtrP a) => // {a} a a_ge0 _; case: (sqrtrP b) => [b_lt0 | {b} b b_ge0].
+case: (sqrtrP a) => // {}a a_ge0 _; case: (sqrtrP b) => [b_lt0 | {}b b_ge0].
   by rewrite mulr0 ler0_sqrtr // nmulr_lle0 ?mulr_ge0.
 by rewrite mulrACA sqrtr_sqr ger0_norm ?mulr_ge0.
 Qed.
@@ -4415,7 +4415,7 @@ have sz_p: size p = n.+1.
   rewrite size_addl ?size_polyXn // ltnS size_opp size_polyC mulrn_eq0.
   by case: posnP => //; case: negP.
 pose r := sort argCle r0; have r_arg: sorted argCle r by apply: sort_sorted.
-have{Dp} Dp: p = \prod_(z <- r) ('X - z%:P).
+have{} Dp: p = \prod_(z <- r) ('X - z%:P).
   rewrite Dp lead_coefE sz_p coefB coefXn coefC -mulrb -mulrnA mulnb lt0n andNb.
   by rewrite subr0 eqxx scale1r; apply/esym/perm_big; rewrite perm_sort.
 have mem_rP z: (n > 0)%N -> reflect (z ^+ n = x) (z \in r).

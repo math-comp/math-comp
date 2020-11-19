@@ -294,7 +294,7 @@ Proof. by move=> x y /=; rewrite !ratz_frac mulq_frac // /= !mulr1. Qed.
 Fact invq_frac x :
   x.1 != 0 -> x.2 != 0 -> invq (fracq x) = fracq (invq_subdef x).
 Proof.
-by rewrite /invq_subdef; case: fracqP => // k {x} x k0; rewrite fracqMM.
+by rewrite /invq_subdef; case: fracqP => // k {}x k0; rewrite fracqMM.
 Qed.
 
 Fact mulqC : commutative mulq.
@@ -357,7 +357,7 @@ Canonical rat_countFieldType := [countFieldType of rat].
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
-rewrite -[x]valqK fracq_eq0; case: fracqP=> /= [|k {x} x k0].
+rewrite -[x]valqK fracq_eq0; case: fracqP=> /= [|k {}x k0].
   by rewrite eqxx orbT.
 by rewrite !mulf_eq0 (negPf k0) /= denq_eq0 orbF.
 Qed.

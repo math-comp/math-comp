@@ -405,7 +405,7 @@ have fZ: linear f.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun (Linear fZ)).
   rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.
   exact: (rmorphM (RMorphism fM)).
-have{Dalpha} Dalpha: alpha =1 f by move=> a; rewrite -Dalpha ?memvf ?lfunE.
+have{} Dalpha: alpha =1 f by move=> a; rewrite -Dalpha ?memvf ?lfunE.
 suffices <-: fixedField [set alpha] = 1%AS.
   by rewrite gal_generated /generator; exists alpha.
 apply/vspaceP=> x; apply/fixedFieldP/idfP; rewrite ?memvf // => id_x.
@@ -442,7 +442,7 @@ End FinGalois.
 Lemma Fermat's_little_theorem (L : fieldExtType F) (K : {subfield L}) a :
   (a \in K) = (a ^+ order K == a).
 Proof.
-move: K a; wlog [{L}L -> K a]: L / exists galL : splittingFieldType F, L = galL.
+move: K a; wlog [{}L -> K a]: L / exists galL : splittingFieldType F, L = galL.
   by pose galL := (FinSplittingFieldType F L) => /(_ galL); apply; exists galL.
 have /galois_fixedField fixLK := finField_galois (subvf K).
 have [alpha defGalLK Dalpha] := finField_galois_generator (subvf K).

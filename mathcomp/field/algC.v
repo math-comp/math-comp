@@ -71,14 +71,14 @@ have nz2: 2%:R != 0 :> L.
   apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
     by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
-  have{char2} char2: 2 \in [char L] by apply/eqP.
+  have{} char2: 2 \in [char L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
     rewrite fmorph_div rmorphD conjK -{1}[conj e](addNKr e) mulrDl.
     by rewrite opp_id (addrC e) divff // addr_eq0 opp_id.
   pose a := e * conj e; have aJ: conj a = a by rewrite rmorphM conjK mulrC.
   have [w Dw] := @solve_monicpoly _ 2 (nth 0 [:: e * a; - 1]) isT.
-  have{Dw} Dw: w ^+ 2 + w = e * a.
+  have{} Dw: w ^+ 2 + w = e * a.
     by rewrite Dw !big_ord_recl big_ord0 /= mulr1 mulN1r addr0 subrK.
   pose b := w + conj w; have bJ: conj b = b by rewrite rmorphD conjK addrC.
   have Db2: b ^+ 2 + b = a.

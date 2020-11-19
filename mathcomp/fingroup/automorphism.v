@@ -432,7 +432,7 @@ Lemma lone_subgroup_char G H :
   H \char G.
 Proof.
 move=> sHG Huniq; apply/charP; split=> // f injf Gf; apply/eqP.
-have{injf} injf: {in H &, injective f}.
+have{} injf: {in H &, injective f}.
   by move/injmP: injf; apply: sub_in2; apply/subsetP.
 have fH: f @* H = f @: H by rewrite /morphim (setIidPr sHG).
 rewrite eqEcard {2}fH card_in_imset ?{}Huniq //=.

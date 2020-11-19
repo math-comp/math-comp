@@ -687,12 +687,12 @@ Proof.
 move=> e_p; have: x \in x :: p by apply: mem_head.
 elim: p x {1 3 5}x e_p => [|y2 p IHp] x y1.
   by rewrite mem_seq1 => _ /eqP->.
-rewrite inE orbC /= => /andP[ey12 /IHp {IHp}IHp].
+rewrite inE orbC /= => /andP[ey12 {}/IHp IHp].
 case: ifPn => [y2p_x _ | not_y2p_x /eqP def_x].
   have [p' e_p' Up' p'p] := IHp _ y2p_x.
   by split=> // y /p'p; apply: predU1r.
 have [p' e_p' Up' p'p] := IHp y2 (mem_head y2 p).
-have{p'p} p'p z: z \in y2 :: p' -> z \in y2 :: p.
+have{} p'p z: z \in y2 :: p' -> z \in y2 :: p.
   by rewrite !inE; case: (z == y2) => // /p'p.
 rewrite -(last_cons y1) def_x; split=> //=; first by rewrite ey12.
 by rewrite (contra (p'p y1)) -?def_x.

@@ -1093,7 +1093,7 @@ Lemma pairwise_orthogonalP S :
 Proof.
 rewrite /pairwise_orthogonal /=; case notS0: (~~ _); last by right; case.
 elim: S notS0 => [|phi S IH] /=; first by left.
-rewrite inE eq_sym andbT => /norP[nz_phi /IH{IH}IH].
+rewrite inE eq_sym andbT => /norP[nz_phi /IH{}IH].
 have [opS | not_opS] := allP; last first.
   right=> [[/andP[notSp _] opS]]; case: not_opS => psi Spsi /=.
   by rewrite opS ?mem_head 1?mem_behead // (memPnC notSp).
@@ -1306,7 +1306,7 @@ Lemma isometry_of_free S f :
 Proof.
 move=> freeS If; have defS := free_span freeS.
 have [tau /(_ freeS (size_map f S))Dtau] := linear_of_free S (map f S).
-have{Dtau} Dtau: {in S, tau =1 f}.
+have{} Dtau: {in S, tau =1 f}.
   by move=> _ /(nthP 0)[i ltiS <-]; rewrite -!(nth_map 0 0) ?Dtau.
 exists tau => // _ _ /defS[a -> _] /defS[b -> _].
 rewrite !{1}linear_sum !{1}cfdot_suml; apply/eq_big_seq=> xi1 Sxi1.
@@ -2229,7 +2229,7 @@ rewrite (set_partition_big _ (rcosets_partition_mul H K)) ?big_imset /=.
   apply: eq_bigr => y Hy; rewrite rcosetE norm_rlcoset ?(subsetP nKH) //.
   rewrite -lcosetE mulr_natl big_imset /=; last exact: in2W (mulgI _).
   by rewrite -sumr_const; apply: eq_bigr => z Kz; rewrite conjgM cfunJ.
-have [{nKH}nKH /isomP[injf _]] := sdprod_isom defG.
+have [{}nKH /isomP[injf _]] := sdprod_isom defG.
 apply: can_in_inj (fun Ky => invm injf (coset K (repr Ky))) _ => y Hy.
 by rewrite rcosetE -val_coset ?(subsetP nKH) // coset_reprK invmE.
 Qed.
@@ -2410,7 +2410,7 @@ Lemma map_cfAut_free S : cfAut_closed u S -> free S -> free (map (cfAut u) S).
 Proof.
 set Su := map _ S => sSuS freeS; have uniqS := free_uniq freeS.
 have uniqSu: uniq Su by rewrite (map_inj_uniq cfAut_inj).
-have{sSuS} sSuS: {subset Su <= S} by move=> _ /mapP[phi Sphi ->]; apply: sSuS.
+have{} sSuS: {subset Su <= S} by move=> _ /mapP[phi Sphi ->]; apply: sSuS.
 have [|_ eqSuS] := uniq_min_size uniqSu sSuS; first by rewrite size_map.
 by rewrite (perm_free (uniq_perm uniqSu uniqS eqSuS)).
 Qed.

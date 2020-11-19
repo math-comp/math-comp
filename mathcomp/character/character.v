@@ -1490,7 +1490,7 @@ Proof.
 move=> Gx; have [e [[B uB def_x] [_ e1] [-> _] _]] := repr_rsim_diag rG Gx.
 rewrite cfRepr1 -[n in n%:R]card_ord -sumr_const -(eq_bigr _ (in1W e1)).
 case/normC_sum_eq1=> [i _ | c /eqP norm_c_1 def_e]; first by rewrite e1.
-have{def_e} def_e: e = const_mx c by apply/rowP=> i; rewrite mxE def_e ?andbT.
+have{} def_e: e = const_mx c by apply/rowP=> i; rewrite mxE def_e ?andbT.
 by exists c => //; rewrite def_x def_e diag_const_mx scalar_mxC mulmxKV.
 Qed.
 
@@ -1619,7 +1619,7 @@ apply: andb_id2l => Gx; rewrite {1 2}[chi]cfun_sum_constt !sum_cfunE.
 apply/eqP/bigcapP=> [Kx i Ci | Kx]; last first.
   by apply: eq_bigr => i /Kx Kx_i; rewrite !cfunE cfker1.
 rewrite cfkerEirr inE /= -(inj_eq (mulfI Ci)).
-have:= (normC_sum_upper _ Kx) i; rewrite !cfunE => -> // {i Ci} i _.
+have:= (normC_sum_upper _ Kx) i; rewrite !cfunE => -> // {Ci}i _.
 have chi_i_ge0: 0 <= '[chi, 'chi_i].
   by rewrite Cnat_ge0 ?Cnat_cfdot_char_irr.
 by rewrite !cfunE normrM (normr_idP _) ?ler_wpmul2l ?char1_ge_norm ?irr_char.

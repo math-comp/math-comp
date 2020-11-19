@@ -1770,7 +1770,7 @@ rewrite -{P mem_r}big_r; elim: r Ur => /= [_ | i r IHr].
   rewrite (big_pred1 [ffun=> j0]) ?big_nil //= => f.
   apply/familyP/eqP=> /= [Df |->{f} i]; last by rewrite ffunE !inE.
   by apply/ffunP=> i; rewrite ffunE; apply/eqP/Df.
-case/andP=> /negbTE nri; rewrite big_cons big_distrl => {IHr}/IHr <-.
+case/andP=> /negbTE nri; rewrite big_cons big_distrl => {}/IHr<-.
 rewrite (partition_big (fun f : fIJ => f i) (Q i)) => [|f]; last first.
   by move/familyP/(_ i); rewrite /= inE /= eqxx.
 pose seti j (f : fIJ) := [ffun k => if k == i then j else f k].

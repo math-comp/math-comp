@@ -158,7 +158,7 @@ Definition kHom_rmorphism K E f homKEf :=
 Lemma kHom_horner K E f p x :
   kHom K E f -> p \is a polyOver E -> x \in E -> f p.[x] = (map_poly f p).[f x].
 Proof.
-move=> homKf /polyOver_subvs[{p}p -> Ex]; pose fRM := kHom_rmorphism homKf.
+move=> homKf /polyOver_subvs[{}p -> Ex]; pose fRM := kHom_rmorphism homKf.
 by rewrite (horner_map _ _ (Subvs Ex)) -[f _](horner_map fRM) map_poly_comp.
 Qed.
 
@@ -632,7 +632,7 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
   pose f0 := kHomExtend 1 \1 (inLz x) z.
   have{map1q1z_z} hom_f0 : kHom 1 <<1; inLz x>> f0.
     by apply: kHomExtendP map1q1z_z => //; apply: kHom1.
-  have{splitLpz} splitLpz: splittingFieldFor <<1; inLz x>> pz imL.
+  have{} splitLpz: splittingFieldFor <<1; inLz x>> pz imL.
     have [r def_pz defLz] := splitLpz; exists r => //.
     apply/eqP; rewrite eqEsubv -{2}defLz adjoin_seqSl ?sub1v // andbT.
     apply/Fadjoin_seqP; split; last first.
@@ -1230,7 +1230,7 @@ exists (pmap f r).
 rewrite splitKa; have{splitKa}: all (root (minPoly K a)) r.
   by apply/allP => b; rewrite splitKa root_prod_XsubC.
 elim: r Er => /= [|b r IHr]; first by rewrite !big_nil.
-case/andP=> Eb Er /andP[pKa_b_0 /(IHr Er){IHr Er}IHr].
+case/andP=> Eb Er /andP[pKa_b_0 /(IHr Er){Er}IHr].
 have [x galE /eqP xa_b] := normalField_root_minPoly sKE nKE Ea pKa_b_0.
 rewrite /(f b); case: (pickP _) => [y /andP[_ /eqP<-]|/(_ x)/andP[]//].
 by rewrite !big_cons IHr.
@@ -1587,7 +1587,7 @@ Proof. by rewrite -normalField_ker ker_normal. Qed.
 Lemma normalField_img : normalField_cast @* 'Gal(E / K) = 'Gal(M / K).
 Proof.
 have [[sKM sME] [sKE _ nKE]] := (andP sKME, and3P galKE).
-apply/setP=> x; apply/idP/idP=> [/morphimP[{x}x galEx _ ->] | galMx].
+apply/setP=> x; apply/idP/idP=> [/morphimP[{}x galEx _ ->] | galMx].
   rewrite gal_kHom //; apply/kAHomP=> a Ka; have Ma := subvP sKM a Ka.
   by rewrite normalField_cast_eq // (fixed_gal sKE).
 have /(kHom_to_gal sKME nKE)[y galEy eq_xy]: kHom K M x by rewrite -gal_kHom.

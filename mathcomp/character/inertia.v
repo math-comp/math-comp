@@ -1140,7 +1140,7 @@ have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
     by have /cfclassP[y _ ->] := mem_tnth i phiKt; rewrite cfConjg_irr ?mem_irr.
   constructor 3; exists p => [i j /(congr1 (tnth (irr L)))/eqP| ].
     by apply: contraTeq; rewrite !pK !nth_uniq ?t_cast ?cfclass_uniq.
-  have{DthL} DthL: 'Res theta = e%:R *: \sum_(i < t) (phi ^: K)%CF`_i.
+  have{} DthL: 'Res theta = e%:R *: \sum_(i < t) (phi ^: K)%CF`_i.
     by rewrite DthL (big_nth 0) big_mkord t_cast.
   suffices /eqP e1: e == 1%N by rewrite DthL e1 scale1r; apply: eq_bigr.
   have Dth1: theta 1%g = e%:R * t%:R * phi 1%g.
@@ -1153,7 +1153,7 @@ have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
   rewrite mul1r -Dth1 -cfInd1 //.
   by rewrite char1_ge_constt ?cfInd_char ?irr_char ?constt_Ind_Res.
 have IKphi: 'I_K[phi] = K by rewrite -{1}(setIidPl sKG) -setIA.
-have{DthL} DthL: 'Res[L] theta = e%:R *: phi.
+have{} DthL: 'Res[L] theta = e%:R *: phi.
   by rewrite DthL -[rhs in (_ ^: rhs)%CF]IKphi cfclass_inertia big_seq1.
 pose mmLth := @mul_mod_Iirr K L s.
 have linKbar := char_abelianP _ abKbar.
@@ -1295,7 +1295,7 @@ exists c => // c2 c2Nth det_c2_mu; apply: irr_inj.
 have [irrMc _ imMc _] := constt_Ind_ext nsNG chiN.
 have /codomP[s2 Dc2]: c2 \in codom (@mul_mod_Iirr G N c).
   by rewrite -imMc constt_Ind_Res c2Nth constt_irr ?inE.
-have{Dc2} Dc2: 'chi_c2 = ('chi_s2 %% N)%CF * 'chi_c.
+have{} Dc2: 'chi_c2 = ('chi_s2 %% N)%CF * 'chi_c.
   by rewrite Dc2 cfIirrE // mod_IirrE.
 have s2_lin: 'chi_s2 \is a linear_char.
   rewrite qualifE irr_char; apply/eqP/(mulIf (irr1_neq0 c)).

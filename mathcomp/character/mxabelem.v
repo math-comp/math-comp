@@ -955,7 +955,7 @@ have rphi_fful i: mx_faithful (rphi i).
 have rphi_z i: rphi i z = (w ^+ i.+1)%:M.
   by rewrite /rphi [phi]lock /= /morphim_mx autmE alpha_i_z -lock phi_ze.
 pose iphi i := irr_comp sS (rphi i); pose phi_ i := irr_repr (iphi i).
-have{phi_ze} phi_ze i e: phi_ i (z ^+ e)%g = (w ^+ (e * i.+1)%N)%:M.
+have{} phi_ze i e: phi_ i (z ^+ e)%g = (w ^+ (e * i.+1)%N)%:M.
   rewrite /phi_ !{1}irr_center_scalar ?groupX ?irr_modeX //.
   suffices ->: irr_mode (iphi i) z = w ^+ i.+1 by rewrite mulnC exprM.
   have:= mx_rsim_sym (rsim_irr_comp sS F'S (rphi_irr i)).

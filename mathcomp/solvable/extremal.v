@@ -862,7 +862,7 @@ Proof.
 move=> n_gt1; have [def2q _ ltqm _] := def2qr n_gt1.
 case/(isoGrpP _ (Grp_2dihedral n_gt1)); rewrite card_2dihedral // -/ m => oG.
 case/existsP=> -[x y] /=; rewrite -/q => /eqP[defG xq y2 xy].
-have{defG} defG: <[x]> * <[y]> = G.
+have{} defG: <[x]> * <[y]> = G.
   by rewrite -norm_joinEr // norms_cycle xy groupV cycle_id.
 have notXy: y \notin <[x]>.
   apply: contraL ltqm => Xy; rewrite -leqNgt -oG -defG mulGSid ?cycle_subG //.
@@ -884,7 +884,7 @@ move=> n_gt3; have [def2q _ ltqm _] := def2qr (ltnW (ltnW n_gt3)).
 case/(isoGrpP _ (Grp_semidihedral n_gt3)).
 rewrite card_semidihedral // -/m => oG.
 case/existsP=> -[x y] /=; rewrite -/q -/r => /eqP[defG xq y2 xy].
-have{defG} defG: <[x]> * <[y]> = G.
+have{} defG: <[x]> * <[y]> = G.
   by rewrite -norm_joinEr // norms_cycle xy mem_cycle.
 have notXy: y \notin <[x]>.
   apply: contraL ltqm => Xy; rewrite -leqNgt -oG -defG mulGSid ?cycle_subG //.
@@ -905,7 +905,7 @@ Proof.
 move=> n_gt2; have [def2q def2r ltqm _] := def2qr (ltnW n_gt2).
 case/(isoGrpP _ (Grp_quaternion n_gt2)); rewrite card_quaternion // -/m => oG.
 case/existsP=> -[x y] /=; rewrite -/q -/r => /eqP[defG xq y2 xy].
-have{defG} defG: <[x]> * <[y]> = G.
+have{} defG: <[x]> * <[y]> = G.
   by rewrite -norm_joinEr // norms_cycle xy groupV cycle_id.
 have notXy: y \notin <[x]>.
   apply: contraL ltqm => Xy; rewrite -leqNgt -oG -defG mulGSid ?cycle_subG //.
@@ -1949,7 +1949,7 @@ have [a [fGa oa au n_gt01 cycGs]]: exists a,
   rewrite -(injm_p_rank injf) // p_rank_abelian 1?morphim_abelian //= p2 -/Gs.
   case: leqP => [|fGs1_gt1]; [by left | right].
   split=> //; exists c; last by rewrite -def_m // m_c expg_zneg.
-  have{defA1} defA1: <[a]> \x <[c]> = 'Ohm_1(Aut U).
+  have{} defA1: <[a]> \x <[c]> = 'Ohm_1(Aut U).
     by rewrite -(Ohm_dprod 1 defA) defA1 (@Ohm_p_cycle 1 _ 2) /p_elt oc.
   have def_fGs1: 'Ohm_1(f @* Gs) = 'Ohm_1(A).
     apply/eqP; rewrite eqEcard OhmS // -(dprod_card defA1) -!orderE oa oc.
@@ -2240,7 +2240,7 @@ have tiER: E :&: R = 'Z(E) by rewrite setIA (setIidPl (subset_trans sEH sHG)).
 have [cRR | not_cRR] := boolP (abelian R).
   exists E; [by right | exists [group of R]; split=> //; left].
   by rewrite /= -(setIidPl (sub_abelian_cent cRR sUR)) scUR.
-have{scUR} scUR: [group of U] \in 'SCN(R).
+have{} scUR: [group of U] \in 'SCN(R).
   by apply/SCN_P; rewrite (normalS sUR (subsetIl _ _)) // char_normal.
 have pR: p.-group R := pgroupS (subsetIl _ _) pG.
 have [R_le_3 | R_gt_3] := leqP (logn p #|R|) 3.

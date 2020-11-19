@@ -3114,7 +3114,7 @@ Proof.
 move=> addUV dxUV.
 have eqUV: \rank U = \rank (cokermx V).
   by rewrite mxrank_coker -{3}(mxrank1 F n) -addUV (mxdirectP dxUV) addnK.
-have{dxUV} dxUV: (U :&: V = 0)%MS by apply/mxdirect_addsP.
+have{} dxUV: (U :&: V = 0)%MS by apply/mxdirect_addsP.
 exists (in_submod U (val_factmod 1%:M *m proj_mx U V)) => // [|x Gx].
   rewrite /row_free -{6}eqUV -[_ == _]sub1mx -val_submodS val_submod1.
   rewrite in_submodK ?proj_mx_sub // -{1}[U](proj_mx_id dxUV) //.
@@ -3407,7 +3407,7 @@ Proof.
 rewrite -{9}(mxrank1 F n) -Clifford_Socle1.
 rewrite (mxdirectP (Socle_direct sH)) /= -sum_nat_const.
 apply: eq_bigr => W1 _; have [W0 _ W0G] := imsetP Clifford_atrans.
-have{W0G} W0G W': W' \in orbit 'Cl G W0 by rewrite -W0G inE.
+have{} W0G W': W' \in orbit 'Cl G W0 by rewrite -W0G inE.
 have [/orbitP[x Gx <-] /orbitP[y Gy <-]] := (W0G W, W0G W1).
 by rewrite !{1}val_Clifford_act // !mxrankMfree // !repr_mx_free.
 Qed.
@@ -4299,7 +4299,7 @@ have simM: mxsimple aG M.
   rewrite (eqmx_module _ (genmxE _)); apply/mxmoduleP=> x Gx.
   by rewrite -mulmxA -homf // mulmxA submxMr // (mxmoduleP modU).
 pose i := PackSocle (component_socle sG simM).
-have{modM rsimM} rsimM: mx_rsim rG (socle_repr i).
+have{modM} rsimM: mx_rsim rG (socle_repr i).
   apply: mx_rsim_trans rsimM (mx_rsim_sym _); apply/mx_rsim_iso.
   apply: (component_mx_iso (socle_simple _)) => //.
   by rewrite [component_mx _ _]PackSocleK component_mx_id.
@@ -4812,7 +4812,7 @@ Lemma dec_mx_reducible_semisimple U :
 Proof.
 have [m] := ubnP (\rank U); elim: m U => // m IHm U leUm modU redU.
 have [U0 | nzU] := eqVneq U 0.
-  have{U0} U0: (\sum_(i < 0) 0 :=: U)%MS by rewrite big_ord0 U0.
+  have{} U0: (\sum_(i < 0) 0 :=: U)%MS by rewrite big_ord0 U0.
   by apply: (intro_mxsemisimple U0); case.
 have [V simV sVU] := dec_mxsimple_exists modU nzU; have [modV nzV _] := simV.
 have [W modW defVW dxVW] := redU V modV sVU.
@@ -5035,7 +5035,7 @@ have compUf: mx_composition_series (regular_repr rF G) Uf.
   rewrite -{2}(map_mx0 f) -map_cons !(nth_map 0) ?leqW //.
   by rewrite map_submx // ltmxW // (pathP _ (mx_series_lt compU)).
 have [[i ltiU] simUi] := rsim_regular_series irrG compUf lastUf.
-have{simUi} simUi: mx_rsim rG (subseries_repr i modUf).
+have{} simUi: mx_rsim rG (subseries_repr i modUf).
   by apply: mx_rsim_trans simUi _; apply: section_eqmx.
 by rewrite (mx_rsim_abs_irr simUi) absUf; rewrite size_map in ltiU.
 Qed.
@@ -5693,7 +5693,7 @@ elim: t => //=.
 - move=> t1 IH1 n1 rt1; rewrite eval_mulmx eval_mx_term mul_scalar_mx.
   by rewrite scaler_nat {}IH1 //; elim: n1 => //= n1 IHn1; rewrite !mulrS IHn1.
 - by move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite eval_mulT IH1 ?IH2.
-move=> t1 IH1 n1 /IH1 {IH1}IH1.
+move=> t1 + n1 => /[apply] IH1.
 elim: n1 => [|n1 IHn1] /=; first by rewrite eval_mx_term.
 by rewrite eval_mulT exprS IH1 IHn1.
 Qed.

@@ -392,7 +392,7 @@ have ext1 mu0 x: {mu1 | exists y, x = Sinj mu1 y
     suffices in01M: lrmorphism in01 by exists (LRMorphism in01M).
     pose rwM := (=^~ Din01, SinjZ, rmorph1, rmorphB, rmorphM).
     by do 3?split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
-  have {z zz Dz px Dx} Dx: exists xx, x = QrC xx.
+  have {z zz Dz px} Dx: exists xx, x = QrC xx.
     exists (map_poly (in_alg Qr) px).[zz].
     by rewrite -horner_map Dz Sinj_poly Dx.
   pose lin01 := linfun in01; pose K := (lin01 @: fullv)%VS.
@@ -637,7 +637,7 @@ Proof.
 have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
 move=> mulS S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
-  case/S_P: Sx => {x}x ->; rewrite big1 ?isAlgInt0 // => i _.
+  case/S_P: Sx => {}x ->; rewrite big1 ?isAlgInt0 // => i _.
   by have /rowP/(_ i) := v0; rewrite !mxE => ->; rewrite mul0rz.
 have sYS (i : 'I_n): x * Y`_i \in S.
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
