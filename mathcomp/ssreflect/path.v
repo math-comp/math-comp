@@ -879,6 +879,31 @@ Arguments map_sort {T T' f leT' leT}.
 Arguments merge_map {T T' f leT}.
 Arguments sort_map {T T' f leT}.
 
+Section SortSeq_in.
+
+Variables (T : Type) (P : {pred T}) (leT : rel T).
+
+Hypothesis leT_total : {in P &, total leT}.
+
+Lemma sort_sorted_in s : all P s -> sorted leT (sort leT s).
+Proof.
+move=> /all_sigP [{}s <-]; rewrite sort_map sorted_map.
+by apply: sort_sorted; move=> [x Px] [y Py]; apply: leT_total.
+Qed.
+
+Hypothesis leT_tr : {in P & &, transitive leT}.
+
+Lemma sorted_sort_in s : all P s -> sorted leT s -> sort leT s = s.
+Proof.
+move=> /all_sigP [{}s <-]; rewrite sort_map sorted_map.
+by move=> /sorted_sort -> // [x Px] [y Py] [z Pz]; apply: leT_tr.
+Qed.
+
+End SortSeq_in.
+
+Arguments sort_sorted_in {T P leT} leT_total {s}.
+Arguments sorted_sort_in {T P leT} leT_tr {s}.
+
 Section EqSortSeq.
 
 Variables (T : eqType) (leT : rel T).
@@ -1069,6 +1094,26 @@ apply/(@irr_sorted_eq _ lt_lex); rewrite /lt_lex /leN //=.
 - by move=> ?; rewrite !(mem_filter, mem_sort).
 Qed.
 
+Lemma sort_stable_in T (P : {pred T}) (leT leT' : rel T) :
+  {in P &, total leT} -> {in P & &, transitive leT'} ->
+  forall s : seq T, all P s -> sorted leT' s ->
+  sorted [rel x y | leT x y && (leT y x ==> leT' x y)] (sort leT s).
+Proof.
+move=> leT_total leT_tr _ /all_sigP [s <-]; rewrite sort_map !sorted_map.
+apply: sort_stable; first by move=> [x Px] [y Py]; apply: leT_total.
+by move=> [x Px] [y Py] [z Pz]; apply: leT_tr.
+Qed.
+
+Lemma filter_sort_in T (P : {pred T}) (leT : rel T) :
+  {in P &, total leT} -> {in P & &, transitive leT} ->
+  forall p s, all P s -> filter p (sort leT s) = sort leT (filter p s).
+Proof.
+move=> leT_total leT_tr p _ /all_sigP [s <-].
+rewrite !(sort_map, filter_map) filter_sort //.
+  by move=> [x Px] [y Py]; apply: leT_total.
+by move=> [x Px] [y Py] [z Pz]; apply: leT_tr.
+Qed.
+
 Section Stability_mask.
 
 Variables (T : Type) (leT : rel T).
@@ -1090,6 +1135,30 @@ Lemma sorted_mask_sort s m :
 Proof. by move/(sorted_sort leT_tr) <-; exact: mask_sort. Qed.
 
 End Stability_mask.
+
+Section Stability_mask_in.
+
+Variables (T : Type) (P : {pred T}) (leT : rel T).
+Hypothesis leT_total : {in P &, total leT}.
+Hypothesis leT_tr : {in P & &, transitive leT}.
+
+Lemma mask_sort_in s m :
+  all P s -> {m_s : bitseq | mask m_s (sort leT s) = sort leT (mask m s)}.
+Proof.
+move=> /all_sigP [{}s <-]; case: (mask_sort (leT := relpre sval leT) _ _ s m).
+- by move=> [x Px] [y Py]; apply: leT_total.
+- by move=> [x Px] [y Py] [z Pz]; apply: leT_tr.
+- by move=> m' m'E; exists m'; rewrite -map_mask !sort_map -map_mask m'E.
+Qed.
+
+Lemma sorted_mask_sort_in s m :
+  all P s -> sorted leT (mask m s) -> {m_s | mask m_s (sort leT s) = mask m s}.
+Proof.
+move=> ? /(sorted_sort_in leT_tr _) <-; last exact: all_mask.
+exact: mask_sort_in.
+Qed.
+
+End Stability_mask_in.
 
 Section Stability_subseq.
 
@@ -1113,6 +1182,37 @@ by case: eqP => // _; rewrite {1}/sort /= lexy /=.
 Qed.
 
 End Stability_subseq.
+
+Section Stability_subseq_in.
+
+Variables (T : eqType) (leT : rel T).
+
+Lemma subseq_sort_in t s :
+  {in s &, total leT} -> {in s & &, transitive leT} ->
+  subseq t s -> subseq (sort leT t) (sort leT s).
+Proof.
+move=> leT_total leT_tr /subseqP [m _ ->].
+have [m' <-] := mask_sort_in leT_total leT_tr m (allss _).
+exact: mask_subseq.
+Qed.
+
+Lemma sorted_subseq_sort_in t s :
+  {in s &, total leT} -> {in s & &, transitive leT} ->
+  subseq t s -> sorted leT t -> subseq t (sort leT s).
+Proof.
+move=> ? leT_tr ? /(sorted_sort_in leT_tr) <-; last exact/allP/mem_subseq.
+exact: subseq_sort_in.
+Qed.
+
+Lemma mem2_sort_in s :
+  {in s &, total leT} -> {in s & &, transitive leT} ->
+  forall x y, leT x y -> mem2 s x y -> mem2 (sort leT s) x y.
+Proof.
+move=> leT_total leT_tr x y lexy; rewrite !mem2E.
+by move/subseq_sort_in; case: (_ == _); rewrite /sort /= ?lexy; apply.
+Qed.
+
+End Stability_subseq_in.
 
 (* Function trajectories. *)
 

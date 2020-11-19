@@ -2385,6 +2385,12 @@ Notation "[ 'seq' E : R | i : T <- s & C ]" :=
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
 
+Lemma all_sigP T a (s : seq T) : all a s -> {s' : seq (sig a) | map sval s' = s}.
+Proof.
+elim: s => /= [_|x s ihs /andP [ax /ihs [s' <-]]]; first by exists [::].
+by exists (exist a x ax :: s').
+Qed.
+
 Section MiscMask.
 
 Lemma leq_count_mask T (P : {pred T}) m s : count P (mask m s) <= count P s.
