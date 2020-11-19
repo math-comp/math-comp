@@ -47,6 +47,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope abelem_scope.
+
 Import GroupScope GRing.Theory FinRing.Theory.
 Local Open Scope ring_scope.
 

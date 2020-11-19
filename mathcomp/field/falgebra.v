@@ -77,6 +77,10 @@ From mathcomp Require Import finalg zmodp matrix vector poly.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Declare Scope aspace_scope.
+Declare Scope lrfun_scope.
+
 Local Open Scope ring_scope.
 
 Reserved Notation "{ 'aspace' T }" (at level 0, format "{ 'aspace'  T }").

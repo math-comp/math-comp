@@ -115,6 +115,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope eq_scope.
+Declare Scope fun_delta_scope.
+
 Module Equality.
 
 Definition axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).

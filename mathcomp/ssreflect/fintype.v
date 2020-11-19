@@ -156,6 +156,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope fin_quant_scope.
+
 Module Finite.
 
 Section RawMixin.

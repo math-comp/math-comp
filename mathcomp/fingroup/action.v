@@ -122,6 +122,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope action_scope.
+Declare Scope groupAction_scope.
+
 Import GroupScope.
 
 Section ActionDef.

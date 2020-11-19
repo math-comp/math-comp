@@ -81,11 +81,13 @@ From mathcomp Require Import quotient gproduct.
 (* structures when F1 is monotonic or hereditary, respectively.               *)
 (******************************************************************************)
 
-Import GroupScope.
-
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Declare Scope gFun_scope.
+
+Import GroupScope.
 
 Delimit Scope gFun_scope with gF.
 

@@ -40,6 +40,10 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope int_scope.
+Declare Scope distn_scope.
+Declare Scope rat_scope.
+
 Reserved Notation "n %:Z" (at level 2, left associativity, format "n %:Z").
 Reserved Notation "n = m :> 'in' 't'"
   (at level 70, m at next level, format "n  =  m  :>  'in' 't'").

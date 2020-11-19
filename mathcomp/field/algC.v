@@ -53,6 +53,10 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope C_scope.
+Declare Scope C_core_scope.
+Declare Scope C_expanded_scope.
+
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 

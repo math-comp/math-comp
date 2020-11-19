@@ -585,6 +585,10 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope ring_scope.
+Declare Scope term_scope.
+Declare Scope linear_ring_scope.
+
 Reserved Notation "+%R" (at level 0).
 Reserved Notation "-%R" (at level 0).
 Reserved Notation "*%R" (at level 0, format " *%R").

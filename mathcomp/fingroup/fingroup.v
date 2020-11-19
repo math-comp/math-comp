@@ -143,6 +143,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope group_scope.
+Declare Scope Group_scope.
+
 Delimit Scope group_scope with g.
 Delimit Scope Group_scope with G.
 

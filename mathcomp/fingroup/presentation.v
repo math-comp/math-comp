@@ -52,6 +52,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope group_presentation.
+Declare Scope nt_group_presentation.
+
 Import GroupScope.
 
 Module Presentation.

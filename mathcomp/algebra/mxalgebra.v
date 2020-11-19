@@ -135,6 +135,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope matrix_set_scope.
+
 Import GroupScope.
 Import GRing.Theory.
 Local Open Scope ring_scope.

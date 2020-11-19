@@ -14,4 +14,4 @@ vcharacter.v
 -arg -w -arg -notation-overridden
 -arg -w -arg -duplicate-clear
 -arg -w -arg -ambiguous-paths
--arg -w -arg -undeclared-scope
+-arg -w -arg +undeclared-scope

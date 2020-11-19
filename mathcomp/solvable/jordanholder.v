@@ -49,12 +49,13 @@ From mathcomp Require Import automorphism quotient action gseries.
 (* by Assia Mahboubi.                                                         *)
 (******************************************************************************)
 
-
-Import GroupScope.
-
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Declare Scope section_scope.
+
+Import GroupScope.
 
 Inductive section (gT : finGroupType) := GSection of {group gT} * {group gT}.
 
