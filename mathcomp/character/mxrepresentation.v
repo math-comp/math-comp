@@ -282,6 +282,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope irrType_scope.
+Declare Scope group_ring_scope.
+
 Import GroupScope GRing.Theory.
 Local Open Scope ring_scope.
 

@@ -100,6 +100,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope big_scope.
+
 Reserved Notation "\big [ op / idx ]_ i F"
   (at level 36, F at level 36, op, idx at level 10, i at level 0,
      right associativity,

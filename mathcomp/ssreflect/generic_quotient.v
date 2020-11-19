@@ -88,6 +88,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope quotient_scope.
+
 Reserved Notation "\pi_ Q" (at level 0, format "\pi_ Q").
 Reserved Notation "\pi" (at level 0, format "\pi").
 Reserved Notation "{pi_ Q a }"

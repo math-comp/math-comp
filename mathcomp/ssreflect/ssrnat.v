@@ -106,6 +106,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope coq_nat_scope.
+Declare Scope nat_rec_scope.
+
 (* Disable Coq prelude hints to improve proof script robustness. *)
 
 Remove Hints plus_n_O plus_n_Sm mult_n_O mult_n_Sm : core.

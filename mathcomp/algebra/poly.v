@@ -100,6 +100,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope unity_root_scope.
+
 Import GRing.Theory.
 Local Open Scope ring_scope.
 

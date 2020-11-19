@@ -407,6 +407,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope order_scope.
+Declare Scope cpo_sort.
+
 Delimit Scope order_scope with O.
 Local Open Scope order_scope.
 

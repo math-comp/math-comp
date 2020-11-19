@@ -110,6 +110,9 @@ From mathcomp Require Import choice fintype finfun bigop.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Declare Scope set_scope.
+
 Section SetType.
 
 Variable T : finType.

@@ -56,6 +56,7 @@ Unset Printing Implicit Defensive.
 (* ...                                                                  *)
 (************************************************************************)
 
+Declare Scope AC_scope.
 
 Delimit Scope AC_scope with AC.
 

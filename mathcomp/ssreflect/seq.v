@@ -190,6 +190,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope seq_scope.
+
 Reserved Notation "[ '<->' P0 ; P1 ; .. ; Pn ]"
   (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]").
 

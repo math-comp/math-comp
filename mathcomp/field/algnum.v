@@ -41,6 +41,9 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Declare Scope algC_scope.
+Declare Scope algC_expanded_scope.
+
 Import GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 

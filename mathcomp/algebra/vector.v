@@ -91,6 +91,10 @@ From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Declare Scope vspace_scope.
+Declare Scope lfun_scope.
+
 Local Open Scope ring_scope.
 
 Reserved Notation "{ 'vspace' T }" (at level 0, format "{ 'vspace'  T }").
