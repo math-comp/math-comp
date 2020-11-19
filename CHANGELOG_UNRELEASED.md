@@ -276,6 +276,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `(path|sorted)_(mask|filter)_in`, `rev_cycle`, `cycle_map`,
   `(homo|mono)_cycle(_in)`.
 
+- in `path.v`, new lemma `sort_iota_stable`.
+
 - in `seq.v` new lemmas `index_pivot`, `take_pivot`, `rev_pivot`,
   `eqseq_pivot2l`, `eqseq_pivot2r`, `eqseq_pivotl`, `eqseq_pivotr`
   `uniq_eqseq_pivotl`, `uniq_eqseq_pivotr`, `mask_rcons`, `rev_mask`,
@@ -366,6 +368,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, generalized lemmas `sub_path_in`, `sub_sorted_in`, and
   `eq_path_in` for non-`eqType`s.
 
+- in `path.v`, generalized lemmas `sorted_ltn_nth` and `sorted_leq_nth`
+  (formerly `sorted_lt_nth` and `sorted_le_nth`, cf Renamed section) for
+  non-`eqType`s.
+
 - in `order.v`, generalized `sort_le_id` for any `porderType`.
 
 ### Renamed
@@ -415,7 +421,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     (`allpairs_consr` and `allpairs_catr` are now deprecated alias,
     and will be attributed to the new `perm_allpairs_catr`).
 
-- in `path.v`, `eq_sorted(_irr)` -> `(irr_)sorted_eq`
+- in `path.v`,
+  + `eq_sorted(_irr)` -> `(irr_)sorted_eq`
+  + `sorted_(lt|le)_nth` -> `sorted_(ltn|leq)_nth`
+  + `(ltn|leq)_index` -> `sorted_(ltn|leq)_index`
+  + `subseq_order_path` -> `subseq_path`
 
 - in `div.v`
   + `coprime_mul(l|r)` -> `coprimeM(l|r)`

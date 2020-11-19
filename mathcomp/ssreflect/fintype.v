@@ -1648,7 +1648,7 @@ pose t0 := nth (F i0) s 0; have: t0 \in s by rewrite mem_nth.
 rewrite mem_sort => /mapP/sig2_eqW[it0]; rewrite mem_enum => it0P def_t0.
 have /negP[/=] := no_i it0; rewrite [P _]it0P/=; apply/'forall_implyP=> j Pj.
 have /(nthP (F i0))[k g_lt <-] : F j \in s by rewrite mem_sort map_f ?mem_enum.
-by rewrite -def_t0 sorted_le_nth.
+by rewrite -def_t0 sorted_leq_nth.
 Qed.
 
 End Extremum.
