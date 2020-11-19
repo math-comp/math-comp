@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop ssralg.
+From mathcomp Require Import choice fintype div tuple finfun bigop order ssralg.
 From mathcomp Require Import finalg zmodp matrix vector poly.
 
 (******************************************************************************)
@@ -93,7 +93,7 @@ Reserved Notation "''AEnd' ( T )" (at level 8, format "''AEnd' ( T )").
 Notation "\dim_ E V" := (divn (\dim V) (\dim E))
   (at level 10, E at level 2, V at level 8, format "\dim_ E  V") : nat_scope.
 
-Import GRing.Theory.
+Import Order.LTheory GRing.Theory.
 
 (* Finite dimensional algebra *)
 Module Falgebra.
