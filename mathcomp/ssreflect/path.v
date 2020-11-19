@@ -882,21 +882,20 @@ Arguments sort_map {T T' f leT}.
 Section SortSeq_in.
 
 Variables (T : Type) (P : {pred T}) (leT : rel T).
+Notation le_sT := (relpre (val : sig P -> _) leT).
 
 Hypothesis leT_total : {in P &, total leT}.
+Let le_sT_total : total le_sT := in2_sig leT_total.
 
 Lemma sort_sorted_in s : all P s -> sorted leT (sort leT s).
-Proof.
-move=> /all_sigP [{}s <-]; rewrite sort_map sorted_map.
-by apply: sort_sorted; move=> [x Px] [y Py]; apply: leT_total.
-Qed.
+Proof. by move=> /all_sigP[? ->]; rewrite sort_map sorted_map sort_sorted. Qed.
 
 Hypothesis leT_tr : {in P & &, transitive leT}.
+Let le_sT_tr : transitive le_sT := in3_sig leT_tr.
 
 Lemma sorted_sort_in s : all P s -> sorted leT s -> sort leT s = s.
 Proof.
-move=> /all_sigP [{}s <-]; rewrite sort_map sorted_map.
-by move=> /sorted_sort -> // [x Px] [y Py] [z Pz]; apply: leT_tr.
+by move=> /all_sigP [{}s ->]; rewrite sort_map sorted_map => /sorted_sort->.
 Qed.
 
 End SortSeq_in.
@@ -1099,19 +1098,16 @@ Lemma sort_stable_in T (P : {pred T}) (leT leT' : rel T) :
   forall s : seq T, all P s -> sorted leT' s ->
   sorted [rel x y | leT x y && (leT y x ==> leT' x y)] (sort leT s).
 Proof.
-move=> leT_total leT_tr _ /all_sigP [s <-]; rewrite sort_map !sorted_map.
-apply: sort_stable; first by move=> [x Px] [y Py]; apply: leT_total.
-by move=> [x Px] [y Py] [z Pz]; apply: leT_tr.
+move=> /in2_sig leT_total /in3_sig leT_tr _ /all_sigP[s ->].
+by rewrite sort_map !sorted_map; apply: sort_stable.
 Qed.
 
 Lemma filter_sort_in T (P : {pred T}) (leT : rel T) :
   {in P &, total leT} -> {in P & &, transitive leT} ->
   forall p s, all P s -> filter p (sort leT s) = sort leT (filter p s).
 Proof.
-move=> leT_total leT_tr p _ /all_sigP [s <-].
-rewrite !(sort_map, filter_map) filter_sort //.
-  by move=> [x Px] [y Py]; apply: leT_total.
-by move=> [x Px] [y Py] [z Pz]; apply: leT_tr.
+move=> /in2_sig leT_total /in3_sig leT_tr p _ /all_sigP[s ->].
+by rewrite !(sort_map, filter_map) filter_sort.
 Qed.
 
 Section Stability_mask.
@@ -1142,20 +1138,21 @@ Variables (T : Type) (P : {pred T}) (leT : rel T).
 Hypothesis leT_total : {in P &, total leT}.
 Hypothesis leT_tr : {in P & &, transitive leT}.
 
+Notation le_sT := (relpre (val : sig P -> _) leT).
+Let le_sT_total : total le_sT := in2_sig leT_total.
+Let le_sT_tr : transitive le_sT := in3_sig leT_tr.
+
 Lemma mask_sort_in s m :
   all P s -> {m_s : bitseq | mask m_s (sort leT s) = sort leT (mask m s)}.
 Proof.
-move=> /all_sigP [{}s <-]; case: (mask_sort (leT := relpre sval leT) _ _ s m).
-- by move=> [x Px] [y Py]; apply: leT_total.
-- by move=> [x Px] [y Py] [z Pz]; apply: leT_tr.
-- by move=> m' m'E; exists m'; rewrite -map_mask !sort_map -map_mask m'E.
+move=> /all_sigP [{}s ->]; case: (mask_sort (leT := le_sT) _ _ s m) => //.
+by move=> m' m'E; exists m'; rewrite -map_mask !sort_map -map_mask m'E.
 Qed.
 
 Lemma sorted_mask_sort_in s m :
   all P s -> sorted leT (mask m s) -> {m_s | mask m_s (sort leT s) = mask m s}.
 Proof.
-move=> ? /(sorted_sort_in leT_tr _) <-; last exact: all_mask.
-exact: mask_sort_in.
+move=> ? /(sorted_sort_in leT_tr _) <-; [exact: mask_sort_in | exact: all_mask].
 Qed.
 
 End Stability_mask_in.

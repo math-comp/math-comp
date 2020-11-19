@@ -2385,9 +2385,9 @@ Notation "[ 'seq' E : R | i : T <- s & C ]" :=
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
 
-Lemma all_sigP T a (s : seq T) : all a s -> {s' : seq (sig a) | map sval s' = s}.
+Lemma all_sigP T a (s : seq T) : all a s -> {s' : seq (sig a) | s = map sval s'}.
 Proof.
-elim: s => /= [_|x s ihs /andP [ax /ihs [s' <-]]]; first by exists [::].
+elim: s => /= [_|x s ihs /andP [ax /ihs [s' ->]]]; first by exists [::].
 by exists (exist a x ax :: s').
 Qed.
 
