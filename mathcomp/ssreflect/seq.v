@@ -3059,7 +3059,7 @@ move=> sz_s; apply/(canLR revK)/eq_from_flatten_shape.
 transitivity (rev (shape (reshape (rev sh) (rev s)))).
   by rewrite !reshapeKl ?revK ?size_rev ?sz_s ?sumn_rev.
 rewrite shape_rev; congr (rev _); rewrite -[RHS]map_comp.
-by apply: eq_map => t /=; rewrite size_rev.
+by under eq_map do rewrite /= size_rev.
 Qed.
 
 Lemma reshape_rcons s sh n (m := sumn sh) :
@@ -3246,12 +3246,11 @@ Proof. by []. Qed.
 Lemma eq_allpairs (f1 f2 : forall x, T x -> R) s t :
     (forall x, f1 x =1 f2 x) ->
   [seq f1 x y | x <- s, y <- t x] = [seq f2 x y | x <- s, y <- t x].
-Proof. by move=> eq_f; rewrite (eq_map (fun x => eq_map (eq_f x) (t x))). Qed.
+Proof. by move=> eq_f; under eq_map do under eq_map do rewrite eq_f. Qed.
 
 Lemma eq_allpairsr (f : forall x, T x -> R) s t1 t2 : (forall x, t1 x = t2 x) ->
   [seq f x y | x <- s, y <- t1 x] = [seq f x y | x <- s, y <- t2 x].
-(* From Coq 8.10 Proof. by move=> eq_t; under eq_map do rewrite eq_t. Qed. *)
-Proof. by move=> eq_t; congr flatten; apply: eq_map => x; rewrite eq_t. Qed.
+Proof. by move=> eq_t; under eq_map do rewrite eq_t. Qed.
 
 Lemma allpairs_cat f s1 s2 t :
   [seq f x y | x <- s1 ++ s2, y <- t x] =
@@ -3270,7 +3269,7 @@ Proof. by rewrite -map_comp. Qed.
 Lemma allpairs_mapr f (g : forall x, T' x -> T x) s t :
   [seq f x y | x <- s, y <- map (g x) (t x)] =
     [seq f x (g x y) | x <- s, y <- t x].
-Proof. by rewrite -(eq_map (fun=> map_comp _ _ _)). Qed.
+Proof. by under eq_map do rewrite -map_comp. Qed.
 
 End AllPairsDep.
 
@@ -3517,8 +3516,7 @@ Local Notation tseq := tally_seq.
 
 Lemma size_tally_seq bs : size (tally_seq bs) = sumn (unzip2 bs).
 Proof.
-rewrite size_flatten /shape -map_comp; congr sumn.
-by apply/eq_map=> b; apply: size_nseq.
+by rewrite size_flatten /shape -map_comp; under eq_map do rewrite /= size_nseq.
 Qed.
 
 Lemma tally_seqK : {in wf_tally, cancel tally_seq tally}.
@@ -3570,7 +3568,7 @@ Proof.
 have /andP[Ubs _] := tallyP s; pose b := [fun s x => (x, count_mem x (tseq s))].
 suffices /permPl->: perm_eq (tally s) (map (b (tally s)) (unzip1 (tally s))).
   congr perm_eq: (perm_map (b (tally s)) (tallyEl s)).
-  by apply/eq_map=> x; rewrite /= (permP (tallyK s)).
+  by under eq_map do rewrite /= (permP (tallyK s)).
 elim: (tally s) Ubs => [|[x m] bs IH] //= /andP[bs'x /IH-IHbs {IH}].
 rewrite /tseq /= -/(tseq _) count_cat count_nseq /= eqxx mul1n.
 rewrite (count_memPn _) ?addn0 ?perm_cons; last first.
@@ -3583,7 +3581,7 @@ Qed.
 Lemma perm_tally s1 s2 : perm_eq s1 s2 -> perm_eq (tally s1) (tally s2).
 Proof.
 move=> eq_s12; apply: (@perm_trans _ [seq (x, count_mem x s2) | x <- undup s1]).
-  by congr perm_eq: (tallyE s1); apply/eq_map=> x; rewrite (permP eq_s12).
+  by congr perm_eq: (tallyE s1); under eq_map do rewrite (permP eq_s12).
 by rewrite (permPr (tallyE s2)); apply/perm_map/perm_undup/(perm_mem eq_s12).
 Qed.
 
@@ -3630,8 +3628,8 @@ have cpE: forall f & forall s bs, is_acc (f s bs), is_acc (cons_perms_ f _ _ _).
 have prE: is_acc (perms_rec _ _ _) by elim=> //= n IHn s bs; apply: cpE.
 pose has_suffix f := forall s : seq T, f s = [seq t ++ s | t <- f [::]].
 suffices prEs n bs: has_suffix (fun s => perms_rec n s bs [::]).
-  move=> n x bs bs1 bs2 /=; rewrite cpE // prEs; congr (_ ++ _).
-  by apply/eq_map=> t; rewrite cats1.
+  move=> n x bs bs1 bs2 /=; rewrite cpE // prEs.
+  by under eq_map do rewrite cats1.
 elim: n bs => //= n IHn bs s; elim: bs [::] => [|[x [|m]] bs IHbs] //= bs1.
 rewrite cpE // IHbs IHn [in RHS]cpE // [in RHS]IHn map_cat -map_comp.
 by congr (_ ++ _); apply: eq_map => t /=; rewrite -catA.

@@ -1045,8 +1045,8 @@ Lemma big_index_uniq (I : eqType) (r : seq I) (E : 'I_(size r) -> R) :
     uniq r ->
   \big[op/idx]_i E i = \big[op/idx]_(x <- r) oapp E idx (insub (index x r)).
 Proof.
-move=> Ur; apply/esym; rewrite big_tnth; apply: eq_bigr => i _.
-by rewrite index_uniq // valK.
+move=> Ur; apply/esym; rewrite big_tnth.
+by under [LHS]eq_bigr do rewrite index_uniq// valK.
 Qed.
 
 Lemma big_tuple I n (t : n.-tuple I) (P : pred I) F :
@@ -1087,9 +1087,8 @@ Lemma big_ord_recl n F :
      op (F ord0) (\big[op/idx]_(i < n) F (@lift n.+1 ord0 i)).
 Proof.
 pose G i := F (inord i); have eqFG i: F i = G i by rewrite /G inord_val.
-rewrite (eq_bigr _ (fun i _ => eqFG i)) -(big_mkord _ (fun _ => _) G) eqFG.
-rewrite big_ltn // big_add1 /= big_mkord; congr op.
-by apply: eq_bigr => i _; rewrite eqFG.
+under eq_bigr do rewrite eqFG; under [in RHS]eq_bigr do rewrite eqFG.
+by rewrite -(big_mkord _ (fun _ => _) G) eqFG big_ltn // big_add1 /= big_mkord.
 Qed.
 
 Lemma big_nseq_cond I n a (P : pred I) F :
@@ -1624,8 +1623,8 @@ Lemma exchange_big_dep I J rI rJ (P : pred I) (Q : I -> pred J)
     \big[*%M/1]_(j <- rJ | xQ j) \big[*%M/1]_(i <- rI | P i && Q i j) F i j.
 Proof.
 move=> PQxQ; pose p u := (u.2, u.1).
-rewrite (eq_bigr _ _ _ (fun _ _ => big_tnth _ _ rI _ _)) (big_tnth _ _ rJ).
-rewrite (eq_bigr _ _ _ (fun _ _ => (big_tnth _ _ rJ _ _))) big_tnth.
+under [LHS]eq_bigr do rewrite big_tnth; rewrite [LHS]big_tnth.
+under [RHS]eq_bigr do rewrite big_tnth; rewrite [RHS]big_tnth.
 rewrite !pair_big_dep (reindex_onto (p _ _) (p _ _)) => [|[]] //=.
 apply: eq_big => [] [j i] //=; symmetry; rewrite eqxx andbT andb_idl //.
 by case/andP; apply: PQxQ.
@@ -1636,8 +1635,8 @@ Lemma exchange_big I J rI rJ (P : pred I) (Q : pred J) F :
   \big[*%M/1]_(i <- rI | P i) \big[*%M/1]_(j <- rJ | Q j) F i j =
     \big[*%M/1]_(j <- rJ | Q j) \big[*%M/1]_(i <- rI | P i) F i j.
 Proof.
-rewrite (exchange_big_dep Q) //; apply: eq_bigr => i /= Qi.
-by apply: eq_bigl => j; rewrite Qi andbT.
+rewrite (exchange_big_dep Q) //.
+by under eq_bigr => i Qi do under eq_bigl do rewrite Qi andbT.
 Qed.
 
 Lemma exchange_big_dep_nat m1 n1 m2 n2 (P : pred nat) (Q : rel nat)
@@ -1647,7 +1646,7 @@ Lemma exchange_big_dep_nat m1 n1 m2 n2 (P : pred nat) (Q : rel nat)
     \big[*%M/1]_(m2 <= j < n2 | xQ j)
        \big[*%M/1]_(m1 <= i < n1 | P i && Q i j) F i j.
 Proof.
-move=> PQxQ; rewrite (eq_bigr _ _ _ (fun _ _ => big_seq_cond _ _ _ _ _)).
+move=> PQxQ; under eq_bigr do rewrite big_seq_cond.
 rewrite big_seq_cond /= (exchange_big_dep xQ) => [|i j]; last first.
   by rewrite !mem_index_iota => /andP[mn_i Pi] /andP[mn_j /PQxQ->].
 rewrite 2!(big_seq_cond _ _ _ xQ); apply: eq_bigr => j /andP[-> _] /=.
@@ -1660,7 +1659,7 @@ Lemma exchange_big_nat m1 n1 m2 n2 (P Q : pred nat) F :
     \big[*%M/1]_(m2 <= j < n2 | Q j) \big[*%M/1]_(m1 <= i < n1 | P i) F i j.
 Proof.
 rewrite (exchange_big_dep_nat Q) //.
-by apply: eq_bigr => i /= Qi; apply: eq_bigl => j; rewrite Qi andbT.
+by under eq_bigr => i Qi do under eq_bigl do rewrite Qi andbT.
 Qed.
 
 End Abelian.
@@ -1754,7 +1753,7 @@ Proof. by rewrite big_endo ?mulm0 // => x y; apply: mulmDr. Qed.
 Lemma big_distrlr I J rI rJ (pI : pred I) (pJ : pred J) F G :
   (\big[+%M/0]_(i <- rI | pI i) F i) * (\big[+%M/0]_(j <- rJ | pJ j) G j)
    = \big[+%M/0]_(i <- rI | pI i) \big[+%M/0]_(j <- rJ | pJ j) (F i * G j).
-Proof. by rewrite big_distrl; apply: eq_bigr => i _; rewrite big_distrr. Qed.
+Proof. by rewrite big_distrl; under eq_bigr do rewrite big_distrr. Qed.
 
 Lemma big_distr_big_dep (I J : finType) j0 (P : pred I) (Q : I -> pred J) F :
   \big[*%M/1]_(i | P i) \big[+%M/0]_(j | Q i j) F i j =

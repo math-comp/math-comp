@@ -5684,9 +5684,9 @@ elim: t => //=.
 - by move=> k _; apply/rowP=> i; rewrite !mxE /= nth_row_env nth_map_rVval.
 - by move=> x _; rewrite eval_mx_term.
 - by move=> x _; rewrite eval_mx_term.
-- move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite -{}IH1 // -{}IH2 //.
+- move=> t1 + t2 + /andP[rt1 rt2] => <-// <-//.
   by apply/rowP=> k; rewrite !mxE.
-- by move=> t1 IH1 rt1; rewrite -{}IH1 //; apply/rowP=> k; rewrite !mxE.
+- by move=> t1 + rt1 => <-//; apply/rowP=> k; rewrite !mxE.
 - move=> t1 IH1 n1 rt1; rewrite eval_mulmx eval_mx_term mul_scalar_mx.
   by rewrite scaler_nat {}IH1 //; elim: n1 => //= n1 IHn1; rewrite !mulrS IHn1.
 - by move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite eval_mulT IH1 ?IH2.
