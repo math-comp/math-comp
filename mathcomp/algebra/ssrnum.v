@@ -367,8 +367,8 @@ Export NumDomain_joins.Exports.
 Module Import Def.
 
 Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
-  nosimpl (norm_op (NormedZmodule.class T)).
-Arguments normr {R T} x.
+  (norm_op (NormedZmodule.class T)).
+Arguments normr {R T} x : simpl never.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)

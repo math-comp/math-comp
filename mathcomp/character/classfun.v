@@ -443,14 +443,13 @@ Definition isometry_from_to mCFD tau mCFR :=
    prop_in2 mCFD (inPhantom (isometry tau))
   /\ prop_in1 mCFD (inPhantom (forall phi, in_mem (tau phi) mCFR)).
 
-End Predicates.
+Definition orthogonal S1 S2 := @ortho_rec S1 S2.
 
-(* Outside section so the nosimpl does not get "cooked" out. *)
-Definition orthogonal gT D S1 S2 := nosimpl (@ortho_rec gT D S1 S2).
+End Predicates.
 
 Arguments cfker {gT D%g} phi%CF.
 Arguments cfaithful {gT D%g} phi%CF.
-Arguments orthogonal {gT D%g} S1%CF S2%CF.
+Arguments orthogonal {gT D%g} S1%CF S2%CF : simpl never.
 Arguments pairwise_orthogonal {gT D%g} S%CF.
 Arguments orthonormal {gT D%g} S%CF.
 Arguments isometry {gT rT D%g R%g} tau%CF.

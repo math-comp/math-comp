@@ -1533,7 +1533,8 @@ Definition gcdp_rec p q :=
       if n is n1.+1 then loop n1 qq rr else rr in
   loop (size p1) p1 q1.
 
-Definition gcdp := nosimpl gcdp_rec.
+Definition gcdp := gcdp_rec.
+Arguments gcdp : simpl never.
 
 Lemma gcd0p : left_id 0 gcdp.
 Proof.
@@ -2354,7 +2355,7 @@ by rewrite -size_poly_eq1=> /irred_p /(_ dvd_dp); right.
 Qed.
 
 End IDomainPseudoDivision.
-
+Arguments gcdp : simpl never.
 Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp : core.
 Hint Resolve dvdp0 : core.
 

@@ -122,11 +122,12 @@ Qed.
 (** The falling factorial *)
 
 Fixpoint ffact_rec n m := if m is m'.+1 then n * ffact_rec n.-1 m' else 1.
+Notation "n ^_ m" := (ffact_rec n m)
+  (at level 30, right associativity) : nat_rec_scope.
 
-Definition falling_factorial := nosimpl ffact_rec.
-
-Notation "n ^_ m" := (falling_factorial n m)
-  (at level 30, right associativity) : nat_scope.
+Definition falling_factorial := ffact_rec.
+Arguments falling_factorial : simpl never.
+Notation "n ^_ m" := (falling_factorial n m) : nat_scope.
 
 Lemma ffactE : falling_factorial = ffact_rec. Proof. by []. Qed.
 
@@ -178,11 +179,12 @@ Fixpoint binomial_rec n m :=
   | _, 0 => 1
   | 0, _.+1 => 0
   end.
+Notation "''C' ( n , m )" := (binomial_rec n m)
+  (at level 8, format "''C' ( n ,  m )") : nat_rec_scope.
 
-Definition binomial := nosimpl binomial_rec.
-
-Notation "''C' ( n , m )" := (binomial n m)
-  (at level 8, format "''C' ( n ,  m )") : nat_scope.
+Definition binomial := binomial_rec.
+Arguments binomial : simpl never.
+Notation "''C' ( n , m )" := (binomial n m) : nat_scope.
 
 Lemma binE : binomial = binomial_rec. Proof. by []. Qed.
 

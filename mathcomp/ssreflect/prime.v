@@ -121,6 +121,7 @@ End PrimeDecompAux.
 Definition NumFactor (f : nat * nat) := ([Num of f.1], f.2).
 
 Definition pfactor p e := p ^ e.
+Arguments pfactor : simpl never.
 
 Section prime_decomp.
 
@@ -225,7 +226,7 @@ case def_a: a => [|a'] /= in le_a_n *; rewrite !natTrecE -/p {}eq_bc_0.
   case: d if_d0 def_m => [[//| def_m {pr_p}pr_p pr_m'] _ | d _ def_m] /=.
     rewrite def_m def_a addn0 mulnA -2!expnSr.
     by split; rewrite /pd_ord /pf_ok /= ?muln1 ?pr_p ?leqnn.
-  apply: apd_ok; rewrite // /pd_ok /= /pfactor expn1 muln1 /pd_ord /= ltpm.
+  apply: apd_ok; rewrite // /pd_ok /= muln1 /pd_ord /= ltpm.
   rewrite /pf_ok !andbT /=; split=> //; apply: contra leppm.
   case/hasP=> r /=; rewrite mem_index_iota => /andP[lt1r ltrm] dvrm; apply/hasP.
   have [ltrp | lepr] := ltnP r p.
@@ -280,7 +281,7 @@ have next_pm: lb_dvd p.+2 m.
   rewrite odd_double -ltn_double def_r -mul2n ltn_pmul2r //.
   by case: r def_r => [|[|[]]] //; rewrite def_d // mul1n /= odd_double.
 apply: apd_ok => //; case: a' def_a le_a_n => [|a'] def_a => [_ | lta] /=.
-  rewrite /pd_ok /= /pfactor expn1 muln1 /pd_ord /= ltpm /pf_ok !andbT /=.
+  rewrite /pd_ok /= muln1 /pd_ord /= ltpm /pf_ok !andbT /=.
   split=> //; apply: contra next_pm.
   case/hasP=> q; rewrite mem_index_iota => /andP[lt1q ltqm] dvqm; apply/hasP.
   have [ltqp | lepq] := ltnP q p.+2.
