@@ -408,7 +408,6 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope order_scope.
-Declare Scope cpo_sort.
 
 Delimit Scope order_scope with O.
 Local Open Scope order_scope.
@@ -1057,7 +1056,6 @@ End Exports.
 
 End POrder.
 Import POrder.Exports.
-Bind Scope cpo_sort with POrder.sort.
 
 Section POrderDef.
 
@@ -2072,7 +2070,6 @@ End Exports.
 
 End FinPOrder.
 Import FinPOrder.Exports.
-Bind Scope cpo_sort with FinPOrder.sort.
 
 Module FinLattice.
 Section ClassDef.
