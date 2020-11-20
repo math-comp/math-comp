@@ -129,15 +129,6 @@ Local Open Scope order_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
-Reserved Notation "<= y" (at level 35).
-Reserved Notation ">= y" (at level 35).
-Reserved Notation "< y" (at level 35).
-Reserved Notation "> y" (at level 35).
-Reserved Notation "<= y :> T" (at level 35, y at next level).
-Reserved Notation ">= y :> T" (at level 35, y at next level).
-Reserved Notation "< y :> T" (at level 35, y at next level).
-Reserved Notation "> y :> T" (at level 35, y at next level).
-
 Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
