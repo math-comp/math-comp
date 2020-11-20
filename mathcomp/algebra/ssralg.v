@@ -1856,22 +1856,22 @@ Include Additive.Exports. (* Allows GRing.additive to resolve conflicts. *)
 Section LiftedZmod.
 Variables (U : Type) (V : zmodType).
 Definition null_fun_head (phV : phant V) of U : V := let: Phant := phV in 0.
-Definition add_fun_head t (f g : U -> V) x := let: tt := t in f x + g x.
-Definition sub_fun_head t (f g : U -> V) x := let: tt := t in f x - g x.
+Definition add_fun (f g : U -> V) x := f x + g x.
+Definition sub_fun (f g : U -> V) x := f x - g x.
 End LiftedZmod.
 
 (* Lifted multiplication. *)
 Section LiftedRing.
 Variables (R : ringType) (T : Type).
 Implicit Type f : T -> R.
-Definition mull_fun_head t a f x := let: tt := t in a * f x.
-Definition mulr_fun_head t a f x := let: tt := t in f x * a.
+Definition mull_fun a f x := a * f x.
+Definition mulr_fun a f x := f x * a.
 End LiftedRing.
 
 (* Lifted linear operations. *)
 Section LiftedScale.
 Variables (R : ringType) (U : Type) (V : lmodType R) (A : lalgType R).
-Definition scale_fun_head t a (f : U -> V) x := let: tt := t in a *: f x.
+Definition scale_fun a (f : U -> V) x := a *: f x.
 Definition in_alg_head (phA : phant A) k : A := let: Phant := phA in k%:A.
 End LiftedScale.
 
@@ -1881,11 +1881,17 @@ Notation null_fun V := (null_fun_head (Phant V)) (only parsing).
 Local Notation in_alg_loc A := (in_alg_head (Phant A)) (only parsing).
 
 Local Notation "\0" := (null_fun _) : ring_scope.
-Local Notation "f \+ g" := (add_fun_head tt f g) : ring_scope.
-Local Notation "f \- g" := (sub_fun_head tt f g) : ring_scope.
-Local Notation "a \*: f" := (scale_fun_head tt a f) : ring_scope.
-Local Notation "x \*o f" := (mull_fun_head tt x f) : ring_scope.
-Local Notation "x \o* f" := (mulr_fun_head tt x f) : ring_scope.
+Local Notation "f \+ g" := (add_fun f g) : ring_scope.
+Local Notation "f \- g" := (sub_fun f g) : ring_scope.
+Local Notation "a \*: f" := (scale_fun a f) : ring_scope.
+Local Notation "x \*o f" := (mull_fun x f) : ring_scope.
+Local Notation "x \o* f" := (mulr_fun x f) : ring_scope.
+
+Arguments add_fun {_ _} f g _ /.
+Arguments sub_fun {_ _} f g _ /.
+Arguments mull_fun {_ _}  a f _ /.
+Arguments mulr_fun {_ _} a f _ /.
+Arguments scale_fun {_ _ _} a f _ /.
 
 Section AdditiveTheory.
 
@@ -6084,11 +6090,17 @@ Notation "*:%R" := (@scale _ _).
 Notation "a *: m" := (scale a m) : ring_scope.
 Notation "k %:A" := (scale k 1) : ring_scope.
 Notation "\0" := (null_fun _) : ring_scope.
-Notation "f \+ g" := (add_fun_head tt f g) : ring_scope.
-Notation "f \- g" := (sub_fun_head tt f g) : ring_scope.
-Notation "a \*: f" := (scale_fun_head tt a f) : ring_scope.
-Notation "x \*o f" := (mull_fun_head tt x f) : ring_scope.
-Notation "x \o* f" := (mulr_fun_head tt x f) : ring_scope.
+Notation "f \+ g" := (add_fun f g) : ring_scope.
+Notation "f \- g" := (sub_fun f g) : ring_scope.
+Notation "a \*: f" := (scale_fun a f) : ring_scope.
+Notation "x \*o f" := (mull_fun x f) : ring_scope.
+Notation "x \o* f" := (mulr_fun x f) : ring_scope.
+
+Arguments add_fun {_ _} f g _ /.
+Arguments sub_fun {_ _} f g _ /.
+Arguments mull_fun {_ _}  a f _ /.
+Arguments mulr_fun {_ _} a f _ /.
+Arguments scale_fun {_ _ _} a f _ /.
 
 Notation "\sum_ ( i <- r | P ) F" :=
   (\big[+%R/0%R]_(i <- r | P%B) F%R) : ring_scope.

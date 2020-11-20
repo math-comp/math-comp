@@ -140,7 +140,7 @@ Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
 Definition poly_of of phant R := polynomial.
 Identity Coercion type_poly_of : poly_of >-> polynomial.
 
-Definition coefp_head h i (p : poly_of (Phant R)) := let: tt := h in p`_i.
+Definition coefp i (p : poly_of (Phant R)) := p`_i.
 
 End Polynomial.
 
@@ -150,9 +150,8 @@ Bind Scope ring_scope with poly_of.
 Bind Scope ring_scope with polynomial.
 Arguments polyseq {R} p%R.
 Arguments poly_inj {R} [p1%R p2%R] : rename.
-Arguments coefp_head {R} h i%N p%R.
+Arguments coefp {R} i%N / p%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)).
-Notation coefp i := (coefp_head tt i).
 
 Definition poly_countMixin (R : countRingType) :=
   [countMixin of polynomial R by <:].

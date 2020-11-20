@@ -508,8 +508,8 @@ Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
 Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.
 
 (* In order to add a second canonical structure on xcfun *)
-Definition xcfun_r_head k A phi := let: tt := k in xcfun phi A.
-Local Notation xcfun_r A := (xcfun_r_head tt A).
+Definition xcfun_r A phi := xcfun phi A.
+Arguments xcfun_r A phi /.
 
 Lemma xcfun_rE A chi : xcfun_r A chi = xcfun chi A. Proof. by []. Qed.
 
@@ -534,7 +534,7 @@ by congr (_ * \tr _) => {A} /=; rewrite /gring_mx /= -rowE rowK mxvecK.
 Qed.
 
 End Char.
-Notation xcfun_r A := (xcfun_r_head tt A).
+Arguments xcfun_r {_ _} A phi /.
 Notation "phi .[ A ]" := (xcfun phi A) : cfun_scope.
 
 Definition pred_Nirr gT B := #|@classes gT B|.-1.

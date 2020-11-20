@@ -148,7 +148,7 @@ Definition monotonic :=
 
 Variables (k : unit) (F1 F2 : object_map).
 
-Definition comp_head : object_map := fun gT A => let: tt := k in F1 (F2 A).
+Definition comp : object_map := fun gT A => F1 (F2 A).
 
 Definition modulo : object_map :=
   fun gT A => coset (F2 A) @*^-1 (F1 (A / (F2 A))).
@@ -244,7 +244,8 @@ Export GFunctor.Exports.
 
 Bind Scope gFun_scope with GFunctor.object_map.
 
-Notation "F1 \o F2" := (GFunctor.comp_head tt F1 F2) : gFun_scope.
+Arguments GFunctor.comp F1 F2 _ /.
+Notation "F1 \o F2" := (GFunctor.comp F1 F2) : gFun_scope.
 Notation "F1 %% F2" := (GFunctor.modulo F1 F2) : gFun_scope.
 
 Section FunctorGroup.

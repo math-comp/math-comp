@@ -378,8 +378,8 @@ Definition cfun_base A : #|classes B ::&: A|.-tuple classfun :=
 Definition classfun_on A := <<cfun_base A>>%VS.
 
 Definition cfdot phi psi := #|B|%:R^-1 * \sum_(x in B) phi x * (psi x)^*.
-Definition cfdotr_head k psi phi := let: tt := k in cfdot phi psi.
-Definition cfnorm_head k phi := let: tt := k in cfdot phi phi.
+Definition cfdotr psi phi := cfdot phi psi.
+Definition cfnorm phi := cfdot phi phi.
 
 Coercion seq_of_cfun phi := [:: phi].
 
@@ -395,7 +395,8 @@ Arguments cfun_indicator {gT} B%g.
 Arguments cfAut {gT B%g} u phi%CF.
 Arguments cfReal {gT B%g} phi%CF.
 Arguments cfdot {gT B%g} phi%CF psi%CF.
-Arguments cfdotr_head {gT B%g} k psi%CF phi%CF.
+Arguments cfdotr {gT B%g} psi%CF phi%CF /.
+Arguments cfnorm {gT B%g} phi%CF /.
 
 Notation "''CF' ( G )" := (classfun G) : type_scope.
 Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
@@ -414,8 +415,6 @@ Notation "''[' u , v ]_ G":=  (@cfdot _ G u v) (only parsing) : ring_scope.
 Notation "''[' u , v ]" := (cfdot u v) : ring_scope.
 Notation "''[' u ]_ G" := '[u, u]_G (only parsing) : ring_scope.
 Notation "''[' u ]" := '[u, u] : ring_scope.
-Notation cfdotr := (cfdotr_head tt).
-Notation cfnorm := (cfnorm_head tt).
 
 Section Predicates.
 
