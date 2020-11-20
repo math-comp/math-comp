@@ -882,7 +882,7 @@ Arguments sort_map {T T' f leT}.
 Section SortSeq_in.
 
 Variables (T : Type) (P : {pred T}) (leT : rel T).
-Notation le_sT := (relpre (val : sig P -> _) leT).
+Let le_sT := relpre (val : sig P -> _) leT.
 
 Hypothesis leT_total : {in P &, total leT}.
 Let le_sT_total : total le_sT := in2_sig leT_total.
@@ -1138,7 +1138,7 @@ Variables (T : Type) (P : {pred T}) (leT : rel T).
 Hypothesis leT_total : {in P &, total leT}.
 Hypothesis leT_tr : {in P & &, transitive leT}.
 
-Notation le_sT := (relpre (val : sig P -> _) leT).
+Let le_sT := relpre (val : sig P -> _) leT.
 Let le_sT_total : total le_sT := in2_sig leT_total.
 Let le_sT_tr : transitive le_sT := in3_sig leT_tr.
 
