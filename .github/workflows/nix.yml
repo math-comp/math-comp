@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        coq: [ "8.11", "8.10", "8.9" ]
+        coq: [ "8.11", "8.10", "8.12" ]
     steps:
       - name: Get branch shortname
         run: echo "##[set-output name=name;]$(echo ${GITHUB_REF#refs/heads/})"
@@ -19,8 +19,8 @@ jobs:
       - name: Get owner lowercase name
         run: echo "##[set-output name=name;]$(echo $GITHUB_REPOSITORY | cut -d/ -f1 | tr '[:upper:]' '[:lower:]')"
         id: owner-lowercase
-      - uses: cachix/install-nix-action@v8
-      - uses: cachix/cachix-action@v6
+      - uses: cachix/install-nix-action@v12
+      - uses: cachix/cachix-action@v8
         if: steps.owner.outputs.name == 'math-comp' || steps.owner.outputs.name == 'CohenCyril'
         with:
           # Name of a cachix cache to push and pull/substitute
