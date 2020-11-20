@@ -1650,7 +1650,7 @@ Lemma diagmx_ind (P : forall m n, 'M_(m, n) -> Type) :
   forall m n A, is_diag_mx A -> P m n A.
 Proof.
 move=> P0l P0r PS m n A Adiag; have Atrig := is_diag_mx_is_trig Adiag.
-elim/trigmx_ind: Atrig Adiag => // {m n} m n r c {A}A _ PA.
+elim/trigmx_ind: Atrig Adiag => // {}m {}n r c {}A _ PA.
 rewrite is_diag_block_mx => // /and4P[_ /eqP-> _ Adiag].
 exact: PS (PA _).
 Qed.
@@ -1660,7 +1660,7 @@ Lemma diagsqmx_ind (P : forall n, 'M[V]_n -> Type) :
   (forall n x c A, is_diag_mx A -> P n A -> P (1 + n)%N (block_mx x 0 c A)) ->
   forall n A, is_diag_mx A -> P n A.
 Proof.
-move=> P0 PS n A; elim/sqmx_ind: A => {n} [|n x r c] A PA.
+move=> P0 PS n A; elim/sqmx_ind: A => [|{}n x r c] A PA.
   by rewrite thinmx0; apply: P0.
 rewrite is_diag_block_mx => // /and4P[/eqP-> /eqP-> _ Adiag].
 exact: PS (PA _).

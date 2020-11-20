@@ -1101,7 +1101,7 @@ Lemma free_span X v (sumX := fun k => \sum_(x <- X) k x *: x) :
 Proof.
 rewrite -{2}[X]in_tupleE => freeX /coord_span def_v.
 pose k x := oapp (fun i => coord (in_tuple X) i v) 0 (insub (index x X)).
-exists k => [|k1 {def_v}def_v _ /(nthP 0)[i ltiX <-]].
+exists k => [|k1 {}def_v _ /(nthP 0)[i ltiX <-]].
   rewrite /sumX (big_nth 0) big_mkord def_v; apply: eq_bigr => i _.
   by rewrite /k index_uniq ?free_uniq // valK.
 rewrite /k /= index_uniq ?free_uniq // insubT //= def_v.
@@ -1627,7 +1627,7 @@ Proof. by apply: (iffP subvP) => cUf x /cUf/fixedSpaceP. Qed.
 Lemma fixedSpace_limg f U : (U <= fixedSpace f -> f @: U = U)%VS.
 Proof.
 move/fixedSpacesP=> cUf; apply/vspaceP=> x.
-by apply/memv_imgP/idP=> [[{x} x Ux ->] | Ux]; last exists x; rewrite ?cUf.
+by apply/memv_imgP/idP=> [[{}x Ux ->] | Ux]; last exists x; rewrite ?cUf.
 Qed.
 
 Lemma fixedSpace_id : fixedSpace \1 = {:vT}%VS.
@@ -1862,7 +1862,7 @@ Lemma sumv_pi_uniq_sum v :
   \sum_(i <- r0 | P i) sumv_pi_for defV i v = v.
 Proof.
 rewrite /sumv_pi_for defV -!(big_filter r0 P).
-elim: (filter P r0) v => [|i r IHr] v /= => [_ | /andP[r'i /IHr{IHr}IHr]].
+elim: (filter P r0) v => [|i r IHr] v /= => [_ | /andP[r'i /IHr{}IHr]].
   by rewrite !big_nil memv0 => /eqP.
 rewrite !big_cons eqxx => /addv_pi1_pi2; congr (_ + _ = v).
 rewrite -[_ v]IHr ?memv_pi2 //; apply: eq_big_seq => j /=.

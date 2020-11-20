@@ -148,7 +148,7 @@ have sylP: p.-Sylow(G) P.
   by rewrite p'natE // -indexgI -oSiN // /dvdn oS1.
 have eqS Q: maxp G Q = p.-Sylow(G) Q.
   apply/idP/idP=> [S_Q|]; last exact: Hall_max.
-  have{S_Q} S_Q: Q \in S by rewrite inE.
+  have{} S_Q: Q \in S by rewrite inE.
   rewrite pHallE -(card_Hall sylP); case: (S_pG Q) => // -> _ /=.
   by case: (atransP2 trS S_P S_Q) => x _ ->; rewrite cardJg.
 have ->: 'Syl_p(G) = S by apply/setP=> Q; rewrite 2!inE.
@@ -568,7 +568,7 @@ Theorem Baer_Suzuki x G :
   x \in 'O_p(G).
 Proof.
 have [n] := ubnP #|G|; elim: n G x => // n IHn G x /ltnSE-leGn Gx pE.
-set E := x ^: G; have{pE} pE: {in E &, forall x1 x2, p.-group <<[set x1; x2]>>}.
+set E := x ^: G; have{} pE: {in E &, forall x1 x2, p.-group <<[set x1; x2]>>}.
   move=> _ _ /imsetP[y1 Gy1 ->] /imsetP[y2 Gy2 ->].
   rewrite -(mulgKV y1 y2) conjgM -2!conjg_set1 -conjUg genJ pgroupJ.
   by rewrite pE // groupMl ?groupV.

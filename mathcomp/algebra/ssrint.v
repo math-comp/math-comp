@@ -410,7 +410,7 @@ Proof. by case: m; first case. Qed.
 
 Lemma subz_ge0 m n : lez 0 (n - m) = lez m n.
 Proof.
-case: (intP m); case: (intP n)=> // {m n} m n /=;
+case: (intP m); case: (intP n)=> // {}m {}n /=;
 rewrite ?ltnS -?opprD ?opprB ?subzSS; case: leqP=> // hmn;
 by [ rewrite subzn //
    | rewrite -opprB subzn ?(ltnW hmn) //;

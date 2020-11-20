@@ -680,7 +680,7 @@ rewrite rootM => pqx0 szpq.
 have [nzq nzp]: q != 0 /\ p != 0.
   by apply/norP; rewrite -mulf_eq0 -size_poly_eq0 szpq.
 without loss{pqx0} qx0: q p Kp Kq nzp nzq szpq / root q x.
-  move=> IH; case/orP: pqx0 => /IH{IH}IH; first exact: IH.
+  move=> IH; case/orP: pqx0 => /IH{}IH; first exact: IH.
   have{IH} /orP[]: (q %= p * q) || (q %= 1) by apply: IH => //; rewrite mulrC.
     by rewrite orbC -{1}[q]mul1r eqp_mul2r // eqp_sym => ->.
   by rewrite -{1}[p]mul1r eqp_sym eqp_mul2r // => ->.
@@ -875,7 +875,7 @@ Implicit Types (V : {vspace L}) (E : {subfield L}).
 
 Lemma trivial_fieldOver : (1%VS : {vspace L_F}) =i F.
 Proof.
-move=> x; apply/vlineP/idP=> [[{x}x ->] | Fx].
+move=> x; apply/vlineP/idP=> [[{}x ->] | Fx].
   by rewrite fieldOver_scaleE mulr1 (valP x).
 by exists (vsproj F x); rewrite fieldOver_scaleE mulr1 vsprojK.
 Qed.
@@ -912,7 +912,7 @@ suff: basis_of (vspaceOver M) b by apply: size_basis.
 apply/andP; split.
   rewrite eqEsubv; apply/andP; split; apply/span_subvP=> u.
     by rewrite mem_vspaceOver field_module_eq // => /Mb.
-  move/(@vbasis_mem _ _ _ M); rewrite -defM => /memv_sumP[{u}u Fu ->].
+  move/(@vbasis_mem _ _ _ M); rewrite -defM => /memv_sumP[{}u Fu ->].
   apply: memv_suml => i _; have /memv_cosetP[a Fa ->] := Fu i isT.
   by apply: (memvZ (Subvs Fa)); rewrite memv_span ?memt_nth.
 apply/freeP=> a /(directv_sum_independent dx_b) a_0 i.
@@ -1109,7 +1109,7 @@ move=> v; rewrite -{1}(field_module_eq modM0) -(mem_vspaceOver M0) {}/V.
 move: (vspaceOver F1 M0) => M.
 apply/idP/idP=> [/coord_vbasis|/coord_span]->; apply/memv_suml=> i _.
   rewrite /(_ *: _) /= /fieldOver_scale; case: (coord _ i _) => /= x.
-  rewrite {1}[F1]unlock mem_baseVspace => /vlineP[{x}x ->].
+  rewrite {1}[F1]unlock mem_baseVspace => /vlineP[{}x ->].
   by rewrite -(@scalerAl F L) mul1r memvZ ?memv_span ?memt_nth.
 move: (coord _ i _) => x; rewrite -[_`_i]mul1r scalerAl -tnth_nth.
 have F1x: x%:A \in F1.

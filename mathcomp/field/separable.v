@@ -414,7 +414,7 @@ exists p => //; exists (\poly_(i < r.+1) f`_(i * p)).
 rewrite comp_polyE size_poly_eq -?Dn ?fn1 ?oner_eq0 //.
 have pr_p := charf_prime charLp; have p_gt0 := prime_gt0 pr_p.
 apply/polyP=> i; rewrite coef_sum.
-have [[{i} i ->] | p'i] := altP (@dvdnP p i); last first.
+have [[{}i ->] | p'i] := altP (@dvdnP p i); last first.
   rewrite big1 => [|j _]; last first.
     rewrite coefZ -exprM coefXn [_ == _](contraNF _ p'i) ?mulr0 // => /eqP->.
     by rewrite dvdn_mulr.
@@ -512,7 +512,7 @@ Lemma Derivation_separableP :
     (separable_element K x).
 Proof.
 apply: (iffP idP) => [sepKx D derD /subvP DK_0 | derKx_0].
-  have{DK_0} DK_0 q: q \is a polyOver K -> map_poly D q = 0.
+  have{} DK_0 q: q \is a polyOver K -> map_poly D q = 0.
     move=> /polyOverP Kq; apply/polyP=> i; apply/eqP.
     by rewrite coef0 coef_map -memv_ker DK_0.
   apply/subvP=> _ /Fadjoin_polyP[p Kp ->]; rewrite memv_ker.
@@ -771,7 +771,7 @@ have sep_pKy: separable_poly (minPoly K y).
 have{sep_pKy} sep_q: separable_poly q by rewrite Dq separable_map in sep_pKy.
 have [r nz_r PETr] := large_field_PET nz_p px0 qy0 sep_q.
 have [[s [Us Ks /ltnW leNs]] | //] := finite_PET (size r).
-have{s Us leNs} /allPn[t {Ks}/Ks Kt nz_rt]: ~~ all (root r) s.
+have{s Us leNs} /allPn[t {}/Ks Kt nz_rt]: ~~ all (root r) s.
   by apply: contraTN leNs; rewrite -ltnNge => /max_poly_roots->.
 have{PETr} [/= [p1 Dx] [q1 Dy]] := PETr (Subvs Kt) nz_rt.
 set z := t * y - x in Dx Dy; exists z; apply/eqP.

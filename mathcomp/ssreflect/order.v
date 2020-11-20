@@ -6965,7 +6965,7 @@ Lemma leEtprod n T (t1 t2 : n.-tuple T) :
 Proof.
 elim: n => [|n IHn] in t1 t2 *.
   by rewrite tuple0 [t2]tuple0/= lexx; symmetry; apply/forallP => [].
-case: (tupleP t1) (tupleP t2) => [x1 {t1}t1] [x2 {t2}t2].
+case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
 rewrite [_ <= _]le_cons [t1 <= t2 :> seq _]IHn.
 apply/idP/forallP => [/andP[lex12 /forallP/= let12 i]|lext12].
   by case: (unliftP ord0 i) => [j ->|->]//; rewrite !tnthS.
@@ -7275,7 +7275,7 @@ Lemma lexi_tupleP n T (t1 t2 : n.-tuple T) :
 Proof.
 elim: n => [|n IHn] in t1 t2 *.
   by rewrite tuple0 [t2]tuple0/= lexx; constructor; exists ord0 => -[].
-case: (tupleP t1) (tupleP t2) => [x1 {t1}t1] [x2 {t2}t2].
+case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
 rewrite [_ <= _]lexi_cons; apply: (iffP idP) => [|[k leif_xt12]].
   case: comparableP => //= [ltx12 _|-> /IHn[k kP]].
     exists ord0 => i; rewrite leqn0 => /eqP/(@ord_inj n.+1 i ord0)->.
@@ -7296,7 +7296,7 @@ Lemma ltxi_tupleP n T (t1 t2 : n.-tuple T) :
 Proof.
 elim: n => [|n IHn] in t1 t2 *.
   by rewrite tuple0 [t2]tuple0/= ltxx; constructor => - [] [].
-case: (tupleP t1) (tupleP t2) => [x1 {t1}t1] [x2 {t2}t2].
+case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
 rewrite [_ < _]ltxi_cons; apply: (iffP idP) => [|[k leif_xt12]].
   case: (comparableP x1 x2) => //= [ltx12 _|-> /IHn[k kP]].
     exists ord0 => i; rewrite leqn0 => /eqP/(@ord_inj n.+1 i ord0)->.

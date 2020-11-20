@@ -175,13 +175,13 @@ have{Ss u} ->: Ss = Ss_ dS.
   apply/matrixP=> i j; rewrite mxE [in X in _ = X]mxE; case: (j == j0) => {j}//.
   apply/polyP=> k; rewrite coef_poly Sylvester_mxE mxE.
   have [k_ge_dS | k_lt_dS] := leqP dS k.
-    case: (split i) => {i}i; rewrite !mxE coefMXn;
+    case: (split i) => {}i; rewrite !mxE coefMXn;
     case: ifP => // /negbT; rewrite -ltnNge ltnS => hi.
       apply: (leq_sizeP _ _ (leqnn (size p))); rewrite -(ltn_predK p_nc).
       by rewrite ltn_subRL (leq_trans _ k_ge_dS) // ltn_add2r.
     - apply: (leq_sizeP _ _ (leqnn (size q))); rewrite -(ltn_predK q_nc).
       by rewrite ltn_subRL (leq_trans _ k_ge_dS) // addnC ltn_add2l.
-  by rewrite insubdK //; case: (split i) => {i}i;
+  by rewrite insubdK //; case: (split i) => {}i;
      rewrite !mxE coefMXn; case: leqP.
 case: (ubnPgeq dS) (dS_gt0); elim=> // dj IHj ltjS _; pose j1 := Ordinal ltjS.
 pose rj0T (A : 'M[{poly R}]_dS) := row j0 A^T.
@@ -253,7 +253,7 @@ have le_q'_dq: size q' <= dq.
   by rewrite /dq -(size_scale q nz_k) q'r size_mul // addnC -def_r leq_addl.
 exists (row_mx (- c *: poly_rV q') (k *: poly_rV p')).
   apply: contraNneq r_nz; rewrite -row_mx0; case/eq_row_mx=> q0 p0.
-  have{p0} p0: p = 0.
+  have{} p0: p = 0.
     apply/eqP; rewrite -size_poly_eq0 -(size_scale p nz_c) p'r.
     rewrite -(size_scale _ nz_k) scalerAl -(poly_rV_K le_p'_dp) -linearZ p0.
     by rewrite linear0 mul0r size_poly0.

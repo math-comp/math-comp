@@ -120,7 +120,7 @@ have [trG _] := andP primG; have [x Sx defS] := imsetP trG.
 move: primG; rewrite (trans_prim_astab Sx) // => /maximal_eqP[_].
 case/(_ ('C_G[x | to] <*> H)%G) => /= [||cxH|]; first exact: joing_subl.
 - by rewrite join_subG subsetIl.
-- have{cxH} cxH: H \subset 'C_G[x | to] by rewrite -cxH joing_subr.
+- have{} cxH: H \subset 'C_G[x | to] by rewrite -cxH joing_subr.
   rewrite subsetI sHG /= in cxH; left; apply/subsetP=> a Ha.
   apply/astabP=> y Sy; have [b Gb ->] := atransP2 trG Sx Sy.
   rewrite actCJV [to x (a ^ _)](astab1P _) ?(subsetP cxH) //.

@@ -424,7 +424,7 @@ have <-: 'Z(H / Z) * 'Z(K / Z) = 'Z(G / Z).
   by rewrite -mulHK quotientMl // center_prod ?quotient_cents.
 have ZquoZ (B A : {group gT}):
   B \subset 'C(A) -> 'Z_n(A) * 'Z_n(B) = Z -> 'Z(A / Z) = 'Z_n.+1(A) / Z.
-- move=> cAB {defZ}defZ; have cAZnB: 'Z_n(B) \subset 'C(A) := gFsub_trans _ cAB.
+- move=> cAB {}defZ; have cAZnB: 'Z_n(B) \subset 'C(A) := gFsub_trans _ cAB.
   have /second_isom[/=]: A \subset 'N(Z).
     by rewrite -defZ normsM ?gFnorm ?cents_norm // centsC.
   suffices ->: Z :&: A = 'Z_n(A).

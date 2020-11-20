@@ -934,7 +934,7 @@ wlog [j a'Mij]: m n M i Da le_mn / {j | ~~ (a %| M i j)%Z}; last first.
     do 2!rewrite /cofactor [row' _ _]mx11_scalar !mxE det_scalar1 /=.
     rewrite mulr1 mul1r mulN1r opprK -[_ + _](mulzK _ nz_b) mulrDl.
     by rewrite -!mulrA !divzK ?dvdz_gcdl ?dvdz_gcdr // Db divzz nz_b unitr1.
-  have{Db} Db: M1 i 0 = b.
+  have{} Db: M1 i 0 = b.
     rewrite /M1 -(lshift0 n 1) [U]block_mxEh mul_mx_row row_mxEl.
     rewrite -[M](@hsubmxK _ _ 2) (@mul_row_col _ _ 2) mulmx0 addr0 !mxE /=.
     rewrite big_ord_recl big_ord1 !mxE /= [lshift _ _]((_ =P 0) _) // Da.
@@ -943,7 +943,7 @@ wlog [j a'Mij]: m n M i Da le_mn / {j | ~~ (a %| M i j)%Z}; last first.
   exists L => //; exists (R *m invmx U); last exists d => //.
     by rewrite unitmx_mul uR unitmx_inv.
   by rewrite mulmxA -dM1 mulmxK.
-move=> {A leA IHa} IHa; wlog Di: i M Da / i = 0; last rewrite {i}Di in Da.
+move=> {A leA}IHa; wlog Di: i M Da / i = 0; last rewrite {i}Di in Da.
   case/(_ 0 (xrow i 0 M)); rewrite ?mxE ?tpermR // => L uL [R uR [d dvD dM]].
   exists (xrow i 0 L); first by rewrite xrowE unitmx_mul unitmx_perm.
   exists R => //; exists d; rewrite //= xrowE -!mulmxA (mulmxA L) -dM xrowE.
@@ -982,7 +982,7 @@ without loss{nz_a a_dvM} a1: M a Da / a = 1.
   by rewrite !nth_default ?size_map ?mulr0.
 rewrite {a}a1 -[m.+1]/(1 + m)%N -[n.+1]/(1 + n)%N in M Da *.
 pose Mu := ursubmx M; pose Ml := dlsubmx M.
-have{Da} Da: ulsubmx M = 1 by rewrite [_ M]mx11_scalar !mxE !lshift0 Da.
+have{} Da: ulsubmx M = 1 by rewrite [_ M]mx11_scalar !mxE !lshift0 Da.
 pose M1 := - (Ml *m Mu) + drsubmx M.
 have [|L uL [R uR [d dvD dM1]]] := IHmn m n M1; first by rewrite -addnS ltnW.
 exists (block_mx 1 0 Ml L).
@@ -1023,7 +1023,7 @@ have [L _ [G uG [D _ defK]]] := int_Smith_normal_form K.
 pose Gud := castmx (Dm, Em) G; pose G'lr := castmx (Em, Dm) (invmx G).
 have{K L D defK kerK} kerGu: map_mx intr (usubmx Gud) *m S = 0.
   pose Kl : 'M[rat]_k:= map_mx intr (lsubmx (castmx (Ek, Dm) (K *m invmx G))).
-  have{defK} defK: map_mx intr K = row_mx Kl 0 *m map_mx intr Gud.
+  have{} defK: map_mx intr K = row_mx Kl 0 *m map_mx intr Gud.
     rewrite -[K](mulmxKV uG) -{2}[G](castmxK Dm Em) -/Gud.
     rewrite -[K *m _](castmxK Ek Dm) map_mxM map_castmx.
     rewrite -(hsubmxK (castmx _ _)) map_row_mx -/Kl map_castmx /Em.

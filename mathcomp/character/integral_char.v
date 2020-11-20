@@ -376,7 +376,7 @@ rewrite ltnS => leGn piGle2; have [simpleG | ] := boolP (simple G); last first.
     rewrite groupP /= genGid normG andbT eqb_id negbK => /eqP->.
     exact: solvable1.
   rewrite [N == G]eqEproper sNG eqbF_neg !negbK => ltNG /and3P[grN].
-  case/isgroupP: grN => {N}N -> in sNG ltNG *; rewrite /= genGid => ntN nNG.
+  case/isgroupP: grN => {}N -> in sNG ltNG *; rewrite /= genGid => ntN nNG.
   have nsNG: N <| G by apply/andP.
   have dv_le_pi m: (m %| #|G| -> size (primes m) <= 2)%N.
     move=> m_dv_G; apply: leq_trans piGle2.

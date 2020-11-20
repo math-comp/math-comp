@@ -239,7 +239,7 @@ without loss{nCq} qx0: q mon_q q_dv_p / root (q ^ FtoL) x.
   rewrite -(subnn (size q1)) {1}IHq1 ?Dp ?dvdp_mulr // polySpred ?monic_neq0 //.
   by rewrite eqSS size_monicM ?monic_neq0 // -!subn1 subnAC addKn.
 have /dvdp_prod_XsubC[m Dq]: q ^ FtoL %| p_ I by rewrite DpI dvdp_map.
-pose B := [set j in mask m (enum I)]; have{Dq} Dq: q ^ FtoL = p_ B.
+pose B := [set j in mask m (enum I)]; have{} Dq: q ^ FtoL = p_ B.
   apply/eqP; rewrite -eqp_monic ?monic_map ?monic_prod_XsubC //.
   congr (_ %= _): Dq; apply: perm_big => //.
   by rewrite uniq_perm ?mask_uniq ?enum_uniq // => j; rewrite mem_enum inE.
@@ -372,7 +372,7 @@ pose root_in (xR : realC) p := exists2 w, w \in sQ (tag xR) & root p w.
 pose extendsR (xR yR : realC) := tag xR \in sQ (tag yR).
 have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   rewrite {}/extendsR; case: (has_Rroot xR p c) / and4P; last by exists xR.
-  case: xR => x [R QxR] /= [/inQpK <-]; move: (p ^ _) => {p}p mon_p /inQ_K<- Dc.
+  case: xR => x [R QxR] /= [/inQpK <-]; move: (p ^ _) => {}p mon_p /inQ_K<- Dc.
   have{c Dc} p0_le0: (p ^ QxR).[0] <= 0.
     rewrite horner_coef0 coef_map -[p`_0]ofQ_K -coef_map -horner_coef0 (eqP Dc).
     by rewrite -rmorphX -rmorphN ofQ_K /= rmorphN rmorphX oppr_le0 sqr_ge0.
@@ -417,7 +417,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   exists u => {s s_y}//; set y := ofQ z (t_ u); set p1 := minPoly Qx u in Dp.
   have /QtoQ[Qyz QyzE]: y \in sQ z := sQof z (t_ u).
   pose q1_ v := Fadjoin_poly Qx u (Qyz v).
-  have{QyzE} QyzE v: Qyz v = (q1_ v).[u].
+  have{} QyzE v: Qyz v = (q1_ v).[u].
     by rewrite Fadjoin_poly_eq // -Dt -sQof2 QyzE sQof.
   have /all_sig2[q_ coqp Dq] v: {q | v != 0 -> coprimep p q & q ^ Qxz = q1_ v}.
     have /pQwx[q Dq]: q1_ v \is a polyOver Qx by apply: Fadjoin_polyOver.
@@ -572,7 +572,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have /(find_root ((d * e)^-1 *: r ^ QxR))[N ub_rp] := xab0.
     pose f := d * e * h2; apply/posP; exists (maxn N (maxn m n)), f => [|k].
       by rewrite !mulr_gt0 ?invr_gt0 ?ltr0n.
-    rewrite !geq_max => /and3P[/ab_le/ub_rp{ub_rp}ub_rp le_mk le_nk].
+   rewrite !geq_max => /and3P[/ab_le/ub_rp{}ub_rp le_mk le_nk].
     rewrite -(ltr_add2r f) -mulr2n -mulr_natr divfK // /nlim /lim Dqvw.
     rewrite rmorphD hornerD /= -addrA -ltr_subl_addl ler_lt_add //.
       by rewrite rmorphM hornerM ler_pmul ?ltW ?v_gtd ?w_gte.
