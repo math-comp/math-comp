@@ -2429,8 +2429,8 @@ Variables m n p : nat.
 Implicit Type A : 'M[R]_(m, n).
 Implicit Type B : 'M[R]_(n, p).
 
-Definition mulmxr_head t B A := let: tt := t in A *m B.
-Local Notation mulmxr := (mulmxr_head tt).
+Definition mulmxr B A := mulmx A B.
+Arguments mulmxr B A /.
 
 Definition lin_mulmxr B := lin_mx (mulmxr B).
 
@@ -2451,6 +2451,7 @@ Canonical lin_mulmxr_additive := Additive lin_mulmxr_is_linear.
 Canonical lin_mulmxr_linear := Linear lin_mulmxr_is_linear.
 
 End Mulmxr.
+Arguments mulmxr {_ _ _} B A /.
 
 (* The trace. *)
 Section Trace.
@@ -2608,7 +2609,7 @@ Hint Extern 0 (is_true (is_trig_mx (diag_mx _))) =>
 
 Notation "a %:M" := (scalar_mx a) : ring_scope.
 Notation "A *m B" := (mulmx A B) : ring_scope.
-Notation mulmxr := (mulmxr_head tt).
+Arguments mulmxr {_ _ _ _} B A /.
 Notation "\tr A" := (mxtrace A) : ring_scope.
 Notation "'\det' A" := (determinant A) : ring_scope.
 Notation "'\adj' A" := (adjugate A) : ring_scope.

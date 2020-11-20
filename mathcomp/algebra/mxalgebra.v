@@ -707,7 +707,7 @@ Qed.
 
 (* A variant of row_free_inj that exposes mulmxr, an alias for mulmx^~ *)
 (* but which is canonically additive *)
-Definition row_free_injr m n p A : row_free A -> injective (@mulmxr A) :=
+Definition row_free_injr m n p A : row_free A -> injective (mulmxr A) :=
   @row_free_inj m n p A.
 
 Lemma row_free_unit n (A : 'M_n) : row_free A = (A \in unitmx).
