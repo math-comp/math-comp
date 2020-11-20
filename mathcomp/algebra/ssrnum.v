@@ -383,10 +383,10 @@ Notation comparabler := (@Order.comparable ring_display _) (only parsing).
 Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
 Notation maxr := (@Order.max ring_display _).
-Notation "@ 'maxr' R" := (@Order.join ring_display R)
+Notation "@ 'maxr' R" := (@Order.max ring_display R)
     (at level 10, R at level 8, only parsing) : fun_scope.
 Notation minr := (@Order.min ring_display _).
-Notation "@ 'minr' R" := (@Order.meet ring_display R)
+Notation "@ 'minr' R" := (@Order.min ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
 
 Section Def.
