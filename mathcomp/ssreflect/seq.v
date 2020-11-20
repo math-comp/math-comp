@@ -909,6 +909,10 @@ Arguments seqn {T} n.
 Prenex Implicits cat take drop rot rotr catrev.
 Prenex Implicits find count nth all has filter.
 Arguments rev {T} s : simpl never.
+Arguments nth : simpl nomatch.
+Arguments set_nth : simpl nomatch.
+Arguments take : simpl nomatch.
+Arguments drop : simpl nomatch.
 
 Arguments nilP {T s}.
 Arguments all_filterP {T a s}.
@@ -1463,6 +1467,7 @@ Lemma uniq_eqseq_pivotr x s1 s2 s3 s4 : uniq (s3 ++ x :: s4) ->
 Proof. by move=> ?; rewrite eq_sym uniq_eqseq_pivotl//; case: eqVneq => /=. Qed.
 
 End EqSeq.
+Arguments eqseq : simpl nomatch.
 
 Section RotIndex.
 Variables (T : eqType).
@@ -1581,6 +1586,7 @@ End FindNth.
 Fixpoint incr_nth v i {struct i} :=
   if v is n :: v' then if i is i'.+1 then n :: incr_nth v' i' else n.+1 :: v'
   else ncons i 0 [:: 1].
+Arguments incr_nth : simpl nomatch.
 
 Lemma nth_incr_nth v i j : nth 0 (incr_nth v i) j = (i == j) + nth 0 v j.
 Proof.
@@ -1978,6 +1984,8 @@ Proof. by elim: s n => [|x s IHs] [|n] //= Hn; congr (_ :: _); apply: IHs. Qed.
 Lemma mask0 m : mask m [::] = [::].
 Proof. by case: m. Qed.
 
+Lemma mask0s s : mask [::] s = [::]. Proof. by []. Qed.
+
 Lemma mask1 b x : mask [:: b] [:: x] = nseq b x.
 Proof. by case: b. Qed.
 
@@ -2026,6 +2034,7 @@ by elim: s m => [|x s IHs] [|b m] //=; rewrite (mask_false, IHs).
 Qed.
 
 End Mask.
+Arguments mask _ !_ !_.
 
 Section EqMask.
 

@@ -260,6 +260,7 @@ Lemma add4n m : 4 + m = m.+4. Proof. by []. Qed.
 (* Further properties depend on ordering conditions.                  *)
 
 Definition subn_rec := minus.
+Arguments subn_rec : simpl nomatch.
 Notation "m - n" := (subn_rec m n) : nat_rec_scope.
 
 Definition subn := nosimpl subn_rec.

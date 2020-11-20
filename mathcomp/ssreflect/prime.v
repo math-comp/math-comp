@@ -76,6 +76,7 @@ Fixpoint elogn2 e q r {struct q} :=
   | q'.+1, 1 => elogn2 e.+1 q' q'
   | q'.+1, r'.+2 => elogn2 e q' r'
   end.
+Arguments elogn2 : simpl nomatch.
 
 Variant elogn2_spec n : nat * nat -> Type :=
   Elogn2Spec e m of n = 2 ^ e * m.*2.+1 : elogn2_spec n (e, m).

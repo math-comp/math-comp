@@ -294,6 +294,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, added `size_merge_sort_push`, which documents an
   invariant of `merge_sort_push`.
 
+- in `seq.v ` added lemma `mask0s`.
+
 ### Changed
 
 - in `ssrbool.v`, use `Reserved Notation` for `[rel _ _ : _ | _]` to avoid warnings with coq-8.12
@@ -373,6 +375,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   non-`eqType`s.
 
 - in `order.v`, generalized `sort_le_id` for any `porderType`.
+
+- the following constants have been tuned to only reduce when they do
+  not expose a match: `subn_rec`, `decode_rec`, `nth` (thus avoiding a
+  notorious problem of ``p`_0`` expanding too eagerly), `set_nth`,
+  `take`, `drop`, `eqseq`, `incr_nth`, `elogn2`, `binomial_rec`,
+  `sumpT`.
+
+- in `seq.v`, `mask` will only expand if both arguments are
+  constructors, the case `mask [::] s` can be dealt with using
+  `mask0s` or explicit conversion.
 
 ### Renamed
 
