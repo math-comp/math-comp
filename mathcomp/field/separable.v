@@ -288,8 +288,8 @@ Variables (K : {vspace L}) (D : 'End(L)).
 (* A deriviation only needs to be additive and satify Lebniz's law, but all   *)
 (* the deriviations used here are going to be linear, so we only define       *)
 (* the Derivation predicate for linear endomorphisms.                         *)
-Definition Derivation (s := vbasis K) : bool :=
-  all (fun u => all (fun v => D (u * v) == D u * v + u * D v) s) s.
+Definition Derivation : bool :=
+  all1rel (fun u v => D (u * v) == D u * v + u * D v) (vbasis K).
 
 Hypothesis derD : Derivation.
 
@@ -299,7 +299,7 @@ move=> u v /coord_vbasis-> /coord_vbasis->.
 rewrite !(mulr_sumr, linear_sum) -big_split; apply: eq_bigr => /= j _.
 rewrite !mulr_suml linear_sum -big_split; apply: eq_bigr => /= i _.
 rewrite !(=^~ scalerAl, linearZZ) -!scalerAr linearZZ -!scalerDr !scalerA /=.
-by congr (_ *: _); apply/eqP; rewrite (allP (allP derD _ _)) ?memt_nth.
+by congr (_ *: _); apply/eqP/(allrelP derD); exact: memt_nth.
 Qed.
 
 Lemma Derivation_mul_poly (Dp := map_poly D) :
@@ -314,7 +314,7 @@ End Derivation.
 
 Lemma DerivationS E K D : (K <= E)%VS -> Derivation E D -> Derivation K D.
 Proof.
-move/subvP=> sKE derD; apply/allP=> x Kx; apply/allP=> y Ky; apply/eqP.
+move/subvP=> sKE derD; apply/allrelP=> x y Kx Ky; apply/eqP.
 by rewrite (Derivation_mul derD) ?sKE // vbasis_mem.
 Qed.
 
@@ -492,8 +492,7 @@ Qed.
 Lemma extendDerivationP :
   separable_element K x -> Derivation <<K; x>> (extendDerivation K).
 Proof.
-move=> sep; apply/allP=> u /vbasis_mem Hu; apply/allP=> v /vbasis_mem Hv.
-apply/eqP.
+move=> sep; apply/allrelP=> u v /vbasis_mem Hu /vbasis_mem Hv; apply/eqP.
 rewrite -(Fadjoin_poly_eq Hu) -(Fadjoin_poly_eq Hv) -hornerM.
 rewrite !{1}extendDerivation_horner ?{1}rpredM ?Fadjoin_polyOver //.
 rewrite (Derivation_mul_poly derD) ?Fadjoin_polyOver //.
@@ -528,7 +527,7 @@ have DK_0: (K <= lker D)%VS.
   apply/subvP=> v Kv; rewrite memv_ker lfunE /= Fadjoin_polyC //.
   by rewrite derivC horner0.
 have Dder: Derivation <<K; x>> D.
-  apply/allP=> u /vbasis_mem Kx_u; apply/allP=> v /vbasis_mem Kx_v; apply/eqP.
+  apply/allrelP=> u v /vbasis_mem Kx_u /vbasis_mem Kx_v; apply/eqP.
   rewrite !lfunE /=; set Px := Fadjoin_poly K x.
   set Px_u := Px u; rewrite -(Fadjoin_poly_eq Kx_u) -/Px -/Px_u.
   set Px_v := Px v; rewrite -(Fadjoin_poly_eq Kx_v) -/Px -/Px_v.
