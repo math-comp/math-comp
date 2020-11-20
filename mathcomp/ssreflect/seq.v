@@ -126,7 +126,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*                   s and t, respectively, in row-major order,               *)
 (*                   and where t is possibly dependent in elements of s       *)
 (* allpairs_dep f s t := self expanding definition for                        *)
-(*                       [seq f x y | x <- s, y <- t i]                       *)
+(*                       [seq f x y | x <- s, y <- t y]                       *)
 (*  ** Iterators: for s == [:: x_1, ..., x_n], t == [:: y_1, ..., y_m],       *)
 (* allpairs f s t := same as allpairs_dep but where t is non dependent,       *)
 (*                    i.e. self expanding definition for                      *)
