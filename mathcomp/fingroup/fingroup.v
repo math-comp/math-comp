@@ -360,7 +360,8 @@ Definition expgn_rec (x : T) n : rT := iterop n mulg x oneg.
 
 End ElementOps.
 
-Definition expgn := nosimpl expgn_rec.
+Definition expgn := expgn_rec.
+Arguments expgn : simpl never.
 
 Notation "1" := (oneg _) : group_scope.
 Notation "x1 * x2" := (mulg x1 x2) : group_scope.

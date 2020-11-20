@@ -578,7 +578,8 @@ Fixpoint gcdn_rec m n :=
   let n' := n %% m in if n' is 0 then m else
   if m - n'.-1 is m'.+1 then gcdn_rec (m' %% n') n' else n'.
 
-Definition gcdn := nosimpl gcdn_rec.
+Definition gcdn := gcdn_rec.
+Arguments gcdn : simpl never.
 
 Lemma gcdnE m n : gcdn m n = if m == 0 then n else gcdn (n %% m) m.
 Proof.

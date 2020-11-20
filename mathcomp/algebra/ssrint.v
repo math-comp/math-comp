@@ -101,11 +101,12 @@ Definition addz (m n : int) :=
     | Negz n', Posz m' => if n' < m' then Posz (m' - n'.+1) else Negz (n' - m')
   end.
 
-Definition oppz m := nosimpl
+Definition oppz m :=
   match m with
     | Posz n => if n is (n'.+1)%N then Negz n' else Posz 0
     | Negz n => Posz (n.+1)%N
   end.
+Arguments oppz : simpl never.
 
 Local Notation "0" := (Posz 0) : int_scope.
 Local Notation "-%Z" := (@oppz) : int_scope.
@@ -499,11 +500,12 @@ End intOrderedTheory.
 Bind Scope ring_scope with int.
 
 (* definition of intmul *)
-Definition intmul (R : zmodType) (x : R) (n : int) := nosimpl
+Definition intmul (R : zmodType) (x : R) (n : int) :=
   match n with
     | Posz n => (x *+ n)%R
     | Negz n => (x *- (n.+1))%R
   end.
+Arguments intmul : simpl never.
 
 Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : ring_scope.
 Notation "x *~ n" := (intmul x n)
@@ -982,11 +984,12 @@ End MorphTheory.
 
 Arguments intr_inj {R} [x1 x2].
 
-Definition exprz (R : unitRingType) (x : R) (n : int) := nosimpl
+Definition exprz (R : unitRingType) (x : R) (n : int) :=
   match n with
     | Posz n => x ^+ n
     | Negz n => x ^- (n.+1)
   end.
+Arguments exprz : simpl never.
 
 Notation "x ^ n" := (exprz x n) : ring_scope.
 

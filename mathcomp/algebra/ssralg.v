@@ -690,7 +690,8 @@ Local Notation "+%R" := (@add _) : ring_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
 Local Notation "x - y" := (x + - y) : ring_scope.
 
-Definition natmul V x n := nosimpl iterop _ n +%R x (zero V).
+Definition natmul V x n := iterop n +%R x (zero V).
+Arguments natmul : simpl never.
 
 Local Notation "x *+ n" := (natmul x n) : ring_scope.
 Local Notation "x *- n" := (- (x *+ n)) : ring_scope.
@@ -971,7 +972,8 @@ Import Ring.Exports.
 
 Definition one (R : ringType) : R := Ring.one (Ring.class R).
 Definition mul (R : ringType) : R -> R -> R := Ring.mul (Ring.class R).
-Definition exp R x n := nosimpl iterop _ n (@mul R) x (one R).
+Definition exp R x n := iterop n (@mul R) x (one R).
+Arguments exp : simpl never.
 Notation sign R b := (exp (- one R) (nat_of_bool b)) (only parsing).
 Definition comm R x y := @mul R x y = mul y x.
 Definition lreg R x := injective (@mul R x).

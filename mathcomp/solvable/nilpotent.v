@@ -44,13 +44,10 @@ End SeriesDefs.
 (* By convention, the lower central series starts at 1 while the upper series *)
 (* starts at 0 (sic).                                                         *)
 Definition lower_central_at n := lower_central_at_rec n.-1.
+Definition upper_central_at := upper_central_at_rec.
 
-(* Note: 'nosimpl' MUST be used outside of a section -- the end of section    *)
-(* "cooking" destroys it.                                                     *)
-Definition upper_central_at := nosimpl upper_central_at_rec.
-
-Arguments lower_central_at n%N {gT} A%g.
-Arguments upper_central_at n%N {gT} A%g.
+Arguments lower_central_at n%N {gT} A%g : simpl never.
+Arguments upper_central_at n%N {gT} A%g : simpl never.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
   (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.

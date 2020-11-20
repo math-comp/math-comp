@@ -48,8 +48,10 @@ Definition rat_countMixin := [countMixin of rat by <:].
 Canonical rat_countType := CountType rat rat_countMixin.
 Canonical rat_subCountType := [subCountType of rat].
 
-Definition numq x := nosimpl ((valq x).1).
-Definition denq x := nosimpl ((valq x).2).
+Definition numq x := ((valq x).1).
+Definition denq x := ((valq x).2).
+Arguments numq : simpl never.
+Arguments denq : simpl never.
 
 Lemma denq_gt0 x : 0 < denq x.
 Proof. by rewrite /denq; case: x=> [[a b] /= /andP []]. Qed.
@@ -90,7 +92,8 @@ rewrite muln_gcdr; do 2!rewrite muln_divCA ?(dvdn_gcdl, dvdn_gcdr) ?divnn //.
 by rewrite ?gcdn_gt0 ?muln1.
 Qed.
 
-Definition fracq (x : int * int) := nosimpl (@Rat (_, _) (fracq_subproof x)).
+Definition fracq (x : int * int) := (@Rat (_, _) (fracq_subproof x)).
+Arguments fracq : simpl never.
 
 Fact ratz_frac n : ratz n = fracq (n, 1).
 Proof. by apply: val_inj; rewrite /= gcdn1 !divn1 abszE mulr_sign_norm. Qed.
@@ -205,10 +208,12 @@ by rewrite fracq_eq ?mulf_neq0 //= mulrCA mulrA.
 Qed.
 
 Definition addq_subdef (x y : int * int) := (x.1 * y.2 + y.1 * x.2, x.2 * y.2).
-Definition addq (x y : rat) := nosimpl fracq (addq_subdef (valq x) (valq y)).
+Definition addq (x y : rat) := fracq (addq_subdef (valq x) (valq y)).
+Arguments addq : simpl never.
 
 Definition oppq_subdef (x : int * int) := (- x.1, x.2).
-Definition oppq (x : rat) := nosimpl fracq (oppq_subdef (valq x)).
+Definition oppq (x : rat) := fracq (oppq_subdef (valq x)).
+Arguments oppq : simpl never.
 
 Fact addq_subdefC : commutative addq_subdef.
 Proof. by move=> x y; rewrite /addq_subdef addrC [_.2 * _]mulrC. Qed.
@@ -267,8 +272,9 @@ Qed.
 Definition rat_ZmodMixin := ZmodMixin addqA addqC add0q addNq.
 Canonical rat_ZmodType := ZmodType rat rat_ZmodMixin.
 
-Definition mulq_subdef (x y : int * int) := nosimpl (x.1 * y.1, x.2 * y.2).
-Definition mulq (x y : rat) := nosimpl fracq (mulq_subdef (valq x) (valq y)).
+Definition mulq_subdef (x y : int * int) := (x.1 * y.1, x.2 * y.2).
+Definition mulq (x y : rat) := fracq (mulq_subdef (valq x) (valq y)).
+Arguments mulq : simpl never.
 
 Fact mulq_subdefC : commutative mulq_subdef.
 Proof. by move=> x y; rewrite /mulq_subdef mulrC [_ * x.2]mulrC. Qed.
@@ -276,8 +282,9 @@ Proof. by move=> x y; rewrite /mulq_subdef mulrC [_ * x.2]mulrC. Qed.
 Fact mul_subdefA : associative mulq_subdef.
 Proof. by move=> x y z; rewrite /mulq_subdef !mulrA. Qed.
 
-Definition invq_subdef (x : int * int) := nosimpl (x.2, x.1).
-Definition invq (x : rat) := nosimpl fracq (invq_subdef (valq x)).
+Definition invq_subdef (x : int * int) := (x.2, x.1).
+Definition invq (x : rat) := fracq (invq_subdef (valq x)).
+Arguments invq : simpl never.
 
 Fact mulq_frac x y : (mulq (fracq x) (fracq y)) = fracq (mulq_subdef x y).
 Proof.
