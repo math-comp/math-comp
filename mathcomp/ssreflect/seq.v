@@ -3491,9 +3491,9 @@ Implicit Types (x : T) (y : S) (xs : seq T) (ys : seq S).
 
 Definition allrel xs ys := all [pred x | all (r x) ys] xs.
 
-Lemma allrel0s ys : allrel [::] ys. Proof. by []. Qed.
+Lemma allrel0l ys : allrel [::] ys. Proof. by []. Qed.
 
-Lemma allrels0 xs : allrel xs [::]. Proof. by elim: xs. Qed.
+Lemma allrel0r xs : allrel xs [::]. Proof. by elim: xs. Qed.
 
 Lemma allrel_consl x xs ys : allrel (x :: xs) ys = all (r x) ys && allrel xs ys.
 Proof. by []. Qed.
@@ -3502,10 +3502,15 @@ Lemma allrel_consr xs y ys :
   allrel xs (y :: ys) = all (r^~ y) xs && allrel xs ys.
 Proof. exact: all_predI. Qed.
 
-Lemma allrel1s x ys : allrel [:: x] ys = all (r x) ys. Proof. exact: andbT. Qed.
+Lemma allrel_cons2 x y xs ys :
+  allrel (x :: xs) (y :: ys) =
+  [&& r x y, all (r x) ys, all (r^~ y) xs & allrel xs ys].
+Proof. by rewrite /= allrel_consr -andbA. Qed.
 
-Lemma allrels1 xs y : allrel xs [:: y] = all (r^~ y) xs.
-Proof. by rewrite allrel_consr allrels0 andbT. Qed.
+Lemma allrel1l x ys : allrel [:: x] ys = all (r x) ys. Proof. exact: andbT. Qed.
+
+Lemma allrel1r xs y : allrel xs [:: y] = all (r^~ y) xs.
+Proof. by rewrite allrel_consr allrel0r andbT. Qed.
 
 Lemma allrel_catl xs xs' ys :
   allrel (xs ++ xs') ys = allrel xs ys && allrel xs' ys.
@@ -3514,7 +3519,7 @@ Proof. exact: all_cat. Qed.
 Lemma allrel_catr xs ys ys' :
   allrel xs (ys ++ ys') = allrel xs ys && allrel xs ys'.
 Proof.
-elim: ys => /= [|y ys ihys]; first by rewrite allrels0.
+elim: ys => /= [|y ys ihys]; first by rewrite allrel0r.
 by rewrite !allrel_consr ihys andbA.
 Qed.
 
@@ -3525,17 +3530,30 @@ Proof. by elim: xs => //= x xs ->; rewrite all_cat all_map. Qed.
 End AllRel.
 
 Arguments allrel {T S} r xs ys : simpl never.
-Arguments allrel0s {T S} r ys.
-Arguments allrels0 {T S} r xs.
+Arguments allrel0l {T S} r ys.
+Arguments allrel0r {T S} r xs.
 Arguments allrel_consl {T S} r x xs ys.
 Arguments allrel_consr {T S} r xs y ys.
-Arguments allrel1s {T S} r x ys.
-Arguments allrels1 {T S} r xs y.
+Arguments allrel1l {T S} r x ys.
+Arguments allrel1r {T S} r xs y.
 Arguments allrel_catl {T S} r xs xs' ys.
 Arguments allrel_catr {T S} r xs ys ys'.
 Arguments allrel_allpairsE {T S} r xs ys.
 
 Notation all1rel r xs := (allrel r xs xs).
+
+Lemma eq_in_allrel {T S : Type} (P : {pred T}) (Q : {pred S}) r r' :
+  {in P & Q, r =2 r'} ->
+  forall xs ys, all P xs -> all Q ys -> allrel r xs ys = allrel r' xs ys.
+Proof.
+move=> rr' + ys; elim=> //= x xs IH /andP [Px Pxs] Qys.
+congr andb => /=; last exact: IH.
+by elim: ys Qys {IH} => //= y ys IH /andP [Qy Qys]; rewrite rr' // IH.
+Qed.
+
+Lemma eq_allrel {T S : Type} (r r': T -> S -> bool) xs ys :
+  r =2 r' -> allrel r xs ys = allrel r' xs ys.
+Proof. by move=> rr'; apply/eq_in_allrel/all_predT/all_predT. Qed.
 
 Lemma allrelC {T S : Type} (r : T -> S -> bool) xs ys :
   allrel r xs ys = allrel (fun y => r^~ y) ys xs.
@@ -3568,8 +3586,7 @@ Proof. by rewrite /allrel /= rsym; do 3 case: r. Qed.
 Lemma all1rel_cons x xs :
   all1rel r (x :: xs) = [&& r x x, all (r x) xs & all1rel r xs].
 Proof.
-rewrite allrel_consl allrel_consr /= !andbA [r x x && _]andbC -andbA andbACA.
-rewrite -[RHS]andbA; congr andb; rewrite -all_predI.
+rewrite allrel_cons2; congr andb; rewrite andbA -all_predI; congr andb.
 by elim: xs => //= y xs ->; rewrite rsym andbb.
 Qed.
 

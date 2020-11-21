@@ -1101,8 +1101,7 @@ Lemma merge_stable_path x s1 s2 :
   path leT_lex x (merge leT s1 s2).
 Proof.
 elim: s1 s2 x => //= x s1 ih1; elim => //= y s2 ih2 h.
-rewrite allrel_consl allrel_consr /= -andbA.
-move=> /and4P [xy' xs2 ys1 s1s2] /andP [hx xs1] /andP [hy ys2].
+rewrite allrel_cons2 => /and4P [xy' xs2 ys1 s1s2] /andP [hx xs1] /andP [hy ys2].
 case: ifP => xy /=; rewrite (hx, hy) /=.
 - by apply: ih1; rewrite ?allrel_consr ?ys1 //= xy xy' implybT.
 - by apply: ih2; have:= leT_total x y; rewrite ?allrel_consl ?xs2 ?xy //= => ->.
