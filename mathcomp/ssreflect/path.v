@@ -1446,13 +1446,21 @@ Notation "@ 'eq_sorted'" :=
   (deprecate eq_sorted sorted_eq) (at level 10, only parsing) : fun_scope.
 Notation "@ 'eq_sorted_irr'" := (deprecate eq_sorted_irr irr_sorted_eq)
   (at level 10, only parsing) : fun_scope.
-Notation "@ 'sorted_lt_nth'" := (deprecate sorted_lt_nth sorted_ltn_nth)
+Notation "@ 'sorted_lt_nth'" :=
+  (fun (T : Type) (leT : rel T) (leT_tr : transitive leT) =>
+     deprecate sorted_lt_nth sorted_ltn_nth leT_tr)
   (at level 10, only parsing) : fun_scope.
-Notation "@ 'sorted_le_nth'" := (deprecate sorted_le_nth sorted_leq_nth)
+Notation "@ 'sorted_le_nth'" :=
+  (fun (T : Type) (leT : rel T) (leT_tr : transitive leT) =>
+     deprecate sorted_le_nth sorted_leq_nth leT_tr)
   (at level 10, only parsing) : fun_scope.
-Notation "@ 'ltn_index'" := (deprecate ltn_index sorted_ltn_index)
+Notation "@ 'ltn_index'" :=
+  (fun (T : eqType) (leT : rel T) (leT_tr : transitive leT) =>
+     deprecate ltn_index sorted_ltn_index leT_tr)
   (at level 10, only parsing) : fun_scope.
-Notation "@ 'leq_index'" := (deprecate leq_index sorted_leq_index)
+Notation "@ 'leq_index'" :=
+  (fun (T : eqType) (leT : rel T) (leT_tr : transitive leT) =>
+     deprecate leq_index sorted_leq_index leT_tr)
   (at level 10, only parsing) : fun_scope.
 Notation "@ 'subseq_order_path'" := (deprecate subseq_order_path subseq_path)
   (at level 10, only parsing) : fun_scope.
@@ -1462,15 +1470,12 @@ Notation eq_sorted :=
 Notation eq_sorted_irr :=
   (fun le_tr le_irr => @eq_sorted_irr _ _ le_tr le_irr _ _) (only parsing).
 Notation sorted_lt_nth :=
-  (fun leT_tr x0 s_sorted => @sorted_lt_nth _ _ leT_tr x0 _ s_sorted _ _)
-  (only parsing).
+  (fun leT_tr x0 => @sorted_lt_nth _ _ leT_tr x0 _) (only parsing).
 Notation sorted_le_nth :=
-  (fun leT_tr leT_refl x0 s_sorted =>
-     @sorted_le_nth _ _ leT_tr leT_refl x0 _ s_sorted _ _) (only parsing).
-Notation ltn_index :=
-  (fun leT_tr s_sorted => @ltn_index _ _ leT_tr _ s_sorted _ _) (only parsing).
+  (fun leT_tr leT_refl x0 => @sorted_le_nth _ _ leT_tr leT_refl x0 _)
+  (only parsing).
+Notation ltn_index := (fun leT_tr => @ltn_index _ _ leT_tr _) (only parsing).
 Notation leq_index :=
-  (fun leT_tr leT_refl s_sorted =>
-     @leq_index _ _ leT_tr leT_refl _ s_sorted _ _) (only parsing).
+  (fun leT_tr leT_refl => @leq_index _ _ leT_tr leT_refl _) (only parsing).
 Notation subseq_order_path :=
   (fun leT_tr => @subseq_order_path _ _ leT_tr _ _ _) (only parsing).
