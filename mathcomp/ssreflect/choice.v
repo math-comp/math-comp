@@ -76,6 +76,7 @@ Fixpoint decode_rec (v q r : nat) {struct q} :=
   | q'.+1, 1     => [rec v.+1, q', q']
   | q'.+1, r'.+2 => [rec v, q', r']
   end where "[ 'rec' v , q , r ]" := (decode_rec v q r).
+Arguments decode_rec : simpl nomatch.
 
 Definition decode n := if n is 0 then [::] else [rec 0, n.-1, n.-1].
 

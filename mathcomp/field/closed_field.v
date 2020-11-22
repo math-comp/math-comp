@@ -194,6 +194,7 @@ Proof. by move=> a n; elim: n a=> [a /= -> //|n ihn a ra]; apply: ihn. Qed.
 Fixpoint sumpT (p q : polyF) :=
   match p, q with a :: p, b :: q => (a + b)%T :: sumpT p q
                 | [::], q => q | p, [::] => p end.
+Arguments sumpT : simpl nomatch.
 
 Lemma eval_sumpT (p q : polyF) (e : seq F) :
   eval_poly e (sumpT p q) = (eval_poly e p) + (eval_poly e q).

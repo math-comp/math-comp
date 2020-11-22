@@ -178,6 +178,7 @@ Fixpoint binomial_rec n m :=
   | _, 0 => 1
   | 0, _.+1 => 0
   end.
+Arguments binomial_rec : simpl nomatch.
 
 Definition binomial := nosimpl binomial_rec.
 
