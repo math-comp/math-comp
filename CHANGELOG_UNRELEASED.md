@@ -54,6 +54,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `in_on1P`, `in_on1lP`, `in_on2P`, `on1W_in`, `on1lW_in`, `on2W_in`,
     `in_on1W`, `in_on1lW`, `in_on2W`, `on1S`, `on1lS`, `on2S`,
     `on1S_in`, `on1lS_in`, `on2S_in`, `in_on1S`, `in_on1lS`, `in_on2S`.
+  + lemmas about interaction between `{in _, _}` and `sig`:
+    `in1_sig`, `in2_sig`, and `in3_sig`.
 
 - Added a factory `distrLatticePOrderMixin` in order.v to build a
   `distrLatticeType` from a `porderType`.
@@ -270,13 +272,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   already deprecated in favor of `allpairs_rconsr`, cf renamed
   section).
 
-- in `seq.v`, new lemmas `allss` and `all_mask`.
+- in `seq.v`, new lemmas `allss`, `all_mask`, and `all_sigP`.
+  `allss` has also been declared as a hint.
 
 - in `path.v`, new lemmas `sub_cycle(_in)`, `eq_cycle_in`,
   `(path|sorted)_(mask|filter)_in`, `rev_cycle`, `cycle_map`,
   `(homo|mono)_cycle(_in)`.
 
 - in `path.v`, new lemma `sort_iota_stable`.
+
+- in `path.v`, new lemmas `order_path_min_in`, `path_sorted_inE`,
+  `sorted_(leq|ltn)_nth_in`, `subseq_path_in`, `subseq_sorted_in`,
+  `sorted_(leq|ltn)_index_in`, `sorted_uniq_in`, `sorted_eq_in`,
+  `irr_sorted_eq_in`, `sort_sorted_in`, `sorted_sort_in`, `perm_sort_inP`,
+  `all_sort`, `sort_stable_in`, `filter_sort_in`, `(sorted_)mask_sort_in`,
+  `(sorted_)subseq_sort_in`, and `mem2_sort_in`.
 
 - in `seq.v` new lemmas `index_pivot`, `take_pivot`, `rev_pivot`,
   `eqseq_pivot2l`, `eqseq_pivot2r`, `eqseq_pivotl`, `eqseq_pivotr`

@@ -1500,6 +1500,16 @@ Arguments count_memPn {T x s}.
 Arguments uniqPn {T} x0 {s}.
 Arguments uniqP {T} x0 {s}.
 
+(* Since both `all (mem s) s` and `all (pred_of_seq s) s` may appear in       *)
+(* goals, the following hint has to be declared using the `Hint Extern`       *)
+(* command. Additionally, `mem` and `pred_of_seq` in the above terms do not   *)
+(* reduce to each other; thus, stating `allss` in the form of one of them     *)
+(* makes `apply: allss` failing for the other case. Since both `mem` and      *)
+(* `pred_of_seq` reduce to `mem_seq`, the following explicit type annotation  *)
+(* for `allss` makes it work for both cases.                                  *)
+Hint Extern 0 (is_true (all _ _)) =>
+  apply: (allss : forall T s, all (mem_seq s) s) : core.
+
 Section NthTheory.
 
 Lemma nthP (T : eqType) (s : seq T) x x0 :
