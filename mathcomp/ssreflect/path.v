@@ -253,8 +253,8 @@ Lemma sorted_ltn_nth_in x0 s : all P s -> sorted leT s ->
   {in [pred n | n < size s] &, {homo nth x0 s : i j / i < j >-> leT i j}}.
 Proof.
 elim: s => // x s ihs Pxs path_xs [|i] [|j] //=; rewrite -!topredE /= !ltnS.
-- by move=> _ js _; apply/all_nthP/js/order_path_min_in.
-- by apply/ihs/path_sorted/path_xs; case/andP: Pxs.
+  by move=> _ js _; apply/all_nthP/js/order_path_min_in.
+by apply/ihs/path_sorted/path_xs; case/andP: Pxs.
 Qed.
 
 Hypothesis leT_refl : {in P, reflexive leT}.
@@ -549,21 +549,20 @@ Lemma sorted_eq_in s1 s2 :
   {in s1 & &, transitive leT} -> {in s1 &, antisymmetric leT} ->
   sorted leT s1 -> sorted leT s2 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
-move=> /in3_sig leT_tr /in2_sig leT_asym + + perm_s12; move: (perm_s12).
-case/all_sigP: (allss s1) => s1' ->; move: (allss s1).
-rewrite (perm_all _ perm_s12) => /all_sigP [s2' ->] /(perm_map_inj val_inj).
-rewrite !sorted_map => {}perm_s12 s1_sorted s2_sorted; congr map.
-by apply: sorted_eq s1_sorted s2_sorted perm_s12 => // ? ? /leT_asym /val_inj.
+move=> /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_anti ss1 ss2 s1s2.
+move: ss1 ss2 (s1s2); have /all_sigP[s1' ->] := allss s1.
+have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
+by rewrite !sorted_map => ss1' ss2 /(perm_map_inj val_inj)/(sorted_eq leT_tr)->.
 Qed.
 
 Lemma irr_sorted_eq_in s1 s2 :
   {in s1 & &, transitive leT} -> {in s1, irreflexive leT} ->
   sorted leT s1 -> sorted leT s2 -> s1 =i s2 -> s1 = s2.
 Proof.
-move=> /in3_sig leT_tr /in1_sig leT_irr + + eq_s12; move: (eq_s12).
-case/all_sigP: (allss s1) => s1' ->; move: (allss s1).
-rewrite (eq_all_r eq_s12) => /all_sigP [s2' ->].
-rewrite !sorted_map => {}eq_s12 s1_sorted s2_sorted; congr map.
+move=> /in3_sig leT_tr /in1_sig leT_irr ss1 ss2 s1s2; move: ss1 ss2 (s1s2).
+have /all_sigP[s1' ->] := allss s1.
+have /all_sigP[s2' ->] : all (mem s1) s2 by rewrite -(eq_all_r s1s2).
+rewrite !sorted_map => ss1' ss2' {}s1s2; congr map.
 by apply: (irr_sorted_eq leT_tr) => // x; rewrite -!(mem_map val_inj).
 Qed.
 
@@ -1028,29 +1027,29 @@ Proof. by apply: perm_mem; rewrite perm_sort. Qed.
 Lemma sort_uniq s : uniq (sort leT s) = uniq s.
 Proof. by apply: perm_uniq; rewrite perm_sort. Qed.
 
-Lemma perm_sort_inP s1 s2 :
-  {in s1 &, total leT} -> {in s1 & &, transitive leT} ->
-  {in s1 &, antisymmetric leT} ->
-  reflect (sort leT s1 = sort leT s2) (perm_eq s1 s2).
-Proof.
-move=> leT_total leT_tr leT_asym.
-apply: (iffP idP) => eq12; last by rewrite -perm_sort eq12 perm_sort.
-apply: sorted_eq_in.
-- by move=> ? ? ?; rewrite !mem_sort; apply: leT_tr.
-- by move=> ? ?; rewrite !mem_sort; apply: leT_asym.
-- by apply/(sort_sorted_in leT_total).
-- by apply/(sort_sorted_in leT_total); rewrite -(perm_all _ eq12).
-- by rewrite perm_sort (permPl eq12) -perm_sort.
-Qed.
-
 Lemma perm_sortP :
   total leT -> transitive leT -> antisymmetric leT ->
   forall s1 s2, reflect (sort leT s1 = sort leT s2) (perm_eq s1 s2).
 Proof.
-by move=> *; apply: perm_sort_inP; [apply: in2W | apply: in3W | apply: in2W].
+move=> leT_total leT_tr leT_asym s1 s2.
+apply: (iffP idP) => eq12; last by rewrite -perm_sort eq12 perm_sort.
+apply: (sorted_eq leT_tr leT_asym); rewrite ?sort_sorted //.
+by rewrite perm_sort (permPl eq12) -perm_sort.
 Qed.
 
 End EqSortSeq.
+
+Lemma perm_sort_inP (T : eqType) (leT : rel T) (s1 s2 : seq T) :
+  {in s1 &, total leT} -> {in s1 & &, transitive leT} ->
+  {in s1 &, antisymmetric leT} ->
+  reflect (sort leT s1 = sort leT s2) (perm_eq s1 s2).
+Proof.
+move=> /in2_sig leT_total /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_asym.
+apply: (iffP idP) => s1s2; last by rewrite -(perm_sort leT) s1s2 perm_sort.
+move: (s1s2); have /all_sigP[s1' ->] := allss s1.
+have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
+by rewrite !sort_map => /(perm_map_inj val_inj) /(perm_sortP leT_total)->.
+Qed.
 
 Lemma perm_iota_sort (T : Type) (leT : rel T) x0 s :
   {i_s : seq nat | perm_eq i_s (iota 0 (size s)) &
