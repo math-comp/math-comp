@@ -3639,13 +3639,13 @@ Proof. exact: (@leIr _ [latticeType of L^d]). Qed.
 Lemma leUl x y : x <= x `|` y.
 Proof. exact: (@leIl _ [latticeType of L^d]). Qed.
 
-Lemma join_idPl {x y} : reflect (x `|` y = y) (x <= y).
+Lemma join_idPr {x y} : reflect (x `|` y = y) (x <= y).
 Proof. exact: (@meet_idPr _ [latticeType of L^d]). Qed.
-Lemma join_idPr {x y} : reflect (y `|` x = y) (x <= y).
+Lemma join_idPl {x y} : reflect (y `|` x = y) (x <= y).
 Proof. exact: (@meet_idPl _ [latticeType of L^d]). Qed.
 
-Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPr. Qed.
-Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPl. Qed.
+Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPl. Qed.
+Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPr. Qed.
 
 Lemma leUidl x y : (x `|` y <= y) = (x <= y).
 Proof. exact: (@leIidr _ [latticeType of L^d]). Qed.
@@ -3667,7 +3667,7 @@ Lemma lcomparableP x y : incomparel x y
 Proof.
 by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
    rewrite ?(meetxx, joinxx);
-   rewrite ?(meet_idPl hxy', meet_idPr hxy', join_idPl hxy', join_idPr hxy');
+   rewrite ?(meet_l hxy', meet_r hxy', join_l hxy', join_r hxy');
    constructor.
 Qed.
 
@@ -4378,8 +4378,7 @@ Lemma leBx x y : x `\` y <= x.
 Proof. by rewrite -{2}[x](joinIB y) lexU2 // lexx orbT. Qed.
 Hint Resolve leBx : core.
 
-Lemma subxx x : x `\` x = 0.
-Proof. by have := subKI x x; rewrite (meet_idPr _). Qed.
+Lemma subxx x : x `\` x = 0. Proof. by have := subKI x x; rewrite meet_r. Qed.
 
 Lemma leBl z x y : x <= y -> x `\` z <= y `\` z.
 Proof.
@@ -4390,21 +4389,21 @@ Qed.
 Lemma subKU y x : y `|` (x `\` y) = y `|` x.
 Proof.
 apply/eqP; rewrite eq_le leU2 //= leUx leUl.
-by apply/meet_idPl; have := joinIB y x; rewrite joinIl (join_idPr _).
+by apply/meet_idPl; have := joinIB y x; rewrite joinIl join_l.
 Qed.
 
 Lemma subUK y x : (x `\` y) `|` y = x `|` y.
 Proof. by rewrite joinC subKU joinC. Qed.
 
 Lemma leBKU y x : y <= x -> y `|` (x `\` y) = x.
-Proof. by move=> /join_idPl {2}<-; rewrite subKU. Qed.
+Proof. by move=> /join_r {2}<-; rewrite subKU. Qed.
 
 Lemma leBUK y x : y <= x -> (x `\` y) `|` y = x.
 Proof. by move=> leyx; rewrite joinC leBKU. Qed.
 
 Lemma leBLR x y z : (x `\` y <= z) = (x <= y `|` z).
 Proof.
-apply/idP/idP; first by move=> /join_idPl <-; rewrite joinA subKU joinAC leUr.
+apply/idP/idP; first by move=> /join_r <-; rewrite joinA subKU joinAC leUr.
 by rewrite -{1}[x](joinIB y) => /(leU2r_le (subIK _ _)).
 Qed.
 
@@ -4424,16 +4423,14 @@ Lemma joinBx x y z : (y `\` z) `|` x = ((y `|` x) `\` z) `|` (z `&` x).
 Proof. by rewrite ![_ `|` x]joinC ![_ `&` x]meetC joinxB. Qed.
 
 Lemma leBr z x y : x <= y -> z `\` y <= z `\` x.
-Proof.
-by move=> lexy; rewrite leBLR joinxB (meet_idPr _) ?leBUK ?leUr ?lexU2 ?lexy.
-Qed.
+Proof. by move=> lexy; rewrite leBLR joinxB meet_r ?leBUK ?leUr ?lexUl. Qed.
 
 Lemma leB2 x y z t : x <= z -> t <= y -> x `\` y <= z `\` t.
 Proof. by move=> /(@leBl t) ? /(@leBr x) /le_trans ->. Qed.
 
 Lemma meet_eq0E_sub z x y : x <= z -> (x `&` y == 0) = (x <= z `\` y).
 Proof.
-move=> xz; apply/idP/idP; last by move=> /meet_idPr <-; rewrite -meetA meetBI.
+move=> xz; apply/idP/idP; last by move=> /meet_r <-; rewrite -meetA meetBI.
 by move=> /eqP xIy_eq0; rewrite -[x](joinIB y) xIy_eq0 join0x leBl.
 Qed.
 
@@ -4474,22 +4471,20 @@ Proof. by rewrite ![_ `&` z]meetC meetxB. Qed.
 Lemma subxI x y z : x `\` (y `&` z) = (x `\` y) `|` (x `\` z).
 Proof.
 apply/eqP; rewrite eq_sub leUx !leBx //= joinIl joinA joinCA !subKU.
-rewrite joinCA -joinA [_ `|` x]joinC ![x `|` _](join_idPr _) //.
+rewrite joinCA -joinA [_ `|` x]joinC ![x `|` _]join_l //.
 by rewrite -joinIl leUr /= meetUl {1}[_ `&` z]meetC ?meetBI joinx0.
 Qed.
 
 Lemma subBx x y z : (x `\` y) `\` z = x `\` (y `|` z).
 Proof.
 apply/eqP; rewrite eq_sub leBr ?leUl //=.
-rewrite subxU joinIr subKU -joinIr (meet_idPl _) ?leUr //=.
-by rewrite -meetA subIK meetx0.
+by rewrite subxU joinIr subKU -joinIr meet_l ?leUr //= -meetA subIK meetx0.
 Qed.
 
 Lemma subxB x y z : x `\` (y `\` z) = (x `\` y) `|` (x `&` z).
 Proof.
-rewrite -[y in RHS](joinIB z) subxU joinIl subxI -joinA.
-rewrite joinBI (join_idPl _) // joinBx [x `|` _](join_idPr _) ?leIl //.
-by rewrite meetA meetAC subIK meet0x joinx0 (meet_idPr _).
+rewrite -[y in RHS](joinIB z) subxU joinIl subxI -joinA joinBI join_r //.
+by rewrite joinBx meetKU meetA meetAC subIK meet0x joinx0 meet_r.
 Qed.
 
 Lemma joinBK x y : (y `|` x) `\` x = (y `\` x).
@@ -4499,10 +4494,7 @@ Lemma joinBKC x y : (x `|` y) `\` x = (y `\` x).
 Proof. by rewrite subUx subxx join0x. Qed.
 
 Lemma disj_le x y : x `&` y == 0 -> x <= y = (x == 0).
-Proof.
-have [->|x_neq0] := eqVneq x 0; first by rewrite le0x.
-by apply: contraTF => lexy; rewrite (meet_idPl _).
-Qed.
+Proof. by rewrite [x == 0]eq_sym -eq_meetl => /eqP ->. Qed.
 
 Lemma disj_leC x y : y `&` x == 0 -> x <= y = (x == 0).
 Proof. by rewrite meetC => /disj_le. Qed.
@@ -4514,9 +4506,7 @@ Lemma disj_subr x y : x `&` y == 0 -> y `\` x = y.
 Proof. by rewrite meetC => /disj_subl. Qed.
 
 Lemma lt0B x y : x < y -> 0 < y `\` x.
-Proof.
-by move=> ?; rewrite lt_leAnge leBRL leBLR le0x meet0x eqxx joinx0 /= lt_geF.
-Qed.
+Proof. by move=> ?; rewrite lt_leAnge le0x leBLR joinx0 /= lt_geF. Qed.
 
 End CBDistrLatticeTheory.
 End CBDistrLatticeTheory.
