@@ -549,8 +549,8 @@ Lemma sorted_eq_in s1 s2 :
   {in s1 & &, transitive leT} -> {in s1 &, antisymmetric leT} ->
   sorted leT s1 -> sorted leT s2 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
-move=> /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_anti ss1 ss2 s1s2.
-move: ss1 ss2 (s1s2); have /all_sigP[s1' ->] := allss s1.
+move=> /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_anti + + /[dup] s1s2.
+have /all_sigP[s1' ->] := allss s1.
 have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
 by rewrite !sorted_map => ss1' ss2 /(perm_map_inj val_inj)/(sorted_eq leT_tr)->.
 Qed.
@@ -559,7 +559,7 @@ Lemma irr_sorted_eq_in s1 s2 :
   {in s1 & &, transitive leT} -> {in s1, irreflexive leT} ->
   sorted leT s1 -> sorted leT s2 -> s1 =i s2 -> s1 = s2.
 Proof.
-move=> /in3_sig leT_tr /in1_sig leT_irr ss1 ss2 s1s2; move: ss1 ss2 (s1s2).
+move=> /in3_sig leT_tr /in1_sig leT_irr + + /[dup] s1s2.
 have /all_sigP[s1' ->] := allss s1.
 have /all_sigP[s2' ->] : all (mem s1) s2 by rewrite -(eq_all_r s1s2).
 rewrite !sorted_map => ss1' ss2' {}s1s2; congr map.
