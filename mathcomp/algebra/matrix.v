@@ -1935,7 +1935,7 @@ Proof. by rewrite scale_scalar_mx mulr1. Qed.
 
 Lemma scalar_mx_sum_delta a : a%:M = \sum_i a *: delta_mx i i.
 Proof.
-by rewrite -diag_const_mx diag_mx_sum_delta; apply: eq_bigr => i _; rewrite mxE.
+by rewrite -diag_const_mx diag_mx_sum_delta; under eq_bigr do rewrite mxE.
 Qed.
 
 Lemma mx1_sum_delta : 1%:M = \sum_i delta_mx i i.
@@ -1996,11 +1996,9 @@ Local Notation "A *m B" := (mulmx A B) : ring_scope.
 Lemma mulmxA m n p q (A : 'M_(m, n)) (B : 'M_(n, p)) (C : 'M_(p, q)) :
   A *m (B *m C) = A *m B *m C.
 Proof.
-apply/matrixP=> i l; rewrite !mxE.
-transitivity (\sum_j (\sum_k (A i j * (B j k * C k l)))).
-  by apply: eq_bigr => j _; rewrite mxE big_distrr.
+apply/matrixP=> i l; rewrite !mxE; under eq_bigr do rewrite mxE big_distrr/=.
 rewrite exchange_big; apply: eq_bigr => j _; rewrite mxE big_distrl /=.
-by apply: eq_bigr => k _; rewrite mulrA.
+by under eq_bigr do rewrite mulrA.
 Qed.
 
 Lemma mul0mx m n p (A : 'M_(n, p)) : 0 *m A = 0 :> 'M_(m, p).
@@ -2016,13 +2014,13 @@ Qed.
 Lemma mulmxN m n p (A : 'M_(m, n)) (B : 'M_(n, p)) : A *m (- B) = - (A *m B).
 Proof.
 apply/matrixP=> i k; rewrite !mxE -sumrN.
-by apply: eq_bigr => j _; rewrite mxE mulrN.
+by under eq_bigr do rewrite mxE mulrN.
 Qed.
 
 Lemma mulNmx m n p (A : 'M_(m, n)) (B : 'M_(n, p)) : - A *m B = - (A *m B).
 Proof.
 apply/matrixP=> i k; rewrite !mxE -sumrN.
-by apply: eq_bigr => j _; rewrite mxE mulNr.
+by under eq_bigr do rewrite mxE mulNr.
 Qed.
 
 Lemma mulmxDl m n p (A1 A2 : 'M_(m, n)) (B : 'M_(n, p)) :
@@ -2083,12 +2081,12 @@ Proof. by rewrite !rowE mulmxA. Qed.
 Lemma mulmx_sum_row m n (u : 'rV_m) (A : 'M_(m, n)) :
   u *m A = \sum_i u 0 i *: row i A.
 Proof.
-by apply/rowP=> j; rewrite mxE summxE; apply: eq_bigr => i _; rewrite !mxE.
+by apply/rowP=> j; rewrite mxE summxE; under [RHS]eq_bigr do rewrite !mxE.
 Qed.
 
 Lemma mxsub_mul m n m' n' p f g (A : 'M_(m, p)) (B : 'M_(p, n)) :
   mxsub f g (A *m B) = rowsub f A *m colsub g B :> 'M_(m', n').
-Proof. by split_mxE; apply: eq_bigr => k _; rewrite !mxE. Qed.
+Proof. by split_mxE; under [RHS]eq_bigr do rewrite !mxE. Qed.
 
 Lemma mul_rowsub_mx m n m' p f (A : 'M_(m, p)) (B : 'M_(p, n)) :
   rowsub f A *m B = rowsub f (A *m B) :> 'M_(m', n).
@@ -2330,14 +2328,14 @@ Lemma mul_mx_row m n p1 p2 (A : 'M_(m, n)) (Bl : 'M_(n, p1)) (Br : 'M_(n, p2)) :
   A *m row_mx Bl Br = row_mx (A *m Bl) (A *m Br).
 Proof.
 apply/matrixP=> i k; rewrite !mxE.
-by case defk: (split k); rewrite mxE; apply: eq_bigr => j _; rewrite mxE defk.
+by case defk: (split k); rewrite mxE; under eq_bigr do rewrite mxE defk.
 Qed.
 
 Lemma mul_col_mx m1 m2 n p (Au : 'M_(m1, n)) (Ad : 'M_(m2, n)) (B : 'M_(n, p)) :
   col_mx Au Ad *m B = col_mx (Au *m B) (Ad *m B).
 Proof.
 apply/matrixP=> i k; rewrite !mxE.
-by case defi: (split i); rewrite mxE; apply: eq_bigr => j _; rewrite mxE defi.
+by case defi: (split i); rewrite mxE; under eq_bigr do rewrite mxE defi.
 Qed.
 
 Lemma mul_row_col m n1 n2 p (Al : 'M_(m, n1)) (Ar : 'M_(m, n2))
@@ -2466,8 +2464,8 @@ Proof. by apply: eq_bigr=> i _; rewrite mxE. Qed.
 
 Lemma mxtrace_is_scalar : scalar mxtrace.
 Proof.
-move=> a A B; rewrite mulr_sumr -big_split /=; apply: eq_bigr=> i _.
-by rewrite !mxE.
+move=> a A B; rewrite mulr_sumr -big_split /=.
+by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
 Canonical mxtrace_additive := Additive mxtrace_is_scalar.
 Canonical mxtrace_linear := Linear mxtrace_is_scalar.
@@ -2481,8 +2479,8 @@ Proof. by apply: eq_bigr => j _; rewrite mxE eqxx. Qed.
 
 Lemma mxtrace_scalar a : \tr a%:M = a *+ n.
 Proof.
-rewrite -diag_const_mx mxtrace_diag.
-by rewrite (eq_bigr _ (fun j _ => mxE _ _ 0 j)) sumr_const card_ord.
+rewrite -diag_const_mx mxtrace_diag; under eq_bigr do rewrite mxE.
+by rewrite sumr_const card_ord.
 Qed.
 
 Lemma mxtrace1 : \tr 1%:M = n%:R. Proof. exact: mxtrace_scalar. Qed.
@@ -2497,7 +2495,7 @@ Lemma mxtrace_block n1 n2 (Aul : 'M_n1) Aur Adl (Adr : 'M_n2) :
   \tr (block_mx Aul Aur Adl Adr) = \tr Aul + \tr Adr.
 Proof.
 rewrite /(\tr _) big_split_ord /=.
-by congr (_ + _); apply: eq_bigr => i _; rewrite (block_mxEul, block_mxEdr).
+by congr (_ + _); under eq_bigr do rewrite (block_mxEul, block_mxEdr).
 Qed.
 
 (* The matrix ring structure requires a strutural condition (dimension of the *)
@@ -3058,7 +3056,7 @@ Lemma expand_det_col n (A : 'M[R]_n) j0 :
   \det A = \sum_i (A i j0 * cofactor A i j0).
 Proof.
 rewrite -det_tr (expand_det_row _ j0).
-by apply: eq_bigr => i _; rewrite cofactor_tr mxE.
+by under eq_bigr do rewrite cofactor_tr mxE.
 Qed.
 
 Lemma trmx_adj n (A : 'M[R]_n) : (\adj A)^T = \adj A^T.
