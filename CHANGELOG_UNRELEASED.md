@@ -376,6 +376,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `order.v`, generalized `sort_le_id` for any `porderType`.
 
+- in `order.v`, the names of lemmas `join_idPl` and `join_idPr` are transposed
+  to follow the naming convention.
+
 - the following constants have been tuned to only reduce when they do
   not expose a match: `subn_rec`, `decode_rec`, `nth` (thus avoiding a
   notorious problem of ``p`_0`` expanding too eagerly), `set_nth`,
