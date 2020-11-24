@@ -129,15 +129,6 @@ Local Open Scope order_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
-Reserved Notation "<= y" (at level 35).
-Reserved Notation ">= y" (at level 35).
-Reserved Notation "< y" (at level 35).
-Reserved Notation "> y" (at level 35).
-Reserved Notation "<= y :> T" (at level 35, y at next level).
-Reserved Notation ">= y :> T" (at level 35, y at next level).
-Reserved Notation "< y :> T" (at level 35, y at next level).
-Reserved Notation "> y :> T" (at level 35, y at next level).
-
 Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
@@ -392,10 +383,10 @@ Notation comparabler := (@Order.comparable ring_display _) (only parsing).
 Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
 Notation maxr := (@Order.max ring_display _).
-Notation "@ 'maxr' R" := (@Order.join ring_display R)
+Notation "@ 'maxr' R" := (@Order.max ring_display R)
     (at level 10, R at level 8, only parsing) : fun_scope.
 Notation minr := (@Order.min ring_display _).
-Notation "@ 'minr' R" := (@Order.meet ring_display R)
+Notation "@ 'minr' R" := (@Order.min ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
 
 Section Def.

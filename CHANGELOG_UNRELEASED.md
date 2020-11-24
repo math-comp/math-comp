@@ -386,6 +386,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   constructors, the case `mask [::] s` can be dealt with using
   `mask0s` or explicit conversion.
 
+- in `ssrnum.v`, fixed notations `@minr` and `@maxr` to point `Order.min` and
+  `Order.max` respectively.
+
 ### Renamed
 
 - `big_rmcond` -> `big_rmcond_in` (cf Changed section)
