@@ -285,12 +285,14 @@ Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
 Notation "[ 'pick' x : T | P ]" := (pick (fun x : T => P%B))
   (at level 0, x ident, only parsing) : form_scope.
 Definition pick_true T (x : T) := true.
+Reserved Notation "[ 'pick' x : T ]"
+  (at level 0, x ident, format "[ 'pick'  x : T ]").
 Notation "[ 'pick' x : T ]" := [pick x : T | pick_true x]
-  (at level 0, x ident, only parsing).
+  (only parsing) : form_scope.
+Notation "[ 'pick' x : T ]" := [pick x : T | pick_true _]
+  (only printing) : form_scope.
 Notation "[ 'pick' x ]" := [pick x : _]
   (at level 0, x ident, only parsing) : form_scope.
-Notation "[ 'pic' 'k' x : T ]" := [pick x : T | pick_true _]
-  (at level 0, x ident, format "[ 'pic' 'k'  x : T ]") : form_scope.
 Notation "[ 'pick' x | P & Q ]" := [pick x | P && Q ]
   (at level 0, x ident,
    format "[ '[hv ' 'pick'  x  |  P '/ '   &  Q ] ']'") : form_scope.

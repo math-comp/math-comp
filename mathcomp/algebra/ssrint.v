@@ -67,10 +67,13 @@ Variant int : Set := Posz of nat | Negz of nat.
 Notation "n %:Z" := (Posz n) (only parsing) : int_scope.
 Notation "n %:Z" := (Posz n) (only parsing) : ring_scope.
 
-Notation "n = m :> 'in' 't'"  := (Posz n = Posz m) : ring_scope.
-Notation "n == m :> 'in' 't'" := (Posz n == Posz m) : ring_scope.
-Notation "n != m :> 'in' 't'" := (Posz n != Posz m) : ring_scope.
-Notation "n <> m :> 'in' 't'" := (Posz n <> Posz m) : ring_scope.
+Notation "n = m :> 'in' 't'"  := (Posz n = Posz m) (only printing) : ring_scope.
+Notation "n == m :> 'in' 't'" := (Posz n == Posz m)
+  (only printing) : ring_scope.
+Notation "n != m :> 'in' 't'" := (Posz n != Posz m)
+  (only printing) : ring_scope.
+Notation "n <> m :> 'in' 't'" := (Posz n <> Posz m)
+  (only printing) : ring_scope.
 
 Definition natsum_of_int (m : int) : nat + nat :=
   match m with Posz p => inl _ p | Negz n => inr _ n end.
@@ -452,8 +455,7 @@ Local Coercion Posz : nat >-> int.
 Implicit Types m n p : nat.
 Implicit Types x y z : int.
 
-Lemma lez_nat m n : (m <= n :> int) = (m <= n)%N.
-Proof. by []. Qed.
+Lemma lez_nat m n : (m <= n :> int) = (m <= n)%N. Proof. by []. Qed.
 
 Lemma ltz_nat  m n : (m < n :> int) = (m < n)%N.
 Proof. by rewrite ltnNge ltNge lez_nat. Qed.

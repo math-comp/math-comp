@@ -1,0 +1,3 @@
+imset2_pair
+     : forall (aT aT2 : finType) (A : {set aT}) (B : {set aT2}),
+       [set (x, y) | x in A, y in B] = setX A B
