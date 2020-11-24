@@ -21,3 +21,27 @@ Proof.
 move=> /[apply] b.
 Check (b : B).
 Abort.
+
+Lemma test_swap_plus P Q : P -> Q -> False.
+Proof.
+move=> + /[dup] q.
+suff: P -> Q -> False by [].
+Abort.
+
+Lemma test_dup_plus2 P : P -> let x := 0 in False.
+Proof.
+move=> + /[dup] y.
+suff: P -> let x := 0 in False by [].
+Abort.
+
+Lemma test_swap_plus P Q R : P -> Q -> R -> False.
+Proof.
+move=> + /[swap].
+suff: P -> R -> Q -> False by [].
+Abort.
+
+Lemma test_swap_plus2 P : P -> let x := 0 in let y := 1 in False.
+Proof.
+move=> + /[swap].
+suff: P -> let y := 1 in let x := 0 in False by [].
+Abort.
