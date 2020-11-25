@@ -208,6 +208,15 @@ End SubPath.
 Section Transitive_in.
 
 Variables (P : {pred T}) (leT : rel T).
+
+Lemma order_path_min_in x s :
+  {in P & &, transitive leT} -> all P (x :: s) -> path leT x s -> all (leT x) s.
+Proof.
+move=> leT_tr; elim: s => //= y s ihs /and3P [Px Py Ps] /andP [xy ys].
+rewrite xy {}ihs ?Px //=; case: s Ps ys => //= z s /andP [Pz Ps] /andP [yz ->].
+by rewrite (leT_tr _ _ _ Py Px Pz).
+Qed.
+
 Hypothesis leT_tr : {in P & &, transitive leT}.
 
 Lemma path_mask_in x m s :
@@ -233,6 +242,31 @@ Qed.
 Lemma sorted_filter_in a s : all P s -> sorted leT s -> sorted leT (filter a s).
 Proof. rewrite filter_mask; exact: sorted_mask_in. Qed.
 
+Lemma path_sorted_inE x s :
+  all P (x :: s) -> path leT x s = all (leT x) s && sorted leT s.
+Proof.
+move=> Pxs; apply/idP/idP => [xs|/andP[/path_min_sorted<-//]].
+by rewrite (order_path_min_in leT_tr) //; apply: path_sorted xs.
+Qed.
+
+Lemma sorted_ltn_nth_in x0 s : all P s -> sorted leT s ->
+  {in [pred n | n < size s] &, {homo nth x0 s : i j / i < j >-> leT i j}}.
+Proof.
+elim: s => // x s ihs Pxs path_xs [|i] [|j] //=; rewrite -!topredE /= !ltnS.
+  by move=> _ js _; apply/all_nthP/js/order_path_min_in.
+by apply/ihs/path_sorted/path_xs; case/andP: Pxs.
+Qed.
+
+Hypothesis leT_refl : {in P, reflexive leT}.
+
+Lemma sorted_leq_nth_in x0 s : all P s -> sorted leT s ->
+  {in [pred n | n < size s] &, {homo nth x0 s : i j / i <= j >-> leT i j}}.
+Proof.
+move=> Ps s_sorted x y xs ys; rewrite leq_eqVlt=> /predU1P[->|].
+  exact/leT_refl/all_nthP.
+exact: sorted_ltn_nth_in.
+Qed.
+
 End Transitive_in.
 
 Section Transitive.
@@ -241,8 +275,7 @@ Variable (leT : rel T).
 
 Lemma order_path_min x s : transitive leT -> path leT x s -> all (leT x) s.
 Proof.
-move=> leT_tr; elim: s => //= y [//|z s] ihs /andP[xy yz]; rewrite xy {}ihs//.
-by move: yz => /= /andP [/(leT_tr _ _ _ xy) ->].
+by move=> leT_tr; apply/order_path_min_in/all_predT => //; apply: in3W.
 Qed.
 
 Hypothesis leT_tr : transitive leT.
@@ -262,27 +295,17 @@ Lemma sorted_filter a s : sorted leT s -> sorted leT (filter a s).
 Proof. exact/sorted_filter_in/all_predT. Qed.
 
 Lemma path_sortedE x s : path leT x s = all (leT x) s && sorted leT s.
-Proof.
-apply/idP/idP => [xs|/andP[/path_min_sorted<-//]].
-by rewrite order_path_min//; apply: path_sorted xs.
-Qed.
+Proof. exact/path_sorted_inE/all_predT. Qed.
 
 Lemma sorted_ltn_nth x0 s : sorted leT s ->
   {in [pred n | n < size s] &, {homo nth x0 s : i j / i < j >-> leT i j}}.
-Proof.
-elim: s => //= x s ihs path_xs [|i] [|j] //=; rewrite -!topredE /= !ltnS.
-- by move=> _ js _; apply/all_nthP/js/order_path_min.
-- exact/ihs/path_sorted/path_xs.
-Qed.
+Proof. exact/sorted_ltn_nth_in/all_predT. Qed.
 
 Hypothesis leT_refl : reflexive leT.
 
 Lemma sorted_leq_nth x0 s : sorted leT s ->
   {in [pred n | n < size s] &, {homo nth x0 s : i j / i <= j >-> leT i j}}.
-Proof.
-move=> s_sorted x y xs ys.
-by rewrite leq_eqVlt=> /predU1P[->//|]; apply: sorted_ltn_nth.
-Qed.
+Proof. exact/sorted_leq_nth_in/all_predT. Qed.
 
 End Transitive.
 
@@ -291,10 +314,14 @@ End Paths.
 Arguments pathP {T e x p}.
 Arguments path_sorted {T e x s}.
 Arguments path_min_sorted {T e x s}.
+Arguments order_path_min_in {T P leT x s}.
 Arguments path_mask_in {T P leT} leT_tr {x m s}.
 Arguments path_filter_in {T P leT} leT_tr {x a s}.
 Arguments sorted_mask_in {T P leT} leT_tr {m s}.
 Arguments sorted_filter_in {T P leT} leT_tr {a s}.
+Arguments path_sorted_inE {T P leT} leT_tr {x s}.
+Arguments sorted_ltn_nth_in {T P leT} leT_tr x0 {s}.
+Arguments sorted_leq_nth_in {T P leT} leT_tr leT_refl x0 {s}.
 Arguments order_path_min {T leT x s}.
 Arguments path_mask {T leT} leT_tr {x} m {s}.
 Arguments path_filter {T leT} leT_tr {x} a {s}.
@@ -417,13 +444,38 @@ Implicit Type s : seq T.
 Local Notation path := (path leT).
 Local Notation sorted := (sorted leT).
 
+Lemma subseq_path_in x s1 s2 :
+  {in x :: s2 & &, transitive leT} -> subseq s1 s2 -> path x s2 -> path x s1.
+Proof. by move=> tr /subseqP [m _ ->]; apply/(path_mask_in tr). Qed.
+
+Lemma subseq_sorted_in s1 s2 :
+  {in s2 & &, transitive leT} -> subseq s1 s2 -> sorted s2 -> sorted s1.
+Proof. by move=> tr /subseqP [m _ ->]; apply/(sorted_mask_in tr). Qed.
+
+Lemma sorted_ltn_index_in s : {in s & &, transitive leT} -> sorted s ->
+  {in s &, forall x y, index x s < index y s -> leT x y}.
+Proof.
+case: s => // x0 s' leT_tr s_sorted x y xs ys.
+move/(sorted_ltn_nth_in leT_tr x0 (allss (_ :: _)) s_sorted).
+by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
+Qed.
+
+Lemma sorted_leq_index_in s :
+  {in s & &, transitive leT} -> {in s, reflexive leT} -> sorted s ->
+  {in s &, forall x y, index x s <= index y s -> leT x y}.
+Proof.
+case: s => // x0 s' leT_tr leT_refl s_sorted x y xs ys.
+move/(sorted_leq_nth_in leT_tr leT_refl x0 (allss (_ :: _)) s_sorted).
+by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
+Qed.
+
 Hypothesis leT_tr : transitive leT.
 
 Lemma subseq_path x s1 s2 : subseq s1 s2 -> path x s2 -> path x s1.
-Proof. by case/subseqP => m _ ->; apply/path_mask. Qed.
+Proof. by apply: subseq_path_in; apply: in3W. Qed.
 
 Lemma subseq_sorted s1 s2 : subseq s1 s2 -> sorted s2 -> sorted s1.
-Proof. by case/subseqP => m _ ->; apply/sorted_mask. Qed.
+Proof. by apply: subseq_sorted_in; apply: in3W. Qed.
 
 Lemma sorted_uniq : irreflexive leT -> forall s, sorted s -> uniq s.
 Proof.
@@ -475,8 +527,46 @@ Qed.
 
 End EqSorted.
 
+Arguments sorted_ltn_index_in {T leT s} leT_tr s_sorted.
+Arguments sorted_leq_index_in {T leT s} leT_tr leT_refl s_sorted.
 Arguments sorted_ltn_index {T leT} leT_tr {s}.
 Arguments sorted_leq_index {T leT} leT_tr leT_refl {s}.
+
+Section EqSorted_in.
+
+Variables (T : eqType) (leT : rel T).
+Implicit Type s : seq T.
+
+Lemma sorted_uniq_in s :
+  {in s & &, transitive leT} -> {in s, irreflexive leT} ->
+  sorted leT s -> uniq s.
+Proof.
+move=> /in3_sig leT_tr /in1_sig leT_irr; case/all_sigP: (allss s) => s' ->.
+by rewrite sorted_map (map_inj_uniq val_inj); exact: sorted_uniq.
+Qed.
+
+Lemma sorted_eq_in s1 s2 :
+  {in s1 & &, transitive leT} -> {in s1 &, antisymmetric leT} ->
+  sorted leT s1 -> sorted leT s2 -> perm_eq s1 s2 -> s1 = s2.
+Proof.
+move=> /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_anti + + /[dup] s1s2.
+have /all_sigP[s1' ->] := allss s1.
+have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
+by rewrite !sorted_map => ss1' ss2 /(perm_map_inj val_inj)/(sorted_eq leT_tr)->.
+Qed.
+
+Lemma irr_sorted_eq_in s1 s2 :
+  {in s1 & &, transitive leT} -> {in s1, irreflexive leT} ->
+  sorted leT s1 -> sorted leT s2 -> s1 =i s2 -> s1 = s2.
+Proof.
+move=> /in3_sig leT_tr /in1_sig leT_irr + + /[dup] s1s2.
+have /all_sigP[s1' ->] := allss s1.
+have /all_sigP[s2' ->] : all (mem s1) s2 by rewrite -(eq_all_r s1s2).
+rewrite !sorted_map => ss1' ss2' {}s1s2; congr map.
+by apply: (irr_sorted_eq leT_tr) => // x; rewrite -!(mem_map val_inj).
+Qed.
+
+End EqSorted_in.
 
 Section EqPath.
 
@@ -879,6 +969,30 @@ Arguments map_sort {T T' f leT' leT}.
 Arguments merge_map {T T' f leT}.
 Arguments sort_map {T T' f leT}.
 
+Section SortSeq_in.
+
+Variables (T : Type) (P : {pred T}) (leT : rel T).
+Let le_sT := relpre (val : sig P -> _) leT.
+
+Hypothesis leT_total : {in P &, total leT}.
+Let le_sT_total : total le_sT := in2_sig leT_total.
+
+Lemma sort_sorted_in s : all P s -> sorted leT (sort leT s).
+Proof. by move=> /all_sigP[? ->]; rewrite sort_map sorted_map sort_sorted. Qed.
+
+Hypothesis leT_tr : {in P & &, transitive leT}.
+Let le_sT_tr : transitive le_sT := in3_sig leT_tr.
+
+Lemma sorted_sort_in s : all P s -> sorted leT s -> sort leT s = s.
+Proof.
+by move=> /all_sigP [{}s ->]; rewrite sort_map sorted_map => /sorted_sort->.
+Qed.
+
+End SortSeq_in.
+
+Arguments sort_sorted_in {T P leT} leT_total {s}.
+Arguments sorted_sort_in {T P leT} leT_tr {s}.
+
 Section EqSortSeq.
 
 Variables (T : eqType) (leT : rel T).
@@ -925,6 +1039,18 @@ Qed.
 
 End EqSortSeq.
 
+Lemma perm_sort_inP (T : eqType) (leT : rel T) (s1 s2 : seq T) :
+  {in s1 &, total leT} -> {in s1 & &, transitive leT} ->
+  {in s1 &, antisymmetric leT} ->
+  reflect (sort leT s1 = sort leT s2) (perm_eq s1 s2).
+Proof.
+move=> /in2_sig leT_total /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_asym.
+apply: (iffP idP) => s1s2; last by rewrite -(perm_sort leT) s1s2 perm_sort.
+move: (s1s2); have /all_sigP[s1' ->] := allss s1.
+have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
+by rewrite !sort_map => /(perm_map_inj val_inj) /(perm_sortP leT_total)->.
+Qed.
+
 Lemma perm_iota_sort (T : Type) (leT : rel T) x0 s :
   {i_s : seq nat | perm_eq i_s (iota 0 (size s)) &
                    sort leT s = map (nth x0 s) i_s}.
@@ -932,6 +1058,14 @@ Proof.
 exists (sort (relpre (nth x0 s) leT) (iota 0 (size s))).
   by rewrite perm_sort.
 by rewrite -[X in sort leT X](mkseq_nth x0) sort_map.
+Qed.
+
+Lemma all_sort (T : Type) (P : {pred T}) (leT : rel T) s :
+  all P (sort leT s) = all P s.
+Proof.
+case: s => // x s; move: (x :: s) => {}s.
+rewrite -(mkseq_nth x s) sort_map !all_map.
+by apply: perm_all; rewrite perm_sort.
 Qed.
 
 Lemma size_sort (T : Type) (leT : rel T) s : size (sort leT s) = size s.
@@ -1069,6 +1203,23 @@ apply/(@irr_sorted_eq _ lt_lex); rewrite /lt_lex /leN //=.
 - by move=> ?; rewrite !(mem_filter, mem_sort).
 Qed.
 
+Lemma sort_stable_in T (P : {pred T}) (leT leT' : rel T) :
+  {in P &, total leT} -> {in P & &, transitive leT'} ->
+  forall s : seq T, all P s -> sorted leT' s ->
+  sorted [rel x y | leT x y && (leT y x ==> leT' x y)] (sort leT s).
+Proof.
+move=> /in2_sig leT_total /in3_sig leT_tr _ /all_sigP[s ->].
+by rewrite sort_map !sorted_map; apply: sort_stable.
+Qed.
+
+Lemma filter_sort_in T (P : {pred T}) (leT : rel T) :
+  {in P &, total leT} -> {in P & &, transitive leT} ->
+  forall p s, all P s -> filter p (sort leT s) = sort leT (filter p s).
+Proof.
+move=> /in2_sig leT_total /in3_sig leT_tr p _ /all_sigP[s ->].
+by rewrite !(sort_map, filter_map) filter_sort.
+Qed.
+
 Section Stability_mask.
 
 Variables (T : Type) (leT : rel T).
@@ -1090,6 +1241,31 @@ Lemma sorted_mask_sort s m :
 Proof. by move/(sorted_sort leT_tr) <-; exact: mask_sort. Qed.
 
 End Stability_mask.
+
+Section Stability_mask_in.
+
+Variables (T : Type) (P : {pred T}) (leT : rel T).
+Hypothesis leT_total : {in P &, total leT}.
+Hypothesis leT_tr : {in P & &, transitive leT}.
+
+Let le_sT := relpre (val : sig P -> _) leT.
+Let le_sT_total : total le_sT := in2_sig leT_total.
+Let le_sT_tr : transitive le_sT := in3_sig leT_tr.
+
+Lemma mask_sort_in s m :
+  all P s -> {m_s : bitseq | mask m_s (sort leT s) = sort leT (mask m s)}.
+Proof.
+move=> /all_sigP [{}s ->]; case: (mask_sort (leT := le_sT) _ _ s m) => //.
+by move=> m' m'E; exists m'; rewrite -map_mask !sort_map -map_mask m'E.
+Qed.
+
+Lemma sorted_mask_sort_in s m :
+  all P s -> sorted leT (mask m s) -> {m_s | mask m_s (sort leT s) = mask m s}.
+Proof.
+move=> ? /(sorted_sort_in leT_tr _) <-; [exact: mask_sort_in | exact: all_mask].
+Qed.
+
+End Stability_mask_in.
 
 Section Stability_subseq.
 
@@ -1113,6 +1289,37 @@ by case: eqP => // _; rewrite {1}/sort /= lexy /=.
 Qed.
 
 End Stability_subseq.
+
+Section Stability_subseq_in.
+
+Variables (T : eqType) (leT : rel T).
+
+Lemma subseq_sort_in t s :
+  {in s &, total leT} -> {in s & &, transitive leT} ->
+  subseq t s -> subseq (sort leT t) (sort leT s).
+Proof.
+move=> leT_total leT_tr /subseqP [m _ ->].
+have [m' <-] := mask_sort_in leT_total leT_tr m (allss _).
+exact: mask_subseq.
+Qed.
+
+Lemma sorted_subseq_sort_in t s :
+  {in s &, total leT} -> {in s & &, transitive leT} ->
+  subseq t s -> sorted leT t -> subseq t (sort leT s).
+Proof.
+move=> ? leT_tr ? /(sorted_sort_in leT_tr) <-; last exact/allP/mem_subseq.
+exact: subseq_sort_in.
+Qed.
+
+Lemma mem2_sort_in s :
+  {in s &, total leT} -> {in s & &, transitive leT} ->
+  forall x y, leT x y -> mem2 s x y -> mem2 (sort leT s) x y.
+Proof.
+move=> leT_total leT_tr x y lexy; rewrite !mem2E.
+by move/subseq_sort_in; case: (_ == _); rewrite /sort /= ?lexy; apply.
+Qed.
+
+End Stability_subseq_in.
 
 (* Function trajectories. *)
 

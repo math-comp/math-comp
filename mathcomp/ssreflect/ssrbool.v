@@ -102,6 +102,10 @@ Arguments mono_sym_in {aT rT} [aR rR f aD].
 Arguments homo_sym_in11 {aT rT} [aR rR f aD aD'].
 Arguments mono_sym_in11 {aT rT} [aR rR f aD aD'].
 
+(******************)
+(* v8.14 addtions *)
+(******************)
+
 Section LocalGlobal.
 
 Local Notation "{ 'all1' P }" := (forall x, P x : Prop) (at level 0).
@@ -208,6 +212,10 @@ Arguments on2S_in  {T1 T2 D1} D2 {f Q2}.
 Arguments in_on1S  {T1 T2} D2 {f Q1}.
 Arguments in_on1lS {T1 T2 T3} D2 {f h Q1l}.
 Arguments in_on2S  {T1 T2} D2 {f Q2}.
+
+(******************)
+(* v8.13 addtions *)
+(******************)
 
 Section CancelOn.
 
@@ -349,3 +357,34 @@ Proof. by case: b => // /(_ isT). Qed.
 Lemma contra_notF P b : (b -> P) -> ~ P -> b = false.
 Proof. by case: b => // /(_ isT). Qed.
 End Contra.
+
+(******************)
+(* v8.14 addtions *)
+(******************)
+
+Section in_sig.
+Local Notation "{ 'all1' P }" := (forall x, P x : Prop) (at level 0).
+Local Notation "{ 'all2' P }" := (forall x y, P x y : Prop) (at level 0).
+Local Notation "{ 'all3' P }" := (forall x y z, P x y z : Prop) (at level 0).
+
+Variables T1 T2 T3 : Type.
+Variables (D1 : {pred T1}) (D2 : {pred T2})  (D3 : {pred T3}).
+Variable P1 : T1 -> Prop.
+Variable P2 : T1 -> T2 -> Prop.
+Variable P3 : T1 -> T2 -> T3 -> Prop.
+
+Lemma in1_sig : {in D1, {all1 P1}} -> forall x : sig D1, P1 (sval x).
+Proof. by move=> DP [x Dx]; have := DP _ Dx. Qed.
+
+Lemma in2_sig : {in D1 & D2, {all2 P2}} ->
+  forall (x : sig D1) (y : sig D2), P2 (sval x) (sval y).
+Proof. by move=> DP [x Dx] [y Dy]; have := DP _ _ Dx Dy. Qed.
+
+Lemma in3_sig : {in D1 & D2 & D3, {all3 P3}} ->
+  forall (x : sig D1) (y : sig D2) (z : sig D3), P3 (sval x) (sval y) (sval z).
+Proof. by move=> DP [x Dx] [y Dy] [z Dz]; have := DP _ _ _ Dx Dy Dz. Qed.
+
+End in_sig.
+Arguments in1_sig {T1 D1 P1}.
+Arguments in2_sig {T1 T2 D1 D2 P2}.
+Arguments in3_sig {T1 T2 T3 D1 D2 D3 P3}.
