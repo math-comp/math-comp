@@ -110,9 +110,9 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*   A \in unitmx == A is invertible (R must be a comUnitRingType).           *)
 (*        invmx A == the inverse matrix of A if A \in unitmx A, otherwise A.  *)
 (* A \is a mxOver S == the matrix A has its coefficients in S.                *)
-(*     comm_mx A B := A *m B = B *m A                                         *)
-(*    comm_mxb A B := A *m B == B *m A                                        *)
-(*  all_comm_mx As := allrel comm_mxb                                         *)
+(*       comm_mx A B := A *m B = B *m A                                       *)
+(*      comm_mxb A B := A *m B == B *m A                                      *)
+(* all_comm_mx As fs := all2rel comm_mxb fs                                   *)
 (* The following operations provide a correspondence between linear functions *)
 (* and matrices:                                                              *)
 (*     lin1_mx f == the m x n matrix that emulates via right product          *)
@@ -2772,23 +2772,21 @@ Proof. by move=> comm_mxfF; elim/big_ind: _ => // g h; apply: comm_mxD. Qed.
 Lemma comm_mxP f g : reflect (comm_mx f g) (comm_mxb f g).
 Proof. exact: eqP. Qed.
 
-Notation all_comm_mx := (allrel comm_mxb).
+Notation all_comm_mx fs := (all2rel comm_mxb fs).
 
 Lemma all_comm_mxP fs :
   reflect {in fs &, forall f g, f *m g = g *m f} (all_comm_mx fs).
 Proof. by apply: (iffP allrelP) => fsP ? ? ? ?; apply/eqP/fsP. Qed.
 
 Lemma all_comm_mx1 f : all_comm_mx [:: f].
-Proof. by rewrite /comm_mxb allrel1. Qed.
+Proof. by rewrite /comm_mxb all2rel1. Qed.
 
 Lemma all_comm_mx2P f g : reflect (f *m g = g *m f) (all_comm_mx [:: f; g]).
-Proof.
-by rewrite /comm_mxb; apply: (iffP and4P) => [[_/eqP//]|->]; rewrite ?eqxx.
-Qed.
+Proof. by rewrite /comm_mxb /= all2rel2 ?eqxx //; exact: eqP. Qed.
 
 Lemma all_comm_mx_cons f fs :
   all_comm_mx (f :: fs) = all (comm_mxb f) fs && all_comm_mx fs.
-Proof. by rewrite /comm_mxb [LHS]allrel_cons. Qed.
+Proof. by rewrite /comm_mxb /= all2rel_cons //= eqxx. Qed.
 
 End CommMx.
 Notation all_comm_mx := (allrel comm_mxb).

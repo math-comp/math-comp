@@ -1078,21 +1078,20 @@ Section Class_Def.
 Variables aT rT : FalgType K.
 
 Definition ahom_in (U : {vspace aT}) (f : 'Hom(aT, rT)) :=
-  let fM_at x y := f (x * y) == f x * f y in
-  all (fun x => all (fM_at x) (vbasis U)) (vbasis U) && (f 1 == 1).
+  all2rel (fun x y : aT => f (x * y) == f x * f y) (vbasis U) && (f 1 == 1).
 
 Lemma ahom_inP {f : 'Hom(aT, rT)} {U : {vspace aT}} :
   reflect ({in U &, {morph f : x y / x * y >-> x * y}} * (f 1 = 1))
           (ahom_in U f).
 Proof.
-apply: (iffP andP) => [[/allP fM /eqP f1] | [fM f1]]; last first.
-  rewrite f1; split=> //; apply/allP=> x Ax; apply/allP=> y Ay.
+apply: (iffP andP) => [[/allrelP fM /eqP f1] | [fM f1]]; last first.
+  rewrite f1; split=> //; apply/allrelP => x y Ax Ay.
   by rewrite fM // vbasis_mem.
-split=> // x y  /coord_vbasis -> /coord_vbasis ->.
+split=> // x y /coord_vbasis -> /coord_vbasis ->.
 rewrite !mulr_suml ![f _]linear_sum mulr_suml; apply: eq_bigr => i _ /=.
 rewrite !mulr_sumr linear_sum; apply: eq_bigr => j _ /=.
 rewrite !linearZ -!scalerAr -!scalerAl 2!linearZ /=; congr (_ *: (_ *: _)).
-by apply/eqP/(allP (fM _ _)); apply: memt_nth.
+by apply/eqP/fM; apply: memt_nth.
 Qed.
 
 Lemma ahomP {f : 'Hom(aT, rT)} : reflect (lrmorphism f) (ahom_in {:aT} f).

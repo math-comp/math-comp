@@ -1097,24 +1097,24 @@ Hypothesis (leT_total : total leT) (leT'_tr : transitive leT').
 Let leT_lex := [rel x y | leT x y && (leT y x ==> leT' x y)].
 
 Lemma merge_stable_path x s1 s2 :
-  all (fun y => all (leT' y) s2) s1 ->
-  path leT_lex x s1 -> path leT_lex x s2 -> path leT_lex x (merge leT s1 s2).
+  allrel leT' s1 s2 -> path leT_lex x s1 -> path leT_lex x s2 ->
+  path leT_lex x (merge leT s1 s2).
 Proof.
 elim: s1 s2 x => //= x s1 ih1; elim => //= y s2 ih2 h.
-rewrite all_predI -andbA => /and4P [xy' xs2 ys1 s1s2].
-case/andP => hx xs1 /andP [] hy ys2; case: ifP => xy /=; rewrite (hx, hy) /=.
-- by apply: ih1; rewrite ?all_predI ?ys1 //= xy xy' implybT.
-- by apply: ih2; have:= leT_total x y; rewrite ?xs2 //= xy => /= ->.
+rewrite allrel_cons2 => /and4P [xy' xs2 ys1 s1s2] /andP [hx xs1] /andP [hy ys2].
+case: ifP => xy /=; rewrite (hx, hy) /=.
+- by apply: ih1; rewrite ?allrel_consr ?ys1 //= xy xy' implybT.
+- by apply: ih2; have:= leT_total x y; rewrite ?allrel_consl ?xs2 ?xy //= => ->.
 Qed.
 
 Lemma merge_stable_sorted s1 s2 :
-  all (fun x => all (leT' x) s2) s1 ->
-  sorted leT_lex s1 -> sorted leT_lex s2 -> sorted leT_lex (merge leT s1 s2).
+  allrel leT' s1 s2 -> sorted leT_lex s1 -> sorted leT_lex s2 ->
+  sorted leT_lex (merge leT s1 s2).
 Proof.
-case: s1 s2 => [|x s1] [|y s2] //=; rewrite all_predI -andbA.
+case: s1 s2 => [|x s1] [|y s2] //=; rewrite allrel_consl allrel_consr /= -andbA.
 case/and4P => [xy' xs2 ys1 s1s2] xs1 ys2; rewrite -/(merge _ (_ :: _)).
 by case: ifP (leT_total x y) => /= xy yx; apply/merge_stable_path;
-  rewrite /= ?(all_predI, xs2, ys1, xy, yx, xy', implybT).
+  rewrite /= ?(allrel_consl, allrel_consr, xs2, ys1, xy, yx, xy', implybT).
 Qed.
 
 End Stability_merge.
@@ -1142,9 +1142,9 @@ Proof.
 elim: ss s1 => [] // [] //= m s2 ss ihss s1; rewrite -2!andbA.
 move=> /and5P [sorted_s1 perm_s1 sorted_s2 perm_s2 hss]; apply: ihss.
 rewrite hss size_merge size_cat iotaD addnC -size_cat perm_merge perm_cat //.
-rewrite merge_stable_sorted // (perm_all _ perm_s2); apply/allP => n.
-rewrite mem_iota (perm_all _ perm_s1) => /andP [_ n_lt]; apply/allP => p.
-by rewrite mem_iota size_cat addnC => /andP [] /(leq_trans n_lt).
+rewrite merge_stable_sorted //; apply/allrelP => n p.
+rewrite (perm_mem perm_s1) (perm_mem perm_s2) !mem_iota size_cat addnC.
+by move=> /andP [_ n_lt] /andP [] /(leq_trans n_lt).
 Qed.
 
 Let pop_stable s1 ss :
@@ -1153,9 +1153,9 @@ Proof.
 elim: ss s1 => [s1 /andP [] /andP [] //|s2 ss ihss s1]; rewrite /= -2!andbA.
 move=> /and5P [sorted_s1 perm_s1 sorted_s2 perm_s2 hss]; apply: ihss.
 rewrite /= hss size_merge size_cat iotaD addnC -size_cat perm_merge perm_cat //.
-rewrite merge_stable_sorted // (perm_all _ perm_s2); apply/allP => n.
-rewrite mem_iota (perm_all _ perm_s1) => /andP [_ n_lt]; apply/allP => p.
-by rewrite mem_iota size_cat addnC => /andP [] /(leq_trans n_lt).
+rewrite merge_stable_sorted //; apply/allrelP => n p.
+rewrite (perm_mem perm_s1) (perm_mem perm_s2) !mem_iota size_cat addnC.
+by move=> /andP [_ n_lt] /andP [] /(leq_trans n_lt).
 Qed.
 
 Lemma sort_iota_stable n : sorted lt_lex (sort leN (iota 0 n)).

@@ -90,11 +90,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `seq.v`, new lemma `mkseqP` to abstract a sequence `s` with
   `mkseq f n`, where `f` and `n` are fresh variables.
 
-- in `seq.v`, new high-order predicate `allrel r s` which
-  asserts that a relation `r` holds on all pairs of elements of `s`, and
-  + lemmas `allrel_map`, `allrelP` and `allrel0`.
-  + lemmas `allrel1`, `allrel2` and `allrel_cons`,
-    under assumptions of reflexivity and symmetry of `r`.
+- in `seq.v`, new high-order relation `allrel r xs ys` which asserts that
+  `r x y` holds whenever `x` is in `xs` and `y` is in `ys`, new notation
+  `all2rel r xs (:= allrel r xs xs)` which asserts that `r` holds on all
+  pairs of elements of `xs`, and
+  + lemmas `allrel0(l|r)`, `allrel_cons(l|r|2)`, `allrel1(l|r)`,
+    `allrel_cat(l|r)`, `allrel_allpairsE`, `eq_in_allrel`, `eq_allrel`,
+    `allrelC`, `allrel_map(l|r)`, `allrelP`,
+  + lemmas `all2rel1`, `all2rel2`, and `all2rel_cons`
+    under assumptions of symmetry of `r`.
+
 - in `mxpoly.v`, new lemmas `mxminpoly_minP` and `dvd_mxminpoly`.
 - in `mxalgebra.v` new lemmas `row_base0`, `sub_kermx`, `kermx0` and
   `mulmx_free_eq0`.
