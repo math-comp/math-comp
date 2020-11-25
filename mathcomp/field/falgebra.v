@@ -1078,7 +1078,7 @@ Section Class_Def.
 Variables aT rT : FalgType K.
 
 Definition ahom_in (U : {vspace aT}) (f : 'Hom(aT, rT)) :=
-  all1rel (fun x y : aT => f (x * y) == f x * f y) (vbasis U) && (f 1 == 1).
+  all2rel (fun x y : aT => f (x * y) == f x * f y) (vbasis U) && (f 1 == 1).
 
 Lemma ahom_inP {f : 'Hom(aT, rT)} {U : {vspace aT}} :
   reflect ({in U &, {morph f : x y / x * y >-> x * y}} * (f 1 = 1))

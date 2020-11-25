@@ -289,7 +289,7 @@ Variables (K : {vspace L}) (D : 'End(L)).
 (* the deriviations used here are going to be linear, so we only define       *)
 (* the Derivation predicate for linear endomorphisms.                         *)
 Definition Derivation : bool :=
-  all1rel (fun u v => D (u * v) == D u * v + u * D v) (vbasis K).
+  all2rel (fun u v => D (u * v) == D u * v + u * D v) (vbasis K).
 
 Hypothesis derD : Derivation.
 

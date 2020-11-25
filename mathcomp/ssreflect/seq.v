@@ -134,7 +134,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*               := [:: f x_1 y_1; ...; f x_1 y_m; f x_2 y_1; ...; f x_n y_m] *)
 (* allrel r xs ys := all [pred x | all (r x) ys] xs                           *)
 (*                == r x y holds whenever x is in xs and y is in ys           *)
-(*   all1rel r xs := allrel r xs xs                                           *)
+(*   all2rel r xs := allrel r xs xs                                           *)
 (*                == the proposition r x y holds for all possible x, y in xs. *)
 (*        map f s == the sequence [:: f x_1, ..., f x_n].                     *)
 (*      pmap pf s == the sequence [:: y_i1, ..., y_ik] where i1 < ... < ik,   *)
@@ -3540,7 +3540,7 @@ Arguments allrel_catl {T S} r xs xs' ys.
 Arguments allrel_catr {T S} r xs ys ys'.
 Arguments allrel_allpairsE {T S} r xs ys.
 
-Notation all1rel r xs := (allrel r xs xs).
+Notation all2rel r xs := (allrel r xs xs).
 
 Lemma eq_in_allrel {T S : Type} (P : {pred T}) (Q : {pred S}) r r' :
   {in P & Q, r =2 r'} ->
@@ -3551,9 +3551,9 @@ congr andb => /=; last exact: IH.
 by elim: ys Qys {IH} => //= y ys IH /andP [Qy Qys]; rewrite rr' // IH.
 Qed.
 
-Lemma eq_allrel {T S : Type} (r r': T -> S -> bool) xs ys :
-  r =2 r' -> allrel r xs ys = allrel r' xs ys.
-Proof. by move=> rr'; apply/eq_in_allrel/all_predT/all_predT. Qed.
+Lemma eq_allrel {T S : Type} (r r': T -> S -> bool) :
+  r =2 r' -> allrel r =2 allrel r'.
+Proof. by move=> rr' xs ys; apply/eq_in_allrel/all_predT/all_predT. Qed.
 
 Lemma allrelC {T S : Type} (r : T -> S -> bool) xs ys :
   allrel r xs ys = allrel (fun y => r^~ y) ys xs.
@@ -3571,26 +3571,26 @@ Lemma allrelP {T S : eqType} {r : T -> S -> bool} {xs ys} :
   reflect {in xs & ys, forall x y, r x y} (allrel r xs ys).
 Proof. by rewrite allrel_allpairsE; exact: all_allpairsP. Qed.
 
-Section All1Rel.
+Section All2Rel.
 
 Variable (T : nonPropType) (r : rel T).
 Implicit Types (x y z : T) (xs : seq T).
 Hypothesis (rsym : symmetric r).
 
-Lemma all1rel1 x : all1rel r [:: x] = r x x.
+Lemma all2rel1 x : all2rel r [:: x] = r x x.
 Proof. by rewrite /allrel /= !andbT. Qed.
 
-Lemma all1rel2 x y : all1rel r [:: x; y] = r x x && r y y && r x y.
+Lemma all2rel2 x y : all2rel r [:: x; y] = r x x && r y y && r x y.
 Proof. by rewrite /allrel /= rsym; do 3 case: r. Qed.
 
-Lemma all1rel_cons x xs :
-  all1rel r (x :: xs) = [&& r x x, all (r x) xs & all1rel r xs].
+Lemma all2rel_cons x xs :
+  all2rel r (x :: xs) = [&& r x x, all (r x) xs & all2rel r xs].
 Proof.
 rewrite allrel_cons2; congr andb; rewrite andbA -all_predI; congr andb.
 by elim: xs => //= y xs ->; rewrite rsym andbb.
 Qed.
 
-End All1Rel.
+End All2Rel.
 
 Section Permutations.
 
