@@ -1536,11 +1536,7 @@ Lemma bigD1_ord n j (P : pred 'I_n) F :
     = F j * \big[*%M/1]_(i < n.-1 | P (lift j i)) F (lift j i).
 Proof.
 move=> Pj; rewrite (bigD1 j Pj) (reindex_omap (lift j) (unlift j))/=.
-  (** Coq >= 8.10 *)
-  (* by under eq_bigl do rewrite liftK eq_sym eqxx neq_lift ?andbT. *)
-  (** Coq >= 8.7 *)
-  congr (_ * _); apply: eq_bigl => i.
-  by rewrite liftK eq_sym eqxx neq_lift ?andbT.
+  by under eq_bigl do rewrite liftK eq_sym eqxx neq_lift ?andbT.
 by move=> i; case: unliftP => [k ->|->]; rewrite ?eqxx ?andbF.
 Qed.
 
