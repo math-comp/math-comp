@@ -511,7 +511,7 @@ HB.mixin Record is_SUB (T : Type) (P : pred T) (sub_sort : indexed Type) := SubT
   val : sub_sort -> T;
   Sub : forall x, P x -> sub_sort;
   Sub_rect : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
-  SubK : forall x Px, val (@Sub x Px) = x
+  SubK_subproof : forall x Px, val (@Sub x Px) = x
 }.
 
 HB.structure Definition SUB (T : Type) (P : pred T) := { S of is_SUB T P S }.
@@ -522,6 +522,7 @@ HB.structure Definition subEquality T (P : pred T) :=
   { sT of Equality sT & is_SUB T P sT}.
 
 Notation subEqType := subEquality.type.
+Notation val := (is_SUB.val (SUB.class _)).
 
 Section SubType.
 
@@ -536,8 +537,10 @@ Section Theory.
 
 Variable sT : subType P.
 
-Local Notation val := (@val _ _ sT).
+Local Notation val := (is_SUB.val (SUB.class sT)).
 Local Notation Sub := (@Sub _ _ sT).
+
+Lemma SubK x Px : val (@Sub x Px) = x. Proof. exact: SubK_subproof. Qed.
 
 Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
 
@@ -607,7 +610,7 @@ End Theory.
 
 End SubType.
 
-Arguments val {T P sT} u : rename.
+(* Arguments val {T P sT} u : rename. *)
 Arguments Sub {T P sT} x Px : rename.
 Arguments vrefl {T P} x Px.
 Arguments vrefl_rect {T P} x Px.

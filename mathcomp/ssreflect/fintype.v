@@ -1741,15 +1741,12 @@ Inductive ordinal : predArgType := Ordinal m of m < n.
 
 Coercion nat_of_ord i := let: Ordinal m _ := i in m.
 
-Canonical ordinal_subType := [subType for nat_of_ord].
-Definition ordinal_eqMixin := Eval hnf in [eqMixin of ordinal by <:].
-Canonical ordinal_eqType := Eval hnf in EqType ordinal ordinal_eqMixin.
-Definition ordinal_choiceMixin := [choiceMixin of ordinal by <:].
-Canonical ordinal_choiceType :=
-  Eval hnf in ChoiceType ordinal ordinal_choiceMixin.
-Definition ordinal_countMixin := [countMixin of ordinal by <:].
-Canonical ordinal_countType := Eval hnf in CountType ordinal ordinal_countMixin.
-Canonical ordinal_subCountType := [subCountType of ordinal].
+Definition ordinal_subMixin := (BuildSubTypeFor ordinal nat_of_ord).
+HB.instance ordinal ordinal_subMixin.
+HB.instance Definition ordinal_eqMixin : is_eqType ordinal :=
+  [eqMixin of ordinal by <:].
+HB.instance Definition ordinal_choiceMixin := [choiceMixin of ordinal by <:].
+HB.instance Definition ordinal_countMixin := [countMixin of ordinal by <:].
 
 Lemma ltn_ord (i : ordinal) : i < n. Proof. exact: valP i. Qed.
 
@@ -1769,10 +1766,8 @@ Proof. by rewrite pmap_sub_uniq ?iota_uniq. Qed.
 Lemma mem_ord_enum i : i \in ord_enum.
 Proof. by rewrite -(mem_map ord_inj) val_ord_enum mem_iota ltn_ord. Qed.
 
-Definition ordinal_finMixin :=
-  Eval hnf in UniqFinMixin ord_enum_uniq mem_ord_enum.
-Canonical ordinal_finType := Eval hnf in FinType ordinal ordinal_finMixin.
-Canonical ordinal_subFinType := Eval hnf in [subFinType of ordinal].
+HB.instance Definition ordinal_finMixin : is_finite ordinal :=
+  UniqFinMixin ord_enum_uniq mem_ord_enum.
 
 End OrdinalSub.
 
@@ -1885,7 +1880,7 @@ Proof. exact: nth_image. Qed.
 Lemma nth_enum_rank_in x00 x0 A Ax0 :
   {in A, cancel (@enum_rank_in x0 A Ax0) (nth x00 (enum A))}.
 Proof.
-move=> x Ax; rewrite /= insubdK ?nth_index ?mem_enum //.
+move=> x Ax; rewrite insubdK ?nth_index ?mem_enum //.
 by rewrite cardE [_ \in _]index_mem mem_enum.
 Qed.
 
@@ -2210,8 +2205,8 @@ Proof.
 by case=> x1 x2; rewrite (predX_prod_enum (pred1 x1) (pred1 x2)) !card1.
 Qed.
 
-Definition prod_finMixin := Eval hnf in FinMixin prod_enumP.
-Canonical prod_finType := Eval hnf in FinType (T1 * T2) prod_finMixin.
+HB.instance Definition prod_finMixin : is_finite (T1 * T2)%type :=
+  FinMixin prod_enumP.
 
 Lemma cardX (A1 : {pred T1}) (A2 : {pred T2}) :
   #|[predX A1 & A2]| = #|A1| * #|A2|.
@@ -2242,8 +2237,7 @@ rewrite -size_filter -cardE /=; case: eqP => [-> | ne_j_i].
 by apply: eq_card0 => y.
 Qed.
 
-Definition tag_finMixin := Eval hnf in FinMixin tag_enumP.
-Canonical tag_finType := Eval hnf in FinType {i : I & T_ i} tag_finMixin.
+HB.instance Definition tag_finMixin : is_finite {i : I & T_ i} := FinMixin tag_enumP.
 
 Lemma card_tagged :
   #|{: {i : I & T_ i}}| = sumn (map (fun i => #|T_ i|) (enum I)).
@@ -2270,8 +2264,8 @@ Qed.
 Lemma mem_sum_enum u : u \in sum_enum.
 Proof. by case: u => x; rewrite mem_cat -!enumT map_f ?mem_enum ?orbT. Qed.
 
-Definition sum_finMixin := Eval hnf in UniqFinMixin sum_enum_uniq mem_sum_enum.
-Canonical sum_finType := Eval hnf in FinType (T1 + T2) sum_finMixin.
+HB.instance Definition sum_finMixin : is_finite (T1 + T2)%type :=
+  UniqFinMixin sum_enum_uniq mem_sum_enum.
 
 Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
 Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.

@@ -2,6 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime.
+From HB Require Import structures.
 
 (******************************************************************************)
 (* This files defines types equipped with order relations.                    *)
