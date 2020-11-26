@@ -137,7 +137,7 @@ if pkgs.lib.trivial.inNixShell then pkg.overrideAttrs (old: {
   buildInputs = if do-nothing then []
                 else (old.buildInputs ++
                 (if pkgs.lib.trivial.inNixShell then pkgs.lib.optional withEmacs pkgs.emacs
-                 else []));
+                 else [])) ++ [ pkgs.lua pkgs.sedutil ];
 
   propagatedBuildInputs = if do-nothing then [] else old.propagatedBuildInputs;
 
