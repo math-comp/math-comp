@@ -661,11 +661,14 @@ Local Notation inlined_sub_rect :=
 Local Notation inlined_new_rect :=
   (fun K K_S u => let (x) as u return K u := u in K_S x).
 
-Notation "[ 'subType' 'for' v ]" := (SubType _ v _ inlined_sub_rect vrefl_rect)
- (at level 0, only parsing) : form_scope.
+Reserved Notation "[ 'subType' 'for' v ]"
+  (at level 0, format "[ 'subType'  'for'  v ]").
 
-Notation "[ 'sub' 'Type' 'for' v ]" := (SubType _ v _ _ vrefl_rect)
- (at level 0, format "[ 'sub' 'Type'  'for'  v ]") : form_scope.
+Notation "[ 'subType' 'for' v ]" := (SubType _ v _ inlined_sub_rect vrefl_rect)
+ (only parsing) : form_scope.
+
+Notation "[ 'subType' 'for' v ]" := (SubType _ v _ _ vrefl_rect)
+ (only printing) : form_scope.
 
 Notation "[ 'subType' 'for' v 'by' rec ]" := (SubType _ v _ rec vrefl)
  (at level 0, format "[ 'subType'  'for'  v  'by'  rec ]") : form_scope.
@@ -681,11 +684,13 @@ Definition NewType T U v c Urec :=
   SubType U v (fun x _ => c x) Urec'.
 Arguments NewType [T U].
 
-Notation "[ 'newType' 'for' v ]" := (NewType v _ inlined_new_rect vrefl_rect)
- (at level 0, only parsing) : form_scope.
+Reserved Notation "[ 'newType' 'for' v ]" (at level 0, format "[ 'newType'  'for'  v ]").
 
-Notation "[ 'new' 'Type' 'for' v ]" := (NewType v _ _ vrefl_rect)
- (at level 0, format "[ 'new' 'Type'  'for'  v ]") : form_scope.
+Notation "[ 'newType' 'for' v ]" := (NewType v _ inlined_new_rect vrefl_rect)
+ (only parsing) : form_scope.
+
+Notation "[ 'newType' 'for' v ]" := (NewType v _ _ vrefl_rect)
+ (only printing) : form_scope.
 
 Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
  (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.

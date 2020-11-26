@@ -507,6 +507,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `coprimez_mul(l|r)` -> `coprimezM(l|r)`
   + `coprimez_exp(l|r)` -> `coprimezX(l|r)`
 
+- in `finset.v`, fixed printing of notation `[set E | x in A , y in B & P ]`
+
 ### Removed
 
 - in `interval.v`, we remove the following:

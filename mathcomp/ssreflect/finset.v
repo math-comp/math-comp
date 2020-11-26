@@ -1101,16 +1101,16 @@ Notation "f @2: ( A , B )" := (imset2 f (mem A) (fun _ => mem B))
 Notation "[ 'set' E | x 'in' A ]" := ((fun x => E) @: A)
   (at level 0, E, x at level 99,
    format "[ '[hv' 'set'  E '/ '  |  x  'in'  A ] ']'") : set_scope.
-Notation "[ 'set' E | x 'in' A & P ]" := [set E | x in [set x in A | P]]
+Notation "[ 'set' E | x 'in' A & P ]" := [set E | x in pred_of_set [set x in A | P]]
   (at level 0, E, x at level 99,
    format "[ '[hv' 'set'  E '/ '  |  x  'in'  A '/ '  &  P ] ']'") : set_scope.
 Notation "[ 'set' E | x 'in' A , y 'in' B ]" :=
-  (imset2 (fun x y => E) (mem A) (fun x => (mem B)))
+  (imset2 (fun x y => E) (mem A) (fun x => mem B))
   (at level 0, E, x, y at level 99, format
    "[ '[hv' 'set'  E '/ '  |  x  'in'  A , '/   '  y  'in'  B ] ']'"
   ) : set_scope.
 Notation "[ 'set' E | x 'in' A , y 'in' B & P ]" :=
-  [set E | x in A, y in [set y in B | P]]
+  [set E | x in A, y in pred_of_set [set y in B | P]]
   (at level 0, E, x, y at level 99, format
    "[ '[hv' 'set'  E '/ '  |  x  'in'  A , '/   '  y  'in'  B '/ '  &  P ] ']'"
   ) : set_scope.
@@ -1122,7 +1122,7 @@ Notation "[ 'set' E | x : T 'in' A & P ]" :=
   [set E | x : T in [set x : T in A | P]]
   (at level 0, E, x at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U 'in' B ]" :=
-  (imset2 (fun (x : T) (y : U) => E) (mem A) (fun (x : T) => (mem B)))
+  (imset2 (fun (x : T) (y : U) => E) (mem A) (fun (x : T) => mem B))
   (at level 0, E, x, y at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U 'in' B & P ]" :=
   [set E | x : T in A, y : U in [set y : U in B | P]]
@@ -1133,7 +1133,8 @@ Local Notation predOfType T := (pred_of_simpl (@pred_of_argType T)).
 Notation "[ 'set' E | x : T ]" := [set E | x : T in predOfType T]
   (at level 0, E, x at level 99,
    format "[ '[hv' 'set'  E '/ '  |  x  :  T ] ']'") : set_scope.
-Notation "[ 'set' E | x : T & P ]" := [set E | x : T in [set x : T | P]]
+Notation "[ 'set' E | x : T & P ]" :=
+  [set E | x : T in pred_of_set [set x : T | P]]
   (at level 0, E, x at level 99,
    format "[ '[hv' 'set'  E '/ '  |  x  :  T '/ '  &  P ] ']'") : set_scope.
 Notation "[ 'set' E | x : T , y : U 'in' B ]" :=
@@ -1142,7 +1143,7 @@ Notation "[ 'set' E | x : T , y : U 'in' B ]" :=
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U  'in'  B ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T , y : U 'in' B & P ]" :=
-  [set E | x : T, y : U in [set y in B | P]]
+  [set E | x : T, y : U in pred_of_set [set y in B | P]]
   (at level 0, E, x, y at level 99, format
  "[ '[hv ' 'set'  E '/'  |  x  :  T , '/  '  y  :  U  'in'  B '/'  &  P ] ']'"
   ) : set_scope.
@@ -1152,7 +1153,7 @@ Notation "[ 'set' E | x : T 'in' A , y : U ]" :=
    "[ '[hv' 'set'  E '/ '  |  x  :  T  'in'  A , '/   '  y  :  U ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U & P ]" :=
-  [set E | x : T in A, y : U in [set y in P]]
+  [set E | x : T in A, y : U in pred_of_set [set y in P]]
   (at level 0, E, x, y at level 99, format
    "[ '[hv' 'set'  E '/ '  |  x  :  T  'in'  A , '/   '  y  :  U  &  P ] ']'")
    : set_scope.
@@ -1162,7 +1163,7 @@ Notation "[ 'set' E | x : T , y : U ]" :=
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T , y : U & P ]" :=
-  [set E | x : T, y : U in [set y in P]]
+  [set E | x : T, y : U in pred_of_set [set y in P]]
   (at level 0, E, x, y at level 99, format
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U  &  P ] ']'")
    : set_scope.
@@ -1180,48 +1181,6 @@ Notation "[ 'set' E | x , y ]" := [set E | x : _, y : _]
   (at level 0, E, x, y at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x , y & P ]" := [set E | x : _, y : _ & P ]
   (at level 0, E, x, y at level 99, only parsing) : set_scope.
-
-(* Print-only variants to work around the Coq pretty-printer K-term kink. *)
-Notation "[ 'se' 't' E | x 'in' A , y 'in' B ]" :=
-  (imset2 (fun x y => E) (mem A) (fun _ => mem B))
-  (at level 0, E, x, y at level 99, format
-   "[ '[hv' 'se' 't'  E '/ '  |  x  'in'  A , '/   '  y  'in'  B ] ']'")
-   : set_scope.
-Notation "[ 'se' 't' E | x 'in' A , y 'in' B & P ]" :=
-  [se t E | x in A, y in [set y in B | P]]
-  (at level 0, E, x, y at level 99, format
- "[ '[hv ' 'se' 't'  E '/'  |  x  'in'  A , '/  '  y  'in'  B '/'  &  P ] ']'"
-  ) : set_scope.
-Notation "[ 'se' 't' E | x : T , y : U 'in' B ]" :=
-  (imset2 (fun x (y : U) => E) (mem (predOfType T)) (fun _ => mem B))
-  (at level 0, E, x, y at level 99, format
-   "[ '[hv ' 'se' 't'  E '/'  |  x  :  T , '/  '  y  :  U  'in'  B ] ']'")
-   : set_scope.
-Notation "[ 'se' 't' E | x : T , y : U 'in' B & P ]" :=
-  [se t E | x : T, y : U in [set y in B | P]]
-  (at level 0, E, x, y at level 99, format
-"[ '[hv ' 'se' 't'  E '/'  |  x  :  T , '/  '  y  :  U  'in'  B '/'  &  P ] ']'"
-  ) : set_scope.
-Notation "[ 'se' 't' E | x : T 'in' A , y : U ]" :=
-  (imset2 (fun x y => E) (mem A) (fun _ : T => mem (predOfType U)))
-  (at level 0, E, x, y at level 99, format
-   "[ '[hv' 'se' 't'  E '/ '  |  x  :  T  'in'  A , '/   '  y  :  U ] ']'")
-   : set_scope.
-Notation "[ 'se' 't' E | x : T 'in' A , y : U & P ]" :=
-  (imset2 (fun x (y : U) => E) (mem A) (fun _ : T => mem [set y \in P]))
-  (at level 0, E, x, y at level 99, format
-"[ '[hv ' 'se' 't'  E '/'  |  x  :  T  'in'  A , '/  '  y  :  U '/'  &  P ] ']'"
-  ) : set_scope.
-Notation "[ 'se' 't' E | x : T , y : U ]" :=
-  [se t E | x : T, y : U in predOfType U]
-  (at level 0, E, x, y at level 99, format
-   "[ '[hv' 'se' 't'  E '/ '  |  x  :  T , '/   '  y  :  U ] ']'")
-   : set_scope.
-Notation "[ 'se' 't' E | x : T , y : U & P ]" :=
-  [se t E | x : T, y : U in [set y in P]]
-  (at level 0, E, x, y at level 99, format
-   "[ '[hv' 'se' 't'  E '/'  |  x  :  T , '/   '  y  :  U '/'  &  P ] ']'")
-   : set_scope.
 
 Section FunImage.
 

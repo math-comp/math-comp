@@ -1,0 +1,6 @@
+ker_sdprodm
+     : forall (gT rT : finGroupType) (H K G : {group gT})
+         (fH : {morphism H >-> rT}) (fK : {morphism K >-> rT})
+         (eqHK_G : H ><| K = G) (actf : {in H & K, morph_act 'J 'J fH fK}),
+       'ker (sdprodm eqHK_G actf) =
+       [set a * b^-1 | a in H, b in K & fH a == fK b]
