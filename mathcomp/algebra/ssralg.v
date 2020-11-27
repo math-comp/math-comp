@@ -1448,69 +1448,25 @@ Proof. by move/(@lregX Rc x n); rewrite revrX. Qed.
 
 End RightRegular.
 
-Module Lmodule.
-
-Structure mixin_of (R : ringType) (V : zmodType) : Type := Mixin {
+HB.mixin Record is_Lmodule_of_Zmodule (R : ringType) V of Zmodule V := {
   scale : R -> V -> V;
-  _ : forall a b v, scale a (scale b v) = scale (a * b) v;
-  _ : left_id 1 scale;
-  _ : right_distributive scale +%R;
-  _ : forall v, {morph scale^~ v: a b / a + b}
+  scalerA : forall a b v, scale a (scale b v) = scale (a * b) v;
+  scale1r : left_id 1 scale;
+  scalerDr : right_distributive scale +%R;
+  scalerDl : forall v, {morph scale^~ v: a b / a + b}
 }.
+#[mathcomp] HB.structure Definition Lmodule (R : ringType) :=
+  {M of Zmodule M & is_Lmodule_of_Zmodule R M}.
 
-Section ClassDef.
-
-Variable R : ringType.
-
-Structure class_of V := Class {
-  base : Zmodule.class_of V;
-  mixin : mixin_of R (Zmodule.Pack base)
-}.
-Local Coercion base : class_of >-> Zmodule.class_of.
-
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variable (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack phR T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
-
-Definition pack b0 (m0 : mixin_of R (@Zmodule.Pack T b0)) :=
-  fun bT b & phant_id (Zmodule.class bT) b =>
-  fun    m & phant_id m0 m => Pack phR (@Class T b m).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @Zmodule.Pack cT xclass.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base : class_of >-> Zmodule.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> Zmodule.type.
-Canonical zmodType.
-Notation lmodType R := (type (Phant R)).
-Notation LmodType R T m := (@pack _ (Phant R) T _ m _ _ id _ id).
-Notation LmodMixin := Mixin.
-Notation "[ 'lmodType' R 'of' T 'for' cT ]" := (@clone _ (Phant R) T cT _ idfun)
+Definition lmodType_of (R : ringType) (phR : phant R) := Lmodule.type R.
+Notation lmodType R := (lmodType_of (Phant R)).
+Notation LmodType R T m := (@Lmodule.pack _ [ringType of R] T _ m _ _ id _ id).
+Notation LmodMixin := Lmodule.Mixin.
+Notation "[ 'lmodType' R 'of' T 'for' cT ]" :=
+  (@Lmodule.clone [ringType of R] T cT)
   (at level 0, format "[ 'lmodType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'lmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
+Notation "[ 'lmodType' R 'of' T ]" := [lmodType R of T for _]
   (at level 0, format "[ 'lmodType'  R  'of'  T ]") : form_scope.
-End Exports.
-
-End Lmodule.
-Import Lmodule.Exports.
-
-Definition scale (R : ringType) (V : lmodType R) : R -> V -> V :=
-  Lmodule.scale (Lmodule.class V).
 
 Local Notation "*:%R" := (@scale _ _).
 Local Notation "a *: v" := (scale a v) : ring_scope.
@@ -1521,18 +1477,6 @@ Variables (R : ringType) (V : lmodType R).
 Implicit Types (a b c : R) (u v : V).
 
 Local Notation "*:%R" := (@scale R V).
-
-Lemma scalerA a b v : a *: (b *: v) = a * b *: v.
-Proof. by case: V v => ? [] ? []. Qed.
-
-Lemma scale1r : @left_id R V 1 *:%R.
-Proof. by case: V => ? [] ? []. Qed.
-
-Lemma scalerDr a : {morph *:%R a : u v / u + v}.
-Proof. by case: V a => ? [] ? []. Qed.
-
-Lemma scalerDl v : {morph *:%R^~ v : a b / a + b}.
-Proof. by case: V v => ? [] ? []. Qed.
 
 Lemma scale0r v : 0 *: v = 0.
 Proof. by apply: (addIr (1 *: v)); rewrite -scalerDl !add0r. Qed.
@@ -1608,74 +1552,23 @@ End ClosedPredicates.
 
 End LmoduleTheory.
 
-Module Lalgebra.
-
-Definition axiom (R : ringType) (V : lmodType R) (mul : V -> V -> V) :=
-  forall a u v, a *: mul u v = mul (a *: u) v.
-
-Section ClassDef.
-
-Variable R : ringType.
-
-Record class_of (T : Type) : Type := Class {
-  base : Ring.class_of T;
-  mixin : Lmodule.mixin_of R (Zmodule.Pack base);
-  ext : @axiom R (Lmodule.Pack _ (Lmodule.Class mixin)) (Ring.mul base)
+HB.mixin Record is_Lalgebra_of_Lmodule (R : ringType) V of
+  Ring V & Lmodule R V := {
+    scalerAl : forall (a : R) (u v : V), a *: (u * v) = (a *: u) * v
 }.
-Definition base2 R m := Lmodule.Class (@mixin R m).
-Local Coercion base : class_of >-> Ring.class_of.
-Local Coercion base2 : class_of >-> Lmodule.class_of.
+#[mathcomp] HB.structure Definition Lalgebra (R : ringType) :=
+  {A of is_Lalgebra_of_Lmodule R A &}.
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variable (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack phR T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
-
-Definition pack b0 mul0 (axT : @axiom R (@Lmodule.Pack R _ T b0) mul0) :=
-  fun bT b & phant_id (Ring.class bT) (b : Ring.class_of T) =>
-  fun mT m & phant_id (@Lmodule.class R phR mT) (@Lmodule.Class R T b m) =>
-  fun ax & phant_id axT ax =>
-  Pack (Phant R) (@Class T b m ax).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @Ring.Pack cT xclass.
-Definition lmodType := @Lmodule.Pack R phR cT xclass.
-Definition lmod_ringType := @Lmodule.Pack R phR ringType xclass.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> Ring.class_of.
-Coercion base2 : class_of >-> Lmodule.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> Ring.type.
-Canonical ringType.
-Coercion lmodType : type >-> Lmodule.type.
-Canonical lmodType.
-Canonical lmod_ringType.
-Notation lalgType R := (type (Phant R)).
-Notation LalgType R T a := (@pack _ (Phant R) T _ _ a _ _ id _ _ id _ id).
-Notation "[ 'lalgType' R 'of' T 'for' cT ]" := (@clone _ (Phant R) T cT _ idfun)
-  (at level 0, format "[ 'lalgType'  R  'of'  T  'for'  cT ]")
-  : form_scope.
-Notation "[ 'lalgType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
+Definition lalgType_of (R : ringType) (phR : phant R) := Lalgebra.type R.
+Notation lalgType R := (lalgType_of (Phant R)).
+Notation LalgType R T m := (@Lalgebra.pack _ [ringType of R] T _ m _ _ id _ id).
+Notation LalgMixin := Lalgebra.Mixin.
+Notation "[ 'lalgType' R 'of' T 'for' cT ]" :=
+  (@Lalgebra.clone [ringType of R] T cT)
+  (at level 0, format "[ 'lalgType'  R  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'lalgType' R 'of' T ]" := [lalgType R of T for _]
   (at level 0, format "[ 'lalgType'  R  'of'  T ]") : form_scope.
-End Exports.
 
-End Lalgebra.
-Import Lalgebra.Exports.
 
 (* Scalar injection (see the definition of in_alg A below). *)
 Local Notation "k %:A" := (k *: 1) : ring_scope.
@@ -1689,23 +1582,18 @@ Section LalgebraTheory.
 Variables (R : ringType) (A : lalgType R).
 Implicit Types x y : A.
 
-Lemma scalerAl k (x y : A) : k *: (x * y) = k *: x * y.
-Proof. by case: A k x y => ? []. Qed.
-
-Lemma mulr_algl a x : a%:A * x = a *: x.
+Lemma mulr_algl a x : (a *: 1) * x = a *: x.
 Proof. by rewrite -scalerAl mul1r. Qed.
 
-Canonical regular_eqType := [eqType of R^o].
-Canonical regular_choiceType := [choiceType of R^o].
-Canonical regular_zmodType := [zmodType of R^o].
-Canonical regular_ringType := [ringType of R^o].
+HB.instance (R^o) (Ring.class R).
 
 Definition regular_lmodMixin :=
-  let mkMixin := @Lmodule.Mixin R regular_zmodType (@mul R) in
+  let mkMixin := @Lmodule.Mixin  (@mul R) in
   mkMixin (@mulrA R) (@mul1r R) (@mulrDr R) (fun v a b => mulrDl a b v).
+HB.instance (R^o) regular_lmodMixin.
 
-Canonical regular_lmodType := LmodType R R^o regular_lmodMixin.
-Canonical regular_lalgType := LalgType R R^o (@mulrA regular_ringType).
+HB.instance Definition regular_lalgMixin : is_Lalgebra_of_Lmodule R (R^o) :=
+  is_Lalgebra_of_Lmodule.Build R (R^o) mulrA.
 
 Section ClosedPredicates.
 
@@ -2418,71 +2306,26 @@ Qed.
 
 End LRMorphismTheory.
 
-Module ComRing.
+HB.mixin Record commutative_mul R of Ring R := {
+  mulrC : commutative (@mul [ringType of R])
+}.
+#[mathcomp]
+HB.structure Definition ComRing := {R of Ring R & commutative_mul R}.
 
-Definition RingMixin R one mul mulA mulC mul1x mul_addl :=
-  let mulx1 := Monoid.mulC_id mulC mul1x in
-  let mul_addr := Monoid.mulC_dist mulC mul_addl in
-  @Ring.EtaMixin R one mul mulA mul1x mulx1 mul_addl mul_addr.
-
-Section ClassDef.
-
-Record class_of R :=
-  Class {base : Ring.class_of R; mixin : commutative (Ring.mul base)}.
-Local Coercion base : class_of >-> Ring.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variable (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Let xT := let: Pack T _ := cT in T.
-Notation xclass := (class : class_of xT).
-
-Definition pack mul0 (m0 : @commutative T T mul0) :=
-  fun bT b & phant_id (Ring.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
-
-Definition eqType := @Equality.Pack cT xclass.
-Definition choiceType := @Choice.Pack cT xclass.
-Definition zmodType := @Zmodule.Pack cT xclass.
-Definition ringType := @Ring.Pack cT xclass.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> Ring.class_of.
-Arguments mixin [R].
-Coercion mixin : class_of >-> commutative.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> Ring.type.
-Canonical ringType.
-Notation comRingType := type.
-Notation ComRingType T m := (@pack T _ m _ _ id _ id).
-Notation ComRingMixin := RingMixin.
-Notation "[ 'comRingType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
+Notation comRingType := ComRing.type.
+Notation ComRingType T m := (ComRing.pack T m).
+Notation ComRingMixin := ComRing.Mixin.
+Notation "[ 'comRingType' 'of' T 'for' cT ]" := (ComRing.clone T cT)
   (at level 0, format "[ 'comRingType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'comRingType' 'of' T ]" := (@clone T _ _ id)
+Notation "[ 'comRingType' 'of' T ]" := (ComRing.clone T _)
   (at level 0, format "[ 'comRingType'  'of'  T ]") : form_scope.
-End Exports.
-
-End ComRing.
-Import ComRing.Exports.
 
 Section ComRingTheory.
 
 Variable R : comRingType.
 Implicit Types x y : R.
 
-Lemma mulrC : @commutative R R *%R. Proof. by case: R => T []. Qed.
-Canonical mul_comoid := Monoid.ComLaw mulrC.
+Canonical mul_comoid := Monoid.ComLaw (@mulrC R).
 Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
