@@ -126,13 +126,14 @@ Definition cycle p := if p is x :: p' then path x (rcons p' x) else true.
 Lemma cycle_path p : cycle p = path (last x0_cycle p) p.
 Proof. by case: p => //= x p; rewrite rcons_path andbC. Qed.
 
-Lemma rot_cycle p : cycle (rot n0 p) = cycle p.
+Lemma cycle_catC p q : cycle (p ++ q) = cycle (q ++ p).
 Proof.
-case: n0 p => [|n] [|y0 p] //=; first by rewrite /rot /= cats0.
-rewrite /rot /= -[p in RHS](cat_take_drop n) -cats1 -catA cat_path.
-case: (drop n p) => [|z0 q]; rewrite /= -cats1 !cat_path /= !andbT andbC //.
-by rewrite last_cat; repeat bool_congr.
+case: p q => [|x p] [|y q]; rewrite /= ?cats0 //=.
+by rewrite !rcons_path !cat_path !last_cat /= -!andbA; do !bool_congr.
 Qed.
+
+Lemma rot_cycle p : cycle (rot n0 p) = cycle p.
+Proof. by rewrite cycle_catC cat_take_drop. Qed.
 
 Lemma rotr_cycle p : cycle (rotr n0 p) = cycle p.
 Proof. by rewrite -rot_cycle rotrK. Qed.
@@ -147,24 +148,46 @@ Proof. by case: s => //= y s /andP [->]. Qed.
 
 End Path.
 
+Section RevPath.
+
+Variables (e : rel T).
+
+Lemma rev_path x p :
+  path e (last x p) (rev (belast x p)) = path (fun z => e^~ z) x p.
+Proof.
+elim: p x => //= y p IHp x; rewrite rev_cons rcons_path -{}IHp andbC.
+by rewrite -(last_cons x) -rev_rcons -lastI rev_cons last_rcons.
+Qed.
+
+Lemma rev_cycle p : cycle e (rev p) = cycle (fun z => e^~ z) p.
+Proof.
+case: p => //= x p; rewrite -rev_path last_rcons belast_rcons rev_cons.
+by rewrite -[in LHS]cats1 cycle_catC.
+Qed.
+
+Lemma rev_sorted p : sorted e (rev p) = sorted (fun z => e^~ z) p.
+Proof. by case: p => //= x p; rewrite -rev_path lastI rev_rcons. Qed.
+
+End RevPath.
+
 Section SubPath_in.
 
 Variable (P : {pred T}) (e e' : rel T).
 Hypothesis (ee' : {in P &, subrel e e'}).
 
-Lemma sub_path_in x s : all P (x :: s) -> path e x s -> path e' x s.
+Lemma sub_in_path x s : all P (x :: s) -> path e x s -> path e' x s.
 Proof.
 by elim: s x => //= y s ihs x /and3P [? ? ?] /andP [/ee' -> //]; apply/ihs/andP.
 Qed.
 
-Lemma sub_cycle_in s : all P s -> cycle e s -> cycle e' s.
+Lemma sub_in_cycle s : all P s -> cycle e s -> cycle e' s.
 Proof.
 case: s => //= x s /andP [Px Ps].
-by apply: sub_path_in; rewrite /= all_rcons Px.
+by apply: sub_in_path; rewrite /= all_rcons Px.
 Qed.
 
-Lemma sub_sorted_in s : all P s -> sorted e s -> sorted e' s.
-Proof. by case: s => //; apply: sub_path_in. Qed.
+Lemma sub_in_sorted s : all P s -> sorted e s -> sorted e' s.
+Proof. by case: s => //; apply: sub_in_path. Qed.
 
 End SubPath_in.
 
@@ -176,11 +199,11 @@ Hypothesis (ee' : {in P &, e =2 e'}).
 Let e_e' : {in P &, subrel e e'}. Proof. by move=> ? ? ? ?; rewrite ee'. Qed.
 Let e'_e : {in P &, subrel e' e}. Proof. by move=> ? ? ? ?; rewrite ee'. Qed.
 
-Lemma eq_path_in x s : all P (x :: s) -> path e x s = path e' x s.
-Proof. by move=> Pxs; apply/idP/idP; apply: sub_path_in Pxs. Qed.
+Lemma eq_in_path x s : all P (x :: s) -> path e x s = path e' x s.
+Proof. by move=> Pxs; apply/idP/idP; apply: sub_in_path Pxs. Qed.
 
-Lemma eq_cycle_in s : all P s -> cycle e s = cycle e' s.
-Proof. by move=> Ps; apply/idP/idP; apply: sub_cycle_in Ps. Qed.
+Lemma eq_in_cycle s : all P s -> cycle e s = cycle e' s.
+Proof. by move=> Ps; apply/idP/idP; apply: sub_in_cycle Ps. Qed.
 
 End EqPath_in.
 
@@ -189,7 +212,7 @@ Section SubPath.
 Variables e e' : rel T.
 
 Lemma sub_path : subrel e e' -> forall x p, path e x p -> path e' x p.
-Proof. by move=> ? ? ?; apply/sub_path_in/all_predT; apply: in2W. Qed.
+Proof. by move=> ? ? ?; apply/sub_in_path/all_predT; apply: in2W. Qed.
 
 Lemma sub_cycle : subrel e e' -> subpred (cycle e) (cycle e').
 Proof. by move=> ee' [] // ? ?; apply: sub_path. Qed.
@@ -198,7 +221,7 @@ Lemma sub_sorted : subrel e e' -> subpred (sorted e) (sorted e').
 Proof. by move=> ee' [] //=; apply: sub_path. Qed.
 
 Lemma eq_path : e =2 e' -> path e =2 path e'.
-Proof. by move=> ? ? ?; apply/eq_path_in/all_predT; apply: in2W. Qed.
+Proof. by move=> ? ? ?; apply/eq_in_path/all_predT; apply: in2W. Qed.
 
 Lemma eq_cycle : e =2 e' -> cycle e =1 cycle e'.
 Proof. by move=> ee' [] // ? ?; apply: eq_path. Qed.
@@ -219,29 +242,6 @@ Qed.
 
 Hypothesis leT_tr : {in P & &, transitive leT}.
 
-Lemma path_mask_in x m s :
-  all P (x :: s) -> path leT x s -> path leT x (mask m s).
-Proof.
-elim: m s x => [|[] m ih] [|y s] x //=.
-  by case/and3P=> ? ? ? /andP [-> /ih ->] //; apply/andP.
-case/andP=> Px Pys /andP [xy ys]; case/andP: (Pys) => Py Ps.
-case: (mask _ _) (all_mask m Ps) (ih s y Pys ys) => //=.
-by move=> z t /andP [Pz Pt] /andP [] /(leT_tr Py Px Pz xy) ->.
-Qed.
-
-Lemma path_filter_in x a s :
-  all P (x :: s) -> path leT x s -> path leT x (filter a s).
-Proof. by move=> Pxs; rewrite filter_mask; exact: path_mask_in. Qed.
-
-Lemma sorted_mask_in m s : all P s -> sorted leT s -> sorted leT (mask m s).
-Proof.
-elim: m s => [|[] m ih] [|x s] //= Pxs; first exact: path_mask_in.
-by move/path_sorted/ih; apply; case/andP: Pxs.
-Qed.
-
-Lemma sorted_filter_in a s : all P s -> sorted leT s -> sorted leT (filter a s).
-Proof. rewrite filter_mask; exact: sorted_mask_in. Qed.
-
 Lemma path_sorted_inE x s :
   all P (x :: s) -> path leT x s = all (leT x) s && sorted leT s.
 Proof.
@@ -249,13 +249,34 @@ move=> Pxs; apply/idP/idP => [xs|/andP[/path_min_sorted<-//]].
 by rewrite (order_path_min_in leT_tr) //; apply: path_sorted xs.
 Qed.
 
+Lemma sorted_pairwise_in s : all P s -> sorted leT s = pairwise leT s.
+Proof.
+by elim: s => //= x s IHs /andP [Px Ps]; rewrite path_sorted_inE ?IHs //= Px.
+Qed.
+
+Lemma path_pairwise_in x s :
+  all P (x :: s) -> path leT x s = pairwise leT (x :: s).
+Proof. by move=> Pxs; rewrite -sorted_pairwise_in. Qed.
+
+Lemma sorted_mask_in m s : all P s -> sorted leT s -> sorted leT (mask m s).
+Proof.
+by move=> Ps; rewrite !sorted_pairwise_in ?all_mask //; exact: pairwise_mask.
+Qed.
+
+Lemma sorted_filter_in a s : all P s -> sorted leT s -> sorted leT (filter a s).
+Proof. rewrite filter_mask; exact: sorted_mask_in. Qed.
+
+Lemma path_mask_in x m s :
+  all P (x :: s) -> path leT x s -> path leT x (mask m s).
+Proof. exact/(sorted_mask_in (true :: m)). Qed.
+
+Lemma path_filter_in x a s :
+  all P (x :: s) -> path leT x s -> path leT x (filter a s).
+Proof. by move=> Pxs; rewrite filter_mask; exact: path_mask_in. Qed.
+
 Lemma sorted_ltn_nth_in x0 s : all P s -> sorted leT s ->
   {in [pred n | n < size s] &, {homo nth x0 s : i j / i < j >-> leT i j}}.
-Proof.
-elim: s => // x s ihs Pxs path_xs [|i] [|j] //=; rewrite -!topredE /= !ltnS.
-  by move=> _ js _; apply/all_nthP/js/order_path_min_in.
-by apply/ihs/path_sorted/path_xs; case/andP: Pxs.
-Qed.
+Proof. by move=> Ps; rewrite sorted_pairwise_in //; apply/pairwiseP. Qed.
 
 Hypothesis leT_refl : {in P, reflexive leT}.
 
@@ -282,11 +303,14 @@ Hypothesis leT_tr : transitive leT.
 
 Let leT_tr' : {in predT & &, transitive leT}. Proof. exact: in3W. Qed.
 
-Lemma path_mask x m s : path leT x s -> path leT x (mask m s).
-Proof. exact/path_mask_in/all_predT. Qed.
+Lemma path_sortedE x s : path leT x s = all (leT x) s && sorted leT s.
+Proof. exact/path_sorted_inE/all_predT. Qed.
 
-Lemma path_filter x a s : path leT x s -> path leT x (filter a s).
-Proof. exact/path_filter_in/all_predT. Qed.
+Lemma sorted_pairwise s : sorted leT s = pairwise leT s.
+Proof. exact/sorted_pairwise_in/all_predT. Qed.
+
+Lemma path_pairwise x s : path leT x s = pairwise leT (x :: s).
+Proof. exact/path_pairwise_in/all_predT. Qed.
 
 Lemma sorted_mask m s : sorted leT s -> sorted leT (mask m s).
 Proof. exact/sorted_mask_in/all_predT. Qed.
@@ -294,8 +318,11 @@ Proof. exact/sorted_mask_in/all_predT. Qed.
 Lemma sorted_filter a s : sorted leT s -> sorted leT (filter a s).
 Proof. exact/sorted_filter_in/all_predT. Qed.
 
-Lemma path_sortedE x s : path leT x s = all (leT x) s && sorted leT s.
-Proof. exact/path_sorted_inE/all_predT. Qed.
+Lemma path_mask x m s : path leT x s -> path leT x (mask m s).
+Proof. exact/path_mask_in/all_predT. Qed.
+
+Lemma path_filter x a s : path leT x s -> path leT x (filter a s).
+Proof. exact/path_filter_in/all_predT. Qed.
 
 Lemma sorted_ltn_nth x0 s : sorted leT s ->
   {in [pred n | n < size s] &, {homo nth x0 s : i j / i < j >-> leT i j}}.
@@ -315,47 +342,25 @@ Arguments pathP {T e x p}.
 Arguments path_sorted {T e x s}.
 Arguments path_min_sorted {T e x s}.
 Arguments order_path_min_in {T P leT x s}.
-Arguments path_mask_in {T P leT} leT_tr {x m s}.
-Arguments path_filter_in {T P leT} leT_tr {x a s}.
+Arguments path_sorted_inE {T P leT} leT_tr {x s}.
+Arguments sorted_pairwise_in {T P leT} leT_tr {s}.
+Arguments path_pairwise_in {T P leT} leT_tr {x s}.
 Arguments sorted_mask_in {T P leT} leT_tr {m s}.
 Arguments sorted_filter_in {T P leT} leT_tr {a s}.
-Arguments path_sorted_inE {T P leT} leT_tr {x s}.
+Arguments path_mask_in {T P leT} leT_tr {x m s}.
+Arguments path_filter_in {T P leT} leT_tr {x a s}.
 Arguments sorted_ltn_nth_in {T P leT} leT_tr x0 {s}.
 Arguments sorted_leq_nth_in {T P leT} leT_tr leT_refl x0 {s}.
 Arguments order_path_min {T leT x s}.
-Arguments path_mask {T leT} leT_tr {x} m {s}.
-Arguments path_filter {T leT} leT_tr {x} a {s}.
+Arguments path_sortedE {T leT} leT_tr x s.
+Arguments sorted_pairwise {T leT} leT_tr s.
+Arguments path_pairwise {T leT} leT_tr x s.
 Arguments sorted_mask {T leT} leT_tr m {s}.
 Arguments sorted_filter {T leT} leT_tr a {s}.
-Arguments path_sortedE {T leT} leT_tr x s.
+Arguments path_mask {T leT} leT_tr {x} m {s}.
+Arguments path_filter {T leT} leT_tr {x} a {s}.
 Arguments sorted_ltn_nth {T leT} leT_tr x0 {s}.
 Arguments sorted_leq_nth {T leT} leT_tr leT_refl x0 {s}.
-
-Lemma cycle_catC (T : Type) (e : rel T) (p q : seq T) :
-  cycle e (p ++ q) = cycle e (q ++ p).
-Proof. by rewrite -rot_size_cat rot_cycle. Qed.
-
-Section RevPath.
-
-Variables (T : Type) (e : rel T).
-
-Lemma rev_path x p :
-  path e (last x p) (rev (belast x p)) = path (fun z => e^~ z) x p.
-Proof.
-elim: p x => //= y p IHp x; rewrite rev_cons rcons_path -{}IHp andbC.
-by rewrite -(last_cons x) -rev_rcons -lastI rev_cons last_rcons.
-Qed.
-
-Lemma rev_cycle p : cycle e (rev p) = cycle (fun z => e^~ z) p.
-Proof.
-case: p => //= x p; rewrite -rev_path last_rcons belast_rcons rev_cons.
-by rewrite -[in LHS]cats1 cycle_catC.
-Qed.
-
-Lemma rev_sorted p : sorted e (rev p) = sorted (fun z => e^~ z) p.
-Proof. by case: p => //= x p; rewrite -rev_path lastI rev_rcons. Qed.
-
-End RevPath.
 
 Section HomoPath.
 
@@ -372,23 +377,23 @@ Proof. by case: s; last apply: path_map. Qed.
 
 Lemma homo_path_in x s : {in P &, {homo f : x y / e x y >-> e' x y}} ->
   all P (x :: s) -> path e x s -> path e' (f x) (map f s).
-Proof. by move=> f_mono; rewrite path_map; apply: sub_path_in. Qed.
+Proof. by move=> f_mono; rewrite path_map; apply: sub_in_path. Qed.
 
 Lemma homo_cycle_in s : {in P &, {homo f : x y / e x y >-> e' x y}} ->
   all P s -> cycle e s -> cycle e' (map f s).
-Proof. by move=> f_mono; rewrite cycle_map; apply: sub_cycle_in. Qed.
+Proof. by move=> f_mono; rewrite cycle_map; apply: sub_in_cycle. Qed.
 
 Lemma homo_sorted_in s : {in P &, {homo f : x y / e x y >-> e' x y}} ->
   all P s -> sorted e s -> sorted e' (map f s).
-Proof. by move=> f_mono; rewrite sorted_map; apply: sub_sorted_in. Qed.
+Proof. by move=> f_mono; rewrite sorted_map; apply: sub_in_sorted. Qed.
 
 Lemma mono_path_in x s : {in P &, {mono f : x y / e x y >-> e' x y}} ->
   all P (x :: s) -> path e' (f x) (map f s) = path e x s.
-Proof. by move=> f_mono; rewrite path_map; apply: eq_path_in. Qed.
+Proof. by move=> f_mono; rewrite path_map; apply: eq_in_path. Qed.
 
 Lemma mono_cycle_in s : {in P &, {mono f : x y / e x y >-> e' x y}} ->
   all P s -> cycle e' (map f s) = cycle e s.
-Proof. by move=> f_mono; rewrite cycle_map; apply: eq_cycle_in. Qed.
+Proof. by move=> f_mono; rewrite cycle_map; apply: eq_in_cycle. Qed.
 
 Lemma mono_sorted_in s : {in P &, {mono f : x y / e x y >-> e' x y}} ->
   all P s -> sorted e' (map f s) = sorted e s.
@@ -436,6 +441,30 @@ Arguments mono_path {T T' f e e' x s}.
 Arguments mono_cycle {T T' f e e'}.
 Arguments mono_sorted {T T' f e e'}.
 
+Section CycleAll2Rel.
+
+Lemma cycle_all2rel (T : Type) (leT : rel T) :
+  transitive leT -> forall s, cycle leT s = all2rel leT s.
+Proof.
+move=> leT_tr; elim=> //= x s IHs.
+rewrite allrel_cons2 -{}IHs // (path_sortedE leT_tr) /= all_rcons -rev_sorted.
+rewrite rev_rcons /= (path_sortedE (rev_trans leT_tr)) all_rev !andbA.
+case: (boolP (leT x x && _ && _)) => //=.
+case: s => //= y s /and3P[/and3P[_ xy _] yx sx].
+rewrite rev_sorted rcons_path /= (leT_tr _ _ _ _ xy) ?andbT //.
+by case: (lastP s) sx => //= {}s z; rewrite all_rcons last_rcons => /andP [->].
+Qed.
+
+Lemma cycle_all2rel_in (T : Type) (P : {pred T}) (leT : rel T) :
+  {in P & &, transitive leT} ->
+  forall s, all P s -> cycle leT s = all2rel leT s.
+Proof.
+move=> /in3_sig leT_tr s /all_sigP [{}s ->].
+by rewrite cycle_map allrel_mapl allrel_mapr; apply: cycle_all2rel.
+Qed.
+
+End CycleAll2Rel.
+
 Section EqSorted.
 
 Variables (T : eqType) (leT : rel T).
@@ -478,25 +507,12 @@ Lemma subseq_sorted s1 s2 : subseq s1 s2 -> sorted s2 -> sorted s1.
 Proof. by apply: subseq_sorted_in; apply: in3W. Qed.
 
 Lemma sorted_uniq : irreflexive leT -> forall s, sorted s -> uniq s.
-Proof.
-move=> leT_irr; elim=> //= x s IHs s_ord.
-rewrite (IHs (path_sorted s_ord)) andbT; apply/negP=> s_x.
-by case/allPn: (order_path_min leT_tr s_ord); exists x; rewrite // leT_irr.
-Qed.
+Proof. by move=> irr s; rewrite sorted_pairwise //; apply/pairwise_uniq. Qed.
 
 Lemma sorted_eq : antisymmetric leT ->
   forall s1 s2, sorted s1 -> sorted s2 -> perm_eq s1 s2 -> s1 = s2.
 Proof.
-move=> leT_asym; elim=> [|x1 s1 IHs1] s2 //= ord_s1 ord_s2 eq_s12.
-  by case: {+}s2 (perm_size eq_s12).
-have s2_x1: x1 \in s2 by rewrite -(perm_mem eq_s12) mem_head.
-case: s2 s2_x1 eq_s12 ord_s2 => //= x2 s2; rewrite in_cons.
-case: eqP => [<- _| ne_x12 /= s2_x1] eq_s12 ord_s2.
-  by rewrite {IHs1}(IHs1 s2) ?(@path_sorted _ leT x1) // -(perm_cons x1).
-case: (ne_x12); apply: leT_asym; rewrite (allP (order_path_min _ ord_s2))//.
-have: x2 \in x1 :: s1 by rewrite (perm_mem eq_s12) mem_head.
-case/predU1P=> [eq_x12 | s1_x2]; first by case ne_x12.
-by rewrite (allP (order_path_min _ ord_s1)).
+by move=> leT_asym s1 s2; rewrite !sorted_pairwise //; apply: pairwise_eq.
 Qed.
 
 Lemma irr_sorted_eq : irreflexive leT ->
@@ -871,6 +887,28 @@ elim: s [::] => /= [|x s ihs] ss allss.
     [rewrite /= ht | apply/ihss/merge_sorted].
 Qed.
 
+Lemma allrel_merge s1 s2 : allrel leT s1 s2 -> merge s1 s2 = s1 ++ s2.
+Proof.
+elim: s1 s2 => [|x s1 IHs1] [|y s2]; rewrite ?cats0 //=.
+by rewrite allrel_consl /= -andbA => /and3P [-> _ /IHs1->].
+Qed.
+
+Lemma pairwise_sort s : pairwise leT s -> sort s = s.
+Proof.
+pose catss := foldr (fun x => cat ^~ x) (Nil T).
+rewrite -{1 3}[s]/(catss [::] ++ s) sortE; elim: s [::] => /= [|x s ihs] ss.
+  elim: ss [::] => //= s ss ihss t; rewrite -catA => ssst.
+  rewrite -ihss ?allrel_merge //; move: ssst; rewrite !pairwise_cat.
+  by case/and4P.
+rewrite (catA _ [:: _]) => ssxs.
+suff x_ss_E: catss (merge_sort_push [:: x] ss) = catss ([:: x] :: ss).
+  by rewrite -[catss _ ++ _]/(catss ([:: x] :: ss)) -x_ss_E ihs // x_ss_E.
+move: ssxs; rewrite pairwise_cat => /and3P [_ + _].
+elim: ss [:: x] => {x s ihs} //= -[|x s] ss ihss t h_pairwise;
+  rewrite /= cats0 // allrel_merge ?ihss ?catA //.
+by move: h_pairwise; rewrite -catA !pairwise_cat => /and4P [].
+Qed.
+
 Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
 Proof.
 rewrite size_cat; elim: s1 s2 => // x s1 IH1.
@@ -894,30 +932,10 @@ Qed.
 Hypothesis leT_tr : transitive leT.
 
 Lemma sorted_merge s t : sorted (s ++ t) -> merge s t = s ++ t.
-Proof.
-elim: s => //= x s; case: t; rewrite ?cats0 //= => y t ih hp.
-move: (order_path_min leT_tr hp).
-by rewrite ih ?(path_sorted hp) // all_cat /= => /and3P [_ -> _].
-Qed.
+Proof. by rewrite sorted_pairwise // pairwise_cat => /and3P[/allrel_merge]. Qed.
 
 Lemma sorted_sort s : sorted s -> sort s = s.
-Proof.
-pose catss := foldr (fun x => cat ^~ x) (Nil T).
-rewrite -{1 3}[s]/(catss [::] ++ s) sortE; elim: s [::] => /= [|x s ihs] ss.
-- elim: ss [::] => //= s ss ihss t; rewrite -catA => h_sorted.
-  rewrite -ihss ?sorted_merge //.
-  by elim: (catss _) h_sorted => //= ? ? ih /path_sorted.
-- move=> h_sorted.
-  suff x_ss_E: catss (merge_sort_push [:: x] ss) = catss ([:: x] :: ss)
-    by rewrite (catA _ [:: _]) -[catss _ ++ _]/(catss ([:: x] :: ss)) -x_ss_E
-               ihs // x_ss_E /= -catA.
-  have {h_sorted}: sorted (catss ss ++ [:: x]).
-    case: (catss _) h_sorted => //= ? ?.
-    by rewrite (catA _ [:: _]) cat_path => /andP [].
-  elim: ss [:: x] => {x s ihs} //= -[|x s] ss ihss t h_sorted;
-    rewrite /= cats0 // sorted_merge ?ihss ?catA //.
-  by elim: (catss ss) h_sorted => //= ? ? ih /path_sorted.
-Qed.
+Proof. by rewrite sorted_pairwise //; apply/pairwise_sort. Qed.
 
 End SortSeq.
 
@@ -925,6 +943,8 @@ Arguments merge {T} relT !s1 !s2 : rename.
 Arguments merge_path {T leT} leT_total {x s1 s2}.
 Arguments merge_sorted {T leT} leT_total {s1 s2}.
 Arguments sort_sorted {T leT} leT_total s.
+Arguments allrel_merge {T leT s1 s2}.
+Arguments pairwise_sort {T leT s}.
 Arguments sorted_merge {T leT} leT_tr {s t}.
 Arguments sorted_sort {T leT} leT_tr {s}.
 
@@ -1121,7 +1141,7 @@ End Stability_merge.
 
 Section Stability_iota.
 
-Variables (leN : rel nat) (leN_total : total leN) (leN_tr : transitive leN).
+Variables (leN : rel nat) (leN_total : total leN).
 
 Let lt_lex := [rel n m | leN n m && (leN m n ==> (n < m))].
 
@@ -1172,16 +1192,24 @@ Qed.
 
 End Stability_iota.
 
-Lemma sort_stable T (leT leT' : rel T) :
-  total leT -> transitive leT' -> forall s : seq T, sorted leT' s ->
+Lemma sort_pairwise_stable T (leT leT' : rel T) :
+  total leT -> forall s : seq T, pairwise leT' s ->
   sorted [rel x y | leT x y && (leT y x ==> leT' x y)] (sort leT s).
 Proof.
-move=> leT_total leT'_tr s sorted_s; case Ds: s => // [x s1].
+move=> leT_total s pairwise_s; case Ds: s => // [x s1].
 rewrite -{s1}Ds -(mkseq_nth x s) sort_map.
 have leN_total: total (relpre (nth x s) leT) by move=> n m; apply: leT_total.
 apply: (homo_sorted_in _ (allss _)) (sort_iota_stable leN_total _) => /= y z.
 rewrite !mem_sort !mem_iota !leq0n add0n /= => ys zs /andP [->] /=.
-by case: (leT _ _); first apply: sorted_ltn_nth.
+by case: (leT _ _); first apply: pairwiseP.
+Qed.
+
+Lemma sort_stable T (leT leT' : rel T) :
+  total leT -> transitive leT' -> forall s : seq T, sorted leT' s ->
+  sorted [rel x y | leT x y && (leT y x ==> leT' x y)] (sort leT s).
+Proof.
+move=> leT_total leT'_tr s; rewrite sorted_pairwise //.
+exact: sort_pairwise_stable.
 Qed.
 
 Lemma filter_sort T (leT : rel T) :
@@ -1649,6 +1677,8 @@ End CycleArc.
 
 Prenex Implicits arc.
 
+(* Deprecated in 1.12.0 *)
+
 Notation "@ 'eq_sorted'" :=
   (deprecate eq_sorted sorted_eq) (at level 10, only parsing) : fun_scope.
 Notation "@ 'eq_sorted_irr'" := (deprecate eq_sorted_irr irr_sorted_eq)
@@ -1686,3 +1716,25 @@ Notation leq_index :=
   (fun leT_tr leT_refl => @leq_index _ _ leT_tr leT_refl _) (only parsing).
 Notation subseq_order_path :=
   (fun leT_tr => @subseq_order_path _ _ leT_tr _ _ _) (only parsing).
+
+(* Deprecated in 1.13.0 *)
+
+Notation "@ 'sub_path_in'" :=
+  (deprecate sub_path_in sub_in_path) (at level 10, only parsing) : fun_scope.
+Notation "@ 'sub_cycle_in'" :=
+  (deprecate sub_cycle_in sub_in_cycle) (at level 10, only parsing) : fun_scope.
+Notation "@ 'sub_sorted_in'" := (deprecate sub_sorted_in sub_in_sorted)
+  (at level 10, only parsing) : fun_scope.
+Notation "@ 'eq_path_in'" :=
+  (deprecate eq_path_in eq_in_path) (at level 10, only parsing) : fun_scope.
+Notation "@ 'eq_cycle_in'" :=
+  (deprecate eq_cycle_in eq_in_cycle) (at level 10, only parsing) : fun_scope.
+
+Notation sub_path_in :=
+  (fun ee' => @sub_path_in _ _ _ _ ee' _ _) (only parsing).
+Notation sub_cycle_in :=
+  (fun ee' => @sub_cycle_in _ _ _ _ ee' _) (only parsing).
+Notation sub_sorted_in :=
+  (fun ee' => @sub_sorted_in _ _ _ _ ee' _) (only parsing).
+Notation eq_path_in := (fun ee' => @eq_path_in _ _ _ _ ee' _ _) (only parsing).
+Notation eq_cycle_in := (fun ee' => @eq_cycle_in _ _ _ _ ee' _) (only parsing).
