@@ -1745,14 +1745,13 @@ Proof. by move=> x; exists (absz x).+1; rewrite natz ltz_nat ltnSn. Qed.
 End intArchimedean.
 End intArchimedean.
 
-Canonical int_numArchiDomain :=
-  Eval hnf in NumArchiDomainType int intArchimedean.archimedean_axiomz.
-Canonical int_realArchiDomain :=
-  Eval hnf in [realArchiDomainType of int].
+Canonical int_archiNumDomain :=
+  Eval hnf in ArchiNumDomainType int intArchimedean.archimedean_axiomz.
+Canonical int_archiRealDomain := [archiRealDomainType of int].
 
 Section ZnatPred.
 
-Definition Znat := (@Cnat int_numArchiDomain).
+Definition Znat := @Cnat int_archiNumDomain.
 Fact Znat_key : pred_key Znat. by []. Qed.
 Canonical Znat_keyd := KeyedQualifier Znat_key.
 
@@ -1762,7 +1761,7 @@ by apply: (iffP (CnatP m)) => [[n ->] | [n ->]]; exists n; rewrite natz.
 Qed.
 
 Lemma Znat_semiring_closed : semiring_closed Znat.
-Proof. by apply: (Cnat_semiring int_numArchiDomain). Qed.
+Proof. exact: Cnat_semiring. Qed.
 Canonical Znat_addrPred := AddrPred Znat_semiring_closed.
 Canonical Znat_mulrPred := MulrPred Znat_semiring_closed.
 Canonical Znat_semiringPred := SemiringPred Znat_semiring_closed.
@@ -1797,26 +1796,23 @@ Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
 
-Section NumArchiDomainTheory.
+Section ArchiNumDomainTheory.
 
-Variable R : numArchiDomainType.
+Variable R : archiNumDomainType.
+Implicit Type x : R.
 
-Local Notation Cnat := (@Cnat R).
-Local Notation Creal := (@Num.real R).
-Local Notation ZtoC := (intr : int -> R).
-
-Fact floorC_subproof x : {m | x \is Creal -> ZtoC m <= x < ZtoC (m + 1)}.
+Fact floorC_subproof x : {m | x \is Num.real -> m%:~R <= x < (m + 1)%:~R}.
 Proof.
-have [Rx | _] := boolP (x \is Creal); last by exists 0.
+have [Rx | _] := boolP (x \is Num.real); last by exists 0.
 without loss x_ge0: x Rx / x >= 0.
   have [x_ge0 | /ltW x_le0] := real_ge0P Rx; first exact.
   case/(_ (- x)) => [||m /(_ isT)]; rewrite ?rpredN ?oppr_ge0 //.
-  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= lt_neqAle le_eqVlt.
-  case: eqP => [-> _ | _ /and3P[lt_x_m _ le_m_x]].
-    by exists (- m) => _; rewrite lexx rmorphD ltr_addl ltr01.
-  by exists (- m - 1); rewrite le_m_x subrK.
-exists (Posz (truncC x)) => _ ; rewrite addrC -intS -!natz !mulrz_nat.
-exact: (truncC_itv x_ge0).
+  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= le_eqVlt.
+  case: eqP => [-> _ | _ /andP[lt_x_m lt_m_x]].
+    by exists (- m); rewrite lexx rmorphD ltr_addl ltr01.
+  by exists (- m - 1); rewrite (ltW lt_m_x) subrK.
+exists (Posz (truncC x)) => _; rewrite addrC -intS -!pmulrn.
+exact: truncC_itv.
 Qed.
 
 Definition floorC x := sval (floorC_subproof x).
@@ -1825,27 +1821,24 @@ Definition Cint := [qualify a x : R | (floorC x)%:~R == x].
 Fact Cint_key : pred_key Cint. Proof. by []. Qed.
 Canonical Cint_keyed := KeyedQualifier Cint_key.
 
-Lemma floorC_itv x : x \is Creal -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
+Lemma floorC_itv x : x \is Num.real -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
 Proof. by rewrite /floorC => Rx; case: (floorC_subproof x) => //= m; apply. Qed.
 
 Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
 Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltz_addr1.
-have /floorC_itv/andP[lefx ltxf1]: x \is Creal.
-  by rewrite -[x](subrK m%:~R) rpredD ?realz ?ler_sub_real.
+move: (ger_real lemx); rewrite realz => /floorC_itv/andP[lefx ltxf1].
 by rewrite -!(ltr_int R) 2?(@le_lt_trans _ _ x).
 Qed.
 
 Lemma intCK : cancel intr floorC.
-Proof.
-by move=> m; apply: floorC_def; rewrite ler_int ltr_int ltz_addr1 lexx.
-Qed.
+Proof. by move=> m; apply: floorC_def; rewrite lexx rmorphD ltr_addl ltr01. Qed.
 
 Lemma floorCK : {in Cint, cancel floorC intr}. Proof. by move=> z /eqP. Qed.
 
-Lemma floorC0 : floorC 0 = 0. Proof. exact: (intCK 0). Qed.
-Lemma floorC1 : floorC 1 = 1. Proof. exact: (intCK 1). Qed.
-Hint Resolve floorC0 floorC1.
+Lemma floorC0 : floorC 0 = 0. Proof. exact: intCK 0. Qed.
+Lemma floorC1 : floorC 1 = 1. Proof. exact: intCK 1. Qed.
+Hint Resolve floorC0 floorC1 : core.
 
 Lemma floorCpK (p : {poly R}) :
   p \is a polyOver Cint -> map_poly intr (map_poly floorC p) = p.
@@ -1867,7 +1860,7 @@ Proof.
 by apply: (iffP idP) => [/eqP<-|[m ->]]; [exists (floorC x) | apply: Cint_int].
 Qed.
 
-Lemma floorCD : {in Cint & Creal, {morph floorC : x y / x + y}}.
+Lemma floorCD : {in Cint & Num.real, {morph floorC : x y / x + y}}.
 Proof.
 move=> _ y /CintP[m ->] Ry; apply: floorC_def.
 by rewrite -addrA 2!rmorphD /= intCK ler_add2l ltr_add2l floorC_itv.
@@ -1888,7 +1881,7 @@ Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
 
 Lemma Cint0 : 0 \is a Cint. Proof. exact: (Cint_int 0). Qed.
 Lemma Cint1 : 1 \is a Cint. Proof. exact: (Cint_int 1). Qed.
-Hint Resolve Cint0 Cint1.
+Hint Resolve Cint0 Cint1 : core.
 
 Fact Cint_subring : subring_closed Cint.
 Proof.
@@ -1903,7 +1896,7 @@ Canonical Cint_semiringPred := SemiringPred Cint_subring.
 Canonical Cint_smulrPred := SmulrPred Cint_subring.
 Canonical Cint_subringPred := SubringPred Cint_subring.
 
-Lemma Creal_Cint : {subset Cint <= Creal}.
+Lemma Creal_Cint : {subset Cint <= Num.real}.
 Proof. by move=> _ /CintP[m ->]; apply: realz. Qed.
 
 Lemma Cint_normK x : x \is a Cint -> `|x| ^+ 2 = x ^+ 2.
@@ -1996,39 +1989,35 @@ Implicit Type nu : {rmorphism R -> R}.
 Lemma aut_Cint nu : {in Cint, nu =1 id}.
 Proof. by move=> _ /CintP[m ->]; apply: rmorph_int. Qed.
 
-End NumArchiDomainTheory.
+End ArchiNumDomainTheory.
 
-Hint Resolve floorC0 floorC1 Cint_int Cint0 Cint1.
+Hint Resolve floorC0 floorC1 Cint_int Cint0 Cint1 : core.
 Arguments intCK {R}.
 Arguments Cint {R}.
 Arguments floorC {R}.
 
-Section NumArchiFieldTheory.
+Section ArchiNumFieldTheory.
 
-Variable R : numArchiFieldType.
+Variable R : archiNumFieldType.
 
 (* autLmodC *)
 Implicit Type nu : {rmorphism R -> R}.
 
-Local Notation Cint := (@Cint R).
-
 Lemma Cint_aut nu x : (nu x \is a Cint) = (x \is a Cint).
 Proof. by rewrite !CintE -rmorphN !Cnat_aut. Qed.
 
-End NumArchiFieldTheory.
+End ArchiNumFieldTheory.
 
-Section NumArchiClosedFieldTheory.
+Section ArchiNumClosedFieldTheory.
 
-Variable R : numArchiClosedFieldType.
+Variable R : archiNumClosedFieldType.
 
 Implicit Type x : R.
-
-Local Notation Cint := (@Cint R).
 
 Lemma conj_Cint x : x \is a Cint -> x^* = x.
 Proof. by move/Creal_Cint/conj_Creal. Qed.
 
-End NumArchiClosedFieldTheory.
+End ArchiNumClosedFieldTheory.
 
 #[deprecated(since="mathcomp 1.12.0", note="Use polyCMz instead.")]
 Notation polyC_mulrz := polyCMz (only parsing).

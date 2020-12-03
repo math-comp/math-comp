@@ -243,9 +243,9 @@ Parameter conjMixin : Num.ClosedField.imaginary_mixin_of numDomainType.
 Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
 
 Axiom archimedean : Num.archimedean_axiom numDomainType.
-Canonical numArchiDomainType := NumArchiDomainType type archimedean.
-Canonical numArchiFieldType := [numArchiFieldType of type].
-Canonical numArchiClosedFieldType := [numArchiClosedFieldType of type].
+Canonical archiNumDomainType := ArchiNumDomainType type archimedean.
+Canonical archiNumFieldType := [archiNumFieldType of type].
+Canonical archiNumClosedFieldType := [archiNumClosedFieldType of type].
 
 Axiom algebraic : integralRange (@ratr unitRingType).
 
@@ -461,9 +461,9 @@ Canonical numClosedFieldType := NumClosedFieldType type conjMixin.
 
 Fact archimedean : Num.archimedean_axiom numDomainType.
 Proof. exact: rat_algebraic_archimedean algebraic. Qed.
-Canonical numArchiDomainType := NumArchiDomainType type archimedean.
-Canonical numArchiFieldType := [numArchiFieldType of type].
-Canonical numArchiClosedFieldType := [numArchiClosedFieldType of type].
+Canonical archiNumDomainType := ArchiNumDomainType type archimedean.
+Canonical archiNumFieldType := [archiNumFieldType of type].
+Canonical archiNumClosedFieldType := [archiNumClosedFieldType of type].
 
 End Implementation.
 
@@ -545,9 +545,9 @@ Canonical numFieldType.
 Canonical decFieldType.
 Canonical closedFieldType.
 Canonical numClosedFieldType.
-Canonical numArchiDomainType.
-Canonical numArchiFieldType.
-Canonical numArchiClosedFieldType.
+Canonical archiNumDomainType.
+Canonical archiNumFieldType.
+Canonical archiNumClosedFieldType.
 
 Notation algCeq := eqType.
 Notation algCzmod := zmodType.

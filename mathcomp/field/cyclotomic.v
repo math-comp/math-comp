@@ -118,8 +118,8 @@ Local Notation pQtoC := (map_poly ratr).
 Local Definition algC_intr_inj := @intr_inj [numDomainType of algC].
 Local Hint Resolve algC_intr_inj : core.
 Local Notation QtoC_M := (ratr_rmorphism [numFieldType of algC]).
-Local Notation floorC := (@floorC [numArchiDomainType of algC]).
-Local Notation intCK := (@intCK [numArchiDomainType of algC]).
+Local Notation floorC := (@floorC [archiNumDomainType of algC]).
+Local Notation intCK := (@intCK [archiNumDomainType of algC]).
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.

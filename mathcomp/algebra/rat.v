@@ -615,19 +615,19 @@ rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
-Canonical rat_numArchiDomainType := NumArchiDomainType rat rat_archimedean.
-Canonical rat_realArchiDomainType := [realArchiDomainType of rat].
-Canonical rat_numArchiFieldType := [numArchiFieldType of rat].
-Canonical rat_realArchiFieldType := [realArchiFieldType of rat].
+Canonical rat_archiNumDomainType := ArchiNumDomainType rat rat_archimedean.
+Canonical rat_archiRealDomainType := [archiRealDomainType of rat].
+Canonical rat_archiNumFieldType := [archiNumFieldType of rat].
+Canonical rat_archiRealFieldType := [archiRealFieldType of rat].
 
 Section QintPred.
 
-Definition Qint := (@Cint rat_numArchiDomainType).
+Definition Qint := @Cint rat_archiNumDomainType.
 Fact Qint_key : pred_key Qint. Proof. by []. Qed.
 Canonical Qint_keyed := KeyedQualifier Qint_key.
 
 Lemma QintP x : reflect (exists z, x = z%:~R) (x \in Qint).
-Proof. by exact: CintP. Qed.
+Proof. exact: CintP. Qed.
 
 Lemma Qint_def x : (x \is a Qint) = (denq x == 1).
 Proof.
@@ -636,12 +636,10 @@ by exists (numq x); rewrite numqE xden mulr1.
 Qed.
 
 Lemma numqK : {in Qint, cancel (fun x => numq x) intr}.
-Proof.
-by move=> x; rewrite Qint_def numqE => /eqP ->; rewrite mulr1.
-Qed.
+Proof. by move=> _ /QintP [x ->]; rewrite numqE denq_int mulr1. Qed.
 
 Fact Qint_subring_closed : subring_closed Qint.
-Proof. by exact: Cint_subring. Qed.
+Proof. exact: Cint_subring. Qed.
 
 Canonical Qint_opprPred := OpprPred Qint_subring_closed.
 Canonical Qint_addrPred := AddrPred Qint_subring_closed.
@@ -655,18 +653,18 @@ End QintPred.
 
 Section QnatPred.
 
-Definition Qnat := (@Cnat rat_numArchiDomainType).
+Definition Qnat := @Cnat rat_archiNumDomainType.
 Fact Qnat_key : pred_key Qnat. Proof. by []. Qed.
 Canonical Qnat_keyed := KeyedQualifier Qnat_key.
 
 Lemma Qnat_def x : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
-Proof. by exact: CnatEint. Qed.
+Proof. exact: CnatEint. Qed.
 
 Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
-Proof. by exact: CnatP. Qed.
+Proof. exact: CnatP. Qed.
 
 Fact Qnat_semiring_closed : semiring_closed Qnat.
-Proof. by exact: Cnat_semiring. Qed.
+Proof. exact: Cnat_semiring. Qed.
 
 Canonical Qnat_addrPred := AddrPred Qnat_semiring_closed.
 Canonical Qnat_mulrPred := MulrPred Qnat_semiring_closed.
@@ -687,7 +685,7 @@ Lemma ratr_int z : ratr z%:~R = z%:~R.
 Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 
 Lemma ratr_nat n : ratr n%:R = n%:R.
-Proof. exact: (ratr_int n). Qed.
+Proof. exact: ratr_int n. Qed.
 
 Lemma rpred_rat (S : {pred R}) (ringS : divringPred S) (kS : keyed_pred ringS)
                 a :

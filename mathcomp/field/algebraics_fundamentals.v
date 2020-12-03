@@ -364,7 +364,7 @@ have galQ x: {z | x \in sQ z & is_Gal z}.
   exists p^@; first exact: alg_polyOver.
   exists (map (inQ z) s); last by apply/vspaceP=> u; rewrite defQz memvf.
   by rewrite -(eqp_map (ofQ z)) pQof Dp map_rp inQsK ?eqpxx.
-pose is_realC x := {R : realArchiFieldType & {rmorphism Q x -> R}}.
+pose is_realC x := {R : archiRealFieldType & {rmorphism Q x -> R}}.
 pose realC := {x : C & is_realC x}.
 pose has_Rroot (xR : realC) p c (Rx := sQ (tag xR)) :=
   [&& p \is a polyOver Rx, p \is monic, c \in Rx & p.[0] == - c ^+ 2].
@@ -589,11 +589,11 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose Ry := LtRealFieldOfField
                (RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _)).
   have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
-  pose RyArchi := [realArchiDomainType of NumArchiDomainType Ry archiRy].
-  by exists ([realArchiFieldType of RyArchi]); apply: [rmorphism of idfun].
+  exists [archiRealFieldType of ArchiNumDomainType Ry archiRy].
+  exact: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
-    exists 0, rat_realArchiFieldType, f.
+    exists 0, rat_archiRealFieldType, f.
     exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.
