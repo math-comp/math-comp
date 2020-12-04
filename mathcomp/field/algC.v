@@ -857,10 +857,10 @@ Proof. by move/getCratK <-; rewrite fmorph_div !rmorph_int. Qed.
 Lemma Creal_Crat : {subset Crat <= Creal}.
 Proof. by move=> x /conj_Crat/CrealP. Qed.
 
-Lemma Cint_rat a : (QtoC a \in Cint) = (a \in Qint).
+Lemma Cint_rat a : (QtoC a \in Cint) = (a \in Cint).
 Proof.
 apply/idP/idP=> [Za | /numqK <-]; last by rewrite rmorph_int.
-apply/QintP; exists (floorC (QtoC a)); apply: (can_inj ratCK).
+apply/CintP; exists (floorC (QtoC a)); apply: (can_inj ratCK).
 by rewrite rmorph_int floorCK.
 Qed.
 

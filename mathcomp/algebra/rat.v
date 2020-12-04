@@ -13,9 +13,6 @@ From mathcomp Require Import ssrint.
 (*                 rationals of the generic ring morphism n%:~R               *)
 (*       numq r == numerator of (r : rat)                                     *)
 (*       denq r == denominator of (r : rat)                                   *)
-(* x \is a Qint == x is an element of rat whose denominator is equal to 1     *)
-(* x \is a Qnat == x is a positive element of rat whose denominator is equal  *)
-(*                 to 1                                                       *)
 (*       ratr x == generic embedding of  (r : R) into an arbitrary unitring.  *)
 (******************************************************************************)
 
@@ -620,57 +617,14 @@ Canonical rat_archiRealDomainType := [archiRealDomainType of rat].
 Canonical rat_archiNumFieldType := [archiNumFieldType of rat].
 Canonical rat_archiRealFieldType := [archiRealFieldType of rat].
 
-Section QintPred.
-
-Definition Qint := @Cint rat_archiNumDomainType.
-Fact Qint_key : pred_key Qint. Proof. by []. Qed.
-Canonical Qint_keyed := KeyedQualifier Qint_key.
-
-Lemma QintP x : reflect (exists z, x = z%:~R) (x \in Qint).
-Proof. exact: CintP. Qed.
-
-Lemma Qint_def x : (x \is a Qint) = (denq x == 1).
+Lemma Qint_def x : (x \is a Cint) = (denq x == 1).
 Proof.
-apply/QintP/eqP => [[z ->]|xden]; first by rewrite denq_int.
+apply/CintP/eqP => [[z ->]|xden]; first by rewrite denq_int.
 by exists (numq x); rewrite numqE xden mulr1.
 Qed.
 
-Lemma numqK : {in Qint, cancel (fun x => numq x) intr}.
-Proof. by move=> _ /QintP [x ->]; rewrite numqE denq_int mulr1. Qed.
-
-Fact Qint_subring_closed : subring_closed Qint.
-Proof. exact: Cint_subring. Qed.
-
-Canonical Qint_opprPred := OpprPred Qint_subring_closed.
-Canonical Qint_addrPred := AddrPred Qint_subring_closed.
-Canonical Qint_mulrPred := MulrPred Qint_subring_closed.
-Canonical Qint_zmodPred := ZmodPred Qint_subring_closed.
-Canonical Qint_semiringPred := SemiringPred Qint_subring_closed.
-Canonical Qint_smulrPred := SmulrPred Qint_subring_closed.
-Canonical Qint_subringPred := SubringPred Qint_subring_closed.
-
-End QintPred.
-
-Section QnatPred.
-
-Definition Qnat := @Cnat rat_archiNumDomainType.
-Fact Qnat_key : pred_key Qnat. Proof. by []. Qed.
-Canonical Qnat_keyed := KeyedQualifier Qnat_key.
-
-Lemma Qnat_def x : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
-Proof. exact: CnatEint. Qed.
-
-Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
-Proof. exact: CnatP. Qed.
-
-Fact Qnat_semiring_closed : semiring_closed Qnat.
-Proof. exact: Cnat_semiring. Qed.
-
-Canonical Qnat_addrPred := AddrPred Qnat_semiring_closed.
-Canonical Qnat_mulrPred := MulrPred Qnat_semiring_closed.
-Canonical Qnat_semiringPred := SemiringPred Qnat_semiring_closed.
-
-End QnatPred.
+Lemma numqK : {in Cint, cancel (fun x => numq x) intr}.
+Proof. by move=> _ /CintP [x ->]; rewrite numqE denq_int mulr1. Qed.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.
