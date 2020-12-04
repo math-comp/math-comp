@@ -133,8 +133,7 @@ Lemma zchar_nth_expansion S A phi :
     phi \in 'Z[S, A] ->
   {z | forall i, z i \in Cint & phi = \sum_(i < size S) z i *: S`_i}.
 Proof.
-case/andP=> _ /sumboolP/sig_eqW[/= z ->].
-exists (intr \o z) => [i|]; first exact: Cint_int.
+case/andP=> _ /sumboolP/sig_eqW[/= z ->]; exists (intr \o z) => //=.
 by apply: eq_bigr => i _; rewrite scaler_int.
 Qed.
 
@@ -150,7 +149,7 @@ Lemma zchar_expansion S A phi : uniq S ->
 Proof.
 move=> Suniq /zchar_nth_expansion[z Zz ->] /=.
 pose zS xi := oapp z 0 (insub (index xi S)).
-exists zS => [xi | ]; rewrite {}/zS; first by case: (insub _).
+exists zS => [xi | ]; rewrite {}/zS; first by case: (insub _) => /=.
 rewrite (big_nth 0) big_mkord; apply: eq_bigr => i _; congr (_ *: _).
 by rewrite index_uniq // valK.
 Qed.

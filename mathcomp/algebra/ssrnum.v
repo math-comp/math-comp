@@ -1220,6 +1220,7 @@ Definition archiNumDomainType := @ArchiNumDomain.Pack cT class.
 Definition fieldType := @GRing.Field.Pack cT class.
 Definition numFieldType := @NumField.Pack cT class.
 Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition field_archiNumDomainType := @ArchiNumDomain.Pack fieldType class.
 Definition numField_archiNumDomainType :=
   @ArchiNumDomain.Pack numFieldType class.
 
@@ -1258,6 +1259,7 @@ Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
+Canonical field_archiNumDomainType.
 Canonical numField_archiNumDomainType.
 Notation archiNumFieldType := type.
 Notation "[ 'archiNumFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
@@ -1300,15 +1302,26 @@ Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
 Definition idomainType := @GRing.IntegralDomain.Pack cT class.
 Definition porderType := @Order.POrder.Pack ring_display cT class.
 Definition numDomainType := @NumDomain.Pack cT class.
-Definition archiNumDomainType := @ArchiNumDomain.Pack cT class.
 Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition archiNumFieldType := @ArchiNumField.Pack cT class.
+Definition decFieldType := @GRing.DecidableField.Pack cT class.
 Definition closedFieldType := @GRing.ClosedField.Pack cT class.
+Definition numFieldType := @NumField.Pack cT class.
 Definition numClosedFieldType := @ClosedField.Pack cT class.
+Definition archiNumDomainType := @ArchiNumDomain.Pack cT class.
+Definition archiNumFieldType := @ArchiNumField.Pack cT class.
 Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition decField_archiNumDomainType :=
+  @ArchiNumDomain.Pack decFieldType class.
+Definition closedField_archiNumDomainType :=
+  @ArchiNumDomain.Pack closedFieldType class.
+Definition numClosedField_archiNumDomainType :=
+  @ArchiNumDomain.Pack numClosedFieldType class.
+Definition decField_archiNumFieldType :=
+  @ArchiNumField.Pack decFieldType class.
 Definition closedField_archiNumFieldType :=
   @ArchiNumField.Pack closedFieldType class.
+Definition numClosedField_archiNumFieldType :=
+  @ArchiNumField.Pack numClosedFieldType class.
 
 End ClassDef.
 
@@ -1337,21 +1350,28 @@ Coercion porderType : type >-> Order.POrder.type.
 Canonical porderType.
 Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
-Coercion archiNumDomainType : type >-> ArchiNumDomain.type.
-Canonical archiNumDomainType.
 Coercion fieldType : type >-> GRing.Field.type.
 Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion archiNumFieldType : type >-> ArchiNumField.type.
-Canonical archiNumFieldType.
+Coercion decFieldType : type >-> GRing.DecidableField.type.
+Canonical decFieldType.
 Coercion closedFieldType : type >-> GRing.ClosedField.type.
 Canonical closedFieldType.
+Coercion numFieldType : type >-> NumField.type.
+Canonical numFieldType.
 Coercion numClosedFieldType : type >-> ClosedField.type.
 Canonical numClosedFieldType.
+Coercion archiNumDomainType : type >-> ArchiNumDomain.type.
+Canonical archiNumDomainType.
+Coercion archiNumFieldType : type >-> ArchiNumField.type.
+Canonical archiNumFieldType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
+Canonical decField_archiNumDomainType.
+Canonical closedField_archiNumDomainType.
+Canonical numClosedField_archiNumDomainType.
+Canonical decField_archiNumFieldType.
 Canonical closedField_archiNumFieldType.
+Canonical numClosedField_archiNumFieldType.
 Notation archiNumClosedFieldType := type.
 Notation "[ 'archiNumClosedFieldType' 'of' T ]" :=  (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiNumClosedFieldType'  'of'  T ]") : form_scope.
@@ -1399,6 +1419,10 @@ Definition numDomainType := @NumDomain.Pack cT class.
 Definition archiNumDomainType := @ArchiNumDomain.Pack cT class.
 Definition realDomainType := @RealDomain.Pack cT class.
 Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition lattice_archiNumDomainType := @ArchiNumDomain.Pack latticeType class.
+Definition distrLattice_archiNumDomainType :=
+  @ArchiNumDomain.Pack distrLatticeType class.
+Definition order_archiNumDomainType := @ArchiNumDomain.Pack orderType class.
 Definition realDomain_archiNumDomainType :=
   @ArchiNumDomain.Pack realDomainType class.
 
@@ -1441,6 +1465,9 @@ Coercion realDomainType : type >-> RealDomain.type.
 Canonical realDomainType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
+Canonical lattice_archiNumDomainType.
+Canonical distrLattice_archiNumDomainType.
+Canonical order_archiNumDomainType.
 Canonical realDomain_archiNumDomainType.
 Notation archiRealDomainType := type.
 Notation "[ 'archiRealDomainType' 'of' T ]" := (@pack T _ _ id _ _ id)
@@ -1495,10 +1522,26 @@ Definition fieldType := @GRing.Field.Pack cT class.
 Definition numFieldType := @NumField.Pack cT class.
 Definition archiNumFieldType := @ArchiNumField.Pack cT class.
 Definition realFieldType := @RealField.Pack cT class.
-Definition realField_archiRealDomainType :=
-  @ArchiRealDomain.Pack realFieldType class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition realField_archiNumDomainType :=
+  @ArchiNumDomain.Pack realFieldType class.
+Definition lattice_archiNumFieldType := @ArchiNumField.Pack latticeType class.
+Definition distrLattice_archiNumFieldType :=
+  @ArchiNumField.Pack distrLatticeType class.
+Definition order_archiNumFieldType := @ArchiNumField.Pack orderType class.
+Definition realDomain_archiNumFieldType :=
+  @ArchiNumField.Pack realDomainType class.
 Definition realField_archiNumFieldType :=
   @ArchiNumField.Pack realFieldType class.
+Definition archiRealDomain_archiNumFieldType :=
+  @ArchiNumField.Pack archiRealDomainType class.
+Definition field_archiRealDomainType := @ArchiRealDomain.Pack fieldType class.
+Definition numField_archiRealDomainType :=
+  @ArchiRealDomain.Pack numFieldType class.
+Definition realField_archiRealDomainType :=
+  @ArchiRealDomain.Pack realFieldType class.
+Definition archiNumField_archiRealDomainType :=
+  @ArchiRealDomain.Pack archiNumFieldType class.
 
 End ClassDef.
 
@@ -1545,11 +1588,22 @@ Canonical fieldType.
 Coercion numFieldType : type >-> NumField.type.
 Canonical numFieldType.
 Coercion archiNumFieldType : type >-> ArchiNumField.type.
-Canonical archiNumDomainType.
+Canonical archiNumFieldType.
 Coercion realFieldType : type >-> RealField.type.
 Canonical realFieldType.
+Coercion normedZmodType : type >-> NormedZmodule.type.
+Canonical normedZmodType.
+Canonical realField_archiNumDomainType.
+Canonical lattice_archiNumFieldType.
+Canonical distrLattice_archiNumFieldType.
+Canonical order_archiNumFieldType.
+Canonical realDomain_archiNumFieldType.
 Canonical realField_archiNumFieldType.
+Canonical archiRealDomain_archiNumFieldType.
+Canonical field_archiRealDomainType.
+Canonical numField_archiRealDomainType.
 Canonical realField_archiRealDomainType.
+Canonical archiNumField_archiRealDomainType.
 Notation archiRealFieldType := type.
 Notation "[ 'archiRealFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiRealFieldType'  'of'  T ]") : form_scope.
@@ -1604,6 +1658,10 @@ Definition archiNumFieldType := @ArchiNumField.Pack cT class.
 Definition realFieldType := @RealField.Pack cT class.
 Definition archiRealFieldType := @ArchiRealField.Pack cT class.
 Definition rcfType := @RealClosedField.Pack cT class.
+Definition normedZmodType := NormedZmodType numDomainType cT class.
+Definition rcf_archiNumDomainType := @ArchiNumDomain.Pack rcfType class.
+Definition rcf_archiNumFieldType := @ArchiNumField.Pack rcfType class.
+Definition rcf_archiRealDomainType := @ArchiRealDomain.Pack rcfType class.
 Definition rcf_archiRealFieldType := @ArchiRealField.Pack rcfType class.
 
 End ClassDef.
@@ -1657,6 +1715,11 @@ Coercion archiRealFieldType : type >-> ArchiRealField.type.
 Canonical archiRealFieldType.
 Coercion rcfType : type >-> RealClosedField.type.
 Canonical rcfType.
+Coercion normedZmodType : type >-> NormedZmodule.type.
+Canonical normedZmodType.
+Canonical rcf_archiNumDomainType.
+Canonical rcf_archiNumFieldType.
+Canonical rcf_archiRealDomainType.
 Canonical rcf_archiRealFieldType.
 Notation archiRcfType := Num.ArchiRealClosedField.type.
 Notation "[ 'archiRcfType' 'of' T ]" :=  (@pack T _ _ id _ _ id)
@@ -5688,9 +5751,12 @@ Qed.
 End ArchiRealDomainTheory.
 
 Arguments Cnat {R}.
-Arguments natCK {R}.
+Arguments natCK {R} _%N.
 Arguments truncC {R}.
-Hint Resolve truncC0 truncC1 Cnat_nat Cnat0 Cnat1 : core.
+Hint Resolve truncC0 truncC1 : core.
+Hint Extern 0 (is_true (_%:R \is a Cnat)) => apply: Cnat_nat : core.
+Hint Extern 0 (is_true (0 \is a Cnat)) => apply: Cnat0 : core.
+Hint Extern 0 (is_true (1 \is a Cnat)) => apply: Cnat1 : core.
 
 Section ArchiNumFieldTheory.
 

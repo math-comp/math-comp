@@ -676,7 +676,7 @@ rewrite (bigD1 ord_max) //= [n %| m](contraNF _ Z'u) => [|n_dv_m]; last first.
   rewrite -sub_cent1 subEproper eq_sym eqEcard subsetT oG oCu leq_sub2r //.
   by rewrite leq_exp2l // dvdn_leq.
 rewrite divr1 dvdC_mulr //; apply/rpred_prod => d /andP[/Zaq-Zaqd _].
-have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r Cint0.
+have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r /=.
 by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 

@@ -527,7 +527,7 @@ rewrite rmorphM scalerAl -Dq lead_coefZ lead_coefM /=.
 have /monicP->: pZtoQ pz \is monic by rewrite -(map_monic QtoCm) pZtoQtoC -Dp.
 rewrite (monicP mon_q) mul1r mulr1 lead_coef_map_inj //; last exact: intr_inj.
 rewrite Dq => ->; apply/polyOverP=> i; rewrite !(coefZ, coef_map).
-by rewrite -rmorphM /= rmorph_int Cint_int.
+by rewrite -rmorphM /= rmorph_int.
 Qed.
 
 Lemma Cint_rat_Aint z : z \in Crat -> z \in Aint -> z \in Cint.
@@ -546,11 +546,10 @@ move=> x; rewrite -polyOverXsubC.
 by apply: root_monic_Aint; rewrite ?monicXsubC ?root_XsubC.
 Qed.
 
-Lemma Aint_int x : x%:~R \in Aint.
-Proof. by rewrite Aint_Cint ?Cint_int. Qed.
+Lemma Aint_int x : x%:~R \in Aint. Proof. by rewrite Aint_Cint. Qed.
 
-Lemma Aint0 : 0 \in Aint. Proof. exact: (Aint_int 0). Qed.
-Lemma Aint1 : 1 \in Aint. Proof. exact: (Aint_int 1). Qed.
+Lemma Aint0 : 0 \in Aint. Proof. exact: Aint_int 0. Qed.
+Lemma Aint1 : 1 \in Aint. Proof. exact: Aint_int 1. Qed.
 Hint Resolve Aint0 Aint1 : core.
 
 Lemma Aint_unity_root n x : (n > 0)%N -> n.-unity_root x -> x \in Aint.

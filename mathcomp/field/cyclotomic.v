@@ -144,7 +144,7 @@ Notation "''Phi_' n" := (Cyclotomic n)
 Lemma Cyclotomic_monic n : 'Phi_n \is monic.
 Proof.
 rewrite /'Phi_n; case: (C_prim_root_exists _) => z /= _.
-rewrite monicE lead_coefE coef_map_id0 ?(int_algC_K 0) ?getCint0 ?floorC0 //.
+rewrite monicE lead_coefE coef_map_id0 ?(int_algC_K 0) ?floorC0 //.
 by rewrite size_poly_eq -lead_coefE (monicP (cyclotomic_monic _ _)) (intCK 1).
 Qed.
 
@@ -180,7 +180,7 @@ have [r def_zn]: exists r, cyclotomic z n = pZtoC r.
     rewrite map_polyZ mapXn1 Dr0 Dr -scalerAl scalerKV ?intr_eq0 //.
     by rewrite rmorphM.
   by rewrite zprimitiveZ // zprimitive_monic ?monic_Xn_sub_1 ?mapXn1.
-rewrite floorCpK; last by apply/polyOverP=> i; rewrite def_zn coef_map Cint_int.
+rewrite floorCpK; last by apply/polyOverP=> i; rewrite def_zn coef_map /=.
 pose f e (k : 'I_n) := Ordinal (ltn_pmod (k * e) n_gt0).
 have [e Dz0] := prim_rootP prim_z (prim_expr_order prim_z0).
 have co_e_n: coprime e n by rewrite -(prim_root_exp_coprime e prim_z) -Dz0.

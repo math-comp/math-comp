@@ -1417,7 +1417,7 @@ have [c vGc co_p_f]: exists2 c, c \in irr_constt nuG & ~~ (p %| 'chi_c 1%g)%C.
   rewrite prime_coprime // negbK -dvdC_nat -[rhs in (_ %| rhs)%C]mulr1.
   rewrite -(lin_char1 lin_v) -cfInd1 // ['Ind _]cfun_sum_constt /=.
   rewrite sum_cfunE rpred_sum // => i /p_dv_v1 p_dv_chi1i.
-  rewrite cfunE dvdC_mull // rpred_Cnat //.
+  rewrite cfunE dvdC_mull // ssrint.Cint_Cnat //.
   by rewrite Cnat_cfdot_char ?cfInd_char ?irr_char.
 pose f := truncC ('chi_c 1%g); pose b := (egcdn f m).1.
 have fK: f%:R = 'chi_c 1%g by rewrite truncCK ?Cnat_irr1.

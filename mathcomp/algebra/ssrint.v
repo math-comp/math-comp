@@ -1852,13 +1852,11 @@ Lemma floorCpP (p : {poly R}) :
   p \is a polyOver Cint -> {q | p = map_poly intr q}.
 Proof. by exists (map_poly floorC p); rewrite floorCpK. Qed.
 
-Lemma Cint_int m : m%:~R \is a Cint.
-Proof. by rewrite unfold_in intCK. Qed.
+Lemma Cint_int m : m%:~R \is a Cint. Proof. by rewrite unfold_in intCK. Qed.
+Hint Resolve Cint_int : core.
 
 Lemma CintP x : reflect (exists m, x = m%:~R) (x \is a Cint).
-Proof.
-by apply: (iffP idP) => [/eqP<-|[m ->]]; [exists (floorC x) | apply: Cint_int].
-Qed.
+Proof. by apply: (iffP idP) => [/eqP<-|[m ->]]; first exists (floorC x). Qed.
 
 Lemma floorCD : {in Cint & Num.real, {morph floorC : x y / x + y}}.
 Proof.
@@ -1879,8 +1877,8 @@ Lemma rpred_Cint S (ringS : subringPred S) (kS : keyed_pred ringS) x :
   x \is a Cint -> x \in kS.
 Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
 
-Lemma Cint0 : 0 \is a Cint. Proof. exact: (Cint_int 0). Qed.
-Lemma Cint1 : 1 \is a Cint. Proof. exact: (Cint_int 1). Qed.
+Lemma Cint0 : 0 \is a Cint. Proof. exact: Cint_int 0. Qed.
+Lemma Cint1 : 1 \is a Cint. Proof. exact: Cint_int 1. Qed.
 Hint Resolve Cint0 Cint1 : core.
 
 Fact Cint_subring : subring_closed Cint.
@@ -1908,7 +1906,7 @@ Proof. by move/Creal_Cint/realEsign. Qed.
 (* Relating Cint and Cnat. *)
 
 Lemma Cint_Cnat : {subset Cnat <= Cint}.
-Proof. by move=> _ /CnatP[n ->]; rewrite pmulrn Cint_int. Qed.
+Proof. by move=> _ /CnatP[n ->]; rewrite pmulrn. Qed.
 
 Lemma CintE x : (x \is a Cint) = (x \is a Cnat) || (- x \is a Cnat).
 Proof.
@@ -1991,10 +1989,13 @@ Proof. by move=> _ /CintP[m ->]; apply: rmorph_int. Qed.
 
 End ArchiNumDomainTheory.
 
-Hint Resolve floorC0 floorC1 Cint_int Cint0 Cint1 : core.
 Arguments intCK {R}.
 Arguments Cint {R}.
 Arguments floorC {R}.
+Hint Resolve floorC0 floorC1 : core.
+Hint Extern 0 (is_true (_%:~R \is a Cint)) => apply: Cint_int : core.
+Hint Extern 0 (is_true (0 \is a Cint)) => apply: Cint0 : core.
+Hint Extern 0 (is_true (1 \is a Cint)) => apply: Cint1 : core.
 
 Section ArchiNumFieldTheory.
 

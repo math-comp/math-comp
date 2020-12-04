@@ -71,6 +71,7 @@ Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation algCF := [fieldType of algC].
+Local Notation natCK := (@natCK [archiNumDomainType of algC]).
 
 Section AlgC.
 
@@ -831,9 +832,7 @@ Variable G : {group gT}.
 Implicit Types (phi chi xi : 'CF(G)) (i : Iirr G).
 
 Lemma irr_char i : 'chi_i \is a character.
-Proof.
-by apply/forallP=> j; rewrite (tnth_nth 0) coord_free ?irr_free ?isNatC_nat.
-Qed.
+Proof. by apply/forallP=> j; rewrite (tnth_nth 0) coord_free ?irr_free. Qed.
 
 Lemma cfun1_char : (1 : 'CF(G)) \is a character.
 Proof. by rewrite -irr0 irr_char. Qed.
@@ -870,7 +869,7 @@ Qed.
 Lemma Cnat_char1 chi : chi \is a character -> chi 1%g \in Cnat.
 Proof.
 case/char_sum_irr=> r ->{chi}.
-by elim/big_rec: _ => [|i chi _ Nchi1]; rewrite cfunE ?rpredD // Cnat_irr1.
+by elim/big_rec: _ => [|i chi _ Nchi1]; rewrite cfunE ?rpredD ?Cnat_irr1.
 Qed.
 
 Lemma char1_ge0 chi : chi \is a character -> 0 <= chi 1%g.
@@ -1404,7 +1403,7 @@ apply/irrP/andP=> [[i ->] | [Nchi]]; first by rewrite irr_char cfnorm_irr.
 rewrite cfdot_sum_irr => /eqP/Cnat_sum_eq1[i _| i [_ ci1 cj0]].
   by rewrite rpredM // ?conj_Cnat ?Cnat_cfdot_char_irr.
 exists i; rewrite [chi]cfun_sum_cfdot (bigD1 i) //=.
-rewrite -(@normr_idP _ _ (@Cnat_ge0 _ (Cnat_cfdot_char_irr i Nchi))).
+rewrite -(normr_idP (Cnat_ge0 (Cnat_cfdot_char_irr i Nchi))).
 rewrite normC_def {}ci1 sqrtC1 scale1r big1 ?addr0 // => j neq_ji.
 by rewrite (('[_] =P 0) _) ?scale0r // -normr_eq0 normC_def cj0 ?sqrtC0.
 Qed.
@@ -1522,7 +1521,7 @@ exists (chi - 'chi_i); last by rewrite addrC subrK.
 apply/forallP=> j; rewrite coord_cfdot cfdotBl cfdot_irr.
 have [<- | _] := eqP; last by rewrite subr0 Cnat_cfdot_char_irr.
 have := i_in_chi; rewrite inE /= -(eqP (Cnat_cfdot_char_irr i Nchi)) pnatr_eq0.
-by case: (truncC _) => // n _; rewrite mulrSr addrK ?isNatC_nat.
+by case: (truncC _) => // n _; rewrite mulrSr addrK.
 Qed.
 
 Lemma cfun_sum_constt (phi : 'CF(G)) :

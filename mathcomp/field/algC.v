@@ -662,7 +662,7 @@ Hint Resolve algCreal_Re algCreal_Im : core.
 Lemma dvdCP x y : reflect (exists2 z, z \in Cint & y = z * x) (x %| y)%C.
 Proof.
 rewrite unfold_in; have [-> | nz_x] := eqVneq.
-  by apply: (iffP eqP) => [->|[z _ ->]]; first exists 0; rewrite ?mulr0 ?Cint0.
+  by apply: (iffP eqP) => [->|[z _ ->]]; first exists 0; rewrite ?mulr0.
 apply: (iffP idP) => [Zyx | [z Zz ->]]; last by rewrite mulfK.
 by exists (y / x); rewrite ?divfK.
 Qed.
@@ -676,7 +676,7 @@ by move=> /pmulr_lge0-> /CintEge0-> /CnatP[n ->]; exists n.
 Qed.
 
 Lemma dvdC0 x : (x %| 0)%C.
-Proof. by apply/dvdCP; exists 0; rewrite ?mul0r ?Cint0. Qed.
+Proof. by apply/dvdCP; exists 0; rewrite ?mul0r. Qed.
 
 Lemma dvd0C x : (0 %| x)%C = (x == 0).
 Proof. by rewrite unfold_in eqxx. Qed.
@@ -703,7 +703,7 @@ Lemma dvdC_trans x y z : (x %| y)%C -> (y %| z)%C -> (x %| z)%C.
 Proof. by move=> x_dv_y /dvdCP[m Zm ->]; apply: dvdC_mull. Qed.
 
 Lemma dvdC_refl x : (x %| x)%C.
-Proof. by apply/dvdCP; exists 1; rewrite ?mul1r ?Cint1. Qed.
+Proof. by apply/dvdCP; exists 1; rewrite ?mul1r. Qed.
 Hint Resolve dvdC_refl : core.
 
 Fact dvdC_key x : pred_key (dvdC x). Proof. by []. Qed.
@@ -859,7 +859,7 @@ Proof. by move=> x /conj_Crat/CrealP. Qed.
 
 Lemma Cint_rat a : (QtoC a \in Cint) = (a \in Qint).
 Proof.
-apply/idP/idP=> [Za | /numqK <-]; last by rewrite rmorph_int Cint_int.
+apply/idP/idP=> [Za | /numqK <-]; last by rewrite rmorph_int.
 apply/QintP; exists (floorC (QtoC a)); apply: (can_inj ratCK).
 by rewrite rmorph_int floorCK.
 Qed.
