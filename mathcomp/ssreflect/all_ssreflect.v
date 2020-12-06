@@ -7,6 +7,7 @@ Require Export seq.
 Require Export choice.
 Require Export path.
 Require Export div.
+Require Export finmap.
 Require Export fintype.
 Require Export fingraph.
 Require Export tuple.
