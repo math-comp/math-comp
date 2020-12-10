@@ -605,26 +605,49 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
+Module ratArchimedean.
+Section ratArchimedean.
+
+Implicit Types x : rat.
+
+Let trunc x : nat := if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
+
+Lemma truncP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
 Proof.
-move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
-by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
+rewrite /trunc -numq_ge0; case: (ratP x) => -[] //= n d _.
+rewrite ler_pdivl_mulr ?ltr_pdivr_mulr ?ltr0z // -!natrM ler_nat ltr_nat.
+by rewrite leq_trunc_div ltn_ceil.
 Qed.
 
-Canonical rat_archiNumDomainType := ArchiNumDomainType rat rat_archimedean.
+Let is_nat x := (0 <= x) && (denq x == 1).
+
+Lemma is_natE x : is_nat x = ((trunc x)%:R == x).
+Proof.
+rewrite /is_nat /trunc -numq_ge0 !rat_eq; case: (ratP x) => -[] //= n d pnd.
+rewrite pmulrn numq_int denq_int mulr1 -PoszM !eqz_nat -dvdn_eq.
+apply/eqP/idP => [->|/dvdnP[k nE]] //.
+by move/eqP: pnd; rewrite nE gcdnC gcdnMl.
+Qed.
+
+Lemma is_intE x : (denq x == 1) = is_nat x || is_nat (- x).
+Proof. by rewrite /is_nat denqN oppr_ge0 -andb_orl le_total. Qed.
+
+Definition mixin : Num.ArchiNumDomain.mixin_of [numDomainType of rat] :=
+  Num.ArchiNumDomain.Mixin truncP is_natE is_intE.
+
+End ratArchimedean.
+End ratArchimedean.
+
+Canonical rat_archiNumDomainType := ArchiNumDomainType rat ratArchimedean.mixin.
 Canonical rat_archiRealDomainType := [archiRealDomainType of rat].
 Canonical rat_archiNumFieldType := [archiNumFieldType of rat].
 Canonical rat_archiRealFieldType := [archiRealFieldType of rat].
 
-Lemma Qint_def x : (x \is a Cint) = (denq x == 1).
-Proof.
-apply/CintP/eqP => [[z ->]|xden]; first by rewrite denq_int.
-by exists (numq x); rewrite numqE xden mulr1.
-Qed.
+Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 
-Lemma numqK : {in Cint, cancel (fun x => numq x) intr}.
-Proof. by move=> _ /CintP [x ->]; rewrite numqE denq_int mulr1. Qed.
+Lemma numqK : {in Num.int, cancel (fun x => numq x) intr}.
+Proof. by move=> _ /RintP [x ->]; rewrite numq_int. Qed.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.

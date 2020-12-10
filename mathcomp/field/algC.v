@@ -31,11 +31,7 @@ From mathcomp Require Import algebraics_fundamentals.
 (*               file cyclotomic.v).                                          *)
 (* In addition, we provide:                                                   *)
 (*       Crat == the subset of rational numbers.                              *)
-(*       Cint == the subset of integers.                                      *)
-(*       Cnat == the subset of natural integers.                              *)
 (*  getCrat z == some a : rat such that ratr a = z, provided z \in Crat.      *)
-(*   floorC z == for z \in Creal, an m : int s.t. m%:~R <= z < (m + 1)%:~R.   *)
-(*   truncC z == for z >= 0, an n : nat s.t. n%:R <= z < n.+1%:R, else 0%N.   *)
 (* minCpoly z == the minimal (monic) polynomial over Crat with root z.        *)
 (* algC_invaut nu == an inverse of nu : {rmorphism algC -> algC}.             *)
 (*         (x %| y)%C <=> y is an integer (Cint) multiple of x; if x or y are *)
@@ -474,15 +470,9 @@ Module Internals.
 Import Implementation.
 
 Local Notation algC := type.
-Local Notation "z ^*" := (conj z) (at level 2, format "z ^*") : ring_scope.
 Local Notation QtoC := (ratr : rat -> algC).
 Local Notation QtoCm := [rmorphism of QtoC].
 Local Notation pQtoC := (map_poly QtoC).
-Local Notation ZtoQ := (intr : int -> rat).
-Local Notation ZtoC := (intr : int -> algC).
-Local Notation Creal := (Num.real : qualifier 0 algC).
-Local Notation Cnat := (Cnat : qualifier 1 algC).
-Local Notation Cint := (Cint : qualifier 1 algC).
 
 Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
 Proof. exact: GRing.imaginary_exists. Qed.
@@ -575,7 +565,7 @@ Lemma zCdivE (p : int) : p = p%:~R :> divisor. Proof. by []. Qed.
 Definition CdivE := (nCdivE, zCdivE).
 
 Definition dvdC (x : divisor) : {pred algC} :=
-   fun y => if x == 0 then y == 0 else y / x \in Cint.
+   fun y => if x == 0 then y == 0 else y / x \in Num.int.
 Notation "x %| y" := (y \in dvdC x) : C_expanded_scope.
 Notation "x %| y" := (@in_mem divisor y (mem (dvdC x))) : C_scope.
 
@@ -642,11 +632,6 @@ Definition algC_algebraic x := Algebraics.Implementation.algebraic x.
 
 (* Real number subset. *)
 
-Lemma Creal0 : 0 \is Creal. Proof. exact: rpred0. Qed.
-Lemma Creal1 : 1 \is Creal. Proof. exact: rpred1. Qed.
-(* Trivial cannot resolve a general real0 hint. *)
-Hint Resolve Creal0 Creal1 : core.
-
 Lemma algCrect x : x = 'Re x + 'i * 'Im x.
 Proof. by rewrite [LHS]Crect. Qed.
 
@@ -659,7 +644,7 @@ Hint Resolve algCreal_Re algCreal_Im : core.
 
 (* Integer divisibility. *)
 
-Lemma dvdCP x y : reflect (exists2 z, z \in Cint & y = z * x) (x %| y)%C.
+Lemma dvdCP x y : reflect (exists2 z, z \in Num.int & y = z * x) (x %| y)%C.
 Proof.
 rewrite unfold_in; have [-> | nz_x] := eqVneq.
   by apply: (iffP eqP) => [->|[z _ ->]]; first exists 0; rewrite ?mulr0.
@@ -672,7 +657,7 @@ Proof.
 move=> x_ge0 y_ge0 x_dv_y; apply: sig_eqW.
 case/dvdCP: x_dv_y => z Zz -> in y_ge0 *; move: x_ge0 y_ge0 Zz.
 rewrite le_eqVlt => /predU1P[<- | ]; first by exists 22; rewrite !mulr0.
-by move=> /pmulr_lge0-> /CintEge0-> /CnatP[n ->]; exists n.
+by move=> /pmulr_lge0-> /RintEge0-> /RnatP[n ->]; exists n.
 Qed.
 
 Lemma dvdC0 x : (x %| 0)%C.
@@ -681,13 +666,13 @@ Proof. by apply/dvdCP; exists 0; rewrite ?mul0r. Qed.
 Lemma dvd0C x : (0 %| x)%C = (x == 0).
 Proof. by rewrite unfold_in eqxx. Qed.
 
-Lemma dvdC_mull x y z : y \in Cint -> (x %| z)%C -> (x %| y * z)%C.
+Lemma dvdC_mull x y z : y \in Num.int -> (x %| z)%C -> (x %| y * z)%C.
 Proof.
 move=> Zy /dvdCP[m Zm ->]; apply/dvdCP.
 by exists (y * m); rewrite ?mulrA ?rpredM.
 Qed.
 
-Lemma dvdC_mulr x y z : y \in Cint -> (x %| z)%C -> (x %| z * y)%C.
+Lemma dvdC_mulr x y z : y \in Num.int -> (x %| z)%C -> (x %| z * y)%C.
 Proof. by rewrite mulrC; apply: dvdC_mull. Qed.
 
 Lemma dvdC_mul2r x y z : y != 0 -> (x * y %| z * y)%C = (x %| z)%C.
@@ -719,16 +704,16 @@ Canonical dvdC_zmodPred x := ZmodPred (dvdC_zmod x).
 
 Lemma dvdC_nat (p n : nat) : (p %| n)%C = (p %| n)%N.
 Proof.
-rewrite unfold_in CintEge0 ?divr_ge0 ?invr_ge0 ?ler0n // !pnatr_eq0.
+rewrite unfold_in RintEge0 ?divr_ge0 ?invr_ge0 ?ler0n // !pnatr_eq0.
 have [-> | nz_p] := eqVneq; first by rewrite dvd0n.
-apply/CnatP/dvdnP=> [[q def_q] | [q ->]]; exists q.
+apply/RnatP/dvdnP=> [[q def_q] | [q ->]]; exists q.
   by apply/eqP; rewrite -eqC_nat natrM -def_q divfK ?pnatr_eq0.
 by rewrite [num in num / _]natrM mulfK ?pnatr_eq0.
 Qed.
 
-Lemma dvdC_int (p : nat) x : x \in Cint -> (p %| x)%C = (p %| `|floorC x|)%N.
+Lemma dvdC_int (p : nat) x : x \in Num.int -> (p %| x)%C = (p %| `|floorR x|)%N.
 Proof.
-move=> Zx; rewrite -{1}(floorCK Zx) {1}[floorC x]intEsign.
+move=> Zx; rewrite -{1}(floorRK Zx) {1}[floorR x]intEsign.
 by rewrite rmorphMsign rpredMsign dvdC_nat.
 Qed.
 
@@ -784,23 +769,23 @@ Lemma eqCmod0_nat (e m : nat) : (m == 0 %[mod e])%C = (e %| m)%N.
 Proof. by rewrite eqCmod0 dvdC_nat. Qed.
 
 Lemma eqCmodMr e :
-  {in Cint, forall z x y, x == y %[mod e] -> x * z == y * z %[mod e]}%C.
+  {in Num.int, forall z x y, x == y %[mod e] -> x * z == y * z %[mod e]}%C.
 Proof. by move=> z Zz x y; rewrite /eqCmod -mulrBl => /dvdC_mulr->. Qed.
 
 Lemma eqCmodMl e :
-  {in Cint, forall z x y, x == y %[mod e] -> z * x == z * y %[mod e]}%C.
+  {in Num.int, forall z x y, x == y %[mod e] -> z * x == z * y %[mod e]}%C.
 Proof. by move=> z Zz x y Exy; rewrite !(mulrC z) eqCmodMr. Qed.
 
-Lemma eqCmodMl0 e : {in Cint, forall x, x * e == 0 %[mod e]}%C.
+Lemma eqCmodMl0 e : {in Num.int, forall x, x * e == 0 %[mod e]}%C.
 Proof. by move=> x Zx; rewrite -(mulr0 x) eqCmodMl. Qed.
 
-Lemma eqCmodMr0 e : {in Cint, forall x, e * x == 0 %[mod e]}%C.
+Lemma eqCmodMr0 e : {in Num.int, forall x, e * x == 0 %[mod e]}%C.
 Proof. by move=> x Zx; rewrite /= mulrC eqCmodMl0. Qed.
 
-Lemma eqCmod_addl_mul e : {in Cint, forall x y, x * e + y == y %[mod e]}%C.
+Lemma eqCmod_addl_mul e : {in Num.int, forall x y, x * e + y == y %[mod e]}%C.
 Proof. by move=> x Zx y; rewrite -{2}[y]add0r eqCmodDr eqCmodMl0. Qed.
 
-Lemma eqCmodM e : {in Cint & Cint, forall x1 y2 x2 y1,
+Lemma eqCmodM e : {in Num.int & Num.int, forall x1 y2 x2 y1,
   x1 == x2 %[mod e] -> y1 == y2 %[mod e] -> x1 * y1 == x2 * y2 %[mod e]}%C.
 Proof.
 move=> x1 y2 Zx1 Zy2 x2 y1 eq_x /(eqCmodMl Zx1)/eqCmod_trans-> //.
@@ -857,11 +842,11 @@ Proof. by move/getCratK <-; rewrite fmorph_div !rmorph_int. Qed.
 Lemma Creal_Crat : {subset Crat <= Creal}.
 Proof. by move=> x /conj_Crat/CrealP. Qed.
 
-Lemma Cint_rat a : (QtoC a \in Cint) = (a \in Cint).
+Lemma Cint_rat a : (QtoC a \in Num.int) = (a \in Num.int).
 Proof.
 apply/idP/idP=> [Za | /numqK <-]; last by rewrite rmorph_int.
-apply/CintP; exists (floorC (QtoC a)); apply: (can_inj ratCK).
-by rewrite rmorph_int floorCK.
+apply/RintP; exists (floorR (QtoC a)); apply: (can_inj ratCK).
+by rewrite rmorph_int floorRK.
 Qed.
 
 Lemma minCpolyP x :
@@ -931,5 +916,4 @@ Qed.
 End AutC.
 
 End AlgebraicsTheory.
-Hint Resolve Creal0 Creal1 Crat0 Crat1 : core.
-Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
+Hint Resolve Crat0 Crat1 dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.

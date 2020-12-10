@@ -71,7 +71,7 @@ Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation algCF := [fieldType of algC].
-Local Notation natCK := (@natCK [archiNumDomainType of algC]).
+Local Notation natRK := (@natRK [archiNumDomainType of algC]).
 
 Section AlgC.
 
@@ -650,7 +650,7 @@ Local Notation "''e_' i" := 'e_(W i).
 Lemma irr1_degree i : 'chi_i 1%g = ('n_i)%:R.
 Proof. by rewrite -irrRepr cfRepr1. Qed.
 
-Lemma Cnat_irr1 i : 'chi_i 1%g \in Cnat.
+Lemma Cnat_irr1 i : 'chi_i 1%g \in Num.nat.
 Proof. by rewrite irr1_degree rpred_nat. Qed.
 
 Lemma irr1_gt0 i : 0 < 'chi_i 1%g.
@@ -824,7 +824,7 @@ Section IsChar.
 Variable gT : finGroupType.
 
 Definition character {G : {set gT}} :=
-  [qualify a phi : 'CF(G) | [forall i, coord (irr G) i phi \in Cnat]].
+  [qualify a phi : 'CF(G) | [forall i, coord (irr G) i phi \in Num.nat]].
 Fact character_key G : pred_key (@character G). Proof. by []. Qed.
 Canonical character_keyed G := KeyedQualifier (character_key G).
 
@@ -852,7 +852,7 @@ Lemma char_sum_irrP {phi} :
 Proof.
 apply: (iffP idP)=> [/forallP-Nphi | [n ->]]; last first.
   by apply: rpred_sum => i _; rewrite scaler_nat rpredMn // irr_char.
-do [have [a ->] := cfun_irr_sum phi] in Nphi *; exists (truncC \o a).
+do [have [a ->] := cfun_irr_sum phi] in Nphi *; exists (Num.trunc \o a).
 apply: eq_bigr => i _; congr (_ *: _); have:= eqP (Nphi i).
 by rewrite eq_sum_nth_irr coord_sum_free ?irr_free.
 Qed.
@@ -866,14 +866,14 @@ exists (ncons (n i) i r); rewrite scaler_nat.
 by elim: {n}(n i) => [|n IHn]; rewrite ?add0r //= big_cons mulrS -addrA IHn.
 Qed.
 
-Lemma Cnat_char1 chi : chi \is a character -> chi 1%g \in Cnat.
+Lemma Cnat_char1 chi : chi \is a character -> chi 1%g \in Num.nat.
 Proof.
 case/char_sum_irr=> r ->{chi}.
 by elim/big_rec: _ => [|i chi _ Nchi1]; rewrite cfunE ?rpredD ?Cnat_irr1.
 Qed.
 
 Lemma char1_ge0 chi : chi \is a character -> 0 <= chi 1%g.
-Proof. by move/Cnat_char1/Cnat_ge0. Qed.
+Proof. by move/Cnat_char1/Rnat_ge0. Qed.
 
 Lemma char1_eq0 chi : chi \is a character -> (chi 1%g == 0) = (chi == 0).
 Proof.
@@ -884,7 +884,7 @@ by rewrite (negbTE (irr1_neq0 i)).
 Qed.
 
 Lemma char1_gt0 chi : chi \is a character -> (0 < chi 1%g) = (chi != 0).
-Proof. by move=> Nchi; rewrite -char1_eq0 // Cnat_gt0 ?Cnat_char1. Qed.
+Proof. by move=> Nchi; rewrite -char1_eq0 // Rnat_gt0 ?Cnat_char1. Qed.
 
 Lemma char_reprP phi :
   reflect (exists rG : representation algCF G, phi = cfRepr rG)
@@ -946,7 +946,7 @@ Proof. exact: cfAut_char. Qed.
 
 Lemma cfAut_char1 u (chi : 'CF(G)) :
   chi \is a character -> cfAut u chi 1%g = chi 1%g.
-Proof. by move/Cnat_char1=> Nchi1; rewrite cfunE aut_Cnat. Qed.
+Proof. by move/Cnat_char1=> Nchi1; rewrite cfunE aut_Rnat. Qed.
 
 Lemma cfAut_irr1 u i : (cfAut u 'chi[G]_i) 1%g = 'chi_i 1%g.
 Proof. exact: cfAut_char1 (irr_char i). Qed.
@@ -1088,8 +1088,8 @@ Lemma irr_repr_lin_char (i : Iirr G) x :
   irr_repr (socle_of_Iirr i) x = ('chi_i x)%:M.
 Proof.
 move=> Gx CFi; rewrite -irrRepr cfunE Gx.
-move: (_ x); rewrite -[irr_degree _]natCK -irr1_degree lin_char1 //.
-by rewrite (natCK 1) => A; rewrite trace_mx11 -mx11_scalar.
+move: (_ x); rewrite -[irr_degree _]natRK -irr1_degree lin_char1 //.
+by rewrite (natRK 1) => A; rewrite trace_mx11 -mx11_scalar.
 Qed.
 
 Fact linear_char_key B : pred_key (@linear_char B). Proof. by []. Qed.
@@ -1376,18 +1376,18 @@ by rewrite cfdotZl -cfdotC.
 Qed.
 
 Lemma Cnat_cfdot_char_irr i phi :
-  phi \is a character -> '[phi, 'chi_i]_G \in Cnat.
+  phi \is a character -> '[phi, 'chi_i]_G \in Num.nat.
 Proof. by move/forallP/(_ i); rewrite coord_cfdot. Qed.
 
 Lemma cfdot_char_r phi chi :  
   chi \is a character -> '[phi, chi]_G = \sum_i '[phi, 'chi_i] * '[chi, 'chi_i].
 Proof.
 move=> Nchi; rewrite cfdot_sum_irr; apply: eq_bigr => i _; congr (_ * _).
-by rewrite conj_Cnat ?Cnat_cfdot_char_irr.
+by rewrite conj_Rnat ?Cnat_cfdot_char_irr.
 Qed.
 
 Lemma Cnat_cfdot_char chi xi :
-  chi \is a character -> xi \is a character -> '[chi, xi]_G \in Cnat.
+  chi \is a character -> xi \is a character -> '[chi, xi]_G \in Num.nat.
 Proof.
 move=> Nchi Nxi; rewrite cfdot_char_r ?rpred_sum // => i _.
 by rewrite rpredM ?Cnat_cfdot_char_irr.
@@ -1395,15 +1395,15 @@ Qed.
  
 Lemma cfdotC_char chi xi :
   chi \is a character-> xi \is a character -> '[chi, xi]_G = '[xi, chi].
-Proof. by move=> Nchi Nxi; rewrite cfdotC conj_Cnat ?Cnat_cfdot_char. Qed.
+Proof. by move=> Nchi Nxi; rewrite cfdotC conj_Rnat ?Cnat_cfdot_char. Qed.
 
 Lemma irrEchar chi : (chi \in irr G) = (chi \is a character) && ('[chi] == 1).
 Proof.
 apply/irrP/andP=> [[i ->] | [Nchi]]; first by rewrite irr_char cfnorm_irr.
-rewrite cfdot_sum_irr => /eqP/Cnat_sum_eq1[i _| i [_ ci1 cj0]].
-  by rewrite rpredM // ?conj_Cnat ?Cnat_cfdot_char_irr.
+rewrite cfdot_sum_irr => /eqP/Rnat_sum_eq1[i _| i [_ ci1 cj0]].
+  by rewrite rpredM // ?conj_Rnat ?Cnat_cfdot_char_irr.
 exists i; rewrite [chi]cfun_sum_cfdot (bigD1 i) //=.
-rewrite -(normr_idP (Cnat_ge0 (Cnat_cfdot_char_irr i Nchi))).
+rewrite -(normr_idP (Rnat_ge0 (Cnat_cfdot_char_irr i Nchi))).
 rewrite normC_def {}ci1 sqrtC1 scale1r big1 ?addr0 // => j neq_ji.
 by rewrite (('[_] =P 0) _) ?scale0r // -normr_eq0 normC_def cj0 ?sqrtC0.
 Qed.
@@ -1520,8 +1520,8 @@ move=> Nchi; apply: (iffP idP) => [i_in_chi| [chi' Nchi' ->]]; last first.
 exists (chi - 'chi_i); last by rewrite addrC subrK.
 apply/forallP=> j; rewrite coord_cfdot cfdotBl cfdot_irr.
 have [<- | _] := eqP; last by rewrite subr0 Cnat_cfdot_char_irr.
-have := i_in_chi; rewrite inE /= -(eqP (Cnat_cfdot_char_irr i Nchi)) pnatr_eq0.
-by case: (truncC _) => // n _; rewrite mulrSr addrK.
+move: i_in_chi; rewrite inE; case/RnatP: (Cnat_cfdot_char_irr i Nchi) => n ->.
+by rewrite pnatr_eq0 -lt0n => /natrB <-; apply: rpred_nat.
 Qed.
 
 Lemma cfun_sum_constt (phi : 'CF(G)) :
@@ -1558,7 +1558,7 @@ Proof.
 move=> _ _ /constt_charP[//|phi1 Nphi1 ->] /constt_charP[//|psi1 Npsi1 ->].
 rewrite cfdot_irr; case: eqP => // -> /eqP/idPn[].
 rewrite cfdotDl !cfdotDr cfnorm_irr -addrA gt_eqF ?ltr_paddr ?ltr01 //.
-by rewrite Cnat_ge0 ?rpredD ?Cnat_cfdot_char ?irr_char.
+by rewrite Rnat_ge0 ?rpredD ?Cnat_cfdot_char ?irr_char.
 Qed.
 
 End IrrConstt.
@@ -1620,7 +1620,7 @@ apply/eqP/bigcapP=> [Kx i Ci | Kx]; last first.
 rewrite cfkerEirr inE /= -(inj_eq (mulfI Ci)).
 have:= (normC_sum_upper _ Kx) i; rewrite !cfunE => -> // {Ci}i _.
 have chi_i_ge0: 0 <= '[chi, 'chi_i].
-  by rewrite Cnat_ge0 ?Cnat_cfdot_char_irr.
+  by rewrite Rnat_ge0 ?Cnat_cfdot_char_irr.
 by rewrite !cfunE normrM (normr_idP _) ?ler_wpmul2l ?char1_ge_norm ?irr_char.
 Qed.
 
@@ -1687,7 +1687,7 @@ Lemma cfRes_char chi : chi \is a character -> 'Res[H, G] chi \is a character.
 Proof.
 have [sHG | not_sHG] := boolP (H \subset G).
   by case/char_reprP=> rG ->; rewrite -(cfRepr_sub rG sHG) cfRepr_char.
-by move/Cnat_char1=> Nchi1; rewrite cfResEout // rpredZ_Cnat ?rpred1.
+by move/Cnat_char1=> Nchi1; rewrite cfResEout // rpredZ_Rnat ?rpred1.
 Qed.
 
 Lemma cfRes_eq0 phi : phi \is a character -> ('Res[H, G] phi == 0) = (phi == 0).
@@ -1746,7 +1746,7 @@ Lemma cfdot_Res_ge_constt i j psi :
   '['Res[H, G] 'chi_j, 'chi_i] <= '['Res[H] psi, 'chi_i].
 Proof.
 move=> {psi} _ /constt_charP[// | psi Npsi ->].
-rewrite linearD cfdotDl addrC -subr_ge0 addrK Cnat_ge0 //=.
+rewrite linearD cfdotDl addrC -subr_ge0 addrK Rnat_ge0 //=.
 by rewrite Cnat_cfdot_char_irr // cfRes_char.
 Qed.
 
@@ -1755,7 +1755,7 @@ Lemma constt_Res_trans j psi :
   {subset irr_constt ('Res[H, G] 'chi_j) <= irr_constt ('Res[H] psi)}.
 Proof.
 move=> Npsi Cj i; apply: contraNneq; rewrite eq_le => {1}<-.
-rewrite cfdot_Res_ge_constt ?Cnat_ge0 ?Cnat_cfdot_char_irr //.
+rewrite cfdot_Res_ge_constt ?Rnat_ge0 ?Cnat_cfdot_char_irr //.
 by rewrite cfRes_char ?irr_char.
 Qed.
 
@@ -1776,7 +1776,7 @@ Qed.
 Lemma cfMorph_char chi : chi \is a character -> cfMorph chi \is a character.
 Proof.
 have [sGD /char_reprP[rfG ->] | outGD Nchi] := boolP (G \subset D); last first.
-  by rewrite cfMorphEout // rpredZ_Cnat ?rpred1 ?Cnat_char1.
+  by rewrite cfMorphEout // rpredZ_Rnat ?rpred1 ?Cnat_char1.
 apply/char_reprP; exists (Representation (morphim_repr rfG sGD)).
 by rewrite cfRepr_morphim.
 Qed.
@@ -1969,7 +1969,7 @@ Proof.
 move=> /Cnat_char1 Nphi /Cnat_char1 Npsi.
 apply/eqP/andP=> [phi_psi_1 | [/eqP-> /eqP->]]; last by rewrite cfDprod_cfun1.
 have /andP[/eqP phi1 /eqP psi1]: (phi 1%g == 1) && (psi 1%g == 1).
-  by rewrite -Cnat_mul_eq1 // -(cfDprod1 KxH) phi_psi_1 cfun11.
+  by rewrite -Rnat_mul_eq1 // -(cfDprod1 KxH) phi_psi_1 cfun11.
 rewrite -[phi](cfDprodKl KxH psi1) -{2}[psi](cfDprodKr KxH phi1) phi_psi_1.
 by rewrite !rmorph1.
 Qed.
@@ -2034,9 +2034,9 @@ Proof. by rewrite dprod_IirrE /cfDprod irr0 rmorph1 mul1r. Qed.
 
 Lemma dprod_Iirr_inj : injective dprod_Iirr.
 Proof.
-move=> [i1 j1] [i2 j2] /eqP; rewrite -[_ == _]oddb -(natCK (_ == _)).
+move=> [i1 j1] [i2 j2] /eqP; rewrite -[_ == _]oddb -(natRK (_ == _)).
 rewrite -cfdot_irr !dprod_IirrE cfdot_dprod !cfdot_irr -natrM mulnb.
-by rewrite natCK oddb -xpair_eqE => /eqP.
+by rewrite natRK oddb -xpair_eqE => /eqP.
 Qed.
 
 Lemma dprod_Iirr0 : dprod_Iirr (0, 0) = 0.
@@ -2155,7 +2155,7 @@ have Phi1_1: Phi 1%g = 1 by rewrite Phi1 cfun1E group1.
 have nz_Phi1: Phi 1%g != 0 by rewrite Phi1_1 oner_eq0.
 have [_ <-] := cfBigdprodK nz_Phi1 Pi.
 rewrite Phi1_1 divr1 -/Phi Phi1 rmorph1.
-rewrite prod_cfunE // in Phi1_1; have := Cnat_prod_eq1 _ Phi1_1 Pi.
+rewrite prod_cfunE // in Phi1_1; have := Rnat_prod_eq1 _ Phi1_1 Pi.
 rewrite -(cfRes1 (A i)) cfBigdprodiK // => ->; first by rewrite scale1r.
 by move=> {i Pi} j /Nphi Nphi_j; rewrite Cnat_char1 ?cfBigdprodi_char.
 Qed.
@@ -2270,7 +2270,7 @@ Proof.
 move=> Nchi; without loss kerH: / H \subset cfker chi.
   move/contraNF=> IHchi; apply/wlog_neg=> N'chiH.
   suffices ->: (chi / H)%CF = (chi 1%g)%:A.
-    by rewrite rpredZ_Cnat ?Cnat_char1 ?rpred1.
+    by rewrite rpredZ_Rnat ?Cnat_char1 ?rpred1.
   by apply/cfunP=> x; rewrite cfunE cfun1E mulr_natr cfunElock IHchi.
 without loss nsHG: G chi Nchi kerH / H <| G.
   move=> IHchi; have nsHN := normalSG (subset_trans kerH (cfker_sub chi)).
@@ -2582,7 +2582,7 @@ Qed.
 
 End DetRepr.
 
-Definition cfDet phi := \prod_i detRepr 'Chi_i ^+ truncC '[phi, 'chi[G]_i].
+Definition cfDet phi := \prod_i detRepr 'Chi_i ^+ Num.trunc '[phi, 'chi[G]_i].
 
 Lemma cfDet_lin_char phi : cfDet phi \is a linear_char.
 Proof. by apply: rpred_prod => i _; apply: rpredX; apply: detRepr_lin_char. Qed.
@@ -2591,11 +2591,11 @@ Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
 move=> phi psi Nphi Npsi; rewrite /= -big_split; apply: eq_bigr => i _ /=.
-by rewrite -exprD cfdotDl truncCD ?nnegrE ?Cnat_ge0 // Cnat_cfdot_char_irr.
+by rewrite -exprD cfdotDl truncRD ?nnegrE ?Rnat_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
-Proof. by rewrite /cfDet big1 // => i _; rewrite cfdot0l truncC0. Qed.
+Proof. by rewrite /cfDet big1 // => i _; rewrite cfdot0l truncR0. Qed.
 
 Lemma cfDetMn k :
   {in character, {morph cfDet : phi / phi *+ k >-> phi ^+ k}}.
@@ -2612,7 +2612,7 @@ transitivity (\prod_W detRepr (socle_repr W) ^+ standard_irr_coef rG W).
   rewrite (cfRepr_sim (mx_rsim_standard rG)) cfRepr_standard.
   rewrite cfdot_suml (bigD1 i) ?big1 //= => [|j i'j]; last first.
     by rewrite cfdotZl cfdot_irr (negPf i'j) mulr0.
-  by rewrite cfdotZl cfnorm_irr mulr1 addr0 natCK.
+  by rewrite cfdotZl cfnorm_irr mulr1 addr0 natRK.
 apply/cfun_inP=> x Gx; rewrite prod_cfunE //.
 transitivity (detRepr (standard_grepr rG) x); last first.
   rewrite !cfunE Gx !trace_mx11 !mxE eqxx !mulrb.
@@ -2658,7 +2658,7 @@ Lemma cfDetRes gT (G H : {group gT}) phi :
   phi \is a character -> cfDet ('Res[H, G] phi) = 'Res (cfDet phi).
 Proof.
 move=> Nphi; have [sGH | not_sHG] := boolP (H \subset G); last first.
-  have /CnatP[n Dphi1] := Cnat_char1 Nphi.
+  have /RnatP[n Dphi1] := Cnat_char1 Nphi.
   rewrite !cfResEout // Dphi1 lin_char1 ?cfDet_lin_char // scale1r.
   by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // expr1n.
 have [rG ->] := char_reprP Nphi; rewrite !(=^~ cfRepr_sub, cfDetRepr) //.
@@ -2671,7 +2671,7 @@ Lemma cfDetMorph aT rT (D G : {group aT}) (f : {morphism D >-> rT})
   phi \is a character -> cfDet (cfMorph phi) = cfMorph (cfDet phi).
 Proof.
 move=> Nphi; have [sGD | not_sGD] := boolP (G \subset D); last first.
-  have /CnatP[n Dphi1] := Cnat_char1 Nphi.
+  have /RnatP[n Dphi1] := Cnat_char1 Nphi.
   rewrite !cfMorphEout // Dphi1 lin_char1 ?cfDet_lin_char // scale1r.
   by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // expr1n.
 have [rG ->] := char_reprP Nphi; rewrite !(=^~ cfRepr_morphim, cfDetRepr) //.
@@ -2691,10 +2691,10 @@ Qed.
 
 Lemma cfDet_mul_lin gT (G : {group gT}) (lambda phi : 'CF(G)) :
     lambda \is a linear_char -> phi \is a character ->
-  cfDet (lambda * phi) = lambda ^+ truncC (phi 1%g) * cfDet phi.
+  cfDet (lambda * phi) = lambda ^+ Num.trunc (phi 1%g) * cfDet phi.
 Proof.
 case/andP=> /char_reprP[[n1 rG1] ->] /= n1_1 /char_reprP[[n2 rG2] ->] /=.
-do [rewrite !cfRepr1 pnatr_eq1 natCK; move/eqP] in n1_1 *.
+do [rewrite !cfRepr1 pnatr_eq1 natRK; move/eqP] in n1_1 *.
 rewrite {n1}n1_1 in rG1 *; rewrite cfRepr_prod cfDetRepr.
 apply/cfun_inP=> x Gx; rewrite !cfunE cfDetRepr cfunE Gx !mulrb !trace_mx11.
 rewrite !mxE prod_repr_lin ?mulrb //=; case: _ / (esym _); rewrite detZ.

@@ -296,7 +296,6 @@ Record class_of (T : Type) := Class {
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> GRing.Zmodule.class_of.
-Local Coercion mixin : class_of >-> normed_mixin_of.
 
 Structure type (phR : phant R) :=
   Pack { sort; _ : class_of sort }.
@@ -388,160 +387,6 @@ End Exports.
 End NumDomain_joins.
 Export NumDomain_joins.Exports.
 
-Module Import Def.
-
-Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
-  nosimpl (norm_op (NormedZmodule.class T)).
-Arguments normr {R T} x.
-
-Notation ler := (@Order.le ring_display _) (only parsing).
-Notation "@ 'ler' R" := (@Order.le ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation ltr := (@Order.lt ring_display _) (only parsing).
-Notation "@ 'ltr' R" := (@Order.lt ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation ger := (@Order.ge ring_display _) (only parsing).
-Notation "@ 'ger' R" := (@Order.ge ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation gtr := (@Order.gt ring_display _) (only parsing).
-Notation "@ 'gtr' R" := (@Order.gt ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation lerif := (@Order.leif ring_display _) (only parsing).
-Notation "@ 'lerif' R" := (@Order.leif ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation lterif := (@Order.lteif ring_display _) (only parsing).
-Notation "@ 'lteif' R" := (@Order.lteif ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation comparabler := (@Order.comparable ring_display _) (only parsing).
-Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-Notation maxr := (@Order.max ring_display _).
-Notation "@ 'maxr' R" := (@Order.max ring_display R)
-    (at level 10, R at level 8, only parsing) : fun_scope.
-Notation minr := (@Order.min ring_display _).
-Notation "@ 'minr' R" := (@Order.min ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
-
-Section Def.
-Context {R : numDomainType}.
-Implicit Types (x : R).
-
-Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
-Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
-Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
-Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
-Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
-
-End Def. End Def.
-
-(* Shorter qualified names, when Num.Def is not imported. *)
-Notation norm := normr (only parsing).
-Notation le := ler (only parsing).
-Notation lt := ltr (only parsing).
-Notation ge := ger (only parsing).
-Notation gt := gtr (only parsing).
-Notation leif := lerif (only parsing).
-Notation lteif := lterif (only parsing).
-Notation comparable := comparabler (only parsing).
-Notation sg := sgr.
-Notation max := maxr.
-Notation min := minr.
-Notation pos := Rpos.
-Notation neg := Rneg.
-Notation nneg := Rnneg.
-Notation real := Rreal.
-
-Module Keys. Section Keys.
-Variable R : numDomainType.
-Fact Rpos_key : pred_key (@pos R). Proof. by []. Qed.
-Definition Rpos_keyed := KeyedQualifier Rpos_key.
-Fact Rneg_key : pred_key (@real R). Proof. by []. Qed.
-Definition Rneg_keyed := KeyedQualifier Rneg_key.
-Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
-Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
-Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
-Definition Rreal_keyed := KeyedQualifier Rreal_key.
-End Keys. End Keys.
-
-(* (Exported) symbolic syntax. *)
-Module Import Syntax.
-Import Def Keys.
-
-Notation "`| x |" := (norm x) : ring_scope.
-
-Notation "<=%R" := le : fun_scope.
-Notation ">=%R" := ge : fun_scope.
-Notation "<%R" := lt : fun_scope.
-Notation ">%R" := gt : fun_scope.
-Notation "<?=%R" := leif : fun_scope.
-Notation "<?<=%R" := lteif : fun_scope.
-Notation ">=<%R" := comparable : fun_scope.
-Notation "><%R" := (fun x y => ~~ (comparable x y)) : fun_scope.
-
-Notation "<= y" := (ge y) : ring_scope.
-Notation "<= y :> T" := (<= (y : T)) (only parsing) : ring_scope.
-Notation ">= y"  := (le y) : ring_scope.
-Notation ">= y :> T" := (>= (y : T)) (only parsing) : ring_scope.
-
-Notation "< y" := (gt y) : ring_scope.
-Notation "< y :> T" := (< (y : T)) (only parsing) : ring_scope.
-Notation "> y" := (lt y) : ring_scope.
-Notation "> y :> T" := (> (y : T)) (only parsing) : ring_scope.
-
-Notation "x <= y" := (le x y) : ring_scope.
-Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : ring_scope.
-Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
-Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
-
-Notation "x < y"  := (lt x y) : ring_scope.
-Notation "x < y :> T" := ((x : T) < (y : T)) (only parsing) : ring_scope.
-Notation "x > y"  := (y < x) (only parsing) : ring_scope.
-Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
-
-Notation "x <= y <= z" := ((x <= y) && (y <= z)) : ring_scope.
-Notation "x < y <= z" := ((x < y) && (y <= z)) : ring_scope.
-Notation "x <= y < z" := ((x <= y) && (y < z)) : ring_scope.
-Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
-
-Notation "x <= y ?= 'iff' C" := (lerif x y C) : ring_scope.
-Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
-  (only parsing) : ring_scope.
-
-Notation "x < y ?<= 'if' C" := (lterif x y C) : ring_scope.
-Notation "x < y ?<= 'if' C :> R" := ((x : R) < (y : R) ?<= if C)
-  (only parsing) : ring_scope.
-
-Notation ">=< y" := [pred x | comparable x y] : ring_scope.
-Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
-Notation "x >=< y" := (comparable x y) : ring_scope.
-
-Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
-Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
-Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
-
-Canonical Rpos_keyed.
-Canonical Rneg_keyed.
-Canonical Rnneg_keyed.
-Canonical Rreal_keyed.
-
-Export Order.POCoercions.
-
-End Syntax.
-
-Section ExtensionAxioms.
-
-Variable R : numDomainType.
-
-Definition real_axiom : Prop := forall x : R, x \is real.
-
-Definition archimedean_axiom : Prop := forall x : R, exists ub, `|x| < ub%:R.
-
-Definition real_closed_axiom : Prop :=
-  forall (p : {poly R}) (a b : R),
-    a <= b -> p.[a] <= 0 <= p.[b] -> exists2 x, a <= x <= b & root p x.
-
-End ExtensionAxioms.
-
 (* The rest of the numbers interface hierarchy. *)
 Module NumField.
 
@@ -628,11 +473,14 @@ Module ClosedField.
 
 Section ClassDef.
 
-Record imaginary_mixin_of (R : numDomainType) := ImaginaryMixin {
+Variable (R : numDomainType).
+
+Record imaginary_mixin_of (R : numDomainType)
+       (norm := norm_op (NumDomain.class R)) := ImaginaryMixin {
   imaginary : R;
   conj_op : {rmorphism R -> R};
   _ : imaginary ^+ 2 = - 1;
-  _ : forall x, x * conj_op x = `|x| ^+ 2;
+  _ : forall x, x * conj_op x = norm x ^+ 2;
 }.
 
 Set Primitive Projections.
@@ -1017,6 +865,10 @@ End Exports.
 End RealField.
 Import RealField.Exports.
 
+Definition real_closed_axiom (R : numDomainType) : Prop :=
+  forall (p : {poly R}) (a b : R),
+    a <= b -> p.[a] <= 0 <= p.[b] -> exists2 x, a <= x <= b & root p x.
+
 Module RealClosedField.
 
 Section ClassDef.
@@ -1114,10 +966,20 @@ Module ArchiNumDomain.
 
 Section ClassDef.
 
+Record mixin_of (R : numDomainType) := Mixin {
+  trunc : R -> nat;
+  is_nat : pred R;
+  is_int : pred R;
+  _ : forall x, if 0 <= x then
+                  (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N;
+  _ : forall x, is_nat x = ((trunc x)%:R == x);
+  _ : forall x, is_int x = is_nat x || is_nat (- x);
+}.
+
 Set Primitive Projections.
 Record class_of R := Class {
   base : NumDomain.class_of R;
-  mixin : @archimedean_axiom (num_for R base)
+  mixin : mixin_of (num_for R base)
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumDomain.class_of.
@@ -1127,7 +989,7 @@ Local Coercion sort : type >-> Sortclass.
 Variables (T : Type) (cT : type).
 Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
 Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
+Definition pack b0 (m0 : mixin_of (num_for T b0)) :=
   fun bT b & phant_id (NumDomain.class bT) b =>
   fun    m & phant_id m0 m => Pack (@Class T b m).
 
@@ -1147,6 +1009,7 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> NumDomain.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
@@ -1190,7 +1053,7 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base : NumField.class_of R;
-  mixin : @archimedean_axiom (num_for R base)
+  mixin : @ArchiNumDomain.mixin_of (num_for R base)
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumField.class_of.
@@ -1276,7 +1139,7 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base : ClosedField.class_of R;
-  mixin : @archimedean_axiom (num_for R base)
+  mixin : @ArchiNumDomain.mixin_of (num_for R base)
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> ClosedField.class_of.
@@ -1387,7 +1250,7 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base : RealDomain.class_of R;
-  mixin : @archimedean_axiom (num_for R base)
+  mixin : @ArchiNumDomain.mixin_of (num_for R base)
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> RealDomain.class_of.
@@ -1484,7 +1347,7 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base : RealField.class_of R;
-  mixin : @archimedean_axiom (num_for R base)
+  mixin : @ArchiNumDomain.mixin_of (num_for R base)
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> RealField.class_of.
@@ -1619,7 +1482,7 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base : RealClosedField.class_of R;
-  mixin : @archimedean_axiom (num_for R base)
+  mixin : @ArchiNumDomain.mixin_of (num_for R base)
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> RealClosedField.class_of.
@@ -1729,6 +1592,187 @@ End Exports.
 End ArchiRealClosedField.
 Import ArchiRealClosedField.Exports.
 
+Module Import Def.
+
+Notation ler := (@Order.le ring_display _) (only parsing).
+Notation "@ 'ler' R" := (@Order.le ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation ltr := (@Order.lt ring_display _) (only parsing).
+Notation "@ 'ltr' R" := (@Order.lt ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation ger := (@Order.ge ring_display _) (only parsing).
+Notation "@ 'ger' R" := (@Order.ge ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation gtr := (@Order.gt ring_display _) (only parsing).
+Notation "@ 'gtr' R" := (@Order.gt ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation lerif := (@Order.leif ring_display _) (only parsing).
+Notation "@ 'lerif' R" := (@Order.leif ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation lterif := (@Order.lteif ring_display _) (only parsing).
+Notation "@ 'lteif' R" := (@Order.lteif ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation comparabler := (@Order.comparable ring_display _) (only parsing).
+Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+Notation maxr := (@Order.max ring_display _).
+Notation "@ 'maxr' R" := (@Order.max ring_display R)
+    (at level 10, R at level 8, only parsing) : fun_scope.
+Notation minr := (@Order.min ring_display _).
+Notation "@ 'minr' R" := (@Order.min ring_display R)
+  (at level 10, R at level 8, only parsing) : fun_scope.
+
+Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
+  nosimpl (norm_op (NormedZmodule.class T)).
+Arguments normr {R T} x.
+
+Section NumDomainDef.
+Context {R : numDomainType}.
+
+Definition sgr (x : R) : R := if x == 0 then 0 else if x < 0 then -1 else 1.
+Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
+Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
+Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
+Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
+
+End NumDomainDef.
+
+Section ArchiNumDomainDef.
+Context {R : archiNumDomainType}.
+
+Definition truncR : R -> nat := ArchiNumDomain.trunc (ArchiNumDomain.class R).
+
+Definition Rnat : qualifier 1 R :=
+  [qualify a x : R | ArchiNumDomain.is_nat (ArchiNumDomain.class R) x].
+
+Definition Rint : qualifier 1 R :=
+  [qualify a x : R | ArchiNumDomain.is_int (ArchiNumDomain.class R) x].
+
+End ArchiNumDomainDef.
+
+Arguments truncR {R} : simpl never.
+Arguments Rnat {R} : simpl never.
+Arguments Rint {R} : simpl never.
+
+End Def.
+
+(* Shorter qualified names, when Num.Def is not imported. *)
+Notation le := ler (only parsing).
+Notation lt := ltr (only parsing).
+Notation ge := ger (only parsing).
+Notation gt := gtr (only parsing).
+Notation leif := lerif (only parsing).
+Notation lteif := lterif (only parsing).
+Notation comparable := comparabler (only parsing).
+Notation max := maxr.
+Notation min := minr.
+Notation norm := normr (only parsing).
+Notation sg := sgr.
+Notation pos := Rpos.
+Notation neg := Rneg.
+Notation nneg := Rnneg.
+Notation real := Rreal.
+(* Not to pollute the local namespace, Num.nat and Num.int are defined later. *)
+Notation trunc := truncR.
+
+Module Keys.
+Section NumDomainKeys.
+Variable R : numDomainType.
+Fact Rpos_key : pred_key (@pos R). Proof. by []. Qed.
+Definition Rpos_keyed := KeyedQualifier Rpos_key.
+Fact Rneg_key : pred_key (@real R). Proof. by []. Qed.
+Definition Rneg_keyed := KeyedQualifier Rneg_key.
+Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
+Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
+Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
+Definition Rreal_keyed := KeyedQualifier Rreal_key.
+End NumDomainKeys.
+Section ArchiNumDomainKeys.
+Variable R : archiNumDomainType.
+Fact Rnat_key : pred_key (@Rnat R). Proof. by []. Qed.
+Definition Rnat_keyed := KeyedQualifier Rnat_key.
+Fact Rint_key : pred_key (@Rint R). Proof. by []. Qed.
+Definition Rint_keyed := KeyedQualifier Rint_key.
+End ArchiNumDomainKeys.
+End Keys.
+
+(* (Exported) symbolic syntax. *)
+Module Import Syntax.
+Import Keys.
+
+Notation "`| x |" := (norm x) : ring_scope.
+
+Notation "<=%R" := le : fun_scope.
+Notation ">=%R" := ge : fun_scope.
+Notation "<%R" := lt : fun_scope.
+Notation ">%R" := gt : fun_scope.
+Notation "<?=%R" := leif : fun_scope.
+Notation "<?<=%R" := lteif : fun_scope.
+Notation ">=<%R" := comparable : fun_scope.
+Notation "><%R" := (fun x y => ~~ (comparable x y)) : fun_scope.
+
+Notation "<= y" := (ge y) : ring_scope.
+Notation "<= y :> T" := (<= (y : T)) (only parsing) : ring_scope.
+Notation ">= y"  := (le y) : ring_scope.
+Notation ">= y :> T" := (>= (y : T)) (only parsing) : ring_scope.
+
+Notation "< y" := (gt y) : ring_scope.
+Notation "< y :> T" := (< (y : T)) (only parsing) : ring_scope.
+Notation "> y" := (lt y) : ring_scope.
+Notation "> y :> T" := (> (y : T)) (only parsing) : ring_scope.
+
+Notation "x <= y" := (le x y) : ring_scope.
+Notation "x <= y :> T" := ((x : T) <= (y : T)) (only parsing) : ring_scope.
+Notation "x >= y" := (y <= x) (only parsing) : ring_scope.
+Notation "x >= y :> T" := ((x : T) >= (y : T)) (only parsing) : ring_scope.
+
+Notation "x < y"  := (lt x y) : ring_scope.
+Notation "x < y :> T" := ((x : T) < (y : T)) (only parsing) : ring_scope.
+Notation "x > y"  := (y < x) (only parsing) : ring_scope.
+Notation "x > y :> T" := ((x : T) > (y : T)) (only parsing) : ring_scope.
+
+Notation "x <= y <= z" := ((x <= y) && (y <= z)) : ring_scope.
+Notation "x < y <= z" := ((x < y) && (y <= z)) : ring_scope.
+Notation "x <= y < z" := ((x <= y) && (y < z)) : ring_scope.
+Notation "x < y < z" := ((x < y) && (y < z)) : ring_scope.
+
+Notation "x <= y ?= 'iff' C" := (lerif x y C) : ring_scope.
+Notation "x <= y ?= 'iff' C :> R" := ((x : R) <= (y : R) ?= iff C)
+  (only parsing) : ring_scope.
+
+Notation "x < y ?<= 'if' C" := (lterif x y C) : ring_scope.
+Notation "x < y ?<= 'if' C :> R" := ((x : R) < (y : R) ?<= if C)
+  (only parsing) : ring_scope.
+
+Notation ">=< y" := [pred x | comparable x y] : ring_scope.
+Notation ">=< y :> T" := (>=< (y : T)) (only parsing) : ring_scope.
+Notation "x >=< y" := (comparable x y) : ring_scope.
+
+Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
+Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
+Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
+
+Canonical Rpos_keyed.
+Canonical Rneg_keyed.
+Canonical Rnneg_keyed.
+Canonical Rreal_keyed.
+Canonical Rnat_keyed.
+Canonical Rint_keyed.
+
+Export Order.POCoercions.
+
+End Syntax.
+
+Section ExtensionAxioms.
+
+Variable R : numDomainType.
+
+Definition real_axiom : Prop := forall x : R, x \is real.
+
+Definition archimedean_axiom : Prop := forall x : R, exists ub, `|x| < ub%:R.
+
+End ExtensionAxioms.
+
 (* The elementary theory needed to support the definition of the derived      *)
 (* operations for the extensions described above.                             *)
 Module Import Internals.
@@ -1789,7 +1833,7 @@ Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
-Proof. by rewrite lt_def; case: eqP => // ->; rewrite lexx. Qed.
+Proof. by rewrite le_eqVlt eq_sym. Qed.
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
@@ -1871,9 +1915,6 @@ End NumDomain.
 Lemma num_real (R : realDomainType) (x : R) : x \is real.
 Proof. exact: le_total. Qed.
 
-Fact archi_bound_subproof (R : archiNumDomainType) : archimedean_axiom R.
-Proof. by case: R => ? []. Qed.
-
 Section RealClosed.
 Variable R : rcfType.
 
@@ -1891,6 +1932,25 @@ by rewrite rootE !hornerE subr_eq0; exists y.
 Qed.
 
 End RealClosed.
+
+Section ArchiNumDomain.
+Variable R : archiNumDomainType.
+Implicit Types x y : R.
+
+Lemma truncRP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+Proof. by case: R x => [? [? []]]. Qed.
+
+Lemma truncR_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R.
+Proof. by move=> x_ge0; move: (truncRP x); rewrite x_ge0. Qed.
+
+Lemma RnatE x : (x \is a Rnat) = ((trunc x)%:R == x).
+Proof. by case: R x => ? [? []]. Qed.
+
+Lemma RintE x : (x \is a Rint) = (x \is a Rnat) || (- x \is a Rnat).
+Proof. by case: R x => ? [? []]. Qed.
+
+End ArchiNumDomain.
 
 End Internals.
 
@@ -1919,7 +1979,7 @@ End PredInstances.
 
 Module Import ExtraDef.
 
-Definition archi_bound {R} x := sval (sigW (@archi_bound_subproof R x)).
+Definition archi_bound {R : archiNumDomainType} (x : R) := (trunc `|x|).+1.
 
 Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
 
@@ -1957,22 +2017,17 @@ Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
 
-Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. by rewrite lt_def. Qed.
+Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. exact: lt_def. Qed.
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x). Proof. exact: le0r. Qed.
 
-Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0.
-Proof. by rewrite lt0r; case/andP. Qed.
-
-Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0.
-Proof. by rewrite lt_neqAle; case/andP. Qed.
+Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0. Proof. by move=> /gt_eqF ->. Qed.
+Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0. Proof. by move=> /lt_eqF ->. Qed.
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
 Proof. exact: pmulr_rgt0. Qed.
 
 Lemma pmulr_rge0 x y : 0 < x -> (0 <= x * y) = (0 <= y).
-Proof.
-by rewrite !le0r mulf_eq0; case: eqP => // [-> /negPf[] | _ /pmulr_rgt0->].
-Qed.
+Proof. by move=> x_gt0; rewrite !le0r mulf_eq0 pmulr_rgt0 // gt_eqF. Qed.
 
 (* Integer comparisons and characteristic 0. *)
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
@@ -2219,13 +2274,10 @@ Proof. by move=> /ltW/ger0_real. Qed.
 Lemma ltr0_real x : x < 0 -> x \is real.
 Proof. by move=> /ltW/ler0_real. Qed.
 
-Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real0 : core.
-
-Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real1 : core.
-
-Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
+Lemma real0 : 0 \is @real R. Proof. exact: rpred0. Qed.
+Lemma real1 : 1 \is @real R. Proof. exact: rpred1. Qed.
+Lemma realn n : n%:R \is @real R. Proof. exact: rpred_nat. Qed.
+Hint Resolve real0 real1 : core.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !ler_opp2. Qed.
@@ -2239,7 +2291,7 @@ Proof. exact: real_leVge. Qed.
 Lemma realB : {in real &, forall x y, x - y \is real}.
 Proof. exact: rpredB. Qed.
 
-Lemma realN : {mono (@GRing.opp R) : x /  x \is real}.
+Lemma realN : {mono (@GRing.opp R) : x / x \is real}.
 Proof. exact: rpredN. Qed.
 
 Lemma realBC x y : (x - y \is real) = (y - x \is real).
@@ -4067,7 +4119,11 @@ Qed.
 
 End NumDomainOperationTheory.
 
-Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real : core.
+Hint Resolve ler_opp2 ltr_opp2 normr_real : core.
+Hint Extern 0 (is_true (_%:R \is real)) => apply: realn : core.
+Hint Extern 0 (is_true (0 \is real)) => apply: real0 : core.
+Hint Extern 0 (is_true (1 \is real)) => apply: real1 : core.
+
 Arguments ler_sqr {R} [x y].
 Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
@@ -4910,7 +4966,7 @@ Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
 Definition normCK x : `|x| ^+ 2 = x * x^*.
-Proof. by case: C x => ? [? ? ? []]. Qed.
+Proof. by apply: esym; case: C x => ? [? ? ? []]. Qed.
 
 Lemma sqrCi : 'i ^+ 2 = -1 :> C.
 Proof. by case: C => ? [? ? ? []]. Qed.
@@ -5063,8 +5119,7 @@ Proof. by move=> n_gt0; rewrite -{1}(rootC0 n) eqr_rootC. Qed.
 Lemma nonRealCi : ('i : C) \isn't real.
 Proof. by rewrite realEsqr sqrCi oppr_ge0 lt_geF ?ltr01. Qed.
 
-Lemma neq0Ci : 'i != 0 :> C.
-Proof. by apply: contraNneq nonRealCi => ->; apply: real0. Qed.
+Lemma neq0Ci : 'i != 0 :> C. Proof. by apply: contraNneq nonRealCi => ->. Qed.
 
 Lemma normCi : `|'i| = 1 :> C.
 Proof. by apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) // -normrX sqrCi normrN1. Qed.
@@ -5578,122 +5633,116 @@ Variable R : archiNumDomainType.
 Implicit Types x y z : R.
 Implicit Types m n : nat.
 
+Local Notation trunc := (@trunc R).
+Local Notation Rnat := (@Rnat R).
+Local Notation Rint := (@Rint R).
+
+Definition truncRP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N :=
+  truncRP x.
+
+Definition truncR_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R :=
+  @truncR_itv R x.
+
+Definition RnatE x : (x \is a Rnat) = ((trunc x)%:R == x) := RnatE x.
+
+Definition RintE x : (x \is a Rint) = (x \is a Rnat) || (- x \is a Rnat) :=
+  RintE x.
+
 Lemma archi_boundP x : 0 <= x -> x < (bound x)%:R.
-Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
-
-Fact truncC_subproof x : {m | (0 <= x) -> (m%:R <= x < m.+1%:R) }.
 Proof.
-have [Rx | _] := boolP (0 <= x); last by exists 0%N.
-have /ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R; last first.
-  exists n ; rewrite lt_x_n1 andbT.
-  case Dn: n => // [n1]; rewrite -Dn.
-  have [//|]:= (real_leP (rpred_nat _ n) (ger0_real Rx)).
-  by rewrite Dn => /min_n; rewrite Dn ltnn.
-exists (archi_bound x).
-by apply: (lt_trans (archi_boundP Rx)); rewrite ltr_nat.
+move=> x_ge0; case/truncR_itv/andP: (normr_ge0 x) => _.
+exact/le_lt_trans/real_ler_norm/ger0_real.
 Qed.
 
-Definition truncC x := if 0 <= x then sval (truncC_subproof x) else 0%N.
-Definition Cnat := Qualifier 1 (fun x : R => (truncC x)%:R == x).
-
-Fact Cnat_key : pred_key Cnat. Proof. by []. Qed.
-Canonical Cnat_keyed := KeyedQualifier Cnat_key.
-
-Lemma truncC_itv x : 0 <= x -> (truncC x)%:R <= x < (truncC x).+1%:R.
-Proof.
-move => x_ge0; rewrite /truncC ifT //.
-by case: (truncC_subproof x) => /= m; move/(_ x_ge0).
-Qed.
-
-Lemma truncC_def x n : n%:R <= x < n.+1%:R -> truncC x = n.
+Lemma truncR_def x n : n%:R <= x < n.+1%:R -> trunc x = n.
 Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
-have /truncC_itv/andP[lefx ltxf1]: x >= 0.
-  by apply: (le_trans _ lemx); apply: ler0n.
+have/truncR_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
 by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Lemma natCK : cancel (GRing.natmul 1) truncC.
-Proof. by move=> m; apply: truncC_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
+Lemma natRK : cancel (GRing.natmul 1) trunc.
+Proof. by move=> m; apply: truncR_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
-Lemma truncCK : {in Cnat, cancel truncC (GRing.natmul 1)}.
-Proof. by move=> x /eqP. Qed.
+Lemma truncRK : {in Rnat, cancel trunc (GRing.natmul 1)}.
+Proof. by move=> x; rewrite RnatE => /eqP. Qed.
 
-Lemma truncC0 : truncC 0 = 0%N. Proof. exact: (natCK 0%N). Qed.
-Lemma truncC1 : truncC 1 = 1%N. Proof. exact: (natCK 1%N). Qed.
-Hint Resolve truncC0 truncC1 : core.
+Lemma truncR0 : trunc 0 = 0%N. Proof. exact: natRK 0%N. Qed.
+Lemma truncR1 : trunc 1 = 1%N. Proof. exact: natRK 1%N. Qed.
+Hint Resolve truncR0 truncR1 : core.
 
-Lemma CnatP x : reflect (exists n, x = n%:R) (x \is a Cnat).
+Lemma RnatP x : reflect (exists n, x = n%:R) (x \is a Rnat).
 Proof.
-by apply: (iffP eqP) => [<- | [n ->]]; [exists (truncC x) | rewrite natCK].
+rewrite RnatE; apply: (iffP eqP) => [<- | [n ->]]; first by exists (trunc x).
+by rewrite natRK.
 Qed.
 
-Lemma Cnat_nat n : n%:R \is a Cnat. Proof. by apply/CnatP; exists n. Qed.
-Hint Resolve Cnat_nat : core.
+Lemma Rnat_nat n : n%:R \is a Rnat. Proof. by apply/RnatP; exists n. Qed.
+Hint Resolve Rnat_nat : core.
 
-Lemma truncCD :
-  {in Cnat & Num.nneg, {morph truncC : x y / x + y >-> (x + y)%N}}.
+Lemma truncRD :
+  {in Rnat & Num.nneg, {morph trunc : x y / x + y >-> (x + y)%N}}.
 Proof.
-move=> _ y /CnatP[n ->] y_ge0; apply: truncC_def.
-by rewrite -addnS !natrD !natCK ler_add2l ltr_add2l truncC_itv.
+move=> _ y /RnatP[n ->] y_ge0; apply: truncR_def.
+by rewrite -addnS !natrD !natRK ler_add2l ltr_add2l truncR_itv.
 Qed.
 
-Lemma truncCM : {in Cnat &, {morph truncC : x y / x * y >-> (x * y)%N}}.
-Proof. by move=> _ _ /CnatP[n1 ->] /CnatP[n2 ->]; rewrite -natrM !natCK. Qed.
+Lemma truncRM : {in Rnat &, {morph trunc : x y / x * y >-> (x * y)%N}}.
+Proof. by move=> _ _ /RnatP[n1 ->] /RnatP[n2 ->]; rewrite -natrM !natRK. Qed.
 
-Lemma truncCX n : {in Cnat, {morph truncC : x / x ^+ n >-> (x ^ n)%N}}.
-Proof. by move=> _ /CnatP[n1 ->]; rewrite -natrX !natCK. Qed.
+Lemma truncRX n : {in Rnat, {morph trunc : x / x ^+ n >-> (x ^ n)%N}}.
+Proof. by move=> _ /RnatP[n1 ->]; rewrite -natrX !natRK. Qed.
 
-Lemma rpred_Cnat S (ringS : semiringPred S) (kS : keyed_pred ringS) x :
-  x \is a Cnat -> x \in kS.
-Proof. by case/CnatP=> n ->; apply: rpred_nat. Qed.
+Lemma rpred_Rnat S (ringS : semiringPred S) (kS : keyed_pred ringS) x :
+  x \is a Rnat -> x \in kS.
+Proof. by case/RnatP=> n ->; apply: rpred_nat. Qed.
 
-Lemma Cnat0 : 0 \is a Cnat. Proof. exact: (Cnat_nat 0). Qed.
-Lemma Cnat1 : 1 \is a Cnat. Proof. exact: (Cnat_nat 1). Qed.
-Hint Resolve Cnat0 Cnat1 : core.
+Lemma Rnat0 : 0 \is a Rnat. Proof. exact: (Rnat_nat 0). Qed.
+Lemma Rnat1 : 1 \is a Rnat. Proof. exact: (Rnat_nat 1). Qed.
+Hint Resolve Rnat0 Rnat1 : core.
 
-Fact Cnat_semiring : semiring_closed Cnat.
+Fact Rnat_semiring : semiring_closed Rnat.
 Proof.
-by do 2![split] => //= _ _ /CnatP[n ->] /CnatP[m ->]; rewrite -(natrD, natrM).
+by do 2![split] => //= _ _ /RnatP[n ->] /RnatP[m ->]; rewrite -(natrD, natrM).
 Qed.
-Canonical Cnat_addrPred := AddrPred Cnat_semiring.
-Canonical Cnat_mulrPred := MulrPred Cnat_semiring.
-Canonical Cnat_semiringPred := SemiringPred Cnat_semiring.
+Canonical Rnat_addrPred := AddrPred Rnat_semiring.
+Canonical Rnat_mulrPred := MulrPred Rnat_semiring.
+Canonical Rnat_semiringPred := SemiringPred Rnat_semiring.
 
-Lemma Creal_Cnat : {subset Cnat <= real}.
-Proof. move=> _ /CnatP[m ->]; apply: realn. Qed.
+Lemma Rreal_Rnat : {subset Rnat <= real}. Proof. by move=> _ /RnatP[m ->]. Qed.
 
-Lemma Cnat_normK x : x \is a Cnat -> `|x| ^+ 2 = x ^+ 2.
-Proof. by move/Creal_Cnat/real_normK. Qed.
+Lemma Rnat_normK x : x \is a Rnat -> `|x| ^+ 2 = x ^+ 2.
+Proof. by move/Rreal_Rnat/real_normK. Qed.
 
-Lemma truncC_gt0 x : (0 < truncC x)%N = (1 <= x).
+Lemma truncR_gt0 x : (0 < trunc x)%N = (1 <= x).
 Proof.
-apply/idP/idP=> [m_gt0 | x_ge1].
-  have /truncC_itv/andP[lemx _]: 0 <= x.
-    by move: m_gt0; rewrite /truncC; case: ifP.
+apply/idP/idP => [m_gt0 | x_ge1].
+  have /truncR_itv/andP[lemx _]: 0 <= x.
+    by move: (truncRP x) m_gt0; case: ifP => // _ /eqP ->.
   by apply: le_trans lemx; rewrite ler1n.
-have /truncC_itv/andP[_ ltxm1]:= le_trans ler01 x_ge1.
+have /truncR_itv/andP[_ ltxm1] := le_trans ler01 x_ge1.
 by rewrite -ltnS -(ltr_nat R) (le_lt_trans x_ge1).
 Qed.
 
-Lemma truncC0Pn x : reflect (truncC x = 0%N) (~~ (1 <= x)).
-Proof. by rewrite -truncC_gt0 -eqn0Ngt; apply: eqP. Qed.
+Lemma truncR0Pn x : reflect (trunc x = 0%N) (~~ (1 <= x)).
+Proof. by rewrite -truncR_gt0 -eqn0Ngt; apply: eqP. Qed.
 
-Lemma Cnat_ge0 x : x \is a Cnat -> 0 <= x.
-Proof. by case/CnatP=> n ->; apply: ler0n. Qed.
+Lemma Rnat_ge0 x : x \is a Rnat -> 0 <= x.
+Proof. by case/RnatP=> n ->; apply: ler0n. Qed.
 
-Lemma Cnat_gt0 x : x \is a Cnat -> (0 < x) = (x != 0).
-Proof. by case/CnatP=> n ->; rewrite pnatr_eq0 ltr0n lt0n. Qed.
+Lemma Rnat_gt0 x : x \is a Rnat -> (0 < x) = (x != 0).
+Proof. by case/RnatP=> n ->; rewrite pnatr_eq0 ltr0n lt0n. Qed.
 
-Lemma norm_Cnat x : x \is a Cnat -> `|x| = x.
-Proof. by move/Cnat_ge0/ger0_norm. Qed.
+Lemma norm_Rnat x : x \is a Rnat -> `|x| = x.
+Proof. by move/Rnat_ge0/ger0_norm. Qed.
 
-Lemma Cnat_sum_eq1 (I : finType) (P : pred I) (F : I -> R) :
-     (forall i, P i -> F i \is a Cnat) -> \sum_(i | P i) F i = 1 ->
+Lemma Rnat_sum_eq1 (I : finType) (P : pred I) (F : I -> R) :
+     (forall i, P i -> F i \is a Rnat) -> \sum_(i | P i) F i = 1 ->
    {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
 Proof.
-move=> natF sumF1; pose nF i := truncC (F i).
-have{natF} defF i: P i -> F i = (nF i)%:R by move/natF/eqP.
+move=> natF sumF1; pose nF i := trunc (F i).
+have{natF} defF i: P i -> F i = (nF i)%:R by move/natF; rewrite RnatE => /eqP.
 have{sumF1} /eqP sumF1: (\sum_(i | P i) nF i == 1)%N.
   by rewrite -(@eqr_nat R) natr_sum -(eq_bigr _ defF) sumF1.
 have [i Pi nZfi]: {i : I | P i & nF i != 0%N}.
@@ -5705,35 +5754,129 @@ exists i; split=> // [|j neq_ji Pj]; first by rewrite defF // -Fi1.
 by rewrite defF // (eqP (Fi'0 j _)) // neq_ji.
 Qed.
 
-Lemma Cnat_mul_eq1 x y :
-  x \is a Cnat -> y \is a Cnat -> (x * y == 1) = (x == 1) && (y == 1).
-Proof. by do 2!move/truncCK <-; rewrite -natrM !pnatr_eq1 muln_eq1. Qed.
+Lemma Rnat_mul_eq1 x y :
+  x \is a Rnat -> y \is a Rnat -> (x * y == 1) = (x == 1) && (y == 1).
+Proof. by do 2!move/truncRK <-; rewrite -natrM !pnatr_eq1 muln_eq1. Qed.
 
-Lemma Cnat_prod_eq1 (I : finType) (P : pred I) (F : I -> R) :
-    (forall i, P i -> F i \is a Cnat) -> \prod_(i | P i) F i = 1 ->
+Lemma Rnat_prod_eq1 (I : finType) (P : pred I) (F : I -> R) :
+    (forall i, P i -> F i \is a Rnat) -> \prod_(i | P i) F i = 1 ->
   forall i, P i -> F i = 1.
 Proof.
 move=> natF prodF1; apply/eqfun_inP; rewrite -big_andE.
-move: prodF1; elim/(big_load (fun x => x \is a Cnat)): _.
+move: prodF1; elim/(big_load (fun x => x \is a Rnat)): _.
 elim/big_rec2: _ => // i all1x x /natF N_Fi [Nx x1all1].
-by split=> [|/eqP]; rewrite ?rpredM ?Cnat_mul_eq1 // => /andP[-> /eqP].
+by split=> [|/eqP]; rewrite ?rpredM ?Rnat_mul_eq1 // => /andP[-> /eqP].
+Qed.
+
+(* Rint *)
+
+Local Lemma Rint_natP x :
+  reflect (exists n, x = n%:R \/ x = - n%:R) (x \is a Rint).
+Proof.
+rewrite RintE.
+apply: (iffP idP) => [int_x| [n [] ->]]; rewrite ?opprK ?rpred_nat ?orbT //.
+rewrite -[x]opprK; case/orP: int_x => /RnatP [n ->]; exists n; last by right.
+by rewrite ?opprK; left.
+Qed.
+
+Lemma rpred_Rint S (ringS : subringPred S) (kS : keyed_pred ringS) x :
+  x \is a Rint -> x \in kS.
+Proof. by case/Rint_natP => [n [] ->]; rewrite ?rpredN ?rpred_nat. Qed.
+
+Lemma Rint0 : 0 \is a Rint. Proof. by rewrite RintE Rnat0. Qed.
+Lemma Rint1 : 1 \is a Rint. Proof. by rewrite RintE Rnat1. Qed.
+Hint Resolve Rint0 Rint1 : core.
+
+Lemma Rint_Rnat : {subset Rnat <= Rint}.
+Proof. by move=> ?; rewrite RintE => ->. Qed.
+
+Lemma Rreal_Rint : {subset Rint <= Num.real}.
+Proof. by move=> ? /Rint_natP [m [] ->]; rewrite ?rpredN rpred_nat. Qed.
+
+Fact Rint_subring : subring_closed Rint.
+Proof.
+by split=> // _ _ /Rint_natP [n [] ->] /Rint_natP [m [] ->];
+  rewrite RintE ?opprD ?mulrN ?mulNr ?opprK -?natrD -?natrM ?rpred_nat ?orbT //;
+  rewrite  [- _ + _]addrC; case: (leqP n m) => [|/ltnW] /natrB <-;
+  rewrite ?rpred_nat ?orbT.
+Qed.
+Canonical Rint_opprPred := OpprPred Rint_subring.
+Canonical Rint_addrPred := AddrPred Rint_subring.
+Canonical Rint_mulrPred := MulrPred Rint_subring.
+Canonical Rint_zmodPred := ZmodPred Rint_subring.
+Canonical Rint_semiringPred := SemiringPred Rint_subring.
+Canonical Rint_smulrPred := SmulrPred Rint_subring.
+Canonical Rint_subringPred := SubringPred Rint_subring.
+
+Lemma Rint_normK x : x \is a Rint -> `|x| ^+ 2 = x ^+ 2.
+Proof. by move/Rreal_Rint/real_normK. Qed.
+
+Lemma RintEsign x : x \is a Rint -> x = (-1) ^+ (x < 0)%R * `|x|.
+Proof. by move/Rreal_Rint/realEsign. Qed.
+
+Lemma Rnat_norm_Rint x : x \is a Rint -> `|x| \is a Rnat.
+Proof. by case/Rint_natP => [m [] ->]; rewrite ?normrN normr_nat. Qed.
+
+Lemma RnatEint x : (x \is a Rnat) = (x \is a Rint) && (0 <= x).
+Proof.
+apply/idP/andP=> [Nx | [Zx x_ge0]]; first by rewrite Rint_Rnat ?Rnat_ge0.
+by rewrite -(ger0_norm x_ge0) Rnat_norm_Rint.
+Qed.
+
+Lemma RintEge0 x : 0 <= x -> (x \is a Rint) = (x \is a Rnat).
+Proof. by rewrite RnatEint andbC => ->. Qed.
+
+Lemma Rnat_exp_even x n : ~~ odd n -> x \is a Rint -> x ^+ n \is a Rnat.
+Proof.
+move=> n_oddF x_Rint.
+by rewrite RnatEint rpredX //= real_exprn_even_ge0 // Rreal_Rint.
+Qed.
+
+Lemma norm_Rint_ge1 x : x \is a Rint -> x != 0 -> 1 <= `|x|.
+Proof.
+rewrite -normr_eq0 => /Rnat_norm_Rint/RnatP[n ->].
+by rewrite pnatr_eq0 ler1n lt0n.
+Qed.
+
+Lemma sqr_Rint_ge1 x : x \is a Rint -> x != 0 -> 1 <= x ^+ 2.
+Proof.
+by move=> Zx nz_x; rewrite -Rint_normK // expr_ge1 ?normr_ge0 ?norm_Rint_ge1.
+Qed.
+
+Lemma Rint_ler_sqr x : x \is a Rint -> x <= x ^+ 2.
+Proof.
+move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
+apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Rreal_Rint.
+by rewrite -Rint_normK // ler_eexpr // norm_Rint_ge1.
 Qed.
 
 (* predCmod *)
 Variables (U V : lmodType R) (f : {additive U -> V}).
 
-Lemma raddfZ_Cnat a u : a \is a Cnat -> f (a *: u) = a *: f u.
-Proof. by case/CnatP=> n ->; apply: raddfZnat. Qed.
+Lemma raddfZ_Rnat a u : a \is a Rnat -> f (a *: u) = a *: f u.
+Proof. by case/RnatP=> n ->; apply: raddfZnat. Qed.
 
-Lemma rpredZ_Cnat S (addS : @addrPred V S) (kS : keyed_pred addS) :
-  {in Cnat & kS, forall z u, z *: u \in kS}.
-Proof. by move=> _ u /CnatP[n ->]; apply: rpredZnat. Qed.
+Lemma rpredZ_Rnat S (addS : @addrPred V S) (kS : keyed_pred addS) :
+  {in Rnat & kS, forall z u, z *: u \in kS}.
+Proof. by move=> _ u /RnatP[n ->]; apply: rpredZnat. Qed.
+
+Lemma raddfZ_Rint a u : a \is a Rint -> f (a *: u) = a *: f u.
+Proof. by move=> /Rint_natP[m [] ->]; rewrite ?scaleNr ?raddfN raddfZnat. Qed.
+
+Lemma rpredZ_Rint S (subS : @zmodPred V S) (kS : keyed_pred subS) :
+  {in Rint & kS, forall z u, z *: u \in kS}.
+Proof.
+by move=> _ u /Rint_natP[m [] ->]; rewrite ?scaleNr ?rpredN; apply: rpredZnat.
+Qed.
 
 (* autC *)
 Implicit Type nu : {rmorphism R -> R}.
 
-Lemma aut_Cnat nu : {in Cnat, nu =1 id}.
-Proof. by move=> _ /CnatP[n ->]; apply: rmorph_nat. Qed.
+Lemma aut_Rnat nu : {in Rnat, nu =1 id}.
+Proof. by move=> _ /RnatP[n ->]; apply: rmorph_nat. Qed.
+
+Lemma aut_Rint nu : {in Rint, nu =1 id}.
+Proof. by move=> _ /Rint_natP[m [] ->]; rewrite ?rmorphN rmorph_nat. Qed.
 
 End ArchiNumDomainTheory.
 
@@ -5743,20 +5886,20 @@ Variables (R : archiRealDomainType).
 
 Lemma upper_nthrootP (x : R) i : (bound x <= i)%N -> x < 2%:R ^+ i.
 Proof.
-rewrite /bound; case: (sigW _) => /= b le_x_b le_b_i.
-apply: (le_lt_trans (ler_norm _) (lt_trans le_x_b _ )).
-by rewrite -natrX ltr_nat (leq_ltn_trans le_b_i) // ltn_expl.
+case/truncR_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
+by rewrite (lt_le_trans xlt) // -natrX ler_nat (ltn_trans le_b_i) // ltn_expl.
 Qed.
 
 End ArchiRealDomainTheory.
 
-Arguments Cnat {R}.
-Arguments natCK {R} _%N.
-Arguments truncC {R}.
-Hint Resolve truncC0 truncC1 : core.
-Hint Extern 0 (is_true (_%:R \is a Cnat)) => apply: Cnat_nat : core.
-Hint Extern 0 (is_true (0 \is a Cnat)) => apply: Cnat0 : core.
-Hint Extern 0 (is_true (1 \is a Cnat)) => apply: Cnat1 : core.
+Arguments natRK {R} _%N.
+Arguments RnatP {R x}.
+Hint Resolve truncR0 truncR1 : core.
+Hint Extern 0 (is_true (_%:R \is a Rnat)) => apply: Rnat_nat : core.
+Hint Extern 0 (is_true (0 \is a Rnat)) => apply: Rnat0 : core.
+Hint Extern 0 (is_true (1 \is a Rnat)) => apply: Rnat1 : core.
+Hint Extern 0 (is_true (0 \is a Rint)) => apply: Rint0 : core.
+Hint Extern 0 (is_true (1 \is a Rint)) => apply: Rint1 : core.
 
 Section ArchiNumFieldTheory.
 
@@ -5765,10 +5908,11 @@ Variable R : archiNumFieldType.
 (* autLmodC *)
 Implicit Type nu : {rmorphism R -> R}.
 
-Lemma Cnat_aut nu x : (nu x \is a Cnat) = (x \is a Cnat).
-Proof.
-by do [apply/idP/idP=> Nx; have:= aut_Cnat nu Nx] => [/fmorph_inj <- | ->].
-Qed.
+Lemma Rnat_aut nu x : (nu x \is a Rnat) = (x \is a Rnat).
+Proof. by apply/idP/idP=> /[dup] ? /(aut_Rnat nu) => [/fmorph_inj <-| ->]. Qed.
+
+Lemma Rint_aut nu x : (nu x \is a Rint) = (x \is a Rint).
+Proof. by rewrite !RintE -rmorphN !Rnat_aut. Qed.
 
 End ArchiNumFieldTheory.
 
@@ -5778,8 +5922,11 @@ Variable R : archiNumClosedFieldType.
 
 Implicit Type x : R.
 
-Lemma conj_Cnat x : x \is a Cnat -> x^* = x.
-Proof. by case/CnatP=> n ->; apply: rmorph_nat. Qed.
+Lemma conj_Rnat x : x \is a Rnat -> x^* = x.
+Proof. by move/Rreal_Rnat/CrealP. Qed.
+
+Lemma conj_Rint x : x \is a Rint -> x^* = x.
+Proof. by move/Rreal_Rint/CrealP. Qed.
 
 End ArchiNumClosedFieldTheory.
 
@@ -6138,6 +6285,52 @@ End Exports.
 End RealLtMixin.
 Import RealLtMixin.Exports.
 
+Module ArchiMixin.
+Section ArchiMixin.
+Variables (R : numDomainType) (m : archimedean_axiom R).
+
+Implicit Type x : R.
+
+Definition bound x := sval (sigW (m x)).
+
+Lemma boundP x : 0 <= x -> x < (bound x)%:R.
+Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
+
+Fact trunc_subproof x : {m | 0 <= x -> m%:R <= x < m.+1%:R }.
+Proof.
+have [Rx | _] := boolP (0 <= x); last by exists 0%N.
+have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
+  by exists (bound x); rewrite (lt_trans (boundP Rx)) ?ltr_nat.
+exists n => _; rewrite {}lt_x_n1 andbT; case: n min_n => //= n min_n.
+rewrite real_leNgt ?rpred_nat ?ger0_real //; apply/negP => /min_n.
+by rewrite ltnn.
+Qed.
+
+Definition trunc x := if 0 <= x then sval (trunc_subproof x) else 0%N.
+
+Lemma truncP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+Proof.
+rewrite /trunc; case: trunc_subproof => // n hn.
+by case: ifP => x_ge0; rewrite ?(ifT _ _ x_ge0) ?(ifF _ _ x_ge0) // hn.
+Qed.
+
+Definition archiMixin : ArchiNumDomain.mixin_of R :=
+  ArchiNumDomain.Mixin truncP (fun => erefl) (fun => erefl).
+
+End ArchiMixin.
+
+Module Exports.
+Coercion archiMixin : archimedean_axiom >-> ArchiNumDomain.mixin_of.
+End Exports.
+
+End ArchiMixin.
+Import ArchiMixin.Exports.
+
+(* Not to pollute the local namespace, we define Num.nat and Num.int here. *)
+Notation nat := Rnat.
+Notation int := Rint.
+
 End Num.
 
 Export Num.NumDomain.Exports Num.NormedZmodule.Exports.
@@ -6149,6 +6342,6 @@ Export Num.ArchiNumClosedField.Exports Num.ArchiRealDomain.Exports.
 Export Num.ArchiRealField.Exports Num.ArchiRealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
 Export Num.NumMixin.Exports Num.RealMixin.Exports.
-Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
+Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports Num.ArchiMixin.Exports.
 
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.

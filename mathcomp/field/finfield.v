@@ -638,14 +638,14 @@ suffices: `|aq n| <= (q - 1)%:R.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: le_trans (ler_sub_dist _ _).
   by rewrite normr_nat normrX n1z expr1n ler_subr_addl (leC_nat 2).
-have Zaq d: d %| n -> aq d \in Cint.
+have Zaq d: d %| n -> aq d \in Num.int.
   move/(dvdn_prim_root z_prim)=> zd_prim.
   rewrite rpred_horner ?rpred_nat //= -Cintr_Cyclotomic //.
   by apply/polyOverP=> i; rewrite coef_map ?rpred_int.
 suffices: (aq n %| (q - 1)%:R)%C.
-  rewrite {1}[aq n]CintEsign ?Zaq // -(rpredMsign _ (aq n < 0)%R).
+  rewrite {1}[aq n]RintEsign ?Zaq // -(rpredMsign _ (aq n < 0)%R).
   rewrite dvdC_mul2l ?signr_eq0 //.
-  have /CnatP[m ->]: `|aq n| \in Cnat by rewrite Cnat_norm_Cint ?Zaq.
+  have /RnatP[m ->]: `|aq n| \in Num.nat by rewrite Rnat_norm_Rint ?Zaq.
   by rewrite leC_nat dvdC_nat; apply: dvdn_leq; rewrite subn_gt0.
 have prod_aq m: m %| n -> \prod_(d < n.+1 | d %| m) aq d = (q ^ m - 1)%:R.
   move=> m_dv_n; transitivity ('X^m - 1).[q%:R : algC]; last first.

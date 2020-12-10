@@ -69,8 +69,8 @@ Canonical Zchar_opprPred := OpprPred Zchar_zmod.
 Canonical Zchar_addrPred := AddrPred Zchar_zmod.
 Canonical Zchar_zmodPred := ZmodPred Zchar_zmod.
 
-Lemma scale_zchar a phi : a \in Cint -> phi \in Zchar -> a *: phi \in Zchar.
-Proof. by case/CintP=> m -> Zphi; rewrite scaler_int rpredMz. Qed.
+Lemma scale_zchar a phi : a \in Num.int -> phi \in Zchar -> a *: phi \in Zchar.
+Proof. by case/RintP=> m -> Zphi; rewrite scaler_int rpredMz. Qed.
 
 End Basics.
 
@@ -131,7 +131,7 @@ Proof. by move=> Sphi; rewrite mem_zchar_on ?cfun_onT. Qed.
 
 Lemma zchar_nth_expansion S A phi :
     phi \in 'Z[S, A] ->
-  {z | forall i, z i \in Cint & phi = \sum_(i < size S) z i *: S`_i}.
+  {z | forall i, z i \in Num.int & phi = \sum_(i < size S) z i *: S`_i}.
 Proof.
 case/andP=> _ /sumboolP/sig_eqW[/= z ->]; exists (intr \o z) => //=.
 by apply: eq_bigr => i _; rewrite scaler_int.
@@ -139,13 +139,13 @@ Qed.
 
 Lemma zchar_tuple_expansion n (S : n.-tuple 'CF(G)) A phi :
     phi \in 'Z[S, A] ->
-  {z | forall i, z i \in Cint & phi = \sum_(i < n) z i *: S`_i}.
+  {z | forall i, z i \in Num.int & phi = \sum_(i < n) z i *: S`_i}.
 Proof. by move/zchar_nth_expansion; rewrite size_tuple. Qed.
 
 (* A pure seq version with the extra hypothesis of S's unicity.  *)
 Lemma zchar_expansion S A phi : uniq S -> 
     phi \in 'Z[S, A] ->
-  {z | forall xi, z xi \in Cint & phi = \sum_(xi <- S) z xi *: xi}.
+  {z | forall xi, z xi \in Num.int & phi = \sum_(xi <- S) z xi *: xi}.
 Proof.
 move=> Suniq /zchar_nth_expansion[z Zz ->] /=.
 pose zS xi := oapp z 0 (insub (index xi S)).
@@ -221,11 +221,11 @@ apply: (iffP idP) => [| [a Na [b Nb ->]]]; last by rewrite rpredB ?char_vchar.
 case/zchar_tuple_expansion=> z Zz ->; rewrite (bigID (fun i => 0 <= z i)) /=.
 set chi1 := \sum_(i | _) _; set nchi2 := \sum_(i | _) _.
 exists chi1; last exists (- nchi2); last by rewrite opprK.
-  apply: rpred_sum => i zi_ge0; rewrite -tnth_nth rpredZ_Cnat ?irr_char //.
-  by rewrite CnatEint Zz.
+  apply: rpred_sum => i zi_ge0; rewrite -tnth_nth rpredZ_Rnat ?irr_char //.
+  by rewrite RnatEint Zz.
 rewrite -sumrN rpred_sum // => i zi_lt0; rewrite -scaleNr -tnth_nth.
-rewrite rpredZ_Cnat ?irr_char // CnatEint rpredN Zz oppr_ge0 ltW //.
-by rewrite real_ltNge ?Creal_Cint.
+rewrite rpredZ_Rnat ?irr_char // RnatEint rpredN Zz oppr_ge0 ltW //.
+by rewrite real_ltNge ?Rreal_Rint.
 Qed.
 
 Lemma Aint_vchar phi x : phi \in 'Z[irr G] -> phi x \in Aint.
@@ -234,35 +234,35 @@ case/vcharP=> [chi1 Nchi1 [chi2 Nchi2 ->]].
 by rewrite !cfunE rpredB ?Aint_char.
 Qed.
 
-Lemma Cint_vchar1 phi : phi \in 'Z[irr G] -> phi 1%g \in Cint.
+Lemma Cint_vchar1 phi : phi \in 'Z[irr G] -> phi 1%g \in Num.int.
 Proof.
 case/vcharP=> phi1 Nphi1 [phi2 Nphi2 ->].
-by rewrite !cfunE rpredB // rpred_Cnat ?Cnat_char1.
+by rewrite !cfunE rpredB // rpred_Rnat ?Cnat_char1.
 Qed.
 
-Lemma Cint_cfdot_vchar_irr i phi : phi \in 'Z[irr G] -> '[phi, 'chi_i] \in Cint.
+Lemma Cint_cfdot_vchar_irr i phi :
+  phi \in 'Z[irr G] -> '[phi, 'chi_i] \in Num.int.
 Proof.
 case/vcharP=> chi1 Nchi1 [chi2 Nchi2 ->].
-by rewrite cfdotBl rpredB // rpred_Cnat ?Cnat_cfdot_char_irr.
+by rewrite cfdotBl rpredB // rpred_Rnat ?Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfdot_vchar_r phi psi :
   psi \in 'Z[irr G] -> '[phi, psi] = \sum_i '[phi, 'chi_i] * '[psi, 'chi_i].
 Proof.
 move=> Zpsi; rewrite cfdot_sum_irr; apply: eq_bigr => i _; congr (_ * _).
-by rewrite aut_Cint ?Cint_cfdot_vchar_irr.
+by rewrite aut_Rint ?Cint_cfdot_vchar_irr.
 Qed.
 
-Lemma Cint_cfdot_vchar : {in 'Z[irr G] &, forall phi psi, '[phi, psi] \in Cint}.
+Lemma Cint_cfdot_vchar :
+  {in 'Z[irr G] &, forall phi psi, '[phi, psi] \in Num.int}.
 Proof.
 move=> phi psi Zphi Zpsi; rewrite /= cfdot_vchar_r // rpred_sum // => k _.
 by rewrite rpredM ?Cint_cfdot_vchar_irr.
 Qed.
 
-Lemma Cnat_cfnorm_vchar : {in 'Z[irr G], forall phi, '[phi] \in Cnat}.
-Proof.
-by move=> phi Zphi; rewrite /= CnatEint cfnorm_ge0 Cint_cfdot_vchar.
-Qed.
+Lemma Cnat_cfnorm_vchar : {in 'Z[irr G], forall phi, '[phi] \in Num.nat}.
+Proof. by move=> phi Zphi; rewrite /= RnatEint cfnorm_ge0 Cint_cfdot_vchar. Qed.
 
 Fact vchar_mulr_closed : mulr_closed 'Z[irr G].
 Proof.
@@ -427,8 +427,8 @@ apply/idP/mapP=> [Sxi | [i Ii ->{xi}]]; last first.
   by case b_i: (b i); rewrite (scale1r, scaleN1r).
 have: '[xi] = 1 by rewrite oSS ?eqxx.
 have vc_xi := vcS _ Sxi; rewrite cfdot_sum_irr.
-case/Cnat_sum_eq1 => [i _ | i [_ /eqP norm_xi_i xi_i'_0]].
-  by rewrite -normCK rpredX // Cnat_norm_Cint ?Cint_cfdot_vchar_irr.
+case/Rnat_sum_eq1 => [i _ | i [_ /eqP norm_xi_i xi_i'_0]].
+  by rewrite -normCK rpredX // Rnat_norm_Rint ?Cint_cfdot_vchar_irr.
 suffices def_xi: xi = (-1) ^+ b i *: 'chi_i.
   exists i; rewrite // mem_enum inE -/(b i) orbC.
   by case: (b i) def_xi Sxi => // ->; rewrite scale1r.
@@ -436,7 +436,7 @@ move: Sxi; rewrite [xi]cfun_sum_cfdot (bigD1 i) //.
 rewrite big1 //= ?addr0 => [|j ne_ji]; last first.
   apply/eqP; rewrite scaler_eq0 -normr_eq0 -[_ == 0](expf_eq0 _ 2) normCK.
   by rewrite xi_i'_0 ?eqxx.
-have:= norm_xi_i; rewrite (aut_Cint _ (Cint_cfdot_vchar_irr _ _)) //.
+have:= norm_xi_i; rewrite (aut_Rint _ (Cint_cfdot_vchar_irr _ _)) //.
 rewrite -subr_eq0 subr_sqr_1 mulf_eq0 subr_eq0 addr_eq0 /b scaler_sign.
 case/pred2P=> ->; last by rewrite scaleN1r => ->.
 rewrite scale1r => Sxi; case: ifP => // SNxi.
@@ -471,7 +471,7 @@ have orthS: orthonormal S.
     by move/eqP; rewrite eq_scaled_irr (negbTE phi_i) => /andP[_ /= /eqP].
   rewrite eq_scaled_irr cfdotZl cfdotZr cfdot_irr mulrA mulr_natr mulrb.
   rewrite mem_enum in phi_i; rewrite (negbTE phi_i) andbC; case: eqP => // <-.
-  have /CnatP[m def_m] := Cnat_norm_Cint (Cint_cfdot_vchar_irr i Zphi).
+  have /RnatP[m def_m] := Rnat_norm_Rint (Cint_cfdot_vchar_irr i Zphi).
   apply/eqP; rewrite eqxx /= -normCK def_m -natrX eqr_nat eqn_leq lt0n.
   rewrite expn_eq0 andbT -eqC_nat -def_m normr_eq0 [~~ _]phi_i andbT.
   rewrite (leq_exp2r _ 1) // -ltnS -(@ltn_exp2r _ _ 2) //.
@@ -535,7 +535,7 @@ Proof.
 move=> freeS [If Zf]; have [tau Dtau Itau] := isometry_of_free freeS If.
 exists tau => //; split; first by apply: sub_in2 Itau; apply: zchar_span.
 move=> _ /zchar_nth_expansion[a Za ->]; rewrite linear_sum rpred_sum // => i _.
-by rewrite linearZ rpredZ_Cint ?Dtau ?Zf ?mem_nth.
+by rewrite linearZ rpredZ_Rint ?Dtau ?Zf ?mem_nth.
 Qed.
 
 Lemma Zisometry_inj A nu :
@@ -547,7 +547,7 @@ Proof.
 move=> Inu _ _ /zchar_nth_expansion[u Zu ->] /zchar_nth_expansion[v Zv ->].
 rewrite !raddf_sum; apply: eq_bigr => j _ /=.
 rewrite !cfdot_suml; apply: eq_bigr => i _.
-by rewrite !raddfZ_Cint //= !cfdotZl !cfdotZr Inu ?mem_nth.
+by rewrite !raddfZ_Rint //= !cfdotZl !cfdotZr Inu ?mem_nth.
 Qed.
 
 End Isometries.
@@ -574,7 +574,7 @@ Lemma sub_aut_zchar S A psi :
   psi - psi^u \in 'Z[S, A^#].
 Proof.
 move=> Z_S Spsi Spsi_u; rewrite zcharD1 !cfunE subr_eq0 rpredB //=.
-by rewrite aut_Cint // Cint_vchar1 // (zchar_trans Z_S) ?(zcharW Spsi).
+by rewrite aut_Rint // Cint_vchar1 // (zchar_trans Z_S) ?(zcharW Spsi).
 Qed.
 
 Lemma conjC_vcharAut chi x : chi \in 'Z[irr G] -> (u (chi x))^* = u (chi x)^*.
@@ -586,8 +586,7 @@ Qed.
 Lemma cfdot_aut_vchar phi chi :
   chi \in 'Z[irr G] -> '[phi^u , chi^u] = u '[phi, chi].
 Proof.
-case/vcharP=> chi1 Nchi1 [chi2 Nchi2 ->].
-by rewrite !raddfB /= !cfdot_aut_char.
+by case/vcharP=> chi1 Nchi1 [chi2 Nchi2 ->]; rewrite !raddfB /= !cfdot_aut_char.
 Qed.
 
 Lemma vchar_aut A chi : (chi^u \in 'Z[irr G, A]) = (chi \in 'Z[irr G, A]).
@@ -596,7 +595,7 @@ rewrite !(zchar_split _ A) cfAut_on; congr (_ && _).
 apply/idP/idP=> [Zuchi|]; last exact: cfAut_vchar.
 rewrite [chi]cfun_sum_cfdot rpred_sum // => i _.
 rewrite scale_zchar ?irr_vchar //.
-by rewrite -(Cint_aut u) -cfdot_aut_irr -aut_IirrE Cint_cfdot_vchar_irr.
+by rewrite -(Rint_aut u) -cfdot_aut_irr -aut_IirrE Cint_cfdot_vchar_irr.
 Qed.
 
 End AutVchar.
@@ -664,7 +663,7 @@ case i0: (i == 0).
   exists 0 => [x Hx|]; last by rewrite irr0 cfker_cfun1 subsetDl.
   by rewrite (eqP i0) !irr0 !cfun1E // (subsetP sHG) ?Hx.
 have ochi1: '['chi_i, 1] = 0 by rewrite -irr0 cfdot_irr i0.
-pose a := 'chi_i 1%g; have Za: a \in Cint by rewrite CintE Cnat_irr1.
+pose a := 'chi_i 1%g; have Za: a \in Num.int by rewrite RintE Cnat_irr1.
 pose theta := 'chi_i - a%:A; pose phi := 'Ind[G] theta + a%:A.
 have /cfun_onP theta0: theta \in 'CF(H, H^#).
   by rewrite cfunD1E !cfunE cfun11 mulr1 subrr.
@@ -831,9 +830,9 @@ Lemma dirr_consttE (phi : 'CF(G)) (i : dIirr G) :
 Proof. by rewrite inE. Qed.
 
 Lemma Cnat_dirr (phi : 'CF(G)) i :
-  phi \in 'Z[irr G] -> i \in dirr_constt phi -> '[phi, dchi i] \in Cnat.
+  phi \in 'Z[irr G] -> i \in dirr_constt phi -> '[phi, dchi i] \in Num.nat.
 Proof.
-move=> PiZ; rewrite CnatEint dirr_consttE andbC => /ltW -> /=.
+move=> PiZ; rewrite RnatEint dirr_consttE andbC => /ltW -> /=.
 by case: i => b i; rewrite cfdotZr rmorph_sign rpredMsign Cint_cfdot_vchar_irr.
 Qed.
  
@@ -864,7 +863,7 @@ Lemma irr_constt_to_dirr (phi: 'CF(G)) i : phi \in 'Z[irr G] ->
   (i \in irr_constt phi) = (to_dirr phi i \in dirr_constt phi).
 Proof.
 move=> Zphi; rewrite irr_consttE dirr_consttE cfdotZr rmorph_sign /=.
-by rewrite -real_normrEsign ?normr_gt0 ?Creal_Cint // Cint_cfdot_vchar_irr.
+by rewrite -real_normrEsign ?normr_gt0 ?Rreal_Rint // Cint_cfdot_vchar_irr.
 Qed.
 
 Lemma to_dirrK (phi: 'CF(G)) : cancel (to_dirr phi) (@of_irr G).
@@ -899,7 +898,7 @@ move=> PiZ; rewrite {1 2}(cfun_sum_dconstt PiZ).
 rewrite cfdot_suml; apply: eq_bigr=> i IiD.
 rewrite cfdot_sumr (bigD1 i) //= big1 ?addr0 => [|j /andP [JiD IdJ]].
   rewrite cfdotZr cfdotZl cfdot_dchi eqxx eq_sym (negPf (ndirr_diff i)).
-  by rewrite subr0 mulr1 aut_Cnat ?Cnat_dirr.
+  by rewrite subr0 mulr1 aut_Rnat ?Cnat_dirr.
 rewrite cfdotZr cfdotZl cfdot_dchi eq_sym (negPf IdJ) -natrB ?mulr0 //.
 by rewrite (negPf (contraNneq _ (dirr_constt_oppl JiD))) => // <-.
 Qed.
@@ -918,8 +917,8 @@ suffices Fd i: i \in dirr_constt phi -> '[phi, dchi i] = 1.
   by apply: eq_bigr => i /Fd->; rewrite scale1r.
 move=> IiD; apply: contraNeq Nl4 => phi_i_neq1.
 rewrite -Pln cnorm_dconstt // (bigD1 i) ?ler_paddr ?sumr_ge0 //=.
-  by move=> j /andP[JiD _]; rewrite exprn_ge0 ?Cnat_ge0 ?Cnat_dirr.
-have /CnatP[m Dm] := Cnat_dirr PiZ IiD; rewrite Dm -natrX ler_nat (leq_sqr 2).
+  by move=> j /andP[JiD _]; rewrite exprn_ge0 ?Rnat_ge0 ?Cnat_dirr.
+have /RnatP[m Dm] := Cnat_dirr PiZ IiD; rewrite Dm -natrX ler_nat (leq_sqr 2).
 by rewrite ltn_neqAle eq_sym -eqC_nat -ltC_nat -Dm phi_i_neq1 -dirr_consttE.
 Qed.
 

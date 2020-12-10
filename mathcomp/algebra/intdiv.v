@@ -440,26 +440,24 @@ apply/eqP/dvdz_mod0P=> eq_mn.
 by rewrite -(subrK n m) -modzDml eq_mn add0r.
 Qed.
 
-Lemma divzDl m n d :
-  (d %| m)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
+Lemma divzDl m n d : (d %| m)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
 Proof.
 have [-> | d_nz] := eqVneq d 0; first by rewrite !divz0.
 by move/divzK=> {1}<-; rewrite divzMDl.
 Qed.
 
-Lemma divzDr m n d :
-  (d %| n)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
+Lemma divzDr m n d : (d %| n)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
 Proof. by move=> dv_n; rewrite addrC divzDl // addrC. Qed.
 
-Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> ((m%:~R / d%:~R : rat) \is a Cint).
+Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> (m%:~R / d%:~R : rat) \is a Num.int.
 Proof.
 case/dvdzP=> z ->; rewrite rmorphM /=; have [->|dn0] := eqVneq d 0.
   by rewrite mulr0 mul0r.
 by rewrite mulfK ?intr_eq0.
 Qed.
 
-Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> ((m%:R / d%:R : rat) \is a Cnat).
-Proof. by move=> h; rewrite CnatEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
+Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
+Proof. by move=> h; rewrite RnatEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
 
 (* Greatest common divisor *)
 

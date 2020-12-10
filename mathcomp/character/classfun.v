@@ -5,7 +5,7 @@ From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient finalg action gproduct.
 From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import matrix vector falgebra ssrnum ssrint algC algnum.
+From mathcomp Require Import matrix vector falgebra ssrnum algC algnum.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)
@@ -135,10 +135,10 @@ Section Defs.
 Variable gT : finGroupType.
 
 Definition is_class_fun (B : {set gT}) (f : {ffun gT -> algC}) :=
-  [forall x, forall y in B, f (x ^ y)%g == f x] && (support f \subset B).
+  [forall x, forall y in B, f (x ^ y) == f x] && (support f \subset B).
 
 Lemma intro_class_fun (G : {group gT}) f :
-    {in G &, forall x y, f (x ^ y)%g = f x} ->
+    {in G &, forall x y, f (x ^ y) = f x} ->
     (forall x, x \notin G -> f x = 0) ->
   is_class_fun G (finfun f).
 Proof.
@@ -185,7 +185,7 @@ move=> eq_phi; apply/cfunP=> x.
 by have [/eq_phi-> // | notAx] := boolP (x \in G); rewrite !cfun0gen.
 Qed.
 
-Lemma cfunJgen phi x y : y \in G -> phi (x ^ y)%g = phi x.
+Lemma cfunJgen phi x y : y \in G -> phi (x ^ y) = phi x.
 Proof.
 case: phi => f fP Gy; apply/eqP.
 by case: (andP fP) => /'forall_forall_inP->.
@@ -472,7 +472,7 @@ Proof. by rewrite -{1}(genGid G) => /(cfun0gen phi). Qed.
 Lemma support_cfun phi : support phi \subset G.
 Proof. by apply/subsetP=> g; apply: contraR => /cfun0->. Qed.
 
-Lemma cfunJ phi x y : y \in G -> phi (x ^ y)%g = phi x.
+Lemma cfunJ phi x y : y \in G -> phi (x ^ y) = phi x.
 Proof. by rewrite -{1}(genGid G) => /(cfunJgen phi)->. Qed.
 
 Lemma cfun_repr phi x : phi (repr (x ^: G)) = phi x.
@@ -557,7 +557,7 @@ Lemma cfun_on0 A phi x : phi \in 'CF(G, A) -> x \notin A -> phi x = 0.
 Proof. by move/cfun_onP; apply. Qed.
 
 Lemma sum_by_classes (R : ringType) (F : gT -> R) :
-    {in G &, forall g h, F (g ^ h)%g = F g} ->
+    {in G &, forall g h, F (g ^ h) = F g} ->
   \sum_(g in G) F g = \sum_(xG in classes G) #|xG|%:R * F (repr xG).
 Proof.
 move=> FJ; rewrite {1}(partition_big _  _ ((@mem_classes gT)^~ G)) /=.
@@ -2175,7 +2175,7 @@ Local Notation H := <<A>>.
 (* The defalut value for the ~~ (H \subset G) case matches the one for cfRes *)
 (* so that Frobenius reciprocity holds even in this degenerate case.         *)
 Definition ffun_cfInd (phi : 'CF(A)) :=
-  [ffun x => if H \subset G then #|A|%:R^-1 * (\sum_(y in G) phi (x ^ y)%g)
+  [ffun x => if H \subset G then #|A|%:R^-1 * (\sum_(y in G) phi (x ^ y))
                             else #|G|%:R * '[phi, 1] *+ (x == 1%g)].
 
 Fact cfInd_subproof phi : is_class_fun G (ffun_cfInd phi).
@@ -2206,7 +2206,7 @@ Local Notation "''Ind[' B , A ]" := (@cfInd B A) : ring_scope.
 Local Notation "''Ind[' B ]" := 'Ind[B, _] : ring_scope.
 
 Lemma cfIndE (G H : {group gT}) phi x :
-  H \subset G -> 'Ind[G, H] phi x = #|H|%:R^-1 * (\sum_(y in G) phi (x ^ y)%g).
+  H \subset G -> 'Ind[G, H] phi x = #|H|%:R^-1 * (\sum_(y in G) phi (x ^ y)).
 Proof. by rewrite cfunElock !genGid => ->. Qed.
 
 Variables G K H : {group gT}.
@@ -2278,7 +2278,7 @@ Lemma cfIndInd phi :
 Proof.
 move=> sKG sHK; apply/cfun_inP=> x Gx; rewrite !cfIndE ?(subset_trans sHK) //.
 apply: canLR (mulKf (neq0CG K)) _; rewrite mulr_sumr mulr_natl.
-transitivity (\sum_(y in G) \sum_(z in K) #|H|%:R^-1 * phi ((x ^ y) ^ z)%g).
+transitivity (\sum_(y in G) \sum_(z in K) #|H|%:R^-1 * phi ((x ^ y) ^ z)).
   by apply: eq_bigr => y Gy; rewrite cfIndE // -mulr_sumr.
 symmetry; rewrite exchange_big /= -sumr_const; apply: eq_bigr => z Kz.
 rewrite (reindex_inj (mulIg z)).
@@ -2297,8 +2297,7 @@ transitivity (#|H|%:R^-1 * \sum_(x in G) phi x * (psi x)^*).
     by move=> x /setDP[_ /cfun0->]; rewrite mul0r.
   by congr (_ * _); apply: eq_bigr => x Hx; rewrite cfResE.
 set h' := _^-1; apply: canRL (mulKf (neq0CG G)) _.
-transitivity
-    (h' * \sum_(y in G) \sum_(x in G) phi (x ^ y)%g * (psi (x ^ y)%g)^*).
+transitivity (h' * \sum_(y in G) \sum_(x in G) phi (x ^ y) * (psi (x ^ y))^*).
   rewrite mulrCA mulr_natl -sumr_const; congr (_ * _); apply: eq_bigr => y Gy.
   by rewrite (reindex_acts 'J _ Gy) ?astabsJ ?normG.
 rewrite exchange_big mulr_sumr; apply: eq_bigr => x _; rewrite cfIndE //=.
@@ -2314,7 +2313,7 @@ Lemma cfIndM phi psi:  H \subset G ->
 Proof.
 move=> HsG; apply/cfun_inP=> x Gx; rewrite !cfIndE // !cfunE !cfIndE // -mulrA.
 congr (_ * _); rewrite mulr_suml; apply: eq_bigr=> i iG; rewrite !cfunE.
-case: (boolP (x ^ i \in H)%g)=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
+case: (boolP (x ^ i \in H))=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
 by rewrite !cfResE //; congr (_ * _); rewrite cfunJgen ?genGid.
 Qed.
 
@@ -2343,8 +2342,8 @@ apply: eq_big => [z | z /andP[Gz /eqP <-]].
   have [Gz | G'z] := boolP (z \in G).
     by rewrite (sameP eqP (rcoset_kerP _ _ _)) ?inD.
   by case: rcosetP G'z => // [[t Kt ->]]; rewrite groupM // (subsetP sKG).
-have [Dz Dxz] := (inD z Gz, inD (x ^ z)%g (groupJ Gx Gz)); rewrite -morphJ //.
-have [Hxz | notHxz] := boolP (x ^ z \in H)%g; first by rewrite cfMorphE.
+have [Dz Dxz] := (inD z Gz, inD (x ^ z) (groupJ Gx Gz)); rewrite -morphJ //.
+have [Hxz | notHxz] := boolP (x ^ z \in H); first by rewrite cfMorphE.
 by rewrite !cfun0 // -sub1set -morphim_set1 // morphimSGK ?sub1set.
 Qed.
 
@@ -2369,7 +2368,7 @@ apply/cfun_inP=> s; rewrite -{1}defR => /morphimP[x _ Gx ->]{s}.
 rewrite cfIsomE ?cfIndE // -defR -{1}defS ?morphimS ?card_injm // morphimEdom.
 congr (_ * _); rewrite big_imset //=; last exact/injmP.
 apply: eq_bigr => y Gy; rewrite -morphJ //.
-have [Hxy | H'xy] := boolP (x ^ y \in H)%g; first by rewrite -eq_hg ?cfIsomE.
+have [Hxy | H'xy] := boolP (x ^ y \in H); first by rewrite -eq_hg ?cfIsomE.
 by rewrite !cfun0 -?defS // -sub1set -morphim_set1 ?injmSK ?sub1set // groupJ.
 Qed.
 
@@ -2385,11 +2384,11 @@ Local Notation "phi ^u" := (cfAut u phi) (at level 3, format "phi ^u").
 Lemma cfAutZ_nat n phi : (n%:R *: phi)^u = n%:R *: phi^u.
 Proof. exact: raddfZnat. Qed.
 
-Lemma cfAutZ_Cnat z phi : z \in Cnat -> (z *: phi)^u = z *: phi^u.
-Proof. exact: raddfZ_Cnat. Qed.
+Lemma cfAutZ_Cnat z phi : z \in Num.nat -> (z *: phi)^u = z *: phi^u.
+Proof. exact: raddfZ_Rnat. Qed.
 
-Lemma cfAutZ_Cint z phi : z \in Cint -> (z *: phi)^u = z *: phi^u.
-Proof. exact: raddfZ_Cint. Qed.
+Lemma cfAutZ_Cint z phi : z \in Num.int -> (z *: phi)^u = z *: phi^u.
+Proof. exact: raddfZ_Rint. Qed.
 
 Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut_rmorphism u)).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_autK. Qed.
