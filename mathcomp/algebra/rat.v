@@ -789,3 +789,30 @@ by move=> p /eqP p_neq0; rat_to_ring; rewrite mulVf.
 Qed.
 
 Add Field rat_field : rat_field_theory.
+
+Module mc_1_12.
+
+Local Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
+Local Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
+
+Lemma QintP (x : rat) : reflect (exists z, x = z%:~R) (x \in Qint).
+Proof. exact: RintP. Qed.
+
+Lemma Qnat_def (x : rat) : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
+Proof. exact: RnatEint. Qed.
+
+Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
+Proof. exact: RnatP. Qed.
+
+End mc_1_12.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.int instead.")]
+Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.nat instead.")]
+Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RintP instead.")]
+Notation QintP := mc_1_12.QintP (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RnatEint instead.")]
+Notation Qnat_def := mc_1_12.Qnat_def (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RnatP instead.")]
+Notation QnatP := mc_1_12.QnatP (only parsing).

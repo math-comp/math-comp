@@ -917,3 +917,356 @@ End AutC.
 
 End AlgebraicsTheory.
 Hint Resolve Crat0 Crat1 dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
+
+Module mc_1_12.
+
+Implicit Types (x y z : algC) (n : nat) (m : int) (b : bool).
+
+Notation Cint := (Num.int : {pred algC}) (only parsing).
+Notation Cnat := (Num.nat : {pred algC}) (only parsing).
+Notation floorC := (floorR : algC -> int) (only parsing).
+Notation truncC := (Num.trunc : algC -> nat) (only parsing).
+
+Lemma Creal0 : 0 \is Creal. Proof. exact: real0. Qed.
+Lemma Creal1 : 1 \is Creal. Proof. exact: real1. Qed.
+
+Lemma floorC_itv x : x \is Creal -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
+Proof. exact: floorR_itv. Qed.
+
+Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
+Proof. exact: floorR_def. Qed.
+
+Lemma intCK : cancel intr floorC.
+Proof. exact: intRK. Qed.
+
+Lemma floorCK : {in Cint, cancel floorC intr}.
+Proof. exact: floorRK. Qed.
+
+Lemma floorC0 : floorC 0 = 0. Proof. exact: floorR0. Qed.
+Lemma floorC1 : floorC 1 = 1. Proof. exact: floorR1. Qed.
+
+Lemma floorCpK (p : {poly algC}) :
+  p \is a polyOver Cint -> map_poly intr (map_poly floorC p) = p.
+Proof. exact: floorRpK. Qed.
+
+Lemma floorCpP (p : {poly algC}) :
+  p \is a polyOver Cint -> {q | p = map_poly intr q}.
+Proof. exact: floorRpP. Qed.
+
+Lemma Cint_int m : m%:~R \in Cint.
+Proof. exact: Rint_int. Qed.
+
+Lemma CintP x : reflect (exists m, x = m%:~R) (x \in Cint).
+Proof. exact: RintP. Qed.
+
+Lemma floorCD : {in Cint & Creal, {morph floorC : x y / x + y}}.
+Proof. exact: floorRD. Qed.
+
+Lemma floorCN : {in Cint, {morph floorC : x / - x}}.
+Proof. exact: floorRN. Qed.
+
+Lemma floorCM : {in Cint &, {morph floorC : x y / x * y}}.
+Proof. exact: floorRM. Qed.
+
+Lemma floorCX n : {in Cint, {morph floorC : x / x ^+ n}}.
+Proof. exact: floorRX. Qed.
+
+Lemma rpred_Cint
+        (S : {pred algC}) (ringS : subringPred S) (kS : keyed_pred ringS) x :
+  x \in Cint -> x \in kS.
+Proof. exact: rpred_Rint. Qed.
+
+Lemma Cint0 : 0 \in Cint. Proof. exact: Rint0. Qed.
+Lemma Cint1 : 1 \in Cint. Proof. exact: Rint1. Qed.
+
+Lemma Creal_Cint : {subset Cint <= Creal}.
+Proof. exact: Rreal_Rint. Qed.
+
+Lemma conj_Cint x : x \in Cint -> x^* = x.
+Proof. exact: conj_Rint. Qed.
+
+Lemma Cint_normK x : x \in Cint -> `|x| ^+ 2 = x ^+ 2.
+Proof. exact: Rint_normK. Qed.
+
+Lemma CintEsign x : x \in Cint -> x = (-1) ^+ (x < 0)%C * `|x|.
+Proof. exact: RintEsign. Qed.
+
+Lemma truncC_itv x : 0 <= x -> (truncC x)%:R <= x < (truncC x).+1%:R.
+Proof. exact: truncR_itv. Qed.
+
+Lemma truncC_def x n : n%:R <= x < n.+1%:R -> truncC x = n.
+Proof. exact: truncR_def. Qed.
+
+Lemma natCK n : truncC n%:R = n.
+Proof. exact: natRK. Qed.
+
+Lemma CnatP x : reflect (exists n, x = n%:R) (x \in Cnat).
+Proof. exact: RnatP. Qed.
+
+Lemma truncCK : {in Cnat, cancel truncC (GRing.natmul 1)}.
+Proof. exact: truncRK. Qed.
+
+Lemma truncC_gt0 x : (0 < truncC x)%N = (1 <= x).
+Proof. exact: truncR_gt0. Qed.
+
+Lemma truncC0Pn x : reflect (truncC x = 0%N) (~~ (1 <= x)).
+Proof. exact: truncR0Pn. Qed.
+
+Lemma truncC0 : truncC 0 = 0%N. Proof. exact: truncR0. Qed.
+Lemma truncC1 : truncC 1 = 1%N. Proof. exact: truncR1. Qed.
+
+Lemma truncCD :
+  {in Cnat & Num.nneg, {morph truncC : x y / x + y >-> (x + y)%N}}.
+Proof. exact: truncRD. Qed.
+
+Lemma truncCM : {in Cnat &, {morph truncC : x y / x * y >-> (x * y)%N}}.
+Proof. exact: truncRM. Qed.
+
+Lemma truncCX n : {in Cnat, {morph truncC : x / x ^+ n >-> (x ^ n)%N}}.
+Proof. exact: truncRX. Qed.
+
+Lemma rpred_Cnat
+        (S : {pred algC}) (ringS : semiringPred S) (kS : keyed_pred ringS) x :
+  x \in Cnat -> x \in kS.
+Proof. exact: rpred_Rnat. Qed.
+
+Lemma Cnat_nat n : n%:R \in Cnat.
+Proof. exact: Rnat_nat. Qed.
+Lemma Cnat0 : 0 \in Cnat. Proof. exact: Rnat0. Qed.
+Lemma Cnat1 : 1 \in Cnat. Proof. exact: Rnat1. Qed.
+
+Lemma Cnat_ge0 x : x \in Cnat -> 0 <= x.
+Proof. exact: Rnat_ge0. Qed.
+
+Lemma Cnat_gt0 x : x \in Cnat -> (0 < x) = (x != 0).
+Proof. exact: Rnat_gt0. Qed.
+
+Lemma conj_Cnat x : x \in Cnat -> x^* = x.
+Proof. exact: conj_Rnat. Qed.
+
+Lemma norm_Cnat x : x \in Cnat -> `|x| = x.
+Proof. exact: norm_Rnat. Qed.
+
+Lemma Creal_Cnat : {subset Cnat <= Creal}.
+Proof. exact: Rreal_Rnat. Qed.
+
+Lemma Cnat_sum_eq1 (I : finType) (P : pred I) (F : I -> algC) :
+     (forall i, P i -> F i \in Cnat) -> \sum_(i | P i) F i = 1 ->
+   {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
+Proof. exact: Rnat_sum_eq1. Qed.
+
+Lemma Cnat_mul_eq1 x y :
+  x \in Cnat -> y \in Cnat -> (x * y == 1) = (x == 1) && (y == 1).
+Proof. exact: Rnat_mul_eq1. Qed.
+
+Lemma Cnat_prod_eq1 (I : finType) (P : pred I) (F : I -> algC) :
+    (forall i, P i -> F i \in Cnat) -> \prod_(i | P i) F i = 1 ->
+  forall i, P i -> F i = 1.
+Proof. exact: Rnat_prod_eq1. Qed.
+
+Lemma Cint_Cnat : {subset Cnat <= Cint}.
+Proof. exact: Rint_Rnat. Qed.
+
+Lemma CintE x : (x \in Cint) = (x \in Cnat) || (- x \in Cnat).
+Proof. exact: RintE. Qed.
+
+Lemma Cnat_norm_Cint x : x \in Cint -> `|x| \in Cnat.
+Proof. exact: Rnat_norm_Rint. Qed.
+
+Lemma CnatEint x : (x \in Cnat) = (x \in Cint) && (0 <= x).
+Proof. exact: RnatEint. Qed.
+
+Lemma CintEge0 x : 0 <= x -> (x \in Cint) = (x \in Cnat).
+Proof. exact: RintEge0. Qed.
+
+Lemma Cnat_exp_even x n : ~~ odd n -> x \in Cint -> x ^+ n \in Cnat.
+Proof. exact: Rnat_exp_even. Qed.
+
+Lemma norm_Cint_ge1 x : x \in Cint -> x != 0 -> 1 <= `|x|.
+Proof. exact: norm_Rint_ge1. Qed.
+
+Lemma sqr_Cint_ge1 x : x \in Cint -> x != 0 -> 1 <= x ^+ 2.
+Proof. exact: sqr_Rint_ge1. Qed.
+
+Lemma Cint_ler_sqr x : x \in Cint -> x <= x ^+ 2.
+Proof. exact: Rint_ler_sqr. Qed.
+
+Section AutC.
+
+Implicit Type nu : {rmorphism algC -> algC}.
+
+Lemma aut_Cnat nu : {in Cnat, nu =1 id}. Proof. exact: aut_Rnat. Qed.
+Lemma aut_Cint nu : {in Cint, nu =1 id}. Proof. exact: aut_Rint. Qed.
+
+Lemma Cnat_aut nu x : (nu x \in Cnat) = (x \in Cnat).
+Proof. exact: Rnat_aut. Qed.
+
+Lemma Cint_aut nu x : (nu x \in Cint) = (x \in Cint).
+Proof. exact: Rint_aut. Qed.
+
+End AutC.
+
+Section AutLmodC.
+
+Variables (U V : lmodType algC) (f : {additive U -> V}).
+
+Lemma raddfZ_Cnat a u : a \in Cnat -> f (a *: u) = a *: f u.
+Proof. exact: raddfZ_Rnat. Qed.
+
+Lemma raddfZ_Cint a u : a \in Cint -> f (a *: u) = a *: f u.
+Proof. exact: raddfZ_Rint. Qed.
+
+End AutLmodC.
+
+Section PredCmod.
+
+Variable V : lmodType algC.
+
+Lemma rpredZ_Cnat S (addS : @addrPred V S) (kS : keyed_pred addS) :
+  {in Cnat & kS, forall z u, z *: u \in kS}.
+Proof. exact: rpredZ_Rnat. Qed.
+
+Lemma rpredZ_Cint S (subS : @zmodPred V S) (kS : keyed_pred subS) :
+  {in Cint & kS, forall z u, z *: u \in kS}.
+Proof. exact: rpredZ_Rint. Qed.
+
+End PredCmod.
+
+End mc_1_12.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.int instead.")]
+Notation Cint := (Num.int : {pred algC}) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.nat instead.")]
+Notation Cnat := (Num.nat : {pred algC}) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorR instead.")]
+Notation floorC := (floorR : algC -> int) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.trunc instead.")]
+Notation truncC := (Num.trunc : algC -> nat) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use real0 instead.")]
+Notation Creal0 := mc_1_12.Creal0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use real1 instead.")]
+Notation Creal1 := mc_1_12.Creal1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorR_itv instead.")]
+Notation floorC_itv := mc_1_12.floorC_itv (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorR_def instead.")]
+Notation floorC_def := mc_1_12.floorC_def (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use intRK instead.")]
+Notation intCK := mc_1_12.intCK (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRK instead.")]
+Notation floorCK := mc_1_12.floorCK (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorR0 instead.")]
+Notation floorC0 := mc_1_12.floorC0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorR1 instead.")]
+Notation floorC1 := mc_1_12.floorC1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRpK instead.")]
+Notation floorCpK := mc_1_12.floorCpK (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRpP instead.")]
+Notation floorCpP := mc_1_12.floorCpP (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint_int instead.")]
+Notation Cint_int := mc_1_12.Cint_int (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RintP instead.")]
+Notation CintP := mc_1_12.CintP (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRD instead.")]
+Notation floorCD := mc_1_12.floorCD (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRN instead.")]
+Notation floorCN := mc_1_12.floorCN (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRM instead.")]
+Notation floorCM := mc_1_12.floorCM (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use floorRX instead.")]
+Notation floorCX := mc_1_12.floorCX (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use rpred_Rint instead.")]
+Notation rpred_Cint := mc_1_12.rpred_Cint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint0 instead.")]
+Notation Cint0 := mc_1_12.Cint0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint1 instead.")]
+Notation Cint1 := mc_1_12.Cint1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rreal_Rint instead.")]
+Notation Creal_Cint := mc_1_12.Creal_Cint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use conj_Rint instead.")]
+Notation conj_Cint := mc_1_12.conj_Cint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint_normK instead.")]
+Notation Cint_normK := mc_1_12.Cint_normK (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RintEsign instead.")]
+Notation CintEsign := mc_1_12.CintEsign (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncR_itv instead.")]
+Notation truncC_itv := mc_1_12.truncC_itv (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncR_def instead.")]
+Notation truncC_def := mc_1_12.truncC_def (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use natRK instead.")]
+Notation natCK := mc_1_12.natCK (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RnatP instead.")]
+Notation CnatP := mc_1_12.CnatP (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncRK instead.")]
+Notation truncCK := mc_1_12.truncCK (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncR_gt0 instead.")]
+Notation truncC_gt0 := mc_1_12.truncC_gt0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncR0Pn instead.")]
+Notation truncC0Pn := mc_1_12.truncC0Pn (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncR0 instead.")]
+Notation truncC0 := mc_1_12.truncC0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncR1 instead.")]
+Notation truncC1 := mc_1_12.truncC1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncRD instead.")]
+Notation truncCD := mc_1_12.truncCD (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncRM instead.")]
+Notation truncCM := mc_1_12.truncCM (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use truncRX instead.")]
+Notation truncCX := mc_1_12.truncCX (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use rpred_Rnat instead.")]
+Notation rpred_Cnat := mc_1_12.rpred_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_nat instead.")]
+Notation Cnat_nat := mc_1_12.Cnat_nat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat0 instead.")]
+Notation Cnat0 := mc_1_12.Cnat0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat1 instead.")]
+Notation Cnat1 := mc_1_12.Cnat1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_ge0 instead.")]
+Notation Cnat_ge0 := mc_1_12.Cnat_ge0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_gt0 instead.")]
+Notation Cnat_gt0 := mc_1_12.Cnat_gt0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use conj_Rnat instead.")]
+Notation conj_Cnat := mc_1_12.conj_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use norm_Rnat instead.")]
+Notation norm_Cnat := mc_1_12.norm_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rreal_Rnat instead.")]
+Notation Creal_Cnat := mc_1_12.Creal_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_sum_eq1 instead.")]
+Notation Cnat_sum_eq1 := mc_1_12.Cnat_sum_eq1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_mul_eq1 instead.")]
+Notation Cnat_mul_eq1 := mc_1_12.Cnat_mul_eq1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_prod_eq1 instead.")]
+Notation Cnat_prod_eq1 := mc_1_12.Cnat_prod_eq1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint_Rnat instead.")]
+Notation Cint_Cnat := mc_1_12.Cint_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RintE instead.")]
+Notation CintE := mc_1_12.CintE (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_norm_Rint instead.")]
+Notation Cnat_norm_Cint := mc_1_12.Cnat_norm_Cint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RnatEint instead.")]
+Notation CnatEint := mc_1_12.CnatEint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RintEge0 instead.")]
+Notation CintEge0 := mc_1_12.CintEge0 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_exp_even instead.")]
+Notation Cnat_exp_even := mc_1_12.Cnat_exp_even (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use norm_Rint_ge1 instead.")]
+Notation norm_Cint_ge1 := mc_1_12.norm_Cint_ge1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use sqr_Rint_ge1 instead.")]
+Notation sqr_Cint_ge1 := mc_1_12.sqr_Cint_ge1 (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint_ler_sqr instead.")]
+Notation Cint_ler_sqr := mc_1_12.Cint_ler_sqr (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use aut_Rnat instead.")]
+Notation aut_Cnat := mc_1_12.aut_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use aut_Rint instead.")]
+Notation aut_Cint := mc_1_12.aut_Cint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rnat_aut instead.")]
+Notation Cnat_aut := mc_1_12.Cnat_aut (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Rint_aut instead.")]
+Notation Cint_aut := mc_1_12.Cint_aut (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use raddfZ_Rnat instead.")]
+Notation raddfZ_Cnat := mc_1_12.raddfZ_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use raddfZ_Rint instead.")]
+Notation raddfZ_Cint := mc_1_12.raddfZ_Cint (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use rpredZ_Rnat instead.")]
+Notation rpredZ_Cnat := mc_1_12.rpredZ_Cnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use rpredZ_Rint instead.")]
+Notation rpredZ_Cint := mc_1_12.rpredZ_Cint (only parsing).

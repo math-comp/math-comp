@@ -1901,3 +1901,5 @@ End ZnatPred.
 
 #[deprecated(since="mathcomp 1.12.0", note="Use polyCMz instead.")]
 Notation polyC_mulrz := polyCMz (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.nat instead.")]
+Notation Znat := (Num.nat : qualifier 1 int) (only parsing).
