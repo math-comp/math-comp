@@ -507,7 +507,7 @@ Definition intmul (R : zmodType) (x : R) (n : int) := nosimpl
     | Negz n => (x *- (n.+1))%R
   end.
 
-Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : ring_scope.
+Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : fun_scope.
 Notation "x *~ n" := (intmul x n)
   (at level 40, left associativity, format "x  *~  n") : ring_scope.
 Notation intr := ( *~%R 1).
