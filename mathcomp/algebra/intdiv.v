@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
-From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
+From mathcomp Require Import perm ssralg finalg zmodp matrix mxalgebra vector.
+From mathcomp Require Import poly polydiv ssrnum ssrint archimedean rat.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)

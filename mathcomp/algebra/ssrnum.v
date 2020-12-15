@@ -69,50 +69,6 @@ From mathcomp Require Import ssralg poly.
 (*   [rcfType of T for S]                                                     *)
 (*                  == T-clone of the rcfType structure S.                    *)
 (*                                                                            *)
-(*   * ArchiNumDomain (Num Domain with the Archimedean axiom)                 *)
-(*     archiNumDomainType                                                     *)
-(*                  == interface for an Archimedean num domain.               *)
-(*     ArchiNumDomainType T r                                                 *)
-(*                  == packs the archimeadean axiom r into a                  *)
-(*                     ArchiNumDomainType. The carrier T must have a num      *)
-(*                     domain type structure.                                 *)
-(*    [archiNumDomainType of T for S ]                                        *)
-(*                  == T-clone of the archiNumDomainType structure  S.        *)
-(*    [archiNumDomainType of T]                                               *)
-(*                  == clone of a canonical archiNumDomainType structure      *)
-(*                     on T.                                                  *)
-(*                                                                            *)
-(*   * ArchiNumField (Num Field with the Archimedean axiom)                   *)
-(*     archiNumFieldType                                                      *)
-(*                  == interface for an Archimedean num field.                *)
-(*    [archiNumFieldType of T]                                                *)
-(*                  == clone of a canonical archiNumFieldType structure on T. *)
-(*                                                                            *)
-(*   * ArchiNumClosedField (Num Closed Field with the Archimedean axiom)      *)
-(*     archiNumClosedFieldType                                                *)
-(*                  == interface for an Archimedean num closed field.         *)
-(*    [archiNumClosedFieldType of T]                                          *)
-(*                  == clone of a canonical archiNumClosedFieldType           *)
-(*                     structure on T.                                        *)
-(*                                                                            *)
-(*   * ArchiRealDomain (Real Domain with the Archimedean axiom)               *)
-(*     archiRealDomainType                                                    *)
-(*                  == interface for an Archimedean real domain.              *)
-(*    [archiRealDomainType of T]                                              *)
-(*                  == clone of a canonical archiRealDomainType structure     *)
-(*                     on T.                                                  *)
-(*                                                                            *)
-(*   * ArchiRealField (Real Field with the Archimedean axiom)                 *)
-(*     archiRealFieldType                                                     *)
-(*                  == interface for an Archimedean real field.               *)
-(*    [archiRealFieldType of T]                                               *)
-(*                  == clone of a canonical archiRealFieldType structure on T.*)
-(*                                                                            *)
-(*   * ArchiRealClosedField (Real Closed Field with the Archimedean axiom)    *)
-(*     archiRcfType == interface for an Archimedean real closed field.        *)
-(*    [archiRcfType of T]                                                     *)
-(*                  == clone of a canonical archiRcfType structure on T.      *)
-(*                                                                            *)
 (* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _,         *)
 (* _ < _ ?<= if _, >=<, and ><) and lattice operations (meet and join)        *)
 (* defined in order.v are redefined for the ring_display in the ring_scope    *)
@@ -127,8 +83,6 @@ From mathcomp Require Import ssralg poly.
 (*  x \is a Num.neg <=> x is negative (:= x < 0).                             *)
 (* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0).                       *)
 (* x \is a Num.real <=> x is real (:= x >= 0 or x < 0).                       *)
-(*      Num.bound x == in Archimedean domains, and upper bound for x, i.e.,   *)
-(*                     and n such that `|x| < n%:R.                           *)
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
 (*                     x >= 0, or 0 otherwise.                                *)
 (* For numeric algebraically closed fields we provide the generic definitions *)
@@ -1034,7 +988,8 @@ Coercion numDomainType : type >-> NumDomain.type.
 Canonical numDomainType.
 Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
-Notation archiNumDomainType := type.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archiNumDomainType := type (only parsing).
 Notation ArchiNumDomainType T m := (@pack T _ m _ _ id _ id).
 Notation "[ 'archiNumDomainType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
   (at level 0, format "[ 'archiNumDomainType'  'of'  T  'for'  cT ]") :
@@ -1124,7 +1079,9 @@ Coercion normedZmodType : type >-> NormedZmodule.type.
 Canonical normedZmodType.
 Canonical field_archiNumDomainType.
 Canonical numField_archiNumDomainType.
-Notation archiNumFieldType := type.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archiNumFieldType := type (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
 Notation "[ 'archiNumFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiNumFieldType'  'of'  T ]") : form_scope.
 End Exports.
@@ -1235,8 +1192,10 @@ Canonical numClosedField_archiNumDomainType.
 Canonical decField_archiNumFieldType.
 Canonical closedField_archiNumFieldType.
 Canonical numClosedField_archiNumFieldType.
-Notation archiNumClosedFieldType := type.
-Notation "[ 'archiNumClosedFieldType' 'of' T ]" :=  (@pack T _ _ id _ _ id)
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archiNumClosedFieldType := type (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation "[ 'archiNumClosedFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiNumClosedFieldType'  'of'  T ]") : form_scope.
 End Exports.
 
@@ -1332,7 +1291,8 @@ Canonical lattice_archiNumDomainType.
 Canonical distrLattice_archiNumDomainType.
 Canonical order_archiNumDomainType.
 Canonical realDomain_archiNumDomainType.
-Notation archiRealDomainType := type.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archiRealDomainType := type (only parsing).
 Notation "[ 'archiRealDomainType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiRealDomainType'  'of'  T ]") : form_scope.
 End Exports.
@@ -1467,9 +1427,17 @@ Canonical field_archiRealDomainType.
 Canonical numField_archiRealDomainType.
 Canonical realField_archiRealDomainType.
 Canonical archiNumField_archiRealDomainType.
-Notation archiRealFieldType := type.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archiRealFieldType := type (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use archiRealFieldType instead.")]
+Notation archiFieldType := type (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
 Notation "[ 'archiRealFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiRealFieldType'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 1.13.0",
+             note="Use [archiRealFieldType of _] instead.")]
+Notation "[ 'archiFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
+  (at level 0, format "[ 'archiFieldType'  'of'  T ]") : form_scope.
 End Exports.
 
 End ArchiRealField.
@@ -1584,13 +1552,22 @@ Canonical rcf_archiNumDomainType.
 Canonical rcf_archiNumFieldType.
 Canonical rcf_archiRealDomainType.
 Canonical rcf_archiRealFieldType.
-Notation archiRcfType := Num.ArchiRealClosedField.type.
-Notation "[ 'archiRcfType' 'of' T ]" :=  (@pack T _ _ id _ _ id)
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archiRcfType := type (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation "[ 'archiRcfType' 'of' T ]" := (@pack T _ _ id _ _ id)
   (at level 0, format "[ 'archiRcfType'  'of'  T ]") : form_scope.
 End Exports.
 
 End ArchiRealClosedField.
 Import ArchiRealClosedField.Exports.
+
+Local Notation archiNumDomainType := ArchiNumDomain.type.
+Local Notation archiNumFieldType := ArchiNumField.type.
+Local Notation archiNumClosedFieldType := ArchiNumClosedField.type.
+Local Notation archiRealDomainType := ArchiRealDomain.type.
+Local Notation archiRealFieldType := ArchiRealField.type.
+Local Notation archiRcfType := ArchiRealClosedField.type.
 
 Module Import Def.
 
@@ -1673,7 +1650,8 @@ Notation neg := Rneg.
 Notation nneg := Rnneg.
 Notation real := Rreal.
 (* Not to pollute the local namespace, Num.nat and Num.int are defined later. *)
-Notation trunc := truncR.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation trunc := truncR (only parsing).
 
 Module Keys.
 Section NumDomainKeys.
@@ -1938,17 +1916,11 @@ Variable R : archiNumDomainType.
 Implicit Types x y : R.
 
 Lemma truncRP x :
-  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+  if 0 <= x then (truncR x)%:R <= x < (truncR x).+1%:R else truncR x == 0%N.
 Proof. by case: R x => [? [? []]]. Qed.
 
-Lemma truncR_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R.
+Lemma truncR_itv x : 0 <= x -> (truncR x)%:R <= x < (truncR x).+1%:R.
 Proof. by move=> x_ge0; move: (truncRP x); rewrite x_ge0. Qed.
-
-Lemma RnatE x : (x \is a Rnat) = ((trunc x)%:R == x).
-Proof. by case: R x => ? [? []]. Qed.
-
-Lemma RintE x : (x \is a Rint) = (x \is a Rnat) || (- x \is a Rnat).
-Proof. by case: R x => ? [? []]. Qed.
 
 End ArchiNumDomain.
 
@@ -1979,13 +1951,14 @@ End PredInstances.
 
 Module Import ExtraDef.
 
-Definition archi_bound {R : archiNumDomainType} (x : R) := (trunc `|x|).+1.
+Definition archi_bound {R : archiNumDomainType} (x : R) := (truncR `|x|).+1.
 
 Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
 
 End ExtraDef.
 
-Notation bound := archi_bound.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation bound := archi_bound (only parsing).
 Notation sqrt := sqrtr.
 
 Module Import Theory.
@@ -5626,309 +5599,28 @@ Arguments conjCK {C} x.
 Arguments sqrCK {C} [x] le0x.
 Arguments sqrCK_P {C x}.
 
-Section ArchiNumDomainTheory.
+Module mc_1_12.
 
-(* nat subset *)
-Variable R : archiNumDomainType.
-Implicit Types x y z : R.
-Implicit Types m n : nat.
-
-Local Notation trunc := (@trunc R).
-Local Notation Rnat := (@Rnat R).
-Local Notation Rint := (@Rint R).
-
-Definition truncRP x :
-  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N :=
-  truncRP x.
-
-Definition truncR_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R :=
-  @truncR_itv R x.
-
-Definition RnatE x : (x \is a Rnat) = ((trunc x)%:R == x) := RnatE x.
-
-Definition RintE x : (x \is a Rint) = (x \is a Rnat) || (- x \is a Rnat) :=
-  RintE x.
-
-Lemma archi_boundP x : 0 <= x -> x < (bound x)%:R.
+Local Lemma archi_boundP (R : archiNumDomainType) (x : R) :
+  0 <= x -> x < (archi_bound x)%:R.
 Proof.
 move=> x_ge0; case/truncR_itv/andP: (normr_ge0 x) => _.
 exact/le_lt_trans/real_ler_norm/ger0_real.
 Qed.
 
-Lemma truncR_def x n : n%:R <= x < n.+1%:R -> trunc x = n.
-Proof.
-case/andP=> lemx ltxm1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
-have/truncR_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
-by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
-Qed.
-
-Lemma natRK : cancel (GRing.natmul 1) trunc.
-Proof. by move=> m; apply: truncR_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
-
-Lemma truncRK : {in Rnat, cancel trunc (GRing.natmul 1)}.
-Proof. by move=> x; rewrite RnatE => /eqP. Qed.
-
-Lemma truncR0 : trunc 0 = 0%N. Proof. exact: natRK 0%N. Qed.
-Lemma truncR1 : trunc 1 = 1%N. Proof. exact: natRK 1%N. Qed.
-Hint Resolve truncR0 truncR1 : core.
-
-Lemma RnatP x : reflect (exists n, x = n%:R) (x \is a Rnat).
-Proof.
-rewrite RnatE; apply: (iffP eqP) => [<- | [n ->]]; first by exists (trunc x).
-by rewrite natRK.
-Qed.
-
-Lemma Rnat_nat n : n%:R \is a Rnat. Proof. by apply/RnatP; exists n. Qed.
-Hint Resolve Rnat_nat : core.
-
-Lemma truncRD :
-  {in Rnat & Num.nneg, {morph trunc : x y / x + y >-> (x + y)%N}}.
-Proof.
-move=> _ y /RnatP[n ->] y_ge0; apply: truncR_def.
-by rewrite -addnS !natrD !natRK ler_add2l ltr_add2l truncR_itv.
-Qed.
-
-Lemma truncRM : {in Rnat &, {morph trunc : x y / x * y >-> (x * y)%N}}.
-Proof. by move=> _ _ /RnatP[n1 ->] /RnatP[n2 ->]; rewrite -natrM !natRK. Qed.
-
-Lemma truncRX n : {in Rnat, {morph trunc : x / x ^+ n >-> (x ^ n)%N}}.
-Proof. by move=> _ /RnatP[n1 ->]; rewrite -natrX !natRK. Qed.
-
-Lemma rpred_Rnat S (ringS : semiringPred S) (kS : keyed_pred ringS) x :
-  x \is a Rnat -> x \in kS.
-Proof. by case/RnatP=> n ->; apply: rpred_nat. Qed.
-
-Lemma Rnat0 : 0 \is a Rnat. Proof. exact: (Rnat_nat 0). Qed.
-Lemma Rnat1 : 1 \is a Rnat. Proof. exact: (Rnat_nat 1). Qed.
-Hint Resolve Rnat0 Rnat1 : core.
-
-Fact Rnat_semiring : semiring_closed Rnat.
-Proof.
-by do 2![split] => //= _ _ /RnatP[n ->] /RnatP[m ->]; rewrite -(natrD, natrM).
-Qed.
-Canonical Rnat_addrPred := AddrPred Rnat_semiring.
-Canonical Rnat_mulrPred := MulrPred Rnat_semiring.
-Canonical Rnat_semiringPred := SemiringPred Rnat_semiring.
-
-Lemma Rreal_Rnat : {subset Rnat <= real}. Proof. by move=> _ /RnatP[m ->]. Qed.
-
-Lemma Rnat_normK x : x \is a Rnat -> `|x| ^+ 2 = x ^+ 2.
-Proof. by move/Rreal_Rnat/real_normK. Qed.
-
-Lemma truncR_gt0 x : (0 < trunc x)%N = (1 <= x).
-Proof.
-apply/idP/idP => [m_gt0 | x_ge1].
-  have /truncR_itv/andP[lemx _]: 0 <= x.
-    by move: (truncRP x) m_gt0; case: ifP => // _ /eqP ->.
-  by apply: le_trans lemx; rewrite ler1n.
-have /truncR_itv/andP[_ ltxm1] := le_trans ler01 x_ge1.
-by rewrite -ltnS -(ltr_nat R) (le_lt_trans x_ge1).
-Qed.
-
-Lemma truncR0Pn x : reflect (trunc x = 0%N) (~~ (1 <= x)).
-Proof. by rewrite -truncR_gt0 -eqn0Ngt; apply: eqP. Qed.
-
-Lemma Rnat_ge0 x : x \is a Rnat -> 0 <= x.
-Proof. by case/RnatP=> n ->; apply: ler0n. Qed.
-
-Lemma Rnat_gt0 x : x \is a Rnat -> (0 < x) = (x != 0).
-Proof. by case/RnatP=> n ->; rewrite pnatr_eq0 ltr0n lt0n. Qed.
-
-Lemma norm_Rnat x : x \is a Rnat -> `|x| = x.
-Proof. by move/Rnat_ge0/ger0_norm. Qed.
-
-Lemma Rnat_sum_eq1 (I : finType) (P : pred I) (F : I -> R) :
-     (forall i, P i -> F i \is a Rnat) -> \sum_(i | P i) F i = 1 ->
-   {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
-Proof.
-move=> natF sumF1; pose nF i := trunc (F i).
-have{natF} defF i: P i -> F i = (nF i)%:R by move/natF; rewrite RnatE => /eqP.
-have{sumF1} /eqP sumF1: (\sum_(i | P i) nF i == 1)%N.
-  by rewrite -(@eqr_nat R) natr_sum -(eq_bigr _ defF) sumF1.
-have [i Pi nZfi]: {i : I | P i & nF i != 0%N}.
-  by apply/sig2W/exists_inP; rewrite -negb_forall_in -sum_nat_eq0 sumF1.
-have F'ge0 := (leq0n _, etrans (eq_sym _ _) (sum_nat_eq0 (predD1 P i) nF)).
-rewrite -lt0n in nZfi; have [_] := (leqif_add (leqif_eq nZfi) (F'ge0 _)).
-rewrite /= big_andbC -bigD1 // sumF1 => /esym/andP/=[/eqP Fi1 /forall_inP Fi'0].
-exists i; split=> // [|j neq_ji Pj]; first by rewrite defF // -Fi1.
-by rewrite defF // (eqP (Fi'0 j _)) // neq_ji.
-Qed.
-
-Lemma Rnat_mul_eq1 x y :
-  x \is a Rnat -> y \is a Rnat -> (x * y == 1) = (x == 1) && (y == 1).
-Proof. by do 2!move/truncRK <-; rewrite -natrM !pnatr_eq1 muln_eq1. Qed.
-
-Lemma Rnat_prod_eq1 (I : finType) (P : pred I) (F : I -> R) :
-    (forall i, P i -> F i \is a Rnat) -> \prod_(i | P i) F i = 1 ->
-  forall i, P i -> F i = 1.
-Proof.
-move=> natF prodF1; apply/eqfun_inP; rewrite -big_andE.
-move: prodF1; elim/(big_load (fun x => x \is a Rnat)): _.
-elim/big_rec2: _ => // i all1x x /natF N_Fi [Nx x1all1].
-by split=> [|/eqP]; rewrite ?rpredM ?Rnat_mul_eq1 // => /andP[-> /eqP].
-Qed.
-
-(* Rint *)
-
-Local Lemma Rint_natP x :
-  reflect (exists n, x = n%:R \/ x = - n%:R) (x \is a Rint).
-Proof.
-rewrite RintE.
-apply: (iffP idP) => [int_x| [n [] ->]]; rewrite ?opprK ?rpred_nat ?orbT //.
-rewrite -[x]opprK; case/orP: int_x => /RnatP [n ->]; exists n; last by right.
-by rewrite ?opprK; left.
-Qed.
-
-Lemma rpred_Rint S (ringS : subringPred S) (kS : keyed_pred ringS) x :
-  x \is a Rint -> x \in kS.
-Proof. by case/Rint_natP => [n [] ->]; rewrite ?rpredN ?rpred_nat. Qed.
-
-Lemma Rint0 : 0 \is a Rint. Proof. by rewrite RintE Rnat0. Qed.
-Lemma Rint1 : 1 \is a Rint. Proof. by rewrite RintE Rnat1. Qed.
-Hint Resolve Rint0 Rint1 : core.
-
-Lemma Rint_Rnat : {subset Rnat <= Rint}.
-Proof. by move=> ?; rewrite RintE => ->. Qed.
-
-Lemma Rreal_Rint : {subset Rint <= Num.real}.
-Proof. by move=> ? /Rint_natP [m [] ->]; rewrite ?rpredN rpred_nat. Qed.
-
-Fact Rint_subring : subring_closed Rint.
-Proof.
-by split=> // _ _ /Rint_natP [n [] ->] /Rint_natP [m [] ->];
-  rewrite RintE ?opprD ?mulrN ?mulNr ?opprK -?natrD -?natrM ?rpred_nat ?orbT //;
-  rewrite  [- _ + _]addrC; case: (leqP n m) => [|/ltnW] /natrB <-;
-  rewrite ?rpred_nat ?orbT.
-Qed.
-Canonical Rint_opprPred := OpprPred Rint_subring.
-Canonical Rint_addrPred := AddrPred Rint_subring.
-Canonical Rint_mulrPred := MulrPred Rint_subring.
-Canonical Rint_zmodPred := ZmodPred Rint_subring.
-Canonical Rint_semiringPred := SemiringPred Rint_subring.
-Canonical Rint_smulrPred := SmulrPred Rint_subring.
-Canonical Rint_subringPred := SubringPred Rint_subring.
-
-Lemma Rint_normK x : x \is a Rint -> `|x| ^+ 2 = x ^+ 2.
-Proof. by move/Rreal_Rint/real_normK. Qed.
-
-Lemma RintEsign x : x \is a Rint -> x = (-1) ^+ (x < 0)%R * `|x|.
-Proof. by move/Rreal_Rint/realEsign. Qed.
-
-Lemma Rnat_norm_Rint x : x \is a Rint -> `|x| \is a Rnat.
-Proof. by case/Rint_natP => [m [] ->]; rewrite ?normrN normr_nat. Qed.
-
-Lemma RnatEint x : (x \is a Rnat) = (x \is a Rint) && (0 <= x).
-Proof.
-apply/idP/andP=> [Nx | [Zx x_ge0]]; first by rewrite Rint_Rnat ?Rnat_ge0.
-by rewrite -(ger0_norm x_ge0) Rnat_norm_Rint.
-Qed.
-
-Lemma RintEge0 x : 0 <= x -> (x \is a Rint) = (x \is a Rnat).
-Proof. by rewrite RnatEint andbC => ->. Qed.
-
-Lemma Rnat_exp_even x n : ~~ odd n -> x \is a Rint -> x ^+ n \is a Rnat.
-Proof.
-move=> n_oddF x_Rint.
-by rewrite RnatEint rpredX //= real_exprn_even_ge0 // Rreal_Rint.
-Qed.
-
-Lemma norm_Rint_ge1 x : x \is a Rint -> x != 0 -> 1 <= `|x|.
-Proof.
-rewrite -normr_eq0 => /Rnat_norm_Rint/RnatP[n ->].
-by rewrite pnatr_eq0 ler1n lt0n.
-Qed.
-
-Lemma sqr_Rint_ge1 x : x \is a Rint -> x != 0 -> 1 <= x ^+ 2.
-Proof.
-by move=> Zx nz_x; rewrite -Rint_normK // expr_ge1 ?normr_ge0 ?norm_Rint_ge1.
-Qed.
-
-Lemma Rint_ler_sqr x : x \is a Rint -> x <= x ^+ 2.
-Proof.
-move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
-apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Rreal_Rint.
-by rewrite -Rint_normK // ler_eexpr // norm_Rint_ge1.
-Qed.
-
-(* predCmod *)
-Variables (U V : lmodType R) (f : {additive U -> V}).
-
-Lemma raddfZ_Rnat a u : a \is a Rnat -> f (a *: u) = a *: f u.
-Proof. by case/RnatP=> n ->; apply: raddfZnat. Qed.
-
-Lemma rpredZ_Rnat S (addS : @addrPred V S) (kS : keyed_pred addS) :
-  {in Rnat & kS, forall z u, z *: u \in kS}.
-Proof. by move=> _ u /RnatP[n ->]; apply: rpredZnat. Qed.
-
-Lemma raddfZ_Rint a u : a \is a Rint -> f (a *: u) = a *: f u.
-Proof. by move=> /Rint_natP[m [] ->]; rewrite ?scaleNr ?raddfN raddfZnat. Qed.
-
-Lemma rpredZ_Rint S (subS : @zmodPred V S) (kS : keyed_pred subS) :
-  {in Rint & kS, forall z u, z *: u \in kS}.
-Proof.
-by move=> _ u /Rint_natP[m [] ->]; rewrite ?scaleNr ?rpredN; apply: rpredZnat.
-Qed.
-
-(* autC *)
-Implicit Type nu : {rmorphism R -> R}.
-
-Lemma aut_Rnat nu : {in Rnat, nu =1 id}.
-Proof. by move=> _ /RnatP[n ->]; apply: rmorph_nat. Qed.
-
-Lemma aut_Rint nu : {in Rint, nu =1 id}.
-Proof. by move=> _ /Rint_natP[m [] ->]; rewrite ?rmorphN rmorph_nat. Qed.
-
-End ArchiNumDomainTheory.
-
-Section ArchiRealDomainTheory.
-
-Variables (R : archiRealDomainType).
-
-Lemma upper_nthrootP (x : R) i : (bound x <= i)%N -> x < 2%:R ^+ i.
+Local Lemma upper_nthrootP (R : archiRealDomainType) (x : R) i :
+  (archi_bound x <= i)%N -> x < 2%:R ^+ i.
 Proof.
 case/truncR_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
 by rewrite (lt_le_trans xlt) // -natrX ler_nat (ltn_trans le_b_i) // ltn_expl.
 Qed.
 
-End ArchiRealDomainTheory.
+End mc_1_12.
 
-Arguments natRK {R} _%N.
-Arguments RnatP {R x}.
-Hint Resolve truncR0 truncR1 : core.
-Hint Extern 0 (is_true (_%:R \is a Rnat)) => apply: Rnat_nat : core.
-Hint Extern 0 (is_true (0 \is a Rnat)) => apply: Rnat0 : core.
-Hint Extern 0 (is_true (1 \is a Rnat)) => apply: Rnat1 : core.
-Hint Extern 0 (is_true (0 \is a Rint)) => apply: Rint0 : core.
-Hint Extern 0 (is_true (1 \is a Rint)) => apply: Rint1 : core.
-
-Section ArchiNumFieldTheory.
-
-Variable R : archiNumFieldType.
-
-(* autLmodC *)
-Implicit Type nu : {rmorphism R -> R}.
-
-Lemma Rnat_aut nu x : (nu x \is a Rnat) = (x \is a Rnat).
-Proof. by apply/idP/idP=> /[dup] ? /(aut_Rnat nu) => [/fmorph_inj <-| ->]. Qed.
-
-Lemma Rint_aut nu x : (nu x \is a Rint) = (x \is a Rint).
-Proof. by rewrite !RintE -rmorphN !Rnat_aut. Qed.
-
-End ArchiNumFieldTheory.
-
-Section ArchiNumClosedFieldTheory.
-
-Variable R : archiNumClosedFieldType.
-
-Implicit Type x : R.
-
-Lemma conj_Rnat x : x \is a Rnat -> x^* = x.
-Proof. by move/Rreal_Rnat/CrealP. Qed.
-
-Lemma conj_Rint x : x \is a Rint -> x^* = x.
-Proof. by move/Rreal_Rint/CrealP. Qed.
-
-End ArchiNumClosedFieldTheory.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation archi_boundP := mc_1_12.archi_boundP (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation upper_nthrootP := mc_1_12.upper_nthrootP (only parsing).
 
 End Theory.
 
@@ -6328,8 +6020,10 @@ End ArchiMixin.
 Import ArchiMixin.Exports.
 
 (* Not to pollute the local namespace, we define Num.nat and Num.int here. *)
-Notation nat := Rnat.
-Notation int := Rint.
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation nat := Rnat (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation int := Rint (only parsing).
 
 End Num.
 

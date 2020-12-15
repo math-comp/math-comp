@@ -1,10 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path bigop finset prime order ssralg.
-From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
-From mathcomp Require Import ssrnum closed_field ssrint rat intdiv.
-From mathcomp Require Import algebraics_fundamentals.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import path choice fintype bigop finset prime order.
+From mathcomp Require Import generic_quotient ssralg countalg poly polydiv.
+From mathcomp Require Import mxpoly ssrnum ssrint archimedean rat intdiv.
+From mathcomp Require Import closed_field algebraics_fundamentals.
 
 (******************************************************************************)
 (* This file provides an axiomatic construction of the algebraic numbers.     *)
@@ -548,7 +548,7 @@ Notation algCfield := fieldType.
 Notation algCnumField := numFieldType.
 Notation algCnumClosedField := numClosedFieldType.
 
-Notation Creal := (@Num.Def.Rreal numDomainType).
+Notation Creal := (@Num.real numDomainType).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
@@ -711,9 +711,10 @@ apply/RnatP/dvdnP=> [[q def_q] | [q ->]]; exists q.
 by rewrite [num in num / _]natrM mulfK ?pnatr_eq0.
 Qed.
 
-Lemma dvdC_int (p : nat) x : x \in Num.int -> (p %| x)%C = (p %| `|floorR x|)%N.
+Lemma dvdC_int (p : nat) x :
+  x \in Num.int -> (p %| x)%C = (p %| `|Num.floor x|)%N.
 Proof.
-move=> Zx; rewrite -{1}(floorRK Zx) {1}[floorR x]intEsign.
+move=> Zx; rewrite -{1}(floorRK Zx) {1}[Num.floor x]intEsign.
 by rewrite rmorphMsign rpredMsign dvdC_nat.
 Qed.
 
@@ -845,7 +846,7 @@ Proof. by move=> x /conj_Crat/CrealP. Qed.
 Lemma Cint_rat a : (QtoC a \in Num.int) = (a \in Num.int).
 Proof.
 apply/idP/idP=> [Za | /numqK <-]; last by rewrite rmorph_int.
-apply/RintP; exists (floorR (QtoC a)); apply: (can_inj ratCK).
+apply/RintP; exists (Num.floor (QtoC a)); apply: (can_inj ratCK).
 by rewrite rmorph_int floorRK.
 Qed.
 
@@ -924,7 +925,7 @@ Implicit Types (x y z : algC) (n : nat) (m : int) (b : bool).
 
 Notation Cint := (Num.int : {pred algC}) (only parsing).
 Notation Cnat := (Num.nat : {pred algC}) (only parsing).
-Notation floorC := (floorR : algC -> int) (only parsing).
+Notation floorC := (Num.floor : algC -> int) (only parsing).
 Notation truncC := (Num.trunc : algC -> nat) (only parsing).
 
 Lemma Creal0 : 0 \is Creal. Proof. exact: real0. Qed.
@@ -1139,7 +1140,7 @@ Notation Cint := (Num.int : {pred algC}) (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use Num.nat instead.")]
 Notation Cnat := (Num.nat : {pred algC}) (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use floorR instead.")]
-Notation floorC := (floorR : algC -> int) (only parsing).
+Notation floorC := (Num.floor : algC -> int) (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use Num.trunc instead.")]
 Notation truncC := (Num.trunc : algC -> nat) (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use real0 instead.")]
@@ -1270,3 +1271,14 @@ Notation raddfZ_Cint := mc_1_12.raddfZ_Cint (only parsing).
 Notation rpredZ_Cnat := mc_1_12.rpredZ_Cnat (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use rpredZ_Rint instead.")]
 Notation rpredZ_Cint := mc_1_12.rpredZ_Cint (only parsing).
+
+Canonical Rnat_addrPred.
+Canonical Rnat_mulrPred.
+Canonical Rnat_semiringPred.
+Canonical Rint_opprPred.
+Canonical Rint_addrPred.
+Canonical Rint_mulrPred.
+Canonical Rint_zmodPred.
+Canonical Rint_semiringPred.
+Canonical Rint_smulrPred.
+Canonical Rint_subringPred.

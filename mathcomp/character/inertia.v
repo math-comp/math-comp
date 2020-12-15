@@ -1,12 +1,12 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop prime order.
-From mathcomp Require Import ssralg ssrnum finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient action zmodp cyclic center.
-From mathcomp Require Import gproduct commutator gseries nilpotent pgroup.
-From mathcomp Require Import sylow maximal frobenius matrix mxalgebra.
-From mathcomp Require Import mxrepresentation vector algC classfun character.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import order fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action gproduct ssralg zmodp matrix mxalgebra.
+From mathcomp Require Import vector ssrnum archimedean commutator cyclic center.
+From mathcomp Require Import pgroup gseries nilpotent sylow maximal frobenius.
+From mathcomp Require Import algC mxrepresentation classfun character.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

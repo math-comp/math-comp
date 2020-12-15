@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
-From mathcomp Require Import ssrint.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype bigop order ssralg countalg ssrnum.
+From mathcomp Require Import ssrint archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -795,13 +795,13 @@ Module mc_1_12.
 Local Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
 Local Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
 
-Lemma QintP (x : rat) : reflect (exists z, x = z%:~R) (x \in Qint).
+Local Lemma QintP (x : rat) : reflect (exists z, x = z%:~R) (x \in Qint).
 Proof. exact: RintP. Qed.
 
-Lemma Qnat_def (x : rat) : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
+Local Lemma Qnat_def (x : rat) : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
 Proof. exact: RnatEint. Qed.
 
-Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
+Local Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
 Proof. exact: RnatP. Qed.
 
 End mc_1_12.
@@ -816,3 +816,14 @@ Notation QintP := mc_1_12.QintP (only parsing).
 Notation Qnat_def := mc_1_12.Qnat_def (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use RnatP instead.")]
 Notation QnatP := mc_1_12.QnatP (only parsing).
+
+Canonical Rnat_addrPred.
+Canonical Rnat_mulrPred.
+Canonical Rnat_semiringPred.
+Canonical Rint_opprPred.
+Canonical Rint_addrPred.
+Canonical Rint_mulrPred.
+Canonical Rint_zmodPred.
+Canonical Rint_semiringPred.
+Canonical Rint_smulrPred.
+Canonical Rint_subringPred.

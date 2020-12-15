@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
-From mathcomp Require Import poly.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype finfun bigop order ssralg countalg poly.
+From mathcomp Require Import ssrnum.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
@@ -1459,7 +1459,7 @@ Lemma sgzP x :
   (sgz x == 0)  (sgz x == -1) (sgz x == 1) `|x| (sgr x) (sgz x).
 Proof.
 rewrite ![_ == sgz _]eq_sym ![_ == sgr _]eq_sym !sgr_cp0 !sgz_cp0.
-by rewrite /sgr /sgz !leNgt; case: ltrgt0P; constructor.
+by rewrite /sgz; case: sgrP; constructor.
 Qed.
 
 Lemma sgzN x : sgz (- x) = - sgz x.
@@ -1481,15 +1481,11 @@ Proof. by rewrite -eqr_oppLR -mulrN -sgzN mulz_sg_eq1. Qed.
 (*   (sgr y * sgr z == sgr x) = ((sgr y * sgr x == sgr z) && (sgr z != 0)). *)
 (* Proof. by do 3!case: sgrP=> _. Qed. *)
 
-Lemma sgzM x y : sgz (x * y) = sgz x  * sgz y.
+Lemma sgzM x y : sgz (x * y) = sgz x * sgz y.
 Proof.
-case: (sgzP x)=> hx; first by rewrite hx ?mul0r sgz0.
-  case: (sgzP y)=> hy; first by rewrite hy !mulr0 sgz0.
-    by apply/eqP; rewrite mul1r sgz_cp0 pmulr_rgt0.
-  by apply/eqP; rewrite mul1r sgz_cp0 nmulr_llt0.
-case: (sgzP y)=> hy; first by rewrite hy !mulr0 sgz0.
-  by apply/eqP; rewrite mulr1 sgz_cp0 nmulr_rlt0.
-by apply/eqP; rewrite mulN1r opprK sgz_cp0 nmulr_rgt0.
+rewrite -sgz_sgr -(sgz_sgr x) -(sgz_sgr y) sgrM.
+by case: sgrP; case: sgrP; rewrite /sgz ?(mulNr, mul0r, mul1r);
+  rewrite ?(oppr_eq0, oppr_cp0, eqxx, ltxx, ltr01, ltr10, oner_eq0).
 Qed.
 
 Lemma sgzX (n : nat) x : sgz (x ^+ n) = (sgz x) ^+ n.
@@ -1785,121 +1781,23 @@ Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
 
-Section ArchiNumDomainTheory.
+Module mc_1_12.
 
-Variable R : archiNumDomainType.
-Implicit Type x : R.
+Local Lemma Znat_def (n : int) : (n \is a Num.Def.Rnat) = (0 <= n).
+Proof. by []. Qed.
 
-Fact floorR_subproof x : {m | x \is Num.real -> m%:~R <= x < (m + 1)%:~R}.
-Proof.
-have [Rx | _] := boolP (x \is Num.real); last by exists 0.
-without loss x_ge0: x Rx / x >= 0.
-  have [x_ge0 | /ltW x_le0] := real_ge0P Rx; first exact.
-  case/(_ (- x)) => [||m /(_ isT)]; rewrite ?rpredN ?oppr_ge0 //.
-  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= le_eqVlt.
-  case: eqP => [-> _ | _ /andP[lt_x_m lt_m_x]].
-    by exists (- m); rewrite lexx rmorphD ltr_addl ltr01.
-  by exists (- m - 1); rewrite (ltW lt_m_x) subrK.
-by exists (Posz (Num.trunc x)) => _; rewrite addrC -intS -!pmulrn truncR_itv.
-Qed.
-
-Definition floorR x := sval (floorR_subproof x).
-
-Lemma floorR_itv x : x \is Num.real -> (floorR x)%:~R <= x < (floorR x + 1)%:~R.
-Proof. by rewrite /floorR => Rx; case: (floorR_subproof x) => //= m; apply. Qed.
-
-Lemma floorR_def x m : m%:~R <= x < (m + 1)%:~R -> floorR x = m.
-Proof.
-case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltz_addr1.
-move: (ger_real lemx); rewrite realz => /floorR_itv/andP[lefx ltxf1].
-by rewrite -!(ltr_int R) 2?(@le_lt_trans _ _ x).
-Qed.
-
-Lemma intRK : cancel intr floorR.
-Proof. by move=> m; apply: floorR_def; rewrite lexx rmorphD ltr_addl ltr01. Qed.
-
-Lemma RintP x : reflect (exists m, x = m%:~R) (x \is a Num.int).
-Proof.
-apply: (iffP idP) => [x_int | [m ->]]; last exact: rpred_int.
-rewrite -[x]opprK; move: x_int; rewrite RintE.
-move=> /orP [] /RnatP [n ->]; first by exists n; rewrite opprK.
-by exists (- n%:R); rewrite mulrNz mulrz_nat.
-Qed.
-
-Lemma Rint_def x : x \is a Num.int = ((floorR x)%:~R == x).
-Proof.
-apply/idP/idP => [/RintP [n ->] | /eqP <-]; last exact: rpred_int.
-by rewrite eqr_int; apply/eqP/floorR_def; rewrite ltr_int ltz_addr1 !lexx.
-Qed.
-
-Lemma floorRK : {in Num.int, cancel floorR intr}.
-Proof. by move=> z; rewrite Rint_def => /eqP. Qed.
-
-Lemma floorR0 : floorR 0 = 0. Proof. exact: intRK 0. Qed.
-Lemma floorR1 : floorR 1 = 1. Proof. exact: intRK 1. Qed.
-Hint Resolve floorR0 floorR1 : core.
-
-Lemma floorRpK (p : {poly R}) :
-  p \is a polyOver Num.int -> map_poly intr (map_poly floorR p) = p.
-Proof.
-move/(all_nthP 0)=> Zp; apply/polyP=> i.
-rewrite coef_map coef_map_id0 //= -[p]coefK coef_poly.
-by case: ifP => [/Zp/floorRK // | _]; rewrite floorR0.
-Qed.
-
-Lemma floorRpP (p : {poly R}) :
-  p \is a polyOver Num.int -> {q | p = map_poly intr q}.
-Proof. by exists (map_poly floorR p); rewrite floorRpK. Qed.
-
-Lemma Rint_int m : (m%:~R : R) \is a Num.int. Proof. exact: rpred_int. Qed.
-
-Lemma floorRD : {in Num.int & Num.real, {morph floorR : x y / x + y}}.
-Proof.
-move=> _ y /RintP[m ->] Ry; apply: floorR_def.
-by rewrite -addrA 2!rmorphD /= intRK ler_add2l ltr_add2l floorR_itv.
-Qed.
-
-Lemma floorRN : {in Num.int, {morph floorR : x / - x}}.
-Proof. by move=> _ /RintP[m ->]; rewrite -rmorphN !intRK. Qed.
-
-Lemma floorRM : {in Num.int &, {morph floorR : x y / x * y}}.
-Proof. by move=> _ _ /RintP[m1 ->] /RintP[m2 ->]; rewrite -rmorphM !intRK. Qed.
-
-Lemma floorRX n : {in Num.int, {morph floorR : x / x ^+ n}}.
-Proof. by move=> _ /RintP[m ->]; rewrite -rmorphX !intRK. Qed.
-
-(* Relating Cnat and oldCnat. *)
-
-Lemma truncR_old x : (Num.trunc x = if 0 <= x then `|floorR x|%N else 0%N).
-Proof.
-case: ifP => [x_ge0 | x_ge0F]; last first.
-  by apply/truncR0Pn; apply/contraFN: x_ge0F; apply/le_trans.
-rewrite -[LHS]absz_nat; congr absz; apply/eqP.
-have /andP[fl_ler lt_fl] := floorR_itv (ger0_real x_ge0).
-have /andP[tr_ler lt_tr] := truncR_itv x_ge0.
-rewrite eq_le -!ltz_addr1 -!(ltr_int R) -PoszD addn1.
-by rewrite (le_lt_trans tr_ler lt_fl) (le_lt_trans fl_ler lt_tr).
-Qed.
-
-End ArchiNumDomainTheory.
-
-Arguments intRK {R}.
-Arguments floorR {R}.
-Hint Resolve floorR0 floorR1 : core.
-Hint Extern 0 (is_true (_%:~R \is a Num.int)) => apply: Rint_int : core.
-
-Section ZnatPred.
-
-Lemma Zint (n : int) : n \is a Num.int. Proof. by []. Qed.
-
-Lemma Znat_def (n : int) : (n \is a Num.nat) = (0 <= n). Proof. by []. Qed.
-
-Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a Num.nat).
+Local Lemma ZnatP (m : int) :
+  reflect (exists n : nat, m = n) (m \is a Num.Def.Rnat).
 Proof. by case: m => m; constructor; [exists m | case]. Qed.
 
-End ZnatPred.
+End mc_1_12.
 
 #[deprecated(since="mathcomp 1.12.0", note="Use polyCMz instead.")]
 Notation polyC_mulrz := polyCMz (only parsing).
-#[deprecated(since="mathcomp 1.13.0", note="Use Num.nat instead.")]
-Notation Znat := (Num.nat : qualifier 1 int) (only parsing).
+#[deprecated(since="mathcomp 1.13.0",
+             note="Require archimedean.v and use Num.nat instead.")]
+Notation Znat := (Num.Def.Rnat : qualifier 1 int) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation Znat_def := mc_1_12.Znat_def (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation ZnatP := mc_1_12.ZnatP (only parsing).

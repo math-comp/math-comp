@@ -1,4 +1,5 @@
 all_algebra.v
+archimedean.v
 countalg.v
 finalg.v
 fraction.v

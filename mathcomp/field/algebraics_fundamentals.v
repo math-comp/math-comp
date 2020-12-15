@@ -1,11 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path tuple bigop finset prime order.
-From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint rat intdiv fingroup finalg zmodp.
-From mathcomp Require Import cyclic pgroup sylow vector falgebra fieldext.
-From mathcomp Require Import separable galois.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import path choice fintype tuple bigop finset prime order.
+From mathcomp Require Import fingroup ssralg countalg finalg zmodp vector poly.
+From mathcomp Require Import polydiv mxpoly ssrnum ssrint archimedean rat.
+From mathcomp Require Import intdiv cyclic pgroup sylow closed_field falgebra.
+From mathcomp Require Import fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -593,7 +593,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   exact: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
-    exists 0, rat_archiRealFieldType, f.
+    exists 0, [archiRealFieldType of rat], f.
     exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.

@@ -1,6 +1,7 @@
 algebra/all_algebra.v
-algebra/finalg.v
+algebra/archimedean.v
 algebra/countalg.v
+algebra/finalg.v
 algebra/fraction.v
 algebra/intdiv.v
 algebra/interval.v
@@ -85,9 +86,9 @@ ssreflect/ssrAC.v
 ssreflect/ssrbool.v
 ssreflect/ssreflect.v
 ssreflect/ssrfun.v
+ssreflect/ssrmatching.v
 ssreflect/ssrnat.v
 ssreflect/ssrnotations.v
-ssreflect/ssrmatching.v
 ssreflect/tuple.v
 
 -I .

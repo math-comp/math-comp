@@ -1,11 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div tuple bigop prime finset fingroup.
-From mathcomp Require Import ssralg poly polydiv morphism action finalg zmodp.
-From mathcomp Require Import cyclic center pgroup abelian matrix mxpoly vector.
-From mathcomp Require Import falgebra fieldext separable galois.
-From mathcomp Require ssrnum ssrint algC cyclotomic.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple bigop prime finset ssralg.
+From mathcomp Require Import finalg zmodp matrix mxpoly vector poly polydiv.
+From mathcomp Require Import fingroup morphism action cyclic center pgroup.
+From mathcomp Require Import abelian falgebra fieldext separable galois.
+From mathcomp Require order ssrnum ssrint archimedean algC cyclotomic.
 
 (******************************************************************************)
 (*  Additional constructions and results on finite fields.                    *)
@@ -568,7 +568,7 @@ End FinFieldExists.
 
 Section FinDomain.
 
-Import order ssrnum ssrint algC cyclotomic Order.TTheory Num.Theory.
+Import order ssrnum ssrint archimedean algC cyclotomic Order.TTheory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.

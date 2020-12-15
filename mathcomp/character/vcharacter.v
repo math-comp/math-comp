@@ -1,12 +1,12 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient finalg action gproduct.
-From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import frobenius vector ssrnum ssrint intdiv algC.
-From mathcomp Require Import algnum classfun character integral_char.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import order fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action gproduct ssralg finalg zmodp vector poly.
+From mathcomp Require Import ssrnum ssrint archimedean intdiv commutator cyclic.
+From mathcomp Require Import center pgroup sylow frobenius algC algnum classfun.
+From mathcomp Require Import character integral_char.
 
 (******************************************************************************)
 (* This file provides basic notions of virtual character theory:              *)

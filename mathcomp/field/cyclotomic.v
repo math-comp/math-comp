@@ -1,10 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly finset fingroup finalg zmodp cyclic.
-From mathcomp Require Import ssrnum ssrint polydiv rat intdiv mxpoly.
-From mathcomp Require Import vector falgebra fieldext separable galois algC.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import ssralg finalg zmodp poly polydiv mxpoly vector.
+From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
+From mathcomp Require Import cyclic falgebra fieldext separable galois algC.
 
 (******************************************************************************)
 (* This file provides few basic properties of cyclotomic polynomials.         *)
@@ -135,7 +135,7 @@ Qed.
 
 Definition Cyclotomic n : {poly int} :=
   let: exist z _ := C_prim_root_exists (ltn0Sn n.-1) in
-  map_poly floorR (cyclotomic z n).
+  map_poly Num.floor (cyclotomic z n).
 
 Notation "''Phi_' n" := (Cyclotomic n)
   (at level 8, n at level 2, format "''Phi_' n").

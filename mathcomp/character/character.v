@@ -1,12 +1,12 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
-From mathcomp Require Import path div fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset gproduct fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import order fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action gproduct ssralg poly ssrnum archimedean.
+From mathcomp Require Import finalg zmodp matrix mxalgebra mxpoly vector.
 From mathcomp Require Import commutator cyclic center pgroup nilpotent sylow.
-From mathcomp Require Import abelian matrix mxalgebra mxpoly mxrepresentation.
-From mathcomp Require Import vector ssrnum algC classfun.
+From mathcomp Require Import abelian algC mxrepresentation classfun.
 
 (******************************************************************************)
 (* This file contains the basic notions of character theory, based on Isaacs. *)

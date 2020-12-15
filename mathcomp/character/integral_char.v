@@ -1,13 +1,13 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient action finalg zmodp.
-From mathcomp Require Import commutator cyclic center pgroup sylow gseries.
-From mathcomp Require Import nilpotent abelian ssrnum ssrint polydiv rat.
-From mathcomp Require Import matrix mxalgebra intdiv mxpoly vector falgebra.
-From mathcomp Require Import fieldext separable galois algC cyclotomic algnum.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import order fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action ssralg poly polydiv finalg zmodp matrix.
+From mathcomp Require Import mxalgebra mxpoly vector ssrnum ssrint archimedean.
+From mathcomp Require Import rat intdiv commutator cyclic center pgroup gseries.
+From mathcomp Require Import nilpotent sylow abelian falgebra fieldext.
+From mathcomp Require Import separable galois algC cyclotomic algnum.
 From mathcomp Require Import mxrepresentation classfun character.
 
 (******************************************************************************)
