@@ -1778,6 +1778,5 @@ Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
 
-Notation "@ 'polyC_mulrz'" :=
-  (deprecate polyC_mulrz polyCMz) (at level 10, only parsing) : fun_scope.
-Notation polyC_mulrz := (@polyC_mulrz _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCMz instead.")]
+Notation polyC_mulrz := polyCMz (only parsing).

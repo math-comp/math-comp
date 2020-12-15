@@ -1075,11 +1075,11 @@ rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
 by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
 Qed.
 
-Notation "@ 'coprimez_expl'" :=
-  (deprecate coprimez_expl coprimezXl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'coprimez_expr'" :=
-  (deprecate coprimez_expr coprimezXr) (at level 10, only parsing) : fun_scope.
-Notation coprimez_mull := (deprecate coprimez_mull coprimezMl) (only parsing).
-Notation coprimez_mulr := (deprecate coprimez_mulr coprimezMr) (only parsing).
-Notation coprimez_expl := (fun k => @coprimez_expl k _ _) (only parsing).
-Notation coprimez_expr := (fun k => @coprimez_expr k _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimezMl instead.")]
+Notation coprimez_mull := coprimezMl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimezMr instead.")]
+Notation coprimez_mulr := coprimezMr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimezXl instead.")]
+Notation coprimez_expl := coprimezXl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimezXr instead.")]
+Notation coprimez_expr := coprimezXr (only parsing).

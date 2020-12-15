@@ -27,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
   `*:%R`, and `*~%R` are now declared in `fun_scope`.
 
+- across the library, the deprecation mechanism to use has been changed from the
+  `deprecate` notation to the `deprecated` attribute (cf. Removed section).
+
 ### Renamed
 
 - in `path.v`,
@@ -34,6 +37,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `eq_(path|cycle)_in` -> `eq_in_(path|cycle)`
 
 ### Removed
+
+- in `ssreflect.v`, the `deprecate` notation has been deprecated. Use the
+  `deprecated` attribute instead (cf. Changed section).
+
+- in `seq.v`, `iota_add` has been deprecated. Use `iotaD` instead.
+
+- in `ssrnat.v` and `ssrnum.v`, deprecation aliases and the `mc_1_10`
+  compatibility modules introduced in MathComp 1.11+beta1 have been removed.
 
 ### Infrastructure
 

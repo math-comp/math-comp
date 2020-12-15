@@ -12,22 +12,6 @@ Global Set Bullet Behavior "None".
 (*                  Prop are canonical nonPropType instances. This is         *)
 (*                  useful for applied views.                                 *)
 (*   --> This will become standard with the Coq v8.11 SSReflect core library. *)
-(*  deprecate old new == new, but warning that old is deprecated and new      *)
-(*                       should be used instead.                              *)
-(*    --> Usage: Notation old := (deprecate old new) (only parsing).          *)
-(*    --> Caveat: deprecate old new only inherits new's maximal implicits;    *)
-(*        on-demand implicits should be added after : (deprecate old new _).  *)
-(*    --> Caveat 2: if premises or conclusions need to be adjusted, of for    *)
-(*        non-prenex implicits, use the idiom:                                *)
-(*         Notation old := ((fun a1 a2 ... => deprecate old new a1 a2 ...)    *)
-(*                          _ _ ... _) (only printing).                       *)
-(*        where all the implicit a_i's occur first, and correspond to the     *)
-(*        trailing _'s, making sure deprecate old new is fully applied and    *)
-(*        there are _no implicits_ inside the (fun .. => ..) expression. This *)
-(*        is to avoid triggering a bug in SSReflect elaboration that is       *)
-(*        triggered by such evars under binders.                              *)
-(*  Import Deprecation.Silent :: turn off deprecation warning messages.       *)
-(*  Import Deprecation.Reject :: raise an error instead of only warning.      *)
 (*                                                                            *)
 (*   Intro pattern ltac views:                                                *)
 (*   - top of the stack actions:                                              *)
@@ -95,6 +79,8 @@ Ltac flag old_id new_id :=
 Module Exports.
 Arguments hide {T} u v /.
 Coercion hide : exposed >-> hidden.
+#[deprecated(since="mathcomp 1.13.0",
+             note="Use the deprecated attribute instead.")]
 Notation deprecate old_id new_id :=
   (hide (fun old_id new_id => ltac:(flag old_id new_id; exact tt)) new_id)
   (only parsing).

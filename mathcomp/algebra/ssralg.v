@@ -6044,8 +6044,8 @@ Definition imaginary_exists := imaginary_exists.
 Notation null_fun V := (null_fun V) (only parsing).
 Notation in_alg A := (in_alg_loc A).
 
-Notation prodrMn :=
- (fun n A F => deprecate prodrMn prodrMn_const _ n _ A F) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use prodrMn_const instead.")]
+Notation prodrMn := prodrMn_const (only parsing).
 
 End Theory.
 

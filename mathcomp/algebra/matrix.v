@@ -3146,9 +3146,8 @@ Canonical matrix_finAlgType (R : finComRingType) n' :=
 
 Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
-Notation "@ 'scalar_mx_comm'" := (deprecate scalar_mx_comm comm_mx_scalar)
-  (at level 10, only parsing) : fun_scope.
-Notation scalar_mx_comm := (@scalar_mx_comm _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use comm_mx_scalar instead.")]
+Notation scalar_mx_comm := comm_mx_scalar (only parsing).
 
 (*****************************************************************************)
 (********************** Matrix unit ring and inverse matrices ****************)
@@ -3685,6 +3684,5 @@ Canonical mxOver_subringPred (S : {pred R}) (ringS : subringPred S)
 End mxRingOver.
 End mxOver.
 
-Notation "@ 'map_mx_sub'" :=
-  (deprecate map_mx_sub map_mxB) (at level 10, only parsing) : fun_scope.
-Notation map_mx_sub := (fun f => @map_mx_sub _ _ f) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use map_mxB instead.")]
+Notation map_mx_sub := map_mxB (only parsing).

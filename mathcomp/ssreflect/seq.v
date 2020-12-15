@@ -4040,38 +4040,43 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
 Ltac tfae := do !apply: AllIffConj.
 
 (* Temporary backward compatibility. *)
-Notation take_addn := (deprecate take_addn takeD _) (only parsing).
-Notation rot_addn := (deprecate rot_addn rotD _) (only parsing).
-Notation nseq_addn := (deprecate nseq_addn nseqD _) (only parsing).
-Notation perm_eq_rev := (deprecate perm_eq_rev perm_rev _)
-  (only parsing).
-Notation perm_eq_flatten := (deprecate perm_eq_flatten perm_flatten _ _ _)
-  (only parsing).
-Notation perm_eq_all := (deprecate perm_eq_all perm_all _ _ _)
-  (only parsing).
-Notation perm_eq_small := (deprecate perm_eq_small perm_small_eq _ _ _)
-  (only parsing).
-Notation perm_eq_nilP := (deprecate perm_eq_nilP perm_nilP) (only parsing).
-Notation perm_eq_consP := (deprecate perm_eq_consP perm_consP) (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_rev instead.")]
+Notation perm_eq_rev := perm_rev (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_flatten instead.")]
+Notation perm_eq_flatten := perm_flatten (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_all instead.")]
+Notation perm_eq_all := perm_all (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_small_eq instead.")]
+Notation perm_eq_small := perm_small_eq (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_nilP instead.")]
+Notation perm_eq_nilP := perm_nilP (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_consP instead.")]
+Notation perm_eq_consP := perm_consP (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use uniq_min_size instead.")]
 Notation leq_size_perm :=
   ((fun T s1 s2 Us1 ss12 les21 =>
-   let: (Esz12, Es12) :=
-     deprecate leq_size_perm uniq_min_size T s1 s2 Us1 ss12 les21
+   let: (Esz12, Es12) := uniq_min_size T s1 s2 Us1 ss12 les21
    in conj Es12 Esz12) _ _ _)
   (only parsing).
-Notation uniq_perm_eq := (deprecate uniq_perm_eq uniq_perm _ _ _)
-  (only parsing).
-Notation perm_eq_iotaP := (deprecate perm_eq_iotaP perm_iotaP) (only parsing).
-Notation perm_undup_count := (deprecate perm_undup_count perm_count_undup _ _)
-  (only parsing).
-(* TODO: restore when Coq 8.10 is no longer supported                *)
-(* #[deprecated(since="mathcomp 1.13.0", note="Use iotaD instead.")] *)
+#[deprecated(since="mathcomp 1.9.0", note="Use uniq_perm instead.")]
+Notation uniq_perm_eq := uniq_perm (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_iotaP instead.")]
+Notation perm_eq_iotaP := perm_iotaP (only parsing).
+#[deprecated(since="mathcomp 1.9.0", note="Use perm_count_undup instead.")]
+Notation perm_undup_count := perm_count_undup (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use takeD instead.")]
+Notation take_addn := takeD (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use rotD instead.")]
+Notation rot_addn := rotD (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use nseqD instead.")]
+Notation nseq_addn := nseqD (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use mem_allpairs_catr instead.")]
+Notation allpairs_catr := mem_allpairs_catr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use mem_allpairs_consr instead.")]
+Notation allpairs_consr := mem_allpairs_consr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use allpairs_rconsr instead.")]
+Notation perm_allpairs_rconsr := allpairs_rconsr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use iotaDl instead.")]
+Notation iota_addl := iotaDl (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use iotaD instead.")]
 Notation iota_add := iotaD (only parsing).
-Notation iota_addl := (deprecate iota_addl iotaDl) (only parsing).
-
-Notation allpairs_catr :=
-  (deprecate allpairs_catr mem_allpairs_catr _ _ _) (only parsing).
-Notation allpairs_consr :=
-  (deprecate allpairs_consr mem_allpairs_consr _ _ _) (only parsing).
-Notation perm_allpairs_rconsr :=
-  (deprecate perm_allpairs_rconsr allpairs_rconsr _ _ _) (only parsing).

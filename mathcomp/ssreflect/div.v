@@ -1041,11 +1041,11 @@ Qed.
 
 End Chinese.
 
-Notation "@ 'coprime_expl'" :=
-  (deprecate coprime_expl coprimeXl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'coprime_expr'" :=
-  (deprecate coprime_expr coprimeXr) (at level 10, only parsing) : fun_scope.
-Notation coprime_mull := (deprecate coprime_mull coprimeMl) (only parsing).
-Notation coprime_mulr := (deprecate coprime_mulr coprimeMr) (only parsing).
-Notation coprime_expl := (fun k => @coprime_expl k _ _) (only parsing).
-Notation coprime_expr := (fun k => @coprime_expr k _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimeMl instead.")]
+Notation coprime_mull := coprimeMl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimeMr instead.")]
+Notation coprime_mulr := coprimeMr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimeXl instead.")]
+Notation coprime_expl := coprimeXl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimeXr instead.")]
+Notation coprime_expr := coprimeXr (only parsing).
