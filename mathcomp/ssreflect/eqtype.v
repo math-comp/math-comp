@@ -778,15 +778,8 @@ Notation "[ 'eqMixin' 'of' T 'by' <: ]" := (SubEqMixin T)
 Definition void_eqMixin := PcanEqMixin (of_voidK unit).
 HB.instance void void_eqMixin. (* TODO: PcanEqMixin should become a factory *)
 
-Section SigEqType.
-
-Variables (T : eqType) (P : pred T).
-Set Printing All.
-Definition sig_eqMixin := Eval hnf in [eqMixin of {x | P x} by <:].
-
-HB.instance ({x | P x}) sig_eqMixin.
-
-End SigEqType.
+HB.instance Definition sig_eqMixin (T : eqType) (P : pred T) :=
+  [eqMixin of {x | P x} by <:].
 
 Section ProdEqType.
 

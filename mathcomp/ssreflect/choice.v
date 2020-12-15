@@ -499,16 +499,13 @@ HB.structure Definition subChoice T (P : pred T) :=
 
 Notation subChoiceType := subChoice.type.
 
-Section SigChoiceType.
-Variables (T : choiceType) (P : pred T).
-Definition sig_choiceMixin : choiceMixin {x | P x}. Admitted.
-HB.instance ({x | P x}) sig_choiceMixin.
-End SigChoiceType.
-
 Prenex Implicits xchoose choose.
 Notation "[ 'choiceMixin' 'of' T 'by' <: ]" :=
   (sub_choiceMixin _ : choiceMixin T)
   (at level 0, format "[ 'choiceMixin'  'of'  T  'by'  <: ]") : form_scope.
+
+HB.instance Definition sig_choiceMixin (T : choiceType) (P : pred T) :=
+  [choiceMixin of {x | P x} by <:].
 
 HB.mixin Record is_countable (T : Type) : Type := {
   pickle : T -> nat;
@@ -655,7 +652,7 @@ Definition void_countMixin : is_countable void := PcanCountMixin (of_voidK unit)
 HB.instance Definition option_countMixin T : is_countable (option T) :=
   CanCountMixin (@seq_of_optK T).
 
-HB.instance Definition sig_countMixin T (P : pred T) :=
+HB.instance Definition sig_countMixin (T : countType) (P : pred T) :=
   [countMixin of {x | P x} by <:].
 
 HB.instance

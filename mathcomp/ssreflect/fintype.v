@@ -1499,11 +1499,12 @@ Check [subFinType of myb].
 Check [finType of myb].
 *)
 
+HB.instance Definition sig_finMixin (T : finType) (P : pred T) :=
+  [finMixin of {x | P x} by <:].
+
 Section CardSig.
 
 Variables (T : finType) (P : pred T).
-
-HB.instance Definition sig_finMixin := [finMixin of {x | P x} by <:].
 
 Lemma card_sig : #|{: {x | P x}}| = #|[pred x | P x]|.
 Proof. exact: card_sub. Qed.
