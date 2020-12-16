@@ -397,11 +397,6 @@ ci-finmap-dev:
     - opam pin add -n -k path coq-fcsl-pcm .
     - opam install -y -v -j "${NJOBS}" coq-fcsl-pcm
 
-ci-fcsl-pcm-8.10:
-  extends: .ci-fcsl-pcm
-  variables:
-    COQ_VERSION: "8.10"
-
 ci-fcsl-pcm-8.11:
   extends: .ci-fcsl-pcm
   variables:
