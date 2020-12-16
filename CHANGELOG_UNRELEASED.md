@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
+  `*:%R`, and `*~%R` are now declared in `fun_scope`.
+
 ### Renamed
 
 ### Removed

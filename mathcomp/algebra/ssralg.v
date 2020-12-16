@@ -684,9 +684,9 @@ Definition opp V := Zmodule.opp (Zmodule.class V).
 Definition add V := Zmodule.add (Zmodule.class V).
 
 Local Notation "0" := (zero _) : ring_scope.
-Local Notation "-%R" := (@opp _) : ring_scope.
+Local Notation "-%R" := (@opp _) : fun_scope.
 Local Notation "- x" := (opp x) : ring_scope.
-Local Notation "+%R" := (@add _) : ring_scope.
+Local Notation "+%R" := (@add _) : fun_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
 Local Notation "x - y" := (x + - y) : ring_scope.
 
@@ -980,7 +980,7 @@ Definition rreg R x := injective ((@mul R)^~ x).
 Local Notation "1" := (one _) : ring_scope.
 Local Notation "- 1" := (- (1)) : ring_scope.
 Local Notation "n %:R" := (1 *+ n) : ring_scope.
-Local Notation "*%R" := (@mul _).
+Local Notation "*%R" := (@mul _) : fun_scope.
 Local Notation "x * y" := (mul x y) : ring_scope.
 Local Notation "x ^+ n" := (exp x n) : ring_scope.
 
@@ -1606,7 +1606,7 @@ Import Lmodule.Exports.
 Definition scale (R : ringType) (V : lmodType R) : R -> V -> V :=
   Lmodule.scale (Lmodule.class V).
 
-Local Notation "*:%R" := (@scale _ _).
+Local Notation "*:%R" := (@scale _ _) : fun_scope.
 Local Notation "a *: v" := (scale a v) : ring_scope.
 
 Section LmoduleTheory.
@@ -1614,7 +1614,7 @@ Section LmoduleTheory.
 Variables (R : ringType) (V : lmodType R).
 Implicit Types (a b c : R) (u v : V).
 
-Local Notation "*:%R" := (@scale R V).
+Local Notation "*:%R" := (@scale R V) : fun_scope.
 
 Lemma scalerA a b v : a *: (b *: v) = a * b *: v.
 Proof. by case: V v => ? [] ? []. Qed.
@@ -6063,9 +6063,9 @@ Export Pred.Exports SubType.Exports.
 Notation QEdecFieldMixin := QEdecFieldMixin.
 
 Notation "0" := (zero _) : ring_scope.
-Notation "-%R" := (@opp _) : ring_scope.
+Notation "-%R" := (@opp _) : fun_scope.
 Notation "- x" := (opp x) : ring_scope.
-Notation "+%R" := (@add _).
+Notation "+%R" := (@add _) : fun_scope.
 Notation "x + y" := (add x y) : ring_scope.
 Notation "x - y" := (add x (- y)) : ring_scope.
 Notation "x *+ n" := (natmul x n) : ring_scope.
@@ -6079,14 +6079,14 @@ Notation "- 1" := (opp 1) : ring_scope.
 Notation "n %:R" := (natmul 1 n) : ring_scope.
 Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
-Notation "*%R" := (@mul _).
+Notation "*%R" := (@mul _) : fun_scope.
 Notation "x * y" := (mul x y) : ring_scope.
 Notation "x ^+ n" := (exp x n) : ring_scope.
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 Notation "x / y" := (mul x y^-1) : ring_scope.
 
-Notation "*:%R" := (@scale _ _).
+Notation "*:%R" := (@scale _ _) : fun_scope.
 Notation "a *: m" := (scale a m) : ring_scope.
 Notation "k %:A" := (scale k 1) : ring_scope.
 Notation "\0" := (null_fun _) : ring_scope.
