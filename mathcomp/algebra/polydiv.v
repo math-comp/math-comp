@@ -3205,7 +3205,7 @@ Notation "@ 'divp_scalel'" :=
 Notation "@ 'divp_scaler'" :=
   (deprecate modp_scaler divpZr) (at level 10, only parsing) : fun_scope.
 Notation "@ 'divp_opp'" :=
-  (deprecate modp_opp divpN) (at level 10, only parsing) : fun_scope.
+  (deprecate divp_opp divpN) (at level 10, only parsing) : fun_scope.
 Notation "@ 'divp_add'" :=
   (deprecate modp_add divpD) (at level 10, only parsing) : fun_scope.
 Notation modp_scalel := (@modp_scalel _) (only parsing).
