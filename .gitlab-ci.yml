@@ -428,11 +428,6 @@ ci-multinomials-dev:
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-analysis
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-analysis
 
-ci-analysis-8.10:
-  extends: .ci-analysis
-  variables:
-    COQ_VERSION: "8.10"
-
 ci-analysis-8.11:
   extends: .ci-analysis
   variables:
