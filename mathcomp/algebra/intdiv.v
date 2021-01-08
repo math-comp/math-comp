@@ -623,6 +623,31 @@ Proof. exact: coprime_dvdr. Qed.
 Lemma dvdz_pexp2r m n k : (k > 0)%N -> (m ^+ k %| n ^+ k)%Z = (m %| n)%Z.
 Proof. by rewrite dvdzE !abszX; apply: dvdn_pexp2r. Qed.
 
+Definition floorq x :=
+  if 0 <= numq x then (numq x %/ denq x)%Z
+  else - ((- numq x + denq x - 1) %/ denq x)%Z.
+
+Lemma floorqE : floorq =1 Num.floor.
+Proof.
+move=> x; apply/sym_eq/floorR_def/andP; rewrite /floorq.
+case: (ratP x) => n d cpnd; case: (@leP _ _ 0) => sn; split.
++ by rewrite ler_pdivl_mulr ?ltr0z // -rmorphM ler_int lez_floor.
++ by rewrite ltr_pdivr_mulr ?ltr0z // -rmorphM ltr_int ltz_ceil.
++ rewrite mulrNz ler_oppl -mulNr.
+  rewrite ler_pdivr_mulr ?ltr0z // -rmorphM -mulrNz ler_int.
+  rewrite -ltz_addr1 -ltr_subl_addr -(ltr_add2r (Posz d.+1)) addrAC.
+  by rewrite -{5}(mul1r (Posz d.+1)) -mulrDl ltz_ceil.
++ rewrite ltr_pdivr_mulr ?ltr0z // rmorphD /= mulrDl mul1r -ltr_subl_addr.
+  rewrite mulrNz mulNr ltr_oppr opprB (addrC (d.+1%:~R)).
+  rewrite -mulrNz -rmorphD -rmorphM ltr_int -lez_addr1 -ler_subr_addr.
+  by rewrite lez_floor.
+Qed.
+
+Definition ceilq x := - floorq (- x).
+
+Lemma ceilqE : ceilq =1 Num.ceil.
+Proof. by move=> x; rewrite /ceilq floorqE. Qed.
+
 Section Chinese.
 
 (***********************************************************************)
