@@ -63,6 +63,8 @@ From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
 (*                         m : nat.                                           *)
 (*         Num.floor x == for x \in Num.real, an m : int such that            *)
 (*                        m%:~R <= z < (m + 1)%:~R, else 0%Z.                 *)
+(*          Num.ceil x == for x \in Num.real, an m : int such that            *)
+(*                        (m%:~R - 1)%:~R < z <= m%:~R, else 0%Z.             *)
 (*         Num.trunc x == for x >= 0, an n : nat such that                    *)
 (*                        n%:R <= z < n.+1%:R, else 0%N.                      *)
 (*         Num.bound x == upper bound for x, i.e., n such that `|x| < n%:R.   *)
@@ -146,10 +148,12 @@ End Internals.
 Module Import Def.
 Export ssrnum.Num.Def.
 Definition floorR {R : archiNumDomainType} (x : R) := sval (floorR_subproof x).
+Definition ceilR {R : archiNumDomainType} (x : R) := - floorR (- x).
 End Def.
 
 Notation trunc := Num.Def.truncR.
 Notation floor := floorR.
+Notation ceil := ceilR.
 Local Notation Rnat := Num.Def.Rnat.
 Local Notation Rint := Num.Def.Rint.
 Notation bound := Num.ExtraDef.archi_bound.
@@ -164,6 +168,7 @@ Implicit Types x y z : R.
 
 Local Notation trunc := (@Num.trunc R).
 Local Notation floor := (@Num.floor R).
+Local Notation ceil := (@Num.ceil R).
 Local Notation Rnat := (@Rnat R).
 Local Notation Rint := (@Rint R).
 
@@ -372,6 +377,89 @@ Proof. by move=> _ _ /RintP[m1 ->] /RintP[m2 ->]; rewrite -rmorphM !intRK. Qed.
 
 Lemma floorRX n : {in Rint, {morph floor : x / x ^+ n}}.
 Proof. by move=> _ /RintP[m ->]; rewrite -rmorphX !intRK. Qed.
+
+(* ceil and Rint *)
+
+Lemma ceilR_itv x : x \is Num.real -> (ceil x - 1)%:~R < x <= (ceil x)%:~R.
+Proof.
+move=> Rx.
+by rewrite -opprD !mulrNz ltr_oppl ler_oppr andbC floorR_itv // realN.
+Qed.
+
+Lemma gt_pred_ceilR x : x \is Num.real -> (ceil x - 1)%:~R < x.
+Proof. by move=> /ceilR_itv /andP[]. Qed.
+
+Lemma le_ceilR x : x \is Num.real -> x <= (ceil x)%:~R.
+Proof. by move=> /ceilR_itv /andP[]. Qed.
+
+Lemma ceilR_def x m : (m - 1)%:~R < x <= m%:~R -> ceil x = m.
+Proof.
+move=> Hx; apply/eqP; rewrite eqr_oppLR; apply/eqP/floorR_def.
+by rewrite ler_oppr ltr_oppl andbC -!mulrNz opprD opprK.
+Qed.
+
+Lemma ceilR_le_int x n : x \is Num.real -> x <= n%:~R = (ceilR x <= n).
+Proof.
+rewrite -realN; move=> /(floorR_ge_int (- n)).
+by rewrite mulrNz ler_oppl opprK => ->; rewrite ler_oppl.
+Qed.
+
+Lemma ceilR_le : {in Num.real &, {homo (@ceilR R) : x y / x <= y}}.
+Proof.
+move=> x y Rx Ry xley.
+by rewrite ler_oppl opprK; apply: floorR_le; rewrite ?realN // ler_oppl opprK.
+Qed.
+
+Lemma floor_ceil_eq x : x \is Num.real -> x \is a Rint = (floorR x == ceilR x).
+Proof.
+move=> Rx; apply/idP/idP => [Ix|/eqP fxcy].
+  by rewrite -eqr_oppLR floorRN.
+  by rewrite Rint_def; apply/eqP/le_anti; rewrite ge_floorR //= fxcy le_ceilR.
+Qed.
+
+Lemma floor_ceil_neq x :
+  x \is Num.real -> ~~ (x \is a Rint) = (ceil x == floor x + 1).
+Proof.
+move=> Rx; apply/idP/idP => [Ix|cxfy]; last first.
+  apply/negP; rewrite floor_ceil_eq //.
+  move: cxfy => /eqP ->; rewrite addrC -subr_eq subrr eq_sym.
+  apply/negP; exact: oner_neq0.
+apply/eqP/le_anti/andP; split.
+  move: (lt_succ_floorR Rx); rewrite -(ltr_add2r 1%:~R) => xlef.
+  move: (gt_pred_ceilR Rx); rewrite rmorphB /= ltr_subl_addr => clex.
+  by move: (lt_trans clex xlef); rewrite -rmorphD /= ltr_int ltz_addr1.
+rewrite leNgt; apply/negP => clef; move: Ix; apply/negP/negPn; rewrite Rint_def.
+apply/eqP/le_anti; rewrite ge_floorR //=.
+move: clef; rewrite ltz_addr1 -(@ler_int R); apply: le_trans; exact: le_ceilR.
+Qed.
+
+Lemma intRK' : cancel intr ceil.
+Proof. by move=> m; apply/eqP; rewrite eqr_oppLR -mulrNz intRK. Qed.
+
+Lemma Rint_def' x : x \is a Rint = ((ceil x)%:~R == x).
+Proof. by rewrite mulrNz eqr_oppLR -Rint_def !RintE opprK orbC. Qed.
+
+Lemma ceilRK : {in Rint, cancel ceil intr}.
+Proof. by move=> z; rewrite Rint_def' => /eqP. Qed.
+
+Lemma ceilR0 : ceil 0 = 0. Proof. exact: intRK' 0. Qed.
+Lemma ceilR1 : ceil 1 = 1. Proof. exact: intRK' 1. Qed.
+Hint Resolve ceilR0 ceilR1 : core.
+
+Lemma ceilRD : {in Rint & Num.real, {morph ceil : x y / x + y}}.
+Proof.
+move=> _ y /RintP[m ->] Ry; apply: ceilR_def.
+by rewrite -addrA 3!rmorphD /= intRK' ler_add2l ltr_add2l -rmorphD ceilR_itv.
+Qed.
+
+Lemma ceilRN : {in Rint, {morph ceil : x / - x}}.
+Proof. by move=> _ /RintP[m ->]; rewrite -rmorphN !intRK'. Qed.
+
+Lemma ceilRM : {in Rint &, {morph ceil : x y / x * y}}.
+Proof. by move=> _ _ /RintP[m1 ->] /RintP[m2 ->]; rewrite -rmorphM !intRK'. Qed.
+
+Lemma ceilRX n : {in Rint, {morph ceil : x / x ^+ n}}.
+Proof. by move=> _ /RintP[m ->]; rewrite -rmorphX !intRK'. Qed.
 
 Lemma rpred_Rint S (ringS : subringPred S) (kS : keyed_pred ringS) x :
   x \is a Rint -> x \in kS.
