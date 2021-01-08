@@ -304,11 +304,31 @@ Proof. by case: R x => ? [? []]. Qed.
 Lemma floorR_itv x : x \is Num.real -> (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. by rewrite /floor => Rx; case: (floorR_subproof x) => //= m; apply. Qed.
 
+Lemma ge_floorR x : x \is Num.real -> (floor x)%:~R <= x.
+Proof. by move=> /floorR_itv /andP[]. Qed.
+
+Lemma lt_succ_floorR x : x \is Num.real -> x < (floor x + 1)%:~R.
+Proof. by move=> /floorR_itv /andP[]. Qed.
+
 Lemma floorR_def x m : m%:~R <= x < (m + 1)%:~R -> floor x = m.
 Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltz_addr1.
 move: (ger_real lemx); rewrite realz => /floorR_itv/andP[lefx ltxf1].
 by rewrite -!(ltr_int R) 2?(@le_lt_trans _ _ x).
+Qed.
+
+Lemma floorR_ge_int x n : x \is Num.real -> n%:~R <= x = (n <= floorR x).
+Proof.
+move=> /floorR_itv /andP[lefx ltxf1]; apply/idP/idP => lenx.
++ by move: ltxf1 => /(le_lt_trans lenx); rewrite ltr_int ltz_addr1.
++ by move: lefx; apply: le_trans; rewrite ler_int.
+Qed.
+
+Lemma floorR_le : {in Num.real &, {homo (@floorR R) : x y / x <= y}}.
+Proof.
+move=> x y Rx Ry.
+rewrite -floorR_ge_int //.
+apply: le_trans; exact: ge_floorR.
 Qed.
 
 Lemma intRK : cancel intr floor.
