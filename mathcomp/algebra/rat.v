@@ -757,6 +757,22 @@ Qed.
 
 End InPrealField.
 
+Section InParchiField.
+
+Variable F : archiNumFieldType.
+
+Lemma floor_rat : {mono (@ratr F) : x / Num.floor x}.
+Proof.
+move=> x; apply: floorR_def; apply/andP; split.
+  by rewrite -ratr_int ler_rat ge_floorR // num_real.
+  by rewrite -ratr_int ltr_rat lt_succ_floorR // num_real.
+Qed.
+
+Lemma ceil_rat : {mono (@ratr F) : x / Num.ceil x}.
+Proof. by move=> x; rewrite /Num.ceil -rmorphN floor_rat. Qed.
+
+End InParchiField.
+
 Arguments ratr {R}.
 
 (* Conntecting rationals to the ring an field tactics *)
