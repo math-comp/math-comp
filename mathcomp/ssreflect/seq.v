@@ -133,9 +133,11 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*                      [seq f x y | x <- s, y <- t]                          *)
 (*               := [:: f x_1 y_1; ...; f x_1 y_m; f x_2 y_1; ...; f x_n y_m] *)
 (* allrel r xs ys := all [pred x | all (r x) ys] xs                           *)
-(*                == r x y holds whenever x is in xs and y is in ys           *)
+(*                <=> r x y holds whenever x is in xs and y is in ys          *)
 (*   all2rel r xs := allrel r xs xs                                           *)
-(*                == the proposition r x y holds for all possible x, y in xs. *)
+(*                <=> the proposition r x y holds for all possible x, y in xs.*)
+(*  pairwise r xs <=> the relation r holds for any i-th and j-th element of   *)
+(*                    xs such that i < j.                                     *)
 (*        map f s == the sequence [:: f x_1, ..., f x_n].                     *)
 (*      pmap pf s == the sequence [:: y_i1, ..., y_ik] where i1 < ... < ik,   *)
 (*                   pf x_i = Some y_i, and pf x_j = None iff j is not in     *)
@@ -3523,6 +3525,20 @@ elim: ys => /= [|y ys ihys]; first by rewrite allrel0r.
 by rewrite !allrel_consr ihys andbA.
 Qed.
 
+Lemma allrel_maskl m xs ys : allrel xs ys -> allrel (mask m xs) ys.
+Proof.
+by elim: m xs => [|[] m IHm] [|x xs] //= /andP [xys /IHm->]; rewrite ?xys.
+Qed.
+
+Lemma allrel_maskr m xs ys : allrel xs ys -> allrel xs (mask m ys).
+Proof. by elim: xs => //= x xs IHxs /andP [/all_mask->]. Qed.
+
+Lemma allrel_filterl a xs ys : allrel xs ys -> allrel (filter a xs) ys.
+Proof. by rewrite filter_mask; apply: allrel_maskl. Qed.
+
+Lemma allrel_filterr a xs ys : allrel xs ys -> allrel xs (filter a ys).
+Proof. by rewrite filter_mask; apply: allrel_maskr. Qed.
+
 Lemma allrel_allpairsE xs ys :
   allrel xs ys = all id [seq r x y | x <- xs, y <- ys].
 Proof. by elim: xs => //= x xs ->; rewrite all_cat all_map. Qed.
@@ -3538,20 +3554,40 @@ Arguments allrel1l {T S} r x ys.
 Arguments allrel1r {T S} r xs y.
 Arguments allrel_catl {T S} r xs xs' ys.
 Arguments allrel_catr {T S} r xs ys ys'.
+Arguments allrel_maskl {T S} r m xs ys.
+Arguments allrel_maskr {T S} r m xs ys.
+Arguments allrel_filterl {T S} r a xs ys.
+Arguments allrel_filterr {T S} r a xs ys.
 Arguments allrel_allpairsE {T S} r xs ys.
 
 Notation all2rel r xs := (allrel r xs xs).
+
+Lemma sub_in_allrel
+      {T S : Type} (P : {pred T}) (Q : {pred S}) (r r' : T -> S -> bool) :
+  {in P & Q, forall x y, r x y -> r' x y} ->
+  forall xs ys, all P xs -> all Q ys -> allrel r xs ys -> allrel r' xs ys.
+Proof.
+move=> rr' + ys; elim=> //= x xs IHxs /andP [Px Pxs] Qys.
+rewrite !allrel_consl => /andP [+ {}/IHxs-> //]; rewrite andbT.
+by elim: ys Qys => //= y ys IHys /andP [Qy Qys] /andP [/rr'-> // /IHys->].
+Qed.
+
+Lemma sub_allrel {T S : Type} (r r' : T -> S -> bool) :
+  (forall x y, r x y -> r' x y) ->
+  forall xs ys, allrel r xs ys -> allrel r' xs ys.
+Proof.
+by move=> rr' xs ys; apply/sub_in_allrel/all_predT/all_predT; apply: in2W.
+Qed.
 
 Lemma eq_in_allrel {T S : Type} (P : {pred T}) (Q : {pred S}) r r' :
   {in P & Q, r =2 r'} ->
   forall xs ys, all P xs -> all Q ys -> allrel r xs ys = allrel r' xs ys.
 Proof.
-move=> rr' + ys; elim=> //= x xs IH /andP [Px Pxs] Qys.
-congr andb => /=; last exact: IH.
-by elim: ys Qys {IH} => //= y ys IH /andP [Qy Qys]; rewrite rr' // IH.
+move=> rr' xs ys Pxs Qys.
+by apply/idP/idP; apply/sub_in_allrel/Qys/Pxs => ? ? ? ?; rewrite rr'.
 Qed.
 
-Lemma eq_allrel {T S : Type} (r r': T -> S -> bool) :
+Lemma eq_allrel {T S : Type} (r r' : T -> S -> bool) :
   r =2 r' -> allrel r =2 allrel r'.
 Proof. by move=> rr' xs ys; apply/eq_in_allrel/all_predT/all_predT. Qed.
 
@@ -3591,6 +3627,132 @@ by elim: xs => //= y xs ->; rewrite rsym andbb.
 Qed.
 
 End All2Rel.
+
+Section Pairwise.
+
+Variables (T : Type) (r : T -> T -> bool).
+Implicit Types (x y : T) (xs ys : seq T).
+
+Fixpoint pairwise xs : bool :=
+  if xs is x :: xs then all (r x) xs && pairwise xs else true.
+
+Lemma pairwise_cons x xs : pairwise (x :: xs) = all (r x) xs && pairwise xs.
+Proof. by []. Qed.
+
+Lemma pairwise_cat xs ys :
+  pairwise (xs ++ ys) = [&& allrel r xs ys, pairwise xs & pairwise ys].
+Proof. by elim: xs => //= x xs ->; rewrite all_cat -!andbA; bool_congr. Qed.
+
+Lemma pairwise_rcons xs x :
+  pairwise (rcons xs x) = all (r^~ x) xs && pairwise xs.
+Proof. by rewrite -cats1 pairwise_cat allrel1r andbT. Qed.
+
+Lemma pairwise2 x y : pairwise [:: x; y] = r x y.
+Proof. by rewrite /= !andbT. Qed.
+
+Lemma pairwise_mask m xs : pairwise xs -> pairwise (mask m xs).
+Proof.
+by elim: m xs => [|[] m IHm] [|x xs] //= /andP [? ?]; rewrite ?IHm // all_mask.
+Qed.
+
+Lemma pairwise_filter a xs : pairwise xs -> pairwise (filter a xs).
+Proof. by rewrite filter_mask; apply: pairwise_mask. Qed.
+
+Lemma pairwiseP x0 xs :
+  reflect {in gtn (size xs) &, {homo nth x0 xs : i j / i < j >-> r i j}}
+          (pairwise xs).
+Proof.
+elim: xs => /= [|x xs IHxs]; first exact: (iffP idP).
+apply: (iffP andP) => [[r_x_xs pxs] i j|Hnth]; rewrite -?topredE /= ?ltnS.
+  by case: i j => [|i] [|j] //= gti gtj ij; [exact/all_nthP | exact/IHxs].
+split; last by apply/IHxs => // i j; apply/(Hnth i.+1 j.+1).
+by apply/(all_nthP x0) => i gti; apply/(Hnth 0 i.+1).
+Qed.
+
+Lemma pairwise_all2rel :
+  reflexive r -> symmetric r -> forall xs, pairwise xs = all2rel r xs.
+Proof.
+by move=> r_refl r_sym; elim => //= x xs ->; rewrite all2rel_cons // r_refl.
+Qed.
+
+End Pairwise.
+
+Arguments pairwise {T} r xs.
+Arguments pairwise_cons {T} r x xs.
+Arguments pairwise_cat {T} r xs ys.
+Arguments pairwise_rcons {T} r xs x.
+Arguments pairwise2 {T} r x y.
+Arguments pairwise_mask {T r} m {xs}.
+Arguments pairwise_filter {T r} a {xs}.
+Arguments pairwiseP {T r} x0 {xs}.
+Arguments pairwise_all2rel {T r} r_refl r_sym xs.
+
+Lemma sub_in_pairwise {T : Type} (P : {pred T}) (r r' : rel T) :
+  {in P &, subrel r r'} ->
+  forall xs, all P xs -> pairwise r xs -> pairwise r' xs.
+Proof.
+move=> rr'; elim=> //= x xs IHxs /andP [Px Pxs] /andP [+ {}/IHxs->] //.
+rewrite andbT; elim: xs Pxs => //= x' xs IHxs /andP [? ?] /andP [+ /IHxs->] //.
+by rewrite andbT; apply: rr'.
+Qed.
+
+Lemma sub_pairwise {T : Type} (r r' : rel T) xs :
+  subrel r r' -> pairwise r xs -> pairwise r' xs.
+Proof. by move=> rr'; apply/sub_in_pairwise/all_predT; apply: in2W. Qed.
+
+Lemma eq_in_pairwise {T : Type} (P : {pred T}) (r r' : rel T) :
+  {in P &, r =2 r'} -> forall xs, all P xs -> pairwise r xs = pairwise r' xs.
+Proof.
+move=> rr' xs Pxs.
+by apply/idP/idP; apply/sub_in_pairwise/Pxs => ? ? ? ?; rewrite rr'.
+Qed.
+
+Lemma eq_pairwise {T : Type} (r r' : rel T) :
+  r =2 r' -> pairwise r =i pairwise r'.
+Proof. by move=> rr' xs; apply/eq_in_pairwise/all_predT. Qed.
+
+Lemma pairwise_map {T T' : Type} (f : T' -> T) (r : rel T) xs :
+  pairwise r (map f xs) = pairwise (relpre f r) xs.
+Proof. by elim: xs => //= x xs ->; rewrite all_map. Qed.
+
+Section EqPairwise.
+
+Variables (T : eqType) (r : T -> T -> bool).
+Implicit Types (xs ys : seq T).
+
+Lemma subseq_pairwise xs ys : subseq xs ys -> pairwise r ys -> pairwise r xs.
+Proof. by case/subseqP => m _ ->; apply: pairwise_mask. Qed.
+
+Lemma uniq_pairwise xs : uniq xs = pairwise [rel x y | x != y] xs.
+Proof.
+elim: xs => //= x xs ->; congr andb; rewrite -has_pred1 -all_predC.
+by elim: xs => //= x' xs ->; case: eqVneq.
+Qed.
+
+Lemma pairwise_uniq xs : irreflexive r -> pairwise r xs -> uniq xs.
+Proof.
+move=> r_irr; rewrite uniq_pairwise; apply/sub_pairwise => x y.
+by apply: contraTneq => ->; rewrite r_irr.
+Qed.
+
+Lemma pairwise_eq : antisymmetric r ->
+  forall xs ys, pairwise r xs -> pairwise r ys -> perm_eq xs ys -> xs = ys.
+Proof.
+move=> r_asym; elim=> [|x xs IHxs] [|y ys] //=; try by move=> ? ? /perm_size.
+move=> /andP [r_x_xs pxs] /andP [r_y_ys pys] eq_xs_ys.
+move: (mem_head y ys) (mem_head x xs).
+rewrite -(perm_mem eq_xs_ys) [x \in _](perm_mem eq_xs_ys) !inE.
+case: eqVneq eq_xs_ys => /= [->|ne_xy] eq_xs_ys ys_x xs_y.
+  by rewrite (IHxs ys) // -(perm_cons x).
+by case/eqP: ne_xy; apply: r_asym; rewrite (allP r_x_xs) ?(allP r_y_ys).
+Qed.
+
+End EqPairwise.
+
+Arguments subseq_pairwise {T r xs ys}.
+Arguments uniq_pairwise {T} xs.
+Arguments pairwise_uniq {T r xs}.
+Arguments pairwise_eq {T r} r_asym {xs ys}.
 
 Section Permutations.
 
