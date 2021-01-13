@@ -28,7 +28,7 @@ installation instructions in other scenarios.
 
 - The [website](http://math-comp.github.io/math-comp/) of the MathComp library
   contains:
-  + links to the [HTML documentation of each file](https://math-comp.github.io/htmldoc/index.html)
+  + links to the [HTML documentation of the last version](https://math-comp.github.io/htmldoc/libgraph.html) as well as previous versions documentation,
   + a list of [tutorials](https://math-comp.github.io/documentation.html)
 - The [ssreflect mailing list](https://sympa.inria.fr/sympa/info/ssreflect) is the primary
   venue for help and questions about the library.
