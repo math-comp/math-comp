@@ -217,6 +217,14 @@ Proof. by rewrite /<=%O /= lteifxx. Qed.
 Lemma bound_ltxx c1 c2 x : (BSide c1 x < BSide c2 x) = (c1 && ~~ c2).
 Proof. by rewrite /<%O /= lteifxx. Qed.
 
+Lemma ge_pinftyE b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
+
+Lemma le_ninftyE b : (b <= -oo) = (b == -oo). Proof. by case: b => // - []. Qed.
+
+Lemma gt_pinfty b : (+oo < b) = false. Proof. by []. Qed.
+
+Lemma lt_ninfty b : (b < -oo) = false. Proof. by case: b => // -[]. Qed.
+
 Definition subitv i1 i2 :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in (b2l <= b1l) && (b1r <= b2r).
