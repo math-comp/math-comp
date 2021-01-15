@@ -98,10 +98,8 @@ coq-8.11:
 coq-8.12:
   extends: .opam-build-once
 
-# to uncomment when 8.13+alpha available
-# coq-8.13:
-#   # to be replaced with .opam-build-once when 8.13.0 available
-#   extends: .opam-build
+coq-8.13:
+  extends: .opam-build-once
 
 coq-dev:
   extends: .opam-build
@@ -149,11 +147,10 @@ test-coq-dev:
   variables:
     COQ_VERSION: "dev"
 
-# test-coq-8.13:
-#   # to be replaced with .test-once (to disable this nightly build) when 8.13.0 is released
-#   extends: .test
-#   variables:
-#     COQ_VERSION: "8.13"
+test-coq-8.13:
+  extends: .test-once
+  variables:
+    COQ_VERSION: "8.13"
 
 test-coq-8.12:
   extends: .test-once
@@ -229,6 +226,11 @@ ci-fourcolor-8.12:
   variables:
     COQ_VERSION: "8.12"
 
+ci-fourcolor-8.13:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.13"
+
 ci-fourcolor-dev:
   extends: .ci-fourcolor
   variables:
@@ -258,6 +260,11 @@ ci-odd-order-8.12:
   extends: .ci-odd-order
   variables:
     COQ_VERSION: "8.12"
+
+ci-odd-order-8.13:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.13"
 
 ci-odd-order-dev:
   extends: .ci-odd-order
@@ -289,6 +296,11 @@ ci-lemma-overloading-8.12:
   variables:
     COQ_VERSION: "8.12"
 
+ci-lemma-overloading-8.13:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.13"
+
 ci-lemma-overloading-dev:
   extends: .ci-lemma-overloading
   variables:
@@ -318,6 +330,11 @@ ci-bigenough-8.12:
   extends: .ci-bigenough
   variables:
     COQ_VERSION: "8.12"
+
+ci-bigenough-8.13:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.13"
 
 ci-bigenough-dev:
   extends: .ci-bigenough
@@ -350,6 +367,11 @@ ci-real-closed-8.12:
   variables:
     COQ_VERSION: "8.12"
 
+ci-real-closed-8.13:
+  extends: .ci-real-closed
+  variables:
+    COQ_VERSION: "8.13"
+
 ci-real-closed-dev:
   extends: .ci-real-closed
   variables:
@@ -380,6 +402,11 @@ ci-finmap-8.12:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "8.12"
+
+ci-finmap-8.13:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.13"
 
 ci-finmap-dev:
   extends: .ci-finmap
@@ -412,6 +439,11 @@ ci-multinomials-8.12:
   variables:
     COQ_VERSION: "8.12"
 
+ci-multinomials-8.13:
+  extends: .ci-multinomials
+  variables:
+    COQ_VERSION: "8.13"
+
 ci-multinomials-dev:
   extends: .ci-multinomials
   variables:
@@ -438,6 +470,11 @@ ci-analysis-8.12:
   variables:
     COQ_VERSION: "8.12"
 
+ci-analysis-8.13:
+  extends: .ci-analysis
+  variables:
+    COQ_VERSION: "8.13"
+
 ci-analysis-dev:
   extends: .ci-analysis
   variables:
@@ -462,6 +499,11 @@ ci-fcsl-pcm-8.12:
   extends: .ci-fcsl-pcm
   variables:
     COQ_VERSION: "8.12"
+
+ci-fcsl-pcm-8.13:
+  extends: .ci-fcsl-pcm
+  variables:
+    COQ_VERSION: "8.13"
 
 ci-fcsl-pcm-dev:
   extends: .ci-fcsl-pcm
@@ -519,10 +561,8 @@ mathcomp-dev_coq-8.11:
 mathcomp-dev_coq-8.12:
   extends: .docker-deploy-once
 
-# to uncomment when 8.13+alpha available
-# mathcomp-dev_coq-8.13:
-#   # to be replaced with .docker-deploy-once when 8.13.0 available
-#   extends: .docker-deploy
+mathcomp-dev_coq-8.13:
+  extends: .docker-deploy-once
 
 mathcomp-dev_coq-dev:
   extends: .docker-deploy
