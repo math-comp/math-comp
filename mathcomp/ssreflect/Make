@@ -17,6 +17,7 @@ fintype.v
 generic_quotient.v
 path.v
 prime.v
+relorder.v
 tuple.v
 ssrnotations.v
 ssrmatching.v
