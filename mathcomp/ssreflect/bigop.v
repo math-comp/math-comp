@@ -1907,6 +1907,12 @@ Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
 Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
 
+Lemma sumnB I r (P : pred I) (E1 E2 : I -> nat) :
+     (forall i, P i -> E1 i <= E2 i) ->
+  \sum_(i <- r | P i) (E2 i - E1 i) =
+  \sum_(i <- r | P i) E2 i - \sum_(i <- r | P i) E1 i.
+Proof. by move=> /(_ _ _)/subnK-/(eq_bigr _)<-; rewrite big_split addnK. Qed.
+
 Lemma sum_nat_eq0 (I : finType) (P : pred I) (E : I -> nat) :
   (\sum_(i | P i) E i == 0)%N = [forall (i | P i), E i == 0%N].
 Proof. by rewrite eq_sym -(@leqif_sum I P _ (fun _ => 0%N) E) ?big1_eq. Qed.
