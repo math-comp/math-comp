@@ -217,9 +217,9 @@ Proof. by rewrite /<=%O /= lteifxx. Qed.
 Lemma bound_ltxx c1 c2 x : (BSide c1 x < BSide c2 x) = (c1 && ~~ c2).
 Proof. by rewrite /<%O /= lteifxx. Qed.
 
-Lemma ge_pinftyE b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
+Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
 
-Lemma le_ninftyE b : (b <= -oo) = (b == -oo). Proof. by case: b => // - []. Qed.
+Lemma le_ninfty b : (b <= -oo) = (b == -oo). Proof. by case: b => // - []. Qed.
 
 Lemma gt_pinfty b : (+oo < b) = false. Proof. by []. Qed.
 

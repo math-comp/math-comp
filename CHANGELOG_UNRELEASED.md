@@ -22,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
 
-- in `interval.v`, new lemmas: `ge_pinftyE`, `le_ninftyE`, `gt_pinfty`, `lt_ninfty`.
+- in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
 
 ### Changed
 
