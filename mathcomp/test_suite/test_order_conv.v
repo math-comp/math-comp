@@ -1,6 +1,63 @@
 From mathcomp Require Import all_ssreflect.
 Import Order.Theory.
 
+Notation "ord ^~" := (dual_pOrder ord) (at level 8, format "ord ^~").
+
+Module DualOrderTest.
+Section DualOrderTest.
+Variable (T : eqType) (ord : {pOrder T}).
+
+Lemma le_dual_inv x y: x <=_((ord^~)^~) y = x <=_ord y.
+Proof. by []. Qed.
+
+Lemma lt_dual_inv x y: x <_((ord^~)^~) y = x <_ord y.
+Proof. by []. Qed.
+
+Goal ord = (ord^~)^~.
+Proof. by []. Qed.
+
+Goal [leo: (dual_rel <=:ord)] = ord^~.
+Proof. by []. Qed.
+
+Goal [lto: (dual_rel <:ord)] = ord^~.
+Proof. by []. Qed.
+
+Goal forall x y, x <_ord y -> y <_(ord^~) x.
+Proof. by []. Qed.
+
+Goal forall x y, x <=_ord y = y <=_(ord^~) x.
+Proof. by []. Qed.
+
+End DualOrderTest.
+End DualOrderTest.
+
+(*Section DualMeetJoinTest.
+
+End BJoinTheory.
+
+(* ==================================================================== *)
+Context {T: eqType}. (*(M : {meetSemiLattice T}) (J : {joinSemiLattice T}).*)
+Axiom dualK: forall r : {porder T}, r^~^~ = r.
+Context (M : {meetSemiLattice T}) (J : {joinSemiLattice T}).
+Goal M^~^~= M.
+by rewrite dualK.
+Qed.
+
+
+Check @Meet.clone _ (Phant _) M _ id.
+Check @Join.clone _ (Phant _) M^~ _ id.
+Check @Meet.clone _ (Phant _) (M^~)^~ _ id.
+Set Printing All.
+Goal M = @Meet.clone _ (Phant _) (M^~)^~ _ id.
+reflexivity.
+Qed.
+(*Goal M = (M^~)^~ :> { meetSemiLattice T}.*)
+(*Check (M^~)^~ : { meetSemiLattice T}.*)
+Set Printing All.
+Fail Check erefl J : ((J^~j)^~m) = J.
+
+End DualMeetJoinTest.*)
+
 Section dual_of_dual.
 Variable (disp : unit).
 
