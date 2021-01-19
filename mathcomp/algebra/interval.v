@@ -221,11 +221,15 @@ Canonical itv_bound_tPOrderType :=
   TPOrderType (itv_bound T) (TopMixin bound_lex1).
 Canonical itv_bound_tbPOrderType := [tbPOrderType of itv_bound T].
 
+Lemma leEbound : <=%O = le_bound. Proof. by []. Qed.
+
+Lemma ltEbound : <%O = lt_bound. Proof. by []. Qed.
+
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
-Proof. by rewrite /<=%O /= lteifxx. Qed.
+Proof. by rewrite leEbound /= lteifxx. Qed.
 
 Lemma bound_ltxx c1 c2 x : (BSide c1 x < BSide c2 x) = (c1 && ~~ c2).
-Proof. by rewrite /<%O /= lteifxx. Qed.
+Proof. by rewrite ltEbound /= lteifxx. Qed.
 
 Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
 
@@ -453,7 +457,7 @@ Qed.
 Lemma bound_leEmeet b1 b2 : (b1 <= b2) = (bound_meet b1 b2 == b1).
 Proof.
 by case: b1 b2 => [[]?|[]][[]?|[]] //=;
-  rewrite [LHS]/<=%O /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
+  rewrite leEbound /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
 Qed.
 
 Definition itv_bound_latticeMixin :=
@@ -529,6 +533,10 @@ Canonical interval_bLatticeType := [bLatticeType of interval T].
 Canonical interval_tLatticeType := [tLatticeType of interval T].
 Canonical interval_tbLatticeType := [tbLatticeType of interval T].
 
+Lemma meetEitv : Order.meet = itv_meet. Proof. by []. Qed.
+
+Lemma joinEitv : Order.join = itv_join. Proof. by []. Qed.
+
 Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.
 
@@ -540,7 +548,7 @@ Variable (disp : unit) (T : orderType disp).
 Implicit Types (x y z : T) (i : interval T).
 
 Lemma itv_bound_totalMixin : totalLatticeMixin [latticeType of itv_bound T].
-Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
+Proof. by move=> [[]?|[]][[]?|[]]; rewrite leEbound //=; case: ltgtP. Qed.
 
 Canonical itv_bound_distrLatticeType :=
   DistrLatticeType (itv_bound T) itv_bound_totalMixin.
@@ -551,7 +559,7 @@ Canonical itv_bound_orderType := OrderType (itv_bound T) itv_bound_totalMixin.
 
 Lemma itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
 Proof.
-by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
+by move=> [? ?][? ?][? ?]; rewrite meetEitv joinEitv /= -meetUl -joinIl.
 Qed.
 
 Canonical interval_distrLatticeType :=
@@ -581,7 +589,8 @@ Qed.
 Lemma itv_total_meet3E i1 i2 i3 :
   i1 `&` i2 `&` i3 \in [:: i1 `&` i2; i1 `&` i3; i2 `&` i3].
 Proof.
-case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r]; rewrite !inE /eq_op /=.
+case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
+rewrite !inE meetEitv /eq_op /=.
 case: (leP b1l b2l); case: (leP b1l b3l); case: (leP b2l b3l);
   case: (leP b1r b2r); case: (leP b1r b3r); case: (leP b2r b3r);
   rewrite ?eqxx ?orbT //= => b23r b13r b12r b23l b13l b12l.
@@ -600,7 +609,8 @@ Qed.
 Lemma itv_total_join3E i1 i2 i3 :
   i1 `|` i2 `|` i3 \in [:: i1 `|` i2; i1 `|` i3; i2 `|` i3].
 Proof.
-case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r]; rewrite !inE /eq_op /=.
+case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
+rewrite !inE joinEitv /eq_op /=.
 case: (leP b1l b2l); case: (leP b1l b3l); case: (leP b2l b3l);
   case: (leP b1r b2r); case: (leP b1r b3r); case: (leP b2r b3r);
   rewrite ?eqxx ?orbT //= => b23r b13r b12r b23l b13l b12l.
@@ -627,16 +637,16 @@ Variable R : numDomainType.
 Implicit Types x : R.
 
 Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
-Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
+Proof. by rewrite itv_boundlr leEbound /= oppr_le0 andbb. Qed.
 
 Lemma mem0_itvoo_xNx x : 0 \in `](- x), x[ = (0 < x).
-Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
+Proof. by rewrite itv_boundlr leEbound /= oppr_lt0 andbb. Qed.
 
 Lemma oppr_itv ba bb (xa xb x : R) :
   (- x \in Interval (BSide ba xa) (BSide bb xb)) =
   (x \in Interval (BSide (~~ bb) (- xb)) (BSide (~~ ba) (- xa))).
 Proof.
-by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteif_oppl lteif_oppr.
+by rewrite !itv_boundlr leEbound /= !implybF negbK andbC lteif_oppl lteif_oppr.
 Qed.
 
 Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `](- b), (- a)[).
@@ -889,7 +899,7 @@ Proof. by move/lt_in_itv; rewrite negb_or negbK. Qed.
 
 Lemma itv_gte ba xa bb xb :
   xb <= xa ?< if ba && ~~ bb -> Interval (BSide ba xa) (BSide bb xb) =i pred0.
-Proof. by move=> ?; apply: itv_ge; rewrite /<%O /= lteifNF. Qed.
+Proof. by move=> ?; apply: itv_ge; rewrite ltEbound /= lteifNF. Qed.
 
 Lemma ltr_in_itv ba bb xa xb x :
   ~~ ba || bb -> x \in Interval (BSide ba xa) (BSide bb xb) -> xa < xb.
