@@ -1,3 +1,5 @@
+(* Credit: ported from https://github.com/Coq-Polyhedra/order.                *)
+(* Initial authors are X. Allamigeon, Q. Canu, and P.-Y. Strub.               *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset.
 
@@ -52,6 +54,7 @@ Variable T : eqType.
 (* TODO: the interface (POrder.order) should not be a primitive record. see:  *)
 (* https://github.com/math-comp/math-comp/pull/462#issuecomment-598130155.    *)
 Set Primitive Projections.
+
 Record mixin_of (le lt : rel T) := Mixin {
   lt_def : forall x y, lt x y = (y != x) && le x y;
   dlt_def : forall x y, lt y x = (y != x) && le y x;
@@ -67,6 +70,7 @@ Structure order (phT : phant T) := Pack {
   lt : rel T;
   #[canonical=no] class_ : class_of le lt;
 }.
+
 Unset Primitive Projections.
 
 Variable (phT : phant T) (ord : order phT).
@@ -100,27 +104,44 @@ Notation lt := POrder.lt.
 Arguments le {T phT} ord x y : rename, simpl never.
 Arguments lt {T phT} ord x y : rename, simpl never.
 
+Module Import DualPOrder.
+
+Canonical dual_pOrder (T : eqType) (ord : {pOrder T}) :=
+  POrder
+    (dual_rel (le ord)) (dual_rel (lt ord))
+    (let mixin := POrder.class ord in
+     @POrder.Mixin
+       T (dual_rel (le ord)) (dual_rel (lt ord))
+       (POrder.dlt_def mixin) (POrder.lt_def mixin) (POrder.lexx mixin)
+       (fun x y yx xy => POrder.le_anti mixin xy yx)
+       (fun y x z xy yz => POrder.le_trans mixin yz xy)).
+
+End DualPOrder.
+
 Module BPOrder.
 
 Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (le : rel T) (bottom : T) := forall x, le bottom x.
+Definition mixin_of (ord : {pOrder T}) (bottom : T) :=
+  forall x, le ord bottom x.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (bottom : T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of le bottom;
+  mixin : mixin_of (POrder.Pack _ base) bottom;
 }.
-Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
   lt : rel T;
   bottom : T;
-  _ : class_of le lt bottom;
+  #[canonical=no] class_ : class_of le lt bottom;
 }.
+
+Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
 
@@ -135,21 +156,23 @@ Variable (leT ltT : rel T) (bottomT : T).
 
 Definition clone c of phant_id class c := @Pack phT leT ltT bottomT c.
 
-Definition pack (m0 : forall x, leT bottomT x) :=
-  fun (bord : POrder.order phT) b
-        & phant_id (POrder.class bord) b =>
-  fun m & phant_id m0 m => @Pack phT leT ltT bottomT (Class b m).
+Definition pack (b0 : POrder.class_of leT ltT)
+                (m0 : mixin_of (POrder.Pack _ b0) bottomT) :=
+  fun (b : POrder.class_of leT ltT)            & phant_id b0 b =>
+  fun (m : mixin_of (POrder.Pack _ b) bottomT) & phant_id m0 m =>
+  @Pack phT leT ltT bottomT (Class m).
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Notation "{ 'bPOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'bPOrder'  T }").
 Notation BPOrder le lt bottom mixin :=
-  (@pack _ (Phant _) le lt bottom mixin _ _ id _ id).
+  (@pack _ (Phant _) le lt bottom _ mixin _ id _ id).
 Notation "[ 'bPOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (nosimpl _) (nosimpl _) _ id)
   (at level 0, format "[ 'bPOrder'  'of'  le ]").
@@ -167,12 +190,13 @@ Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (le : rel T) (top : T) := forall x, le x top.
+Definition mixin_of (ord : {pOrder T}) (top : T) := forall x, le ord x top.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (top : T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of le top;
+  mixin : mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -181,6 +205,7 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
@@ -196,21 +221,23 @@ Variable (leT ltT : rel T) (topT : T).
 
 Definition clone c of phant_id class c := @Pack phT leT ltT topT c.
 
-Definition pack (m0 : forall x, leT x topT) :=
-  fun (bord : POrder.order phT) b
-        & phant_id (POrder.class bord) b =>
-  fun m & phant_id m0 m => @Pack phT leT ltT topT (Class b m).
+Definition pack (b0 : POrder.class_of leT ltT)
+                (m0 : mixin_of (POrder.Pack _ b0) topT) :=
+  fun (b : POrder.class_of leT ltT)         & phant_id b0 b =>
+  fun (m : mixin_of (POrder.Pack _ b) topT) & phant_id m0 m =>
+  @Pack phT leT ltT topT (Class m).
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Notation "{ 'tPOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tPOrder'  T }").
 Notation TPOrder le lt top mixin :=
-  (@pack _ (Phant _) le lt top mixin _ _ id _ id).
+  (@pack _ (Phant _) le lt top _ mixin _ id _ id).
 Notation "[ 'tPOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (nosimpl _) (nosimpl _) _ id)
   (at level 0, format "[ 'tPOrder'  'of'  le ]").
@@ -229,9 +256,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (bottom top : T) := Class {
   base : BPOrder.class_of le lt bottom;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -241,11 +269,12 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt bottom top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> BPOrder.class_of.
 Local Coercion base2 le lt bottom top (c : class_of le lt bottom top) :
-  TPOrder.class_of le lt top := TPOrder.Class (base c) (mixin c).
+  TPOrder.class_of le lt top := TPOrder.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -266,8 +295,8 @@ Definition pack :=
   fun (bord : BPOrder.order phT) (b : BPOrder.class_of leT ltT bottomT)
       & phant_id (BPOrder.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT bottomT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT bottomT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -299,17 +328,16 @@ Variable T : eqType.
 
 Set Primitive Projections.
 
-Record mixin_of (le : rel T) (meet : T -> T -> T) := Mixin {
+Record mixin_of (ord : {pOrder T}) (meet : T -> T -> T) := Mixin {
   meetC : commutative meet;
   meetA : associative meet;
-  leEmeet : forall x y, (le x y) = (meet x y == x);
+  leEmeet : forall x y, (le ord x y) = (meet x y == x);
 }.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of le meet;
+  mixin : mixin_of (POrder.Pack _ base) meet;
 }.
-
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -333,21 +361,23 @@ Variable (leT ltT : rel T) (meetT : T -> T -> T).
 
 Definition clone c of phant_id class c := @Pack phT leT ltT meetT c.
 
-Definition pack (m0 : mixin_of leT meetT) :=
-  fun (bord : POrder.order phT) b
-        & phant_id (POrder.class bord) b =>
-  fun m & phant_id m0 m => @Pack phT leT ltT meetT (@Class leT ltT meetT b m).
+Definition pack (b0 : POrder.class_of leT ltT)
+                (m0 : mixin_of (POrder.Pack _ b0) meetT) :=
+  fun (b : POrder.class_of leT ltT)          & phant_id b0 b =>
+  fun (m : mixin_of (POrder.Pack _ b) meetT) & phant_id m0 m =>
+  @Pack phT leT ltT meetT (Class m).
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Notation "{ 'meetOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'meetOrder'  T }").
 Notation MeetOrder le lt meet mixin :=
-  (@pack _ (Phant _) le lt meet mixin _ _ id _ id).
+  (@pack _ (Phant _) le lt meet _ mixin _ id _ id).
 Notation "[ 'meetOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (nosimpl _) (nosimpl _) _ id)
   (at level 0, format "[ 'meetOrder'  'of'  le ]").
@@ -366,9 +396,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet : T -> T -> T) (bottom : T) := Class {
   base : Meet.class_of le lt meet;
-  mixin : BPOrder.mixin_of le bottom;
+  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -383,7 +414,7 @@ Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Meet.class_of.
 Local Coercion base2 le lt meet bottom (c : class_of le lt meet bottom) :
-  BPOrder.class_of le lt bottom := BPOrder.Class (base c) (mixin c).
+  BPOrder.class_of le lt bottom := BPOrder.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -403,8 +434,8 @@ Definition pack :=
   fun (bord : Meet.order phT) (b : Meet.class_of leT ltT meetT)
       & phant_id (Meet.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
-  @Pack phT leT ltT meetT bottomT (Class b m).
+      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT bottomT (Class (base := b) m).
 
 End ClassDef.
 
@@ -435,9 +466,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet : T -> T -> T) (top : T) := Class {
   base : Meet.class_of le lt meet;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -452,7 +484,7 @@ Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Meet.class_of.
 Local Coercion base2 le lt meet top (c : class_of le lt meet top) :
-  TPOrder.class_of le lt top := TPOrder.Class (base c) (mixin c).
+  TPOrder.class_of le lt top := TPOrder.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -472,8 +504,8 @@ Definition pack :=
   fun (bord : Meet.order phT) (b : Meet.class_of leT ltT meetT)
       & phant_id (Meet.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -504,9 +536,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet : T -> T -> T) (bottom top : T) := Class {
   base : BMeet.class_of le lt meet bottom;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -517,15 +550,16 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet bottom top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> BMeet.class_of.
 Local Coercion base2 le lt meet bottom top
                      (c : class_of le lt meet bottom top) :
-  TMeet.class_of le lt meet top := TMeet.Class (base c) (mixin c).
+  TMeet.class_of le lt meet top := TMeet.Class (mixin c).
 Local Coercion base3 le lt meet bottom top
                      (c : class_of le lt meet bottom top) :
-  TBPOrder.class_of le lt bottom top := TBPOrder.Class (base c) (mixin c).
+  TBPOrder.class_of le lt bottom top := TBPOrder.Class (base := c) (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -568,8 +602,8 @@ Definition pack :=
   fun (bord : BMeet.order phT) (b : BMeet.class_of leT ltT meetT bottomT)
       & phant_id (BMeet.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT bottomT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT bottomT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -614,12 +648,13 @@ Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (le : rel T) := Meet.mixin_of (dual_rel le).
+Definition mixin_of (ord : {pOrder T}) := Meet.mixin_of (dual_pOrder ord).
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (join : T -> T -> T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of le join;
+  mixin : mixin_of (POrder.Pack _ base) join;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -628,6 +663,7 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   #[canonical=no] class_ : class_of le lt join;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
@@ -643,21 +679,23 @@ Variable (leT ltT : rel T) (joinT : T -> T -> T).
 
 Definition clone c of phant_id class c := @Pack phT leT ltT joinT c.
 
-Definition pack (m0 : mixin_of leT joinT) :=
-  fun (bord : POrder.order phT) b
-        & phant_id (POrder.class bord) b =>
-  fun m & phant_id m0 m => @Pack phT leT ltT joinT (@Class leT ltT joinT b m).
+Definition pack (b0 : POrder.class_of leT ltT)
+                (m0 : mixin_of (POrder.Pack _ b0) joinT) :=
+  fun (b : POrder.class_of leT ltT)          & phant_id b0 b =>
+  fun (m : mixin_of (POrder.Pack _ b) joinT) & phant_id m0 m =>
+  @Pack phT leT ltT joinT (Class m).
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Notation "{ 'joinOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'joinOrder'  T }").
 Notation JoinOrder le lt join mixin :=
-  (@pack _ (Phant _) le lt join mixin _ _ id _ id).
+  (@pack _ (Phant _) le lt join _ mixin _ id _ id).
 Notation "[ 'joinOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (nosimpl _) (nosimpl _) _ id)
   (at level 0, format "[ 'joinOrder'  'of'  le ]").
@@ -676,9 +714,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (join : T -> T -> T) (bottom : T) := Class {
   base : Join.class_of le lt join;
-  mixin : BPOrder.mixin_of le bottom;
+  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -688,11 +727,12 @@ Structure order (phT : phant T) := Pack {
   bottom : T;
   #[canonical=no] class_ : class_of le lt join bottom;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Join.class_of.
 Local Coercion base2 le lt join bottom (c : class_of le lt join bottom) :
-  BPOrder.class_of le lt bottom := BPOrder.Class (base c) (mixin c).
+  BPOrder.class_of le lt bottom := BPOrder.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -712,8 +752,8 @@ Definition pack :=
   fun (bord : Join.order phT) (b : Join.class_of leT ltT joinT)
       & phant_id (Join.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
-  @Pack phT leT ltT joinT bottomT (Class b m).
+      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT joinT bottomT (Class (base := b) m).
 
 End ClassDef.
 
@@ -744,9 +784,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (join : T -> T -> T) (top : T) := Class {
   base : Join.class_of le lt join;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -756,11 +797,12 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt join top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Join.class_of.
 Local Coercion base2 le lt join top (c : class_of le lt join top) :
-  TPOrder.class_of le lt top := TPOrder.Class (base c) (mixin c).
+  TPOrder.class_of le lt top := TPOrder.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -780,8 +822,8 @@ Definition pack :=
   fun (bord : Join.order phT) (b : Join.class_of leT ltT joinT)
       & phant_id (Join.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT joinT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT joinT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -812,9 +854,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (join : T -> T -> T) (bottom top : T) := Class {
   base : BJoin.class_of le lt join bottom;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -825,15 +868,16 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt join bottom top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> BJoin.class_of.
 Local Coercion base2 le lt join bottom top
                      (c : class_of le lt join bottom top) :
-  TJoin.class_of le lt join top := TJoin.Class (base c) (mixin c).
+  TJoin.class_of le lt join top := TJoin.Class (mixin c).
 Local Coercion base3 le lt join bottom top
                      (c : class_of le lt join bottom top) :
-  TBPOrder.class_of le lt bottom top := TBPOrder.Class (base c) (mixin c).
+  TBPOrder.class_of le lt bottom top := TBPOrder.Class (base := c) (mixin c).
 
 Variable (phT : phant T).
 Variable (ord : order phT).
@@ -877,8 +921,8 @@ Definition pack :=
   fun (bord : BJoin.order phT) (b : BJoin.class_of leT ltT joinT bottomT)
       & phant_id (BJoin.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT joinT bottomT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT joinT bottomT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -924,9 +968,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
   base : Meet.class_of le lt meet;
-  mixin : Join.mixin_of le join;
+  mixin : Join.mixin_of (POrder.Pack _ base) join;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -936,11 +981,12 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   #[canonical=no] class_ : class_of le lt meet join;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Meet.class_of.
 Local Coercion base2 le lt meet join (c : class_of le lt meet join) :
-  Join.class_of le lt join := Join.Class c (mixin c).
+  Join.class_of le lt join := Join.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -960,8 +1006,8 @@ Definition pack :=
   fun (bord : Meet.order phT) (b : Meet.class_of leT ltT meetT)
       & phant_id (Meet.class bord) b =>
   fun (mord : Join.order phT) m
-      & phant_id (Join.class mord) (Join.Class b m) =>
-  @Pack phT leT ltT meetT joinT (Class b m).
+      & phant_id (Join.class mord) (Join.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT (Class (base := b) m).
 
 End ClassDef.
 
@@ -992,10 +1038,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom : T) :=
   Class {
   base : Lattice.class_of le lt meet join;
-  mixin : BPOrder.mixin_of le bottom;
+  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1006,15 +1053,16 @@ Structure order (phT : phant T) := Pack {
   bottom : T;
   #[canonical=no] class_ : class_of le lt meet join bottom;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Lattice.class_of.
 Local Coercion base2 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
-  BMeet.class_of le lt meet bottom := BMeet.Class (base c) (mixin c).
+  BMeet.class_of le lt meet bottom := BMeet.Class (mixin c).
 Local Coercion base3 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
-  BJoin.class_of le lt join bottom := BJoin.Class (base c) (mixin c).
+  BJoin.class_of le lt join bottom := BJoin.Class (base := c) (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1057,8 +1105,8 @@ Definition pack :=
   fun (bord : Lattice.order phT) (b : Lattice.class_of leT ltT meetT joinT)
       & phant_id (Lattice.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT bottomT (Class b m).
+      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT bottomT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1105,9 +1153,10 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (top : T) := Class {
   base : Lattice.class_of le lt meet join;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1118,13 +1167,14 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet join top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Lattice.class_of.
 Local Coercion base2 le lt meet join top (c : class_of le lt meet join top) :
-  TMeet.class_of le lt meet top := TMeet.Class (base c) (mixin c).
+  TMeet.class_of le lt meet top := TMeet.Class (mixin c).
 Local Coercion base3 le lt meet join top (c : class_of le lt meet join top) :
-  TJoin.class_of le lt join top := TJoin.Class (base c) (mixin c).
+  TJoin.class_of le lt join top := TJoin.Class (base := c) (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1166,8 +1216,8 @@ Definition pack :=
   fun (bord : Lattice.order phT) (b : Lattice.class_of leT ltT meetT joinT)
       & phant_id (Lattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1213,10 +1263,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom top : T) :=
   Class {
   base : BLattice.class_of le lt meet join bottom;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1228,18 +1279,19 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet join bottom top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> BLattice.class_of.
 Local Coercion base2 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TLattice.class_of le lt meet join top := TLattice.Class (base c) (mixin c).
+  TLattice.class_of le lt meet join top := TLattice.Class (mixin c).
 Local Coercion base3 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TBMeet.class_of le lt meet bottom top := TBMeet.Class (base c) (mixin c).
+  TBMeet.class_of le lt meet bottom top := TBMeet.Class (base := c) (mixin c).
 Local Coercion base4 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TBJoin.class_of le lt join bottom top := TBJoin.Class (base c) (mixin c).
+  TBJoin.class_of le lt join bottom top := TBJoin.Class (base := c) (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1282,8 +1334,8 @@ Definition pack :=
       (b : BLattice.class_of leT ltT meetT joinT bottomT)
       & phant_id (BLattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT bottomT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT bottomT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1340,14 +1392,15 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
-Record mixin_of (meet join : T -> T -> T) := Mixin {
-  meetUl : left_distributive meet join;
-  joinIl : left_distributive join meet;
+
+Record mixin_of (ord : {lattice T}) := Mixin {
+  meetUl : left_distributive (meet ord) (join ord);
+  joinIl : left_distributive (join ord) (meet ord);
 }.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
   base : Lattice.class_of le lt meet join;
-  mixin : mixin_of meet join;
+  mixin : mixin_of (Lattice.Pack _ base);
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1357,6 +1410,7 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   #[canonical=no] class_ : class_of le lt meet join;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Lattice.class_of.
@@ -1376,15 +1430,17 @@ Variable (leT ltT : rel T) (meetT joinT : T -> T -> T).
 
 Definition clone c of phant_id class c := @Pack phT leT ltT meetT joinT c.
 
-Definition pack (m0 : mixin_of meetT joinT) :=
-  fun (bord : Lattice.order phT) b & phant_id (Lattice.class bord) b =>
-  fun m & phant_id m0 m =>
-  @Pack phT leT ltT meetT joinT (@Class leT ltT meetT joinT b m).
+Definition pack (b0 : Lattice.class_of leT ltT meetT joinT)
+                (m0 : mixin_of (Lattice.Pack _ b0)) :=
+  fun (b : Lattice.class_of leT ltT meetT joinT) & phant_id b0 b =>
+  fun (m : mixin_of (Lattice.Pack _ b))          & phant_id m0 m =>
+  @Pack phT leT ltT meetT joinT (Class m).
 
 End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> Lattice.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Coercion meetOrder : order >-> Meet.order.
@@ -1396,7 +1452,7 @@ Canonical lattice.
 Notation "{ 'distrLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'distrLattice'  T }").
 Notation DistrLattice le lt meet join mixin :=
-  (@pack _ (Phant _) le lt meet join mixin _ _ id _ id).
+  (@pack _ (Phant _) le lt meet join _ mixin _ id _ id).
 Notation "[ 'distrLattice' 'of' le ]" :=
   (@clone _ (Phant _) _ le (nosimpl _) (nosimpl _) (nosimpl _) _ id)
   (at level 0, format "[ 'distrLattice'  'of'  le ]").
@@ -1412,10 +1468,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom : T) :=
   Class {
   base : DistrLattice.class_of le lt meet join;
-  mixin : BPOrder.mixin_of le bottom;
+  mixin : BPOrder.mixin_of (Lattice.Pack _ base) bottom;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1426,12 +1483,13 @@ Structure order (phT : phant T) := Pack {
   bottom : T;
   #[canonical=no] class_ : class_of le lt meet join bottom;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
-  BLattice.class_of le lt meet join bottom := BLattice.Class (base c) (mixin c).
+  BLattice.class_of le lt meet join bottom := BLattice.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1462,8 +1520,8 @@ Definition pack :=
       (b : DistrLattice.class_of leT ltT meetT joinT)
       & phant_id (DistrLattice.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT bottomT (Class b m).
+      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT bottomT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1506,10 +1564,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (top : T) :=
   Class {
   base : DistrLattice.class_of le lt meet join;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1520,11 +1579,12 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet join top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 le lt meet join top (c : class_of le lt meet join top) :
-  TLattice.class_of le lt meet join top := TLattice.Class (base c) (mixin c).
+  TLattice.class_of le lt meet join top := TLattice.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1553,8 +1613,8 @@ Definition pack :=
       (b : DistrLattice.class_of leT ltT meetT joinT)
       & phant_id (DistrLattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1597,10 +1657,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom top : T) :=
   Class {
   base : BDistrLattice.class_of le lt meet join bottom;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1612,17 +1673,18 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet join bottom top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> BDistrLattice.class_of.
 Local Coercion base2 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
   TDistrLattice.class_of le lt meet join top :=
-  TDistrLattice.Class (base c) (mixin c).
+  TDistrLattice.Class (mixin c).
 Local Coercion base3 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
   TBLattice.class_of le lt meet join bottom top :=
-  TBLattice.Class (base c) (mixin c).
+  TBLattice.Class (base := c) (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1675,8 +1737,8 @@ Definition pack :=
       (b : BDistrLattice.class_of leT ltT meetT joinT bottomT)
       & phant_id (BDistrLattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT bottomT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT bottomT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1739,10 +1801,15 @@ Section ClassDef.
 
 Variable T : eqType.
 
+Definition mixin_of (ord : {pOrder T}) := total (le ord).
+
+Definition le_total ord (m : mixin_of ord) : total (le ord) := m.
+
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
   base : DistrLattice.class_of le lt meet join;
-  mixin : total le;
+  mixin : mixin_of (POrder.Pack _ base);
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1752,6 +1819,7 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   #[canonical=no] class_ : class_of le lt meet join;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> DistrLattice.class_of.
@@ -1783,6 +1851,8 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> DistrLattice.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion le_total : mixin_of >-> total.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Coercion meetOrder : order >-> Meet.order.
@@ -1812,10 +1882,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom : T) :=
   Class {
   base : Total.class_of le lt meet join;
-  mixin : BPOrder.mixin_of le bottom;
+  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1826,13 +1897,14 @@ Structure order (phT : phant T) := Pack {
   bottom : T;
   #[canonical=no] class_ : class_of le lt meet join bottom;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Total.class_of.
 Local Coercion base2 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
   BDistrLattice.class_of le lt meet join bottom :=
-  BDistrLattice.Class (base c) (mixin c).
+  BDistrLattice.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1867,8 +1939,8 @@ Definition pack :=
   fun (bord : Total.order phT) (b : Total.class_of leT ltT meetT joinT)
       & phant_id (Total.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT bottomT (Class b m).
+      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT bottomT (Class (base := b) m).
 
 End ClassDef.
 
@@ -1915,10 +1987,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (top : T) :=
   Class {
   base : Total.class_of le lt meet join;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -1929,12 +2002,13 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet join top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Total.class_of.
 Local Coercion base2 le lt meet join top (c : class_of le lt meet join top) :
   TDistrLattice.class_of le lt meet join top :=
-  TDistrLattice.Class (base c) (mixin c).
+  TDistrLattice.Class (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1967,8 +2041,8 @@ Definition pack :=
   fun (bord : Total.order phT) (b : Total.class_of leT ltT meetT joinT)
       & phant_id (Total.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -2015,10 +2089,11 @@ Section ClassDef.
 Variable T : eqType.
 
 Set Primitive Projections.
+
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom top : T) :=
   Class {
   base : BTotal.class_of le lt meet join bottom;
-  mixin : TPOrder.mixin_of le top;
+  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
 }.
 
 Structure order (phT : phant T) := Pack {
@@ -2030,16 +2105,17 @@ Structure order (phT : phant T) := Pack {
   top : T;
   #[canonical=no] class_ : class_of le lt meet join bottom top;
 }.
+
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> BTotal.class_of.
 Local Coercion base2 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TTotal.class_of le lt meet join top := TTotal.Class (base c) (mixin c).
+  TTotal.class_of le lt meet join top := TTotal.Class (mixin c).
 Local Coercion base3 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
   TBDistrLattice.class_of le lt meet join bottom top :=
-  TBDistrLattice.Class (base c) (mixin c).
+  TBDistrLattice.Class (base := c) (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -2101,8 +2177,8 @@ Definition pack :=
       (b : BTotal.class_of leT ltT meetT joinT bottomT)
       & phant_id (BTotal.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
-  @Pack phT leT ltT meetT joinT bottomT topT (Class b m).
+      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
+  @Pack phT leT ltT meetT joinT bottomT topT (Class (base := b) m).
 
 End ClassDef.
 
@@ -2195,32 +2271,6 @@ Definition lteif x y C := if C then x <= y else x < y.
 Definition min x y := if x < y then x else y.
 Definition max x y := if x < y then y else x.
 
-Variant le_xor_gt x y : T -> T -> T -> T -> bool -> bool -> Set :=
-  | LeNotGt of x <= y : le_xor_gt x y x x y y true false
-  | GtNotLe of y < x  : le_xor_gt x y y y x x false true.
-
-Variant lt_xor_ge x y : T -> T -> T -> T -> bool -> bool -> Set :=
-  | LtNotGe of x < y  : lt_xor_ge x y x x y y false true
-  | GeNotLt of y <= x : lt_xor_ge x y y y x x true false.
-
-Variant compare x y :
-  T -> T -> T -> T -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareLt of x < y : compare x y x x y y false false false true false true
-  | CompareGt of y < x : compare x y y y x x false false true false true false
-  | CompareEq of x = y : compare x y x x x x true true true true false false.
-
-Variant incompare x y :
-  T -> T -> T -> T ->
-  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | InCompareLt of x < y :
-    incompare x y x x y y false false false true false true true true
-  | InCompareGt of y < x :
-    incompare x y y y x x false false true false true false true true
-  | InCompare of x >< y  :
-    incompare x y x y y x false false false false false false false false
-  | InCompareEq of x = y :
-    incompare x y x x x x true true true true false false true true.
-
 Definition arg_min {I : finType} := @extremum T I le.
 Definition arg_max {I : finType} := @extremum T I ge.
 
@@ -2237,40 +2287,71 @@ Local Notation "x >< y" := (~~ (comparable ord x y)).
 Local Notation "x `&` y" := (meet ord x y).
 Local Notation "x `|` y" := (join ord x y).
 
-Variant lel_xor_gt x y :
-  T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
-  | LelNotGt of x <= y : lel_xor_gt x y x x y y x x y y true false
-  | GtlNotLe of y < x  : lel_xor_gt x y y y x x y y x x false true.
-
-Variant ltl_xor_ge x y :
-  T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
-  | LtlNotGe of x < y  : ltl_xor_ge x y x x y y x x y y false true
-  | GelNotLt of y <= x : ltl_xor_ge x y y y x x y y x x true false.
-
-Variant comparel x y :
-   T -> T -> T -> T -> T -> T -> T -> T ->
-   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | ComparelLt of x < y : comparel x y
-    x x y y x x y y false false false true false true
-  | ComparelGt of y < x : comparel x y
-    y y x x y y x x false false true false true false
-  | ComparelEq of x = y : comparel x y
-    x x x x x x x x true true true true false false.
-
-Variant incomparel x y :
-  T -> T -> T -> T -> T -> T -> T -> T ->
-  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | InComparelLt of x < y : incomparel x y
-    x x y y x x y y false false false true false true true true
-  | InComparelGt of y < x : incomparel x y
-    y y x x y y x x false false true false true false true true
-  | InComparel of x >< y  : incomparel x y
-    x y y x (y `&` x) (x `&` y) (y `|` x) (x `|` y)
-    false false false false false false false false
-  | InComparelEq of x = y : incomparel x y
-    x x x x x x x x true true true true false false true true.
-
 End LatticeDef.
+
+Variant le_xor_gt T (le lt : rel T) x y :
+    T -> T -> T -> T -> bool -> bool -> Set :=
+  | LeNotGt of le x y : le_xor_gt le lt x y x x y y true false
+  | GtNotLe of lt y x : le_xor_gt le lt x y y y x x false true.
+
+Variant lt_xor_ge T (le lt : rel T) x y :
+    T -> T -> T -> T -> bool -> bool -> Set :=
+  | LtNotGe of lt x y : lt_xor_ge le lt x y x x y y false true
+  | GeNotLt of le y x : lt_xor_ge le lt x y y y x x true false.
+
+Variant compare T (lt : rel T) x y :
+    T -> T -> T -> T -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | CompareLt of lt x y :
+    compare lt x y x x y y false false false true false true
+  | CompareGt of lt y x :
+    compare lt x y y y x x false false true false true false
+  | CompareEq of x = y :
+    compare lt x y x x x x true true true true false false.
+
+Variant incompare T (lt comp : rel T) x y :
+    T -> T -> T -> T ->
+    bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | InCompareLt of lt x y      : incompare lt comp x y
+    x x y y false false false true false true true true
+  | InCompareGt of lt y x      : incompare lt comp x y
+    y y x x false false true false true false true true
+  | InCompare   of ~~ comp x y : incompare lt comp x y
+    x y y x false false false false false false false false
+  | InCompareEq of x = y       : incompare lt comp x y
+    x x x x true true true true false false true true.
+
+Variant lel_xor_gt T (le lt : rel T) x y :
+    T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
+  | LelNotGt of le x y : lel_xor_gt le lt x y x x y y x x y y true false
+  | GtlNotLe of lt y x : lel_xor_gt le lt x y y y x x y y x x false true.
+
+Variant ltl_xor_ge T (le lt : rel T) x y :
+    T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
+  | LtlNotGe of lt x y : ltl_xor_ge le lt x y x x y y x x y y false true
+  | GelNotLt of le y x : ltl_xor_ge le lt x y y y x x y y x x true false.
+
+Variant comparel T (lt : rel T) x y :
+    T -> T -> T -> T -> T -> T -> T -> T ->
+    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | ComparelLt of lt x y :
+    comparel lt x y x x y y x x y y false false false true false true
+  | ComparelGt of lt y x :
+    comparel lt x y y y x x y y x x false false true false true false
+  | ComparelEq of x = y :
+    comparel lt x y x x x x x x x x true true true true false false.
+
+Variant incomparel T (lt comp : rel T) (meet join : T -> T -> T) x y :
+    T -> T -> T -> T -> T -> T -> T -> T ->
+    bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | InComparelLt of lt x y      : incomparel lt comp meet join x y
+    x x y y x x y y false false false true false true true true
+  | InComparelGt of lt y x      : incomparel lt comp meet join x y
+    y y x x y y x x false false true false true false true true
+  | InComparel   of ~~ comp x y : incomparel lt comp meet join x y
+    x y y x (meet y x) (meet x y) (join y x) (join x y)
+    false false false false false false false false
+  | InComparelEq of x = y       : incomparel lt comp meet join x y
+    x x x x x x x x true true true true false false true true.
 
 (* TODO: Reserved Notation *)
 
@@ -2329,11 +2410,13 @@ Canonical dual_pOrder (ord : {pOrder T}) :=
 
 Canonical dual_bPOrder (ord : {tPOrder T}) :=
   BPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_bottom (top ord))
-          (TPOrder.mixin (TPOrder.class ord)).
+          (TPOrder.mixin (TPOrder.class ord) :
+             BPOrder.mixin_of (dual_pOrder ord) _).
 
 Canonical dual_tPOrder (ord : {bPOrder T}) :=
   TPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_top (bottom ord))
-          (BPOrder.mixin (BPOrder.class ord)).
+          (BPOrder.mixin (BPOrder.class ord) :
+             TPOrder.mixin_of (dual_pOrder ord) _).
 
 (* BUG, TODO: can we design better packagers to infer head symbols of         *)
 (* operators from existing instances, or should operators other than [le] be  *)
@@ -2355,8 +2438,8 @@ Canonical dual_tbMeetOrder (ord : {tbJoinOrder T}) :=
   [tbMeetOrder of dual_rel <=:ord].
 
 Canonical dual_joinOrder (ord : {meetOrder T}) :=
-  JoinOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_meet (meet ord))
-            (Meet.mixin (Meet.class ord)).
+  JoinOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_join (meet ord))
+            (Meet.mixin (Meet.class ord) : Join.mixin_of (dual_pOrder ord) _).
 
 Canonical dual_bJoinOrder (ord : {tMeetOrder T}) :=
   [bJoinOrder of dual_rel <=:ord].
@@ -2381,7 +2464,7 @@ Canonical dual_distrLattice (ord : {distrLattice T}) :=
     (dual_rel <=:ord) (dual_rel <:ord)
     (dual_meet (join ord)) (dual_join (meet ord))
     (let mixin := DistrLattice.mixin (DistrLattice.class ord) in
-     DistrLattice.Mixin
+     @DistrLattice.Mixin _ (dual_lattice ord)
        (DistrLattice.joinIl mixin) (DistrLattice.meetUl mixin)).
 
 Canonical dual_bDistrLattice (ord : {tDistrLattice T}) :=
@@ -2424,14 +2507,15 @@ Local Notation le := (le ord).
 Local Notation lt := (lt ord).
 Local Notation ge := (ge ord).
 Local Notation gt := (gt ord).
+Local Notation comparable := (comparable ord).
 Local Notation leif := (leif ord).
 Local Notation lteif := (lteif ord).
 Local Notation min := (min ord).
 Local Notation max := (max ord).
-Local Notation le_xor_gt := (le_xor_gt ord).
-Local Notation lt_xor_ge := (lt_xor_ge ord).
-Local Notation compare := (compare ord).
-Local Notation incompare := (incompare ord).
+Local Notation le_xor_gt := (le_xor_gt le lt).
+Local Notation lt_xor_ge := (lt_xor_ge le lt).
+Local Notation compare := (compare lt).
+Local Notation incompare := (incompare lt comparable).
 Local Notation arg_min := (arg_min ord).
 Local Notation arg_max := (arg_max ord).
 
@@ -2444,7 +2528,7 @@ Local Notation "x < y < z"   := ((x < y) && (y < z)).
 Local Notation "x < y <= z"  := ((x < y) && (y <= z)).
 Local Notation "x <= y < z"  := ((x <= y) && (y < z)).
 
-Local Notation ">=<%O" := (comparable ord).
+Local Notation ">=<%O" := comparable.
 Local Notation ">=< y" := (>=<_ord y).
 Local Notation "x >=< y" := (x >=<_ord y).
 Local Notation "x >< y" := (x ><_ord y).
@@ -2550,11 +2634,8 @@ Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
 Lemma lt_sorted_uniq_le s : sorted lt s = uniq s && sorted le s.
 Proof.
-case: s => //= n s; elim: s n => //= m s IHs n.
-rewrite inE lt_neqAle negb_or IHs -!andbA.
-case sn: (n \in s); last do !bool_congr.
-rewrite andbF; apply/and5P=> [[ne_nm lenm _ _ le_ms]]; case/negP: ne_nm.
-by rewrite eq_le lenm /=; apply: (allP (order_path_min le_trans le_ms)).
+rewrite (sorted_pairwise le_trans) (sorted_pairwise lt_trans) uniq_pairwise.
+by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite lt_neqAle.
 Qed.
 
 Lemma lt_sorted_eq s1 s2 : sorted lt s1 -> sorted lt s2 -> s1 =i s2 -> s1 = s2.
@@ -2566,6 +2647,107 @@ Proof. exact/sorted_eq/le_anti/le_trans. Qed.
 
 Lemma sort_le_id s : sorted le s -> sort le s = s.
 Proof. exact/sorted_sort/le_trans. Qed.
+
+Lemma le_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <=:ord s ->
+ {in [pred n | (n < size s)%N] &,
+    {homo nth x0 s : i j / (i < j)%N >-> i <= j}}.
+Proof. exact/sorted_ltn_nth/le_trans. Qed.
+
+Lemma le_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=:ord s ->
+  {in [pred n | (n < size s)%N] &,
+    {homo nth x0 s : i j / (i <= j)%N >-> i <= j}}.
+Proof. exact: (sorted_leq_nth le_trans le_refl). Qed.
+
+Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <:ord s ->
+  {in [pred n | (n < size s)%N] &,
+    {mono nth x0 s : i j / (i <= j)%N >-> i <= j}}.
+Proof.
+rewrite lt_sorted_uniq_le => /andP[s_uniq le_s].
+apply: (total_homo_mono_in _ _ ltn_neqAle lt_neqAle le_anti leq_total) => //.
+move=> i j ilt jlt ltij; rewrite lt_neqAle le_sorted_leq_nth// 1?ltnW//.
+by rewrite nth_uniq// ltn_eqF.
+Qed.
+
+Lemma lt_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <:ord s ->
+  {in [pred n | (n < size s)%N] &,
+    {mono nth x0 s : i j / (i < j)%N >-> i < j}}.
+Proof.
+move=> ss; have := lt_sorted_leq_nth x0 ss.
+exact: (anti_mono_in _ ltn_neqAle lt_neqAle anti_leq).
+Qed.
+
+Lemma filter_lt_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+  [seq x <- s | x < nth x0 s i] = take i s.
+Proof.
+move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
+under eq_in_filter => j do
+  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_ltn_nth//].
+by rewrite (filter_iota_ltn 0) ?map_nth_iota0 // ltnW.
+Qed.
+
+Lemma count_lt_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+  count (fun y => y < nth x0 s i) s = i.
+Proof.
+by move=> ss i_lt; rewrite -size_filter/= filter_lt_nth// size_take i_lt.
+Qed.
+
+Lemma filter_le_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+  [seq x <- s | x <= nth x0 s i] = take i.+1 s.
+Proof.
+move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
+under eq_in_filter => j do
+  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_leq_nth//].
+by rewrite (filter_iota_leq 0)// map_nth_iota0.
+Qed.
+
+Lemma count_le_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+  count (le^~ (nth x0 s i)) s = i.+1.
+Proof.
+by move=> ss i_lt; rewrite -size_filter/= filter_le_nth// size_takel.
+Qed.
+
+Lemma count_lt_le_mem x s : (count (lt^~ x) s < count (le^~ x) s)%N = (x \in s).
+Proof.
+have := count_predUI (pred1 x) (lt^~ x) s.
+have -> : count (predI (pred1 x) (lt^~ x)) s = 0%N.
+  rewrite (@eq_count _ _ pred0) ?count_pred0 // => y /=.
+  by rewrite lt_def; case: eqP => //= ->; rewrite eqxx.
+have /eq_count->: predU (pred1 x) (lt^~ x) =1 le^~ x.
+  by move=> y /=; rewrite le_eqVlt.
+by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
+Qed.
+
+Lemma sorted_filter_lt x s :
+  sorted <=:ord s -> [seq y <- s | y < x] = take (count (lt^~ x) s) s.
+Proof.
+elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
+case: ifP => [|ltyxF]; rewrite IHs//.
+rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
+by move=> /(allP le_y_s) yz; apply: contraFF ltyxF; apply: le_lt_trans.
+Qed.
+
+Lemma sorted_filter_le x s :
+  sorted <=:ord s -> [seq y <- s | y <= x] = take (count (le^~ x) s) s.
+Proof.
+elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
+case: ifP => [|leyxF]; rewrite IHs//.
+rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
+by move=> /(allP le_y_s) yz; apply: contraFF leyxF; apply: le_trans.
+Qed.
+
+Lemma nth_count_le x x0 s i : sorted <=:ord s ->
+  (i < count (le^~ x) s)%N -> nth x0 s i <= x.
+Proof.
+move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_le //.
+by apply/(all_nthP _ (filter_all (le^~ x) _)); rewrite size_filter.
+Qed.
+
+Lemma nth_count_lt x x0 s i : sorted <=:ord s ->
+  (i < count (lt^~ x) s)%N -> nth x0 s i < x.
+Proof.
+move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_lt //.
+by apply/(all_nthP _ (filter_all (lt^~ x) _)); rewrite size_filter.
+Qed.
 
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
 Proof.
@@ -2999,12 +3181,12 @@ Section ArgExtremum.
 Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 Hypothesis F_comparable : {in P &, forall i j, F i >=< F j}.
 
-Lemma comparable_arg_minP: extremum_spec le P F (arg_min i0 P F).
+Lemma comparable_arg_minP : extremum_spec le P F (arg_min i0 P F).
 Proof.
 by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: lexx|apply: le_trans].
 Qed.
 
-Lemma comparable_arg_maxP: extremum_spec ge P F (arg_max i0 P F).
+Lemma comparable_arg_maxP : extremum_spec ge P F (arg_max i0 P F).
 Proof.
 apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: lexx|exact: ge_trans|].
 by move=> x y xP yP; rewrite orbC [_ || _]F_comparable.
@@ -3243,8 +3425,8 @@ End POrderMonotonyTheory.
 
 End POrderTheory.
 
-Hint Extern 0 (is_true (le _ _ _)) => apply: lexx : core.
-Hint Resolve lexx ltxx lt_irreflexive ltW lt_eqF : core.
+#[global] Hint Extern 0 (is_true (le _ _ _)) => apply: lexx : core.
+#[global] Hint Resolve lexx ltxx lt_irreflexive ltW lt_eqF : core.
 
 Arguments leifP {T ord x y C}.
 Arguments leif_refl {T ord x C}.
@@ -3305,8 +3487,8 @@ Lemma ltx1 x : (x < 1) = (x != 1). Proof. exact: (@lt0x _ ord_dual). Qed.
 End TPOrderTheory.
 End TPOrderTheory.
 
-Hint Extern 0 (is_true (le _ (bottom _) _)) => apply: le0x : core.
-Hint Extern 0 (is_true (le _ _ (top _))) => apply: lex1 : core.
+#[global] Hint Extern 0 (is_true (le _ (bottom _) _)) => apply: le0x : core.
+#[global] Hint Extern 0 (is_true (le _ _ (top _))) => apply: lex1 : core.
 
 Module Import MeetTheory.
 Section MeetTheory.
@@ -3428,51 +3610,53 @@ Proof. by rewrite !(@eq_le _ ord) !lex1 lexI. Qed.
 Canonical meet_monoid := Monoid.Law meetA meet1x meetx1.
 Canonical meet_comoid := Monoid.ComLaw meetC.
 
-Lemma meet_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \big[meet/1]_(i <- r | P i) F i <= F x.
 Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leIl. Qed.
 
-Lemma meet_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
+Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \big[meet/1]_(x <- r | P x) F x <= u.
-Proof. by move=> ? ?; apply/le_trans/meet_inf_seq. Qed.
+Proof. by move=> ? ?; apply/le_trans/meets_inf_seq. Qed.
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
-  P j -> \big[meet/1]_(i | P i) F i <= F j.
-Proof. exact/meet_inf_seq/mem_index_enum. Qed.
+   P j -> \big[meet/1]_(i | P i) F i <= F j.
+Proof. exact: meets_inf_seq. Qed.
 
 Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
-  P j -> F j <= u -> \big[meet/1]_(i | P i) F i <= u.
-Proof. exact/meet_max_seq/mem_index_enum. Qed.
+   P j -> F j <= u -> \big[meet/1]_(i | P i) F i <= u.
+Proof. exact: meets_max_seq. Qed.
+
+Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> u <= F x) -> u <= \big[meet/1]_(x <- r | P x) F x.
+Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite lexI leFm. Qed.
 
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \big[meet/1]_(x <- r | P x) F x).
 Proof.
 apply: (iffP idP) => leFm => [x xr Px|].
-  exact/(le_trans leFm)/meet_inf_seq.
-rewrite big_seq_cond; elim/big_rec: _ => //= i x /andP[ir Pi] lx.
-by rewrite lexI lx leFm.
+  exact/(le_trans leFm)/meets_inf_seq.
+by rewrite big_seq_cond meets_ge // => x /andP[/leFm].
 Qed.
 
 Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
-  reflect (forall i : I, P i -> l <= F i) (l <= \big[meet/1]_(i | P i) F i).
+   reflect (forall i : I, P i -> l <= F i) (l <= \big[meet/1]_(i | P i) F i).
 Proof. by apply: (iffP (meetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
 
 Lemma le_meets I (A B : {set I}) (F : I -> L) :
-  A \subset B -> \big[meet/1]_(i in B) F i <= \big[meet/1]_(i in A) F i.
+   A \subset B -> \big[meet/1]_(i in B) F i <= \big[meet/1]_(i in A) F i.
 Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
 
 Lemma meets_setU I (A B : {set I}) (F : I -> L) :
   \big[meet/1]_(i in (A :|: B)) F i =
   \big[meet/1]_(i in A) F i `&` \big[meet/1]_(i in B) F i.
 Proof.
-
 rewrite -!big_enum; have /= <- := @big_cat _ _ meet_comoid.
 apply/eq_big_idem; first exact: meetxx.
 by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
 
-Lemma meet_seq I (r : seq I) (F : I -> L) :
+Lemma meets_seq I (r : seq I) (F : I -> L) :
   \big[meet/1]_(i <- r) F i = \big[meet/1]_(i in r) F i.
 Proof.
 by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
@@ -3573,21 +3757,25 @@ Proof. exact: (@meet_eq1 _ ord_dual). Qed.
 Canonical join_monoid := Monoid.Law joinA join0x joinx0.
 Canonical join_comoid := Monoid.ComLaw joinC.
 
-Lemma join_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \big[join/0]_(i <- r | P i) F i.
-Proof. exact: (@meet_inf_seq _ ord_dual). Qed.
+Proof. exact: (@meets_inf_seq _ ord_dual). Qed.
 
-Lemma join_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
+Lemma joins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
   x \in r -> P x -> l <= F x -> l <= \big[join/0]_(x <- r | P x) F x.
-Proof. exact: (@meet_max_seq _ ord_dual). Qed.
+Proof. exact: (@meets_max_seq _ ord_dual). Qed.
 
-Lemma join_sup I (j : I) (P : {pred I}) (F : I -> L) :
+Lemma joins_sup I (j : I) (P : {pred I}) (F : I -> L) :
   P j -> F j <= \big[join/0]_(i | P i) F i.
 Proof. exact: (@meets_inf _ ord_dual). Qed.
 
-Lemma join_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
+Lemma joins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
   P j -> l <= F j -> l <= \big[join/0]_(i | P i) F i.
 Proof. exact: (@meets_max _ ord_dual). Qed.
+
+Lemma joins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> F x <= u) -> \big[join/0]_(x <- r | P x) F x <= u.
+Proof. exact: (@meets_ge _ ord_dual). Qed.
 
 Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
   reflect (forall x : T, x \in r -> P x -> F x <= u)
@@ -3607,9 +3795,9 @@ Lemma joins_setU I (A B : {set I}) (F : I -> L) :
   \big[join/0]_(i in A) F i `|` \big[join/0]_(i in B) F i.
 Proof. exact: (@meets_setU _ ord_dual). Qed.
 
-Lemma join_seq I (r : seq I) (F : I -> L) :
+Lemma joins_seq I (r : seq I) (F : I -> L) :
   \big[join/0]_(i <- r) F i = \big[join/0]_(i in r) F i.
-Proof. exact: (@meet_seq _ ord_dual). Qed.
+Proof. exact: (@meets_seq _ ord_dual). Qed.
 
 End BJoinTheory.
 End BJoinTheory.
@@ -3635,20 +3823,25 @@ Section LatticeTheory.
 Context {L : eqType} {ord : {lattice L}}.
 Implicit Types (x y : L).
 
+Local Notation le := (le ord).
+Local Notation lt := (lt ord).
+Local Notation comparable := (comparable ord).
 Local Notation min := (min ord).
 Local Notation max := (max ord).
-Local Notation lel_xor_gt := (lel_xor_gt ord).
-Local Notation ltl_xor_ge := (ltl_xor_ge ord).
-Local Notation comparel := (comparel ord).
-Local Notation incomparel := (incomparel ord).
+Local Notation meet := (meet ord).
+Local Notation join := (join ord).
+Local Notation lel_xor_gt := (lel_xor_gt le lt).
+Local Notation ltl_xor_ge := (ltl_xor_ge le lt).
+Local Notation comparel := (comparel lt).
+Local Notation incomparel := (incomparel lt comparable meet join).
 
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x < y" := (x <_ord y).
 Local Notation "x >= y" := (x >=_ord y) (only parsing).
 Local Notation "x > y" := (x >_ord y) (only parsing).
-Local Notation "x >=< y" := (comparable ord x y).
-Local Notation "x `&` y" := (meet ord x y).
-Local Notation "x `|` y" := (join ord x y).
+Local Notation "x >=< y" := (comparable x y).
+Local Notation "x `&` y" := (meet x y).
+Local Notation "x `|` y" := (join x y).
 
 Lemma meetUK x y : (x `&` y) `|` y = y.
 Proof. by apply/eqP; rewrite eq_joinr -eq_meetl meetIK. Qed.
@@ -3847,13 +4040,6 @@ Hint Resolve ge_total : core.
 Lemma comparableT x y : x >=< y. Proof. exact: le_total. Qed.
 Hint Resolve comparableT : core.
 
-Lemma sort_le_sorted s : sorted le (sort le s).
-Proof. exact: sort_sorted. Qed.
-Hint Resolve sort_le_sorted : core.
-
-Lemma sort_lt_sorted s : sorted lt (sort le s) = uniq s.
-Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
-
 Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 
 Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
@@ -3892,6 +4078,68 @@ Proof. by rewrite !leNgt => ? /contraTT ?; apply/idP/idP. Qed.
 Lemma eq_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
 Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
+
+Lemma sort_le_sorted s : sorted le (sort le s).
+Proof. exact: sort_sorted. Qed.
+Hint Resolve sort_le_sorted : core.
+
+Lemma sort_lt_sorted s : sorted lt (sort le s) = uniq s.
+Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
+
+Lemma count_le_gt x s :
+  count (fun y => y <= x) s = size s - count (fun y => y > x) s.
+Proof.
+rewrite -(count_predC (fun y => y > x)) addKn.
+by apply: eq_count => y; rewrite /= leNgt.
+Qed.
+
+Lemma count_lt_ge x s :
+  count (fun y => y < x) s = size s - count (fun y => y >= x) s.
+Proof.
+rewrite -(count_predC (fun y => y >= x)) addKn.
+by apply: eq_count => y; rewrite /= ltNge.
+Qed.
+
+Lemma sorted_filter_gt x s :
+  sorted <=:ord s -> [seq y <- s | x < y] = drop (count (le^~ x) s) s.
+Proof.
+move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
+rewrite (@sorted_filter_lt _ [totalOrder of dual_rel <=:ord]).
+  by rewrite take_rev revK count_rev.
+by rewrite rev_sorted.
+Qed.
+
+Lemma sorted_filter_ge x s :
+  sorted <=:ord s -> [seq y <- s | x <= y] = drop (count (lt^~ x) s) s.
+Proof.
+move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
+rewrite (@sorted_filter_le _ [totalOrder of dual_rel <=:ord]).
+  by rewrite take_rev revK count_rev.
+by rewrite rev_sorted.
+Qed.
+
+Lemma nth_count_ge x x0 s i : sorted <=:ord s ->
+  (count (lt^~ x) s <= i < size s)%N -> x <= nth x0 s i.
+Proof.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_ge //.
+apply/(all_nthP _ (filter_all _ _)).
+by rewrite size_filter ltn_subLR // count_lt_ge subnK // count_size.
+Qed.
+
+Lemma nth_count_gt x x0 s i : sorted <=:ord s ->
+  (count (le^~ x) s <= i < size s)%N -> x < nth x0 s i.
+Proof.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_gt //.
+apply/(all_nthP _ (filter_all _ _)).
+by rewrite size_filter ltn_subLR // count_le_gt subnK // count_size.
+Qed.
+
+Lemma nth_count_eq x x0 s i : sorted <=:ord s ->
+  (count (lt^~ x) s <= i < count (le^~ x) s)%N -> nth x0 s i = x.
+Proof.
+move=> ss /andP[ige ilt]; apply/(@le_anti _ ord).
+by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
+Qed.
 
 (* max and min is join and meet *)
 
@@ -4044,10 +4292,10 @@ End ArgExtremum.
 
 End TotalTheory.
 
-Hint Resolve le_total : core.
-Hint Resolve ge_total : core.
-Hint Resolve comparableT : core.
-Hint Resolve sort_le_sorted : core.
+#[global] Hint Resolve le_total : core.
+#[global] Hint Resolve ge_total : core.
+#[global] Hint Resolve comparableT : core.
+#[global] Hint Resolve sort_le_sorted : core.
 
 Arguments min_idPr {T ord x y}.
 Arguments max_idPl {T ord x y}.
@@ -4056,7 +4304,7 @@ Arguments max_idPl {T ord x y}.
 
 Section ContraTheory.
 
-Context {T1 T2 : eqType} {ord1 : {totalOrder T1}} {ord2 : {totalOrder T2}}.
+Context {T1 T2 : eqType} {ord1 : {pOrder T1}} {ord2 : {totalOrder T2}}.
 Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
 
 Local Notation "x <= y" := (x <=_ord2 y).
@@ -4120,9 +4368,8 @@ End ContraTheory.
 
 Section TotalMonotonyTheory.
 
-Context {T T' : eqType} {ord : {totalOrder T}} {ord' : {totalOrder T'}}.
+Context {T T' : eqType} {ord : {totalOrder T}} {ord' : {pOrder T'}}.
 Variables (D : {pred T}) (f : T -> T').
-Implicit Types (x y z : T) (u v w : T').
 
 Let leT'_anti   := @le_anti _ ord'.
 Let ltT_neqAle  := @lt_neqAle _ ord.
@@ -4155,9 +4402,12 @@ End TotalTheory.
 
 Module LePOrderMixin.
 Section LePOrderMixin.
-Variable (T : eqType) (le lt : rel T).
+(* TODO: use a phantom type to get rid of an explicit eqType. *)
+Variable (T : eqType).
 
 Record of_ := Build {
+  le       : rel T;
+  lt       : rel T;
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
   lexx     : reflexive     le;
   le_anti  : antisymmetric le;
@@ -4166,14 +4416,14 @@ Record of_ := Build {
 
 Variable (m : of_).
 
-Lemma lt_def' (x y : T) : lt y x = (y != x) && le y x.
+Lemma lt_def' (x y : T) : lt m y x = (y != x) && le m y x.
 Proof. by rewrite (lt_def m) eq_sym. Qed.
 
-Lemma le_anti' x y : le x y -> le y x -> x = y.
-Proof. by move=> ? ?; apply/le_anti/andP. Qed.
+Lemma le_anti' x y : le m x y -> le m y x -> x = y.
+Proof. by move=> xy yx; apply/(@le_anti m)/andP. Qed.
 
 Definition porderMixin :=
-  POrder.Mixin (lt_def m) lt_def' (lexx m) le_anti' (le_trans m).
+  POrder.Mixin (lt_def m) lt_def' (lexx m) le_anti' (@le_trans m).
 
 End LePOrderMixin.
 
@@ -4186,8 +4436,102 @@ End Exports.
 End LePOrderMixin.
 Import LePOrderMixin.Exports.
 
-Module DistrLatticeMixin.
-Section DistrLatticeMixin.
+Module BottomRelMixin.
+Section BottomRelMixin.
+Variable (T : eqType) (ord : {pOrder T}).
+
+Record of_ := Build {
+  bottom : T;
+  le0x : forall x, bottom <=_ord x;
+}.
+
+Definition bPOrderMixin (m : of_) : BPOrder.mixin_of ord (bottom m) := le0x m.
+
+End BottomRelMixin.
+
+Module Exports.
+Notation bottomRelMixin := of_.
+Notation BottomRelMixin := Build.
+Coercion bPOrderMixin : of_ >-> BPOrder.mixin_of.
+End Exports.
+
+End BottomRelMixin.
+Import BottomRelMixin.Exports.
+
+Module TopRelMixin.
+Section TopRelMixin.
+Variable (T : eqType) (ord : {pOrder T}).
+
+Record of_ := Build {
+  top : T;
+  lex1 : forall x, x <=_ord top;
+}.
+
+Definition tPOrderMixin (m : of_) : TPOrder.mixin_of ord (top m) := lex1 m.
+
+End TopRelMixin.
+
+Module Exports.
+Notation topRelMixin := of_.
+Notation TopRelMixin := Build.
+Coercion tPOrderMixin : of_ >-> TPOrder.mixin_of.
+End Exports.
+
+End TopRelMixin.
+Import TopRelMixin.Exports.
+
+Module MeetRelMixin.
+Section MeetRelMixin.
+Variable (T : eqType) (ord : {pOrder T}).
+
+Record of_ := Build {
+  meet : T -> T -> T;
+  meetC   : commutative meet;
+  meetA   : associative meet;
+  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+}.
+
+Definition meetMixin (m : of_) : Meet.mixin_of ord (meet m) :=
+  Meet.Mixin (meetC m) (meetA m) (leEmeet m).
+
+End MeetRelMixin.
+
+Module Exports.
+Notation meetRelMixin := of_.
+Notation MeetRelMixin := Build.
+Coercion meetMixin : of_ >-> Meet.mixin_of.
+End Exports.
+
+End MeetRelMixin.
+Import MeetRelMixin.Exports.
+
+Module JoinRelMixin.
+Section JoinRelMixin.
+Variable (T : eqType) (ord : {pOrder T}).
+
+Record of_ := Build {
+  join : T -> T -> T;
+  joinC   : commutative join;
+  joinA   : associative join;
+  leEjoin : forall x y, (y <=_ord x) = (join x y == x);
+}.
+
+Definition joinMixin (m : of_) : Join.mixin_of ord (join m) :=
+  @Meet.Mixin _ (dual_pOrder ord) _ (joinC m) (joinA m) (leEjoin m).
+
+End JoinRelMixin.
+
+Module Exports.
+Notation joinRelMixin := of_.
+Notation JoinRelMixin := Build.
+Coercion joinMixin : of_ >-> Join.mixin_of.
+End Exports.
+
+End JoinRelMixin.
+Import JoinRelMixin.Exports.
+
+Module DistrLatticeRelMixin.
+Section DistrLatticeRelMixin.
 Variable (T : eqType) (ord : {lattice T}).
 
 Record of_ := Build { meetUl : left_distributive (meet ord) (join ord) }.
@@ -4202,22 +4546,24 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl // -joinA meetUKC. Qed.
 
 Definition distrLatticeMixin := DistrLattice.Mixin (meetUl m) joinIl.
 
-End DistrLatticeMixin.
+End DistrLatticeRelMixin.
 
 Module Exports.
+Notation distrLatticeRelMixin := of_.
+Notation DistrLatticeRelMixin := Build.
 Coercion distrLatticeMixin : of_ >-> DistrLattice.mixin_of.
-Notation distrLatticeMixin := of_.
-Notation DistrLatticeMixin := Build.
 End Exports.
 
-End DistrLatticeMixin.
-Import DistrLatticeMixin.Exports.
+End DistrLatticeRelMixin.
+Import DistrLatticeRelMixin.Exports.
 
-Module LatticePOrderMixin.
-Section LatticePOrderMixin.
-Variable (T : eqType) (ord : {pOrder T}) (meet join : T -> T -> T).
+Module LatticePOrderRelMixin.
+Section LatticePOrderRelMixin.
+Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
+  meet : T -> T -> T;
+  join : T -> T -> T;
   meetC : commutative meet;
   joinC : commutative join;
   meetA : associative meet;
@@ -4229,37 +4575,38 @@ Record of_ := Build {
 
 Variable (m : of_).
 
-Definition meetMixin := Meet.Mixin (meetC m) (meetA m) (leEmeet m).
+Definition meetMixin := MeetRelMixin (meetC m) (meetA m) (leEmeet m).
 
-Lemma leEjoin x y : (y <=_ord x) = (join x y == x).
+Lemma leEjoin x y : (y <=_ord x) = (join m x y == x).
 Proof.
 rewrite (leEmeet m); apply/eqP/eqP => <-.
   by rewrite meetC // meetKU.
 by rewrite joinC // joinKI.
 Qed.
 
-Definition joinMixin : Join.mixin_of <=:ord join :=
-  Meet.Mixin (joinC m) (joinA m) leEjoin.
+Definition joinMixin := JoinRelMixin (joinC m) (joinA m) leEjoin.
 
-End LatticePOrderMixin.
+End LatticePOrderRelMixin.
 
 Module Exports.
-Notation latticePOrderMixin := of_.
-Notation LatticePOrderMixin := Build.
-Coercion meetMixin : of_ >-> Meet.mixin_of.
-Coercion joinMixin : of_ >-> Join.mixin_of.
-Definition LatticeOfPOrder T ord meet join (m : @of_ T ord meet join) :
-  {lattice T} := [lattice of <=:(JoinOrder <=:(MeetOrder _ _ _ m) _ _ m)].
+Notation latticePOrderRelMixin := of_.
+Notation LatticePOrderRelMixin := Build.
+Coercion meetMixin : of_ >-> meetRelMixin.
+Coercion joinMixin : of_ >-> joinRelMixin.
+Definition LatticeOfPOrder T ord (m : @of_ T ord) : {lattice T} :=
+  [lattice of <=:(JoinOrder <=:(MeetOrder _ _ _ m) _ _ m)].
 End Exports.
 
-End LatticePOrderMixin.
-Import LatticePOrderMixin.Exports.
+End LatticePOrderRelMixin.
+Import LatticePOrderRelMixin.Exports.
 
-Module DistrLatticePOrderMixin.
-Section DistrLatticePOrderMixin.
-Variable (T : eqType) (ord : {pOrder T}) (meet join : T -> T -> T).
+Module DistrLatticePOrderRelMixin.
+Section DistrLatticePOrderRelMixin.
+Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
+  meet : T -> T -> T;
+  join : T -> T -> T;
   meetC : commutative meet;
   joinC : commutative join;
   meetA : associative meet;
@@ -4272,27 +4619,27 @@ Record of_ := Build {
 
 Variable (m : of_).
 
-Definition latticeMixin : latticePOrderMixin ord meet join :=
-  LatticePOrderMixin
+Definition latticeMixin : latticePOrderRelMixin ord :=
+  LatticePOrderRelMixin
     (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (leEmeet m).
 
 Definition distrLatticeMixin :=
-  @DistrLatticeMixin _ (LatticeOfPOrder latticeMixin) (meetUl m).
+  @DistrLatticeRelMixin _ (LatticeOfPOrder latticeMixin) (meetUl m).
 
-End DistrLatticePOrderMixin.
+End DistrLatticePOrderRelMixin.
 
 Module Exports.
-Notation distrLatticePOrderMixin := of_.
-Notation DistrLatticePOrderMixin := Build.
-Coercion latticeMixin : of_ >-> latticePOrderMixin.
-Coercion distrLatticeMixin : of_ >-> DistrLatticeMixin.of_.
+Notation distrLatticePOrderRelMixin := of_.
+Notation DistrLatticePOrderRelMixin := Build.
+Coercion latticeMixin : of_ >-> latticePOrderRelMixin.
+Coercion distrLatticeMixin : of_ >-> distrLatticeRelMixin.
 End Exports.
 
-End DistrLatticePOrderMixin.
-Import DistrLatticePOrderMixin.Exports.
+End DistrLatticePOrderRelMixin.
+Import DistrLatticePOrderRelMixin.Exports.
 
-Module TotalLatticeMixin.
-Section TotalLatticeMixin.
+Module TotalLatticeRelMixin.
+Section TotalLatticeRelMixin.
 Variable (T : eqType) (ord : {lattice T}).
 Definition of_ := total <=:ord.
 
@@ -4311,139 +4658,118 @@ move=> x y z; case: (leP x z); case: (leP y z); case: (leP x y);
 - by move: (lt_le_trans xz (le_trans xy yz)); rewrite ltxx.
 Qed.
 
-Definition distrLatticeMixin := DistrLatticeMixin meetUl.
+Definition distrLatticeMixin := DistrLatticeRelMixin meetUl.
 
-End TotalLatticeMixin.
+Definition totalMixin : Total.mixin_of ord := m.
+
+End TotalLatticeRelMixin.
 
 Module Exports.
-Notation totalLatticeMixin := of_.
-Coercion distrLatticeMixin : of_ >-> DistrLatticeMixin.of_.
+Notation totalLatticeRelMixin := of_.
+Coercion distrLatticeMixin : of_ >-> distrLatticeRelMixin.
+Coercion totalMixin : of_ >-> Total.mixin_of.
 Definition OrderOfLattice T ord (m : @of_ T ord) : {totalOrder T} :=
   TotalOrder <=:(DistrLattice _ _ _ _ m) _ _ _ m.
 End Exports.
 
-End TotalLatticeMixin.
-Import TotalLatticeMixin.Exports.
+End TotalLatticeRelMixin.
+Import TotalLatticeRelMixin.Exports.
 
-Module TotalPOrderMixin.
-Section TotalPOrderMixin.
+Module TotalPOrderRelMixin.
+Section TotalPOrderRelMixin.
 Variable (T : eqType) (ord : {pOrder T}).
 Definition of_ := total <=:ord.
 
 Variable (m : of_).
 Implicit Types (x y z : T).
 
+Let meet := min ord.
+Let join := max ord.
+
 Let comparableT x y : x >=<_ord y := m x y.
 
-Let leP x y := comparable_leP (comparableT x y).
-
-Definition meet := min ord.
-
-Fact meetC : commutative meet.
-Proof. by move=> x y; rewrite /meet; case: leP. Qed.
-
-Fact meetA : associative meet.
-Proof.
-move=> x y z; rewrite !(fun_if, if_arg).
-case: (leP z y) (leP y x) (leP z x) => [] zy [] yx [] zx//=.
-  by have := le_lt_trans (le_trans zy yx) zx; rewrite ltxx.
-by apply/eqP; rewrite (@eq_le _ ord) zx ltW// (lt_trans yx).
-Qed.
+Fact meetC : commutative meet. Proof. by move=> *; apply: comparable_minC. Qed.
+Fact joinC : commutative join. Proof. by move=> *; apply: comparable_maxC. Qed.
+Fact meetA : associative meet. Proof. by move=> *; apply: comparable_minA. Qed.
+Fact joinA : associative join. Proof. by move=> *; apply: comparable_maxA. Qed.
+Fact joinKI y x : meet x (join x y) = x. Proof. exact: comparable_maxKx. Qed.
+Fact meetKU y x : join x (meet x y) = x. Proof. exact: comparable_minKx. Qed.
 
 Fact leEmeet x y : (x <=_ord y) = (meet x y == x).
-Proof. by rewrite /meet; case: leP => [|/lt_eqF ->]; rewrite ?eqxx. Qed.
+Proof. by rewrite eq_minl. Qed.
 
-Definition meetMixin := Meet.Mixin meetC meetA leEmeet.
+Definition latticeMixin : latticePOrderRelMixin ord :=
+  LatticePOrderRelMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
 
-Definition join := max ord.
+Definition totalMixin : totalLatticeRelMixin (LatticeOfPOrder latticeMixin) :=
+  m.
 
-Fact joinC : commutative join.
-Proof. by move=> x y; rewrite /join; case: leP. Qed.
-
-Fact joinA : associative join.
-Proof.
-move=> x y z; rewrite !(fun_if, if_arg).
-case: (leP z y) (leP y x) (leP z x) => [] zy [] yx [] zx//=.
-  by have := le_lt_trans (le_trans zy yx) zx; rewrite ltxx.
-by apply/eqP; rewrite (@eq_le _ ord) zx ltW// (lt_trans yx).
-Qed.
-
-Fact leEjoin x y : (y <=_ord x) = (join x y == x).
-Proof. by rewrite /join; case: leP => [|/gt_eqF ->]; rewrite ?eqxx. Qed.
-
-Definition joinMixin : Join.mixin_of (<=:ord) join :=
-  Meet.Mixin joinC joinA leEjoin.
-
-Let ord_lattice :=
-  [lattice of <=:(JoinOrder <=:(MeetOrder _ _ _ meetMixin) _ _ joinMixin)].
-
-Definition totalLatticeMixin : totalLatticeMixin ord_lattice := m.
-
-End TotalPOrderMixin.
+End TotalPOrderRelMixin.
 
 Module Exports.
-Notation totalPOrderMixin := of_.
-Coercion meetMixin : of_ >-> Meet.mixin_of.
-Coercion joinMixin : of_ >-> Join.mixin_of.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
+Notation totalPOrderRelMixin := of_.
+Coercion latticeMixin : of_ >-> latticePOrderRelMixin.
+Coercion totalMixin : of_ >-> totalLatticeRelMixin.
 End Exports.
 
-End TotalPOrderMixin.
-Import TotalPOrderMixin.Exports.
+End TotalPOrderRelMixin.
+Import TotalPOrderRelMixin.Exports.
 
-Module TotalMeetSemilatticeMixin.
-Section TotalMeetSemilatticeMixin.
+Module TotalMeetOrderRelMixin.
+Section TotalMeetOrderRelMixin.
 Variable (T : eqType) (ord : {meetOrder T}).
 Definition of_ := total <=:ord.
 
 Variable (m : of_).
 
-Definition joinMixin : Join.mixin_of _ _ := (m : totalPOrderMixin ord).
+Definition joinMixin : joinRelMixin ord := (m : totalPOrderRelMixin ord).
 
 Let ord_lattice := [lattice of <=:(JoinOrder _ _ _ joinMixin)].
 
-Definition totalLatticeMixin : totalLatticeMixin ord_lattice := m.
+Definition totalMixin : totalLatticeRelMixin ord_lattice := m.
 
-End TotalMeetSemilatticeMixin.
+End TotalMeetOrderRelMixin.
 
 Module Exports.
-Notation totalMeetSemilatticeMixin := of_.
-Coercion joinMixin : of_ >-> Join.mixin_of.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
+Notation totalMeetOrderRelMixin := of_.
+Coercion joinMixin : of_ >-> joinRelMixin.
+Coercion totalMixin : of_ >-> totalLatticeRelMixin.
 End Exports.
 
-End TotalMeetSemilatticeMixin.
-Import TotalMeetSemilatticeMixin.Exports.
+End TotalMeetOrderRelMixin.
+Import TotalMeetOrderRelMixin.Exports.
 
-Module TotalJoinSemilatticeMixin.
-Section TotalJoinSemilatticeMixin.
+Module TotalJoinOrderRelMixin.
+Section TotalJoinOrderRelMixin.
 Variable (T : eqType) (ord : {joinOrder T}).
 Definition of_ := total <=:ord.
 
 Variable (m : of_).
 
-Definition meetMixin : Meet.mixin_of _ _ := (m : totalPOrderMixin ord).
+Definition meetMixin : meetRelMixin ord := (m : totalPOrderRelMixin ord).
 
 Let ord_lattice := [lattice of <=:(MeetOrder _ _ _ meetMixin)].
 
-Definition totalLatticeMixin : totalLatticeMixin ord_lattice := m.
+Definition totalMixin : totalLatticeRelMixin ord_lattice := m.
 
-End TotalJoinSemilatticeMixin.
+End TotalJoinOrderRelMixin.
 
 Module Exports.
-Notation totalJoinSemilatticeMixin := of_.
-Coercion meetMixin : of_ >-> Meet.mixin_of.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
+Notation totalJoinOrderRelMixin := of_.
+Coercion meetMixin : of_ >-> meetRelMixin.
+Coercion totalMixin : of_ >-> totalLatticeRelMixin.
 End Exports.
 
-End TotalJoinSemilatticeMixin.
-Import TotalJoinSemilatticeMixin.Exports.
+End TotalJoinOrderRelMixin.
+Import TotalJoinOrderRelMixin.Exports.
 
 Module LtPOrderMixin.
 Section LtPOrderMixin.
-Variable (T : eqType) (le lt : rel T).
+Variable (T : eqType).
 
 Record of_ := Build {
+  le       : rel T;
+  lt       : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
@@ -4451,28 +4777,27 @@ Record of_ := Build {
 
 Variable (m : of_).
 
-Fact lt_asym x y : (lt x y && lt y x) = false.
-Proof.
-by apply/negP => /andP [] xy /(lt_trans m xy); apply/negP; rewrite (lt_irr m x).
-Qed.
+Fact lt_asym x y : (lt m x y && lt m y x) = false.
+Proof. by apply/negP => /andP [] xy /(lt_trans xy); rewrite (lt_irr m x). Qed.
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
+Fact lt_def x y : lt m x y = (y != x) && le m x y.
 Proof. by rewrite le_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact le_refl : reflexive le. Proof. by move=> ?; rewrite le_def // eqxx. Qed.
+Fact le_refl : reflexive (le m).
+Proof. by move=> ?; rewrite le_def // eqxx. Qed.
 
-Fact le_anti : antisymmetric le.
+Fact le_anti : antisymmetric (le m).
 Proof.
 by move=> ? ?; rewrite !le_def // eq_sym -orb_andr lt_asym; case: eqP.
 Qed.
 
-Fact le_trans : transitive le.
+Fact le_trans : transitive (le m).
 Proof.
 by move=> y x z; rewrite !le_def // => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
-  rewrite ?ltxy ?(lt_trans m ltxy ltyz) ?orbT.
+  rewrite ?ltxy ?(lt_trans ltxy ltyz) ?orbT.
 Qed.
 
-Definition lePOrderMixin : lePOrderMixin le lt :=
+Definition porderMixin : lePOrderMixin T :=
   LePOrderMixin lt_def le_refl le_anti le_trans.
 
 End LtPOrderMixin.
@@ -4480,7 +4805,7 @@ End LtPOrderMixin.
 Module Exports.
 Notation ltPOrderMixin := of_.
 Notation LtPOrderMixin := Build.
-Coercion lePOrderMixin : of_ >-> LePOrderMixin.of_.
+Coercion porderMixin : of_ >-> lePOrderMixin.
 End Exports.
 
 End LtPOrderMixin.
@@ -4488,9 +4813,13 @@ Import LtPOrderMixin.Exports.
 
 Module MeetJoinMixin.
 Section MeetJoinMixin.
-Variable (T : eqType) (le lt : rel T) (meet join : T -> T -> T).
+Variable (T : eqType).
 
 Record of_ := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
   le_def : forall x y : T, le x y = (meet x y == x);
   lt_def : forall x y : T, lt x y = (y != x) && le x y;
   meetC : commutative meet;
@@ -4504,24 +4833,25 @@ Record of_ := Build {
 
 Variable (m : of_).
 
-Fact le_refl : reflexive le. Proof. by move=> x; rewrite le_def ?meetxx. Qed.
+Fact le_refl : reflexive (le m).
+Proof. by move=> x; rewrite le_def ?meetxx. Qed.
 
-Fact le_anti : antisymmetric le.
+Fact le_anti : antisymmetric (le m).
 Proof. by move=> x y; rewrite !le_def // meetC // => /andP [] /eqP -> /eqP. Qed.
 
-Fact le_trans : transitive le.
+Fact le_trans : transitive (le m).
 Proof.
 move=> y x z; rewrite !le_def // => /eqP lexy /eqP leyz; apply/eqP.
 by rewrite -[in LHS]lexy -meetA // leyz.
 Qed.
 
-Definition porderMixin : lePOrderMixin le lt :=
+Definition porderMixin : lePOrderMixin T :=
   LePOrderMixin (lt_def m) le_refl le_anti le_trans.
 
 Definition latticeMixin :
-  latticePOrderMixin (POrder le lt porderMixin) meet join :=
-  @LatticePOrderMixin
-    _ (POrder le lt porderMixin) meet join
+  latticePOrderRelMixin (POrder (le m) (lt m) porderMixin) :=
+  @LatticePOrderRelMixin
+    _ (POrder (le m) (lt m) porderMixin) (meet m) (join m)
     (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (le_def m).
 
 End MeetJoinMixin.
@@ -4530,7 +4860,7 @@ Module Exports.
 Notation meetJoinMixin := of_.
 Notation MeetJoinMixin := Build.
 Coercion porderMixin : of_ >-> lePOrderMixin.
-Coercion latticeMixin : of_ >-> latticePOrderMixin.
+Coercion latticeMixin : of_ >-> latticePOrderRelMixin.
 End Exports.
 
 End MeetJoinMixin.
@@ -4538,9 +4868,13 @@ Import MeetJoinMixin.Exports.
 
 Module DistrMeetJoinMixin.
 Section DistrMeetJoinMixin.
-Variable (T : eqType) (le lt : rel T) (meet join : T -> T -> T).
+Variable (T : eqType).
 
 Record of_ := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
   le_def : forall x y : T, le x y = (meet x y == x);
   lt_def : forall x y : T, lt x y = (y != x) && le x y;
   meetC : commutative meet;
@@ -4555,22 +4889,22 @@ Record of_ := Build {
 
 Variable (m : of_).
 
-Definition meetJoinMixin : meetJoinMixin le lt meet join :=
+Definition latticeMixin : meetJoinMixin T :=
   MeetJoinMixin (le_def m) (lt_def m) (meetC m) (joinC m) (meetA m) (joinA m)
                 (joinKI m) (meetKU m) (meetxx m).
 
-Let le_lattice := LatticeOfPOrder meetJoinMixin.
+Let le_lattice := LatticeOfPOrder latticeMixin.
 
-Definition distrLatticeMixin : distrLatticeMixin le_lattice :=
-  @DistrLatticeMixin _ le_lattice (meetUl m).
+Definition distrLatticeMixin : distrLatticeRelMixin le_lattice :=
+  @DistrLatticeRelMixin _ le_lattice (meetUl m).
 
 End DistrMeetJoinMixin.
 
 Module Exports.
 Notation distrMeetJoinMixin := of_.
 Notation DistrMeetJoinMixin := Build.
-Coercion meetJoinMixin : of_ >-> MeetJoinMixin.of_.
-Coercion distrLatticeMixin : of_ >-> DistrLatticeMixin.of_.
+Coercion latticeMixin : of_ >-> meetJoinMixin.
+Coercion distrLatticeMixin : of_ >-> DistrLatticeRelMixin.of_.
 End Exports.
 
 End DistrMeetJoinMixin.
@@ -4578,9 +4912,13 @@ Import DistrMeetJoinMixin.Exports.
 
 Module LeOrderMixin.
 Section LeOrderMixin.
-Variables (T : eqType) (le lt : rel T) (meet join : T -> T -> T).
+Variables (T : eqType).
 
 Record of_ := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
   lt_def : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
@@ -4591,34 +4929,48 @@ Record of_ := Build {
 
 Variables (m : of_).
 
-Fact le_refl : reflexive le.
-Proof. by move=> x; case: (le x x) (le_total m x x). Qed.
+Fact le_refl : reflexive (le m).
+Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
 
-Definition lePOrderMixin :=
+Definition porderMixin :=
   LePOrderMixin (lt_def m) le_refl (@le_anti m) (@le_trans m).
 
 Let le_order :=
-  OrderOfLattice (le_total m : totalPOrderMixin (POrder le lt lePOrderMixin)).
+  OrderOfLattice
+    (le_total m : totalPOrderRelMixin (POrder (le m) (lt m) porderMixin)).
 
-Let meetE x y : meet x y = RelOrder.meet le_order x y := meet_def m x y.
-Let joinE x y : join x y = RelOrder.join le_order x y := join_def m x y.
-Fact meetC : commutative meet. Proof. by move=> *; rewrite !meetE meetC. Qed.
-Fact joinC : commutative join. Proof. by move=> *; rewrite !joinE joinC. Qed.
-Fact meetA : associative meet. Proof. by move=> *; rewrite !meetE meetA. Qed.
-Fact joinA : associative join. Proof. by move=> *; rewrite !joinE joinA. Qed.
-Fact joinKI y x : meet x (join x y) = x.
+Let meetE x y : meet m x y = RelOrder.meet le_order x y := meet_def m x y.
+Let joinE x y : join m x y = RelOrder.join le_order x y := join_def m x y.
+
+Fact meetC : commutative (meet m).
+Proof. by move=> *; rewrite !meetE meetC. Qed.
+
+Fact joinC : commutative (join m).
+Proof. by move=> *; rewrite !joinE joinC. Qed.
+
+Fact meetA : associative (meet m).
+Proof. by move=> *; rewrite !meetE meetA. Qed.
+
+Fact joinA : associative (join m).
+Proof. by move=> *; rewrite !joinE joinA. Qed.
+
+Fact joinKI y x : meet m x (join m x y) = x.
 Proof. by rewrite meetE joinE joinKI. Qed.
-Fact meetKU y x : join x (meet x y) = x.
+
+Fact meetKU y x : join m x (meet m x y) = x.
 Proof. by rewrite meetE joinE meetKU. Qed.
-Fact meetxx : idempotent meet.
+
+Fact meetxx : idempotent (meet m).
 Proof. by move=> *; rewrite meetE meetxx. Qed.
-Fact le_def x y : le x y = (meet x y == x).
+
+Fact le_def x y : le m x y = (meet m x y == x).
 Proof. by rewrite meetE eq_meetl. Qed.
 
-Definition latticeMixin : meetJoinMixin le lt meet join :=
-  MeetJoinMixin le_def (lt_def m) meetC joinC meetA joinA joinKI meetKU meetxx.
+Definition latticeMixin : meetJoinMixin T :=
+  MeetJoinMixin
+    le_def (lt_def m) meetC joinC meetA joinA joinKI meetKU meetxx.
 
-Definition totalMixin : totalLatticeMixin (LatticeOfPOrder latticeMixin) :=
+Definition totalMixin : totalLatticeRelMixin (LatticeOfPOrder latticeMixin) :=
   le_total m.
 
 End LeOrderMixin.
@@ -4627,7 +4979,7 @@ Module Exports.
 Notation leOrderMixin := of_.
 Notation LeOrderMixin := Build.
 Coercion latticeMixin : of_ >-> meetJoinMixin.
-Coercion totalMixin : of_ >-> totalLatticeMixin.
+Coercion totalMixin : of_ >-> totalLatticeRelMixin.
 End Exports.
 
 End LeOrderMixin.
@@ -4635,9 +4987,13 @@ Import LeOrderMixin.Exports.
 
 Module LtOrderMixin.
 Section LtOrderMixin.
-Variables (T : eqType) (le lt : rel T) (meet join : T -> T -> T).
+Variables (T : eqType).
 
 Record of_ := Build {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
@@ -4648,33 +5004,33 @@ Record of_ := Build {
 
 Variables (m : of_).
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
+Fact lt_def x y : lt m x y = (y != x) && le m x y.
 Proof. by rewrite le_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact meet_def_le x y : meet x y = if lt x y then x else y.
+Fact meet_def_le x y : meet m x y = if lt m x y then x else y.
 Proof. by rewrite meet_def // lt_def; case: eqP. Qed.
 
-Fact join_def_le x y : join x y = if lt x y then y else x.
+Fact join_def_le x y : join m x y = if lt m x y then y else x.
 Proof. by rewrite join_def // lt_def; case: eqP. Qed.
 
-Fact le_anti : antisymmetric le.
+Fact le_anti : antisymmetric (le m).
 Proof.
 move=> x y; rewrite !le_def //.
-by case: eqVneq => //= _ /andP [] hxy /(lt_trans m hxy); rewrite lt_irr.
+by case: eqVneq => //= _ /andP [] hxy /(lt_trans hxy); rewrite lt_irr.
 Qed.
 
-Fact le_trans : transitive le.
+Fact le_trans : transitive (le m).
 Proof.
 move=> y x z; rewrite !le_def //; case: eqVneq => [->|_] //=.
-by case: eqVneq => [-> ->|_ hxy /(lt_trans m hxy) ->]; rewrite orbT.
+by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
 Qed.
 
-Fact le_total : total le.
+Fact le_total : total (le m).
 Proof.
 by move=> x y; rewrite !le_def //; case: eqVneq => //=; exact: lt_total.
 Qed.
 
-Definition orderMixin : leOrderMixin le lt meet join :=
+Definition orderMixin : leOrderMixin T :=
   LeOrderMixin lt_def meet_def_le join_def_le le_anti le_trans le_total.
 
 End LtOrderMixin.
@@ -4705,7 +5061,7 @@ Local Canonical nat_pOrder := POrder leq ltn nat_pOrderMixin.
 (* following declaration fails.                                               *)
 Local Canonical nat_bPOrder := BPOrder leq ltn 0 leq0n.
 
-Definition nat_totalMixin : totalPOrderMixin nat_pOrder := leq_total.
+Definition nat_totalMixin : totalPOrderRelMixin nat_pOrder := leq_total.
 
 Local Canonical nat_meetOrder := MeetOrder leq ltn minn nat_totalMixin.
 Local Canonical nat_bMeetOrder := [bMeetOrder of leq].
@@ -4757,11 +5113,20 @@ Export RelOrder.DistrLattice.Exports RelOrder.BDistrLattice.Exports.
 Export RelOrder.TDistrLattice.Exports RelOrder.TBDistrLattice.Exports.
 Export RelOrder.Total.Exports RelOrder.BTotal.Exports.
 Export RelOrder.TTotal.Exports RelOrder.TBTotal.Exports.
-
-(* TODO: remove *)
-Notation le := RelOrder.le.
-Notation lt := RelOrder.lt.
-Notation bottom := RelOrder.bottom.
-Notation top := RelOrder.top.
-Notation meet := RelOrder.meet.
-Notation join := RelOrder.join.
+Export RelOrder.LePOrderMixin.Exports.
+Export RelOrder.BottomRelMixin.Exports.
+Export RelOrder.TopRelMixin.Exports.
+Export RelOrder.MeetRelMixin.Exports.
+Export RelOrder.JoinRelMixin.Exports.
+Export RelOrder.DistrLatticeRelMixin.Exports.
+Export RelOrder.LatticePOrderRelMixin.Exports.
+Export RelOrder.DistrLatticePOrderRelMixin.Exports.
+Export RelOrder.TotalLatticeRelMixin.Exports.
+Export RelOrder.TotalPOrderRelMixin.Exports.
+Export RelOrder.TotalMeetOrderRelMixin.Exports.
+Export RelOrder.TotalJoinOrderRelMixin.Exports.
+Export RelOrder.LtPOrderMixin.Exports.
+Export RelOrder.MeetJoinMixin.Exports.
+Export RelOrder.DistrMeetJoinMixin.Exports.
+Export RelOrder.LeOrderMixin.Exports.
+Export RelOrder.LtOrderMixin.Exports.

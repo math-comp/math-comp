@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
-From mathcomp Require Import finset.
+From mathcomp Require Import relorder finset.
 
 (******************************************************************************)
 (* This files defines types equipped with order relations.                    *)
@@ -535,6 +535,8 @@ Declare Scope order_scope.
 
 Delimit Scope order_scope with O.
 Local Open Scope order_scope.
+
+Import RelOrder.Theory.
 
 Reserved Notation "<= y" (at level 35).
 Reserved Notation ">= y" (at level 35).
@@ -1129,20 +1131,15 @@ Section ClassDef.
 
 Set Primitive Projections.
 
-Record mixin_of (T0 : Type) (b : Equality.class_of T0)
-                (T := Equality.Pack b) := Mixin {
+Record mixin_of (T : eqType) := Mixin {
   le : rel T;
   lt : rel T;
-  lt_def    : forall x y, lt x y = (y != x) && (le x y);
-  lt_def'   : forall x y, lt y x = (y != x) && (le y x); (* dual of lt_def *)
-  lexx      : reflexive     le;
-  le_anti   : forall x y, le x y -> le y x -> x = y;
-  le_trans  : transitive    le;
+  rel_mixin : RelOrder.POrder.mixin_of le lt;
 }.
 
 Record class_of (T : Type) := Class {
   base  : Choice.class_of T;
-  mixin : mixin_of base;
+  mixin : mixin_of (Equality.Pack base);
 }.
 
 Unset Primitive Projections.
@@ -1169,6 +1166,9 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> Choice.class_of.
+Coercion mixin : class_of >-> mixin_of.
+Coercion Mixin : RelOrder.POrder.mixin_of >-> mixin_of.
+Coercion rel_mixin : mixin_of >-> RelOrder.POrder.mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1194,17 +1194,17 @@ Import POrder.Exports.
 
 Section POrderDef.
 
-Variable (disp : unit) (T : porderType disp).
+Variables (disp : unit) (T : porderType disp).
 
-Definition le : rel T := POrder.le (POrder.mixin (POrder.class T)).
+Let ord := POrder _ _ (POrder.class T).
+
+Definition le : rel T := RelOrder.le ord.
 Local Notation "x <= y" := (le x y) : order_scope.
 
-Definition lt : rel T := POrder.lt (POrder.mixin (POrder.class T)).
+Definition lt : rel T := RelOrder.lt ord.
 Local Notation "x < y" := (lt x y) : order_scope.
 
 Definition comparable : rel T := fun (x y : T) => (x <= y) || (y <= x).
-Local Notation "x >=< y" := (comparable x y) : order_scope.
-Local Notation "x >< y" := (~~ (x >=< y)) : order_scope.
 
 Definition ge : simpl_rel T := [rel x y | y <= x].
 Definition gt : simpl_rel T := [rel x y | y < x].
@@ -1215,43 +1215,11 @@ Definition le_of_leif x y C (le_xy : @leif x y C) := le_xy.1 : le x y.
 
 Definition lteif x y C := if C then x <= y else x < y.
 
-Variant le_xor_gt (x y : T) :
-  T -> T -> T -> T -> bool -> bool -> Set :=
-  | LeNotGt of x <= y : le_xor_gt x y x x y y true false
-  | GtNotLe of y < x  : le_xor_gt x y y y x x false true.
-
-Variant lt_xor_ge (x y : T) :
-  T -> T -> T -> T -> bool -> bool -> Set :=
-  | LtNotGe of x < y  : lt_xor_ge x y x x y y false true
-  | GeNotLt of y <= x : lt_xor_ge x y y y x x true false.
-
 Definition min x y := if x < y then x else y.
 Definition max x y := if x < y then y else x.
 
-Variant compare (x y : T) :
-   T -> T -> T -> T ->
-   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareLt of x < y : compare x y
-    x x y y false false false true false true
-  | CompareGt of y < x : compare x y
-    y y x x false false true false true false
-  | CompareEq of x = y : compare x y
-    x x x x true true true true false false.
-
-Variant incompare (x y : T) :
-   T -> T -> T -> T ->
-  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | InCompareLt of x < y : incompare x y
-    x x y y false false false true false true true true
-  | InCompareGt of y < x : incompare x y
-    y y x x false false true false true false true true
-  | InCompare of x >< y  : incompare x y
-    x y y x false false false false false false false false
-  | InCompareEq of x = y : incompare x y
-    x x x x true true true true false false true true.
-
 Definition arg_min {I : finType} := @extremum T I le.
-Definition arg_max {I : finType}  := @extremum T I ge.
+Definition arg_max {I : finType} := @extremum T I ge.
 
 (* Lifted min/max operations. *)
 Section LiftedPOrder.
@@ -1281,6 +1249,11 @@ Notation dual_leif := (@leif (dual_display _) _).
 Notation dual_lteif := (@lteif (dual_display _) _).
 Notation dual_max := (@max (dual_display _) _).
 Notation dual_min := (@min (dual_display _) _).
+
+Notation le_xor_gt := (RelOrder.le_xor_gt le lt).
+Notation lt_xor_ge := (RelOrder.lt_xor_ge le lt).
+Notation compare := (RelOrder.compare lt).
+Notation incompare := (RelOrder.incompare lt comparable).
 
 Module Import POSyntax.
 
@@ -1422,57 +1395,31 @@ Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
 End POSyntax.
 
-Module POCoercions.
+Module Import POCoercions.
 Coercion le_of_leif : leif >-> is_true.
 End POCoercions.
-
-Module Import DualPOrder.
-Section DualPOrder.
-
-Canonical dual_eqType (T : eqType) := EqType T [eqMixin of T^d].
-Canonical dual_choiceType (T : choiceType) := [choiceType of T^d].
-Canonical dual_countType (T : countType) := [countType of T^d].
-Canonical dual_finType (T : finType) := [finType of T^d].
-
-Context {disp : unit}.
-Variable T : porderType disp.
-
-Definition dual_porderMixin :=
-  let mixin := POrder.mixin (POrder.class T) in
-  @POrder.Mixin
-    _ _ (fun x y : T => y <= x) (fun x y : T => y < x)
-    (POrder.lt_def' mixin) (POrder.lt_def mixin) (POrder.lexx mixin)
-    (fun x y yx xy => @POrder.le_anti _ _ mixin x y xy yx)
-    (fun _ _ _ xy yz => @POrder.le_trans _ _ mixin _ _ _ yz xy).
-
-Canonical dual_porderType :=
-  POrderType (dual_display disp) T^d dual_porderMixin.
-
-Lemma leEdual (x y : T) : (x <=^d y :> T^d) = (y <= x). Proof. by []. Qed.
-Lemma ltEdual (x y : T) : (x <^d y :> T^d) = (y < x). Proof. by []. Qed.
-
-End DualPOrder.
-End DualPOrder.
 
 Module BPOrder.
 Section ClassDef.
 
 Set Primitive Projections.
 
-Record mixin_of (T0 : Type) (b : POrder.class_of T0)
-                (T := POrder.Pack tt b) := Mixin {
+Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
   bottom : T;
-  le0x : forall x, bottom <= x;
+  rel_mixin : RelOrder.BPOrder.mixin_of ord bottom;
 }.
 
 Record class_of (T : Type) := Class {
   base  : POrder.class_of T;
-  mixin : mixin_of base;
+  mixin : mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
+
+Definition rel_class T (c : class_of T) :=
+  RelOrder.BPOrder.Class (rel_mixin (mixin c)).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1495,6 +1442,9 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.BPOrder.class_of.
+Coercion Mixin : RelOrder.BPOrder.mixin_of >-> mixin_of.
+Coercion rel_mixin : mixin_of >-> RelOrder.BPOrder.mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1523,19 +1473,24 @@ Import BPOrder.Exports.
 Module TPOrder.
 Section ClassDef.
 
-Definition mixin_of (T : Type) (base : POrder.class_of T) : Type :=
-  BPOrder.mixin_of (POrder.class [porderType of (@POrder.Pack tt T base)^d]).
-
 Set Primitive Projections.
+
+Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
+  top : T;
+  rel_mixin : RelOrder.TPOrder.mixin_of ord top;
+}.
 
 Record class_of (T : Type) := Class {
   base  : POrder.class_of T;
-  mixin : mixin_of base;
+  mixin : mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
+
+Definition rel_class T (c : class_of T) :=
+  RelOrder.TPOrder.Class (rel_mixin (mixin c)).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1558,6 +1513,9 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.TPOrder.class_of.
+Coercion Mixin : RelOrder.TPOrder.mixin_of >-> mixin_of.
+Coercion rel_mixin : mixin_of >-> RelOrder.TPOrder.mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1591,7 +1549,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : BPOrder.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -1599,6 +1557,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> BPOrder.class_of.
 Local Coercion base2 T (c : class_of T) : TPOrder.class_of T :=
   @TPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TBPOrder.Class _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1624,6 +1585,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> BPOrder.class_of.
 Coercion base2 : class_of >-> TPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.TBPOrder.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1644,10 +1606,14 @@ End Exports.
 End TBPOrder.
 Import TBPOrder.Exports.
 
-Definition bottom {disp : unit} {T : bPOrderType disp} : T :=
-  BPOrder.bottom (BPOrder.mixin (BPOrder.class T)).
-Definition top {disp : unit} {T : tPOrderType disp} : T :=
-  BPOrder.bottom (TPOrder.mixin (TPOrder.class T)).
+Definition bottom (disp : unit) (T : bPOrderType disp) : T :=
+  RelOrder.bottom (BPOrder le lt _ (BPOrder.class T)).
+
+Definition top (disp : unit) (T : tPOrderType disp) : T :=
+  RelOrder.top (TPOrder le lt _ (TPOrder.class T)).
+
+Arguments bottom {disp T}.
+Arguments top {disp T}.
 
 Notation dual_bottom := (@bottom (dual_display _) _).
 Notation dual_top := (@top (dual_display _) _).
@@ -1664,22 +1630,22 @@ Section ClassDef.
 
 Set Primitive Projections.
 
-Record mixin_of (T0 : Type) (b : POrder.class_of T0)
-                (T := POrder.Pack tt b) := Mixin {
+Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
   meet : T -> T -> T;
-  meetC   : commutative meet;
-  meetA   : associative meet;
-  leEmeet : forall x y, (x <= y) = (meet x y == x);
+  rel_mixin : RelOrder.Meet.mixin_of ord meet;
 }.
 
 Record class_of (T : Type) := Class {
   base  : POrder.class_of T;
-  mixin : mixin_of base;
+  mixin : mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
+
+Definition rel_class T (c : class_of T) :=
+  RelOrder.Meet.Class (rel_mixin (mixin c)).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1702,6 +1668,9 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.Meet.class_of.
+Coercion Mixin : RelOrder.Meet.mixin_of >-> mixin_of.
+Coercion rel_mixin : mixin_of >-> RelOrder.Meet.mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1737,7 +1706,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : MeetSemilattice.class_of T;
-  mixin : BPOrder.mixin_of base;
+  mixin : BPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -1745,6 +1714,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> MeetSemilattice.class_of.
 Local Coercion base2 T (c : class_of T) : BPOrder.class_of T :=
   @BPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.BMeet.Class _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1771,6 +1743,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> MeetSemilattice.class_of.
 Coercion base2 : class_of >-> BPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.BMeet.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1798,7 +1771,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : MeetSemilattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -1806,6 +1779,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> MeetSemilattice.class_of.
 Local Coercion base2 T (c : class_of T) : TPOrder.class_of T :=
   @TPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TMeet.Class _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1832,6 +1808,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> MeetSemilattice.class_of.
 Coercion base2 : class_of >-> TPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.TMeet.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1859,7 +1836,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : BMeetSemilattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -1869,6 +1846,9 @@ Local Coercion base2 T (c : class_of T) : TMeetSemilattice.class_of T :=
   @TMeetSemilattice.Class T c (mixin c).
 Local Coercion base3 T (c : class_of T) : TBPOrder.class_of T :=
   @TBPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TBMeet.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1910,6 +1890,7 @@ Module Exports.
 Coercion base : class_of >-> BMeetSemilattice.class_of.
 Coercion base2 : class_of >-> TMeetSemilattice.class_of.
 Coercion base3 : class_of >-> TBPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.TBMeet.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -1946,20 +1927,24 @@ Import TBMeetSemilattice.Exports.
 Module JoinSemilattice.
 Section ClassDef.
 
-Definition mixin_of (T : Type) (base : POrder.class_of T) : Type :=
-  MeetSemilattice.mixin_of
-    (POrder.class [porderType of (@POrder.Pack tt T base)^d]).
-
 Set Primitive Projections.
+
+Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
+  join : T -> T -> T;
+  rel_mixin : RelOrder.Join.mixin_of ord join;
+}.
 
 Record class_of (T : Type) := Class {
   base  : POrder.class_of T;
-  mixin : mixin_of base;
+  mixin : mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
+
+Definition rel_class T (c : class_of T) :=
+  RelOrder.Join.Class (rel_mixin (mixin c)).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -1982,6 +1967,9 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> POrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.Join.class_of.
+Coercion Mixin : RelOrder.Join.mixin_of >-> mixin_of.
+Coercion rel_mixin : mixin_of >-> RelOrder.Join.mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2017,7 +2005,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : JoinSemilattice.class_of T;
-  mixin : BPOrder.mixin_of base;
+  mixin : BPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2025,6 +2013,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> JoinSemilattice.class_of.
 Local Coercion base2 T (c : class_of T) : BPOrder.class_of T :=
   @BPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.BJoin.Class _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2051,6 +2042,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> JoinSemilattice.class_of.
 Coercion base2 : class_of >-> BPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.BJoin.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2078,7 +2070,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : JoinSemilattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2086,6 +2078,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> JoinSemilattice.class_of.
 Local Coercion base2 T (c : class_of T) : TPOrder.class_of T :=
   @TPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TJoin.Class _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2112,6 +2107,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> JoinSemilattice.class_of.
 Coercion base2 : class_of >-> TPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.TJoin.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2139,7 +2135,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : BJoinSemilattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2149,6 +2145,9 @@ Local Coercion base2 T (c : class_of T) : TJoinSemilattice.class_of T :=
   @TJoinSemilattice.Class T c (mixin c).
 Local Coercion base3 T (c : class_of T) : TBPOrder.class_of T :=
   @TBPOrder.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TBJoin.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2190,6 +2189,7 @@ Module Exports.
 Coercion base : class_of >-> BJoinSemilattice.class_of.
 Coercion base2 : class_of >-> TJoinSemilattice.class_of.
 Coercion base3 : class_of >-> TBPOrder.class_of.
+Coercion rel_class : class_of >-> RelOrder.TBJoin.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2230,7 +2230,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : MeetSemilattice.class_of T;
-  mixin : JoinSemilattice.mixin_of base;
+  mixin : JoinSemilattice.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2238,6 +2238,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> MeetSemilattice.class_of.
 Local Coercion base2 T (c : class_of T) : JoinSemilattice.class_of T :=
   @JoinSemilattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.Lattice.Class _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2265,6 +2268,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> MeetSemilattice.class_of.
 Coercion base2 : class_of >-> JoinSemilattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.Lattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2292,7 +2296,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : Lattice.class_of T;
-  mixin : BPOrder.mixin_of base;
+  mixin : BPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2302,6 +2306,9 @@ Local Coercion base2 T (c : class_of T) : BMeetSemilattice.class_of T :=
   @BMeetSemilattice.Class T c (mixin c).
 Local Coercion base3 T (c : class_of T) : BJoinSemilattice.class_of T :=
   @BJoinSemilattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.BLattice.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2342,6 +2349,7 @@ Module Exports.
 Coercion base : class_of >-> Lattice.class_of.
 Coercion base2 : class_of >-> BMeetSemilattice.class_of.
 Coercion base3 : class_of >-> BJoinSemilattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.BLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2382,7 +2390,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : Lattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2392,6 +2400,9 @@ Local Coercion base2 T (c : class_of T) : TMeetSemilattice.class_of T :=
   @TMeetSemilattice.Class T c (mixin c).
 Local Coercion base3 T (c : class_of T) : TJoinSemilattice.class_of T :=
   @TJoinSemilattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TLattice.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2432,6 +2443,7 @@ Module Exports.
 Coercion base : class_of >-> Lattice.class_of.
 Coercion base2 : class_of >-> TMeetSemilattice.class_of.
 Coercion base3 : class_of >-> TJoinSemilattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.TLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2472,7 +2484,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : BLattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2484,6 +2496,9 @@ Local Coercion base3 T (c : class_of T) : TBMeetSemilattice.class_of T :=
   @TBMeetSemilattice.Class T c (mixin c).
 Local Coercion base4 T (c : class_of T) : TBJoinSemilattice.class_of T :=
   @TBJoinSemilattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TBLattice.Class _ _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2566,6 +2581,7 @@ Coercion base : class_of >-> BLattice.class_of.
 Coercion base2 : class_of >-> TLattice.class_of.
 Coercion base3 : class_of >-> TBMeetSemilattice.class_of.
 Coercion base4 : class_of >-> TBJoinSemilattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.TBLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2634,51 +2650,22 @@ End Exports.
 End TBLattice.
 Import TBLattice.Exports.
 
-Definition meet {disp : unit} {T : meetSemilatticeType disp} : T -> T -> T :=
-  MeetSemilattice.meet (MeetSemilattice.mixin (MeetSemilattice.class T)).
-Definition join {disp : unit} {T : joinSemilatticeType disp} : T -> T -> T :=
-  MeetSemilattice.meet (JoinSemilattice.mixin (JoinSemilattice.class T)).
+Definition meet (disp : unit) (T : meetSemilatticeType disp) : T -> T -> T :=
+  RelOrder.meet (MeetOrder _ _ _ (MeetSemilattice.class T)).
+
+Definition join (disp : unit) (T : joinSemilatticeType disp) : T -> T -> T :=
+  RelOrder.join (JoinOrder _ _ _ (JoinSemilattice.class T)).
+
+Arguments meet {disp T}.
+Arguments join {disp T}.
 
 Notation dual_meet := (@meet (dual_display _) _).
 Notation dual_join := (@join (dual_display _) _).
 
-Section LatticeDef.
-Context {disp : unit} {T : latticeType disp}.
-
-Variant lel_xor_gt (x y : T) :
-  T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
-  | LelNotGt of x <= y : lel_xor_gt x y x x y y x x y y true false
-  | GtlNotLe of y < x  : lel_xor_gt x y y y x x y y x x false true.
-
-Variant ltl_xor_ge (x y : T) :
-  T -> T -> T -> T -> T -> T -> T -> T -> bool -> bool -> Set :=
-  | LtlNotGe of x < y  : ltl_xor_ge x y x x y y x x y y false true
-  | GelNotLt of y <= x : ltl_xor_ge x y y y x x y y x x true false.
-
-Variant comparel (x y : T) :
-   T -> T -> T -> T -> T -> T -> T -> T ->
-   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | ComparelLt of x < y : comparel x y
-    x x y y x x y y false false false true false true
-  | ComparelGt of y < x : comparel x y
-    y y x x y y x x false false true false true false
-  | ComparelEq of x = y : comparel x y
-    x x x x x x x x true true true true false false.
-
-Variant incomparel (x y : T) :
-  T -> T -> T -> T -> T -> T -> T -> T ->
-  bool -> bool -> bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | InComparelLt of x < y : incomparel x y
-    x x y y x x y y false false false true false true true true
-  | InComparelGt of y < x : incomparel x y
-    y y x x y y x x false false true false true false true true
-  | InComparel of x >< y  : incomparel x y
-    x y y x (meet y x) (meet x y) (join y x) (join x y)
-    false false false false false false false false
-  | InComparelEq of x = y : incomparel x y
-    x x x x x x x x true true true true false false true true.
-
-End LatticeDef.
+Notation lel_xor_gt := (RelOrder.lel_xor_gt le lt).
+Notation ltl_xor_ge := (RelOrder.ltl_xor_ge le lt).
+Notation comparel := (RelOrder.comparel lt).
+Notation incomparel := (RelOrder.incomparel lt comparable meet join).
 
 Module Import LatticeSyntax.
 
@@ -2801,20 +2788,17 @@ Section ClassDef.
 
 Set Primitive Projections.
 
-Record mixin_of (T0 : Type) (b : Lattice.class_of T0)
-                (T := Lattice.Pack tt b) := Mixin {
-  meetUl : @left_distributive T T meet join;
-  joinIl : @left_distributive T T join meet; (* dual of meetUl *)
-}.
-
 Record class_of (T : Type) := Class {
   base  : Lattice.class_of T;
-  mixin : mixin_of base;
+  mixin : RelOrder.DistrLattice.mixin_of (RelOrder.Lattice.Pack _ base);
 }.
 
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Lattice.class_of.
+
+Definition rel_class T (c : class_of T) :=
+  RelOrder.DistrLattice.Class (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2840,6 +2824,7 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> Lattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.DistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2881,7 +2866,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : DistrLattice.class_of T;
-  mixin : BPOrder.mixin_of base;
+  mixin : BPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2889,6 +2874,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : BLattice.class_of T :=
   @BLattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.BDistrLattice.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -2927,6 +2915,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> DistrLattice.class_of.
 Coercion base2 : class_of >-> BLattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.BDistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -2969,7 +2958,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : DistrLattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -2977,6 +2966,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 T (c : class_of T) : TLattice.class_of T :=
   @TLattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TDistrLattice.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3015,6 +3007,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> DistrLattice.class_of.
 Coercion base2 : class_of >-> TLattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.TDistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3057,7 +3050,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : BDistrLattice.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -3067,6 +3060,9 @@ Local Coercion base2 T (c : class_of T) : TDistrLattice.class_of T :=
   @TDistrLattice.Class T c (mixin c).
 Local Coercion base3 T (c : class_of T) : TBLattice.class_of T :=
   @TBLattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TBDistrLattice.Class _ _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3150,6 +3146,7 @@ Module Exports.
 Coercion base : class_of >-> BDistrLattice.class_of.
 Coercion base2 : class_of >-> TDistrLattice.class_of.
 Coercion base3 : class_of >-> TBLattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.TBDistrLattice.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3501,19 +3498,19 @@ End CTBDistrLatticeSyntax.
 Module Total.
 Section ClassDef.
 
-Definition mixin_of T0 (b : POrder.class_of T0) (T := POrder.Pack tt b) :=
-  total (<=%O : rel T).
-
 Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : DistrLattice.class_of T;
-  mixin : mixin_of base;
+  mixin : RelOrder.Total.mixin_of (RelOrder.DistrLattice.Pack _ base);
 }.
 
 Unset Primitive Projections.
 
 Local Coercion base : class_of >-> DistrLattice.class_of.
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.Total.Class _ _ _ _ _ c (@mixin _ c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3540,6 +3537,8 @@ End ClassDef.
 
 Module Exports.
 Coercion base : class_of >-> DistrLattice.class_of.
+Arguments mixin [T] c.
+Coercion rel_class : class_of >-> RelOrder.Total.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3580,7 +3579,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : Total.class_of T;
-  mixin : BPOrder.mixin_of base;
+  mixin : BPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -3588,6 +3587,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> Total.class_of.
 Local Coercion base2 T (c : class_of T) : BDistrLattice.class_of T :=
   @BDistrLattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.BTotal.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3627,6 +3629,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> Total.class_of.
 Coercion base2 : class_of >-> BDistrLattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.BTotal.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3674,7 +3677,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : Total.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -3682,6 +3685,9 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> Total.class_of.
 Local Coercion base2 T (c : class_of T) : TDistrLattice.class_of T :=
   @TDistrLattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TTotal.Class _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3721,6 +3727,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> Total.class_of.
 Coercion base2 : class_of >-> TDistrLattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.TTotal.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3768,7 +3775,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : BTotal.class_of T;
-  mixin : TPOrder.mixin_of base;
+  mixin : TPOrder.mixin_of (POrder _ _ base);
 }.
 
 Unset Primitive Projections.
@@ -3778,6 +3785,9 @@ Local Coercion base2 T (c : class_of T) : TTotal.class_of T :=
   @TTotal.Class T c (mixin c).
 Local Coercion base3 T (c : class_of T) : TBDistrLattice.class_of T :=
   @TBDistrLattice.Class T c (mixin c).
+
+Definition rel_class T (c : class_of T) :=
+  @RelOrder.TBTotal.Class _ _ _ _ _ _ _ c (mixin c).
 
 Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
 
@@ -3864,6 +3874,7 @@ Module Exports.
 Coercion base : class_of >-> BTotal.class_of.
 Coercion base2 : class_of >-> TTotal.class_of.
 Coercion base3 : class_of >-> TBDistrLattice.class_of.
+Coercion rel_class : class_of >-> RelOrder.TBTotal.class_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Coercion choiceType : type >-> Choice.type.
@@ -3948,6 +3959,142 @@ End Exports.
 
 End TBTotal.
 Import TBTotal.Exports.
+
+Module RelOrderCoercions.
+Section RelOrderCoercions.
+Variable (disp : unit).
+
+Definition pOrder (T : porderType disp) : {pOrder T} :=
+  POrder le lt (POrder.class T).
+
+Definition bPOrder (T : bPOrderType disp) : {bPOrder T} :=
+  @RelOrder.BPOrder.Pack _ _ le lt bottom (BPOrder.class T).
+
+Definition tPOrder (T : tPOrderType disp) : {tPOrder T} :=
+  @RelOrder.TPOrder.Pack _ _ le lt top (TPOrder.class T).
+
+Definition tbPOrder (T : tbPOrderType disp) : {tbPOrder T} :=
+  @RelOrder.TBPOrder.Pack _ _ le lt bottom top (TBPOrder.class T).
+
+Definition meetOrder (T : meetSemilatticeType disp) : {meetOrder T} :=
+  @RelOrder.Meet.Pack _ _ le lt meet (MeetSemilattice.class T).
+
+Definition bMeetOrder (T : bMeetSemilatticeType disp) : {bMeetOrder T} :=
+  @RelOrder.BMeet.Pack _ _ le lt meet bottom (BMeetSemilattice.class T).
+
+Definition tMeetOrder (T : tMeetSemilatticeType disp) : {tMeetOrder T} :=
+  @RelOrder.TMeet.Pack _ _ le lt meet top (TMeetSemilattice.class T).
+
+Definition tbMeetOrder (T : tbMeetSemilatticeType disp) : {tbMeetOrder T} :=
+  @RelOrder.TBMeet.Pack _ _ le lt meet bottom top (TBMeetSemilattice.class T).
+
+Definition joinOrder (T : joinSemilatticeType disp) : {joinOrder T} :=
+  @RelOrder.Join.Pack _ _ le lt join (JoinSemilattice.class T).
+
+Definition bJoinOrder (T : bJoinSemilatticeType disp) : {bJoinOrder T} :=
+  @RelOrder.BJoin.Pack _ _ le lt join bottom (BJoinSemilattice.class T).
+
+Definition tJoinOrder (T : tJoinSemilatticeType disp) : {tJoinOrder T} :=
+  @RelOrder.TJoin.Pack _ _ le lt join top (TJoinSemilattice.class T).
+
+Definition tbJoinOrder (T : tbJoinSemilatticeType disp) : {tbJoinOrder T} :=
+  @RelOrder.TBJoin.Pack _ _ le lt join bottom top (TBJoinSemilattice.class T).
+
+Definition lattice (T : latticeType disp) : {lattice T} :=
+  @RelOrder.Lattice.Pack _ _ le lt meet join (Lattice.class T).
+
+Definition bLattice (T : bLatticeType disp) : {bLattice T} :=
+  @RelOrder.BLattice.Pack _ _ le lt meet join bottom (BLattice.class T).
+
+Definition tLattice (T : tLatticeType disp) : {tLattice T} :=
+  @RelOrder.TLattice.Pack _ _ le lt meet join top (TLattice.class T).
+
+Definition tbLattice (T : tbLatticeType disp) : {tbLattice T} :=
+  @RelOrder.TBLattice.Pack _ _ le lt meet join bottom top (TBLattice.class T).
+
+Definition distrLattice (T : distrLatticeType disp) : {distrLattice T} :=
+  @RelOrder.DistrLattice.Pack _ _ le lt meet join (DistrLattice.class T).
+
+Definition bDistrLattice (T : bDistrLatticeType disp) : {bDistrLattice T} :=
+  @RelOrder.BDistrLattice.Pack
+    _ _ le lt meet join bottom (BDistrLattice.class T).
+
+Definition tDistrLattice (T : tDistrLatticeType disp) : {tDistrLattice T} :=
+  @RelOrder.TDistrLattice.Pack _ _ le lt meet join top (TDistrLattice.class T).
+
+Definition tbDistrLattice (T : tbDistrLatticeType disp) : {tbDistrLattice T} :=
+  @RelOrder.TBDistrLattice.Pack
+    _ _ le lt meet join bottom top (TBDistrLattice.class T).
+
+Definition totalOrder (T : orderType disp) : {totalOrder T} :=
+  @RelOrder.Total.Pack _ _ le lt meet join (Total.class T).
+
+Definition bTotalOrder (T : bOrderType disp) : {bTotalOrder T} :=
+  @RelOrder.BTotal.Pack _ _ le lt meet join bottom (BTotal.class T).
+
+Definition tTotalOrder (T : tOrderType disp) : {tTotalOrder T} :=
+  @RelOrder.TTotal.Pack _ _ le lt meet join top (TTotal.class T).
+
+Definition tbTotalOrder (T : tbOrderType disp) : {tbTotalOrder T} :=
+  @RelOrder.TBTotal.Pack _ _ le lt meet join bottom top (TBTotal.class T).
+
+End RelOrderCoercions.
+
+Module Exports.
+
+Coercion pOrder : POrder.type >-> RelOrder.POrder.order.
+Coercion bPOrder : BPOrder.type >-> RelOrder.BPOrder.order.
+Coercion tPOrder : TPOrder.type >-> RelOrder.TPOrder.order.
+Coercion tbPOrder : TBPOrder.type >-> RelOrder.TBPOrder.order.
+Coercion meetOrder : MeetSemilattice.type >-> RelOrder.Meet.order.
+Coercion bMeetOrder : BMeetSemilattice.type >-> RelOrder.BMeet.order.
+Coercion tMeetOrder : TMeetSemilattice.type >-> RelOrder.TMeet.order.
+Coercion tbMeetOrder : TBMeetSemilattice.type >-> RelOrder.TBMeet.order.
+Coercion joinOrder : JoinSemilattice.type >-> RelOrder.Join.order.
+Coercion bJoinOrder : BJoinSemilattice.type >-> RelOrder.BJoin.order.
+Coercion tJoinOrder : TJoinSemilattice.type >-> RelOrder.TJoin.order.
+Coercion tbJoinOrder : TBJoinSemilattice.type >-> RelOrder.TBJoin.order.
+Coercion lattice : Lattice.type >-> RelOrder.Lattice.order.
+Coercion bLattice : BLattice.type >-> RelOrder.BLattice.order.
+Coercion tLattice : TLattice.type >-> RelOrder.TLattice.order.
+Coercion tbLattice : TBLattice.type >-> RelOrder.TBLattice.order.
+Coercion distrLattice : DistrLattice.type >-> RelOrder.DistrLattice.order.
+Coercion bDistrLattice : BDistrLattice.type >-> RelOrder.BDistrLattice.order.
+Coercion tDistrLattice : TDistrLattice.type >-> RelOrder.TDistrLattice.order.
+Coercion tbDistrLattice : TBDistrLattice.type >-> RelOrder.TBDistrLattice.order.
+Coercion totalOrder : Total.type >-> RelOrder.Total.order.
+Coercion bTotalOrder : BTotal.type >-> RelOrder.BTotal.order.
+Coercion tTotalOrder : TTotal.type >-> RelOrder.TTotal.order.
+Coercion tbTotalOrder : TBTotal.type >-> RelOrder.TBTotal.order.
+
+Canonical pOrder.
+Canonical bPOrder.
+Canonical tPOrder.
+Canonical tbPOrder.
+Canonical meetOrder.
+Canonical bMeetOrder.
+Canonical tMeetOrder.
+Canonical tbMeetOrder.
+Canonical joinOrder.
+Canonical bJoinOrder.
+Canonical tJoinOrder.
+Canonical tbJoinOrder.
+Canonical lattice.
+Canonical bLattice.
+Canonical tLattice.
+Canonical tbLattice.
+Canonical distrLattice.
+Canonical bDistrLattice.
+Canonical tDistrLattice.
+Canonical tbDistrLattice.
+Canonical totalOrder.
+Canonical bTotalOrder.
+Canonical tTotalOrder.
+Canonical tbTotalOrder.
+
+End Exports.
+End RelOrderCoercions.
+Import RelOrderCoercions.Exports.
 
 (**********)
 (* FINITE *)
@@ -6325,15 +6472,24 @@ Import FinTBTotal.Exports.
 
 Module Import DualOrder.
 Section DualOrder.
+
+Canonical dual_eqType (T : eqType) := EqType T [eqMixin of T^d].
+Canonical dual_choiceType (T : choiceType) := [choiceType of T^d].
+Canonical dual_countType (T : countType) := [countType of T^d].
+Canonical dual_finType (T : finType) := [finType of T^d].
+
 Context {disp : unit}.
 
+Canonical dual_porderType (T : porderType disp) :=
+  POrderType (dual_display disp) T^d
+             (RelOrder.POrder.class (RelOrder.dual_pOrder T)).
 Canonical dual_tPOrderType (T : bPOrderType disp) :=
-  TPOrderType T^d (BPOrder.mixin (BPOrder.class T)).
+  TPOrderType T^d (RelOrder.TPOrder.class (RelOrder.dual_tPOrder T)).
 Canonical dual_bPOrderType (T : tPOrderType disp) :=
-  BPOrderType T^d (TPOrder.mixin (TPOrder.class T)).
+  BPOrderType T^d (RelOrder.BPOrder.class (RelOrder.dual_bPOrder T)).
 Canonical dual_tbPOrderType (T : tbPOrderType disp) := [tbPOrderType of T^d].
 Canonical dual_meetSemilatticeType (T : joinSemilatticeType disp) :=
-  MeetSemilatticeType T^d (JoinSemilattice.mixin (JoinSemilattice.class T)).
+  MeetSemilatticeType T^d (RelOrder.Meet.class (RelOrder.dual_meetOrder T)).
 Canonical dual_bMeetSemilatticeType (T : tJoinSemilatticeType disp) :=
   [bMeetSemilatticeType of T^d].
 Canonical dual_tMeetSemilatticeType (T : bJoinSemilatticeType disp) :=
@@ -6341,7 +6497,7 @@ Canonical dual_tMeetSemilatticeType (T : bJoinSemilatticeType disp) :=
 Canonical dual_tbMeetSemilatticeType (T : tbJoinSemilatticeType disp) :=
   [tbMeetSemilatticeType of T^d].
 Canonical dual_joinSemilatticeType (T : meetSemilatticeType disp) :=
-  JoinSemilatticeType T^d (MeetSemilattice.mixin (MeetSemilattice.class T)).
+  JoinSemilatticeType T^d (RelOrder.Join.class (RelOrder.dual_joinOrder T)).
 Canonical dual_bJoinSemilatticeType (T : tMeetSemilatticeType disp) :=
   [bJoinSemilatticeType of T^d].
 Canonical dual_tJoinSemilatticeType (T : bMeetSemilatticeType disp) :=
@@ -6352,12 +6508,9 @@ Canonical dual_latticeType (T : latticeType disp) := [latticeType of T^d].
 Canonical dual_bLatticeType (T : tLatticeType disp) := [bLatticeType of T^d].
 Canonical dual_tLatticeType (T : bLatticeType disp) := [tLatticeType of T^d].
 Canonical dual_tbLatticeType (T : tbLatticeType disp) := [tbLatticeType of T^d].
-Definition dual_distrLatticeMixin (T : distrLatticeType disp) :=
-  let m := DistrLattice.mixin (DistrLattice.class T) in
-  @DistrLattice.Mixin _ (Lattice.class [latticeType of T^d])
-                      (DistrLattice.joinIl m) (DistrLattice.meetUl m).
 Canonical dual_distrLatticeType (T : distrLatticeType disp) :=
-  DistrLatticeType T^d (dual_distrLatticeMixin T).
+  DistrLatticeType
+    T^d (RelOrder.DistrLattice.class (RelOrder.dual_distrLattice T)).
 Canonical dual_bDistrLatticeType (T : tDistrLatticeType disp) :=
   [bDistrLatticeType of T^d].
 Canonical dual_tDistrLatticeType (T : bDistrLatticeType disp) :=
@@ -6365,8 +6518,7 @@ Canonical dual_tDistrLatticeType (T : bDistrLatticeType disp) :=
 Canonical dual_tbDistrLatticeType (T : tbDistrLatticeType disp) :=
   [tbDistrLatticeType of T^d].
 Canonical dual_orderType (T : orderType disp) :=
-  OrderType T^d ((fun x y => @Total.mixin _ (Total.class T) y x) :
-                   Total.mixin_of (Lattice.class [distrLatticeType of T^d])).
+  OrderType T^d (RelOrder.Total.class (RelOrder.dual_totalOrder T)).
 Canonical dual_bOrderType (T : tOrderType disp) := [bOrderType of T^d].
 Canonical dual_tOrderType (T : bOrderType disp) := [tOrderType of T^d].
 Canonical dual_tbOrderType (T : tbOrderType disp) := [tbOrderType of T^d].
@@ -6399,6 +6551,12 @@ Canonical dual_finOrderType (T : finOrderType disp) :=
 Canonical dual_finTBOrderType (T : finTBOrderType disp) :=
   [finTBOrderType of T^d].
 
+Lemma leEdual (T : porderType disp) (x y : T) : (x <=^d y :> T^d) = (y <= x).
+Proof. by []. Qed.
+
+Lemma ltEdual (T : porderType disp) (x y : T) : (x <^d y :> T^d) = (y < x).
+Proof. by []. Qed.
+
 Lemma botEdual (T : bPOrderType disp) : (1 : T^d) = (0 : T). Proof. by []. Qed.
 
 Lemma topEdual (T : tPOrderType disp) : (0 : T^d) = (1 : T). Proof. by []. Qed.
@@ -6428,98 +6586,70 @@ Implicit Types (x y : T) (s : seq T).
 Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
 Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
 
-Lemma lexx (x : T) : x <= x.
-Proof. by case: T x => ? [? []]. Qed.
+Lemma lexx x : x <= x. Proof. exact: lexx. Qed.
 Hint Resolve lexx : core.
 
 Definition le_refl : reflexive le := lexx.
 Definition ge_refl : reflexive ge := lexx.
 
-Lemma le_anti: antisymmetric (<=%O : rel T).
-Proof. by case: T => ? [? [? ? ? ? ? le_anti ?]] ? ? /andP[/le_anti]. Qed.
-
-Lemma ge_anti: antisymmetric (>=%O : rel T).
-Proof. by move=> x y /le_anti. Qed.
-
-Lemma le_trans: transitive (<=%O : rel T).
-Proof. by case: T => ? [? []]. Qed.
-
-Lemma ge_trans: transitive (>=%O : rel T).
-Proof. by move=> ? ? ? ? /le_trans; apply. Qed.
+Lemma le_anti: antisymmetric (<=%O : rel T). Proof. exact: le_anti. Qed.
+Lemma ge_anti: antisymmetric (>=%O : rel T). Proof. exact: ge_anti. Qed.
+Lemma le_trans: transitive (<=%O : rel T). Proof. exact: le_trans. Qed.
+Lemma ge_trans: transitive (>=%O : rel T). Proof. exact: ge_trans. Qed.
 
 Lemma le_le_trans x y z t : z <= x -> y <= t -> x <= y -> z <= t.
 Proof. by move=> + /(le_trans _)/[apply]; apply: le_trans. Qed.
 
 Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
-Proof. by case: T x y => ? [? []]. Qed.
+Proof. exact: lt_def. Qed.
 
 Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
-Proof. by rewrite lt_def eq_sym. Qed.
+Proof. exact: lt_neqAle. Qed.
 
-Lemma ltxx x: x < x = false.
-Proof. by rewrite lt_def eqxx. Qed.
+Lemma ltxx x: x < x = false. Proof. exact: ltxx. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
 Hint Resolve lt_irreflexive : core.
 
 Definition ltexx := (lexx, ltxx).
 
-Lemma le_eqVlt x y: (x <= y) = (x == y) || (x < y).
-Proof. by rewrite lt_neqAle; case: eqP => //= ->; rewrite lexx. Qed.
-
-Lemma lt_eqF x y: x < y -> x == y = false.
-Proof. by rewrite lt_neqAle => /andP [/negbTE->]. Qed.
-
-Lemma gt_eqF x y : y < x -> x == y = false.
-Proof. by apply: contraTF => /eqP ->; rewrite ltxx. Qed.
-
-Lemma eq_le x y: (x == y) = (x <= y <= x).
-Proof. by apply/eqP/idP => [->|/le_anti]; rewrite ?lexx. Qed.
-
-Lemma ltW x y: x < y -> x <= y.
-Proof. by rewrite le_eqVlt orbC => ->. Qed.
+Lemma le_eqVlt x y: (x <= y) = (x == y) || (x < y). Proof. exact: le_eqVlt. Qed.
+Lemma lt_eqF x y: x < y -> x == y = false. Proof. exact: lt_eqF. Qed.
+Lemma gt_eqF x y : y < x -> x == y = false. Proof. exact: gt_eqF. Qed.
+Lemma eq_le x y: (x == y) = (x <= y <= x). Proof. exact: eq_le. Qed.
+Lemma ltW x y: x < y -> x <= y. Proof. exact: ltW. Qed.
 
 Lemma lt_le_trans y x z: x < y -> y <= z -> x < z.
-Proof.
-rewrite !lt_neqAle => /andP [nexy lexy leyz]; rewrite (le_trans lexy) // andbT.
-by apply: contraNneq nexy => eqxz; rewrite eqxz eq_le leyz andbT in lexy *.
-Qed.
+Proof. exact: lt_le_trans. Qed.
 
 Lemma lt_trans: transitive (<%O : rel T).
-Proof. by move=> y x z le1 /ltW le2; apply/(@lt_le_trans y). Qed.
+Proof. exact: lt_trans. Qed.
 
 Lemma le_lt_trans y x z: x <= y -> y < z -> x < z.
-Proof. by rewrite le_eqVlt => /orP [/eqP ->|/lt_trans t /t]. Qed.
+Proof. exact: le_lt_trans. Qed.
 
 Lemma lt_nsym x y : x < y -> y < x -> False.
-Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
+Proof. exact: lt_nsym. Qed.
 
 Lemma lt_asym x y : x < y < x = false.
-Proof. by apply/negP => /andP []; apply: lt_nsym. Qed.
+Proof. exact: lt_asym. Qed.
 
 Lemma le_gtF x y: x <= y -> y < x = false.
-Proof.
-by move=> le_xy; apply/negP => /lt_le_trans /(_ le_xy); rewrite ltxx.
-Qed.
+Proof. exact: le_gtF. Qed.
 
 Lemma lt_geF x y : (x < y) -> y <= x = false.
-Proof.
-by move=> le_xy; apply/negP => /le_lt_trans /(_ le_xy); rewrite ltxx.
-Qed.
+Proof. exact: lt_geF. Qed.
 
 Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
 
 Lemma lt_leAnge x y : (x < y) = (x <= y) && ~~ (y <= x).
-Proof.
-apply/idP/idP => [ltxy|/andP[lexy Nleyx]]; first by rewrite ltW // lt_geF.
-by rewrite lt_neqAle lexy andbT; apply: contraNneq Nleyx => ->.
-Qed.
+Proof. exact: lt_leAnge. Qed.
 
 Lemma lt_le_asym x y : x < y <= x = false.
-Proof. by rewrite lt_neqAle -andbA -eq_le eq_sym andNb. Qed.
+Proof. exact: lt_le_asym. Qed.
 
 Lemma le_lt_asym x y : x <= y < x = false.
-Proof. by rewrite andbC lt_le_asym. Qed.
+Proof. exact: le_lt_asym. Qed.
 
 Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
@@ -6548,10 +6678,7 @@ Lemma lt_path_pairwise x s : path <%O x s = pairwise <%O (x :: s).
 Proof. exact/path_pairwise/lt_trans. Qed.
 
 Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
-Proof.
-rewrite le_sorted_pairwise lt_sorted_pairwise uniq_pairwise -pairwise_relI.
-by apply/eq_pairwise => ? ?; rewrite lt_neqAle.
-Qed.
+Proof. exact: lt_sorted_uniq_le. Qed.
 
 Lemma le_sorted_mask m s : sorted <=%O s -> sorted <=%O (mask m s).
 Proof. exact/sorted_mask/le_trans. Qed.
@@ -6580,30 +6707,22 @@ Proof. exact/path_filter/lt_trans. Qed.
 Lemma le_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <=%O s ->
  {in [pred n | (n < size s)%N] &,
     {homo nth x0 s : i j / (i < j)%N >-> i <= j}}.
-Proof. exact/sorted_ltn_nth/le_trans. Qed.
+Proof. exact: le_sorted_ltn_nth. Qed.
 
 Lemma le_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=%O s ->
   {in [pred n | (n < size s)%N] &,
     {homo nth x0 s : i j / (i <= j)%N >-> i <= j}}.
-Proof. exact/sorted_leq_nth/le_refl/le_trans. Qed.
+Proof. exact: le_sorted_leq_nth. Qed.
 
 Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <%O s ->
   {in [pred n | (n < size s)%N] &,
     {mono nth x0 s : i j / (i <= j)%N >-> i <= j}}.
-Proof.
-rewrite lt_sorted_uniq_le => /andP[s_uniq le_s].
-apply: (total_homo_mono_in _ _ ltn_neqAle lt_neqAle le_anti leq_total) => //.
-move=> i j ilt jlt ltij; rewrite lt_neqAle le_sorted_leq_nth// 1?ltnW//.
-by rewrite nth_uniq// ltn_eqF.
-Qed.
+Proof. exact: lt_sorted_leq_nth. Qed.
 
 Lemma lt_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <%O s ->
   {in [pred n | (n < size s)%N] &,
     {mono nth x0 s : i j / (i < j)%N >-> i < j}}.
-Proof.
-move=> ss; have := lt_sorted_leq_nth x0 ss.
-exact: (anti_mono_in _ ltn_neqAle lt_neqAle anti_leq).
-Qed.
+Proof. exact: lt_sorted_ltn_nth. Qed.
 
 Lemma subseq_le_path x s1 s2 : subseq s1 s2 -> path <=%O x s2 -> path <=%O x s1.
 Proof. exact/subseq_path/le_trans. Qed.
@@ -6622,244 +6741,178 @@ Proof. exact/sorted_uniq/ltxx/lt_trans. Qed.
 
 Lemma lt_sorted_eq s1 s2 :
   sorted <%O s1 -> sorted <%O s2 -> s1 =i s2 -> s1 = s2.
-Proof. exact/irr_sorted_eq/ltxx/lt_trans. Qed.
+Proof. exact: lt_sorted_eq. Qed.
 
 Lemma le_sorted_eq s1 s2 :
   sorted <=%O s1 -> sorted <=%O s2 -> perm_eq s1 s2 -> s1 = s2.
-Proof. exact/sorted_eq/le_anti/le_trans. Qed.
+Proof. exact: le_sorted_eq. Qed.
 
 Lemma filter_lt_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   [seq x <- s | x < nth x0 s i] = take i s.
-Proof.
-move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
-under eq_in_filter => j do
-  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_ltn_nth//].
-by rewrite (filter_iota_ltn 0) ?map_nth_iota0 // ltnW.
-Qed.
+Proof. exact: filter_lt_nth. Qed.
 
 Lemma count_lt_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   count (< nth x0 s i) s = i.
-Proof.
-by move=> ss i_lt; rewrite -size_filter/= filter_lt_nth// size_take i_lt.
-Qed.
+Proof. exact: count_lt_nth. Qed.
 
 Lemma filter_le_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   [seq x <- s | x <= nth x0 s i] = take i.+1 s.
-Proof.
-move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
-under eq_in_filter => j do
-  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_leq_nth//].
-by rewrite (filter_iota_leq 0)// map_nth_iota0.
-Qed.
+Proof. exact: filter_le_nth. Qed.
 
 Lemma count_le_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   count (<= nth x0 s i) s = i.+1.
-Proof.
-by move=> ss i_lt; rewrite -size_filter/= filter_le_nth// size_takel.
-Qed.
+Proof. exact: count_le_nth. Qed.
 
 Lemma count_lt_le_mem x s : (count (< x) s < count (<= x) s)%N = (x \in s).
-Proof.
-have := count_predUI (pred1 x) (< x) s.
-have -> : count (predI (pred1 x) (< x)) s = 0%N.
-  rewrite (@eq_count _ _ pred0) ?count_pred0 // => y /=.
-  by rewrite lt_def; case: eqP => //= ->; rewrite eqxx.
-have /eq_count-> : [predU1 x & < x] =1 (<= x) by move=> y /=; rewrite le_eqVlt.
-by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
-Qed.
+Proof. exact: count_lt_le_mem. Qed.
 
 Lemma sorted_filter_lt x s :
   sorted <=%O s -> [seq y <- s | y < x] = take (count (< x) s) s.
-Proof.
-elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
-case: ifP => [|ltyxF]; rewrite IHs//.
-rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
-by move=> /(allP le_y_s) yz; apply: contraFF ltyxF; apply: le_lt_trans.
-Qed.
+Proof. exact: sorted_filter_lt. Qed.
 
 Lemma sorted_filter_le x s :
   sorted <=%O s -> [seq y <- s | y <= x] = take (count (<= x) s) s.
-Proof.
-elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
-case: ifP => [|leyxF]; rewrite IHs//.
-rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
-by move=> /(allP le_y_s) yz; apply: contraFF leyxF; apply: le_trans.
-Qed.
+Proof. exact: sorted_filter_le. Qed.
 
 Lemma nth_count_le x x0 s i : sorted <=%O s ->
   (i < count (<= x) s)%N -> nth x0 s i <= x.
-Proof.
-move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_le //.
-by apply/(all_nthP _ (filter_all (<= x) _)); rewrite size_filter.
-Qed.
+Proof. exact: nth_count_le. Qed.
 
 Lemma nth_count_lt x x0 s i : sorted <=%O s ->
   (i < count (< x) s)%N -> nth x0 s i < x.
-Proof.
-move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_lt //.
-by apply/(all_nthP _ (filter_all (< x) _)); rewrite size_filter.
-Qed.
+Proof. exact: nth_count_lt. Qed.
 
 Lemma sort_le_id s : sorted <=%O s -> sort <=%O s = s.
-Proof. exact/sorted_sort/le_trans. Qed.
+Proof. exact: sort_le_id. Qed.
 
 Lemma sort_lt_id s : sorted <%O s -> sort <%O s = s.
 Proof. exact/sorted_sort/lt_trans. Qed.
 
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
-Proof.
-move=> c_xy; apply/idP/idP => [/le_gtF/negP/negP//|]; rewrite lt_neqAle.
-by move: c_xy => /orP [] -> //; rewrite andbT negbK => /eqP ->.
-Qed.
+Proof. exact: comparable_leNgt. Qed.
 
 Lemma comparable_ltNge x y : x >=< y -> (x < y) = ~~ (y <= x).
-Proof.
-move=> c_xy; apply/idP/idP => [/lt_geF/negP/negP//|].
-by rewrite lt_neqAle eq_le; move: c_xy => /orP [] -> //; rewrite andbT.
-Qed.
+Proof. exact: comparable_ltNge. Qed.
 
 Lemma comparable_ltgtP x y : x >=< y ->
   compare x y (min y x) (min x y) (max y x) (max x y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
-Proof.
-rewrite /min /max />=<%O !le_eqVlt [y == x]eq_sym.
-have := (eqVneq x y, (boolP (x < y), boolP (y < x))).
-move=> [[->//|neq_xy /=] [[] xy [] //=]] ; do ?by rewrite ?ltxx; constructor.
-  by rewrite ltxx in xy.
-by rewrite le_gtF // ltW.
-Qed.
+Proof. exact: comparable_ltgtP. Qed.
 
 Lemma comparable_leP x y : x >=< y ->
   le_xor_gt x y (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
-Proof. by case/comparable_ltgtP=> [?|?|->]; constructor; rewrite // ltW. Qed.
+Proof. exact: comparable_leP. Qed.
 
 Lemma comparable_ltP x y : x >=< y ->
   lt_xor_ge x y (min y x) (min x y) (max y x) (max x y) (y <= x) (x < y).
-Proof. by case/comparable_ltgtP=> [?|?|->]; constructor; rewrite // ltW. Qed.
+Proof. exact: comparable_ltP. Qed.
 
 Lemma comparable_sym x y : (y >=< x) = (x >=< y).
-Proof. by rewrite /comparable orbC. Qed.
+Proof. exact: comparable_sym. Qed.
 
 Lemma comparablexx x : x >=< x.
-Proof. by rewrite /comparable lexx. Qed.
+Proof. exact: comparablexx. Qed.
 
 Lemma incomparable_eqF x y : (x >< y) -> (x == y) = false.
-Proof. by apply: contraNF => /eqP ->; rewrite comparablexx. Qed.
+Proof. exact: incomparable_eqF. Qed.
 
 Lemma incomparable_leF x y : (x >< y) -> (x <= y) = false.
-Proof. by apply: contraNF; rewrite /comparable => ->. Qed.
+Proof. exact: incomparable_leF. Qed.
 
 Lemma incomparable_ltF x y : (x >< y) -> (x < y) = false.
-Proof. by rewrite lt_neqAle => /incomparable_leF ->; rewrite andbF. Qed.
+Proof. exact: incomparable_ltF. Qed.
 
 Lemma comparableP x y : incompare x y
   (min y x) (min x y) (max y x) (max x y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
   (y >=< x) (x >=< y).
-Proof.
-rewrite ![y >=< _]comparable_sym; have [c_xy|i_xy] := boolP (x >=< y).
-  by case: (comparable_ltgtP c_xy) => ?; constructor.
-by rewrite /min /max ?incomparable_eqF ?incomparable_leF;
-   rewrite ?incomparable_ltF// 1?comparable_sym //; constructor.
-Qed.
+Proof. exact: comparableP. Qed.
 
 Lemma le_comparable (x y : T) : x <= y -> x >=< y.
-Proof. by case: comparableP. Qed.
+Proof. exact: le_comparable. Qed.
 
 Lemma lt_comparable (x y : T) : x < y -> x >=< y.
-Proof. by case: comparableP. Qed.
+Proof. exact: lt_comparable. Qed.
 
 Lemma ge_comparable (x y : T) : y <= x -> x >=< y.
-Proof. by case: comparableP. Qed.
+Proof. exact: ge_comparable. Qed.
 
 Lemma gt_comparable (x y : T) : y < x -> x >=< y.
-Proof. by case: comparableP. Qed.
+Proof. exact: gt_comparable. Qed.
 
 (* leif *)
 
 Lemma leifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
-Proof.
-rewrite /leif le_eqVlt; apply: (iffP idP)=> [|[]].
-  by case: C => [/eqP->|lxy]; rewrite ?eqxx // lxy lt_eqF.
-by case/orP=> [/eqP->|lxy] <-; rewrite ?eqxx // lt_eqF.
-Qed.
+Proof. exact: leifP. Qed.
 
 Lemma leif_refl x C : reflect (x <= x ?= iff C) C.
-Proof. by apply: (iffP idP) => [-> | <-] //; split; rewrite ?eqxx. Qed.
+Proof. exact: leif_refl. Qed.
 
 Lemma leif_trans x1 x2 x3 C12 C23 :
   x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23.
-Proof.
-move=> ltx12 ltx23; apply/leifP; rewrite -ltx12.
-case eqx12: (x1 == x2).
-  by rewrite (eqP eqx12) lt_neqAle !ltx23 andbT; case C23.
-by rewrite (@lt_le_trans x2) ?ltx23 // lt_neqAle eqx12 ltx12.
-Qed.
+Proof. exact: leif_trans. Qed.
 
 Lemma leif_le x y : x <= y -> x <= y ?= iff (x >= y).
-Proof. by move=> lexy; split=> //; rewrite eq_le lexy. Qed.
+Proof. exact: leif_le. Qed.
 
 Lemma leif_eq x y : x <= y -> x <= y ?= iff (x == y).
 Proof. by []. Qed.
 
 Lemma ge_leif x y C : x <= y ?= iff C -> (y <= x) = C.
-Proof. by case=> le_xy; rewrite eq_le le_xy. Qed.
+Proof. exact: ge_leif. Qed.
 
 Lemma lt_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
-Proof. by move=> le_xy; rewrite lt_neqAle !le_xy andbT. Qed.
+Proof. exact: lt_leif. Qed.
 
 Lemma ltNleif x y C : x <= y ?= iff ~~ C -> (x < y) = C.
-Proof. by move/lt_leif; rewrite negbK. Qed.
+Proof. exact: ltNleif. Qed.
 
 Lemma eq_leif x y C : x <= y ?= iff C -> (x == y) = C.
-Proof. by move/leifP; case: C comparableP => [] []. Qed.
+Proof. exact: eq_leif. Qed.
 
 Lemma eqTleif x y C : x <= y ?= iff C -> C -> x = y.
-Proof. by move=> /eq_leif<-/eqP. Qed.
+Proof. exact: eqTleif. Qed.
 
 (* lteif *)
 
 Lemma lteif_trans x y z C1 C2 :
   x < y ?<= if C1 -> y < z ?<= if C2 -> x < z ?<= if C1 && C2.
-Proof.
-case: C1 C2 => [][];
-  [exact: le_trans | exact: le_lt_trans | exact: lt_le_trans | exact: lt_trans].
-Qed.
+Proof. exact: lteif_trans. Qed.
 
 Lemma lteif_anti C1 C2 x y :
   (x < y ?<= if C1) && (y < x ?<= if C2) = C1 && C2 && (x == y).
-Proof. by case: C1 C2 => [][]; rewrite lte_anti. Qed.
+Proof. exact: lteif_anti. Qed.
 
 Lemma lteifxx x C : (x < x ?<= if C) = C.
-Proof. by case: C; rewrite /= ltexx. Qed.
+Proof. exact: lteifxx. Qed.
 
 Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
-Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
+Proof. exact: lteifNF. Qed.
 
 Lemma lteifS x y C : x < y -> x < y ?<= if C.
-Proof. by case: C => //= /ltW. Qed.
+Proof. exact: lteifS. Qed.
 
 Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
 
 Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
 
 Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
-Proof. by case=> [][] /=; case: comparableP. Qed.
+Proof. exact: lteif_orb. Qed.
 
 Lemma lteif_andb x y : {morph lteif x y : p q / p && q}.
-Proof. by case=> [][] /=; case: comparableP. Qed.
+Proof. exact: lteif_andb. Qed.
 
 Lemma lteif_imply C1 C2 x y : C1 ==> C2 -> x < y ?<= if C1 -> x < y ?<= if C2.
-Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
+Proof. exact: lteif_imply. Qed.
 
 Lemma lteifW C x y : x < y ?<= if C -> x <= y.
-Proof. by case: C => // /ltW. Qed.
+Proof. exact: lteifW. Qed.
 
 Lemma ltrW_lteif C x y : x < y -> x < y ?<= if C.
-Proof. by case: C => // /ltW. Qed.
+Proof. exact: ltrW_lteif. Qed.
 
 Lemma lteifN C x y : x < y ?<= if ~~ C -> ~~ (y < x ?<= if C).
-Proof. by case: C => /=; case: comparableP. Qed.
+Proof. exact: lteifN. Qed.
 
 (* min and max *)
 
@@ -6867,166 +6920,126 @@ Lemma minElt x y : min x y = if x < y then x else y. Proof. by []. Qed.
 Lemma maxElt x y : max x y = if x < y then y else x. Proof. by []. Qed.
 
 Lemma minEle x y : min x y = if x <= y then x else y.
-Proof. by case: comparableP. Qed.
+Proof. exact: minEle. Qed.
 
 Lemma maxEle x y : max x y = if x <= y then y else x.
-Proof. by case: comparableP. Qed.
+Proof. exact: maxEle. Qed.
 
 Lemma comparable_minEgt x y : x >=< y -> min x y = if x > y then y else x.
-Proof. by case: comparableP. Qed.
+Proof. exact: comparable_minEgt. Qed.
 Lemma comparable_maxEgt x y : x >=< y -> max x y = if x > y then x else y.
-Proof. by case: comparableP. Qed.
+Proof. exact: comparable_maxEgt. Qed.
 Lemma comparable_minEge x y : x >=< y -> min x y = if x >= y then y else x.
-Proof. by case: comparableP. Qed.
+Proof. exact: comparable_minEge. Qed.
 Lemma comparable_maxEge x y : x >=< y -> max x y = if x >= y then x else y.
-Proof. by case: comparableP. Qed.
+Proof. exact: comparable_maxEge. Qed.
 
-Lemma min_l x y : x <= y -> min x y = x. Proof. by case: comparableP. Qed.
-Lemma min_r x y : y <= x -> min x y = y. Proof. by case: comparableP. Qed.
-Lemma max_l x y : y <= x -> max x y = x. Proof. by case: comparableP. Qed.
-Lemma max_r x y : x <= y -> max x y = y. Proof. by case: comparableP. Qed.
+Lemma min_l x y : x <= y -> min x y = x. Proof. exact: min_l. Qed.
+Lemma min_r x y : y <= x -> min x y = y. Proof. exact: min_r. Qed.
+Lemma max_l x y : y <= x -> max x y = x. Proof. exact: max_l. Qed.
+Lemma max_r x y : x <= y -> max x y = y. Proof. exact: max_r. Qed.
 
-Lemma minxx : idempotent (min : T -> T -> T).
-Proof. by rewrite /min => x; rewrite ltxx. Qed.
+Lemma minxx : idempotent (min : T -> T -> T). Proof. exact: minxx. Qed.
+Lemma maxxx : idempotent (max : T -> T -> T). Proof. exact: maxxx. Qed.
 
-Lemma maxxx : idempotent (max : T -> T -> T).
-Proof. by rewrite /max => x; rewrite ltxx. Qed.
-
-Lemma eq_minl x y : (min x y == x) = (x <= y).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
-
-Lemma eq_maxr x y : (max x y == y) = (x <= y).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
+Lemma eq_minl x y : (min x y == x) = (x <= y). Proof. exact: eq_minl. Qed.
+Lemma eq_maxr x y : (max x y == y) = (x <= y). Proof. exact: eq_maxr. Qed.
 
 Lemma min_idPl x y : reflect (min x y = x) (x <= y).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_minl. Qed.
+Proof. exact: min_idPl. Qed.
 
 Lemma max_idPr x y : reflect (max x y = y) (x <= y).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_maxr. Qed.
+Proof. exact: max_idPr. Qed.
 
-Lemma min_minKx x y : min (min x y) y = min x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma min_minxK x y : min x (min x y) = min x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma max_maxKx x y : max (max x y) y = max x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma max_maxxK x y : max x (max x y) = max x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+Lemma min_minKx x y : min (min x y) y = min x y. Proof. exact: min_minKx. Qed.
+Lemma min_minxK x y : min x (min x y) = min x y. Proof. exact: min_minxK. Qed.
+Lemma max_maxKx x y : max (max x y) y = max x y. Proof. exact: max_maxKx. Qed.
+Lemma max_maxxK x y : max x (max x y) = max x y. Proof. exact: max_maxxK. Qed.
 
 Lemma comparable_minl z : {in >=< z &, forall x y, min x y >=< z}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Proof. exact: comparable_minl. Qed.
 
 Lemma comparable_minr z : {in >=<%O z &, forall x y, z >=< min x y}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Proof. exact: comparable_minr. Qed.
 
 Lemma comparable_maxl z : {in >=< z &, forall x y, max x y >=< z}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Proof. exact: comparable_maxl. Qed.
 
 Lemma comparable_maxr z : {in >=<%O z &, forall x y, z >=< max x y}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Proof. exact: comparable_maxr. Qed.
 
 Section Comparable2.
 Variables (z x y : T) (cmp_xy : x >=< y).
 
-Lemma comparable_minC : min x y = min y x.
-Proof. by case: comparableP cmp_xy. Qed.
-
-Lemma comparable_maxC : max x y = max y x.
-Proof. by case: comparableP cmp_xy. Qed.
+Lemma comparable_minC : min x y = min y x. Proof. exact: comparable_minC. Qed.
+Lemma comparable_maxC : max x y = max y x. Proof. exact: comparable_maxC. Qed.
 
 Lemma comparable_eq_minr : (min x y == y) = (y <= x).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+Proof. exact: comparable_eq_minr. Qed.
 
 Lemma comparable_eq_maxl : (max x y == x) = (y <= x).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+Proof. exact: comparable_eq_maxl. Qed.
 
 Lemma comparable_min_idPr : reflect (min x y = y) (y <= x).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_minr. Qed.
+Proof. exact: comparable_min_idPr. Qed.
 
 Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_maxl. Qed.
+Proof. exact: comparable_max_idPl. Qed.
 
 Lemma comparable_le_minr : (z <= min x y) = (z <= x) && (z <= y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
-  by case: (comparableP z) => // [/lt_trans xlt/xlt|->] /ltW.
-Qed.
+Proof. exact: comparable_le_minr. Qed.
 
 Lemma comparable_le_minl : (min x y <= z) = (x <= z) || (y <= z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/le_trans/ltW.
-Qed.
+Proof. exact: comparable_le_minl. Qed.
 
 Lemma comparable_lt_minr : (z < min x y) = (z < x) && (z < y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
-  by case: (comparableP z) => // /lt_trans xlt/xlt.
-Qed.
+Proof. exact: comparable_lt_minr. Qed.
 
 Lemma comparable_lt_minl : (min x y < z) = (x < z) || (y < z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/lt_trans.
-Qed.
+Proof. exact: comparable_lt_minl. Qed.
 
 Lemma comparable_le_maxr : (z <= max x y) = (z <= x) || (z <= y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]// /le_trans->//; apply/ltW.
-Qed.
+Proof. exact: comparable_le_maxr. Qed.
 
 Lemma comparable_le_maxl : (max x y <= z) = (x <= z) && (y <= z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
-  by case: (comparableP z) => // [ylt /lt_trans /(_ _)/ltW|->/ltW]->.
-Qed.
+Proof. exact: comparable_le_maxl. Qed.
 
 Lemma comparable_lt_maxr : (z < max x y) = (z < x) || (z < y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]// /lt_trans->.
-Qed.
+Proof. exact: comparable_lt_maxr. Qed.
 
 Lemma comparable_lt_maxl : (max x y < z) = (x < z) && (y < z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
-by case: (comparableP z) => // ylt /lt_trans->.
-Qed.
+Proof. exact: comparable_lt_maxl. Qed.
 
 Lemma comparable_minxK : max (min x y) y = y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Proof. exact: comparable_minxK. Qed.
 
 Lemma comparable_minKx : max x (min x y) = x.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Proof. exact: comparable_minKx. Qed.
 
 Lemma comparable_maxxK : min (max x y) y = y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Proof. exact: comparable_maxxK. Qed.
 
 Lemma comparable_maxKx : min x (max x y) = x.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Proof. exact: comparable_maxKx. Qed.
 
 Lemma comparable_lteifNE C : x >=< y -> x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
-Proof. by case: C => /=; case: comparableP. Qed.
+Proof. exact: comparable_lteifNE. Qed.
 
 Lemma comparable_lteif_minr C :
-  (z < Order.min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_minr, comparable_lt_minr). Qed.
+  (z < min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. exact: comparable_lteif_minr. Qed.
 
 Lemma comparable_lteif_minl C :
-  (Order.min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_minl, comparable_lt_minl). Qed.
+  (min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. exact: comparable_lteif_minl. Qed.
 
 Lemma comparable_lteif_maxr C :
-  (z < Order.max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_maxr, comparable_lt_maxr). Qed.
+  (z < max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. exact: comparable_lteif_maxr. Qed.
 
 Lemma comparable_lteif_maxl C :
-  (Order.max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_maxl, comparable_lt_maxl). Qed.
+  (max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. exact: comparable_lteif_maxl. Qed.
 
 End Comparable2.
 
@@ -7035,120 +7048,63 @@ Variables (x y z : T) (cmp_xy : x >=< y) (cmp_xz : x >=< z) (cmp_yz : y >=< z).
 Let P := comparableP.
 
 Lemma comparable_minA : min x (min y z) = min (min x y) z.
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
-Qed.
+Proof. exact: comparable_minA. Qed.
 
 Lemma comparable_maxA : max x (max y z) = max (max x y) z.
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
-Qed.
+Proof. exact: comparable_maxA. Qed.
 
 Lemma comparable_max_minl : max (min x y) z = min (max x z) (max y z).
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z).
-move=> [xy|xy|xy|<-] [xz|xz|xz|<-] [yz|yz|yz|//->]//= _; rewrite ?ltxx//.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-Qed.
+Proof. exact: comparable_max_minl. Qed.
 
 Lemma comparable_min_maxl : min (max x y) z = max (min x z) (min y z).
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z).
-move=> [xy|xy|xy|<-] [xz|xz|xz|<-] []yz//= _; rewrite ?ltxx//.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy yz; rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
-Qed.
+Proof. exact: comparable_min_maxl. Qed.
 
 End Comparable3.
 
 Lemma comparable_minAC x y z : x >=< y -> x >=< z -> y >=< z ->
   min (min x y) z = min (min x z) y.
-Proof.
-move=> xy xz yz; rewrite -comparable_minA// [min y z]comparable_minC//.
-by rewrite comparable_minA// 1?comparable_sym.
-Qed.
+Proof. exact: comparable_minAC. Qed.
 
 Lemma comparable_maxAC x y z : x >=< y -> x >=< z -> y >=< z ->
   max (max x y) z = max (max x z) y.
-Proof.
-move=> xy xz yz; rewrite -comparable_maxA// [max y z]comparable_maxC//.
-by rewrite comparable_maxA// 1?comparable_sym.
-Qed.
+Proof. exact: comparable_maxAC. Qed.
 
 Lemma comparable_minCA x y z : x >=< y -> x >=< z -> y >=< z ->
   min x (min y z) = min y (min x z).
-Proof.
-move=> xy xz yz; rewrite comparable_minA// [min x y]comparable_minC//.
-by rewrite -comparable_minA// 1?comparable_sym.
-Qed.
+Proof. exact: comparable_minCA. Qed.
 
 Lemma comparable_maxCA x y z : x >=< y -> x >=< z -> y >=< z ->
   max x (max y z) = max y (max x z).
-Proof.
-move=> xy xz yz; rewrite comparable_maxA// [max x y]comparable_maxC//.
-by rewrite -comparable_maxA// 1?comparable_sym.
-Qed.
+Proof. exact: comparable_maxCA. Qed.
 
 Lemma comparable_minACA x y z t :
     x >=< y -> x >=< z -> x >=< t -> y >=< z -> y >=< t -> z >=< t ->
   min (min x y) (min z t) = min (min x z) (min y t).
-Proof.
-move=> xy xz xt yz yt zt; rewrite comparable_minA// ?comparable_minl//.
-rewrite [min _ z]comparable_minAC// -comparable_minA// ?comparable_minl//.
-by rewrite inE comparable_sym.
-Qed.
+Proof. exact: comparable_minACA. Qed.
 
 Lemma comparable_maxACA x y z t :
     x >=< y -> x >=< z -> x >=< t -> y >=< z -> y >=< t -> z >=< t ->
   max (max x y) (max z t) = max (max x z) (max y t).
-Proof.
-move=> xy xz xt yz yt zt; rewrite comparable_maxA// ?comparable_maxl//.
-rewrite [max _ z]comparable_maxAC// -comparable_maxA// ?comparable_maxl//.
-by rewrite inE comparable_sym.
-Qed.
+Proof. exact: comparable_maxACA. Qed.
 
 Lemma comparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
   max x (min y z) = min (max x y) (max x z).
-Proof.
-move=> xy xz yz; rewrite ![max x _]comparable_maxC// ?comparable_minr//.
-by rewrite comparable_max_minl// 1?comparable_sym.
-Qed.
+Proof. exact: comparable_max_minr. Qed.
 
 Lemma comparable_min_maxr x y z : x >=< y -> x >=< z -> y >=< z ->
   min x (max y z) = max (min x y) (min x z).
-Proof.
-move=> xy xz yz; rewrite ![min x _]comparable_minC// ?comparable_maxr//.
-by rewrite comparable_min_maxl// 1?comparable_sym.
-Qed.
+Proof. exact: comparable_min_maxr. Qed.
 
 Section ArgExtremum.
 
 Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 Hypothesis F_comparable : {in P &, forall i j, F i >=< F j}.
 
-Lemma comparable_arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
-Proof.
-by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: lexx|apply: le_trans].
-Qed.
+Lemma comparable_arg_minP : extremum_spec <=%O P F (arg_min i0 P F).
+Proof. exact: comparable_arg_minP. Qed.
 
-Lemma comparable_arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
-Proof.
-apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: lexx|exact: ge_trans|].
-by move=> x y xP yP; rewrite orbC [_ || _]F_comparable.
-Qed.
+Lemma comparable_arg_maxP : extremum_spec >=%O P F (arg_max i0 P F).
+Proof. exact: comparable_arg_maxP. Qed.
 
 End ArgExtremum.
 
@@ -7157,31 +7113,31 @@ End ArgExtremum.
 Lemma mono_in_leif (A : {pred T}) (f : T -> T) C :
    {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
-Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
+Proof. exact: mono_in_leif. Qed.
 
 Lemma mono_leif (f : T -> T) C :
     {mono f : x y / x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
-Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+Proof. exact: mono_leif. Qed.
 
 Lemma nmono_in_leif (A : {pred T}) (f : T -> T) C :
     {in A &, {mono f : x y /~ x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
-Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
+Proof. exact: nmono_in_leif. Qed.
 
 Lemma nmono_leif (f : T -> T) C : {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
-Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+Proof. exact: nmono_leif. Qed.
 
 Lemma comparable_bigl x x0 op I (P : pred I) F (s : seq I) :
   {in >=< x &, forall y z, op y z >=< x} -> x0 >=< x ->
   {in P, forall i, F i >=< x} -> \big[op/x0]_(i <- s | P i) F i >=< x.
-Proof. by move=> *; elim/big_ind : _. Qed.
+Proof. exact: comparable_bigl. Qed.
 
 Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
   {in >=<%O x &, forall y z, x >=< op y z} -> x >=< x0 ->
   {in P, forall i, x >=< F i} -> x >=< \big[op/x0]_(i <- s | P i) F i.
-Proof. by move=> *; elim/big_ind : _. Qed.
+Proof. exact: comparable_bigr. Qed.
 
 Section bigminmax.
 
@@ -7212,102 +7168,102 @@ Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
 Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
 
 Lemma comparable_contraTle b x y : x >=< y -> (y < x -> ~~ b) -> (b -> x <= y).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: comparable_contraTle. Qed.
 
 Lemma comparable_contraTlt b x y : x >=< y -> (y <= x -> ~~ b) -> (b -> x < y).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: comparable_contraTlt. Qed.
 
 Lemma comparable_contraPle P x y : x >=< y -> (y < x -> ~ P) -> (P -> x <= y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Proof. exact: comparable_contraPle. Qed.
 
 Lemma comparable_contraPlt P x y : x >=< y -> (y <= x -> ~ P) -> (P -> x < y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Proof. exact: comparable_contraPlt. Qed.
 
 Lemma comparable_contraNle b x y : x >=< y -> (y < x -> b) -> (~~ b -> x <= y).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: comparable_contraNle. Qed.
 
 Lemma comparable_contraNlt b x y : x >=< y -> (y <= x -> b) -> (~~ b -> x < y).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: comparable_contraNlt. Qed.
 
 Lemma comparable_contra_not_le P x y : x >=< y -> (y < x -> P) -> (~ P -> x <= y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Proof. exact: comparable_contra_not_le. Qed.
 
 Lemma comparable_contra_not_lt P x y : x >=< y -> (y <= x -> P) -> (~ P -> x < y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Proof. exact: comparable_contra_not_lt. Qed.
 
 Lemma comparable_contraFle b x y : x >=< y -> (y < x -> b) -> (b = false -> x <= y).
-Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
+Proof. exact: comparable_contraFle. Qed.
 
 Lemma comparable_contraFlt b x y : x >=< y -> (y <= x -> b) -> (b = false -> x < y).
-Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
+Proof. exact: comparable_contraFlt. Qed.
 
 Lemma contra_leT b x y : (~~ b -> x < y) -> (y <= x -> b).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: contra_leT. Qed.
 
 Lemma contra_ltT b x y : (~~ b -> x <= y) -> (y < x -> b).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: contra_ltT. Qed.
 
 Lemma contra_leN b x y : (b -> x < y) -> (y <= x -> ~~ b).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: contra_leN. Qed.
 
 Lemma contra_ltN b x y : (b -> x <= y) -> (y < x -> ~~ b).
-Proof. by case: comparableP; case: b. Qed.
+Proof. exact: contra_ltN. Qed.
 
 Lemma contra_le_not P x y : (P -> x < y) -> (y <= x -> ~ P).
-Proof. by case: comparableP => // _ PF _ /PF. Qed.
+Proof. exact: contra_le_not. Qed.
 
 Lemma contra_lt_not P x y : (P -> x <= y) -> (y < x -> ~ P).
-Proof. by case: comparableP => // _ PF _ /PF. Qed.
+Proof. exact: contra_lt_not. Qed.
 
 Lemma contra_leF b x y : (b -> x < y) -> (y <= x -> b = false).
-Proof. by case: comparableP; case: b => // _ /implyP. Qed.
+Proof. exact: contra_leF. Qed.
 
 Lemma contra_ltF b x y : (b -> x <= y) -> (y < x -> b = false).
-Proof. by case: comparableP; case: b => // _ /implyP. Qed.
+Proof. exact: contra_ltF. Qed.
 
 Lemma comparable_contra_leq_le m n x y : x >=< y ->
   (y < x -> (n < m)%N) -> ((m <= n)%N -> x <= y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: comparable_contra_leq_le. Qed.
 
 Lemma comparable_contra_leq_lt m n x y : x >=< y ->
   (y <= x -> (n < m)%N) -> ((m <= n)%N -> x < y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: comparable_contra_leq_lt. Qed.
 
 Lemma comparable_contra_ltn_le m n x y : x >=< y ->
   (y < x -> (n <= m)%N) -> ((m < n)%N -> x <= y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: comparable_contra_ltn_le. Qed.
 
 Lemma comparable_contra_ltn_lt m n x y : x >=< y ->
   (y <= x -> (n <= m)%N) -> ((m < n)%N -> x < y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: comparable_contra_ltn_lt. Qed.
 
 Lemma contra_le_leq x y m n : ((n < m)%N -> y < x) -> (x <= y -> (m <= n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: contra_le_leq. Qed.
 
 Lemma contra_le_ltn x y m n : ((n <= m)%N -> y < x) -> (x <= y -> (m < n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: contra_le_ltn. Qed.
 
 Lemma contra_lt_leq x y m n : ((n < m)%N -> y <= x) -> (x < y -> (m <= n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: contra_lt_leq. Qed.
 
 Lemma contra_lt_ltn x y m n : ((n <= m)%N -> y <= x) -> (x < y -> (m < n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. exact: contra_lt_ltn. Qed.
 
 Lemma comparable_contra_le x y z t : z >=< t ->
   (t < z -> y < x) -> (x <= y -> z <= t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. exact: comparable_contra_le. Qed.
 
 Lemma comparable_contra_le_lt x y z t : z >=< t ->
   (t <= z -> y < x) -> (x <= y -> z < t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. exact: comparable_contra_le_lt. Qed.
 
 Lemma comparable_contra_lt_le x y z t : z >=< t ->
   (t < z -> y <= x) -> (x < y -> z <= t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. exact: comparable_contra_lt_le. Qed.
 
 Lemma comparable_contra_lt x y z t : z >=< t ->
  (t <= z -> y <= x) -> (x < y -> z < t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. exact: comparable_contra_lt. Qed.
 
 End ContraTheory.
 
@@ -7317,73 +7273,64 @@ Context {disp disp' : unit} {T : porderType disp} {T' : porderType disp'}.
 Implicit Types (m n p : nat) (x y z : T) (u v w : T').
 Variables (D D' : {pred T}) (f : T -> T').
 
-Let leT_anti := @le_anti _ T.
-Let leT'_anti := @le_anti _ T'.
-Hint Resolve lexx lt_neqAle lt_def : core.
-
-Let ge_antiT : antisymmetric (>=%O : rel T).
-Proof. by move=> ? ? /le_anti. Qed.
-
 Lemma ltW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
-Proof. exact: homoW. Qed.
+Proof. exact: ltW_homo. Qed.
 
 Lemma ltW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y}.
-Proof. exact: homoW. Qed.
+Proof. exact: ltW_nhomo. Qed.
 
 Lemma inj_homo_lt :
   injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y}.
-Proof. exact: inj_homo. Qed.
+Proof. exact: inj_homo_lt. Qed.
 
 Lemma inj_nhomo_lt :
   injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y}.
-Proof. exact: inj_homo. Qed.
+Proof. exact: inj_nhomo_lt. Qed.
 
 Lemma inc_inj : {mono f : x y / x <= y} -> injective f.
-Proof. exact: mono_inj. Qed.
+Proof. exact: inc_inj. Qed.
 
 Lemma dec_inj : {mono f : x y /~ x <= y} -> injective f.
-Proof. exact: mono_inj. Qed.
+Proof. exact: dec_inj. Qed.
 
 Lemma leW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
-Proof. exact: anti_mono. Qed.
+Proof. exact: leW_mono. Qed.
 
 Lemma leW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
-Proof. exact: anti_mono. Qed.
+Proof. exact: leW_nmono. Qed.
 
 (* Monotony in D D' *)
 Lemma ltW_homo_in :
   {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}}.
-Proof. exact: homoW_in. Qed.
+Proof. exact: ltW_homo_in. Qed.
 
 Lemma ltW_nhomo_in :
   {in D & D', {homo f : x y /~ x < y}} -> {in D & D', {homo f : x y /~ x <= y}}.
-Proof. exact: homoW_in. Qed.
+Proof. exact: ltW_nhomo_in. Qed.
 
 Lemma inj_homo_lt_in :
     {in D & D', injective f} ->  {in D & D', {homo f : x y / x <= y}} ->
   {in D & D', {homo f : x y / x < y}}.
-Proof. exact: inj_homo_in. Qed.
+Proof. exact: inj_homo_lt_in. Qed.
 
 Lemma inj_nhomo_lt_in :
     {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
   {in D & D', {homo f : x y /~ x < y}}.
-Proof. exact: inj_homo_in. Qed.
+Proof. exact: inj_nhomo_lt_in. Qed.
 
-Lemma inc_inj_in : {in D &, {mono f : x y / x <= y}} ->
-   {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
+Lemma inc_inj_in : {in D &, {mono f : x y / x <= y}} -> {in D &, injective f}.
+Proof. exact: inc_inj_in. Qed.
 
-Lemma dec_inj_in :
-  {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
-Proof. exact: mono_inj_in. Qed.
+Lemma dec_inj_in : {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
+Proof. exact: dec_inj_in. Qed.
 
 Lemma leW_mono_in :
   {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
-Proof. exact: anti_mono_in. Qed.
+Proof. exact: leW_mono_in. Qed.
 
 Lemma leW_nmono_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
-Proof. exact: anti_mono_in. Qed.
+Proof. exact: leW_nmono_in. Qed.
 
 End POrderMonotonyTheory.
 
@@ -7407,16 +7354,10 @@ Section BPOrderTheory.
 Context {disp : unit} {T : bPOrderType disp}.
 Implicit Types (x y : T).
 
-Lemma le0x x : 0 <= x. Proof. by case: T x => [?[?[]]]. Qed.
-
-Lemma lex0 x : (x <= 0) = (x == 0).
-Proof. by rewrite le_eqVlt (le_gtF (le0x _)) orbF. Qed.
-
-Lemma ltx0 x : (x < 0) = false.
-Proof. by rewrite lt_neqAle lex0 andNb. Qed.
-
-Lemma lt0x x : (0 < x) = (x != 0).
-Proof. by rewrite lt_neqAle le0x andbT eq_sym. Qed.
+Lemma le0x x : 0 <= x. Proof. exact: le0x. Qed.
+Lemma lex0 x : (x <= 0) = (x == 0). Proof. exact: lex0. Qed.
+Lemma ltx0 x : (x < 0) = false. Proof. exact: ltx0. Qed.
+Lemma lt0x x : (0 < x) = (x != 0). Proof. exact: lt0x. Qed.
 
 Variant eq0_xor_gt0 x : bool -> bool -> Set :=
     Eq0NotPOs : x = 0 -> eq0_xor_gt0 x true false
@@ -7431,13 +7372,12 @@ End BPOrderTheory.
 Module Import TPOrderTheory.
 Section TPOrderTheory.
 Context {disp : unit} {T : tPOrderType disp}.
-Let Td := [bPOrderType of T^d].
 Implicit Types (x y : T).
 
-Lemma lex1 (x : T) : x <= 1. Proof. exact: (@le0x _ Td). Qed.
-Lemma le1x x : (1 <= x) = (x == 1). Proof. exact: (@lex0 _ Td). Qed.
-Lemma lt1x x : (1 < x) = false. Proof. exact: (@ltx0 _ Td). Qed.
-Lemma ltx1 x : (x < 1) = (x != 1). Proof. exact: (@lt0x _ Td). Qed.
+Lemma lex1 (x : T) : x <= 1. Proof. exact: lex1. Qed.
+Lemma le1x x : (1 <= x) = (x == 1). Proof. exact: le1x. Qed.
+Lemma lt1x x : (1 < x) = false. Proof. exact: lt1x. Qed.
+Lemma ltx1 x : (x < 1) = (x != 1). Proof. exact: ltx1. Qed.
 
 End TPOrderTheory.
 End TPOrderTheory.
@@ -7450,74 +7390,50 @@ Section MeetTheory.
 Context {disp : unit} {L : meetSemilatticeType disp}.
 Implicit Types (x y : L).
 
-Lemma meetC : commutative (@meet _ L). Proof. by case: L => [?[?[]]]. Qed.
-Lemma meetA : associative (@meet _ L). Proof. by case: L => [?[?[]]]. Qed.
-Lemma leEmeet x y : (x <= y) = (x `&` y == x).
-Proof. by case: L x y => [?[?[]]]. Qed.
+Lemma meetC : commutative (@meet _ L). Proof. exact: meetC. Qed.
+Lemma meetA : associative (@meet _ L). Proof. exact: meetA. Qed.
+Lemma leEmeet x y : (x <= y) = (x `&` y == x). Proof. exact: leEmeet. Qed.
 
-Lemma meetxx : idempotent (@meet _ L).
-Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
-Lemma meetAC : right_commutative (@meet _ L).
-Proof. by move=> x y z; rewrite -!meetA [X in _ `&` X]meetC. Qed.
-Lemma meetCA : left_commutative (@meet _ L).
-Proof. by move=> x y z; rewrite !meetA [X in X `&` _]meetC. Qed.
-Lemma meetACA : interchange (@meet _ L) (@meet _ L).
-Proof. by move=> x y z t; rewrite !meetA [X in X `&` _]meetAC. Qed.
+Lemma meetxx : idempotent (@meet _ L). Proof. exact: meetxx. Qed.
+Lemma meetAC : right_commutative (@meet _ L). Proof. exact: meetAC. Qed.
+Lemma meetCA : left_commutative (@meet _ L). Proof. exact: meetCA. Qed.
+Lemma meetACA : interchange (@meet _ L) (@meet _ L). Proof. exact: meetACA. Qed.
 
-Lemma meetKI y x : x `&` (x `&` y) = x `&` y.
-Proof. by rewrite meetA meetxx. Qed.
-Lemma meetIK y x : (x `&` y) `&` y = x `&` y.
-Proof. by rewrite -meetA meetxx. Qed.
-Lemma meetKIC y x : x `&` (y `&` x) = x `&` y.
-Proof. by rewrite meetC meetIK meetC. Qed.
-Lemma meetIKC y x : y `&` x `&` y = x `&` y.
-Proof. by rewrite meetAC meetC meetxx. Qed.
+Lemma meetKI y x : x `&` (x `&` y) = x `&` y. Proof. exact: meetKI. Qed.
+Lemma meetIK y x : (x `&` y) `&` y = x `&` y. Proof. exact: meetIK. Qed.
+Lemma meetKIC y x : x `&` (y `&` x) = x `&` y. Proof. exact: meetKIC. Qed.
+Lemma meetIKC y x : y `&` x `&` y = x `&` y. Proof. exact: meetIKC. Qed.
 
 (* interaction with order *)
 
 Lemma lexI x y z : (x <= y `&` z) = (x <= y) && (x <= z).
-Proof.
-rewrite !leEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
-  by rewrite meetA meetIK eqxx -meetA meetACA meetxx meetAC eqxx.
-by rewrite -[X in X `&` _]meetA meetIK meetA.
-Qed.
+Proof. exact: lexI. Qed.
 
-Lemma leIxl x y z : y <= x -> y `&` z <= x.
-Proof. by rewrite !leEmeet meetAC => /eqP ->. Qed.
-
-Lemma leIxr x y z : z <= x -> y `&` z <= x.
-Proof. by rewrite !leEmeet -meetA => /eqP ->. Qed.
+Lemma leIxl x y z : y <= x -> y `&` z <= x. Proof. exact: leIxl. Qed.
+Lemma leIxr x y z : z <= x -> y `&` z <= x. Proof. exact: leIxr. Qed.
 
 Lemma leIx2 x y z : (y <= x) || (z <= x) -> y `&` z <= x.
-Proof. by case/orP => [/leIxl|/leIxr]. Qed.
+Proof. exact: leIx2. Qed.
 
-Lemma leIr x y : y `&` x <= x.
-Proof. by rewrite leIx2 ?lexx ?orbT. Qed.
-
-Lemma leIl x y : x `&` y <= x.
-Proof. by rewrite leIx2 ?lexx ?orbT. Qed.
+Lemma leIr x y : y `&` x <= x. Proof. exact: leIr. Qed.
+Lemma leIl x y : x `&` y <= x. Proof. exact: leIl. Qed.
 
 Lemma meet_idPl {x y} : reflect (x `&` y = x) (x <= y).
-Proof. by rewrite leEmeet; apply/eqP. Qed.
+Proof. exact: meet_idPl. Qed.
 Lemma meet_idPr {x y} : reflect (y `&` x = x) (x <= y).
-Proof. by rewrite meetC; apply/meet_idPl. Qed.
+Proof. exact: meet_idPr. Qed.
 
-Lemma meet_l x y : x <= y -> x `&` y = x. Proof. exact/meet_idPl. Qed.
-Lemma meet_r x y : y <= x -> x `&` y = y. Proof. exact/meet_idPr. Qed.
+Lemma meet_l x y : x <= y -> x `&` y = x. Proof. exact: meet_l. Qed.
+Lemma meet_r x y : y <= x -> x `&` y = y. Proof. exact: meet_r. Qed.
 
-Lemma leIidl x y : (x <= x `&` y) = (x <= y).
-Proof. by rewrite !leEmeet meetKI. Qed.
-Lemma leIidr x y : (x <= y `&` x) = (x <= y).
-Proof. by rewrite !leEmeet meetKIC. Qed.
+Lemma leIidl x y : (x <= x `&` y) = (x <= y). Proof. exact: leIidl. Qed.
+Lemma leIidr x y : (x <= y `&` x) = (x <= y). Proof. exact: leIidr. Qed.
 
-Lemma eq_meetl x y : (x `&` y == x) = (x <= y).
-Proof. by apply/esym/leEmeet. Qed.
-
-Lemma eq_meetr x y : (x `&` y == y) = (y <= x).
-Proof. by rewrite meetC eq_meetl. Qed.
+Lemma eq_meetl x y : (x `&` y == x) = (x <= y). Proof. exact: eq_meetl. Qed.
+Lemma eq_meetr x y : (x `&` y == y) = (y <= x). Proof. exact: eq_meetr. Qed.
 
 Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
-Proof. by move=> xz yt; rewrite lexI !leIx2 ?xz ?yt ?orbT //. Qed.
+Proof. exact: leI2. Qed.
 
 End MeetTheory.
 End MeetTheory.
@@ -7529,11 +7445,8 @@ Module Import BMeetTheory.
 Section BMeetTheory.
 Context {disp : unit} {L : bMeetSemilatticeType disp}.
 
-Lemma meet0x : left_zero 0 (@meet _ L).
-Proof. by move=> x; apply/meet_idPl. Qed.
-
-Lemma meetx0 : right_zero 0 (@meet _ L).
-Proof. by move=> x; apply/meet_idPr. Qed.
+Lemma meet0x : left_zero 0 (@meet _ L). Proof. exact: meet0x. Qed.
+Lemma meetx0 : right_zero 0 (@meet _ L). Proof. exact: meetx0. Qed.
 
 Canonical meet_muloid := Monoid.MulLaw meet0x meetx0.
 
@@ -7545,25 +7458,22 @@ Section TMeetTheory.
 Context {disp : unit} {L : tMeetSemilatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
-Lemma meetx1 : right_id 1 (@meet _ L).
-Proof. by move=> x; apply/meet_idPl. Qed.
-
-Lemma meet1x : left_id 1 (@meet _ L).
-Proof. by move=> x; apply/meet_idPr. Qed.
+Lemma meetx1 : right_id 1 (@meet _ L). Proof. exact: meetx1. Qed.
+Lemma meet1x : left_id 1 (@meet _ L). Proof. exact: meet1x. Qed.
 
 Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
-Proof. by rewrite !eq_le !lex1 /= lexI. Qed.
+Proof. exact: meet_eq1. Qed.
 
 Canonical meet_monoid := Monoid.Law meetA meet1x meetx1.
 Canonical meet_comoid := Monoid.ComLaw meetC.
 
 Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leIl. Qed.
+Proof. exact: meets_inf_seq. Qed.
 
 Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. by move=> ? ?; apply/le_trans/meets_inf_seq. Qed.
+Proof. exact: meets_max_seq. Qed.
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
@@ -7575,38 +7485,28 @@ Proof. exact: meets_max_seq. Qed.
 
 Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
   (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.
-Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite lexI leFm. Qed.
+Proof. exact: meets_ge. Qed.
 
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \meet_(x <- r | P x) F x).
-Proof.
-apply: (iffP idP) => leFm => [x xr Px|].
-  exact/(le_trans leFm)/meets_inf_seq.
-by rewrite big_seq_cond meets_ge // => x /andP[/leFm].
-Qed.
+Proof. exact: meetsP_seq. Qed.
 
 Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. by apply: (iffP (meetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
+Proof. exact: meetsP. Qed.
 
 Lemma le_meets I (A B : {set I}) (F : I -> L) :
    A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
-Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
+Proof. exact: le_meets. Qed.
 
 Lemma meets_setU I (A B : {set I}) (F : I -> L) :
    \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
-Proof.
-rewrite -!big_enum; have /= <- := @big_cat _ _ meet_comoid.
-apply/eq_big_idem; first exact: meetxx.
-by move=> ?; rewrite mem_cat !mem_enum inE.
-Qed.
+Proof. exact: meets_setU. Qed.
 
 Lemma meets_seq I (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof.
-by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
-Qed.
+Proof. exact: meets_seq. Qed.
 
 End TMeetTheory.
 
@@ -7622,57 +7522,49 @@ End TMeetTheory.
 Module Import JoinTheory.
 Section JoinTheory.
 Context {disp : unit} {L : joinSemilatticeType disp}.
-Let Ld := [meetSemilatticeType of L^d].
 Implicit Types (x y : L).
 
-Lemma joinC : commutative (@join _ L). Proof. exact: (@meetC _ Ld). Qed.
-Lemma joinA : associative (@join _ L). Proof. exact: (@meetA _ Ld). Qed.
-Lemma leEjoin x y : (x <= y) = (x `|` y == y).
-Proof. by rewrite joinC; apply: (@leEmeet _ Ld). Qed.
+Lemma joinC : commutative (@join _ L). Proof. exact: joinC. Qed.
+Lemma joinA : associative (@join _ L). Proof. exact: joinA. Qed.
+Lemma leEjoin x y : (x <= y) = (x `|` y == y). Proof. exact: leEjoin. Qed.
 
-Lemma joinxx : idempotent (@join _ L). Proof. exact: (@meetxx _ Ld). Qed.
-Lemma joinAC : right_commutative (@join _ L). Proof. exact: (@meetAC _ Ld). Qed.
-Lemma joinCA : left_commutative (@join _ L). Proof. exact: (@meetCA _ Ld). Qed.
-Lemma joinACA : interchange (@join _ L) (@join _ L).
-Proof. exact: (@meetACA _ Ld). Qed.
+Lemma joinxx : idempotent (@join _ L). Proof. exact: joinxx. Qed.
+Lemma joinAC : right_commutative (@join _ L). Proof. exact: joinAC. Qed.
+Lemma joinCA : left_commutative (@join _ L). Proof. exact: joinCA. Qed.
+Lemma joinACA : interchange (@join _ L) (@join _ L). Proof. exact: joinACA. Qed.
 
-Lemma joinKU y x : x `|` (x `|` y) = x `|` y. Proof. exact: (@meetKI _ Ld). Qed.
-Lemma joinUK y x : (x `|` y) `|` y = x `|` y. Proof. exact: (@meetIK _ Ld). Qed.
-Lemma joinKUC y x : x `|` (y `|` x) = x `|` y.
-Proof. exact: (@meetKIC _ Ld). Qed.
-Lemma joinUKC y x : y `|` x `|` y = x `|` y. Proof. exact: (@meetIKC _ Ld). Qed.
+Lemma joinKU y x : x `|` (x `|` y) = x `|` y. Proof. exact: joinKU. Qed.
+Lemma joinUK y x : (x `|` y) `|` y = x `|` y. Proof. exact: joinUK. Qed.
+Lemma joinKUC y x : x `|` (y `|` x) = x `|` y. Proof. exact: joinKUC. Qed.
+Lemma joinUKC y x : y `|` x `|` y = x `|` y. Proof. exact: joinUKC. Qed.
 
 (* interaction with order *)
 Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
-Proof. exact: (@lexI _ Ld). Qed.
-Lemma lexUl x y z : x <= y -> x <= y `|` z. Proof. exact: (@leIxl _ Ld). Qed.
-Lemma lexUr x y z : x <= z -> x <= y `|` z. Proof. exact: (@leIxr _ Ld). Qed.
+Proof. exact: leUx. Qed.
+Lemma lexUl x y z : x <= y -> x <= y `|` z. Proof. exact: lexUl. Qed.
+Lemma lexUr x y z : x <= z -> x <= y `|` z. Proof. exact: lexUr. Qed.
 Lemma lexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx2 _ Ld). Qed.
+Proof. exact: lexU2. Qed.
 
-Lemma leUr x y : x <= y `|` x. Proof. exact: (@leIr _ Ld). Qed.
-Lemma leUl x y : x <= x `|` y. Proof. exact: (@leIl _ Ld). Qed.
+Lemma leUr x y : x <= y `|` x. Proof. exact: leUr. Qed.
+Lemma leUl x y : x <= x `|` y. Proof. exact: leUl. Qed.
 
 Lemma join_idPl {x y} : reflect (y `|` x = y) (x <= y).
-Proof. exact: (@meet_idPl _ Ld). Qed.
+Proof. exact: join_idPl. Qed.
 Lemma join_idPr {x y} : reflect (x `|` y = y) (x <= y).
-Proof. exact: (@meet_idPr _ Ld). Qed.
+Proof. exact: join_idPr. Qed.
 
-Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPl. Qed.
-Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPr. Qed.
+Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact: join_l. Qed.
+Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact: join_r. Qed.
 
-Lemma leUidl x y : (x `|` y <= y) = (x <= y).
-Proof. exact: (@leIidr _ Ld). Qed.
-Lemma leUidr x y : (y `|` x <= y) = (x <= y).
-Proof. exact: (@leIidl _ Ld). Qed.
+Lemma leUidl x y : (x `|` y <= y) = (x <= y). Proof. exact: leUidl. Qed.
+Lemma leUidr x y : (y `|` x <= y) = (x <= y). Proof. exact: leUidr. Qed.
 
-Lemma eq_joinl x y : (x `|` y == x) = (y <= x).
-Proof. exact: (@eq_meetl _ Ld). Qed.
-Lemma eq_joinr x y : (x `|` y == y) = (x <= y).
-Proof. exact: (@eq_meetr _ Ld). Qed.
+Lemma eq_joinl x y : (x `|` y == x) = (y <= x). Proof. exact: eq_joinl. Qed.
+Lemma eq_joinr x y : (x `|` y == y) = (x <= y). Proof. exact: eq_joinr. Qed.
 
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
-Proof. exact: (@leI2 _ Ld). Qed.
+Proof. exact: leU2. Qed.
 
 End JoinTheory.
 End JoinTheory.
@@ -7683,58 +7575,57 @@ Arguments join_idPr {disp L x y}.
 Module Import BJoinTheory.
 Section BJoinTheory.
 Context {disp : unit} {L : bJoinSemilatticeType disp}.
-Let Ld := [tMeetSemilatticeType of L^d].
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
-Lemma joinx0 : right_id 0 (@join _ L). Proof. exact: (@meetx1 _ Ld). Qed.
-Lemma join0x : left_id 0 (@join _ L). Proof. exact: (@meet1x _ Ld). Qed.
+Lemma joinx0 : right_id 0 (@join _ L). Proof. exact: joinx0. Qed.
+Lemma join0x : left_id 0 (@join _ L). Proof. exact: join0x. Qed.
 
 Lemma join_eq0 x y : (x `|` y == 0) = (x == 0) && (y == 0).
-Proof. exact: (@meet_eq1 _ Ld). Qed.
+Proof. exact: join_eq0. Qed.
 
 Canonical join_monoid := Monoid.Law joinA join0x joinx0.
 Canonical join_comoid := Monoid.ComLaw joinC.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
-Proof. exact: (@meets_inf_seq _ Ld). Qed.
+Proof. exact: joins_sup_seq. Qed.
 
 Lemma joins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
   x \in r -> P x -> l <= F x -> l <= \join_(x <- r | P x) F x.
-Proof. exact: (@meets_max_seq _ Ld). Qed.
+Proof. exact: joins_min_seq. Qed.
 
 Lemma joins_sup I (j : I) (P : {pred I}) (F : I -> L) :
   P j -> F j <= \join_(i | P i) F i.
-Proof. exact: (@meets_inf _ Ld). Qed.
+Proof. exact: joins_sup. Qed.
 
 Lemma joins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
   P j -> l <= F j -> l <= \join_(i | P i) F i.
-Proof. exact: (@meets_max _ Ld). Qed.
+Proof. exact: joins_min. Qed.
 
 Lemma joins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
   (forall x : J, P x -> F x <= u) -> \join_(x <- r | P x) F x <= u.
-Proof. exact: (@meets_ge _ Ld). Qed.
+Proof. exact: joins_le. Qed.
 
 Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
   reflect (forall x : T, x \in r -> P x -> F x <= u)
           (\join_(x <- r | P x) F x <= u).
-Proof. exact: (@meetsP_seq _ Ld). Qed.
+Proof. exact: joinsP_seq. Qed.
 
 Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
   reflect (forall i : I, P i -> F i <= u) (\join_(i | P i) F i <= u).
-Proof. exact: (@meetsP _ Ld). Qed.
+Proof. exact: joinsP. Qed.
 
 Lemma le_joins I (A B : {set I}) (F : I -> L) :
   A \subset B -> \join_(i in A) F i <= \join_(i in B) F i.
-Proof. exact: (@le_meets _ Ld). Qed.
+Proof. exact: le_joins. Qed.
 
 Lemma joins_setU I (A B : {set I}) (F : I -> L) :
   \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
-Proof. exact: (@meets_setU _ Ld). Qed.
+Proof. exact: joins_setU. Qed.
 
 Lemma joins_seq I (r : seq I) (F : I -> L) :
   \join_(i <- r) F i = \join_(i in r) F i.
-Proof. exact: (@meets_seq _ Ld). Qed.
+Proof. exact: joins_seq. Qed.
 
 End BJoinTheory.
 
@@ -7754,10 +7645,9 @@ End BJoinTheory.
 Module Import TJoinTheory.
 Section TJoinTheory.
 Context {disp : unit} {L : tJoinSemilatticeType disp}.
-Let Ld := [bMeetSemilatticeType of L^d].
 
-Lemma joinx1 : right_zero 1 (@join _ L). Proof. exact: (@meetx0 _ Ld). Qed.
-Lemma join1x : left_zero 1 (@join _ L). Proof. exact: (@meet0x _ Ld). Qed.
+Lemma joinx1 : right_zero 1 (@join _ L). Proof. exact: joinx1. Qed.
+Lemma join1x : left_zero 1 (@join _ L). Proof. exact: join1x. Qed.
 
 Canonical join_muloid := Monoid.MulLaw join1x joinx1.
 
@@ -7769,19 +7659,14 @@ Section LatticeTheory.
 Context {disp : unit} {L : latticeType disp}.
 Implicit Types (x y : L).
 
-Lemma meetUK x y : (x `&` y) `|` y = y.
-Proof. by apply/eqP; rewrite eq_joinr -eq_meetl meetIK. Qed.
-
-Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
-Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite joinC meetUK. Qed.
-Lemma meetKU y x : x `|` (x `&` y) = x. Proof. by rewrite meetC meetKUC. Qed.
-
-Lemma joinIK x y : (x `|` y) `&` y = y.
-Proof. by apply/eqP; rewrite eq_meetr -eq_joinl joinUK. Qed.
-
-Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite joinC joinIK. Qed.
-Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite meetC joinIK. Qed.
-Lemma joinKI y x : x `&` (x `|` y) = x. Proof. by rewrite joinC joinKIC. Qed.
+Lemma meetUK x y : (x `&` y) `|` y = y. Proof. exact: meetUK. Qed.
+Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. exact: meetUKC. Qed.
+Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. exact: meetKUC. Qed.
+Lemma meetKU y x : x `|` (x `&` y) = x. Proof. exact: meetKU. Qed.
+Lemma joinIK x y : (x `|` y) `&` y = y. Proof. exact: joinIK. Qed.
+Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. exact: joinIKC. Qed.
+Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. exact: joinKIC. Qed.
+Lemma joinKI y x : x `&` (x `|` y) = x. Proof. exact: joinKI. Qed.
 
 (* comparison predicates *)
 
@@ -7789,28 +7674,23 @@ Lemma lcomparableP x y : incomparel x y
   (min y x) (min x y) (max y x) (max x y)
   (y `&` x) (x `&` y) (y `|` x) (x `|` y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y) (y >=< x) (x >=< y).
-Proof.
-by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
-   rewrite ?(meetxx, joinxx);
-   rewrite ?(meet_l hxy', meet_r hxy', join_l hxy', join_r hxy');
-   constructor.
-Qed.
+Proof. exact: lcomparableP. Qed.
 
 Lemma lcomparable_ltgtP x y : x >=< y ->
   comparel x y (min y x) (min x y) (max y x) (max x y)
                (y `&` x) (x `&` y) (y `|` x) (x `|` y)
                (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
-Proof. by case: (lcomparableP x) => // *; constructor. Qed.
+Proof. exact: lcomparable_ltgtP. Qed.
 
 Lemma lcomparable_leP x y : x >=< y ->
   lel_xor_gt x y (min y x) (min x y) (max y x) (max x y)
                  (y `&` x) (x `&` y) (y `|` x) (x `|` y) (x <= y) (y < x).
-Proof. by case/lcomparable_ltgtP => [/ltW xy|xy|->]; constructor. Qed.
+Proof. exact: lcomparable_leP. Qed.
 
 Lemma lcomparable_ltP x y : x >=< y ->
   ltl_xor_ge x y (min y x) (min x y) (max y x) (max x y)
                  (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
-Proof. by case/lcomparable_ltgtP => [xy|/ltW xy|->]; constructor. Qed.
+Proof. exact: lcomparable_ltP. Qed.
 
 End LatticeTheory.
 End LatticeTheory.
@@ -7822,15 +7702,16 @@ Variable L : distrLatticeType disp.
 Implicit Types (x y : L).
 
 Lemma meetUl : left_distributive (@meet _ L) (@join _ L).
-Proof. by case: L => [?[?[]]]. Qed.
+Proof. exact: meetUl. Qed.
+
 Lemma joinIl : left_distributive (@join _ L) (@meet _ L).
-Proof. by case: L => [?[?[]]]. Qed.
+Proof. exact: joinIl. Qed.
 
 Lemma meetUr : right_distributive (@meet _ L) (@join _ L).
-Proof. by move=> x y z; rewrite ![x `&` _]meetC meetUl. Qed.
+Proof. exact: meetUr. Qed.
 
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
-Proof. by move=> x y z; rewrite ![x `|` _]joinC joinIl. Qed.
+Proof. exact: joinIr. Qed.
 
 End DistrLatticeTheory.
 End DistrLatticeTheory.
@@ -7845,39 +7726,24 @@ Local Notation "0" := bottom.
 Canonical join_addoid := Monoid.AddLaw (@meetUl _ L) (@meetUr _ _).
 
 Lemma leU2l_le y t x z : x `&` t = 0 -> x `|` y <= z `|` t -> x <= z.
-Proof.
-by move=> xIt0 /(leI2 (lexx x)); rewrite joinKI meetUr xIt0 joinx0 leIidl.
-Qed.
+Proof. exact: leU2l_le. Qed.
 
 Lemma leU2r_le y t x z : x `&` t = 0 -> y `|` x <= t `|` z -> x <= z.
-Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
+Proof. exact: leU2r_le. Qed.
 
 Lemma disjoint_lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
-Proof.
-move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
-by apply: (@leU2l_le x z); rewrite ?joinxx.
-Qed.
+Proof. exact: disjoint_lexUl. Qed.
 
 Lemma disjoint_lexUr z x y : x `&` z = 0 -> (x <= z `|` y) = (x <= y).
-Proof. by move=> xz0; rewrite joinC; rewrite disjoint_lexUl. Qed.
+Proof. exact: disjoint_lexUr. Qed.
 
 Lemma leU2E x y z t : x `&` t = 0 -> y `&` z = 0 ->
   (x `|` y <= z `|` t) = (x <= z) && (y <= t).
-Proof.
-move=> dxt dyz; apply/idP/andP; last by case=> ? ?; exact: leU2.
-by move=> lexyzt; rewrite (leU2l_le _ lexyzt) // (leU2r_le _ lexyzt).
-Qed.
+Proof. exact: leU2E. Qed.
 
 Lemma joins_disjoint I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `&` F i = 0) -> d `&` \join_(i | P i) F i = 0.
-Proof.
-move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == 0).
-  rewrite big_all_cond; apply/allP => i _ /=.
-  by apply/implyP => /d_Fi_disj ->.
-elim/big_rec2: _ => [|i y]; first by rewrite meetx0.
-case; rewrite (andbF, andbT) // => Pi /(_ isT) dy /eqP dFi.
-by rewrite meetUr dy dFi joinxx.
-Qed.
+Proof. exact: joins_disjoint. Qed.
 
 End BDistrLatticeTheory.
 End BDistrLatticeTheory.
@@ -7885,7 +7751,6 @@ End BDistrLatticeTheory.
 Module Import TDistrLatticeTheory.
 Section TDistrLatticeTheory.
 Context {disp : unit} {L : tDistrLatticeType disp}.
-Let Ld := [bDistrLatticeType of L^d].
 Implicit Types (I : finType) (T : eqType) (x y : L).
 Local Notation "1" := top.
 (* Distributive lattice theory with 1 *)
@@ -7893,24 +7758,24 @@ Local Notation "1" := top.
 Canonical meet_addoid := Monoid.AddLaw (@joinIl _ L) (@joinIr _ _).
 
 Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
-Proof. rewrite joinC; exact: (@leU2l_le _ Ld). Qed.
+Proof. exact: leI2l_le. Qed.
 
 Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
-Proof. rewrite joinC; exact: (@leU2r_le _ Ld). Qed.
+Proof. exact: leI2r_le. Qed.
 
 Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@disjoint_lexUl _ Ld). Qed.
+Proof. exact: cover_leIxl. Qed.
 
 Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@disjoint_lexUr _ Ld). Qed.
+Proof. exact: cover_leIxr. Qed.
 
 Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
-Proof. by move=> ? ?; apply: (@leU2E _ Ld); rewrite meetC. Qed.
+Proof. exact: leI2E. Qed.
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
-Proof. exact: (@joins_disjoint _ Ld). Qed.
+Proof. exact: meets_total. Qed.
 
 End TDistrLatticeTheory.
 End TDistrLatticeTheory.
@@ -7920,19 +7785,14 @@ Section TotalTheory.
 Context {disp : unit} {T : orderType disp}.
 Implicit Types (x y z t : T) (s : seq T).
 
-Lemma le_total : total (<=%O : rel T). Proof. by case: T => [? [?]]. Qed.
-Hint Resolve le_total : core.
-
-Lemma ge_total : total (>=%O : rel T).
-Proof. by move=> ? ?; apply: le_total. Qed.
-Hint Resolve ge_total : core.
-
+Lemma le_total : total (<=%O : rel T). Proof. exact: le_total. Qed.
+(* FIXME *)
+Lemma ge_total : total (>=%O : rel T). Proof. exact: ge_total. Qed.
 Lemma comparableT x y : x >=< y. Proof. exact: le_total. Qed.
-Hint Resolve comparableT : core.
+Hint Resolve le_total ge_total comparableT : core.
 
-Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
-
-Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
+Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: leNgt. Qed.
+Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: ltNge. Qed.
 
 Definition ltgtP x y := LatticeTheory.lcomparable_ltgtP (comparableT x y).
 Definition leP x y := LatticeTheory.lcomparable_leP (comparableT x y).
@@ -7941,13 +7801,13 @@ Definition ltP x y := LatticeTheory.lcomparable_ltP (comparableT x y).
 Lemma wlog_le P :
      (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
    forall x y, P x y.
-Proof. by move=> sP hP x y; case: (leP x y) => [| /ltW] /hP // /sP. Qed.
+Proof. exact: wlog_le. Qed.
 
 Lemma wlog_lt P :
     (forall x, P x x) ->
     (forall x y, (P y x -> P x y)) -> (forall x y, x < y -> P x y) ->
   forall x y, P x y.
-Proof. by move=> rP sP hP x y; case: (ltgtP x y) => [||->] // /hP // /sP. Qed.
+Proof. exact: wlog_lt. Qed.
 
 Lemma neq_lt x y : (x != y) = (x < y) || (y < x). Proof. by case: ltgtP. Qed.
 
@@ -7955,26 +7815,26 @@ Lemma lt_total x y : x != y -> (x < y) || (y < x). Proof. by case: ltgtP. Qed.
 
 Lemma eq_leLR x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
-Proof. by rewrite !ltNge => ? /contraTT ?; apply/idP/idP. Qed.
+Proof. exact: eq_leLR. Qed.
 
 Lemma eq_leRL x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y).
-Proof. by move=> *; symmetry; apply: eq_leLR. Qed.
+Proof. exact: eq_leRL. Qed.
 
 Lemma eq_ltLR x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t).
-Proof. by rewrite !leNgt => ? /contraTT ?; apply/idP/idP. Qed.
+Proof. exact: eq_ltLR. Qed.
 
 Lemma eq_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
-Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
+Proof. exact: eq_ltRL. Qed.
 
 Lemma sort_le_sorted s : sorted <=%O (sort <=%O s).
-Proof. exact: sort_sorted. Qed.
+Proof. exact: sort_le_sorted. Qed.
 Hint Resolve sort_le_sorted : core.
 
 Lemma sort_lt_sorted s : sorted <%O (sort <=%O s) = uniq s.
-Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
+Proof. exact: sort_lt_sorted. Qed.
 
 Lemma perm_sort_leP s1 s2 : reflect (sort <=%O s1 = sort <=%O s2) (perm_eq s1 s2).
 Proof. exact/perm_sortP/le_anti/le_trans/le_total. Qed.
@@ -8001,53 +7861,30 @@ Lemma mem2_sort_le s x y : x <= y -> mem2 s x y -> mem2 (sort <=%O s) x y.
 Proof. exact/mem2_sort/le_trans/le_total. Qed.
 
 Lemma count_le_gt x s : count (<= x) s = size s - count (> x) s.
-Proof.
-by rewrite -(count_predC (> x)) addKn; apply: eq_count => y; rewrite /= leNgt.
-Qed.
+Proof. exact: count_le_gt. Qed.
 
 Lemma count_lt_ge x s : count (< x) s = size s - count (>= x) s.
-Proof.
-by rewrite -(count_predC (>= x)) addKn; apply: eq_count => y; rewrite /= ltNge.
-Qed.
+Proof. exact: count_lt_ge. Qed.
 
 Lemma sorted_filter_gt x s :
   sorted <=%O s -> [seq y <- s | x < y] = drop (count (<= x) s) s.
-Proof.
-move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_lt _ (dual_orderType T)); last by rewrite rev_sorted.
-by rewrite take_rev revK count_rev.
-Qed.
+Proof. exact: sorted_filter_gt. Qed.
 
 Lemma sorted_filter_ge x s :
   sorted <=%O s -> [seq y <- s | x <= y] = drop (count (< x) s) s.
-Proof.
-move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_le _ (dual_orderType T)); last by rewrite rev_sorted.
-by rewrite take_rev revK count_rev.
-Qed.
+Proof. exact: sorted_filter_ge. Qed.
 
 Lemma nth_count_ge x x0 s i : sorted <=%O s ->
   (count (< x) s <= i < size s)%N -> x <= nth x0 s i.
-Proof.
-move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_ge //.
-apply/(all_nthP _ (filter_all _ _)).
-by rewrite size_filter ltn_subLR // count_lt_ge subnK // count_size.
-Qed.
+Proof. exact: nth_count_ge. Qed.
 
 Lemma nth_count_gt x x0 s i : sorted <=%O s ->
   (count (<= x) s <= i < size s)%N -> x < nth x0 s i.
-Proof.
-move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_gt //.
-apply/(all_nthP _ (filter_all _ _)).
-by rewrite size_filter ltn_subLR // count_le_gt subnK // count_size.
-Qed.
+Proof. exact: nth_count_gt. Qed.
 
 Lemma nth_count_eq x x0 s i : sorted <=%O s ->
   (count (< x) s <= i < count (<= x) s)%N -> nth x0 s i = x.
-Proof.
-move=> ss /andP[ige ilt]; apply/le_anti.
-by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
-Qed.
+Proof. exact: nth_count_eq. Qed.
 
 (* max and min is join and meet *)
 
@@ -8061,106 +7898,84 @@ Lemma maxEgt x y : max x y = if x > y then x else y. Proof. by case: ltP. Qed.
 Lemma minEge x y : min x y = if x >= y then y else x. Proof. by case: leP. Qed.
 Lemma maxEge x y : max x y = if x >= y then x else y. Proof. by case: leP. Qed.
 
-Lemma minC : commutative (min : T -> T -> T).
-Proof. by move=> x y; apply: comparable_minC. Qed.
+Lemma minC : commutative (min : T -> T -> T). Proof. exact: minC. Qed.
+Lemma maxC : commutative (max : T -> T -> T). Proof. exact: maxC. Qed.
+Lemma minA : associative (min : T -> T -> T). Proof. exact: minA. Qed.
+Lemma maxA : associative (max : T -> T -> T). Proof. exact: maxA. Qed.
+Lemma minAC : right_commutative (min : T -> T -> T). Proof. exact: minAC. Qed.
+Lemma maxAC : right_commutative (max : T -> T -> T). Proof. exact: maxAC. Qed.
+Lemma minCA : left_commutative (min : T -> T -> T). Proof. exact: minCA. Qed.
+Lemma maxCA : left_commutative (max : T -> T -> T). Proof. exact: maxCA. Qed.
+Lemma minACA : interchange (min : T -> T -> T) min. Proof. exact: minACA. Qed.
+Lemma maxACA : interchange (max : T -> T -> T) max. Proof. exact: maxACA. Qed.
 
-Lemma maxC : commutative (max : T -> T -> T).
-Proof. by move=> x y; apply: comparable_maxC. Qed.
-
-Lemma minA : associative (min : T -> T -> T).
-Proof. by move=> x y z; apply: comparable_minA. Qed.
-
-Lemma maxA : associative (max : T -> T -> T).
-Proof. by move=> x y z; apply: comparable_maxA. Qed.
-
-Lemma minAC : right_commutative (min : T -> T -> T).
-Proof. by move=> x y z; apply: comparable_minAC. Qed.
-
-Lemma maxAC : right_commutative (max : T -> T -> T).
-Proof. by move=> x y z; apply: comparable_maxAC. Qed.
-
-Lemma minCA : left_commutative (min : T -> T -> T).
-Proof. by move=> x y z; apply: comparable_minCA. Qed.
-
-Lemma maxCA : left_commutative (max : T -> T -> T).
-Proof. by move=> x y z; apply: comparable_maxCA. Qed.
-
-Lemma minACA : interchange (min : T -> T -> T) min.
-Proof. by move=> x y z t; apply: comparable_minACA. Qed.
-
-Lemma maxACA : interchange (max : T -> T -> T) max.
-Proof. by move=> x y z t; apply: comparable_maxACA. Qed.
-
-Lemma eq_minr x y : (min x y == y) = (y <= x).
-Proof. exact: comparable_eq_minr. Qed.
-
-Lemma eq_maxl x y : (max x y == x) = (y <= x).
-Proof. exact: comparable_eq_maxl. Qed.
+Lemma eq_minr x y : (min x y == y) = (y <= x). Proof. exact: eq_minr. Qed.
+Lemma eq_maxl x y : (max x y == x) = (y <= x). Proof. exact: eq_maxl. Qed.
 
 Lemma min_idPr x y : reflect (min x y = y) (y <= x).
-Proof. exact: comparable_min_idPr. Qed.
+Proof. exact: min_idPr. Qed.
 
 Lemma max_idPl x y : reflect (max x y = x) (y <= x).
-Proof. exact: comparable_max_idPl. Qed.
+Proof. exact: max_idPl. Qed.
 
 Lemma le_minr z x y : (z <= min x y) = (z <= x) && (z <= y).
-Proof. exact: comparable_le_minr. Qed.
+Proof. exact: le_minr. Qed.
 
 Lemma le_minl z x y : (min x y <= z) = (x <= z) || (y <= z).
-Proof. exact: comparable_le_minl. Qed.
+Proof. exact: le_minl. Qed.
 
 Lemma lt_minr z x y : (z < min x y) = (z < x) && (z < y).
-Proof. exact: comparable_lt_minr. Qed.
+Proof. exact: lt_minr. Qed.
 
 Lemma lt_minl z x y : (min x y < z) = (x < z) || (y < z).
-Proof. exact: comparable_lt_minl. Qed.
+Proof. exact: lt_minl. Qed.
 
 Lemma le_maxr z x y : (z <= max x y) = (z <= x) || (z <= y).
-Proof. exact: comparable_le_maxr. Qed.
+Proof. exact: le_maxr. Qed.
 
 Lemma le_maxl z x y : (max x y <= z) = (x <= z) && (y <= z).
-Proof. exact: comparable_le_maxl. Qed.
+Proof. exact: le_maxl. Qed.
 
 Lemma lt_maxr z x y : (z < max x y) = (z < x) || (z < y).
-Proof. exact: comparable_lt_maxr. Qed.
+Proof. exact: lt_maxr. Qed.
 
 Lemma lt_maxl z x y : (max x y < z) = (x < z) && (y < z).
-Proof. exact: comparable_lt_maxl. Qed.
+Proof. exact: lt_maxl. Qed.
 
-Lemma minxK x y : max (min x y) y = y. Proof. exact: comparable_minxK. Qed.
-Lemma minKx x y : max x (min x y) = x. Proof. exact: comparable_minKx. Qed.
-Lemma maxxK x y : min (max x y) y = y. Proof. exact: comparable_maxxK. Qed.
-Lemma maxKx x y : min x (max x y) = x. Proof. exact: comparable_maxKx. Qed.
+Lemma minxK x y : max (min x y) y = y. Proof. exact: minxK. Qed.
+Lemma minKx x y : max x (min x y) = x. Proof. exact: minKx. Qed.
+Lemma maxxK x y : min (max x y) y = y. Proof. exact: maxxK. Qed.
+Lemma maxKx x y : min x (max x y) = x. Proof. exact: maxKx. Qed.
 
 Lemma max_minl : left_distributive (max : T -> T -> T) min.
-Proof. by move=> x y z; apply: comparable_max_minl. Qed.
+Proof. exact: max_minl. Qed.
 
 Lemma min_maxl : left_distributive (min : T -> T -> T) max.
-Proof. by move=> x y z; apply: comparable_min_maxl. Qed.
+Proof. exact: min_maxl. Qed.
 
 Lemma max_minr : right_distributive (max : T -> T -> T) min.
-Proof. by move=> x y z; apply: comparable_max_minr. Qed.
+Proof. exact: max_minr. Qed.
 
 Lemma min_maxr : right_distributive (min : T -> T -> T) max.
-Proof. by move=> x y z; apply: comparable_min_maxr. Qed.
+Proof. exact: min_maxr. Qed.
 
 Lemma leIx x y z : (meet y z <= x) = (y <= x) || (z <= x).
-Proof. by rewrite meetEtotal le_minl. Qed.
+Proof. exact: leIx. Qed.
 
 Lemma lexU x y z : (x <= join y z) = (x <= y) || (x <= z).
-Proof. by rewrite joinEtotal le_maxr. Qed.
+Proof. exact: lexU. Qed.
 
 Lemma ltxI x y z : (x < meet y z) = (x < y) && (x < z).
-Proof. by rewrite !ltNge leIx negb_or. Qed.
+Proof. exact: ltxI. Qed.
 
 Lemma ltIx x y z : (meet y z < x) = (y < x) || (z < x).
-Proof. by rewrite !ltNge lexI negb_and. Qed.
+Proof. exact: ltIx. Qed.
 
 Lemma ltxU x y z : (x < join y z) = (x < y) || (x < z).
-Proof. by rewrite !ltNge leUx negb_and. Qed.
+Proof. exact: ltxU. Qed.
 
 Lemma ltUx x y z : (join y z < x) = (y < x) && (z < x).
-Proof. by rewrite !ltNge lexU negb_or. Qed.
+Proof. exact: ltUx. Qed.
 
 Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx, ltIx).
@@ -8170,33 +7985,33 @@ Definition lteUx := (@leUx _ T, ltUx).
 (* lteif *)
 
 Lemma lteifNE x y C : x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
-Proof. by case: C => /=; case: leP. Qed.
+Proof. exact: lteifNE. Qed.
 
 Lemma lteif_minr z x y C :
-  (z < Order.min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (le_minr, lt_minr). Qed.
+  (z < min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. exact: lteif_minr. Qed.
 
 Lemma lteif_minl z x y C :
-  (Order.min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (le_minl, lt_minl). Qed.
+  (min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. exact: lteif_minl. Qed.
 
 Lemma lteif_maxr z x y C :
-  (z < Order.max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (le_maxr, lt_maxr). Qed.
+  (z < max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. exact: lteif_maxr. Qed.
 
 Lemma lteif_maxl z x y C :
-  (Order.max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (le_maxl, lt_maxl). Qed.
+  (max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. exact: lteif_maxl. Qed.
 
 Section ArgExtremum.
 
 Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 
 Lemma arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
-Proof. by apply: extremumP => //; apply: le_trans. Qed.
+Proof. exact: comparable_arg_minP. Qed.
 
 Lemma arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
-Proof. by apply: extremumP => //; [apply: ge_refl | apply: ge_trans]. Qed.
+Proof. exact: comparable_arg_maxP. Qed.
 
 End ArgExtremum.
 
@@ -8490,58 +8305,58 @@ Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : orderType disp2}.
 Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
 
 Lemma contraTle b z t : (t < z -> ~~ b) -> (b -> z <= t).
-Proof. exact: comparable_contraTle. Qed.
+Proof. exact: contraTle. Qed.
 
 Lemma contraTlt b z t : (t <= z -> ~~ b) -> (b -> z < t).
-Proof. exact: comparable_contraTlt. Qed.
+Proof. exact: contraTlt. Qed.
 
 Lemma contraPle P z t : (t < z -> ~ P) -> (P -> z <= t).
-Proof. exact: comparable_contraPle. Qed.
+Proof. exact: contraPle. Qed.
 
 Lemma contraPlt P z t : (t <= z -> ~ P) -> (P -> z < t).
-Proof. exact: comparable_contraPlt. Qed.
+Proof. exact: contraPlt. Qed.
 
 Lemma contraNle b z t : (t < z -> b) -> (~~ b -> z <= t).
-Proof. exact: comparable_contraNle. Qed.
+Proof. exact: contraNle. Qed.
 
 Lemma contraNlt b z t : (t <= z -> b) -> (~~ b -> z < t).
-Proof. exact: comparable_contraNlt. Qed.
+Proof. exact: contraNlt. Qed.
 
 Lemma contra_not_le P z t : (t < z -> P) -> (~ P -> z <= t).
-Proof. exact: comparable_contra_not_le. Qed.
+Proof. exact: contra_not_le. Qed.
 
 Lemma contra_not_lt P z t : (t <= z -> P) -> (~ P -> z < t).
-Proof. exact: comparable_contra_not_lt. Qed.
+Proof. exact: contra_not_lt. Qed.
 
 Lemma contraFle b z t : (t < z -> b) -> (b = false -> z <= t).
-Proof. exact: comparable_contraFle. Qed.
+Proof. exact: contraFle. Qed.
 
 Lemma contraFlt b z t : (t <= z -> b) -> (b = false -> z < t).
-Proof. exact: comparable_contraFlt. Qed.
+Proof. exact: contraFlt. Qed.
 
 Lemma contra_leq_le m n z t : (t < z -> (n < m)%N) -> ((m <= n)%N -> z <= t).
-Proof. exact: comparable_contra_leq_le. Qed.
+Proof. exact: contra_leq_le. Qed.
 
 Lemma contra_leq_lt m n z t : (t <= z -> (n < m)%N) -> ((m <= n)%N -> z < t).
-Proof. exact: comparable_contra_leq_lt. Qed.
+Proof. exact: contra_leq_lt. Qed.
 
 Lemma contra_ltn_le m n z t : (t < z -> (n <= m)%N) -> ((m < n)%N -> z <= t).
-Proof. exact: comparable_contra_ltn_le. Qed.
+Proof. exact: contra_ltn_le. Qed.
 
 Lemma contra_ltn_lt m n z t : (t <= z -> (n <= m)%N) -> ((m < n)%N -> z < t).
-Proof. exact: comparable_contra_ltn_lt. Qed.
+Proof. exact: contra_ltn_lt. Qed.
 
 Lemma contra_le x y z t : (t < z -> y < x) -> (x <= y -> z <= t).
-Proof. exact: comparable_contra_le. Qed.
+Proof. exact: contra_le. Qed.
 
 Lemma contra_le_lt x y z t : (t <= z -> y < x) -> (x <= y -> z < t).
-Proof. exact: comparable_contra_le_lt. Qed.
+Proof. exact: contra_le_lt. Qed.
 
 Lemma contra_lt_le x y z t : (t < z -> y <= x) -> (x < y -> z <= t).
-Proof. exact: comparable_contra_lt_le. Qed.
+Proof. exact: contra_lt_le. Qed.
 
 Lemma contra_lt x y z t : (t <= z -> y <= x) -> (x < y -> z < t).
-Proof. exact: comparable_contra_lt. Qed.
+Proof. exact: contra_lt. Qed.
 
 End ContraTheory.
 
@@ -8550,28 +8365,20 @@ Section TotalMonotonyTheory.
 Context {disp : unit} {disp' : unit}.
 Context {T : orderType disp} {T' : porderType disp'}.
 Variables (D : {pred T}) (f : T -> T').
-Implicit Types (x y z : T) (u v w : T').
-
-Let leT_anti    := @le_anti _ T.
-Let leT'_anti   := @le_anti _ T'.
-Let ltT_neqAle  := @lt_neqAle _ T.
-Let ltT'_neqAle := @lt_neqAle _ T'.
-Let ltT_def     := @lt_def _ T.
-Let leT_total   := @le_total _ T.
 
 Lemma le_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
-Proof. exact: total_homo_mono. Qed.
+Proof. exact: le_mono. Qed.
 
 Lemma le_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
-Proof. exact: total_homo_mono. Qed.
+Proof. exact: le_nmono. Qed.
 
 Lemma le_mono_in :
   {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
-Proof. exact: total_homo_mono_in. Qed.
+Proof. exact: le_mono_in. Qed.
 
 Lemma le_nmono_in :
   {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
-Proof. exact: total_homo_mono_in. Qed.
+Proof. exact: le_nmono_in. Qed.
 
 End TotalMonotonyTheory.
 End TotalTheory.
@@ -8826,167 +8633,162 @@ End CTBDistrLatticeTheory.
 (* FACTORIES *)
 (*************)
 
-Module LePOrderMixin.
-Section LePOrderMixin.
-Variable (T : eqType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  lt_def   : forall x y, lt x y = (y != x) && (le x y);
-  lexx     : reflexive     le;
-  le_anti  : antisymmetric le;
-  le_trans : transitive    le;
-}.
-
-Variable (m : of_).
-
-Lemma lt_def' (x y : T) : lt m y x = (y != x) && le m y x.
-Proof. by rewrite lt_def eq_sym. Qed.
-
-Lemma le_anti' x y : le m x y -> le m y x -> x = y.
-Proof. by move=> ? ?; apply/(@le_anti m)/andP. Qed.
-
-Definition porderMixin :=
-  @POrder.Mixin
-    _ _ (le m) (lt m) (lt_def m) lt_def' (lexx m) le_anti' (@le_trans m).
-
-End LePOrderMixin.
-
+Module RelOrderMixin.
 Module Exports.
-Notation lePOrderMixin := of_.
-Notation LePOrderMixin := Build.
-Coercion porderMixin : of_ >-> POrder.mixin_of.
+
+(* Alternative constructors for some relorder factories that lets us infer    *)
+(* order instances from types rather than relation:                           *)
+
+Definition BottomMixin (disp : unit) (T : porderType disp) bottom :
+  (forall x : T, bottom <= x) -> bottomRelMixin T := @BottomRelMixin _ _ bottom.
+
+Definition TopMixin (disp : unit) (T : porderType disp) top :
+  (forall x : T, x <= top) -> topRelMixin T := @TopRelMixin _ _ top.
+
+Definition MeetMixin (disp : unit) (T : porderType disp) meet :
+  commutative meet -> associative meet ->
+  (forall x y : T, x <= y = (meet x y == x)) -> meetRelMixin T :=
+  @MeetRelMixin _ _ meet.
+
+Definition JoinMixin (disp : unit) (T : porderType disp) join :
+  commutative join -> associative join ->
+  (forall x y : T, y <= x = (join x y == x)) -> joinRelMixin T :=
+  @JoinRelMixin _ _ join.
+
+Definition DistrLatticeMixin (disp : unit) (T : latticeType disp) :
+  left_distributive (@meet _ T) (@join _ T) -> distrLatticeRelMixin T :=
+  @DistrLatticeRelMixin _ _.
+
+Definition LatticePOrderMixin (disp : unit) (T : porderType disp) meet join :
+  commutative meet -> commutative join ->
+  associative meet -> associative join ->
+  (forall y x : T, meet x (join x y) = x) ->
+  (forall y x : T, join x (meet x y) = x) ->
+  (forall x y : T, x <= y = (meet x y == x)) -> latticePOrderRelMixin T :=
+  @LatticePOrderRelMixin _ _ meet join.
+
+Definition DistrLatticePOrderMixin
+           (disp : unit) (T : porderType disp) meet join :
+  commutative meet -> commutative join ->
+  associative meet -> associative join ->
+  (forall y x : T, meet x (join x y) = x) ->
+  (forall y x : T, join x (meet x y) = x) ->
+  (forall x y : T, x <= y = (meet x y == x)) ->
+  left_distributive meet join -> latticePOrderRelMixin T :=
+  @DistrLatticePOrderRelMixin _ _ meet join.
+
+(* Big pack notations: *)
+
+Definition LatticeOfPOrderType
+           disp (T : porderType disp) (m : latticePOrderRelMixin T) :
+  latticeType disp :=
+  [latticeType of JoinSemilatticeType (MeetSemilatticeType T m) m].
+
+Definition DistrLatticeOfPOrderType
+           disp (T : porderType disp) (m : distrLatticePOrderRelMixin T) :
+  distrLatticeType disp := DistrLatticeType (LatticeOfPOrderType m) m.
+
+Definition OrderOfLatticeType
+           disp (T : latticeType disp) (m : totalLatticeRelMixin T) :
+  orderType disp := OrderType (DistrLatticeType T m) m.
+
+Definition OrderOfPOrderType
+           disp (T : porderType disp) (m : totalPOrderRelMixin T) :
+  orderType disp := @OrderOfLatticeType _ (LatticeOfPOrderType m) m.
+
+Definition OrderOfMeetSemilatticeType
+           disp (T : meetSemilatticeType disp) (m : totalMeetOrderRelMixin T) :
+  orderType disp :=
+  @OrderOfLatticeType _ [latticeType of JoinSemilatticeType T m] m.
+
+Definition OrderOfJoinSemilatticeType
+           disp (T : joinSemilatticeType disp) (m : totalJoinOrderRelMixin T) :
+  orderType disp :=
+  @OrderOfLatticeType _ [latticeType of MeetSemilatticeType T m] m.
+
+Definition LatticeOfChoiceType
+           disp (T : choiceType) (m : meetJoinMixin T) : latticeType disp :=
+  [latticeType of JoinSemilatticeType
+                    (MeetSemilatticeType (POrderType disp T m) m) m].
+
+Definition DistrLatticeOfChoiceType
+           disp (T : choiceType) (m : distrMeetJoinMixin T) :
+  distrLatticeType disp := DistrLatticeType (LatticeOfChoiceType disp m) m.
+
+Definition OrderOfChoiceType disp (T : choiceType) (m : leOrderMixin T) :
+  orderType disp := @OrderOfLatticeType _ (LatticeOfChoiceType disp m) m.
+
 End Exports.
+End RelOrderMixin.
+Import RelOrderMixin.Exports.
 
-End LePOrderMixin.
-Import LePOrderMixin.Exports.
-
-Module BottomMixin.
-Section BottomMixin.
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  bottom : T;
-  le0x : forall x, bottom <= x;
-}.
-
-Definition bPOrderMixin (m : of_) := @BPOrder.Mixin _ _ (bottom m) (le0x m).
-
-End BottomMixin.
-
-Module Exports.
-Notation bottomMixin := of_.
-Notation BottomMixin := Build.
-Coercion bPOrderMixin : of_ >-> BPOrder.mixin_of.
-End Exports.
-
-End BottomMixin.
-Import BottomMixin.Exports.
-
-Module TopMixin.
-Section TopMixin.
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  top : T;
-  lex1 : forall x, x <= top;
-}.
-
-Definition tPOrderMixin (m : of_) : TPOrder.mixin_of (POrder.class T) :=
-  @BPOrder.Mixin _ (POrder.class [porderType of T^d]) (top m) (lex1 m).
-
-End TopMixin.
-
-Module Exports.
-Notation topMixin := of_.
-Notation TopMixin := Build.
-Coercion tPOrderMixin : of_ >-> TPOrder.mixin_of.
-End Exports.
-
-End TopMixin.
-Import TopMixin.Exports.
-
-Module MeetMixin.
-Section MeetMixin.
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  meet : T -> T -> T;
-  meetC   : commutative meet;
-  meetA   : associative meet;
-  leEmeet : forall x y, (x <= y) = (meet x y == x);
-}.
-
-Definition meetMixin (m : of_) :=
-  @MeetSemilattice.Mixin _ _ (meet m) (meetC m) (meetA m) (leEmeet m).
-
-End MeetMixin.
-
-Module Exports.
-Coercion meetMixin : of_ >-> MeetSemilattice.mixin_of.
-Notation meetMixin := of_.
-Notation MeetMixin := Build.
-End Exports.
-
-End MeetMixin.
-Import MeetMixin.Exports.
-
-Module JoinMixin.
-Section JoinMixin.
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  join : T -> T -> T;
-  joinC   : commutative join;
-  joinA   : associative join;
-  leEjoin : forall x y, (y <= x) = (join x y == x);
-}.
-
-Definition joinMixin (m : of_) :
-  JoinSemilattice.mixin_of (POrder.class T) :=
-  @MeetSemilattice.Mixin _ (POrder.class [porderType of T^d])
-                         (join m) (joinC m) (joinA m) (leEjoin m).
-
-End JoinMixin.
-
-Module Exports.
-Coercion joinMixin : of_ >-> JoinSemilattice.mixin_of.
-Notation joinMixin := of_.
-Notation JoinMixin := Build.
-End Exports.
-
-End JoinMixin.
-Import JoinMixin.Exports.
-
-Module DistrLatticeMixin.
-Section DistrLatticeMixin.
+Module TotalLatticeMixin.
+Section TotalLatticeMixin.
 Variable (disp : unit) (T : latticeType disp).
 
-Record of_ := Build {
-  meetUl : @left_distributive T T meet join;
-}.
+Definition of_ (phT : phant T) := total (<=%O : rel T).
 
-Variable (m : of_).
+Definition mixin phT (m : of_ phT) : totalLatticeRelMixin T := m.
 
-Lemma meetUr : right_distributive (@meet _ T) (@join _ T).
-Proof. by move=> x y z; rewrite ![x `&` _]meetC (meetUl m). Qed.
-
-Lemma joinIl : left_distributive (@join _ T) (@meet _ T).
-Proof. by move=> x y z; rewrite meetUr joinIK (meetUl m) -joinA meetUKC. Qed.
-
-Definition distrLatticeMixin := @DistrLattice.Mixin _ _ (meetUl m) joinIl.
-
-End DistrLatticeMixin.
+End TotalLatticeMixin.
 
 Module Exports.
-Coercion distrLatticeMixin : of_ >-> DistrLattice.mixin_of.
-Notation distrLatticeMixin := of_.
-Notation DistrLatticeMixin := Build.
+Notation totalLatticeMixin T := (of_ (Phant T)).
+Coercion mixin : of_ >-> totalLatticeRelMixin.
 End Exports.
+End TotalLatticeMixin.
+Import TotalLatticeMixin.Exports.
 
-End DistrLatticeMixin.
-Import DistrLatticeMixin.Exports.
+Module TotalPOrderMixin.
+Section TotalPOrderMixin.
+Variable (disp : unit) (T : porderType disp).
+
+Definition of_ (phT : phant T) := total (<=%O : rel T).
+
+Definition mixin phT (m : of_ phT) : totalPOrderRelMixin T := m.
+
+End TotalPOrderMixin.
+
+Module Exports.
+Notation totalPOrderMixin T := (of_ (Phant T)).
+Coercion mixin : of_ >-> totalPOrderRelMixin.
+End Exports.
+End TotalPOrderMixin.
+Import TotalPOrderMixin.Exports.
+
+Module TotalMeetSemilatticeMixin.
+Section TotalMeetSemilatticeMixin.
+Variable (disp : unit) (T : meetSemilatticeType disp).
+
+Definition of_ (phT : phant T) := total (<=%O : rel T).
+
+Definition mixin phT (m : of_ phT) : totalMeetOrderRelMixin T := m.
+
+End TotalMeetSemilatticeMixin.
+
+Module Exports.
+Notation totalMeetSemilatticeMixin T := (of_ (Phant T)).
+Coercion mixin : of_ >-> totalMeetOrderRelMixin.
+End Exports.
+End TotalMeetSemilatticeMixin.
+Import TotalMeetSemilatticeMixin.Exports.
+
+Module TotalJoinSemilatticeMixin.
+Section TotalJoinSemilatticeMixin.
+Variable (disp : unit) (T : joinSemilatticeType disp).
+
+Definition of_ (phT : phant T) := total (<=%O : rel T).
+
+Definition mixin phT (m : of_ phT) : totalJoinOrderRelMixin T := m.
+
+End TotalJoinSemilatticeMixin.
+
+Module Exports.
+Notation totalJoinSemilatticeMixin T := (of_ (Phant T)).
+Coercion mixin : of_ >-> totalJoinOrderRelMixin.
+End Exports.
+End TotalJoinSemilatticeMixin.
+Import TotalJoinSemilatticeMixin.Exports.
 
 Module CBDistrLatticeMixin.
 Section CBDistrLatticeMixin.
@@ -9035,646 +8837,6 @@ End Exports.
 End CTBDistrLatticeMixin.
 Import CTBDistrLatticeMixin.Exports.
 
-Module TotalOrderMixin.
-Section TotalOrderMixin.
-Variable (disp : unit) (T : distrLatticeType disp).
-Definition of_ := total (<=%O : rel T).
-
-Definition totalOrderMixin (m : of_) : Total.mixin_of (DistrLattice.class T) :=
-  m.
-
-End TotalOrderMixin.
-
-Module Exports.
-Coercion totalOrderMixin : of_ >-> Total.mixin_of.
-Notation totalOrderMixin := of_.
-End Exports.
-
-End TotalOrderMixin.
-Import TotalOrderMixin.Exports.
-
-Module LatticePOrderMixin.
-Section LatticePOrderMixin.
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x, meet x (join x y) = x;
-  meetKU : forall y x, join x (meet x y) = x;
-  leEmeet : forall x y, (x <= y) = (meet x y == x);
-}.
-
-Variable (m : of_).
-
-Definition meetMixin := @MeetMixin _ _ (meet m) (meetC m) (meetA m) (leEmeet m).
-
-Lemma leEjoin x y : (y <= x) = (join m x y == x).
-Proof.
-rewrite (leEmeet m); apply/eqP/eqP => <-.
-  by rewrite (meetC m) (meetKU m).
-by rewrite (joinC m) (joinKI m).
-Qed.
-
-Definition joinMixin := @JoinMixin _ _ (join m) (joinC m) (joinA m) leEjoin.
-
-End LatticePOrderMixin.
-
-Module Exports.
-Notation latticePOrderMixin := of_.
-Notation LatticePOrderMixin := Build.
-Coercion meetMixin : of_ >-> MeetMixin.of_.
-Coercion joinMixin : of_ >-> JoinMixin.of_.
-Definition LatticeOfPOrder disp (T : porderType disp) (m : of_ T) :
-  latticeType disp :=
-  [latticeType of JoinSemilatticeType (MeetSemilatticeType T m) m].
-End Exports.
-
-End LatticePOrderMixin.
-Import LatticePOrderMixin.Exports.
-
-Module DistrLatticePOrderMixin.
-Section DistrLatticePOrderMixin.
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x, meet x (join x y) = x;
-  meetKU : forall y x, join x (meet x y) = x;
-  leEmeet : forall x y, (x <= y) = (meet x y == x);
-  meetUl : left_distributive meet join;
-}.
-
-Variable (m : of_).
-
-Definition latticeMixin :=
-  @LatticePOrderMixin
-    _ _ (meet m) (join m) (meetC m) (joinC m) (meetA m) (joinA m)
-    (joinKI m) (meetKU m) (leEmeet m).
-
-Definition distrLatticeMixin :=
-  @DistrLatticeMixin _ (LatticeOfPOrder latticeMixin) (meetUl m).
-
-End DistrLatticePOrderMixin.
-
-Module Exports.
-Notation distrLatticePOrderMixin := of_.
-Notation DistrLatticePOrderMixin := Build.
-Coercion latticeMixin : of_ >-> latticePOrderMixin.
-Coercion distrLatticeMixin : of_ >-> DistrLatticeMixin.of_.
-Definition DistrLatticeOfPOrderType disp (T : porderType disp) (m : of_ T) :
-  distrLatticeType disp := DistrLatticeType (LatticeOfPOrder m) m.
-End Exports.
-
-End DistrLatticePOrderMixin.
-Import DistrLatticePOrderMixin.Exports.
-
-Module TotalLatticeMixin.
-Section TotalLatticeMixin.
-Variable (disp : unit) (T : latticeType disp).
-Definition of_ := total (<=%O : rel T).
-
-Variable (m : of_).
-Implicit Types (x y z : T).
-
-Let comparableT x y : x >=< y := m x y.
-
-Fact meetUl : @left_distributive T T meet join.
-Proof.
-pose leP x y := lcomparable_leP (comparableT x y).
-move=> x y z; case: (leP x z); case: (leP y z); case: (leP x y);
-  case: (leP x z); case: (leP y z); case: (leP x y) => //= xy yz xz _ _ _;
-  rewrite ?joinxx //.
-- by move: (le_lt_trans xz (lt_trans yz xy)); rewrite ltxx.
-- by move: (lt_le_trans xz (le_trans xy yz)); rewrite ltxx.
-Qed.
-
-Definition distrLatticeMixin := @DistrLatticeMixin _ T meetUl.
-
-Definition totalMixin :
-  totalOrderMixin (DistrLatticeType T distrLatticeMixin) := m.
-
-End TotalLatticeMixin.
-
-Module Exports.
-Notation totalLatticeMixin := of_.
-Coercion distrLatticeMixin : of_ >-> DistrLatticeMixin.of_.
-Coercion totalMixin : of_ >-> totalOrderMixin.
-Definition OrderOfLattice disp (T : latticeType disp) (m : of_ T) :
-  orderType disp := OrderType (DistrLatticeType T m) m.
-End Exports.
-
-End TotalLatticeMixin.
-Import TotalLatticeMixin.Exports.
-
-Module TotalPOrderMixin.
-Section TotalPOrderMixin.
-Variable (disp : unit) (T : porderType disp).
-Definition of_ := total (<=%O : rel T).
-
-Variable (m : of_).
-Implicit Types (x y z : T).
-
-Let comparableT x y : x >=< y := m x y.
-
-Fact leP x y : le_xor_gt x y
-  (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
-Proof. exact: comparable_leP. Qed.
-
-Definition meet := @min _ T.
-
-Fact meetC : commutative meet.
-Proof. by move=> x y; rewrite /meet; case: leP. Qed.
-
-Fact meetA : associative meet.
-Proof.
-move=> x y z; rewrite !(fun_if, if_arg).
-case: (leP z y) (leP y x) (leP z x) => [] zy [] yx [] zx//=.
-  by have := le_lt_trans (le_trans zy yx) zx; rewrite ltxx.
-by apply/eqP; rewrite eq_le zx ltW// (lt_trans yx).
-Qed.
-
-Fact leEmeet x y : (x <= y) = (meet x y == x).
-Proof. by rewrite /meet; case: leP => ?; rewrite ?eqxx ?lt_eqF. Qed.
-
-Definition meetMixin := @MeetMixin _ T _ meetC meetA leEmeet.
-
-Definition join := @max _ T.
-
-Fact joinC : commutative join.
-Proof. by move=> x y; rewrite /join; case: leP. Qed.
-
-Fact joinA : associative join.
-Proof.
-move=> x y z; rewrite !(fun_if, if_arg).
-case: (leP z y) (leP y x) (leP z x) => [] zy [] yx [] zx//=.
-  by have := le_lt_trans (le_trans zy yx) zx; rewrite ltxx.
-by apply/eqP; rewrite eq_le zx ltW// (lt_trans yx).
-Qed.
-
-Fact leEjoin x y : (y <= x) = (join x y == x).
-Proof. by rewrite /join; case: leP => ?; rewrite ?eqxx ?gt_eqF. Qed.
-
-Definition joinMixin := @JoinMixin _ T _ joinC joinA leEjoin.
-
-Let T_latticeType :=
-  [latticeType of JoinSemilatticeType (MeetSemilatticeType T meetMixin)
-                                      joinMixin].
-
-Definition totalLatticeMixin : totalLatticeMixin T_latticeType := m.
-
-End TotalPOrderMixin.
-
-Module Exports.
-Notation totalPOrderMixin := of_.
-Coercion meetMixin : of_ >-> MeetMixin.of_.
-Coercion joinMixin : of_ >-> JoinMixin.of_.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
-Definition OrderOfPOrder disp (T : porderType disp) (m : of_ T) :
-  orderType disp := OrderOfLattice m.
-End Exports.
-
-End TotalPOrderMixin.
-Import TotalPOrderMixin.Exports.
-
-Module TotalMeetSemilatticeMixin.
-Section TotalMeetSemilatticeMixin.
-Variable (disp : unit) (T : meetSemilatticeType disp).
-Definition of_ := total (<=%O : rel T).
-
-Variable (m : of_).
-
-Definition joinMixin : joinMixin T := (m : totalPOrderMixin T).
-
-Let T_latticeType := [latticeType of JoinSemilatticeType T joinMixin].
-
-Definition totalLatticeMixin : totalLatticeMixin T_latticeType := m.
-
-End TotalMeetSemilatticeMixin.
-
-Module Exports.
-Notation totalMeetSemilatticeMixin := of_.
-Coercion joinMixin : of_ >-> JoinMixin.of_.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
-Definition OrderOfMeetSemilattice
-           disp (T : meetSemilatticeType disp) (m : of_ T) : orderType disp :=
-  OrderOfLattice m.
-End Exports.
-
-End TotalMeetSemilatticeMixin.
-Import TotalMeetSemilatticeMixin.Exports.
-
-Module TotalJoinSemilatticeMixin.
-Section TotalJoinSemilatticeMixin.
-Variable (disp : unit) (T : joinSemilatticeType disp).
-Definition of_ := total (<=%O : rel T).
-
-Variable (m : of_).
-
-Definition meetMixin : meetMixin T := (m : totalPOrderMixin T).
-
-Let T_latticeType := [latticeType of MeetSemilatticeType T meetMixin].
-
-Definition totalLatticeMixin : totalLatticeMixin T_latticeType := m.
-
-End TotalJoinSemilatticeMixin.
-
-Module Exports.
-Notation totalJoinSemilatticeMixin := of_.
-Coercion meetMixin : of_ >-> MeetMixin.of_.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
-Definition OrderOfJoinSemilattice
-           disp (T : joinSemilatticeType disp) (m : of_ T) : orderType disp :=
-  OrderOfLattice m.
-End Exports.
-
-End TotalJoinSemilatticeMixin.
-Import TotalJoinSemilatticeMixin.Exports.
-
-Module LtPOrderMixin.
-Section LtPOrderMixin.
-Variable (T : eqType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  le_def   : forall x y, le x y = (x == y) || lt x y;
-  lt_irr   : irreflexive lt;
-  lt_trans : transitive lt;
-}.
-
-Variable (m : of_).
-
-Fact lt_asym x y : (lt m x y && lt m y x) = false.
-Proof.
-by apply/negP => /andP [] xy /(lt_trans xy); apply/negP; rewrite (lt_irr m x).
-Qed.
-
-Fact lt_def x y : lt m x y = (y != x) && le m x y.
-Proof. by rewrite le_def eq_sym; case: eqP => //= <-; rewrite lt_irr. Qed.
-
-Fact le_refl : reflexive (le m). Proof. by move=> ?; rewrite le_def eqxx. Qed.
-
-Fact le_anti : antisymmetric (le m).
-Proof. by move=> ? ?; rewrite !le_def eq_sym -orb_andr lt_asym; case: eqP. Qed.
-
-Fact le_trans : transitive (le m).
-Proof.
-by move=> y x z; rewrite !le_def => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
-  rewrite ?ltxy ?(lt_trans ltxy ltyz) // ?orbT.
-Qed.
-
-Definition lePOrderMixin : lePOrderMixin T :=
-  @LePOrderMixin _ (le m) (lt m) lt_def le_refl le_anti le_trans.
-
-End LtPOrderMixin.
-
-Module Exports.
-Notation ltPOrderMixin := of_.
-Notation LtPOrderMixin := Build.
-Coercion lePOrderMixin : of_ >-> LePOrderMixin.of_.
-End Exports.
-
-End LtPOrderMixin.
-Import LtPOrderMixin.Exports.
-
-Module MeetJoinMixin.
-Section MeetJoinMixin.
-
-Variable (T : choiceType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (y != x) && le x y;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x : T, meet x (join x y) = x;
-  meetKU : forall y x : T, join x (meet x y) = x;
-  meetxx : idempotent meet;
-}.
-
-Variable (m : of_).
-
-Fact le_refl : reflexive (le m). Proof. by move=> x; rewrite le_def meetxx. Qed.
-
-Fact le_anti : antisymmetric (le m).
-Proof. by move=> x y; rewrite !le_def meetC => /andP [] /eqP {2}<- /eqP ->. Qed.
-
-Fact le_trans : transitive (le m).
-Proof.
-move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
-by rewrite -[in LHS]lexy -meetA leyz lexy.
-Qed.
-
-Definition porderMixin : lePOrderMixin T :=
-  LePOrderMixin (lt_def m) le_refl le_anti le_trans.
-
-Let T_porderType := POrderType tt T porderMixin.
-
-Definition latticeMixin : latticePOrderMixin T_porderType :=
-  @LatticePOrderMixin _ T_porderType _ _ (meetC m) (joinC m) (meetA m) (joinA m)
-                      (joinKI m) (meetKU m) (le_def m).
-
-Let T_latticeType := LatticeOfPOrder latticeMixin.
-
-End MeetJoinMixin.
-
-Module Exports.
-Notation meetJoinMixin := of_.
-Notation MeetJoinMixin := Build.
-Coercion porderMixin : of_ >-> lePOrderMixin.
-Coercion latticeMixin : of_ >-> latticePOrderMixin.
-Definition LatticeOfChoiceType disp (T : choiceType) (m : of_ T) :
-  latticeType disp :=
-  [latticeType of JoinSemilatticeType
-                    (MeetSemilatticeType (POrderType disp T m) m) m].
-End Exports.
-
-End MeetJoinMixin.
-Import MeetJoinMixin.Exports.
-
-Module MeetJoinLeMixin.
-Section MeetJoinLeMixin.
-
-Variable (disp : unit) (T : porderType disp).
-
-Record of_ := Build {
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
-  joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
-}.
-
-Variable (m : of_).
-Fact meet_lel x y : meet m x y <= meet m y x.
-Proof.
-have:= le_refl (meet m x y); rewrite meetP => /andP [mlex mley].
-by rewrite (meetP m) mlex mley.
-Qed.
-Fact meetC : commutative (meet m).
-Proof. by move=> x y; apply le_anti; rewrite !meet_lel. Qed.
-Fact meet_leL {x y} : (meet m x y) <= x.
-Proof. by have:= le_refl (meet m x y); rewrite (meetP m) => /andP []. Qed.
-Fact meet_leR {x y} : (meet m x y) <= y.
-Proof. by have:= le_refl (meet m x y); rewrite (meetP m) => /andP []. Qed.
-
-Fact join_lel x y : join m x y <= join m y x.
-Proof.
-have:= le_refl (join m y x); rewrite joinP => /andP [ylej xlej].
-by rewrite (joinP m) ylej xlej.
-Qed.
-Fact joinC : commutative (join m).
-Proof. by move=> x y; apply le_anti; rewrite !join_lel. Qed.
-Fact join_leL {x y} : x <= (join m x y).
-Proof. by have:= le_refl (join m x y); rewrite (joinP m) => /andP []. Qed.
-Fact join_leR {x y} : y <= (join m x y).
-Proof. by have:= le_refl (join m x y); rewrite (joinP m) => /andP []. Qed.
-
-Fact meetA : associative (meet m).
-Proof.
-move=> x y z; apply le_anti.
-apply/andP; split; rewrite !meetP -?andbA; apply/and3P; split.
-- exact: meet_leL.
-- exact: le_trans meet_leR meet_leL.
-- exact: le_trans meet_leR meet_leR.
-- exact: le_trans meet_leL meet_leL.
-- exact: le_trans meet_leL meet_leR.
-- exact: meet_leR.
-Qed.
-Fact joinA : associative (join m).
-Proof.
-move=> x y z; apply le_anti.
-apply/andP; split; rewrite !joinP -?andbA; apply/and3P; split.
-- exact: le_trans join_leL join_leL.
-- exact: le_trans join_leR join_leL.
-- exact: join_leR.
-- exact: join_leL.
-- exact: le_trans join_leL join_leR.
-- exact: le_trans join_leR join_leR.
-Qed.
-Fact joinKI y x : meet m x (join m x y) = x.
-Proof.
-apply/le_anti/andP; split; first exact: meet_leL.
-by rewrite meetP le_refl join_leL.
-Qed.
-Fact meetKU y x : join m x (meet m x y) = x.
-Proof.
-apply/le_anti/andP; split; last exact: join_leL.
-by rewrite joinP le_refl meet_leL.
-Qed.
-Fact leEmeet x y : (x <= y) = (meet m x y == x).
-Proof. by rewrite eq_le meetP meet_leL le_refl. Qed.
-
-Definition latticeMixin :=
-  LatticePOrderMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
-
-End MeetJoinLeMixin.
-
-Module Exports.
-Coercion latticeMixin : of_ >-> Order.LatticePOrderMixin.of_.
-Notation meetJoinLeMixin := of_.
-Notation MeetJoinLeMixin := Build.
-End Exports.
-
-End MeetJoinLeMixin.
-Import MeetJoinLeMixin.Exports.
-
-Module DistrMeetJoinMixin.
-Section DistrMeetJoinMixin.
-
-Variable (T : choiceType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (y != x) && le x y;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x : T, meet x (join x y) = x;
-  meetKU : forall y x : T, join x (meet x y) = x;
-  meetUl : left_distributive meet join;
-  meetxx : idempotent meet;
-}.
-
-Variable (m : of_).
-
-Definition meetJoinMixin : meetJoinMixin T :=
-  @MeetJoinMixin T (le m) (lt m) (meet m) (join m) (le_def m) (lt_def m)
-                 (meetC m) (joinC m) (meetA m) (joinA m)
-                 (joinKI m) (meetKU m) (meetxx m).
-
-Let T_latticeType := LatticeOfChoiceType tt meetJoinMixin.
-
-Definition distrLatticeMixin : distrLatticeMixin T_latticeType :=
-  @DistrLatticeMixin _ T_latticeType (meetUl m).
-
-End DistrMeetJoinMixin.
-
-Module Exports.
-Notation distrMeetJoinMixin := of_.
-Notation DistrMeetJoinMixin := Build.
-Coercion meetJoinMixin : of_ >-> MeetJoinMixin.of_.
-Coercion distrLatticeMixin : of_ >-> DistrLatticeMixin.of_.
-Definition DistrLatticeOfChoiceType disp (T : choiceType) (m : of_ T) :
-  distrLatticeType disp := DistrLatticeType (LatticeOfChoiceType disp m) m.
-End Exports.
-
-End DistrMeetJoinMixin.
-Import DistrMeetJoinMixin.Exports.
-
-Module LeOrderMixin.
-Section LeOrderMixin.
-
-Variables (T : choiceType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  lt_def : forall x y, lt x y = (y != x) && le x y;
-  meet_def : forall x y, meet x y = if lt x y then x else y;
-  join_def : forall x y, join x y = if lt x y then y else x;
-  le_anti : antisymmetric le;
-  le_trans : transitive le;
-  le_total : total le;
-}.
-
-Variables (m : of_).
-
-Fact le_refl : reflexive (le m).
-Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
-
-Definition lePOrderMixin :=
-  LePOrderMixin (lt_def m) le_refl (@le_anti m) (@le_trans m).
-
-Let T_orderType :=
-  OrderOfPOrder (le_total m : totalPOrderMixin (POrderType tt T lePOrderMixin)).
-
-Implicit Types (x y z : T_orderType).
-
-Fact meetE x y : meet m x y = x `&` y. Proof. by rewrite meet_def. Qed.
-Fact joinE x y : join m x y = x `|` y. Proof. by rewrite join_def. Qed.
-Fact meetC : commutative (meet m).
-Proof. by move=> *; rewrite !meetE meetC. Qed.
-Fact joinC : commutative (join m).
-Proof. by move=> *; rewrite !joinE joinC. Qed.
-Fact meetA : associative (meet m).
-Proof. by move=> *; rewrite !meetE meetA. Qed.
-Fact joinA : associative (join m).
-Proof. by move=> *; rewrite !joinE joinA. Qed.
-Fact joinKI y x : meet m x (join m x y) = x.
-Proof. by rewrite meetE joinE joinKI. Qed.
-Fact meetKU y x : join m x (meet m x y) = x.
-Proof. by rewrite meetE joinE meetKU. Qed.
-Fact meetUl : left_distributive (meet m) (join m).
-Proof. by move=> *; rewrite !meetE !joinE meetUl. Qed.
-Fact meetxx : idempotent (meet m).
-Proof. by move=> *; rewrite meetE meetxx. Qed.
-Fact le_def x y : x <= y = (meet m x y == x).
-Proof. by rewrite meetE (eq_meetl x y). Qed.
-
-Definition distrLatticeMixin : distrMeetJoinMixin T :=
-  @DistrMeetJoinMixin _ (le m) (lt m) (meet m) (join m) le_def (lt_def m)
-                      meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
-
-Let T_distrLatticeType := DistrLatticeOfChoiceType tt distrLatticeMixin.
-
-Definition totalMixin : totalOrderMixin T_distrLatticeType := le_total m.
-
-End LeOrderMixin.
-
-Module Exports.
-Notation leOrderMixin := of_.
-Notation LeOrderMixin := Build.
-Coercion distrLatticeMixin : of_ >-> distrMeetJoinMixin.
-Coercion totalMixin : of_ >-> totalOrderMixin.
-Definition OrderOfChoiceType disp (T : choiceType) (m : of_ T) :
-  orderType disp := OrderType (DistrLatticeOfChoiceType disp m) m.
-End Exports.
-
-End LeOrderMixin.
-Import LeOrderMixin.Exports.
-
-Module LtOrderMixin.
-Section LtOrderMixin.
-
-Variable (T : choiceType).
-
-Record of_ := Build {
-  le : rel T;
-  lt : rel T;
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  le_def   : forall x y, le x y = (x == y) || lt x y;
-  meet_def : forall x y, meet x y = if lt x y then x else y;
-  join_def : forall x y, join x y = if lt x y then y else x;
-  lt_irr   : irreflexive lt;
-  lt_trans : transitive lt;
-  lt_total : forall x y, x != y -> lt x y || lt y x;
-}.
-
-Variables (m : of_).
-
-Fact lt_def x y : lt m x y = (y != x) && le m x y.
-Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
-
-Fact meet_def_le x y : meet m x y = if lt m x y then x else y.
-Proof. by rewrite meet_def lt_def; case: eqP. Qed.
-
-Fact join_def_le x y : join m x y = if lt m x y then y else x.
-Proof. by rewrite join_def lt_def; case: eqP. Qed.
-
-Fact le_anti : antisymmetric (le m).
-Proof.
-move=> x y; rewrite !le_def; case: eqVneq => //= _ /andP [] hxy.
-by move/(lt_trans hxy); rewrite lt_irr.
-Qed.
-
-Fact le_trans : transitive (le m).
-Proof.
-move=> y x z; rewrite !le_def; case: eqVneq => [->|_] //=.
-by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
-Qed.
-
-Fact le_total : total (le m).
-Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
-
-Definition orderMixin : leOrderMixin T :=
-  @LeOrderMixin _ (le m) (lt m) (meet m) (join m)
-                lt_def meet_def_le join_def_le le_anti le_trans le_total.
-
-End LtOrderMixin.
-
-Module Exports.
-Notation ltOrderMixin := of_.
-Notation LtOrderMixin := Build.
-Coercion orderMixin : of_ >-> leOrderMixin.
-End Exports.
-
-End LtOrderMixin.
-Import LtOrderMixin.Exports.
-
 Module CanMixin.
 Section CanMixin.
 
@@ -9685,7 +8847,7 @@ Variables (disp' : unit) (T' : orderType disp') (f : T -> T').
 
 Lemma MonoTotal : {mono f : x y / x <= y} ->
   totalPOrderMixin T' -> totalPOrderMixin T.
-Proof. by move=> f_mono T'_tot x y; rewrite -!f_mono le_total. Qed.
+Proof. by move=> f_mono T'tot x y; rewrite -/le -!f_mono le_total. Qed.
 
 End Total.
 
@@ -9757,7 +8919,7 @@ Proof. by move=> y x z; rewrite /meet !f'_can meetA. Qed.
 Lemma meet_eql x y : (x <= y) = (meet x y == x).
 Proof. by rewrite /meet -(can_eq f_can) f'_can eq_meetl f_mono. Qed.
 
-Definition IsoMeetSemilattice := @MeetMixin _ T _ meetC meetA meet_eql.
+Definition IsoMeetSemilattice := MeetMixin meetC meetA meet_eql.
 
 End MeetSemilattice.
 
@@ -9777,7 +8939,7 @@ Proof. by move=> y x z; rewrite /join !f'_can joinA. Qed.
 Lemma join_eql x y : (y <= x) = (join x y == x).
 Proof. by rewrite /join -(can_eq f_can) f'_can eq_joinl f_mono. Qed.
 
-Definition IsoJoinSemilattice := @JoinMixin _ T _ joinC joinA join_eql.
+Definition IsoJoinSemilattice := JoinMixin joinC joinA join_eql.
 
 End JoinSemilattice.
 
@@ -9831,7 +8993,7 @@ End Partial.
 Section Total.
 Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
-Definition sub_TotalOrderMixin : totalPOrderMixin (sub_POrderType sT) :=
+Definition sub_TotalOrderMixin : totalPOrderMixin sT :=
   @MonoTotalMixin _ _ _ _ val (fun _ _ => erefl) (@le_total _ T).
 Canonical sub_MeetSemilatticeType :=
   Eval hnf in MeetSemilatticeType sT sub_TotalOrderMixin.
@@ -9851,7 +9013,7 @@ Notation "[ 'porderMixin' 'of' T 'by' <: ]" :=
   (at level 0, format "[ 'porderMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
-  (sub_TotalOrderMixin _ : totalPOrderMixin [porderType of T])
+  (sub_TotalOrderMixin _ : totalPOrderMixin T)
   (at level 0, only parsing) : form_scope.
 
 Canonical sub_POrderType.
@@ -10704,7 +9866,7 @@ Section BPOrder.
 Variable (T : bPOrderType disp1) (T' : bPOrderType disp2).
 
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
-Proof. by rewrite /<=%O /= /le !le0x. Qed.
+Proof. by rewrite leEprod !le0x. Qed.
 
 Canonical bPOrderType := BPOrderType (T * T') (BottomMixin le0x).
 
@@ -10716,7 +9878,7 @@ Section TPOrder.
 Variable (T : tPOrderType disp1) (T' : tPOrderType disp2).
 
 Fact lex1 (x : T * T') : x <= (1, 1).
-Proof. by rewrite /<=%O /= /le !lex1. Qed.
+Proof. by rewrite leEprod !lex1. Qed.
 
 Canonical tPOrderType := TPOrderType (T * T') (TopMixin lex1).
 
@@ -11153,7 +10315,7 @@ Section Total.
 Variable (T : orderType disp1) (T' : T -> orderType disp2).
 Implicit Types (x y : {t : T & T' t}).
 
-Fact total : totalPOrderMixin [porderType of {t : T & T' t}].
+Fact total : totalPOrderMixin {t : T & T' t}.
 Proof.
 move=> x y; rewrite !leEsig; case: (ltgtP (tag x) (tag y)) => //=.
 case: x y => [x x'] [y y']/= eqxy; elim: _ /eqxy in y' *.
@@ -11380,9 +10542,9 @@ Section Total.
 Variable (T : orderType disp1) (T' : orderType disp2).
 Implicit Types (x y : T * T').
 
-Fact total : totalPOrderMixin [porderType of T * T'].
+Fact total : totalPOrderMixin (T * T').
 Proof.
-move=> x y; rewrite /<=%O /= /le; case: ltgtP => //= _; exact: le_total.
+by move=> x y; rewrite !leEprodlexi; case: ltgtP => //= _; exact: le_total.
 Qed.
 
 Canonical meetSemilatticeType := MeetSemilatticeType (T * T') total.
@@ -11682,9 +10844,7 @@ Fact meetA : associative meet.
 Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetA ih. Qed.
 
 Fact leEmeet x y : (x <= y) = (meet x y == x).
-Proof.
-by rewrite /<=%O /=; elim: x y => [|? ? ih] [|? ?] //=; rewrite eqE leEmeet ih.
-Qed.
+Proof. by elim: x y => [|? ? ih] [|? ?] //=; rewrite leEseq leEmeet ih. Qed.
 
 Definition meetMixin := MeetMixin meetC meetA leEmeet.
 Canonical meetSemilatticeType := MeetSemilatticeType (seq T) meetMixin.
@@ -11717,8 +10877,7 @@ Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite joinA ih. Qed.
 
 Fact leEjoin x y : (y <= x) = (join x y == x).
 Proof.
-elim: x y => [|? ? ih] [|? ?]; rewrite /<=%O ?eqxx //=.
-by rewrite eqE /= eq_joinl [le _ _]ih.
+by elim: x y => [|? ? ih] [|? ?]; rewrite ?eqxx // leEseq -eq_joinl ih.
 Qed.
 
 Definition joinMixin := JoinMixin joinC joinA leEjoin.
@@ -11933,10 +11092,9 @@ Section Total.
 Variable T : orderType disp.
 Implicit Types s : seq T.
 
-Fact total : totalPOrderMixin [porderType of seq T].
+Fact total : totalPOrderMixin (seq T).
 Proof.
-suff: total (<=%O : rel (seq T)) by [].
-by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
+by elim=> [|x1 s1 ihs2] [|x2 s2] //=; rewrite !lexi_cons; case: ltgtP => /=.
 Qed.
 
 Canonical meetSemilatticeType := MeetSemilatticeType (seq T) total.
@@ -12584,7 +11742,7 @@ Canonical tbPOrderType n (T : tbPOrderType disp) :=
 Section Total.
 Variables (n : nat) (T : orderType disp).
 
-Definition total : totalPOrderMixin [porderType of n.-tuple T] :=
+Definition total : totalPOrderMixin (n.-tuple T) :=
   [totalOrderMixin of n.-tuple T by <:].
 Canonical meetSemilatticeType := MeetSemilatticeType (n.-tuple T) total.
 Canonical joinSemilatticeType := JoinSemilatticeType (n.-tuple T) total.
@@ -13265,7 +12423,6 @@ End Syntax.
 
 Module LTheory.
 Export POCoercions.
-Export DualPOrder.
 Export DualOrder.
 
 Export POrderTheory.
@@ -13297,7 +12454,21 @@ End Theory.
 
 End Order.
 
+Export RelOrder.Syntax.
 Export Order.Syntax.
+
+Export RelOrder.POrder.Exports RelOrder.BPOrder.Exports.
+Export RelOrder.TPOrder.Exports RelOrder.TBPOrder.Exports.
+Export RelOrder.Meet.Exports RelOrder.BMeet.Exports.
+Export RelOrder.TMeet.Exports RelOrder.TBMeet.Exports.
+Export RelOrder.Join.Exports RelOrder.BJoin.Exports.
+Export RelOrder.TJoin.Exports RelOrder.TBJoin.Exports.
+Export RelOrder.Lattice.Exports RelOrder.BLattice.Exports.
+Export RelOrder.TLattice.Exports RelOrder.TBLattice.Exports.
+Export RelOrder.DistrLattice.Exports RelOrder.BDistrLattice.Exports.
+Export RelOrder.TDistrLattice.Exports RelOrder.TBDistrLattice.Exports.
+Export RelOrder.Total.Exports RelOrder.BTotal.Exports.
+Export RelOrder.TTotal.Exports RelOrder.TBTotal.Exports.
 
 Export Order.POrder.Exports.
 Export Order.BPOrder.Exports.
@@ -13340,27 +12511,37 @@ Export Order.FinTBDistrLattice.Exports.
 Export Order.FinCTBDistrLattice.Exports.
 Export Order.FinTotal.Exports.
 Export Order.FinTBTotal.Exports.
+Export Order.RelOrderCoercions.Exports.
 
-Export Order.LePOrderMixin.Exports.
-Export Order.BottomMixin.Exports.
-Export Order.TopMixin.Exports.
-Export Order.MeetMixin.Exports.
-Export Order.JoinMixin.Exports.
-Export Order.DistrLatticeMixin.Exports.
-Export Order.CBDistrLatticeMixin.Exports.
-Export Order.CTBDistrLatticeMixin.Exports.
-Export Order.TotalOrderMixin.Exports.
-Export Order.LatticePOrderMixin.Exports.
-Export Order.DistrLatticePOrderMixin.Exports.
+Export RelOrder.LePOrderMixin.Exports.
+Export RelOrder.BottomRelMixin.Exports.
+Export RelOrder.TopRelMixin.Exports.
+Export RelOrder.MeetRelMixin.Exports.
+Export RelOrder.JoinRelMixin.Exports.
+Export RelOrder.DistrLatticeRelMixin.Exports.
+Export RelOrder.LatticePOrderRelMixin.Exports.
+Export RelOrder.DistrLatticePOrderRelMixin.Exports.
+Export RelOrder.TotalLatticeRelMixin.Exports.
+Export RelOrder.TotalPOrderRelMixin.Exports.
+Export RelOrder.TotalMeetOrderRelMixin.Exports.
+Export RelOrder.TotalJoinOrderRelMixin.Exports.
+Export RelOrder.LtPOrderMixin.Exports.
+Export RelOrder.MeetJoinMixin.Exports.
+Export RelOrder.DistrMeetJoinMixin.Exports.
+Export RelOrder.LeOrderMixin.Exports.
+Export RelOrder.LtOrderMixin.Exports.
+
+Export Order.RelOrderMixin.Exports.
 Export Order.TotalLatticeMixin.Exports.
 Export Order.TotalPOrderMixin.Exports.
 Export Order.TotalMeetSemilatticeMixin.Exports.
 Export Order.TotalJoinSemilatticeMixin.Exports.
-Export Order.LtPOrderMixin.Exports.
-Export Order.MeetJoinMixin.Exports.
-Export Order.DistrMeetJoinMixin.Exports.
-Export Order.LeOrderMixin.Exports.
-Export Order.LtOrderMixin.Exports.
+Export Order.CBDistrLatticeMixin.Exports.
+Export Order.CTBDistrLatticeMixin.Exports.
+Export Order.TotalLatticeMixin.Exports.
+Export Order.TotalPOrderMixin.Exports.
+Export Order.TotalMeetSemilatticeMixin.Exports.
+Export Order.TotalJoinSemilatticeMixin.Exports.
 Export Order.CanMixin.Exports.
 Export Order.SubOrder.Exports.
 

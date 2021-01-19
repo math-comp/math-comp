@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly.
+From mathcomp Require Import ssrAC div fintype path bigop relorder order finset.
+From mathcomp Require Import fingroup ssralg poly.
 
 (******************************************************************************)
 (* This file defines some classes to manipulate number structures, i.e        *)
@@ -139,8 +139,7 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 Module Num.
 
 Record normed_mixin_of (R T : zmodType)
-       (Rorder : Order.POrder.mixin_of (Equality.class R))
-       (le_op := Order.POrder.le Rorder)
+       (Rorder : Order.POrder.mixin_of R) (le_op := Order.POrder.le Rorder)
   := NormedMixin {
   norm_op : T -> R;
   _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
@@ -150,7 +149,7 @@ Record normed_mixin_of (R T : zmodType)
 }.
 
 Record mixin_of (R : ringType)
-       (Rorder : Order.POrder.mixin_of (Equality.class R))
+       (Rorder : Order.POrder.mixin_of R)
        (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
        (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
   := Mixin {
@@ -168,7 +167,7 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of T := Class {
   base : GRing.IntegralDomain.class_of T;
-  order_mixin : Order.POrder.mixin_of (Equality.class (ring_for T base));
+  order_mixin : Order.POrder.mixin_of (ring_for T base);
   normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
   mixin : mixin_of normed_mixin;
 }.
@@ -717,11 +716,13 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base   : NumDomain.class_of R;
-  mmixin : Order.MeetSemilattice.mixin_of base;
-  jmixin : Order.JoinSemilattice.mixin_of base;
-  lmixin : Order.DistrLattice.mixin_of
-           (@Order.Lattice.Class _ (Order.MeetSemilattice.Class mmixin) jmixin);
-  tmixin : Order.Total.mixin_of base;
+  mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack tt base);
+  jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack tt base);
+  lmixin : RelOrder.DistrLattice.mixin_of
+             (Order.Lattice.Pack
+                tt (@Order.Lattice.Class
+                      _ (Order.MeetSemilattice.Class mmixin) jmixin));
+  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack tt base);
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumDomain.class_of.
@@ -931,11 +932,13 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base  : NumField.class_of R;
-  mmixin : Order.MeetSemilattice.mixin_of base;
-  jmixin : Order.JoinSemilattice.mixin_of base;
-  lmixin : Order.DistrLattice.mixin_of
-           (@Order.Lattice.Class _ (Order.MeetSemilattice.Class mmixin) jmixin);
-  tmixin : Order.Total.mixin_of base;
+  mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack tt base);
+  jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack tt base);
+  lmixin : RelOrder.DistrLattice.mixin_of
+             (Order.Lattice.Pack
+                tt (@Order.Lattice.Class
+                      _ (Order.MeetSemilattice.Class mmixin) jmixin));
+  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack tt base);
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumField.class_of.
@@ -5377,7 +5380,7 @@ End NumMixin.
 Module Exports.
 Notation numMixin := of_.
 Notation NumMixin := Mixin.
-Coercion ltPOrderMixin : numMixin >-> Order.LtPOrderMixin.of_.
+Coercion ltPOrderMixin : numMixin >-> RelOrder.LtPOrderMixin.of_.
 Coercion normedZmodMixin : numMixin >-> normed_mixin_of.
 Coercion numDomainMixin : numMixin >-> mixin_of.
 Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
@@ -5404,7 +5407,7 @@ End RealMixin.
 Module Exports.
 Coercion le_total : real_axiom >-> totalPOrderMixin.
 Definition RealDomainOfNumDomain (T : numDomainType) (m : real_axiom T) :=
-  [realDomainType of OrderOfPOrder m].
+  [realDomainType of OrderOfPOrderType m].
 End Exports.
 
 End RealMixin.
@@ -5497,7 +5500,7 @@ Notation RealLeMixin := Mixin.
 Coercion numMixin : realLeMixin >-> NumMixin.of_.
 Coercion orderMixin : realLeMixin >-> totalPOrderMixin.
 Definition LeRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
-  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
+  [realDomainType of @OrderOfPOrderType _ (NumDomainOfIdomain m) m].
 Definition LeRealFieldOfField (R : fieldType) (m : of_ R) :=
   [realFieldType of [numFieldType of LeRealDomainOfIdomain m]].
 End Exports.
@@ -5613,7 +5616,7 @@ Notation RealLtMixin := Mixin.
 Coercion numMixin : realLtMixin >-> NumMixin.of_.
 Coercion orderMixin : realLtMixin >-> totalPOrderMixin.
 Definition LtRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
-  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
+  [realDomainType of @OrderOfPOrderType _ (NumDomainOfIdomain m) m].
 Definition LtRealFieldOfField (R : fieldType) (m : of_ R) :=
   [realFieldType of [numFieldType of LtRealDomainOfIdomain m]].
 End Exports.
