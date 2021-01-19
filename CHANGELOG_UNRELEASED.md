@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- in `ssrnat.v`, added lemma `sumnB`.
+- in `bigop.v`, added lemma `sumnB`.
 
 - in `seq.v`,
   + new higher-order predicate `pairwise r xs` which asserts that the relation
