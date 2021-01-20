@@ -4040,30 +4040,6 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
 Ltac tfae := do !apply: AllIffConj.
 
 (* Temporary backward compatibility. *)
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_rev instead.")]
-Notation perm_eq_rev := perm_rev (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_flatten instead.")]
-Notation perm_eq_flatten := perm_flatten (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_all instead.")]
-Notation perm_eq_all := perm_all (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_small_eq instead.")]
-Notation perm_eq_small := perm_small_eq (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_nilP instead.")]
-Notation perm_eq_nilP := perm_nilP (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_consP instead.")]
-Notation perm_eq_consP := perm_consP (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use uniq_min_size instead.")]
-Notation leq_size_perm :=
-  ((fun T s1 s2 Us1 ss12 les21 =>
-   let: (Esz12, Es12) := uniq_min_size T s1 s2 Us1 ss12 les21
-   in conj Es12 Esz12) _ _ _)
-  (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use uniq_perm instead.")]
-Notation uniq_perm_eq := uniq_perm (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_iotaP instead.")]
-Notation perm_eq_iotaP := perm_iotaP (only parsing).
-#[deprecated(since="mathcomp 1.9.0", note="Use perm_count_undup instead.")]
-Notation perm_undup_count := perm_count_undup (only parsing).
 #[deprecated(since="mathcomp 1.11.0", note="Use takeD instead.")]
 Notation take_addn := takeD (only parsing).
 #[deprecated(since="mathcomp 1.11.0", note="Use rotD instead.")]

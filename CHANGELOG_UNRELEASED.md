@@ -46,6 +46,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrnat.v` and `ssrnum.v`, deprecation aliases and the `mc_1_10`
   compatibility modules introduced in MathComp 1.11+beta1 have been removed.
 
+- in `seq.v`, remove the following deprecation aliases introduced in MathComp
+  1.9.0: `perm_eq_rev`, `perm_eq_flatten`, `perm_eq_all`, `perm_eq_small`,
+  `perm_eq_nilP`, `perm_eq_consP`, `leq_size_perm`, `uniq_perm_eq`,
+  `perm_eq_iotaP`, and `perm_undup_count`.
+
 ### Infrastructure
 
 ### Misc
