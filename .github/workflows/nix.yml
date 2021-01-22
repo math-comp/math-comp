@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        coq: [ "8.11", "8.10", "8.12" ]
+        coq: [ "8.11", "8.12" ]
     steps:
       - name: Get branch shortname
         run: echo "##[set-output name=name;]$(echo ${GITHUB_REF#refs/heads/})"

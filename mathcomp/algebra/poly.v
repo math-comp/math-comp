@@ -2769,27 +2769,19 @@ Qed.
 
 End ClosedField.
 
-Notation "@ 'polyC_add'" :=
-  (deprecate polyC_add polyCD) (at level 10, only parsing) : fun_scope.
-Notation "@ 'polyC_opp'" :=
-  (deprecate polyC_opp polyCN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'polyC_sub'" :=
-  (deprecate polyC_sub polyCB) (at level 10, only parsing) : fun_scope.
-Notation "@ 'polyC_muln'" :=
-  (deprecate polyC_muln polyCMn) (at level 10, only parsing) : fun_scope.
-Notation "@ 'polyC_mul'" :=
-  (deprecate polyC_mul polyCM) (at level 10, only parsing) : fun_scope.
-Notation "@ 'polyC_inv'" :=
-  (deprecate polyC_inv polyCV) (at level 10, only parsing) : fun_scope.
-Notation "@ 'lead_coef_opp'" :=
-  (deprecate lead_coef_opp lead_coefN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'derivn_sub'" :=
-  (deprecate derivn_sub derivnB) (at level 10, only parsing) : fun_scope.
-Notation polyC_add := (@polyC_add _) (only parsing).
-Notation polyC_opp := (@polyC_opp _) (only parsing).
-Notation polyC_sub := (@polyC_sub _) (only parsing).
-Notation polyC_muln := (@polyC_muln _) (only parsing).
-Notation polyC_mul := (@polyC_mul _) (only parsing).
-Notation polyC_inv := (@polyC_inv _) (only parsing).
-Notation lead_coef_opp := (@lead_coef_opp _) (only parsing).
-Notation derivn_sub := (@derivn_sub _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCD instead.")]
+Notation polyC_add := polyCD (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCN instead.")]
+Notation polyC_opp := polyCN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCB instead.")]
+Notation polyC_sub := polyCB (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCMn instead.")]
+Notation polyC_muln := polyCMn (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCM instead.")]
+Notation polyC_mul := polyCM (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use polyCV instead.")]
+Notation polyC_inv := polyCV (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lead_coefN instead.")]
+Notation lead_coef_opp := lead_coefN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use derivnB instead.")]
+Notation derivn_sub := derivnB (only parsing).

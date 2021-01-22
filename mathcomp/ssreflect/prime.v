@@ -1429,11 +1429,11 @@ apply/eqP; rewrite /eq_op /= /eq_op /= !modn_dvdm ?dvdn_part //.
 by rewrite chinese_modl // chinese_modr // !modn_small ?eqxx ?ltn_ord.
 Qed.
 
-Notation "@ 'primes_mul'" :=
-  (deprecate primes_mul primesM) (at level 10, only parsing) : fun_scope.
-Notation "@ 'primes_exp'" :=
-  (deprecate primes_exp primesX) (at level 10, only parsing) : fun_scope.
-Notation primes_mul := (@primes_mul _ _) (only parsing).
-Notation primes_exp := (fun m => @primes_exp m _) (only parsing).
-Notation pnat_mul := (deprecate pnat_mul pnatM) (only parsing).
-Notation pnat_exp := (deprecate pnat_exp pnatX) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use primesM instead.")]
+Notation primes_mul := primesM (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use primesX instead.")]
+Notation primes_exp := primesX (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use pnatM instead.")]
+Notation pnat_mul := pnatM (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use pnatX instead.")]
+Notation pnat_exp := pnatX (only parsing).

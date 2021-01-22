@@ -2732,6 +2732,7 @@ Arguments aut_groupAction {gT} G%g.
 Notation "[ 'Aut' G ]" := (aut_action G) : action_scope.
 Notation "[ 'Aut' G ]" := (aut_groupAction G) : groupAction_scope.
 
-Notation pcycleE := (deprecate pcycleE porbitE _) (only parsing).
-Notation pcycle_actperm := (deprecate pcycle_actperm porbit_actperm _)
-  (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use porbitE instead.")]
+Notation pcycleE := porbitE (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use porbit_actperm instead.")]
+Notation pcycle_actperm := porbit_actperm (only parsing).

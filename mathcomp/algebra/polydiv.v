@@ -624,17 +624,12 @@ Proof. by move=> dvddp; rewrite [RHS]rdivp_eq rmodp_eq0 ?addr0. Qed.
 
 End MonicDivisor.
 
-Notation "@ 'rdivp_addl'" :=
-  (deprecate rdivp_addl rdivpDl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'rdivp_addr'" :=
-  (deprecate rdivp_addr rdivpDr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'rmodp_add'" :=
-  (deprecate rmodp_add rmodpD) (at level 10, only parsing) : fun_scope.
-Notation rdivp_addl :=
-  (fun d_monic => @rdivp_addl _ _ d_monic _) (only parsing).
-Notation rdivp_addr :=
-  (fun d_monic q => @rdivp_addr _ _ d_monic q _) (only parsing).
-Notation rmodp_add := (@rmodp_add _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use rdivpDl instead.")]
+Notation rdivp_addl := rdivpDl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use rdivpDr instead.")]
+Notation rdivp_addr := rdivpDr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use rmodpD instead.")]
+Notation rmodp_add := rmodpD (only parsing).
 
 End RingMonic.
 
@@ -2358,27 +2353,20 @@ End IDomainPseudoDivision.
 Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp : core.
 Hint Resolve dvdp0 : core.
 
-Notation "@ 'dvdp_scalel'" :=
-  (deprecate dvdp_scalel dvdpZl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'dvdp_scaler'" :=
-  (deprecate dvdp_scaler dvdpZr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'dvdp_opp'" :=
-  (deprecate dvdp_opp dvdpNr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'coprimep_scalel'" :=
-  (deprecate coprimep_scalel coprimepZl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'coprimep_scaler'" :=
-  (deprecate coprimep_scaler coprimepZr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'coprimep_mull'" :=
-  (deprecate coprimep_mull coprimepMl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'coprimep_mulr'" :=
-  (deprecate coprimep_mulr coprimepMr) (at level 10, only parsing) : fun_scope.
-Notation dvdp_scalel := (@dvdp_scalel _ _) (only parsing).
-Notation dvdp_scaler := (@dvdp_scaler _ _) (only parsing).
-Notation dvdp_opp := (@dvdp_opp _) (only parsing).
-Notation coprimep_scalel := (@coprimep_scalel _ _) (only parsing).
-Notation coprimep_scaler := (@coprimep_scaler _ _) (only parsing).
-Notation coprimep_mull := (@coprimep_mull _) (only parsing).
-Notation coprimep_mulr := (@coprimep_mulr _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use dvdpZl instead.")]
+Notation dvdp_scalel := dvdpZl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use dvdpZr instead.")]
+Notation dvdp_scaler := dvdpZr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use dvdpNr instead.")]
+Notation dvdp_opp := dvdpNr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimepZl instead.")]
+Notation coprimep_scalel := coprimepZl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimepZr instead.")]
+Notation coprimep_scaler := coprimepZr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimepMl instead.")]
+Notation coprimep_mull := coprimepMl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use coprimepMr instead.")]
+Notation coprimep_mulr := coprimepMr (only parsing).
 
 End CommonIdomain.
 
@@ -2704,30 +2692,22 @@ Qed.
 
 End MoreUnitDivisor.
 
-Notation "@ 'modp_scalel'" :=
-  (deprecate modp_scalel modpZl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'modp_scaler'" :=
-  (deprecate modp_scaler modpZr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'modp_opp'" :=
-  (deprecate modp_opp modpN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'modp_add'" :=
-  (deprecate modp_add modpD) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_scalel'" :=
-  (deprecate divp_scalel divpZl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_scaler'" :=
-  (deprecate divp_scaler divpZr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_opp'" :=
-  (deprecate divp_opp divpN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_add'" :=
-  (deprecate divp_add divpD) (at level 10, only parsing) : fun_scope.
-Notation modp_scalel := (@modp_scalel _ _) (only parsing).
-Notation modp_scaler := (fun d_unit => @modp_scaler _ _ d_unit _) (only parsing).
-Notation modp_opp := (@modp_opp _ _) (only parsing).
-Notation modp_add := (@modp_add _ _) (only parsing).
-Notation divp_scalel := (@divp_scalel _ _) (only parsing).
-Notation divp_scaler := (fun d_unit => @divp_scaler _ _ d_unit _) (only parsing).
-Notation divp_opp := (@divp_opp _ _) (only parsing).
-Notation divp_add := (@divp_add _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpZl instead.")]
+Notation modp_scalel := modpZl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpZr instead.")]
+Notation modp_scaler := modpZr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpN instead.")]
+Notation modp_opp := modpN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpD instead.")]
+Notation modp_add := modpD (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpZl instead.")]
+Notation divp_scalel := divpZl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpZr instead.")]
+Notation divp_scaler := divpZr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpN instead.")]
+Notation divp_opp := divpN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpD instead.")]
+Notation divp_add := divpD (only parsing).
 
 End IdomainUnit.
 
@@ -3192,30 +3172,22 @@ End FieldMap.
 
 End FieldDivision.
 
-Notation "@ 'modp_scalel'" :=
-  (deprecate modp_scalel modpZl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'modp_scaler'" :=
-  (deprecate modp_scaler modpZr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'modp_opp'" :=
-  (deprecate modp_opp modpN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'modp_add'" :=
-  (deprecate modp_add modpD) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_scalel'" :=
-  (deprecate modp_scalel divpZl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_scaler'" :=
-  (deprecate modp_scaler divpZr) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_opp'" :=
-  (deprecate divp_opp divpN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'divp_add'" :=
-  (deprecate modp_add divpD) (at level 10, only parsing) : fun_scope.
-Notation modp_scalel := (@modp_scalel _) (only parsing).
-Notation modp_scaler := (@modp_scaler _ _) (only parsing).
-Notation modp_opp := (@modp_opp _) (only parsing).
-Notation modp_add := (@modp_add _) (only parsing).
-Notation divp_scalel := (@divp_scalel _) (only parsing).
-Notation divp_scaler := (@divp_scaler _ _) (only parsing).
-Notation divp_opp := (@divp_opp _) (only parsing).
-Notation divp_add := (@divp_add _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpZl instead.")]
+Notation modp_scalel := modpZl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpZr instead.")]
+Notation modp_scaler := modpZr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpN instead.")]
+Notation modp_opp := modpN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use modpD instead.")]
+Notation modp_add := modpD (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpZl instead.")]
+Notation divp_scalel := divpZl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpZr instead.")]
+Notation divp_scaler := divpZr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpN instead.")]
+Notation divp_opp := divpN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use divpD instead.")]
+Notation divp_add := divpD (only parsing).
 
 End Field.
 

@@ -1677,64 +1677,27 @@ End CycleArc.
 
 Prenex Implicits arc.
 
-(* Deprecated in 1.12.0 *)
-
-Notation "@ 'eq_sorted'" :=
-  (deprecate eq_sorted sorted_eq) (at level 10, only parsing) : fun_scope.
-Notation "@ 'eq_sorted_irr'" := (deprecate eq_sorted_irr irr_sorted_eq)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'sorted_lt_nth'" :=
-  (fun (T : Type) (leT : rel T) (leT_tr : transitive leT) =>
-     deprecate sorted_lt_nth sorted_ltn_nth leT_tr)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'sorted_le_nth'" :=
-  (fun (T : Type) (leT : rel T) (leT_tr : transitive leT) =>
-     deprecate sorted_le_nth sorted_leq_nth leT_tr)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'ltn_index'" :=
-  (fun (T : eqType) (leT : rel T) (leT_tr : transitive leT) =>
-     deprecate ltn_index sorted_ltn_index leT_tr)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'leq_index'" :=
-  (fun (T : eqType) (leT : rel T) (leT_tr : transitive leT) =>
-     deprecate leq_index sorted_leq_index leT_tr)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'subseq_order_path'" := (deprecate subseq_order_path subseq_path)
-  (at level 10, only parsing) : fun_scope.
-
-Notation eq_sorted :=
-  (fun le_tr le_asym => @eq_sorted _ _ le_tr le_asym _ _) (only parsing).
-Notation eq_sorted_irr :=
-  (fun le_tr le_irr => @eq_sorted_irr _ _ le_tr le_irr _ _) (only parsing).
-Notation sorted_lt_nth :=
-  (fun leT_tr x0 => @sorted_lt_nth _ _ leT_tr x0 _) (only parsing).
-Notation sorted_le_nth :=
-  (fun leT_tr leT_refl x0 => @sorted_le_nth _ _ leT_tr leT_refl x0 _)
-  (only parsing).
-Notation ltn_index := (fun leT_tr => @ltn_index _ _ leT_tr _) (only parsing).
-Notation leq_index :=
-  (fun leT_tr leT_refl => @leq_index _ _ leT_tr leT_refl _) (only parsing).
-Notation subseq_order_path :=
-  (fun leT_tr => @subseq_order_path _ _ leT_tr _ _ _) (only parsing).
-
-(* Deprecated in 1.13.0 *)
-
-Notation "@ 'sub_path_in'" :=
-  (deprecate sub_path_in sub_in_path) (at level 10, only parsing) : fun_scope.
-Notation "@ 'sub_cycle_in'" :=
-  (deprecate sub_cycle_in sub_in_cycle) (at level 10, only parsing) : fun_scope.
-Notation "@ 'sub_sorted_in'" := (deprecate sub_sorted_in sub_in_sorted)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'eq_path_in'" :=
-  (deprecate eq_path_in eq_in_path) (at level 10, only parsing) : fun_scope.
-Notation "@ 'eq_cycle_in'" :=
-  (deprecate eq_cycle_in eq_in_cycle) (at level 10, only parsing) : fun_scope.
-
-Notation sub_path_in :=
-  (fun ee' => @sub_path_in _ _ _ _ ee' _ _) (only parsing).
-Notation sub_cycle_in :=
-  (fun ee' => @sub_cycle_in _ _ _ _ ee' _) (only parsing).
-Notation sub_sorted_in :=
-  (fun ee' => @sub_sorted_in _ _ _ _ ee' _) (only parsing).
-Notation eq_path_in := (fun ee' => @eq_path_in _ _ _ _ ee' _ _) (only parsing).
-Notation eq_cycle_in := (fun ee' => @eq_cycle_in _ _ _ _ ee' _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use sorted_eq instead.")]
+Notation eq_sorted := sorted_eq (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use irr_sorted_eq instead.")]
+Notation eq_sorted_irr := irr_sorted_eq (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use sorted_ltn_nth instead.")]
+Notation sorted_lt_nth := sorted_ltn_nth (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use sorted_leq_nth instead.")]
+Notation sorted_le_nth := sorted_leq_nth (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use sorted_ltn_index instead.")]
+Notation ltn_index := sorted_ltn_index (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use sorted_leq_index instead.")]
+Notation leq_index := sorted_leq_index (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use subseq_path instead.")]
+Notation subseq_order_path := subseq_path (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use sub_in_path instead.")]
+Notation sub_path_in := sub_in_path (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use sub_in_cycle instead.")]
+Notation sub_cycle_in := sub_in_cycle (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use sub_in_sorted instead.")]
+Notation sub_sorted_in := sub_in_sorted (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use eq_in_path instead.")]
+Notation eq_path_in := eq_in_path (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use eq_in_cycle instead.")]
+Notation eq_cycle_in := eq_in_cycle (only parsing).

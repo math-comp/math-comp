@@ -876,444 +876,197 @@ Proof. exact: itv_splitUeq. Qed.
 
 End mc_1_11.
 
-(* Use `Order.lteif` instead of `lteif`. (`deprecate` does not accept a       *)
-(* qualified name.)                                                           *)
-Local Notation lteif := Order.lteif (only parsing).
-
+#[deprecated(since="mathcomp 1.12.0", note="Use Order.lteif instead.")]
 Notation "@ 'lersif'" :=
-  ((fun _ (R : numDomainType) x y b => @Order.lteif _ R x y (~~ b))
-     (deprecate lersif lteif))
+  (fun (R : numDomainType) x y b => @Order.lteif _ R x y (~~ b))
     (at level 10, only parsing).
 
-Notation lersif := (@lersif _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use Order.lteif instead.")]
+Notation lersif := (fun x y b => @Order.lteif _ _ x y (~~ b)) (only parsing).
 
+#[deprecated(since="mathcomp 1.12.0", note="Use [_ < _ ?<= if _] instead.")]
 Notation "x <= y ?< 'if' b" :=
-  ((fun _ => x < y ?<= if ~~ b) (deprecate lersif lteif))
-    (at level 70, y at next level, only parsing) : ring_scope.
+  (x < y ?<= if ~~ b) (at level 70, y at next level, only parsing) : ring_scope.
 
 (* LersifPo *)
 
-Notation "@ 'subr_lersifr0'" :=
-  ((fun _ => @mc_1_11.subr_lersifr0) (deprecate subr_lersifr0 subr_lteifr0))
-    (at level 10, only parsing).
-
-Notation subr_lersifr0 := (@subr_lersifr0 _) (only parsing).
-
-Notation "@ 'subr_lersif0r'" :=
-  ((fun _ => @mc_1_11.subr_lersif0r) (deprecate subr_lersif0r subr_lteif0r))
-    (at level 10, only parsing).
-
-Notation subr_lersif0r := (@subr_lersif0r _) (only parsing).
-
-Notation subr_lersif0 :=
-  ((fun _ => @mc_1_11.subr_lersif0) (deprecate subr_lersif0 subr_lteif0))
-    (only parsing).
-
-Notation "@ 'lersif_trans'" :=
-  ((fun _ => @mc_1_11.lersif_trans) (deprecate lersif_trans lteif_trans))
-    (at level 10, only parsing).
-
-Notation lersif_trans := (@lersif_trans _ _ _ _ _ _) (only parsing).
-
-Notation lersif01 :=
-  ((fun _ => @mc_1_11.lersif01) (deprecate lersif01 lteif01)) (only parsing).
-
-Notation "@ 'lersif_anti'" :=
-  ((fun _ => @mc_1_11.lersif_anti) (deprecate lersif_anti lteif_anti))
-    (at level 10, only parsing).
-
-Notation lersif_anti := (@lersif_anti _) (only parsing).
-
-Notation "@ 'lersifxx'" :=
-  ((fun _ => @mc_1_11.lersifxx) (deprecate lersifxx lteifxx))
-    (at level 10, only parsing).
-
-Notation lersifxx := (@lersifxx _) (only parsing).
-
-Notation "@ 'lersifNF'" :=
-  ((fun _ => @mc_1_11.lersifNF) (deprecate lersifNF lteifNF))
-    (at level 10, only parsing).
-
-Notation lersifNF := (@lersifNF _ _ _ _) (only parsing).
-
-Notation "@ 'lersifS'" :=
-  ((fun _ => @mc_1_11.lersifS) (deprecate lersifS lteifS))
-    (at level 10, only parsing).
-
-Notation lersifS := (@lersifS _ _ _) (only parsing).
-
-Notation "@ 'lersifT'" :=
-  ((fun _ => @mc_1_11.lersifT) (deprecate lersifT lteifT))
-    (at level 10, only parsing).
-
-Notation lersifT := (@lersifT _) (only parsing).
-
-Notation "@ 'lersifF'" :=
-  ((fun _ => @mc_1_11.lersifF) (deprecate lersifF lteifF))
-    (at level 10, only parsing).
-
-Notation lersifF := (@lersifF _) (only parsing).
-
-Notation "@ 'lersif_oppl'" :=
-  ((fun _ => @mc_1_11.lersif_oppl) (deprecate lersif_oppl lteif_oppl))
-    (at level 10, only parsing).
-
-Notation lersif_oppl := (@lersif_oppl _) (only parsing).
-
-Notation "@ 'lersif_oppr'" :=
-  ((fun _ => @mc_1_11.lersif_oppr) (deprecate lersif_oppr lteif_oppr))
-    (at level 10, only parsing).
-
-Notation lersif_oppr := (@lersif_oppr _) (only parsing).
-
-Notation "@ 'lersif_0oppr'" :=
-  ((fun _ => @mc_1_11.lersif_0oppr) (deprecate lersif_0oppr lteif_0oppr))
-    (at level 10, only parsing).
-
-Notation lersif_0oppr := (@lersif_0oppr _) (only parsing).
-
-Notation "@ 'lersif_oppr0'" :=
-  ((fun _ => @mc_1_11.lersif_oppr0) (deprecate lersif_oppr0 lteif_oppr0))
-    (at level 10, only parsing).
-
-Notation lersif_oppr0 := (@lersif_oppr0 _) (only parsing).
-
-Notation "@ 'lersif_opp2'" :=
-  ((fun _ => @mc_1_11.lersif_opp2) (deprecate lersif_opp2 lteif_opp2))
-    (at level 10, only parsing).
-
-Notation lersif_opp2 := (@lersif_opp2 _) (only parsing).
-
-Notation lersif_oppE :=
-  ((fun _ => @mc_1_11.lersif_oppE) (deprecate lersif_oppE lteif_oppE))
-    (only parsing).
-
-Notation "@ 'lersif_add2l'" :=
-  ((fun _ => @mc_1_11.lersif_add2l) (deprecate lersif_add2l lteif_add2l))
-    (at level 10, only parsing).
-
-Notation lersif_add2l := (@lersif_add2l _) (only parsing).
-
-Notation "@ 'lersif_add2r'" :=
-  ((fun _ => @mc_1_11.lersif_add2r) (deprecate lersif_add2r lteif_add2r))
-    (at level 10, only parsing).
-
-Notation lersif_add2r := (@lersif_add2r _) (only parsing).
-
-Notation lersif_add2 :=
-  ((fun _ => @mc_1_11.lersif_add2) (deprecate lersif_add2 lteif_add2))
-    (only parsing).
-
-Notation "@ 'lersif_subl_addr'" :=
-  ((fun _ => @mc_1_11.lersif_subl_addr)
-     (deprecate lersif_subl_addr lteif_subl_addr))
-    (at level 10, only parsing).
-
-Notation lersif_subl_addr := (@lersif_subl_addr _) (only parsing).
-
-Notation "@ 'lersif_subr_addr'" :=
-  ((fun _ => @mc_1_11.lersif_subr_addr)
-     (deprecate lersif_subr_addr lteif_subr_addr))
-    (at level 10, only parsing).
-
-Notation lersif_subr_addr := (@lersif_subr_addr _) (only parsing).
-
-Notation lersif_sub_addr :=
-  ((fun _ => @mc_1_11.lersif_sub_addr)
-     (deprecate lersif_sub_addr lteif_sub_addr))
-    (only parsing).
-
-Notation "@ 'lersif_subl_addl'" :=
-  ((fun _ => @mc_1_11.lersif_subl_addl)
-     (deprecate lersif_subl_addl lteif_subl_addl))
-    (at level 10, only parsing).
-
-Notation lersif_subl_addl := (@lersif_subl_addl _) (only parsing).
-
-Notation "@ 'lersif_subr_addl'" :=
-  ((fun _ => @mc_1_11.lersif_subr_addl)
-     (deprecate lersif_subr_addl lteif_subr_addl))
-    (at level 10, only parsing).
-
-Notation lersif_subr_addl := (@lersif_subr_addl _) (only parsing).
-
-Notation lersif_sub_addl :=
-  ((fun _ => @mc_1_11.lersif_sub_addl)
-     (deprecate lersif_sub_addl lteif_sub_addl))
-    (only parsing).
-
-Notation "@ 'lersif_andb'" :=
-  ((fun _ => @mc_1_11.lersif_andb) (deprecate lersif_andb lteif_andb))
-    (at level 10, only parsing).
-
-Notation lersif_andb := (@lersif_andb _) (only parsing).
-
-Notation "@ 'lersif_orb'" :=
-  ((fun _ => @mc_1_11.lersif_orb) (deprecate lersif_orb lteif_orb))
-    (at level 10, only parsing).
-
-Notation lersif_orb := (@lersif_orb _) (only parsing).
-
-Notation "@ 'lersif_imply'" :=
-  ((fun _ => @mc_1_11.lersif_imply) (deprecate lersif_imply lteif_imply))
-    (at level 10, only parsing).
-
-Notation lersif_imply := (@lersif_imply _ _ _ _ _) (only parsing).
-
-Notation "@ 'lersifW'" :=
-  ((fun _ => @mc_1_11.lersifW) (deprecate lersifW lteifW))
-    (at level 10, only parsing).
-
-Notation lersifW := (@lersifW _ _ _ _) (only parsing).
-
-Notation "@ 'ltrW_lersif'" :=
-  ((fun _ => @mc_1_11.ltrW_lersif) (deprecate ltrW_lersif ltrW_lteif))
-    (at level 10, only parsing).
-
-Notation ltrW_lersif := (@ltrW_lersif _) (only parsing).
-
-Notation "@ 'lersif_pmul2l'" :=
-  ((fun _ => @mc_1_11.lersif_pmul2l) (deprecate lersif_pmul2l lteif_pmul2l))
-    (at level 10, only parsing).
-
-Notation lersif_pmul2l := (fun b => @lersif_pmul2l _ b _) (only parsing).
-
-Notation "@ 'lersif_pmul2r'" :=
-  ((fun _ => @mc_1_11.lersif_pmul2r) (deprecate lersif_pmul2r lteif_pmul2r))
-    (at level 10, only parsing).
-
-Notation lersif_pmul2r := (fun b => @lersif_pmul2r _ b _) (only parsing).
-
-Notation "@ 'lersif_nmul2l'" :=
-  ((fun _ => @mc_1_11.lersif_nmul2l) (deprecate lersif_nmul2l lteif_nmul2l))
-    (at level 10, only parsing).
-
-Notation lersif_nmul2l := (fun b => @lersif_nmul2l _ b _) (only parsing).
-
-Notation "@ 'lersif_nmul2r'" :=
-  ((fun _ => @mc_1_11.lersif_nmul2r) (deprecate lersif_nmul2r lteif_nmul2r))
-    (at level 10, only parsing).
-
-Notation lersif_nmul2r := (fun b => @lersif_nmul2r _ b _) (only parsing).
-
-Notation "@ 'real_lersifN'" :=
-  ((fun _ => @mc_1_11.real_lersifN) (deprecate real_lersifN real_lteifNE))
-    (at level 10, only parsing).
-
-Notation real_lersifN := (@real_lersifN _ _ _) (only parsing).
-
-Notation "@ 'real_lersif_norml'" :=
-  ((fun _ => @mc_1_11.real_lersif_norml)
-     (deprecate real_lersif_norml real_lteif_norml))
-    (at level 10, only parsing).
-
-Notation real_lersif_norml :=
-  (fun b => @real_lersif_norml _ b _) (only parsing).
-
-Notation "@ 'real_lersif_normr'" :=
-  ((fun _ => @mc_1_11.real_lersif_normr)
-     (deprecate real_lersif_normr real_lteif_normr))
-    (at level 10, only parsing).
-
-Notation real_lersif_normr :=
-  (fun b x => @real_lersif_normr _ b x _) (only parsing).
-
-Notation "@ 'lersif_nnormr'" :=
-  ((fun _ => @mc_1_11.lersif_nnormr) (deprecate lersif_nnormr lteif_nnormr))
-    (at level 10, only parsing).
-
-Notation lersif_nnormr := (fun x => @lersif_nnormr _ _ x _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use subr_lteifr0 instead.")]
+Notation subr_lersifr0 := mc_1_11.subr_lersifr0 (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use subr_lteif0r instead.")]
+Notation subr_lersif0r := mc_1_11.subr_lersif0r (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use subr_lteif0 instead.")]
+Notation subr_lersif0 := mc_1_11.subr_lersif0 (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_trans instead.")]
+Notation lersif_trans := mc_1_11.lersif_trans (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif01 instead.")]
+Notation lersif01 := mc_1_11.lersif01 (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_anti instead.")]
+Notation lersif_anti := mc_1_11.lersif_anti (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifxx instead.")]
+Notation lersifxx := mc_1_11.lersifxx (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifNF instead.")]
+Notation lersifNF := mc_1_11.lersifNF (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifS instead.")]
+Notation lersifS := mc_1_11.lersifS (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifT instead.")]
+Notation lersifT := mc_1_11.lersifT (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifF instead.")]
+Notation lersifF := mc_1_11.lersifF (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_oppl instead.")]
+Notation lersif_oppl := mc_1_11.lersif_oppl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_oppr instead.")]
+Notation lersif_oppr := mc_1_11.lersif_oppr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_0oppr instead.")]
+Notation lersif_0oppr := mc_1_11.lersif_0oppr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_oppr0 instead.")]
+Notation lersif_oppr0 := mc_1_11.lersif_oppr0 (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_opp2 instead.")]
+Notation lersif_opp2 := mc_1_11.lersif_opp2 (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_oppE instead.")]
+Notation lersif_oppE := mc_1_11.lersif_oppE (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_add2l instead.")]
+Notation lersif_add2l := mc_1_11.lersif_add2l (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_add2r instead.")]
+Notation lersif_add2r := mc_1_11.lersif_add2r (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_add2 instead.")]
+Notation lersif_add2 := mc_1_11.lersif_add2 (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_subl_addr instead.")]
+Notation lersif_subl_addr := mc_1_11.lersif_subl_addr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_subr_addr instead.")]
+Notation lersif_subr_addr := mc_1_11.lersif_subr_addr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_sub_addr instead.")]
+Notation lersif_sub_addr := mc_1_11.lersif_sub_addr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lersif_subl_addl instead.")]
+Notation lersif_subl_addl := mc_1_11.lersif_subl_addl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lersif_subr_addl instead.")]
+Notation lersif_subr_addl := mc_1_11.lersif_subr_addl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lersif_sub_addl instead.")]
+Notation lersif_sub_addl := mc_1_11.lersif_sub_addl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_andb instead.")]
+Notation lersif_andb := mc_1_11.lersif_andb (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_orb instead.")]
+Notation lersif_orb := mc_1_11.lersif_orb (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_imply instead.")]
+Notation lersif_imply := mc_1_11.lersif_imply (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifW instead.")]
+Notation lersifW := mc_1_11.lersifW (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use ltrW_lteif instead.")]
+Notation ltrW_lersif := mc_1_11.ltrW_lersif (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_pmul2l instead.")]
+Notation lersif_pmul2l := mc_1_11.lersif_pmul2l (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_pmul2r instead.")]
+Notation lersif_pmul2r := mc_1_11.lersif_pmul2r (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_nmul2l instead.")]
+Notation lersif_nmul2l := mc_1_11.lersif_nmul2l (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_nmul2r instead.")]
+Notation lersif_nmul2r := mc_1_11.lersif_nmul2r (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use real_lteifNE instead.")]
+Notation real_lersifN := mc_1_11.real_lersifN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use real_lteif_norml instead.")]
+Notation real_lersif_norml := mc_1_11.real_lersif_norml (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use real_lteif_normr instead.")]
+Notation real_lersif_normr := mc_1_11.real_lersif_normr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_nnormr instead.")]
+Notation lersif_nnormr := mc_1_11.lersif_nnormr (only parsing).
 
 (* LersifOrdered *)
 
-Notation "@ 'lersifN'" :=
-  ((fun _ => @mc_1_11.lersifN) (deprecate lersifN lteifNE))
-    (at level 10, only parsing).
-
-Notation lersifN := (@lersifN _) (only parsing).
-
-Notation "@ 'lersif_norml'" :=
-  ((fun _ => @mc_1_11.lersif_norml) (deprecate lersif_norml lteif_norml))
-    (at level 10, only parsing).
-
-Notation lersif_norml := (@lersif_norml _) (only parsing).
-
-Notation "@ 'lersif_normr'" :=
-  ((fun _ => @mc_1_11.lersif_normr) (deprecate lersif_normr lteif_normr))
-    (at level 10, only parsing).
-
-Notation lersif_normr := (@lersif_normr _) (only parsing).
-
-Notation "@ 'lersif_distl'" :=
-  ((fun _ => @mc_1_11.lersif_distl) (deprecate lersif_distl lteif_distl))
-    (at level 10, only parsing).
-
-Notation lersif_distl := (@lersif_distl _) (only parsing).
-
-Notation "@ 'lersif_minr'" :=
-  ((fun _ => @mc_1_11.lersif_minr) (deprecate lersif_minr lteif_minr))
-    (at level 10, only parsing).
-
-Notation lersif_minr := (@lersif_minr _) (only parsing).
-
-Notation "@ 'lersif_minl'" :=
-  ((fun _ => @mc_1_11.lersif_minl) (deprecate lersif_minl lteif_minl))
-    (at level 10, only parsing).
-
-Notation lersif_minl := (@lersif_minl _) (only parsing).
-
-Notation "@ 'lersif_maxr'" :=
-  ((fun _ => @mc_1_11.lersif_maxr) (deprecate lersif_maxr lteif_maxr))
-    (at level 10, only parsing).
-
-Notation lersif_maxr := (@lersif_maxr _) (only parsing).
-
-Notation "@ 'lersif_maxl'" :=
-  ((fun _ => @mc_1_11.lersif_maxl) (deprecate lersif_maxl lteif_maxl))
-    (at level 10, only parsing).
-
-Notation lersif_maxl := (@lersif_maxl _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteifNE instead.")]
+Notation lersifN := mc_1_11.lersifN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_norml instead.")]
+Notation lersif_norml := mc_1_11.lersif_norml (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_normr instead.")]
+Notation lersif_normr := mc_1_11.lersif_normr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_distl instead.")]
+Notation lersif_distl := mc_1_11.lersif_distl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_minr instead.")]
+Notation lersif_minr := mc_1_11.lersif_minr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_minl instead.")]
+Notation lersif_minl := mc_1_11.lersif_minl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_maxr instead.")]
+Notation lersif_maxr := mc_1_11.lersif_maxr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_maxl instead.")]
+Notation lersif_maxl := mc_1_11.lersif_maxl (only parsing).
 
 (* LersifField *)
 
-Notation "@ 'lersif_pdivl_mulr'" :=
-  ((fun _ => @mc_1_11.lersif_pdivl_mulr)
-     (deprecate lersif_pdivl_mulr lteif_pdivl_mulr))
-    (at level 10, only parsing).
-
-Notation lersif_pdivl_mulr :=
-  (fun b => @lersif_pdivl_mulr _ b _) (only parsing).
-
-Notation "@ 'lersif_pdivr_mulr'" :=
-  ((fun _ => @mc_1_11.lersif_pdivr_mulr)
-     (deprecate lersif_pdivr_mulr lteif_pdivr_mulr))
-    (at level 10, only parsing).
-
-Notation lersif_pdivr_mulr :=
-  (fun b => @lersif_pdivr_mulr _ b _) (only parsing).
-
-Notation "@ 'lersif_pdivl_mull'" :=
-  ((fun _ => @mc_1_11.lersif_pdivl_mull)
-     (deprecate lersif_pdivl_mull lteif_pdivl_mull))
-    (at level 10, only parsing).
-
-Notation lersif_pdivl_mull :=
-  (fun b => @lersif_pdivl_mull _ b _) (only parsing).
-
-Notation "@ 'lersif_pdivr_mull'" :=
-  ((fun _ => @mc_1_11.lersif_pdivr_mull)
-     (deprecate lersif_pdivr_mull lteif_pdivr_mull))
-    (at level 10, only parsing).
-
-Notation lersif_pdivr_mull :=
-  (fun b => @lersif_pdivr_mull _ b _) (only parsing).
-
-Notation "@ 'lersif_ndivl_mulr'" :=
-  ((fun _ => @mc_1_11.lersif_ndivl_mulr)
-     (deprecate lersif_ndivl_mulr lteif_ndivl_mulr))
-    (at level 10, only parsing).
-
-Notation lersif_ndivl_mulr :=
-  (fun b => @lersif_ndivl_mulr _ b _) (only parsing).
-
-Notation "@ 'lersif_ndivr_mulr'" :=
-  ((fun _ => @mc_1_11.lersif_ndivr_mulr)
-     (deprecate lersif_ndivr_mulr lteif_ndivr_mulr))
-    (at level 10, only parsing).
-
-Notation lersif_ndivr_mulr :=
-  (fun b => @lersif_ndivr_mulr _ b _) (only parsing).
-
-Notation "@ 'lersif_ndivl_mull'" :=
-  ((fun _ => @mc_1_11.lersif_ndivl_mull)
-     (deprecate lersif_ndivl_mull lteif_ndivl_mull))
-    (at level 10, only parsing).
-
-Notation lersif_ndivl_mull :=
-  (fun b => @lersif_ndivl_mull _ b _) (only parsing).
-
-Notation "@ 'lersif_ndivr_mull'" :=
-  ((fun _ => @mc_1_11.lersif_ndivr_mull)
-     (deprecate lersif_ndivr_mull lteif_ndivr_mull))
-    (at level 10, only parsing).
-
-Notation lersif_ndivr_mull :=
-  (fun b => @lersif_ndivr_mull _ b _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_pdivl_mulr instead.")]
+Notation lersif_pdivl_mulr := mc_1_11.lersif_pdivl_mulr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_pdivr_mulr instead.")]
+Notation lersif_pdivr_mulr := mc_1_11.lersif_pdivr_mulr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_pdivl_mull instead.")]
+Notation lersif_pdivl_mull := mc_1_11.lersif_pdivl_mull (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_pdivr_mull instead.")]
+Notation lersif_pdivr_mull := mc_1_11.lersif_pdivr_mull (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_ndivl_mulr instead.")]
+Notation lersif_ndivl_mulr := mc_1_11.lersif_ndivl_mulr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_ndivr_mulr instead.")]
+Notation lersif_ndivr_mulr := mc_1_11.lersif_ndivr_mulr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_ndivl_mull instead.")]
+Notation lersif_ndivl_mull := mc_1_11.lersif_ndivl_mull (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_ndivr_mull instead.")]
+Notation lersif_ndivr_mull := mc_1_11.lersif_ndivr_mull (only parsing).
 
 (* IntervalPo *)
 
-Notation "@ 'lersif_in_itv'" :=
-  ((fun _ => @mc_1_11.lersif_in_itv) (deprecate lersif_in_itv lteif_in_itv))
-    (at level 10, only parsing).
-
-Notation lersif_in_itv := (@lersif_in_itv _ _ _ _ _ _) (only parsing).
-
-Notation "@ 'itv_gte'" :=
-  ((fun _ => @mc_1_11.itv_gte) (deprecate itv_gte itv_ge))
-    (at level 10, only parsing).
-
-Notation itv_gte := (@itv_gte _ _ _ _ _) (only parsing).
-
-Notation "@ 'ltr_in_itv'" :=
-  ((fun _ => @mc_1_11.ltr_in_itv) (deprecate ltr_in_itv lt_in_itv))
-    (at level 10, only parsing).
-
-Notation ltr_in_itv := (@ltr_in_itv _ _ _ _ _ _) (only parsing).
-
-Notation "@ 'ler_in_itv'" :=
-  ((fun _ => @mc_1_11.ler_in_itv) (deprecate ler_in_itv lt_in_itv))
-    (at level 10, only parsing).
-
-Notation ler_in_itv := (@ler_in_itv _ _ _ _ _ _) (only parsing).
-
-Notation "@ 'itv_splitU2'" :=
-  ((fun _ => @mc_1_11.itv_splitU2) (deprecate itv_splitU2 itv_splitUeq))
-    (at level 10, only parsing).
-
-Notation itv_splitU2 := (@itv_splitU2 _ _ _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lteif_in_itv instead.")]
+Notation lersif_in_itv := mc_1_11.lersif_in_itv (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use itv_ge instead.")]
+Notation itv_gte := mc_1_11.itv_gte (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lt_in_itv instead.")]
+Notation ltr_in_itv := mc_1_11.ltr_in_itv (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lt_in_itv instead.")]
+Notation ler_in_itv := @mc_1_11.ler_in_itv (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use itv_splitUeq instead.")]
+Notation itv_splitU2 := mc_1_11.itv_splitU2 (only parsing).
 
 (* `itv_intersection` accepts any `numDomainType` but `Order.meet` accepts    *)
-(* only `realDomainType`. Use `Order.meet` instead of `itv_meet`.             *)
+(* only `realDomainType`.                                                     *)
+#[deprecated(since="mathcomp 1.12.0", note="Use Order.meet instead.")]
 Notation "@ 'itv_intersection'" :=
-  ((fun _ (R : realDomainType) => @Order.meet _ [latticeType of interval R])
-     (deprecate itv_intersection itv_meet))
+  (fun (R : realDomainType) => @Order.meet _ [latticeType of interval R])
     (at level 10, only parsing) : fun_scope.
+#[deprecated(since="mathcomp 1.12.0", note="Use Order.meet instead.")]
+Notation itv_intersection :=
+  (@Order.meet _ [latticeType of interval (_ : realDomainType)]) (only parsing).
 
-Notation itv_intersection := (@itv_intersection _) (only parsing).
-
+#[deprecated(since="mathcomp 1.12.0", note="Use meet1x instead.")]
 Notation "@ 'itv_intersection1i'" :=
-  ((fun _ (R : realDomainType) => @meet1x _ [tbLatticeType of interval R])
-     (deprecate itv_intersection1i meet1x))
+  (fun (R : realDomainType) => @meet1x _ [tbLatticeType of interval R])
     (at level 10, only parsing) : fun_scope.
+#[deprecated(since="mathcomp 1.12.0", note="Use meet1x instead.")]
+Notation itv_intersection1i :=
+  (@meet1x _ [tbLatticeType of interval (_ : realDomainType)]) (only parsing).
 
-Notation itv_intersection1i := (@itv_intersection1i _) (only parsing).
-
+#[deprecated(since="mathcomp 1.12.0", note="Use meetx1 instead.")]
 Notation "@ 'itv_intersectioni1'" :=
-  ((fun _ (R : realDomainType) => @meetx1 _ [tbLatticeType of interval R])
-     (deprecate itv_intersectioni1 meetx1))
+  (fun (R : realDomainType) => @meetx1 _ [tbLatticeType of interval R])
     (at level 10, only parsing) : fun_scope.
+#[deprecated(since="mathcomp 1.12.0", note="Use meetx1 instead.")]
+ Notation itv_intersectioni1 :=
+  (@meetx1 _ [tbLatticeType of interval (_ : realDomainType)]) (only parsing).
 
-Notation itv_intersectioni1 := (@itv_intersectioni1 _) (only parsing).
-
+#[deprecated(since="mathcomp 1.12.0", note="Use meetxx instead.")]
 Notation "@ 'itv_intersectionii'" :=
-  ((fun _ (R : realDomainType) => @meetxx _ [latticeType of interval R])
-     (deprecate itv_intersectionii meetxx))
+  (fun _ (R : realDomainType) => @meetxx _ [latticeType of interval R])
     (at level 10, only parsing) : fun_scope.
-
-Notation itv_intersectionii := (@itv_intersectionii _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use meetxx instead.")]
+Notation itv_intersectionii :=
+  (@meetxx _ [latticeType of interval (_ : realDomainType)]) (only parsing).
 
 (* IntervalOrdered *)
-
+#[deprecated(since="mathcomp 1.12.0", note="Use meetC instead.")]
 Notation "@ 'itv_intersectionC'" :=
-  ((fun _ (R : realDomainType) => @meetC _ [latticeType of interval R])
-     (deprecate itv_intersectionC meetC))
+  (fun (R : realDomainType) => @meetC _ [latticeType of interval R])
     (at level 10, only parsing) : fun_scope.
+#[deprecated(since="mathcomp 1.12.0", note="Use meetC instead.")]
+Notation itv_intersectionC :=
+  (@meetC _ [latticeType of interval (_ : realDomainType)]) (only parsing).
 
-Notation itv_intersectionC := (@itv_intersectionC _) (only parsing).
-
+#[deprecated(since="mathcomp 1.12.0", note="Use meetA instead.")]
 Notation "@ 'itv_intersectionA'" :=
-  ((fun _ (R : realDomainType) => @meetA _ [latticeType of interval R])
-     (deprecate itv_intersectionA meetA))
+  (fun (R : realDomainType) => @meetA _ [latticeType of interval R])
     (at level 10, only parsing) : fun_scope.
-
-Notation itv_intersectionA := (@itv_intersectionA _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use meetA instead.")]
+Notation itv_intersectionA :=
+  (@meetA _ [latticeType of interval (_ : realDomainType)]) (only parsing).

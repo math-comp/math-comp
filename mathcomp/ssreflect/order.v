@@ -3422,12 +3422,10 @@ Proof. exact: anti_mono_in. Qed.
 
 End POrderMonotonyTheory.
 
-Notation "@ 'eq_sorted_lt'" := (deprecate eq_sorted_lt lt_sorted_eq)
-  (at level 10, only parsing) : fun_scope.
-Notation "@ 'eq_sorted_le'" := (deprecate eq_sorted_le le_sorted_eq)
-  (at level 10, only parsing) : fun_scope.
-Notation eq_sorted_lt := (@eq_sorted_lt _ _ _ _) (only parsing).
-Notation eq_sorted_le := (@eq_sorted_le _ _ _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use lt_sorted_eq instead.")]
+Notation eq_sorted_lt := lt_sorted_eq (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use le_sorted_eq instead.")]
+Notation eq_sorted_le := le_sorted_eq (only parsing).
 
 End POrderTheory.
 

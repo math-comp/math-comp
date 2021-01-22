@@ -2049,6 +2049,5 @@ Qed.
 
 End Solver.
 
-Notation "@ 'limg_add'" :=
-  (deprecate limg_add limgD) (at level 10, only parsing) : fun_scope.
-Notation limg_add := (@limg_add _ _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use limgD instead.")]
+Notation limg_add := limgD (only parsing).

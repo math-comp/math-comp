@@ -2357,9 +2357,7 @@ End Greatest.
 
 End SetFixpoint.
 
-Notation mem_imset := 
-  ((fun aT rT D x f xD => deprecate mem_imset imset_f aT rT f D x xD) _ _ _ _)
-  (only parsing).
-Notation mem_imset2 := ((fun aT aT2 rT D D2 x x2 f xD xD2 => 
-  deprecate mem_imset2 imset2_f aT aT2 rT f D D2 x x2 xD xD2) _ _ _ _ _ _ _)
-  (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use imset_f instead.")]
+Notation mem_imset := imset_f (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use imset2_f instead.")]
+Notation mem_imset2 := imset2_f (only parsing).

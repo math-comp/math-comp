@@ -917,8 +917,8 @@ Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
 
-Notation disjoint_trans := 
-  (deprecate disjoint_trans disjointWl _ _ _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use disjointWl instead.")]
+Notation disjoint_trans := disjointWl (only parsing).
 
 Hint Resolve subxx_hint : core.
 
@@ -1723,12 +1723,10 @@ End ArgMinMax.
 
 End Extrema.
 
-Notation "@ 'arg_minP'" :=
-  (deprecate arg_minP arg_minnP) (at level 10, only parsing) : fun_scope.
-Notation arg_minP := (@arg_minP _ _ _) (only parsing).
-Notation "@ 'arg_maxP'" :=
-  (deprecate arg_maxP arg_maxnP) (at level 10, only parsing) : fun_scope.
-Notation arg_maxP := (@arg_maxP _ _ _) (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use arg_minnP instead.")]
+Notation arg_minP := arg_minnP (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use arg_maxnP instead.")]
+Notation arg_maxP := arg_maxnP (only parsing).
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
@@ -2352,5 +2350,7 @@ Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
 
 End SumFinType.
 
-Notation bump_addl := (deprecate bump_addl bumpDl) (only parsing).
-Notation unbump_addl := (deprecate unbump_addl unbumpDl) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use bumpDl instead.")]
+Notation bump_addl := bumpDl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use unbumpDl instead.")]
+Notation unbump_addl := unbumpDl (only parsing).

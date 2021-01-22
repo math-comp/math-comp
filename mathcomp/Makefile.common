@@ -31,7 +31,7 @@ TGTS?=
 H:= $(if $(VERBOSE),,@)  # not used yet
 TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
 COQMAKE = $(MAKE) -f Makefile.coq $(COQMAKEOPTIONS)
-COQMAKE_TESTSUITE = $(MAKE) -f Makefile.test-suite.coq VDFILE=".coqdeps.test-suite" $(COQMAKEOPTIONS)
+COQMAKE_TESTSUITE = $(MAKE) -f Makefile.test-suite.coq $(COQMAKEOPTIONS)
 BRANCH_coq:= $(shell $(COQBIN)coqtop -v | head -1 | grep -E '(trunk|master)' \
 	      | wc -l | sed 's/ *//g')
 
@@ -153,7 +153,6 @@ doc: __always__ Makefile.coq
 	. ../etc/utils/builddoc_lib.sh; \
 		cd _build_doc && mangle_sources $(COQFILES)
 	+cd _build_doc && $(COQMAKE)
-	cd _build_doc && if [ ! -f .Makefile.coq.d ] ; then cp .coqdeps.d .Makefile.coq.d ; fi #can be removed when coq-8.10 compatibility is dropped
 	cd _build_doc && grep -v vio: .Makefile.coq.d > depend
 	cd _build_doc && cat depend | ../../etc/buildlibgraph $(COQFILES) > htmldoc/depend.js
 	cd _build_doc && $(COQBIN)coqdoc -t "Mathematical Components" \

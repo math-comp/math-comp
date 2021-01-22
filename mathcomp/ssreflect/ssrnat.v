@@ -1974,78 +1974,26 @@ Ltac nat_congr := first
      symmetry
    end ].
 
-Module mc_1_10.
-
-Variant leq_xor_gtn m n : bool -> bool -> Set :=
-  | LeqNotGtn of m <= n : leq_xor_gtn m n true false
-  | GtnNotLeq of n < m  : leq_xor_gtn m n false true.
-
-Lemma leqP m n : leq_xor_gtn m n (m <= n) (n < m).
-Proof. by case: leqP; constructor. Qed.
-
-Variant ltn_xor_geq m n : bool -> bool -> Set :=
-  | LtnNotGeq of m < n  : ltn_xor_geq m n false true
-  | GeqNotLtn of n <= m : ltn_xor_geq m n true false.
-
-Lemma ltnP m n : ltn_xor_geq m n (n <= m) (m < n).
-Proof. by case: ltnP; constructor. Qed.
-
-Variant eqn0_xor_gt0 n : bool -> bool -> Set :=
-  | Eq0NotPos of n = 0 : eqn0_xor_gt0 n true false
-  | PosNotEq0 of n > 0 : eqn0_xor_gt0 n false true.
-
-Lemma posnP n : eqn0_xor_gt0 n (n == 0) (0 < n).
-Proof. by case: n; constructor. Qed.
-
-Variant compare_nat m n :
-   bool -> bool -> bool -> bool -> bool -> bool -> Set :=
-  | CompareNatLt of m < n : compare_nat m n false false false true false true
-  | CompareNatGt of m > n : compare_nat m n false false true false true false
-  | CompareNatEq of m = n : compare_nat m n true true true true false false.
-
-Lemma ltngtP m n : compare_nat m n (n == m) (m == n) (n <= m)
-                                   (m <= n) (n < m) (m < n).
-Proof. by case: ltngtP; constructor. Qed.
-
-End mc_1_10.
-
 (* Temporary backward compatibility. *)
-Notation odd_add := (deprecate odd_add oddD _) (only parsing).
-Notation odd_sub := (deprecate odd_sub oddB _) (only parsing).
-
-Notation "@ 'homo_inj_lt'" :=
-  (deprecate homo_inj_lt inj_homo_ltn) (at level 10, only parsing) : fun_scope.
-Notation homo_inj_lt := (@homo_inj_lt _) (only parsing).
-Notation "@ 'homo_inj_lt_in'" :=
-  (deprecate homo_inj_lt_in inj_homo_ltn_in) (at level 10, only parsing) : fun_scope.
-Notation homo_inj_lt_in := (@homo_inj_lt_in _ _ _) (only parsing).
-
-Notation "@ 'incr_inj'" :=
-  (deprecate incr_inj incn_inj) (at level 10, only parsing) : fun_scope.
-Notation incr_inj := (@incr_inj _) (only parsing).
-Notation "@ 'incr_inj_in'" :=
-  (deprecate incr_inj_in incn_inj_in) (at level 10, only parsing) : fun_scope.
-Notation incr_inj_in := (@incr_inj_in _ _) (only parsing).
-
-Notation "@ 'decr_inj'" :=
-  (deprecate decr_inj decn_inj) (at level 10, only parsing) : fun_scope.
-Notation decr_inj := (@decr_inj _) (only parsing).
-Notation "@ 'decr_inj_in'" :=
-  (deprecate decr_inj_in decn_inj_in) (at level 10, only parsing) : fun_scope.
-Notation decr_inj_in := (@decr_inj_in _ _) (only parsing).
-
-Notation "@ 'iter_add'" :=
-  (deprecate iter_add iterD) (at level 10, only parsing) : fun_scope.
-Notation "@ 'odd_opp'" :=
-  (deprecate odd_opp oddN) (at level 10, only parsing) : fun_scope.
-Notation "@ 'sqrn_sub'" :=
-  (deprecate sqrn_sub sqrnB) (at level 10, only parsing) : fun_scope.
-Notation iter_add := (@iterD _) (only parsing).
-Notation maxn_mulr := (deprecate maxn_mulr maxnMr) (only parsing).
-Notation maxn_mull := (deprecate maxn_mull maxnMl) (only parsing).
-Notation minn_mulr := (deprecate minn_mulr minnMr) (only parsing).
-Notation minn_mull := (deprecate minn_mull minnMl) (only parsing).
-Notation odd_opp := (@odd_opp _ _) (only parsing).
-Notation odd_mul := (deprecate odd_mul oddM) (only parsing).
-Notation odd_exp := (deprecate odd_exp oddX) (only parsing).
-Notation sqrn_sub := (@sqrn_sub _ _) (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use oddD instead.")]
+Notation odd_add := oddD (only parsing).
+#[deprecated(since="mathcomp 1.11.0", note="Use oddB instead.")]
+Notation odd_sub := oddB (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use iterD instead.")]
+Notation iter_add := iterD (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use maxnMr instead.")]
+Notation maxn_mulr := maxnMr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use maxnMl instead.")]
+Notation maxn_mull := maxnMl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use minnMr instead.")]
+Notation minn_mulr := minnMr (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use minnMl instead.")]
+Notation minn_mull := minnMl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use oddN instead.")]
+Notation odd_opp := oddN (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use oddM instead.")]
+Notation odd_mul := oddM (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use oddX instead.")]
+Notation odd_exp := oddX (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use sqrnB instead.")]
+Notation sqrn_sub := sqrnB (only parsing).

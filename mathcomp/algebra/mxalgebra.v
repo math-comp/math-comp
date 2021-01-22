@@ -3068,9 +3068,7 @@ Proof. by rewrite /center_mx -map_cent_mx; apply: map_capmx. Qed.
 
 End MapMatrixSpaces.
 
-Notation "@ 'mulsmx_addl'" :=
-  (deprecate mulsmx_addl mulsmxDl) (at level 10, only parsing) : fun_scope.
-Notation "@ 'mulsmx_addr'" :=
-  (deprecate mulsmx_addr mulsmxDr) (at level 10, only parsing) : fun_scope.
-Notation mulsmx_addl := (@mulsmx_addl _ _ _ _ _) (only parsing).
-Notation mulsmx_addr := (@mulsmx_addr _ _ _ _ _) (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use mulsmxDl instead.")]
+Notation mulsmx_addl := mulsmxDl (only parsing).
+#[deprecated(since="mathcomp 1.12.0", note="Use mulsmxDr instead.")]
+Notation mulsmx_addr := mulsmxDr (only parsing).
