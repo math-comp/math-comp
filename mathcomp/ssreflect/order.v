@@ -3968,75 +3968,84 @@ Definition pOrder (T : porderType disp) : {pOrder T} :=
   POrder le lt (POrder.class T).
 
 Definition bPOrder (T : bPOrderType disp) : {bPOrder T} :=
-  @RelOrder.BPOrder.Pack _ _ le lt bottom (BPOrder.class T).
+  @RelOrder.BPOrder.Pack _ _ le lt bottom (nosimpl (BPOrder.class T)).
 
 Definition tPOrder (T : tPOrderType disp) : {tPOrder T} :=
-  @RelOrder.TPOrder.Pack _ _ le lt top (TPOrder.class T).
+  @RelOrder.TPOrder.Pack _ _ le lt top (nosimpl (TPOrder.class T)).
 
 Definition tbPOrder (T : tbPOrderType disp) : {tbPOrder T} :=
-  @RelOrder.TBPOrder.Pack _ _ le lt bottom top (TBPOrder.class T).
+  @RelOrder.TBPOrder.Pack _ _ le lt bottom top (nosimpl (TBPOrder.class T)).
 
 Definition meetOrder (T : meetSemilatticeType disp) : {meetOrder T} :=
-  @RelOrder.Meet.Pack _ _ le lt meet (MeetSemilattice.class T).
+  @RelOrder.Meet.Pack _ _ le lt meet (nosimpl (MeetSemilattice.class T)).
 
 Definition bMeetOrder (T : bMeetSemilatticeType disp) : {bMeetOrder T} :=
-  @RelOrder.BMeet.Pack _ _ le lt meet bottom (BMeetSemilattice.class T).
+  @RelOrder.BMeet.Pack
+    _ _ le lt meet bottom (nosimpl (BMeetSemilattice.class T)).
 
 Definition tMeetOrder (T : tMeetSemilatticeType disp) : {tMeetOrder T} :=
-  @RelOrder.TMeet.Pack _ _ le lt meet top (TMeetSemilattice.class T).
+  @RelOrder.TMeet.Pack _ _ le lt meet top (nosimpl (TMeetSemilattice.class T)).
 
 Definition tbMeetOrder (T : tbMeetSemilatticeType disp) : {tbMeetOrder T} :=
-  @RelOrder.TBMeet.Pack _ _ le lt meet bottom top (TBMeetSemilattice.class T).
+  @RelOrder.TBMeet.Pack
+    _ _ le lt meet bottom top (nosimpl (TBMeetSemilattice.class T)).
 
 Definition joinOrder (T : joinSemilatticeType disp) : {joinOrder T} :=
-  @RelOrder.Join.Pack _ _ le lt join (JoinSemilattice.class T).
+  @RelOrder.Join.Pack _ _ le lt join (nosimpl (JoinSemilattice.class T)).
 
 Definition bJoinOrder (T : bJoinSemilatticeType disp) : {bJoinOrder T} :=
-  @RelOrder.BJoin.Pack _ _ le lt join bottom (BJoinSemilattice.class T).
+  @RelOrder.BJoin.Pack
+    _ _ le lt join bottom (nosimpl (BJoinSemilattice.class T)).
 
 Definition tJoinOrder (T : tJoinSemilatticeType disp) : {tJoinOrder T} :=
-  @RelOrder.TJoin.Pack _ _ le lt join top (TJoinSemilattice.class T).
+  @RelOrder.TJoin.Pack _ _ le lt join top (nosimpl (TJoinSemilattice.class T)).
 
 Definition tbJoinOrder (T : tbJoinSemilatticeType disp) : {tbJoinOrder T} :=
-  @RelOrder.TBJoin.Pack _ _ le lt join bottom top (TBJoinSemilattice.class T).
+  @RelOrder.TBJoin.Pack
+    _ _ le lt join bottom top (nosimpl (TBJoinSemilattice.class T)).
 
 Definition lattice (T : latticeType disp) : {lattice T} :=
-  @RelOrder.Lattice.Pack _ _ le lt meet join (Lattice.class T).
+  @RelOrder.Lattice.Pack _ _ le lt meet join (nosimpl (Lattice.class T)).
 
 Definition bLattice (T : bLatticeType disp) : {bLattice T} :=
-  @RelOrder.BLattice.Pack _ _ le lt meet join bottom (BLattice.class T).
+  @RelOrder.BLattice.Pack
+    _ _ le lt meet join bottom (nosimpl (BLattice.class T)).
 
 Definition tLattice (T : tLatticeType disp) : {tLattice T} :=
-  @RelOrder.TLattice.Pack _ _ le lt meet join top (TLattice.class T).
+  @RelOrder.TLattice.Pack _ _ le lt meet join top (nosimpl (TLattice.class T)).
 
 Definition tbLattice (T : tbLatticeType disp) : {tbLattice T} :=
-  @RelOrder.TBLattice.Pack _ _ le lt meet join bottom top (TBLattice.class T).
+  @RelOrder.TBLattice.Pack
+    _ _ le lt meet join bottom top (nosimpl (TBLattice.class T)).
 
 Definition distrLattice (T : distrLatticeType disp) : {distrLattice T} :=
-  @RelOrder.DistrLattice.Pack _ _ le lt meet join (DistrLattice.class T).
+  @RelOrder.DistrLattice.Pack
+    _ _ le lt meet join (nosimpl (DistrLattice.class T)).
 
 Definition bDistrLattice (T : bDistrLatticeType disp) : {bDistrLattice T} :=
   @RelOrder.BDistrLattice.Pack
-    _ _ le lt meet join bottom (BDistrLattice.class T).
+    _ _ le lt meet join bottom (nosimpl (BDistrLattice.class T)).
 
 Definition tDistrLattice (T : tDistrLatticeType disp) : {tDistrLattice T} :=
-  @RelOrder.TDistrLattice.Pack _ _ le lt meet join top (TDistrLattice.class T).
+  @RelOrder.TDistrLattice.Pack
+    _ _ le lt meet join top (nosimpl (TDistrLattice.class T)).
 
 Definition tbDistrLattice (T : tbDistrLatticeType disp) : {tbDistrLattice T} :=
   @RelOrder.TBDistrLattice.Pack
-    _ _ le lt meet join bottom top (TBDistrLattice.class T).
+    _ _ le lt meet join bottom top (nosimpl (TBDistrLattice.class T)).
 
 Definition totalOrder (T : orderType disp) : {totalOrder T} :=
-  @RelOrder.Total.Pack _ _ le lt meet join (Total.class T).
+  @RelOrder.Total.Pack _ _ le lt meet join (nosimpl (Total.class T)).
 
 Definition bTotalOrder (T : bOrderType disp) : {bTotalOrder T} :=
-  @RelOrder.BTotal.Pack _ _ le lt meet join bottom (BTotal.class T).
+  @RelOrder.BTotal.Pack _ _ le lt meet join bottom (nosimpl (BTotal.class T)).
 
 Definition tTotalOrder (T : tOrderType disp) : {tTotalOrder T} :=
-  @RelOrder.TTotal.Pack _ _ le lt meet join top (TTotal.class T).
+  @RelOrder.TTotal.Pack _ _ le lt meet join top (nosimpl (TTotal.class T)).
 
 Definition tbTotalOrder (T : tbOrderType disp) : {tbTotalOrder T} :=
-  @RelOrder.TBTotal.Pack _ _ le lt meet join bottom top (TBTotal.class T).
+  @RelOrder.TBTotal.Pack
+    _ _ le lt meet join bottom top (nosimpl (TBTotal.class T)).
 
 End RelOrderCoercions.
 
