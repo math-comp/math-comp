@@ -1,81 +1,82 @@
 From mathcomp Require Import all_ssreflect.
 Import Order.Theory.
 
+Module D := RelOrder.DualOrder.
+
 Section relorder.
 Variable (T : eqType).
 
 Let eq_dual_dual_pOrder (ord : {pOrder T}) :
-  RelOrder.dual_pOrder (RelOrder.dual_pOrder ord) = ord := erefl.
+  D.dual_pOrder (D.dual_pOrder ord) = ord := erefl.
 
 Let eq_dual_dual_bPOrder (ord : {bPOrder T}) :
-  RelOrder.dual_bPOrder (RelOrder.dual_tPOrder ord) = ord := erefl.
+  D.dual_bPOrder (D.dual_tPOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tPOrder (ord : {tPOrder T}) :
-  RelOrder.dual_tPOrder (RelOrder.dual_bPOrder ord) = ord := erefl.
+  D.dual_tPOrder (D.dual_bPOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tbPOrder (ord : {tbPOrder T}) :
-  RelOrder.dual_tbPOrder (RelOrder.dual_tbPOrder ord) = ord := erefl.
+  D.dual_tbPOrder (D.dual_tbPOrder ord) = ord := erefl.
 
 Let eq_dual_dual_meetOrder (ord : {meetOrder T}) :
-  RelOrder.dual_meetOrder (RelOrder.dual_joinOrder ord) = ord := erefl.
+  D.dual_meetOrder (D.dual_joinOrder ord) = ord := erefl.
 
 Let eq_dual_dual_bMeetOrder (ord : {bMeetOrder T}) :
-  RelOrder.dual_bMeetOrder (RelOrder.dual_tJoinOrder ord) = ord := erefl.
+  D.dual_bMeetOrder (D.dual_tJoinOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tMeetOrder (ord : {tMeetOrder T}) :
-  RelOrder.dual_tMeetOrder (RelOrder.dual_bJoinOrder ord) = ord := erefl.
+  D.dual_tMeetOrder (D.dual_bJoinOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tbMeetOrder (ord : {tbMeetOrder T}) :
-  RelOrder.dual_tbMeetOrder (RelOrder.dual_tbJoinOrder ord) = ord := erefl.
+  D.dual_tbMeetOrder (D.dual_tbJoinOrder ord) = ord := erefl.
 
 Let eq_dual_dual_joinOrder (ord : {joinOrder T}) :
-  RelOrder.dual_joinOrder (RelOrder.dual_meetOrder ord) = ord := erefl.
+  D.dual_joinOrder (D.dual_meetOrder ord) = ord := erefl.
 
 Let eq_dual_dual_bJoinOrder (ord : {bJoinOrder T}) :
-  RelOrder.dual_bJoinOrder (RelOrder.dual_tMeetOrder ord) = ord := erefl.
+  D.dual_bJoinOrder (D.dual_tMeetOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tJoinOrder (ord : {tJoinOrder T}) :
-  RelOrder.dual_tJoinOrder (RelOrder.dual_bMeetOrder ord) = ord := erefl.
+  D.dual_tJoinOrder (D.dual_bMeetOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tbJoinOrder (ord : {tbJoinOrder T}) :
-  RelOrder.dual_tbJoinOrder (RelOrder.dual_tbMeetOrder ord) = ord := erefl.
+  D.dual_tbJoinOrder (D.dual_tbMeetOrder ord) = ord := erefl.
 
 Let eq_dual_dual_lattice (ord : {lattice T}) :
-  RelOrder.dual_lattice (RelOrder.dual_lattice ord) = ord := erefl.
+  D.dual_lattice (D.dual_lattice ord) = ord := erefl.
 
 Let eq_dual_dual_bLattice (ord : {bLattice T}) :
-  RelOrder.dual_bLattice (RelOrder.dual_tLattice ord) = ord := erefl.
+  D.dual_bLattice (D.dual_tLattice ord) = ord := erefl.
 
 Let eq_dual_dual_tLattice (ord : {tLattice T}) :
-  RelOrder.dual_tLattice (RelOrder.dual_bLattice ord) = ord := erefl.
+  D.dual_tLattice (D.dual_bLattice ord) = ord := erefl.
 
 Let eq_dual_dual_tbLattice (ord : {tbLattice T}) :
-  RelOrder.dual_tbLattice (RelOrder.dual_tbLattice ord) = ord := erefl.
+  D.dual_tbLattice (D.dual_tbLattice ord) = ord := erefl.
 
 Let eq_dual_dual_distrLattice (ord : {distrLattice T}) :
-  RelOrder.dual_distrLattice (RelOrder.dual_distrLattice ord) = ord := erefl.
+  D.dual_distrLattice (D.dual_distrLattice ord) = ord := erefl.
 
 Let eq_dual_dual_bDistrLattice (ord : {bDistrLattice T}) :
-  RelOrder.dual_bDistrLattice (RelOrder.dual_tDistrLattice ord) = ord := erefl.
+  D.dual_bDistrLattice (D.dual_tDistrLattice ord) = ord := erefl.
 
 Let eq_dual_dual_tDistrLattice (ord : {tDistrLattice T}) :
-  RelOrder.dual_tDistrLattice (RelOrder.dual_bDistrLattice ord) = ord := erefl.
+  D.dual_tDistrLattice (D.dual_bDistrLattice ord) = ord := erefl.
 
 Let eq_dual_dual_tbDistrLattice (ord : {tbDistrLattice T}) :
-  RelOrder.dual_tbDistrLattice (RelOrder.dual_tbDistrLattice ord) = ord :=
-  erefl.
+  D.dual_tbDistrLattice (D.dual_tbDistrLattice ord) = ord := erefl.
 
 Let eq_dual_dual_totalOrder (ord : {totalOrder T}) :
-  RelOrder.dual_totalOrder (RelOrder.dual_totalOrder ord) = ord := erefl.
+  D.dual_totalOrder (D.dual_totalOrder ord) = ord := erefl.
 
 Let eq_dual_dual_bTotalOrder (ord : {bTotalOrder T}) :
-  RelOrder.dual_bTotalOrder (RelOrder.dual_tTotalOrder ord) = ord := erefl.
+  D.dual_bTotalOrder (D.dual_tTotalOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tTotalOrder (ord : {tTotalOrder T}) :
-  RelOrder.dual_tTotalOrder (RelOrder.dual_bTotalOrder ord) = ord := erefl.
+  D.dual_tTotalOrder (D.dual_bTotalOrder ord) = ord := erefl.
 
 Let eq_dual_dual_tbTotalOrder (ord : {tbTotalOrder T}) :
-  RelOrder.dual_tbTotalOrder (RelOrder.dual_tbTotalOrder ord) = ord := erefl.
+  D.dual_tbTotalOrder (D.dual_tbTotalOrder ord) = ord := erefl.
 
 End relorder.
 

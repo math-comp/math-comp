@@ -33,13 +33,13 @@ Reserved Notation "A `|` B" (at level 52, left associativity).
 Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
-Module RelOrder.
-
 Definition dual_rel (T : Type) (r : rel T) := fun y x => r x y.
 Definition dual_bottom (T : Type) (top : T) := top.
 Definition dual_top (T : Type) (bottom : T) := bottom.
 Definition dual_meet (T : Type) (join : T -> T -> T) := join.
 Definition dual_join (T : Type) (meet : T -> T -> T) := meet.
+
+Module RelOrder.
 
 (**************)
 (* STRUCTURES *)
@@ -2362,19 +2362,12 @@ End Syntax.
 
 (* ========================================================================== *)
 
+Module DualOrder.
 Section DualOrder.
 
 Variable T : eqType.
 
-Canonical dual_pOrder (ord : {pOrder T}) :=
-  POrder
-    (dual_rel <=:ord) (dual_rel <:ord)
-    (let mixin := POrder.class ord in
-     @POrder.Mixin
-       T (dual_rel <=:ord) (dual_rel <:ord)
-       (POrder.dlt_def mixin) (POrder.lt_def mixin) (POrder.lexx mixin)
-       (fun x y yx xy => POrder.le_anti mixin xy yx)
-       (fun y x z xy yz => POrder.le_trans mixin yz xy)).
+Canonical dual_pOrder (ord : {pOrder T}) := dual_pOrder ord.
 
 Canonical dual_bPOrder (ord : {tPOrder T}) :=
   BPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_bottom (top ord))
@@ -2460,6 +2453,38 @@ Canonical dual_tbTotalOrder (ord : {tbTotalOrder T}) :=
   [tbTotalOrder of dual_rel <=:ord].
 
 End DualOrder.
+
+Module Exports.
+
+Canonical dual_pOrder.
+Canonical dual_bPOrder.
+Canonical dual_tPOrder.
+Canonical dual_tbPOrder.
+Canonical dual_meetOrder.
+Canonical dual_bMeetOrder.
+Canonical dual_tMeetOrder.
+Canonical dual_tbMeetOrder.
+Canonical dual_joinOrder.
+Canonical dual_bJoinOrder.
+Canonical dual_tJoinOrder.
+Canonical dual_tbJoinOrder.
+Canonical dual_lattice.
+Canonical dual_bLattice.
+Canonical dual_tLattice.
+Canonical dual_tbLattice.
+Canonical dual_distrLattice.
+Canonical dual_bDistrLattice.
+Canonical dual_tDistrLattice.
+Canonical dual_tbDistrLattice.
+Canonical dual_totalOrder.
+Canonical dual_bTotalOrder.
+Canonical dual_tTotalOrder.
+Canonical dual_tbTotalOrder.
+
+End Exports.
+End DualOrder.
+Import DualOrder.Exports.
+
 (* See [Module DualOrderTest] for tests. *)
 
 (**********)
@@ -5081,6 +5106,7 @@ Export RelOrder.DistrLattice.Exports RelOrder.BDistrLattice.Exports.
 Export RelOrder.TDistrLattice.Exports RelOrder.TBDistrLattice.Exports.
 Export RelOrder.Total.Exports RelOrder.BTotal.Exports.
 Export RelOrder.TTotal.Exports RelOrder.TBTotal.Exports.
+Export RelOrder.DualOrder.Exports.
 Export RelOrder.LePOrderMixin.Exports.
 Export RelOrder.BottomRelMixin.Exports.
 Export RelOrder.TopRelMixin.Exports.
