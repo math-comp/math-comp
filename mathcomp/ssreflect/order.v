@@ -6491,14 +6491,15 @@ Context {disp : unit}.
 
 Canonical dual_porderType (T : porderType disp) :=
   POrderType (dual_display disp) T^d
-             (RelOrder.POrder.class (RelOrder.dual_pOrder T)).
+             (RelOrder.POrder.class (RelOrder.DualPOrder.dual_pOrder T)).
 Canonical dual_tPOrderType (T : bPOrderType disp) :=
-  TPOrderType T^d (RelOrder.TPOrder.class (RelOrder.dual_tPOrder T)).
+  TPOrderType T^d (RelOrder.TPOrder.class (RelOrder.DualOrder.dual_tPOrder T)).
 Canonical dual_bPOrderType (T : tPOrderType disp) :=
-  BPOrderType T^d (RelOrder.BPOrder.class (RelOrder.dual_bPOrder T)).
+  BPOrderType T^d (RelOrder.BPOrder.class (RelOrder.DualOrder.dual_bPOrder T)).
 Canonical dual_tbPOrderType (T : tbPOrderType disp) := [tbPOrderType of T^d].
 Canonical dual_meetSemilatticeType (T : joinSemilatticeType disp) :=
-  MeetSemilatticeType T^d (RelOrder.Meet.class (RelOrder.dual_meetOrder T)).
+  MeetSemilatticeType
+    T^d (RelOrder.Meet.class (RelOrder.DualOrder.dual_meetOrder T)).
 Canonical dual_bMeetSemilatticeType (T : tJoinSemilatticeType disp) :=
   [bMeetSemilatticeType of T^d].
 Canonical dual_tMeetSemilatticeType (T : bJoinSemilatticeType disp) :=
@@ -6506,7 +6507,8 @@ Canonical dual_tMeetSemilatticeType (T : bJoinSemilatticeType disp) :=
 Canonical dual_tbMeetSemilatticeType (T : tbJoinSemilatticeType disp) :=
   [tbMeetSemilatticeType of T^d].
 Canonical dual_joinSemilatticeType (T : meetSemilatticeType disp) :=
-  JoinSemilatticeType T^d (RelOrder.Join.class (RelOrder.dual_joinOrder T)).
+  JoinSemilatticeType
+    T^d (RelOrder.Join.class (RelOrder.DualOrder.dual_joinOrder T)).
 Canonical dual_bJoinSemilatticeType (T : tMeetSemilatticeType disp) :=
   [bJoinSemilatticeType of T^d].
 Canonical dual_tJoinSemilatticeType (T : bMeetSemilatticeType disp) :=
@@ -6519,7 +6521,7 @@ Canonical dual_tLatticeType (T : bLatticeType disp) := [tLatticeType of T^d].
 Canonical dual_tbLatticeType (T : tbLatticeType disp) := [tbLatticeType of T^d].
 Canonical dual_distrLatticeType (T : distrLatticeType disp) :=
   DistrLatticeType
-    T^d (RelOrder.DistrLattice.class (RelOrder.dual_distrLattice T)).
+    T^d (RelOrder.DistrLattice.class (RelOrder.DualOrder.dual_distrLattice T)).
 Canonical dual_bDistrLatticeType (T : tDistrLatticeType disp) :=
   [bDistrLatticeType of T^d].
 Canonical dual_tDistrLatticeType (T : bDistrLatticeType disp) :=
@@ -6527,7 +6529,7 @@ Canonical dual_tDistrLatticeType (T : bDistrLatticeType disp) :=
 Canonical dual_tbDistrLatticeType (T : tbDistrLatticeType disp) :=
   [tbDistrLatticeType of T^d].
 Canonical dual_orderType (T : orderType disp) :=
-  OrderType T^d (RelOrder.Total.class (RelOrder.dual_totalOrder T)).
+  OrderType T^d (RelOrder.Total.class (RelOrder.DualOrder.dual_totalOrder T)).
 Canonical dual_bOrderType (T : tOrderType disp) := [bOrderType of T^d].
 Canonical dual_tOrderType (T : bOrderType disp) := [tOrderType of T^d].
 Canonical dual_tbOrderType (T : tbOrderType disp) := [tbOrderType of T^d].
@@ -12522,6 +12524,7 @@ Export Order.FinTotal.Exports.
 Export Order.FinTBTotal.Exports.
 Export Order.RelOrderCoercions.Exports.
 
+Export RelOrder.DualOrder.Exports.
 Export RelOrder.LePOrderMixin.Exports.
 Export RelOrder.BottomRelMixin.Exports.
 Export RelOrder.TopRelMixin.Exports.
