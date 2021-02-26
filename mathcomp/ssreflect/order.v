@@ -992,7 +992,7 @@ Module Order.
 (* STRUCTURES *)
 (**************)
 
-HB.mixin Record is_POrdered (d : unit) T of is_eqType T := {
+HB.mixin Record is_POrdered (d : unit) T of HasDecEq T := {
   dummy    : let _ := T in let _ := d in unit; (* fixme *)
   le       : rel T;
   lt       : rel T;
@@ -1005,7 +1005,7 @@ HB.mixin Record is_POrdered (d : unit) T of is_eqType T := {
 HB.structure Definition POrder (d : unit) :=
   { T of Choice T & is_POrdered d T }.
 
-HB.factory Record is_LePOrdered (d : unit) T of is_eqType T := {
+HB.factory Record is_LePOrdered (d : unit) T of HasDecEq T := {
   le       : rel T;
   le_refl  : reflexive     le;
   le_anti  : antisymmetric le;
@@ -1018,7 +1018,7 @@ HB.instance Definition _ := @is_POrdered.Build d T
   tt le _ (fun _ _ => erefl) le_refl le_anti le_trans.
 HB.end.
 
-HB.factory Record is_LtLePOrdered (d : unit) T of is_eqType T := {
+HB.factory Record is_LtLePOrdered (d : unit) T of HasDecEq T := {
   le : rel T;
   lt : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
@@ -1050,7 +1050,7 @@ HB.instance Definition _ := @is_POrdered.Build d T
 
 HB.end.
 
-HB.factory Record is_LtPOrdered (d : unit) T of is_eqType T := {
+HB.factory Record is_LtPOrdered (d : unit) T of HasDecEq T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
   lt_trans : transitive  lt;

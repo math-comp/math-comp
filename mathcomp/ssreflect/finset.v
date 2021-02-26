@@ -122,7 +122,7 @@ Local Notation inlined_new_rect :=
 
 (* put in subType *)
 Local Notation SubTypeFor T v s sr sk :=
-  (@SUB.Class _ _ T (@is_SUB.phant_Build _ _ T v s sr sk)).
+  (@SUB.Class _ _ T (@IsSUB.phant_Build _ _ T v s sr sk)).
 
 (* put in subType *)
 Definition NewTypeFor T U v c Urec sk :=
@@ -141,9 +141,9 @@ Definition finfun_of_set A := let: FinSet f := A in f.
 Definition set_of of phant T := set_type.
 Identity Coercion type_of_set_of : set_of >-> set_type.
 
-Definition set_is_SUB := BuildNewTypeFor finfun_of_set.
-HB.instance set_type set_is_SUB.
-HB.instance Definition set_eqMixin : is_eqType set_type :=
+Definition set_IsSUB := BuildNewTypeFor finfun_of_set.
+HB.instance set_type set_IsSUB.
+HB.instance Definition set_eqMixin : HasDecEq set_type :=
   [eqMixin of set_type by <:].
 HB.instance Definition set_choiceMixin := [choiceMixin of set_type by <:].
 HB.instance Definition set_countMixin := [countMixin of set_type by <:].
@@ -239,7 +239,7 @@ Section BasicSetTheory.
 Variable T : finType.
 Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
-HB.instance ({set T}) (set_is_SUB T).
+HB.instance ({set T}) (set_IsSUB T).
 HB.instance ({set T}) (set_eqMixin T).
 HB.instance ({set T}) (set_choiceMixin T).
 HB.instance ({set T}) (set_countMixin T).

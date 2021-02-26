@@ -206,7 +206,7 @@ Reserved Notation "[ 'min' G | gP & gQ ]" (at level 0,
 (* be to define a class for infinite groups, which could  *)
 (* share all of the algebraic laws.                       *)
 
-HB.mixin Record is_mul_base_group G := {
+HB.mixin Record IsMulBaseGroup G := {
   mulg_subdef : G -> G -> G;
   oneg_subdef : G;
   invg_subdef : G -> G;
@@ -237,7 +237,7 @@ HB.mixin Record is_mul_base_group G := {
 (* correct.                                                       *)
 
 #[mathcomp, arg_sort] HB.structure Definition BaseFinGroup :=
-  { G of is_mul_base_group G & Finite G }.
+  { G of IsMulBaseGroup G & Finite G }.
 
 Bind Scope group_scope with BaseFinGroup.arg_sort.
 Bind Scope group_scope with BaseFinGroup.sort.
@@ -270,13 +270,13 @@ Notation "x ^-1" := (invg x) : group_scope.
 Notation "x ^+ n" := (expgn x n) : group_scope.
 Notation "x ^- n" := (x ^+ n)^-1 : group_scope.
 
-HB.mixin Record group_of_base_group G of BaseFinGroup G := {
+HB.mixin Record BaseFinGroup_IsGroup G of BaseFinGroup G := {
   mulVg_subproof :
     left_inverse (@oneg [the BaseFinGroup.type of G]) (@invg _) (@mulg _)
 }.
 
 #[mathcomp] HB.structure Definition FinGroup :=
-  { G of group_of_base_group G & BaseFinGroup G }.
+  { G of BaseFinGroup_IsGroup G & BaseFinGroup G }.
 
 Module FinGroupExports.
 Notation finGroupType := FinGroup.type.
@@ -286,7 +286,7 @@ Notation "[ 'finGroupType' 'of' T ]" := (@FinGroup.clone T _)
 End FinGroupExports.
 HB.export FinGroupExports.
 
-HB.factory Record is_mul_group G of Finite G := {
+HB.factory Record IsMulGroup G of Finite G := {
   mulg : G -> G -> G;
   oneg : G;
   invg : G -> G;
@@ -295,7 +295,7 @@ HB.factory Record is_mul_group G of Finite G := {
   mulVg : left_inverse oneg invg mulg;
 }.
 
-HB.builders Context G of is_mul_group G.
+HB.builders Context G of IsMulGroup G.
 
 Notation "1" := oneg.
 Infix "*" := mulg.
@@ -315,8 +315,8 @@ by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
 
 HB.instance Definition _ := 
-  is_mul_base_group.Build G mulgA mul1g mk_invgK mk_invMg.
-HB.instance Definition _ := group_of_base_group.Build G mulVg.
+  IsMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
+HB.instance Definition _ := BaseFinGroup_IsGroup.Build G mulVg.
 
 HB.end.
 
@@ -666,9 +666,9 @@ apply/imset2P/imset2P=> [[x y Ax By /(canRL invgK)->] | [y x]].
 by rewrite !inE => By1 Ax1 ->; exists x^-1 y^-1; rewrite ?invMg.
 Qed.
 
-HB.instance Definition set_base_group := is_mul_base_group.Build (set_type gT)
+HB.instance Definition set_base_group := IsMulBaseGroup.Build (set_type gT)
   set_mulgA set_mul1g set_invgK set_invgM.
-HB.instance Definition _ : is_mul_base_group {set gT} := set_base_group.
+HB.instance Definition _ : IsMulBaseGroup {set gT} := set_base_group.
 
 End BaseSetMulDef.
 
@@ -1187,22 +1187,12 @@ Definition group_of of phant gT : predArgType := group_type.
 Local Notation groupT := (group_of (Phant gT)).
 Identity Coercion type_of_group : group_of >-> group_type.
 
-HB.instance Definition _ : SUB _ _ group_type :=
-  @SUB.class _ _ [subType for gval].
-HB.instance Definition _ : is_eqType group_type :=
-  [eqMixin of group_type by <:].
-HB.instance Definition _ : has_choice group_type :=
-  [choiceMixin of group_type by <:].
-HB.instance Definition _ : is_countable group_type :=
-  [countMixin of group_type by <:].
-HB.instance Definition _ : FinTypeForSub _ _ group_type :=
-  [finMixin of group_type by <:].
+HB.instance Definition _ := SUB.Build group_type [subType for gval].
+HB.instance Definition _ := [Finite of group_type by <:].
 
 (* No predType or baseFinGroupType structures, as these would hide the *)
 (* group-to-set coercion and thus spoil unification.                  *)
-
-HB.instance Definition _ : subFinite _ _ groupT :=
-  @subFinite.class _ _ [the subFinite.type _ of group_type].
+HB.instance Definition _ := SubFinite.Build groupT group_type.
 
 Definition group (A : {set gT}) gA : groupT := @Group A gA.
 
@@ -1662,15 +1652,8 @@ Qed.
 Inductive subg_of : predArgType := Subg x & x \in G.
 Definition sgval u := let: Subg x _ := u in x.
 HB.instance Definition _ : SUB _ _ subg_of :=
-  @SUB.class _ _ [subType for sgval].
-HB.instance Definition _ : is_eqType subg_of :=
-  [eqMixin of subg_of by <:].
-HB.instance Definition _ : has_choice subg_of :=
-  [choiceMixin of subg_of by <:].
-HB.instance Definition _ : is_countable subg_of :=
-  [countMixin of subg_of by <:].
-HB.instance Definition _ : FinTypeForSub _ _ subg_of :=
-  [finMixin of subg_of by <:].
+  SUB.class [subType for sgval].
+HB.instance Definition _ := [Finite of subg_of by <:].
 
 Lemma subgP u : sgval u \in G.
 Proof. exact: valP. Qed.
@@ -1690,7 +1673,7 @@ Proof. by move=> u; apply: val_inj; apply: mulVg. Qed.
 Lemma subg_mulP : associative subg_mul.
 Proof. by move=> u v w; apply: val_inj; apply: mulgA. Qed.
 
-HB.instance Definition _ := is_mul_group.Build subg_of
+HB.instance Definition _ := IsMulGroup.Build subg_of
   subg_mulP subg_oneP subg_invP.
 
 Lemma sgvalM : {in setT &, {morph sgval : x y / x * y}}. Proof. by []. Qed.
