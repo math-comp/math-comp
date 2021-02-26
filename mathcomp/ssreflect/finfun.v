@@ -280,9 +280,9 @@ Variable rT : countType.
 HB.instance ({ffun aT -> rT}) (countMixin (fun=> rT)).
 End simpl_countType.
 
-HB.instance Definition dffun_finMixin rT : is_finite (dffun_aT rT finType) :=
+HB.instance Definition dffun_finMixin rT : IsFinite (dffun_aT rT finType) :=
   PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT rT finType) _ _).
-HB.instance Definition ffun_finMixin (rT : finType) : is_finite {ffun aT -> rT} :=
+HB.instance Definition ffun_finMixin (rT : finType) : IsFinite {ffun aT -> rT} :=
   PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT (fun=> rT) finType) _ _).
 
 End InheritedStructures.

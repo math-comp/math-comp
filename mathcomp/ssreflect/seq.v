@@ -1012,8 +1012,7 @@ have [<-|neqx] := x1 =P x2; last by right; case.
 by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
-Canonical seq_eqMixin := EqMixin eqseqP.
-HB.instance (seq T) seq_eqMixin.
+HB.instance Definition seq_eqMixin := EqMixin eqseqP.
 
 Lemma eqseqE : eqseq = eq_op. Proof. by []. Qed.
 

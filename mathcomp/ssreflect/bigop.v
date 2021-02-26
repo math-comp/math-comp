@@ -1310,7 +1310,7 @@ Lemma big_sumType (I1 I2 : finType) (P : pred (I1 + I2)) F :
         (\big[*%M/1]_(i | P (inl _ i)) F (inl _ i))
       * (\big[*%M/1]_(i | P (inr _ i)) F (inr _ i)).
 Proof.
-by rewrite ![index_enum _]unlock [@Finite.enum in LHS]unlock big_cat !big_map.
+by rewrite ![index_enum _]unlock [@Finite.enum in LHS]unlock/= big_cat !big_map.
 Qed.
 
 Lemma big_split_ord m n (P : pred 'I_(m + n)) F :
