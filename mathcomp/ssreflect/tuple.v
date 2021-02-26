@@ -44,8 +44,8 @@ Variables (n : nat) (T : Type).
 
 Structure tuple_of : Type := Tuple {tval :> seq T; _ : size tval == n}.
 
-Definition tuple_is_SUB := BuildSubTypeFor _ tval.
-HB.instance tuple_of tuple_is_SUB.
+Definition tuple_IsSUB := BuildSubTypeFor _ tval.
+HB.instance tuple_of tuple_IsSUB.
 
 Implicit Type t : tuple_of.
 
@@ -282,7 +282,7 @@ Section EqTuple.
 
 Variables (n : nat) (T : eqType).
 
-HB.instance Definition tuple_eqMixin : is_eqType (n.-tuple T) :=
+HB.instance Definition tuple_eqMixin : HasDecEq (n.-tuple T) :=
   [eqMixin of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
@@ -367,7 +367,7 @@ Variables (n : nat) (T : finType).
 (* but in practice it will not work because the mixin_enum projector          *)
 (* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
-HB.instance Definition tuple_finMixin : is_finite (n.-tuple T) :=
+HB.instance Definition tuple_finMixin : IsFinite (n.-tuple T) :=
   FinMixin (@FinTuple.enumP n T).
 
 Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.

@@ -114,24 +114,6 @@ Unset Printing Implicit Defensive.
 
 Declare Scope set_scope.
 
-Local Notation inlined_sub_rect :=
-  (fun K K_S u => let (x, Px) as u return K u := u in K_S x Px).
-
-Local Notation inlined_new_rect :=
-  (fun K K_S u => let (x) as u return K u := u in K_S x).
-
-(* put in subType *)
-Local Notation SubTypeFor T v s sr sk :=
-  (@SUB.Class _ _ T (@is_SUB.phant_Build _ _ T v s sr sk)).
-
-(* put in subType *)
-Definition NewTypeFor T U v c Urec sk :=
-  let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  SubTypeFor U v (fun x _ => c x) Urec' sk.
-
-(* put in subType *)
-Notation BuildNewTypeFor v := (@NewTypeFor _ _ v _ inlined_new_rect vrefl_rect).
-
 Section SetType.
 
 Variable T : finType.
@@ -141,14 +123,9 @@ Definition finfun_of_set A := let: FinSet f := A in f.
 Definition set_of of phant T := set_type.
 Identity Coercion type_of_set_of : set_of >-> set_type.
 
-Definition set_is_SUB := BuildNewTypeFor finfun_of_set.
-HB.instance set_type set_is_SUB.
-HB.instance Definition set_eqMixin : is_eqType set_type :=
-  [eqMixin of set_type by <:].
-HB.instance Definition set_choiceMixin := [choiceMixin of set_type by <:].
-HB.instance Definition set_countMixin := [countMixin of set_type by <:].
-(* TODO: in the end only the last one should be left *)
-HB.instance Definition set_finMixin := [finMixin of set_type by <:].
+HB.instance Definition set_IsSUB :=
+   SUB.Build set_type [newType for finfun_of_set].
+HB.instance Definition _ := [Finite of set_type by <:].
 
 End SetType.
 
@@ -239,11 +216,7 @@ Section BasicSetTheory.
 Variable T : finType.
 Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
-HB.instance ({set T}) (set_is_SUB T).
-HB.instance ({set T}) (set_eqMixin T).
-HB.instance ({set T}) (set_choiceMixin T).
-HB.instance ({set T}) (set_countMixin T).
-HB.instance ({set T}) (set_finMixin T).
+HB.instance Definition _ := Finite.Build {set T} (set_type T).
 
 Lemma in_set pA x : x \in finset pA = pA x.
 Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
