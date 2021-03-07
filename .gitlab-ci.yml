@@ -432,11 +432,6 @@ ci-analysis-8.13:
   variables:
     COQ_VERSION: "8.13"
 
-ci-analysis-dev:
-  extends: .ci-analysis
-  variables:
-    COQ_VERSION: "dev"
-
 # The FCSL-PCM library
 .ci-fcsl-pcm:
   extends: .ci
