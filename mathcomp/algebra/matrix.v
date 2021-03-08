@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop finset fingroup perm.
+From mathcomp Require Import fintype finfun bigop finset fingroup perm order.
 From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 
 (******************************************************************************)
@@ -49,11 +49,43 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*                   same width).            \ Ad /                           *)
 (* block_mx Aul Aur Adl Adr == the block matrix / Aul Aur \                   *)
 (*                                              \ Adl Adr /                   *)
+(* \mxblock_(i < m, j < n) B i j                                              *)
+(*                == the block matrix of type 'M_(\sum_i p_ i, \sum_j q_ j)   *)
+(*                             / (B 0 0) ⋯ (B 0 j) ⋯ (B 0 n) \                *)
+(*                             |   ...       ...       ...   |                *)
+(*                             | (B i 0) ⋯ (B i j) ⋯ (B i n) |                *)
+(*                             |   ...       ...       ...   |                *)
+(*                             \ (B m 0) ⋯ (B m j) ⋯ (B m n) /                *)
+(*                   where each block (B i j) has type 'M_(p_ i, q_ j).       *)
+(* \mxdiag_(i < n) B i == the block square matrix of type 'M_(\sum_i p_ i)    *)
+(*                                / (B 0)      0      \                       *)
+(*                                |     ...     ...   |                       *)
+(*                                |  0    (B i)    0  |                       *)
+(*                                |   ...     ...     |                       *)
+(*                                \      0      (B n) /                       *)
+(*                        where each block (B i) has type 'M_(p_ i).          *)
+(*  \mxrow_(j < n) B j ==  the block matrix of type 'M_(m, \sum_j q_ j).      *)
+(*                                 < (B 0) ... (B n) >                        *)
+(*                         where each block (B j) has type 'M_(m, q_ j).      *)
+(*  \mxcol_(i < m) B i ==  the block matrix of type 'M_(\sum_i p_ i, n)       *)
+(*                                      / (B 0) \                             *)
+(*                                      |  ...  |                             *)
+(*                                      \ (B m) /                             *)
+(*                         where each block (B i) has type 'M(p_ i, n).       *)
 (*   [l|r]submx A == the left/right submatrices of a row block matrix A.      *)
 (*                   Note that the type of A, 'M_(m, n1 + n2) indicates how A *)
 (*                   should be decomposed.                                    *)
 (*   [u|d]submx A == the up/down submatrices of a column block matrix A.      *)
 (* [u|d][l|r]submx A == the upper left, etc submatrices of a block matrix A.  *)
+(*  submxblock A i j == the block submatrix of type 'M_(p_ i, q_ j) of A.     *)
+(*                      The type of A, 'M_(\sum_i p_ i, \sum_i q_ i)          *)
+(*                      indicates how A should be decomposed.                 *)
+(*                      There is no analogous for mxdiag since one can use    *)
+(*                      submxblock A i i to extract a diagonal block.         *)
+(*   submxrow A j == the submatrix of type 'M_(m, q_ j) of A. The type of A,  *)
+(*                   'M_(m, \sum_j q_ j) indicates how A should be decomposed.*)
+(*   submxrow A j == the submatrix of type 'M_(p_ i, n) of A. The type of A,  *)
+(*                   'M_(\sum_i p_ i, n) indicates how A should be decomposed.*)
 (*    mxsub f g A == generic reordered submatrix, given by functions f and g  *)
 (*                   which specify which subset of rows and columns to take   *)
 (*                   and how to reorder them, e.g. picking f and g to be      *)
@@ -193,6 +225,28 @@ Reserved Notation "\col_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\col_ j  E").
 Reserved Notation "\col_ ( j < n ) E"
+  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+Reserved Notation "\mxblock_ ( i , j ) E"
+  (at level 36, E at level 36, i, j at level 50,
+   format "\mxblock_ ( i ,  j )  E").
+Reserved Notation "\mxblock_ ( i < m , j < n ) E"
+  (at level 36, E at level 36, i, m, j, n at level 50). (* only parsing *)
+Reserved Notation "\mxblock_ ( i , j < n ) E"
+  (at level 36, E at level 36, i, j, n at level 50). (* only parsing *)
+Reserved Notation "\mxrow_ j E"
+  (at level 36, E at level 36, j at level 2,
+   format "\mxrow_ j  E").
+Reserved Notation "\mxrow_ ( j < n ) E"
+  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+Reserved Notation "\mxcol_ j E"
+  (at level 36, E at level 36, j at level 2,
+   format "\mxcol_ j  E").
+Reserved Notation "\mxcol_ ( j < n ) E"
+  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+Reserved Notation "\mxdiag_ j E"
+  (at level 36, E at level 36, j at level 2,
+   format "\mxdiag_ j  E").
+Reserved Notation "\mxdiag_ ( j < n ) E"
   (at level 36, E at level 36, j, n at level 50). (* only parsing *)
 
 Reserved Notation "x %:M"   (at level 8, format "x %:M").
@@ -510,6 +564,13 @@ Lemma castmx_sym m1 n1 m2 n2 (eq_m : m1 = m2) (eq_n : n1 = n2) A1 A2 :
   A1 = castmx (eq_m, eq_n) A2 -> A2 = castmx (esym eq_m, esym eq_n) A1.
 Proof. by move/(canLR (castmxK _ _)). Qed.
 
+Lemma eq_castmx m1 n1 m2 n2 (eq_mn eq_mn' : (m1 = m2) * (n1 = n2)) :
+  castmx eq_mn =1 castmx eq_mn'.
+Proof.
+case: eq_mn eq_mn' => [em en] [em' en'] A.
+by apply: (canRL (castmxKV _ _)); rewrite castmx_comp castmx_id.
+Qed.
+
 Lemma castmxE m1 n1 m2 n2 (eq_mn : (m1 = m2) * (n1 = n2)) A i j :
   castmx eq_mn A i j =
      A (cast_ord (esym eq_mn.1) i) (cast_ord (esym eq_mn.2) j).
@@ -539,6 +600,13 @@ Lemma trmx_cast m1 n1 m2 n2 (eq_mn : (m1 = m2) * (n1 = n2)) A :
   (castmx eq_mn A)^T = castmx (eq_mn.2, eq_mn.1) A^T.
 Proof.
 by case: eq_mn => eq_m eq_n; apply/matrixP=> i j; rewrite !(mxE, castmxE).
+Qed.
+
+Lemma trmx_conform m' n' m n (B : 'M_(m', n')) (A : 'M_(m, n)) :
+  (conform_mx B A)^T = conform_mx B^T A^T.
+Proof.
+rewrite /conform_mx; do !case: eqP; rewrite ?mxE// => en em.
+by rewrite trmx_cast.
 Qed.
 
 Lemma tr_row_perm m n s (A : 'M_(m, n)) : (row_perm s A)^T = col_perm s A^T.
@@ -3686,3 +3754,779 @@ End mxOver.
 
 #[deprecated(since="mathcomp 1.12.0", note="Use map_mxB instead.")]
 Notation map_mx_sub := map_mxB (only parsing).
+
+Section BlockMatrix.
+Import tagnat.
+Context {T : Type} {p q : nat} {p_ : 'I_p -> nat} {q_ : 'I_q -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Notation sq := (\sum_i q_ i)%N.
+Implicit Type (s : 'I_sp) (t : 'I_sq).
+
+Definition mxblock (B_ : forall i j, 'M[T]_(p_ i, q_ j)) :=
+  \matrix_(j, k) B_ (sig1 j) (sig1 k) (sig2 j) (sig2 k).
+Local Notation "\mxblock_ ( i , j ) E" := (mxblock (fun i j => E)) : ring_scope.
+
+Definition mxrow m (B_ : forall j, 'M[T]_(m, q_ j)) :=
+  \matrix_(j, k) B_ (sig1 k) j (sig2 k).
+Local Notation "\mxrow_ i E" := (mxrow (fun i => E)) : ring_scope.
+
+Definition mxcol n (B_ : forall i, 'M[T]_(p_ i, n)) :=
+  \matrix_(j, k) B_ (sig1 j) (sig2 j) k.
+Local Notation "\mxcol_ i E" := (mxcol (fun i => E)) : ring_scope.
+
+Definition submxblock (A : 'M[T]_(sp, sq)) i j := mxsub  (Rank i) (Rank j) A.
+Definition submxrow m (A : 'M[T]_(m, sq))    j := colsub          (Rank j) A.
+Definition submxcol n (A : 'M[T]_(sp, n))  i   := rowsub (Rank i)          A.
+
+Lemma mxblockEh B_ : \mxblock_(i, j) B_ i j = \mxrow_j \mxcol_i B_ i j.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma mxblockEv B_ : \mxblock_(i, j) B_ i j = \mxcol_i \mxrow_j B_ i j.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma submxblockEh A i j : submxblock A i j = submxcol (submxrow A j) i.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma submxblockEv A i j : submxblock A i j = submxrow (submxcol A i) j.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma mxblockK B_ i j : submxblock (\mxblock_(i, j) B_ i j) i j = B_ i j.
+Proof.
+apply/matrixP => k l; rewrite !mxE !Rank2K.
+by do !case: _ / esym; rewrite !cast_ord_id.
+Qed.
+
+Lemma mxrowK m B_ j : @submxrow m (\mxrow_j B_ j) j = B_ j.
+Proof.
+apply/matrixP => k l; rewrite !mxE !Rank2K.
+by do !case: _ / esym; rewrite !cast_ord_id.
+Qed.
+
+Lemma mxcolK n B_ i : @submxcol n (\mxcol_i B_ i) i = B_ i.
+Proof.
+apply/matrixP => k l; rewrite !mxE !Rank2K.
+by do !case: _ / esym; rewrite !cast_ord_id.
+Qed.
+
+Lemma submxrow_matrix B_ j :
+  submxrow (\mxblock_(i, j) B_ i j) j = \mxcol_i B_ i j.
+Proof. by rewrite mxblockEh mxrowK. Qed.
+
+Lemma submxcol_matrix B_ i :
+  submxcol (\mxblock_(i, j) B_ i j) i = \mxrow_j B_ i j.
+Proof. by rewrite mxblockEv mxcolK. Qed.
+
+Lemma submxblockK A : \mxblock_(i, j) (submxblock A i j) = A.
+Proof. by apply/matrixP => k l; rewrite !mxE !sig2K. Qed.
+
+Lemma submxrowK m (A : 'M[T]_(m, sq)) : \mxrow_j (submxrow A j) = A.
+Proof. by apply/matrixP => k l; rewrite !mxE !sig2K. Qed.
+
+Lemma submxcolK n (A : 'M[T]_(sp, n)) : \mxcol_i (submxcol A i) = A.
+Proof. by apply/matrixP => k l; rewrite !mxE !sig2K. Qed.
+
+Lemma mxblockP A B :
+  (forall i j, submxblock A i j = submxblock B i j) <-> A = B.
+Proof.
+split=> [eqAB|->//]; apply/matrixP=> s t;
+have /matrixP := eqAB (sig1 s) (sig1 t).
+by move=> /(_ (sig2 s) (sig2 t)); rewrite !mxE !sig2K.
+Qed.
+
+Lemma mxrowP m (A B : 'M_(m, sq)) :
+  (forall j, submxrow A j = submxrow B j) <-> A = B.
+Proof.
+split=> [eqAB|->//]; apply/matrixP=> i t; have /matrixP := eqAB (sig1 t).
+by move=> /(_ i (sig2 t)); rewrite !mxE !sig2K.
+Qed.
+
+Lemma mxcolP n (A B : 'M_(sp, n)) :
+  (forall i, submxcol A i = submxcol B i) <-> A = B.
+Proof.
+split=> [eqAB|->//]; apply/matrixP=> s j; have /matrixP := eqAB (sig1 s).
+by move=> /(_ (sig2 s) j); rewrite !mxE !sig2K.
+Qed.
+
+Lemma eq_mxblockP A_ B_ :
+  (forall i j, A_ i j = B_ i j) <->
+  (\mxblock_(i, j) A_ i j = \mxblock_(i, j) B_ i j).
+Proof. by rewrite -mxblockP; split => + i j => /(_ i j); rewrite !mxblockK. Qed.
+
+Lemma eq_mxblock A_ B_ :
+  (forall i j, A_ i j = B_ i j) ->
+  (\mxblock_(i, j) A_ i j = \mxblock_(i, j) B_ i j).
+Proof. by move=> /eq_mxblockP. Qed.
+
+Lemma eq_mxrowP m (A_ B_ : forall j, 'M[T]_(m, q_ j)) :
+  (forall j, A_ j = B_ j) <-> (\mxrow_j A_ j = \mxrow_j B_ j).
+Proof. by rewrite -mxrowP; split => + j => /(_ j); rewrite !mxrowK. Qed.
+
+Lemma eq_mxrow m (A_ B_ : forall j, 'M[T]_(m, q_ j)) :
+  (forall j, A_ j = B_ j) -> (\mxrow_j A_ j = \mxrow_j B_ j).
+Proof. by move=> /eq_mxrowP. Qed.
+
+Lemma eq_mxcolP n (A_ B_ : forall i, 'M[T]_(p_ i, n)) :
+  (forall i, A_ i = B_ i) <-> (\mxcol_i A_ i = \mxcol_i B_ i).
+Proof. by rewrite -mxcolP; split => + i => /(_ i); rewrite !mxcolK. Qed.
+
+Lemma eq_mxcol n (A_ B_ : forall i, 'M[T]_(p_ i, n)) :
+  (forall i, A_ i = B_ i) -> (\mxcol_i A_ i = \mxcol_i B_ i).
+Proof. by move=> /eq_mxcolP. Qed.
+
+Lemma row_mxrow m (B_ : forall j, 'M[T]_(m, q_ j)) i :
+  row i (\mxrow_j B_ j) = \mxrow_j (row i (B_ j)).
+Proof. by apply/rowP => l; rewrite !mxE. Qed.
+
+Lemma col_mxrow m (B_ : forall j, 'M[T]_(m, q_ j)) j :
+  col j (\mxrow_j B_ j) = col (sig2 j) (B_ (sig1 j)).
+Proof. by apply/colP => l; rewrite !mxE. Qed.
+
+Lemma row_mxcol n (B_ : forall i, 'M[T]_(p_ i, n)) i :
+  row i (\mxcol_i B_ i) = row (sig2 i) (B_ (sig1 i)).
+Proof. by apply/rowP => l; rewrite !mxE. Qed.
+
+Lemma col_mxcol n (B_ : forall i, 'M[T]_(p_ i, n)) j :
+  col j (\mxcol_i B_ i) = \mxcol_i (col j (B_ i)).
+Proof. by apply/colP => l; rewrite !mxE. Qed.
+
+Lemma row_mxblock B_ i :
+  row i (\mxblock_(i, j) B_ i j) = \mxrow_j row (sig2 i) (B_ (sig1 i) j).
+Proof. by apply/rowP => l; rewrite !mxE. Qed.
+
+Lemma col_mxblock B_ j :
+  col j (\mxblock_(i, j) B_ i j) = \mxcol_i col (sig2 j) (B_ i (sig1 j)).
+Proof. by apply/colP => l; rewrite !mxE. Qed.
+
+End BlockMatrix.
+
+Notation "\mxblock_ ( i < m , j < n ) E" :=
+  (mxblock (fun (i : 'I_m) (j : 'I_ n) => E)) (only parsing) : ring_scope.
+Notation "\mxblock_ ( i , j < n ) E" :=
+  (\mxblock_(i < n, j < n) E) (only parsing) : ring_scope.
+Notation "\mxblock_ ( i , j ) E" := (\mxblock_(i < _, j < _) E) : ring_scope.
+Notation "\mxrow_ ( j < m ) E" := (mxrow (fun (j : 'I_m) => E))
+  (only parsing) : ring_scope.
+Notation "\mxrow_ j E" := (\mxrow_(j < _) E) : ring_scope.
+Notation "\mxcol_ ( i < m ) E" := (mxcol (fun (i : 'I_m) => E))
+  (only parsing) : ring_scope.
+Notation "\mxcol_ i E" := (\mxcol_(i < _) E) : ring_scope.
+
+Lemma tr_mxblock {T : Type} {p q : nat} {p_ : 'I_p -> nat} {q_ : 'I_q -> nat}
+  (B_ : forall i j, 'M[T]_(p_ i, q_ j)) :
+  (\mxblock_(i, j) B_ i j)^T = \mxblock_(i, j) (B_ j i)^T.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+
+Section SquareBlockMatrix.
+
+Context {T : Type} {p : nat} {p_ : 'I_p -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Implicit Type (s : 'I_sp).
+
+Lemma tr_mxrow n (B_ : forall j, 'M[T]_(n, p_ j)) :
+  (\mxrow_j B_ j)^T = \mxcol_i (B_ i)^T.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma tr_mxcol n (B_ : forall i, 'M[T]_(p_ i, n)) :
+  (\mxcol_i B_ i)^T = \mxrow_i (B_ i)^T.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma tr_submxblock (A : 'M[T]_sp) i j :
+  (submxblock A i j)^T = (submxblock A^T j i).
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma tr_submxrow n (A : 'M[T]_(n, sp)) j :
+  (submxrow A j)^T = (submxcol A^T j).
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma tr_submxcol n (A : 'M[T]_(sp, n)) i :
+  (submxcol A i)^T = (submxrow A^T i).
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+End SquareBlockMatrix.
+
+Section BlockRowRecL.
+Import tagnat.
+Context {T : Type} {m : nat} {p_ : 'I_m.+1 -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+
+Lemma mxsize_recl : (p_ ord0 + \sum_i p_ (lift ord0 i) = (\sum_i p_ i))%N.
+Proof. by rewrite big_ord_recl. Qed.
+
+Lemma mxrow_recl n (B_ : forall j, 'M[T]_(n, p_ j)) :
+  \mxrow_j B_ j = castmx (erefl, mxsize_recl)
+    (row_mx (B_ 0) (\mxrow_j B_ (lift ord0 j))).
+Proof.
+apply/mxrowP => i; rewrite mxrowK.
+apply/matrixP => j k; rewrite !(castmxE, mxE)/=.
+case: splitP => l /=; do [
+    rewrite [LHS]RankEsum big_mkcond big_ord_recl -big_mkcond/=;
+    rewrite /bump/= -addnA cast_ord_id;
+    under eq_bigl do rewrite add1n -ltn_predRL/=].
+  case: posnP => i0; last first.
+    by move=> lE; have := ltn_ord l; rewrite /= -lE -ltn_subRL subnn.
+  by rewrite (@val_inj _ _ _ i 0 i0) big_pred0_eq in k * => /val_inj->.
+case: posnP => i0.
+  rewrite (@val_inj _ _ _ i 0 i0) big_pred0_eq in k l * => kE.
+  by have := ltn_ord k; rewrite /= [val k]kE -ltn_subRL subnn.
+have i_lt : i.-1 < m by rewrite -subn1 ltn_subLR.
+set i' := lift ord0 (Ordinal i_lt).
+have ii' : i = i' by apply/val_inj; rewrite /=/bump/= add1n prednK.
+have k_lt : k < p_ i' by rewrite -ii'.
+move=> /addnI; rewrite eqRank => /val_inj/= /[dup] kl<-; rewrite mxE.
+rewrite Rank2K//; case: _ / esym; rewrite cast_ord_id/=.
+rewrite -/i'; set j' := Ordinal _; have : k = j' :> nat by [].
+by move: j'; rewrite -ii' => j' /val_inj->.
+Qed.
+
+End BlockRowRecL.
+
+Lemma mxcol_recu {T : Type} {p : nat} {p_ : 'I_p.+1 -> nat} m
+    (B_ : forall j, 'M[T]_(p_ j, m)) :
+  \mxcol_j B_ j = castmx (mxsize_recl, erefl)
+    (col_mx (B_ 0) (\mxcol_j B_ (lift ord0 j))).
+Proof.
+by apply: trmx_inj; rewrite trmx_cast tr_col_mx !tr_mxcol mxrow_recl.
+Qed.
+
+Section BlockMatrixRec.
+Local Notation e := (mxsize_recl, mxsize_recl).
+Local Notation l0 := (lift ord0).
+Context {T : Type}.
+
+Lemma mxblock_recu {p q : nat} {p_ : 'I_p.+1 -> nat} {q_ : 'I_q -> nat}
+    (B_ : forall i j, 'M[T]_(p_ i, q_ j)) :
+  \mxblock_(i, j) B_ i j = castmx (mxsize_recl, erefl) (col_mx
+     (\mxrow_j B_ ord0 j)
+     (\mxblock_(i, j) B_ (l0 i) j)).
+Proof. by rewrite !mxblockEv mxcol_recu. Qed.
+
+Lemma mxblock_recl {p q : nat} {p_ : 'I_p -> nat} {q_ : 'I_q.+1 -> nat}
+    (B_ : forall i j, 'M[T]_(p_ i, q_ j)) :
+  \mxblock_(i, j) B_ i j = castmx (erefl, mxsize_recl)
+  (row_mx (\mxcol_i B_ i ord0) (\mxblock_(i, j) B_ i (l0 j))).
+Proof. by rewrite !mxblockEh mxrow_recl. Qed.
+
+Lemma mxblock_recul {p q : nat} {p_ : 'I_p.+1 -> nat} {q_ : 'I_q.+1 -> nat}
+    (B_ : forall i j, 'M[T]_(p_ i, q_ j)) :
+  \mxblock_(i, j) B_ i j = castmx e (block_mx
+     (B_ 0 0)                  (\mxrow_j B_ ord0 (l0 j))
+     (\mxcol_i B_ (l0 i) ord0) (\mxblock_(i, j) B_ (l0 i) (l0 j))).
+Proof.
+rewrite mxblock_recl mxcol_recu mxblock_recu -cast_row_mx -block_mxEh.
+by rewrite castmx_comp; apply: eq_castmx.
+Qed.
+
+Lemma mxrowEblock {q : nat} {q_ : 'I_q -> nat} m
+    (R_ : forall j, 'M[T]_(m, q_ j)) :
+  (\mxrow_j R_ j) =
+  castmx (big_ord1 _ (fun=> m), erefl) (\mxblock_(i < 1, j < q) R_ j).
+Proof.
+rewrite mxblock_recu castmx_comp.
+apply/matrixP => i j; rewrite !castmxE !mxE/=; case: splitP => //=.
+  by move=> k /val_inj->; rewrite ?cast_ord_id ?mxE//=.
+by move=> [k klt]; suff: false by []; rewrite big_ord0 in klt.
+Qed.
+
+Lemma mxcolEblock {p : nat} {p_ : 'I_p -> nat} n
+    (C_ : forall i, 'M[T]_(p_ i, n)) :
+  (\mxcol_i C_ i) =
+  castmx (erefl, big_ord1 _ (fun=> n)) (\mxblock_(i < p, j < 1) C_ i).
+Proof.
+by apply: trmx_inj; rewrite tr_mxcol mxrowEblock trmx_cast tr_mxblock.
+Qed.
+
+Lemma mxEmxrow m n (A : 'M[T]_(m, n)) :
+  A = castmx (erefl, big_ord1 _ (fun=> n)) (\mxrow__ A).
+Proof.
+apply/matrixP => i j; rewrite castmxE !mxE/= cast_ord_id.
+congr (A i); set j' := cast_ord _ _.
+suff -> : j' = (tagnat.Rank 0 j) by apply/val_inj; rewrite tagnat.Rank2K.
+by apply/val_inj; rewrite [RHS]tagnat.RankEsum/= big_pred0_eq add0n.
+Qed.
+
+Lemma mxEmxcol m n (A : 'M[T]_(m, n)) :
+  A = castmx (big_ord1 _ (fun=> m), erefl) (\mxcol__ A).
+Proof. by apply: trmx_inj; rewrite trmx_cast tr_mxcol [LHS]mxEmxrow. Qed.
+
+Lemma mxEmxblock m n (A : 'M[T]_(m, n)) :
+  A = castmx (big_ord1 _ (fun=> m), big_ord1 _ (fun=> n))
+             (\mxblock_(i < 1, j < 1) A).
+Proof. by rewrite [LHS]mxEmxrow mxrowEblock castmx_comp; apply: eq_castmx. Qed.
+
+End BlockMatrixRec.
+
+Section BlockRowZmod.
+Context {V : zmodType} {q : nat} {q_ : 'I_q -> nat}.
+Notation sq := (\sum_i q_ i)%N.
+Implicit Type (s : 'I_sq).
+
+Lemma mxrowD m (R_ R'_ : forall j, 'M[V]_(m, q_ j)) :
+  \mxrow_j (R_ j + R'_ j) = \mxrow_j (R_ j) + \mxrow_j (R'_ j).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxrowN m (R_ : forall j, 'M[V]_(m, q_ j)) :
+  \mxrow_j (- R_ j) = - \mxrow_j (R_ j).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxrowB m (R_ R'_ : forall j, 'M[V]_(m, q_ j)) :
+  \mxrow_j (R_ j - R'_ j) = \mxrow_j (R_ j) - \mxrow_j (R'_ j).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxrow0 m : \mxrow_j (0 : 'M[V]_(m, q_ j)) = 0.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxrow_const m a : \mxrow_j (const_mx a : 'M[V]_(m, q_ j)) = const_mx a.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxrow_sum (J : finType) m
+    (R_ : forall i j, 'M[V]_(m, q_ j)) (P : {pred J}) :
+  \mxrow_j (\sum_(i | P i) R_ i j) = \sum_(i | P i) \mxrow_j (R_ i j).
+Proof.
+apply/matrixP => i j; rewrite !(mxE, summxE).
+by apply: eq_bigr => l; rewrite !mxE.
+Qed.
+
+Lemma submxrowD m (B B' : 'M[V]_(m, sq)) j :
+ submxrow (B + B') j = submxrow B j + submxrow B' j.
+Proof. by apply/matrixP => i i'; rewrite !mxE. Qed.
+
+Lemma submxrowN m (B : 'M[V]_(m, sq)) j :
+ submxrow (- B) j = - submxrow B j.
+Proof. by apply/matrixP => i i'; rewrite !mxE. Qed.
+
+Lemma submxrowB m (B B' : 'M[V]_(m, sq)) j :
+ submxrow (B - B') j = submxrow B j - submxrow B' j.
+Proof. by apply/matrixP => i i'; rewrite !mxE. Qed.
+
+Lemma submxrow0 m j : submxrow (0 : 'M[V]_(m, sq)) j = 0.
+Proof. by apply/matrixP=> i i'; rewrite !mxE. Qed.
+
+Lemma submxrow_sum (J : finType) m
+   (R_ : forall i, 'M[V]_(m, sq)) (P : {pred J}) j:
+  submxrow (\sum_(i | P i) R_ i) j = \sum_(i | P i) submxrow (R_ i) j.
+Proof.
+apply/matrixP => i i'; rewrite !(mxE, summxE).
+by apply: eq_bigr => l; rewrite !mxE.
+Qed.
+
+End BlockRowZmod.
+
+Section BlockRowRing.
+Context {R : ringType} {n : nat} {q_ : 'I_n -> nat}.
+Notation sq := (\sum_i q_ i)%N.
+Implicit Type (s : 'I_sq).
+
+Lemma mul_mxrow m n' (A : 'M[R]_(m, n')) (R_ : forall j, 'M[R]_(n', q_ j)) :
+  A *m \mxrow_j R_ j= \mxrow_j (A *m R_ j).
+Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+
+Lemma mul_submxrow m n' (A : 'M[R]_(m, n')) (B : 'M[R]_(n', sq)) j :
+  A *m submxrow B j= submxrow (A *m B) j.
+Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+
+End BlockRowRing.
+
+Section BlockColZmod.
+Context {V : zmodType} {n : nat} {p_ : 'I_n -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Implicit Type (s : 'I_sp).
+
+Lemma mxcolD m (C_ C'_ : forall i, 'M[V]_(p_ i, m)) :
+  \mxcol_i (C_ i + C'_ i) = \mxcol_i (C_ i) + \mxcol_i (C'_ i).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxcolN m (C_ : forall i, 'M[V]_(p_ i, m)) :
+  \mxcol_i (- C_ i) = - \mxcol_i (C_ i).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxcolB m (C_ C'_ : forall i, 'M[V]_(p_ i, m)) :
+  \mxcol_i (C_ i - C'_ i) = \mxcol_i (C_ i) - \mxcol_i (C'_ i).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxcol0 m : \mxcol_i (0 : 'M[V]_(p_ i, m)) = 0.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxcol_const m a : \mxcol_j (const_mx a : 'M[V]_(p_ j, m)) = const_mx a.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxcol_sum (I : finType) m (C_ : forall j i, 'M[V]_(p_ i, m)) (P : {pred I}):
+  \mxcol_i (\sum_(j | P j) C_ j i) = \sum_(j | P j) \mxcol_i (C_ j i).
+Proof.
+apply/matrixP => i j; rewrite !(mxE, summxE).
+by apply: eq_bigr => l; rewrite !mxE.
+Qed.
+
+Lemma submxcolD m (B B' : 'M[V]_(sp, m)) i :
+ submxcol (B + B') i = submxcol B i + submxcol B' i.
+Proof. by apply/matrixP => j j'; rewrite !mxE. Qed.
+
+Lemma submxcolN m (B : 'M[V]_(sp, m)) i :
+ submxcol (- B) i = - submxcol B i.
+Proof. by apply/matrixP => j j'; rewrite !mxE. Qed.
+
+Lemma submxcolB m (B B' : 'M[V]_(sp, m)) i :
+ submxcol (B - B') i = submxcol B i - submxcol B' i.
+Proof. by apply/matrixP => j j'; rewrite !mxE. Qed.
+
+Lemma submxcol0 m i : submxcol (0 : 'M[V]_(sp, m)) i = 0.
+Proof. by apply/matrixP=> j j'; rewrite !mxE. Qed.
+
+Lemma submxcol_sum (I : finType) m
+   (C_ : forall j, 'M[V]_(sp, m)) (P : {pred I}) i :
+  submxcol (\sum_(j | P j) C_ j) i = \sum_(j | P j) submxcol (C_ j) i.
+Proof.
+apply/matrixP => j j'; rewrite !(mxE, summxE).
+by apply: eq_bigr => l; rewrite !mxE.
+Qed.
+
+End BlockColZmod.
+
+Section BlockColRing.
+Context {R : ringType} {n : nat} {p_ : 'I_n -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Implicit Type (s : 'I_sp).
+
+Lemma mxcol_mul n' m (C_ : forall i, 'M[R]_(p_ i, n')) (A : 'M[R]_(n', m)) :
+  \mxcol_i C_ i *m A = \mxcol_i (C_ i *m A).
+Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+
+Lemma submxcol_mul n' m (B : 'M[R]_(sp, n')) (A : 'M[R]_(n', m)) i :
+  submxcol B i *m A = submxcol (B *m A) i.
+Proof. by apply/matrixP=> j s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+
+End BlockColRing.
+
+Section BlockMatrixZmod.
+Context {V : zmodType} {m n : nat}.
+Context {p_ : 'I_m -> nat} {q_ : 'I_n -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Notation sq := (\sum_i q_ i)%N.
+
+Lemma mxblockD (B_ B'_ : forall i j, 'M[V]_(p_ i, q_ j)) :
+  \mxblock_(i, j) (B_ i j + B'_ i j) =
+  \mxblock_(i, j) (B_ i j) + \mxblock_(i, j) (B'_ i j).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxblockN (B_ : forall i j, 'M[V]_(p_ i, q_ j)) :
+  \mxblock_(i, j) (- B_ i j) = - \mxblock_(i, j) (B_ i j).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxblockB (B_ B'_ : forall i j, 'M[V]_(p_ i, q_ j)) :
+  \mxblock_(i, j) (B_ i j - B'_ i j) =
+  \mxblock_(i, j) (B_ i j) - \mxblock_(i, j) (B'_ i j).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxblock0 : \mxblock_(i, j) (0 : 'M[V]_(p_ i, q_ j)) = 0.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxblock_const a :
+  \mxblock_(i, j) (const_mx a : 'M[V]_(p_ i, q_ j)) = const_mx a.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma mxblock_sum (I : finType)
+    (B_ : forall k i j, 'M[V]_(p_ i, q_ j)) (P : {pred I}):
+  \mxblock_(i, j) (\sum_(k | P k) B_ k i j) =
+  \sum_(k | P k) \mxblock_(i, j) (B_ k i j).
+Proof.
+apply/matrixP => i j; rewrite !(mxE, summxE).
+by apply: eq_bigr => l; rewrite !mxE.
+Qed.
+
+Lemma submxblockD (B B' : 'M[V]_(sp, sq)) i j :
+ submxblock (B + B') i j = submxblock B i j + submxblock B' i j.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma submxblockN (B : 'M[V]_(sp, sq)) i j :
+ submxblock (- B) i j = - submxblock B i j.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma submxblockB (B B' : 'M[V]_(sp, sq)) i j :
+ submxblock (B - B') i j = submxblock B i j - submxblock B' i j.
+Proof. by apply/matrixP => k l; rewrite !mxE. Qed.
+
+Lemma submxblock0 i j : submxblock (0 : 'M[V]_(sp, sq)) i j = 0.
+Proof. by apply/matrixP=> k l; rewrite !mxE. Qed.
+
+Lemma submxblock_sum (I : finType)
+   (B_ : forall k, 'M[V]_(sp, sq)) (P : {pred I}) i j :
+  submxblock (\sum_(k | P k) B_ k) i j = \sum_(k | P k) submxblock (B_ k) i j.
+Proof.
+apply/matrixP => k l; rewrite !(mxE, summxE).
+by apply: eq_bigr => p; rewrite !mxE.
+Qed.
+
+End BlockMatrixZmod.
+
+Section BlockMatrixRing.
+Context {R : ringType} {p q : nat} {p_ : 'I_p -> nat} {q_ : 'I_q -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Notation sq := (\sum_i q_ i)%N.
+
+Lemma mul_mxrow_mxcol m n
+    (R_ : forall j, 'M[R]_(m, p_ j)) (C_ : forall i, 'M[R]_(p_ i, n)) :
+  \mxrow_j R_ j *m \mxcol_i C_ i = \sum_i (R_ i *m C_ i).
+Proof.
+apply/matrixP => i j; rewrite !mxE summxE; under [RHS]eq_bigr do rewrite !mxE.
+rewrite sig_big_dep/= (reindex _ tagnat.sig_bij_on)/=.
+by apply: eq_bigr=> l _; rewrite !mxE.
+Qed.
+
+Lemma mul_mxcol_mxrow m
+    (C_ : forall i, 'M[R]_(p_ i, m)) (R_ : forall j, 'M[R]_(m, q_ j)) :
+  \mxcol_i C_ i*m \mxrow_j R_ j  = \mxblock_(i, j) (C_ i *m R_ j).
+Proof.
+apply/mxblockP => i j; rewrite mxblockK.
+by rewrite submxblockEh -mul_submxrow -submxcol_mul mxcolK mxrowK.
+Qed.
+
+Lemma mul_mxrow_mxblock m
+    (R_ : forall i, 'M[R]_(m, p_ i)) (B_ : forall i j, 'M[R]_(p_ i, q_ j)) :
+  \mxrow_i R_ i *m \mxblock_(i, j) B_ i j = \mxrow_j (\sum_i (R_ i *m B_ i j)).
+Proof.
+rewrite mxblockEv mul_mxrow_mxcol mxrow_sum.
+by apply: eq_bigr => i _; rewrite mul_mxrow.
+Qed.
+
+Lemma mul_mxblock_mxrow m
+    (B_ : forall i j, 'M[R]_(q_ i, p_ j)) (C_ : forall i, 'M[R]_(p_ i, m)) :
+  \mxblock_(i, j) B_ i j *m \mxcol_j C_ j = \mxcol_i (\sum_j (B_ i j *m C_ j)).
+Proof.
+rewrite mxblockEh mul_mxrow_mxcol mxcol_sum.
+by apply: eq_bigr => i _; rewrite mxcol_mul.
+Qed.
+
+End BlockMatrixRing.
+
+Lemma mul_mxblock {R : ringType} {p q r : nat}
+    {p_ : 'I_p -> nat} {q_ : 'I_q -> nat} {r_ : 'I_r -> nat}
+    (A_ : forall i j, 'M[R]_(p_ i, q_ j)) (B_ : forall j k, 'M_(q_ j, r_ k)) :
+  \mxblock_(i, j) A_ i j *m \mxblock_(j, k) B_ j k =
+  \mxblock_(i, k) \sum_j (A_ i j *m B_ j k).
+Proof.
+rewrite mxblockEh mul_mxrow_mxblock mxblockEh; apply: eq_mxrow => i.
+by under [LHS]eq_bigr do rewrite mxcol_mul; rewrite -mxcol_sum.
+Qed.
+
+Section SquareBlockMatrixZmod.
+Import Order.TTheory tagnat.
+Context {V : zmodType} {p : nat} {p_ : 'I_p -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Implicit Type (s : 'I_sp).
+
+Lemma is_trig_mxblockP (B_ : forall i j, 'M[V]_(p_ i, p_ j)) :
+  reflect [/\ forall (i j : 'I_p), (i < j)%N -> B_ i j = 0 &
+              forall i, is_trig_mx (B_ i i)]
+          (is_trig_mx (\mxblock_(i, j) B_ i j)).
+Proof.
+apply: (iffP is_trig_mxP); last first.
+  move=> [Blt1 /(_ _)/is_trig_mxP Blt2]/= s s'; rewrite !mxE.
+  rewrite -[_ < _]lt_sig ltEsig/= /sig1 /sig2 leEord.
+  case: ltngtP => //= ii'; first by rewrite (Blt1 _ _ ii') mxE.
+  move: (sig s) (sig s') ii' => -[/= i j] [/= i' +] /val_inj ii'.
+  by case: _ / ii' => j'; rewrite tagged_asE => /Blt2->.
+move=> Btrig; split=> [i i' lti|i].
+  apply/matrixP => j j'; have := Btrig (Rank _ j) (Rank _ j').
+  rewrite !mxE !Rank2K; do !case: _ / esym; rewrite !cast_ord_id.
+  rewrite /Rank [_ <= _]lt_rank.
+  by rewrite ltEsig/= leEord ltnW//= (ltn_geF lti)//= => /(_ isT).
+apply/is_trig_mxP => j j' ltj; have := Btrig (Rank _ j) (Rank _ j').
+rewrite !mxE !Rank2K; do! case: _ / esym; rewrite !cast_ord_id.
+by rewrite [_ <= _]lt_rank ltEsig/= !leEord leqnn/= tagged_asE; apply.
+Qed.
+
+Lemma is_trig_mxblock (B_ : forall i j, 'M[V]_(p_ i, p_ j)) :
+  is_trig_mx (\mxblock_(i, j) B_ i j) =
+  ([forall i : 'I_p, forall j : 'I_p, (i < j)%N ==> (B_ i j == 0)] &&
+   [forall i, is_trig_mx (B_ i i)]).
+Proof.
+by apply/is_trig_mxblockP/andP => -[] => [/(_ _ _ _)/eqP|]
+  => /'forall_'forall_implyP => [|/(_ _ _ _)/eqP] Blt /forallP.
+Qed.
+
+Lemma is_diag_mxblockP (B_ : forall i j, 'M[V]_(p_ i, p_ j)) :
+  reflect [/\ forall (i j : 'I_p), i != j -> B_ i j = 0 &
+              forall i, is_diag_mx (B_ i i)]
+          (is_diag_mx (\mxblock_(i, j) B_ i j)).
+Proof.
+apply: (iffP is_diag_mxP); last first.
+  move=> [Bneq1 /(_ _)/is_diag_mxP Bneq2]/= s s'; rewrite !mxE.
+  rewrite val_eqE -(can_eq sigK) /sig1 /sig2.
+  move: (sig s) (sig s') => -[/= i j] [/= i' j'].
+  rewrite -tag_eqE/= /tag_eq/= negb_and.
+  case: eqVneq => /= [ii'|/Bneq1->]; last by rewrite !mxE.
+  by rewrite -ii' in j' *; rewrite tagged_asE => /Bneq2.
+move=> Bdiag; split=> [i i' Ni|i].
+  apply/matrixP => j j'; have := Bdiag (Rank _ j) (Rank _ j').
+  rewrite !mxE !Rank2K; do !case: _ / esym; rewrite !cast_ord_id.
+  by rewrite eq_Rank negb_and Ni; apply.
+apply/is_diag_mxP => j j' Nj; have := Bdiag (Rank _ j) (Rank _ j').
+rewrite !mxE !Rank2K; do! case: _ / esym; rewrite !cast_ord_id.
+by rewrite eq_Rank negb_and val_eqE Nj orbT; apply.
+Qed.
+
+Lemma is_diag_mxblock (B_ : forall i j, 'M[V]_(p_ i, p_ j)) :
+  is_diag_mx (\mxblock_(i, j) B_ i j) =
+  ([forall i : 'I_p, forall j : 'I_p, (i != j) ==> (B_ i j == 0)] &&
+   [forall i, is_diag_mx (B_ i i)]).
+Proof.
+by apply/is_diag_mxblockP/andP => -[] => [/(_ _ _ _)/eqP|]
+  => /'forall_'forall_implyP => [|/(_ _ _ _)/eqP] Blt /forallP.
+Qed.
+
+Definition mxdiag (B_ : forall i, 'M[V]_(p_ i)) : 'M[V]_(\sum_i p_ i) :=
+  \mxblock_(j, k) if j == k then conform_mx 0 (B_ j) else 0.
+Local Notation "\mxdiag_ i E" := (mxdiag (fun i => E)) : ring_scope.
+
+Lemma submxblock_diag (B_  : forall i, 'M[V]_(p_ i)) i :
+  submxblock (\mxdiag_i B_ i) i i = B_ i.
+Proof. by rewrite mxblockK conform_mx_id eqxx. Qed.
+
+Lemma eq_mxdiagP (B_ B'_ : forall i, 'M[V]_(p_ i)) :
+  (forall i, B_ i = B'_ i) <-> (\mxdiag_i B_ i = \mxdiag_i B'_ i).
+Proof.
+rewrite /mxdiag -eq_mxblockP; split => [+ i j|+ i] => [/(_ i)|/(_ i i)].
+  by case: eqVneq => // -> ->.
+by rewrite eqxx !conform_mx_id.
+Qed.
+
+Lemma eq_mxdiag (B_ B'_ : forall i, 'M[V]_(p_ i)) :
+  (forall i, B_ i = B'_ i) -> (\mxdiag_i B_ i = \mxdiag_i B'_ i).
+Proof. by move=> /eq_mxdiagP. Qed.
+
+Lemma mxdiagD (B_ B'_ : forall i, 'M[V]_(p_ i)) :
+  \mxdiag_i (B_ i + B'_ i) = \mxdiag_i (B_ i) + \mxdiag_i (B'_ i).
+Proof.
+rewrite /mxdiag -mxblockD; apply/eq_mxblock => i j.
+by case: eqVneq => [->|]; rewrite ?conform_mx_id ?addr0.
+Qed.
+
+Lemma mxdiagN (B_ : forall i, 'M[V]_(p_ i)) :
+  \mxdiag_i (- B_ i) = - \mxdiag_i (B_ i).
+Proof.
+rewrite /mxdiag -mxblockN; apply/eq_mxblock => i j.
+by case: eqVneq => [->|]; rewrite ?conform_mx_id ?oppr0.
+Qed.
+
+Lemma mxdiagB (B_ B'_ : forall i, 'M[V]_(p_ i)) :
+  \mxdiag_i (B_ i - B'_ i) = \mxdiag_i (B_ i) - \mxdiag_i (B'_ i).
+Proof. by rewrite mxdiagD mxdiagN. Qed.
+
+Lemma mxdiag0 : \mxdiag_i (0 : 'M[V]_(p_ i)) = 0.
+Proof. by under [LHS]eq_mxdiag do rewrite -[0]subr0; rewrite mxdiagB subrr. Qed.
+
+Lemma mxdiag_sum (I : finType) (B_ : forall k i, 'M[V]_(p_ i)) (P : {pred I}) :
+  \mxdiag_i (\sum_(k | P k) B_ k i) = \sum_(k | P k) \mxdiag_i (B_ k i).
+Proof.
+rewrite /mxdiag -mxblock_sum; apply/eq_mxblock => i j.
+case: eqVneq => [->|]; rewrite ?conform_mx_id//; last by rewrite big1.
+by apply: eq_bigr => k; rewrite conform_mx_id.
+Qed.
+
+Lemma tr_mxdiag (B_ : forall i, 'M[V]_(p_ i)) :
+  (\mxdiag_i B_ i)^T = \mxdiag_i (B_ i)^T.
+Proof.
+rewrite tr_mxblock; apply/eq_mxblock => i j.
+by case: eqVneq => [->|]; rewrite ?trmx_conform ?trmx0.
+Qed.
+
+Lemma row_mxdiag (B_ : forall i, 'M[V]_(p_ i)) k :
+  let B'_ i := if sig1 k == i then conform_mx 0 (B_ i) else 0 in
+  row k (\mxdiag_ i B_ i) = row (sig2 k) (\mxrow_i B'_ i).
+Proof.
+rewrite /= row_mxblock row_mxrow; apply/eq_mxrow => i.
+by case: eqVneq => // e; congr row; rewrite e.
+Qed.
+
+Lemma col_mxdiag (B_ : forall i, 'M[V]_(p_ i)) k :
+  let B'_ i := if sig1 k == i then conform_mx 0 (B_ i) else 0 in
+  col k (\mxdiag_ i B_ i) = col (sig2 k) (\mxcol_i B'_ i).
+Proof.
+by rewrite /= col_mxblock col_mxcol; apply/eq_mxcol => i; rewrite eq_sym.
+Qed.
+
+End SquareBlockMatrixZmod.
+
+Notation "\mxdiag_ ( i < n ) E" := (mxdiag (fun i : 'I_n => E))
+  (only parsing) : ring_scope.
+Notation "\mxdiag_ i E" := (\mxdiag_(i < _) E) : ring_scope.
+
+Lemma mxdiag_recl {V : zmodType} {m : nat} {p_ : 'I_m.+1 -> nat}
+    (B_ : forall i, 'M[V]_(p_ i)) :
+  \mxdiag_i B_ i = castmx (mxsize_recl, mxsize_recl)
+    (block_mx (B_ 0) 0 0 (\mxdiag_i B_ (lift ord0 i))).
+Proof.
+rewrite /mxdiag mxblock_recul/= !conform_mx_id.
+by congr (castmx _ (block_mx _ _ _ _)); rewrite ?mxrow0 ?mxcol0.
+Qed.
+
+Section SquareBlockMatrixRing.
+Import tagnat.
+Context {R : ringType} {p : nat} {p_ : 'I_p -> nat}.
+Notation sp := (\sum_i p_ i)%N.
+Implicit Type (s : 'I_sp).
+
+Lemma mxtrace_mxblock (B_ : forall i j, 'M[R]_(p_ i, p_ j)) :
+  \tr (\mxblock_(i, j) B_ i j) = \sum_i \tr (B_ i i).
+Proof.
+rewrite /mxtrace sig_big_dep (reindex _ sig_bij_on)/=.
+by apply: eq_bigr => i _; rewrite !mxE.
+Qed.
+
+Lemma mxdiagZ a : \mxdiag_i (a%:M : 'M[R]_(p_ i)) = a%:M.
+Proof.
+apply/matrixP => s t; rewrite !mxE -(can_eq sigK) /sig1 /sig2.
+case: (sig s) (sig t) => [/= i j] [/= i' j'].
+case: eqP => [<-|ni] in j' *; last by rewrite !mxE; case: eqVneq => // -[].
+by rewrite conform_mx_id eq_Tagged/= mxE.
+Qed.
+
+Lemma diag_mxrow (B_ : forall j, 'rV[R]_(p_ j)) :
+  diag_mx (\mxrow_j B_ j) = \mxdiag_j (diag_mx (B_ j)).
+Proof.
+apply/matrixP => s s'; rewrite !mxE/= -(can_eq sigK) /sig1 /sig2.
+case: (sig s) (sig s') => [/= i j] [/= i' j'].
+rewrite -tag_eqE /tag_eq/=; case: (eqVneq i i') => ii'; rewrite ?mxE//=.
+by case: _ / ii' in j' *; rewrite tagged_asE/= conform_mx_id mxE.
+Qed.
+
+Lemma mxtrace_mxdiag (B_ : forall i, 'M[R]_(p_ i)) :
+  \tr (\mxdiag_i B_ i) = \sum_i \tr (B_ i).
+Proof.
+by rewrite mxtrace_mxblock; apply: eq_bigr => i _; rewrite eqxx/= conform_mx_id.
+Qed.
+
+Lemma mul_mxdiag_mxcol m
+    (D_ : forall i, 'M[R]_(p_ i)) (C_ : forall i, 'M[R]_(p_ i, m)):
+  \mxdiag_i D_ i *m \mxcol_i C_ i = \mxcol_i (D_ i *m C_ i).
+Proof.
+rewrite /mxdiag mxblockEh mul_mxrow_mxcol.
+under [LHS]eq_bigr do rewrite mxcol_mul; rewrite -mxcol_sum.
+apply/eq_mxcol => i; rewrite (bigD1 i)//= eqxx conform_mx_id big1 ?addr0//.
+by move=> j; case: eqVneq => //=; rewrite mul0mx.
+Qed.
+
+End SquareBlockMatrixRing.
+
+Lemma mul_mxrow_mxdiag {R : ringType} {p : nat} {p_ : 'I_p -> nat} m
+    (R_ : forall i, 'M[R]_(m, p_ i)) (D_ : forall i, 'M[R]_(p_ i)) :
+  \mxrow_i R_ i *m \mxdiag_i D_ i = \mxrow_i (R_ i *m D_ i).
+Proof.
+apply: trmx_inj; rewrite trmx_mul_rev !tr_mxrow tr_mxdiag mul_mxdiag_mxcol.
+by apply/ eq_mxcol => i; rewrite trmx_mul_rev.
+Qed.
+
+Lemma mul_mxblock_mxdiag {R : ringType} {p q : nat}
+  {p_ : 'I_p -> nat} {q_ : 'I_q -> nat}
+    (B_ : forall i j, 'M[R]_(p_ i, q_ j)) (D_ : forall j, 'M[R]_(q_ j)) :
+  \mxblock_(i, j) B_ i j *m \mxdiag_j D_ j = \mxblock_(i, j) (B_ i j *m D_ j).
+Proof.
+by rewrite !mxblockEh mul_mxrow_mxdiag; under eq_mxrow do rewrite mxcol_mul.
+Qed.
+
+Lemma mul_mxdiag_mxblock {R : ringType} {p q : nat}
+  {p_ : 'I_p -> nat} {q_ : 'I_q -> nat}
+    (D_ : forall j, 'M[R]_(p_ j)) (B_ : forall i j, 'M[R]_(p_ i, q_ j)):
+  \mxdiag_j D_ j *m \mxblock_(i, j) B_ i j = \mxblock_(i, j) (D_ i *m B_ i j).
+Proof.
+by rewrite !mxblockEv mul_mxdiag_mxcol; under eq_mxcol do rewrite mul_mxrow.
+Qed.

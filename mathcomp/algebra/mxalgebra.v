@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop finset fingroup perm.
+From mathcomp Require Import fintype finfun bigop finset fingroup perm order.
 From mathcomp Require Import div prime binomial ssralg finalg zmodp matrix.
 
 (*****************************************************************************)
@@ -1674,6 +1674,34 @@ rewrite -mxrank_sum_cap; split; first exact: leq_addr.
 by rewrite addnC (@eqn_add2r _ 0) eq_sym mxrank_eq0 -submx0.
 Qed.
 
+(* rank of block matrices with 0s inside *)
+
+Lemma rank_col_mx0 m n p (A : 'M_(m, n)) :
+  \rank (col_mx A (0 : 'M_(p, n))) = \rank A.
+Proof. by rewrite -addsmxE addsmx0. Qed.
+
+Lemma rank_col_0mx m n p (A : 'M_(m, n)) :
+  \rank (col_mx (0 : 'M_(p, n)) A) = \rank A.
+Proof. by rewrite -addsmxE adds0mx. Qed.
+
+Lemma rank_row_mx0 m n p (A : 'M_(m, n)) :
+  \rank (row_mx A (0 : 'M_(m, p))) = \rank A.
+Proof. by rewrite -mxrank_tr -[RHS]mxrank_tr tr_row_mx trmx0 rank_col_mx0. Qed.
+
+Lemma rank_row_0mx m n p (A : 'M_(m, n)) :
+  \rank (row_mx (0 : 'M_(m, p)) A) = \rank A.
+Proof. by rewrite -mxrank_tr -[RHS]mxrank_tr tr_row_mx trmx0 rank_col_0mx. Qed.
+
+Lemma rank_diag_block_mx m n p q
+    (A : 'M_(m, n)) (B : 'M_(p, q)) :
+  \rank (block_mx A 0 0 B) = (\rank A + \rank B)%N.
+Proof.
+rewrite block_mxEv -addsmxE mxrank_disjoint_sum ?rank_row_mx0 ?rank_row_0mx//.
+apply/eqP/rowV0P => v; rewrite sub_capmx => /andP[/submxP[x ->]].
+rewrite mul_mx_row mulmx0 => /submxP[y]; rewrite mul_mx_row mulmx0.
+by move=> /eq_row_mx[-> _]; rewrite row_mx0.
+Qed.
+
 (* Subspace projection matrix *)
 
 Lemma proj_mx_sub m n U V (W : 'M_(m, n)) : (W *m proj_mx U V <= U)%MS.
@@ -3072,3 +3100,29 @@ End MapMatrixSpaces.
 Notation mulsmx_addl := mulsmxDl (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use mulsmxDr instead.")]
 Notation mulsmx_addr := mulsmxDr (only parsing).
+
+Section RowColDiagBlockMatrix.
+Import tagnat.
+Context {F : fieldType} {n : nat} {p_ : 'I_n -> nat}.
+
+Lemma eqmx_col {m} (V_ : forall i, 'M[F]_(p_ i, m)) :
+  (\mxcol_i V_ i :=: \sum_i <<V_ i>>)%MS.
+Proof.
+apply/eqmxP/andP; split.
+  apply/row_subP => i; rewrite row_mxcol.
+  by rewrite (sumsmx_sup (sig1 i))// genmxE row_sub.
+apply/sumsmx_subP => i0 _; rewrite genmxE; apply/row_subP => j.
+apply: (eq_row_sub (Rank _ j)); apply/rowP => k.
+by rewrite !mxE Rank2K; case: _ / esym; rewrite cast_ord_id.
+Qed.
+
+Lemma rank_mxdiag (V_ : forall i, 'M[F]_(p_ i)) :
+  (\rank (\mxdiag_i V_ i) = \sum_i \rank (V_ i))%N.
+Proof.
+elim: {+}n {+}p_ V_ => [|m IHm] q_ V_.
+  by move: (\mxdiag__ _); rewrite !big_ord0 => M; rewrite flatmx0 mxrank0.
+rewrite mxdiag_recl [RHS]big_ord_recl/= -IHm.
+by case: _ / mxsize_recl; rewrite ?castmx_id rank_diag_block_mx.
+Qed.
+
+End RowColDiagBlockMatrix.
