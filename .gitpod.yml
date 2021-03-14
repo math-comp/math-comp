@@ -1,14 +1,18 @@
 # The Docker image to run your workspace in. Defaults to gitpod/workspace-full
-image: .gitpod.dockerfile
+image:
+  file: .gitpod.Dockerfile
+
 # Command to start on workspace startup (optional)
 tasks:
-  - init: sh <(curl -L https://nixos.org/nix/install) --no-daemon && direnv allow && de-preload
-  - command: sudo docker-up
+  - before: nix-shell
 
 ports:
   - port: 8000
     onOpen: open-preview
 
 vscode:
-  extensions: # from https://open-vsx.org/
+  extensions:
     - bbenoist.Nix@1.0.1:TbrU16w37jLfkqA6h20vuQ==
+    - maximedenes.vscoq@0.3.2:nH2SKs3TvzC87hvAzEEpyg==
+    - gares.coq-elpi-lang@0.0.4:fd+apIChnUwoQhvWFW33KA==
+    - gares.elpi-lang@0.1.1:Hq2+Ku1u3oO5KPtLqtFsIA==
