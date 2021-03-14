@@ -1,10 +1,14 @@
 # The Docker image to run your workspace in. Defaults to gitpod/workspace-full
-image: coqorg/coq:8.13
+image: .gitpod.dockerfile
 # Command to start on workspace startup (optional)
 tasks:
-# - init: install
-#   command: 
-# Ports to expose on workspace startup (optional)
+  - init: sh <(curl -L https://nixos.org/nix/install) --no-daemon && direnv allow && de-preload
+  - command: sudo docker-up
+
 ports:
   - port: 8000
     onOpen: open-preview
+
+vscode:
+  extensions: # from https://open-vsx.org/
+    - bbenoist.Nix@1.0.1:TbrU16w37jLfkqA6h20vuQ==
