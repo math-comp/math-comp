@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
-From mathcomp Require Import seq choice fintype.
+From mathcomp Require Import seq choice fintype path.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
