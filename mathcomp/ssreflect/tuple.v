@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
-From mathcomp Require Import seq choice fintype.
+From mathcomp Require Import seq choice fintype path.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -207,6 +207,10 @@ Canonical zip_tuple t u := Tuple (zip_tupleP t u).
 Lemma allpairs_tupleP f t (u : m.-tuple U) : @size rT (allpairs f t u) == n * m.
 Proof. by rewrite size_allpairs !size_tuple. Qed.
 Canonical allpairs_tuple f t u := Tuple (allpairs_tupleP f t u).
+
+Lemma sort_tupleP r t : size (sort r t) == n.
+Proof. by rewrite size_sort size_tuple. Qed.
+Canonical sort_tuple r t := Tuple (sort_tupleP r t).
 
 Definition thead (u : n.+1.-tuple T) := tnth u ord0.
 
