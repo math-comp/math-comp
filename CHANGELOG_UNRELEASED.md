@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- in `tuple.v', addedd Canonical definition for sort
+
 ### Added
 
 - in `bigop.v`, added lemma `sumnB`.
