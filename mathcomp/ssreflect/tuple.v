@@ -208,9 +208,9 @@ Lemma allpairs_tupleP f t (u : m.-tuple U) : @size rT (allpairs f t u) == n * m.
 Proof. by rewrite size_allpairs !size_tuple. Qed.
 Canonical allpairs_tuple f t u := Tuple (allpairs_tupleP f t u).
 
-Lemma sort_tupleP T n r t : size (sort r t) == n.
+Lemma sort_tupleP r t : size (sort r t) == n.
 Proof. by rewrite size_sort size_tuple. Qed.
-Canonical sort_tuple T n r t := Tuple (@sort_tupleP T n r t).
+Canonical sort_tuple r t := Tuple (@sort_tupleP T n r t).
 
 Definition thead (u : n.+1.-tuple T) := tnth u ord0.
 
