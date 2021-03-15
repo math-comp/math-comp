@@ -1,0 +1,10 @@
+-I mathcomp
+-R mathcomp mathcomp
+
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -redundant-canonical-projection
+-arg -w -arg -notation-overridden
+-arg -w -arg +duplicate-clear
+-arg -w -arg +non-primitive-record
+-arg -w -arg +undeclared-scope
+-arg -w -arg -deprecated-hint-without-locality
