@@ -1,3 +1,4 @@
+---
 # The Docker image to run your workspace in. Defaults to gitpod/workspace-full
 image:
   file: .gitpod.Dockerfile
@@ -13,6 +14,6 @@ ports:
 vscode:
   extensions:
     - bbenoist.Nix@1.0.1:TbrU16w37jLfkqA6h20vuQ==
-    - maximedenes.vscoq@0.3.2:nH2SKs3TvzC87hvAzEEpyg==
     - gares.coq-elpi-lang@0.0.4:fd+apIChnUwoQhvWFW33KA==
     - gares.elpi-lang@0.1.1:Hq2+Ku1u3oO5KPtLqtFsIA==
+    - maximedenes.vscoq@0.3.3:/adqFu9kP5hzZZO35NPV8g==
