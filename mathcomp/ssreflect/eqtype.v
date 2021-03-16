@@ -128,7 +128,7 @@ HB.structure Definition Equality := { T of HasDecEq T }.
 
 Notation eqType := Equality.type.
 Notation EqMixin := Equality.Mixin.
-Notation "[ 'eqMixin' 'of' T ]" := (Equality.of _ : Equality.mixin_of T)
+Notation "[ 'eqMixin' 'of' T ]" := (Equality.on _ : Equality.mixin_of T)
   (at level 0, format "[ 'eqMixin'  'of'  T ]") : form_scope.
 Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
@@ -528,8 +528,8 @@ HB.mixin Record IsSUB (T : Type) (P : pred T) (sub_sort : Type) := SubType {
 HB.structure Definition SUB (T : Type) (P : pred T) := { S of IsSUB T P S }.
 
 Notation subType := SUB.type.
-Notation val := (IsSUB.val_subdef (SUB.of _)).
-Notation "\val" := (IsSUB.val_subdef (SUB.of _)) (only parsing).
+Notation val := (IsSUB.val_subdef (SUB.on _)).
+Notation "\val" := (IsSUB.val_subdef (SUB.on _)) (only parsing).
 Notation "\val" := (IsSUB.val_subdef _) (only printing).
 
 HB.structure Definition SubEquality T (P : pred T) :=
@@ -550,7 +550,7 @@ Section Theory.
 
 Variable sT : subType P.
 
-Local Notation val := (IsSUB.val_subdef (SUB.of sT)).
+Local Notation val := (IsSUB.val_subdef (SUB.on sT)).
 Local Notation Sub := (@Sub _ _ sT).
 
 Lemma SubK x Px : val (@Sub x Px) = x. Proof. exact: SubK_subproof. Qed.

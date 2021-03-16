@@ -288,7 +288,7 @@ End ChoiceNamespace.
 Notation choiceType := Choice.type.
 Notation ChoiceMixin := Choice.Mixin.
 Notation choiceMixin T := (Choice.mixin_of T).
-Notation "[ 'choiceMixin' 'of' T ]" := (Choice.of _ : Choice.mixin_of T)
+Notation "[ 'choiceMixin' 'of' T ]" := (Choice.on _ : Choice.mixin_of T)
   (at level 0, format "[ 'choiceMixin'  'of'  T ]") : form_scope.
 Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T C)
   (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
@@ -517,7 +517,7 @@ HB.structure Definition Countable := { T of Choice T & IsCountable T }.
 Notation countType := Countable.type.
 Notation CountMixin := Countable.Mixin.
 Notation countMixin T := (Countable.mixin_of T).
-Notation "[ 'countMixin' 'of' T ]" := (Countable.of _ : Countable.mixin_of T)
+Notation "[ 'countMixin' 'of' T ]" := (Countable.on _ : Countable.mixin_of T)
   (at level 0, format "[ 'countMixin'  'of'  T ]") : form_scope.
 Notation "[ 'countType' 'of' T 'for' cT ]" := (Countable.clone T cT)
 (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
