@@ -1440,7 +1440,7 @@ Section RightRegular.
 Variable R : ringType.
 Implicit Types x y : R.
 
-HB.instance (R^c) (Zmodule.of R).
+HB.instance (R^c) (Zmodule.on R).
 
 Definition converse_ringMixin :=
   let mul' x y := y * x in
@@ -1628,7 +1628,7 @@ Section LalgebraTheory.
 Variables (R : ringType) (A : lalgType R).
 Implicit Types x y : A.
 
-HB.instance (R^o) (Ring.of R).
+HB.instance (R^o) (Ring.on R).
 
 Definition regular_lmodMixin :=
   let mkMixin := @Lmodule.Mixin  (@mul R) in
@@ -5936,9 +5936,9 @@ End PairUnitRing.
 (* HB FEATURE: (easy) types/defs/anything can be a factory *)
 (*    HB.saturate (R1 R2 : comUnitRingType) (R1 * R2)%type *)
 HB.instance Definition _ (R1 R2 : comUnitRingType) :=
-  UnitRing.of (R1 * R2)%type.
+  UnitRing.on (R1 * R2)%type.
 HB.instance Definition _ (R : comUnitRingType) (A1 A2 : unitAlgType R) :=
-  UnitRing.of (A1 * A2)%type.
+  UnitRing.on (A1 * A2)%type.
 
 Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :
   x *+ n = (x.1 *+ n, x.2 *+ n).
