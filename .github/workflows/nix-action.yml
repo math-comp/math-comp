@@ -39,7 +39,7 @@ jobs:
         matrix=$(nix-shell --arg do-nothing true --run nixTasks)
         echo ::set-output name=matrix::{\"task\":$(echo $matrix)}\"
 
-  main:
+  mathcomp:
     runs-on: ubuntu-latest
     needs:
     - setup
@@ -67,11 +67,11 @@ jobs:
       with:
         fetch-depth: 0
     - name: Building/fetching dependencies
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job dependencies
+      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job "_deps"
     - name: Building/fetching current project
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job main
+      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job mathcomp
 
-  shell:
+  mathcomp-single:
     runs-on: ubuntu-latest
     needs:
     - setup
@@ -99,7 +99,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Building/fetching dependencies
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job dependencies
+      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job _deps
     - name: Building/fetching current project
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job shell
+      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job mathcomp-single
 

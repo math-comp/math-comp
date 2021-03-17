@@ -6,11 +6,11 @@
 
   ## The attribute to build, either from nixpkgs
   ## of from the overlays located in `.nix/coq-overlays`
-  coq-attribute = "mathcomp";
+  attribute = "mathcomp";
 
   ## If you want to select a different attribute
   ## to serve as a basis for nix-shell edit this
-  shell-coq-attribute = "mathcomp-single";
+  shell-attribute = "mathcomp-single";
 
   ## Indicate the relative location of your _CoqProject
   ## If not specified, it defaults to "_CoqProject"
@@ -18,7 +18,7 @@
 
   ## select an entry to build in the following `tasks` set
   ## defaults to "default"
-  select = "coq-8.13";
+  default-task = "coq-8.13";
 
   ## write one `tasks.name` attribute set per
   ## alternative configuration, the can be used to
