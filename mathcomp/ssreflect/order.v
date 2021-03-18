@@ -1012,7 +1012,7 @@ Module Order.
 (**************)
 
 HB.mixin Record is_POrdered (d : unit) T of HasDecEq T := {
-  dummy    : let _ := T in let _ := d in unit; (* fixme *)
+  dummy    : let _ : Type := T in let _ : unit := d in unit; (* fixme *)
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
