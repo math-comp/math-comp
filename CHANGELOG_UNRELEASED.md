@@ -24,12 +24,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new lemmas `count_undup`, `eq_count_undup`, `rev_take`,
     `rev_drop`, `takeEmask`, `dropEmask`, `filter_iota_ltn`,
     `filter_iota_leq`, `map_nth_iota0` and `map_nth_iota`
+  + new lemma `allrelT`.
 
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
   + new lemmas `cat_sorted2`, `path_le`, `take_path`, `take_sorted`,
     `drop_sorted`, `undup_path`, `undup_sorted`, `count_merge`,
     `eq_count_merge`
+
+- in `path.v`, new lemmas: `eq(_in)_sorted` and `all_merge`.
 
 - in `tuple.v`, added Canonical tuple for sort.
 
@@ -173,6 +176,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   1.9.0: `perm_eq_rev`, `perm_eq_flatten`, `perm_eq_all`, `perm_eq_small`,
   `perm_eq_nilP`, `perm_eq_consP`, `leq_size_perm`, `uniq_perm_eq`,
   `perm_eq_iotaP`, and `perm_undup_count`.
+
+- in `path.v`, remove the deprecation aliases `eq(_in)_sorted` introduced in
+  MathComp 1.12.0. These names of lemmas are now taken by new lemmas
+  (cf. Added section).
+
+- in `order.v`, remove the deprecation aliases `eq_sorted_(le|lt)`.
 
 ### Infrastructure
 

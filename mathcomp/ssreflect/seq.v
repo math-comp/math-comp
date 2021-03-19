@@ -3674,6 +3674,10 @@ Lemma allrelP {T S : eqType} {r : T -> S -> bool} {xs ys} :
   reflect {in xs & ys, forall x y, r x y} (allrel r xs ys).
 Proof. by rewrite allrel_allpairsE; exact: all_allpairsP. Qed.
 
+Lemma allrelT {T S : Type} (xs : seq T) (ys : seq S) :
+  allrel (fun _ _ => true) xs ys = true.
+Proof. by elim: xs => //= ? ?; rewrite allrel_consl all_predT. Qed.
+
 Section All2Rel.
 
 Variable (T : nonPropType) (r : rel T).
