@@ -208,6 +208,9 @@ Proof. by move=> Pxs; apply/idP/idP; apply: sub_in_path Pxs. Qed.
 Lemma eq_in_cycle s : all P s -> cycle e s = cycle e' s.
 Proof. by move=> Ps; apply/idP/idP; apply: sub_in_cycle Ps. Qed.
 
+Lemma eq_in_sorted s : all P s -> sorted e s = sorted e' s.
+Proof. by move=> Ps; apply/idP/idP; apply: sub_in_sorted Ps. Qed.
+
 End EqPath_in.
 
 Section SubPath.
@@ -227,6 +230,9 @@ Lemma eq_path : e =2 e' -> path e =2 path e'.
 Proof. by move=> ? ? ?; apply/eq_in_path/all_predT; apply: in2W. Qed.
 
 Lemma eq_cycle : e =2 e' -> cycle e =1 cycle e'.
+Proof. by move=> ee' [] // ? ?; apply: eq_path. Qed.
+
+Lemma eq_sorted : e =2 e' -> sorted e =1 sorted e'.
 Proof. by move=> ee' [] // ? ?; apply: eq_path. Qed.
 
 End SubPath.
@@ -1708,10 +1714,6 @@ End CycleArc.
 
 Prenex Implicits arc.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use sorted_eq instead.")]
-Notation eq_sorted := sorted_eq (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use irr_sorted_eq instead.")]
-Notation eq_sorted_irr := irr_sorted_eq (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use sorted_ltn_nth instead.")]
 Notation sorted_lt_nth := sorted_ltn_nth (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use sorted_leq_nth instead.")]

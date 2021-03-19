@@ -3540,11 +3540,6 @@ Proof. exact: anti_mono_in. Qed.
 
 End POrderMonotonyTheory.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use lt_sorted_eq instead.")]
-Notation eq_sorted_lt := lt_sorted_eq (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use le_sorted_eq instead.")]
-Notation eq_sorted_le := le_sorted_eq (only parsing).
-
 End POrderTheory.
 
 Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
