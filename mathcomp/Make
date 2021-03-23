@@ -1,72 +1,72 @@
-algebra/all_algebra.v
-algebra/finalg.v
-algebra/countalg.v
-algebra/fraction.v
-algebra/intdiv.v
-algebra/interval.v
-algebra/matrix.v
-algebra/mxalgebra.v
-algebra/mxpoly.v
-algebra/polydiv.v
-algebra/poly.v
-algebra/polyXY.v
-algebra/rat.v
-algebra/ring_quotient.v
+# algebra/all_algebra.v
+# algebra/finalg.v
+# algebra/countalg.v
+# algebra/fraction.v
+# algebra/intdiv.v
+# algebra/interval.v
+# algebra/matrix.v
+# algebra/mxalgebra.v
+# algebra/mxpoly.v
+# algebra/polydiv.v
+# algebra/poly.v
+# algebra/polyXY.v
+# algebra/rat.v
+# algebra/ring_quotient.v
 algebra/ssralg.v
-algebra/ssrint.v
-algebra/ssrnum.v
-algebra/vector.v
-algebra/zmodp.v
-all/all.v
-character/all_character.v
-character/character.v
-character/classfun.v
-character/inertia.v
-character/integral_char.v
-character/mxabelem.v
-character/mxrepresentation.v
-character/vcharacter.v
-field/algC.v
-field/algebraics_fundamentals.v
-field/algnum.v
-field/all_field.v
-field/closed_field.v
-field/cyclotomic.v
-field/falgebra.v
-field/fieldext.v
-field/finfield.v
-field/galois.v
-field/separable.v
-fingroup/action.v
-fingroup/all_fingroup.v
-fingroup/automorphism.v
+# algebra/ssrint.v
+# algebra/ssrnum.v
+# algebra/vector.v
+# algebra/zmodp.v
+# all/all.v
+# character/all_character.v
+# character/character.v
+# character/classfun.v
+# character/inertia.v
+# character/integral_char.v
+# character/mxabelem.v
+# character/mxrepresentation.v
+# character/vcharacter.v
+# field/algC.v
+# field/algebraics_fundamentals.v
+# field/algnum.v
+# field/all_field.v
+# field/closed_field.v
+# field/cyclotomic.v
+# field/falgebra.v
+# field/fieldext.v
+# field/finfield.v
+# field/galois.v
+# field/separable.v
+# fingroup/action.v
+# fingroup/all_fingroup.v
+# fingroup/automorphism.v
 fingroup/fingroup.v
-fingroup/gproduct.v
+# fingroup/gproduct.v
 fingroup/morphism.v
-fingroup/perm.v
+# fingroup/perm.v
 fingroup/presentation.v
-fingroup/quotient.v
-solvable/abelian.v
-solvable/all_solvable.v
-solvable/alt.v
-solvable/burnside_app.v
-solvable/center.v
-solvable/commutator.v
-solvable/cyclic.v
-solvable/extraspecial.v
-solvable/extremal.v
-solvable/finmodule.v
-solvable/frobenius.v
-solvable/gfunctor.v
-solvable/gseries.v
-solvable/hall.v
-solvable/jordanholder.v
-solvable/maximal.v
-solvable/nilpotent.v
-solvable/pgroup.v
-solvable/primitive_action.v
-solvable/sylow.v
-ssreflect/all_ssreflect.v
+# fingroup/quotient.v
+# solvable/abelian.v
+# solvable/all_solvable.v
+# solvable/alt.v
+# solvable/burnside_app.v
+# solvable/center.v
+# solvable/commutator.v
+# solvable/cyclic.v
+# solvable/extraspecial.v
+# solvable/extremal.v
+# solvable/finmodule.v
+# solvable/frobenius.v
+# solvable/gfunctor.v
+# solvable/gseries.v
+# solvable/hall.v
+# solvable/jordanholder.v
+# solvable/maximal.v
+# solvable/nilpotent.v
+# solvable/pgroup.v
+# solvable/primitive_action.v
+# solvable/sylow.v
+# ssreflect/all_ssreflect.v
 ssreflect/bigop.v
 ssreflect/binomial.v
 ssreflect/choice.v
@@ -76,12 +76,12 @@ ssreflect/finfun.v
 ssreflect/fingraph.v
 ssreflect/finset.v
 ssreflect/fintype.v
-ssreflect/generic_quotient.v
+# ssreflect/generic_quotient.v
 ssreflect/order.v
 ssreflect/path.v
 ssreflect/prime.v
 ssreflect/seq.v
-ssreflect/ssrAC.v
+# ssreflect/ssrAC.v
 ssreflect/ssrbool.v
 ssreflect/ssreflect.v
 ssreflect/ssrfun.v
@@ -102,3 +102,5 @@ ssreflect/tuple.v
 -arg -w -arg +undeclared-scope
 -arg -w -arg -deprecated-hint-without-locality
 -arg -w -arg -deprecated-ident-entry
+-arg -w -arg -elpi.add-const-for-axiom-or-sectionvar
+-arg -w -arg -deprecated-syntactic-definition

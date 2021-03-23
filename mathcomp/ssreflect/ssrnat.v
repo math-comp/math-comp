@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
+From HB Require Import structures.
 Require Import BinNat.
 Require BinPos Ndec.
 Require Export Ring.
@@ -177,7 +178,7 @@ by elim: n m => [|n IHn] [|m] //= /IHn->.
 Qed.
 
 Canonical nat_eqMixin := EqMixin eqnP.
-Canonical nat_eqType := Eval hnf in EqType nat nat_eqMixin.
+HB.instance nat nat_eqMixin.
 
 Arguments eqn !m !n.
 Arguments eqnP {x y}.
@@ -1817,7 +1818,7 @@ by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //= /IHp [->].
 Qed.
 
 Canonical bin_nat_eqMixin := EqMixin eq_binP.
-Canonical bin_nat_eqType := Eval hnf in EqType N bin_nat_eqMixin.
+HB.instance N bin_nat_eqMixin.
 
 Arguments N.eqb !n !m.
 
@@ -1910,7 +1911,7 @@ Coercion extend_number : number >-> Funclass.
 
 Canonical number_subType := [newType for bin_of_number].
 Definition number_eqMixin := Eval hnf in [eqMixin of number by <:].
-Canonical number_eqType := Eval hnf in EqType number number_eqMixin.
+HB.instance number number_eqMixin.
 
 Notation "[ 'Num' 'of' e ]" := (Num (bin_of_nat e))
   (at level 0, format "[ 'Num'  'of'  e ]") : nat_scope.
