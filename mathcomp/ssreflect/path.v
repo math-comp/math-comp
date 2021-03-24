@@ -73,7 +73,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*    of splitP will also simultaneously replace take (index x p) with p1 and *)
 (*    drop (index x p).+1 p with p2.                                          *)
 (*  - splitPl applies when x \in x0 :: p; it replaces p with p1 ++ p2 and     *)
-(*    simultaneously generates an equation x = last x0 p.                     *)
+(*    simultaneously generates an equation x = last x0 p1.                    *)
 (*  - splitPr applies when x \in p; it replaces p with (p1 ++ x :: p2), so x  *)
 (*    appears explicitly at the start of the right part.                      *)
 (* The parts p1 and p2 are computed using index/take/drop in all cases, but   *)
