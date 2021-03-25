@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
 From HB Require Import structures.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
 Require Import BinNat.
 Require BinPos Ndec.
 Require Export Ring.

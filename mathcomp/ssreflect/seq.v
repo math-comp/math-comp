@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 From HB Require Import structures.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 
 (******************************************************************************)
 (* The seq type is the ssreflect type for sequences; it is an alias for the   *)
