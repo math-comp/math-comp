@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 mkdir -p .theia
-echo "{ \"coqtop.binPath\": \"$COQBIN\" }" > .theia/settings.json
+echo "{ \"coqtop.binPath\": \"$(dirname $(which coqtop))\" }" > .theia/settings.json
