@@ -133,6 +133,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`:
   + Lemmas `big_nat_widenl`, `big_geq_mkord`
+- in `ssrint.v`,
+  + Lemmas: `mulr_absz`, `natr_absz`, `lez_abs`
 
 - In `ssralg.v`
   + new lemma `fmorph_eq`
