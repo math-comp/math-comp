@@ -149,11 +149,14 @@ Proof. by case: s => //= y s /andP[]. Qed.
 Lemma path_min_sorted x s : all (e x) s -> path x s = sorted s.
 Proof. by case: s => //= y s /andP [->]. Qed.
 
+Lemma pairwise_sorted s : pairwise e s -> sorted s.
+Proof. by elim: s => //= x s IHs /andP[/path_min_sorted -> /IHs]. Qed.
+
 End Path.
 
-Section RevPath.
+Section PathEq.
 
-Variables (e : rel T).
+Variables (e e' : rel T).
 
 Lemma rev_path x p :
   path e (last x p) (rev (belast x p)) = path (fun z => e^~ z) x p.
@@ -171,7 +174,19 @@ Qed.
 Lemma rev_sorted p : sorted e (rev p) = sorted (fun z => e^~ z) p.
 Proof. by case: p => //= x p; rewrite -rev_path lastI rev_rcons. Qed.
 
-End RevPath.
+Lemma path_relI x s :
+  path [rel x y | e x y && e' x y] x s = path e x s && path e' x s.
+Proof. by elim: s x => //= y s IHs x; rewrite andbACA IHs. Qed.
+
+Lemma cycle_relI s :
+  cycle [rel x y | e x y && e' x y] s = cycle e s && cycle e' s.
+Proof. by case: s => [|? ?]; last apply: path_relI. Qed.
+
+Lemma sorted_relI s :
+  sorted [rel x y | e x y && e' x y] s = sorted e s && sorted e' s.
+Proof. by case: s; last apply: path_relI. Qed.
+
+End PathEq.
 
 Section SubPath_in.
 
@@ -977,6 +992,19 @@ Proof. by rewrite sorted_pairwise // pairwise_cat => /and3P[/allrel_merge]. Qed.
 Lemma sorted_sort s : sorted leT s -> sort s = s.
 Proof. by rewrite sorted_pairwise //; apply/pairwise_sort. Qed.
 
+Lemma mergeA : associative merge.
+Proof.
+elim=> // x xs IHxs; elim=> // y ys IHys; elim=> [|z zs IHzs] /=.
+  by case: ifP.
+case: ifP; case: ifP => /= lexy leyz.
+- by rewrite lexy (leT_tr lexy leyz) -IHxs /= leyz.
+- by rewrite lexy leyz -IHys.
+- case: ifP => lexz; first by rewrite -IHxs //= leyz.
+  by rewrite -!/(merge (_ :: _)) IHzs /= lexy.
+- suff->: leT x z = false by rewrite leyz // -!/(merge (_ :: _)) IHzs /= lexy.
+  by apply/contraFF/leT_tr: leyz; have := leT_total x y; rewrite lexy.
+Qed.
+
 End SortSeq.
 
 Arguments merge {T} relT !s1 !s2 : rename.
@@ -987,6 +1015,7 @@ Arguments merge_path {T leT} leT_total {x s1 s2}.
 Arguments merge_sorted {T leT} leT_total {s1 s2}.
 Arguments sorted_merge {T leT} leT_tr {s t}.
 Arguments sorted_sort {T leT} leT_tr {s}.
+Arguments mergeA {T leT} leT_total leT_tr.
 
 Section SortMap.
 Variables (T T' : Type) (f : T' -> T).
@@ -1114,8 +1143,7 @@ Qed.
 Lemma ltn_sorted_uniq_leq s : sorted ltn s = uniq s && sorted leq s.
 Proof.
 rewrite (sorted_pairwise leq_trans) (sorted_pairwise ltn_trans) uniq_pairwise.
-elim: s => //= n s ->; rewrite andbACA -all_predI; congr andb.
-by apply/eq_all => ? /=; case: ltngtP.
+by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite ltn_neqAle.
 Qed.
 
 Lemma iota_sorted i n : sorted leq (iota i n).
@@ -1293,8 +1321,8 @@ Variables (leT_total : total leT) (leT_tr : transitive leT).
 
 Lemma subseq_sort : {homo sort leT : t s / subseq t s}.
 Proof.
-move=> _ s /subseqP [m _ ->].
-case: (mask_sort leT_total leT_tr s m) => m' <-; exact: mask_subseq.
+move=> _ s /subseqP [m _ ->]; have [m' <-] := mask_sort leT_total leT_tr s m.
+exact: mask_subseq.
 Qed.
 
 Lemma sorted_subseq_sort t s :

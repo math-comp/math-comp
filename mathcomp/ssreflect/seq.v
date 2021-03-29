@@ -302,6 +302,9 @@ Proof. by elim: s1 => //= x s1 ->. Qed.
 Lemma size_cat s1 s2 : size (s1 ++ s2) = size s1 + size s2.
 Proof. by elim: s1 => //= x s1 ->. Qed.
 
+Lemma cat_nilp s1 s2 : nilp (s1 ++ s2) = nilp s1 && nilp s2.
+Proof. by case: s1. Qed.
+
 (* last, belast, rcons, and last induction. *)
 
 Fixpoint rcons s z := if s is x :: s' then x :: rcons s' z else [:: z].
@@ -873,6 +876,9 @@ Proof. by rewrite -cats1 -catrevE. Qed.
 
 Lemma size_rev s : size (rev s) = size s.
 Proof. by elim: s => // x s IHs; rewrite rev_cons size_rcons IHs. Qed.
+
+Lemma rev_nilp s : nilp (rev s) = nilp s.
+Proof. by move: s (rev s) (size_rev s) => [|? ?] []. Qed.
 
 Lemma rev_cat s t : rev (s ++ t) = rev t ++ rev s.
 Proof. by rewrite -catrev_catr -catrev_catl. Qed.
@@ -3678,6 +3684,10 @@ Lemma allrelT {T S : Type} (xs : seq T) (ys : seq S) :
   allrel (fun _ _ => true) xs ys = true.
 Proof. by elim: xs => //= ? ?; rewrite allrel_consl all_predT. Qed.
 
+Lemma allrel_relI {T S : Type} (r r' : T -> S -> bool) xs ys :
+  allrel (fun x y => r x y && r' x y) xs ys = allrel r xs ys && allrel r' xs ys.
+Proof. by rewrite -all_predI; apply: eq_all => ?; rewrite /= -all_predI. Qed.
+
 Section All2Rel.
 
 Variable (T : nonPropType) (r : rel T).
@@ -3785,6 +3795,10 @@ Proof. by move=> rr' xs; apply/eq_in_pairwise/all_predT. Qed.
 Lemma pairwise_map {T T' : Type} (f : T' -> T) (r : rel T) xs :
   pairwise r (map f xs) = pairwise (relpre f r) xs.
 Proof. by elim: xs => //= x xs ->; rewrite all_map. Qed.
+
+Lemma pairwise_relI {T : Type} (r r' : rel T) (s : seq T) :
+  pairwise [rel x y | r x y && r' x y] s = pairwise r s && pairwise r' s.
+Proof. by elim: s => //= x s ->; rewrite andbACA all_predI. Qed.
 
 Section EqPairwise.
 

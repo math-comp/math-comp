@@ -2762,8 +2762,7 @@ Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
 Proof.
 rewrite (sorted_pairwise le_trans) (sorted_pairwise lt_trans) uniq_pairwise.
-elim: s => //= n s ->; rewrite andbACA -all_predI; congr andb.
-by apply/eq_all => ?; rewrite /= -lt_neqAle.
+by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite lt_neqAle.
 Qed.
 
 Lemma lt_sorted_eq s1 s2 : sorted <%O s1 -> sorted <%O s2 -> s1 =i s2 -> s1 = s2.

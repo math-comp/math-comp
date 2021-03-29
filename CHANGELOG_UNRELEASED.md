@@ -24,7 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new lemmas `count_undup`, `eq_count_undup`, `rev_take`,
     `rev_drop`, `takeEmask`, `dropEmask`, `filter_iota_ltn`,
     `filter_iota_leq`, `map_nth_iota0` and `map_nth_iota`
-  + new lemma `allrelT`.
+  + new lemmas `cat_nilp`, `rev_nilp`, `allrelT`, `allrel_relI`, and
+    `pairwise_relI`.
 
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
@@ -32,7 +33,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `drop_sorted`, `undup_path`, `undup_sorted`, `count_merge`,
     `eq_count_merge`
 
-- in `path.v`, new lemmas: `eq(_in)_sorted` and `all_merge`.
+- in `path.v`, new lemmas: `pairwise_sorted`, `path_relI`, `cycle_relI`,
+  `sorted_relI`, `eq(_in)_sorted`, `mergeA`, and `all_merge`.
 
 - in `tuple.v`, added Canonical tuple for sort.
 
