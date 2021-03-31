@@ -36,8 +36,8 @@ jobs:
     - name: Setup build matrix
       id: set-matrix
       run: |
-        matrix=$(nix-shell --arg do-nothing true --run nixTasks)
-        echo ::set-output name=matrix::{\"task\":$(echo $matrix)}\"
+        matrix=$(nix-shell --arg do-nothing true --run nixBundles)
+        echo ::set-output name=matrix::{\"bundle\":$(echo $matrix)}\"
 
   mathcomp:
     runs-on: ubuntu-latest
@@ -67,9 +67,9 @@ jobs:
       with:
         fetch-depth: 0
     - name: Building/fetching dependencies
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job "_deps"
+      run: nix-build --no-out-link --argstr ci "${{ matrix.bundle }}" --argstr ci-job "_deps"
     - name: Building/fetching current project
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job mathcomp
+      run: nix-build --no-out-link --argstr ci "${{ matrix.bundle }}" --argstr ci-job mathcomp
 
   mathcomp-single:
     runs-on: ubuntu-latest
@@ -99,7 +99,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Building/fetching dependencies
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job _deps
+      run: nix-build --no-out-link --argstr ci "${{ matrix.bundle }}" --argstr ci-job _deps
     - name: Building/fetching current project
-      run: nix-build --no-out-link --argstr ci "${{ matrix.task }}" --argstr ci-job mathcomp-single
+      run: nix-build --no-out-link --argstr ci "${{ matrix.bundle }}" --argstr ci-job mathcomp-single
 

@@ -16,18 +16,18 @@
   ## If not specified, it defaults to "_CoqProject"
   coqproject = "mathcomp/_CoqProject";
 
-  ## select an entry to build in the following `tasks` set
+  ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-task = "coq-8.13";
+  default-bundle = "coq-8.13";
 
-  ## write one `tasks.name` attribute set per
+  ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
   ## compute several ci jobs as well
 
   ## You can override Coq and other Coq coqPackages
   ## through the following attribute
 
-  tasks."coq-8.13".coqPackages.coq.override.version = "8.13";
-  tasks."coq-8.12".coqPackages.coq.override.version = "8.12";
-  tasks."coq-8.11".coqPackages.coq.override.version = "8.11";
+  bundles."coq-8.13".coqPackages.coq.override.version = "8.13";
+  bundles."coq-8.12".coqPackages.coq.override.version = "8.12";
+  bundles."coq-8.11".coqPackages.coq.override.version = "8.11";
 }
