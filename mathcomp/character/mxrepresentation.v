@@ -5763,7 +5763,8 @@ Hypotheses (irrG : mx_irreducible rG) (cGA : centgmx rG A).
 Notation FA := (gen_of irrG cGA).
 
 (* This should be [countMixin of FA by <:]*)
-Definition gen_countMixin := (sub_countMixin (gen_subType irrG cGA)).
+Definition gen_countMixin := (sub_countMixin
+   (gen_subType irrG cGA : @subType (Finite.sort _) _)).
 Canonical gen_countType := Eval hnf in CountType FA gen_countMixin.
 Canonical gen_subCountType := Eval hnf in [subCountType of FA].
 Definition gen_finMixin := [finMixin of FA by <:].
