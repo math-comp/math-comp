@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop ssralg.
-From mathcomp Require Import generic_quotient ring_quotient.
+(* From mathcomp Require Import generic_quotient ring_quotient. *)
 
 (*****************************************************************************)
 (* This file clones part of ssralg hierachy for countable types; it does not *)
