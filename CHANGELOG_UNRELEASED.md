@@ -111,6 +111,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + we provide an equality of spaces `eqmx_col` between `\mxcol_i V_
     i` and the sum of spaces `\sum_i <<V_ i>>)%MS`.
 
+- new file `mxred.v` which contains the theory of diagonalization. To
+  that effect, we define `conjmx`, `restrictmx`, `similar_to`,
+  `similar`, `similar_in`, `similar_in_to`, `all_similar_to`,
+  `similar_diag`, `diagonalizable_in`, `diagonalizable`,
+  `codiagonalizable_in`, `codiagonalizable`, `similar_trig`,
+  `trigonalizable_in`, `trigonalizable`, `cotrigonalizable_in`, and
+  `cotrigonalizable`; and their theory: `stablemx_comp`,
+  `stablemx_restrict`, `conjmxM`, `conjMmx`, `conjuMmx`, `conjMumx`,
+  `conjuMumx`, `conjmx_scalar`, `conj0mx`, `conjmx0`, `conjumx`,
+  `conj1mx`, `conjVmx`, `conjmxK`, `conjmxVK`, `horner_mx_conj`,
+  `horner_mx_uconj`, `horner_mx_uconjC`, `mxminpoly_conj`,
+  `mxminpoly_uconj`, `sub_kermxpoly_conjmx`, `sub_eigenspace_conjmx`,
+  `eigenpoly_conjmx`, `eigenvalue_conjmx`, `conjmx_eigenvalue`,
+  `similarPp`, `similarW`, `similarP`, `similarRL`, `similarLR`,
+  `similar_mxminpoly`, `similar_diag_row_base`, `similar_diagPp`,
+  `similar_diagP`, `similar_diagPex`, `similar_diagLR`,
+  `similar_diag_mxminpoly`, `similar_diag_sum`, `codiagonalizable1`,
+  `codiagonalizable_on`, `diagonalizable_diag`,
+  `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
+  `diagonalizableP`, `diagonalizable_conj_diag`, and
+  `codiagonalizableP`.
+
+Remark that even though `trigonalization` is defined, its theory is
+not here yet.
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
