@@ -1494,8 +1494,6 @@ Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T _)
 End BDistrLatticeExports.
 HB.export BDistrLatticeExports.
 
-End Order.
-
 (* STOP
 
 Module TBDistrLattice.
@@ -5071,8 +5069,11 @@ End PCan.
 Definition CanOrder f' (f_can : cancel f f') := PcanOrder (can_pcan f_can).
 
 End Total.
+*)
+
 End Order.
 
+(*
 Section Lattice.
 
 Variables (disp : unit) (T : porderType disp).
@@ -7816,3 +7817,5 @@ End tagnat.
 End tagnat.
 Arguments tagnat.Rank {n p_}.
 *)
+
+HB.reexport.
