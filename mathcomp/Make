@@ -11,7 +11,7 @@ algebra/countalg.v
 # algebra/poly.v
 # algebra/polyXY.v
 # algebra/rat.v
-# algebra/ring_quotient.v
+algebra/ring_quotient.v
 algebra/ssralg.v
 # algebra/ssrint.v
 # algebra/ssrnum.v
