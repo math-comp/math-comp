@@ -1603,71 +1603,23 @@ End TotalExports.
 
 HB.export TotalExports.
 
-(* STOP
+
 (**********)
 (* FINITE *)
 (**********)
 
-Module FinPOrder.
-Section ClassDef.
+#[mathcomp]
+HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base  : POrder.class_of T;
-  mixin : Finite.mixin_of (Equality.Pack base)
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> POrder.class_of.
-Local Coercion base2 T (c : class_of T) : Finite.class_of T :=
-  Finite.Class (mixin c).
-
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition pack :=
-  fun bT b & phant_id (@POrder.class disp bT) b =>
-  fun mT m & phant_id (@Finite.class mT) (@Finite.Class _ _ m) =>
-  Pack disp (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT class.
-Definition finType := @Finite.Pack cT class.
-Definition porderType := @POrder.Pack disp cT class.
-Definition count_porderType := @POrder.Pack disp countType class.
-Definition fin_porderType := @POrder.Pack disp finType class.
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> POrder.class_of.
-Coercion base2 : class_of >-> Finite.class_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion countType : type >-> Countable.type.
-Coercion finType : type >-> Finite.type.
-Coercion porderType : type >-> POrder.type.
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical finType.
-Canonical porderType.
-Canonical count_porderType.
-Canonical fin_porderType.
-Notation finPOrderType := type.
-Notation "[ 'finPOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+Module FinPOrderExports.
+Notation finPOrderType := FinPOrder.type.
+Notation "[ 'finPOrderType' 'of' T ]" := (FinPOrder.clone _ T _ )
   (at level 0, format "[ 'finPOrderType'  'of'  T ]") : form_scope.
-End Exports.
+End FinPOrderExports.
 
-End FinPOrder.
-Import FinPOrder.Exports.
+HB.export FinPOrderExports.
 
+(* STOP
 Module FinLattice.
 Section ClassDef.
 
