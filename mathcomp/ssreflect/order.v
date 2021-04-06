@@ -1475,7 +1475,7 @@ HB.mixin Record is_DistLattice_of_Lattice d (T : indexed Type)
   meetUl : @left_distributive T T meet join;
 }.
 #[mathcomp]
-HB.structure Definition DistrLattice d := 
+HB.structure Definition DistrLattice d :=
   { T of is_DistLattice_of_Lattice d T & Lattice d T }.
 
 Module DistrLatticeExports.
@@ -1507,76 +1507,23 @@ End TBDistrLatticeExports.
 
 HB.export TBDistrLatticeExports.
 
-
-(* STOP
-
-Module CBDistrLattice.
-Section ClassDef.
-
-Record mixin_of (T0 : Type) (b : BDistrLattice.class_of T0)
-                (T := BDistrLattice.Pack tt b) := Mixin {
-  sub : T -> T -> T;
-  _ : forall x y, y `&` sub x y = bottom;
-  _ : forall x y, (x `&` y) `|` sub x y = x
+HB.mixin Record has_sub d (T : indexed Type) of BDistrLattice d T := {
+  sub    : T -> T -> T;
+  subKI  : forall x y, y `&` sub x y = bottom;
+  joinIB : forall x y, (x `&` y) `|` sub x y = x
 }.
 
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base  : BDistrLattice.class_of T;
-  mixin : mixin_of base;
-}.
-Unset Primitive Projections.
+#[mathcomp]
+HB.structure Definition CBDistrLattice d := { T of has_sub d T & }.
 
-Local Coercion base : class_of >-> BDistrLattice.class_of.
-
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
-
-Definition pack :=
-  fun bT b & phant_id (@BDistrLattice.class disp bT) b =>
-  fun m => Pack disp (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition porderType := @POrder.Pack disp cT class.
-Definition latticeType := @Lattice.Pack disp cT class.
-Definition bLatticeType := @BLattice.Pack disp cT class.
-Definition distrLatticeType := @DistrLattice.Pack disp cT class.
-Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> BDistrLattice.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion bLatticeType : type >-> BLattice.type.
-Coercion distrLatticeType : type >-> DistrLattice.type.
-Coercion bDistrLatticeType : type >-> BDistrLattice.type.
-Canonical eqType.
-Canonical choiceType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Notation cbDistrLatticeType  := type.
-Notation CBDistrLatticeType T m := (@pack T _ _ _ id m).
-Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
+Module CBDistrLatticeExports.
+Notation cbDistrLatticeType  := CBDistrLattice.type.
+Notation CBDistrLatticeType T m := (@CBDistrLattice.pack _ T m).
+(*Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@CBDistrLattice.clone _ T cT)
   (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
 Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
+  (@CBDistrLattice.clone disp T cT)
   (at level 0,
    format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
   form_scope.
@@ -1585,19 +1532,16 @@ Notation "[ 'cbDistrLatticeType' 'of' T ]" := [cbDistrLatticeType of T for _]
 Notation "[ 'cbDistrLatticeType' 'of' T 'with' disp ]" :=
   [cbDistrLatticeType of T for _ with disp]
   (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'with' disp ]") :
-  form_scope.
-End Exports.
+    form_scope.*)
+End CBDistrLatticeExports.
 
-End CBDistrLattice.
-Export CBDistrLattice.Exports.
-
-Definition sub {disp : unit} {T : cbDistrLatticeType disp} : T -> T -> T :=
-  CBDistrLattice.sub (CBDistrLattice.class T).
+HB.export CBDistrLatticeExports.
 
 Module Import CBDistrLatticeSyntax.
 Notation "x `\` y" := (sub x y) : order_scope.
 End CBDistrLatticeSyntax.
 
+(* STOP
 Module CTBDistrLattice.
 Section ClassDef.
 
