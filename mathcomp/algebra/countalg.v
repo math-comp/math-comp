@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop ssralg.
 (* From mathcomp Require Import generic_quotient ring_quotient. *)
@@ -35,7 +36,7 @@ Module CountRing.
 
 Local Notation mixin_of T := (Countable.mixin_of T).
 
-Section Generic.
+(*Section Generic.
 
 (* Implicits *)
 Variables (type base_type : Type) (class_of base_of : Type -> Type).
@@ -53,59 +54,21 @@ Definition gen_pack T :=
 
 End Generic.
 
-Arguments gen_pack [type base_type class_of base_of base_sort].
+Arguments gen_pack [type base_type class_of base_of base_sort].*)
 Local Notation cnt_ c := (@Countable.Class _ c c).
 Local Notation do_pack pack T := (pack T _ _ id _ _ _ id).
 Import GRing.Theory.
 
-Module Zmodule.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of M :=
-  Class { base : GRing.Zmodule.class_of M; mixin : mixin_of M }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> GRing.Zmodule.class_of.
-Local Coercion mixin : class_of >-> mixin_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.Zmodule.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-
-Definition join_countType := @Countable.Pack zmodType (cnt_ class).
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.Zmodule.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Canonical join_countType.
-Notation countZmodType := type.
-Notation "[ 'countZmodType' 'of' T ]" := (do_pack pack T)
+#[mathcomp]
+HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
+Module ZmoduleExports.
+Notation countZmodType := Zmodule.type.
+Notation "[ 'countZmodType' 'of' T ]" := (Zmodule.clone T _) (* NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countZmodType'  'of'  T ]") : form_scope.
-End Exports.
+End ZmoduleExports.
+HB.export ZmoduleExports.
 
-End Zmodule.
-Import Zmodule.Exports.
-
+(* STOP
 Module Ring.
 
 Section ClassDef.
@@ -783,10 +746,13 @@ End Exports.
 
 End ClosedField.
 Import ClosedField.Exports.
-
+*)
 End CountRing.
 
+HB.reexport.
+(*
 Import CountRing.
 Export Zmodule.Exports Ring.Exports ComRing.Exports UnitRing.Exports.
 Export ComUnitRing.Exports IntegralDomain.Exports.
 Export Field.Exports DecidableField.Exports ClosedField.Exports.
+*)
