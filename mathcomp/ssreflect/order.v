@@ -1668,7 +1668,6 @@ End FinTotalExports.
 
 HB.export FinTotalExports.
 
-(* STOP
 (********)
 (* DUAL *)
 (********)
@@ -1823,27 +1822,17 @@ Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
 Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
 
 Lemma lexx (x : T) : x <= x.
-Proof. by case: T x => ? [? []]. Qed.
+Proof. exact: le_refl. Qed.
 Hint Resolve lexx : core.
 
-Definition le_refl : reflexive le := lexx.
 Definition ge_refl : reflexive ge := lexx.
 Hint Resolve le_refl : core.
-
-Lemma le_anti: antisymmetric (<=%O : rel T).
-Proof. by case: T => ? [? []]. Qed.
 
 Lemma ge_anti: antisymmetric (>=%O : rel T).
 Proof. by move=> x y /le_anti. Qed.
 
-Lemma le_trans: transitive (<=%O : rel T).
-Proof. by case: T => ? [? []]. Qed.
-
 Lemma ge_trans: transitive (>=%O : rel T).
 Proof. by move=> ? ? ? ? /le_trans; apply. Qed.
-
-Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
-Proof. by case: T x y => ? [? []]. Qed.
 
 Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
 Proof. by rewrite lt_def eq_sym. Qed.
@@ -1871,6 +1860,7 @@ Proof. by apply/eqP/idP => [->|/le_anti]; rewrite ?lexx. Qed.
 Lemma ltW x y: x < y -> x <= y.
 Proof. by rewrite le_eqVlt orbC => ->. Qed.
 
+(* STOP
 Lemma lt_le_trans y x z: x < y -> y <= z -> x < z.
 Proof.
 rewrite !lt_neqAle => /andP [nexy lexy leyz]; rewrite (le_trans lexy) // andbT.
