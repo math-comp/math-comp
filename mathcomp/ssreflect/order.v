@@ -1655,114 +1655,20 @@ End FinCDistrLatticeExports.
 
 HB.export FinCDistrLatticeExports.
 
-(* STOP
-Module FinTotal.
-Section ClassDef.
 
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base  : FinDistrLattice.class_of T;
-  mixin : Total.mixin_of base;
-}.
-Unset Primitive Projections.
+#[mathcomp]
+HB.structure Definition FinTotal d :=
+  { T of Total d T & FinDistrLattice d T }.
 
-Local Coercion base : class_of >-> FinDistrLattice.class_of.
-Local Coercion base2 T (c : class_of T) : Total.class_of T :=
-  @Total.Class _ c (mixin (c := c)).
-
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition pack :=
-  fun bT b & phant_id (@FinDistrLattice.class disp bT) b =>
-  fun mT m & phant_id (@Total.class disp mT) (Total.Class m) =>
-  Pack disp (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT class.
-Definition finType := @Finite.Pack cT class.
-Definition porderType := @POrder.Pack disp cT class.
-Definition finPOrderType := @FinPOrder.Pack disp cT class.
-Definition latticeType := @Lattice.Pack disp cT class.
-Definition bLatticeType := @BLattice.Pack disp cT class.
-Definition tbLatticeType := @TBLattice.Pack disp cT class.
-Definition finLatticeType := @FinLattice.Pack disp cT class.
-Definition distrLatticeType := @DistrLattice.Pack disp cT class.
-Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
-Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT class.
-Definition finDistrLatticeType := @FinDistrLattice.Pack disp cT class.
-Definition orderType := @Total.Pack disp cT class.
-Definition order_countType := @Countable.Pack orderType class.
-Definition order_finType := @Finite.Pack orderType class.
-Definition order_finPOrderType := @FinPOrder.Pack disp orderType class.
-Definition order_bLatticeType := @BLattice.Pack disp orderType class.
-Definition order_tbLatticeType := @TBLattice.Pack disp orderType class.
-Definition order_finLatticeType := @FinLattice.Pack disp orderType class.
-Definition order_bDistrLatticeType := @BDistrLattice.Pack disp orderType class.
-Definition order_tbDistrLatticeType :=
-  @TBDistrLattice.Pack disp orderType class.
-Definition order_finDistrLatticeType :=
-  @FinDistrLattice.Pack disp orderType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> FinDistrLattice.class_of.
-Coercion base2 : class_of >-> Total.class_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion countType : type >-> Countable.type.
-Coercion finType : type >-> Finite.type.
-Coercion porderType : type >-> POrder.type.
-Coercion finPOrderType : type >-> FinPOrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion bLatticeType : type >-> BLattice.type.
-Coercion tbLatticeType : type >-> TBLattice.type.
-Coercion finLatticeType : type >-> FinLattice.type.
-Coercion distrLatticeType : type >-> DistrLattice.type.
-Coercion bDistrLatticeType : type >-> BDistrLattice.type.
-Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
-Coercion finDistrLatticeType : type >-> FinDistrLattice.type.
-Coercion orderType : type >-> Total.type.
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical finType.
-Canonical porderType.
-Canonical finPOrderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical finLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical finDistrLatticeType.
-Canonical orderType.
-Canonical order_countType.
-Canonical order_finType.
-Canonical order_finPOrderType.
-Canonical order_bLatticeType.
-Canonical order_tbLatticeType.
-Canonical order_finLatticeType.
-Canonical order_bDistrLatticeType.
-Canonical order_tbDistrLatticeType.
-Canonical order_finDistrLatticeType.
-Notation finOrderType := type.
-Notation "[ 'finOrderType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+Module FinTotalExports.
+Notation finOrderType := FinTotal.type.
+Notation "[ 'finOrderType' 'of' T ]" := (FinTotal.clone _ T _ )
   (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
-End Exports.
+End FinTotalExports.
 
-End FinTotal.
-Export FinTotal.Exports.
+HB.export FinTotalExports.
 
+(* STOP
 (********)
 (* DUAL *)
 (********)
