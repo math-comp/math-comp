@@ -290,7 +290,7 @@ Notation PiMorph11 pi_f :=
 
 (* lifting helpers *)
 Notation lift_op1 Q f := (locked (fun x : Q => \pi_Q (f (repr x)) : Q)).
-Notation lift_op2 Q g := 
+Notation lift_op2 Q g :=
   (locked (fun x y : Q => \pi_Q (g (repr x) (repr y)) : Q)).
 Notation lift_fun1 Q f := (locked (fun x : Q => f (repr x))).
 Notation lift_fun2 Q g := (locked (fun x y : Q => g (repr x) (repr y))).
@@ -307,7 +307,7 @@ Lemma eq_lock T T' e : e =1 (@locked (T -> T') (fun x : T => e x)).
 Proof. by rewrite -lock. Qed.
 Prenex Implicits eq_lock.
 
-Notation PiEmbed e := 
+Notation PiEmbed e :=
   (fun x => @EqualTo _ _ (e x) (eq_lock (fun _ => \pi _) _)).
 
 (********************)
@@ -320,7 +320,7 @@ HB.mixin Record IsEqQuotient T (eq_quot_op : rel T) (Q : Type) of
 }.
 
 #[mathcomp]
-HB.structure Definition EqQuotient T eq_quot_op := 
+HB.structure Definition EqQuotient T eq_quot_op :=
   {Q of IsEqQuotient T eq_quot_op Q & Quotient T Q & HasDecEq Q}.
 (*TODO : Check why there was no warning when we didn't put HasDecEq*)
 
@@ -341,11 +341,16 @@ Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q _)
 (* - get the subType structure and maybe declare it Canonical.            *)
 (**************************************************************************)
 
-Module QuotSubType.
-Section SubTypeMixin.
 
-Variable T : eqType.
-Variable qT : quotType T.
+Definition quot_type_subdef T (qT : quotType T) of phant qT : Type := qT.
+Notation quot_type_of T Q := (@quot_type_subdef T _ (Phant Q)).
+Notation quot_type Q := (quot_type_subdef (Phant Q)).
+HB.instance Definition _ T (qT : quotType T) :=
+  Quotient.copy (quot_type qT) qT.
+
+Module QuotSubType.
+Section QuotSubType.
+Variable (T : eqType) (qT : quotType T).
 
 Definition Sub x (px : repr (\pi_qT x) == x) := \pi_qT x.
 
@@ -361,43 +366,83 @@ Proof. by rewrite /Sub reprK. Qed.
 Lemma reprP K (PK : forall x Px, K (@Sub x Px)) u : K u.
 Proof. by rewrite (sort_Sub u); apply: PK. Qed.
 
-HB.instance Definition _ := IsSUB.Build _ _ qT reprP qreprK.
-HB.instance Definition _ := [Equality of qT by <:].
-
-End SubTypeMixin.
+#[export]
+HB.instance Definition _ := IsSUB.Build _ _ (quot_type qT) reprP qreprK.
+#[export]
+HB.instance Definition _ := [Equality of quot_type qT by <:].
+End QuotSubType.
+Module Exports. HB.reexport. End Exports.
+End QuotSubType.
+Export QuotSubType.Exports.
 
 HB.instance Definition _ (T : choiceType) (qT : quotType T) :=
-  [Choice of qT by <:].
+  [Choice of quot_type qT by <:].
 
 HB.instance Definition _ (T : countType) (qT : quotType T) :=
-  [Countable of qT by <:].
+  [Countable of quot_type qT by <:].
 
 HB.instance Definition _ (T : finType) (qT : quotType T) :=
-  [Finite of qT by <:].
+  [Finite of quot_type qT by <:].
 
-End QuotSubType.
+Notation "[ 'SUB' Q 'of' T 'by' %/ ]" :=
+  (SUB.copy Q%type (quot_type_of T Q))
+  (at level 0, format "[ 'SUB'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
-(* STOP
+Notation "[ 'SUB' Q 'by' %/ ]" :=
+  (SUB.copy Q%type (quot_type Q))
+  (at level 0, format "[ 'SUB'  Q  'by'  %/ ]") : form_scope.
 
 Notation "[ 'subType' Q 'of' T 'by' %/ ]" :=
-(@SubType T _ Q _ _ (@QuotSubType.reprP _ _) (@QuotSubType.qreprK _ _))
-(at level 0, format "[ 'subType'  Q  'of'  T  'by'  %/ ]") : form_scope.
+  (@SubType T _ Q _ _ (@QuotSubType.reprP _ _) (@QuotSubType.qreprK _ _))
+  (at level 0, format "[ 'subType'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
-Notation "[ 'eqMixin' 'of' Q 'by' <:%/ ]" := 
-  (@QuotSubType.eqMixin _ _: Equality.class_of Q)
+Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=
+  (Equality.copy Q%type (quot_type Q))
+  (at level 0, format "[ 'Equality'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+#[deprecated(since="mathcomp 2.0.0", note="Use [Equality of _ by <:%/] ")]
+Notation "[ 'eqMixin' 'of' Q 'by' <:%/ ]" :=
+  (Equality.copy Q%type (quot_type Q))
   (at level 0, format "[ 'eqMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" := 
-  (@QuotSubType.choiceMixin _ _: Choice.mixin_of Q)
+Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" := (Choice.copy Q%type (quot_type Q))
+  (at level 0, format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+Notation "[ 'HasChoice' 'of' Q 'by' <:%/ ]" :=
+  ([HasChoice of quot_type Q by <:] : HasChoice Q%type)
+  (at level 0, format "[ 'HasChoice'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use [Choice of _ by <:%/] or [HasChoice of _ by <:%/]")]
+Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
+  ([HasChoice of quot_type Q by <:] : HasChoice Q%type)
   (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'countMixin' 'of' Q 'by' <:%/ ]" := 
-  (@QuotSubType.countMixin _ _: Countable.mixin_of Q)
-  (at level 0, format "[ 'countMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
+Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" := (Countable.copy Q%type (quot_type Q))
+  (at level 0, format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'finMixin' 'of' Q 'by' <:%/ ]" := 
-  (@QuotSubType.finMixin _ _: Finite.mixin_of Q)
-  (at level 0, format "[ 'finMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
+Notation "[ 'IsCountable' 'of' Q 'by' <:%/ ]" :=
+  ([IsCountable of quot_type Q by <:] : IsCountable Q%type)
+  (at level 0, format "[ 'IsCountable'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use [Countable of _ by <:%/] or [IsCountable of _ by <:%/]")]
+Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
+  ([IsCountable of quot_type Q by <:] : IsCountable Q%type)
+  (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" := (Finite.copy Q%type (quot_type Q))
+  (at level 0, format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+Notation "[ 'IsFinite' 'of' Q 'by' <:%/ ]" :=
+  ([IsFinite of quot_type Q by <:] : IsFinite Q%type)
+  (at level 0, format "[ 'IsFinite'  'of'  Q  'by'  <:%/ ]") : form_scope.
+
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use [Finite of _ by <:%/] or [IsFinite of _ by <:%/]")]
+Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
+  ([IsFinite of quot_type Q by <:] : IsFinite Q%type)
+  (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 (****************************************************)
 (* Definition of a (decidable) equivalence relation *)
@@ -470,7 +515,7 @@ Record encModRel := EncModRelPack {
 
 Variable r : encModRel.
 
-Definition encModRelClass := 
+Definition encModRelClass :=
   let: EncModRelPack _ c as r' := r return encModRel_class_of r' in c.
 
 Definition encModRelP (x : D) : r x x -> r (ED (DE x)) x.
@@ -585,29 +630,25 @@ Lemma equivQTP : cancel (CD \o erepr) (pi \o DC).
 Proof. by move=> x; rewrite /= (pi_CD _ (erepr x) _) ?ereprK /eC /= ?encDP. Qed.
 
 Local Notation qT := (type_of (Phantom (rel D) encD)).
-Definition quotClass := QuotClass equivQTP.
-Canonical quotType := QuotType qT quotClass.
+#[export]
+HB.instance Definition _ := IsQuotient.Build D qT equivQTP.
 
 Lemma eqmodP x y : reflect (x = y %[mod qT]) (eD x y).
 Proof. by apply: (iffP (pi_DC _ _)); rewrite !unlock. Qed.
 
-Fact eqMixin : Equality.mixin_of qT. Proof. exact: CanEqMixin ereprK. Qed.
-Canonical eqType := EqType qT eqMixin.
-Definition choiceMixin := CanChoiceMixin ereprK.
-Canonical choiceType := ChoiceType qT choiceMixin.
+#[export]
+HB.instance Definition _ := Choice.copy qT (can_type ereprK).
 
 Lemma eqmodE x y : x == y %[mod qT] = eD x y.
 Proof. exact: sameP eqP (@eqmodP _ _). Qed.
 
-Canonical eqQuotType := EqQuotType eD qT eqmodE.
+#[export]
+HB.instance Definition _ := IsEqQuotient.Build _ eD qT eqmodE.
 
 End EquivQuot.
+Module Exports. HB.reexport. End Exports.
 End EquivQuot.
-
-Canonical EquivQuot.quotType.
-Canonical EquivQuot.eqType.
-Canonical EquivQuot.choiceType.
-Canonical EquivQuot.eqQuotType.
+Export EquivQuot.Exports.
 
 Arguments EquivQuot.ereprK {D C CD DC eD encD}.
 
@@ -643,9 +684,8 @@ Variables (D : Type) (C : countType) (CD : C -> D) (DC : D -> C).
 Variables (eD : equiv_rel D) (encD : encModRel CD DC eD).
 Notation eC := (encoded_equiv encD).
 
-Fact eq_quot_countMixin : Countable.mixin_of {eq_quot encD}.
-Proof. exact: CanCountMixin EquivQuot.ereprK. Qed.
-Canonical eq_quot_countType := CountType {eq_quot encD} eq_quot_countMixin.
+HB.instance Definition _ :=
+  Countable.copy {eq_quot encD} (can_type EquivQuot.ereprK).
 
 End CountEncodingModuloRel.
 
@@ -676,5 +716,3 @@ Proof. by rewrite -eqquotE; apply/eqP. Qed.
 End EqQuotTheory.
 
 Prenex Implicits eqquotE eqquotP.
-
- *)
