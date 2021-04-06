@@ -1011,7 +1011,7 @@ Module Order.
 (* STRUCTURES *)
 (**************)
 
-HB.mixin Record is_POrdered (d : unit) T of HasDecEq T := {
+HB.mixin Record IsPOrdered (d : unit) T of HasDecEq T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
@@ -1021,29 +1021,29 @@ HB.mixin Record is_POrdered (d : unit) T of HasDecEq T := {
 }.
 #[mathcomp] (* fixme: add phant_pack to the list of mathcomp generated stuff *)
 HB.structure Definition POrder (d : unit) :=
-  { T of Choice T & is_POrdered d T }.
+  { T of Choice T & IsPOrdered d T }.
 
-HB.factory Record is_LePOrdered (d : unit) T of HasDecEq T := {
+HB.factory Record IsLePOrdered (d : unit) T of HasDecEq T := {
   le       : rel T;
   le_refl  : reflexive     le;
   le_anti  : antisymmetric le;
   le_trans : transitive    le;
 }.
 
-HB.builders Context (d : unit) T of is_LePOrdered d T.
+HB.builders Context (d : unit) T of IsLePOrdered d T.
 (* TODO: print nice error message when keyed type is not provided *)
-HB.instance Definition _ := @is_POrdered.Build d T
+HB.instance Definition _ := @IsPOrdered.Build d T
   le _ (fun _ _ => erefl) le_refl le_anti le_trans.
 HB.end.
 
-HB.factory Record is_LtLePOrdered (d : unit) T of HasDecEq T := {
+HB.factory Record IsLtLePOrdered (d : unit) T of HasDecEq T := {
   le : rel T;
   lt : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
 }.
-HB.builders Context (d : unit) T of is_LtLePOrdered d T.
+HB.builders Context (d : unit) T of IsLtLePOrdered d T.
 
 Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
 
@@ -1063,18 +1063,18 @@ Qed.
 Let lt_def x y : lt x y = (y != x) && (le x y).
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-HB.instance Definition _ := @is_POrdered.Build d T
+HB.instance Definition _ := @IsPOrdered.Build d T
   le lt lt_def le_refl le_anti le_trans.
 
 HB.end.
 
-HB.factory Record is_LtPOrdered (d : unit) T of HasDecEq T := {
+HB.factory Record IsLtPOrdered (d : unit) T of HasDecEq T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
   lt_trans : transitive  lt;
 }.
-HB.builders Context (d : unit) (T : indexed Type) of is_LtPOrdered d T.
-HB.instance Definition _ := @is_LtLePOrdered.Build d T
+HB.builders Context (d : unit) (T : indexed Type) of IsLtPOrdered d T.
+HB.instance Definition _ := @IsLtLePOrdered.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
 
@@ -1251,7 +1251,7 @@ Coercion le_of_leif : leif >-> is_true.
 End POCoercions.
 HB.export POCoercions.
 
-(* HB.mixin Record is_JoinSemiLattice_of_POrder *)
+(* HB.mixin Record POrder_IsJoinSemiLattice *)
 (*     d (T : indexed Type) of POrder d T := { *)
 (*   join : T -> T -> T; *)
 (*   joinC : commutative join; *)
@@ -1259,9 +1259,9 @@ HB.export POCoercions.
 (*   le_defU : forall x y, (x <= y) = (join x y == y); *)
 (* }. *)
 (* HB.structure Definition JoinSemiLattice d := *)
-(*   { T of is_JoinSemiLattice_of_POrder d T & POrder d T }. *)
+(*   { T of POrder_IsJoinSemiLattice d T & POrder d T }. *)
 
-(* HB.mixin Record is_MeetSemiLattice_of_POrder *)
+(* HB.mixin Record POrder_IsMeetSemiLattice *)
 (*     d (T : indexed Type) of POrder d T := { *)
 (*   meet : T -> T -> T; *)
 (*   meetC : commutative meet; *)
@@ -1269,9 +1269,9 @@ HB.export POCoercions.
 (*   le_def : forall x y, (x <= y) = (meet x y == x); *)
 (* }. *)
 (* HB.structure Definition MeetSemiLattice d := *)
-(*   { T of is_MeetSemiLattice_of_POrder d T & POrder d T }. *)
+(*   { T of POrder_IsMeetSemiLattice d T & POrder d T }. *)
 
-HB.mixin Record is_Lattice_of_POrder
+HB.mixin Record POrder_IsLattice
     d (T : indexed Type) of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
@@ -1283,20 +1283,20 @@ HB.mixin Record is_Lattice_of_POrder
   meetKU : forall y x, join x (meet x y) = x;
   leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
-(* HB.builders Context d T of is_Lattice_of_POrder d T. *)
+(* HB.builders Context d T of POrder_IsLattice d T. *)
 
 (* Let le_defU : forall x y, (x <= y) = (join x y == y). *)
 (* Proof. Admitted. *)
 
-(* HB.instance Definition _ := @is_MeetSemiLattice_of_POrder.Build d T *)
+(* HB.instance Definition _ := @POrder_IsMeetSemiLattice.Build d T *)
 (*   meet meetC meetA le_def. *)
-(* HB.instance Definition _ := @is_JoinSemiLattice_of_POrder.Build d T *)
+(* HB.instance Definition _ := @POrder_IsJoinSemiLattice.Build d T *)
 (*   join joinC joinA le_defU. *)
 (* HB.end. *)
 
 #[mathcomp]
 HB.structure Definition Lattice d :=
-  { T of is_Lattice_of_POrder d T & POrder d T }.
+  { T of POrder_IsLattice d T & POrder d T }.
 
 Module LatticeExports.
 Notation latticeType := Lattice.type.
@@ -1469,14 +1469,14 @@ Notation "\meet_ ( i 'in' A ) F" :=
 End TBLatticeSyntax.
 HB.export TBLatticeSyntax.
 
-(* TODO: rename to lattice_is_meet_distributive ? *)
-HB.mixin Record is_DistLattice_of_Lattice d (T : indexed Type)
+(* TODO: rename to lattice_Ismeet_distributive ? *)
+HB.mixin Record Lattice_MeetIsDistributive d (T : indexed Type)
     of Lattice d T := {
   meetUl : @left_distributive T T meet join;
 }.
 #[mathcomp]
 HB.structure Definition DistrLattice d :=
-  { T of is_DistLattice_of_Lattice d T & Lattice d T }.
+  { T of Lattice_MeetIsDistributive d T & Lattice d T }.
 
 Module DistrLatticeExports.
 Notation distrLatticeType := DistrLattice.type.
@@ -1578,12 +1578,12 @@ Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
 End CTBDistrLatticeSyntax.
 
-
-HB.mixin Record is_total d (T : indexed Type) of POrder d T :=
+HB.mixin Record POrder_IsTotal d T of POrder d T :=
   { le_total : total (<=%O : rel T) }.
 
 #[mathcomp]
-HB.structure Definition Total d := { T of is_total d T & DistrLattice d T }.
+HB.structure Definition Total d :=
+  { T of POrder_IsTotal d T & DistrLattice d T }.
 
 Module TotalExports.
 Notation orderType := Total.type.
@@ -1602,7 +1602,6 @@ Notation OrderType T m := (@Total.pack _ T m).
 End TotalExports.
 
 HB.export TotalExports.
-
 
 (**********)
 (* FINITE *)
@@ -2633,7 +2632,7 @@ Fact dual_le_anti : antisymmetric (@ge _ T).
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
 HB.instance Definition _ :=
-  is_POrdered.Build
+  IsPOrdered.Build
     (dual_display disp) (T^d)
     dual_lt_def lexx dual_le_anti
     (fun y z x zy yx => @le_trans _ _ y x z yx zy).
@@ -2683,7 +2682,7 @@ Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
 Proof. by rewrite [LHS]leEjoin joinC. Qed.
 
 HB.instance Definition _ :=
-  @is_Lattice_of_POrder.Build
+  @POrder_IsLattice.Build
     (dual_display disp) L^d
     join meet joinC meetC joinA meetA meetKU joinKI dual_leEmeet.
 
@@ -2879,7 +2878,7 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite !(joinC x) -joinIl. Qed.
 
-HB.instance Definition _ := is_DistLattice_of_Lattice.Build _ L^d joinIl.
+HB.instance Definition _ := Lattice_MeetIsDistributive.Build _ L^d joinIl.
 
 End DistrLatticeTheory.
 End DistrLatticeTheory.
@@ -3750,7 +3749,7 @@ End CTBDistrLatticeTheory.
 (* FACTORIES *)
 (*************)
 
-HB.factory Record DistrLatticeOfPOrder d T of POrder d T := {
+HB.factory Record POrder_IsMeetDistrLattice d T of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetC : commutative meet;
@@ -3764,21 +3763,20 @@ HB.factory Record DistrLatticeOfPOrder d T of POrder d T := {
 }.
 
 HB.builders
-  Context d T of DistrLatticeOfPOrder d T.
+  Context d T of POrder_IsMeetDistrLattice d T.
 
 HB.instance Definition _ :=
-  is_Lattice_of_POrder.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
+  POrder_IsLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
 HB.instance Definition _ :=
-  is_DistLattice_of_Lattice.Build d T meetUl.
+  Lattice_MeetIsDistributive.Build d T meetUl.
 
 HB.end.
 
-HB.factory Record OrderOfLattice d T of Lattice d T := {
+HB.factory Record Lattice_IsTotal d T of Lattice d T := {
   le_total : total (<=%O : rel T)
 }.
 
-HB.builders
-  Context d T of OrderOfLattice d T.
+HB.builders Context d T of Lattice_IsTotal d T.
 
 Implicit Types (x y z : T).
 
@@ -3795,17 +3793,17 @@ move=> x y z; case: (leP x z); case: (leP y z); case: (leP x y);
 Qed.
 
 HB.instance Definition _ :=
-  is_DistLattice_of_Lattice.Build d T meetUl.
+  Lattice_MeetIsDistributive.Build d T meetUl.
 HB.instance Definition _ :=
-  is_total.Build d T comparableT.
+  POrder_IsTotal.Build d T comparableT.
 
 HB.end.
 
-HB.factory Record OrderOfPOrder d T of POrder d T := {
+HB.factory Record POrder_IsOrder d T of POrder d T := {
   le_total : total (<=%O : rel T) }.
 
 HB.builders
-  Context d T of OrderOfPOrder d T.
+  Context d T of POrder_IsOrder d T.
 
 Implicit Types (x y z : T).
 
@@ -3861,9 +3859,9 @@ Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite /meet; case: leP => ?; rewrite ?eqxx ?lt_eqF. Qed.
 
 HB.instance Definition _ :=
-  is_Lattice_of_POrder.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
+  POrder_IsLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
 HB.instance Definition _ :=
-  OrderOfLattice.Build d T comparableT.
+  Lattice_IsTotal.Build d T comparableT.
 HB.end.
 
 (* TODO: keep this?
@@ -3871,13 +3869,13 @@ Module Exports.
 Notation totalPOrderMixin := of_.
 Coercion latticeMixin : of_ >-> LatticeMixin.of_.
 Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
-Definition OrderOfPOrder disp (T : porderType disp) (m : of_ T) :=
+Definition POrder_IsOrder disp (T : porderType disp) (m : of_ T) :=
   OrderType (DistrLatticeType (LatticeType T m) m) m.
 End Exports.
 *)
 
 (* was MeetJoinMixin *)
-HB.factory Record DistrLatticeOfChoice (d : unit) T of Choice T := {
+HB.factory Record IsMeetJoinDistrLattice (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -3895,7 +3893,7 @@ HB.factory Record DistrLatticeOfChoice (d : unit) T of Choice T := {
 }.
 
 HB.builders
-  Context (d : unit) T of DistrLatticeOfChoice d T.
+  Context (d : unit) T of IsMeetJoinDistrLattice d T.
 
 Fact le_refl : reflexive le. Proof. by move=> x; rewrite le_def meetxx. Qed.
 
@@ -3909,11 +3907,11 @@ by rewrite -[in LHS]lexy -meetA leyz lexy.
 Qed.
 
 HB.instance Definition _ :=
-  is_POrdered.Build d T lt_def le_refl le_anti le_trans.
+  IsPOrdered.Build d T lt_def le_refl le_anti le_trans.
 
 HB.instance Definition _ :=
-  DistrLatticeOfPOrder.Build d T meetC joinC meetA joinA
-                               joinKI meetKU le_def meetUl.
+  POrder_IsMeetDistrLattice.Build d T meetC joinC meetA joinA
+                                      joinKI meetKU le_def meetUl.
 
 HB.end.
 
@@ -3959,9 +3957,9 @@ Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
 
 HB.instance Definition _ :=
-  is_POrdered.Build d T lt_def le_refl le_anti le_trans.
+  IsPOrdered.Build d T lt_def le_refl le_anti le_trans.
 
-HB.instance Definition _ := OrderOfPOrder.Build d T le_total.
+HB.instance Definition _ := POrder_IsOrder.Build d T le_total.
 
 Implicit Types (x y z : T).
 
@@ -3987,11 +3985,11 @@ Fact le_def x y : x <= y = (meet x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
 HB.instance Definition _ :=
-  DistrLatticeOfChoice.Build d T le_def lt_def
+  IsMeetJoinDistrLattice.Build d T le_def lt_def
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
 
-(* we don't need it: already provided by OrderOfPOrder above *)
-(*HB.instance Definition _ := is_total.Build d T le_total.*)
+(* we don't need it: already provided by POrder_IsOrder above *)
+(*HB.instance Definition _ := POrder_IsTotal.Build d T le_total.*)
 
 HB.end.
 
@@ -4046,28 +4044,22 @@ HB.instance Definition _ :=
   OrderOfChoice.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
 HB.end.
 
-(* TODO: not done yet
+HB.factory Record MonoTotal (disp' disp : unit) (T' : orderType disp') (T : Type)
+  of POrder disp T := { f : T -> T'; f_mono : {mono f : x y / x <= y} }.
+HB.builders Context (disp' disp : unit) (T' : orderType disp') (T : Type)
+  of MonoTotal disp' disp T' T.
+Lemma totalT : total (<=%O : rel T).
+Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
+HB.instance Definition _ := POrder_IsTotal.Build disp T totalT.
+HB.end.
 
-Module CanMixin.
-Section CanMixin.
-
-Section Total.
-
-Variables (disp : unit) (T : porderType disp).
-Variables (disp' : unit) (T' : orderType disp') (f : T -> T').
-
-Lemma MonoTotal : {mono f : x y / x <= y} ->
-  totalPOrderMixin T' -> totalPOrderMixin T.
-Proof. by move=> f_mono T'_tot x y; rewrite -!f_mono le_total. Qed.
-
-End Total.
-
+Module Cancel.
 Section Order.
 
 Variables (T : choiceType) (disp : unit).
 
 Section Partial.
-Variables (T' : porderType disp) (f : T -> T').
+Variables (disp' : unit) (T' : porderType disp) (f : T -> T').
 
 Section PCan.
 Variables (f' : T' -> option T) (f_can : pcancel f f').
@@ -4082,11 +4074,11 @@ Fact trans : transitive le. Proof. by move=> y x z xy /(le_trans xy). Qed.
 Fact lt_def x y : lt x y = (y != x) && le x y.
 Proof. by rewrite /lt lt_def (inj_eq (pcan_inj f_can)). Qed.
 
-Definition PcanPOrder := LePOrderMixin lt_def refl anti trans.
+Definition PcanPOrder := IsPOrdered.Build disp T lt_def refl anti trans.
 
 End PCan.
 
-Definition CanPOrder f' (f_can : cancel f f') := PcanPOrder (can_pcan f_can).
+Definition CanPOrder f' (f_can : cancel f f') := IsLePOrder.PcanPOrder (can_pcan f_can).
 
 End Partial.
 
@@ -4480,7 +4472,8 @@ Definition t := nat.
 HB.instance Definition _ := Choice.copy t nat.
 
 #[export]
-HB.instance Definition _ := DistrLatticeOfChoice.Build dvd_display t le_def (fun _ _ => erefl _)
+HB.instance Definition _ := IsMeetJoinDistrLattice.Build
+  dvd_display t le_def (fun=> erefl)
   gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
 
 #[export]
