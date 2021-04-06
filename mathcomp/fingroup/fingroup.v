@@ -320,6 +320,7 @@ HB.instance Definition _ := BaseFinGroup_IsGroup.Build G mulVg.
 
 HB.end.
 
+#[compress_coercions]
 HB.instance Definition _ (T : baseFinGroupType) :
     Finite (BaseFinGroup.arg_sort T) :=
   Finite.class [the finType of (T : Type)].
