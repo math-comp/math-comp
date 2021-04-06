@@ -3876,6 +3876,7 @@ Definition OrderOfPOrder disp (T : porderType disp) (m : of_ T) :=
 End Exports.
 *)
 
+(* was MeetJoinMixin *)
 HB.factory Record DistrLatticeOfChoice (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
@@ -3932,7 +3933,7 @@ HB.factory Record leOrder T of Choice T := {
 }.*)
 
 (* workaround *)
-HB.factory Record OrderOfChoice T of Choice T := {
+HB.factory Record OrderOfChoice (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -3952,7 +3953,7 @@ HB.factory Record OrderOfChoice T of Choice T := {
 }.
 
 HB.builders
-  Context (d : unit) T of OrderOfChoice T.
+  Context (d : unit) T of OrderOfChoice d T.
 
 Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
@@ -3989,73 +3990,63 @@ HB.instance Definition _ :=
   DistrLatticeOfChoice.Build d T le_def lt_def
     meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
 
-(* TODO: not sure what we should do with this *)
-(*Let T_distrLatticeType := DistrLatticeOfChoiceType distrLatticeMixin.
-
-Definition totalMixin : totalOrderMixin T_distrLatticeType := le_total m.
- *)
+(* we don't need it: already provided by OrderOfPOrder above *)
+(*HB.instance Definition _ := is_total.Build d T le_total.*)
 
 HB.end.
 
-(* STOP
-Module LtOrderMixin.
-Section LtOrderMixin.
-
-Variable (T : choiceType).
-
-Record of_ := Build {
+(* was LtOrderMixin *)
+HB.factory Record LtOrder (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
-  meet_def : forall x y, meet x y = if lt x y then x else y;
-  join_def : forall x y, join x y = if lt x y then y else x;
+  meet_def : forall x y, meet x y = match lt x y with
+                               | true => x
+                               | false => y
+                               end;
+  join_def : forall x y, join x y = match lt x y with
+                               | true => y
+                               | false => x
+                               end;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
   lt_total : forall x y, x != y -> lt x y || lt y x;
 }.
 
-Variables (m : of_).
+HB.builders
+  Context d T of LtOrder d T.
 
-Fact lt_def x y : lt m x y = (y != x) && le m x y.
+Fact lt_def x y : lt x y = (y != x) && le x y.
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact meet_def_le x y : meet m x y = if lt m x y then x else y.
+Fact meet_def_le x y : meet x y = if lt x y then x else y.
 Proof. by rewrite meet_def lt_def; case: eqP. Qed.
 
-Fact join_def_le x y : join m x y = if lt m x y then y else x.
+Fact join_def_le x y : join x y = if lt x y then y else x.
 Proof. by rewrite join_def lt_def; case: eqP. Qed.
 
-Fact le_anti : antisymmetric (le m).
+Fact le_anti : antisymmetric le.
 Proof.
 move=> x y; rewrite !le_def; case: eqVneq => //= _ /andP [] hxy.
 by move/(lt_trans hxy); rewrite lt_irr.
 Qed.
 
-Fact le_trans : transitive (le m).
+Fact le_trans : transitive le.
 Proof.
 move=> y x z; rewrite !le_def; case: eqVneq => [->|_] //=.
 by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
 Qed.
 
-Fact le_total : total (le m).
+Fact le_total : total le.
 Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
 
-Definition orderMixin : leOrderMixin T :=
-  @LeOrderMixin _ (le m) (lt m) (meet m) (join m)
-                lt_def meet_def_le join_def_le le_anti le_trans le_total.
+HB.instance Definition _ :=
+  OrderOfChoice.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
+HB.end.
 
-End LtOrderMixin.
-
-Module Exports.
-Notation ltOrderMixin := of_.
-Notation LtOrderMixin := Build.
-Coercion orderMixin : of_ >-> leOrderMixin.
-End Exports.
-
-End LtOrderMixin.
-Import LtOrderMixin.Exports.
+(* TODO: not done yet
 
 Module CanMixin.
 Section CanMixin.
@@ -4121,11 +4112,9 @@ End PCan.
 Definition CanOrder f' (f_can : cancel f f') := PcanOrder (can_pcan f_can).
 
 End Total.
-*)
 
 End Order.
 
-(*
 Section Lattice.
 
 Variables (disp : unit) (T : porderType disp).
@@ -4230,7 +4219,7 @@ Definition leEsub := @leEsub.
 Definition ltEsub := @ltEsub.
 End Exports.
 End SubOrder.
-Import SubOrder.Exports.
+Import SubOrder.Exports. *)
 
 (*************)
 (* INSTANCES *)
@@ -4259,7 +4248,6 @@ Import SubOrder.Exports.
 (* lattice types to their definition without structure abstraction.           *)
 (******************************************************************************)
 
-Module NatOrder.
 Section NatOrder.
 
 Lemma nat_display : unit. Proof. exact: tt. Qed.
@@ -4267,16 +4255,11 @@ Lemma nat_display : unit. Proof. exact: tt. Qed.
 Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
-Definition orderMixin :=
-  LeOrderMixin ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
-               anti_leq leq_trans leq_total.
+HB.instance Definition _ :=
+  OrderOfChoice.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
+                      anti_leq leq_trans leq_total.
 
-Canonical porderType := POrderType nat_display nat orderMixin.
-Canonical latticeType := LatticeType nat orderMixin.
-Canonical bLatticeType := BLatticeType nat (BottomMixin leq0n).
-Canonical distrLatticeType := DistrLatticeType nat orderMixin.
-Canonical bDistrLatticeType := [bDistrLatticeType of nat].
-Canonical orderType := OrderType nat orderMixin.
+HB.instance Definition _ := has_bottom.Build nat_display nat leq0n.
 
 Lemma leEnat : le = leq. Proof. by []. Qed.
 Lemma ltEnat : lt = ltn. Proof. by []. Qed.
@@ -4286,24 +4269,8 @@ Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
 
-Module Exports.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical orderType.
-Definition leEnat := leEnat.
-Definition ltEnat := ltEnat.
-Definition minEnat := minEnat.
-Definition maxEnat := maxEnat.
-Definition botEnat := botEnat.
-End Exports.
-End NatOrder.
-
 Module NatMonotonyTheory.
 Section NatMonotonyTheory.
-Import NatOrder.Exports.
 
 Context {disp : unit} {T : porderType disp}.
 Variables (D : {pred nat}) (f : nat -> T).
@@ -4507,12 +4474,22 @@ apply: eqn_from_log; rewrite ?(gcdn_gt0, lcmn_gt0)//= => p.
 by rewrite !(logn_gcd, logn_lcm) ?(gcdn_gt0, lcmn_gt0)// minn_maxl.
 Qed.
 
-Definition t_distrLatticeMixin := MeetJoinMixin le_def (fun _ _ => erefl _)
-  gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
-
 Definition t := nat.
 
-Canonical eqType := [eqType of t].
+#[export]
+HB.instance Definition _ := Choice.copy t nat.
+
+#[export]
+HB.instance Definition _ := DistrLatticeOfChoice.Build dvd_display t le_def (fun _ _ => erefl _)
+  gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
+
+#[export]
+HB.instance Definition _ := has_bottom.Build _ t (dvd1n : forall m : t, (1 %| m)).
+
+#[export]
+HB.instance Definition _ := has_top.Build _ t (dvdn0 : forall m : t, (m %| 0)).
+
+(*Canonical eqType := [eqType of t].
 Canonical choiceType := [choiceType of t].
 Canonical countType := [countType of t].
 Canonical porderType := POrderType dvd_display t t_distrLatticeMixin.
@@ -4523,7 +4500,7 @@ Canonical tbLatticeType := TBLatticeType t
   (TopMixin (dvdn0 : forall m : t, (m %| 0))).
 Canonical distrLatticeType := DistrLatticeType t t_distrLatticeMixin.
 Canonical bDistrLatticeType := [bDistrLatticeType of t].
-Canonical tbDistrLatticeType := [tbDistrLatticeType of t].
+Canonical tbDistrLatticeType := [tbDistrLatticeType of t].*)
 
 Import DvdSyntax.
 Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
@@ -4535,17 +4512,9 @@ Lemma nat0E : nat0 = 0%N :> t. Proof. by []. Qed.
 
 End NatDvd.
 Module Exports.
+(* FIXME: uncomment when selection of material *)
+(*HB.reexport.*)
 Notation natdvd := t.
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
 Definition dvdEnat := dvdE.
 Definition sdvdEnat := sdvdE.
 Definition gcdEnat := gcdE.
@@ -4559,9 +4528,9 @@ End NatDvd.
 (* Canonical structures on ordinal *)
 (***********************************)
 
+(* STOP
 Module OrdinalOrder.
 Section OrdinalOrder.
-Import NatOrder.
 
 Lemma ord_display : unit. Proof. exact: tt. Qed.
 
@@ -6870,4 +6839,5 @@ End tagnat.
 Arguments tagnat.Rank {n p_}.
 *)
 
+End Order.
 HB.reexport.
