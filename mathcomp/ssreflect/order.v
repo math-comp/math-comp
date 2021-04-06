@@ -3508,7 +3508,7 @@ Implicit Types (x y z : L).
 Local Notation "0" := bottom.
 
 Lemma subKI x y : y `&` (x `\` y) = 0.
-Proof. by case: L x y => ? [?[]]. Qed.
+Proof. exact: subKI. Qed.
 
 Lemma subIK x y : (x `\` y) `&` y = 0.
 Proof. by rewrite meetC subKI. Qed.
@@ -3520,7 +3520,7 @@ Lemma meetBI z x y : (x `\` y) `&` (z `&` y) = 0.
 Proof. by rewrite meetC meetIB. Qed.
 
 Lemma joinIB y x : (x `&` y) `|` (x `\` y) = x.
-Proof. by case: L x y => ? [?[]]. Qed.
+Proof. exact: joinIB. Qed.
 
 Lemma joinBI y x : (x `\` y) `|` (x `&` y) = x.
 Proof. by rewrite joinC joinIB. Qed.
@@ -3676,7 +3676,7 @@ Local Notation "0" := bottom.
 Local Notation "1" := top.
 
 Lemma complE x : ~` x = 1 `\` x.
-Proof. by case: L x => [?[? ?[]]]. Qed.
+Proof. exact: complE. Qed.
 
 Lemma sub1x x : 1 `\` x = ~` x.
 Proof. by rewrite complE. Qed.
@@ -3747,6 +3747,7 @@ Proof. by elim/big_rec2: _=> [|i x y ? <-]; rewrite ?compl1 ?complI. Qed.
 End CTBDistrLatticeTheory.
 End CTBDistrLatticeTheory.
 
+(* STOP
 (*************)
 (* FACTORIES *)
 (*************)
