@@ -84,68 +84,19 @@ Notation "[ 'countRingType' 'of' T ]" :=
 End CRingExports.
 HB.export CRingExports.
 
-(* STOP
-Module ComRing.
+#[mathcomp]
+HB.structure Definition CComRing := {R of GRing.ComRing R & Countable R}.
 
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.ComRing.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := Ring.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.ComRing.class_of.
-Local Coercion base2 : class_of >-> Ring.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.ComRing.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition join_countType := @Countable.Pack comRingType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack comRingType class.
-Definition join_countRingType := @Ring.Pack comRingType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.ComRing.class_of.
-Coercion base2 : class_of >-> Ring.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Notation countComRingType := CountRing.ComRing.type.
-Notation "[ 'countComRingType' 'of' T ]" := (do_pack pack T)
+Module CComRingExports.
+Notation countComRingType := CComRing.type.
+Notation "[ 'countComRingType' 'of' T ]" := (CComRing.clone T _)
   (at level 0, format "[ 'countComRingType'  'of'  T ]") : form_scope.
-End Exports.
+End CComRingExports.
+HB.export CComRingExports.
 
+HB.graph "g.dot".
+
+(* STOP
 End ComRing.
 Import ComRing.Exports.
 
