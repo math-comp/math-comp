@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop div ssralg countalg binomial tuple.
 
@@ -128,12 +129,9 @@ Variable R : ringType.
 (* Defines a polynomial as a sequence with <> 0 last element *)
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
 
-Canonical polynomial_subType := Eval hnf in [subType for polyseq].
-Definition polynomial_eqMixin := Eval hnf in [eqMixin of polynomial by <:].
-Canonical polynomial_eqType := Eval hnf in EqType polynomial polynomial_eqMixin.
-Definition polynomial_choiceMixin := [choiceMixin of polynomial by <:].
-Canonical polynomial_choiceType :=
-  Eval hnf in ChoiceType polynomial polynomial_choiceMixin.
+HB.instance Definition _ := [subMixin for polyseq].
+HB.instance Definition _ := [Equality of polynomial by <:].
+HB.instance Definition _ := [Choice of polynomial by <:].
 
 Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
 

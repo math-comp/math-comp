@@ -32,7 +32,7 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory CodeSeq.
 
-Module  ountRing.
+Module CountRing.
 
 Local Notation mixin_of T := (Countable.mixin_of T).
 
@@ -72,92 +72,92 @@ HB.export  ZmoduleExports.
 #[mathcomp]
 HB.structure Definition Ring := {R of GRing.Ring R & Countable R}.
 
-Module  RingExports.
+Module CRingExports.
 Notation countRingType := Ring.type.
 Notation "[ 'countRingType' 'of' T ]" :=
   (Ring.clone T _) (* NB: was (do_pack pack T) *)
       (at level 0, format "[ 'countRingType'  'of'  T ]") : form_scope.
-End  RingExports.
-HB.export  RingExports.
+End CRingExports.
+HB.export CRingExports.
 
 #[mathcomp]
 HB.structure Definition ComRing := {R of GRing.ComRing R & Countable R}.
 
-Module  ComRingExports.
+Module CComRingExports.
 Notation countComRingType := ComRing.type.
 Notation "[ 'countComRingType' 'of' T ]" := (ComRing.clone T _)
   (at level 0, format "[ 'countComRingType'  'of'  T ]") : form_scope.
-End  ComRingExports.
-HB.export  ComRingExports.
+End CComRingExports.
+HB.export CComRingExports.
 
 #[mathcomp]
 HB.structure Definition UnitRing := {R of GRing.UnitRing R & Countable R}.
 
-Module  UnitRingExports.
+Module CUnitRingExports.
 Notation countUnitRingType := UnitRing.type.
 Notation "[ 'countUnitRingType' 'of' T ]" := (UnitRing.clone T _) 
   (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countUnitRingType'  'of'  T ]") : form_scope.
-End  UnitRingExports.
-HB.export  UnitRingExports.
+End CUnitRingExports.
+HB.export CUnitRingExports.
 
 #[mathcomp]
 HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Countable R}.
 
-Module  ComUnitRingExports.
+Module CComUnitRingExports.
 Notation countComUnitRingType := ComUnitRing.type.
 Notation "[ 'countComUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
   (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countComUnitRingType'  'of'  T ]") : form_scope.
-End  ComUnitRingExports.
-HB.export  ComUnitRingExports.
+End CComUnitRingExports.
+HB.export CComUnitRingExports.
 
 #[mathcomp]
 HB.structure Definition IntegralDomain :=
   {R of GRing.IntegralDomain R & Countable R}.
 
-Module  IntegralDomainExports.
+Module CIntegralDomainExports.
 Notation countIdomainType := IntegralDomain.type.
 Notation "[ 'countIdomainType' 'of' T ]" := (IntegralDomain.clone T _) 
   (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countIdomainType'  'of'  T ]") : form_scope.
-End  IntegralDomainExports.
-HB.export  IntegralDomainExports.
+End CIntegralDomainExports.
+HB.export CIntegralDomainExports.
 
 #[mathcomp]
 HB.structure Definition Field := {R of GRing.Field R & Countable R}.
 
-Module  FieldExports.
+Module CFieldExports.
 Notation countFieldType := Field.type.
 Notation "[ 'countFieldType' 'of' T ]" := (Field.clone T _) (*(do_pack pack T)*)
   (at level 0, format "[ 'countFieldType'  'of'  T ]") : form_scope.
-End  FieldExports.
-HB.export  FieldExports.
+End CFieldExports.
+HB.export CFieldExports.
 
 #[mathcomp]
 HB.structure Definition DecidableField := 
   {R of GRing.DecidableField R & Countable R}.
 
-Module  DecidableFieldExports.
+Module CDecidableFieldExports.
 Notation countDecFieldType := DecidableField.type.
 Notation "[ 'countDecFieldType' 'of' T ]" := (DecidableField.clone T _) 
   (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countDecFieldType'  'of'  T ]") : form_scope.
-End  DecidableFieldExports.
-HB.export  DecidableFieldExports.
+End CDecidableFieldExports.
+HB.export CDecidableFieldExports.
 
 #[mathcomp]
 HB.structure Definition ClosedField := {R of GRing.ClosedField R & Countable R}.
 
-Module  ClosedFieldExports.
+Module CClosedFieldExports.
 Notation countClosedFieldType := ClosedField.type.
 Notation "[ 'countClosedFieldType' 'of' T ]" := (ClosedField.clone T _) 
   (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countClosedFieldType'  'of'  T ]") : form_scope.
-End  ClosedFieldExports.
-HB.export  ClosedFieldExports.
+End CClosedFieldExports.
+HB.export CClosedFieldExports.
 
-End  ountRing.
+End CountRing.
 
 HB.reexport.
 (*
