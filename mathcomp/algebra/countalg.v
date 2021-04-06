@@ -59,71 +59,32 @@ Local Notation cnt_ c := (@Countable.Class _ c c).
 Local Notation do_pack pack T := (pack T _ _ id _ _ _ id).
 Import GRing.Theory.
 
+(* Initial C letter of CZmodule is needed because of name clashes in short
+  names.  see coq-elpi issue ### *)
 #[mathcomp]
-HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
-Module ZmoduleExports.
-Notation countZmodType := Zmodule.type.
-Notation "[ 'countZmodType' 'of' T ]" := (Zmodule.clone T _) (* NB: was (do_pack pack T)*)
+HB.structure Definition CZmodule := {M of GRing.Zmodule M & Countable M}.
+Module CZmoduleExports.
+Notation countZmodType := CZmodule.type.
+Notation "[ 'countZmodType' 'of' T ]" := (CZmodule.clone T _)
+  (* NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countZmodType'  'of'  T ]") : form_scope.
-End ZmoduleExports.
-HB.export ZmoduleExports.
+End CZmoduleExports.
+HB.export CZmoduleExports.
+
+
+#[mathcomp]
+HB.structure Definition CRing := {R of GRing.Ring R & Countable R}.
+
+
+Module CRingExports.
+Notation countRingType := CRing.type.
+Notation "[ 'countRingType' 'of' T ]" :=
+  (CRing.clone T _) (* NB: was (do_pack pack T) *)
+      (at level 0, format "[ 'countRingType'  'of'  T ]") : form_scope.
+End CRingExports.
+HB.export CRingExports.
 
 (* STOP
-Module Ring.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class { base : GRing.Ring.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := Zmodule.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.Ring.class_of.
-Local Coercion base2 : class_of >-> Zmodule.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.Ring.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition join_countType := @Countable.Pack ringType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack ringType class.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base : class_of >-> GRing.Ring.class_of.
-Coercion base2 : class_of >-> Zmodule.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Notation countRingType := type.
-Notation "[ 'countRingType' 'of' T ]" := (do_pack pack T)
-  (at level 0, format "[ 'countRingType'  'of'  T ]") : form_scope.
-End Exports.
-
-End Ring.
-Import Ring.Exports.
-
 Module ComRing.
 
 Section ClassDef.
