@@ -1541,118 +1541,44 @@ Module Import CBDistrLatticeSyntax.
 Notation "x `\` y" := (sub x y) : order_scope.
 End CBDistrLatticeSyntax.
 
-(* STOP
-Module CTBDistrLattice.
-Section ClassDef.
-
-Record mixin_of (T0 : Type) (b : TBDistrLattice.class_of T0)
-                (T := TBDistrLattice.Pack tt b) (sub : T -> T -> T) := Mixin {
+HB.mixin Record has_compl d (T : indexed Type) of
+         TBDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
-  _ : forall x, compl x = sub top x
+  complE : forall x, compl x = (top : T) `\` x (* FIXME? *)
 }.
 
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base  : TBDistrLattice.class_of T;
-  mixin1 : CBDistrLattice.mixin_of base;
-  mixin2 : @mixin_of _ base (CBDistrLattice.sub mixin1);
-}.
-Unset Primitive Projections.
+#[mathcomp]
+HB.structure Definition CTBDistrLattice d := { T of has_compl d T & }.
 
-Local Coercion base : class_of >-> TBDistrLattice.class_of.
-Local Coercion base2 T (c : class_of T) : CBDistrLattice.class_of T :=
-  CBDistrLattice.Class (mixin1 c).
-
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack disp T c.
-Definition clone_with disp' c of phant_id class c := @Pack disp' T c.
-
-Definition pack :=
-  fun bT b & phant_id (@TBDistrLattice.class disp bT) b =>
-  fun mT m0 & phant_id (@CBDistrLattice.class disp mT) (CBDistrLattice.Class m0) =>
-  fun m1 => Pack disp (@Class T b m0 m1).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition porderType := @POrder.Pack disp cT class.
-Definition latticeType := @Lattice.Pack disp cT class.
-Definition bLatticeType := @BLattice.Pack disp cT class.
-Definition tbLatticeType := @TBLattice.Pack disp cT class.
-Definition distrLatticeType := @DistrLattice.Pack disp cT class.
-Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
-Definition tbDistrLatticeType := @TBDistrLattice.Pack disp cT class.
-Definition cbDistrLatticeType := @CBDistrLattice.Pack disp cT class.
-Definition cb_tbLatticeType := @TBLattice.Pack disp cbDistrLatticeType class.
-Definition cb_tbDistrLatticeType :=
-  @TBDistrLattice.Pack disp cbDistrLatticeType class.
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> TBDistrLattice.class_of.
-Coercion base2 : class_of >-> CBDistrLattice.class_of.
-Coercion mixin1 : class_of >-> CBDistrLattice.mixin_of.
-Coercion mixin2 : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion bLatticeType : type >-> BLattice.type.
-Coercion tbLatticeType : type >-> TBLattice.type.
-Coercion distrLatticeType : type >-> DistrLattice.type.
-Coercion bDistrLatticeType : type >-> BDistrLattice.type.
-Coercion tbDistrLatticeType : type >-> TBDistrLattice.type.
-Coercion cbDistrLatticeType : type >-> CBDistrLattice.type.
-Canonical eqType.
-Canonical choiceType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical cbDistrLatticeType.
-Canonical cb_tbLatticeType.
-Canonical cb_tbDistrLatticeType.
-Notation ctbDistrLatticeType  := type.
-Notation CTBDistrLatticeType T m := (@pack T _ _ _ id _ _ id m).
-Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT ]") :
-  form_scope.
-Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0,
-   format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]")
-  : form_scope.
-Notation "[ 'ctbDistrLatticeType' 'of' T ]" := [ctbDistrLatticeType of T for _]
-  (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'ctbDistrLatticeType' 'of' T 'with' disp ]" :=
-  [ctbDistrLatticeType of T for _ with disp]
-  (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'with' disp ]") :
-  form_scope.
-Notation "[ 'default_ctbDistrLatticeType' 'of' T ]" :=
-  (@pack T _ _ _ id _ _ id (Mixin (fun=> erefl)))
-  (at level 0, format "[ 'default_ctbDistrLatticeType'  'of'  T ]") :
-  form_scope.
-End Exports.
-
-End CTBDistrLattice.
-Export CTBDistrLattice.Exports.
-
-Definition compl {disp : unit} {T : ctbDistrLatticeType disp} : T -> T :=
-  CTBDistrLattice.compl (CTBDistrLattice.class T).
+Module CTBDistrLatticeExports.
+Notation ctbDistrLatticeType  := CTBDistrLattice.type.
+Notation CTBDistrLatticeType T m := (@CTBDistrLattice.pack _ T m).
+(* Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
+(*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT ]") : *)
+(*   form_scope. *)
+(* Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" := *)
+(*   (@clone_with T _ cT disp _ id) *)
+(*   (at level 0, *)
+(*    format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") *)
+(*   : form_scope. *)
+(* Notation "[ 'ctbDistrLatticeType' 'of' T ]" := [ctbDistrLatticeType of T for _] *)
+(*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T ]") : form_scope. *)
+(* Notation "[ 'ctbDistrLatticeType' 'of' T 'with' disp ]" := *)
+(*   [ctbDistrLatticeType of T for _ with disp] *)
+(*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'with' disp ]") : *)
+(*   form_scope. *)
+(* Notation "[ 'default_ctbDistrLatticeType' 'of' T ]" := *)
+(*   (@pack T _ _ _ id _ _ id (Mixin (fun=> erefl))) *)
+(*   (at level 0, format "[ 'default_ctbDistrLatticeType'  'of'  T ]") : *)
+(*   form_scope. *)
+End CTBDistrLatticeExports.
+HB.export CTBDistrLatticeExports.
 
 Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
 End CTBDistrLatticeSyntax.
 
+(* STOP
 Module Total.
 Section ClassDef.
 
