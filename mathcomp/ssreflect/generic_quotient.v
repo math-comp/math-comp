@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice.
 From mathcomp Require Import seq fintype.
 
@@ -113,36 +114,29 @@ Local Open Scope quotient_scope.
 (* Definition of the quotient interface. *)
 (*****************************************)
 
+HB.mixin Record is_quot T (qT : Type) := {
+  repr_of : qT -> T;
+  quot_pi_subdef : T -> qT;
+  repr_ofK_subproof : cancel repr_of quot_pi_subdef
+}.
+
+#[mathcomp]
+HB.structure Definition Quotient T := { qT of is_quot T qT }.
+Arguments repr_of [T qT] : rename.
+
+Notation quotType := Quotient.type.
+
 Section QuotientDef.
 
 Variable T : Type.
-
-Record quot_mixin_of qT := QuotClass {
-  quot_repr : qT -> T;
-  quot_pi : T -> qT;
-  _ : cancel quot_repr quot_pi
-}.
-
-Notation quot_class_of := quot_mixin_of.
-
-Record quotType := QuotTypePack {
-  quot_sort :> Type;
-  quot_class : quot_class_of quot_sort
-}.
-
-Variable qT : quotType.
-Definition pi_phant of phant qT := quot_pi (quot_class qT).
+Variable qT : quotType T.
+Definition pi_phant of phant qT := @quot_pi_subdef _ qT.
 Local Notation "\pi" := (pi_phant (Phant qT)).
-Definition repr_of := quot_repr (quot_class qT).
 
-Lemma repr_ofK : cancel repr_of \pi.
-Proof. by rewrite /pi_phant /repr_of /=; case: qT=> [? []]. Qed.
-
-Definition QuotType_clone (Q : Type) qT cT 
-  of phant_id (quot_class qT) cT := @QuotTypePack Q cT.
+Lemma repr_ofK : cancel (@repr_of _ _) \pi.
+Proof. exact: repr_ofK_subproof. Qed.
 
 End QuotientDef.
-
 Arguments repr_ofK {T qT}.
 
 (****************************)
@@ -191,9 +185,7 @@ Canonical mpi_unlock := Unlockable MPi.E.
 Canonical pi_unlock := Unlockable Pi.E.
 Canonical repr_unlock := Unlockable Repr.E.
 
-Notation quot_class_of := quot_mixin_of.
-Notation QuotType Q m := (@QuotTypePack _ Q m).
-Notation "[ 'quotType' 'of' Q ]" := (@QuotType_clone _ Q _ _ id)
+Notation "[ 'quotType' 'of' Q ]" := (Quotient.clone _ Q _)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
 Arguments repr {T qT} x.
@@ -317,6 +309,8 @@ Prenex Implicits eq_lock.
 
 Notation PiEmbed e := 
   (fun x => @EqualTo _ _ (e x) (eq_lock (fun _ => \pi _) _)).
+
+(* STOP
 
 (********************)
 (* About eqQuotType *)
@@ -724,3 +718,5 @@ Proof. by rewrite -eqquotE; apply/eqP. Qed.
 End EqQuotTheory.
 
 Prenex Implicits eqquotE eqquotP.
+
+ *)
