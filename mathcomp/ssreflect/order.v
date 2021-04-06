@@ -1578,75 +1578,32 @@ Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
 End CTBDistrLatticeSyntax.
 
+
+HB.mixin Record is_total d (T : indexed Type) of POrder d T :=
+  { le_total : total (<=%O : rel T) }.
+
+#[mathcomp]
+HB.structure Definition Total d := { T of is_total d T & DistrLattice d T }.
+
+Module TotalExports.
+Notation orderType := Total.type.
+Notation OrderType T m := (@Total.pack _ T m).
+(* Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
+(*   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT ]") : form_scope. *)
+(* Notation "[ 'orderType' 'of' T 'for' cT 'with' disp ]" := *)
+(*   (@clone_with T _ cT disp _ id) *)
+(*   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT  'with'  disp ]") : *)
+(*   form_scope. *)
+(* Notation "[ 'orderType' 'of' T ]" := [orderType of T for _] *)
+(*   (at level 0, format "[ 'orderType'  'of'  T ]") : form_scope. *)
+(* Notation "[ 'orderType' 'of' T 'with' disp ]" := *)
+(*   [orderType of T for _ with disp] *)
+(*   (at level 0, format "[ 'orderType'  'of'  T  'with' disp ]") : form_scope. *)
+End TotalExports.
+
+HB.export TotalExports.
+
 (* STOP
-Module Total.
-Section ClassDef.
-
-Definition mixin_of T0 (b : POrder.class_of T0) (T := POrder.Pack tt b) :=
-  total (<=%O : rel T).
-
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base  : DistrLattice.class_of T;
-  mixin : mixin_of base;
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> DistrLattice.class_of.
-
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c & phant_id class c := @Pack disp T c.
-Definition clone_with disp' c & phant_id class c := @Pack disp' T c.
-
-Definition pack :=
-  fun bT b & phant_id (@DistrLattice.class disp bT) b =>
-  fun m => Pack disp (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition porderType := @POrder.Pack disp cT class.
-Definition latticeType := @Lattice.Pack disp cT class.
-Definition distrLatticeType := @DistrLattice.Pack disp cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> DistrLattice.class_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion distrLatticeType : type >-> DistrLattice.type.
-Canonical eqType.
-Canonical choiceType.
-Canonical porderType.
-Canonical latticeType.
-Canonical distrLatticeType.
-Notation orderType := type.
-Notation OrderType T m := (@pack T _ _ _ id m).
-Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ id)
-  (at level 0, format "[ 'orderType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'orderType' 'of' T 'for' cT 'with' disp ]" :=
-  (@clone_with T _ cT disp _ id)
-  (at level 0, format "[ 'orderType'  'of'  T  'for'  cT  'with'  disp ]") :
-  form_scope.
-Notation "[ 'orderType' 'of' T ]" := [orderType of T for _]
-  (at level 0, format "[ 'orderType'  'of'  T ]") : form_scope.
-Notation "[ 'orderType' 'of' T 'with' disp ]" :=
-  [orderType of T for _ with disp]
-  (at level 0, format "[ 'orderType'  'of'  T  'with' disp ]") : form_scope.
-End Exports.
-
-End Total.
-Import Total.Exports.
-
 (**********)
 (* FINITE *)
 (**********)
