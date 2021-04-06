@@ -32,7 +32,7 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory CodeSeq.
 
-Module CountRing.
+Module  ountRing.
 
 Local Notation mixin_of T := (Countable.mixin_of T).
 
@@ -62,102 +62,102 @@ Import GRing.Theory.
 (* Initial C letter of CZmodule is needed because of name clashes in short
   names.  see coq-elpi issue ### *)
 #[mathcomp]
-HB.structure Definition CZmodule := {M of GRing.Zmodule M & Countable M}.
-Module CZmoduleExports.
-Notation countZmodType := CZmodule.type.
-Notation "[ 'countZmodType' 'of' T ]" := (CZmodule.clone T _)
+HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
+Module  ZmoduleExports.
+Notation countZmodType := Zmodule.type.
+Notation "[ 'countZmodType' 'of' T ]" := (Zmodule.clone T _)
   (* NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countZmodType'  'of'  T ]") : form_scope.
-End CZmoduleExports.
-HB.export CZmoduleExports.
+End  ZmoduleExports.
+HB.export  ZmoduleExports.
 
 #[mathcomp]
-HB.structure Definition CRing := {R of GRing.Ring R & Countable R}.
+HB.structure Definition Ring := {R of GRing.Ring R & Countable R}.
 
-Module CRingExports.
-Notation countRingType := CRing.type.
+Module  RingExports.
+Notation countRingType := Ring.type.
 Notation "[ 'countRingType' 'of' T ]" :=
-  (CRing.clone T _) (* NB: was (do_pack pack T) *)
+  (Ring.clone T _) (* NB: was (do_pack pack T) *)
       (at level 0, format "[ 'countRingType'  'of'  T ]") : form_scope.
-End CRingExports.
-HB.export CRingExports.
+End  RingExports.
+HB.export  RingExports.
 
 #[mathcomp]
-HB.structure Definition CComRing := {R of GRing.ComRing R & Countable R}.
+HB.structure Definition ComRing := {R of GRing.ComRing R & Countable R}.
 
-Module CComRingExports.
-Notation countComRingType := CComRing.type.
-Notation "[ 'countComRingType' 'of' T ]" := (CComRing.clone T _)
+Module  ComRingExports.
+Notation countComRingType := ComRing.type.
+Notation "[ 'countComRingType' 'of' T ]" := (ComRing.clone T _)
   (at level 0, format "[ 'countComRingType'  'of'  T ]") : form_scope.
-End CComRingExports.
-HB.export CComRingExports.
+End  ComRingExports.
+HB.export  ComRingExports.
 
 #[mathcomp]
-HB.structure Definition CUnitRing := {R of GRing.UnitRing R & Countable R}.
+HB.structure Definition UnitRing := {R of GRing.UnitRing R & Countable R}.
 
-Module CUnitRingExports.
-Notation countUnitRingType := CUnitRing.type.
-Notation "[ 'countUnitRingType' 'of' T ]" := (CUnitRing.clone T _) (*NB: was (do_pack pack T)*)
+Module  UnitRingExports.
+Notation countUnitRingType := UnitRing.type.
+Notation "[ 'countUnitRingType' 'of' T ]" := (UnitRing.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countUnitRingType'  'of'  T ]") : form_scope.
-End CUnitRingExports.
-HB.export CUnitRingExports.
+End  UnitRingExports.
+HB.export  UnitRingExports.
 
 #[mathcomp]
-HB.structure Definition CComUnitRing := {R of GRing.ComUnitRing R & Countable R}.
+HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Countable R}.
 
-Module CComUnitRingExports.
-Notation countComUnitRingType := CComUnitRing.type.
-Notation "[ 'countComUnitRingType' 'of' T ]" := (CComUnitRing.clone T _) (*NB: was (do_pack pack T)*)
+Module  ComUnitRingExports.
+Notation countComUnitRingType := ComUnitRing.type.
+Notation "[ 'countComUnitRingType' 'of' T ]" := (ComUnitRing.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countComUnitRingType'  'of'  T ]") : form_scope.
-End CComUnitRingExports.
-HB.export CComUnitRingExports.
+End  ComUnitRingExports.
+HB.export  ComUnitRingExports.
 
 #[mathcomp]
-HB.structure Definition CIntegralDomain := {R of GRing.IntegralDomain R & Countable R}.
+HB.structure Definition IntegralDomain := {R of GRing.IntegralDomain R & Countable R}.
 
-Module CIntegralDomainExports.
-Notation countIdomainType := CIntegralDomain.type.
-Notation "[ 'countIdomainType' 'of' T ]" := (CIntegralDomain.clone T _) (*NB: was (do_pack pack T)*)
+Module  IntegralDomainExports.
+Notation countIdomainType := IntegralDomain.type.
+Notation "[ 'countIdomainType' 'of' T ]" := (IntegralDomain.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countIdomainType'  'of'  T ]") : form_scope.
-End CIntegralDomainExports.
-HB.export CIntegralDomainExports.
+End  IntegralDomainExports.
+HB.export  IntegralDomainExports.
 
 #[mathcomp]
-HB.structure Definition CField := {R of GRing.Field R & Countable R}.
+HB.structure Definition Field := {R of GRing.Field R & Countable R}.
 
-Module CFieldExports.
-Notation countFieldType := CField.type.
-Notation "[ 'countFieldType' 'of' T ]" := (CField.clone T _) (*(do_pack pack T)*)
+Module  FieldExports.
+Notation countFieldType := Field.type.
+Notation "[ 'countFieldType' 'of' T ]" := (Field.clone T _) (*(do_pack pack T)*)
   (at level 0, format "[ 'countFieldType'  'of'  T ]") : form_scope.
-End CFieldExports.
-HB.export CFieldExports.
+End  FieldExports.
+HB.export  FieldExports.
 
 #[mathcomp]
-HB.structure Definition CDecidableField := {R of GRing.DecidableField R & Countable R}.
+HB.structure Definition DecidableField := {R of GRing.DecidableField R & Countable R}.
 
-Module CDecidableFieldExports.
-Notation countDecFieldType := CDecidableField.type.
-Notation "[ 'countDecFieldType' 'of' T ]" := (CDecidableField.clone T _) (*NB: was (do_pack pack T)*)
+Module  DecidableFieldExports.
+Notation countDecFieldType := DecidableField.type.
+Notation "[ 'countDecFieldType' 'of' T ]" := (DecidableField.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countDecFieldType'  'of'  T ]") : form_scope.
-End CDecidableFieldExports.
-HB.export CDecidableFieldExports.
+End  DecidableFieldExports.
+HB.export  DecidableFieldExports.
 
 #[mathcomp]
-HB.structure Definition CClosedField := {R of GRing.ClosedField R & Countable R}.
+HB.structure Definition ClosedField := {R of GRing.ClosedField R & Countable R}.
 
-Module CClosedFieldExports.
-Notation countClosedFieldType := CClosedField.type.
-Notation "[ 'countClosedFieldType' 'of' T ]" := (CClosedField.clone T _) (*NB: was (do_pack pack T)*)
+Module  ClosedFieldExports.
+Notation countClosedFieldType := ClosedField.type.
+Notation "[ 'countClosedFieldType' 'of' T ]" := (ClosedField.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countClosedFieldType'  'of'  T ]") : form_scope.
-End CClosedFieldExports.
-HB.export CClosedFieldExports.
+End  ClosedFieldExports.
+HB.export  ClosedFieldExports.
 
-End CountRing.
+End  ountRing.
 
 HB.reexport.
 (*
 Import CountRing.
 Export Zmodule.Exports Ring.Exports ComRing.Exports UnitRing.Exports.
-Export ComUnitRing.Exports IntegralDomain.Exports.
+Export  omUnitRing.Exports IntegralDomain.Exports.
 Export Field.Exports DecidableField.Exports ClosedField.Exports.
 *)
