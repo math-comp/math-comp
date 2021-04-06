@@ -4671,7 +4671,7 @@ HB.mixin Record Field_IsAlgClosed F of Field F := {
 
 (* TODO: put a factory in field/closed_field *)
 #[mathcomp(axiom = "closed_field_axiom")]
-HB.structure Definition ClosedField := { F of Field F & Field_IsAlgClosed F }.
+HB.structure Definition ClosedField := { F of DecidableField F & Field_IsAlgClosed F }.
 
 Module ClosedFieldExports.
 Notation closedFieldType := ClosedField.type.
