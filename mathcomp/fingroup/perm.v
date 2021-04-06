@@ -421,9 +421,7 @@ pose ts := t x y s; rewrite /= -[_ * s]/ts.
 pose dp u := #|porbits u :\ porbit u y :\ porbit u x|.
 rewrite !(addnC #|_|) (cardsD1 (porbit ts y)) imset_f ?inE //.
 rewrite (cardsD1 (porbit ts x)) inE imset_f ?inE //= -/(dp ts) {}/ts.
-Admitted.
-(*
-rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(imset_f, inE) //.
+rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(imset_f, inE); [|by []..].
 rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   wlog suffices: s / dp s <= dp (t x y s).
     by move=> IHs; apply/eqP; rewrite eqn_leq -{2}(tK x y s) !IHs.
@@ -453,7 +451,6 @@ move/loopingP/(_ n); rewrite -{n}snx.
 case/trajectP=> [[_|i]]; first exact: nesym; rewrite ltnS -permX => lt_i def_y.
 by move/lt_xf: lt_i; rewrite def_y /= eqxx orbT.
 Qed.
-*)
 
 Lemma odd_perm1 : odd_perm 1 = false.
 Proof.
@@ -601,9 +598,8 @@ elim: {k}(k : nat) {1 3}k (erefl (k : nat)) => [|m IHm] k def_k.
   by rewrite (_ : k = ord0) ?lift_perm1 ?odd_perm1 //; apply: val_inj.
 have le_mn: m < n.+1 by [rewrite -def_k ltnW]; pose j := Ordinal le_mn.
 rewrite -(mulg1 1)%g -(lift_permM _ j) odd_permM {}IHm // addbC.
-Admitted.
-(*
-rewrite (_ : _ 1 = tperm j k); first by rewrite odd_tperm neq_ltn def_k leqnn.
+rewrite (_ : _ 1 = tperm j k).
+  by rewrite odd_tperm neq_ltn /val /= def_k leqnn.
 apply/permP=> i; case: (unliftP j i) => [i'|] ->; last first.
   by rewrite lift_perm_id tpermL.
 apply: ord_inj; rewrite lift_perm_lift !permE /= eq_sym -if_neg neq_lift.
@@ -611,7 +607,6 @@ rewrite fun_if -val_eqE /= def_k /bump ltn_neqAle andbC.
 case: leqP => [_ | lt_i'm] /=; last by rewrite -if_neg neq_ltn leqW.
 by rewrite add1n eqSS; case: eqVneq.
 Qed.
-*)
 
 End LiftPerm.
 
