@@ -1494,78 +1494,21 @@ Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T _)
 End BDistrLatticeExports.
 HB.export BDistrLatticeExports.
 
-(* STOP
 
-Module TBDistrLattice.
-Section ClassDef.
+#[mathcomp]
+HB.structure Definition TBDistrLattice d :=
+  { T of TBLattice d T & BDistrLattice d T }.
 
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base  : BDistrLattice.class_of T;
-  mixin : TBLattice.mixin_of base;
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> BDistrLattice.class_of.
-Local Coercion base2 T (c : class_of T) : TBLattice.class_of T :=
-  @TBLattice.Class T c (mixin c).
-
-Structure type (disp : unit) := Pack { sort; _ : class_of sort }.
-
-Local Coercion sort : type >-> Sortclass.
-
-Variables (T : Type) (disp : unit) (cT : type disp).
-
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition pack :=
-  fun bT (b : BDistrLattice.class_of T)
-      & phant_id (@BDistrLattice.class disp bT) b =>
-  fun mT m & phant_id (@TBLattice.class disp mT) (@TBLattice.Class _ b m) =>
-  Pack disp (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition porderType := @POrder.Pack disp cT class.
-Definition latticeType := @Lattice.Pack disp cT class.
-Definition bLatticeType := @BLattice.Pack disp cT class.
-Definition tbLatticeType := @TBLattice.Pack disp cT class.
-Definition distrLatticeType := @DistrLattice.Pack disp cT class.
-Definition bDistrLatticeType := @BDistrLattice.Pack disp cT class.
-Definition ntb_distrLatticeType := @DistrLattice.Pack disp tbLatticeType class.
-Definition ntb_bDistrLatticeType :=
-  @BDistrLattice.Pack disp tbLatticeType class.
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> BDistrLattice.class_of.
-Coercion base2 : class_of >-> TBLattice.class_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Coercion choiceType : type >-> Choice.type.
-Coercion porderType : type >-> POrder.type.
-Coercion latticeType : type >-> Lattice.type.
-Coercion bLatticeType : type >-> BLattice.type.
-Coercion tbLatticeType : type >-> TBLattice.type.
-Coercion distrLatticeType : type >-> DistrLattice.type.
-Coercion bDistrLatticeType : type >-> BDistrLattice.type.
-Canonical eqType.
-Canonical choiceType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical ntb_distrLatticeType.
-Canonical ntb_bDistrLatticeType.
-Notation tbDistrLatticeType := type.
-Notation "[ 'tbDistrLatticeType' 'of' T ]" := (@pack T _ _ _ id _ _ id)
+Module TBDistrLatticeExports.
+Notation tbDistrLatticeType := TBDistrLattice.type.
+Notation "[ 'tbDistrLatticeType' 'of' T ]" := (TBDistrLattice.clone _ T _)
   (at level 0, format "[ 'tbDistrLatticeType'  'of'  T ]") : form_scope.
-End Exports.
+End TBDistrLatticeExports.
 
-End TBDistrLattice.
-Export TBDistrLattice.Exports.
+HB.export TBDistrLatticeExports.
+
+
+(* STOP
 
 Module CBDistrLattice.
 Section ClassDef.
