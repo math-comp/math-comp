@@ -39,7 +39,7 @@ algebra/ssralg.v
 # field/separable.v
 # fingroup/action.v
 # fingroup/all_fingroup.v
-# fingroup/automorphism.v
+fingroup/automorphism.v
 fingroup/fingroup.v
 # fingroup/gproduct.v
 fingroup/morphism.v
