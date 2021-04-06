@@ -1361,14 +1361,14 @@ Notation "x `|` y" := (join x y) : order_scope.
 End LatticeSyntax.
 HB.export LatticeSyntax.
 
-HB.mixin Record has_bottom d (T : indexed Type) of POrder d T := {
+HB.mixin Record HasBottom d (T : indexed Type) of POrder d T := {
   bottom : T;
   le0x : forall x, bottom <= x;
 }.
 (* TODO: Restore when we remove the mathcomp attribute *)
-(* HB.structure Definition BPOrder d := { T of has_bottom d T & POrder d T }. *)
+(* HB.structure Definition BPOrder d := { T of HasBottom d T & POrder d T }. *)
 #[mathcomp]
-HB.structure Definition BLattice d := { T of has_bottom d T & Lattice d T }.
+HB.structure Definition BLattice d := { T of HasBottom d T & Lattice d T }.
 
 Module BLatticeExports.
 Notation bLatticeType := BLattice.type.
@@ -1420,16 +1420,16 @@ Notation "\join_ ( i 'in' A ) F" :=
 End BLatticeSyntax.
 HB.export BLatticeSyntax.
 
-HB.mixin Record has_top d (T : indexed Type) of POrder d T := {
+HB.mixin Record HasTop d (T : indexed Type) of POrder d T := {
   top : T;
   lex1 : forall x, x <= top;
 }.
 (* TODO: Restore when we remove the mathcomp attribute *)
-(* HB.structure Definition TPOrder d := { T of has_bottom d T & POrder d T }. *)
-(* HB.structure Definition TLattice d := { T of has_top d T & Lattice d T }. *)
-(* HB.structure Definition TBOrder d := { T of has_top d T & BPOrder d T }. *)
+(* HB.structure Definition TPOrder d := { T of HasBottom d T & POrder d T }. *)
+(* HB.structure Definition TLattice d := { T of HasTop d T & Lattice d T }. *)
+(* HB.structure Definition TBOrder d := { T of HasTop d T & BPOrder d T }. *)
 #[mathcomp]
-HB.structure Definition TBLattice d := { T of has_top d T & BLattice d T }.
+HB.structure Definition TBLattice d := { T of HasTop d T & BLattice d T }.
 
 Module TBLatticeExports.
 Notation tbLatticeType := TBLattice.type.
@@ -1485,7 +1485,7 @@ End DistrLatticeExports.
 HB.export DistrLatticeExports.
 
 HB.structure Definition BDistrLattice d :=
-  { T of has_bottom d T & DistrLattice d T}.
+  { T of HasBottom d T & DistrLattice d T}.
 
 Module BDistrLatticeExports.
 Notation bDistrLatticeType  := BDistrLattice.type.
@@ -1507,14 +1507,14 @@ End TBDistrLatticeExports.
 
 HB.export TBDistrLatticeExports.
 
-HB.mixin Record has_sub d (T : indexed Type) of BDistrLattice d T := {
+HB.mixin Record HasSub d (T : indexed Type) of BDistrLattice d T := {
   sub    : T -> T -> T;
   subKI  : forall x y, y `&` sub x y = bottom;
   joinIB : forall x y, (x `&` y) `|` sub x y = x
 }.
 
 #[mathcomp]
-HB.structure Definition CBDistrLattice d := { T of has_sub d T & }.
+HB.structure Definition CBDistrLattice d := { T of HasSub d T & }.
 
 Module CBDistrLatticeExports.
 Notation cbDistrLatticeType  := CBDistrLattice.type.
@@ -1541,14 +1541,14 @@ Module Import CBDistrLatticeSyntax.
 Notation "x `\` y" := (sub x y) : order_scope.
 End CBDistrLatticeSyntax.
 
-HB.mixin Record has_compl d (T : indexed Type) of
+HB.mixin Record HasCompl d (T : indexed Type) of
          TBDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
-  complE : forall x, compl x = (top : T) `\` x (* FIXME? *)
+  complE : forall x : T, compl x = (top : T) `\` x (* FIXME? *)
 }.
 
 #[mathcomp]
-HB.structure Definition CTBDistrLattice d := { T of has_compl d T & }.
+HB.structure Definition CTBDistrLattice d := { T of HasCompl d T & }.
 
 Module CTBDistrLatticeExports.
 Notation ctbDistrLatticeType  := CTBDistrLattice.type.
@@ -3318,10 +3318,10 @@ Context {disp : unit} {L : tbLatticeType disp}.
 
 Lemma lex1 (x : L) : x <= top. Proof. exact: lex1. Qed.
 
-HB.instance Definition _ := has_bottom.Build _ L^d lex1.
+HB.instance Definition _ := HasBottom.Build _ L^d lex1.
 (* FIXME: BUG? *)
 (* HB.instance Definition _ := TBLattice.on L^d. *)
-HB.instance Definition _ := has_top.Build _ L^d (@le0x _ L).
+HB.instance Definition _ := HasTop.Build _ L^d (@le0x _ L).
 
 Lemma botEdual : (dual_bottom : L^d) = 1 :> L. Proof. by []. Qed.
 Lemma topEdual : (dual_top : L^d) = 0 :> L. Proof. by []. Qed.
@@ -3931,7 +3931,7 @@ HB.factory Record leOrder T of Choice T := {
 }.*)
 
 (* workaround *)
-HB.factory Record OrderOfChoice (d : unit) T of Choice T := {
+HB.factory Record IsOrdered (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -3951,7 +3951,7 @@ HB.factory Record OrderOfChoice (d : unit) T of Choice T := {
 }.
 
 HB.builders
-  Context (d : unit) T of OrderOfChoice d T.
+  Context (d : unit) T of IsOrdered d T.
 
 Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
@@ -4041,30 +4041,25 @@ Fact le_total : total le.
 Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
 
 HB.instance Definition _ :=
-  OrderOfChoice.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
+  IsOrdered.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
 HB.end.
 
-Module CanMixin.
-Section CanMixin.
+HB.factory Record MonoTotal disp T of POrder disp T := {
+  disp' : unit;
+  T' : orderType disp';
+  f : T -> T';
+  f_mono : {mono f : x y / x <= y}
+}.
+HB.builders Context disp T of MonoTotal disp T.
+Lemma totalT : total (<=%O : rel T).
+Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
+HB.instance Definition _ := POrder_IsOrder.Build disp T totalT.
+HB.end.
 
-Section Total.
-
-Variables (disp : unit) (T : porderType disp).
-Variables (disp' : unit) (T' : orderType disp') (f : T -> T').
-
-Lemma MonoTotal : {mono f : x y / x <= y} ->
-  totalPOrderMixin T' -> totalPOrderMixin T.
-Proof. by move=> f_mono T'_tot x y; rewrite -!f_mono le_total. Qed.
-
-End Total.
-
-Module Cancel.
-Section Order.
-
-Variables (T : choiceType) (disp : unit).
-
-Section Partial.
-Variables (disp' : unit) (T' : porderType disp) (f : T -> T').
+Module CancelPartial.
+Section CancelPartial.
+Variables (disp : unit) (T : choiceType).
+Variables (disp' : unit) (T' : porderType disp') (f : T -> T').
 
 Section PCan.
 Variables (f' : T' -> option T) (f_can : pcancel f f').
@@ -4079,46 +4074,72 @@ Fact trans : transitive le. Proof. by move=> y x z xy /(le_trans xy). Qed.
 Fact lt_def x y : lt x y = (y != x) && le x y.
 Proof. by rewrite /lt lt_def (inj_eq (pcan_inj f_can)). Qed.
 
-Definition PcanPOrder := IsPOrdered.Build disp T lt_def refl anti trans.
+Definition Pcan := IsPOrdered.Build disp T lt_def refl anti trans.
 
 End PCan.
 
-Definition CanPOrder f' (f_can : cancel f f') := IsLePOrder.PcanPOrder (can_pcan f_can).
+Definition Can f' (f_can : cancel f f') := Pcan (can_pcan f_can).
 
-End Partial.
+End CancelPartial.
+End CancelPartial.
 
-Section Total.
+Notation PcanPartial := CancelPartial.Pcan.
+Notation CanPartial := CancelPartial.Can.
 
-Variables (T' : orderType disp) (f : T -> T').
+#[export]
+HB.instance Definition _ (disp : unit) (T : choiceType)
+  (disp' : unit) (T' : porderType disp') (f : T -> T')
+  (f' : T' -> option T) (f_can : pcancel f f') : IsPOrdered disp (pcan_type f_can) :=
+  PcanPartial disp (f_can : @pcancel _ (pcan_type f_can)  f f').
+
+#[export]
+HB.instance Definition _ (disp : unit) (T : choiceType)
+  (disp' : unit) (T' : porderType disp') (f : T -> T') (f' : T' ->  T)
+  (f_can : cancel f f') : IsPOrdered disp (can_type f_can) :=
+  CanPartial disp (f_can : @cancel _ (can_type f_can)  f f').
+
+Section CancelTotal.
+Variables (disp : unit) (T : choiceType).
+Variables (disp' : unit) (T' : orderType disp') (f : T -> T').
 
 Section PCan.
 
 Variables (f' : T' -> option T) (f_can : pcancel f f').
 
-Let T_porderType := POrderType disp T (PcanPOrder f_can).
+#[local]
+HB.instance Definition _ :=
+   MonoTotal.Build disp (pcan_type f_can) (fun _ _ => erefl).
 
-Let total_le : total (le f).
-Proof. by apply: (@MonoTotal _ T_porderType _ _ f) => //; apply: le_total. Qed.
-
-Definition PcanOrder := LeOrderMixin
-  (@lt_def _ _ _ f_can) (fun _ _ => erefl) (fun _ _ => erefl)
-  (@anti _ _ _ f_can) (@trans _ _) total_le.
+Definition PcanTotal : POrder_IsTotal _ (pcan_type f_can) :=
+  Total.on (pcan_type f_can).
 
 End PCan.
 
-Definition CanOrder f' (f_can : cancel f f') := PcanOrder (can_pcan f_can).
+Section Can.
 
-End Total.
+Variables (f' : T' -> T) (f_can : cancel f f').
 
-End Order.
+#[local]
+HB.instance Definition _ :=
+   MonoTotal.Build disp (can_type f_can) (fun _ _ => erefl).
 
-Section Lattice.
+Definition CanTotal : POrder_IsTotal _ (can_type f_can) :=
+  Total.on (can_type f_can).
 
-Variables (disp : unit) (T : porderType disp).
-Variables (disp' : unit) (T' : latticeType disp') (f : T -> T').
+End Can.
+End CancelTotal.
 
-Variables (f' : T' -> T) (f_can : cancel f f') (f'_can : cancel f' f).
-Variable (f_mono : {mono f : x y / x <= y}).
+HB.factory Record IsoLattice disp T of POrder disp T := {
+  disp' : unit;
+  T' : latticeType disp';
+  f : T -> T';
+  f' : T' -> T;
+  f_can : cancel f f';
+  f'_can : cancel f' f;
+  f_mono : {mono f : x y / x <= y};
+}.
+
+HB.builders Context disp T of IsoLattice disp T.
 
 Definition meet (x y : T) := f' (meet (f x) (f y)).
 Definition join (x y : T) := f' (join (f x) (f y)).
@@ -4136,87 +4157,109 @@ Proof. by rewrite /join /meet f'_can meetKU f_can. Qed.
 Lemma meet_eql x y : (x <= y) = (meet x y == x).
 Proof. by rewrite /meet -(can_eq f_can) f'_can eq_meetl f_mono. Qed.
 
-Definition IsoLattice :=
-  @LatticeMixin _ T _ _ meetC joinC meetA joinA joinKI meetKI meet_eql.
+HB.instance Definition _ := POrder_IsLattice.Build _ T
+  meetC joinC meetA joinA joinKI meetKI meet_eql.
 
-End Lattice.
+HB.end.
 
-Section DistrLattice.
+HB.factory Record IsoDistrLattice disp T of POrder disp T := {
+  disp' : unit;
+  T' : distrLatticeType disp';
+  f : T -> T';
+  f' : T' -> T;
+  f_can : cancel f f';
+  f'_can : cancel f' f;
+  f_mono : {mono f : x y / x <= y};
+}.
 
-Variables (disp : unit) (T : porderType disp).
-Variables (disp' : unit) (T' : distrLatticeType disp') (f : T -> T').
+HB.builders Context disp T of IsoDistrLattice disp T.
 
-Variables (f' : T' -> T) (f_can : cancel f f') (f'_can : cancel f' f).
-Variable (f_mono : {mono f : x y / x <= y}).
+HB.instance Definition _ := IsoLattice.Build _ T f_can f'_can f_mono.
 
-Lemma meetUl : left_distributive (meet f f') (join f f').
-Proof. by move=> x y z; rewrite /meet /join !f'_can meetUl. Qed.
+Lemma meetUl : left_distributive (meet : T -> T -> T) join.
+Proof. by move=> x y z; rewrite /meet /join /= !f'_can meetUl. Qed.
 
-Definition IsoDistrLattice :=
-  @DistrLatticeMixin _ (LatticeType T (IsoLattice f_can f'_can f_mono)) meetUl.
+HB.instance Definition _ := Lattice_MeetIsDistributive.Build _ T meetUl.
 
-End DistrLattice.
+HB.end.
 
-End CanMixin.
-
-Module Exports.
-Notation MonoTotalMixin := MonoTotal.
-Notation PcanPOrderMixin := PcanPOrder.
-Notation CanPOrderMixin := CanPOrder.
-Notation PcanOrderMixin := PcanOrder.
-Notation CanOrderMixin := CanOrder.
-Notation IsoLatticeMixin := IsoLattice.
-Notation IsoDistrLatticeMixin := IsoDistrLattice.
-End Exports.
-End CanMixin.
-Import CanMixin.Exports.
+Module CanExports.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.MonoTotal instead.")]
+Notation MonoTotalMixin d T := (MonoTotal d T).
+#[deprecated(since="mathcomp 2.0.0", note="use Order.PcanPartial instead.")]
+Notation PcanPOrderMixin := PcanPartial.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.CanPartial instead.")]
+Notation CanPOrderMixin := CanPartial.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.PcanTotal instead.")]
+Notation PcanOrderMixin := PcanTotal.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.CanTotal instead.")]
+Notation CanOrderMixin := CanTotal.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.IsoLattice instead.")]
+Notation IsoLatticeMixin d T := (IsoLattice d T).
+#[deprecated(since="mathcomp 2.0.0", note="use Order.IsoDistrLattice instead.")]
+Notation IsoDistrLatticeMixin d T := (IsoDistrLattice d T).
+End CanExports.
+Export CanExports.
 
 Module SubOrder.
 
 Section Partial.
 Context {disp : unit} {T : porderType disp} (P : {pred T}) (sT : subType P).
 
-Definition sub_POrderMixin := PcanPOrderMixin (@valK _ _ sT).
-Canonical sub_POrderType := Eval hnf in POrderType disp sT sub_POrderMixin.
+#[export]
+HB.instance Definition _ : IsPOrdered disp (sub_type sT) :=
+  PcanPartial disp (valK : @pcancel _ (sub_type sT) val insub).
 
-Lemma leEsub (x y : sT) : (x <= y) = (val x <= val y). Proof. by []. Qed.
-Lemma ltEsub (x y : sT) : (x < y) = (val x < val y). Proof. by []. Qed.
+Lemma leEsub (x y : sub_type sT) : (x <= y) = (val x <= val y).
+Proof. by []. Qed.
+Lemma ltEsub (x y : sub_type sT) : (x < y) = (val x < val y).
+Proof. by []. Qed.
 
 End Partial.
 
 Section Total.
 Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
-Definition sub_TotalOrderMixin : totalPOrderMixin (sub_POrderType sT) :=
-  @MonoTotalMixin _ _ _ _ val (fun _ _ => erefl) (@le_total _ T).
-Canonical sub_LatticeType :=
-  Eval hnf in LatticeType sT sub_TotalOrderMixin.
-Canonical sub_DistrLatticeType :=
-  Eval hnf in DistrLatticeType sT sub_TotalOrderMixin.
-Canonical sub_OrderType := Eval hnf in OrderType sT sub_TotalOrderMixin.
+#[export]
+HB.instance Definition _ :=
+  MonoTotal.Build _ (sub_type sT) (fun _ _ => erefl).
 
 End Total.
-Arguments sub_TotalOrderMixin {disp T} [P].
 
 Module Exports.
-Notation "[ 'porderMixin' 'of' T 'by' <: ]" :=
-  (sub_POrderMixin _ : lePOrderMixin [eqType of T])
-  (at level 0, format "[ 'porderMixin'  'of'  T  'by'  <: ]") : form_scope.
+HB.reexport.
+Notation "[ 'POrder' 'of' T 'by' <: ]" :=
+  (POrder.copy T%type (sub_type T))
+  (at level 0, format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
 
-Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
-  (sub_TotalOrderMixin _ : totalPOrderMixin [porderType of T])
+Notation "[ 'IsPOrdered'  'of' T 'by' <: ]" :=
+  (fun d => (PcanPartial d (valK : @pcancel (_ : porderType d)
+                                                    T%type val insub) :
+   (IsPOrdered d T%type)) _)
+  (at level 0, format "[ 'IsPOrdered'  'of'  T  'by'  <: ]") : form_scope.
+
+#[deprecated(since="mathcomp 2.0.0",
+  note="use [POrder of T by <:] or [IsPOrdered of T by <:] instead.")]
+Notation "[ 'porderMixin' 'of' T 'by' <: ]" :=
+  [IsPOrdered of T by <:]
+  (at level 0, format "[ 'porderMixin'  'of'  T  'by'  <: ]",
+   only parsing) : form_scope.
+
+Notation "[ 'IsTotal' 'of' T 'by' <: ]" :=
+  (MonoTotal.Build _ T (fun _ _ => erefl))
   (at level 0, only parsing) : form_scope.
 
-Canonical sub_POrderType.
-Canonical sub_LatticeType.
-Canonical sub_DistrLatticeType.
-Canonical sub_OrderType.
+Notation "[ 'Order' 'of' T 'by' <: ]" :=
+  (Total.copy T%type (sub_type T))
+  (at level 0, only parsing) : form_scope.
 
-Definition leEsub := @leEsub.
-Definition ltEsub := @ltEsub.
+#[deprecated(since="mathcomp 2.0.0",
+  note="use [Order of T by <:] or [IsTotal of T by <:] instead.")]
+Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
+  [IsTotal of T by <:] (at level 0, only parsing) : form_scope.
 End Exports.
 End SubOrder.
-Import SubOrder.Exports. *)
+Import SubOrder.Exports.
 
 (*************)
 (* INSTANCES *)
@@ -4253,10 +4296,10 @@ Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
 HB.instance Definition _ :=
-  OrderOfChoice.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
-                      anti_leq leq_trans leq_total.
+  IsOrdered.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
+                  anti_leq leq_trans leq_total.
 
-HB.instance Definition _ := has_bottom.Build nat_display nat leq0n.
+HB.instance Definition _ := HasBottom.Build nat_display nat leq0n.
 
 Lemma leEnat : le = leq. Proof. by []. Qed.
 Lemma ltEnat : lt = ltn. Proof. by []. Qed.
@@ -4478,14 +4521,14 @@ HB.instance Definition _ := Choice.copy t nat.
 
 #[export]
 HB.instance Definition _ := IsMeetJoinDistrLattice.Build
-  dvd_display t le_def (fun=> erefl)
+  dvd_display t le_def (fun _ _ => erefl)
   gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
 
 #[export]
-HB.instance Definition _ := has_bottom.Build _ t (dvd1n : forall m : t, (1 %| m)).
+HB.instance Definition _ := HasBottom.Build _ t (dvd1n : forall m : t, (1 %| m)).
 
 #[export]
-HB.instance Definition _ := has_top.Build _ t (dvdn0 : forall m : t, (m %| 0)).
+HB.instance Definition _ := HasTop.Build _ t (dvdn0 : forall m : t, (m %| 0)).
 
 (*Canonical eqType := [eqType of t].
 Canonical choiceType := [choiceType of t].
@@ -4526,7 +4569,6 @@ End NatDvd.
 (* Canonical structures on ordinal *)
 (***********************************)
 
-(* STOP
 Module OrdinalOrder.
 Section OrdinalOrder.
 
@@ -4535,14 +4577,8 @@ Lemma ord_display : unit. Proof. exact: tt. Qed.
 Section PossiblyTrivial.
 Variable (n : nat).
 
-Definition porderMixin := [porderMixin of 'I_n by <:].
-Canonical porderType := POrderType ord_display 'I_n (porderMixin).
-
-Definition orderMixin := [totalOrderMixin of 'I_n by <:].
-Canonical latticeType := LatticeType 'I_n orderMixin.
-Canonical distrLatticeType := DistrLatticeType 'I_n orderMixin.
-Canonical orderType  := OrderType 'I_n orderMixin.
-Canonical finPOrderType := [finPOrderType of 'I_n].
+#[export]
+HB.instance Definition _ := [Order of 'I_n by <:].
 
 Lemma leEord : (le : rel 'I_n) = leq. Proof. by []. Qed.
 Lemma ltEord : (lt : rel 'I_n) = (fun m n => m < n)%N. Proof. by []. Qed.
@@ -4552,15 +4588,12 @@ Section NonTrivial.
 Variable (n' : nat).
 Let n := n'.+1.
 
-Canonical bLatticeType :=
-   BLatticeType 'I_n (BottomMixin (leq0n : forall x, ord0 <= x)).
-Canonical bDistrLatticeType := [bDistrLatticeType of 'I_n].
-Canonical tbLatticeType :=
-   TBLatticeType 'I_n (TopMixin (@leq_ord _ : forall x, x <= ord_max)).
-Canonical tbDistrLatticeType := [tbDistrLatticeType of 'I_n].
-Canonical finLatticeType := [finLatticeType of 'I_n].
-Canonical finDistrLatticeType := [finDistrLatticeType of 'I_n].
-Canonical finOrderType := [finOrderType of 'I_n].
+#[export]
+HB.instance Definition _ :=
+   HasBottom.Build _ 'I_n (leq0n : forall x, ord0 <= x).
+#[export]
+HB.instance Definition _ :=
+   HasTop.Build _ 'I_n (@leq_ord _ : forall x, x <= ord_max).
 
 Lemma botEord : 0%O = ord0. Proof. by []. Qed.
 Lemma topEord : 1%O = ord_max. Proof. by []. Qed.
@@ -4570,25 +4603,16 @@ End NonTrivial.
 End OrdinalOrder.
 
 Module Exports.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical orderType.
-Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finDistrLatticeType.
-Canonical finOrderType.
-
+(* FIXME: uncomment when selection of material *)
+(* HB.reexport. *)
 Definition leEord := leEord.
 Definition ltEord := ltEord.
 Definition botEord := botEord.
 Definition topEord := topEord.
 End Exports.
 End OrdinalOrder.
+
+(* STOP
 
 (*******************************)
 (* Canonical structure on bool *)
@@ -6650,7 +6674,13 @@ Module Theory.
 Export CTheory TotalTheory.
 End Theory.
 
+*)
+
+Module Exports. HB.reexport. End Exports.
 End Order.
+Export Order.Exports.
+
+(*
 
 Export Order.Syntax.
 
@@ -6836,6 +6866,3 @@ End tagnat.
 End tagnat.
 Arguments tagnat.Rank {n p_}.
 *)
-
-End Order.
-HB.reexport.
