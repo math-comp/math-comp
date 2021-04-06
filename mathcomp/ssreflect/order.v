@@ -1282,7 +1282,7 @@ HB.mixin Record is_Lattice_of_POrder
   joinA : associative join;
   joinKI : forall y x, meet x (join x y) = x;
   meetKU : forall y x, join x (meet x y) = x;
-  le_def : forall x y, (x <= y) = (meet x y == x);
+  leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
 (* HB.builders Context d T of is_Lattice_of_POrder d T. *)
 
@@ -1826,14 +1826,24 @@ Lemma lexx (x : T) : x <= x.
 Proof. exact: le_refl. Qed.
 Hint Resolve lexx : core.
 
+Definition le_refl : reflexive le := lexx.
 Definition ge_refl : reflexive ge := lexx.
 Hint Resolve le_refl : core.
+
+Lemma le_anti: antisymmetric (<=%O : rel T).
+Proof. exact: le_anti. Qed.
 
 Lemma ge_anti: antisymmetric (>=%O : rel T).
 Proof. by move=> x y /le_anti. Qed.
 
+Lemma le_trans: transitive (<=%O : rel T).
+Proof. exact: le_trans. Qed.
+
 Lemma ge_trans: transitive (>=%O : rel T).
 Proof. by move=> ? ? ? ? /le_trans; apply. Qed.
+
+Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
+Proof. exact: lt_def. Qed.
 
 Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
 Proof. by rewrite lt_def eq_sym. Qed.
@@ -2606,13 +2616,13 @@ Arguments max_idPr {disp T x y}.
 Arguments comparable_min_idPr {disp T x y _}.
 Arguments comparable_max_idPl {disp T x y _}.
 
-(* STOP
 Module Import DualPOrder.
 Section DualPOrder.
-Canonical dual_eqType (T : eqType) := EqType T [eqMixin of T^d].
-Canonical dual_choiceType (T : choiceType) := [choiceType of T^d].
-Canonical dual_countType (T : countType) := [countType of T^d].
-Canonical dual_finType (T : finType) := [finType of T^d].
+
+HB.instance Definition _ (T : eqType) := [eqMixin of T^d].
+HB.instance Definition _ (T : choiceType) := [choiceMixin of T^d].
+HB.instance Definition _ (T : countType) := [countMixin of T^d].
+HB.instance Definition _ (T : finType) := Finite.on T^d.
 
 Context {disp : unit}.
 Variable T : porderType disp.
@@ -2623,19 +2633,18 @@ Proof. by apply: lt_neqAle. Qed.
 Fact dual_le_anti : antisymmetric (@ge _ T).
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
-Definition dual_porderMixin :=
-  @POrder.Mixin _ _ ge gt dual_lt_def (lexx : reflexive ge) dual_le_anti
-                (fun y z x zy yx => @le_trans _ _ y x z yx zy).
-Canonical dual_porderType :=
-  POrderType (dual_display disp) T^d dual_porderMixin.
+HB.instance Definition _ :=
+  is_POrdered.Build
+    (dual_display disp) (T^d) tt
+    dual_lt_def lexx dual_le_anti
+    (fun y z x zy yx => @le_trans _ _ y x z yx zy).
 
 Lemma leEdual (x y : T) : (x <=^d y :> T^d) = (y <= x). Proof. by []. Qed.
 Lemma ltEdual (x y : T) : (x <^d y :> T^d) = (y < x). Proof. by []. Qed.
 
 End DualPOrder.
 
-Canonical dual_finPOrderType d (T : finPOrderType d) :=
-  [finPOrderType of T^d].
+HB.instance Definition _ d (T : finPOrderType d) := FinPOrder.on T^d.
 
 End DualPOrder.
 
@@ -2645,16 +2654,14 @@ Context {disp : unit}.
 Variable L : latticeType disp.
 Implicit Types (x y : L).
 
-Lemma meetC : commutative (@meet _ L). Proof. by case: L => [?[?[]]]. Qed.
-Lemma joinC : commutative (@join _ L). Proof. by case: L => [?[?[]]]. Qed.
+Lemma meetC : commutative (@meet _ L). Proof. exact: meetC. Qed.
+Lemma joinC : commutative (@join _ L). Proof. exact: joinC. Qed.
 
-Lemma meetA : associative (@meet _ L). Proof. by case: L => [?[?[]]]. Qed.
-Lemma joinA : associative (@join _ L). Proof. by case: L => [?[?[]]]. Qed.
+Lemma meetA : associative (@meet _ L). Proof. exact: meetA. Qed.
+Lemma joinA : associative (@join _ L). Proof. exact: joinA. Qed.
 
-Lemma joinKI y x : x `&` (x `|` y) = x.
-Proof. by case: L x y => [?[?[]]]. Qed.
-Lemma meetKU y x : x `|` (x `&` y) = x.
-Proof. by case: L x y => [?[?[]]]. Qed.
+Lemma joinKI y x : x `&` (x `|` y) = x. Proof. exact: joinKI. Qed.
+Lemma meetKU y x : x `|` (x `&` y) = x. Proof. exact: meetKU. Qed.
 
 Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite joinC joinKI. Qed.
 Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite meetC meetKU. Qed.
@@ -2668,7 +2675,7 @@ Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
 Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite joinC joinIK. Qed.
 
 Lemma leEmeet x y : (x <= y) = (x `&` y == x).
-Proof. by case: L x y => [?[?[]]]. Qed.
+Proof. exact: leEmeet. Qed.
 
 Lemma leEjoin x y : (x <= y) = (x `|` y == y).
 Proof. by rewrite leEmeet; apply/eqP/eqP => <-; rewrite (joinKI, meetUK). Qed.
@@ -2676,11 +2683,10 @@ Proof. by rewrite leEmeet; apply/eqP/eqP => <-; rewrite (joinKI, meetUK). Qed.
 Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
 Proof. by rewrite [LHS]leEjoin joinC. Qed.
 
-Definition dual_latticeMixin :=
-  @Lattice.Mixin _ (POrder.class [porderType of L^d]) _ _ joinC meetC
-                 joinA meetA meetKU joinKI dual_leEmeet.
-
-Canonical dual_latticeType := LatticeType L^d dual_latticeMixin.
+HB.instance Definition _ :=
+  @is_Lattice_of_POrder.Build
+    (dual_display disp) L^d
+    join meet joinC meetC joinA meetA meetKU joinKI dual_leEmeet.
 
 Lemma meetEdual x y : ((x : L^d) `&^d` y) = (x `|` y). Proof. by []. Qed.
 Lemma joinEdual x y : ((x : L^d) `|^d` y) = (x `&` y). Proof. by []. Qed.
@@ -2863,7 +2869,7 @@ Variable L : distrLatticeType disp.
 Implicit Types (x y : L).
 
 Lemma meetUl : left_distributive (@meet _ L) (@join _ L).
-Proof. by case: L => [?[?[]]]. Qed.
+Proof. exact: meetUl. Qed.
 
 Lemma meetUr : right_distributive (@meet _ L) (@join _ L).
 Proof. by move=> x y z; rewrite meetC meetUl ![_ `&` x]meetC. Qed.
@@ -2874,10 +2880,7 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite !(joinC x) -joinIl. Qed.
 
-Definition dual_distrLatticeMixin :=
-  @DistrLattice.Mixin _ (Lattice.class [latticeType of L^d]) joinIl.
-
-Canonical dual_distrLatticeType := DistrLatticeType L^d dual_distrLatticeMixin.
+HB.instance Definition _ := is_DistLattice_of_Lattice.Build _ L^d joinIl.
 
 End DistrLatticeTheory.
 End DistrLatticeTheory.
@@ -2887,7 +2890,7 @@ Section TotalTheory.
 Context {disp : unit} {T : orderType disp}.
 Implicit Types (x y z t : T) (s : seq T).
 
-Lemma le_total : total (<=%O : rel T). Proof. by case: T => [? [?]]. Qed.
+Definition le_total : total (<=%O : rel T) := le_total.
 Hint Resolve le_total : core.
 
 Lemma ge_total : total (>=%O : rel T).
@@ -3204,7 +3207,7 @@ Implicit Types (I : finType) (T : eqType) (x y z : L).
 Local Notation "0" := bottom.
 
 (* Non-distributive lattice theory with 0 & 1*)
-Lemma le0x x : 0 <= x. Proof. by case: L x => [?[?[]]]. Qed.
+Lemma le0x x : 0 <= x. Proof. exact: le0x. Qed.
 Hint Resolve le0x : core.
 
 Lemma lex0 x : (x <= 0) = (x == 0).
@@ -3315,24 +3318,19 @@ Module Import DualTBLattice.
 Section DualTBLattice.
 Context {disp : unit} {L : tbLatticeType disp}.
 
-Lemma lex1 (x : L) : x <= top. Proof. by case: L x => [?[?[]]]. Qed.
+Lemma lex1 (x : L) : x <= top. Proof. exact: lex1. Qed.
 
-Definition dual_bLatticeMixin :=
-  @BLattice.Mixin _ (Lattice.class [latticeType of L^d]) top lex1.
-Canonical dual_bLatticeType := BLatticeType L^d dual_bLatticeMixin.
-
-Definition dual_tbLatticeMixin :=
-  @TBLattice.Mixin _ (BLattice.class [bLatticeType of L^d])
-                   (bottom : L) (@le0x _ L).
-Canonical dual_tbLatticeType := TBLatticeType L^d dual_tbLatticeMixin.
+HB.instance Definition _ := has_bottom.Build _ L^d lex1.
+(* FIXME: BUG? *)
+(* HB.instance Definition _ := TBLattice.on L^d. *)
+HB.instance Definition _ := has_top.Build _ L^d (@le0x _ L).
 
 Lemma botEdual : (dual_bottom : L^d) = 1 :> L. Proof. by []. Qed.
 Lemma topEdual : (dual_top : L^d) = 0 :> L. Proof. by []. Qed.
 
 End DualTBLattice.
 
-Canonical dual_finLatticeType d (T : finLatticeType d) :=
-  [finLatticeType of T^d].
+HB.instance Definition _ d (T : finLatticeType d) := FinLattice.on T^d.
 
 End DualTBLattice.
 
@@ -3346,22 +3344,22 @@ Local Notation "1" := top.
 Hint Resolve le0x lex1 : core.
 
 Lemma meetx1 : right_id 1 (@meet _ L).
-Proof. exact: (@joinx0 _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joinx0 _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meet1x : left_id 1 (@meet _ L).
-Proof. exact: (@join0x _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join0x _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma joinx1 : right_zero 1 (@join _ L).
-Proof. exact: (@meetx0 _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@meetx0 _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma join1x : left_zero 1 (@join _ L).
-Proof. exact: (@meet0x _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@meet0x _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma le1x x : (1 <= x) = (x == 1).
-Proof. exact: (@lex0 _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@lex0 _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
-Proof. exact: (@join_eq0 _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join_eq0 _ [the tbLatticeType _ of L^d]). Qed.
 
 Canonical meet_monoid := Monoid.Law (@meetA _ _) meet1x meetx1.
 Canonical meet_comoid := Monoid.ComLaw (@meetC _ _).
@@ -3371,40 +3369,40 @@ Canonical join_muloid := Monoid.MulLaw join1x joinx1.
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@join_sup _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join_sup _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@join_min _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join_min _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. exact: (@joinsP _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joinsP _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meet_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. exact: (@join_sup_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join_sup_seq _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meet_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. exact: (@join_min_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join_min_seq _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \meet_(x <- r | P x) F x).
-Proof. exact: (@joinsP_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joinsP_seq _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma le_meets I (A B : {set I}) (F : I -> L) :
    A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
-Proof. exact: (@le_joins _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@le_joins _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meets_setU I (A B : {set I}) (F : I -> L) :
    \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
-Proof. exact: (@joins_setU _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joins_setU _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meet_seq I (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof. exact: (@join_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@join_seq _ [the tbLatticeType _ of L^d]). Qed.
 
 End TBLatticeTheory.
 End TBLatticeTheory.
@@ -3458,13 +3456,13 @@ Module Import DualTBDistrLattice.
 Section DualTBDistrLattice.
 Context {disp : unit} {L : tbDistrLatticeType disp}.
 
-Canonical dual_bDistrLatticeType := [bDistrLatticeType of L^d].
-Canonical dual_tbDistrLatticeType := [tbDistrLatticeType of L^d].
+HB.instance Definition _ := BDistrLattice.on L^d.
+HB.instance Definition _ := TBDistrLattice.on L^d.
 
 End DualTBDistrLattice.
 
-Canonical dual_finDistrLatticeType d (T : finDistrLatticeType d) :=
-  [finDistrLatticeType of T^d].
+HB.instance Definition _ d (T : finDistrLatticeType d) :=
+  FinDistrLattice.on T^d.
 
 End DualTBDistrLattice.
 
@@ -3475,34 +3473,30 @@ Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation "1" := top.
 
+Local Notation Ld := [the tbDistrLatticeType _ of L^d].
+
 Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
-Proof. rewrite joinC; exact: (@leU2l_le _ [tbDistrLatticeType of L^d]). Qed.
+Proof. by rewrite joinC; exact: (@leU2l_le _ Ld). Qed.
 
 Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
-Proof. rewrite joinC; exact: (@leU2r_le _ [tbDistrLatticeType of L^d]). Qed.
+Proof. by rewrite joinC; exact: (@leU2r_le _ Ld). Qed.
 
 Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
-Proof.
-rewrite joinC; exact: (@disjoint_lexUl _ [tbDistrLatticeType of L^d]).
-Qed.
+Proof. by rewrite joinC; exact: (@disjoint_lexUl _ Ld). Qed.
 
 Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
-Proof.
-rewrite joinC; exact: (@disjoint_lexUr _ [tbDistrLatticeType of L^d]).
-Qed.
+Proof. by rewrite joinC; exact: (@disjoint_lexUr _ Ld). Qed.
 
 Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
-Proof.
-by move=> ? ?; apply: (@leU2E _ [tbDistrLatticeType of L^d]); rewrite meetC.
-Qed.
+Proof. by move=> ? ?; apply: (@leU2E _ Ld); rewrite meetC. Qed.
 
 Canonical join_addoid := Monoid.AddLaw (@meetUl _ L) (@meetUr _ _).
 Canonical meet_addoid := Monoid.AddLaw (@joinIl _ L) (@joinIr _ _).
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
-Proof. exact: (@joins_disjoint _ [tbDistrLatticeType of L^d]). Qed.
+Proof. exact: (@joins_disjoint _ Ld). Qed.
 
 End TBDistrLatticeTheory.
 End TBDistrLatticeTheory.
