@@ -71,10 +71,8 @@ Notation "[ 'countZmodType' 'of' T ]" := (CZmodule.clone T _)
 End CZmoduleExports.
 HB.export CZmoduleExports.
 
-
 #[mathcomp]
 HB.structure Definition CRing := {R of GRing.Ring R & Countable R}.
-
 
 Module CRingExports.
 Notation countRingType := CRing.type.
@@ -94,571 +92,66 @@ Notation "[ 'countComRingType' 'of' T ]" := (CComRing.clone T _)
 End CComRingExports.
 HB.export CComRingExports.
 
-HB.graph "g.dot".
+#[mathcomp]
+HB.structure Definition CUnitRing := {R of GRing.UnitRing R & Countable R}.
 
-(* STOP
-End ComRing.
-Import ComRing.Exports.
-
-Module UnitRing.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.UnitRing.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := Ring.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.UnitRing.class_of.
-Local Coercion base2 : class_of >-> Ring.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.UnitRing.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-
-Definition join_countType := @Countable.Pack unitRingType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack unitRingType class.
-Definition join_countRingType := @Ring.Pack unitRingType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.UnitRing.class_of.
-Coercion base2 : class_of >-> Ring.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Notation countUnitRingType := CountRing.UnitRing.type.
-Notation "[ 'countUnitRingType' 'of' T ]" := (do_pack pack T)
+Module CUnitRingExports.
+Notation countUnitRingType := CUnitRing.type.
+Notation "[ 'countUnitRingType' 'of' T ]" := (CUnitRing.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countUnitRingType'  'of'  T ]") : form_scope.
-End Exports.
+End CUnitRingExports.
+HB.export CUnitRingExports.
 
-End UnitRing.
-Import UnitRing.Exports.
+#[mathcomp]
+HB.structure Definition CComUnitRing := {R of GRing.ComUnitRing R & Countable R}.
 
-Module ComUnitRing.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.ComUnitRing.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := ComRing.Class (base c) (mixin c).
-Definition base3 R (c : class_of R) := @UnitRing.Class R (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.ComUnitRing.class_of.
-Local Coercion base2 : class_of >-> ComRing.class_of.
-Local Coercion base3 : class_of >-> UnitRing.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.ComUnitRing.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition countComRingType := @ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition countUnitRingType := @UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-
-Definition join_countType := @Countable.Pack comUnitRingType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack comUnitRingType class.
-Definition join_countRingType := @Ring.Pack comUnitRingType class.
-Definition join_countComRingType := @ComRing.Pack comUnitRingType class.
-Definition join_countUnitRingType := @UnitRing.Pack comUnitRingType class.
-Definition ujoin_countComRingType := @ComRing.Pack unitRingType class.
-Definition cjoin_countUnitRingType := @UnitRing.Pack comRingType class.
-Definition ccjoin_countUnitRingType := @UnitRing.Pack countComRingType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.ComUnitRing.class_of.
-Coercion base2 : class_of >-> ComRing.class_of.
-Coercion base3 : class_of >-> UnitRing.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion countComRingType : type >-> ComRing.type.
-Canonical countComRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion countUnitRingType : type >-> UnitRing.type.
-Canonical countUnitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Canonical join_countComRingType.
-Canonical join_countUnitRingType.
-Canonical ujoin_countComRingType.
-Canonical cjoin_countUnitRingType.
-Canonical ccjoin_countUnitRingType.
-Notation countComUnitRingType := CountRing.ComUnitRing.type.
-Notation "[ 'countComUnitRingType' 'of' T ]" := (do_pack pack T)
+Module CComUnitRingExports.
+Notation countComUnitRingType := CComUnitRing.type.
+Notation "[ 'countComUnitRingType' 'of' T ]" := (CComUnitRing.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countComUnitRingType'  'of'  T ]") : form_scope.
-End Exports.
+End CComUnitRingExports.
+HB.export CComUnitRingExports.
 
-End ComUnitRing.
-Import ComUnitRing.Exports.
+#[mathcomp]
+HB.structure Definition CIntegralDomain := {R of GRing.IntegralDomain R & Countable R}.
 
-Module IntegralDomain.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.IntegralDomain.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := ComUnitRing.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Local Coercion base2 : class_of >-> ComUnitRing.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.IntegralDomain.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition countComRingType := @ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition countUnitRingType := @UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition countComUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-
-Definition join_countType := @Countable.Pack idomainType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack idomainType class.
-Definition join_countRingType := @Ring.Pack idomainType class.
-Definition join_countUnitRingType := @UnitRing.Pack idomainType class.
-Definition join_countComRingType := @ComRing.Pack idomainType class.
-Definition join_countComUnitRingType := @ComUnitRing.Pack idomainType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Coercion base2 : class_of >-> ComUnitRing.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion countComRingType : type >-> ComRing.type.
-Canonical countComRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion countUnitRingType : type >-> UnitRing.type.
-Canonical countUnitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion countComUnitRingType : type >-> ComUnitRing.type.
-Canonical countComUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Canonical join_countComRingType.
-Canonical join_countUnitRingType.
-Canonical join_countComUnitRingType.
-Notation countIdomainType := CountRing.IntegralDomain.type.
-Notation "[ 'countIdomainType' 'of' T ]" := (do_pack pack T)
+Module CIntegralDomainExports.
+Notation countIdomainType := CIntegralDomain.type.
+Notation "[ 'countIdomainType' 'of' T ]" := (CIntegralDomain.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countIdomainType'  'of'  T ]") : form_scope.
-End Exports.
+End CIntegralDomainExports.
+HB.export CIntegralDomainExports.
 
-End IntegralDomain.
-Import IntegralDomain.Exports.
+#[mathcomp]
+HB.structure Definition CField := {R of GRing.Field R & Countable R}.
 
-Module Field.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.Field.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := IntegralDomain.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.Field.class_of.
-Local Coercion base2 : class_of >-> IntegralDomain.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.Field.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition countComRingType := @ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition countUnitRingType := @UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition countComUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition countIdomainType := @IntegralDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-
-Definition join_countType := @Countable.Pack fieldType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack fieldType class.
-Definition join_countRingType := @Ring.Pack fieldType class.
-Definition join_countUnitRingType := @UnitRing.Pack fieldType class.
-Definition join_countComRingType := @ComRing.Pack fieldType class.
-Definition join_countComUnitRingType := @ComUnitRing.Pack fieldType class.
-Definition join_countIdomainType := @IntegralDomain.Pack fieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.Field.class_of.
-Coercion base2 : class_of >-> IntegralDomain.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion countComRingType : type >-> ComRing.type.
-Canonical countComRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion countUnitRingType : type >-> UnitRing.type.
-Canonical countUnitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion countComUnitRingType : type >-> ComUnitRing.type.
-Canonical countComUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion countIdomainType : type >-> IntegralDomain.type.
-Canonical countIdomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Canonical join_countComRingType.
-Canonical join_countUnitRingType.
-Canonical join_countComUnitRingType.
-Canonical join_countIdomainType.
-Notation countFieldType := CountRing.Field.type.
-Notation "[ 'countFieldType' 'of' T ]" := (do_pack pack T)
+Module CFieldExports.
+Notation countFieldType := CField.type.
+Notation "[ 'countFieldType' 'of' T ]" := (CField.clone T _) (*(do_pack pack T)*)
   (at level 0, format "[ 'countFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End CFieldExports.
+HB.export CFieldExports.
 
-End Field.
-Import Field.Exports.
+#[mathcomp]
+HB.structure Definition CDecidableField := {R of GRing.DecidableField R & Countable R}.
 
-Module DecidableField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.DecidableField.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := Field.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.DecidableField.class_of.
-Local Coercion base2 : class_of >-> Field.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.DecidableField.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition countComRingType := @ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition countUnitRingType := @UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition countComUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition countIdomainType := @IntegralDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition countFieldType := @Field.Pack cT class.
-Definition decFieldType := @GRing.DecidableField.Pack cT class.
-
-Definition join_countType := @Countable.Pack decFieldType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack decFieldType class.
-Definition join_countRingType := @Ring.Pack decFieldType class.
-Definition join_countUnitRingType := @UnitRing.Pack decFieldType class.
-Definition join_countComRingType := @ComRing.Pack decFieldType class.
-Definition join_countComUnitRingType := @ComUnitRing.Pack decFieldType class.
-Definition join_countIdomainType := @IntegralDomain.Pack decFieldType class.
-Definition join_countFieldType := @Field.Pack decFieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.DecidableField.class_of.
-Coercion base2 : class_of >-> Field.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion countComRingType : type >-> ComRing.type.
-Canonical countComRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion countUnitRingType : type >-> UnitRing.type.
-Canonical countUnitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion countComUnitRingType : type >-> ComUnitRing.type.
-Canonical countComUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion countIdomainType : type >-> IntegralDomain.type.
-Canonical countIdomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion countFieldType : type >-> Field.type.
-Canonical countFieldType.
-Coercion decFieldType : type >-> GRing.DecidableField.type.
-Canonical decFieldType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Canonical join_countComRingType.
-Canonical join_countUnitRingType.
-Canonical join_countComUnitRingType.
-Canonical join_countIdomainType.
-Canonical join_countFieldType.
-Notation countDecFieldType := CountRing.DecidableField.type.
-Notation "[ 'countDecFieldType' 'of' T ]" := (do_pack pack T)
+Module CDecidableFieldExports.
+Notation countDecFieldType := CDecidableField.type.
+Notation "[ 'countDecFieldType' 'of' T ]" := (CDecidableField.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countDecFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End CDecidableFieldExports.
+HB.export CDecidableFieldExports.
 
-End DecidableField.
-Import DecidableField.Exports.
+#[mathcomp]
+HB.structure Definition CClosedField := {R of GRing.ClosedField R & Countable R}.
 
-Module ClosedField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R :=
-  Class { base : GRing.ClosedField.class_of R; mixin : mixin_of R }.
-Unset Primitive Projections.
-Definition base2 R (c : class_of R) := DecidableField.Class (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.ClosedField.class_of.
-Local Coercion base2 : class_of >-> DecidableField.class_of.
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Definition pack := gen_pack Pack Class GRing.ClosedField.class.
-Variable cT : type.
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition countType := @Countable.Pack cT (cnt_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition countZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition countRingType := @Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition countComRingType := @ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition countUnitRingType := @UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition countComUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition countIdomainType := @IntegralDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition countFieldType := @Field.Pack cT class.
-Definition decFieldType := @GRing.DecidableField.Pack cT class.
-Definition countDecFieldType := @DecidableField.Pack cT class.
-Definition closedFieldType := @GRing.ClosedField.Pack cT class.
-
-Definition join_countType := @Countable.Pack closedFieldType (cnt_ class).
-Definition join_countZmodType := @Zmodule.Pack closedFieldType class.
-Definition join_countRingType := @Ring.Pack closedFieldType class.
-Definition join_countUnitRingType := @UnitRing.Pack closedFieldType class.
-Definition join_countComRingType := @ComRing.Pack closedFieldType class.
-Definition join_countComUnitRingType := @ComUnitRing.Pack closedFieldType class.
-Definition join_countIdomainType := @IntegralDomain.Pack closedFieldType class.
-Definition join_countFieldType := @Field.Pack closedFieldType class.
-Definition join_countDecFieldType := @DecidableField.Pack closedFieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.ClosedField.class_of.
-Coercion base2 : class_of >-> DecidableField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion countType : type >-> Countable.type.
-Canonical countType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion countZmodType : type >-> Zmodule.type.
-Canonical countZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion countRingType : type >-> Ring.type.
-Canonical countRingType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion countComRingType : type >-> ComRing.type.
-Canonical countComRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion countUnitRingType : type >-> UnitRing.type.
-Canonical countUnitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion countComUnitRingType : type >-> ComUnitRing.type.
-Canonical countComUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion countIdomainType : type >-> IntegralDomain.type.
-Canonical countIdomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion countFieldType : type >-> Field.type.
-Canonical countFieldType.
-Coercion decFieldType : type >-> GRing.DecidableField.type.
-Canonical decFieldType.
-Coercion countDecFieldType : type >-> DecidableField.type.
-Canonical countDecFieldType.
-Coercion closedFieldType : type >-> GRing.ClosedField.type.
-Canonical closedFieldType.
-Canonical join_countType.
-Canonical join_countZmodType.
-Canonical join_countRingType.
-Canonical join_countComRingType.
-Canonical join_countUnitRingType.
-Canonical join_countComUnitRingType.
-Canonical join_countIdomainType.
-Canonical join_countFieldType.
-Canonical join_countDecFieldType.
-Notation countClosedFieldType := CountRing.ClosedField.type.
-Notation "[ 'countClosedFieldType' 'of' T ]" := (do_pack pack T)
+Module CClosedFieldExports.
+Notation countClosedFieldType := CClosedField.type.
+Notation "[ 'countClosedFieldType' 'of' T ]" := (CClosedField.clone T _) (*NB: was (do_pack pack T)*)
   (at level 0, format "[ 'countClosedFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End CClosedFieldExports.
+HB.export CClosedFieldExports.
 
-End ClosedField.
-Import ClosedField.Exports.
-*)
 End CountRing.
 
 HB.reexport.
