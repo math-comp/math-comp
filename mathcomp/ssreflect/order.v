@@ -4044,14 +4044,19 @@ HB.instance Definition _ :=
   OrderOfChoice.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
 HB.end.
 
-HB.factory Record MonoTotal (disp' disp : unit) (T' : orderType disp') (T : Type)
-  of POrder disp T := { f : T -> T'; f_mono : {mono f : x y / x <= y} }.
-HB.builders Context (disp' disp : unit) (T' : orderType disp') (T : Type)
-  of MonoTotal disp' disp T' T.
-Lemma totalT : total (<=%O : rel T).
-Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
-HB.instance Definition _ := POrder_IsTotal.Build disp T totalT.
-HB.end.
+Module CanMixin.
+Section CanMixin.
+
+Section Total.
+
+Variables (disp : unit) (T : porderType disp).
+Variables (disp' : unit) (T' : orderType disp') (f : T -> T').
+
+Lemma MonoTotal : {mono f : x y / x <= y} ->
+  totalPOrderMixin T' -> totalPOrderMixin T.
+Proof. by move=> f_mono T'_tot x y; rewrite -!f_mono le_total. Qed.
+
+End Total.
 
 Module Cancel.
 Section Order.
