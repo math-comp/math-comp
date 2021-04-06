@@ -1081,6 +1081,7 @@ HB.end.
 
 Module POrderExports.
 Notation porderType := POrder.type.
+Arguments le_trans {d s} [_ _ _].
 Notation POrderType disp T m := (POrder.pack disp T m).
 Notation "[ 'porderType' 'of' T 'for' cT ]" := (POrder.clone _ T cT)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
@@ -1860,7 +1861,6 @@ Proof. by apply/eqP/idP => [->|/le_anti]; rewrite ?lexx. Qed.
 Lemma ltW x y: x < y -> x <= y.
 Proof. by rewrite le_eqVlt orbC => ->. Qed.
 
-(* STOP
 Lemma lt_le_trans y x z: x < y -> y <= z -> x < z.
 Proof.
 rewrite !lt_neqAle => /andP [nexy lexy leyz]; rewrite (le_trans lexy) // andbT.
@@ -2527,7 +2527,7 @@ Lemma ltW_homo : {homo f : x y / x < y} -> {homo f : x y / x <= y}.
 Proof. exact: homoW. Qed.
 
 Lemma ltW_nhomo : {homo f : x y /~ x < y} -> {homo f : x y /~ x <= y}.
-Proof. exact: homoW. Qed.
+Proof. by apply: homoW=> // x y; rewrite eq_sym. Qed.
 
 Lemma inj_homo_lt :
   injective f -> {homo f : x y / x <= y} -> {homo f : x y / x < y}.
@@ -2535,7 +2535,7 @@ Proof. exact: inj_homo. Qed.
 
 Lemma inj_nhomo_lt :
   injective f -> {homo f : x y /~ x <= y} -> {homo f : x y /~ x < y}.
-Proof. exact: inj_homo. Qed.
+Proof. by apply: inj_homo=> // x y; rewrite eq_sym. Qed.
 
 Lemma inc_inj : {mono f : x y / x <= y} -> injective f.
 Proof. exact: mono_inj. Qed.
@@ -2547,7 +2547,7 @@ Lemma leW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
 Proof. exact: anti_mono. Qed.
 
 Lemma leW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
-Proof. exact: anti_mono. Qed.
+Proof. by apply: anti_mono=> // x y; rewrite eq_sym. Qed.
 
 (* Monotony in D D' *)
 Lemma ltW_homo_in :
@@ -2556,7 +2556,7 @@ Proof. exact: homoW_in. Qed.
 
 Lemma ltW_nhomo_in :
   {in D & D', {homo f : x y /~ x < y}} -> {in D & D', {homo f : x y /~ x <= y}}.
-Proof. exact: homoW_in. Qed.
+Proof. by apply: homoW_in=> // x y; rewrite eq_sym. Qed.
 
 Lemma inj_homo_lt_in :
     {in D & D', injective f} ->  {in D & D', {homo f : x y / x <= y}} ->
@@ -2566,7 +2566,7 @@ Proof. exact: inj_homo_in. Qed.
 Lemma inj_nhomo_lt_in :
     {in D & D', injective f} -> {in D & D', {homo f : x y /~ x <= y}} ->
   {in D & D', {homo f : x y /~ x < y}}.
-Proof. exact: inj_homo_in. Qed.
+Proof. by apply: inj_homo_in=> // x y; rewrite eq_sym. Qed.
 
 Lemma inc_inj_in : {in D &, {mono f : x y / x <= y}} ->
    {in D &, injective f}.
@@ -2582,7 +2582,7 @@ Proof. exact: anti_mono_in. Qed.
 
 Lemma leW_nmono_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
-Proof. exact: anti_mono_in. Qed.
+Proof. by apply: anti_mono_in=> // x y; rewrite eq_sym. Qed.
 
 End POrderMonotonyTheory.
 
@@ -2606,6 +2606,7 @@ Arguments max_idPr {disp T x y}.
 Arguments comparable_min_idPr {disp T x y _}.
 Arguments comparable_max_idPl {disp T x y _}.
 
+(* STOP
 Module Import DualPOrder.
 Section DualPOrder.
 Canonical dual_eqType (T : eqType) := EqType T [eqMixin of T^d].
