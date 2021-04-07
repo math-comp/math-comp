@@ -4612,12 +4612,11 @@ Definition topEord := topEord.
 End Exports.
 End OrdinalOrder.
 
-(* STOP
-
 (*******************************)
 (* Canonical structure on bool *)
 (*******************************)
 
+(*
 Module BoolOrder.
 Section BoolOrder.
 Implicit Types (x y : bool).
@@ -4695,6 +4694,7 @@ Definition subEbool := subEbool.
 Definition complEbool := complEbool.
 End Exports.
 End BoolOrder.
+*)
 
 (*******************************)
 (* Definition of prod_display. *)
@@ -4877,19 +4877,26 @@ End LexiSyntax.
 Module ProdOrder.
 Section ProdOrder.
 
-Definition type (disp : unit) (T T' : Type) := (T * T')%type.
+Local Open Scope type_scope.
+
+Definition type (disp : unit) (T T' : Type) := (T * T').
 
 Context {disp1 disp2 disp3 : unit}.
 
 Local Notation "T * T'" := (type disp3 T T') : type_scope.
 
-Canonical eqType (T T' : eqType):= Eval hnf in [eqType of T * T'].
-Canonical choiceType (T T' : choiceType):= Eval hnf in [choiceType of T * T'].
-Canonical countType (T T' : countType):= Eval hnf in [countType of T * T'].
-Canonical finType (T T' : finType):= Eval hnf in [finType of T * T'].
+#[export]
+HB.instance Definition _ (T T' : eqType) := [eqMixin of T * T'].
+#[export]
+HB.instance Definition _ (T T' : choiceType) := [choiceMixin of T * T'].
+#[export]
+HB.instance Definition _ (T T' : countType) := [countMixin of T * T'].
+#[export]
+HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
 
 Section POrder.
 Variable (T : porderType disp1) (T' : porderType disp2).
+
 Implicit Types (x y : T * T').
 
 Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
@@ -4908,8 +4915,8 @@ rewrite /le => y x z /andP [] hxy ? /andP [] /(le_trans hxy) ->.
 by apply: le_trans.
 Qed.
 
-Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
-Canonical porderType := POrderType disp3 (T * T') porderMixin.
+#[export]
+HB.instance Definition _ := IsPOrdered.Build disp3 (T * T') (rrefl _) refl anti trans.
 
 Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
@@ -4954,9 +4961,9 @@ Proof. by case: x => ? ?; congr pair; rewrite meetKU. Qed.
 Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite eqE /= -!leEmeet. Qed.
 
-Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet.
-Canonical latticeType := LatticeType (T * T') latticeMixin.
+#[export]
+HB.instance Definition _ :=
+  POrder_IsLattice.Build _ (T * T') meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2). Proof. by []. Qed.
 
@@ -4970,7 +4977,8 @@ Variable (T : bLatticeType disp1) (T' : bLatticeType disp2).
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by rewrite /<=%O /= /le !le0x. Qed.
 
-Canonical bLatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
+#[export]
+HB.instance Definition _ := HasBottom.Build _ (T * T') le0x.
 
 Lemma botEprod : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
@@ -4982,7 +4990,8 @@ Variable (T : tbLatticeType disp1) (T' : tbLatticeType disp2).
 Fact lex1 (x : T * T') : x <= (top, top).
 Proof. by rewrite /<=%O /= /le !lex1. Qed.
 
-Canonical tbLatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
+#[export]
+HB.instance Definition _ := HasTop.Build _ (T * T') lex1.
 
 Lemma topEprod : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
 
@@ -4994,11 +5003,21 @@ Variable (T : distrLatticeType disp1) (T' : distrLatticeType disp2).
 Fact meetUl : left_distributive (@meet T T') (@join T T').
 Proof. by move=> ? ? ?; congr pair; rewrite meetUl. Qed.
 
-Definition distrLatticeMixin := DistrLatticeMixin meetUl.
-Canonical distrLatticeType := DistrLatticeType (T * T') distrLatticeMixin.
+#[export]
+HB.instance Definition _ := Lattice_MeetIsDistributive.Build _ (T * T') meetUl.
 
 End DistrLattice.
 
+(* STOP
+#[export]
+HB.instance Definition _
+  (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
+    BDistrLattice.clone disp3 (T * T') _.
+
+    [bDistrLatticeType of (T * T')].
+
+
+Print Canonical Projections type.
 Canonical bDistrLatticeType
           (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
   [bDistrLatticeType of T * T'].
