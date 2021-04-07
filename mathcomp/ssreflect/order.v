@@ -5299,7 +5299,6 @@ End Exports.
 End SigmaOrder.
 Import SigmaOrder.Exports.
 
-(* STOP
 (*************************************************)
 (* We declare a "copy" of the cartesian product, *)
 (* which has canonical lexicographic order.      *)
@@ -5308,16 +5307,22 @@ Import SigmaOrder.Exports.
 Module ProdLexiOrder.
 Section ProdLexiOrder.
 
-Definition type (disp : unit) (T T' : Type) := (T * T')%type.
+Local Open Scope type_scope.
+
+Definition type (disp : unit) (T T' : Type) := T * T'.
 
 Context {disp1 disp2 disp3 : unit}.
 
 Local Notation "T * T'" := (type disp3 T T') : type_scope.
 
-Canonical eqType (T T' : eqType):= Eval hnf in [eqType of T * T'].
-Canonical choiceType (T T' : choiceType):= Eval hnf in [choiceType of T * T'].
-Canonical countType (T T' : countType):= Eval hnf in [countType of T * T'].
-Canonical finType (T T' : finType):= Eval hnf in [finType of T * T'].
+#[export]
+HB.instance Definition _ (T T' : eqType) := [eqMixin of T * T'].
+#[export]
+HB.instance Definition _ (T T' : choiceType) := [choiceMixin of T * T'].
+#[export]
+HB.instance Definition _ (T T' : countType) := [countMixin of T * T'].
+#[export]
+HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
 
 Section POrder.
 Variable (T : porderType disp1) (T' : porderType disp2).
@@ -5348,8 +5353,9 @@ rewrite /lt /le; case: x y => [x1 x2] [y1 y2]//=; rewrite xpair_eqE.
 by case: (comparableP x1 y1); rewrite lt_def.
 Qed.
 
-Definition porderMixin := LePOrderMixin lt_def refl anti trans.
-Canonical porderType := POrderType disp3 (T * T') porderMixin.
+#[export]
+HB.instance Definition _ :=
+  IsPOrdered.Build disp3 (T * T') lt_def refl anti trans.
 
 Lemma leEprodlexi x y :
   (x <= y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
@@ -5369,18 +5375,25 @@ Proof. by []. Qed.
 
 End POrder.
 
+(* FIXME *)
+HB.instance Definition _ (T : finPOrderType disp1)
+  (T' : finPOrderType disp2) := POrder.on (T * T').
+#[export]
+HB.instance Definition _ (T : finPOrderType disp1)
+  (T' : finPOrderType disp2) := FinPOrder.on (T * T').
+(* /FIXME *)
+
 Section Total.
 Variable (T : orderType disp1) (T' : orderType disp2).
 Implicit Types (x y : T * T').
 
-Fact total : totalPOrderMixin [porderType of T * T'].
+Fact total : total (<=%O: rel [porderType of T * T']).
 Proof.
 move=> x y; rewrite /<=%O /= /le; case: ltgtP => //= _; exact: le_total.
 Qed.
 
-Canonical latticeType := LatticeType (T * T') total.
-Canonical distrLatticeType := DistrLatticeType (T * T') total.
-Canonical orderType := OrderType (T * T') total.
+#[export]
+HB.instance Definition _ := POrder_IsTotal.Build _ (T * T') total.
 
 End Total.
 
@@ -5389,61 +5402,39 @@ Variable (T : finOrderType disp1) (T' : finOrderType disp2).
 
 Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !le0x implybT. Qed.
-Canonical bLatticeType := BLatticeType (T * T') (BLattice.Mixin le0x).
-Canonical bDistrLatticeType := [bDistrLatticeType of T * T'].
+
+#[export]
+HB.instance Definition _ := HasBottom.Build _ (T * T') le0x.
 
 Lemma botEprodlexi : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
 
 Fact lex1 (x : T * T') : x <= (1, 1) :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !lex1 implybT. Qed.
-Canonical tbLatticeType := TBLatticeType (T * T') (TBLattice.Mixin lex1).
-Canonical tbDistrLatticeType := [tbDistrLatticeType of T * T'].
+
+#[export]
+HB.instance Definition _ := HasTop.Build _ (T * T') lex1.
 
 Lemma topEprodlexi : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
 
 End FinDistrLattice.
 
-Canonical finPOrderType (T : finPOrderType disp1)
-    (T' : finPOrderType disp2) := [finPOrderType of T * T'].
-Canonical finLatticeType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finLatticeType of T * T'].
-Canonical finDistrLatticeType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finDistrLatticeType of T * T'].
-Canonical finOrderType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finOrderType of T * T'].
-
-Lemma sub_prod_lexi d (T : POrder.Exports.porderType disp1)
+(* FIXME: to be commented out when exports will be fixed *)
+(*Lemma sub_prod_lexi d (T : POrder.Exports.porderType disp1)
                       (T' : POrder.Exports.porderType disp2) :
    subrel (<=%O : rel (T *prod[d] T')) (<=%O : rel (T * T')).
 Proof.
 by case=> [x1 x2] [y1 y2]; rewrite leEprod leEprodlexi /=; case: comparableP.
 Qed.
-
+*)
 End ProdLexiOrder.
 
 Module Exports.
-
+(* FIXME *)
+(* HB.reexport *)
 Notation "T *lexi[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *lexi[ d ]  T'") : type_scope.
 Notation "T *l T'" := (type lexi_display T T')
   (at level 70, format "T  *l  T'") : type_scope.
-
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical finType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical orderType.
-Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finDistrLatticeType.
-Canonical finOrderType.
 
 Definition leEprodlexi := @leEprodlexi.
 Definition ltEprodlexi := @ltEprodlexi.
@@ -5451,13 +5442,14 @@ Definition lexi_pair := @lexi_pair.
 Definition ltxi_pair := @ltxi_pair.
 Definition topEprodlexi := @topEprodlexi.
 Definition botEprodlexi := @botEprodlexi.
-Definition sub_prod_lexi := @sub_prod_lexi.
+(* FIXME *)
+(*Definition sub_prod_lexi := @sub_prod_lexi.*)
 
 End Exports.
 End ProdLexiOrder.
 Import ProdLexiOrder.Exports.
 
-Module DefaultProdLexiOrder.
+(*Module DefaultProdLexiOrder.
 Section DefaultProdLexiOrder.
 Context {disp1 disp2 : unit}.
 
@@ -5495,7 +5487,7 @@ Canonical prodlexi_finOrderType (T : finOrderType disp1)
   (T' : finOrderType disp2) := [finOrderType of T * T'].
 
 End DefaultProdLexiOrder.
-End DefaultProdLexiOrder.
+End DefaultProdLexiOrder.*)
 
 (*****************************************)
 (* We declare a "copy" of the sequences, *)
@@ -5511,9 +5503,12 @@ Context {disp disp' : unit}.
 
 Local Notation seq := (type disp').
 
-Canonical eqType (T : eqType):= Eval hnf in [eqType of seq T].
-Canonical choiceType (T : choiceType):= Eval hnf in [choiceType of seq T].
-Canonical countType (T : countType):= Eval hnf in [countType of seq T].
+#[export]
+HB.instance Definition _ (T : eqType) := [eqMixin of seq T].
+#[export]
+HB.instance Definition _ (T : choiceType) := [choiceMixin of seq T].
+#[export]
+HB.instance Definition _ (T : countType) := [countMixin of seq T].
 
 Section POrder.
 Variable T : porderType disp.
@@ -5536,8 +5531,8 @@ elim=> [|y ys ihs] [|x xs] [|z zs] //= /andP[xy xys] /andP[yz yzs].
 by rewrite (le_trans xy)// ihs.
 Qed.
 
-Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
-Canonical porderType := POrderType disp' (seq T) porderMixin.
+#[export]
+HB.instance Definition _ := IsPOrdered.Build disp' (seq T) (rrefl _) refl anti trans.
 
 Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
                                 if s2 isn't x2 :: s2' then false else
@@ -5599,9 +5594,9 @@ Proof.
 by rewrite /<=%O /=; elim: x y => [|? ? ih] [|? ?] //=; rewrite eqE leEmeet ih.
 Qed.
 
-Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet.
-Canonical latticeType := LatticeType (seq T) latticeMixin.
+#[export]
+HB.instance Definition _ :=
+  POrder_IsLattice.Build _ (seq T) meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Lemma meetEseq s1 s2 : s1 `&` s2 =  [seq x.1 `&` x.2 | x <- zip s1 s2].
 Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2]//=; rewrite -ihs1. Qed.
@@ -5621,7 +5616,8 @@ Lemma join_cons x1 s1 x2 s2 :
   (x1 :: s1 : seq T) `|` (x2 :: s2) = (x1 `|` x2) :: s1 `|` s2.
 Proof. by []. Qed.
 
-Canonical bLatticeType := BLatticeType (seq T) (BLattice.Mixin (@le0s _)).
+#[export]
+HB.instance Definition _ := HasBottom.Build _ (seq T) (@le0s _).
 
 Lemma botEseq : 0 = [::] :> seq T.
 Proof. by []. Qed.
@@ -5634,24 +5630,19 @@ Variable T : distrLatticeType disp.
 Fact meetUl : left_distributive (@meet T) (@join T).
 Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetUl ih. Qed.
 
-Definition distrLatticeMixin := DistrLatticeMixin meetUl.
-Canonical distrLatticeType := DistrLatticeType (seq T) distrLatticeMixin.
-Canonical bDistrLatticeType := [bDistrLatticeType of seq T].
+#[export]
+HB.instance Definition _ :=
+  Lattice_MeetIsDistributive.Build _ (seq T) meetUl.
 
 End DistrLattice.
 
 End SeqProdOrder.
 
 Module Exports.
-
+(* FIXME *)
+(* HB.reexport *)
 Notation seqprod_with := type.
 Notation seqprod := (type prod_display).
-
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
 
 Definition leEseq := @leEseq.
 Definition le0s := @le0s.
@@ -5666,7 +5657,8 @@ End Exports.
 End SeqProdOrder.
 Import SeqProdOrder.Exports.
 
-Module DefaultSeqProdOrder.
+(* FIXME *)
+(*Module DefaultSeqProdOrder.
 Section DefaultSeqProdOrder.
 Context {disp : unit}.
 
@@ -5682,7 +5674,8 @@ Canonical seqprod_bDistrLatticeType (T : bDistrLatticeType disp) :=
   [bDistrLatticeType of seq T].
 
 End DefaultSeqProdOrder.
-End DefaultSeqProdOrder.
+End DefaultSeqProdOrder.*)
+(* /FIXME *)
 
 (*********************************************)
 (* We declare a "copy" of the sequences,     *)
@@ -5698,9 +5691,12 @@ Context {disp disp' : unit}.
 
 Local Notation seq := (type disp').
 
-Canonical eqType (T : eqType):= Eval hnf in [eqType of seq T].
-Canonical choiceType (T : choiceType):= Eval hnf in [choiceType of seq T].
-Canonical countType (T : countType):= Eval hnf in [countType of seq T].
+#[export]
+HB.instance Definition _ (T : eqType) := [eqMixin of seq T].
+#[export]
+HB.instance Definition _ (T : choiceType) := [choiceMixin of seq T].
+#[export]
+HB.instance Definition _ (T : countType) := [countMixin of seq T].
 
 Section POrder.
 Variable T : porderType disp.
@@ -5735,8 +5731,8 @@ elim: s1 s2 => [|x s1 ihs1] [|y s2]//=.
 by rewrite eqseq_cons ihs1; case: comparableP.
 Qed.
 
-Definition porderMixin := LePOrderMixin lt_def refl anti trans.
-Canonical porderType := POrderType disp' (seq T) porderMixin.
+#[export]
+HB.instance Definition _ := IsPOrdered.Build disp' (seq T) lt_def refl anti trans.
 
 Lemma leEseqlexi s1 s2 :
    s1 <= s2 = if s1 isn't x1 :: s1' then true else
@@ -5792,41 +5788,33 @@ Section Total.
 Variable T : orderType disp.
 Implicit Types s : seq T.
 
-Fact total : totalPOrderMixin [porderType of seq T].
+Fact total : total (<=%O : rel (seq T)).
 Proof.
-suff: total (<=%O : rel (seq T)) by [].
 by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
 Qed.
 
-Canonical latticeType := LatticeType (seq T) total.
-Canonical bLatticeType :=
-  BLatticeType (seq T) (BLattice.Mixin (@lexi0s _)).
-Canonical distrLatticeType := DistrLatticeType (seq T) total.
-Canonical bDistrLatticeType := [bDistrLatticeType of seq T].
-Canonical orderType := OrderType (seq T) total.
+#[export]
+HB.instance Definition _ := POrder_IsTotal.Build _ (seq T) total.
+#[export]
+HB.instance Definition _ := HasBottom.Build _ (seq T) (@lexi0s _).
 
 End Total.
 
+(* FIXME *)
+(*
 Lemma sub_seqprod_lexi d (T : POrder.Exports.porderType disp) :
    subrel (<=%O : rel (seqprod_with d T)) (<=%O : rel (seq T)).
 Proof.
 elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite le_cons lexi_cons /=.
 by move=> /andP[-> /ihs1->]; rewrite implybT.
-Qed.
+Qed. *)
 
 End SeqLexiOrder.
 
 Module Exports.
-
+(* FIXME: HB.reexport *)
 Notation seqlexi_with := type.
 Notation seqlexi := (type lexi_display).
-
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical orderType.
 
 Definition leEseqlexi := @leEseqlexi.
 Definition lexi0s := @lexi0s.
@@ -5843,12 +5831,13 @@ Definition ltxi_cons := @ltxi_cons.
 Definition ltxi_lehead := @ltxi_lehead.
 Definition eqhead_ltxiE := @eqhead_ltxiE.
 Definition neqhead_ltxiE := @neqhead_ltxiE.
-Definition sub_seqprod_lexi := @sub_seqprod_lexi.
+(* FIXME: Definition sub_seqprod_lexi := @sub_seqprod_lexi. *)
 
 End Exports.
 End SeqLexiOrder.
 Import SeqLexiOrder.Exports.
 
+(* FIXME
 Module DefaultSeqLexiOrder.
 Section DefaultSeqLexiOrder.
 Context {disp : unit}.
@@ -5868,7 +5857,12 @@ Canonical seqlexi_orderType (T : orderType disp) :=
 
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
+*)
 
+
+(* FIXME: tuples need Canonical instance for sequences
+ * -> we need HB.reexport to work properly             *)
+(*
 (***************************************)
 (* We declare a "copy" of the tuples,  *)
 (* which has canonical product order.  *)
@@ -6391,6 +6385,9 @@ Canonical tlexi_finOrderType n (T : finOrderType disp) :=
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
+*)
+
+(* STOP
 Module Import DualOrder.
 Section DualOrder.
 Context {disp : unit}.
