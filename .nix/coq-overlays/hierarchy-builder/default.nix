@@ -20,7 +20,10 @@ with lib; mkCoqDerivation ({
   nativeBuildInputs = [ which ];
   propagatedBuildInputs = [ coq-elpi coq.ocaml ];
   inherit installFlags;
-
+  buildPhase = ''
+    make config
+    make build
+  '';
   meta = {
     description = "Coq plugin embedding ELPI.";
     maintainers = [ maintainers.cohencyril ];
