@@ -138,6 +138,12 @@ Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
 Definition poly_of of phant R := polynomial.
 Identity Coercion type_poly_of : poly_of >-> polynomial.
 
+Local Notation "{poly}" := (poly_of (Phant R)).
+
+HB.instance Definition _ := SUB.on {poly}.
+HB.instance Definition _ := Equality.on {poly}.
+HB.instance Definition _ := Choice.on {poly}.
+
 Definition coefp i (p : poly_of (Phant R)) := p`_i.
 
 End Polynomial.
@@ -151,18 +157,10 @@ Arguments poly_inj {R} [p1%R p2%R] : rename.
 Arguments coefp {R} i%N / p%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)).
 
-HB.instance Definition _ (R : countRingType) :=
-  [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countRingType) := Countable.on {poly R}.
-
 Section PolynomialTheory.
 
 Variable R : ringType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
-
-HB.instance Definition _ := SUB.on {poly R}.
-HB.instance Definition _ := Equality.on {poly R}.
-HB.instance Definition _ := Choice.on {poly R}.
 
 Definition lead_coef p := p`_(size p).-1.
 Lemma lead_coefE p : lead_coef p = p`_(size p).-1. Proof. by []. Qed.
@@ -331,6 +329,7 @@ Qed.
 
 HB.instance Definition _ :=
   GRing.IsZmodule.Build (polynomial R) add_polyA add_polyC add_poly0 add_polyN.
+HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
 Lemma polyC0 : 0%:P = 0 :> {poly R}. Proof. by []. Qed.
@@ -1695,14 +1694,6 @@ Arguments polyOverP {R S0 addS kS p} : rename.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
 Arguments eq_poly {R n} [E1] E2 eq_E12.
 
-(* TODO *)
-(* Canonical polynomial_countZmodType (R : countRingType) := *)
-(*   [countZmodType of polynomial R]. *)
-(* Canonical poly_countZmodType (R : countRingType) := [countZmodType of {poly R}]. *)
-(* Canonical polynomial_countRingType (R : countRingType) := *)
-(*   [countRingType of polynomial R]. *)
-(* Canonical poly_countRingType (R : countRingType) := [countRingType of {poly R}]. *)
-
 (* Container morphism. *)
 Section MapPoly.
 
@@ -2172,12 +2163,6 @@ Definition derivCE := (derivE, deriv_exp).
 
 End PolynomialComRing.
 
-(* TODO *)
-(* Canonical polynomial_countComRingType (R : countComRingType) := *)
-(*   [countComRingType of polynomial R]. *)
-(* Canonical poly_countComRingType (R : countComRingType) := *)
-(*   [countComRingType of {poly R}]. *)
-
 Section PolynomialIdomain.
 
 (* Integral domain structure on poly *)
@@ -2404,19 +2389,25 @@ Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
 
-(* TODO *)
-(* Canonical polynomial_countUnitRingType (R : countIdomainType) := *)
-(*   [countUnitRingType of polynomial R]. *)
-(* Canonical poly_countUnitRingType (R : countIdomainType) := *)
-(*   [countUnitRingType of {poly R}]. *)
-(* Canonical polynomial_countComUnitRingType (R : countIdomainType) := *)
-(*   [countComUnitRingType of polynomial R]. *)
-(* Canonical poly_countComUnitRingType (R : countIdomainType) := *)
-(*   [countComUnitRingType of {poly R}]. *)
-(* Canonical polynomial_countIdomainType (R : countIdomainType) := *)
-(*   [countIdomainType of polynomial R]. *)
-(* Canonical poly_countIdomainType (R : countIdomainType) := *)
-(*   [countIdomainType of {poly R}]. *)
+HB.instance Definition _ (R : countRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countComRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countComRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countUnitRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countUnitRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countComUnitRingType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countComUnitRingType) := Countable.on {poly R}.
+
+HB.instance Definition _ (R : countIdomainType) :=
+  [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countIdomainType) := Countable.on {poly R}.
 
 Section MapFieldPoly.
 
