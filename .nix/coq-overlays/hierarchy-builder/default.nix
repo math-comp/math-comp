@@ -31,6 +31,8 @@ with lib; mkCoqDerivation ({
   };
 }
 // optionalAttrs shim {
-  buildFlags = [ "-C shim" ];
+  buildPhase = ''
+    make -C shim
+  '';
   installFlags = installFlags ++ [ "-C shim" ];
 })
