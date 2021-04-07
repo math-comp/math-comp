@@ -285,7 +285,6 @@ Section Canonicals.
 Variable R : idomainType.
 
 (* reexporting the structures *)
-Print Canonical Projections FracField.type_of.
 HB.instance Definition _ := GRing.Zmodule.on {fraction R}.
 HB.instance Definition _ := GRing.Ring.on {fraction R}.
 HB.instance Definition _ := GRing.ComRing.on {fraction R}.
