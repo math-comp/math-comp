@@ -8,7 +8,7 @@ algebra/countalg.v
 # algebra/mxalgebra.v
 # algebra/mxpoly.v
 # algebra/polydiv.v
-# algebra/poly.v
+algebra/poly.v
 # algebra/polyXY.v
 # algebra/rat.v
 algebra/ring_quotient.v

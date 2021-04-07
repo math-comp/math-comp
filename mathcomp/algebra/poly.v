@@ -152,7 +152,7 @@ Arguments coefp {R} i%N / p%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)).
 
 HB.instance Definition _ (R : countRingType) :=
-  [countMixin of polynomial R by <:].
+  [Countable of polynomial R by <:].
 
 Section PolynomialTheory.
 
