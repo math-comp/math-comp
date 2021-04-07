@@ -1,7 +1,7 @@
 # algebra/all_algebra.v
 # algebra/finalg.v
 algebra/countalg.v
-# algebra/fraction.v
+algebra/fraction.v
 # algebra/intdiv.v
 # algebra/interval.v
 # algebra/matrix.v
