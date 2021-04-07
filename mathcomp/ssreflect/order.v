@@ -5071,10 +5071,11 @@ Canonical finDistrLatticeType (T : finDistrLatticeType disp1)
 
 Canonical finCDistrLatticeType (T : finCDistrLatticeType disp1)
   (T' : finCDistrLatticeType disp2) := [finCDistrLatticeType of T * T'].
+*)
 
 End ProdOrder.
 
-Module Exports.
+(*Module Exports.
 
 Notation "T *prod[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
@@ -5110,8 +5111,10 @@ Definition topEprod := @topEprod.
 Definition subEprod := @subEprod.
 Definition complEprod := @complEprod.
 
-End Exports.
+End Exports.*)
 End ProdOrder.
+
+(*
 Import ProdOrder.Exports.
 
 Module DefaultProdOrder.
