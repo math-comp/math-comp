@@ -39,13 +39,13 @@ algebra/ssralg.v
 # field/separable.v
 # fingroup/action.v
 # fingroup/all_fingroup.v
-# fingroup/automorphism.v
+fingroup/automorphism.v
 fingroup/fingroup.v
 # fingroup/gproduct.v
 fingroup/morphism.v
 fingroup/perm.v
 fingroup/presentation.v
-# fingroup/quotient.v
+fingroup/quotient.v
 # solvable/abelian.v
 # solvable/all_solvable.v
 # solvable/alt.v
