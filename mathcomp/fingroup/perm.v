@@ -54,11 +54,8 @@ Identity Coercion type_of_perm : perm_of >-> perm_type.
 
 Notation pT := (perm_of (Phant T)).
 
-HB.instance Definition _ := [subMixin for pval]. (*
-HB.instance Definition xxx := [Equality of perm_type by <:].
-HB.instance Definition _ := [IsCountable of perm_type by <:].
-HB.instance Definition _ := [HasChoice of perm_type by <:].*)
-HB.instance Definition yyy := [Finite of perm_type by <:].
+HB.instance Definition _ := [subMixin for pval].
+HB.instance Definition _ := [Finite of perm_type by <:].
 
 Lemma perm_proof (f : T -> T) : injective f -> injectiveb (finfun f).
 Proof.
@@ -143,6 +140,10 @@ Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 
 HB.instance Definition _ :=
   IsMulGroup.Build (perm_type T) perm_mulP perm_oneP perm_invP.
+
+Print perm_type_canonical_Finite.
+Print perm_type_canonical_FinGroup.
+
 
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
