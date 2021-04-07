@@ -54,10 +54,10 @@ Identity Coercion type_of_perm : perm_of >-> perm_type.
 
 Notation pT := (perm_of (Phant T)).
 
-HB.instance Definition _ := [subMixin for pval].
+HB.instance Definition _ := [subMixin for pval]. (*
 HB.instance Definition xxx := [Equality of perm_type by <:].
 HB.instance Definition _ := [IsCountable of perm_type by <:].
-HB.instance Definition _ := [HasChoice of perm_type by <:].
+HB.instance Definition _ := [HasChoice of perm_type by <:].*)
 HB.instance Definition yyy := [Finite of perm_type by <:].
 
 Lemma perm_proof (f : T -> T) : injective f -> injectiveb (finfun f).
@@ -143,13 +143,6 @@ Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 
 HB.instance Definition _ :=
   IsMulGroup.Build (perm_type T) perm_mulP perm_oneP perm_invP.
-
-(* Cyril: HERE IS THE PROBLEM I THINK *)
-Print perm_type_canonical_Finite.
-Print perm_type_canonical_FinGroup.
-(* these are not the same mixins, and I don't understand why *)
-
-STOP.
 
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
@@ -398,27 +391,6 @@ apply (iffP idP) => [/porbitPmin [i _ ->]| [i ->]]; last exact: mem_porbit.
 by exists i.
 Qed.
 
-(* Opaque HB_unnamed_mixin_1. *)
-(* Opaque HB_unnamed_mixin_2. *)
-Opaque HB_unnamed_mixin_3.
-Opaque HB_unnamed_mixin_4.
-Opaque HB_unnamed_mixin_5.
-Opaque HB_unnamed_mixin_6.
-Opaque HB_unnamed_mixin_7.
-(* Opaque HB_unnamed_mixin_8. *)
-Opaque HB_unnamed_mixin_9.
-Opaque HB_unnamed_mixin_10.
-Opaque HB_unnamed_mixin_11.
-Opaque HB_unnamed_mixin_12.
-Opaque HB_unnamed_mixin_13.
-Opaque HB_unnamed_mixin_14.
-Opaque HB_unnamed_mixin_15.
-Opaque HB_unnamed_mixin_16.
-Opaque HB_unnamed_mixin_17.
-Opaque HB_unnamed_mixin_18.
-Opaque HB_unnamed_mixin_19.
-
-
 Lemma porbits_mul_tperm s x y : let t := tperm x y in
   #|porbits (mulg t s)| + (x \notin porbit s y).*2 = #|porbits s| + (x != y).
 Proof.
@@ -445,50 +417,7 @@ have eq_xf a b u: pred2 a b ((u ^+ (xf a b u).+1) a).
 have xfC a b u: xf b a (t a b u) = xf a b u.
   without loss lt_a: a b u / xf b a (t a b u) < xf a b u.
     move=> IHab; set m := xf b a _; set n := xf a b u.
-hnf; intros.
-rewrite /m /n.
-rewrite /xf/=.
-rewrite /porbit.
-rewrite /cycle.
-rewrite /perm_type_canonical_FinGroup.
-set xxx := (X in @FinGroup.Pack _ X).
-Time Fail simple apply @erefl.
-
-(* move: (HB_unnamed_factory_3 _). *)
-(* move: (Builders_21.HB_unnamed_factory_25 _) => ?. *)
-(* set yyy := (HB_unnamed_factory_3 _). *)
-(* move: yyy *)
-    Time Fail by [].
-
-(* Time Fail simple apply @erefl. *)
-(* Set Printing All. *)
-(* move: xxx => ?. *)
-
-(* Set Printing All. *)
-(* rewrite /=. *)
-(* (* move: (X in @FinGroup.Pack _ X) => ?. *) *)
-(* Time Fail simple apply @erefl. *)
-    
-(*   Fail debug trivial; hnf; intros; (solve *)
-(*    [ do![ solve *)
-(*     [ debug trivial | apply : Logic.eq_sym ; debug trivial ] *)
-(*     | discriminate *)
-(*     | contradiction *)
-(*     | split ] *)
-(*    | case not_locked_false_eq_true; assumption *)
-(*    | match goal with *)
-(*      | H:~ _ |- _ => solve [ case H; debug trivial ] *)
-(*      end ]). *)
-
-(* Print done.    debug trivial. *)
-(*       trivial; hnf; intros; (solve *)
-(*    [do ![ solve *)
-(*     [ trivial | apply : Logic.eq_sym ; trivial ] *)
-(*     ] *)
-(* ]). *)
-(*       Print  done. *)
-(*       move=> //. *)
- => // ltx; [apply: IHab | rewrite -[m]IHab tC tK].
+    by case: (ltngtP m n) => // ltx; [apply: IHab | rewrite -[m]IHab tC tK].
   by move/lt_xf: (lt_a); rewrite -(tXC a b) 1?ltnW //= orbC [_ || _]eq_xf.
 pose ts := t x y s; rewrite /= -[_ * s]/ts.
 pose dp u := #|porbits u :\ porbit u y :\ porbit u x|.

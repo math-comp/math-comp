@@ -4,6 +4,7 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import fintype bigop finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient action gproduct gfunctor.
 From mathcomp Require Import cyclic.
+Set Kernel Term Sharing.
 
 (******************************************************************************)
 (* Definition of the center of a group and of external central products:      *)
