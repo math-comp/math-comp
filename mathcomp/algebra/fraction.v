@@ -268,26 +268,13 @@ do 2?case: insubP; rewrite //= ?eqxx ?oner_eq0 // => u _ hu _.
 by congr \pi; apply: val_inj; rewrite /= hu.
 Qed.
 
-End FracField.
-End FracField.
-(* STOP
-
 (* fractions form a ring with explicit unit *)
-Definition RatFieldUnitMixin := FieldUnitMixin mulV_l inv0.
-Canonical frac_unitRingType := Eval hnf in UnitRingType type RatFieldUnitMixin.
-Canonical frac_comUnitRingType := [comUnitRingType of type].
-
-Lemma field_axiom : GRing.Field.mixin_of frac_unitRingType.
-Proof. exact. Qed.
-
 (* fractions form a field *)
-Definition RatFieldIdomainMixin := (FieldIdomainMixin field_axiom).
-Canonical frac_idomainType :=
-  Eval hnf in IdomainType type (FieldIdomainMixin field_axiom).
-Canonical frac_fieldType := FieldType type field_axiom.
+HB.instance Definition _ := GRing.ComRing_IsField.Build type mulV_l inv0.
 
 End FracField.
 End FracField.
+HB.export FracField.
 
 Notation "{ 'fraction' T }" := (FracField.type_of (Phant T)).
 Notation equivf := (@FracField.equivf _).
@@ -298,27 +285,14 @@ Section Canonicals.
 Variable R : idomainType.
 
 (* reexporting the structures *)
-Canonical FracField.frac_quotType.
-Canonical FracField.frac_eqType.
-Canonical FracField.frac_choiceType.
-Canonical FracField.frac_zmodType.
-Canonical FracField.frac_ringType.
-Canonical FracField.frac_comRingType.
-Canonical FracField.frac_unitRingType.
-Canonical FracField.frac_comUnitRingType.
-Canonical FracField.frac_idomainType.
-Canonical FracField.frac_fieldType.
-Canonical FracField.tofrac_pi_morph.
-Canonical frac_of_quotType := Eval hnf in [quotType of {fraction R}].
-Canonical frac_of_eqType := Eval hnf  in [eqType of {fraction R}].
-Canonical frac_of_choiceType := Eval hnf in [choiceType of {fraction R}].
-Canonical frac_of_zmodType := Eval hnf in [zmodType of {fraction R}].
-Canonical frac_of_ringType := Eval hnf in [ringType of {fraction R}].
-Canonical frac_of_comRingType := Eval hnf in [comRingType of {fraction R}].
-Canonical frac_of_unitRingType := Eval hnf in [unitRingType of {fraction R}].
-Canonical frac_of_comUnitRingType := Eval hnf in [comUnitRingType of {fraction R}].
-Canonical frac_of_idomainType := Eval hnf in [idomainType of {fraction R}].
-Canonical frac_of_fieldType := Eval hnf in [fieldType of {fraction R}].
+Print Canonical Projections FracField.type_of.
+HB.instance Definition _ := GRing.Zmodule.on {fraction R}.
+HB.instance Definition _ := GRing.Ring.on {fraction R}.
+HB.instance Definition _ := GRing.ComRing.on {fraction R}.
+HB.instance Definition _ := GRing.UnitRing.on {fraction R}.
+HB.instance Definition _ := GRing.ComUnitRing.on {fraction R}.
+HB.instance Definition _ := GRing.IntegralDomain.on {fraction R}.
+HB.instance Definition _ := GRing.Field.on {fraction R}.
 
 End Canonicals.
 
@@ -372,4 +346,4 @@ Qed.
 Lemma tofrac_eq0 (p : R): (p%:F == 0) = (p == 0).
 Proof. by rewrite tofrac_eq. Qed.
 End FracFieldTheory.
- *)
+
