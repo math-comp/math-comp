@@ -5,9 +5,9 @@
   coqproject = "mathcomp/_CoqProject";
   default-bundle = "coq-8.13";
   bundles = let common = {
-      hierarchy-builder.override.version = "master";
-      mathcomp.job = false;
-      mathcomp-single.job = true;
+    hierarchy-builder.override.version = "master";
+    mathcomp.job = false;
+    mathcomp-single.job = true;
   }; in {
     "coq-8.13".coqPackages = {
       coq.override.version = "8.13";

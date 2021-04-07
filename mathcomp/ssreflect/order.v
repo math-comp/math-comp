@@ -3,7 +3,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
-From mathcomp Require Import path fintype tuple bigop finset div prime.
 
 (******************************************************************************)
 (* This files defines types equipped with order relations.                    *)
@@ -3911,12 +3910,11 @@ move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
 by rewrite -[in LHS]lexy -meetA leyz lexy.
 Qed.
 
-HB.instance Definition _ :=
-  IsPOrdered.Build d T lt_def le_refl le_anti le_trans.
+HB.instance Definition _ := IsPOrdered.Build d T
+  lt_def le_refl le_anti le_trans.
 
-HB.instance Definition _ :=
-  POrder_IsMeetDistrLattice.Build d T meetC joinC meetA joinA
-                                      joinKI meetKU le_def meetUl.
+HB.instance Definition _ := POrder_IsMeetDistrLattice.Build d T
+  meetC joinC meetA joinA joinKI meetKU le_def meetUl.
 
 HB.end.
 
@@ -3961,12 +3959,15 @@ HB.builders
 Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
 
-HB.instance Definition _ :=
-  IsPOrdered.Build d T lt_def le_refl le_anti le_trans.
+HB.instance Definition _ := IsPOrdered.Build d T
+  lt_def le_refl le_anti le_trans.
 
-HB.instance Definition _ := POrder_IsTotal.Build d T le_total.
+Section GeneratedOrder.
 
-Implicit Types (x y z : T).
+Let T' := T.
+#[local] HB.instance Definition _ := POrder.on T'.
+#[local] HB.instance Definition _ := POrder_IsTotal.Build d T' le_total.
+Implicit Types (x y z : T').
 
 Fact meetE x y : meet x y = x `&` y. Proof. by rewrite meet_def. Qed.
 Fact joinE x y : join x y = x `|` y. Proof. by rewrite join_def. Qed.
@@ -3989,12 +3990,12 @@ Proof. by move=> *; rewrite meetE meetxx. Qed.
 Fact le_def x y : x <= y = (meet x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
-HB.instance Definition _ :=
-  IsMeetJoinDistrLattice.Build d T le_def lt_def
-    meetC joinC meetA joinA joinKI meetKU meetUl meetxx.
+End GeneratedOrder.
 
-(* we don't need it: already provided by POrder_IsTotal above *)
-(*HB.instance Definition _ := DistrLattice_IsTotal.Build d T le_total.*)
+HB.instance Definition _ :=
+  POrder_IsMeetDistrLattice.Build d T meetC joinC meetA joinA
+                                      joinKI meetKU le_def meetUl.
+HB.instance Definition _ := DistrLattice_IsTotal.Build d T le_total.
 
 HB.end.
 
@@ -4535,19 +4536,6 @@ HB.instance Definition _ := HasBottom.Build _ t (dvd1n : forall m : t, (1 %| m))
 #[export]
 HB.instance Definition _ := HasTop.Build _ t (dvdn0 : forall m : t, (m %| 0)).
 
-(*Canonical eqType := [eqType of t].
-Canonical choiceType := [choiceType of t].
-Canonical countType := [countType of t].
-Canonical porderType := POrderType dvd_display t t_distrLatticeMixin.
-Canonical latticeType := LatticeType t t_distrLatticeMixin.
-Canonical bLatticeType := BLatticeType t
-  (BottomMixin (dvd1n : forall m : t, (1 %| m))).
-Canonical tbLatticeType := TBLatticeType t
-  (TopMixin (dvdn0 : forall m : t, (m %| 0))).
-Canonical distrLatticeType := DistrLatticeType t t_distrLatticeMixin.
-Canonical bDistrLatticeType := [bDistrLatticeType of t].
-Canonical tbDistrLatticeType := [tbDistrLatticeType of t].*)
-
 Import DvdSyntax.
 Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
 Lemma sdvdE (m n : t) : m %<| n = (n != m) && (m %| n). Proof. by []. Qed.
@@ -4621,7 +4609,6 @@ End OrdinalOrder.
 (* Canonical structure on bool *)
 (*******************************)
 
-(*
 Module BoolOrder.
 Section BoolOrder.
 Implicit Types (x y : bool).
@@ -4645,27 +4632,13 @@ Definition sub x y := x && ~~ y.
 Lemma subKI x y : y && sub x y = false. Proof. by case: x y => [] []. Qed.
 Lemma joinIB x y : (x && y) || sub x y = x. Proof. by case: x y => [] []. Qed.
 
-Definition orderMixin :=
-  LeOrderMixin ltn_def andbE orbE anti leq_trans leq_total.
-
-Canonical porderType := POrderType bool_display bool orderMixin.
-Canonical latticeType := LatticeType bool orderMixin.
-Canonical bLatticeType := BLatticeType bool (@BottomMixin _ _ false leq0n).
-Canonical tbLatticeType := TBLatticeType bool (@TopMixin _ _ true leq_b1).
-Canonical distrLatticeType := DistrLatticeType bool orderMixin.
-Canonical orderType := OrderType bool orderMixin.
-Canonical bDistrLatticeType := [bDistrLatticeType of bool].
-Canonical tbDistrLatticeType := [tbDistrLatticeType of bool].
-Canonical cbDistrLatticeType := CBDistrLatticeType bool
-  (@CBDistrLatticeMixin _ _ (fun x y => x && ~~ y) subKI joinIB).
-Canonical ctbDistrLatticeType := CTBDistrLatticeType bool
-  (@CTBDistrLatticeMixin _ _ sub negb (fun x => erefl : ~~ x = sub true x)).
-
-Canonical finPOrderType := [finPOrderType of bool].
-Canonical finLatticeType :=  [finLatticeType of bool].
-Canonical finDistrLatticeType :=  [finDistrLatticeType of bool].
-Canonical finCDistrLatticeType := [finCDistrLatticeType of bool].
-Canonical finOrderType := [finOrderType of bool].
+#[export] HB.instance Definition _ := @IsOrdered.Build bool_display bool
+   _ _ andb orb ltn_def andbE orbE anti leq_trans leq_total.
+#[export] HB.instance Definition _ := @HasBottom.Build _ bool false leq0n.
+#[export] HB.instance Definition _ := @HasTop.Build _ bool true leq_b1.
+#[export] HB.instance Definition _ := @HasSub.Build _ bool sub subKI joinIB.
+#[export] HB.instance Definition _ := @HasCompl.Build _ bool
+  negb (fun x => erefl : ~~ x = sub true x).
 
 Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
 Lemma ltEbool x y : (x < y) = (x < y)%N. Proof. by []. Qed.
@@ -4676,21 +4649,8 @@ Lemma complEbool : compl = negb. Proof. by []. Qed.
 
 End BoolOrder.
 Module Exports.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical cbDistrLatticeType.
-Canonical ctbDistrLatticeType.
-Canonical orderType.
-Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finDistrLatticeType.
-Canonical finOrderType.
-Canonical finCDistrLatticeType.
+(* FIXME: uncomment when selection of material *)
+(* HB.reexport. *)
 Definition leEbool := leEbool.
 Definition ltEbool := ltEbool.
 Definition andEbool := andEbool.
@@ -4699,7 +4659,6 @@ Definition subEbool := subEbool.
 Definition complEbool := complEbool.
 End Exports.
 End BoolOrder.
-*)
 
 (*******************************)
 (* Definition of prod_display. *)
