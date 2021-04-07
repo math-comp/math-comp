@@ -141,10 +141,6 @@ Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 HB.instance Definition _ :=
   IsMulGroup.Build (perm_type T) perm_mulP perm_oneP perm_invP.
 
-Print perm_type_canonical_Finite.
-Print perm_type_canonical_FinGroup.
-
-
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
 
