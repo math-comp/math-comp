@@ -108,7 +108,7 @@ HB.mixin Record IsZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T 
 }.
 
 #[mathcomp]
-HB.structure Definition ZmodQuotient T eqT zeroT oppT addT := 
+HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
   {Q of IsZmodQuotient T eqT zeroT oppT addT Q & GRing.Zmodule Q & EqQuotient T eqT Q}.
 
 Section ZModQuotient.
@@ -159,7 +159,8 @@ addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
 
 #[mathcomp]
 HB.structure Definition RingQuotient T eqT zeroT oppT addT oneT mulT :=
-  {Q of IsRingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.Ring Q}.
+  {Q of IsRingQuotient T eqT zeroT oppT addT oneT mulT Q &
+   ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q }.
 
 Section ringQuotient.
 (*Clash with the module name RingQuotient*)
@@ -175,9 +176,10 @@ Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
 End ringQuotient.
 Module RingQuotientExports.
 Notation ringQuotType := RingQuotient.type.
-Notation "[ 'ringQuotType' o & m 'of' Q ]" :=
-  (@RingQuotient.clone _ _ _ _ _ o m Q _)
-  (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope.
+(* FIXME: broken *)
+(* Notation "[ 'ringQuotType' o & m 'of' Q ]" := *)
+(*   (@RingQuotient.clone _ _ _ _ _ o m Q _) *)
+(*   (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope. *)
 End RingQuotientExports.
 HB.export RingQuotientExports.
 
@@ -201,10 +203,9 @@ HB.mixin Record IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred
     pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
   }.
 
-
 #[mathcomp]
 HB.structure Definition UnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT :=
-  {Q of IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q}.
+  {Q of IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q & IsQuotient T Q & IsEqQuotient T eqT Q & IsZmodQuotient T eqT zeroT oppT addT Q & IsRingQuotient T eqT zeroT oppT addT oneT mulT Q}.
 
 Section UnitRingQuot.
 Variable (T : Type).
@@ -313,12 +314,12 @@ Canonical equiv_encModRel := defaultEncModRel equiv.
 
 Definition type := {eq_quot equiv}.
 Definition type_of of phant R := type.
+Local Notation quot := (type_of (Phant R)).
 
-(*We cannot HB.instance ?*)
-Canonical rquot_quotType := [quotType of type].
-Canonical rquot_eqType := [eqType of type].
-Canonical rquot_choiceType := [choiceType of type].
-Canonical rquot_eqQuotType := [eqQuotType equiv of type].
+HB.instance Definition _ : EqQuotient R equiv type := EqQuotient.on type.
+HB.instance Definition _ := Choice.on type.
+HB.instance Definition _ := EqQuotient.on quot.
+HB.instance Definition _ := Choice.on quot.
 
 Lemma idealrBE x y : (x - y) \in kI = (x == y %[mod type]).
 Proof. by rewrite piE equivE. Qed.
@@ -337,7 +338,6 @@ Proof.
 move=> x; unlock opp; apply/eqP; rewrite piE equivE.
 by rewrite -opprD rpredN idealrDE opprK reprK.
 Qed.
-
 Canonical pi_opp_morph := PiMorph1 pi_opp.
 
 Lemma pi_add : {morph \pi : x y / x + y >-> add x y}.
@@ -360,34 +360,53 @@ Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 Lemma addNq: left_inverse zero opp add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
-(* Definition rquot_zmodMixin := ZmodMixin addqA addqC add0q addNq. *)
 HB.instance Definition _ := ZmodMixin type addqA addqC add0q addNq.
-
-
-(* STOP
-Definition rquot_zmodQuotMixin := ZmodQuotMixin type (lock _) pi_opp pi_add.
-Canonical rquot_zmodQuotType := ZmodQuotType 0 -%R +%R type rquot_zmodQuotMixin.*)
+HB.instance Definition _ := GRing.Zmodule.on quot.
+HB.instance Definition _ := @IsZmodQuotient.Build R equiv 0 -%R +%R type
+  (lock _) pi_opp pi_add.
+HB.instance Definition _ := @ZmodQuotient.on quot.
 
 End ZmodQuotient.
-(*
 Notation "{quot I }" := (@type_of _ _ _ I (Phant _)).
+
+HB.factory Record Zmodule_IsComRing (T : Type) of GRing.Zmodule T := {
+  one : T ;
+  mul : T -> T -> T ;
+  mulA : associative mul ;
+  mulC : commutative mul ;
+  mul1r : left_id one mul ;
+  mul_addl : left_distributive mul +%R ;
+  nonzero1 : one != 0%R ;
+}.
+HB.builders Context T of Zmodule_IsComRing T.
+
+Fact mulr1 : right_id one mul.
+Proof. by move=> x; rewrite mulC mul1r. Qed.
+
+Fact mulrDr : right_distributive mul +%R.
+Proof. by move=> x y z; rewrite mulC mul_addl 2!(mulC _ x). Qed.
+
+HB.instance Definition _ := @GRing.Zmodule_IsRing.Build T
+  _ mul mulA mul1r mulr1 mul_addl mulrDr nonzero1.
+
+HB.instance Definition _ := GRing.Ring_HasCommutativeMul.Build T mulC.
+
+HB.end.
 
 Section RingQuotient.
 
 Variables (R : comRingType) (I : {pred R})
           (idealI : idealr I) (kI : keyed_pred idealI).
 
-Local Notation type := {quot kI}.
-
-Definition one: type := lift_cst type 1.
-Definition mul := lift_op2 type *%R.
+Definition one : {quot kI} := lift_cst {quot kI} 1.
+Definition mul := lift_op2 {quot kI} *%R.
 
 Canonical pi_one_morph := PiConst one.
 
 Lemma pi_mul: {morph \pi : x y / x * y >-> mul x y}.
 Proof.
 move=> x y; unlock mul; apply/eqP; rewrite piE equivE.
-rewrite -[_ * _](addrNK (x * repr (\pi_type y))) -mulrBr.
+rewrite -[_ * _](addrNK (x * repr (\pi_{quot kI} y))) -mulrBr.
 rewrite -addrA -mulrBl rpredD //.
   by rewrite idealMr // idealrDE opprK reprK.
 by rewrite mulrC idealMr // idealrDE opprK reprK.
@@ -412,17 +431,20 @@ Qed.
 Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
-Definition rquot_comRingMixin :=
-  ComRingMixin mulqA mulqC mul1q mulq_addl nonzero1q.
+HB.instance Definition _ := Zmodule_IsComRing.Build (type kI)
+  mulqA mulqC mul1q mulq_addl nonzero1q.
+HB.instance Definition _ := GRing.ComRing.on {quot kI}.
 
+(* STOP
 Canonical rquot_ringType    := Eval hnf in RingType type rquot_comRingMixin.
 Canonical rquot_comRingType := Eval hnf in ComRingType type mulqC.
 
 Definition rquot_ringQuotMixin := RingQuotMixin type (lock _) pi_mul.
 Canonical rquot_ringQuotType := RingQuotType 1 *%R type rquot_ringQuotMixin.
-
+*)
 End RingQuotient.
 
+(* STOP
 Section IDomainQuotient.
 
 Variables (R : comRingType) (I : {pred R})
