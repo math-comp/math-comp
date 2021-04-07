@@ -5,4 +5,7 @@
   name = "coq${coq.coq-version}-mathcomp-planB";
   propagatedBuildInputs = old.propagatedBuildInputs ++
                           [ coq-elpi hierarchy-builder-shim ];
+  patchPhase = ''
+    ulimit -s 81960
+  '';
 })
