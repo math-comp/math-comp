@@ -115,7 +115,7 @@ Definition type_of of phant R := type.
 Notation "{ 'fraction' T }" := (type_of (Phant T)).
 
 (* we recover some structure for the quotient *)
-HB.instance Definition _ := EqQuotient.on type.
+HB.instance Definition _ : EqQuotient _ equivf type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
 HB.instance Definition _ := EqQuotient.on {fraction R}.
 HB.instance Definition _ := Choice.on {fraction R}.
@@ -212,7 +212,7 @@ Qed.
 
 Lemma addN_l : left_inverse 0%:F opp add.
 Proof.
-elim/quotW=> x; apply/eqP; rewrite piE /equivf_equiv /= /equivf.
+elim/quotW=> x; apply/eqP; rewrite piE /equivf.
 rewrite /addf /oppf !numden_Ratio ?(oner_eq0, mulf_neq0, domP) //.
 by rewrite mulr1 mulr0 mulNr addNr.
 Qed.
@@ -241,13 +241,13 @@ Qed.
 Lemma mul_addl : left_distributive mul add.
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> z; apply/eqP.
-rewrite !piE /equivf_equiv /= /equivf /mulf /addf !numden_Ratio ?mulf_neq0 ?domP //; apply/eqP.
+rewrite !piE /equivf /mulf /addf !numden_Ratio ?mulf_neq0 ?domP //; apply/eqP.
 rewrite !(mulrDr, mulrDl) (AC (3*(2*2))%AC (4*2*7*((1*3)*(6*5)))%AC)/=.
 by rewrite [X in _ + X](AC (3*(2*2))%AC (4*6*7*((1*3)*(2*5)))%AC)/=.
 Qed.
 
 Lemma nonzero1 : 1%:F != 0%:F :> type.
-Proof. by rewrite piE /equivf_equiv /= equivfE !numden_Ratio ?mul1r ?oner_eq0. Qed.
+Proof. by rewrite piE equivfE !numden_Ratio ?mul1r ?oner_eq0. Qed.
 
 (* fractions form a commutative ring *)
 HB.instance Definition _ :=
@@ -256,7 +256,7 @@ HB.instance Definition _ :=
 Lemma mulV_l : forall a, a != 0%:F -> mul (inv a) a = 1%:F.
 Proof.
 elim/quotW=> x /=; rewrite !piE.
-rewrite /equivf_equiv /= /equivf !numden_Ratio ?oner_eq0 // mulr1 mulr0=> nx0.
+rewrite /equivf !numden_Ratio ?oner_eq0 // mulr1 mulr0=> nx0.
 apply/eqmodP; rewrite /= equivfE.
 by rewrite !numden_Ratio ?(oner_eq0, mulf_neq0, domP) // !mulr1 mulrC.
 Qed.
