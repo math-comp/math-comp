@@ -153,11 +153,16 @@ Notation "{ 'poly' T }" := (poly_of (Phant T)).
 
 HB.instance Definition _ (R : countRingType) :=
   [Countable of polynomial R by <:].
+HB.instance Definition _ (R : countRingType) := Countable.on {poly R}.
 
 Section PolynomialTheory.
 
 Variable R : ringType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
+
+HB.instance Definition _ := SUB.on {poly R}.
+HB.instance Definition _ := Equality.on {poly R}.
+HB.instance Definition _ := Choice.on {poly R}.
 
 Definition lead_coef p := p`_(size p).-1.
 Lemma lead_coefE p : lead_coef p = p`_(size p).-1. Proof. by []. Qed.
@@ -534,6 +539,7 @@ HB.instance Definition _ :=
   GRing.Zmodule_IsRing.Build
     (polynomial R)
     mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
+HB.instance Definition _ := GRing.Ring.on {poly R}.
 
 Lemma polyC1 : 1%:P = 1 :> {poly R}. Proof. by []. Qed.
 
@@ -667,8 +673,10 @@ Proof. by rewrite !scale_polyE mulrA. Qed.
 HB.instance Definition _ :=
   GRing.Zmodule_IsLmodule.Build
     R (polynomial R) scale_polyA scale_1poly scale_polyDr scale_polyDl.
+HB.instance Definition _ := GRing.Lmodule.on {poly R}.
 HB.instance Definition _ :=
   GRing.Lmodule_IsLalgebra.Build R (polynomial R) scale_polyAl.
+HB.instance Definition _ := GRing.Lalgebra.on {poly R}.
 
 Lemma mul_polyC a p : a%:P * p = a *: p.
 Proof. by rewrite -scale_polyE. Qed.
@@ -1687,6 +1695,14 @@ Arguments polyOverP {R S0 addS kS p} : rename.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
 Arguments eq_poly {R n} [E1] E2 eq_E12.
 
+(* TODO *)
+(* Canonical polynomial_countZmodType (R : countRingType) := *)
+(*   [countZmodType of polynomial R]. *)
+(* Canonical poly_countZmodType (R : countRingType) := [countZmodType of {poly R}]. *)
+(* Canonical polynomial_countRingType (R : countRingType) := *)
+(*   [countRingType of polynomial R]. *)
+(* Canonical poly_countRingType (R : countRingType) := [countRingType of {poly R}]. *)
+
 (* Container morphism. *)
 Section MapPoly.
 
@@ -2039,6 +2055,8 @@ Qed.
 HB.instance Definition _ :=
   GRing.Ring_HasCommutativeMul.Build (polynomial R) poly_mul_comm.
 HB.instance Definition _ := GRing.is_ComAlgebra.Build R (polynomial R).
+HB.instance Definition _ := GRing.ComRing.on {poly R}.
+HB.instance Definition _ := GRing.ComAlgebra.on {poly R}.
 
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
 Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
@@ -2154,6 +2172,12 @@ Definition derivCE := (derivE, deriv_exp).
 
 End PolynomialComRing.
 
+(* TODO *)
+(* Canonical polynomial_countComRingType (R : countComRingType) := *)
+(*   [countComRingType of polynomial R]. *)
+(* Canonical poly_countComRingType (R : countComRingType) := *)
+(*   [countComRingType of {poly R}]. *)
+
 Section PolynomialIdomain.
 
 (* Integral domain structure on poly *)
@@ -2201,9 +2225,11 @@ Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 HB.instance Definition _ :=
   GRing.ComRing_HasMulInverse.Build
     (polynomial R) poly_mulVp poly_intro_unit poly_inv_out.
+HB.instance Definition _ := GRing.UnitRing.on {poly R}.
 
 HB.instance Definition _ :=
   GRing.Ring_IsIntegral.Build (polynomial R) poly_idomainAxiom.
+HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 
 Lemma poly_unitE p :
   (p \in GRing.unit) = (size p == 1%N) && (p`_0 \in GRing.unit).
@@ -2377,6 +2403,20 @@ Lemma roots_geq_poly_eq0 p (rs : seq R) : all (root p) rs -> uniq rs ->
 Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
+
+(* TODO *)
+(* Canonical polynomial_countUnitRingType (R : countIdomainType) := *)
+(*   [countUnitRingType of polynomial R]. *)
+(* Canonical poly_countUnitRingType (R : countIdomainType) := *)
+(*   [countUnitRingType of {poly R}]. *)
+(* Canonical polynomial_countComUnitRingType (R : countIdomainType) := *)
+(*   [countComUnitRingType of polynomial R]. *)
+(* Canonical poly_countComUnitRingType (R : countIdomainType) := *)
+(*   [countComUnitRingType of {poly R}]. *)
+(* Canonical polynomial_countIdomainType (R : countIdomainType) := *)
+(*   [countIdomainType of polynomial R]. *)
+(* Canonical poly_countIdomainType (R : countIdomainType) := *)
+(*   [countIdomainType of {poly R}]. *)
 
 Section MapFieldPoly.
 
