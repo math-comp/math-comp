@@ -4241,6 +4241,45 @@ HB.mixin Record IsField R of UnitRing R := {
   fieldP : field_axiom [the unitRingType of R];
 }.
 
+HB.factory Record ComRing_IsField R of ComRing R := {
+  inv : R -> R;
+  mulVf : forall a, a != 0 -> inv a * a = 1;
+  inv0 : inv 0 = 0
+}.
+
+HB.builders Context R of ComRing_IsField R.
+Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
+Proof.
+move=> yx1; apply: contraNneq (@oner_neq0 [ringType of R])=> x0.
+by rewrite -yx1 x0 mulr0.
+Qed.
+
+Fact inv_out : {in predC (predC1 0), inv =1 id}.
+Proof.
+move=> x/negbNE/eqP->; exact: inv0.
+Qed.
+
+HB.instance Definition _ :=
+  ComRing_HasMulInverse.Build R mulVf intro_unit inv_out.
+
+Fact fieldP : field_axiom [the unitRingType of R].
+Proof.
+by move=> x xn0; rewrite unitrE mulrC mulVf.
+Qed.
+
+Fact mulf_eq0 : integral_domain_axiom [the ringType of R].
+Proof.
+move=> x y xy0; apply/norP=> [[]] /fieldP Ux /fieldP.
+by rewrite -(unitrMr _ Ux) xy0 unitr0.
+Qed.
+
+HB.instance Definition _ :=
+  Ring_IsIntegral.Build R mulf_eq0.
+
+HB.instance Definition _ :=
+  IsField.Build R fieldP.
+HB.end.
+
 #[mathcomp(axiom = "field_axiom")]
 HB.structure Definition Field := { R of IntegralDomain R & IsField R }.
 
