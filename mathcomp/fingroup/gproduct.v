@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset fingroup morphism.
 From mathcomp Require Import quotient action.
@@ -630,7 +631,7 @@ by rewrite (perm_mem eq_r12) mem_cat mem_nth.
 Qed.
 
 Lemma reindex_bigcprod (I J : finType) (h : J -> I) P (A : I -> {set gT}) G x :
-    {on SimplPred P, bijective h} -> \big[cprod/1]_(i | P i) A i = G -> 
+    {on SimplPred P, bijective h} -> \big[cprod/1]_(i | P i) A i = G ->
     {in SimplPred P, forall i, x i \in A i} ->
   \prod_(i | P i) x i = \prod_(j | P (h j)) x (h j).
 Proof.
@@ -995,11 +996,8 @@ Proof. by move=> x; congr (_, _); apply: mulVg. Qed.
 Lemma extprod_mulgA : associative extprod_mulg.
 Proof. by move=> x y z; congr (_, _); apply: mulgA. Qed.
 
-Definition extprod_groupMixin :=
-  Eval hnf in FinGroup.Mixin extprod_mulgA extprod_mul1g extprod_mulVg.
-Canonical extprod_baseFinGroupType :=
-  Eval hnf in BaseFinGroupType (gT1 * gT2) extprod_groupMixin.
-Canonical prod_group := FinGroupType extprod_mulVg.
+HB.instance Definition _ := IsMulGroup.Build (gT1 * gT2)%type
+  extprod_mulgA extprod_mul1g extprod_mulVg.
 
 Lemma group_setX (H1 : {group gT1}) (H2 : {group gT2}) : group_set (setX H1 H2).
 Proof.
@@ -1014,12 +1012,16 @@ Definition pairg1 x : gT1 * gT2 := (x, 1).
 Definition pair1g x : gT1 * gT2 := (1, x).
 
 Lemma pairg1_morphM : {morph pairg1 : x y / x * y}.
-Proof. by move=> x y /=; rewrite {2}/mulg /= /extprod_mulg /= mul1g. Qed.
+(* TODO: eliminate mulg_subdef automatically
+   (using a future option in HB.structure) *)
+Proof. by move=> x y /=; rewrite {2}/mulg /mulg_subdef/= /extprod_mulg /= mul1g. Qed.
 
 Canonical pairg1_morphism := @Morphism _ _ setT _ (in2W pairg1_morphM).
 
 Lemma pair1g_morphM : {morph pair1g : x y / x * y}.
-Proof. by move=> x y /=; rewrite {2}/mulg /= /extprod_mulg /= mul1g. Qed.
+(* TODO: eliminate mulg_subdef automatically
+   (using a future option in HB.structure) *)
+Proof. by move=> x y /=; rewrite {2}/mulg /mulg_subdef/= /extprod_mulg /= mul1g. Qed.
 
 Canonical pair1g_morphism := @Morphism _ _ setT _ (in2W pair1g_morphM).
 
@@ -1045,7 +1047,7 @@ Proof. by rewrite -imset2_pair imset2_set1r morphimEsub ?subsetT. Qed.
 Lemma morphim_pair1g (H2 : {set gT2}) : pair1g @* H2 = setX 1 H2.
 Proof. by rewrite -imset2_pair imset2_set1l morphimEsub ?subsetT. Qed.
 
-Lemma morphim_fstX (H1: {set gT1}) (H2 : {group gT2}) : 
+Lemma morphim_fstX (H1: {set gT1}) (H2 : {group gT2}) :
   [morphism of fun x => x.1] @* setX H1 H2 = H1.
 Proof.
 apply/eqP; rewrite eqEsubset morphimE setTI /=.
@@ -1055,7 +1057,7 @@ move=> Hx1; apply/imsetP; exists (x, 1); last by trivial.
 by rewrite in_setX Hx1 /=.
 Qed.
 
-Lemma morphim_sndX (H1: {group gT1}) (H2 : {set gT2}) : 
+Lemma morphim_sndX (H1: {group gT1}) (H2 : {set gT2}) :
   [morphism of fun x => x.2] @* setX H1 H2 = H2.
 Proof.
 apply/eqP; rewrite eqEsubset morphimE setTI /=.
@@ -1073,7 +1075,9 @@ apply/imset2P/andP=> [[[x1 u1] [v1 y1]] | [Hx Hy]].
   rewrite !inE /= => /andP[Hx1 /eqP->] /andP[/eqP-> Hx] [-> ->].
   by rewrite mulg1 mul1g.
 exists (x, 1 : gT2) (1 : gT1, y); rewrite ?inE ?Hx ?eqxx //.
-by rewrite /mulg /= /extprod_mulg /= mulg1 mul1g.
+(* TODO: eliminate mulg_subdef automatically
+   (using a future option in HB.structure) *)
+by rewrite /mulg /mulg_subdef/= /extprod_mulg /= mulg1 mul1g.
 Qed.
 
 Lemma setX_dprod (H1 : {group gT1}) (H2 : {group gT2}) :
@@ -1105,7 +1109,9 @@ Lemma setX_gen (H1 : {set gT1}) (H2 : {set gT2}) :
 Proof.
 move=> H1_1 H2_1; apply/eqP.
 rewrite eqEsubset gen_subG setXS ?subset_gen //.
-rewrite -setX_prod -morphim_pair1g -morphim_pairg1 !morphim_gen ?subsetT //.
+(* TODO: investigate why the occurence selection changed *)
+rewrite -[in X in X \subset _]setX_prod.
+rewrite -morphim_pair1g -morphim_pairg1 !morphim_gen ?subsetT //.
 by rewrite morphim_pair1g morphim_pairg1 mul_subG // genS // setXS ?sub1set.
 Qed.
 
@@ -1127,17 +1133,8 @@ Variable to : groupAction D R.
 Notation sdT := (sdprod_by to).
 Notation sdval := (@pair_of_sd to).
 
-Canonical sdprod_subType := Eval hnf in [subType for sdval].
-Definition sdprod_eqMixin := Eval hnf in [eqMixin of sdT by <:].
-Canonical sdprod_eqType := Eval hnf in EqType sdT sdprod_eqMixin.
-Definition sdprod_choiceMixin := [choiceMixin of sdT by <:].
-Canonical sdprod_choiceType := ChoiceType sdT sdprod_choiceMixin.
-Definition sdprod_countMixin := [countMixin of sdT by <:].
-Canonical sdprod_countType := CountType sdT sdprod_countMixin.
-Canonical sdprod_subCountType := Eval hnf in [subCountType of sdT].
-Definition sdprod_finMixin := [finMixin of sdT by <:].
-Canonical sdprod_finType := FinType sdT sdprod_finMixin.
-Canonical sdprod_subFinType := Eval hnf in [subFinType of sdT].
+HB.instance Definition _ := [subMixin for sdval].
+HB.instance Definition _ := [Finite of sdT by <:].
 
 Definition sdprod_one := SdPair to (group1 _).
 
@@ -1176,13 +1173,8 @@ case: v w => [[b y]] /=; case/setXP=> Db Ry [[c z]] /=; case/setXP=> Dc Rz.
 by rewrite !(actMin to) // gactM ?gact_stable // !mulgA.
 Qed.
 
-Canonical sdprod_groupMixin :=
-  FinGroup.Mixin sdprod_mulgA sdprod_mul1g sdprod_mulVg.
-
-Canonical sdprod_baseFinGroupType :=
-  Eval hnf in BaseFinGroupType sdT sdprod_groupMixin.
-
-Canonical sdprod_groupType := FinGroupType sdprod_mulVg.
+HB.instance Definition _ := IsMulGroup.Build sdT
+  sdprod_mulgA sdprod_mul1g sdprod_mulVg.
 
 Definition sdpair1 x := insubd sdprod_one (1, x) : sdT.
 Definition sdpair2 a := insubd sdprod_one (a, 1) : sdT.

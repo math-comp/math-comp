@@ -37,11 +37,11 @@ algebra/ssralg.v
 # field/finfield.v
 # field/galois.v
 # field/separable.v
-# fingroup/action.v
-# fingroup/all_fingroup.v
+fingroup/action.v
+fingroup/all_fingroup.v
 fingroup/automorphism.v
 fingroup/fingroup.v
-# fingroup/gproduct.v
+fingroup/gproduct.v
 fingroup/morphism.v
 fingroup/perm.v
 fingroup/presentation.v
