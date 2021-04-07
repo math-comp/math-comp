@@ -2376,6 +2376,23 @@ HB.mixin Record Ring_HasCommutativeMul R of Ring R := {
 #[mathcomp]
 HB.structure Definition ComRing := {R of Ring R & Ring_HasCommutativeMul R}.
 
+HB.factory Record Zmodule_IsComRing R of Zmodule R := {
+  one : R;
+  mul : R -> R -> R;
+  mulrA : associative mul;
+  mulrC : commutative mul;
+  mul1r : left_id one mul;
+  mulrDl : left_distributive mul add;
+  oner_neq0 : one != zero
+}.
+HB.builders Context R of Zmodule_IsComRing R.
+  Definition mulr1 := Monoid.mulC_id mulrC mul1r.
+  Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
+  HB.instance Definition _ := @Zmodule_IsRing.Build R
+    one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
+  HB.instance Definition _ := Ring_HasCommutativeMul.Build R mulrC.
+HB.end.
+
 Module ComRingExports.
 Notation comRingType := ComRing.type.
 Notation ComRingType T m := (ComRing.pack T m).
