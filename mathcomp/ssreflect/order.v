@@ -5751,8 +5751,6 @@ HB.instance Definition _ (T : orderType disp) :=
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
 
-(* FIXME: tuples need Canonical instance for sequences
- * -> we need HB.reexport to work properly             *)
 (***************************************)
 (* We declare a "copy" of the tuples,  *)
 (* which has canonical product order.  *)
@@ -6201,41 +6199,40 @@ Section DefaultTupleLexiOrder.
 Context {disp : unit}.
 
 HB.instance Definition _ n (T : porderType disp) :=
-  POrder.copy (n.-tuple T) (n.-tupleprod T).
+  POrder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : finPOrderType disp) :=
-  FinPOrder.copy (n.-tuple T) (n.-tupleprod T).
+  FinPOrder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : orderType disp) :=
-  Lattice.copy (n.-tuple T) (n.-tupleprod T).
+  Lattice.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : orderType disp) :=
-  DistrLattice.copy (n.-tuple T) (n.-tupleprod T).
-(* FIXME *)
-Fail HB.instance Definition _ n (T : orderType disp) :=
-  Total.copy (n.-tuple T) (n.-tupleprod T).
+  DistrLattice.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : orderType disp) :=
+  Total.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : finOrderType disp) :=
-  BLattice.copy (n.-tuple T) (n.-tupleprod T).
+  BLattice.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : finOrderType disp) :=
-  TBLattice.copy (n.-tuple T) (n.-tupleprod T).
-(* FIXME *)
-Fail HB.instance Definition _ n (T : finOrderType disp) :=
-  FinTotal.copy (n.-tuple T) (n.-tupleprod T).
+  TBLattice.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finOrderType disp) :=
+  FinTotal.copy (n.-tuple T) (n.-tuplelexi T).
 
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
-(* STOP
 Module Import DualOrder.
 Section DualOrder.
 Context {disp : unit}.
 Variable O : orderType disp.
 
-Lemma dual_totalMixin : totalOrderMixin [distrLatticeType of O^d].
-Proof. by move=> x y; rewrite le_total. Qed.
-Canonical dual_orderType := OrderType O^d dual_totalMixin.
+Lemma dual_total : total (<=%O : rel O^d).
+Proof. by move=> x y; exact: le_total. Qed.
+
+#[export]
+HB.instance Definition _ := DistrLattice_IsTotal.Build _ O^d dual_total.
 
 End DualOrder.
 
-Canonical dual_finOrderType d (T : finOrderType d) :=
-  [finOrderType of T^d].
+#[export]
+HB.instance Definition _ d (T : finOrderType d) := FinTotal.on T^d.
 
 End DualOrder.
 
@@ -6475,8 +6472,6 @@ Notation le_enum_val := le_enum_val.
 Notation le_enum_rank_in := le_enum_rank_in.
 Notation le_enum_rank := le_enum_rank.
 
-*)
-
 Module Syntax.
 Export POSyntax.
 Export LatticeSyntax.
@@ -6503,8 +6498,7 @@ Export TBLatticeTheory.
 Export BDistrLatticeTheory.
 Export DualTBDistrLattice.
 Export TBDistrLatticeTheory.
-(* FIXME *)
-(* Export DualOrder. *)
+Export DualOrder. (* FIXME? *)
 End LTheory.
 
 Module CTheory.
@@ -6555,13 +6549,12 @@ Export Order.FinTotal.Exports.
 (* Export Order.TupleProdOrder.Exports. *)
 (* Export Order.TupleLexiOrder.Exports. *)
 
-(* FIXME *)
-(* Module DefaultProdOrder := Order.DefaultProdOrder. *)
-(* Module DefaultSeqProdOrder := Order.DefaultSeqProdOrder. *)
-(* Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder. *)
-(* Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder. *)
-(* Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder. *)
-(* Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder. *)
+Module DefaultProdOrder := Order.DefaultProdOrder.
+Module DefaultSeqProdOrder := Order.DefaultSeqProdOrder.
+Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder.
+Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
+Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
+Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
 
 Import Order.Theory.
 
