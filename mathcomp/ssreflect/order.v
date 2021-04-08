@@ -3964,9 +3964,9 @@ HB.instance Definition _ := IsPOrdered.Build d T
 
 Section GeneratedOrder.
 
-Let T' := T.
-#[local] HB.instance Definition _ := POrder.on T'.
-#[local] HB.instance Definition _ := POrder_IsTotal.Build d T' le_total.
+Local Definition T' := T.
+HB.instance Definition _ := POrder.on T'.
+HB.instance Definition _ := POrder_IsTotal.Build d T' le_total.
 Implicit Types (x y z : T').
 
 Fact meetE x y : meet x y = x `&` y. Proof. by rewrite meet_def. Qed.
@@ -6599,6 +6599,8 @@ Notation le_enum_val := le_enum_val.
 Notation le_enum_rank_in := le_enum_rank_in.
 Notation le_enum_rank := le_enum_rank.
 
+*)
+
 Module Syntax.
 Export POSyntax.
 Export LatticeSyntax.
@@ -6625,7 +6627,8 @@ Export TBLatticeTheory.
 Export BDistrLatticeTheory.
 Export DualTBDistrLattice.
 Export TBDistrLatticeTheory.
-Export DualOrder.
+(* FIXME *)
+(* Export DualOrder. *)
 End LTheory.
 
 Module CTheory.
@@ -6640,13 +6643,9 @@ Module Theory.
 Export CTheory TotalTheory.
 End Theory.
 
-*)
-
 Module Exports. HB.reexport. End Exports.
 End Order.
 Export Order.Exports.
-
-(*
 
 Export Order.Syntax.
 
@@ -6666,46 +6665,32 @@ Export Order.FinCDistrLattice.Exports.
 Export Order.Total.Exports.
 Export Order.FinTotal.Exports.
 
-Export Order.LePOrderMixin.Exports.
-Export Order.BottomMixin.Exports.
-Export Order.TopMixin.Exports.
-Export Order.LatticeMixin.Exports.
-Export Order.DistrLatticeMixin.Exports.
-Export Order.CBDistrLatticeMixin.Exports.
-Export Order.CTBDistrLatticeMixin.Exports.
-Export Order.TotalOrderMixin.Exports.
-Export Order.DistrLatticePOrderMixin.Exports.
-Export Order.TotalLatticeMixin.Exports.
-Export Order.TotalPOrderMixin.Exports.
-Export Order.LtPOrderMixin.Exports.
-Export Order.MeetJoinMixin.Exports.
-Export Order.LeOrderMixin.Exports.
-Export Order.LtOrderMixin.Exports.
-Export Order.CanMixin.Exports.
-Export Order.SubOrder.Exports.
+(* FIXME: check if covered by Order.Exports *)
+(* Export Order.NatOrder.Exports. *)
+(* Export Order.NatMonotonyTheory. *)
+(* Export Order.NatDvd.Exports. *)
+(* Export Order.OrdinalOrder.Exports. *)
+(* Export Order.BoolOrder.Exports. *)
+(* Export Order.ProdOrder.Exports. *)
+(* Export Order.SigmaOrder.Exports. *)
+(* Export Order.ProdLexiOrder.Exports. *)
+(* Export Order.SeqProdOrder.Exports. *)
+(* Export Order.SeqLexiOrder.Exports. *)
+(* Export Order.TupleProdOrder.Exports. *)
+(* Export Order.TupleLexiOrder.Exports. *)
 
-Export Order.NatOrder.Exports.
-Export Order.NatMonotonyTheory.
-Export Order.NatDvd.Exports.
-Export Order.OrdinalOrder.Exports.
-Export Order.BoolOrder.Exports.
-Export Order.ProdOrder.Exports.
-Export Order.SigmaOrder.Exports.
-Export Order.ProdLexiOrder.Exports.
-Export Order.SeqProdOrder.Exports.
-Export Order.SeqLexiOrder.Exports.
-Export Order.TupleProdOrder.Exports.
-Export Order.TupleLexiOrder.Exports.
-
-Module DefaultProdOrder := Order.DefaultProdOrder.
-Module DefaultSeqProdOrder := Order.DefaultSeqProdOrder.
-Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder.
-Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
-Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
-Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
+(* FIXME *)
+(* Module DefaultProdOrder := Order.DefaultProdOrder. *)
+(* Module DefaultSeqProdOrder := Order.DefaultSeqProdOrder. *)
+(* Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder. *)
+(* Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder. *)
+(* Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder. *)
+(* Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder. *)
 
 Import Order.Theory.
 
+(* FIXME *)
+(*
 Module tagnat.
 Section tagnat.
 Import Order.EnumVal.
