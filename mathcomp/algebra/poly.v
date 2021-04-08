@@ -2208,7 +2208,7 @@ Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 HB.instance Definition _ :=
   GRing.ComRing_HasMulInverse.Build
     (polynomial R) poly_mulVp poly_intro_unit poly_inv_out.
-HB.instance Definition _ := GRing.UnitRing.on {poly R}.
+HB.instance Definition _ := GRing.ComUnitRing.on {poly R}.
 
 HB.instance Definition _ :=
   GRing.Ring_IsIntegral.Build (polynomial R) poly_idomainAxiom.
