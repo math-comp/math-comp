@@ -956,7 +956,7 @@ HB.mixin Record Zmodule_IsRing R of Zmodule R := {
   oner_neq0 : one != 0
 }.
 
-HB.factory Record IsRing R of HasDecEq R & HasChoice R := {
+HB.factory Record IsRing R of Choice R := {
   zero : R;
   opp : R -> R;
   add : R -> R -> R;
