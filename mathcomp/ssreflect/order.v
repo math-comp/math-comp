@@ -2621,9 +2621,9 @@ Arguments comparable_max_idPl {disp T x y _}.
 Module Import DualPOrder.
 Section DualPOrder.
 
-HB.instance Definition _ (T : eqType) := [eqMixin of T^d].
-HB.instance Definition _ (T : choiceType) := [choiceMixin of T^d].
-HB.instance Definition _ (T : countType) := [countMixin of T^d].
+HB.instance Definition _ (T : eqType) := Equality.on T^d.
+HB.instance Definition _ (T : choiceType) := Choice.on T^d.
+HB.instance Definition _ (T : countType) := Countable.on T^d.
 HB.instance Definition _ (T : finType) := Finite.on T^d.
 
 Context {disp : unit}.
@@ -4294,6 +4294,7 @@ Import SubOrder.Exports.
 (* lattice types to their definition without structure abstraction.           *)
 (******************************************************************************)
 
+Module NatOrder.
 Section NatOrder.
 
 Lemma nat_display : unit. Proof. exact: tt. Qed.
@@ -4301,10 +4302,12 @@ Lemma nat_display : unit. Proof. exact: tt. Qed.
 Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
+#[export]
 HB.instance Definition _ :=
   IsOrdered.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
                   anti_leq leq_trans leq_total.
 
+#[export]
 HB.instance Definition _ := HasBottom.Build nat_display nat leq0n.
 
 Lemma leEnat : le = leq. Proof. by []. Qed.
@@ -4314,6 +4317,17 @@ Lemma maxEnat : max = maxn. Proof. by []. Qed.
 Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
+
+Module Exports.
+HB.reexport.
+Definition leEnat := leEnat.
+Definition ltEnat := ltEnat.
+Definition minEnat := minEnat.
+Definition maxEnat := maxEnat.
+Definition botEnat := botEnat.
+End Exports.
+End NatOrder.
+HB.export NatOrder.Exports.
 
 Module NatMonotonyTheory.
 Section NatMonotonyTheory.
@@ -4546,8 +4560,7 @@ Lemma nat0E : nat0 = 0%N :> t. Proof. by []. Qed.
 
 End NatDvd.
 Module Exports.
-(* FIXME: uncomment when selection of material *)
-(*HB.reexport.*)
+HB.reexport.
 Notation natdvd := t.
 Definition dvdEnat := dvdE.
 Definition sdvdEnat := sdvdE.
@@ -4557,6 +4570,7 @@ Definition nat1E := nat1E.
 Definition nat0E := nat0E.
 End Exports.
 End NatDvd.
+HB.export NatDvd.Exports.
 
 (***********************************)
 (* Canonical structures on ordinal *)
@@ -4596,14 +4610,14 @@ End NonTrivial.
 End OrdinalOrder.
 
 Module Exports.
-(* FIXME: uncomment when selection of material *)
-(* HB.reexport. *)
+HB.reexport.
 Definition leEord := leEord.
 Definition ltEord := ltEord.
 Definition botEord := botEord.
 Definition topEord := topEord.
 End Exports.
 End OrdinalOrder.
+HB.export OrdinalOrder.Exports.
 
 (*******************************)
 (* Canonical structure on bool *)
@@ -4649,8 +4663,7 @@ Lemma complEbool : compl = negb. Proof. by []. Qed.
 
 End BoolOrder.
 Module Exports.
-(* FIXME: uncomment when selection of material *)
-(* HB.reexport. *)
+HB.reexport.
 Definition leEbool := leEbool.
 Definition ltEbool := ltEbool.
 Definition andEbool := andEbool.
@@ -4659,6 +4672,7 @@ Definition subEbool := subEbool.
 Definition complEbool := complEbool.
 End Exports.
 End BoolOrder.
+HB.export BoolOrder.Exports.
 
 (*******************************)
 (* Definition of prod_display. *)
@@ -4841,7 +4855,7 @@ End LexiSyntax.
 Module ProdOrder.
 Section ProdOrder.
 
-Local Open Scope type_scope.
+Local Open Scope type_scope. (* FIXME *)
 
 Definition type (disp : unit) (T T' : Type) := T * T'.
 
@@ -4849,14 +4863,10 @@ Context {disp1 disp2 disp3 : unit}.
 
 Local Notation "T * T'" := (type disp3 T T') : type_scope.
 
-#[export]
-HB.instance Definition _ (T T' : eqType) := [eqMixin of T * T'].
-#[export]
-HB.instance Definition _ (T T' : choiceType) := [choiceMixin of T * T'].
-#[export]
-HB.instance Definition _ (T T' : countType) := [countMixin of T * T'].
-#[export]
-HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
+#[export] HB.instance Definition _ (T T' : eqType) := Equality.on (T * T').
+#[export] HB.instance Definition _ (T T' : choiceType) := Choice.on (T * T').
+#[export] HB.instance Definition _ (T T' : countType) := Countable.on (T * T').
+#[export] HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
 
 Section POrder.
 Variable (T : porderType disp1) (T' : porderType disp2).
@@ -4975,23 +4985,15 @@ End DistrLattice.
 
 (* FIXME: the canonical (t)bDistrLatticeType instances of products should be  *)
 (*        automatically generated. *)
+#[export]
 HB.instance Definition _
   (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
   DistrLattice.on (T * T').
 
 #[export]
 HB.instance Definition _
-  (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
-  BDistrLattice.on (T * T').
-
-HB.instance Definition _
   (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :=
-  BDistrLattice.on (T * T').
-
-#[export]
-HB.instance Definition _
-  (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :=
-  TBDistrLattice.on (T * T').
+  DistrLattice.on (T * T').
 (* /FIXME *)
 
 Section CBDistrLattice.
@@ -5028,36 +5030,24 @@ Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 End CTBDistrLattice.
 
 (* FIXME *)
+#[export]
 HB.instance Definition _ (T : finPOrderType disp1)
   (T' : finPOrderType disp2) := POrder.on (T * T').
 #[export]
-HB.instance Definition _ (T : finPOrderType disp1)
-  (T' : finPOrderType disp2) := FinPOrder.on (T * T').
-
 HB.instance Definition _ (T : finLatticeType disp1)
   (T' : finLatticeType disp2) := Lattice.on (T * T').
 #[export]
-HB.instance Definition _ (T : finLatticeType disp1)
-  (T' : finLatticeType disp2) := FinLattice.on (T * T').
-
 HB.instance Definition _ (T : finDistrLatticeType disp1)
   (T' : finDistrLatticeType disp2) := DistrLattice.on (T * T').
 #[export]
-HB.instance Definition _ (T : finDistrLatticeType disp1)
-  (T' : finDistrLatticeType disp2) := FinDistrLattice.on (T * T').
-
 HB.instance Definition _ (T : finCDistrLatticeType disp1)
   (T' : finCDistrLatticeType disp2) := CTBDistrLattice.on (T * T').
-#[export]
-HB.instance Definition _ (T : finCDistrLatticeType disp1)
-  (T' : finCDistrLatticeType disp2) := FinCDistrLattice.on (T * T').
 (* /FIXME *)
 
 End ProdOrder.
 
 Module Exports.
-(* FIXME: uncomment when selection of material *)
-(* HB.reexport. *)
+HB.reexport.
 Notation "T *prod[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
 Notation "T *p T'" := (type prod_display T T')
@@ -5074,49 +5064,51 @@ Definition subEprod := @subEprod.
 Definition complEprod := @complEprod.
 End Exports.
 End ProdOrder.
+HB.export ProdOrder.Exports.
 
-(* TODO after recovering HB.reexport:
 Module DefaultProdOrder.
 Section DefaultProdOrder.
 Context {disp1 disp2 : unit}.
 
-Canonical prod_porderType (T : porderType disp1) (T' : porderType disp2) :=
-  [porderType of T * T' for [porderType of T *p T']].
-Canonical prod_latticeType (T : latticeType disp1) (T' : latticeType disp2) :=
-  [latticeType of T * T' for [latticeType of T *p T']].
-Canonical prod_bLatticeType
-    (T : bLatticeType disp1) (T' : bLatticeType disp2) :=
-  [bLatticeType of T * T' for [bLatticeType of T *p T']].
-Canonical prod_tbLatticeType
-    (T : tbLatticeType disp1) (T' : tbLatticeType disp2) :=
-  [tbLatticeType of T * T' for [tbLatticeType of T *p T']].
-Canonical prod_distrLatticeType
+(* FIXME: Scopes of arguments are broken in several places.                   *)
+(* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
+HB.instance Definition _ (T : porderType disp1) (T' : porderType disp2) :=
+  POrder.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : latticeType disp1) (T' : latticeType disp2) :=
+  Lattice.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : bLatticeType disp1) (T' : bLatticeType disp2) :=
+  BLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : tbLatticeType disp1) (T' : tbLatticeType disp2) :=
+  TBLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
     (T : distrLatticeType disp1) (T' : distrLatticeType disp2) :=
-  [distrLatticeType of T * T' for [distrLatticeType of T *p T']].
-Canonical prod_bDistrLatticeType
+  DistrLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
     (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
-  [bDistrLatticeType of T * T'].
-Canonical prod_tbDistrLatticeType
+  BDistrLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
     (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :=
-  [tbDistrLatticeType of T * T'].
-Canonical prod_cbDistrLatticeType
+  TBDistrLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
     (T : cbDistrLatticeType disp1) (T' : cbDistrLatticeType disp2) :=
-  [cbDistrLatticeType of T * T' for [cbDistrLatticeType of T *p T']].
-Canonical prod_ctbDistrLatticeType
+  CBDistrLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
     (T : ctbDistrLatticeType disp1) (T' : ctbDistrLatticeType disp2) :=
-  [ctbDistrLatticeType of T * T' for [ctbDistrLatticeType of T *p T']].
-Canonical prod_finPOrderType (T : finPOrderType disp1)
-  (T' : finPOrderType disp2) := [finPOrderType of T * T'].
-Canonical prod_finLatticeType (T : finLatticeType disp1)
-  (T' : finLatticeType disp2) := [finLatticeType of T * T'].
-Canonical prod_finDistrLatticeType (T : finDistrLatticeType disp1)
-  (T' : finDistrLatticeType disp2) := [finDistrLatticeType of T * T'].
-Canonical prod_finCDistrLatticeType (T : finCDistrLatticeType disp1)
-  (T' : finCDistrLatticeType disp2) := [finCDistrLatticeType of T * T'].
+  CTBDistrLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : finPOrderType disp1) (T' : finPOrderType disp2) :=
+  FinPOrder.copy (T * T')%type (T *p T').
+HB.instance Definition _
+    (T : finLatticeType disp1) (T' : finLatticeType disp2) :=
+  FinLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
+    (T : finDistrLatticeType disp1) (T' : finDistrLatticeType disp2) :=
+  FinDistrLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _
+    (T : finCDistrLatticeType disp1) (T' : finCDistrLatticeType disp2) :=
+  FinCDistrLattice.copy (T * T')%type (T *p T').
 
 End DefaultProdOrder.
 End DefaultProdOrder.
-*)
 
 (********************************************************)
 (* We declare lexicographic ordering on dependent pairs *)
@@ -5191,11 +5183,9 @@ Proof. by case: x => [t v]/= in u *; rewrite ltEsig/= lexx/= tagged_asE. Qed.
 End POrder.
 
 (* FIXME *)
-HB.instance Definition _ (T : finPOrderType disp1)
-  (T' : T -> finPOrderType disp2) := POrder.on {t : T & T' t}.
 #[export]
 HB.instance Definition _ (T : finPOrderType disp1)
-  (T' : T -> finPOrderType disp2) := FinPOrder.on {t : T & T' t}.
+  (T' : T -> finPOrderType disp2) := POrder.on {t : T & T' t}.
 (* /FIXME *)
 
 Section Total.
@@ -5241,10 +5231,7 @@ End FinDistrLattice.
 End SigmaOrder.
 
 Module Exports.
-
-(* FIXME: uncomment when selection of material *)
-(* HB.reexport. *)
-
+HB.reexport.
 Definition leEsig := @leEsig.
 Definition ltEsig := @ltEsig.
 Definition le_Taggedl := @le_Taggedl.
@@ -5253,7 +5240,6 @@ Definition le_Taggedr := @le_Taggedr.
 Definition lt_Taggedr := @lt_Taggedr.
 Definition topEsig := @topEsig.
 Definition botEsig := @botEsig.
-
 End Exports.
 End SigmaOrder.
 Import SigmaOrder.Exports.
@@ -5266,7 +5252,7 @@ Import SigmaOrder.Exports.
 Module ProdLexiOrder.
 Section ProdLexiOrder.
 
-Local Open Scope type_scope.
+Local Open Scope type_scope. (* FIXME *)
 
 Definition type (disp : unit) (T T' : Type) := T * T'.
 
@@ -5274,14 +5260,10 @@ Context {disp1 disp2 disp3 : unit}.
 
 Local Notation "T * T'" := (type disp3 T T') : type_scope.
 
-#[export]
-HB.instance Definition _ (T T' : eqType) := [eqMixin of T * T'].
-#[export]
-HB.instance Definition _ (T T' : choiceType) := [choiceMixin of T * T'].
-#[export]
-HB.instance Definition _ (T T' : countType) := [countMixin of T * T'].
-#[export]
-HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
+#[export] HB.instance Definition _ (T T' : eqType) := Equality.on (T * T').
+#[export] HB.instance Definition _ (T T' : choiceType) := Choice.on (T * T').
+#[export] HB.instance Definition _ (T T' : countType) := Countable.on (T * T').
+#[export] HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
 
 Section POrder.
 Variable (T : porderType disp1) (T' : porderType disp2).
@@ -5335,11 +5317,9 @@ Proof. by []. Qed.
 End POrder.
 
 (* FIXME *)
-HB.instance Definition _ (T : finPOrderType disp1)
-  (T' : finPOrderType disp2) := POrder.on (T * T').
 #[export]
 HB.instance Definition _ (T : finPOrderType disp1)
-  (T' : finPOrderType disp2) := FinPOrder.on (T * T').
+  (T' : finPOrderType disp2) := POrder.on (T * T').
 (* /FIXME *)
 
 Section Total.
@@ -5377,19 +5357,18 @@ Lemma topEprodlexi : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
 
 End FinDistrLattice.
 
-(* FIXME: to be commented out when exports will be fixed *)
-(*Lemma sub_prod_lexi d (T : POrder.Exports.porderType disp1)
-                      (T' : POrder.Exports.porderType disp2) :
+Lemma sub_prod_lexi d (T : porderType disp1) (T' : porderType disp2) :
    subrel (<=%O : rel (T *prod[d] T')) (<=%O : rel (T * T')).
 Proof.
 by case=> [x1 x2] [y1 y2]; rewrite leEprod leEprodlexi /=; case: comparableP.
 Qed.
-*)
+
 End ProdLexiOrder.
 
 Module Exports.
-(* FIXME *)
-(* HB.reexport *)
+
+HB.reexport.
+
 Notation "T *lexi[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *lexi[ d ]  T'") : type_scope.
 Notation "T *l T'" := (type lexi_display T T')
@@ -5401,52 +5380,25 @@ Definition lexi_pair := @lexi_pair.
 Definition ltxi_pair := @ltxi_pair.
 Definition topEprodlexi := @topEprodlexi.
 Definition botEprodlexi := @botEprodlexi.
-(* FIXME *)
-(*Definition sub_prod_lexi := @sub_prod_lexi.*)
+Definition sub_prod_lexi := @sub_prod_lexi.
 
 End Exports.
 End ProdLexiOrder.
-Import ProdLexiOrder.Exports.
+HB.export ProdLexiOrder.Exports.
 
-(*Module DefaultProdLexiOrder.
+Module DefaultProdLexiOrder.
 Section DefaultProdLexiOrder.
 Context {disp1 disp2 : unit}.
 
-Canonical prodlexi_porderType
-    (T : porderType disp1) (T' : porderType disp2) :=
-  [porderType of T * T' for [porderType of T *l T']].
-Canonical prodlexi_latticeType
-    (T : orderType disp1) (T' : orderType disp2) :=
-  [latticeType of T * T' for [latticeType of T *l T']].
-Canonical prodlexi_bLatticeType
-    (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  [bLatticeType of T * T' for [bLatticeType of T *l T']].
-Canonical prodlexi_tbLatticeType
-    (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  [tbLatticeType of T * T' for [tbLatticeType of T *l T']].
-Canonical prodlexi_distrLatticeType
-    (T : orderType disp1) (T' : orderType disp2) :=
-  [distrLatticeType of T * T' for [distrLatticeType of T *l T']].
-Canonical prodlexi_orderType
-    (T : orderType disp1) (T' : orderType disp2) :=
-  [orderType of T * T' for [orderType of T *l T']].
-Canonical prodlexi_bDistrLatticeType
-    (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  [bDistrLatticeType of T * T'].
-Canonical prodlexi_tbDistrLatticeType
-    (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  [tbDistrLatticeType of T * T'].
-Canonical prodlexi_finPOrderType (T : finPOrderType disp1)
-  (T' : finPOrderType disp2) := [finPOrderType of T * T'].
-Canonical prodlexi_finLatticeType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finLatticeType of T * T'].
-Canonical prodlexi_finDistrLatticeType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finDistrLatticeType of T * T'].
-Canonical prodlexi_finOrderType (T : finOrderType disp1)
-  (T' : finOrderType disp2) := [finOrderType of T * T'].
+HB.instance Definition _ (T : porderType disp1) (T' : porderType disp2) :=
+  POrder.copy (T * T')%type (T *l T').
+HB.instance Definition _ (T : orderType disp1) (T' : orderType disp2) :=
+  Total.copy (T * T')%type (T *l T').
+HB.instance Definition _ (T : finOrderType disp1) (T' : finOrderType disp2) :=
+  FinTotal.copy (T * T')%type (T *l T').
 
 End DefaultProdLexiOrder.
-End DefaultProdLexiOrder.*)
+End DefaultProdLexiOrder.
 
 (*****************************************)
 (* We declare a "copy" of the sequences, *)
@@ -5462,12 +5414,9 @@ Context {disp disp' : unit}.
 
 Local Notation seq := (type disp').
 
-#[export]
-HB.instance Definition _ (T : eqType) := [eqMixin of seq T].
-#[export]
-HB.instance Definition _ (T : choiceType) := [choiceMixin of seq T].
-#[export]
-HB.instance Definition _ (T : countType) := [countMixin of seq T].
+#[export] HB.instance Definition _ (T : eqType) := Equality.on (seq T).
+#[export] HB.instance Definition _ (T : choiceType) := Choice.on (seq T).
+#[export] HB.instance Definition _ (T : countType) := Countable.on (seq T).
 
 Section POrder.
 Variable T : porderType disp.
@@ -5598,8 +5547,9 @@ End DistrLattice.
 End SeqProdOrder.
 
 Module Exports.
-(* FIXME *)
-(* HB.reexport *)
+
+HB.reexport.
+
 Notation seqprod_with := type.
 Notation seqprod := (type prod_display).
 
@@ -5614,27 +5564,21 @@ Definition joinEseq := @joinEseq.
 
 End Exports.
 End SeqProdOrder.
-Import SeqProdOrder.Exports.
+HB.export SeqProdOrder.Exports.
 
-(* FIXME *)
-(*Module DefaultSeqProdOrder.
+Module DefaultSeqProdOrder.
 Section DefaultSeqProdOrder.
 Context {disp : unit}.
 
-Canonical seqprod_porderType (T : porderType disp) :=
-  [porderType of seq T for [porderType of seqprod T]].
-Canonical seqprod_latticeType (T : latticeType disp) :=
-  [latticeType of seq T for [latticeType of seqprod T]].
-Canonical seqprod_ndbLatticeType (T : latticeType disp) :=
-  [bLatticeType of seq T for [bLatticeType of seqprod T]].
-Canonical seqprod_distrLatticeType (T : distrLatticeType disp) :=
-  [distrLatticeType of seq T for [distrLatticeType of seqprod T]].
-Canonical seqprod_bDistrLatticeType (T : bDistrLatticeType disp) :=
-  [bDistrLatticeType of seq T].
+HB.instance Definition _ (T : porderType disp) :=
+  POrder.copy (seq T) (seqprod T).
+HB.instance Definition _ (T : latticeType disp) :=
+  BLattice.copy (seq T) (seqprod T).
+HB.instance Definition _ (T : distrLatticeType disp) :=
+  BDistrLattice.copy (seq T) (seqprod T).
 
 End DefaultSeqProdOrder.
-End DefaultSeqProdOrder.*)
-(* /FIXME *)
+End DefaultSeqProdOrder.
 
 (*********************************************)
 (* We declare a "copy" of the sequences,     *)
@@ -5650,12 +5594,9 @@ Context {disp disp' : unit}.
 
 Local Notation seq := (type disp').
 
-#[export]
-HB.instance Definition _ (T : eqType) := [eqMixin of seq T].
-#[export]
-HB.instance Definition _ (T : choiceType) := [choiceMixin of seq T].
-#[export]
-HB.instance Definition _ (T : countType) := [countMixin of seq T].
+#[export] HB.instance Definition _ (T : eqType) := Equality.on (seq T).
+#[export] HB.instance Definition _ (T : choiceType) := Choice.on (seq T).
+#[export] HB.instance Definition _ (T : countType) := Countable.on (seq T).
 
 Section POrder.
 Variable T : porderType disp.
@@ -5759,19 +5700,19 @@ HB.instance Definition _ := HasBottom.Build _ (seq T) (@lexi0s _).
 
 End Total.
 
-(* FIXME *)
-(*
-Lemma sub_seqprod_lexi d (T : POrder.Exports.porderType disp) :
+Lemma sub_seqprod_lexi d (T : porderType disp) :
    subrel (<=%O : rel (seqprod_with d T)) (<=%O : rel (seq T)).
 Proof.
 elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite le_cons lexi_cons /=.
 by move=> /andP[-> /ihs1->]; rewrite implybT.
-Qed. *)
+Qed.
 
 End SeqLexiOrder.
 
 Module Exports.
-(* FIXME: HB.reexport *)
+
+HB.reexport.
+
 Notation seqlexi_with := type.
 Notation seqlexi := (type lexi_display).
 
@@ -5790,38 +5731,28 @@ Definition ltxi_cons := @ltxi_cons.
 Definition ltxi_lehead := @ltxi_lehead.
 Definition eqhead_ltxiE := @eqhead_ltxiE.
 Definition neqhead_ltxiE := @neqhead_ltxiE.
-(* FIXME: Definition sub_seqprod_lexi := @sub_seqprod_lexi. *)
+Definition sub_seqprod_lexi := @sub_seqprod_lexi.
 
 End Exports.
 End SeqLexiOrder.
-Import SeqLexiOrder.Exports.
+HB.export SeqLexiOrder.Exports.
 
-(* FIXME
 Module DefaultSeqLexiOrder.
 Section DefaultSeqLexiOrder.
 Context {disp : unit}.
 
-Canonical seqlexi_porderType (T : porderType disp) :=
-  [porderType of seq T for [porderType of seqlexi T]].
-Canonical seqlexi_latticeType (T : orderType disp) :=
-  [latticeType of seq T for [latticeType of seqlexi T]].
-Canonical seqlexi_bLatticeType (T : orderType disp) :=
-  [bLatticeType of seq T for [bLatticeType of seqlexi T]].
-Canonical seqlexi_distrLatticeType (T : orderType disp) :=
-  [distrLatticeType of seq T for [distrLatticeType of seqlexi T]].
-Canonical seqlexi_bDistrLatticeType (T : orderType disp) :=
-  [bDistrLatticeType of seq T].
-Canonical seqlexi_orderType (T : orderType disp) :=
-  [orderType of seq T for [orderType of seqlexi T]].
+HB.instance Definition _ (T : porderType disp) :=
+  POrder.copy (seq T) (seqlexi T).
+HB.instance Definition _ (T : orderType disp) :=
+  BDistrLattice.copy (seq T) (seqlexi T).
+HB.instance Definition _ (T : orderType disp) :=
+  Total.copy (seq T) (seqlexi T).
 
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
-*)
-
 
 (* FIXME: tuples need Canonical instance for sequences
  * -> we need HB.reexport to work properly             *)
-(*
 (***************************************)
 (* We declare a "copy" of the tuples,  *)
 (* which has canonical product order.  *)
@@ -5839,18 +5770,16 @@ Local Notation "n .-tuple" := (type disp' n) : type_scope.
 
 Section Basics.
 Variable (n : nat).
-
-Canonical eqType (T : eqType):= Eval hnf in [eqType of n.-tuple T].
-Canonical choiceType (T : choiceType):= Eval hnf in [choiceType of n.-tuple T].
-Canonical countType (T : countType):= Eval hnf in [countType of n.-tuple T].
-Canonical finType (T : finType):= Eval hnf in [finType of n.-tuple T].
+#[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : choiceType) := Choice.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : countType) := Countable.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : finType) := Finite.on (n.-tuple T).
 End Basics.
 
 Section POrder.
 Implicit Types (T : porderType disp).
 
-Definition porderMixin n T := [porderMixin of n.-tuple T by <:].
-Canonical porderType n T := POrderType disp' (n.-tuple T) (porderMixin n T).
+#[export] HB.instance Definition _ n T := [POrder of n.-tuple T by <:].
 
 Lemma leEtprod n T (t1 t2 : n.-tuple T) :
    t1 <= t2 = [forall i, tnth t1 i <= tnth t2 i].
@@ -5921,9 +5850,9 @@ rewrite leEtprod eqEtuple; apply: eq_forallb => /= i.
 by rewrite tnth_meet leEmeet.
 Qed.
 
-Definition latticeMixin :=
-  Lattice.Mixin meetC joinC meetA joinA joinKI meetKU leEmeet.
-Canonical latticeType := LatticeType (n.-tuple T) latticeMixin.
+#[export]
+HB.instance Definition _ := POrder_IsLattice.Build
+  _ (n.-tuple T) meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Lemma meetEtprod t1 t2 :
   t1 `&` t2 = [tuple of [seq x.1 `&` x.2 | x <- zip t1 t2]].
@@ -5942,7 +5871,8 @@ Implicit Types (t : n.-tuple T).
 Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq le0x. Qed.
 
-Canonical bLatticeType := BLatticeType (n.-tuple T) (BLattice.Mixin le0x).
+#[export]
+HB.instance Definition _ := HasBottom.Build _ (n.-tuple T) le0x.
 
 Lemma botEtprod : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
 
@@ -5955,8 +5885,8 @@ Implicit Types (t : n.-tuple T).
 Fact lex1 t : t <= [tuple of nseq n 1] :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq lex1. Qed.
 
-Canonical tbLatticeType :=
-  TBLatticeType (n.-tuple T) (TBLattice.Mixin lex1).
+#[export]
+HB.instance Definition _ := HasTop.Build _ (n.-tuple T) lex1.
 
 Lemma topEtprod : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
 
@@ -5972,15 +5902,20 @@ move=> t1 t2 t3; apply: eq_from_tnth => i.
 by rewrite !(tnth_meet, tnth_join) meetUl.
 Qed.
 
-Definition distrLatticeMixin := DistrLatticeMixin meetUl.
-Canonical distrLatticeType := DistrLatticeType (n.-tuple T) distrLatticeMixin.
+#[export]
+HB.instance Definition _ :=
+  Lattice_MeetIsDistributive.Build _ (n.-tuple T) meetUl.
 
 End DistrLattice.
 
-Canonical bDistrLatticeType (n : nat) (T : bDistrLatticeType disp) :=
-  [bDistrLatticeType of n.-tuple T].
-Canonical tbDistrLatticeType (n : nat) (T : tbDistrLatticeType disp) :=
-  [tbDistrLatticeType of n.-tuple T].
+(* FIXME *)
+#[export]
+HB.instance Definition _ (n : nat) (T : bDistrLatticeType disp) :=
+  DistrLattice.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : tbDistrLatticeType disp) :=
+  DistrLattice.on (n.-tuple T).
+(* /FIXME *)
 
 Section CBDistrLattice.
 Variables (n : nat) (T : cbDistrLatticeType disp).
@@ -6005,9 +5940,7 @@ Proof.
 by apply: eq_from_tnth => i; rewrite tnth_join tnth_meet tnth_sub joinIB.
 Qed.
 
-Definition cbDistrLatticeMixin := CBDistrLatticeMixin subKI joinIB.
-Canonical cbDistrLatticeType :=
-  CBDistrLatticeType (n.-tuple T) cbDistrLatticeMixin.
+#[export] HB.instance Definition _ := HasSub.Build _ (n.-tuple T) subKI joinIB.
 
 Lemma subEtprod t1 t2 :
   t1 `\` t2 = [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
@@ -6029,54 +5962,39 @@ Proof.
 by apply: eq_from_tnth => i; rewrite tnth_compl tnth_sub complE tnth_nseq.
 Qed.
 
-Definition ctbDistrLatticeMixin := CTBDistrLatticeMixin complE.
-Canonical ctbDistrLatticeType :=
-  CTBDistrLatticeType (n.-tuple T) ctbDistrLatticeMixin.
+#[export] HB.instance Definition _ := HasCompl.Build _ (n.-tuple T) complE.
 
 Lemma complEtprod t : ~` t = [tuple of [seq ~` x | x <- t]].
 Proof. by []. Qed.
 
 End CTBDistrLattice.
 
-Canonical finPOrderType n (T : finPOrderType disp) :=
-  [finPOrderType of n.-tuple T].
-
-Canonical finLatticeType n (T : finLatticeType disp) :=
-  [finLatticeType of n.-tuple T].
-
-Canonical finDistrLatticeType n (T : finDistrLatticeType disp) :=
-  [finDistrLatticeType of n.-tuple T].
-
-Canonical finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
-  [finCDistrLatticeType of n.-tuple T].
+(* FIXME *)
+#[export]
+HB.instance Definition _ (n : nat) (T : finPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : finLatticeType disp) :=
+  Lattice.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : finDistrLatticeType disp) :=
+  DistrLattice.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : finCDistrLatticeType disp) :=
+  CTBDistrLattice.on (n.-tuple T).
+(* /FIXME *)
 
 End TupleProdOrder.
 
 Module Exports.
+
+HB.reexport.
 
 Notation "n .-tupleprod[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
   type_scope.
 Notation "n .-tupleprod" := (n.-tupleprod[prod_display])
   (at level 2, format "n .-tupleprod") : type_scope.
-
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical finType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical cbDistrLatticeType.
-Canonical ctbDistrLatticeType.
-Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finDistrLatticeType.
-Canonical finCDistrLatticeType.
 
 Definition leEtprod := @leEtprod.
 Definition ltEtprod := @ltEtprod.
@@ -6094,39 +6012,38 @@ Definition tnth_compl := @tnth_compl.
 
 End Exports.
 End TupleProdOrder.
-Import TupleProdOrder.Exports.
+HB.export TupleProdOrder.Exports.
 
 Module DefaultTupleProdOrder.
 Section DefaultTupleProdOrder.
 Context {disp : unit}.
 
-Canonical tprod_porderType n (T : porderType disp) :=
-  [porderType of n.-tuple T for [porderType of n.-tupleprod T]].
-Canonical tprod_latticeType n (T : latticeType disp) :=
-  [latticeType of n.-tuple T for [latticeType of n.-tupleprod T]].
-Canonical tprod_bLatticeType n (T : bLatticeType disp) :=
-  [bLatticeType of n.-tuple T for [bLatticeType of n.-tupleprod T]].
-Canonical tprod_tbLatticeType n (T : tbLatticeType disp) :=
-  [tbLatticeType of n.-tuple T for [tbLatticeType of n.-tupleprod T]].
-Canonical tprod_distrLatticeType n (T : distrLatticeType disp) :=
-  [distrLatticeType of n.-tuple T for [distrLatticeType of n.-tupleprod T]].
-Canonical tprod_bDistrLatticeType n (T : bDistrLatticeType disp) :=
-  [bDistrLatticeType of n.-tuple T].
-Canonical tprod_tbDistrLatticeType n (T : tbDistrLatticeType disp) :=
-  [tbDistrLatticeType of n.-tuple T].
-Canonical tprod_cbDistrLatticeType n (T : cbDistrLatticeType disp) :=
-  [cbDistrLatticeType of n.-tuple T for [cbDistrLatticeType of n.-tupleprod T]].
-Canonical tprod_ctbDistrLatticeType n (T : ctbDistrLatticeType disp) :=
-  [ctbDistrLatticeType of n.-tuple T for
-                       [ctbDistrLatticeType of n.-tupleprod T]].
-Canonical tprod_finPOrderType n (T : finPOrderType disp) :=
-  [finPOrderType of n.-tuple T].
-Canonical tprod_finLatticeType n (T : finLatticeType disp) :=
-  [finLatticeType of n.-tuple T].
-Canonical tprod_finDistrLatticeType n (T : finDistrLatticeType disp) :=
-  [finDistrLatticeType of n.-tuple T].
-Canonical tprod_finCDistrLatticeType n (T : finCDistrLatticeType disp) :=
-  [finCDistrLatticeType of n.-tuple T].
+HB.instance Definition _ n (T : porderType disp) :=
+  POrder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : latticeType disp) :=
+  Lattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : bLatticeType disp) :=
+  BLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : tbLatticeType disp) :=
+  TBLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : distrLatticeType disp) :=
+  DistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : bDistrLatticeType disp) :=
+  BDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : tbDistrLatticeType disp) :=
+  TBDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : cbDistrLatticeType disp) :=
+  CBDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : ctbDistrLatticeType disp) :=
+  CTBDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finPOrderType disp) :=
+  FinPOrder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finLatticeType disp) :=
+  FinLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finDistrLatticeType disp) :=
+  FinDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finCDistrLatticeType disp) :=
+  FinCDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
 
 End DefaultTupleProdOrder.
 End DefaultTupleProdOrder.
@@ -6147,19 +6064,16 @@ Local Notation "n .-tuple" := (type disp' n) : type_scope.
 
 Section Basics.
 Variable (n : nat).
-
-Canonical eqType (T : eqType):= Eval hnf in [eqType of n.-tuple T].
-Canonical choiceType (T : choiceType):= Eval hnf in [choiceType of n.-tuple T].
-Canonical countType (T : countType):= Eval hnf in [countType of n.-tuple T].
-Canonical finType (T : finType):= Eval hnf in [finType of n.-tuple T].
+#[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : choiceType) := Choice.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : countType) := Countable.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : finType) := Finite.on (n.-tuple T).
 End Basics.
 
 Section POrder.
 Implicit Types (T : porderType disp).
 
-Definition porderMixin n T := [porderMixin of n.-tuple T by <:].
-Canonical porderType n T := POrderType disp' (n.-tuple T) (porderMixin n T).
-
+#[export] HB.instance Definition _ n T := [POrder of n.-tuple T by <:].
 
 Lemma lexi_tupleP n T (t1 t2 : n.-tuple T) :
    reflect (exists k : 'I_n.+1, forall i : 'I_n, (i <= k)%N ->
@@ -6203,7 +6117,6 @@ rewrite lexx implyTb; apply/IHn; exists k => i le_ik.
 by have := leif_xt12 (lift ord0 i) le_ik; rewrite !tnthS.
 Qed.
 
-
 Lemma ltxi_tuplePlt n T (t1 t2 : n.-tuple T) : reflect
   (exists2 k : 'I_n, forall i : 'I_n, (i < k)%N -> tnth t1 i = tnth t2 i
                                                  & tnth t1 k < tnth t2 k)
@@ -6217,17 +6130,15 @@ Qed.
 
 End POrder.
 
-Section Total.
-Variables (n : nat) (T : orderType disp).
-Implicit Types (t : n.-tuple T).
+(* FIXME *)
+#[export]
+HB.instance Definition _ (n : nat) (T : finPOrderType disp) :=
+  POrder.on (n.-tuple T).
+(* /FIXME *)
 
-Definition total : totalPOrderMixin [porderType of n.-tuple T] :=
-  [totalOrderMixin of n.-tuple T by <:].
-Canonical latticeType := LatticeType (n.-tuple T) total.
-Canonical distrLatticeType := DistrLatticeType (n.-tuple T) total.
-Canonical orderType := OrderType (n.-tuple T) total.
-
-End Total.
+#[export]
+HB.instance Definition _ (n : nat) (T : orderType disp) :=
+  [Order of n.-tuple T by <:].
 
 Section BDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
@@ -6236,8 +6147,7 @@ Implicit Types (t : n.-tuple T).
 Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
 Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
 
-Canonical bLatticeType := BLatticeType (n.-tuple T) (BLattice.Mixin le0x).
-Canonical bDistrLatticeType := [bDistrLatticeType of n.-tuple T].
+#[export] HB.instance Definition _ := HasBottom.Build _ (n.-tuple T) le0x.
 
 Lemma botEtlexi : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
 
@@ -6250,24 +6160,13 @@ Implicit Types (t : n.-tuple T).
 Fact lex1 t : t <= [tuple of nseq n 1].
 Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
 
-Canonical tbLatticeType :=
-  TBLatticeType (n.-tuple T) (TBLattice.Mixin lex1).
-Canonical tbDistrLatticeType := [tbDistrLatticeType of n.-tuple T].
+#[export] HB.instance Definition _ := HasTop.Build _ (n.-tuple T) lex1.
 
 Lemma topEtlexi : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
 
 End TBDistrLattice.
 
-Canonical finPOrderType n (T : finPOrderType disp) :=
-  [finPOrderType of n.-tuple T].
-Canonical finLatticeType n (T : finOrderType disp) :=
-  [finLatticeType of n.-tuple T].
-Canonical finDistrLatticeType n (T : finOrderType disp) :=
-  [finDistrLatticeType of n.-tuple T].
-Canonical finOrderType n (T : finOrderType disp) :=
-  [finOrderType of n.-tuple T].
-
-Lemma sub_tprod_lexi d n (T : POrder.Exports.porderType disp) :
+Lemma sub_tprod_lexi d n (T : porderType disp) :
    subrel (<=%O : rel (n.-tupleprod[d] T)) (<=%O : rel (n.-tuple T)).
 Proof. exact: sub_seqprod_lexi. Qed.
 
@@ -6275,28 +6174,13 @@ End TupleLexiOrder.
 
 Module Exports.
 
+HB.reexport.
+
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
   order_scope.
 Notation "n .-tuplelexi" := (n.-tuplelexi[lexi_display])
   (at level 2, format "n .-tuplelexi") : order_scope.
-
-Canonical eqType.
-Canonical choiceType.
-Canonical countType.
-Canonical finType.
-Canonical porderType.
-Canonical latticeType.
-Canonical bLatticeType.
-Canonical tbLatticeType.
-Canonical distrLatticeType.
-Canonical orderType.
-Canonical bDistrLatticeType.
-Canonical tbDistrLatticeType.
-Canonical finPOrderType.
-Canonical finLatticeType.
-Canonical finDistrLatticeType.
-Canonical finOrderType.
 
 Definition lexi_tupleP := @lexi_tupleP.
 Arguments lexi_tupleP {disp disp' n T t1 t2}.
@@ -6310,41 +6194,33 @@ Definition sub_tprod_lexi := @sub_tprod_lexi.
 
 End Exports.
 End TupleLexiOrder.
-Import TupleLexiOrder.Exports.
+HB.export TupleLexiOrder.Exports.
 
 Module DefaultTupleLexiOrder.
 Section DefaultTupleLexiOrder.
 Context {disp : unit}.
 
-Canonical tlexi_porderType n (T : porderType disp) :=
-  [porderType of n.-tuple T for [porderType of n.-tuplelexi T]].
-Canonical tlexi_latticeType n (T : orderType disp) :=
-  [latticeType of n.-tuple T for [latticeType of n.-tuplelexi T]].
-Canonical tlexi_bLatticeType n (T : finOrderType disp) :=
-  [bLatticeType of n.-tuple T for [bLatticeType of n.-tuplelexi T]].
-Canonical tlexi_tbLatticeType n (T : finOrderType disp) :=
-  [tbLatticeType of n.-tuple T for [tbLatticeType of n.-tuplelexi T]].
-Canonical tlexi_distrLatticeType n (T : orderType disp) :=
-  [distrLatticeType of n.-tuple T for [distrLatticeType of n.-tuplelexi T]].
-Canonical tlexi_bDistrLatticeType n (T : finOrderType disp) :=
-  [bDistrLatticeType of n.-tuple T].
-Canonical tlexi_tbDistrLatticeType n (T : finOrderType disp) :=
-  [tbDistrLatticeType of n.-tuple T].
-Canonical tlexi_orderType n (T : orderType disp) :=
-  [orderType of n.-tuple T for [orderType of n.-tuplelexi T]].
-Canonical tlexi_finPOrderType n (T : finPOrderType disp) :=
-  [finPOrderType of n.-tuple T].
-Canonical tlexi_finLatticeType n (T : finOrderType disp) :=
-  [finLatticeType of n.-tuple T].
-Canonical tlexi_finDistrLatticeType n (T : finOrderType disp) :=
-  [finDistrLatticeType of n.-tuple T].
-Canonical tlexi_finOrderType n (T : finOrderType disp) :=
-  [finOrderType of n.-tuple T].
+HB.instance Definition _ n (T : porderType disp) :=
+  POrder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finPOrderType disp) :=
+  FinPOrder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : orderType disp) :=
+  Lattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : orderType disp) :=
+  DistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+(* FIXME *)
+Fail HB.instance Definition _ n (T : orderType disp) :=
+  Total.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finOrderType disp) :=
+  BLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finOrderType disp) :=
+  TBLattice.copy (n.-tuple T) (n.-tupleprod T).
+(* FIXME *)
+Fail HB.instance Definition _ n (T : finOrderType disp) :=
+  FinTotal.copy (n.-tuple T) (n.-tupleprod T).
 
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
-
-*)
 
 (* STOP
 Module Import DualOrder.
