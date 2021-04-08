@@ -68,10 +68,13 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     plugin abstraction and Prop-irrelevance functions.                     *)
 (*                                                                            *)
 (* List of factories (to use with HB.instance Definition _ := )               *)
-(* - IsZmodule.Build T addA addC add0x addNx                                  *)
+(*  - IsZmodule.Build T addA addC add0x addNx                                 *)
 (*     Requires a choiceType on T and declares a Zmodule on T from the        *)
 (*     algebraic properties of its operations.                                *)
 (*     NB: we have removed the notation ZmodMixin and used IsZmodule.Build    *)
+(*  - PreZmodule.Build T injf f0 fN fD                                        *)
+(*        Require a choiceType on T and declares a Zmodule on T from an       *)
+(*        injection into a Zmodule and morphism properties                    *)
 (*                                                                            *)
 (*  * Ring (non-commutative rings):                                           *)
 (*              ringType == interface type for a Ring structure.              *)
@@ -4850,6 +4853,8 @@ Next Obligation. by move=> x; apply: injf; rewrite fD f0 add0r. Qed.
 Next Obligation. by move=> x; apply: injf; rewrite !(fD, fN, f0) addNr. Qed.
 HB.instance U zmodU.
 HB.end.
+
+
 
 HB.factory Record PredSubZmodule V (S : {pred V})
   (subS : zmodPred S) (kS : keyed_pred subS) U of SubChoice V S U := {}.
