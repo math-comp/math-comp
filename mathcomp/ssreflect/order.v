@@ -4233,7 +4233,7 @@ HB.instance Definition _ :=
 End Total.
 
 Module Exports.
-HB.reexport.
+HB.reexport SubOrder.
 Notation "[ 'POrder' 'of' T 'by' <: ]" :=
   (POrder.copy T%type (sub_type T))
   (at level 0, format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
@@ -4265,7 +4265,7 @@ Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
   [IsTotal of T by <:] (at level 0, only parsing) : form_scope.
 End Exports.
 End SubOrder.
-Import SubOrder.Exports.
+HB.export SubOrder.Exports.
 
 (*************)
 (* INSTANCES *)
@@ -4319,7 +4319,7 @@ Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
 End NatOrder.
 
 Module Exports.
-HB.reexport.
+HB.reexport NatOrder.
 Definition leEnat := leEnat.
 Definition ltEnat := ltEnat.
 Definition minEnat := minEnat.
@@ -4560,7 +4560,7 @@ Lemma nat0E : nat0 = 0%N :> t. Proof. by []. Qed.
 
 End NatDvd.
 Module Exports.
-HB.reexport.
+HB.reexport NatDvd.
 Notation natdvd := t.
 Definition dvdEnat := dvdE.
 Definition sdvdEnat := sdvdE.
@@ -4610,7 +4610,7 @@ End NonTrivial.
 End OrdinalOrder.
 
 Module Exports.
-HB.reexport.
+HB.reexport OrdinalOrder.
 Definition leEord := leEord.
 Definition ltEord := ltEord.
 Definition botEord := botEord.
@@ -4663,7 +4663,7 @@ Lemma complEbool : compl = negb. Proof. by []. Qed.
 
 End BoolOrder.
 Module Exports.
-HB.reexport.
+HB.reexport BoolOrder.
 Definition leEbool := leEbool.
 Definition ltEbool := ltEbool.
 Definition andEbool := andEbool.
@@ -5047,7 +5047,7 @@ HB.instance Definition _ (T : finCDistrLatticeType disp1)
 End ProdOrder.
 
 Module Exports.
-HB.reexport.
+HB.reexport ProdOrder.
 Notation "T *prod[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
 Notation "T *p T'" := (type prod_display T T')
@@ -5231,7 +5231,7 @@ End FinDistrLattice.
 End SigmaOrder.
 
 Module Exports.
-HB.reexport.
+HB.reexport SigmaOrder.
 Definition leEsig := @leEsig.
 Definition ltEsig := @ltEsig.
 Definition le_Taggedl := @le_Taggedl.
@@ -5242,7 +5242,7 @@ Definition topEsig := @topEsig.
 Definition botEsig := @botEsig.
 End Exports.
 End SigmaOrder.
-Import SigmaOrder.Exports.
+HB.export SigmaOrder.Exports.
 
 (*************************************************)
 (* We declare a "copy" of the cartesian product, *)
@@ -5367,7 +5367,7 @@ End ProdLexiOrder.
 
 Module Exports.
 
-HB.reexport.
+HB.reexport ProdLexiOrder.
 
 Notation "T *lexi[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *lexi[ d ]  T'") : type_scope.
@@ -5548,7 +5548,7 @@ End SeqProdOrder.
 
 Module Exports.
 
-HB.reexport.
+HB.reexport SeqProdOrder.
 
 Notation seqprod_with := type.
 Notation seqprod := (type prod_display).
@@ -5711,7 +5711,7 @@ End SeqLexiOrder.
 
 Module Exports.
 
-HB.reexport.
+HB.reexport SeqLexiOrder.
 
 Notation seqlexi_with := type.
 Notation seqlexi := (type lexi_display).
@@ -5986,7 +5986,7 @@ End TupleProdOrder.
 
 Module Exports.
 
-HB.reexport.
+HB.reexport TupleProdOrder.
 
 Notation "n .-tupleprod[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
@@ -6172,7 +6172,7 @@ End TupleLexiOrder.
 
 Module Exports.
 
-HB.reexport.
+HB.reexport TupleLexiOrder.
 
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
@@ -6558,8 +6558,6 @@ Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
 
 Import Order.Theory.
 
-(* FIXME *)
-(*
 Module tagnat.
 Section tagnat.
 Import Order.EnumVal.
@@ -6577,8 +6575,8 @@ rewrite card_tagged sumnE/= big_map big_enum.
 by apply: eq_bigr => i _; rewrite card_ord.
 Qed.
 
-Definition sig : ordsum -> T  := enum_val \o (cast_ord (esym card)).
-Definition rank : T -> ordsum := (cast_ord card) \o enum_rank.
+Definition sig : ordsum -> T  := enum_val \o cast_ord (esym card).
+Definition rank : T -> ordsum := cast_ord card \o enum_rank.
 
 Lemma sigK : cancel sig rank.
 Proof.
@@ -6685,4 +6683,3 @@ Proof. by rewrite RankEsum. Qed.
 End tagnat.
 End tagnat.
 Arguments tagnat.Rank {n p_}.
-*)
