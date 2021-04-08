@@ -2211,7 +2211,7 @@ HB.instance Definition _ :=
 HB.instance Definition _ := GRing.ComUnitRing.on {poly R}.
 
 HB.instance Definition _ :=
-  GRing.Ring_IsIntegral.Build (polynomial R) poly_idomainAxiom.
+  GRing.ComUnitRing_IsIntegral.Build (polynomial R) poly_idomainAxiom.
 HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 
 Lemma poly_unitE p :

@@ -234,10 +234,9 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (* [idomainMixin of R by <:] == mixin axiom for a idomain subType.            *)
 (*                                                                            *)
 (* List of factories (to use with HB.instance Definition _ := )               *)
-(* - Ring_IsIntegral.Build T idomAxiom                                        *)
+(* - ComUnitRing_IsIntegral.Build T idomAxiom                                 *)
 (*     Requires a comUnitRingType on T and declares an integral idomainType   *)
 (*     on T from the property of no nonzero zero-divisors                     *)
-(*     TODO: shouldn't this actually be called comUnitRing_IsIntegral.Build?  *)
 (*                                                                            *)
 (*  * Field (commutative fields):                                             *)
 (*              fieldType == interface type for fields.                       *)
@@ -319,8 +318,8 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*        'exists 'X_i, u1 == 0 /\ ... /\ u_m == 0 /\ v1 != 0 ... /\ v_n != 0 *)
 (*                                                                            *)
 (* List of factories (to use with HB.instance Definition _ := )               *)
-(*  - UnitRing_IsDec.Build R satP                                             *)
-(*     Requires a FieldType and on R and declares a decFieldType on R from    *)
+(*  - Field_IsDec.Build F satP                                                *)
+(*     Requires a FieldType and on R and declares a decFieldType on F from    *)
 (*    the decidable satifiability theory axiom                                *)
 (* TODO : revise name "decidable_of_QE", check explicit arguments.            *)
 (*  - decidable_of_QE.build F wf_proj ok_proj                                 *)
@@ -4169,13 +4168,13 @@ Prenex Implicits dnf_rterm.
 Definition integral_domain_axiom (R : ringType) :=
   forall x y : R, x * y = 0 -> (x == 0) || (y == 0).
 
-HB.mixin Record Ring_IsIntegral R of Ring R := {
+HB.mixin Record ComUnitRing_IsIntegral R of ComUnitRing R := {
   mulf_eq0_subproof : integral_domain_axiom [the ringType of R];
 }.
 
 #[mathcomp(axiom = "integral_domain_axiom")]
 HB.structure Definition IntegralDomain :=
-  {R of Ring_IsIntegral R & ComUnitRing R}.
+  {R of ComUnitRing_IsIntegral R & ComUnitRing R}.
 
 Module IntegralDomainExports.
 Notation idomainType := IntegralDomain.type.
@@ -4305,9 +4304,9 @@ End IntegralDomainTheory.
 Module RegularIdomainExports.
 Section IntegralDomainTheory.
 Variable R : idomainType.
-(* TODO: HB.instance Definition _ : Ring_IsIntegral R^o := alias R. *)
-HB.instance Definition regular_integral : Ring_IsIntegral R^o :=
-  Ring_IsIntegral.Build (R^o) mulf_eq0_subproof.
+(* TODO: HB.instance Definition _ : ComUnitRing_IsIntegral R^o := alias R. *)
+HB.instance Definition regular_integral : ComUnitRing_IsIntegral R^o :=
+  ComUnitRing_IsIntegral.Build (R^o) mulf_eq0_subproof.
 End IntegralDomainTheory.
 End RegularIdomainExports.
 HB.export RegularIdomainExports.
@@ -4353,8 +4352,8 @@ HB.builders Context R (f : ComUnitRing_isField R).
   re-export the operation of the original factory *)
 Let p : forall x : R, x != 0 -> x \in unit. Proof. by case f. Defined.
 
-HB.instance Definition _ : Ring_IsIntegral R :=
-  Ring_IsIntegral.Build R (IdomainMixin p). (* unitfE_subproof from f *)
+HB.instance Definition _ : ComUnitRing_IsIntegral R :=
+  ComUnitRing_IsIntegral.Build R (IdomainMixin p). (* unitfE_subproof from f *)
 
 HB.instance Definition _ : IsField R := f.
 
@@ -4563,13 +4562,13 @@ Definition decidable_field_axiom (R : unitRingType)
     (s : seq R -> pred (formula R)) :=
   forall e f, reflect (holds e f) (s e f).
 
-HB.mixin Record UnitRing_IsDec R of UnitRing R := {
+HB.mixin Record Field_IsDec R of UnitRing R := {
   sat : seq R -> pred (formula R);
   satP : decidable_field_axiom sat;
 }.
 
 #[mathcomp(axiom = "decidable_field_axiom")]
-HB.structure Definition DecidableField := { F of Field F & UnitRing_IsDec F }.
+HB.structure Definition DecidableField := { F of Field F & Field_IsDec F }.
 
 Module DecFieldExports.
 Notation decFieldType := DecidableField.type.
@@ -4752,8 +4751,8 @@ HB.factory Record decidable_of_QE F of Field F := {
 }.
 HB.builders Context F of decidable_of_QE F.
 
-HB.instance Definition qe_is_def_field : UnitRing_IsDec F :=
-  UnitRing_IsDec.Build F (proj_satP wf_proj ok_proj).
+HB.instance Definition qe_is_def_field : Field_IsDec F :=
+  Field_IsDec.Build F (proj_satP wf_proj ok_proj).
 
 HB.end.
 
