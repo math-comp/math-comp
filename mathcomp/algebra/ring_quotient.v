@@ -316,9 +316,13 @@ Definition type := {eq_quot equiv}.
 Definition type_of of phant R := type.
 Local Notation quot := (type_of (Phant R)).
 
+#[export]
 HB.instance Definition _ : EqQuotient R equiv type := EqQuotient.on type.
+#[export]
 HB.instance Definition _ := Choice.on type.
+#[export]
 HB.instance Definition _ := EqQuotient.on quot.
+#[export]
 HB.instance Definition _ := Choice.on quot.
 
 Lemma idealrBE x y : (x - y) \in kI = (x == y %[mod type]).
@@ -360,10 +364,14 @@ Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 Lemma addNq: left_inverse zero opp add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
+#[export]
 HB.instance Definition _ := ZmodMixin type addqA addqC add0q addNq.
+#[export]
 HB.instance Definition _ := GRing.Zmodule.on quot.
+#[export]
 HB.instance Definition _ := @IsZmodQuotient.Build R equiv 0 -%R +%R type
   (lock _) pi_opp pi_add.
+#[export]
 HB.instance Definition _ := @ZmodQuotient.on quot.
 
 End ZmodQuotient.
@@ -407,12 +415,16 @@ Qed.
 Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
+#[export]
 HB.instance Definition _ := GRing.Zmodule_IsComRing.Build (type kI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
+#[export]
 HB.instance Definition _ := GRing.ComRing.on {quot kI}.
 
+#[export]
 HB.instance Definition _ := @IsRingQuotient.Build
   R (equiv kI) 0 -%R +%R 1%R *%R (type kI) (lock _) pi_mul.
+#[export]
 HB.instance Definition _ := @RingQuotient.on {quot kI}.
 
 End RingQuotient.
@@ -429,7 +441,10 @@ Qed.
 
 End IDomainQuotient.
 
+Module Exports. HB.reexport. End Exports.
 End Quotient.
+
+Export Quotient.Exports.
 
 Notation "{ideal_quot I }" := (@Quotient.type_of _ _ _ I (Phant _)).
 Notation "x == y %[mod_ideal I ]" :=
@@ -441,15 +456,3 @@ Notation "x != y %[mod_ideal I ]" :=
 Notation "x <> y %[mod_ideal I ]" :=
   (x <> y %[mod {ideal_quot I}]) : quotient_scope.
 
-(* STOP
-NB: not needed anymore, right?
-Canonical Quotient.rquot_eqType.
-Canonical Quotient.rquot_choiceType.
-Canonical Quotient.rquot_zmodType.
-Canonical Quotient.rquot_ringType.
-Canonical Quotient.rquot_comRingType.
-Canonical Quotient.rquot_quotType.
-Canonical Quotient.rquot_eqQuotType.
-Canonical Quotient.rquot_zmodQuotType.
-Canonical Quotient.rquot_ringQuotType.
-*)
