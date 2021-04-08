@@ -246,6 +246,7 @@ Bind Scope group_scope with unit_of.
 Canonical unit_action.
 Canonical unit_groupAction.
 End UnitsGroupExports.
+HB.export UnitsGroupExports.
 
 Notation unit R Ux := (Unit (Phant R) Ux).
 
@@ -331,509 +332,85 @@ HB.builders Context F of IsField F.
   HB.instance Definition _ := GRing.Field_IsDec.Build F decidable.
 HB.end.
 
-(* STOP
-
 #[mathcomp, infer(R)]
 HB.structure Definition Lmodule (R : ringType) :=
   {M of GRing.Lmodule R M & Finite M}.
 
-Check   IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
-
-
+(* FIXME
 HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
-  IsMulGroup.Build (Lmodule.sort M) (@addrA M) (@add0r M) (@addNr M).
-(* FIXME doesn't work with M instead of (Finite.sort M) *)
-Set Printing All.
+  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
 Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type R) :=
   BaseFinGroup.clone M _.
-Coercion Lmodule_to_finGroup (R : Lmodule.type) := FinGroup.clone R _.
+Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type R) :=
+  FinGroup.clone M _.
+*)
 
-Module FieldExports.
-Notation finFieldType := Field.type.
-Notation "[ 'finFieldType' 'of' T ]" := (Field.clone T _)
-  (at level 0, format "[ 'finFieldType'  'of'  T ]") : form_scope.
-End FieldExports.
-HB.export FieldExports.
+Module LmoduleExports.
+Notation finLmodType R := (Lmodule.type R).
+Notation "[ 'finLmodType' 'of' T ]" := (Lmodule.clone _ T _)
+  (at level 0, format "[ 'finLmodType'  'of'  T ]") : form_scope.
+End LmoduleExports.
+HB.export LmoduleExports.
 
+#[mathcomp, infer(R)]
+HB.structure Definition Lalgebra (R : ringType) :=
+  {M of GRing.Lalgebra R M & Finite M}.
 
+(* FIXME
+HB.instance Definition _ (R : ringType) (M : Lalgebra.type R) :=
+  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
+Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type R) :=
+  BaseFinGroup.clone M _.
+Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type R) :=
+  FinGroup.clone M _.
+*)
 
+Module LalgebraExports.
+Notation finLalgType R := (Lalgebra.type R).
+Notation "[ 'finLalgType' 'of' T ]" := (Lalgebra.clone _ T _)
+  (at level 0, format "[ 'finLalgType'  'of'  T ]") : form_scope.
+End LalgebraExports.
+HB.export LalgebraExports.
 
+#[mathcomp, infer(R)]
+HB.structure Definition Algebra (R : ringType) :=
+  {M of GRing.Algebra R M & Finite M}.
 
-Module Lmodule.
+(* FIXME
+HB.instance Definition _ (R : ringType) (M : Algebra.type R) :=
+  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
+Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Algebra.type R) :=
+  BaseFinGroup.clone M _.
+Coercion Lalgebra_to_finGroup (R : ringType) (M : Algebra.type R) :=
+  FinGroup.clone M _.
+*)
 
-Section ClassDef.
+Module AlgebraExports.
+Notation finAlgType R := (Algebra.type R).
+Notation "[ 'finAlgType' 'of' T ]" := (Algebra.clone _ T _)
+  (at level 0, format "[ 'finAlgType'  'of'  T ]") : form_scope.
+End AlgebraExports.
+HB.export AlgebraExports.
 
-Variable R : ringType.
+#[mathcomp, infer(R)]
+HB.structure Definition UnitAlgebra (R : unitRingType) :=
+  {M of GRing.UnitAlgebra R M & Finite M}.
 
-Set Primitive Projections.
-Record class_of M :=
-  Class { base : GRing.Lmodule.class_of R M; mixin : mixin_of M base }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> GRing.Lmodule.class_of.
-Local Coercion base2 R (c : class_of R) : Zmodule.class_of R :=
-  Zmodule.Class (mixin c).
+(* FIXME
+HB.instance Definition _ (R : unitRingType) (M : UnitAlgebra.type R) :=
+  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
+Coercion Lalgebra_to_baseFinGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
+  BaseFinGroup.clone M _.
+Coercion Lalgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
+  FinGroup.clone M _.
+*)
 
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (phR : phant R) (cT : type phR).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack := gen_pack (Pack phR) Class (@GRing.Lmodule.class R phR).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-(* Definition countType := @Countable.Pack cT (fin_ class). *)
-Definition finType := @Finite.Pack cT (fin_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-(* Definition countZmodType := @CountRing.Zmodule.Pack cT class. *)
-Definition finZmodType := @Zmodule.Pack cT class.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
-Definition baseFinGroupType := base_group cT zmodType finType.
-Definition finGroupType := fin_group baseFinGroupType zmodType.
-
-(* Definition lmod_countType := @Countable.Pack lmodType (fin_ class). *)
-Definition lmod_finType := @Finite.Pack lmodType (fin_ class).
-Definition lmod_baseFinGroupType := base_group lmodType zmodType finType.
-Definition lmod_finGroupType := fin_group lmod_baseFinGroupType zmodType.
-(* Definition lmod_countZmodType := @CountRing.Zmodule.Pack lmodType class. *)
-Definition lmod_finZmodType := @Zmodule.Pack lmodType class.
-
-End ClassDef.
-
-Module Import Exports.
-Coercion base : class_of >-> GRing.Lmodule.class_of.
-Coercion base2 : class_of >-> Zmodule.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-(* Coercion countType : type >-> Countable.type. *)
-(* Canonical countType. *)
-Coercion finType : type >-> Finite.type.
-Canonical finType.
-Coercion baseFinGroupType : type >-> FinGroup.base_type.
-Canonical baseFinGroupType.
-Coercion finGroupType : type >-> FinGroup.type.
-Canonical finGroupType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-(* Coercion countZmodType : type >-> CountRing.Zmodule.type. *)
-(* Canonical countZmodType. *)
-Coercion finZmodType : type >-> Zmodule.type.
-Canonical finZmodType.
-Coercion lmodType : type >-> GRing.Lmodule.type.
-Canonical lmodType.
-(* Canonical lmod_countType. *)
-Canonical lmod_finType.
-Canonical lmod_baseFinGroupType.
-Canonical lmod_finGroupType.
-(* Canonical lmod_countZmodType. *)
-Canonical lmod_finZmodType.
-Notation finLmodType R := (FinRing.Lmodule.type (Phant R)).
-Notation "[ 'finLmodType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
-  (at level 0, format "[ 'finLmodType'  R  'of'  T ]") : form_scope.
-End Exports.
-
-End Lmodule.
-Import Lmodule.Exports.
-
-Module Lalgebra.
-
-Section ClassDef.
-
-Variable R : ringType.
-
-Set Primitive Projections.
-Record class_of M :=
-  Class { base : GRing.Lalgebra.class_of R M; mixin : mixin_of M base }.
-Unset Primitive Projections.
-Definition base2 M (c : class_of M) := Ring.Class (mixin c).
-Definition base3 M (c : class_of M) := @Lmodule.Class _ _ (base c) (mixin c).
-Local Coercion base : class_of >-> GRing.Lalgebra.class_of.
-Local Coercion base2 : class_of >-> Ring.class_of.
-Local Coercion base3 : class_of >-> Lmodule.class_of.
-
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (phR : phant R) (cT : type phR).
-Definition pack := gen_pack (Pack phR) Class (@GRing.Lalgebra.class R phR).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-(* Definition countType := @Countable.Pack cT (fin_ class). *)
-Definition finType := @Finite.Pack cT (fin_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-(* Definition countZmodType := @CountRing.Zmodule.Pack cT class. *)
-Definition finZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-(* Definition countRingType := @CountRing.Ring.Pack cT class. *)
-Definition finRingType := @Ring.Pack cT class.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
-Definition finLmodType := @Lmodule.Pack R phR cT class.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
-Definition baseFinGroupType := base_group cT zmodType finType.
-Definition finGroupType := fin_group baseFinGroupType zmodType.
-
-(* Definition lalg_countType := @Countable.Pack lalgType (fin_ class). *)
-Definition lalg_finType := @Finite.Pack lalgType (fin_ class).
-Definition lalg_baseFinGroupType := base_group lalgType zmodType finType.
-Definition lalg_finGroupType := fin_group lalg_baseFinGroupType zmodType.
-(* Definition lalg_countZmodType := @CountRing.Zmodule.Pack lalgType class. *)
-Definition lalg_finZmodType := @Zmodule.Pack lalgType class.
-Definition lalg_finLmodType := @Lmodule.Pack R phR lalgType class.
-(* Definition lalg_countRingType := @CountRing.Ring.Pack lalgType class. *)
-Definition lalg_finRingType := @Ring.Pack lalgType class.
-(* Definition lmod_countRingType := @CountRing.Ring.Pack lmodType class. *)
-Definition lmod_finRingType := @Ring.Pack lmodType class.
-Definition finLmod_ringType := @GRing.Ring.Pack finLmodType class.
-(* Definition finLmod_countRingType := @CountRing.Ring.Pack finLmodType class. *)
-Definition finLmod_finRingType := @Ring.Pack finLmodType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.Lalgebra.class_of.
-Coercion base2 : class_of >-> Ring.class_of.
-Coercion base3 : class_of >-> Lmodule.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-(* Coercion countType : type >-> Countable.type. *)
-(* Canonical countType. *)
-Coercion finType : type >-> Finite.type.
-Canonical finType.
-Coercion baseFinGroupType : type >-> FinGroup.base_type.
-Canonical baseFinGroupType.
-Coercion finGroupType : type >-> FinGroup.type.
-Canonical finGroupType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-(* Coercion countZmodType : type >-> CountRing.Zmodule.type. *)
-(* Canonical countZmodType. *)
-Coercion finZmodType : type >-> Zmodule.type.
-Canonical finZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-(* Coercion countRingType : type >-> CountRing.Ring.type. *)
-(* Canonical countRingType. *)
-Coercion finRingType : type >-> Ring.type.
-Canonical finRingType.
-Coercion lmodType : type >-> GRing.Lmodule.type.
-Canonical lmodType.
-Coercion finLmodType : type >-> Lmodule.type.
-Canonical finLmodType.
-Coercion lalgType : type >-> GRing.Lalgebra.type.
-Canonical lalgType.
-(* Canonical lalg_countType. *)
-Canonical lalg_finType.
-Canonical lalg_baseFinGroupType.
-Canonical lalg_finGroupType.
-(* Canonical lalg_countZmodType. *)
-Canonical lalg_finZmodType.
-Canonical lalg_finLmodType.
-(* Canonical lalg_countRingType. *)
-Canonical lalg_finRingType.
-(* Canonical lmod_countRingType. *)
-Canonical lmod_finRingType.
-Canonical finLmod_ringType.
-(* Canonical finLmod_countRingType. *)
-Canonical finLmod_finRingType.
-Notation finLalgType R := (FinRing.Lalgebra.type (Phant R)).
-Notation "[ 'finLalgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
-  (at level 0, format "[ 'finLalgType'  R  'of'  T ]") : form_scope.
-End Exports.
-
-End Lalgebra.
-Import Lalgebra.Exports.
-
-Module Algebra.
-
-Section ClassDef.
-
-Variable R : ringType.
-
-Set Primitive Projections.
-Record class_of M :=
-  Class { base : GRing.Algebra.class_of R M; mixin : mixin_of M base }.
-Unset Primitive Projections.
-Definition base2 M (c : class_of M) := Lalgebra.Class (mixin c).
-Local Coercion base : class_of >-> GRing.Algebra.class_of.
-Local Coercion base2 : class_of >->Lalgebra.class_of.
-
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (phR : phant R) (cT : type phR).
-Definition pack := gen_pack (Pack phR) Class (@GRing.Algebra.class R phR).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-(* Definition countType := @Countable.Pack cT (fin_ class). *)
-Definition finType := @Finite.Pack cT (fin_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-(* Definition countZmodType := @CountRing.Zmodule.Pack cT class. *)
-Definition finZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-(* Definition countRingType := @CountRing.Ring.Pack cT class. *)
-Definition finRingType := @Ring.Pack cT class.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
-Definition finLmodType := @Lmodule.Pack R phR cT class.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
-Definition finLalgType := @Lalgebra.Pack R phR cT class.
-Definition algType := @GRing.Algebra.Pack R phR cT class.
-Definition baseFinGroupType := base_group cT zmodType finType.
-Definition finGroupType := fin_group baseFinGroupType zmodType.
-
-(* Definition alg_countType := @Countable.Pack algType (fin_ class). *)
-Definition alg_finType := @Finite.Pack algType (fin_ class).
-Definition alg_baseFinGroupType := base_group algType zmodType finType.
-Definition alg_finGroupType := fin_group alg_baseFinGroupType zmodType.
-(* Definition alg_countZmodType := @CountRing.Zmodule.Pack algType class. *)
-Definition alg_finZmodType := @Zmodule.Pack algType class.
-(* Definition alg_countRingType := @CountRing.Ring.Pack algType class. *)
-Definition alg_finRingType := @Ring.Pack algType class.
-Definition alg_finLmodType := @Lmodule.Pack R phR algType class.
-Definition alg_finLalgType := @Lalgebra.Pack R phR algType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.Algebra.class_of.
-Coercion base2 : class_of >-> Lalgebra.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-(* Coercion countType : type >-> Countable.type. *)
-(* Canonical countType. *)
-Coercion finType : type >-> Finite.type.
-Canonical finType.
-Coercion baseFinGroupType : type >-> FinGroup.base_type.
-Canonical baseFinGroupType.
-Coercion finGroupType : type >-> FinGroup.type.
-Canonical finGroupType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-(* Coercion countZmodType : type >-> CountRing.Zmodule.type. *)
-(* Canonical countZmodType. *)
-Coercion finZmodType : type >-> Zmodule.type.
-Canonical finZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-(* Coercion countRingType : type >-> CountRing.Ring.type. *)
-(* Canonical countRingType. *)
-Coercion finRingType : type >-> Ring.type.
-Canonical finRingType.
-Coercion lmodType : type >-> GRing.Lmodule.type.
-Canonical lmodType.
-Coercion finLmodType : type >-> Lmodule.type.
-Canonical finLmodType.
-Coercion lalgType : type >-> GRing.Lalgebra.type.
-Canonical lalgType.
-Coercion finLalgType : type >-> Lalgebra.type.
-Canonical finLalgType.
-Coercion algType : type >-> GRing.Algebra.type.
-Canonical algType.
-(* Canonical alg_countType. *)
-Canonical alg_finType.
-Canonical alg_baseFinGroupType.
-Canonical alg_finGroupType.
-(* Canonical alg_countZmodType. *)
-Canonical alg_finZmodType.
-(* Canonical alg_countRingType. *)
-Canonical alg_finRingType.
-Canonical alg_finLmodType.
-Canonical alg_finLalgType.
-Notation finAlgType R := (type (Phant R)).
-Notation "[ 'finAlgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
-  (at level 0, format "[ 'finAlgType'  R  'of'  T ]") : form_scope.
-End Exports.
-
-End Algebra.
-Import Algebra.Exports.
-
-Module UnitAlgebra.
-
-Section ClassDef.
-
-Variable R : unitRingType.
-
-Set Primitive Projections.
-Record class_of M :=
-  Class { base : GRing.UnitAlgebra.class_of R M; mixin : mixin_of M base }.
-Unset Primitive Projections.
-Definition base2 M (c : class_of M) := Algebra.Class (mixin c).
-Definition base3 M (c : class_of M) := @UnitRing.Class _ (base c) (mixin c).
-
-Local Coercion base : class_of >-> GRing.UnitAlgebra.class_of.
-Local Coercion base2 : class_of >-> Algebra.class_of.
-Local Coercion base3 : class_of >-> UnitRing.class_of.
-
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (phR : phant R) (cT : type phR).
-Definition pack := gen_pack (Pack phR) Class (@GRing.UnitAlgebra.class R phR).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-(* Definition countType := @Countable.Pack cT (fin_ class). *)
-Definition finType := @Finite.Pack cT (fin_ class).
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-(* Definition countZmodType := @CountRing.Zmodule.Pack cT class. *)
-Definition finZmodType := @Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-(* Definition countRingType := @CountRing.Ring.Pack cT class. *)
-Definition finRingType := @Ring.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-(* Definition countUnitRingType := @CountRing.UnitRing.Pack cT class. *)
-Definition finUnitRingType := @UnitRing.Pack cT class.
-Definition lmodType := @GRing.Lmodule.Pack R phR cT class.
-Definition finLmodType := @Lmodule.Pack R phR cT class.
-Definition lalgType := @GRing.Lalgebra.Pack R phR cT class.
-Definition finLalgType := @Lalgebra.Pack R phR cT class.
-Definition algType := @GRing.Algebra.Pack R phR cT class.
-Definition finAlgType := @Algebra.Pack R phR cT class.
-Definition unitAlgType := @GRing.UnitAlgebra.Pack R phR cT class.
-Definition baseFinGroupType := base_group cT zmodType finType.
-Definition finGroupType := fin_group baseFinGroupType zmodType.
-
-(* Definition unitAlg_countType := @Countable.Pack unitAlgType (fin_ class). *)
-Definition unitAlg_finType := @Finite.Pack unitAlgType (fin_ class).
-Definition unitAlg_baseFinGroupType := base_group unitAlgType zmodType finType.
-Definition unitAlg_finGroupType := fin_group unitAlg_baseFinGroupType zmodType.
-(* Definition unitAlg_countZmodType := @CountRing.Zmodule.Pack unitAlgType class. *)
-Definition unitAlg_finZmodType := @Zmodule.Pack unitAlgType class.
-(* Definition unitAlg_countRingType := @CountRing.Ring.Pack unitAlgType class. *)
-Definition unitAlg_finRingType := @Ring.Pack unitAlgType class.
-(* Definition unitAlg_countUnitRingType := *)
-  (* @CountRing.UnitRing.Pack unitAlgType class. *)
-Definition unitAlg_finUnitRingType := @UnitRing.Pack unitAlgType class.
-Definition unitAlg_finLmodType := @Lmodule.Pack R phR unitAlgType class.
-Definition unitAlg_finLalgType := @Lalgebra.Pack R phR unitAlgType class.
-Definition unitAlg_finAlgType := @Algebra.Pack R phR unitAlgType class.
-Definition unitRing_finLmodType := @Lmodule.Pack R phR unitRingType class.
-Definition unitRing_finLalgType := @Lalgebra.Pack R phR unitRingType class.
-Definition unitRing_finAlgType := @Algebra.Pack R phR unitRingType class.
-(* Definition countUnitRing_lmodType := *)
-  (* @GRing.Lmodule.Pack R phR countUnitRingType class. *)
-(* Definition countUnitRing_finLmodType := *)
-  (* @Lmodule.Pack R phR countUnitRingType class. *)
-(* Definition countUnitRing_lalgType := *)
-  (* @GRing.Lalgebra.Pack R phR countUnitRingType class. *)
-(* Definition countUnitRing_finLalgType := *)
-  (* @Lalgebra.Pack R phR countUnitRingType class. *)
-(* Definition countUnitRing_algType := *)
-  (* @GRing.Algebra.Pack R phR countUnitRingType class. *)
-(* Definition countUnitRing_finAlgType := *)
-  (* @Algebra.Pack R phR countUnitRingType class. *)
-Definition finUnitRing_lmodType :=
-  @GRing.Lmodule.Pack R phR finUnitRingType class.
-Definition finUnitRing_finLmodType :=
-  @Lmodule.Pack R phR finUnitRingType class.
-Definition finUnitRing_lalgType :=
-  @GRing.Lalgebra.Pack R phR finUnitRingType class.
-Definition finUnitRing_finLalgType :=
-  @Lalgebra.Pack R phR finUnitRingType class.
-Definition finUnitRing_algType :=
-  @GRing.Algebra.Pack R phR finUnitRingType class.
-Definition finUnitRing_finAlgType :=
-  @Algebra.Pack R phR finUnitRingType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.UnitAlgebra.class_of.
-Coercion base2 : class_of >-> Algebra.class_of.
-Coercion base3 : class_of >-> UnitRing.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-(* Coercion countType : type >-> Countable.type. *)
-(* Canonical countType. *)
-Coercion finType : type >-> Finite.type.
-Canonical finType.
-Coercion baseFinGroupType : type >-> FinGroup.base_type.
-Canonical baseFinGroupType.
-Coercion finGroupType : type >-> FinGroup.type.
-Canonical finGroupType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-(* Coercion countZmodType : type >-> CountRing.Zmodule.type. *)
-(* Canonical countZmodType. *)
-Coercion finZmodType : type >-> Zmodule.type.
-Canonical finZmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-(* Coercion countRingType : type >-> CountRing.Ring.type. *)
-(* Canonical countRingType. *)
-Coercion finRingType : type >-> Ring.type.
-Canonical finRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-(* Coercion countUnitRingType : type >-> CountRing.UnitRing.type. *)
-(* Canonical countUnitRingType. *)
-Coercion finUnitRingType : type >-> UnitRing.type.
-Canonical finUnitRingType.
-Coercion lmodType : type >-> GRing.Lmodule.type.
-Canonical lmodType.
-Coercion finLmodType : type >-> Lmodule.type.
-Canonical finLmodType.
-Coercion lalgType : type >-> GRing.Lalgebra.type.
-Canonical lalgType.
-Coercion finLalgType : type >-> Lalgebra.type.
-Canonical finLalgType.
-Coercion algType : type >-> GRing.Algebra.type.
-Canonical algType.
-Coercion finAlgType : type >-> Algebra.type.
-Canonical finAlgType.
-Coercion unitAlgType : type >-> GRing.UnitAlgebra.type.
-Canonical unitAlgType.
-(* Canonical unitAlg_countType. *)
-Canonical unitAlg_finType.
-Canonical unitAlg_baseFinGroupType.
-Canonical unitAlg_finGroupType.
-(* Canonical unitAlg_countZmodType. *)
-Canonical unitAlg_finZmodType.
-(* Canonical unitAlg_countRingType. *)
-Canonical unitAlg_finRingType.
-(* Canonical unitAlg_countUnitRingType. *)
-Canonical unitAlg_finUnitRingType.
-Canonical unitAlg_finLmodType.
-Canonical unitAlg_finLalgType.
-Canonical unitAlg_finAlgType.
-Canonical unitRing_finLmodType.
-Canonical unitRing_finLalgType.
-Canonical unitRing_finAlgType.
-(* Canonical countUnitRing_lmodType. *)
-(* Canonical countUnitRing_finLmodType. *)
-(* Canonical countUnitRing_lalgType. *)
-(* Canonical countUnitRing_finLalgType. *)
-(* Canonical countUnitRing_algType. *)
-(* Canonical countUnitRing_finAlgType. *)
-Canonical finUnitRing_lmodType.
-Canonical finUnitRing_finLmodType.
-Canonical finUnitRing_lalgType.
-Canonical finUnitRing_finLalgType.
-Canonical finUnitRing_algType.
-Canonical finUnitRing_finAlgType.
-Notation finUnitAlgType R := (type (Phant R)).
-Notation "[ 'finUnitAlgType' R 'of' T ]" := (do_pack (@pack _ (Phant R)) T)
-  (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
-End Exports.
-
-End UnitAlgebra.
-Import UnitAlgebra.Exports.
+Module UnitAlgebraExports.
+Notation finUnitAlgType R := (UnitAlgebra.type R).
+Notation "[ 'finUnitAlgType' 'of' T ]" := (UnitAlgebra.clone _ T _)
+  (at level 0, format "[ 'finUnitAlgType'  'of'  T ]") : form_scope.
+End UnitAlgebraExports.
+HB.export UnitAlgebraExports.
 
 Module Theory.
 
@@ -854,15 +431,10 @@ End Theory.
 End FinRing.
 
 Import FinRing.
-Export Zmodule.Exports Ring.Exports ComRing.Exports.
-Export UnitRing.Exports UnitsGroupExports ComUnitRing.Exports.
-Export IntegralDomain.Exports Field.Exports DecField.Exports.
-Export Lmodule.Exports Lalgebra.Exports Algebra.Exports UnitAlgebra.Exports.
+HB.reexport.
 
 Notation "{ 'unit' R }" := (unit_of (Phant R))
   (at level 0, format "{ 'unit'  R }") : type_scope.
 Prenex Implicits FinRing.uval.
 Notation "''U'" := (unit_action _) (at level 8) : action_scope.
 Notation "''U'" := (unit_groupAction _) (at level 8) : groupAction_scope.
-
- *)
