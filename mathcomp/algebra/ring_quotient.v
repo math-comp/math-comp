@@ -369,6 +369,7 @@ HB.instance Definition _ := @ZmodQuotient.on quot.
 End ZmodQuotient.
 Notation "{quot I }" := (@type_of _ _ _ I (Phant _)).
 
+(* TODO: move to ssralg.v? *)
 HB.factory Record Zmodule_IsComRing (T : Type) of GRing.Zmodule T := {
   one : T ;
   mul : T -> T -> T ;
@@ -435,16 +436,12 @@ HB.instance Definition _ := Zmodule_IsComRing.Build (type kI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
 HB.instance Definition _ := GRing.ComRing.on {quot kI}.
 
-(* STOP
-Canonical rquot_ringType    := Eval hnf in RingType type rquot_comRingMixin.
-Canonical rquot_comRingType := Eval hnf in ComRingType type mulqC.
+HB.instance Definition _ := @IsRingQuotient.Build
+  R (equiv kI) 0 -%R +%R 1%R *%R (type kI) (lock _) pi_mul.
+HB.instance Definition _ := @RingQuotient.on {quot kI}.
 
-Definition rquot_ringQuotMixin := RingQuotMixin type (lock _) pi_mul.
-Canonical rquot_ringQuotType := RingQuotType 1 *%R type rquot_ringQuotMixin.
-*)
 End RingQuotient.
 
-(* STOP
 Section IDomainQuotient.
 
 Variables (R : comRingType) (I : {pred R})
@@ -455,11 +452,10 @@ Proof.
 by move=> /eqP; rewrite -[x]reprK -[y]reprK !piE !equivE !subr0 prime_idealrM.
 Qed.
 
-End IDomainQuotient.*)
+End IDomainQuotient.
 
 End Quotient.
 
-(*
 Notation "{ideal_quot I }" := (@Quotient.type_of _ _ _ I (Phant _)).
 Notation "x == y %[mod_ideal I ]" :=
   (x == y %[mod {ideal_quot I}]) : quotient_scope.
@@ -470,6 +466,8 @@ Notation "x != y %[mod_ideal I ]" :=
 Notation "x <> y %[mod_ideal I ]" :=
   (x <> y %[mod {ideal_quot I}]) : quotient_scope.
 
+(* STOP
+NB: not needed anymore, right?
 Canonical Quotient.rquot_eqType.
 Canonical Quotient.rquot_choiceType.
 Canonical Quotient.rquot_zmodType.
