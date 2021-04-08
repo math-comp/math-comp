@@ -369,31 +369,6 @@ HB.instance Definition _ := @ZmodQuotient.on quot.
 End ZmodQuotient.
 Notation "{quot I }" := (@type_of _ _ _ I (Phant _)).
 
-(* TODO: move to ssralg.v? *)
-HB.factory Record Zmodule_IsComRing (T : Type) of GRing.Zmodule T := {
-  one : T ;
-  mul : T -> T -> T ;
-  mulA : associative mul ;
-  mulC : commutative mul ;
-  mul1r : left_id one mul ;
-  mul_addl : left_distributive mul +%R ;
-  nonzero1 : one != 0%R ;
-}.
-HB.builders Context T of Zmodule_IsComRing T.
-
-Fact mulr1 : right_id one mul.
-Proof. by move=> x; rewrite mulC mul1r. Qed.
-
-Fact mulrDr : right_distributive mul +%R.
-Proof. by move=> x y z; rewrite mulC mul_addl 2!(mulC _ x). Qed.
-
-HB.instance Definition _ := @GRing.Zmodule_IsRing.Build T
-  _ mul mulA mul1r mulr1 mul_addl mulrDr nonzero1.
-
-HB.instance Definition _ := GRing.Ring_HasCommutativeMul.Build T mulC.
-
-HB.end.
-
 Section RingQuotient.
 
 Variables (R : comRingType) (I : {pred R})
@@ -432,7 +407,7 @@ Qed.
 Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
-HB.instance Definition _ := Zmodule_IsComRing.Build (type kI)
+HB.instance Definition _ := GRing.Zmodule_IsComRing.Build (type kI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
 HB.instance Definition _ := GRing.ComRing.on {quot kI}.
 

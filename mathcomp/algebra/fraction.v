@@ -218,7 +218,7 @@ by rewrite mulr1 mulr0 mulNr addNr.
 Qed.
 
 (* fracions form an abelian group *)
-HB.instance Definition _ := GRing.IsZmodule.Build type addA addC add0_l addN_l.
+HB.instance Definition _ := ZmodMixin type addA addC add0_l addN_l.
 
 Lemma mulA : associative mul.
 Proof.

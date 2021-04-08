@@ -12,10 +12,13 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (* This file defines for each Structure (Zmodule, Ring, etc ...) its type,    *)
 (* its packers and its canonical properties :                                 *)
 (*                                                                            *)
+(* NB: The documentation is currently being reworked. Main guideline: it      *)
+(* should focus on describing factories (and mixins which are a special case).*)
+(*                                                                            *)
 (*  * Zmodule (additive abelian groups):                                      *)
 (*              zmodType == interface type for Zmodule structure.             *)
-(* ZmodMixin addA addC add0x addNx == builds the mixin for a Zmodule from the *)
-(*                          algebraic properties of its operations.           *)
+(* ZmodMixin T addA addC add0x addNx == builds the mixin for a Zmodule from   *)
+(*                          the algebraic properties of its operations.       *)
 (*          ZmodType V m == packs the mixin m to build a Zmodule of type      *)
 (*                          zmodType. The carrier type V must have a          *)
 (*                          choiceType canonical structure.                   *)
@@ -67,10 +70,10 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     plugin abstraction and Prop-irrelevance functions.                     *)
 (*  * Ring (non-commutative rings):                                           *)
 (*              ringType == interface type for a Ring structure.              *)
-(* RingMixin mulA mul1x mulx1 mulDx mulxD == builds the mixin for a Ring from *)
-(*                           the algebraic properties of its multiplicative   *)
-(*                           operators; the carrier type must have a zmodType *)
-(*                           structure.                                       *)
+(* RingMixin T mulA mul1x mulx1 mulDx mulxD nonzero1 == builds the mixin for  *)
+(*                           a Ring from the algebraic properties of its      *)
+(*                           multiplicative operators; the carrier type must  *)
+(*                           have a zmodType structure.                       *)
 (*           RingType R m == packs the ring mixin m into a ringType.          *)
 (*                    R^c == the converse Ring for R: R^c is convertible to R *)
 (*                           but when R has a canonical ringType structure    *)
@@ -138,6 +141,14 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     [comRingType of R] == clone of a canonical comRingType structure on R. *)
 (* [comRingMixin of R by <:] == comutativity mixin axiom for R when it is a   *)
 (*                           subType of a commutative ring.                   *)
+(* Ring_HasCommutativeMul.Build T mulC == builds the mixin for a commutative  *)
+(*                           ring from the commutativity of the               *)
+(*                           multiplication; the carrier type must have a     *)
+(*                           ring structure                                   *)
+(* Zmodule_IsComRing.Build T mulA mulC mul1x mulDl nonzero1 == builds the     *)
+(*                           mixin for a commutative ring from the algebraic  *)
+(*                           properties of the multiplication; the carrier    *)
+(*                           type must have a Zmodule structure               *)
 (*                                                                            *)
 (*  * UnitRing (Rings whose units have computable inverses):                  *)
 (*           unitRingType == interface type for the UnitRing structure.       *)
@@ -188,6 +199,11 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           WARNING: ALWAYS give an explicit type argument   *)
 (*                           to UnitRingType along with a mixin produced by   *)
 (*                           ComUnitRingMixin (see above).                    *)
+(* ComRing_HasMulInverse.Build T mulVp intro_unit inv_out == builds the mixin *)
+(*                           for a commutative ring with multiplicative       *)
+(*                           inverses from the algebraic properties of the    *)
+(*                           inverse; the carrier type must have a structure  *)
+(*                           of commutative ring                              *)
 (* [comUnitRingType of R] == a comUnitRingType structure for R created by     *)
 (*                           merging canonical comRingType and unitRingType   *)
 (*                           structures on R.                                 *)
@@ -200,6 +216,11 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (* [idomainType of R for S] == R-clone of the idomainType structure S.        *)
 (*     [idomainType of R] == clone of a canonical idomainType structure on R. *)
 (* [idomainMixin of R by <:] == mixin axiom for a idomain subType.            *)
+(* Ring_IsIntegral.Build T idomAxiom == builds the mixin for an integral      *)
+(*                           domain from the property of no nonzero           *)
+(*                           zero-divisors; the carrier type must have a      *)
+(*                           structure of dommutative ring with               *)
+(*                           multiplicative inverses.                         *)
 (*                                                                            *)
 (*  * Field (commutative fields):                                             *)
 (*              fieldType == interface type for fields.                       *)
@@ -289,7 +310,12 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           algebraic properties of the scaling operation;   *)
 (*                           the module carrier type must have a zmodType     *)
 (*                           structure, and the scalar carrier must have a    *)
-(*                           ringType structure.                              *)
+(*                           ringType structure. [TODO: is this still up-to-date?] *)
+(*  Zmodule_IsLmodule.Build R T scalA scal1x scalDr scalDl builds an Lmodule  *)
+(*                           mixin from the algebraic properties of the       *)
+(*                           scaling operation; the module carrier type must  *)
+(*                           have a zmodType structure, and the scalar        *)
+(*                           carrier must have a ringType structure.          *)
 (*         LmodType R V m == packs the mixin v to build an Lmodule of type    *)
 (*                           lmodType R. The carrier type V must have a       *)
 (*                           zmodType structure.                              *)
@@ -316,6 +342,10 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           Lalgebra of type lalgType R. The carrier type V  *)
 (*                           must have both lmodType R and ringType canonical *)
 (*                           structures.                                      *)
+(* Lmodule_IsLalgebra.Build R T scalAl == builds the mixin for a Lalgebra     *)
+(*                           from an algebraic property of the scaling        *)
+(*                           operator; the carrier type must have a structure *)
+(*                           of Lmodule                                       *)
 (*                    R^o == the regular algebra of R: R^o is convertible to  *)
 (*                           R, but when R has a ringType structure then R^o  *)
 (*                           extends it to an lalgType structure by letting R *)
@@ -365,6 +395,9 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           structure.                                       *)
 (*    [comAlgType R of V] == a comAlgType R structure for V created by        *)
 (*                           merging canonical algType and comRingType on V.  *)
+(* is_ComAlgebra.Build R T == builds the mixin for a commutative algebra; the *)
+(*                           carrier type must have a structure of            *)
+(*                           commutative ring.                                *)
 (*                                                                            *)
 (*  * ComUnitAlgebra (commutative algebra with computable inverses):          *)
 (*       comUnitAlgType R == interface type for ComUnitAlgebra structure with *)
@@ -1447,7 +1480,7 @@ Definition converse_ringMixin :=
   let mulrA' x y z := esym (mulrA z y x) in
   let mulrDl' x y z := mulrDr z x y in
   let mulrDr' x y z := mulrDl y z x in
-  @Zmodule_IsRing.Build _ (1 : R) mul' mulrA' mulr1 mul1r mulrDl' mulrDr' oner_neq0.
+  RingMixin R mulrA' mulr1 mul1r mulrDl' mulrDr' oner_neq0.
 HB.instance (R^c) converse_ringMixin.
 
 End RightRegular.
@@ -2388,8 +2421,8 @@ HB.factory Record Zmodule_IsComRing R of Zmodule R := {
 HB.builders Context R of Zmodule_IsComRing R.
   Definition mulr1 := Monoid.mulC_id mulrC mul1r.
   Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
-  HB.instance Definition _ := @Zmodule_IsRing.Build R
-    one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
+  HB.instance Definition _ := RingMixin R
+    mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
   HB.instance Definition _ := Ring_HasCommutativeMul.Build R mulrC.
 HB.end.
 
@@ -5798,7 +5831,7 @@ Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDr. Qed.
 Fact ffun1_nonzero : ffun_one != 0.
 Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
-HB.instance Definition _ := Zmodule_IsRing.Build {ffun aT -> R}
+HB.instance Definition _ := RingMixin {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr ffun1_nonzero.
 Definition ffun_ring := ([the ringType of {ffun aT -> R}] : Type).
 
@@ -5888,7 +5921,7 @@ Proof. by move=> x y z; congr (_, _); apply: mulrDr. Qed.
 Fact pair_one_neq0 : (1, 1) != 0 :> R1 * R2.
 Proof. by rewrite xpair_eqE oner_eq0. Qed.
 
-HB.instance Definition _ := Zmodule_IsRing.Build (R1 * R2)%type
+HB.instance Definition _ := RingMixin (R1 * R2)%type
    pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_one_neq0.
 
 End PairRing.

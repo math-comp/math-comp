@@ -328,7 +328,7 @@ by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.IsZmodule.Build (polynomial R) add_polyA add_polyC add_poly0 add_polyN.
+  ZmodMixin (polynomial R) add_polyA add_polyC add_poly0 add_polyN.
 HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
@@ -534,10 +534,8 @@ Qed.
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
-HB.instance Definition _ :=
-  GRing.Zmodule_IsRing.Build
-    (polynomial R)
-    mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
+HB.instance Definition _ := RingMixin (polynomial R)
+  mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
 HB.instance Definition _ := GRing.Ring.on {poly R}.
 
 Lemma polyC1 : 1%:P = 1 :> {poly R}. Proof. by []. Qed.
