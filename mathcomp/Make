@@ -51,7 +51,7 @@ fingroup/quotient.v
 # solvable/alt.v
 # solvable/burnside_app.v
 # solvable/center.v
-# solvable/commutator.v
+solvable/commutator.v
 # solvable/cyclic.v
 # solvable/extraspecial.v
 # solvable/extremal.v
