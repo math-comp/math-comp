@@ -334,19 +334,15 @@ HB.end.
 HB.structure Definition Lmodule (R : ringType) :=
   {M of GRing.Lmodule R M & Finite M}.
 
-(* FIXME
-HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
-  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
-(*
-NB: should become:
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion lmodtype_id : Lmodule.type >-> Lmodule.type_.
+
 HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
   [finGroupMixin of M for +%R].
-*)
-Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type R) :=
+Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type_ R) :=
   BaseFinGroup.clone M _.
-Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type R) :=
-  FinGroup.clone M _.
-*)
+Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type_ R) : finGroupType :=
+  FinGroup.clone (M : Type) _.
 
 Module LmoduleExports.
 Notation finLmodType R := (Lmodule.type R).
@@ -359,15 +355,15 @@ HB.export LmoduleExports.
 HB.structure Definition Lalgebra (R : ringType) :=
   {M of GRing.Lalgebra R M & Finite M}.
 
-(* FIXME
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion lalgtype_id : Lalgebra.type >-> Lalgebra.type_.
+
 HB.instance Definition _ (R : ringType) (M : Lalgebra.type R) :=
-  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
-(* NB: use the [finMixinGroup of for] notation*)
-Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type R) :=
+  [finGroupMixin of M for +%R].
+Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type_ R) :=
   BaseFinGroup.clone M _.
-Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type R) :=
+Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type_ R) :=
   FinGroup.clone M _.
-*)
 
 Module LalgebraExports.
 Notation finLalgType R := (Lalgebra.type R).
@@ -380,14 +376,15 @@ HB.export LalgebraExports.
 HB.structure Definition Algebra (R : ringType) :=
   {M of GRing.Algebra R M & Finite M}.
 
-(* FIXME
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion algtype_id : Algebra.type >-> Algebra.type_.
+
 HB.instance Definition _ (R : ringType) (M : Algebra.type R) :=
-  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
-Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Algebra.type R) :=
+  [finGroupMixin of M for +%R].
+Coercion Algebra_to_baseFinGroup (R : ringType) (M : Algebra.type_ R) :=
   BaseFinGroup.clone M _.
-Coercion Lalgebra_to_finGroup (R : ringType) (M : Algebra.type R) :=
+Coercion Algebra_to_finGroup (R : ringType) (M : Algebra.type_ R) :=
   FinGroup.clone M _.
-*)
 
 Module AlgebraExports.
 Notation finAlgType R := (Algebra.type R).
@@ -400,14 +397,15 @@ HB.export AlgebraExports.
 HB.structure Definition UnitAlgebra (R : unitRingType) :=
   {M of GRing.UnitAlgebra R M & Finite M}.
 
-(* FIXME
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion unit_algtype_id : UnitAlgebra.type >-> UnitAlgebra.type_.
+
 HB.instance Definition _ (R : unitRingType) (M : UnitAlgebra.type R) :=
-  IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
-Coercion Lalgebra_to_baseFinGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
+  [finGroupMixin of M for +%R].
+Coercion UnitAlgebra_to_baseFinGroup (R : unitRingType) (M : UnitAlgebra.type_ R) :=
   BaseFinGroup.clone M _.
-Coercion Lalgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
+Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type_ R) :=
   FinGroup.clone M _.
-*)
 
 Module UnitAlgebraExports.
 Notation finUnitAlgType R := (UnitAlgebra.type R).
