@@ -267,10 +267,10 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                                                                            *)
 (* List of factories (to use with HB.instance Definition _ := )               *)
 (* - IsField.Build R fieldP                                                   *)
-(*     Requires a unitRingT on R and declares a fieldType on R from the       *)
+(*     Requires a unitRingType on R and declares a fieldType on R from the    *)
 (*     field axiom (every non-zero is a unit).                                *)
-(* - ComRing_IsField.Build R inv mulVf inv0                                   *)
-(*     Requires a comRing on R and declares a fieldType on R from the         *)
+(* - ComRing_IsField.Build R mulVf invr0                                      *)
+(*     Requires a comRingType on R and declares a fieldType on R from the     *)
 (*     algeraic properties of the inverse                                     *)
 (*                                                                            *)
 (*  * DecidableField (fields with a decidable first order theory):            *)
@@ -315,6 +315,15 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           is a quantifier-free formula equivalent to       *)
 (*        'exists 'X_i, u1 == 0 /\ ... /\ u_m == 0 /\ v1 != 0 ... /\ v_n != 0 *)
 (*                                                                            *)
+(* List of factories (to use with HB.instance Definition _ := )               *)
+(*  - UnitRing_IsDec.Build R satP                                             *)
+(*     Requires a FieldType and on R and declares a decFieldType on R from    *)
+(*    the decidable satifiability theory axiom                                *)
+(* TODO : revise name "decidable_of_QE", check explicit arguments.            *)
+(*  - decidable_of_QE.build F wf_proj ok_proj                                 *)
+(*    Requires a FieldType on F and declares a decFieldType on F from the     *)
+(*      properties of a quantifier elimination projection function.           *)
+(*                                                                            *)
 (*  * ClosedField (algebraically closed fields):                              *)
 (*        closedFieldType == interface type for the ClosedField structure.    *)
 (*    ClosedFieldType F m == packs the closed field mixin m into a            *)
@@ -323,6 +332,11 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (* [closedFieldType of F on S] == F-clone of a closedFieldType structure S.   *)
 (* [closedFieldType of F] == clone of a canonicalclosedFieldType structure    *)
 (*                           on F.                                            *)
+(*                                                                            *)
+(* List of factories (to use with HB.instance Definition _ := )               *)
+(*  - Field_IsAlgClosed.Build F                                               *)
+(*    Requires a FieldType on F and declares a closedFieldType on F from      *)
+(*    the closure property.                                                   *)
 (*                                                                            *)
 (*  * Lmodule (module with left multiplication by external scalars).          *)
 (*             lmodType R == interface type for an Lmodule structure with     *)
@@ -4304,45 +4318,6 @@ HB.mixin Record IsField R of UnitRing R := {
   fieldP : field_axiom [the unitRingType of R];
 }.
 
-HB.factory Record ComRing_IsField R of ComRing R := {
-  inv : R -> R;
-  mulVf : forall a, a != 0 -> inv a * a = 1;
-  inv0 : inv 0 = 0
-}.
-
-HB.builders Context R of ComRing_IsField R.
-Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
-Proof.
-move=> yx1; apply: contraNneq (@oner_neq0 [ringType of R])=> x0.
-by rewrite -yx1 x0 mulr0.
-Qed.
-
-Fact inv_out : {in predC (predC1 0), inv =1 id}.
-Proof.
-move=> x/negbNE/eqP->; exact: inv0.
-Qed.
-
-HB.instance Definition _ :=
-  ComRing_HasMulInverse.Build R mulVf intro_unit inv_out.
-
-Fact fieldP : field_axiom [the unitRingType of R].
-Proof.
-by move=> x xn0; rewrite unitrE mulrC mulVf.
-Qed.
-
-Fact mulf_eq0 : integral_domain_axiom [the ringType of R].
-Proof.
-move=> x y xy0; apply/norP=> [[]] /fieldP Ux /fieldP.
-by rewrite -(unitrMr _ Ux) xy0 unitr0.
-Qed.
-
-HB.instance Definition _ :=
-  Ring_IsIntegral.Build R mulf_eq0.
-
-HB.instance Definition _ :=
-  IsField.Build R fieldP.
-HB.end.
-
 #[mathcomp(axiom = "field_axiom")]
 HB.structure Definition Field := { R of IntegralDomain R & IsField R }.
 
@@ -4382,12 +4357,12 @@ HB.instance Definition _ : IsField R := f.
 
 HB.end.
 
-HB.factory Record field_of_comring R of ComRing R := {
+HB.factory Record ComRing_IsField R of ComRing R := {
   inv : R -> R;
   mulVf : forall x, x != 0 -> inv x * x = 1;
   invr0 : inv 0 = 0;
 }.
-HB.builders Context R of field_of_comring R.
+HB.builders Context R of ComRing_IsField R.
 
 Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
@@ -4398,10 +4373,10 @@ Qed.
 Fact inv_out : {in predC (predC1 0), inv =1 id}.
 Proof. by move=> x /negbNE/eqP->; exact: invr0. Qed.
 
-HB.instance Definition field_comring_comunitring : ComRing_HasMulInverse R :=
+HB.instance Definition _ : ComRing_HasMulInverse R :=
   ComRing_HasMulInverse.Build R mulVf intro_unit inv_out.
 
-HB.instance Definition field_comring_field : ComUnitRing_isField R :=
+HB.instance Definition _ : ComUnitRing_isField R :=
   ComUnitRing_isField.Build R (fun x x_neq_0 => x_neq_0).
 
 HB.end.
