@@ -141,14 +141,14 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     [comRingType of R] == clone of a canonical comRingType structure on R. *)
 (* [comRingMixin of R by <:] == comutativity mixin axiom for R when it is a   *)
 (*                           subType of a commutative ring.                   *)
-(* Ring_HasCommutativeMul.Build T mulC == builds the mixin for a commutative  *)
-(*                           ring from the commutativity of the               *)
-(*                           multiplication; the carrier type must have a     *)
-(*                           ring structure                                   *)
-(* Zmodule_IsComRing.Build T mulA mulC mul1x mulDl nonzero1 == builds the     *)
-(*                           mixin for a commutative ring from the algebraic  *)
-(*                           properties of the multiplication; the carrier    *)
-(*                           type must have a Zmodule structure               *)
+(*                                                                            *)
+(* List of factories (to use with HB.instance Definition _ := )               *)
+(* - Ring_HasCommutativeMul.Build T mulC                                      *)
+(*   Requires a ringType on T and declares a comRingType on T                 *)
+(*   from the commutativity of the multiplication.                            *)
+(* - Zmodule_IsComRing.Build T mulA mulC mul1x mulDl nonzero1                 *)
+(*   Requires a zmodType on T and declares a comRingType on T                 *)
+(*   from the algebraic properties of the multiplication.                     *)
 (*                                                                            *)
 (*  * UnitRing (Rings whose units have computable inverses):                  *)
 (*           unitRingType == interface type for the UnitRing structure.       *)
@@ -2409,6 +2409,7 @@ HB.mixin Record Ring_HasCommutativeMul R of Ring R := {
 #[mathcomp]
 HB.structure Definition ComRing := {R of Ring R & Ring_HasCommutativeMul R}.
 
+(* replacement for ComRingMixin *)
 HB.factory Record Zmodule_IsComRing R of Zmodule R := {
   one : R;
   mul : R -> R -> R;
@@ -2429,7 +2430,6 @@ HB.end.
 Module ComRingExports.
 Notation comRingType := ComRing.type.
 Notation ComRingType T m := (ComRing.pack T m).
-Notation ComRingMixin := ComRing.Mixin.
 Notation "[ 'comRingType' 'of' T 'for' cT ]" := (ComRing.clone T cT)
   (at level 0, format "[ 'comRingType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'comRingType' 'of' T ]" := (ComRing.clone T _)
