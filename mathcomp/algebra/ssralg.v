@@ -166,7 +166,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     from the algebraic properties of the multiplication.                   *)
 (*     NB: replacement for ComRingMixin that used to construct only a ring    *)
 (*  - PreComRing.Build T injf f1 fM                                           *)
-(*        Requires a ringType on T and declares a comrRingType on T from an   *)
+(*        Requires a ringType on T and declares a comRingType on T from an    *)
 (*        injection into a comRingType and morphism properties                *)
 (*                                                                            *)
 (*  * UnitRing (Rings whose units have computable inverses):                  *)
@@ -210,9 +210,9 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     (invertible). The inverse of a non-unit x is constrained to be x       *)
 (*     x itself (property invr_out)                                           *)
 (*     NB: replaces "UnitRingMixin mulVr mulrV unitP inv0id"                  *)
-(* - PreRing.Build R injf fM fV                                               *)
-(*     Requires a ringType on R and declares a unitRingType on T from an      *)
-(*     injection into a unitRingType and morphism properties                  *)
+(*  - PreUnitRing.Build R injf fM fV                                          *)
+(*        Requires a ringType on R and declares a unitRingType on R from an   *)
+(*        injection into a unitRingType and morphism properties               *)
 (*                                                                            *)
 (*  * ComUnitRing (commutative rings with computable inverses):               *)
 (*        comUnitRingType == interface type for ComUnitRing structure.        *)
@@ -365,7 +365,8 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     Requires a ringType on R and a Zmodule on T and declares an Lmodule on *)
 (*     R T from the algebraic properties of the                               *)
 (*  - PreLmodule.Build R T injf fZ                                            *)
-(*        Requires a ringType on T and declares a lmodType on R T from an     *)
+(*        Requires a ringType on R and a Zmodule on T and                     *)
+(*        declares a lmodType on R T from an                                  *)
 (*        injection into a lmodType and morphism properties                   *)
 (*                                                                            *)
 (*         LmodType R V m == packs the mixin v to build an Lmodule of type    *)
@@ -400,7 +401,8 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     Requires a ringType on R and on T, and an Lmodule on R T and declares  *)
 (*     an Lalgebra on R T from the associativity of scaling                   *)
 (*  - PreLalgebra.Build R T injf fM fZ                                        *)
-(*     Requires a ringType on T and declares a lalgType on R T from an        *)
+(*     Requires a ringType on T and and a Lmodule on R T and declares a       *)
+(*        lalgType on R T from an                                             *)
 (*        injection into a lalgType and morphism properties                   *)
 (*                                                                            *)
 (*                    R^o == the regular algebra of R: R^o is convertible to  *)
@@ -438,7 +440,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*     algebra on R V using an algebraic property of the scalar operation     *)
 (*     Requires a ringType on T and declares a lalgType on R T from an        *)
 (*        injection into a lalgType and morphism properties                   *)
-(*  - PreLalgebra.Build R V injf fM fZ                                        *)
+(*  - Prealgebra.Build R V injf fM fZ                                         *)
 (*     Requires a ringType on R and declares a algType on R V from an         *)
 (*        injection into an algType and morphism properties                   *)
 (*                                                                            *)
@@ -4875,8 +4877,6 @@ Next Obligation. by move=> x; apply: injf; rewrite fD f0 add0r. Qed.
 Next Obligation. by move=> x; apply: injf; rewrite !(fD, fN, f0) addNr. Qed.
 HB.instance U zmodU.
 HB.end.
-
-
 
 HB.factory Record PredSubZmodule V (S : {pred V})
   (subS : zmodPred S) (kS : keyed_pred subS) U of SubChoice V S U := {}.
