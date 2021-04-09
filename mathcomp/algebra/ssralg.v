@@ -748,6 +748,7 @@ HB.mixin Record IsZmodule V := {
 HB.structure Definition Zmodule := {V of IsZmodule V & Choice V}.
 
 Module ZmodExports.
+Bind Scope ring_scope with Zmodule.sort.
 Notation zmodType := Zmodule.type.
 Notation ZmodType T m := (@Zmodule.pack T m).
 Notation ZmodMixin V := (IsZmodule.Build V).
@@ -1011,6 +1012,7 @@ HB.end.
 HB.structure Definition Ring := { R of IsRing R & Choice R }.
 
 Module RingExports.
+Bind Scope ring_scope with Ring.sort.
 Notation ringType := Ring.type.
 Notation RingType T m := (@Ring.pack T m).
 Notation "[ 'ringType' 'of' T 'for' cT ]" := (Ring.clone T cT)
@@ -1603,6 +1605,7 @@ HB.structure Definition Lmodule (R : ringType) :=
   {M of Zmodule M & Zmodule_IsLmodule R M}.
 
 Module LmodExports.
+Bind Scope ring_scope with Lmodule.sort.
 Notation lmodType R := (Lmodule.type R).
 Notation LmodType R T m := (@Lmodule.pack [the ringType of R] T m).
 Notation LmodMixin := Lmodule.Mixin.
@@ -1709,6 +1712,7 @@ HB.structure Definition Lalgebra (R : ringType) :=
   {A of Lmodule_IsLalgebra R A &}.
 
 Module LalgExports.
+Bind Scope ring_scope with Lalgebra.sort.
 Notation lalgType R := (Lalgebra.type R).
 Notation LalgType R T m := (Lalgebra.pack [the ringType of R] T m).
 Notation LalgMixin := Lalgebra.Mixin.
@@ -2499,6 +2503,7 @@ HB.builders Context R of Zmodule_IsComRing R.
 HB.end.
 
 Module ComRingExports.
+Bind Scope ring_scope with ComRing.sort.
 Notation comRingType := ComRing.type.
 Notation ComRingType T m := (ComRing.pack T m).
 Notation "[ 'comRingType' 'of' T 'for' cT ]" := (ComRing.clone T cT)
@@ -2609,6 +2614,7 @@ HB.structure Definition Algebra (R : ringType) :=
   {A of Lalgebra_IsAlgebra R A &}.
 
 Module AlgExports.
+Bind Scope ring_scope with Algebra.sort.
 Notation algType R := (Algebra.type R).
 Notation AlgType R A ax := (Algebra.pack [the ringType of R] A ax).
 Notation "[ 'algType' R 'of' T 'for' cT ]" :=
@@ -2635,6 +2641,7 @@ HB.end.
 HB.structure Definition ComAlgebra R := {V of is_ComAlgebra R V &}.
 
 Module ComAlgExports.
+Bind Scope ring_scope with ComAlgebra.sort.
 Notation comAlgType R := (ComAlgebra.type R).
 Notation "[ 'comAlgType' R 'of' T ]" :=
     (ComAlgebra.clone [the ringType of R] T _)
@@ -2709,6 +2716,7 @@ HB.mixin Record Ring_HasMulInverse R of Ring R := {
 #[mathcomp] HB.structure Definition UnitRing := {R of Ring_HasMulInverse R&}.
 
 Module UnitRingExports.
+Bind Scope ring_scope with UnitRing.sort.
 Notation unitRingType := UnitRing.type.
 Notation UnitRingType T m := (UnitRing.pack T m).
 Notation "[ 'unitRingType' 'of' T 'for' cT ]" := (UnitRing.clone T cT)
@@ -2990,6 +2998,7 @@ End UnitRingMorphism.
 HB.structure Definition ComUnitRing := {R of ComRing R & UnitRing R}.
 
 Module ComUnitRingExports.
+Bind Scope ring_scope with ComUnitRing.sort.
 Notation comUnitRingType := ComUnitRing.type.
 Notation "[ 'comUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
   (at level 0, format "[ 'comUnitRingType'  'of'  T ]") : form_scope.
@@ -3021,6 +3030,7 @@ HB.end.
 HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
 
 Module UnitAlgebraExports.
+Bind Scope ring_scope with UnitAlgebra.sort.
 Notation unitAlgType R := (UnitAlgebra.type R).
 
 Notation "[ 'unitAlgType' R 'of' T ]" :=
@@ -3033,6 +3043,7 @@ HB.export UnitAlgebraExports.
 HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
 
 Module ComUnitAlgebraExports.
+Bind Scope ring_scope with UnitAlgebra.sort.
 Notation comUnitAlgType R := (ComUnitAlgebra.type R).
 Notation "[ 'comUnitAlgType' R 'of' T ]" :=
   (ComUnitAlgebra.clone [the ringType of R] T _)
