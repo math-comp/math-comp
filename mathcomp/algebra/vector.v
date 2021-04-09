@@ -204,7 +204,7 @@ Fact mx2vs_subproof m (A : 'M[K]_(m, vT)) : <<(<<A>>)>>%MS == <<A>>%MS.
 Proof. by rewrite genmx_id. Qed.
 Definition mx2vs {m} A : {vspace vT} := Space _ (@mx2vs_subproof m A).
 
-HB.instance Definition _ := BuildSubTypeFor {vspace vT} (@vs2mx (Phant vT)).
+HB.instance Definition _ := [subMixin of {vspace vT} for (@vs2mx (Phant vT))].
 Lemma vs2mxK : cancel vs2mx mx2vs.
 Proof. by move=> v; apply: val_inj; rewrite /= gen_vs2mx. Qed.
 Lemma mx2vsK m (M : 'M_(m, vT)) : (vs2mx (mx2vs M) :=: M)%MS.
@@ -214,6 +214,7 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
+(* FIXME *)
 Canonical hom_subType := [newType for f2mx].
 End Hom.
 
@@ -1874,7 +1875,7 @@ Variable (K : fieldType) (vT : vectType K) (U : {vspace vT}).
 Inductive subvs_of : predArgType := Subvs u & u \in U.
 
 Definition vsval w : vT := let: Subvs u _ := w in u.
-HB.instance Definition _ := BuildSubTypeFor subvs_of vsval.
+HB.instance Definition _ := [subMixin of subvs_of for vsval].
 HB.instance Definition _ := [Equality of subvs_of by <:].
 HB.instance Definition _ := [Choice of subvs_of by <:].
 HB.instance Definition _ := GRing.PredSubZmodule.Build _ _ _  (mem U) subvs_of.

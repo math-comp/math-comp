@@ -4899,7 +4899,7 @@ Let kS_S v : v \in kS -> v \in S. Proof. by rewrite keyed_predE. Qed.
 Let S_kS v : v \in S -> v \in kS. Proof. by rewrite keyed_predE. Qed.
 Let inU v Sv : U := Sub v (kS_S Sv).
 Let zeroU := inU (rpred0 kS).
-Let oppU (u : U) := inU (rpredNr (S_kS (val u))).
+Let oppU (u : U) := inU (rpredNr (S_kS (valP u))).
 Let addU (u1 u2 : U) := inU (rpredD (S_kS (valP u1)) (S_kS (valP u2))).
 
 Program Definition zmodU := @PreZmodule.Build U V _
