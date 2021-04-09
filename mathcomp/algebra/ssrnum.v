@@ -4273,370 +4273,297 @@ Arguments sqrCK_P {C x}.
 
 End Theory.
 
-(* STOP
-
 (*************)
 (* FACTORIES *)
 (*************)
 
-Module NumMixin.
-Section NumMixin.
-Variable (R : idomainType).
-
-Record of_ := Mixin {
-  le : rel R;
-  lt : rel R;
+HB.factory Record IntegralDomain_IsNumDomain R of GRing.IntegralDomain R := {
+  Rle : rel R;
+  Rlt : rel R;
   norm : R -> R;
-  normD     : forall x y, le (norm (x + y)) (norm x + norm y);
-  addr_gt0  : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
+  normD     : forall x y, Rle (norm (x + y)) (norm x + norm y);
+  addr_gt0  : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x + y);
   norm_eq0  : forall x, norm x = 0 -> x = 0;
-  ger_total : forall x y, le 0 x -> le 0 y -> le x y || le y x;
+  ger_total : forall x y, Rle 0 x -> Rle 0 y -> Rle x y || Rle y x;
   normM     : {morph norm : x y / x * y};
-  le_def    : forall x y, (le x y) = (norm (y - x) == y - x);
-  lt_def    : forall x y, (lt x y) = (y != x) && (le x y)
+  le_def    : forall x y, (Rle x y) = (norm (y - x) == y - x);
+  lt_def    : forall x y, (Rlt x y) = (y != x) && (Rle x y)
 }.
 
-Variable (m : of_).
+#[verbose]
+HB.builders Context R of IntegralDomain_IsNumDomain R.
+  Local Notation "x <= y" := (Rle x y) : ring_scope.
+  Local Notation "x < y" := (Rlt x y) : ring_scope.
+  Local Notation "`| x |" := (norm x) : ring_scope.
 
-Local Notation "x <= y" := (le m x y) : ring_scope.
-Local Notation "x < y" := (lt m x y) : ring_scope.
-Local Notation "`| x |" := (norm m x) : ring_scope.
+  Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
 
-Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
+  Lemma ge0_def x : (0 <= x) = (`|x| == x).
+  Proof. by rewrite le_def subr0. Qed.
 
-Lemma ge0_def x : (0 <= x) = (`|x| == x).
-Proof. by rewrite le_def subr0. Qed.
+  Lemma subr_ge0 x y : (0 <= x - y) = (y <= x).
+  Proof. by rewrite ge0_def -le_def. Qed.
 
-Lemma subr_ge0 x y : (0 <= x - y) = (y <= x).
-Proof. by rewrite ge0_def -le_def. Qed.
+  Lemma subr_gt0 x y : (0 < y - x) = (x < y).
+  Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
 
-Lemma subr_gt0 x y : (0 < y - x) = (x < y).
-Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
+  Lemma lt_trans : transitive Rlt.
+  Proof.
+  move=> y x z le_xy le_yz.
+  by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 // subr_gt0.
+  Qed.
 
-Lemma lt_trans : transitive (lt m).
-Proof.
-move=> y x z le_xy le_yz.
-by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 // subr_gt0.
-Qed.
+  Lemma le01 : 0 <= 1.
+  Proof.
+  have n1_nz: `|1| != 0 :> R.
+    by apply: contraNneq (@oner_neq0 [the GRing.Ring.type of R]) => /norm_eq0->.
+  by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
+  Qed.
 
-Lemma le01 : 0 <= 1.
-Proof.
-have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /norm_eq0->.
-by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
-Qed.
+  Lemma lt01 : 0 < 1.
+  Proof. by rewrite lt_def oner_neq0 le01. Qed.
 
-Lemma lt01 : 0 < 1.
-Proof. by rewrite lt_def oner_neq0 le01. Qed.
+  Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
 
-Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
+  Lemma lerr x : x <= x.
+  Proof.
+  have n2: `|2%:R| == 2%:R :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
+  rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
+  by rewrite -(eqP n2) -normM mul0r.
+  Qed.
 
-Lemma lerr x : x <= x.
-Proof.
-have n2: `|2%:R| == 2%:R :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
-rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
-by rewrite -(eqP n2) -normM mul0r.
-Qed.
+  Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
+  Proof. by rewrite lt_def; case: eqVneq => //= ->; rewrite lerr. Qed.
 
-Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
-Proof. by rewrite lt_def; case: eqVneq => //= ->; rewrite lerr. Qed.
+  Lemma le_trans : transitive Rle.
+  by move=> y x z; rewrite !le_def' => /predU1P [->|hxy] // /predU1P [<-|hyz];
+    rewrite ?hxy ?(lt_trans hxy hyz) orbT.
+  Qed.
 
-Lemma le_trans : transitive (le m).
-by move=> y x z; rewrite !le_def' => /predU1P [->|hxy] // /predU1P [<-|hyz];
-  rewrite ?hxy ?(lt_trans hxy hyz) orbT.
-Qed.
+  Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
+  Proof.
+  rewrite -mulr_natr -[RHS]mulr_natr normM.
+  congr (_ * _); apply/eqP; rewrite -ge0_def.
+  elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
+  by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
+  Qed.
 
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof.
-rewrite -mulr_natr -[RHS]mulr_natr normM.
-congr (_ * _); apply/eqP; rewrite -ge0_def.
-elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
-by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
-Qed.
+  Lemma normrN1 : `|-1| = 1 :> R.
+  Proof.
+  have: `|-1| ^+ 2 == 1 :> R
+    by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
+  rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
+  have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
+    by rewrite lt_def; case: eqP => // ->; rewrite lerr.
+  by rewrite oppr_eq0 oner_eq0 => /(addr_gt0 lt01); rewrite subrr ltrr.
+  Qed.
 
-Lemma normrN1 : `|-1| = 1 :> R.
-Proof.
-have: `|-1| ^+ 2 == 1 :> R
-  by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
-rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
-have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
-  by rewrite lt_def; case: eqP => // ->; rewrite lerr.
-by rewrite oppr_eq0 oner_eq0 => /(addr_gt0 lt01); rewrite subrr ltrr.
-Qed.
+  Lemma normrN x : `|- x| = `|x|.
+  Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Lemma normrN x : `|- x| = `|x|.
-Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
+  HB.instance Definition _ :=
+    Order.IsLtLePOrdered.Build ring_display R le_def' ltrr lt_trans.
 
-Definition ltPOrderMixin : ltPOrderMixin R :=
-  LtPOrderMixin le_def' ltrr lt_trans.
+  HB.instance Definition _ :=
+    Zmodule_IsNormed.Build ring_display R normD norm_eq0 normrMn normrN.
 
-Definition normedZmodMixin :
-  @normed_mixin_of R R ltPOrderMixin :=
-  @Num.NormedMixin _ _ ltPOrderMixin (norm m)
-                   (normD m) (@norm_eq0 m) normrMn normrN.
+  HB.instance Definition _ :=
+    IsNumDomain.Build ring_display R addr_gt0 ger_total normM le_def.
+HB.end.
 
-Definition numDomainMixin :
-  @mixin_of R ltPOrderMixin normedZmodMixin :=
-  @Num.Mixin _ ltPOrderMixin normedZmodMixin (@addr_gt0 m)
-             (@ger_total m) (@normM m) (@le_def m).
+HB.factory Record NumDomain_IsReal R of NumDomain R := {
+  real : real_axiom [the NumDomain.type of R]
+}.
 
-End NumMixin.
+HB.builders Context R of NumDomain_IsReal R.
+  Lemma le_total : Order.POrder_IsTotal ring_display R.
+  Proof.
+  constructor=> x y; move: (real (x - y)).
+  by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
+  Qed.
 
-Module Exports.
-Notation numMixin := of_.
-Notation NumMixin := Mixin.
-Coercion ltPOrderMixin : numMixin >-> Order.LtPOrderMixin.of_.
-Coercion normedZmodMixin : numMixin >-> normed_mixin_of.
-Coercion numDomainMixin : numMixin >-> mixin_of.
-Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
-  NumDomainType (POrderType ring_display T m) m.
-End Exports.
+  HB.instance Definition _ := le_total.
+HB.end.
 
-End NumMixin.
-Import NumMixin.Exports.
-
-Module RealMixin.
-Section RealMixin.
-Variables (R : numDomainType).
-
-Variable (real : real_axiom R).
-
-Lemma le_total : totalPOrderMixin R.
-Proof.
-move=> x y; move: (real (x - y)).
-by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
-Qed.
-
-End RealMixin.
-
-Module Exports.
-Coercion le_total : real_axiom >-> totalPOrderMixin.
-Definition RealDomainOfNumDomain (T : numDomainType) (m : real_axiom T) :=
-  [realDomainType of OrderOfPOrder m].
-End Exports.
-
-End RealMixin.
-Import RealMixin.Exports.
-
-Module RealLeMixin.
-Section RealLeMixin.
-Variables (R : idomainType).
-
-Record of_ := Mixin {
-  le : rel R;
-  lt : rel R;
+HB.factory Record IntegralDomain_IsLeReal R of GRing.IntegralDomain R := {
+  Rle : rel R;
+  Rlt : rel R;
   norm : R -> R;
-  le0_add   : forall x y, le 0 x -> le 0 y -> le 0 (x + y);
-  le0_mul   : forall x y, le 0 x -> le 0 y -> le 0 (x * y);
-  le0_anti  : forall x, le 0 x -> le x 0 -> x = 0;
-  sub_ge0   : forall x y, le 0 (y - x) = le x y;
-  le0_total : forall x, le 0 x || le x 0;
+  le0_add   : forall x y, Rle 0 x -> Rle 0 y -> Rle 0 (x + y);
+  le0_mul   : forall x y, Rle 0 x -> Rle 0 y -> Rle 0 (x * y);
+  le0_anti  : forall x, Rle 0 x -> Rle x 0 -> x = 0;
+  sub_ge0   : forall x y, Rle 0 (y - x) = Rle x y;
+  le0_total : forall x, Rle 0 x || Rle x 0;
   normN     : forall x, norm (- x) = norm x;
-  ge0_norm  : forall x, le 0 x -> norm x = x;
-  lt_def    : forall x y, lt x y = (y != x) && le x y;
+  ge0_norm  : forall x, Rle 0 x -> norm x = x;
+  lt_def    : forall x y, Rlt x y = (y != x) && Rle x y;
 }.
 
-Variable (m : of_).
+HB.builders Context R of IntegralDomain_IsLeReal R.
+  Local Notation le := Rle.
+  Local Notation lt := Rlt.
 
-Local Notation "x <= y" := (le m x y) : ring_scope.
-Local Notation "x < y" := (lt m x y) : ring_scope.
-Local Notation "`| x |" := (norm m x) : ring_scope.
+  Local Notation "x <= y" := (le x y) : ring_scope.
+  Local Notation "x < y" := (lt x y) : ring_scope.
+  Local Notation "`| x |" := (norm x) : ring_scope.
 
-Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
-Let leN_total x : 0 <= x \/ 0 <= - x.
-Proof. by apply/orP; rewrite le0N le0_total. Qed.
+  Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
+  Let leN_total x : 0 <= x \/ 0 <= - x.
+  Proof. by apply/orP; rewrite le0N le0_total. Qed.
 
-Let le00 : 0 <= 0. Proof. by have:= le0_total m 0; rewrite orbb. Qed.
+  Let le00 : 0 <= 0. Proof. by have:= le0_total 0; rewrite orbb. Qed.
 
-Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
-Proof.
-rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
-rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
-by rewrite [x](@le0_anti m) // hxy -le0N opprK.
-Qed.
+  Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
+  Proof.
+  rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
+  rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
+  by rewrite [x](@le0_anti) // hxy -le0N opprK.
+  Qed.
 
-Fact eq0_norm x : `|x| = 0 -> x = 0.
-Proof.
-case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
-by rewrite -[x]opprK -Dnx normN nx0 oppr0.
-Qed.
+  Fact eq0_norm x : `|x| = 0 -> x = 0.
+  Proof.
+  case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
+  by rewrite -[x]opprK -Dnx normN nx0 oppr0.
+  Qed.
 
-Fact le_def x y : (x <= y) = (`|y - x| == y - x).
-Proof.
-wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
-rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
-by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
-Qed.
+  Fact le_def x y : (x <= y) = (`|y - x| == y - x).
+  Proof.
+  wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
+  rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
+  by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
+  Qed.
 
-Fact normM : {morph norm m : x y / x * y}.
-Proof.
-move=> x y /=; wlog x_ge0 : x / 0 <= x.
-  by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
-wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
-by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
-Qed.
+  Fact normM : {morph norm : x y / x * y}.
+  Proof.
+  move=> x y /=; wlog x_ge0 : x / 0 <= x.
+    by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
+  wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
+  by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
+  Qed.
 
-Fact le_normD x y : `|x + y| <= `|x| + `|y|.
-Proof.
-wlog x_ge0 : x y / 0 <= x.
-  by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
-rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
-  by rewrite !ge0_norm ?subrr ?le0_add.
-rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
-  by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
-by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
-Qed.
+  Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+  Proof.
+  wlog x_ge0 : x y / 0 <= x.
+    by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
+  rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
+    by rewrite !ge0_norm ?subrr ?le0_add.
+  rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
+    by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+  by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
+  Qed.
 
-Fact le_total : total (le m).
-Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
+  Fact le_total : total le.
+  Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
-Definition numMixin : numMixin R :=
-  NumMixin le_normD lt0_add eq0_norm (in2W le_total) normM le_def (lt_def m).
+  HB.instance Definition _ := IntegralDomain_IsNumDomain.Build R
+    le_normD lt0_add eq0_norm (in2W le_total) normM le_def lt_def.
 
-Definition orderMixin :
-  totalPOrderMixin (POrderType ring_display R numMixin) :=
-  le_total.
+  HB.instance Definition _ := Order.POrder_IsTotal.Build ring_display R
+    le_total.
+HB.end.
 
-End RealLeMixin.
-
-Module Exports.
-Notation realLeMixin := of_.
-Notation RealLeMixin := Mixin.
-Coercion numMixin : realLeMixin >-> NumMixin.of_.
-Coercion orderMixin : realLeMixin >-> totalPOrderMixin.
-Definition LeRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
-  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
-Definition LeRealFieldOfField (R : fieldType) (m : of_ R) :=
-  [realFieldType of [numFieldType of LeRealDomainOfIdomain m]].
-End Exports.
-
-End RealLeMixin.
-Import RealLeMixin.Exports.
-
-Module RealLtMixin.
-Section RealLtMixin.
-Variables (R : idomainType).
-
-Record of_ := Mixin {
-  lt : rel R;
-  le : rel R;
+HB.factory Record IntegralDomain_IsLtReal R of GRing.IntegralDomain R := {
+  Rlt : rel R;
+  Rle : rel R;
   norm : R -> R;
-  lt0_add   : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
-  lt0_mul   : forall x y, lt 0 x -> lt 0 y -> lt 0 (x * y);
-  lt0_ngt0  : forall x,  lt 0 x -> ~~ (lt x 0);
-  sub_gt0   : forall x y, lt 0 (y - x) = lt x y;
-  lt0_total : forall x, x != 0 -> lt 0 x || lt x 0;
+  lt0_add   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x + y);
+  lt0_mul   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x * y);
+  lt0_ngt0  : forall x,  Rlt 0 x -> ~~ (Rlt x 0);
+  sub_gt0   : forall x y, Rlt 0 (y - x) = Rlt x y;
+  lt0_total : forall x, x != 0 -> Rlt 0 x || Rlt x 0;
   normN     : forall x, norm (- x) = norm x;
-  ge0_norm  : forall x, le 0 x -> norm x = x;
-  le_def    : forall x y, le x y = (x == y) || lt x y;
+  ge0_norm  : forall x, Rle 0 x -> norm x = x;
+  le_def    : forall x y, Rle x y = (x == y) || Rlt x y;
 }.
 
-Variable (m : of_).
+HB.builders Context R of IntegralDomain_IsLtReal R.
+(* FIXME terrible error message "elpi fails"
+   when replacing IntegralDomain_IsLtReal by GRing.IntegralDomain *)
+  Local Notation le := Rle.
+  Local Notation lt := Rlt.
 
-Local Notation "x < y" := (lt m x y) : ring_scope.
-Local Notation "x <= y" := (le m x y) : ring_scope.
-Local Notation "`| x |" := (norm m x) : ring_scope.
+  Local Notation "x < y" := (lt x y) : ring_scope.
+  Local Notation "x <= y" := (le x y) : ring_scope.
+  Local Notation "`| x |" := (norm x) : ring_scope.
 
-Fact lt0N x : (- x < 0) = (0 < x).
-Proof. by rewrite -sub_gt0 add0r opprK. Qed.
-Let leN_total x : 0 <= x \/ 0 <= - x.
-Proof.
-rewrite !le_def [_ == - x]eq_sym oppr_eq0 -[0 < - x]lt0N opprK.
-apply/orP; case: (eqVneq x) => //=; exact: lt0_total.
-Qed.
+  Fact lt0N x : (- x < 0) = (0 < x).
+  Proof. by rewrite -sub_gt0 add0r opprK. Qed.
+  Let leN_total x : 0 <= x \/ 0 <= - x.
+  Proof.
+  rewrite !le_def [_ == - x]eq_sym oppr_eq0 -[0 < - x]lt0N opprK.
+  apply/orP; case: (eqVneq x) => //=; exact: lt0_total.
+  Qed.
 
-Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
+  Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
 
-Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
-Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
+  Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
+  Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
 
-Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
-Proof.
-rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
-by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
-Qed.
+  Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
+  Proof.
+  rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
+  by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
+  Qed.
 
-Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
-Proof.
-rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite mul0r eqxx.
-by case/predU1P=> [<-|y_gt0]; rewrite ?mulr0 ?eqxx ?lt0_mul // orbT.
-Qed.
+  Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
+  Proof.
+  rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite mul0r eqxx.
+  by case/predU1P=> [<-|y_gt0]; rewrite ?mulr0 ?eqxx ?lt0_mul // orbT.
+  Qed.
 
-Fact normM : {morph norm m : x y / x * y}.
-Proof.
-move=> x y /=; wlog x_ge0 : x / 0 <= x.
-  by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
-wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
-by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
-Qed.
+  Fact normM : {morph norm : x y / x * y}.
+  Proof.
+  move=> x y /=; wlog x_ge0 : x / 0 <= x.
+    by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
+  wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
+  by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
+  Qed.
 
-Fact le_normD x y : `|x + y| <= `|x| + `|y|.
-Proof.
-wlog x_ge0 : x y / 0 <= x.
-  by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
-rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
-  by rewrite !ge0_norm ?subrr ?le0_add.
-rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
-  by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
-by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
-Qed.
+  Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+  Proof.
+  wlog x_ge0 : x y / 0 <= x.
+    by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
+  rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
+    by rewrite !ge0_norm ?subrr ?le0_add.
+  rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
+    by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+  by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
+  Qed.
 
-Fact eq0_norm x : `|x| = 0 -> x = 0.
-Proof.
-case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
-by rewrite -[x]opprK -Dnx normN nx0 oppr0.
-Qed.
+  Fact eq0_norm x : `|x| = 0 -> x = 0.
+  Proof.
+  case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
+  by rewrite -[x]opprK -Dnx normN nx0 oppr0.
+  Qed.
 
-Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
-Proof.
-wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
-rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
-by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
-Qed.
+  Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
+  Proof.
+  wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
+  rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
+  by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
+  Qed.
 
-Fact lt_def x y : (x < y) = (y != x) && (x <= y).
-Proof.
-rewrite le_def; case: eqVneq => //= ->; rewrite -sub_gt0 subrr.
-by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
-Qed.
+  Fact lt_def x y : (x < y) = (y != x) && (x <= y).
+  Proof.
+  rewrite le_def; case: eqVneq => //= ->; rewrite -sub_gt0 subrr.
+  by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
+  Qed.
 
-Fact le_total : total (le m).
-Proof.
-move=> x y; rewrite !le_def; have [->|] //= := eqVneq; rewrite -subr_eq0.
-by move/(lt0_total m); rewrite -(sub_gt0 _ (x - y)) sub0r opprB !sub_gt0 orbC.
-Qed.
+  Fact le_total : total le.
+  Proof.
+  move=> x y; rewrite !le_def; have [->|] //= := eqVneq; rewrite -subr_eq0.
+  by move/lt0_total; rewrite -(sub_gt0 (x - y)) sub0r opprB !sub_gt0 orbC.
+  Qed.
 
-Definition numMixin : numMixin R :=
-  NumMixin le_normD (@lt0_add m) eq0_norm (in2W le_total) normM le_def' lt_def.
+  HB.instance Definition _ := IntegralDomain_IsNumDomain.Build R
+    le_normD lt0_add eq0_norm (in2W le_total) normM le_def' lt_def.
 
-Definition orderMixin :
-  totalPOrderMixin (POrderType ring_display R numMixin) :=
-  le_total.
-
-End RealLtMixin.
-
-Module Exports.
-Notation realLtMixin := of_.
-Notation RealLtMixin := Mixin.
-Coercion numMixin : realLtMixin >-> NumMixin.of_.
-Coercion orderMixin : realLtMixin >-> totalPOrderMixin.
-Definition LtRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
-  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
-Definition LtRealFieldOfField (R : fieldType) (m : of_ R) :=
-  [realFieldType of [numFieldType of LtRealDomainOfIdomain m]].
-End Exports.
-
-End RealLtMixin.
-Import RealLtMixin.Exports.
-end STOP *)
+  HB.instance Definition _ := Order.POrder_IsTotal.Build ring_display R
+    le_total.
+HB.end.
 
 Module Exports. HB.reexport. End Exports.
 End Num.
 Export Num.Exports.
 
 Export Num.Syntax Num.PredInstances.
-(*
-Export Num.NumMixin.Exports Num.RealMixin.Exports.
-Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
-
-Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
-*)
