@@ -1,10 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism presentation.
 From mathcomp Require Import quotient action commutator gproduct gfunctor.
-From mathcomp Require Import ssralg finalg zmodp cyclic pgroup center gseries.
+From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup center gseries.
 From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
 
 (******************************************************************************)
@@ -92,7 +93,7 @@ Qed.
 
 Definition gact := (base_act \ act_dom)%gact.
 Fact gtype_key : unit. Proof. by []. Qed.
-Definition gtype := locked_with gtype_key (sdprod_groupType gact).
+Definition gtype := locked_with gtype_key [the finGroupType of sdprod_by gact].
 
 Hypotheses (p_gt1 : p > 1) (q_gt1 : q > 1).
 
@@ -153,10 +154,24 @@ Definition dihedral_gtype := gtype q 2 q.-1.
 Definition semidihedral_gtype := gtype q 2 (q %/ p).-1.
 Definition quaternion_kernel :=
   <<[set u | u ^+ 2 == 1] :\: [set u ^+ 2 | u in [set: gtype q 4 q.-1]]>>.
-Definition quaternion_gtype :=
-  locked_with gtype_key (coset_groupType quaternion_kernel).
 
 End SpecializeExtremals.
+
+Definition locked_with2 T k x k2 := let: tt := k in let: tt := k2 in x : T.
+Lemma locked_withE2 T k (x : T) k2 : unkeyed (locked_with2 k x k2) = x.
+Proof. case: k; case: k2; by []. Qed.
+
+Canonical locked_with_unlockable2 T k x :=
+  @Unlockable T x (locked_with2 k x k) (locked_withE2 k x k).
+
+Lemma gtype2_key : nat -> unit. Proof. by []. Qed.
+Definition data n := [the finGroupType of coset_of (quaternion_kernel n)].
+Definition quaternion_gtype n :=
+    locked_with2
+      (gtype2_key n)
+      (data n)
+      (gtype2_key n)
+      .
 
 Notation "''Mod_' m" := (modular_gtype m) : type_scope.
 Notation "''Mod_' m" := [set: gsort 'Mod_m] : group_scope.
@@ -1096,6 +1111,8 @@ rewrite [X]defU // defU -?cycle_subG //.
 by apply: double_inj; rewrite -muln2 -iCG Lagrange // oG -mul2n.
 Qed.
 
+(* HERE BOOM *)
+
 Theorem quaternion_structure :
     n > 2 -> extremal_generators G 2 n (x, y) -> G \isog 'Q_m ->
   [/\ [/\ pprod X Y = G, {in G :\: X, forall t, #[t] = 4}
@@ -1114,7 +1131,33 @@ Theorem quaternion_structure :
 Proof.
 move=> n_gt2 genG isoG; have [def2q def2r ltqm ltrq] := def2qr (ltnW n_gt2).
 have [oG Gx ox X'y] := genG; rewrite -/m -/q -/X in oG ox X'y.
-case/extremal_generators_facts: genG; rewrite -/X // => pG maxX nsXG defXY nXY.
+case/extremal_generators_facts: genG; rewrite -/X.
+done. 
+hnf; intros. repeat split. 
+Set Printing All.
+  have : (Mxy \isog [set: 'Q_q]) = (G \isog [set: 'Q_m]).
+  
+    have : forall f,
+
+          f
+          ( (FinGroup_to_Finite_22 (quaternion_gtype q)))
+         =
+          f
+          ( (FinGroup_to_Finite_22 (quaternion_gtype m)))
+             
+        :> Prop.
+    intros. Time reflexivity.
+    Set Printing All. rewrite /FinGroup_to_Finite_22.
+    Set Printing All. rewrite /FinGroup_class_to_Finite_class_21.
+    Set Printing All. rewrite /quaternion_gtype.
+    
+          Time reflexivity.
+
+
+18: (clear isoG; assumption).
+Print Ltac done.
+
+// => pG maxX nsXG defXY nXY.
 have [sXG nXG]:= andP nsXG; have [Gy notXy]:= setDP X'y.
 have oxr: #[x ^+ r] = 2 by rewrite orderXdiv ox -def2r ?dvdn_mull ?mulnK.
 have ox2: #[x ^+ 2] = r by rewrite orderXdiv ox -def2r ?dvdn_mulr ?mulKn.
