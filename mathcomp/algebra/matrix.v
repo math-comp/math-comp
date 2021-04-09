@@ -2668,7 +2668,7 @@ Section FinZmodMatrix.
 Variables (V : finZmodType) (m n : nat).
 Local Notation MV := 'M[V]_(m, n).
 
-#[verbose] HB.instance Definition _ := [Finite of MV by <:].
+HB.instance Definition _ := [Finite of MV by <:].
 
 HB.instance Definition _ := [finGroupMixin of MV for +%R].
 
@@ -3188,7 +3188,7 @@ Arguments comm_mx_scalar {R n}.
 Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
 
-#[verbose] HB.instance Definition _ (R : finComRingType) (n' : nat) :=
+HB.instance Definition _ (R : finComRingType) (n' : nat) :=
   [Finite of 'M[R]_n'.+1 by <:].
 
 Hint Resolve comm_mx_scalar comm_scalar_mx : core.
@@ -3334,10 +3334,10 @@ End MatrixInv.
 
 Prenex Implicits unitmx invmx invmxK.
 
-#[verbose] HB.instance Definition _ (R : countComUnitRingType) (n' : nat) :=
+HB.instance Definition _ (R : countComUnitRingType) (n' : nat) :=
   [Countable of 'M[R]_n'.+1 by <:].
 
-#[verbose] HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
+HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
   [Finite of 'M[R]_n.+1 by <:].
 (* Finite inversible matrices and the general linear group. *)
 Section FinUnitMatrix.

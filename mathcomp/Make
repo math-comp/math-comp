@@ -4,7 +4,7 @@ algebra/countalg.v
 algebra/fraction.v
 # algebra/intdiv.v
 # algebra/interval.v
-# algebra/matrix.v
+algebra/matrix.v
 # algebra/mxalgebra.v
 # algebra/mxpoly.v
 algebra/polydiv.v
