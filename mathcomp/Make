@@ -13,7 +13,7 @@ algebra/polyXY.v
 # algebra/rat.v
 algebra/ring_quotient.v
 algebra/ssralg.v
-# algebra/ssrint.v
+algebra/ssrint.v
 algebra/ssrnum.v
 algebra/vector.v
 algebra/zmodp.v

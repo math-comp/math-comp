@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
 From mathcomp Require Import poly.
@@ -84,12 +85,7 @@ Definition int_of_natsum (m : nat + nat) :=
 Lemma natsum_of_intK : cancel natsum_of_int int_of_natsum.
 Proof. by case. Qed.
 
-Definition int_eqMixin := CanEqMixin natsum_of_intK.
-Definition int_countMixin := CanCountMixin natsum_of_intK.
-Definition int_choiceMixin := CountChoiceMixin int_countMixin.
-Canonical int_eqType := Eval hnf in EqType int int_eqMixin.
-Canonical int_choiceType := Eval hnf in ChoiceType int int_choiceMixin.
-Canonical int_countType := Eval hnf in CountType int int_countMixin.
+HB.instance Definition _ := Countable.copy int (can_type natsum_of_intK).
 
 Lemma eqz_nat (m n : nat) : (m%:Z == n%:Z) = (m == n). Proof. by []. Qed.
 
@@ -196,12 +192,12 @@ Lemma addNz : left_inverse (0:int) oppz addz. Proof. by do 3?elim. Qed.
 Lemma predn_int (n : nat) : 0 < n -> n.-1%:Z = n - 1.
 Proof. by case: n=> // n _ /=; rewrite subn1. Qed.
 
-Definition Mixin := ZmodMixin addzA addzC add0z addNz.
+Definition Mixin := GRing.IsZmodule.Build int addzA addzC add0z addNz.
 
 End intZmod.
 End intZmod.
 
-Canonical int_ZmodType := ZmodType int intZmod.Mixin.
+HB.instance Definition _ := intZmod.Mixin.
 
 Local Open Scope ring_scope.
 
@@ -304,13 +300,13 @@ Qed.
 
 Lemma nonzero1z : 1%Z != 0. Proof. by []. Qed.
 
-Definition comMixin := ComRingMixin mulzA mulzC mul1z mulz_addl nonzero1z.
+Definition comMixin := GRing.Zmodule_IsComRing.Build int
+  mulzA mulzC mul1z mulz_addl nonzero1z.
 
 End intRing.
 End intRing.
 
-Canonical int_Ring := Eval hnf in RingType int intRing.comMixin.
-Canonical int_comRing := Eval hnf in ComRingType int intRing.mulzC.
+HB.instance Definition _ := intRing.comMixin.
 
 Section intRingTheory.
 
@@ -355,27 +351,20 @@ by case: m n => m [] n //= /eqP;
   rewrite ?(NegzE, mulrN, mulNr) ?oppr_eq0 -PoszM [_ == _]muln_eq0.
 Qed.
 
-Definition comMixin := ComUnitRingMixin mulVz unitzPl invz_out.
+Definition comMixin := GRing.ComRing_HasMulInverse.Build int
+  mulVz unitzPl invz_out.
 
 End intUnitRing.
 End intUnitRing.
 
-Canonical int_unitRingType :=
-  Eval hnf in UnitRingType int intUnitRing.comMixin.
-Canonical int_comUnitRing := Eval hnf in [comUnitRingType of int].
-Canonical int_idomainType :=
-  Eval hnf in IdomainType int intUnitRing.idomain_axiomz.
-
-Canonical int_countZmodType := [countZmodType of int].
-Canonical int_countRingType := [countRingType of int].
-Canonical int_countComRingType := [countComRingType of int].
-Canonical int_countUnitRingType := [countUnitRingType of int].
-Canonical int_countComUnitRingType := [countComUnitRingType of int].
-Canonical int_countIdomainType := [countIdomainType of int].
+HB.instance Definition _ := intUnitRing.comMixin.
+HB.instance Definition _ := GRing.ComUnitRing_IsIntegral.Build int
+  intUnitRing.idomain_axiomz.
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
 Notation "m - n" :=
-  (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
+  (@GRing.add [the GRing.Zmodule.type of int]
+     m%N (@GRing.opp [the GRing.Zmodule.type of int] n%N)) : distn_scope.
 Arguments absz m%distn_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 
@@ -434,20 +423,13 @@ Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
 
-Definition Mixin : realLeMixin int_idomainType :=
-  RealLeMixin
-    lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
+Definition Mixin := Num.IntegralDomain_IsLeReal.Build int
+  lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
 
 End intOrdered.
 End intOrdered.
 
-Canonical int_porderType := POrderType ring_display int intOrdered.Mixin.
-Canonical int_latticeType := LatticeType int intOrdered.Mixin.
-Canonical int_distrLatticeType := DistrLatticeType int intOrdered.Mixin.
-Canonical int_orderType := OrderType int intOrdered.lez_total.
-Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
-Canonical int_normedZmodType := NormedZmodType int int intOrdered.Mixin.
-Canonical int_realDomainType := [realDomainType of int].
+HB.instance Definition _ := intOrdered.Mixin.
 
 Section intOrderedTheory.
 
@@ -571,30 +553,49 @@ rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
 * by rewrite -addnS -addSn mulrnDr.
 Qed.
 
-Definition Mint_LmodMixin :=
-  @LmodMixin _ [zmodType of M] (fun n x => x *~ n)
-   mulrzA_C mulr1z mulrzDr mulrzDl.
-Canonical Mint_LmodType := LmodType int M^z Mint_LmodMixin.
+(* Definition Mint_LmodMixin := *)
+(*   @LmodMixin _ [zmodType of M] (fun n x => x *~ n) *)
+(*    mulrzA_C mulr1z mulrzDr mulrzDl. *)
+(* Canonical Mint_LmodType := LmodType int M^z Mint_LmodMixin. *)
+(* FIXME: cannot use a builder on a (context) variable?
+   (rather than a concrete built constant) *)
 
+(*
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
+*)
 
 Lemma mulrzA x m n :  x *~ (m * n) = x *~ m *~ n.
+Admitted.
+(*
 Proof. by rewrite -!scalezrE scalerA mulrC. Qed.
+*)
 
 Lemma mulr0z x : x *~ 0 = 0. Proof. by []. Qed.
 
 Lemma mul0rz n : 0 *~ n = 0 :> M.
+Admitted.
+(*
 Proof. by rewrite -scalezrE scaler0. Qed.
+*)
 
 Lemma mulrNz x n : x *~ (- n) = - (x *~ n).
+Admitted.
+(*
 Proof. by rewrite -scalezrE scaleNr. Qed.
 
 Lemma mulrN1z x : x *~ (- 1) = - x. Proof. by rewrite -scalezrE scaleN1r. Qed.
+*)
 
 Lemma mulNrz x n : (- x) *~ n = - (x *~ n).
+Admitted.
+
+(*
 Proof. by rewrite -scalezrE scalerN. Qed.
+ *)
 
 Lemma mulrzBr x m n : x *~ (m - n) = x *~ m - x *~ n.
+Admitted.
+(*
 Proof. by rewrite -scalezrE scalerBl. Qed.
 
 Lemma mulrzBl x y n : (x - y) *~ n = x *~ n - y *~ n.
@@ -610,6 +611,7 @@ Proof. by rewrite -/M^z; apply: scaler_suml. Qed.
 Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
 Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
+*)
 
 Canonical intmul_additive x := Additive (@mulrzBr x).
 
@@ -707,7 +709,10 @@ Proof. by rewrite -!scaler_int !scalerA mulrzr mulrzl. Qed.
 End LMod.
 
 Lemma mulrz_int (M : zmodType) (n : int) (x : M) : x *~ n%:~R = x *~ n.
+Admitted.
+(*
 Proof. by rewrite -scalezrE scaler_int. Qed.
+*)
 
 Section MorphTheory.
 Local Coercion Posz : nat >-> int.
@@ -925,29 +930,29 @@ Proof. by rewrite -(mulr0z x) ler_nmulz2l. Qed.
 Lemma mulrIz x (hx : x != 0) : injective ( *~%R x).
 Proof.
 move=> y z; rewrite -![x *~ _]mulrzr => /(mulfI hx).
-by apply: inc_inj y z; apply: ler_pmulz2l.
+apply: inc_inj y z; exact/ler_pmulz2l/ltr01.
 Qed.
 
 Lemma ler_int m n : (m%:~R <= n%:~R :> R) = (m <= n).
-Proof. by rewrite ler_pmulz2l. Qed.
+Proof. by rewrite ler_pmulz2l // ltr01. Qed.
 
 Lemma ltr_int m n : (m%:~R < n%:~R :> R) = (m < n).
-Proof. by rewrite ltr_pmulz2l. Qed.
+Proof. by rewrite ltr_pmulz2l // ltr01. Qed.
 
 Lemma eqr_int m n : (m%:~R == n%:~R :> R) = (m == n).
 Proof. by rewrite (inj_eq (mulrIz _)) ?oner_eq0. Qed.
 
 Lemma ler0z n : (0 <= n%:~R :> R) = (0 <= n).
-Proof. by rewrite pmulrz_rge0. Qed.
+Proof. by rewrite pmulrz_rge0 // ltr01. Qed.
 
 Lemma ltr0z n : (0 < n%:~R :> R) = (0 < n).
-Proof. by rewrite pmulrz_rgt0. Qed.
+Proof. by rewrite pmulrz_rgt0 // ltr01. Qed.
 
 Lemma lerz0 n : (n%:~R <= 0 :> R) = (n <= 0).
-Proof. by rewrite pmulrz_rle0. Qed.
+Proof. by rewrite pmulrz_rle0 // ltr01. Qed.
 
 Lemma ltrz0 n : (n%:~R < 0 :> R) = (n < 0).
-Proof. by rewrite pmulrz_rlt0. Qed.
+Proof. by rewrite pmulrz_rlt0 // ltr01. Qed.
 
 Lemma ler1z (n : int) : (1 <= n%:~R :> R) = (1 <= n).
 Proof. by rewrite -[1]/(1%:~R) ler_int. Qed.
@@ -1540,7 +1545,7 @@ Lemma abszE (m : int) : `|m| = `|m|%R :> int. Proof. by []. Qed.
 
 Lemma absz0 : `|0%R| = 0. Proof. by []. Qed.
 
-Lemma abszN m : `|- m| = `|m|. Proof. by case: (normrN m). Qed.
+Lemma abszN m : `|- m| = `|m|. Proof. by case: (Num.normrN m). Qed.  (* FIXME: was normrN (without Num ?), missing Export ? *)
 
 Lemma absz_eq0 m : (`|m| == 0) = (m == 0%R). Proof. by case: (intP m). Qed.
 
@@ -1601,7 +1606,7 @@ End Absz.
 Module Export IntDist.
 
 Notation "m - n" :=
-  (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
+  (@GRing.add _ (m%N : int) (@GRing.opp _ (n%N : int))) : distn_scope.
 Arguments absz m%distn_scope.
 Notation "`| m |" := (absz m) : nat_scope.
 Coercion Posz : nat >-> int.
@@ -1668,7 +1673,7 @@ wlog le_m31 : m1 m3 / (m3 <= m1)%R.
 rewrite ger0_norm ?subr_ge0 // orb_idl => [|/andP[le_m12 le_m23]]; last first.
   by have /eqP->: m2 == m3; rewrite ?lexx // eq_le le_m23 (le_trans le_m31).
 rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -[X in X && _]subr_ge0.
-by apply: leif_add; apply/real_leif_norm/num_real.
+apply: leif_add; apply/real_leif_norm/num_real.
 Qed.
 
 Lemma leqif_add_dist n1 n2 n3 :
@@ -1696,7 +1701,7 @@ Lemma intr_norm m : `|m|%:~R = `|m%:~R : R|.
 Proof. by rewrite {2}[m]intEsign rmorphMsign normrMsign abszE normr_nat. Qed.
 
 Lemma normrMz m (x : R) : `|x *~ m| = `|x| *~ `|m|.
-Proof. by rewrite -mulrzl normrM -intr_norm mulrzl. Qed.
+Proof. by rewrite -mulrzl Num.normrM -intr_norm mulrzl. Qed.  (* FIXME: was normrN (without Num ?), missing Export ? *)
 
 Lemma expN1r (i : int) : (-1 : R) ^ i = (-1) ^+ `|i|.
 Proof.
