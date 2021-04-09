@@ -62,7 +62,7 @@ solvable/gseries.v
 # solvable/hall.v
 # solvable/jordanholder.v
 # solvable/maximal.v
-# solvable/nilpotent.v
+solvable/nilpotent.v
 solvable/pgroup.v
 # solvable/primitive_action.v
 # solvable/sylow.v
