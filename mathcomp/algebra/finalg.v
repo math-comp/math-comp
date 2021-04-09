@@ -350,8 +350,8 @@ Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type_ R) : finGroupType
 
 Module LmoduleExports.
 Notation finLmodType R := (Lmodule.type R).
-Notation "[ 'finLmodType' 'of' T ]" := (Lmodule.clone _ T _)
-  (at level 0, format "[ 'finLmodType'  'of'  T ]") : form_scope.
+Notation "[ 'finLmodType' R 'of' T ]" := (Lmodule.clone R T _)
+  (at level 0, format "[ 'finLmodType'  R  'of'  T ]") : form_scope.
 End LmoduleExports.
 HB.export LmoduleExports.
 
@@ -372,8 +372,8 @@ Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type_ R) :=
 
 Module LalgebraExports.
 Notation finLalgType R := (Lalgebra.type R).
-Notation "[ 'finLalgType' 'of' T ]" := (Lalgebra.clone _ T _)
-  (at level 0, format "[ 'finLalgType'  'of'  T ]") : form_scope.
+Notation "[ 'finLalgType' R 'of' T ]" := (Lalgebra.clone R T _)
+  (at level 0, format "[ 'finLalgType'  R  'of'  T ]") : form_scope.
 End LalgebraExports.
 HB.export LalgebraExports.
 
@@ -394,8 +394,8 @@ Coercion Algebra_to_finGroup (R : ringType) (M : Algebra.type_ R) :=
 
 Module AlgebraExports.
 Notation finAlgType R := (Algebra.type R).
-Notation "[ 'finAlgType' 'of' T ]" := (Algebra.clone _ T _)
-  (at level 0, format "[ 'finAlgType'  'of'  T ]") : form_scope.
+Notation "[ 'finAlgType' R 'of' T ]" := (Algebra.clone R T _)
+  (at level 0, format "[ 'finAlgType'  R  'of'  T ]") : form_scope.
 End AlgebraExports.
 HB.export AlgebraExports.
 
@@ -416,8 +416,8 @@ Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type_ R) :=
 
 Module UnitAlgebraExports.
 Notation finUnitAlgType R := (UnitAlgebra.type R).
-Notation "[ 'finUnitAlgType' 'of' T ]" := (UnitAlgebra.clone _ T _)
-  (at level 0, format "[ 'finUnitAlgType'  'of'  T ]") : form_scope.
+Notation "[ 'finUnitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T _)
+  (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
 
