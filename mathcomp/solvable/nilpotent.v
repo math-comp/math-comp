@@ -408,12 +408,12 @@ Qed.
 
 Lemma ucnSnR n G : 'Z_n.+1(G) = [set x in G | [~: [set x], G] \subset 'Z_n(G)].
 Proof.
-apply/setP=> x.
+(* apply/setP=> x; rewrite inE -(setIidPr (ucn_sub n.+1 G)) inE ucnSn. *)
 (* FIXME: before, we got a `rewrite inE` right after the apply/setP=> x.  *
  * However, this rewrite unfolds termes to strange internal HB names.     *
  * We fixed the issue by applying the inE more carefully, but the problem *
  * needs to be investigated.                                              *)
-rewrite -(setIidPr (ucn_sub n.+1 G)) [LHS]inE [RHS]inE ucnSn.
+apply/setP=> x; rewrite -(setIidPr (ucn_sub n.+1 G)) [LHS]inE [RHS]inE ucnSn.
 case Gx: (x \in G) => //=; have nZG := ucn_norm n G.
 rewrite -sub1set -sub_quotient_pre -?quotient_cents2 ?sub1set ?(subsetP nZG) //.
 by rewrite subsetI quotientS ?sub1set.
