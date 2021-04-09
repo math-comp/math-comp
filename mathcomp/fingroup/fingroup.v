@@ -1188,7 +1188,7 @@ Definition group_of of phant gT : predArgType := group_type.
 Local Notation groupT := (group_of (Phant gT)).
 Identity Coercion type_of_group : group_of >-> group_type.
 
-HB.instance Definition _ := SUB.copy group_type [subType for gval].
+HB.instance Definition _ := [subMixin for gval].
 HB.instance Definition _ := [Finite of group_type by <:].
 
 (* No predType or baseFinGroupType structures, as these would hide the *)

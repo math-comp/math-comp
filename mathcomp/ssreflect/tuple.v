@@ -44,7 +44,7 @@ Variables (n : nat) (T : Type).
 
 Structure tuple_of : Type := Tuple {tval :> seq T; _ : size tval == n}.
 
-Definition tuple_IsSUB := BuildSubTypeFor _ tval.
+Definition tuple_IsSUB := [subMixin for tval].
 HB.instance tuple_of tuple_IsSUB.
 
 Implicit Type t : tuple_of.
