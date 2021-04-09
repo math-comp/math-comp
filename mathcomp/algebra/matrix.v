@@ -1728,20 +1728,6 @@ Arguments is_diag_mxP {V m n A}.
 Arguments is_trig_mx {V m n}.
 Arguments is_trig_mxP {V m n A}.
 
-Section FinZmodMatrix.
-Variables (V : finZmodType) (m n : nat).
-Local Notation MV := 'M[V]_(m, n).
-
-#[verbose]
-HB.instance Definition _ := [Finite of MV by <:].
-(*NB: CYRILME*)
-
-(*#[verbose] HB.instance Definition _ := FinRing.Zmodule.on MV. REMOVEME*)
-
-HB.instance Definition _ := [finGroupMixin of MV for +%R].
-
-End FinZmodMatrix.
-
 (* Parametricity over the additive structure. *)
 Section MapZmodMatrix.
 
@@ -2678,35 +2664,21 @@ Qed.
 
 HB.instance Definition _ (M : countZmodType) m n :=
   [Countable of 'M[M]_(m, n) by <:].
-(*was Canonical matrix_countZmodType (M : countZmodType) m n :=
-  [countZmodType of 'M[M]_(m, n)].*)
+HB.instance Definition _ (R : countRingType) n :=
+  [Countable of 'M[R]_n.+1 by <:].
 
-HB.instance Definition _ (M : countRingType) m n :=
-  [Countable of 'M[M]_(m, n) by <:].
-(*was Canonical matrix_countRingType (R : countRingType) n :=
-  [countRingType of 'M[R]_n.+1].*)
+Section FinZmodMatrix.
+Variables (V : finZmodType) (m n : nat).
+Local Notation MV := 'M[V]_(m, n).
 
-HB.instance Definition _ (M : finRingType) m n :=
-  [Finite of 'M[M]_(m, n) by <:].
+#[verbose] HB.instance Definition _ := [Finite of MV by <:].
 
-(*HB.instance Definition matrix_finLmodType (R : finRingType) m n :=
-  [finLmodType of 'M[R]_(m, n)].
-*)
-(*was Canonical matrix_finLmodType (R : finRingType) m n :=
-  [finLmodType R of 'M[R]_(m, n)].*)
+HB.instance Definition _ := [finGroupMixin of MV for +%R].
 
-(* STOP
+End FinZmodMatrix.
 
-Check forall (R : finRingType) (n' : nat),
-  GRing.Ring.copy 'M[R]_n'.+1 (sub_type _).
-
-Canonical matrix_finRingType (R : finRingType) n' :=
-  [finRingType of 'M[R]_n'.+1].
-(*was Canonical matrix_finRingType (R : finRingType) n' :=
-  Eval hnf in [finRingType of 'M[R]_n'.+1].*)
-
-Canonical matrix_finLalgType (R : finRingType) n' :=
-  [finLalgType R of 'M[R]_n'.+1].
+HB.instance Definition _ (R : finRingType) n :=
+  [Finite of 'M[R]_n.+1 by <:].
 
 (* Parametricity over the algebra structure. *)
 Section MapRingMatrix.
@@ -3063,8 +3035,7 @@ rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [|f Uf].
     by exists in_Sn => /= f Uf; first apply: val_inj; apply: insubdK.
   apply: eq_big => /= [s | s _]; rewrite ?(valP s) // big_distrr /=.
   rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
-  rewrite big_split /= -mulrA [in RHS](mulrCA _ (_ ^+ t)) 3!mulrA.
-(*TODO: this is bad  rewrite big_split /= mulrA mulrCA mulrA mulrCA mulrA.*)
+  rewrite big_split /= mulrA mulrCA mulrA mulrCA mulrA.
   rewrite -signr_addb odd_permM !pvalE; congr (_ * _); symmetry.
   by rewrite (reindex_perm s); apply: eq_bigr => i; rewrite permM.
 transitivity (\det (\matrix_(i, j) B (f i) j) * \prod_i A i (f i)).
@@ -3220,10 +3191,9 @@ Arguments comm_mx_scalar {R n}.
 Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
 
-(* TODO
+(* STOP
 Canonical matrix_finAlgType (R : finComRingType) n' :=
   [finAlgType R of 'M[R]_n'.+1].
-*)
 
 Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
@@ -4544,4 +4514,5 @@ Lemma mul_mxdiag_mxblock {R : ringType} {p q : nat}
 Proof.
 by rewrite !mxblockEv mul_mxdiag_mxcol; under eq_mxcol do rewrite mul_mxrow.
 Qed.
+*)
 *)
