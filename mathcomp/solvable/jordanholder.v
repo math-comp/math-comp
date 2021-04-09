@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype bigop finset fingroup morphism.
 From mathcomp Require Import automorphism quotient action gseries.
@@ -78,19 +79,9 @@ Section Sections.
 Variables (gT : finGroupType).
 Implicit Types (G : {group gT}) (s : section gT).
 
-Canonical section_subType := Eval hnf in [newType for @pair_of_section gT].
-Definition section_eqMixin := Eval hnf in [eqMixin of section gT by <:].
-Canonical section_eqType := Eval hnf in EqType (section gT) section_eqMixin.
-Definition section_choiceMixin := [choiceMixin of section gT by <:].
-Canonical section_choiceType :=
-  Eval hnf in ChoiceType (section gT) section_choiceMixin.
-Definition section_countMixin := [countMixin of section gT by <:].
-Canonical section_countType :=
-  Eval hnf in CountType (section gT) section_countMixin.
-Canonical section_subCountType := Eval hnf in [subCountType of section gT].
-Definition section_finMixin := [finMixin of section gT by <:].
-Canonical section_finType := Eval hnf in FinType (section gT) section_finMixin.
-Canonical section_subFinType := Eval hnf in [subFinType of section gT].
+Canonical section_subType := [newMixin for (@pair_of_section gT)].
+(* FIXME : HB.instance was working when the Mixin Notation was written in this file *)
+HB.instance Definition _ := [Finite of section gT by <:].
 Canonical section_group.
 
 (* Isomorphic sections *)

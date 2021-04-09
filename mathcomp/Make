@@ -60,7 +60,7 @@ solvable/finmodule.v
 solvable/gfunctor.v
 solvable/gseries.v
 # solvable/hall.v
-# solvable/jordanholder.v
+solvable/jordanholder.v
 # solvable/maximal.v
 solvable/nilpotent.v
 solvable/pgroup.v
