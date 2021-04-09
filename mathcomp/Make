@@ -59,7 +59,7 @@ solvable/finmodule.v
 # solvable/frobenius.v
 solvable/gfunctor.v
 solvable/gseries.v
-# solvable/hall.v
+solvable/hall.v
 solvable/jordanholder.v
 solvable/maximal.v
 solvable/nilpotent.v
