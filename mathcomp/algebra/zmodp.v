@@ -353,27 +353,17 @@ Proof. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
 
 End F_prime.
 
-(* FIX ME : don't know how to do that 
-Lemma Fp_fieldMixin : GRing.Field.mixin_of [the unitRingType of 'F_p].
+Lemma Fp_fieldMixin : GRing.ComUnitRing_IsField 'F_p.
 Proof.
-move=> x nzx; rewrite qualifE /= prime_coprime ?gtnNdvd ?lt0n //.
+constructor => x nzx.
+(* FIXME: remove the subdef *)
+rewrite qualifE /GRing.unit_subdef/=.
+rewrite prime_coprime ?gtnNdvd ?lt0n //.
 case: (ltnP 1 p) => [lt1p | ]; last by case: p => [|[|p']].
 by rewrite Zp_cast ?prime_gt1 ?pdiv_prime.
 Qed.
-*)
-Lemma Fp_mulVf (x : 'F_p) : x != 0 -> x^-1 * x = 1.
-Admitted.
 
-Lemma Fp_inv0 : 0^-1 = 0 :> 'F_p.
-Proof. by []. Qed.
-
-(* FIX ME HB.instance fails *)
-Check
-  GRing.ComRing_IsField.Build 'F_p Fp_mulVf Fp_inv0.
-
-Fail HB.instance Definition _ := 
-  GRing.ComRing_IsField.Build 'F_p Fp_mulVf Fp_inv0.
-
+HB.instance Definition _ := Fp_fieldMixin.
 
 (*
 Definition Fp_idomainMixin := FieldIdomainMixin Fp_fieldMixin.

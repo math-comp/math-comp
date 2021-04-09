@@ -4368,8 +4368,8 @@ move=> m x y xy0; apply/norP=> [[]] /m Ux /m.
 by rewrite -(unitrMr _ Ux) xy0 unitr0.
 Qed.
 
-HB.factory Definition ComUnitRing_isField R of ComUnitRing R := IsField R.
-HB.builders Context R (f : ComUnitRing_isField R).
+HB.factory Definition ComUnitRing_IsField R of ComUnitRing R := IsField R.
+HB.builders Context R (f : ComUnitRing_IsField R).
 
 (* TODO: factory aliases should
   re-export the operation of the original factory *)
@@ -4401,8 +4401,8 @@ Proof. by move=> x /negbNE/eqP->; exact: invr0. Qed.
 HB.instance Definition _ : ComRing_HasMulInverse R :=
   ComRing_HasMulInverse.Build R mulVf intro_unit inv_out.
 
-HB.instance Definition _ : ComUnitRing_isField R :=
-  ComUnitRing_isField.Build R (fun x x_neq_0 => x_neq_0).
+HB.instance Definition _ : ComUnitRing_IsField R :=
+  ComUnitRing_IsField.Build R (fun x x_neq_0 => x_neq_0).
 
 HB.end.
 
