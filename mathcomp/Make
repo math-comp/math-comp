@@ -55,7 +55,7 @@ solvable/commutator.v
 solvable/cyclic.v
 # solvable/extraspecial.v
 # solvable/extremal.v
-# solvable/finmodule.v
+solvable/finmodule.v
 # solvable/frobenius.v
 solvable/gfunctor.v
 solvable/gseries.v
