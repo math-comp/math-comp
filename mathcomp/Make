@@ -46,7 +46,7 @@ fingroup/morphism.v
 fingroup/perm.v
 fingroup/presentation.v
 fingroup/quotient.v
-# solvable/abelian.v
+solvable/abelian.v
 # solvable/all_solvable.v
 solvable/alt.v
 solvable/burnside_app.v
