@@ -343,10 +343,7 @@ Notation "\row_ j E" := (\row_(j < _) E) : ring_scope.
 HB.instance Definition _ (R : eqType) m n := [Equality of 'M[R]_(m, n) by <:].
 HB.instance Definition _ (R : choiceType) m n := [Choice of 'M[R]_(m, n) by <:].
 HB.instance Definition _ (R : countType) m n := [Countable of 'M[R]_(m, n) by <:].
-(*TODO: we can generate the finType w.o. generating eqType/choiceType/countType
-  before, but it hits us down the road, *)
 HB.instance Definition _ (R : finType) m n := [Finite of 'M[R]_(m, n) by <:].
-(*Check (forall (R : finType) m n, [the eqType of 'M[R]_(m, n)]).*)
 
 Lemma card_matrix (F : finType) m n : (#|{: 'M[F]_(m, n)}| = #|F| ^ (m * n))%N.
 Proof. by rewrite card_sub card_ffun card_prod !card_ord. Qed.
@@ -3191,9 +3188,8 @@ Arguments comm_mx_scalar {R n}.
 Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
 
-(* STOP
-Canonical matrix_finAlgType (R : finComRingType) n' :=
-  [finAlgType R of 'M[R]_n'.+1].
+#[verbose] HB.instance Definition _ (R : finComRingType) (n' : nat) :=
+  [Finite of 'M[R]_n'.+1 by <:].
 
 Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
@@ -3338,25 +3334,24 @@ End MatrixInv.
 
 Prenex Implicits unitmx invmx invmxK.
 
-(* TODO
-Canonical matrix_countUnitRingType (R : countComUnitRingType) n :=
-  [countUnitRingType of 'M[R]_n.+1].
-*)
+#[verbose] HB.instance Definition _ (R : countComUnitRingType) (n' : nat) :=
+  [Countable of 'M[R]_n'.+1 by <:].
 
+#[verbose] HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
+  [Finite of 'M[R]_n.+1 by <:].
 (* Finite inversible matrices and the general linear group. *)
 Section FinUnitMatrix.
 
 Variables (n : nat) (R : finComUnitRingType).
 
-(* TODO
-Canonical matrix_finUnitRingType n' :=
-  Eval hnf in [finUnitRingType of 'M[R]_n'.+1].
-*)
-
 Definition GLtype of phant R := {unit 'M[R]_n.-1.+1}.
 
 Coercion GLval ph (u : GLtype ph) : 'M[R]_n.-1.+1 :=
   let: FinRing.Unit A _ := u in A.
+
+HB.instance Definition _ := [subMixin for @GLval (Phant R)].
+(*NB: was Canonical GL_subType := [subType of {'GL_n[R]} for GLval].
+in the next section!*)
 
 End FinUnitMatrix.
 
@@ -3373,16 +3368,8 @@ Section GL_unit.
 
 Variables (n : nat) (R : finComUnitRingType).
 
-Canonical GL_subType := [subType of {'GL_n[R]} for GLval].
-Definition GL_eqMixin := Eval hnf in [eqMixin of {'GL_n[R]} by <:].
-Canonical GL_eqType := Eval hnf in EqType {'GL_n[R]} GL_eqMixin.
-Canonical GL_choiceType := Eval hnf in [choiceType of {'GL_n[R]}].
-Canonical GL_countType := Eval hnf in [countType of {'GL_n[R]}].
-Canonical GL_subCountType := Eval hnf in [subCountType of {'GL_n[R]}].
-Canonical GL_finType := Eval hnf in [finType of {'GL_n[R]}].
-Canonical GL_subFinType := Eval hnf in [subFinType of {'GL_n[R]}].
-Canonical GL_baseFinGroupType := Eval hnf in [baseFinGroupType of {'GL_n[R]}].
-Canonical GL_finGroupType := Eval hnf in [finGroupType of {'GL_n[R]}].
+HB.instance Definition _ := [Finite of {'GL_n[R]} by <:].
+HB.instance Definition _ := FinGroup.on {'GL_n[R]}.
 Definition GLgroup of phant R := [set: {'GL_n[R]}].
 Canonical GLgroup_group ph := Eval hnf in [group of GLgroup ph].
 
@@ -4514,5 +4501,3 @@ Lemma mul_mxdiag_mxblock {R : ringType} {p q : nat}
 Proof.
 by rewrite !mxblockEv mul_mxdiag_mxcol; under eq_mxcol do rewrite mul_mxrow.
 Qed.
-*)
-*)
