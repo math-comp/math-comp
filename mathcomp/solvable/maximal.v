@@ -1,10 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype finfun bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism quotient.
 From mathcomp Require Import action commutator gproduct gfunctor ssralg.
-From mathcomp Require Import finalg zmodp cyclic pgroup center gseries.
+From mathcomp Require Import countalg finalg zmodp cyclic pgroup center gseries.
 From mathcomp Require Import nilpotent sylow abelian finmodule.
 
 (******************************************************************************)
@@ -1125,7 +1126,7 @@ rewrite card_subcent_extraspecial // mulnCA Lagrange // mulnC.
 rewrite leq_mul ?subset_leq_card //; last by rewrite mul_subG ?subsetIl.
 apply: subset_trans (sub1G _); rewrite -tiUV !subsetI subsetIl subIset ?sVE //=.
 rewrite -(pmaxElem_LdivP p_pr maxF) -defF centM -!setIA -(setICA 'C(W)).
-rewrite setIC setIA setIS // subsetI cUV sub_LdivT.
+rewrite setIC (setIA G) setIS // subsetI cUV sub_LdivT.
 by case/and3P: (abelemS sVE abelE).
 Qed.
 
