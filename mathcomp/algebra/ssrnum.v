@@ -4290,7 +4290,6 @@ HB.factory Record IntegralDomain_IsNumDomain R of GRing.IntegralDomain R := {
   lt_def    : forall x y, (Rlt x y) = (y != x) && (Rle x y)
 }.
 
-#[verbose]
 HB.builders Context R of IntegralDomain_IsNumDomain R.
   Local Notation "x <= y" := (Rle x y) : ring_scope.
   Local Notation "x < y" := (Rlt x y) : ring_scope.
