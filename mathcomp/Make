@@ -63,7 +63,7 @@ solvable/gfunctor.v
 # solvable/jordanholder.v
 # solvable/maximal.v
 # solvable/nilpotent.v
-# solvable/pgroup.v
+solvable/pgroup.v
 # solvable/primitive_action.v
 # solvable/sylow.v
 ssreflect/all_ssreflect.v
