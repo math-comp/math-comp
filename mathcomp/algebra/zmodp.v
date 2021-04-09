@@ -101,15 +101,10 @@ Qed.
 Lemma Zp_addC : commutative Zp_add.
 Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
 
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   GRing.IsZmodule.Build 'I_p Zp_addA Zp_addC Zp_add0z Zp_addNz.
 
-(* FIXME don't know what to do this with out giving explicit stuff 
-Canonical Zp_baseFinGroupType := Eval hnf in [baseFinGroupType of 'I_p for +%R].
-Canonical Zp_finGroupType := Eval hnf in [finGroupType of 'I_p for +%R].
-*)
-HB.instance  Definition _ := 
-  IsMulGroup.Build 'I_p Zp_addA Zp_add0z Zp_addNz.
+HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 
 (* Ring operations *)
 

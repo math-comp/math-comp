@@ -85,7 +85,7 @@ Notation finZmodType := Zmodule.type.
 Notation "[ 'finZmodType' 'of' T ]" := (Zmodule.clone T _)
   (at level 0, format "[ 'finZmodType'  'of'  T ]") : form_scope.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
-    (IsMulGroup.Build R (@addrA R) (@add0r R) (@addNr R))
+    (IsMulGroup.Build R (@addrA _) (@add0r _) (@addNr _))
   (at level 0, format "[ 'finGroupMixin'  'of'  R  'for'  +%R ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
@@ -108,8 +108,7 @@ End AdditiveGroup.
 #[mathcomp]
 HB.structure Definition Ring := {R of GRing.Ring R & Finite R}.
 
-HB.instance Definition _ (R : Ring.type) :=
-  IsMulGroup.Build R (@addrA R) (@add0r R) (@addNr R).
+HB.instance Definition _ (R : Ring.type) := [finGroupMixin of R for +%R].
 Coercion Ring_to_baseFinGroup (R : Ring.type) := BaseFinGroup.clone R _.
 Coercion Ring_to_finGroup (R : Ring.type) := FinGroup.clone R _.
 
@@ -157,8 +156,7 @@ HB.end.
 #[mathcomp]
 HB.structure Definition ComRing := {R of GRing.ComRing R & Finite R}.
 
-HB.instance Definition _ (R : ComRing.type) :=
-  IsMulGroup.Build R (@addrA R) (@add0r R) (@addNr R).
+HB.instance Definition _ (R : ComRing.type) := [finGroupMixin of R for +%R].
 Coercion ComRing_to_baseFinGroup (R : ComRing.type) := BaseFinGroup.clone R _.
 Coercion ComRing_to_finGroup (R : ComRing.type) := FinGroup.clone R _.
 
@@ -339,6 +337,11 @@ HB.structure Definition Lmodule (R : ringType) :=
 (* FIXME
 HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
   IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
+(*
+NB: should become:
+HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
+  [finGroupMixin of M for +%R].
+*)
 Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type R) :=
   BaseFinGroup.clone M _.
 Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type R) :=
@@ -359,6 +362,7 @@ HB.structure Definition Lalgebra (R : ringType) :=
 (* FIXME
 HB.instance Definition _ (R : ringType) (M : Lalgebra.type R) :=
   IsMulGroup.Build M (@addrA M) (@add0r M) (@addNr M).
+(* NB: use the [finMixinGroup of for] notation*)
 Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type R) :=
   BaseFinGroup.clone M _.
 Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type R) :=
