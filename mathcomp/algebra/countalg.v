@@ -157,6 +157,11 @@ Notation "[ 'countClosedFieldType' 'of' T ]" := (ClosedField.clone T _)
 End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
+#[export]
+HB.instance Definition _ (R : countZmodType) := Zmodule.on R^o.
+#[export]
+HB.instance Definition _ (R : countRingType) := Ring.on R^o.
+
 End CountRing.
 
 Import CountRing.

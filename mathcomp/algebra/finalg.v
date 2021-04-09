@@ -421,6 +421,15 @@ Notation "[ 'finUnitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T _)
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
 
+Module RegularExports.
+HB.instance Definition _ (R : finZmodType) := Zmodule.on R^o.
+HB.instance Definition _ (R : finRingType) := Ring.on R^o.
+HB.instance Definition _ (R : finComRingType) := Ring.on R^o.
+HB.instance Definition _ (R : finUnitRingType) := Ring.on R^o.
+(* TODO: finish*)
+End RegularExports.
+HB.export RegularExports.
+
 Module Theory.
 
 Definition zmod1gE := zmod1gE.
