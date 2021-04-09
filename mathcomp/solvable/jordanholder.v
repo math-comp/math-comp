@@ -79,7 +79,7 @@ Section Sections.
 Variables (gT : finGroupType).
 Implicit Types (G : {group gT}) (s : section gT).
 
-Canonical section_subType := [newMixin for (@pair_of_section gT)].
+HB.instance Definition _ := [newMixin for (@pair_of_section gT)].
 (* FIXME : HB.instance was working when the Mixin Notation was written in this file *)
 HB.instance Definition _ := [Finite of section gT by <:].
 Canonical section_group.
