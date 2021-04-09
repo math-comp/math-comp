@@ -2513,7 +2513,7 @@ Section ComRingTheory.
 Variable R : comRingType.
 Implicit Types x y : R.
 
-Canonical mul_comoid := Monoid.ComLaw (@mulrC R).
+Canonical mul_comoid := @Monoid.ComLaw R(*NB: we need to do avoid to avoid an expansion that changes the behavior of some rewrite's*) _ _ (@mulrC R).
 Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
