@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly.
@@ -127,239 +128,85 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import Order.TTheory GRing.Theory.
+Import (* Order.TTheory *) GRing.Theory.
 
 Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record normed_mixin_of (R T : zmodType)
-       (Rorder : Order.POrder.mixin_of (Equality.class R))
-       (le_op := Order.POrder.le Rorder)
-  := NormedMixin {
-  norm_op : T -> R;
-  _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
-  _ : forall x, norm_op x = 0 -> x = 0;
-  _ : forall x n, norm_op (x *+ n) = norm_op x *+ n;
-  _ : forall x, norm_op (- x) = norm_op x;
+#[mathcomp]
+HB.structure Definition POrderedZmodule d :=
+  { R of Order.IsPOrdered d R & GRing.Zmodule R }.
+
+(* FIXME: this is the right Zmodule_IsNormed mixin: *)
+(* HB.mixin Record Zmodule_IsNormed d (R : POrderedZmodule.type d) M
+         of GRing.Zmodule M := {
+  norm_op : M -> R;
+  ler_norm_add : forall x y, norm_op (x + y) <= norm_op x + norm_op y;
+  normr0_eq0 : forall x, norm_op x = 0 -> x = 0;
+  normrMn : forall x n, norm_op (x *+ n) = norm_op x *+ n;
+  normrN : forall x, norm_op (- x) = norm_op x;
+}. *)
+HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M & GRing.Zmodule M := {
+  norm : M -> M;
+  ler_norm_add : forall x y, norm (x + y) <= norm x + norm y;
+  norm0_eq0 : forall x, norm x = 0 -> x = 0;
+  normMn : forall x n, norm (x *+ n) = norm x *+ n;
+  normN : forall x, norm (- x) = norm x;
 }.
 
-Record mixin_of (R : ringType)
-       (Rorder : Order.POrder.mixin_of (Equality.class R))
-       (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
-       (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
-  := Mixin {
-  _ : forall x y, lt_op 0 x -> lt_op 0 y -> lt_op 0 (x + y);
-  _ : forall x y, le_op 0 x -> le_op 0 y -> le_op x y || le_op y x;
-  _ : {morph norm_op : x y / x * y};
-  _ : forall x y, (le_op x y) = (norm_op (y - x) == y - x);
-}.
+#[mathcomp]
+(* FIXME additional attribute when the structure is fixed: infer(R) *)
+HB.structure Definition NormedZmodule d :=
+  { M of Zmodule_IsNormed d M & POrderedZmodule d M}.
+Arguments norm {R T} x : rename.
 
-Local Notation ring_for T b := (@GRing.Ring.Pack T b).
-
-Module NumDomain.
-
-Section ClassDef.
-Set Primitive Projections.
-Record class_of T := Class {
-  base : GRing.IntegralDomain.class_of T;
-  order_mixin : Order.POrder.mixin_of (Equality.class (ring_for T base));
-  normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
-  mixin : mixin_of normed_mixin;
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Local Coercion order_base T (class_of_T : class_of T) :=
-  @Order.POrder.Class _ class_of_T (order_mixin class_of_T).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack (b0 : GRing.IntegralDomain.class_of _) om0
-           (nm0 : @normed_mixin_of (ring_for T b0) (ring_for T b0) om0)
-           (m0 : @mixin_of (ring_for T b0) om0 nm0) :=
-  fun bT (b : GRing.IntegralDomain.class_of T)
-      & phant_id (@GRing.IntegralDomain.class bT) b =>
-  fun om & phant_id om0 om =>
-  fun nm & phant_id nm0 nm =>
-  fun m & phant_id m0 m =>
-  @Pack T (@Class T b om nm m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition porder_zmodType := @GRing.Zmodule.Pack porderType class.
-Definition porder_ringType := @GRing.Ring.Pack porderType class.
-Definition porder_comRingType := @GRing.ComRing.Pack porderType class.
-Definition porder_unitRingType := @GRing.UnitRing.Pack porderType class.
-Definition porder_comUnitRingType := @GRing.ComUnitRing.Pack porderType class.
-Definition porder_idomainType := @GRing.IntegralDomain.Pack porderType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion base  : class_of >-> GRing.IntegralDomain.class_of.
-Coercion order_base : class_of >-> Order.POrder.class_of.
-Coercion normed_mixin : class_of >-> normed_mixin_of.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Canonical porder_zmodType.
-Canonical porder_ringType.
-Canonical porder_comRingType.
-Canonical porder_unitRingType.
-Canonical porder_comUnitRingType.
-Canonical porder_idomainType.
-Notation numDomainType := type.
-Notation NumDomainType T m := (@pack T _ _ _ m _ _ id _ id _ id _ id).
-Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
-  (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'numDomainType' 'of' T ]" := (@clone T _ _ id)
-  (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
-End Exports.
-
-End NumDomain.
-Import NumDomain.Exports.
-
-Local Notation num_for T b := (@NumDomain.Pack T b).
-
-Module NormedZmodule.
-
-Section ClassDef.
-
-Variable R : numDomainType.
-
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base : GRing.Zmodule.class_of T;
-  mixin : @normed_mixin_of R (@GRing.Zmodule.Pack T base) (NumDomain.class R);
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> GRing.Zmodule.class_of.
-Local Coercion mixin : class_of >-> normed_mixin_of.
-
-Structure type (phR : phant R) :=
-  Pack { sort; _ : class_of sort }.
-Local Coercion sort : type >-> Sortclass.
-
-Variables (phR : phant R) (T : Type) (cT : type phR).
-
-Definition class := let: Pack _ c := cT return class_of cT in c.
-Definition clone c of phant_id class c := @Pack phR T c.
-Definition pack b0 (m0 : @normed_mixin_of R (@GRing.Zmodule.Pack T b0)
-                                          (NumDomain.class R)) :=
-  Pack phR (@Class T b0 m0).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-
-End ClassDef.
-
-(* TODO: Ideally,`numDomain_normedZmodType` should be located in              *)
-(* `NumDomain_joins`. Currently, it's located here to make `hierarchy.ml` can *)
-(* recognize that `numDomainType` inherits `normedZmodType`.                  *)
-Definition numDomain_normedZmodType (R : numDomainType) : type (Phant R) :=
-  @Pack R (Phant R) R (Class (NumDomain.normed_mixin (NumDomain.class R))).
-
-Module Exports.
-Coercion base : class_of >-> GRing.Zmodule.class_of.
-Coercion mixin : class_of >-> normed_mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion numDomain_normedZmodType : NumDomain.type >-> type.
-Canonical numDomain_normedZmodType.
-Notation normedZmodType R := (type (Phant R)).
-Notation NormedZmodType R T m := (@pack _ (Phant R) T _ m).
-Notation NormedZmodMixin := Mixin.
-Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
+Module NormedZmoduleExports.
+Notation normedZmodType (* R *) := (NormedZmodule.type (* R *)).
+Notation NormedZmodType (* R *) T m := (NormedZmodule.pack _ (* R *) T m).
+(* Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
   (@clone _ (Phant R) T cT _ idfun)
   (at level 0, format "[ 'normedZmodType'  R  'of'  T  'for'  cT ]") :
   form_scope.
 Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
-  (at level 0, format "[ 'normedZmodType'  R  'of'  T ]") : form_scope.
-End Exports.
+  (at level 0, format "[ 'normedZmodType'  R  'of'  T ]") : form_scope. *)
+End NormedZmoduleExports.
+HB.export NormedZmoduleExports.
 
-End NormedZmodule.
-Import NormedZmodule.Exports.
+(* FIXME: this is the right IsNumDomain mixin: *)
+(* HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
+  & NormedZmodule d [the POrderedZmodule.type _ of R] R := {
+ _ : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+ _ : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
+ _ : {morph (norm_op : R -> R) : x y / x * y};
+ _ : forall x y : R, (x <= y) = (norm_op (y - x) == (y - x));
+}. *)
+HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
+   & NormedZmodule d R := {
+  _ : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+  _ : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
+  _ : {morph (norm : R -> R) : x y / x * y};
+  _ : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
+}.
+#[mathcomp]
+HB.structure Definition NumDomain :=
+  { R of IsNumDomain ring_display R &
+    NormedZmodule ring_display R & GRing.Zmodule R }.
 
-Module NumDomain_joins.
-Import NumDomain.
-Section NumDomain_joins.
-
-Variables (T : Type) (cT : type).
-
-Notation class := (class cT).
-(* Definition normedZmodType : normedZmodType cT := *)
-(*   @NormedZmodule.Pack *)
-(*      cT (Phant cT) cT *)
-(*      (NormedZmodule.Class (NumDomain.normed_mixin class)). *)
-Notation normedZmodType := (NormedZmodule.numDomain_normedZmodType cT).
-Definition normedZmod_ringType :=
-  @GRing.Ring.Pack normedZmodType class.
-Definition normedZmod_comRingType :=
-  @GRing.ComRing.Pack normedZmodType class.
-Definition normedZmod_unitRingType :=
-  @GRing.UnitRing.Pack normedZmodType class.
-Definition normedZmod_comUnitRingType :=
-  @GRing.ComUnitRing.Pack normedZmodType class.
-Definition normedZmod_idomainType :=
-  @GRing.IntegralDomain.Pack normedZmodType class.
-Definition normedZmod_porderType :=
-  @Order.POrder.Pack ring_display normedZmodType class.
-
-End NumDomain_joins.
-
-Module Exports.
-(* Coercion normedZmodType : type >-> NormedZmodule.type. *)
-(* Canonical normedZmodType. *)
-Canonical normedZmod_ringType.
-Canonical normedZmod_comRingType.
-Canonical normedZmod_unitRingType.
-Canonical normedZmod_comUnitRingType.
-Canonical normedZmod_idomainType.
-Canonical normedZmod_porderType.
-End Exports.
-End NumDomain_joins.
-Export NumDomain_joins.Exports.
+Module NumDomainExports.
+Bind Scope ring_scope with NumDomain.sort.
+Notation numDomainType := NumDomain.type.
+Notation NumDomainType T m := (NumDomain.pack _ T m).
+Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (NumDomain.clone _ T cT)
+  (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone _ T _)
+  (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
+End NumDomainExports.
+HB.export NumDomainExports.
 
 Module Import Def.
 
-Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
-  nosimpl (norm_op (NormedZmodule.class T)).
-Arguments normr {R T} x.
+Notation normr := norm.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)
@@ -402,7 +249,6 @@ Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
 End Def. End Def.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
-Notation norm := normr (only parsing).
 Notation le := ler (only parsing).
 Notation lt := ltr (only parsing).
 Notation ge := ger (only parsing).
@@ -508,6 +354,8 @@ Definition real_closed_axiom : Prop :=
     a <= b -> p.[a] <= 0 <= p.[b] -> exists2 x, a <= x <= b & root p x.
 
 End ExtensionAxioms.
+
+(*
 
 (* The rest of the numbers interface hierarchy. *)
 Module NumField.
@@ -4426,7 +4274,7 @@ Notation "n .-root" := (nthroot n) (at level 2, format "n .-root") : ring_scope.
 Notation "n .-root" := (nthroot n) (only parsing) : ring_scope.
 Notation sqrtC := 2.-root.
 
-Definition Re x := (x + x^*) / 2%:R.
+Definition Re x := (x + x^* ) / 2%:R.
 Definition Im x := 'i * (x^* - x) / 2%:R.
 Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
 Notation "'Im z" := (Im z) (at level 10, z at level 8) : ring_scope.
@@ -4438,7 +4286,7 @@ Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
 Lemma mul_conjC_ge0 x : 0 <= x * x^*.
 Proof. by rewrite -normCK exprn_ge0. Qed.
 
-Lemma mul_conjC_gt0 x : (0 < x * x^*) = (x != 0).
+Lemma mul_conjC_gt0 x : (0 < x * x^* ) = (x != 0).
 Proof.
 have [->|x_neq0] := eqVneq; first by rewrite rmorph0 mulr0.
 by rewrite -normCK exprn_gt0 ?normr_gt0.
@@ -4447,7 +4295,7 @@ Qed.
 Lemma mul_conjC_eq0 x : (x * x^* == 0) = (x == 0).
 Proof. by rewrite -normCK expf_eq0 normr_eq0. Qed.
 
-Lemma conjC_ge0 x : (0 <= x^*) = (0 <= x).
+Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
 Proof.
 wlog suffices: x / 0 <= x -> 0 <= x^*.
   by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
@@ -4728,7 +4576,7 @@ have [w wn1 ltRw0] := neg_unity_root n_gt1.
 wlog leRI0yw: w wn1 ltRw0 / 0 <= 'Re y * 'Im w.
   move=> IHw; have: 'Re y * 'Im w \is real by rewrite rpredM.
   case/real_ge0P=> [|/ltW leRIyw0]; first exact: IHw.
-  apply: (IHw w^*); rewrite ?Re_conj ?Im_conj ?mulrN ?oppr_ge0 //.
+  apply: (IHw w^* ); rewrite ?Re_conj ?Im_conj ?mulrN ?oppr_ge0 //.
   by rewrite -rmorphX wn1 rmorph1.
 exists (w * y); first by rewrite exprMn wn1 mul1r rootCK.
 rewrite [w]Crect [y]Crect mulC_rect.
@@ -4748,7 +4596,7 @@ have [z zn_x leR0z]: exists2 z, z ^+ n = x & 'Re z >= 0.
 without loss leI0z: z zn_x leR0z / 'Im z >= 0.
   move=> IHz; have: 'Im z \is real by [].
   case/real_ge0P=> [|/ltW leIz0]; first exact: IHz.
-  apply: (IHz z^*); rewrite ?Re_conj ?Im_conj ?oppr_ge0 //.
+  apply: (IHz z^* ); rewrite ?Re_conj ?Im_conj ?oppr_ge0 //.
   by rewrite -rmorphX zn_x conj_Creal.
 by apply: le_trans leR0z _; rewrite -Re_y ?rootC_Re_max ?ltr0_real.
 Qed.
@@ -4918,7 +4766,7 @@ apply/Creal_ImP/le_anti;
 by rewrite leI0x -oppr_ge0 -raddfN -defNx Im_rootC_ge0.
 Qed.
 
-Lemma normC_def x : `|x| = sqrtC (x * x^*).
+Lemma normC_def x : `|x| = sqrtC (x * x^* ).
 Proof. by rewrite -normCK sqrCK. Qed.
 
 Lemma norm_conjC x : `|x^*| = `|x|.
@@ -4944,7 +4792,7 @@ have uE z: (`|u z| = 1) * (`|z| * u z = z).
 have [->|nz_x] := eqVneq x 0; first by exists (u y); rewrite uE ?normr0 ?mul0r.
 exists (u x); rewrite uE // /u (negPf nz_x); congr (_ , _).
 have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
-  apply/(addrI (x * x^*))/(addIr (y * y^*)); rewrite -2!{1}normCK -sqrrD.
+  apply/(addrI (x * x^* ))/(addIr (y * y^* )); rewrite -2!{1}normCK -sqrrD.
   by rewrite addrA -addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
@@ -5382,11 +5230,15 @@ End Exports.
 
 End RealLtMixin.
 Import RealLtMixin.Exports.
+*)
 
+Module Exports. HB.reexport. End Exports.
 End Num.
+Export Num.Exports.
 
 Export Num.NumDomain.Exports Num.NormedZmodule.Exports.
-Export Num.NumDomain_joins.Exports.
+
+(*
 Export Num.NumField.Exports Num.ClosedField.Exports.
 Export Num.RealDomain.Exports Num.RealField.Exports.
 Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
@@ -5395,3 +5247,4 @@ Export Num.NumMixin.Exports Num.RealMixin.Exports.
 Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
 
 Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.
+*)
