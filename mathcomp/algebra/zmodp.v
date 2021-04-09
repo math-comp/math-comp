@@ -364,26 +364,6 @@ by rewrite Zp_cast ?prime_gt1 ?pdiv_prime.
 Qed.
 
 HB.instance Definition _ := Fp_fieldMixin.
+HB.instance Definition _ := FinRing.IsField.Build 'F_p.
 
-(*
-Definition Fp_idomainMixin := FieldIdomainMixin Fp_fieldMixin.
-
-Canonical Fp_idomainType := Eval hnf in IdomainType 'F_p  Fp_idomainMixin.
-Canonical Fp_finIdomainType := Eval hnf in [finIdomainType of 'F_p].
-Canonical Fp_fieldType := Eval hnf in FieldType 'F_p Fp_fieldMixin.
-Canonical Fp_finFieldType := Eval hnf in [finFieldType of 'F_p].
-Canonical Fp_decFieldType :=
-  Eval hnf in [decFieldType of 'F_p for Fp_finFieldType].
-*)
 End PrimeField.
-
-(* 
-Canonical Zp_countZmodType m := [countZmodType of 'I_m.+1].
-Canonical Zp_countRingType m := [countRingType of 'I_m.+2].
-Canonical Zp_countComRingType m := [countComRingType of 'I_m.+2].
-Canonical Zp_countUnitRingType m := [countUnitRingType of 'I_m.+2].
-Canonical Zp_countComUnitRingType m := [countComUnitRingType of 'I_m.+2].
-Canonical Fp_countIdomainType p := [countIdomainType of 'F_p].
-Canonical Fp_countFieldType p := [countFieldType of 'F_p].
-Canonical Fp_countDecFieldType p := [countDecFieldType of 'F_p].
-*)
