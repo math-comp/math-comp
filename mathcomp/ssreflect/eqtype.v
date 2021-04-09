@@ -665,18 +665,28 @@ Notation "[ 'subType' 'of' U 'for' v ]" :=
 Notation "[ 'subType' 'of' U ]" := (SUB.clone _ _ U _)
  (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
 
-Notation BuildSubTypeFor T v :=
-  (@IsSUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect).
+Notation "[ 'subMixin' 'for' v ]" :=
+  (@IsSUB.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
+  (only parsing) : form_scope.
 
-Notation "[ 'subMixin' 'for' v ]" := (BuildSubTypeFor _ v)
-  (at level 0, format "[ 'subMixin'  'for'  v ]") : form_scope.
+Notation "[ 'subMixin' 'for' v ]" := (@IsSUB.phant_Build _ _ _ v _ _ _)
+  (only printing, at level 0, format "[ 'subMixin'  'for'  v ]") : form_scope.
+
+Notation "[ 'subMixin' 'of'  T  'for' v ]" :=
+  (@IsSUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect)
+  (only parsing) : form_scope.
+
+Notation "[ 'subMixin' 'for' v 'by' rec ]" :=
+ (@IsSUB.phant_Build _ _ _ v _ rec vrefl)
+ (at level 0, format "[ 'subMixin'  'for'  v  'by'  rec ]") : form_scope.
 
 Definition NewType T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
   SubType U v (fun x _ => c x) Urec' sk.
 Arguments NewType [T U].
 
-Reserved Notation "[ 'newType' 'for' v ]" (at level 0, format "[ 'newType'  'for'  v ]").
+Reserved Notation "[ 'newType' 'for' v ]"
+  (at level 0, format "[ 'newType'  'for'  v ]").
 
 Notation "[ 'newType' 'for' v ]" := (NewType v _ inlined_new_rect vrefl_rect)
  (only parsing) : form_scope.
@@ -687,14 +697,18 @@ Notation "[ 'newType' 'for' v ]" := (NewType v _ _ vrefl_rect)
 Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
  (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.
 
-Notation BuildNewTypeFor T v :=
-  (@IsSUB.phant_Build _ _ T v _ inlined_new_rect vrefl_rect).
+Definition NewMixin T U v c Urec sk :=
+  let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
+  @IsSUB.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
 
-Notation "[ 'newMixin' 'for' v ]" := (@NewType _ _ v _ inlined_new_rect vrefl_rect)
-  (only parsing) : form_scope.
+Notation "[ 'newMixin' 'for' v ]" :=
+  (@NewMixin _ _ v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
-(* TODO : new notation of newMixin (QC & RA) *)
-(* Need an (only printing) notation, too ? *)
+Notation "[ 'newMixin' 'for' v ]" := (@NewMixin _ _ v _ _ _)
+  (only printing, at level 0, format "[ 'newMixin'  'for'  v ]") : form_scope.
+
+Notation "[ 'newMixin' 'of'  T  'for' v ]" :=
+  (@NewMixin _ T v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
 Definition innew T nT x := @Sub T predT nT x (erefl true).
 Arguments innew {T nT}.
@@ -723,8 +737,7 @@ End SigProj.
 Prenex Implicits svalP s2val s2valP s2valP'.
 
 (* BUG: coq-elpi: destructuring let in glob2term NYI *)
-Definition sig_IsSUB T (P : pred T) :=
-  BuildSubTypeFor (sig P) sval.
+Definition sig_IsSUB T (P : pred T) := [subMixin of (sig P) for sval].
 Section HB.
 Variable T : Type.
 Variable P : pred T.

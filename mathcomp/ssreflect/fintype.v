@@ -1739,7 +1739,7 @@ Inductive ordinal : predArgType := Ordinal m of m < n.
 
 Coercion nat_of_ord i := let: Ordinal m _ := i in m.
 
-Definition ordinal_subMixin := (BuildSubTypeFor ordinal nat_of_ord).
+Definition ordinal_subMixin := [subMixin of ordinal for nat_of_ord].
 HB.instance ordinal ordinal_subMixin.
 HB.instance Definition ordinal_eqMixin : HasDecEq ordinal :=
   [eqMixin of ordinal by <:].

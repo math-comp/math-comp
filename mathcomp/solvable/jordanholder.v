@@ -80,7 +80,6 @@ Variables (gT : finGroupType).
 Implicit Types (G : {group gT}) (s : section gT).
 
 HB.instance Definition _ := [newMixin for (@pair_of_section gT)].
-(* FIXME : HB.instance was working when the Mixin Notation was written in this file *)
 HB.instance Definition _ := [Finite of section gT by <:].
 Canonical section_group.
 
@@ -227,7 +226,7 @@ Qed.
 End CompositionSeries.
 
 (******************************************************************************)
-(* Helper lemmas for group actions.                                           *) 
+(* Helper lemmas for group actions.                                           *)
 (******************************************************************************)
 
 Section MoreGroupAction.
@@ -243,7 +242,7 @@ apply/subsetP=> a Aa; rewrite !inE; rewrite Aa.
 by  apply/subsetP=> x; rewrite inE nGA.
 Qed.
 
-Lemma gactsM (N1 N2 : {set rT}) : 
+Lemma gactsM (N1 N2 : {set rT}) :
     N1 \subset D -> N2 \subset D ->
   [acts A, on N1 | to] -> [acts A, on N2 | to] -> [acts A, on N1 * N2 | to].
 Proof.
@@ -256,7 +255,7 @@ rewrite e gactM // ?(subsetP sN1D y1) ?(subsetP sN2D) //.
 by apply: mem_mulg; rewrite ?(gactsP _ aAN1) // ?(gactsP _ aAN2).
 Qed.
 
-Lemma gactsI (N1 N2 : {set rT}) : 
+Lemma gactsI (N1 N2 : {set rT}) :
   [acts A, on N1 | to] -> [acts A, on N2 | to] -> [acts A, on N1 :&: N2 | to].
 Proof.
 move=> aAN1 aAN2.
@@ -265,7 +264,7 @@ case/setIP: Ny=> N1y N2y; rewrite inE ?astabs_act  ?N1y ?N2y //.
 - by move/subsetP: aAN2; move/(_ x Ax).
 - by move/subsetP: aAN1; move/(_ x Ax).
 Qed.
-  
+
 Lemma gastabsP (S : {set rT}) (a : aT) :
   a \in A -> reflect (forall x, (to x a \in S) = (x \in S)) (a \in 'N(S | to)).
 Proof.
@@ -311,7 +310,7 @@ apply/morphpreP; split; first by rewrite acts_qact_dom_norm.
 by move/gastabsP: nx; move/(_  qdx (coset H y)); rewrite K'Hy qactE.
 Qed.
 
-Lemma qacts_coset (H K : {group rT}) : 
+Lemma qacts_coset (H K : {group rT}) :
     H \subset D -> [acts A, on K | to] ->
   [acts qact_dom to H, on (coset H) @* K | to / H].
 Proof.
@@ -332,7 +331,7 @@ Variables (D : {group rT})(A : {group aT}).
 Variable to : groupAction A D.
 
 Definition maxainv (B C : {set rT}) :=
-  [max C of H | 
+  [max C of H |
     [&& (H <| B), ~~ (B \subset H) & [acts A, on H | to]]].
 
 Section MaxAinvProps.
@@ -520,9 +519,9 @@ rewrite /= -trivg_quotient => tK'; apply: (congr1 (@gval _)); move: tK'.
 by apply: (@quotient_injG _ H); rewrite ?inE /= ?normal_refl.
 Qed.
 
-Lemma asimpleI (N1 N2 : {group rT}) : 
+Lemma asimpleI (N1 N2 : {group rT}) :
     N2 \subset 'N(N1) -> N1 \subset D ->
-    [acts A, on N1 | to] -> [acts A, on N2 | to] -> 
+    [acts A, on N1 | to] -> [acts A, on N2 | to] ->
     asimple (to / N1) (N2 / N1) ->
   asimple (to / (N2 :&: N1)) (N2 / (N2 :&: N1)).
 Proof.
@@ -576,7 +575,7 @@ Variables (A : {group aT}) (D : {group rT}) (to : groupAction A D).
 (******************************************************************************)
 
 Lemma StrongJordanHolderUniqueness (G : {group rT}) (s1 s2 : seq {group rT}) :
-    G \subset D -> acomps to G s1 -> acomps to G s2 -> 
+    G \subset D -> acomps to G s1 -> acomps to G s2 ->
   perm_eq (mkfactors G s1) (mkfactors G s2).
 Proof.
 have [n] := ubnP #|G|; elim: n G => // n Hi G in s1 s2 * => cG hsD cs1 cs2.
@@ -663,8 +662,3 @@ by apply: perm_trans i2; apply: perm_refl.
 Qed.
 
 End StrongJordanHolder.
-
-
-
-
-
