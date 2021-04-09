@@ -687,6 +687,12 @@ Notation "[ 'newType' 'for' v ]" := (NewType v _ _ vrefl_rect)
 Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
  (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.
 
+Notation BuildNewTypeFor T v :=
+  (@IsSUB.phant_Build _ _ T v _ inlined_new_rect vrefl_rect).
+
+Notation "[ 'newMixin' 'for' v ]" := (BuildNewTypeFor _ v)
+  (at level 0, format "[ 'newMixin'  'for'  v ]") : form_scope.
+
 Definition innew T nT x := @Sub T predT nT x (erefl true).
 Arguments innew {T nT}.
 
