@@ -128,7 +128,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope order_scope.
 Local Open Scope ring_scope.
-Import (* Order.TTheory *) GRing.Theory.
+Import Order.TTheory GRing.Theory.
 
 Fact ring_display : unit. Proof. exact: tt. Qed.
 
@@ -150,9 +150,9 @@ HB.structure Definition POrderedZmodule d :=
 HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M & GRing.Zmodule M := {
   norm : M -> M;
   ler_norm_add : forall x y, norm (x + y) <= norm x + norm y;
-  norm0_eq0 : forall x, norm x = 0 -> x = 0;
-  normMn : forall x n, norm (x *+ n) = norm x *+ n;
-  normN : forall x, norm (- x) = norm x;
+  normr0_eq0 : forall x, norm x = 0 -> x = 0;
+  normrMn : forall x n, norm (x *+ n) = norm x *+ n;
+  normrN : forall x, norm (- x) = norm x;
 }.
 
 #[mathcomp]
@@ -162,6 +162,7 @@ HB.structure Definition NormedZmodule d :=
 Arguments norm {R T} x : rename.
 
 Module NormedZmoduleExports.
+Bind Scope ring_scope with NormedZmodule.sort.
 Notation normedZmodType (* R *) := (NormedZmodule.type (* R *)).
 Notation NormedZmodType (* R *) T m := (NormedZmodule.pack _ (* R *) T m).
 (* Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
@@ -183,23 +184,26 @@ HB.export NormedZmoduleExports.
 }. *)
 HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
    & NormedZmodule d R := {
-  _ : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
-  _ : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
-  _ : {morph (norm : R -> R) : x y / x * y};
-  _ : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
+  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
+  normrM : {morph (norm : R -> R) : x y / x * y};
+  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
+
 #[mathcomp]
 HB.structure Definition NumDomain :=
   { R of IsNumDomain ring_display R &
-    NormedZmodule ring_display R & GRing.Zmodule R }.
+    NormedZmodule ring_display (* R *) R & GRing.IntegralDomain R }.
+Arguments addr_gt0 {_} [x y] : rename.
+Arguments ger_leVge {_} [x y] : rename.
 
 Module NumDomainExports.
 Bind Scope ring_scope with NumDomain.sort.
 Notation numDomainType := NumDomain.type.
-Notation NumDomainType T m := (NumDomain.pack _ T m).
-Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (NumDomain.clone _ T cT)
+Notation NumDomainType T m := (@NumDomain.pack T m).
+Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (NumDomain.clone T cT)
   (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone _ T _)
+Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone T _)
   (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
 End NumDomainExports.
 HB.export NumDomainExports.
@@ -355,708 +359,114 @@ Definition real_closed_axiom : Prop :=
 
 End ExtensionAxioms.
 
-(*
-
 (* The rest of the numbers interface hierarchy. *)
-Module NumField.
 
-Section ClassDef.
+#[mathcomp]
+HB.structure Definition NumField := { R of GRing.IsField R & NumDomain R }.
 
-Set Primitive Projections.
-Record class_of R := Class {
-  base  : NumDomain.class_of R;
-  mixin : GRing.Field.mixin_of (num_for R base);
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumDomain.class_of.
-Local Coercion base2 R (c : class_of R) : GRing.Field.class_of _ :=
-  GRing.Field.Class (@mixin _ c).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack :=
-  fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
-  fun mT m & phant_id (GRing.Field.mixin (GRing.Field.class mT)) m =>
-  Pack (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition porder_fieldType := @GRing.Field.Pack porderType class.
-Definition normedZmod_fieldType := @GRing.Field.Pack normedZmodType class.
-Definition numDomain_fieldType := @GRing.Field.Pack numDomainType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumDomain.class_of.
-Coercion base2 : class_of >-> GRing.Field.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical porder_fieldType.
-Canonical normedZmod_fieldType.
-Canonical numDomain_fieldType.
-Notation numFieldType := type.
-Notation "[ 'numFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
+Module NumFieldExports.
+Bind Scope ring_scope with NumField.sort.
+Notation numFieldType := NumField.type.
+Notation "[ 'numFieldType' 'of' T ]" := (NumField.clone T _)
   (at level 0, format "[ 'numFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End NumFieldExports.
+HB.export NumFieldExports.
 
-End NumField.
-Import NumField.Exports.
-
-Module ClosedField.
-
-Section ClassDef.
-
-Record imaginary_mixin_of (R : numDomainType) := ImaginaryMixin {
+HB.mixin Record NumField_IsImaginary R of NumField R := {
   imaginary : R;
   conj_op : {rmorphism R -> R};
-  _ : imaginary ^+ 2 = - 1;
-  _ : forall x, x * conj_op x = `|x| ^+ 2;
+  sqrCi : imaginary ^+ 2 = - 1;
+  normCK : forall x, `|x| ^+ 2 = x * conj_op x;
 }.
 
-Set Primitive Projections.
-Record class_of R := Class {
-  base : NumField.class_of R;
-  decField_mixin : GRing.DecidableField.mixin_of (num_for R base);
-  closedField_axiom : GRing.ClosedField.axiom (num_for R base);
-  conj_mixin  : imaginary_mixin_of (num_for R base);
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumField.class_of.
-Local Coercion base2 R (c : class_of R) : GRing.ClosedField.class_of R :=
-  @GRing.ClosedField.Class
-    R (@GRing.DecidableField.Class R (base c) (@decField_mixin _ c))
-    (@closedField_axiom _ c).
+#[mathcomp]
+HB.structure Definition ClosedField :=
+  { R of NumField_IsImaginary R & GRing.ClosedField R & NumField R }.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone := fun b & phant_id class (b : class_of T) => Pack b.
-Definition pack :=
-  fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
-  fun mT dec closed
-      & phant_id (GRing.ClosedField.class mT)
-                 (@GRing.ClosedField.Class
-                    _ (@GRing.DecidableField.Class _ b dec) closed) =>
-  fun mc => Pack (@Class T b dec closed mc).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition decFieldType := @GRing.DecidableField.Pack cT class.
-Definition closedFieldType := @GRing.ClosedField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition porder_decFieldType := @GRing.DecidableField.Pack porderType class.
-Definition normedZmod_decFieldType :=
-  @GRing.DecidableField.Pack normedZmodType class.
-Definition numDomain_decFieldType :=
-  @GRing.DecidableField.Pack numDomainType class.
-Definition numField_decFieldType :=
-  @GRing.DecidableField.Pack numFieldType class.
-Definition porder_closedFieldType := @GRing.ClosedField.Pack porderType class.
-Definition normedZmod_closedFieldType :=
-  @GRing.ClosedField.Pack normedZmodType class.
-Definition numDomain_closedFieldType :=
-  @GRing.ClosedField.Pack numDomainType class.
-Definition numField_closedFieldType :=
-  @GRing.ClosedField.Pack numFieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumField.class_of.
-Coercion base2 : class_of >-> GRing.ClosedField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion decFieldType : type >-> GRing.DecidableField.type.
-Canonical decFieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion closedFieldType : type >-> GRing.ClosedField.type.
-Canonical closedFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical porder_decFieldType.
-Canonical normedZmod_decFieldType.
-Canonical numDomain_decFieldType.
-Canonical numField_decFieldType.
-Canonical porder_closedFieldType.
-Canonical normedZmod_closedFieldType.
-Canonical numDomain_closedFieldType.
-Canonical numField_closedFieldType.
-Notation numClosedFieldType := type.
-Notation NumClosedFieldType T m := (@pack T _ _ id _ _ _ id m).
-Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (@clone T cT _ id)
+Module ClosedFieldExports.
+Bind Scope ring_scope with ClosedField.sort.
+Notation numClosedFieldType := ClosedField.type.
+Notation NumClosedFieldType T m := (ClosedField.Pack T m).
+Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T cT)
   (at level 0, format "[ 'numClosedFieldType'  'of'  T  'for' cT ]") :
                                                          form_scope.
-Notation "[ 'numClosedFieldType' 'of' T ]" := (@clone T _ _ id)
+Notation "[ 'numClosedFieldType' 'of' T ]" := (ClosedField.clone T _)
   (at level 0, format "[ 'numClosedFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End ClosedFieldExports.
+HB.export ClosedFieldExports.
 
-End ClosedField.
-Import ClosedField.Exports.
+#[mathcomp]
+HB.structure Definition RealDomain :=
+  { R of Order.Total ring_display R & NumDomain R }.
 
-Module RealDomain.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base   : NumDomain.class_of R;
-  nmixin : Order.Lattice.mixin_of base;
-  lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
-  tmixin : Order.Total.mixin_of base;
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumDomain.class_of.
-Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
-  @Order.Total.Class _ (@Order.DistrLattice.Class _ _ (lmixin c)) (@tmixin _ c).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack :=
-  fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
-  fun mT n l m &
-      phant_id (@Order.Total.class ring_display mT)
-               (@Order.Total.Class T (@Order.DistrLattice.Class
-                                        T (@Order.Lattice.Class T b n) l) m) =>
-  Pack (@Class T b n l m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType class.
-Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType class.
-Definition comRing_latticeType :=
-  @Order.Lattice.Pack ring_display comRingType class.
-Definition unitRing_latticeType :=
-  @Order.Lattice.Pack ring_display unitRingType class.
-Definition comUnitRing_latticeType :=
-  @Order.Lattice.Pack ring_display comUnitRingType class.
-Definition idomain_latticeType :=
-  @Order.Lattice.Pack ring_display idomainType class.
-Definition normedZmod_latticeType :=
-  @Order.Lattice.Pack ring_display normedZmodType class.
-Definition numDomain_latticeType :=
-  @Order.Lattice.Pack ring_display numDomainType class.
-Definition zmod_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display zmodType class.
-Definition ring_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display ringType class.
-Definition comRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display comRingType class.
-Definition unitRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display unitRingType class.
-Definition comUnitRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display comUnitRingType class.
-Definition idomain_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display idomainType class.
-Definition normedZmod_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display normedZmodType class.
-Definition numDomain_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display numDomainType class.
-Definition zmod_orderType := @Order.Total.Pack ring_display zmodType class.
-Definition ring_orderType := @Order.Total.Pack ring_display ringType class.
-Definition comRing_orderType :=
-  @Order.Total.Pack ring_display comRingType class.
-Definition unitRing_orderType :=
-  @Order.Total.Pack ring_display unitRingType class.
-Definition comUnitRing_orderType :=
-  @Order.Total.Pack ring_display comUnitRingType class.
-Definition idomain_orderType :=
-  @Order.Total.Pack ring_display idomainType class.
-Definition normedZmod_orderType :=
-  @Order.Total.Pack ring_display normedZmodType class.
-Definition numDomain_orderType :=
-  @Order.Total.Pack ring_display numDomainType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumDomain.class_of.
-Coercion base2 : class_of >-> Order.Total.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical zmod_latticeType.
-Canonical ring_latticeType.
-Canonical comRing_latticeType.
-Canonical unitRing_latticeType.
-Canonical comUnitRing_latticeType.
-Canonical idomain_latticeType.
-Canonical normedZmod_latticeType.
-Canonical numDomain_latticeType.
-Canonical zmod_distrLatticeType.
-Canonical ring_distrLatticeType.
-Canonical comRing_distrLatticeType.
-Canonical unitRing_distrLatticeType.
-Canonical comUnitRing_distrLatticeType.
-Canonical idomain_distrLatticeType.
-Canonical normedZmod_distrLatticeType.
-Canonical numDomain_distrLatticeType.
-Canonical zmod_orderType.
-Canonical ring_orderType.
-Canonical comRing_orderType.
-Canonical unitRing_orderType.
-Canonical comUnitRing_orderType.
-Canonical idomain_orderType.
-Canonical normedZmod_orderType.
-Canonical numDomain_orderType.
-Notation realDomainType := type.
-Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ id)
+Module RealDomainExports.
+Bind Scope ring_scope with RealDomain.sort.
+Notation realDomainType := RealDomain.type.
+Notation "[ 'realDomainType' 'of' T ]" := (RealDomain.clone T _)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
-End Exports.
+End RealDomainExports.
+HB.export RealDomainExports.
+(* FIXME: often copy/paste and forget to change that, maybe a warning/error
+   when HB.export twice the same module ?
+   (open issue on HB) *)
 
-End RealDomain.
-Import RealDomain.Exports.
+#[mathcomp]
+HB.structure Definition RealField :=
+  { R of Order.Total ring_display R & NumField R }.
 
-Module RealField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base  : NumField.class_of R;
-  nmixin : Order.Lattice.mixin_of base;
-  lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
-  tmixin : Order.Total.mixin_of base;
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumField.class_of.
-Local Coercion base2 R (c : class_of R) : RealDomain.class_of R :=
-  @RealDomain.Class _ _ (nmixin c) (lmixin c) (@tmixin R c).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack :=
-  fun bT (b : NumField.class_of T) & phant_id (NumField.class bT) b =>
-  fun mT n l t
-      & phant_id (RealDomain.class mT) (@RealDomain.Class T b n l t) =>
-  Pack (@Class T b n l t).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition realDomainType := @RealDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition field_latticeType :=
-  @Order.Lattice.Pack ring_display fieldType class.
-Definition field_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display fieldType class.
-Definition field_orderType := @Order.Total.Pack ring_display fieldType class.
-Definition field_realDomainType := @RealDomain.Pack fieldType class.
-Definition numField_latticeType :=
-  @Order.Lattice.Pack ring_display numFieldType class.
-Definition numField_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display numFieldType class.
-Definition numField_orderType :=
-  @Order.Total.Pack ring_display numFieldType class.
-Definition numField_realDomainType := @RealDomain.Pack numFieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumField.class_of.
-Coercion base2 : class_of >-> RealDomain.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical field_latticeType.
-Canonical field_distrLatticeType.
-Canonical field_orderType.
-Canonical field_realDomainType.
-Canonical numField_latticeType.
-Canonical numField_distrLatticeType.
-Canonical numField_orderType.
-Canonical numField_realDomainType.
-Notation realFieldType := type.
-Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ id)
+Module RealFieldExports.
+Bind Scope ring_scope with RealField.sort.
+Notation realFieldType := RealField.type.
+Notation "[ 'realFieldType' 'of' T ]" := (RealField.clone T _)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End RealFieldExports.
+HB.export RealFieldExports.
 
-End RealField.
-Import RealField.Exports.
-
-Module ArchimedeanField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base : RealField.class_of R;
-  mixin : archimedean_axiom (num_for R base)
+HB.mixin Record RealField_IsArchimedean R of RealField R := {
+  archi_bound_subproof : archimedean_axiom [the NumDomain.type of R]
 }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
-  fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
+#[mathcomp]
+HB.structure Definition ArchimedeanField :=
+  { R of RealField_IsArchimedean R & RealField R }.
 
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition realDomainType := @RealDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition realFieldType := @RealField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> RealField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion realFieldType : type >-> RealField.type.
-Canonical realFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Notation archiFieldType := type.
-Notation ArchiFieldType T m := (@pack T _ m _ _ id _ id).
-Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
+Module ArchimedeanFieldExports.
+Bind Scope ring_scope with ArchimedeanField.sort.
+Notation archiFieldType := ArchimedeanField.type.
+Notation ArchiFieldType T m := (ArchimedeanField.Pack T m).
+Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (ArchimedeanField.clone T cT)
   (at level 0, format "[ 'archiFieldType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'archiFieldType' 'of' T ]" := (@clone T _ _ id)
+Notation "[ 'archiFieldType' 'of' T ]" := (ArchimedeanField.clone T _)
   (at level 0, format "[ 'archiFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End ArchimedeanFieldExports.
+HB.export ArchimedeanFieldExports.
 
-End ArchimedeanField.
-Import ArchimedeanField.Exports.
-
-Module RealClosedField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base : RealField.class_of R;
-  mixin : real_closed_axiom (num_for R base)
+HB.mixin Record RealField_IsClosed R of RealField R := {
+  poly_ivt_subproof : real_closed_axiom [the NumDomain.type of R]
 }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : real_closed_axiom (num_for T b0)) :=
-  fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
+#[mathcomp]
+HB.structure Definition RealClosedField :=
+  { R of RealField_IsClosed R & RealField R }.
 
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition realDomainType := @RealDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition realFieldType := @RealField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> RealField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion realFieldType : type >-> RealField.type.
-Canonical realFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Notation rcfType := Num.RealClosedField.type.
-Notation RcfType T m := (@pack T _ m _ _ id _ id).
-Notation "[ 'rcfType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
+Module RealClosedFieldExports.
+Bind Scope ring_scope with RealClosedField.sort.
+Notation rcfType := RealClosedField.type.
+Notation RcfType T m := (RealClosedField.Pack T m).
+Notation "[ 'rcfType' 'of' T 'for' cT ]" := (RealClosedField.clone T cT)
   (at level 0, format "[ 'rcfType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'rcfType' 'of' T ]" :=  (@clone T _ _ id)
+Notation "[ 'rcfType' 'of' T ]" :=  (RealClosedField.clone T _)
   (at level 0, format "[ 'rcfType'  'of'  T ]") : form_scope.
-End Exports.
-
-End RealClosedField.
-Import RealClosedField.Exports.
+End RealClosedFieldExports.
+HB.export RealClosedFieldExports.
 
 (* The elementary theory needed to support the definition of the derived      *)
 (* operations for the extensions described above.                             *)
 Module Import Internals.
 
-Section NormedZmodule.
-Variables (R : numDomainType) (V : normedZmodType R).
-Implicit Types (l : R) (x y : V).
-
-Lemma ler_norm_add x y : `|x + y| <= `|x| + `|y|.
-Proof. by case: V x y => ? [? []]. Qed.
-
-Lemma normr0_eq0 x : `|x| = 0 -> x = 0.
-Proof. by case: V x => ? [? []]. Qed.
-
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof. by case: V x => ? [? []]. Qed.
-
-Lemma normrN x : `|- x| = `|x|.
-Proof. by case: V x => ? [? []]. Qed.
-
-End NormedZmodule.
-
 Section NumDomain.
 Variable R : numDomainType.
 Implicit Types x y : R.
-
-(* Lemmas from the signature *)
-
-Lemma addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y.
-Proof. by case: R x y => ? [? ? ? []]. Qed.
-
-Lemma ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x).
-Proof. by case: R x y => ? [? ? ? []]. Qed.
-
-Lemma normrM : {morph norm : x y / (x : R) * y}.
-Proof. by case: R => ? [? ? ? []]. Qed.
-
-Lemma ler_def x y : (x <= y) = (`|y - x| == y - x).
-Proof. by case: R x y => ? [? ? ? []]. Qed.
 
 (* Basic consequences (just enough to get predicate closure properties). *)
 
@@ -1160,13 +570,10 @@ End NumDomain.
 Lemma num_real (R : realDomainType) (x : R) : x \is real.
 Proof. exact: le_total. Qed.
 
-Fact archi_bound_subproof (R : archiFieldType) : archimedean_axiom R.
-Proof. by case: R => ? []. Qed.
-
 Section RealClosed.
 Variable R : rcfType.
 
-Lemma poly_ivt : real_closed_axiom R. Proof. by case: R => ? []. Qed.
+Lemma poly_ivt : real_closed_axiom R. Proof. exact: poly_ivt_subproof. Qed.
 
 Fact sqrtr_subproof (x : R) :
   exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
@@ -1222,20 +629,10 @@ Module Import Theory.
 Section NumIntegralDomainTheory.
 
 Variable R : numDomainType.
-Implicit Types (V : normedZmodType R) (x y z t : R).
-
-(* Lemmas from the signature (reexported from internals). *)
-
-Definition ler_norm_add V (x y : V) : `|x + y| <= `|x| + `|y| :=
-  ler_norm_add x y.
-Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
-Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 R V x.
-Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
-  @ger_leVge R x y.
-Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
-Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := ler_def x y.
-Definition normrMn V (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.
-Definition normrN V (x : V) : `|- x| = `|x| := normrN x.
+(* FIXME: here is the right definition for V *)
+(* Implicit Types (V : normedZmodType R) (x y z t : R). *)
+Local Notation V := R.
+Implicit Types (x y z t : R).
 
 (* Predicate definitions. *)
 
@@ -1296,13 +693,13 @@ Proof. exact: (big_morph norm normrM normr1). Qed.
 Lemma normrX n x : `|x ^+ n| = `|x| ^+ n.
 Proof. by rewrite -(card_ord n) -!prodr_const normr_prod. Qed.
 
-Lemma normr_unit : {homo (@norm R R) : x / x \is a GRing.unit}.
+Lemma normr_unit : {homo (@norm _ (* R *) R) : x / x \is a GRing.unit}.
 Proof.
 move=> x /= /unitrP [y [yx xy]]; apply/unitrP; exists `|y|.
 by rewrite -!normrM xy yx normr1.
 Qed.
 
-Lemma normrV : {in GRing.unit, {morph (@norm R R) : x / x ^-1}}.
+Lemma normrV : {in GRing.unit, {morph (@norm _ (* R *) R) : x / x ^-1}}.
 Proof.
 move=> x ux; apply: (mulrI (normr_unit ux)).
 by rewrite -normrM !divrr ?normr1 ?normr_unit.
@@ -1330,7 +727,9 @@ Proof. by apply/big_real; [apply: rpredM | apply: rpred1]. Qed.
 
 Section NormedZmoduleTheory.
 
-Variable V : normedZmodType R.
+(* FIXME: this is the correct introduction of V *)
+(* Variable V : normedZmodType R. *)
+Local Notation V := R.
 Implicit Types (v w : V).
 
 Lemma normr0 : `|0 : V| = 0.
@@ -1347,7 +746,8 @@ Proof. by rewrite -opprB normrN. Qed.
 Lemma normr_id v : `| `|v| | = `|v|.
 Proof.
 have nz2: 2%:R != 0 :> R by rewrite pnatr_eq0.
-apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n ger0_norm //.
+apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n.
+rewrite [LHS]ger0_norm //.  (* FIXME: [LHS] was not needed before *)
 by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
 Qed.
 
@@ -1363,7 +763,7 @@ Lemma normr_gt0 v : `|v| > 0 = (v != 0).
 Proof. by rewrite lt_def normr_eq0 normr_ge0 andbT. Qed.
 
 Definition normrE := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
-  normr_lt0, normr_le0, normr_gt0, normrN).
+  normr_lt0, normr_le0, normr_gt0, @normrN _ R).
 
 End NormedZmoduleTheory.
 
@@ -1382,9 +782,9 @@ Lemma subr_ge0 x y : (0 <= y - x) = (x <= y). Proof. exact: subr_ge0. Qed.
 Lemma subr_gt0 x y : (0 < y - x) = (x < y).
 Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
 Lemma subr_le0  x y : (y - x <= 0) = (y <= x).
-Proof. by rewrite -subr_ge0 opprB add0r subr_ge0. Qed.
+Proof. by rewrite -[LHS]subr_ge0 opprB add0r subr_ge0. Qed.  (* FIXME: [LHS] was not needed before *)
 Lemma subr_lt0  x y : (y - x < 0) = (y < x).
-Proof. by rewrite -subr_gt0 opprB add0r subr_gt0. Qed.
+Proof. by rewrite -[LHS]subr_gt0 opprB add0r subr_gt0. Qed.  (* FIXME: [LHS] was not needed before *)
 
 Definition subr_lte0 := (subr_le0, subr_lt0).
 Definition subr_gte0 := (subr_ge0, subr_gt0).
@@ -1421,7 +821,7 @@ End NumIntegralDomainTheory.
 Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
-Arguments normr0P {R V v}.
+Arguments normr0P {R (* V *) v}.  (* FIXME (uncomment V) *)
 Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
 Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
@@ -1511,10 +911,10 @@ Proof. by move=> /ltW/ler0_real. Qed.
 Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
 Hint Resolve real0 : core.
 
-Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
+Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real ?ler01. Qed.  (* FIXME: the ler01 was not needed before *)
 Hint Resolve real1 : core.
 
-Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
+Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real ?ler0n. Qed.  (* FIXME: the ler0n was not needed before *)
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !ler_opp2. Qed.
@@ -1605,7 +1005,7 @@ Variant comparer0 x : R -> R -> R -> R -> R ->
   | ComparerEq0 of x = 0 : comparer0 x 0 0 0 0 0 true true true true false false.
 
 Lemma real_ge0P x : x \is real -> ger0_xor_lt0 x
-   (min 0 x) (min x 0) (max 0 x) (max x 0)
+   (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME: Order.min used to have no scope on its arguments, now order_scope so 0 is interpreted as bottom instead of GRing.zero *)
   `|x| (x < 0) (0 <= x).
 Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: real_leP;
@@ -1613,7 +1013,7 @@ by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
 Lemma real_le0P x : x \is real -> ler0_xor_gt0 x
-  (min 0 x) (min x 0) (max 0 x) (max x 0)
+  (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
   `|x| (0 < x) (x <= 0).
 Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: real_ltP;
@@ -1621,7 +1021,7 @@ by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
 Lemma real_ltgt0P x : x \is real ->
-  comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+  comparer0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
             `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: (@real_ltgtP 0 x);
@@ -1973,7 +1373,8 @@ Qed.
 
 Lemma ler_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x <= y}.
 Proof.
-by case: n => // n _ x y /=; rewrite -mulr_natl -[y *+ _]mulr_natl ler_pmul2l.
+case: n => // n _ x y /=; rewrite -mulr_natl -[y *+ _]mulr_natl ler_pmul2l //.
+by rewrite ltr0n.  (* FIXME: this rewrite ltr0n was not needed before *)
 Qed.
 
 Lemma ltr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x < y}.
@@ -2072,10 +1473,10 @@ Lemma ltr_nmuln2l x :
 Proof. by move=> x_lt0; apply: leW_nmono (ler_nmuln2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
-Proof. by rewrite ler_pmuln2l. Qed.
+Proof. by rewrite ler_pmuln2l // ltr01. Qed.  (* FIXME: ltr01 was not needed before *)
 
 Lemma ltr_nat m n : (m%:R < n%:R :> R) = (m < n)%N.
-Proof. by rewrite ltr_pmuln2l. Qed.
+Proof. by rewrite ltr_pmuln2l // ltr01. Qed.
 
 Lemma eqr_nat m n : (m%:R == n%:R :> R) = (m == n)%N.
 Proof. by rewrite (inj_eq (mulrIn _)) ?oner_eq0. Qed.
@@ -2094,8 +1495,8 @@ Lemma ltr1n n : 1 < n%:R :> R = (1 < n)%N. Proof. by rewrite -ltr_nat. Qed.
 Lemma lern1 n : n%:R <= 1 :> R = (n <= 1)%N. Proof. by rewrite -ler_nat. Qed.
 Lemma ltrn1 n : n%:R < 1 :> R = (n < 1)%N. Proof. by rewrite -ltr_nat. Qed.
 
-Lemma ltrN10 : -1 < 0 :> R. Proof. by rewrite oppr_lt0. Qed.
-Lemma lerN10 : -1 <= 0 :> R. Proof. by rewrite oppr_le0. Qed.
+Lemma ltrN10 : -1 < 0 :> R. Proof. by rewrite oppr_lt0 ltr01. Qed.  (* FIXME ltr01 was not needed before *)
+Lemma lerN10 : -1 <= 0 :> R. Proof. by rewrite oppr_le0 ler01. Qed.  (* FIXME ltr01 was not needed before *)
 Lemma ltr10 : 1 < 0 :> R = false. Proof. by rewrite le_gtF. Qed.
 Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite lt_geF. Qed.
 Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
@@ -2204,7 +1605,8 @@ Lemma ler_prod I r (P : pred I) (E1 E2 : I -> R) :
   \prod_(i <- r | P i) E1 i <= \prod_(i <- r | P i) E2 i.
 Proof.
 move=> leE12; elim/(big_load (fun x => 0 <= x)): _.
-elim/big_rec2: _ => // i x2 x1 /leE12/andP[le0Ei leEi12] [x1ge0 le_x12].
+elim/big_rec2: _ => [|i x2 x1 /leE12/andP[le0Ei leEi12] [x1ge0 le_x12]].
+  by rewrite ler01 lexx.  (* FIXME: was not necessary before *)
 by rewrite mulr_ge0 // ler_pmul.
 Qed.
 
@@ -2429,13 +1831,13 @@ Definition lter_iexpr := (ler_iexpr, ltr_iexpr).
 Lemma ler_eexpr x n : (0 < n)%N -> 1 <= x -> x <= x ^+ n.
 Proof.
 case: n => // n _ x_ge1.
-by rewrite exprS ler_pemulr ?(le_trans _ x_ge1) // exprn_ege1.
+by rewrite exprS ler_pemulr ?(le_trans _ x_ge1) // ?ler01 // exprn_ege1.  (* FIXME: ler01 was not needed before *)
 Qed.
 
 Lemma ltr_eexpr x n : 1 < x -> (x < x ^+ n) = (1 < n)%N.
 Proof.
 move=> x_ge1; case: n=> [|[|n]] //; first by rewrite expr0 lt_gtF.
-by rewrite exprS ltr_pmulr ?(lt_trans _ x_ge1) ?exprn_egt1.
+by rewrite exprS ltr_pmulr ?(lt_trans _ x_ge1) ?exprn_egt1 // ltr01.  (* FIXME: ltr01 was not needed before *)
 Qed.
 
 Definition lter_eexpr := (ler_eexpr, ltr_eexpr).
@@ -2458,7 +1860,7 @@ Qed.
 Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0%N) || (x == 1)).
 Proof.
 move=> xle0; case: n => [|n]; first by rewrite expr0 eqxx.
-case: (@real_ltgtP x 1); do ?by rewrite ?ger0_real.
+case: (@real_ltgtP x 1) => //; do ?by rewrite ?ger0_real.  (* FIXME: the // was not needed before (correspond to real1) *)
 + by move=> x_lt1; rewrite 1?lt_eqF // exprn_ilt1.
 + by move=> x_lt1; rewrite 1?gt_eqF // exprn_egt1.
 by move->; rewrite expr1n eqxx.
@@ -2491,7 +1893,8 @@ Lemma ler_eexpn2l x :
 Proof.
 move=> xgt1; apply: (le_mono (inj_homo_lt _ _)); last first.
   by apply: ler_weexpn2l; rewrite ltW.
-by apply: ieexprIn; rewrite ?gt_eqF ?gtr_cpable //; apply: lt_trans xgt1.
+apply: ieexprIn; rewrite ?gt_eqF ?gtr_cpable //; apply: lt_trans xgt1.
+exact: ltr01.  (* FIXME: was not needed *)
 Qed.
 
 Lemma ltr_eexpn2l x :
@@ -2769,7 +2172,9 @@ Qed.
 
 Section NormedZmoduleTheory.
 
-Variable V : normedZmodType R.
+(* FIXME: this was the introduction of V *)
+(* Variable V : normedZmodType R. *)
+Local Notation V := R.
 Implicit Types (u v w : V).
 
 Lemma normr_real v : `|v| \is real. Proof. by apply/ger0_real. Qed.
@@ -3075,7 +2480,7 @@ Proof. by rewrite !(fun_if sg) !sgrE. Qed.
 Lemma sgr_lt0 x : (sg x < 0) = (x < 0).
 Proof.
 rewrite /sg; case: eqP => [-> // | _].
-by case: ifP => _; rewrite ?ltrN10 // lt_gtF.
+by case: ifP => _; rewrite ?ltrN10 // lt_gtF // ltr01.  (* FIXME: ltr01 *)
 Qed.
 
 Lemma sgr_le0 x : (sgr x <= 0) = (x <= 0).
@@ -3126,7 +2531,8 @@ Lemma leif_add x1 y1 C1 x2 y2 C2 :
     x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 + x2 <= y1 + y2 ?= iff C1 && C2.
 Proof.
-rewrite -(mono_leif (ler_add2r x2)) -(mono_leif (C := C2) (ler_add2l y1)).
+rewrite -[X in X -> _](mono_leif (ler_add2r x2)).  (* FIXME: the pattern was not needed *)
+rewrite -(mono_leif (C := C2) (ler_add2l y1)).
 exact: leif_trans.
 Qed.
 
@@ -3140,8 +2546,8 @@ exact: leif_add.
 Qed.
 
 Lemma leif_0_sum (I : finType) (P C : pred I) (E : I -> R) :
-    (forall i, P i -> 0 <= E i ?= iff C i) ->
-  0 <= \sum_(i | P i) E i ?= iff [forall (i | P i), C i].
+    (forall i, P i -> 0%R <= E i ?= iff C i) ->
+  0%R <= \sum_(i | P i) E i ?= iff [forall (i | P i), C i].  (* FIXME: 0%R instead of 0 ? *)
 Proof. by move/leif_sum; rewrite big1_eq. Qed.
 
 Lemma real_leif_norm x : x \is real -> x <= `|x| ?= iff (0 <= x).
@@ -3182,7 +2588,7 @@ Lemma leif_pprod (I : finType) (P C : pred I) (E1 E2 : I -> R) :
 Proof.
 move=> E1_ge0 leE12 /=; rewrite -big_andE; elim/(big_load (fun x => 0 <= x)): _.
 elim/big_rec3: _ => [|i Ci m2 m1 Pi [m1ge0 le_m12]].
-  by split=> //; apply/leifP; rewrite orbT.
+  by split; [exact ler01|apply/leifP; rewrite orbT..].  (* FIMXE: ler01 instead of // *)
 have Ei_ge0 := E1_ge0 i Pi; split; first by rewrite mulr_ge0.
 congr (leif _ _ _): (leif_pmul Ei_ge0 m1ge0 (leE12 i Pi) le_m12).
 by rewrite mulf_eq0 -!orbA; congr (_ || _); rewrite !orb_andr orbA orbb.
@@ -3190,10 +2596,10 @@ Qed.
 
 (* lteif *)
 
-Lemma subr_lteifr0 C x y : (y - x < 0 ?<= if C) = (y < x ?<= if C).
+Lemma subr_lteifr0 C x y : (y - x < 0%R ?<= if C) = (y < x ?<= if C).  (* FIXME: 0%R *)
 Proof. by case: C => /=; rewrite subr_lte0. Qed.
 
-Lemma subr_lteif0r C x y : (0 < y - x ?<= if C) = (x < y ?<= if C).
+Lemma subr_lteif0r C x y : (0%R < y - x ?<= if C) = (x < y ?<= if C).  (* FIXME: 0%R *)
 Proof. by case: C => /=; rewrite subr_gte0. Qed.
 
 Definition subr_lteif0 := (subr_lteifr0, subr_lteif0r).
@@ -3207,10 +2613,10 @@ Proof. by case: C; rewrite /= lter_oppl. Qed.
 Lemma lteif_oppr C x y : x < - y ?<= if C = (y < - x ?<= if C).
 Proof. by case: C; rewrite /= lter_oppr. Qed.
 
-Lemma lteif_0oppr C x : 0 < - x ?<= if C = (x < 0 ?<= if C).
+Lemma lteif_0oppr C x : 0%R < - x ?<= if C = (x < 0%R ?<= if C).  (* FIXME: 0%R *)
 Proof. by case: C; rewrite /= (oppr_ge0, oppr_gt0). Qed.
 
-Lemma lteif_oppr0 C x : - x < 0 ?<= if C = (0 < x ?<= if C).
+Lemma lteif_oppr0 C x : - x < 0%R ?<= if C = (0%R < x ?<= if C).  (* FIXME: 0%R *)
 Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
 
 Lemma lteif_opp2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
@@ -3254,7 +2660,7 @@ Proof. by case: C => ? ? ?; rewrite /= lter_nmul2l. Qed.
 Lemma lteif_nmul2r C x : x < 0 -> {mono *%R^~ x : y z /~ y < z ?<= if C}.
 Proof. by case: C => ? ? ?; rewrite /= lter_nmul2r. Qed.
 
-Lemma lteif_nnormr C x y : y < 0 ?<= if ~~ C -> (`|x| < y ?<= if C) = false.
+Lemma lteif_nnormr C x y : y < 0%R ?<= if ~~ C -> (`|x| < y ?<= if C) = false.  (* FIXME: 0%R *)
 Proof. by case: C => ?; rewrite /= lter_nnormr. Qed.
 
 Lemma real_lteifNE x y C : x \is Num.real -> y \is Num.real ->
@@ -3569,13 +2975,13 @@ Definition lter_ndivr_mull := (ler_ndivr_mull, ltr_ndivr_mull).
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
 
-Lemma normfV : {morph (@norm F F) : x / x ^-1}.
+Lemma normfV : {morph (@norm _ (* F *) F) : x / x ^-1}.  (* FIXME *)
 Proof.
 move=> x /=; have [/normrV //|Nux] := boolP (x \is a GRing.unit).
 by rewrite !invr_out // unitfE normr_eq0 -unitfE.
 Qed.
 
-Lemma normf_div : {morph (@norm F F) : x y / x / y}.
+Lemma normf_div : {morph (@norm _ (* F *) F) : x y / x / y}.  (* FIXME *)
 Proof. by move=> x y /=; rewrite normrM normfV. Qed.
 
 Lemma invr_sg x : (sg x)^-1 = sgr x.
@@ -3722,15 +3128,15 @@ Lemma ltrgtP x y :
                  (x >= y) (x <= y) (x > y) (x < y) .
 Proof. exact: real_ltgtP. Qed.
 
-Lemma ger0P x : ger0_xor_lt0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+Lemma ger0P x : ger0_xor_lt0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
                                 `|x| (x < 0) (0 <= x).
 Proof. exact: real_ge0P. Qed.
 
-Lemma ler0P x : ler0_xor_gt0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+Lemma ler0P x : ler0_xor_gt0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
                                 `|x| (0 < x) (x <= 0).
 Proof. exact: real_le0P. Qed.
 
-Lemma ltrgt0P x : comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+Lemma ltrgt0P x : comparer0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
   `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof. exact: real_ltgt0P. Qed.
 
@@ -3862,7 +3268,7 @@ Lemma sgr_smul x y : sg (sg x * y) = sg x * sg y.
 Proof. by rewrite sgrM sgr_id. Qed.
 
 Lemma sgr_gt0 x : (sg x > 0) = (x > 0).
-Proof. by rewrite -sgr_cp0 sgr_id sgr_cp0. Qed.
+Proof. by rewrite -[LHS]sgr_cp0 sgr_id sgr_cp0. Qed.  (* FIXME: [LHS] was not needed *)
 
 Lemma sgr_ge0 x : (sgr x >= 0) = (x >= 0).
 Proof. by rewrite !leNgt sgr_lt0. Qed.
@@ -4201,26 +3607,15 @@ Qed.
 
 End RealClosedFieldTheory.
 
-Definition conjC {C : numClosedFieldType} : {rmorphism C -> C} :=
- ClosedField.conj_op (ClosedField.conj_mixin (ClosedField.class C)).
-Notation "z ^*" := (@conjC _ z) (at level 2, format "z ^*") : ring_scope.
-
-Definition imaginaryC {C : numClosedFieldType} : C :=
- ClosedField.imaginary (ClosedField.conj_mixin (ClosedField.class C)).
-Notation "'i" := (@imaginaryC _) (at level 0) : ring_scope.
+Notation "z ^*" := (conj_op z) (at level 2, format "z ^*") : ring_scope.
+Notation "'i" := imaginary (at level 0) : ring_scope.
 
 Section ClosedFieldTheory.
 
 Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
-Definition normCK x : `|x| ^+ 2 = x * x^*.
-Proof. by case: C x => ? [? ? ? []]. Qed.
-
-Lemma sqrCi : 'i ^+ 2 = -1 :> C.
-Proof. by case: C => ? [? ? ? []]. Qed.
-
-Lemma conjCK : involutive (@conjC C).
+Lemma conjCK : involutive (@conj_op C).
 Proof.
 have JE x : x^* = `|x|^+2 / x.
   have [->|x_neq0] := eqVneq x 0; first by rewrite rmorph0 invr0 mulr0.
@@ -4232,7 +3627,7 @@ by rewrite divff ?mul1r ?invrK // !expf_eq0 normr_eq0 //.
 Qed.
 
 Let Re2 z := z + z^*.
-Definition nnegIm z := (0 <= imaginaryC * (z^* - z)).
+Definition nnegIm z := (0 <= 'i * (z^* - z)).
 Definition argCle y z := nnegIm z ==> nnegIm y && (Re2 z <= Re2 y).
 
 Variant rootC_spec n (x : C) : Type :=
@@ -4299,7 +3694,7 @@ Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
 Proof.
 wlog suffices: x / 0 <= x -> 0 <= x^*.
   by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
-rewrite le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
+rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.  (* FIXME: pattern *)
 by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
 Qed.
 
@@ -4383,7 +3778,7 @@ Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
 Lemma Crect x : x = 'Re x + 'i * 'Im x.
 Proof.
 rewrite 2!mulrA -expr2 sqrCi mulN1r opprB -mulrDl addrACA subrr addr0.
-by rewrite -mulr2n -mulr_natr mulfK.
+by rewrite -mulr2n -[X in X * _]mulr_natr mulfK.  (* FIXME: pattern *)
 Qed.
 
 Lemma Creal_Re x : 'Re x \is real.
@@ -4868,7 +4263,7 @@ End ClosedFieldTheory.
 Notation "n .-root" := (@nthroot _ n)
   (at level 2, format "n .-root") : ring_scope.
 Notation sqrtC := 2.-root.
-Notation "'i" := (@imaginaryC _) (at level 0) : ring_scope.
+Notation "'i" := imaginary (at level 0) : ring_scope.
 Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
 Notation "'Im z" := (Im z) (at level 10, z at level 8) : ring_scope.
 
@@ -4877,6 +4272,8 @@ Arguments sqrCK {C} [x] le0x.
 Arguments sqrCK_P {C x}.
 
 End Theory.
+
+(* STOP
 
 (*************)
 (* FACTORIES *)
@@ -5230,19 +4627,14 @@ End Exports.
 
 End RealLtMixin.
 Import RealLtMixin.Exports.
-*)
+end STOP *)
 
 Module Exports. HB.reexport. End Exports.
 End Num.
 Export Num.Exports.
 
-Export Num.NumDomain.Exports Num.NormedZmodule.Exports.
-
-(*
-Export Num.NumField.Exports Num.ClosedField.Exports.
-Export Num.RealDomain.Exports Num.RealField.Exports.
-Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
+(*
 Export Num.NumMixin.Exports Num.RealMixin.Exports.
 Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
 
