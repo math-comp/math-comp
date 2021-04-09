@@ -109,7 +109,7 @@ Canonical Zp_baseFinGroupType := Eval hnf in [baseFinGroupType of 'I_p for +%R].
 Canonical Zp_finGroupType := Eval hnf in [finGroupType of 'I_p for +%R].
 *)
 HB.instance  Definition _ := 
-  IsMulGroup.Build 'I_p  Zp_addA Zp_add0z Zp_addNz.
+  IsMulGroup.Build 'I_p Zp_addA Zp_add0z Zp_addNz.
 
 (* Ring operations *)
 
@@ -118,7 +118,6 @@ Proof. by move=> x; apply: val_inj; rewrite /= modnMml mul1n modZp. Qed.
 
 Lemma Zp_mulC : commutative Zp_mul.
 Proof. by move=> x y; apply: val_inj; rewrite /= mulnC. Qed.
-
 
 Lemma Zp_mulz1 : right_id Zp1 Zp_mul.
 Proof. by move=> x; rewrite Zp_mulC Zp_mul1z. Qed.
