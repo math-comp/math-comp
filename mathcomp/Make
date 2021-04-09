@@ -49,7 +49,7 @@ fingroup/quotient.v
 # solvable/abelian.v
 # solvable/all_solvable.v
 solvable/alt.v
-# solvable/burnside_app.v
+solvable/burnside_app.v
 solvable/center.v
 solvable/commutator.v
 solvable/cyclic.v
