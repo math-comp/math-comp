@@ -3822,7 +3822,7 @@ Fact leP x y : le_xor_gt x y
   (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
 Proof. exact: comparable_leP. Qed.
 
-Definition meet := @min _ [porderType of T]. (* FIXME: [the POrder of T] doesn't work *)
+Definition meet := @min _ [porderType of T].
 Definition join := @max _ [porderType of T].
 
 Fact meetC : commutative meet.
