@@ -42,8 +42,6 @@ Definition ratz (n : int) := @Rat (n, 1) (coprimen1 _).
 (* Coercion ratz (n : int) := @Rat (n, 1) (coprimen1 _). *)
 
 HB.instance Definition _ :  SUB _ _ rat := SUB.class [subType for valq].
-HB.instance Definition _ := [Equality of rat by <:].
-HB.instance Definition _ := [Choice of rat by <:].
 HB.instance Definition _ := [Countable of rat by <:].
 
 Definition numq x := nosimpl ((valq x).1).
@@ -534,8 +532,7 @@ by apply: (canRL (signrMK _)); rewrite mulz_sign_abs.
 Qed.
 
 Fact norm_ratN x : normq (- x) = normq x.
-(* FIX ME normrN is not visible anymore directly *)
-Proof. by rewrite /normq numqN denqN Num.normrN. Qed.
+Proof. by rewrite /normq numqN denqN normrN. Qed.
 
 Fact ge_rat0_norm x : le_rat 0 x -> normq x = x.
 Proof.
@@ -547,7 +544,7 @@ Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite /lt_rat lt_def rat_eq. Qed.
 
 HB.instance Definition _ :=
-   Num.IntegralDomain_IsLeReal.Build rat le_rat0D le_rat0M le_rat0_anti 
+   Num.IntegralDomain_IsLeReal.Build rat le_rat0D le_rat0M le_rat0_anti
      subq_ge0 (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
@@ -579,12 +576,11 @@ Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-(*FIX ME normrM is not directly visible *)
-rewrite pmulrn abszE intr_norm numqE Num.normrM ler_pemulr //.
+rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   Num.RealField_IsArchimedean.Build rat rat_archimedean.
 
 Section QintPred.

@@ -1545,7 +1545,7 @@ Lemma abszE (m : int) : `|m| = `|m|%R :> int. Proof. by []. Qed.
 
 Lemma absz0 : `|0%R| = 0. Proof. by []. Qed.
 
-Lemma abszN m : `|- m| = `|m|. Proof. by case: (Num.normrN m). Qed.  (* FIXME: was normrN (without Num ?), missing Export ? *)
+Lemma abszN m : `|- m| = `|m|. Proof. by case: (normrN m). Qed.
 
 Lemma absz_eq0 m : (`|m| == 0) = (m == 0%R). Proof. by case: (intP m). Qed.
 
@@ -1701,7 +1701,7 @@ Lemma intr_norm m : `|m|%:~R = `|m%:~R : R|.
 Proof. by rewrite {2}[m]intEsign rmorphMsign normrMsign abszE normr_nat. Qed.
 
 Lemma normrMz m (x : R) : `|x *~ m| = `|x| *~ `|m|.
-Proof. by rewrite -mulrzl Num.normrM -intr_norm mulrzl. Qed.  (* FIXME: was normrN (without Num ?), missing Export ? *)
+Proof. by rewrite -mulrzl normrM -intr_norm mulrzl. Qed.
 
 Lemma expN1r (i : int) : (-1 : R) ^ i = (-1) ^+ `|i|.
 Proof.

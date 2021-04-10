@@ -634,6 +634,19 @@ Variable R : numDomainType.
 Local Notation V := R.
 Implicit Types (x y z t : R).
 
+(* Lemmas from the signature (reexported). *)
+
+Definition ler_norm_add (* V *) (x y : V) : `|x + y| <= `|x| + `|y| :=
+  ler_norm_add x y.  (* FIXME *)
+Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
+Definition normr0_eq0 (* V *) (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 ring_display R (* V *) x.  (* FIXME *)
+Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
+  @ger_leVge R x y.
+Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
+Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := ler_def x y.
+Definition normrMn (* V *) (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.  (* FIXME *)
+Definition normrN (* V *) (x : V) : `|- x| = `|x| := normrN x.  (*  FIXME *)
+
 (* Predicate definitions. *)
 
 Lemma posrE x : (x \is pos) = (0 < x). Proof. by []. Qed.
@@ -763,7 +776,7 @@ Lemma normr_gt0 v : `|v| > 0 = (v != 0).
 Proof. by rewrite lt_def normr_eq0 normr_ge0 andbT. Qed.
 
 Definition normrE := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
-  normr_lt0, normr_le0, normr_gt0, @normrN _ R).
+  normr_lt0, normr_le0, normr_gt0, normrN).
 
 End NormedZmoduleTheory.
 
