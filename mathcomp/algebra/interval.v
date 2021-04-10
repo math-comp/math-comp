@@ -647,11 +647,12 @@ Section LersifPo.
 Variable R : numDomainType.
 Implicit Types (b : bool) (x y z : R).
 
-(* STOP HERE *)
-Lemma subr_lersifr0 b (x y : R) : (y - x <= 0 ?< if b) = (y <= x ?< if b).
+Lemma subr_lersifr0 b (x y : R) : (y - x <= 0%R ?< if b) = (y <= x ?< if b). 
+(* FIX ME : had to add %R to 0 *)
 Proof. exact: subr_lteifr0. Qed.
 
-Lemma subr_lersif0r b (x y : R) : (0 <= y - x ?< if b) = (x <= y ?< if b).
+Lemma subr_lersif0r b (x y : R) : (0%R <= y - x ?< if b) = (x <= y ?< if b).
+(* FIX ME : had to add %R to 0 *)
 Proof. exact: subr_lteif0r. Qed.
 
 Definition subr_lersif0 := (subr_lersifr0, subr_lersif0r).
@@ -660,7 +661,8 @@ Lemma lersif_trans x y z b1 b2 :
   x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
 Proof. by rewrite negb_or; exact: lteif_trans. Qed.
 
-Lemma lersif01 b : (0 : R) <= 1 ?< if b. Proof. exact: lteif01. Qed.
+Lemma lersif01 b : (0 : R) <= 1%R ?< if b. Proof. exact: lteif01. Qed.
+(* FIX ME : had to add %R to 1 *)
 
 Lemma lersif_anti b1 b2 x y :
   (x <= y ?< if b1) && (y <= x ?< if b2) =
@@ -685,10 +687,12 @@ Proof. exact: lteif_oppl. Qed.
 Lemma lersif_oppr b x y : x <= - y ?< if b = (y <= - x ?< if b).
 Proof. exact: lteif_oppr. Qed.
 
-Lemma lersif_0oppr b x : 0 <= - x ?< if b = (x <= 0 ?< if b).
+Lemma lersif_0oppr b x : 0%R <= - x ?< if b = (x <= 0%R ?< if b).
+(* FIX ME : had to add %R to 0 *)
 Proof. exact: lteif_0oppr. Qed.
 
-Lemma lersif_oppr0 b x : - x <= 0 ?< if b = (0 <= x ?< if b).
+Lemma lersif_oppr0 b x : - x <= 0%R ?< if b = (0%R <= x ?< if b).
+(* FIX ME : had to add %R to 0 *)
 Proof. exact: lteif_oppr0. Qed.
 
 Lemma lersif_opp2 b : {mono (-%R : R -> R) : x y /~ x <= y ?< if b}.
@@ -764,7 +768,8 @@ Lemma real_lersif_normr b x y :
   (x <= `|y| ?< if b) = ((x <= y ?< if b) || (x <= - y ?< if b)).
 Proof. exact: real_lteif_normr. Qed.
 
-Lemma lersif_nnormr b x y : y <= 0 ?< if ~~ b -> (`|x| <= y ?< if b) = false.
+Lemma lersif_nnormr b x y : y <= 0%R ?< if ~~ b -> (`|x| <= y ?< if b) = false.
+(* FIX ME : had to add %R to 0 *)
 Proof. exact: lteif_nnormr. Qed.
 
 End LersifPo.
@@ -1024,19 +1029,20 @@ Notation itv_intersection :=
 
 #[deprecated(since="mathcomp 1.12.0", note="Use meet1x instead.")]
 Notation "@ 'itv_intersection1i'" :=
-  (fun (R : realDomainType) => @meet1x _ [tbLatticeType of interval R])
+  (fun (R : realDomainType) => @meet1x _ (Order.TBLattice.on R))
     (at level 10, only parsing) : fun_scope.
 #[deprecated(since="mathcomp 1.12.0", note="Use meet1x instead.")]
 Notation itv_intersection1i :=
-  (@meet1x _ [tbLatticeType of interval (_ : realDomainType)]) (only parsing).
+  (@meet1x _ (Order.TBLattice.on interval (_ : realDomainType))) (only parsing).
 
 #[deprecated(since="mathcomp 1.12.0", note="Use meetx1 instead.")]
 Notation "@ 'itv_intersectioni1'" :=
-  (fun (R : realDomainType) => @meetx1 _ [tbLatticeType of interval R])
+  (fun (R : realDomainType) => @meetx1 _ (Order.TBLattice.on (interval R)))
     (at level 10, only parsing) : fun_scope.
 #[deprecated(since="mathcomp 1.12.0", note="Use meetx1 instead.")]
  Notation itv_intersectioni1 :=
-  (@meetx1 _ [tbLatticeType of interval (_ : realDomainType)]) (only parsing).
+  (@meetx1 _ (Order.TBLattice.on (interval (_ : realDomainType))))
+   (only parsing).
 
 #[deprecated(since="mathcomp 1.12.0", note="Use meetxx instead.")]
 Notation "@ 'itv_intersectionii'" :=
