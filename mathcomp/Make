@@ -24,7 +24,7 @@ algebra/zmodp.v
 # character/inertia.v
 # character/integral_char.v
 # character/mxabelem.v
-# character/mxrepresentation.v
+character/mxrepresentation.v
 # character/vcharacter.v
 # field/algC.v
 # field/algebraics_fundamentals.v
