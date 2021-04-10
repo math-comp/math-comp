@@ -647,12 +647,10 @@ Section LersifPo.
 Variable R : numDomainType.
 Implicit Types (b : bool) (x y z : R).
 
-Lemma subr_lersifr0 b (x y : R) : (y - x <= 0%R ?< if b) = (y <= x ?< if b). 
-(* FIX ME : had to add %R to 0 *)
+Lemma subr_lersifr0 b (x y : R) : (y - x <= 0 ?< if b) = (y <= x ?< if b).
 Proof. exact: subr_lteifr0. Qed.
 
-Lemma subr_lersif0r b (x y : R) : (0%R <= y - x ?< if b) = (x <= y ?< if b).
-(* FIX ME : had to add %R to 0 *)
+Lemma subr_lersif0r b (x y : R) : (0 <= y - x ?< if b) = (x <= y ?< if b).
 Proof. exact: subr_lteif0r. Qed.
 
 Definition subr_lersif0 := (subr_lersifr0, subr_lersif0r).
@@ -687,12 +685,10 @@ Proof. exact: lteif_oppl. Qed.
 Lemma lersif_oppr b x y : x <= - y ?< if b = (y <= - x ?< if b).
 Proof. exact: lteif_oppr. Qed.
 
-Lemma lersif_0oppr b x : 0%R <= - x ?< if b = (x <= 0%R ?< if b).
-(* FIX ME : had to add %R to 0 *)
+Lemma lersif_0oppr b x : 0 <= - x ?< if b = (x <= 0 ?< if b).
 Proof. exact: lteif_0oppr. Qed.
 
-Lemma lersif_oppr0 b x : - x <= 0%R ?< if b = (0%R <= x ?< if b).
-(* FIX ME : had to add %R to 0 *)
+Lemma lersif_oppr0 b x : - x <= 0 ?< if b = (0 <= x ?< if b).
 Proof. exact: lteif_oppr0. Qed.
 
 Lemma lersif_opp2 b : {mono (-%R : R -> R) : x y /~ x <= y ?< if b}.
@@ -768,8 +764,7 @@ Lemma real_lersif_normr b x y :
   (x <= `|y| ?< if b) = ((x <= y ?< if b) || (x <= - y ?< if b)).
 Proof. exact: real_lteif_normr. Qed.
 
-Lemma lersif_nnormr b x y : y <= 0%R ?< if ~~ b -> (`|x| <= y ?< if b) = false.
-(* FIX ME : had to add %R to 0 *)
+Lemma lersif_nnormr b x y : y <= 0 ?< if ~~ b -> (`|x| <= y ?< if b) = false.
 Proof. exact: lteif_nnormr. Qed.
 
 End LersifPo.

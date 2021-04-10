@@ -1018,7 +1018,7 @@ Variant comparer0 x : R -> R -> R -> R -> R ->
   | ComparerEq0 of x = 0 : comparer0 x 0 0 0 0 0 true true true true false false.
 
 Lemma real_ge0P x : x \is real -> ger0_xor_lt0 x
-   (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME: Order.min used to have no scope on its arguments, now order_scope so 0 is interpreted as bottom instead of GRing.zero *)
+   (min 0 x) (min x 0) (max 0 x) (max x 0)
   `|x| (x < 0) (0 <= x).
 Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: real_leP;
@@ -1026,7 +1026,7 @@ by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
 Lemma real_le0P x : x \is real -> ler0_xor_gt0 x
-  (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
+  (min 0 x) (min x 0) (max 0 x) (max x 0)
   `|x| (0 < x) (x <= 0).
 Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: real_ltP;
@@ -1034,7 +1034,7 @@ by rewrite ?subr0 ?sub0r //; constructor.
 Qed.
 
 Lemma real_ltgt0P x : x \is real ->
-  comparer0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
+  comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
             `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof.
 move=> hx; rewrite -[X in `|X|]subr0; case: (@real_ltgtP 0 x);
@@ -2559,8 +2559,8 @@ exact: leif_add.
 Qed.
 
 Lemma leif_0_sum (I : finType) (P C : pred I) (E : I -> R) :
-    (forall i, P i -> 0%R <= E i ?= iff C i) ->
-  0%R <= \sum_(i | P i) E i ?= iff [forall (i | P i), C i].  (* FIXME: 0%R instead of 0 ? *)
+    (forall i, P i -> 0 <= E i ?= iff C i) ->
+  0 <= \sum_(i | P i) E i ?= iff [forall (i | P i), C i].
 Proof. by move/leif_sum; rewrite big1_eq. Qed.
 
 Lemma real_leif_norm x : x \is real -> x <= `|x| ?= iff (0 <= x).
@@ -2609,10 +2609,10 @@ Qed.
 
 (* lteif *)
 
-Lemma subr_lteifr0 C x y : (y - x < 0%R ?<= if C) = (y < x ?<= if C).  (* FIXME: 0%R *)
+Lemma subr_lteifr0 C x y : (y - x < 0 ?<= if C) = (y < x ?<= if C).
 Proof. by case: C => /=; rewrite subr_lte0. Qed.
 
-Lemma subr_lteif0r C x y : (0%R < y - x ?<= if C) = (x < y ?<= if C).  (* FIXME: 0%R *)
+Lemma subr_lteif0r C x y : (0 < y - x ?<= if C) = (x < y ?<= if C).
 Proof. by case: C => /=; rewrite subr_gte0. Qed.
 
 Definition subr_lteif0 := (subr_lteifr0, subr_lteif0r).
@@ -2626,10 +2626,10 @@ Proof. by case: C; rewrite /= lter_oppl. Qed.
 Lemma lteif_oppr C x y : x < - y ?<= if C = (y < - x ?<= if C).
 Proof. by case: C; rewrite /= lter_oppr. Qed.
 
-Lemma lteif_0oppr C x : 0%R < - x ?<= if C = (x < 0%R ?<= if C).  (* FIXME: 0%R *)
+Lemma lteif_0oppr C x : 0 < - x ?<= if C = (x < 0 ?<= if C).
 Proof. by case: C; rewrite /= (oppr_ge0, oppr_gt0). Qed.
 
-Lemma lteif_oppr0 C x : - x < 0%R ?<= if C = (0%R < x ?<= if C).  (* FIXME: 0%R *)
+Lemma lteif_oppr0 C x : - x < 0 ?<= if C = (0 < x ?<= if C).
 Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
 
 Lemma lteif_opp2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
@@ -2673,7 +2673,7 @@ Proof. by case: C => ? ? ?; rewrite /= lter_nmul2l. Qed.
 Lemma lteif_nmul2r C x : x < 0 -> {mono *%R^~ x : y z /~ y < z ?<= if C}.
 Proof. by case: C => ? ? ?; rewrite /= lter_nmul2r. Qed.
 
-Lemma lteif_nnormr C x y : y < 0%R ?<= if ~~ C -> (`|x| < y ?<= if C) = false.  (* FIXME: 0%R *)
+Lemma lteif_nnormr C x y : y < 0 ?<= if ~~ C -> (`|x| < y ?<= if C) = false.
 Proof. by case: C => ?; rewrite /= lter_nnormr. Qed.
 
 Lemma real_lteifNE x y C : x \is Num.real -> y \is Num.real ->
@@ -3141,15 +3141,15 @@ Lemma ltrgtP x y :
                  (x >= y) (x <= y) (x > y) (x < y) .
 Proof. exact: real_ltgtP. Qed.
 
-Lemma ger0P x : ger0_xor_lt0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
+Lemma ger0P x : ger0_xor_lt0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
                                 `|x| (x < 0) (0 <= x).
 Proof. exact: real_ge0P. Qed.
 
-Lemma ler0P x : ler0_xor_gt0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
+Lemma ler0P x : ler0_xor_gt0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
                                 `|x| (0 < x) (x <= 0).
 Proof. exact: real_le0P. Qed.
 
-Lemma ltrgt0P x : comparer0 x (min 0%R x) (min x 0%R) (max 0%R x) (max x 0%R)  (* FIXME *)
+Lemma ltrgt0P x : comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
   `|x| (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
 Proof. exact: real_ltgt0P. Qed.
 

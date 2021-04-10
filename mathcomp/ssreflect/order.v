@@ -1095,7 +1095,7 @@ Notation "[ 'porderType' 'of' T 'with' disp ]" :=
   (at level 0, format "[ 'porderType'  'of'  T  'with' disp ]") : form_scope.
 End POrderExports.
 HB.export POrderExports.
-Bind Scope order_scope with POrder.sort.
+(* Bind Scope order_scope with POrder.sort. *)
 
 Section POrderDef.
 
