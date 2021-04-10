@@ -214,8 +214,7 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
-(* FIXME *)
-Canonical hom_subType := [newType for f2mx].
+HB.instance Definition _ := SUB.copy 'Hom(aT, rT) [newType for f2mx].
 End Hom.
 
 Arguments mx2vs {K vT m%N} A%MS.
