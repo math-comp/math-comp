@@ -1,4 +1,4 @@
-# algebra/all_algebra.v
+algebra/all_algebra.v
 algebra/finalg.v
 algebra/countalg.v
 algebra/fraction.v
