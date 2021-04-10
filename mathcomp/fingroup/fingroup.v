@@ -306,6 +306,7 @@ Proof.
 have mulV21 x: x^-1^-1 * 1 = x by rewrite -(mulVg x) mulgA mulVg mul1g.
 by move=> x; rewrite -[_ ^-1]mulV21 -(mul1g 1) mulgA !mulV21.
 Qed.
+HB.export mk_invgK.
 
 Lemma mk_invMg : {morph invg : x y / x * y >-> y * x}.
 Proof.
@@ -313,6 +314,7 @@ have mulgV x: x * x^-1 = 1 by rewrite -{1}[x]mk_invgK mulVg.
 move=> x y /=; rewrite -[y^-1 * _]mul1g -(mulVg (x * y)) -2!mulgA (mulgA y).
 by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
+HB.export mk_invMg.
 
 HB.instance Definition _ := 
   IsMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
@@ -2989,3 +2991,5 @@ Notation "[ 'min' G | gP ]" := [min gval G of G | gP] : group_scope.
 Notation "[ 'min' A 'of' G | gP & gQ ]" :=
   [min A of G | gP && gQ] : group_scope.
 Notation "[ 'min' G | gP & gQ ]" := [min G | gP && gQ] : group_scope.
+
+HB.reexport.

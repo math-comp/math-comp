@@ -826,8 +826,8 @@ have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
 (* FIXME / *)
-pose sG_invgK := Builders_30.mk_invgK (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
-pose sG_invMg := Builders_30.mk_invMg (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
+pose sG_invgK := mk_invgK (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
+pose sG_invMg := mk_invMg (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
 pose sgT := BaseFinGroup.Pack (BaseFinGroup.Class (IsMulBaseGroup.Build _ sG_Ag sG_1g sG_invgK sG_invMg) (Countable.on _) (Choice.on _) (Finite.on (seq_sub rs))).
 have sG_Vg': left_inverse (@oneg sgT) (@invg _) (@mulg _).
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
