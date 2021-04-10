@@ -310,7 +310,7 @@ rewrite [prodv]unlock; apply/span_subvP=> _ /allpairsP[[u v] /= [Uu Vv ->]].
 by rewrite sUVW ?vbasis_mem.
 Qed.
 
-Lemma prodv_line u v : (<[u]> * <[v]> = <[(u * v)%R]>)%VS.  (* FIXME: scope issue, the %R was not neede before *)
+Lemma prodv_line u v : (<[u]> * <[v]> = <[u * v]>)%VS.
 Proof.
 apply: subv_anti; rewrite -memvE memv_mul ?memv_line // andbT.
 apply/prodvP=> _ _ /vlineP[a ->] /vlineP[b ->].
@@ -434,7 +434,7 @@ move=> sUV; elim: n => [|n IHn]; first by rewrite !expv0 subvv.
 by rewrite !expvSl prodvS.
 Qed.
 
-Lemma expv_line u n : (<[u]> ^+ n = <[(u ^+ n)%R]>)%VS.  (* FIXME: scope issue, the %R was not neede before *)
+Lemma expv_line u n : (<[u]> ^+ n = <[u ^+ n]>)%VS.
 Proof.
 elim: n => [|n IH]; first by rewrite expr0 expv0.
 by rewrite exprS expvSl IH prodv_line.

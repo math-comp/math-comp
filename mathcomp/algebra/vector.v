@@ -136,6 +136,7 @@ End OtherDefs.
 (* /FIXME *)
 
 Module Import VectorExports.
+Bind Scope ring_scope with Vector.sort.
 (* FIXME: in ssralg, R was often replaced by [the ringType of R] *
  * Should it be the same here?                                   *)
 Notation vectType R := (@Vector.type R).
