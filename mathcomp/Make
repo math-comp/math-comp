@@ -30,7 +30,7 @@ algebra/zmodp.v
 # field/algebraics_fundamentals.v
 # field/algnum.v
 # field/all_field.v
-# field/closed_field.v
+field/closed_field.v
 # field/cyclotomic.v
 # field/falgebra.v
 # field/fieldext.v

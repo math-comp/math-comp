@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
 From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
 From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
@@ -39,7 +40,7 @@ Import PreClosedField.
 Module ClosedFieldQE.
 Section ClosedFieldQE.
 
-Variables (F : fieldType) (F_closed : GRing.ClosedField.axiom F).
+Variables (F : fieldType) (F_closed : GRing.closed_field_axiom F).
 
 Notation fF := (@GRing.formula F).
 Notation tF := (@GRing.term F).
@@ -645,11 +646,15 @@ Qed.
 Lemma wf_ex_elim : GRing.wf_QE_proj ex_elim.
 Proof. by move=> i bc /= rbc; apply: ex_elim_qf. Qed.
 
-Definition Mixin := QEdecFieldMixin wf_ex_elim holds_ex_elim.
+End ClosedFieldQE.
+End ClosedFieldQE.
 
-End ClosedFieldQE.
-End ClosedFieldQE.
-Notation closed_field_QEMixin := ClosedFieldQE.Mixin.
+HB.builders Context F (f : GRing.Field_IsAlgClosed F).
+  HB.instance Definition _ := GRing.decidable_of_QE.Build F
+    (@ClosedFieldQE.wf_ex_elim [the GRing.Field.type of F])
+    (ClosedFieldQE.holds_ex_elim solve_monicpoly).
+  HB.instance Definition _ := f.
+HB.end.
 
 Import CodeSeq.
 
@@ -691,6 +696,10 @@ have I_ideal : idealr_closed I.
   by apply: dvdp_trans Iq2; apply/dv_d/leq_maxr.
 pose Iaddkey := GRing.Pred.Add (DefaultPredKey I) I_ideal.
 pose Iidkey := MkIdeal (GRing.Pred.Zmod Iaddkey I_ideal) I_ideal.
+pose E := GRing.ComRing.Pack (GRing.ComRing.Class (GRing.Ring_HasCommutativeMul.Build _ (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)))).
+Admitted.
+(* FIXME *)
+(*
 pose E := ComRingType _ (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)).
 pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
 have PtoEd i: PtoE (d i) = 0.
@@ -718,6 +727,7 @@ exists [countFieldType of Ecount], FtoE, w => [|u].
   by rewrite /root defPtoE (PtoEd 0%N).
 by exists (repr u); rewrite defPtoE /= reprK.
 Qed.
+*)
 
 Lemma countable_algebraic_closure (F : countFieldType) :
   {K : countClosedFieldType & {FtoK : {rmorphism F -> K} | integralRange FtoK}}.
@@ -832,6 +842,9 @@ have Kadd0: left_id (FtoK 0) Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -(EtoK_0 i) -EtoK_D add0r.
 have KaddN: left_inverse (FtoK 0) Kopp Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -EtoK_N -EtoK_D addNr EtoK_0.
+Admitted.
+(* FIXME *)
+(*
 pose Kzmod := ZmodType K (ZmodMixin KaddA KaddC Kadd0 KaddN).
 have KmulC: commutative Kmul.
   by move=> u v; have [i [x ->] [y ->]] := KtoE2 u v; rewrite -!EtoK_M mulrC.
@@ -900,3 +913,4 @@ apply: integral_root (ext1root _ _) _.
   by rewrite map_poly_eq0 -size_poly_gt0 ltnW.
 by apply/integral_poly=> i; rewrite coef_map; apply: integral_rmorph.
 Qed.
+ *)
