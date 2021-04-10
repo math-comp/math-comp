@@ -2,7 +2,7 @@
 algebra/finalg.v
 algebra/countalg.v
 algebra/fraction.v
-# algebra/intdiv.v
+algebra/intdiv.v
 # algebra/interval.v
 algebra/matrix.v
 algebra/mxalgebra.v
