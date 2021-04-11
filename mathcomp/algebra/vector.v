@@ -1729,9 +1729,19 @@ Definition lfun_lalgType := Eval hnf in [lalgType R of 'End(vT)
   for LalgType R lfun_ringType (fun k x y => comp_lfunZr k y x)].
 Definition lfun_algType := Eval hnf in [algType R of 'End(vT)
   for AlgType R _ (fun k (x y : lfun_lalgType) => comp_lfunZl k y x)].
-*)
-End LfunAlgebra.
+ *)
 
+Definition lfun_lalgMixin :=
+   GRing.Lmodule_IsLalgebra.Build _ lfun_ringType (fun k x y => comp_lfunZr k y x).
+Definition lfun_lalgType := Eval hnf in LalgType _ lfun_ringType lfun_lalgMixin.
+
+Definition lfun_algMixin :=
+  GRing.Lalgebra_IsAlgebra.Build _ lfun_lalgType
+    (fun k x y => comp_lfunZl k y x).
+(* FIXME: this one segfault *)
+Definition lfun_algType := Eval hnf in AlgType _ lfun_lalgType lfun_algMixin.
+
+End LfunAlgebra.
 
 Section Projection.
 
