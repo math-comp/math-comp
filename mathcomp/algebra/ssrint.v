@@ -553,49 +553,29 @@ rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
 * by rewrite -addnS -addSn mulrnDr.
 Qed.
 
-(* Definition Mint_LmodMixin := *)
-(*   @LmodMixin _ [zmodType of M] (fun n x => x *~ n) *)
-(*    mulrzA_C mulr1z mulrzDr mulrzDl. *)
-(* Canonical Mint_LmodType := LmodType int M^z Mint_LmodMixin. *)
-(* FIXME: cannot use a builder on a (context) variable?
-   (rather than a concrete built constant) *)
+HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
+HB.instance Definition _ := @GRing.Zmodule_IsLmodule.Build _ M^z
+  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDr mulrzDl.
 
-(*
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
-*)
 
 Lemma mulrzA x m n :  x *~ (m * n) = x *~ m *~ n.
-Admitted.
-(*
 Proof. by rewrite -!scalezrE scalerA mulrC. Qed.
-*)
 
 Lemma mulr0z x : x *~ 0 = 0. Proof. by []. Qed.
 
 Lemma mul0rz n : 0 *~ n = 0 :> M.
-Admitted.
-(*
 Proof. by rewrite -scalezrE scaler0. Qed.
-*)
 
 Lemma mulrNz x n : x *~ (- n) = - (x *~ n).
-Admitted.
-(*
 Proof. by rewrite -scalezrE scaleNr. Qed.
 
 Lemma mulrN1z x : x *~ (- 1) = - x. Proof. by rewrite -scalezrE scaleN1r. Qed.
-*)
 
 Lemma mulNrz x n : (- x) *~ n = - (x *~ n).
-Admitted.
-
-(*
 Proof. by rewrite -scalezrE scalerN. Qed.
- *)
 
 Lemma mulrzBr x m n : x *~ (m - n) = x *~ m - x *~ n.
-Admitted.
-(*
 Proof. by rewrite -scalezrE scalerBl. Qed.
 
 Lemma mulrzBl x y n : (x - y) *~ n = x *~ n - y *~ n.
@@ -611,7 +591,6 @@ Proof. by rewrite -/M^z; apply: scaler_suml. Qed.
 Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
 Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
-*)
 
 Canonical intmul_additive x := Additive (@mulrzBr x).
 
@@ -709,10 +688,7 @@ Proof. by rewrite -!scaler_int !scalerA mulrzr mulrzl. Qed.
 End LMod.
 
 Lemma mulrz_int (M : zmodType) (n : int) (x : M) : x *~ n%:~R = x *~ n.
-Admitted.
-(*
 Proof. by rewrite -scalezrE scaler_int. Qed.
-*)
 
 Section MorphTheory.
 Local Coercion Posz : nat >-> int.
