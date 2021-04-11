@@ -285,7 +285,10 @@ Proof. exact: val_reprGLm. Qed.
 
 Lemma reprGLmM : {in G &, {morph reprGLm : x y / x * y}}%g.
 Proof.
-by move=> x y Gx Gy; apply: val_inj; rewrite /= !val_reprGLm ?groupM ?repr_mxM.
+move=> x y Gx Gy; apply: val_inj; rewrite /=.
+rewrite -![FinRing.uval ?[a]]/(\val (reprGLm ?[a])).  (* FIXME: was not needed before (c.f. one liner below) *)
+by rewrite !val_reprGLm ?groupM ?repr_mxM.
+(* by move=> x y Gx Gy; apply: val_inj; rewrite /= !val_reprGLm ?groupM ?repr_mxM. *)
 Qed.
 Canonical reprGL_morphism := Morphism reprGLmM.
 
@@ -425,7 +428,7 @@ Variables p m n : nat.
 Local Notation Mmn := 'M['F_p]_(m, n).
 
 Lemma mx_Fp_abelem : prime p -> p.-abelem [set: Mmn].
-Proof. exact: fin_Fp_lmod_abelem. Qed.
+Proof. exact: fin_Fp_lmod_abelem. Qed.  (* FIXME: much slower *)
 
 Lemma mx_Fp_stable (L : {group Mmn}) : [acts setT, on L | 'Zm].
 Proof.
@@ -486,6 +489,7 @@ Qed.
 
 Local Notation ab_rV_P := (existsP isog_abelem_rV).
 Definition abelem_rV : gT -> rVn := xchoose ab_rV_P.
+Arguments abelem_rV _%group_scope.  (* FIXME: was not needed before *)
 
 Local Notation ErV := abelem_rV.
 
@@ -933,7 +937,7 @@ pose ephi i := invm (injm_Zpm a) (Zp_unitm (FinRing.Unit _ (phi_unitP i))).
 pose j : 'Z_#[z] := val (invm (injm_Zp_unitm z) a).
 have co_j_p: coprime j p.
   rewrite coprime_sym /j; case: (invm _ a) => /=.
-  by rewrite ozp /GRing.unit /= Zp_cast.
+  by rewrite ozp /GRing.unit /= /GRing.unit_subdef /= Zp_cast.  (* FIXME: had to unfold GRing.unit_subdef *)
 have [alpha Aut_alpha alphaZ] := center_aut_extraspecial pS esS co_j_p.
 have alpha_i_z i: ((alpha ^+ ephi i) z = z ^+ i.+1)%g.
   transitivity ((a ^+ ephi i) z)%g.

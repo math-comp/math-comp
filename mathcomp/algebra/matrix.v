@@ -2674,6 +2674,9 @@ HB.instance Definition _ := [finGroupMixin of MV for +%R].
 
 End FinZmodMatrix.
 
+HB.instance Definition _ (R : finRingType) (m n : nat) :=
+  FinRing.Zmodule.on 'M[R]_(m, n).
+
 HB.instance Definition _ (R : finRingType) n :=
   [Finite of 'M[R]_n.+1 by <:].
 

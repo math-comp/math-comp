@@ -239,10 +239,9 @@ HB.mixin Record IsMulBaseGroup G := {
 #[mathcomp, arg_sort] HB.structure Definition BaseFinGroup :=
   { G of IsMulBaseGroup G & Finite G }.
 
+Module BaseFinGroupExports.
 Bind Scope group_scope with BaseFinGroup.arg_sort.
 Bind Scope group_scope with BaseFinGroup.sort.
-
-Module BaseFinGroupExports.
 Notation baseFinGroupType := BaseFinGroup.type.
 Notation BaseFinGroupType T m := (BaseFinGroup.pack T m).
 Notation "[ 'baseFinGroupType' 'of' T ]" := (@BaseFinGroup.clone T _)
