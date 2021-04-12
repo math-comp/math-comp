@@ -47,13 +47,13 @@ fingroup/perm.v
 fingroup/presentation.v
 fingroup/quotient.v
 solvable/abelian.v
-# solvable/all_solvable.v
+solvable/all_solvable.v
 solvable/alt.v
 solvable/burnside_app.v
 solvable/center.v
 solvable/commutator.v
 solvable/cyclic.v
-# solvable/extraspecial.v
+solvable/extraspecial.v
 solvable/extremal.v
 solvable/finmodule.v
 solvable/frobenius.v
