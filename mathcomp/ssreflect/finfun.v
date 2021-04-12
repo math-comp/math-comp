@@ -107,21 +107,10 @@ Notation "T ^ n" :=
   (@finfun_of (exp_finIndexType n) (fun=> T) (Phant _)) : type_scope.
 
 Local Notation finPi aT rT := (forall x : Finite.sort aT, rT x) (only parsing).
-Local Notation finfun_def :=
-  (fun aT rT g => FinfunOf (Phant (finPi aT rT)) (finfun_rec g (enum aT))).
 
-Module Type FinfunDefSig.
-Parameter finfun : forall aT rT, finPi aT rT -> {ffun finPi aT rT}.
-Axiom finfunE : finfun = finfun_def.
-End FinfunDefSig.
-
-Module FinfunDef : FinfunDefSig.
-Definition finfun := finfun_def.
-Lemma finfunE : finfun = finfun_def. Proof. by []. Qed.
-End FinfunDef.
-
-Notation finfun := FinfunDef.finfun.
-Canonical finfun_unlock := Unlockable FinfunDef.finfunE.
+HB.lock Definition finfun aT rT g :=
+  FinfunOf (Phant (finPi aT rT)) (finfun_rec g (enum aT)).
+Canonical finfun_unlock := Unlockable finfun.unlock.
 Arguments finfun {aT rT} g.
 
 Notation "[ 'ffun' x : aT => E ]" := (finfun (fun x : aT => E))

@@ -154,32 +154,19 @@ Notation "A :!=: B" := (A != B :> {set _})
 Notation "A :=P: B" := (A =P B :> {set _})
   (at level 70, no associativity, only parsing) : set_scope.
 
-Local Notation finset_def := (fun T P => @FinSet T (finfun P)).
 
-Local Notation pred_of_set_def := (fun T (A : set_type T) => val A : _ -> _).
+HB.lock
+Definition finset (T : finType) (P : pred T) : {set T} := @FinSet T (finfun P).
+Canonical finset_unlock := Unlockable finset.unlock.
 
-Module Type SetDefSig.
-Parameter finset : forall T : finType, pred T -> {set T}.
-Parameter pred_of_set : forall T, set_type T -> fin_pred_sort (predPredType T).
 (* The weird type of pred_of_set is imposed by the syntactic restrictions on  *)
 (* coercion declarations; it is unfortunately not possible to use a functor   *)
 (* to retype the declaration, because this triggers an ugly bug in the Coq    *)
 (* coercion chaining code.                                                    *)
-Axiom finsetE : finset = finset_def.
-Axiom pred_of_setE : pred_of_set = pred_of_set_def.
-End SetDefSig.
-
-Module SetDef : SetDefSig.
-Definition finset := finset_def.
-Definition pred_of_set := pred_of_set_def.
-Lemma finsetE : finset = finset_def. Proof. by []. Qed.
-Lemma pred_of_setE : pred_of_set = pred_of_set_def. Proof. by []. Qed.
-End SetDef.
-
-Notation finset := SetDef.finset.
-Notation pred_of_set := SetDef.pred_of_set.
-Canonical finset_unlock := Unlockable SetDef.finsetE.
-Canonical pred_of_set_unlock := Unlockable SetDef.pred_of_setE.
+HB.lock
+Definition pred_of_set T (A : set_type T) : fin_pred_sort (predPredType T)
+:= val A.
+Canonical pred_of_set_unlock := Unlockable pred_of_set.unlock.
 
 Notation "[ 'set' x : T | P ]" := (finset (fun x : T => P%B))
   (at level 0, x at level 99, only parsing) : set_scope.
