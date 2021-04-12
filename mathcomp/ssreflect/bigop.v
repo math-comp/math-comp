@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div fintype tuple finfun.
 
@@ -531,18 +532,8 @@ Definition applybig {R I} (body : bigbody R I) x :=
 Definition reducebig R I idx r (body : I -> bigbody R I) :=
   foldr (applybig \o body) idx r.
 
-Module Type BigOpSig.
-Parameter bigop : forall R I, R -> seq I -> (I -> bigbody R I) -> R.
-Axiom bigopE : bigop = reducebig.
-End BigOpSig.
-
-Module BigOp : BigOpSig.
-Definition bigop := reducebig.
-Lemma bigopE : bigop = reducebig. Proof. by []. Qed.
-End BigOp.
-
-Notation bigop := BigOp.bigop (only parsing).
-Canonical bigop_unlock := Unlockable BigOp.bigopE.
+HB.lock Definition bigop := reducebig.
+Canonical bigop_unlock := Unlockable bigop.unlock.
 
 Definition index_iota m n := iota m (n - m).
 

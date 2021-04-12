@@ -143,47 +143,25 @@ Arguments repr_ofK {T qT}.
 (* Protecting some symbols. *)
 (****************************)
 
-Module Type PiSig.
-Parameter f : forall (T : Type) (qT : quotType T), phant qT -> T -> qT.
-Axiom E : f = pi_phant.
-End PiSig.
-
-Module Pi : PiSig.
-Definition f := pi_phant.
-Definition E := erefl f.
-End Pi.
-
-Module MPi : PiSig.
-Definition f := pi_phant.
-Definition E := erefl f.
-End MPi.
-
-Module Type ReprSig.
-Parameter f : forall (T : Type) (qT : quotType T), qT -> T.
-Axiom E : f = repr_of.
-End ReprSig.
-
-Module Repr : ReprSig.
-Definition f := repr_of.
-Definition E := erefl f.
-End Repr.
+HB.lock Definition pi := pi_phant.
+HB.lock Definition mpi := pi_phant.
+HB.lock Definition repr := repr_of.
 
 (*******************)
 (* Fancy Notations *)
 (*******************)
 
-Notation repr := Repr.f.
-Notation "\pi_ Q" := (@Pi.f _ _ (Phant Q)) : quotient_scope.
-Notation "\pi" := (@Pi.f _ _ (Phant _))  (only parsing) : quotient_scope.
+Notation "\pi_ Q" := (@pi _ _ (Phant Q)) : quotient_scope.
+Notation "\pi" := (@pi _ _ (Phant _))  (only parsing) : quotient_scope.
 Notation "x == y %[mod Q ]" := (\pi_Q x == \pi_Q y) : quotient_scope.
 Notation "x = y %[mod Q ]" := (\pi_Q x = \pi_Q y) : quotient_scope.
 Notation "x != y %[mod Q ]" := (\pi_Q x != \pi_Q y) : quotient_scope.
 Notation "x <> y %[mod Q ]" := (\pi_Q x <> \pi_Q y) : quotient_scope.
 
-Local Notation "\mpi" := (@MPi.f _ _ (Phant _)).
-Canonical mpi_unlock := Unlockable MPi.E.
-Canonical pi_unlock := Unlockable Pi.E.
-Canonical repr_unlock := Unlockable Repr.E.
+Local Notation "\mpi" := (@mpi _ _ (Phant _)).
+Canonical mpi_unlock := Unlockable mpi.unlock.
+Canonical pi_unlock := Unlockable pi.unlock.
+Canonical repr_unlock := Unlockable repr.unlock.
 
 Notation "[ 'quotType' 'of' Q ]" := (Quotient.clone _ Q _)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.

@@ -154,32 +154,19 @@ Notation "A :!=: B" := (A != B :> {set _})
 Notation "A :=P: B" := (A =P B :> {set _})
   (at level 70, no associativity, only parsing) : set_scope.
 
-Local Notation finset_def := (fun T P => @FinSet T (finfun P)).
 
-Local Notation pred_of_set_def := (fun T (A : set_type T) => val A : _ -> _).
+HB.lock
+Definition finset (T : finType) (P : pred T) : {set T} := @FinSet T (finfun P).
+Canonical finset_unlock := Unlockable finset.unlock.
 
-Module Type SetDefSig.
-Parameter finset : forall T : finType, pred T -> {set T}.
-Parameter pred_of_set : forall T, set_type T -> fin_pred_sort (predPredType T).
 (* The weird type of pred_of_set is imposed by the syntactic restrictions on  *)
 (* coercion declarations; it is unfortunately not possible to use a functor   *)
 (* to retype the declaration, because this triggers an ugly bug in the Coq    *)
 (* coercion chaining code.                                                    *)
-Axiom finsetE : finset = finset_def.
-Axiom pred_of_setE : pred_of_set = pred_of_set_def.
-End SetDefSig.
-
-Module SetDef : SetDefSig.
-Definition finset := finset_def.
-Definition pred_of_set := pred_of_set_def.
-Lemma finsetE : finset = finset_def. Proof. by []. Qed.
-Lemma pred_of_setE : pred_of_set = pred_of_set_def. Proof. by []. Qed.
-End SetDef.
-
-Notation finset := SetDef.finset.
-Notation pred_of_set := SetDef.pred_of_set.
-Canonical finset_unlock := Unlockable SetDef.finsetE.
-Canonical pred_of_set_unlock := Unlockable SetDef.pred_of_setE.
+HB.lock
+Definition pred_of_set T (A : set_type T) : fin_pred_sort (predPredType T)
+:= val A.
+Canonical pred_of_set_unlock := Unlockable pred_of_set.unlock.
 
 Notation "[ 'set' x : T | P ]" := (finset (fun x : T => P%B))
   (at level 0, x at level 99, only parsing) : set_scope.
@@ -1049,33 +1036,15 @@ End CartesianProd.
 
 Arguments setXP {fT1 fT2 A1 A2 x1 x2}.
 
-Local Notation imset_def :=
-  (fun (aT rT : finType) f mD => [set y in @image_mem aT rT f mD]).
-Local Notation imset2_def :=
-  (fun (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) =>
-     [set y in @image_mem _ rT (prod_curry f)
-                           (mem [pred u | D1 u.1 & D2 u.1 u.2])]).
+HB.lock
+Definition imset (aT rT : finType) f mD := [set y in @image_mem aT rT f mD].
+Canonical imset_unlock := Unlockable imset.unlock.
 
-Module Type ImsetSig.
-Parameter imset : forall aT rT : finType,
- (aT -> rT) -> mem_pred aT -> {set rT}.
-Parameter imset2 : forall aT1 aT2 rT : finType,
- (aT1 -> aT2 -> rT) -> mem_pred aT1 -> (aT1 -> mem_pred aT2) -> {set rT}.
-Axiom imsetE : imset = imset_def.
-Axiom imset2E : imset2 = imset2_def.
-End ImsetSig.
+HB.lock
+Definition imset2 (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) :=
+  [set y in @image_mem _ rT (prod_curry f) (mem [pred u | D1 u.1 & D2 u.1 u.2])].
+Canonical imset2_unlock := Unlockable imset2.unlock.
 
-Module Imset : ImsetSig.
-Definition imset := imset_def.
-Definition imset2 := imset2_def.
-Lemma imsetE : imset = imset_def. Proof. by []. Qed.
-Lemma imset2E : imset2 = imset2_def. Proof. by []. Qed.
-End Imset.
-
-Notation imset := Imset.imset.
-Notation imset2 := Imset.imset2.
-Canonical imset_unlock := Unlockable Imset.imsetE.
-Canonical imset2_unlock := Unlockable Imset.imset2E.
 Definition preimset (aT : finType) rT f (R : mem_pred rT) :=
   [set x : aT | in_mem (f x) R].
 

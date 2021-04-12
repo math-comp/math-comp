@@ -95,19 +95,8 @@ Definition gact := (base_act \ act_dom)%gact.
 
 End Construction.
 
-Module Type ExtremalType.
-Parameter gtype : nat -> nat -> nat -> finGroupType.
-Parameter gtypeE : forall q p e, gtype q p e = [the finGroupType of sdprod_by (gact q p e)].
-End ExtremalType.
-
-Module Extremal : ExtremalType.
-Definition gtype q p e := [the finGroupType of sdprod_by (gact q p e)].
-Lemma gtypeE q p e : gtype q p e = [the finGroupType of sdprod_by (gact q p e)].
-Proof. by []. Qed.
-End Extremal.
-
-Notation gtype := Extremal.gtype.
-Canonical gtype_unlockable q p e := Unlockable (Extremal.gtypeE q p e).
+HB.lock Definition gtype q p e := [the finGroupType of sdprod_by (gact q p e)].
+Canonical gtype_unlockable := Unlockable gtype.unlock.
 
 Section ConstructionCont.
 
@@ -123,7 +112,7 @@ Hypotheses (p_gt1 : p > 1) (q_gt1 : q > 1).
 
 Lemma card : #|[set: gtype]| = (p * q)%N.
 Proof.
-rewrite [gtype]unlock -(sdprod_card (sdprod_sdpair _)).
+rewrite [gtype.body]unlock -(sdprod_card (sdprod_sdpair _)).
 rewrite !card_injm ?injm_sdpair1 ?injm_sdpair2 //.
 by rewrite mulnC -!orderE !order_Zp1 !Zp_cast.
 Qed.
@@ -131,7 +120,7 @@ Qed.
 Lemma Grp : (exists s, [/\ s \in Aut B, #[s] %| p & s b = b ^+ e]) ->
   [set: gtype] \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ e)).
 Proof.
-rewrite [gtype]unlock => [[s [AutBs dvd_s_p sb]]].
+rewrite [gtype.body]unlock => [[s [AutBs dvd_s_p sb]]].
 have memB: _ \in B by move=> c; rewrite -Zp_cycle inE.
 have Aa: a \in <[a]> by rewrite !cycle_id.
 have [oa ob]: #[a] = p /\ #[b] = q by rewrite !order_Zp1 !Zp_cast.
@@ -181,19 +170,9 @@ Definition quaternion_kernel :=
 
 End SpecializeExtremals.
 
-Module Type QuaternionType.
-Parameter gtype : nat -> finGroupType.
-Parameter gtypeE : forall n, gtype n = [the finGroupType of coset_of (quaternion_kernel n)].
-End QuaternionType.
-
-Module Quaternion : QuaternionType.
-Definition gtype n := [the finGroupType of coset_of (quaternion_kernel n)].
-Lemma gtypeE n : gtype n = [the finGroupType of coset_of (quaternion_kernel n)].
-Proof. by []. Qed.
-End Quaternion.
-
-Notation quaternion_gtype := Quaternion.gtype.
-Canonical quaternion_unlock n := Unlockable (Quaternion.gtypeE n).
+HB.lock Definition quaternion_gtype n :=
+  [the finGroupType of coset_of (quaternion_kernel n)].
+Canonical quaternion_unlock := Unlockable quaternion_gtype.unlock.
 
 Notation "''Mod_' m" := (modular_gtype m) : type_scope.
 Notation "''Mod_' m" := [set: gsort 'Mod_m] : group_scope.
@@ -779,7 +758,7 @@ have def_q : m %/ pdiv m = q
   by rewrite /m -(ltn_predK n_gt2) pdiv_pfactor // expnS mulKn.
 have r_gt1 : r > 1 by rewrite (ltn_exp2l 0) // -(subnKC n_gt2).
 have def2r : (2 * r)%N = q by rewrite -expnS /q -(subnKC n_gt2).
-rewrite /GrpQ [@quaternion_gtype _]unlock /quaternion_kernel {}def_q.
+rewrite /GrpQ [quaternion_gtype]unlock /quaternion_kernel {}def_q.
 set B := [set: _]; have: B \homg Grp (u : v : (u ^+ q, v ^+ 4, u ^ v = u^-1)).
   by rewrite -Grp_ext_dihedral ?homg_refl.
 have: #|B| = (q * 4)%N by rewrite card_ext_dihedral // mulnC -muln2 -mulnA.

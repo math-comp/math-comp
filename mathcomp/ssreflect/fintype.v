@@ -176,18 +176,8 @@ Arguments enum_subdef /.
 Module Export FiniteNES.
 Module Finite.
 
-(* TODO: we could add this sealing pattern to HB or as a coq-elpi app *)
-Module Type EnumSig.
-Parameter enum : forall cT : Finite.type, seq cT.
-Axiom enumDef : enum = @enum_subdef.
-End EnumSig.
+HB.lock Definition enum := @enum_subdef.
 
-Module EnumDef : EnumSig.
-Definition enum := @enum_subdef.
-Definition enumDef := erefl enum.
-End EnumDef.
-
-Notation enum := EnumDef.enum.
 Notation axiom := finite_axiom.
 Notation EnumMixin m := (@IsFinite.Build _ _ m).
 
@@ -251,7 +241,7 @@ Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T cT)
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
 
-Canonical finEnum_unlock := Unlockable Finite.EnumDef.enumDef.
+Canonical finEnum_unlock := Unlockable Finite.enum.unlock.
 
 (* Workaround for the silly syntactic uniformity restriction on coercions;    *)
 (* this avoids a cross-dependency between finset.v and prime.v for the        *)
@@ -296,21 +286,12 @@ Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
 Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
   (at level 0, x ident, only parsing) : form_scope.
 
+
 (* We lock the definitions of card and subset to mitigate divergence of the   *)
 (* Coq term comparison algorithm.                                             *)
+HB.lock Definition card  (T : finType) (mA : mem_pred T) := size (enum_mem mA).
+Canonical card_unlock := Unlockable card.unlock.
 
-Local Notation card_type := (forall T : finType, mem_pred T -> nat).
-Local Notation card_def := (fun T mA => size (enum_mem mA)).
-Module Type CardDefSig.
-Parameter card : card_type. Axiom cardEdef : card = card_def.
-End CardDefSig.
-Module CardDef : CardDefSig.
-Definition card : card_type := card_def. Definition cardEdef := erefl card.
-End CardDef.
-(* Should be Include, but for a silly restriction: can't Include at toplevel! *)
-Export CardDef.
-
-Canonical card_unlock := Unlockable cardEdef.
 (* A is at level 99 to allow the notation #|G : H| in groups. *)
 Notation "#| A |" := (card (mem A))
   (at level 0, A at level 99, format "#| A |") : nat_scope.
@@ -425,16 +406,10 @@ Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
-Local Notation subset_type := (forall (T : finType) (A B : mem_pred T), bool).
-Local Notation subset_def := (fun T A B => pred0b (predD A B)).
-Module Type SubsetDefSig.
-Parameter subset : subset_type. Axiom subsetEdef : subset = subset_def.
-End SubsetDefSig.
-Module Export SubsetDef : SubsetDefSig.
-Definition subset : subset_type := subset_def.
-Definition subsetEdef := erefl subset.
-End SubsetDef.
-Canonical subset_unlock := Unlockable subsetEdef.
+HB.lock
+Definition subset (T : finType) (A B : mem_pred T) : bool := pred0b (predD A B).
+Canonical subset_unlock := Unlockable subset.unlock.
+
 Notation "A \subset B" := (subset (mem A) (mem B))
   (at level 70, no associativity) : bool_scope.
 

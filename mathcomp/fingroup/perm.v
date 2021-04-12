@@ -75,28 +75,11 @@ Bind Scope group_scope with perm_of.
 Notation "''S_' n" := {perm 'I_n}
   (at level 8, n at level 2, format "''S_' n").
 
-Local Notation fun_of_perm_def := (fun T (u : perm_type T) => val u : T -> T).
-Local Notation perm_def := (fun T f injf => Perm (@perm_proof T f injf)).
+HB.lock Definition perm T f injf := Perm (@perm_proof T f injf).
+Canonical perm_unlock := Unlockable perm.unlock.
 
-Module Type PermDefSig.
-Parameter fun_of_perm : forall T, perm_type T -> T -> T.
-Parameter perm : forall (T : finType) (f : T -> T), injective f -> {perm T}.
-Axiom fun_of_permE : fun_of_perm = fun_of_perm_def.
-Axiom permE : perm = perm_def.
-End PermDefSig.
-
-Module PermDef : PermDefSig.
-Definition fun_of_perm := fun_of_perm_def.
-Definition perm := perm_def.
-Lemma fun_of_permE : fun_of_perm = fun_of_perm_def. Proof. by []. Qed.
-Lemma permE : perm = perm_def. Proof. by []. Qed.
-End PermDef.
-
-Notation fun_of_perm := PermDef.fun_of_perm.
-Notation "@ 'perm'" := (@PermDef.perm) (at level 10, format "@ 'perm'").
-Notation perm := (@PermDef.perm _ _).
-Canonical fun_of_perm_unlock := Unlockable PermDef.fun_of_permE.
-Canonical perm_unlock := Unlockable PermDef.permE.
+HB.lock Definition fun_of_perm T (u : perm_type T) : T -> T := val u.
+Canonical fun_of_perm_unlock := Unlockable fun_of_perm.unlock.
 Coercion fun_of_perm : perm_type >-> Funclass.
 
 Section Theory.
