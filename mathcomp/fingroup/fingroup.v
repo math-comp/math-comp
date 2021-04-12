@@ -249,6 +249,7 @@ Notation "[ 'baseFinGroupType' 'of' T ]" := (@BaseFinGroup.clone T _)
 End BaseFinGroupExports.
 HB.export BaseFinGroupExports.
 
+Module Notations.
 Section ElementOps.
 
 Variable T : baseFinGroupType.
@@ -268,6 +269,8 @@ Notation "x1 * x2" := (mulg x1 x2) : group_scope.
 Notation "x ^-1" := (invg x) : group_scope.
 Notation "x ^+ n" := (expgn x n) : group_scope.
 Notation "x ^- n" := (x ^+ n)^-1 : group_scope.
+End Notations.
+HB.export Notations.
 
 HB.mixin Record BaseFinGroup_IsGroup G of BaseFinGroup G := {
   mulVg_subproof :
