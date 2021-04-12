@@ -92,8 +92,32 @@ by case: pickP => [op /andP[] | _] //=; rewrite group1.
 Qed.
 
 Definition gact := (base_act \ act_dom)%gact.
-Fact gtype_key : unit. Proof. by []. Qed.
-Definition gtype := locked_with gtype_key [the finGroupType of sdprod_by gact].
+
+End Construction.
+
+Module Type ExtremalType.
+Parameter gtype : nat -> nat -> nat -> finGroupType.
+Parameter gtypeE : forall q p e, gtype q p e = [the finGroupType of sdprod_by (gact q p e)].
+End ExtremalType.
+
+Module Extremal : ExtremalType.
+Definition gtype q p e := [the finGroupType of sdprod_by (gact q p e)].
+Lemma gtypeE q p e : gtype q p e = [the finGroupType of sdprod_by (gact q p e)].
+Proof. by []. Qed.
+End Extremal.
+
+Notation gtype := Extremal.gtype.
+Canonical gtype_unlockable q p e := Unlockable (Extremal.gtypeE q p e).
+
+Section ConstructionCont.
+
+Variables q p e : nat.
+Let a : 'Z_p := Zp1.
+Let b : 'Z_q := Zp1.
+Local Notation B := <[b]>.
+Local Notation gtype := (gtype q p e) (only parsing).
+Local Notation gact := (gact q p e) (only parsing).
+Local Notation aut_of := (aut_of q p e) (only parsing).
 
 Hypotheses (p_gt1 : p > 1) (q_gt1 : q > 1).
 
@@ -137,7 +161,7 @@ rewrite im_xsdprodm !morphim_cycle //= !eltm_id -norm_joinEr //.
 by rewrite norms_cycle xy mem_cycle.
 Qed.
 
-End Construction.
+End ConstructionCont.
 
 End Extremal.
 
@@ -157,21 +181,19 @@ Definition quaternion_kernel :=
 
 End SpecializeExtremals.
 
-Definition locked_with2 T k x k2 := let: tt := k in let: tt := k2 in x : T.
-Lemma locked_withE2 T k (x : T) k2 : unkeyed (locked_with2 k x k2) = x.
-Proof. case: k; case: k2; by []. Qed.
+Module Type QuaternionType.
+Parameter gtype : nat -> finGroupType.
+Parameter gtypeE : forall n, gtype n = [the finGroupType of coset_of (quaternion_kernel n)].
+End QuaternionType.
 
-Canonical locked_with_unlockable2 T k x :=
-  @Unlockable T x (locked_with2 k x k) (locked_withE2 k x k).
+Module Quaternion : QuaternionType.
+Definition gtype n := [the finGroupType of coset_of (quaternion_kernel n)].
+Lemma gtypeE n : gtype n = [the finGroupType of coset_of (quaternion_kernel n)].
+Proof. by []. Qed.
+End Quaternion.
 
-Lemma gtype2_key : nat -> unit. Proof. by []. Qed.
-Definition data n := [the finGroupType of coset_of (quaternion_kernel n)].
-Definition quaternion_gtype n :=
-    locked_with2
-      (gtype2_key n)
-      (data n)
-      (gtype2_key n)
-      .
+Notation quaternion_gtype := Quaternion.gtype.
+Canonical quaternion_unlock n := Unlockable (Quaternion.gtypeE n).
 
 Notation "''Mod_' m" := (modular_gtype m) : type_scope.
 Notation "''Mod_' m" := [set: gsort 'Mod_m] : group_scope.
@@ -1131,33 +1153,7 @@ Theorem quaternion_structure :
 Proof.
 move=> n_gt2 genG isoG; have [def2q def2r ltqm ltrq] := def2qr (ltnW n_gt2).
 have [oG Gx ox X'y] := genG; rewrite -/m -/q -/X in oG ox X'y.
-case/extremal_generators_facts: genG; rewrite -/X.
-done. 
-hnf; intros. repeat split. 
-Set Printing All.
-  have : (Mxy \isog [set: 'Q_q]) = (G \isog [set: 'Q_m]).
-  
-    have : forall f,
-
-          f
-          ( (FinGroup_to_Finite_22 (quaternion_gtype q)))
-         =
-          f
-          ( (FinGroup_to_Finite_22 (quaternion_gtype m)))
-             
-        :> Prop.
-    intros. Time reflexivity.
-    Set Printing All. rewrite /FinGroup_to_Finite_22.
-    Set Printing All. rewrite /FinGroup_class_to_Finite_class_21.
-    Set Printing All. rewrite /quaternion_gtype.
-    
-          Time reflexivity.
-
-
-18: (clear isoG; assumption).
-Print Ltac done.
-
-// => pG maxX nsXG defXY nXY.
+case/extremal_generators_facts: genG; rewrite -/X // => pG maxX nsXG defXY nXY.
 have [sXG nXG]:= andP nsXG; have [Gy notXy]:= setDP X'y.
 have oxr: #[x ^+ r] = 2 by rewrite orderXdiv ox -def2r ?dvdn_mull ?mulnK.
 have ox2: #[x ^+ 2] = r by rewrite orderXdiv ox -def2r ?dvdn_mulr ?mulKn.
@@ -1560,19 +1556,14 @@ Lemma cancel_index_extremal_groups :
 Proof. by case. Qed.
 Local Notation extgK := cancel_index_extremal_groups.
 
-Import choice.
+#[export]
+HB.instance Definition _ := Countable.copy extremal_group_type (can_type extgK).
 
-Definition extremal_group_eqMixin := CanEqMixin extgK.
-Canonical extremal_group_eqType := EqType _ extremal_group_eqMixin.
-Definition extremal_group_choiceMixin := CanChoiceMixin extgK.
-Canonical extremal_group_choiceType := ChoiceType _ extremal_group_choiceMixin.
-Definition extremal_group_countMixin := CanCountMixin extgK.
-Canonical extremal_group_countType := CountType _ extremal_group_countMixin.
 Lemma bound_extremal_groups (c : extremal_group_type) : pickle c < 6.
 Proof. by case: c. Qed.
-Definition extremal_group_finMixin := Finite.CountMixin bound_extremal_groups.
-Canonical extremal_group_finType :=
-  FinType extremal_group_type extremal_group_finMixin.
+
+#[export]
+HB.instance Definition _ := Finite.CountMixin bound_extremal_groups.
 
 Definition extremal_class (A : {set gT}) :=
   let m := #|A| in let p := pdiv m in let n := logn p m in
