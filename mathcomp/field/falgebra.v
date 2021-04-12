@@ -173,15 +173,8 @@ Section FalgLfun.
 Variable (R : comRingType) (aT : FalgType R).
 Implicit Types f g : 'End(aT).
 
-HB.instance Definition _ :=
-  GRing.Ring.copy 'End(aT) (lfun_ringType (FalgType_proper aT)).
-(* FIXME: not yet done in vector *)
-(*
-HB.instance Definition _ :=
-  GRing.Lalgebra.copy 'End(aT) (lfun_lalgType (FalgType_proper aT)).
-HB.instance Definition _ :=
-  GRing.Algebra.copy 'End(aT) (lfun_algType (FalgType_proper aT)).
- *)
+HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
+  (lfun_algType (FalgType_proper aT)).
 
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
 Lemma lfun_compE f g : (g \o f)%VF = f * g. Proof. by []. Qed.
@@ -218,11 +211,6 @@ Proof. by rewrite /lfun_invr => /negPf->. Qed.
 
 HB.instance Definition _ := GRing.Ring_HasMulInverse.Build 'End(aT)
   lfun_mulRVr lfun_mulrRV lfun_unitrP lfun_invr_out.
-(* FIXME: not yet done in vector *)
-(*
-Canonical lfun_unitAlgType := [unitAlgType K of 'End(aT)].
-Canonical Falg_fun_FalgType := [FalgType K of 'End(aT)].
-*)
 
 Lemma lfun_invE f : lker f == 0%VS -> f^-1%VF = f^-1.
 Proof. by rewrite /f^-1 /= /lfun_invr => ->. Qed.
@@ -262,8 +250,6 @@ Proof. by apply/lfunP => z; rewrite id_lfunE lfunE /= mul1r. Qed.
 Lemma amullM u v : (amull (u * v) = amull v * amull u)%VF.
 Proof. by apply/lfunP => w; rewrite comp_lfunE !lfunE /= mulrA. Qed.
 
-(* FIXME: not yet done in vector *)
-(*
 Lemma amulr_is_lrmorphism : lrmorphism amulr.
 Proof.
 split=> [|a u]; last by apply/lfunP=> w; rewrite scale_lfunE !lfunE /= scalerAr.
@@ -275,7 +261,6 @@ Canonical amulr_additive := Eval hnf in Additive amulr_is_lrmorphism.
 Canonical amulr_linear := Eval hnf in AddLinear amulr_is_lrmorphism.
 Canonical amulr_rmorphism := Eval hnf in AddRMorphism amulr_is_lrmorphism.
 Canonical amulr_lrmorphism := Eval hnf in LRMorphism amulr_is_lrmorphism.
- *)
 
 Lemma lker0_amull u : u \is a GRing.unit -> lker (amull u) == 0%VS.
 Proof. by move=> Uu; apply/lker0P=> v w; rewrite !lfunE; apply: mulrI. Qed.
@@ -732,11 +717,8 @@ rewrite -(algidl (subvP (centerv_sub A) _ (memv_algid _))) algidr //=.
 by rewrite memv_cap memv_algid centv_algid.
 Qed.
 
-(* FIXME: take this out of the section to make a factory *)
-(* well, it seems unused anyway *)
-(*
 Lemma Falgebra_FieldMixin :
-  GRing.IntegralDomain.axiom aT -> GRing.Field.mixin_of aT.
+  GRing.integral_domain_axiom aT -> GRing.field_axiom aT.
 Proof.
 move=> domT u nz_u; apply/unitrP.
 have kerMu: lker (amulr u) == 0%VS.
@@ -748,7 +730,6 @@ have /memv_imgP[v _ vu1]: 1 \in limg (amulr u); last rewrite lfunE /= in vu1.
 exists v; split=> //; apply: (lker0P kerMu).
 by rewrite !lfunE /= -mulrA -vu1 mulr1 mul1r.
 Qed.
-*)
 
 Section SkewField.
 
