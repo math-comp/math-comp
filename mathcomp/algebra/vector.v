@@ -1723,13 +1723,6 @@ Definition lfun_comp_ringType := RingType 'End(vT) lfun_comp_ringMixin.
 Definition lfun_ringMixin (* : GRing.Ring.mixin_of (lfun_zmodType vT vT) *) :=
   converse_ringMixin lfun_comp_ringType.
 Definition lfun_ringType := Eval hnf in RingType 'End(vT) lfun_ringMixin.
-(* FIXME: the next two structures have not been ported yet *)
-(*
-Definition lfun_lalgType := Eval hnf in [lalgType R of 'End(vT)
-  for LalgType R lfun_ringType (fun k x y => comp_lfunZr k y x)].
-Definition lfun_algType := Eval hnf in [algType R of 'End(vT)
-  for AlgType R _ (fun k (x y : lfun_lalgType) => comp_lfunZl k y x)].
- *)
 
 Definition lfun_lalgMixin :=
    GRing.Lmodule_IsLalgebra.Build _ lfun_ringType (fun k x y => comp_lfunZr k y x).
@@ -1738,8 +1731,8 @@ Definition lfun_lalgType := Eval hnf in LalgType _ lfun_ringType lfun_lalgMixin.
 Definition lfun_algMixin :=
   GRing.Lalgebra_IsAlgebra.Build _ lfun_lalgType
     (fun k x y => comp_lfunZl k y x).
-(* FIXME: this one segfault *)
-Definition lfun_algType := Eval hnf in AlgType _ lfun_lalgType lfun_algMixin.
+(* FIXME: segfaults when replacing [the ringType of R by GRing.Ring.sort] by _ *)
+Definition lfun_algType := Eval hnf in AlgType [the ringType of R by GRing.Ring.sort] lfun_lalgType lfun_algMixin.
 
 End LfunAlgebra.
 
