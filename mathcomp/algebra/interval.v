@@ -659,8 +659,7 @@ Lemma lersif_trans x y z b1 b2 :
   x <= y ?< if b1 -> y <= z ?< if b2 -> x <= z ?< if b1 || b2.
 Proof. by rewrite negb_or; exact: lteif_trans. Qed.
 
-Lemma lersif01 b : (0 : R) <= 1%R ?< if b. Proof. exact: lteif01. Qed.
-(* FIX ME : had to add %R to 1 *)
+Lemma lersif01 b : (0 : R) <= 1 ?< if b. Proof. exact: lteif01. Qed.
 
 Lemma lersif_anti b1 b2 x y :
   (x <= y ?< if b1) && (y <= x ?< if b2) =

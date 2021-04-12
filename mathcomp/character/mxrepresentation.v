@@ -725,9 +725,8 @@ Proof. exact: enum_valK_in. Qed.
 Lemma gring_indexK : {in G, cancel gring_index enum_val}.
 Proof. exact: enum_rankK_in. Qed.
   
-(* FIX ME : had to add the %g*)
 Definition regular_mx x : 'M[R]_nG :=
-  \matrix_i delta_mx 0 (gring_index (enum_val i * x)%g).
+  \matrix_i delta_mx 0 (gring_index (enum_val i * x)).
 
 Lemma regular_mx_repr : mx_repr G regular_mx.
 Proof.
@@ -741,8 +740,7 @@ Local Notation aG := regular_repr.
 Definition group_ring := enveloping_algebra_mx aG.
 Local Notation R_G := group_ring.
 
-(* FIXME : had to add the %g*)
-Definition gring_row : 'M[R]_nG -> 'rV_nG := row (gring_index 1%g).
+Definition gring_row : 'M[R]_nG -> 'rV_nG := row (gring_index 1).
 Canonical gring_row_linear := [linear of gring_row].
 
 Lemma gring_row_mul A B : gring_row (A *m B) = gring_row A *m B.
@@ -2912,9 +2910,8 @@ by rewrite -(morphim_mx_abs_irr _ nHG) splitG //; apply/morphim_mx_irr.
 Qed.
 
 (* FIX ME : Had to reintroduce this notion as [finGroupType does not          *)
-(* prettyprinti well                                                          *)
+(* prettyprint well                                                          *)
 Definition coset_groupType gT (H : {set gT}) := [finGroupType of coset_of H].
-
 Lemma coset_splitting_field gT (H : {set gT}) :
   group_closure_field gT -> group_closure_field (coset_groupType H).
 Proof.
@@ -3336,8 +3333,7 @@ have [|XG [defX1 dxX1]] := sum_mxsimple_direct_sub simMG (_ : _ :=: 1%:M)%MS.
     rewrite -submx0; apply/sumsmx_subP; move/(_ 1%g (erefl _)); apply: negP.
     by rewrite submx0 repr_mx1 mulmx1; case simM.
   apply/mxmoduleP=> x Gx; rewrite sumsmxMr; apply/sumsmx_subP=> [[y Gy]] /= _.
-(* FIX ME : has to add the %g *)
-  by rewrite (sumsmx_sup (subg G (y * x)%g)) // subgK ?groupM // 
+  by rewrite (sumsmx_sup (subg G (y * x))) // subgK ?groupM // 
              -mulmxA repr_mxM.
 exists (val @: XG); first by apply/subsetP=> ?; case/imsetP=> [[x Gx]] _ ->.
 have bij_val: {on val @: XG, bijective (@sgval _ G)}.
@@ -3877,8 +3873,7 @@ Local Notation R_G := (group_ring rF G).
 
 Lemma gring_free : row_free R_G.
 Proof.
-(* FIX ME : has to add the %g*)
-apply/row_freeP; exists (lin1_mx (row (gring_index G 1%g) \o vec_mx)).
+apply/row_freeP; exists (lin1_mx (row (gring_index G 1) \o vec_mx)).
 apply/row_matrixP=> i; rewrite row_mul rowK mul_rV_lin1 /= mxvecK rowK row1.
 by rewrite gring_indexK // mul1g gring_valK.
 Qed.
@@ -3929,8 +3924,7 @@ have def_n: \rank (cokermx U) = n.
   apply/eqP; rewrite mxrank_coker mxrank_ker subKn ?rank_leq_row // -genmxE.
   rewrite -[_ == _]sub1mx; have [_ _ ->] := irrG; rewrite ?submx1 //.
     rewrite (eqmx_module _ (genmxE _)); apply/mxmoduleP=> x Gx.
-    (* FIX ME : had to add %g *)
-    apply/row_subP=> i; apply: eq_row_sub (gring_index G (enum_val i * x)%g) _.
+    apply/row_subP=> i; apply: eq_row_sub (gring_index G (enum_val i * x)) _.
     rewrite !rowE mulmxA !mul_rV_lin1 /= -mulmxA -gring_mxJ //.
     by rewrite -rowE rowK.
   rewrite (eqmx_eq0 (genmxE _)); apply/rowV0Pn.
@@ -4085,8 +4079,7 @@ Lemma principal_comp_subproof : mxsimple aG (rfix_mx aG G).
 Proof.
 apply: linear_mxsimple; first exact: rfix_mx_module.
 apply/eqP; rewrite rfix_regular eqn_leq rank_leq_row lt0n mxrank_eq0.
-(* FIX ME : had to add the %g*)
-apply/eqP => /(congr1 (gring_proj 1%g \o gring_mx aG)); apply/eqP.
+apply/eqP => /(congr1 (gring_proj 1 \o gring_mx aG)); apply/eqP.
 rewrite /= -[gring_mx _ _]/(gring_op _ _) !linear0 !linear_sum (bigD1 1%g) //=.
 rewrite gring_opG ?gring_projE // eqxx big1 ?addr0 ?oner_eq0 // => x.
 by case/andP=> Gx nt_x; rewrite gring_opG // gring_projE // eq_sym (negPf nt_x).
@@ -4520,8 +4513,7 @@ Let i0 := Ordinal (irr_degree_gt0 i).
 
 Definition irr_mode x := irr_repr i x i0 i0.
 
-(* FIX ME : has to had the %g *)
-Lemma irr_mode1 : irr_mode 1%g = 1.
+Lemma irr_mode1 : irr_mode 1 = 1.
 Proof. by rewrite /irr_mode repr_mx1 mxE eqxx. Qed.
 
 Lemma irr_center_scalar : {in 'Z(G), forall x, irr_repr i x = (irr_mode x)%:M}.
@@ -4603,7 +4595,6 @@ exists (fun i => oapp h' [1 sGq]%irr (insub i)) => [j | i] lin_i.
   exists g => [||G'x]; last 1 [case/morphimP=> x _ Gx ->] || by [].
   by rewrite quo_repr_coset ?hom_g.
 rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
-Set Printing Coercions.
 (* FIX ME : had to do this unfold *)
 rewrite /Sub /=.
 set u := exist _ _ _; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)). 
@@ -5512,8 +5503,7 @@ Qed.
 Lemma gen_mx_repr : mx_repr G gen_mx.
 Proof.
 split=> [|g h Gg Gh]; apply: (can_inj val_genK).
-  (* FIX ME : had to add %g*)
-  by rewrite -[gen_mx 1%g]mul1mx val_genJmx // repr_mx1 mulmx1.
+  by rewrite -[gen_mx 1]mul1mx val_genJmx // repr_mx1 mulmx1.
 rewrite {1}[val_gen]lock -[gen_mx g]mul1mx !val_genJmx // -mulmxA -repr_mxM //.
 by rewrite -val_genJmx ?groupM ?mul1mx -?lock.
 Qed.
