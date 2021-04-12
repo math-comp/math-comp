@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop ssralg finalg.
 From mathcomp Require Import zmodp matrix vector falgebra poly polydiv mxpoly.
@@ -85,199 +86,26 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
-Module FieldExt.
+#[mathcomp]
+HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
+  GRing.Ring_HasCommutativeMul T & GRing.IntegralDomain T & GRing.Field T}.
 
-Import GRing.
-
-Section FieldExt.
-
-Variable R : ringType.
-
-Set Primitive Projections.
-Record class_of T := Class {
-  base : Falgebra.class_of R T;
-  comm_ext : commutative (Ring.mul base);
-  idomain_ext : IntegralDomain.axiom (Ring.Pack base);
-  field_ext : Field.mixin_of (UnitRing.Pack base)
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> Falgebra.class_of.
-
-Section Bases.
-Variables (T : Type) (c : class_of T).
-Definition base1 := ComRing.Class (@comm_ext T c).
-Definition base2 := @ComUnitRing.Class T base1 c.
-Definition base3 := @IntegralDomain.Class T base2 (@idomain_ext T c).
-Definition base4 := @Field.Class T base3 (@field_ext T c).
-Definition base5 := @ComAlgebra.Class R T (@base T c) (@comm_ext T c).
-Definition base6 := @ComUnitAlgebra.Class R T base5 c.
-End Bases.
-Local Coercion base1 : class_of >-> ComRing.class_of.
-Local Coercion base2 : class_of >-> ComUnitRing.class_of.
-Local Coercion base3 : class_of >-> IntegralDomain.class_of.
-Local Coercion base4 : class_of >-> Field.class_of.
-Local Coercion base5 : class_of >-> ComAlgebra.class_of.
-Local Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
-
-Structure type (phR : phant R) := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-
-Variables (phR : phant R) (T : Type) (cT : type phR).
-Definition class := let: Pack _ c :=  cT return class_of cT in c.
-
-Definition pack :=
-  fun (bT : Falgebra.type phR) b
-    & phant_id (Falgebra.class bT : Falgebra.class_of R bT)
-               (b : Falgebra.class_of R T) =>
-  fun mT Cm IDm Fm
-    & phant_id (GRing.ComRing.mixin (Field.class mT)) Cm
-    & phant_id (GRing.IntegralDomain.mixin (Field.class mT)) IDm
-    & phant_id (GRing.Field.mixin (Field.class mT)) Fm =>
-    Pack phR (@Class T b Cm IDm Fm).
-
-Definition pack_eta K :=
-  let cK := Field.class K in let Cm := ComRing.mixin cK in
-  let IDm := IntegralDomain.mixin cK in let Fm := Field.mixin cK in
-  fun (bT : Falgebra.type phR) b & phant_id (Falgebra.class bT) b =>
-  fun cT_ & phant_id (@Class T b) cT_ => @Pack phR T (cT_ Cm IDm Fm).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @Zmodule.Pack cT class.
-Definition ringType := @Ring.Pack cT class.
-Definition unitRingType := @UnitRing.Pack cT class.
-Definition comRingType := @ComRing.Pack cT class.
-Definition comUnitRingType := @ComUnitRing.Pack cT class.
-Definition idomainType := @IntegralDomain.Pack cT class.
-Definition fieldType := @Field.Pack cT class.
-Definition lmodType := @Lmodule.Pack R phR cT class.
-Definition lalgType := @Lalgebra.Pack R phR cT class.
-Definition algType := @Algebra.Pack R phR cT class.
-Definition unitAlgType := @UnitAlgebra.Pack R phR cT class.
-Definition comAlgType := @ComAlgebra.Pack R phR cT class.
-Definition comUnitAlgType := @ComUnitAlgebra.Pack R phR cT class.
-Definition vectType := @Vector.Pack R phR cT class.
-Definition FalgType := @Falgebra.Pack R phR cT class.
-
-Definition Falg_comRingType := @ComRing.Pack FalgType class.
-Definition Falg_comUnitRingType := @ComUnitRing.Pack FalgType class.
-Definition Falg_comAlgType := @ComAlgebra.Pack R phR FalgType class.
-Definition Falg_comUnitAlgType := @ComUnitAlgebra.Pack R phR FalgType class.
-Definition Falg_idomainType := @IntegralDomain.Pack FalgType class.
-Definition Falg_fieldType := @Field.Pack FalgType class.
-
-Definition vect_comRingType := @ComRing.Pack vectType class.
-Definition vect_comUnitRingType := @ComUnitRing.Pack vectType class.
-Definition vect_comAlgType := @ComAlgebra.Pack R phR vectType class.
-Definition vect_comUnitAlgType := @ComUnitAlgebra.Pack R phR vectType class.
-Definition vect_idomainType := @IntegralDomain.Pack vectType class.
-Definition vect_fieldType := @Field.Pack vectType class.
-
-Definition comUnitAlg_idomainType := @IntegralDomain.Pack comUnitAlgType class.
-Definition comUnitAlg_fieldType := @Field.Pack comUnitAlgType class.
-
-Definition unitAlg_idomainType := @IntegralDomain.Pack unitAlgType class.
-Definition unitAlg_fieldType := @Field.Pack unitAlgType class.
-
-Definition comAlg_idomainType := @IntegralDomain.Pack comAlgType class.
-Definition comAlg_fieldType := @Field.Pack comAlgType class.
-
-Definition alg_idomainType := @IntegralDomain.Pack algType class.
-Definition alg_fieldType := @Field.Pack algType class.
-
-Definition lalg_idomainType := @IntegralDomain.Pack lalgType class.
-Definition lalg_fieldType := @Field.Pack lalgType class.
-
-Definition lmod_idomainType := @IntegralDomain.Pack lmodType class.
-Definition lmod_fieldType := @Field.Pack lmodType class.
-
-End FieldExt.
-
-Module Exports.
-
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion base : class_of >-> Falgebra.class_of.
-Coercion base4 : class_of >-> Field.class_of.
-Coercion base6 : class_of >-> ComUnitAlgebra.class_of.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> Ring.type.
-Canonical ringType.
-Coercion unitRingType : type >-> UnitRing.type.
-Canonical unitRingType.
-Coercion comRingType : type >-> ComRing.type.
-Canonical comRingType.
-Coercion comUnitRingType : type >-> ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> IntegralDomain.type.
-Canonical idomainType.
-Coercion fieldType : type >-> Field.type.
-Canonical fieldType.
-Coercion lmodType : type >-> Lmodule.type.
-Canonical lmodType.
-Coercion lalgType : type >-> Lalgebra.type.
-Canonical lalgType.
-Coercion algType : type >-> Algebra.type.
-Canonical algType.
-Coercion unitAlgType : type >-> UnitAlgebra.type.
-Canonical unitAlgType.
-Coercion comAlgType : type >-> ComAlgebra.type.
-Canonical comAlgType.
-Coercion comUnitAlgType : type >-> ComUnitAlgebra.type.
-Canonical comUnitAlgType.
-Coercion vectType : type >-> Vector.type.
-Canonical vectType.
-Coercion FalgType : type >-> Falgebra.type.
-Canonical FalgType.
-
-Canonical Falg_comRingType.
-Canonical Falg_comUnitRingType.
-Canonical Falg_comAlgType.
-Canonical Falg_comUnitAlgType.
-Canonical Falg_idomainType.
-Canonical Falg_fieldType.
-Canonical vect_comRingType.
-Canonical vect_comUnitRingType.
-Canonical vect_comAlgType.
-Canonical vect_comUnitAlgType.
-Canonical vect_idomainType.
-Canonical vect_fieldType.
-Canonical comUnitAlg_idomainType.
-Canonical comUnitAlg_fieldType.
-Canonical unitAlg_idomainType.
-Canonical unitAlg_fieldType.
-Canonical comAlg_idomainType.
-Canonical comAlg_fieldType.
-Canonical alg_idomainType.
-Canonical alg_fieldType.
-Canonical lalg_idomainType.
-Canonical lalg_fieldType.
-Canonical lmod_idomainType.
-Canonical lmod_fieldType.
-Notation fieldExtType R := (type (Phant R)).
-
-Notation "[ 'fieldExtType' F 'of' L ]" :=
-  (@pack _ (Phant F) L _ _ id _ _ _ _ id id id)
+Module FieldExtExports.
+Bind Scope ring_scope with FieldExt.sort.
+Notation fieldExtType R := (FieldExt.type R).
+Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone (Phant F) L _)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
-
-Notation "[ 'fieldExtType' F 'of' L 'for' K ]" :=
-  (@pack_eta _ (Phant F) L K _ _ id _ id)
+Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone (Phant F) L K)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
-
-Notation "{ 'subfield' L }" := (@aspace_of _ (FalgType _) (Phant L))
+Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
+  (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)
   (at level 0, format "{ 'subfield'  L }") : type_scope.
+End FieldExtExports.
+HB.export FieldExtExports.
 
-End Exports.
-End FieldExt.
-Export FieldExt.Exports.
-
+(* FIXME
 Canonical regular_fieldExtType (F : fieldType) := [fieldExtType F of F^o for F].
+*)
 
 Section FieldExtTheory.
 
@@ -362,6 +190,8 @@ Proof. by apply/(polyOverS (subvP (sub1v _)))/polyOver1P; exists p. Qed.
 
 Lemma sub_adjoin1v x E : (<<1; x>> <= E)%VS = (x \in E)%VS.
 Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
+
+(* STOP
 
 Fact vsval_multiplicative K : multiplicative (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
@@ -737,7 +567,11 @@ Canonical fieldExt_horner_lrmorhism := [lrmorphism of fieldExt_horner].
 
 End Horner.
 
+*)
+
 End FieldExtTheory.
+
+(* STOP
 
 Notation "E :&: F" := (capv_aspace E F) : aspace_scope.
 Notation "'C_ E [ x ]" := (capv_aspace E 'C[x]) : aspace_scope.
@@ -1646,4 +1480,6 @@ exists (map_poly iota (rVpoly x)).
   by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v.
 by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly.
 Qed.
+*)
+
 *)
