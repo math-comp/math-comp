@@ -489,7 +489,6 @@ Qed.
 
 Local Notation ab_rV_P := (existsP isog_abelem_rV).
 Definition abelem_rV : gT -> rVn := xchoose ab_rV_P.
-Arguments abelem_rV _%group_scope.  (* FIXME: was not needed before *)
 
 Local Notation ErV := abelem_rV.
 
