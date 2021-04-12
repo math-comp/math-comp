@@ -277,11 +277,15 @@ HB.mixin Record BaseFinGroup_IsGroup G of BaseFinGroup G := {
 #[mathcomp] HB.structure Definition FinGroup :=
   { G of BaseFinGroup_IsGroup G & BaseFinGroup G }.
 
+
 Module FinGroupExports.
 Notation finGroupType := FinGroup.type.
 Notation FinGroupType T m := (FinGroup.pack T m).
 Notation "[ 'finGroupType' 'of' T ]" := (@FinGroup.clone T _)
   (at level 0, format "[ 'finGroupType'  'of'  T ]") : form_scope.
+
+Bind Scope group_scope with FinGroup.sort.
+
 End FinGroupExports.
 HB.export FinGroupExports.
 

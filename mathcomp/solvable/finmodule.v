@@ -49,8 +49,6 @@ Unset Printing Implicit Defensive.
 
 Import GroupScope GRing.Theory FinRing.Theory.
 Local Open Scope ring_scope.
-(* TODO: understand how to fix fingroup to avoid this line. *)
-Bind Scope group_scope with FinGroup.sort.
 
 Module FiniteModule.
 
@@ -230,19 +228,6 @@ End Exports.
 End FiniteModule.
 
 HB.export FiniteModule.Exports.
-
-(* TODO: REMOVE THESE LINES
-Canonical FiniteModule.fmod_subType.
-Canonical FiniteModule.fmod_eqType.
-Canonical FiniteModule.fmod_choiceType.
-Canonical FiniteModule.fmod_countType.
-Canonical FiniteModule.fmod_finType.
-Canonical FiniteModule.fmod_subCountType.
-Canonical FiniteModule.fmod_subFinType.
-Canonical FiniteModule.fmod_zmodType.
-Canonical FiniteModule.fmod_finZmodType.
-Canonical FiniteModule.fmod_baseFinGroupType.
-Canonical FiniteModule.fmod_finGroupType. *)
 
 Arguments FiniteModule.fmodK {gT A} abelA [x] Ax.
 Arguments FiniteModule.fmvalK {gT A abelA} x.
@@ -538,9 +523,8 @@ Qed.
 Lemma sum_index_rcosets_cycle : (\sum_(x in X) n_ x)%N = #|G : H|.
 Proof. by rewrite [#|G : H|](card_partition partHGg) -defHgX big_imset. Qed.
 
-(* TODO : scope information should not be needed here. *)
 Lemma transfer_cycle_expansion :
-   transfer g = \sum_(x in X) fmalpha ((g ^+ n_ x) ^ (x^-1))%g.
+   transfer g = \sum_(x in X) fmalpha ((g ^+ n_ x) ^ (x^-1)).
 Proof.
 pose Y := \bigcup_(x in X) [set x * g ^+ i | i : 'I_(n_ x)].
 pose rY := transversal_repr 1 Y.
