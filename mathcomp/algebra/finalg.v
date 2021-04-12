@@ -22,7 +22,7 @@ From mathcomp Require Import ssralg countalg.
 (* strongly recommended.                                                     *)
 (*   This file also provides direct tie-ins with finite group theory:        *)
 (*  [baseFinGroupType of R for +%R] == the (canonical) additive group        *)
-(*      [finGroupType of R for +%R]    structures for R                      *)
+(*     [finGroupMixin of R for +%R]    structures for R                      *)
 (*                         {unit R} == the type of units of R, which has a   *)
 (*                                     canonical group structure.            *)
 (*                FinRing.unit R Ux == the element of {unit R} corresponding *)
