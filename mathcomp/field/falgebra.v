@@ -940,8 +940,6 @@ Notation "<< U ; x >>" := (agenv (U + <[x]>)) : vspace_scope.
 Notation "<< U & vs >>" := << U + <<vs>> >>%AS : aspace_scope.
 Notation "<< U ; x >>" := << U + <[x]> >>%AS : aspace_scope. 
 
-(* FIXME: not yet done in vector *)
-(*
 Section SubFalgType.
 
 (* The FalgType structure of subvs_of A for A : {aspace aT}.                  *)
@@ -949,7 +947,7 @@ Section SubFalgType.
 Variable (K : fieldType) (aT : FalgType K) (A : {aspace aT}).
 
 Definition subvs_one := Subvs (memv_algid A).
-Definition subvs_mul (u v : subvs_of A) := 
+Definition subvs_mul (u v : subvs_of A) :=
   Subvs (subv_trans (memv_mul (subvsP u) (subvsP v)) (asubv _)).
 
 Fact subvs_mulA : associative subvs_mul.
@@ -963,22 +961,20 @@ Proof. move=> x y z; apply/val_inj/mulrDl. Qed.
 Fact subvs_mulDr : right_distributive subvs_mul +%R.
 Proof. move=> x y z; apply/val_inj/mulrDr. Qed.
 
-Definition subvs_ringMixin :=
-  RingMixin subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr
-            (algid_neq0 _).
-Canonical subvs_ringType := Eval hnf in RingType (subvs_of A) subvs_ringMixin.
+HB.instance Definition _ := GRing.Zmodule_IsRing.Build (subvs_of A)
+  subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr (algid_neq0 _).
 
 Lemma subvs_scaleAl k (x y : subvs_of A) : k *: (x * y) = (k *: x) * y.
 Proof. exact/val_inj/scalerAl. Qed.
-Canonical subvs_lalgType := Eval hnf in LalgType K (subvs_of A) subvs_scaleAl.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build K (subvs_of A)
+  subvs_scaleAl.
 
 Lemma subvs_scaleAr k (x y : subvs_of A) : k *: (x * y) = x * (k *: y).
 Proof. exact/val_inj/scalerAr. Qed.
-Canonical subvs_algType := Eval hnf in AlgType K (subvs_of A) subvs_scaleAr.
+HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build K (subvs_of A)
+  subvs_scaleAr.
 
-Canonical subvs_unitRingType := Eval hnf in FalgUnitRingType (subvs_of A).
-Canonical subvs_unitAlgType := Eval hnf in [unitAlgType K of subvs_of A].
-Canonical subvs_FalgType := Eval hnf in [FalgType K of subvs_of A].
+HB.instance Definition _ := FalgUnitRingType (subvs_of A).
 
 Implicit Type w : subvs_of A.
 
@@ -996,7 +992,6 @@ by apply: (mulrI Uu); rewrite -[in u in u / _]def_w ?mulrK.
 Qed.
 
 End SubFalgType.
-*)
 
 Section AHom.
 
