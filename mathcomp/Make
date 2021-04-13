@@ -36,7 +36,7 @@ field/falgebra.v
 field/fieldext.v
 # field/finfield.v
 # field/galois.v
-# field/separable.v
+field/separable.v
 fingroup/action.v
 fingroup/all_fingroup.v
 fingroup/automorphism.v
