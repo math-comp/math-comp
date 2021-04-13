@@ -4890,34 +4890,32 @@ HB.instance U zmodU.
 HB.end.
 
 HB.factory Record PredSubZmodule V (S : {pred V})
-  (subS : zmodPred S) (kS : keyed_pred subS) U of SubChoice V S U := {}.
+  (subS : zmodPred S) (kS : keyed_pred subS) U of SubChoice V (mem kS) U := {}.
 
 HB.builders Context (V : zmodType) (S : {pred V})
   (subS : zmodPred S) (kS : keyed_pred subS) U of PredSubZmodule V S subS kS U.
 
-Let kS_S v : v \in kS -> v \in S. Proof. by rewrite keyed_predE. Qed.
-Let S_kS v : v \in S -> v \in kS. Proof. by rewrite keyed_predE. Qed.
-Let inU v Sv : U := Sub v (kS_S Sv).
+Let inU v Sv : U := Sub v Sv.
 Let zeroU := inU (rpred0 kS).
-Let oppU (u : U) := inU (rpredNr (S_kS (valP u))).
-Let addU (u1 u2 : U) := inU (rpredD (S_kS (valP u1)) (S_kS (valP u2))).
+Let oppU (u : U) := inU (rpredNr (valP u)).
+Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
 
 Program Definition zmodU := @PreZmodule.Build U V _
   zeroU oppU addU val_inj _ _ _.
 Next Obligation. by rewrite SubK. Qed.
 Next Obligation. by move=> x; rewrite SubK. Qed.
 Next Obligation. by move=> *; rewrite !SubK. Qed.
-HB.instance U zmodU.
+HB.instance Definition _ := zmodU.
 
 Lemma valD : additive (val : U -> V).
 Proof. by move=> x y /=; rewrite !SubK. Qed.
 
-HB.instance Definition _ := IsSubZmodule.Build V S U valD.
+HB.instance Definition _ := IsSubZmodule.Build V (mem kS) U valD.
 HB.end.
 
 (* HB.instance Definition _ (V : zmodType) (S : {pred V}) *)
-(*    (subS : zmodPred S) (kS : keyed_pred subS) (sT : subType kS) := *)
-(*  PredSubZmodule.Build V S subS kS (sub_type sT).  *)
+(*    (subS : zmodPred S) (kS : keyed_pred subS) (sT : subType (mem kS)) := *)
+(*  PredSubZmodule.Build V S subS kS (sub_type sT). *)
 
 HB.mixin Record IsSubRing (R : ringType) (S : {pred R}) U
     of SubZmodule R S U & Ring U := {
@@ -4956,28 +4954,25 @@ HB.instance R ringR.
 HB.end.
 
 HB.factory Record PredSubRing (R : ringType) (S : {pred R})
-  (ringS : subringPred S) (kS : keyed_pred ringS) U of SubZmodule R S U := {}.
+  (ringS : subringPred S) (kS : keyed_pred ringS) U of SubZmodule R (mem kS) U := {}.
 
 HB.builders Context (R : ringType) (S : {pred R})
   (ringS : subringPred S) (kS : keyed_pred ringS)
   U of PredSubRing R S ringS kS U.
 
-Let kS_S v : v \in kS -> v \in S. Proof. by rewrite keyed_predE. Qed.
-Let S_kS v : v \in S -> v \in kS. Proof. by rewrite keyed_predE. Qed.
-Let inU v Sv : U := Sub v (kS_S Sv).
+Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU (rpred1 kS).
-Let mulU (u1 u2 : U) := inU (rpredM (S_kS (valP u1)) (S_kS (valP u2))).
+Let mulU (u1 u2 : U) := inU (rpredM (valP u1) (valP u2)).
 
 Program Definition ringU := @PreRing.Build U R _ oneU mulU val_inj _ _.
 Next Obligation. by rewrite /= SubK. Qed.
 Next Obligation. by move=> x y /=; rewrite !SubK. Qed.
-HB.instance U ringU.
+HB.instance Definition _ := ringU.
 
 Lemma valM : multiplicative (val : U -> R).
 Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
 
-HB.instance Definition _ := IsSubRing.Build R S U valM.
-
+HB.instance Definition _ := IsSubRing.Build R (mem kS) U valM.
 HB.end.
 
 HB.factory Record PreComRing R of Ring R := {
@@ -5027,24 +5022,22 @@ HB.instance U lmodU.
 HB.end.
 
 HB.factory Record PredSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
-    (linS : submodPred S) (kS : keyed_pred linS) U of SubZmodule V S U := {}.
+    (linS : submodPred S) (kS : keyed_pred linS) U of SubZmodule V (mem kS) U := {}.
 
 HB.builders Context (R : ringType) (V : lmodType R) (S : {pred V})
     (linS : submodPred S) (kS : keyed_pred linS) W
   of PredSubLmodule R V S linS kS W.
 
-Let kS_S v : v \in kS -> v \in S. Proof. by rewrite keyed_predE. Qed.
-Let S_kS v : v \in S -> v \in kS. Proof. by rewrite keyed_predE. Qed.
-Let inW v Sv : W := Sub v (kS_S Sv).
-Let scaleW a (w : W) := inW (rpredZ a (S_kS (valP w))).
+Let inW v Sv : W := Sub v Sv.
+Let scaleW a (w : W) := inW (rpredZ a (valP w)).
 
 Program Definition lmodW := @PreLmodule.Build R W _ _ val_inj scaleW _.
 Next Obligation. by move=> k x; rewrite /= SubK. Qed.
-HB.instance W lmodW.
+HB.instance Definition _ := lmodW.
 
 Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
 
-HB.instance Definition _ := IsSubLmodule.Build R V S W valZ.
+HB.instance Definition _ := IsSubLmodule.Build R V (mem kS) W valZ.
 HB.end.
 
 HB.factory Record PreLalgebra R B of Ring B & Lmodule R B := {
@@ -5105,22 +5098,19 @@ HB.structure Definition SubUnitRing (R : ringType)
   {U of SubRing R S U & UnitRing U}.
 
 HB.factory Record PredSubUnitRing (R : unitRingType) (S : {pred R})
-  (ringS : divringPred S) (kS : keyed_pred ringS) U of SubRing R S U := {}.
+  (ringS : divringPred S) (kS : keyed_pred ringS) U of SubRing R (mem kS) U := {}.
 
 HB.builders Context (R : unitRingType) (S : {pred R})
   (ringS : divringPred S) (kS : keyed_pred ringS)
   U of PredSubUnitRing R S ringS kS U.
 
-Let kS_S v : v \in kS -> v \in S. Proof. by rewrite keyed_predE. Qed.
-Let S_kS v : v \in S -> v \in kS. Proof. by rewrite keyed_predE. Qed.
-Let inU v Sv : U := Sub v (kS_S Sv).
-Let invU (u : U) := inU (rpredVr (S_kS (valP u))).
+Let inU v Sv : U := Sub v Sv.
+Let invU (u : U) := inU (rpredVr (valP u)).
 
 Program Definition unitringU := @PreUnitRing.Build U R val val_inj invU _ _.
 Next Obligation. by split=> [x y|]; rewrite valM ?SubK. Qed.
 Next Obligation. by move=> x; rewrite SubK. Qed.
-HB.instance U unitringU.
-
+HB.instance Definition _ := unitringU.
 HB.end.
 
 Lemma idomainMixin (R : idomainType) (T : ringType) (f : T -> R) :
@@ -5138,14 +5128,15 @@ Proof. by move=> _ injf f0 fU u; rewrite -fU unitfE -f0 inj_eq. Qed.
 
 Module SubExports.
 
-(* Notation "[ 'zmodMixin' 'of' U 'by' <: ]" := (zmodMixin (Phant U)) *)
-(*   (at level 0, format "[ 'zmodMixin'  'of'  U  'by'  <: ]") : form_scope. *)
-(* Notation "[ 'ringMixin' 'of' R 'by' <: ]" := *)
-(*   (@ringMixin _ _ _ _ _ _ (@erefl Type R%type) (rrefl _)) *)
-(*   (at level 0, format "[ 'ringMixin'  'of'  R  'by'  <: ]") : form_scope. *)
-(* Notation "[ 'lmodMixin' 'of' U 'by' <: ]" := *)
-(*   (@lmodMixin _ _ _ _ _ _ _ (@erefl Type U%type) (rrefl _)) *)
-(*   (at level 0, format "[ 'lmodMixin'  'of'  U  'by'  <: ]") : form_scope. *)
+Notation "[ 'zmodMixin' 'of' U 'by' <: ]" :=
+  (PredSubZmodule.Build _ _ _ _ (sub_type U))
+  (at level 0, format "[ 'zmodMixin'  'of'  U  'by'  <: ]") : form_scope.
+Notation "[ 'ringMixin' 'of' R 'by' <: ]" :=
+  (PredSubRing.Build _ _ _ _ (sub_type R))
+  (at level 0, format "[ 'ringMixin'  'of'  R  'by'  <: ]") : form_scope.
+Notation "[ 'lmodMixin' 'of' U 'by' <: ]" :=
+  (PredSubLmodule.Build _ _ _ _ _ (sub_type U))
+  (at level 0, format "[ 'lmodMixin'  'of'  U  'by'  <: ]") : form_scope.
 Notation "[ 'lalgMixin' 'of' A 'by' <: ]" :=
   ((lalgMixin (Phant A) val_inj (rrefl _)) *%R (rrefl _))
   (at level 0, format "[ 'lalgMixin'  'of'  A  'by'  <: ]") : form_scope.
@@ -5155,10 +5146,10 @@ Notation "[ 'comRingMixin' 'of' R 'by' <: ]" :=
 Notation "[ 'algMixin' 'of' A 'by' <: ]" :=
   (algMixin (Phant A) val_inj (rrefl _) (rrefl _))
   (at level 0, format "[ 'algMixin'  'of'  A  'by'  <: ]") : form_scope.
-(* Notation "[ 'unitRingMixin' 'of' R 'by' <: ]" := *)
-(*   (@unitRingMixin _ _ _ _ _ _ (@erefl Type R%type) (erefl _) (rrefl _)) *)
-(*   (at level 0, format "[ 'unitRingMixin'  'of'  R  'by'  <: ]") : *)
-(* form_scope. *)
+Notation "[ 'unitRingMixin' 'of' R 'by' <: ]" :=
+  (PredSubUnitRing.Build _ _ _ _ (sub_type R))
+  (at level 0, format "[ 'unitRingMixin'  'of'  R  'by'  <: ]") :
+form_scope.
 Notation "[ 'idomainMixin' 'of' R 'by' <: ]" :=
   (idomainMixin (Phant R) val_inj (erefl _) (rrefl _))
   (at level 0, format "[ 'idomainMixin'  'of'  R  'by'  <: ]") : form_scope.

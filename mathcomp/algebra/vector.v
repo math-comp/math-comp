@@ -1868,8 +1868,6 @@ Proof. by apply: sumv_pi_uniq_sum; apply/filter_uniq/iota_uniq. Qed.
 
 End SumvPi.
 
-(* FIXME: substructures of Z/Lmodules *)
-(*
 Section SubVector.
 
 (* Turn a {vspace V} into a vectType                                          *)
@@ -1881,12 +1879,11 @@ Definition vsval w : vT := let: Subvs u _ := w in u.
 HB.instance Definition _ := [subMixin of subvs_of for vsval].
 HB.instance Definition _ := [Equality of subvs_of by <:].
 HB.instance Definition _ := [Choice of subvs_of by <:].
-HB.instance Definition _ := GRing.PredSubZmodule.Build _ _ _  (mem U) subvs_of.
-
-Definition subvs_zmodMixin := [zmodMixin of subvs_of by <:].
-Canonical subvs_zmodType := ZmodType subvs_of subvs_zmodMixin.
-Definition subvs_lmodMixin := [lmodMixin of subvs_of by <:].
-Canonical subvs_lmodType := LmodType K subvs_of subvs_lmodMixin.
+HB.instance Definition _ := [zmodMixin of subvs_of by <:].
+HB.instance Definition _ := [lmodMixin of subvs_of by <:].
+HB.instance Definition _ := GRing.Lmodule.copy subvs_of (sub_type subvs_of).
+(* FIXME: this is not very satisfying,
+   should we include the copy in the above [*Mixin of _ by <:] notations? *)
 
 Lemma subvsP w : vsval w \in U. Proof. exact: valP. Qed.
 Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
@@ -1911,7 +1908,7 @@ Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
 Canonical vsproj_additive := Additive vsproj_is_linear.
 Canonical vsproj_linear := AddLinear vsproj_is_linear.
 
-Fact subvs_vect_iso : Vector.axiom (\dim U) subvs_of.
+Fact subvs_vect_iso : vector_axiom (\dim U) subvs_of.
 Proof.
 exists (fun w => \row_i coord (vbasis U) i (vsval w)).
   by move=> k w1 w2; apply/rowP=> i; rewrite !mxE linearP.
@@ -1923,14 +1920,12 @@ move=> rw; apply/rowP=> i; rewrite mxE vsprojK.
 by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.
 Qed.
 
-Definition subvs_vectMixin :=  VectMixin subvs_vect_iso.
-Canonical subvs_vectType := VectType K subvs_of subvs_vectMixin.
+HB.instance Definition _ := Lmodule_HasFinDim.Build K subvs_of subvs_vect_iso.
 
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.
 Arguments subvs_inj {K vT U} [x1 x2].
 Arguments vsprojK {K vT U} [x] Ux.
-*)
 
 Section MatrixVectType.
 
