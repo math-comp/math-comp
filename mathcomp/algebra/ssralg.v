@@ -5138,23 +5138,24 @@ Notation "[ 'lmodMixin' 'of' U 'by' <: ]" :=
   (PredSubLmodule.Build _ _ _ _ _ (sub_type U))
   (at level 0, format "[ 'lmodMixin'  'of'  U  'by'  <: ]") : form_scope.
 Notation "[ 'lalgMixin' 'of' A 'by' <: ]" :=
-  ((lalgMixin (Phant A) val_inj (rrefl _)) *%R (rrefl _))
+  (Lmodule_IsLalgebra.Build _ A%type
+     ((lalgMixin (Phant A) val_inj (rrefl _)) *%R (rrefl _)))
   (at level 0, format "[ 'lalgMixin'  'of'  A  'by'  <: ]") : form_scope.
 Notation "[ 'comRingMixin' 'of' R 'by' <: ]" :=
-  (comRingMixin (Phant R) val_inj (rrefl _))
+  (Ring_HasCommutativeMul.Build R%type (comRingMixin (Phant R) val_inj (rrefl _)))
   (at level 0, format "[ 'comRingMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'algMixin' 'of' A 'by' <: ]" :=
   (algMixin (Phant A) val_inj (rrefl _) (rrefl _))
   (at level 0, format "[ 'algMixin'  'of'  A  'by'  <: ]") : form_scope.
 Notation "[ 'unitRingMixin' 'of' R 'by' <: ]" :=
   (PredSubUnitRing.Build _ _ _ _ (sub_type R))
-  (at level 0, format "[ 'unitRingMixin'  'of'  R  'by'  <: ]") :
-form_scope.
+  (at level 0, format "[ 'unitRingMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'idomainMixin' 'of' R 'by' <: ]" :=
-  (idomainMixin (Phant R) val_inj (erefl _) (rrefl _))
+  (ComUnitRing_IsIntegral.Build R%type
+     (idomainMixin (Phant R) val_inj (erefl _) (rrefl _)))
   (at level 0, format "[ 'idomainMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'fieldMixin' 'of' F 'by' <: ]" :=
-  (fieldMixin (Phant F) val_inj (erefl _) (frefl _))
+  (IsField.Build F%type (fieldMixin (Phant F) val_inj (erefl _) (frefl _)))
   (at level 0, format "[ 'fieldMixin'  'of'  F  'by'  <: ]") : form_scope.
 
 End SubExports.
