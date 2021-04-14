@@ -5129,13 +5129,13 @@ Proof. by move=> _ injf f0 fU u; rewrite -fU unitfE -f0 inj_eq. Qed.
 Module SubExports.
 
 Notation "[ 'zmodMixin' 'of' U 'by' <: ]" :=
-  (PredSubZmodule.Build _ _ _ _ (sub_type U))
+  (PredSubZmodule.Build _ _ _ _ U)
   (at level 0, format "[ 'zmodMixin'  'of'  U  'by'  <: ]") : form_scope.
 Notation "[ 'ringMixin' 'of' R 'by' <: ]" :=
-  (PredSubRing.Build _ _ _ _ (sub_type R))
+  (PredSubRing.Build _ _ _ _ R)
   (at level 0, format "[ 'ringMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'lmodMixin' 'of' U 'by' <: ]" :=
-  (PredSubLmodule.Build _ _ _ _ _ (sub_type U))
+  (PredSubLmodule.Build _ _ _ _ _ U)
   (at level 0, format "[ 'lmodMixin'  'of'  U  'by'  <: ]") : form_scope.
 Notation "[ 'lalgMixin' 'of' A 'by' <: ]" :=
   (Lmodule_IsLalgebra.Build _ A%type
@@ -5148,7 +5148,7 @@ Notation "[ 'algMixin' 'of' A 'by' <: ]" :=
   (algMixin (Phant A) val_inj (rrefl _) (rrefl _))
   (at level 0, format "[ 'algMixin'  'of'  A  'by'  <: ]") : form_scope.
 Notation "[ 'unitRingMixin' 'of' R 'by' <: ]" :=
-  (PredSubUnitRing.Build _ _ _ _ (sub_type R))
+  (PredSubUnitRing.Build _ _ _ _ R)
   (at level 0, format "[ 'unitRingMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'idomainMixin' 'of' R 'by' <: ]" :=
   (ComUnitRing_IsIntegral.Build R%type

@@ -1881,9 +1881,6 @@ HB.instance Definition _ := [Equality of subvs_of by <:].
 HB.instance Definition _ := [Choice of subvs_of by <:].
 HB.instance Definition _ := [zmodMixin of subvs_of by <:].
 HB.instance Definition _ := [lmodMixin of subvs_of by <:].
-HB.instance Definition _ := GRing.Lmodule.copy subvs_of (sub_type subvs_of).
-(* FIXME: this is not very satisfying,
-   should we include the copy in the above [*Mixin of _ by <:] notations? *)
 
 Lemma subvsP w : vsval w \in U. Proof. exact: valP. Qed.
 Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
