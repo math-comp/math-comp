@@ -35,7 +35,7 @@ field/closed_field.v
 field/falgebra.v
 field/fieldext.v
 # field/finfield.v
-# field/galois.v
+field/galois.v
 field/separable.v
 fingroup/action.v
 fingroup/all_fingroup.v
