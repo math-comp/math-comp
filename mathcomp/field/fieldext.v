@@ -1289,8 +1289,8 @@ Definition SubfxVectMixin := Lmodule_HasFinDim.Build _ subFExtend
   min_subfx_vectAxiom.
 Definition SubfxVectType := VectType F subFExtend SubfxVectMixin.
 (* FIXME *)
-(* Definition SubfxFalgType := Eval simpl in [FalgType F of SubfxVectType]. *)
-(* Definition SubFieldExtType := Eval simpl in [fieldExtType F of SubfxFalgType]. *)
+Definition SubfxFalgType := Falgebra.Pack (Falgebra.Class (Vector.class SubfxVectType) (GRing.Algebra.on _) (GRing.UnitRing.on _)).
+Definition SubFieldExtType := FieldExt.Pack (FieldExt.Class (Vector.class SubfxVectType) (GRing.Field.on _) (GRing.IntegralDomain.on _) (GRing.Algebra.on _)).
 
 End Irreducible.
 
