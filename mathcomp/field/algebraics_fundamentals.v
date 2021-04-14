@@ -120,17 +120,6 @@ Local Notation "p ^@" := (p ^ in_alg _) (at level 2, format "p ^@"): ring_scope.
 Local Notation "<< E ; u >>" := <<E; u>>%VS.
 Local Notation Qmorphism C := {rmorphism rat -> C}.
 
-(* TODO: backport to ssrnum *)
-(* FIXME: compress coercion chain *)
-Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
-  (apply: ltr01) : core.
-Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
-  (apply: ltr0Sn) : core.
-Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
-  (apply: ler01) : core.
-Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
-  (apply: ler0n) : core.
-
 Lemma rat_algebraic_archimedean (C : numFieldType) (QtoC : Qmorphism C) :
   integralRange QtoC -> Num.archimedean_axiom C.
 Proof.

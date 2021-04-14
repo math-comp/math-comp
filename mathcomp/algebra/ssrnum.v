@@ -677,12 +677,18 @@ Qed.
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. exact: ltr01. Qed.
 Lemma ler0n n : 0 <= n%:R :> R. Proof. by rewrite -nnegrE rpred_nat. Qed.
-Hint Resolve ler01 ltr01 ler0n : core.
+Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler01) : core.
+Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr01) : core.
+Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler0n) : core.
 Lemma ltr0Sn n : 0 < n.+1%:R :> R.
 Proof. by elim: n => // n; apply: addr_gt0. Qed.
 Lemma ltr0n n : (0 < n%:R :> R) = (0 < n)%N.
 Proof. by case: n => //= n; apply: ltr0Sn. Qed.
-Hint Resolve ltr0Sn : core.
+Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr0Sn) : core.
 
 Lemma pnatr_eq0 n : (n%:R == 0 :> R) = (n == 0)%N.
 Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gt_eqF. Qed.
@@ -835,7 +841,14 @@ Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R (* V *) v}.  (* FIXME (uncomment V) *)
-Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
+Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler01) : core.
+Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr01) : core.
+Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler0n) : core.
+Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr0Sn) : core.
 Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
 Section NumDomainOperationTheory.
@@ -924,10 +937,10 @@ Proof. by move=> /ltW/ler0_real. Qed.
 Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
 Hint Resolve real0 : core.
 
-Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real ?ler01. Qed.  (* FIXME: the ler01 was not needed before *)
+Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
 Hint Resolve real1 : core.
 
-Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real ?ler0n. Qed.  (* FIXME: the ler0n was not needed before *)
+Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !ler_opp2. Qed.
@@ -1386,8 +1399,7 @@ Qed.
 
 Lemma ler_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x <= y}.
 Proof.
-case: n => // n _ x y /=; rewrite -mulr_natl -[y *+ _]mulr_natl ler_pmul2l //.
-by rewrite ltr0n.  (* FIXME: this rewrite ltr0n was not needed before *)
+by case: n => // n _ x y /=; rewrite -mulr_natl -[y *+ _]mulr_natl ler_pmul2l.
 Qed.
 
 Lemma ltr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x < y}.
@@ -1486,7 +1498,7 @@ Lemma ltr_nmuln2l x :
 Proof. by move=> x_lt0; apply: leW_nmono (ler_nmuln2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
-Proof. by rewrite ler_pmuln2l // ltr01. Qed.  (* FIXME: ltr01 was not needed before *)
+Proof. by rewrite ler_pmuln2l. Qed.
 
 Lemma ltr_nat m n : (m%:R < n%:R :> R) = (m < n)%N.
 Proof. by rewrite ltr_pmuln2l // ltr01. Qed.
@@ -1508,8 +1520,8 @@ Lemma ltr1n n : 1 < n%:R :> R = (1 < n)%N. Proof. by rewrite -ltr_nat. Qed.
 Lemma lern1 n : n%:R <= 1 :> R = (n <= 1)%N. Proof. by rewrite -ler_nat. Qed.
 Lemma ltrn1 n : n%:R < 1 :> R = (n < 1)%N. Proof. by rewrite -ltr_nat. Qed.
 
-Lemma ltrN10 : -1 < 0 :> R. Proof. by rewrite oppr_lt0 ltr01. Qed.  (* FIXME ltr01 was not needed before *)
-Lemma lerN10 : -1 <= 0 :> R. Proof. by rewrite oppr_le0 ler01. Qed.  (* FIXME ltr01 was not needed before *)
+Lemma ltrN10 : -1 < 0 :> R. Proof. by rewrite oppr_lt0. Qed.
+Lemma lerN10 : -1 <= 0 :> R. Proof. by rewrite oppr_le0. Qed.
 Lemma ltr10 : 1 < 0 :> R = false. Proof. by rewrite le_gtF. Qed.
 Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite lt_geF. Qed.
 Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
@@ -1618,8 +1630,7 @@ Lemma ler_prod I r (P : pred I) (E1 E2 : I -> R) :
   \prod_(i <- r | P i) E1 i <= \prod_(i <- r | P i) E2 i.
 Proof.
 move=> leE12; elim/(big_load (fun x => 0 <= x)): _.
-elim/big_rec2: _ => [|i x2 x1 /leE12/andP[le0Ei leEi12] [x1ge0 le_x12]].
-  by rewrite ler01 lexx.  (* FIXME: was not necessary before *)
+elim/big_rec2: _ => // i x2 x1 /leE12/andP[le0Ei leEi12] [x1ge0 le_x12].
 by rewrite mulr_ge0 // ler_pmul.
 Qed.
 
@@ -1844,13 +1855,13 @@ Definition lter_iexpr := (ler_iexpr, ltr_iexpr).
 Lemma ler_eexpr x n : (0 < n)%N -> 1 <= x -> x <= x ^+ n.
 Proof.
 case: n => // n _ x_ge1.
-by rewrite exprS ler_pemulr ?(le_trans _ x_ge1) // ?ler01 // exprn_ege1.  (* FIXME: ler01 was not needed before *)
+by rewrite exprS ler_pemulr ?(le_trans _ x_ge1) // exprn_ege1.
 Qed.
 
 Lemma ltr_eexpr x n : 1 < x -> (x < x ^+ n) = (1 < n)%N.
 Proof.
 move=> x_ge1; case: n=> [|[|n]] //; first by rewrite expr0 lt_gtF.
-by rewrite exprS ltr_pmulr ?(lt_trans _ x_ge1) ?exprn_egt1 // ltr01.  (* FIXME: ltr01 was not needed before *)
+by rewrite exprS ltr_pmulr ?(lt_trans _ x_ge1) ?exprn_egt1.
 Qed.
 
 Definition lter_eexpr := (ler_eexpr, ltr_eexpr).
@@ -1873,7 +1884,7 @@ Qed.
 Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0%N) || (x == 1)).
 Proof.
 move=> xle0; case: n => [|n]; first by rewrite expr0 eqxx.
-case: (@real_ltgtP x 1) => //; do ?by rewrite ?ger0_real.  (* FIXME: the // was not needed before (correspond to real1) *)
+case: (@real_ltgtP x 1); do ?by rewrite ?ger0_real.
 + by move=> x_lt1; rewrite 1?lt_eqF // exprn_ilt1.
 + by move=> x_lt1; rewrite 1?gt_eqF // exprn_egt1.
 by move->; rewrite expr1n eqxx.
@@ -1906,8 +1917,7 @@ Lemma ler_eexpn2l x :
 Proof.
 move=> xgt1; apply: (le_mono (inj_homo_lt _ _)); last first.
   by apply: ler_weexpn2l; rewrite ltW.
-apply: ieexprIn; rewrite ?gt_eqF ?gtr_cpable //; apply: lt_trans xgt1.
-exact: ltr01.  (* FIXME: was not needed *)
+by apply: ieexprIn; rewrite ?gt_eqF ?gtr_cpable //; apply: lt_trans xgt1.
 Qed.
 
 Lemma ltr_eexpn2l x :
@@ -2493,7 +2503,7 @@ Proof. by rewrite !(fun_if sg) !sgrE. Qed.
 Lemma sgr_lt0 x : (sg x < 0) = (x < 0).
 Proof.
 rewrite /sg; case: eqP => [-> // | _].
-by case: ifP => _; rewrite ?ltrN10 // lt_gtF // ltr01.  (* FIXME: ltr01 *)
+by case: ifP => _; rewrite ?ltrN10 // lt_gtF.
 Qed.
 
 Lemma sgr_le0 x : (sgr x <= 0) = (x <= 0).

@@ -906,29 +906,29 @@ Proof. by rewrite -(mulr0z x) ler_nmulz2l. Qed.
 Lemma mulrIz x (hx : x != 0) : injective ( *~%R x).
 Proof.
 move=> y z; rewrite -![x *~ _]mulrzr => /(mulfI hx).
-apply: inc_inj y z; exact/ler_pmulz2l/ltr01.
+by apply: inc_inj y z; apply: ler_pmulz2l.
 Qed.
 
 Lemma ler_int m n : (m%:~R <= n%:~R :> R) = (m <= n).
-Proof. by rewrite ler_pmulz2l // ltr01. Qed.
+Proof. by rewrite ler_pmulz2l. Qed.
 
 Lemma ltr_int m n : (m%:~R < n%:~R :> R) = (m < n).
-Proof. by rewrite ltr_pmulz2l // ltr01. Qed.
+Proof. by rewrite ltr_pmulz2l. Qed.
 
 Lemma eqr_int m n : (m%:~R == n%:~R :> R) = (m == n).
 Proof. by rewrite (inj_eq (mulrIz _)) ?oner_eq0. Qed.
 
 Lemma ler0z n : (0 <= n%:~R :> R) = (0 <= n).
-Proof. by rewrite pmulrz_rge0 // ltr01. Qed.
+Proof. by rewrite pmulrz_rge0. Qed.
 
 Lemma ltr0z n : (0 < n%:~R :> R) = (0 < n).
-Proof. by rewrite pmulrz_rgt0 // ltr01. Qed.
+Proof. by rewrite pmulrz_rgt0. Qed.
 
 Lemma lerz0 n : (n%:~R <= 0 :> R) = (n <= 0).
-Proof. by rewrite pmulrz_rle0 // ltr01. Qed.
+Proof. by rewrite pmulrz_rle0. Qed.
 
 Lemma ltrz0 n : (n%:~R < 0 :> R) = (n < 0).
-Proof. by rewrite pmulrz_rlt0 // ltr01. Qed.
+Proof. by rewrite pmulrz_rlt0. Qed.
 
 Lemma ler1z (n : int) : (1 <= n%:~R :> R) = (1 <= n).
 Proof. by rewrite -[1]/(1%:~R) ler_int. Qed.
@@ -1649,7 +1649,7 @@ wlog le_m31 : m1 m3 / (m3 <= m1)%R.
 rewrite ger0_norm ?subr_ge0 // orb_idl => [|/andP[le_m12 le_m23]]; last first.
   by have /eqP->: m2 == m3; rewrite ?lexx // eq_le le_m23 (le_trans le_m31).
 rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -[X in X && _]subr_ge0.
-apply: leif_add; apply/real_leif_norm/num_real.
+by apply: leif_add; apply/real_leif_norm/num_real.
 Qed.
 
 Lemma leqif_add_dist n1 n2 n3 :
