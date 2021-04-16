@@ -177,8 +177,7 @@ move=> n m; apply: (iffP idP) => [|<-]; last by elim n.
 by elim: n m => [|n IHn] [|m] //= /IHn->.
 Qed.
 
-Canonical nat_eqMixin := EqMixin eqnP.
-HB.instance nat nat_eqMixin.
+HB.instance Definition _ := HasDecEq.Build nat eqnP.
 
 Arguments eqn !m !n.
 Arguments eqnP {x y}.
@@ -1817,8 +1816,7 @@ move=> p q; apply: (iffP idP) => [|<-]; last by case: p => //; elim.
 by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //= /IHp [->].
 Qed.
 
-Canonical bin_nat_eqMixin := EqMixin eq_binP.
-HB.instance N bin_nat_eqMixin.
+HB.instance Definition _ := HasDecEq.Build N eq_binP.
 
 Arguments N.eqb !n !m.
 
