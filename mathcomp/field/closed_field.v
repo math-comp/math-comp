@@ -698,7 +698,7 @@ pose Iaddkey := GRing.Pred.Add (DefaultPredKey I) I_ideal.
 pose Iidkey := MkIdeal (GRing.Pred.Zmod Iaddkey I_ideal) I_ideal.
 pose E := GRing.ComRing.Pack (GRing.ComRing.Class (GRing.Ring_HasCommutativeMul.Build _ (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)))).
 Admitted.
-(* FIXME *)
+(* FIXME: explicit Pack ? *)
 (*
 pose E := ComRingType _ (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)).
 pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
@@ -843,7 +843,7 @@ have Kadd0: left_id (FtoK 0) Kadd.
 have KaddN: left_inverse (FtoK 0) Kopp Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -EtoK_N -EtoK_D addNr EtoK_0.
 Admitted.
-(* FIXME *)
+(* FIXME: explicit Pack ? *)
 (*
 pose Kzmod := ZmodType K (ZmodMixin KaddA KaddC Kadd0 KaddN).
 have KmulC: commutative Kmul.

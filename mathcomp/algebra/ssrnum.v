@@ -138,7 +138,7 @@ Module Num.
 HB.structure Definition POrderedZmodule d :=
   { R of Order.IsPOrdered d R & GRing.Zmodule R }.
 
-(* FIXME: this is the right Zmodule_IsNormed mixin: *)
+(* FIXME: generic_norm, this is the right Zmodule_IsNormed mixin: *)
 (* HB.mixin Record Zmodule_IsNormed d (R : POrderedZmodule.type d) M
          of GRing.Zmodule M := {
   norm_op : M -> R;
@@ -156,7 +156,7 @@ HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M & GRing.Zmodule M :=
 }.
 
 #[mathcomp]
-(* FIXME additional attribute when the structure is fixed: infer(R) *)
+(* FIXME: generic_norm, additional attribute when the structure is fixed: infer(R) *)
 HB.structure Definition NormedZmodule d :=
   { M of Zmodule_IsNormed d M & POrderedZmodule d M}.
 Arguments norm {R T} x : rename.
@@ -174,7 +174,7 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
-(* FIXME: this is the right IsNumDomain mixin: *)
+(* FIXME: generic_norm, this is the right IsNumDomain mixin: *)
 (* HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
   & NormedZmodule d [the POrderedZmodule.type _ of R] R := {
  _ : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
@@ -406,9 +406,6 @@ Notation "[ 'realDomainType' 'of' T ]" := (RealDomain.clone T _)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
 End RealDomainExports.
 HB.export RealDomainExports.
-(* FIXME: often copy/paste and forget to change that, maybe a warning/error
-   when HB.export twice the same module ?
-   (open issue on HB) *)
 
 #[mathcomp]
 HB.structure Definition RealField :=
@@ -629,7 +626,7 @@ Module Import Theory.
 Section NumIntegralDomainTheory.
 
 Variable R : numDomainType.
-(* FIXME: here is the right definition for V *)
+(* FIXME: generic_norm, here is the right definition for V *)
 (* Implicit Types (V : normedZmodType R) (x y z t : R). *)
 Local Notation V := R.
 Implicit Types (x y z t : R).
@@ -637,15 +634,15 @@ Implicit Types (x y z t : R).
 (* Lemmas from the signature (reexported). *)
 
 Definition ler_norm_add (* V *) (x y : V) : `|x + y| <= `|x| + `|y| :=
-  ler_norm_add x y.  (* FIXME *)
+  ler_norm_add x y.  (* FIXME: generic_norm *)
 Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
-Definition normr0_eq0 (* V *) (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 ring_display R (* V *) x.  (* FIXME *)
+Definition normr0_eq0 (* V *) (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 ring_display R (* V *) x.  (* FIXME: generic_norm *)
 Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
   @ger_leVge R x y.
 Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
 Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := ler_def x y.
-Definition normrMn (* V *) (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.  (* FIXME *)
-Definition normrN (* V *) (x : V) : `|- x| = `|x| := normrN x.  (*  FIXME *)
+Definition normrMn (* V *) (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.  (* FIXME: generic_norm *)
+Definition normrN (* V *) (x : V) : `|- x| = `|x| := normrN x.  (*  FIXME: generic_norm *)
 
 (* Predicate definitions. *)
 
@@ -746,7 +743,7 @@ Proof. by apply/big_real; [apply: rpredM | apply: rpred1]. Qed.
 
 Section NormedZmoduleTheory.
 
-(* FIXME: this is the correct introduction of V *)
+(* FIXME: generic_norm, this is the correct introduction of V *)
 (* Variable V : normedZmodType R. *)
 Local Notation V := R.
 Implicit Types (v w : V).
@@ -766,7 +763,7 @@ Lemma normr_id v : `| `|v| | = `|v|.
 Proof.
 have nz2: 2%:R != 0 :> R by rewrite pnatr_eq0.
 apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n.
-rewrite [LHS]ger0_norm //.  (* FIXME: [LHS] was not needed before *)
+rewrite [LHS]ger0_norm //.  (* FIXME: rewrite pattern *)
 by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
 Qed.
 
@@ -801,9 +798,9 @@ Lemma subr_ge0 x y : (0 <= y - x) = (x <= y). Proof. exact: subr_ge0. Qed.
 Lemma subr_gt0 x y : (0 < y - x) = (x < y).
 Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
 Lemma subr_le0  x y : (y - x <= 0) = (y <= x).
-Proof. by rewrite -[LHS]subr_ge0 opprB add0r subr_ge0. Qed.  (* FIXME: [LHS] was not needed before *)
+Proof. by rewrite -[LHS]subr_ge0 opprB add0r subr_ge0. Qed.  (* FIXME: rewrite pattern *)
 Lemma subr_lt0  x y : (y - x < 0) = (y < x).
-Proof. by rewrite -[LHS]subr_gt0 opprB add0r subr_gt0. Qed.  (* FIXME: [LHS] was not needed before *)
+Proof. by rewrite -[LHS]subr_gt0 opprB add0r subr_gt0. Qed.  (* FIXME: rewrite pattern *)
 
 Definition subr_lte0 := (subr_le0, subr_lt0).
 Definition subr_gte0 := (subr_ge0, subr_gt0).
@@ -840,7 +837,7 @@ End NumIntegralDomainTheory.
 Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
-Arguments normr0P {R (* V *) v}.  (* FIXME (uncomment V) *)
+Arguments normr0P {R (* V *) v}.  (* FIXME: generic_norm, (uncomment V) *)
 Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
   (apply: ler01) : core.
 Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
@@ -2195,7 +2192,7 @@ Qed.
 
 Section NormedZmoduleTheory.
 
-(* FIXME: this was the introduction of V *)
+(* FIXME: generic_norm, this was the introduction of V *)
 (* Variable V : normedZmodType R. *)
 Local Notation V := R.
 Implicit Types (u v w : V).
@@ -2554,7 +2551,7 @@ Lemma leif_add x1 y1 C1 x2 y2 C2 :
     x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 + x2 <= y1 + y2 ?= iff C1 && C2.
 Proof.
-rewrite -[X in X -> _](mono_leif (ler_add2r x2)).  (* FIXME: the pattern was not needed *)
+rewrite -[X in X -> _](mono_leif (ler_add2r x2)).  (* FIXME: rewrite pattern *)
 rewrite -(mono_leif (C := C2) (ler_add2l y1)).
 exact: leif_trans.
 Qed.
@@ -2998,13 +2995,13 @@ Definition lter_ndivr_mull := (ler_ndivr_mull, ltr_ndivr_mull).
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
 
-Lemma normfV : {morph (@norm _ (* F *) F) : x / x ^-1}.  (* FIXME *)
+Lemma normfV : {morph (@norm _ (* F *) F) : x / x ^-1}.  (* FIXME: generic_norm *)
 Proof.
 move=> x /=; have [/normrV //|Nux] := boolP (x \is a GRing.unit).
 by rewrite !invr_out // unitfE normr_eq0 -unitfE.
 Qed.
 
-Lemma normf_div : {morph (@norm _ (* F *) F) : x y / x / y}.  (* FIXME *)
+Lemma normf_div : {morph (@norm _ (* F *) F) : x y / x / y}.  (* FIXME: generic_norm *)
 Proof. by move=> x y /=; rewrite normrM normfV. Qed.
 
 Lemma invr_sg x : (sg x)^-1 = sgr x.
@@ -3291,7 +3288,7 @@ Lemma sgr_smul x y : sg (sg x * y) = sg x * sg y.
 Proof. by rewrite sgrM sgr_id. Qed.
 
 Lemma sgr_gt0 x : (sg x > 0) = (x > 0).
-Proof. by rewrite -[LHS]sgr_cp0 sgr_id sgr_cp0. Qed.  (* FIXME: [LHS] was not needed *)
+Proof. by rewrite -[LHS]sgr_cp0 sgr_id sgr_cp0. Qed.  (* FIXME: rewrite pattern *)
 
 Lemma sgr_ge0 x : (sgr x >= 0) = (x >= 0).
 Proof. by rewrite !leNgt sgr_lt0. Qed.
@@ -3717,7 +3714,7 @@ Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
 Proof.
 wlog suffices: x / 0 <= x -> 0 <= x^*.
   by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
-rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.  (* FIXME: pattern *)
+rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.  (* FIXME: rewrite pattern *)
 by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
 Qed.
 
@@ -3801,7 +3798,7 @@ Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
 Lemma Crect x : x = 'Re x + 'i * 'Im x.
 Proof.
 rewrite 2!mulrA -expr2 sqrCi mulN1r opprB -mulrDl addrACA subrr addr0.
-by rewrite -mulr2n -[X in X * _]mulr_natr mulfK.  (* FIXME: pattern *)
+by rewrite -mulr2n -[X in X * _]mulr_natr mulfK.  (* FIXME: rewrite pattern *)
 Qed.
 
 Lemma Creal_Re x : 'Re x \is real.
@@ -4499,8 +4496,6 @@ HB.factory Record IntegralDomain_IsLtReal R of GRing.IntegralDomain R := {
 }.
 
 HB.builders Context R of IntegralDomain_IsLtReal R.
-(* FIXME terrible error message "elpi fails"
-   when replacing IntegralDomain_IsLtReal by GRing.IntegralDomain *)
   Local Notation le := Rle.
   Local Notation lt := Rlt.
 

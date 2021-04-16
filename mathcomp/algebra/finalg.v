@@ -316,7 +316,7 @@ HB.builders Context F of IsField F.
     | ('forall 'X_k, f1) => [forall x : F, sat (set_nth 0%R e k x) f1]
     end%T.
 
-  (* FIXME : we would have expected GRing.DecidableField.axiom *)
+  (* FIXME: we would have expected GRing.DecidableField.axiom *)
   Lemma decidable : GRing.decidable_field_axiom sat.
   Proof.
   move=> e f; elim: f e;

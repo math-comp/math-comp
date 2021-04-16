@@ -654,7 +654,7 @@ HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ L_F
 
 Fact fieldOver_vectMixin : Lmodule_HasFinDim.axioms_ [the ringType of K_F] L_F
   (GRing.Zmodule.on _) (Choice.on _) (Equality.on _) (GRing.Lmodule.on _).
-  (* FIXME: not nice *)
+  (* FIXME: explicit Pack *)
 Proof.
 have [bL [_ nz_bL] [defL dxSbL]] := field_module_semisimple (subvf (F * _)).
 do [set n := \dim_F {:L} in bL nz_bL *; set SbL := (\sum_i _)%VS] in defL dxSbL.
@@ -811,7 +811,7 @@ Let coordF (x : F) := (coord_vbasis (memvf x)).
 
 Fact baseField_vectMixin : Lmodule_HasFinDim.axioms_ [the fieldType of F0] L0
   (GRing.Zmodule.on _) (Choice.on _) (Equality.on _) (GRing.Lmodule.on _).
-  (* FIXME: not nice *)
+  (* FIXME: explicit Pack *)
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
@@ -1288,7 +1288,7 @@ Qed.
 Definition SubfxVectMixin := Lmodule_HasFinDim.Build _ subFExtend
   min_subfx_vectAxiom.
 Definition SubfxVectType := VectType F subFExtend SubfxVectMixin.
-(* FIXME *)
+(* FIXME: explicit Pack *)
 Definition SubfxFalgType := Falgebra.Pack (Falgebra.Class (Vector.class SubfxVectType) (GRing.Algebra.on _) (GRing.UnitRing.on _)).
 Definition SubFieldExtType := FieldExt.Pack (FieldExt.Class (Vector.class SubfxVectType) (GRing.Field.on _) (GRing.IntegralDomain.on _) (GRing.Algebra.on _)).
 

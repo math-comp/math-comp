@@ -286,7 +286,7 @@ Proof. exact: val_reprGLm. Qed.
 Lemma reprGLmM : {in G &, {morph reprGLm : x y / x * y}}%g.
 Proof.
 move=> x y Gx Gy; apply: val_inj; rewrite /=.
-rewrite -![FinRing.uval ?[a]]/(\val (reprGLm ?[a])).  (* FIXME: was not needed before (c.f. one liner below) *)
+rewrite -![FinRing.uval ?[a]]/(\val (reprGLm ?[a])).  (* FIXME: extra unfold (c.f. one liner below) *)
 by rewrite !val_reprGLm ?groupM ?repr_mxM.
 (* by move=> x y Gx Gy; apply: val_inj; rewrite /= !val_reprGLm ?groupM ?repr_mxM. *)
 Qed.
@@ -936,7 +936,7 @@ pose ephi i := invm (injm_Zpm a) (Zp_unitm (FinRing.Unit _ (phi_unitP i))).
 pose j : 'Z_#[z] := val (invm (injm_Zp_unitm z) a).
 have co_j_p: coprime j p.
   rewrite coprime_sym /j; case: (invm _ a) => /=.
-  by rewrite ozp /GRing.unit /= /GRing.unit_subdef /= Zp_cast.  (* FIXME: had to unfold GRing.unit_subdef *)
+  by rewrite ozp /GRing.unit /= /GRing.unit_subdef /= Zp_cast.  (* FIXME: extra unfold *)
 have [alpha Aut_alpha alphaZ] := center_aut_extraspecial pS esS co_j_p.
 have alpha_i_z i: ((alpha ^+ ephi i) z = z ^+ i.+1)%g.
   transitivity ((a ^+ ephi i) z)%g.
