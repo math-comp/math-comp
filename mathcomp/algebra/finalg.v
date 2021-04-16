@@ -426,7 +426,9 @@ HB.instance Definition _ (R : finZmodType) := Zmodule.on R^o.
 HB.instance Definition _ (R : finRingType) := Ring.on R^o.
 HB.instance Definition _ (R : finComRingType) := Ring.on R^o.
 HB.instance Definition _ (R : finUnitRingType) := Ring.on R^o.
-(* TODO: finish*)
+HB.instance Definition _ (R : finComUnitRingType) := Ring.on R^o.
+HB.instance Definition _ (R : finIntegralDomainType) := Ring.on R^o.
+HB.instance Definition _ (R : finFieldType) := Ring.on R^o.
 End RegularExports.
 HB.export RegularExports.
 
