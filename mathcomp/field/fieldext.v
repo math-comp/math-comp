@@ -103,9 +103,8 @@ Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
 End FieldExtExports.
 HB.export FieldExtExports.
 
-(* FIXME
-Canonical regular_fieldExtType (F : fieldType) := [fieldExtType F of F^o for F].
-*)
+(* FIXME: strange way to build a FieldExt *)
+HB.instance Definition _ (F : fieldType) := GRing.Field.on F^o.
 
 Section FieldExtTheory.
 
