@@ -109,6 +109,13 @@ jobs:
       run: nix-build --argstr job "hierarchy-builder" --argstr bundle ${{ matrix.bundle }}
     - name: Build planB sources
       run: nix-build --argstr job "mathcomp-single-planB-src" --argstr bundle ${{ matrix.bundle }}
+    - name: Save planB sources as a GH artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: planB-sources
+        path: |
+          result/mathcomp
+          ! result/**/*.vo
 
   mathcomp-planB:
     runs-on: ubuntu-latest
