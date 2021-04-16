@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
@@ -258,6 +259,42 @@ Prenex Implicits alg_integral.
 Import DefaultKeying GRing.DefaultPred.
 Arguments map_poly_inj {F R} f [p1 p2].
 
+
+(** FIX ME : the proof was creating local stuff, 
+              we made it global so we can use HB.... 
+*)
+Section ArchiFieldPatch.
+
+
+Notation Qfield := (fieldExtType [the ringType of rat : Type]).
+
+Variable R : Qfield.
+
+Variable  Rlt : rel R.
+Variable  Rle : rel R.
+Variable  norm : R -> R.
+Hypothesis  lt0_add   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x + y).
+Hypothesis  lt0_mul   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x * y).
+Hypothesis  lt0_ngt0  : forall x,  Rlt 0 x -> ~~ (Rlt x 0).
+Hypothesis  sub_gt0   : forall x y, Rlt 0 (y - x) = Rlt x y.
+Hypothesis  lt0_total : forall x, x != 0 -> Rlt 0 x || Rlt x 0.
+Hypothesis  normN     : forall x, norm (- x) = norm x.
+Hypothesis  ge0_norm  : forall x, Rle 0 x -> norm x = x.
+Hypothesis  le_def    : forall x y, Rle x y = (x == y) || Rlt x y.
+
+HB.instance Definition _ := 
+  Num.IntegralDomain_IsLtReal.Build R lt0_add lt0_mul lt0_ngt0 
+     sub_gt0 lt0_total normN ge0_norm le_def.
+
+Definition get_archifield : archiFieldType.
+  apply: Num.ArchimedeanField.Pack.
+  apply: Num.ArchimedeanField.Class.
+  exact (Num.RealField_IsArchimedean.Build 
+       _ (@rat_algebraic_archimedean _ _ alg_integral)).
+Defined.
+
+End ArchiFieldPatch.
+
 Theorem Fundamental_Theorem_of_Algebraics :
   {L : closedFieldType &
      {conj : {rmorphism L -> L} | involutive conj & ~ conj =1 id}}.
@@ -275,13 +312,11 @@ pose genQfield z L := {LtoC : Cmorph L & {u | LtoC u = z & <<1; u>> = fullv}}.
 have /all_tag[Q /all_tag[ofQ genQz]] z: {Qz : Qfield & genQfield z Qz}.
   have [|p [/monic_neq0 nzp pz0 irr_p]] := minPoly_decidable_closure _ (algC z).
     exact: rat_algebraic_decidable.
-  (* FIXME: fix fieldext *)
-  (* pose Qz := SubFieldExtType pz0 irr_p. *)
-  (* pose QzC := subfx_inj_rmorphism QtoC z p. *)
-  (* exists Qz, QzC, (subfx_root QtoC z p); first exact: subfx_inj_root. *)
-  (* apply/vspaceP=> u; rewrite memvf; apply/Fadjoin1_polyP. *)
-  (* by have [q] := subfxEroot pz0 nzp u; exists q. *)
-  admit.
+  pose Qz := SubFieldExtType pz0 irr_p.
+  pose QzC := subfx_inj_rmorphism QtoC z p.
+  exists Qz, QzC, (subfx_root QtoC z p); first exact: subfx_inj_root.
+  apply/vspaceP=> u; rewrite memvf; apply/Fadjoin1_polyP.
+  by have [q] := subfxEroot pz0 nzp u; exists q.
 have pQof z p: p^@ ^ ofQ z = p ^ QtoC.
   by rewrite -map_poly_comp; apply: eq_map_poly => x; rewrite !fmorph_eq_rat.
 have pQof2 z p u: ofQ z p^@.[u] = (p ^ QtoC).[ofQ z u].
@@ -589,10 +624,10 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
-  pose Ry := LtRealFieldOfField
-               (RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _)).
-  have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
-  by exists (ArchiFieldType Ry archiRy); apply: [rmorphism of idfun].
+(* This is the instance *)
+  exists (@get_archifield (Q y) _ _ _ posD
+            posM posNneg posB posVneg absN absE (rrefl _)).
+  by apply: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
     exists 0, [archiFieldType of rat], f.
@@ -655,7 +690,12 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [t [t_C t_z gal_t]]: exists t, [/\ z_ n \in sQ t, z \in sQ t & is_Gal t].
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
-  pose Qt := SplittingFieldType rat (Q t) gal_t; have /QtoQ[CnQt CnQtE] := t_C.
+    (* FIXME : SplittingField structure has to be done by hand *)
+    pose Qt : SplittingField.type_ [fieldType of rat] :=
+      (@galois.SplittingField.Pack 
+              _ _             (SplittingField.Class 
+                (FieldExt_IsSplittingField.Build _ _ gal_t))).
+  have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
   pose Cn : {subfield Qt} := <<Rn; i_t>>%AS.
   have defCn: Cn = limg CnQt :> {vspace Q t} by rewrite /= -aimg_adjoin defRi.
@@ -682,8 +722,13 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [sRCn sCnRz]: (Rn <= Cn)%VS /\ (Cn <= Rz)%VS by rewrite !subv_adjoin.
   have sRnRz := subv_trans sRCn sCnRz.
   have{gal_z} galRz: galois Rn Rz.
-    apply/and3P; split=> //; apply/splitting_normalField=> //.
-    pose u : SplittingFieldType rat (Q z) gal_z := inQ z z.
+    apply/and3P; split=> //; first by apply: sepQ 
+                             (* FIX ME This is not solved by //*).
+    apply/splitting_normalField=> //.
+    (* FIX ME : again calling the Build explicitely *)
+    pose u : SplittingFieldType [fieldType of rat] (Q z) 
+               (FieldExt_IsSplittingField.Build _ _ gal_z)
+               := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
       by rewrite coef_map linearZZ rmorph1 rpredZ ?rpred1.
