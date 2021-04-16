@@ -286,13 +286,22 @@ HB.instance Definition _ :=
   Num.IntegralDomain_IsLtReal.Build R lt0_add lt0_mul lt0_ngt0 
      sub_gt0 lt0_total normN ge0_norm le_def.
 
-Definition get_archifield : archiFieldType.
-  apply: Num.ArchimedeanField.Pack.
-  apply: Num.ArchimedeanField.Class.
-  exact (Num.RealField_IsArchimedean.Build 
-       _ (@rat_algebraic_archimedean _ _ alg_integral)).
-Defined.
+Definition get_archifield : archiFieldType :=
+  (Num.ArchimedeanField.Pack
+    (Num.ArchimedeanField.Class
+      (Num.RealField_IsArchimedean.Build 
+       _ (@rat_algebraic_archimedean _ _ alg_integral)))).
 
+(* FIX ME : Build done by hand. Cannot make this work  
+  HB.instance Definition _ := 
+      Num.RealField_IsArchimedean.Build 
+       R (@rat_algebraic_archimedean _ _ alg_integral).
+  This works 
+  HB.instance Definition _ := 
+      Num.RealField_IsArchimedean.Build 
+       _ (@rat_algebraic_archimedean _ _ alg_integral).
+  but I don't know how to get the ArchimedianField after *)
+ 
 End ArchiFieldPatch.
 
 Theorem Fundamental_Theorem_of_Algebraics :
