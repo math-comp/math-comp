@@ -692,8 +692,8 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
     (* FIXME : SplittingField structure has to be done by hand *)
     pose Qt : SplittingField.type_ [fieldType of rat] :=
-      (@galois.SplittingField.Pack 
-              _ _             (SplittingField.Class 
+      (@galois.SplittingField.Pack _ _ 
+        (SplittingField.Class 
                 (FieldExt_IsSplittingField.Build _ _ gal_t))).
   have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
