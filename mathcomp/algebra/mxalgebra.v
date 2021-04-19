@@ -2528,13 +2528,16 @@ rewrite card_GL // big_ltn // big_nat1 expn1 -(addn1 #|F|) -subn1 -!mulnA.
 by rewrite -subn_sqr.
 Qed.
 
+(* FIXME: to be understood. If you remove card, then there is no seepdup *)
+Lemma card_GL_predK n p : #|'GL_n.-1.+1(p)| = #|'GL_n(p)|. Proof. by []. Qed.
+
 End CardGL.
 
 Lemma logn_card_GL_p n p : prime p -> logn p #|'GL_n(p)| = 'C(n, 2).
 Proof.
 move=> p_pr; have p_gt1 := prime_gt1 p_pr.
 have p_i_gt0: p ^ _ > 0 by move=> i; rewrite expn_gt0 ltnW.
-rewrite (card_GL _ (ltn0Sn n.-1)) card_ord Fp_cast // big_add1 /=.
+rewrite -card_GL_predK (card_GL _ (ltn0Sn n.-1)) card_ord Fp_cast // big_add1 /=.
 pose p'gt0 m := m > 0 /\ logn p m = 0%N.
 suffices [Pgt0 p'P]: p'gt0 (\prod_(0 <= i < n.-1.+1) (p ^ i.+1 - 1))%N.
   by rewrite lognM // p'P pfactorK // addn0; case n.
