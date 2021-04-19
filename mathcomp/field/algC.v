@@ -276,6 +276,8 @@ Parameter type : Type.
 
 Parameter conjMixin : Num.ClosedField.axioms_ type.
 
+Parameter countMixin : Countable.axioms_ type.
+
 (* FIX ME : a bit ugly *)
 Axiom algebraic : integralRange (@ratr 
          (GRing.UnitRing.Pack (GRing.UnitRing.Class conjMixin))).
@@ -479,6 +481,8 @@ rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
+Definition countMixin := Countable.on type.
+
 End Implementation.
 
 
@@ -486,6 +490,8 @@ Definition divisor := Implementation.type.
 
 #[export]
 HB.instance Definition _ := Implementation.conjMixin.
+#[export]
+HB.instance Definition _ := Implementation.countMixin.
 
 Module Internals.
 
@@ -604,7 +610,7 @@ Notation "x != y %[mod e ]" := (~~ (x == y %[mod e])%C) : C_scope.
 
 End Exports.
 
-Module HBExports. #[verbose]HB.reexport. End HBExports.
+Module HBExports. HB.reexport. End HBExports.
 
 End Algebraics.
 

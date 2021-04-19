@@ -28,7 +28,7 @@ character/mxrepresentation.v
 # character/vcharacter.v
 field/algC.v
 field/algebraics_fundamentals.v
-# field/algnum.v
+field/algnum.v
 # field/all_field.v
 field/closed_field.v
 field/cyclotomic.v
