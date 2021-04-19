@@ -243,9 +243,9 @@ Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE add0r. Qed.
 Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE addNr. Qed.
 
-(* STOP
-Definition cfun_zmodMixin := ZmodMixin cfun_addA cfun_addC cfun_add0 cfun_addN.
-Canonical cfun_zmodType := ZmodType classfun cfun_zmodMixin.
+
+HB.instance Definition _ := ZmodMixin classfun
+  cfun_addA cfun_addC cfun_add0 cfun_addN.
 
 Lemma muln_cfunE phi n x : (phi *+ n) x = phi x *+ n.
 Proof. by elim: n => [|n IHn]; rewrite ?mulrS !cfunE ?IHn. Qed.
@@ -269,10 +269,9 @@ Proof.
 by apply/eqP=> /cfunP/(_ 1%g)/eqP; rewrite cfun1Egen cfunE group1 oner_eq0.
 Qed.
 
-Definition cfun_ringMixin :=
-  ComRingMixin cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
-Canonical cfun_ringType := RingType classfun cfun_ringMixin.
-Canonical cfun_comRingType := ComRingType classfun cfun_mulC.
+HB.instance Definition _ :=
+  GRing.Zmodule_IsComRing.Build
+    classfun cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
 
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
 Proof. by elim: n => //= n IHn; rewrite !cfunE IHn. Qed.
@@ -290,9 +289,8 @@ Qed.
 Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
 Proof. by rewrite /cfun_inv => phi /negbTE/= ->. Qed.
 
-Definition cfun_unitMixin := ComUnitRingMixin cfun_mulV cfun_unitP cfun_inv0id.
-Canonical cfun_unitRingType := UnitRingType classfun cfun_unitMixin.
-Canonical cfun_comUnitRingType := [comUnitRingType of classfun].
+HB.instance Definition _ :=
+   GRing.ComRing_HasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
 
 Fact cfun_scaleA a b phi :
   cfun_scale a (cfun_scale b phi) = cfun_scale (a * b) phi.
@@ -304,6 +302,10 @@ Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunE mulrDr. Qed.
 Fact cfun_scaleDl phi : {morph cfun_scale^~ phi : a b / a + b}.
 Proof. by move=> a b; apply/cfunP=> x; rewrite !cfunE mulrDl. Qed.
 
+(* STOP
+HB.instance Definition _ :=
+  GRing.Lmodule_IsLalgebra.Build Algebraics.Algebraics_Implementation__canonical__GRing_Ring classfun cfun_scaleA.
+
 Definition cfun_lmodMixin :=
   LmodMixin cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
 Canonical cfun_lmodType := LmodType algC classfun cfun_lmodMixin.
@@ -313,9 +315,13 @@ Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
 Fact cfun_scaleAr a phi psi : a *: (phi * psi) = phi * (a *: psi).
 Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 
+(*
+   
 Canonical cfun_lalgType := LalgType algC classfun cfun_scaleAl.
 Canonical cfun_algType := AlgType algC classfun cfun_scaleAr.
 Canonical cfun_unitAlgType := [unitAlgType algC of classfun].
+
+*)
 
 Section Automorphism.
 
@@ -341,6 +347,7 @@ Lemma cfAut_cfun1 : cfAut 1 = 1. Proof. exact: rmorph1. Qed.
 
 Lemma cfAut_scalable : scalable_for (u \; *:%R) cfAut.
 Proof. by move=> a phi; apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
+
 Canonical cfAut_linear := AddLinear cfAut_scalable.
 Canonical cfAut_lrmorphism := [lrmorphism of cfAut].
 
