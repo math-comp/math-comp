@@ -612,8 +612,6 @@ Export Algebraics.Exports.
 
 Export Algebraics.HBExports.
 
-Print Canonical Projections algC.
-
 Section AlgebraicsTheory.
 
 Implicit Types (x y z : algC) (n : nat) (m : int) (b : bool).
