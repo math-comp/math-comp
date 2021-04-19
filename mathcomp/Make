@@ -20,7 +20,7 @@ algebra/zmodp.v
 # all/all.v
 # character/all_character.v
 # character/character.v
-# character/classfun.v
+character/classfun.v
 # character/inertia.v
 # character/integral_char.v
 character/mxabelem.v

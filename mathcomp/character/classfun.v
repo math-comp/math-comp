@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
@@ -158,11 +159,9 @@ Implicit Types phi psi xi : classfun.
 Fact classfun_key : unit. Proof. by []. Qed.
 Definition Cfun := locked_with classfun_key (fun flag : nat => Classfun).
 
-Canonical cfun_subType := Eval hnf in [subType for cfun_val].
-Definition cfun_eqMixin := Eval hnf in [eqMixin of classfun by <:].
-Canonical cfun_eqType := Eval hnf in EqType classfun cfun_eqMixin.
-Definition cfun_choiceMixin := Eval hnf in [choiceMixin of classfun by <:].
-Canonical cfun_choiceType := Eval hnf in ChoiceType classfun cfun_choiceMixin.
+HB.instance Definition _ := [subMixin for cfun_val].
+HB.instance Definition _ := [Equality of classfun by <:].
+HB.instance Definition _ := [Choice of classfun by <:].
 
 Definition fun_of_cfun phi := cfun_val phi : gT -> algC.
 Coercion fun_of_cfun : classfun >-> Funclass.
@@ -244,6 +243,7 @@ Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE add0r. Qed.
 Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE addNr. Qed.
 
+(* STOP
 Definition cfun_zmodMixin := ZmodMixin cfun_addA cfun_addC cfun_add0 cfun_addN.
 Canonical cfun_zmodType := ZmodType classfun cfun_zmodMixin.
 
@@ -385,8 +385,9 @@ Coercion seq_of_cfun phi := [:: phi].
 
 Definition cforder phi := \big[lcmn/1%N]_(x in <<B>>) #[phi x]%C.
 
+*)
 End Defs.
-
+(*
 Bind Scope cfun_scope with classfun.
 
 Arguments classfun {gT} B%g.
@@ -645,13 +646,13 @@ rewrite -andbA; apply: andb_id2l => /imsetP[x Gx ->].
 by rewrite !class_sub_norm ?normsD ?normG // inE andbC.
 Qed.
 
-Lemma cfConjCE phi x : (phi^*)%CF x = (phi x)^*.
+Lemma cfConjCE phi x : ( phi^* )%CF x = (phi x)^*.
 Proof. by rewrite cfunE. Qed.
 
-Lemma cfConjCK : involutive (fun phi => phi^*)%CF.
+Lemma cfConjCK : involutive (fun phi => phi^* )%CF.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE conjCK. Qed.
 
-Lemma cfConjC_cfun1 : (1^*)%CF = 1 :> 'CF(G).
+Lemma cfConjC_cfun1 : ( 1^* )%CF = 1 :> 'CF(G).
 Proof. exact: rmorph1. Qed.
 
 (* Class function kernel and faithful class functions *)
@@ -922,11 +923,11 @@ Lemma cfnorm_sign n phi : '[(-1) ^+ n *: phi] = '[phi].
 Proof. by rewrite -signr_odd scaler_sign; case: (odd n); rewrite ?cfnormN. Qed.
 
 Lemma cfnormD phi psi :
-  let d := '[phi, psi] in '[phi + psi] = '[phi] + '[psi] + (d + d^*).
+  let d := '[phi, psi] in '[phi + psi] = '[phi] + '[psi] + ( d + d^* ).
 Proof. by rewrite /= addrAC -cfdotC cfdotDl !cfdotDr !addrA. Qed.
 
 Lemma cfnormB phi psi :
-  let d := '[phi, psi] in '[phi - psi] = '[phi] + '[psi] - (d + d^*).
+  let d := '[phi, psi] in '[phi - psi] = '[phi] + '[psi] - ( d + d^* ).
 Proof. by rewrite /= cfnormD cfnormN cfdotNr rmorphN -opprD. Qed.
 
 Lemma cfnormDd phi psi : '[phi, psi] = 0 -> '[phi + psi] = '[phi] + '[psi].
@@ -2292,12 +2293,12 @@ have [sHG | not_sHG] := boolP (H \subset G); last first.
   rewrite cfResEout // cfIndEout // cfdotZr cfdotZl mulrAC; congr (_ * _).
   rewrite (cfdotEl _ (cfuni_on _ _)) mulVKf ?neq0CG // big_set1.
   by rewrite cfuniE ?normal1 ?set11 ?mul1r.
-transitivity (#|H|%:R^-1 * \sum_(x in G) phi x * (psi x)^*).
+transitivity (#|H|%:R^-1 * \sum_(x in G) phi x * (psi x)^* ).
   rewrite (big_setID H) /= (setIidPr sHG) addrC big1 ?add0r; last first.
     by move=> x /setDP[_ /cfun0->]; rewrite mul0r.
   by congr (_ * _); apply: eq_bigr => x Hx; rewrite cfResE.
 set h' := _^-1; apply: canRL (mulKf (neq0CG G)) _.
-transitivity (h' * \sum_(y in G) \sum_(x in G) phi (x ^ y) * (psi (x ^ y))^*).
+transitivity (h' * \sum_(y in G) \sum_(x in G) phi (x ^ y) * (psi (x ^ y))^* ).
   rewrite mulrCA mulr_natl -sumr_const; congr (_ * _); apply: eq_bigr => y Gy.
   by rewrite (reindex_acts 'J _ Gy) ?astabsJ ?normG.
 rewrite exchange_big mulr_sumr; apply: eq_bigr => x _; rewrite cfIndE //=.
@@ -2492,3 +2493,4 @@ Definition cfconjC_eq1 := cfAut_eq1 conjC.
 
 #[deprecated(since="mathcomp 1.11.0", note="Use cf_triangle_leif instead.")]
 Notation cf_triangle_lerif := cf_triangle_leif (only parsing).
+*)
