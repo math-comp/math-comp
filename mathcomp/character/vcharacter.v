@@ -284,6 +284,9 @@ rewrite zchar_split rpredM //; apply/cfun_onP=> x A'x.
 by rewrite cfunE (cfun_onP Aphi) ?mul0r.
 Qed.
 
+(* FIXME : normCK is not exported *)
+Local Notation normCK := Num.normCK.
+
 Section CfdotPairwiseOrthogonal.
 
 Variables (M : {group gT}) (S : seq 'CF(G)) (nu : 'CF(G) -> 'CF(M)).
