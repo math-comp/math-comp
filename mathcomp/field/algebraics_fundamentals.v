@@ -266,7 +266,7 @@ Arguments map_poly_inj {F R} f [p1 p2].
 Section ArchiFieldPatch.
 
 
-Notation Qfield := (fieldExtType [the ringType of rat : Type]).
+Notation Qfield := (fieldExtType rat).
 
 Variable R : Qfield.
 

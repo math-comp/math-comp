@@ -86,13 +86,13 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
-#[mathcomp]
+#[mathcomp, infer(R)]
 HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
   GRing.Ring_HasCommutativeMul T & GRing.IntegralDomain T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
-Notation fieldExtType R := (FieldExt.type [ringType of R]).
+Notation fieldExtType R := (FieldExt.type R).
 Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone (Phant F) L _)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
 Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone (Phant F) L K)
