@@ -61,7 +61,9 @@ have splitXn1: splittingFieldFor 1 ('X^n - 1) {:Qn}.
   apply/eqP; rewrite eqEsubv subvf -genQn adjoin_seqSr //; apply/allP=> /=.
   by rewrite andbT -root_prod_XsubC -Dr; apply/unity_rootP/prim_expr_order.
 have Qn_ax : SplittingField.axiom Qn by exists ('X^n - 1).
-exists (SplittingFieldType _ _ Qn_ax).
+(* FIXME: the fact that we call explicitly a Build function is maybe not the right fix *)
+(*was exists (SplittingFieldType _ _ Qn_ax).*)
+exists (SplittingFieldType _ _ (FieldExt_IsSplittingField.Build _ _ Qn_ax)).
   apply/splitting_galoisField.
   exists ('X^n - 1); split => //.
   apply: separable_Xn_sub_1; rewrite -(fmorph_eq0 QnC) rmorph_nat.
@@ -412,6 +414,9 @@ rewrite mulr_suml rpred_sum // => K /repr_classesP[Gx {1}->].
 by rewrite !mulrA mulrAC rpredM ?Aint_irr ?Aint_class_div_irr1.
 Qed.
 
+(* FIXME : normCK is not exported *)
+Local Notation normCK := Num.normCK.
+
 (* This is Isaacs, Theorem (3.12). *)
 Theorem dvd_irr1_index_center gT (G : {group gT}) i :
   ('chi[G]_i 1%g %| #|G : 'Z('chi_i)%CF|)%C.
@@ -472,7 +477,10 @@ transitivity ('chi_i x * 'chi_i (x^-1)%g *+ #|h x|); last first.
   rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -exprMn.
   by rewrite (normC_lin_char lin_lambda) ?mulr1 //= cfcenter_fful_irr.
 rewrite mulrAC -natrM mulr_natl; congr (_ *+ _).
-symmetry; rewrite /h /mulg /= /set_mulg [in _ @2: (_, _)]unlock cardsE.
+(* TODO: eliminate mulg_subdef automatically
+   (using a future option in HB.structure) *)
+symmetry; rewrite /h /mulg /mulg_subdef /= /set_mulg [in _ @2: (_, _)]unlock cardsE.
+(*symmetry; rewrite /h /mulg /= /set_mulg [in _ @2: (_, _)]unlock cardsE.*)
 rewrite -cardX card_in_image // => [] [y1 z1] [y2 z2] /=.
 move=> /andP[/=/imsetP[u1 Gu1 ->] Zz1] /andP[/=/imsetP[u2 Gu2 ->] Zz2] {y1 y2}.
 move=> eq12; have /eqP := congr1 'chi_i eq12.

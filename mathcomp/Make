@@ -22,7 +22,7 @@ algebra/zmodp.v
 character/character.v
 character/classfun.v
 character/inertia.v
-# character/integral_char.v
+character/integral_char.v
 character/mxabelem.v
 character/mxrepresentation.v
 # character/vcharacter.v
