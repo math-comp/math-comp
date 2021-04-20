@@ -86,7 +86,6 @@ Variable mul1g : left_id oneg mulg.
 Variable mulVg : left_inverse oneg invg mulg.
 
 HB.instance Definition _ := Fg.
-#[verbose]
 HB.instance Definition _ := IsMulGroup.Build G mulgA mul1g mulVg.
 
 Definition get_base := [baseFinGroupType of G].
