@@ -346,7 +346,7 @@ HB.structure Definition SplittingField F :=
 Module SplittingFieldExports.
 Bind Scope ring_scope with SplittingField.sort.
 Notation splittingFieldType F := (SplittingField.type F).
-Notation SplittingFieldType F L ax := (SplittingField.pack F%type L ax).
+Notation SplittingFieldType F L ax := (SplittingField.pack F L ax).
 Notation "[ 'splittingFieldType' F 'of' L 'for' K ]" :=
   (SplittingField.clone F L K)
   (at level 0, format "[ 'splittingFieldType'  F  'of'  L  'for'  K ]")
