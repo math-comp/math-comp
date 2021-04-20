@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
 From mathcomp Require Import path div fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset gproduct fingroup morphism.
@@ -66,6 +67,35 @@ From mathcomp Require Import vector ssrnum algC classfun.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+(* FIX ME : normCK is not exported *)
+Local Notation normCK := Num.normCK.
+
+(* FIX ME : ugly make an instance local -> global. move to fingroup *)
+Module Fix.
+
+Section Build.
+
+Variable G : Type.
+Hypothesis Fg : Finite.axioms_ G.
+Variable mulg : G -> G -> G.
+Variable oneg : G.
+Variable invg : G -> G.
+Variable mulgA : associative mulg.
+Variable mul1g : left_id oneg mulg.
+Variable mulVg : left_inverse oneg invg mulg.
+
+HB.instance Definition _ := Fg.
+#[verbose]
+HB.instance Definition _ := IsMulGroup.Build G mulgA mul1g mulVg.
+
+Definition get_base := [baseFinGroupType of G].
+Definition get_group := [finGroupType of G].
+
+End Build.
+
+End Fix.
+
 
 Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
@@ -2502,8 +2532,8 @@ have mulA: associative mul by move=> u v w; apply: cFinj; rewrite !cFmul mulrA.
 have mul1: left_id one mul by move=> u; apply: cFinj; rewrite cFmul cFone mul1r.
 have mulV: left_inverse one inv mul.
   by move=> u; apply: cFinj; rewrite cFmul cFinv cFone mulVr ?lin_char_unitr.
-pose linGm := FinGroup.Mixin mulA mul1 mulV.
-pose linG := @FinGroupType (BaseFinGroupType linT linGm) mulV.
+pose imA := IsMulGroup.Build linT mulA mul1 mulV.
+pose linG := Fix.get_group (Finite.on linT) mulA mul1 mulV.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
   by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
 do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].
