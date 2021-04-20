@@ -601,8 +601,6 @@ have /setIdP[/imsetP[y Gy ->] _] := enum_valP j; rewrite cfun_classE Gy.
 by rewrite pnatr_eq0 -lt0n lt0b => /class_eqP->.
 Qed.
 
-Check classfun.
-Check G.
 Lemma dim_cfun : \dim 'CF(G) = #|classes G|.
 Proof. by rewrite dimvf /dim /= genGid. Qed.
 
