@@ -312,7 +312,7 @@ have maxn3 n1 n2 n3: {m | [/\ n1 <= m, n2 <= m & n3 <= m]%N}.
   by exists (maxn n1 (maxn n2 n3)); apply/and3P; rewrite -!geq_max.
 have [C [/= QtoC algC]] := countable_algebraic_closure [countFieldType of rat].
 exists C; have [i Di2] := GRing.imaginary_exists C.
-pose Qfield := fieldExtType [the ringType of rat : Type].
+pose Qfield := fieldExtType rat.
 pose Cmorph (L : Qfield) := {rmorphism L -> C}.
 have charQ (L : Qfield): [char L] =i pred0 := ftrans (char_lalg L) (char_num _).
 have sepQ  (L : Qfield) (K E : {subfield L}): separable K E.
