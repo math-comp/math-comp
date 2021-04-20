@@ -68,9 +68,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-(* FIX ME : normCK is not exported *)
-Local Notation normCK := Num.normCK.
-
 (* FIX ME : ugly make an instance local -> global. move to fingroup *)
 Module Fix.
 

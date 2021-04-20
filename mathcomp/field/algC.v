@@ -463,14 +463,14 @@ move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 cfType; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
 rewrite -i2 rmorphX /= expr2 -{2}iL_J.
 (*FIX ME add to give the type *)
- rewrite -(@Num.normCK cfType).
+rewrite -(@normCK cfType).
 by rewrite exprn_ge0.
 Qed.
 
 HB.instance Definition _ := IsComplex.Build type conjK conj_nt.
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
-Proof. by apply: (@Num.normCK [the numClosedFieldType of type]). Qed.
+Proof. by apply: (@normCK [the numClosedFieldType of type]). Qed.
 
 Definition conjMixin := Num.ClosedField.on type.
 

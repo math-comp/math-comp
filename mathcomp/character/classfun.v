@@ -812,9 +812,6 @@ move=> Aphi A'psi; rewrite (cfdotElr Aphi A'psi).
 by rewrite setDE setICA setICr setI0 big_set0 mulr0.
 Qed.
 
-(* FIXME : normCK is nor exported *)
-Local Notation normCK := Num.normCK.
-
 Lemma cfnormE A phi :
   phi \in 'CF(G, A) -> '[phi] = #|G|%:R^-1 * (\sum_(x in A) `|phi x| ^+ 2).
 Proof.  by move/cfdotEl->; rewrite (eq_bigr _ (fun _ _ => normCK _)). Qed.
@@ -933,7 +930,6 @@ Proof. by rewrite sqrtC_eq0 cfnorm_eq0. Qed.
 Lemma sqrt_cfnorm_gt0 phi : (sqrtC '[phi] > 0) = (phi != 0).
 Proof. by rewrite sqrtC_gt0 cfnorm_gt0. Qed.
 
-(* FIX ME : normCK is not exported *)
 Lemma cfnormZ a phi : '[a *: phi]= `|a| ^+ 2 * '[phi]_G.
 Proof. by rewrite cfdotZl cfdotZr mulrA normCK. Qed.
 

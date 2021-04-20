@@ -3635,6 +3635,10 @@ Section ClosedFieldTheory.
 Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
+Definition normCK : forall x, `|x| ^+ 2 = x * x^* := normCK.
+
+Definition sqrCi : 'i ^+ 2 = -1 :> C := sqrCi.
+
 Lemma conjCK : involutive (@conj_op C).
 Proof.
 have JE x : x^* = `|x|^+2 / x.

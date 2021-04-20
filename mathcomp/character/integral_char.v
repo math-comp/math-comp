@@ -414,9 +414,6 @@ rewrite mulr_suml rpred_sum // => K /repr_classesP[Gx {1}->].
 by rewrite !mulrA mulrAC rpredM ?Aint_irr ?Aint_class_div_irr1.
 Qed.
 
-(* FIXME : normCK is not exported *)
-Local Notation normCK := Num.normCK.
-
 (* This is Isaacs, Theorem (3.12). *)
 Theorem dvd_irr1_index_center gT (G : {group gT}) i :
   ('chi[G]_i 1%g %| #|G : 'Z('chi_i)%CF|)%C.
