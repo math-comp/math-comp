@@ -29,12 +29,12 @@ character/mxrepresentation.v
 field/algC.v
 field/algebraics_fundamentals.v
 field/algnum.v
-# field/all_field.v
+field/all_field.v
 field/closed_field.v
 field/cyclotomic.v
 field/falgebra.v
 field/fieldext.v
-# field/finfield.v
+field/finfield.v
 field/galois.v
 field/separable.v
 fingroup/action.v
