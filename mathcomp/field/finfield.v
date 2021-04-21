@@ -597,9 +597,8 @@ have [L [zs Dq]]: {L : fieldExtType K & splits L q^%:A}.
   by rewrite ltnS Dszp size_mul ?polyXsubC_eq0 ?size_XsubC ?addn2 in lbn.
 suffices: splits L p^%:A^%:A.
   rewrite -[_^%:A]map_poly_comp.
-(* FIX ME : had to give explicitely the YY *)
-  set YY := @GRing_Lalgebra__to__GRing_Ring _ _ .
-  rewrite -(@eq_map_poly _ YY _ _ (fun a => baseField_scaleE a 1)).
+(* FIX ME : had to give explicitely the ringType *)
+  rewrite -(@eq_map_poly _ [ringType of L] _ _ (fun a => baseField_scaleE a 1)).
   by exists [mfieldExtType F of baseFieldType L].
 exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
 by rewrite Dp mulrC [_^%:A]rmorphM /= mapXsubC /= eqp_mull.
