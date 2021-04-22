@@ -2144,20 +2144,18 @@ rewrite /socle_val /= in e0W *; rewrite -(nth_map _ 0) ?nth_index //.
 by rewrite -(size_map component_mx) index_mem.
 Qed.
 
-HB.instance Definition _ :  SUB _ _ sG := 
-  SUB.class (SubType _ _ _ socle_sort_rect PackSocleK).
-HB.instance Definition _ := [Equality of sG by <:].
+HB.instance Definition _ := IsSUB.Build _ _ sG socle_sort_rect PackSocleK.
 HB.instance Definition _ := [Choice of sG by <:].
 
 Lemma socleP (W W' : sG) : reflect (W = W') (W == W')%MS.
 Proof. by rewrite (sameP genmxP eqP) !{1}genmx_component; apply: (W =P _). Qed.
 
-Fact socle_finType_subproof :
+Fact socle_can_subproof :
   cancel (fun W => SeqSub (socle_mem W)) (fun s => PackSocle (valP s)).
 Proof. by move=> W /=; apply: val_inj; rewrite /= PackSocleK. Qed.
 
-HB.instance Definition _ := CanCountMixin socle_finType_subproof.
-HB.instance Definition _ : IsFinite sG := CanFinMixin socle_finType_subproof.
+HB.instance Definition _ : IsCountable sG := CanCountMixin socle_can_subproof.
+HB.instance Definition _ : IsFinite sG := CanFinMixin socle_can_subproof.
 
 End SocleDef.
 
@@ -2909,11 +2907,9 @@ move=> nHG splitG n rGH irrGH.
 by rewrite -(morphim_mx_abs_irr _ nHG) splitG //; apply/morphim_mx_irr.
 Qed.
 
-(* FIX ME : Had to reintroduce this notion as [finGroupType does not          *)
-(* prettyprint well                                                          *)
-Definition coset_groupType gT (H : {set gT}) := [finGroupType of coset_of H].
 Lemma coset_splitting_field gT (H : {set gT}) :
-  group_closure_field gT -> group_closure_field (coset_groupType H).
+  group_closure_field gT ->
+  group_closure_field [the finGroupType of coset_of H].
 Proof.
 move=> split_gT Gbar; have ->: Gbar = (coset H @*^-1 Gbar / H)%G.
   by apply: val_inj; rewrite /= /quotient morphpreK ?sub_im_coset.
@@ -3333,8 +3329,7 @@ have [|XG [defX1 dxX1]] := sum_mxsimple_direct_sub simMG (_ : _ :=: 1%:M)%MS.
     rewrite -submx0; apply/sumsmx_subP; move/(_ 1%g (erefl _)); apply: negP.
     by rewrite submx0 repr_mx1 mulmx1; case simM.
   apply/mxmoduleP=> x Gx; rewrite sumsmxMr; apply/sumsmx_subP=> [[y Gy]] /= _.
-  by rewrite (sumsmx_sup (subg G (y * x))) // subgK ?groupM // 
-             -mulmxA repr_mxM.
+  by rewrite (sumsmx_sup (subg G (y * x)))// subgK ?groupM// -mulmxA repr_mxM.
 exists (val @: XG); first by apply/subsetP=> ?; case/imsetP=> [[x Gx]] _ ->.
 have bij_val: {on val @: XG, bijective (@sgval _ G)}.
   exists (subg G) => [g _ | x]; first exact: sgvalK.
