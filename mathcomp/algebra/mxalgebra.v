@@ -1842,7 +1842,7 @@ Proof.
 move=> i j eqAij; have /row_free_inj := maxrowsub_free.
 move=> /(_ 1%N) /(_ (delta_mx 0 i) (delta_mx 0 j)).
 rewrite -!rowE !row_rowsub eqAij => /(_ erefl) /matrixP /(_ 0 i) /eqP.
-by rewrite !mxE eqxx/=; case: (i =P j); rewrite // oner_eq0.
+by rewrite !mxE !eqxx/=; case: (i =P j); rewrite // oner_eq0.
 Qed.
 
 Variable (rkA : row_full A).

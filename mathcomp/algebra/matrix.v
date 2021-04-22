@@ -276,21 +276,31 @@ Variant matrix : predArgType := Matrix of {ffun 'I_m * 'I_n -> R}.
 
 Definition mx_val A := let: Matrix g := A in g.
 
-Canonical matrix_subType := Eval hnf in [newType for mx_val].
-
-Fact matrix_key : unit. Proof. by []. Qed.
-Definition matrix_of_fun_def F := Matrix [ffun ij => F ij.1 ij.2].
-Definition matrix_of_fun k := locked_with k matrix_of_fun_def.
-Canonical matrix_unlockable k := [unlockable fun matrix_of_fun k].
+HB.instance Definition _ := [newMixin for mx_val].
 
 Definition fun_of_matrix A (i : 'I_m) (j : 'I_n) := mx_val A (i, j).
 
 Coercion fun_of_matrix : matrix >-> Funclass.
 
+End MatrixDef.
+
+Fact matrix_key : unit. Proof. by []. Qed.
+
+HB.lock
+Definition matrix_of_fun R (m n : nat) (k : unit) (F : 'I_m -> 'I_n -> R) :=
+  @Matrix R m n [ffun ij => F ij.1 ij.2].
+Canonical matrix_unlockable := Unlockable matrix_of_fun.unlock.
+
+Section MatrixDef2.
+
+Variable R : Type.
+Variables m n : nat.
+Implicit Type F : 'I_m -> 'I_n -> R.
+
 Lemma mxE k F : matrix_of_fun k F =2 F.
 Proof. by move=> i j; rewrite unlock /fun_of_matrix /= ffunE. Qed.
 
-Lemma matrixP (A B : matrix) : A =2 B <-> A = B.
+Lemma matrixP (A B : matrix R m n) : A =2 B <-> A = B.
 Proof.
 rewrite /fun_of_matrix; split=> [/= eqAB | -> //].
 by apply/val_inj/ffunP=> [[i j]]; apply: eqAB.
@@ -299,7 +309,7 @@ Qed.
 Lemma eq_mx k F1 F2 : (F1 =2 F2) -> matrix_of_fun k F1 = matrix_of_fun k F2.
 Proof. by move=> eq_F; apply/matrixP => i j; rewrite !mxE eq_F. Qed.
 
-End MatrixDef.
+End MatrixDef2.
 
 Arguments eq_mx {R m n k} [F1] F2 eq_F12.
 
