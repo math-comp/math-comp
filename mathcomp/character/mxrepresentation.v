@@ -5081,11 +5081,10 @@ Hypotheses (irrG : irr rG) (cGA : centgmx rG A).
 Notation FA := (gen_of irrG cGA).
 Let inFA := Gen irrG cGA.
 
-Canonical gen_subType := Eval hnf in [newType for rVval : FA -> 'rV_d].
-#[export]
-HB.instance Definition _ := [Equality of FA by <:].
-#[export]
-HB.instance Definition _ := [Choice of FA by <:].
+(* FIXME: embed the hnf in HB.instance *)
+Definition rVval_IsSUB := Eval hnf in [newMixin for rVval : FA -> 'rV_d].
+#[export] HB.instance Definition _ := rVval_IsSUB.
+#[export] HB.instance Definition _ := [Choice of FA by <:].
 
 Definition gen0 := inFA 0.
 Definition genN (x : FA) := inFA (- val x).
@@ -5103,9 +5102,8 @@ Proof. by move=> x; apply: val_inj; rewrite /= add0r. Qed.
 Lemma gen_addNr : left_inverse gen0 genN genD.
 Proof. by move=> x; apply: val_inj; rewrite /= addNr. Qed.
 
-#[export]
-HB.instance Definition _ := 
-  GRing.IsZmodule.Build FA gen_addA gen_addC gen_add0r gen_addNr.
+#[export] HB.instance Definition _ := GRing.IsZmodule.Build FA
+  gen_addA gen_addC gen_add0r gen_addNr.
 
 Definition pval (x : FA) := rVpoly (val x).
 
@@ -5177,9 +5175,7 @@ Qed.
 Lemma gen_ntriv : gen1 != 0.
 Proof. by rewrite -(inj_eq mxval_inj) mxval_gen1 mxval0 oner_eq0. Qed.
 
-#[export]
-HB.instance Definition _ := 
-  GRing.Zmodule_IsComRing.Build FA
+#[export] HB.instance Definition _ := GRing.Zmodule_IsComRing.Build FA
     gen_mulA gen_mulC gen_mul1r gen_mulDr gen_ntriv.
 
 Lemma mxval1 : mxval 1 = 1%:M. Proof. exact: mxval_gen1. Qed.
@@ -5212,9 +5208,8 @@ Qed.
 Lemma gen_invr0 : genV 0 = 0.
 Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 
-#[export]
-HB.instance Definition _ := 
-  GRing.ComRing_IsField.Build FA gen_mulVr gen_invr0.
+#[export] HB.instance Definition _ := GRing.ComRing_IsField.Build FA
+  gen_mulVr gen_invr0.
 
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.
 Proof. exact: mxval_genV. Qed.
@@ -5717,11 +5712,7 @@ elim: f e => //.
 - rewrite /gen_form => t1 t2 e rt_t; set t := (_ - _)%T.
   have:= GRing.qf_evalP (gen_env e) (mxrank_form_qf 0 (gen_term t)).
   rewrite eval_mxrank mxrank_eq0 eval_gen_term // => tP.
-(** FIX ME : had to give explicitly the rewriting pattern 
   by rewrite (sameP satP tP) /= subr_eq0 val_eqE; apply: eqP.
-*)
-  rewrite (sameP satP tP) /= subr_eq0 /=.
-  by rewrite [rVval _ == rVval _]val_eqE; apply: eqP.
 - move=> f1 IH1 f2 IH2 s /= /andP[/(IH1 s)f1P /(IH2 s)f2P].
   by apply: (iffP satP) => [[/satP/f1P ? /satP/f2P] | [/f1P/satP ? /f2P/satP]].
 - move=> f1 IH1 f2 IH2 s /= /andP[/(IH1 s)f1P /(IH2 s)f2P].
@@ -5744,7 +5735,7 @@ Qed.
 
 Definition gen_sat e f := GRing.sat (gen_env e) (gen_form (GRing.to_rform f)).
 
-(* FIX ME : why this MathCompCompatDecidableField *)
+(* FIXME : why this MathCompCompatDecidableField *)
 Lemma gen_satP :
   GRing.MathCompCompatDecidableField.DecidableField.axiom gen_sat.
 Proof.
@@ -5764,9 +5755,6 @@ Variables (rG : mx_representation F G n) (A : 'M[F]_n).
 Hypotheses (irrG : mx_irreducible rG) (cGA : centgmx rG A).
 Notation FA := (gen_of irrG cGA).
 
-(* This should be [countMixin of FA by <:]*)
-
-HB.instance Definition _ := [Countable of FA by <:].
 HB.instance Definition _ := [Finite of FA by <:].
 HB.instance Definition _ := [finGroupMixin of FA for +%R].
 
@@ -5795,8 +5783,6 @@ Arguments in_genK {F gT G n' rG A} irrG cGA {m} W : rename.
 Arguments val_genK {F gT G n' rG A irrG cGA m} W : rename.
 Prenex Implicits gen_env gen_term gen_form gen_sat.
 
-Canonical gen_subType.
-
 (* Classical splitting and closure field constructions provide convenient     *)
 (* packaging for the pointwise construction.                                  *)
 Section BuildSplittingField.
@@ -5823,7 +5809,7 @@ have{nabsG} [A]: exists2 A, (A \in cG)%MS & ~~ is_scalar_mx A.
   by apply: contra nabsG; apply: cent_mx_scalar_abs_irr.
 rewrite {cG}memmx_cent_envelop -mxminpoly_linear_is_scalar -ltnNge => cGA.
 move/(non_linear_gen_reducible irrG cGA).
-(* FIX ME : _ match a generated constance *)
+(* FIXME: _ matches a generated constant *)
 set F' := _ irrG cGA; set rG' := @map_repr _ F' _ _ _ _ rG.
 move: F' (gen_rmorphism _ _ : {rmorphism F -> F'}) => F' f' in rG' * => irrG'.
 pose U' := [seq map_mx f' Ui | Ui <- U].
