@@ -288,13 +288,12 @@ End ChoiceNamespace.
 Notation choiceType := Choice.type.
 Notation ChoiceMixin := Choice.Mixin.
 Notation choiceMixin T := (Choice.mixin_of T).
-Notation "[ 'choiceMixin' 'of' T ]" := (Choice.on _ : Choice.mixin_of T)
+Notation "[ 'choiceMixin' 'of' T ]" := (Choice.on _ : HasChoice T)
   (at level 0, format "[ 'choiceMixin'  'of'  T ]") : form_scope.
 Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T C)
   (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
 Notation "[ 'choiceType' 'of' T ]" := (Choice.clone T _)
   (at level 0, format "[ 'choiceType'  'of'  T ]") : form_scope.
-
 
 Section ChoiceTheory.
 
@@ -398,7 +397,7 @@ HB.instance Definition _ : HasChoice (sub_type sT) := sub_choiceMixin.
 
 End SubChoice.
 
-Fact seq_choiceMixin : choiceMixin (seq T).
+Fact seq_choiceMixin : HasChoice (seq T).
 Proof.
 pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
@@ -488,8 +487,7 @@ HB.structure Definition SubChoice T (P : pred T) :=
 Notation subChoiceType := SubChoice.type.
 
 Prenex Implicits xchoose choose.
-Notation "[ 'Choice' 'of' T 'by' <: ]" :=
-  (Choice.copy T%type (sub_type T) : choiceMixin T%type)
+Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T))
   (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
 
 #[deprecated(since="mathcomp 2.0.0",
