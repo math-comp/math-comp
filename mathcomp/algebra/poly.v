@@ -130,7 +130,6 @@ Variable R : ringType.
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
 
 HB.instance Definition _ := [subMixin for polyseq].
-HB.instance Definition _ := [Equality of polynomial by <:].
 HB.instance Definition _ := [Choice of polynomial by <:].
 
 Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
@@ -141,7 +140,6 @@ Identity Coercion type_poly_of : poly_of >-> polynomial.
 Local Notation "{poly}" := (poly_of (Phant R)).
 
 HB.instance Definition _ := SUB.on {poly}.
-HB.instance Definition _ := Equality.on {poly}.
 HB.instance Definition _ := Choice.on {poly}.
 
 Definition coefp i (p : poly_of (Phant R)) := p`_i.
@@ -327,8 +325,8 @@ move=> p; apply/polyP=> i.
 by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
-HB.instance Definition _ :=
-  ZmodMixin (polynomial R) add_polyA add_polyC add_poly0 add_polyN.
+HB.instance Definition _ := GRing.IsZmodule.Build (polynomial R)
+  add_polyA add_polyC add_poly0 add_polyN.
 HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
@@ -667,12 +665,10 @@ Proof. by move=> a b /=; rewrite !scale_polyE raddfD mulrDl. Qed.
 Fact scale_polyAl a p q : scale_poly a (p * q) = scale_poly a p * q.
 Proof. by rewrite !scale_polyE mulrA. Qed.
 
-HB.instance Definition _ :=
-  GRing.Zmodule_IsLmodule.Build
-    R (polynomial R) scale_polyA scale_1poly scale_polyDr scale_polyDl.
-HB.instance Definition _ := GRing.Lmodule.on {poly R}.
-HB.instance Definition _ :=
-  GRing.Lmodule_IsLalgebra.Build R (polynomial R) scale_polyAl.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R (polynomial R)
+  scale_polyA scale_1poly scale_polyDr scale_polyDl.
+HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build R (polynomial R)
+  scale_polyAl.
 HB.instance Definition _ := GRing.Lalgebra.on {poly R}.
 
 Lemma mul_polyC a p : a%:P * p = a *: p.
@@ -2041,10 +2037,9 @@ apply/polyP=> i; rewrite coefM coefMr.
 by apply: eq_bigr => j _; rewrite mulrC.
 Qed.
 
-HB.instance Definition _ :=
-  GRing.Ring_HasCommutativeMul.Build (polynomial R) poly_mul_comm.
+HB.instance Definition _ := GRing.Ring_HasCommutativeMul.Build (polynomial R)
+  poly_mul_comm.
 HB.instance Definition _ := GRing.is_ComAlgebra.Build R (polynomial R).
-HB.instance Definition _ := GRing.ComRing.on {poly R}.
 HB.instance Definition _ := GRing.ComAlgebra.on {poly R}.
 
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
@@ -2205,13 +2200,12 @@ Qed.
 Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
 Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
-HB.instance Definition _ :=
-  GRing.ComRing_HasMulInverse.Build
-    (polynomial R) poly_mulVp poly_intro_unit poly_inv_out.
+HB.instance Definition _ := GRing.ComRing_HasMulInverse.Build (polynomial R)
+  poly_mulVp poly_intro_unit poly_inv_out.
 HB.instance Definition _ := GRing.ComUnitRing.on {poly R}.
 
-HB.instance Definition _ :=
-  GRing.ComUnitRing_IsIntegral.Build (polynomial R) poly_idomainAxiom.
+HB.instance Definition _ := GRing.ComUnitRing_IsIntegral.Build (polynomial R)
+  poly_idomainAxiom.
 HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 
 Lemma poly_unitE p :
@@ -2386,6 +2380,9 @@ Lemma roots_geq_poly_eq0 p (rs : seq R) : all (root p) rs -> uniq rs ->
 Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
+
+(* FIXME: these are seamingly artifical ways to close the inheritance graph *)
+(*    We make parameters more and more precise to trigger completion by HB  *)
 
 HB.instance Definition _ (R : countRingType) :=
   [Countable of polynomial R by <:].
