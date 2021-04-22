@@ -667,8 +667,7 @@ have [lea1 | lt1a] := leqP #[a] 1.
 rewrite -(card_injm (injm_invm (injm_Zpm a))) /= ?im_Zpm; last first.
   by apply/subsetP=> x; rewrite inE; apply: cycle_generator.
 rewrite -card_units_Zp // cardsE card_sub morphim_invmE; apply: eq_card => /= d.
-rewrite !inE /= qualifE /= /Zp lt1a inE /= generator_coprime.
-by rewrite /GRing.unit_subdef /= {1}Zp_cast.  (* FIXME: extra unfold *)
+by rewrite !inE /= qualifE /= /Zp lt1a inE /= generator_coprime {1}Zp_cast.
 Qed.
 
 Lemma Aut_cycle_abelian : abelian (Aut <[a]>).
@@ -825,14 +824,15 @@ have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
-(* FIXME: explicit Pack / *)
+(* FIXME: explicit use of builders / *)
 pose sG_invgK := mk_invgK (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
 pose sG_invMg := mk_invMg (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
-pose sgT := BaseFinGroup.Pack (BaseFinGroup.Class (IsMulBaseGroup.Build _ sG_Ag sG_1g sG_invgK sG_invMg) (Countable.on _) (Choice.on _) (Finite.on (seq_sub rs))).
+pose ssMG := IsMulBaseGroup.Build _ sG_Ag sG_1g sG_invgK sG_invMg.
+pose sgT := BaseFinGroup.pack (seq_sub rs) ssMG.
 have sG_Vg': left_inverse (@oneg sgT) (@invg _) (@mulg _).
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
-pose gT := FinGroup.Pack (FinGroup.Class (BaseFinGroup_IsGroup.Build _ sG_Vg')).
-(* / FIXME: explicit Pack *)
+pose gT := FinGroup.pack sgT (BaseFinGroup_IsGroup.Build _ sG_Vg').
+(* / FIXME: explicit use of builders *)
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
   by split=> [ri1 | ->]; first apply: val_inj.

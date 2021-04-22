@@ -246,10 +246,10 @@ HB.instance Definition _ (T : eqType) := Equality.copy (GenTree.tree T)
 (* is always an Equality/Choice Type).                                        *)
 
 HB.mixin Record HasChoice T := Mixin {
-  find : pred T -> nat -> option T;
-  choice_correct_subdef {P n x} : find P n = Some x -> P x;
-  choice_complete_subdef {P : pred T} : (exists x, P x) -> exists n, find P n;
-  choice_extensional_subdef {P Q : pred T} : P =1 Q -> find P =1 find Q
+  find_subdef : pred T -> nat -> option T;
+  choice_correct_subdef {P n x} : find_subdef P n = Some x -> P x;
+  choice_complete_subdef {P : pred T} : (exists x, P x) -> exists n, find_subdef P n;
+  choice_extensional_subdef {P Q : pred T} : P =1 Q -> find_subdef P =1 find_subdef Q
 }.
 #[mathcomp]
 HB.structure Definition Choice := { T of HasChoice T & HasDecEq T}.
@@ -258,6 +258,8 @@ Module Export ChoiceNamespace.
   Module Choice.
 
   Module InternalTheory.
+
+  Notation find := find_subdef.
 
   Notation correct := choice_correct_subdef.
   Arguments correct {_ _ _ _}.

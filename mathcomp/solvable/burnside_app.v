@@ -36,8 +36,8 @@ HB.instance Definition _ := Finite.on colors.
 Section square_colouring.
 
 Definition square := 'I_4.
-HB.instance Definition _ := Finite.on square.
 HB.instance Definition _ := SUB.on square.
+HB.instance Definition _ := Finite.on square.
 
 Definition mksquare i : square := Sub (i %% _) (ltn_mod i 4).
 Definition c0 := mksquare 0.
@@ -470,8 +470,8 @@ End square_colouring.
 Section cube_colouring.
 
 Definition cube := 'I_6.
-HB.instance Definition _ := Finite.on cube.
 HB.instance Definition _ := SUB.on cube.
+HB.instance Definition _ := Finite.on cube.
 
 Definition mkFcube i : cube := Sub (i %% 6) (ltn_mod i 6).
 Definition F0 := mkFcube 0.

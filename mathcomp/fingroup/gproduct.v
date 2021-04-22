@@ -1012,16 +1012,12 @@ Definition pairg1 x : gT1 * gT2 := (x, 1).
 Definition pair1g x : gT1 * gT2 := (1, x).
 
 Lemma pairg1_morphM : {morph pairg1 : x y / x * y}.
-(* TODO: eliminate mulg_subdef automatically
-   (using a future option in HB.structure) *)
-Proof. by move=> x y /=; rewrite {2}/mulg /mulg_subdef/= /extprod_mulg /= mul1g. Qed.
+Proof. by move=> x y /=; rewrite {2}/mulg /= /extprod_mulg /= mul1g. Qed.
 
 Canonical pairg1_morphism := @Morphism _ _ setT _ (in2W pairg1_morphM).
 
 Lemma pair1g_morphM : {morph pair1g : x y / x * y}.
-(* TODO: eliminate mulg_subdef automatically
-   (using a future option in HB.structure) *)
-Proof. by move=> x y /=; rewrite {2}/mulg /mulg_subdef/= /extprod_mulg /= mul1g. Qed.
+Proof. by move=> x y /=; rewrite {2}/mulg /= /extprod_mulg /= mul1g. Qed.
 
 Canonical pair1g_morphism := @Morphism _ _ setT _ (in2W pair1g_morphM).
 
@@ -1075,9 +1071,7 @@ apply/imset2P/andP=> [[[x1 u1] [v1 y1]] | [Hx Hy]].
   rewrite !inE /= => /andP[Hx1 /eqP->] /andP[/eqP-> Hx] [-> ->].
   by rewrite mulg1 mul1g.
 exists (x, 1 : gT2) (1 : gT1, y); rewrite ?inE ?Hx ?eqxx //.
-(* TODO: eliminate mulg_subdef automatically
-   (using a future option in HB.structure) *)
-by rewrite /mulg /mulg_subdef/= /extprod_mulg /= mulg1 mul1g.
+by rewrite /mulg /= /extprod_mulg /= mulg1 mul1g.
 Qed.
 
 Lemma setX_dprod (H1 : {group gT1}) (H2 : {group gT2}) :

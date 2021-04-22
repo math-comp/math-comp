@@ -167,16 +167,12 @@ HB.mixin Record IsFinite T of Equality T := {
   enumP_subdef : finite_axiom enum_subdef
 }.
 
-#[mathcomp]
-HB.structure Definition Finite :=
-  {T of HasDecEq T & IsFinite T & IsCountable T & HasChoice T }.
-
-Arguments enum_subdef /.
+#[mathcomp] HB.structure Definition Finite := {T of IsFinite T & Countable T }.
 
 Module Export FiniteNES.
 Module Finite.
 
-HB.lock Definition enum := @enum_subdef.
+HB.lock Definition enum T := IsFinite.enum_subdef (Finite.class_of T).
 
 Notation axiom := finite_axiom.
 Notation EnumMixin m := (@IsFinite.Build _ _ m).
@@ -206,6 +202,7 @@ Definition CountMixin := EnumMixin count_enumP.
 
 End WithCountType.
 End Finite.
+Canonical finEnum_unlock := Unlockable Finite.enum.unlock.
 End FiniteNES.
 
 Section CanonicalFinType.
@@ -240,8 +237,6 @@ Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T cT)
   (at level 0, format "[ 'finType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
-
-Canonical finEnum_unlock := Unlockable Finite.enum.unlock.
 
 (* Workaround for the silly syntactic uniformity restriction on coercions;    *)
 (* this avoids a cross-dependency between finset.v and prime.v for the        *)
@@ -289,7 +284,7 @@ Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
 
 (* We lock the definitions of card and subset to mitigate divergence of the   *)
 (* Coq term comparison algorithm.                                             *)
-HB.lock Definition card  (T : finType) (mA : mem_pred T) := size (enum_mem mA).
+HB.lock Definition card (T : finType) (mA : mem_pred T) := size (enum_mem mA).
 Canonical card_unlock := Unlockable card.unlock.
 
 (* A is at level 99 to allow the notation #|G : H| in groups. *)
@@ -1405,11 +1400,8 @@ Qed.
 
 End SubFinType.
 
-(* This assumes that T has both finType and subCountType structures. *)
-(* this is not a clone, but a pack without mixin *)
 Notation "[ 'subFinType' 'of' T ]" := (SubFinite.clone _ _ T _)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
-
 
 HB.factory Record SubCountable_IsFinite (T : finType) P (sT : Type)
   of SubCountable T P sT := { }.
@@ -1449,7 +1441,7 @@ Notation "[ 'IsFinite' 'of' T 'by' <: ]" :=
   (at level 0, format "[ 'IsFinite'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : finType) (P : pred T) (sT : subType P) :=
-  [finMixin of sub_type sT by <:].
+  [IsFinite of sub_type sT by <:].
 
 Notation "[ 'Finite' 'of' T 'by' <: ]" := (Finite.copy T%type (sub_type T))
   (at level 0, format "[ 'Finite'  'of'  T  'by'  <: ]") : form_scope.
@@ -1469,7 +1461,7 @@ End SubCountable_IsFiniteTheory.
 (* (* Regression for the subFinType stack *) *)
 (* Record myb : Type := MyB {myv : bool; _ : ~~ myv}. *)
 (* HB.instance Definition myb_sub : IsSUB bool (fun x => ~~ x) myb := *)
-(*    BuildSubTypeFor _ myv. *)
+(*    [subMixin for myv]. *)
 (* HB.instance Definition _ := [Finite of myb by <:]. *)
 (* Check [subFinType of myb]. *)
 (* Check [finType of myb]. *)
@@ -1478,7 +1470,7 @@ Section CardSig.
 
 Variables (T : finType) (P : pred T).
 
-HB.instance Definition sig_finMixin := [finMixin of {x | P x} by <:].
+HB.instance Definition sig_finMixin := [Finite of {x | P x} by <:].
 
 Lemma card_sig : #|{: {x | P x}}| = #|[pred x | P x]|.
 Proof. exact: card_sub. Qed.
@@ -1492,9 +1484,8 @@ Variables (T : eqType) (s : seq T).
 
 Record seq_sub : Type := SeqSub {ssval : T; ssvalP : in_mem ssval (@mem T _ s)}.
 
-Definition seq_sub_subMixin := [subMixin for ssval]. (* TODO: let (,) in Elpi *)
-HB.instance seq_sub seq_sub_subMixin.
-HB.instance Definition seq_sub_eqMixin : HasDecEq seq_sub := [eqMixin of seq_sub by <:]. (* TODO: omit type and see bug *)
+HB.instance Definition _ := [subMixin for ssval].
+HB.instance Definition seq_sub_eqMixin := [Equality of seq_sub by <:].
 
 Definition seq_sub_enum : seq seq_sub := undup (pmap insub s).
 
@@ -2253,7 +2244,8 @@ rewrite -size_filter -cardE /=; case: eqP => [-> | ne_j_i].
 by apply: eq_card0 => y.
 Qed.
 
-HB.instance Definition tag_finMixin : IsFinite {i : I & T_ i} := FinMixin tag_enumP.
+HB.instance Definition tag_finMixin : IsFinite {i : I & T_ i} :=
+  FinMixin tag_enumP.
 
 Lemma card_tagged :
   #|{: {i : I & T_ i}}| = sumn (map (fun i => #|T_ i|) (enum I)).

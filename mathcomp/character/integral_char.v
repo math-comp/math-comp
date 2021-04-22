@@ -474,10 +474,7 @@ transitivity ('chi_i x * 'chi_i (x^-1)%g *+ #|h x|); last first.
   rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -exprMn.
   by rewrite (normC_lin_char lin_lambda) ?mulr1 //= cfcenter_fful_irr.
 rewrite mulrAC -natrM mulr_natl; congr (_ *+ _).
-(* TODO: eliminate mulg_subdef automatically
-   (using a future option in HB.structure) *)
-symmetry; rewrite /h /mulg /mulg_subdef /= /set_mulg [in _ @2: (_, _)]unlock cardsE.
-(*symmetry; rewrite /h /mulg /= /set_mulg [in _ @2: (_, _)]unlock cardsE.*)
+symmetry; rewrite /h /mulg /= /set_mulg [in _ @2: (_, _)]unlock cardsE.
 rewrite -cardX card_in_image // => [] [y1 z1] [y2 z2] /=.
 move=> /andP[/=/imsetP[u1 Gu1 ->] Zz1] /andP[/=/imsetP[u2 Gu2 ->] Zz2] {y1 y2}.
 move=> eq12; have /eqP := congr1 'chi_i eq12.

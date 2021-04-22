@@ -121,8 +121,8 @@ Proof. by move=> s; apply/permP=> x; rewrite !permE /= permE f_iinv. Qed.
 Lemma perm_mulP : associative perm_mul.
 Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 
-HB.instance Definition _ :=
-  IsMulGroup.Build (perm_type T) perm_mulP perm_oneP perm_invP.
+HB.instance Definition _ := IsMulGroup.Build (perm_type T)
+  perm_mulP perm_oneP perm_invP.
 
 Lemma perm1 x : (1 : {perm T}) x = x.
 Proof. by rewrite permE. Qed.
@@ -372,7 +372,7 @@ by exists i.
 Qed.
 
 Lemma porbits_mul_tperm s x y : let t := tperm x y in
-  #|porbits (mulg t s)| + (x \notin porbit s y).*2 = #|porbits s| + (x != y).
+  #|porbits (t * s)| + (x \notin porbit s y).*2 = #|porbits s| + (x != y).
 Proof.
 pose xf a b u := seq.find (pred2 a b) (traject u (u a) #|porbit u a|).
 have xf_size a b u: xf a b u <= #|porbit u a|.
@@ -403,7 +403,7 @@ pose ts := t x y s; rewrite /= -[_ * s]/ts.
 pose dp u := #|porbits u :\ porbit u y :\ porbit u x|.
 rewrite !(addnC #|_|) (cardsD1 (porbit ts y)) imset_f ?inE //.
 rewrite (cardsD1 (porbit ts x)) inE imset_f ?inE //= -/(dp ts) {}/ts.
-rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(imset_f, inE); [|by []..].
+rewrite (cardsD1 (porbit s y)) (cardsD1 (porbit s x)) !(imset_f, inE) //.
 rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   wlog suffices: s / dp s <= dp (t x y s).
     by move=> IHs; apply/eqP; rewrite eqn_leq -{2}(tK x y s) !IHs.
@@ -580,8 +580,7 @@ elim: {k}(k : nat) {1 3}k (erefl (k : nat)) => [|m IHm] k def_k.
   by rewrite (_ : k = ord0) ?lift_perm1 ?odd_perm1 //; apply: val_inj.
 have le_mn: m < n.+1 by [rewrite -def_k ltnW]; pose j := Ordinal le_mn.
 rewrite -(mulg1 1)%g -(lift_permM _ j) odd_permM {}IHm // addbC.
-rewrite (_ : _ 1 = tperm j k).
-  by rewrite odd_tperm neq_ltn /val /= def_k leqnn.
+rewrite (_ : _ 1 = tperm j k); first by rewrite odd_tperm neq_ltn/= def_k leqnn.
 apply/permP=> i; case: (unliftP j i) => [i'|] ->; last first.
   by rewrite lift_perm_id tpermL.
 apply: ord_inj; rewrite lift_perm_lift !permE /= eq_sym -if_neg neq_lift.

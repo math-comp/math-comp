@@ -255,9 +255,9 @@ Section ElementOps.
 Variable T : baseFinGroupType.
 Notation rT := (BaseFinGroup.sort T).
 
-Definition oneg : rT := @oneg_subdef T.
-Definition mulg : T -> T -> rT := @mulg_subdef T.
-Definition invg : T -> rT := @invg_subdef T.
+Definition oneg : rT := Eval unfold oneg_subdef in @oneg_subdef T.
+Definition mulg : T -> T -> rT := Eval unfold mulg_subdef in @mulg_subdef T.
+Definition invg : T -> rT := Eval unfold invg_subdef in @invg_subdef T.
 Definition expgn_rec (x : T) n : rT := iterop n mulg x oneg.
 
 End ElementOps.

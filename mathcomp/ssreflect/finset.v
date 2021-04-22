@@ -123,8 +123,8 @@ Definition finfun_of_set A := let: FinSet f := A in f.
 Definition set_of of phant T := set_type.
 Identity Coercion type_of_set_of : set_of >-> set_type.
 
-HB.instance Definition set_IsSUB :=
-   SUB.copy set_type [newType for finfun_of_set].
+Definition set_IsSUB := Eval hnf in [newMixin for finfun_of_set].
+HB.instance Definition _ := set_IsSUB.
 HB.instance Definition _ := [Finite of set_type by <:].
 
 End SetType.
@@ -203,7 +203,7 @@ Section BasicSetTheory.
 Variable T : finType.
 Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
-HB.instance Definition _ := Finite.copy {set T} (set_type T).
+HB.instance Definition _ := Finite.on {set T}.
 
 Lemma in_set pA x : x \in finset pA = pA x.
 Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
