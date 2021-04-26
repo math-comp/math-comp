@@ -1278,6 +1278,25 @@ move=> le_mn le_np; rewrite -big_cat -{2}(subnKC le_mn) -iotaD subnDA.
 by rewrite subnKC // leq_sub.
 Qed.
 
+Lemma big_nat_widenl (m1 m2 n : nat) (P : pred nat) F :
+  m2 <= m1 ->
+  \big[op/idx]_(m1 <= i < n | P i) F i =
+  \big[op/idx]_(m2 <= i < n | P i && (m1 <= i)) F i.
+Proof.
+move=> le_m21; have [le_nm1|lt_m1n] := leqP n m1.
+  rewrite big_geq// big_nat_cond big1//.
+  by move=> i /and3P[/andP[_ /leq_trans/(_ le_nm1)/ltn_geF->]].
+rewrite big_mkcond big_mkcondl (big_cat_nat _ _ le_m21) 1?ltnW//.
+rewrite [X in op X]big_nat_cond [X in op X]big_pred0; last first.
+  by move=> k; case: ltnP; rewrite andbF.
+by rewrite Monoid.mul1m; apply: congr_big_nat => // k /andP[].
+Qed.
+
+Lemma big_geq_mkord (m n : nat) (P : pred nat) F :
+  \big[op/idx]_(m <= i < n | P i) F i =
+  \big[op/idx]_(i < n | P i && (m <= i)) F i.
+Proof. by rewrite (@big_nat_widenl _ 0)// big_mkord. Qed.
+
 Lemma big_nat1 n F : \big[*%M/1]_(n <= i < n.+1) F i = F n.
 Proof. by rewrite big_ltn // big_geq // mulm1. Qed.
 
@@ -1672,7 +1691,9 @@ Arguments big_ltn_cond [R idx op m n P F].
 Arguments big_ltn [R idx op m n F].
 Arguments big_addn [R idx op].
 Arguments big_mkord [R idx op n].
-Arguments big_nat_widen [R idx op] .
+Arguments big_nat_widen [R idx op].
+Arguments big_nat_widenl [R idx op].
+Arguments big_geq_mkord [R idx op].
 Arguments big_ord_widen_cond [R idx op n1].
 Arguments big_ord_widen [R idx op n1].
 Arguments big_ord_widen_leq [R idx op n1].
