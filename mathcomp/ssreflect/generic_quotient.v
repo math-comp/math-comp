@@ -120,11 +120,9 @@ HB.mixin Record IsQuotient T (qT : Type) := {
   repr_ofK_subproof : cancel repr_of quot_pi_subdef
 }.
 
-#[mathcomp]
+#[short(type="quotType", pack="QuotType")]
 HB.structure Definition Quotient T := { qT of IsQuotient T qT }.
 Arguments repr_of [T qT] : rename.
-
-Notation quotType := Quotient.type.
 
 Section QuotientDef.
 
@@ -297,17 +295,14 @@ HB.mixin Record IsEqQuotient T (eq_quot_op : rel T) (Q : Type) of
   pi_eq_quot : {mono \pi_Q : x y / eq_quot_op x y >-> x == y}
 }.
 
-#[mathcomp]
+#[short(type="eqQuotType", pack="QqQuotType")]
 HB.structure Definition EqQuotient T eq_quot_op :=
   {Q of IsEqQuotient T eq_quot_op Q & Quotient T Q & HasDecEq Q}.
 (*TODO : Check why there was no warning when we didn't put HasDecEq*)
 
-Notation eqQuotType := EqQuotient.type.
-
 Canonical pi_eq_quot_mono T eq_quot_op eqT :=
   PiMono2 (@pi_eq_quot T eq_quot_op eqT).
 
-Notation EqQuotType e Q m := (EqQuotient.pack _ e Q m).
 Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q _)
  (at level 0, format "[ 'eqQuotType'  e  'of'  Q ]") : form_scope.
 
@@ -315,7 +310,7 @@ Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q _)
 (* Even if a quotType is a natural subType, we do not make this subType   *)
 (* canonical, to allow the user to define the subtyping he wants. However *)
 (* one can:                                                               *)
-(* - get the eqMixin and the choiceMixin by subtyping                     *)
+(* - get the HasDecEq and the HasChoice by subtyping                      *)
 (* - get the subType structure and maybe declare it Canonical.            *)
 (**************************************************************************)
 
@@ -378,23 +373,12 @@ Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=
   (Equality.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Equality'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-#[deprecated(since="mathcomp 2.0.0", note="Use [Equality of _ by <:%/] ")]
-Notation "[ 'eqMixin' 'of' Q 'by' <:%/ ]" :=
-  (Equality.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'eqMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
-
 Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" := (Choice.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'HasChoice' 'of' Q 'by' <:%/ ]" :=
   ([HasChoice of quot_type Q by <:] : HasChoice Q%type)
   (at level 0, format "[ 'HasChoice'  'of'  Q  'by'  <:%/ ]") : form_scope.
-
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use [Choice of _ by <:%/] or [HasChoice of _ by <:%/]")]
-Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
-  ([HasChoice of quot_type Q by <:] : HasChoice Q%type)
-  (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" := (Countable.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
@@ -403,24 +387,12 @@ Notation "[ 'IsCountable' 'of' Q 'by' <:%/ ]" :=
   ([IsCountable of quot_type Q by <:] : IsCountable Q%type)
   (at level 0, format "[ 'IsCountable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use [Countable of _ by <:%/] or [IsCountable of _ by <:%/]")]
-Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
-  ([IsCountable of quot_type Q by <:] : IsCountable Q%type)
-  (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
-
 Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" := (Finite.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'IsFinite' 'of' Q 'by' <:%/ ]" :=
   ([IsFinite of quot_type Q by <:] : IsFinite Q%type)
   (at level 0, format "[ 'IsFinite'  'of'  Q  'by'  <:%/ ]") : form_scope.
-
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use [Finite of _ by <:%/] or [IsFinite of _ by <:%/]")]
-Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
-  ([IsFinite of quot_type Q by <:] : IsFinite Q%type)
-  (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 (****************************************************)
 (* Definition of a (decidable) equivalence relation *)

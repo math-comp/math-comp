@@ -230,48 +230,27 @@ Section InheritedStructures.
 Variable aT : finType.
 Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
 
-Local Remark eqMixin rT : Equality.mixin_of (dffun_aT rT eqType).
+Local Remark dffun_HasDecEq rT : HasDecEq (dffun_aT rT eqType).
 Proof. exact: PcanEqMixin tfgraphK. Qed.
+HB.instance Definition _ rT := dffun_HasDecEq rT.
+HB.instance Definition _ (rT : eqType) :=
+  Equality.copy {ffun aT -> rT} {dffun forall _, rT}.
 
-Section dep_eqType.
-Variable rT : aT -> eqType.
-HB.instance (dffun_aT rT eqType) (eqMixin rT).
-End dep_eqType.
-
-Section simpl_eqType.
-Variable rT : eqType.
-HB.instance ({ffun aT -> rT}) (eqMixin (fun=> rT)).
-End simpl_eqType.
-
-Local Remark choiceMixin rT : Choice.mixin_of (dffun_aT rT choiceType).
+Local Remark dffun_HasChoice rT : HasChoice (dffun_aT rT choiceType).
 Proof. exact: PcanChoiceMixin tfgraphK. Qed.
+HB.instance Definition _ rT := dffun_HasChoice rT.
+HB.instance Definition _ (rT : choiceType) :=
+  Choice.copy {ffun aT -> rT} {dffun forall _, rT}.
 
-Section dep_choiceType.
-Variable rT : aT -> choiceType.
-HB.instance (dffun_aT rT choiceType) (choiceMixin rT).
-End dep_choiceType.
-
-Section simpl_choiceType.
-Variable rT : choiceType.
-HB.instance ({ffun aT -> rT}) (choiceMixin (fun=> rT)).
-End simpl_choiceType.
-
-Local Remark countMixin rT : Countable.mixin_of (dffun_aT rT countType).
+Local Remark dffun_IsCountable rT : IsCountable (dffun_aT rT countType).
 Proof. exact: PcanCountMixin tfgraphK. Qed.
+HB.instance Definition _ rT := dffun_IsCountable rT.
+HB.instance Definition _ (rT : countType) :=
+  Countable.copy {ffun aT -> rT} {dffun forall _, rT}.
 
-Section dep_countType.
-Variable rT : aT -> countType.
-HB.instance (dffun_aT rT countType) (countMixin rT).
-End dep_countType.
-
-Section simpl_countType.
-Variable rT : countType.
-HB.instance ({ffun aT -> rT}) (countMixin (fun=> rT)).
-End simpl_countType.
-
-HB.instance Definition dffun_finMixin rT : IsFinite (dffun_aT rT finType) :=
+HB.instance Definition _ rT : IsFinite (dffun_aT rT finType) :=
   PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT rT finType) _ _).
-HB.instance Definition ffun_finMixin (rT : finType) : IsFinite {ffun aT -> rT} :=
+HB.instance Definition _ (rT : finType) : IsFinite {ffun aT -> rT} :=
   PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT (fun=> rT) finType) _ _).
 
 End InheritedStructures.

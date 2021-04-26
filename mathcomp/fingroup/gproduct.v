@@ -1127,7 +1127,7 @@ Variable to : groupAction D R.
 Notation sdT := (sdprod_by to).
 Notation sdval := (@pair_of_sd to).
 
-HB.instance Definition _ := [subMixin for sdval].
+HB.instance Definition _ := [IsSUB for sdval].
 HB.instance Definition _ := [Finite of sdT by <:].
 
 Definition sdprod_one := SdPair to (group1 _).

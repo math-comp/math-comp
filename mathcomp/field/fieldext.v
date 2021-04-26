@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg finalg.
-From mathcomp Require Import zmodp matrix vector falgebra poly polydiv mxpoly.
-From mathcomp Require Import generic_quotient.
+From mathcomp Require Import choice fintype tuple finfun bigop ssralg countalg.
+From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
+From mathcomp Require Import mxpoly generic_quotient.
 
 (******************************************************************************)
 (*  * Finite dimensional field extentions                                     *)
@@ -86,16 +86,15 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
-#[mathcomp, infer(R)]
+#[infer(R), short(type="fieldExtType", pack="FieldExtType")]
 HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
-  GRing.Ring_HasCommutativeMul T & GRing.IntegralDomain T & GRing.Field T}.
+  GRing.Ring_HasCommutativeMul T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
-Notation fieldExtType R := (FieldExt.type R).
-Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone (Phant F) L _)
+Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone F L _)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
-Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone (Phant F) L K)
+Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone F L K)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
 Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
   (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)
@@ -651,9 +650,7 @@ Proof. exact: mulrCA. Qed.
 HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ L_F
   fieldOver_scaleAr.
 
-Fact fieldOver_vectMixin : Lmodule_HasFinDim.axioms_ [the ringType of K_F] L_F
-  (GRing.Zmodule.on _) (Choice.on _) (Equality.on _) (GRing.Lmodule.on _).
-  (* FIXME: explicit Pack *)
+Fact fieldOver_vectMixin : Lmodule_HasFinDim [the ringType of K_F] L_F.
 Proof.
 have [bL [_ nz_bL] [defL dxSbL]] := field_module_semisimple (subvf (F * _)).
 do [set n := \dim_F {:L} in bL nz_bL *; set SbL := (\sum_i _)%VS] in defL dxSbL.
@@ -808,9 +805,7 @@ Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
 Let coordF (x : F) := (coord_vbasis (memvf x)).
 
-Fact baseField_vectMixin : Lmodule_HasFinDim.axioms_ [the fieldType of F0] L0
-  (GRing.Zmodule.on _) (Choice.on _) (Equality.on _) (GRing.Lmodule.on _).
-  (* FIXME: explicit Pack *)
+Fact baseField_vectMixin : Lmodule_HasFinDim [the fieldType of F0] L0.
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
@@ -874,17 +869,32 @@ by apply/prodvP=> u v; rewrite !mem_baseVspace; apply: memvM.
 Qed.
 Canonical baseAspace E := ASpace (baseAspace_suproof E).
 
-Fact refBaseField_key : unit. Proof. by []. Qed.
-Definition refBaseField := locked_with refBaseField_key (baseAspace 1).
-Canonical refBaseField_unlockable := [unlockable of refBaseField].
-Notation F1 := refBaseField.
+End BaseField.
+
+Notation baseFieldType L := (baseField_type (Phant L)).
+
+HB.lock Definition refBaseField (F0 : fieldType) (F : fieldExtType F0)
+  (L : fieldExtType F) := baseAspace (1%AS : {aspace L}).
+Canonical refBaseField_unlockable := Unlockable refBaseField.unlock.
+
+Section RefBaseField.
+
+Variables (F0 : fieldType) (F : fieldExtType F0) (L : fieldExtType F).
+
+Notation F1 := (refBaseField L).
+Notation F1unlock := refBaseField.unlock.
+Notation L0 := (baseFieldType L).
+
+Let n := \dim {:F}.
+Let bF : n.-tuple F := vbasis {:F}.
+Let coordF (x : F) := (coord_vbasis (memvf x)).
 
 Lemma dim_refBaseField : \dim F1 = n.
-Proof. by rewrite [F1]unlock dim_baseVspace dimv1 mul1n. Qed.
+Proof. by rewrite F1unlock dim_baseVspace dimv1 mul1n. Qed.
 
 Lemma baseVspace_module V (V0 := baseVspace V) : (F1 * V0 <= V0)%VS.
 Proof.
-apply/prodvP=> u v; rewrite [F1]unlock !mem_baseVspace => /vlineP[x ->] Vv.
+apply/prodvP=> u v; rewrite F1unlock !mem_baseVspace => /vlineP[x ->] Vv.
 by rewrite -(@scalerAl F L) mul1r; apply: memvZ.
 Qed.
 
@@ -907,11 +917,11 @@ move=> v; rewrite -{1}(field_module_eq modM0) -(mem_vspaceOver M0) {}/V.
 move: (vspaceOver F1 M0) => M.
 apply/idP/idP=> [/coord_vbasis|/coord_span]->; apply/memv_suml=> i _.
   rewrite /(_ *: _) /= /fieldOver_scale; case: (coord _ i _) => /= x.
-  rewrite {1}[F1]unlock mem_baseVspace => /vlineP[{}x ->].
+  rewrite {1}F1unlock mem_baseVspace => /vlineP[{}x ->].
   by rewrite -(@scalerAl F L) mul1r memvZ ?memv_span ?memt_nth.
 move: (coord _ i _) => x; rewrite -[_`_i]mul1r scalerAl -tnth_nth.
 have F1x: x%:A \in F1.
-  by rewrite [F1]unlock mem_baseVspace (@memvZ F L) // mem1v.
+  by rewrite F1unlock mem_baseVspace (@memvZ F L) // mem1v.
 by congr (_ \in M): (memvZ (Subvs F1x) (vbasis_mem (mem_tnth i _))).
 Qed.
 
@@ -924,9 +934,7 @@ rewrite /is_aspace has_algid1 -?memE0 ?mem1v //.
 by apply/prodvP=> u v; rewrite -!memE0; apply: memvM.
 Qed.
 
-End BaseField.
-
-Notation baseFieldType L := (baseField_type (Phant L)).
+End RefBaseField.
 
 (* Base of fieldOver, finally. *)
 Section MoreFieldOver.
@@ -1265,7 +1273,7 @@ Hypothesis irr_p : irreducible_poly p.
 Let nz_p : p != 0. Proof. exact: irredp_neq0. Qed.
 
 (* The Vector axiom requires irreducibility. *)
-Lemma min_subfx_vectAxiom : vector_axiom_def (size p).-1 (Phant subFExtend).
+Lemma min_subfx_vect : vector_axiom_def (size p).-1 (Phant subFExtend).
 Proof.
 move/subfx_irreducibleP: irr_p => /=/(_ nz_p) min_p; set d := (size p).-1.
 have Dd: d.+1 = size p by rewrite polySpred.
@@ -1284,12 +1292,8 @@ rewrite leqNgt implybNN -Dd ltnS size_poly linearB subr_eq0 /=.
 by move/eqP/(can_inj rVpolyK).
 Qed.
 
-Definition SubfxVectMixin := Lmodule_HasFinDim.Build _ subFExtend
-  min_subfx_vectAxiom.
-Definition SubfxVectType := VectType F subFExtend SubfxVectMixin.
-(* FIXME: explicit Pack *)
-Definition SubfxFalgType := Falgebra.Pack (Falgebra.Class (Vector.class SubfxVectType) (GRing.Algebra.on _) (GRing.UnitRing.on _)).
-Definition SubFieldExtType := FieldExt.Pack (FieldExt.Class (Vector.class SubfxVectType) (GRing.Field.on _) (GRing.IntegralDomain.on _) (GRing.Algebra.on _)).
+Definition SubfxVect := Lmodule_HasFinDim.Build _ subFExtend min_subfx_vect.
+Definition SubFieldExtType := Eval hnf in FieldExtType _ subFExtend SubfxVect.
 
 End Irreducible.
 
@@ -1339,20 +1343,19 @@ have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
-Admitted.
-(*
-pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
-pose rL := ComRingType (RingType vL mulM) mulC.
-have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: toPinj.
+pose mulM := GRing.Zmodule_IsComRing.Build _ mulA mulC mul1 mulD nzL1.
+pose rL := ComRingType vL mulM.
+have mulZlM : GRing.Lmodule_IsLalgebra F rL.
+  constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
-have mulZr: GRing.Algebra.axiom (LalgType F rL mulZl).
-  by move=> a x y; rewrite !(mulrC x) scalerAl.
-pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
-pose uaL := [unitAlgType F of AlgType F urL mulZr].
-pose faL := [FalgType F of uaL].
-have unitE: GRing.Field.mixin_of urL.
-  move=> x nz_x; apply/unitrP; set q := toPF x.
+pose laL := LalgType F rL mulZlM.
+have mulZrM : GRing.Lalgebra_IsAlgebra F laL.
+  by constructor => a x y; rewrite !(mulrC x) scalerAl.
+pose aL := AlgType F laL mulZrM.
+pose uLM := Algebra_IsFalgebra.Build F aL.
+pose cuL := ComUnitRingType uLM _.
+have unitM : GRing.ComUnitRing_IsField cuL.
+  constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
     apply: contraLR (leq_gcdpr p nz_q) => /irr_p/implyP.
@@ -1361,82 +1364,77 @@ have unitE: GRing.Field.mixin_of urL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose ucrL := [comUnitRingType of ComRingType urL mulC].
-have mul0 := GRing.Field.IdomainMixin unitE.
-pose fL := FieldType (IdomainType ucrL mul0) unitE.
-exists [fieldExtType F of faL for fL]; first by rewrite dimvf; apply: mul1n.
+pose feL := FieldExtType _ unitM _.
+exists feL; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
 have toLlin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
 do ?split; try exact: toLlin; move=> q r /=.
 by apply: toPinj; rewrite !toL_K modp_mul -!(mulrC r) modp_mul.
 Qed.
-*)
 
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.
   In Coq 8.4 Qed takes about 18s.
   In Coq 8.7, everything seems to be all right *)
-(*
-Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) :
-    irreducible_poly p ->
-  {L : fieldExtType F & Vector.dim L = (size p).-1 &
-    {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}.
-Proof.
-case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n].
-have Dn: n.+1 = size p := ltn_predK p_gt1.
-have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn.
-pose toL q : vL := poly_rV (q %% p).
-have toL_K q : rVpoly (toL q) = q %% p.
-  by rewrite poly_rV_K // -ltnS Dn ?ltn_modp -?Dn.
-pose mul (x y : vL) : vL := toL (rVpoly x * rVpoly y).
-pose L1 : vL := poly_rV 1.
-have L1K: rVpoly L1 = 1 by rewrite poly_rV_K // size_poly1 -ltnS Dn.
-have mulC: commutative mul by rewrite /mul => x y; rewrite mulrC.
-have mulA: associative mul.
-  by move=> x y z; rewrite -!(mulC z) /mul !toL_K /toL !modp_mul mulrCA.
-have mul1: left_id L1 mul.
-  move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS.
-  by rewrite size_poly.
-have mulD: left_distributive mul +%R.
-  move=> x y z; apply: canLR rVpolyK _.
-  by rewrite !raddfD mulrDl /= !toL_K /toL modpD.
-have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0.
-pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
-pose rL := ComRingType (RingType vL mulM) mulC.
-have mulZl: GRing.Lalgebra.axiom mul.
-  move=> a x y; apply: canRL rVpolyK _.
-  by rewrite !linearZ /= toL_K -scalerAl modpZl.
-have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
-  by move=> a x y; rewrite !(mulrC x) scalerAl.
-pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
-pose uaL := [unitAlgType F of AlgType F urL mulZr].
-pose faL := [FalgType F of uaL].
-have unitE: GRing.Field.mixin_of urL.
-  move=> x nz_x; apply/unitrP; set q := rVpoly x.
-  have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x.
-  have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
-    have /contraR := irr_p _ _ (dvdp_gcdl p q); apply.
-    have: size (gcdp p q) <= size q by apply: leq_gcdpr.
-    rewrite leqNgt; apply: contra; move/eqp_size ->.
-    by rewrite (polySpred nz_p) ltnS size_poly.
-  suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
-  congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1).
-  by rewrite -mulNr modp_addl_mul_small ?size_poly1.
-pose ucrL := [comUnitRingType of ComRingType urL mulC].
-pose fL := FieldType (IdomainType ucrL (GRing.Field.IdomainMixin unitE)) unitE.
-exists [fieldExtType F of faL for fL]; first exact: mul1n.
-pose z : vL := toL 'X; set iota := in_alg _.
-have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
-  elim/poly_ind: q => [|a q IHq].
-    by rewrite map_poly0 horner0 linear0 mod0p.
-  rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
-  rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first.
-    by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW.
-  by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul.
-exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0.
-apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP.
-exists (map_poly iota (rVpoly x)).
-  by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v.
-by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly.
-Qed.
-*)
+(* Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) : *)
+(*     irreducible_poly p -> *)
+(*   {L : fieldExtType F & \dim {: L} = (size p).-1 & *)
+(*     {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}. *)
+(* Proof. *)
+(* case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n]. *)
+(* have Dn: n.+1 = size p := ltn_predK p_gt1. *)
+(* have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn. *)
+(* pose toL q : vL := poly_rV (q %% p). *)
+(* have toL_K q : rVpoly (toL q) = q %% p. *)
+(*   by rewrite poly_rV_K // -ltnS Dn ?ltn_modp -?Dn. *)
+(* pose mul (x y : vL) : vL := toL (rVpoly x * rVpoly y). *)
+(* pose L1 : vL := poly_rV 1. *)
+(* have L1K: rVpoly L1 = 1 by rewrite poly_rV_K // size_poly1 -ltnS Dn. *)
+(* have mulC: commutative mul by rewrite /mul => x y; rewrite mulrC. *)
+(* have mulA: associative mul. *)
+(*   by move=> x y z; rewrite -!(mulC z) /mul !toL_K /toL !modp_mul mulrCA. *)
+(* have mul1: left_id L1 mul. *)
+(*   move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS. *)
+(*   by rewrite size_poly. *)
+(* have mulD: left_distributive mul +%R. *)
+(*   move=> x y z; apply: canLR rVpolyK _. *)
+(*   by rewrite !raddfD mulrDl /= !toL_K /toL modpD. *)
+(* have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0. *)
+(* pose mulM := GRing.Zmodule_IsComRing.Build vL mulA mulC mul1 mulD nzL1. *)
+(* pose rL := ComRingType vL mulM. *)
+(* have mulZlM : GRing.Lmodule_IsLalgebra F rL. *)
+(*   constructor => a x y; apply: canRL rVpolyK _. *)
+(*   by rewrite !linearZ /= toL_K -scalerAl modpZl. *)
+(* pose laL := LalgType F rL mulZlM. *)
+(* have mulZrM : GRing.Lalgebra_IsAlgebra F laL. *)
+(*   by constructor => a x y; rewrite !(mulrC x) scalerAl. *)
+(* pose aL := AlgType F laL mulZrM. *)
+(* pose uLM := Algebra_IsFalgebra.Build F aL. *)
+(* pose cuL := ComUnitRingType uLM _. *)
+(* have unitM : GRing.ComUnitRing_IsField cuL. *)
+(*   constructor => x nz_x; apply/unitrP; set q := rVpoly x. *)
+(*   have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x. *)
+(*   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q. *)
+(*     have /contraR := irr_p _ _ (dvdp_gcdl p q); apply. *)
+(*     have: size (gcdp p q) <= size q by apply: leq_gcdpr. *)
+(*     rewrite leqNgt; apply: contra; move/eqp_size ->. *)
+(*     by rewrite (polySpred nz_p) ltnS size_poly. *)
+(*   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC. *)
+(*   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1). *)
+(*   by rewrite -mulNr modp_addl_mul_small ?size_poly1. *)
+(* pose feL := FieldExtType _ unitM _. *)
+(* exists feL; first by rewrite dimvf; apply: mul1n. *)
+(* pose z : vL := toL 'X; set iota := in_alg _. *)
+(* have q_z q: rVpoly (map_poly iota q).[z] = q %% p. *)
+(*   elim/poly_ind: q => [|a q IHq]. *)
+(*     by rewrite map_poly0 horner0 linear0 mod0p. *)
+(*   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=. *)
+(*   rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first. *)
+(*     by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW. *)
+(*   by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul. *)
+(* exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0. *)
+(* apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP. *)
+(* exists (map_poly iota (rVpoly x)). *)
+(*   by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v. *)
+(* by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly. *)
+(* Qed. *)

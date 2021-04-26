@@ -273,14 +273,11 @@ Module Type Specification.
 
 Parameter type : Type.
 
+Parameter conjMixin : Num.ClosedField type.
 
-Parameter conjMixin : Num.ClosedField.axioms_ type.
+Parameter IsCountable : Countable type.
 
-Parameter countMixin : Countable.axioms_ type.
-
-(* FIX ME : a bit ugly *)
-Axiom algebraic : integralRange (@ratr 
-         (GRing.UnitRing.Pack (GRing.UnitRing.Class conjMixin))).
+Axiom algebraic : integralRange (@ratr (Num.ClosedField.Pack conjMixin)).
 
 End Specification.
 
@@ -297,14 +294,11 @@ Proof. exact: s2valP (tagged Fundamental_Theorem_of_Algebraics). Qed.
 Fact conjL_nt : ~ conjL =1 id.
 Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
-(* FIXME : this is ugly *)
-Definition L' := GRing.ClosedField.Pack 
-  (GRing.ClosedField.Class (GRing.ClosedField.on L) (GRing.ClosedField.on L)).
-
-HB.instance Definition _ := GRing.ClosedField.class L'.
+Definition L' : Type := eta L.
+HB.instance Definition _ := GRing.ClosedField.on L'.
 HB.instance Definition _ := IsComplex.Build L' conjL_K conjL_nt.
 
-Notation cfType :=  [the Num.ClosedField.type of GRing.ClosedField.sort L'].
+Notation cfType := [the Num.ClosedField.type of L'].
 
 Definition QtoL := [rmorphism of @ratr cfType].
 
@@ -324,7 +318,7 @@ Definition type : Type := {eq_quot eq_root}%qT.
 
 HB.instance Definition _ : EqQuotient _ eq_root type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
-HB.instance Definition _ : Countable.mixin_of type := CanCountMixin reprK.
+HB.instance Definition _ : IsCountable type := CanCountMixin reprK.
 
 Definition CtoL (u : type) := rootQtoL (repr u).
 
@@ -434,7 +428,7 @@ rewrite horner_poly rmorph_sum; apply: eq_bigr => k _.
 by rewrite rmorphM rmorphX /= LtoC_K.
 Qed.
 
-HB.instance Definition _ := GRing.Field_IsAlgClosed.Build type closedFieldAxiom.
+HB.instance Definition _ := Field_IsAlgClosed.Build type closedFieldAxiom.
 
 Fact conj_subproof u : integralOver QtoL (conjL (CtoL u)).
 Proof.
@@ -461,10 +455,7 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 cfType; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-rewrite -i2 rmorphX /= expr2 -{2}iL_J.
-(*FIX ME add to give the type *)
-rewrite -(@normCK cfType).
-by rewrite exprn_ge0.
+by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
 HB.instance Definition _ := IsComplex.Build type conjK conj_nt.
@@ -481,17 +472,14 @@ rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
-Definition countMixin := Countable.on type.
+Definition IsCountable := Countable.on type.
 
 End Implementation.
 
-
 Definition divisor := Implementation.type.
 
-#[export]
-HB.instance Definition _ := Implementation.conjMixin.
-#[export]
-HB.instance Definition _ := Implementation.countMixin.
+#[export] HB.instance Definition _ := Implementation.conjMixin.
+#[export] HB.instance Definition _ := Implementation.IsCountable.
 
 Module Internals.
 

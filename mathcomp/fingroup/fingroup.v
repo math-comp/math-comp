@@ -216,6 +216,9 @@ HB.mixin Record IsMulBaseGroup G := {
   invMg_subproof : {morph invg_subdef  : x y / mulg_subdef  x y >-> mulg_subdef  y x}
 }.
 
+(* FIXME: fake def *)
+HB.instance Definition _ (T : finType) (x : IsMulBaseGroup (@eta Type T)) :=
+  Finite.on x.
 
 (* We want to use sort as a coercion class, both to infer         *)
 (* argument scopes properly, and to allow groups and cosets to    *)
@@ -236,14 +239,15 @@ HB.mixin Record IsMulBaseGroup G := {
 (* basic functions, the inferred return type should generally be  *)
 (* correct.                                                       *)
 
-#[mathcomp, arg_sort] HB.structure Definition BaseFinGroup :=
-  { G of IsMulBaseGroup G & Finite G }.
+#[arg_sort, short(type="baseFinGroupType", pack="BaseFinGroupType")]
+HB.structure Definition BaseFinGroup := { G of IsMulBaseGroup G & Finite G }.
+
+HB.instance Definition _ (T : finType) (x : IsMulBaseGroup (@eta Type T)) :
+  IsMulBaseGroup x := x.
 
 Module BaseFinGroupExports.
 Bind Scope group_scope with BaseFinGroup.arg_sort.
 Bind Scope group_scope with BaseFinGroup.sort.
-Notation baseFinGroupType := BaseFinGroup.type.
-Notation BaseFinGroupType T m := (BaseFinGroup.pack T m).
 Notation "[ 'baseFinGroupType' 'of' T ]" := (@BaseFinGroup.clone T _)
   (at level 0, format "[ 'baseFinGroupType'  'of'  T ]") : form_scope.
 End BaseFinGroupExports.
@@ -277,18 +281,14 @@ HB.mixin Record BaseFinGroup_IsGroup G of BaseFinGroup G := {
     left_inverse (@oneg [the BaseFinGroup.type of G]) (@invg _) (@mulg _)
 }.
 
-#[mathcomp] HB.structure Definition FinGroup :=
+#[short(type="finGroupType", pack="FinGroupType")]
+HB.structure Definition FinGroup :=
   { G of BaseFinGroup_IsGroup G & BaseFinGroup G }.
 
-
 Module FinGroupExports.
-Notation finGroupType := FinGroup.type.
-Notation FinGroupType T m := (FinGroup.pack T m).
 Notation "[ 'finGroupType' 'of' T ]" := (@FinGroup.clone T _)
   (at level 0, format "[ 'finGroupType'  'of'  T ]") : form_scope.
-
 Bind Scope group_scope with FinGroup.sort.
-
 End FinGroupExports.
 HB.export FinGroupExports.
 
@@ -312,7 +312,6 @@ Proof.
 have mulV21 x: x^-1^-1 * 1 = x by rewrite -(mulVg x) mulgA mulVg mul1g.
 by move=> x; rewrite -[_ ^-1]mulV21 -(mul1g 1) mulgA !mulV21.
 Qed.
-HB.export mk_invgK.
 
 Lemma mk_invMg : {morph invg : x y / x * y >-> y * x}.
 Proof.
@@ -320,7 +319,6 @@ have mulgV x: x * x^-1 = 1 by rewrite -{1}[x]mk_invgK mulVg.
 move=> x y /=; rewrite -[y^-1 * _]mul1g -(mulVg (x * y)) -2!mulgA (mulgA y).
 by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
-HB.export mk_invMg.
 
 HB.instance Definition _ := 
   IsMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
@@ -1196,7 +1194,7 @@ Definition group_of of phant gT : predArgType := group_type.
 Local Notation groupT := (group_of (Phant gT)).
 Identity Coercion type_of_group : group_of >-> group_type.
 
-HB.instance Definition _ := [subMixin for gval].
+HB.instance Definition _ := [IsSUB for gval].
 HB.instance Definition _ := [Finite of group_type by <:].
 
 (* No predType or baseFinGroupType structures, as these would hide the *)

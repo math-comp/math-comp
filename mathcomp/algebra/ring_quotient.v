@@ -107,9 +107,10 @@ HB.mixin Record IsZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T 
   pi_addr : {morph \pi_Q : x y / addT x y >-> x + y}
 }.
 
-#[mathcomp]
+#[short(type="zmodQuotType", pack="ZmodQuotType")]
 HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
-  {Q of IsZmodQuotient T eqT zeroT oppT addT Q & GRing.Zmodule Q & EqQuotient T eqT Q}.
+  {Q of IsZmodQuotient T eqT zeroT oppT addT Q &
+        GRing.Zmodule Q & EqQuotient T eqT Q}.
 
 Section ZModQuotient.
 
@@ -123,9 +124,8 @@ Canonical pi_opp_quot_morph zqT := PiMorph1 (@pi_oppr _ _ _ _ _ zqT).
 Canonical pi_add_quot_morph zqT := PiMorph2 (@pi_addr _ _ _ _ _ zqT).
 
 End ZModQuotient.
-Module ZModQuotientExports.
 
-Notation zmodQuotType := ZmodQuotient.type.
+Module ZModQuotientExports.
 Notation "[ 'zmodQuotType' z , o & a 'of' Q ]" :=
   (@ZmodQuotient.clone _ _ z o a Q _)
   (at level 0, format "[ 'zmodQuotType'  z ,  o  &  a  'of'  Q ]") : form_scope.
@@ -157,7 +157,7 @@ addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
     pi_mulr : {morph \pi_Q : x y / mulT x y >-> x * y}
   }.
 
-#[mathcomp]
+#[short(type="ringQuotType", pack="RingQuotType")]
 HB.structure Definition RingQuotient T eqT zeroT oppT addT oneT mulT :=
   {Q of IsRingQuotient T eqT zeroT oppT addT oneT mulT Q &
    ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q }.
@@ -175,7 +175,6 @@ Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
 
 End ringQuotient.
 Module RingQuotientExports.
-Notation ringQuotType := RingQuotient.type.
 (* FIXME: broken *)
 (* Notation "[ 'ringQuotType' o & m 'of' Q ]" := *)
 (*   (@RingQuotient.clone _ _ _ _ _ o m Q _) *)
@@ -203,7 +202,7 @@ HB.mixin Record IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred
     pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
   }.
 
-#[mathcomp]
+#[short(type="unitRingQuotType", pack="UnitRingQuotType")]
 HB.structure Definition UnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT :=
   {Q of IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q & IsQuotient T Q & IsEqQuotient T eqT Q & IsZmodQuotient T eqT zeroT oppT addT Q & IsRingQuotient T eqT zeroT oppT addT oneT mulT Q}.
 
@@ -219,9 +218,8 @@ Canonical pi_unit_quot_morph urqT := PiMono1 (@pi_unitr _ _ _ _ _ _ _ _ _ urqT).
 Canonical pi_inv_quot_morph urqT := PiMorph1 (@pi_invr _ _ _ _ _ _ _ _ _ urqT).
 
 End UnitRingQuot.
-Module UnitRingQuotientExports.
 
-Notation unitRingQuotType := UnitRingQuotient.type.
+Module UnitRingQuotientExports.
 Notation "[ 'unitRingQuotType' u & i 'of' Q ]" :=
   (@UnitRingQuotient.clone _ _ _ _ _ _ _ u i Q _)
   (at level 0, format "[ 'unitRingQuotType'  u  &  i  'of'  Q ]") : form_scope.

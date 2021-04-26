@@ -30,7 +30,7 @@ Inductive ratio := mkRatio { frac :> R * R; _ : frac.2 != 0 }.
 Definition ratio_of of phant R := ratio.
 Local Notation "{ 'ratio' T }" := (ratio_of (Phant T)).
 
-HB.instance Definition _ := [subMixin for frac].
+HB.instance Definition _ := [IsSUB for frac].
 HB.instance Definition _ := [Choice of ratio by <:].
 HB.instance Definition _ := SUB.on {ratio R}.
 HB.instance Definition _ := Choice.on {ratio R}.

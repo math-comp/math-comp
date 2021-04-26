@@ -5077,7 +5077,7 @@ Notation FA := (gen_of irrG cGA).
 Let inFA := Gen irrG cGA.
 
 (* FIXME: embed the hnf in HB.instance *)
-Definition rVval_IsSUB := Eval hnf in [newMixin for rVval : FA -> 'rV_d].
+Definition rVval_IsSUB := Eval hnf in [IsNew for rVval : FA -> 'rV_d].
 #[export] HB.instance Definition _ := rVval_IsSUB.
 #[export] HB.instance Definition _ := [Choice of FA by <:].
 

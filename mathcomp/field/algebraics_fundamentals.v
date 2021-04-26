@@ -259,51 +259,6 @@ Prenex Implicits alg_integral.
 Import DefaultKeying GRing.DefaultPred.
 Arguments map_poly_inj {F R} f [p1 p2].
 
-
-(** FIX ME : the proof was creating local stuff, 
-              we made it global so we can use HB.... 
-*)
-Section ArchiFieldPatch.
-
-
-Notation Qfield := (fieldExtType rat).
-
-Variable R : Qfield.
-
-Variable  Rlt : rel R.
-Variable  Rle : rel R.
-Variable  norm : R -> R.
-Hypothesis  lt0_add   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x + y).
-Hypothesis  lt0_mul   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x * y).
-Hypothesis  lt0_ngt0  : forall x,  Rlt 0 x -> ~~ (Rlt x 0).
-Hypothesis  sub_gt0   : forall x y, Rlt 0 (y - x) = Rlt x y.
-Hypothesis  lt0_total : forall x, x != 0 -> Rlt 0 x || Rlt x 0.
-Hypothesis  normN     : forall x, norm (- x) = norm x.
-Hypothesis  ge0_norm  : forall x, Rle 0 x -> norm x = x.
-Hypothesis  le_def    : forall x y, Rle x y = (x == y) || Rlt x y.
-
-HB.instance Definition _ := 
-  Num.IntegralDomain_IsLtReal.Build R lt0_add lt0_mul lt0_ngt0 
-     sub_gt0 lt0_total normN ge0_norm le_def.
-
-Definition get_archifield : archiFieldType :=
-  (Num.ArchimedeanField.Pack
-    (Num.ArchimedeanField.Class
-      (Num.RealField_IsArchimedean.Build 
-       _ (@rat_algebraic_archimedean _ _ alg_integral)))).
-
-(* FIX ME : Build done by hand. Cannot make this work  
-  HB.instance Definition _ := 
-      Num.RealField_IsArchimedean.Build 
-       R (@rat_algebraic_archimedean _ _ alg_integral).
-  This works 
-  HB.instance Definition _ := 
-      Num.RealField_IsArchimedean.Build 
-       _ (@rat_algebraic_archimedean _ _ alg_integral).
-  but I don't know how to get the ArchimedianField after *)
- 
-End ArchiFieldPatch.
-
 Theorem Fundamental_Theorem_of_Algebraics :
   {L : closedFieldType &
      {conj : {rmorphism L -> L} | involutive conj & ~ conj =1 id}}.
@@ -633,10 +588,12 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
-(* This is the instance *)
-  exists (@get_archifield (Q y) _ _ _ posD
-            posM posNneg posB posVneg absN absE (rrefl _)).
-  by apply: [rmorphism of idfun].
+  pose RyM := Num.IntegralDomain_IsLtReal.Build _ posD
+                posM posNneg posB posVneg absN absE (rrefl _).
+  pose Ry := RealFieldType _ RyM.
+  have QisArchi : Num.RealField_IsArchimedean Ry.
+    by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
+  exists (ArchiFieldType _ QisArchi); apply: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
     exists 0, [archiFieldType of rat], f.
@@ -699,10 +656,8 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [t [t_C t_z gal_t]]: exists t, [/\ z_ n \in sQ t, z \in sQ t & is_Gal t].
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
-    (* FIXME : SplittingField structure has to be done by hand *)
-    pose QtMixin := FieldExt_IsSplittingField.Build _ _ gal_t.
-    pose Qt : SplittingField.type rat :=
-      (SplittingField.Pack (SplittingField.Class QtMixin)).
+  pose QtMixin := FieldExt_IsSplittingField.Build _ _ gal_t.
+  pose Qt := SplittingFieldType _ QtMixin _.
   have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
   pose Cn : {subfield Qt} := <<Rn; i_t>>%AS.
@@ -732,10 +687,8 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have{gal_z} galRz: galois Rn Rz.
     apply/and3P; split=> //; first by apply: sepQ.
     apply/splitting_normalField=> //.
-    (* FIX ME : again calling the Build explicitely *)
     pose QzMixin := FieldExt_IsSplittingField.Build _ _ gal_z.
-    pose Qz : SplittingField.type rat :=
-      (SplittingField.Pack (SplittingField.Class QzMixin)).
+    pose Qz := SplittingFieldType _ QzMixin _.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.

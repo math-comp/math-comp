@@ -338,15 +338,14 @@ HB.mixin Record FieldExt_IsSplittingField
   splittingFieldP_subproof : splitting_field_axiom [the fieldExtType _ of L]
 }.
 
-#[mathcomp(axiom="splitting_field_axiom"), infer(F)]
+#[mathcomp(axiom="splitting_field_axiom"), infer(F),
+  short(type="splittingFieldType", pack="SplittingFieldType")]
 HB.structure Definition SplittingField F :=
  { T of FieldExt_IsSplittingField F T & FieldExt F T }.
 
 
 Module SplittingFieldExports.
 Bind Scope ring_scope with SplittingField.sort.
-Notation splittingFieldType F := (SplittingField.type F).
-Notation SplittingFieldType F L ax := (SplittingField.pack F L ax).
 Notation "[ 'splittingFieldType' F 'of' L 'for' K ]" :=
   (SplittingField.clone F L K)
   (at level 0, format "[ 'splittingFieldType'  F  'of'  L  'for'  K ]")

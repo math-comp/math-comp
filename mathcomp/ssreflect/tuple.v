@@ -44,8 +44,7 @@ Variables (n : nat) (T : Type).
 
 Structure tuple_of : Type := Tuple {tval :> seq T; _ : size tval == n}.
 
-Definition tuple_IsSUB := [subMixin for tval].
-HB.instance tuple_of tuple_IsSUB.
+HB.instance Definition _ := [IsSUB for tval].
 
 Implicit Type t : tuple_of.
 
@@ -286,8 +285,8 @@ Section EqTuple.
 
 Variables (n : nat) (T : eqType).
 
-HB.instance Definition tuple_eqMixin : HasDecEq (n.-tuple T) :=
-  [eqMixin of n.-tuple T by <:].
+HB.instance Definition tuple_HasDecEq : HasDecEq (n.-tuple T) :=
+  [HasDecEq of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
@@ -318,10 +317,10 @@ Qed.
 End EqTuple.
 
 (* TODO: try to factor this into a single instance *)
-HB.instance Definition tuple_choiceMixin n (T : choiceType) :=
-  [choiceMixin of n.-tuple T by <:].
-HB.instance Definition tuple_countMixin n (T : countType) :=
-  [countMixin of n.-tuple T by <:].
+HB.instance Definition tuple_HasChoice n (T : choiceType) :=
+  [HasChoice of n.-tuple T by <:].
+HB.instance Definition tuple_IsCountable n (T : countType) :=
+  [IsCountable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
 Section FinTupleSig.

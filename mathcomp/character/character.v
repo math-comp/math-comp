@@ -68,31 +68,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-(* FIX ME : ugly make an instance local -> global. move to fingroup *)
-Module Fix.
-
-Section Build.
-
-Variable G : Type.
-Hypothesis Fg : Finite.axioms_ G.
-Variable mulg : G -> G -> G.
-Variable oneg : G.
-Variable invg : G -> G.
-Variable mulgA : associative mulg.
-Variable mul1g : left_id oneg mulg.
-Variable mulVg : left_inverse oneg invg mulg.
-
-HB.instance Definition _ := Fg.
-HB.instance Definition _ := IsMulGroup.Build G mulgA mul1g mulVg.
-
-Definition get_base := [baseFinGroupType of G].
-Definition get_group := [finGroupType of G].
-
-End Build.
-
-End Fix.
-
-
 Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
@@ -612,12 +587,9 @@ Arguments socle_of_Iirr {gT G%G} i%R.
 Notation "''Chi_' i" := (irr_repr (socle_of_Iirr i))
   (at level 8, i at level 2, format "''Chi_' i").
 
-Fact irr_key : unit. Proof. by []. Qed.
-Definition irr_def gT B : (Nirr B).-tuple 'CF(B) :=
+HB.lock Definition irr gT B : (Nirr B).-tuple 'CF(B) :=
    let irr_of i := 'Res[B, <<B>>] (@cfRepr gT _ _ 'Chi_(inord i)) in
    [tuple of mkseq irr_of (Nirr B)].
-Definition irr := locked_with irr_key irr_def.
-
 Arguments irr {gT} B%g.
 
 Notation "''chi_' i" :=  (tnth (irr _) i%R)
@@ -641,7 +613,7 @@ Proof. by move/Iirr1_neq0; exists (inord 1). Qed.
 
 Lemma irrRepr i : cfRepr 'Chi_i = 'chi_i.
 Proof.
-rewrite [@irr]unlock (tnth_nth 0) nth_mkseq // -[<<G>>]/(gval _) genGidG.
+rewrite irr.unlock (tnth_nth 0) nth_mkseq // -[<<G>>]/(gval _) genGidG.
 by rewrite cfRes_id inord_val.
 Qed.
 
@@ -2529,7 +2501,7 @@ have mul1: left_id one mul by move=> u; apply: cFinj; rewrite cFmul cFone mul1r.
 have mulV: left_inverse one inv mul.
   by move=> u; apply: cFinj; rewrite cFmul cFinv cFone mulVr ?lin_char_unitr.
 pose imA := IsMulGroup.Build linT mulA mul1 mulV.
-pose linG := Fix.get_group (Finite.on linT) mulA mul1 mulV.
+pose linG := FinGroupType linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
   by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
 do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].

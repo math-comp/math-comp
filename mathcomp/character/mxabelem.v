@@ -199,20 +199,19 @@ Lemma stable_rowg_mxK (L : {group rVn}) :
 Proof.
 move=> linL; apply/eqP; rewrite eqEsubset sub_rowg_mx andbT.
 apply/subsetP=> v; rewrite inE.
-(* FIXME: slow conversion
-have : 
-    set_type
-    (matrix_matrix__canonical__fintype_Finite
-       (FinRing_Field__to__fintype_Finite F) 
-       (S O) n)
-       =
-    GroupSet.sort
-    (fingroup_FinGroup__to__fingroup_BaseFinGroup
-       (matrix_matrix__canonical__fingroup_FinGroup
-          (FinRing_Field__to__FinRing_Zmodule F) 
-          (S O) n)).
-Time by [].
-*)
+(* FIXME: slow conversion *)
+(* have :  *)
+(*     set_type *)
+(*     (matrix_matrix__canonical__fintype_Finite *)
+(*        (FinRing_Field__to__fintype_Finite F)  *)
+(*        (S O) n) *)
+(*        = *)
+(*     GroupSet.sort *)
+(*     (fingroup_FinGroup__to__fingroup_BaseFinGroup *)
+(*        (matrix_matrix__canonical__fingroup_FinGroup *)
+(*           (FinRing_Field__to__FinRing_Zmodule F)  *)
+(*           (S O) n)). *)
+(* Time by []. *)
 rewrite genmxE => /submxP[u ->{v}].
 rewrite mulmx_sum_row group_prod // => i _.
 rewrite rowK; move: (enum_val i) (enum_valP i) => v Lv.

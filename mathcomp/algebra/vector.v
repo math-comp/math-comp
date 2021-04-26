@@ -115,7 +115,8 @@ HB.mixin Record Lmodule_HasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V
   { dim : nat;
     vector_subdef : vector_axiom_def dim (Phant V) }.
 
-#[mathcomp(axiom="vector_axiom_def"), infer(R)]
+#[mathcomp(axiom="vector_axiom_def"), infer(R),
+  short(type="vectType", pack="VectType")]
 HB.structure Definition Vector (R : ringType) :=
   { V of Lmodule_HasFinDim R V & GRing.Lmodule R V }.
 
@@ -137,11 +138,6 @@ End OtherDefs.
 
 Module Import VectorExports.
 Bind Scope ring_scope with Vector.sort.
-(* FIXME: in ssralg, R was often replaced by [the ringType of R] *
- * Should it be the same here?                                   *)
-Notation vectType R := (@Vector.type R).
-Notation VectType R V mV := (@Vector.pack R V mV).
-Notation VectMixin := Vector.Mixin.
 Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone R T cT)
   (at level 0, format "[ 'vectType'  R  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'vectType' R 'of' T ]" := [vectType R of T for _]
@@ -205,7 +201,7 @@ Fact mx2vs_subproof m (A : 'M[K]_(m, vT)) : <<(<<A>>)>>%MS == <<A>>%MS.
 Proof. by rewrite genmx_id. Qed.
 Definition mx2vs {m} A : {vspace vT} := Space _ (@mx2vs_subproof m A).
 
-HB.instance Definition _ := [subMixin of {vspace vT} for (@vs2mx (Phant vT))].
+HB.instance Definition _ := [IsSUB of {vspace vT} for (@vs2mx (Phant vT))].
 Lemma vs2mxK : cancel vs2mx mx2vs.
 Proof. by move=> v; apply: val_inj; rewrite /= gen_vs2mx. Qed.
 Lemma mx2vsK m (M : 'M_(m, vT)) : (vs2mx (mx2vs M) :=: M)%MS.
@@ -231,7 +227,6 @@ Section VspaceDefs.
 Variables (K : fieldType) (vT : vectType K).
 Implicit Types (u : vT) (X : seq vT) (U V : {vspace vT}).
 
-HB.instance Definition _ := [Equality of {vspace vT} by <:].
 HB.instance Definition _ := [Choice of {vspace vT} by <:].
 
 Definition dimv U := \rank (vs2mx U).
@@ -1272,7 +1267,6 @@ Section LfunZmodType.
 Variables (R : ringType) (aT rT : vectType R).
 Implicit Types f g h : 'Hom(aT, rT).
 
-HB.instance Definition _ := [Equality of 'Hom(aT, rT) by <:].
 HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
 
 Fact lfun_is_linear f : linear f.
@@ -1311,8 +1305,8 @@ Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
 
-HB.instance Definition _ :=
-  @GRing.IsZmodule.Build 'Hom(aT, rT) _ _ _ lfun_addA lfun_addC lfun_add0 lfun_addN.
+HB.instance Definition _ := GRing.IsZmodule.Build 'Hom(aT, rT)
+  lfun_addA lfun_addC lfun_add0 lfun_addN.
 
 Lemma zero_lfunE x : (0 : 'Hom(aT, rT)) x = 0. Proof. exact: lfunE. Qed.
 Lemma add_lfunE f g x : (f + g) x = f x + g x. Proof. exact: lfunE. Qed.
@@ -1363,8 +1357,8 @@ apply: Bijective (Hom \o vec_mx) _ _ => [[A]|A] /=; last exact: vec_mxK.
 by rewrite mxvecK.
 Qed.
 
-HB.instance Definition _ :=
-  Lmodule_HasFinDim.Build _ 'Hom(aT, rT) lfun_vect_iso.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ 'Hom(aT, rT)
+  lfun_vect_iso.
 
 End LfunVectType.
 
@@ -1713,26 +1707,23 @@ Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
 (* FIXME: as explained above, the following structures should not be declared *
  * as canonical, so mixins and structures are built separately, and we        *
  * don't use HB.instance Definition _ := ...                                  *
- * Please check that this is ok                                               *)
-Definition lfun_comp_ringMixin :=
-  GRing.Zmodule_IsRing.Build 'End(vT)
-    comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
-Definition lfun_comp_ringType := RingType 'End(vT) lfun_comp_ringMixin.
+ *  This is ok, but maybe we could introduce an alias                         *)
+Definition lfun_comp_ringMixin := GRing.Zmodule_IsRing.Build 'End(vT)
+  comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
+Definition lfun_comp_ringType := Eval hnf in RingType 'End(vT)
+  lfun_comp_ringMixin.
 
 (* In the standard endomorphism ring product is categorical composition.     *)
-Definition lfun_ringMixin (* : GRing.Ring.mixin_of (lfun_zmodType vT vT) *) :=
-  converse_ringMixin lfun_comp_ringType.
-Definition lfun_ringType := Eval hnf in RingType 'End(vT) lfun_ringMixin.
+Definition lfun_ringType := Eval hnf in
+  RingType 'End(vT) (lfun_comp_ringType^c).
 
-Definition lfun_lalgMixin :=
-   GRing.Lmodule_IsLalgebra.Build _ lfun_ringType (fun k x y => comp_lfunZr k y x).
-Definition lfun_lalgType := Eval hnf in LalgType _ lfun_ringType lfun_lalgMixin.
+Definition lfun_lalgMixin := GRing.Lmodule_IsLalgebra.Build _ lfun_ringType
+  (fun k x y => comp_lfunZr k y x).
+Definition lfun_lalgType := Eval hnf in LalgType _ 'End(vT) lfun_lalgMixin.
 
-Definition lfun_algMixin :=
-  GRing.Lalgebra_IsAlgebra.Build _ lfun_lalgType
+Definition lfun_algMixin := GRing.Lalgebra_IsAlgebra.Build R lfun_lalgType
     (fun k x y => comp_lfunZl k y x).
-(* FIXME: segfaults when replacing [the ringType of R by GRing.Ring.sort] by _ *)
-Definition lfun_algType := Eval hnf in AlgType [the ringType of R by GRing.Ring.sort] lfun_lalgType lfun_algMixin.
+Definition lfun_algType := Eval hnf in AlgType _ 'End(vT) lfun_algMixin.
 
 End LfunAlgebra.
 
@@ -1876,8 +1867,7 @@ Variable (K : fieldType) (vT : vectType K) (U : {vspace vT}).
 Inductive subvs_of : predArgType := Subvs u & u \in U.
 
 Definition vsval w : vT := let: Subvs u _ := w in u.
-HB.instance Definition _ := [subMixin of subvs_of for vsval].
-HB.instance Definition _ := [Equality of subvs_of by <:].
+HB.instance Definition _ := [IsSUB of subvs_of for vsval].
 HB.instance Definition _ := [Choice of subvs_of by <:].
 HB.instance Definition _ := [zmodMixin of subvs_of by <:].
 HB.instance Definition _ := [lmodMixin of subvs_of by <:].
@@ -1967,7 +1957,8 @@ have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
 have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
 by exists p2r; [apply: (@can2_linear _ _ _ (Linear r2p_lin)) | exists r2p].
 Qed.
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ (vT1 * vT2)%type pair_vect_iso.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ (vT1 * vT2)%type
+  pair_vect_iso.
 
 End ProdVector.
 
@@ -1988,7 +1979,8 @@ exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.
 Qed.
 
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ {ffun I -> vT} ffun_vect_iso.
+HB.instance Definition _ := Lmodule_HasFinDim.Build _ {ffun I -> vT}
+  ffun_vect_iso.
 
 End FunVectType.
 

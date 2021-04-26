@@ -40,42 +40,12 @@ Unset Printing Implicit Defensive.
 
 Module FinRing.
 
-(* Local Notation mixin_of T b := (Finite.mixin_of (EqType T b)). *)
-
-(* Section Generic. *)
-
-(* (* Implicits *) *)
-(* Variables (type base_type : Type) (class_of base_of : Type -> Type). *)
-(* Variable to_choice : forall T, base_of T -> Choice.class_of T. *)
-(* Variable base_sort : base_type -> Type. *)
-
-(* (* Explicits *) *)
-(* Variable Pack : forall T, class_of T -> type. *)
-(* Variable Class : forall T b, mixin_of T (to_choice b) -> class_of T. *)
-(* Variable base_class : forall bT, base_of (base_sort bT). *)
-
-(* Definition gen_pack T := *)
-(*   fun bT b & phant_id (base_class bT) b => *)
-(*   fun fT m & phant_id (Finite.class fT) (Finite.Class m) => *)
-(*   Pack (@Class T b m). *)
-
-(* End Generic. *)
-
-(* Arguments gen_pack [type base_type class_of base_of to_choice base_sort]. *)
-(* Local Notation fin_ c := (@Finite.Class _ c c). *)
-(* Local Notation do_pack pack T := (pack T _ _ id _ _ id). *)
 Import GRing.Theory.
 
-(* Definition groupMixin V := FinGroup.Mixin (@addrA V) (@add0r V) (@addNr V). *)
-(* Local Notation base_group T vT fT := *)
-(*   (@FinGroup.PackBase T (groupMixin vT) (Finite.class fT)). *)
-(* Local Notation fin_group B V := (@FinGroup.Pack B (@addNr V)). *)
-
-#[mathcomp]
+#[short(type="finZmodType", pack="FinZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
 Module ZmoduleExports.
-Notation finZmodType := Zmodule.type.
 Notation "[ 'finZmodType' 'of' T ]" := (Zmodule.clone T _)
   (at level 0, format "[ 'finZmodType'  'of'  T ]") : form_scope.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
@@ -84,8 +54,112 @@ Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
 End ZmoduleExports.
 HB.export ZmoduleExports.
 
-#[export]
-HB.instance Definition _ (R : Zmodule.type) :=
+#[short(type="finRingType", pack="FinRingType")]
+HB.structure Definition Ring := {R of GRing.Ring R & Finite R}.
+
+Module RingExports.
+Notation "[ 'finRingType' 'of' T ]" := (Ring.clone T _)
+  (at level 0, format "[ 'finRingType'  'of'  T ]") : form_scope.
+End RingExports.
+HB.export RingExports.
+
+#[short(type="finComRingType", pack="FinComRingType")]
+HB.structure Definition ComRing := {R of GRing.ComRing R & Finite R}.
+
+Module ComRingExports.
+Notation "[ 'finComRingType' 'of' T ]" := (ComRing.clone T _)
+  (at level 0, format "[ 'finComRingType'  'of'  T ]") : form_scope.
+End ComRingExports.
+HB.export ComRingExports.
+
+#[short(type="finUnitRingType", pack="FinUnitRingType")]
+HB.structure Definition UnitRing := {R of GRing.UnitRing R & Finite R}.
+
+Module UnitRingExports.
+Notation "[ 'finUnitRingType' 'of' T ]" := (UnitRing.clone T _)
+  (at level 0, format "[ 'finUnitRingType'  'of'  T ]") : form_scope.
+End UnitRingExports.
+HB.export UnitRingExports.
+
+#[short(type="finComUnitRingType", pack="FinComUnitRingType")]
+HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Finite R}.
+
+Module ComUnitRingExports.
+Notation "[ 'finComUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
+  (at level 0, format "[ 'finComUnitRingType'  'of'  T ]") : form_scope.
+End ComUnitRingExports.
+HB.export ComUnitRingExports.
+
+#[short(type="finIntegralDomainType", pack="FinIntegralDomainType")]
+HB.structure Definition IntegralDomain :=
+  {R of GRing.IntegralDomain R & Finite R}.
+
+Module IntegralDomainExports.
+Notation "[ 'finIntegralDomainType' 'of' T ]" := (IntegralDomain.clone T _)
+  (at level 0, format "[ 'finIntegralDomainType'  'of'  T ]") : form_scope.
+End IntegralDomainExports.
+HB.export IntegralDomainExports.
+
+#[short(type="finFieldType", pack="FinFieldType")]
+HB.structure Definition Field := {R of GRing.Field R & Finite R}.
+
+Module FieldExports.
+Notation "[ 'finFieldType' 'of' T ]" := (Field.clone T _)
+  (at level 0, format "[ 'finFieldType'  'of'  T ]") : form_scope.
+End FieldExports.
+HB.export FieldExports.
+
+#[infer(R), short(type="finLmodType", pack="FinLmodType")]
+HB.structure Definition Lmodule (R : ringType) :=
+  {M of GRing.Lmodule R M & Finite M}.
+
+Module LmoduleExports.
+Notation "[ 'finLmodType' R 'of' T ]" := (Lmodule.clone R T _)
+  (at level 0, format "[ 'finLmodType'  R  'of'  T ]") : form_scope.
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion lmodtype_id : Lmodule.type >-> Lmodule.type_.
+End LmoduleExports.
+HB.export LmoduleExports.
+
+#[infer(R), short(type="finLalgType", pack="FinLalgType")]
+HB.structure Definition Lalgebra (R : ringType) :=
+  {M of GRing.Lalgebra R M & Finite M}.
+
+Module LalgebraExports.
+Notation "[ 'finLalgType' R 'of' T ]" := (Lalgebra.clone R T _)
+  (at level 0, format "[ 'finLalgType'  R  'of'  T ]") : form_scope.
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion lalgtype_id : Lalgebra.type >-> Lalgebra.type_.
+End LalgebraExports.
+HB.export LalgebraExports.
+
+#[infer(R), short(type="finAlgType", pack="FinAlgType")]
+HB.structure Definition Algebra (R : ringType) :=
+  {M of GRing.Algebra R M & Finite M}.
+
+Module AlgebraExports.
+Notation "[ 'finAlgType' R 'of' T ]" := (Algebra.clone R T _)
+  (at level 0, format "[ 'finAlgType'  R  'of'  T ]") : form_scope.
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion algtype_id : Algebra.type >-> Algebra.type_.
+End AlgebraExports.
+HB.export AlgebraExports.
+
+#[infer(R), short(type="finUnitAlgType", pack="FinUnitAlgType")]
+HB.structure Definition UnitAlgebra (R : unitRingType) :=
+  {M of GRing.UnitAlgebra R M & Finite M}.
+
+Module UnitAlgebraExports.
+Notation "[ 'finUnitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T _)
+  (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
+(* FIXME: add to HB or define directly type instead of type_ *)
+Identity Coercion unit_algtype_id : UnitAlgebra.type >-> UnitAlgebra.type_.
+End UnitAlgebraExports.
+HB.export UnitAlgebraExports.
+
+(* Group structures *)
+
+#[export] HB.instance Definition _ (R : Zmodule.type) :=
   [finGroupMixin of R for +%R].
 Coercion Zmodule_to_baseFinGroup (R : Zmodule.type) := BaseFinGroup.clone R _.
 Coercion Zmodule_to_finGroup (R : Zmodule.type) := FinGroup.clone R _.
@@ -105,20 +179,10 @@ Proof. by apply/centsP=> x _ y _; apply: zmod_mulgC. Qed.
 
 End AdditiveGroup.
 
-#[mathcomp]
-HB.structure Definition Ring := {R of GRing.Ring R & Finite R}.
-
 #[export]
 HB.instance Definition _ (R : Ring.type) := [finGroupMixin of R for +%R].
 Coercion Ring_to_baseFinGroup (R : Ring.type) := BaseFinGroup.clone R _.
 Coercion Ring_to_finGroup (R : Ring.type) := FinGroup.clone R _.
-
-Module RingExports.
-Notation finRingType := Ring.type.
-Notation "[ 'finRingType' 'of' T ]" := (Ring.clone T _)
-  (at level 0, format "[ 'finRingType'  'of'  T ]") : form_scope.
-End RingExports.
-HB.export RingExports.
 
 HB.factory Record IsRing R of Ring R := {}.
 
@@ -154,35 +218,16 @@ HB.builders Context R of IsRing R.
     GRing.Ring_HasMulInverse.Build R mulVr mulrV intro_unit invr_out.
 HB.end.
 
-#[mathcomp]
-HB.structure Definition ComRing := {R of GRing.ComRing R & Finite R}.
-
 #[export]
 HB.instance Definition _ (R : ComRing.type) := [finGroupMixin of R for +%R].
 Coercion ComRing_to_baseFinGroup (R : ComRing.type) := BaseFinGroup.clone R _.
 Coercion ComRing_to_finGroup (R : ComRing.type) := FinGroup.clone R _.
 
-Module ComRingExports.
-Notation finComRingType := ComRing.type.
-Notation "[ 'finComRingType' 'of' T ]" := (ComRing.clone T _)
-  (at level 0, format "[ 'finComRingType'  'of'  T ]") : form_scope.
-End ComRingExports.
-HB.export ComRingExports.
-
-#[mathcomp]
-HB.structure Definition UnitRing := {R of GRing.UnitRing R & Finite R}.
 
 #[export]
 HB.instance Definition _ (R : UnitRing.type) := [finGroupMixin of R for +%R].
 Coercion UnitRing_to_baseFinGroup (R : UnitRing.type) := BaseFinGroup.clone R _.
 Coercion UnitRing_to_finGroup (R : UnitRing.type) := FinGroup.clone R _.
-
-Module UnitRingExports.
-Notation finUnitRingType := UnitRing.type.
-Notation "[ 'finUnitRingType' 'of' T ]" := (UnitRing.clone T _)
-  (at level 0, format "[ 'finUnitRingType'  'of'  T ]") : form_scope.
-End UnitRingExports.
-HB.export UnitRingExports.
 
 Section UnitsGroup.
 
@@ -196,10 +241,8 @@ Local Notation uT := (unit_of phR).
 Implicit Types u v : uT.
 Definition uval u := let: Unit x _ := u in x.
 
-#[export]
-HB.instance Definition _ := [subMixin for uval].
-#[export]
-HB.instance Definition _ := [Finite of uT by <:].
+#[export] HB.instance Definition _ := [IsSUB for uval].
+#[export] HB.instance Definition _ := [Finite of uT by <:].
 
 Definition unit1 := Unit phR (@GRing.unitr1 _).
 Lemma unit_inv_proof u : (val u)^-1 \is a GRing.unit.
@@ -215,9 +258,8 @@ Proof. by move=> u; apply/val_inj/mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
 Proof. by move=> u; apply/val_inj/(mulVr (valP u)). Qed.
 
-#[export]
-HB.instance Definition _ :=
-  IsMulGroup.Build uT unit_muluA unit_mul1u unit_mulVu.
+#[export] HB.instance Definition _ := IsMulGroup.Build uT
+  unit_muluA unit_mul1u unit_mulVu.
 
 Lemma val_unit1 : val (1%g : uT) = 1. Proof. by []. Qed.
 Lemma val_unitM x y : val (x * y : uT)%g = val x * val y. Proof. by []. Qed.
@@ -250,55 +292,24 @@ HB.export UnitsGroupExports.
 
 Notation unit R Ux := (Unit (Phant R) Ux).
 
-#[mathcomp]
-HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Finite R}.
-
-#[export]
-HB.instance Definition _ (R : ComUnitRing.type) := [finGroupMixin of R for +%R].
+#[export] HB.instance Definition _ (R : ComUnitRing.type) :=
+  [finGroupMixin of R for +%R].
 Coercion ComUnitRing_to_baseFinGroup (R : ComUnitRing.type) :=
   BaseFinGroup.clone R _.
 Coercion ComUnitRing_to_finGroup (R : ComUnitRing.type) :=
   FinGroup.clone R _.
 
-Module ComUnitRingExports.
-Notation finComUnitRingType := ComUnitRing.type.
-Notation "[ 'finComUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
-  (at level 0, format "[ 'finComUnitRingType'  'of'  T ]") : form_scope.
-End ComUnitRingExports.
-HB.export ComUnitRingExports.
-
-#[mathcomp]
-HB.structure Definition IntegralDomain :=
-  {R of GRing.IntegralDomain R & Finite R}.
-
-#[export]
-HB.instance Definition _ (R : IntegralDomain.type) := [finGroupMixin of R for +%R].
+#[export] HB.instance Definition _ (R : IntegralDomain.type) :=
+  [finGroupMixin of R for +%R].
 Coercion IntegralDomain_to_baseFinGroup (R : IntegralDomain.type) :=
   BaseFinGroup.clone R _.
 Coercion IntegralDomain_to_finGroup (R : IntegralDomain.type) :=
   FinGroup.clone R _.
 
-Module IntegralDomainExports.
-Notation finIntegralDomainType := IntegralDomain.type.
-Notation "[ 'finIntegralDomainType' 'of' T ]" := (IntegralDomain.clone T _)
-  (at level 0, format "[ 'finIntegralDomainType'  'of'  T ]") : form_scope.
-End IntegralDomainExports.
-HB.export IntegralDomainExports.
-
-#[mathcomp]
-HB.structure Definition Field := {R of GRing.Field R & Finite R}.
-
-#[export]
-HB.instance Definition _ (R : Field.type) := [finGroupMixin of R for +%R].
+#[export] HB.instance Definition _ (R : Field.type) :=
+  [finGroupMixin of R for +%R].
 Coercion Field_to_baseFinGroup (R : Field.type) := BaseFinGroup.clone R _.
 Coercion Field_to_finGroup (R : Field.type) := FinGroup.clone R _.
-
-Module FieldExports.
-Notation finFieldType := Field.type.
-Notation "[ 'finFieldType' 'of' T ]" := (Field.clone T _)
-  (at level 0, format "[ 'finFieldType'  'of'  T ]") : form_scope.
-End FieldExports.
-HB.export FieldExports.
 
 HB.factory Record IsField F of Field F := {}.
 
@@ -332,13 +343,6 @@ HB.builders Context F of IsField F.
   HB.instance Definition _ := GRing.Field_IsDec.Build F decidable.
 HB.end.
 
-#[mathcomp, infer(R)]
-HB.structure Definition Lmodule (R : ringType) :=
-  {M of GRing.Lmodule R M & Finite M}.
-
-(* FIXME: add to HB or define directly type instead of type_ *)
-Identity Coercion lmodtype_id : Lmodule.type >-> Lmodule.type_.
-
 #[export]
 HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
   [finGroupMixin of M for +%R].
@@ -348,20 +352,6 @@ Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type_ R) :=
 Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type_ R) : finGroupType :=
   FinGroup.clone (M : Type) _.
 
-Module LmoduleExports.
-Notation finLmodType R := (Lmodule.type R).
-Notation "[ 'finLmodType' R 'of' T ]" := (Lmodule.clone R T _)
-  (at level 0, format "[ 'finLmodType'  R  'of'  T ]") : form_scope.
-End LmoduleExports.
-HB.export LmoduleExports.
-
-#[mathcomp, infer(R)]
-HB.structure Definition Lalgebra (R : ringType) :=
-  {M of GRing.Lalgebra R M & Finite M}.
-
-(* FIXME: add to HB or define directly type instead of type_ *)
-Identity Coercion lalgtype_id : Lalgebra.type >-> Lalgebra.type_.
-
 #[export]
 HB.instance Definition _ (R : ringType) (M : Lalgebra.type R) :=
   [finGroupMixin of M for +%R].
@@ -369,20 +359,6 @@ Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type_ R) :=
   BaseFinGroup.clone M _.
 Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type_ R) :=
   FinGroup.clone M _.
-
-Module LalgebraExports.
-Notation finLalgType R := (Lalgebra.type R).
-Notation "[ 'finLalgType' R 'of' T ]" := (Lalgebra.clone R T _)
-  (at level 0, format "[ 'finLalgType'  R  'of'  T ]") : form_scope.
-End LalgebraExports.
-HB.export LalgebraExports.
-
-#[mathcomp, infer(R)]
-HB.structure Definition Algebra (R : ringType) :=
-  {M of GRing.Algebra R M & Finite M}.
-
-(* FIXME: add to HB or define directly type instead of type_ *)
-Identity Coercion algtype_id : Algebra.type >-> Algebra.type_.
 
 #[export]
 HB.instance Definition _ (R : ringType) (M : Algebra.type R) :=
@@ -392,20 +368,6 @@ Coercion Algebra_to_baseFinGroup (R : ringType) (M : Algebra.type_ R) :=
 Coercion Algebra_to_finGroup (R : ringType) (M : Algebra.type_ R) :=
   FinGroup.clone M _.
 
-Module AlgebraExports.
-Notation finAlgType R := (Algebra.type R).
-Notation "[ 'finAlgType' R 'of' T ]" := (Algebra.clone R T _)
-  (at level 0, format "[ 'finAlgType'  R  'of'  T ]") : form_scope.
-End AlgebraExports.
-HB.export AlgebraExports.
-
-#[mathcomp, infer(R)]
-HB.structure Definition UnitAlgebra (R : unitRingType) :=
-  {M of GRing.UnitAlgebra R M & Finite M}.
-
-(* FIXME: add to HB or define directly type instead of type_ *)
-Identity Coercion unit_algtype_id : UnitAlgebra.type >-> UnitAlgebra.type_.
-
 #[export]
 HB.instance Definition _ (R : unitRingType) (M : UnitAlgebra.type R) :=
   [finGroupMixin of M for +%R].
@@ -413,13 +375,6 @@ Coercion UnitAlgebra_to_baseFinGroup (R : unitRingType) (M : UnitAlgebra.type_ R
   BaseFinGroup.clone M _.
 Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type_ R) :=
   FinGroup.clone M _.
-
-Module UnitAlgebraExports.
-Notation finUnitAlgType R := (UnitAlgebra.type R).
-Notation "[ 'finUnitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T _)
-  (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
-End UnitAlgebraExports.
-HB.export UnitAlgebraExports.
 
 Module RegularExports.
 HB.instance Definition _ (R : finZmodType) := Zmodule.on R^o.

@@ -97,7 +97,7 @@ Notation "\dim_ E V" := (divn (\dim V) (\dim E))
 Import GRing.Theory.
 
 (* Finite dimensional algebra *)
-#[mathcomp]
+#[short(type="FalgType", pack="FAlgType")]
 HB.structure Definition Falgebra (R : ringType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
 
@@ -136,7 +136,10 @@ HB.end.
 
 Module FalgebraExports.
 Bind Scope ring_scope with sort.
-Notation FalgType R := (Falgebra.type R).
+Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L _)
+  (at level 0, format "[ 'FalgType'  F  'of'  L ]") : form_scope.
+Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L L')
+  (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
 Notation FalgUnitRingType T := (Algebra_IsFalgebra.Build _ T).
 End FalgebraExports.
 HB.export FalgebraExports.
@@ -514,7 +517,7 @@ Structure aspace := ASpace {asval :> {vspace aT}; _ : is_aspace asval}.
 Definition aspace_of of phant aT := aspace.
 Local Notation "{ 'aspace' T }" := (aspace_of (Phant T)) : type_scope.
 
-HB.instance Definition _ := [subMixin for asval].
+HB.instance Definition _ := [IsSUB for asval].
 HB.instance Definition _ := [Equality of aspace by <:].
 HB.instance Definition _ := [Choice of aspace by <:].
 
@@ -1029,7 +1032,7 @@ Qed.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
 
-HB.instance Definition _ := [subMixin for ahval].
+HB.instance Definition _ := [IsSUB for ahval].
 HB.instance Definition _ := [Equality of ahom by <:].
 HB.instance Definition _ := [Choice of ahom by <:].
 

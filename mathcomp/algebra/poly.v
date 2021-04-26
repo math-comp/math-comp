@@ -129,7 +129,7 @@ Variable R : ringType.
 (* Defines a polynomial as a sequence with <> 0 last element *)
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
 
-HB.instance Definition _ := [subMixin for polyseq].
+HB.instance Definition _ := [IsSUB for polyseq].
 HB.instance Definition _ := [Choice of polynomial by <:].
 
 Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.

@@ -276,7 +276,7 @@ Variant matrix : predArgType := Matrix of {ffun 'I_m * 'I_n -> R}.
 
 Definition mx_val A := let: Matrix g := A in g.
 
-HB.instance Definition _ := [newMixin for mx_val].
+HB.instance Definition _ := [IsNew for mx_val].
 
 Definition fun_of_matrix A (i : 'I_m) (j : 'I_n) := mx_val A (i, j).
 
@@ -1797,11 +1797,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
-Definition matrix_lmodMixin :=
-  LmodMixin scalemxA scale1mx scalemxDr scalemxDl.
-
-Canonical matrix_lmodType :=
-  Eval hnf in LmodType R 'M[R]_(m, n) matrix_lmodMixin.
+HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R 'M[R]_(m, n)
+  scalemxA scale1mx scalemxDr scalemxDl.
 
 Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
 Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
@@ -3362,10 +3359,6 @@ Definition GLtype of phant R := {unit 'M[R]_n.-1.+1}.
 Coercion GLval ph (u : GLtype ph) : 'M[R]_n.-1.+1 :=
   let: FinRing.Unit A _ := u in A.
 
-HB.instance Definition _ := [subMixin for @GLval (Phant R)].
-(*NB: was Canonical GL_subType := [subType of {'GL_n[R]} for GLval].
-in the next section!*)
-
 End FinUnitMatrix.
 
 Bind Scope group_scope with GLtype.
@@ -3376,6 +3369,9 @@ Notation "{ ''GL_' n [ R ] }" := (GLtype n (Phant R))
 Notation "{ ''GL_' n ( p ) }" := {'GL_n['F_p]}
   (at level 0, n at level 2, p at level 10,
     format "{ ''GL_' n ( p ) }") : type_scope.
+
+HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
+  [IsSUB of {'GL_n[R]} for GLval].
 
 Section GL_unit.
 

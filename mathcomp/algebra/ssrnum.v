@@ -134,7 +134,7 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-#[mathcomp]
+#[short(type="porderZmodType", pack="POrderZmodType")]
 HB.structure Definition POrderedZmodule d :=
   { R of Order.IsPOrdered d R & GRing.Zmodule R }.
 
@@ -147,7 +147,7 @@ HB.structure Definition POrderedZmodule d :=
   normrMn : forall x n, norm_op (x *+ n) = norm_op x *+ n;
   normrN : forall x, norm_op (- x) = norm_op x;
 }. *)
-HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M & GRing.Zmodule M := {
+HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M := {
   norm : M -> M;
   ler_norm_add : forall x y, norm (x + y) <= norm x + norm y;
   normr0_eq0 : forall x, norm x = 0 -> x = 0;
@@ -155,7 +155,7 @@ HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M & GRing.Zmodule M :=
   normrN : forall x, norm (- x) = norm x;
 }.
 
-#[mathcomp]
+#[short(type="normedZmodType", pack="NormedZmodType")]
 (* FIXME: generic_norm, additional attribute when the structure is fixed: infer(R) *)
 HB.structure Definition NormedZmodule d :=
   { M of Zmodule_IsNormed d M & POrderedZmodule d M}.
@@ -163,8 +163,6 @@ Arguments norm {R T} x : rename.
 
 Module NormedZmoduleExports.
 Bind Scope ring_scope with NormedZmodule.sort.
-Notation normedZmodType (* R *) := (NormedZmodule.type (* R *)).
-Notation NormedZmodType (* R *) T m := (NormedZmodule.pack _ (* R *) T m).
 (* Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
   (@clone _ (Phant R) T cT _ idfun)
   (at level 0, format "[ 'normedZmodType'  R  'of'  T  'for'  cT ]") :
@@ -190,17 +188,18 @@ HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
   ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
 
-#[mathcomp]
+#[short(type="numDomainType", pack="NumDomainType")]
 HB.structure Definition NumDomain :=
   { R of IsNumDomain ring_display R &
     NormedZmodule ring_display (* R *) R & GRing.IntegralDomain R }.
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
 
+(* TODO: make IsNumDomain depend on intermediate structures *)
+(* TODO: make IsNumDomain.sort canonically a NumDomain *)
+
 Module NumDomainExports.
 Bind Scope ring_scope with NumDomain.sort.
-Notation numDomainType := NumDomain.type.
-Notation NumDomainType T m := (@NumDomain.pack T m).
 Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (NumDomain.clone T cT)
   (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone T _)
@@ -361,7 +360,7 @@ End ExtensionAxioms.
 
 (* The rest of the numbers interface hierarchy. *)
 
-#[mathcomp]
+#[short(type="numFieldType", pack="NumFieldType")]
 HB.structure Definition NumField := { R of GRing.IsField R & NumDomain R }.
 
 Module NumFieldExports.
@@ -379,14 +378,12 @@ HB.mixin Record NumField_IsImaginary R of NumField R := {
   normCK : forall x, `|x| ^+ 2 = x * conj_op x;
 }.
 
-#[mathcomp]
+#[short(type="numClosedFieldType", pack="NumClosedFieldType")]
 HB.structure Definition ClosedField :=
   { R of NumField_IsImaginary R & GRing.ClosedField R & NumField R }.
 
 Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
-Notation numClosedFieldType := ClosedField.type.
-Notation NumClosedFieldType T m := (ClosedField.Pack T m).
 Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T cT)
   (at level 0, format "[ 'numClosedFieldType'  'of'  T  'for' cT ]") :
                                                          form_scope.
@@ -395,25 +392,23 @@ Notation "[ 'numClosedFieldType' 'of' T ]" := (ClosedField.clone T _)
 End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
-#[mathcomp]
+#[short(type="realDomainType", pack="RealDomainType")]
 HB.structure Definition RealDomain :=
   { R of Order.Total ring_display R & NumDomain R }.
 
 Module RealDomainExports.
 Bind Scope ring_scope with RealDomain.sort.
-Notation realDomainType := RealDomain.type.
 Notation "[ 'realDomainType' 'of' T ]" := (RealDomain.clone T _)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
 End RealDomainExports.
 HB.export RealDomainExports.
 
-#[mathcomp]
+#[short(type="realFieldType", pack="RealFieldType")]
 HB.structure Definition RealField :=
   { R of Order.Total ring_display R & NumField R }.
 
 Module RealFieldExports.
 Bind Scope ring_scope with RealField.sort.
-Notation realFieldType := RealField.type.
 Notation "[ 'realFieldType' 'of' T ]" := (RealField.clone T _)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
 End RealFieldExports.
@@ -423,14 +418,12 @@ HB.mixin Record RealField_IsArchimedean R of RealField R := {
   archi_bound_subproof : archimedean_axiom [the NumDomain.type of R]
 }.
 
-#[mathcomp]
+#[short(type="archiFieldType", pack="ArchiFieldType")]
 HB.structure Definition ArchimedeanField :=
   { R of RealField_IsArchimedean R & RealField R }.
 
 Module ArchimedeanFieldExports.
 Bind Scope ring_scope with ArchimedeanField.sort.
-Notation archiFieldType := ArchimedeanField.type.
-Notation ArchiFieldType T m := (ArchimedeanField.Pack T m).
 Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (ArchimedeanField.clone T cT)
   (at level 0, format "[ 'archiFieldType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'archiFieldType' 'of' T ]" := (ArchimedeanField.clone T _)
@@ -442,14 +435,12 @@ HB.mixin Record RealField_IsClosed R of RealField R := {
   poly_ivt_subproof : real_closed_axiom [the NumDomain.type of R]
 }.
 
-#[mathcomp]
+#[short(type="rcfType", pack="RcfType")]
 HB.structure Definition RealClosedField :=
   { R of RealField_IsClosed R & RealField R }.
 
 Module RealClosedFieldExports.
 Bind Scope ring_scope with RealClosedField.sort.
-Notation rcfType := RealClosedField.type.
-Notation RcfType T m := (RealClosedField.Pack T m).
 Notation "[ 'rcfType' 'of' T 'for' cT ]" := (RealClosedField.clone T cT)
   (at level 0, format "[ 'rcfType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'rcfType' 'of' T ]" :=  (RealClosedField.clone T _)

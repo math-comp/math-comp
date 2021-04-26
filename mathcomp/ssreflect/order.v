@@ -1018,9 +1018,18 @@ HB.mixin Record IsPOrdered (d : unit) T of HasDecEq T := {
   le_anti  : antisymmetric le;
   le_trans : transitive    le;
 }.
-#[mathcomp] (* fixme: add phant_pack to the list of mathcomp generated stuff *)
+
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsPOrdered d (@eta Type T)) := Choice.on x.
+
+#[short(type="porderType", pack="POrderType")]
 HB.structure Definition POrder (d : unit) :=
   { T of Choice T & IsPOrdered d T }.
+
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsPOrdered d (@eta Type T)) : IsPOrdered d x := x.
 
 HB.factory Record IsLePOrdered (d : unit) T of HasDecEq T := {
   le       : rel T;
@@ -1034,6 +1043,13 @@ HB.builders Context (d : unit) T of IsLePOrdered d T.
 HB.instance Definition _ := @IsPOrdered.Build d T
   le _ (fun _ _ => erefl) le_refl le_anti le_trans.
 HB.end.
+
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsLePOrdered d (@eta Type T)) := Choice.on x.
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsLePOrdered d (@eta Type T)) : IsLePOrdered d x := x.
 
 HB.factory Record IsLtLePOrdered (d : unit) T of HasDecEq T := {
   le : rel T;
@@ -1067,6 +1083,13 @@ HB.instance Definition _ := @IsPOrdered.Build d T
 
 HB.end.
 
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsLtLePOrdered d (@eta Type T)) := Choice.on x.
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsLtLePOrdered d (@eta Type T)) : IsLtLePOrdered d x := x.
+
 HB.factory Record IsLtPOrdered (d : unit) T of HasDecEq T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
@@ -1078,10 +1101,15 @@ HB.instance Definition _ := @IsLtLePOrdered.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
 
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsLtPOrdered d (@eta Type T)) := Choice.on x.
+(* FIXME *)
+HB.instance Definition _ (d : unit) (T : choiceType)
+  (x : IsLtPOrdered d (@eta Type T)) : IsLtPOrdered d x := x.
+
 Module POrderExports.
-Notation porderType := POrder.type.
 Arguments le_trans {d s} [_ _ _].
-Notation POrderType disp T m := (POrder.pack disp T m).
 Notation "[ 'porderType' 'of' T 'for' cT ]" := (POrder.clone _ T cT)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'porderType' 'of' T 'for' cT 'with' disp ]" :=
@@ -1258,6 +1286,7 @@ HB.export POCoercions.
 (*   joinA : associative join; *)
 (*   le_defU : forall x y, (x <= y) = (join x y == y); *)
 (* }. *)
+(* #[short(type="joinSemiLatticeType", pack="JoinSemiLatticeType")] *)
 (* HB.structure Definition JoinSemiLattice d := *)
 (*   { T of POrder_IsJoinSemiLattice d T & POrder d T }. *)
 
@@ -1268,6 +1297,7 @@ HB.export POCoercions.
 (*   meetA : associative meet; *)
 (*   le_def : forall x y, (x <= y) = (meet x y == x); *)
 (* }. *)
+(* #[short(type="meetSemiLatticeType", pack="MeetSemiLatticeType")] *)
 (* HB.structure Definition MeetSemiLattice d := *)
 (*   { T of POrder_IsMeetSemiLattice d T & POrder d T }. *)
 
@@ -1294,13 +1324,11 @@ HB.mixin Record POrder_IsLattice d (T : Type) of POrder d T := {
 (*   join joinC joinA le_defU. *)
 (* HB.end. *)
 
-#[mathcomp]
+#[short(type="latticeType", pack="LatticeType")]
 HB.structure Definition Lattice d :=
   { T of POrder_IsLattice d T & POrder d T }.
 
 Module LatticeExports.
-Notation latticeType := Lattice.type.
-Notation LatticeType d T m := (Lattice.pack d T m).
 Notation "[ 'latticeType' 'of' T 'for' cT ]" := (Lattice.clone _ T cT)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'latticeType' 'of' T 'for' cT 'with' disp ]" :=
@@ -1368,16 +1396,14 @@ HB.mixin Record HasBottom d (T : Type) of POrder d T := {
 }.
 (* TODO: Restore when we remove the mathcomp attribute *)
 (* HB.structure Definition BPOrder d := { T of HasBottom d T & POrder d T }. *)
-#[mathcomp]
+#[short(type="bLatticeType", pack="BLatticeType")]
 HB.structure Definition BLattice d := { T of HasBottom d T & Lattice d T }.
 
 Module BLatticeExports.
-Notation bLatticeType := BLattice.type.
-Notation BLatticeType T m := (BLattice.pack _ T m).
-(* Notation "[ 'bLatticeType' 'of' T 'for' cT ]" := (BLattice.clone _ T cT) *)
-(*   (at level 0, format "[ 'bLatticeType'  'of'  T  'for'  cT ]") : form_scope. *)
-(* Notation "[ 'bLatticeType' 'of' T ]" := [bLatticeType of T for _] *)
-(*   (at level 0, format "[ 'bLatticeType'  'of'  T ]") : form_scope. *)
+Notation "[ 'bLatticeType' 'of' T 'for' cT ]" := (BLattice.clone _ T cT)
+  (at level 0, format "[ 'bLatticeType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'bLatticeType' 'of' T ]" := [bLatticeType of T for _]
+  (at level 0, format "[ 'bLatticeType'  'of'  T ]") : form_scope.
 (* Notation "[ 'bLatticeType' 'of' T 'for' cT 'with' disp ]" := *)
 (*   (@clone_with T _ cT disp _ id) *)
 (*   (at level 0, *)
@@ -1430,12 +1456,11 @@ HB.mixin Record HasTop d (T : Type) of POrder d T := {
 (* HB.structure Definition TPOrder d := { T of HasBottom d T & POrder d T }. *)
 (* HB.structure Definition TLattice d := { T of HasTop d T & Lattice d T }. *)
 (* HB.structure Definition TBOrder d := { T of HasTop d T & BPOrder d T }. *)
-#[mathcomp]
+#[short(type="tbLatticeType", pack="TBLatticeType")]
 HB.structure Definition TBLattice d := { T of HasTop d T & BLattice d T }.
 
 Module TBLatticeExports.
-Notation tbLatticeType := TBLattice.type.
-Notation TBLatticeType T m := (TBLattice.pack _ T m).
+(* FIXME: clone? *)
 End TBLatticeExports.
 HB.export TBLatticeExports.
 
@@ -1476,37 +1501,33 @@ HB.export TBLatticeSyntax.
 HB.mixin Record Lattice_MeetIsDistributive d (T : Type) of Lattice d T := {
   meetUl : @left_distributive T T meet join;
 }.
-#[mathcomp]
+#[short(type="distrLatticeType", pack="DistrLatticeType")]
 HB.structure Definition DistrLattice d :=
   { T of Lattice_MeetIsDistributive d T & Lattice d T }.
 
 Module DistrLatticeExports.
-Notation distrLatticeType := DistrLattice.type.
-Notation DistrLatticeType T m := (DistrLattice.pack _ T m).
+(* FIXME: clone? *)
 End DistrLatticeExports.
 HB.export DistrLatticeExports.
 
+#[short(type="bDistrLatticeType", pack="BDistrLatticeType")]
 HB.structure Definition BDistrLattice d :=
   { T of HasBottom d T & DistrLattice d T}.
 
 Module BDistrLatticeExports.
-Notation bDistrLatticeType  := BDistrLattice.type.
 Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T _)
   (at level 0, format "[ 'bDistrLatticeType'  'of'  T ]") : form_scope.
 End BDistrLatticeExports.
 HB.export BDistrLatticeExports.
 
-
-#[mathcomp]
+#[short(type="tbDistrLatticeType", pack="TBDistrLatticeType")]
 HB.structure Definition TBDistrLattice d :=
   { T of TBLattice d T & BDistrLattice d T }.
 
 Module TBDistrLatticeExports.
-Notation tbDistrLatticeType := TBDistrLattice.type.
 Notation "[ 'tbDistrLatticeType' 'of' T ]" := (TBDistrLattice.clone _ T _)
   (at level 0, format "[ 'tbDistrLatticeType'  'of'  T ]") : form_scope.
 End TBDistrLatticeExports.
-
 HB.export TBDistrLatticeExports.
 
 #[key="T"]
@@ -1516,12 +1537,11 @@ HB.mixin Record HasSub d (T : Type) of BDistrLattice d T := {
   joinIB : forall x y, (x `&` y) `|` sub x y = x
 }.
 
-#[mathcomp]
-HB.structure Definition CBDistrLattice d := { T of HasSub d T & }.
+#[short(type="cbDistrLatticeType", pack="CBDistrLatticeType")]
+HB.structure Definition CBDistrLattice d :=
+  { T of HasSub d T & BDistrLattice d T }.
 
 Module CBDistrLatticeExports.
-Notation cbDistrLatticeType  := CBDistrLattice.type.
-Notation CBDistrLatticeType T m := (@CBDistrLattice.pack _ T m).
 (*Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@CBDistrLattice.clone _ T cT)
   (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
@@ -1551,12 +1571,11 @@ HB.mixin Record HasCompl d (T : Type) of
   complE : forall x : T, compl x = (top : T) `\` x (* FIXME? *)
 }.
 
-#[mathcomp]
-HB.structure Definition CTBDistrLattice d := { T of HasCompl d T & }.
+#[short(type="ctbDistrLatticeType", pack="CTBDistrLatticeType")]
+HB.structure Definition CTBDistrLattice d :=
+  { T of HasCompl d T & TBDistrLattice d T & CBDistrLattice d T }.
 
 Module CTBDistrLatticeExports.
-Notation ctbDistrLatticeType  := CTBDistrLattice.type.
-Notation CTBDistrLatticeType T m := (@CTBDistrLattice.pack _ T m).
 (* Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
 (*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT ]") : *)
 (*   form_scope. *)
@@ -1585,13 +1604,11 @@ End CTBDistrLatticeSyntax.
 HB.mixin Record DistrLattice_IsTotal d T of DistrLattice d T :=
   { le_total : total (<=%O : rel T) }.
 
-#[mathcomp]
+#[short(type="orderType", pack="OrderType")]
 HB.structure Definition Total d :=
   { T of DistrLattice_IsTotal d T & DistrLattice d T }.
 
 Module TotalExports.
-Notation orderType := Total.type.
-Notation OrderType T m := (@Total.pack _ T m).
 (* Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
 (*   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT ]") : form_scope. *)
 (* Notation "[ 'orderType' 'of' T 'for' cT 'with' disp ]" := *)
@@ -1611,64 +1628,53 @@ HB.export TotalExports.
 (* FINITE *)
 (**********)
 
-#[mathcomp]
+#[short(type="finPOrderType", pack="FinPOrderType")]
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
 Module FinPOrderExports.
-Notation finPOrderType := FinPOrder.type.
 Notation "[ 'finPOrderType' 'of' T ]" := (FinPOrder.clone _ T _ )
   (at level 0, format "[ 'finPOrderType'  'of'  T ]") : form_scope.
 End FinPOrderExports.
-
 HB.export FinPOrderExports.
 
-#[mathcomp]
+#[short(type="finLatticeType", pack="FinLatticeType")]
 HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }.
 
 Module FinLatticeExports.
-Notation finLatticeType := FinLattice.type.
 Notation "[ 'finLatticeType' 'of' T ]" := (FinLattice.clone _ T _ )
   (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
 End FinLatticeExports.
-
 HB.export FinLatticeExports.
 
-#[mathcomp]
+#[short(type="finDistrLatticeType", pack="FinDistrLatticeType")]
 HB.structure Definition FinDistrLattice d :=
   { T of Finite T & TBDistrLattice d T }.
 
 Module FinDistrLatticeExports.
-Notation finDistrLatticeType := FinDistrLattice.type.
 Notation "[ 'finDistrLatticeType' 'of' T ]" := (FinDistrLattice.clone _ T _ )
   (at level 0, format "[ 'finDistrLatticeType'  'of'  T ]") : form_scope.
 End FinDistrLatticeExports.
-
 HB.export FinDistrLatticeExports.
 
-
-#[mathcomp]
+#[short(type="finCDistrLatticeType", pack="FinCDistrLatticeType")]
 HB.structure Definition FinCDistrLattice d :=
   { T of Finite T & CTBDistrLattice d T }.
 
 Module FinCDistrLatticeExports.
-Notation finCDistrLatticeType := FinCDistrLattice.type.
 Notation "[ 'finCDistrLatticeType' 'of' T ]" := (FinCDistrLattice.clone _ T _ )
   (at level 0, format "[ 'finCDistrLatticeType'  'of'  T ]") : form_scope.
 End FinCDistrLatticeExports.
-
 HB.export FinCDistrLatticeExports.
 
 
-#[mathcomp]
+#[short(type="finOrderType", pack="FinOrderType")]
 HB.structure Definition FinTotal d :=
   { T of Total d T & FinDistrLattice d T }.
 
 Module FinTotalExports.
-Notation finOrderType := FinTotal.type.
 Notation "[ 'finOrderType' 'of' T ]" := (FinTotal.clone _ T _ )
   (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
 End FinTotalExports.
-
 HB.export FinTotalExports.
 
 (********)
@@ -4238,18 +4244,11 @@ Notation "[ 'POrder' 'of' T 'by' <: ]" :=
   (POrder.copy T%type (sub_type T))
   (at level 0, format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
 
-Notation "[ 'IsPOrdered'  'of' T 'by' <: ]" :=
+Notation "[ 'IsPOrdered' 'of' T 'by' <: ]" :=
   (fun d => (PcanPartial d (valK : @pcancel (_ : porderType d)
                                                     T%type val insub) :
    (IsPOrdered d T%type)) _)
   (at level 0, format "[ 'IsPOrdered'  'of'  T  'by'  <: ]") : form_scope.
-
-#[deprecated(since="mathcomp 2.0.0",
-  note="use [POrder of T by <:] or [IsPOrdered of T by <:] instead.")]
-Notation "[ 'porderMixin' 'of' T 'by' <: ]" :=
-  [IsPOrdered of T by <:]
-  (at level 0, format "[ 'porderMixin'  'of'  T  'by'  <: ]",
-   only parsing) : form_scope.
 
 Notation "[ 'IsTotal' 'of' T 'by' <: ]" :=
   (MonoTotal.Build _ T (fun _ _ => erefl))
@@ -4258,11 +4257,6 @@ Notation "[ 'IsTotal' 'of' T 'by' <: ]" :=
 Notation "[ 'Order' 'of' T 'by' <: ]" :=
   (Total.copy T%type (sub_type T))
   (at level 0, only parsing) : form_scope.
-
-#[deprecated(since="mathcomp 2.0.0",
-  note="use [Order of T by <:] or [IsTotal of T by <:] instead.")]
-Notation "[ 'totalOrderMixin' 'of' T 'by' <: ]" :=
-  [IsTotal of T by <:] (at level 0, only parsing) : form_scope.
 End Exports.
 End SubOrder.
 HB.export SubOrder.Exports.
