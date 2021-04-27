@@ -12,7 +12,7 @@ in mkCoqDerivation {
   owner = "LPCIC";
   inherit version;
   defaultVersion = lib.switch coq.coq-version [
-    { case = "8.13"; out = "1.9.7"; }
+    { case = "8.13"; out = "master"; }
     { case = "8.12"; out = "1.8.3_8.12"; }
     { case = "8.11"; out = "1.6.3_8.11"; }
   ] null;
