@@ -1157,7 +1157,7 @@ Lemma add_sub_fact_mod m (W : 'M_(m, n)) :
   val_submod (in_submod W) + val_factmod (in_factmod W) = W.
 Proof.
 rewrite /val_submod /val_factmod /= -!mulmxA -mulmxDr.
-rewrite addrC (mulmxA (pid_mx _)) pid_mx_id // (mulmxA (col_ebase _)).
+rewrite addrC ![in X in X + _](mulmxA (pid_mx _)) pid_mx_id // (mulmxA (col_ebase _)).
 rewrite (mulmxA _ _ (row_ebase _)) mulmx_ebase.
 rewrite (mulmxA (pid_mx _)) pid_mx_id // mulmxA -mulmxDl -mulmxDr.
 by rewrite subrK mulmx1 mulmxA mulmxKV ?row_ebase_unit.

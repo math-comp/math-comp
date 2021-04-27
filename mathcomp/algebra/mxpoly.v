@@ -1333,7 +1333,7 @@ elim: m r n A => [|m IHm] r [|n] A /=; try by case r.
 rewrite GRing.eval_Pick /mxrank unlock /=; set pf := fun _ => _.
 rewrite -(@eq_pick _ pf) => [|k]; rewrite {}/pf ?mxE // eq_sym.
 case: pick => [[i j]|] //=; set B := _ - _; have:= mxrankE B.
-case: (Gaussian_elimination B) r => [[_ _] _] [|r] //= <-; rewrite {}IHm eqSS.
+case: (Gaussian_elimination_ B) r => [[_ _] _] [|r] //= <-; rewrite {}IHm eqSS.
 by congr (\rank _ == r); apply/matrixP=> k l; rewrite !(mxE, big_ord1) !tpermR.
 Qed.
 
