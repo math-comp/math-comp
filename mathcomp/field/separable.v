@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset prime.
 From mathcomp Require Import binomial ssralg poly polydiv fingroup perm.
@@ -34,19 +35,21 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
+HB.lock
+Definition separable_poly {R : idomainType} (p : {poly R}) := coprimep p p^`().
+Canonical separable_poly_unlockable := Unlockable separable_poly.unlock.
+
 Section SeparablePoly.
 
 Variable R : idomainType.
 Implicit Types p q d u v : {poly R}.
 
-Definition separable_poly p := coprimep p p^`().
-
-Local Notation separable := separable_poly.
+Local Notation separable := (@separable_poly R).
 Local Notation lcn_neq0 := (Pdiv.Idomain.lc_expn_scalp_neq0 _).
 
 Lemma separable_poly_neq0 p : separable p -> p != 0.
 Proof.
-by apply: contraTneq => ->; rewrite /separable deriv0 coprime0p eqp01.
+by apply: contraTneq => ->; rewrite unlock deriv0 coprime0p eqp01.
 Qed.
 
 Lemma poly_square_freeP p :
@@ -66,16 +69,16 @@ Lemma separable_polyP {p} :
 Proof.
 apply: (iffP idP) => [sep_p | [sq'p nz_der1p]].
   split=> [u v | u u_dv_p]; last first.
-    apply: contraTneq => u'0; rewrite -leqNgt -(eqnP sep_p).
+    apply: contraTneq => u'0; rewrite unlock in sep_p; rewrite -leqNgt -(eqnP sep_p).
     rewrite dvdp_leq -?size_poly_eq0 ?(eqnP sep_p) // dvdp_gcd u_dv_p.
     have /dvdpZr <-: lead_coef u ^+ scalp p u != 0 by rewrite lcn_neq0.
     by rewrite -derivZ -Pdiv.Idomain.divpK //= derivM u'0 mulr0 addr0 dvdp_mull.
   rewrite Pdiv.Idomain.dvdp_eq mulrCA mulrA; set c := _ ^+ _ => /eqP Dcp.
   have nz_c: c != 0 by rewrite lcn_neq0.
-  move: sep_p; rewrite coprimep_sym -[separable _](coprimepZl _ _ nz_c).
+  move: sep_p; rewrite coprimep_sym unlock -(coprimepZl _ _ nz_c).
   rewrite -(coprimepZr _ _ nz_c) -derivZ Dcp derivM coprimepMl.
   by rewrite coprimep_addl_mul !coprimepMr -andbA => /and4P[].
-rewrite /separable coprimep_def eqn_leq size_poly_gt0; set g := gcdp _ _.
+rewrite unlock coprimep_def eqn_leq size_poly_gt0; set g := gcdp _ _.
 have nz_g: g != 0.
   rewrite -dvd0p dvdp_gcd -(mulr0 0); apply/nandP; left.
   by have /poly_square_freeP-> := sq'p; rewrite ?size_poly0.
@@ -111,10 +114,11 @@ Qed.
 Lemma separable_mul p q :
   separable (p * q) = [&& separable p, separable q & coprimep p q].
 Proof.
-apply/idP/and3P => [sep_pq | [sep_p seq_q co_pq]].
+apply/idP/and3P => [sep_pq | [sep_p sep_q co_pq]].
   rewrite !(dvdp_separable _ sep_pq) ?dvdp_mulIr ?dvdp_mulIl //.
   by rewrite (separable_coprime sep_pq).
-rewrite /separable derivM coprimepMl {1}addrC mulrC !coprimep_addl_mul.
+rewrite unlock in sep_p sep_q *.
+rewrite derivM coprimepMl {1}addrC mulrC !coprimep_addl_mul.
 by rewrite !coprimepMr (coprimep_sym q p) co_pq !andbT; apply/andP.
 Qed.
 
@@ -125,13 +129,13 @@ Lemma separable_root p x :
   separable (p * ('X - x%:P)) = separable p && ~~ root p x.
 Proof.
 rewrite separable_mul; apply: andb_id2l => seq_p.
-by rewrite /separable derivXsubC coprimep1 coprimep_XsubC.
+by rewrite unlock derivXsubC coprimep1 coprimep_XsubC.
 Qed.
 
 Lemma separable_prod_XsubC (r : seq R) :
   separable (\prod_(x <- r) ('X - x%:P)) = uniq r.
 Proof.
-elim: r => [|x r IH]; first by rewrite big_nil /separable_poly coprime1p.
+elim: r => [|x r IH]; first by rewrite big_nil unlock /separable_poly coprime1p.
 by rewrite big_cons mulrC separable_root IH root_prod_XsubC andbC.
 Qed.
 
@@ -173,7 +177,7 @@ Lemma separable_map (F : fieldType) (R : idomainType)
                     (f : {rmorphism F -> R}) (p : {poly F}) :
   separable_poly (map_poly f p) = separable_poly p.
 Proof.
-by rewrite /separable_poly deriv_map /coprimep -gcdp_map size_map_poly.
+by rewrite unlock deriv_map /coprimep -gcdp_map size_map_poly.
 Qed.
 
 Section InfinitePrimitiveElementTheorem.
@@ -379,12 +383,12 @@ Qed.
 Lemma base_separable : x \in K -> separable_element K x.
 Proof.
 move=> Kx; apply/separable_elementP; exists ('X - x%:P).
-by rewrite polyOverXsubC root_XsubC /separable_poly !derivCE coprimep1.
+by rewrite polyOverXsubC root_XsubC unlock !derivCE coprimep1.
 Qed.
 
 Lemma separable_nz_der : separable_element K x = ((minPoly K x)^`() != 0).
 Proof.
-rewrite /separable_element /separable_poly.
+rewrite /separable_element unlock.
 apply/idP/idP=> [|nzPx'].
   by apply: contraTneq => ->; rewrite coprimep0 -size_poly_eq1 size_minPoly.
 have gcdK : gcdp (minPoly K x) (minPoly K x)^`() \in polyOver K.
@@ -611,7 +615,7 @@ move=> charLp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
   exists ('X - (f \Po 'X^m)); split.
   - by rewrite rpredB ?polyOver_comp ?rpredX ?polyOverX ?Fadjoin_polyOver.
   - by rewrite rootE !hornerE horner_comp hornerXn Dx subrr.
-  rewrite /separable_poly !(derivE, deriv_comp) -mulr_natr -rmorphMn /= mL0.
+  rewrite unlock !(derivE, deriv_comp) -mulr_natr -rmorphMn /= mL0.
   by rewrite !mulr0 subr0 coprimep1.
 without loss{e} ->: e x sepKx / e = 0%N.
   move=> IH; elim: {e}e.+1 => [|e]; [exact: memv_adjoin | apply: subvP].
