@@ -14,6 +14,7 @@ jobs:
   hb:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         bundle: [ "coq-8.13", "coq-8.12", "coq-8.11" ]
     steps:
@@ -37,6 +38,7 @@ jobs:
   hb-shim:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         bundle: [ "coq-8.13" ]
     steps:
@@ -88,6 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: hb
     strategy:
+      fail-fast: false
       matrix:
         bundle: [ "coq-8.13" ]
     steps:
