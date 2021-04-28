@@ -111,6 +111,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + we provide an equality of spaces `eqmx_col` between `\mxcol_i V_
     i` and the sum of spaces `\sum_i <<V_ i>>)%MS`.
 
+- in `bigop.v`:
+  + Lemmas `big_nat_widenl`, `big_geq_mkord`
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
