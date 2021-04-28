@@ -5,7 +5,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 (************************************************************************)
-(* Small Scale Rewriting using Associatity and Commutativity            *)
+(* Small Scale Rewriting using Associativity and Commutativity          *)
 (*                                                                      *)
 (* Rewriting with AC (not modulo AC), using a small scale command.      *)
 (* Replaces opA, opC, opAC, opCA, ... and any combinations of them      *)
@@ -34,7 +34,7 @@ Unset Printing Implicit Defensive.
 (* - patternshape is expressed using the syntax                         *)
 (*      p := n | p * p'                                                 *)
 (*      where "*" is purely formal                                      *)
-(*        and n > 0 is number of left associated symbols                *)
+(*        and n > 0 is the number of left associated symbols            *)
 (*   examples of pattern shapes:                                        *)
 (*   + 4 represents (n * m * p * q)                                     *)
 (*   + (1*2) represents (n * (m * p))                                   *)
