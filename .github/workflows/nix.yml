@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        bundle: [ "coq-8.13", "coq-8.12", "coq-8.11" ]
+        bundle: [ "coq-8.13" ]
     steps:
     - name: Cachix install
       uses: cachix/install-nix-action@v12
@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        bundle: [ "coq-8.13", "coq-8.12", "coq-8.11" ]
+        bundle: [ "coq-8.13" ]
     steps:
     - name: Cachix install
       uses: cachix/install-nix-action@v12
