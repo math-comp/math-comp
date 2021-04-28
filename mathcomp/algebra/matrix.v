@@ -2677,13 +2677,16 @@ Local Notation MV := 'M[V]_(m, n).
 
 HB.instance Definition _ := [Finite of MV by <:].
 
+#[compress_coercions]
 HB.instance Definition _ := [finGroupMixin of MV for +%R].
 
 End FinZmodMatrix.
 
+#[compress_coercions]
 HB.instance Definition _ (R : finRingType) (m n : nat) :=
   FinRing.Zmodule.on 'M[R]_(m, n).
 
+#[compress_coercions]
 HB.instance Definition _ (R : finRingType) n :=
   [Finite of 'M[R]_n.+1 by <:].
 
