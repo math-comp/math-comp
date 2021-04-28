@@ -2583,12 +2583,9 @@ End DerivedGroup.
 Arguments irr_prime_injP {gT G i}.
 
 (* Determinant characters and determinential order. *)
-Section DetOrder.
-
-Variables (gT : finGroupType) (G : {group gT}).
-
 Section DetRepr.
 
+Variables (gT : finGroupType) (G : {group gT}).
 Variables (n : nat) (rG : mx_representation [fieldType of algC] G n).
 
 Definition det_repr_mx x : 'M_1 := (\det (rG x))%:M.
@@ -2609,20 +2606,29 @@ Qed.
 
 End DetRepr.
 
-Definition cfDet phi := \prod_i detRepr 'Chi_i ^+ truncC '[phi, 'chi[G]_i].
+HB.lock
+Definition cfDet (gT : finGroupType) (G : {group gT}) phi :=
+  \prod_i detRepr 'Chi_i ^+ truncC '[phi, 'chi[G]_i].
+Canonical cfDet_unlockable := Unlockable cfDet.unlock.
+
+Section DetOrder.
+
+Variables (gT : finGroupType) (G : {group gT}).
+
+Local Notation cfDet := (@cfDet gT G).
 
 Lemma cfDet_lin_char phi : cfDet phi \is a linear_char.
-Proof. by apply: rpred_prod => i _; apply: rpredX; apply: detRepr_lin_char. Qed.
+Proof. by rewrite unlock; apply: rpred_prod => i _; apply: rpredX; apply: detRepr_lin_char. Qed.
 
 Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
-move=> phi psi Nphi Npsi; rewrite /= -big_split; apply: eq_bigr => i _ /=.
+move=> phi psi Nphi Npsi; rewrite unlock /= -big_split; apply: eq_bigr => i _ /=.
 by rewrite -exprD cfdotDl truncCD ?nnegrE ?Cnat_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
-Proof. by rewrite /cfDet big1 // => i _; rewrite cfdot0l truncC0. Qed.
+Proof. by rewrite unlock big1 // => i _; rewrite cfdot0l truncC0. Qed.
 
 Lemma cfDetMn k :
   {in character, {morph cfDet : phi / phi *+ k >-> phi ^+ k}}.
@@ -2631,10 +2637,10 @@ move=> phi Nphi; elim: k => [|k IHk]; rewrite ?cfDet0 // mulrS exprS -{}IHk.
 by rewrite cfDetD ?rpredMn.
 Qed.
 
-Lemma cfDetRepr n rG : cfDet (cfRepr rG) = @detRepr n rG.
+Lemma cfDetRepr n rG : cfDet (cfRepr rG) = @detRepr _ _ n rG.
 Proof.
 transitivity (\prod_W detRepr (socle_repr W) ^+ standard_irr_coef rG W).
-  rewrite (reindex _ (socle_of_Iirr_bij _)) /cfDet /=.
+  rewrite (reindex _ (socle_of_Iirr_bij _)) unlock /=.
   apply: eq_bigr => i _; congr (_ ^+ _).
   rewrite (cfRepr_sim (mx_rsim_standard rG)) cfRepr_standard.
   rewrite cfdot_suml (bigD1 i) ?big1 //= => [|j i'j]; last first.
@@ -2710,7 +2716,7 @@ Lemma cfDetIsom aT rT (G : {group aT}) (R : {group rT})
                 (f : {morphism G >-> rT}) (isoGR : isom G R f) phi :
   cfDet (cfIsom isoGR phi) = cfIsom isoGR (cfDet phi).
 Proof.
-rewrite rmorph_prod /cfDet (reindex (isom_Iirr isoGR)); last first.
+rewrite unlock rmorph_prod (reindex (isom_Iirr isoGR)); last first.
   by exists (isom_Iirr (isom_sym isoGR)) => i; rewrite ?isom_IirrK ?isom_IirrKV.
 apply: eq_bigr => i; rewrite -!cfDetRepr !irrRepr isom_IirrE rmorphX cfIsom_iso.
 by rewrite /= ![in cfIsom _]unlock cfDetMorph ?cfRes_char ?cfDetRes ?irr_char.
