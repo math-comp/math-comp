@@ -1228,14 +1228,6 @@ Proof. by apply/group_setP; split=> [|x y _ _]; rewrite inE. Qed.
 
 Canonical setT_group phT := group (group_setT phT).
 
-(* These definitions come early so we can establish the Notation. *)
-Definition generated A := \bigcap_(G : groupT | A \subset G) G.
-Definition gcore A B := \bigcap_(x in B) A :^ x.
-Definition joing A B := generated (A :|: B).
-Definition commutator A B := generated (commg_set A B).
-Definition cycle x := generated [set x].
-Definition order x := #|cycle x|.
-
 End GroupSetMulProp.
 
 Arguments lcosetP {gT A x y}.
@@ -1244,10 +1236,6 @@ Arguments rcosetP {gT A x y}.
 Arguments rcosetsP {gT A B C}.
 Arguments group_setP {gT A}.
 Prenex Implicits group_set mulsgP set1gP.
-
-Arguments commutator _ _%g _%g.
-Arguments joing _ _%g _%g.
-Arguments generated _ _%g.
 
 Notation "{ 'group' gT }" := (group_of (Phant gT))
   (at level 0, format "{ 'group'  gT }") : type_scope.
@@ -1260,6 +1248,22 @@ Bind Scope Group_scope with group_of.
 Notation "1" := (one_group _) : Group_scope.
 Notation "[ 1 gT ]" := (1%G : {group gT}) : Group_scope.
 Notation "[ 'set' : gT ]" := (setT_group (Phant gT)) : Group_scope.
+
+(* These definitions come early so we can establish the Notation. *)
+HB.lock
+Definition generated (gT : finGroupType) (A : {set gT}) :=
+  \bigcap_(G : {group gT} | A \subset G) G.
+Canonical generated_unlockable := Unlockable generated.unlock.
+
+Definition gcore (gT : finGroupType) (A B : {set gT}) := \bigcap_(x in B) A :^ x.
+Definition joing (gT : finGroupType) (A B : {set gT}) := generated (A :|: B).
+Definition commutator (gT : finGroupType) (A B : {set gT}) := generated (commg_set A B).
+Definition cycle (gT : finGroupType) (x : gT) := generated [set x].
+Definition order (gT : finGroupType) (x : gT) := #|cycle x|.
+
+Arguments commutator _ _%g _%g.
+Arguments joing _ _%g _%g.
+Arguments generated _ _%g.
 
 (* Helper notation for defining new groups that need a bespoke finGroupType. *)
 (* The actual group for such a type (say, my_gT) will be the full group,     *)
@@ -1802,7 +1806,10 @@ Canonical bigcap_group := group group_set_bigcap.
 
 End Nary.
 
-Canonical generated_group A : {group _} := Eval hnf in [group of <<A>>].
+Lemma group_set_generated (A : {set gT}) : group_set <<A>>.
+Proof. by rewrite unlock group_set_bigcap. Qed.
+
+Canonical generated_group A := group (group_set_generated A).
 Canonical gcore_group G A : {group _} := Eval hnf in [group of gcore G A].
 Canonical commutator_group A B : {group _} := Eval hnf in [group of [~: A, B]].
 Canonical joing_group A B : {group _} := Eval hnf in [group of A <*> B].
@@ -2045,7 +2052,7 @@ Implicit Types A B C D : {set gT}.
 Implicit Types G H K : {group gT}.
 
 Lemma subset_gen A : A \subset <<A>>.
-Proof. exact/bigcapsP. Qed.
+Proof. rewrite [@generated]unlock; exact/bigcapsP. Qed.
 
 Lemma sub_gen A B : A \subset B -> A \subset <<B>>.
 Proof. by move/subset_trans=> -> //; apply: subset_gen. Qed.
@@ -2054,7 +2061,7 @@ Lemma mem_gen x A : x \in A -> x \in <<A>>.
 Proof. exact: subsetP (subset_gen A) x. Qed.
 
 Lemma generatedP x A : reflect (forall G, A \subset G -> x \in G) (x \in <<A>>).
-Proof. exact: bigcapP. Qed.
+Proof. rewrite [@generated]unlock; exact: bigcapP. Qed.
 
 Lemma gen_subG A G : (<<A>> \subset G) = (A \subset G).
 Proof.

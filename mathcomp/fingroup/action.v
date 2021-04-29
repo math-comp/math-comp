@@ -1611,7 +1611,7 @@ Qed.
 Canonical perm_action := Action aperm_is_action.
 
 Lemma porbitE a : porbit a = orbit perm_action <[a]>%g.
-Proof. by []. Qed.
+Proof. by rewrite unlock. Qed.
 
 Lemma perm_act1P a : reflect (forall x, aperm x a = x) (a == 1).
 Proof.
