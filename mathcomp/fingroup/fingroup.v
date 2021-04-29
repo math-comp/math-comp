@@ -1333,6 +1333,11 @@ Proof. by rewrite subG1; apply: eqP. Qed.
 Lemma proper1G : ([1] \proper G) = (G :!=: 1).
 Proof. by rewrite properEneq sub1G andbT eq_sym. Qed.
 
+Lemma in_one_group x : (x \in 1%G) = (x == 1).
+Proof. by rewrite -[x \in _]/(x \in [set 1]) !inE. Qed.
+
+Definition inE := (in_one_group, inE).
+
 Lemma trivgPn : reflect (exists2 x, x \in G & x != 1) (G :!=: 1).
 Proof.
 rewrite -subG1.
@@ -1874,7 +1879,7 @@ Proof.
 rewrite -[#|G|]sum1_card (partition_big_imset (rcoset H)) /=.
 rewrite mulnC -sum_nat_const; apply: eq_bigr => _ /rcosetsP[x Gx ->].
 rewrite -(card_rcoset _ x) -sum1_card; apply: eq_bigl => y.
-by rewrite rcosetE (sameP eqP rcoset_eqP) group_modr (sub1set, inE).
+by rewrite rcosetE (sameP eqP rcoset_eqP) group_modr ?sub1set // !inE.
 Qed.
 
 Lemma divgI G H : #|G| %/ #|G :&: H| = #|G : H|.
@@ -2720,7 +2725,7 @@ Qed.
 
 Lemma cent1P x y : reflect (commute x y) (x \in 'C[y]).
 Proof.
-rewrite inE conjg_set1 sub1set inE (sameP eqP conjg_fixP)commg1_sym.
+rewrite [x \in _]inE conjg_set1 sub1set !inE (sameP eqP conjg_fixP)commg1_sym.
 exact: commgP.
 Qed.
 
@@ -2735,7 +2740,7 @@ Proof. by rewrite !cent1E eq_sym. Qed.
 Canonical centraliser_group A : {group _} := Eval hnf in [group of 'C(A)].
 
 Lemma cent_set1 x : 'C([set x]) = 'C[x].
-Proof. by apply: big_pred1 => y /=; rewrite inE. Qed.
+Proof. by apply: big_pred1 => y /=; rewrite !inE. Qed.
 
 Lemma cent1J x y : 'C[x ^ y] = 'C[x] :^ y.
 Proof. by rewrite -conjg_set1 normJ. Qed.
@@ -2836,7 +2841,7 @@ Lemma cent_classP x G : reflect (x ^: G = [set x]) (x \in 'C(G)).
 Proof.
 apply: (iffP (centP _ _)) => [Cx | Cx1 y Gy].
   apply/eqP; rewrite eqEsubset sub1set class_refl andbT.
-  by apply/subsetP=> _ /imsetP[y Gy ->]; rewrite inE conjgE Cx ?mulKg.
+  by apply/subsetP=> _ /imsetP[y Gy ->]; rewrite !inE conjgE Cx ?mulKg.
 by apply/commgP/conjg_fixP/set1P; rewrite -Cx1; apply/imsetP; exists y.
 Qed.
 

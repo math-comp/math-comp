@@ -229,8 +229,6 @@ End BasicSetTheory.
 
 Arguments eqsVneq {T} A B, {T A B}.
 
-Definition inE := (in_set, inE).
-
 Arguments set0 {T}.
 Arguments eq_finset {T} [pA] pB eq_pAB.
 Hint Resolve in_setT : core.
@@ -240,12 +238,14 @@ Notation "[ 'set' : T ]" := (setTfor (Phant T))
 
 Notation setT := [set: _] (only parsing).
 
+HB.lock
+Definition set1 (T : finType) (a : T) := [set x | x == a].
+
 Section setOpsDefs.
 
 Variable T : finType.
 Implicit Types (a x : T) (A B D : {set T}) (P : {set {set T}}).
 
-Definition set1 a := [set x | x == a].
 Definition setU A B := [set x | (x \in A) || (x \in B)].
 Definition setI A B := [set x in A | x \in B].
 Definition setC A := [set x | x \notin A].
@@ -309,10 +309,10 @@ Lemma subset_leqif_cards A B : A \subset B -> (#|A| <= #|B| ?= iff (A == B)).
 Proof. by move=> sAB; rewrite eqEsubset sAB; apply: subset_leqif_card. Qed.
 
 Lemma in_set0 x : x \in set0 = false.
-Proof. by rewrite inE. Qed.
+Proof. by rewrite in_set. Qed.
 
 Lemma sub0set A : set0 \subset A.
-Proof. by apply/subsetP=> x; rewrite inE. Qed.
+Proof. by apply/subsetP=> x; rewrite in_set. Qed.
 
 Lemma subset0 A : (A \subset set0) = (A == set0).
 Proof. by rewrite eqEsubset sub0set andbT. Qed.
@@ -326,20 +326,20 @@ Proof. by rewrite -!proper0 => sAB /proper_sub_trans->. Qed.
 Lemma set_0Vmem A : (A = set0) + {x : T | x \in A}.
 Proof.
 case: (pickP (mem A)) => [x Ax | A0]; [by right; exists x | left].
-by apply/setP=> x; rewrite inE; apply: A0.
+by apply/setP=> x; rewrite in_set; apply: A0.
 Qed.
 
 Lemma set_enum A : [set x | x \in enum A] = A.
-Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
+Proof. by apply/setP => x; rewrite in_set mem_enum. Qed.
 
 Lemma enum_set0 : enum set0 = [::] :> seq T.
 Proof. by rewrite (eq_enum (in_set _)) enum0. Qed.
 
 Lemma subsetT A : A \subset setT.
-Proof. by apply/subsetP=> x; rewrite inE. Qed.
+Proof. by apply/subsetP=> x; rewrite in_set. Qed.
 
 Lemma subsetT_hint mA : subset mA (mem [set: T]).
-Proof. by rewrite unlock; apply/pred0P=> x; rewrite !inE. Qed.
+Proof. by rewrite unlock; apply/pred0P=> x; rewrite !inE in_set. Qed.
 Hint Resolve subsetT_hint : core.
 
 Lemma subTset A : (setT \subset A) = (A == setT).
@@ -349,22 +349,24 @@ Lemma properT A : (A \proper setT) = (A != setT).
 Proof. by rewrite properEneq subsetT andbT. Qed.
 
 Lemma set1P x a : reflect (x = a) (x \in [set a]).
-Proof. by rewrite inE; apply: eqP. Qed.
+Proof. by rewrite set1.unlock in_set; apply: eqP. Qed.
 
 Lemma enum_setT : enum [set: T] = Finite.enum T.
 Proof. by rewrite (eq_enum (in_set _)) enumT. Qed.
 
 Lemma in_set1 x a : (x \in [set a]) = (x == a).
-Proof. exact: in_set. Qed.
+Proof. by rewrite set1.unlock in_set. Qed.
+
+Definition inE := (in_set, in_set1, inE).
 
 Lemma set11 x : x \in [set x].
-Proof. by rewrite inE. Qed.
+Proof. by rewrite !inE. Qed.
 
 Lemma set1_inj : injective (@set1 T).
 Proof. by move=> a b eqsab; apply/set1P; rewrite -eqsab set11. Qed.
 
 Lemma enum_set1 a : enum [set a] = [:: a].
-Proof. by rewrite (eq_enum (in_set _)) enum1. Qed.
+Proof. by rewrite set1.unlock (eq_enum (in_set _)) enum1. Qed.
 
 Lemma setU1P x a B : reflect (x = a \/ x \in B) (x \in a |: B).
 Proof. by rewrite !inE; apply: predU1P. Qed.
@@ -696,7 +698,7 @@ by rewrite -powersetE sAB // inE.
 Qed.
 
 Lemma powerset0 : powerset set0 = [set set0] :> {set {set T}}.
-Proof. by apply/setP=> A; rewrite !inE subset0. Qed.
+Proof. by apply/setP=> A; rewrite set1.unlock !inE subset0. Qed.
 
 Lemma powersetT : powerset [set: T] = [set: {set T}].
 Proof. by apply/setP=> A; rewrite !inE subsetT. Qed.
@@ -731,7 +733,7 @@ Lemma cards0_eq A : #|A| = 0 -> A = set0.
 Proof. by move=> A_0; apply/setP=> x; rewrite inE (card0_eq A_0). Qed.
 
 Lemma cards1 x : #|[set x]| = 1.
-Proof. by rewrite cardsE card1. Qed.
+Proof. by rewrite set1.unlock cardsE card1. Qed.
 
 Lemma cardsUI A B : #|A :|: B| + #|A :&: B| = #|A| + #|B|.
 Proof. by rewrite !cardsE cardUI. Qed.
@@ -829,7 +831,7 @@ by case: posnP => // A0; rewrite (cards0_eq A0) sub0set.
 Qed.
 
 Lemma powerset1 x : powerset [set x] = [set set0; [set x]].
-Proof. by apply/setP=> A; rewrite !inE subset1 orbC. Qed.
+Proof. by apply/setP=> A; rewrite inE subset1 orbC set1.unlock !inE. Qed.
 
 Lemma setIidPl A B : reflect (A :&: B = A) (A \subset B).
 Proof.
@@ -1988,12 +1990,12 @@ case/and3P=> /eqP <- tiP notP0; apply/and3P; split; first exact/and3P.
   by apply/bigcupP; exists (pblock P x); rewrite ?pblock_mem //.
 apply/forall_inP=> B PB; have /set0Pn[x Bx]: B != set0 := memPn notP0 B PB.
 apply/cards1P; exists (odflt x [pick y in pblock P x]); apply/esym/eqP.
-rewrite eqEsubset sub1set inE -andbA; apply/andP; split.
+rewrite eqEsubset sub1set !inE -andbA; apply/andP; split.
   by apply/imset_f/bigcupP; exists B.
 rewrite (def_pblock tiP PB Bx); case def_y: _ / pickP => [y By | /(_ x)/idP//].
 rewrite By /=; apply/subsetP=> _ /setIP[/imsetP[z Pz ->]].
 case: {1}_ / pickP => [t zPt Bt | /(_ z)/idP[]]; last by rewrite mem_pblock.
-by rewrite -(same_pblock tiP zPt) (def_pblock tiP PB Bt) def_y set11.
+by rewrite -(same_pblock tiP zPt) (def_pblock tiP PB Bt) def_y inE.
 Qed.
 
 Section Transversals.
