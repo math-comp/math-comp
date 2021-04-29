@@ -8,6 +8,8 @@ From mathcomp Require Import ssralg finalg zmodp cyclic pgroup center gseries.
 From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
 From mathcomp Require Import extremal.
 
+Unset Kernel Term Sharing.
+
 (******************************************************************************)
 (* This file contains the fine structure thorems for extraspecial p-groups.   *)
 (* Together with the material in the maximal and extremal libraries, it       *)

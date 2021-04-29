@@ -8,6 +8,8 @@ From mathcomp Require Import quotient action commutator gproduct gfunctor.
 From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup center gseries.
 From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
 
+Unset Kernel Term Sharing.
+
 (******************************************************************************)
 (*    This file contains the definition and properties of extremal p-groups;  *)
 (* it covers and is mostly based on the beginning of Aschbacher, section 23,  *)

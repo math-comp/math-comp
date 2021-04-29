@@ -4,7 +4,6 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
 From mathcomp Require Import ssrint.
-Set Kernel Term Sharing.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
