@@ -291,26 +291,31 @@ exists (perm inj_p); rewrite -[Is]/(tval (Tuple szIs)); congr (tval _).
 by apply: eq_from_tnth => i; rewrite tnth_map tnth_mktuple permE (tnth_nth x0).
 Qed.
 
+(* Note that porbit s x is the orbit of x by <[s]> under the action aperm. *)
+(* Hence, the porbit lemmas below are special cases of more general lemmas *)
+(* on orbits that will be stated in action.v.                              *)
+(*   Defining porbit directly here avoids a dependency of matrix.v on      *)
+(* action.v and hence morphism.v.                                          *)
+Definition aperm (T : finType) x (s : {perm T}) := s x.
+
+HB.lock
+Definition porbit (T : finType) (s : {perm T}) x := aperm x @: <[s]>.
+Canonical porbit_unlockable := Unlockable porbit.unlock.
+
+Definition porbits (T : finType) (s : {perm T}) := porbit s @: T.
+
 Section PermutationParity.
 
 Variable T : finType.
 
 Implicit Types (s t u v : {perm T}) (x y z a b : T).
 
-(* Note that porbit s x is the orbit of x by <[s]> under the action aperm. *)
-(* Hence, the porbit lemmas below are special cases of more general lemmas *)
-(* on orbits that will be stated in action.v.                              *)
-(*   Defining porbit directly here avoids a dependency of matrix.v on      *)
-(* action.v and hence morphism.v.                                          *)
-Definition aperm x s := s x.
-Definition porbit s x := aperm x @: <[s]>.
-Definition porbits s := porbit s @: T.
 Definition odd_perm (s : perm_type T) := odd #|T| (+) odd #|porbits s|.
 
 Lemma apermE x s : aperm x s = s x. Proof. by []. Qed.
 
 Lemma mem_porbit s i x : (s ^+ i) x \in porbit s x.
-Proof. by rewrite (imset_f (aperm x)) ?mem_cycle. Qed.
+Proof. by rewrite [@porbit]unlock (imset_f (aperm x)) ?mem_cycle. Qed.
 
 Lemma porbit_id s x : x \in porbit s x.
 Proof. by rewrite -{1}[x]perm1 (mem_porbit s 0). Qed.
@@ -324,7 +329,7 @@ Lemma uniq_traject_porbit s x : uniq (traject s x #|porbit s x|).
 Proof.
 case def_n: #|_| => // [n]; rewrite looping_uniq.
 apply: contraL (card_size (traject s x n)) => /loopingP t_sx.
-rewrite -ltnNge size_traject -def_n ?subset_leq_card //.
+rewrite -ltnNge size_traject -def_n ?subset_leq_card // porbit.unlock.
 by apply/subsetP=> _ /imsetP[_ /cycleP[i ->] ->]; rewrite /aperm permX t_sx.
 Qed.
 
@@ -347,7 +352,8 @@ Qed.
 
 Lemma eq_porbit_mem s x y : (porbit s x == porbit s y) = (x \in porbit s y).
 Proof.
-apply/eqP/idP=> [<- | /imsetP[si s_si ->]]; first exact: porbit_id.
+apply/eqP/idP; first by move<-; exact: porbit_id.
+rewrite porbit.unlock => /imsetP[si s_si ->].
 apply/setP => z; apply/imsetP/imsetP=> [] [sj s_sj ->].
   by exists (si * sj); rewrite ?groupM /aperm ?permM.
 exists (si^-1 * sj); first by rewrite groupM ?groupV.
@@ -362,7 +368,9 @@ Proof. by apply/eqP; rewrite eq_porbit_mem mem_porbit. Qed.
 
 Lemma porbitPmin s x y :
   y \in porbit s x -> exists2 i, i < #[s] & y = (s ^+ i) x.
-Proof. by move=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i. Qed.
+Proof.
+by rewrite porbit.unlock=> /imsetP [z /cyclePmin[ i Hi ->{z}] ->{y}]; exists i.
+Qed.
 
 Lemma porbitP s x y :
   reflect (exists i, y = (s ^+ i) x) (y \in porbit s x).
@@ -370,6 +378,9 @@ Proof.
 apply (iffP idP) => [/porbitPmin [i _ ->]| [i ->]]; last exact: mem_porbit.
 by exists i.
 Qed.
+
+Lemma porbit_setP s t x : porbit s x =i porbit t x <-> porbit s x = porbit t x.
+Proof. by rewrite porbit.unlock; exact: setP. Qed.
 
 Lemma porbits_mul_tperm s x y : let t := tperm x y in
   #|porbits (t * s)| + (x \notin porbit s y).*2 = #|porbits s| + (x != y).
@@ -413,8 +424,8 @@ rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
   suffices ts_z: porbit (t x y s) z = porbit s z.
     by rewrite -ts_z !eq_porbit_mem {1 2}ts_z sxz syz imset_f ?inE.
   suffices exp_id n: ((t x y s) ^+ n) z = (s ^+ n) z.
-    apply/setP=> u; apply/idP/idP=> /imsetP[_ /cycleP[i ->] ->].
-      by rewrite /aperm exp_id mem_porbit.
+    apply/porbit_setP => u; apply/idP/idP=> /porbitP[i ->].
+      by rewrite /aperm exp_id mem_porbit. 
     by rewrite /aperm -exp_id mem_porbit.
   elim: n => // n IHn; rewrite !expgSr !permM {}IHn tpermD //.
     by apply: contraNneq sxz => ->; apply: mem_porbit.
@@ -436,8 +447,8 @@ Qed.
 
 Lemma odd_perm1 : odd_perm 1 = false.
 Proof.
-rewrite /odd_perm card_imset ?addbb // => x y; move/eqP.
-by rewrite eq_porbit_mem /porbit cycle1 imset_set1 /aperm perm1; move/set1P.
+rewrite /odd_perm card_imset ?addbb // => x y; move/eqP; rewrite eq_porbit_mem.
+by rewrite porbit.unlock cycle1 imset_set1 /aperm perm1 inE=> /eqP.
 Qed.
 
 Lemma odd_mul_tperm x y s : odd_perm (tperm x y * s) = (x != y) (+) odd_perm s.
