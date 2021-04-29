@@ -700,10 +700,9 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
     (* FIXME : SplittingField structure has to be done by hand *)
-    pose Qt : SplittingField.type_ [fieldType of rat] :=
-      (@galois.SplittingField.Pack _ _ 
-        (SplittingField.Class 
-                (FieldExt_IsSplittingField.Build _ _ gal_t))).
+    pose QtMixin := FieldExt_IsSplittingField.Build _ _ gal_t.
+    pose Qt : SplittingField.type rat :=
+      (SplittingField.Pack (SplittingField.Class QtMixin)).
   have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
   pose Cn : {subfield Qt} := <<Rn; i_t>>%AS.
@@ -731,13 +730,13 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have [sRCn sCnRz]: (Rn <= Cn)%VS /\ (Cn <= Rz)%VS by rewrite !subv_adjoin.
   have sRnRz := subv_trans sRCn sCnRz.
   have{gal_z} galRz: galois Rn Rz.
-    apply/and3P; split=> //; first by apply: sepQ 
-                             (* FIX ME This is not solved by //*).
+    apply/and3P; split=> //; first by apply: sepQ.
     apply/splitting_normalField=> //.
     (* FIX ME : again calling the Build explicitely *)
-    pose u : SplittingFieldType [fieldType of rat] (Q z) 
-               (FieldExt_IsSplittingField.Build _ _ gal_z)
-               := inQ z z.
+    pose QzMixin := FieldExt_IsSplittingField.Build _ _ gal_z.
+    pose Qz : SplittingField.type rat :=
+      (SplittingField.Pack (SplittingField.Class QzMixin)).
+    pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
       by rewrite coef_map linearZZ rmorph1 rpredZ ?rpred1.
