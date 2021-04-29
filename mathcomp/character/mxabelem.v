@@ -8,8 +8,6 @@ From mathcomp Require Import zmodp commutator cyclic center pgroup gseries.
 From mathcomp Require Import nilpotent sylow maximal abelian matrix.
 From mathcomp Require Import mxalgebra mxrepresentation.
 
-Set Kernel Term Sharing.
-
 (******************************************************************************)
 (*   This file completes the theory developed in mxrepresentation.v with the  *)
 (* construction and properties of linear representations over finite fields,  *)
