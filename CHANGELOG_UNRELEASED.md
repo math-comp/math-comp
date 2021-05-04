@@ -72,6 +72,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `le_Rank`, `lt_sig`, `lt_rank`, `lt_Rank`, `eq_Rank`, `rankEsum`,
     `RankEsum`, `rect`, and `eqRank`.
   + lemmas `joins_le` and `meets_ge`.
+  + new lemmas `le_sorted_ltn_nth`, `le_sorted_leq_nth`,
+    `lt_sorted_leq_nth`, `lt_sorted_ltn_nth`, `filter_lt_nth`,
+    `count_lt_nth`, `filter_le_nth`, `count_le_nth`,
+    `count_lt_le_mem`, `sorted_filter_lt`, `sorted_filter_le`,
+    `nth_count_le`, `nth_count_lt`, `count_le_gt`,
+    `count_lt_ge`, `sorted_filter_gt`, `sorted_filter_ge`,
+    `nth_count_ge`, `nth_count_lt` and `nth_count_eq`
 
 - in `matrix.v`, seven new definitions:
   + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations
