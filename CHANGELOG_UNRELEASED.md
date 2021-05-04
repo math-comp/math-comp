@@ -134,6 +134,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `rat.v`
   + new lemmas `minr_rat`, `maxr_rat`
 
+- In `intdiv.v`
+  + new definition `lcmz`
+  + new lemmas `dvdz_lcmr`, `dvdz_lcml`, `dvdz_lcm`, `lcmzC`, `lcm0z`,
+    `lcmz0`, `lcmz_ge0`, `lcmz_neq0`
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,

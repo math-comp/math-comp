@@ -21,6 +21,7 @@ From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
 (*                 m and n are (resp. compare, don't compare) equal mod d.    *)
 (*     gcdz m n == the (non-negative) greatest common divisor of m and n,     *)
 (*                 with gcdz 0 0 = 0.                                         *)
+(*     lcmz m n == the (non-negative) least common multiple of m and n,       *)
 (* coprimez m n <=> m and n are coprime.                                      *)
 (*    egcdz m n == the Bezout coefficients of the gcd of m and n: a pair      *)
 (*                 (u, v) of coprime integers such that u*m + v*n = gcdz m n. *)
@@ -58,6 +59,8 @@ Definition modz (m d : int) : int := m - divz m d * d.
 Definition dvdz d m := (`|d| %| `|m|)%N.
 
 Definition gcdz m n := (gcdn `|m| `|n|)%:Z.
+
+Definition lcmz m n := (lcmn `|m| `|n|)%:Z.
 
 Definition egcdz m n : int * int :=
   if m == 0 then (0, (-1) ^+ (n < 0)%R) else
@@ -543,7 +546,35 @@ Proof. by rewrite -PoszM muln_gcdl -!abszM. Qed.
 Lemma mulz_divCA_gcd n m : n * (m %/ gcdz n m)%Z  = m * (n %/ gcdz n m)%Z.
 Proof. by rewrite mulz_divCA ?dvdz_gcdl ?dvdz_gcdr. Qed.
 
-(* Not including lcm theory, for now. *)
+(* Least common multiple *)
+
+Lemma dvdz_lcmr m n : (n %| lcmz m n)%Z.
+Proof. exact: dvdn_lcmr. Qed.
+
+Lemma dvdz_lcml m n : (m %| lcmz m n)%Z.
+Proof. exact: dvdn_lcml. Qed.
+
+Lemma dvdz_lcm d1 d2 m : ((lcmn d1 d2 %| m) = (d1 %| m) && (d2 %| m))%Z.
+Proof. exact: dvdn_lcm. Qed.
+
+Lemma lcmzC : commutative lcmz.
+Proof. by move=> m n; rewrite /lcmz lcmnC. Qed.
+
+Lemma lcm0z : left_zero 0 lcmz.
+Proof. by move=> x; rewrite /lcmz absz0 lcm0n. Qed.
+
+Lemma lcmz0 : right_zero 0 lcmz.
+Proof. by move=> x; rewrite /lcmz absz0 lcmn0. Qed.
+
+Lemma lcmz_ge0 m n : 0 <= lcmz m n.
+Proof. by []. Qed.
+
+Lemma lcmz_neq0 m n : (lcmz m n != 0) = (m != 0) && (n != 0).
+Proof.
+have [->|m_neq0] := eqVneq m 0; first by rewrite lcm0z.
+have [->|n_neq0] := eqVneq n 0; first by rewrite lcmz0.
+by rewrite gt_eqF// [0 < _]lcmn_gt0 !absz_gt0 m_neq0 n_neq0.
+Qed.
 
 (* Coprime factors *)
 
