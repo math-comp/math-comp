@@ -221,6 +221,11 @@ Qed.
 Lemma lez_divRL m n d : d > 0 -> (m <= (n %/ d)%Z) = (m * d <= n).
 Proof. by move=> d_gt0; rewrite !leNgt ltz_divLR. Qed.
 
+Lemma lez_pdiv2r d : 0 <= d -> {homo divz^~ d : m n / m <= n}.
+Proof.
+by case: d => [[|d]|]// _ [] m [] n //; rewrite /divz !mul1r; apply: leq_div2r.
+Qed.
+
 Lemma divz_ge0 m d : d > 0 -> ((m %/ d)%Z >= 0) = (m >= 0).
 Proof. by case: d m => // d [] n d_gt0; rewrite (divz_nat, divNz_nat). Qed.
 

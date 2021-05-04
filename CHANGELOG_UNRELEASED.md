@@ -138,6 +138,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new definition `lcmz`
   + new lemmas `dvdz_lcmr`, `dvdz_lcml`, `dvdz_lcm`, `lcmzC`, `lcm0z`,
     `lcmz0`, `lcmz_ge0`, `lcmz_neq0`
+  + new lemma `lez_pdiv2r`
 
 ### Changed
 
