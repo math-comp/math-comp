@@ -786,6 +786,12 @@ Proof.
 by rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm ?ler0q.
 Qed.
 
+Lemma minr_rat : {morph ratr F : x y / Num.min x y}.
+Proof. by move=> x y; rewrite !minEle ler_rat; case: leP. Qed.
+
+Lemma maxr_rat : {morph ratr F : x y / Num.max x y}.
+Proof. by move=> x y; rewrite !maxEle ler_rat; case: leP. Qed.
+
 End InPrealField.
 
 Arguments ratr {R}.

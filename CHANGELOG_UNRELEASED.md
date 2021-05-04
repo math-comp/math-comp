@@ -131,6 +131,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `ssralg.v`
   + new lemma `fmorph_eq`
 
+- In `rat.v`
+  + new lemmas `minr_rat`, `maxr_rat`
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
