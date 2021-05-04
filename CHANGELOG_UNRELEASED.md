@@ -128,6 +128,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `bigop.v`:
   + Lemmas `big_nat_widenl`, `big_geq_mkord`
 
+- In `ssralg.v`
+  + new lemma `fmorph_eq`
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
