@@ -27,7 +27,7 @@ make it readable.
   ```
   rewrite conditional_rule ?simplify_side_condition // next_rule.
   ```
-- Do not use `focus`, use the relevant [indentation](#indentation-in-proof-scripts),
+- Do not use `Focus` or `{}`, use the relevant [indentation](#indentation-in-proof-scripts),
   along with terminators like `by` or `exact`.
 
 ### Spaces
