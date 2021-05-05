@@ -96,7 +96,7 @@ This particular example can be problematic if matrix.v is imported because then,
   + Matrices should be named `A`, `B`, ..., `M`, `N`, ...
   + Polymorphic variables should be named `x`, ...
 - Variables/hypohteses that do not survive the line can be introduced using `?`.
-- Variables/hypohteses with a very short scope (~ 2-5 lines) can have a short name.
+- Variables/hypohteses with a very short scope (~ 1-5 lines) can have a short name.
 - Variables/hypohteses with a longer scope (> 5 lines) must have a meaningful name.
 
 ### Naming conventions for lemmas (non exhaustive)
