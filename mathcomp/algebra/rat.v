@@ -746,10 +746,11 @@ Proof. by rewrite (_ : 0 = ratr F 0) ?ltr_rat ?rmorph0. Qed.
 Lemma ratr_sg x : ratr F (sgr x) = sgr (ratr F x).
 Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn rmorph_sign. Qed.
 
-(* FIX ME : this takes time *)
 Lemma ratr_norm x : ratr F `|x| = `|ratr F x|.
 Proof.
-by rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm ?ler0q.
+(* TODO: remove pattern [in RHS] below after fixing #698 *)
+rewrite {2}[x]numEsign [in RHS]rmorphMsign.
+by rewrite normrMsign [`|ratr F _|]ger0_norm ?ler0q.
 Qed.
 
 End InPrealField.
