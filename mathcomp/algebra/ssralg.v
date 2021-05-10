@@ -2720,8 +2720,9 @@ Notation "[ 'unitRingType' 'of' T ]" := (UnitRing.clone T _)
 End UnitRingExports.
 HB.export UnitRingExports.
 
-Definition unit {R : unitRingType} := Eval unfold unit_subdef in
-  [qualify a u : R | unit_subdef u].
+Definition unit {R : unitRingType} :=
+  Eval cbv [ unit_subdef Ring_HasMulInverse.unit_subdef ] in
+    [qualify a u : R | unit_subdef u].
 Fact unit_key R : pred_key (@unit R). Proof. by []. Qed.
 Canonical unit_keyed R := KeyedQualifier (@unit_key R).
 
