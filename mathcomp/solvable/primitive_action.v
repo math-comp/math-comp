@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+(*From HB Require Import structures*) (*HB is not needed here*)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
 From mathcomp Require Import div seq fintype tuple finset.
 From mathcomp Require Import fingroup action gseries.

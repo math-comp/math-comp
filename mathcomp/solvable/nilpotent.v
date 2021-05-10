@@ -105,7 +105,7 @@ Lemma nil_comm_properr G A H :
     nilpotent G -> H \subset G -> H :!=: 1 -> A \subset 'N_G(H) ->
   [~: A, H] \proper H.
 Proof. by rewrite commGC; apply: nil_comm_properl. Qed.
- 
+
 Lemma centrals_nil (s : seq {group gT}) G :
   G.-central.-series 1%G s -> last 1%G s = G -> nilpotent G.
 Proof.
@@ -408,7 +408,12 @@ Qed.
 
 Lemma ucnSnR n G : 'Z_n.+1(G) = [set x in G | [~: [set x], G] \subset 'Z_n(G)].
 Proof.
-apply/setP=> x; rewrite inE -(setIidPr (ucn_sub n.+1 G)) inE ucnSn.
+(* apply/setP=> x; rewrite inE -(setIidPr (ucn_sub n.+1 G)) inE ucnSn. *)
+(* FIXME: before, we got a `rewrite inE` right after the apply/setP=> x.  *
+ * However, this rewrite unfolds termes to strange internal HB names.     *
+ * We fixed the issue by applying the inE more carefully, but the problem *
+ * needs to be investigated.                                              *)
+apply/setP=> x; rewrite -(setIidPr (ucn_sub n.+1 G)) [LHS]inE [RHS]inE ucnSn.
 case Gx: (x \in G) => //=; have nZG := ucn_norm n G.
 rewrite -sub1set -sub_quotient_pre -?quotient_cents2 ?sub1set ?(subsetP nZG) //.
 by rewrite subsetI quotientS ?sub1set.
@@ -568,7 +573,7 @@ Proof. by case/isogP=> f injf <-; rewrite nil_class_injm. Qed.
 
 Lemma quotient_nil G H : nilpotent G -> nilpotent (G / H).
 Proof. exact: morphim_nil. Qed.
-  
+
 Lemma quotient_center_nil G : nilpotent (G / 'Z(G)) = nilpotent G.
 Proof.
 rewrite -ucn1; apply/idP/idP; last exact: quotient_nil.

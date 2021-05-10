@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype.
 From mathcomp Require Import bigop finset fingroup morphism automorphism.
 From mathcomp Require Import quotient gproduct.
@@ -363,9 +364,13 @@ Proof. by case F. Qed.
 Lemma gFunctorI gT (G H : {group gT}) :
   F gT G :&: H = F gT G :&: F gT (G :&: H).
 Proof.
-rewrite -{1}(setIidPr (gFsub F G)) [G :&: _]setIC -setIA.
+rewrite -{1}(setIidPr (gFsub F G)) setIAC setIC.
 rewrite -(setIidPr (gFhereditary (subsetIl G H))).
 by rewrite setIC -setIA (setIidPr (gFsub F (G :&: H))).
+(* FIXME ? previous proof below *)
+(* rewrite -{1}(setIidPr (gFsub F G)) [G :&: _]setIC -setIA.
+rewrite -(setIidPr (gFhereditary (subsetIl G H))).
+by rewrite setIC -setIA (setIidPr (gFsub F (G :&: H))). *)
 Qed.
 
 Lemma pmorphimF : GFunctor.pcontinuous F.

@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
 From mathcomp Require Import generic_quotient.
@@ -29,14 +30,10 @@ Inductive ratio := mkRatio { frac :> R * R; _ : frac.2 != 0 }.
 Definition ratio_of of phant R := ratio.
 Local Notation "{ 'ratio' T }" := (ratio_of (Phant T)).
 
-Canonical ratio_subType := Eval hnf in [subType for frac].
-Canonical ratio_of_subType := Eval hnf in [subType of {ratio R}].
-Definition ratio_EqMixin := [eqMixin of ratio by <:].
-Canonical ratio_eqType := EqType ratio ratio_EqMixin.
-Canonical ratio_of_eqType := Eval hnf in [eqType of {ratio R}].
-Definition ratio_ChoiceMixin := [choiceMixin of ratio by <:].
-Canonical ratio_choiceType := ChoiceType ratio ratio_ChoiceMixin.
-Canonical ratio_of_choiceType := Eval hnf in [choiceType of {ratio R}].
+HB.instance Definition _ := [IsSUB for frac].
+HB.instance Definition _ := [Choice of ratio by <:].
+HB.instance Definition _ := SUB.on {ratio R}.
+HB.instance Definition _ := Choice.on {ratio R}.
 
 Lemma denom_ratioP : forall f : ratio, f.2 != 0. Proof. by case. Qed.
 
@@ -115,15 +112,10 @@ Definition type_of of phant R := type.
 Notation "{ 'fraction' T }" := (type_of (Phant T)).
 
 (* we recover some structure for the quotient *)
-Canonical frac_quotType := [quotType of type].
-Canonical frac_eqType := [eqType of type].
-Canonical frac_choiceType := [choiceType of type].
-Canonical frac_eqQuotType := [eqQuotType equivf of type].
-
-Canonical frac_of_quotType := [quotType of {fraction R}].
-Canonical frac_of_eqType := [eqType of {fraction R}].
-Canonical frac_of_choiceType := [choiceType of {fraction R}].
-Canonical frac_of_eqQuotType := [eqQuotType equivf of {fraction R}].
+HB.instance Definition _ : EqQuotient _ equivf type := EqQuotient.on type.
+HB.instance Definition _ := Choice.on type.
+HB.instance Definition _ := EqQuotient.on {fraction R}.
+HB.instance Definition _ := Choice.on {fraction R}.
 
 (* we explain what was the equivalence on the quotient *)
 Lemma equivf_def (x y : ratio R) : x == y %[mod type]
@@ -223,8 +215,7 @@ by rewrite mulr1 mulr0 mulNr addNr.
 Qed.
 
 (* fracions form an abelian group *)
-Definition frac_zmodMixin :=  ZmodMixin addA addC add0_l addN_l.
-Canonical frac_zmodType := Eval hnf in ZmodType type frac_zmodMixin.
+HB.instance Definition _ := ZmodMixin type addA addC add0_l addN_l.
 
 Lemma mulA : associative mul.
 Proof.
@@ -255,10 +246,9 @@ Qed.
 Lemma nonzero1 : 1%:F != 0%:F :> type.
 Proof. by rewrite piE equivfE !numden_Ratio ?mul1r ?oner_eq0. Qed.
 
-(* fracions form a commutative ring *)
-Definition frac_comRingMixin := ComRingMixin mulA mulC mul1_l mul_addl nonzero1.
-Canonical frac_ringType := Eval hnf in RingType type frac_comRingMixin.
-Canonical frac_comRingType := Eval hnf in ComRingType type mulC.
+(* fractions form a commutative ring *)
+HB.instance Definition _ :=
+  GRing.Zmodule_IsComRing.Build type mulA mulC mul1_l mul_addl nonzero1.
 
 Lemma mulV_l : forall a, a != 0%:F -> mul (inv a) a = 1%:F.
 Proof.
@@ -276,54 +266,18 @@ by congr \pi; apply: val_inj; rewrite /= hu.
 Qed.
 
 (* fractions form a ring with explicit unit *)
-Definition RatFieldUnitMixin := FieldUnitMixin mulV_l inv0.
-Canonical frac_unitRingType := Eval hnf in UnitRingType type RatFieldUnitMixin.
-Canonical frac_comUnitRingType := [comUnitRingType of type].
-
-Lemma field_axiom : GRing.Field.mixin_of frac_unitRingType.
-Proof. exact. Qed.
-
 (* fractions form a field *)
-Definition RatFieldIdomainMixin := (FieldIdomainMixin field_axiom).
-Canonical frac_idomainType :=
-  Eval hnf in IdomainType type (FieldIdomainMixin field_axiom).
-Canonical frac_fieldType := FieldType type field_axiom.
+HB.instance Definition _ := GRing.ComRing_IsField.Build type mulV_l inv0.
 
 End FracField.
 End FracField.
+HB.export FracField.
 
 Notation "{ 'fraction' T }" := (FracField.type_of (Phant T)).
 Notation equivf := (@FracField.equivf _).
 Hint Resolve denom_ratioP : core.
 
-Section Canonicals.
-
-Variable R : idomainType.
-
-(* reexporting the structures *)
-Canonical FracField.frac_quotType.
-Canonical FracField.frac_eqType.
-Canonical FracField.frac_choiceType.
-Canonical FracField.frac_zmodType.
-Canonical FracField.frac_ringType.
-Canonical FracField.frac_comRingType.
-Canonical FracField.frac_unitRingType.
-Canonical FracField.frac_comUnitRingType.
-Canonical FracField.frac_idomainType.
-Canonical FracField.frac_fieldType.
-Canonical FracField.tofrac_pi_morph.
-Canonical frac_of_quotType := Eval hnf in [quotType of {fraction R}].
-Canonical frac_of_eqType := Eval hnf  in [eqType of {fraction R}].
-Canonical frac_of_choiceType := Eval hnf in [choiceType of {fraction R}].
-Canonical frac_of_zmodType := Eval hnf in [zmodType of {fraction R}].
-Canonical frac_of_ringType := Eval hnf in [ringType of {fraction R}].
-Canonical frac_of_comRingType := Eval hnf in [comRingType of {fraction R}].
-Canonical frac_of_unitRingType := Eval hnf in [unitRingType of {fraction R}].
-Canonical frac_of_comUnitRingType := Eval hnf in [comUnitRingType of {fraction R}].
-Canonical frac_of_idomainType := Eval hnf in [idomainType of {fraction R}].
-Canonical frac_of_fieldType := Eval hnf in [fieldType of {fraction R}].
-
-End Canonicals.
+HB.instance Definition _ (R : idomainType) := GRing.Field.on {fraction R}.
 
 Section FracFieldTheory.
 
@@ -375,3 +329,4 @@ Qed.
 Lemma tofrac_eq0 (p : R): (p%:F == 0) = (p == 0).
 Proof. by rewrite tofrac_eq. Qed.
 End FracFieldTheory.
+

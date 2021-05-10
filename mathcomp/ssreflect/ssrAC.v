@@ -1,3 +1,4 @@
+From HB Require Import structures.
 Require Import BinPos BinNat.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq bigop.
 Set Implicit Arguments.
@@ -68,8 +69,8 @@ Notation vmrefl := (ltac: (vm_compute; reflexivity)) (only parsing).
 
 Module AC.
 
-Canonical positive_eqType := EqType positive
-   (EqMixin (fun _ _ => equivP idP (Pos.eqb_eq _ _))).
+HB.instance Definition _ := HasDecEq.Build positive
+  (fun _ _ => equivP idP (Pos.eqb_eq _ _)).
 (* Should be replaced by (EqMixin Pos.eqb_spec) for coq >= 8.7 *)
 
 Inductive syntax := Leaf of positive | Op of syntax & syntax.

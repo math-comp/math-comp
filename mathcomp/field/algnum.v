@@ -87,9 +87,6 @@ have [n [[pz Dpz] [px Dpx]]] := char0_PET nz_rz rz0 nz_rx rx0 char0_Q.
 by exists (n, [:: px; - pz]); rewrite /= !raddfN hornerN -[z]opprK Dpz Dpx.
 Qed.
 
-Canonical subfx_unitAlgType (F L : fieldType) iota (z : L) p :=
-  Eval hnf in [unitAlgType F of subFExtend iota z p].
-
 Lemma num_field_exists (s : seq algC) :
   {Qs : fieldExtType rat & {QsC : {rmorphism Qs -> algC}
    & {s1 : seq Qs | map QsC s1 = s & <<1 & s1>>%VS = fullv}}}.
@@ -368,7 +365,7 @@ have Sinj_poly Qr (QrC : numF_inj Qr) p:
   map_poly QrC (map_poly (in_alg Qr) p) = pQtoC p.
 - rewrite -map_poly_comp; apply: eq_map_poly => a.
   by rewrite /= SinjZ rmorph1 mulr1.
-have ext1 mu0 x: {mu1 | exists y, x = Sinj mu1 y
+have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   & exists2 in01 : {lrmorphism _}, Sinj mu0 =1 Sinj mu1 \o in01
   & {morph in01: y / Saut mu0 y >-> Saut mu1 y}}.
 - pose b0 := vbasis {:Sdom mu0}.
