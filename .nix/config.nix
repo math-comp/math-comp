@@ -5,7 +5,7 @@
   coqproject = "mathcomp/_CoqProject";
   default-bundle = "coq-8.13";
   bundles = let common = {
-    hierarchy-builder.override.version = "#171";
+    hierarchy-builder.override.version = "master";
     mathcomp.job = false;
     mathcomp-single.job = true;
   }; in {
