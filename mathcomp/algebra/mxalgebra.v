@@ -2499,11 +2499,7 @@ Lemma LUP_card_GL n : n > 0 ->
   #|'GL_n[F]| = (#|F| ^ 'C(n, 2) * \prod_(1 <= i < n.+1) (#|F| ^ i - 1))%N.
 Proof.
 case: n => // n' _; set n := n'.+1; set p := #|F|.
-(* FIXME: extra unfold: Gring.unit_subdef had to be unfolded *)
-(*rewrite cardsT /= card_sub /GRing.unit /= big_add1 /= -triangular_sum -/n /=.*)
-rewrite cardsT /= card_sub /GRing.unit /= big_add1 /= -triangular_sum
-  /GRing.unit_subdef /= -/n /=.
-(* /FIXME *)
+rewrite cardsT /= card_sub /GRing.unit /= big_add1 /= -triangular_sum -/n /=.
 elim: {n'}n => [|n IHn].
   rewrite !big_geq // mul1n (@eq_card _ _ predT) ?card_matrix //= => M.
   by rewrite {1}[M]flatmx0 -(flatmx0 1%:M) unitmx1.
