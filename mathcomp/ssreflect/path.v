@@ -497,7 +497,7 @@ Lemma cycle_all2rel_in (T : Type) (P : {pred T}) (leT : rel T) :
   {in P & &, transitive leT} ->
   forall s, all P s -> cycle leT s = all2rel leT s.
 Proof.
-move=> /in3_sig leT_tr s /all_sigP [{}s ->].
+move=> /in3_sig leT_tr _ /all_sigP [s ->].
 by rewrite cycle_map allrel_mapl allrel_mapr; apply: cycle_all2rel.
 Qed.
 
@@ -1062,7 +1062,7 @@ Lemma sorted_sort_in T (P : {pred T}) (leT : rel T) :
   {in P & &, transitive leT} ->
   forall s : seq T, all P s -> sorted leT s -> sort leT s = s.
 Proof.
-move=> /in3_sig ? s /all_sigP[? ->].
+move=> /in3_sig ? _ /all_sigP[s ->].
 by rewrite sort_map sorted_map => /sorted_sort->.
 Qed.
 
@@ -1224,22 +1224,6 @@ move=> /in2_sig leT_total /in3_sig leT_tr _ /all_sigP[s ->].
 by rewrite sort_map !sorted_map; apply: sort_stable.
 Qed.
 
-Lemma sort_sorted T (leT : rel T) :
-  total leT -> forall s, sorted leT (sort leT s).
-Proof.
-move=> leT_total s; apply/sub_sorted/sort_stable => //= [? ? /andP[] //|].
-by case: s => // x s; elim: s x => /=.
-Qed.
-
-Lemma sort_sorted_in T (P : {pred T}) (leT : rel T) :
-  {in P &, total leT} -> forall s : seq T, all P s -> sorted leT (sort leT s).
-Proof.
-by move=> /in2_sig ? s /all_sigP[? ->]; rewrite sort_map sorted_map sort_sorted.
-Qed.
-
-Arguments sort_sorted {T leT} leT_total s.
-Arguments sort_sorted_in {T P leT} leT_total {s}.
-
 Lemma filter_sort T (leT : rel T) :
   total leT -> transitive leT ->
   forall p s, filter p (sort leT s) = sort leT (filter p s).
@@ -1368,6 +1352,22 @@ Qed.
 
 End Stability_subseq_in.
 
+Lemma sort_sorted T (leT : rel T) :
+  total leT -> forall s, sorted leT (sort leT s).
+Proof.
+move=> leT_total s; apply/sub_sorted/sort_stable => //= [? ? /andP[] //|].
+by case: s => // x s; elim: s x => /=.
+Qed.
+
+Lemma sort_sorted_in T (P : {pred T}) (leT : rel T) :
+  {in P &, total leT} -> forall s : seq T, all P s -> sorted leT (sort leT s).
+Proof.
+by move=> /in2_sig ? _ /all_sigP[s ->]; rewrite sort_map sorted_map sort_sorted.
+Qed.
+
+Arguments sort_sorted {T leT} leT_total s.
+Arguments sort_sorted_in {T P leT} leT_total {s}.
+
 Lemma perm_sortP (T : eqType) (leT : rel T) :
   total leT -> transitive leT -> antisymmetric leT ->
   forall s1 s2, reflect (sort leT s1 = sort leT s2) (perm_eq s1 s2).
@@ -1388,6 +1388,36 @@ apply: (iffP idP) => s1s2; last by rewrite -(perm_sort leT) s1s2 perm_sort.
 move: (s1s2); have /all_sigP[s1' ->] := allss s1.
 have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
 by rewrite !sort_map => /(perm_map_inj val_inj) /(perm_sortP leT_total)->.
+Qed.
+
+Lemma homo_sort_map (T : Type) (T' : eqType) (f : T -> T') leT leT' :
+  antisymmetric (relpre f leT') -> transitive (relpre f leT') -> total leT ->
+  {homo f : x y / leT x y >-> leT' x y} ->
+  forall s : seq T, sort leT' (map f s) = map f (sort leT s).
+Proof.
+move=> leT'_asym leT'_trans leT_total f_homo s; case Ds: s => // [x s'].
+rewrite -{}Ds -(mkseq_nth x s) [in RHS]sort_map -!map_comp /comp.
+apply: (@sorted_eq_in _ leT') => [? ? ?|? ?|||]; rewrite ?mem_sort.
+- by move=> /mapP[? _ ->] /mapP[? _ ->] /mapP[? _ ->]; apply/leT'_trans.
+- by move=> /mapP[? _ ->] /mapP[? _ ->] /leT'_asym ->.
+- apply: (sort_sorted_in _ (allss _)) => _ _ /mapP[y _ ->] /mapP[z _ ->].
+  by case/orP: (leT_total (nth x s y) (nth x s z)) => /f_homo ->; rewrite ?orbT.
+- by rewrite map_comp -sort_map; exact/homo_sorted/sort_sorted.
+- by rewrite perm_sort perm_map // perm_sym perm_sort.
+Qed.
+
+Lemma homo_sort_map_in
+      (T : Type) (T' : eqType) (P : {pred T}) (f : T -> T') leT leT' :
+  {in P &, antisymmetric (relpre f leT')} ->
+  {in P & &, transitive (relpre f leT')} -> {in P &, total leT} ->
+  {in P &, {homo f : x y / leT x y >-> leT' x y}} ->
+  forall s : seq T, all P s ->
+        sort leT' [seq f x | x <- s] = [seq f x | x <- sort leT s].
+Proof.
+move=> /in2_sig leT'_asym /in3_sig leT'_trans /in2_sig leT_total.
+move=> /in2_sig f_homo _ /all_sigP[s ->].
+rewrite [in RHS]sort_map -!map_comp /comp.
+by apply: homo_sort_map => // ? ? /leT'_asym /val_inj.
 Qed.
 
 (* Function trajectories. *)

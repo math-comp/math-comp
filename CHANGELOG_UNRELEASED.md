@@ -34,7 +34,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `eq_count_merge`
 
 - in `path.v`, new lemmas: `pairwise_sorted`, `path_relI`, `cycle_relI`,
-  `sorted_relI`, `eq(_in)_sorted`, `mergeA`, and `all_merge`.
+  `sorted_relI`, `eq(_in)_sorted`, `mergeA`, `all_merge`, and
+  `homo_sort_map(_in)`.
 
 - in `tuple.v`, added Canonical tuple for sort.
 
