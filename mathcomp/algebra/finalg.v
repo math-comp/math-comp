@@ -1068,31 +1068,60 @@ Section Joins.
 Variable cT : Field.type.
 Let class : Field.class_of cT := Field.class cT.
 
-Definition type := Eval hnf in DecFieldType cT (DecidableFieldMixin cT).
-Definition finType := @Finite.Pack type (fin_ class).
-Definition finZmodType := @Zmodule.Pack type class.
-Definition finRingType := @Ring.Pack type class.
-Definition finUnitRingType := @UnitRing.Pack type class.
-Definition finComRingType := @ComRing.Pack type class.
-Definition finComUnitRingType := @ComUnitRing.Pack type class.
-Definition finIdomainType := @IntegralDomain.Pack type class.
-Definition baseFinGroupType := base_group type finZmodType finZmodType.
-Definition finGroupType := fin_group baseFinGroupType cT.
+Canonical decFieldType := Eval hnf in DecFieldType cT (DecidableFieldMixin cT).
+Definition countDecFieldType := [countDecFieldType of cT].
+Definition decField_finType := @Finite.Pack decFieldType (fin_ class).
+Definition decField_finZmodType := @Zmodule.Pack decFieldType class.
+Definition decField_finRingType := @Ring.Pack decFieldType class.
+Definition decField_finUnitRingType := @UnitRing.Pack decFieldType class.
+Definition decField_finComRingType := @ComRing.Pack decFieldType class.
+Definition decField_finComUnitRingType := @ComUnitRing.Pack decFieldType class.
+Definition decField_finIdomainType := @IntegralDomain.Pack decFieldType class.
+Definition decField_baseFinGroupType :=
+  base_group decFieldType decField_finZmodType decField_finZmodType.
+Definition decField_finGroupType := fin_group decField_baseFinGroupType cT.
+Definition countDecField_finType := @Finite.Pack countDecFieldType (fin_ class).
+Definition countDecField_finZmodType := @Zmodule.Pack countDecFieldType class.
+Definition countDecField_finRingType := @Ring.Pack countDecFieldType class.
+Definition countDecField_finUnitRingType :=
+  @UnitRing.Pack countDecFieldType class.
+Definition countDecField_finComRingType :=
+  @ComRing.Pack countDecFieldType class.
+Definition countDecField_finComUnitRingType :=
+  @ComUnitRing.Pack countDecFieldType class.
+Definition countDecField_finIdomainType :=
+  @IntegralDomain.Pack countDecFieldType class.
+Definition countDecField_baseFinGroupType :=
+  base_group countDecFieldType countDecField_finZmodType
+             countDecField_finZmodType.
+Definition countDecField_finGroupType :=
+  fin_group countDecField_baseFinGroupType cT.
 
 End Joins.
 
 Module Exports.
-Coercion type : Field.type >-> GRing.DecidableField.type.
-Canonical type.
-Canonical finType.
-Canonical finZmodType.
-Canonical finRingType.
-Canonical finUnitRingType.
-Canonical finComRingType.
-Canonical finComUnitRingType.
-Canonical finIdomainType.
-Canonical baseFinGroupType.
-Canonical finGroupType.
+Coercion decFieldType : Field.type >-> GRing.DecidableField.type.
+Coercion countDecFieldType : Field.type >-> CountRing.DecidableField.type.
+Canonical decFieldType.
+Canonical countDecFieldType.
+Canonical decField_finType.
+Canonical decField_finZmodType.
+Canonical decField_finRingType.
+Canonical decField_finUnitRingType.
+Canonical decField_finComRingType.
+Canonical decField_finComUnitRingType.
+Canonical decField_finIdomainType.
+Canonical decField_baseFinGroupType.
+Canonical decField_finGroupType.
+Canonical countDecField_finType.
+Canonical countDecField_finZmodType.
+Canonical countDecField_finRingType.
+Canonical countDecField_finUnitRingType.
+Canonical countDecField_finComRingType.
+Canonical countDecField_finComUnitRingType.
+Canonical countDecField_finIdomainType.
+Canonical countDecField_baseFinGroupType.
+Canonical countDecField_finGroupType.
 
 End Exports.
 
