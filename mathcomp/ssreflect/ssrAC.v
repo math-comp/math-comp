@@ -68,9 +68,7 @@ Notation vmrefl := (ltac: (vm_compute; reflexivity)) (only parsing).
 
 Module AC.
 
-Canonical positive_eqType := EqType positive
-   (EqMixin (fun _ _ => equivP idP (Pos.eqb_eq _ _))).
-(* Should be replaced by (EqMixin Pos.eqb_spec) for coq >= 8.7 *)
+Canonical positive_eqType := EqType positive (EqMixin Pos.eqb_spec).
 
 Inductive syntax := Leaf of positive | Op of syntax & syntax.
 Coercion serial := (fix loop (acc : seq positive) (s : syntax) :=

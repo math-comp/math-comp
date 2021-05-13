@@ -1385,15 +1385,13 @@ Canonical lfun_lmodType := Eval hnf in LmodType R 'Hom(aT, rT) lfun_lmodMixin.
 
 Lemma scale_lfunE k f x : (k *: f) x = k *: f x. Proof. exact: lfunE. Qed.
 
-(* GG: exists (Vector.Hom \o vec_mx) fails in the proof below in 8.3,     *)
-(* probably because of incomplete type unification. Will it work in 8.4?  *)
 Fact lfun_vect_iso : Vector.axiom (Vector.dim aT * Vector.dim rT) 'Hom(aT, rT).
 Proof.
 exists (mxvec \o f2mx) => [a f g|].
   rewrite /= -linearP /= -[A in _ = mxvec A]/(f2mx (Vector.Hom _)).
   congr (mxvec (f2mx _)); apply/lfunP=> v; do 2!rewrite lfunE /=.
   by rewrite unlock /= -linearP mulmxDr scalemxAr.
-apply: Bijective (Vector.Hom \o vec_mx) _ _ => [[A]|A] /=; last exact: vec_mxK.
+exists (Vector.Hom \o vec_mx) => [[A]|A] /=; last exact: vec_mxK.
 by rewrite mxvecK.
 Qed.
 
