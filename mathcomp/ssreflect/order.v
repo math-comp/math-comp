@@ -4097,30 +4097,33 @@ Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
 Canonical join_monoid := Monoid.Law (@joinA _ _) join0x joinx0.
 Canonical join_comoid := Monoid.ComLaw (@joinC _ _).
 
-Lemma join_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
 Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leUl. Qed.
 
-Lemma join_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
+Lemma joins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
   x \in r -> P x -> l <= F x -> l <= \join_(x <- r | P x) F x.
-Proof. by move=> ? ? /le_trans; apply; apply: join_sup_seq. Qed.
+Proof. by move=> ? ? /le_trans; apply; apply: joins_sup_seq. Qed.
 
-Lemma join_sup I (j : I) (P : {pred I}) (F : I -> L) :
+Lemma joins_sup I (j : I) (P : {pred I}) (F : I -> L) :
   P j -> F j <= \join_(i | P i) F i.
-Proof. exact: join_sup_seq. Qed.
+Proof. exact: joins_sup_seq. Qed.
 
-Lemma join_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
+Lemma joins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
   P j -> l <= F j -> l <= \join_(i | P i) F i.
-Proof. exact: join_min_seq. Qed.
+Proof. exact: joins_min_seq. Qed.
+
+Lemma joins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> F x <= u) -> \join_(x <- r | P x) F x <= u.
+Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite leUx leFm. Qed.
 
 Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
   reflect (forall x : T, x \in r -> P x -> F x <= u)
           (\join_(x <- r | P x) F x <= u).
 Proof.
 apply: (iffP idP) => leFm => [x xr Px|].
-  exact/(le_trans _ leFm)/join_sup_seq.
-rewrite big_seq_cond; elim/big_rec: _ => //= i x /andP[ir Pi] lx.
-by rewrite leUx lx leFm.
+  exact/(le_trans _ leFm)/joins_sup_seq.
+by rewrite big_seq_cond joins_le// => x /andP[/leFm].
 Qed.
 
 Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
@@ -4129,7 +4132,7 @@ Proof. by apply: (iffP (joinsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
 
 Lemma le_joins I (A B : {set I}) (F : I -> L) :
   A \subset B -> \join_(i in A) F i <= \join_(i in B) F i.
-Proof. by move=> /subsetP AB; apply/joinsP => i iA; apply/join_sup/AB. Qed.
+Proof. by move=> /subsetP AB; apply/joinsP => i iA; apply/joins_sup/AB. Qed.
 
 Lemma joins_setU I (A B : {set I}) (F : I -> L) :
   \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
@@ -4139,13 +4142,25 @@ apply/eq_big_idem; first exact: joinxx.
 by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
 
-Lemma join_seq I (r : seq I) (F : I -> L) :
+Lemma joins_seq I (r : seq I) (F : I -> L) :
   \join_(i <- r) F i = \join_(i in r) F i.
 Proof.
 by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?joinxx ?mem_enum.
 Qed.
 
 End BLatticeTheory.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use joins_sup_seq instead.")]
+Notation join_sup_seq := joins_sup_seq.
+#[deprecated(since="mathcomp 1.13.0", note="Use joins_min_seq instead.")]
+Notation join_min_seq := joins_min_seq.
+#[deprecated(since="mathcomp 1.13.0", note="Use joins_sup instead.")]
+Notation join_sup := joins_sup.
+#[deprecated(since="mathcomp 1.13.0", note="Use joins_min instead.")]
+Notation join_min := joins_min.
+#[deprecated(since="mathcomp 1.13.0", note="Use joins_seq instead.")]
+Notation join_seq := joins_seq.
+
 End BLatticeTheory.
 
 Module Import DualTBLattice.
@@ -4206,21 +4221,25 @@ Canonical meet_comoid := Monoid.ComLaw (@meetC _ _).
 Canonical meet_muloid := Monoid.MulLaw (@meet0x _ L) (@meetx0 _ _).
 Canonical join_muloid := Monoid.MulLaw join1x joinx1.
 
-Lemma meet_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. exact: (@join_sup_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joins_sup_seq _ [tbLatticeType of L^d]). Qed.
 
-Lemma meet_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
+Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. exact: (@join_min_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joins_min_seq _ [tbLatticeType of L^d]). Qed.
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@join_sup _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joins_sup _ [tbLatticeType of L^d]). Qed.
 
 Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@join_min _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joins_min _ [tbLatticeType of L^d]). Qed.
+
+Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.
+Proof. exact: (@joins_le _ [tbLatticeType of L^d]). Qed.
 
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
@@ -4239,11 +4258,19 @@ Lemma meets_setU I (A B : {set I}) (F : I -> L) :
    \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
 Proof. exact: (@joins_setU _ [tbLatticeType of L^d]). Qed.
 
-Lemma meet_seq I (r : seq I) (F : I -> L) :
+Lemma meets_seq I (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof. exact: (@join_seq _ [tbLatticeType of L^d]). Qed.
+Proof. exact: (@joins_seq _ [tbLatticeType of L^d]). Qed.
 
 End TBLatticeTheory.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use meets_inf_seq instead.")]
+Notation meet_inf_seq := meets_inf_seq.
+#[deprecated(since="mathcomp 1.13.0", note="Use meets_max_seq instead.")]
+Notation meet_max_seq := meets_max_seq.
+#[deprecated(since="mathcomp 1.13.0", note="Use meets_seq instead.")]
+Notation meet_seq := meets_seq.
+
 End TBLatticeTheory.
 
 Module Import BDistrLatticeTheory.

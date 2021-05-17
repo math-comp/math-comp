@@ -65,6 +65,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `rank_bij_on`, `sig_bij_on`, `le_sig`, `le_sig1`, `le_rank`,
     `le_Rank`, `lt_sig`, `lt_rank`, `lt_Rank`, `eq_Rank`, `rankEsum`,
     `RankEsum`, `rect`, and `eqRank`.
+  + lemmas `joins_le` and `meets_ge`.
 
 - in `matrix.v`, seven new definitions:
   + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations
@@ -127,6 +128,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`,
   + `sub_(path|cycle|sorted)_in` -> `sub_in_(path|cycle|sorted)`
   + `eq_(path|cycle)_in` -> `eq_in_(path|cycle)`
+
+- in `order.v`
+  + `join_(|sup_|min_)seq` -> `joins_(|sup_|min_)seq`
+  + `meet_(|sup_|min_)seq` -> `meets_(|sup_|min_)seq`
+  + `join_(sup|min)` -> `joins_(sup|min)`
 
 ### Removed
 
