@@ -4097,68 +4097,52 @@ Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
 Canonical join_monoid := Monoid.Law (@joinA _ _) join0x joinx0.
 Canonical join_comoid := Monoid.ComLaw (@joinC _ _).
 
-Lemma join_sup I (j : I) (P : {pred I}) (F : I -> L) :
-   P j -> F j <= \join_(i | P i) F i.
-Proof. by move=> Pj; rewrite (bigD1 j) //= lexU2 ?lexx. Qed.
-
-Lemma join_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
-   P j -> l <= F j -> l <= \join_(i | P i) F i.
-Proof. by move=> Pj /le_trans -> //; rewrite join_sup. Qed.
-
-Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
-   reflect (forall i : I, P i -> F i <= u) (\join_(i | P i) F i <= u).
-Proof.
-have -> : \join_(i | P i) F i <= u = (\big[andb/true]_(i | P i) (F i <= u)).
-  by elim/big_rec2: _ => [|i y b Pi <-]; rewrite ?le0x ?leUx.
-rewrite big_all_cond; apply: (iffP allP) => /= H i;
-have := H i _; rewrite mem_index_enum; last by move/implyP->.
-by move=> /(_ isT) /implyP.
-Qed.
-
 Lemma join_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
-Proof. by move=> /seq_tnthP[j->] Px; rewrite big_tnth join_sup. Qed.
+Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leUl. Qed.
 
 Lemma join_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
   x \in r -> P x -> l <= F x -> l <= \join_(x <- r | P x) F x.
-Proof. by move=> /seq_tnthP[j->] Px; rewrite big_tnth; apply: join_min. Qed.
+Proof. by move=> ? ? /le_trans; apply; apply: join_sup_seq. Qed.
+
+Lemma join_sup I (j : I) (P : {pred I}) (F : I -> L) :
+  P j -> F j <= \join_(i | P i) F i.
+Proof. exact: join_sup_seq. Qed.
+
+Lemma join_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
+  P j -> l <= F j -> l <= \join_(i | P i) F i.
+Proof. exact: join_min_seq. Qed.
 
 Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
   reflect (forall x : T, x \in r -> P x -> F x <= u)
           (\join_(x <- r | P x) F x <= u).
 Proof.
-rewrite big_tnth; apply: (iffP (joinsP _ _ _)) => /= F_le.
-  by move=> x /seq_tnthP[i ->]; apply: F_le.
-by move=> i /F_le->//; rewrite mem_tnth.
+apply: (iffP idP) => leFm => [x xr Px|].
+  exact/(le_trans _ leFm)/join_sup_seq.
+rewrite big_seq_cond; elim/big_rec: _ => //= i x /andP[ir Pi] lx.
+by rewrite leUx lx leFm.
 Qed.
+
+Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
+  reflect (forall i : I, P i -> F i <= u) (\join_(i | P i) F i <= u).
+Proof. by apply: (iffP (joinsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
 
 Lemma le_joins I (A B : {set I}) (F : I -> L) :
-   A \subset B -> \join_(i in A) F i <= \join_(i in B) F i.
-Proof.
-move=> AsubB; rewrite -(setID B A).
-rewrite [X in _ <= X](eq_bigl [predU B :&: A & B :\: A]); last first.
-  by move=> i; rewrite !inE.
-rewrite bigU //=; last by rewrite -setI_eq0 setDE setIACA setICr setI0.
-by rewrite lexU2 // (setIidPr _) // lexx.
-Qed.
+  A \subset B -> \join_(i in A) F i <= \join_(i in B) F i.
+Proof. by move=> /subsetP AB; apply/joinsP => i iA; apply/join_sup/AB. Qed.
 
 Lemma joins_setU I (A B : {set I}) (F : I -> L) :
-   \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
+  \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
 Proof.
-apply/eqP; rewrite eq_le leUx !le_joins ?subsetUl ?subsetUr ?andbT //.
-apply/joinsP => i; rewrite inE; move=> /orP.
-by case=> ?; rewrite lexU2 //; [rewrite join_sup|rewrite orbC join_sup].
+rewrite -!big_enum; have /= <- := @big_cat _ _ join_comoid.
+apply/eq_big_idem; first exact: joinxx.
+by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
 
 Lemma join_seq I (r : seq I) (F : I -> L) :
-   \join_(i <- r) F i = \join_(i in r) F i.
+  \join_(i <- r) F i = \join_(i in r) F i.
 Proof.
-rewrite [RHS](eq_bigl (mem [set i | i \in r])); last by move=> i; rewrite !inE.
-elim: r => [|i r ihr]; first by rewrite big_nil big1 // => i; rewrite ?inE.
-rewrite big_cons {}ihr; apply/eqP; rewrite eq_le set_cons.
-rewrite leUx join_sup ?inE ?eqxx // le_joins //= ?subsetUr //.
-apply/joinsP => j; rewrite !inE => /predU1P [->|jr]; rewrite ?lexU2 ?lexx //.
-by rewrite join_sup ?orbT ?inE.
+by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?joinxx ?mem_enum.
 Qed.
 
 End BLatticeTheory.
@@ -4222,18 +4206,6 @@ Canonical meet_comoid := Monoid.ComLaw (@meetC _ _).
 Canonical meet_muloid := Monoid.MulLaw (@meet0x _ L) (@meetx0 _ _).
 Canonical join_muloid := Monoid.MulLaw join1x joinx1.
 
-Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
-   P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@join_sup _ [tbLatticeType of L^d]). Qed.
-
-Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
-   P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@join_min _ [tbLatticeType of L^d]). Qed.
-
-Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
-   reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. exact: (@joinsP _ [tbLatticeType of L^d]). Qed.
-
 Lemma meet_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
 Proof. exact: (@join_sup_seq _ [tbLatticeType of L^d]). Qed.
@@ -4242,10 +4214,22 @@ Lemma meet_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
 Proof. exact: (@join_min_seq _ [tbLatticeType of L^d]). Qed.
 
+Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
+   P j -> \meet_(i | P i) F i <= F j.
+Proof. exact: (@join_sup _ [tbLatticeType of L^d]). Qed.
+
+Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
+   P j -> F j <= u -> \meet_(i | P i) F i <= u.
+Proof. exact: (@join_min _ [tbLatticeType of L^d]). Qed.
+
 Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \meet_(x <- r | P x) F x).
 Proof. exact: (@joinsP_seq _ [tbLatticeType of L^d]). Qed.
+
+Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
+   reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
+Proof. exact: (@joinsP _ [tbLatticeType of L^d]). Qed.
 
 Lemma le_meets I (A B : {set I}) (F : I -> L) :
    A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
