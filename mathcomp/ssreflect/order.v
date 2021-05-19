@@ -2778,6 +2778,106 @@ Proof. exact/sorted_eq/le_anti/le_trans. Qed.
 Lemma sort_le_id s : sorted <=%O s -> sort <=%O s = s.
 Proof. exact/sorted_sort/le_trans. Qed.
 
+Lemma le_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <=%O s ->
+ {in [pred n | (n < size s)%N] &,
+    {homo nth x0 s : i j / (i < j)%N >-> i <= j}}.
+Proof. exact/sorted_ltn_nth/le_trans. Qed.
+
+Lemma le_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=%O s ->
+  {in [pred n | (n < size s)%N] &,
+    {homo nth x0 s : i j / (i <= j)%N >-> i <= j}}.
+Proof. exact: (sorted_leq_nth le_trans le_refl). Qed.
+
+Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <%O s ->
+  {in [pred n | (n < size s)%N] &,
+    {mono nth x0 s : i j / (i <= j)%N >-> i <= j}}.
+Proof.
+rewrite lt_sorted_uniq_le => /andP[s_uniq le_s].
+apply: (total_homo_mono_in _ _ ltn_neqAle lt_neqAle le_anti leq_total) => //.
+move=> i j ilt jlt ltij; rewrite lt_neqAle le_sorted_leq_nth// 1?ltnW//.
+by rewrite nth_uniq// ltn_eqF.
+Qed.
+
+Lemma lt_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <%O s ->
+  {in [pred n | (n < size s)%N] &,
+    {mono nth x0 s : i j / (i < j)%N >-> i < j}}.
+Proof.
+move=> ss; have := lt_sorted_leq_nth x0 ss.
+exact: (anti_mono_in _ ltn_neqAle lt_neqAle anti_leq).
+Qed.
+
+Lemma filter_lt_nth x0 s i : sorted <%O s -> (i < size s)%N ->
+  [seq x <- s | x < nth x0 s i] = take i s.
+Proof.
+move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
+under eq_in_filter => j do
+  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_ltn_nth//].
+by rewrite (filter_iota_ltn 0) ?map_nth_iota0 // ltnW.
+Qed.
+
+Lemma count_lt_nth x0 s i : sorted <%O s -> (i < size s)%N ->
+  count (< nth x0 s i) s = i.
+Proof.
+by move=> ss i_lt; rewrite -size_filter/= filter_lt_nth// size_take i_lt.
+Qed.
+
+Lemma filter_le_nth x0 s i : sorted <%O s -> (i < size s)%N ->
+  [seq x <- s | x <= nth x0 s i] = take i.+1 s.
+Proof.
+move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
+under eq_in_filter => j do
+  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_leq_nth//].
+by rewrite (filter_iota_leq 0)// map_nth_iota0.
+Qed.
+
+Lemma count_le_nth x0 s i : sorted <%O s -> (i < size s)%N ->
+  count (<= nth x0 s i) s = i.+1.
+Proof.
+by move=> ss i_lt; rewrite -size_filter/= filter_le_nth// size_takel.
+Qed.
+
+Lemma count_lt_le_mem x s : (count (< x) s < count (<= x) s)%N = (x \in s).
+Proof.
+have := count_predUI (pred1 x) (< x) s.
+have -> : count (predI (pred1 x) (< x)) s = 0%N.
+  rewrite (@eq_count _ _ pred0) ?count_pred0 // => y /=.
+  by rewrite lt_def; case: eqP => //= ->; rewrite eqxx.
+have /eq_count-> : [predU1 x & < x] =1 (<= x) by move=> y /=; rewrite le_eqVlt.
+by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
+Qed.
+
+Lemma sorted_filter_lt x s :
+  sorted <=%O s -> [seq y <- s | y < x] = take (count (< x) s) s.
+Proof.
+elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
+case: ifP => [|ltyxF]; rewrite IHs//.
+rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
+by move=> /(allP le_y_s) yz; apply: contraFF ltyxF; apply: le_lt_trans.
+Qed.
+
+Lemma sorted_filter_le x s :
+  sorted <=%O s -> [seq y <- s | y <= x] = take (count (<= x) s) s.
+Proof.
+elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
+case: ifP => [|leyxF]; rewrite IHs//.
+rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
+by move=> /(allP le_y_s) yz; apply: contraFF leyxF; apply: le_trans.
+Qed.
+
+Lemma nth_count_le x x0 s i : sorted <=%O s ->
+  (i < count (<= x) s)%N -> nth x0 s i <= x.
+Proof.
+move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_le //.
+by apply/(all_nthP _ (filter_all (<= x) _)); rewrite size_filter.
+Qed.
+
+Lemma nth_count_lt x x0 s i : sorted <=%O s ->
+  (i < count (< x) s)%N -> nth x0 s i < x.
+Proof.
+move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_lt //.
+by apply/(all_nthP _ (filter_all (< x) _)); rewrite size_filter.
+Qed.
+
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
 Proof.
 move=> c_xy; apply/idP/idP => [/le_gtF/negP/negP//|]; rewrite lt_neqAle.
@@ -3946,6 +4046,16 @@ Lemma arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
 Proof. by apply: extremumP => //; [apply: ge_refl | apply: ge_trans]. Qed.
 
 End ArgExtremum.
+
+Lemma count_le_gt x s : count (<= x) s = size s - count (> x) s.
+Proof.
+by rewrite -(count_predC (> x)) addKn; apply: eq_count => y; rewrite /= leNgt.
+Qed.
+
+Lemma count_lt_ge x s : count (< x) s = size s - count (>= x) s.
+Proof.
+by rewrite -(count_predC (>= x)) addKn; apply: eq_count => y; rewrite /= ltNge.
+Qed.
 
 End TotalTheory.
 
@@ -7550,6 +7660,52 @@ End DualOrder.
 
 Canonical dual_finOrderType d (T : finOrderType d) :=
   [finOrderType of T^d].
+
+Section DualOrderTheory.
+
+Context {disp : unit} {T : orderType disp}.
+Implicit Type s : seq T.
+
+Lemma sorted_filter_gt x s :
+  sorted <=%O s -> [seq y <- s | x < y] = drop (count (<= x) s) s.
+Proof.
+move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
+rewrite (@sorted_filter_lt _ (dual_orderType T)); last by rewrite rev_sorted.
+by rewrite take_rev revK count_rev.
+Qed.
+
+Lemma sorted_filter_ge x s :
+  sorted <=%O s -> [seq y <- s | x <= y] = drop (count (< x) s) s.
+Proof.
+move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
+rewrite (@sorted_filter_le _ (dual_orderType T)); last by rewrite rev_sorted.
+by rewrite take_rev revK count_rev.
+Qed.
+
+Lemma nth_count_ge x x0 s i : sorted <=%O s ->
+  (count (< x) s <= i < size s)%N -> x <= nth x0 s i.
+Proof.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_ge //.
+apply/(all_nthP _ (filter_all _ _)).
+by rewrite size_filter ltn_subLR // count_lt_ge subnK // count_size.
+Qed.
+
+Lemma nth_count_gt x x0 s i : sorted <=%O s ->
+  (count (<= x) s <= i < size s)%N -> x < nth x0 s i.
+Proof.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_gt //.
+apply/(all_nthP _ (filter_all _ _)).
+by rewrite size_filter ltn_subLR // count_le_gt subnK // count_size.
+Qed.
+
+Lemma nth_count_eq x x0 s i : sorted <=%O s ->
+  (count (< x) s <= i < count (<= x) s)%N -> nth x0 s i = x.
+Proof.
+move=> ss /andP[ige ilt]; apply/le_anti.
+by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
+Qed.
+
+End DualOrderTheory.
 
 End DualOrder.
 

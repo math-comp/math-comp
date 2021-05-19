@@ -21,9 +21,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `sub(_in)_pairwise`, `eq(_in)_pairwise`, `pairwise_map`, `subseq_pairwise`,
     `uniq_pairwise`, `pairwise_uniq`, and `pairwise_eq`.
   + new lemmas `zip_map`, `eqseq_all`, and `eq_map_all`.
+  + new lemmas `count_undup`, `eq_count_undup`, `rev_take`,
+    `rev_drop`, `takeEmask`, `dropEmask`, `filter_iota_ltn`,
+    `filter_iota_leq`, `map_nth_iota0` and `map_nth_iota`
 
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
+  + new lemmas `cat_sorted2`, `path_le`, `take_path`, `take_sorted`,
+    `drop_sorted`, `undup_path`, `undup_sorted`, `count_merge`,
+    `eq_count_merge`
 
 - in `tuple.v`, added Canonical tuple for sort.
 
@@ -66,6 +72,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `le_Rank`, `lt_sig`, `lt_rank`, `lt_Rank`, `eq_Rank`, `rankEsum`,
     `RankEsum`, `rect`, and `eqRank`.
   + lemmas `joins_le` and `meets_ge`.
+  + new lemmas `le_sorted_ltn_nth`, `le_sorted_leq_nth`,
+    `lt_sorted_leq_nth`, `lt_sorted_ltn_nth`, `filter_lt_nth`,
+    `count_lt_nth`, `filter_le_nth`, `count_le_nth`,
+    `count_lt_le_mem`, `sorted_filter_lt`, `sorted_filter_le`,
+    `nth_count_le`, `nth_count_lt`, `count_le_gt`,
+    `count_lt_ge`, `sorted_filter_gt`, `sorted_filter_ge`,
+    `nth_count_ge`, `nth_count_lt` and `nth_count_eq`
 
 - in `matrix.v`, seven new definitions:
   + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations
@@ -114,6 +127,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`:
   + Lemmas `big_nat_widenl`, `big_geq_mkord`
+
+- In `ssralg.v`
+  + new lemma `fmorph_eq`
+
+- In `rat.v`
+  + new lemmas `minr_rat`, `maxr_rat`
+
+- In `intdiv.v`
+  + new definition `lcmz`
+  + new lemmas `dvdz_lcmr`, `dvdz_lcml`, `dvdz_lcm`, `lcmzC`, `lcm0z`,
+    `lcmz0`, `lcmz_ge0`, `lcmz_neq0`
+  + new lemma `lez_pdiv2r`
 
 ### Changed
 

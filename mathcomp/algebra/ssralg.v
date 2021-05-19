@@ -4967,6 +4967,9 @@ Qed.
 Lemma fmorph_inj : injective f.
 Proof. by apply/raddf_inj => x /eqP; rewrite fmorph_eq0 => /eqP. Qed.
 
+Lemma fmorph_eq : {mono f : x y / x == y}.
+Proof. exact: inj_eq fmorph_inj. Qed.
+
 Lemma fmorph_eq1 x : (f x == 1) = (x == 1).
 Proof. by rewrite -(inj_eq fmorph_inj) rmorph1. Qed.
 
@@ -5976,6 +5979,7 @@ Definition rmorph_div := rmorph_div.
 Definition fmorph_eq0 := fmorph_eq0.
 Definition fmorph_inj := @fmorph_inj.
 Arguments fmorph_inj {F R} f [x1 x2].
+Definition fmorph_eq := fmorph_eq.
 Definition fmorph_eq1 := fmorph_eq1.
 Definition fmorph_char := fmorph_char.
 Definition fmorph_unit := fmorph_unit.

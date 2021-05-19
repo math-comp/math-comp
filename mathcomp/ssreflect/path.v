@@ -112,6 +112,9 @@ Proof. by elim: p1 x => [|y p1 Hrec] x //=; rewrite Hrec -!andbA. Qed.
 Lemma rcons_path x p y : path x (rcons p y) = path x p && e (last x p) y.
 Proof. by rewrite -cats1 cat_path /= andbT. Qed.
 
+Lemma take_path x p i : path x p -> path x (take i p).
+Proof. elim: p x i => [//| x p] IHp x' [//| i] /= /andP[-> ?]; exact: IHp. Qed.
+
 Lemma pathP x p x0 :
   reflect (forall i, i < size p -> e (nth x0 (x :: p) i) (nth x0 p i))
           (path x p).
@@ -258,6 +261,9 @@ Lemma path_pairwise_in x s :
   all P (x :: s) -> path leT x s = pairwise leT (x :: s).
 Proof. by move=> Pxs; rewrite -sorted_pairwise_in. Qed.
 
+Lemma cat_sorted2 s s' : sorted leT (s ++ s') -> sorted leT s * sorted leT s'.
+Proof. by case: s => //= x s; rewrite cat_path => /andP[-> /path_sorted]. Qed.
+
 Lemma sorted_mask_in m s : all P s -> sorted leT s -> sorted leT (mask m s).
 Proof.
 by move=> Ps; rewrite !sorted_pairwise_in ?all_mask //; exact: pairwise_mask.
@@ -301,6 +307,11 @@ Qed.
 
 Hypothesis leT_tr : transitive leT.
 
+Lemma path_le x x' s : leT x x' -> path leT x' s -> path leT x s.
+Proof.
+by case: s => [//| x'' s xlex' /= /andP[x'lex'' ->]]; rewrite (leT_tr xlex').
+Qed.
+
 Let leT_tr' : {in predT & &, transitive leT}. Proof. exact: in3W. Qed.
 
 Lemma path_sortedE x s : path leT x s = all (leT x) s && sorted leT s.
@@ -333,6 +344,12 @@ Hypothesis leT_refl : reflexive leT.
 Lemma sorted_leq_nth x0 s : sorted leT s ->
   {in [pred n | n < size s] &, {homo nth x0 s : i j / i <= j >-> leT i j}}.
 Proof. exact/sorted_leq_nth_in/all_predT. Qed.
+
+Lemma take_sorted n s : sorted leT s -> sorted leT (take n s).
+Proof. by rewrite -[s in sorted _ s](cat_take_drop n) => /cat_sorted2[]. Qed.
+
+Lemma drop_sorted n s : sorted leT s -> sorted leT (drop n s).
+Proof. by rewrite -[s in sorted _ s](cat_take_drop n) => /cat_sorted2[]. Qed.
 
 End Transitive.
 
@@ -530,6 +547,12 @@ Proof.
 case: s => // x0 s' s_sorted x y xs ys /(sorted_ltn_nth leT_tr x0 s_sorted).
 by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
 Qed.
+
+Lemma undup_path x s : path x s -> path x (undup s).
+Proof. exact/subseq_path/undup_subseq. Qed.
+
+Lemma undup_sorted s : sorted s -> sorted (undup s).
+Proof. exact/subseq_sorted/undup_subseq. Qed.
 
 Hypothesis leT_refl : reflexive leT.
 
@@ -1056,6 +1079,14 @@ apply: (iffP idP) => eq12; last by rewrite -perm_sort eq12 perm_sort.
 apply: (sorted_eq leT_tr leT_asym); rewrite ?sort_sorted //.
 by rewrite perm_sort (permPl eq12) -perm_sort.
 Qed.
+
+Lemma count_merge p s1 s2 : count p (merge leT s1 s2) = count p (s1 ++ s2).
+Proof. exact/permP/permPl/perm_merge. Qed.
+
+Lemma eq_count_merge (p : pred T) s1 s1' s2 s2' :
+  count p s1 = count p s1' -> count p s2 = count p s2' ->
+  count p (merge leT s1 s2) = count p (merge leT s1' s2').
+Proof. by rewrite !count_merge !count_cat => -> ->. Qed.
 
 End EqSortSeq.
 
