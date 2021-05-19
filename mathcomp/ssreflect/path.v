@@ -261,10 +261,8 @@ Lemma path_pairwise_in x s :
   all P (x :: s) -> path leT x s = pairwise leT (x :: s).
 Proof. by move=> Pxs; rewrite -sorted_pairwise_in. Qed.
 
-Lemma cat_sorted2 s1 s2 : sorted leT (s1 ++ s2) -> sorted leT s1 * sorted leT s2.
-Proof.
-by move: s1 s2 => [|x s1] [|y s2] //=; rewrite ?cats0// cat_path /= => /and3P[].
-Qed.
+Lemma cat_sorted2 s s' : sorted leT (s ++ s') -> sorted leT s * sorted leT s'.
+Proof. by case: s => //= x s; rewrite cat_path => /andP[-> /path_sorted]. Qed.
 
 Lemma sorted_mask_in m s : all P s -> sorted leT s -> sorted leT (mask m s).
 Proof.
