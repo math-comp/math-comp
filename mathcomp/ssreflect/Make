@@ -22,6 +22,17 @@ ssrnotations.v
 ssrmatching.v
 order.v
 
+mini_ssrfun.v
+mini_ssrbool.v
+mini_eqtype.v
+mini_ssrnat.v
+mini_seq.v
+mini_ssreflect.v
+mini_div.v
+mini_path.v
+mini_prime.v
+mini_sum.v
+
 -I .
 -R . mathcomp.ssreflect
 
