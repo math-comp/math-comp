@@ -1572,6 +1572,9 @@ Proof. by case: (intP m). Qed.
 Lemma ltz0_abs m : (m < 0)%R -> `|m| = - m :> int.
 Proof. by case: (intP m). Qed.
 
+Lemma lez_abs m : m <= `|m|%N :> int.
+Proof. by case: (intP m). Qed.
+
 Lemma absz_sign s : `|(-1) ^+ s| = 1.
 Proof. by rewrite abszX exp1n. Qed.
 
@@ -1597,6 +1600,18 @@ Lemma abszEsg m : (`|m|%:Z = sgz m * m)%R.
 Proof. by rewrite -sgrz -normrEsg. Qed.
 
 End Absz.
+
+Section MoreAbsz.
+Variable R : numDomainType.
+Implicit Type i : int.
+
+Lemma mulr_absz (x : R) i : x *+ `|i| = x *~ `|i|.
+Proof. by rewrite -abszE. Qed.
+
+Lemma natr_absz i : `|i|%:R = `|i|%:~R :> R.
+Proof. by rewrite -abszE. Qed.
+
+End MoreAbsz.
 
 Module Export IntDist.
 
