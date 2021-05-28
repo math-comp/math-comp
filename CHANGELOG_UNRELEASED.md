@@ -148,6 +148,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `lcmz0`, `lcmz_ge0`, `lcmz_neq0`
   + new lemma `lez_pdiv2r`
 
+- In `ssrnum.v`:
+  + new lemma `eqNr`
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
