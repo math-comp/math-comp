@@ -2178,6 +2178,9 @@ Proof. by rewrite !(@eq_le _ R) !ler_muln2r -orb_andr. Qed.
 Lemma mulrn_eq0 x n : (x *+ n == 0) = ((n == 0)%N || (x == 0)).
 Proof. by rewrite -mulr_natl mulf_eq0 pnatr_eq0. Qed.
 
+Lemma eqNr x : (- x == x) = (x == 0).
+Proof. by rewrite eq_sym -addr_eq0 -mulr2n mulrn_eq0. Qed.
+
 Lemma mulrIn x : x != 0 -> injective (GRing.natmul x).
 Proof.
 move=> x_neq0 m n; without loss /subnK <-: m n / (n <= m)%N.
