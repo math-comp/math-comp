@@ -14,6 +14,7 @@ Require Export finfun.
 Require Export bigop.
 Require Export prime.
 Require Export finset.
+Require Export relorder.
 Require Export order.
 Require Export binomial.
 Require Export generic_quotient.

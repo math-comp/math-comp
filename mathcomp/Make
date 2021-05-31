@@ -80,6 +80,7 @@ ssreflect/generic_quotient.v
 ssreflect/order.v
 ssreflect/path.v
 ssreflect/prime.v
+ssreflect/relorder.v
 ssreflect/seq.v
 ssreflect/ssrAC.v
 ssreflect/ssrbool.v

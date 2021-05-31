@@ -40,6 +40,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `tuple.v`, added Canonical tuple for sort.
 
 - in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
+- in `order.v`,
+  + the following new structures of ordered types:
+    * `(b|t|tb)POrderType`: `porderType` with a top and/or a bottom,
+    * `meetSemilatticeType`: meet semilattices,
+    * `(b|t|tb)MeetSemilatticeType`:
+      `meetSemilatticeType` with a top and/or a bottom,
+    * `joinSemilatticeType`: join semilattices,
+    * `(b|t|tb)JoinSemilatticeType`:
+      `joinSemilatticeType` with a top and/or a bottom,
+	* `tLatticeType`: `latticeType` with a top,
+	* `tDistrLatticeType`: `distrLatticeType` with a top,
+	* `(b|t|tb)OrderType`: `orderType` with a top and/or a bottom,
+	* `fin(B|T|TB)POrderType`: `finPOrderType` with a top and/or a bottom,
+	* `fin(B)MeetSemilatticeType`:
+      finite meet semilattices with/without a bottom,
+	* `fin(T)JoinSemilatticeType`:
+      finite join semilattices with/without a top, and
+	* possibly empty finite lattice structures which involve renamings of
+      existing structures (cf Changed and Renamed sections).
+  + new factories `meetSemilatticeMixin`, `joinSemilatticeMixin`,
+    `totalMeetSemilatticeMixin`, and `totalJoinSemilatticeMixin`.
+  + new "big pack" notations `LatticeOfPOrder`, `OrderOfMeetSemilattice`,
+    `OrderOfJoinSemilattice`, and `LatticeOfChoiceType`.
 
 - in `order.v`
   + we provide a canonical total order on ordinals and lemmas
@@ -158,6 +181,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - across the library, the deprecation mechanism to use has been changed from the
   `deprecate` notation to the `deprecated` attribute (cf. Removed section).
+- in `order.v`,
+  + For an ordered type instance `T`, the class record of `T^d^d` is now
+    convertible with that of `T` except for complemented lattice structures.
+    To make duals definitionally involutive as such, the mixins of `porderType`
+    and `distrLatticeType` (whose duals are themselves) are redefined to include
+    some dual axioms (e.g., antisymmetry of `<=^d`), and the mixins of
+    `tPOrderType` and `joinSemilatticeType` (whose duals are `bPOrderType` and
+    `meetSemilatticeType` respectively) are defined as duals of the mixins of
+    the dual structures. Provided factories hide these internal details of
+    mixins. Caveat: duals of structures are not definitionally involutive yet,
+    since structure records cannot be primitive for technical reasons and
+    `dual_display` is opaque.
+  + The `latticeType` structure has been redefined as the join of
+    `meetSemilatticeType` and `joinSemilatticeType` that have no extra mixin.
+    To declare a canonical `latticeType` instance of type `T`, one has to
+    declare canonical semilattice type instances of `T` first, and then use
+    `[latticeType of T]` to compute their join.
+  + The `meetJoinMixin` factory has been redefined not to require the
+    distributivity. One that requires distributivity has been renamed to
+    `distrMeetJoinMixin` (cf Renamed section).
+  + The finite lattice structures `finLatticeType`, `finDistrLatticeType`, and
+    `finOrderType` (excluding `finCDistrLatticeType`) are now allowed to be
+    empty. The original (nonempty) finite lattice structures (including
+    `finCDistrLatticeType`) are renamed to have prefix `TB` (cf Added and
+    Renamed sections).
 
 ### Renamed
 
@@ -169,6 +217,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `join_(|sup_|min_)seq` -> `joins_(|sup_|min_)seq`
   + `meet_(|sup_|min_)seq` -> `meets_(|sup_|min_)seq`
   + `join_(sup|min)` -> `joins_(sup|min)`
+- in `order.v`,
+  + the following structures have been renamed (cf Added and Changed sections):
+    * `finLatticeType` -> `finTBLatticeType`
+    * `finDistrLatticeType` -> `finTBDistrLatticeType`
+    * `finCDistrLatticeType` -> `finCTBDistrLatticeType`
+    * `finOrderType` -> `finTBOrderType`
+  + the following factories have been renamed (cf Changed section):
+    * `latticeMixin` -> `latticePOrderMixin`
+    * `meetJoinMixin` -> `distrMeetJoinMixin`
 
 ### Removed
 
