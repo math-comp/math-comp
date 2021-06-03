@@ -142,7 +142,7 @@ pose rV2V (rv : 'rV_n) := \sum_i rv 0 i *: (vbasis V)`_i.
 have rV2V_K: cancel rV2V V2rV.
   have freeV: free (vbasis V) := basis_free (vbasisP V).
   by move=> rv; apply/rowP=> i; rewrite mxE coord_sum_free.
-rewrite -[n]mul1n -card_matrix -(card_imset _ (can_inj rV2V_K)).
+rewrite -[n]mul1n -card_mx -(card_imset _ (can_inj rV2V_K)).
 apply: eq_card => v; apply/idP/imsetP=> [/coord_vbasis-> | [rv _ ->]].
   by exists (V2rV v) => //; apply: eq_bigr => i _; rewrite mxE.
 by apply: (@rpred_sum vT) => i _; rewrite rpredZ ?vbasis_mem ?memt_nth.
@@ -302,7 +302,7 @@ Lemma primeChar_vectAxiom : Vector.axiom n (primeChar_lmodType charRp).
 Proof.
 have /isog_isom/=[f /isomP[injf im_f]]: [set: R] \isog [set: 'rV['F_p]_n].
   rewrite (@isog_abelem_card _ _ p) fin_Fp_lmod_abelem //=.
-  by rewrite !cardsT card_primeChar card_matrix mul1n card_Fp.
+  by rewrite !cardsT card_primeChar card_mx mul1n card_Fp.
 exists f; last by exists (invm injf) => x; rewrite ?invmE ?invmK ?im_f ?inE.
 move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.

@@ -175,6 +175,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `meet_(|sup_|min_)seq` -> `meets_(|sup_|min_)seq`
   + `join_(sup|min)` -> `joins_(sup|min)`
 
+- in `matrix.v`, `card_matrix` -> `card_mx`
+
 ### Removed
 
 - in `ssreflect.v`, the `deprecate` notation has been deprecated. Use the
