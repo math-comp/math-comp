@@ -178,6 +178,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `matrix.v`, `card_matrix` -> `card_mx`
 
 - in `ssralg.v`, `prodr_natmul` ->  `prodrMn`
+- in `finset`
+  + `mem_imset_eq`  -> `mem_imset`
+  + `mem_imset2_eq` -> `mem_imset2`
+  
+
 ### Removed
 
 - in `ssreflect.v`, the `deprecate` notation has been deprecated. Use the
