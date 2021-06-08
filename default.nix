@@ -10,4 +10,4 @@ let auto = fetchGit {
   rev = import .nix/coq-nix-toolbox.nix;
 };
 in
-(import auto ({inherit src;} // args)).nix-auto
+import auto ({inherit src;} // args)
