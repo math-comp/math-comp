@@ -178,6 +178,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `matrix.v`, `card_matrix` -> `card_mx`
 
 - in `ssralg.v`, `prodr_natmul` ->  `prodrMn`
+- in `bigop.v`, `big_uncond` -> ` big_rmcond`
+
 ### Removed
 
 - in `ssreflect.v`, the `deprecate` notation has been deprecated. Use the
