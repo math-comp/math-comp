@@ -1230,7 +1230,7 @@ Lemma big_mkcondl I r (P Q : pred I) F :
      \big[*%M/1]_(i <- r | Q i) (if P i then F i else 1).
 Proof. by rewrite big_andbC big_mkcondr. Qed.
 
-Lemma big_uncond I (r : seq I) (P : pred I) F :
+Lemma big_rmcond I (r : seq I) (P : pred I) F :
   (forall i, ~~ P i -> F i = 1) ->
   \big[*%M/1]_(i <- r | P i) F i = \big[*%M/1]_(i <- r) F i.
 Proof.
@@ -1242,7 +1242,7 @@ Lemma big_rmcond_in (I : eqType) (r : seq I) (P : pred I) F :
   (forall i, i \in r -> ~~ P i -> F i = 1) ->
   \big[*%M/1]_(i <- r | P i) F i = \big[*%M/1]_(i <- r) F i.
 Proof.
-move=> F_eq1; rewrite big_seq_cond [RHS]big_seq_cond !big_mkcondl big_uncond//.
+move=> F_eq1; rewrite big_seq_cond [RHS]big_seq_cond !big_mkcondl big_rmcond//.
 by move=> i /F_eq1; case: ifP => // _ ->.
 Qed.
 
@@ -2018,7 +2018,5 @@ Arguments biggcdn_inf [I] i0 [P F m].
 
 #[deprecated(since="mathcomp 1.12.0", note="Use big_enumP instead.")]
 Notation filter_index_enum := deprecated_filter_index_enum (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use big_rmcond_in instead.")]
-Notation big_rmcond := big_rmcond_in (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use big_rmcond_in instead.")]
-Notation big_uncond_in := big_rmcond_in (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use big_rmcond instead.")]
+Notation big_uncond := big_rmcond (only parsing).
