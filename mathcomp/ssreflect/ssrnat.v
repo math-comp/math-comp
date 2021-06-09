@@ -1249,6 +1249,16 @@ Lemma factS n : (n.+1)`!  = n.+1 * n`!. Proof. by []. Qed.
 Lemma fact_gt0 n : n`! > 0.
 Proof. by elim: n => //= n IHn; rewrite muln_gt0. Qed.
 
+Lemma fact_geq n : n <= n`!.
+Proof. by case: n => // n; rewrite factS -(addn1 n) leq_pmulr ?fact_gt0. Qed.
+
+Lemma leq_fact : {homo factorial : x y / x <= y}.
+Proof.
+move=> m n; elim: n m => [m|n ih [_|m mn]]; first by rewrite leqn0 => /eqP ->.
+by rewrite factS mulSn fact0 addn_gt0 fact_gt0.
+by rewrite 2!factS leq_mul // ih.
+Qed.
+
 (* Parity and bits. *)
 
 Coercion nat_of_bool (b : bool) := if b then 1 else 0.

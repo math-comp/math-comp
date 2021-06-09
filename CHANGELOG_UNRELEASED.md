@@ -179,6 +179,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `codiagonalizableP`.
 
 - in `bigop.v`, added lemma `big_bool`.
+- In `ssrnat.v`:
+  + new lemmas `fact_geq`, `leq_fact`
+
+- In `binomial.v`:
+  + new lemma `fact_split`
+
+- In `bigop.v`:
+  + new lemma `big_rev_mkord`
 
 ### Changed
 
