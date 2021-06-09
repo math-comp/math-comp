@@ -1,11 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path tuple bigop finset prime order.
-From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint rat intdiv fingroup finalg zmodp.
-From mathcomp Require Import cyclic pgroup sylow vector falgebra fieldext.
-From mathcomp Require Import separable galois.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import path choice fintype tuple bigop finset prime order.
+From mathcomp Require Import fingroup ssralg countalg finalg zmodp vector poly.
+From mathcomp Require Import polydiv mxpoly ssrnum ssrint archimedean rat.
+From mathcomp Require Import intdiv cyclic pgroup sylow closed_field falgebra.
+From mathcomp Require Import fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -364,7 +364,7 @@ have galQ x: {z | x \in sQ z & is_Gal z}.
   exists p^@; first exact: alg_polyOver.
   exists (map (inQ z) s); last by apply/vspaceP=> u; rewrite defQz memvf.
   by rewrite -(eqp_map (ofQ z)) pQof Dp map_rp inQsK ?eqpxx.
-pose is_realC x := {R : archiFieldType & {rmorphism Q x -> R}}.
+pose is_realC x := {R : archiRealFieldType & {rmorphism Q x -> R}}.
 pose realC := {x : C & is_realC x}.
 pose has_Rroot (xR : realC) p c (Rx := sQ (tag xR)) :=
   [&& p \is a polyOver Rx, p \is monic, c \in Rx & p.[0] == - c ^+ 2].
@@ -453,11 +453,11 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     pose d := wid ab; pose dq := \poly_(i < (size q).-1) Mq i.+1.
     have d_ge0: 0 <= d by rewrite subr_ge0; case: xab.
     have [Mdq MdqP] := poly_disk_bound dq d.
-    pose n := Num.bound (Mu * Mdq * d); exists n => c /= /andP[].
+    pose n := Num.bound (Mu * Mdq * d); exists n => c /andP[].
     have{xab} [[]] := findP n _ _ xab; case: (find n q ab) => a1 b1 /=.
     rewrite -/d => qa1_le0 qb1_ge0 le_ab1 [/= le_aa1 le_b1b] Dab1 le_a1c le_cb1.
     have /MuP lbMu: c \in itv ab.
-      by rewrite !inE (le_trans le_aa1) ?(le_trans le_cb1).
+      by rewrite inE (le_trans le_aa1) ?(le_trans le_cb1).
     have Mu_ge0: 0 <= Mu by rewrite (le_trans _ lbMu).
     have Mdq_ge0: 0 <= Mdq.
       by rewrite (le_trans _ (MdqP 0 _)) ?normr0.
@@ -589,10 +589,11 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose Ry := LtRealFieldOfField
                (RealLtMixin posD posM posNneg posB posVneg absN absE (rrefl _)).
   have archiRy := @rat_algebraic_archimedean Ry _ alg_integral.
-  by exists (ArchiFieldType Ry archiRy); apply: [rmorphism of idfun].
+  exists [archiRealFieldType of ArchiNumDomainType Ry archiRy].
+  exact: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
-    exists 0, [archiFieldType of rat], f.
+    exists 0, [archiRealFieldType of rat], f.
     exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.

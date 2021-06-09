@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
-From mathcomp Require Import poly.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype finfun bigop order ssralg countalg poly.
+From mathcomp Require Import ssrnum.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
@@ -1459,7 +1459,7 @@ Lemma sgzP x :
   (sgz x == 0)  (sgz x == -1) (sgz x == 1) `|x| (sgr x) (sgz x).
 Proof.
 rewrite ![_ == sgz _]eq_sym ![_ == sgr _]eq_sym !sgr_cp0 !sgz_cp0.
-by rewrite /sgr /sgz !leNgt; case: ltrgt0P; constructor.
+by rewrite /sgz; case: sgrP; constructor.
 Qed.
 
 Lemma sgzN x : sgz (- x) = - sgz x.
@@ -1481,15 +1481,11 @@ Proof. by rewrite -eqr_oppLR -mulrN -sgzN mulz_sg_eq1. Qed.
 (*   (sgr y * sgr z == sgr x) = ((sgr y * sgr x == sgr z) && (sgr z != 0)). *)
 (* Proof. by do 3!case: sgrP=> _. Qed. *)
 
-Lemma sgzM x y : sgz (x * y) = sgz x  * sgz y.
+Lemma sgzM x y : sgz (x * y) = sgz x * sgz y.
 Proof.
-case: (sgzP x)=> hx; first by rewrite hx ?mul0r sgz0.
-  case: (sgzP y)=> hy; first by rewrite hy !mulr0 sgz0.
-    by apply/eqP; rewrite mul1r sgz_cp0 pmulr_rgt0.
-  by apply/eqP; rewrite mul1r sgz_cp0 nmulr_llt0.
-case: (sgzP y)=> hy; first by rewrite hy !mulr0 sgz0.
-  by apply/eqP; rewrite mulr1 sgz_cp0 nmulr_rlt0.
-by apply/eqP; rewrite mulN1r opprK sgz_cp0 nmulr_rgt0.
+rewrite -sgz_sgr -(sgz_sgr x) -(sgz_sgr y) sgrM.
+by case: sgrP; case: sgrP; rewrite /sgz ?(mulNr, mul0r, mul1r);
+  rewrite ?(oppr_eq0, oppr_cp0, eqxx, ltxx, ltr01, ltr10, oner_eq0).
 Qed.
 
 Lemma sgzX (n : nat) x : sgz (x ^+ n) = (sgz x) ^+ n.
@@ -1749,24 +1745,31 @@ Proof. by rewrite -mul_polyC polyCMz polyC1 mulrzl. Qed.
 
 End PolyZintRing.
 
-Section ZnatPred.
+Module intArchimedean.
+Section intArchimedean.
 
-Definition Znat := [qualify a n : int | 0 <= n].
-Fact Znat_key : pred_key Znat. by []. Qed.
-Canonical Znat_keyd := KeyedQualifier Znat_key.
+Implicit Types n : int.
 
-Lemma Znat_def n : (n \is a Znat) = (0 <= n). Proof. by []. Qed.
+Let trunc n : nat := if n is Posz n' then n' else 0%N.
 
-Lemma Znat_semiring_closed : semiring_closed Znat.
-Proof. by do 2?split => //; [apply: addr_ge0 | apply: mulr_ge0]. Qed.
-Canonical Znat_addrPred := AddrPred Znat_semiring_closed.
-Canonical Znat_mulrPred := MulrPred Znat_semiring_closed.
-Canonical Znat_semiringPred := SemiringPred Znat_semiring_closed.
+Lemma truncP n :
+  if 0 <= n then (trunc n)%:R <= n < (trunc n).+1%:R else trunc n == 0%N.
+Proof. by case: n => //= n; rewrite !natz intS ltz_add1r lexx. Qed.
 
-Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a Znat).
-Proof. by apply: (iffP idP) => [|[n -> //]]; case: m => // n; exists n. Qed.
+Lemma is_natE n : (0 <= n) = ((trunc n)%:R == n).
+Proof. by case: n => //= n; rewrite natz eqxx. Qed.
 
-End ZnatPred.
+Lemma is_intE n : true = (0 <= n) || (0 <= - n).
+Proof. by case: n. Qed.
+
+Definition mixin : Num.ArchiNumDomain.mixin_of [numDomainType of int] :=
+  Num.ArchiNumDomain.Mixin truncP is_natE is_intE.
+
+End intArchimedean.
+End intArchimedean.
+
+Canonical int_archiNumDomain := ArchiNumDomainType int intArchimedean.mixin.
+Canonical int_archiRealDomain := [archiRealDomainType of int].
 
 Section rpred.
 
@@ -1793,5 +1796,23 @@ Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
 
+Module mc_1_12.
+
+Local Lemma Znat_def (n : int) : (n \is a Num.Def.Rnat) = (0 <= n).
+Proof. by []. Qed.
+
+Local Lemma ZnatP (m : int) :
+  reflect (exists n : nat, m = n) (m \is a Num.Def.Rnat).
+Proof. by case: m => m; constructor; [exists m | case]. Qed.
+
+End mc_1_12.
+
 #[deprecated(since="mathcomp 1.12.0", note="Use polyCMz instead.")]
 Notation polyC_mulrz := polyCMz (only parsing).
+#[deprecated(since="mathcomp 1.13.0",
+             note="Require archimedean.v and use Num.nat instead.")]
+Notation Znat := (Num.Def.Rnat : qualifier 1 int) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation Znat_def := mc_1_12.Znat_def (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Require archimedean.v.")]
+Notation ZnatP := mc_1_12.ZnatP (only parsing).

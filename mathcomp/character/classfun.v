@@ -1,11 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient finalg action gproduct.
-From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import matrix vector falgebra ssrnum algC algnum.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import order fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action gproduct ssralg finalg zmodp matrix vector.
+From mathcomp Require Import poly ssrnum archimedean commutator cyclic center.
+From mathcomp Require Import pgroup sylow falgebra algC algnum.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)
@@ -2313,8 +2313,8 @@ Lemma cfIndM phi psi:  H \subset G ->
 Proof.
 move=> HsG; apply/cfun_inP=> x Gx; rewrite !cfIndE // !cfunE !cfIndE // -mulrA.
 congr (_ * _); rewrite mulr_suml; apply: eq_bigr=> i iG; rewrite !cfunE.
-case: (boolP (x^i \in H))=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
-by rewrite !cfResE //; congr (_*_); rewrite cfunJgen ?genGid.
+case: (boolP (x ^ i \in H))=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
+by rewrite !cfResE //; congr (_ * _); rewrite cfunJgen ?genGid.
 Qed.
 
 End Induced.
@@ -2384,11 +2384,11 @@ Local Notation "phi ^u" := (cfAut u phi) (at level 3, format "phi ^u").
 Lemma cfAutZ_nat n phi : (n%:R *: phi)^u = n%:R *: phi^u.
 Proof. exact: raddfZnat. Qed.
 
-Lemma cfAutZ_Cnat z phi : z \in Cnat -> (z *: phi)^u = z *: phi^u.
-Proof. exact: raddfZ_Cnat. Qed.
+Lemma cfAutZ_Cnat z phi : z \in Num.nat -> (z *: phi)^u = z *: phi^u.
+Proof. exact: raddfZ_Rnat. Qed.
 
-Lemma cfAutZ_Cint z phi : z \in Cint -> (z *: phi)^u = z *: phi^u.
-Proof. exact: raddfZ_Cint. Qed.
+Lemma cfAutZ_Cint z phi : z \in Num.int -> (z *: phi)^u = z *: phi^u.
+Proof. exact: raddfZ_Rint. Qed.
 
 Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut_rmorphism u)).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_autK. Qed.

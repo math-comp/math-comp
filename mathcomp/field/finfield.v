@@ -1,11 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div tuple bigop prime finset fingroup.
-From mathcomp Require Import ssralg poly polydiv morphism action finalg zmodp.
-From mathcomp Require Import cyclic center pgroup abelian matrix mxpoly vector.
-From mathcomp Require Import falgebra fieldext separable galois.
-From mathcomp Require ssrnum ssrint algC cyclotomic.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple bigop prime finset ssralg.
+From mathcomp Require Import finalg zmodp matrix mxpoly vector poly polydiv.
+From mathcomp Require Import fingroup morphism action cyclic center pgroup.
+From mathcomp Require Import abelian falgebra fieldext separable galois.
+From mathcomp Require order ssrnum ssrint archimedean algC cyclotomic.
 
 (******************************************************************************)
 (*  Additional constructions and results on finite fields.                    *)
@@ -568,7 +568,7 @@ End FinFieldExists.
 
 Section FinDomain.
 
-Import order ssrnum ssrint algC cyclotomic Order.TTheory Num.Theory.
+Import order ssrnum ssrint archimedean algC cyclotomic Order.TTheory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.
@@ -638,14 +638,14 @@ suffices: `|aq n| <= (q - 1)%:R.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: le_trans (ler_sub_dist _ _).
   by rewrite normr_nat normrX n1z expr1n ler_subr_addl (leC_nat 2).
-have Zaq d: d %| n -> aq d \in Cint.
+have Zaq d: d %| n -> aq d \in Num.int.
   move/(dvdn_prim_root z_prim)=> zd_prim.
   rewrite rpred_horner ?rpred_nat //= -Cintr_Cyclotomic //.
   by apply/polyOverP=> i; rewrite coef_map ?rpred_int.
 suffices: (aq n %| (q - 1)%:R)%C.
-  rewrite {1}[aq n]CintEsign ?Zaq // -(rpredMsign _ (aq n < 0)%R).
+  rewrite {1}[aq n]RintEsign ?Zaq // -(rpredMsign _ (aq n < 0)%R).
   rewrite dvdC_mul2l ?signr_eq0 //.
-  have /CnatP[m ->]: `|aq n| \in Cnat by rewrite Cnat_norm_Cint ?Zaq.
+  have /RnatP[m ->]: `|aq n| \in Num.nat by rewrite Rnat_norm_Rint ?Zaq.
   by rewrite leC_nat dvdC_nat; apply: dvdn_leq; rewrite subn_gt0.
 have prod_aq m: m %| n -> \prod_(d < n.+1 | d %| m) aq d = (q ^ m - 1)%:R.
   move=> m_dv_n; transitivity ('X^m - 1).[q%:R : algC]; last first.
@@ -676,7 +676,7 @@ rewrite (bigD1 ord_max) //= [n %| m](contraNF _ Z'u) => [|n_dv_m]; last first.
   rewrite -sub_cent1 subEproper eq_sym eqEcard subsetT oG oCu leq_sub2r //.
   by rewrite leq_exp2l // dvdn_leq.
 rewrite divr1 dvdC_mulr //; apply/rpred_prod => d /andP[/Zaq-Zaqd _].
-have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r.
+have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r /=.
 by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 

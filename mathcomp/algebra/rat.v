@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
-From mathcomp Require Import ssrint.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype bigop order ssralg countalg ssrnum.
+From mathcomp Require Import ssrint archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -13,9 +13,6 @@ From mathcomp Require Import ssrint.
 (*                 rationals of the generic ring morphism n%:~R               *)
 (*       numq r == numerator of (r : rat)                                     *)
 (*       denq r == denominator of (r : rat)                                   *)
-(* x \is a Qint == x is an element of rat whose denominator is equal to 1     *)
-(* x \is a Qnat == x is a positive element of rat whose denominator is equal  *)
-(*                 to 1                                                       *)
 (*       ratr x == generic embedding of  (r : R) into an arbitrary unitring.  *)
 (******************************************************************************)
 
@@ -608,77 +605,49 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
+Module ratArchimedean.
+Section ratArchimedean.
+
+Implicit Types x : rat.
+
+Let trunc x : nat := if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
+
+Lemma truncP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
 Proof.
-move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
-by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
+rewrite /trunc -numq_ge0; case: (ratP x) => -[] //= n d _.
+rewrite ler_pdivl_mulr ?ltr_pdivr_mulr ?ltr0z // -!natrM ler_nat ltr_nat.
+by rewrite leq_trunc_div ltn_ceil.
 Qed.
 
-Canonical archiType := ArchiFieldType rat rat_archimedean.
+Let is_nat x := (0 <= x) && (denq x == 1).
 
-Section QintPred.
-
-Definition Qint := [qualify a x : rat | denq x == 1].
-Fact Qint_key : pred_key Qint. Proof. by []. Qed.
-Canonical Qint_keyed := KeyedQualifier Qint_key.
-
-Lemma Qint_def x : (x \is a Qint) = (denq x == 1). Proof. by []. Qed.
-
-Lemma numqK : {in Qint, cancel (fun x => numq x) intr}.
-Proof. by move=> x /(_ =P 1 :> int) Zx; rewrite numqE Zx rmorph1 mulr1. Qed.
-
-Lemma QintP x : reflect (exists z, x = z%:~R) (x \in Qint).
+Lemma is_natE x : is_nat x = ((trunc x)%:R == x).
 Proof.
-apply: (iffP idP) => [/numqK <- | [z ->]]; first by exists (numq x).
-by rewrite Qint_def denq_int.
+rewrite /is_nat /trunc -numq_ge0 !rat_eq; case: (ratP x) => -[] //= n d pnd.
+rewrite pmulrn numq_int denq_int mulr1 -PoszM !eqz_nat -dvdn_eq.
+apply/eqP/idP => [->|/dvdnP[k nE]] //.
+by move/eqP: pnd; rewrite nE gcdnC gcdnMl.
 Qed.
 
-Fact Qint_subring_closed : subring_closed Qint.
-Proof.
-split=> // _ _ /QintP[x ->] /QintP[y ->]; apply/QintP.
-  by exists (x - y); rewrite -rmorphB.
-by exists (x * y); rewrite -rmorphM.
-Qed.
+Lemma is_intE x : (denq x == 1) = is_nat x || is_nat (- x).
+Proof. by rewrite /is_nat denqN oppr_ge0 -andb_orl le_total. Qed.
 
-Canonical Qint_opprPred := OpprPred Qint_subring_closed.
-Canonical Qint_addrPred := AddrPred Qint_subring_closed.
-Canonical Qint_mulrPred := MulrPred Qint_subring_closed.
-Canonical Qint_zmodPred := ZmodPred Qint_subring_closed.
-Canonical Qint_semiringPred := SemiringPred Qint_subring_closed.
-Canonical Qint_smulrPred := SmulrPred Qint_subring_closed.
-Canonical Qint_subringPred := SubringPred Qint_subring_closed.
+Definition mixin : Num.ArchiNumDomain.mixin_of [numDomainType of rat] :=
+  Num.ArchiNumDomain.Mixin truncP is_natE is_intE.
 
-End QintPred.
+End ratArchimedean.
+End ratArchimedean.
 
-Section QnatPred.
+Canonical rat_archiNumDomainType := ArchiNumDomainType rat ratArchimedean.mixin.
+Canonical rat_archiRealDomainType := [archiRealDomainType of rat].
+Canonical rat_archiNumFieldType := [archiNumFieldType of rat].
+Canonical rat_archiRealFieldType := [archiRealFieldType of rat].
 
-Definition Qnat := [qualify a x : rat | (x \is a Qint) && (0 <= x)].
-Fact Qnat_key : pred_key Qnat. Proof. by []. Qed.
-Canonical Qnat_keyed := KeyedQualifier Qnat_key.
+Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 
-Lemma Qnat_def x : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
-Proof. by []. Qed.
-
-Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
-Proof.
-rewrite Qnat_def; apply: (iffP idP) => [/andP []|[n ->]]; last first.
-  by rewrite Qint_def pmulrn denq_int eqxx ler0z.
-by move=> /QintP [] [] n ->; rewrite ?ler0z // => _; exists n.
-Qed.
-
-Fact Qnat_semiring_closed : semiring_closed Qnat.
-Proof.
-do 2?split; move=> // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
-  by rewrite rpredD // addr_ge0.
-by rewrite rpredM // mulr_ge0.
-Qed.
-
-Canonical Qnat_addrPred := AddrPred Qnat_semiring_closed.
-Canonical Qnat_mulrPred := MulrPred Qnat_semiring_closed.
-Canonical Qnat_semiringPred := SemiringPred Qnat_semiring_closed.
-
-End QnatPred.
+Lemma numqK : {in Num.int, cancel (fun x => numq x) intr}.
+Proof. by move=> _ /RintP [x ->]; rewrite numq_int. Qed.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.
@@ -693,7 +662,7 @@ Lemma ratr_int z : ratr z%:~R = z%:~R.
 Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 
 Lemma ratr_nat n : ratr n%:R = n%:R.
-Proof. exact: (ratr_int n). Qed.
+Proof. exact: ratr_int n. Qed.
 
 Lemma rpred_rat (S : {pred R}) (ringS : divringPred S) (kS : keyed_pred ringS)
                 a :
@@ -794,6 +763,22 @@ Proof. by move=> x y; rewrite !maxEle ler_rat; case: leP. Qed.
 
 End InPrealField.
 
+Section InParchiField.
+
+Variable F : archiNumFieldType.
+
+Lemma floor_rat : {mono (@ratr F) : x / Num.floor x}.
+Proof.
+move=> x; apply: floorR_def; apply/andP; split.
+  by rewrite -ratr_int ler_rat ge_floorR // num_real.
+  by rewrite -ratr_int ltr_rat lt_succ_floorR // num_real.
+Qed.
+
+Lemma ceil_rat : {mono (@ratr F) : x / Num.ceil x}.
+Proof. by move=> x; rewrite /Num.ceil -rmorphN floor_rat. Qed.
+
+End InParchiField.
+
 Arguments ratr {R}.
 
 (* Conntecting rationals to the ring an field tactics *)
@@ -826,3 +811,41 @@ by move=> p /eqP p_neq0; rat_to_ring; rewrite mulVf.
 Qed.
 
 Add Field rat_field : rat_field_theory.
+
+Module mc_1_12.
+
+Local Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
+Local Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
+
+Local Lemma QintP (x : rat) : reflect (exists z, x = z%:~R) (x \in Qint).
+Proof. exact: RintP. Qed.
+
+Local Lemma Qnat_def (x : rat) : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
+Proof. exact: RnatEint. Qed.
+
+Local Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
+Proof. exact: RnatP. Qed.
+
+End mc_1_12.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.int instead.")]
+Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use Num.nat instead.")]
+Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RintP instead.")]
+Notation QintP := mc_1_12.QintP (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RnatEint instead.")]
+Notation Qnat_def := mc_1_12.Qnat_def (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use RnatP instead.")]
+Notation QnatP := mc_1_12.QnatP (only parsing).
+
+Canonical Rnat_addrPred.
+Canonical Rnat_mulrPred.
+Canonical Rnat_semiringPred.
+Canonical Rint_opprPred.
+Canonical Rint_addrPred.
+Canonical Rint_mulrPred.
+Canonical Rint_zmodPred.
+Canonical Rint_semiringPred.
+Canonical Rint_smulrPred.
+Canonical Rint_subringPred.
