@@ -1543,9 +1543,6 @@ HB.instance Definition _ := Countable.copy extremal_group_type (can_type extgK).
 Lemma bound_extremal_groups (c : extremal_group_type) : pickle c < 6.
 Proof. by case: c. Qed.
 
-#[export]
-HB.instance Definition _ := Finite.CountMixin bound_extremal_groups.
-
 Definition extremal_class (A : {set gT}) :=
   let m := #|A| in let p := pdiv m in let n := logn p m in
   if (n > 1) && (A \isog 'D_(2 ^ n)) then Dihedral else
