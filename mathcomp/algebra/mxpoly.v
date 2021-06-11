@@ -66,7 +66,7 @@ From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
 (*                  is a boolean predicate representing a set of matrices,    *)
 (*                  this states that conjmx P A is in S,                      *)
 (*                  which means A is similar to a matrix in S.                *)
-(* From the latter, we derive serveral related notions:                       *)
+(* From the latter, we derive several related notions:                        *)
 (*       A ~_P B := A ~_P {in pred1 B}                                        *)
 (*                  A is similar to B, with base change matrix P              *)
 (*  A ~_{in S} B := exists P, P \in S /\ A ~_P B                              *)
