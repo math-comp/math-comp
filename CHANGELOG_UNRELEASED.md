@@ -156,6 +156,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `ssrnum.v`:
   + new lemma `eqNr`
 
+- In `mxpoly.v`: developed the theory of diagonalization. To that
+  effect, we define `conjmx`, `restrictmx`, and notations `A ~_P B`,
+  `A ~_P {in S'}`, `A ~_{in S} B`, `A ~_{in S} {in S'}`,
+  `all_simmx_in`, `diagonalizable_for`, `diagonalizable_in`,
+  `diagonalizable`, `codiagonalizable_in`, and `codiagonalizable`; and
+  their theory: `stablemx_comp`, `stablemx_restrict`, `conjmxM`,
+  `conjMmx`, `conjuMmx`, `conjMumx`, `conjuMumx`, `conjmx_scalar`,
+  `conj0mx`, `conjmx0`, `conjumx`, `conj1mx`, `conjVmx`, `conjmxK`,
+  `conjmxVK`, `horner_mx_conj`, `horner_mx_uconj`, `horner_mx_uconjC`,
+  `mxminpoly_conj`, `mxminpoly_uconj`, `sub_kermxpoly_conjmx`,
+  `sub_eigenspace_conjmx`, `eigenpoly_conjmx`, `eigenvalue_conjmx`,
+  `conjmx_eigenvalue`, `simmxPp`, `simmxW`, `simmxP`, `simmxRL`,
+  `simmxLR`, `simmx_minpoly`, `diagonalizable_for_row_base`,
+  `diagonalizable_forPp`, `diagonalizable_forP`,
+  `diagonalizable_forPex`, `diagonalizable_forLR`,
+  `diagonalizable_for_mxminpoly`, `diagonalizable_for_sum`,
+  `codiagonalizable1`, `codiagonalizable_on`, `diagonalizable_diag`,
+  `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
+  `diagonalizableP`, `diagonalizable_conj_diag`, and
+  `codiagonalizableP`.
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
