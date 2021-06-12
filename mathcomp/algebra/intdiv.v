@@ -3,7 +3,7 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
-From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
+From mathcomp Require Import polydiv perm zmodp mxalgebra vector.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)
@@ -14,6 +14,7 @@ From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
 (*   (m %/ d)%Z == the quotient of the Euclidean division of m by d, such     *)
 (*                 that m = (m %/ d)%Z * d + (m %% d)%Z. Since for d != 0 the *)
 (*                 remainder is non-negative, (m %/ d)%Z is non-zero for      *)
+(*                 negative m.                                                *)
 (*   (d %| m)%Z <=> m is divisible by d; dvdz d is the (collective) predicate *)
 (*                 for integers divisible by d, and (d %| m)%Z is actually    *)
 (*                 (transposing) notation for m \in dvdz d.                   *)
@@ -21,7 +22,7 @@ From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
 (*                 m and n are (resp. compare, don't compare) equal mod d.    *)
 (*     gcdz m n == the (non-negative) greatest common divisor of m and n,     *)
 (*                 with gcdz 0 0 = 0.                                         *)
-(*     lcmz m n == the (non-negative) least common multiple of m and n,       *)
+(*     lcmz m n == the (non-negative) least common multiple of m and n.       *)
 (* coprimez m n <=> m and n are coprime.                                      *)
 (*    egcdz m n == the Bezout coefficients of the gcd of m and n: a pair      *)
 (*                 (u, v) of coprime integers such that u*m + v*n = gcdz m n. *)
@@ -30,7 +31,8 @@ From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
 (*                 remainder problem for n1 and n2, i.e., and integer n such  *)
 (*                 that n = n1 %[mod m1] and n = n2 %[mod m2].                *)
 (*  zcontents p == the contents of p : {poly int}, that is, the gcd of the    *)
-(*                 coefficients of p, with the lead coefficient of p,         *)
+(*                 coefficients of p, with the same sign as the lead          *)
+(*                 coefficient of p.                                          *)
 (* zprimitive p == the primitive part of p : {poly int}, i.e., p divided by   *)
 (*                 its contents.                                              *)
 (* inIntSpan X v <-> v is an integral linear combination of elements of       *)
@@ -39,7 +41,7 @@ From mathcomp Require Import polydiv finalg perm zmodp mxalgebra vector.
 (* int_Smith_normal_form :: a theorem asserting the existence of the Smith    *)
 (*                 normal form for integer matrices.                          *)
 (* Note that many of the concepts and results in this file could and perhaps  *)
-(* sould be generalized to the more general setting of integral, unique       *)
+(* should be generalized to the more general setting of integral, unique      *)
 (* factorization, principal ideal, or Euclidean domains.                      *)
 (******************************************************************************)
 
