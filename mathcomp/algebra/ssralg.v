@@ -4200,8 +4200,7 @@ HB.mixin Record ComUnitRing_IsIntegral R of ComUnitRing R := {
   mulf_eq0_subproof : integral_domain_axiom [the ringType of R];
 }.
 
-#[mathcomp(axiom="integral_domain_axiom"),
-  short(type="idomainType", pack="IdomainType")]
+#[mathcomp(axiom="integral_domain_axiom"), short(type="idomainType", pack="IdomainType")]
 HB.structure Definition IntegralDomain :=
   {R of ComUnitRing_IsIntegral R & ComUnitRing R}.
 
@@ -4352,8 +4351,7 @@ HB.mixin Record IsField R of UnitRing R := {
 HB.instance Definition _ (R : idomainType)
   (x : IsField (@eta Type R)) := IntegralDomain.on x.
 
-#[mathcomp(axiom="field_axiom"),
-  short(type="fieldType", pack="FieldType")]
+#[mathcomp(axiom="field_axiom"), short(type="fieldType", pack="FieldType")]
 HB.structure Definition Field := { R of IntegralDomain R & IsField R }.
 
 (* FIXME if deps of IsField are adjusted, this becomes unnecessary *)
@@ -4599,8 +4597,7 @@ HB.mixin Record Field_IsDec R of UnitRing R := {
 #[export] HB.instance Definition _ (F : fieldType)
   (x : Field_IsDec (@eta Type F)) := Field.on x.
 
-#[mathcomp(axiom="decidable_field_axiom"),
-  short(type="decFieldType", pack="DecFieldType")]
+#[mathcomp(axiom="decidable_field_axiom"), short(type="decFieldType", pack="DecFieldType")]
 HB.structure Definition DecidableField := { F of Field F & Field_IsDec F }.
 
 (* FIXME if deps are fixed, this is unnecessary *)
@@ -4803,8 +4800,7 @@ HB.mixin Record DecField_IsAlgClosed F of DecidableField F := {
 }.
 
 (* TODO: put a factory in field/closed_field *)
-#[mathcomp(axiom="closed_field_axiom"),
-  short(type="closedFieldType", pack="ClosedFieldType")]
+#[mathcomp(axiom="closed_field_axiom"), short(type="closedFieldType", pack="ClosedFieldType")]
 HB.structure Definition ClosedField :=
   { F of DecidableField F & DecField_IsAlgClosed F }.
 
