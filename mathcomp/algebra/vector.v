@@ -115,8 +115,7 @@ HB.mixin Record Lmodule_HasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V
   { dim : nat;
     vector_subdef : vector_axiom_def dim (Phant V) }.
 
-#[mathcomp(axiom="vector_axiom_def"), infer(R),
-  short(type="vectType", pack="VectType")]
+#[mathcomp(axiom="vector_axiom_def"), infer(R), short(type="vectType", pack="VectType")]
 HB.structure Definition Vector (R : ringType) :=
   { V of Lmodule_HasFinDim R V & GRing.Lmodule R V }.
 
