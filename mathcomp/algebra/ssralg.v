@@ -3078,8 +3078,8 @@ Variable R : comUnitRingType.
 Implicit Types x y : R.
 
 (* TODO: HB.recover_all_instances (R^o). *)
-HB.instance (R^c) (xxx1 R).
-HB.instance (R^o) (xxx2 R).
+HB.instance Definition _ : Ring_HasMulInverse (R^c) := xxx1 R.
+HB.instance Definition _ : Ring_HasMulInverse (R^o) := xxx2 R.
 End ComUnitRingTheory.
 End RegularConverseComUnitRingExports.
 HB.export RegularConverseComUnitRingExports.
@@ -4883,7 +4883,7 @@ Next Obligation. by move=> x y z; apply: injf; rewrite !fD addrA. Qed.
 Next Obligation. by move=> x y; apply: injf; rewrite !fD addrC. Qed.
 Next Obligation. by move=> x; apply: injf; rewrite fD f0 add0r. Qed.
 Next Obligation. by move=> x; apply: injf; rewrite !(fD, fN, f0) addNr. Qed.
-HB.instance U zmodU.
+HB.instance Definition _ : IsZmodule U := zmodU.
 HB.end.
 
 HB.factory Record PredSubZmodule V (S : {pred V})
@@ -4948,7 +4948,7 @@ Next Obligation. by move=> x; apply: injf; rewrite fM f1 mulr1. Qed.
 Next Obligation. by move=> *; apply: injf; rewrite !(fM, raddfD) mulrDl. Qed.
 Next Obligation. by move=> *; apply: injf; rewrite !(fM, raddfD) mulrDr. Qed.
 Next Obligation. by rewrite -(inj_eq injf) raddf0 f1 oner_eq0. Qed.
-HB.instance R ringR.
+HB.instance Definition _ : Zmodule_IsRing R := ringR.
 HB.end.
 
 HB.factory Record PredSubRing (R : ringType) (S : {pred R})
@@ -5017,7 +5017,7 @@ Next Obligation. by move=> *; apply: injf; rewrite !(fZ, raddfD). Qed.
 Next Obligation.
 by move=> x a b; apply: injf; rewrite !(fZ, raddfD) scalerDl.
 Qed.
-HB.instance U lmodU.
+HB.instance Definition _ : Zmodule_IsLmodule R U := lmodU.
 HB.end.
 
 HB.factory Record PredSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
@@ -5088,7 +5088,7 @@ Qed.
 Next Obligation.
 by move=> x; rewrite !inE => fxNU; apply: injf; rewrite fV invr_out.
 Qed.
-HB.instance R unitringR.
+HB.instance Definition _ : Ring_HasMulInverse R := unitringR.
 
 HB.end.
 
