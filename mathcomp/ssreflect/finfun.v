@@ -124,10 +124,10 @@ Canonical finfun_unlock := Unlockable FinfunDef.finfunE.
 Arguments finfun {aT rT} g.
 
 Notation "[ 'ffun' x : aT => E ]" := (finfun (fun x : aT => E))
-  (at level 0, x ident) : fun_scope.
+  (at level 0, x name) : fun_scope.
 
 Notation "[ 'ffun' x => E ]" := (@finfun _ (fun=> _) (fun x => E))
-  (at level 0, x ident, format "[ 'ffun'  x  =>  E ]") : fun_scope.
+  (at level 0, x name, format "[ 'ffun'  x  =>  E ]") : fun_scope.
 
 Notation "[ 'ffun' => E ]" := [ffun _ => E]
   (at level 0, format "[ 'ffun' =>  E ]") : fun_scope.

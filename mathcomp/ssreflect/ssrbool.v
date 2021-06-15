@@ -39,24 +39,24 @@ Coercion rel_of_simpl_rel T (sr : simpl_rel T) : rel T := sr.
 Arguments rel_of_simpl_rel {T} sr x / y : rename.
 
 (* Required to avoid an incompatible format warning with coq-8.12 *)
-Reserved Notation "[ 'rel' x y : T | E ]" (at level 0, x ident, y ident,
+Reserved Notation "[ 'rel' x y : T | E ]" (at level 0, x name, y name,
   format "'[hv' [ 'rel'  x  y  :  T  | '/ '  E ] ']'").
 
 Notation "[ 'rel' x y | E ]" := (SimplRel (fun x y => E%B)) (at level 0,
-  x ident, y ident, format "'[hv' [ 'rel'  x  y  | '/ '  E ] ']'") : fun_scope.
+  x name, y name, format "'[hv' [ 'rel'  x  y  | '/ '  E ] ']'") : fun_scope.
 Notation "[ 'rel' x y : T | E ]" := (SimplRel (fun x y : T => E%B)) 
   (only parsing) : fun_scope.
 Notation "[ 'rel' x y 'in' A & B | E ]" :=
-  [rel x y | (x \in A) && (y \in B) && E] (at level 0, x ident, y ident,
+  [rel x y | (x \in A) && (y \in B) && E] (at level 0, x name, y name,
   format "'[hv' [ 'rel'  x  y  'in'  A  &  B  | '/ '  E ] ']'") : fun_scope.
 Notation "[ 'rel' x y 'in' A & B ]" := [rel x y | (x \in A) && (y \in B)]
-  (at level 0, x ident, y ident,
+  (at level 0, x name, y name,
   format "'[hv' [ 'rel'  x  y  'in'  A  &  B ] ']'") : fun_scope.
 Notation "[ 'rel' x y 'in' A | E ]" := [rel x y in A & A | E]
-  (at level 0, x ident, y ident,
+  (at level 0, x name, y name,
   format "'[hv' [ 'rel'  x  y  'in'  A  | '/ '  E ] ']'") : fun_scope.
 Notation "[ 'rel' x y 'in' A ]" := [rel x y in A & A] (at level 0,
-  x ident, y ident, format "'[hv' [ 'rel'  x  y  'in'  A ] ']'") : fun_scope.
+  x name, y name, format "'[hv' [ 'rel'  x  y  'in'  A ] ']'") : fun_scope.
 
 Notation xrelpre := (fun f (r : rel _) x y => r (f x) (f y)).
 Definition relpre {T rT} (f : T -> rT)  (r : rel rT) :=

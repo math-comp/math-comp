@@ -86,7 +86,7 @@ Definition sizeT : polyF -> cps nat := (fix loop p :=
 Definition qf_red_cps T (x : cps T) (y : _ -> T) :=
    forall e k, qf_eval e (x k) = qf_eval e (k (y e)).
 Notation "x ->_ e y" := (qf_red_cps x (fun e => y))
-  (e ident, at level 90, format "x  ->_ e  y").
+  (e name, at level 90, format "x  ->_ e  y").
 
 Definition qf_cps T D (x : cps T) :=
   forall k, (forall y, D y -> qf (k y)) -> qf (x k).

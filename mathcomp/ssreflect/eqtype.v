@@ -504,12 +504,12 @@ Arguments app_fdelta {aT rT%type} df%FUN_DELTA f z.
 Notation "[ 'fun' z : T => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z : T =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA  (fun _ => F)) ..))
-  (at level 0, z ident, only parsing) : fun_scope.
+  (at level 0, z name, only parsing) : fun_scope.
 
 Notation "[ 'fun' z => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA (fun _ => F)) ..))
-  (at level 0, z ident, format
+  (at level 0, z name, format
    "'[hv' [ '[' 'fun'  z  => '/ '  F ']' '/'  'with'  '[' d1 , '/'  .. , '/'  dn ']' ] ']'"
    ) : fun_scope.
 
