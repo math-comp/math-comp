@@ -6383,6 +6383,13 @@ Proof. by move=> x; congr (_, _); apply: addNr. Qed.
 Definition pair_zmodMixin := ZmodMixin pair_addA pair_addC pair_add0 pair_addN.
 Canonical pair_zmodType := Eval hnf in ZmodType (M1 * M2) pair_zmodMixin.
 
+Fact fst_is_additive : additive fst.
+Proof. by []. Qed.
+Canonical fst_additive := Additive fst_is_additive.
+Fact snd_is_additive : additive snd.
+Proof. by []. Qed.
+Canonical snd_additive := Additive snd_is_additive.
+
 End PairZmod.
 
 Section PairRing.
@@ -6412,6 +6419,13 @@ Proof. by rewrite xpair_eqE oner_eq0. Qed.
 Definition pair_ringMixin :=
   RingMixin pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_one_neq0.
 Canonical pair_ringType := Eval hnf in RingType (R1 * R2) pair_ringMixin.
+
+Fact fst_is_multiplicative : multiplicative fst.
+Proof. by []. Qed.
+Canonical fst_rmorphism := AddRMorphism fst_is_multiplicative.
+Fact snd_is_multiplicative : multiplicative snd.
+Proof. by []. Qed.
+Canonical snd_rmorphism := AddRMorphism snd_is_multiplicative.
 
 End PairRing.
 
@@ -6448,6 +6462,13 @@ Definition pair_lmodMixin :=
   LmodMixin pair_scaleA pair_scale1 pair_scaleDr pair_scaleDl.
 Canonical pair_lmodType := Eval hnf in LmodType R (V1 * V2) pair_lmodMixin.
 
+Fact fst_is_scalable : scalable fst.
+Proof. by []. Qed.
+Canonical fst_linear := AddLinear fst_is_scalable.
+Fact snd_is_scalable : scalable snd.
+Proof. by []. Qed.
+Canonical snd_linear := AddLinear snd_is_scalable.
+
 End PairLmod.
 
 Section PairLalg.
@@ -6457,6 +6478,9 @@ Variables (R : ringType) (A1 A2 : lalgType R).
 Fact pair_scaleAl a (u v : A1 * A2) : a *: (u * v) = (a *: u) * v.
 Proof. by congr (_, _); apply: scalerAl. Qed.
 Canonical pair_lalgType :=  Eval hnf in LalgType R (A1 * A2) pair_scaleAl.
+
+Definition fst_lrmorphism := [lrmorphism of fst].
+Definition snd_lrmorphism := [lrmorphism of snd].
 
 End PairLalg.
 

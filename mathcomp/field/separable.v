@@ -228,7 +228,7 @@ have co_p0_q0: coprimep p0 q0.
     by rewrite mulrC mulrBr mul_polyC addrAC -addrA -opprB -rmorphM -rmorphB.
   have ->: q0 = q2 ^ at_t \Po ('X - y%:P) by rewrite polyCK ?comp_polyXaddC_K.
   apply/coprimep_comp_poly/Bezout_coprimepP; exists (u ^ at_t, v ^ at_t).
-  by rewrite -!rmorphM -rmorphD Dr /= map_polyC polyC_eqp1.
+  by rewrite /= -!rmorphM -rmorphD Dr /= map_polyC polyC_eqp1.
 have{co_p0_q0}: gcdp p0 (q ^ iota) %= 'X - y%:P.
   rewrite /eqp Dq (eqp_dvdl _ (Gauss_gcdpr _ _)) // dvdp_gcdr dvdp_gcd.
   rewrite dvdp_mull // -root_factor_theorem rootE horner_comp !hornerE.
