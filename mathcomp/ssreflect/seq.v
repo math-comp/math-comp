@@ -155,6 +155,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*               := [:: (x_1, y_1); ...; (x_mn, y_mn)] with mn = minn n m.    *)
 (*      unzip1 s == [:: (x_1).1; ...; (x_n).1] when s : seq (S * T).          *)
 (*      unzip2 s == [:: (x_1).2; ...; (x_n).2] when s : seq (S * T).          *)
+(*    map2 f s t == the sequence [:: f x_1 y_1, ..., f x_nm y_nm]             *)
+(*                  with mn = minn n m.                                      *)
 (*     flatten s == x_1 ++ ... ++ x_n ++ [::] when s : seq (seq T).           *)
 (*   reshape r s == s reshaped into a sequence of sequences whose sizes are   *)
 (*                  given by r (truncating if s is too long or too short).    *)
@@ -3063,6 +3065,91 @@ Lemma zip_map I f g (s : seq I) :
 Proof. by elim: s => //= i s ->. Qed.
 
 End Zip.
+
+Section Map2.
+
+Variables (n0 : nat) (T1 : Type) (x1 : T1) (T2 : Type) (x2 : T2).
+Variables (T3 : Type) (f : T1 -> T2 -> T3).
+
+Fixpoint map2 (s1 : seq T1) (s2 : seq T2) : seq T3 :=
+  match s1, s2 with
+  | a :: s3, b :: s4 => f a b :: map2 s3 s4
+  | _, _ => [::]
+  end.
+
+Lemma map2_map_zip s1 s2 : map2 s1 s2 = map (fun '(x, y) => f x y) (zip s1 s2).
+Proof. by elim: s1 s2 => [|h1 s1 +] [|h2 s2] //= => ->. Qed.
+
+Lemma map2_cons s1 s2 : map2 (x1 :: s1) (x2 :: s2) = f x1 x2 :: map2 s1 s2.
+Proof. by []. Qed.
+
+Lemma map2s0 s1 : map2 s1 [::] = [::].
+Proof. by case: s1. Qed.
+
+Lemma map2_nseq : map2 (nseq n0 x1) (nseq n0 x2) = nseq n0 (f x1 x2).
+Proof. by elim: n0 => // *; congr (_ :: _). Qed.
+
+Lemma map2_cat s11 s12 s21 s22 : size s11 = size s21 ->
+  map2 (s11 ++ s12) (s21 ++ s22) = map2 s11 s21 ++ map2 s12 s22.
+Proof. by move: s11 s21; apply: seq_ind2 => // ? ? ? ? ? /= ->. Qed.
+
+Lemma size_map2 s1 s2 : size (map2 s1 s2) = minn (size s1) (size s2).
+Proof. by rewrite map2_map_zip size_map size_zip. Qed.
+
+Lemma behead_map2 s1 s2 : behead (map2 s1 s2) = map2 (behead s1) (behead s2).
+Proof. by case: s1 s2 => [|? +] [|? ?] //= => -[]. Qed.
+
+Lemma nth_map2 s1 s2 (k : nat) da db dc :
+  dc = f da db -> size s2 = size s1 ->
+  nth dc (map2 s1 s2) k = f (nth da s1 k) (nth db s2 k).
+Proof.
+elim: s1 s2 k => [|h1 s1 IH1] s2 k Habc Hsize.
+  by rewrite (size0nil Hsize) !nth_nil.
+case: s2 IH1 Hsize =>[//|h2 s2] IH1 [Hsize].
+case: k IH1 =>[//|k]; exact.
+Qed.
+
+Lemma map2_rcons s1 s2 x1' x2' : size s1 = size s2 ->
+  map2 (rcons s1 x1') (rcons s2 x2') = rcons (map2 s1 s2) (f x1' x2').
+Proof. by move=> ?; rewrite -!cats1 map2_cat. Qed.
+
+Lemma last_map2 s1 s2 x1' x2' : size s1 = size s2 ->
+  last (f x1' x2') (map2 s1 s2) = f (last x1' s1) (last x2' s2).
+Proof. by move: s1 s2; apply: seq_ind2 => // ? ? [|? ?] [|? ?]. Qed.
+
+Lemma belast_map2 s1 s2 x1' x2' :
+  belast (f x1' x2') (map2 s1 s2) = map2 (belast x1' s1) (belast x2' s2).
+Proof. by elim: s1 s2 x1' x2' => //= h1 s1 + [//|h2 s2] x1' x2' /= => ->. Qed.
+
+Lemma map2_take s1 s2 : map2 (take n0 s1) (take n0 s2) = take n0 (map2 s1 s2).
+Proof. by elim: n0 s1 s2 => [|n IHn] [|h1 s1] [|h2 s2] //=; rewrite IHn. Qed.
+
+Lemma map2_drop s1 s2 :
+  map2 (drop n0 s1) (drop n0 s2) = drop n0 (map2 s1 s2).
+Proof. by elim: n0 s1 s2 => [|n IHn] [|h1 s1] [|h2 s2] //=; case: drop. Qed.
+
+Lemma map2_rot s1 s2 : size s1 = size s2 ->
+  map2 (rot n0 s1) (rot n0 s2) = rot n0 (map2 s1 s2).
+Proof.
+by move=> eqs; rewrite /rot map2_cat ?size_drop ?eqs // map2_take map2_drop.
+Qed.
+
+Lemma map2_rotr s1 s2 : size s1 = size s2 ->
+  map2 (rotr n0 s1) (rotr n0 s2) = rotr n0 (map2 s1 s2).
+Proof.
+by move=> eqs; apply: canRL (rotK n0) _; rewrite -map2_rot ?size_rotr // !rotrK.
+Qed.
+
+Lemma map2_rev s1 s2 : size s1 = size s2 ->
+  map2 (rev s1) (rev s2) = rev (map2 s1 s2).
+Proof. by move=> ?; rewrite map2_map_zip -rev_zip // map_rev -map2_map_zip. Qed.
+
+Lemma map2_mask m s1 s2 : map2 (mask m s1) (mask m s2) = mask m (map2 s1 s2).
+Proof.
+by elim: m s1 s2 => [|[|] m IHm] [|h1 p1] [|h2 p2]; rewrite /= ?IHm ?map2s0.
+Qed.
+
+End Map2.
 
 Prenex Implicits zip unzip1 unzip2 all2.
 
