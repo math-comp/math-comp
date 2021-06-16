@@ -216,10 +216,10 @@ Proof. exact/eqP/root_root. Qed.
 Lemma root_connect x y : (root x == root y) = connect x y.
 Proof. exact: sameP eqP (rootP x y). Qed.
 
-Definition closed_mem m_a := forall x y, e x y -> in_mem x m_a = in_mem y m_a.
+Definition closed_mem m_a := forall x y, e x y -> in_mem x m_a -> in_mem y m_a.
 
 Definition closure_mem m_a : pred T :=
-  fun x => ~~ disjoint (mem (connect x)) m_a.
+  fun y => [exists x, in_mem x m_a && connect x y].
 
 End Connect.
 
@@ -309,33 +309,41 @@ by rewrite -(last_cons x) -rev_rcons p_y -lastI rev_cons last_rcons.
 Qed.
 
 Lemma intro_closed a : (forall x y, e x y -> x \in a -> y \in a) -> closed e a.
-Proof.
-move=> cl_a x y e_xy; apply/idP/idP=> [|a_y]; first exact: cl_a.
-have{x e_xy} /connectP[p e_p ->]: connect e y x by rewrite sym_e connect1.
-by elim: p y a_y e_p => //= y p IHp x a_x /andP[/cl_a/(_ a_x)]; apply: IHp.
-Qed.
+Proof. by []. Qed.
 
 Lemma closed_connect a :
-  closed e a -> forall x y, connect e x y -> (x \in a) = (y \in a).
+  closed e a -> forall x y, connect e x y -> (x \in a) -> (y \in a).
 Proof.
 move=> cl_a x _ /connectP[p e_p ->].
-by elim: p x e_p => //= y p IHp x /andP[/cl_a->]; apply: IHp.
+by elim: p x e_p => //= y p IHp x /andP[/cl_a *]; apply: IHp; auto.
 Qed.
 
+Lemma closed_connect_sym a :
+  closed e a -> forall x y, connect e x y -> (x \in a) = (y \in a).
+Proof.
+by move=> cl_a x y c_xy; apply/idP/idP; apply/closed_connect; rewrite // sym_e.
+Qed.
+
+(* this used to be the definition of closed *)
+Lemma closed_sym a : closed e a -> forall x y, e x y -> (x \in a) = (y \in a).
+Proof. move => cl_a x y /connect1; exact: closed_connect_sym. Qed.
+
 Lemma connect_closed x : closed e (connect e x).
-Proof. by move=> y z /connect1/same_connect_r; apply. Qed.
+Proof. by move => y z /connect1 c_yz c_xy; apply: connect_trans c_yz. Qed.
 
 Lemma predC_closed a : closed e a -> closed e [predC a].
-Proof. by move=> cl_a x y /cl_a; rewrite !inE => ->. Qed.
+Proof.
+by move => cl_a x y /connect1 ?; apply/contraNN/closed_connect; rewrite // sym_e.
+Qed.
 
 Lemma closure_closed a : closed e (closure e a).
 Proof.
-apply: intro_closed => x y /connect1 e_xy; congr (~~ _).
-by apply: eq_disjoint; apply: same_connect.
+apply: intro_closed => x y xy /exists_inP [z z_a c_zx].
+by apply/exists_inP; exists z => //; apply: connect_trans (connect1 xy).
 Qed.
 
 Lemma mem_closure a : {subset a <= closure e a}.
-Proof. by move=> x a_x; apply/existsP; exists x; rewrite !inE connect0. Qed.
+Proof. by move => x a_x; apply/exists_inP; exists x. Qed.
 
 Lemma subset_closure a : a \subset closure e a.
 Proof. by apply/subsetP; apply: mem_closure. Qed.
@@ -344,10 +352,10 @@ Lemma n_comp_closure2 x y :
   n_comp e (closure e (pred2 x y)) = (~~ connect e x y).+1.
 Proof.
 rewrite -(root_connect sym_e) -card2; apply: eq_card => z.
-apply/idP/idP=> [/andP[/eqP {2}<- /pred0Pn[t /andP[/= ezt exyt]]] |].
-  by case/pred2P: exyt => <-; rewrite (rootP sym_e ezt) !inE eqxx ?orbT.
-by case/pred2P=> ->; rewrite !inE roots_root //; apply/existsP;
-  [exists x | exists y]; rewrite !inE eqxx ?orbT sym_e connect_root.
+apply/idP/idP=> [/andP [/eqP {2}<- /exists_inP [t xyt etz]]|].
+  by case/pred2P : xyt => <-; rewrite inE (rootP sym_e etz) eqxx ?orbT.
+by case/pred2P => ->; rewrite !inE roots_root //; apply/existsP;
+  [exists x | exists y]; rewrite !inE eqxx ?orbT connect_root.
 Qed.
 
 Lemma n_comp_connect x : n_comp e (connect e x) = 1.
@@ -585,7 +593,7 @@ Proof.
 move=> a_n cl_a; rewrite /n_comp_mem; set b := [predI froots f & a].
 suff <-: #|preim (froot f) b| = #|b| * n.
   apply: eq_card => x; rewrite !inE (roots_root fconnect_sym).
-  exact/esym/(closed_connect cl_a)/connect_root.
+  by rewrite -(closed_connect_sym symf cl_a (connect_root _ x)).
 have{cl_a a_n} (x): b x -> froot f x = x /\ order x = n.
   by case/andP=> /eqP-> /(subsetP a_n)/eqnP->.
 elim: {a b}#|b| {1 3 4}b (eqxx #|b|) => [|m IHm] b def_m f_b.
@@ -600,7 +608,7 @@ Qed.
 
 Lemma fclosed1 (a : {pred T}) :
   fclosed f a -> forall x, (x \in a) = (f x \in a).
-Proof. by move=> cl_a x; apply: cl_a (eqxx _). Qed.
+Proof. move => cl_a x. exact: (closed_sym symf) _ (eqxx _). Qed.
 
 Lemma same_fconnect1 x : fconnect f x =1 fconnect f (f x).
 Proof. by apply: same_connect1 => /=. Qed.
@@ -608,12 +616,12 @@ Proof. by apply: same_connect1 => /=. Qed.
 Lemma same_fconnect1_r x y : fconnect f x y = fconnect f x (f y).
 Proof. by apply: same_connect1r x => /=. Qed.
 
-Lemma fcard_gt0P (a : {pred T}) : 
+Lemma fcard_gt0P (a : {pred T}) :
   fclosed f a -> reflect (exists x, x \in a) (0 < fcard f a).
 Proof.
 move=> clfA; apply: (iffP card_gt0P) => [[x /andP[]]|[x xA]]; first by exists x.
 exists (froot f x); rewrite inE roots_root /=; last exact: fconnect_sym.
-by rewrite -(closed_connect clfA (connect_root _ x)).
+by rewrite (closed_connect clfA (connect_root _ x)).
 Qed.
 
 Lemma fcard_gt1P (A : {pred T}) :
@@ -625,7 +633,7 @@ move=> clAf; apply: (iffP card_gt1P) => [|[x xA [y yA not_xfy]]].
   move=> [x [y [/andP [/= rfx xA] /andP[/= rfy yA] xDy]]].
   by exists x; try exists y; rewrite // -root_connect // (eqP rfx) (eqP rfy).
 exists (froot f x), (froot f y); rewrite !inE !roots_root ?root_connect //=.
-by split => //; rewrite -(closed_connect clAf (connect_root _ _)).
+by split => //; rewrite (closed_connect clAf (connect_root _ _)).
 Qed.
 
 End orbit_inj.
@@ -953,11 +961,12 @@ move=> Aee' Ae'e; split=> [y a_y | x' z' a_x].
 apply/idP/idP=> [/connectP[p e'p ->{z'}] | /connectP[p e_p p_z']].
   elim: p x' a_x e'p => //= y' p IHp x' a_x.
   case: (Ae'e x' a_x) => _ Ae'x /andP[/Ae'x e_xy /IHp e_yz] {Ae'x}.
-  by apply: connect_trans (e_yz _); rewrite // -(closed_connect cl_a e_xy).
+  by apply: connect_trans (e_yz _); rewrite // -(closed_connect_sym _ cl_a e_xy).
 case: (Ae'e x' a_x) => /connect_trans-> //.
 elim: p {x'}(h x') p_z' a_x e_p => /= [|y p IHp] x p_z' a_x.
   by rewrite -p_z' in a_x *; case: (Ae'e _ a_x); rewrite sym_e'.
-case/andP=> e_xy /(IHp _ p_z') e'yz; have a_y: y \in a by rewrite -(cl_a e_xy).
+case/andP=> e_xy /(IHp _ p_z') e'yz.
+have a_y: y \in a by rewrite -(closed_sym _ cl_a e_xy).
 by apply: connect_trans (e'yz a_y); case: (Aee' _ a_x) => _ ->.
 Qed.
 
@@ -973,7 +982,7 @@ rewrite [h' _ _]iinv_f //; split=> // y' e'xy.
 by rewrite connect1 // a_ee' ?negbK.
 Qed.
 
-Let ccl_a := closed_connect cl_a.
+Let ccl_a := closed_connect_sym sym_e cl_a.
 
 Lemma adjunction_closed : rel_adjunction -> closed e' [preim h of a].
 Proof.
@@ -1009,7 +1018,7 @@ Notation "@ 'fun_adjunction' T T' h f f' a" :=
   (@rel_adjunction T T' h (frel f) (frel f') a)
   (at level 10, T, T', h, f, f', a at level 8, only parsing) : type_scope.
 
-Arguments intro_adjunction [T T' h e e'] _ [a].
+Arguments intro_adjunction [T T' h e e'] _ _ [a].
 Arguments adjunction_n_comp [T T'] h [e e'] _ _ [a].
 
 Unset Implicit Arguments.
