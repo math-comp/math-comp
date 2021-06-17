@@ -2302,6 +2302,10 @@ have [-> | /coprimepZl->] := eqVneq; last exact: coprime1p.
 by rewrite scale0r /coprimep gcd0p size_XsubC.
 Qed.
 
+Lemma coprimep_XsubC2 (a b : R) : b - a != 0 ->
+  coprimep ('X - a%:P) ('X - b%:P).
+Proof. by move=> bBa_neq0; rewrite coprimep_XsubC rootE hornerXsubC. Qed.
+
 Lemma coprimepX p : coprimep p 'X = ~~ root p 0.
 Proof. by rewrite -['X]subr0 coprimep_XsubC. Qed.
 

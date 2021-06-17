@@ -983,6 +983,12 @@ Lemma monic_comreg p :
   p \is monic -> GRing.comm p (lead_coef p)%:P /\ GRing.rreg (lead_coef p).
 Proof. by move/monicP->; split; [apply: commr1 | apply: rreg1]. Qed.
 
+Lemma monic_lreg p : p \is monic -> GRing.lreg p.
+Proof. by move=> /eqP lp1; apply/lreg_lead; rewrite lp1; apply/lreg1. Qed.
+
+Lemma monic_rreg p : p \is monic -> GRing.rreg p.
+Proof. by move=> /eqP lp1; apply/rreg_lead; rewrite lp1; apply/rreg1. Qed.
+
 (* Horner evaluation of polynomials *)
 Implicit Types s rs : seq R.
 Fixpoint horner_rec s x := if s is a :: s' then horner_rec s' x * x + a else 0.
