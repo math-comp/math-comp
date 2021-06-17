@@ -129,6 +129,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `mul_mxblock_mxdiag`, and `mul_mxdiag_mxblock`.
    + adding missing lemmas `trmx_conform` and `eq_castmx`.
 
+- in `matrix.v`, new lemmas `row_thin_mx`, `col_flat_mx`,
+  `col_id_mulmx`, `row_id_mulmx`, `mulmx_rsub`, `mulmx_lsub`,
+  `exp_block_diag_mx` and `invmx_block_diag`
+
 - in `mxalgegra.v`,
   + Lemmas about rank of block matrices with `0`s inside
     `rank_col_mx0`, `rank_col_0mx`, `rank_row_mx0`, `rank_row_0mx`,
@@ -144,6 +148,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `ssralg.v`
   + new lemma `fmorph_eq`
   + Canonical additive, linear and rmorphism for `fst` and `snd`
+  + new lemmas `lregMl` and `rregMr`
 
 - In `rat.v`
   + new lemmas `minr_rat`, `maxr_rat`
@@ -177,6 +182,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
   `diagonalizableP`, `diagonalizable_conj_diag`, and
   `codiagonalizableP`.
+
+- in `mxpoly.v`, new lemmas `row'_col'_char_poly_mx` and
+  `char_block_diag_mx`
+
+- in `polydiv.v`, new lemma `coprimep_factor`
+
+- in `poly.v`, new lemmas `monic_lreg` and `monic_rreg`
 
 ### Changed
 

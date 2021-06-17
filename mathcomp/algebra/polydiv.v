@@ -1950,6 +1950,15 @@ have := f_equal (horner^~ x) e; rewrite /= !hornerZ hornerD.
 by rewrite !hornerM (eqP px0) mulr0 add0r hornerC mulr1; move->.
 Qed.
 
+Lemma coprimep_factor (a b : R) : b - a \is a GRing.unit ->
+  coprimep ('X - a%:P) ('X - b%:P).
+Proof.
+move=> Hab; apply/Bezout_coprimepP.
+exists ((b - a)^-1%:P , -(b - a) ^-1%:P).
+rewrite /= !mulrBr !mulNr opprK -!addrA (addrC (- _)) !addrA addrN.
+by rewrite add0r -mulrBr -rmorphB -rmorphM mulVr // eqpxx.
+Qed.
+
 Lemma Gauss_dvdpl p q d: coprimep d q -> (d %| p * q) = (d %| p).
 Proof.
 move/Bezout_coprimepP=>[[u v] Puv]; apply/idP/idP; last exact: dvdp_mulr.
