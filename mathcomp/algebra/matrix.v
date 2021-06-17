@@ -837,6 +837,18 @@ Proof. by apply/colP=> j; rewrite !mxE; congr (A _ _); apply/val_inj. Qed.
 
 End CutPaste.
 
+Lemma row_thin_mx m n (A : 'M_(m,0)) (B : 'M_(m,n)) : row_mx A B = B.
+Proof.
+apply/matrixP=> i j; rewrite mxE; case: splitP=> [|k H]; first by case.
+by congr fun_of_matrix; exact: val_inj.
+Qed.
+
+Lemma col_flat_mx m n (A : 'M_(0,n)) (B : 'M_(m,n)) : col_mx A B = B.
+Proof.
+apply/matrixP=> i j; rewrite mxE; case: splitP => [|k H]; first by case.
+by congr fun_of_matrix; exact: val_inj.
+Qed.
+
 Lemma trmx_lsub m n1 n2 (A : 'M_(m, n1 + n2)) : (lsubmx A)^T = usubmx A^T.
 Proof. by split_mxE. Qed.
 
@@ -2222,6 +2234,20 @@ Lemma rowsubE m m' n f (A : 'M_(m, n)) :
    rowsub f A = rowsub f 1%:M *m A :> 'M_(m', n).
 Proof. by rewrite mul_rowsub_mx mul1mx. Qed.
 
+Lemma col_id_mulmx m n (A : 'M_(m,n)) i : A *m col i 1%:M = col i A.
+Proof.
+apply/matrixP=> k l; rewrite !mxE.
+rewrite (bigD1 i) // big1 /= ?addr0 ?mxE ?eqxx ?mulr1 // => j /negbTE neqji.
+  by rewrite !mxE neqji mulr0.
+Qed.
+
+Lemma row_id_mulmx m n (A : 'M_(m,n)) i : row i 1%:M *m A = row i A.
+Proof.
+apply/matrixP=> k l; rewrite !mxE.
+rewrite (bigD1 i) // big1 /= ?addr0 ?mxE ?eqxx ?mul1r // => j /negbTE Hj.
+  by rewrite !mxE eq_sym Hj mul0r.
+Qed.
+
 (* mulmx and col_perm, row_perm, xcol, xrow *)
 
 Lemma mul_col_perm m n p s (A : 'M_(m, n)) (B : 'M_(n, p)) :
@@ -2447,6 +2473,18 @@ Lemma mulmx_block m1 m2 n1 n2 p1 p2 (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
                (Adl *m Bul + Adr *m Bdl) (Adl *m Bur + Adr *m Bdr).
 Proof. by rewrite mul_col_mx !mul_row_block. Qed.
 
+Lemma mulmx_rsub m n p k (A : 'M_(m, n)) (B : 'M_(n, p + k)) :
+  A *m rsubmx B = rsubmx (A *m B).
+Proof.
+by apply/matrixP=> i j; rewrite !mxE; apply: eq_bigr => l //= _; rewrite mxE.
+Qed.
+
+Lemma mulmx_lsub m n p k (A : 'M_(m, n)) (B : 'M_(n, p + k)) :
+  A *m lsubmx B = lsubmx (A *m B).
+Proof.
+by apply/matrixP=> i j; rewrite !mxE; apply: eq_bigr => l //= _; rewrite mxE.
+Qed.
+
 (* Correspondence between matrices and linear function on row vectors. *)
 Section LinRowVector.
 
@@ -2635,6 +2673,15 @@ Lemma lift0_mx_is_perm s : is_perm_mx (lift0_mx (perm_mx s)).
 Proof. by rewrite lift0_mx_perm perm_mx_is_perm. Qed.
 
 End LiftPerm.
+
+Lemma exp_block_diag_mx m n (A: 'M_m.+1) (B : 'M_n.+1) k :
+  (block_mx A 0 0 B) ^+ k = block_mx (A ^+ k) 0 0 (B ^+ k).
+Proof.
+elim: k=> [|k IHk].
+  by rewrite !expr0 -scalar_mx_block.
+rewrite !exprS IHk /GRing.mul /= (mulmx_block A 0 0 B (A ^+ k)).
+by rewrite !mulmx0 !mul0mx !add0r !addr0.
+Qed.
 
 (* Determinants and adjugates are defined here, but most of their properties *)
 (* only hold for matrices over a commutative ring, so their theory is        *)
@@ -3360,6 +3407,21 @@ Qed.
 End MatrixInv.
 
 Prenex Implicits unitmx invmx invmxK.
+
+Lemma invmx_block_diag (R : comUnitRingType) n1 n2
+      (Aul : 'M[R]_n1.+1) (Adr : 'M[R]_n2.+1) :
+  block_mx Aul 0 0 Adr \in unitmx ->
+  (block_mx Aul 0 0 Adr)^-1 = block_mx Aul^-1 0 0 Adr^-1.
+Proof.
+move=> Hu.
+have Hu2: (block_mx Aul 0 0 Adr) \is a GRing.unit by [].
+rewrite unitmxE det_ublock unitrM in Hu.
+case/andP: Hu; rewrite -!unitmxE => HAul HAur.
+have H: block_mx Aul 0 0 Adr *  block_mx Aul^-1 0 0 Adr^-1 = 1.
+rewrite /GRing.mul /= (mulmx_block Aul _ _ _ Aul^-1) !mulmxV //.
+  by rewrite !mul0mx !mulmx0 !add0r addr0 -scalar_mx_block.
+by apply: (mulrI Hu2); rewrite H mulrV.
+Qed.
 
 Canonical matrix_countUnitRingType (R : countComUnitRingType) n :=
   [countUnitRingType of 'M[R]_n.+1].

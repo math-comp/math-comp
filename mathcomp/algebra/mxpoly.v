@@ -583,6 +583,25 @@ rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //; last first.
 by move=> k /negPf ki_eqF; rewrite !mxE eqxx ki_eqF mul0r.
 Qed.
 
+Lemma row'_col'_char_poly_mx {R : ringType} m i (M : 'M[R]_m) :
+  row' i (col' i (char_poly_mx M)) = char_poly_mx (row' i (col' i M)).
+Proof.
+apply/matrixP=> k l; rewrite !mxE.
+suff ->: (lift i k == lift i l) = (k == l) => //.
+by apply/inj_eq/lift_inj.
+Qed.
+
+Lemma char_block_diag_mx {R : ringType} m n (A : 'M[R]_m) (B : 'M[R]_n) :
+  char_poly_mx (block_mx A 0 0 B) =
+  block_mx (char_poly_mx A) 0 0 (char_poly_mx B).
+Proof.
+apply/matrixP=> i j; rewrite !mxE.
+case: splitP=> k Hk; rewrite !mxE; case: splitP=> l Hl; rewrite !mxE;
+rewrite -!(inj_eq (@ord_inj _)) Hk Hl ?subr0 ?eqn_add2l //.
+  by rewrite ltn_eqF // ltn_addr.
+by rewrite gtn_eqF // ltn_addr.
+Qed.
+
 Section MinPoly.
 
 Variables (F : fieldType) (n' : nat).
