@@ -283,12 +283,6 @@ Definition zmodType := @GRing.Zmodule.Pack cT class.
 
 End ClassDef.
 
-(* TODO: Ideally,`numDomain_normedZmodType` should be located in              *)
-(* `NumDomain_joins`. Currently, it's located here to make `hierarchy.ml` can *)
-(* recognize that `numDomainType` inherits `normedZmodType`.                  *)
-Definition numDomain_normedZmodType (R : numDomainType) : type (Phant R) :=
-  @Pack R (Phant R) R (Class (NumDomain.normed_mixin (NumDomain.class R))).
-
 Module Exports.
 Coercion base : class_of >-> GRing.Zmodule.class_of.
 Coercion mixin : class_of >-> normed_mixin_of.
@@ -299,8 +293,6 @@ Coercion choiceType : type >-> Choice.type.
 Canonical choiceType.
 Coercion zmodType : type >-> GRing.Zmodule.type.
 Canonical zmodType.
-Coercion numDomain_normedZmodType : NumDomain.type >-> type.
-Canonical numDomain_normedZmodType.
 Notation normedZmodType R := (type (Phant R)).
 Notation NormedZmodType R T m := (@pack _ (Phant R) T _ m).
 Notation NormedZmodMixin := Mixin.
@@ -322,17 +314,12 @@ Section NumDomain_joins.
 Variables (T : Type) (cT : type).
 
 Notation class := (class cT).
-(* Definition normedZmodType : normedZmodType cT := *)
-(*   @NormedZmodule.Pack *)
-(*      cT (Phant cT) cT *)
-(*      (NormedZmodule.Class (NumDomain.normed_mixin class)). *)
-Notation normedZmodType := (NormedZmodule.numDomain_normedZmodType cT).
-Definition normedZmod_ringType :=
-  @GRing.Ring.Pack normedZmodType class.
-Definition normedZmod_comRingType :=
-  @GRing.ComRing.Pack normedZmodType class.
-Definition normedZmod_unitRingType :=
-  @GRing.UnitRing.Pack normedZmodType class.
+Definition normedZmodType : normedZmodType cT :=
+  @NormedZmodule.Pack
+     cT (Phant cT) cT (NormedZmodule.Class (NumDomain.normed_mixin class)).
+Definition normedZmod_ringType := @GRing.Ring.Pack normedZmodType class.
+Definition normedZmod_comRingType := @GRing.ComRing.Pack normedZmodType class.
+Definition normedZmod_unitRingType := @GRing.UnitRing.Pack normedZmodType class.
 Definition normedZmod_comUnitRingType :=
   @GRing.ComUnitRing.Pack normedZmodType class.
 Definition normedZmod_idomainType :=
@@ -343,8 +330,8 @@ Definition normedZmod_porderType :=
 End NumDomain_joins.
 
 Module Exports.
-(* Coercion normedZmodType : type >-> NormedZmodule.type. *)
-(* Canonical normedZmodType. *)
+Coercion normedZmodType : type >-> NormedZmodule.type.
+Canonical normedZmodType.
 Canonical normedZmod_ringType.
 Canonical normedZmod_comRingType.
 Canonical normedZmod_unitRingType.

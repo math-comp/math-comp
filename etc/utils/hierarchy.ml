@@ -57,18 +57,14 @@ let parse_canonicals file =
   let lines = ref [] in
   let ic = open_in file in
   let re = Str.regexp
-      "^\\([^ ]+\\)\\.sort <- \\([^ ]+\\)\\.sort ( \\([^ ]+\\)\\.\\([^\\. ]+\\) )$" in
+      "^\\([^ ]+\\)\\.sort <- \\([^ ]+\\)\\.sort ( \\([^ ]+\\) )$" in
   begin
     try while true do
         let line = input_line ic in
         if Str.string_match re line 0
         then
-          let to_module = Str.matched_group 1 line in
-          let from_module = Str.matched_group 2 line in
-          let proj_module = Str.matched_group 3 line in
-          if from_module = proj_module || to_module = proj_module then
-            lines := (from_module, to_module,
-                      proj_module ^ "." ^ Str.matched_group 4 line) :: !lines
+          lines := (Str.matched_group 2 line, Str.matched_group 1 line,
+                    Str.matched_group 3 line) :: !lines
       done with End_of_file -> close_in ic
   end;
   List.rev !lines
@@ -186,6 +182,7 @@ Tactic Notation "check_join"
 Goal False.
 |}
     (String.concat " " libs);
+  let results = ref [] in
   MapS.iter (fun kl ml ->
       MapS.iter (fun kr mr ->
           let m =
@@ -197,14 +194,18 @@ Goal False.
           in
           match MapS.bindings m with
             | [] -> ()
-            | [kj, ()] ->
-              Printf.printf "check_join %s.type %s.type %s.type.\n" kl kr kj
+            | [kj, ()] -> results := (kl, kr, kj) :: !results
             | joins ->
               failwith
                 (Printf.sprintf
                    "%s and %s have more than two least common children: %s."
                    kl kr (String.concat ", " (List.map fst joins)))
         ) inhs) inhs;
+  List.iter
+    (fun (kl, kr, kj) ->
+       Printf.printf "check_join %s.type %s.type %s.type.\n" kl kr kj)
+    (List.sort (fun (_, _, j1) (_, _, j2) -> String.compare j1 j2)
+       (List.rev !results));
   Printf.printf "Abort.\n"
 ;;
 
@@ -258,8 +259,12 @@ Redirect %S Print Graph.
         failwith "Failed to invoke coqtop."
   end;
   (* Parsing *)
-  let canonicals = parse_canonicals tmp_canonicals in
   let coercions = parse_coercions tmp_coercions in
+  let canonicals = List.filter
+      (fun (src1, dest1, _) -> List.exists
+          (fun (src2, dest2, _) -> src1 = src2 && dest1 = dest2) coercions)
+      (parse_canonicals tmp_canonicals)
+  in
   (* Output *)
   if !opt_verify then
     print_verifier !opt_imports

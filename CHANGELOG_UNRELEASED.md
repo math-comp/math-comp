@@ -186,6 +186,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - across the library, the deprecation mechanism to use has been changed from the
   `deprecate` notation to the `deprecated` attribute (cf. Removed section).
 
+- in `finalg.v`, `finFieldType` now inherits from `countDecFieldType`.
+
 ### Renamed
 
 - in `path.v`,
@@ -229,5 +231,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `order.v`, remove the deprecation aliases `eq_sorted_(le|lt)`.
 
 ### Infrastructure
+
+- The way `hierachy.ml` recognizes inheritance has been changed: `S1` inherits
+  from `S2` when there is a coercion path from `S1.sort` to `S2.sort` and there
+  is a canonical structure instance that unifies `S1.sort` and `S2.sort`,
+  regardless of where (which module) these constants are declared.
+  As a result, it recognizes non-forgetful inheritance and checks the uniqueness
+  of join and exhaustiveness of canonical declarations involving it.
 
 ### Misc
