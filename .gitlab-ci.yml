@@ -79,6 +79,18 @@ make-coq-latest:
       - tags
       - merge_requests
 
+.dune-build:
+  stage: build
+  image: coqorg/coq:dev
+  script:
+    - opam switch "$COMPILER_EDGE"
+    - opam install dune
+    - cd mathcomp && dune build
+  except:
+    - tags
+    - merge_requests
+    - schedules
+
 .opam-build-once:
   extends: .opam-build
   except:
@@ -100,6 +112,9 @@ coq-8.13:
 
 coq-dev:
   extends: .opam-build
+
+coq-dev:dune:
+  extends: .dune-build
 
 ################
 ##### test stage
