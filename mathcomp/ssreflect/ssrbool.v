@@ -388,3 +388,33 @@ End in_sig.
 Arguments in1_sig {T1 D1 P1}.
 Arguments in2_sig {T1 T2 D1 D2 P2}.
 Arguments in3_sig {T1 T2 T3 D1 D2 D3 P3}.
+
+(******************)
+(* v8.15 addtions *)
+(******************)
+
+Section ReflectCombinators.
+
+Variables (P Q : Prop) (p q : bool).
+
+Hypothesis rP : reflect P p.
+Hypothesis rQ : reflect Q q.
+
+Lemma negPP : reflect (~ P) (~~ p).
+Proof. by apply:(iffP negP); apply: contra_not => /rP. Qed.
+
+Lemma andPP : reflect (P /\ Q) (p && q).
+Proof. by apply: (iffP andP) => -[/rP ? /rQ ?]. Qed.
+
+Lemma orPP : reflect (P \/ Q) (p || q).
+Proof. by apply: (iffP orP) => -[/rP ?|/rQ ?]; tauto. Qed.
+
+Lemma implyPP : reflect (P -> Q) (p ==> q).
+Proof. by apply: (iffP implyP) => pq /rP /pq /rQ. Qed.
+
+End ReflectCombinators.
+Arguments negPP {P p}.
+Arguments andPP {P Q p q}.
+Arguments orPP {P Q p q}.
+Arguments implyPP {P Q p q}.
+Prenex Implicits negPP andPP orPP implyPP.
