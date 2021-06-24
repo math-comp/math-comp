@@ -3382,6 +3382,7 @@ Variables (n : nat) (R : finComUnitRingType).
 
 HB.instance Definition _ := [Finite of {'GL_n[R]} by <:].
 HB.instance Definition _ := FinGroup.on {'GL_n[R]}.
+
 Definition GLgroup of phant R := [set: {'GL_n[R]}].
 Canonical GLgroup_group ph := Eval hnf in [group of GLgroup ph].
 

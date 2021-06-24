@@ -703,7 +703,7 @@ pose Iaddkey := GRing.Pred.Add (DefaultPredKey I) I_ideal.
 pose Iidkey := MkIdeal (GRing.Pred.Zmod Iaddkey I_ideal) I_ideal.
 pose EMixin := GRing.Ring_HasCommutativeMul.Build _
   (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)).
-pose E := [comRingType of EMixin].
+pose E := ComRingType _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
@@ -724,7 +724,7 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
 pose EfieldMixin := GRing.ComRing_IsField.Build _ EmulV Einv0.
-pose Efield := [fieldType of EfieldMixin].
+pose Efield := FieldType E EfieldMixin.
 pose EIsCountable := @CanCountMixin _ Efield _ _ reprK.
 pose Ecount := CountFieldType E EIsCountable.
 pose FtoE := [rmorphism of PtoE \o polyC]; pose w : E := PtoE 'X.
@@ -861,8 +861,8 @@ have KmulD: left_distributive Kmul Kadd.
   move=> u v w; have [i [x ->] [[y ->] [z ->]]] := KtoE3 u v w.
   by rewrite -!(EtoK_M, EtoK_D) mulrDl.
 have Kone_nz: FtoK 1 != FtoK 0 by rewrite EtoKeq0 oner_neq0.
-pose KringMixin := (GRing.Zmodule_IsComRing.Build _
-  KmulA KmulC Kmul1 KmulD Kone_nz).
+pose KringMixin := GRing.Zmodule_IsComRing.Build _
+  KmulA KmulC Kmul1 KmulD Kone_nz.
 pose Kring := ComRingType K KringMixin.
 have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
   move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.

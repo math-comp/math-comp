@@ -588,9 +588,9 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
-  pose RyM := Num.IntegralDomain_IsLtReal.Build _ posD
+  pose RyM := Num.IntegralDomain_IsLtReal.Build (Q y) posD
                 posM posNneg posB posVneg absN absE (rrefl _).
-  pose Ry := RealFieldType _ RyM.
+  pose Ry := RealFieldType (Q y) RyM.
   have QisArchi : Num.RealField_IsArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
   exists (ArchiFieldType _ QisArchi); apply: [rmorphism of idfun].
@@ -657,7 +657,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
   pose QtMixin := FieldExt_IsSplittingField.Build _ _ gal_t.
-  pose Qt := SplittingFieldType _ QtMixin _.
+  pose Qt := SplittingFieldType _ (Q t) QtMixin.
   have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
   pose Cn : {subfield Qt} := <<Rn; i_t>>%AS.
@@ -688,7 +688,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     apply/and3P; split=> //; first by apply: sepQ.
     apply/splitting_normalField=> //.
     pose QzMixin := FieldExt_IsSplittingField.Build _ _ gal_z.
-    pose Qz := SplittingFieldType _ QzMixin _.
+    pose Qz := SplittingFieldType _ (Q z) QzMixin.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.

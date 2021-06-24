@@ -199,9 +199,9 @@ HB.instance Definition _ := FieldExt_IsSplittingField.Build F ffT
 End FinFieldExt.
 
 Definition FinSplittingFieldType (F : finFieldType) (fT : fieldExtType F) :=
-  Eval hnf in SplittingFieldType F fT (finvect_type fT).
+  Eval hnf in SplittingFieldType F fT (SplittingField.on (finvect_type fT)).
 Definition FinFieldExtType (F : finFieldType) (fT : fieldExtType F) :=
-  Eval hnf in FinFieldType (FinSplittingFieldType fT) (finvect_type fT).
+  Eval hnf in FinFieldType (FinSplittingFieldType fT) (FinRing.Field.on (finvect_type fT)).
 Arguments FinSplittingFieldType : clear implicits.
 
 Section PrimeChar.
@@ -683,7 +683,8 @@ Definition FinDomainFieldType : finFieldType :=
  let cC := GRing.Ring_HasCommutativeMul.Build R finDomain_mulrC in
  let cR := ComUnitRingType R cC in
  let iC := GRing.ComUnitRing_IsIntegral.Build cR domR in
- let fC := GRing.IsField.Build iC finDomain_field in FinFieldType R fC.
+ let iR := FinIntegralDomainType cR iC in
+ let fC := GRing.IsField.Build iR finDomain_field in FinFieldType iR fC.
 
 Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=
   let RoverFp := [splittingFieldType _ of

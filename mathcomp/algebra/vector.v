@@ -210,7 +210,7 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
-HB.instance Definition _ := SUB.copy 'Hom(aT, rT) [newType for f2mx].
+HB.instance Definition _ : IsSUB _ _ 'Hom(aT, rT) := [IsNew for f2mx].
 End Hom.
 
 Arguments mx2vs {K vT m%N} A%MS.
@@ -1712,9 +1712,9 @@ Definition lfun_comp_ringMixin := GRing.Zmodule_IsRing.Build 'End(vT)
 Definition lfun_comp_ringType := Eval hnf in RingType 'End(vT)
   lfun_comp_ringMixin.
 
-(* In the standard endomorphism ring product is categorical composition.     *)
+(* In the standard endomorphism ring product is categorical composition. *)
 Definition lfun_ringType := Eval hnf in
-  RingType 'End(vT) (lfun_comp_ringType^c).
+  RingType 'End(vT) (GRing.Ring.on (lfun_comp_ringType^c)).
 
 Definition lfun_lalgMixin := GRing.Lmodule_IsLalgebra.Build _ lfun_ringType
   (fun k x y => comp_lfunZr k y x).
