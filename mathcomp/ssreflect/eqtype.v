@@ -646,25 +646,6 @@ Reserved Notation "[ 'subType' 'for' v ]"
 Reserved Notation "[ 'IsSUB' 'for' v ]"
   (at level 0, format "[ 'IsSUB'  'for'  v ]").
 
-Notation SubType T v s sr sk :=
-  (SUB.pack _ _ T%type (@IsSUB.phant_Build _ _ T v s sr sk)).
-
-Notation "[ 'subType' 'for' v ]" := (SubType _ v _ inlined_sub_rect vrefl_rect)
- (only parsing) : form_scope.
-
-Notation "[ 'subType' 'for' v ]" := (SubType _ v _ _ vrefl_rect)
- (only printing) : form_scope.
-
-Notation "[ 'subType' 'for' v 'by' rec ]" := (SubType _ v _ rec vrefl)
- (at level 0, format "[ 'subType'  'for'  v  'by'  rec ]") : form_scope.
-
-Notation "[ 'subType' 'of' U 'for' v ]" :=
-   (SUB.clone _ _ U (SubType _ v _ _ _))
- (at level 0, format "[ 'subType'  'of'  U  'for'  v ]") : form_scope.
-
-Notation "[ 'subType' 'of' U ]" := (SUB.clone _ _ U _)
- (at level 0, format "[ 'subType'  'of'  U ]") : form_scope.
-
 Notation "[ 'IsSUB' 'for' v ]" :=
   (@IsSUB.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
@@ -680,24 +661,8 @@ Notation "[ 'IsSUB' 'for' v 'by' rec ]" :=
 Notation "[ 'IsSUB' 'for' v ]" := (@IsSUB.phant_Build _ _ _ v _ _ _)
   (only printing, at level 0, format "[ 'IsSUB'  'for'  v ]") : form_scope.
 
-Definition NewType T U v c Urec sk :=
-  let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  SubType U v (fun x _ => c x) Urec' sk.
-Arguments NewType [T U].
-
-Reserved Notation "[ 'newType' 'for' v ]"
-  (at level 0, format "[ 'newType'  'for'  v ]").
 Reserved Notation "[ 'IsNew' 'for' v ]"
   (at level 0, format "[ 'IsNew'  'for'  v ]").
-
-Notation "[ 'newType' 'for' v ]" := (NewType v _ inlined_new_rect vrefl_rect)
- (only parsing) : form_scope.
-
-Notation "[ 'newType' 'for' v ]" := (NewType v _ _ vrefl_rect)
- (only printing) : form_scope.
-
-Notation "[ 'newType' 'for' v 'by' rec ]" := (NewType v _ rec vrefl)
- (at level 0, format "[ 'newType'  'for'  v  'by'  rec ]") : form_scope.
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in

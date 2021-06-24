@@ -1667,8 +1667,8 @@ Qed.
 
 Inductive subg_of : predArgType := Subg x & x \in G.
 Definition sgval u := let: Subg x _ := u in x.
-HB.instance Definition _ : SUB _ _ subg_of :=
-  SUB.class [subType for sgval].
+Definition subg_of_SUB := Eval hnf in [IsSUB for sgval].
+HB.instance Definition _ := subg_of_SUB.
 HB.instance Definition _ := [Finite of subg_of by <:].
 
 Lemma subgP u : sgval u \in G.

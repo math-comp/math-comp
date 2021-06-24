@@ -1353,7 +1353,7 @@ have mulZrM : GRing.Lalgebra_IsAlgebra F laL.
   by constructor => a x y; rewrite !(mulrC x) scalerAl.
 pose aL := AlgType F laL mulZrM.
 pose uLM := Algebra_IsFalgebra.Build F aL.
-pose cuL := ComUnitRingType uLM _.
+pose cuL := ComUnitRingType aL uLM.
 have unitM : GRing.ComUnitRing_IsField cuL.
   constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
@@ -1364,7 +1364,7 @@ have unitM : GRing.ComUnitRing_IsField cuL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose feL := FieldExtType _ unitM _.
+pose feL := FieldExtType _ _ unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).

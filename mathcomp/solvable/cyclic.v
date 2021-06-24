@@ -825,7 +825,7 @@ have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
-pose gT := [finGroupType of IsMulGroup.Build _ sG_Ag sG_1g sG_Vg].
+pose gT := FinGroupType _ (IsMulGroup.Build _ sG_Ag sG_1g sG_Vg).
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
   by split=> [ri1 | ->]; first apply: val_inj.
