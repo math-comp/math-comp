@@ -1865,6 +1865,10 @@ Lemma big_all_cond :
   \big[andb/true]_(i <- r | P i) B i = all [pred i | P i ==> B i] r.
 Proof. by rewrite big_mkcond unlock. Qed.
 
+Lemma big_bool R (idx : R) (op : Monoid.com_law idx) (F : bool -> R):
+  \big[op/idx]_(i : bool) F i = op (F true) (F false).
+Proof. by rewrite /index_enum !unlock /= Monoid.mulm1. Qed.
+
 End Seq.
 
 Section FinType.
