@@ -1350,6 +1350,14 @@ Proof.
 by elim: rr => [|r rr IHrr]; rewrite ?big_nil //= big_cat big_cons -IHrr.
 Qed.
 
+Lemma big_enum_cond (I : finType) (A : {pred I}) (P : pred I) F :
+  \big[*%M/1]_(i <- enum A | P i) F i = \big[*%M/1]_(i in A | P i) F i.
+Proof. by rewrite -big_filter_cond. Qed.
+
+Lemma big_enum (I : finType) (A : {pred I}) F :
+  \big[*%M/1]_(i <- enum A) F i = \big[*%M/1]_(i in A) F i.
+Proof. by rewrite big_enum_cond big_andbC. Qed.
+
 End Plain.
 
 Section Abelian.
@@ -1371,16 +1379,6 @@ case/splitPr: r2 / r2i => [r3 r4] in eq_r12 *; rewrite big_cat /= !big_cons.
 rewrite mulmCA; congr (_ * _); rewrite -big_cat; apply: IHr1 => a.
 by move/(_ a): eq_r12; rewrite !count_cat /= addnCA; apply: addnI.
 Qed.
-
-Lemma big_enum_cond (I : finType) (A : {pred I}) (P : pred I) F :
-  \big[*%M/1]_(i <- enum A | P i) F i = \big[*%M/1]_(i in A | P i) F i.
-Proof.
-by rewrite -big_filter_cond; have [e _ _ [/perm_big->]] := big_enumP.
-Qed.
-
-Lemma big_enum (I : finType) (A : {pred I}) F :
-  \big[*%M/1]_(i <- enum A) F i = \big[*%M/1]_(i in A) F i.
-Proof. by rewrite big_enum_cond big_andbC. Qed.
 
 Lemma big_uniq (I : finType) (r : seq I) F :
   uniq r -> \big[*%M/1]_(i <- r) F i = \big[*%M/1]_(i in r) F i.

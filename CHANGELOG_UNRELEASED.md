@@ -189,6 +189,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `deprecate` notation to the `deprecated` attribute (cf. Removed section).
 
 - in `finalg.v`, `finFieldType` now inherits from `countDecFieldType`.
+- In bigop generalized `big_enum_cond` and `big_enum` to non-abelian monoid.
 
 ### Renamed
 
