@@ -2994,7 +2994,7 @@ Definition maxgroup A gP := maxset (fun A => group_set A && gP <<A>>%G) A.
 Definition mingroup A gP := minset (fun A => group_set A && gP <<A>>%G) A.
 
 Variable gP : pred {group gT}.
-Arguments gP G%G.
+Arguments gP _%G.
 
 Lemma ex_maxgroup : (exists G, gP G) -> {G : {group gT} | maxgroup G gP}.
 Proof.
