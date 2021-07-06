@@ -26,6 +26,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `filter_iota_leq`, `map_nth_iota0` and `map_nth_iota`
   + new lemmas `cat_nilp`, `rev_nilp`, `allrelT`, `allrel_relI`, and
     `pairwise_relI`.
+  + new iterator `map2`
+  + new lemmas `map2_map_zip`, `map2_cons`, `map2_nseq`, `map2_cat`,
+    `size_map2`, `behead_map2`, `nth_map2`, `map2_rcons`, `last_map2`,
+    `belast_map2`, `map2_take`, `map2_drop`, `map2_rot`, `map2_rotr`,
+    `map2_rev`, `map2_mask`, `map2s0`
 
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
