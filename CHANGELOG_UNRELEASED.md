@@ -41,6 +41,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
 
+- in `finset.v`, new lemmas: `bigcup0P`, `bigcup_disjointP`, `imset_cover`,
+  `cover1`, `trivIset1`, `trivIsetD`, `trivIsetU`, `coverD1`, `partition0`,
+  `partiton_neq0`, `partition_trivIset`, `partitionS`, `partitionD1`,
+  `partitionU1`, `partition_set0`, `partition_pigeonhole`, `indexed_partition`,
+  `imset_inj`, `imset_disjoint`, `imset_trivIset`, `imset0mem`,
+  `imset_partition`.
+
 - in `order.v`
   + we provide a canonical total order on ordinals and lemmas
     `leEord`, `ltEord`, `botEord`, and `topEord` to translate generic

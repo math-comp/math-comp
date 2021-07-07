@@ -1647,12 +1647,27 @@ apply: (iffP idP) => [sFU i Pi| sFU].
 by apply/subsetP=> x /bigcupP[i Pi]; apply: (subsetP (sFU i Pi)).
 Qed.
 
-Lemma bigcup_disjoint U P F :
-  (forall i, P i -> [disjoint U & F i]) -> [disjoint U & \bigcup_(i | P i) F i].
+Lemma bigcup0P P F :
+  reflect (forall i, P i -> F i = set0) (\bigcup_(i | P i) F i == set0).
 Proof.
-move=> dUF; rewrite disjoint_sym disjoint_subset.
+rewrite -subset0; apply: (iffP (bigcupsP _ _ _)) => sub0 i /sub0; last by move->.
+by rewrite subset0 => /eqP.
+Qed.
+
+Lemma bigcup_disjointP U P F  :
+  reflect (forall i : I, P i -> [disjoint U & F i])
+          [disjoint U & \bigcup_(i | P i) F i].
+Proof.
+apply: (iffP idP) => [dUF i Pp|dUF].
+  by apply: disjointWr dUF; apply: bigcup_sup.
+rewrite disjoint_sym disjoint_subset.
 by apply/bigcupsP=> i /dUF; rewrite disjoint_sym disjoint_subset.
 Qed.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use bigcup_disjointP instead.")]
+Lemma bigcup_disjoint U P F :
+  (forall i, P i -> [disjoint U & F i]) -> [disjoint U & \bigcup_(i | P i) F i].
+Proof. by move/bigcup_disjointP. Qed.
 
 Lemma bigcup_setU A B F :
   \bigcup_(i in A :|: B) F i =
@@ -1794,6 +1809,20 @@ rewrite /cover; elim/big_rec2: _ => [|A n U _ leUn]; first by rewrite cards0.
 by rewrite (leq_trans (leq_card_setU A U).1) ?leq_add2l.
 Qed.
 
+Lemma imset_cover (T' : finType) P  (f : T -> T') :
+  [set f x | x in cover P] = \bigcup_(i in P) [set f x | x in i].
+Proof.
+apply/setP=> y; apply/imsetP/bigcupP => [|[A AP /imsetP[x xA ->]]].
+  by move=> [x /bigcupP[A AP xA] ->]; exists A => //; rewrite imset_f.
+by exists x => //; apply/bigcupP; exists A.
+Qed.
+
+Lemma cover1 A : cover [set A] = A.
+Proof. by rewrite /cover big_set1. Qed.
+
+Lemma trivIset1 A : trivIset [set A].
+Proof. by rewrite /trivIset cover1 big_set1. Qed.
+
 Lemma trivIsetP P :
   reflect {in P &, forall A B, A != B -> [disjoint A & B]} (trivIset P).
 Proof.
@@ -1815,6 +1844,28 @@ Qed.
 
 Lemma trivIsetS P Q : P \subset Q -> trivIset Q -> trivIset P.
 Proof. by move/subsetP/sub_in2=> sPQ /trivIsetP/sPQ/trivIsetP. Qed.
+
+Lemma trivIsetD P Q : trivIset P -> trivIset (P :\: Q).
+Proof.
+move/trivIsetP => tP; apply/trivIsetP => A B /setDP[TA _] /setDP[TB _]; exact: tP.
+Qed.
+
+Lemma trivIsetU P Q :
+  trivIset Q -> trivIset P -> [disjoint cover Q & cover P] -> trivIset (Q :|: P).
+Proof.
+move => /trivIsetP tQ /trivIsetP tP dQP; apply/trivIsetP => A B.
+move => /setUP[?|?] /setUP[?|?]; first [exact:tQ|exact:tP|move => _].
+  by apply: disjointW dQP; rewrite bigcup_sup.
+by rewrite disjoint_sym; apply: disjointW dQP; rewrite bigcup_sup.
+Qed.
+
+Lemma coverD1 P B : trivIset P -> B \in P -> cover (P :\ B) = cover P :\: B.
+Proof.
+move/trivIsetP => tP SP; apply/setP => x; rewrite inE.
+apply/bigcupP/idP => [[A /setD1P [ADS AP] xA]|/andP[xNS /bigcupP[A AP xA]]].
+  by rewrite (disjointFr (tP _ _ _ _ ADS)) //=; apply/bigcupP; exists A.
+by exists A; rewrite // !inE AP andbT; apply: contraNneq xNS => <-.
+Qed.
 
 Lemma trivIsetI P D : trivIset P -> trivIset (P ::&: D).
 Proof. by apply: trivIsetS; rewrite -setI_powerset subsetIl. Qed.
@@ -1891,6 +1942,43 @@ Qed.
 Lemma cover_partition P D : partition P D -> cover P = D.
 Proof. by case/and3P=> /eqP. Qed.
 
+Lemma partition0 P D : partition P D -> set0 \in P = false.
+Proof. case/and3P => _ _. by apply: contraNF. Qed.
+
+Lemma partition_neq0 P D B : partition P D -> B \in P -> B != set0.
+Proof. by move=> partP; apply: contraTneq => ->; rewrite (partition0 partP). Qed.
+
+Lemma partition_trivIset P D : partition P D -> trivIset P.
+Proof. by case/and3P. Qed.
+
+Lemma partitionS P D B : partition P D -> B \in P -> B \subset D.
+Proof.
+by move=> partP BP; rewrite -(cover_partition partP); apply: bigcup_max BP _.
+Qed.
+
+Lemma partitionD1 P D B :
+  partition P D -> B \in P -> partition (P :\ B) (D :\: B).
+Proof.
+case/and3P => /eqP covP trivP set0P SP.
+by rewrite /partition inE (negbTE set0P) trivIsetD ?coverD1 -?covP ?eqxx ?andbF.
+Qed.
+
+Lemma partitionU1 P D B :
+  partition P D -> B != set0 -> [disjoint B & D] -> partition (B |: P) (B :|: D).
+Proof.
+case/and3P => /eqP covP trivP set0P BD0 disSD.
+rewrite /partition !inE (negbTE set0P) orbF [_ == B]eq_sym BD0 andbT.
+rewrite /cover bigcup_setU /= big_set1 -covP eqxx /=.
+by move: disSD; rewrite -covP=> /bigcup_disjointP/trivIsetU1 => -[].
+Qed.
+
+Lemma partition_set0 P : partition P set0 = (P == set0).
+Proof.
+apply/and3P/eqP => [[/bigcup0P covP _ ]|->]; last first.
+  by rewrite /partition inE /trivIset/cover !big_set0 cards0 !eqxx.
+by apply: contraNeq => /set0Pn[B BP]; rewrite -(covP B BP).
+Qed.
+
 Lemma card_partition P D : partition P D -> #|D| = \sum_(A in P) #|A|.
 Proof. by case/and3P=> /eqP <- /eqnP. Qed.
 
@@ -1898,6 +1986,25 @@ Lemma card_uniform_partition n P D :
   {in P, forall A, #|A| = n} -> partition P D -> #|D| = #|P| * n.
 Proof.
 by move=> uniP /card_partition->; rewrite -sum_nat_const; apply: eq_bigr.
+Qed.
+
+Lemma partition_pigeonhole P D A :
+  partition P D -> #|P| <= #|A| -> A \subset D -> {in P, forall B, #|A :&: B| <= 1} ->
+  {in P, forall B, A :&: B != set0}.
+Proof.
+move=> partP card_A_P /subsetP subAD sub1; apply/forall_inP.
+apply: contraTT card_A_P => /forall_inPn [B BP]; rewrite negbK => AB0.
+rewrite -!ltnNge -(setD1K BP) cardsU1 !inE eqxx /= add1n ltnS.
+have [tP covP] := (partition_trivIset partP,cover_partition partP).
+have APx x : x \in A -> x \in pblock P x by rewrite mem_pblock covP; apply: subAD.
+have inj_f : {in A &, injective (pblock P)}.
+  move=> x y xA yA /eqP; rewrite eq_pblock ?covP ?subAD // => Pxy.
+  apply: (@card_le1_eqP _ (A :&: pblock P x)); rewrite ?inE ?Pxy ?APx ?andbT //.
+  by apply: sub1; rewrite pblock_mem ?covP ?subAD.
+rewrite -(card_in_imset inj_f); apply: subset_leq_card.
+apply/subsetP => ? /imsetP[x xA ->].
+rewrite !inE pblock_mem ?covP ?subAD ?andbT //.
+by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT. 
 Qed.
 
 Section BigOps.
@@ -2127,6 +2234,60 @@ apply: contraR => /pred0Pn[x /andP[/bigcupP[A E_A Ax] /bigcupP[B F_B Bx]]].
 rewrite -(def_pblock tiQ Q_E E_A) -(def_pblock tiP _ Ax) ?(sQP E) //.
 by rewrite -(def_pblock tiQ Q_F F_B) -(def_pblock tiP _ Bx) ?(sQP F).
 Qed.
+
+Lemma indexed_partition (I T : finType) (J : {pred I}) (B : I -> {set T}) :
+  let P := [set B i | i in J] in
+  {in J &, forall i j : I, j != i -> [disjoint B i & B j]} ->
+  (forall i : I, J i -> B i != set0) -> partition P (cover P) /\ {in J&, injective B}.
+Proof.
+move=> P disjB inhB.
+have s0NP : set0 \notin P.
+  by apply/negP => /imsetP[x xI /eqP]; apply/negP; rewrite eq_sym inhB.
+by rewrite /partition eqxx s0NP andbT /=; apply: trivIimset.
+Qed.
+
+Section PartitionImage.
+Variables (T : finType) (P : {set {set T}}) (D : {set T}).
+Variables (T' : finType) (f : T -> T') (inj_f : injective f).
+Let fP := [set f @: (B : {set T}) | B in P].
+
+Lemma imset_inj : injective (fun A : {set T} => f @: A).
+Proof.
+move => A B => /setP E; apply/setP => x.
+by rewrite -(mem_imset (mem A) x inj_f) E mem_imset.
+Qed.
+
+Lemma imset_disjoint (A B : {pred T}) :
+  [disjoint f @: A & f @: B] = [disjoint A & B].
+Proof.
+apply/pred0Pn/pred0Pn => /= [[? /andP[/imsetP[x xA ->]] xB]|].
+  by exists x; rewrite xA -(mem_imset (mem B) x inj_f).
+by move => [x /andP[xA xB]]; exists (f x); rewrite !mem_imset ?xA.
+Qed.
+
+Lemma imset_trivIset : trivIset P = trivIset fP.
+Proof.
+apply/trivIsetP/trivIsetP.
+- move=> trivP ? ? /imsetP[A AP ->] /imsetP[B BP ->].
+  by rewrite (inj_eq imset_inj) imset_disjoint; apply: trivP.
+- move=> trivP A B AP BP; rewrite -imset_disjoint -(inj_eq imset_inj).
+  by apply: trivP; rewrite imset_f.
+Qed.
+
+Lemma imset0mem : (set0 \in fP) = (set0 \in P).
+Proof.
+apply/imsetP/idP => [[A AP /esym/eqP]|P0]; last by exists set0; rewrite ?imset0.
+by rewrite imset_eq0 => /eqP<-.
+Qed.
+
+Lemma imset_partition : partition P D = partition fP (f @: D).
+Proof.
+suff cov: (cover fP == f @:D) = (cover P == D).
+  by rewrite /partition -imset_trivIset imset0mem cov.
+by rewrite /fP cover_imset -imset_cover (inj_eq imset_inj).
+Qed.
+End PartitionImage.
+
 
 (**********************************************************************)
 (*                                                                    *)
