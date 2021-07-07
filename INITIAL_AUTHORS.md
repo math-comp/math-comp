@@ -1,5 +1,5 @@
 Here are the initial authors of this libary, other contributors can be found in
-the [CHANGELOG.md](https://github.com/math-comp/math-comp/blob/master/CONTRIBUTING.md)
+the [CHANGELOG.md](https://github.com/math-comp/math-comp/blob/master/CHANGELOG.md)
 and on [github insights](https://github.com/math-comp/math-comp/graphs/contributors)
 
 - Andrea Asperti      University of Bologna - Microsoft Inria Joint Centre
