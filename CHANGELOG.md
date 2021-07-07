@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 This release is compatible with Coq versions 8.10, 8.11, and 8.12.
 
+The contributors to this version are:
+Anton Trunov, Christian Doczkal, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel,
+Jasper Hugunin, Kazuhiko Sakaguchi, Laurent Théry, Reynald Affeldt, and Yves Bertot.
+
 ### Added
 
 - Contraposition lemmas involving propositions:
@@ -534,6 +538,11 @@ This release is compatible with Coq versions 8.10, 8.11, and 8.12.
 
 This release is compatible with Coq versions 8.7, 8.8, 8.9, 8.10, and 8.11.
 
+The contributors to this version are:
+Antonio Nikishaev, Anton Trunov, Assia Mahboubi, Christian Doczkal, Cyril Cohen,
+Enrico Tassi, Erik Martin-Dorel, Florent Hivert, Kazuhiko Sakaguchi,
+Pierre-Marie Pédrot, Pierre-Yves Strub, Reynald Affeldt, Simon Boulier, Yves Bertot.
+
 - Added lemmas about monotony of functions `nat -> T` where `T` is an
   ordered type: `homo_ltn_lt_in`, `incn_inP`, `nondecn_inP`,
   `nhomo_ltn_lt_in`, `decn_inP`, `nonincn_inP`, `homo_ltn_lt`,
@@ -656,6 +665,12 @@ This release is compatible with Coq versions 8.7, 8.8, 8.9, 8.10, and 8.11.
 ## [1.11+beta1] - 2020-04-15
 
 This release is compatible with Coq versions 8.7, 8.8, 8.9 and 8.10.
+
+The contributors to this version are:
+Antonio Nikishaev, Anton Trunov, Assia Mahboubi, Cyril Cohen, Enrico Tassi,
+Erik Martin-Dorel, Florent Hivert, Kazuhiko Sakaguchi, Pierre-Marie Pédrot,
+Pierre-Yves Strub, Reynald Affeldt, Simon Boulier, Yves Bertot.
+
 
 ### Added
 
@@ -842,6 +857,11 @@ The following were deprecated since release 1.9.0
 
 This release is compatible with Coq versions 8.9 and 8.10.
 
+The contributors to this version are:
+Antonio Nikishaev, Anton Trunov, Arthur Azevedo de Amorim, Christian Doczkal, Cyril Cohen,
+Enrico Tassi, Erik Martin-Dorel, Florent Hivert, Gabriel Taumaturgo, Georges Gonthier,
+Kazuhiko Sakaguchi, Laurent Théry, Maxime Dénès, Reynald Affeldt, and Yves Bertot.
+
 ### Added
 
 - Added a `void` notation for the `Empty_set` type of the standard library, the
@@ -1026,6 +1046,10 @@ MathComp 1.9.0 is compatible with Coq 8.7, 8.8, 8.9 and 8.10beta1.
 Minor releases will remain compatible with Coq 8.9 and 8.10; compatibility with earlier
 versions may be dropped.
 
+The contributors to this version are:
+Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Georges Gonthier,
+Kazuhiko Sakaguchi, Sora Chen, Søren Eller Thomsen.
+
 ### Added
 
 - `nonPropType`, an interface for non-`Prop` types, and `{pred T}` and
@@ -1092,6 +1116,11 @@ versions may be dropped.
 
 Drop compatibility with Coq 8.6 (OCaml plugin removed).
 MathComp 1.8.0 is compatible with Coq 8.7, 8.8 and 8.9.
+
+The contributors to this version are:
+Anton Trunov, Assia Mahboubi, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel,
+Florent Hivert, Georges Gonthier, Kazuhiko Sakaguchi, Laurence Rideau,
+Laurent Théry, Pierre-Yves Strub, Søren Eller Thomsen, Yves Bertot. 
 
 ### Added
 
