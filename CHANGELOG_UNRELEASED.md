@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `ssrbool.v`, added lemmas `andPP` and `orPP`.
+
 - in `bigop.v`, added lemma `sumnB`.
 
 - in `seq.v`,
@@ -26,6 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `filter_iota_leq`, `map_nth_iota0` and `map_nth_iota`
   + new lemmas `cat_nilp`, `rev_nilp`, `allrelT`, `allrel_relI`, and
     `pairwise_relI`.
+  + new lemmas: `forall_cons`, `exists_cons`, `sub_map`, `eq_mem_map`,
+    `eq_in_pmap`.
 
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.

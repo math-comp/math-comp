@@ -388,3 +388,10 @@ End in_sig.
 Arguments in1_sig {T1 D1 P1}.
 Arguments in2_sig {T1 T2 D1 D2 P2}.
 Arguments in3_sig {T1 T2 T3 D1 D2 D3 P3}.
+
+Lemma andPP {P Q p q} : reflect P p -> reflect Q q -> reflect (P /\ Q) (p && q).
+Proof. by move=> rP rQ; apply: (iffP andP) => -[/rP ? /rQ ?]. Qed.
+
+Lemma orPP {P Q p q} : reflect P p -> reflect Q q -> reflect (P \/ Q) (p || q).
+Proof. by move=> rP rQ; apply: (iffP orP) => -[/rP ?|/rQ ?]; tauto. Qed.
+

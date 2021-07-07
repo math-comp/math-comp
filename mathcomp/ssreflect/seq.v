@@ -1069,6 +1069,20 @@ Proof. by rewrite in_cons orbF. Qed.
  (* to be repeated after the Section discharge. *)
 Let inE := (mem_seq1, in_cons, inE).
 
+Lemma forall_cons {P : T -> Prop} {a s} :
+  {in a::s, forall x, P x} <-> P a /\ {in s, forall x, P x}.
+Proof.
+split=> [A|[A B]]; last by move => x /predU1P [-> //|]; apply: B.
+by split=> [|b Hb]; apply: A; rewrite !inE ?eqxx ?Hb ?orbT. 
+Qed.
+
+Lemma exists_cons {P : T -> Prop} {a s} :
+  (exists2 x, x \in a::s & P x) <-> P a \/ exists2 x, x \in s & P x.
+Proof.
+split=> [[x /predU1P[->|x_s] Px]|]; [by left| by right; exists x|]. 
+by move=> [?|[x x_s ?]]; [exists a|exists x]; rewrite ?inE ?eqxx ?x_s ?orbT.
+Qed.
+
 Lemma mem_seq2 x y z : (x \in [:: y; z]) = xpred2 y z x.
 Proof. by rewrite !inE. Qed.
 
@@ -1117,16 +1131,13 @@ Implicit Type a : pred T.
 Lemma hasP {a s} : reflect (exists2 x, x \in s & a x) (has a s).
 Proof.
 elim: s => [|y s IHs] /=; first by right; case.
-have [a_y | a'y] := @idP (a y); first by left; exists y; rewrite ?mem_head.
-apply: (iffP IHs) => -[x]; first by exists x; first apply: mem_behead.
-by case/predU1P=> [->|] //; exists x.
+exact: equivP (orPP idP IHs) (iff_sym exists_cons).
 Qed.
 
 Lemma allP {a s} : reflect {in s, forall x, a x} (all a s).
 Proof.
-rewrite -[all _ _]negbK -has_predC.
-apply: (iffP idP) => [s'a' x s_x | a_s]; last by apply/hasP=> /= -[x /a_s->].
-by apply: contraR s'a' => a'x; apply/hasP; exists x.
+elim: s => [|/= y s IHs]; first by left.
+exact: equivP (andPP idP IHs) (iff_sym forall_cons).
 Qed.
 
 Lemma hasPn a s : reflect {in s, forall x, ~~ a x} (~~ has a s).
@@ -1165,16 +1176,10 @@ Section EqIn.
 Variables a1 a2 : pred T.
 
 Lemma eq_in_filter s : {in s, a1 =1 a2} -> filter a1 s = filter a2 s.
-Proof.
-elim: s => //= x s IHs eq_a.
-by rewrite eq_a ?mem_head ?IHs // => y s_y; apply: eq_a; apply: mem_behead.
-Qed.
+Proof. by elim: s => //= x s IHs /forall_cons [-> /IHs ->]. Qed.
 
 Lemma eq_in_find s : {in s, a1 =1 a2} -> find a1 s = find a2 s.
-Proof.
-elim: s => //= x s IHs eq_a12; rewrite eq_a12 ?mem_head // IHs // => y s'y.
-by rewrite eq_a12 // mem_behead.
-Qed.
+Proof. by elim: s => //= x s IHs /forall_cons [-> /IHs ->]. Qed.
 
 Lemma eq_in_count s : {in s, a1 =1 a2} -> count a1 s = count a2 s.
 Proof. by move/eq_in_filter=> eq_a12; rewrite -!size_filter eq_a12. Qed.
@@ -1512,6 +1517,8 @@ Arguments nseqP {T n x y}.
 Arguments count_memPn {T x s}.
 Arguments uniqPn {T} x0 {s}.
 Arguments uniqP {T} x0 {s}.
+Arguments forall_cons {T P a s}.
+Arguments exists_cons {T P a s}.
 
 (* Since both `all (mem s) s` and `all (pred_of_seq s) s` may appear in       *)
 (* goals, the following hint has to be declared using the `Hint Extern`       *)
@@ -1778,7 +1785,7 @@ Qed.
 
 Lemma uniq_leq_size s1 s2 : uniq s1 -> {subset s1 <= s2} -> size s1 <= size s2.
 Proof.
-elim: s1 s2 => //= x s1 IHs s2 /andP[not_s1x Us1] /allP/=/andP[s2x /allP ss12].
+elim: s1 s2 => //= x s1 IHs s2 /andP[not_s1x Us1] /forall_cons[s2x ss12].
 have [i s3 def_s2] := rot_to s2x; rewrite -(size_rot i s2) def_s2.
 apply: IHs => // y s1y; have:= ss12 y s1y.
 by rewrite -(mem_rot i) def_s2 inE (negPf (memPn _ y s1y)).
@@ -1788,7 +1795,7 @@ Lemma leq_size_uniq s1 s2 :
   uniq s1 -> {subset s1 <= s2} -> size s2 <= size s1 -> uniq s2.
 Proof.
 elim: s1 s2 => [[] | x s1 IHs s2] // Us1x; have /andP[not_s1x Us1] := Us1x.
-case/allP/andP=> /rot_to[i s3 def_s2] /allP ss12 le_s21.
+case/forall_cons => /rot_to[i s3 def_s2] ss12 le_s21.
 rewrite -(rot_uniq i) -(size_rot i) def_s2 /= in le_s21 *.
 have ss13 y (s1y : y \in s1): y \in s3.
   by have:= ss12 y s1y; rewrite -(mem_rot i) def_s2 inE (negPf (memPn _ y s1y)).
@@ -2553,9 +2560,8 @@ Qed.
 
 Lemma mapP s y : reflect (exists2 x, x \in s & y = f x) (y \in map f s).
 Proof.
-elim: s => [|x s IHs]; [by right; case | rewrite /= inE].
-have [Dy | fx'y] := y =P f x; first by left; exists x; rewrite ?mem_head.
-by apply: (iffP IHs) => [[z]|[z /predU1P[->|]]]; exists z; do ?apply: predU1r.
+elim: s => [|x s IHs]; [by right; case|rewrite /= inE]. 
+exact: equivP (orPP eqP IHs) (iff_sym exists_cons). 
 Qed.
 
 Lemma map_uniq s : uniq (map f s) -> uniq s.
@@ -2588,6 +2594,15 @@ Qed.
 
 Lemma perm_map s t : perm_eq s t -> perm_eq (map f s) (map f t).
 Proof. by move/permP=> Est; apply/permP=> a; rewrite !count_map Est. Qed.
+
+Lemma eq_in_map g s : {in s, f =1 g} <-> map f s = map g s.
+Proof. by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->]. Qed.
+
+Lemma sub_map s1 s2 : {subset s1 <= s2} -> {subset map f s1 <= map f s2}.
+Proof. by move=> sub_s ? /mapP[x x_s ->]; rewrite map_f ?sub_s. Qed.
+
+Lemma eq_mem_map s1 s2 : s1 =i s2 -> map f s1 =i map f s2. 
+Proof. by move=> Es x; apply/idP/idP; apply: sub_map => ?; rewrite Es. Qed.
 
 Hypothesis Hf : injective f.
 
@@ -2639,15 +2654,6 @@ Proof. by move=> eq_f12; elim=> //= x s ->; rewrite eq_f12. Qed.
 
 End MapComp.
 
-Lemma eq_in_map (T1 : eqType) T2 (f1 f2 : T1 -> T2) (s : seq T1) :
-  {in s, f1 =1 f2} <-> map f1 s = map f2 s.
-Proof.
-elim: s => //= x s IHs; split=> [eqf12 | [f12x /IHs eqf12]]; last first.
-  by move=> y /predU1P[-> | /eqf12].
-rewrite eqf12 ?mem_head //; congr (_ :: _).
-by apply/IHs=> y s_y; rewrite eqf12 // mem_behead.
-Qed.
-
 Lemma map_id_in (T : eqType) f (s : seq T) : {in s, f =1 id} -> map f s = s.
 Proof. by move/eq_in_map->; apply: map_id. Qed.
 
@@ -2687,8 +2693,11 @@ Section EqPmap.
 
 Variables (aT rT : eqType) (f : aT -> option rT) (g : rT -> aT).
 
+Lemma eq_in_pmap (f1 f2 : aT -> option rT) s : {in s, f1 =1 f2} -> pmap f1 s = pmap f2 s.
+Proof. by elim: s => //= a s IHs /forall_cons [-> /IHs ->]. Qed.
+
 Lemma eq_pmap (f1 f2 : aT -> option rT) : f1 =1 f2 -> pmap f1 =1 pmap f2.
-Proof. by move=> Ef; elim=> //= x s ->; rewrite Ef. Qed.
+Proof. by move=> Ef s; apply: eq_in_pmap (in1W Ef). Qed.
 
 Lemma mem_pmap s u : (u \in pmap f s) = (Some u \in map f s).
 Proof. by elim: s => //= x s IHs; rewrite in_cons -IHs; case: (f x). Qed.
@@ -3277,9 +3286,8 @@ Variables S T : eqType.
 Lemma flattenP (A : seq (seq T)) x :
   reflect (exists2 s, s \in A & x \in s) (x \in flatten A).
 Proof.
-elim: A => /= [|s A /iffP IH_A]; [by right; case | rewrite mem_cat].
-have [s_x|s'x] := @idP (x \in s); first by left; exists s; rewrite ?mem_head.
-by apply: IH_A => [[t] | [t /predU1P[->|]]]; exists t; rewrite // mem_behead.
+elim: A => /= [|s A IH_A]; [by right; case | rewrite mem_cat].
+by apply: equivP (iff_sym exists_cons); apply: (orPP idP IH_A).
 Qed.
 Arguments flattenP {A x}.
 
