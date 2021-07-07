@@ -1,4 +1,4 @@
-Here are the initial authors of this libary, other contributors can be found in
+Here are the initial authors of this library which contributed to its development before the project moved to Github (the version control [history before github](https://github.com/math-comp/mathcomp-history-before-github) can still be accessed). Recent contributors can be found in
 the [CHANGELOG.md](https://github.com/math-comp/math-comp/blob/master/CHANGELOG.md)
 and on [github insights](https://github.com/math-comp/math-comp/graphs/contributors)
 
