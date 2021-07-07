@@ -21,13 +21,6 @@ Unset Printing Implicit Defensive.
 
 (** More properties of the factorial **)
 
-Lemma fact_smonotone m n : 0 < m -> m < n -> m`! < n`!.
-Proof.
-case: m => // m _; elim: n m => // n IHn [|m] lt_m_n.
-  by rewrite -[_.+1]muln1 leq_mul ?fact_gt0.
-by rewrite ltn_mul ?IHn.
-Qed.
-
 Lemma fact_prod n : n`! = \prod_(1 <= i < n.+1) i.
 Proof.
 elim: n => [|n IHn] //; first by rewrite big_nil.
@@ -232,7 +225,7 @@ Qed.
 Lemma bin_factd n m : 0 < n -> 'C(n, m) = n`! %/ (m`! * (n - m)`!).
 Proof.
 have [/bin_fact<-|*] := leqP m n; first by rewrite mulnK ?muln_gt0 ?fact_gt0.
-by rewrite divnMA bin_small ?divn_small ?fact_gt0 ?fact_smonotone.
+by rewrite divnMA bin_small ?divn_small ?fact_gt0 ?ltn_fact.
 Qed.
 
 Lemma bin_ffact n m : 'C(n, m) * m`! = n ^_ m.

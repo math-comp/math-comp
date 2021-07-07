@@ -180,7 +180,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`, added lemma `big_bool`.
 - In `ssrnat.v`:
-  + new lemmas `fact_geq`, `leq_fact`
+  + new lemmas `fact_geq`, `leq_pfact`, `leq_fact`, `ltn_pfact`
 
 - In `binomial.v`:
   + new lemma `fact_split`
@@ -197,6 +197,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `deprecate` notation to the `deprecated` attribute (cf. Removed section).
 
 - in `finalg.v`, `finFieldType` now inherits from `countDecFieldType`.
+
+- `fact_smonotone` moved from `binomial.v` to `ssrnat.v`, renamed to `ltn_fact`,
+  and changed to use the `homo` notation
 
 ### Renamed
 
