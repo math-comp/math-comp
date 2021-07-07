@@ -553,7 +553,7 @@ Proof. by rewrite !cardE !size_filter count_predC. Qed.
 Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
 case Ax: (x \in A).
-  by apply: eq_card => y; rewrite inE /=; case: eqP => // ->.
+  by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC.
 rewrite [#|predI _ _|]eq_card0 => [|y /=]; first exact: eq_card.
 by rewrite !inE; case: eqP => // ->.
@@ -568,10 +568,10 @@ Proof. by rewrite -(cardC (pred1 x)) card1. Qed.
 Lemma cardD1 x A : #|A| = (x \in A) + #|[predD1 A & x]|.
 Proof.
 case Ax: (x \in A); last first.
-  by apply: eq_card => y; rewrite !inE /=; case: eqP => // ->.
+  by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC /=.
 rewrite [#|predI _ _|]eq_card0 => [|y]; last by rewrite !inE; case: eqP.
-by apply: eq_card => y; rewrite !inE; case: eqP => // ->.
+by apply: eq_card => y /[!inE]; case: eqP => // ->.
 Qed.
 
 Lemma max_card A : #|A| <= #|T|.
@@ -811,10 +811,9 @@ Lemma card_gt1P A :
   reflect (exists x y, [/\ x \in A, y \in A & x != y]) (1 < #|A|).
 Proof.
 apply: (iffP card_geqP) => [[s] []|[x] [y] [xA yA xDy]].
-  case: s => [|a [|b []]]//=; rewrite inE andbT => aDb _ subD.
+  case: s => [|a [|b []]]//= /[!(inE, andbT)] aDb _ subD.
   by exists a, b; rewrite aDb !subD ?inE ?eqxx ?orbT.
-exists [:: x; y]; rewrite /= !inE xDy.
-by split=> // z; rewrite !inE => /pred2P[]->.
+by exists [:: x; y]; rewrite /= !inE xDy; split=> // z /[!inE] /pred2P[]->.
 Qed.
 
 Lemma card_gt2P A :

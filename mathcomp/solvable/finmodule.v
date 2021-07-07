@@ -194,8 +194,7 @@ Qed.
 
 Fact actr_is_groupAction : is_groupAction setT 'M.
 Proof.
-move=> a Na /=; rewrite inE; apply/andP; split.
-  by apply/subsetP=> u _; rewrite inE.
+move=> a Na /[1!inE]; apply/andP; split; first by apply/subsetP=> u _ /[1!inE].
 by apply/morphicP=> u v _ _; rewrite !permE /= actAr.
 Qed.
 

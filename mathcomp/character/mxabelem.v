@@ -79,8 +79,7 @@ Canonical Structure mx_repr_action := Action mx_repr_is_action.
 
 Fact mx_repr_is_groupAction : is_groupAction [set: 'rV[R]_n] mx_repr_action.
 Proof.
-move=> x Gx /=; rewrite !inE.
-apply/andP; split; first by apply/subsetP=> u; rewrite !inE.
+move=> x Gx /[!inE]; apply/andP; split; first by apply/subsetP=> u /[!inE].
 by apply/morphicP=> /= u v _ _; rewrite !actpermE /= /mx_repr_act mulmxDl.
 Qed.
 Canonical Structure mx_repr_groupAction := GroupAction mx_repr_is_groupAction.
@@ -112,8 +111,7 @@ Qed.
 Canonical scale_action := Action scale_is_action.
 Fact scale_is_groupAction : is_groupAction setT scale_action.
 Proof.
-move=> a _ /=; rewrite inE; apply/andP.
-split; first by apply/subsetP=> A; rewrite !inE.
+move=> a _ /[1!inE]; apply/andP; split; first by apply/subsetP=> A /[!inE].
 by apply/morphicP=> u A _ _ /=; rewrite !actpermE /= /scale_act scalerDr.
 Qed.
 Canonical scale_groupAction := GroupAction scale_is_groupAction.
@@ -151,9 +149,8 @@ Proof. by apply/actsP=> a _ v; rewrite !inE eqmx_scale // -unitfE (valP a). Qed.
 Lemma rowgS m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
   (rowg A \subset rowg B) = (A <= B)%MS.
 Proof.
-apply/subsetP/idP=> sAB => [| u].
-  by apply/row_subP=> i; have:= sAB (row i A); rewrite !inE row_sub => ->.
-by rewrite !inE => suA; apply: submx_trans sAB.
+apply/subsetP/idP=> sAB => [|u /[!inE] suA]; last exact: submx_trans sAB.
+by apply/row_subP=> i; have /[!(inE, row_sub)]-> := sAB (row i A).
 Qed.
 
 Lemma eq_rowg m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
@@ -174,7 +171,7 @@ Definition rowg_mx (L : {set rVn}) := <<\matrix_(i < #|L|) enum_val i>>%MS.
 Lemma rowgK m (A : 'M_(m, n)) : (rowg_mx (rowg A) :=: A)%MS.
 Proof.
 apply/eqmxP; rewrite !genmxE; apply/andP; split.
-  by apply/row_subP=> i; rewrite rowK; have:= enum_valP i; rewrite /= inE.
+  by apply/row_subP=> i; rewrite rowK; have /[!inE] := enum_valP i.
 apply/row_subP=> i; set v := row i A.
 have Av: v \in rowg A by rewrite inE row_sub.
 by rewrite (eq_row_sub (enum_rank_in Av v)) // rowK enum_rankK_in.
@@ -260,7 +257,7 @@ Lemma bigdprod_rowg m (I : finType) (P : pred I) A (B : 'M[F]_(m, n)) :
 Proof.
 move=> S defS; rewrite mxdirectE defS /= => /eqP rankB.
 apply: bigcprod_card_dprod (bigcprod_rowg defS) (eq_leq _).
-by rewrite card_rowg rankB expn_sum; apply: eq_bigr => i _; rewrite card_rowg.
+by rewrite card_rowg rankB expn_sum; apply: eq_bigr => i; rewrite card_rowg.
 Qed.
 
 End RowGroup.
@@ -297,7 +294,7 @@ Qed.
 
 Lemma astab_rowg_repr m (A : 'M_(m, n)) : 'C(rowg A | 'MR rG) = rstab rG A.
 Proof.
-apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]/=; apply: andb_id2l => Gx.
 apply/subsetP/eqP=> cAx => [|u]; last first.
   by rewrite !inE mx_repr_actE // => /submxP[u' ->]; rewrite -mulmxA cAx.
 apply/row_matrixP=> i; apply/eqP; move/implyP: (cAx (row i A)).
@@ -306,7 +303,7 @@ Qed.
 
 Lemma astabs_rowg_repr m (A : 'M_(m, n)) : 'N(rowg A | 'MR rG) = rstabs rG A.
 Proof.
-apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]/=; apply: andb_id2l => Gx.
 apply/subsetP/idP=> nAx => [|u]; last first.
   by rewrite !inE mx_repr_actE // => Au; apply: (submx_trans (submxMr _ Au)).
 apply/row_subP=> i; move/implyP: (nAx (row i A)).
@@ -429,7 +426,7 @@ Proof. exact: fin_Fp_lmod_abelem. Qed.
 
 Lemma mx_Fp_stable (L : {group Mmn}) : [acts setT, on L | 'Zm].
 Proof.
-apply/subsetP=> a _; rewrite !inE; apply/subsetP=> A L_A.
+apply/subsetP=> a _ /[!inE]; apply/subsetP=> A L_A.
 by rewrite inE /= /scale_act -[val _]natr_Zp scaler_nat groupX.
 Qed.
 
@@ -638,9 +635,8 @@ Qed.
 
 Lemma rstab_abelem m (A : 'M_(m, n)) : rstab rG A = 'C_G(rV_E @* rowg A).
 Proof.
-apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
-apply/eqP/centP=> cAx => [_ /morphimP[u _ Au ->]|].
-  move: Au; rewrite inE => /submxP[u' ->] {u}.
+apply/setP=> x /[!inE]/=; apply: andb_id2l => Gx; apply/eqP/centP => cAx.
+move=> _ /morphimP[u _ + ->] => /[1!inE] /submxP[{}u ->].
   by apply/esym/commgP/conjg_fixP; rewrite -rVabelemJ -?mulmxA ?cAx.
 apply/row_matrixP=> i; apply: rVabelem_inj.
 by rewrite row_mul rVabelemJ // /conjg -cAx ?mulKg ?mem_morphim // inE row_sub.
@@ -648,7 +644,7 @@ Qed.
 
 Lemma rstabs_abelem m (A : 'M_(m, n)) : rstabs rG A = 'N_G(rV_E @* rowg A).
 Proof.
-apply/setP=> x; rewrite !inE /=; apply: andb_id2l => Gx.
+apply/setP=> x /[!inE]/=; apply: andb_id2l => Gx.
 by rewrite -rowgS -rVabelemS abelem_rowgJ.
 Qed.
 
@@ -701,7 +697,7 @@ Lemma rfix_abelem (H : {set gT}) :
 Proof.
 move/subsetP=> sHG; apply/eqmxP/andP; split.
   rewrite -rowgS rowg_mxK -sub_rVabelem_im // subsetI sub_rVabelem /=.
-  apply/centsP=> y /morphimP[v _]; rewrite inE => cGv ->{y} x Gx.
+  apply/centsP=> y /morphimP[v _] /[1!inE] cGv ->{y} x Gx.
   by apply/commgP/conjg_fixP; rewrite /= -rVabelemJ ?sHG ?(rfix_mxP H _).
 rewrite genmxE; apply/rfix_mxP=> x Hx; apply/row_matrixP=> i.
 rewrite row_mul rowK; case/morphimP: (enum_valP i) => z Ez /setIP[_ cHz] ->.
@@ -739,7 +735,7 @@ Qed.
 
 Lemma mxmodule_abelem_subg m (U : 'M_(m, n)) : mxmodule rHG U = mxmodule rH U.
 Proof.
-apply: eq_subset_r => x; rewrite !inE; apply: andb_id2l => Hx.
+apply: eq_subset_r => x /[!inE]; apply: andb_id2l => Hx.
 by rewrite eq_abelem_subg_repr.
 Qed.
 
@@ -884,7 +880,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     rewrite (setIidPl _) ?indexgg // sub_cent1 (subsetP cSzS) //.
     exact: mem_repr (class_refl S z).
   rewrite sum1dep_card setIdE (setIidPr _) 1?cardsE ?cardZcl; last first.
-    by apply/subsetP=> zS; rewrite 2!inE => /andP[].
+    by apply/subsetP=> zS /[!inE] /andP[].
   have pn_gt0: p ^ n.*2 > 0 by rewrite expn_gt0 p_gt0.
   rewrite card_irr // oSpn expnS -(prednK pn_gt0) mulnS eqn_add2l.
   rewrite (eq_bigr (fun _ => p)) => [|xS]; last first.

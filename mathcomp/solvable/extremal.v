@@ -792,7 +792,7 @@ have defK: K = [set w].
   rewrite add0n -[j./2]odd_double_half addnC doubleD -!muln2 -mulnA.
   rewrite -(expg_mod_order v) ov modnMDl; case: (odd _); last first.
     right; rewrite mulg1 /r -(subnKC n_gt2) expnSr mulnA expgM.
-    by apply: imset_f; rewrite inE.
+    by apply: imset_f => /[1!inE].
   rewrite (inj_eq (mulIg _)) -expg_mod_order ou -[k]odd_double_half.
   rewrite addnC -muln2 mulnDl -mulnA def2r modnMDl -ou expg_mod_order.
   case: (odd k); [left | right]; rewrite ?mul1n ?mul1g //.
@@ -1455,7 +1455,7 @@ split.
     by rewrite -(groupMr _ (sX'G2 y X'y)) !sX'G2.
   rewrite eqEsubset andbC gen_subG class_sub_norm ?gFnorm //.
   rewrite (OhmE 1 pG) mem_gen ?inE ?Gy -?order_dvdn ?oy // gen_subG /= -/My.
-  apply/subsetP=> t; rewrite !inE; case/andP=> Gt t2.
+  apply/subsetP=> t /[!inE]; case/andP=> Gt t2.
   have pX := pgroupS sXG pG.
   case Xt: (t \in X).
     have: t \in 'Ohm_1(X) by rewrite (OhmE 1 pX) mem_gen // !inE Xt.

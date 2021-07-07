@@ -326,7 +326,7 @@ Lemma connect_closed x : closed e (connect e x).
 Proof. by move=> y z /connect1/same_connect_r; apply. Qed.
 
 Lemma predC_closed a : closed e a -> closed e [predC a].
-Proof. by move=> cl_a x y /cl_a; rewrite !inE => ->. Qed.
+Proof. by move=> cl_a x y /cl_a /[!inE] ->. Qed.
 
 Lemma closure_closed a : closed e (closure e a).
 Proof.

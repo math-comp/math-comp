@@ -145,14 +145,14 @@ Fixpoint tprod  (m1 : nat) :
 Lemma dsumx_mul m1 m2 n p A B :
   dsubmx ((A *m B) : 'M[F]_(m1 + m2, n)) = dsubmx (A : 'M_(m1 + m2, p)) *m B.
 Proof.
-apply/matrixP=> i j; rewrite !mxE; apply: eq_bigr=> k _.
+apply/matrixP=> i j /[!mxE]; apply: eq_bigr=> k _.
 by rewrite !mxE.
 Qed.
 
 Lemma usumx_mul m1 m2 n p A B :
   usubmx ((A *m B) : 'M[F]_(m1 + m2, n)) = usubmx (A : 'M_(m1 + m2, p)) *m B.
 Proof.
-by apply/matrixP=> i j; rewrite !mxE; apply: eq_bigr=> k _; rewrite !mxE.
+by apply/matrixP=> i j /[!mxE]; apply: eq_bigr=> k _ /[!mxE].
 Qed.
 
 Let trow_mul (m1 m2 n2 p2 : nat) 
@@ -2511,7 +2511,7 @@ do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].
     apply: can_inj (insubd one) _ => u; apply: val_inj.
     by rewrite insubdK /= ?irrK //; apply: cFlin.
   rewrite -(card_image inj_cFI) -card_lin_irr.
-  apply/eq_card=> i; rewrite inE; apply/codomP/idP=> [[u ->] | /inT[u Du]].
+  apply/eq_card=> i /[1!inE]; apply/codomP/idP=> [[u ->] | /inT[u Du]].
     by rewrite /= irrK; apply: cFlin.
   by exists u; apply: irr_inj; rewrite /= irrK.
 apply/eqP; rewrite eqn_dvd; apply/andP; split.
@@ -2720,7 +2720,7 @@ Lemma cfcenter_repr n (rG : mx_representation algCF G n) :
   'Z(cfRepr rG)%CF = rcenter rG.
 Proof.
 rewrite /cfcenter /rcenter cfRepr_char /=.
-apply/setP=> x; rewrite !inE; apply/andb_id2l=> Gx.
+apply/setP=> x /[!inE]; apply/andb_id2l=> Gx.
 apply/eqP/is_scalar_mxP=> [|[c rG_c]].
   by case/max_cfRepr_norm_scalar=> // c; exists c.
 rewrite -(sqrCK (char1_ge0 (cfRepr_char rG))) normC_def; congr (sqrtC _).
@@ -2755,7 +2755,7 @@ Lemma cfker_center_normal phi : cfker phi <| 'Z(phi)%CF.
 Proof.
 apply: normalS (cfcenter_sub phi) (cfker_normal phi).
 rewrite /= /cfcenter; case: ifP => // Hphi; rewrite cfkerEchar //.
-apply/subsetP=> x; rewrite !inE => /andP[-> /eqP->] /=.
+apply/subsetP=> x /[!inE] /andP[-> /eqP->] /=.
 by rewrite ger0_norm ?char1_ge0.
 Qed.
 
@@ -2803,7 +2803,7 @@ have sZG: Z \subset G by apply: cfcenter_sub.
 have ->: cfker chi = cfker xi.
   rewrite -(setIidPr (normal_sub (cfker_center_normal _))) -/Z.
   rewrite !cfkerEchar // ?lin_charW //= -/Z.
-  apply/setP=> x; rewrite !inE; apply: andb_id2l => Zx.
+  apply/setP=> x /[!inE]; apply: andb_id2l => Zx.
   rewrite (subsetP sZG) //= -!(cfResE chi sZG) ?group1 // def_chi !cfunE.
   by rewrite (inj_eq (mulfI _)) ?char1_eq0.
 have: abelian (Z / cfker xi) by rewrite sub_der1_abelian ?lin_char_der1.

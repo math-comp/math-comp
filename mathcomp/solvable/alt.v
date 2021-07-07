@@ -343,7 +343,7 @@ have p1x_x: p1 x = x by apply: fix_p1.
 have{le_p_n} lt_p1_n: #|[set x | p1 x != x]| < n.
   move: le_p_n; rewrite ltnS (cardsD1 x1) Hx1; apply/leq_trans/subset_leq_card.
   rewrite subsetD1 inE permM tpermR eqxx andbT.
-  by apply/subsetP=> y; rewrite !inE; apply: contraNneq=> /fix_p1->.
+  by apply/subsetP=> y /[!inE]; apply: contraNneq=> /fix_p1->.
 transitivity (p1 (+) true); last first.
   by rewrite odd_permM odd_tperm -Hx1 inE eq_sym addbK.
 have ->: p = p1 * tperm x1 (p x1) by rewrite -tpermV mulgK.
@@ -364,7 +364,7 @@ have rfd_rgd p: rfd (rgd p) = p.
   apply/permP => [[z Hz]]; apply/val_eqP; rewrite !permE.
   by rewrite /= [rgd _ _]permE /= insubF eqxx // permE /= insubT.
 have sSd: 'C_('Alt_T)[x | 'P] \subset 'dom rfd.
-  by apply/subsetP=> p; rewrite !inE /=; case/andP.
+  by apply/subsetP=> p /[!inE]/= /andP[].
 apply/isogP; exists [morphism of restrm sSd rfd] => /=; last first.
   rewrite morphim_restrm setIid; apply/setP=> z; apply/morphimP/idP=> [[p _]|].
     case/setIP; rewrite Alt_even => Hp; move/astab1P=> Hp1 ->.

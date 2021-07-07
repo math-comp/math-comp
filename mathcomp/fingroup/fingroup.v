@@ -666,7 +666,7 @@ Lemma repr_set1 x : repr [set x] = x.
 Proof. by apply/set1P/card_mem_repr; rewrite cards1. Qed.
 
 Lemma repr_set0 : repr set0 = 1.
-Proof. by rewrite /repr; case: pickP => [x|_]; rewrite !inE. Qed.
+Proof. by rewrite /repr; case: pickP => [x|_] /[!inE]. Qed.
 
 End Repr.
 

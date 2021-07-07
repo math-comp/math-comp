@@ -1170,7 +1170,7 @@ have injf: {in A &, injective f}.
 have sfA_XS': f @: A \subset pffun_on 1 X S^`(1).
   apply/subsetP=> _ /imsetP[_ /morphimP[y nSy Ry ->] ->].
   apply/pffun_onP; split=> [|_ /imageP[x /= Xx ->]].
-    by apply/subsetP=> x; apply: contraR; rewrite ffunE => /negPf->.
+    by apply/subsetP=> x; apply: contraNT => /[!ffunE]/negPf->.
   have Sx := subsetP sXS x Xx.
   by rewrite ffunE Xx norm_conj_autE // (subsetP sSR_S') ?mem_commg.
 rewrite -(card_in_imset injf) (leq_trans (subset_leq_card sfA_XS')) // defS'.
@@ -1523,7 +1523,7 @@ have{nsXG} pU := pgroupS (subset_trans sUX (normal_sub nsXG)) pG.
 case gsetU1: (group_set 'Ldiv_p(U)).
   by rewrite -defU1 (OhmE 1 pU) gen_set_id // -sub_LdivT subsetIr.
 move: gsetU1; rewrite /group_set 2!inE group1 expg1n eqxx; case/subsetPn=> xy.
-case/imset2P=> x y; rewrite !inE => /andP[Ux xp1] /andP[Uy yp1] ->{xy}.
+case/imset2P=> x y /[!inE] /andP[Ux xp1] /andP[Uy yp1] ->{xy}.
 rewrite groupM //= => nt_xyp; pose XY := <[x]> <*> <[y]>.
 have{yp1 nt_xyp} defXY: XY = U.
   have sXY_U: XY \subset U by rewrite join_subG !cycle_subG Ux Uy.

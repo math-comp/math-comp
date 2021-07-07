@@ -4406,7 +4406,7 @@ exists r`_0 => [|z n_gt0 /(mem_rP z n_gt0) r_z].
   have sz_r: size r = n by apply: succn_inj; rewrite -sz_p Dp size_prod_XsubC.
   case: posnP => [n0 | n_gt0]; first by rewrite nth_default // sz_r n0.
   by apply/mem_rP=> //; rewrite mem_nth ?sz_r.
-case: {Dp mem_rP}r r_z r_arg => // y r1; rewrite inE => /predU1P[-> _|r1z].
+case: {Dp mem_rP}r r_z r_arg => // y r1 /[1!inE] /predU1P[-> _|r1z].
   by apply/implyP=> ->; rewrite lexx.
 by move/(order_path_min argCle_trans)/allP->.
 Qed.

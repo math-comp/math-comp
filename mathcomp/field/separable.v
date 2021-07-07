@@ -565,7 +565,7 @@ have KyxEqKx: (<< <<K; q.[x]>>; x>> = <<K; x>>)%VS.
   apply/eqP; rewrite eqEsubv andbC adjoinSl ?subv_adjoin //=.
   apply/FadjoinP/andP; rewrite memv_adjoin andbT.
   by apply/FadjoinP/andP; rewrite subv_adjoin mempx_Fadjoin.
-have:= extendDerivationP derD sepFyx; rewrite KyxEqKx => derDx.
+have /[!KyxEqKx] derDx := extendDerivationP derD sepFyx.
 rewrite -horner_comp (Derivation_horner derDx) ?memv_adjoin //; last first.
   by apply: (polyOverSv (subv_adjoin _ _)); apply: polyOver_comp.
 set Dx_p := map_poly _; have Dx_p_0 t: t \is a polyOver K -> (Dx_p t).[x] = 0.
@@ -730,7 +730,7 @@ have h0M: {morph h0: ij1 ij2 / (ij1 * ij2)%g >-> ij1 * ij2}.
   by rewrite /h0 => [] [i1 j1] [i2 j2] /=; rewrite mulrACA -!exprD !expr_mod.
 have memH ij: (ij \in H) = (h0 ij == 1).
   rewrite /= gen_set_id ?inE //; apply/group_setP; rewrite inE [h0 _]mulr1.
-  by split=> // ? ?; rewrite !inE h0M => /eqP-> /eqP->; rewrite mulr1.
+  by split=> // ? ? /[!(inE, h0M)] /eqP-> /eqP->; rewrite mulr1.
 have nH ij: ij \in 'N(H)%g.
   by apply/(subsetP (cent_sub _))/centP=> ij1 _; congr (_, _); rewrite Zp_mulgC.
 have hE ij: h (coset H ij) = h0 ij.

@@ -1539,7 +1539,7 @@ Lemma reindex (I J : finType) (h : J -> I) (P : pred I) F :
   \big[*%M/1]_(i | P i) F i = \big[*%M/1]_(j | P (h j)) F (h j).
 Proof.
 case=> h' hK h'K; rewrite (reindex_onto h h' h'K).
-by apply: eq_bigl => j; rewrite !inE; case Pi: (P _); rewrite //= hK ?eqxx.
+by apply: eq_bigl => j /[!inE]; case Pi: (P _); rewrite //= hK ?eqxx.
 Qed.
 Arguments reindex [I J] h [P F].
 
@@ -1795,10 +1795,10 @@ rewrite big_distrr; apply: eq_big => [f | f eq_f]; last first.
   rewrite big_cons ffunE eqxx !big_seq; congr (_ * _).
   by apply: eq_bigr => k; rewrite ffunE; case: eqP nri => // -> ->.
 rewrite !ffunE !eqxx andbT; apply/andP/familyP=> /= [[Pjf fij0] k | Pff].
-  have:= familyP Pjf k; rewrite /= ffunE inE; case: eqP => // -> _.
+  have /[!(ffunE, inE)] := familyP Pjf k; case: eqP => // -> _.
   by rewrite nri -(eqP fij0) !ffunE !inE !eqxx.
-split; [apply/familyP | apply/eqP/ffunP] => k; have:= Pff k; rewrite !ffunE.
-  by rewrite inE; case: eqP => // ->.
+split; [apply/familyP | apply/eqP/ffunP] => k; have /[!(ffunE, inE)]:= Pff k.
+  by case: eqP => // ->.
 by case: eqP => // ->; rewrite nri /= => /eqP.
 Qed.
 

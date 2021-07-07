@@ -426,7 +426,7 @@ elim: E uniqE => /= [_ | x0 E IH_E /andP[E'x0 uniqE]] in F trivF *.
     have /pred0Pn[y Fy]: #|F x| != 0 by rewrite trivF.
     by exists y; apply/fsym/subset_cardP; rewrite ?subset_pred1 // card1 trivF.
   apply: eq_card1 (finfun f0 : fT) _ _ => f; apply/familyP/eqP=> [Ff | {f}-> x].
-    by apply/ffunP=> x; have:= Ff x; rewrite Ff0 ffunE => /eqP.
+    by apply/ffunP=> x; have /[!(Ff0, ffunE)]/eqP := Ff x.
   by rewrite ffunE Ff0 inE /=.
 have [y0 Fxy0 | Fx00] := pickP (F x0); last first.
   by rewrite !eq_card0 // => f; apply: contraFF (Fx00 (f x0))=> /familyP; apply.

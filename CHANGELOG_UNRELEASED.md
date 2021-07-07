@@ -156,6 +156,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - In `ssrnum.v`:
   + new lemma `eqNr`
+- Added intro pattern ltac views for rewrite:
+  `/[1! rules]`, `/[! rules]`.
+
 
 - In `mxpoly.v`: developed the theory of diagonalization. To that
   effect, we define `conjmx`, `restrictmx`, and notations `A ~_P B`,

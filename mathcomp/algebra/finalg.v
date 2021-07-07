@@ -554,8 +554,7 @@ Canonical unit_action :=
   @TotalAction _ _ unit_act (@mulr1 _) (fun _ _ _ => mulrA _ _ _).
 Lemma unit_is_groupAction : @is_groupAction _ R setT setT unit_action.
 Proof.
-move=> u _ /=; rewrite inE; apply/andP; split.
-  by apply/subsetP=> x _; rewrite inE.
+move=> u _ /[1!inE]; apply/andP; split; first by apply/subsetP=> x /[1!inE].
 by apply/morphicP=> x y _ _; rewrite !actpermE /= [_ u]mulrDl.
 Qed.
 Canonical unit_groupAction := GroupAction unit_is_groupAction.
