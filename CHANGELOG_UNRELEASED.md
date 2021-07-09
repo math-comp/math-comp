@@ -90,6 +90,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `subseq_(le|lt)_(path|sorted)`, `lt_sorted_uniq`, `sort_lt_id`,
     `perm_sort_leP`, `filter_sort_le`, `(sorted_)(mask|subseq)_sort_le`,
     `mem2_sort_le`.
+  + a new mixin `meetJoinLeMixin` constructing a `latticeType` from `meet`,
+    `join` and proofs that those are respectvely the greatest lower bound and
+    the least upper bound.
 
 - in `matrix.v`, seven new definitions:
   + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations

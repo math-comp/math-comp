@@ -303,6 +303,11 @@ From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 (*                    idempotence of meet.                                    *)
 (*                    (can build:  porderType, latticeType, distrLatticeType) *)
 (*                                                                            *)
+(* - meetJoinLeMixin == on a porderType, takes meet, join, and a proof that   *)
+(*                    those are respectvely the greatest lower bound and the  *)
+(*                    least upper bound.                                      *)
+(*                    (can build: latticeType)                                *)
+(*                                                                            *)
 (* - leOrderMixin == on a choiceType, takes le, lt, meet, join,               *)
 (*                   antisymmetry, transitivity and totality of le.           *)
 (*                   (can build:  porderType, latticeType, distrLatticeType,  *)
@@ -5266,6 +5271,93 @@ End Exports.
 
 End MeetJoinMixin.
 Import MeetJoinMixin.Exports.
+
+Module MeetJoinLeMixin.
+Section MeetJoinLeMixin.
+
+Variable (disp : unit) (T : porderType disp).
+
+Record of_ := Build {
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
+  joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
+}.
+
+Variable (m : of_).
+
+Fact meet_lel x y : meet m x y <= meet m y x.
+Proof.
+have:= le_refl (meet m x y); rewrite meetP => /andP [mlex mley].
+by rewrite (meetP m) mlex mley.
+Qed.
+Fact meetC : commutative (meet m).
+Proof. by move=> x y; apply le_anti; rewrite !meet_lel. Qed.
+Fact meet_leL {x y} : (meet m x y) <= x.
+Proof. by have:= le_refl (meet m x y); rewrite (meetP m) => /andP []. Qed.
+Fact meet_leR {x y} : (meet m x y) <= y.
+Proof. by have:= le_refl (meet m x y); rewrite (meetP m) => /andP []. Qed.
+
+Fact join_lel x y : join m x y <= join m y x.
+Proof.
+have:= le_refl (join m y x); rewrite joinP => /andP [ylej xlej].
+by rewrite (joinP m) ylej xlej.
+Qed.
+Fact joinC : commutative (join m).
+Proof. by move=> x y; apply le_anti; rewrite !join_lel. Qed.
+Fact join_leL {x y} : x <= (join m x y).
+Proof. by have:= le_refl (join m x y); rewrite (joinP m) => /andP []. Qed.
+Fact join_leR {x y} : y <= (join m x y).
+Proof. by have:= le_refl (join m x y); rewrite (joinP m) => /andP []. Qed.
+
+Fact meetA : associative (meet m).
+Proof.
+move=> x y z; apply le_anti.
+apply/andP; split; rewrite !meetP -?andbA; apply/and3P; split.
+- exact: meet_leL.
+- exact: le_trans meet_leR meet_leL.
+- exact: le_trans meet_leR meet_leR.
+- exact: le_trans meet_leL meet_leL.
+- exact: le_trans meet_leL meet_leR.
+- exact: meet_leR.
+Qed.
+Fact joinA : associative (join m).
+Proof.
+move=> x y z; apply le_anti.
+apply/andP; split; rewrite !joinP -?andbA; apply/and3P; split.
+- exact: le_trans join_leL join_leL.
+- exact: le_trans join_leR join_leL.
+- exact: join_leR.
+- exact: join_leL.
+- exact: le_trans join_leL join_leR.
+- exact: le_trans join_leR join_leR.
+Qed.
+Fact joinKI y x : meet m x (join m x y) = x.
+Proof.
+apply/le_anti/andP; split; first exact: meet_leL.
+by rewrite meetP le_refl join_leL.
+Qed.
+Fact meetKU y x : join m x (meet m x y) = x.
+Proof.
+apply/le_anti/andP; split; last exact: join_leL.
+by rewrite joinP le_refl meet_leL.
+Qed.
+Fact leEmeet x y : (x <= y) = (meet m x y == x).
+Proof. by rewrite eq_le meetP meet_leL le_refl. Qed.
+
+Definition latticeMixin :=
+  LatticeMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
+
+End MeetJoinLeMixin.
+
+Module Exports.
+Coercion latticeMixin : of_ >-> Order.LatticeMixin.of_.
+Notation meetJoinLeMixin := of_.
+Notation MeetJoinLeMixin := Build.
+End Exports.
+
+End MeetJoinLeMixin.
+Import MeetJoinLeMixin.Exports.
 
 Module LeOrderMixin.
 Section LeOrderMixin.
