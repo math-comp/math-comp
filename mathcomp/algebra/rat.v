@@ -14,9 +14,9 @@ From mathcomp Require Import ssrint.
 (*       numq r == numerator of (r : rat)                                     *)
 (*       denq r == denominator of (r : rat)                                   *)
 (* x \is a Qint == x is an element of rat whose denominator is equal to 1     *)
-(* x \is a Qnat == x is a positive element of rat whose denominator is equal  *)
-(*                 to 1                                                       *)
-(*       ratr x == generic embedding of  (r : R) into an arbitrary unitring.  *)
+(* x \is a Qnat == x is a non-negative element of rat whose denominator       *)
+(*                 is equal to 1                                              *)
+(*       ratr r == generic embedding of (r : rat) into an arbitrary unitring. *)
 (******************************************************************************)
 
 Import Order.TTheory GRing.Theory Num.Theory.
