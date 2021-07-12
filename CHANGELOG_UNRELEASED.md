@@ -198,8 +198,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `finalg.v`, `finFieldType` now inherits from `countDecFieldType`.
 
-- `fact_smonotone` moved from `binomial.v` to `ssrnat.v`, renamed to `ltn_fact`,
-  and changed to use the `homo` notation
+- `fact_smonotone` moved from `binomial.v` to `ssrnat.v` and renamed to `ltn_fact`.
 
 ### Renamed
 

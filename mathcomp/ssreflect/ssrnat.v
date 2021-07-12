@@ -1252,9 +1252,9 @@ Proof. by elim: n => //= n IHn; rewrite muln_gt0. Qed.
 Lemma fact_geq n : n <= n`!.
 Proof. by case: n => // n; rewrite factS -(addn1 n) leq_pmulr ?fact_gt0. Qed.
 
-Lemma ltn_fact : {in [pred m | 0 < m], {homo factorial : m n / m < n}}.
+Lemma ltn_fact m n : 0 < m -> m < n -> m`! < n`!.
 Proof.
-case=> // m _ n; elim: n m => // n ih [|m] mn; last by rewrite ltn_mul ?ih.
+case: m n => // m n _; elim: n m => // n ih [|m] ?; last by rewrite ltn_mul ?ih.
 by rewrite -[_.+1]muln1 leq_mul ?fact_gt0.
 Qed.
 #[deprecated(since="mathcomp 1.13.0", note="Use ltn_fact instead")]
