@@ -98,9 +98,6 @@ Arguments fun_of_fin {aT rT ph} f x.
 Notation "{ 'ffun' fT }" := (finfun_of (Phant fT))
   (at level 0, format "{ 'ffun'  '[hv' fT ']' }") : type_scope.
 
-Notation "{ 'dffun' fT }" := (dfinfun_of (Phant fT))
-  (at level 0, format "{ 'dffun'  '[hv' fT ']' }") : type_scope.
-
 Definition exp_finIndexType := ordinal_finType.
 Notation "T ^ n" :=
   (@finfun_of (exp_finIndexType n) (fun=> T) (Phant _)) : type_scope.
@@ -238,35 +235,25 @@ Notation family F := (family_mem (fmem F)).
 Section InheritedStructures.
 
 Variable aT : finType.
-Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
+Notation ffun_aT rT rS := {ffun forall x : aT, rT x : rS}.
 
-Local Remark eqMixin rT : Equality.mixin_of (dffun_aT rT eqType).
+Local Remark eqMixin rT : Equality.mixin_of (ffun_aT rT eqType).
 Proof. exact: PcanEqMixin tfgraphK. Qed.
-Canonical finfun_eqType (rT : eqType) :=
-  EqType {ffun aT -> rT} (eqMixin (fun=> rT)).
-Canonical dfinfun_eqType rT :=
-  EqType (dffun_aT rT eqType) (eqMixin rT).
+Canonical finfun_eqType rT := EqType (ffun_aT rT eqType) (eqMixin rT).
 
-Local Remark choiceMixin rT : Choice.mixin_of (dffun_aT rT choiceType).
+Local Remark choiceMixin rT : Choice.mixin_of (ffun_aT rT choiceType).
 Proof. exact: PcanChoiceMixin tfgraphK. Qed.
-Canonical finfun_choiceType (rT : choiceType) :=
-  ChoiceType {ffun aT -> rT} (choiceMixin (fun=> rT)).
-Canonical dfinfun_choiceType rT :=
-  ChoiceType (dffun_aT rT choiceType) (choiceMixin rT).
+Canonical finfun_choiceType rT :=
+  ChoiceType (ffun_aT rT choiceType) (choiceMixin rT).
 
-Local Remark countMixin rT : Countable.mixin_of (dffun_aT rT countType).
+Local Remark countMixin rT : Countable.mixin_of (ffun_aT rT countType).
 Proof. exact: PcanCountMixin tfgraphK. Qed.
-Canonical finfun_countType (rT : countType) :=
-  CountType {ffun aT -> rT} (countMixin (fun => rT)).
-Canonical dfinfun_countType rT :=
-  CountType (dffun_aT rT countType) (countMixin rT).
+Canonical finfun_countType rT :=
+  CountType (ffun_aT rT countType) (countMixin rT).
 
 Local Definition finMixin rT :=
-  PcanFinMixin (tfgraphK : @pcancel _ (dffun_aT rT finType) _ _).
-Canonical finfun_finType (rT : finType) :=
-  FinType {ffun aT -> rT} (finMixin (fun=> rT)).
-Canonical dfinfun_finType rT :=
-  FinType (dffun_aT rT finType) (finMixin rT).
+  PcanFinMixin (tfgraphK : @pcancel _ (ffun_aT rT finType) _ _).
+Canonical finfun_finType rT := FinType (ffun_aT rT finType) (finMixin rT).
 
 End InheritedStructures.
 
@@ -414,7 +401,7 @@ Notation pffun_on y D R := (pffun_on_mem y (mem D) (mem R)).
 Section FinDepTheory.
 
 Variables (aT : finType) (rT : aT -> finType).
-Notation fT := {dffun forall x : aT, rT x}.
+Notation fT := {ffun forall x : aT, rT x}.
 
 Lemma card_family (F : forall x, pred (rT x)) :
   #|(family F : simpl_pred fT)| = foldr muln 1 [seq #|F x| | x : aT].
