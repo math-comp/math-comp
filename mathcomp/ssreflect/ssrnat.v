@@ -1249,6 +1249,17 @@ Lemma factS n : (n.+1)`!  = n.+1 * n`!. Proof. by []. Qed.
 Lemma fact_gt0 n : n`! > 0.
 Proof. by elim: n => //= n IHn; rewrite muln_gt0. Qed.
 
+Lemma fact_geq n : n <= n`!.
+Proof. by case: n => // n; rewrite factS -(addn1 n) leq_pmulr ?fact_gt0. Qed.
+
+Lemma ltn_fact m n : 0 < m -> m < n -> m`! < n`!.
+Proof.
+case: m n => // m n _; elim: n m => // n ih [|m] ?; last by rewrite ltn_mul ?ih.
+by rewrite -[_.+1]muln1 leq_mul ?fact_gt0.
+Qed.
+#[deprecated(since="mathcomp 1.13.0", note="Use ltn_fact instead")]
+Notation fact_smonotone := ltn_fact.
+
 (* Parity and bits. *)
 
 Coercion nat_of_bool (b : bool) := if b then 1 else 0.
@@ -1740,6 +1751,17 @@ Proof. exact: total_homo_mono_in. Qed.
 End NatToNat.
 End Monotonicity.
 
+Lemma leq_pfact : {in [pred n | 0 < n] &, {mono factorial : m n / m <= n}}.
+Proof. by apply: leq_mono_in => n m n0 m0; apply: ltn_fact. Qed.
+
+Lemma leq_fact : {homo factorial : m n / m <= n}.
+Proof.
+by move=> [m|m n mn]; rewrite ?fact_gt0// leq_pfact// inE (leq_trans _ mn).
+Qed.
+
+Lemma ltn_pfact : {in [pred n | 0 < n] &, {mono factorial : m n / m < n}}.
+Proof. exact/leqW_mono_in/leq_pfact. Qed.
+
 (* Support for larger integers. The normal definitions of +, - and even  *)
 (* IO are unsuitable for Peano integers larger than 2000 or so because   *)
 (* they are not tail-recursive. We provide a workaround module, along    *)
@@ -1956,7 +1978,6 @@ Add Ring nat_ring_ssr : nat_semi_ring (morphism nat_semi_morph,
 
 (* A congruence tactic, similar to the boolean one, along with an .+1/+  *)
 (* normalization tactic.                                                 *)
-
 
 Ltac nat_norm :=
   succn_to_add; rewrite ?add0n ?addn0 -?addnA ?(addSn, addnS, add0n, addn0).

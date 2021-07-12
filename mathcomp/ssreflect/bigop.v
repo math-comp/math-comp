@@ -1600,6 +1600,14 @@ do 2!rewrite (big_addn _ _ 0) big_mkord; rewrite (reindex_inj rev_ord_inj) /=.
 by apply: eq_big => [i | i _]; rewrite /= -addSn subnDr addnC addnBA.
 Qed.
 
+Lemma big_rev_mkord m n P F :
+ \big[op/idx]_(m <= k < n | P k) F k
+    = \big[op/idx]_(k < n - m | P (n - k.+1)) F (n - k.+1).
+Proof.
+rewrite big_nat_rev (big_addn _ _ 0) big_mkord.
+by apply: eq_big => [i|i _]; rewrite -addSn addnC subnDr.
+Qed.
+
 Lemma sig_big_dep (I : finType) (J : I -> finType)
     (P : pred I) (Q : forall {i}, pred (J i)) (F : forall {i}, J i -> R) :
   \big[op/idx]_(i | P i) \big[op/idx]_(j : J i | Q j) F j =
