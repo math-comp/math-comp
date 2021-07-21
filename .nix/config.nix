@@ -6,6 +6,7 @@
   default-bundle = "coq-8.13";
   bundles = let common = {
     hierarchy-builder.override.version = "master";
+    coq-elpi.override.version = "v1.11.0";
     mathcomp.job = false;
     mathcomp-single.job = true;
   }; in {
