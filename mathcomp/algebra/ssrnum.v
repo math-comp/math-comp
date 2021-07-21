@@ -134,7 +134,7 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-#[short(type="porderZmodType", pack="POrderZmodType")]
+#[short(type="porderZmodType")]
 HB.structure Definition POrderedZmodule d :=
   { R of Order.IsPOrdered d R & GRing.Zmodule R }.
 
@@ -155,7 +155,7 @@ HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M := {
   normrN : forall x, norm (- x) = norm x;
 }.
 
-#[short(type="normedZmodType", pack="NormedZmodType")]
+#[short(type="normedZmodType")]
 (* FIXME: generic_norm, additional attribute when the structure is fixed: infer(R) *)
 HB.structure Definition NormedZmodule d :=
   { M of Zmodule_IsNormed d M & POrderedZmodule d M}.
@@ -188,7 +188,7 @@ HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
   ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
 
-#[short(type="numDomainType", pack="NumDomainType")]
+#[short(type="numDomainType")]
 HB.structure Definition NumDomain :=
   { R of IsNumDomain ring_display R &
     NormedZmodule ring_display (* R *) R & GRing.IntegralDomain R }.
@@ -360,7 +360,7 @@ End ExtensionAxioms.
 
 (* The rest of the numbers interface hierarchy. *)
 
-#[short(type="numFieldType", pack="NumFieldType")]
+#[short(type="numFieldType")]
 HB.structure Definition NumField := { R of GRing.IsField R & NumDomain R }.
 
 Module NumFieldExports.
@@ -378,7 +378,7 @@ HB.mixin Record NumField_IsImaginary R of NumField R := {
   normCK : forall x, `|x| ^+ 2 = x * conj_op x;
 }.
 
-#[short(type="numClosedFieldType", pack="NumClosedFieldType")]
+#[short(type="numClosedFieldType")]
 HB.structure Definition ClosedField :=
   { R of NumField_IsImaginary R & GRing.ClosedField R & NumField R }.
 
@@ -392,7 +392,7 @@ Notation "[ 'numClosedFieldType' 'of' T ]" := (ClosedField.clone T _)
 End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
-#[short(type="realDomainType", pack="RealDomainType")]
+#[short(type="realDomainType")]
 HB.structure Definition RealDomain :=
   { R of Order.Total ring_display R & NumDomain R }.
 
@@ -403,7 +403,7 @@ Notation "[ 'realDomainType' 'of' T ]" := (RealDomain.clone T _)
 End RealDomainExports.
 HB.export RealDomainExports.
 
-#[short(type="realFieldType", pack="RealFieldType")]
+#[short(type="realFieldType")]
 HB.structure Definition RealField :=
   { R of Order.Total ring_display R & NumField R }.
 
@@ -418,7 +418,7 @@ HB.mixin Record RealField_IsArchimedean R of RealField R := {
   archi_bound_subproof : archimedean_axiom [the NumDomain.type of R]
 }.
 
-#[short(type="archiFieldType", pack="ArchiFieldType")]
+#[short(type="archiFieldType")]
 HB.structure Definition ArchimedeanField :=
   { R of RealField_IsArchimedean R & RealField R }.
 
@@ -435,7 +435,7 @@ HB.mixin Record RealField_IsClosed R of RealField R := {
   poly_ivt_subproof : real_closed_axiom [the NumDomain.type of R]
 }.
 
-#[short(type="rcfType", pack="RcfType")]
+#[short(type="rcfType")]
 HB.structure Definition RealClosedField :=
   { R of RealField_IsClosed R & RealField R }.
 

@@ -167,16 +167,8 @@ HB.mixin Record IsFinite T of Equality T := {
   enumP_subdef : finite_axiom enum_subdef
 }.
 
-(* FIXME mixin attribute? fake deps? *)
-HB.instance Definition _ (T : countType) (x : IsFinite (@eta Type T)) :=
-  Countable.on x.
-
-#[short(type="finType", pack="FinType")]
+#[short(type="finType")]
 HB.structure Definition Finite := {T of IsFinite T & Countable T }.
-
-(* FIXME: if deps coincide with the structure, this is not needed *)
-HB.instance Definition _ (T : countType) (x : IsFinite (@eta Type T)) :
-  IsFinite x := x.
 
 Module Export FiniteNES.
 Module Finite.
@@ -1388,7 +1380,7 @@ Definition CanFinMixin g (fK : cancel f g) := PcanFinMixin (can_pcan fK).
 
 End TransferFinType.
 
-#[short(type="subFinType", pack="SubFinType")]
+#[short(type="subFinType")]
 HB.structure Definition SubFinite (T : Type) (P : pred T) :=
   { sT of Finite sT & IsSUB T P sT }.
 
@@ -1516,12 +1508,12 @@ Definition seq_sub_IsFinite := IsFinite.Build seq_sub seq_sub_axiom.
 (* Beware: these are not the canonical instances, as they are not consistent  *)
 (* with the generic sub_choiceType canonical instance.                        *)
 Definition adhoc_seq_sub_HasChoice := PcanChoiceMixin seq_sub_pickleK.
-Definition adhoc_seq_sub_choiceType := Eval hnf in ChoiceType seq_sub
+Definition adhoc_seq_sub_choiceType := HB.pack_for choiceType seq_sub
   adhoc_seq_sub_HasChoice.
-Definition adhoc_seq_sub_countType := Eval hnf in CountType seq_sub
-  (seq_sub_IsCountable : IsCountable adhoc_seq_sub_choiceType).
-Definition adhoc_seq_sub_finType := Eval hnf in FinType adhoc_seq_sub_countType
-  (seq_sub_IsFinite : IsFinite adhoc_seq_sub_countType).
+Definition adhoc_seq_sub_countType := HB.pack_for countType seq_sub
+  seq_sub_IsCountable adhoc_seq_sub_HasChoice.
+Definition adhoc_seq_sub_finType := HB.pack_for finType seq_sub
+  seq_sub_IsFinite seq_sub_IsCountable adhoc_seq_sub_HasChoice.
 
 End SeqSubType.
 

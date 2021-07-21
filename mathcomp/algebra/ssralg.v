@@ -744,18 +744,8 @@ HB.mixin Record IsZmodule V := {
   addNr : left_inverse zero opp add
 }.
 
-(* FIXME mixin attribute? fake deps? *)
-#[export]
-HB.instance Definition _ (T : choiceType) (x : IsZmodule (@eta Type T)) :=
-  Choice.on x.
-
-#[short(type="zmodType", pack="ZmodType")]
+#[short(type="zmodType")]
 HB.structure Definition Zmodule := {V of IsZmodule V & Choice V}.
-
-(* TODO: automate OR NOT *)
-#[export]
-HB.instance Definition _ (T : choiceType) (x : IsZmodule (@eta Type T)) :
-  IsZmodule x := x.
 
 Module ZmodExports.
 Bind Scope ring_scope with Zmodule.sort.
@@ -1017,7 +1007,7 @@ HB.builders Context R of IsRing R.
     one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
 HB.end.
 
-#[short(type="ringType", pack="RingType")]
+#[short(type="ringType")]
 HB.structure Definition Ring := { R of IsRing R & Choice R }.
 
 Module RingExports.
@@ -1605,7 +1595,7 @@ HB.mixin Record Zmodule_IsLmodule (R : ringType) V of Zmodule V := {
   scalerDr : right_distributive scale +%R;
   scalerDl : forall v, {morph scale^~ v: a b / a + b}
 }.
-#[infer(R), short(type="lmodType", pack="LmodType")]
+#[infer(R), short(type="lmodType")]
 HB.structure Definition Lmodule (R : ringType) :=
   {M of Zmodule M & Zmodule_IsLmodule R M}.
 
@@ -1708,7 +1698,7 @@ End LmoduleTheory.
 HB.mixin Record Lmodule_IsLalgebra R V of Ring V & Lmodule R V := {
   scalerAl : forall (a : R) (u v : V), a *: (u * v) = (a *: u) * v
 }.
-#[infer(R), short(type="lalgType", pack="LalgType")]
+#[infer(R), short(type="lalgType")]
 HB.structure Definition Lalgebra R :=
   {A of Lmodule_IsLalgebra R A & Ring A & Lmodule R A}.
 
@@ -2479,7 +2469,7 @@ End LRMorphismTheory.
 HB.mixin Record Ring_HasCommutativeMul R of Ring R := {
   mulrC : commutative (@mul [the ringType of R])
 }.
-#[short(type="comRingType", pack="ComRingType")]
+#[short(type="comRingType")]
 HB.structure Definition ComRing := {R of Ring R & Ring_HasCommutativeMul R}.
 
 HB.factory Record Zmodule_IsComRing R of Zmodule R := {
@@ -2604,7 +2594,7 @@ End ComRingTheory.
 HB.mixin Record Lalgebra_IsAlgebra (R : ringType) V of Lalgebra R V := {
   scalerAr : forall k (x y : V), k *: (x * y) = x * (k *: y);
 }.
-#[infer(R), short(type="algType", pack="AlgType")]
+#[infer(R), short(type="algType")]
 HB.structure Definition Algebra (R : ringType) :=
   {A of Lalgebra_IsAlgebra R A & Lalgebra R A}.
 
@@ -2631,7 +2621,7 @@ HB.instance Definition lalgebra_is_algebra : Lalgebra_IsAlgebra R V :=
 
 HB.end.
 
-#[infer(R), short(type="comAlgType", pack="ComAlgType")]
+#[infer(R), short(type="comAlgType")]
 HB.structure Definition ComAlgebra R :=
   {V of is_ComAlgebra R V & ComRing V & Lalgebra R V}.
 
@@ -2708,7 +2698,7 @@ HB.mixin Record Ring_HasMulInverse R of Ring R := {
   unitrP_subproof : forall x y, y * x = 1 /\ x * y = 1 -> unit_subdef x;
   invr_out_subproof : {in [predC unit_subdef], inv =1 id}
 }.
-#[short(type="unitRingType", pack="UnitRingType")]
+#[short(type="unitRingType")]
 HB.structure Definition UnitRing := {R of Ring_HasMulInverse R & Ring R}.
 
 Module UnitRingExports.
@@ -2990,7 +2980,7 @@ Proof. by move=> Uy; rewrite rmorphM rmorphV. Qed.
 
 End UnitRingMorphism.
 
-#[short(type="comUnitRingType", pack="ComUnitRingType")]
+#[short(type="comUnitRingType")]
 HB.structure Definition ComUnitRing := {R of ComRing R & UnitRing R}.
 
 Module ComUnitRingExports.
@@ -3021,7 +3011,7 @@ HB.instance Definition mulinverse : Ring_HasMulInverse R :=
 
 HB.end.
 
-#[infer(R), short(type="unitAlgType", pack="UnitAlgType")]
+#[infer(R), short(type="unitAlgType")]
 HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
 
 Module UnitAlgebraExports.
@@ -3032,7 +3022,7 @@ Notation "[ 'unitAlgType' R 'of' T ]" :=
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
 
-#[infer(R), short(type="comUnitAlgType", pack="ComUnitAlgType")]
+#[infer(R), short(type="comUnitAlgType")]
 HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
 
 Module ComUnitAlgebraExports.
@@ -4200,7 +4190,7 @@ HB.mixin Record ComUnitRing_IsIntegral R of ComUnitRing R := {
   mulf_eq0_subproof : integral_domain_axiom [the ringType of R];
 }.
 
-#[mathcomp(axiom="integral_domain_axiom"), short(type="idomainType", pack="IdomainType")]
+#[mathcomp(axiom="integral_domain_axiom"), short(type="idomainType")]
 HB.structure Definition IntegralDomain :=
   {R of ComUnitRing_IsIntegral R & ComUnitRing R}.
 
@@ -4346,18 +4336,9 @@ Definition field_axiom (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 HB.mixin Record IsField R of UnitRing R := {
   fieldP : field_axiom [the unitRingType of R];
 }.
-(* FIXME use fake deps? *)
-#[export]
-HB.instance Definition _ (R : idomainType)
-  (x : IsField (@eta Type R)) := IntegralDomain.on x.
 
-#[mathcomp(axiom="field_axiom"), short(type="fieldType", pack="FieldType")]
+#[mathcomp(axiom="field_axiom"), short(type="fieldType")]
 HB.structure Definition Field := { R of IntegralDomain R & IsField R }.
-
-(* FIXME if deps of IsField are adjusted, this becomes unnecessary *)
-#[export]
-HB.instance Definition _ (R : idomainType) (x : IsField (@eta Type R)) :
-  IsField x := x.
 
 Module FieldExports.
 Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T cT)
@@ -4593,17 +4574,8 @@ HB.mixin Record Field_IsDec R of UnitRing R := {
   satP : decidable_field_axiom sat;
 }.
 
-(* FIXME: fake deps? *)
-#[export] HB.instance Definition _ (F : fieldType)
-  (x : Field_IsDec (@eta Type F)) := Field.on x.
-
-#[mathcomp(axiom="decidable_field_axiom"), short(type="decFieldType", pack="DecFieldType")]
+#[mathcomp(axiom="decidable_field_axiom"), short(type="decFieldType")]
 HB.structure Definition DecidableField := { F of Field F & Field_IsDec F }.
-
-(* FIXME if deps are fixed, this is unnecessary *)
-#[export]
-HB.instance Definition _ (F : fieldType)
-  (x : Field_IsDec (@eta Type F)) : Field_IsDec x := x.
 
 Module DecFieldExports.
 Notation "[ 'decFieldType' 'of' T 'for' cT ]" := (DecidableField.clone T cT)
@@ -4800,7 +4772,7 @@ HB.mixin Record DecField_IsAlgClosed F of DecidableField F := {
 }.
 
 (* TODO: put a factory in field/closed_field *)
-#[mathcomp(axiom="closed_field_axiom"), short(type="closedFieldType", pack="ClosedFieldType")]
+#[mathcomp(axiom="closed_field_axiom"), short(type="closedFieldType")]
 HB.structure Definition ClosedField :=
   { F of DecidableField F & DecField_IsAlgClosed F }.
 
@@ -4852,7 +4824,7 @@ HB.mixin Record IsSubZmodule V (S : {pred V}) U of SUB V S U & Zmodule U := {
   valB : additive (val : U -> V);
 }.
 
-#[short(type="subZmodType", pack="SubZmodType")]
+#[short(type="subZmodType")]
 HB.structure Definition SubZmodule V S :=
   { U of SubChoice V S U & Zmodule U & IsSubZmodule V S U }.
 
@@ -4919,7 +4891,7 @@ HB.mixin Record IsSubRing (R : ringType) (S : {pred R}) U
   valM : multiplicative (val : U -> R);
 }.
 
-#[short(type="subRingType", pack="SubRingType")]
+#[short(type="subRingType")]
 HB.structure Definition SubRing (R : ringType) (S : {pred R}) :=
   { U of SubZmodule R S U & Ring U & IsSubRing R S U }.
 
@@ -4990,7 +4962,7 @@ HB.mixin Record IsSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
  valZ : scalable (val : W -> V);
 }.
 
-#[short(type="subLmodType", pack="SubLmodType")]
+#[short(type="subLmodType")]
 HB.structure Definition SubLmodule (R : ringType) (V : lmodType R)
     (S : {pred V}) :=
   { W of SubZmodule V S W & Zmodule_IsLmodule R W & IsSubLmodule R V S W}.
@@ -5092,7 +5064,7 @@ HB.instance Definition _ : Ring_HasMulInverse R := unitringR.
 
 HB.end.
 
-#[short(type="subUnitRingType", pack="SubUnitRingType")]
+#[short(type="subUnitRingType")]
 HB.structure Definition SubUnitRing (R : ringType)
     (S : {pred Ring.sort R}) :=
   {U of SubRing R S U & UnitRing U}.

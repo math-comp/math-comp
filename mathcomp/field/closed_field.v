@@ -703,7 +703,7 @@ pose Iaddkey := GRing.Pred.Add (DefaultPredKey I) I_ideal.
 pose Iidkey := MkIdeal (GRing.Pred.Zmod Iaddkey I_ideal) I_ideal.
 pose EMixin := GRing.Ring_HasCommutativeMul.Build _
   (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)).
-pose E := ComRingType _ EMixin.
+pose E : comRingType := HB.pack _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
@@ -724,9 +724,9 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
 pose EfieldMixin := GRing.ComRing_IsField.Build _ EmulV Einv0.
-pose Efield := FieldType E EfieldMixin.
-pose EIsCountable := @CanCountMixin _ Efield _ _ reprK.
-pose Ecount := CountFieldType E EIsCountable.
+pose Efield : fieldType := HB.pack E EfieldMixin.
+pose EIsCountable := @CanCountMixin _ E _ _ reprK.
+pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
 pose FtoE := [rmorphism of PtoE \o polyC]; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
   by rewrite map_poly_comp horner_map [_.['X]]comp_polyXr.
@@ -848,8 +848,8 @@ have Kadd0: left_id (FtoK 0) Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -(EtoK_0 i) -EtoK_D add0r.
 have KaddN: left_inverse (FtoK 0) Kopp Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -EtoK_N -EtoK_D addNr EtoK_0.
-pose KzmodMixin := GRing.IsZmodule.Build cntK KaddA KaddC Kadd0 KaddN.
-pose Kzmod := CountZmodType K KzmodMixin.
+pose KzmodMixin := GRing.IsZmodule.Build K KaddA KaddC Kadd0 KaddN.
+pose Kzmod : countZmodType := HB.pack K KzmodMixin.
 have KmulC: commutative Kmul.
   by move=> u v; have [i [x ->] [y ->]] := KtoE2 u v; rewrite -!EtoK_M mulrC.
 have KmulA: @associative Kzmod Kmul.
@@ -863,13 +863,13 @@ have KmulD: left_distributive Kmul Kadd.
 have Kone_nz: FtoK 1 != FtoK 0 by rewrite EtoKeq0 oner_neq0.
 pose KringMixin := GRing.Zmodule_IsComRing.Build _
   KmulA KmulC Kmul1 KmulD Kone_nz.
-pose Kring := ComRingType K KringMixin.
+pose Kring : comRingType := HB.pack K Kzmod KringMixin cntK.
 have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
   move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.
   by rewrite -EtoK_V -[_ * _]EtoK_M mulVf ?EtoK_1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
 pose KfieldMixin := GRing.ComRing_IsField.Build _ KmulV Kinv0.
-pose Kfield := FieldType K KfieldMixin.
+pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
 have EtoKrmorphism i: rmorphism (EtoK i : E i -> Kfield).
   by do 2?split=> [x y|]; rewrite ?EtoK_D ?EtoK_N ?EtoK_M ?EtoK_1.
 pose EtoKM := RMorphism (EtoKrmorphism _); have EtoK_E: EtoK _ = EtoKM _ by [].
@@ -901,7 +901,7 @@ have Kclosed: GRing.closed_field_axiom Kfield.
   by rewrite -if_neg neq_ltn lemk.
 suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.
   pose Kcc := Field_IsAlgClosed.Build Kfield Kclosed.
-  by exists (CountClosedFieldType K Kcc).
+  by exists (HB.pack_for countClosedFieldType K Kfield Kcc).
 exists (EtoKM 0%N) => /= z; have [i [{}z ->]] := KtoE z.
 suffices{z} /(_ z)[p mon_p]: integralRange (toE 0%N i isT).
   by rewrite -(fmorph_root (EtoKM i)) -map_poly_comp toEtoKp; exists p.

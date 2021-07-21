@@ -120,7 +120,7 @@ HB.mixin Record IsQuotient T (qT : Type) := {
   repr_ofK_subproof : cancel repr_of quot_pi_subdef
 }.
 
-#[short(type="quotType", pack="QuotType")]
+#[short(type="quotType")]
 HB.structure Definition Quotient T := { qT of IsQuotient T qT }.
 Arguments repr_of [T qT] : rename.
 
@@ -295,7 +295,7 @@ HB.mixin Record IsEqQuotient T (eq_quot_op : rel T) (Q : Type) of
   pi_eq_quot : {mono \pi_Q : x y / eq_quot_op x y >-> x == y}
 }.
 
-#[short(type="eqQuotType", pack="QqQuotType")]
+#[short(type="eqQuotType")]
 HB.structure Definition EqQuotient T eq_quot_op :=
   {Q of IsEqQuotient T eq_quot_op Q & Quotient T Q & HasDecEq Q}.
 (*TODO : Check why there was no warning when we didn't put HasDecEq*)
@@ -543,7 +543,7 @@ Definition pi := locked (fun x => EquivQuotient (canon_id x)).
 
 Lemma ereprK : cancel erepr pi.
 Proof.
-pose T := SUB.pack _ _ _ [IsSUB for erepr].
+pose T : subType _ := HB.pack equivQuotient [IsSUB for erepr].
 by unlock pi; case=> x hx; apply/(@val_inj _ _ T)/eqP.
 Qed.
 

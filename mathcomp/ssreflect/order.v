@@ -1019,17 +1019,9 @@ HB.mixin Record IsPOrdered (d : unit) T of HasDecEq T := {
   le_trans : transitive    le;
 }.
 
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsPOrdered d (@eta Type T)) := Choice.on x.
-
-#[short(type="porderType", pack="POrderType")]
+#[short(type="porderType")]
 HB.structure Definition POrder (d : unit) :=
   { T of Choice T & IsPOrdered d T }.
-
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsPOrdered d (@eta Type T)) : IsPOrdered d x := x.
 
 HB.factory Record IsLePOrdered (d : unit) T of HasDecEq T := {
   le       : rel T;
@@ -1043,13 +1035,6 @@ HB.builders Context (d : unit) T of IsLePOrdered d T.
 HB.instance Definition _ := @IsPOrdered.Build d T
   le _ (fun _ _ => erefl) le_refl le_anti le_trans.
 HB.end.
-
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsLePOrdered d (@eta Type T)) := Choice.on x.
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsLePOrdered d (@eta Type T)) : IsLePOrdered d x := x.
 
 HB.factory Record IsLtLePOrdered (d : unit) T of HasDecEq T := {
   le : rel T;
@@ -1083,13 +1068,6 @@ HB.instance Definition _ := @IsPOrdered.Build d T
 
 HB.end.
 
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsLtLePOrdered d (@eta Type T)) := Choice.on x.
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsLtLePOrdered d (@eta Type T)) : IsLtLePOrdered d x := x.
-
 HB.factory Record IsLtPOrdered (d : unit) T of HasDecEq T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
@@ -1100,13 +1078,6 @@ HB.builders Context (d : unit) (T : Type) of IsLtPOrdered d T.
 HB.instance Definition _ := @IsLtLePOrdered.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
-
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsLtPOrdered d (@eta Type T)) := Choice.on x.
-(* FIXME *)
-HB.instance Definition _ (d : unit) (T : choiceType)
-  (x : IsLtPOrdered d (@eta Type T)) : IsLtPOrdered d x := x.
 
 Module POrderExports.
 Arguments le_trans {d s} [_ _ _].
@@ -1286,7 +1257,7 @@ HB.export POCoercions.
 (*   joinA : associative join; *)
 (*   le_defU : forall x y, (x <= y) = (join x y == y); *)
 (* }. *)
-(* #[short(type="joinSemiLatticeType", pack="JoinSemiLatticeType")] *)
+(* #[short(type="joinSemiLatticeType")] *)
 (* HB.structure Definition JoinSemiLattice d := *)
 (*   { T of POrder_IsJoinSemiLattice d T & POrder d T }. *)
 
@@ -1297,7 +1268,7 @@ HB.export POCoercions.
 (*   meetA : associative meet; *)
 (*   le_def : forall x y, (x <= y) = (meet x y == x); *)
 (* }. *)
-(* #[short(type="meetSemiLatticeType", pack="MeetSemiLatticeType")] *)
+(* #[short(type="meetSemiLatticeType")] *)
 (* HB.structure Definition MeetSemiLattice d := *)
 (*   { T of POrder_IsMeetSemiLattice d T & POrder d T }. *)
 
@@ -1324,7 +1295,7 @@ HB.mixin Record POrder_IsLattice d (T : Type) of POrder d T := {
 (*   join joinC joinA le_defU. *)
 (* HB.end. *)
 
-#[short(type="latticeType", pack="LatticeType")]
+#[short(type="latticeType")]
 HB.structure Definition Lattice d :=
   { T of POrder_IsLattice d T & POrder d T }.
 
@@ -1396,7 +1367,7 @@ HB.mixin Record HasBottom d (T : Type) of POrder d T := {
 }.
 (* TODO: Restore when we remove the mathcomp attribute *)
 (* HB.structure Definition BPOrder d := { T of HasBottom d T & POrder d T }. *)
-#[short(type="bLatticeType", pack="BLatticeType")]
+#[short(type="bLatticeType")]
 HB.structure Definition BLattice d := { T of HasBottom d T & Lattice d T }.
 
 Module BLatticeExports.
@@ -1456,7 +1427,7 @@ HB.mixin Record HasTop d (T : Type) of POrder d T := {
 (* HB.structure Definition TPOrder d := { T of HasBottom d T & POrder d T }. *)
 (* HB.structure Definition TLattice d := { T of HasTop d T & Lattice d T }. *)
 (* HB.structure Definition TBOrder d := { T of HasTop d T & BPOrder d T }. *)
-#[short(type="tbLatticeType", pack="TBLatticeType")]
+#[short(type="tbLatticeType")]
 HB.structure Definition TBLattice d := { T of HasTop d T & BLattice d T }.
 
 Module TBLatticeExports.
@@ -1501,7 +1472,7 @@ HB.export TBLatticeSyntax.
 HB.mixin Record Lattice_MeetIsDistributive d (T : Type) of Lattice d T := {
   meetUl : @left_distributive T T meet join;
 }.
-#[short(type="distrLatticeType", pack="DistrLatticeType")]
+#[short(type="distrLatticeType")]
 HB.structure Definition DistrLattice d :=
   { T of Lattice_MeetIsDistributive d T & Lattice d T }.
 
@@ -1510,7 +1481,7 @@ Module DistrLatticeExports.
 End DistrLatticeExports.
 HB.export DistrLatticeExports.
 
-#[short(type="bDistrLatticeType", pack="BDistrLatticeType")]
+#[short(type="bDistrLatticeType")]
 HB.structure Definition BDistrLattice d :=
   { T of HasBottom d T & DistrLattice d T}.
 
@@ -1520,7 +1491,7 @@ Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T _)
 End BDistrLatticeExports.
 HB.export BDistrLatticeExports.
 
-#[short(type="tbDistrLatticeType", pack="TBDistrLatticeType")]
+#[short(type="tbDistrLatticeType")]
 HB.structure Definition TBDistrLattice d :=
   { T of TBLattice d T & BDistrLattice d T }.
 
@@ -1537,7 +1508,7 @@ HB.mixin Record HasSub d (T : Type) of BDistrLattice d T := {
   joinIB : forall x y, (x `&` y) `|` sub x y = x
 }.
 
-#[short(type="cbDistrLatticeType", pack="CBDistrLatticeType")]
+#[short(type="cbDistrLatticeType")]
 HB.structure Definition CBDistrLattice d :=
   { T of HasSub d T & BDistrLattice d T }.
 
@@ -1571,7 +1542,7 @@ HB.mixin Record HasCompl d (T : Type) of
   complE : forall x : T, compl x = (top : T) `\` x (* FIXME? *)
 }.
 
-#[short(type="ctbDistrLatticeType", pack="CTBDistrLatticeType")]
+#[short(type="ctbDistrLatticeType")]
 HB.structure Definition CTBDistrLattice d :=
   { T of HasCompl d T & TBDistrLattice d T & CBDistrLattice d T }.
 
@@ -1604,7 +1575,7 @@ End CTBDistrLatticeSyntax.
 HB.mixin Record DistrLattice_IsTotal d T of DistrLattice d T :=
   { le_total : total (<=%O : rel T) }.
 
-#[short(type="orderType", pack="OrderType")]
+#[short(type="orderType")]
 HB.structure Definition Total d :=
   { T of DistrLattice_IsTotal d T & DistrLattice d T }.
 
@@ -1628,7 +1599,7 @@ HB.export TotalExports.
 (* FINITE *)
 (**********)
 
-#[short(type="finPOrderType", pack="FinPOrderType")]
+#[short(type="finPOrderType")]
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
 Module FinPOrderExports.
@@ -1637,7 +1608,7 @@ Notation "[ 'finPOrderType' 'of' T ]" := (FinPOrder.clone _ T _ )
 End FinPOrderExports.
 HB.export FinPOrderExports.
 
-#[short(type="finLatticeType", pack="FinLatticeType")]
+#[short(type="finLatticeType")]
 HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }.
 
 Module FinLatticeExports.
@@ -1646,7 +1617,7 @@ Notation "[ 'finLatticeType' 'of' T ]" := (FinLattice.clone _ T _ )
 End FinLatticeExports.
 HB.export FinLatticeExports.
 
-#[short(type="finDistrLatticeType", pack="FinDistrLatticeType")]
+#[short(type="finDistrLatticeType")]
 HB.structure Definition FinDistrLattice d :=
   { T of Finite T & TBDistrLattice d T }.
 
@@ -1656,7 +1627,7 @@ Notation "[ 'finDistrLatticeType' 'of' T ]" := (FinDistrLattice.clone _ T _ )
 End FinDistrLatticeExports.
 HB.export FinDistrLatticeExports.
 
-#[short(type="finCDistrLatticeType", pack="FinCDistrLatticeType")]
+#[short(type="finCDistrLatticeType")]
 HB.structure Definition FinCDistrLattice d :=
   { T of Finite T & CTBDistrLattice d T }.
 
@@ -1667,7 +1638,7 @@ End FinCDistrLatticeExports.
 HB.export FinCDistrLatticeExports.
 
 
-#[short(type="finOrderType", pack="FinOrderType")]
+#[short(type="finOrderType")]
 HB.structure Definition FinTotal d :=
   { T of Total d T & FinDistrLattice d T }.
 

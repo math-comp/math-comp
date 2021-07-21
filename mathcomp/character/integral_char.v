@@ -62,7 +62,7 @@ have splitXn1: splittingFieldFor 1 ('X^n - 1) {:Qn}.
   apply/eqP; rewrite eqEsubv subvf -genQn adjoin_seqSr //; apply/allP=> /=.
   by rewrite andbT -root_prod_XsubC -Dr; apply/unity_rootP/prim_expr_order.
 have Qn_ax : FieldExt_IsSplittingField _ Qn by constructor; exists ('X^n - 1).
-exists (SplittingFieldType _ Qn Qn_ax).
+exists (HB.pack_for (splittingFieldType rat) Qn Qn_ax).
   apply/splitting_galoisField.
   exists ('X^n - 1); split => //.
   apply: separable_Xn_sub_1; rewrite -(fmorph_eq0 QnC) rmorph_nat.

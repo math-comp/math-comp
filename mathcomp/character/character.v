@@ -2501,7 +2501,7 @@ have mul1: left_id one mul by move=> u; apply: cFinj; rewrite cFmul cFone mul1r.
 have mulV: left_inverse one inv mul.
   by move=> u; apply: cFinj; rewrite cFmul cFinv cFone mulVr ?lin_char_unitr.
 pose imA := IsMulGroup.Build linT mulA mul1 mulV.
-pose linG := FinGroupType linT imA.
+pose linG : finGroupType := HB.pack linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
   by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
 do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].

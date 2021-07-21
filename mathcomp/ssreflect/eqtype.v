@@ -125,7 +125,7 @@ Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
 HB.mixin Record HasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 
-#[mathcomp(axiom="eq_axiom"), short(type="eqType", pack="EqType")]
+#[mathcomp(axiom="eq_axiom"), short(type="eqType")]
 HB.structure Definition Equality := { T of HasDecEq T }.
 
 Notation "[ 'HasDecEq' 'of' T ]" := (Equality.on T)

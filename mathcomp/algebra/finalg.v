@@ -42,7 +42,7 @@ Module FinRing.
 
 Import GRing.Theory.
 
-#[short(type="finZmodType", pack="FinZmodType")]
+#[short(type="finZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
 Module ZmoduleExports.
@@ -54,7 +54,7 @@ Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
 End ZmoduleExports.
 HB.export ZmoduleExports.
 
-#[short(type="finRingType", pack="FinRingType")]
+#[short(type="finRingType")]
 HB.structure Definition Ring := {R of GRing.Ring R & Finite R}.
 
 Module RingExports.
@@ -63,7 +63,7 @@ Notation "[ 'finRingType' 'of' T ]" := (Ring.clone T _)
 End RingExports.
 HB.export RingExports.
 
-#[short(type="finComRingType", pack="FinComRingType")]
+#[short(type="finComRingType")]
 HB.structure Definition ComRing := {R of GRing.ComRing R & Finite R}.
 
 Module ComRingExports.
@@ -72,7 +72,7 @@ Notation "[ 'finComRingType' 'of' T ]" := (ComRing.clone T _)
 End ComRingExports.
 HB.export ComRingExports.
 
-#[short(type="finUnitRingType", pack="FinUnitRingType")]
+#[short(type="finUnitRingType")]
 HB.structure Definition UnitRing := {R of GRing.UnitRing R & Finite R}.
 
 Module UnitRingExports.
@@ -81,7 +81,7 @@ Notation "[ 'finUnitRingType' 'of' T ]" := (UnitRing.clone T _)
 End UnitRingExports.
 HB.export UnitRingExports.
 
-#[short(type="finComUnitRingType", pack="FinComUnitRingType")]
+#[short(type="finComUnitRingType")]
 HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Finite R}.
 
 Module ComUnitRingExports.
@@ -90,7 +90,7 @@ Notation "[ 'finComUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
 End ComUnitRingExports.
 HB.export ComUnitRingExports.
 
-#[short(type="finIntegralDomainType", pack="FinIntegralDomainType")]
+#[short(type="finIntegralDomainType")]
 HB.structure Definition IntegralDomain :=
   {R of GRing.IntegralDomain R & Finite R}.
 
@@ -100,7 +100,7 @@ Notation "[ 'finIntegralDomainType' 'of' T ]" := (IntegralDomain.clone T _)
 End IntegralDomainExports.
 HB.export IntegralDomainExports.
 
-#[short(type="finFieldType", pack="FinFieldType")]
+#[short(type="finFieldType")]
 HB.structure Definition Field := {R of GRing.Field R & Finite R}.
 
 Module FieldExports.
@@ -109,7 +109,7 @@ Notation "[ 'finFieldType' 'of' T ]" := (Field.clone T _)
 End FieldExports.
 HB.export FieldExports.
 
-#[infer(R), short(type="finLmodType", pack="FinLmodType")]
+#[infer(R), short(type="finLmodType")]
 HB.structure Definition Lmodule (R : ringType) :=
   {M of GRing.Lmodule R M & Finite M}.
 
@@ -121,7 +121,7 @@ Identity Coercion lmodtype_id : Lmodule.type >-> Lmodule.type_.
 End LmoduleExports.
 HB.export LmoduleExports.
 
-#[infer(R), short(type="finLalgType", pack="FinLalgType")]
+#[infer(R), short(type="finLalgType")]
 HB.structure Definition Lalgebra (R : ringType) :=
   {M of GRing.Lalgebra R M & Finite M}.
 
@@ -133,7 +133,7 @@ Identity Coercion lalgtype_id : Lalgebra.type >-> Lalgebra.type_.
 End LalgebraExports.
 HB.export LalgebraExports.
 
-#[infer(R), short(type="finAlgType", pack="FinAlgType")]
+#[infer(R), short(type="finAlgType")]
 HB.structure Definition Algebra (R : ringType) :=
   {M of GRing.Algebra R M & Finite M}.
 
@@ -145,7 +145,7 @@ Identity Coercion algtype_id : Algebra.type >-> Algebra.type_.
 End AlgebraExports.
 HB.export AlgebraExports.
 
-#[infer(R), short(type="finUnitAlgType", pack="FinUnitAlgType")]
+#[infer(R), short(type="finUnitAlgType")]
 HB.structure Definition UnitAlgebra (R : unitRingType) :=
   {M of GRing.UnitAlgebra R M & Finite M}.
 

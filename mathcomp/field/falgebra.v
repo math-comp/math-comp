@@ -97,7 +97,7 @@ Notation "\dim_ E V" := (divn (\dim V) (\dim E))
 Import GRing.Theory.
 
 (* Finite dimensional algebra *)
-#[short(type="FalgType", pack="FAlgType")]
+#[short(type="FalgType")]
 HB.structure Definition Falgebra (R : ringType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
 

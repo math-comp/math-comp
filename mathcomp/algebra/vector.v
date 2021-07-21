@@ -115,7 +115,7 @@ HB.mixin Record Lmodule_HasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V
   { dim : nat;
     vector_subdef : vector_axiom_def dim (Phant V) }.
 
-#[mathcomp(axiom="vector_axiom_def"), infer(R), short(type="vectType", pack="VectType")]
+#[mathcomp(axiom="vector_axiom_def"), infer(R), short(type="vectType")]
 HB.structure Definition Vector (R : ringType) :=
   { V of Lmodule_HasFinDim R V & GRing.Lmodule R V }.
 
@@ -1709,20 +1709,24 @@ Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
  *  This is ok, but maybe we could introduce an alias                         *)
 Definition lfun_comp_ringMixin := GRing.Zmodule_IsRing.Build 'End(vT)
   comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
-Definition lfun_comp_ringType := Eval hnf in RingType 'End(vT)
-  lfun_comp_ringMixin.
+Definition lfun_comp_ringType : ringType :=
+  HB.pack 'End(vT) lfun_comp_ringMixin.
 
 (* In the standard endomorphism ring product is categorical composition. *)
-Definition lfun_ringType := Eval hnf in
-  RingType 'End(vT) (GRing.Ring.on (lfun_comp_ringType^c)).
+Definition lfun_ringMixin : GRing.Zmodule_IsRing 'End(vT) :=
+  GRing.Ring.on (lfun_comp_ringType^c).
+Definition lfun_ringType : ringType :=
+  HB.pack 'End(vT) lfun_ringMixin.
 
-Definition lfun_lalgMixin := GRing.Lmodule_IsLalgebra.Build _ lfun_ringType
+Definition lfun_lalgMixin := GRing.Lmodule_IsLalgebra.Build R lfun_ringType
   (fun k x y => comp_lfunZr k y x).
-Definition lfun_lalgType := Eval hnf in LalgType _ 'End(vT) lfun_lalgMixin.
+Definition lfun_lalgType : lalgType R :=
+  HB.pack 'End(vT) lfun_ringType lfun_lalgMixin.
 
 Definition lfun_algMixin := GRing.Lalgebra_IsAlgebra.Build R lfun_lalgType
-    (fun k x y => comp_lfunZl k y x).
-Definition lfun_algType := Eval hnf in AlgType _ 'End(vT) lfun_algMixin.
+  (fun k x y => comp_lfunZl k y x).
+Definition lfun_algType : algType R :=
+  HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
 
 End LfunAlgebra.
 

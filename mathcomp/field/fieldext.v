@@ -86,7 +86,7 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
-#[infer(R), short(type="fieldExtType", pack="FieldExtType")]
+#[infer(R), short(type="fieldExtType")]
 HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
   GRing.Ring_HasCommutativeMul T & GRing.Field T}.
 
@@ -1293,7 +1293,7 @@ by move/eqP/(can_inj rVpolyK).
 Qed.
 
 Definition SubfxVect := Lmodule_HasFinDim.Build _ subFExtend min_subfx_vect.
-Definition SubFieldExtType := Eval hnf in FieldExtType _ subFExtend SubfxVect.
+Definition SubFieldExtType : fieldExtType F := HB.pack subFExtend SubfxVect.
 
 End Irreducible.
 
@@ -1344,16 +1344,16 @@ have mulD: left_distributive mul +%R.
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
 pose mulM := GRing.Zmodule_IsComRing.Build _ mulA mulC mul1 mulD nzL1.
-pose rL := ComRingType vL mulM.
+pose rL : comRingType := HB.pack vL mulM.
 have mulZlM : GRing.Lmodule_IsLalgebra F rL.
   constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
-pose laL := LalgType F rL mulZlM.
+pose laL : lalgType F := HB.pack rL mulZlM.
 have mulZrM : GRing.Lalgebra_IsAlgebra F laL.
   by constructor => a x y; rewrite !(mulrC x) scalerAl.
-pose aL := AlgType F laL mulZrM.
+pose aL : algType F := HB.pack laL mulZrM.
 pose uLM := Algebra_IsFalgebra.Build F aL.
-pose cuL := ComUnitRingType aL uLM.
+pose cuL : comUnitRingType := HB.pack aL uLM.
 have unitM : GRing.ComUnitRing_IsField cuL.
   constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
@@ -1364,7 +1364,7 @@ have unitM : GRing.ComUnitRing_IsField cuL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose feL := FieldExtType _ _ unitM.
+pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
 suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
