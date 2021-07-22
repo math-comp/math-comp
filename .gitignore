@@ -9,6 +9,7 @@
 *.aux
 *.a
 *.o
+*.v.timing
 Make*.coq
 Make*.coq.bak
 Make*.coq.conf
