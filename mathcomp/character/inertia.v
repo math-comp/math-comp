@@ -1196,7 +1196,7 @@ apply/bigcapP=> y /(subsetP IGtheta)/setIdP[nKy /eqP th_y].
 apply: contraR nz_th_x; rewrite mem_conjg -{}th_y cfConjgE {nKy}//.
 move: {x y}(x ^ _) => x U'x; have [Kx | /cfun0-> //] := boolP (x \in K).
 have /eqP := congr1 (fun k => (('chi_j %% L)%CF^-1 * 'chi_k) x) eq_mm_ij.
-rewrite -rmorphV // !mmLthE !mulrA -!rmorphM mulVr //= rmorph1 !cfunE.
+rewrite -rmorphV // !mmLthE !mulrA -!rmorphM mulVr // rmorph1 !cfunE.
 rewrite (mulrC _^-1) -/mu -subr_eq0 -mulrBl cfun1E Kx mulf_eq0 => /orP[]//.
 rewrite mulrb subr_eq0 -(lin_char1 lin_mu) [_ == _](contraNF _ U'x) //.
 by rewrite /U cfkerEchar ?lin_charW // inE Kx.
