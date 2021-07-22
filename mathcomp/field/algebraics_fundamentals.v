@@ -687,7 +687,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have{gal_z} galRz: galois Rn Rz.
     apply/and3P; split=> //; first by apply: sepQ.
     apply/splitting_normalField=> //.
-    pose QzMixin := FieldExt_IsSplittingField.Build _ _ gal_z.
+    pose QzMixin := FieldExt_IsSplittingField.Build _ (Q z) gal_z.
     pose Qz : splittingFieldType _ := HB.pack (Q z) QzMixin.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
