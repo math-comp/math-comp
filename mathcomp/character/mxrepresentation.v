@@ -715,7 +715,8 @@ End Quotient.
 Section Regular.
 
 Variables (gT : finGroupType) (G : {group gT}).
-Local Notation nG := #|pred_of_set (gval G)|.
+Definition gcard := #|G|. (* hides the projections to set *)
+Local Notation nG := gcard.
 
 Definition gring_index (x : gT) := enum_rank_in (group1 G) x.
 
@@ -4590,9 +4591,7 @@ exists (fun i => oapp h' [1 sGq]%irr (insub i)) => [j | i] lin_i.
   exists g => [||G'x]; last 1 [case/morphimP=> x _ Gx ->] || by [].
   by rewrite quo_repr_coset ?hom_g.
 rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
-(* FIX ME : had to do this unfold *)
-rewrite /Sub /=.
-set u := exist _ _ _; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)). 
+set u := Sub i lin_i; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
 have [g lin_g inj_g hom_g] := rsim_irr_comp sGq F'Gq (irrGq u).
 exists g => [||x Gx]; last 1 [have:= hom_g (coset _ x)] || by [].
 by rewrite quo_repr_coset; first by apply; rewrite mem_quotient.
