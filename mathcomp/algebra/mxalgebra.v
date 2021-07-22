@@ -188,6 +188,10 @@ Fixpoint Gaussian_elimination_ {F : fieldType} {m n} : 'M[F]_(m, n) -> 'M_m * 'M
 HB.lock Definition Gaussian_elimination := @Gaussian_elimination_.
 Canonical Gaussian_elimination_unlockable := Unlockable Gaussian_elimination.unlock.
 
+HB.lock Definition mxrank (F : fieldType) m n (A : 'M_(m, n)) :=
+  if [|| m == 0 | n == 0]%N then 0%N else (@Gaussian_elimination F m n A).2.
+Canonical mxrank_unlockable := Unlockable mxrank.unlock.
+
 Section RowSpaceTheoryDefs.
 
 Variable F : fieldType.
@@ -197,12 +201,12 @@ Local Notation "''M_' ( m , n )" := 'M[F]_(m, n) : type_scope.
 Local Notation "''M_' n" := 'M[F]_(n, n) : type_scope.
 
 Variables (m n : nat) (A : 'M_(m, n)).
+Local Notation mxrank := (@mxrank F m n A).
 
 Let LUr := @Gaussian_elimination F m n A.
 
 Definition col_ebase := LUr.1.1.
 Definition row_ebase := LUr.1.2.
-Definition mxrank := if [|| m == 0 | n == 0]%N then 0%N else LUr.2.
 
 Definition row_free := mxrank == m.
 Definition row_full := mxrank == n.
@@ -379,7 +383,7 @@ Definition proj_mx n (U V : 'M_n) : 'M_n := pinvmx (col_mx U V) *m col_mx U 0.
 Local Notation GaussE := Gaussian_elimination_.
 
 Fact mxrankE m n (A : 'M_(m, n)) : \rank A = (GaussE A).2.
-Proof. by rewrite /mxrank unlock /=; case: m n A => [|m] [|n]. Qed.
+Proof. by rewrite mxrank.unlock unlock /=; case: m n A => [|m] [|n]. Qed.
 
 Lemma rank_leq_row m n (A : 'M_(m, n)) : \rank A <= m.
 Proof.
@@ -2471,7 +2475,7 @@ set m := n; rewrite [in m.+1]/m; transitivity #|fr m|.
   by rewrite cardsT /= card_sub; apply: eq_card => A; rewrite -row_free_unit.
 have: m <= n by []; elim: m => [_ | m IHm /ltnW-le_mn].
   rewrite (@eq_card1 _ (0 : 'M_(0, n))) ?big_geq //= => A.
-  by rewrite flatmx0 !inE !eqxx.
+  by rewrite flatmx0 !inE mxrank.unlock !eqxx.
 rewrite big_nat_recr // -{}IHm //= !subSS mulnBr muln1 -expnD subnKC //.
 rewrite -sum_nat_const /= -sum1_card -add1n.
 rewrite (partition_big dsubmx (fr m)) /= => [|A]; last first.

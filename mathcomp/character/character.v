@@ -477,7 +477,7 @@ apply: mx_rsim_trans (mx_rsim_sym (rsim_submod1 (mxmodule1 rG) _)) _ => //.
 apply: mx_rsim_dsum (modW) _ defS dxS _ => i.
 rewrite /W /standard_irr_coef /modW /soc; case: pickP => [Wi|_] /=; last first.
   rewrite /muln_grepr big_ord0.
-  by exists 0 => [||x _]; rewrite ?mxrank0 ?mulmx0 ?mul0mx.
+  by exists 0 => [||x _]; rewrite /row_free ?mxrank0 ?mulmx0 ?mul0mx.
 by move/eqP=> <-; apply: mx_rsim_socle; apply: rsim_irr_comp (socle_irr Wi).
 Qed.
 

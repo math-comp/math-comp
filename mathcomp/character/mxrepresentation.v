@@ -4787,7 +4787,7 @@ have qev_nsim u: qev (row_env [:: u]) nsimUt = nsim n (vec_mx u).
   do 2!bool_congr; apply: andb_id2l => sUV.
   by rewrite ltn_neqAle andbC !mxrank_leqif_sup.
 have n2gt0: n ^ 2 > 0.
-  by move: nzU; rewrite muln_gt0 -mxrank_eq0; case: posnP (U) => // ->.
+  by move: nzU; rewrite muln_gt0 -mxrank_eq0 unlock; case: posnP (U) => // ->.
 apply: (iffP satP) => [|[V nsimV]].
   by case/Exists_rowP=> // v; move/qevP; rewrite qev_nsim; exists (vec_mx v).
 apply/Exists_rowP=> //; exists (mxvec V); apply/qevP.
@@ -5282,7 +5282,7 @@ Definition subbase nA (B : 'rV_nA) : 'M_(nA * d, n) :=
   \matrix_ik mxvec (\matrix_(i, k) (row (B 0 i) (A ^+ k))) 0 ik.
 
 Lemma gen_dim_ex_proof : exists nA, [exists B : 'rV_nA, row_free (subbase B)].
-Proof. by exists 0%N; apply/existsP; exists 0. Qed.
+Proof. by exists 0%N; apply/existsP; exists 0; rewrite /row_free unlock. Qed.
 
 Lemma gen_dim_ub_proof nA :
   [exists B : 'rV_nA, row_free (subbase B)] -> (nA <= n)%N.
