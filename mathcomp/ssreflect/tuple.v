@@ -37,7 +37,7 @@ Unset Printing Implicit Defensive.
 (*     ord_tuple n : the n.-tuple of all i : 'I_n                             *)
 (******************************************************************************)
 
-Section Def.
+Section TupleDef.
 
 Variables (n : nat) (T : Type).
 
@@ -81,7 +81,7 @@ Definition tuple t mkT : tuple_of :=
 Lemma tupleE t : tuple (fun sP => @Tuple t sP) = t.
 Proof. by case: t. Qed.
 
-End Def.
+End TupleDef.
 
 Notation "n .-tuple" := (tuple_of n)
   (at level 2, format "n .-tuple") : type_scope.
@@ -440,3 +440,225 @@ Notation "[ 'tuple' F | i < n ]" := (mktuple (fun i : 'I_n => F))
    format "[ '[hv' 'tuple'  F '/'   |  i  <  n ] ']'") : form_scope.
 
 Arguments eq_mktuple {n T'} [f1] f2 eq_f12.
+
+Section BseqDef.
+
+Variables (n : nat) (T : Type).
+
+Structure bseq_of : Type := Bseq {bseqval :> seq T; _ : size bseqval <= n}.
+
+Lemma bseqval_inj : injective bseqval.
+Proof.
+move=> [a Ha] [b Hb] /= H.
+move: Ha Hb; rewrite H => Ha Hb.
+congr Bseq; exact: eq_irrelevance.
+Qed.
+
+Canonical bseq_subType := Eval hnf in [subType for bseqval].
+
+Implicit Type bs : bseq_of.
+
+Lemma size_bseq bs : size bs <= n.
+Proof. by case: bs. Qed.
+
+Definition bseq bs mkB : bseq_of :=
+  mkB (let: Bseq _ bsP := bs return size bs <= n in bsP).
+
+Lemma bseqE bs : bseq (fun sP => @Bseq bs sP) = bs.
+Proof. by case: bs. Qed.
+
+End BseqDef.
+
+Canonical nil_bseq n T := Bseq (isT : @size T [::] <= n).
+Canonical cons_bseq n T x (t : bseq_of n T) :=
+  Bseq (valP t : size (x :: t) <= n.+1).
+
+Notation "n .-bseq" := (bseq_of n) 
+  (at level 2, format "n .-bseq") : type_scope.
+
+Notation "{ 'bseq' n 'of' T }" := (n.-bseq T : predArgType)
+  (at level 0, only parsing) : form_scope.
+
+Notation "[ 'bseq' 'of' s ]" := (bseq (fun sP => @Bseq _ _ s sP))
+  (at level 0, format "[ 'bseq'  'of'  s ]") : form_scope.
+
+Notation "[ 'bseq' x1 ; .. ; xn ]" := [bseq of x1 :: .. [:: xn] ..]
+  (at level 0, format "[ 'bseq' '['  x1 ; '/'  .. ; '/'  xn ']' ]")
+  : form_scope.
+
+Notation "[ 'bseq' ]" := [bseq of [::]]
+  (at level 0, format "[ 'bseq' ]") : form_scope.
+
+Definition bseq_of_seq n T (s : seq T) : n.-bseq T :=
+  match (size s <= n) =P true with
+    ReflectT H => Bseq H | ReflectF _ => [bseq]
+  end.
+
+Definition bseq_of_tuple n T (t : n.-tuple T) : n.-bseq T :=
+  Bseq (eq_leq (size_tuple t)).
+
+Coercion bseq_of_tuple : tuple_of >-> bseq_of.
+
+Definition widen_bseq n m T (le_n_m : n <= m) (bs : n.-bseq T) : m.-bseq T := 
+  @Bseq m T bs (leq_trans (size_bseq bs) le_n_m).
+
+Section SeqBseq.
+
+Variables (n m : nat) (T U rT : Type).
+Implicit Type bs : n.-bseq T.
+
+Lemma rcons_bseqP bs x : size (rcons bs x) <= n.+1.
+Proof. by rewrite size_rcons ltnS size_bseq. Qed.
+Canonical rcons_bseq bs x := Bseq (rcons_bseqP bs x).
+
+Lemma behead_bseqP bs : size (behead bs) <= n.-1.
+Proof. rewrite size_behead -!subn1; apply/leq_sub2r/size_bseq. Qed.
+Canonical behead_bseq bs := Bseq (behead_bseqP bs).
+
+Lemma belast_bseqP x bs : size (belast x bs) <= n.
+Proof. by rewrite size_belast; apply/size_bseq. Qed.
+Canonical belast_bseq x bs := Bseq (belast_bseqP x bs).
+
+Lemma cat_bseqP bs (bs' : m.-bseq T) : size (bs ++ bs') <= n + m.
+Proof. by rewrite size_cat; apply/leq_add/size_bseq/size_bseq. Qed.
+Canonical cat_bseq bs (bs' : m.-bseq T) := Bseq (cat_bseqP bs bs').
+
+Lemma take_bseqP bs : size (take m bs) <= n.
+Proof. 
+apply/leq_trans; last by apply/(size_bseq bs).
+by rewrite size_take; case: ifP=> // /ltnW.
+Qed.
+Canonical take_bseq bs := Bseq (take_bseqP bs).
+
+Lemma drop_bseqP bs : size (drop m bs) <= n - m.
+Proof. by rewrite size_drop; apply/leq_sub2r/size_bseq. Qed.
+Canonical drop_bseq bs := Bseq (drop_bseqP bs).
+
+Lemma rev_bseqP bs : size (rev bs) <= n.
+Proof. by rewrite size_rev size_bseq. Qed.
+Canonical rev_bseq t := Bseq (rev_bseqP t).
+
+Lemma rot_bseqP bs : size (rot m bs) <= n.
+Proof. by rewrite size_rot size_bseq. Qed.
+Canonical rot_bseq t := Bseq (rot_bseqP t).
+
+Lemma rotr_bseqP bs : size (rotr m bs) <= n.
+Proof. by rewrite size_rotr size_bseq. Qed.
+Canonical rotr_bseq t := Bseq (rotr_bseqP t).
+
+Lemma map_bseqP f bs : @size rT (map f bs) <= n.
+Proof. by rewrite size_map size_bseq. Qed.
+Canonical map_bseq f t := Bseq (map_bseqP f t).
+
+Lemma scanl_bseqP f x bs : @size rT (scanl f x bs) <= n.
+Proof. by rewrite size_scanl size_bseq. Qed.
+Canonical scanl_bseq f x bs := Bseq (scanl_bseqP f x bs).
+
+Lemma pairmap_bseqP f x bs : @size rT (pairmap f x bs) <= n.
+Proof. by rewrite size_pairmap size_bseq. Qed.
+Canonical pairmap_bseq f x bs := Bseq (pairmap_bseqP f x bs).
+
+Lemma allpairs_bseqP f bs (bs' : m.-bseq U) : @size rT (allpairs f bs bs') <= n * m.
+Proof. by rewrite size_allpairs; apply/leq_mul/size_bseq/size_bseq. Qed.
+Canonical allpairs_bseq f bs (bs' : m.-bseq U) := Bseq (allpairs_bseqP f bs bs').
+
+Lemma sort_bseqP r bs : size (sort r bs) <= n.
+Proof. by rewrite size_sort size_bseq. Qed.
+Canonical sort_bseq r t := Bseq (sort_bseqP r t).
+
+End SeqBseq.
+
+Definition bseq_eqMixin n (T : eqType) := 
+  Eval hnf in [eqMixin of n.-bseq T by <:].
+
+Canonical bseq_eqType n (T : eqType) := 
+  Eval hnf in EqType (n.-bseq T) (bseq_eqMixin n T).
+
+Canonical bseq_predType n (T : eqType) := 
+  Eval hnf in PredType (fun t : n.-bseq T => mem_seq t). 
+
+Definition bseq_choiceMixin n (T : choiceType) := 
+  [choiceMixin of n.-bseq T by <:].
+
+Canonical bseq_choiceType n (T : choiceType) :=
+  Eval hnf in ChoiceType (n.-bseq T) (bseq_choiceMixin n T).
+
+Definition bseq_countMixin n (T : countType) := 
+  [countMixin of n.-bseq T by <:].
+
+Canonical bseq_countType n (T : countType) :=
+  Eval hnf in CountType (n.-bseq T) (bseq_countMixin n T).
+
+Canonical bseq_subCountType n (T : countType) := 
+  Eval hnf in [subCountType of n.-bseq T].
+
+Module Type FinBseqSig.
+Section FinBseqSig.
+Variables (n : nat) (T : finType).
+Parameter enum : seq (n.-bseq T).
+Axiom enumP : Finite.axiom enum.
+End FinBseqSig.
+End FinBseqSig.
+
+Module FinBseq : FinBseqSig.
+Section FinBseq.
+Variables (n : nat) (T : finType).
+
+Definition enum : seq (n.-bseq T) :=
+  flatten (map^~ (iota 0 n.+1) (fun m => 
+    map (@bseq_of_seq n _) (map (@tval _ _) (enum {: m.-tuple T}))
+  )).
+
+Lemma enumP : Finite.axiom enum.
+Proof.
+case=> s sn.
+rewrite count_flatten -[in iota _ _](subnKC sn) -addnS iotaD !map_cat.
+rewrite sumn_cat add0n /= addnCA -sumn_cat -!map_cat count_uniq_mem; last first.
+- rewrite -map_comp map_inj_uniq //; first by rewrite enum_uniq.
+  move=> /= [a Ha] [b Hb] /=.
+  rewrite /bseq_of_seq.
+  move: sn=> /[dup].
+  move: Ha=> /[dup] /eqP {2}<- Ha. 
+  move: Hb=> /[dup] /eqP {2}<- Hb. 
+  case: eqP=> //; case: eqP=> // b1 b2 _ _ [] H.
+  move: Ha Hb; rewrite H=> Ha Hb.
+  by have ->: Ha = Hb by exact/bool_irrelevance.
+rewrite -map_comp (_ : _ \in _); last first.
+- apply/mapP => /=.
+  exists (in_tuple s); first by rewrite mem_enum inE.
+  rewrite /bseq_of_seq.
+  move: sn; case: eqP=> //.
+  rewrite /in_tuple /= => Ha Hb.
+  by have ->: Ha = Hb by exact/bool_irrelevance.
+rewrite add1n; congr S; apply/eqP/natnseq0P/all_pred1P/allP => /= m.
+rewrite -map_comp; case/mapP => /= l Hl ->.
+move: Hl; rewrite mem_cat => /orP[|].
+- rewrite mem_iota add0n leq0n /= => ls.
+  apply/eqP/count_memPn/mapP => /= -[s' /mapP[t' _ ->]].
+  rewrite /bseq_of_seq.
+  move: sn; case: eqP=> // _ sn [] H; move: ls; last first.
+  + by rewrite H /leq=> /=. 
+  have ->: size s = size t' by rewrite H.
+  by rewrite size_tuple /leq subSnn. 
+rewrite mem_iota => /andP[sl].
+rewrite addSn subnKC // ltnS => ln.
+apply/eqP/count_memPn/mapP => /= -[s' /mapP[t' _ ->]].
+rewrite /bseq_of_seq.
+move: ln; have {1}->: l = size t' by rewrite size_tuple. 
+case: eqP=> //.
+move=> ? _ [] H; move: sl. 
+by rewrite H size_tuple /leq subSnn. 
+Qed.
+
+End FinBseq.
+End FinBseq.
+
+Definition bseq_finMixin n (T : finType) := 
+  Eval hnf in FinMixin (@FinBseq.enumP n T).
+
+Canonical bseq_finType n (T : finType) := 
+  Eval hnf in FinType (n.-bseq T) (bseq_finMixin n T).
+
+Canonical bseq_subFinType n (T: finType) := 
+  Eval hnf in [subFinType of n.-bseq T].
+
