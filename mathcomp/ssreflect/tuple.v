@@ -489,18 +489,35 @@ Notation "[ 'bseq' x1 ; .. ; xn ]" := [bseq of x1 :: .. [:: xn] ..]
 Notation "[ 'bseq' ]" := [bseq of [::]]
   (at level 0, format "[ 'bseq' ]") : form_scope.
 
-Definition bseq_of_seq n T (s : seq T) : n.-bseq T :=
-  match (size s <= n) =P true with
-    ReflectT H => Bseq H | ReflectF _ => [bseq]
-  end.
+Definition bseq_of_seq n T (s : seq T) : n.-bseq T := insubd [bseq] s.
 
 Definition bseq_of_tuple n T (t : n.-tuple T) : n.-bseq T :=
   Bseq (eq_leq (size_tuple t)).
 
 Coercion bseq_of_tuple : tuple_of >-> bseq_of.
 
-Definition widen_bseq n m T (le_n_m : n <= m) (bs : n.-bseq T) : m.-bseq T := 
-  @Bseq m T bs (leq_trans (size_bseq bs) le_n_m).
+
+Definition widen_bseq m n T (lemn : m <= n) (bs : m.-bseq T) : n.-bseq T := 
+  @Bseq n T bs (leq_trans (size_bseq bs) lemn).
+
+Lemma widen_bseq_id n T (lenn : n <= n) (t : n.-bseq T) : widen_bseq lenn t = t.
+Proof. exact: val_inj. Qed.
+
+Lemma widen_bseqK m n T (lemn : m <= n) (lenm : n <= m) :
+   cancel (@widen_bseq m n T lemn) (widen_bseq lenm).
+Proof. by move=> t; apply: val_inj. Qed.
+
+Lemma widen_bseq_trans m n p T (lemn : m <= n) (lenp : n <= p) (t : m.-bseq T) :
+  widen_bseq (leq_trans lemn lenp) t = widen_bseq lenp (widen_bseq lemn t).
+Proof. exact/val_inj. Qed.
+
+Definition in_bseq T (s : seq T) : (size s).-bseq T := Bseq (leqnn (size s)).
+
+Lemma in_nseqE T s : in_bseq s = s :> seq T. Proof. by []. Qed.
+
+Lemma widen_bseq_in_bseq n T (t : n.-bseq T) :
+  widen_bseq (size_bseq t) (in_bseq t) = t.
+Proof. exact: val_inj. Qed.
 
 Section SeqBseq.
 
@@ -525,7 +542,7 @@ Canonical cat_bseq bs (bs' : m.-bseq T) := Bseq (cat_bseqP bs bs').
 
 Lemma take_bseqP bs : size (take m bs) <= n.
 Proof. 
-apply/leq_trans; last by apply/(size_bseq bs).
+apply/leq_trans; last exact/(size_bseq bs).
 by rewrite size_take; case: ifP=> // /ltnW.
 Qed.
 Canonical take_bseq bs := Bseq (take_bseqP bs).
@@ -592,73 +609,20 @@ Canonical bseq_countType n (T : countType) :=
 Canonical bseq_subCountType n (T : countType) := 
   Eval hnf in [subCountType of n.-bseq T].
 
-Module Type FinBseqSig.
-Section FinBseqSig.
-Variables (n : nat) (T : finType).
-Parameter enum : seq (n.-bseq T).
-Axiom enumP : Finite.axiom enum.
-End FinBseqSig.
-End FinBseqSig.
+Definition bseq_tagged_tuple {n T} (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
+  Tagged _ (in_tuple s : (Ordinal (size_bseq s : size s < n.+1)).-tuple _).
 
-Module FinBseq : FinBseqSig.
-Section FinBseq.
-Variables (n : nat) (T : finType).
+Definition tagged_tuple_bseq {n T} (t : {k : 'I_n.+1 & k.-tuple T}) : n.-bseq T :=
+  widen_bseq (leq_ord (tag t)) (tagged t).
+  
+Lemma bseq_tagged_tupleK n T : cancel (@bseq_tagged_tuple n T) tagged_tuple_bseq.
+Proof. by move=> t; apply/val_inj. Qed.
 
-Definition enum : seq (n.-bseq T) :=
-  flatten (map^~ (iota 0 n.+1) (fun m => 
-    map (@bseq_of_seq n _) (map (@tval _ _) (enum {: m.-tuple T}))
-  )).
-
-Lemma enumP : Finite.axiom enum.
-Proof.
-case=> s sn.
-rewrite count_flatten -[in iota _ _](subnKC sn) -addnS iotaD !map_cat.
-rewrite sumn_cat add0n /= addnCA -sumn_cat -!map_cat count_uniq_mem; last first.
-- rewrite -map_comp map_inj_uniq //; first by rewrite enum_uniq.
-  move=> /= [a Ha] [b Hb] /=.
-  rewrite /bseq_of_seq.
-  move: sn=> /[dup].
-  move: Ha=> /[dup] /eqP {2}<- Ha. 
-  move: Hb=> /[dup] /eqP {2}<- Hb. 
-  case: eqP=> //; case: eqP=> // b1 b2 _ _ [] H.
-  move: Ha Hb; rewrite H=> Ha Hb.
-  by have ->: Ha = Hb by exact/bool_irrelevance.
-rewrite -map_comp (_ : _ \in _); last first.
-- apply/mapP => /=.
-  exists (in_tuple s); first by rewrite mem_enum inE.
-  rewrite /bseq_of_seq.
-  move: sn; case: eqP=> //.
-  rewrite /in_tuple /= => Ha Hb.
-  by have ->: Ha = Hb by exact/bool_irrelevance.
-rewrite add1n; congr S; apply/eqP/natnseq0P/all_pred1P/allP => /= m.
-rewrite -map_comp; case/mapP => /= l Hl ->.
-move: Hl; rewrite mem_cat => /orP[|].
-- rewrite mem_iota add0n leq0n /= => ls.
-  apply/eqP/count_memPn/mapP => /= -[s' /mapP[t' _ ->]].
-  rewrite /bseq_of_seq.
-  move: sn; case: eqP=> // _ sn [] H; move: ls; last first.
-  + by rewrite H /leq=> /=. 
-  have ->: size s = size t' by rewrite H.
-  by rewrite size_tuple /leq subSnn. 
-rewrite mem_iota => /andP[sl].
-rewrite addSn subnKC // ltnS => ln.
-apply/eqP/count_memPn/mapP => /= -[s' /mapP[t' _ ->]].
-rewrite /bseq_of_seq.
-move: ln; have {1}->: l = size t' by rewrite size_tuple. 
-case: eqP=> //.
-move=> ? _ [] H; move: sl. 
-by rewrite H size_tuple /leq subSnn. 
-Qed.
-
-End FinBseq.
-End FinBseq.
-
-Definition bseq_finMixin n (T : finType) := 
-  Eval hnf in FinMixin (@FinBseq.enumP n T).
+Definition bseq_finMixin n (T : finType) :=
+  CanFinMixin (@bseq_tagged_tupleK n T).
 
 Canonical bseq_finType n (T : finType) := 
   Eval hnf in FinType (n.-bseq T) (bseq_finMixin n T).
 
 Canonical bseq_subFinType n (T: finType) := 
   Eval hnf in [subFinType of n.-bseq T].
-
