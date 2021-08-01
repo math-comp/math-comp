@@ -8,7 +8,9 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 (******************************************************************************)
-(* Tuples, i.e., sequences with a fixed (known) length. We define:            *)
+(* This file defines tuples, i.e., sequences with a fixed (known) length,     *)
+(* and sequences with bounded length.                                         *)
+(* For tuples we define:                                                      *)
 (*         n.-tuple T == the type of n-tuples of elements of type T.          *)
 (*       [tuple of s] == the tuple whose underlying sequence (value) is s.    *)
 (*                       The size of s must be known: specifically, Coq must  *)
@@ -27,12 +29,25 @@ Unset Printing Implicit Defensive.
 (*         [tnth t i] == the i'th component of t, where i : nat and i < n     *)
 (*                       is convertible to true.                              *)
 (*            thead t == the first element of t, when n is m.+1 for some m.   *)
+(* For bounded sequences we define:                                           *)
+(*         n.-bseq T  == the type of bounded sequences of elements of type T, *)
+(*                       the length of bounded sequence is smaller or         *)
+(*                       or equal to n.                                       *)
+(*       [bseq of s]  == the bounded sequence whose underlying value is s.    *)
+(*                       The size of s must be known.                         *)
+(*         in_bseq s  == the (size s).-bseq with value s.                     *)
+(*            [bseq]  == the empty bseq.                                      *)
+(* [bseq x1; ..; xn]  == the explicit n.-bseq <x1; ..; xn>.                   *)
+(*    cast_bseq Emn t == the m.-bseq t cast as an n.-tuple using Emn : m = n. *)
+(*   widen_bseq Lmn t == the m.-bseq t cast as an n.-tuple using Lmn : m <= n.*)
 (* Most seq constructors (cons, behead, cat, rcons, belast, take, drop, rot,  *)
-(* map, ...) can be used to build tuples via the [tuple of s] construct.      *)
-(*   Tuples are actually a subType of seq, and inherit all combinatorial      *)
-(* structures, including the finType structure.                               *)
+(* map, ...) can be used to build tuples and bounded sequences via            *)
+(* the [tuple of s] and [bseq of s] constructs correspondingly.               *)
+(*   Tuples and bounded sequences are actually instances of subType of seq,   *)
+(* and inherit all combinatorial structures, including the finType structure. *)
 (*   Some useful lemmas and definitions:                                      *)
 (*     tuple0 : [tuple] is the only 0.-tuple                                  *)
+(*     bseq0 : [bseq] is the only 0.-bseq                                     *)
 (*     tupleP : elimination view for n.+1.-tuple                              *)
 (*     ord_tuple n : the n.-tuple of all i : 'I_n                             *)
 (******************************************************************************)
@@ -441,18 +456,12 @@ Notation "[ 'tuple' F | i < n ]" := (mktuple (fun i : 'I_n => F))
 
 Arguments eq_mktuple {n T'} [f1] f2 eq_f12.
 
+
 Section BseqDef.
 
 Variables (n : nat) (T : Type).
 
 Structure bseq_of : Type := Bseq {bseqval :> seq T; _ : size bseqval <= n}.
-
-Lemma bseqval_inj : injective bseqval.
-Proof.
-move=> [a Ha] [b Hb] /= H.
-move: Ha Hb; rewrite H => Ha Hb.
-congr Bseq; exact: eq_irrelevance.
-Qed.
 
 Canonical bseq_subType := Eval hnf in [subType for bseqval].
 
@@ -496,28 +505,59 @@ Definition bseq_of_tuple n T (t : n.-tuple T) : n.-bseq T :=
 
 Coercion bseq_of_tuple : tuple_of >-> bseq_of.
 
+Lemma size_bseq_of_seq n T (s : seq T) : size (bseq_of_seq n s) <= size s.
+Proof. 
+  rewrite /bseq_of_seq /insubd. 
+  case: insubP=> /=; first by move=> ?? ->. 
+  move=> ?; exact/leq0n. 
+Qed.
 
-Definition widen_bseq m n T (lemn : m <= n) (bs : m.-bseq T) : n.-bseq T := 
+Section CastBseq. 
+
+Variable T : Type.
+
+Definition in_bseq (s : seq T) : (size s).-bseq T := Bseq (leqnn (size s)).
+
+Definition cast_bseq m n (eq_mn : m = n) bs :=
+  let: erefl in _ = n := eq_mn return n.-bseq T in bs.
+
+Definition widen_bseq m n (lemn : m <= n) (bs : m.-bseq T) : n.-bseq T := 
   @Bseq n T bs (leq_trans (size_bseq bs) lemn).
 
-Lemma widen_bseq_id n T (lenn : n <= n) (t : n.-bseq T) : widen_bseq lenn t = t.
+Lemma cast_bseq_id n (eq_nn : n = n) bs : cast_bseq eq_nn bs = bs.
+Proof. by rewrite (eq_axiomK eq_nn). Qed.
+
+Lemma cast_bseqK m n (eq_mn : m = n) : 
+  cancel (cast_bseq eq_mn) (cast_bseq (esym eq_mn)).
+Proof. by case: n / eq_mn. Qed.
+
+Lemma case_bseqKV m n (eq_mn : m = n) : 
+  cancel (cast_bseq (esym eq_mn)) (cast_bseq eq_mn).
+Proof. by case: n / eq_mn. Qed.
+
+Lemma cast_bseq_trans m n p (eq_mn : m = n) (eq_np : n = p) bs :
+  cast_bseq (etrans eq_mn eq_np) bs = cast_bseq eq_np (cast_bseq eq_mn bs).
+Proof. by case: n / eq_mn eq_np; case: p /. Qed.
+
+Lemma widen_bseq_id n (lenn : n <= n) (bs : n.-bseq T) : 
+  widen_bseq lenn bs = bs.
 Proof. exact: val_inj. Qed.
 
-Lemma widen_bseqK m n T (lemn : m <= n) (lenm : n <= m) :
-   cancel (@widen_bseq m n T lemn) (widen_bseq lenm).
+Lemma widen_bseqK m n (lemn : m <= n) (lenm : n <= m) :
+   cancel (@widen_bseq m n lemn) (widen_bseq lenm).
 Proof. by move=> t; apply: val_inj. Qed.
 
-Lemma widen_bseq_trans m n p T (lemn : m <= n) (lenp : n <= p) (t : m.-bseq T) :
-  widen_bseq (leq_trans lemn lenp) t = widen_bseq lenp (widen_bseq lemn t).
+Lemma widen_bseq_trans m n p (lemn : m <= n) (lenp : n <= p) (bs : m.-bseq T) :
+  widen_bseq (leq_trans lemn lenp) bs = widen_bseq lenp (widen_bseq lemn bs).
 Proof. exact/val_inj. Qed.
 
-Definition in_bseq T (s : seq T) : (size s).-bseq T := Bseq (leqnn (size s)).
+Lemma in_nseqE s : in_bseq s = s :> seq T. Proof. by []. Qed.
 
-Lemma in_nseqE T s : in_bseq s = s :> seq T. Proof. by []. Qed.
-
-Lemma widen_bseq_in_bseq n T (t : n.-bseq T) :
-  widen_bseq (size_bseq t) (in_bseq t) = t.
+Lemma widen_bseq_in_bseq n (bs : n.-bseq T) :
+  widen_bseq (size_bseq bs) (in_bseq bs) = bs.
 Proof. exact: val_inj. Qed.
+
+End CastBseq.
 
 Section SeqBseq.
 
@@ -553,19 +593,19 @@ Canonical drop_bseq bs := Bseq (drop_bseqP bs).
 
 Lemma rev_bseqP bs : size (rev bs) <= n.
 Proof. by rewrite size_rev size_bseq. Qed.
-Canonical rev_bseq t := Bseq (rev_bseqP t).
+Canonical rev_bseq bs := Bseq (rev_bseqP bs).
 
 Lemma rot_bseqP bs : size (rot m bs) <= n.
 Proof. by rewrite size_rot size_bseq. Qed.
-Canonical rot_bseq t := Bseq (rot_bseqP t).
+Canonical rot_bseq bs := Bseq (rot_bseqP bs).
 
 Lemma rotr_bseqP bs : size (rotr m bs) <= n.
 Proof. by rewrite size_rotr size_bseq. Qed.
-Canonical rotr_bseq t := Bseq (rotr_bseqP t).
+Canonical rotr_bseq bs := Bseq (rotr_bseqP bs).
 
 Lemma map_bseqP f bs : @size rT (map f bs) <= n.
 Proof. by rewrite size_map size_bseq. Qed.
-Canonical map_bseq f t := Bseq (map_bseqP f t).
+Canonical map_bseq f bs := Bseq (map_bseqP f bs).
 
 Lemma scanl_bseqP f x bs : @size rT (scanl f x bs) <= n.
 Proof. by rewrite size_scanl size_bseq. Qed.
@@ -581,7 +621,10 @@ Canonical allpairs_bseq f bs (bs' : m.-bseq U) := Bseq (allpairs_bseqP f bs bs')
 
 Lemma sort_bseqP r bs : size (sort r bs) <= n.
 Proof. by rewrite size_sort size_bseq. Qed.
-Canonical sort_bseq r t := Bseq (sort_bseqP r t).
+Canonical sort_bseq r bs := Bseq (sort_bseqP r bs).
+
+Lemma bseq0 : all_equal_to ([bseq] : 0.-bseq T).
+Proof. by move=> bs; apply: val_inj; case: bs => [[]]. Qed.
 
 End SeqBseq.
 
@@ -593,6 +636,9 @@ Canonical bseq_eqType n (T : eqType) :=
 
 Canonical bseq_predType n (T : eqType) := 
   Eval hnf in PredType (fun t : n.-bseq T => mem_seq t). 
+
+Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
+Proof. by []. Qed.
 
 Definition bseq_choiceMixin n (T : choiceType) := 
   [choiceMixin of n.-bseq T by <:].
@@ -614,9 +660,24 @@ Definition bseq_tagged_tuple {n T} (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} 
 
 Definition tagged_tuple_bseq {n T} (t : {k : 'I_n.+1 & k.-tuple T}) : n.-bseq T :=
   widen_bseq (leq_ord (tag t)) (tagged t).
-  
+
 Lemma bseq_tagged_tupleK n T : cancel (@bseq_tagged_tuple n T) tagged_tuple_bseq.
-Proof. by move=> t; apply/val_inj. Qed.
+Proof. by move=> bs; apply/val_inj. Qed.
+
+Lemma bseq_tagged_tuple_inj n T : injective (@bseq_tagged_tuple n T).
+Proof. rewrite /bseq_tagged_tuple; move=> ?? [] ??; exact/val_inj. Qed.
+
+Lemma tagged_tuple_bseq_inj n T : injective (@tagged_tuple_bseq n T).
+Proof. 
+  move=> [[k Hk] [t Ht]] [[m Hm] [u Hu]]. 
+  rewrite /tagged_tuple_bseq=> /=; move=> [].
+  move=> H1; have H2: k = m.
+  - by move: Ht Hu=> /= /eqP<- /eqP<-; rewrite H1.
+  move: Hk Ht Hm Hu; rewrite H1 H2=> Hk Ht Hm Hu.
+  have ->: Hk = Hm by exact/bool_irrelevance.
+  have ->: Ht = Hu by exact/bool_irrelevance.
+  done.
+Qed.
 
 Definition bseq_finMixin n (T : finType) :=
   CanFinMixin (@bseq_tagged_tupleK n T).
@@ -626,3 +687,16 @@ Canonical bseq_finType n (T : finType) :=
 
 Canonical bseq_subFinType n (T: finType) := 
   Eval hnf in [subFinType of n.-bseq T].
+
+Lemma card_bseq n (T : finType) : 
+  #|{:n.-bseq T}| = sumn [seq (#|T| ^ i) | i <- iota 0 n.+1].
+Proof. 
+  have ->: #|{: n.-bseq T}| = #|{: {k : 'I_n.+1 & k.-tuple T}}|.
+  - apply/anti_leq/andP; split; apply/leq_card.
+    + exact/bseq_tagged_tuple_inj.
+    + exact/tagged_tuple_bseq_inj.
+  rewrite -val_enum_ord -(map_comp _ val) /comp /=.       
+  rewrite card_tagged /=.
+  apply/f_equal/eq_in_map.
+  by move=> ??; rewrite card_tuple.
+Qed.

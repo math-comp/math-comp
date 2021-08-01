@@ -44,6 +44,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `tuple.v`, added Canonical tuple for sort.
   + new lemma `val_tcast`
 
+- in `tuple.v`, added type of bounded sequences `n.-bseq T` and its theory.
+
 - in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
 
 - in `finset.v`, new lemmas: `bigcup0P`, `bigcup_disjointP`, `imset_cover`,
