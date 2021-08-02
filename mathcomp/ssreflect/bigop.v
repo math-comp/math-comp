@@ -1935,6 +1935,12 @@ End NatConst.
 
 Lemma sumnE r : sumn r = \sum_(i <- r) i. Proof. exact: foldrE. Qed.
 
+Lemma card_bseq n (T : finType) : #|{bseq n of T}| = \sum_(i < n.+1) #|T| ^ i.
+Proof.
+rewrite (bij_eq_card bseq_tagged_tuple_bij) card_tagged sumnE big_map big_enum.
+by under eq_bigr do rewrite card_tuple.
+Qed.
+
 Lemma leqif_sum (I : finType) (P C : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i ?= iff C i) ->
   \sum_(i | P i) E1 i <= \sum_(i | P i) E2 i ?= iff [forall (i | P i), C i].

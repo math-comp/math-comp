@@ -37,6 +37,7 @@ Unset Printing Implicit Defensive.
 (*                       The size of s must be known.                         *)
 (*         in_bseq s  == the (size s).-bseq with value s.                     *)
 (*            [bseq]  == the empty bseq.                                      *)
+(*     insub_bseq n s == the n.-bseq of value s if size s <= n, else [bseq].  *)
 (* [bseq x1; ..; xn]  == the explicit n.-bseq <x1; ..; xn>.                   *)
 (*    cast_bseq Emn t == the m.-bseq t cast as an n.-tuple using Emn : m = n. *)
 (*   widen_bseq Lmn t == the m.-bseq t cast as an n.-tuple using Lmn : m <= n.*)
@@ -482,7 +483,7 @@ Canonical nil_bseq n T := Bseq (isT : @size T [::] <= n).
 Canonical cons_bseq n T x (t : bseq_of n T) :=
   Bseq (valP t : size (x :: t) <= n.+1).
 
-Notation "n .-bseq" := (bseq_of n) 
+Notation "n .-bseq" := (bseq_of n)
   (at level 2, format "n .-bseq") : type_scope.
 
 Notation "{ 'bseq' n 'of' T }" := (n.-bseq T : predArgType)
@@ -498,21 +499,15 @@ Notation "[ 'bseq' x1 ; .. ; xn ]" := [bseq of x1 :: .. [:: xn] ..]
 Notation "[ 'bseq' ]" := [bseq of [::]]
   (at level 0, format "[ 'bseq' ]") : form_scope.
 
-Definition bseq_of_seq n T (s : seq T) : n.-bseq T := insubd [bseq] s.
-
-Definition bseq_of_tuple n T (t : n.-tuple T) : n.-bseq T :=
+Coercion bseq_of_tuple n T (t : n.-tuple T) : n.-bseq T :=
   Bseq (eq_leq (size_tuple t)).
 
-Coercion bseq_of_tuple : tuple_of >-> bseq_of.
+Definition insub_bseq n T (s : seq T) : n.-bseq T := insubd [bseq] s.
 
-Lemma size_bseq_of_seq n T (s : seq T) : size (bseq_of_seq n s) <= size s.
-Proof. 
-  rewrite /bseq_of_seq /insubd. 
-  case: insubP=> /=; first by move=> ?? ->. 
-  move=> ?; exact/leq0n. 
-Qed.
+Lemma size_insub_bseq n T (s : seq T) : size (insub_bseq n s) <= size s.
+Proof. by rewrite /insub_bseq /insubd; case: insubP => // ? ? ->. Qed.
 
-Section CastBseq. 
+Section CastBseq.
 
 Variable T : Type.
 
@@ -521,17 +516,17 @@ Definition in_bseq (s : seq T) : (size s).-bseq T := Bseq (leqnn (size s)).
 Definition cast_bseq m n (eq_mn : m = n) bs :=
   let: erefl in _ = n := eq_mn return n.-bseq T in bs.
 
-Definition widen_bseq m n (lemn : m <= n) (bs : m.-bseq T) : n.-bseq T := 
+Definition widen_bseq m n (lemn : m <= n) (bs : m.-bseq T) : n.-bseq T :=
   @Bseq n T bs (leq_trans (size_bseq bs) lemn).
 
 Lemma cast_bseq_id n (eq_nn : n = n) bs : cast_bseq eq_nn bs = bs.
 Proof. by rewrite (eq_axiomK eq_nn). Qed.
 
-Lemma cast_bseqK m n (eq_mn : m = n) : 
+Lemma cast_bseqK m n (eq_mn : m = n) :
   cancel (cast_bseq eq_mn) (cast_bseq (esym eq_mn)).
 Proof. by case: n / eq_mn. Qed.
 
-Lemma case_bseqKV m n (eq_mn : m = n) : 
+Lemma cast_bseqKV m n (eq_mn : m = n) :
   cancel (cast_bseq (esym eq_mn)) (cast_bseq eq_mn).
 Proof. by case: n / eq_mn. Qed.
 
@@ -539,9 +534,17 @@ Lemma cast_bseq_trans m n p (eq_mn : m = n) (eq_np : n = p) bs :
   cast_bseq (etrans eq_mn eq_np) bs = cast_bseq eq_np (cast_bseq eq_mn bs).
 Proof. by case: n / eq_mn eq_np; case: p /. Qed.
 
-Lemma widen_bseq_id n (lenn : n <= n) (bs : n.-bseq T) : 
+Lemma size_cast_bseq m n (eq_mn : m = n) (bs : m.-bseq T) :
+  size (cast_bseq eq_mn bs) = size bs.
+Proof. by case: n / eq_mn. Qed.
+
+Lemma widen_bseq_id n (lenn : n <= n) (bs : n.-bseq T) :
   widen_bseq lenn bs = bs.
 Proof. exact: val_inj. Qed.
+
+Lemma cast_bseqEwiden m n (eq_mn : m = n) (bs : m.-bseq T) :
+  cast_bseq eq_mn bs = widen_bseq (eq_leq eq_mn) bs.
+Proof. by case: n / eq_mn; rewrite widen_bseq_id. Qed.
 
 Lemma widen_bseqK m n (lemn : m <= n) (lenm : n <= m) :
    cancel (@widen_bseq m n lemn) (widen_bseq lenm).
@@ -551,7 +554,11 @@ Lemma widen_bseq_trans m n p (lemn : m <= n) (lenp : n <= p) (bs : m.-bseq T) :
   widen_bseq (leq_trans lemn lenp) bs = widen_bseq lenp (widen_bseq lemn bs).
 Proof. exact/val_inj. Qed.
 
-Lemma in_nseqE s : in_bseq s = s :> seq T. Proof. by []. Qed.
+Lemma size_widen_bseq m n (lemn : m <= n) (bs : m.-bseq T) :
+  size (widen_bseq lemn bs) = size bs.
+Proof. by []. Qed.
+
+Lemma in_bseqE s : in_bseq s = s :> seq T. Proof. by []. Qed.
 
 Lemma widen_bseq_in_bseq n (bs : n.-bseq T) :
   widen_bseq (size_bseq bs) (in_bseq bs) = bs.
@@ -581,7 +588,7 @@ Proof. by rewrite size_cat; apply/leq_add/size_bseq/size_bseq. Qed.
 Canonical cat_bseq bs (bs' : m.-bseq T) := Bseq (cat_bseqP bs bs').
 
 Lemma take_bseqP bs : size (take m bs) <= n.
-Proof. 
+Proof.
 apply/leq_trans; last exact/(size_bseq bs).
 by rewrite size_take; case: ifP=> // /ltnW.
 Qed.
@@ -628,31 +635,31 @@ Proof. by move=> bs; apply: val_inj; case: bs => [[]]. Qed.
 
 End SeqBseq.
 
-Definition bseq_eqMixin n (T : eqType) := 
+Definition bseq_eqMixin n (T : eqType) :=
   Eval hnf in [eqMixin of n.-bseq T by <:].
 
-Canonical bseq_eqType n (T : eqType) := 
+Canonical bseq_eqType n (T : eqType) :=
   Eval hnf in EqType (n.-bseq T) (bseq_eqMixin n T).
 
-Canonical bseq_predType n (T : eqType) := 
-  Eval hnf in PredType (fun t : n.-bseq T => mem_seq t). 
+Canonical bseq_predType n (T : eqType) :=
+  Eval hnf in PredType (fun t : n.-bseq T => mem_seq t).
 
 Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
 Proof. by []. Qed.
 
-Definition bseq_choiceMixin n (T : choiceType) := 
+Definition bseq_choiceMixin n (T : choiceType) :=
   [choiceMixin of n.-bseq T by <:].
 
 Canonical bseq_choiceType n (T : choiceType) :=
   Eval hnf in ChoiceType (n.-bseq T) (bseq_choiceMixin n T).
 
-Definition bseq_countMixin n (T : countType) := 
+Definition bseq_countMixin n (T : countType) :=
   [countMixin of n.-bseq T by <:].
 
 Canonical bseq_countType n (T : countType) :=
   Eval hnf in CountType (n.-bseq T) (bseq_countMixin n T).
 
-Canonical bseq_subCountType n (T : countType) := 
+Canonical bseq_subCountType n (T : countType) :=
   Eval hnf in [subCountType of n.-bseq T].
 
 Definition bseq_tagged_tuple {n T} (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
@@ -661,42 +668,31 @@ Definition bseq_tagged_tuple {n T} (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} 
 Definition tagged_tuple_bseq {n T} (t : {k : 'I_n.+1 & k.-tuple T}) : n.-bseq T :=
   widen_bseq (leq_ord (tag t)) (tagged t).
 
-Lemma bseq_tagged_tupleK n T : cancel (@bseq_tagged_tuple n T) tagged_tuple_bseq.
+Lemma bseq_tagged_tupleK {n T} : cancel (@bseq_tagged_tuple n T) tagged_tuple_bseq.
 Proof. by move=> bs; apply/val_inj. Qed.
 
-Lemma bseq_tagged_tuple_inj n T : injective (@bseq_tagged_tuple n T).
-Proof. rewrite /bseq_tagged_tuple; move=> ?? [] ??; exact/val_inj. Qed.
-
-Lemma tagged_tuple_bseq_inj n T : injective (@tagged_tuple_bseq n T).
-Proof. 
-  move=> [[k Hk] [t Ht]] [[m Hm] [u Hu]]. 
-  rewrite /tagged_tuple_bseq=> /=; move=> [].
-  move=> H1; have H2: k = m.
-  - by move: Ht Hu=> /= /eqP<- /eqP<-; rewrite H1.
-  move: Hk Ht Hm Hu; rewrite H1 H2=> Hk Ht Hm Hu.
-  have ->: Hk = Hm by exact/bool_irrelevance.
-  have ->: Ht = Hu by exact/bool_irrelevance.
-  done.
+Lemma tagged_tuple_bseqK {n T} : cancel (@tagged_tuple_bseq n T) bseq_tagged_tuple.
+Proof.
+move=> [k t]; rewrite /tagged_tuple_bseq /bseq_tagged_tuple/=; symmetry.
+apply: eq_existT_curried => [|k_eq]; apply/val_inj; rewrite /= ?size_tuple//.
+by refine match k_eq in _ = y return
+     match k_eq in _ = m return m.-tuple T with erefl => t end = t :> seq _
+  with erefl => erefl end.
 Qed.
+
+Lemma bseq_tagged_tuple_bij {n T} : bijective (@bseq_tagged_tuple n T).
+Proof. exact/Bijective/tagged_tuple_bseqK/bseq_tagged_tupleK. Qed.
+
+Lemma tagged_tuple_bseq_bij {n T} : bijective (@tagged_tuple_bseq n T).
+Proof. exact/Bijective/bseq_tagged_tupleK/tagged_tuple_bseqK. Qed.
+
+Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
 
 Definition bseq_finMixin n (T : finType) :=
   CanFinMixin (@bseq_tagged_tupleK n T).
 
-Canonical bseq_finType n (T : finType) := 
+Canonical bseq_finType n (T : finType) :=
   Eval hnf in FinType (n.-bseq T) (bseq_finMixin n T).
 
-Canonical bseq_subFinType n (T: finType) := 
+Canonical bseq_subFinType n (T: finType) :=
   Eval hnf in [subFinType of n.-bseq T].
-
-Lemma card_bseq n (T : finType) : 
-  #|{:n.-bseq T}| = sumn [seq (#|T| ^ i) | i <- iota 0 n.+1].
-Proof. 
-  have ->: #|{: n.-bseq T}| = #|{: {k : 'I_n.+1 & k.-tuple T}}|.
-  - apply/anti_leq/andP; split; apply/leq_card.
-    + exact/bseq_tagged_tuple_inj.
-    + exact/tagged_tuple_bseq_inj.
-  rewrite -val_enum_ord -(map_comp _ val) /comp /=.       
-  rewrite card_tagged /=.
-  apply/f_equal/eq_in_map.
-  by move=> ??; rewrite card_tuple.
-Qed.

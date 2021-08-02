@@ -1321,6 +1321,9 @@ Arguments image_injP {T T' f A}.
 Arguments leq_card_in [T T'] f.
 Arguments leq_card [T T'] f.
 
+Lemma bij_eq_card (T T' : finType) (f : T -> T') : bijective f -> #|T| = #|T'|.
+Proof. by move=> [g /can_inj/leq_card + /can_inj/leq_card]; case: ltngtP. Qed.
+
 Section FinCancel.
 
 Variables (T : finType) (f g : T -> T).
