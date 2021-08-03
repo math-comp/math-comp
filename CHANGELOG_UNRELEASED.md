@@ -185,6 +185,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `codiagonalizableP`.
 
 - in `bigop.v`, added lemma `big_bool`.
+- In `ssrnat.v`:
+  + new lemmas `fact_geq`, `leq_pfact`, `leq_fact`, `ltn_pfact`
+
+- In `binomial.v`:
+  + new lemma `fact_split`
+
+- In `bigop.v`:
+  + new lemma `big_rev_mkord`
 
 ### Changed
 
@@ -195,6 +203,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `deprecate` notation to the `deprecated` attribute (cf. Removed section).
 
 - in `finalg.v`, `finFieldType` now inherits from `countDecFieldType`.
+
+- `fact_smonotone` moved from `binomial.v` to `ssrnat.v` and renamed to `ltn_fact`.
 
 ### Renamed
 

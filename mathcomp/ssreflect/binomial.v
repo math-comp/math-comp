@@ -21,18 +21,14 @@ Unset Printing Implicit Defensive.
 
 (** More properties of the factorial **)
 
-Lemma fact_smonotone m n : 0 < m -> m < n -> m`! < n`!.
-Proof.
-case: m => // m _; elim: n m => // n IHn [|m] lt_m_n.
-  by rewrite -[_.+1]muln1 leq_mul ?fact_gt0.
-by rewrite ltn_mul ?IHn.
-Qed.
-
 Lemma fact_prod n : n`! = \prod_(1 <= i < n.+1) i.
 Proof.
 elim: n => [|n IHn] //; first by rewrite big_nil.
 by apply/esym; rewrite factS IHn // !big_add1 big_nat_recr //= mulnC.
 Qed.
+
+Lemma fact_split n m : m <= n -> n`! = m`! * \prod_(m.+1 <= k < n.+1) k.
+Proof. by move=> leq_mn; rewrite !fact_prod -big_cat_nat. Qed.
 
 Lemma logn_fact p n : prime p -> logn p n`! = \sum_(1 <= k < n.+1) n %/ p ^ k.
 Proof.
@@ -229,7 +225,7 @@ Qed.
 Lemma bin_factd n m : 0 < n -> 'C(n, m) = n`! %/ (m`! * (n - m)`!).
 Proof.
 have [/bin_fact<-|*] := leqP m n; first by rewrite mulnK ?muln_gt0 ?fact_gt0.
-by rewrite divnMA bin_small ?divn_small ?fact_gt0 ?fact_smonotone.
+by rewrite divnMA bin_small ?divn_small ?fact_gt0 ?ltn_fact.
 Qed.
 
 Lemma bin_ffact n m : 'C(n, m) * m`! = n ^_ m.
@@ -344,8 +340,8 @@ Proof.
 case: p => // p pP.
 rewrite -[(_ ^ _).+1]addn0 (expnDn 1) big_ord_recr big_ord_recl /=.
 rewrite subnn binn exp1n !mul1n addnAC -modnDmr; congr ((_ + _) %% _).
-apply/eqP/dvdn_sum => -[i ?] _; exact/dvdn_mulr/prime_dvd_bin. 
-Qed. 
+apply/eqP/dvdn_sum => -[i ?] _; exact/dvdn_mulr/prime_dvd_bin.
+Qed.
 
 Lemma fermat_little a p : prime p -> a ^ p = a %[mod p].
 Proof.
