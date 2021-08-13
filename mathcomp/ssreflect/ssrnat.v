@@ -1403,6 +1403,15 @@ Proof. by move/subnK <-; rewrite halfD addnA leq_addl. Qed.
 Lemma half_gt0 n : (0 < n./2) = (1 < n).
 Proof. by case: n => [|[]]. Qed.
 
+Lemma uphalf_leq m n : m <= n -> uphalf m <= uphalf n.
+Proof.
+move/subnK <-; rewrite !uphalf_half oddD halfD !addnA.
+by do 2 case: odd; apply: leq_addl.
+Qed.
+
+Lemma uphalf_gt0 n : (0 < uphalf n) = (0 < n).
+Proof. by case: n. Qed.
+
 Lemma odd_geq m n : odd n -> (m <= n) = (m./2.*2 <= n).
 Proof.
 move=> odd_n; rewrite -[m in LHS]odd_double_half -[n]odd_double_half odd_n.
