@@ -2600,6 +2600,9 @@ Proof. by rewrite /index; elim: s => //= y s IHs; rewrite (inj_eq Hf) IHs. Qed.
 Lemma map_inj_uniq s : uniq (map f s) = uniq s.
 Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
 
+Lemma undup_map_inj s : undup (map f s) = map f (undup s).
+Proof. by elim: s => //= s0 s ->; rewrite mem_map //; case: (_ \in _). Qed.
+
 Lemma perm_map_inj s t : perm_eq (map f s) (map f t) -> perm_eq s t.
 Proof.
 move/permP=> Est; apply/allP=> x _ /=.
