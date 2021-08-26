@@ -135,6 +135,10 @@ Proof. by case: n / eq_mn eq_np; case: p /. Qed.
 Lemma tvalK n (t : n.-tuple T) : in_tuple t = tcast (esym (size_tuple t)) t.
 Proof. by apply: val_inj => /=; case: _ / (esym _). Qed.
 
+Lemma val_tcast m n (eq_mn : m = n) (t : m.-tuple T) :
+  tcast eq_mn t = t :> seq T.
+Proof. by case: n / eq_mn. Qed.
+
 Lemma in_tupleE s : in_tuple s = s :> seq T. Proof. by []. Qed.
 
 End CastTuple.
