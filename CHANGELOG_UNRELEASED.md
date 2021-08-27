@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + generalized lemma `partition_big`.
   + added lemma `big_pmap`.
 - in `bigop.v`, added lemmas `sumnB` and `card_bseq`.
+- in `bigop.v`, added lemma `sumnB`.
+- in `bigop.v`, added lemma `card_bseq`.
 
 - in `seq.v`,
   + new higher-order predicate `pairwise r xs` which asserts that the relation
@@ -58,13 +60,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + canonical instances making `n.-bseq` canonically an `eqType`, a
     `predType`, a `choiceType`, a `countType`, a `subCountType`, a
     `finType`, a `subFinType`; and making `nil`, `cons`, `rcons`,
-    `behead`, `belast`, `cat`, `take`, `drop`, `rev`, `rot`, `map`,
+    `behead`, `belast`, `cat`, `take`, `drop`, `rev`, `rot`, `rotr`, `map`,
     `scanl`, `pairmap`, `allpairs`, and `sort` canonical `_.-bseq`.
   + lemmas `size_bseq`, `bseqE`, `size_insub_bseq`, `cast_bseq_id`,
     `cast_bseqK`, `cast_bseqKV`, `cast_bseq_trans`, `size_cast_bseq`,
     `widen_bseq_id`, `cast_bseqEwiden`, `widen_bseqK`,
     `widen_bseq_trans`, `size_widen_bseq`, `in_bseqE`,
-    `widen_bseq_in_bseq`, `membsE`, `bseq_tagged_tupleK`,
+    `widen_bseq_in_bseq`, `bseq0`, `membsE`, `bseq_tagged_tupleK`,
     `tagged_tuple_bseqK`,`bseq_tagged_tuple_bij`, and
     `tagged_tuple_bseq_bij`.
 
