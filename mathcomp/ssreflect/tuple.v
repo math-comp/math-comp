@@ -675,11 +675,9 @@ Proof. by move=> bs; apply/val_inj. Qed.
 Lemma tagged_tuple_bseqK {n T} :
   cancel (@tagged_tuple_bseq n T) bseq_tagged_tuple.
 Proof.
-move=> [k t]; rewrite /bseq_tagged_tuple /=; symmetry.
-apply: eq_existT_curried => [|k_eq]; apply/val_inj; rewrite /= ?size_tuple//.
-by refine match k_eq in _ = y return
-     match k_eq in _ = m return m.-tuple T with erefl => t end = t :> seq _
-  with erefl => erefl end.
+move=> [[k lt_kn] t]; apply: eq_existT_curried => [|k_eq]; apply/val_inj.
+  by rewrite /= size_tuple.
+by refine (let: erefl := k_eq in _).
 Qed.
 
 Lemma bseq_tagged_tuple_bij {n T} : bijective (@bseq_tagged_tuple n T).
