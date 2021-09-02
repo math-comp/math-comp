@@ -89,6 +89,13 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*          uniq s <=> all the items in s are pairwise different.             *)
 (*    subseq s1 s2 <=> s1 is a subsequence of s2, i.e., s1 = mask m s2 for    *)
 (*                    some m : bitseq (see below).                            *)
+(*  subchain s1 s2 <=> s1 is a contiguous subsequence of s2, i.e.,            *)
+(*                       s ++ s1 ++ s' = s2 for some sequences s, s'.         *)
+(*    prefix s1 s2 <=> s1 is a subchain of s2 appearing at the beginning      *)
+(*                       of s2.                                               *)
+(*    suffix s1 s2 <=> s1 is a subchain of s2 appearing at the end of s2.     *)
+(* subchain_index s1 s2 <=> the first index at which s1 appears in s2,        *)
+(*                            or size s2 if subchain s1 s2 is false.          *)
 (*   perm_eq s1 s2 <=> s2 is a permutation of s1, i.e., s1 and s2 have the    *)
 (*                    items (with the same repetitions), but possibly in a    *)
 (*                    different order.                                        *)
@@ -3391,6 +3398,290 @@ Notation "[ 'seq' E : R | x : S <- s , y : T <- t ]" :=
 Notation "[ 'seq' E : R | x <- s , y <- t ]" :=
   (flatten [seq [seq E : R | y <- t] | x  <- s])
   (at level 0, E at level 99, x name, y name, only parsing) : seq_scope.
+
+Section Subchain.
+
+Variables T : eqType.
+Implicit Type s : seq T.
+
+Lemma nilpE s : nilp s = (s == [::]). Proof. by case: s. Qed.
+
+Fixpoint prefix s1 s2 :=
+  if s2 isn't y :: s2' then s1 == [::] else
+  if s1 isn't x :: s1' then true else
+    (x == y) && prefix s1' s2'.
+
+Definition suffix (s1 s2 : seq T) := prefix (rev s1) (rev s2).
+
+Fixpoint subchain s1 s2 :=
+  if s2 is y :: s2' then prefix s1 s2 || subchain s1 s2' else s1 == [::].
+
+Fixpoint subchain_index s1 s2 :=
+  if prefix s1 s2 then 0
+  else if s2 is y :: s2' then (subchain_index s1 s2').+1 else 1.
+
+Lemma prefix_refl s : prefix s s.
+Proof. by elim: s => //= a s IH; rewrite eqxx. Qed.
+
+Lemma subchain0seq s : subchain [::] s.
+Proof. by case: s. Qed.
+
+Lemma subchain_refl s : subchain s s.
+Proof. by case: s => //= x s; rewrite eqxx prefix_refl. Qed.
+
+Lemma prefixseq0 s : prefix s [::] = (s == [::]).
+Proof. by case: s. Qed.
+
+Lemma prefix0seq s : prefix [::] s.
+Proof. by case: s. Qed.
+
+Lemma prefix_cons s1 s2 x y :
+  prefix (x :: s1) (y :: s2) = (x == y) && prefix s1 s2.
+Proof. by have [->|/negPf /= -> //] := eqVneq x y; rewrite /= eqxx. Qed.
+
+Lemma prefix_prefix s1 s2 : prefix s1 (s1 ++ s2).
+Proof. by elim: s1 s2 => [[]//|x s IHs s2 /=]; rewrite eqxx IHs. Qed.
+
+Lemma suffix_suffix s1 s2 : suffix s2 (s1 ++ s2).
+Proof. by rewrite /suffix rev_cat prefix_prefix. Qed.
+
+Lemma prefixP s1 s2 :
+  reflect (exists s2' : seq T, s2 = s1 ++ s2') (prefix s1 s2).
+Proof.
+elim: s1 s2 => [|y s2 IHs2] [|x s1] /=.
+- by constructor; exists [::].
+- by constructor; exists (x :: s1).
+- by constructor; case.
+apply/(iffP idP); last by move=> [s2' [<- ->]]; rewrite eqxx prefix_prefix.
+by have [-> /IHs2 [s2' ->]|//] := eqVneq x y; exists s2'.
+Qed.
+
+Lemma suffixP s1 s2 :
+  reflect (exists s2' : seq T, s2 = s2' ++ s1) (suffix s1 s2).
+Proof.
+apply: (iffP (prefixP _ _)) => [[s2' rev_s2]|[s2' ->]]; exists (rev s2').
+  by rewrite -[s2]revK rev_s2 rev_cat revK.
+by rewrite rev_cat.
+Qed.
+
+Lemma subchainP s1 s2 :
+  reflect (exists s s' : seq T, s2 = s ++ s1 ++ s') (subchain s1 s2).
+Proof.
+elim: s2 s1 => /= [s1|y s2' IHs2 s1].
+- apply: (iffP idP) => [/eqP ->|[s] [s'] E]; first by exists [::], [::].
+  by have: @nilp T [::] by []; rewrite -nilpE E !cat_nilp => /and3P[].
+apply: (iffP idP).
+- case/orP; first by move/prefixP => -[s ->]; exists [::],s.
+  by move/IHs2 => [s [s' ->]]; exists (y::s), s'.
+move => [s [s']]. case: s => //= [|x u].
+case: s1 => //= ? u [<- ->];by rewrite eqxx prefix_prefix.
+by move => [-> E]; rewrite (introT (IHs2 _)) ?orbT // E; exists u, s'.
+Qed.
+
+Lemma prefix_trans : transitive prefix.
+Proof.
+move=> s1 s2 s3 /prefixP [suf1 p1] /prefixP [suf2 p2]; rewrite p2 p1 -catA.
+by rewrite prefix_prefix.
+Qed.
+
+Lemma suffix_trans : transitive suffix.
+Proof.
+move=> s1 s2 s3 /suffixP [pref1 p1] /suffixP [pref2 p2]; rewrite p2 p1 catA.
+by rewrite suffix_suffix.
+Qed.
+
+Lemma subchain_trans : transitive subchain.
+Proof.
+move => s s1 s2 /subchainP[s1p [s1s def_s]] /subchainP[sp [ss def_s2]].
+by apply/subchainP; exists (sp++s1p),(s1s++ss); rewrite def_s2 def_s -!catA.
+Qed.
+
+Lemma subchain_rev s1 s2 : subchain (rev s1) (rev s2) = subchain s1 s2.
+Proof.
+wlog suff W : s1 s2 / subchain s1 s2 -> subchain (rev s1) (rev s2).
+  by apply/idP/idP => /W //; rewrite !revK.
+case/subchainP => pre [suf] ->; rewrite !rev_cat -catA.
+by apply/subchainP; exists (rev suf), (rev pre).
+Qed.
+
+Lemma prefixW s1 s2 : prefix s1 s2 -> subchain s1 s2.
+Proof. by move=> /prefixP[s2' ->]; apply/subchainP; exists [::], s2'. Qed.
+
+Lemma suffixW s1 s2 : suffix s1 s2 -> subchain s1 s2.
+Proof. by rewrite /suffix => /prefixW preH; rewrite -subchain_rev. Qed.
+
+Lemma suffix_refl s : suffix s s.
+Proof. exact: prefix_refl. Qed.
+
+Lemma suffixseq0 s : suffix s [::] = (s == [::]).
+Proof. by rewrite /suffix prefixseq0 -!nilpE rev_nilp. Qed.
+
+Lemma suffix0seq s : suffix [::] s.
+Proof. exact: prefix0seq. Qed.
+
+Lemma suffix_rcons s1 s2 x y :
+  suffix (rcons s1 x) (rcons s2 y) = (x == y) && suffix s1 s2.
+Proof. by rewrite /suffix 2!rev_rcons prefix_cons. Qed.
+
+Lemma prefix_subchain s1 s2 : subchain s1 (s1 ++ s2).
+Proof. exact/prefixW/prefix_prefix. Qed.
+
+Lemma suffix_subchain s1 s2 : subchain s2 (s1 ++ s2).
+Proof. exact/suffixW/suffix_suffix. Qed.
+
+Lemma subchain_cons s x : subchain s (x :: s).
+Proof. by rewrite -cat1s suffix_subchain. Qed.
+
+Lemma subchainseq0 s : subchain s [::] = (s == [::]).
+Proof. by case: s. Qed.
+
+Lemma prefix_singleton s x :
+  prefix s [:: x] = (s == [::]) || (s == [:: x]).
+Proof. by case: s => //= y s; rewrite prefixseq0 eqseq_cons. Qed.
+
+Lemma subchain_singleton s x :
+  subchain s [:: x] = (s == [::]) || (s == [:: x]).
+Proof. by rewrite /= prefix_singleton orbC orbA orbb. Qed.
+
+Lemma subchain_mono s1 s2 x : subchain s1 s2 -> subchain s1 (x :: s2).
+Proof. by case: s1 => [|y s subH] //=; rewrite subH orbT. Qed.
+
+Lemma catl_subchain s1 s2 s : subchain (s ++ s1) s2 -> subchain s1 s2.
+Proof. apply: subchain_trans; exact/suffixW/suffix_suffix. Qed.
+
+Lemma subchain_cons2 s1 s2 x : subchain (x :: s1) (x :: s2) -> subchain s1 s2.
+Proof.
+rewrite /= eqxx /= -cat1s => /orP[/prefixW//|]; exact: catl_subchain.
+Qed.
+
+Lemma subchain_catl s1 s2 s3 : subchain s1 s2 -> subchain s1 (s3 ++ s2).
+Proof. by move => H; apply: subchain_trans H (suffix_subchain _ _). Qed.
+
+Lemma catr_subchain s1 s2 s3 : subchain (s1 ++ s3) s2 -> subchain s1 s2.
+Proof.
+case: s3 => [|x s /subchainP [p [sf]] ->]; first by rewrite cats0.
+by rewrite -catA; apply: subchain_catl; rewrite prefix_subchain.
+Qed.
+
+Lemma subchain_catr s1 s2 s3 : subchain s1 s2 -> subchain s1 (s2 ++ s3).
+Proof.
+case: s3 => [|x s /subchainP [p [sf]] ->]; first by rewrite cats0.
+by rewrite -catA; apply: subchain_catl; rewrite -catA prefix_subchain.
+Qed.
+
+Lemma cat_prefix s1 s2 s3 : prefix (s1 ++ s3) s2 -> prefix s1 s2.
+Proof. by move=> /prefixP [s2'] ->; rewrite -catA prefix_prefix. Qed.
+
+Lemma prefix_cat s1 s2 s3 : prefix s1 s2 -> prefix s1 (s2 ++ s3).
+Proof. by move=> /prefixP [s2'] ->; rewrite -catA prefix_prefix. Qed.
+
+Lemma suffix_cat s1 s2 s3 : suffix s1 s2 -> suffix s1 (s3 ++ s2).
+Proof. by move=> /suffixP [s2'] ->; rewrite catA suffix_suffix. Qed.
+
+Lemma cat_suffix s1 s2 s3 : suffix (s3 ++ s1) s2 -> suffix s1 s2.
+Proof. by move=> /suffixP [s2'] ->; rewrite catA suffix_suffix. Qed.
+
+Lemma prefix_subchain_trans s2 s1 s3 :
+  prefix s1 s2 -> subchain s2 s3 -> subchain s1 s3.
+Proof.
+move=> /prefixP [s' ->] /subchainP [s [s'']].
+by rewrite -catA => ->; rewrite subchain_catl // prefix_subchain.
+Qed.
+
+Lemma suffix_subchain_trans s2 s1 s3 :
+  suffix s1 s2 -> subchain s2 s3 -> subchain s1 s3.
+Proof.
+rewrite -subchain_rev /suffix; move=> preH subH.
+by rewrite -subchain_rev (prefix_subchain_trans preH subH).
+Qed.
+
+Lemma subchainW s1 s2 : subchain s1 s2 -> subseq s1 s2.
+Proof.
+move=> /subchainP[sp [ss ->]].
+exact: subseq_trans (prefix_subseq _ _) (suffix_subseq _ _).
+Qed.
+
+Lemma mem_subchain s1 s2 : subchain s1 s2 -> {subset s1 <= s2}.
+Proof. by move=> /subchainW subH; apply: mem_subseq. Qed.
+
+Lemma prefix1seq s x : prefix [:: x] s -> (x \in s).
+Proof. by case: s => // x' s /=; case: eqP => //= ->; rewrite mem_head. Qed.
+
+Lemma subchain1seq s x : subchain [:: x] s = (x \in s).
+Proof.
+elim: s => // x' s /=; case: eqP => //=.
+  by move=> ->; rewrite mem_head; case: s => //=.
+by rewrite in_cons => /(eqP ); rewrite -eqbF_neg => /eqP ->.
+Qed.
+
+Lemma suffix1seq s x : suffix [:: x] s -> (x \in s).
+Proof. by move=> /suffixW sufH; move: sufH; rewrite subchain1seq. Qed.
+
+Lemma prefix_rcons s x : prefix s (rcons s x).
+Proof. by rewrite -cats1 prefix_prefix. Qed.
+
+Lemma suffix_cons s x : suffix s (x :: s).
+Proof. by rewrite /suffix rev_cons prefix_rcons. Qed.
+
+Lemma subchain_rcons s x : subchain s (rcons s x).
+Proof. by rewrite -cats1 prefix_subchain. Qed.
+
+Lemma subchain_uniq s1 s2 : subchain s1 s2 -> uniq s2 -> uniq s1.
+Proof. by move=> /subchainW /subseq_uniq subH. Qed.
+
+Lemma prefix_uniq s1 s2 : prefix s1 s2 -> uniq s2 -> uniq s1.
+Proof. by move=> /prefixW /subchain_uniq preH. Qed.
+
+Lemma suffix_uniq s1 s2 : suffix s1 s2 -> uniq s2 -> uniq s1.
+Proof. by move=> /suffixW /subchain_uniq preH. Qed.
+
+Lemma take_prefix s i : prefix (take i s) s.
+Proof. by rewrite -{2}[s](cat_take_drop i) prefix_prefix. Qed.
+
+Lemma drop_suffix s i : suffix (drop i s) s.
+Proof. by rewrite -{2}[s](cat_take_drop i) suffix_suffix. Qed.
+
+Lemma take_subchain s i : subchain (take i s) s.
+Proof. by rewrite prefixW // take_prefix. Qed.
+
+Lemma drop_prefix s i : ~~ prefix (drop i s) s -> i > 0.
+Proof. by case: i => //=; rewrite drop0 ltnn prefix_refl. Qed.
+
+Lemma drop_subchain s i : subchain (drop i s) s.
+Proof. by rewrite -{2}[s](cat_take_drop i) suffix_subchain. Qed.
+
+Lemma subchain_head s1 s2 x : subchain (x :: s1) s2 -> subchain [:: x] s2.
+Proof.
+case: s1 => [|y s /subchainP [p [sf]]] //= => ->.
+by rewrite subchain_catl => //=; rewrite eqxx.
+Qed.
+
+Lemma subchain_indexseq0 s : subchain_index s [::] = (s != [::]).
+Proof. by rewrite /= prefixseq0; case (_ == _). Qed.
+
+Lemma subchain_index_ltn s1 s2 :
+  subchain s1 s2 = (subchain_index s1 s2 < (size s2).+1).
+Proof.
+elim: s2 s1 => [|x s2' IH /=] s1; first by rewrite /= prefixseq0; case s1.
+by case: (prefix _ _); rewrite IH !ltnS.
+Qed.
+
+Lemma subchain_index0seq s : subchain_index [::] s = 0.
+Proof. by case: s. Qed.
+
+Lemma subchain_index_refl s : subchain_index s s = 0.
+Proof. by case: s => [|x s'] //=; rewrite eqxx prefix_refl. Qed.
+
+Lemma subchain_index_size s1 s2 : subchain_index s1 s2 <= (size s2).+1.
+Proof. by elim: s2 => [|x s2'] /=; case: ifP. Qed.
+
+Lemma subchain_index_prefix s1 s2 : prefix s1 s2 -> subchain_index s1 s2 = 0.
+Proof. by case: s1 s2 => [|x s1] [|y s2] //= ->. Qed.
+
+Lemma size_suffix s1 s2 : suffix s1 s2 -> size s1 <= size s2.
+Proof. by move=> /suffixW /subchainW /size_subseq suffH. Qed.
+
+End Subchain.
 
 Section AllPairsDep.
 
