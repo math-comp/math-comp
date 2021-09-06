@@ -211,6 +211,14 @@ move/subsetP=> sH /subsetP tH; apply/subsetP => x; rewrite inE /= permM.
 by have [-> /tH | /sH] := eqVneq (s x) x.
 Qed.
 
+Lemma perm_onV H s : perm_on H s -> perm_on H s^-1.
+Proof.
+move => /subsetP sH; apply/subsetP => i.
+rewrite inE => Hi; apply: sH; rewrite inE.
+move: Hi; apply contra => /eqP {1}<-.
+by rewrite permK.
+Qed.
+
 Lemma out_perm S u x : perm_on S u -> x \notin S -> u x = x.
 Proof. by move=> uS; apply: contraNeq (subsetP uS x). Qed.
 
@@ -410,6 +418,18 @@ Lemma porbitP s x y :
 Proof.
 apply (iffP idP) => [/porbitPmin [i _ ->]| [i ->]]; last exact: mem_porbit.
 by exists i.
+Qed.
+
+Lemma porbitV s : porbit s^-1 =1 porbit s.
+Proof.
+move=> x; apply/setP => y; rewrite porbit_sym.
+by apply/porbitP/porbitP => [][i ->]; exists i; rewrite expgVn ?permK ?permKV.
+Qed.
+
+Lemma porbitsV s : porbits s^-1 = porbits s.
+Proof.
+rewrite /porbits; apply/setP=> y.
+by apply/imsetP/imsetP => [] [x _ ->{y}]; exists x; rewrite // porbitV.
 Qed.
 
 Lemma porbits_mul_tperm s x y : let t := tperm x y in
