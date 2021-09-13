@@ -257,6 +257,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - In `ssrnum.v`:
   + lemma `normr_nneg`, declared a `Hint Resolve` in the `core` database
+- in `bigop.v`:
+  + Lemma `big_nat_mul`
 
 ### Changed
 

@@ -1313,6 +1313,16 @@ Lemma big_nat_recr n m F : m <= n ->
   \big[*%M/1]_(m <= i < n.+1) F i = (\big[*%M/1]_(m <= i < n) F i) * F n.
 Proof. by move=> lemn; rewrite (@big_cat_nat n) ?leqnSn // big_nat1. Qed.
 
+Lemma big_nat_mul n k F :
+  \big[*%M/1]_(0 <= i < n * k) F i =
+  \big[*%M/1]_(0 <= i < n) \big[*%M/1]_(i * k <= j < i.+1 * k) F j.
+Proof.
+elim: n => [|n ih]; first by rewrite mul0n 2!big_nil.
+rewrite [in RHS]big_nat_recr//= -ih mulSn addnC [in LHS]/index_iota subn0 iotaD.
+rewrite big_cat /= [in X in _ = X * _]/index_iota subn0; congr (_ * _).
+by rewrite add0n /index_iota (addnC _ k) addnK.
+Qed.
+
 Lemma big_ord_recr n F :
   \big[*%M/1]_(i < n.+1) F i =
      (\big[*%M/1]_(i < n) F (widen_ord (leqnSn n) i)) * F ord_max.
