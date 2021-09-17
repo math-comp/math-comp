@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `homo_sort_map(_in)`.
 
 - in `tuple.v`, added Canonical tuple for sort.
+  + new lemma `val_tcast`
 
 - in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
 
