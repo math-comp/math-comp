@@ -195,7 +195,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`, added lemma `big_bool`.
 - In `ssrnat.v`:
-  + new lemmas `fact_geq`, `leq_pfact`, `leq_fact`, `ltn_pfact`
+  + new lemmas `fact_geq`, `leq_pfact`, `leq_fact`, `ltn_pfact`, `uphalf_leq`,
+    `uphalf_gt0`.
 
 - In `binomial.v`:
   + new lemma `fact_split`
