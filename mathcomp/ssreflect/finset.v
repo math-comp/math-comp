@@ -1233,16 +1233,16 @@ Qed.
 
 Lemma imset_inj : injective f -> injective (fun A : {set aT} => f @: A).
 Proof.
-move => inj_f A B => /setP E; apply/setP => x.
+move=> inj_f A B => /setP E; apply/setP => x.
 by rewrite -(mem_imset (mem A) x inj_f) E mem_imset.
 Qed.
 
 Lemma imset_disjoint (A B : {pred aT}) :
   injective f -> [disjoint f @: A & f @: B] = [disjoint A & B].
 Proof.
-move => inj_f; apply/pred0Pn/pred0Pn => /= [[? /andP[/imsetP[x xA ->]] xB]|].
+move=> inj_f; apply/pred0Pn/pred0Pn => /= [[_ /andP[/imsetP[x xA ->]] xB]|].
   by exists x; rewrite xA -(mem_imset (mem B) x inj_f).
-by move => [x /andP[xA xB]]; exists (f x); rewrite !mem_imset ?xA.
+by move=> [x /andP[xA xB]]; exists (f x); rewrite !mem_imset ?xA.
 Qed.
 
 Lemma imset2_f (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
