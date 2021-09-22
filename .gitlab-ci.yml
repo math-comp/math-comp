@@ -228,6 +228,11 @@ ci-fourcolor-8.13:
   variables:
     COQ_VERSION: "8.13"
 
+ci-fourcolor-8.14:
+  extends: .ci-fourcolor
+  variables:
+    COQ_VERSION: "8.14"
+
 ci-fourcolor-dev:
   extends: .ci-fourcolor
   variables:
@@ -257,6 +262,11 @@ ci-odd-order-8.13:
   extends: .ci-odd-order
   variables:
     COQ_VERSION: "8.13"
+
+ci-odd-order-8.14:
+  extends: .ci-odd-order
+  variables:
+    COQ_VERSION: "8.14"
 
 ci-odd-order-dev:
   extends: .ci-odd-order
@@ -288,6 +298,11 @@ ci-lemma-overloading-8.13:
   variables:
     COQ_VERSION: "8.13"
 
+ci-lemma-overloading-8.14:
+  extends: .ci-lemma-overloading
+  variables:
+    COQ_VERSION: "8.14"
+
 ci-lemma-overloading-dev:
   extends: .ci-lemma-overloading
   variables:
@@ -317,6 +332,11 @@ ci-bigenough-8.13:
   extends: .ci-bigenough
   variables:
     COQ_VERSION: "8.13"
+
+ci-bigenough-8.14:
+  extends: .ci-bigenough
+  variables:
+    COQ_VERSION: "8.14"
 
 ci-bigenough-dev:
   extends: .ci-bigenough
@@ -349,6 +369,11 @@ ci-real-closed-8.13:
   variables:
     COQ_VERSION: "8.13"
 
+ci-real-closed-8.14:
+  extends: .ci-real-closed
+  variables:
+    COQ_VERSION: "8.14"
+
 ci-real-closed-dev:
   extends: .ci-real-closed
   variables:
@@ -379,6 +404,11 @@ ci-finmap-8.13:
   extends: .ci-finmap
   variables:
     COQ_VERSION: "8.13"
+
+ci-finmap-8.14:
+  extends: .ci-finmap
+  variables:
+    COQ_VERSION: "8.14"
 
 ci-finmap-dev:
   extends: .ci-finmap
@@ -411,6 +441,11 @@ ci-multinomials-8.13:
   variables:
     COQ_VERSION: "8.13"
 
+ci-multinomials-8.14:
+  extends: .ci-multinomials
+  variables:
+    COQ_VERSION: "8.14"
+
 ci-multinomials-dev:
   extends: .ci-multinomials
   variables:
@@ -442,6 +477,11 @@ ci-analysis-8.13:
   variables:
     COQ_VERSION: "8.13"
 
+ci-analysis-8.14:
+  extends: .ci-analysis
+  variables:
+    COQ_VERSION: "8.14"
+
 # The FCSL-PCM library
 .ci-fcsl-pcm:
   extends: .ci
@@ -466,6 +506,11 @@ ci-fcsl-pcm-8.13:
   extends: .ci-fcsl-pcm
   variables:
     COQ_VERSION: "8.13"
+
+ci-fcsl-pcm-8.14:
+  extends: .ci-fcsl-pcm
+  variables:
+    COQ_VERSION: "8.14"
 
 ci-fcsl-pcm-dev:
   extends: .ci-fcsl-pcm
