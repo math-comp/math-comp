@@ -1184,7 +1184,7 @@ Proof. by rewrite foldlE big_cons mul1m. Qed.
 
 Lemma eq_big_idx_seq idx' I r (P : pred I) F :
      right_id idx' *%M -> has P r ->
-   \big[*%M/idx']_(i <- r | P i) F i =\big[*%M/1]_(i <- r | P i) F i.
+   \big[*%M/idx']_(i <- r | P i) F i = \big[*%M/1]_(i <- r | P i) F i.
 Proof.
 move=> op_idx'; rewrite -!(big_filter _ _ r) has_count -size_filter.
 case/lastP: (filter P r) => {r}// r i _.
@@ -1193,7 +1193,7 @@ Qed.
 
 Lemma eq_big_idx idx' (I : finType) i0 (P : pred I) F :
      P i0 -> right_id idx' *%M ->
-  \big[*%M/idx']_(i | P i) F i =\big[*%M/1]_(i | P i) F i.
+  \big[*%M/idx']_(i | P i) F i = \big[*%M/1]_(i | P i) F i.
 Proof.
 by move=> Pi0 op_idx'; apply: eq_big_idx_seq => //; apply/hasP; exists i0.
 Qed.
@@ -1350,6 +1350,14 @@ Proof.
 by elim: rr => [|r rr IHrr]; rewrite ?big_nil //= big_cat big_cons -IHrr.
 Qed.
 
+Lemma big_pmap J I (h : J -> option I) (r : seq J) F :
+  \big[op/idx]_(i <- pmap h r) F i = \big[op/idx]_(j <- r) oapp F idx (h j).
+Proof.
+elim: r => [| r0 r IHr]/=; first by rewrite !big_nil.
+rewrite /= big_cons; case: (h r0) => [i|] /=; last by rewrite mul1m.
+by rewrite big_cons IHr.
+Qed.
+
 End Plain.
 
 Section Abelian.
@@ -1472,12 +1480,13 @@ by apply: eq_card => i; rewrite inE /= andbC.
 Qed.
 Arguments cardD1x [I A].
 
-Lemma partition_big (I J : finType) (P : pred I) p (Q : pred J) F :
-    (forall i, P i -> Q (p i)) ->
-      \big[*%M/1]_(i | P i) F i =
-         \big[*%M/1]_(j | Q j) \big[*%M/1]_(i | P i && (p i == j)) F i.
+Lemma partition_big I (s : seq I)
+      (J : finType) (P : pred I) (p : I -> J) (Q : pred J) F :
+  (forall i, P i -> Q (p i)) ->
+  \big[*%M/1]_(i <- s | P i) F i =
+  \big[*%M/1]_(j : J | Q j) \big[*%M/1]_(i <- s | (P i) && (p i == j)) F i.
 Proof.
-move=> Qp; transitivity (\big[*%M/1]_(i | P i && Q (p i)) F i).
+move=> Qp; transitivity (\big[*%M/1]_(i <- s | P i && Q (p i)) F i).
   by apply: eq_bigl => i; case Pi: (P i); rewrite // Qp.
 have [n leQn] := ubnP #|Q|; elim: n => // n IHn in Q {Qp} leQn *.
 case: (pickP Q) => [j Qj | Q0]; last first.
@@ -1488,7 +1497,7 @@ rewrite (bigID (fun i => p i == j)); congr (_ * _); apply: eq_bigl => i.
 by rewrite andbA.
 Qed.
 
-Arguments partition_big [I J P] p Q [F].
+Arguments partition_big [I s J P] p Q [F].
 
 Lemma big_image_cond I (J : finType) (h : J -> I) (A : pred J) (P : pred I) F :
   \big[*%M/1]_(i <- [seq h j | j in A] | P i) F i
@@ -1731,7 +1740,7 @@ Arguments bigU [R idx op I].
 Arguments bigD1 [R idx op I] j [P F].
 Arguments bigD1_seq [R idx op I r] j [F].
 Arguments bigD1_ord [R idx op n] j [P F].
-Arguments partition_big [R idx op I J P] p Q [F].
+Arguments partition_big [R idx op I s J P] p Q [F].
 Arguments reindex_omap [R idx op I J] h h' [P F].
 Arguments reindex_onto [R idx op I J] h h' [P F].
 Arguments reindex [R idx op I J] h [P F].
@@ -1751,6 +1760,7 @@ Arguments big_ord_recl [R idx op].
 Arguments big_ord_recr [R idx op].
 Arguments big_nat_recl [R idx op].
 Arguments big_nat_recr [R idx op].
+Arguments big_pmap [R idx op J I] h [r].
 
 Section Distributivity.
 
