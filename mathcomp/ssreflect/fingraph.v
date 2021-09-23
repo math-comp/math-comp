@@ -135,7 +135,7 @@ Definition rgraph x := enum (e x).
 Lemma rgraphK : grel rgraph =2 e.
 Proof. by move=> x y; rewrite /= mem_enum. Qed.
 
-Definition connect : rel T := fun x y => y \in dfs rgraph #|T| [::] x.
+Definition connect : rel T := [rel x y | y \in dfs rgraph #|T| [::] x].
 Canonical connect_app_pred x := ApplicativePred (connect x).
 
 Lemma connectP x y :
@@ -291,6 +291,19 @@ Proof. by move=> eq_e x; rewrite /root (eq_pick (eq_connect eq_e x)). Qed.
 Lemma eq_roots e e' : e =2 e' -> roots e =1 roots e'.
 Proof. by move=> eq_e x; rewrite /roots (eq_root eq_e). Qed.
 
+Lemma connect_rev e :
+  (connect [rel x y | e y x]) =2 [rel x y | connect e y x].
+Proof.
+suff crev e': subrel (connect [rel x y | e' y x]) [rel x y | connect e' y x].
+  by move=> x y; apply/idP/idP; apply: crev.
+move=> x y /connectP[p e_p p_y]; apply/connectP.
+exists (rev (belast x p)); first by rewrite p_y rev_path.
+by rewrite -(last_cons x) -rev_rcons p_y -lastI rev_cons last_rcons.
+Qed.
+
+Lemma sym_connect_sym e : symmetric e -> connect_sym e.
+Proof. by move=> sym_e x y; rewrite (eq_connect sym_e) connect_rev. Qed.
+
 End EqConnect.
 
 Section Closure.
@@ -299,14 +312,8 @@ Variables (T : finType) (e : rel T).
 Hypothesis sym_e : connect_sym e.
 Implicit Type a : {pred T}.
 
-Lemma same_connect_rev : connect e =2 connect (fun x y => e y x).
-Proof.
-suff crev e': subrel (connect (fun x : T => e'^~ x)) (fun x => (connect e')^~x).
-  by move=> x y; rewrite sym_e; apply/idP/idP; apply: crev.
-move=> x y /connectP[p e_p p_y]; apply/connectP.
-exists (rev (belast x p)); first by rewrite p_y rev_path.
-by rewrite -(last_cons x) -rev_rcons p_y -lastI rev_cons last_rcons.
-Qed.
+Lemma same_connect_rev : connect e =2 connect [rel x y | e y x].
+Proof. by move=> x y; rewrite sym_e connect_rev. Qed.
 
 Lemma intro_closed a : (forall x y, e x y -> x \in a -> y \in a) -> closed e a.
 Proof.

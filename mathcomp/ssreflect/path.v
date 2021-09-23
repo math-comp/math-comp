@@ -159,19 +159,19 @@ Section PathEq.
 Variables (e e' : rel T).
 
 Lemma rev_path x p :
-  path e (last x p) (rev (belast x p)) = path (fun z => e^~ z) x p.
+  path e (last x p) (rev (belast x p)) = path [rel y z | e z y] x p.
 Proof.
 elim: p x => //= y p IHp x; rewrite rev_cons rcons_path -{}IHp andbC.
 by rewrite -(last_cons x) -rev_rcons -lastI rev_cons last_rcons.
 Qed.
 
-Lemma rev_cycle p : cycle e (rev p) = cycle (fun z => e^~ z) p.
+Lemma rev_cycle p : cycle e (rev p) = cycle [rel y z | e z y] p.
 Proof.
 case: p => //= x p; rewrite -rev_path last_rcons belast_rcons rev_cons.
 by rewrite -[in LHS]cats1 cycle_catC.
 Qed.
 
-Lemma rev_sorted p : sorted e (rev p) = sorted (fun z => e^~ z) p.
+Lemma rev_sorted p : sorted e (rev p) = sorted [rel y z | e z y] p.
 Proof. by case: p => //= x p; rewrite -rev_path lastI rev_rcons. Qed.
 
 Lemma path_relI x s :

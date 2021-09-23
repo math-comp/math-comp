@@ -45,6 +45,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `homo_sort_map(_in)`.
 
 - in `fintype.v`, new lemma `bij_eq_card`.
+- in `fingraph.v`, new lemmas: `Lemma connect_rev`, `connect_from_sym`
+- in `fingraph.v`, new lemmas: `connect_rev`, `connect_from_sym`
 
 - in `tuple.v`, added Canonical tuple for sort.
   + new lemma `val_tcast`
