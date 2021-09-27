@@ -21,6 +21,10 @@ From mathcomp Require Import ssrnum.
 (*                                                                            *)
 (* We provide a set of notations to write intervals (see below)               *)
 (* `[a, b], `]a, b], ..., `]-oo, a], ..., `]-oo, +oo[                         *)
+(* The substrings "oo", "oc", "co", "cc" in the names of lemmas respectively  *)
+(* stand for the intervals of the shape `]a, b[, `]a, b], `[a, b[, `[a, b].   *)
+(* The substrings "pinfty" and "ninfty" in the names of lemmas stand for      *)
+(* +oo and -oo.                                                               *)
 (* We also provide the lemma subitvP which computes the inequalities one      *)
 (* needs to prove when trying to prove the inclusion of intervals.            *)
 (*                                                                            *)
@@ -279,6 +283,33 @@ Proof. by rewrite !itv_boundlr andbT. Qed.
 
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
 Proof. by move=> ? ? /le_trans; exact. Qed.
+
+Lemma subset_itv (r s u v : bool) x y : r <= u -> v <= s ->
+  {subset Interval (BSide r x) (BSide s y) <= Interval (BSide u x) (BSide v y)}.
+Proof.
+by move: r s u v=> [] [] [] []// *; apply: subitvP; rewrite subitvE !bound_lexx.
+Qed.
+
+Lemma subset_itv_oo_cc x y : {subset `]x, y[ <= `[x, y]}.
+Proof. exact: subset_itv. Qed.
+
+Lemma subset_itv_oo_oc x y : {subset `]x, y[ <= `]x, y]}.
+Proof. exact: subset_itv. Qed.
+
+Lemma subset_itv_oo_co x y : {subset `]x, y[ <= `[x, y[}.
+Proof. exact: subset_itv. Qed.
+
+Lemma subset_itv_oc_cc x y : {subset `]x, y] <= `[x, y]}.
+Proof. exact: subset_itv. Qed.
+
+Lemma subset_itv_co_cc x y : {subset `[x, y[ <= `[x, y]}.
+Proof. exact: subset_itv. Qed.
+
+Lemma itvxx x : `[x, x] =i pred1 x.
+Proof. by move=> y; rewrite in_itv/= -eq_le eq_sym. Qed.
+
+Lemma itvxxP y x : reflect (y = x) (y \in `[x, x]).
+Proof. by rewrite itvxx; apply/eqP. Qed.
 
 Lemma subitvPl b1l b2l br :
   b2l <= b1l -> {subset Interval b1l br <= Interval b2l br}.

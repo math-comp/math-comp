@@ -4060,6 +4060,14 @@ Proof. exact: real_ltr_distl. Qed.
 
 Definition lter_distl := (ler_distl, ltr_distl).
 
+Lemma ltr_distlC x y e : (`|x - y| < e) = (x - e < y < x + e).
+Proof. by rewrite distrC ltr_distl. Qed.
+
+Lemma ler_distlC x y e : (`|x - y| <= e) = (x - e <= y <= x + e).
+Proof. by rewrite distrC ler_distl. Qed.
+
+Definition lter_distlC := (ler_distlC, ltr_distlC).
+
 Lemma ltr_distl_addr x y e : `|x - y| < e -> x < y + e.
 Proof. exact: real_ltr_distl_addr. Qed.
 
