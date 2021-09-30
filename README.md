@@ -1,5 +1,5 @@
 [![pipeline status](https://gitlab.com/math-comp/math-comp/badges/master/pipeline.svg)](https://gitlab.com/math-comp/math-comp/commits/master)
-[![Join the chat at https://gitter.im/math-comp/](https://badges.gitter.im/math-comp.svg)](https://gitter.im/math-comp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://coq.zulipchat.com/#narrow/stream/237664-math-comp-users)
 
 # The Mathematical Components repository
 
