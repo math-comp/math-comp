@@ -2,6 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
+From mathcomp Require Import finset.
 
 (******************************************************************************)
 (* This files defines types equipped with order relations.                    *)
@@ -181,6 +182,10 @@ From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 (* n.-tuplelexi[d] T == same with n.tuple T                                   *)
 (*         seqlexi T := lexiprod_with lexi_display T                          *)
 (*    n.-tuplelexi T := n.-tuple[lexi_display] T                              *)
+(*     {subset[d] T} := {set T}                                               *)
+(*                   == a "copy" of set which is canonically ordered by the   *)
+(*                      subset order and displayed in display d               *)
+(*        {subset T} := {subset[subset_display] T}                            *)
 (*                                                                            *)
 (* Beware that canonical structure inference will not try to find the copy of *)
 (* the structures that fits the display one mentioned, but will rather        *)
@@ -396,11 +401,17 @@ From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 (* - porderType, latticeType, distrLatticeType, and orderType, on             *)
 (*     n.-tuplelexi[d] T another "copy" of n.-tuple T, with lexicographic     *)
 (*     ordering (and n.-tuplelexi T its specialization to lexi_display)       *)
+(* - porderType, latticeType, distrLatticeType, orderType, bLatticeType,      *)
+(*   tbLatticeType, cbDistrLatticeType, ctbDistrLatticeType                   *)
+(*   on {subset[disp] T} a "copy" of {set T} using subset order               *)
+(*     (and {subset T} its specialization to subset_display)                  *)
 (* and all possible finite type instances                                     *)
 (*                                                                            *)
-(* In order to get a canonical order on prod or seq, one may import modules   *)
-(*   DefaultProdOrder or DefaultProdLexiOrder, DefaultSeqProdOrder or         *)
-(*   DefaultSeqLexiOrder, and DefaultTupleProdOrder or DefaultTupleLexiOrder. *)
+(* In order to get a canonical order on prod, seq, tuple or set, one may      *)
+(*   import modules DefaultProdOrder or DefaultProdLexiOrder,                 *)
+(*   DefaultSeqProdOrder or DefaultSeqLexiOrder,                              *)
+(*   DefaultTupleProdOrder or DefaultTupleLexiOrder                           *)
+(*   and DefaultSetSubsetOrder.                                               *)
 (*                                                                            *)
 (* On orderType, leP ltP ltgtP are the three main lemmas for case analysis.   *)
 (* On porderType, one may use comparableP, comparable_leP, comparable_ltP,    *)
@@ -7883,6 +7894,157 @@ Qed.
 End DualOrderTheory.
 
 End DualOrder.
+
+(*********************************************)
+(* We declare a "copy" of the sets,          *)
+(* which is canonically ordered by inclusion *)
+(*********************************************)
+Module SetSubsetOrder.
+Section SetSubsetOrder.
+
+Definition type (disp : unit) (T : finType) := {set T}.
+Definition type_of (disp : unit) (T : finType) of phant T := type disp T.
+Identity Coercion type_of_type_of : type_of >-> type.
+
+Context {disp : unit} {T : finType}.
+Local Notation "{ 'subset' T }" := (type_of disp (Phant T)).
+Implicit Type (A B C : {subset T}).
+
+Lemma le_def A B : A \subset B = (A :&: B == A).
+Proof. exact/setIidPl/eqP. Qed.
+
+Lemma setKUC B A : A :&: (A :|: B) = A.
+Proof. by rewrite setUC setKU. Qed.
+
+Lemma setKIC B A : A :|: (A :&: B) = A.
+Proof. by rewrite setIC setKI. Qed.
+
+Definition t_distrLatticeMixin :=
+  MeetJoinMixin le_def (fun _ _ => erefl _) (@setIC _) (@setUC _)
+                (@setIA _) (@setUA _) setKUC setKIC (@setIUl _) (@setIid _).
+
+Lemma subset_display : unit. Proof. exact: tt. Qed.
+
+Canonical eqType := [eqType of {subset T}].
+Canonical choiceType := [choiceType of {subset T}].
+Canonical countType := [countType of {subset T}].
+Canonical finType := [finType of {subset T}].
+Canonical porderType := POrderType subset_display {subset T} t_distrLatticeMixin.
+Canonical latticeType := LatticeType {subset T} t_distrLatticeMixin.
+Canonical bLatticeType := BLatticeType {subset T}
+  (BottomMixin (@sub0set _ : forall A, (set0 <= A :> {subset T})%O)).
+Canonical tbLatticeType := TBLatticeType {subset T}
+  (TopMixin (@subsetT _ : forall A, (A <= setT :> {subset T})%O)).
+Canonical distrLatticeType := DistrLatticeType {subset T} t_distrLatticeMixin.
+Canonical bDistrLatticeType := [bDistrLatticeType of {subset T}].
+Canonical tbDistrLatticeType := [tbDistrLatticeType of {subset T}].
+
+Lemma setIDv A B : B :&: (A :\: B) = set0.
+Proof.
+apply/eqP; rewrite -subset0; apply/subsetP => x.
+by rewrite !inE => /and3P[->].
+Qed.
+
+Definition t_cbdistrLatticeMixin := CBDistrLatticeMixin setIDv (@setID _).
+Canonical cbDistrLatticeType := CBDistrLatticeType {subset T} t_cbdistrLatticeMixin.
+
+Lemma setTDsym A : ~: A = setT :\: A.
+Proof. by rewrite setTD. Qed.
+
+Definition t_ctbdistrLatticeMixin := CTBDistrLatticeMixin setTDsym.
+Canonical ctbDistrLatticeType := CTBDistrLatticeType {subset T} t_ctbdistrLatticeMixin.
+
+Canonical finPOrderType := [finPOrderType of {subset T}].
+Canonical finLatticeType := [finLatticeType of {subset T}].
+Canonical finDistrLatticeType := [finDistrLatticeType of {subset T}].
+Canonical finCDistrLatticeType := [finCDistrLatticeType of {subset T}].
+
+Lemma leEsubset A B : (A <= B) = (A \subset B).
+Proof. by []. Qed.
+Lemma meetEsubset A B : A `&` B = A :&: B.
+Proof. by []. Qed.
+Lemma joinEsubset A B : A `|` B = A :|: B.
+Proof. by []. Qed.
+Lemma botEsubset : 0 = set0 :> {subset T}.
+Proof. by []. Qed.
+Lemma topEsubset : 1 = setT :> {subset T}.
+Proof. by []. Qed.
+Lemma subEsubset A B : A `\` B = A :\: B.
+Proof. by []. Qed.
+Lemma complEsubset A : ~` A = ~: A.
+Proof. by []. Qed.
+
+End SetSubsetOrder.
+
+Module Exports.
+Notation "{ 'subset' [ d ] T }" := (type_of d (Phant T))
+  (at level 2, d at next level, format "{ 'subset' [ d ]  T }") : order_scope.
+Notation "{ 'subset' T }" := {subset[subset_display] T}
+  (at level 2, format "{ 'subset' T }") : order_scope.
+
+Canonical eqType.
+Canonical choiceType.
+Canonical countType.
+Canonical finType.
+Canonical porderType.
+Canonical latticeType.
+Canonical bLatticeType.
+Canonical tbLatticeType.
+Canonical distrLatticeType.
+Canonical bDistrLatticeType.
+Canonical tbDistrLatticeType.
+Canonical cbDistrLatticeType.
+Canonical ctbDistrLatticeType.
+Canonical finPOrderType.
+Canonical finLatticeType.
+Canonical finDistrLatticeType.
+Canonical finCDistrLatticeType.
+
+Definition leEsubset := @leEsubset.
+Definition meetEsubset := @meetEsubset.
+Definition joinEsubset := @joinEsubset.
+Definition botEsubset := @botEsubset.
+Definition topEsubset := @topEsubset.
+Definition subEsubset := @subEsubset.
+Definition complEsubset := @complEsubset.
+
+End Exports.
+End SetSubsetOrder.
+Export SetSubsetOrder.Exports.
+
+Module DefaultSetSubsetOrder.
+Section DefaultSetSubsetOrder.
+Context {disp : unit}.
+
+Canonical subset_porderType (T : finType)  :=
+  [porderType of {set T} for [porderType of {subset T}]].
+Canonical subset_latticeType (T : finType) :=
+  [latticeType of {set T} for [latticeType of {subset T}]].
+Canonical subset_bLatticeType (T : finType) :=
+  [bLatticeType of {set T} for [bLatticeType of {subset T}]].
+Canonical subset_tbLatticeType (T : finType) :=
+  [tbLatticeType of {set T} for [tbLatticeType of {subset T}]].
+Canonical subset_distrLatticeType (T : finType) :=
+  [distrLatticeType of {set T} for [distrLatticeType of {subset T}]].
+Canonical subset_bDistrLatticeType (T : finType) :=
+  [bDistrLatticeType of {set T}].
+Canonical subset_tbDistrLatticeType (T : finType) :=
+  [tbDistrLatticeType of {set T}].
+Canonical subset_cbDistrLatticeType (T : finType) :=
+  [cbDistrLatticeType of {set T} for [cbDistrLatticeType of {subset T}]].
+Canonical subset_ctbDistrLatticeType (T : finType) :=
+  [ctbDistrLatticeType of {set T} for [ctbDistrLatticeType of {subset T}]].
+Canonical subset_finPOrderType (T : finType) :=
+  [finPOrderType of {set T}].
+Canonical subset_finLatticeType (T : finType) :=
+  [finLatticeType of {set T}].
+Canonical subset_finDistrLatticeType (T : finType) :=
+  [finDistrLatticeType of {set T}].
+Canonical subset_finCDistrLatticeType (T : finType) :=
+  [finCDistrLatticeType of {set T}].
+
+End DefaultSetSubsetOrder.
+End DefaultSetSubsetOrder.
 
 Notation enum A := (sort <=%O (enum A)).
 
