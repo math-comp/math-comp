@@ -1231,6 +1231,20 @@ apply/setP => y.
 by apply/imsetP/set1P=> [[x' /set1P-> //]| ->]; exists x; rewrite ?set11.
 Qed.
 
+Lemma imset_inj : injective f -> injective (fun A : {set aT} => f @: A).
+Proof.
+move=> inj_f A B => /setP E; apply/setP => x.
+by rewrite -(mem_imset (mem A) x inj_f) E mem_imset.
+Qed.
+
+Lemma imset_disjoint (A B : {pred aT}) :
+  injective f -> [disjoint f @: A & f @: B] = [disjoint A & B].
+Proof.
+move=> inj_f; apply/pred0Pn/pred0Pn => /= [[_ /andP[/imsetP[x xA ->]] xB]|].
+  by exists x; rewrite xA -(mem_imset (mem B) x inj_f).
+by move=> [x /andP[xA xB]]; exists (f x); rewrite !mem_imset ?xA.
+Qed.
+
 Lemma imset2_f (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     x \in D -> x2 \in D2 x ->
   f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)).
@@ -1381,6 +1395,7 @@ End FunImage.
 
 Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
+Arguments imset_disjoint {aT rT f A B}.
 
 Section BigOps.
 
@@ -2250,27 +2265,13 @@ Variables (T : finType) (P : {set {set T}}) (D : {set T}).
 Variables (T' : finType) (f : T -> T') (inj_f : injective f).
 Let fP := [set f @: (B : {set T}) | B in P].
 
-Lemma imset_inj : injective (fun A : {set T} => f @: A).
+Lemma imset_trivIset : trivIset fP = trivIset P.
 Proof.
-move => A B => /setP E; apply/setP => x.
-by rewrite -(mem_imset (mem A) x inj_f) E mem_imset.
-Qed.
-
-Lemma imset_disjoint (A B : {pred T}) :
-  [disjoint f @: A & f @: B] = [disjoint A & B].
-Proof.
-apply/pred0Pn/pred0Pn => /= [[? /andP[/imsetP[x xA ->]] xB]|].
-  by exists x; rewrite xA -(mem_imset (mem B) x inj_f).
-by move => [x /andP[xA xB]]; exists (f x); rewrite !mem_imset ?xA.
-Qed.
-
-Lemma imset_trivIset : trivIset P = trivIset fP.
-Proof.
-apply/trivIsetP/trivIsetP.
-- move=> trivP ? ? /imsetP[A AP ->] /imsetP[B BP ->].
-  by rewrite (inj_eq imset_inj) imset_disjoint; apply: trivP.
-- move=> trivP A B AP BP; rewrite -imset_disjoint -(inj_eq imset_inj).
+apply/trivIsetP/trivIsetP => [trivP A B AP BP|].
+- rewrite -(imset_disjoint inj_f) -(inj_eq (imset_inj inj_f)).
   by apply: trivP; rewrite imset_f.
+- move=> trivP ? ? /imsetP[A AP ->] /imsetP[B BP ->].
+  by rewrite (inj_eq (imset_inj inj_f)) imset_disjoint //; apply: trivP.
 Qed.
 
 Lemma imset0mem : (set0 \in fP) = (set0 \in P).
@@ -2279,11 +2280,11 @@ apply/imsetP/idP => [[A AP /esym/eqP]|P0]; last by exists set0; rewrite ?imset0.
 by rewrite imset_eq0 => /eqP<-.
 Qed.
 
-Lemma imset_partition : partition P D = partition fP (f @: D).
+Lemma imset_partition : partition fP (f @: D) = partition P D.
 Proof.
 suff cov: (cover fP == f @:D) = (cover P == D).
   by rewrite /partition -imset_trivIset imset0mem cov.
-by rewrite /fP cover_imset -imset_cover (inj_eq imset_inj).
+by rewrite /fP cover_imset -imset_cover (inj_eq (imset_inj inj_f)).
 Qed.
 End PartitionImage.
 
