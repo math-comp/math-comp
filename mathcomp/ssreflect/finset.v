@@ -1354,7 +1354,7 @@ Proof.  by move=> /(imset2Sl B2) sBA /(imset2Sr A)/subset_trans->. Qed.
 
 End ImsetProp.
 
-Implicit Types (f g : aT -> rT) (D : {set aT}) (R : {pred rT}).
+Implicit Types (f g : aT -> rT) (D : {pred aT}) (R : {pred rT}).
 
 Lemma eq_preimset f g R : f =1 g -> f @^-1: R = g @^-1: R.
 Proof. by move=> eqfg; apply/setP => y; rewrite !inE eqfg. Qed.
