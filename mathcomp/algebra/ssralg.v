@@ -6044,6 +6044,14 @@ Definition can2_lrmorphism := can2_lrmorphism.
 Definition bij_lrmorphism := bij_lrmorphism.
 Definition imaginary_exists := imaginary_exists.
 
+Definition raddf := (raddf0, raddfN, raddfD, raddfMn).
+
+Definition rmorphE :=
+  (rmorphD, rmorph0, rmorphB, rmorphN, rmorphMNn, rmorphMn, rmorph1, rmorphX).
+
+Definition linearE :=
+  (linearD, linear0, linearB, linearMNn, linearMn, linearZ).
+
 Notation null_fun V := (null_fun V) (only parsing).
 Notation in_alg A := (in_alg_loc A).
 
