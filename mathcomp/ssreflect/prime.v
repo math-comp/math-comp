@@ -414,9 +414,9 @@ Qed.
 Lemma Euclid_dvd1 p : prime p -> (p %| 1) = false.
 Proof. by rewrite dvdn1; case: eqP => // ->. Qed.
 
-Lemma Euclid_dvdM m n p : prime p -> (p %| m * n) = (p %| m) || (p %| n).
+Lemma Euclid_dvdM p : prime p -> {morph dvdn p : x y / x * y >-> x || y}.
 Proof.
-move=> pr_p; case dv_pm: (p %| m); first exact: dvdn_mulr.
+move=> pr_p m n; case dv_pm: (p %| m); first exact: dvdn_mulr.
 by rewrite Gauss_dvdr // prime_coprime // dv_pm.
 Qed.
 
@@ -424,7 +424,7 @@ Lemma Euclid_dvd_prod (I : Type) (r : seq I) (P : pred I) (f : I -> nat) p :
   prime p ->  
   p %| \prod_(i <- r | P i) f i = \big[orb/false]_(i <- r | P i) (p %| f i).
 Proof.
-move=> pP; apply: big_morph=> [x y|]; [exact: Euclid_dvdM | exact: Euclid_dvd1].
+move=> pP; apply: big_morph; [exact: Euclid_dvdM | exact: Euclid_dvd1].
 Qed.
 
 Lemma Euclid_dvdX m n p : prime p -> (p %| m ^ n) = (p %| m) && (n > 0).

@@ -801,23 +801,19 @@ Proof. by rewrite addrC mulrS. Qed.
 Lemma mulrb x (b : bool) : x *+ b = (if b then x else 0).
 Proof. by case: b. Qed.
 
-Lemma mul0rn n : 0 *+ n = 0 :> V.
-Proof. by elim: n => // n IHn; rewrite mulrS add0r. Qed.
+Lemma mul0rn : left_zero 0%R (@natmul V).
+Proof. by elim=> //= n IHn; rewrite mulrS add0r. Qed.
 
 Lemma mulNrn x n : (- x) *+ n = x *- n.
 Proof. by elim: n => [|n IHn]; rewrite ?oppr0 // !mulrS opprD IHn. Qed.
 
 Lemma mulrnDl n : {morph (fun x => x *+ n) : x y / x + y}.
 Proof.
-move=> x y; elim: n => [|n IHn]; rewrite ?addr0 // !mulrS.
-by rewrite addrCA -!addrA -IHn -addrCA.
+by move=> x y; elim: n => [|n IHn]; rewrite ?addr0 // !mulrS addrACA IHn.
 Qed.
 
-Lemma mulrnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
-Proof.
-elim: m => [|m IHm]; first by rewrite add0r.
-by rewrite !mulrS IHm addrA.
-Qed.
+Lemma mulrnDr x : {morph natmul x : x y / (x + y)%N >-> x + y}.
+Proof. by elim=> [|m IHm] n; rewrite ?add0r // !mulrS IHm addrA. Qed.
 
 Lemma mulrnBl n : {morph (fun x => x *+ n) : x y / x - y}.
 Proof.
@@ -836,8 +832,8 @@ Proof.
 by rewrite mulnC; elim: n => //= n IHn; rewrite mulrS mulrnDr IHn.
 Qed.
 
-Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
-Proof. by rewrite -!mulrnA mulnC. Qed.
+Lemma mulrnAC : right_commutative (@natmul V).
+Proof. by move=> x m n; rewrite -!mulrnA mulnC. Qed.
 
 Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
 Proof. by elim: n => [|n ih]; rewrite ?add0r //= ih mulrS addrA. Qed.
@@ -1086,8 +1082,8 @@ Proof. by case: n => //; rewrite mulr1. Qed.
 Lemma expr0n n : 0 ^+ n = (n == 0%N)%:R :> R.
 Proof. by case: n => // n; rewrite exprS mul0r. Qed.
 
-Lemma expr1n n : 1 ^+ n = 1 :> R.
-Proof. by elim: n => // n IHn; rewrite exprS mul1r. Qed.
+Lemma expr1n : left_zero 1 (@exp R).
+Proof. by elim=> // n IHn; rewrite exprS mul1r. Qed.
 
 Lemma exprD x m n : x ^+ (m + n) = x ^+ m * x ^+ n.
 Proof. by elim: m => [|m IHm]; rewrite ?mul1r // !exprS -mulrA -IHm. Qed.
@@ -1171,8 +1167,8 @@ elim: m => [|m IHm]; first by rewrite expr1n.
 by rewrite mulSn exprD IHm exprS exprMn_comm //; apply: commrX.
 Qed.
 
-Lemma exprAC x m n : (x ^+ m) ^+ n = (x ^+ n) ^+ m.
-Proof. by rewrite -!exprM mulnC. Qed.
+Lemma exprAC : right_commutative (@exp R).
+Proof. by move=> x m n; rewrite -!exprM mulnC. Qed.
 
 Lemma expr_mod n x i : x ^+ n = 1 -> x ^+ (i %% n) = x ^+ i.
 Proof.
@@ -1444,7 +1440,8 @@ Section Char2.
 
 Hypothesis charR2 : 2 \in [char R].
 
-Lemma addrr_char2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_char. Qed.
+Lemma addrr_char2 : self_inverse (0 : R) +%R.
+Proof. by move=> x; rewrite -mulr2n mulrn_char. Qed.
 
 Lemma oppr_char2 x : - x = x.
 Proof. by apply/esym/eqP; rewrite -addr_eq0 addrr_char2. Qed.
@@ -1630,8 +1627,8 @@ Proof. by case: V v => ? [] ? []. Qed.
 Lemma scale0r v : 0 *: v = 0.
 Proof. by apply: (addIr (1 *: v)); rewrite -scalerDl !add0r. Qed.
 
-Lemma scaler0 a : a *: 0 = 0 :> V.
-Proof. by rewrite -{1}(scale0r 0) scalerA mulr0 scale0r. Qed.
+Lemma scaler0 : right_zero 0 *:%R.
+Proof. by move=> a; rewrite -{1}(scale0r 0) scalerA mulr0 scale0r. Qed.
 
 Lemma scaleNr a v : - a *: v = - (a *: v).
 Proof. by apply: (addIr (a *: v)); rewrite -scalerDl !addNr scale0r. Qed.

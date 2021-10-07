@@ -767,14 +767,14 @@ Definition dsubmx (A : 'M[R]_(m1 + m2, n)) :=
 Lemma row_mxEl A1 A2 i j : row_mx A1 A2 i (lshift n2 j) = A1 i j.
 Proof. by rewrite mxE (unsplitK (inl _ _)). Qed.
 
-Lemma row_mxKl A1 A2 : lsubmx (row_mx A1 A2) = A1.
-Proof. by apply/matrixP=> i j; rewrite mxE row_mxEl. Qed.
+Lemma row_mxKl A2 : cancel (row_mx^~ A2) lsubmx.
+Proof. by move=> A1; apply/matrixP=> i j; rewrite mxE row_mxEl. Qed.
 
 Lemma row_mxEr A1 A2 i j : row_mx A1 A2 i (rshift n1 j) = A2 i j.
 Proof. by rewrite mxE (unsplitK (inr _ _)). Qed.
 
-Lemma row_mxKr A1 A2 : rsubmx (row_mx A1 A2) = A2.
-Proof. by apply/matrixP=> i j; rewrite mxE row_mxEr. Qed.
+Lemma row_mxKr A1 : cancel (row_mx A1) rsubmx.
+Proof. by move=> A2; apply/matrixP=> i j; rewrite mxE row_mxEr. Qed.
 
 Lemma hsubmxK A : row_mx (lsubmx A) (rsubmx A) = A.
 Proof. by apply/matrixP=> i j /[!mxE]; case: split_ordP => k -> /[!mxE]. Qed.
@@ -782,14 +782,14 @@ Proof. by apply/matrixP=> i j /[!mxE]; case: split_ordP => k -> /[!mxE]. Qed.
 Lemma col_mxEu A1 A2 i j : col_mx A1 A2 (lshift m2 i) j = A1 i j.
 Proof. by rewrite mxE (unsplitK (inl _ _)). Qed.
 
-Lemma col_mxKu A1 A2 : usubmx (col_mx A1 A2) = A1.
-Proof. by apply/matrixP=> i j; rewrite mxE col_mxEu. Qed.
+Lemma col_mxKu A2 : cancel (col_mx^~ A2) usubmx.
+Proof. by move=> A1; apply/matrixP=> i j; rewrite mxE col_mxEu. Qed.
 
 Lemma col_mxEd A1 A2 i j : col_mx A1 A2 (rshift m1 i) j = A2 i j.
 Proof. by rewrite mxE (unsplitK (inr _ _)). Qed.
 
-Lemma col_mxKd A1 A2 : dsubmx (col_mx A1 A2) = A2.
-Proof. by apply/matrixP=> i j; rewrite mxE col_mxEd. Qed.
+Lemma col_mxKd A1 : cancel (col_mx A1) dsubmx.
+Proof. by move=> A2; apply/matrixP=> i j; rewrite mxE col_mxEd. Qed.
 
 Lemma lsubmxEsub : lsubmx = colsub (lshift _).
 Proof. by rewrite /lsubmx /mxsub !unlock. Qed.
@@ -1808,8 +1808,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mul1r. Qed.
 Lemma scalemxDl A x y : (x + y) *m: A = x *m: A + y *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrDl. Qed.
 
-Lemma scalemxDr x A B : x *m: (A + B) = x *m: A + x *m: B.
-Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
+Lemma scalemxDr : right_distributive scalemx +%R.
+Proof. by move=> x A B; apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
@@ -2203,12 +2203,13 @@ Qed.
 Lemma scalar_mxM n a b : (a * b)%:M = a%:M *m b%:M :> 'M_n.
 Proof. by rewrite mul_scalar_mx scale_scalar_mx. Qed.
 
-Lemma mul1mx m n (A : 'M_(m, n)) : 1%:M *m A = A.
-Proof. by rewrite mul_scalar_mx scale1r. Qed.
+Lemma mul1mx m n : left_id 1%:M (@mulmx m m n).
+Proof. by move=> A; rewrite mul_scalar_mx scale1r. Qed.
 
-Lemma mulmx1 m n (A : 'M_(m, n)) : A *m 1%:M = A.
+Lemma mulmx1 m n : right_id 1%:M (@mulmx m n n).
 Proof.
-by rewrite -diag_const_mx mul_mx_diag; apply/matrixP=> i j; rewrite !mxE mulr1.
+move=> A; rewrite -diag_const_mx mul_mx_diag.
+by apply/matrixP=> i j; rewrite !mxE mulr1.
 Qed.
 
 Lemma rowsubE m m' n f (A : 'M_(m, n)) :

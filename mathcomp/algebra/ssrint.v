@@ -540,10 +540,10 @@ rewrite ?(muln0, mulr0n, mul0rn, oppr0, mulNrn, opprK) //;
 * by rewrite -mulrnA.
 Qed.
 
-Fact mulrzAC m n x : (x *~ n) *~ m = (x *~ m) *~ n.
-Proof. by rewrite !mulrzA_C mulrC. Qed.
+Fact mulrzAC : right_commutative (@intmul M).
+Proof. by move=> x m n; rewrite !mulrzA_C mulrC. Qed.
 
-Fact mulr1z (x : M) : x *~ 1 = x. Proof. by []. Qed.
+Fact mulr1z : right_id 1%R (@intmul M). Proof. by []. Qed.
 
 Fact mulrzDr m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
 Proof.
@@ -583,8 +583,8 @@ Proof. by rewrite -!scalezrE scalerA mulrC. Qed.
 
 Lemma mulr0z x : x *~ 0 = 0. Proof. by []. Qed.
 
-Lemma mul0rz n : 0 *~ n = 0 :> M.
-Proof. by rewrite -scalezrE scaler0. Qed.
+Lemma mul0rz : left_zero 0 (@intmul M).
+Proof. by move=> n; rewrite -scalezrE scaler0. Qed.
 
 Lemma mulrNz x n : x *~ (- n) = - (x *~ n).
 Proof. by rewrite -scalezrE scaleNr. Qed.
@@ -1016,8 +1016,8 @@ Proof. by case: (intP n)=> // [|m]; rewrite ?opprK ?expr0z ?invr1 // invrK. Qed.
 Lemma exprz_inv x n : (x^-1) ^ n = x ^ (- n).
 Proof. by case: (intP n)=> // m; rewrite -[_ ^ (- _)]exprVn ?opprK ?invrK. Qed.
 
-Lemma exp1rz n : 1 ^ n = 1 :> R.
-Proof. by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: expr1n. Qed.
+Lemma exp1rz : left_zero 1 (@exprz R).
+Proof. by case/intP => // m; rewrite -?exprz_inv ?invr1; apply: expr1n. Qed.
 
 Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: exprS. Qed.
 
@@ -1093,8 +1093,8 @@ rewrite exprSz ihn // intS mulrDr mulr1 exprzD_ss //.
 by case: (intP m)=> // m'; rewrite ?oppr_le0 //.
 Qed.
 
-Lemma exprzAC x m n : (x ^ m) ^ n = (x ^ n) ^ m.
-Proof. by rewrite !exprz_exp mulrC. Qed.
+Lemma exprzAC : right_commutative (@exprz R).
+Proof. by move=> x m n; rewrite !exprz_exp mulrC. Qed.
 
 Lemma exprz_out x n (nux : x \isn't a GRing.unit) (hn : 0 <= n) :
   x ^ (- n) = x ^ n.
