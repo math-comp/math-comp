@@ -209,6 +209,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `bigop.v`:
   + new lemma `big_rev_mkord`
 
+- In `ssrnum.v`:
+  + new lemmas `ltr_distlC`, `ler_distlC`, new definition `lter_distlC`
+
+- In `interval.v`:
+  + new lemmas `subset_itv`, `subset_itv_oo_cc`, `subset_itv_oo_oc`,
+    `subset_itv_oo_co`, `subset_itv_oc_cc`, `subset_itv_co_cc`,
+    `itvxx`, `itvxxP`
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
