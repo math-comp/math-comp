@@ -164,6 +164,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - In `rat.v`
   + new lemmas `minr_rat`, `maxr_rat`
+  + constants `fracq`, `oppq`, `addq`, `mulq` and `invq` are
+    "locked" when applied to variables, computation occurs only when
+    applied to constructors.
 
 - In `intdiv.v`
   + new definition `lcmz`
