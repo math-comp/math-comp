@@ -276,7 +276,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Infrastructure
 
-- The way `hierachy.ml` recognizes inheritance has been changed: `S1` inherits
+- The way `hierarchy.ml` recognizes inheritance has been changed: `S1` inherits
   from `S2` when there is a coercion path from `S1.sort` to `S2.sort` and there
   is a canonical structure instance that unifies `S1.sort` and `S2.sort`,
   regardless of where (which module) these constants are declared.
