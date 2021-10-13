@@ -88,7 +88,7 @@ From mathcomp Require Import automorphism quotient.
 (*             be the actual morphism object (e.g., coset_morphism H), not    *)
 (*             the underlying function (e.g., coset H).                       *)
 (* The explicit application of an action to is usually written (to%act x a),  *)
-(* but %act can be omitted if to is an abstract action or a set action to0^*. *)
+(* but %act can be omitted if to is an abstract action or a set action to^*.  *)
 (* Note that this form will simplify and expose the acting function.          *)
 (*   There is a %gact scope for group actions; the notations above are        *)
 (* recognised in %gact when they denote canonical group actions.              *)
