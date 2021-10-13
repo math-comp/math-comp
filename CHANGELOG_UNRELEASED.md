@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + added lemma `sumnB`.
   + generalized lemma `partition_big`.
   + added lemma `big_pmap`.
+- in `bigop.v`, added lemmas `sumnB` and `card_bseq`.
+- in `bigop.v`, added lemma `sumnB`.
+- in `bigop.v`, added lemma `card_bseq`.
 
 - in `seq.v`,
   + new higher-order predicate `pairwise r xs` which asserts that the relation
@@ -41,8 +44,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `sorted_relI`, `eq(_in)_sorted`, `mergeA`, `all_merge`, and
   `homo_sort_map(_in)`.
 
+- in `fintype.v`, new lemma `bij_eq_card`.
+
 - in `tuple.v`, added Canonical tuple for sort.
   + new lemma `val_tcast`
+
+- in `tuple.v`, added type of bounded sequences `n.-bseq T` and its
+  theory, i.e.
+  + definition `bseq` with constructor `Bseq`,
+  + notation `n.-bseq`, `{bseq n of T}`, `[bseq of s]`, `[bseq x1 ;
+    .. ; xn]`, and `[bseq]`, coercions to `n.-tuple` and to `seq` (which commute
+    definitionally), definitions `insub_bseq`, `in_bseq`, `cast_bseq`,
+    `widen_bseq`,  `bseq_tagged_tuple` and `tagged_tuple_bseq` (the
+    later two are mutual inverses).
+  + canonical instances making `n.-bseq` canonically an `eqType`, a
+    `predType`, a `choiceType`, a `countType`, a `subCountType`, a
+    `finType`, a `subFinType`; and making `nil`, `cons`, `rcons`,
+    `behead`, `belast`, `cat`, `take`, `drop`, `rev`, `rot`, `rotr`, `map`,
+    `scanl`, `pairmap`, `allpairs`, and `sort` canonical `_.-bseq`.
+  + lemmas `size_bseq`, `bseqE`, `size_insub_bseq`, `cast_bseq_id`,
+    `cast_bseqK`, `cast_bseqKV`, `cast_bseq_trans`, `size_cast_bseq`,
+    `widen_bseq_id`, `cast_bseqEwiden`, `widen_bseqK`,
+    `widen_bseq_trans`, `size_widen_bseq`, `in_bseqE`,
+    `widen_bseq_in_bseq`, `bseq0`, `membsE`, `bseq_tagged_tupleK`,
+    `tagged_tuple_bseqK`,`bseq_tagged_tuple_bij`, and
+    `tagged_tuple_bseq_bij`.
 
 - in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
 
