@@ -475,12 +475,10 @@ set x := (n, d); rewrite -[n]/x.1 -[d]/x.2 -fracqE.
 by case: fracqP => [_|k fx k_neq0] /=; constructor.
 Qed.
 
+#[deprecated(since="mathcomp 1.13.0", note="Use eqr_div instead.")]
 Lemma divq_eq (nx dx ny dy : rat) :
   dx != 0 -> dy != 0 -> (nx / dx == ny / dy) = (nx * dy == ny * dx).
-Proof.
-move=> dx_neq0 dy_neq0; rewrite -(inj_eq (@mulIf _ (dx * dy) _)) ?mulf_neq0 //.
-by rewrite mulrA divfK // mulrCA divfK // [dx * _ ]mulrC.
-Qed.
+Proof. exact: GRing.eqr_div. Qed.
 
 Variant rat_spec (* (x : rat) *) : rat -> int -> int -> Type :=
   Rat_spec (n : int) (d : nat)  & coprime `|n| d.+1

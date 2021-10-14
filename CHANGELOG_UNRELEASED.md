@@ -245,6 +245,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new lemmas `subset_itv`, `subset_itv_oo_cc`, `subset_itv_oo_oc`,
     `subset_itv_oo_co`, `subset_itv_oc_cc`, `subset_itv_co_cc`,
     `itvxx`, `itvxxP`
+- In `ssralg.v`:
+  + new lemma `eqr_div`
+
+- In `ssrnum.v`:
+  + new lemma `sqrtrV`
 
 ### Changed
 

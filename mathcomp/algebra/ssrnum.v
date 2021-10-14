@@ -4349,6 +4349,14 @@ move=> b_gt0; have [a_le0|a_gt0] := ler0P a; last first.
 by rewrite ler0_sqrtr // sqrtr_gt0 b_gt0 (le_lt_trans a_le0).
 Qed.
 
+Lemma sqrtrV x : 0 <= x -> sqrt (x^-1) = (sqrt x)^-1.
+Proof.
+case: ltrgt0P => // [x_gt0 _|->]; last by rewrite !(invr0, sqrtr0).
+have sx_neq0 : sqrt x != 0 by rewrite sqrtr_eq0 -ltNge.
+apply: (mulfI sx_neq0).
+by rewrite -sqrtrM !(divff, ltW, sqrtr1) // lt0r_neq0.
+Qed.
+
 End RealClosedFieldTheory.
 
 Definition conjC {C : numClosedFieldType} : {rmorphism C -> C} :=

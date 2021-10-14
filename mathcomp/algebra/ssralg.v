@@ -4944,6 +4944,11 @@ Proof. by move=> nzy1 nzy2; rewrite invfM mulrDl !mulrA mulrAC !mulfK. Qed.
 Lemma mulf_div x1 y1 x2 y2 : (x1 / y1) * (x2 / y2) = (x1 * x2) / (y1 * y2).
 Proof. by rewrite mulrACA -invfM. Qed.
 
+Lemma eqr_div x y z t : y != 0 -> t != 0 -> (x / y == z / t) = (x * t == z * y).
+Proof.
+move=> yD0 tD0; rewrite -[x in RHS](divfK yD0) -[z in RHS](divfK tD0) mulrAC.
+by apply/eqP/eqP => [->|/(mulIf yD0)/(mulIf tD0)].
+Qed.
 
 Lemma char0_natf_div :
   [char F] =i pred0 -> forall m d, d %| m -> (m %/ d)%:R = m%:R / d%:R :> F.
