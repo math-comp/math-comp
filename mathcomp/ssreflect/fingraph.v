@@ -291,8 +291,7 @@ Proof. by move=> eq_e x; rewrite /root (eq_pick (eq_connect eq_e x)). Qed.
 Lemma eq_roots e e' : e =2 e' -> roots e =1 roots e'.
 Proof. by move=> eq_e x; rewrite /roots (eq_root eq_e). Qed.
 
-Lemma connect_rev e :
-  (connect [rel x y | e y x]) =2 [rel x y | connect e y x].
+Lemma connect_rev e : connect [rel x y | e y x] =2 [rel x y | connect e y x].
 Proof.
 suff crev e': subrel (connect [rel x y | e' y x]) [rel x y | connect e' y x].
   by move=> x y; apply/idP/idP; apply: crev.
