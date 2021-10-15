@@ -251,6 +251,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In `ssrnum.v`:
   + new lemma `sqrtrV`
 
+- In `ssrnum.v`:
+  + lemma `normr_nneg`, declared a `Hint Resolve` in the `core` database
+
 ### Changed
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
