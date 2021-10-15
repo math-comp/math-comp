@@ -1564,6 +1564,10 @@ Arguments normr0P {R V v}.
 Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
 Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
+Lemma normr_nneg (R : numDomainType) (x : R) : `|x| \is Num.nneg.
+Proof. by rewrite qualifE. Qed.
+Hint Resolve normr_nneg : core.
+
 Section NumDomainOperationTheory.
 
 Variable R : numDomainType.
