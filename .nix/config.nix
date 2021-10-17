@@ -35,7 +35,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     master = [
       "mathcomp-finmap" "mathcomp-bigenough" "mathcomp-analysis"
       "mathcomp-abel" "multinomials" "mathcomp-real-closed" "coqeal"
-      "fourcolor" "odd-order"
+      "fourcolor" "odd-order" "gaia"
     ];
     common-bundles = listToAttrs (forEach master (p:
        { name = p; value.override.version = "master"; }))
