@@ -254,6 +254,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - In `ssrnum.v`:
   + new lemma `sqrtrV`
+- In `perm.v`:
+  + new lemma `perm_onV`, `porbitV`, `porbitsV`
 
 - In `ssrnum.v`:
   + lemma `normr_nneg`, declared a `Hint Resolve` in the `core` database
