@@ -7,7 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" ]
+build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" "COQEXTRAFLAGS+=-native-compiler yes" {coq-native:installed & coq:version < "8.13~" } ]
 install: [ make "-C" "mathcomp/ssreflect" "install" ]
 depends: [ "coq" { ((>= "8.11" & < "8.15~") | (= "dev"))} ]
 
