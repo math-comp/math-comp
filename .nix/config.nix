@@ -43,7 +43,6 @@ with builtins; with (import <nixpkgs> {}).lib;
   in {
     "coq-8.13".coqPackages = common-bundles // {
       coq.override.version = "8.13";
-      paramcoq.override.version = "v1.1.2+coq8.13";
     };
     "coq-8.12".coqPackages = common-bundles // {
       coq.override.version = "8.12";
