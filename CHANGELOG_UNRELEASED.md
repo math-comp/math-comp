@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + generalized lemma `partition_big`.
   + added lemma `big_pmap`.
 - in `bigop.v`, added lemmas `sumnB` and `card_bseq`.
+- in `ssrbool.v`, added lemmas `neqPP`, `andPP`, `orPP`, and `implyPP`.
+
 - in `bigop.v`, added lemma `sumnB`.
 - in `bigop.v`, added lemma `card_bseq`.
 
@@ -33,6 +35,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new lemmas `cat_nilp`, `rev_nilp`, `allrelT`, `allrel_relI`, and
     `pairwise_relI`.
   + new lemma `undup_map_inj`.
+  + new lemmas: `forall_cons`, `exists_cons`, `sub_map`, `eq_mem_map`,
+    `eq_in_pmap`.
 
 - in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
   `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
