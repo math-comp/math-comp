@@ -90,6 +90,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     current interface, which requires `finOrderType` structures to be
     nonempty, the `finOrderType` is only defined for ordinal which are
     manifestly nonempty (i.e. `'I_n.+1`).
+  + we provide a canonical finite complemented distributive lattice structure
+    on finite set ({set T}) ordered by inclusion and lemmas
+    `leEsubset`, `meetEsubset`, `joinEsubset`, `botEsubset`, `topEsubset`
+    `subEsubset`, `complEsubset` to translate generic symbols to the
+    concrete ones.
   + new notation `Order.enum A` for `sort <=%O (enum A)`, with new
     lemmas in module `Order`: `cardE`, `mem_enum`, `enum_uniq`,
     `cardT`, `enumT`, `enum0`, `enum1`, `eq_enum`, `eq_cardT`,
