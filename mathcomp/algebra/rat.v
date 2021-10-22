@@ -28,7 +28,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Reserved Notation "[rat x // y ]" (format "[rat  x  //  y ]", at level 0).
+Reserved Notation "[ 'rat' x // y ]" (format "[ 'rat'  x  //  y ]", at level 0).
 Reserved Notation "n %:Q" (at level 2, left associativity, format "n %:Q").
 
 Local Open Scope ring_scope.
