@@ -35,8 +35,6 @@ From mathcomp Require Import fintype finfun bigop finset fingroup.
 (*                     (sDom : A \subset D); restrm f sDom is transparently   *)
 (*                     identical to f; the restrmP and domP lemmas provide    *)
 (*                     opaque restrictions.                                   *)
-(*     invm f infj  == the inverse morphism for an injective f, with domain   *)
-(*                     f @* D, given (injf : 'injm f).                        *)
 (*                                                                            *)
 (*      G \isog H  <=> G and H are isomorphic as groups.                      *)
 (*       H \homg G <=> H is a homomorphic image of G.                         *)

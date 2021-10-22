@@ -32,7 +32,7 @@ From mathcomp Require Import quotient action.
 (* ++ Morphisms on product groups:                                            *)
 (*   pprodm nAB fJ fAB == the morphism extending fA and fB on A <*> B when    *)
 (*                        nAB : B \subset 'N(A),                              *)
-(*                        fJ : {in A & B, morph_actj fA fB}, and              *)
+(*                        fJ : {in A & B, morph_act 'J 'J fA fB}, and         *)
 (*                        fAB : {in A :&: B, fA =1 fB}.                       *)
 (*     sdprodm defG fJ == the morphism extending fA and fB on G, given        *)
 (*                        defG : A ><| B = G and                              *)
