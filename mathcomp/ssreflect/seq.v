@@ -2595,9 +2595,6 @@ Qed.
 Lemma perm_map s t : perm_eq s t -> perm_eq (map f s) (map f t).
 Proof. by move/permP=> Est; apply/permP=> a; rewrite !count_map Est. Qed.
 
-Lemma eq_in_map g s : {in s, f =1 g} <-> map f s = map g s.
-Proof. by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->]. Qed.
-
 Lemma sub_map s1 s2 : {subset s1 <= s2} -> {subset map f s1 <= map f s2}.
 Proof. by move=> sub_s ? /mapP[x x_s ->]; rewrite map_f ?sub_s. Qed.
 
@@ -2657,6 +2654,10 @@ Proof. by move=> eq_f12; elim=> //= x s ->; rewrite eq_f12. Qed.
 
 End MapComp.
 
+Lemma eq_in_map (T1 : eqType) T2 (f1 f2 : T1 -> T2) (s : seq T1) : 
+  {in s, f1 =1 f2} <-> map f1 s = map f2 s.
+Proof. by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->]. Qed.
+
 Lemma map_id_in (T : eqType) f (s : seq T) : {in s, f =1 id} -> map f s = s.
 Proof. by move/eq_in_map->; apply: map_id. Qed.
 
@@ -2692,15 +2693,17 @@ Proof. by elim: s => //= x s <-; case: f. Qed.
 
 End Pmap.
 
+Lemma eq_in_pmap (aT : eqType) rT (f1 f2 : aT -> option rT) s : 
+  {in s, f1 =1 f2} -> pmap f1 s = pmap f2 s.
+Proof. by elim: s => //= a s IHs /forall_cons [-> /IHs ->]. Qed.
+
+Lemma eq_pmap aT rT (f1 f2 : aT -> option rT) : 
+  f1 =1 f2 -> pmap f1 =1 pmap f2.
+Proof. by move=> Ef; elim => //= a s ->; rewrite Ef. Qed.
+
 Section EqPmap.
 
 Variables (aT rT : eqType) (f : aT -> option rT) (g : rT -> aT).
-
-Lemma eq_in_pmap (f1 f2 : aT -> option rT) s : {in s, f1 =1 f2} -> pmap f1 s = pmap f2 s.
-Proof. by elim: s => //= a s IHs /forall_cons [-> /IHs ->]. Qed.
-
-Lemma eq_pmap (f1 f2 : aT -> option rT) : f1 =1 f2 -> pmap f1 =1 pmap f2.
-Proof. by move=> Ef s; apply: eq_in_pmap (in1W Ef). Qed.
 
 Lemma mem_pmap s u : (u \in pmap f s) = (Some u \in map f s).
 Proof. by elim: s => //= x s IHs; rewrite in_cons -IHs; case: (f x). Qed.
