@@ -205,7 +205,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     new definition of `fracq` ensures that if `x` and `y` of type
     `int * int` represent the same rational then `fracq x` is
     definitionally equal to `fracq y` (i.e. the underlying proofs are
-    the same).
+    the same). Additionally, `addq` and `mulq` are tuned to minimize
+    the number of integer arithmetic operations when the denominators
+    are equal to one.
+  + notation `[rat x // y]` for displaying the normal form of a
+    rational. We also provide the parsable notation for debugging
+    purposes.
 
 - In `intdiv.v`
   + new definition `lcmz`

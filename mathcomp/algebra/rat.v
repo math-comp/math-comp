@@ -17,6 +17,9 @@ From mathcomp Require Import ssrint.
 (* x \is a Qnat == x is a non-negative element of rat whose denominator       *)
 (*                 is equal to 1                                              *)
 (*       ratr r == generic embedding of (r : rat) into an arbitrary unitring. *)
+(* [rat x // y] == smart constructor for rationals, definitionally equal      *)
+(*                 to x / y for concrete values, intended for printing only   *)
+(*                 of normal forms. The parsable notation is for debugging.   *)
 (******************************************************************************)
 
 Import Order.TTheory GRing.Theory Num.Theory.
@@ -24,6 +27,9 @@ Import Order.TTheory GRing.Theory Num.Theory.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Reserved Notation "[rat x // y ]" (format "[rat  x  //  y ]", at level 0).
+Reserved Notation "n %:Q" (at level 2, left associativity, format "n %:Q").
 
 Local Open Scope ring_scope.
 Local Notation sgr := Num.sg.
@@ -258,10 +264,34 @@ Qed.
 (* to "enough" constructors. This preserves the reduction on gound elements   *)
 (* while it suspends it when applied to at least one variable at the leaf of  *)
 (* the arithmetic operation.                                                  *)
-Definition addq_subdef (x y : int * int) := (x.1 * y.2 + y.1 * x.2, x.2 * y.2).
+(* Moreover we optimize addition when one or both arguments are integers,     *)
+(* in which case we presimplify the output, this shortens the size of the hnf *)
+(* of terms of the form N%:Q when N is a concrete natural number.             *)
+Definition addq_subdef (x y : int * int) :=
+  let: (x1, x2) := x in
+  let: (y1, y2) := y in
+  match x2, y2 with
+    | Posz 1, Posz 1   =>
+        match x1, y1 with
+        | Posz 0, _ => (y1, 1)
+        | _, Posz 0 => (x1, 1)
+        | Posz n, Posz 1 => (Posz n.+1, 1)
+        | Posz 1, Posz n => (Posz n.+1, 1)
+        | _, _ => (x1 + y1, 1)
+        end
+    | Posz 1, _  => (x1 * y2 + y1, y2)
+    | _, Posz 1  => (x1 + y1 * x2, x2)
+    | _, _       => (x1 * y2 + y1 * x2, x2 * y2)
+  end.
 Definition addq '(Rat x xP) '(Rat y yP) := fracq (addq_subdef x y).
 Lemma addq_def x y : addq x y = fracq (addq_subdef (valq x) (valq y)).
 Proof. by case: x; case: y. Qed.
+
+Lemma addq_subdefE x y : addq_subdef x y = (x.1 * y.2 + y.1 * x.2, x.2 * y.2).
+Proof.
+case: x y => [x1 [[|[|x2]]|x2]] [y1 [[|[|y2]]|y2]]/=; rewrite ?Monoid.simpm//.
+by case: x1 y1 => [[|[|m]]|m] [[|[|n]]|n]; rewrite ?Monoid.simpm// -PoszD addn1.
+Qed.
 
 Definition oppq_subdef (x : int * int) := (- x.1, x.2).
 Definition oppq '(Rat x xP) := fracq (oppq_subdef x).
@@ -269,11 +299,11 @@ Definition oppq_def x : oppq x = fracq (oppq_subdef (valq x)).
 Proof. by case: x. Qed.
 
 Fact addq_subdefC : commutative addq_subdef.
-Proof. by move=> x y; rewrite /addq_subdef addrC [_.2 * _]mulrC. Qed.
+Proof. by move=> x y; rewrite !addq_subdefE addrC [x.2 * _]mulrC. Qed.
 
 Fact addq_subdefA : associative addq_subdef.
 Proof.
-move=> x y z; rewrite /addq_subdef.
+move=> x y z; rewrite !addq_subdefE.
 by rewrite !mulrA !mulrDl addrA ![_ * x.2]mulrC !mulrA.
 Qed.
 
@@ -281,13 +311,13 @@ Fact addq_frac x y : x.2 != 0 -> y.2 != 0 ->
   (addq (fracq x) (fracq y)) = fracq (addq_subdef x y).
 Proof.
 case: fracqP => // u fx u_neq0 _; case: fracqP => // v fy v_neq0 _.
-rewrite addq_def /addq_subdef /=.
+rewrite addq_def !addq_subdefE /=.
 rewrite ![(_ * numq _) * _]mulrACA [(_ * denq _) * _]mulrACA.
 by rewrite [v * _]mulrC -mulrDr fracqMM ?mulf_neq0.
 Qed.
 
 Fact ratzD : {morph ratz : x y / x + y >-> addq x y}.
-Proof. by move=> x y /=; rewrite !ratz_frac /addq_subdef/= !mulr1. Qed.
+Proof. by move=> x y; rewrite !ratz_frac addq_frac// addq_subdefE/= !mulr1. Qed.
 
 Fact oppq_frac x : oppq (fracq x) = fracq (oppq_subdef x).
 Proof.
@@ -305,35 +335,48 @@ Proof. by move=> x y; rewrite !addq_def /= addq_subdefC. Qed.
 Fact addqA : associative addq.
 Proof.
 move=> x y z; rewrite -[x]valqK -[y]valqK -[z]valqK.
-by rewrite !addq_frac ?mulf_neq0 ?denq_neq0 // addq_subdefA.
+by rewrite ?addq_frac ?addq_subdefA// ?addq_subdefE ?mulf_neq0 ?denq_neq0.
 Qed.
 
 Fact add0q : left_id zeroq addq.
 Proof.
-move=> x; rewrite -[x]valqK addq_frac ?denq_neq0 // /addq_subdef /=.
+move=> x; rewrite -[x]valqK addq_frac ?denq_neq0 // !addq_subdefE /=.
 by rewrite mul0r add0r mulr1 mul1r -surjective_pairing.
 Qed.
 
 Fact addNq : left_inverse (fracq (0, 1)) oppq addq.
 Proof.
 move=> x; rewrite -[x]valqK !(addq_frac, oppq_frac) ?denq_neq0 //.
-rewrite /addq_subdef /oppq_subdef //= mulNr addNr; apply/eqP.
+rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
 by rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mul0r.
 Qed.
 
 Definition rat_ZmodMixin := ZmodMixin addqA addqC add0q addNq.
 Canonical rat_ZmodType := ZmodType rat rat_ZmodMixin.
 
-Definition mulq_subdef (x y : int * int) := (x.1 * y.1, x.2 * y.2).
+Definition mulq_subdef (x y : int * int) :=
+  let: (x1, x2) := x in
+  let: (y1, y2) := y in
+  match x2, y2 with
+    | Posz 1, Posz 1 => (x1 * y1, 1)
+    | Posz 1, _      => (x1 * y1, y2)
+    | _, Posz 1      => (x1 * y1, x2)
+    | _, _           => (x1 * y1, x2 * y2)
+  end.
 Definition mulq '(Rat x xP) '(Rat y yP) := fracq (mulq_subdef x y).
 Lemma mulq_def x y : mulq x y = fracq (mulq_subdef (valq x) (valq y)).
 Proof. by case: x; case: y. Qed.
 
+Lemma mulq_subdefE x y : mulq_subdef x y = (x.1 * y.1, x.2 * y.2).
+Proof.
+by case: x y => [x1 [[|[|x2]]|x2]] [y1 [[|[|y2]]|y2]]/=; rewrite ?Monoid.simpm.
+Qed.
+
 Fact mulq_subdefC : commutative mulq_subdef.
-Proof. by move=> x y; rewrite /mulq_subdef mulrC [_ * x.2]mulrC. Qed.
+Proof. by move=> x y; rewrite !mulq_subdefE mulrC [_ * x.2]mulrC. Qed.
 
 Fact mul_subdefA : associative mulq_subdef.
-Proof. by move=> x y z; rewrite /mulq_subdef !mulrA. Qed.
+Proof. by move=> x y z; rewrite !mulq_subdefE !mulrA. Qed.
 
 Definition invq_subdef (x : int * int) := (x.2, x.1).
 Definition invq '(Rat x xP) := fracq (invq_subdef x).
@@ -342,7 +385,7 @@ Proof. by case: x. Qed.
 
 Fact mulq_frac x y : (mulq (fracq x) (fracq y)) = fracq (mulq_subdef x y).
 Proof.
-rewrite mulq_def /mulq_subdef; case: (fracqP x) => /= [|u fx u_neq0].
+rewrite mulq_def !mulq_subdefE; case: (fracqP x) => /= [|u fx u_neq0].
   by rewrite !mul0r !mul1r fracq0 frac0q.
 case: (fracqP y) => /= [|v fy v_neq0].
   by rewrite !mulr0 !mulr1 fracq0 frac0q.
@@ -366,14 +409,14 @@ Qed.
 
 Fact mul1q : left_id oneq mulq.
 Proof.
-move=> x; rewrite -[x]valqK; rewrite mulq_frac /mulq_subdef.
+move=> x; rewrite -[x]valqK; rewrite mulq_frac !mulq_subdefE.
 by rewrite !mul1r -surjective_pairing.
 Qed.
 
 Fact mulq_addl : left_distributive mulq addq.
 Proof.
 move=> x y z; rewrite -[x]valqK -[y]valqK -[z]valqK /=.
-rewrite !(mulq_frac, addq_frac) ?mulf_neq0 ?denq_neq0 //=.
+rewrite !(mulq_frac, addq_frac, mulq_subdefE, addq_subdefE) ?mulf_neq0 ?denq_neq0 //=.
 apply/eqP; rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mulrDl; apply/eqP.
 by rewrite !mulrA ![_ * (valq z).1]mulrC !mulrA ![_ * (valq x).2]mulrC !mulrA.
 Qed.
@@ -388,7 +431,7 @@ Canonical rat_comRing := Eval hnf in ComRingType rat mulqC.
 Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
 rewrite -[x]valqK fracq_eq ?denq_neq0 //= mulr1 mul0r=> nx0.
-rewrite !(mulq_frac, invq_frac) ?denq_neq0 //.
+rewrite !(mulq_frac, invq_frac, mulq_subdefE) ?denq_neq0 //.
 by apply/eqP; rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= mulr1 mul1r mulrC.
 Qed.
 
@@ -421,8 +464,7 @@ rewrite -[x]valqK fracq_eq0; case: fracqP=> /= [|k {}x k0].
 by rewrite !mulf_eq0 (negPf k0) /= denq_eq0 orbF.
 Qed.
 
-Notation "n %:Q" := ((n : int)%:~R : rat)
-  (at level 2, left associativity, format "n %:Q")  : ring_scope.
+Notation "n %:Q" := ((n : int)%:~R : rat) : ring_scope.
 
 Hint Resolve denq_neq0 denq_gt0 denq_ge0 : core.
 
@@ -478,7 +520,7 @@ move: x => [m n] /=; apply/val_inj; rewrite val_fracq/=.
 case: eqVneq => //= [->|n_neq0]; first by rewrite rat0 invr0 mulr0.
 rewrite -[m%:Q]valqK -[n%:Q]valqK.
 rewrite [_^-1]invq_frac ?denq_neq0 ?numq_eq0 ?intq_eq0//=.
-rewrite [X in valq X]mulq_frac val_fracq /invq_subdef /mulq_subdef/=.
+rewrite [X in valq X]mulq_frac val_fracq /invq_subdef !mulq_subdefE/=.
 by rewrite -!/(numq _) -!/(denq _) !numq_int !denq_int mul1r mulr1 n_neq0.
 Qed.
 
@@ -573,7 +615,7 @@ have hxy: (0 <= numq x * denq y + numq y * denq x).
   by rewrite addr_ge0 ?mulr_ge0.
 rewrite [_ + _]addq_def /numq /= -!/(denq _) ?mulf_eq0 ?denq_eq0.
 rewrite val_fracq/=; case: ifP => //=.
-by rewrite !mulr_ge0// !le_gtF ?mulr_ge0 ?denq_ge0//=.
+by rewrite ?addq_subdefE !mulr_ge0// !le_gtF ?mulr_ge0 ?denq_ge0//=.
 Qed.
 
 Fact le_rat0M x y : le_rat 0 x -> le_rat 0 y -> le_rat 0 (x * y).
@@ -583,7 +625,7 @@ have hxy: (0 <= numq x * denq y + numq y * denq x).
   by rewrite addr_ge0 ?mulr_ge0.
 rewrite [_ * _]mulq_def /numq /= -!/(denq _) ?mulf_eq0 ?denq_eq0.
 rewrite val_fracq/=; case: ifP => //=.
-by rewrite !mulr_ge0// !le_gtF ?mulr_ge0 ?denq_ge0//=.
+by rewrite ?mulq_subdefE !mulr_ge0// !le_gtF ?mulr_ge0 ?denq_ge0//=.
 Qed.
 
 Fact le_rat0_anti x : le_rat 0 x -> le_rat x 0 -> x = 0.
@@ -899,3 +941,11 @@ by move=> p /eqP p_neq0; rat_to_ring; rewrite mulVf.
 Qed.
 
 Add Field rat_field : rat_field_theory.
+
+(* For debugging purposes we provide the parsable version *)
+Notation "[rat x // y ]" :=
+  (@Rat (x : int, y : int) (fracq_subproof (x : int, y : int)))
+  (only parsing) : ring_scope.
+
+(* Pretty printing or normal element of rat. *)
+Notation "[rat x // y ]" := (@Rat (x, y) _) (only printing) : ring_scope.
