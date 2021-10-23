@@ -28,7 +28,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Reserved Notation "[rat x // y ]" (format "[rat  x  //  y ]", at level 0).
+Reserved Notation "[ 'rat' x // y ]" (format "[ 'rat'  x  //  y ]", at level 0).
 Reserved Notation "n %:Q" (at level 2, left associativity, format "n %:Q").
 
 Local Open Scope ring_scope.
@@ -942,10 +942,9 @@ Qed.
 
 Add Field rat_field : rat_field_theory.
 
-(* For debugging purposes we provide the parsable version *)
-Notation "[rat x // y ]" :=
-  (@Rat (x : int, y : int) (fracq_subproof (x : int, y : int)))
-  (only parsing) : ring_scope.
-
 (* Pretty printing or normal element of rat. *)
-Notation "[rat x // y ]" := (@Rat (x, y) _) (only printing) : ring_scope.
+Notation "[ 'rat' x // y ]" := (@Rat (x, y) _) (only printing) : ring_scope.
+
+(* For debugging purposes we provide the parsable version *)
+Notation "[ 'rat' x // y ]" :=
+  (@Rat (x : int, y : int) (fracq_subproof (x : int, y : int))) : ring_scope.
