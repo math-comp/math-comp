@@ -632,7 +632,6 @@ Proof. exact/eqP/commgP/commuteV/commuteX. Qed.
 
 End GroupIdentities.
 
-#[global]
 Hint Rewrite mulg1 mul1g invg1 mulVg mulgV (@invgK) mulgK mulgKV
              invMg mulgA : gsimpl.
 
