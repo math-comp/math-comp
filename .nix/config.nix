@@ -38,8 +38,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       "fourcolor" "odd-order" "gaia"
     ];
     common-bundles = listToAttrs (forEach master (p:
-       { name = p; value.override.version = "master"; }))
-    // { mathcomp-ssreflect.main-job = true; };
+      { name = p; value.override.version = "master"; }))
+    // { mathcomp-ssreflect.main-job = true;
+         extructures.override.version = "#11";
+       };
   in {
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
