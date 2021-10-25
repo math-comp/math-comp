@@ -10,15 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- in `bigop.v`,
-  + added lemma `sumnB`.
-  + generalized lemma `partition_big`.
-  + added lemma `big_pmap`.
-- in `bigop.v`, added lemmas `sumnB` and `card_bseq`.
-- in `ssrbool.v`, added lemmas `neqPP`, `andPP`, `orPP`, and `implyPP`.
+- Added intro pattern ltac views for rewrite:
+  `/[1! rules]`, `/[! rules]`.
+ 
+- in `ssrbool.v`, added lemmas `negPP`, `andPP`, `orPP`, and `implyPP`.
 
-- in `bigop.v`, added lemma `sumnB`.
-- in `bigop.v`, added lemma `card_bseq`.
+- In `ssrnat.v`: new lemmas `fact_geq`, `leq_pfact`, `leq_fact`,
+  `ltn_pfact`, `uphalf_leq`, `uphalf_gt0`.
 
 - in `seq.v`,
   + new higher-order predicate `pairwise r xs` which asserts that the relation
@@ -38,21 +36,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new lemmas: `forall_cons`, `exists_cons`, `sub_map`, `eq_mem_map`,
     `eq_in_pmap`.
 
-- in `path.v`, new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
-  `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
+- in `path.v`,
+  + new lemmas: `sorted_pairwise(_in)`, `path_pairwise(_in)`,
+    `cycle_all2rel(_in)`, `pairwise_sort`, and `sort_pairwise_stable`.
   + new lemmas `cat_sorted2`, `path_le`, `take_path`, `take_sorted`,
     `drop_sorted`, `undup_path`, `undup_sorted`, `count_merge`,
     `eq_count_merge`
-
-- in `path.v`, new lemmas: `pairwise_sorted`, `path_relI`, `cycle_relI`,
-  `sorted_relI`, `eq(_in)_sorted`, `mergeA`, `all_merge`, and
-  `homo_sort_map(_in)`.
+  + new lemmas: `pairwise_sorted`, `path_relI`, `cycle_relI`,
+    `sorted_relI`, `eq(_in)_sorted`, `mergeA`, `all_merge`, and
+    `homo_sort_map(_in)`.
 
 - in `fintype.v`, new lemma `bij_eq_card`.
+
 - in `fingraph.v`, new lemmas: `connect_rev`, `sym_connect_sym`
 
-- in `tuple.v`, added Canonical tuple for sort.
-  + new lemma `val_tcast`
+- in `finset.v`, new lemmas: `bigcup0P`, `bigcup_disjointP`, `imset_cover`,
+  `cover1`, `trivIset1`, `trivIsetD`, `trivIsetU`, `coverD1`, `partition0`,
+  `partiton_neq0`, `partition_trivIset`, `partitionS`, `partitionD1`,
+  `partitionU1`, `partition_set0`, `partition_pigeonhole`, `indexed_partition`,
+  `imset_inj`, `imset_disjoint`, `imset_trivIset`, `imset0mem`,
+  `imset_partition`.
 
 - in `tuple.v`, added type of bounded sequences `n.-bseq T` and its
   theory, i.e.
@@ -74,8 +77,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `widen_bseq_in_bseq`, `bseq0`, `membsE`, `bseq_tagged_tupleK`,
     `tagged_tuple_bseqK`,`bseq_tagged_tuple_bij`, and
     `tagged_tuple_bseq_bij`.
+  + added Canonical tuple for sort.
+  + new lemma `val_tcast`
 
-- in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
+- in `bigop.v`,
+  + generalized lemma `partition_big`.
+  + new lemmas `big_pmap`, `sumnB`, `card_bseq`, `big_nat_widenl`,
+  `big_geq_mkord`, `big_bool`, `big_rev_mkord`, `big_nat_mul`
 
 - in `finset.v`, new lemmas: `bigcup0P`, `bigcup_disjointP`, `imset_cover`,
   `cover1`, `trivIset1`, `trivIsetD`, `trivIsetU`, `coverD1`, `partition0`,
@@ -85,6 +93,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `imset_partition`.
   + generalized `eq_preimset`, `eq_imset`, `eq_in_imset`, `eq_in_imset2` to
     predicates (not only {set T}).
+- in `interval.v`, new lemmas: `ge_pinfty`, `le_ninfty`, `gt_pinfty`, `lt_ninfty`.
 
 - in `order.v`
   + we provide a canonical total order on ordinals and lemmas
@@ -232,6 +241,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added intro pattern ltac views for rewrite:
   `/[1! rules]`, `/[! rules]`.
 
+  + we provide an equality of spaces `eqmx_col` between `\mxcol_i V_i`
+    and the sum of spaces `\sum_i <<V_ i>>)%MS`.
 
 - In `mxpoly.v`
   + developed the theory of diagonalization. To that
@@ -256,36 +267,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `codiagonalizableP`.
   + new lemmas ``row'_col'_char_poly_mx` and `char_block_diag_mx`
 
-- in `bigop.v`, added lemma `big_bool`.
-- In `ssrnat.v`:
-  + new lemmas `fact_geq`, `leq_pfact`, `leq_fact`, `ltn_pfact`, `uphalf_leq`,
-    `uphalf_gt0`.
-
-- In `binomial.v`:
-  + new lemma `fact_split`
-
-- In `bigop.v`:
-  + new lemma `big_rev_mkord`
-
-- In `ssrnum.v`:
-  + new lemmas `ltr_distlC`, `ler_distlC`, new definition `lter_distlC`
-
-- In `interval.v`:
-  + new lemmas `subset_itv`, `subset_itv_oo_cc`, `subset_itv_oo_oc`,
-    `subset_itv_oo_co`, `subset_itv_oc_cc`, `subset_itv_co_cc`,
-    `itvxx`, `itvxxP`
-- In `ssralg.v`:
+- In `ssralg.v`
+  + new lemma `fmorph_eq`
+  + Canonical additive, linear and rmorphism for `fst` and `snd`
+  + multi-rules `linearE`, `rmorphE`, and `raddfE`, for easier automatic
+    reasoning with linear functions, morphisms, and additive functions.
   + new lemma `eqr_div`
 
 - In `ssrnum.v`:
-  + new lemma `sqrtrV`
-- In `perm.v`:
-  + new lemma `perm_onV`, `porbitV`, `porbitsV`
-
-- In `ssrnum.v`:
   + lemma `normr_nneg`, declared a `Hint Resolve` in the `core` database
-- in `bigop.v`:
-  + Lemma `big_nat_mul`
+  + new lemmas `ltr_distlC`, `ler_distlC`, new definition `lter_distlC`
+  + new lemmas `sqrtrV`, `eqNr`
+
+- in `ssrint.v`,
+  + Lemmas: `mulr_absz`, `natr_absz`, `lez_abs`
+
+- In `intdiv.v`
+  + new definition `lcmz`
+  + new lemmas `dvdz_lcmr`, `dvdz_lcml`, `dvdz_lcm`, `lcmzC`, `lcm0z`,
+    `lcmz0`, `lcmz_ge0`, `lcmz_neq0`
+  + new lemma `lez_pdiv2r`
+
+- In `rat.v`
+  + new lemmas `minr_rat`, `maxr_rat`
+  + constants `fracq`, `oppq`, `addq`, `mulq`, `invq`, `normq`,
+    `le_rat`, and `lt_rat` are "locked" when applied to variables,
+    computation occurs only when applied to constructors. Moreover the
+    new definition of `fracq` ensures that if `x` and `y` of type
+    `int * int` represent the same rational then `fracq x` is
+    definitionally equal to `fracq y` (i.e. the underlying proofs are
+    the same). Additionally, `addq` and `mulq` are tuned to minimize
+    the number of integer arithmetic operations when the denominators
+    are equal to one.
+  + notation `[rat x // y]` for displaying the normal form of a
+    rational. We also provide the parsable notation for debugging
+    purposes.
+
+- In `binomial.v`: new lemma `fact_split`
+
+- In `interval.v`: new lemmas `subset_itv`, `subset_itv_oo_cc`,
+  `subset_itv_oo_oc`, `subset_itv_oo_co`, `subset_itv_oc_cc`,
+  `subset_itv_co_cc`, `itvxx`, `itvxxP`
+
+- In `perm.v`: new lemma `perm_onV`, `porbitV`, `porbitsV`
 
 - in `polydiv.v`
   + new lemma `coprimep_XsubC2`
