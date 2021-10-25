@@ -226,7 +226,7 @@ Pierre Roux, Reynald Affeldt, Yves Bertot
     `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
     `diagonalizableP`, `diagonalizable_conj_diag`, and
     `codiagonalizableP`.
-  + new lemmas ``row'_col'_char_poly_mx` and `char_block_diag_mx` 
+  + new lemmas `row'_col'_char_poly_mx` and `char_block_diag_mx` 
 
 - In `ssralg.v`
   + new lemma `fmorph_eq`
