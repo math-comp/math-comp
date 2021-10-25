@@ -835,6 +835,18 @@ Proof. by apply/colP=> j; rewrite !mxE; congr (A _ _); apply/val_inj. Qed.
 
 End CutPaste.
 
+Lemma row_thin_mx m n (A : 'M_(m,0)) (B : 'M_(m,n)) : row_mx A B = B.
+Proof.
+apply/matrixP=> i j; rewrite mxE; case: splitP=> [|k H]; first by case.
+by congr fun_of_matrix; exact: val_inj.
+Qed.
+
+Lemma col_flat_mx m n (A : 'M_(0,n)) (B : 'M_(m,n)) : col_mx A B = B.
+Proof.
+apply/matrixP=> i j; rewrite mxE; case: splitP => [|k H]; first by case.
+by congr fun_of_matrix; exact: val_inj.
+Qed.
+
 Lemma trmx_lsub m n1 n2 (A : 'M_(m, n1 + n2)) : (lsubmx A)^T = usubmx A^T.
 Proof. by split_mxE. Qed.
 
@@ -2013,6 +2025,9 @@ Proof. by rewrite [1%:M]scalar_mx_sum_delta -scaler_sumr scale1r. Qed.
 Lemma row1 i : row i 1%:M = delta_mx 0 i.
 Proof. by apply/rowP=> j; rewrite !mxE eq_sym. Qed.
 
+Lemma col1 i : col i 1%:M = delta_mx i 0.
+Proof. by apply/colP => j; rewrite !mxE eqxx andbT. Qed.
+
 Definition is_scalar_mx (A : 'M[R]_n) :=
   if insub 0%N is Some i then A == (A i i)%:M else true.
 
@@ -2136,6 +2151,12 @@ Lemma rowE m n i (A : 'M_(m, n)) : row i A = delta_mx 0 i *m A.
 Proof.
 apply/rowP=> j; rewrite !mxE (bigD1_ord i) //= mxE !eqxx mul1r.
 by rewrite big1 ?addr0 // => i'; rewrite mxE /= lift_eqF mul0r.
+Qed.
+
+Lemma colE m n i (A : 'M_(m, n)) : col i A = A *m delta_mx i 0.
+Proof.
+apply/colP=> j; rewrite !mxE (bigD1_ord i) //= mxE !eqxx mulr1.
+by rewrite big1 ?addr0 // => i'; rewrite mxE /= lift_eqF mulr0.
 Qed.
 
 Lemma mul_rVP m n A B :((@mulmx 1 m n)^~ A =1 mulmx^~ B) <-> (A = B).
@@ -2440,6 +2461,22 @@ Lemma mulmx_block m1 m2 n1 n2 p1 p2 (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
                (Adl *m Bul + Adr *m Bdl) (Adl *m Bur + Adr *m Bdr).
 Proof. by rewrite mul_col_mx !mul_row_block. Qed.
 
+Lemma mulmx_lsub m n p k (A : 'M_(m, n)) (B : 'M_(n, p + k)) :
+  A *m lsubmx B = lsubmx (A *m B).
+Proof. by rewrite !lsubmxEsub mulmx_colsub. Qed.
+
+Lemma mulmx_rsub m n p k (A : 'M_(m, n)) (B : 'M_(n, p + k)) :
+  A *m rsubmx B = rsubmx (A *m B).
+Proof. by rewrite !rsubmxEsub mulmx_colsub. Qed.
+
+Lemma mul_usub_mx m k n p (A : 'M_(m + k, n)) (B : 'M_(n, p)) :
+  usubmx A *m B = usubmx (A *m B).
+Proof. by rewrite !usubmxEsub mul_rowsub_mx. Qed.
+
+Lemma mul_dsub_mx m k n p (A : 'M_(m + k, n)) (B : 'M_(n, p)) :
+  dsubmx A *m B = dsubmx (A *m B).
+Proof. by rewrite !dsubmxEsub mul_rowsub_mx. Qed.
+
 (* Correspondence between matrices and linear function on row vectors. *)
 Section LinRowVector.
 
@@ -2628,6 +2665,14 @@ Lemma lift0_mx_is_perm s : is_perm_mx (lift0_mx (perm_mx s)).
 Proof. by rewrite lift0_mx_perm perm_mx_is_perm. Qed.
 
 End LiftPerm.
+
+Lemma exp_block_diag_mx m n (A: 'M_m.+1) (B : 'M_n.+1) k :
+  (block_mx A 0 0 B) ^+ k = block_mx (A ^+ k) 0 0 (B ^+ k).
+Proof.
+elim: k=> [|k IHk]; first by rewrite !expr0 -scalar_mx_block.
+rewrite !exprS IHk [LHS](mulmx_block A _ _ _ (A ^+ k)).
+by rewrite !mulmx0 !mul0mx !add0r !addr0.
+Qed.
 
 (* Determinants and adjugates are defined here, but most of their properties *)
 (* only hold for matrices over a commutative ring, so their theory is        *)
@@ -3353,6 +3398,22 @@ Qed.
 End MatrixInv.
 
 Prenex Implicits unitmx invmx invmxK.
+
+Lemma block_diag_mx_unit (R : comUnitRingType) n1 n2
+      (Aul : 'M[R]_n1) (Adr : 'M[R]_n2) :
+  (block_mx Aul 0 0 Adr \in unitmx) = (Aul \in unitmx) && (Adr \in unitmx).
+Proof. by rewrite !unitmxE det_ublock unitrM. Qed.
+
+Lemma invmx_block_diag (R : comUnitRingType) n1 n2
+     (Aul : 'M[R]_n1) (Adr : 'M[R]_n2) :
+  block_mx Aul 0 0 Adr \in unitmx ->
+  invmx (block_mx Aul 0 0 Adr) = block_mx (invmx Aul) 0 0 (invmx Adr).
+Proof.
+move=> /[dup] Aunit; rewrite block_diag_mx_unit => /andP[Aul_unit Adr_unit].
+rewrite -[LHS]mul1mx; apply: (canLR (mulmxK _)) => //.
+rewrite [RHS](mulmx_block (invmx Aul)) !(mulmx0, mul0mx, add0r, addr0).
+by rewrite !mulVmx// -?scalar_mx_block.
+Qed.
 
 Canonical matrix_countUnitRingType (R : countComUnitRingType) n :=
   [countUnitRingType of 'M[R]_n.+1].

@@ -1251,6 +1251,12 @@ Proof. by move=> x y; rewrite !mul1r. Qed.
 Lemma lregM x y : lreg x -> lreg y -> lreg (x * y).
 Proof. by move=> reg_x reg_y z t; rewrite -!mulrA => /reg_x/reg_y. Qed.
 
+Lemma lregMl (a b: R) : lreg (a * b) -> lreg b.
+Proof. by move=> rab c c' eq_bc; apply/rab; rewrite -!mulrA eq_bc. Qed.
+
+Lemma rregMr (a b: R) : rreg (a * b) -> rreg a.
+Proof. by move=> rab c c' eq_ca; apply/rab; rewrite !mulrA eq_ca. Qed.
+
 Lemma lregX x n : lreg x -> lreg (x ^+ n).
 Proof.
 by move=> reg_x; elim: n => [|n]; [apply: lreg1 | rewrite exprS; apply: lregM].

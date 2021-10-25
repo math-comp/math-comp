@@ -180,6 +180,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `mul_mxblock_mxdiag`, and `mul_mxdiag_mxblock`.
    + adding missing lemmas `trmx_conform` and `eq_castmx`.
 
+- in `matrix.v`,
+  + new lemmas `row_thin_mx`, `col_flat_mx`, `col1`, `colE`,
+    `mulmx_lsub`, `mulmx_rsub`, `mul_usub_mx`, `mul_dsub_mx`,
+    `exp_block_diag_mx`, `block_diag_mx_unit`, `invmx_block_diag`
+
 - in `mxalgegra.v`,
   + Lemmas about rank of block matrices with `0`s inside
     `rank_col_mx0`, `rank_col_0mx`, `rank_row_mx0`, `rank_row_0mx`,
@@ -197,6 +202,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + Canonical additive, linear and rmorphism for `fst` and `snd`
   + multi-rules `linearE`, `rmorphE`, and `raddfE`, for easier automatic
     reasoning with linear functions, morphisms, and additive functions.
+  + new lemmas `lregMl` and `rregMr`
 
 - In `rat.v`
   + new lemmas `minr_rat`, `maxr_rat`
@@ -225,26 +231,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/[1! rules]`, `/[! rules]`.
 
 
-- In `mxpoly.v`: developed the theory of diagonalization. To that
-  effect, we define `conjmx`, `restrictmx`, and notations `A ~_P B`,
-  `A ~_P {in S'}`, `A ~_{in S} B`, `A ~_{in S} {in S'}`,
-  `all_simmx_in`, `diagonalizable_for`, `diagonalizable_in`,
-  `diagonalizable`, `codiagonalizable_in`, and `codiagonalizable`; and
-  their theory: `stablemx_comp`, `stablemx_restrict`, `conjmxM`,
-  `conjMmx`, `conjuMmx`, `conjMumx`, `conjuMumx`, `conjmx_scalar`,
-  `conj0mx`, `conjmx0`, `conjumx`, `conj1mx`, `conjVmx`, `conjmxK`,
-  `conjmxVK`, `horner_mx_conj`, `horner_mx_uconj`, `horner_mx_uconjC`,
-  `mxminpoly_conj`, `mxminpoly_uconj`, `sub_kermxpoly_conjmx`,
-  `sub_eigenspace_conjmx`, `eigenpoly_conjmx`, `eigenvalue_conjmx`,
-  `conjmx_eigenvalue`, `simmxPp`, `simmxW`, `simmxP`, `simmxRL`,
-  `simmxLR`, `simmx_minpoly`, `diagonalizable_for_row_base`,
-  `diagonalizable_forPp`, `diagonalizable_forP`,
-  `diagonalizable_forPex`, `diagonalizable_forLR`,
-  `diagonalizable_for_mxminpoly`, `diagonalizable_for_sum`,
-  `codiagonalizable1`, `codiagonalizable_on`, `diagonalizable_diag`,
-  `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
-  `diagonalizableP`, `diagonalizable_conj_diag`, and
-  `codiagonalizableP`.
+- In `mxpoly.v`
+  + developed the theory of diagonalization. To that
+    effect, we define `conjmx`, `restrictmx`, and notations `A ~_P B`,
+    `A ~_P {in S'}`, `A ~_{in S} B`, `A ~_{in S} {in S'}`,
+    `all_simmx_in`, `diagonalizable_for`, `diagonalizable_in`,
+    `diagonalizable`, `codiagonalizable_in`, and `codiagonalizable`; and
+    their theory: `stablemx_comp`, `stablemx_restrict`, `conjmxM`,
+    `conjMmx`, `conjuMmx`, `conjMumx`, `conjuMumx`, `conjmx_scalar`,
+    `conj0mx`, `conjmx0`, `conjumx`, `conj1mx`, `conjVmx`, `conjmxK`,
+    `conjmxVK`, `horner_mx_conj`, `horner_mx_uconj`, `horner_mx_uconjC`,
+    `mxminpoly_conj`, `mxminpoly_uconj`, `sub_kermxpoly_conjmx`,
+    `sub_eigenspace_conjmx`, `eigenpoly_conjmx`, `eigenvalue_conjmx`,
+    `conjmx_eigenvalue`, `simmxPp`, `simmxW`, `simmxP`, `simmxRL`,
+    `simmxLR`, `simmx_minpoly`, `diagonalizable_for_row_base`,
+    `diagonalizable_forPp`, `diagonalizable_forP`,
+    `diagonalizable_forPex`, `diagonalizable_forLR`,
+    `diagonalizable_for_mxminpoly`, `diagonalizable_for_sum`,
+    `codiagonalizable1`, `codiagonalizable_on`, `diagonalizable_diag`,
+    `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
+    `diagonalizableP`, `diagonalizable_conj_diag`, and
+    `codiagonalizableP`.
+  + new lemmas ``row'_col'_char_poly_mx` and `char_block_diag_mx`
 
 - in `bigop.v`, added lemma `big_bool`.
 - In `ssrnat.v`:
@@ -276,6 +284,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `normr_nneg`, declared a `Hint Resolve` in the `core` database
 - in `bigop.v`:
   + Lemma `big_nat_mul`
+
+- in `polydiv.v`
+  + new lemma `coprimep_XsubC2`
+
+- in `poly.v`
+  + new lemmas `monic_lreg` and `monic_rreg`
 
 ### Changed
 
