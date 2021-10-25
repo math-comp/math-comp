@@ -1,61 +1,4 @@
 jobs:
-  QuickChick:
-    needs:
-    - coq
-    - mathcomp-ssreflect
-    runs-on: ubuntu-latest
-    steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ env.tested_ref }}
-    - name: Cachix install
-      uses: cachix/install-nix-action@v12
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
-    - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
-      with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        name: math-comp
-    - id: stepCheck
-      name: Checking presence of CI target QuickChick
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"QuickChick\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\")\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "mathcomp-ssreflect"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq-ext-lib'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "coq-ext-lib"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: simple-io'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "simple-io"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "QuickChick"
   Verdi:
     needs:
     - coq
@@ -90,28 +33,28 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target Verdi
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"Verdi\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"Verdi\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: Cheerios'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "Cheerios"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: InfSeqExt'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "InfSeqExt"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "Verdi"
   addition-chains:
     needs:
@@ -148,28 +91,28 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target addition-chains
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"addition-chains\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"addition-chains\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: paramcoq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "paramcoq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "addition-chains"
   autosubst:
     needs:
@@ -205,74 +148,21 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target autosubst
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"autosubst\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"autosubst\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "autosubst"
-  category-theory:
-    needs:
-    - coq
-    - mathcomp-ssreflect
-    runs-on: ubuntu-latest
-    steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ env.tested_ref }}
-    - name: Cachix install
-      uses: cachix/install-nix-action@v12
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
-    - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
-      with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        name: math-comp
-    - id: stepCheck
-      name: Checking presence of CI target category-theory
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"category-theory\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\")\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "mathcomp-ssreflect"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: equations'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "equations"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "category-theory"
   coq:
     needs: []
     runs-on: ubuntu-latest
@@ -305,12 +195,12 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target coq
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"coq\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"coq\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
   coq-bits:
     needs:
@@ -346,20 +236,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target coq-bits
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"coq-bits\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"coq-bits\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq-bits"
   coqeal:
     needs:
@@ -396,32 +286,32 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target coqeal
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"coqeal\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"coqeal\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: bignums'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "bignums"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: paramcoq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "paramcoq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: multinomials'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "multinomials"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coqeal"
   coquelicot:
     needs:
@@ -457,20 +347,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target coquelicot
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"coquelicot\" \\\n   --dry-run 2>&1 >\
+        \ bundle \"coq-8.14\" --argstr job \"coquelicot\" \\\n   --dry-run 2>&1 >\
         \ /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coquelicot"
   deriving:
     needs:
@@ -506,20 +396,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target deriving
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"deriving\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"deriving\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "deriving"
   extructures:
     needs:
@@ -556,24 +446,24 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target extructures
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"extructures\" \\\n   --dry-run 2>&1 >\
+        \ bundle \"coq-8.14\" --argstr job \"extructures\" \\\n   --dry-run 2>&1 >\
         \ /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: deriving'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "deriving"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "extructures"
   fourcolor:
     needs:
@@ -609,20 +499,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target fourcolor
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"fourcolor\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"fourcolor\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "fourcolor"
   gaia:
     needs:
@@ -659,24 +549,24 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target gaia
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"gaia\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"gaia\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "gaia"
   gaia-hydras:
     needs:
@@ -712,83 +602,25 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target gaia-hydras
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"gaia-hydras\" \\\n   --dry-run 2>&1 >\
+        \ bundle \"coq-8.14\" --argstr job \"gaia-hydras\" \\\n   --dry-run 2>&1 >\
         \ /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: hydra-battles'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "hydra-battles"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: gaia'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "gaia"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "gaia-hydras"
-  graph-theory:
-    needs:
-    - coq
-    - mathcomp-algebra
-    - mathcomp-finmap
-    runs-on: ubuntu-latest
-    steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ env.tested_ref }}
-    - name: Cachix install
-      uses: cachix/install-nix-action@v12
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
-    - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
-      with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        name: math-comp
-    - id: stepCheck
-      name: Checking presence of CI target graph-theory
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"graph-theory\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\")\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "mathcomp-algebra"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-finmap'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "mathcomp-finmap"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: hierarchy-builder'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "hierarchy-builder"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "graph-theory"
   interval:
     needs:
     - coq
@@ -823,28 +655,28 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target interval
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"interval\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"interval\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: bignums'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "bignums"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coquelicot'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coquelicot"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: flocq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "flocq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "interval"
   mathcomp:
     needs:
@@ -885,40 +717,40 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-fingroup'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-solvable'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-solvable"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-field'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-field"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-character'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-character"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp"
   mathcomp-abel:
     needs:
@@ -955,24 +787,24 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-abel
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-abel\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-abel\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-field'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-field"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-real-closed'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-real-closed"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-abel"
   mathcomp-algebra:
     needs:
@@ -1009,24 +841,24 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-algebra
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-algebra\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-algebra\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-fingroup'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
   mathcomp-analysis:
     needs:
@@ -1066,40 +898,36 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-analysis
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-analysis\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-analysis\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-field'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-field"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-finmap'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-finmap"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-bigenough'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-bigenough"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-real-closed'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-real-closed"
     - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: hierarchy-builder'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "hierarchy-builder"
-    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-analysis"
   mathcomp-bigenough:
     needs:
@@ -1135,20 +963,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-bigenough
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-bigenough\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-bigenough\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-bigenough"
   mathcomp-character:
     needs:
@@ -1188,36 +1016,36 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-character
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-character\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-character\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-fingroup'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-solvable'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-solvable"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-field'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-field"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-character"
   mathcomp-field:
     needs:
@@ -1256,32 +1084,32 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-field
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-field\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-field\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-fingroup'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-solvable'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-solvable"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-field"
   mathcomp-fingroup:
     needs:
@@ -1317,20 +1145,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-fingroup
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-fingroup\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-fingroup\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-fingroup"
   mathcomp-finmap:
     needs:
@@ -1366,20 +1194,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-finmap
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-finmap\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-finmap\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-finmap"
   mathcomp-real-closed:
     needs:
@@ -1417,28 +1245,28 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-real-closed
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-real-closed\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-real-closed\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-field'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-field"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-bigenough'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-bigenough"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-real-closed"
   mathcomp-single:
     needs:
@@ -1473,16 +1301,16 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-single
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-single\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-single\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-single"
   mathcomp-solvable:
     needs:
@@ -1520,28 +1348,28 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-solvable
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-solvable\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-solvable\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-fingroup'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-solvable"
   mathcomp-ssreflect:
     needs:
@@ -1576,16 +1404,16 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target mathcomp-ssreflect
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"mathcomp-ssreflect\" \\\n   --dry-run\
+        \ bundle \"coq-8.14\" --argstr job \"mathcomp-ssreflect\" \\\n   --dry-run\
         \ 2>&1 > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep\
         \ \"built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
   multinomials:
     needs:
@@ -1624,32 +1452,32 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target multinomials
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"multinomials\" \\\n   --dry-run 2>&1\
+        \ bundle \"coq-8.14\" --argstr job \"multinomials\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
         built:\" | sed \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-finmap'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-finmap"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-bigenough'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-bigenough"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "multinomials"
   odd-order:
     needs:
@@ -1685,20 +1513,20 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target odd-order
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"odd-order\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"odd-order\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-character'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-character"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "odd-order"
   reglang:
     needs:
@@ -1734,75 +1562,22 @@ jobs:
     - id: stepCheck
       name: Checking presence of CI target reglang
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"reglang\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        \ bundle \"coq-8.14\" --argstr job \"reglang\" \\\n   --dry-run 2>&1 > /dev/null)\n\
         echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
         \ \"s/.*/built/\")\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "reglang"
-  relation-algebra:
-    needs:
-    - coq
-    - mathcomp-ssreflect
-    runs-on: ubuntu-latest
-    steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ env.tested_ref }}
-    - name: Cachix install
-      uses: cachix/install-nix-action@v12
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
-    - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
-      with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        name: math-comp
-    - id: stepCheck
-      name: Checking presence of CI target relation-algebra
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.13\" --argstr job \"relation-algebra\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\")\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: aac-tactics'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "aac-tactics"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "mathcomp-ssreflect"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.13"
-        --argstr job "relation-algebra"
-name: Nix CI for bundle coq-8.13
+name: Nix CI for bundle coq-8.14
 'on':
   pull_request:
     paths:
