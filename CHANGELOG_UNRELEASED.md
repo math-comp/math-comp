@@ -50,12 +50,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `fingraph.v`, new lemmas: `connect_rev`, `sym_connect_sym`
 
-- in `finset.v`, new lemmas: `bigcup0P`, `bigcup_disjointP`, `imset_cover`,
-  `cover1`, `trivIset1`, `trivIsetD`, `trivIsetU`, `coverD1`, `partition0`,
-  `partiton_neq0`, `partition_trivIset`, `partitionS`, `partitionD1`,
-  `partitionU1`, `partition_set0`, `partition_pigeonhole`, `indexed_partition`,
-  `imset_inj`, `imset_disjoint`, `imset_trivIset`, `imset0mem`,
-  `imset_partition`.
+- in `finset.v`,
+  + new lemmas: `bigcup0P`, `bigcup_disjointP`, `imset_cover`,
+    `cover1`, `trivIset1`, `trivIsetD`, `trivIsetU`, `coverD1`,
+    `partition0`, `partiton_neq0`, `partition_trivIset`, `partitionS`,
+    `partitionD1`, `partitionU1`, `partition_set0`,
+    `partition_pigeonhole`, `indexed_partition`, `imset_inj`,
+    `imset_disjoint`, `imset_trivIset`, `imset0mem`,
+    `imset_partition`.
+  + generalized `eq_preimset`, `eq_imset`, `eq_in_imset`, `eq_in_imset2` to
+    predicates (not only {set T}).
 
 - in `tuple.v`, added type of bounded sequences `n.-bseq T` and its
   theory, i.e.
@@ -153,9 +157,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `join` and proofs that those are respectvely the greatest lower bound and
     the least upper bound.
 
-- in `matrix.v`, seven new definitions:
-  + `mxblock`, `mxcol`, `mxrow` and `mxdiag` with notations
-    `\mxblock_(i < m, j < n) B_ i j`, `\mxcol_(i < m) B_ i`,
+- in `matrix.v`, 
+  + seven new definitions: `mxblock`, `mxcol`, `mxrow` and `mxdiag` with
+    notations `\mxblock_(i < m, j < n) B_ i j`, `\mxcol_(i < m) B_ i`,
     `\mxrow_(j < n) B_ j`, and `\mxdiag_(i < n) B_ i` (and variants
     without explicit `< n`), to form big matrices described by blocks.
   + `submxblock`, `submxcol` and `submxrow` to extract blocks from the
@@ -196,6 +200,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `mulmx_lsub`, `mulmx_rsub`, `mul_usub_mx`, `mul_dsub_mx`,
     `exp_block_diag_mx`, `block_diag_mx_unit`, `invmx_block_diag`
 
+   + new lemmas: `row_thin_mx`, `col_flat_mx`, `col1`, `colE`,
+    `mulmx_lsub`, `mulmx_rsub`, `mul_usub_mx`, `mul_dsub_mx`,
+    `exp_block_diag_mx`, `block_diag_mx_unit`, `invmx_block_diag`
+    
 - in `mxalgegra.v`,
   + Lemmas about rank of block matrices with `0`s inside
     `rank_col_mx0`, `rank_col_0mx`, `rank_row_mx0`, `rank_row_0mx`,
@@ -266,6 +274,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `diagonalizableP`, `diagonalizable_conj_diag`, and
     `codiagonalizableP`.
   + new lemmas ``row'_col'_char_poly_mx` and `char_block_diag_mx`
+  + new lemmas ``row'_col'_char_poly_mx` and `char_block_diag_mx` 
 
 - In `ssralg.v`
   + new lemma `fmorph_eq`
@@ -273,20 +282,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + multi-rules `linearE`, `rmorphE`, and `raddfE`, for easier automatic
     reasoning with linear functions, morphisms, and additive functions.
   + new lemma `eqr_div`
+  + new lemmas `lregMl` and `rregMr`
 
 - In `ssrnum.v`:
-  + lemma `normr_nneg`, declared a `Hint Resolve` in the `core` database
   + new lemmas `ltr_distlC`, `ler_distlC`, new definition `lter_distlC`
   + new lemmas `sqrtrV`, `eqNr`
 
-- in `ssrint.v`,
-  + Lemmas: `mulr_absz`, `natr_absz`, `lez_abs`
+- in `ssrint.v`, new lemmas `mulr_absz`, `natr_absz`, `lez_abs`
 
 - In `intdiv.v`
   + new definition `lcmz`
   + new lemmas `dvdz_lcmr`, `dvdz_lcml`, `dvdz_lcm`, `lcmzC`, `lcm0z`,
     `lcmz0`, `lcmz_ge0`, `lcmz_neq0`
   + new lemma `lez_pdiv2r`
+
+- in `polydiv.v`, new lemma `coprimep_XsubC2`
+
+- in `poly.v`, new lemmas `monic_lreg` and `monic_rreg`
 
 - In `rat.v`
   + new lemmas `minr_rat`, `maxr_rat`
@@ -318,6 +330,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + new lemmas `monic_lreg` and `monic_rreg`
 
 ### Changed
+
+- In `ssrnum.v`, lemma `normr_nneg`, declared a `Hint Resolve` in the
+  `core` database
 
 - In `ssralg.v` and `ssrint.v`, the nullary ring notations `-%R`, `+%R`, `*%R`,
   `*:%R`, and `*~%R` are now declared in `fun_scope`.
