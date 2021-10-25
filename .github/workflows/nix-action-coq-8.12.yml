@@ -5,30 +5,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target QuickChick
@@ -62,30 +59,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target Verdi
@@ -120,30 +114,27 @@ jobs:
     - mathcomp-algebra
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target addition-chains
@@ -177,30 +168,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target autosubst
@@ -226,30 +214,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target category-theory
@@ -277,30 +262,27 @@ jobs:
     needs: []
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coq
@@ -318,30 +300,27 @@ jobs:
     - mathcomp-algebra
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coq-bits
@@ -368,30 +347,27 @@ jobs:
     - multinomials
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coqeal
@@ -429,30 +405,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coquelicot
@@ -472,36 +445,125 @@ jobs:
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
         --argstr job "coquelicot"
+  deriving:
+    needs:
+    - coq
+    - mathcomp-ssreflect
+    runs-on: ubuntu-latest
+    steps:
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ env.tested_commit }}
+    - name: Cachix install
+      uses: cachix/install-nix-action@v14
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+    - name: Cachix setup math-comp
+      uses: cachix/cachix-action@v10
+      with:
+        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
+        name: math-comp
+    - id: stepCheck
+      name: Checking presence of CI target deriving
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
+        \ bundle \"coq-8.12\" --argstr job \"deriving\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+        echo ::set-output name=status::$(echo $nb_dry_run | grep \"built:\" | sed\
+        \ \"s/.*/built/\")\n"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: coq'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
+        --argstr job "coq"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
+        --argstr job "mathcomp-ssreflect"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: Building/fetching current CI target
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
+        --argstr job "deriving"
+  extructures:
+    needs:
+    - coq
+    - mathcomp-ssreflect
+    runs-on: ubuntu-latest
+    steps:
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ env.tested_commit }}
+    - name: Cachix install
+      uses: cachix/install-nix-action@v14
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+    - name: Cachix setup math-comp
+      uses: cachix/cachix-action@v10
+      with:
+        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
+        name: math-comp
+    - id: stepCheck
+      name: Checking presence of CI target extructures
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
+        \ bundle \"coq-8.12\" --argstr job \"extructures\" \\\n   --dry-run 2>&1 >\
+        \ /dev/null)\necho ::set-output name=status::$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\")\n"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: coq'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
+        --argstr job "coq"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
+        --argstr job "mathcomp-ssreflect"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: Building/fetching current CI target
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.12"
+        --argstr job "extructures"
   fourcolor:
     needs:
     - coq
     - mathcomp-algebra
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target fourcolor
@@ -528,30 +590,27 @@ jobs:
     - mathcomp-algebra
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target gaia
@@ -581,30 +640,27 @@ jobs:
     - coquelicot
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target interval
@@ -643,30 +699,27 @@ jobs:
     - mathcomp-character
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp
@@ -713,30 +766,27 @@ jobs:
     - mathcomp-real-closed
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-abel
@@ -767,30 +817,27 @@ jobs:
     - mathcomp-fingroup
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-algebra
@@ -824,30 +871,27 @@ jobs:
     - mathcomp-real-closed
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-analysis
@@ -893,30 +937,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-bigenough
@@ -946,30 +987,27 @@ jobs:
     - mathcomp-field
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-character
@@ -1014,30 +1052,27 @@ jobs:
     - mathcomp-solvable
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-field
@@ -1075,30 +1110,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-fingroup
@@ -1124,30 +1156,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-finmap
@@ -1175,30 +1204,27 @@ jobs:
     - mathcomp-bigenough
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-real-closed
@@ -1231,30 +1257,27 @@ jobs:
     - coq
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-single
@@ -1278,30 +1301,27 @@ jobs:
     - mathcomp-algebra
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-solvable
@@ -1334,30 +1354,27 @@ jobs:
     - coq
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-ssreflect
@@ -1382,30 +1399,27 @@ jobs:
     - mathcomp-bigenough
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target multinomials
@@ -1443,30 +1457,27 @@ jobs:
     - mathcomp-character
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target odd-order
@@ -1492,30 +1503,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target reglang
@@ -1541,30 +1549,27 @@ jobs:
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
-    - name: Determine which ref to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_ref=${{\
-        \ github.ref }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
         \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/head\" >> $GITHUB_ENV\n  else\n    echo \"tested_ref=refs/pull/${{\
-        \ github.event.number }}/merge\" >> $GITHUB_ENV\n  fi\nfi\n"
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ref: ${{ env.tested_ref }}
+        ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v8
-      with:
-        name: coq
     - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v8
+      uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target relation-algebra
