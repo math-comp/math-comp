@@ -83,6 +83,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `partitionU1`, `partition_set0`, `partition_pigeonhole`, `indexed_partition`,
   `imset_inj`, `imset_disjoint`, `imset_trivIset`, `imset0mem`,
   `imset_partition`.
+  + generalized `eq_preimset`, `eq_imset`, `eq_in_imset`, `eq_in_imset2` to
+    predicates (not only {set T}).
 
 - in `order.v`
   + we provide a canonical total order on ordinals and lemmas
