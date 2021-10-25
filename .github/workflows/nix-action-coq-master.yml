@@ -19,11 +19,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -61,11 +59,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -114,11 +110,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -163,11 +157,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -213,11 +205,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -271,11 +261,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -341,11 +329,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -395,11 +381,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -452,11 +436,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -517,11 +499,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -570,11 +550,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -638,11 +616,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -699,11 +675,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -748,11 +722,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -799,11 +771,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -855,11 +825,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -902,11 +870,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -958,11 +924,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -1006,11 +970,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -1067,11 +1029,9 @@ jobs:
       uses: cachix/install-nix-action@v14
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup coq
-      uses: cachix/cachix-action@v10
-      with:
-        name: coq
-    - name: Cachix setup math-comp
+    - extraPullNames:
+      - coq
+      name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
