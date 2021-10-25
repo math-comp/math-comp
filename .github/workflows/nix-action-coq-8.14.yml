@@ -23,6 +23,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -79,6 +80,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -134,6 +136,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -179,6 +182,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -218,6 +222,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -266,6 +271,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -325,6 +331,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -372,6 +379,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -419,6 +427,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -466,6 +475,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -514,6 +524,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -565,6 +576,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -616,6 +628,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -676,6 +689,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -744,6 +758,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -796,6 +811,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -851,6 +867,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -914,6 +931,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -965,6 +983,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1031,6 +1050,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1090,6 +1110,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1137,6 +1158,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1186,6 +1208,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1240,6 +1263,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1285,6 +1309,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1339,6 +1364,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1385,6 +1411,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1444,6 +1471,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:
@@ -1491,6 +1519,7 @@ jobs:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - extraPullNames:
       - coq
+      - coq-community
       name: Cachix setup math-comp
       uses: cachix/cachix-action@v10
       with:

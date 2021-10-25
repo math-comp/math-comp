@@ -18,6 +18,7 @@ with builtins; with (import <nixpkgs> {}).lib;
   coqproject = "mathcomp/_CoqProject";
 
   cachix.coq = {};
+  cachix.coq-community = {};
   cachix.math-comp.authToken = "CACHIX_AUTH_TOKEN";
 
   ## select an entry to build in the following `bundles` set
