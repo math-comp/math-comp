@@ -75,6 +75,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `order.v`
   + notation `f \min g` and `f \max g` for definitions `min_fun` and `max_fun`
+- in `ssrnum.v`,
+  + added lemmas `mulCii`, `ReE`, `ImE`, `conjCN1`, `CrealJ`, `eqCP`,
+    `eqC`, `ImM`, `ImMil`, `ReMil`, `ImMir`, `ReMir`, `ReM`,
+    `invC_Crect`, `ImV`, `ReV`, `rectC_mulr`, `rectC_mull`,
+    `divC_Crect`, `divC_rect`, `Im_div`, `Re_div`.
+  + adding resolution of `'Re x \in Num.real` and `'Im x \in Num.real`
+    as in `Hint Extern` to `core` database.
+
+- in `ssrbool.v`, added `homo_mono1`.
 
 ### Changed
 
@@ -103,6 +112,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `gproduct.v`
   + put notations `G ><| H`, `G \* H` and `G \x H` in `group_scope`
+- in `ssrnum.v`
+  + locked definitions `Re` and `Im`.
 
 ### Renamed
 

@@ -977,8 +977,8 @@ rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (ler_add2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
 rewrite (mono_leif (ler_pmul2r _)) ?ltr0n //.
 have:= leif_trans (leif_Re_Creal '[phi, psi]) (cfCauchySchwarz_sqrt phi psi).
-congr (_ <= _ ?= iff _); apply: andb_id2r.
-rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC.
+congr (_ <= _ ?= iff _); first by rewrite ReE.
+apply: andb_id2r; rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC /=.
 have [-> | nz_psi] := eqVneq psi 0; first by rewrite cfdot0r coord0.
 case/vlineP=> [x ->]; rewrite cfdotZl linearZ pmulr_lge0 ?cfnorm_gt0 //=.
 by rewrite (coord_free 0) ?seq1_free // eqxx mulr1.
