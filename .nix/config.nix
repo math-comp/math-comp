@@ -18,11 +18,12 @@ with builtins; with (import <nixpkgs> {}).lib;
   coqproject = "mathcomp/_CoqProject";
 
   cachix.coq = {};
+  cachix.coq-community = {};
   cachix.math-comp.authToken = "CACHIX_AUTH_TOKEN";
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.13";
+  default-bundle = "coq-8.14";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -33,22 +34,34 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
-      "mathcomp-finmap" "mathcomp-bigenough" "mathcomp-analysis"
+      "mathcomp-finmap" "mathcomp-bigenough"
       "mathcomp-abel" "multinomials" "mathcomp-real-closed" "coqeal"
-      "fourcolor" "odd-order" "gaia"
+      "fourcolor" "odd-order" "gaia" "deriving" "mathcomp-zify"
+      "extructures"
     ];
     common-bundles = listToAttrs (forEach master (p:
-       { name = p; value.override.version = "master"; }))
+      { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true; };
   in {
+    "coq-master".coqPackages = common-bundles // {
+      coq.override.version = "master";
+      bignums.override.version = "master";
+      paramcoq.override.version = "master";
+    };
+    "coq-8.14".coqPackages = common-bundles // {
+      coq.override.version = "8.14";
+    };
     "coq-8.13".coqPackages = common-bundles // {
       coq.override.version = "8.13";
+      mathcomp-analysis.override.version = "master";
     };
     "coq-8.12".coqPackages = common-bundles // {
       coq.override.version = "8.12";
+      mathcomp-analysis.override.version = "master";
     };
     "coq-8.11".coqPackages = common-bundles // {
       coq.override.version = "8.11";
+      mathcomp-analysis.override.version = "master";
     };
   };
 }
