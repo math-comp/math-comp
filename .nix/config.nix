@@ -41,7 +41,9 @@ with builtins; with (import <nixpkgs> {}).lib;
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
-    // { mathcomp-ssreflect.main-job = true; };
+    // { mathcomp-ssreflect.main-job = true; 
+         mathcomp-doc.job = true;
+       };
   in {
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
