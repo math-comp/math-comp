@@ -1,11 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[1.13.0] - 2021-10-25](#1130---2021-10-25), [[1.12.0] - 2020-11-26](#1120---2020-11-26), and [[1.11.0] - 2020-06-09](#1110---2020-06-09).
+Last releases: [[1.13.0] - 2021-10-28](#1130---2021-10-28), [[1.12.0] - 2020-11-26](#1120---2020-11-26), and [[1.11.0] - 2020-06-09](#1110---2020-06-09).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.13.0] - 2021-10-25
+## [1.13.0] - 2021-10-28
 
 This release is compatible with Coq versions 8.11, 8.12, 8.13, and 8.14.
 
