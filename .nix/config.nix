@@ -37,7 +37,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-finmap" "mathcomp-bigenough"
       "mathcomp-abel" "multinomials" "mathcomp-real-closed" "coqeal"
       "fourcolor" "odd-order" "gaia" "deriving" "mathcomp-zify"
-      "extructures"
+      "extructures" "mathcomp-analysis"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
@@ -49,21 +49,21 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "master";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
+      mathcomp-analysis.job = false;
     };
     "coq-8.14".coqPackages = common-bundles // {
       coq.override.version = "8.14";
     };
     "coq-8.13".coqPackages = common-bundles // {
       coq.override.version = "8.13";
-      mathcomp-analysis.override.version = "master";
     };
     "coq-8.12".coqPackages = common-bundles // {
       coq.override.version = "8.12";
-      mathcomp-analysis.override.version = "master";
+      mathcomp-zify.job = false;
     };
     "coq-8.11".coqPackages = common-bundles // {
       coq.override.version = "8.11";
-      mathcomp-analysis.override.version = "master";
+      mathcomp-zify.job = false;
     };
   };
 }
