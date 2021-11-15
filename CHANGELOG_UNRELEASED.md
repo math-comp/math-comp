@@ -31,6 +31,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     read as `(-12)%:~R`
 
 - in `bigop.v`, added lemmas `telescope_big`, `telescope_sumn` and `telescope_sumn_in`
+- in `seq.v`, added statement `size_take_min`.
+- in `bigop.v`:
+  + `leq_bigmax_seq`, `bigmax_leqP_seq`, `bigmax_sup_seq`
 
 ### Changed
 

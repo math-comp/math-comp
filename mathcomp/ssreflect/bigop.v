@@ -2018,9 +2018,18 @@ Lemma prodn_gt0 I r (P : pred I) F :
   (forall i, 0 < F i) -> 0 < \prod_(i <- r | P i) F i.
 Proof. by move=> Fpos; apply: prodn_cond_gt0. Qed.
 
+Lemma leq_bigmax_seq (I : eqType) r (P : pred I) F i0 :
+  i0 \in r -> P i0 -> F i0 <= \max_(i <- r | P i) F i.
+Proof.
+move=> + Pi0; elim: r => // h t ih; rewrite inE big_cons.
+move=> /predU1P[<-|i0t]; first by rewrite Pi0 leq_maxl.
+by case: ifPn => Ph; [rewrite leq_max ih// orbT|rewrite ih].
+Qed.
+Arguments leq_bigmax_seq [I r P F].
+
 Lemma leq_bigmax_cond (I : finType) (P : pred I) F i0 :
   P i0 -> F i0 <= \max_(i | P i) F i.
-Proof. by move=> Pi0; rewrite (bigD1 i0) ?leq_maxl. Qed.
+Proof. exact: leq_bigmax_seq. Qed.
 Arguments leq_bigmax_cond [I P F].
 
 Lemma leq_bigmax (I : finType) F (i0 : I) : F i0 <= \max_i F i.
@@ -2035,10 +2044,25 @@ apply: (iffP idP) => leFm => [i Pi|].
 by elim/big_ind: _ => // m1 m2; rewrite geq_max => ->.
 Qed.
 
+Lemma bigmax_leqP_seq (I : eqType) r (P : pred I) m F :
+  reflect (forall i, i \in r -> P i -> F i <= m) (\max_(i <- r | P i) F i <= m).
+Proof.
+apply: (iffP idP) => leFm => [i ri Pi|].
+  exact/(leq_trans _ leFm)/leq_bigmax_seq.
+rewrite big_seq_cond; elim/big_ind: _ => // [m1 m2|i /andP[ri]].
+  by rewrite geq_max => ->.
+exact: leFm.
+Qed.
+
 Lemma bigmax_sup (I : finType) i0 (P : pred I) m F :
   P i0 -> m <= F i0 -> m <= \max_(i | P i) F i.
 Proof. by move=> Pi0 le_m_Fi0; apply: leq_trans (leq_bigmax_cond i0 Pi0). Qed.
 Arguments bigmax_sup [I] i0 [P m F].
+
+Lemma bigmax_sup_seq (I : eqType) r i0 (P : pred I) m F :
+  i0 \in r -> P i0 -> m <= F i0 -> m <= \max_(i <- r | P i) F i.
+Proof. by move=> i0r Pi0 ?; apply: leq_trans (leq_bigmax_seq i0 _ _). Qed.
+Arguments bigmax_sup_seq [I r] i0 [P m F].
 
 Lemma bigmax_eq_arg (I : finType) i0 (P : pred I) F :
   P i0 -> \max_(i | P i) F i = F [arg max_(i > i0 | P i) F i].
