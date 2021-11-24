@@ -13,7 +13,7 @@ From mathcomp Require Import fintype div bigop.
 (* prime_decomp m == the list of prime factors of m > 1, sorted by primes.    *)
 (*       logn p m == the e such that (p ^ e) \in prime_decomp n, else 0.      *)
 (*  trunc_log p m == the largest e such that p ^ e <= m, or 0 if p or m is 0. *)
-(*        log2n_up_up m == the smallest e such that m <= 2 ^ e.                      *)
+(*     up_log p m == the smallest e such that m <= p ^ e, or 0 if p <= 1      *)
 (*         pdiv n == the smallest prime divisor of n > 1, else 1.             *)
 (*     max_pdiv n == the largest prime divisor of n > 1, else 1.              *)
 (*     divisors m == the sorted list of divisors of m > 0, else [::].         *)
@@ -826,6 +826,112 @@ move=> p_gt1 le_pj_k; rewrite -ltnS -(@ltn_exp2l p) //.
 exact: leq_ltn_trans (trunc_log_ltn _ _).
 Qed.
 
+(* Truncated up real logarithm *)
+
+Definition up_log p n :=
+  if (p <= 1) then 0 else 
+  let v := trunc_log p n in if n <= p ^ v then v else v.+1.
+
+Lemma up_log0 p : up_log p 0 = 0.
+Proof. by case: p => // [] []. Qed.
+
+Lemma up_log1 p : up_log p 1 = 0.
+Proof. by case: p => // [] []. Qed.
+
+Lemma up_log_eq0 p n : (up_log p n == 0) = (p <= 1) || (n <= 1).
+Proof.
+case: p => // [] [] // p.
+case: n => [|[|n]]; rewrite /up_log //=.
+have /= := trunc_log_bounds (isT : 1 < p.+2) (isT : 0 < n.+2).
+by case: (leqP _ n.+1); case: trunc_log.
+Qed.
+
+Lemma up_log_gt0 p n : (0 < up_log p n) = (1 < p) && (1 < n).
+Proof. by rewrite ltnNge leqn0 up_log_eq0 negb_or -!ltnNge. Qed.
+
+Lemma up_log_bounds p n :
+  1 < p -> 1 < n -> let k := up_log p n in p ^ k.-1 < n <= p ^ k.
+Proof.
+move=> p_gt1 n_gt1.
+have n_gt0 : 0 < n by apply: leq_trans n_gt1.
+rewrite /up_log (leqNgt p 1) p_gt1 /=.
+have /= /andP[tpLn nLtpS] := trunc_log_bounds p_gt1 n_gt0.
+have [nLnp|npLn] := leqP n (p ^ trunc_log p n); last by rewrite npLn ltnW.
+rewrite nLnp (leq_trans _ tpLn) // ltn_exp2l // prednK ?leqnn //.
+by case: trunc_log (leq_trans n_gt1 nLnp).
+Qed.
+
+Lemma up_logP p n : 1 < p -> n <= p ^ up_log p n.
+Proof.
+case: n => [|[|n]] // p_gt1; first by rewrite up_log1.
+by have /andP[] := up_log_bounds p_gt1 (isT: 1 < n.+2).
+Qed.
+
+Lemma up_log_gtn p n : 1 < p -> 1 < n -> p ^ (up_log p n).-1 < n.
+Proof.
+by case: n => [|[|n]] p_gt1 n_gt1 //; have /andP[] := up_log_bounds p_gt1 n_gt1.
+Qed.
+
+Lemma up_log_min p k j : 1 < p -> k <= p ^ j -> up_log p k <= j.
+Proof.
+case: k => [|[|k]] // p_gt1 kLj; rewrite ?(up_log0, up_log1) //.
+rewrite -[up_log _ _]prednK ?up_log_gt0 ?p_gt1 // -(@ltn_exp2l p) //.
+by apply: leq_trans (up_log_gtn p_gt1 (isT : 1 < k.+2)) _.
+Qed.
+
+Lemma leq_up_log p m n : m <= n -> up_log p m <= up_log p n.
+Proof.
+move=> mLn; case: p => [|[|p]] //.
+by apply/up_log_min => //; apply: leq_trans mLn (up_logP _ _).
+Qed.
+
+Lemma up_log_eq p n k : 1 < p -> p ^ n < k <= p ^ n.+1 -> up_log p k = n.+1.
+Proof.
+move=> p_gt1 /andP[npLk kLpn]; apply/eqP; rewrite eqn_leq.
+apply/andP; split; first by apply: up_log_min.
+rewrite -(ltn_exp2l _ _ p_gt1) //.
+by apply: leq_trans npLk (up_logP _ _).
+Qed.
+
+Lemma up_lognn p : 1 < p -> up_log p p = 1.
+Proof. by move=> p_gt1; apply: up_log_eq; rewrite p_gt1 /=. Qed.
+
+Lemma expnK p n : 1 < p -> up_log p (p ^ n) = n.
+Proof. 
+case: n => [|n] p_gt1 /=; first by rewrite up_log1.
+by apply: up_log_eq; rewrite // leqnn andbT ltn_exp2l. 
+Qed.
+
+Lemma up_logMp p n : 1 < p -> 0 < n -> up_log p (p * n) = (up_log p n).+1.
+Proof.
+case: p => // p.
+case: n => // [] [|n] p_gt1 n_gt1; first by rewrite muln1 up_lognn // up_log1.
+apply: up_log_eq => //.
+have := up_log_bounds p_gt1 (isT : 1 < n.+2).
+have : 0 < up_log p.+1 n.+2 by rewrite up_log_gt0 p_gt1.
+case: up_log => //= k _ Hp.
+by rewrite expnS ltn_mul2l /= expnS leq_mul2l.
+Qed.
+
+Lemma up_log2_double n : 0 < n -> up_log 2 n.*2 = (up_log 2 n).+1.
+Proof.  by move=> n_gt0; rewrite -mul2n up_logMp. Qed.
+
+Lemma up_log2S n : 0 < n -> up_log 2 n.+1 = (up_log 2 (n./2.+1)).+1.
+Proof.
+case: n=> // [] [|n] // _.
+apply: up_log_eq => //; apply/andP; split.
+  apply: leq_trans (_ : n./2.+1.*2 < n.+3); last first.
+    by rewrite doubleS !ltnS -[X in _ <= X]odd_double_half leq_addl.
+  have /= /andP[H1n _] := up_log_bounds (isT : 1 < 2) (isT : 1 < n./2.+2).
+  by rewrite ltnS -leq_double -mul2n -expnS prednK ?up_log_gt0 // in H1n.
+rewrite -[_./2.+1]/(n./2.+2).
+have /= /andP[_ H2n] := up_log_bounds (isT : 1 < 2) (isT : 1 < n./2.+2).
+rewrite -leq_double -!mul2n -expnS in H2n.
+apply: leq_trans H2n.
+rewrite mul2n !doubleS !ltnS.
+by rewrite -[X in X <= _]odd_double_half -add1n leq_add2r; case: odd.
+Qed.
+
 (* pi- parts *)
 
 (* Testing for membership in set of prime factors. *)
@@ -1429,99 +1535,6 @@ rewrite -!big_mkcond -sum_nat_const pair_big (reindex_onto h h') => [|[d d'] _].
 apply/eqP; rewrite /eq_op /= /eq_op /= !modn_dvdm ?dvdn_part //.
 by rewrite chinese_modl // chinese_modr // !modn_small ?eqxx ?ltn_ord.
 Qed.
-
-Section Log2Up.
-
-Definition log2n_up n :=
-  let v := trunc_log 2 n in if n <= 2 ^ v then v else v.+1.
-
-Lemma log2n_up0 : log2n_up 0 = 0.
-Proof. by []. Qed.
-
-Lemma log2n_up1 : log2n_up 1 = 0.
-Proof. by []. Qed.
-
-Lemma log2n_up_eq0 n : (log2n_up n == 0) = (n <= 1).
-Proof.
-case: n => [|[|n]]; rewrite /log2n_up //.
-have /= := trunc_log_bounds (isT : 1 < 2) (isT : 0 < n.+2).
-by case: (leqP _ n.+1).
-Qed.
-
-Lemma log2n_up_gt0 n : (0 < log2n_up n) = (1 < n).
-Proof. by rewrite ltnNge leqn0 log2n_up_eq0 ltnNge. Qed.
-
-Lemma log2n_up_bounds n : 1 < n -> 2 ^ (log2n_up n).-1 < n <= 2 ^ (log2n_up n).
-Proof.
-move=> /= n_gt1.
-have n_gt0 : 0 < n by apply: leq_trans n_gt1.
-rewrite /log2n_up.
-have /= /andP[t2Ln nLt2S] := trunc_log_bounds (isT : 1 < 2) n_gt0.
-have [nLn2|n2Ln] := leqP n (2 ^ trunc_log 2 n); last by rewrite n2Ln ltnW.
-rewrite nLn2 (leq_trans _ t2Ln) // ltn_exp2l // prednK ?leqnn //.
-by case: trunc_log (leq_trans n_gt1 nLn2).
-Qed.
-
-Lemma log2n_up_geq n : n <= 2 ^ log2n_up n.
-Proof. 
-by case: n => [|[|n]] //; have /andP[] := log2n_up_bounds (isT: 1 < n.+2).
-Qed.
-
-Lemma log2n_up_ltn n : 1 < n -> 2 ^ (log2n_up n).-1 < n.
-Proof.
-by case: n => [|[|n]] _ //; have /andP[] := log2n_up_bounds (isT: 1 < n.+2).
-Qed.
-
-Lemma log2n_up_exp k j : k <= 2 ^ j -> log2n_up k <= j.
-Proof.
-case: k => [|[|k]] // kLj.
-rewrite -[log2n_up _]prednK ?log2n_up_gt0 // -(@ltn_exp2l 2) //.
-by apply: leq_trans (log2n_up_ltn (isT : 1 < k.+2)) _.
-Qed.
-
-Lemma leq_log2n_up m n : m <= n -> log2n_up m <= log2n_up n.
-Proof. by move=> mLn; apply/log2n_up_exp/(leq_trans _ (log2n_up_geq _)). Qed.
-
-Lemma log2n_up_eq n k : 2 ^ n < k <= 2 ^ n.+1 -> log2n_up k = n.+1.
-Proof.
-case/andP=> n2Lk kL2n; apply/eqP; rewrite eqn_leq.
-apply/andP; split; first by apply: log2n_up_exp.
-rewrite -(ltn_exp2l _ _ (_ : 1 < 2)) //.
-by apply: leq_trans n2Lk (log2n_up_geq k).
-Qed.
-
-Lemma exp2nK n : log2n_up (2 ^ n) = n.
-Proof. 
-by case: n=>//= n; apply: log2n_up_eq; rewrite leqnn andbT ltn_exp2l. 
-Qed.
-
-Lemma log2n_up_double n : 0 < n -> log2n_up n.*2 = (log2n_up n).+1.
-Proof.
-case: n => //= [] [|n] _ //.
-apply: log2n_up_eq; have Hn := log2n_up_bounds (isT : 1 < n.+2).
-rewrite -[X in 2 ^ X < _ <= _]prednK ?log2n_up_gt0 // !expnS !mul2n.
-by rewrite leq_double ltn_double.
-Qed.
-
-Lemma log2n_upS n : 0 < n -> log2n_up n.+1 = (log2n_up (n./2.+1)).+1.
-Proof.
-case: n=> // [] [|n] // _.
-apply: log2n_up_eq; apply/andP; split.
-  apply: leq_trans (_ : n./2.+1.*2 < n.+3); last first.
-    by rewrite doubleS !ltnS -[X in _ <= X]odd_double_half leq_addl.
-  have /= /andP[H1n _] := log2n_up_bounds (isT : 1 < n./2.+2).
-  by rewrite ltnS -leq_double -mul2n -expnS prednK ?log2n_up_gt0 // in H1n.
-rewrite -[_./2.+1]/(n./2.+2).
-have /= /andP[_ H2n] := log2n_up_bounds (isT : 1 < n./2.+2).
-rewrite -leq_double -!mul2n -expnS in H2n.
-apply: leq_trans H2n.
-rewrite mul2n !doubleS !ltnS.
-by rewrite -[X in X <= _]odd_double_half -add1n leq_add2r; case: odd.
-Qed.
-
-End Log2Up.
-
-
 
 #[deprecated(since="mathcomp 1.12.0", note="Use primesM instead.")]
 Notation primes_mul := primesM (only parsing).
