@@ -7989,9 +7989,9 @@ End SetSubsetOrder.
 
 Module Exports.
 Notation "{ 'subset' [ d ] T }" := (type_of d (Phant T))
-  (at level 2, d at next level, format "{ 'subset' [ d ]  T }") : order_scope.
+  (at level 2, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}
-  (at level 2, format "{ 'subset' T }") : order_scope.
+  (at level 2, format "{ 'subset' T }") : type_scope.
 
 Canonical eqType.
 Canonical choiceType.

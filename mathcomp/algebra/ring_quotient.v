@@ -559,7 +559,7 @@ Canonical rquot_zmodQuotType := ZmodQuotType 0 -%R +%R type rquot_zmodQuotMixin.
 
 End ZmodQuotient.
 
-Notation "{quot I }" := (@type_of _ _ _ I (Phant _)).
+Notation "{quot I }" := (@type_of _ _ _ I (Phant _)) : type_scope.
 
 Section RingQuotient.
 
@@ -626,7 +626,8 @@ End IDomainQuotient.
 
 End Quotient.
 
-Notation "{ideal_quot I }" := (@Quotient.type_of _ _ _ I (Phant _)).
+Notation "{ideal_quot I }" :=
+  (@Quotient.type_of _ _ _ I (Phant _)) : type_scope.
 Notation "x == y %[mod_ideal I ]" :=
   (x == y %[mod {ideal_quot I}]) : quotient_scope.
 Notation "x = y %[mod_ideal I ]" :=

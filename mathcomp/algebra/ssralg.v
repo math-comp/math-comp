@@ -1848,7 +1848,7 @@ Notation additive f := (axiom f).
 Coercion apply : map >-> Funclass.
 Notation Additive fA := (Pack (Phant _) fA).
 Notation "{ 'additive' fUV }" := (map (Phant fUV))
-  (at level 0, format "{ 'additive'  fUV }") : ring_scope.
+  (at level 0, format "{ 'additive'  fUV }") : type_scope.
 Notation "[ 'additive' 'of' f 'as' g ]" := (@clone _ _ _ f g _ _ idfun id)
   (at level 0, format "[ 'additive'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'additive' 'of' f ]" := (@clone _ _ _ f f _ _ id id)
@@ -2064,7 +2064,7 @@ Coercion apply : map >-> Funclass.
 Notation RMorphism fM := (Pack (Phant _) fM).
 Notation AddRMorphism fM := (pack fM id).
 Notation "{ 'rmorphism' fRS }" := (map (Phant fRS))
-  (at level 0, format "{ 'rmorphism'  fRS }") : ring_scope.
+  (at level 0, format "{ 'rmorphism'  fRS }") : type_scope.
 Notation "[ 'rmorphism' 'of' f 'as' g ]" := (@clone _ _ _ f g _ _ idfun id)
   (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'rmorphism' 'of' f ]" := (@clone _ _ _ f f _ _ id id)
@@ -2275,11 +2275,11 @@ Coercion apply : map >-> Funclass.
 Notation Linear fL := (Pack (Phant _) fL).
 Notation AddLinear fZ := (pack fZ id).
 Notation "{ 'linear' fUV | s }" := (map s (Phant fUV))
-  (at level 0, format "{ 'linear'  fUV  |  s }") : ring_scope.
+  (at level 0, format "{ 'linear'  fUV  |  s }") : type_scope.
 Notation "{ 'linear' fUV }" := {linear fUV | *:%R}
-  (at level 0, format "{ 'linear'  fUV }") : ring_scope.
+  (at level 0, format "{ 'linear'  fUV }") : type_scope.
 Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
-  (at level 0, format "{ 'scalar'  U }") : ring_scope.
+  (at level 0, format "{ 'scalar'  U }") : type_scope.
 Notation "[ 'linear' 'of' f 'as' g ]" := (@clone _ _ _ _ _ f g _ _ idfun id)
   (at level 0, format "[ 'linear'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'linear' 'of' f ]" := (@clone _ _ _ _ _ f f _ _ id id)
@@ -2482,9 +2482,9 @@ Coercion apply : map >-> Funclass.
 Notation LRMorphism f_lrM := (Pack (Phant _) (Class f_lrM f_lrM)).
 Notation AddLRMorphism fZ := (pack fZ id).
 Notation "{ 'lrmorphism' fAB | s }" := (map s (Phant fAB))
-  (at level 0, format "{ 'lrmorphism'  fAB  |  s }") : ring_scope.
+  (at level 0, format "{ 'lrmorphism'  fAB  |  s }") : type_scope.
 Notation "{ 'lrmorphism' fAB }" := {lrmorphism fAB | *:%R}
-  (at level 0, format "{ 'lrmorphism'  fAB }") : ring_scope.
+  (at level 0, format "{ 'lrmorphism'  fAB }") : type_scope.
 Notation "[ 'lrmorphism' 'of' f ]" := (@clone _ _ _ _ _ f _ _ id _ _ id)
   (at level 0, format "[ 'lrmorphism'  'of'  f ]") : form_scope.
 Coercion additive : map >-> Additive.map.

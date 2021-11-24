@@ -151,7 +151,7 @@ Bind Scope ring_scope with polynomial.
 Arguments polyseq {R} p%R.
 Arguments poly_inj {R} [p1%R p2%R] : rename.
 Arguments coefp {R} i%N / p%R.
-Notation "{ 'poly' T }" := (poly_of (Phant T)).
+Notation "{ 'poly' T }" := (poly_of (Phant T)) : type_scope.
 
 Definition poly_countMixin (R : countRingType) :=
   [countMixin of polynomial R by <:].

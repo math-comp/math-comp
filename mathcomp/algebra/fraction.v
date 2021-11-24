@@ -69,7 +69,7 @@ Proof. by rewrite /Ratio /insubd; case: insubP; rewrite //= eqxx. Qed.
 
 End FracDomain.
 
-Notation "{ 'ratio' T }" := (ratio_of (Phant T)).
+Notation "{ 'ratio' T }" := (ratio_of (Phant T)) : type_scope.
 Identity Coercion type_fracdomain_of : ratio_of >-> ratio.
 
 Notation "'\n_' x"  := (frac x).1
@@ -112,7 +112,7 @@ Canonical equivf_equiv := EquivRel equivf equivf_refl equivf_sym equivf_trans.
 
 Definition type := {eq_quot equivf}.
 Definition type_of of phant R := type.
-Notation "{ 'fraction' T }" := (type_of (Phant T)).
+Notation "{ 'fraction' T }" := (type_of (Phant T)) : type_scope.
 
 (* we recover some structure for the quotient *)
 Canonical frac_quotType := [quotType of type].
