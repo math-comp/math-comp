@@ -12,7 +12,8 @@ From mathcomp Require Import fintype div bigop.
 (*                   component to a Num (which can print large values).       *)
 (* prime_decomp m == the list of prime factors of m > 1, sorted by primes.    *)
 (*       logn p m == the e such that (p ^ e) \in prime_decomp n, else 0.      *)
-(*  trunc_log p m == the largest e such that p ^ e <= m, or 0 if p or m is 0. *)
+(*  trunc_log p m == the largest e such that p ^ e <= m, or 0 if p <=1  or    *)
+(*                   m is 0.                                                  *)
 (*     up_log p m == the smallest e such that m <= p ^ e, or 0 if p <= 1      *)
 (*         pdiv n == the smallest prime divisor of n > 1, else 1.             *)
 (*     max_pdiv n == the largest prime divisor of n > 1, else 1.              *)
@@ -799,18 +800,19 @@ Qed.
 Definition trunc_log p n :=
   let fix loop n k :=
     if k is k'.+1 then if p <= n then (loop (n %/ p) k').+1 else 0 else 0
-  in loop n n.
+  in if p <= 1 then 0 else loop n n.
 
 Lemma trunc_log0 p : trunc_log p 0 = 0.
-Proof. by []. Qed.
+Proof. by case: p => [] // []. Qed.
 
-Lemma trunc_log1 p : 1 < p -> trunc_log p 1 = 0.
+Lemma trunc_log1 p : trunc_log p 1 = 0.
 Proof. by case: p => [|[]]. Qed.
 
 Lemma trunc_log_bounds p n :
   1 < p -> 0 < n -> let k := trunc_log p n in p ^ k <= n < p ^ k.+1.
 Proof.
 rewrite {+}/trunc_log => p_gt1; have p_gt0 := ltnW p_gt1.
+rewrite [p <= 1]leqNgt p_gt1 /=.
 set loop := (loop in loop n n); set m := n; rewrite [in n in loop m n]/m.
 have: m <= n by []; elim: n m => [|n IHn] [|m] //= /ltnSE-le_m_n _.
 have [le_p_n | // ] := leqP p _; rewrite 2!expnSr -leq_divRL -?ltn_divLR //.
@@ -822,7 +824,7 @@ Proof. by move=> p_gt1 /(trunc_log_bounds p_gt1)/andP[]. Qed.
 
 Lemma trunc_log_ltn p n : 1 < p -> n < p ^ (trunc_log p n).+1.
 Proof.
-have [-> | n_gt0] := posnP n; first by move=> /ltnW; rewrite expn_gt0.
+have [-> | n_gt0] := posnP n; first by rewrite trunc_log0 => /ltnW.
 by case/trunc_log_bounds/(_ n_gt0)/andP.
 Qed.
 
@@ -832,7 +834,7 @@ move=> p_gt1 le_pj_k; rewrite -ltnS -(@ltn_exp2l p) //.
 exact: leq_ltn_trans (trunc_log_ltn _ _).
 Qed.
 
-Lemma trunc_log_eq0 p n : (trunc_log p n == 0) = (n <= p.-1).
+Lemma trunc_log_eq0 p n : (trunc_log p n == 0) = (p <= 1) || (n <= p.-1).
 Proof.
 case: p => [|[|p]]; case: n => // n; rewrite /= ltnS.
 have /= /andP[] := trunc_log_bounds (isT : 1 < p.+2) (isT : 0 < n.+1).
@@ -843,20 +845,14 @@ move: nlep; rewrite -ltnS => nlep; apply: (leq_ltn_trans nlep).
 by rewrite -[X in X <= _]expn1; apply: leq_pexp2l.
 Qed.
 
-Lemma trunc_log_gt0 p n : (0 < trunc_log p n) = (p.-1 < n).
-Proof. by rewrite ltnNge leqn0 trunc_log_eq0 -ltnNge. Qed.
+Lemma trunc_log_gt0 p n : (0 < trunc_log p n) = (1 < p) && (p.-1 < n).
+Proof. by rewrite ltnNge leqn0 trunc_log_eq0 negb_or -!ltnNge. Qed.
 
-Lemma trunc_log0n n : trunc_log 0 n = n.
-Proof.
-case: n => [//|n]; rewrite /trunc_log /= divn0.
-by elim: n => [//|n IHn]; rewrite divn0 IHn.
-Qed.
+Lemma trunc_log0n n : trunc_log 0 n = 0.
+Proof. by []. Qed.
 
-Lemma trunc_log1n n : trunc_log 1 n = n.
-Proof.
-case: n => [//|n]; rewrite /trunc_log /= divn1.
-by elim: {-1}n => [//|n' IHn']; rewrite divn1 IHn'.
-Qed.
+Lemma trunc_log1n n : trunc_log 1 n = 0.
+Proof. by []. Qed.
 
 Lemma leq_trunc_log p m n : m <= n -> trunc_log p m <= trunc_log p n.
 Proof.
@@ -873,7 +869,7 @@ apply: leq_ltn_trans kLpn; apply: trunc_logP => //.
 by apply: leq_trans npLk; rewrite expn_gt0 ltnW.
 Qed.
 
-Lemma trunc_lognn p : 0 < p -> trunc_log p p = 1.
+Lemma trunc_lognn p : 1 < p -> trunc_log p p = 1.
 Proof. by case: p => [|[|p]] // _; rewrite /trunc_log ltnSn divnn. Qed.
 
 Lemma trunc_expnK p n : 1 < p -> trunc_log p (p ^ n) = n.
@@ -901,7 +897,6 @@ rewrite leqW ?trunc_logP //= ?double_gt0 ?half_gt0//.
 rewrite trunc_log2_double ?half_gt0// expnS.
 by rewrite -doubleS mul2n leq_double trunc_log_ltn.
 Qed.
-
 
 (* Truncated up real logarithm *)
 
@@ -990,7 +985,7 @@ by rewrite expnS ltn_pmul2l// up_log_gtn.
 Qed.
 
 Lemma up_log2_double n : 0 < n -> up_log 2 n.*2 = (up_log 2 n).+1.
-Proof.  by move=> n_gt0; rewrite -mul2n up_logMp. Qed.
+Proof. by move=> n_gt0; rewrite -mul2n up_logMp. Qed.
 
 Lemma up_log2S n : 0 < n -> up_log 2 n.+1 = (up_log 2 (n./2.+1)).+1.
 Proof.
@@ -1018,7 +1013,7 @@ Qed.
 
 Lemma trunc_log_up_log p n : 
   1 < p -> 0 < n -> trunc_log p n = (up_log p n.+1).-1.
-Proof. by move=> p_gt1 n_gt0; rewrite up_log_trunc_log.
+Proof. by move=> ? ?; rewrite up_log_trunc_log.
 Qed.
 
 (* pi- parts *)
