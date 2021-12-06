@@ -12,7 +12,7 @@ From mathcomp Require Import fintype div bigop.
 (*                   component to a Num (which can print large values).       *)
 (* prime_decomp m == the list of prime factors of m > 1, sorted by primes.    *)
 (*       logn p m == the e such that (p ^ e) \in prime_decomp n, else 0.      *)
-(*  trunc_log p m == the largest e such that p ^ e <= m, or 0 if p <=1  or    *)
+(*  trunc_log p m == the largest e such that p ^ e <= m, or 0 if p <= 1 or    *)
 (*                   m is 0.                                                  *)
 (*     up_log p m == the smallest e such that m <= p ^ e, or 0 if p <= 1      *)
 (*         pdiv n == the smallest prime divisor of n > 1, else 1.             *)
