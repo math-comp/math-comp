@@ -981,13 +981,12 @@ Qed.
 
 Lemma up_logMp p n : 1 < p -> 0 < n -> up_log p (p * n) = (up_log p n).+1.
 Proof.
-case: p => // p.
-case: n => // [] [|n] p_gt1 n_gt1; first by rewrite muln1 up_lognn // up_log1.
+case: p => [//|p] p_gt0.
+case: n => [//|[|n]] _; first by rewrite muln1 up_lognn// up_log1.
 apply: up_log_eq => //.
-have := up_log_bounds p_gt1 (isT : 1 < n.+2).
-have : 0 < up_log p.+1 n.+2 by rewrite up_log_gt0 p_gt1.
-case: up_log => //= k _ Hp.
-by rewrite expnS ltn_mul2l /= expnS leq_mul2l.
+rewrite expnS leq_pmul2l// up_logP// andbT.
+rewrite -[up_log _ _]prednK ?up_log_gt0 ?p_gt0 //.
+by rewrite expnS ltn_pmul2l// up_log_gtn.
 Qed.
 
 Lemma up_log2_double n : 0 < n -> up_log 2 n.*2 = (up_log 2 n).+1.
