@@ -45,11 +45,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `homo_sort_map(_in)`.
 
 - in `prime.v` 
+  + theorems `trunc_log0`, `trunc_log1`, `trunc_logP`, `trunc_log_eq0`,
+    `trunc_log_gt0`, `trunc_log0n`, `trunc_log1n`, `leq_trunc_log`,
+    `trunc_log_eq`, `trunc_lognn`, `trunc_expnK`,  `trunc_logMp`,
+    `trunc_log2_double`, `trunc_log2S`
   + definition `up_log` 
   + theorems `up_log0`, `up_log1`, `up_log_eq0`, `up_log_gt0`, 
     `up_log_bounds` , `up_logP`, `up_log_gtn`, `up_log_min`,
-    `leq_up_log`, `up_log_eq`, `up_lognn`, `expnK`, `up_logMp`,
-    `up_log2_double`, `up_log2S`
+    `leq_up_log`, `up_log_eq`, `up_lognn`, `up_expnK`, `up_logMp`,
+    `up_log2_double`, `up_log2S`, `up_log_trunc_log`, `trunc_log_up_log`
      
 - in `fintype.v`, new lemma `bij_eq_card`.
 
