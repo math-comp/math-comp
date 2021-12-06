@@ -1018,7 +1018,7 @@ Qed.
 
 Lemma trunc_log_up_log p n : 
   1 < p -> 0 < n -> trunc_log p n = (up_log p n.+1).-1.
-Proof. by move=> p_gt1 p_gt0; rewrite up_log_trunc_log.
+Proof. by move=> p_gt1 n_gt0; rewrite up_log_trunc_log.
 Qed.
 
 (* pi- parts *)
