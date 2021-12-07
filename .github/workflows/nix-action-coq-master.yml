@@ -17,7 +17,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -57,7 +57,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -83,6 +83,7 @@ jobs:
     - bignums
     - paramcoq
     - multinomials
+    - mathcomp-real-closed
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to test
@@ -98,7 +99,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -134,6 +135,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "multinomials"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-real-closed'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "mathcomp-real-closed"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "coqeal"
@@ -156,7 +161,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -203,7 +208,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -253,7 +258,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -300,7 +305,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -355,7 +360,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -422,7 +427,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -473,7 +478,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -523,7 +528,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -573,7 +578,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -633,7 +638,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -674,7 +679,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -732,7 +737,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -778,7 +783,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -826,7 +831,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -879,7 +884,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -923,7 +928,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -976,7 +981,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -1018,7 +1023,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -1067,7 +1072,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -1125,7 +1130,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
@@ -1170,7 +1175,7 @@ jobs:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
-      uses: cachix/install-nix-action@v14
+      uses: cachix/install-nix-action@v16
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Cachix setup math-comp
