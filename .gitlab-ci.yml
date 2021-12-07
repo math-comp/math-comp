@@ -452,16 +452,6 @@ ci-analysis-8.13:
     - opam pin add -n -k path coq-fcsl-pcm .
     - opam install -y -v -j "${NJOBS}" coq-fcsl-pcm
 
-ci-fcsl-pcm-8.11:
-  extends: .ci-fcsl-pcm
-  variables:
-    COQ_VERSION: "8.11"
-
-ci-fcsl-pcm-8.12:
-  extends: .ci-fcsl-pcm
-  variables:
-    COQ_VERSION: "8.12"
-
 ci-fcsl-pcm-8.13:
   extends: .ci-fcsl-pcm
   variables:
