@@ -1634,7 +1634,7 @@ Notation "[ 'distrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
 Notation "[ 'distrLatticeType' 'of' T ]" := [distrLatticeType of T for _]
   (at level 0, format "[ 'distrLatticeType'  'of'  T ]") : form_scope.
 Notation "[ 'distrLatticeType' 'of' T 'with' disp ]" :=
-  [latticeType of T for _ with disp]
+  [distrLatticeType of T for _ with disp]
   (at level 0, format "[ 'distrLatticeType'  'of'  T  'with' disp ]") :
   form_scope.
 End Exports.
