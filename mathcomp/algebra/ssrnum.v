@@ -4824,9 +4824,10 @@ Proof.
 by case: n => [|n] k_gt0; [rewrite !root0C expr0n gtn_eqF | apply: rootCX].
 Qed.
 
-Lemma rootCV n x : (n > 0)%N -> 0 <= x -> n.-root x^-1 = (n.-root x)^-1.
+Lemma rootCV n x : 0 <= x -> n.-root x^-1 = (n.-root x)^-1.
 Proof.
-move=> n_gt0 x_ge0; apply/eqP.
+move=> x_ge0; have [->|n_gt0] := posnP n; first by rewrite !root0C invr0.
+apply/eqP.
 by rewrite -(eqr_expn2 n_gt0) ?(invr_ge0, rootC_ge0) // !exprVn !rootCK.
 Qed.
 
