@@ -2,13 +2,15 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
-From mathcomp Require Import ssrint.
+From mathcomp Require Import ssrint prime.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
 (* structure of archimedean, real field, with int and nat declared as closed  *)
 (* subrings.                                                                  *)
 (*          rat == the type of rational number, with single constructor Rat   *)
+(*     <number> == <number> as a rat with <number> a decimal constant.        *)
+(*                 This notation is in rat_scope (delimited with %Q).         *)
 (*         n%:Q == explicit cast from int to rat, ie. the specialization to   *)
 (*                 rationals of the generic ring morphism n%:~R               *)
 (*       numq r == numerator of (r : rat)                                     *)
@@ -132,6 +134,82 @@ Definition fracq '((n', d')) : rat :=
   end.
 Arguments fracq : simpl never.
 
+(* Define a Number Notation for rat in rat_scope *)
+(* Since rat values obtained from fracq contain fracq_subdef, which is not *)
+(* an inductive constructor, we need to go through an intermediate         *)
+(* inductive type.                                                         *)
+Variant Irat_prf := Ifracq_subproof : (int * int) -> Irat_prf.
+Variant Irat := IRat : (int * int) -> Irat_prf -> Irat.
+
+Definition parse (x : Number.number) : option Irat :=
+  let parse_pos i f :=
+    let nf := Decimal.nb_digits f in
+    let d := (10 ^ nf)%nat in
+    let n := (Nat.of_uint i * d + Nat.of_uint f)%nat in
+    valq (fracq (Posz n, Posz d)) in
+  let parse i f :=
+    match i with
+    | Decimal.Pos i => parse_pos i f
+    | Decimal.Neg i => let (n, d) := parse_pos i f in ((- n)%R, d)
+    end in
+  match x with
+  | Number.Decimal (Decimal.Decimal i f) =>
+      let nd := parse i f in
+      Some (IRat nd (Ifracq_subproof nd))
+  | Number.Decimal (Decimal.DecimalExp _ _ _) => None
+  | Number.Hexadecimal _ => None
+  end.
+
+Definition print (r : Irat) : option Number.number :=
+  let print_pos n d :=
+    if d == 1%nat then Some (Nat.to_uint n, Decimal.Nil) else
+      let d2d5 :=
+        match prime_decomp d with
+        | [:: (2, d2); (5, d5)] => Some (d2, d5)
+        | [:: (2, d2)] => Some (d2, O)
+        | [:: (5, d5)] => Some (O, d5)
+        | _ => None
+        end in
+      match d2d5 with
+      | Some (d2, d5) =>
+          let f := (2 ^ (d5 - d2) * 5 ^ (d2 - d5))%nat in
+          let (i, f) := edivn (n * f) (d * f) in
+          Some (Nat.to_uint i, Nat.to_uint f)
+      | None => None
+      end in
+  let print_IRat nd :=
+    match nd with
+    | (Posz n, Posz d) =>
+        match print_pos n d with
+        | Some (i, f) => Some (Decimal.Pos i, f)
+        | None => None
+        end
+    | (Negz n, Posz d) =>
+        match print_pos n.+1 d with
+        | Some (i, f) => Some (Decimal.Neg i, f)
+        | None => None
+        end
+    | (_, Negz _) => None
+    end in
+  match r with
+  | IRat nd _ =>
+      match print_IRat nd with
+      | Some (i, f) => Some (Number.Decimal (Decimal.Decimal i f))
+      | None => None
+      end
+  end.
+
+Number Notation rat parse print (via Irat
+  mapping [Rat => IRat, fracq_subproof => Ifracq_subproof])
+  : rat_scope.
+
+(* Now, the following should parse as rat (and print unchaged) *)
+(* Check 12%Q. *)
+(* Check 3.14%Q. *)
+(* Check (-3.14)%Q. *)
+(* Check 0.5%Q. *)
+(* Check 0.2%Q. *)
+
 Lemma val_fracq x : val (fracq x) = fracq_subdef x.
 Proof. by case: x => [[n|n] [[|[|d]]|d]]//=; rewrite !fracq_opt_subdef_id. Qed.
 
@@ -189,8 +267,8 @@ do 2!rewrite muln_divCA ?(dvdn_gcdl, dvdn_gcdr) // divnn.
 by rewrite gcdn_gt0 !absz_gt0 d_neq0 orbT !muln1 !mulz_sign_abs.
 Qed.
 
-Definition zeroq := fracq (0, 1).
-Definition oneq := fracq (1, 1).
+Definition zeroq := 0%Q.
+Definition oneq := 1%Q.
 
 Fact frac0q x : fracq (0, x) = zeroq.
 Proof.
@@ -247,7 +325,7 @@ Fact fracq_eq0 x : (fracq x == zeroq) = (x.1 == 0) || (x.2 == 0).
 Proof.
 move: x=> [n d] /=; have [->|d0] := eqVneq d 0.
   by rewrite fracq0 eqxx orbT.
-by rewrite orbF fracq_eq ?d0 //= mulr1 mul0r.
+by rewrite -[zeroq]valqK orbF fracq_eq ?d0 //= mulr1 mul0r.
 Qed.
 
 Fact fracqMM x n d : x != 0 -> fracq (x * n, x * d) = fracq (n, d).
@@ -340,7 +418,7 @@ Qed.
 
 Fact add0q : left_id zeroq addq.
 Proof.
-move=> x; rewrite -[x]valqK addq_frac ?denq_neq0 // !addq_subdefE /=.
+move=> x; rewrite -[x]valqK -[zeroq]valqK addq_frac ?denq_neq0 // !addq_subdefE.
 by rewrite mul0r add0r mulr1 mul1r -surjective_pairing.
 Qed.
 
@@ -409,7 +487,7 @@ Qed.
 
 Fact mul1q : left_id oneq mulq.
 Proof.
-move=> x; rewrite -[x]valqK; rewrite mulq_frac !mulq_subdefE.
+move=> x; rewrite -[x]valqK -[oneq]valqK; rewrite mulq_frac !mulq_subdefE.
 by rewrite !mul1r -surjective_pairing.
 Qed.
 
@@ -430,8 +508,8 @@ Canonical rat_comRing := Eval hnf in ComRingType rat mulqC.
 
 Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
-rewrite -[x]valqK fracq_eq ?denq_neq0 //= mulr1 mul0r=> nx0.
-rewrite !(mulq_frac, invq_frac, mulq_subdefE) ?denq_neq0 //.
+rewrite -[x]valqK -[0]valqK fracq_eq ?denq_neq0 //= mulr1 mul0r=> nx0.
+rewrite !(mulq_frac, invq_frac, mulq_subdefE) ?denq_neq0 // -[1]valqK.
 by apply/eqP; rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= mulr1 mul1r mulrC.
 Qed.
 
@@ -471,8 +549,6 @@ Hint Resolve denq_neq0 denq_gt0 denq_ge0 : core.
 Definition subq (x y : rat) : rat := (addq x (oppq y)).
 Definition divq (x y : rat) : rat := (mulq x (invq y)).
 
-Notation "0" := zeroq : rat_scope.
-Notation "1" := oneq : rat_scope.
 Infix "+" := addq : rat_scope.
 Notation "- x" := (oppq x) : rat_scope.
 Infix "*" := mulq : rat_scope.

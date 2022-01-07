@@ -13,3 +13,11 @@ Proof. reflexivity. Qed.
 
 Goal (-1)^-1 = -1 :> rat.
 Proof. reflexivity. Qed.
+
+Local Open Scope rat_scope.
+
+Check 12.
+Check 3.14.
+Check -3.14.
+Check 0.5.
+Check 0.2.
