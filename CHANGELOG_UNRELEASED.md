@@ -26,6 +26,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `prime.v` 
   + definition `trunc_log` now it is 0 when p <= 1 
 
+- in `ssrnum.v`
+  + generalized lemma `rootCV` so that the degree is not necessarily positive.
+
 ### Renamed
 
 ### Removed
