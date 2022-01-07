@@ -99,7 +99,10 @@ coq-8.13:
   extends: .opam-build-once
 
 coq-8.14:
-  # to be replaced with .opam-build-once when 8.14.0 available
+  extends: .opam-build-once
+
+coq-8.15:
+  # to be replaced with .opam-build-once when 8.15.0 available
   extends: .opam-build
 
 coq-dev:
@@ -148,9 +151,14 @@ test-coq-dev:
   variables:
     COQ_VERSION: "dev"
 
-test-coq-8.14:
-  # to be replaced with .test-once when 8.14.0 available
+test-coq-8.15:
+  # to be replaced with .test-once when 8.15.0 available
   extends: .test
+  variables:
+    COQ_VERSION: "8.15"
+
+test-coq-8.14:
+  extends: .test-once
   variables:
     COQ_VERSION: "8.14"
 
@@ -514,7 +522,10 @@ mathcomp-dev_coq-8.13:
   extends: .docker-deploy-once
 
 mathcomp-dev_coq-8.14:
-  # to be replaced with .docker-deploy-once when 8.14.0 available
+  extends: .docker-deploy-once
+
+mathcomp-dev_coq-8.15:
+  # to be replaced with .docker-deploy-once when 8.15.0 available
   extends: .docker-deploy
 
 mathcomp-dev_coq-dev:
