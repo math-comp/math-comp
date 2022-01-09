@@ -59,10 +59,12 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.12".coqPackages = common-bundles // {
       coq.override.version = "8.12";
+      mathcomp-analysis.job = false;
       mathcomp-zify.job = false;
     };
     "coq-8.11".coqPackages = common-bundles // {
       coq.override.version = "8.11";
+      mathcomp-analysis.job = false;
       mathcomp-zify.job = false;
     };
   };
