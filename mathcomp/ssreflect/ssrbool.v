@@ -418,3 +418,17 @@ Arguments andPP {P Q p q}.
 Arguments orPP {P Q p q}.
 Arguments implyPP {P Q p q}.
 Prenex Implicits negPP andPP orPP implyPP.
+
+(******************)
+(* v8.16 addtions *)
+(******************)
+
+Lemma mono1W_in (aT rT : predArgType) (f : aT -> rT) (aD : {pred aT})
+    (aP : pred aT) (rP : pred rT) :
+  {in aD, {mono f : x / aP x >-> rP x}} ->
+  {in aD, {homo f : x / aP x >-> rP x}}.
+Proof. by move=> fP x xD xP; rewrite fP. Qed.
+Arguments mono1W_in [aT rT f aD aP rP].
+
+#[deprecated(since="mathcomp 1.14.0", note="Use mono1W_in instead.")]
+Notation mono2W_in := mono1W_in.
