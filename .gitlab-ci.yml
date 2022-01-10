@@ -435,20 +435,15 @@ ci-multinomials-dev:
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-analysis
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-analysis
 
-ci-analysis-8.11:
-  extends: .ci-analysis
-  variables:
-    COQ_VERSION: "8.11"
-
-ci-analysis-8.12:
-  extends: .ci-analysis
-  variables:
-    COQ_VERSION: "8.12"
-
 ci-analysis-8.13:
   extends: .ci-analysis
   variables:
     COQ_VERSION: "8.13"
+
+ci-analysis-8.14:
+  extends: .ci-analysis
+  variables:
+    COQ_VERSION: "8.14"
 
 # The FCSL-PCM library
 .ci-fcsl-pcm:
