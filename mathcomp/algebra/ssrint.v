@@ -45,14 +45,14 @@ Declare Scope distn_scope.
 Declare Scope rat_scope.
 
 Reserved Notation "n %:Z" (at level 2, left associativity, format "n %:Z").
-Reserved Notation "n = m :> 'in' 't'"
-  (at level 70, m at next level, format "n  =  m  :>  'in' 't'").
-Reserved Notation "n == m :> 'in' 't'"
-  (at level 70, m at next level, format "n  ==  m  :>  'in' 't'").
-Reserved Notation "n != m :> 'in' 't'"
-  (at level 70, m at next level, format "n  !=  m  :>  'in' 't'").
-Reserved Notation "n <> m :> 'in' 't'"
-  (at level 70, m at next level, format "n  <>  m  :>  'in' 't'").
+Reserved Notation "n = m :> 'int'"
+  (at level 70, m at next level, format "n  =  m  :>  'int'", only printing).
+Reserved Notation "n == m :> 'int'"
+  (at level 70, m at next level, format "n  ==  m  :>  'int'", only printing).
+Reserved Notation "n != m :> 'int'"
+  (at level 70, m at next level, format "n  !=  m  :>  'int'", only printing).
+Reserved Notation "n <> m :> 'int'"
+  (at level 70, m at next level, format "n  <>  m  :>  'int'", only printing).
 
 Import Order.TTheory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
@@ -67,13 +67,10 @@ Variant int : Set := Posz of nat | Negz of nat.
 Notation "n %:Z" := (Posz n) (only parsing) : int_scope.
 Notation "n %:Z" := (Posz n) (only parsing) : ring_scope.
 
-Notation "n = m :> 'in' 't'"  := (Posz n = Posz m) (only printing) : ring_scope.
-Notation "n == m :> 'in' 't'" := (Posz n == Posz m)
-  (only printing) : ring_scope.
-Notation "n != m :> 'in' 't'" := (Posz n != Posz m)
-  (only printing) : ring_scope.
-Notation "n <> m :> 'in' 't'" := (Posz n <> Posz m)
-  (only printing) : ring_scope.
+Notation "n = m :> 'int'"  := (Posz n = Posz m) (only printing)  : ring_scope.
+Notation "n == m :> 'int'" := (Posz n == Posz m) (only printing) : ring_scope.
+Notation "n != m :> 'int'" := (Posz n != Posz m) (only printing) : ring_scope.
+Notation "n <> m :> 'int'" := (Posz n <> Posz m) (only printing) : ring_scope.
 
 Definition natsum_of_int (m : int) : nat + nat :=
   match m with Posz p => inl _ p | Negz n => inr _ n end.
