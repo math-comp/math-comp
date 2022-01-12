@@ -15,7 +15,7 @@ sed -r -e '
         # to a if not EOF
         :a; N; $!ba;                                                                                                         
         # remove all starred lines
-        s/\(\*{5,}?\)//g;
+        s/\(\*{5,}+\)//g;
     
         # remove *)\n(*
         s/\*+\)\n\(\*+/\n/g;
