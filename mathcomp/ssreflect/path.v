@@ -143,6 +143,10 @@ Proof. by rewrite -rot_cycle rotrK. Qed.
 
 Definition sorted s := if s is x :: s' then path x s' else true.
 
+Lemma sortedP s x :
+  reflect (forall i, i.+1 < size s -> e (nth x s i) (nth x s i.+1)) (sorted s).
+Proof. by case: s => *; [constructor|apply: (iffP (pathP _ _ _)); apply]. Qed.
+
 Lemma path_sorted x s : path x s -> sorted s.
 Proof. by case: s => //= y s /andP[]. Qed.
 
@@ -377,6 +381,7 @@ End Transitive.
 End Paths.
 
 Arguments pathP {T e x p}.
+Arguments sortedP {T e s}.
 Arguments path_sorted {T e x s}.
 Arguments path_min_sorted {T e x s}.
 Arguments order_path_min_in {T P leT x s}.

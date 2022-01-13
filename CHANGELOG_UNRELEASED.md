@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `seq.v`, added theorem `pairwise_trans`,
 
+- in `path.v`, added lemma `sortedP`
 - in `prime.v` 
   + theorems `trunc_log0`, `trunc_log1`, `trunc_log_eq0`,
     `trunc_log_gt0`, `trunc_log0n`, `trunc_log1n`, `leq_trunc_log`,
