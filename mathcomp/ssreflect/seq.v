@@ -3846,6 +3846,22 @@ case: eqVneq eq_xs_ys => /= [->|ne_xy] eq_xs_ys ys_x xs_y.
 by case/eqP: ne_xy; apply: r_asym; rewrite (allP r_x_xs) ?(allP r_y_ys).
 Qed.
 
+Lemma pairwise_trans s : antisymmetric r ->
+   pairwise r s -> {in s & &, transitive r}.
+Proof.
+move=> /(_ _ _ _)/eqP r_anti + y x z => /pairwiseP-/(_ y) ltP ys xs zs.
+have [-> //|neqxy] := eqVneq x y; have [-> //|neqzy] := eqVneq z y.
+move=> lxy lyz; move: ys xs zs lxy neqxy lyz neqzy.
+move=> /(nthP y)[j jlt <-] /(nthP y)[i ilt <-] /(nthP y)[k klt <-].
+have [ltij|ltji|->] := ltngtP i j; last 2 first.
+- by move=> leij; rewrite r_anti// leij ltP.
+- by move=> lejj; rewrite r_anti// lejj.
+move=> _ _; have [ltjk|ltkj|->] := ltngtP j k; last 2 first.
+- by move=> lejk; rewrite r_anti// lejk ltP.
+- by move=> lekk; rewrite r_anti// lekk.
+by move=> _ _; apply: (ltP) => //; apply: ltn_trans ltjk.
+Qed.
+
 End EqPairwise.
 
 Arguments subseq_pairwise {T r xs ys}.
