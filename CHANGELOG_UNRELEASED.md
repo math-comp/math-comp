@@ -60,6 +60,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     E : R | x <- s, y <- t ]` now support destructuring patterns in
     binder positions.
 
+- in `fintype.v`,
+  + notations `[seq F | x in A ]` and `[seq F | x ]` now support destructuring
+    patterns in binder positions.  In the case of `[seq F | x ]` and `[seq F |
+    x : T ]`, type inference on `x` now occurs earlier, meaning that implicit
+    types and typeclass resolution in `T` will take precedence over unification
+    constraints arising from typechecking `x` in `F`.  This may result in
+    occasional incompatibilities.
+
 ### Renamed
 
 ### Removed
