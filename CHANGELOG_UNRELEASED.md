@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     are now read as `12%:R` or `42%:R`
 
 - in `ssrint.v`
+  + number notation in scope int_scope, `12` or `-42`
+    are now read as `Posz 12` or `Negz 41`
+
+- in `ssrint.v`
   + number notation in scope ring_scope, numbers such as `-12` are now
     read as `(-12)%:~R`
 
