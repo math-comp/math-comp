@@ -71,13 +71,13 @@ have nz2: 2%:R != 0 :> L.
   apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
     by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
-  have{} char2: 2 \in [char L] by apply/eqP.
+  have{} char2: 2%N \in [char L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
     rewrite fmorph_div rmorphD conjK -{1}[conj e](addNKr e) mulrDl.
     by rewrite opp_id (addrC e) divff // addr_eq0 opp_id.
   pose a := e * conj e; have aJ: conj a = a by rewrite rmorphM conjK mulrC.
-  have [w Dw] := @solve_monicpoly _ 2 (nth 0 [:: e * a; - 1]) isT.
+  have [w Dw] := @solve_monicpoly _ 2%N (nth 0 [:: e * a; - 1]) isT.
   have{} Dw: w ^+ 2 + w = e * a.
     by rewrite Dw !big_ord_recl big_ord0 /= mulr1 mulN1r addr0 subrK.
   pose b := w + conj w; have bJ: conj b = b by rewrite rmorphD conjK addrC.
@@ -92,7 +92,7 @@ have nz2: 2%:R != 0 :> L.
   by rewrite {2}eJ rmorphD rmorph1.
 have mul2I: injective (fun z : L => z *+ 2).
   by move=> x y; rewrite /= -mulr_natl -(mulr_natl y) => /mulfI->.
-pose sqrt x : L := sval (sig_eqW (@solve_monicpoly _ 2 (nth 0 [:: x]) isT)).
+pose sqrt x : L := sval (sig_eqW (@solve_monicpoly _ 2%N (nth 0 [:: x]) isT)).
 have sqrtK x: sqrt x ^+ 2 = x.
   rewrite /sqrt; case: sig_eqW => /= y ->.
   by rewrite !big_ord_recl big_ord0 /= mulr1 mul0r !addr0.
@@ -425,7 +425,7 @@ Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
 Fact conj_nt : ~ conj =1 id.
 Proof.
 have [i i2]: exists i : type, i ^+ 2 = -1.
-  have [i] := @solve_monicpoly _ 2 (nth 0 [:: -1 : type]) isT.
+  have [i] := @solve_monicpoly _ 2%N (nth 0 [:: -1 : type]) isT.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
@@ -946,7 +946,7 @@ Lemma dvdCP_nat x y : 0 <= x -> 0 <= y -> (x %| y)%C -> {n | y = n%:R * x}.
 Proof.
 move=> x_ge0 y_ge0 x_dv_y; apply: sig_eqW.
 case/dvdCP: x_dv_y => z Zz -> in y_ge0 *; move: x_ge0 y_ge0 Zz.
-rewrite le_eqVlt => /predU1P[<- | ]; first by exists 22; rewrite !mulr0.
+rewrite le_eqVlt => /predU1P[<- | ]; first by exists 22%N; rewrite !mulr0.
 by move=> /pmulr_lge0-> /CintEge0-> /CnatP[n ->]; exists n.
 Qed.
 

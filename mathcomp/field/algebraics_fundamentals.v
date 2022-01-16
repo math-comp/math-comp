@@ -627,7 +627,7 @@ have R'i n: i \notin sQ (x_ n).
   suffices /eqP <-: - QxR v ^+ 2 == 1 by rewrite oppr_gt0 -leNgt sqr_ge0.
   rewrite -rmorphX -rmorphN fmorph_eq1 -(fmorph_eq1 (ofQ x)) rmorphN eqr_oppLR.
   by rewrite rmorphX Di Di2.
-have szX2_1: size ('X^2 + 1) = 3.
+have szX2_1: size ('X^2 + 1) = 3%N.
   by move=> R; rewrite size_addl ?size_polyXn ?size_poly1.
 have minp_i n (p_i := minPoly (R_ n) (i_ n)): p_i = 'X^2 + 1.
   have p_dv_X2_1: p_i %| 'X^2 + 1.
@@ -663,7 +663,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
   have Dit: ofQ t i_t = i by rewrite CnQtE inQ_K.
   have Dit2: i_t ^+ 2 = -1.
     by apply: (fmorph_inj (ofQ t)); rewrite rmorphX rmorphN1 Dit.
-  have dimCn: \dim_Rn Cn = 2.
+  have dimCn: \dim_Rn Cn = 2%N.
     rewrite -adjoin_degreeE adjoin_degree_aimg.
     by apply: succn_inj; rewrite -size_minPoly minp_i.
   have /sQ_inQ[u_z Dz] := t_z; pose Rz := <<Cn; u_z>>%AS.
@@ -761,8 +761,8 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     rewrite size_minPoly /= adjoin_degreeE (@pnat_dvd _ 2) // -dimCn.
     rewrite dvdn_divLR ?divnK ?adim_gt0 ?field_dimS ?subv_adjoin //.
     exact/FadjoinP.
-  have [w Rz_w deg_w]: exists2 w, w \in Rz & adjoin_degree Cn w = 2.
-    have [P sPG iPG]: exists2 P : {group gal_of Rz}, P \subset G & #|G : P| = 2.
+  have [w Rz_w deg_w]: exists2 w, w \in Rz & adjoin_degree Cn w = 2%N.
+    have [P sPG iPG]: exists2 P : {group gal_of Rz}, P \subset G & #|G : P| = 2%N.
       have [_ _ [k oG]] := pgroup_pdiv evenG ntG.
       have [P [sPG _ oP]] := normal_pgroup evenG (normal_refl G) (leq_pred _).
       by exists P => //; rewrite -divgS // oP oG pfactorK // -expnB ?subSnn.

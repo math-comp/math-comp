@@ -43,7 +43,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope ring_scope.
+Local Notation "n %:R" := (n %:R%R).
 Import GroupScope GRing.Theory.
 
 Reserved Notation "p ^{1+2}" (at level 2, format "p ^{1+2}").
@@ -59,7 +59,7 @@ Section Construction.
 
 Variable p : nat.
 
-Definition act ij (k : 'Z_p) := let: (i, j) := ij in (i + k * j, j).
+Definition act ij (k : 'Z_p) := let: (i, j) := ij in (i + k * j, j)%R.
 Lemma actP : is_action [set: 'Z_p] act.
 Proof.
 apply: is_total_action=> [] [i j] => [|k1 k2] /=; first by rewrite mul0r addr0.

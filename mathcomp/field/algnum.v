@@ -66,7 +66,7 @@ Lemma algC_PET (s : seq algC) :
      & exists ps, s = [seq (pQtoC p).[z] | p <- ps]}.
 Proof.
 elim: s => [|x s [z /sig_eqW[a Dz] /sig_eqW[ps Ds]]].
-  by exists 0; [exists [ffun _ => 2]; rewrite big_ord0 | exists nil].
+  by exists 0; [exists [ffun _ => 2%N]; rewrite big_ord0 | exists nil].
 have r_exists (y : algC): {r | r != 0 & root (pQtoC r) y}.
   have [r [_ mon_r] dv_r] := minCpolyP y.
   by exists r; rewrite ?monic_neq0 ?dv_r.
@@ -819,7 +819,7 @@ rewrite /orderC; case: pickP => /= [k /eqP Dp_k | no_k]; last first.
     by rewrite /= -/p Dp -Cintr_Cyclotomic.
   rewrite Dp size_cyclotomic (sqrnD 1) addnAC mulnDr -add1n leq_add //.
   suffices: (m <= \prod_(q <- primes m | q == 2) q * totient m ^ 2)%N.
-    have [m_even | m_odd] := boolP (2 \in primes m).
+    have [m_even | m_odd] := boolP (2%N \in primes m).
       by rewrite -big_filter filter_pred1_uniq ?primes_uniq // big_seq1.
     by rewrite big_hasC ?has_pred1 // => /leq_trans-> //; apply: leq_addl.
   rewrite big_mkcond totientE // -mulnn -!big_split /=.
