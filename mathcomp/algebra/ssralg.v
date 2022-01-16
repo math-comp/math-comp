@@ -81,6 +81,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                   n%:R == the ring image of an n in nat; this is just      *)
 (*                           notation for 1 *+ n, so 1%:R is convertible to 1 *)
 (*                           and 2%:R to 1 + 1.                               *)
+(*               <number> == <number>%:R with <number> a sequence of digits   *)
 (*                  x * y == the ring product of x and y.                     *)
 (*        \prod_<range> e == iterated product for a ring (cf bigop.v).        *)
 (*                 x ^+ n == x to the nth power with n in nat (non-negative), *)
@@ -6083,6 +6084,26 @@ Export ComUnitAlgebra.Exports IntegralDomain.Exports Field.Exports.
 Export DecidableField.Exports ClosedField.Exports.
 Export Pred.Exports SubType.Exports.
 Notation QEdecFieldMixin := QEdecFieldMixin.
+
+Variant Ione := IOne : Ione.
+Variant Inatmul := INatmul : Ione -> nat -> Inatmul.
+Variant Idummy_placeholder :=.
+
+Definition parse (x : Number.uint) : Inatmul :=
+  INatmul IOne (Nat.of_num_uint x).
+
+Definition print (x : Inatmul) : Number.uint :=
+  match x with
+  | INatmul IOne n => Number.UIntDecimal (Nat.to_uint n)
+  end.
+
+Arguments GRing.one {R}.
+Set Warnings "-via-type-remapping,-via-type-mismatch".
+Number Notation Idummy_placeholder parse print (via Inatmul
+  mapping [[GRing.natmul] => INatmul, [GRing.one] => IOne])
+  : ring_scope.
+Set Warnings "via-type-remapping,via-type-mismatch".
+Arguments GRing.one : clear implicits.
 
 Notation "0" := (zero _) : ring_scope.
 Notation "-%R" := (@opp _) : fun_scope.

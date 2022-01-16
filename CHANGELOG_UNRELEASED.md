@@ -13,6 +13,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`, added lemma `sortedP`
 - in `seq.v`, added statement `size_take_min`.
 
+- in `ssralg.v`
+  + number notation in scope ring_scope, numbers such as `12` or `42`
+    are now read as `12%:R` or `42%:R`
+
+- in `ssrint.v`
+  + number notation in scope ring_scope, numbers such as `-12` are now
+    read as `(-12)%:~R`
+
 ### Changed
 
 ### Renamed
