@@ -655,7 +655,7 @@ Section IntervalField.
 
 Variable R : numFieldType.
 
-Local Notation mid x y := ((x + y) / 2%:R).
+Local Notation mid x y := ((x + y) / 2).
 
 Lemma mid_in_itv : forall ba bb (xa xb : R), xa < xb ?<= if ba && ~~ bb ->
   mid xa xb \in Interval (BSide ba xa) (BSide bb xb).

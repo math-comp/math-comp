@@ -110,7 +110,7 @@ have iJ : conj i = - i.
   have [-> | nz_z] := eqVneq z 0; first exact: rmorph0.
   have [u Ru [v Rv Dz]]:
     exists2 u, conj u = u & exists2 v, conj v = v & (u + z * v) ^+ 2 = z.
-  - pose y := sqrt z; exists ((y + conj y) / 2%:R).
+  - pose y := sqrt z; exists ((y + conj y) / 2).
       by rewrite fmorph_div rmorphD conjK addrC rmorph_nat.
     exists ((y - conj y) / (z *+ 2)).
       rewrite fmorph_div rmorphMn zJ mulNrn invrN mulrN -mulNr rmorphB opprB.
@@ -625,7 +625,7 @@ Definition ltC_nat n p : (n%:R < p%:R :> algC) = (n < p)%N := ltr_nat _ n p.
 Definition Cchar : [char algC] =i pred0 := @char_num _.
 
 (* This can be used in the converse direction to evaluate assertions over     *)
-(* manifest rationals, such as 3%:R^-1 + 7%:%^-1 < 2%:%^-1 :> algC.           *)
+(* manifest rationals, such as 3^-1 + 7%:%^-1 < 2%:%^-1 :> algC.              *)
 (* Missing norm and integer exponent, due to gaps in ssrint and rat.          *)
 Definition CratrE :=
   let CnF := Algebraics.Implementation.numFieldType in
@@ -643,7 +643,7 @@ Definition CintrE :=
    (rmorphMz ZtoCm, @intr_norm CnF, @intr_sg CnF),
    =^~ (@ler_int CnF, @ltr_int CnF, (inj_eq (@intr_inj CnF)))).
 
-Let nz2 : 2%:R != 0 :> algC. Proof. by rewrite -!CintrE. Qed.
+Let nz2 : 2 != 0 :> algC. Proof. by rewrite -!CintrE. Qed.
 
 (* Conjugation and norm. *)
 

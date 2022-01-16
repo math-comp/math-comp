@@ -426,7 +426,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite -/p1 {1}/eqp dvdp_gcd => /and3P[_ _ /dvdp_leq/=/implyP].
     rewrite size_minPoly ltnNge size_poly (contraNneq _ nz_v) // => q1v0.
     by rewrite -(fmorph_eq0 [rmorphism of Qyz]) /= QyzE q1v0 horner0.
-  pose h2 : R := 2%:R^-1; have nz2: 2%:R != 0 :> R by rewrite pnatr_eq0.
+  pose h2 : R := 2^-1; have nz2: 2 != 0 :> R by rewrite pnatr_eq0.
   pose itv ab := [pred c : R | ab.1 <= c <= ab.2].
   pose wid ab : R := ab.2 - ab.1; pose mid ab := (ab.1 + ab.2) * h2.
   pose sub_itv ab cd := cd.1 <= ab.1 :> R /\ ab.2 <= cd.2 :> R.
@@ -771,9 +771,9 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     rewrite adjoin_degreeE -iPG -dim_fixed_galois // -defQw; congr (\dim_Cn _).
     apply/esym/eqP; rewrite eqEsubv adjoinSl ?sub1v //=; apply/FadjoinP.
     by rewrite memv_adjoin /= defQw -galois_connection.
-  have nz2: 2%:R != 0 :> Qt by move/charf0P: (charQ (Q t)) => ->.
+  have nz2: 2 != 0 :> Qt by move/charf0P: (charQ (Q t)) => ->.
   without loss{deg_w} [C'w Cw2]: w Rz_w / w \notin Cn /\ w ^+ 2 \in Cn.
-    pose p := minPoly Cn w; pose v := p`_1 / 2%:R.
+    pose p := minPoly Cn w; pose v := p`_1 / 2.
     have /polyOverP Cp: p \is a polyOver Cn := minPolyOver Cn w.
     have Cv: v \in Cn by rewrite rpred_div ?rpred_nat ?Cp.
     move/(_ (v + w)); apply; first by rewrite rpredD // subvP_adjoin.
@@ -793,11 +793,11 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
       by rewrite exprMn rpredM // rpredX.
     rewrite exprMn fpredMr //=; last by rewrite expf_eq0 (memPnC C'w) ?rpred0.
     by rewrite sqrrD Dit2 expr1n addrC addKr -mulrnAl fpredMl ?rpred_nat.
-  pose rect_w2 u v := [/\ u \in Rn, v \in Rn & u + i_t * (v * 2%:R) = w ^+ 2].
+  pose rect_w2 u v := [/\ u \in Rn, v \in Rn & u + i_t * (v * 2) = w ^+ 2].
   have{Cw2} [u [v [Ru Rv Dw2]]]: {u : Qt & {v | rect_w2 u v}}.
     rewrite /rect_w2 -(Fadjoin_poly_eq Cw2); set p := Fadjoin_poly Rn i_t _.
     have /polyOverP Rp: p \is a polyOver Rn by apply: Fadjoin_polyOver.
-    exists p`_0, (p`_1 / 2%:R); split; rewrite ?rpred_div ?rpred_nat //.
+    exists p`_0, (p`_1 / 2); split; rewrite ?rpred_div ?rpred_nat //.
     rewrite divfK // (horner_coef_wide _ (size_Fadjoin_poly _ _ _)) -/p.
     by rewrite adjoin_degreeE dimCn big_ord_recl big_ord1 mulr1 mulrC.
   pose p := Poly [:: - (ofQ t v ^+ 2); 0; - ofQ t u; 0; 1].
