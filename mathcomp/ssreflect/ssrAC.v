@@ -90,7 +90,7 @@ Module Import Syntax.
 Bind Scope AC_scope with syntax.
 Coercion Leaf : positive >-> syntax.
 Coercion Leaf_of_nat : nat >-> syntax.
-Notation "1" := 1%positive : AC_scope.
+Number Notation positive Pos.of_num_int Pos.to_num_uint : AC_scope.
 Notation "x * y" := (Op x%AC y%AC) : AC_scope.
 End Syntax.
 
