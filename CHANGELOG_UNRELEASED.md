@@ -10,26 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- in `seq.v`, added theorem `pairwise_trans`,
-
-- in `prime.v` 
-  + theorems `trunc_log0`, `trunc_log1`, `trunc_log_eq0`,
-    `trunc_log_gt0`, `trunc_log0n`, `trunc_log1n`, `leq_trunc_log`,
-    `trunc_log_eq`, `trunc_lognn`, `trunc_expnK`,  `trunc_logMp`,
-    `trunc_log2_double`, `trunc_log2S`
-  + definition `up_log` 
-  + theorems `up_log0`, `up_log1`, `up_log_eq0`, `up_log_gt0`, 
-    `up_log_bounds` , `up_logP`, `up_log_gtn`, `up_log_min`,
-    `leq_up_log`, `up_log_eq`, `up_lognn`, `up_expnK`, `up_logMp`,
-    `up_log2_double`, `up_log2S`, `up_log_trunc_log`, `trunc_log_up_log`
-     
 ### Changed
-
-- in `prime.v` 
-  + definition `trunc_log` now it is 0 when p <= 1 
-
-- in `ssrnum.v`
-  + generalized lemma `rootCV` so that the degree is not necessarily positive.
 
 ### Renamed
 
