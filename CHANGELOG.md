@@ -1,9 +1,40 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[1.13.0] - 2021-10-28](#1130---2021-10-28), [[1.12.0] - 2020-11-26](#1120---2020-11-26), and [[1.11.0] - 2020-06-09](#1110---2020-06-09).
+Last releases: [[1.14.0] - 2022-01-19](#1140---2022-01-19), [[1.13.0] - 2021-10-28](#1130---2021-10-28) and [[1.12.0] - 2020-11-26](#1120---2020-11-26).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [1.14.0] - 2022-01-19
+
+This release is compatible with Coq versions 8.11, 8.12, 8.13, 8.14, and 8.15.
+
+
+The contributors to this version are:
+Cyril Cohen, Erik Martin-Dorel, Kazuhiko Sakaguchi, Laurent Théry, Pierre Roux
+
+### Added
+
+- in `seq.v`, added theorem `pairwise_trans`,
+
+- in `prime.v` 
+  + theorems `trunc_log0`, `trunc_log1`, `trunc_log_eq0`,
+    `trunc_log_gt0`, `trunc_log0n`, `trunc_log1n`, `leq_trunc_log`,
+    `trunc_log_eq`, `trunc_lognn`, `trunc_expnK`,  `trunc_logMp`,
+    `trunc_log2_double`, `trunc_log2S`
+  + definition `up_log` 
+  + theorems `up_log0`, `up_log1`, `up_log_eq0`, `up_log_gt0`, 
+    `up_log_bounds` , `up_logP`, `up_log_gtn`, `up_log_min`,
+    `leq_up_log`, `up_log_eq`, `up_lognn`, `up_expnK`, `up_logMp`,
+    `up_log2_double`, `up_log2S`, `up_log_trunc_log`, `trunc_log_up_log`
+     
+### Changed
+
+- in `prime.v` 
+  + definition `trunc_log` now it is 0 when p <= 1 
+
+- in `ssrnum.v`
+  + generalized lemma `rootCV` so that the degree is not necessarily positive.
 
 ## [1.13.0] - 2021-10-28
 
