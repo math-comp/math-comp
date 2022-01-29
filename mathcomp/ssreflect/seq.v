@@ -740,6 +740,9 @@ have [le_sn | lt_ns] := leqP (size s) n0; first by rewrite take_oversize.
 by rewrite size_takel // ltnW.
 Qed.
 
+Lemma size_take_min s : size (take n0 s) = minn n0 (size s).
+Proof. exact: size_take. Qed.
+
 Lemma take_cat s1 s2 :
   take n0 (s1 ++ s2) =
     if n0 < size s1 then take n0 s1 else s1 ++ take (n0 - size s1) s2.
@@ -2261,7 +2264,7 @@ Lemma subseq_rot p s n :
 Proof.
 move=> /subseqP[m size_m ->].
 exists (count id (take n m)); last by rewrite -mask_rot // mask_subseq.
-by rewrite (leq_trans (count_size _ _))// size_take; case: ltnP.
+by rewrite (leq_trans (count_size _ _))// size_take_min geq_minl.
 Qed.
 
 End Subseq.

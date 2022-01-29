@@ -588,7 +588,7 @@ Canonical cat_bseq s (s' : m.-bseq T) := Bseq (cat_bseqP s s').
 
 Lemma take_bseqP s : size (take m s) <= n.
 Proof.
-by rewrite size_take (leq_trans _ (size_bseq s)) //; case: ifPn => // /ltnW.
+by rewrite size_take_min (leq_trans _ (size_bseq s)) // geq_minr.
 Qed.
 Canonical take_bseq s := Bseq (take_bseqP s).
 
