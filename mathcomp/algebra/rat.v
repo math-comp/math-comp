@@ -16,7 +16,7 @@ From mathcomp Require Import ssrint.
 (* x \is a Qint == x is an element of rat whose denominator is equal to 1     *)
 (* x \is a Qnat == x is a non-negative element of rat whose denominator       *)
 (*                 is equal to 1                                              *)
-(*       ratr r == generic embedding of (r : rat) into an arbitrary unitring. *)
+(*       ratr r == generic embedding of (r : rat) into an arbitrary unit ring.*)
 (* [rat x // y] == smart constructor for rationals, definitionally equal      *)
 (*                 to x / y for concrete values, intended for printing only   *)
 (*                 of normal forms. The parsable notation is for debugging.   *)
