@@ -1305,8 +1305,7 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "mathcomp-real-closed"
   mathcomp-single:
-    needs:
-    - coq
+    needs: []
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to test
@@ -1337,10 +1336,6 @@ jobs:
         \ bundle \"coq-8.14\" --argstr job \"mathcomp-single\" \\\n   --dry-run 2>&1\
         \ > /dev/null)\necho $nb_dry_run\necho ::set-output name=status::$(echo $nb_dry_run\
         \ | grep \"built:\" | sed \"s/.*/built/\")\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "coq"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
