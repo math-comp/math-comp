@@ -6,7 +6,7 @@ From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 (******************************************************************************)
 (*          This file describes quotients of algebraic structures.            *)
 (*                                                                            *)
-(* It defines a  join hierarchy mxing the structures defined  in file ssralg  *)
+(* It defines a join hierarchy mixing the structures defined  in file ssralg  *)
 (* (up to  unit ring type)  and the  quotType quotient structure  defined in  *)
 (* file  generic_quotient.   Every structure  in  that  (join) hierarchy  is  *)
 (* parametrized by  a base type  T and the  constants and operations  on the  *)
@@ -121,8 +121,7 @@ Record zmod_quot_class_of (Q : Type) : Type := ZmodQuotClass {
 
 Structure zmodQuotType : Type := ZmodQuotTypePack {
   zmod_quot_sort :> Type;
-  _ : zmod_quot_class_of zmod_quot_sort;
- 
+  _ : zmod_quot_class_of zmod_quot_sort
 }.
 
 Implicit Type zqT : zmodQuotType.
@@ -225,8 +224,7 @@ Record ring_quot_class_of (Q : Type) : Type := RingQuotClass {
 
 Structure ringQuotType : Type := RingQuotTypePack {
   ring_quot_sort :> Type;
-  _ : ring_quot_class_of ring_quot_sort;
- 
+  _ : ring_quot_class_of ring_quot_sort
 }.
 
 Implicit Type rqT : ringQuotType.
@@ -337,8 +335,7 @@ Record unit_ring_quot_class_of (Q : Type) : Type := UnitRingQuotClass {
 
 Structure unitRingQuotType : Type := UnitRingQuotTypePack {
   unit_ring_quot_sort :> Type;
-  _ : unit_ring_quot_class_of unit_ring_quot_sort;
- 
+  _ : unit_ring_quot_class_of unit_ring_quot_sort
 }.
 
 Implicit Type rqT : unitRingQuotType.
