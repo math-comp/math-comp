@@ -7,7 +7,7 @@ From mathcomp Require Import seq fintype.
 (* Provided a base type T, this files defines an interface for quotients Q   *)
 (* of the type T with explicit functions for canonical surjection (\pi       *)
 (* : T -> Q) and for choosing a representative (repr : Q -> T).  It then     *)
-(* provide a helper to quotient T by a decidable equivalence relation (e     *)
+(* provides a helper to quotient T by a decidable equivalence relation (e    *)
 (* : rel T) if T is a choiceType (or encodable as a choiceType modulo e).    *)
 (*                                                                           *)
 (* See "Pragmatic Quotient Types in Coq", proceedings of ITP2013,            *)
@@ -138,7 +138,7 @@ Definition repr_of := quot_repr (quot_class qT).
 Lemma repr_ofK : cancel repr_of \pi.
 Proof. by rewrite /pi_phant /repr_of /=; case: qT=> [? []]. Qed.
 
-Definition QuotType_clone (Q : Type) qT cT 
+Definition QuotType_clone (Q : Type) qT cT
   of phant_id (quot_class qT) cT := @QuotTypePack Q cT.
 
 End QuotientDef.
@@ -298,7 +298,7 @@ Notation PiMorph11 pi_f :=
 
 (* lifting helpers *)
 Notation lift_op1 Q f := (locked (fun x : Q => \pi_Q (f (repr x)) : Q)).
-Notation lift_op2 Q g := 
+Notation lift_op2 Q g :=
   (locked (fun x y : Q => \pi_Q (g (repr x) (repr y)) : Q)).
 Notation lift_fun1 Q f := (locked (fun x : Q => f (repr x))).
 Notation lift_fun2 Q g := (locked (fun x y : Q => g (repr x) (repr y))).
@@ -315,7 +315,7 @@ Lemma eq_lock T T' e : e =1 (@locked (T -> T') (fun x : T => e x)).
 Proof. by rewrite -lock. Qed.
 Prenex Implicits eq_lock.
 
-Notation PiEmbed e := 
+Notation PiEmbed e :=
   (fun x => @EqualTo _ _ (e x) (eq_lock (fun _ => \pi _) _)).
 
 (********************)
@@ -340,8 +340,7 @@ Record eq_quot_class_of (Q : Type) : Type := EqQuotClass {
 
 Record eqQuotType : Type := EqQuotTypePack {
   eq_quot_sort :> Type;
-  _ : eq_quot_class_of eq_quot_sort;
- 
+  _ : eq_quot_class_of eq_quot_sort
 }.
 
 Implicit Type eqT : eqQuotType.
@@ -356,11 +355,11 @@ Coercion eqQuotType_eqType : eqQuotType >-> eqType.
 Coercion eqQuotType_quotType : eqQuotType >-> quotType.
 
 Definition EqQuotType_pack Q :=
-  fun (qT : quotType T) (eT : eqType) qc ec 
-  of phant_id (quot_class qT) qc & phant_id (Equality.class eT) ec => 
+  fun (qT : quotType T) (eT : eqType) qc ec
+  of phant_id (quot_class qT) qc & phant_id (Equality.class eT) ec =>
     fun m => EqQuotTypePack (@EqQuotClass Q qc ec m).
 
-Definition EqQuotType_clone (Q : Type) eqT cT 
+Definition EqQuotType_clone (Q : Type) eqT cT
   of phant_id (eq_quot_class eqT) cT := @EqQuotTypePack Q cT.
 
 Lemma pi_eq_quot eqT : {mono \pi_eqT : x y / eq_quot_op x y >-> x == y}.
@@ -431,19 +430,19 @@ Notation "[ 'subType' Q 'of' T 'by' %/ ]" :=
 (@SubType T _ Q _ _ (@QuotSubType.reprP _ _) (@QuotSubType.qreprK _ _))
 (at level 0, format "[ 'subType'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
-Notation "[ 'eqMixin' 'of' Q 'by' <:%/ ]" := 
+Notation "[ 'eqMixin' 'of' Q 'by' <:%/ ]" :=
   (@QuotSubType.eqMixin _ _: Equality.class_of Q)
   (at level 0, format "[ 'eqMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" := 
+Notation "[ 'choiceMixin' 'of' Q 'by' <:%/ ]" :=
   (@QuotSubType.choiceMixin _ _: Choice.mixin_of Q)
   (at level 0, format "[ 'choiceMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'countMixin' 'of' Q 'by' <:%/ ]" := 
+Notation "[ 'countMixin' 'of' Q 'by' <:%/ ]" :=
   (@QuotSubType.countMixin _ _: Countable.mixin_of Q)
   (at level 0, format "[ 'countMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'finMixin' 'of' Q 'by' <:%/ ]" := 
+Notation "[ 'finMixin' 'of' Q 'by' <:%/ ]" :=
   (@QuotSubType.finMixin _ _: Finite.mixin_of Q)
   (at level 0, format "[ 'finMixin'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
@@ -518,7 +517,7 @@ Record encModRel := EncModRelPack {
 
 Variable r : encModRel.
 
-Definition encModRelClass := 
+Definition encModRelClass :=
   let: EncModRelPack _ c as r' := r return encModRel_class_of r' in c.
 
 Definition encModRelP (x : D) : r x x -> r (ED (DE x)) x.
