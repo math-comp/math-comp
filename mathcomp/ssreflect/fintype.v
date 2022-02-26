@@ -984,6 +984,13 @@ Lemma eqfun_inP D f1 f2 :
   reflect {in D, forall x, f1 x = f2 x} [forall (x | x \in D), f1 x == f2 x].
 Proof. exact: (forall_inPP _ (fun=> eqP)). Qed.
 
+Lemma not_eqfunP f1 f2 : reflect (~ (forall x, f1 x = f2 x)) (~~ [forall x, f1 x == f2 x]).
+Proof.
+apply: Bool.iff_reflect. 
+split; first by apply: contra_notN => /eqfunP. 
+by apply: contraNnot=> /eqfunP.
+Qed.
+
 Lemma existsP P : reflect (exists x, P x) [exists x, P x].
 Proof. exact: 'exists_idP. Qed.
 
