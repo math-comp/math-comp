@@ -1008,6 +1008,12 @@ Lemma exists_eq_inP D f1 f2 :
   reflect (exists2 x, D x & f1 x = f2 x) [exists (x | D x), f1 x == f2 x].
 Proof. exact: (exists_inPP _ (fun=> eqP)). Qed.
 
+Lemma not_exists_eqP f1 f2 : reflect (~ (exists x, f1 x = f2 x)) (~~ [exists x, f1 x == f2 x]).
+Proof.
+apply/(iffP idP); first by apply: contraNnot => /exists_eqP.
+by apply: contra_notN => /exists_eqP.
+Qed.
+
 Lemma eq_existsb P1 P2 : P1 =1 P2 -> [exists x, P1 x] = [exists x, P2 x].
 Proof. by move=> eqP12; congr (_ != 0); apply: eq_card. Qed.
 
