@@ -18,4 +18,3 @@ quotient.v
 -arg -w -arg +undeclared-scope
 -arg -w -arg -deprecated-hint-without-locality
 -arg -w -arg -deprecated-hint-rewrite-without-locality
--arg -w -arg -deprecated-ident-entry
