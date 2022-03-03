@@ -281,37 +281,37 @@ Notation enum A := (enum_mem (mem A)).
 Definition pick (T : finType) (P : pred T) := ohead (enum P).
 
 Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
-  (at level 0, x ident, format "[ 'pick'  x  |  P  ]") : form_scope.
+  (at level 0, x name, format "[ 'pick'  x  |  P  ]") : form_scope.
 Notation "[ 'pick' x : T | P ]" := (pick (fun x : T => P%B))
-  (at level 0, x ident, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope.
 Definition pick_true T (x : T) := true.
 Reserved Notation "[ 'pick' x : T ]"
-  (at level 0, x ident, format "[ 'pick'  x : T ]").
+  (at level 0, x name, format "[ 'pick'  x : T ]").
 Notation "[ 'pick' x : T ]" := [pick x : T | pick_true x]
   (only parsing) : form_scope.
 Notation "[ 'pick' x : T ]" := [pick x : T | pick_true _]
   (only printing) : form_scope.
 Notation "[ 'pick' x ]" := [pick x : _]
-  (at level 0, x ident, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope.
 Notation "[ 'pick' x | P & Q ]" := [pick x | P && Q ]
-  (at level 0, x ident,
+  (at level 0, x name,
    format "[ '[hv ' 'pick'  x  |  P '/ '   &  Q ] ']'") : form_scope.
 Notation "[ 'pick' x : T | P & Q ]" := [pick x : T | P && Q ]
-  (at level 0, x ident, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope.
 Notation "[ 'pick' x 'in' A ]" := [pick x | x \in A]
-  (at level 0, x ident, format "[ 'pick'  x  'in'  A  ]") : form_scope.
+  (at level 0, x name, format "[ 'pick'  x  'in'  A  ]") : form_scope.
 Notation "[ 'pick' x : T 'in' A ]" := [pick x : T | x \in A]
-  (at level 0, x ident, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope.
 Notation "[ 'pick' x 'in' A | P ]" := [pick x | x \in A & P ]
-  (at level 0, x ident,
+  (at level 0, x name,
    format "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P ] ']'") : form_scope.
 Notation "[ 'pick' x : T 'in' A | P ]" := [pick x : T | x \in A & P ]
-  (at level 0, x ident, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope.
 Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
-  (at level 0, x ident, format
+  (at level 0, x name, format
   "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P '/ '  &  Q ] ']'") : form_scope.
 Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
-  (at level 0, x ident, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope.
 
 (* We lock the definitions of card and subset to mitigate divergence of the   *)
 (* Coq term comparison algorithm.                                             *)
@@ -362,8 +362,8 @@ Definition ex_in C B x y :=  let: F^* := B in (C && F)^*.
 
 End Definitions.
 
-Notation "[ x | B ]" := (quant0b (fun x => B x)) (at level 0, x ident).
-Notation "[ x : T | B ]" := (quant0b (fun x : T => B x)) (at level 0, x ident).
+Notation "[ x | B ]" := (quant0b (fun x => B x)) (at level 0, x name).
+Notation "[ x : T | B ]" := (quant0b (fun x : T => B x)) (at level 0, x name).
 
 Module Exports.
 
@@ -1128,16 +1128,16 @@ End Injectiveb.
 Definition image_mem T T' f mA : seq T' := map f (@enum_mem T mA).
 Notation image f A := (image_mem f (mem A)).
 Notation "[ 'seq' F | x 'in' A ]" := (image (fun x => F) A)
-  (at level 0, F at level 99, x ident,
+  (at level 0, F at level 99, x name,
    format "'[hv' [ 'seq'  F '/ '  |  x  'in'  A ] ']'") : seq_scope.
 Notation "[ 'seq' F | x : T 'in' A ]" := (image (fun x : T => F) A)
-  (at level 0, F at level 99, x ident, only parsing) : seq_scope.
+  (at level 0, F at level 99, x name, only parsing) : seq_scope.
 Notation "[ 'seq' F | x : T ]" :=
   [seq F | x : T in pred_of_simpl (@pred_of_argType T)]
-  (at level 0, F at level 99, x ident,
+  (at level 0, F at level 99, x name,
    format "'[hv' [ 'seq'  F '/ '  |  x  :  T ] ']'") : seq_scope.
 Notation "[ 'seq' F , x ]" := [seq F | x : _ ]
-  (at level 0, F at level 99, x ident, only parsing) : seq_scope.
+  (at level 0, F at level 99, x name, only parsing) : seq_scope.
 
 Definition codom T T' f := @image_mem T T' f (mem T).
 
