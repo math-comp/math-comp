@@ -1485,7 +1485,7 @@ Proof. by rewrite -opprB normrN. Qed.
 
 Lemma normr_id v : `| `|v| | = `|v|.
 Proof.
-have nz2: 2%:R != 0 :> R by rewrite pnatr_eq0.
+have nz2: 2 != 0 :> R by rewrite pnatr_eq0.
 apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n ger0_norm //.
 by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
 Qed.
@@ -3766,7 +3766,7 @@ Proof. by case: C => ? /=; rewrite lter_ndivr_mull. Qed.
 
 (* Interval midpoint. *)
 
-Local Notation mid x y := ((x + y) / 2%:R).
+Local Notation mid x y := ((x + y) / 2).
 
 Lemma midf_le x y : x <= y -> (x <= mid x y) * (mid x y <= y).
 Proof.
@@ -4225,10 +4225,10 @@ Section RealField.
 
 Variables (F : realFieldType) (x y : F).
 
-Lemma leif_mean_square : x * y <= (x ^+ 2 + y ^+ 2) / 2%:R ?= iff (x == y).
+Lemma leif_mean_square : x * y <= (x ^+ 2 + y ^+ 2) / 2 ?= iff (x == y).
 Proof. by apply: real_leif_mean_square; apply: num_real. Qed.
 
-Lemma leif_AGM2 : x * y <= ((x + y) / 2%:R)^+ 2 ?= iff (x == y).
+Lemma leif_AGM2 : x * y <= ((x + y) / 2)^+ 2 ?= iff (x == y).
 Proof. by apply: real_leif_AGM2; apply: num_real. Qed.
 
 End RealField.
@@ -4240,7 +4240,7 @@ Variables (F : archiFieldType) (x : F).
 Lemma archi_boundP : 0 <= x -> x < (bound x)%:R.
 Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
 
-Lemma upper_nthrootP i : (bound x <= i)%N -> x < 2%:R ^+ i.
+Lemma upper_nthrootP i : (bound x <= i)%N -> x < 2 ^+ i.
 Proof.
 rewrite /bound; case: (sigW _) => /= b le_x_b le_b_i.
 apply: le_lt_trans (ler_norm x) (lt_trans le_x_b _ ).
@@ -4436,12 +4436,12 @@ Notation "n .-root" := (nthroot n) (at level 2, format "n .-root") : ring_scope.
 Notation "n .-root" := (nthroot n) (only parsing) : ring_scope.
 Notation sqrtC := 2.-root.
 
-Definition Re x := (x + x^*) / 2%:R.
-Definition Im x := 'i * (x^* - x) / 2%:R.
+Definition Re x := (x + x^*) / 2.
+Definition Im x := 'i * (x^* - x) / 2.
 Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
 Notation "'Im z" := (Im z) (at level 10, z at level 8) : ring_scope.
 
-Let nz2 : 2%:R != 0 :> C. Proof. by rewrite pnatr_eq0. Qed.
+Let nz2 : 2 != 0 :> C. Proof. by rewrite pnatr_eq0. Qed.
 
 Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
 
@@ -5098,7 +5098,7 @@ Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
 
 Lemma lerr x : x <= x.
 Proof.
-have n2: `|2%:R| == 2%:R :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
+have n2: `|2| == 2 :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
 rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
 by rewrite -(eqP n2) -normM mul0r.
 Qed.

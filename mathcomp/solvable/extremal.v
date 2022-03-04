@@ -50,7 +50,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope ring_scope.
+Local Notation "n %:R" := (n %:R%R).
 Import GroupScope GRing.Theory.
 
 Reserved Notation "''Mod_' m" (at level 8, m at level 2, format "''Mod_' m").
@@ -193,8 +193,8 @@ Lemma cyclic_pgroup_Aut_structure gT p (G : {group gT}) :
         & {in A, {morph m : a / a^-1 >-> (a^-1)%R}}],
       [/\ abelian A, cyclic F, #|F| = p.-1
         & [faithful F, on 'Ohm_1(G) | [Aut G]]]
-    & if n == 0%N then A = F else
-      exists t, [/\ t \in A, #[t] = 2, m t = - 1%R
+    & if n == 0 then A = F else
+      exists t, [/\ t \in A, #[t] = 2, m t = (- 1)%R
       & if odd p then
         [/\ cyclic A /\ cyclic P,
            exists s, [/\ s \in A, #[s] = (p ^ n)%N, m s = p.+1%:R & P = <[s]>]
@@ -295,7 +295,7 @@ have [cycF ffulF]: cyclic F /\ [faithful F, on 'Ohm_1(G) | [Aut G]].
   by rewrite Aut_prime_cyclic // -orderE ox1.
 exists m; split=> {im_m mV}//; have [n0 | n_gt0] := posnP n.
   by apply/eqP; rewrite eq_sym eqEcard pcore_sub oF oA n0 muln1 /=.
-have [t At mt]: {t | t \in A & m t = -1}.
+have [t At mt]: {t | t \in A & m t = -1}%R.
   apply: inv_m; rewrite /= Zp_cast // coprime_modr modn_small // subn1.
   by rewrite coprimenP // ltnW.
 have ot: #[t] = 2.
@@ -625,7 +625,7 @@ suffices isoED: ED \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ q.-1)).
   apply: eq_existsb => [[x y]] /=; rewrite !xpair_eqE.
   congr (_ && _); apply: andb_id2l; move/eqP=> xq1; congr (_ && (_ == _)).
   by apply/eqP; rewrite eq_sym eq_invg_mul -expgS (ltn_predK q_gt1) xq1.
-have unitrN1 : - 1 \in GRing.unit by move=> R; rewrite unitrN unitr1.
+have unitrN1 : (- 1)%R \in GRing.unit by move=> R; rewrite unitrN unitr1.
 pose uN1 := FinRing.unit ('Z_#[Zp1 : 'Z_q]) (unitrN1 _).
 apply: Extremal.Grp => //; exists (Zp_unitm uN1).
 rewrite Aut_aut order_injm ?injm_Zp_unitm ?in_setT //; split=> //.
@@ -932,7 +932,7 @@ Let Mxy := <<xyG>>.
 
 
 Theorem dihedral2_structure :
-    n > 1 -> extremal_generators G 2 n (x, y) -> G \isog 'D_m -> 
+    n > 1 -> extremal_generators G 2 n (x, y) -> G \isog 'D_m ->
   [/\ [/\ X ><| Y = G, {in G :\: X, forall t, #[t] = 2}
         & {in X & G :\: X, forall z t, z ^ t = z^-1}],
       [/\ G ^`(1) = <[x ^+ 2]>, 'Phi(G) = G ^`(1), #|G^`(1)| = r

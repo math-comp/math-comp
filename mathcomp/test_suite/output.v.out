@@ -37,7 +37,7 @@ cyclic_pgroup_Aut_structure
                      else
                       exists s : perm_for_finType gT,
                         [/\ s \in A, #[s] = (2 ^ n.-1)%N, 
-                           m s = (5%:R)%R, <[s]> \x <[t]> = A
+                           m s = 5%R, <[s]> \x <[t]> = A
                           & exists s0 : perm_for_finType gT,
                               [/\ s0 \in A, #[s0] = 2,
                                   m s0 = ((2 ^ n).+1%:R)%R,

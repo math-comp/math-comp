@@ -358,7 +358,7 @@ Qed.
 
 Lemma rank_mx_group m n q : 'r([set: 'M['Z_q]_(m, n)]) = (m * n)%N.
 Proof.
-wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2)->.
+wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2%N)->.
 set G := setT; have cGG: abelian G := zmod_abelian _.
 have [mn0 | ] := posnP (m * n).
   by rewrite [G](card1_trivg _) ?rank1 // cardsT card_mx mn0.
@@ -379,7 +379,7 @@ Qed.
 
 Lemma mx_group_homocyclic m n q : homocyclic [set: 'M['Z_q]_(m, n)].
 Proof.
-wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2)->.
+wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2%N)->.
 set G := setT; have cGG: abelian G := zmod_abelian _.
 rewrite -max_card_abelian //= rank_mx_group cardsT card_mx card_ord -/G.
 rewrite {1}Zp_cast //; have [-> // | ] := posnP (m * n).

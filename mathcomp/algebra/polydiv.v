@@ -3050,10 +3050,10 @@ Lemma reducible_cubic_root p q :
   size p <= 4 -> 1 < size q < size p -> q %| p -> {r | root p r}.
 Proof.
 move=> p_le4 /andP[]; rewrite leq_eqVlt eq_sym.
-have [/poly2_root[x qx0] _ _ | _ /= q_gt2 p_gt_q] := size q =P 2.
+have [/poly2_root[x qx0] _ _ | _ /= q_gt2 p_gt_q] := size q =P 2%N.
   by exists x; rewrite -!dvdp_XsubCl in qx0 *; apply: (dvdp_trans qx0).
 case/dvdpP/sig_eqW=> r def_p; rewrite def_p.
-suffices /poly2_root[x rx0]: size r = 2 by exists x; rewrite rootM rx0.
+suffices /poly2_root[x rx0]: size r = 2%N by exists x; rewrite rootM rx0.
 have /norP[nz_r nz_q]: ~~ [|| r == 0 | q == 0].
   by rewrite -mulf_eq0 -def_p -size_poly_gt0 (leq_ltn_trans _ p_gt_q).
 rewrite def_p size_mul // -subn1 leq_subLR ltn_subRL in p_gt_q p_le4.

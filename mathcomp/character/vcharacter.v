@@ -486,7 +486,7 @@ by rewrite scale_zchar ?irr_vchar // Cint_cfdot_vchar_irr.
 Qed.
 
 Lemma vchar_norm2 phi :
-    phi \in 'Z[irr G, G^#] -> '[phi] = 2%:R ->
+    phi \in 'Z[irr G, G^#] -> '[phi] = 2 ->
   exists i, exists2 j, j != i & phi = 'chi_i - 'chi_j.
 Proof.
 rewrite zchar_split cfunD1E => /andP[Zphi phi1_0].
