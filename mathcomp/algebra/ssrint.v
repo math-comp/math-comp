@@ -13,12 +13,16 @@ From mathcomp Require Import poly.
 (*                However (Posz m = Posz n) is displayed as (m = n :> int)    *)
 (*                (and so are ==, != and <>)                                  *)
 (*                Lemma NegzE : turns (Negz n) into - n.+1%:Z.                *)
+(*    <number> == <number> as an int with <number> an optional minus sign     *)
+(*                followed by a sequence of digits. This notation is in       *)
+(*                int_scope (delimited with %Z).                              *)
 (*      x *~ m == m times x, with m : int;                                    *)
 (*                convertible to x *+ n if m is Posz n                        *)
 (*                convertible to x *- n.+1 if m is Negz n.                    *)
 (*       m%:~R == the image of m : int in a generic ring (:= 1 *~ m).         *)
 (*    <number> == <number>%:~R with <number> an optional minus sign followed  *)
-(*                by a sequence of digits                                     *)
+(*                by a sequence of digits. This notation is in ring_scope     *)
+(*                (delimited with %R).                                        *)
 (*       x ^ m == x to the m, with m : int;                                   *)
 (*                convertible to x ^+ n if m is Posz n                        *)
 (*                convertible to x ^- n.+1 if m is Negz n.                    *)
@@ -74,6 +78,22 @@ Notation "n == m :> 'int'" := (Posz n == Posz m) (only printing) : ring_scope.
 Notation "n != m :> 'int'" := (Posz n != Posz m) (only printing) : ring_scope.
 Notation "n <> m :> 'int'" := (Posz n <> Posz m) (only printing) : ring_scope.
 
+Definition parse_int (x : Number.int) : int :=
+  match x with
+  | Number.IntDecimal (Decimal.Pos u) => Posz (Nat.of_uint u)
+  | Number.IntDecimal (Decimal.Neg u) => Negz (Nat.of_uint u).-1
+  | Number.IntHexadecimal (Hexadecimal.Pos u) => Posz (Nat.of_hex_uint u)
+  | Number.IntHexadecimal (Hexadecimal.Neg u) => Negz (Nat.of_hex_uint u).-1
+  end.
+
+Definition print_int (x : int) : Number.int :=
+  match x with
+  | Posz n => Number.IntDecimal (Decimal.Pos (Nat.to_uint n))
+  | Negz n => Number.IntDecimal (Decimal.Neg (Nat.to_uint n.+1))
+  end.
+
+Number Notation int parse_int print_int : int_scope.
+
 Definition natsum_of_int (m : int) : nat + nat :=
   match m with Posz p => inl _ p | Negz n => inr _ n end.
 
@@ -109,7 +129,6 @@ Definition oppz m := nosimpl
     | Negz n => Posz (n.+1)%N
   end.
 
-Local Notation "0" := (Posz 0) : int_scope.
 Local Notation "-%Z" := (@oppz) : int_scope.
 Local Notation "- x" := (oppz x) : int_scope.
 Local Notation "+%Z" := (@addz) : int_scope.
@@ -258,7 +277,6 @@ Definition mulz (m n : int) :=
     | Negz n', Posz m' => - (m' * (n'.+1%N))%N%:Z
   end.
 
-Local Notation "1" := (1%N:int) : int_scope.
 Local Notation "*%Z" := (@mulz) : int_scope.
 Local Notation "x * y" := (mulz x y) : int_scope.
 

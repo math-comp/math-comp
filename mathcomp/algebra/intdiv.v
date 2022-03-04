@@ -986,10 +986,10 @@ move=> {A leA}IHa; wlog Di: i M Da / i = 0; last rewrite {i}Di in Da.
   exists (xrow i 0 L); first by rewrite xrowE unitmx_mul unitmx_perm.
   exists R => //; exists d; rewrite //= xrowE -!mulmxA (mulmxA L) -dM xrowE.
   by rewrite mulmxA -perm_mxM tperm2 perm_mx1 mul1mx.
-without loss /forallP a_dvM0: / [forall j, a %| M 0 j]%Z.
+without loss /forallP a_dvM0: / [forall j, a %| M 0%R j]%Z.
   case: (altP forallP) => [_ IH|/forallPn/sigW/IHa IH _]; exact: IH.
 without loss{Da a_dvM0} Da: M / forall j, M 0 j = a.
-  pose Uur := col' 0 (\row_j (1 - (M 0 j %/ a)%Z)).
+  pose Uur := col' 0 (\row_j (1 - (M 0%R j %/ a)%Z)).
   pose U : 'M_(1 + n) := block_mx 1 Uur 0 1%:M; pose M1 := M *m U.
   have uU: U \in unitmx by rewrite unitmxE det_ublock !det1 mulr1.
   case/(_ (M *m U)) => [j | L uL [R uR [d dvD dM]]].
