@@ -109,6 +109,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrbool.v`, added `homo_mono1`.
 
+- In `ssreflect.v`:
+  + notation `!!`
+
 ### Changed
 
 - in `rat.v`
