@@ -872,9 +872,9 @@ Proof. by rewrite big_const_nat iter_addr_0. Qed.
 Lemma telescope_sumr n m (f : nat -> V) : n <= m ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
 Proof.
-rewrite leq_eqVlt => /predU1P[-> | ]; first by rewrite subrr big_geq.
-case: m => // m lenm; rewrite sumrB big_nat_recr // big_nat_recl //=.
-by rewrite addrC opprD addrA subrK addrC.
+move=> nm; rewrite (telescope_big (fun i j => f j - f i)).
+  by case: ltngtP nm => // ->; rewrite subrr.
+by move=> k /andP[nk km]/=; rewrite addrC subrKA.
 Qed.
 
 Section ClosedPredicates.
@@ -2998,12 +2998,8 @@ Lemma telescope_prodr n m (f : nat -> R) :
     (forall k, n < k < m -> f k \is a unit) -> n < m ->
   \prod_(n <= k < m) (f k / f k.+1) = f n / f m.
 Proof.
-move=> Uf /subnK-Dm; do [rewrite -{}Dm; move: {m}(m - _)%N => m] in Uf *.
-rewrite unlock /index_iota -addSnnS addnK /= -mulrA; congr (_ * _).
-have{Uf}: all [preim f of unit] (iota n.+1 m).
-  by apply/allP=> k; rewrite mem_iota addnC => /Uf.
-elim: m n => [|m IHm] n /=; first by rewrite mulr1.
-by rewrite -mulrA addSnnS => /andP[/mulKr-> /IHm].
+move=> Uf ltnm; rewrite (telescope_big (fun i j => f i / f j)) ?ltnm//.
+by move=> k ltnkm /=; rewrite mulrA divrK// Uf.
 Qed.
 
 Lemma commrV x y : comm x y -> comm x y^-1.
