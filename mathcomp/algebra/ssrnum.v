@@ -4389,7 +4389,7 @@ have JE x : x^* = `|x|^+2 / x.
   by apply: (canRL (mulfK _)) => //; rewrite mulrC -normCK.
 move=> x; have [->|x_neq0] := eqVneq x 0; first by rewrite !rmorph0.
 rewrite !JE normrM normfV exprMn normrX normr_id.
-rewrite invfM exprVn (AC (2*2)%AC (1*(2*3)*4)%AC)/= -invfM -exprMn.
+rewrite invfM exprVn (AC (2*2) (1*(2*3)*4))/= -invfM -exprMn.
 by rewrite divff ?mul1r ?invrK // !expf_eq0 normr_eq0 //.
 Qed.
 
@@ -4641,7 +4641,7 @@ Proof. by rewrite oppC_rect addC_rect. Qed.
 Lemma mulC_rect x1 y1 x2 y2 : (x1 + 'i * y1) * (x2 + 'i * y2) =
                               x1 * x2 - y1 * y2 + 'i * (x1 * y2 + x2 * y1).
 Proof.
-rewrite mulrDl !mulrDr (AC (2*2)%AC (1*4*(2*3))%AC)/= mulrACA.
+rewrite mulrDl !mulrDr (AC (2*2) (1*4*(2*3)))/= mulrACA.
 by rewrite -expr2 sqrCi mulN1r -!mulrA [_ * ('i * _)]mulrCA [_ * y1]mulrC.
 Qed.
 
@@ -4960,7 +4960,7 @@ have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
   rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy exprMn_n exprMn.
-  by rewrite mulrN (@GRing.mul C).[AC (2*2)%AC (1*4*(3*2))%AC] -!normCK mulNrn addNr.
+  by rewrite mulrN (@GRing.mul C).[AC (2*2) (1*4*(3*2))] -!normCK mulNrn addNr.
 have{def_xy def2xy} def_yx: `|y * x| = y * x^*.
   by apply: (mulIf nz2); rewrite !mulr_natr mulrC normrM def2xy def_xy.
 rewrite -{1}(divfK nz_x y) invC_norm mulrCA -{}def_yx !normrM invfM.

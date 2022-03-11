@@ -227,11 +227,11 @@ Notation opAC op  p s := (opACof op (AC.pattern p%AC) s%AC) (only parsing).
 Notation opACl op s := (opAC op (AC.Leaf_of_nat (size (AC.serial s%AC))) s%AC)
   (only parsing).
 
-Notation "op .[ 'ACof' p s ]" := (opACof op p s)
+Notation "op .[ 'ACof' p s ]" := (opACof op p%AC s%AC)
   (at level 2, p at level 1, left associativity, only parsing).
-Notation "op .[ 'AC' p s ]" := (opAC op p s)
+Notation "op .[ 'AC' p s ]" := (opAC op p%AC s%AC)
   (at level 2, p at level 1, left associativity, only parsing).
-Notation "op .[ 'ACl' s ]" := (opACl op s)
+Notation "op .[ 'ACl' s ]" := (opACl op s%AC)
   (at level 2, left associativity, only parsing).
 
 Notation AC_strategy :=
