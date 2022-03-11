@@ -159,8 +159,8 @@ Lemma pi_add : {morph \pi : x y / addf x y >-> add x y}.
 Proof.
 move=> x y; unlock add; apply/eqmodP; rewrite /= equivfE /addf /=.
 rewrite !numden_Ratio ?mulf_neq0 ?domP // mulrDr mulrDl; apply/eqP.
-symmetry; rewrite (AC (2*2)%AC (3*1*2*4)%AC) (AC (2*2)%AC (3*2*1*4)%AC)/=.
-by rewrite !equivf_l (ACl ((2*3)*(1*4))%AC) (ACl ((2*3)*(4*1))%AC)/=.
+symmetry; rewrite (AC (2*2) (3*1*2*4)) (AC (2*2) (3*2*1*4))/=.
+by rewrite !equivf_l (ACl ((2*3)*(1*4))) (ACl ((2*3)*(4*1)))/=.
 Qed.
 Canonical pi_add_morph := PiMorph2 pi_add.
 
@@ -248,8 +248,8 @@ Lemma mul_addl : left_distributive mul add.
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> z; apply/eqP.
 rewrite !piE /equivf /mulf /addf !numden_Ratio ?mulf_neq0 ?domP //; apply/eqP.
-rewrite !(mulrDr, mulrDl) (AC (3*(2*2))%AC (4*2*7*((1*3)*(6*5)))%AC)/=.
-by rewrite [X in _ + X](AC (3*(2*2))%AC (4*6*7*((1*3)*(2*5)))%AC)/=.
+rewrite !(mulrDr, mulrDl) (AC (3*(2*2)) (4*2*7*((1*3)*(6*5))))/=.
+by rewrite [X in _ + X](AC (3*(2*2)) (4*6*7*((1*3)*(2*5))))/=.
 Qed.
 
 Lemma nonzero1 : 1%:F != 0%:F :> type.
