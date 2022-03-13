@@ -1672,7 +1672,7 @@ Section DirprodIsom.
 Variable gT : finGroupType.
 Implicit Types G H : {group gT}.
 
-Definition mulgm : gT * gT -> _ := prod_curry mulg.
+Definition mulgm : gT * gT -> _ := uncurry mulg.
 
 Lemma imset_mulgm (A B : {set gT}) : mulgm @: setX A B = A * B.
 Proof. by rewrite -curry_imset2X. Qed.

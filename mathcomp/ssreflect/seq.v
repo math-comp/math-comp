@@ -3562,10 +3562,10 @@ Lemma mem_allpairs f s1 t1 s2 t2 :
 Proof. by move=> eq_s eq_t; apply: mem_allpairs_dep. Qed.
 
 Lemma allpairs_uniq f s t (st := [seq (x, y) | x <- s, y <- t]) :
-    uniq s -> uniq t -> {in st &, injective (prod_curry f)} ->
+    uniq s -> uniq t -> {in st &, injective (uncurry f)} ->
   uniq [seq f x y | x <- s, y <- t].
 Proof.
-move=> Us Ut inj_f; rewrite -(map_allpairs (prod_curry f) (@pair S T)) -/st.
+move=> Us Ut inj_f; rewrite -(map_allpairs (uncurry f) (@pair S T)) -/st.
 rewrite map_inj_in_uniq // allpairs_uniq_dep {Us Ut st inj_f}//.
 by apply: in2W => -[x1 y1] [x2 y2] /= [-> ->].
 Qed.

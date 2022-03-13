@@ -766,7 +766,7 @@ have toEtrans j i k leij lejk leik z:
 have [leMl leMr] := (leq_maxl, leq_maxr); pose le_max := (leq_max, leqnn, orbT).
 pose pairK (x y : Krep) (m := maxn _ _) :=
   (toE _ m (leMl _ _) (tagged x), toE _ m (leMr _ _) (tagged y)).
-pose eqKrep x y := prod_curry (@eq_op _) (pairK x y).
+pose eqKrep x y := uncurry (@eq_op _) (pairK x y).
 have eqKrefl : reflexive eqKrep by move=> z; apply/eqP; apply: toEirr.
 have eqKsym : symmetric eqKrep.
   move=> z1 z2; rewrite {1}/eqKrep /= eq_sym; move: (leMl _ _) (leMr _ _).
@@ -798,9 +798,9 @@ have toErepr m i leim x lerm:
   rewrite eqmodE /= /eqKrep; case: (repr _) => j y /= in lerm * => /eqP /=.
   have leijm: maxn i j <= m by rewrite geq_max leim.
   by move/(congr1 (toE _ _ leijm)); rewrite -!toEtrans.
-pose Kadd (x y : K) := EtoK _ (prod_curry +%R (pairK (repr x) (repr y))).
+pose Kadd (x y : K) := EtoK _ (uncurry +%R (pairK (repr x) (repr y))).
 pose Kopp (x : K) := EtoK _ (- tagged (repr x)).
-pose Kmul (x y : K) := EtoK _ (prod_curry *%R (pairK (repr x) (repr y))).
+pose Kmul (x y : K) := EtoK _ (uncurry *%R (pairK (repr x) (repr y))).
 pose Kinv (x : K) := EtoK _ (tagged (repr x))^-1.
 have EtoK_D i: {morph EtoK i : x y / x + y >-> Kadd x y}.
   move=> x y; apply: eqEtoK; set j := maxn (tag _) _; rewrite !rmorphD.

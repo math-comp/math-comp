@@ -1066,7 +1066,7 @@ Local Notation imset_def :=
   (fun (aT rT : finType) f mD => [set y in @image_mem aT rT f mD]).
 Local Notation imset2_def :=
   (fun (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) =>
-     [set y in @image_mem _ rT (prod_curry f)
+     [set y in @image_mem _ rT (uncurry f)
                            (mem [pred u | D1 u.1 & D2 u.1 u.2])]).
 
 Module Type ImsetSig.
@@ -1763,7 +1763,7 @@ Section Curry.
 Variables (A1 : {set aT1}) (A2 : {set aT2}).
 Variables (D1 : {pred aT1}) (D2 : {pred aT2}).
 
-Lemma curry_imset2X : f @2: (A1, A2) = prod_curry f @: (setX A1 A2).
+Lemma curry_imset2X : f @2: (A1, A2) = uncurry f @: (setX A1 A2).
 Proof.
 rewrite [@imset]unlock unlock; apply/setP=> x; rewrite !in_set; congr (x \in _).
 by apply: eq_image => u //=; rewrite !inE.

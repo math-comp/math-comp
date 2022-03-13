@@ -1217,7 +1217,7 @@ Proof.
 by move=> u; apply/rowP=> k; case/mxvec_indexP: k => i j; rewrite mxvecE mxE.
 Qed.
 
-Lemma curry_mxvec_bij : {on 'I_(m * n), bijective (prod_curry mxvec_index)}.
+Lemma curry_mxvec_bij : {on 'I_(m * n), bijective (uncurry mxvec_index)}.
 Proof.
 exists (enum_val \o cast_ord (esym mxvec_cast)) => [[i j] _ | k _] /=.
   by rewrite cast_ordK enum_rankK.
