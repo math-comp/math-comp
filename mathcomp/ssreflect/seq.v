@@ -667,6 +667,9 @@ Proof. by rewrite all_count count_pred0 eq_sym. Qed.
 Lemma all_predT s : all predT s.
 Proof. by rewrite all_count count_predT. Qed.
 
+Lemma allT (a : pred T) s : (forall x, a x) -> all a s.
+Proof. by move/eq_all->; apply/all_predT. Qed.
+
 Lemma all_predC a s : all (predC a) s = ~~ has a s.
 Proof. by elim: s => //= x s ->; case (a x). Qed.
 
@@ -1166,7 +1169,7 @@ Proof. by rewrite -all_predC; apply: allP. Qed.
 Lemma allPn a s : reflect (exists2 x, x \in s & ~~ a x) (~~ all a s).
 Proof. by rewrite -has_predC; apply: hasP. Qed.
 
-Lemma allss s : all (mem s) s. Proof. exact/allP. Qed.
+Lemma allss s : all [in s] s. Proof. exact/allP. Qed.
 
 Lemma mem_filter a x s : (x \in filter a s) = a x && (x \in s).
 Proof.
@@ -1220,7 +1223,7 @@ Qed.
 Lemma eq_all_r s1 s2 : s1 =i s2 -> all^~ s1 =1 all^~ s2.
 Proof. by move=> Es a; apply/negb_inj; rewrite -!has_predC (eq_has_r Es). Qed.
 
-Lemma has_sym s1 s2 : has (mem s1) s2 = has (mem s2) s1.
+Lemma has_sym s1 s2 : has [in s1] s2 = has [in s2] s1.
 Proof. by apply/hasP/hasP=> -[x]; exists x. Qed.
 
 Lemma has_pred1 x s : has (pred1 x) s = (x \in s).
@@ -1271,7 +1274,7 @@ Lemma cons_uniq x s : uniq (x :: s) = (x \notin s) && uniq s.
 Proof. by []. Qed.
 
 Lemma cat_uniq s1 s2 :
-  uniq (s1 ++ s2) = [&& uniq s1, ~~ has (mem s1) s2 & uniq s2].
+  uniq (s1 ++ s2) = [&& uniq s1, ~~ has [in s1] s2 & uniq s2].
 Proof.
 elim: s1 => [|x s1 IHs]; first by rewrite /= has_pred0.
 by rewrite has_sym /= mem_cat !negb_or has_sym IHs -!andbA; do !bool_congr.
@@ -1540,14 +1543,14 @@ Arguments uniqP {T} x0 {s}.
 Arguments forall_cons {T P a s}.
 Arguments exists_cons {T P a s}.
 
-(* Since both `all (mem s) s` and `all (pred_of_seq s) s` may appear in       *)
-(* goals, the following hint has to be declared using the `Hint Extern`       *)
-(* command. Additionally, `mem` and `pred_of_seq` in the above terms do not   *)
-(* reduce to each other; thus, stating `allss` in the form of one of them     *)
-(* makes `apply: allss` failing for the other case. Since both `mem` and      *)
-(* `pred_of_seq` reduce to `mem_seq`, the following explicit type annotation  *)
-(* for `allss` makes it work for both cases.                                  *)
-#[global] Hint Extern 0 (is_true (all _ _)) =>
+(* Since both `all [in s] s`, `all (mem s) s`, and `all (pred_of_seq s) s`    *)
+(* may appear in goals, the following hint has to be declared using the       *)
+(* `Hint Extern` command. Additionally, `mem` and `pred_of_seq` in the above  *)
+(* terms do not reduce to each other; thus, stating `allss` in the form of    *)
+(* one of them makes `apply: allss` fail for the other case. Since both `mem` *)
+(* and `pred_of_seq` reduce to `mem_seq`, the following explicit type         *)
+(* annotation for `allss` makes it work for both cases.                       *)
+#[export] Hint Extern 0 (is_true (all _ _)) =>
   apply: (allss : forall T s, all (mem_seq s) s) : core.
 
 Section NthTheory.
@@ -2444,6 +2447,9 @@ Proof. by elim: s => //= x s ->. Qed.
 Lemma all_map a s : all a (map s) = all (preim f a) s.
 Proof. by elim: s => //= x s ->. Qed.
 
+Lemma all_mapT (a : pred T2) s : (forall x, a (f x)) -> all a (map s).
+Proof. by rewrite all_map => /allT->. Qed.
+
 Lemma count_map a s : count a (map s) = count (preim f a) s.
 Proof. by elim: s => //= x s ->. Qed.
 
@@ -2466,7 +2472,14 @@ Lemma map_mask m s : map (mask m s) = mask m (map s).
 Proof. by elim: m s => [|[|] m IHm] [|x p] //=; rewrite IHm. Qed.
 
 Lemma inj_map : injective f -> injective map.
-Proof. by move=> injf; elim=> [|y1 s1 IHs] [|y2 s2] //= [/injf-> /IHs->]. Qed.
+Proof. by move=> injf; elim=> [|x s IHs] [|y t] //= [/injf-> /IHs->]. Qed.
+
+Lemma inj_in_map (A : {pred T1}) :
+  {in A &, injective f} -> {in [pred s | all [in A] s] &, injective map}.
+Proof.
+move=> injf; elim=> [|x s IHs] [|y t] //= /andP[Ax As] /andP[Ay At].
+by case=> /injf-> // /IHs->.
+Qed.
 
 End Map.
 
@@ -2569,7 +2582,7 @@ by case a_x: (a x); rewrite /= !IHs /=; case: eqP => // ->; rewrite a_x.
 Qed.
 
 Lemma subseq_uniqP s1 s2 :
-  uniq s2 -> reflect (s1 = filter (mem s1) s2) (subseq s1 s2).
+  uniq s2 -> reflect (s1 = filter [in s1] s2) (subseq s1 s2).
 Proof.
 move=> uniq_s2; apply: (iffP idP) => [ss12 | ->]; last exact: filter_subseq.
 apply/eqP; rewrite -size_subseq_leqif ?subseq_filter ?(introT allP) //.
@@ -2711,27 +2724,31 @@ Qed.
 
 Section MapComp.
 
-Variable T1 T2 T3 : Type.
+Variable S T U : Type.
 
-Lemma map_id (s : seq T1) : map id s = s.
+Lemma map_id (s : seq T) : map id s = s.
 Proof. by elim: s => //= x s ->. Qed.
 
-Lemma eq_map (f1 f2 : T1 -> T2) : f1 =1 f2 -> map f1 =1 map f2.
+Lemma eq_map (f g : S -> T) : f =1 g -> map f =1 map g.
 Proof. by move=> Ef; elim=> //= x s ->; rewrite Ef. Qed.
 
-Lemma map_comp (f1 : T2 -> T3) (f2 : T1 -> T2) s :
-  map (f1 \o f2) s = map f1 (map f2 s).
+Lemma map_comp (f : T -> U) (g : S -> T) s : map (f \o g) s = map f (map g s).
 Proof. by elim: s => //= x s ->. Qed.
 
-Lemma mapK (f1 : T1 -> T2) (f2 : T2 -> T1) :
-  cancel f1 f2 -> cancel (map f1) (map f2).
-Proof. by move=> eq_f12; elim=> //= x s ->; rewrite eq_f12. Qed.
+Lemma mapK (f : S -> T) (g : T -> S) : cancel f g -> cancel (map f) (map g).
+Proof. by move=> fK; elim=> //= x s ->; rewrite fK. Qed.
+
+Lemma mapK_in (A : {pred S}) (f : S -> T) (g : T -> S) :
+  {in A, cancel f g} -> {in [pred s | all [in A] s], cancel (map f) (map g)}.
+Proof. by move=> fK; elim=> //= x s IHs /andP[/fK-> /IHs->]. Qed.
 
 End MapComp.
 
-Lemma eq_in_map (T1 : eqType) T2 (f1 f2 : T1 -> T2) (s : seq T1) : 
-  {in s, f1 =1 f2} <-> map f1 s = map f2 s.
-Proof. by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->]. Qed.
+Lemma eq_in_map (S : eqType) T (f g : S -> T) (s : seq S) : 
+  {in s, f =1 g} <-> map f s = map g s.
+Proof.
+by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->].
+Qed.
 
 Lemma map_id_in (T : eqType) f (s : seq T) : {in s, f =1 id} -> map f s = s.
 Proof. by move/eq_in_map->; apply: map_id. Qed.

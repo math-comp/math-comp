@@ -874,7 +874,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     apply/imsetP; exists z; rewrite //.
     apply/eqP; rewrite eqEcard sub1set class_refl cards1.
     by rewrite -index_cent1 (setIidPl _) ?indexgg // sub_cent1.
-  move/eqP: (class_formula S); rewrite (bigID (mem Zcl)) /=.
+  move/eqP: (class_formula S); rewrite (bigID [in Zcl]) /=.
   rewrite (eq_bigr (fun _ => 1%N)) => [|zS]; last first.
     case/andP=> _ /setIdP[/imsetP[z Sz ->{zS}] /subsetIP[_ cSzS]].
     rewrite (setIidPl _) ?indexgg // sub_cent1 (subsetP cSzS) //.
@@ -980,12 +980,12 @@ split=> // [i | ze | i].
   by rewrite phi_ze exprM.
 rewrite deg_phi {i}; set d := irr_degree i0.
 apply/eqP; move/eqP: (sum_irr_degree sS F'S splitF).
-rewrite (bigID (mem linS)) /= -/irr_degree.
-rewrite (eq_bigr (fun _ => 1%N)) => [|i]; last by rewrite !inE; move/eqP->.
+rewrite (bigID [in linS]) /= -/irr_degree.
+rewrite (eq_bigr (fun=> 1%N)) => [|i]; last by rewrite !inE; move/eqP->.
 rewrite sum1_card nb_lin.
-rewrite (eq_bigl (mem (codom iphi))) // => [|i]; last first.
+rewrite (eq_bigl [in codom iphi]) // => [|i]; last first.
   by rewrite -in_setC -im_iphi.
-rewrite (eq_bigr (fun _ => d ^ 2))%N => [|_ /codomP[i ->]]; last first.
+rewrite (eq_bigr (fun=> d ^ 2))%N => [|_ /codomP[i ->]]; last first.
   by rewrite deg_phi.
 rewrite sum_nat_const card_image // card_ord oSpn (expnS p) -{3}[p]prednK //.
 rewrite mulSn eqn_add2l eqn_pmul2l; last by rewrite -ltnS prednK.

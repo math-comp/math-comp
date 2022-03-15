@@ -624,7 +624,7 @@ have cfHM: M \subset 'C(autm Af @* H).
   rewrite centsC (sameP commG1P trivgP) -tifHM subsetI commg_subl commg_subr.
   by rewrite (subset_trans sMG) // (subset_trans sfHG).
 exists (autm Af @* H <*> M)%G; rewrite /normal /= join_subG sMG sfHG normsY //=.
-rewrite (bigD1 f) ?inE ?eqxx // (eq_bigl (mem I)) /= => [|g]; last first.
+rewrite (bigD1 f) ?inE ?eqxx // (eq_bigl [in I]) /= => [|g]; last first.
   by rewrite /= !inE andbC; case: eqP => // ->.
 by rewrite defM -(autmE Af) -morphimEsub // dprodE // cent_joinEr ?eqxx.
 Qed.

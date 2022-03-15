@@ -1342,7 +1342,7 @@ Qed.
 
 Implicit Type S : {pred R}.
 
-Definition polyOver S := [qualify a p : {poly R} | all (mem S) p].
+Definition polyOver S := [qualify a p : {poly R} | all [in S] p].
 
 Fact polyOver_key S : pred_key (polyOver S). Proof. by []. Qed.
 Canonical polyOver_keyed S := KeyedQualifier (polyOver_key S).

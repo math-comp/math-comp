@@ -768,7 +768,7 @@ rewrite -ltnS -szP -(size_map f) max_ring_poly_roots -?size_poly_eq0 ?{}szP //.
   move/eqP=> yn1 ->{fy}; apply/eqP.
   by rewrite !(hornerE, hornerXn) -fX // yn1 f1 subrr.
 have: uniq rs by apply: enum_uniq.
-have: all (mem G) rs by apply/allP=> y; rewrite mem_enum; case/setIP.
+have: all [in G] rs by apply/allP=> y; rewrite mem_enum; case/setIP.
 elim: rs => //= y rs IHrs /andP[Gy Grs] /andP[y_rs]; rewrite andbC.
 move/IHrs=> -> {IHrs}//; apply/allP=> _ /mapP[z rs_z ->].
 have{Grs} Gz := allP Grs z rs_z; rewrite /diff_roots -!fM // (centsP abelG) //.

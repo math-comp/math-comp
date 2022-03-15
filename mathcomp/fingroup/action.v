@@ -810,7 +810,7 @@ Proof.
 move=> GactS; have sGD := acts_dom GactS.
 transitivity (\sum_(a in G) \sum_(x in 'Fix_(S | to)[a]) 1%N).
   by apply: eq_bigr => a _; rewrite -sum1_card.
-rewrite (exchange_big_dep (mem S)) /= => [|a x _]; last by case/setIP.
+rewrite (exchange_big_dep [in S]) /= => [|a x _]; last by case/setIP.
 rewrite (set_partition_big _ (orbit_partition GactS)) -sum_nat_const /=.
 apply: eq_bigr => _ /imsetP[x Sx ->].
 rewrite -(card_orbit_in_stab x sGD) -sum_nat_const.

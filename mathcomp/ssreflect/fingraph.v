@@ -160,7 +160,7 @@ Proof. by move->; apply: connect0. Qed.
 Lemma connect1 x y : e x y -> connect x y.
 Proof. by move=> e_xy; apply/connectP; exists [:: y]; rewrite /= ?e_xy. Qed.
 
-Lemma path_connect x p : path e x p -> subpred (mem (x :: p)) (connect x).
+Lemma path_connect x p : path e x p -> subpred [in x :: p] (connect x).
 Proof.
 move=> e_p y p_y; case/splitPl: p / p_y e_p => p q <-.
 by rewrite cat_path => /andP[e_p _]; apply/connectP; exists p.

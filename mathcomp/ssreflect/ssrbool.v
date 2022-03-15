@@ -5,6 +5,59 @@ From Coq Require Export ssrbool.
 #[deprecated(since="mathcomp 1.15", note="Use rel_of_simpl instead.")]
 Notation rel_of_simpl_rel := rel_of_simpl.
 
+(******************************************************************************)
+(* Local additions:                                                           *)
+(*        [in A] == the applicative counterpart of a collective predicate A:  *)
+(*                  [in A] x beta-expands to x \in A. This is similar to      *)
+(*                  mem A, except that mem A x only simplfies to x \in A.     *)
+(* --> These will become part of the core SSReflect library in later Coq      *)
+(* versions.                                                                  *)
+(*   For the sake of backwards compatibility, this file also replicates       *)
+(* v8.13-15 additions, including a generalization of the statments of         *)
+(* `homoRL_in`, `homoLR_in`, `homo_mono_in`, `monoLR_in`, `monoRL_in`, and    *)
+(* `can_mono_in`.                                                             *)
+(******************************************************************************)
+
+(*******************)
+(* v8.13 additions *)
+(*******************)
+
+Section HomoMonoMorphismFlip.
+Variables (aT rT : Type) (aR : rel aT) (rR : rel rT) (f : aT -> rT).
+Variable (aD aD' : {pred aT}).
+
+Lemma homo_sym : {homo f : x y / aR x y >-> rR x y} ->
+  {homo f : y x / aR x y >-> rR x y}.
+Proof. by move=> fR y x; apply: fR. Qed.
+
+Lemma mono_sym : {mono f : x y / aR x y >-> rR x y} ->
+  {mono f : y x / aR x y >-> rR x y}.
+Proof. by move=> fR y x; apply: fR. Qed.
+
+Lemma homo_sym_in : {in aD &, {homo f : x y / aR x y >-> rR x y}} ->
+  {in aD &, {homo f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+Lemma mono_sym_in : {in aD &, {mono f : x y / aR x y >-> rR x y}} ->
+  {in aD &, {mono f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+Lemma homo_sym_in11 : {in aD & aD', {homo f : x y / aR x y >-> rR x y}} ->
+  {in aD' & aD, {homo f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+Lemma mono_sym_in11 : {in aD & aD', {mono f : x y / aR x y >-> rR x y}} ->
+  {in aD' & aD, {mono f : y x / aR x y >-> rR x y}}.
+Proof. by move=> fR y x yD xD; apply: fR. Qed.
+
+End HomoMonoMorphismFlip.
+Arguments homo_sym {aT rT} [aR rR f].
+Arguments mono_sym {aT rT} [aR rR f].
+Arguments homo_sym_in {aT rT} [aR rR f aD].
+Arguments mono_sym_in {aT rT} [aR rR f aD].
+Arguments homo_sym_in11 {aT rT} [aR rR f aD aD'].
+Arguments mono_sym_in11 {aT rT} [aR rR f aD aD'].
+
 (******************)
 (* v8.14 addtions *)
 (******************)
@@ -282,3 +335,16 @@ Proof. by case: b1 b2 => [] []. Qed.
 Lemma if_add b1 b2 T (x y : T) :
   (if b1 (+) b2 then x else y) = (if b1 then if b2 then y else x else if b2 then x else y).
 Proof. by case: b1 b2 => [] []. Qed.
+
+(********************)
+(* Future additions *)
+(********************)
+
+Notation "[ 'in' A ]" := (in_mem^~ (mem A))
+  (at level 0, format "[ 'in'  A ]") : fun_scope.
+
+Notation "[ 'predI' A & B ]" := (predI [in A] [in B]) : fun_scope.
+Notation "[ 'predU' A & B ]" := (predU [in A] [in B]) : fun_scope.
+Notation "[ 'predD' A & B ]" := (predD [in A] [in B]) : fun_scope.
+Notation "[ 'predC' A ]" := (predC [in A]) : fun_scope.
+Notation "[ 'preim' f 'of' A ]" := (preim f [in A]) : fun_scope.

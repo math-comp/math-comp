@@ -1133,19 +1133,19 @@ Qed.
 Lemma uniq4_uniq6 : forall x y z t : cube,
   uniq [:: x; y; z; t] -> exists u, exists v, uniq [:: x; y; z; t; u; v].
 Proof.
-move=> x y z t Uxt; move: (cardC (mem [:: x; y; z; t])).
+move=> x y z t Uxt; move: (cardC [in [:: x; y; z; t]]).
 rewrite card_ord  (card_uniq_tuple Uxt) => hcard.
-have hcard2: #|predC (mem [:: x; y; z; t])| = 2.
+have hcard2: #|[predC [:: x; y; z; t]]| = 2.
   by apply: (@addnI 4); rewrite /injective  hcard.
-have:  #|predC (mem [:: x; y; z; t])| != 0 by rewrite hcard2.
+have:  #|[predC [:: x; y; z; t]]| != 0 by rewrite hcard2.
 case/existsP=> u Hu; exists u.
-move: (cardC (mem [:: x; y; z; t; u])); rewrite card_ord => hcard5.
+move: (cardC [in [:: x; y; z; t; u]]); rewrite card_ord => hcard5.
 have: #|[predC [:: x; y; z; t; u]]| !=0.
   rewrite -lt0n  -(ltn_add2l #|[:: x; y; z; t; u]|) hcard5 addn0.
   by apply: (leq_ltn_trans (card_size [:: x; y; z; t; u])).
-case/existsP => v; rewrite inE (mem_cat _ [:: _; _; _; _]) => /norP[Hv Huv].
-exists v; rewrite (cat_uniq [:: x; y; z; t]) Uxt andTb.
-by rewrite -rev_uniq /= negb_or Hu orbF Hv Huv.
+case/existsP => v; rewrite (mem_cat _ [:: _; _; _; _]) => /norP[Hv Huv].
+exists v; rewrite (cat_uniq [:: x; y; z; t]) Uxt andTb -rev_uniq /= orbF.
+by rewrite negb_or Hu Hv Huv.
 Qed.
 
 Lemma card_n4 : forall x y z t : cube, uniq [:: x; y; z; t] ->

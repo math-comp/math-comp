@@ -612,7 +612,7 @@ Proof. by rewrite lt0n; apply: pred0Pn. Qed.
 Lemma card_le1P {A} : reflect {in A, forall x, A =i pred1 x} (#|A| <= 1).
 Proof.
 apply: (iffP idP) => [A1 x xA y|]; last first.
-  by have [/= x xA /(_ _ xA)/eq_card1->|/eq_card0->//] := pickP (mem A).
+  by have [/= x xA /(_ _ xA)/eq_card1->|/eq_card0->//] := pickP [in A].
 move: A1; rewrite (cardD1 x) xA ltnS leqn0 => /eqP/card0_eq/(_ y).
 by rewrite !inE; have [->|]:= eqP.
 Qed.
@@ -737,7 +737,7 @@ Proof.
 by move/subsetP=> sAB /subsetP=> sBC; apply/subsetP=> x /sAB; apply: sBC.
 Qed.
 
-Lemma subset_all s A : (s \subset A) = all (mem A) s.
+Lemma subset_all s A : (s \subset A) = all [in A] s.
 Proof. exact: (sameP (subsetP _ _) allP). Qed.
 
 Lemma properE A B : A \proper B = (A \subset B) && ~~(B \subset A).
@@ -904,7 +904,7 @@ Lemma disjoint_cons x s B :
   [disjoint x :: s & B] = (x \notin B) && [disjoint s & B].
 Proof. exact: disjointU1. Qed.
 
-Lemma disjoint_has s A : [disjoint s & A] = ~~ has (mem A) s.
+Lemma disjoint_has s A : [disjoint s & A] = ~~ has [in A] s.
 Proof.
 apply/negbRL; apply/pred0Pn/hasP => [[x /andP[]]|[x]]; exists x => //.
 exact/andP.

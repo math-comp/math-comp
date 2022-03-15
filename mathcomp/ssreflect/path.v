@@ -638,7 +638,7 @@ Lemma sorted_eq_in s1 s2 :
 Proof.
 move=> /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_anti + + /[dup] s1s2.
 have /all_sigP[s1' ->] := allss s1.
-have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
+have /all_sigP[{s1s2}s2 ->] : all [in s1] s2 by rewrite -(perm_all _ s1s2).
 by rewrite !sorted_map => ss1' ss2 /(perm_map_inj val_inj)/(sorted_eq leT_tr)->.
 Qed.
 
@@ -648,7 +648,7 @@ Lemma irr_sorted_eq_in s1 s2 :
 Proof.
 move=> /in3_sig leT_tr /in1_sig leT_irr + + /[dup] s1s2.
 have /all_sigP[s1' ->] := allss s1.
-have /all_sigP[s2' ->] : all (mem s1) s2 by rewrite -(eq_all_r s1s2).
+have /all_sigP[s2' ->] : all [in s1] s2 by rewrite -(eq_all_r s1s2).
 rewrite !sorted_map => ss1' ss2' {}s1s2; congr map.
 by apply: (irr_sorted_eq leT_tr) => // x; rewrite -!(mem_map val_inj).
 Qed.
@@ -856,7 +856,7 @@ Fixpoint shorten x p :=
   else [::].
 
 Variant shorten_spec x p : T -> seq T -> Type :=
-   ShortenSpec p' of path e x p' & uniq (x :: p') & subpred (mem p') (mem p) :
+   ShortenSpec p' of path e x p' & uniq (x :: p') & {subset p' <= p} :
      shorten_spec x p (last x p') p'.
 
 Lemma shortenP x p : path e x p -> shorten_spec x p (last x p) (shorten x p).
@@ -1413,7 +1413,7 @@ Proof.
 move=> /in2_sig leT_total /in3_sig leT_tr /in2_sig/(_ _ _ _)/val_inj leT_asym.
 apply: (iffP idP) => s1s2; last by rewrite -(perm_sort leT) s1s2 perm_sort.
 move: (s1s2); have /all_sigP[s1' ->] := allss s1.
-have /all_sigP[{s1s2}s2 ->] : all (mem s1) s2 by rewrite -(perm_all _ s1s2).
+have /all_sigP[{s1s2}s2 ->] : all [in s1] s2 by rewrite -(perm_all _ s1s2).
 by rewrite !sort_map => /(perm_map_inj val_inj) /(perm_sortP leT_total)->.
 Qed.
 

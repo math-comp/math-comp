@@ -5465,7 +5465,7 @@ Section Zmodule.
 
 Variables (V : zmodType) (S : {pred V}).
 Variables (subS : zmodPred S) (kS : keyed_pred subS).
-Variable U : subType (mem kS).
+Variable U : subType [in kS].
 
 Let inU v Sv : U := Sub v Sv.
 Let zeroU := inU (rpred0 kS).
@@ -5495,7 +5495,7 @@ Definition cast_zmodType (V : zmodType) T (VeqT : V = T :> Type) :=
   let cast mV := let: erefl in _ = T := VeqT return Zmodule.class_of T in mV in
   Zmodule.Pack (cast (Zmodule.class V)).
 
-Variable (T : subType (mem kS)) (V : zmodType) (VeqT: V = T :> Type).
+Variable (T : subType [in kS]) (V : zmodType) (VeqT: V = T :> Type).
 
 Let inT x Sx : T := Sub x Sx.
 Let oneT := inT (rpred1 kS).
@@ -5534,7 +5534,7 @@ Section Lmodule.
 
 Variables (R : ringType) (V : lmodType R) (S : {pred V}).
 Variables (linS : submodPred S) (kS : keyed_pred linS).
-Variables (W : subType (mem kS)) (Z : zmodType) (ZeqW : Z = W :> Type).
+Variables (W : subType [in kS]) (Z : zmodType) (ZeqW : Z = W :> Type).
 
 Let scaleW a (w : W) := (Sub _ : _ -> W) (rpredZ a (valP w)).
 Let W' := cast_zmodType ZeqW.
@@ -5581,7 +5581,7 @@ Definition cast_ringType (Q : ringType) T (QeqT : Q = T :> Type) :=
 Variables (R : unitRingType) (S : {pred R}).
 Variables (ringS : divringPred S) (kS : keyed_pred ringS).
 
-Variables (T : subType (mem kS)) (Q : ringType) (QeqT : Q = T :> Type).
+Variables (T : subType [in kS]) (Q : ringType) (QeqT : Q = T :> Type).
 
 Let inT x Sx : T := Sub x Sx.
 Let invT (u : T) := inT (rpredVr (valP u)).

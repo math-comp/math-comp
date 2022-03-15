@@ -575,7 +575,7 @@ by apply/andP/idP=> [[pr_q q_p] | /eqP-> //]; rewrite -dvdn_prime2.
 Qed.
 
 Lemma coprime_has_primes m n :
-  0 < m -> 0 < n -> coprime m n = ~~ has (mem (primes m)) (primes n).
+  0 < m -> 0 < n -> coprime m n = ~~ has [in primes m] (primes n).
 Proof.
 move=> m_gt0 n_gt0; apply/eqP/hasPn=> [mn1 p | no_p_mn].
   rewrite /= !mem_primes m_gt0 n_gt0 /= => /andP[pr_p p_n].
@@ -1030,7 +1030,7 @@ Variables (n : nat) (pi : nat_pred).
 
 Definition negn : nat_pred := [predC pi].
 
-Definition pnat : pred nat := fun m => (m > 0) && all (mem pi) (primes m).
+Definition pnat : pred nat := fun m => (m > 0) && all [in pi] (primes m).
 
 Definition partn := \prod_(0 <= p < n.+1 | p \in pi) p ^ logn p n.
 
@@ -1050,7 +1050,7 @@ Lemma negnK pi : pi^'^' =i pi.
 Proof. by move=> p; apply: negbK. Qed.
 
 Lemma eq_negn pi1 pi2 : pi1 =i pi2 -> pi1^' =i pi2^'.
-Proof. by move=> eq_pi n; rewrite 3!inE /= eq_pi. Qed.
+Proof. by move=> eq_pi n; rewrite inE eq_pi. Qed.
 
 Lemma eq_piP m n : \pi(m) =i \pi(n) <-> \pi(m) = \pi(n).
 Proof.
@@ -1143,7 +1143,7 @@ Qed.
 Lemma p_part_gt1 p n : (n`_p > 1) = (p \in \pi(n)).
 Proof. by rewrite ltn_neqAle part_gt0 andbT eq_sym p_part_eq1 negbK. Qed.
 
-Lemma primes_part pi n : primes n`_pi = filter (mem pi) (primes n).
+Lemma primes_part pi n : primes n`_pi = filter [in pi] (primes n).
 Proof.
 have ltnT := ltn_trans; have [->|n_gt0] := posnP n; first by rewrite partn0.
 apply: (irr_sorted_eq ltnT ltnn); rewrite ?(sorted_primes, sorted_filter) //.
@@ -1600,7 +1600,7 @@ have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
   apply: (@addnI (1 * q)); rewrite -mulnDl [1 + _]prednK // mul1n.
   have def_np: np = p * q by rewrite -expnS prednK // -p_part.
   pose mulp := [fun d : 'I_q => in_mod _ np0 (p * d)].
-  rewrite -def_np -{1}[np]card_ord -(cardC (mem (codom mulp))).
+  rewrite -def_np -{1}[np]card_ord -(cardC [in codom mulp]).
   rewrite card_in_image => [|[d1 ltd1] [d2 ltd2] /= _ _ []]; last first.
     move/eqP; rewrite def_np -!muln_modr ?modn_small //.
     by rewrite eqn_pmul2l // => eq_op12; apply/eqP.

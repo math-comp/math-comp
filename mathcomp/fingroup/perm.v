@@ -275,7 +275,7 @@ Proof. by rewrite -{1}tpermV mulVg. Qed.
 Lemma card_perm A : #|perm_on A| = (#|A|)`!.
 Proof.
 pose ffA := {ffun {x | x \in A} -> T}.
-rewrite -ffactnn -{2}(card_sig (mem A)) /= -card_inj_ffuns_on.
+rewrite -ffactnn -{2}(card_sig [in A]) /= -card_inj_ffuns_on.
 pose fT (f : ffA) := [ffun x => oapp f x (insub x)].
 pose pfT f := insubd (1 : {perm T}) (fT f).
 pose fA s : ffA := [ffun u => s (val u)].

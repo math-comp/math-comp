@@ -3430,7 +3430,7 @@ have defW W: (\sum_(x in Xv W) M *m rG x :=: W)%MS.
   have sMxWx: (M *m rG x <= Wx)%MS by rewrite PackSocleK component_mx_id.
   by rewrite (sumsmx_sup Wx) //; apply: contra notW_Mx => /eqP <-.
 have dxXv W: mxdirect (\sum_(x in Xv W) M *m rG x).
-  move: dxX1; rewrite !mxdirectE /= !(bigID (sMv W) (mem X)) /=.
+  move: dxX1; rewrite !mxdirectE /= !(bigID (sMv W) [in X]) /=.
   by rewrite -mxdirectE mxdirect_addsE /= => /andP[].
 have def_t W: #|Xv W| = t.
   rewrite /t -{1}(Clifford_rank_components W) mulKn 1?(cardD1 W) //.
@@ -4584,12 +4584,12 @@ pose h' u := irr_comp sGq (quo_repr (sG'k u) nG'G).
 have irrGq u: mx_irreducible (quo_repr (sG'k u) nG'G).
   by apply/quo_mx_irr; apply: socle_irr.
 exists (fun i => oapp h' [1 sGq]%irr (insub i)) => [j | i] lin_i.
-  rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
+  rewrite (insubT [in _] lin_i) /=; apply/esym/eqP/socle_rsimP.
   apply: mx_rsim_trans (rsim_irr_comp sGq F'Gq (irrGq _)).
   have [g lin_g inj_g hom_g] := rsim_irr_comp sG F'G (irrG j).
   exists g => [||G'x]; last 1 [case/morphimP=> x _ Gx ->] || by [].
   by rewrite quo_repr_coset ?hom_g.
-rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
+rewrite (insubT [in _] lin_i) /=; apply/esym/eqP/socle_rsimP.
 set u := exist _ _ _; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
 have [g lin_g inj_g hom_g] := rsim_irr_comp sGq F'Gq (irrGq u).
 exists g => [||x Gx]; last 1 [have:= hom_g (coset _ x)] || by [].

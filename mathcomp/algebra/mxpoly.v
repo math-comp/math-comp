@@ -1152,7 +1152,7 @@ have{mon_p pw0 intRp intRq}: genI S.
   split; set S1 := _ ++ _; first exists p.
     split=> // i; rewrite -[p]coefK coef_poly; case: ifP => // lt_i_p.
     by apply: genS; rewrite mem_cat orbC mem_nth.
-  set S2 := S1; have: all (mem S1) S2 by apply/allP.
+  set S2 := S1; have: all [in S1] S2 by apply/allP.
   elim: S2 => //= y S2 IH /andP[S1y S12]; split; last exact: IH.
   have{q S S1 IH S1y S12 intRp intRq} [q mon_q qx0]: integralOver RtoK y.
     by move: S1y; rewrite mem_cat => /orP[]; [apply: intRq | apply: intRp].

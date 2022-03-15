@@ -264,7 +264,7 @@ Qed.
 
 Lemma exponent_witness G : nilpotent G -> {x | x \in G & exponent G = #[x]}.
 Proof.
-move=> nilG; have [//=| /= x Gx max_x] := @arg_maxnP _ 1 (mem G) order.
+move=> nilG; have [//=| /= x Gx max_x] := @arg_maxnP _ 1 [in G] order.
 exists x => //; apply/eqP; rewrite eqn_dvd dvdn_exponent // andbT.
 apply/dvdn_biglcmP=> y Gy; apply/dvdn_partP=> //= p.
 rewrite mem_primes => /andP[p_pr _]; have p_gt1: p > 1 := prime_gt1 p_pr.
@@ -1956,7 +1956,7 @@ Lemma max_card_abelian G :
   abelian G -> #|G| <= exponent G ^ 'r(G) ?= iff homocyclic G.
 Proof.
 move=> cGG; have [b defG def_tG] := abelian_structure cGG.
-have Gb: all (mem G) b.
+have Gb: all [in G] b.
   apply/allP=> x b_x; rewrite -(bigdprodWY defG); have [b1 b2] := splitPr b_x.
   by rewrite big_cat big_cons /= mem_gen // setUCA inE cycle_id.
 have ->: homocyclic G = all (pred1 (exponent G)) (abelian_type G).

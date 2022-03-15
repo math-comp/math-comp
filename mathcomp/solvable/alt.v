@@ -165,9 +165,9 @@ pose A3 := [set x : {perm T} | #[x] == 3]; suffices oA3: #|A :&: A3| = 8.
   rewrite -(([set P] =P 'Syl_2(A)) _) ?cards1 // eqEsubset sub1set inE sylP.
   by apply/subsetP=> Q sylQ; rewrite inE -val_eqE /= !sQ2 // inE.
 rewrite -[8]/(4 * 2)%N -{}oQ3 -sum1_card -sum_nat_const.
-rewrite (partition_big (fun x => <[x]>%G) (mem 'Syl_3(A))) => [|x]; last first.
+rewrite (partition_big (fun x => <[x]>%G) [in 'Syl_3(A)]) => [|x]; last first.
   by case/setIP=> Ax; rewrite /= !inE pHallE p_part cycle_subG Ax oA.
-apply: eq_bigr => Q; rewrite inE /= inE pHallE oA p_part -?natTrecE //=.
+apply: eq_bigr => Q; rewrite inE pHallE oA p_part -?natTrecE //=.
 case/andP=> sQA /eqP oQ; have:= oQ.
 rewrite (cardsD1 1) group1 -sum1_card => [[/= <-]]; apply: eq_bigl => x.
 rewrite setIC -val_eqE /= 2!inE in_setD1 -andbA -{4}[x]expg1 -order_dvdn dvdn1.
@@ -191,7 +191,7 @@ have FF (H : {group {perm T}}): H <| 'Alt_T -> H :<>: 1 -> 20 %| #|H|.
   have F6: 5 %| #|H| by rewrite -oT -cardsT (atrans_dvd F5).
   have F7: 4 %| #|H|.
     have F7: #|[set~ x]| = 4 by rewrite cardsC1 oT.
-    case: (pickP (mem [set~ x])) => [y Hy | ?]; last by rewrite eq_card0 in F7.
+    case: (pickP [in [set~ x]]) => [y Hy | ?]; last by rewrite eq_card0 in F7.
     pose K := 'C_H[x | 'P]%G.
     have F8 : K \subset H by apply: subsetIl.
     pose Gx := 'C_('Alt_T)[x | 'P]%G.

@@ -1171,7 +1171,7 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   have ->: e%:R * 'chi_p0 1%g = 'Res[L] theta 1%g by rewrite DthL cfunE.
   rewrite cfRes1 -(ler_pmul2l (gt0CiG K L)) -cfInd1 // -/phi.
   rewrite -card_quotient // -card_Iirr_abelian // mulr_natl.
-  rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID (mem (codom mmLth))) /=.
+  rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID [in codom mmLth]) /=.
   rewrite ler_paddr ?sumr_ge0 // => [i _|].
     by rewrite char1_ge0 ?rpredZ_Cnat ?Cnat_cfdot_char ?cfInd_char ?irr_char.
   rewrite -big_uniq //= big_image -sumr_const ler_sum // => i _.
