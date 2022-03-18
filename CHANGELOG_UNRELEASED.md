@@ -37,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     themselves), the old and new values are convertible and can be
     easily converted with `rewrite -[0%Q]valqK -[1%Q]valqK`
 
+- in `order.v`
+  + fix `[distrLatticeType of T with disp]` notation
+
 ### Renamed
 
 ### Removed
