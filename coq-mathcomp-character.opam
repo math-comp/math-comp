@@ -7,7 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "mathcomp/character" "-j" "%{jobs}%" "COQEXTRAFLAGS+=-native-compiler yes" {coq-native:installed & coq:version < "8.13~" } ]
+build: [ make "-C" "mathcomp/character" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/character" "install" ]
 depends: [ "coq-mathcomp-field" { = version } ]
 
