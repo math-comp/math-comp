@@ -1974,6 +1974,11 @@ Lemma sum_nat_eq0 (I : finType) (P : pred I) (E : I -> nat) :
   (\sum_(i | P i) E i == 0)%N = [forall (i | P i), E i == 0%N].
 Proof. by rewrite eq_sym -(@leqif_sum I P _ (fun _ => 0%N) E) ?big1_eq. Qed.
 
+Lemma leq_prod I r (P : pred I) (E1 E2 : I -> nat) :
+    (forall i, P i -> E1 i <= E2 i) ->
+  \prod_(i <- r | P i) E1 i <= \prod_(i <- r | P i) E2 i.
+Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_mul. Qed.
+
 Lemma prodn_cond_gt0 I r (P : pred I) F :
   (forall i, P i -> 0 < F i) -> 0 < \prod_(i <- r | P i) F i.
 Proof. by move=> Fpos; elim/big_ind: _ => // n1 n2; rewrite muln_gt0 => ->. Qed.
