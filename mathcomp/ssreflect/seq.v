@@ -2458,11 +2458,10 @@ Implicit Types (s : seq T) (m : bitseq).
 
 Lemma mask_filter s m : uniq s -> mask m s = [seq i <- s | i \in mask m s].
 Proof.
-elim: m s => [|[] m ih] [|x s] //=.
-- by move=> _; elim: s.
-- case/andP => /negP x_notin_s /ih {1}->; rewrite inE eqxx /=; congr cons.
-  by apply/eq_in_filter => ? /[1!inE]; case: eqP => // ->.
-- by case: ifP => [/mem_mask -> // | _ /andP [] _ /ih].
+elim: m s => [|[] m IH] [|x s /= /andP[/negP xS uS]]; rewrite ?filter_pred0 //.
+  rewrite inE eqxx /=; congr cons; rewrite [LHS]IH//.
+  by apply/eq_in_filter => ? /[1!inE]; case: eqP => [->|].
+by case: ifP => [/mem_mask //|_]; apply: IH.
 Qed.
 
 Lemma leq_count_subseq P s1 s2 : subseq s1 s2 -> count P s1 <= count P s2.
