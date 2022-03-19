@@ -30,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + number notation in scope ring_scope, numbers such as `-12` are now
     read as `(-12)%:~R`
 
+- in `bigop.v`, added lemmas `telescope_big`, `telescope_sumn` and `telescope_sumn_in`
+
 ### Changed
 
 - in `rat.v`

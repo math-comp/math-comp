@@ -1368,6 +1368,17 @@ rewrite /= big_cons; case: (h r0) => [i|] /=; last by rewrite mul1m.
 by rewrite big_cons IHr.
 Qed.
 
+Lemma telescope_big (f : nat -> nat -> R) (n m : nat) :
+  (forall k, n < k < m -> op (f n k) (f k k.+1) = f n k.+1) ->
+  \big[op/idx]_(n <= i < m) f i i.+1 = if n < m then f n m else idx.
+Proof.
+elim: m => [//| m IHm]; first by rewrite ltn0 big_geq.
+move=> tm; rewrite ltnS; case: ltnP=> // mn; first by rewrite big_geq.
+rewrite big_nat_recr// IHm//; last first.
+  by move=> k /andP[nk /ltnW nm]; rewrite tm// nk.
+by case: ltngtP mn=> //= [nm|<-]; rewrite ?mul1m// tm// nm leqnn.
+Qed.
+
 End Plain.
 
 Section Abelian.
@@ -1771,6 +1782,7 @@ Arguments big_ord_recr [R idx op].
 Arguments big_nat_recl [R idx op].
 Arguments big_nat_recr [R idx op].
 Arguments big_pmap [R idx op J I] h [r].
+Arguments telescope_big [R idx op] f [n m].
 
 Section Distributivity.
 
@@ -1942,6 +1954,25 @@ Lemma prod_nat_const_nat n1 n2 n : \prod_(n1 <= i < n2) n = n ^ (n2 - n1).
 Proof. by rewrite big_const_nat -Monoid.iteropE. Qed.
 
 End NatConst.
+
+Lemma telescope_sumn_in n m f : n <= m ->
+  {in [pred i | n <= i <= m], {homo f : x y / x <= y}} ->
+  \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
+Proof.
+move=> nm fle; rewrite (telescope_big (fun i j => f j - f i)).
+  by case: ltngtP nm => // ->; rewrite subnn.
+move=> k /andP[nk km] /=; rewrite addnBAC ?fle 1?ltnW// ?subnKC// ?fle// inE.
+- by rewrite (ltnW nk) ltnW.
+- by rewrite leqnn ltnW// (ltn_trans nk).
+Qed.
+
+Lemma telescope_sumn n m f : {homo f : x y / x <= y} ->
+  \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
+Proof.
+move=> fle; case: (ltnP n m) => nm.
+apply: (telescope_sumn_in (ltnW nm)) => ? ?; exact: fle.
+by apply/esym/eqP; rewrite big_geq// subn_eq0 fle.
+Qed.
 
 Lemma sumnE r : sumn r = \sum_(i <- r) i. Proof. exact: foldrE. Qed.
 
