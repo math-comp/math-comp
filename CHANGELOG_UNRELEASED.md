@@ -10,8 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `bigop.v`, added lemma `leq_prod`
 - in `path.v`, added lemma `sortedP`
-- in `seq.v`, added statement `size_take_min`.
+- in `seq.v`, added statement `size_take_min`
 
 - in `ssralg.v`
   + number notation in scope ring_scope, numbers such as `12` or `42`
