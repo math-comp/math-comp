@@ -950,7 +950,7 @@ End ClassDef.
 Module Exports.
 Coercion base : class_of >-> Zmodule.class_of.
 Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
+#[reversible] Coercion sort : type >-> Sortclass.
 Bind Scope ring_scope with sort.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
