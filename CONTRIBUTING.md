@@ -85,7 +85,7 @@ This particular example can be problematic if matrix.v is imported because then,
   (see [`ssrbool.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrbool.v))
 
 ### Naming of variables
-- Variable/hypohteses names follow the following conventions.
+- Variable/hypothesis names follow the following conventions.
   + Hypothesis should not be named `H`, `H'`,... (these collide with
   subgroup variable conventions) but have meaningful names. For
   example, an hypothesis `n > 0` should be named `n_gt0`.
@@ -95,9 +95,9 @@ This particular example can be problematic if matrix.v is imported because then,
   + Polynomials should be named by lower case letter `p`, `q`, `r` ... (to avoid collision with properties named `P`, `Q`, ...)
   + Matrices should be named `A`, `B`, ..., `M`, `N`, ...
   + Polymorphic variables should be named `x`, ...
-- Variables/hypohteses that do not survive the line can be introduced using `?`.
-- Variables/hypohteses with a very short scope (~ 1-5 lines) can have a short name.
-- Variables/hypohteses with a longer scope (> 5 lines) must have a meaningful name.
+- Variables/hypotheses that do not survive the line can be introduced using `?`.
+- Variables/hypotheses with a very short scope (~ 1-5 lines) can have a short name.
+- Variables/hypotheses with a longer scope (> 5 lines) must have a meaningful name.
 
 ### Naming conventions for lemmas (non exhaustive)
 #### Names in the library usually obey one of the following conventions
