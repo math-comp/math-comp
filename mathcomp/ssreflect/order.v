@@ -8488,7 +8488,7 @@ Proof.
 pose sum p := \sum_(i < n | (i < tag p)%N) p_ i + tagged p.
 rewrite -/(sum _); have sumlt : forall p, (sum p < \sum_i p_ i)%N.
   rewrite /sum => -[/= i j].
-  rewrite [X in (_ < X)%N](bigID [pred i' : 'I__ | (i' < i)%N])/= ltn_add2l.
+  rewrite [ltnRHS](bigID [pred i' : 'I__ | (i' < i)%N])/= ltn_add2l.
   by rewrite (bigD1 i) ?ltnn//= ltn_addr.
 suff: rank =1 (fun p => Ordinal (sumlt p)) by move=> /(_ p)/(congr1 val).
 apply: (Order.mono_unique _ _ le_rank) => //=.
@@ -8499,10 +8499,10 @@ case: (ltngtP i i') => //= [ltii' _|/val_inj ii']; last first.
   by rewrite -ii' in j' *; rewrite tagged_asE => ltjj'; rewrite ltn_add2l.
 rewrite ltn_addr// (@leq_trans (\sum_(i0 < n | (i0 < i)%N) p_ i0 + p_ i))%N//.
   by rewrite ltn_add2l.
-rewrite [X in (_ <= X)%N](bigID [pred i' : 'I__ | (i' < i)%N])/=.
+rewrite [leqRHS](bigID [pred i' : 'I__ | (i' < i)%N])/=.
 rewrite leq_add//; last first.
   by rewrite (bigD1 i) ?ltnn ?ltii'//= leq_addr.
-rewrite [X in (_ <= X)%N](eq_bigl [pred k : 'I_n | (k < i)%N])// => k/=.
+rewrite [leqRHS](eq_bigl [pred k : 'I_n | (k < i)%N])// => k/=.
 by case: (ltnP k i); rewrite ?andbF// => /ltn_trans->.
 Qed.
 

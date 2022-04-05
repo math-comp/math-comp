@@ -268,7 +268,7 @@ rewrite ltn_eqF // !rmorphM !lead_coefM (leq_trans (leq_ltn_trans _ ltuq)) //=.
   by rewrite mulrC mul_polyC size_scale ?max_size_lead_coefXY ?lead_coef_eq0.
 rewrite swapXY_map_polyC lead_coefC size_map_polyC.
 set v1 := lead_coef _; have nz_v1: v1 != 0 by rewrite lead_coef_eq0 swapXY_eq0.
-rewrite [in rhs in _ <= rhs]polySpred ?mulf_neq0 // size_mul //.
+rewrite [leqRHS]polySpred ?mulf_neq0 // size_mul //.
 by rewrite (polySpred nz_v1) addnC addnS polySpred // ltnS leq_addr.
 Qed.
 

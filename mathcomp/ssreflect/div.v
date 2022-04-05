@@ -138,10 +138,10 @@ Lemma ltn_pmod m d : 0 < d -> m %% d < d.
 Proof. by rewrite ltn_mod. Qed.
 
 Lemma leq_trunc_div m d : m %/ d * d <= m.
-Proof. by rewrite [m in _ <= m](divn_eq m d) leq_addr. Qed.
+Proof. by rewrite [leqRHS](divn_eq m d) leq_addr. Qed.
 
-Lemma leq_mod m d : m %% d  <= m.
-Proof. by rewrite [m in _ <= m](divn_eq m d) leq_addl. Qed.
+Lemma leq_mod m d : m %% sd  <= m.
+Proof. by rewrite [leqRHS](divn_eq m d) leq_addl. Qed.
 
 Lemma leq_div m d : m %/ d <= m.
 Proof.
@@ -613,7 +613,7 @@ elim/ltn_ind: m n => -[|m] IHm [|n] //=.
 rewrite gcdnE; case def_p: (_ %% _) => [|p]; first by rewrite /dvdn def_p.
 have lt_pm: p < m by rewrite -ltnS -def_p ltn_pmod.
 rewrite /= (divn_eq n.+1 m.+1) def_p dvdn_addr ?dvdn_mull //; last exact: IHm.
-by rewrite gcdnE /= IHm // (ltn_trans (ltn_pmod _ _)). 
+by rewrite gcdnE /= IHm // (ltn_trans (ltn_pmod _ _)).
 Qed.
 
 Lemma dvdn_gcdl m n : gcdn m n %| m.

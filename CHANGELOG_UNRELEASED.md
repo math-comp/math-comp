@@ -37,6 +37,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrbool.v`, added lemma `all_sig2_cond`
 - in `choice.v`, added coercion `Choice.mixin`
 - In `seq.v`, added lemmas `mkseqS`, `mkseq_uniqP`
+- in `eqtype.v`:
+  + notations `eqbLHS` and `eqbRHS`
+
+- in `order.v`:
+  + notations `leLHS`, `leRHS`, `ltLHS`, `ltRHS`
+
+- in `ssrnat.v`:
+  + notations `leqLHS`, `leqRHS`, `ltnLHS`, `ltnRHS`
 
 ### Changed
 

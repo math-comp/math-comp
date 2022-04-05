@@ -170,7 +170,7 @@ apply: ihn => //.
 - apply/leq_sizeP => j hnj.
   rewrite coefB -scalerAl coefZ coefXnM ltn_subRL ltnNge.
   have hj : (size r).-1 <= j by apply: leq_trans hnj; rewrite -ltnS prednK.
-  rewrite [r in r <= _]polySpred -?size_poly_gt0 // coefMC.
+  rewrite [leqLHS]polySpred -?size_poly_gt0 // coefMC.
   rewrite (leq_ltn_trans hj) /=; last by rewrite -add1n leq_add2r.
   move: hj; rewrite leq_eqVlt prednK // => /predU1P [<- | hj].
     by rewrite -subn1 subnAC subKn // !subn1 !lead_coefE subrr.
@@ -1669,7 +1669,7 @@ Proof.
 have [-> | nn0] := eqVneq n 0; first by rewrite gcd0p mulr0 eqpxx.
 have [-> | mn0] := eqVneq m 0; first by rewrite mul0r gcdp0 eqpxx.
 rewrite gcdpE modp_mull gcd0p size_mul //; case: leqP; last by rewrite eqpxx.
-rewrite (polySpred mn0) addSn /= -[n in _ <= n]add0n leq_add2r -ltnS.
+rewrite (polySpred mn0) addSn /= -[leqRHS]add0n leq_add2r -ltnS.
 rewrite -polySpred //= leq_eqVlt ltnS size_poly_leq0 (negPf mn0) orbF.
 case/size_poly1P=> c cn0 -> {mn0 m}; rewrite mul_polyC.
 suff -> : n %% (c *: n) = 0 by rewrite gcd0p; apply: eqp_scale.

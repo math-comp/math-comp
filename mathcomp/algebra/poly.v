@@ -2381,7 +2381,7 @@ have [/size1_polyC-> | nc_q] := leqP (size q) 1.
 have nz_q: q != 0 by rewrite -size_poly_eq0 -(subnKC nc_q).
 rewrite mulnC comp_polyE (polySpred nz_p) /= big_ord_recr /= addrC.
 rewrite size_addl size_scale ?lead_coef_eq0 ?size_exp //=.
-rewrite [X in _ < X]polySpred ?expf_neq0 // ltnS size_exp.
+rewrite [ltnRHS]polySpred ?expf_neq0 // ltnS size_exp.
 rewrite (leq_trans (size_sum _ _ _)) //; apply/bigmax_leqP => i _.
 rewrite (leq_trans (size_scale_leq _ _)) // polySpred ?expf_neq0 //.
 by rewrite size_exp -(subnKC nc_q) ltn_pmul2l.

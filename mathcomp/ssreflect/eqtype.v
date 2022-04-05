@@ -38,8 +38,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*         x != y :> T <=> x and y compare unequal at type T.                 *)
 (*             x =P y  :: a proof of reflect (x = y) (x == y); x =P y coerces *)
 (*                     to x == y -> x = y.                                    *)
-(*               eqLHS := (X in (X == _))%pattern (for rewriting)             *)
-(*               eqRHS := (X in (_ == X))%pattern (for rewriting)             *)
+(*              eqbLHS := (X in (X == _))%pattern (for rewriting)             *)
+(*              eqbRHS := (X in (_ == X))%pattern (for rewriting)             *)
 (*               eq_op == the boolean relation behind the == notation.        *)
 (*             pred1 a == the singleton predicate [pred x | x == a].          *)
 (* pred2, pred3, pred4 == pair, triple, quad predicates.                      *)
@@ -191,8 +191,8 @@ Notation "x =P y" := (eqP : reflect (x = y) (x == y))
 Notation "x =P y :> T" := (eqP : reflect (x = y :> T) (x == y :> T))
   (at level 70, y at next level, no associativity) : eq_scope.
 
-Notation eqLHS := (X in (X == _))%pattern.
-Notation eqRHS := (X in (_ == X))%pattern.
+Notation eqbLHS := (X in (X == _))%pattern.
+Notation eqbRHS := (X in (_ == X))%pattern.
 
 Prenex Implicits eq_op eqP.
 
