@@ -969,9 +969,9 @@ Lemma up_lognn p : 1 < p -> up_log p p = 1.
 Proof. by move=> p_gt1; apply: up_log_eq; rewrite p_gt1 /=. Qed.
 
 Lemma up_expnK p n : 1 < p -> up_log p (p ^ n) = n.
-Proof. 
+Proof.
 case: n => [|n] p_gt1 /=; first by rewrite up_log1.
-by apply: up_log_eq; rewrite // leqnn andbT ltn_exp2l. 
+by apply: up_log_eq; rewrite // leqnn andbT ltn_exp2l.
 Qed.
 
 Lemma up_logMp p n : 1 < p -> 0 < n -> up_log p (p * n) = (up_log p n).+1.
@@ -1003,7 +1003,7 @@ rewrite mul2n !doubleS !ltnS.
 by rewrite -[X in X <= _]odd_double_half -add1n leq_add2r; case: odd.
 Qed.
 
-Lemma up_log_trunc_log p n : 
+Lemma up_log_trunc_log p n :
   1 < p -> 1 < n -> up_log p n = (trunc_log p n.-1).+1.
 Proof.
 move=> p_gt1 n_gt1; apply: up_log_eq => //.
@@ -1011,7 +1011,7 @@ rewrite -[n]prednK ?ltnS -?pred_Sn ?[0 < n]ltnW//.
 by rewrite trunc_logP ?ltn_predRL// trunc_log_ltn.
 Qed.
 
-Lemma trunc_log_up_log p n : 
+Lemma trunc_log_up_log p n :
   1 < p -> 0 < n -> trunc_log p n = (up_log p n.+1).-1.
 Proof. by move=> ? ?; rewrite up_log_trunc_log.
 Qed.

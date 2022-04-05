@@ -306,7 +306,7 @@ Lemma rat_eq x y : (x == y) = (numq x * denq y == numq y * denq x).
 Proof.
 symmetry; rewrite rat_eqE andbC.
 have [->|] /= := eqVneq (denq _); first by rewrite (inj_eq (mulIf _)).
-apply: contraNF => /eqP hxy; rewrite -absz_denq -[X in _ == X]absz_denq.
+apply: contraNF => /eqP hxy; rewrite -absz_denq -[eqRHS]absz_denq.
 rewrite eqz_nat /= eqn_dvd.
 rewrite -(@Gauss_dvdr _ `|numq x|) 1?coprime_sym ?coprime_num_den // andbC.
 rewrite -(@Gauss_dvdr _ `|numq y|) 1?coprime_sym ?coprime_num_den //.
@@ -317,7 +317,7 @@ Fact fracq_eq x y : x.2 != 0 -> y.2 != 0 ->
   (fracq x == fracq y) = (x.1 * y.2 == y.1 * x.2).
 Proof.
 case: fracqP=> //= u fx u_neq0 _; case: fracqP=> //= v fy v_neq0 _; symmetry.
-rewrite [X in (_ == X)]mulrC mulrACA [X in (_ == X)]mulrACA.
+rewrite [eqRHS]mulrC mulrACA [eqRHS]mulrACA.
 by rewrite [denq _ * _]mulrC (inj_eq (mulfI _)) ?mulf_neq0 // rat_eq.
 Qed.
 

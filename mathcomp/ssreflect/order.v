@@ -215,6 +215,12 @@ From mathcomp Require Import finset.
 (* with head symbols Order.arg_min and Order.arg_max                          *)
 (* The user may use extremumP or extremum_inP to eliminate them.              *)
 (*                                                                            *)
+(* -> patterns for contextual rewriting:                                      *)
+(*      leLHS := (X in (X <= _)%O)%pattern                                    *)
+(*      leRHS := (X in (_ <= X)%O)%pattern                                    *)
+(*      ltLHS := (X in (X < _)%O)%pattern                                     *)
+(*      ltRHS := (X in (_ < X)%O)%pattern                                     *)
+(*                                                                            *)
 (* In order to build the above structures, one must provide the appropriate   *)
 (* factory instance to the following structure constructors. The list of      *)
 (* possible factories is indicated after each constructor. Each factory is    *)
@@ -1239,6 +1245,11 @@ Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
 Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : order_scope.
+
+Notation leLHS := (X in (X <= _)%O)%pattern.
+Notation leRHS := (X in (_ <= X)%O)%pattern.
+Notation ltLHS := (X in (X < _)%O)%pattern.
+Notation ltRHS := (X in (_ < X)%O)%pattern.
 
 End POSyntax.
 
