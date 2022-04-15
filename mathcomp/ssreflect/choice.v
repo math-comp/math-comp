@@ -276,6 +276,7 @@ End ClassDef.
 
 Module Import Exports.
 Coercion base : class_of >-> Equality.class_of.
+Coercion mixin : class_of >-> mixin_of.
 Coercion sort : type >-> Sortclass.
 Coercion eqType : type >-> Equality.type.
 Canonical eqType.
