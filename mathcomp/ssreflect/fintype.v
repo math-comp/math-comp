@@ -1847,6 +1847,9 @@ Qed.
 
 End OrdinalEnum.
 
+Lemma enum_ord0 : enum 'I_0 = [::].
+Proof. by apply/eqP; rewrite -size_eq0 size_enum_ord. Qed.
+
 Lemma widen_ord_proof n m (i : 'I_n) : n <= m -> i < m.
 Proof. exact: leq_trans. Qed.
 Definition widen_ord n m le_n_m i := Ordinal (@widen_ord_proof n m i le_n_m).
@@ -2241,10 +2244,18 @@ Proof. by move=> lt_m; rewrite val_insubd lt_m. Qed.
 Lemma inord_val (i : 'I_n) : inord i = i.
 Proof. by rewrite /inord /insubd valK. Qed.
 
-Lemma enum_ordS : enum 'I_n = ord0 :: map (lift ord0) (enum 'I_n').
+Lemma enum_ordSl : enum 'I_n = ord0 :: map (lift ord0) (enum 'I_n').
 Proof.
 apply: (inj_map val_inj); rewrite val_enum_ord /= -map_comp.
 by rewrite (map_comp (addn 1)) val_enum_ord -iotaDl.
+Qed.
+
+Lemma enum_ordSr :
+  enum 'I_n = rcons (map (widen_ord (leqnSn _)) (enum 'I_n')) ord_max.
+Proof.
+apply: (inj_map val_inj); rewrite val_enum_ord.
+rewrite -[in iota _  _]addn1 iotaD/= cats1 map_rcons; congr (rcons _ _).
+by rewrite -map_comp/= (@eq_map _ _ _ val) ?val_enum_ord.
 Qed.
 
 Lemma lift_max (i : 'I_n') : lift ord_max i = i :> nat.
@@ -2260,6 +2271,9 @@ Arguments inord {n'}.
 Arguments sub_ord {n'}.
 Arguments sub_ordK {n'}.
 Arguments inord_val {n'}.
+
+#[deprecated(since="mathcomp 1.15.0", note="Use enum_ordSl instead.")]
+Notation enum_ordS := enum_ordSl.
 
 Lemma ord1 : all_equal_to (ord0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.
