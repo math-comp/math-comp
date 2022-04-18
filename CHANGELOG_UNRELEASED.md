@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `fintype.v`, added lemmas `enum_ord0`, `enum_ordSl`, `enum_ordSr`
 
 - in `ssrbool.v`, added lemma `all_sig2_cond`
+- in `choice.v`, added coercion `Choice.mixin`
 
 ### Changed
 
