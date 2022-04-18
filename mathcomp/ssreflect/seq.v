@@ -2264,6 +2264,12 @@ rewrite size_mask -sz_m // -all_count -(eq_all eqb_id).
 by move/(@all_pred1P _ true)->; rewrite sz_m mask_true.
 Qed.
 
+Lemma subseq_anti : antisymmetric subseq.
+Proof.
+move=> s1 s2 /andP[] /size_subseq_leqif /leqifP.
+by case: eqP => [//|_] + /size_subseq; rewrite ltnNge => /negP.
+Qed.
+
 Lemma subseq_cons s x : subseq s (x :: s).
 Proof. exact: suffix_subseq [:: x] s. Qed.
 
