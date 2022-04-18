@@ -2819,6 +2819,10 @@ Definition mkseq f n : seq T := map f (iota 0 n).
 Lemma size_mkseq f n : size (mkseq f n) = n.
 Proof. by rewrite size_map size_iota. Qed.
 
+Lemma mkseqS f n : 
+  mkseq f n.+1 = rcons (mkseq f n) (f n).
+Proof. by rewrite /mkseq -addn1 iotaD add0n map_cat cats1. Qed.
+
 Lemma eq_mkseq f g : f =1 g -> mkseq f =1 mkseq g.
 Proof. by move=> Efg n; apply: eq_map Efg _. Qed.
 
@@ -2855,6 +2859,10 @@ End MakeSeq.
 Section MakeEqSeq.
 
 Variable T : eqType.
+
+Lemma mkseq_in_uniq (f : nat -> T) n : 
+  { in iota 0 n &, injective f } -> uniq (mkseq f n).
+Proof. by move/map_inj_in_uniq ->; apply: iota_uniq. Qed.
 
 Lemma mkseq_uniq (f : nat -> T) n : injective f -> uniq (mkseq f n).
 Proof. by move/map_inj_uniq->; apply: iota_uniq. Qed.
