@@ -32,6 +32,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`, added lemmas `telescope_big`, `telescope_sumn` and `telescope_sumn_in`
 
+- in `fintype.v`, added lemmas `enum_ord0`, `enum_ordSl`, `enum_ordSr`
+
 - in `ssrbool.v`, added lemma `all_sig2_cond`
 
 ### Changed
@@ -44,6 +46,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `order.v`
   + fix `[distrLatticeType of T with disp]` notation
+
+- in `fintype.v`
+  + `enum_ordS` now a notation
 
 ### Renamed
 
