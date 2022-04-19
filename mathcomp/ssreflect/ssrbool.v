@@ -432,3 +432,14 @@ Arguments mono1W_in [aT rT f aD aP rP].
 
 #[deprecated(since="mathcomp 1.14.0", note="Use mono1W_in instead.")]
 Notation mono2W_in := mono1W_in.
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+
+Lemma all_sig2_cond {I T} (C : pred I) P Q :
+    T -> (forall x, C x -> {y : T | P x y & Q x y}) ->
+  {f : I -> T | forall x, C x -> P x (f x) & forall x, C x -> Q x (f x)}.
+Proof.
+by move=> /all_sig_cond/[apply]-[f Pf]; exists f => i Di; have [] := Pf i Di.
+Qed.
