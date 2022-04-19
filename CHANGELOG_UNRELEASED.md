@@ -38,6 +38,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `choice.v`, added coercion `Choice.mixin`
 - In `seq.v`, added lemmas `mkseqS`, `mkseq_uniqP`
 
+- in `seq.v`, added lemmas `nth_seq1`, `set_nthE`, `count_set_nth`,
+  `count_set_nth_ltn`, `count_set_nthF`
+
 ### Changed
 
 - in `rat.v`
