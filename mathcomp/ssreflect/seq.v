@@ -2860,9 +2860,13 @@ Section MakeEqSeq.
 
 Variable T : eqType.
 
-Lemma mkseq_in_uniq (f : nat -> T) n : 
-  { in iota 0 n &, injective f } -> uniq (mkseq f n).
-Proof. by move/map_inj_in_uniq ->; apply: iota_uniq. Qed.
+Lemma mkseq_uniqP (f : nat -> T) n :
+  reflect {in iota 0 n &, injective f} (uniq (mkseq f n)).
+Proof.
+apply: (iffP idP); last by move/map_inj_in_uniq ->; apply: iota_uniq.
+move=> /(uniqP (f 0)) Huniq i j; rewrite !mem_iota add0n !leq0n /= => Hi Hj fij.
+by apply: Huniq; rewrite ?size_mkseq // !nth_mkseq.
+Qed.
 
 Lemma mkseq_uniq (f : nat -> T) n : injective f -> uniq (mkseq f n).
 Proof. by move/map_inj_uniq->; apply: iota_uniq. Qed.
