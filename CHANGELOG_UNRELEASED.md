@@ -32,6 +32,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`, added lemmas `telescope_big`, `telescope_sumn` and `telescope_sumn_in`
 
+- in `ssrbool.v`, added lemma `all_sig2_cond`
+
 ### Changed
 
 - in `rat.v`
