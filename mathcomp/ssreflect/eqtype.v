@@ -477,7 +477,7 @@ End EqFun.
 Prenex Implicits frel.
 
 (* The coercion to rel must be explicit for derived Notations to unparse. *)
-Notation coerced_frel f := (rel_of_simpl_rel (frel f)) (only parsing).
+Notation coerced_frel f := (rel_of_simpl (frel f)) (only parsing).
 
 Section FunWith.
 

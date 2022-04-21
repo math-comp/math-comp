@@ -95,7 +95,7 @@ Notation "G .-chief" := (chief_factor G)
 
 Arguments group_rel_of {gT} r%group_rel_scope _%G _%G : extra scopes.
 
-Notation "r .-series" := (path (rel_of_simpl_rel (group_rel_of r)))
+Notation "r .-series" := (path (rel_of_simpl (group_rel_of r)))
   (at level 2, format "r .-series") : group_scope.
 
 Section Subnormal.

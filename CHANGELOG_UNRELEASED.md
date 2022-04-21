@@ -57,6 +57,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+- in `ssrbool.v`:
+  + notations `{pred T}`, `[rel _ | _]`, `[rel _ in _]`, `xrelpre`
+    (now in ssrbool in Coq)
+  + definitions `PredType`, `simpl_rel`, `SimplRel`, `relpre`
+    (now in ssrbool in Coq)
+  + coercion `rel_of_simpl_rel` deprecated for `rel_of_simpl`
+    (in ssrbool in Coq)
+  + lemmas `simpl_pred_sortE`, `homo_sym`, `mono_sym`, `homo_sym_in`,
+    `mono_sym_in`, `homo_sym_in11`, `mono_sym_in11`, `onW_can`, `onW_can_in`,
+    `in_onW_can`, `onS_can`, `onS_can_in`, `in_onS_can`, `homoRL_in`,
+    `homoLR_in`, `homo_mono_in`, `monoLR_in`, `monoRL_in`, `can_mono_in`,
+    `inj_can_sym_in_on`, `inj_can_sym_on`, `inj_can_sym_in`, `contra_not`,
+    `contraPnot`, `contraTnot`, `contraNnot`, `contraPT`, `contra_notT`,
+    `contra_notN`, `contraPN`, `contraFnot`, `contraPF`, `contra_notF`
+    (now in ssrbool in Coq, beware that `simpl_pred_sortE`,
+    `contra_not`, `contraPnot`, `contraTnot`, `contraNnot`,
+    `contraPT`, `contra_notT`, `contra_notN`, `contraPN`,
+    `contraFnot`, `contraPF`, `contra_notF` have different implicit
+    arguments and the order of arguments changes in `homoRL_in`,
+    `homoLR_in`, `homo_mono_in`, `monoLR_in`, `monoRL_in`,
+    `can_mono_in`)
+
+- in `ssreflect.v`:
+  + structure `NonPropType.call_of`, constructor `Call` and field `callee`
+    (now in ssreflect in Coq)
+  + definitions `maybeProp`, `call` (now in ssreflect in Coq)
+  + structure `NonPropType.test_of`, constructor `Test` and field `condition`
+    (now in ssreflect in Coq, beware that implicit arguments of `condition`
+    differ)
+  + definitions `test_Prop`, `test_negative` (now in ssreflect in Coq)
+  + structure `NonPropType.type`, constructor `Check` and fields `result`,
+    `test`, `frame` (now in ssreflect in Coq, beware that implicit arguments
+    of `Check` differ)
+  + definition `check` (now in ssreflect in Coq, beware that implicit
+    arguments of `check` differ)
+  + notation `[apply]`, `[swap]`, `[dup]` in scope `ssripat_scope`
+    (now in ssreflect in Coq)
+
+- in `ssrfun.v`:
+  + lemmas `Some_inj`, `of_voidK`, `inj_compr` (now in ssrfun in Coq,
+    beware that implicit arguments of `inj_compr` differ)
+  + notation `void` (now in ssrfun in Coq)
+  + definition `of_void` (now in ssrfun in Coq)
+
 ### Infrastructure
 
 - in `builddoc_lib.sh`:
