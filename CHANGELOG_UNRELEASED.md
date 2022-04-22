@@ -36,7 +36,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrbool.v`, added lemma `all_sig2_cond`
 - in `choice.v`, added coercion `Choice.mixin`
-- In `seq.v`, added lemmas `mkseqS`, `mkseq_in_uniq`
 - In `seq.v`, added lemmas `mkseqS`, `mkseq_uniqP`
 
 ### Changed
