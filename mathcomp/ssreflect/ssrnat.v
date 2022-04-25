@@ -342,6 +342,11 @@ Proof. by case: n => [//|n]; rewrite ltnSn. Qed.
 Lemma ltn_predRL m n : (m < n.-1) = (m.+1 < n).
 Proof. by case: n => [//|n]; rewrite succnK. Qed.
 
+Lemma leq_predR m n :
+  0 < n ->
+  (m <= n.-1) = (m < n).
+Proof. by case : n => [//|n/= _]; rewrite ltnS. Qed.
+
 Lemma ltn_predK m n : m < n -> n.-1.+1 = n.
 Proof. by case: n. Qed.
 

@@ -52,6 +52,9 @@ From mathcomp Require ssrnum ssrint algC cyclotomic.
 (*                              little theorem).                              *)
 (* FinDomainSplittingFieldType domR charRp == A splittingFieldType structure  *)
 (*                              that repackages the two constructions above.  *)
+(*                                                                            *)
+(* This file also defines the explicit construction of finite fields via      *)
+(* quotienting by an irreducible polynomial.                                  *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -694,3 +697,449 @@ Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=
    [splittingFieldType 'F_p of R for RoverFp].
 
 End FinDomain.
+
+(* Construction of finite fields via irreducible polynomials *)
+
+Section PolyField.
+
+(*Some needed results about the Poly constructor - not general-purpose*)
+Section MorePoly.
+
+Local Open Scope ring_scope.
+
+Variable R: ringType.
+
+Lemma Poly_nil (s: seq R):
+  (all (eq_op^~0) s) = (polyseq (Poly s) == nil).
+Proof.
+elim: s => [/=| h t /= IHs].
+  by rewrite polyseq0.
+rewrite polyseq_cons. 
+have->: nilp (Poly t) = (polyseq (Poly t) == [::])
+  by apply /nilP; case : (polyseq (Poly t) == [::]) /eqP. 
+rewrite -IHs. 
+case Allt: (all (eq_op^~ 0) t) =>/=; last by rewrite andbF.
+case: (h == 0) /eqP => [ eq_h0 | /eqP neq_h0].
+  by rewrite eq_h0 polyseqC eq_refl.
+by rewrite polyseqC/= neq_h0.
+Qed.
+
+Lemma Poly_split (s: seq R):
+  ~~(all (eq_op^~ 0) s) ->
+  exists s1, (s == Poly s ++ s1) && (all (eq_op^~ 0) s1).
+Proof.
+elim: s => [//| h t/= IHs].
+case Allt: (all (eq_op^~ 0) t) =>/=.
+  move=> /nandP[eq_h0 | //]; exists t.
+  rewrite polyseq_cons polyseqC eq_h0. 
+  move: Allt; rewrite Poly_nil => /eqP->/=.
+  by rewrite eq_refl. 
+move=> _. rewrite polyseq_cons. 
+have->/=: nilp (Poly t) = false
+  by apply /nilP /eqP; rewrite -Poly_nil Allt.
+apply negbT, IHs in Allt.
+case: Allt => [s1 /andP[/eqP t_eq all_s1]].
+exists s1.
+by rewrite {1}t_eq all_s1 eq_refl.
+Qed.
+
+Lemma Poly_cat (s1 s2 : seq R):
+  all (eq_op^~0) s2 ->
+  Poly (s1 ++ s2) = Poly s1.
+Proof.
+elim: s1 => [/= all_s2| h t /= IHs all_s2].
+  by apply poly_inj; rewrite polyseq0; apply /eqP; rewrite -Poly_nil.
+by move: IHs => /(_ all_s2) ->.
+Qed.
+
+End MorePoly.
+
+Section Field.
+
+Local Open Scope ring_scope.
+
+(* We require that the type is finite so that the resulting field is finite. *)
+(* We need an integral domain for [irreducible_poly].                        *)
+(* Every finite integral domain is a (finite) field.                         *)
+Variable F : finFieldType.
+
+Variable p : {poly F}.
+Variable p_irred: irreducible_poly p.
+
+(*A polynomial quotiented by p*)
+Inductive qpoly : predArgType := Qpoly (qp : {poly F}) of (size qp < size p).
+
+Coercion qp (q: qpoly) : {poly F} := let: Qpoly x _ := q in x.
+Definition qsz (q: qpoly) : size q < size p := let: Qpoly _ x := q in x.
+
+Canonical qpoly_subType := [subType for qp].
+Definition qpoly_eqMixin := Eval hnf in [eqMixin of qpoly by <:].
+Canonical qpoly_eqType := Eval hnf in EqType qpoly qpoly_eqMixin.
+
+Definition qpoly_choiceMixin := [choiceMixin of qpoly by <:].
+Canonical qpoly_choiceType := Eval hnf in ChoiceType qpoly qpoly_choiceMixin.
+
+Definition qpoly_countMixin := [countMixin of qpoly by <:].
+Canonical qpoly_countType := Eval hnf in CountType qpoly qpoly_countMixin.
+Canonical qpoly_subCountType := [subCountType of qpoly].
+
+Lemma qpoly_inj: injective qp. Proof. exact: val_inj. Qed.
+
+(* Size of the Finite Field *)
+
+(* We prove the cardinality of this set by giving a mapping from qpolys to    *)
+(* tuples of length (size).-1                                                 *)
+
+Definition qpoly_seq (q: qpoly) : seq F :=
+  q ++ nseq ((size p).-1 - size q) 0.
+
+Lemma p_gt_0: 0 < size p.
+Proof.
+have lt_01 : 0 < 1 by [].
+apply (ltn_trans lt_01).
+by apply p_irred.
+Qed.
+
+Lemma qpoly_seq_size q: size (qpoly_seq q) == (size p).-1.
+Proof.
+apply /eqP; rewrite /qpoly_seq size_cat size_nseq subnKC //.
+case : q => [x Szx /=].
+by rewrite leq_predR // p_gt_0. 
+Qed.
+
+Definition qpoly_tuple q : ((size p).-1).-tuple F := Tuple (qpoly_seq_size q).
+
+Definition tuple_poly (t: ((size p).-1).-tuple F) : {poly F} := Poly t.
+
+Lemma tuple_poly_size t: 
+  size (tuple_poly t) < size p.
+Proof.
+have szt: size t = ((size p).-1) by apply size_tuple.
+have lt_tp: size t < size p by rewrite szt ltn_predL p_gt_0.
+by apply (leq_ltn_trans (size_Poly t)).
+Qed.
+
+Definition tuple_qpoly (t: ((size p).-1).-tuple F) : qpoly := 
+  Qpoly (tuple_poly_size t).
+
+Lemma tuple_qpoly_cancel: cancel tuple_qpoly qpoly_tuple.
+Proof. 
+move=> [t sz_t]; rewrite /qpoly_tuple /tuple_qpoly/=.
+apply val_inj=>/=.
+rewrite /tuple_poly/qpoly_seq/=.
+move: sz_t => /eqP sz_t.
+case Allt: (all (eq_op^~0) t). 
+  have nseqt:=Allt; move: Allt.  
+  rewrite Poly_nil => /eqP->/=.
+  symmetry; rewrite subn0 -sz_t; apply /all_pred1P.
+  by apply nseqt.
+apply negbT, Poly_split in Allt.
+case : Allt => [tl /andP[/eqP t_eq tl_all]]. 
+rewrite {3}t_eq; f_equal. 
+have <-: size tl = ((size p).-1 - size (Poly t))%N
+  by rewrite -sz_t {1}t_eq size_cat -addnBAC // subnn.
+by symmetry; apply /all_pred1P.
+Qed.
+
+Lemma qpoly_tuple_cancel: cancel qpoly_tuple tuple_qpoly.
+Proof. 
+move=> [q q_sz]; rewrite /qpoly_tuple /tuple_qpoly/=.
+apply val_inj=>/=.
+rewrite /tuple_poly /qpoly_seq /=. 
+rewrite Poly_cat //; first by apply polyseqK. 
+by apply /all_pred1P; rewrite size_nseq.
+Qed.
+
+Lemma qpoly_tuple_bij: bijective qpoly_tuple.
+Proof.
+  apply (Bijective qpoly_tuple_cancel tuple_qpoly_cancel).
+Qed.
+
+Definition qpoly_finMixin := CanFinMixin qpoly_tuple_cancel.
+Canonical qpoly_finType := Eval hnf in FinType qpoly qpoly_finMixin. 
+
+Lemma qpoly_size: #|qpoly| = (#|F|^((size p).-1))%N.
+Proof.
+by rewrite (bij_eq_card qpoly_tuple_bij) card_tuple.
+Qed.
+
+(* Algebraic Structures*)
+
+(* Z Module *)
+
+Lemma q0_size: size (0 : {poly F}) < size p.
+Proof. 
+by rewrite size_poly0 p_gt_0.
+Qed.
+
+Lemma q1_size : size (1 : {poly F}) < size p.
+Proof. 
+by rewrite size_poly1 p_irred.
+Qed.
+
+Definition q0 : qpoly := Qpoly q0_size.
+Definition q1 : qpoly := Qpoly q1_size.
+
+Lemma qadd_size (q1 q2: qpoly) : size (val q1 + val q2) < size p.
+Proof.
+apply (leq_ltn_trans (size_add q1 q2)).
+rewrite gtn_max. 
+by apply /andP; split; apply qsz.
+Qed.
+
+Definition qadd (q1 q2: qpoly) : qpoly := Qpoly (qadd_size q1 q2).
+
+Lemma qopp_size (q: qpoly) : size (-(val q)) < size p.
+Proof. 
+by rewrite size_opp; apply qsz.
+Qed.
+
+Definition qopp (q: qpoly) := Qpoly (qopp_size q).
+
+Lemma qaddA : associative qadd.
+Proof.
+move=> q1 q2 q3; rewrite /qadd; apply qpoly_inj=>/=.
+by rewrite GRing.addrA. 
+Qed.
+
+Lemma qaddC : commutative qadd.
+Proof. 
+move=> q1 q2; rewrite /qadd; apply qpoly_inj=>/=. 
+by rewrite GRing.addrC.
+Qed.
+
+Lemma qaddFq : left_id q0 qadd.
+Proof. 
+move=> q; rewrite /qadd /q0; apply qpoly_inj=>/=.
+by rewrite GRing.add0r.
+Qed.
+
+Lemma qaddqq : left_inverse q0 qopp qadd.
+Proof. 
+move=> q; rewrite /qadd /qopp /q0; apply qpoly_inj=>/=.
+by rewrite GRing.addrC GRing.subrr.
+Qed.
+
+Definition qpoly_zmodMixin := ZmodMixin qaddA qaddC qaddFq qaddqq.
+Canonical qpoly_zmodType := ZmodType qpoly qpoly_zmodMixin.
+
+(* Ring *)
+
+Lemma qmul_size (p1 p2: {poly F}) : size ((p1 * p2) %% p) < size p.
+Proof. 
+by rewrite ltn_modp; apply irredp_neq0.
+Qed.
+
+Definition qmul (q1 q2 : qpoly) : qpoly := Qpoly (qmul_size q1 q2).
+
+Lemma qpoly_mulA : associative qmul.
+Proof. 
+move=> q1 q2 q3; rewrite /qmul; apply qpoly_inj=>/=.
+by rewrite (GRing.mulrC ((qp q1 * qp q2) %% p)) !modp_mul
+  (GRing.mulrC _ (qp q1 * qp q2)) GRing.mulrA.
+Qed.
+
+Lemma qpoly_mulC: commutative qmul.
+Proof.
+move=> q1 q2; rewrite /qmul; apply qpoly_inj=>/=.
+by rewrite GRing.mulrC.
+Qed.
+
+Lemma qpoly_mul1q: left_id q1 qmul.
+Proof.
+move=> q. rewrite /qmul /q1; apply qpoly_inj=>/=. 
+by rewrite GRing.mul1r modp_small //; apply qsz.
+Qed.
+
+Lemma qpoly_mulD : left_distributive qmul qadd.
+Proof. 
+move=>q1 q2 q3; rewrite /qmul /qadd; apply qpoly_inj=>/=.
+by rewrite -modpD GRing.mulrDl. 
+Qed.
+
+Lemma qpoly_1not0: q1 != q0.
+Proof. 
+case: (q1 == q0) /eqP => //.
+rewrite /q0 /q1 /= => [[eq_1_0]].
+have neq_1_0:=(GRing.oner_neq0 (poly_ringType F)).
+move: neq_1_0.
+by rewrite eq_1_0 eq_refl.
+Qed. 
+
+Definition qpoly_comRingMixin := ComRingMixin 
+  qpoly_mulA qpoly_mulC qpoly_mul1q qpoly_mulD qpoly_1not0.
+Canonical qpoly_ringType := RingType qpoly qpoly_comRingMixin.
+Canonical qpoly_comRingType := ComRingType qpoly qpoly_mulC.
+
+(* Now we want to show that inverses exist and are computable. *)
+(* We do this in several steps                                 *)
+Definition prime_poly (p: {poly F}) : Prop :=
+  forall (q r : {poly F}), p %| (q * r) -> (p %| q) || (p %| r).
+
+Lemma irred_is_prime (r : {poly F}):
+  irreducible_poly r -> prime_poly r.
+Proof.
+move=> r_irred s t r_div_st.
+have [[u v]/= bez] := (Bezoutp r s).
+case r_div_s: (r %| s) =>//=.
+have rs_coprime: size (gcdp r s) == 1%N; last by 
+  rewrite -(Gauss_dvdpr _ rs_coprime). 
+case gcd_sz: (size (gcdp r s) == 1%N) => //.
+have gcd_div := (dvdp_gcdl r s). 
+apply r_irred in gcd_div; last by apply negbT.
+move: gcd_div.
+by rewrite /eqp dvdp_gcd r_div_s !andbF.
+Qed.
+
+Lemma qpoly_zero (q: qpoly) : (q == 0) = (qp q %% p == 0).
+Proof.
+case: q => [q q_sz]/=. 
+have->: 0 = q0 by [].
+by rewrite /q0 modp_small.
+Qed.
+
+(* The following actually shows that any finite integral domain is a field *)
+Lemma qpoly_mulf_eq0 (q1 q2: qpoly) : (q1 * q2) = 0 -> (q1 == 0) || (q2 == 0).
+Proof.
+have->:(q1 * q2) = qmul q1 q2 by [].
+have->:0 = q0 by [].
+rewrite /qmul /= => [[/ modp_eq0P p_div_q12]].
+rewrite !qpoly_zero.
+by apply irred_is_prime.
+Qed. 
+
+Lemma qpoly_cancel (q1 q2 q3: qpoly): q1 != 0 -> q1 * q2 = q1 * q3 -> q2 = q3.
+Proof.
+move=> q1_neq0 q12_13.
+have q1_sub_q23: q1 * (q2 - q3) = 0 by rewrite GRing.mulrBr q12_13 GRing.subrr.
+apply qpoly_mulf_eq0 in q1_sub_q23.
+move: q1_sub_q23 => /orP[ /eqP q1_eq0 | /eqP eq_q23].
+  by move: q1_neq0; rewrite q1_eq0 eq_refl.
+by apply GRing.subr0_eq.
+Qed.
+
+(* To show that inverses exist, we define the map f_q(x) = q * x and we show *)
+(* that this is injective (and thus bijective since the set is finite)       *)
+(* if q != 0 *)
+Definition qmul_map (q: qpoly) := qmul q.
+
+Lemma qmul_map_inj (q: qpoly) : 
+  q != 0 ->
+  injective (qmul_map q).
+Proof.
+move=> q_neq_0 q1 q2.
+by apply qpoly_cancel.
+Qed.
+
+Lemma mul_map_bij (q: qpoly): 
+  q != 0 ->
+  bijective (qmul_map q).
+Proof.
+move=> q_neq_0.
+by apply injF_bij, qmul_map_inj.
+Qed.
+
+Lemma qpoly_inv_exist (q: qpoly):
+  q != 0 ->
+  exists (inv: qpoly), inv * q = 1.
+Proof.
+move=> q_neq_0. apply mul_map_bij in q_neq_0.
+case : q_neq_0 => g can1 can2.
+exists (g 1). 
+move: can2 => /( _ 1).
+by rewrite GRing.mulrC.
+Qed.
+
+(* A (slow) computable inverse function from the above *)
+Definition qinv (q: qpoly) :=
+  nth q0 (enum qpoly) (find (fun x => x * q == 1) (enum qpoly)).
+
+Lemma qinv_correct (q: qpoly):
+  q != 0 ->
+  (qinv q) * q = 1.
+Proof.
+move=>q_neq_0.  
+apply /eqP; rewrite /qinv.
+have has_inv: has (fun x => x * q == 1) (enum qpoly); 
+  last by apply (nth_find q0) in has_inv.
+apply /hasP.
+apply qpoly_inv_exist in q_neq_0.
+case: q_neq_0 => [inv inv_correct].
+exists inv; last by apply /eqP. 
+have inv_count: count_mem inv (enum qpoly) = 1%N 
+  by rewrite enumT; apply enumP.
+apply /count_memPn.
+by rewrite inv_count.
+Qed.
+
+Lemma qinv_zero: qinv 0 = 0.
+Proof.
+have not_has: ~~ has (fun x => x * 0 == 1) (enum qpoly).
+  apply /hasP. 
+  by move=>[r _ ]; rewrite GRing.mulr0 eq_sym GRing.oner_eq0.
+by rewrite /qinv hasNfind // nth_default.
+Qed.
+
+(* The rest of the algebraic structures: *)
+
+(* ComUnitRing *)
+
+Definition qunit : pred qpoly :=
+  fun x => x != q0.
+
+Lemma qpoly_mulVr : {in qunit, left_inverse q1 qinv qmul}.
+Proof.
+move=> q q_in.
+by apply qinv_correct.
+Qed.
+
+Lemma qpoly_mulrV : {in qunit, right_inverse q1 qinv qmul}.
+Proof.
+move=>q q_in.
+by rewrite qpoly_mulC; apply qpoly_mulVr.
+Qed. 
+
+Lemma qpoly_unitP (q1 q2: qpoly): (q2 * q1) = 1 /\ (q1 * q2) = 1 -> qunit q1.
+Proof.
+move=> [q21_1 q12_1]. 
+rewrite /qunit; apply /eqP => q1_eq_0.
+move: q12_1; rewrite q1_eq_0.
+by rewrite GRing.mul0r => /eqP; rewrite eq_sym GRing.oner_eq0.
+Qed.
+
+Lemma qpoly_inv0id : {in [predC qunit], qinv =1 id}.
+Proof.
+move=>q q_unit.
+have: ~~ (q != 0) by []. 
+rewrite negbK => /eqP->.
+by rewrite qinv_zero.
+Qed.
+
+Definition qpoly_unitringmixin := 
+  UnitRingMixin qpoly_mulVr qpoly_mulrV qpoly_unitP qpoly_inv0id.
+Canonical qpoly_unitringtype := UnitRingType qpoly qpoly_unitringmixin.
+Canonical qpoly_comunitring := [comUnitRingType of qpoly].
+
+(*Integral Domain *)
+
+Canonical qpoly_idomaintype := IdomainType qpoly qpoly_mulf_eq0.
+
+(* Field *)
+Lemma qpoly_mulVf : GRing.Field.axiom qinv.
+Proof.
+move=> q q_neq_0.
+by apply qpoly_mulVr.
+Qed.
+
+Lemma qpoly_inv0: qinv 0%R = 0%R.
+Proof.
+by apply qinv_zero.
+Qed.
+
+Definition qpoly_fieldmixin := FieldMixin qpoly_mulVf qpoly_inv0.
+Canonical qpoly_fieldType := FieldType qpoly qpoly_fieldmixin.
+Canonical qpoly_finFieldType := Eval hnf in [finFieldType of qpoly].
+
+End Field.
+
+End PolyField.
