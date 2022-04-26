@@ -55,6 +55,11 @@ From mathcomp Require ssrnum ssrint algC cyclotomic.
 (*                                                                            *)
 (* This file also defines the explicit construction of finite fields via      *)
 (* quotienting by an irreducible polynomial.                                  *)
+(*                   qpoly p ==  the type of polynomials of size < deg p      *)
+(*          primitive_poly p <-> p (of degree m) has a root alpha which       *)
+(*                               generates the field F_(p^m)                  *)
+(*                   dlog q  == the discrete log of element q (n such that    *)
+(*                              x ^+ n = q)                                   *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -700,12 +705,12 @@ End FinDomain.
 
 (* Construction of finite fields via irreducible polynomials *)
 
-Section PolyField.
+Section FieldConstr.
+
+Local Open Scope ring_scope.
 
 (*Some needed results about the Poly constructor - not general-purpose*)
 Section MorePoly.
-
-Local Open Scope ring_scope.
 
 Variable R: ringType.
 
@@ -753,10 +758,6 @@ by move: IHs => /(_ all_s2) ->.
 Qed.
 
 End MorePoly.
-
-Section Field.
-
-Local Open Scope ring_scope.
 
 (* We require that the type is finite so that the resulting field is finite. *)
 (* We need an integral domain for [irreducible_poly].                        *)
@@ -832,7 +833,7 @@ case Allt: (all (eq_op^~0) t).
   have nseqt:=Allt; move: Allt.  
   rewrite Poly_nil => /eqP->/=.
   symmetry; rewrite subn0 -sz_t; apply /all_pred1P.
-  by apply nseqt.
+  exact: nseqt.
 apply negbT, Poly_split in Allt.
 case : Allt => [tl /andP[/eqP t_eq tl_all]]. 
 rewrite {3}t_eq; f_equal. 
@@ -1125,6 +1126,7 @@ Canonical qpoly_comunitring := [comUnitRingType of qpoly].
 Canonical qpoly_idomaintype := IdomainType qpoly qpoly_mulf_eq0.
 
 (* Field *)
+
 Lemma qpoly_mulVf : GRing.Field.axiom qinv.
 Proof.
 move=> q q_neq_0.
@@ -1133,13 +1135,288 @@ Qed.
 
 Lemma qpoly_inv0: qinv 0%R = 0%R.
 Proof.
-by apply qinv_zero.
+exact: qinv_zero.
 Qed.
 
 Definition qpoly_fieldmixin := FieldMixin qpoly_mulVf qpoly_inv0.
 Canonical qpoly_fieldType := FieldType qpoly qpoly_fieldmixin.
 Canonical qpoly_finFieldType := Eval hnf in [finFieldType of qpoly].
 
-End Field.
+(* Fields over primitive polynomials *)
 
-End PolyField.
+Section Primitive.
+
+Definition primitive_poly (p: {poly F}) : Prop := 
+  irreducible_poly p /\ p %| 'X^((#|F|^((size p).-1)).-1) - 1 /\
+  (forall n, p %| 'X^n - 1 -> (n == 0%N) || (((#|F|^((size p).-1)).-1) <= n)).
+
+Variable p_prim: primitive_poly p.
+
+(* We want to prove that discrete logs exist for all nonzero elements.   *)
+(* We do not consider the trivial case where p = cx for constant c.      *)
+(* This case is not very interesting, since F[X]/(x) is isomorphic to F. *)
+
+Variable p_notx: 2 < size p.
+
+Lemma qx_size: size (polyX F) < size p.
+Proof.
+by rewrite size_polyX.
+Qed.
+
+(* The primitive element x *)
+Definition qx : qpoly := Qpoly qx_size.
+
+Lemma qx_exp (n: nat): qp (qx ^+ n) = ('X^n) %% p.
+Proof.
+elim: n => [/= | n /= IHn]. 
+  by rewrite GRing.expr0 modp_small // size_poly1; apply p_irred.
+rewrite !GRing.exprSr.
+have->: qx ^+ n * qx = qmul (qx ^+ n) qx by [].
+by rewrite /qmul/= IHn GRing.mulrC modp_mul GRing.mulrC.
+Qed.
+
+(* To show that discrete logs exist, we use the following map and show that is *)
+(* is bijective.                                                               *)
+
+Section DlogEx.
+
+Lemma qx_neq0: qx != 0.
+Proof.
+have->: 0 = q0 by [].
+rewrite /qx/q0/=.
+case: (Qpoly qx_size == Qpoly q0_size) /eqP => // [[/eqP eq_x0]].
+by rewrite polyX_eq0 in eq_x0.
+Qed.
+
+Lemma qxn_neq0 (n: nat): qx ^+ n != 0.
+Proof.
+by apply expf_neq0, qx_neq0.
+Qed.
+
+Definition dlog_ord := 'I_((#|F|^((size p).-1)).-1).
+
+(*Logs only exist for nonzero (or unit) qpolys*)
+Inductive qpolyNZ : predArgType := Qnz (qq: qpoly) of (qunit qq).
+Coercion qq (q: qpolyNZ) : qpoly := let: Qnz x _ := q in x.
+Definition qun (q: qpolyNZ) : qunit q := let: Qnz _ x := q in x.
+
+Canonical qpolyNZ_subType := [subType for qq].
+
+Definition qpolyNZ_eqMixin := Eval hnf in [eqMixin of qpolyNZ by <:].
+Canonical qpolyNZ_eqType := Eval hnf in EqType qpolyNZ qpolyNZ_eqMixin.
+Definition qpolyNZ_choiceMixin := [choiceMixin of qpolyNZ by <:].
+Canonical qpolyNZ_choiceType := Eval hnf in ChoiceType qpolyNZ qpolyNZ_choiceMixin.
+Definition qpolyNZ_countMixin := [countMixin of qpolyNZ by <:].
+Canonical qpolyNZ_countType := Eval hnf in CountType qpolyNZ qpolyNZ_countMixin.
+Canonical qpolyNZ_subCountType := [subCountType of qpolyNZ].
+
+Definition qpolyNZ_finMixin := Eval hnf in [finMixin of qpolyNZ by <:].
+Canonical qpolyNZ_finType := Eval hnf in FinType qpolyNZ qpolyNZ_finMixin.
+Canonical subFinType := [subFinType of qpolyNZ].
+
+Lemma qpolyNZ_card: #|qpolyNZ| = #|qpoly|.-1.
+Proof.
+have uniq_sz:=(card_finField_unit qpoly_finFieldType).
+move: uniq_sz; rewrite cardsT/= => <-.
+by rewrite !card_sub.
+Qed.
+
+Lemma qx_unit : qunit qx.
+Proof.
+by rewrite /qunit qx_neq0.
+Qed.
+
+Lemma qpow_unit (n: nat) : qunit (qx ^+ n).
+Proof.
+by rewrite /qunit qxn_neq0.
+Qed.
+
+Definition qpow_map (i: dlog_ord) : qpolyNZ :=
+  Qnz (qpow_unit i).
+
+(* We need to know that p does not divide x^n for any n *)
+Lemma irred_dvdn_Xn (r: {poly F}) (n: nat):
+  irreducible_poly r ->
+  2 < size r ->
+  ~~ (r %| 'X^n).
+Proof.
+move=> r_irred r_size.
+elim: n => [| n /= IHn].
+  rewrite GRing.expr0 dvdp1.
+  by apply /eqP => r_eq_1; rewrite r_eq_1 in r_size.
+rewrite GRing.exprS.
+case r_div: (r %| 'X * 'X^n) => //.
+apply (irred_is_prime r_irred) in r_div.
+move: r_div => /orP[r_divx | r_divxn]; last by rewrite r_divxn in IHn.
+apply dvdp_leq in r_divx; last by rewrite polyX_eq0.
+by move: r_divx; rewrite size_polyX leqNgt r_size.
+Qed.
+
+(* A weaker lemma than [modpD] *)
+Lemma modpD_wk (d q r : {poly F}): 
+  d != 0 -> (q + r) %% d = (q %% d + r %% d) %% d.
+Proof.
+move=> d_neq0; rewrite modpD.
+by rewrite (@modp_small _ (_ + _)) // -modpD ltn_modp.
+Qed.
+
+Lemma qpow_map_bij: bijective qpow_map.
+Proof.
+apply inj_card_bij; last by rewrite qpolyNZ_card qpoly_size card_ord leqnn.
+move=> n1 n2; rewrite /qpow_map/= => [[]].
+wlog: n1 n2 / (n1 <= n2).
+  move=> all_eq.
+  case: (orP (leq_total n1 n2)) => [n1_leqn2 | n2_leqn1].
+    by apply all_eq.
+  by move=> qx_n12; symmetry; apply all_eq.
+move=> n1_leqn2 qx_n12.
+have: (qx ^+ n2 - qx ^+ n1 = 0) by rewrite qx_n12 GRing.subrr.
+rewrite -(subnKC n1_leqn2) GRing.exprD.
+rewrite -{2}(GRing.mulr1 (qx ^+ n1)) -GRing.mulrBr.
+move=> /eqP; rewrite mulf_eq0 => /orP[/eqP xn_eq0|].
+  by have /eqP qn1_x := (negbTE (qxn_neq0 n1)).
+rewrite qpoly_zero/= qx_exp GRing.addrC modpD_wk; last by apply irredp_neq0.
+rewrite modp_mod GRing.addrC -modpD modp_mod => n21_div_p.
+apply p_prim in n21_div_p.
+move: n21_div_p => /orP[| n12_big].
+  rewrite subn_eq0 => n2_leqn1; apply ord_inj; apply /eqP; rewrite eqn_leq.
+  by rewrite n1_leqn2 n2_leqn1.
+have n2_bound: n2 < (#|F| ^ (size p).-1).-1 by [].
+have n12_bound: n2 - n1 <= n2 by rewrite leq_subr.
+have lt_contra:= (leq_ltn_trans (leq_trans n12_big n12_bound) n2_bound).
+by rewrite ltnn in lt_contra.
+Qed.
+
+(* The inverse map (discrete log)*)
+
+Lemma field_gt0: 
+  0 < (#|F|^((size p).-1)).-1.
+Proof.
+rewrite -qpoly_size -qpolyNZ_card; apply /card_gt0P.
+by exists (Qnz qx_unit).
+Qed.
+
+Definition dlog_map (q : qpolyNZ) : dlog_ord :=
+  nth (Ordinal field_gt0) (enum dlog_ord)
+    (find (fun i => (qx ^+ (nat_of_ord i) == q)) (enum dlog_ord)).
+
+Lemma dlog_map_exist (q: qpolyNZ):
+  exists (i: dlog_ord), (qx ^+ i == q).
+Proof.
+case: (qpow_map_bij) => g canqg cangq.
+exists (g q).
+move: cangq => /(_ q)/=; rewrite /qpow_map => q_eq.
+apply (f_equal val) in q_eq. 
+by move: q_eq =>/=->; rewrite eq_refl.
+Qed. 
+
+Lemma dlog_map_correct (q: qpolyNZ):
+  (qx ^+ (dlog_map q) = q).
+Proof.
+rewrite /dlog_map.
+have has_dlog: has 
+  (fun i =>(qx ^+ (nat_of_ord i) == q)) 
+  (enum dlog_ord);
+  last by apply /eqP; apply (nth_find (Ordinal field_gt0)) in has_dlog.
+apply /hasP.
+have [n n_log]:=(dlog_map_exist q).
+exists n => //.
+have n_count: count_mem n (enum dlog_ord) = 1%N
+  by rewrite enumT; apply enumP.
+apply /count_memPn.
+by rewrite n_count.
+Qed.
+
+Lemma dlog_map_can: cancel dlog_map qpow_map.
+Proof.
+move=> q; rewrite /qpow_map; apply val_inj=>/=.
+by rewrite dlog_map_correct.
+Qed.
+
+Lemma qpow_map_can: cancel qpow_map dlog_map.
+Proof.
+rewrite -bij_can_sym.
+  exact: dlog_map_can.
+exact: qpow_map_bij.
+Qed.
+
+Lemma dlog_map_bij: bijective dlog_map.
+Proof.
+exact: (bij_can_bij qpow_map_bij qpow_map_can).
+Qed.
+
+Lemma dlog_map_inj: injective dlog_map.
+Proof.
+exact: (bij_inj dlog_map_bij).
+Qed.
+
+End DlogEx.
+
+(* The full discrete log function, with dlog(0) = 0 *)
+
+Definition dlog (q: qpoly) : dlog_ord :=
+(match (qunit q) as u return (qunit q = u -> dlog_ord) with
+| true => fun q_unit => dlog_map (Qnz q_unit)
+| false => fun _ => (Ordinal field_gt0)
+end) erefl.
+
+Lemma exp_dlog (q: qpoly):
+  q != 0 ->
+  qx ^+ (dlog q) = q.
+Proof.
+move=> q_neq0.
+have q_unit: qunit q by [].
+rewrite /dlog; move: erefl.
+case: {2 3}(qunit q); last by rewrite q_unit.
+by move=> q_unit'/=; rewrite dlog_map_correct.
+Qed.
+
+Lemma dlog0: nat_of_ord (dlog 0) = 0%N.
+Proof.
+rewrite /dlog; move: erefl.
+have unit_zero: qunit 0 = false by rewrite /qunit eq_refl.
+case: {2 3}(qunit 0) => //.
+move=> zero_unit.
+have: qunit 0 = true by [].
+by rewrite unit_zero.
+Qed.
+
+Lemma dlog_exp (i: dlog_ord):
+  dlog(qx ^+ i) = i.
+Proof.
+have->:qx ^+ i = qpow_map i by [].
+have->: dlog (qpow_map i) = dlog_map (qpow_map i); 
+  last by rewrite qpow_map_can.
+rewrite /dlog; move: erefl.
+case: {2 3}(qunit (qpow_map i)) => //.
+move=> qpow_nunit.
+have: qunit (qpow_map i) = true by apply qun.
+by rewrite {1}qpow_nunit.
+Qed.
+
+(* From definition of primitive poly *)
+Lemma qx_field_sz1: qx ^+ (#|F| ^ (size p).-1).-1 = 1.
+Proof.
+apply qpoly_inj =>/=; rewrite qx_exp.
+case p_prim => [_ [p_div _]].
+move: p_div.
+rewrite /dvdp modpD modNp (@modp_small _ 1); 
+  last by rewrite size_poly1 (ltn_trans _ p_notx).
+by rewrite GRing.subr_eq0 => /eqP.
+Qed.
+
+Lemma qpoly_exp_modn (m n: nat) :
+  m = n %[mod (#|F| ^ (size p).-1).-1] ->
+  qx ^+ m = qx ^+ n.
+Proof.
+move=> mn_eqmod.
+rewrite (divn_eq m (#|F| ^ (size p).-1).-1) 
+  (divn_eq n (#|F| ^ (size p).-1).-1).
+rewrite !GRing.exprD !(mulnC _ ((#|F| ^ (size p).-1).-1)).
+rewrite !GRing.exprM !qx_field_sz1 !GRing.expr1n !GRing.mul1r.
+by rewrite mn_eqmod.
+Qed.
+
+End Primitive.
+
+End FieldConstr.
