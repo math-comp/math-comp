@@ -55,7 +55,7 @@ Require Export Ring.
 (*                                                                            *)
 (* -> patterns for contextual rewriting:                                      *)
 (*      leqLHS := (X in (X <= _)%N)%pattern                                   *)
-(*      leqRHS := (X in (_ <= RHS)%N)%pattern                                 *)
+(*      leqRHS := (X in (_ <= X)%N)%pattern                                   *)
 (*      ltnLHS := (X in (X < _)%N)%pattern                                    *)
 (*      ltnRHS := (X in (_ < X)%N)%pattern                                    *)
 (*                                                                            *)

@@ -140,7 +140,7 @@ Proof. by rewrite ltn_mod. Qed.
 Lemma leq_trunc_div m d : m %/ d * d <= m.
 Proof. by rewrite [leqRHS](divn_eq m d) leq_addr. Qed.
 
-Lemma leq_mod m d : m %% sd  <= m.
+Lemma leq_mod m d : m %% d <= m.
 Proof. by rewrite [leqRHS](divn_eq m d) leq_addl. Qed.
 
 Lemma leq_div m d : m %/ d <= m.
