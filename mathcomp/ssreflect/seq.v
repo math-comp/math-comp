@@ -381,6 +381,9 @@ Proof. by elim: s n => [|x s IHs] []. Qed.
 Lemma nth_nil n : nth [::] n = x0.
 Proof. by case: n. Qed.
 
+Lemma nth_seq1 n x : nth [:: x] n = if n == 0 then x else x0.
+Proof. by case: n => [|[]]. Qed.
+
 Lemma last_nth x s : last x s = nth (x :: s) (size s).
 Proof. by elim: s x => [|y s IHs] x /=. Qed.
 
@@ -1543,8 +1546,9 @@ by exists (index x s); [rewrite index_mem | apply nth_index].
 Qed.
 
 Variable T : Type.
+Implicit Types (a : pred T) (x : T).
 
-Lemma has_nthP (a : pred T) s x0 :
+Lemma has_nthP a s x0 :
   reflect (exists2 i, i < size s & a (nth x0 s i)) (has a s).
 Proof.
 elim: s => [|x s IHs] /=; first by right; case.
@@ -1552,13 +1556,51 @@ case nax: (a x); first by left; exists 0.
 by apply: (iffP IHs) => [[i]|[[|i]]]; [exists i.+1 | rewrite nax | exists i].
 Qed.
 
-Lemma all_nthP (a : pred T) s x0 :
+Lemma all_nthP a s x0 :
   reflect (forall i, i < size s -> a (nth x0 s i)) (all a s).
 Proof.
 rewrite -(eq_all (fun x => negbK (a x))) all_predC.
 case: (has_nthP _ _ x0) => [na_s | a_s]; [right=> a_s | left=> i lti].
   by case: na_s => i lti; rewrite a_s.
 by apply/idPn=> na_si; case: a_s; exists i.
+Qed.
+
+Lemma set_nthE s x0 n x :
+  set_nth x0 s n x = if n < size s
+    then take n s ++ x :: drop n.+1 s
+    else s ++ ncons (n - size s) x0 [:: x].
+Proof.
+elim: s n => [|a s IH] n /=; first by rewrite subn0 set_nth_nil.
+case: n => [|n]; first by rewrite drop0.
+by rewrite ltnS /=; case: ltnP (IH n) => _ ->.
+Qed.
+
+Lemma count_set_nth a s x0 n x :
+  count a (set_nth x0 s n x) =
+    count a s + a x - a (nth x0 s n) * (n < size s) + (a x0) * (n - size s).
+Proof.
+rewrite set_nthE; case: ltnP => [nlts|nges]; last first.
+  rewrite -cat_nseq !count_cat count_nseq /=.
+  by rewrite muln0 addn0 subn0 addnAC addnA.
+have -> : n - size s = 0 by apply/eqP; rewrite subn_eq0 ltnW.
+rewrite -[in count a s](cat_take_drop n s) [drop n s](drop_nth x0)//.
+by rewrite !count_cat/= muln1 muln0 addn0 addnAC !addnA [in RHS]addnAC addnK.
+Qed.
+
+Lemma count_set_nth_ltn a s x0 n x : n < size s ->
+  count a (set_nth x0 s n x) = count a s + a x - a (nth x0 s n).
+Proof.
+move=> nlts; rewrite count_set_nth nlts muln1.
+have -> : n - size s = 0 by apply/eqP; rewrite subn_eq0 ltnW.
+by rewrite muln0 addn0.
+Qed.
+
+Lemma count_set_nthF a s x0 n x : ~~ a x0 ->
+  count a (set_nth x0 s n x) = count a s + a x - a (nth x0 s n).
+Proof.
+move=> /negbTE ax0; rewrite count_set_nth ax0 mul0n addn0.
+case: ltnP => [_|nges]; first by rewrite muln1.
+by rewrite nth_default// ax0 subn0.
 Qed.
 
 End NthTheory.
@@ -2695,11 +2737,11 @@ Proof. by elim: s => //= x s <-; case: f. Qed.
 
 End Pmap.
 
-Lemma eq_in_pmap (aT : eqType) rT (f1 f2 : aT -> option rT) s : 
+Lemma eq_in_pmap (aT : eqType) rT (f1 f2 : aT -> option rT) s :
   {in s, f1 =1 f2} -> pmap f1 s = pmap f2 s.
 Proof. by elim: s => //= a s IHs /forall_cons [-> /IHs ->]. Qed.
 
-Lemma eq_pmap aT rT (f1 f2 : aT -> option rT) : 
+Lemma eq_pmap aT rT (f1 f2 : aT -> option rT) :
   f1 =1 f2 -> pmap f1 =1 pmap f2.
 Proof. by move=> Ef; elim => //= a s ->; rewrite Ef. Qed.
 
