@@ -57,7 +57,7 @@ From mathcomp Require ssrnum ssrint algC cyclotomic.
 (* quotienting by an irreducible polynomial.                                  *)
 (*                   qpoly p ==  the type of polynomials of size < deg p      *)
 (*          primitive_poly p <-> p (of degree m) has a root alpha which       *)
-(*                               generates the field F_(p^m)                  *)
+(*                               generates the field                          *)
 (*                   dlog q  == the discrete log of element q (n such that    *)
 (*                              x ^+ n = q)                                   *)
 (******************************************************************************)
@@ -788,8 +788,8 @@ Lemma qpoly_inj: injective qp. Proof. exact: val_inj. Qed.
 
 (* Size of the Finite Field *)
 
-(* We prove the cardinality of this set by giving a mapping from qpolys to    *)
-(* tuples of length (size).-1                                                 *)
+(* We prove the cardinality of this set by giving a map from qpolys to tuples *)
+(* of length (size p).-1.                                                     *)
 
 Definition qpoly_seq (q: qpoly) : seq F :=
   q ++ nseq ((size p).-1 - size q) 0.
@@ -973,7 +973,7 @@ Canonical qpoly_ringType := RingType qpoly qpoly_comRingMixin.
 Canonical qpoly_comRingType := ComRingType qpoly qpoly_mulC.
 
 (* Now we want to show that inverses exist and are computable. *)
-(* We do this in several steps                                 *)
+(* We do this in several steps.                                *)
 Definition prime_poly (p: {poly F}) : Prop :=
   forall (q r : {poly F}), p %| (q * r) -> (p %| q) || (p %| r).
 
@@ -1020,8 +1020,8 @@ by apply GRing.subr0_eq.
 Qed.
 
 (* To show that inverses exist, we define the map f_q(x) = q * x and we show *)
-(* that this is injective (and thus bijective since the set is finite)       *)
-(* if q != 0 *)
+(* that this is injective (and thus bijective) if q != 0.                    *)
+
 Definition qmul_map (q: qpoly) := qmul q.
 
 Lemma qmul_map_inj (q: qpoly) : 
@@ -1051,7 +1051,7 @@ move: can2 => /( _ 1).
 by rewrite GRing.mulrC.
 Qed.
 
-(* A (slow) computable inverse function from the above *)
+(* A (slow) inverse function from the above *)
 Definition qinv (q: qpoly) :=
   nth q0 (enum qpoly) (find (fun x => x * q == 1) (enum qpoly)).
 
@@ -1234,7 +1234,6 @@ Qed.
 Definition qpow_map (i: dlog_ord) : qpolyNZ :=
   Qnz (qpow_unit i).
 
-(* We need to know that p does not divide x^n for any n *)
 Lemma irred_dvdn_Xn (r: {poly F}) (n: nat):
   irreducible_poly r ->
   2 < size r ->

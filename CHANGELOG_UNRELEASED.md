@@ -41,6 +41,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `seq.v`, added lemmas `nth_seq1`, `set_nthE`, `count_set_nth`,
   `count_set_nth_ltn`, `count_set_nthF`
 
+- in `finfield.v`, added type of polynomial quotients `qpoly` and algebraic structures:
+  + canonical instances making `qpoly p` (for `p` irreducible) a `subType` `eqType`,
+    `choiceType`, `countType`, `subCountType`, `finType`, `ZmodType`, `ringType`,
+    `comRingType`, `unitRingType`, `comUnitRingType`, `idomainType`, `fieldType`, and
+    `finFieldType`
+  + added definition of `primitive_poly` and `dlog` (discrete log)
+  + added lemmas `exp_dlog`, `dlog0`, `dlog_exp`, `qx_field_sz1`, and `qpoly_exp_modn1`
+
+- in `ssrnat.v`, added lemma `leq_predR`
+
 ### Changed
 
 - in `rat.v`
