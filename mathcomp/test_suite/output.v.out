@@ -20,25 +20,30 @@ cyclic_pgroup_Aut_structure
            & if n == 0
              then A = F
              else
-              exists t : perm_for_finType gT,
+              exists t : perm_perm_type__canonical__fintype_Finite gT,
                 [/\ t \in A, #[t] = 2, m t = (-1)%R
                   & if odd p
                     then
                      [/\ cyclic A /\ cyclic P,
-                         exists s : perm_for_finType gT,
+                         exists
+                           s : perm_perm_type__canonical__fintype_Finite gT,
                            [/\ s \in A, #[s] = (p ^ n)%N, m s = (p.+1%:R)%R
                              & P = <[s]>]
-                       & exists s0 : perm_for_finType gT,
+                       & exists
+                           s0 : perm_perm_type__canonical__fintype_Finite gT,
                            [/\ s0 \in A, #[s0] = p, m s0 = ((p ^ n).+1%:R)%R
                              & 'Ohm_1(P) = <[s0]>]]
                     else
                      if n == 1
                      then A = <[t]>
                      else
-                      exists s : perm_for_finType gT,
+                      exists
+                        s : perm_perm_type__canonical__fintype_Finite gT,
                         [/\ s \in A, #[s] = (2 ^ n.-1)%N, 
                            m s = 5%R, <[s]> \x <[t]> = A
-                          & exists s0 : perm_for_finType gT,
+                          & exists
+                              s0 : perm_perm_type__canonical__fintype_Finite
+                                     gT,
                               [/\ s0 \in A, #[s0] = 2,
                                   m s0 = ((2 ^ n).+1%:R)%R,
                                   m (s0 * t) = ((2 ^ n).-1%:R)%R

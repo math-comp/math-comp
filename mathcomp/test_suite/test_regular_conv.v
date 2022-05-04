@@ -4,6 +4,8 @@ Section regular.
 
 Import GRing.
 
+(* TODO: commented out with HB port *)
+(*
 Let eq_ringType_of_regular_lalgType (R : ringType) :=
   erefl : regular_lalgType R = Ring.Pack (Ring.class R) :> ringType.
 
@@ -30,5 +32,6 @@ Let eq_unitRingType_of_regular_FalgType (R : comUnitRingType) :=
 (* The following assertion also fails if the class records are not primitive. *)
 Let eq_fieldType_of_regular_fieldExtType (K : fieldType) :=
   erefl : regular_fieldExtType K = Field.Pack (Field.class K) :> fieldType.
+*)
 
 End regular.
