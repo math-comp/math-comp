@@ -341,7 +341,7 @@ Local Notation "x %:F" := (tofrac x).
 Lemma tofrac_is_additive: additive tofrac.
 Proof.
 move=> p q /=; unlock tofrac.
-rewrite -[X in _ = _ + X]pi_opp -[X in _ = X]pi_add.
+rewrite -[X in _ = _ + X]pi_opp -[RHS]pi_add.
 by rewrite /addf /oppf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 
@@ -349,7 +349,7 @@ Canonical tofrac_additive := Additive tofrac_is_additive.
 
 Lemma tofrac_is_multiplicative: multiplicative tofrac.
 Proof.
-split=> [p q|//]; unlock tofrac; rewrite -[X in _ = X]pi_mul.
+split=> [p q|//]; unlock tofrac; rewrite -[RHS]pi_mul.
 by rewrite /mulf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 

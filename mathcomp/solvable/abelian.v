@@ -1906,7 +1906,7 @@ rewrite eqn_dvd dvdn_exponent //= -ltnNge => lt_x_e.
 rewrite (leq_trans (ltn_Pmull (prime_gt1 p_pr) _)) ?expn_gt0 ?prime_gt0 //.
 rewrite -expnS dvdn_leq // ?gcdn_gt0 ?order_gt0 // dvdn_gcd.
 rewrite pfactor_dvdn // dvdn_exp2l.
-  by rewrite -[xp in _ < xp]subn0 ltn_sub2l // lognE p_pr order_gt0 p_dv_x.
+  by rewrite -[ltnRHS]subn0 ltn_sub2l // lognE p_pr order_gt0 p_dv_x.
 rewrite ltn_sub2r // ltnNge -(dvdn_Pexp2l _ _ (prime_gt1 p_pr)) -!p_part.
 by rewrite !part_pnat_id // (pnat_dvd (exponent_dvdn G)).
 Qed.

@@ -165,7 +165,7 @@ Definition pi_of (n : pi_arg) : nat_pred := [pred p in primes n].
 
 Notation "\pi ( n )" := (pi_of n)
   (at level 2, format "\pi ( n )") : nat_scope.
-Notation "\p 'i' ( A )" := \pi(#|A|) 
+Notation "\p 'i' ( A )" := \pi(#|A|)
   (at level 2, format "\p 'i' ( A )") : nat_scope.
 
 Definition pdiv n := head 1 (primes n).
@@ -301,7 +301,7 @@ rewrite doubleS -/p [ifnz 0 _ _]/=; do 2?split => //.
   rewrite orbT next_pm /= -(leq_add2r d.*2) def_m 2!addSnnS -doubleS leq_add.
   - move: ltc; rewrite /kb {}/bc andbT; case e => //= e' _; case: ifnzP => //.
     by case: edivn2P.
-  - by rewrite -[p in p < _]muln1 ltn_pmul2l.
+  - by rewrite -[ltnLHS]muln1 ltn_pmul2l.
   by rewrite leq_double def_a mulSn (leq_trans ltdp) ?leq_addr.
 rewrite mulnDl !muln2 -addnA addnCA doubleD addnCA.
 rewrite (_ : _ + bc.2 = d); last first.
@@ -322,14 +322,14 @@ case: prime_decomp => [|[q [|[|e]]] pd] //=; last first; last by rewrite andbF.
   rewrite {1}/pfactor 2!expnS -!mulnA /=.
   case: (_ ^ _ * _) => [|u -> _ /andP[lt1q _]]; first by rewrite !muln0.
   left; right; exists q; last by rewrite dvdn_mulr.
-  have lt0q := ltnW lt1q; rewrite lt1q -[q in q < _]muln1 ltn_pmul2l //.
+  have lt0q := ltnW lt1q; rewrite lt1q -[ltnLHS]muln1 ltn_pmul2l //.
   by rewrite -[2]muln1 leq_mul.
 rewrite {1}/pfactor expn1; case: pd => [|[r e] pd] /=; last first.
   case: e => [|e] /=; first by rewrite !andbF.
   rewrite {1}/pfactor expnS -mulnA.
   case: (_ ^ _ * _) => [|u -> _ /and3P[lt1q ltqr _]]; first by rewrite !muln0.
   left; right; exists q; last by rewrite dvdn_mulr.
-  by rewrite lt1q -[q in q < _]mul1n ltn_mul // -[q.+1]muln1 leq_mul.
+  by rewrite lt1q -[ltnLHS]mul1n ltn_mul // -[q.+1]muln1 leq_mul.
 rewrite muln1 !andbT => def_q pr_q lt1q; right=> [[]] // [d].
 by rewrite def_q -mem_index_iota => in_d_2q dv_d_q; case/hasP: pr_q; exists d.
 Qed.
@@ -423,7 +423,7 @@ by rewrite Gauss_dvdr // prime_coprime // dv_pm.
 Qed.
 
 Lemma Euclid_dvd_prod (I : Type) (r : seq I) (P : pred I) (f : I -> nat) p :
-  prime p ->  
+  prime p ->
   p %| \prod_(i <- r | P i) f i = \big[orb/false]_(i <- r | P i) (p %| f i).
 Proof.
 move=> pP; apply: big_morph=> [x y|]; [exact: Euclid_dvdM | exact: Euclid_dvd1].
@@ -530,8 +530,8 @@ case def_n: n => [|[|n']] // _; rewrite -def_n => lt_n_p2.
 suffices ->: n = pdiv n by rewrite pdiv_prime ?def_n.
 apply/eqP; rewrite eqn_leq leqNgt andbC pdiv_leq; last by rewrite def_n.
 apply/contraL: lt_n_p2 => lt_pm_m; case/dvdnP: (pdiv_dvd n) => q def_q.
-rewrite -leqNgt [n in _ <= n]def_q leq_pmul2r // pdiv_min_dvd //.
-  by rewrite -[pdiv n]mul1n [n in _ < n]def_q ltn_pmul2r in lt_pm_m.
+rewrite -leqNgt [leqRHS]def_q leq_pmul2r // pdiv_min_dvd //.
+  by rewrite -[pdiv n]mul1n [ltnRHS]def_q ltn_pmul2r in lt_pm_m.
 by rewrite def_q dvdn_mulr.
 Qed.
 
@@ -541,7 +541,7 @@ Proof.
 apply: (iffP idP) => [npr_p|]; last first.
   case=> [|[p [pr_p le_p2_n dv_p_n]]]; first by case: n => [|[]].
   apply/negP=> pr_n; move: dv_p_n le_p2_n; rewrite dvdn_prime2 //; move/eqP->.
-  by rewrite leqNgt -[n in n < _]muln1 ltn_pmul2l ?prime_gt1 ?prime_gt0.
+  by rewrite leqNgt -[ltnLHS]muln1 ltn_pmul2l ?prime_gt1 ?prime_gt0.
 have [lt1p|] := leqP; [right | by left].
 exists (pdiv n); rewrite pdiv_dvd pdiv_prime //; split=> //.
 by case: leqP npr_p => // /ltn_pdiv2_prime -> //; exact: ltnW.
@@ -842,7 +842,7 @@ case: trunc_log => [//|k] b1 b2.
 apply/idP/idP => [/eqP sk0 | nlep]; first by move: b2; rewrite sk0.
 symmetry; rewrite -[_ == _]/false /is_true -b1; apply/negbTE; rewrite -ltnNge.
 move: nlep; rewrite -ltnS => nlep; apply: (leq_ltn_trans nlep).
-by rewrite -[X in X <= _]expn1; apply: leq_pexp2l.
+by rewrite -[leqLHS]expn1; apply: leq_pexp2l.
 Qed.
 
 Lemma trunc_log_gt0 p n : (0 < trunc_log p n) = (1 < p) && (p.-1 < n).
@@ -901,7 +901,7 @@ Qed.
 (* Truncated up real logarithm *)
 
 Definition up_log p n :=
-  if (p <= 1) then 0 else 
+  if (p <= 1) then 0 else
   let v := trunc_log p n in if n <= p ^ v then v else v.+1.
 
 Lemma up_log0 p : up_log p 0 = 0.
@@ -969,9 +969,9 @@ Lemma up_lognn p : 1 < p -> up_log p p = 1.
 Proof. by move=> p_gt1; apply: up_log_eq; rewrite p_gt1 /=. Qed.
 
 Lemma up_expnK p n : 1 < p -> up_log p (p ^ n) = n.
-Proof. 
+Proof.
 case: n => [|n] p_gt1 /=; first by rewrite up_log1.
-by apply: up_log_eq; rewrite // leqnn andbT ltn_exp2l. 
+by apply: up_log_eq; rewrite // leqnn andbT ltn_exp2l.
 Qed.
 
 Lemma up_logMp p n : 1 < p -> 0 < n -> up_log p (p * n) = (up_log p n).+1.
@@ -992,7 +992,7 @@ Proof.
 case: n=> // [] [|n] // _.
 apply: up_log_eq => //; apply/andP; split.
   apply: leq_trans (_ : n./2.+1.*2 < n.+3); last first.
-    by rewrite doubleS !ltnS -[X in _ <= X]odd_double_half leq_addl.
+    by rewrite doubleS !ltnS -[leqRHS]odd_double_half leq_addl.
   have /= /andP[H1n _] := up_log_bounds (isT : 1 < 2) (isT : 1 < n./2.+2).
   by rewrite ltnS -leq_double -mul2n -expnS prednK ?up_log_gt0 // in H1n.
 rewrite -[_./2.+1]/(n./2.+2).
@@ -1000,10 +1000,10 @@ have /= /andP[_ H2n] := up_log_bounds (isT : 1 < 2) (isT : 1 < n./2.+2).
 rewrite -leq_double -!mul2n -expnS in H2n.
 apply: leq_trans H2n.
 rewrite mul2n !doubleS !ltnS.
-by rewrite -[X in X <= _]odd_double_half -add1n leq_add2r; case: odd.
+by rewrite -[leqLHS]odd_double_half -add1n leq_add2r; case: odd.
 Qed.
 
-Lemma up_log_trunc_log p n : 
+Lemma up_log_trunc_log p n :
   1 < p -> 1 < n -> up_log p n = (trunc_log p n.-1).+1.
 Proof.
 move=> p_gt1 n_gt1; apply: up_log_eq => //.
@@ -1011,7 +1011,7 @@ rewrite -[n]prednK ?ltnS -?pred_Sn ?[0 < n]ltnW//.
 by rewrite trunc_logP ?ltn_predRL// trunc_log_ltn.
 Qed.
 
-Lemma trunc_log_up_log p n : 
+Lemma trunc_log_up_log p n :
   1 < p -> 0 < n -> trunc_log p n = (up_log p n.+1).-1.
 Proof. by move=> ? ?; rewrite up_log_trunc_log.
 Qed.
@@ -1201,7 +1201,7 @@ Proof.
 case p_pr: (prime p); first by rewrite p_part pfactorK.
 by rewrite lognE (lognE p m) p_pr.
 Qed.
-    
+
 Lemma partn_lcm pi m n : m > 0 -> n > 0 -> (lcmn m n)`_pi = lcmn m`_pi n`_pi.
 Proof.
 move=> m_gt0 n_gt0; have p_gt0: lcmn m n > 0 by rewrite lcmn_gt0 m_gt0.
@@ -1419,10 +1419,10 @@ Lemma pi'_p'nat pi p n : pi^'.-nat n -> p \in pi -> p^'.-nat n.
 Proof.
 by move=> pi'n pi_p; apply: sub_in_pnat pi'n => q _; apply: contraNneq => ->.
 Qed.
- 
+
 Lemma pi_p'nat p pi n : pi.-nat n -> p \in pi^' -> p^'.-nat n.
 Proof. by move=> pi_n; apply: pi'_p'nat; rewrite pnatNK. Qed.
- 
+
 Lemma partn_part pi rho n : {subset pi <= rho} -> n`_rho`_pi = n`_pi.
 Proof.
 move=> pi_sub_rho; have [->|n_gt0] := posnP n; first by rewrite !partn0 partn1.

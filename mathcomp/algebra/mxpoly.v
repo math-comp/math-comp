@@ -218,7 +218,7 @@ pose S_ j1 := map_mx polyC (\matrix_(i, j) S i (if j == j0 then j1 else j)).
 pose Ss0_ i dj := \poly_(j < dj) S i (insubd j0 j).
 pose Ss_ dj := \matrix_(i, j) (if j == j0 then Ss0_ i dj else (S i j)%:P).
 have{Ss u} ->: Ss = Ss_ dS.
-  apply/matrixP=> i j; rewrite mxE [in X in _ = X]mxE; case: (j == j0) => {j}//.
+  apply/matrixP=> i j; rewrite mxE [in RHS]mxE; case: (j == j0) => {j}//.
   apply/polyP=> k; rewrite coef_poly Sylvester_mxE mxE.
   have [k_ge_dS | k_lt_dS] := leqP dS k.
     case: (split i) => {}i; rewrite !mxE coefMXn;
@@ -242,7 +242,7 @@ rewrite -det_tr => /determinant_multilinear->;
 have [dj0 | dj_gt0] := posnP dj; rewrite ?dj0 !mul1r.
   rewrite !det_tr det_map_mx addrC (expand_det_col _ j0) big1 => [|i _].
     rewrite add0r; congr (\det _)%:P.
-    apply/matrixP=> i j; rewrite [in X in _ = X]mxE; case: eqP => // ->.
+    apply/matrixP=> i j; rewrite [in RHS]mxE; case: eqP => // ->.
     by congr (S i _); apply: val_inj.
   by rewrite mxE /= [Ss0_ _ _]poly_def big_ord0 mul0r.
 have /determinant_alternate->: j1 != j0 by rewrite -val_eqE -lt0n.
@@ -1783,7 +1783,7 @@ apply/diagonalizable_forPex/'forall_diagonalizable_forPex => /=
   by exists D0; apply/simmxW.
 exists (\mxrow_i tag (DoA i)); apply/simmxW.
    rewrite -row_leq_rank eqmx_col (mxdirectP Vd)/=.
-   by under [X in (_ <= X)%N]eq_bigr do rewrite genmxE (eqP (rAV _)).
+   by under [leqRHS]eq_bigr do rewrite genmxE (eqP (rAV _)).
 rewrite mxcol_mul diag_mxrow mul_mxdiag_mxcol; apply: eq_mxcol => i.
 by case: DoA => /= k /(simmxPp); rewrite VA => /(_ isT) ->.
 Qed.

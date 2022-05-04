@@ -53,6 +53,12 @@ Require Export Ring.
 (*   the size of the library down. All the inequalities refer to the same     *)
 (*   constant "leq"; in particular m < n is identical to m.+1 <= n.           *)
 (*                                                                            *)
+(* -> patterns for contextual rewriting:                                      *)
+(*      leqLHS := (X in (X <= _)%N)%pattern                                   *)
+(*      leqRHS := (X in (_ <= X)%N)%pattern                                   *)
+(*      ltnLHS := (X in (X < _)%N)%pattern                                    *)
+(*      ltnRHS := (X in (_ < X)%N)%pattern                                    *)
+(*                                                                            *)
 (*   conditionally strict inequality `leqif'                                  *)
 (*      m <= n ?= iff condition   ==   (m <= n) and ((m == n) = condition)    *)
 (*   This is actually a pair of boolean equalities, so rewriting with an      *)
@@ -856,6 +862,11 @@ Proof.
 by have [le_nm|/eqnP-> //] := leqP; rewrite -{1}(subnK le_nm) -addSn addnK.
 Qed.
 
+Notation leqLHS := (X in (X <= _)%N)%pattern.
+Notation leqRHS := (X in (_ <= X)%N)%pattern.
+Notation ltnLHS := (X in (X < _)%N)%pattern.
+Notation ltnRHS := (X in (_ < X)%N)%pattern.
+
 (* Getting a concrete value from an abstract existence proof. *)
 
 Section ExMinn.
@@ -1106,7 +1117,7 @@ Proof. by move/prednK <-; rewrite ltn_mul2r. Qed.
 Arguments ltn_pmul2r [m n1 n2].
 
 Lemma ltn_Pmull m n : 1 < n -> 0 < m -> m < n * m.
-Proof. by move=> lt1n m_gt0; rewrite -[m in m < _]mul1n ltn_pmul2r. Qed.
+Proof. by move=> lt1n m_gt0; rewrite -[ltnLHS]mul1n ltn_pmul2r. Qed.
 
 Lemma ltn_Pmulr m n : 1 < n -> 0 < m -> m < m * n.
 Proof. by move=> lt1n m_gt0; rewrite mulnC ltn_Pmull. Qed.

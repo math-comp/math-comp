@@ -170,7 +170,7 @@ Section Inertia.
 
 Variable gT : finGroupType.
 
-Definition inertia (B : {set gT}) (phi : 'CF(B)) :=  
+Definition inertia (B : {set gT}) (phi : 'CF(B)) :=
   [set y in 'N(B) | (phi ^ y)%CF == phi].
 
 Local Notation "''I[' phi ]" := (inertia phi) : group_scope.
@@ -380,7 +380,7 @@ move=> nsHG Gy; rewrite -conjg_IirrE cfdot_irr -(inj_eq irr_inj) conjg_IirrE.
 by rewrite -{1}['chi_i]cfConjgJ1 cfConjg_eqE ?mulg1.
 Qed.
 
-Definition cfclass (A : {set gT}) (phi : 'CF(A)) (B : {set gT}) := 
+Definition cfclass (A : {set gT}) (phi : 'CF(A)) (B : {set gT}) :=
   [seq (phi ^ repr Tx)%CF | Tx in rcosets 'I_B[phi] B].
 
 Local Notation "phi ^: G" := (cfclass phi G) : cfun_scope.
@@ -498,7 +498,7 @@ Qed.
 (* This is Isaacs, Theorem (6.2) *)
 Lemma Clifford_Res_sum_cfclass i j :
      H <| G -> j \in irr_constt ('Res[H, G] 'chi_i) ->
-  'Res[H] 'chi_i = 
+  'Res[H] 'chi_i =
      '['Res[H] 'chi_i, 'chi_j] *: (\sum_(chi <- ('chi_j ^: G)%CF) chi).
 Proof.
 move=> nsHG chiHj; have [sHG /subsetP nHG] := andP nsHG.
@@ -1063,7 +1063,7 @@ rewrite gt_eqF // (bigD1 b) //= cfdotZl cfnorm_irr mulr1 ltr_paddr ?egt0 //.
 apply: sumr_ge0 => g /andP[Sg _]; rewrite cfdotZl cfdot_irr.
 by rewrite mulr_ge0 ?ler0n ?Cnat_ge0.
 Qed.
-  
+
 (* This is Isaacs, Corollary (6.17) (due to Gallagher). *)
 Corollary constt_Ind_ext :
   [/\ forall b : Iirr (G / N), 'chi_(mod_Iirr b) * chi \in irr G,
@@ -1175,7 +1175,7 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   rewrite ler_paddr ?sumr_ge0 // => [i _|].
     by rewrite char1_ge0 ?rpredZ_Cnat ?Cnat_cfdot_char ?cfInd_char ?irr_char.
   rewrite -big_uniq //= big_image -sumr_const ler_sum // => i _.
-  rewrite cfunE -[in rhs in _ <= rhs](cfRes1 L) -cfdot_Res_r mmLthL cfRes1.
+  rewrite cfunE -[in leRHS](cfRes1 L) -cfdot_Res_r mmLthL cfRes1.
   by rewrite DthL cfdotZr rmorph_nat cfnorm_irr mulr1.
 constructor 2; exists e; first by exists p0.
 pose mu := (('chi_i / 'chi_j)%R %% L)%CF; pose U := cfker mu.
@@ -1299,7 +1299,7 @@ have{} Dc2: 'chi_c2 = ('chi_s2 %% N)%CF * 'chi_c.
   by rewrite Dc2 cfIirrE // mod_IirrE.
 have s2_lin: 'chi_s2 \is a linear_char.
   rewrite qualifE irr_char; apply/eqP/(mulIf (irr1_neq0 c)).
-  rewrite mul1r -[in rhs in _ = rhs](cfRes1 N) chiN -c2Nth cfRes1.
+  rewrite mul1r -[in RHS](cfRes1 N) chiN -c2Nth cfRes1.
   by rewrite Dc2 cfunE cfMod1.
 have s2Xf_1: 'chi_s2 ^+ f = 1.
   apply/(can_inj (cfModK nsNG))/(mulIr (lin_char_unitr lin_mu))/esym.
@@ -1313,7 +1313,7 @@ Qed.
 (* This is Isaacs, Theorem (6.25). *)
 Theorem solvable_irr_extendible_from_det G N s (theta := 'chi[N]_s) :
     N <| G -> solvable (G / N) ->
-    G \subset 'I[theta] -> coprime #|G : N| (truncC (theta 1%g)) -> 
+    G \subset 'I[theta] -> coprime #|G : N| (truncC (theta 1%g)) ->
   [exists c, 'Res 'chi[G]_c == theta]
     = [exists u, 'Res 'chi[G]_u == cfDet theta].
 Proof.
