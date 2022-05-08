@@ -381,7 +381,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*             additive f <-> f of type U -> V is additive, i.e., f maps the  *)
 (*                           Zmodule structure of U to that of V, 0 to 0,     *)
 (*                           - to - and + to + (equivalently, binary - to -). *)
-(*                        := {morph f : u v / u + v}.                         *)
+(*                        := {morph f : u v / u - v}.                         *)
 (*      {additive U -> V} == the interface type for a Structure (keyed on     *)
 (*                           a function f : U -> V) that encapsulates the     *)
 (*                           additive property; both U and V must have        *)
