@@ -4481,6 +4481,9 @@ Notation "[ 'IsTotal' 'of' T 'by' <: ]" :=
 Notation "[ 'Order' 'of' T 'by' <: ]" :=
   (Total.copy T%type (sub_type T))
   (at level 0, only parsing) : form_scope.
+
+Definition leEsub := @leEsub.
+Definition ltEsub := @ltEsub.
 End Exports.
 End SubOrder.
 HB.export SubOrder.Exports.
