@@ -616,7 +616,7 @@ Qed.
 
 Lemma divq_eq_deprecated (nx dx ny dy : rat) :
   dx != 0 -> dy != 0 -> (nx / dx == ny / dy) = (nx * dy == ny * dx).
-Proof. exact: GRing.eqr_div. Qed.
+Proof. exact: eqr_div. Qed.
 #[deprecated(since="mathcomp 1.13.0", note="Use eqr_div instead.")]
 Notation divq_eq := divq_eq_deprecated (only parsing).
 

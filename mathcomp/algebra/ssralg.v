@@ -5933,6 +5933,7 @@ Definition prodf_div := prodf_div.
 Definition telescope_prodf := telescope_prodf.
 Definition addf_div := addf_div.
 Definition mulf_div := mulf_div.
+Definition eqr_div := eqr_div.
 Definition char0_natf_div := char0_natf_div.
 Definition fpredMr := fpredMr.
 Definition fpredMl := fpredMl.

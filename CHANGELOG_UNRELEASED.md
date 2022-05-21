@@ -58,6 +58,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `obindEapp`, `omapEbind`, `omapEapp`, `oappEmap`, `omap_comp`,
     `oapp_comp`, `oapp_comp_f`, `olift_comp`, `compA`, `ocan_comp`
 
+- in `ssralg.v`
+  + missing export for `eqr_div`
+
 ### Changed
 
 - in `rat.v`
