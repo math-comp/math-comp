@@ -48,6 +48,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `seq.v`, added lemmas `nth_seq1`, `set_nthE`, `count_set_nth`,
   `count_set_nth_ltn`, `count_set_nthF`
+- in `ssrbool.v`
+  + lemmas `can_in_pcan`, `pcan_in_inj`, `in_inj_comp`, `can_in_comp`, `pcan_in_comp`
+  + definition `pred_oapp`
+  + lemams `ocan_in_comp`, `eqbLR`, `eqbRL`
+
+- in `ssrfun.v`
+  + definition `olift`
+  + lemmas `obindEapp`, `omapEbind`, `omapEapp`, `oappEmap`, `omap_comp`,
+    `oapp_comp`, `oapp_comp_f`, `olift_comp`, `compA`, `ocan_comp`
 
 ### Changed
 

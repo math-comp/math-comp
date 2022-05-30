@@ -423,6 +423,10 @@ Prenex Implicits negPP andPP orPP implyPP.
 (* v8.16 addtions *)
 (******************)
 
+(******************************************************************************)
+(*          pred_oapp T D := [pred x | oapp (mem D) false x]                  *)
+(******************************************************************************)
+
 Lemma mono1W_in (aT rT : predArgType) (f : aT -> rT) (aD : {pred aT})
     (aP : pred aT) (rP : pred rT) :
   {in aD, {mono f : x / aP x >-> rP x}} ->
@@ -443,3 +447,53 @@ Lemma all_sig2_cond {I T} (C : pred I) P Q :
 Proof.
 by move=> /all_sig_cond/[apply]-[f Pf]; exists f => i Di; have [] := Pf i Di.
 Qed.
+
+Lemma can_in_pcan [rT aT : Type] (A : {pred aT}) [f : aT -> rT] [g : rT -> aT] :
+  {in A, cancel f g} -> {in A, pcancel f (fun y : rT => Some (g y))}.
+Proof. by move=> fK x Ax; rewrite fK. Qed.
+
+Lemma pcan_in_inj [rT aT : Type] [A : {pred aT}]
+    [f : aT -> rT] [g : rT -> option aT] :
+  {in A, pcancel f g} -> {in A &, injective f}.
+Proof. by move=> fK x y Ax Ay /(congr1 g); rewrite !fK// => -[]. Qed.
+
+Lemma in_inj_comp A B C (f : B -> A) (h : C -> B) (P : pred B) (Q : pred C) :
+  {in P &, injective f} -> {in Q &, injective h} -> {homo h : x / Q x >-> P x} ->
+  {in Q &, injective (f \o h)}.
+Proof.
+by move=> Pf Qh QP x y xQ yQ xy; apply Qh => //; apply Pf => //; apply QP.
+Qed.
+
+Lemma can_in_comp [A B C : Type] (D : {pred B}) (D' : {pred C})
+    [f : B -> A] [h : C -> B] [f' : A -> B] [h' : B -> C] :
+  {homo h : x / x \in D' >-> x \in D} ->
+  {in D, cancel f f'} -> {in D', cancel h h'} ->
+  {in D', cancel (f \o h) (h' \o f')}.
+Proof. by move=> hD fK hK c cD /=; rewrite fK ?hK ?hD. Qed.
+
+Lemma pcan_in_comp [A B C : Type] (D : {pred B}) (D' : {pred C})
+    [f : B -> A] [h : C -> B] [f' : A -> option B] [h' : B -> option C] :
+  {homo h : x / x \in D' >-> x \in D} ->
+  {in D, pcancel f f'} -> {in D', pcancel h h'} ->
+  {in D', pcancel (f \o h) (obind h' \o f')}.
+Proof. by move=> hD fK hK c cD /=; rewrite fK/= ?hK ?hD. Qed.
+
+Definition pred_oapp T (D : {pred T}) : pred (option T) :=
+  [pred x | oapp (mem D) false x].
+
+Lemma ocan_in_comp [A B C : Type] (D : {pred B}) (D' : {pred C})
+    [f : B -> option A] [h : C -> option B] [f' : A -> B] [h' : B -> C] :
+  {homo h : x / x \in D' >-> x \in pred_oapp D} ->
+  {in D, ocancel f f'} -> {in D', ocancel h h'} ->
+  {in D', ocancel (obind f \o h) (h' \o f')}.
+Proof.
+move=> hD fK hK c cD /=; rewrite -[RHS]hK/=; case hcE : (h c) => [b|]//=.
+have bD : b \in D by have := hD _ cD; rewrite hcE inE.
+by rewrite -[b in RHS]fK; case: (f b) => //=; have /hK := cD; rewrite hcE.
+Qed.
+
+Lemma eqbLR (b1 b2 : bool) : b1 = b2 -> b1 -> b2.
+Proof. by move->. Qed.
+
+Lemma eqbRL (b1 b2 : bool) : b1 = b2 -> b2 -> b1.
+Proof. by move->. Qed.
