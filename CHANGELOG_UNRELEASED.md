@@ -128,6 +128,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `rat_vm_compute` which is a specialization to the rewriting
     rule `vm_compute` to trigger `vm_compute` by a rewrite.
 
+- in `interval.v`
+  + coercion `pair_of_interval`
+  + lemmas `in_segment_addgt0Pr`, `in_segment_addgt0Pl`, `ltBSide`,
+    `leBSide`, `lteBSide`, `ltBRight_leBLeft`, `leBRight_ltBLeft`,
+    `bnd_simp`, `itv_splitU1`, `itv_split1U`, `mem_miditv`,
+    `miditv_le_left`, `miditv_ge_right`, `predC_itvl`, `predC_itvr`,
+    `predC_itv`
+  + definition `miditv`
+
 ### Changed
 
 - in `rat.v`
