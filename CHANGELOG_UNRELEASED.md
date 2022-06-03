@@ -73,6 +73,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + canonical instances `opp_fun_additive` and `opp_fun_linear`
   + notation `f \* g` for definition `mul_fun`
 
+- in `order.v`
+  + notation `f \min g` and `f \max g` for definitions `min_fun` and `max_fun`
+
 ### Changed
 
 - in `rat.v`
