@@ -111,6 +111,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrnum.v`
   + lemma `gtr_opp`
 
+- in `order.v`
+  + lemma `le_le_trans`
+
 ### Changed
 
 - in `rat.v`
