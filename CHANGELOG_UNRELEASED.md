@@ -71,6 +71,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notation `\- f` for definition `opp_fun`
   + lemmas `opp_fun_is_additive` and `opp_fun_is_scalable`
   + canonical instances `opp_fun_additive` and `opp_fun_linear`
+  + notation `f \* g` for definition `mul_fun`
 
 ### Changed
 

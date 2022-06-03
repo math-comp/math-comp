@@ -558,6 +558,8 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                a \o* f == the function x |-> f x * a, canonically linear   *)
 (*                           linear when f is and its codomain is an lalgType *)
 (*                           and which simplifies on application.             *)
+(*                 f \* g == the function x |-> f x * g x; f \* g simplifies  *)
+(*                           on application.                                  *)
 (* The Lemmas about these structures are contained in both the GRing module   *)
 (* and in the submodule GRing.Theory, which can be imported when unqualified  *)
 (* access to the theory is needed (GRing.Theory also allows the unqualified   *)
@@ -620,6 +622,7 @@ Reserved Notation "\- f" (at level 35, f at level 35).
 Reserved Notation "a \*o f" (at level 40).
 Reserved Notation "a \o* f" (at level 40).
 Reserved Notation "a \*: f" (at level 40).
+Reserved Notation "f \* g" (at level 40, left associativity).
 
 Delimit Scope ring_scope with R.
 Delimit Scope term_scope with T.
@@ -1876,6 +1879,7 @@ Variables (R : ringType) (T : Type).
 Implicit Type f : T -> R.
 Definition mull_fun a f x := a * f x.
 Definition mulr_fun a f x := f x * a.
+Definition mul_fun f g x := f x * g x.
 End LiftedRing.
 
 (* Lifted linear operations. *)
@@ -1897,6 +1901,7 @@ Local Notation "\- f" := (opp_fun f) : ring_scope.
 Local Notation "a \*: f" := (scale_fun a f) : ring_scope.
 Local Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Local Notation "x \o* f" := (mulr_fun x f) : ring_scope.
+Local Notation "f \* g" := (mul_fun f g) : ring_scope.
 
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
@@ -1904,6 +1909,7 @@ Arguments opp_fun {_ _} f _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
+Arguments mul_fun {_ _} f g _ /.
 
 Section AdditiveTheory.
 
@@ -6150,6 +6156,7 @@ Notation "\- f" := (opp_fun f) : ring_scope.
 Notation "a \*: f" := (scale_fun a f) : ring_scope.
 Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Notation "x \o* f" := (mulr_fun x f) : ring_scope.
+Notation "f \* g" := (mul_fun f g) : ring_scope.
 
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
@@ -6157,6 +6164,7 @@ Arguments opp_fun {_ _} f _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
+Arguments mul_fun {_ _} f g _ /.
 
 Notation "\sum_ ( i <- r | P ) F" :=
   (\big[+%R/0%R]_(i <- r | P%B) F%R) : ring_scope.
