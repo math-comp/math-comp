@@ -114,6 +114,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `order.v`
   + lemma `le_le_trans`
 
+- in `bigop.v`
+  + lemmas `eq_bigl_supp`, `perm_big_supp_cond`, `perm_big_supp`
+
 ### Changed
 
 - in `rat.v`
