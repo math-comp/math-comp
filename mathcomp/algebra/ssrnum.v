@@ -1618,6 +1618,9 @@ Proof. by rewrite lter_oppl oppr0. Qed.
 Lemma oppr_lt0 x : (- x < 0) = (0 < x).
 Proof. by rewrite lter_oppl oppr0. Qed.
 
+Lemma gtr_opp x : 0 < x -> - x < x.
+Proof. by move=> n0; rewrite -subr_lt0 -opprD oppr_lt0 addr_gt0. Qed.
+
 Definition oppr_lte0 := (oppr_le0, oppr_lt0).
 Definition oppr_cp0 := (oppr_gte0, oppr_lte0).
 Definition lter_oppE := (oppr_cp0, lter_opp2).
