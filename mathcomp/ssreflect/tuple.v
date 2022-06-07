@@ -334,6 +334,15 @@ move=> s_x; pose i := index x s; have lt_i: i < size s by rewrite index_mem.
 by exists (Ordinal lt_i); rewrite (tnth_nth x) nth_index.
 Qed.
 
+Lemma tuple_uniqP (t : n.-tuple T) : reflect (injective (tnth t)) (uniq t).
+Proof.
+case: {+}n => [|m] in t *; first by rewrite tuple0; constructor => -[].
+pose x0 := tnth t ord0; apply/(equivP (uniqP x0)); split=> tinj i j.
+  by rewrite !(tnth_nth x0) => /tinj/val_inj; apply; rewrite size_tuple inE.
+rewrite !size_tuple !inE => im jm; have := tinj (Ordinal im) (Ordinal jm).
+by rewrite !(tnth_nth x0) => /[apply]-[].
+Qed.
+
 End EqTuple.
 
 Definition tuple_choiceMixin n (T : choiceType) :=

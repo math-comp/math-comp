@@ -61,6 +61,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssralg.v`
   + missing export for `eqr_div`
 
+- in `tuple.v`:
+  + lemma `tuple_uniqP`
+
 ### Changed
 
 - in `rat.v`
