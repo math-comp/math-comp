@@ -49,6 +49,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `seq.v`, added lemmas `nth_seq1`, `set_nthE`, `count_set_nth`,
   `count_set_nth_ltn`, `count_set_nthF`
 
+- in `tuple.v`:
+  + lemma `tuple_uniqP`
+
 ### Changed
 
 - in `rat.v`
