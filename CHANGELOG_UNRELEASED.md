@@ -117,6 +117,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `bigop.v`
   + lemmas `eq_bigl_supp`, `perm_big_supp_cond`, `perm_big_supp`
 
+- in `ssrnum.v`
+  + lemmas `mulr_ge0_gt0`, `splitr`, `ler_addgt0Pr`, `ler_addgt0Pl`,
+    `lt_le`, `gt_ge`
+
 ### Changed
 
 - in `rat.v`

@@ -2343,6 +2343,15 @@ Proof. by move=> x_le0 y_le0; rewrite -(mulr0 x) ler_wnmul2l. Qed.
 Lemma mulr_gt0 x y : 0 < x -> 0 < y -> 0 < x * y.
 Proof. by move=> x_gt0 y_gt0; rewrite pmulr_rgt0. Qed.
 
+(* and reverse direction *)
+
+Lemma mulr_ge0_gt0 x y : 0 <= x -> 0 <= y -> (0 < x * y) = (0 < x) && (0 < y).
+Proof.
+rewrite le_eqVlt => /predU1P[<-|x0]; first by rewrite mul0r ltxx.
+rewrite le_eqVlt => /predU1P[<-|y0]; first by rewrite mulr0 ltxx andbC.
+by apply/idP/andP=> [|_]; rewrite pmulr_rgt0.
+Qed.
+
 (* Iterated products *)
 
 Lemma prodr_ge0 I r (P : pred I) (E : I -> R) :
@@ -3738,6 +3747,9 @@ Proof. by rewrite !(fun_if GRing.inv) !(invr0, invrN, invr1). Qed.
 Lemma sgrV x : sgr x^-1 = sgr x.
 Proof. by rewrite /sgr invr_eq0 invr_lt0. Qed.
 
+Lemma splitr x : x = x / 2%:R + x / 2%:R.
+Proof. by rewrite -mulr2n -mulr_natr mulfVK //= pnatr_eq0. Qed.
+
 (* lteif *)
 
 Lemma lteif_pdivl_mulr C z x y :
@@ -3789,6 +3801,34 @@ by rewrite !mulrDr !mulr1 ltr_add2r ltr_add2l.
 Qed.
 
 Definition midf_lte := (midf_le, midf_lt).
+
+Lemma ler_addgt0Pr x y : reflect (forall e, e > 0 -> x <= y + e) (x <= y).
+Proof.
+apply/(iffP idP)=> [lexy e e_gt0 | lexye]; first by rewrite ler_paddr// ltW.
+have [||ltyx]// := comparable_leP.
+  rewrite (@comparabler_trans _ (y + 1))// /Order.comparable ?lexye ?ltr01//.
+  by rewrite ler_addl ler01 orbT.
+have /midf_lt [_] := ltyx; rewrite le_gtF//.
+rewrite -(@addrK _ y y) addrAC -addrA 2!mulrDl -splitr lexye//.
+by rewrite divr_gt0// ?ltr0n// subr_gt0.
+Qed.
+
+Lemma ler_addgt0Pl x y : reflect (forall e, e > 0 -> x <= e + y) (x <= y).
+Proof.
+by apply/(equivP (ler_addgt0Pr x y)); split=> lexy e /lexy; rewrite addrC.
+Qed.
+
+Lemma lt_le a b : (forall x, x < a -> x < b) -> a <= b.
+Proof.
+move=> ab; apply/ler_addgt0Pr => e e_gt0; rewrite -ler_subl_addr ltW//.
+by rewrite ab // ltr_subl_addr -ltr_subl_addl subrr.
+Qed.
+
+Lemma gt_ge a b : (forall x, b < x -> a < x) -> a <= b.
+Proof.
+move=> ab; apply/ler_addgt0Pr => e e_gt0.
+by rewrite ltW// ab// -ltr_subl_addl subrr.
+Qed.
 
 (* The AGM, unscaled but without the nth root. *)
 
