@@ -49,6 +49,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "master";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
+      coq-elpi.override.version = "coq-master";
+      hierarchy-builder.override.version = "coq-master";
     };
     "coq-8.15".coqPackages = common-bundles // {
       coq.override.version = "8.15";
