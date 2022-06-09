@@ -259,7 +259,7 @@ Definition inE := (in_set, inE).
 
 Arguments set0 {T}.
 Arguments eq_finset {T} [pA] pB eq_pAB.
-Hint Resolve in_setT : core.
+#[global] Hint Resolve in_setT : core.
 
 Notation "[ 'set' : T ]" := (setTfor (Phant T))
   (at level 0, format "[ 'set' :  T ]") : set_scope.
@@ -1020,7 +1020,7 @@ Arguments subUsetP {T A B C}.
 Arguments subsetDP {T A B C}.
 Arguments subsetD1P {T A B x}.
 Prenex Implicits set1.
-Hint Resolve subsetT_hint : core.
+#[global] Hint Resolve subsetT_hint : core.
 
 Section setOpsAlgebra.
 

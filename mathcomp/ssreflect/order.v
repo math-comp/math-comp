@@ -3469,8 +3469,8 @@ Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
 Proof. by move=> *; elim/big_ind : _. Qed.
 
 End POrderTheory.
-Hint Resolve comparable_minr comparable_minl : core.
-Hint Resolve comparable_maxr comparable_maxl : core.
+#[global] Hint Resolve comparable_minr comparable_minl : core.
+#[global] Hint Resolve comparable_maxr comparable_maxl : core.
 
 Section ContraTheory.
 Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
@@ -3655,7 +3655,7 @@ End POrderMonotonyTheory.
 
 End POrderTheory.
 
-Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
+#[global] Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
 
 Arguments leifP {disp T x y C}.
 Arguments leif_refl {disp T x C}.
@@ -4191,10 +4191,10 @@ Qed.
 
 End TotalTheory.
 
-Hint Resolve le_total : core.
-Hint Resolve ge_total : core.
-Hint Resolve comparableT : core.
-Hint Resolve sort_le_sorted : core.
+#[global] Hint Resolve le_total : core.
+#[global] Hint Resolve ge_total : core.
+#[global] Hint Resolve comparableT : core.
+#[global] Hint Resolve sort_le_sorted : core.
 
 Arguments min_idPr {disp T x y}.
 Arguments max_idPl {disp T x y}.

@@ -615,7 +615,7 @@ Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
 Let intr_inj_ZtoC := (intr_inj : injective ZtoC).
-Local Hint Resolve intr_inj_ZtoC : core.
+#[local] Hint Resolve intr_inj_ZtoC : core.
 
 (* Specialization of a few basic ssrnum order lemmas. *)
 
@@ -1246,5 +1246,6 @@ Proof. by move=> _ u /CintP[m ->]; apply: rpredZint. Qed.
 End PredCmod.
 
 End AlgebraicsTheory.
-Hint Resolve Creal0 Creal1 Cnat_nat Cnat0 Cnat1 Cint0 Cint1 floorC0 Crat0 Crat1 : core.
-Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
+#[global] Hint Resolve Creal0 Creal1 Cnat_nat Cnat0 Cnat1 Cint0 Cint1 : core.
+#[global] Hint Resolve floorC0 Crat0 Crat1 : core.
+#[global] Hint Resolve dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.

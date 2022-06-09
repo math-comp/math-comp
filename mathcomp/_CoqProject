@@ -7,4 +7,4 @@
 -arg -w -arg +duplicate-clear
 -arg -w -arg +non-primitive-record
 -arg -w -arg +undeclared-scope
--arg -w -arg -deprecated-hint-without-locality
+-arg -w -arg -deprecated-hint-rewrite-without-locality

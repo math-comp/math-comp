@@ -491,7 +491,7 @@ Qed.
 
 End PreGroupIdentities.
 
-Hint Resolve commute1 : core.
+#[global] Hint Resolve commute1 : core.
 Arguments invg_inj {T} [x1 x2].
 Prenex Implicits commute invgK.
 
@@ -1356,7 +1356,7 @@ Lemma valG : val G = G. Proof. by []. Qed.
 (* Non-triviality. *)
 
 Lemma group1 : 1 \in G. Proof. by case/group_setP: (valP G). Qed.
-Hint Resolve group1 : core.
+#[local] Hint Resolve group1 : core.
 
 Lemma group1_contra x : x \notin G -> x != 1.
 Proof. by apply: contraNneq => ->. Qed.
@@ -1626,7 +1626,7 @@ Proof. by move=> y Gy /=; rewrite -class_rcoset rcoset_id. Qed.
 
 Lemma class_refl x : x \in x ^: G.
 Proof. by apply/imsetP; exists 1; rewrite ?conjg1. Qed.
-Hint Resolve class_refl : core.
+#[local] Hint Resolve class_refl : core.
 
 Lemma class_eqP x y : reflect (x ^: G = y ^: G) (x \in y ^: G).
 Proof.
@@ -1773,7 +1773,7 @@ Proof. by move=> x y Gx Gy; apply: val_inj; rewrite /= !subgK ?groupM. Qed.
 
 End OneGroup.
 
-Hint Resolve group1 : core.
+#[local] Hint Resolve group1 : core.
 
 Lemma groupD1_inj G H : G^# = H^# -> G :=: H.
 Proof. by move/(congr1 (setU 1)); rewrite !setD1K. Qed.
@@ -1821,9 +1821,9 @@ Qed.
 
 End GroupProp.
 
-Hint Extern 0 (is_true (1%g \in _)) => apply: group1 : core.
-Hint Extern 0 (is_true (0 < #|_|)) => apply: cardG_gt0 : core.
-Hint Extern 0 (is_true (0 < #|_ : _|)) => apply: indexg_gt0 : core.
+#[global] Hint Extern 0 (is_true (1%g \in _)) => apply: group1 : core.
+#[global] Hint Extern 0 (is_true (0 < #|_|)) => apply: cardG_gt0 : core.
+#[global] Hint Extern 0 (is_true (0 < #|_ : _|)) => apply: indexg_gt0 : core.
 
 Notation "G :^ x" := (conjG_group G x) : Group_scope.
 
@@ -1889,7 +1889,7 @@ Proof. exact: cardG_gt0. Qed.
 
 End GroupInter.
 
-Hint Resolve order_gt0 : core.
+#[global] Hint Resolve order_gt0 : core.
 
 Arguments generated_group _ _%g.
 Arguments joing_group _ _%g _%g.
@@ -2982,8 +2982,8 @@ Notation "''C_' G [ x ]" := (setI_group G 'C[x]) : Group_scope.
 Notation "''C_' ( G ) [ x ]" := (setI_group G 'C[x])
   (only parsing) : Group_scope.
 
-Hint Extern 0 (is_true (_ \subset _)) => apply: normG : core.
-Hint Extern 0 (is_true (_ <| _)) => apply: normal_refl : core.
+#[global] Hint Extern 0 (is_true (_ \subset _)) => apply: normG : core.
+#[global] Hint Extern 0 (is_true (_ <| _)) => apply: normal_refl : core.
 
 Section MinMaxGroup.
 

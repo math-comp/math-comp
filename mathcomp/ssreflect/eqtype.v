@@ -202,7 +202,7 @@ Notation eqxx := eq_refl.
 Lemma eq_sym (T : eqType) (x y : T) : (x == y) = (y == x).
 Proof. exact/eqP/eqP. Qed.
 
-Hint Resolve eq_refl eq_sym : core.
+#[global] Hint Resolve eq_refl eq_sym : core.
 
 Variant eq_xor_neq (T : eqType) (x y : T) : bool -> bool -> Set :=
   | EqNotNeq of x = y : eq_xor_neq x y true true

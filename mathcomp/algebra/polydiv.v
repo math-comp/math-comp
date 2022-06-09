@@ -904,7 +904,7 @@ Qed.
 
 End WeakTheoryForIDomainPseudoDivision.
 
-Hint Resolve lc_expn_scalp_neq0 : core.
+#[global] Hint Resolve lc_expn_scalp_neq0 : core.
 
 End WeakIdomain.
 
@@ -2347,8 +2347,8 @@ Qed.
 
 End IDomainPseudoDivision.
 
-Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp : core.
-Hint Resolve dvdp0 : core.
+#[global] Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 : core.
+#[global] Hint Resolve dvdp_mull dvdp_mulr dvdpp dvdp0 : core.
 
 End CommonIdomain.
 

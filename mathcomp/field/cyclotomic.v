@@ -116,7 +116,7 @@ Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
 Local Definition algC_intr_inj := @intr_inj [numDomainType of algC].
-Local Hint Resolve algC_intr_inj : core.
+#[local] Hint Resolve algC_intr_inj : core.
 Local Notation QtoC_M := (ratr_rmorphism [numFieldType of algC]).
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.

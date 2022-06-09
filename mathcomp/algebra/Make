@@ -26,4 +26,3 @@ zmodp.v
 -arg -w -arg +duplicate-clear
 -arg -w -arg -ambiguous-paths
 -arg -w -arg +undeclared-scope
--arg -w -arg -deprecated-hint-without-locality

@@ -1224,7 +1224,7 @@ End BigSumBasis.
 
 End VectorTheory.
 
-Hint Resolve subvv : core.
+#[global] Hint Resolve subvv : core.
 Arguments subvP {K vT U V}.
 Arguments addv_idPl {K vT U V}.
 Arguments addv_idPr {K vT U V}.

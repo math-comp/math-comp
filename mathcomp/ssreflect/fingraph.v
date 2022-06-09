@@ -223,7 +223,7 @@ Definition closure_mem m_a : pred T :=
 
 End Connect.
 
-Hint Resolve connect0 : core.
+#[global] Hint Resolve connect0 : core.
 
 Notation n_comp e a := (n_comp_mem e (mem a)).
 Notation closed e a := (closed_mem e (mem a)).
@@ -853,7 +853,7 @@ End fconnect.
 
 End Orbit.
 
-Hint Resolve in_orbit mem_orbit order_gt0 orbit_uniq : core.
+#[global] Hint Resolve in_orbit mem_orbit order_gt0 orbit_uniq : core.
 Prenex Implicits order orbit findex finv order_set.
 Arguments orbitPcycle {T f x}.
 

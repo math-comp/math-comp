@@ -1542,7 +1542,7 @@ Arguments exists_cons {T P a s}.
 (* makes `apply: allss` failing for the other case. Since both `mem` and      *)
 (* `pred_of_seq` reduce to `mem_seq`, the following explicit type annotation  *)
 (* for `allss` makes it work for both cases.                                  *)
-Hint Extern 0 (is_true (all _ _)) =>
+#[global] Hint Extern 0 (is_true (all _ _)) =>
   apply: (allss : forall T s, all (mem_seq s) s) : core.
 
 Section NthTheory.
@@ -1941,7 +1941,7 @@ Arguments permP {T s1 s2}.
 Arguments permPl {T s1 s2}.
 Arguments permPr {T s1 s2}.
 Prenex Implicits perm_eq.
-Hint Resolve perm_refl : core.
+#[global] Hint Resolve perm_refl : core.
 
 Section RotrLemmas.
 
@@ -2329,7 +2329,7 @@ End Subseq.
 Prenex Implicits subseq.
 Arguments subseqP {T s1 s2}.
 
-Hint Resolve subseq_refl : core.
+#[global] Hint Resolve subseq_refl : core.
 
 Section Rem.
 

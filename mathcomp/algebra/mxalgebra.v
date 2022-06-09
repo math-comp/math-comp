@@ -2217,7 +2217,7 @@ End Eigenspace.
 
 End RowSpaceTheory.
 
-Hint Resolve submx_refl : core.
+#[global] Hint Resolve submx_refl : core.
 Arguments submxP {F m1 m2 n A B}.
 Arguments eq_row_sub [F m n v A].
 Arguments row_subP {F m1 m2 n A B}.

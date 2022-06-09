@@ -1566,12 +1566,12 @@ Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R V v}.
-Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
-Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
+#[global] Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
+#[global] Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
 Lemma normr_nneg (R : numDomainType) (x : R) : `|x| \is Num.nneg.
 Proof. by rewrite qualifE. Qed.
-Hint Resolve normr_nneg : core.
+#[global] Hint Resolve normr_nneg : core.
 
 Section NumDomainOperationTheory.
 
@@ -3519,7 +3519,7 @@ Qed.
 
 End NumDomainOperationTheory.
 
-Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real : core.
+#[global] Hint Resolve ler_opp2 ltr_opp2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
 Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
@@ -3965,7 +3965,7 @@ Proof. by rewrite -real_normrEsign. Qed.
 
 End RealDomainTheory.
 
-Hint Resolve num_real : core.
+#[global] Hint Resolve num_real : core.
 
 Section RealDomainOperations.
 

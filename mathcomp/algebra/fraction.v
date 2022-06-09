@@ -294,7 +294,7 @@ End FracField.
 
 Notation "{ 'fraction' T }" := (FracField.type_of (Phant T)).
 Notation equivf := (@FracField.equivf _).
-Hint Resolve denom_ratioP : core.
+#[global] Hint Resolve denom_ratioP : core.
 
 Section Canonicals.
 
