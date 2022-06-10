@@ -773,7 +773,7 @@ Qed.
 
 Lemma p_rank_abelem p G : p.-abelem G -> 'r_p(G) = logn p #|G|.
 Proof.
-move=> abelG; apply/eqP; rewrite eqn_leq andbC (bigmax_sup G) //.
+move=> abelG; apply/eqP; rewrite eqn_leq andbC (bigmax_sup G)//.
   by apply/bigmax_leqP=> E /[1!inE] /andP[/lognSg->].
 by rewrite inE subxx.
 Qed.
@@ -881,7 +881,7 @@ Lemma rankS A B : A \subset B -> 'r(A) <= 'r(B).
 Proof.
 move=> sAB; rewrite /rank !big_mkord; apply/bigmax_leqP=> p _.
 have leAB: #|A| < #|B|.+1 by rewrite ltnS subset_leq_card.
-by rewrite (bigmax_sup (widen_ord leAB p)) // p_rankS.
+by rewrite (bigmax_sup (widen_ord leAB p)) ?p_rankS.
 Qed.
 
 Lemma rank_geP n G : reflect (exists E, E \in 'E^n(G)) (n <= 'r(G)).
@@ -2066,7 +2066,7 @@ suffices lti_lnO e: (i < lnO p e _ G) = (e < logn p #[x]).
   have [-> //|logx_gt0] := posnP (logn p #[x]).
   have lexpG: (logn p #[x]).-1 < logn p #|G|.
     by rewrite prednK // dvdn_leq_log ?order_dvdG.
-  by rewrite (@bigmax_sup _ (Ordinal lexpG)) ?(prednK, lti_lnO).
+  by rewrite (bigmax_sup (Ordinal lexpG)) ?(prednK, lti_lnO).
 rewrite /lnO -(count_logn_dprod_cycle _ _ defG).
 case: (ltnP e) (b_sorted p) => [lt_e_x | le_x_e].
   rewrite -(cat_take_drop i.+1 b) -map_rev rev_cat !map_cat cat_path.
