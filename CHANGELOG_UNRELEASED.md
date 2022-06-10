@@ -79,6 +79,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `fintype.v`
   + `enum_ordS` now a notation
+- The following notations are now declared in `type_scope`:
+  + `{tuple n of T}` and `{bseq n of T}` in `tuple.v`,
+  + `{subset T}` and `{subset [d] T}` in `order.v`,
+  + `{morphism D >-> T}` in `morphism.v`,
+  + `{acts A, on S | to}` and `{acts A, on group G | to}` in `action.v`,
+  + `{additive U -> V}`, `{rmorphism R -> S}`, `{linear U -> V}`,
+    `{linear U -> V | s}`, `{scalar U}`, `{lrmorphism A -> B}`,
+    `{lrmorphism A -> B | s}` in `ssralg.v`,
+  + `{poly R}` in `poly.v`,
+  + `{quot I}` and `{ideal_quot I}` in `ring_quotient.v`, and
+  + `{ratio T}` and `{fraction T}` in `fraction.v`.
 
 ### Renamed
 

@@ -267,7 +267,7 @@ Notation "[ 'acts' A , 'on' S | to ]" := (A \subset pred_of_set 'N(S | to))
   (at level 0, format "[ 'acts'  A ,  'on'  S  |  to ]") : form_scope.
 
 Notation "{ 'acts' A , 'on' S | to }" := (acts_on A S to)
-  (at level 0, format "{ 'acts'  A ,  'on'  S  |  to }") : form_scope.
+  (at level 0, format "{ 'acts'  A ,  'on'  S  |  to }") : type_scope.
 
 Notation "[ 'transitive' A , 'on' S | to ]" := (atrans A S to)
   (at level 0, format "[ 'transitive'  A ,  'on'  S  |  to ]") : form_scope.
@@ -1880,7 +1880,7 @@ Notation "''C_' ( G | to ) [ a ]" := 'C_(G | to)([set a])
   (at level 8, format "''C_' ( G  |  to ) [ a ]") : group_scope.
 
 Notation "{ 'acts' A , 'on' 'group' G | to }" := (acts_on_group A G to)
-  (at level 0, format "{ 'acts'  A ,  'on'  'group'  G  |  to }") : form_scope.
+  (at level 0, format "{ 'acts'  A ,  'on'  'group'  G  |  to }") : type_scope.
 
 Section RawGroupAction.
 

@@ -85,15 +85,16 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Local Open Scope quotient_scope.
 
-Reserved Notation "{ideal_quot I }" (at level 0, format "{ideal_quot  I }").
-Reserved Notation "m = n %[mod_ideal I ]" (at level 70, n at next level,
-  format "'[hv ' m '/'  =  n '/'  %[mod_ideal  I ] ']'").
-Reserved Notation "m == n %[mod_ideal I ]" (at level 70, n at next level,
-  format "'[hv ' m '/'  ==  n '/'  %[mod_ideal  I ] ']'").
-Reserved Notation "m <> n %[mod_ideal I ]" (at level 70, n at next level,
-  format "'[hv ' m '/'  <>  n '/'  %[mod_ideal  I ] ']'").
-Reserved Notation "m != n %[mod_ideal I ]" (at level 70, n at next level,
-  format "'[hv ' m '/'  !=  n '/'  %[mod_ideal  I ] ']'").
+Reserved Notation "{ 'ideal_quot' I }"
+  (at level 0, format "{ 'ideal_quot'  I }").
+Reserved Notation "m = n %[ 'mod_ideal' I ]" (at level 70, n at next level,
+  format "'[hv ' m '/'  =  n '/'  %[ 'mod_ideal'  I ] ']'").
+Reserved Notation "m == n %[ 'mod_ideal' I ]" (at level 70, n at next level,
+  format "'[hv ' m '/'  ==  n '/'  %[ 'mod_ideal'  I ] ']'").
+Reserved Notation "m <> n %[ 'mod_ideal' I ]" (at level 70, n at next level,
+  format "'[hv ' m '/'  <>  n '/'  %[ 'mod_ideal'  I ] ']'").
+Reserved Notation "m != n %[ 'mod_ideal' I ]" (at level 70, n at next level,
+  format "'[hv ' m '/'  !=  n '/'  %[ 'mod_ideal'  I ] ']'").
 
 
 Section ZmodQuot.
@@ -559,7 +560,7 @@ Canonical rquot_zmodQuotType := ZmodQuotType 0 -%R +%R type rquot_zmodQuotMixin.
 
 End ZmodQuotient.
 
-Notation "{quot I }" := (@type_of _ _ _ I (Phant _)).
+Notation "{ 'quot' I }" := (@type_of _ _ _ I (Phant _)) : type_scope.
 
 Section RingQuotient.
 
@@ -626,14 +627,15 @@ End IDomainQuotient.
 
 End Quotient.
 
-Notation "{ideal_quot I }" := (@Quotient.type_of _ _ _ I (Phant _)).
-Notation "x == y %[mod_ideal I ]" :=
+Notation "{ 'ideal_quot' I }" :=
+  (@Quotient.type_of _ _ _ I (Phant _)) : type_scope.
+Notation "x == y %[ 'mod_ideal' I ]" :=
   (x == y %[mod {ideal_quot I}]) : quotient_scope.
-Notation "x = y %[mod_ideal I ]" :=
+Notation "x = y %[ 'mod_ideal' I ]" :=
   (x = y %[mod {ideal_quot I}]) : quotient_scope.
-Notation "x != y %[mod_ideal I ]" :=
+Notation "x != y %[ 'mod_ideal' I ]" :=
   (x != y %[mod {ideal_quot I}]) : quotient_scope.
-Notation "x <> y %[mod_ideal I ]" :=
+Notation "x <> y %[ 'mod_ideal' I ]" :=
   (x <> y %[mod {ideal_quot I}]) : quotient_scope.
 
 Canonical Quotient.rquot_eqType.

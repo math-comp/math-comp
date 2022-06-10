@@ -103,7 +103,7 @@ Notation "n .-tuple" := (tuple_of n)
   (at level 2, format "n .-tuple") : type_scope.
 
 Notation "{ 'tuple' n 'of' T }" := (n.-tuple T : predArgType)
-  (at level 0, only parsing) : form_scope.
+  (at level 0, only parsing) : type_scope.
 
 Notation "[ 'tuple' 'of' s ]" := (tuple (fun sP => @Tuple _ _ s sP))
   (at level 0, format "[ 'tuple'  'of'  s ]") : form_scope.
@@ -495,7 +495,7 @@ Notation "n .-bseq" := (bseq_of n)
   (at level 2, format "n .-bseq") : type_scope.
 
 Notation "{ 'bseq' n 'of' T }" := (n.-bseq T : predArgType)
-  (at level 0, only parsing) : form_scope.
+  (at level 0, only parsing) : type_scope.
 
 Notation "[ 'bseq' 'of' s ]" := (bseq (fun sP => @Bseq _ _ s sP))
   (at level 0, format "[ 'bseq'  'of'  s ]") : form_scope.
