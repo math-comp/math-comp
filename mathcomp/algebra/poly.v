@@ -1096,6 +1096,12 @@ Proof. by rewrite /comm_poly !hornerC !simp. Qed.
 Lemma comm_polyX x : comm_poly 'X x.
 Proof. by rewrite /comm_poly !hornerX. Qed.
 
+Lemma comm_poly_add p q x: comm_poly p x -> comm_poly q x -> comm_poly (p + q) x.
+Proof.
+move=> comm_px comm_qx.
+by rewrite /comm_poly hornerD mulrDr mulrDl /comm_poly comm_px comm_qx.
+Qed.
+
 Lemma commr_horner a b p : GRing.comm a b -> comm_coef p a -> GRing.comm a p.[b].
 Proof.
 move=> cab cpa; rewrite horner_coef; apply: commr_sum => i _.
@@ -1108,6 +1114,22 @@ move=> comm_qx.
 elim/poly_ind: p => [|p c IHp]; first by rewrite !(simp, horner0).
 rewrite mulrDl hornerD hornerCM -mulrA -commr_polyX mulrA hornerMX.
 by rewrite {}IHp -mulrA -comm_qx mulrA -mulrDl hornerMXaddC.
+Qed.
+
+Lemma comm_poly_mul p q x: comm_poly p x -> comm_poly q x -> comm_poly (p * q) x.
+Proof.
+move=> comm_px comm_qx.
+ by rewrite /comm_poly hornerM_comm // mulrA /comm_poly comm_px -mulrA /comm_poly comm_qx mulrA.
+Qed.
+
+Lemma comm_poly_pow p n x: comm_poly p x -> comm_poly (p ^+ n) x.
+Proof.
+move=> comm_px.
+elim: n=> [ | n IHn].
+  rewrite expr0.
+  by apply comm_poly1.
+rewrite exprSr.
+by apply comm_poly_mul.
 Qed.
 
 Lemma horner_exp_comm p x n : comm_poly p x -> (p ^+ n).[x] = p.[x] ^+ n.
