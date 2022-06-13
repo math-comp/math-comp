@@ -195,6 +195,10 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+(*******************)
+(* v8.17 additions *)
+(*******************)
+
 Lemma all_sig2_cond {I T} (C : pred I) P Q :
     T -> (forall x, C x -> {y : T | P x y & Q x y}) ->
   {f : I -> T | forall x, C x -> P x (f x) & forall x, C x -> Q x (f x)}.
