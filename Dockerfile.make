@@ -6,11 +6,8 @@ WORKDIR /home/coq/mathcomp
 COPY . .
 
 RUN ["/bin/bash", "--login", "-c", "set -x \
-  && [ -n \"${COMPILER_EDGE}\" ] \
-  && opam switch set \"${COMPILER_EDGE}\" \
+  && opam switch \
   && eval $(opam env) \
-  && [ -n \"${COMPILER}\" ] \
-  && opam switch remove -y \"${COMPILER}\" \
   && opam repository add --all-switches --set-default coq-extra-dev https://coq.inria.fr/opam/extra-dev \
   && opam repository add --all-switches --set-default coq-core-dev https://coq.inria.fr/opam/core-dev \
   && opam update -y \
