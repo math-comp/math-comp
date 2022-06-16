@@ -1,11 +1,18 @@
 ARG coq_image="coqorg/coq:dev"
+# hadolint ignore=DL3006
 FROM ${coq_image} as builder
+
+ENV MATHCOMP_VERSION="dev"
+ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
 
 WORKDIR /home/coq/mathcomp
 
 COPY . .
 
-RUN ["/bin/bash", "--login", "-c", "set -x \
+SHELL ["/bin/bash", "--login", "-o", "pipefail", "-c"]
+
+# hadolint ignore=SC2046,DL3004
+RUN set -x \
   && opam switch \
   && eval $(opam env) \
   && opam repository add --all-switches --set-default coq-extra-dev https://coq.inria.fr/opam/extra-dev \
@@ -19,14 +26,10 @@ RUN ["/bin/bash", "--login", "-c", "set -x \
   && opam pin add -n -k path coq-mathcomp-solvable . \
   && opam pin add -n -k path coq-mathcomp-field . \
   && opam pin add -n -k path coq-mathcomp-character . \
-  && opam install -y -v -j ${NJOBS} coq-mathcomp-character \
-  && opam clean -a -c -s --logs"]
+  && opam install -y -v -j "${NJOBS}" "${MATHCOMP_PACKAGE}" \
+  && opam clean -a -c -s --logs \
+  && opam config list && opam list
 
-FROM coqorg/base:bare
-
-ENV COMPILER=""
-ENV MATHCOMP_VERSION="dev"
-ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
-
-COPY --from=builder --chown=coq:coq /home/coq/.opam /home/coq/.opam
-COPY --from=builder --chown=coq:coq /home/coq/.profile /home/coq/.profile
+# Restore default shell to fully preserve backward compatibility
+SHELL ["/bin/sh", "-c"]
+# Still, we may remove this line later on.
