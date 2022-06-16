@@ -22,11 +22,5 @@ RUN ["/bin/bash", "--login", "-c", "set -x \
   && opam install -y -v -j ${NJOBS} coq-mathcomp-character \
   && opam clean -a -c -s --logs"]
 
-FROM coqorg/base:bare
-
-ENV COMPILER=""
 ENV MATHCOMP_VERSION="dev"
 ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
-
-COPY --from=builder --chown=coq:coq /home/coq/.opam /home/coq/.opam
-COPY --from=builder --chown=coq:coq /home/coq/.profile /home/coq/.profile
