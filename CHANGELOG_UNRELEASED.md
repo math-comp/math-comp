@@ -97,6 +97,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `{quot I}` and `{ideal_quot I}` in `ring_quotient.v`, and
   + `{ratio T}` and `{fraction T}` in `fraction.v`.
 
+- in `gproduct.v`
+  + put notations `G ><| H`, `G \* H` and `G \x H` in `group_scope`
+
 ### Renamed
 
 - in `ssrbool.v`, renamed `mono2W_in` to `mono1W_in` (was misnamed).

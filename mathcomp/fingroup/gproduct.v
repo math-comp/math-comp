@@ -100,9 +100,12 @@ Notation sdprod := (semidirect_product _).
 Notation cprod := (central_product _).
 Notation dprod := (direct_product _).
 
-Notation "G ><| H" := (sdprod G H)%g (at level 40, left associativity).
-Notation "G \* H" := (cprod G H)%g (at level 40, left associativity).
-Notation "G \x H" := (dprod G H)%g (at level 40, left associativity).
+Notation "G ><| H" := (sdprod G H)%g
+  (at level 40, left associativity) : group_scope.
+Notation "G \* H" := (cprod G H)%g
+  (at level 40, left associativity) : group_scope.
+Notation "G \x H" := (dprod G H)%g
+  (at level 40, left associativity) : group_scope.
 
 Notation "[ 'complements' 'to' A 'in' B ]" := (complements_to_in A B)
   (at level 0, format "[ 'complements'  'to'  A  'in'  B ]") : group_scope.
