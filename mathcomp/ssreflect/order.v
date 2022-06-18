@@ -84,6 +84,10 @@ From mathcomp Require Import finset.
 (*    x < y ?<= if C <-> x is smaller than y, and strictly if C is false.     *)
 (*           x >=< y <-> x and y are comparable (:= (x <= y) || (y <= x)).    *)
 (*            x >< y <-> x and y are incomparable (:= ~~ x >=< y).            *)
+(*          f \min g <-> the function x |-> Order.min (f x) (g x);            *)
+(*                       f \min g simplifies on application.                  *)
+(*          f \max g <-> the function x |-> Order.max (f x) (g x);            *)
+(*                       f \max g simplifies on application.                  *)
 (* For x, y of type T, where T is canonically a latticeType d:                *)
 (*           x `&` y == the meet of x and y.                                  *)
 (*           x `|` y == the join of x and y.                                  *)
@@ -466,6 +470,8 @@ Reserved Notation ">=< y :> T" (at level 35, y at next level).
 Reserved Notation "x >< y" (at level 70, no associativity).
 Reserved Notation ">< x" (at level 35).
 Reserved Notation ">< y :> T" (at level 35, y at next level).
+Reserved Notation "f \min g" (at level 50, left associativity).
+Reserved Notation "f \max g" (at level 50, left associativity).
 
 Reserved Notation "x < y ?<= 'if' c" (at level 70, y, c at next level,
   format "x '[hv'  <  y '/'  ?<=  'if'  c ']'").
@@ -1157,6 +1163,14 @@ Variant incompare (x y : T) :
 Definition arg_min {I : finType} := @extremum T I le.
 Definition arg_max {I : finType}  := @extremum T I ge.
 
+(* Lifted min/max operations. *)
+Section LiftedPOrder.
+Variable T' : Type.
+Implicit Type f : T' -> T.
+Definition min_fun f g x := min (f x) (g x).
+Definition max_fun f g x := min (f x) (g x).
+End LiftedPOrder.
+
 End POrderDef.
 
 Prenex Implicits lt le leif lteif.
@@ -1165,6 +1179,8 @@ Arguments gt {_ _}.
 Arguments min {_ _}.
 Arguments max {_ _}.
 Arguments comparable {_ _}.
+Arguments min_fun {_ _ _} f g _ /.
+Arguments max_fun {_ _ _} f g _ /.
 
 Module Import POSyntax.
 
@@ -1245,6 +1261,9 @@ Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
 Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : order_scope.
+
+Notation "f \min g" := (min_fun f g) : order_scope.
+Notation "f \max g" := (max_fun f g) : order_scope.
 
 Notation leLHS := (X in (X <= _)%O)%pattern.
 Notation leRHS := (X in (_ <= X)%O)%pattern.

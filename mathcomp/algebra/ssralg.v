@@ -543,6 +543,8 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                 f \- g == the function x |-> f x - g x, canonically        *)
 (*                           linear when f and g are, and simplifies on       *)
 (*                           application.                                     *)
+(*                   \- g == the function x |-> - f x, canonically linear     *)
+(*                           when f is, and simplifies on application.        *)
 (*                k \*: f == the function x |-> k *: f x, which is            *)
 (*                           canonically linear when f is and simplifies on   *)
 (*                           application (this is a shorter alternative to    *)
@@ -556,6 +558,8 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                a \o* f == the function x |-> f x * a, canonically linear   *)
 (*                           linear when f is and its codomain is an lalgType *)
 (*                           and which simplifies on application.             *)
+(*                 f \* g == the function x |-> f x * g x; f \* g simplifies  *)
+(*                           on application.                                  *)
 (* The Lemmas about these structures are contained in both the GRing module   *)
 (* and in the submodule GRing.Theory, which can be imported when unqualified  *)
 (* access to the theory is needed (GRing.Theory also allows the unqualified   *)
@@ -614,9 +618,11 @@ Reserved Notation "x ^f" (at level 2, left associativity, format "x ^f").
 Reserved Notation "\0" (at level 0).
 Reserved Notation "f \+ g" (at level 50, left associativity).
 Reserved Notation "f \- g" (at level 50, left associativity).
+Reserved Notation "\- f" (at level 35, f at level 35).
 Reserved Notation "a \*o f" (at level 40).
 Reserved Notation "a \o* f" (at level 40).
 Reserved Notation "a \*: f" (at level 40).
+Reserved Notation "f \* g" (at level 40, left associativity).
 
 Delimit Scope ring_scope with R.
 Delimit Scope term_scope with T.
@@ -1864,6 +1870,7 @@ Variables (U : Type) (V : zmodType).
 Definition null_fun_head (phV : phant V) of U : V := let: Phant := phV in 0.
 Definition add_fun (f g : U -> V) x := f x + g x.
 Definition sub_fun (f g : U -> V) x := f x - g x.
+Definition opp_fun (f : U -> V) x := - f x.
 End LiftedZmod.
 
 (* Lifted multiplication. *)
@@ -1872,6 +1879,7 @@ Variables (R : ringType) (T : Type).
 Implicit Type f : T -> R.
 Definition mull_fun a f x := a * f x.
 Definition mulr_fun a f x := f x * a.
+Definition mul_fun f g x := f x * g x.
 End LiftedRing.
 
 (* Lifted linear operations. *)
@@ -1889,15 +1897,19 @@ Local Notation in_alg_loc A := (in_alg_head (Phant A)) (only parsing).
 Local Notation "\0" := (null_fun _) : ring_scope.
 Local Notation "f \+ g" := (add_fun f g) : ring_scope.
 Local Notation "f \- g" := (sub_fun f g) : ring_scope.
+Local Notation "\- f" := (opp_fun f) : ring_scope.
 Local Notation "a \*: f" := (scale_fun a f) : ring_scope.
 Local Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Local Notation "x \o* f" := (mulr_fun x f) : ring_scope.
+Local Notation "f \* g" := (mul_fun f g) : ring_scope.
 
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
+Arguments opp_fun {_ _} f _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
+Arguments mul_fun {_ _} f g _ /.
 
 Section AdditiveTheory.
 
@@ -1996,6 +2008,10 @@ Proof.
 by move=> x y /=; rewrite !raddfB addrAC -!addrA -!opprD addrAC addrA.
 Qed.
 Canonical sub_fun_additive := Additive sub_fun_is_additive.
+
+Fact opp_fun_is_additive : additive (\- f).
+Proof. by move=> x y /=; rewrite !raddfB opprB addrC opprK. Qed.
+Canonical opp_fun_additive := Additive opp_fun_is_additive.
 
 End AddFun.
 
@@ -2420,6 +2436,10 @@ Canonical add_fun_linear := AddLinear add_fun_is_scalable.
 Lemma sub_fun_is_scalable : scalable_for s (f \- g).
 Proof. by move=> a u; rewrite /= !linearZ_LR !Ds raddfB. Qed.
 Canonical sub_fun_linear := AddLinear sub_fun_is_scalable.
+
+Lemma opp_fun_is_scalable : scalable_for s (\- f).
+Proof. by move=> a u; rewrite /= linearZ_LR Ds raddfN. Qed.
+Canonical opp_fun_linear := AddLinear opp_fun_is_scalable.
 
 End LinearLmod.
 
@@ -6132,15 +6152,19 @@ Notation "k %:A" := (scale k 1) : ring_scope.
 Notation "\0" := (null_fun _) : ring_scope.
 Notation "f \+ g" := (add_fun f g) : ring_scope.
 Notation "f \- g" := (sub_fun f g) : ring_scope.
+Notation "\- f" := (opp_fun f) : ring_scope.
 Notation "a \*: f" := (scale_fun a f) : ring_scope.
 Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Notation "x \o* f" := (mulr_fun x f) : ring_scope.
+Notation "f \* g" := (mul_fun f g) : ring_scope.
 
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
+Arguments opp_fun {_ _} f _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
+Arguments mul_fun {_ _} f g _ /.
 
 Notation "\sum_ ( i <- r | P ) F" :=
   (\big[+%R/0%R]_(i <- r | P%B) F%R) : ring_scope.
@@ -6223,6 +6247,8 @@ Canonical add_fun_additive.
 Canonical add_fun_linear.
 Canonical sub_fun_additive.
 Canonical sub_fun_linear.
+Canonical opp_fun_additive.
+Canonical opp_fun_linear.
 Canonical mull_fun_additive.
 Canonical mull_fun_linear.
 Canonical mulr_fun_additive.

@@ -234,7 +234,7 @@ by rewrite -mul_cardG -rowgI !card_rowg -!expnD mxrank_sum_cap.
 Qed.
 
 Lemma cprod_rowg m1 m2 (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
-  rowg A \* rowg B = rowg (A + B)%MS.
+  (rowg A \* rowg B)%g = rowg (A + B)%MS.
 Proof. by rewrite rowgD cprodE // (sub_abelian_cent2 (zmod_abelian setT)). Qed.
 
 Lemma dprod_rowg  m1 m2 (A : 'M[F]_(m1, n)) (B : 'M[F]_(m2, n)) :

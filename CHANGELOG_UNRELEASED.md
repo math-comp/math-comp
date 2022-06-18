@@ -68,6 +68,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `tuple_uniqP`
 
 - in `seq.v`, added lemma `subseq_anti`
+  + notation `\- f` for definition `opp_fun`
+  + lemmas `opp_fun_is_additive` and `opp_fun_is_scalable`
+  + canonical instances `opp_fun_additive` and `opp_fun_linear`
+  + notation `f \* g` for definition `mul_fun`
+
+- in `order.v`
+  + notation `f \min g` and `f \max g` for definitions `min_fun` and `max_fun`
 
 ### Changed
 
@@ -93,6 +100,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `{poly R}` in `poly.v`,
   + `{quot I}` and `{ideal_quot I}` in `ring_quotient.v`, and
   + `{ratio T}` and `{fraction T}` in `fraction.v`.
+
+- in `gproduct.v`
+  + put notations `G ><| H`, `G \* H` and `G \x H` in `group_scope`
 
 ### Renamed
 
