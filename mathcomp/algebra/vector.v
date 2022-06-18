@@ -2046,6 +2046,3 @@ by apply/ffunP=> i; rewrite (lfunE (Linear lhsZ)) !ffunE sol_u.
 Qed.
 
 End Solver.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use limgD instead.")]
-Notation limg_add := limgD (only parsing).

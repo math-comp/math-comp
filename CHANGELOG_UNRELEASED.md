@@ -148,13 +148,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notation `big_uncond`
 
 - in `ssrnat.v`:
-  + notations `odd_add`, `odd_sub`
+  + notations `odd_add`, `odd_sub`, `iter_add`, `maxn_mulr`, `maxn_mull`, `minn_mulr`, `minn_mull`, `odd_opp`, `odd_mul`, `odd_exp`, `sqrn_sub`
 
 - in `seq.v`:
-  + notations `take_addn`, `rot_addn`, `nseq_addn`
+  + notations `take_addn`, `rot_addn`, `nseq_addn`, `allpairs_catr`, `allpairs_consr`, `perm_allpairs_rconsr`, `iota_addl`
 
 - in `fintype.v`:
-  + notations `arg_minP`, `arg_maxP`
+  + notations `arg_minP`, `arg_maxP`, `bump_addl`, `unbump_addl`, `disjoint_trans`
 
 - in `perm.v`:
   + notations `tuple_perm_eqP`, `pcycle`, `pcycles`, `mem_pcycle`, `pcycle_id`, `uniq_traject_pcycle`, `pcycle_traject`, `iter_pcycle`, `eq_pcycle_mem`, `pcycle_sym`, `pcycle_perm`, `ncycles_mul_tperm`
@@ -164,6 +164,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `action.v`:
   + notations `pcycleE`, `pcycle_actperm`
+
+- in `prime.v`:
+  + notations `primes_mul`, `primes_exp`, `pnat_mul`, `pnat_exp`
+
+- in `path.v`:
+  + notations `sorted_lt_nth`, `sorted_le_nth`, `ltn_index`, `leq_index`, `subseq_order_path`
+
+- in `div.v`:
+  + notations `coprime_mull`, `coprime_mulr`, `coprime_expl`, `coprime_expr`
+
+- in `bigop.v`:
+  + notations `mulm_addl`, `mulm_addr`, `filter_index_enum`
+
+- in `vector.v`:
+  + notation `limg_add`
+
+- in `ssrint.v`:
+  + notation `polyC_mulrz`
+
+- in `poly.v`:
+  + notations `polyC_add`, `polyC_opp`, `polyC_sub`, `polyC_muln`, `polyC_mul`, `polyC_inv`, `lead_coef_opp`, `derivn_sub`
+
+- in `polydiv.v`:
+  + notations `rdivp_addl`, `rdivp_addr`, `rmodp_add`, `dvdp_scalel`, `dvdp_scaler`, `dvdp_opp`, `coprimep_scalel`, `coprimep_scaler`, `coprimep_mull`, `coprimep_mulr`, `modp_scalel`, `modp_scaler`, `modp_opp`, `modp_add`, `divp_scalel`, `divp_scaler`, `divp_opp`, `divp_add`, `modp_scalel`, `modp_scaler`, `modp_opp`, `modp_add`, `divp_scalel`, `divp_scaler`, `divp_opp`, `divp_add`
+
+- in `mxalgebra.v`:
+  + notations `mulsmx_addl`, `mulsmx_addr`
+
+- in `matrix.v`:
+  + notations `scalar_mx_comm`, `map_mx_sub`
+
+- in `interval.v`:
+  + notations `@ 'lersif'`, `lersif`, `x <= y ?< 'if' b`, `subr_lersifr0`, `subr_lersif0r`, `subr_lersif0`, `lersif_trans`, `lersif01`, `lersif_anti`, `lersifxx`, `lersifNF`, `lersifS`, `lersifT`, `lersifF`, `lersif_oppl`, `lersif_oppr`, `lersif_0oppr`, `lersif_oppr0`, `lersif_opp2`, `lersif_oppE`, `lersif_add2l`, `lersif_add2r`, `lersif_add2`, `lersif_subl_addr`, `lersif_subr_addr`, `lersif_sub_addr`, `lersif_subl_addl`, `lersif_subr_addl`, `lersif_sub_addl`, `lersif_andb`, `lersif_orb`, `lersif_imply`, `lersifW`, `ltrW_lersif`, `lersif_pmul2l`, `lersif_pmul2r`, `lersif_nmul2l`, `lersif_nmul2r`, `real_lersifN`, `real_lersif_norml`, `real_lersif_normr`, `lersif_nnormr`, `lersifN`, `lersif_norml`, `lersif_normr`, `lersif_distl`, `lersif_minr`, `lersif_minl`, `lersif_maxr`, `lersif_maxl`, `lersif_pdivl_mulr`, `lersif_pdivr_mulr`, `lersif_pdivl_mull`, `lersif_pdivr_mull`, `lersif_ndivl_mulr`, `lersif_ndivr_mulr`, `lersif_ndivl_mull`, `lersif_ndivr_mull`, `lersif_in_itv`, `itv_gte`, `ltr_in_itv`, `ler_in_itv`, `itv_splitU2`, `@ 'itv_intersection'`, `itv_intersection`, `@ 'itv_intersection1i'`, `itv_intersection1i`, `@ 'itv_intersectioni1'`, `itv_intersectioni1`, `@ 'itv_intersectionii'`, `itv_intersectionii`, `@ 'itv_intersectionC'`, `itv_intersectionC`, `@ 'itv_intersectionA'`, `itv_intersectionA`
+
+- in `intdiv.v`:
+  + notations `coprimez_mull`, `coprimez_mulr`, `coprimez_expl`, `coprimez_expr`
 
 ### Infrastructure
 

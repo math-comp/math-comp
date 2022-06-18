@@ -916,9 +916,6 @@ Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use disjointWl instead.")]
-Notation disjoint_trans := disjointWl (only parsing).
-
 Hint Resolve subxx_hint : core.
 
 Arguments pred0P {T P}.
@@ -2360,8 +2357,3 @@ Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
 Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
 
 End SumFinType.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use bumpDl instead.")]
-Notation bump_addl := bumpDl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use unbumpDl instead.")]
-Notation unbump_addl := unbumpDl (only parsing).

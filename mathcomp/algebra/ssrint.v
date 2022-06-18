@@ -1835,6 +1835,3 @@ Lemma rpredXsign R S (divS : @divrPred R S) (kS : keyed_pred divS) n x :
 Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCMz instead.")]
-Notation polyC_mulrz := polyCMz (only parsing).
