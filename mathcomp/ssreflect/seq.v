@@ -4216,12 +4216,6 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
 Ltac tfae := do !apply: AllIffConj.
 
 (* Temporary backward compatibility. *)
-#[deprecated(since="mathcomp 1.11.0", note="Use takeD instead.")]
-Notation take_addn := takeD (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use rotD instead.")]
-Notation rot_addn := rotD (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use nseqD instead.")]
-Notation nseq_addn := nseqD (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use mem_allpairs_catr instead.")]
 Notation allpairs_catr := mem_allpairs_catr (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use mem_allpairs_consr instead.")]

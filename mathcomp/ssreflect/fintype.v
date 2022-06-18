@@ -1725,11 +1725,6 @@ End ArgMinMax.
 
 End Extrema.
 
-#[deprecated(since="mathcomp 1.11.0", note="Use arg_minnP instead.")]
-Notation arg_minP := arg_minnP (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use arg_maxnP instead.")]
-Notation arg_maxP := arg_maxnP (only parsing).
-
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,

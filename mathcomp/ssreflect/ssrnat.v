@@ -2016,10 +2016,6 @@ Ltac nat_congr := first
    end ].
 
 (* Temporary backward compatibility. *)
-#[deprecated(since="mathcomp 1.11.0", note="Use oddD instead.")]
-Notation odd_add := oddD (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use oddB instead.")]
-Notation odd_sub := oddB (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use iterD instead.")]
 Notation iter_add := iterD (only parsing).
 #[deprecated(since="mathcomp 1.12.0", note="Use maxnMr instead.")]

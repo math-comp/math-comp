@@ -144,6 +144,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notation `void` (now in ssrfun in Coq)
   + definition `of_void` (now in ssrfun in Coq)
 
+- in `bigop.v`:
+  + notation `big_uncond`
+
+- in `ssrnat.v`:
+  + notations `odd_add`, `odd_sub`
+
+- in `seq.v`:
+  + notations `take_addn`, `rot_addn`, `nseq_addn`
+
+- in `fintype.v`:
+  + notations `arg_minP`, `arg_maxP`
+
+- in `perm.v`:
+  + notations `tuple_perm_eqP`, `pcycle`, `pcycles`, `mem_pcycle`, `pcycle_id`, `uniq_traject_pcycle`, `pcycle_traject`, `iter_pcycle`, `eq_pcycle_mem`, `pcycle_sym`, `pcycle_perm`, `ncycles_mul_tperm`
+
+- in `classfun.v`:
+  + notation `cf_triangle_lerif`
+
+- in `action.v`:
+  + notations `pcycleE`, `pcycle_actperm`
+
 ### Infrastructure
 
 - in `builddoc_lib.sh`:
