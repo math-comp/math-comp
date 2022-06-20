@@ -258,7 +258,7 @@ Proof.
 Qed.
 
 HB.instance Definition _ :=
-  Num.IntegralDomain_IsNumDomain.Build L normD sposD norm_eq0
+  Num.IntegralDomain_IsNumRing.Build L normD sposD norm_eq0
          pos_linear normM (fun x y => erefl (le x y))
                           (fun x y => erefl (lt x y)).
 
