@@ -144,27 +144,20 @@ HB.structure Definition POrderedZmodule d :=
   { R of Order.IsPOrdered d R & GRing.Zmodule R }.
 
 (* FIXME: generic_norm, this is the right Zmodule_IsNormed mixin: *)
-(* HB.mixin Record Zmodule_IsNormed d (R : POrderedZmodule.type d) M
+HB.mixin Record Zmodule_IsNormed d (R : POrderedZmodule.type d) M
          of GRing.Zmodule M := {
-  norm_op : M -> R;
-  ler_norm_add : forall x y, norm_op (x + y) <= norm_op x + norm_op y;
-  normr0_eq0 : forall x, norm_op x = 0 -> x = 0;
-  normrMn : forall x n, norm_op (x *+ n) = norm_op x *+ n;
-  normrN : forall x, norm_op (- x) = norm_op x;
-}. *)
-HB.mixin Record Zmodule_IsNormed d M of POrderedZmodule d M := {
-  norm : M -> M;
+  norm : M -> R;
   ler_norm_add : forall x y, norm (x + y) <= norm x + norm y;
   normr0_eq0 : forall x, norm x = 0 -> x = 0;
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
   normrN : forall x, norm (- x) = norm x;
 }.
 
-#[short(type="normedZmodType")]
+#[short(type="normedZmodType"), infer(R)]
 (* FIXME: generic_norm, additional attribute when the structure is fixed: infer(R) *)
-HB.structure Definition NormedZmodule d :=
-  { M of Zmodule_IsNormed d M & POrderedZmodule d M}.
-Arguments norm {R T} x : rename.
+HB.structure Definition NormedZmodule d (R : POrderedZmodule.type d) :=
+  { M of Zmodule_IsNormed d R M & POrderedZmodule d M}.
+Arguments norm {R M T} x : rename.
 
 Module NormedZmoduleExports.
 Bind Scope ring_scope with NormedZmodule.sort.
@@ -178,25 +171,22 @@ End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
 (* FIXME: generic_norm, this is the right IsNumDomain mixin: *)
-(* HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
-  & NormedZmodule d [the POrderedZmodule.type _ of R] R := {
+HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
+  & NormedZmodule d (POrderedZmodule.clone d R _) R := {
  _ : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  _ : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
- _ : {morph (norm_op : R -> R) : x y / x * y};
- _ : forall x y : R, (x <= y) = (norm_op (y - x) == (y - x));
-}. *)
-HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
-   & NormedZmodule d R := {
-  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
-  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
-  normrM : {morph (norm : R -> R) : x y / x * y};
-  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
+ _ : {morph (norm : R -> R) : x y / x * y};
+ _ : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
-
+Set Printing All.
 #[short(type="numDomainType")]
-HB.structure Definition NumDomain :=
-  { R of IsNumDomain ring_display R &
-    NormedZmodule ring_display (* R *) R & GRing.IntegralDomain R }.
+HB.structure Definition NumDomain := { R of
+     GRing.IntegralDomain R &
+     POrderedZmodule ring_display R &
+     NormedZmodule ring_display
+       (POrderedZmodule.clone ring_display R _) R &
+     IsNumDomain ring_display R
+  }.
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
 
