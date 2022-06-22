@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finfun tuple.
+From mathcomp Require Import fintype bigop finfun tuple order.
 From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 
 (******************************************************************************)
@@ -104,7 +104,9 @@ Reserved Notation "\dim A" (at level 10, A at level 8, format "\dim  A").
 
 Delimit Scope vspace_scope with VS.
 
-Import GRing.Theory.
+Import GRing.Theory Order.LTheory.
+
+Fact vspace_display : unit. Proof. exact: tt. Qed.
 
 (* Finite dimension vector space *)
 Module Vector.
@@ -267,7 +269,6 @@ Definition space_choiceMixin := Eval hnf in [choiceMixin of {vspace vT} by <:].
 Canonical space_choiceType := ChoiceType {vspace vT} space_choiceMixin.
 
 Definition dimv U := \rank (vs2mx U).
-Definition subsetv U V := (vs2mx U <= vs2mx V)%MS.
 Definition vline u := mx2vs (v2r u).
 
 (* Vspace membership is defined as line inclusion. *)
@@ -276,9 +277,6 @@ Definition pred_of_vspace phV (U : Vector.space phV) : {pred vT} :=
 Canonical vspace_predType :=
   @PredType _ (unkeyed {vspace vT}) (@pred_of_vspace _).
 
-Definition fullv : {vspace vT} := mx2vs 1%:M.
-Definition addv U V := mx2vs (vs2mx U + vs2mx V).
-Definition capv U V := mx2vs (vs2mx U :&: vs2mx V).
 Definition complv U := mx2vs (vs2mx U)^C.
 Definition diffv U V := mx2vs (vs2mx U :\: vs2mx V).
 Definition vpick U := r2v (nz_row (vs2mx U)).
@@ -299,19 +297,60 @@ Definition basis_of U X := (span X == U) && free X.
 End VspaceDefs.
 
 Coercion pred_of_vspace : Vector.space >-> pred_sort.
+
+Prenex Implicits complv diffv span free basis_of.
+
+Module Import VspaceSyntax.
+
 Notation "\dim U" := (dimv U) : nat_scope.
-Notation "U <= V" := (subsetv U V) : vspace_scope.
-Notation "U <= V <= W" := (subsetv U V && subsetv V W) : vspace_scope.
 Notation "<[ v ] >" := (vline v) : vspace_scope.
 Notation "<< X >>" := (span X) : vspace_scope.
-Notation "0" := (vline 0) : vspace_scope.
-Arguments fullv {K vT}.
-Prenex Implicits subsetv addv capv complv diffv span free basis_of.
-
-Notation "U + V" := (addv U V) : vspace_scope.
-Notation "U :&: V" := (capv U V) : vspace_scope.
 Notation "U ^C" := (complv U) (at level 8, format "U ^C") : vspace_scope.
 Notation "U :\: V" := (diffv U V) : vspace_scope.
+
+Notation subsetv := (@Order.le vspace_display _).
+Notation "@ 'subsetv' K vT" :=
+  (@Order.le vspace_display _ : rel {vspace (vT : vectType K)})
+  (at level 10, K at level 8, vT at level 8, only parsing) : fun_scope.
+Notation properv := (@Order.lt vspace_display _).
+Notation "@ 'properv' K vT" :=
+  (@Order.lt vspace_display _ : rel {vspace (vT : vectType K)})
+  (at level 10, K at level 8, vT at level 8, only parsing) : fun_scope.
+Notation capv := (@Order.meet vspace_display _).
+Notation "@ 'capv' K vT" :=
+  (@Order.meet vspace_display _ : {vspace (vT : vectType K)} -> _)
+  (at level 10, K at level 8, vT at level 8, only parsing) : fun_scope.
+Notation addv := (@Order.join vspace_display _).
+Notation "@ 'addv' K vT" :=
+  (@Order.join vspace_display _ : {vspace (vT : vectType K)} -> _)
+  (at level 10, K at level 8, vT at level 8, only parsing) : fun_scope.
+Notation fullv := (@Order.top vspace_display _).
+Notation "@ 'fullv' K vT" :=
+  (@Order.top vspace_display _ : {vspace (vT : vectType K)})
+  (at level 10, K at level 8, vT at level 8, only parsing) : fun_scope.
+
+Notation "U <= V" := (subsetv U V) : vspace_scope.
+Notation "U <= V :> T" := ((U : T) <= (V : T))%VS (only parsing) : vspace_scope.
+Notation "U >= V" := (V <= U) (only parsing) : vspace_scope.
+Notation "U >= V :> T" := ((U : T) >= (V : T))%VS (only parsing) : vspace_scope.
+
+Notation "U < V"  := (properv U V) : vspace_scope.
+Notation "U < V :> T" := ((U : T) < (V : T))%VS (only parsing) : vspace_scope.
+Notation "U > V"  := (V < U) (only parsing) : vspace_scope.
+Notation "U > V :> T" := ((U : T) > (V : T))%VS (only parsing) : vspace_scope.
+
+Notation "U <= V <= W" := ((U <= V) && (V <= W))%VS : vspace_scope.
+Notation "U < V <= W" := ((U < V) && (V <= W))%VS : vspace_scope.
+Notation "U <= V < W" := ((U <= V) && (V < W))%VS : vspace_scope.
+Notation "U < V < W" := ((U < V) && (V < W))%VS : vspace_scope.
+
+Notation "U :&: V" := (capv U V) : vspace_scope.
+Notation "U + V" := (addv U V) : vspace_scope.
+
+Notation "0" := (@Order.bottom vspace_display _) : vspace_scope.
+(* Notation "0" := (@Order.bottom vspace_display _ : {vspace _}) *)
+(*   (only parsing) : vspace_scope. *)
+
 Notation "{ : vT }" := (@fullv _ vT) (only parsing) : vspace_scope.
 
 Notation "\sum_ ( i <- r | P ) U" :=
@@ -364,14 +403,113 @@ Notation "\bigcap_ ( i 'in' A | P ) U" :=
 Notation "\bigcap_ ( i 'in' A ) U" :=
   (\big[capv/fullv]_(i in A) U%VS) : vspace_scope.
 
+End VspaceSyntax.
+
+Module VspaceLattice.
+Section VspaceLattice.
+
+Variables (K : fieldType) (vT : vectType K).
+Implicit Types (u : vT) (X : seq vT) (U V : {vspace vT}).
+
+Let vs2mxP U V : reflect (U = V) (vs2mx U == vs2mx V)%MS.
+Proof. by rewrite (sameP genmxP eqP) !gen_vs2mx; apply: eqP. Qed.
+
+Fact subsetv_refl : reflexive (fun U V => vs2mx U <= vs2mx V)%MS.
+Proof. by move=> ?; exact: submx_refl. Qed.
+
+Fact subsetv_asym : antisymmetric (fun U V => vs2mx U <= vs2mx V)%MS.
+Proof. exact: vs2mxP. Qed.
+
+Fact subsetv_trans : transitive (fun U V => vs2mx U <= vs2mx V)%MS.
+Proof. by move=> ? ? ?; exact: submx_trans. Qed.
+
+Definition porderMixin :=
+  LePOrderMixin (fun _ _ => erefl) subsetv_refl subsetv_asym subsetv_trans.
+Canonical porderType :=
+  POrderType vspace_display {vspace vT} porderMixin.
+
+Lemma subsetvE U V : (U <= V)%VS = (vs2mx U <= vs2mx V)%MS. Proof. by []. Qed.
+
+Local Notation capv := (fun U V => mx2vs (vs2mx U :&: vs2mx V)).
+Local Notation addv := (fun U V => mx2vs (vs2mx U + vs2mx V)).
+
+Let vs2mxI U V : vs2mx (capv U V) = (vs2mx U :&: vs2mx V)%MS.
+Proof. by rewrite /= genmx_cap !gen_vs2mx. Qed.
+
+Let vs2mxD U V : vs2mx (addv U V) = (vs2mx U + vs2mx V)%MS.
+Proof. by rewrite /= genmx_adds !gen_vs2mx. Qed.
+
+Fact capvC : commutative capv. Proof. by move=> U V; rewrite capmxC. Qed.
+
+Fact addvC : commutative addv. Proof. by move=> U V; rewrite addsmxC. Qed.
+
+Fact capvA : associative capv.
+Proof. by move=> U V W; apply/vs2mxP; rewrite !vs2mxI capmxA submx_refl. Qed.
+
+Fact addvA : associative addv.
+Proof. by move=> U V W; apply/vs2mxP; rewrite !vs2mxD addsmxA submx_refl. Qed.
+
+Fact subsetEcapv U V : (U <= V)%VS = (capv U V == U).
+Proof.
+by rewrite [LHS](sameP capmx_idPl eqmxP) -vs2mxI vs2mxK; apply/vs2mxP/eqP.
+Qed.
+
+Fact subsetEaddv U V : (V <= U)%VS = (addv U V == U).
+Proof.
+by rewrite [LHS](sameP addsmx_idPl eqmxP) -vs2mxD vs2mxK; apply/vs2mxP/eqP.
+Qed.
+
+Fact addvKI V U : capv U (addv U V) = U.
+Proof.
+apply/eqP; rewrite -subsetEcapv subsetEaddv addvC addvA.
+by apply/eqP; congr addv; apply/eqP; rewrite -subsetEaddv.
+Qed.
+
+Fact capvKU V U : addv U (capv U V) = U.
+Proof.
+apply/eqP; rewrite -subsetEaddv subsetEcapv capvC capvA.
+by apply/eqP; congr capv; apply/eqP; rewrite -subsetEcapv.
+Qed.
+
+Canonical latticeType :=
+  LatticeType {vspace vT}
+    (LatticeMixin capvC addvC capvA addvA addvKI capvKU subsetEcapv).
+
+Fact sub0v U : (vline 0 <= U)%VS.
+Proof. by rewrite subsetvE /= genmxE linear0 sub0mx. Qed.
+
+Canonical bLatticeType := BLatticeType {vspace vT} (BottomMixin sub0v).
+
+Fact subsetv1 V : (V <= mx2vs 1%:M)%VS.
+Proof. by rewrite subsetvE /= mx2vsK; apply: submx1. Qed.
+
+Canonical tbLatticeType := TBLatticeType {vspace vT} (TopMixin subsetv1).
+
+Lemma capvE U V : (U :&: V)%VS = mx2vs (vs2mx U :&: vs2mx V). Proof. by []. Qed.
+Lemma addvE U V : (U + V)%VS = mx2vs (vs2mx U + vs2mx V). Proof. by []. Qed.
+Lemma v0E : 0%VS = vline 0. Proof. by []. Qed.
+Lemma fullvE : {: vT}%VS = mx2vs 1%:M. Proof. by []. Qed.
+
+End VspaceLattice.
+
+Module Exports.
+Canonical porderType.
+Canonical latticeType.
+Canonical bLatticeType.
+Canonical tbLatticeType.
+Definition subsetvE := subsetvE.
+Definition capvE := capvE.
+Definition addvE := addvE.
+Definition v0E := v0E.
+Definition fullvE := fullvE.
+End Exports.
+End VspaceLattice.
+Import VspaceLattice.Exports.
+
 Section VectorTheory.
 
 Variables (K : fieldType) (vT : vectType K).
 Implicit Types (a : K) (u v w : vT) (X Y : seq vT) (U V W : {vspace vT}).
-
-Local Notation subV := (@subsetv K vT) (only parsing).
-Local Notation addV := (@addv K vT) (only parsing).
-Local Notation capV := (@capv K vT) (only parsing).
 
 (* begin hide *)
 
@@ -412,7 +550,7 @@ rewrite mulmx_sum_row linear_sum; apply: eq_bigr => i _.
 by rewrite row_b2mx linearZ /= v2rK.
 Qed.
 
-Let lin_b2mx n (X : n.-tuple vT) k :  
+Let lin_b2mx n (X : n.-tuple vT) k :
   \sum_(i < n) k i *: X`_i = r2v (\row_i k i *m b2mx X).
 Proof. by rewrite -mul_b2mx; apply: eq_bigr => i _; rewrite mxE. Qed.
 
@@ -457,25 +595,13 @@ Proof. by apply/vlineP; exists 1; rewrite scale1r. Qed.
 Lemma subvP U V : reflect {subset U <= V} (U <= V)%VS.
 Proof.
 apply: (iffP rV_subP) => sU12 u.
-  by rewrite !memvE /subsetv !genmxE => /sU12.
-by have:= sU12 (r2v u); rewrite !memvE /subsetv !genmxE r2vK.
+  by rewrite !memvE !subsetvE !genmxE => /sU12.
+by have:= sU12 (r2v u); rewrite !memvE !subsetvE !genmxE r2vK.
 Qed.
-
-Lemma subvv U : (U <= U)%VS. Proof. exact/subvP. Qed.
-Hint Resolve subvv : core.
-
-Lemma subv_trans : transitive subV.
-Proof. by move=> U V W /subvP sUV /subvP sVW; apply/subvP=> u /sUV/sVW. Qed.
-
-Lemma subv_anti : antisymmetric subV.
-Proof. by move=> U V; apply/vs2mxP. Qed.
-
-Lemma eqEsubv U V : (U == V) = (U <= V <= U)%VS.
-Proof. by apply/eqP/idP=> [-> | /subv_anti//]; rewrite subvv. Qed.
 
 Lemma vspaceP U V : U =i V <-> U = V.
 Proof.
-split=> [eqUV | -> //]; apply/subv_anti/andP.
+split=> [eqUV | -> //]; apply/le_anti/andP.
 by split; apply/subvP=> v; rewrite eqUV.
 Qed.
 
@@ -487,69 +613,19 @@ by exists (r2v vi); rewrite memvK r2vK ?row_sub.
 Qed.
 
 (* Empty space. *)
-Lemma sub0v U : (0 <= U)%VS.
-Proof. exact: mem0v. Qed.
-
-Lemma subv0 U : (U <= 0)%VS = (U == 0%VS).
-Proof. by rewrite eqEsubv sub0v andbT. Qed.
-
-Lemma memv0 v : v \in 0%VS = (v == 0).
+Lemma memv0 v : v \in (0 : {vspace vT})%VS = (v == 0).
 Proof. by apply/idP/eqP=> [/vlineP[k ->] | ->]; rewrite (scaler0, mem0v). Qed.
 
 (* Full space *)
-
-Lemma subvf U : (U <= fullv)%VS. Proof. by rewrite /subsetv vs2mxF submx1. Qed.
-Lemma memvf v : v \in fullv. Proof. exact: subvf. Qed.
+Lemma memvf v : v \in {:vT}%VS. Proof. by rewrite memvE lex1. Qed.
 
 (* Picking a non-zero vector in a subspace. *)
 Lemma memv_pick U : vpick U \in U. Proof. by rewrite mem_r2v nz_row_sub. Qed.
 
 Lemma vpick0 U : (vpick U == 0) = (U == 0%VS).
-Proof. by  rewrite -memv0 mem_r2v -subv0 /subV vs2mx0 !submx0 nz_row_eq0. Qed.
+Proof. by rewrite -memv0 mem_r2v -lex0 !subsetvE vs2mx0 !submx0 nz_row_eq0. Qed.
 
 (* Sum of subspaces. *)
-Lemma subv_add U V W : (U + V <= W)%VS = (U <= W)%VS && (V <= W)%VS.
-Proof. by rewrite /subV vs2mxD addsmx_sub. Qed.
-
-Lemma addvS U1 U2 V1 V2 : (U1 <= U2 -> V1 <= V2 -> U1 + V1 <= U2 + V2)%VS.
-Proof. by rewrite /subV !vs2mxD; apply: addsmxS. Qed.
-
-Lemma addvSl U V : (U <= U + V)%VS.
-Proof. by rewrite /subV vs2mxD addsmxSl. Qed.
-
-Lemma addvSr U V : (V <= U + V)%VS.
-Proof. by rewrite /subV vs2mxD addsmxSr. Qed.
-
-Lemma addvC : commutative addV.
-Proof. by move=> U V; apply/vs2mxP; rewrite !vs2mxD addsmxC submx_refl. Qed.
-
-Lemma addvA : associative addV.
-Proof. by move=> U V W; apply/vs2mxP; rewrite !vs2mxD addsmxA submx_refl. Qed.
-
-Lemma addv_idPl {U V}: reflect (U + V = U)%VS (V <= U)%VS.
-Proof. by rewrite /subV (sameP addsmx_idPl eqmxP) -vs2mxD; apply: vs2mxP. Qed.
-
-Lemma addv_idPr {U V} : reflect (U + V = V)%VS (U <= V)%VS.
-Proof. by rewrite addvC; apply: addv_idPl. Qed.
-
-Lemma addvv : idempotent addV.
-Proof. by move=> U; apply/addv_idPl. Qed.
- 
-Lemma add0v : left_id 0%VS addV.
-Proof. by move=> U; apply/addv_idPr/sub0v. Qed.
-
-Lemma addv0 : right_id 0%VS addV.
-Proof. by move=> U; apply/addv_idPl/sub0v. Qed.
-
-Lemma sumfv : left_zero fullv addV.
-Proof. by move=> U; apply/addv_idPl/subvf. Qed.
-
-Lemma addvf : right_zero fullv addV.
-Proof. by move=> U; apply/addv_idPr/subvf. Qed.
-
-Canonical addv_monoid := Monoid.Law addvA add0v addv0.
-Canonical addv_comoid := Monoid.ComLaw addvC.
-
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
 Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed.
 
@@ -567,26 +643,16 @@ Section BigSum.
 Variable I : finType.
 Implicit Type P : pred I.
 
-Lemma sumv_sup i0 P U Vs :
-  P i0 -> (U <= Vs i0)%VS -> (U <= \sum_(i | P i) Vs i)%VS.
-Proof. by move=> Pi0 /subv_trans-> //; rewrite (bigD1 i0) ?addvSl. Qed.
-Arguments sumv_sup i0 [P U Vs].
-
-Lemma subv_sumP {P Us V} :
-  reflect (forall i, P i -> Us i <= V)%VS  (\sum_(i | P i) Us i <= V)%VS.
-Proof.
-apply: (iffP idP) => [sUV i Pi | sUV].
-  by apply: subv_trans sUV; apply: sumv_sup Pi _.
-by elim/big_rec: _ => [|i W Pi sWV]; rewrite ?sub0v // subv_add sUV.
-Qed.
-
 Lemma memv_sumr P vs (Us : I -> {vspace vT}) :
     (forall i, P i -> vs i \in Us i) ->
   \sum_(i | P i) vs i \in (\sum_(i | P i) Us i)%VS.
-Proof. by move=> Uv; apply/rpred_sum=> i Pi; apply/(sumv_sup i Pi)/Uv. Qed.
+Proof.
+move=> Uv; apply/rpred_sum=> i Pi; rewrite memvE. (* TODO: fix *)
+by apply/(join_min Pi)/Uv.
+Qed.
 
-Lemma memv_sumP {P} {Us : I -> {vspace vT}} {v} : 
-  reflect (exists2 vs, forall i, P i ->  vs i \in Us i
+Lemma memv_sumP {P} {Us : I -> {vspace vT}} {v} :
+  reflect (exists2 vs, forall i, P i -> vs i \in Us i
                      & v = \sum_(i | P i) vs i)
           (v \in \sum_(i | P i) Us i)%VS.
 Proof.
@@ -600,50 +666,8 @@ End BigSum.
 
 (* Intersection *)
 
-Lemma subv_cap U V W : (U <= V :&: W)%VS = (U <= V)%VS && (U <= W)%VS.
-Proof. by rewrite /subV vs2mxI sub_capmx. Qed.
-
-Lemma capvS U1 U2 V1 V2 : (U1 <= U2 -> V1 <= V2 -> U1 :&: V1 <= U2 :&: V2)%VS.
-Proof. by rewrite /subV !vs2mxI; apply: capmxS. Qed.
-
-Lemma capvSl U V : (U :&: V <= U)%VS.
-Proof. by rewrite /subV vs2mxI capmxSl. Qed.
-
-Lemma capvSr U V : (U :&: V <= V)%VS.
-Proof. by rewrite /subV vs2mxI capmxSr. Qed.
-
-Lemma capvC : commutative capV.
-Proof. by move=> U V; apply/vs2mxP; rewrite !vs2mxI capmxC submx_refl. Qed.
-
-Lemma capvA : associative capV.
-Proof. by move=> U V W; apply/vs2mxP; rewrite !vs2mxI capmxA submx_refl. Qed.
-
-Lemma capv_idPl {U V} : reflect (U :&: V = U)%VS (U <= V)%VS.
-Proof. by rewrite /subV(sameP capmx_idPl eqmxP) -vs2mxI; apply: vs2mxP. Qed.
-
-Lemma capv_idPr {U V} : reflect (U :&: V = V)%VS (V <= U)%VS.
-Proof. by rewrite capvC; apply: capv_idPl. Qed.
-
-Lemma capvv : idempotent capV.
-Proof. by move=> U; apply/capv_idPl. Qed.
-
-Lemma cap0v : left_zero 0%VS capV.
-Proof. by move=> U; apply/capv_idPl/sub0v. Qed.
-
-Lemma capv0 : right_zero 0%VS capV.
-Proof. by move=> U; apply/capv_idPr/sub0v. Qed.
-
-Lemma capfv : left_id fullv capV.
-Proof. by move=> U; apply/capv_idPr/subvf. Qed.
-
-Lemma capvf : right_id fullv capV.
-Proof. by move=> U; apply/capv_idPl/subvf. Qed.
-
-Canonical capv_monoid := Monoid.Law capvA capfv capvf.
-Canonical capv_comoid := Monoid.ComLaw capvC.
-
 Lemma memv_cap w U V : (w \in U :&: V)%VS = (w \in U) && (w \in V).
-Proof. by rewrite !memvE subv_cap. Qed.
+Proof. by rewrite !memvE lexI. Qed.
 
 Lemma memv_capP {w U V} : reflect (w \in U /\ w \in V) (w \in U :&: V)%VS.
 Proof. by rewrite memv_cap; apply: andP. Qed.
@@ -654,25 +678,7 @@ by move=> sUV; apply/vs2mxP; rewrite !(vs2mxD, vs2mxI); apply/eqmxP/matrix_modl.
 Qed.
 
 Lemma vspace_modr  U V W : (W <= U -> (U :&: V) + W = U :&: (V + W))%VS.
-Proof. by rewrite -!(addvC W) !(capvC U); apply: vspace_modl. Qed.
-
-Section BigCap.
-Variable I : finType.
-Implicit Type P : pred I.
-
-Lemma bigcapv_inf i0 P Us V :
-  P i0 -> (Us i0 <= V -> \bigcap_(i | P i) Us i <= V)%VS.
-Proof. by move=> Pi0; apply: subv_trans; rewrite (bigD1 i0) ?capvSl. Qed.
-
-Lemma subv_bigcapP {P U Vs} :
-  reflect (forall i, P i -> U <= Vs i)%VS (U <= \bigcap_(i | P i) Vs i)%VS.
-Proof.
-apply: (iffP idP) => [sUV i Pi | sUV].
-  by rewrite (subv_trans sUV) ?(bigcapv_inf Pi).
-by elim/big_rec: _ => [|i W Pi]; rewrite ?subvf // subv_cap sUV.
-Qed.
-
-End BigCap.
+Proof. by rewrite -!(joinC W) !(meetC U); apply: vspace_modl. Qed.
 
 (* Complement *)
 Lemma addv_complf U : (U + U^C)%VS = fullv.
@@ -689,7 +695,7 @@ Qed.
 
 (* Difference *)
 Lemma diffvSl U V : (U :\: V <= U)%VS.
-Proof. by rewrite /subV genmxE diffmxSl. Qed.
+Proof. by rewrite subsetvE genmxE diffmxSl. Qed.
 
 Lemma capv_diff U V : ((U :\: V) :&: V = 0)%VS.
 Proof.
@@ -704,7 +710,7 @@ exact/eqmxP/addsmx_diff_cap_eq.
 Qed.
 
 Lemma addv_diff U V : (U :\: V + V = U + V)%VS.
-Proof. by rewrite -{2}(addv_diff_cap U V) -addvA (addv_idPr (capvSr U V)). Qed.
+Proof. by rewrite -{2}(addv_diff_cap U V) -joinA meetUK. Qed.
 
 (* Subspace dimension. *)
 Lemma dimv0 : \dim (0%VS : {vspace vT}) = 0%N.
@@ -726,7 +732,7 @@ Lemma dimv_leqif_sup U V : (U <= V)%VS -> \dim U <= \dim V ?= iff (V <= U)%VS.
 Proof. exact: mxrank_leqif_sup. Qed.
 
 Lemma dimv_leqif_eq U V : (U <= V)%VS -> \dim U <= \dim V ?= iff (U == V).
-Proof. by rewrite eqEsubv; apply: mxrank_leqif_eq. Qed.
+Proof. rewrite eq_le; apply: mxrank_leqif_eq. Qed.
 
 Lemma eqEdim U V : (U == V) = (U <= V)%VS && (\dim V <= \dim U).
 Proof. by apply/idP/andP=> [/eqP | [/dimv_leqif_eq/geq_leqif]] ->. Qed.
@@ -747,16 +753,16 @@ Proof. by move=> dxUV; rewrite -dimv_sum_cap dxUV dimv0 addn0. Qed.
 Lemma dimv_add_leqif U V :
   \dim (U + V) <= \dim U + \dim V ?= iff (U :&: V <= 0)%VS.
 Proof.
-by rewrite /dimv /subV !mxrank_gen vs2mx0 genmxE; apply: mxrank_adds_leqif.
+by rewrite /dimv subsetvE !mxrank_gen vs2mx0 genmxE; apply: mxrank_adds_leqif.
 Qed.
 
 Lemma diffv_eq0 U V : (U :\: V == 0)%VS = (U <= V)%VS.
 Proof.
 rewrite -dimv_eq0 -(eqn_add2l (\dim (U :&: V))) addn0 dimv_cap_compl eq_sym.
-by rewrite (dimv_leqif_eq (capvSl _ _)) (sameP capv_idPl eqP).
+by rewrite (dimv_leqif_eq (leIl _ _)) eq_meetl.
 Qed.
 
-Lemma dimv_leq_sum I r (P : pred I) (Us : I -> {vspace vT}) : 
+Lemma dimv_leq_sum I r (P : pred I) (Us : I -> {vspace vT}) :
   \dim (\sum_(i <- r | P i) Us i) <= \sum_(i <- r | P i) \dim (Us i).
 Proof.
 elim/big_rec2: _ => [|i d vs _ le_vs_d]; first by rewrite dim_vline eqxx.
@@ -863,7 +869,7 @@ apply: (iffP directv_addP) => [dxUV u1 u2 v1 v2 Uu1 Uu2 Vv1 Vv2 | dxUV].
   apply/idP/idP=> [| /eqP[-> ->] //]; rewrite -subr_eq0 opprD addrACA addr_eq0.
   move/eqP=> eq_uv; rewrite xpair_eqE -subr_eq0 eq_uv oppr_eq0 subr_eq0 andbb.
   by rewrite -subr_eq0 -memv0 -dxUV memv_cap -memvN -eq_uv !memvB.
-apply/eqP; rewrite -subv0; apply/subvP=> v /memv_capP[U1v U2v].
+apply/eqP; rewrite -lex0; apply/subvP=> v /memv_capP[U1v U2v].
 by rewrite memv0 -[v == 0]andbb {1}eq_sym -xpair_eqE -dxUV ?mem0v // addrC.
 Qed.
 
@@ -898,7 +904,7 @@ Proof.
 apply: (iffP directv_sumP) => [dxU us Uu u_0 i Pi | dxU i Pi].
   apply/eqP; rewrite -memv0 -(dxU i Pi) memv_cap Uu //= -memvN -sub0r -{1}u_0.
   by rewrite (bigD1 i) //= addrC addKr memv_sumr // => j /andP[/Uu].
-apply/eqP; rewrite -subv0; apply/subvP=> v.
+apply/eqP; rewrite -lex0; apply/subvP=> v.
 rewrite memv_cap memv0 => /andP[Uiv /memv_sumP[us Uu Dv]].
 have: \sum_(j | P j) [eta us with i |-> - v] j = 0.
   rewrite (bigD1 i) //= eqxx {1}Dv addrC -sumrB big1 // => j /andP[_ i'j].
@@ -939,7 +945,7 @@ Proof. by rewrite unlock /dimv genmxE rank_leq_row. Qed.
 
 Lemma span_subvP {X U} : reflect {subset X <= U} (<<X>> <= U)%VS.
 Proof.
-rewrite /subV [@span _ _]unlock genmxE.
+rewrite subsetvE [@span _ _]unlock genmxE.
 apply: (iffP row_subP) => /= [sXU | sXU i].
   by move=> _ /seq_tnthP[i ->]; have:= sXU i; rewrite rowK memvK.
 by rewrite rowK -memvK sXU ?mem_tnth.
@@ -950,14 +956,13 @@ Proof. by move=> sXY; apply/span_subvP=> v /sXY/memv_span. Qed.
 
 Lemma eq_span X Y : X =i Y -> (<<X>> = <<Y>>)%VS.
 Proof.
-by move=> eqXY; apply: subv_anti; rewrite !sub_span // => u; rewrite eqXY.
+by move=> eqXY; apply: le_anti; rewrite !sub_span // => u; rewrite eqXY.
 Qed.
 
 Lemma span_def X : span X = (\sum_(u <- X) <[u]>)%VS.
 Proof.
-apply/subv_anti/andP; split.
-  by apply/span_subvP=> v Xv; rewrite (big_rem v) // memvE addvSl.
-by rewrite big_tnth; apply/subv_sumP=> i _; rewrite -memvE memv_span ?mem_tnth.
+apply/le_anti/andP; split; last by apply/joinsP_seq => i /memv_span.
+by apply/span_subvP=> v Xv; rewrite (big_rem v) // memvE leUl.
 Qed.
 
 Lemma span_nil : (<<Nil vT>> = 0)%VS.
@@ -1005,7 +1010,7 @@ Proof. by rewrite /free span_nil dimv0. Qed.
 
 Lemma seq1_free v : free [:: v] = (v != 0).
 Proof. by rewrite /free span_seq1 dim_vline; case: (~~ _). Qed.
- 
+
 Lemma perm_free X Y : perm_eq X Y -> free X = free Y.
 Proof.
 by move=> eqXY; rewrite /free (perm_size eqXY) (eq_span (perm_mem eqXY)).
@@ -1023,7 +1028,7 @@ Qed.
 Lemma free_not0 v X : free X -> v \in X -> v != 0.
 Proof. by rewrite free_directv andbC => /andP[_ /memPn]; apply. Qed.
 
-Lemma freeP n (X : n.-tuple vT) :  
+Lemma freeP n (X : n.-tuple vT) :
   reflect (forall k, \sum_(i < n) k i *: X`_i = 0 -> (forall i, k i = 0))
           (free X).
 Proof.
@@ -1034,14 +1039,14 @@ rewrite -kermx_eq0; apply/rowV0P=> rk /sub_kermxP kt0.
 by apply/rowP=> i; rewrite mxE {}t_free // mul_b2mx kt0 linear0.
 Qed.
 
-Lemma coord_free n (X : n.-tuple vT) (i j : 'I_n) :  
+Lemma coord_free n (X : n.-tuple vT) (i j : 'I_n) :
   free X -> coord X j (X`_i) = (i == j)%:R.
 Proof.
 rewrite unlock free_b2mx => /row_freeP[Ct CtK]; rewrite -row_b2mx.
 by rewrite -row_mul -[pinvmx _]mulmx1 -CtK 2!mulmxA mulmxKpV // CtK !mxE.
 Qed.
 
-Lemma coord_sum_free n (X : n.-tuple vT) k j : 
+Lemma coord_sum_free n (X : n.-tuple vT) k j :
   free X -> coord X j (\sum_(i < n) k i *: X`_i) = k j.
 Proof.
 move=> Xfree; rewrite linear_sum (bigD1 j) ?linearZ //= coord_free // eqxx.
@@ -1054,7 +1059,7 @@ Lemma cat_free X Y :
 Proof.
 rewrite !free_directv mem_cat directvE /= !big_cat -directvE directv_addE /=.
 rewrite negb_or -!andbA; do !bool_congr; rewrite -!span_def.
-by rewrite (sameP eqP directv_addP).
+by apply/eqP/directv_addP.
 Qed.
 
 Lemma catl_free Y X : free (X ++ Y) -> free X.
@@ -1073,8 +1078,8 @@ Lemma free_cons v X : free (v :: X) = (v \notin <<X>>)%VS && free X.
 Proof.
 rewrite (cat_free [:: v]) seq1_free directvEgeq /= span_seq1 dim_vline.
 case: eqP => [-> | _] /=; first by rewrite mem0v.
-rewrite andbC ltnNge (geq_leqif (dimv_leqif_sup _)) ?addvSr //.
-by rewrite subv_add subvv andbT -memvE.
+rewrite andbC ltnNge (geq_leqif (dimv_leqif_sup _)) ?leUr //.
+by rewrite leUx lexx andbT.
 Qed.
 
 Lemma freeE n (X : n.-tuple vT) :
@@ -1147,7 +1152,7 @@ Proof. by move/basis_free/free_not0; apply. Qed.
 Lemma basis_mem x U X : basis_of U X -> x \in X -> x \in U.
 Proof. by move/span_basis=> <- /memv_span. Qed.
 
-Lemma cat_basis U V X Y : 
+Lemma cat_basis U V X Y :
   directv (U + V) -> basis_of U X -> basis_of V Y -> basis_of (U + V) (X ++ Y).
 Proof.
 move=> dxUV /andP[/eqP defU freeX] /andP[/eqP defV freeY].
@@ -1201,7 +1206,7 @@ Lemma span_bigcat :
 Proof. by rewrite (big_morph _ span_cat span_nil). Qed.
 
 Lemma bigcat_free :
-    directv (\sum_(i | P i) <<Xs i>>) -> 
+    directv (\sum_(i | P i) <<Xs i>>) ->
   (forall i, P i -> free (Xs i)) -> free (\big[cat/[::]]_(i | P i) Xs i).
 Proof.
 rewrite /free directvE /= span_bigcat => /directvP-> /= freeXs.
@@ -1210,7 +1215,7 @@ by apply/eqP/eq_bigr=> i /freeXs/eqP.
 Qed.
 
 Lemma bigcat_basis Us (U := (\sum_(i | P i) Us i)%VS) :
-    directv U -> (forall i, P i -> basis_of (Us i) (Xs i)) -> 
+    directv U -> (forall i, P i -> basis_of (Us i) (Xs i)) ->
   basis_of U (\big[cat/[::]]_(i | P i) Xs i).
 Proof.
 move=> dxU XsUs; rewrite /basis_of span_bigcat.
@@ -1224,19 +1229,10 @@ End BigSumBasis.
 
 End VectorTheory.
 
-Hint Resolve subvv : core.
 Arguments subvP {K vT U V}.
-Arguments addv_idPl {K vT U V}.
-Arguments addv_idPr {K vT U V}.
 Arguments memv_addP {K vT w U V }.
-Arguments sumv_sup [K vT I] i0 [P U Vs].
 Arguments memv_sumP {K vT I P Us v}.
-Arguments subv_sumP {K vT I P Us V}.
-Arguments capv_idPl {K vT U V}.
-Arguments capv_idPr {K vT U V}.
 Arguments memv_capP {K vT w U V}.
-Arguments bigcapv_inf [K vT I] i0 [P Us V].
-Arguments subv_bigcapP {K vT I P U Vs}.
 Arguments directvP {K vT S}.
 Arguments directv_addP {K vT U V}.
 Arguments directv_add_unique {K vT U V}.
@@ -1379,7 +1375,7 @@ Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDr. Qed.
 Fact lfun_scaleDl f k1 k2 : (k1 + k2) *:l f = k1 *:l f + k2 *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDl. Qed.
 
-Definition lfun_lmodMixin := 
+Definition lfun_lmodMixin :=
   LmodMixin lfun_scaleA lfun_scale1 lfun_scaleDr lfun_scaleDl.
 Canonical lfun_lmodType := Eval hnf in LmodType R 'Hom(aT, rT) lfun_lmodMixin.
 
@@ -1459,11 +1455,11 @@ Variables (K : fieldType) (aT rT : vectType K).
 Implicit Types (f g : 'Hom(aT, rT)) (U V : {vspace aT}) (W : {vspace rT}).
 
 Lemma limgS f U V : (U <= V)%VS -> (f @: U <= f @: V)%VS.
-Proof. by rewrite unlock /subsetv !genmxE; apply: submxMr. Qed.
+Proof. by rewrite unlock !subsetvE !genmxE; apply: submxMr. Qed.
 
 Lemma limg_line f v : (f @: <[v]> = <[f v]>)%VS.
 Proof.
-apply/eqP; rewrite 2!unlock eqEsubv /subsetv /= r2vK !genmxE.
+apply/eqP; rewrite 2!unlock eq_le !subsetvE /= r2vK !genmxE.
 by rewrite !(eqmxMr _ (genmxE _)) submx_refl.
 Qed.
 
@@ -1476,14 +1472,14 @@ Lemma memv_imgP f w U :
   reflect (exists2 u, u \in U & w = f u) (w \in f @: U)%VS.
 Proof.
 apply: (iffP idP) => [|[u Uu ->]]; last exact: memv_img.
-rewrite 2!unlock memvE /subsetv !genmxE => /submxP[ku Drw].
+rewrite 2!unlock memvE subsetvE !genmxE => /submxP[ku Drw].
 exists (r2v (ku *m vs2mx U)); last by rewrite /= r2vK -mulmxA -Drw v2rK.
-by rewrite memvE /subsetv !genmxE r2vK submxMl.
+by rewrite memvE subsetvE !genmxE r2vK submxMl.
 Qed.
 
 Lemma lim0g U : (0 @: U = 0 :> {vspace rT})%VS.
 Proof.
-apply/eqP; rewrite -subv0; apply/subvP=> _ /memv_imgP[u _ ->].
+apply/eqP; rewrite -lex0; apply/subvP=> _ /memv_imgP[u _ ->].
 by rewrite lfunE rpred0.
 Qed.
 
@@ -1495,7 +1491,7 @@ Qed.
 
 Lemma limgD f : {morph lfun_img f : U V / U + V}%VS.
 Proof.
-move=> U V; apply/eqP; rewrite unlock eqEsubv /subsetv /= -genmx_adds.
+move=> U V; apply/eqP; rewrite unlock eq_le !subsetvE /= -genmx_adds.
 by rewrite !genmxE !(eqmxMr _ (genmxE _)) !addsmxMr submx_refl.
 Qed.
 
@@ -1504,13 +1500,13 @@ Lemma limg_sum f I r (P : pred I) Us :
 Proof. exact: (big_morph _ (limgD f) (limg0 f)). Qed.
 
 Lemma limg_cap f U V : (f @: (U :&: V) <= f @: U :&: f @: V)%VS.
-Proof. by rewrite subv_cap !limgS ?capvSl ?capvSr. Qed.
+Proof. by rewrite lexI !limgS ?leIl ?leIr. Qed.
 
 Lemma limg_bigcap f I r (P : pred I) Us :
   (f @: (\bigcap_(i <- r | P i) Us i) <= \bigcap_(i <- r | P i) f @: Us i)%VS.
 Proof.
-elim/big_rec2: _ => [|i V U _ sUV]; first exact: subvf.
-by rewrite (subv_trans (limg_cap f _ U)) ?capvS.
+elim/big_rec2: _ => [|i V U _ sUV]; first exact: lex1.
+by rewrite (le_trans (limg_cap f _ U)) ?leI2.
 Qed.
 
 Lemma limg_span f X : (f @: <<X>> = <<map f X>>)%VS.
@@ -1538,12 +1534,12 @@ Proof. by move=> _ /memv_imgP[u _ ->]; rewrite -!comp_lfunE inv_lfun_def. Qed.
 
 Lemma lkerE f U : (U <= lker f)%VS = (f @: U == 0)%VS.
 Proof.
-rewrite unlock -dimv_eq0 /dimv /subsetv !genmxE mxrank_eq0.
+rewrite unlock -dimv_eq0 /dimv subsetvE !genmxE mxrank_eq0.
 by rewrite (sameP sub_kermxP eqP).
 Qed.
 
 Lemma memv_ker f v : (v \in lker f) = (f v == 0).
-Proof. by rewrite -memv0 !memvE subv0 lkerE limg_line. Qed.
+Proof. by rewrite -memv0 !memvE lex0 lkerE limg_line. Qed.
 
 Lemma eqlfunP f g v : reflect (f v = g v) (v \in lker (f - g)).
 Proof. by rewrite memv_ker !lfun_simp subr_eq0; apply: eqP. Qed.
@@ -1553,8 +1549,8 @@ Proof. by apply: (iffP subvP) => E x /E/eqlfunP. Qed.
 
 Lemma limg_ker_compl f U : (f @: (U :\: lker f) = f @: U)%VS.
 Proof.
-rewrite -{2}(addv_diff_cap U (lker f)) limgD; apply/esym/addv_idPl.
-by rewrite (subv_trans _ (sub0v _)) // subv0 -lkerE capvSr.
+rewrite -{2}(addv_diff_cap U (lker f)) limgD; apply/esym/join_l.
+by rewrite (le_trans _ (le0x _)) // lex0 -lkerE leIr.
 Qed.
 
 Lemma limg_ker_dim f U : (\dim (U :&: lker f) + \dim (f @: U) = \dim U)%N.
@@ -1575,7 +1571,7 @@ Qed.
 
 Lemma lker0P f : reflect (injective f) (lker f == 0%VS).
 Proof.
-rewrite -subv0; apply: (iffP subvP) => [injf u v eq_fuv | injf u].
+rewrite -lex0; apply: (iffP subvP) => [injf u v eq_fuv | injf u].
   apply/eqP; rewrite -subr_eq0 -memv0 injf //.
   by rewrite memv_ker linearB /= eq_fuv subrr.
 by rewrite memv_ker memv0 -(inj_eq injf) linear0.
@@ -1588,7 +1584,7 @@ by apply/subvP=> u Uu; have /memv_imgP[v Vv /injf->] := sfUV _ (memv_img f Uu).
 Qed.
 
 Lemma eq_limg_ker0 f U V : lker f == 0%VS -> (f @: U == f @: V)%VS = (U == V).
-Proof. by move=> injf; rewrite !eqEsubv !limg_ker0. Qed.
+Proof. by move=> injf; rewrite !eq_le !limg_ker0. Qed.
 
 Lemma lker0_lfunK f : lker f == 0%VS -> cancel f f^-1%VF.
 Proof.
@@ -1645,7 +1641,7 @@ Hypothesis kerf0 : lker f == 0%VS.
 
 Lemma lker0_limgf : limg f = fullv.
 Proof.
-by apply/eqP; rewrite eqEdim subvf limg_dim_eq //= (eqP kerf0) capv0.
+by apply/eqP; rewrite eqEdim lex1 limg_dim_eq //= (eqP kerf0) meetx0.
 Qed.
 
 Lemma lker0_lfunVK : cancel f^-1%VF f.
@@ -1693,19 +1689,19 @@ Variables (K : fieldType) (aT rT : vectType K).
 Implicit Types (f : 'Hom(aT, rT)) (U : {vspace aT}) (V W : {vspace rT}).
 
 Lemma lpreim_cap_limg f W : (f @^-1: (W :&: limg f))%VS = (f @^-1: W)%VS.
-Proof. by rewrite /lfun_preim -capvA capvv. Qed.
+Proof. by rewrite /lfun_preim meetIK. Qed.
 
 Lemma lpreim0 f : (f @^-1: 0)%VS = lker f.
-Proof. by rewrite /lfun_preim cap0v limg0 add0v. Qed.
+Proof. by rewrite /lfun_preim meet0x limg0 join0x. Qed.
 
 Lemma lpreimS f V W : (V <= W)%VS-> (f @^-1: V <= f @^-1: W)%VS.
-Proof. by move=> sVW; rewrite addvS // limgS // capvS. Qed.
+Proof. by move=> sVW; rewrite leU2 // limgS // leI2. Qed.
 
 Lemma lpreimK f W : (W <= limg f)%VS -> (f @: (f @^-1: W))%VS = W.
 Proof.
-move=> sWf; rewrite limgD (capv_idPl sWf) // -limg_comp.
+move=> sWf; rewrite limgD meet_l // -limg_comp.
 have /eqP->: (f @: lker f == 0)%VS by rewrite -lkerE.
-have /andP[/eqP defW _] := vbasisP W; rewrite addv0 -defW limg_span.
+have /andP[/eqP defW _] := vbasisP W; rewrite joinx0 -defW limg_span.
 rewrite map_id_in // => x Xx; rewrite lfunE /= limg_lfunVK //.
 by apply: span_subvP Xx; rewrite defW.
 Qed.
@@ -1713,7 +1709,7 @@ Qed.
 Lemma memv_preim f u W : (f u \in W) = (u \in f @^-1: W)%VS.
 Proof.
 apply/idP/idP=> [Wfu | /(memv_img f)]; last first.
-  by rewrite -lpreim_cap_limg lpreimK ?capvSr // => /memv_capP[].
+  by rewrite -lpreim_cap_limg lpreimK ?leIr // => /memv_capP[].
 rewrite -[u](addNKr (f^-1%VF (f u))) memv_add ?memv_img //.
   by rewrite memv_cap Wfu memv_img ?memvf.
 by rewrite memv_ker addrC linearB /= subr_eq0 limg_lfunVK ?memv_img ?memvf.
@@ -1769,7 +1765,7 @@ Definition addv_pi1 U V := daddv_pi (U :\: V) V.
 Definition addv_pi2 U V := daddv_pi V (U :\: V).
 
 Lemma memv_pi U V w : (daddv_pi U V) w \in U.
-Proof. by rewrite unlock memvE /subsetv genmxE /= r2vK proj_mx_sub. Qed.
+Proof. by rewrite unlock memvE subsetvE genmxE /= r2vK proj_mx_sub. Qed.
 
 Lemma memv_proj U w : projv U w \in U. Proof. exact: memv_pi. Qed.
 
@@ -1780,8 +1776,8 @@ Lemma memv_pi2 U V w : (addv_pi2 U V) w \in V. Proof. exact: memv_pi. Qed.
 
 Lemma daddv_pi_id U V u : (U :&: V = 0)%VS -> u \in U -> daddv_pi U V u = u.
 Proof.
-move/eqP; rewrite -dimv_eq0 memvE /subsetv /dimv !genmxE mxrank_eq0 => /eqP.
-by move=> dxUV Uu; rewrite unlock /= proj_mx_id ?v2rK.
+move/eqP; rewrite -dimv_eq0 memvE subsetvE /dimv !genmxE mxrank_eq0.
+by move=> /eqP dxUV Uu; rewrite unlock /= proj_mx_id ?v2rK.
 Qed.
 
 Lemma daddv_pi_proj U V w (pi := daddv_pi U V) :
@@ -1791,8 +1787,8 @@ Proof. by move/daddv_pi_id=> -> //; apply: memv_pi. Qed.
 Lemma daddv_pi_add U V w :
   (U :&: V = 0)%VS -> (w \in U + V)%VS -> daddv_pi U V w + daddv_pi V U w = w.
 Proof.
-move/eqP; rewrite -dimv_eq0 memvE /subsetv /dimv !genmxE mxrank_eq0 => /eqP.
-by move=> dxUW UVw; rewrite unlock /= -linearD /= add_proj_mx ?v2rK.
+move/eqP; rewrite -dimv_eq0 memvE subsetvE /dimv !genmxE mxrank_eq0.
+by move=> /eqP dxUW UVw; rewrite unlock /= -linearD /= add_proj_mx ?v2rK.
 Qed.
 
 Lemma projv_id U u : u \in U -> projv U u = u.
@@ -1816,7 +1812,7 @@ Qed.
 Lemma lker_proj U : lker (projv U) = (U^C)%VS.
 Proof.
 apply/eqP; rewrite eqEdim andbC; apply/andP; split.
-  by rewrite dimv_compl -(limg_ker_dim (projv U) fullv) limg_proj addnK capfv.
+  by rewrite dimv_compl -(limg_ker_dim (projv U) fullv) limg_proj addnK meet1x.
 by apply/subvP=> v; rewrite memv_ker -{2}[v]subr0 => /eqP <-; apply: memv_projC.
 Qed.
 
@@ -1824,7 +1820,7 @@ Lemma addv_pi1_proj U V w (pi1 := addv_pi1 U V) : pi1 (pi1 w) = pi1 w.
 Proof. by rewrite daddv_pi_proj // capv_diff. Qed.
 
 Lemma addv_pi2_id U V v : v \in V -> addv_pi2 U V v = v.
-Proof. by apply: daddv_pi_id; rewrite capvC capv_diff. Qed.
+Proof. by apply: daddv_pi_id; rewrite meetC capv_diff. Qed.
 
 Lemma addv_pi2_proj U V w (pi2 := addv_pi2 U V) : pi2 (pi2 w) = pi2 w.
 Proof. by rewrite addv_pi2_id ?memv_pi2. Qed.
@@ -2036,7 +2032,7 @@ Let lhsf u := finfun ((tnth lhs)^~ u).
 Definition vsolve_eq U := finfun (tnth rhs) \in (linfun lhsf @: U)%VS.
 
 Lemma vsolve_eqP (U : {vspace vT}) :
-  reflect (exists2 u, u \in U & forall i, tnth lhs i u = tnth rhs i) 
+  reflect (exists2 u, u \in U & forall i, tnth lhs i u = tnth rhs i)
           (vsolve_eq U).
 Proof.
 have lhsZ: linear lhsf by move=> a u v; apply/ffunP=> i; rewrite !ffunE linearP.
@@ -2047,5 +2043,238 @@ Qed.
 
 End Solver.
 
+Export VspaceSyntax.
+Export VspaceLattice.Exports.
+
+(******************************************************************************)
+(* Compatibility layer                                                        *)
+(******************************************************************************)
+
 #[deprecated(since="mathcomp 1.12.0", note="Use limgD instead.")]
 Notation limg_add := limgD (only parsing).
+
+Module mc_1_12.
+Section mc_1_12.
+
+Variables (K : fieldType) (vT : vectType K).
+Implicit Types (a : K) (u v w : vT) (X Y : seq vT) (U V W : {vspace vT}).
+
+Local Notation subV := (@Order.le _ [porderType of {vspace vT}]) (only parsing).
+Local Notation addV :=
+  (@Order.join _ [latticeType of {vspace vT}]) (only parsing).
+Local Notation capV :=
+  (@Order.meet _ [latticeType of {vspace vT}]) (only parsing).
+
+Lemma subvv U : (U <= U)%VS. Proof. by []. Qed.
+
+Lemma subv_trans : transitive subV. Proof. exact: le_trans. Qed.
+
+Lemma subv_anti : antisymmetric subV. Proof. exact: le_anti. Qed.
+
+Lemma eqEsubv U V : (U == V) = (U <= V <= U)%VS. Proof. exact: eq_le. Qed.
+
+Lemma sub0v U : (0 <= U)%VS. Proof. exact: le0x. Qed.
+
+Lemma subv0 U : (U <= 0)%VS = (U == 0%VS). Proof. exact: lex0. Qed.
+
+Lemma subvf U : (U <= fullv)%VS. Proof. exact: lex1. Qed.
+
+Lemma subv_add U V W : (U + V <= W)%VS = (U <= W)%VS && (V <= W)%VS.
+Proof. exact: leUx. Qed.
+
+Lemma addvS U1 U2 V1 V2 : (U1 <= U2 -> V1 <= V2 -> U1 + V1 <= U2 + V2)%VS.
+Proof. exact: leU2. Qed.
+
+Lemma addvSl U V : (U <= U + V)%VS. Proof. exact: leUl. Qed.
+
+Lemma addvSr U V : (V <= U + V)%VS. Proof. exact: leUr. Qed.
+
+Lemma addvC : commutative addV. Proof. exact: joinC. Qed.
+
+Lemma addvA : associative addV. Proof. exact: joinA. Qed.
+
+Lemma addv_idPl {U V}: reflect (U + V = U)%VS (V <= U)%VS.
+Proof. exact: join_idPl. Qed.
+
+Lemma addv_idPr {U V} : reflect (U + V = V)%VS (U <= V)%VS.
+Proof. exact: join_idPr. Qed.
+
+Lemma addvv : idempotent addV. Proof. exact: joinxx. Qed.
+
+Lemma add0v : left_id 0%VS addV. Proof. exact: join0x. Qed.
+
+Lemma addv0 : right_id 0%VS addV. Proof. exact: joinx0. Qed.
+
+Lemma sumfv : left_zero fullv addV. Proof. exact: join1x. Qed.
+
+Lemma addvf : right_zero fullv addV. Proof. exact: joinx1. Qed.
+
+Lemma sumv_sup (I : finType) i0 (P : pred I) U Vs :
+  P i0 -> (U <= Vs i0)%VS -> (U <= \sum_(i | P i) Vs i)%VS.
+Proof. exact: join_min. Qed.
+
+Lemma subv_sumP (I : finType) {P : pred I} {Us V} :
+  reflect (forall i, P i -> Us i <= V)%VS  (\sum_(i | P i) Us i <= V)%VS.
+Proof. exact: joinsP. Qed.
+
+Lemma subv_cap U V W : (U <= V :&: W)%VS = (U <= V)%VS && (U <= W)%VS.
+Proof. exact: lexI. Qed.
+
+Lemma capvS U1 U2 V1 V2 : (U1 <= U2 -> V1 <= V2 -> U1 :&: V1 <= U2 :&: V2)%VS.
+Proof. exact: leI2. Qed.
+
+Lemma capvSl U V : (U :&: V <= U)%VS. Proof. exact: leIl. Qed.
+
+Lemma capvSr U V : (U :&: V <= V)%VS. Proof. exact: leIr. Qed.
+
+Lemma capvC : commutative capV. Proof. exact: meetC. Qed.
+
+Lemma capvA : associative capV. Proof. exact: meetA. Qed.
+
+Lemma capv_idPl {U V} : reflect (U :&: V = U)%VS (U <= V)%VS.
+Proof. exact: meet_idPl. Qed.
+
+Lemma capv_idPr {U V} : reflect (U :&: V = V)%VS (V <= U)%VS.
+Proof. exact: meet_idPr. Qed.
+
+Lemma capvv : idempotent capV. Proof. exact: meetxx. Qed.
+
+Lemma cap0v : left_zero 0%VS capV. Proof. exact: meet0x. Qed.
+
+Lemma capv0 : right_zero 0%VS capV. Proof. exact: meetx0. Qed.
+
+Lemma capfv : left_id fullv capV. Proof. exact: meet1x. Qed.
+
+Lemma capvf : right_id fullv capV. Proof. exact: meetx1. Qed.
+
+Lemma bigcapv_inf (I : finType) i0 (P : pred I) Us V :
+  P i0 -> (Us i0 <= V -> \bigcap_(i | P i) Us i <= V)%VS.
+Proof. exact: meets_max. Qed.
+
+Lemma subv_bigcapP (I : finType) {P : pred I} {U Vs} :
+  reflect (forall i, P i -> U <= Vs i)%VS (U <= \bigcap_(i | P i) Vs i)%VS.
+Proof. exact: meetsP. Qed.
+
+End mc_1_12.
+
+Arguments addv_idPl {K vT U V}.
+Arguments addv_idPr {K vT U V}.
+Arguments sumv_sup [K vT I] i0 [P U Vs].
+Arguments subv_sumP {K vT I P Us V}.
+Arguments capv_idPl {K vT U V}.
+Arguments capv_idPr {K vT U V}.
+Arguments bigcapv_inf [K vT I] i0 [P Us V].
+Arguments subv_bigcapP {K vT I P U Vs}.
+
+End mc_1_12.
+
+(* #[deprecated(since="1.13", note="Use lexx instead.")] *)
+Notation subvv := mc_1_12.subvv (only parsing).
+
+(* #[deprecated(since="1.13", note="Use le_trans instead.")] *)
+Notation subv_trans := mc_1_12.subv_trans (only parsing).
+
+(* #[deprecated(since="1.13", note="Use le_anti instead.")] *)
+Notation subv_anti := mc_1_12.subv_anti (only parsing).
+
+(* #[deprecated(since="1.13", note="Use eq_le instead.")] *)
+Notation eqEsubv := mc_1_12.eqEsubv (only parsing).
+
+(* #[deprecated(since="1.13", note="Use le0x instead.")] *)
+Notation sub0v := mc_1_12.sub0v (only parsing).
+
+(* #[deprecated(since="1.13", note="Use lex0 instead.")] *)
+Notation subv0 := mc_1_12.subv0 (only parsing).
+
+(* #[deprecated(since="1.13", note="Use lex1 instead.")] *)
+Notation subvf := mc_1_12.subvf (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leUx instead.")] *)
+Notation subv_add := mc_1_12.subv_add (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leU2 instead.")] *)
+Notation addvS := mc_1_12.addvS (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leUl instead.")] *)
+Notation addvSl := mc_1_12.addvSl (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leUr instead.")] *)
+Notation addvSr := mc_1_12.addvSr (only parsing).
+
+(* #[deprecated(since="1.13", note="Use joinC instead.")] *)
+Notation addvC := mc_1_12.addvC (only parsing).
+
+(* #[deprecated(since="1.13", note="Use joinA instead.")] *)
+Notation addvA := mc_1_12.addvA (only parsing).
+
+(* #[deprecated(since="1.13", note="Use join_idPr instead.")] *)
+Notation addv_idPl := mc_1_12.addv_idPl (only parsing).
+
+(* #[deprecated(since="1.13", note="Use join_idPl instead.")] *)
+Notation addv_idPr := mc_1_12.addv_idPr (only parsing).
+
+(* #[deprecated(since="1.13", note="Use joinxx instead.")] *)
+Notation addvv := mc_1_12.addvv (only parsing).
+
+(* #[deprecated(since="1.13", note="Use join0x instead.")] *)
+Notation add0v := mc_1_12.add0v (only parsing).
+
+(* #[deprecated(since="1.13", note="Use joinx0 instead.")] *)
+Notation addv0 := mc_1_12.addv0 (only parsing).
+
+(* #[deprecated(since="1.13", note="Use join1x instead.")] *)
+Notation sumfv := mc_1_12.sumfv (only parsing).
+
+(* #[deprecated(since="1.13", note="Use joinx1 instead.")] *)
+Notation addvf := mc_1_12.addvf (only parsing).
+
+(* #[deprecated(since="1.13", note="Use join_min instead.")] *)
+Notation sumv_sup := mc_1_12.sumv_sup (only parsing).
+
+(* #[deprecated(since="1.13", note="Use joinsP instead.")] *)
+Notation subv_sumP := mc_1_12.subv_sumP (only parsing).
+
+(* #[deprecated(since="1.13", note="Use lexI instead.")] *)
+Notation subv_cap := mc_1_12.subv_cap (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leI2 instead.")] *)
+Notation capvS := mc_1_12.capvS (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leIl instead.")] *)
+Notation capvSl := mc_1_12.capvSl (only parsing).
+
+(* #[deprecated(since="1.13", note="Use leIr instead.")] *)
+Notation capvSr := mc_1_12.capvSr (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meetC instead.")] *)
+Notation capvC := mc_1_12.capvC (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meetA instead.")] *)
+Notation capvA := mc_1_12.capvA (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meet_idPl instead.")] *)
+Notation capv_idPl := mc_1_12.capv_idPl (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meet_idPr instead.")] *)
+Notation capv_idPr := mc_1_12.capv_idPr (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meetxx instead.")] *)
+Notation capvv := mc_1_12.capvv (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meet0x instead.")] *)
+Notation cap0v := mc_1_12.cap0v (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meetx0 instead.")] *)
+Notation capv0 := mc_1_12.capv0 (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meet1x instead.")] *)
+Notation capfv := mc_1_12.capfv (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meetx1 instead.")] *)
+Notation capvf := mc_1_12.capvf (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meets_max instead.")] *)
+Notation bigcapv_inf := mc_1_12.bigcapv_inf (only parsing).
+
+(* #[deprecated(since="1.13", note="Use meetsP instead.")] *)
+Notation subv_bigcapP := mc_1_12.subv_bigcapP (only parsing).
