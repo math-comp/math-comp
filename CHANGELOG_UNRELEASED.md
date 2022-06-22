@@ -48,7 +48,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrnat.v`:
   + notations `leqLHS`, `leqRHS`, `ltnLHS`, `ltnRHS`
-
+  + `geq_half_double` `leq_uphalf_double`
+  
 - in `seq.v`, added lemmas `nth_seq1`, `set_nthE`, `count_set_nth`,
   `count_set_nth_ltn`, `count_set_nthF`
 - in `ssrbool.v`
