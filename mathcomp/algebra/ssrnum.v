@@ -125,6 +125,11 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Reserved Notation "n .-root" (at level 2, format "n .-root").
+Reserved Notation "'i" (at level 0).
+Reserved Notation "'Re z" (at level 10, z at level 8).
+Reserved Notation "'Im z" (at level 10, z at level 8).
+
 Local Open Scope order_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
@@ -3922,32 +3927,24 @@ Hint Resolve num_real : core.
 Section RealDomainOperations.
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
-    (Order.arg_min (disp := ring_display) i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : ring_scope.
+    (Order.arg_min (disp := ring_display) i0 (fun i => P%B) (fun i => F)) :
+   ring_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
-    [arg min_(i < i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : ring_scope.
+  [arg min_(i < i0 | i \in A) F] : ring_scope.
 
-Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : ring_scope.
+Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F] :
+  ring_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
-     (Order.arg_max (disp := ring_display) i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : ring_scope.
+   (Order.arg_max (disp := ring_display) i0 (fun i => P%B) (fun i => F)) :
+  ring_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
-    [arg max_(i > i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : ring_scope.
+    [arg max_(i > i0 | i \in A) F] : ring_scope.
 
-Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : ring_scope.
+Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F] :
+  ring_scope.
 
 (* sgr section *)
 
@@ -4379,8 +4376,9 @@ Implicit Types a x y z : C.
 Definition normCK x : `|x| ^+ 2 = x * x^*.
 Proof. by case: C x => ? [? ? ? []]. Qed.
 
-Lemma sqrCi : 'i ^+ 2 = -1 :> C.
-Proof. by case: C => ? [? ? ? []]. Qed.
+Lemma sqrCi : 'i ^+ 2 = -1 :> C. Proof. by case: C => ? [? ? ? []]. Qed.
+
+Lemma mulCii : 'i * 'i = -1 :> C. Proof. exact: sqrCi. Qed.
 
 Lemma conjCK : involutive (@conjC C).
 Proof.
@@ -4432,14 +4430,19 @@ by move/(order_path_min argCle_trans)/allP->.
 Qed.
 
 Definition nthroot n x := let: RootCspec y _ _ := rootC_subproof n x in y.
-Notation "n .-root" := (nthroot n) (at level 2, format "n .-root") : ring_scope.
-Notation "n .-root" := (nthroot n) (only parsing) : ring_scope.
+Notation "n .-root" := (nthroot n) : ring_scope.
 Notation sqrtC := 2.-root.
 
-Definition Re x := (x + x^*) / 2.
-Definition Im x := 'i * (x^* - x) / 2.
-Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
-Notation "'Im z" := (Im z) (at level 10, z at level 8) : ring_scope.
+Fact Re_lock : unit. Proof. exact: tt. Qed.
+Fact Im_lock : unit. Proof. exact: tt. Qed.
+Definition Re z := locked_with Re_lock ((z + z^*) / 2%:R).
+Definition Im z := locked_with Im_lock ('i * (z^* - z) / 2%:R).
+Notation "'Re z" := (Re z) : ring_scope.
+Notation "'Im z" := (Im z) : ring_scope.
+
+Lemma ReE z : 'Re z = (z + z^*) / 2%:R. Proof. by rewrite ['Re _]unlock. Qed.
+Lemma ImE z : 'Im z = 'i * (z^* - z) / 2%:R.
+Proof. by rewrite ['Im _]unlock. Qed.
 
 Let nz2 : 2 != 0 :> C. Proof. by rewrite pnatr_eq0. Qed.
 
@@ -4468,6 +4471,7 @@ Qed.
 Lemma conjC_nat n : (n%:R)^* = n%:R :> C. Proof. exact: rmorph_nat. Qed.
 Lemma conjC0 : 0^* = 0 :> C. Proof. exact: rmorph0. Qed.
 Lemma conjC1 : 1^* = 1 :> C. Proof. exact: rmorph1. Qed.
+Lemma conjCN1 : (- 1)^* = - 1 :> C. Proof. exact: rmorphN1. Qed.
 Lemma conjC_eq0 x : (x^* == 0) = (x == 0). Proof. exact: fmorph_eq0. Qed.
 
 Lemma invC_norm x : x^-1 = `|x| ^- 2 * x^*.
@@ -4492,6 +4496,9 @@ Proof. by move/CrealP. Qed.
 
 Lemma conj_normC z : `|z|^* = `|z|.
 Proof. by rewrite conj_Creal ?normr_real. Qed.
+
+Lemma CrealJ : {mono (@conjC C) : x / x \is Num.real}.
+Proof. by apply: (homo_mono1 conjCK) => x xreal; rewrite conj_Creal. Qed.
 
 Lemma geC0_conj x : 0 <= x -> x^* = x.
 Proof. by move=> /ger0_real/CrealP. Qed.
@@ -4544,33 +4551,39 @@ Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
 
 Lemma Crect x : x = 'Re x + 'i * 'Im x.
 Proof.
-rewrite 2!mulrA -expr2 sqrCi mulN1r opprB -mulrDl addrACA subrr addr0.
-by rewrite -mulr2n -mulr_natr mulfK.
+rewrite !(ReE, ImE) 2!mulrA mulCii mulN1r opprB -mulrDl.
+by rewrite addrACA subrr addr0 -mulr2n -mulr_natr mulfK.
 Qed.
 
+Lemma eqCP x y : x = y <-> ('Re x = 'Re y) /\ ('Im x = 'Im y).
+Proof. by split=> [->//|[eqRe eqIm]]; rewrite [x]Crect [y]Crect eqRe eqIm. Qed.
+
+Lemma eqC x y : (x == y) = ('Re x == 'Re y) && ('Im x == 'Im y).
+Proof. by apply/eqP/(andPP eqP eqP) => /eqCP. Qed.
+
 Lemma Creal_Re x : 'Re x \is real.
-Proof. by rewrite CrealE fmorph_div rmorph_nat rmorphD conjCK addrC. Qed.
+Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD conjCK addrC. Qed.
 
 Lemma Creal_Im x : 'Im x \is real.
 Proof.
-rewrite CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
+rewrite ImE CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
 
 Fact Re_is_additive : additive Re.
-Proof. by move=> x y; rewrite /Re rmorphB addrACA -opprD mulrBl. Qed.
+Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
 Canonical Re_additive := Additive Re_is_additive.
 
 Fact Im_is_additive : additive Im.
 Proof.
-by move=> x y; rewrite /Im rmorphB opprD addrACA -opprD mulrBr mulrBl.
+by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.
 Canonical Im_additive := Additive Im_is_additive.
 
 Lemma Creal_ImP z : reflect ('Im z = 0) (z \is real).
 Proof.
-rewrite CrealE -subr_eq0 -(can_eq (mulKf neq0Ci)) mulr0.
+rewrite ImE CrealE -subr_eq0 -(can_eq (mulKf neq0Ci)) mulr0.
 by rewrite -(can_eq (divfK nz2)) mul0r; apply: eqP.
 Qed.
 
@@ -4582,7 +4595,7 @@ Qed.
 
 Lemma ReMl : {in real, forall x, {morph Re : z / x * z}}.
 Proof.
-by move=> x Rx z /=; rewrite /Re rmorphM (conj_Creal Rx) -mulrDr -mulrA.
+by move=> x Rx z /=; rewrite !ReE rmorphM (conj_Creal Rx) -mulrDr -mulrA.
 Qed.
 
 Lemma ReMr : {in real, forall x, {morph Re : z / z * x}}.
@@ -4590,25 +4603,25 @@ Proof. by move=> x Rx z /=; rewrite mulrC ReMl // mulrC. Qed.
 
 Lemma ImMl : {in real, forall x, {morph Im : z / x * z}}.
 Proof.
-by move=> x Rx z; rewrite /Im rmorphM (conj_Creal Rx) -mulrBr mulrCA !mulrA.
+by move=> x Rx z; rewrite !ImE rmorphM (conj_Creal Rx) -mulrBr mulrCA !mulrA.
 Qed.
 
 Lemma ImMr : {in real, forall x, {morph Im : z / z * x}}.
 Proof. by move=> x Rx z /=; rewrite mulrC ImMl // mulrC. Qed.
 
-Lemma Re_i : 'Re 'i = 0. Proof. by rewrite /Re conjCi subrr mul0r. Qed.
+Lemma Re_i : 'Re 'i = 0. Proof. by rewrite ReE conjCi subrr mul0r. Qed.
 
 Lemma Im_i : 'Im 'i = 1.
 Proof.
-rewrite /Im conjCi -opprD mulrN -mulr2n mulrnAr ['i * _]sqrCi.
+rewrite ImE conjCi -opprD mulrN -mulr2n mulrnAr mulCii.
 by rewrite mulNrn opprK divff.
 Qed.
 
 Lemma Re_conj z : 'Re z^* = 'Re z.
-Proof. by rewrite /Re addrC conjCK. Qed.
+Proof. by rewrite !ReE addrC conjCK. Qed.
 
 Lemma Im_conj z : 'Im z^* = - 'Im z.
-Proof. by rewrite /Im -mulNr -mulrN opprB conjCK. Qed.
+Proof. by rewrite !ImE -mulNr -mulrN opprB conjCK. Qed.
 
 Lemma Re_rect : {in real &, forall x y, 'Re (x + 'i * y) = x}.
 Proof.
@@ -4645,6 +4658,25 @@ rewrite mulrDl !mulrDr (AC (2*2) (1*4*(2*3)))/= mulrACA.
 by rewrite -expr2 sqrCi mulN1r -!mulrA [_ * ('i * _)]mulrCA [_ * y1]mulrC.
 Qed.
 
+Lemma ImM x y : 'Im (x * y) = 'Re x * 'Im y + 'Re y * 'Im x.
+Proof.
+rewrite [x in LHS]Crect [y in LHS]Crect mulC_rect.
+by rewrite !(Im_rect, rpredB, rpredD, rpredM).
+Qed.
+
+Lemma ImMil x : 'Im ('i * x) = 'Re x.
+Proof. by rewrite ImM Re_i Im_i mul0r mulr1 add0r. Qed.
+
+Lemma ReMil x : 'Re ('i * x) = - 'Im x.
+Proof. by rewrite -ImMil mulrA mulCii mulN1r raddfN. Qed.
+
+Lemma ReMir x : 'Re (x * 'i) = - 'Im x. Proof. by rewrite mulrC ReMil. Qed.
+
+Lemma ImMir x : 'Im (x * 'i) = 'Re x. Proof. by rewrite mulrC ImMil. Qed.
+
+Lemma ReM x y : 'Re (x * y) = 'Re x * 'Re y - 'Im x * 'Im y.
+Proof. by rewrite -ImMil mulrCA ImM ImMil ReMil mulNr ['Im _ * _]mulrC. Qed.
+
 Lemma normC2_rect :
   {in real &, forall x y, `|x + 'i * y| ^+ 2 = x ^+ 2 + y ^+ 2}.
 Proof.
@@ -4655,11 +4687,53 @@ Qed.
 Lemma normC2_Re_Im z : `|z| ^+ 2 = 'Re z ^+ 2 + 'Im z ^+ 2.
 Proof. by rewrite -normC2_rect -?Crect. Qed.
 
+Lemma invC_Crect x y : (x + 'i * y)^-1  = (x^* - 'i * y^*) / `|x + 'i * y| ^+ 2.
+Proof. by rewrite /= invC_norm mulrC !rmorphE rmorphM conjCi mulNr. Qed.
+
 Lemma invC_rect :
   {in real &, forall x y, (x + 'i * y)^-1  = (x - 'i * y) / (x ^+ 2 + y ^+ 2)}.
+Proof. by move=> x y Rx Ry; rewrite invC_Crect normC2_rect ?conj_Creal. Qed.
+
+Lemma ImV x : 'Im x^-1 = - 'Im x / `|x| ^+ 2.
 Proof.
-by move=> x y Rx Ry; rewrite /= invC_norm conjC_rect // mulrC normC2_rect.
+rewrite [x in LHS]Crect invC_rect// ImMr ?(rpredV, rpredD, rpredX)//.
+by rewrite -mulrN Im_rect ?rpredN// -normC2_rect// -Crect.
 Qed.
+
+Lemma ReV x : 'Re x^-1 = 'Re x / `|x| ^+ 2.
+Proof.
+rewrite [x in LHS]Crect invC_rect// ReMr ?(rpredV, rpredD, rpredX)//.
+by rewrite -mulrN Re_rect ?rpredN// -normC2_rect// -Crect.
+Qed.
+
+Lemma rectC_mulr x y z : (x + 'i * y) * z = x * z + 'i * (y * z).
+Proof. by rewrite mulrDl mulrA. Qed.
+
+Lemma rectC_mull x y z : z * (x + 'i * y) = z * x + 'i * (z * y).
+Proof. by rewrite mulrDr mulrCA. Qed.
+
+Lemma divC_Crect x1 y1 x2 y2 :
+  (x1 + 'i * y1) / (x2 + 'i * y2) =
+  (x1 * x2^* + y1 * y2^* + 'i * (x2^* * y1 - x1 * y2^*)) /
+    `|x2 + 'i * y2| ^+ 2.
+Proof.
+rewrite invC_Crect// -mulrN [_ / _]rectC_mulr mulC_rect !mulrA -mulrBl.
+rewrite [_ * _ * y1]mulrAC -mulrDl mulrA -mulrDl !(mulrN, mulNr) opprK.
+by rewrite [- _ + _]addrC.
+Qed.
+
+Lemma divC_rect x1 y1 x2 y2 :
+     x1 \is real -> y1 \is real -> x2 \is real -> y2 \is real ->
+  (x1 + 'i * y1) / (x2 + 'i * y2) =
+  (x1 * x2 + y1 * y2 + 'i * (x2 * y1 - x1 * y2)) /
+    (x2 ^+ 2 + y2 ^+ 2).
+Proof. by move=> *; rewrite divC_Crect normC2_rect ?conj_Creal. Qed.
+
+Lemma Im_div x y : 'Im (x / y) = ('Re y * 'Im x - 'Re x * 'Im y) / `|y| ^+ 2.
+Proof. by rewrite ImM ImV ReV mulrA [X in _ + X]mulrAC -mulrDl mulrN addrC. Qed.
+
+Lemma Re_div x y : 'Re (x / y) = ('Re x * 'Re y + 'Im x * 'Im y) / `|y| ^+ 2.
+Proof. by rewrite ReM ImV ReV !mulrA -mulrBl mulrN opprK. Qed.
 
 Lemma leif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
 Proof.
@@ -4696,17 +4770,10 @@ Let argCleP y z :
   reflect (0 <= 'Im z -> 0 <= 'Im y /\ 'Re z <= 'Re y) (argCle y z).
 Proof.
 suffices dIm x: nnegIm x = (0 <= 'Im x).
-  rewrite /argCle !dIm ler_pmul2r ?invr_gt0 ?ltr0n //.
+  rewrite /argCle !dIm !(ImE, ReE) ler_pmul2r ?invr_gt0 ?ltr0n //.
   by apply: (iffP implyP) => geZyz /geZyz/andP.
-by rewrite /('Im x) pmulr_lge0 ?invr_gt0 ?ltr0n //; congr (0 <= _ * _).
+by rewrite (ImE x) pmulr_lge0 ?invr_gt0 ?ltr0n //; congr (0 <= _ * _).
 Qed.
-(* case Du: sqrCi => [u u2N1] /=. *)
-(* have/eqP := u2N1; rewrite -sqrCi eqf_sqr => /pred2P[] //. *)
-(* have:= conjCi; rewrite /'i; case_rootC => /= v v2n1 min_v conj_v Duv. *)
-(* have{min_v} /idPn[] := min_v u isT u2N1; rewrite negb_imply /nnegIm Du /= Duv. *)
-(* rewrite rmorphN conj_v opprK -opprD mulrNN mulNr -mulr2n mulrnAr -expr2 v2n1. *)
-(* by rewrite mulNrn opprK ler0n oppr_ge0 (ler_nat _ 2 0). *)
-
 
 Lemma rootC_Re_max n x y :
   (n > 0)%N -> y ^+ n = x -> 0 <= 'Im y -> 'Re y <= 'Re (n.-root x).
@@ -5028,16 +5095,20 @@ Qed.
 
 End ClosedFieldTheory.
 
-Notation "n .-root" := (@nthroot _ n)
-  (at level 2, format "n .-root") : ring_scope.
+Notation "n .-root" := (@nthroot _ n).
 Notation sqrtC := 2.-root.
-Notation "'i" := (@imaginaryC _) (at level 0) : ring_scope.
-Notation "'Re z" := (Re z) (at level 10, z at level 8) : ring_scope.
-Notation "'Im z" := (Im z) (at level 10, z at level 8) : ring_scope.
+Notation "'i" := (@imaginaryC _) : ring_scope.
+Notation "'Re z" := (Re z) : ring_scope.
+Notation "'Im z" := (Im z) : ring_scope.
 
 Arguments conjCK {C} x.
 Arguments sqrCK {C} [x] le0x.
 Arguments sqrCK_P {C x}.
+
+Hint Extern 0 (is_true (in_mem ('Re _) _)) =>
+  solve [apply: Creal_Re] : core.
+Hint Extern 0 (is_true (in_mem ('Im _) _)) =>
+  solve [apply: Creal_Im] : core.
 
 End Theory.
 

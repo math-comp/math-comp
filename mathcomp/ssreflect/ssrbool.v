@@ -173,9 +173,9 @@ Arguments orPP {P Q p q}.
 Arguments implyPP {P Q p q}.
 Prenex Implicits negPP andPP orPP implyPP.
 
-(******************)
-(* v8.16 addtions *)
-(******************)
+(*******************)
+(* v8.16 additions *)
+(*******************)
 
 (******************************************************************************)
 (*          pred_oapp T D := [pred x | oapp (mem D) false x]                  *)
@@ -255,3 +255,10 @@ Proof. by move->. Qed.
 
 Lemma eqbRL (b1 b2 : bool) : b1 = b2 -> b2 -> b1.
 Proof. by move->. Qed.
+
+Lemma homo_mono1 [aT rT : Type] [f : aT -> rT] [g : rT -> aT]
+    [aP : pred aT] [rP : pred rT] :
+  cancel g f ->
+  {homo f : x / aP x >-> rP x} ->
+  {homo g : x / rP x >-> aP x} -> {mono g : x / rP x >-> aP x}.
+Proof. by move=> gK fP gP x; apply/idP/idP => [/fP|/gP//]; rewrite gK. Qed.
