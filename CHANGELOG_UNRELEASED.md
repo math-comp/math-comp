@@ -12,7 +12,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`, added lemma `leq_prod`
 - in `path.v`, added lemma `sortedP`
-- in `seq.v`, added statement `size_take_min`
+- in `seq.v`, 
+  + lemma `nilpE`
+  + definition `prefix`
+  + lemmas `prefixE`, `prefix_refl`, `prefixs0`, `prefix0s`, `prefix_cons`,
+    `prefix_catr`, `prefix_prefix`, `prefixP`, `prefix_trans`, `prefixs1`,
+    `catl_prefix`, `prefix_catl`, `prefix_rcons`, `prefix_rev`, `prefix_revLR`,
+    `prefix1s`, `prefix_uniq`, `prefix_take`, `prefix_drop_gt0`, `size_prefix`
+  + definition `suffix`
+  + lemmas `suffixE`, `suffix_refl`, `suffixs0`, `suffix0s`, `suffix_rev`,
+    `suffix_revLR`, `suffix_suffix`, `suffixP`, `suffix_trans`, `suffix_rcons`,
+    `suffix_catl`, `suffix_catr`, `catl_suffix`, `suffix_cons`, `suffixW`,
+    `suffix1s`, `suffix_uniq`, `suffix_drop`, `size_suffix` 
+  + definitions `infix`, `infix_index`
+  + lemmas `infix0s`, `infixs0`, `infix_consl`, `infix_indexss`,
+    `infix_index_le`, `infixTindex`, `infixPn`, `infix_index0s`,
+    `infix_indexs0`, `infixE`, `infix_refl`, `prefixW`, `prefix_infix`,
+    `infix_infix`, `suffix_infix`, `infixP`, `infix_rev`, `infix_trans`, 
+    `infix_revLR`, `infix_rconsl`, `infix_cons`, `infixs1`, `catl_infix`,
+    `catr_infix`, `cons2_infix`, `rcons2_infix`, `catr2_infix`, `catl2_infix`,
+    `infix_catl`, `infix_catr`, `prefix_infix_trans`, `suffix_infix_trans`,
+    `infix_prefix_trans`, `infix_suffix_trans`, `prefix_suffix_trans`,
+    `suffix_prefix_trans`, `infixW`, `mem_infix`, `infix1s`, `infix_rcons`,
+    `infix_uniq`, `infix_take`, `infix_drop`, `consr_infix`, `consl_infix`,
+    `prefix_index`, `size_infix`
 
 - in `ssralg.v`
   + number notation in scope ring_scope, numbers such as `12` or `42`
