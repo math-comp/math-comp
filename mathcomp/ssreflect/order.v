@@ -2732,6 +2732,9 @@ Proof. by case: T => ? [? []]. Qed.
 Lemma ge_trans: transitive (>=%O : rel T).
 Proof. by move=> ? ? ? ? /le_trans; apply. Qed.
 
+Lemma le_le_trans x y z t : z <= x -> y <= t -> x <= y -> z <= t.
+Proof. by move=> + /(le_trans _)/[apply]; apply: le_trans. Qed.
+
 Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
 Proof. by case: T x y => ? [? []]. Qed.
 
