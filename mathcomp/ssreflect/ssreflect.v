@@ -61,3 +61,14 @@ Notation "'[' '!' rules ']'"         := (ltac:(rewrite !rules))
   (at level 0, rules at level 200, only parsing) : ssripat_scope.
 
 End ipat.
+
+(* A class to trigger reduction by rewriting.                           *)
+(* Usage: rewrite [pattern]vm_compute.                                  *)
+(* Alternatively one may redefine a lemma as in algebra/rat.v :         *)
+(* Lemma rat_vm_compute n (x : rat) : vm_compute_eq n%:Q x -> n%:Q = x. *)
+(* Proof. exact. Qed.                                                   *)
+
+Class vm_compute_eq {T : Type} (x y : T) := vm_compute : x = y.
+
+Hint Extern 0 (@vm_compute_eq _ _ _) =>
+       vm_compute; reflexivity : typeclass_instances.

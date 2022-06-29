@@ -96,6 +96,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `opp_fun_is_additive` and `opp_fun_is_scalable`
   + canonical instances `opp_fun_additive` and `opp_fun_linear`
   + notation `f \* g` for definition `mul_fun`
+- in `ssreflect.v`, typeclass `vm_compute_eq` and lemma `vm_compute`
+  in order to trigger a call to the tactic `vm_compute` when rewriting
+  using `rewrite [pattern]vm_compute`.
+
 
 - in `order.v`
   + notation `f \min g` and `f \max g` for definitions `min_fun` and `max_fun`
@@ -120,6 +124,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrnum.v`
   + lemmas `mulr_ge0_gt0`, `splitr`, `ler_addgt0Pr`, `ler_addgt0Pl`,
     `lt_le`, `gt_ge`
+- In `rat.v`
+  + lemma `rat_vm_compute` which is a specialization to the rewriting
+    rule `vm_compute` to trigger `vm_compute` by a rewrite.
 
 ### Changed
 

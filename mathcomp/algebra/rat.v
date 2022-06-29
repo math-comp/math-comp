@@ -1025,3 +1025,7 @@ Notation "[ 'rat' x // y ]" := (@Rat (x, y) _) (only printing) : ring_scope.
 (* For debugging purposes we provide the parsable version *)
 Notation "[ 'rat' x // y ]" :=
   (@Rat (x : int, y : int) (fracq_subproof (x : int, y : int))) : ring_scope.
+
+(* A specialization of vm_compute rewrite rule for pattern _%:Q *)
+Lemma rat_vm_compute n (x : rat) : vm_compute_eq n%:Q x -> n%:Q = x.
+Proof. exact. Qed.
