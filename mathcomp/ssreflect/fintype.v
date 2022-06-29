@@ -916,7 +916,7 @@ Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
 
-Hint Resolve subxx_hint : core.
+#[global] Hint Resolve subxx_hint : core.
 
 Arguments pred0P {T P}.
 Arguments pred0Pn {T P}.
@@ -1802,7 +1802,7 @@ End OrdinalSub.
 Notation "''I_' n" := (ordinal n)
   (at level 8, n at level 2, format "''I_' n").
 
-Hint Resolve ltn_ord : core.
+#[global] Hint Resolve ltn_ord : core.
 
 Section OrdinalEnum.
 

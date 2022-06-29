@@ -61,7 +61,7 @@ Definition denq x := nosimpl ((valq x).2).
 
 Lemma denq_gt0 x : 0 < denq x.
 Proof. by rewrite /denq; case: x=> [[a b] /= /andP []]. Qed.
-Hint Resolve denq_gt0 : core.
+#[global] Hint Resolve denq_gt0 : core.
 
 Definition denq_ge0 x := ltW (denq_gt0 x).
 
@@ -69,7 +69,7 @@ Lemma denq_lt0 x : (denq x < 0) = false. Proof. by rewrite lt_gtF. Qed.
 
 Lemma denq_neq0 x : denq x != 0.
 Proof. by rewrite /denq gt_eqF ?denq_gt0. Qed.
-Hint Resolve denq_neq0 : core.
+#[global] Hint Resolve denq_neq0 : core.
 
 Lemma denq_eq0 x : (denq x == 0) = false.
 Proof. exact: negPf (denq_neq0 _). Qed.
@@ -544,7 +544,7 @@ Qed.
 
 Notation "n %:Q" := ((n : int)%:~R : rat) : ring_scope.
 
-Hint Resolve denq_neq0 denq_gt0 denq_ge0 : core.
+#[global] Hint Resolve denq_neq0 denq_gt0 denq_ge0 : core.
 
 Definition subq (x y : rat) : rat := (addq x (oppq y)).
 Definition divq (x y : rat) : rat := (mulq x (invq y)).

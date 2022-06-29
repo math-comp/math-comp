@@ -334,7 +334,7 @@ Proof. by rewrite !dvdzE abszM; apply: dvdn_mull. Qed.
 
 Lemma dvdz_mulr d m n : (d %| m)%Z -> (d %| m * n)%Z.
 Proof. by move=> d_m; rewrite mulrC dvdz_mull. Qed.
-Hint Resolve dvdz0 dvd1z dvdzz dvdz_mull dvdz_mulr : core.
+#[global] Hint Resolve dvdz0 dvd1z dvdzz dvdz_mull dvdz_mulr : core.
 
 Lemma dvdz_mul d1 d2 m1 m2 : (d1 %| m1 -> d2 %| m2 -> d1 * d2 %| m1 * m2)%Z.
 Proof. by rewrite !dvdzE !abszM; apply: dvdn_mul. Qed.

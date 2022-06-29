@@ -117,7 +117,7 @@ Declare Scope nat_rec_scope.
 
 (* Disable Coq prelude hints to improve proof script robustness. *)
 
-Remove Hints plus_n_O plus_n_Sm mult_n_O mult_n_Sm : core.
+#[global] Remove Hints plus_n_O plus_n_Sm mult_n_O mult_n_Sm : core.
 
 (* Declare legacy Arith operators in new scope. *)
 
@@ -334,11 +334,11 @@ Lemma leq0n n : 0 <= n.                 Proof. by []. Qed.
 Lemma ltn0Sn n : 0 < n.+1.              Proof. by []. Qed.
 Lemma ltn0 n : n < 0 = false.           Proof. by []. Qed.
 Lemma leqnn n : n <= n.                 Proof. by elim: n. Qed.
-Hint Resolve leqnn : core.
+#[global] Hint Resolve leqnn : core.
 Lemma ltnSn n : n < n.+1.               Proof. by []. Qed.
 Lemma eq_leq m n : m = n -> m <= n.     Proof. by move->. Qed.
 Lemma leqnSn n : n <= n.+1.             Proof. by elim: n. Qed.
-Hint Resolve leqnSn : core.
+#[global] Hint Resolve leqnSn : core.
 Lemma leq_pred n : n.-1 <= n.           Proof. by case: n => /=. Qed.
 Lemma leqSpred n : n <= n.-1.+1.        Proof. by case: n => /=. Qed.
 
@@ -368,7 +368,7 @@ Lemma lt0n n : (0 < n) = (n != 0).             Proof. by case: n. Qed.
 Lemma lt0n_neq0 n : 0 < n -> n != 0.           Proof. by case: n. Qed.
 Lemma eqn0Ngt n : (n == 0) = ~~ (n > 0).       Proof. by case: n. Qed.
 Lemma neq0_lt0n n : (n == 0) = false -> 0 < n. Proof. by case: n. Qed.
-Hint Resolve lt0n_neq0 neq0_lt0n : core.
+#[global] Hint Resolve lt0n_neq0 neq0_lt0n : core.
 
 Lemma eqn_leq m n : (m == n) = (m <= n <= m).
 Proof. by elim: m n => [|m IHm] []. Qed.
@@ -405,7 +405,7 @@ Proof. by move=> Hmn; apply: leq_trans. Qed.
 
 Lemma ltnW m n : m < n -> m <= n.
 Proof. exact: leq_trans. Qed.
-Hint Resolve ltnW : core.
+#[global] Hint Resolve ltnW : core.
 
 Lemma leqW m n : m <= n -> m <= n.+1.
 Proof. by move=> le_mn; apply: ltnW. Qed.

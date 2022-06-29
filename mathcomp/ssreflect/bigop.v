@@ -566,7 +566,7 @@ Proof. by rewrite [index_enum T]unlock. Qed.
 
 Lemma mem_index_enum T i : i \in index_enum T.
 Proof. by rewrite [index_enum T]unlock -enumT mem_enum. Qed.
-Hint Resolve mem_index_enum : core.
+#[global] Hint Resolve mem_index_enum : core.
 
 Lemma index_enum_uniq T : uniq (index_enum T).
 Proof. by rewrite [index_enum T]unlock -enumT enum_uniq. Qed.

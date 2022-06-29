@@ -2705,13 +2705,13 @@ Prenex Implicits mulmx mxtrace determinant cofactor adjugate.
 Arguments is_scalar_mxP {R n A}.
 Arguments mul_delta_mx {R m n p}.
 
-Hint Extern 0 (is_true (is_diag_mx (scalar_mx _))) =>
+#[global] Hint Extern 0 (is_true (is_diag_mx (scalar_mx _))) =>
   apply: scalar_mx_is_diag : core.
-Hint Extern 0 (is_true (is_trig_mx (scalar_mx _))) =>
+#[global] Hint Extern 0 (is_true (is_trig_mx (scalar_mx _))) =>
   apply: scalar_mx_is_trig : core.
-Hint Extern 0 (is_true (is_diag_mx (diag_mx _))) =>
+#[global] Hint Extern 0 (is_true (is_diag_mx (diag_mx _))) =>
   apply: diag_mx_is_diag : core.
-Hint Extern 0 (is_true (is_trig_mx (diag_mx _))) =>
+#[global] Hint Extern 0 (is_true (is_trig_mx (diag_mx _))) =>
   apply: diag_mx_is_trig : core.
 
 Notation "a %:M" := (scalar_mx a) : ring_scope.
@@ -3253,7 +3253,7 @@ Arguments diag_mx_comm {R n}.
 Canonical matrix_finAlgType (R : finComRingType) n' :=
   [finAlgType R of 'M[R]_n'.+1].
 
-Hint Resolve comm_mx_scalar comm_scalar_mx : core.
+#[global] Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
 (*****************************************************************************)
 (********************** Matrix unit ring and inverse matrices ****************)

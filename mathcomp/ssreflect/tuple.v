@@ -695,7 +695,7 @@ Proof. exact/Bijective/tagged_tuple_bseqK/bseq_tagged_tupleK. Qed.
 Lemma tagged_tuple_bseq_bij {n T} : bijective (@tagged_tuple_bseq n T).
 Proof. exact/Bijective/bseq_tagged_tupleK/tagged_tuple_bseqK. Qed.
 
-Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
+#[global] Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
 
 Definition bseq_finMixin n (T : finType) :=
   CanFinMixin (@bseq_tagged_tupleK n T).

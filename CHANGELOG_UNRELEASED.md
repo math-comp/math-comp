@@ -264,3 +264,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + change the sed command that removes all starred lines
 
 ### Misc
+
+- fix warning `deprecated-hint-without-locality` by adding the `#[global]`
+  attribute to most hints
+- turn warning `deprecated-hint-without-locality` into an error

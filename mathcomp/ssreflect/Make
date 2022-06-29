@@ -32,4 +32,3 @@ order.v
 -arg -w -arg -ambiguous-paths
 -arg -w -arg +undeclared-scope
 -arg -w -arg -non-reversible-notation
--arg -w -arg -deprecated-hint-without-locality
