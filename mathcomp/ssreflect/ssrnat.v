@@ -2027,27 +2027,3 @@ Ltac nat_congr := first
      apply: (congr1 (addn X1) _);
      symmetry
    end ].
-
-(* Temporary backward compatibility. *)
-#[deprecated(since="mathcomp 1.11.0", note="Use oddD instead.")]
-Notation odd_add := oddD (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use oddB instead.")]
-Notation odd_sub := oddB (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use iterD instead.")]
-Notation iter_add := iterD (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use maxnMr instead.")]
-Notation maxn_mulr := maxnMr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use maxnMl instead.")]
-Notation maxn_mull := maxnMl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use minnMr instead.")]
-Notation minn_mulr := minnMr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use minnMl instead.")]
-Notation minn_mull := minnMl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use oddN instead.")]
-Notation odd_opp := oddN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use oddM instead.")]
-Notation odd_mul := oddM (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use oddX instead.")]
-Notation odd_exp := oddX (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use sqrnB instead.")]
-Notation sqrn_sub := sqrnB (only parsing).

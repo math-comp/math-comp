@@ -3255,9 +3255,6 @@ Canonical matrix_finAlgType (R : finComRingType) n' :=
 
 Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use comm_mx_scalar instead.")]
-Notation scalar_mx_comm := comm_mx_scalar (only parsing).
-
 (*****************************************************************************)
 (********************** Matrix unit ring and inverse matrices ****************)
 (*****************************************************************************)
@@ -3808,9 +3805,6 @@ Canonical mxOver_subringPred (S : {pred R}) (ringS : subringPred S)
 
 End mxRingOver.
 End mxOver.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use map_mxB instead.")]
-Notation map_mx_sub := map_mxB (only parsing).
 
 Section BlockMatrix.
 Import tagnat.

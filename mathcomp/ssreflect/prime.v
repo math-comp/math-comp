@@ -1619,12 +1619,3 @@ rewrite -!big_mkcond -sum_nat_const pair_big (reindex_onto h h') => [|[d d'] _].
 apply/eqP; rewrite /eq_op /= /eq_op /= !modn_dvdm ?dvdn_part //.
 by rewrite chinese_modl // chinese_modr // !modn_small ?eqxx ?ltn_ord.
 Qed.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use primesM instead.")]
-Notation primes_mul := primesM (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use primesX instead.")]
-Notation primes_exp := primesX (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use pnatM instead.")]
-Notation pnat_mul := pnatM (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use pnatX instead.")]
-Notation pnat_exp := pnatX (only parsing).

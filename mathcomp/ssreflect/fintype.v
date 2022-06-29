@@ -916,9 +916,6 @@ Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use disjointWl instead.")]
-Notation disjoint_trans := disjointWl (only parsing).
-
 Hint Resolve subxx_hint : core.
 
 Arguments pred0P {T P}.
@@ -1725,11 +1722,6 @@ End ArgMinMax.
 
 End Extrema.
 
-#[deprecated(since="mathcomp 1.11.0", note="Use arg_minnP instead.")]
-Notation arg_minP := arg_minnP (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use arg_maxnP instead.")]
-Notation arg_maxP := arg_maxnP (only parsing).
-
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
   (at level 0, i, i0 at level 10,
@@ -2365,8 +2357,3 @@ Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
 Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
 
 End SumFinType.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use bumpDl instead.")]
-Notation bump_addl := bumpDl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use unbumpDl instead.")]
-Notation unbump_addl := unbumpDl (only parsing).

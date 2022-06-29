@@ -453,11 +453,6 @@ Definition simpm := (mulm1, mulm0, mul1m, mul0m, mulmA).
 
 End Theory.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use mulmDl instead.")]
-Notation mulm_addl := mulmDl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use mulmDr instead.")]
-Notation mulm_addr := mulmDr (only parsing).
-
 End Theory.
 Include Theory.
 
@@ -2114,7 +2109,5 @@ Lemma biggcdn_inf (I : finType) i0 (P : pred I) F m :
 Proof. by move=> Pi0; apply: dvdn_trans; rewrite (bigD1 i0) ?dvdn_gcdl. Qed.
 Arguments biggcdn_inf [I] i0 [P F m].
 
-#[deprecated(since="mathcomp 1.12.0", note="Use big_enumP instead.")]
-Notation filter_index_enum := deprecated_filter_index_enum (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use big_rmcond instead.")]
 Notation big_uncond := big_rmcond (only parsing).

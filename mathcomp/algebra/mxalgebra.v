@@ -3096,11 +3096,6 @@ Proof. by rewrite /center_mx -map_cent_mx; apply: map_capmx. Qed.
 
 End MapMatrixSpaces.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use mulsmxDl instead.")]
-Notation mulsmx_addl := mulsmxDl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use mulsmxDr instead.")]
-Notation mulsmx_addr := mulsmxDr (only parsing).
-
 Section RowColDiagBlockMatrix.
 Import tagnat.
 Context {F : fieldType} {n : nat} {p_ : 'I_n -> nat}.

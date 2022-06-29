@@ -1040,12 +1040,3 @@ by rewrite chinese_modl chinese_modr !modn_mod !eqxx.
 Qed.
 
 End Chinese.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimeMl instead.")]
-Notation coprime_mull := coprimeMl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimeMr instead.")]
-Notation coprime_mulr := coprimeMr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimeXl instead.")]
-Notation coprime_expl := coprimeXl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimeXr instead.")]
-Notation coprime_expr := coprimeXr (only parsing).

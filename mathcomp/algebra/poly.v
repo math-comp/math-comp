@@ -2774,20 +2774,3 @@ by rewrite monic_prod => // i; rewrite monicXsubC.
 Qed.
 
 End ClosedField.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCD instead.")]
-Notation polyC_add := polyCD (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCN instead.")]
-Notation polyC_opp := polyCN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCB instead.")]
-Notation polyC_sub := polyCB (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCMn instead.")]
-Notation polyC_muln := polyCMn (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCM instead.")]
-Notation polyC_mul := polyCM (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use polyCV instead.")]
-Notation polyC_inv := polyCV (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use lead_coefN instead.")]
-Notation lead_coef_opp := lead_coefN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use derivnB instead.")]
-Notation derivn_sub := derivnB (only parsing).

@@ -624,13 +624,6 @@ Proof. by move=> dvddp; rewrite [RHS]rdivp_eq rmodp_eq0 ?addr0. Qed.
 
 End MonicDivisor.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use rdivpDl instead.")]
-Notation rdivp_addl := rdivpDl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use rdivpDr instead.")]
-Notation rdivp_addr := rdivpDr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use rmodpD instead.")]
-Notation rmodp_add := rmodpD (only parsing).
-
 End RingMonic.
 
 Module Ring.
@@ -2357,21 +2350,6 @@ End IDomainPseudoDivision.
 Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 dvdp_mull dvdp_mulr dvdpp : core.
 Hint Resolve dvdp0 : core.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use dvdpZl instead.")]
-Notation dvdp_scalel := dvdpZl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use dvdpZr instead.")]
-Notation dvdp_scaler := dvdpZr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use dvdpNr instead.")]
-Notation dvdp_opp := dvdpNr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimepZl instead.")]
-Notation coprimep_scalel := coprimepZl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimepZr instead.")]
-Notation coprimep_scaler := coprimepZr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimepMl instead.")]
-Notation coprimep_mull := coprimepMl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use coprimepMr instead.")]
-Notation coprimep_mulr := coprimepMr (only parsing).
-
 End CommonIdomain.
 
 Module Idomain.
@@ -2695,23 +2673,6 @@ by rewrite size_scale ?ltn_modp //; apply: contraTneq cn0 => ->; rewrite unitr0.
 Qed.
 
 End MoreUnitDivisor.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use modpZl instead.")]
-Notation modp_scalel := modpZl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use modpZr instead.")]
-Notation modp_scaler := modpZr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use modpN instead.")]
-Notation modp_opp := modpN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use modpD instead.")]
-Notation modp_add := modpD (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpZl instead.")]
-Notation divp_scalel := divpZl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpZr instead.")]
-Notation divp_scaler := divpZr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpN instead.")]
-Notation divp_opp := divpN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpD instead.")]
-Notation divp_add := divpD (only parsing).
 
 End IdomainUnit.
 
@@ -3175,23 +3136,6 @@ Proof. by rewrite /gdcop gdcop_rec_map !size_map_poly. Qed.
 End FieldMap.
 
 End FieldDivision.
-
-#[deprecated(since="mathcomp 1.12.0", note="Use modpZl instead.")]
-Notation modp_scalel := modpZl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use modpZr instead.")]
-Notation modp_scaler := modpZr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use modpN instead.")]
-Notation modp_opp := modpN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use modpD instead.")]
-Notation modp_add := modpD (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpZl instead.")]
-Notation divp_scalel := divpZl (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpZr instead.")]
-Notation divp_scaler := divpZr (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpN instead.")]
-Notation divp_opp := divpN (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use divpD instead.")]
-Notation divp_add := divpD (only parsing).
 
 End Field.
 

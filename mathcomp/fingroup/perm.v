@@ -709,28 +709,3 @@ by apply/setP => /= s /[!inE]; apply/imsetP; exists s; rewrite ?inE.
 Qed.
 
 End CastSn.
-
-#[deprecated(since="mathcomp 1.11.0", note="Use tuple_permP instead.")]
-Notation tuple_perm_eqP := tuple_permP (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbit instead.")]
-Notation pcycle := porbit (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbits instead.")]
-Notation pcycles := porbits (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use mem_porbit instead.")]
-Notation mem_pcycle := mem_porbit (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbit_id instead.")]
-Notation pcycle_id := porbit_id (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use uniq_traject_porbit instead.")]
-Notation uniq_traject_pcycle := uniq_traject_porbit (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbit_traject instead.")]
-Notation pcycle_traject := porbit_traject (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use iter_porbit instead.")]
-Notation iter_pcycle := iter_porbit (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use eq_porbit_mem instead.")]
-Notation eq_pcycle_mem := eq_porbit_mem (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbit_sym instead.")]
-Notation pcycle_sym := porbit_sym (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbit_perm instead.")]
-Notation pcycle_perm := porbit_perm (only parsing).
-#[deprecated(since="mathcomp 1.11.0", note="Use porbits_mul_tperm instead.")]
-Notation ncycles_mul_tperm := porbits_mul_tperm (only parsing).

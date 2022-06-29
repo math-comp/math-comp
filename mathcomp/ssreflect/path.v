@@ -1753,16 +1753,6 @@ End CycleArc.
 
 Prenex Implicits arc.
 
-#[deprecated(since="mathcomp 1.12.0", note="Use sorted_ltn_nth instead.")]
-Notation sorted_lt_nth := sorted_ltn_nth (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use sorted_leq_nth instead.")]
-Notation sorted_le_nth := sorted_leq_nth (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use sorted_ltn_index instead.")]
-Notation ltn_index := sorted_ltn_index (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use sorted_leq_index instead.")]
-Notation leq_index := sorted_leq_index (only parsing).
-#[deprecated(since="mathcomp 1.12.0", note="Use subseq_path instead.")]
-Notation subseq_order_path := subseq_path (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use sub_in_path instead.")]
 Notation sub_path_in := sub_in_path (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use sub_in_cycle instead.")]
