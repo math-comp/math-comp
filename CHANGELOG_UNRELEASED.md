@@ -110,7 +110,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrbool.v`, added `homo_mono1`.
 
 - In `ssreflect.v`:
-  + notation `[elaborate t]` forcing the elaboration of `t` using Coq's `refine` tactic. This notation can be used in tandem with `have` to force type class resolution when an explicit proof term `t` is provided (otherwise type class instances are quantified implicitly by `have`).
+  + notation `[elaborate t]` forcing the elaboration of `t` using Coq's `refine` tactic.
+    This notation can be used in tandem with `have` to force type class resolution when an
+    explicit proof term `t` is provided (otherwise type class instances are quantified implicitly by `have`).
 
 ### Changed
 
