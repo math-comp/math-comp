@@ -8,11 +8,17 @@ Global Set Bullet Behavior "None".
 (******************************************************************************)
 (* Local additions:                                                           *)
 (*                                                                            *)
+(* [elaborate x] == triggers coq elaboration to fill the holes of the term x  *)
+(*                  The main use case is to trigger typeclass inference in    *)
+(*                  the body of a ssreflect have := [elaborate body].         *)
+(*                                                                            *)
 (*   Intro pattern ltac views:                                                *)
 (*   - calling rewrite from an intro pattern, use with parsimony              *)
 (*     => /[1! rules]  := rewrite rules                                       *)
 (*     => /[! rules]   := rewrite !rules                                      *)
 (******************************************************************************)
+
+Reserved Notation "[ 'elaborate' x ]" (at level 0).
 
 Module Deprecation.
 
@@ -52,6 +58,8 @@ End Exports.
 
 End Deprecation.
 Export Deprecation.Exports.
+
+Notation "[ 'elaborate' x ]" := (ltac:(refine x)) (only parsing).
 
 Module Export ipat.
 
