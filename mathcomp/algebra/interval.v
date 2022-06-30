@@ -13,6 +13,9 @@ From mathcomp Require Import ssrnum.
 (*                     \in can be used to test membership.                    *)
 (*    itvP x_in_i   == where x_in_i has type x \in i, if i is ground,         *)
 (*                     gives a set of rewrite rules that x_in_i imply.        *)
+(* lteBSide, bnd_simp == multirules to simplify inequalities between interval *)
+(*                     bounds                                                 *)
+(*    miditv i      == middle point of interval i                             *)
 (*                                                                            *)
 (* Intervals of T form an partially ordered type (porderType) whose ordering  *)
 (* is the subset relation. If T is a lattice, intervals also form a lattice   *)
@@ -55,6 +58,9 @@ Notation BRight := (BSide false).
 Notation "'-oo'" := (BInfty _ true) (at level 0) : order_scope.
 Notation "'+oo'" := (BInfty _ false) (at level 0) : order_scope.
 Variant interval (T : Type) := Interval of itv_bound T & itv_bound T.
+
+Coercion pair_of_interval T (I : interval T) : itv_bound T * itv_bound T :=
+  let: Interval b1 b2 := I in (b1, b2).
 
 (* We provide the 9 following notations to help writing formal intervals *)
 Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b))
@@ -229,6 +235,60 @@ Lemma gt_pinfty b : (+oo < b) = false. Proof. by []. Qed.
 
 Lemma lt_ninfty b : (b < -oo) = false. Proof. by case: b => // -[]. Qed.
 
+Lemma ltBSide x y (b b' : bool) :
+  BSide b x < BSide b' y = (x < y ?<= if b && ~~ b').
+Proof. by []. Qed.
+
+Lemma leBSide x y (b b' : bool) :
+  BSide b x <= BSide b' y = (x < y ?<= if b' ==> b).
+Proof. by []. Qed.
+
+Definition lteBSide := (ltBSide, leBSide).
+
+Lemma ltBRight_leBLeft b x : b < BRight x = (b <= BLeft x).
+Proof. by move: b => [[] b|[]]. Qed.
+Lemma leBRight_ltBLeft b x : BRight x <= b = (BLeft x < b).
+Proof. by move: b => [[] b|[]]. Qed.
+
+Let BLeft_ltE x y (b : bool) : BSide b x < BLeft y = (x < y).
+Proof. by case: b. Qed.
+Let BRight_leE x y (b : bool) : BSide b x <= BRight y = (x <= y).
+Proof. by case: b. Qed.
+Let BRight_BLeft_leE x y : BRight x <= BLeft y = (x < y).
+Proof. by []. Qed.
+Let BLeft_BRight_ltE x y : BLeft x < BRight y = (x <= y).
+Proof. by []. Qed.
+Let BRight_BSide_ltE x y (b : bool) : BRight x < BSide b y = (x < y).
+Proof. by case: b. Qed.
+Let BLeft_BSide_leE x y (b : bool) : BLeft x <= BSide b y = (x <= y).
+Proof. by case: b. Qed.
+Let BSide_ltE x y (b : bool) : BSide b x < BSide b y = (x < y).
+Proof. by case: b. Qed.
+Let BSide_leE x y (b : bool) : BSide b x <= BSide b y = (x <= y).
+Proof. by case: b. Qed.
+Let BInfty_leE a : a <= BInfty T false. Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_geE a : BInfty T true <= a. Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_le_eqE a : BInfty T false <= a = (a == BInfty T false).
+Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_ge_eqE a : a <= BInfty T true = (a == BInfty T true).
+Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_ltE a : a < BInfty T false = (a != BInfty T false).
+Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_gtE a : BInfty T true < a = (a != BInfty T true).
+Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_ltF a : BInfty T false < a = false.
+Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_gtF a : a < BInfty T true = false.
+Proof. by case: a => [[] a|[]]. Qed.
+Let BInfty_BInfty_ltE : BInfty T true < BInfty T false. Proof. by []. Qed.
+
+Definition bnd_simp := (BLeft_ltE, BRight_leE,
+  BRight_BLeft_leE, BLeft_BRight_ltE,
+  BRight_BSide_ltE, BLeft_BSide_leE, BSide_ltE, BSide_leE,
+  BInfty_leE, BInfty_geE, BInfty_BInfty_ltE,
+  BInfty_le_eqE, BInfty_ge_eqE, BInfty_ltE, BInfty_gtE, BInfty_ltF, BInfty_gtF,
+  @lexx _ T, @ltxx _ T, @eqxx T).
+
 Definition subitv i1 i2 :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in (b2l <= b1l) && (b1r <= b2r).
@@ -397,6 +457,20 @@ Qed.
 
 Arguments itvP [x i].
 
+Lemma itv_splitU1 b x : b <= BLeft x ->
+  Interval b (BRight x) =i [predU1 x & Interval b (BLeft x)].
+Proof.
+move=> bx z; rewrite !inE/= !subitvE ?bnd_simp//= lt_neqAle.
+by case: (eqVneq z x) => [->|]//=; rewrite lexx bx.
+Qed.
+
+Lemma itv_split1U b x : BRight x <= b ->
+  Interval (BLeft x) b =i [predU1 x & Interval (BRight x) b].
+Proof.
+move=> bx z; rewrite !inE/= !subitvE ?bnd_simp//= lt_neqAle.
+by case: (eqVneq z x) => [->|]//=; rewrite lexx bx.
+Qed.
+
 End IntervalPOrder.
 
 Section IntervalLattice.
@@ -537,7 +611,7 @@ End IntervalLattice.
 Section IntervalTotal.
 
 Variable (disp : unit) (T : orderType disp).
-Implicit Types (x y z : T) (i : interval T).
+Implicit Types (a b c : itv_bound T) (x y z : T) (i : interval T).
 
 Lemma itv_bound_totalMixin : totalLatticeMixin [latticeType of itv_bound T].
 Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
@@ -614,6 +688,21 @@ case: (leP b1l b2l); case: (leP b1l b3l); case: (leP b2l b3l);
 - by case: leP b13r (lt_trans b23r b12r).
 Qed.
 
+Lemma predC_itvl a : [predC Interval -oo a] =i Interval a +oo.
+Proof.
+case: a => [b x|[]//] y.
+by rewrite !inE !subitvE/= bnd_simp andbT !lteBSide/= lteifNE negbK.
+Qed.
+
+Lemma predC_itvr a : [predC Interval a +oo] =i Interval -oo a.
+Proof. by move=> y; rewrite inE/= -predC_itvl negbK. Qed.
+
+Lemma predC_itv i : [predC i] =i [predU Interval -oo i.1 & Interval i.2 +oo].
+Proof.
+case: i => [a a']; move=> x; rewrite inE/= itv_splitI negb_and.
+by symmetry; rewrite inE/= -predC_itvl -predC_itvr.
+Qed.
+
 End IntervalTotal.
 
 Local Open Scope ring_scope.
@@ -649,11 +738,21 @@ Proof. exact: oppr_itv. Qed.
 Lemma oppr_itvcc (a b x : R) : (- x \in `[a, b]) = (x \in `[(- b), (- a)]).
 Proof. exact: oppr_itv. Qed.
 
+Definition miditv (R : numDomainType) (i : interval R) : R :=
+  match i with
+  | Interval (BSide _ a) (BSide _ b) => (a + b) / 2%:R
+  | Interval -oo%O (BSide _ b) => b - 1
+  | Interval (BSide _ a) +oo%O => a + 1
+  | Interval -oo%O +oo%O => 0
+  | _ => 0
+  end.
+
 End IntervalNumDomain.
 
 Section IntervalField.
 
 Variable R : numFieldType.
+Implicit Types (x y z : R) (i : interval R).
 
 Local Notation mid x y := ((x + y) / 2).
 
@@ -668,5 +767,40 @@ Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
 
 Lemma mid_in_itvcc : forall (xa xb : R), xa <= xb -> mid xa xb \in `[xa, xb].
 Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
+
+Lemma mem_miditv i : (i.1 < i.2)%O -> miditv i \in i.
+Proof.
+move: i => [[ba a|[]] [bb b|[]]] //= ab; first exact: mid_in_itv.
+by rewrite !in_itv -lteif_subl_addl subrr lteif01.
+by rewrite !in_itv lteif_subl_addr -lteif_subl_addl subrr lteif01.
+Qed.
+
+Lemma miditv_le_left i b : (i.1 < i.2)%O -> (BSide b (miditv i) <= i.2)%O.
+Proof.
+case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[_ ].
+by apply: le_trans; rewrite !bnd_simp.
+Qed.
+
+Lemma miditv_ge_right i b : (i.1 < i.2)%O -> (i.1 <= BSide b (miditv i))%O.
+Proof.
+case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[+ _].
+by move=> /le_trans; apply; rewrite !bnd_simp.
+Qed.
+
+Lemma in_segment_addgt0Pr x y z :
+  reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
+Proof.
+apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
+  by rewrite in_itv /= ler_subl_addr !ler_paddr// (itvP xyz).
+by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
+  rewrite in_itv /= ler_subl_addr => /andP [].
+Qed.
+
+Lemma in_segment_addgt0Pl x y z :
+  reflect (forall e, e > 0 -> y \in `[(- e + x), (e + z)]) (y \in `[x, z]).
+Proof.
+apply/(equivP (in_segment_addgt0Pr x y z)).
+by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
+Qed.
 
 End IntervalField.
