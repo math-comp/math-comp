@@ -508,6 +508,28 @@ Qed.
 
 End CycleAll2Rel.
 
+Section PreInSuffix.
+
+Variables (T : eqType) (e : rel T).
+Implicit Type s : seq T.
+
+Local Notation path := (path e).
+Local Notation sorted := (sorted e).
+
+Lemma prefix_path x s1 s2 : prefix s1 s2 -> path x s2 -> path x s1.
+Proof. by rewrite prefixE => /eqP <-; exact: take_path. Qed.
+
+Lemma prefix_sorted s1 s2 : prefix s1 s2 -> sorted s2 -> sorted s1.
+Proof. by rewrite prefixE => /eqP <-; exact: take_sorted. Qed.
+
+Lemma infix_sorted s1 s2 : infix s1 s2 -> sorted s2 -> sorted s1.
+Proof. by rewrite infixE => /eqP <- ?; apply/take_sorted/drop_sorted. Qed.
+
+Lemma suffix_sorted s1 s2 : suffix s1 s2 -> sorted s2 -> sorted s1.
+Proof. by rewrite suffixE => /eqP <-; exact: drop_sorted. Qed.
+
+End PreInSuffix.
+
 Section EqSorted.
 
 Variables (T : eqType) (leT : rel T).
