@@ -1686,7 +1686,8 @@ apply: eq_bigr => i _; case: leqP => // /nderivn_poly0->.
 by rewrite horner0 simp.
 Qed.
 
-Lemma eq_poly n E1 E2 : E1 =1 E2 -> poly n E1 = poly n E2.
+Lemma eq_poly n E1 E2 : (forall i, i < n -> E1 i = E2 i) ->
+  poly n E1 = poly n E2.
 Proof. by move=> E; rewrite !poly_def; apply: eq_bigr => i _; rewrite E. Qed.
 
 End PolynomialTheory.
