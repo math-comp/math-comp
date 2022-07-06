@@ -96,7 +96,10 @@ coq-8.14:
   extends: .opam-build-once
 
 coq-8.15:
-  # to be replaced with .opam-build-once when 8.15.0 available
+  extends: .opam-build-once
+
+coq-8.16:
+  # to be replaced with .opam-build-once when 8.16.0 available
   extends: .opam-build
 
 coq-dev:
@@ -140,26 +143,31 @@ coq-dev:
     variables:
       - $CRON_MODE == "nightly"
 
-test-coq-dev:
-  extends: .test
+test-coq-8.13:
+  extends: .test-once
   variables:
-    COQ_VERSION: "dev"
-
-test-coq-8.15:
-  # to be replaced with .test-once when 8.15.0 available
-  extends: .test
-  variables:
-    COQ_VERSION: "8.15"
+    COQ_VERSION: "8.13"
 
 test-coq-8.14:
   extends: .test-once
   variables:
     COQ_VERSION: "8.14"
 
-test-coq-8.13:
+test-coq-8.15:
   extends: .test-once
   variables:
-    COQ_VERSION: "8.13"
+    COQ_VERSION: "8.15"
+
+test-coq-8.16:
+  # to be replaced with .test-once when 8.16.0 available
+  extends: .test
+  variables:
+    COQ_VERSION: "8.16"
+
+test-coq-dev:
+  extends: .test
+  variables:
+    COQ_VERSION: "dev"
 
 # set CONTRIB_URL, script, COQ_VERSION, CONTRIB_VERSION when using
 .ci:
@@ -349,15 +357,15 @@ ci-multinomials-dev:
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-analysis
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-analysis
 
-ci-analysis-8.13:
-  extends: .ci-analysis
-  variables:
-    COQ_VERSION: "8.13"
-
 ci-analysis-8.14:
   extends: .ci-analysis
   variables:
     COQ_VERSION: "8.14"
+
+ci-analysis-dev:
+  extends: .ci-analysis
+  variables:
+    COQ_VERSION: "dev"
 
 # The FCSL-PCM library
 .ci-fcsl-pcm:
@@ -423,7 +431,10 @@ mathcomp-dev_coq-8.14:
   extends: .docker-deploy-once
 
 mathcomp-dev_coq-8.15:
-  # to be replaced with .docker-deploy-once when 8.15.0 available
+  extends: .docker-deploy-once
+
+mathcomp-dev_coq-8.16:
+  # to be replaced with .docker-deploy-once when 8.16.0 available
   extends: .docker-deploy
 
 mathcomp-dev_coq-dev:
