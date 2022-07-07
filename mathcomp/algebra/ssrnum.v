@@ -5148,9 +5148,9 @@ Arguments conjCK {C} x.
 Arguments sqrCK {C} [x] le0x.
 Arguments sqrCK_P {C x}.
 
-Hint Extern 0 (is_true (in_mem ('Re _) _)) =>
+#[global] Hint Extern 0 (is_true (in_mem ('Re _) _)) =>
   solve [apply: Creal_Re] : core.
-Hint Extern 0 (is_true (in_mem ('Im _) _)) =>
+#[global] Hint Extern 0 (is_true (in_mem ('Im _) _)) =>
   solve [apply: Creal_Im] : core.
 
 End Theory.
