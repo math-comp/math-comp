@@ -66,6 +66,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.13".coqPackages = common-bundles // {
       coq.override.version = "8.13";
+      mathcomp-analysis.job = false;
     };
   };
 }
