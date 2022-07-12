@@ -140,11 +140,10 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 Module Num.
 
 #[short(type="porderZmodType")]
-HB.structure Definition POrderedZmodule d :=
-  { R of Order.IsPOrdered d R & GRing.Zmodule R }.
+HB.structure Definition POrderedZmodule :=
+  { R of Order.IsPOrdered ring_display R & GRing.Zmodule R }.
 
-(* FIXME: generic_norm, this is the right Zmodule_IsNormed mixin: *)
-HB.mixin Record Zmodule_IsNormed d (R : POrderedZmodule.type d) M
+HB.mixin Record Zmodule_IsNormed (R : POrderedZmodule.type) M
          of GRing.Zmodule M := {
   norm : M -> R;
   ler_norm_add : forall x y, norm (x + y) <= norm x + norm y;
@@ -154,10 +153,9 @@ HB.mixin Record Zmodule_IsNormed d (R : POrderedZmodule.type d) M
 }.
 
 #[short(type="normedZmodType"), infer(R)]
-(* FIXME: generic_norm, additional attribute when the structure is fixed: infer(R) *)
-HB.structure Definition NormedZmodule d (R : POrderedZmodule.type d) :=
-  { M of Zmodule_IsNormed d R M & POrderedZmodule d M}.
-Arguments norm {R M T} x : rename.
+HB.structure Definition NormedZmodule (R : porderZmodType) :=
+  { M of Zmodule_IsNormed R M & POrderedZmodule M }.
+Arguments norm {R M} x : rename.
 
 Module NormedZmoduleExports.
 Bind Scope ring_scope with NormedZmodule.sort.
@@ -170,22 +168,20 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
-(* FIXME: generic_norm, this is the right IsNumDomain mixin: *)
-HB.mixin Record IsNumDomain d R of GRing.Ring R & POrderedZmodule d R
-  & NormedZmodule d (POrderedZmodule.clone d R _) R := {
- _ : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
- _ : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
- _ : {morph (norm : R -> R) : x y / x * y};
- _ : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
+HB.mixin Record IsNumRing R of GRing.Ring R & POrderedZmodule R
+  & NormedZmodule (POrderedZmodule.clone R _) R := {
+ addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+ ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
+ normrM : {morph (norm : R -> R) : x y / x * y};
+ ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
-Set Printing All.
+
 #[short(type="numDomainType")]
 HB.structure Definition NumDomain := { R of
      GRing.IntegralDomain R &
-     POrderedZmodule ring_display R &
-     NormedZmodule ring_display
-       (POrderedZmodule.clone ring_display R _) R &
-     IsNumDomain ring_display R
+     POrderedZmodule R &
+     NormedZmodule (POrderedZmodule.clone R _) R &
+     IsNumRing R
   }.
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
@@ -355,8 +351,14 @@ End ExtensionAxioms.
 
 (* The rest of the numbers interface hierarchy. *)
 
+(* #[short(type="numFieldType")] *)
+(* HB.structure Definition NumField := { R of GRing.IsField R & NumDomain R }. *)
 #[short(type="numFieldType")]
-HB.structure Definition NumField := { R of GRing.IsField R & NumDomain R }.
+HB.structure Definition NumField := { R of GRing.IsField R &
+     GRing.IntegralDomain R &
+     POrderedZmodule R &
+     NormedZmodule (POrderedZmodule.clone R _) R &
+     IsNumRing R }.
 
 Module NumFieldExports.
 Bind Scope ring_scope with NumField.sort.
@@ -612,23 +614,21 @@ Module Import Theory.
 Section NumIntegralDomainTheory.
 
 Variable R : numDomainType.
-(* FIXME: generic_norm, here is the right definition for V *)
-(* Implicit Types (V : normedZmodType R) (x y z t : R). *)
-Local Notation V := R.
-Implicit Types (x y z t : R).
+Implicit Types (V : normedZmodType R) (x y z t : R).
 
 (* Lemmas from the signature (reexported). *)
 
-Definition ler_norm_add (* V *) (x y : V) : `|x + y| <= `|x| + `|y| :=
-  ler_norm_add x y.  (* FIXME: generic_norm *)
+Definition ler_norm_add V (x y : V) : `|x + y| <= `|x| + `|y| :=
+  ler_norm_add x y.
 Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
-Definition normr0_eq0 (* V *) (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 ring_display R (* V *) x.  (* FIXME: generic_norm *)
+Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 :=
+  @normr0_eq0 R V x.
 Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
   @ger_leVge R x y.
 Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
 Definition ler_def x y : (x <= y) = (`|y - x| == y - x) := ler_def x y.
-Definition normrMn (* V *) (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.  (* FIXME: generic_norm *)
-Definition normrN (* V *) (x : V) : `|- x| = `|x| := normrN x.  (*  FIXME: generic_norm *)
+Definition normrMn V (x : V) n : `|x *+ n| = `|x| *+ n := normrMn x n.
+Definition normrN V (x : V) : `|- x| = `|x| := normrN x.
 
 (* Predicate definitions. *)
 
@@ -729,9 +729,7 @@ Proof. by apply/big_real; [apply: rpredM | apply: rpred1]. Qed.
 
 Section NormedZmoduleTheory.
 
-(* FIXME: generic_norm, this is the correct introduction of V *)
-(* Variable V : normedZmodType R. *)
-Local Notation V := R.
+Variable V : normedZmodType R.
 Implicit Types (v w : V).
 
 Lemma normr0 : `|0 : V| = 0.
@@ -823,7 +821,7 @@ End NumIntegralDomainTheory.
 Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
-Arguments normr0P {R (* V *) v}.  (* FIXME: generic_norm, (uncomment V) *)
+Arguments normr0P {R V v}.
 #[global] Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
   (apply: ler01) : core.
 #[global] Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
@@ -2210,9 +2208,7 @@ Qed.
 
 Section NormedZmoduleTheory.
 
-(* FIXME: generic_norm, this was the introduction of V *)
-(* Variable V : normedZmodType R. *)
-Local Notation V := R.
+Variable V : normedZmodType R.
 Implicit Types (u v w : V).
 
 Lemma normr_real v : `|v| \is real. Proof. by apply/ger0_real. Qed.
@@ -3013,13 +3009,13 @@ Definition lter_ndivr_mull := (ler_ndivr_mull, ltr_ndivr_mull).
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
 
-Lemma normfV : {morph (@norm _ (* F *) F) : x / x ^-1}.  (* FIXME: generic_norm *)
+Lemma normfV : {morph (norm : F -> F) : x / x ^-1}.
 Proof.
 move=> x /=; have [/normrV //|Nux] := boolP (x \is a GRing.unit).
 by rewrite !invr_out // unitfE normr_eq0 -unitfE.
 Qed.
 
-Lemma normf_div : {morph (@norm _ (* F *) F) : x y / x / y}.  (* FIXME: generic_norm *)
+Lemma normf_div : {morph (norm : F -> F) : x y / x / y}.
 Proof. by move=> x y /=; rewrite normrM normfV. Qed.
 
 Lemma invr_sg x : (sg x)^-1 = sgr x.
@@ -4434,7 +4430,7 @@ End Theory.
 (* FACTORIES *)
 (*************)
 
-HB.factory Record IntegralDomain_IsNumDomain R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_IsNumRing R of GRing.IntegralDomain R := {
   Rle : rel R;
   Rlt : rel R;
   norm : R -> R;
@@ -4447,7 +4443,7 @@ HB.factory Record IntegralDomain_IsNumDomain R of GRing.IntegralDomain R := {
   lt_def    : forall x y, (Rlt x y) = (y != x) && (Rle x y)
 }.
 
-HB.builders Context R of IntegralDomain_IsNumDomain R.
+HB.builders Context R of IntegralDomain_IsNumRing R.
   Local Notation "x <= y" := (Rle x y) : ring_scope.
   Local Notation "x < y" := (Rlt x y) : ring_scope.
   Local Notation "`| x |" := (norm x) : ring_scope.
@@ -4521,10 +4517,10 @@ HB.builders Context R of IntegralDomain_IsNumDomain R.
     Order.IsLtLePOrdered.Build ring_display R le_def' ltrr lt_trans.
 
   HB.instance Definition _ :=
-    Zmodule_IsNormed.Build ring_display R normD norm_eq0 normrMn normrN.
+    Zmodule_IsNormed.Build _ R normD norm_eq0 normrMn normrN.
 
   HB.instance Definition _ :=
-    IsNumDomain.Build ring_display R addr_gt0 ger_total normM le_def.
+    IsNumRing.Build R addr_gt0 ger_total normM le_def.
 HB.end.
 
 HB.factory Record NumDomain_IsReal R of NumDomain R := {
@@ -4611,7 +4607,7 @@ HB.builders Context R of IntegralDomain_IsLeReal R.
   Fact le_total : total le.
   Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
-  HB.instance Definition _ := IntegralDomain_IsNumDomain.Build R
+  HB.instance Definition _ := IntegralDomain_IsNumRing.Build R
     le_normD lt0_add eq0_norm (in2W le_total) normM le_def lt_def.
 
   HB.instance Definition _ := Order.POrder_IsTotal.Build ring_display R
@@ -4709,7 +4705,7 @@ HB.builders Context R of IntegralDomain_IsLtReal R.
   by move/lt0_total; rewrite -(sub_gt0 (x - y)) sub0r opprB !sub_gt0 orbC.
   Qed.
 
-  HB.instance Definition _ := IntegralDomain_IsNumDomain.Build R
+  HB.instance Definition _ := IntegralDomain_IsNumRing.Build R
     le_normD lt0_add eq0_norm (in2W le_total) normM le_def' lt_def.
 
   HB.instance Definition _ := Order.POrder_IsTotal.Build ring_display R
