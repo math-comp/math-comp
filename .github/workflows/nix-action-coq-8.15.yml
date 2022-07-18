@@ -665,6 +665,7 @@ jobs:
     - mathcomp-algebra
     - mathcomp-finmap
     - mathcomp-fingroup
+    - hierarchy-builder
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to test
@@ -719,6 +720,51 @@ jobs:
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.15"
         --argstr job "graph-theory"
+  hierarchy-builder:
+    needs:
+    - coq
+    runs-on: ubuntu-latest
+    steps:
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
+        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
+        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
+        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
+        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
+        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ env.tested_commit }}
+    - name: Cachix install
+      uses: cachix/install-nix-action@v16
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+    - name: Cachix setup math-comp
+      uses: cachix/cachix-action@v10
+      with:
+        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
+        name: math-comp
+    - id: stepCheck
+      name: Checking presence of CI target hierarchy-builder
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
+        \ bundle \"coq-8.15\" --argstr job \"hierarchy-builder\" \\\n   --dry-run\
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho ::set-output name=status::$(echo\
+        \ $nb_dry_run | grep \"built:\" | sed \"s/.*/built/\")\n"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: coq'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.15"
+        --argstr job "coq"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: coq-elpi'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.15"
+        --argstr job "coq-elpi"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: Building/fetching current CI target
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.15"
+        --argstr job "hierarchy-builder"
   interval:
     needs:
     - coq
@@ -786,6 +832,7 @@ jobs:
   mathcomp:
     needs:
     - coq
+    - hierarchy-builder
     - mathcomp-ssreflect
     - mathcomp-fingroup
     - mathcomp-algebra
@@ -916,6 +963,7 @@ jobs:
   mathcomp-algebra:
     needs:
     - coq
+    - hierarchy-builder
     - mathcomp-ssreflect
     - mathcomp-fingroup
     runs-on: ubuntu-latest
@@ -980,6 +1028,7 @@ jobs:
     - mathcomp-finmap
     - mathcomp-bigenough
     - mathcomp-real-closed
+    - hierarchy-builder
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to test
@@ -1091,6 +1140,7 @@ jobs:
   mathcomp-character:
     needs:
     - coq
+    - hierarchy-builder
     - mathcomp-ssreflect
     - mathcomp-fingroup
     - mathcomp-algebra
@@ -1165,6 +1215,7 @@ jobs:
   mathcomp-doc:
     needs:
     - coq
+    - hierarchy-builder
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to test
@@ -1214,6 +1265,7 @@ jobs:
   mathcomp-field:
     needs:
     - coq
+    - hierarchy-builder
     - mathcomp-ssreflect
     - mathcomp-fingroup
     - mathcomp-algebra
@@ -1283,6 +1335,7 @@ jobs:
   mathcomp-fingroup:
     needs:
     - coq
+    - hierarchy-builder
     - mathcomp-ssreflect
     runs-on: ubuntu-latest
     steps:
@@ -1490,6 +1543,7 @@ jobs:
   mathcomp-solvable:
     needs:
     - coq
+    - hierarchy-builder
     - mathcomp-ssreflect
     - mathcomp-fingroup
     - mathcomp-algebra
@@ -1554,6 +1608,7 @@ jobs:
   mathcomp-ssreflect:
     needs:
     - coq
+    - hierarchy-builder
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to test
