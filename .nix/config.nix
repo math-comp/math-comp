@@ -67,7 +67,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.15".coqPackages = common-bundles // {
       coq.override.version = "8.15";
-      hierarchy-builder.override.version = "master";
+      hierarchy-builder.override.version = "fun_instances";
     };
   };
 }
