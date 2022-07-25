@@ -11,10 +11,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - in `seq.v`
-  + lemma `subset_mapP`
+  + lemmas `subset_mapP`, `take_takel`, `take_taker`
+  + generalized lemma `take_take` (the old `take_take` is now `take_takel`)
 
 - in `path.v` 
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
+
 - in `ssralg.v`
   + lemmas `natr1`, `nat1r`
 
@@ -27,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrnum.v`
   + lemmas `psumr_neq0`, `psumr_neq0P`
+
 - in `ssrnat.v`
   + lemmas `ltn_half_double`, `leq_half_double`, `gtn_half_double`
   + lemmas `uphalfE`, `ltn_uphalf_double`, `geq_uphalf_double`, `gtn_uphalf_double`

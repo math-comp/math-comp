@@ -793,11 +793,14 @@ move=> lt_i_n0 s; case lt_n0_s: (n0 < size s).
 by rewrite -[s in LHS]cats0 take_cat lt_n0_s /= cats0.
 Qed.
 
-Lemma take_take i j : i <= j -> forall s, take i (take j s) = take i s.
-Proof.
-move=> ij s; elim: s i j ij => [// | a s IHs] [|i] [|j] //=.
-by rewrite ltnS => /IHs ->.
-Qed.
+Lemma take_take i j s : take i (take j s) = take (minn i j) s.
+Proof. by elim: s i j => //= a l IH [|i] [|j] //=; rewrite minnSS IH. Qed.
+
+Lemma take_takel i j s : i <= j -> take i (take j s) = take i s.
+Proof. by move=> ?; rewrite take_take (minn_idPl _). Qed.
+
+Lemma take_taker i j s : j <= i -> take i (take j s) = take j s.
+Proof. by move=> ?; rewrite take_take (minn_idPr _). Qed.
 
 Lemma take_drop i j s : take i (drop j s) = drop j (take (i + j) s).
 Proof. by rewrite addnC; elim: s i j => // x s IHs [|i] [|j] /=. Qed.
@@ -809,13 +812,7 @@ by rewrite addSn /= IHi.
 Qed.
 
 Lemma takeC i j s : take i (take j s) = take j (take i s).
-Proof.
-wlog i_le_j : i j / i <= j.
-  by move=> Hwlog; case: (leqP i j) => [|/ltnW] /Hwlog ->.
-rewrite take_take // [RHS]take_oversize // (leq_trans _ i_le_j) //.
-elim: i s {i_le_j} => [|i IHi] s; first by rewrite take0.
-by case: s => [|a s]//; rewrite /= ltnS.
-Qed.
+Proof. by rewrite !take_take minnC. Qed.
 
 Lemma take_nseq i j x : i <= j -> take i (nseq j x) = nseq i x.
 Proof. by move=>/subnKC <-; rewrite nseqD take_size_cat // size_nseq. Qed.
