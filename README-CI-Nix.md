@@ -48,7 +48,7 @@ for the current master branch or
 ```shell
 % nix-shell --run "updateNixpkgs owner branch"
 ```
-for a specifi branch.
+for a specific branch.
 See the [coq-nix-toolbox README](https://github.com/coq-community/coq-nix-toolbox#available-shell-hooks)
 for details.
 
