@@ -69,7 +69,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `seq.v`, added lemma `subseq_anti`
 
-- in `poly.v`, added lemmas `comm_poly_add`, `comm_poly_mul` and `comm_poly_pow`.
+- in `poly.v`, added lemmas `comm_polyD`, `comm_polyM` and `comm_poly_exp`.
 
 ### Changed
 
