@@ -2,18 +2,24 @@ From mathcomp Require Import all_ssreflect ssralg.
 
 Section Tests.
 Lemma test_orb (a b c d : bool) : (a || b) || (c || d) = (a || c) || (b || d).
-Proof. time by rewrite orbACA. Restart.
-Proof. time by rewrite (AC (2*2) ((1*3)*(2*4))). Restart.
+Proof. time by rewrite orbACA. Abort.
+Lemma test_orb (a b c d : bool) : (a || b) || (c || d) = (a || c) || (b || d).
+Proof. time by rewrite (AC (2*2) ((1*3)*(2*4))). Abort.
+Lemma test_orb (a b c d : bool) : (a || b) || (c || d) = (a || c) || (b || d).
 Proof. time by rewrite orb.[AC (2*2) ((1*3)*(2*4))]. Qed.
 
 Lemma test_addn (a b c d : nat) : a + b + c + d = a + c + b + d.
-Proof. time by rewrite -addnA addnAC addnA addnAC. Restart.
-Proof. time by rewrite (ACl (1*3*2*4)). Restart.
+Proof. time by rewrite -addnA addnAC addnA addnAC. Abort.
+Lemma test_addn (a b c d : nat) : a + b + c + d = a + c + b + d.
+Proof. time by rewrite (ACl (1*3*2*4)). Abort.
+Lemma test_addn (a b c d : nat) : a + b + c + d = a + c + b + d.
 Proof. time by rewrite addn.[ACl 1*3*2*4]. Qed.
 
 Lemma test_addr (R : comRingType) (a b c d : R) : (a + b + c + d = a + c + b + d)%R.
-Proof. time by rewrite -GRing.addrA GRing.addrAC GRing.addrA GRing.addrAC. Restart.
-Proof. time by rewrite (ACl (1*3*2*4)). Restart.
+Proof. time by rewrite -GRing.addrA GRing.addrAC GRing.addrA GRing.addrAC. Abort.
+Lemma test_addr (R : comRingType) (a b c d : R) : (a + b + c + d = a + c + b + d)%R.
+Proof. time by rewrite (ACl (1*3*2*4)). Abort.
+Lemma test_addr (R : comRingType) (a b c d : R) : (a + b + c + d = a + c + b + d)%R.
 Proof. time by rewrite (@GRing.add R).[ACl 1*3*2*4]. Qed.
 
 Local Open Scope ring_scope.
