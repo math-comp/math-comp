@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
 
 - in `poly.v`
-  + lemmas `comm_polyD`, `comm_polyM`, `comm_poly_exp`, `root_expn`, `root_deg1`
+  + lemmas `comm_polyD`, `comm_polyM`, `comm_poly_exp`, `root_exp`,
+    `root_ZXsubC`
 
 ### Changed
 
