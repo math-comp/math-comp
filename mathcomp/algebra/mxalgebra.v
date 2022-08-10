@@ -1115,9 +1115,9 @@ rewrite !addsmx_sub ![@addsmx]unlock -!submx0; move/eq_genmx.
 by do 3!case: (_ <= 0)%MS; rewrite //= !genmx_id.
 Qed.
 
-Canonical addsmx_monoid n :=
-  Monoid.Law (@addsmxA n n n n) (@adds0mx_id n n) (@addsmx0_id n n).
-Canonical addsmx_comoid n := Monoid.ComLaw (@addsmxC n n n).
+HB.instance Definition _ n :=
+  Monoid.IsComLaw.Build (matrix F n n) 0%MS addsmx.body
+    (@addsmxA n n n n) (@addsmxC n n n) (@adds0mx_id n n).
 
 Lemma addsmxMr m1 m2 n p (A : 'M_(m1, n)) (B : 'M_(m2, n)) (C : 'M_(n, p)) :
   ((A + B)%MS *m C :=: A *m C + B *m C)%MS.
@@ -1566,9 +1566,9 @@ have [eqBC|] := eqVneq (qidmx B) (qidmx C).
 by rewrite !unlock capmx_nopP capmx_nop_id; do 2?case: (qidmx _) => //.
 Qed.
 
-Canonical capmx_monoid n :=
-   Monoid.Law (@capmxA n n n n) (@cap1mx n) (@capmx1 n).
-Canonical capmx_comoid n := Monoid.ComLaw (@capmxC n n n).
+HB.instance Definition _ n :=
+  Monoid.IsComLaw.Build (matrix F n n) 1%:M capmx.body
+    (@capmxA n n n n) (@capmxC n n n) (@cap1mx n).
 
 Lemma bigcapmx_inf i0 P m n (A_ : I -> 'M_n) (B : 'M_(m, n)) :
   P i0 -> (A_ i0 <= B -> \bigcap_(i | P i) A_ i <= B)%MS.

@@ -509,8 +509,8 @@ Proof. by move=> U; apply/addv_idPl/subvf. Qed.
 Lemma addvf : right_zero fullv addV.
 Proof. by move=> U; apply/addv_idPr/subvf. Qed.
 
-Canonical addv_monoid := Monoid.Law addvA add0v addv0.
-Canonical addv_comoid := Monoid.ComLaw addvC.
+HB.instance Definition _ := Monoid.IsComLaw.Build {vspace vT} 0%VS addv
+  addvA addvC add0v.
 
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
 Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed.
@@ -601,8 +601,8 @@ Proof. by move=> U; apply/capv_idPr/subvf. Qed.
 Lemma capvf : right_id fullv capV.
 Proof. by move=> U; apply/capv_idPl/subvf. Qed.
 
-Canonical capv_monoid := Monoid.Law capvA capfv capvf.
-Canonical capv_comoid := Monoid.ComLaw capvC.
+HB.instance Definition _ := Monoid.IsComLaw.Build {vspace vT} fullv capv
+  capvA capvC capfv.
 
 Lemma memv_cap w U V : (w \in U :&: V)%VS = (w \in U) && (w \in V).
 Proof. by rewrite !memvE subv_cap. Qed.

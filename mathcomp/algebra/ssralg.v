@@ -795,8 +795,8 @@ Lemma addrN : @right_inverse V V V 0 -%R +%R.
 Proof. by move=> x; rewrite addrC addNr. Qed.
 Definition subrr := addrN.
 
-Canonical add_monoid := Monoid.Law addrA add0r addr0.
-Canonical add_comoid := Monoid.ComLaw addrC.
+#[export]
+HB.instance Definition _ := Monoid.IsComLaw.Build V 0 +%R addrA addrC add0r.
 
 Lemma addrCA : @left_commutative V V +%R. Proof. exact: mulmCA. Qed.
 Lemma addrAC : @right_commutative V V +%R. Proof. exact: mulmAC. Qed.
@@ -1082,9 +1082,12 @@ Proof. by rewrite mulNr mul1r. Qed.
 Lemma mulrN1 x : x * -1 = - x.
 Proof. by rewrite mulrN mulr1. Qed.
 
-Canonical mul_monoid := Monoid.Law (@mulrA R) mul1r mulr1.
-Canonical muloid := Monoid.MulLaw mul0r mulr0.
-Canonical addoid := Monoid.AddLaw (@mulrDl R) mulrDr.
+#[export]
+HB.instance Definition _ := Monoid.IsLaw.Build R 1 *%R mulrA mul1r mulr1.
+#[export]
+HB.instance Definition _ := Monoid.IsMulLaw.Build R 0 *%R mul0r mulr0.
+#[export]
+HB.instance Definition _ := Monoid.IsAddLaw.Build R *%R +%R mulrDl mulrDr.
 
 Lemma mulr_suml I r P (F : I -> R) x :
   (\sum_(i <- r | P i) F i) * x = \sum_(i <- r | P i) F i * x.
@@ -2533,7 +2536,8 @@ Section ComRingTheory.
 Variable R : comRingType.
 Implicit Types x y : R.
 
-Canonical mul_comoid := @Monoid.ComLaw R(*NB: we need to do avoid to avoid an expansion that changes the behavior of some rewrite's*) _ _ (@mulrC R).
+#[export]
+HB.instance Definition _ := Monoid.IsCommutativeLaw.Build R *%R mulrC.
 Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
@@ -5776,13 +5780,6 @@ Notation "\prod_ ( i 'in' A | P ) F" :=
   (\big[*%R/1%R]_(i in A | P%B) F%R) : ring_scope.
 Notation "\prod_ ( i 'in' A ) F" :=
   (\big[*%R/1%R]_(i in A) F%R) : ring_scope.
-
-Canonical add_monoid.
-Canonical add_comoid.
-Canonical mul_monoid.
-Canonical mul_comoid.
-Canonical muloid.
-Canonical addoid.
 
 Canonical locked_additive.
 Canonical locked_rmorphism.

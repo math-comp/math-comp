@@ -334,7 +334,8 @@ move=> U; apply/eqP; rewrite -dimv_eq0 -leqn0 (leq_trans (dim_prodv U 0)) //.
 by rewrite dimv0 muln0.
 Qed.
 
-Canonical prodv_muloid := Monoid.MulLaw prod0v prodv0.
+HB.instance Definition _ := Monoid.IsMulLaw.Build {vspace aT} 0%VS prodv
+  prod0v prodv0.
 
 Lemma prod1v : left_id 1%VS prodv.
 Proof.
@@ -378,7 +379,8 @@ apply/prodvP=> u _ Uu /memv_addP[v1 Vv1 [v2 Vv2 ->]].
 by rewrite mulrDr memv_add ?memv_mul.
 Qed.
 
-Canonical addv_addoid := Monoid.AddLaw prodvDl prodvDr.
+HB.instance Definition _ := Monoid.IsAddLaw.Build {vspace aT} prodv addv
+  prodvDl prodvDr.
 
 Lemma prodvA : associative prodv.
 Proof.
@@ -389,7 +391,8 @@ rewrite !(big_distrl, big_distrr) /=; apply: eq_bigr => v _.
 by rewrite !prodv_line mulrA.
 Qed.
 
-Canonical prodv_monoid := Monoid.Law prodvA prod1v prodv1.
+HB.instance Definition _ := Monoid.IsLaw.Build {vspace aT} 1%VS prodv
+  prodvA prod1v prodv1.
 
 Definition expv U n := iterop n.+1.-1 prodv U 1%VS.
 Local Notation "A ^+ n" := (expv A n) : vspace_scope.
