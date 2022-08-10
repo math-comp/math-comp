@@ -574,8 +574,8 @@ rewrite /= mulgA mulG_subG centM subsetI cGH cHK andbT -(cent_joinEr cHK).
 by rewrite -(cent_joinEr cGH) !groupP.
 Qed.
 
-Canonical cprod_law := Monoid.Law cprodA cprod1g cprodg1.
-Canonical cprod_abelaw := Monoid.ComLaw cprodC.
+HB.instance Definition _ := Monoid.IsComLaw.Build {set gT} 1 cprod
+  cprodA cprodC cprod1g.
 
 Lemma cprod_modl A B G H :
   A \* B = G -> A \subset H -> A \* (B :&: H) = G :&: H.
@@ -741,8 +741,8 @@ rewrite setIC group_modr ?joing_subl //= eHK -(cent_joinEr cGH).
 by rewrite -group_modl ?joing_subr //= setIC (normC (sub1G _)) mulgS.
 Qed.
 
-Canonical dprod_law := Monoid.Law dprodA dprod1g dprodg1.
-Canonical dprod_abelaw := Monoid.ComLaw dprodC.
+HB.instance Definition _ := Monoid.IsComLaw.Build {set gT} 1 dprod
+  dprodA dprodC dprod1g.
 
 Lemma bigdprodWcp I (r : seq I) P F G :
   \big[dprod/1]_(i <- r | P i) F i = G -> \big[cprod/1]_(i <- r | P i) F i = G.

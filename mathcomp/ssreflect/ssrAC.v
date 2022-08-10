@@ -221,7 +221,10 @@ Notation AC_check_pattern :=
 
 Notation opACof law p s :=
 ((fun T idx op assoc lid rid comm => (change_type (@AC.direct T idx
-   (@Monoid.ComLaw _ _ (@Monoid.Law _ idx op assoc lid rid) comm)
+   (Monoid.ComLaw.Pack  (* FIXME: find a way to make this robust to hierarchy evolutions *)
+      (Monoid.ComLaw.Class
+         (Monoid.IsLaw.Axioms_ idx op assoc lid rid)
+         (Monoid.IsCommutativeLaw.Axioms_ op comm)))
    p%AC s%AC AC_check_pattern) cbvrefl)) _ _ law
 (Monoid.mulmA _) (Monoid.mul1m _) (Monoid.mulm1 _) (Monoid.mulmC _))
 (only parsing).
@@ -238,7 +241,7 @@ Notation "op .[ 'ACl' s ]" := (opACl op s%AC)
   (at level 2, left associativity, only parsing).
 
 Notation AC_strategy :=
-  (ltac: (cbv -[Monoid.com_operator Monoid.operator]; reflexivity))
+  (ltac: (cbv -[Monoid.ComLaw.sort Monoid.Law.sort]; reflexivity))
   (only parsing).
 Notation ACof p s := (change_type
   (@AC.direct _ _ _  p%AC s%AC AC_check_pattern) AC_strategy)

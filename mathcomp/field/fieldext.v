@@ -123,7 +123,8 @@ move=> U V; without loss suffices subC: U V / (U * V <= V * U)%VS.
   by apply/eqP; rewrite eqEsubv !{1}subC.
 by apply/prodvP=> x y Ux Vy; rewrite mulrC memv_mul.
 Qed.
-Canonical prodv_comoid := Monoid.ComLaw prodvC.
+HB.instance Definition _ :=
+  Monoid.IsCommutativeLaw.Build {vspace L} (@prodv _ L) prodvC.
 
 Lemma prodvCA : left_commutative (@prodv F0 L).
 Proof. exact: Monoid.mulmCA. Qed.

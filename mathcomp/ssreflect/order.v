@@ -3764,8 +3764,8 @@ Variant eq0_xor_gt0 x : bool -> bool -> Set :=
 Lemma posxP x : eq0_xor_gt0 x (x == 0) (0 < x).
 Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
 
-Canonical join_monoid := Monoid.Law (@joinA _ _) join0x joinx0.
-Canonical join_comoid := Monoid.ComLaw (@joinC _ _).
+HB.instance Definition _ := Monoid.IsComLaw.Build L 0 join
+  (@joinA _ L) (@joinC _ L) join0x.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
@@ -3807,7 +3807,7 @@ Proof. by move=> /subsetP AB; apply/joinsP => i iA; apply/joins_sup/AB. Qed.
 Lemma joins_setU I (A B : {set I}) (F : I -> L) :
   \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
 Proof.
-rewrite -!big_enum; have /= <- := @big_cat _ _ join_comoid.
+rewrite -!big_enum; have /= <- := @big_cat _ _ [the Monoid.com_law _ of join].
 apply/eq_big_idem; first exact: joinxx.
 by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
@@ -3869,11 +3869,12 @@ Proof. exact: (@lex0 _ [the tbLatticeType _ of L^d]). Qed.
 Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
 Proof. exact: (@join_eq0 _ [the tbLatticeType _ of L^d]). Qed.
 
-Canonical meet_monoid := Monoid.Law (@meetA _ _) meet1x meetx1.
-Canonical meet_comoid := Monoid.ComLaw (@meetC _ _).
+HB.instance Definition _ := Monoid.IsComLaw.Build L 1 meet
+  (@meetA _ L) (@meetC _ L) meet1x.
 
-Canonical meet_muloid := Monoid.MulLaw (@meet0x _ L) (@meetx0 _ _).
-Canonical join_muloid := Monoid.MulLaw join1x joinx1.
+HB.instance Definition _ := Monoid.IsMulLaw.Build L 0 meet
+  (@meet0x _ L) (@meetx0 _ _).
+HB.instance Definition _ := Monoid.IsMulLaw.Build L 1 join join1x joinx1.
 
 Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
@@ -4004,8 +4005,10 @@ Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
 Proof. by move=> ? ?; apply: (@leU2E _ Ld); rewrite meetC. Qed.
 
-Canonical join_addoid := Monoid.AddLaw (@meetUl _ L) (@meetUr _ _).
-Canonical meet_addoid := Monoid.AddLaw (@joinIl _ L) (@joinIr _ _).
+HB.instance Definition _ := Monoid.IsAddLaw.Build L meet join
+  (@meetUl _ L) (@meetUr _ _).
+HB.instance Definition _ := Monoid.IsAddLaw.Build L join meet
+  (@joinIl _ L) (@joinIr _ _).
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.

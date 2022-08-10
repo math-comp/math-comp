@@ -386,7 +386,7 @@ Proof. by rewrite eq_invg_sym invg1. Qed.
 Lemma mulg1 : right_id 1 mulgT.
 Proof. by move=> x; apply: invg_inj; rewrite invMg invg1 mul1g. Qed.
 
-Canonical finGroup_law := Monoid.Law mulgA mul1g mulg1.
+HB.instance Definition _ := Monoid.IsLaw.Build T 1 mulgT mulgA mul1g mulg1.
 
 Lemma expgnE x n : x ^+ n = expgn_rec x n. Proof. by []. Qed.
 
@@ -2242,8 +2242,8 @@ Proof. by move=> G; apply: val_inj; apply: joing1G. Qed.
 Lemma joinG1 : right_id 1%G joinGT.
 Proof. by move=> G; apply: val_inj; apply: joingG1. Qed.
 
-Canonical joinG_law := Monoid.Law joinGA join1G joinG1.
-Canonical joinG_abelaw := Monoid.ComLaw joinGC.
+HB.instance Definition _ := Monoid.IsComLaw.Build {group gT} 1%G joinGT
+  joinGA joinGC join1G.
 
 Lemma bigprodGEgen I r (P : pred I) (F : I -> {set gT}) :
   (\prod_(i <- r | P i) <<F i>>)%G :=: << \bigcup_(i <- r | P i) F i >>.

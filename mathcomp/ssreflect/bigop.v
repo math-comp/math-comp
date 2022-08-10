@@ -325,77 +325,64 @@ Reserved Notation "\bigcap_ ( i 'in' A ) F"
 
 Module Monoid.
 
-Section Definitions.
-Variables (T : Type) (idm : T).
-
-Structure law := Law {
-  operator : T -> T -> T;
-  _ : associative operator;
-  _ : left_id idm operator;
-  _ : right_id idm operator
+HB.mixin Record IsLaw T (idm : T) (op : T -> T -> T) := {
+  opA : associative op;
+  op1m : left_id idm op;
+  opm1 : right_id idm op;
 }.
-Local Coercion operator : law >-> Funclass.
 
-Structure com_law := ComLaw {
-   com_operator : law;
-   _ : commutative com_operator
+#[export]
+HB.structure Definition Law T idm := {op of IsLaw T idm op}.
+Definition law := Law.type.
+
+HB.mixin Record IsCommutativeLaw T (op : T -> T -> T) := {
+  opC : commutative op;
 }.
-Local Coercion com_operator : com_law >-> law.
 
-Structure mul_law := MulLaw {
-  mul_operator : T -> T -> T;
-  _ : left_zero idm mul_operator;
-  _ : right_zero idm mul_operator
+#[export]
+HB.structure Definition ComLaw T idm :=
+  {op of Law T idm op & IsCommutativeLaw T op}.
+Definition com_law := ComLaw.type.
+
+HB.factory Record IsComLaw T (idm : T) (op : T -> T -> T) := {
+  opA : associative op;
+  opC : commutative op;
+  op1m : left_id idm op;
 }.
-Local Coercion mul_operator : mul_law >-> Funclass.
 
-Structure add_law (mul : T -> T -> T) := AddLaw {
-  add_operator : com_law;
-  _ : left_distributive mul add_operator;
-  _ : right_distributive mul add_operator
+HB.builders Context T idm op of IsComLaw T idm op.
+
+Lemma opm1 : right_id idm op. Proof. by move=> x; rewrite opC op1m. Qed.
+
+HB.instance Definition _ := IsLaw.Build T idm op opA op1m opm1.
+HB.instance Definition _ := IsCommutativeLaw.Build T op opC.
+
+HB.end.
+
+HB.mixin Record IsMulLaw T (zero : T) (mul : T -> T -> T) := {
+  mul_zerol : left_zero zero mul;
+  mul_zeror : right_zero zero mul;
 }.
-Local Coercion add_operator : add_law >-> com_law.
 
-Let op_id (op1 op2 : T -> T -> T) := phant_id op1 op2.
+#[export]
+HB.structure Definition MulLaw T zero := {mul of IsMulLaw T zero mul}.
+Definition mul_law := MulLaw.type.
 
-Definition clone_law op :=
-  fun (opL : law) & op_id opL op =>
-  fun opmA op1m opm1 (opL' := @Law op opmA op1m opm1)
-    & phant_id opL' opL => opL'.
+HB.mixin Record IsAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
+  mul_op_Dl : left_distributive mul op;
+  mul_op_Dr : right_distributive mul op;
+}.
 
-Definition clone_com_law op :=
-  fun (opL : law) (opC : com_law) & op_id opL op & op_id opC op =>
-  fun opmC (opC' := @ComLaw opL opmC) & phant_id opC' opC => opC'.
+#[export]
+HB.structure Definition AddLaw T zero mul :=
+  {add of ComLaw T zero add & IsAddLaw T mul add}.
+Definition add_law := AddLaw.type.
 
-Definition clone_mul_law op :=
-  fun (opM : mul_law) & op_id opM op =>
-  fun op0m opm0 (opM' := @MulLaw op op0m opm0) & phant_id opM' opM => opM'.
-
-Definition clone_add_law mop aop :=
-  fun (opC : com_law) (opA : add_law mop) & op_id opC aop & op_id opA aop =>
-  fun mopDm mopmD (opA' := @AddLaw mop opC mopDm mopmD)
-    & phant_id opA' opA => opA'.
-
-End Definitions.
-
-Module Import Exports.
-Coercion operator : law >-> Funclass.
-Coercion com_operator : com_law >-> law.
-Coercion mul_operator : mul_law >-> Funclass.
-Coercion add_operator : add_law >-> com_law.
-Notation "[ 'law' 'of' f ]" := (@clone_law _ _ f _ id _ _ _ id)
-  (at level 0, format"[ 'law'  'of'  f ]") : form_scope.
-Notation "[ 'com_law' 'of' f ]" := (@clone_com_law _ _ f _ _ id id _ id)
-  (at level 0, format "[ 'com_law'  'of'  f ]") : form_scope.
-Notation "[ 'mul_law' 'of' f ]" := (@clone_mul_law _ _ f _ id _ _ id)
-  (at level 0, format"[ 'mul_law'  'of'  f ]") : form_scope.
-Notation "[ 'add_law' m 'of' a ]" := (@clone_add_law _ _ m a _ _ id id _ _ id)
-  (at level 0, format "[ 'add_law'  m  'of'  a ]") : form_scope.
-End Exports.
+Module Import Exports. HB.reexport. End Exports.
 
 Section CommutativeAxioms.
 
-Variable (T : Type) (zero one : T) (mul add : T -> T -> T) (inv : T -> T).
+Variable (T : Type) (zero one : T) (mul add : T -> T -> T).
 Hypothesis mulC : commutative mul.
 
 Lemma mulC_id : left_id one mul -> right_id one mul.
@@ -416,28 +403,28 @@ Variables (T : Type) (idm : T).
 
 Section Plain.
 Variable mul : law idm.
-Lemma mul1m : left_id idm mul. Proof. by case mul. Qed.
-Lemma mulm1 : right_id idm mul. Proof. by case mul. Qed.
-Lemma mulmA : associative mul. Proof. by case mul. Qed.
+Lemma mul1m : left_id idm mul. Proof. exact: op1m. Qed.
+Lemma mulm1 : right_id idm mul. Proof. exact: opm1. Qed.
+Lemma mulmA : associative mul. Proof. exact: opA. Qed.
 Lemma iteropE n x : iterop n mul x idm = iter n (mul x) idm.
 Proof. by case: n => // n; rewrite iterSr mulm1 iteropS. Qed.
 End Plain.
 
 Section Commutative.
 Variable mul : com_law idm.
-Lemma mulmC : commutative mul. Proof. by case mul. Qed.
+Lemma mulmC : commutative mul. Proof. exact: opC. Qed.
 Lemma mulmCA : left_commutative mul.
-Proof. by move=> x y z; rewrite !mulmA (mulmC x). Qed.
+Proof. by move=> x y z; rewrite !mulmA [_ x _]mulmC. Qed.
 Lemma mulmAC : right_commutative mul.
-Proof. by move=> x y z; rewrite -!mulmA (mulmC y). Qed.
+Proof. by move=> x y z; rewrite -!mulmA [_ y _]mulmC. Qed.
 Lemma mulmACA : interchange mul mul.
-Proof. by move=> x y z t; rewrite -!mulmA (mulmCA y). Qed.
+Proof. by move=> x y z t; rewrite -!mulmA [_ y _]mulmCA. Qed.
 End Commutative.
 
 Section Mul.
 Variable mul : mul_law idm.
-Lemma mul0m : left_zero idm mul. Proof. by case mul. Qed.
-Lemma mulm0 : right_zero idm mul. Proof. by case mul. Qed.
+Lemma mul0m : left_zero idm mul. Proof. exact: mul_zerol. Qed.
+Lemma mulm0 : right_zero idm mul. Proof. exact: mul_zeror. Qed.
 End Mul.
 
 Section Add.
@@ -448,8 +435,8 @@ Lemma addmCA : left_commutative add. Proof. exact: mulmCA. Qed.
 Lemma addmAC : right_commutative add. Proof. exact: mulmAC. Qed.
 Lemma add0m : left_id idm add. Proof. exact: mul1m. Qed.
 Lemma addm0 : right_id idm add. Proof. exact: mulm1. Qed.
-Lemma mulmDl : left_distributive mul add. Proof. by case add. Qed.
-Lemma mulmDr : right_distributive mul add. Proof. by case add. Qed.
+Lemma mulmDl : left_distributive mul add. Proof. exact: mul_op_Dl. Qed.
+Lemma mulmDr : right_distributive mul add. Proof. exact: mul_op_Dr. Qed.
 End Add.
 
 Definition simpm := (mulm1, mulm0, mul1m, mul0m, mulmA).
@@ -466,39 +453,32 @@ Section PervasiveMonoids.
 
 Import Monoid.
 
-Canonical andb_monoid := Law andbA andTb andbT.
-Canonical andb_comoid := ComLaw andbC.
+HB.instance Definition _ := IsComLaw.Build bool true andb andbA andbC andTb.
 
-Canonical andb_muloid := MulLaw andFb andbF.
-Canonical orb_monoid := Law orbA orFb orbF.
-Canonical orb_comoid := ComLaw orbC.
-Canonical orb_muloid := MulLaw orTb orbT.
-Canonical addb_monoid := Law addbA addFb addbF.
-Canonical addb_comoid := ComLaw addbC.
-Canonical orb_addoid := AddLaw andb_orl andb_orr.
-Canonical andb_addoid := AddLaw orb_andl orb_andr.
-Canonical addb_addoid := AddLaw andb_addl andb_addr.
+HB.instance Definition _ := IsMulLaw.Build bool false andb andFb andbF.
+HB.instance Definition _ := IsComLaw.Build bool false orb orbA orbC orFb.
+HB.instance Definition _ := IsMulLaw.Build bool true orb orTb orbT.
+HB.instance Definition _ := IsComLaw.Build bool false addb addbA addbC addFb.
+HB.instance Definition _ := IsAddLaw.Build bool andb orb andb_orl andb_orr.
+HB.instance Definition _ := IsAddLaw.Build bool orb andb orb_andl orb_andr.
+HB.instance Definition _ := IsAddLaw.Build bool andb addb andb_addl andb_addr.
 
-Canonical addn_monoid := Law addnA add0n addn0.
-Canonical addn_comoid := ComLaw addnC.
-Canonical muln_monoid := Law mulnA mul1n muln1.
-Canonical muln_comoid := ComLaw mulnC.
-Canonical muln_muloid := MulLaw mul0n muln0.
-Canonical addn_addoid := AddLaw mulnDl mulnDr.
+HB.instance Definition _ := IsComLaw.Build nat 0 addn addnA addnC add0n.
+HB.instance Definition _ := IsComLaw.Build nat 1 muln mulnA mulnC mul1n.
+HB.instance Definition _ := IsMulLaw.Build nat 0 muln mul0n muln0.
+HB.instance Definition _ := IsAddLaw.Build nat muln addn mulnDl mulnDr.
 
-Canonical maxn_monoid := Law maxnA max0n maxn0.
-Canonical maxn_comoid := ComLaw maxnC.
-Canonical maxn_addoid := AddLaw maxnMl maxnMr.
+HB.instance Definition _ := IsComLaw.Build nat 0 maxn maxnA maxnC max0n.
+HB.instance Definition _ := IsAddLaw.Build nat muln maxn maxnMl maxnMr.
 
-Canonical gcdn_monoid := Law gcdnA gcd0n gcdn0.
-Canonical gcdn_comoid := ComLaw gcdnC.
-Canonical gcdnDoid := AddLaw muln_gcdl muln_gcdr.
+HB.instance Definition _ := IsComLaw.Build nat 0 gcdn gcdnA gcdnC gcd0n.
+HB.instance Definition _ := IsAddLaw.Build nat muln gcdn muln_gcdl muln_gcdr.
 
-Canonical lcmn_monoid := Law lcmnA lcm1n lcmn1.
-Canonical lcmn_comoid := ComLaw lcmnC.
-Canonical lcmn_addoid := AddLaw muln_lcml muln_lcmr.
+HB.instance Definition _ := IsComLaw.Build nat 1 lcmn lcmnA lcmnC lcm1n.
+HB.instance Definition _ := IsAddLaw.Build nat muln lcmn muln_lcml muln_lcmr.
 
-Canonical cat_monoid T := Law (@catA T) (@cat0s T) (@cats0 T).
+HB.instance Definition _ T := IsLaw.Build (seq T) nil cat
+  (@catA T) (@cat0s T) (@cats0 T).
 
 End PervasiveMonoids.
 
@@ -802,8 +782,8 @@ Lemma oop1x_subdef : right_id None oop. Proof. by []. Qed.
 Lemma oopC_subdef : commutative oop.
 Proof. by move=> [x|] [y|]//; rewrite /oAC/= opC. Qed.
 
-Canonical oAC_law := Monoid.Law oopA_subdef oopx1_subdef oop1x_subdef.
-Canonical oAC_com_law := Monoid.ComLaw oopC_subdef.
+HB.instance Definition _ := Monoid.IsComLaw.Build (option T) None oop
+  oopA_subdef oopC_subdef oopx1_subdef.
 
 Context [x : T].
 
@@ -1922,7 +1902,7 @@ Lemma big_undup_iterop_count (I : eqType) (r : seq I) (P : pred I) F :
     = \big[*%M/1]_(i <- r | P i) F i.
 Proof.
 rewrite -[RHS](perm_big _ F (perm_count_undup _)) big_flatten big_map.
-by rewrite big_mkcond; apply: eq_bigr => i _; rewrite big_nseq_cond iteropE.
+by rewrite [LHS]big_mkcond; apply: eq_bigr=> i _; rewrite big_nseq_cond iteropE.
 Qed.
 
 Lemma big_split I r (P : pred I) F1 F2 :

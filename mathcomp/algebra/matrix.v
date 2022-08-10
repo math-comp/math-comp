@@ -1570,15 +1570,16 @@ Lemma map2_mx1 {opm : Monoid.law idm} :
   right_id (const_mx idm) (@map2_mx _ _ _ opm m n).
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm1. Qed.
 
-Canonical map2_mx_monoid {opm : Monoid.law idm} :=
-  Monoid.Law (map2_mxA (opm:=opm)) map2_1mx map2_mx1.
+HB.instance Definition _ {opm : Monoid.law idm} :=
+  Monoid.IsLaw.Build 'M_(m, n) (const_mx idm) (@map2_mx _ _ _ opm _ _)
+    map2_mxA map2_1mx map2_mx1.
 
 Lemma map2_mxC {opm : Monoid.com_law idm} :
   commutative (@map2_mx _ _ _ opm m n).
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE Monoid.mulmC. Qed.
 
-Canonical map2_mx_comoid {opm : Monoid.com_law idm} :=
-  Monoid.ComLaw (map2_mxC (opm:=opm)).
+HB.instance Definition _ {opm : Monoid.com_law idm} :=
+  Monoid.IsCommutativeLaw.Build 'M_(m, n) (@map2_mx _ _ _ opm _ _) map2_mxC.
 
 Lemma map2_0mx {opm : Monoid.mul_law idm} :
   left_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
@@ -1588,8 +1589,9 @@ Lemma map2_mx0 {opm : Monoid.mul_law idm} :
   right_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm0. Qed.
 
-Canonical map2_mx_muloid {opm : Monoid.mul_law idm} :=
-  Monoid.MulLaw (map2_0mx (opm:=opm)) map2_mx0.
+HB.instance Definition _ {opm : Monoid.mul_law idm} :=
+  Monoid.IsMulLaw.Build 'M_(m, n) (const_mx idm) (@map2_mx _ _ _ opm _ _)
+    map2_0mx map2_mx0.
 
 Lemma map2_mxDl {mul : T -> T -> T} {add : Monoid.add_law idm mul} :
   left_distributive (@map2_mx _ _ _ mul m n) (@map2_mx _ _ _ add m n).
@@ -1599,8 +1601,10 @@ Lemma map2_mxDr {mul : T -> T -> T} {add : Monoid.add_law idm mul} :
   right_distributive (@map2_mx _ _ _ mul m n) (@map2_mx _ _ _ add m n).
 Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmDr. Qed.
 
-Canonical map2_mx_addoid {mul : T -> T -> T} {add : Monoid.add_law idm mul} :=
-  Monoid.AddLaw (map2_mxDl (add:=add)) map2_mxDr.
+HB.instance Definition _ {mul : T -> T -> T} {add : Monoid.add_law idm mul} :=
+  Monoid.IsAddLaw.Build 'M_(m, n)
+    (@map2_mx _ _ _ mul _ _) (@map2_mx _ _ _ add _ _)
+    map2_mxDl map2_mxDr.
 
 End MatrixLaws.
 

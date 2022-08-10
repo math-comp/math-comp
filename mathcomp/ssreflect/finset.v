@@ -1012,17 +1012,23 @@ Import Monoid.
 
 Variable T : finType.
 
-Canonical setI_monoid := Law (@setIA T) (@setTI T) (@setIT T).
+HB.instance Definition _ := IsComLaw.Build {set T} [set: T] (@setI T)
+  (@setIA T) (@setIC T) (@setTI T).
 
-Canonical setI_comoid := ComLaw (@setIC T).
-Canonical setI_muloid := MulLaw (@set0I T) (@setI0 T).
+HB.instance Definition _ := IsMulLaw.Build {set T} set0 (@setI T)
+  (@set0I T) (@setI0 T).
 
-Canonical setU_monoid := Law (@setUA T) (@set0U T) (@setU0 T).
-Canonical setU_comoid := ComLaw (@setUC T).
-Canonical setU_muloid := MulLaw (@setTU T) (@setUT T).
+HB.instance Definition _ := IsComLaw.Build {set T} set0 (@setU T)
+  (@setUA T) (@setUC T) (@set0U T).
 
-Canonical setI_addoid := AddLaw (@setUIl T) (@setUIr T).
-Canonical setU_addoid := AddLaw (@setIUl T) (@setIUr T).
+HB.instance Definition _ := IsMulLaw.Build {set T} [set: T] (@setU T)
+  (@setTU T) (@setUT T).
+
+HB.instance Definition _ := IsAddLaw.Build {set T} (@setU T) (@setI T)
+  (@setUIl T) (@setUIr T).
+
+HB.instance Definition _ := IsAddLaw.Build {set T} (@setI T) (@setU T)
+  (@setIUl T) (@setIUr T).
 
 End setOpsAlgebra.
 
