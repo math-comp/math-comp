@@ -4362,13 +4362,12 @@ Arguments rregP {R x}.
 
 Definition field_axiom (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 
-(* FIXME: bad naming, should be UnitRing_isField *)
-HB.mixin Record isField R of UnitRing R := {
+HB.mixin Record UnitRing_isField R of UnitRing R := {
   fieldP : field_axiom [the unitRingType of R];
 }.
 
 #[mathcomp(axiom="field_axiom"), short(type="fieldType")]
-HB.structure Definition Field := { R of IntegralDomain R & isField R }.
+HB.structure Definition Field := { R of IntegralDomain R & UnitRing_isField R }.
 
 Module FieldExports.
 Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T cT)
@@ -4379,7 +4378,7 @@ End FieldExports.
 HB.export FieldExports.
 
 #[export] HB.instance Definition regular_field (F : fieldType) :=
-  isField.Build F^o fieldP.
+  UnitRing_isField.Build F^o fieldP.
 
 Lemma IdomainMixin (R : unitRingType): Field.axiom R -> IntegralDomain.axiom R.
 Proof.
@@ -4393,7 +4392,7 @@ HB.factory Record ComUnitRing_isField R of ComUnitRing R := {
 HB.builders Context R of ComUnitRing_isField R.
 HB.instance Definition _ :=
   ComUnitRing_isIntegral.Build R (IdomainMixin fieldP).
-HB.instance Definition _ := isField.Build R fieldP.
+HB.instance Definition _ := UnitRing_isField.Build R fieldP.
 HB.end.
 
 HB.factory Record ComRing_isField R of ComRing R := {
@@ -5172,7 +5171,7 @@ Notation "[ 'idomainMixin' 'of' R 'by' <: ]" :=
      (idomainMixin (Phant R) val_inj (erefl _) (rrefl _)))
   (at level 0, format "[ 'idomainMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'fieldMixin' 'of' F 'by' <: ]" :=
-  (isField.Build F%type (fieldMixin (Phant F) val_inj (erefl _) (frefl _)))
+  (UnitRing_isField.Build F%type (fieldMixin (Phant F) val_inj (erefl _) (frefl _)))
   (at level 0, format "[ 'fieldMixin'  'of'  F  'by'  <: ]") : form_scope.
 
 End SubExports.

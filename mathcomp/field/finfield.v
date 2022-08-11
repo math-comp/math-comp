@@ -684,7 +684,7 @@ Definition FinDomainFieldType : finFieldType :=
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIntegralDomainType := HB.pack cR iC in
- let fC := GRing.isField.Build iR finDomain_field in
+ let fC := GRing.UnitRing_isField.Build iR finDomain_field in
  HB.pack iR fC.
 
 Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=

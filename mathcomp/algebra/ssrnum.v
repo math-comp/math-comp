@@ -354,7 +354,7 @@ End ExtensionAxioms.
 (* #[short(type="numFieldType")] *)
 (* HB.structure Definition NumField := { R of GRing.isField R & NumDomain R }. *)
 #[short(type="numFieldType")]
-HB.structure Definition NumField := { R of GRing.isField R &
+HB.structure Definition NumField := { R of GRing.UnitRing_isField R &
      GRing.IntegralDomain R &
      POrderedZmodule R &
      NormedZmodule (POrderedZmodule.clone R _) R &

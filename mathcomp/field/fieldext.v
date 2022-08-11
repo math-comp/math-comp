@@ -220,7 +220,7 @@ Lemma subvs_fieldMixin K : GRing.field_axiom [the idomainType of subvs_of K].
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.
 Qed.
-HB.instance Definition _ K := GRing.isField.Build (subvs_of K)
+HB.instance Definition _ K := GRing.UnitRing_isField.Build (subvs_of K)
   (@subvs_fieldMixin K).
 
 Lemma polyOver_subvs {K} {p : {poly L}} :
