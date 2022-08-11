@@ -541,7 +541,7 @@ by case: b1 b2 => [[]?|[]][[]?|[]] //=;
 Qed.
 
 HB.instance Definition _ :=
-  Order.POrder_IsLattice.Build (itv_bound_display disp) (itv_bound T)
+  Order.POrder_isLattice.Build (itv_bound_display disp) (itv_bound T)
     bound_meetC bound_joinC bound_meetA bound_joinA
     bound_joinKI bound_meetKU bound_leEmeet.
 
@@ -549,9 +549,9 @@ Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
 
 Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
 
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   Order.HasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   Order.HasTop.Build (itv_bound_display disp) (itv_bound T) bound_lex1.
 
 Definition itv_meet i1 i2 : interval T :=
@@ -584,7 +584,7 @@ Lemma itv_leEmeet i1 i2 : (i1 <= i2) = (itv_meet i1 i2 == i1).
 Proof. by case: i1 i2 => [? ?][? ?]; rewrite /eq_op /= eq_meetl eq_joinl. Qed.
 
 HB.instance Definition _ :=
-  Order.POrder_IsLattice.Build (interval_display disp) (interval T)
+  Order.POrder_isLattice.Build (interval_display disp) (interval T)
     itv_meetC itv_joinC itv_meetA itv_joinA
     itv_joinKI itv_meetKU itv_leEmeet.
 
@@ -592,9 +592,9 @@ Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
 
 Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
 
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   Order.HasBottom.Build (interval_display disp) (interval T) itv_le0x.
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   Order.HasTop.Build (interval_display disp) (interval T) itv_lex1.
 
 Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
@@ -611,7 +611,7 @@ Lemma itv_bound_total : total (<=%O : rel (itv_bound T)).
 Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
 
 HB.instance Definition _ :=
-  Order.Lattice_IsTotal.Build
+  Order.Lattice_isTotal.Build
     (itv_bound_display disp) (itv_bound T) itv_bound_total.
 
 Lemma itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
@@ -619,8 +619,8 @@ Proof.
 by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
 Qed.
 
-HB.instance Definition _ := 
-  Order.Lattice_MeetIsDistributive.Build 
+HB.instance Definition _ :=
+  Order.Lattice_MeetIsDistributive.Build
     (interval_display disp) (interval T) itv_meetUl.
 
 Lemma itv_splitU c a b : a <= c <= b ->

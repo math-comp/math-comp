@@ -5072,8 +5072,8 @@ Notation FA := (gen_of irrG cGA).
 Let inFA := Gen irrG cGA.
 
 (* FIXME: embed the hnf in HB.instance *)
-Definition rVval_IsSUB := Eval hnf in [IsNew for rVval : FA -> 'rV_d].
-#[export] HB.instance Definition _ := rVval_IsSUB.
+Definition rVval_isSUB := Eval hnf in [IsNew for rVval : FA -> 'rV_d].
+#[export] HB.instance Definition _ := rVval_isSUB.
 #[export] HB.instance Definition _ := [Choice of FA by <:].
 
 Definition gen0 := inFA 0.
@@ -5165,7 +5165,7 @@ Qed.
 Lemma gen_ntriv : gen1 != 0.
 Proof. by rewrite -(inj_eq mxval_inj) mxval_gen1 mxval0 oner_eq0. Qed.
 
-#[export] HB.instance Definition _ := GRing.Zmodule_IsComRing.Build FA
+#[export] HB.instance Definition _ := GRing.Zmodule_isComRing.Build FA
     gen_mulA gen_mulC gen_mul1r gen_mulDr gen_ntriv.
 
 Lemma mxval1 : mxval 1 = 1%:M. Proof. exact: mxval_gen1. Qed.
@@ -5198,7 +5198,7 @@ Qed.
 Lemma gen_invr0 : genV 0 = 0.
 Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 
-#[export] HB.instance Definition _ := GRing.ComRing_IsField.Build FA
+#[export] HB.instance Definition _ := GRing.ComRing_isField.Build FA
   gen_mulVr gen_invr0.
 
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.
@@ -5662,7 +5662,7 @@ apply: (@eq_from_nth _ 0) => [|k _]; first by rewrite !(size_set_nth, size_map).
 by rewrite !(nth_map_rVval, nth_set_nth) /= nth_map_rVval [rVval _]fun_if.
 Qed.
 
-Lemma eval_gen_term e t : 
+Lemma eval_gen_term e t :
   GRing.rterm t -> eval_mx (gen_env e) (gen_term t) = val (GRing.eval e t).
 Proof.
 elim: t => //=.
@@ -5731,7 +5731,7 @@ move=> e f; have [tor rto] := GRing.to_rformP e f.
 exact: (iffP (sat_gen_form e (GRing.to_rform_rformula f))).
 Qed.
 
-#[export] HB.instance Definition _ := GRing.Field_IsDec.Build FA gen_satP.
+#[export] HB.instance Definition _ := GRing.Field_isDec.Build FA gen_satP.
 
 End DecideGenField.
 

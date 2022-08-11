@@ -215,7 +215,7 @@ HB.builders Context R of IsRing R.
   Qed.
 
   HB.instance Definition _ :=
-    GRing.Ring_HasMulInverse.Build R mulVr mulrV intro_unit invr_out.
+    GRing.Ring_hasMulInverse.Build R mulVr mulrV intro_unit invr_out.
 HB.end.
 
 #[export, non_forgetful_inheritance]
@@ -340,7 +340,7 @@ HB.builders Context F of IsField F.
     by move=> i f IH e; apply: (iffP forallP) => f_ x; apply/IH.
   Qed.
 
-  HB.instance Definition _ := GRing.Field_IsDec.Build F decidable.
+  HB.instance Definition _ := GRing.Field_isDec.Build F decidable.
 HB.end.
 
 #[export, non_forgetful_inheritance]

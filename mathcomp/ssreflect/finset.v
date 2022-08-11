@@ -123,8 +123,8 @@ Definition finfun_of_set A := let: FinSet f := A in f.
 Definition set_of of phant T := set_type.
 Identity Coercion type_of_set_of : set_of >-> set_type.
 
-Definition set_IsSUB := Eval hnf in [IsNew for finfun_of_set].
-HB.instance Definition _ := set_IsSUB.
+Definition set_isSUB := Eval hnf in [IsNew for finfun_of_set].
+HB.instance Definition _ := set_isSUB.
 HB.instance Definition _ := [Finite of set_type by <:].
 
 End SetType.

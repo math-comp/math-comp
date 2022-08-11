@@ -324,7 +324,7 @@ Qed.
 
 Lemma nonzero1z : 1%Z != 0. Proof. by []. Qed.
 
-Definition comMixin := GRing.Zmodule_IsComRing.Build int
+Definition comMixin := GRing.Zmodule_isComRing.Build int
   mulzA mulzC mul1z mulz_addl nonzero1z.
 
 End intRing.
@@ -375,14 +375,14 @@ by case: m n => m [] n //= /eqP;
   rewrite ?(NegzE, mulrN, mulNr) ?oppr_eq0 -PoszM [_ == _]muln_eq0.
 Qed.
 
-Definition comMixin := GRing.ComRing_HasMulInverse.Build int
+Definition comMixin := GRing.ComRing_hasMulInverse.Build int
   mulVz unitzPl invz_out.
 
 End intUnitRing.
 End intUnitRing.
 
 HB.instance Definition _ := intUnitRing.comMixin.
-HB.instance Definition _ := GRing.ComUnitRing_IsIntegral.Build int
+HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build int
   intUnitRing.idomain_axiomz.
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
@@ -447,7 +447,7 @@ Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
 
-Definition Mixin := Num.IntegralDomain_IsLeReal.Build int
+Definition Mixin := Num.IntegralDomain_isLeReal.Build int
   lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
 
 End intOrdered.
@@ -604,7 +604,7 @@ rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
 Qed.
 
 HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
-HB.instance Definition _ := @GRing.Zmodule_IsLmodule.Build _ M^z
+HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
   (fun n x => x *~ n) mulrzA_C mulr1z mulrzDr mulrzDl.
 
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.

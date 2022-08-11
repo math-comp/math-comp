@@ -193,7 +193,7 @@ exists (enum ffT); first by rewrite big_enum finField_genPoly eqpxx.
 by apply/vspaceP=> x; rewrite memvf seqv_sub_adjoin ?mem_enum.
 Qed.
 
-HB.instance Definition _ := FieldExt_IsSplittingField.Build F ffT
+HB.instance Definition _ := FieldExt_isSplittingField.Build F ffT
   ffT_splitting_subproof.
 
 End FinFieldExt.
@@ -241,19 +241,19 @@ Proof. by move=> a x y /=; rewrite /primeChar_scale mulrDr. Qed.
 Lemma primeChar_scaleDl x : {morph primeChar_scale^~ x: a b / a + b}.
 Proof. by move=> a b; rewrite /primeChar_scale natrFp natrD mulrDl. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build [ringType of 'F_p] R
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build [ringType of 'F_p] R
     primeChar_scaleA primeChar_scale1 primeChar_scaleDr primeChar_scaleDl.
 
 Lemma primeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
 Proof. by apply: mulrA. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build [ringType of 'F_p] R
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build [ringType of 'F_p] R
   primeChar_scaleAl.
 
 Lemma primeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
 Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build [ringType of 'F_p] R
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build [ringType of 'F_p] R
   primeChar_scaleAr.
 
 End PrimeCharRing.
@@ -305,7 +305,7 @@ move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.
 Qed.
 
-HB.instance Definition _ := Lmodule_HasFinDim.Build [ringType of 'F_p] R
+HB.instance Definition _ := Lmodule_hasFinDim.Build [ringType of 'F_p] R
   primeChar_vectAxiom.
 
 Lemma primeChar_dimf : \dim {: [vectType [ringType of 'F_p] of R]} = n.
@@ -680,9 +680,9 @@ by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.Ring_HasCommutativeMul.Build R finDomain_mulrC in
+ let cC := GRing.Ring_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
- let iC := GRing.ComUnitRing_IsIntegral.Build cR domR in
+ let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIntegralDomainType := HB.pack cR iC in
  let fC := GRing.IsField.Build iR finDomain_field in
  HB.pack iR fC.

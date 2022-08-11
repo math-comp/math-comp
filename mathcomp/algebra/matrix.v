@@ -1810,7 +1810,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R 'M[R]_(m, n)
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R 'M[R]_(m, n)
   scalemxA scale1mx scalemxDr scalemxDl.
 
 Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
@@ -2590,9 +2590,9 @@ Local Notation n := n'.+1.
 Lemma matrix_nonzero1 : 1%:M != 0 :> 'M_n.
 Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsRing.Build 'M[R]_n (@mulmxA n n n n)
+HB.instance Definition _ := GRing.Zmodule_isRing.Build 'M[R]_n (@mulmxA n n n n)
   (@mul1mx n n) (@mulmx1 n n) (@mulmxDl n n n) (@mulmxDr n n n) matrix_nonzero1.
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build R 'M[R]_n
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R 'M[R]_n
   (@scalemxAl n n n).
 
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
@@ -2965,7 +2965,7 @@ Section MatrixAlgType.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build R 'M[R]_n
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build R 'M[R]_n
   (fun k => scalemxAr k).
 
 End MatrixAlgType.
@@ -3354,7 +3354,7 @@ End Defs.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-HB.instance Definition _ := GRing.Ring_HasMulInverse.Build 'M[R]_n
+HB.instance Definition _ := GRing.Ring_hasMulInverse.Build 'M[R]_n
   (@mulVmx n) (@mulmxV n) (@intro_unitmx n) (@invmx_out n).
 
 (* Lemmas requiring that the coefficients are in a unit ring *)

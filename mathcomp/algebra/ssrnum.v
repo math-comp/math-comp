@@ -143,7 +143,7 @@ Module Num.
 HB.structure Definition POrderedZmodule :=
   { R of Order.IsPOrdered ring_display R & GRing.Zmodule R }.
 
-HB.mixin Record Zmodule_IsNormed (R : POrderedZmodule.type) M
+HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
          of GRing.Zmodule M := {
   norm : M -> R;
   ler_norm_add : forall x y, norm (x + y) <= norm x + norm y;
@@ -154,7 +154,7 @@ HB.mixin Record Zmodule_IsNormed (R : POrderedZmodule.type) M
 
 #[short(type="normedZmodType"), infer(R)]
 HB.structure Definition NormedZmodule (R : porderZmodType) :=
-  { M of Zmodule_IsNormed R M & GRing.Zmodule M }.
+  { M of Zmodule_isNormed R M & GRing.Zmodule M }.
 Arguments norm {R M} x : rename.
 
 Module NormedZmoduleExports.
@@ -368,7 +368,7 @@ Notation "[ 'numFieldType' 'of' T ]" := (NumField.clone T _)
 End NumFieldExports.
 HB.export NumFieldExports.
 
-HB.mixin Record NumField_IsImaginary R of NumField R := {
+HB.mixin Record NumField_isImaginary R of NumField R := {
   imaginary : R;
   conj_op : {rmorphism R -> R};
   sqrCi : imaginary ^+ 2 = - 1;
@@ -377,7 +377,7 @@ HB.mixin Record NumField_IsImaginary R of NumField R := {
 
 #[short(type="numClosedFieldType")]
 HB.structure Definition ClosedField :=
-  { R of NumField_IsImaginary R & GRing.ClosedField R & NumField R }.
+  { R of NumField_isImaginary R & GRing.ClosedField R & NumField R }.
 
 Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
@@ -411,13 +411,13 @@ Notation "[ 'realFieldType' 'of' T ]" := (RealField.clone T _)
 End RealFieldExports.
 HB.export RealFieldExports.
 
-HB.mixin Record RealField_IsArchimedean R of RealField R := {
+HB.mixin Record RealField_isArchimedean R of RealField R := {
   archi_bound_subproof : archimedean_axiom [the NumDomain.type of R]
 }.
 
 #[short(type="archiFieldType")]
 HB.structure Definition ArchimedeanField :=
-  { R of RealField_IsArchimedean R & RealField R }.
+  { R of RealField_isArchimedean R & RealField R }.
 
 Module ArchimedeanFieldExports.
 Bind Scope ring_scope with ArchimedeanField.sort.
@@ -428,13 +428,13 @@ Notation "[ 'archiFieldType' 'of' T ]" := (ArchimedeanField.clone T _)
 End ArchimedeanFieldExports.
 HB.export ArchimedeanFieldExports.
 
-HB.mixin Record RealField_IsClosed R of RealField R := {
+HB.mixin Record RealField_isClosed R of RealField R := {
   poly_ivt_subproof : real_closed_axiom [the NumDomain.type of R]
 }.
 
 #[short(type="rcfType")]
 HB.structure Definition RealClosedField :=
-  { R of RealField_IsClosed R & RealField R }.
+  { R of RealField_isClosed R & RealField R }.
 
 Module RealClosedFieldExports.
 Bind Scope ring_scope with RealClosedField.sort.
@@ -4430,7 +4430,7 @@ End Theory.
 (* FACTORIES *)
 (*************)
 
-HB.factory Record IntegralDomain_IsNumRing R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
   Rle : rel R;
   Rlt : rel R;
   norm : R -> R;
@@ -4443,7 +4443,7 @@ HB.factory Record IntegralDomain_IsNumRing R of GRing.IntegralDomain R := {
   lt_def    : forall x y, (Rlt x y) = (y != x) && (Rle x y)
 }.
 
-HB.builders Context R of IntegralDomain_IsNumRing R.
+HB.builders Context R of IntegralDomain_isNumRing R.
   Local Notation "x <= y" := (Rle x y) : ring_scope.
   Local Notation "x < y" := (Rlt x y) : ring_scope.
   Local Notation "`| x |" := (norm x) : ring_scope.
@@ -4517,18 +4517,18 @@ HB.builders Context R of IntegralDomain_IsNumRing R.
     Order.IsLtLePOrdered.Build ring_display R le_def' ltrr lt_trans.
 
   HB.instance Definition _ :=
-    Zmodule_IsNormed.Build _ R normD norm_eq0 normrMn normrN.
+    Zmodule_isNormed.Build _ R normD norm_eq0 normrMn normrN.
 
   HB.instance Definition _ :=
     IsNumRing.Build R addr_gt0 ger_total normM le_def.
 HB.end.
 
-HB.factory Record NumDomain_IsReal R of NumDomain R := {
+HB.factory Record NumDomain_isReal R of NumDomain R := {
   real : real_axiom [the NumDomain.type of R]
 }.
 
-HB.builders Context R of NumDomain_IsReal R.
-  Lemma le_total : Order.POrder_IsTotal ring_display R.
+HB.builders Context R of NumDomain_isReal R.
+  Lemma le_total : Order.POrder_isTotal ring_display R.
   Proof.
   constructor=> x y; move: (real (x - y)).
   by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
@@ -4537,7 +4537,7 @@ HB.builders Context R of NumDomain_IsReal R.
   HB.instance Definition _ := le_total.
 HB.end.
 
-HB.factory Record IntegralDomain_IsLeReal R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_isLeReal R of GRing.IntegralDomain R := {
   Rle : rel R;
   Rlt : rel R;
   norm : R -> R;
@@ -4551,7 +4551,7 @@ HB.factory Record IntegralDomain_IsLeReal R of GRing.IntegralDomain R := {
   lt_def    : forall x y, Rlt x y = (y != x) && Rle x y;
 }.
 
-HB.builders Context R of IntegralDomain_IsLeReal R.
+HB.builders Context R of IntegralDomain_isLeReal R.
   Local Notation le := Rle.
   Local Notation lt := Rlt.
 
@@ -4607,14 +4607,14 @@ HB.builders Context R of IntegralDomain_IsLeReal R.
   Fact le_total : total le.
   Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
-  HB.instance Definition _ := IntegralDomain_IsNumRing.Build R
+  HB.instance Definition _ := IntegralDomain_isNumRing.Build R
     le_normD lt0_add eq0_norm (in2W le_total) normM le_def lt_def.
 
-  HB.instance Definition _ := Order.POrder_IsTotal.Build ring_display R
+  HB.instance Definition _ := Order.POrder_isTotal.Build ring_display R
     le_total.
 HB.end.
 
-HB.factory Record IntegralDomain_IsLtReal R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_isLtReal R of GRing.IntegralDomain R := {
   Rlt : rel R;
   Rle : rel R;
   norm : R -> R;
@@ -4628,7 +4628,7 @@ HB.factory Record IntegralDomain_IsLtReal R of GRing.IntegralDomain R := {
   le_def    : forall x y, Rle x y = (x == y) || Rlt x y;
 }.
 
-HB.builders Context R of IntegralDomain_IsLtReal R.
+HB.builders Context R of IntegralDomain_isLtReal R.
   Local Notation le := Rle.
   Local Notation lt := Rlt.
 
@@ -4705,10 +4705,10 @@ HB.builders Context R of IntegralDomain_IsLtReal R.
   by move/lt0_total; rewrite -(sub_gt0 (x - y)) sub0r opprB !sub_gt0 orbC.
   Qed.
 
-  HB.instance Definition _ := IntegralDomain_IsNumRing.Build R
+  HB.instance Definition _ := IntegralDomain_isNumRing.Build R
     le_normD lt0_add eq0_norm (in2W le_total) normM le_def' lt_def.
 
-  HB.instance Definition _ := Order.POrder_IsTotal.Build ring_display R
+  HB.instance Definition _ := Order.POrder_isTotal.Build ring_display R
     le_total.
 HB.end.
 

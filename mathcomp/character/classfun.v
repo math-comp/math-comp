@@ -271,7 +271,7 @@ by apply/eqP=> /cfunP/(_ 1%g)/eqP; rewrite cfun1Egen cfunE group1 oner_eq0.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.Zmodule_IsComRing.Build
+  GRing.Zmodule_isComRing.Build
     classfun cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
 
 Definition cfun_ringType := [ringType of classfun].
@@ -293,7 +293,7 @@ Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
 Proof. by rewrite /cfun_inv => phi /negbTE/= ->. Qed.
 
 HB.instance Definition _ :=
-   GRing.ComRing_HasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
+   GRing.ComRing_hasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
 
 Fact cfun_scaleA a b phi :
   cfun_scale a (cfun_scale b phi) = cfun_scale (a * b) phi.
@@ -305,25 +305,21 @@ Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunE mulrDr. Qed.
 Fact cfun_scaleDl phi : {morph cfun_scale^~ phi : a b / a + b}.
 Proof. by move=> a b; apply/cfunP=> x; rewrite !cfunE mulrDl. Qed.
 
-
-HB.instance Definition _ := 
-  GRing.Zmodule_IsLmodule.Build [ringType of algC] classfun
+HB.instance Definition _ :=
+  GRing.Zmodule_isLmodule.Build [ringType of algC] classfun
       cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
-
 
 Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
 Fact cfun_scaleAr a phi psi : a *: (phi * psi) = phi * (a *: psi).
 Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 
-HB.instance Definition _ := 
-  GRing.Lmodule_IsLalgebra.Build [ringType of algC] classfun cfun_scaleAl.
+HB.instance Definition _ :=
+  GRing.Lmodule_isLalgebra.Build [ringType of algC] classfun cfun_scaleAl.
 
-HB.instance Definition _ := 
-  GRing.Lalgebra_IsAlgebra.Build [ringType of algC] classfun cfun_scaleAr.
+HB.instance Definition _ :=
+  GRing.Lalgebra_isAlgebra.Build [ringType of algC] classfun cfun_scaleAr.
 
-  
-  
 Section Automorphism.
 
 Variable u : {rmorphism algC -> algC}.
@@ -381,8 +377,8 @@ rewrite def_i; have [y Gy ->] := repr_class <<B>> x.
 by rewrite groupJ // /eK classGidl // -def_i enum_valK_in.
 Qed.
 
-HB.instance Definition _ := 
-  Lmodule_HasFinDim.Build [ringType of algC] classfun  cfun_vect_iso.
+HB.instance Definition _ :=
+  Lmodule_hasFinDim.Build [ringType of algC] classfun  cfun_vect_iso.
 
 Definition cfun_vectType := [vectType _ of classfun].
 

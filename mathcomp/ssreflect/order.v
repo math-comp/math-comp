@@ -1296,7 +1296,7 @@ Coercion le_of_leif : leif >-> is_true.
 End POCoercions.
 HB.export POCoercions.
 
-(* HB.mixin Record POrder_IsJoinSemiLattice *)
+(* HB.mixin Record POrder_isJoinSemiLattice *)
 (*     d (T : indexed Type) of POrder d T := { *)
 (*   join : T -> T -> T; *)
 (*   joinC : commutative join; *)
@@ -1305,9 +1305,9 @@ HB.export POCoercions.
 (* }. *)
 (* #[short(type="joinSemiLatticeType")] *)
 (* HB.structure Definition JoinSemiLattice d := *)
-(*   { T of POrder_IsJoinSemiLattice d T & POrder d T }. *)
+(*   { T of POrder_isJoinSemiLattice d T & POrder d T }. *)
 
-(* HB.mixin Record POrder_IsMeetSemiLattice *)
+(* HB.mixin Record POrder_isMeetSemiLattice *)
 (*     d (T : indexed Type) of POrder d T := { *)
 (*   meet : T -> T -> T; *)
 (*   meetC : commutative meet; *)
@@ -1316,10 +1316,10 @@ HB.export POCoercions.
 (* }. *)
 (* #[short(type="meetSemiLatticeType")] *)
 (* HB.structure Definition MeetSemiLattice d := *)
-(*   { T of POrder_IsMeetSemiLattice d T & POrder d T }. *)
+(*   { T of POrder_isMeetSemiLattice d T & POrder d T }. *)
 
 #[key="T"]
-HB.mixin Record POrder_IsLattice d (T : Type) of POrder d T := {
+HB.mixin Record POrder_isLattice d (T : Type) of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetC : commutative meet;
@@ -1330,20 +1330,20 @@ HB.mixin Record POrder_IsLattice d (T : Type) of POrder d T := {
   meetKU : forall y x, join x (meet x y) = x;
   leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
-(* HB.builders Context d T of POrder_IsLattice d T. *)
+(* HB.builders Context d T of POrder_isLattice d T. *)
 
 (* Let le_defU : forall x y, (x <= y) = (join x y == y). *)
 (* Proof. Admitted. *)
 
-(* HB.instance Definition _ := @POrder_IsMeetSemiLattice.Build d T *)
+(* HB.instance Definition _ := @POrder_isMeetSemiLattice.Build d T *)
 (*   meet meetC meetA le_def. *)
-(* HB.instance Definition _ := @POrder_IsJoinSemiLattice.Build d T *)
+(* HB.instance Definition _ := @POrder_isJoinSemiLattice.Build d T *)
 (*   join joinC joinA le_defU. *)
 (* HB.end. *)
 
 #[short(type="latticeType")]
 HB.structure Definition Lattice d :=
-  { T of POrder_IsLattice d T & POrder d T }.
+  { T of POrder_isLattice d T & POrder d T }.
 
 Module LatticeExports.
 Notation "[ 'latticeType' 'of' T 'for' cT ]" := (Lattice.clone _ T cT)
@@ -1513,7 +1513,7 @@ Notation "\meet_ ( i 'in' A ) F" :=
 End TBLatticeSyntax.
 HB.export TBLatticeSyntax.
 
-(* TODO: rename to lattice_Ismeet_distributive ? *)
+(* TODO: rename to lattice_ismeet_distributive ? *)
 #[key="T"]
 HB.mixin Record Lattice_MeetIsDistributive d (T : Type) of Lattice d T := {
   meetUl : @left_distributive T T meet join;
@@ -1618,12 +1618,12 @@ Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
 End CTBDistrLatticeSyntax.
 
-HB.mixin Record DistrLattice_IsTotal d T of DistrLattice d T :=
+HB.mixin Record DistrLattice_isTotal d T of DistrLattice d T :=
   { le_total : total (<=%O : rel T) }.
 
 #[short(type="orderType")]
 HB.structure Definition Total d :=
-  { T of DistrLattice_IsTotal d T & DistrLattice d T }.
+  { T of DistrLattice_isTotal d T & DistrLattice d T }.
 
 Module TotalExports.
 (* Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
@@ -2871,7 +2871,7 @@ Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
 Proof. by rewrite [LHS]leEjoin joinC. Qed.
 
 HB.instance Definition _ :=
-  @POrder_IsLattice.Build
+  @POrder_isLattice.Build
     (dual_display disp) L^d
     join meet joinC meetC joinA meetA meetKU joinKI dual_leEmeet.
 
@@ -3986,7 +3986,7 @@ End CTBDistrLatticeTheory.
 (* FACTORIES *)
 (*************)
 
-HB.factory Record POrder_IsMeetDistrLattice d T of POrder d T := {
+HB.factory Record POrder_isMeetDistrLattice d T of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetC : commutative meet;
@@ -4000,20 +4000,20 @@ HB.factory Record POrder_IsMeetDistrLattice d T of POrder d T := {
 }.
 
 HB.builders
-  Context d T of POrder_IsMeetDistrLattice d T.
+  Context d T of POrder_isMeetDistrLattice d T.
 
 HB.instance Definition _ :=
-  POrder_IsLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
+  POrder_isLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
 HB.instance Definition _ :=
   Lattice_MeetIsDistributive.Build d T meetUl.
 
 HB.end.
 
-HB.factory Record Lattice_IsTotal d T of Lattice d T := {
+HB.factory Record Lattice_isTotal d T of Lattice d T := {
   le_total : total (<=%O : rel T)
 }.
 
-HB.builders Context d T of Lattice_IsTotal d T.
+HB.builders Context d T of Lattice_isTotal d T.
 
 Implicit Types (x y z : T).
 
@@ -4032,15 +4032,15 @@ Qed.
 HB.instance Definition _ :=
   Lattice_MeetIsDistributive.Build d T meetUl.
 HB.instance Definition _ :=
-  DistrLattice_IsTotal.Build d T comparableT.
+  DistrLattice_isTotal.Build d T comparableT.
 
 HB.end.
 
-HB.factory Record POrder_IsTotal d T of POrder d T := {
+HB.factory Record POrder_isTotal d T of POrder d T := {
   le_total : total (<=%O : rel T) }.
 
 HB.builders
-  Context d T of POrder_IsTotal d T.
+  Context d T of POrder_isTotal d T.
 
 Implicit Types (x y z : T).
 
@@ -4096,9 +4096,9 @@ Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite /meet; case: leP => ?; rewrite ?eqxx ?lt_eqF. Qed.
 
 HB.instance Definition _ :=
-  POrder_IsLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
+  POrder_isLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
 HB.instance Definition _ :=
-  Lattice_IsTotal.Build d T comparableT.
+  Lattice_isTotal.Build d T comparableT.
 HB.end.
 
 (* TODO: keep this?
@@ -4106,7 +4106,7 @@ Module Exports.
 Notation totalPOrderMixin := of_.
 Coercion latticeMixin : of_ >-> LatticeMixin.of_.
 Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
-Definition POrder_IsOrder disp (T : porderType disp) (m : of_ T) :=
+Definition POrder_isOrder disp (T : porderType disp) (m : of_ T) :=
   OrderType (DistrLatticeType (LatticeType T m) m) m.
 End Exports.
 *)
@@ -4146,7 +4146,7 @@ Qed.
 HB.instance Definition _ := IsPOrdered.Build d T
   lt_def le_refl le_anti le_trans.
 
-HB.instance Definition _ := POrder_IsMeetDistrLattice.Build d T
+HB.instance Definition _ := POrder_isMeetDistrLattice.Build d T
   meetC joinC meetA joinA joinKI meetKU le_def meetUl.
 
 HB.end.
@@ -4199,7 +4199,7 @@ Section GeneratedOrder.
 
 Local Definition T' := T.
 HB.instance Definition _ := POrder.on T'.
-HB.instance Definition _ := POrder_IsTotal.Build d T' le_total.
+HB.instance Definition _ := POrder_isTotal.Build d T' le_total.
 Implicit Types (x y z : T').
 
 Fact meetE x y : meet x y = x `&` y. Proof. by rewrite meet_def. Qed.
@@ -4226,9 +4226,9 @@ Proof. by rewrite meetE (eq_meetl x y). Qed.
 End GeneratedOrder.
 
 HB.instance Definition _ :=
-  POrder_IsMeetDistrLattice.Build d T meetC joinC meetA joinA
+  POrder_isMeetDistrLattice.Build d T meetC joinC meetA joinA
                                       joinKI meetKU le_def meetUl.
-HB.instance Definition _ := DistrLattice_IsTotal.Build d T le_total.
+HB.instance Definition _ := DistrLattice_isTotal.Build d T le_total.
 
 HB.end.
 
@@ -4292,7 +4292,7 @@ HB.factory Record MonoTotal disp T of POrder disp T := {
 HB.builders Context disp T of MonoTotal disp T.
 Lemma totalT : total (<=%O : rel T).
 Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
-HB.instance Definition _ := POrder_IsTotal.Build disp T totalT.
+HB.instance Definition _ := POrder_isTotal.Build disp T totalT.
 HB.end.
 
 Module CancelPartial.
@@ -4349,7 +4349,7 @@ Variables (f' : T' -> option T) (f_can : pcancel f f').
 HB.instance Definition _ :=
    MonoTotal.Build disp (pcan_type f_can) (fun _ _ => erefl).
 
-Definition PcanTotal : DistrLattice_IsTotal _ (pcan_type f_can) :=
+Definition PcanTotal : DistrLattice_isTotal _ (pcan_type f_can) :=
   Total.on (pcan_type f_can).
 
 End PCan.
@@ -4362,7 +4362,7 @@ Variables (f' : T' -> T) (f_can : cancel f f').
 HB.instance Definition _ :=
    MonoTotal.Build disp (can_type f_can) (fun _ _ => erefl).
 
-Definition CanTotal : DistrLattice_IsTotal _ (can_type f_can) :=
+Definition CanTotal : DistrLattice_isTotal _ (can_type f_can) :=
   Total.on (can_type f_can).
 
 End Can.
@@ -4396,7 +4396,7 @@ Proof. by rewrite /join /meet f'_can meetKU f_can. Qed.
 Lemma meet_eql x y : (x <= y) = (meet x y == x).
 Proof. by rewrite /meet -(can_eq f_can) f'_can eq_meetl f_mono. Qed.
 
-HB.instance Definition _ := POrder_IsLattice.Build _ T
+HB.instance Definition _ := POrder_isLattice.Build _ T
   meetC joinC meetA joinA joinKI meetKI meet_eql.
 
 HB.end.
@@ -5161,7 +5161,7 @@ Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite eqE /= -!leEmeet. Qed.
 
 #[export]
-HB.instance Definition _ := POrder_IsLattice.Build
+HB.instance Definition _ := POrder_isLattice.Build
   _ (T * T') meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2). Proof. by []. Qed.
@@ -5423,7 +5423,7 @@ by rewrite !tagged_asE le_total.
 Qed.
 
 #[export]
-HB.instance Definition _ := POrder_IsTotal.Build _ {t : T & T' t} total.
+HB.instance Definition _ := POrder_isTotal.Build _ {t : T & T' t} total.
 
 End Total.
 
@@ -5556,7 +5556,7 @@ move=> x y; rewrite /<=%O /= /le; case: ltgtP => //= _; exact: le_total.
 Qed.
 
 #[export]
-HB.instance Definition _ := POrder_IsTotal.Build _ (T * T') total.
+HB.instance Definition _ := POrder_isTotal.Build _ (T * T') total.
 
 End Total.
 
@@ -5728,7 +5728,7 @@ Qed.
 
 #[export]
 HB.instance Definition _ :=
-  POrder_IsLattice.Build _ (seq T) meetC joinC meetA joinA joinKI meetKU leEmeet.
+  POrder_isLattice.Build _ (seq T) meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Lemma meetEseq s1 s2 : s1 `&` s2 =  [seq x.1 `&` x.2 | x <- zip s1 s2].
 Proof. by elim: s1 s2 => [|x s1 ihs1] [|y s2]//=; rewrite -ihs1. Qed.
@@ -5918,7 +5918,7 @@ by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
 Qed.
 
 #[export]
-HB.instance Definition _ := POrder_IsTotal.Build _ (seq T) total.
+HB.instance Definition _ := POrder_isTotal.Build _ (seq T) total.
 #[export]
 HB.instance Definition _ := HasBottom.Build _ (seq T) (@lexi0s _).
 
@@ -6073,7 +6073,7 @@ by rewrite tnth_meet leEmeet.
 Qed.
 
 #[export]
-HB.instance Definition _ := POrder_IsLattice.Build
+HB.instance Definition _ := POrder_isLattice.Build
   _ (n.-tuple T) meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Lemma meetEtprod t1 t2 :
@@ -6451,7 +6451,7 @@ Lemma dual_total : total (<=%O : rel O^d).
 Proof. by move=> x y; exact: le_total. Qed.
 
 #[export]
-HB.instance Definition _ := DistrLattice_IsTotal.Build _ O^d dual_total.
+HB.instance Definition _ := DistrLattice_isTotal.Build _ O^d dual_total.
 
 End DualOrder.
 

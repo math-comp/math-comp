@@ -88,7 +88,7 @@ Import GRing.Theory.
 
 #[infer(R), short(type="fieldExtType")]
 HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
-  GRing.Ring_HasCommutativeMul T & GRing.Field T}.
+  GRing.Ring_hasCommutativeMul T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
@@ -633,7 +633,7 @@ Proof. exact: mulrDr. Qed.
 Fact fieldOver_scaleDl v a b : (a + b) *F: v = a *F: v + b *F: v.
 Proof. exact: mulrDl. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build _ L_F
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L_F
   fieldOver_scaleA fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl.
 
 Lemma fieldOver_scaleE a (u : L) : a *: (u : L_F) = vsval a * u.
@@ -642,16 +642,16 @@ Proof. by []. Qed.
 Fact fieldOver_scaleAl a u v : a *F: (u * v) = (a *F: u) * v.
 Proof. exact: mulrA. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build _ L_F
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ L_F
   fieldOver_scaleAl.
 
 Fact fieldOver_scaleAr a u v : a *F: (u * v) = u * (a *F: v).
 Proof. exact: mulrCA. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ L_F
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L_F
   fieldOver_scaleAr.
 
-Fact fieldOver_vectMixin : Lmodule_HasFinDim [the ringType of K_F] L_F.
+Fact fieldOver_vectMixin : Lmodule_hasFinDim [the ringType of K_F] L_F.
 Proof.
 have [bL [_ nz_bL] [defL dxSbL]] := field_module_semisimple (subvf (F * _)).
 do [set n := \dim_F {:L} in bL nz_bL *; set SbL := (\sum_i _)%VS] in defL dxSbL.
@@ -784,7 +784,7 @@ Proof. exact: scalerDr. Qed.
 Fact baseField_scaleDl v a b : (a + b) *F0: v = a *F0: v + b *F0: v.
 Proof. by rewrite -scalerDl -rmorphD. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build _ L0
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L0
   baseField_scaleA baseField_scale1 baseField_scaleDr baseField_scaleDl.
 
 Lemma baseField_scaleE a (u : L) : a *: (u : L0) = a%:A *: u.
@@ -793,20 +793,20 @@ Proof. by []. Qed.
 Fact baseField_scaleAl a (u v : L0) : a *F0: (u * v) = (a *F0: u) * v.
 Proof. exact: scalerAl. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build _ L0
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ L0
   baseField_scaleAl.
 
 Fact baseField_scaleAr a u v : a *F0: (u * v) = u * (a *F0: v).
 Proof. exact: scalerAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ L0
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L0
   baseField_scaleAr.
 
 Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
 Let coordF (x : F) := (coord_vbasis (memvf x)).
 
-Fact baseField_vectMixin : Lmodule_HasFinDim [the fieldType of F0] L0.
+Fact baseField_vectMixin : Lmodule_hasFinDim [the fieldType of F0] L0.
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
@@ -1107,7 +1107,7 @@ rewrite !piE /equiv_subfext /iotaFz !linear0.
 by rewrite poly_rV_K ?rmorph1 ?oner_eq0 // size_poly1.
 Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsComRing.Build subFExtend
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build subFExtend
   mulfxA mulfxC mul1fx mulfx_addl nonzero1fx.
 
 Definition subfx_poly_inv (q : {poly F}) : {poly F} :=
@@ -1153,7 +1153,7 @@ apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !linear0.
 by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !linear0.
 Qed.
 
-HB.instance Definition _ := GRing.ComRing_IsField.Build subFExtend
+HB.instance Definition _ := GRing.ComRing_isField.Build subFExtend
   subfx_fieldAxiom subfx_inv0.
 
 Fact subfx_inj_is_rmorphism : rmorphism subfx_inj.
@@ -1202,17 +1202,17 @@ Proof. by move=> a; apply: mulrDr. Qed.
 Fact subfx_scalerDl x : {morph subfx_scale^~ x : a b / a + b}.
 Proof. by move=> a b; rewrite /subfx_scale rmorphD mulrDl. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build _ subFExtend
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ subFExtend
   subfx_scalerA subfx_scaler1r subfx_scalerDr subfx_scalerDl.
 
 Fact subfx_scaleAl a u v : subfx_scale a (u * v) = (subfx_scale a u) * v.
 Proof. exact: mulrA. Qed.
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build _ subFExtend
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ subFExtend
   subfx_scaleAl.
 
 Fact subfx_scaleAr a u v : subfx_scale a (u * v) = u * (subfx_scale a v).
 Proof. exact: mulrCA. Qed.
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build _ subFExtend
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
   subfx_scaleAr.
 
 Fact subfx_evalZ : scalable subfx_eval.
@@ -1293,7 +1293,7 @@ rewrite leqNgt implybNN -Dd ltnS size_poly linearB subr_eq0 /=.
 by move/eqP/(can_inj rVpolyK).
 Qed.
 
-Definition SubfxVect := Lmodule_HasFinDim.Build _ subFExtend min_subfx_vect.
+Definition SubfxVect := Lmodule_hasFinDim.Build _ subFExtend min_subfx_vect.
 Definition SubFieldExtType : fieldExtType F := HB.pack subFExtend SubfxVect.
 
 End Irreducible.
@@ -1344,18 +1344,18 @@ have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
-pose mulM := GRing.Zmodule_IsComRing.Build _ mulA mulC mul1 mulD nzL1.
+pose mulM := GRing.Zmodule_isComRing.Build _ mulA mulC mul1 mulD nzL1.
 pose rL : comRingType := HB.pack vL mulM.
-have mulZlM : GRing.Lmodule_IsLalgebra F rL.
+have mulZlM : GRing.Lmodule_isLalgebra F rL.
   constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
 pose laL : lalgType F := HB.pack rL mulZlM.
-have mulZrM : GRing.Lalgebra_IsAlgebra F laL.
+have mulZrM : GRing.Lalgebra_isAlgebra F laL.
   by constructor => a x y; rewrite !(mulrC x) scalerAl.
 pose aL : algType F := HB.pack laL mulZrM.
-pose uLM := Algebra_IsFalgebra.Build F aL.
+pose uLM := Algebra_isFalgebra.Build F aL.
 pose cuL : comUnitRingType := HB.pack aL uLM.
-have unitM : GRing.ComUnitRing_IsField cuL.
+have unitM : GRing.ComUnitRing_isField cuL.
   constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
@@ -1401,18 +1401,18 @@ Qed.
 (*   move=> x y z; apply: canLR rVpolyK _. *)
 (*   by rewrite !raddfD mulrDl /= !toL_K /toL modpD. *)
 (* have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0. *)
-(* pose mulM := GRing.Zmodule_IsComRing.Build vL mulA mulC mul1 mulD nzL1. *)
+(* pose mulM := GRing.Zmodule_isComRing.Build vL mulA mulC mul1 mulD nzL1. *)
 (* pose rL := ComRingType vL mulM. *)
-(* have mulZlM : GRing.Lmodule_IsLalgebra F rL. *)
+(* have mulZlM : GRing.Lmodule_isLalgebra F rL. *)
 (*   constructor => a x y; apply: canRL rVpolyK _. *)
 (*   by rewrite !linearZ /= toL_K -scalerAl modpZl. *)
 (* pose laL := LalgType F rL mulZlM. *)
-(* have mulZrM : GRing.Lalgebra_IsAlgebra F laL. *)
+(* have mulZrM : GRing.Lalgebra_isAlgebra F laL. *)
 (*   by constructor => a x y; rewrite !(mulrC x) scalerAl. *)
 (* pose aL := AlgType F laL mulZrM. *)
-(* pose uLM := Algebra_IsFalgebra.Build F aL. *)
+(* pose uLM := Algebra_isFalgebra.Build F aL. *)
 (* pose cuL := ComUnitRingType uLM _. *)
-(* have unitM : GRing.ComUnitRing_IsField cuL. *)
+(* have unitM : GRing.ComUnitRing_isField cuL. *)
 (*   constructor => x nz_x; apply/unitrP; set q := rVpoly x. *)
 (*   have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x. *)
 (*   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q. *)

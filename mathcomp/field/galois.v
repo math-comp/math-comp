@@ -333,14 +333,14 @@ Arguments kHom_lrmorphism {F L f}.
 Definition splitting_field_axiom (F : fieldType) (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
-HB.mixin Record FieldExt_IsSplittingField
+HB.mixin Record FieldExt_isSplittingField
     (F : fieldType) L of FieldExt F L := {
   splittingFieldP_subproof : splitting_field_axiom [the fieldExtType _ of L]
 }.
 
 #[mathcomp(axiom="splitting_field_axiom"), infer(F), short(type="splittingFieldType")]
 HB.structure Definition SplittingField F :=
- { T of FieldExt_IsSplittingField F T & FieldExt F T }.
+ { T of FieldExt_isSplittingField F T & FieldExt F T }.
 
 
 Module SplittingFieldExports.
@@ -392,7 +392,7 @@ by exists [::]; [rewrite big_nil eqpxx | rewrite Fadjoin_nil regular_fullv].
 Qed.
 
 HB.instance Definition _ (F : fieldType) :=
-  FieldExt_IsSplittingField.Build F F^o (regular_splittingAxiom F).
+  FieldExt_isSplittingField.Build F F^o (regular_splittingAxiom F).
 
 Section SplittingFieldTheory.
 
@@ -404,7 +404,7 @@ Implicit Types (K M E : {subfield L}).
 Lemma splittingFieldP : SplittingField.axiom L.
 Proof. exact: splittingFieldP_subproof. Qed.
 
-Lemma splittingPoly : 
+Lemma splittingPoly :
   {p : {poly L} | p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}}.
 Proof.
 pose factF p s := (p \is a polyOver 1%VS) && (p %= \prod_(z <- s) ('X - z%:P)).
@@ -427,7 +427,7 @@ apply: subvP; apply/Fadjoin_seqP; rewrite -memvE -defL0 mem1v.
 by split=> // y r_y; rewrite -defL0 seqv_sub_adjoin.
 Qed.
 
-HB.instance Definition _ E := FieldExt_IsSplittingField.Build
+HB.instance Definition _ E := FieldExt_isSplittingField.Build
   [the fieldType of subvs_of E] (fieldOver E) (fieldOver_splitting E).
 
 Lemma enum_AEnd : {kAutL : seq 'AEnd(L) | forall f, f \in kAutL}.

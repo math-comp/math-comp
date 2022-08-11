@@ -649,15 +649,15 @@ Proof. by move=> i bc /= rbc; apply: ex_elim_qf. Qed.
 End ClosedFieldQE.
 End ClosedFieldQE.
 
-HB.mixin Record Field_IsAlgClosed F of GRing.Field F := {
+HB.mixin Record Field_isAlgClosed F of GRing.Field F := {
   solve_monicpoly : GRing.closed_field_axiom [the ringType of F];
 }.
 
-HB.builders Context F of Field_IsAlgClosed F.
+HB.builders Context F of Field_isAlgClosed F.
   HB.instance Definition _ := GRing.decidable_of_QE.Build F
     (@ClosedFieldQE.wf_ex_elim [the GRing.Field.type of F])
     (ClosedFieldQE.holds_ex_elim solve_monicpoly).
-  HB.instance Definition _ := GRing.DecField_IsAlgClosed.Build F
+  HB.instance Definition _ := GRing.DecField_isAlgClosed.Build F
     solve_monicpoly.
 HB.end.
 
@@ -701,7 +701,7 @@ have I_ideal : idealr_closed I.
   by apply: dvdp_trans Iq2; apply/dv_d/leq_maxr.
 pose Iaddkey := GRing.Pred.Add (DefaultPredKey I) I_ideal.
 pose Iidkey := MkIdeal (GRing.Pred.Zmod Iaddkey I_ideal) I_ideal.
-pose EMixin := GRing.Ring_HasCommutativeMul.Build _
+pose EMixin := GRing.Ring_hasCommutativeMul.Build _
   (@Quotient.mulqC _ _ _ (KeyedPred Iidkey)).
 pose E : comRingType := HB.pack _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
@@ -723,7 +723,7 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
-pose EfieldMixin := GRing.ComRing_IsField.Build _ EmulV Einv0.
+pose EfieldMixin := GRing.ComRing_isField.Build _ EmulV Einv0.
 pose Efield : fieldType := HB.pack E EfieldMixin.
 pose EIsCountable := @CanCountMixin _ E _ _ reprK.
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
@@ -861,14 +861,14 @@ have KmulD: left_distributive Kmul Kadd.
   move=> u v w; have [i [x ->] [[y ->] [z ->]]] := KtoE3 u v w.
   by rewrite -!(EtoK_M, EtoK_D) mulrDl.
 have Kone_nz: FtoK 1 != FtoK 0 by rewrite EtoKeq0 oner_neq0.
-pose KringMixin := GRing.Zmodule_IsComRing.Build _
+pose KringMixin := GRing.Zmodule_isComRing.Build _
   KmulA KmulC Kmul1 KmulD Kone_nz.
 pose Kring : comRingType := HB.pack K Kzmod KringMixin cntK.
 have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
   move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.
   by rewrite -EtoK_V -[_ * _]EtoK_M mulVf ?EtoK_1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
-pose KfieldMixin := GRing.ComRing_IsField.Build _ KmulV Kinv0.
+pose KfieldMixin := GRing.ComRing_isField.Build _ KmulV Kinv0.
 pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
 have EtoKrmorphism i: rmorphism (EtoK i : E i -> Kfield).
   by do 2?split=> [x y|]; rewrite ?EtoK_D ?EtoK_N ?EtoK_M ?EtoK_1.
@@ -900,7 +900,7 @@ have Kclosed: GRing.closed_field_axiom Kfield.
   rewrite (eq_map_poly (toEleS _ _ _ _)) map_poly_comp {}IHk //= /incEp codeK.
   by rewrite -if_neg neq_ltn lemk.
 suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.
-  pose Kcc := Field_IsAlgClosed.Build Kfield Kclosed.
+  pose Kcc := Field_isAlgClosed.Build Kfield Kclosed.
   by exists (HB.pack_for countClosedFieldType K Kfield Kcc).
 exists (EtoKM 0%N) => /= z; have [i [{}z ->]] := KtoE z.
 suffices{z} /(_ z)[p mon_p]: integralRange (toE 0%N i isT).

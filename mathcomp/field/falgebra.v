@@ -102,10 +102,10 @@ HB.structure Definition Falgebra (R : ringType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
-HB.factory Record Algebra_IsFalgebra (K : fieldType) A
+HB.factory Record Algebra_isFalgebra (K : fieldType) A
            of Vector K A & GRing.Algebra K A := {}.
 
-HB.builders Context K A of Algebra_IsFalgebra K A.
+HB.builders Context K A of Algebra_isFalgebra K A.
   Let vA := [the Vector.type K of A].
   Let am u := linfun (u \o* idfun : vA -> vA).
   Let uam := [pred u | lker (am u) == 0%VS].
@@ -130,7 +130,7 @@ HB.builders Context K A of Algebra_IsFalgebra K A.
   Lemma invr_out : {in [predC uam], vam =1 id}.
   Proof. by move=> u /negbTE/= ->. Qed.
 
-  HB.instance Definition _ := GRing.Ring_HasMulInverse.Build A
+  HB.instance Definition _ := GRing.Ring_hasMulInverse.Build A
     mulVr divrr unitrP invr_out.
 HB.end.
 
@@ -140,14 +140,14 @@ Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L _)
   (at level 0, format "[ 'FalgType'  F  'of'  L ]") : form_scope.
 Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L L')
   (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
-Notation FalgUnitRingType T := (Algebra_IsFalgebra.Build _ T).
+Notation FalgUnitRingType T := (Algebra_isFalgebra.Build _ T).
 End FalgebraExports.
 HB.export FalgebraExports.
 
 Notation "1" := (vline 1) : vspace_scope.
 
 HB.instance Definition _ (K : fieldType) n :=
-  Algebra_IsFalgebra.Build K 'M[K]_n.+1.
+  Algebra_isFalgebra.Build K 'M[K]_n.+1.
 
 HB.instance Definition _ (R : comUnitRingType) := GRing.UnitAlgebra.on R^o.
 (* FIXME: builds a FalgType R R^o, works but couldn't it look nicer? *)
@@ -212,7 +212,7 @@ Qed.
 Lemma lfun_invr_out f : lker f != 0%VS -> lfun_invr f = f.
 Proof. by rewrite /lfun_invr => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.Ring_HasMulInverse.Build 'End(aT)
+HB.instance Definition _ := GRing.Ring_hasMulInverse.Build 'End(aT)
   lfun_mulRVr lfun_mulrRV lfun_unitrP lfun_invr_out.
 
 Lemma lfun_invE f : lker f == 0%VS -> f^-1%VF = f^-1.
@@ -967,17 +967,17 @@ Proof. move=> x y z; apply/val_inj/mulrDl. Qed.
 Fact subvs_mulDr : right_distributive subvs_mul +%R.
 Proof. move=> x y z; apply/val_inj/mulrDr. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsRing.Build (subvs_of A)
+HB.instance Definition _ := GRing.Zmodule_isRing.Build (subvs_of A)
   subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr (algid_neq0 _).
 
 Lemma subvs_scaleAl k (x y : subvs_of A) : k *: (x * y) = (k *: x) * y.
 Proof. exact/val_inj/scalerAl. Qed.
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build K (subvs_of A)
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build K (subvs_of A)
   subvs_scaleAl.
 
 Lemma subvs_scaleAr k (x y : subvs_of A) : k *: (x * y) = x * (k *: y).
 Proof. exact/val_inj/scalerAr. Qed.
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build K (subvs_of A)
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build K (subvs_of A)
   subvs_scaleAr.
 
 HB.instance Definition _ := FalgUnitRingType (subvs_of A).

@@ -146,7 +146,7 @@ Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
 (* inverses to eqE (like eqbE, eqnE, eqseqE, etc.) for new recursive          *)
 (* comparisons, but can only be used for manifest mixing with a bespoke       *)
 (* comparison function, and so is incompatible with PcanEqMixin and the like  *)
-(* - this is why the tree_HasDecEq for GenTree.tree in library choice is not   *)
+(* - this is why the tree_hasDecEq for GenTree.tree in library choice is not   *)
 (* declared Canonical.                                                        *)
 Lemma eqE (T : eqType) x : eq_op x = HasDecEq.eq_op (Equality.class T) x.
 Proof. by []. Qed.
@@ -305,7 +305,7 @@ Module Export EqTypePred := MakeEqTypePred eqtype.Equality.
 Lemma unit_eqP : Equality.axiom (fun _ _ : unit => true).
 Proof. by do 2!case; left. Qed.
 
-HB.instance Definition unit_HasDecEq := HasDecEq.Build unit unit_eqP.
+HB.instance Definition unit_hasDecEq := HasDecEq.Build unit unit_eqP.
 
 (* Comparison for booleans. *)
 
@@ -315,7 +315,7 @@ Definition eqb b := addb (~~ b).
 Lemma eqbP : Equality.axiom eqb.
 Proof. by do 2!case; constructor. Qed.
 
-HB.instance Definition bool_HasDecEq := HasDecEq.Build bool eqbP.
+HB.instance Definition bool_hasDecEq := HasDecEq.Build bool eqbP.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
@@ -778,7 +778,7 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-HB.instance Definition sub_HasDecEq := HasDecEq.Build (sub_type sT) val_eqP.
+HB.instance Definition sub_hasDecEq := HasDecEq.Build (sub_type sT) val_eqP.
 
 End SubEqType.
 
@@ -815,7 +815,7 @@ move=> [x1 x2] [y1 y2] /=; apply: (iffP andP) => [[]|[<- <-]] //=.
 by do 2!move/eqP->.
 Qed.
 
-HB.instance Definition prod_HasDecEq := HasDecEq.Build (T1 * T2)%type pair_eqP.
+HB.instance Definition prod_hasDecEq := HasDecEq.Build (T1 * T2)%type pair_eqP.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
 
@@ -852,7 +852,7 @@ Proof.
 case=> [x|] [y|] /=; by [constructor | apply: (iffP eqP) => [|[]] ->].
 Qed.
 
-HB.instance Definition option_HasDecEq := HasDecEq.Build (option T) opt_eqP.
+HB.instance Definition option_hasDecEq := HasDecEq.Build (option T) opt_eqP.
 
 End OptionEqType.
 
@@ -889,7 +889,7 @@ case: eqP => [<-|Hij] y; last by right; case.
 by apply: (iffP eqP) => [->|<-]; rewrite tagged_asE.
 Qed.
 
-HB.instance Definition tag_HasDecEq := HasDecEq.Build {i : I & T_ i} tag_eqP.
+HB.instance Definition tag_hasDecEq := HasDecEq.Build {i : I & T_ i} tag_eqP.
 
 Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 
@@ -918,7 +918,7 @@ Definition sum_eq u v :=
 Lemma sum_eqP : Equality.axiom sum_eq.
 Proof. case=> x [] y /=; by [right | apply: (iffP eqP) => [->|[->]]]. Qed.
 
-HB.instance Definition sum_HasDecEq := HasDecEq.Build (T1 + T2)%type sum_eqP.
+HB.instance Definition sum_hasDecEq := HasDecEq.Build (T1 + T2)%type sum_eqP.
 
 Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 

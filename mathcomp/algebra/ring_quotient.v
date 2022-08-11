@@ -416,7 +416,7 @@ Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
 #[export]
-HB.instance Definition _ := GRing.Zmodule_IsComRing.Build (type kI)
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build (type kI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
 #[export]
 HB.instance Definition _ := GRing.ComRing.on {quot kI}.

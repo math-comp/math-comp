@@ -652,5 +652,3 @@ by case: ncprodS => gz isoZ; apply: Aut_cprod_by_full.
 Qed.
 
 End IterCprod.
-
-

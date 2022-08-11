@@ -391,13 +391,13 @@ Section SubChoice.
 
 Variables (P : pred T) (sT : subType P).
 
-Definition sub_HasChoice := PcanChoiceMixin (@valK T P sT).
+Definition sub_hasChoice := PcanChoiceMixin (@valK T P sT).
 
-HB.instance Definition _ : HasChoice (sub_type sT) := sub_HasChoice.
+HB.instance Definition _ : HasChoice (sub_type sT) := sub_hasChoice.
 
 End SubChoice.
 
-Fact seq_HasChoice : HasChoice (seq T).
+Fact seq_hasChoice : HasChoice (seq T).
 Proof.
 pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
@@ -416,7 +416,7 @@ elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
 rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
 by case: find => /=.
 Qed.
-HB.instance Definition _ := seq_HasChoice.
+HB.instance Definition _ := seq_hasChoice.
 
 End OneType.
 
@@ -424,7 +424,7 @@ Section TagChoice.
 
 Variables (I : choiceType) (T_ : I -> choiceType).
 
-Fact tagged_HasChoice : HasChoice {i : I & T_ i}.
+Fact tagged_hasChoice : HasChoice {i : I & T_ i}.
 Proof.
 pose mkT i (x : T_ i) := Tagged T_ x.
 pose ft tP n i := omap (mkT i) (find (tP \o mkT i) n).
@@ -443,18 +443,18 @@ rewrite (@extensional _ _ (ft sQ nt)) => [|i].
   by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
 by congr (omap _ _); apply: extensional => x /=.
 Qed.
-HB.instance Definition _ := tagged_HasChoice.
+HB.instance Definition _ := tagged_hasChoice.
 
 End TagChoice.
 
-Fact nat_HasChoice : HasChoice nat.
+Fact nat_hasChoice : HasChoice nat.
 Proof.
 pose f := [fun (P : pred nat) n => if P n then Some n else None].
 exists f => [P n m | P [n Pn] | P Q eqPQ n] /=; last by rewrite eqPQ.
   by case: ifP => // Pn [<-].
 by exists n; rewrite Pn.
 Qed.
-HB.instance Definition _ := nat_HasChoice.
+HB.instance Definition _ := nat_hasChoice.
 
 HB.instance Definition _ : HasChoice bool := CanChoiceMixin oddb.
 HB.instance Definition _ := [HasChoice of bitseq].
@@ -488,7 +488,7 @@ Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T))
   (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
 
 Notation "[ 'HasChoice' 'of' T 'by' <: ]" :=
-  (sub_HasChoice _ : HasChoice T)
+  (sub_hasChoice _ : HasChoice T)
   (at level 0, format "[ 'HasChoice'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : choiceType) (P : pred T) :=
@@ -549,7 +549,7 @@ HB.instance Definition _ sT (f : sT -> T) f' (fK : pcancel f f') :
 HB.instance Definition _ sT (f : sT -> T) f' (fK : cancel f f') :
   IsCountable (can_type fK) := CanCountMixin fK.
 
-HB.instance Definition sub_IsCountable (P : pred T) (sT : subType P) :
+HB.instance Definition sub_isCountable (P : pred T) (sT : subType P) :
   IsCountable (sub_type sT) := PcanCountMixin (@valK T P sT).
 
 Definition pickle_seq s := CodeSeq.code (map (@pickle T) s).
@@ -557,7 +557,7 @@ Definition unpickle_seq n := Some (pmap (@unpickle T) (CodeSeq.decode n)).
 Lemma pickle_seqK : pcancel pickle_seq unpickle_seq.
 Proof. by move=> s; rewrite /unpickle_seq CodeSeq.codeK (map_pK pickleK). Qed.
 
-HB.instance Definition seq_IsCountable := IsCountable.Build (seq T) pickle_seqK.
+HB.instance Definition seq_isCountable := IsCountable.Build (seq T) pickle_seqK.
 
 End CountableTheory.
 
@@ -596,7 +596,7 @@ Proof.
 by case=> i x; rewrite /unpickle_tagged CodeSeq.codeK /= pickleK /= pickleK.
 Qed.
 
-HB.instance Definition tag_IsCountable :=
+HB.instance Definition tag_isCountable :=
   IsCountable.Build {i : I & T_ i} pickle_taggedK.
 
 End TagCountType.
