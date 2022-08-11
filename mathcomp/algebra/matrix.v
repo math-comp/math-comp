@@ -286,7 +286,7 @@ Variant matrix : predArgType := Matrix of {ffun 'I_m * 'I_n -> R}.
 
 Definition mx_val A := let: Matrix g := A in g.
 
-HB.instance Definition _ := [IsNew for mx_val].
+HB.instance Definition _ := [isNew for mx_val].
 
 Definition fun_of_matrix A (i : 'I_m) (j : 'I_n) := mx_val A (i, j).
 
@@ -1190,7 +1190,7 @@ Definition mxvec_index (i : 'I_m) (j : 'I_n) :=
   cast_ord mxvec_cast (enum_rank (i, j)).
 
 Variant is_mxvec_index : 'I_(m * n) -> Type :=
-  IsMxvecIndex i j : is_mxvec_index (mxvec_index i j).
+  isMxvecIndex i j : is_mxvec_index (mxvec_index i j).
 
 Lemma mxvec_indexP k : is_mxvec_index k.
 Proof.
@@ -1199,7 +1199,7 @@ by rewrite -[_ k]enum_valK; case: (enum_val _).
 Qed.
 
 Coercion pair_of_mxvec_index k (i_k : is_mxvec_index k) :=
-  let: IsMxvecIndex i j := i_k in (i, j).
+  let: isMxvecIndex i j := i_k in (i, j).
 
 Definition mxvec (A : 'M[R]_(m, n)) :=
   castmx (erefl _, mxvec_cast) (\row_k A (enum_val k).1 (enum_val k).2).
@@ -1571,7 +1571,7 @@ Lemma map2_mx1 {opm : Monoid.law idm} :
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm1. Qed.
 
 HB.instance Definition _ {opm : Monoid.law idm} :=
-  Monoid.IsLaw.Build 'M_(m, n) (const_mx idm) (@map2_mx _ _ _ opm _ _)
+  Monoid.isLaw.Build 'M_(m, n) (const_mx idm) (@map2_mx _ _ _ opm _ _)
     map2_mxA map2_1mx map2_mx1.
 
 Lemma map2_mxC {opm : Monoid.com_law idm} :
@@ -1579,7 +1579,7 @@ Lemma map2_mxC {opm : Monoid.com_law idm} :
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE Monoid.mulmC. Qed.
 
 HB.instance Definition _ {opm : Monoid.com_law idm} :=
-  Monoid.IsCommutativeLaw.Build 'M_(m, n) (@map2_mx _ _ _ opm _ _) map2_mxC.
+  Monoid.isCommutativeLaw.Build 'M_(m, n) (@map2_mx _ _ _ opm _ _) map2_mxC.
 
 Lemma map2_0mx {opm : Monoid.mul_law idm} :
   left_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
@@ -1590,7 +1590,7 @@ Lemma map2_mx0 {opm : Monoid.mul_law idm} :
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm0. Qed.
 
 HB.instance Definition _ {opm : Monoid.mul_law idm} :=
-  Monoid.IsMulLaw.Build 'M_(m, n) (const_mx idm) (@map2_mx _ _ _ opm _ _)
+  Monoid.isMulLaw.Build 'M_(m, n) (const_mx idm) (@map2_mx _ _ _ opm _ _)
     map2_0mx map2_mx0.
 
 Lemma map2_mxDl {mul : T -> T -> T} {add : Monoid.add_law idm mul} :
@@ -1602,7 +1602,7 @@ Lemma map2_mxDr {mul : T -> T -> T} {add : Monoid.add_law idm mul} :
 Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmDr. Qed.
 
 HB.instance Definition _ {mul : T -> T -> T} {add : Monoid.add_law idm mul} :=
-  Monoid.IsAddLaw.Build 'M_(m, n)
+  Monoid.isAddLaw.Build 'M_(m, n)
     (@map2_mx _ _ _ mul _ _) (@map2_mx _ _ _ add _ _)
     map2_mxDl map2_mxDr.
 
@@ -1633,7 +1633,7 @@ Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 Lemma addNmx : left_inverse (const_mx 0) oppmx addmx.
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build 'M[V]_(m, n)
+HB.instance Definition _ := GRing.isZmodule.Build 'M[V]_(m, n)
   addmxA addmxC add0mx addNmx.
 
 Lemma mulmxnE A d i j : (A *+ d) i j = A i j *+ d.
@@ -2171,7 +2171,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R 'M[R]_(m, n)
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R 'M[R]_(m, n)
   scalemxA scale1mx scalemxDr scalemxDl.
 
 Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
@@ -2838,9 +2838,9 @@ Local Notation n := n'.+1.
 Lemma matrix_nonzero1 : 1%:M != 0 :> 'M[R]_n.
 Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsRing.Build 'M[R]_n (@mulmxA n n n n)
+HB.instance Definition _ := GRing.Zmodule_isRing.Build 'M[R]_n (@mulmxA n n n n)
   (@mul1mx n n) (@mulmx1 n n) (@mulmxDl n n n) (@mulmxDr n n n) matrix_nonzero1.
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build R 'M[R]_n
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R 'M[R]_n
   (@scalemxAl n n n).
 
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
@@ -3211,7 +3211,7 @@ Section MatrixAlgType.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-HB.instance Definition _ := GRing.Lalgebra_IsAlgebra.Build R 'M[R]_n
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build R 'M[R]_n
   (fun k => scalemxAr k).
 
 End MatrixAlgType.
@@ -3600,7 +3600,7 @@ End Defs.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-HB.instance Definition _ := GRing.Ring_HasMulInverse.Build 'M[R]_n
+HB.instance Definition _ := GRing.Ring_hasMulInverse.Build 'M[R]_n
   (@mulVmx n) (@mulmxV n) (@intro_unitmx n) (@invmx_out n).
 
 (* Lemmas requiring that the coefficients are in a unit ring *)

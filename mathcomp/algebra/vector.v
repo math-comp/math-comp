@@ -111,13 +111,13 @@ Import GRing.Theory.
 Definition vector_axiom_def (R : ringType) n (V : lmodType R) of phant V :=
   {v2r : V -> 'rV[R]_n | linear v2r & bijective v2r}.
 
-HB.mixin Record Lmodule_HasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V :=
+HB.mixin Record Lmodule_hasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V :=
   { dim : nat;
     vector_subdef : vector_axiom_def dim (Phant V) }.
 
 #[mathcomp(axiom="vector_axiom_def"), infer(R), short(type="vectType")]
 HB.structure Definition Vector (R : ringType) :=
-  { V of Lmodule_HasFinDim R V & GRing.Lmodule R V }.
+  { V of Lmodule_hasFinDim R V & GRing.Lmodule R V }.
 
 (* FIXME: Vector.axiom requires a phantom type *
  * -> a shortand notation is used instead      *)
@@ -210,7 +210,7 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
-HB.instance Definition _ : IsSUB _ _ 'Hom(aT, rT) := [IsNew for f2mx].
+HB.instance Definition _ : isSUB _ _ 'Hom(aT, rT) := [isNew for f2mx].
 End Hom.
 
 Arguments mx2vs {K vT m%N} A%MS.
@@ -509,7 +509,7 @@ Proof. by move=> U; apply/addv_idPl/subvf. Qed.
 Lemma addvf : right_zero fullv addV.
 Proof. by move=> U; apply/addv_idPr/subvf. Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {vspace vT} 0%VS addv
+HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} 0%VS addv
   addvA addvC add0v.
 
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
@@ -601,7 +601,7 @@ Proof. by move=> U; apply/capv_idPr/subvf. Qed.
 Lemma capvf : right_id fullv capV.
 Proof. by move=> U; apply/capv_idPl/subvf. Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {vspace vT} fullv capv
+HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} fullv capv
   capvA capvC capfv.
 
 Lemma memv_cap w U V : (w \in U :&: V)%VS = (w \in U) && (w \in V).
@@ -1304,7 +1304,7 @@ Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build 'Hom(aT, rT)
+HB.instance Definition _ := GRing.isZmodule.Build 'Hom(aT, rT)
   lfun_addA lfun_addC lfun_add0 lfun_addN.
 
 Lemma zero_lfunE x : (0 : 'Hom(aT, rT)) x = 0. Proof. exact: lfunE. Qed.
@@ -1339,7 +1339,7 @@ Fact lfun_scaleDl f k1 k2 : (k1 + k2) *:l f = k1 *:l f + k2 *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDl. Qed.
 
 HB.instance Definition _ :=
-  GRing.Zmodule_IsLmodule.Build _ 'Hom(aT, rT)
+  GRing.Zmodule_isLmodule.Build _ 'Hom(aT, rT)
     lfun_scaleA lfun_scale1 lfun_scaleDr lfun_scaleDl.
 
 Lemma scale_lfunE k f x : (k *: f) x = k *: f x. Proof. exact: lfunE. Qed.
@@ -1354,7 +1354,7 @@ apply: Bijective (Hom \o vec_mx) _ _ => [[A]|A] /=; last exact: vec_mxK.
 by rewrite mxvecK.
 Qed.
 
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ 'Hom(aT, rT)
+HB.instance Definition _ := Lmodule_hasFinDim.Build _ 'Hom(aT, rT)
   lfun_vect_iso.
 
 End LfunVectType.
@@ -1705,23 +1705,23 @@ Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
  * as canonical, so mixins and structures are built separately, and we        *
  * don't use HB.instance Definition _ := ...                                  *
  *  This is ok, but maybe we could introduce an alias                         *)
-Definition lfun_comp_ringMixin := GRing.Zmodule_IsRing.Build 'End(vT)
+Definition lfun_comp_ringMixin := GRing.Zmodule_isRing.Build 'End(vT)
   comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
 Definition lfun_comp_ringType : ringType :=
   HB.pack 'End(vT) lfun_comp_ringMixin.
 
 (* In the standard endomorphism ring product is categorical composition. *)
-Definition lfun_ringMixin : GRing.Zmodule_IsRing 'End(vT) :=
+Definition lfun_ringMixin : GRing.Zmodule_isRing 'End(vT) :=
   GRing.Ring.on (lfun_comp_ringType^c).
 Definition lfun_ringType : ringType :=
   HB.pack 'End(vT) lfun_ringMixin.
 
-Definition lfun_lalgMixin := GRing.Lmodule_IsLalgebra.Build R lfun_ringType
+Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_ringType
   (fun k x y => comp_lfunZr k y x).
 Definition lfun_lalgType : lalgType R :=
   HB.pack 'End(vT) lfun_ringType lfun_lalgMixin.
 
-Definition lfun_algMixin := GRing.Lalgebra_IsAlgebra.Build R lfun_lalgType
+Definition lfun_algMixin := GRing.Lalgebra_isAlgebra.Build R lfun_lalgType
   (fun k x y => comp_lfunZl k y x).
 Definition lfun_algType : algType R :=
   HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
@@ -1908,7 +1908,7 @@ move=> rw; apply/rowP=> i; rewrite mxE vsprojK.
 by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.
 Qed.
 
-HB.instance Definition _ := Lmodule_HasFinDim.Build K subvs_of subvs_vect_iso.
+HB.instance Definition _ := Lmodule_hasFinDim.Build K subvs_of subvs_vect_iso.
 
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.
@@ -1926,7 +1926,7 @@ Proof.
 exists mxvec => /=; first exact: linearP.
 by exists vec_mx; [apply: mxvecK | apply: vec_mxK].
 Qed.
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ 'M[R]_(m, n) matrix_vect_iso.
+HB.instance Definition _ := Lmodule_hasFinDim.Build _ 'M[R]_(m, n) matrix_vect_iso.
 
 End MatrixVectType.
 
@@ -1940,7 +1940,7 @@ Proof.
 exists (fun a => a%:M) => [a b c|]; first by rewrite rmorphD scale_scalar_mx.
 by exists (fun A : 'M_1 => A 0 0) => [a | A]; rewrite ?mxE // -mx11_scalar.
 Qed.
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ R^o regular_vect_iso.
+HB.instance Definition _ := Lmodule_hasFinDim.Build _ R^o regular_vect_iso.
 
 End RegularVectType.
 
@@ -1958,7 +1958,7 @@ have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
 have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
 by exists p2r; [apply: (@can2_linear _ _ _ (Linear r2p_lin)) | exists r2p].
 Qed.
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ (vT1 * vT2)%type
+HB.instance Definition _ := Lmodule_hasFinDim.Build _ (vT1 * vT2)%type
   pair_vect_iso.
 
 End ProdVector.
@@ -1980,7 +1980,7 @@ exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.
 Qed.
 
-HB.instance Definition _ := Lmodule_HasFinDim.Build _ {ffun I -> vT}
+HB.instance Definition _ := Lmodule_hasFinDim.Build _ {ffun I -> vT}
   ffun_vect_iso.
 
 End FunVectType.

@@ -121,7 +121,7 @@ Proof. by move=> s; apply/permP=> x; rewrite !permE /= permE f_iinv. Qed.
 Lemma perm_mulP : associative perm_mul.
 Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 
-HB.instance Definition _ := IsMulGroup.Build (perm_type T)
+HB.instance Definition _ := isMulGroup.Build (perm_type T)
   perm_mulP perm_oneP perm_invP.
 
 Lemma perm1 x : (1 : {perm T}) x = x.

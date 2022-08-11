@@ -206,7 +206,7 @@ Reserved Notation "[ 'min' G | gP & gQ ]" (at level 0,
 (* be to define a class for infinite groups, which could  *)
 (* share all of the algebraic laws.                       *)
 
-HB.mixin Record IsMulBaseGroup G := {
+HB.mixin Record isMulBaseGroup G := {
   mulg_subdef : G -> G -> G;
   oneg_subdef : G;
   invg_subdef : G -> G;
@@ -236,7 +236,7 @@ HB.mixin Record IsMulBaseGroup G := {
 (* correct.                                                       *)
 
 #[arg_sort, short(type="baseFinGroupType")]
-HB.structure Definition BaseFinGroup := { G of IsMulBaseGroup G & Finite G }.
+HB.structure Definition BaseFinGroup := { G of isMulBaseGroup G & Finite G }.
 
 Module BaseFinGroupExports.
 Bind Scope group_scope with BaseFinGroup.arg_sort.
@@ -269,14 +269,14 @@ Notation "x ^- n" := (x ^+ n)^-1 : group_scope.
 End Notations.
 HB.export Notations.
 
-HB.mixin Record BaseFinGroup_IsGroup G of BaseFinGroup G := {
+HB.mixin Record BaseFinGroup_isGroup G of BaseFinGroup G := {
   mulVg_subproof :
     left_inverse (@oneg [the BaseFinGroup.type of G]) (@invg _) (@mulg _)
 }.
 
 #[short(type="finGroupType")]
 HB.structure Definition FinGroup :=
-  { G of BaseFinGroup_IsGroup G & BaseFinGroup G }.
+  { G of BaseFinGroup_isGroup G & BaseFinGroup G }.
 
 Module FinGroupExports.
 Notation "[ 'finGroupType' 'of' T ]" := (@FinGroup.clone T _)
@@ -285,7 +285,7 @@ Bind Scope group_scope with FinGroup.sort.
 End FinGroupExports.
 HB.export FinGroupExports.
 
-HB.factory Record IsMulGroup G of Finite G := {
+HB.factory Record isMulGroup G of Finite G := {
   mulg : G -> G -> G;
   oneg : G;
   invg : G -> G;
@@ -294,7 +294,7 @@ HB.factory Record IsMulGroup G of Finite G := {
   mulVg : left_inverse oneg invg mulg;
 }.
 
-HB.builders Context G of IsMulGroup G.
+HB.builders Context G of isMulGroup G.
 
 Notation "1" := oneg.
 Infix "*" := mulg.
@@ -314,8 +314,8 @@ by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
 
 HB.instance Definition _ := 
-  IsMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
-HB.instance Definition _ := BaseFinGroup_IsGroup.Build G mulVg.
+  isMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
+HB.instance Definition _ := BaseFinGroup_isGroup.Build G mulVg.
 
 HB.end.
 
@@ -386,7 +386,7 @@ Proof. by rewrite eq_invg_sym invg1. Qed.
 Lemma mulg1 : right_id 1 mulgT.
 Proof. by move=> x; apply: invg_inj; rewrite invMg invg1 mul1g. Qed.
 
-HB.instance Definition _ := Monoid.IsLaw.Build T 1 mulgT mulgA mul1g mulg1.
+HB.instance Definition _ := Monoid.isLaw.Build T 1 mulgT mulgA mul1g mulg1.
 
 Lemma expgnE x n : x ^+ n = expgn_rec x n. Proof. by []. Qed.
 
@@ -666,9 +666,9 @@ apply/imset2P/imset2P=> [[x y Ax By /(canRL invgK)->] | [y x]].
 by rewrite !inE => By1 Ax1 ->; exists x^-1 y^-1; rewrite ?invMg.
 Qed.
 
-HB.instance Definition set_base_group := IsMulBaseGroup.Build (set_type gT)
+HB.instance Definition set_base_group := isMulBaseGroup.Build (set_type gT)
   set_mulgA set_mul1g set_invgK set_invgM.
-HB.instance Definition _ : IsMulBaseGroup {set gT} := set_base_group.
+HB.instance Definition _ : isMulBaseGroup {set gT} := set_base_group.
 
 End BaseSetMulDef.
 
@@ -1682,7 +1682,7 @@ Proof. by move=> u; apply: val_inj; apply: mulVg. Qed.
 Lemma subg_mulP : associative subg_mul.
 Proof. by move=> u v w; apply: val_inj; apply: mulgA. Qed.
 
-HB.instance Definition _ := IsMulGroup.Build subg_of
+HB.instance Definition _ := isMulGroup.Build subg_of
   subg_mulP subg_oneP subg_invP.
 
 Lemma sgvalM : {in setT &, {morph sgval : x y / x * y}}. Proof. by []. Qed.
@@ -2242,7 +2242,7 @@ Proof. by move=> G; apply: val_inj; apply: joing1G. Qed.
 Lemma joinG1 : right_id 1%G joinGT.
 Proof. by move=> G; apply: val_inj; apply: joingG1. Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {group gT} 1%G joinGT
+HB.instance Definition _ := Monoid.isComLaw.Build {group gT} 1%G joinGT
   joinGA joinGC join1G.
 
 Lemma bigprodGEgen I r (P : pred I) (F : I -> {set gT}) :

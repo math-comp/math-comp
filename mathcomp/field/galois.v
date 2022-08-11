@@ -333,14 +333,14 @@ Arguments kHom_lrmorphism {F L f}.
 Definition splitting_field_axiom (F : fieldType) (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
-HB.mixin Record FieldExt_IsSplittingField
+HB.mixin Record FieldExt_isSplittingField
     (F : fieldType) L of FieldExt F L := {
   splittingFieldP_subproof : splitting_field_axiom [the fieldExtType _ of L]
 }.
 
 #[mathcomp(axiom="splitting_field_axiom"), infer(F), short(type="splittingFieldType")]
 HB.structure Definition SplittingField F :=
- { T of FieldExt_IsSplittingField F T & FieldExt F T }.
+ { T of FieldExt_isSplittingField F T & FieldExt F T }.
 
 
 Module SplittingFieldExports.
@@ -387,7 +387,7 @@ HB.factory Record FieldExt_isNormalSplittingField
 }.
 
 HB.builders Context F L of FieldExt_isNormalSplittingField F L.
-HB.instance Definition _ := FieldExt_IsSplittingField.Build F L
+HB.instance Definition _ := FieldExt_isSplittingField.Build F L
   (normal_field_splitting normal_field_splitting_axiom).
 HB.end.
 
@@ -401,7 +401,7 @@ by exists [::]; [rewrite big_nil eqpxx | rewrite Fadjoin_nil regular_fullv].
 Qed.
 
 HB.instance Definition _ (F : fieldType) :=
-  FieldExt_IsSplittingField.Build F F^o (regular_splittingAxiom F).
+  FieldExt_isSplittingField.Build F F^o (regular_splittingAxiom F).
 
 Section SplittingFieldTheory.
 
@@ -413,7 +413,7 @@ Implicit Types (K M E : {subfield L}).
 Lemma splittingFieldP : SplittingField.axiom L.
 Proof. exact: splittingFieldP_subproof. Qed.
 
-Lemma splittingPoly : 
+Lemma splittingPoly :
   {p : {poly L} | p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}}.
 Proof.
 pose factF p s := (p \is a polyOver 1%VS) && (p %= \prod_(z <- s) ('X - z%:P)).
@@ -436,7 +436,7 @@ apply: subvP; apply/Fadjoin_seqP; rewrite -memvE -defL0 mem1v.
 by split=> // y r_y; rewrite -defL0 seqv_sub_adjoin.
 Qed.
 
-HB.instance Definition _ E := FieldExt_IsSplittingField.Build
+HB.instance Definition _ E := FieldExt_isSplittingField.Build
   [the fieldType of subvs_of E] (fieldOver E) (fieldOver_splitting E).
 
 Lemma enum_AEnd : {kAutL : seq 'AEnd(L) | forall f, f \in kAutL}.
@@ -628,7 +628,7 @@ Definition inAEnd f := SeqSub (svalP (enum_AEnd L) f).
 Fact inAEndK : cancel inAEnd val. Proof. by []. Qed.
 
 HB.instance Definition _ := Countable.copy 'AEnd(L) (can_type inAEndK).
-HB.instance Definition _ : IsFinite 'AEnd(L) := CanFinMixin inAEndK.
+HB.instance Definition _ : isFinite 'AEnd(L) := CanFinMixin inAEndK.
 
 (* the group operation is the categorical composition operation *)
 Definition comp_AEnd (f g : 'AEnd(L)) : 'AEnd(L) := (g \o f)%AF.
@@ -642,7 +642,7 @@ Proof. by move=> f; apply/val_inj/comp_lfun1r. Qed.
 Fact comp_AEndK : left_inverse \1%AF (@inv_ahom _ L) comp_AEnd.
 Proof.  by move=> f; apply/val_inj; rewrite /= lker0_compfV ?AEnd_lker0. Qed.
 
-HB.instance Definition _:= IsMulGroup.Build 'AEnd(L)
+HB.instance Definition _:= isMulGroup.Build 'AEnd(L)
   comp_AEndA comp_AEnd1l comp_AEndK.
 
 Definition kAEnd U V := [set f : 'AEnd(L) | kAut U V f].
@@ -712,7 +712,7 @@ Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
 Let gal_sgval_inj := can_inj gal_sgvalK.
 
 HB.instance Definition _ := Countable.copy gal_of (can_type gal_sgvalK).
-HB.instance Definition _ : IsFinite gal_of := CanFinMixin gal_sgvalK.
+HB.instance Definition _ : isFinite gal_of := CanFinMixin gal_sgvalK.
 
 Definition gal_one := Gal 1%g.
 Definition gal_inv x := Gal (gal_sgval x)^-1.
@@ -724,7 +724,7 @@ Proof. by move=> x; apply/gal_sgval_inj/mulVg. Qed.
 Fact gal_mulP : associative gal_mul.
 Proof. by move=> x y z; apply/gal_sgval_inj/mulgA. Qed.
 
-HB.instance Definition _ := IsMulGroup.Build gal_of gal_mulP gal_oneP gal_invP.
+HB.instance Definition _ := isMulGroup.Build gal_of gal_mulP gal_oneP gal_invP.
 
 Coercion gal_repr u : 'AEnd(L) := repr (sgval (gal_sgval u)).
 

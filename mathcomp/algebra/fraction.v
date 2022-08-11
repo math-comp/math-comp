@@ -215,7 +215,7 @@ by rewrite mulr1 mulr0 mulNr addNr.
 Qed.
 
 (* fracions form an abelian group *)
-HB.instance Definition _ := GRing.IsZmodule.Build type addA addC add0_l addN_l.
+HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0_l addN_l.
 
 Lemma mulA : associative mul.
 Proof.
@@ -248,7 +248,7 @@ Proof. by rewrite piE equivfE !numden_Ratio ?mul1r ?oner_eq0. Qed.
 
 (* fractions form a commutative ring *)
 HB.instance Definition _ :=
-  GRing.Zmodule_IsComRing.Build type mulA mulC mul1_l mul_addl nonzero1.
+  GRing.Zmodule_isComRing.Build type mulA mulC mul1_l mul_addl nonzero1.
 
 Lemma mulV_l : forall a, a != 0%:F -> mul (inv a) a = 1%:F.
 Proof.
@@ -267,7 +267,7 @@ Qed.
 
 (* fractions form a ring with explicit unit *)
 (* fractions form a field *)
-HB.instance Definition _ := GRing.ComRing_IsField.Build type mulV_l inv0.
+HB.instance Definition _ := GRing.ComRing_isField.Build type mulV_l inv0.
 
 End FracField.
 End FracField.

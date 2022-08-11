@@ -61,13 +61,13 @@ Declare Scope C_expanded_scope.
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
-HB.factory Record IsComplex L of GRing.ClosedField L  := {
+HB.factory Record isComplex L of GRing.ClosedField L  := {
   conj :  {rmorphism L -> L};
   conjK : involutive conj;
   conj_nt : ~ conj =1 id
 }.
 
-HB.builders Context L of IsComplex L.
+HB.builders Context L of isComplex L.
 
 Lemma nz2: 2 != 0 :> L.
 Proof.
@@ -258,12 +258,12 @@ Proof.
 Qed.
 
 HB.instance Definition _ :=
-  Num.IntegralDomain_IsNumRing.Build L normD sposD norm_eq0
+  Num.IntegralDomain_isNumRing.Build L normD sposD norm_eq0
          pos_linear normM (fun x y => erefl (le x y))
                           (fun x y => erefl (lt x y)).
 
 HB.instance Definition _ :=
-  Num.NumField_IsImaginary.Build L (sqrtK _) normK.
+  Num.NumField_isImaginary.Build L (sqrtK _) normK.
 
 HB.end.
 
@@ -275,7 +275,7 @@ Parameter type : Type.
 
 Parameter conjMixin : Num.ClosedField type.
 
-Parameter IsCountable : Countable type.
+Parameter isCountable : Countable type.
 
 Axiom algebraic : integralRange (@ratr (Num.ClosedField.Pack conjMixin)).
 
@@ -296,7 +296,7 @@ Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
 Definition L' : Type := eta L.
 HB.instance Definition _ := GRing.ClosedField.on L'.
-HB.instance Definition _ := IsComplex.Build L' conjL_K conjL_nt.
+HB.instance Definition _ := isComplex.Build L' conjL_K conjL_nt.
 
 Notation cfType := [the Num.ClosedField.type of L'].
 
@@ -318,7 +318,7 @@ Definition type : Type := {eq_quot eq_root}%qT.
 
 HB.instance Definition _ : EqQuotient _ eq_root type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
-HB.instance Definition _ : IsCountable type := CanCountMixin reprK.
+HB.instance Definition _ : isCountable type := CanCountMixin reprK.
 
 Definition CtoL (u : type) := rootQtoL (repr u).
 
@@ -368,7 +368,7 @@ Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K add0r. Qed.
 Fact addN : left_inverse zero opp add.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K addNr. Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build type addA addC add0 addN.
+HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_additive : additive CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
@@ -393,8 +393,8 @@ Proof. by move=> u v w; apply: CtoL_inj; rewrite !LtoC_K mulrDl. Qed.
 Fact one_nz : one != 0 :> type.
 Proof. by rewrite -(inj_eq CtoL_inj) !LtoC_K oner_eq0. Qed.
 
-HB.instance Definition _ := 
-  GRing.Zmodule_IsComRing.Build type mulA mulC mul1 mulD one_nz.
+HB.instance Definition _ :=
+  GRing.Zmodule_isComRing.Build type mulA mulC mul1 mulD one_nz.
 
 Fact CtoL_is_multiplicative : multiplicative CtoL.
 Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
@@ -408,7 +408,7 @@ Qed.
 
 Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
 
-HB.instance Definition _ := GRing.ComRing_IsField.Build type mulVf inv0.
+HB.instance Definition _ := GRing.ComRing_isField.Build type mulVf inv0.
 
 Fact closedFieldAxiom : GRing.closed_field_axiom [the ringType of type].
 Proof.
@@ -428,7 +428,7 @@ rewrite horner_poly rmorph_sum; apply: eq_bigr => k _.
 by rewrite rmorphM rmorphX /= LtoC_K.
 Qed.
 
-HB.instance Definition _ := Field_IsAlgClosed.Build type closedFieldAxiom.
+HB.instance Definition _ := Field_isAlgClosed.Build type closedFieldAxiom.
 
 Fact conj_subproof u : integralOver QtoL (conjL (CtoL u)).
 Proof.
@@ -458,7 +458,7 @@ have/lt_geF/idP[] := @ltr01 cfType; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism)
 by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
-HB.instance Definition _ := IsComplex.Build type conjK conj_nt.
+HB.instance Definition _ := isComplex.Build type conjK conj_nt.
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
 Proof. by apply: (@normCK [the numClosedFieldType of type]). Qed.
@@ -472,14 +472,14 @@ rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
-Definition IsCountable := Countable.on type.
+Definition isCountable := Countable.on type.
 
 End Implementation.
 
 Definition divisor := Implementation.type.
 
 #[export] HB.instance Definition _ := Implementation.conjMixin.
-#[export] HB.instance Definition _ := Implementation.IsCountable.
+#[export] HB.instance Definition _ := Implementation.isCountable.
 
 Module Internals.
 

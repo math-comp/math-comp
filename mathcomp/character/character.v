@@ -2500,7 +2500,7 @@ have mulA: associative mul by move=> u v w; apply: cFinj; rewrite !cFmul mulrA.
 have mul1: left_id one mul by move=> u; apply: cFinj; rewrite cFmul cFone mul1r.
 have mulV: left_inverse one inv mul.
   by move=> u; apply: cFinj; rewrite cFmul cFinv cFone mulVr ?lin_char_unitr.
-pose imA := IsMulGroup.Build linT mulA mul1 mulV.
+pose imA := isMulGroup.Build linT mulA mul1 mulV.
 pose linG : finGroupType := HB.pack linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
   by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.

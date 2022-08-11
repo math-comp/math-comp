@@ -574,7 +574,7 @@ rewrite /= mulgA mulG_subG centM subsetI cGH cHK andbT -(cent_joinEr cHK).
 by rewrite -(cent_joinEr cGH) !groupP.
 Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {set gT} 1 cprod
+HB.instance Definition _ := Monoid.isComLaw.Build {set gT} 1 cprod
   cprodA cprodC cprod1g.
 
 Lemma cprod_modl A B G H :
@@ -741,7 +741,7 @@ rewrite setIC group_modr ?joing_subl //= eHK -(cent_joinEr cGH).
 by rewrite -group_modl ?joing_subr //= setIC (normC (sub1G _)) mulgS.
 Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {set gT} 1 dprod
+HB.instance Definition _ := Monoid.isComLaw.Build {set gT} 1 dprod
   dprodA dprodC dprod1g.
 
 Lemma bigdprodWcp I (r : seq I) P F G :
@@ -999,7 +999,7 @@ Proof. by move=> x; congr (_, _); apply: mulVg. Qed.
 Lemma extprod_mulgA : associative extprod_mulg.
 Proof. by move=> x y z; congr (_, _); apply: mulgA. Qed.
 
-HB.instance Definition _ := IsMulGroup.Build (gT1 * gT2)%type
+HB.instance Definition _ := isMulGroup.Build (gT1 * gT2)%type
   extprod_mulgA extprod_mul1g extprod_mulVg.
 
 Lemma group_setX (H1 : {group gT1}) (H2 : {group gT2}) : group_set (setX H1 H2).
@@ -1169,7 +1169,7 @@ case: v w => [[b y]] /=; case/setXP=> Db Ry [[c z]] /=; case/setXP=> Dc Rz.
 by rewrite !(actMin to) // gactM ?gact_stable // !mulgA.
 Qed.
 
-HB.instance Definition _ := IsMulGroup.Build sdT
+HB.instance Definition _ := isMulGroup.Build sdT
   sdprod_mulgA sdprod_mul1g sdprod_mulVg.
 
 Definition sdprod_groupType := [the FinGroup.type of sdT].

@@ -67,7 +67,7 @@ have mFpA: associative mFp.
 have mFpC: commutative mFp by move=> i j; apply: val_inj; rewrite /= mulnC.
 have mFp1: left_id Fp1 mFp by move=> i; apply: val_inj; rewrite /= mul1n.
 have mFp1r: right_id Fp1 mFp by move=> i; apply: val_inj; rewrite /= muln1.
-pose mFpcM := Monoid.IsComLaw.Build 'I_p Fp1 mFp mFpA mFpC mFp1.
+pose mFpcM := Monoid.isComLaw.Build 'I_p Fp1 mFp mFpA mFpC mFp1.
 pose mFpCL : Monoid.com_law _ := HB.pack mFp mFpcM.
 pose mFpM := Monoid.Law.sort mFpCL.
 pose vFp (i : 'I_p) := toFp (egcdn i p).1.

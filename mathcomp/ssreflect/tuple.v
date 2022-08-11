@@ -305,8 +305,8 @@ Section EqTuple.
 
 Variables (n : nat) (T : eqType).
 
-HB.instance Definition tuple_HasDecEq : HasDecEq (n.-tuple T) :=
-  [HasDecEq of n.-tuple T by <:].
+HB.instance Definition tuple_hasDecEq : hasDecEq (n.-tuple T) :=
+  [hasDecEq of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
@@ -345,10 +345,10 @@ Qed.
 
 End EqTuple.
 
-HB.instance Definition tuple_HasChoice n (T : choiceType) :=
-  [HasChoice of n.-tuple T by <:].
-HB.instance Definition tuple_IsCountable n (T : countType) :=
-  [IsCountable of n.-tuple T by <:].
+HB.instance Definition tuple_hasChoice n (T : choiceType) :=
+  [hasChoice of n.-tuple T by <:].
+HB.instance Definition tuple_isCountable n (T : countType) :=
+  [isCountable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
 Section FinTupleSig.
@@ -398,7 +398,7 @@ Variables (n : nat) (T : finType).
 (* but in practice it will not work because the mixin_enum projector          *)
 (* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
-HB.instance Definition tuple_finMixin : IsFinite (n.-tuple T) :=
+HB.instance Definition tuple_finMixin : isFinite (n.-tuple T) :=
   FinMixin (@FinTuple.enumP n T).
 
 Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
@@ -631,8 +631,8 @@ Proof. by move=> s; apply: val_inj; case: s => [[]]. Qed.
 
 End SeqBseq.
 
-HB.instance Definition bseq_HasDecEq n (T : eqType) :=
-  [HasDecEq of n.-bseq T by <:].
+HB.instance Definition bseq_hasDecEq n (T : eqType) :=
+  [hasDecEq of n.-bseq T by <:].
 
 Canonical bseq_predType n (T : eqType) :=
   Eval hnf in PredType (fun t : n.-bseq T => mem_seq t).
@@ -640,11 +640,11 @@ Canonical bseq_predType n (T : eqType) :=
 Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
 Proof. by []. Qed.
 
-HB.instance Definition bseq_HasChoice n (T : choiceType) :=
-  [HasChoice of n.-bseq T by <:].
+HB.instance Definition bseq_hasChoice n (T : choiceType) :=
+  [hasChoice of n.-bseq T by <:].
 
-HB.instance Definition bseq_IsCountable n (T : countType) :=
-  [IsCountable of n.-bseq T by <:].
+HB.instance Definition bseq_isCountable n (T : countType) :=
+  [isCountable of n.-bseq T by <:].
 
 Definition bseq_tagged_tuple n T (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
   Tagged _ (in_tuple s : (Ordinal (size_bseq s : size s < n.+1)).-tuple _).
@@ -675,5 +675,5 @@ Proof. exact/Bijective/bseq_tagged_tupleK/tagged_tuple_bseqK. Qed.
 #[global] Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
 
 #[non_forgetful_inheritance]
-HB.instance Definition bseq_IsFinite n (T : finType) : IsFinite (n.-bseq T) :=
+HB.instance Definition bseq_isFinite n (T : finType) : isFinite (n.-bseq T) :=
   CanFinMixin (@bseq_tagged_tupleK n T).

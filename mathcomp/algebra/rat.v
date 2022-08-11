@@ -48,8 +48,8 @@ Delimit Scope rat_scope with Q.
 Definition ratz (n : int) := @Rat (n, 1) (coprimen1 _).
 (* Coercion ratz (n : int) := @Rat (n, 1) (coprimen1 _). *)
 
-Definition rat_IsSUB := Eval hnf in [IsSUB for valq].
-HB.instance Definition _ := rat_IsSUB.
+Definition rat_isSUB := Eval hnf in [IsSUB for valq].
+HB.instance Definition _ := rat_isSUB.
 #[hnf] HB.instance Definition _ := [Equality of rat by <:].
 HB.instance Definition _ := [Countable of rat by <:].
 
@@ -426,7 +426,7 @@ rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
 by rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mul0r.
 Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build rat addqA addqC add0q addNq.
+HB.instance Definition _ := GRing.isZmodule.Build rat addqA addqC add0q addNq.
 
 Definition mulq_subdef (x y : int * int) :=
   let: (x1, x2) := x in
@@ -498,7 +498,7 @@ Qed.
 Fact nonzero1q : oneq != zeroq. Proof. by []. Qed.
 
 HB.instance Definition _ :=
-  GRing.Zmodule_IsComRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
+  GRing.Zmodule_isComRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
 
 Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
@@ -509,7 +509,7 @@ Qed.
 
 Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
-HB.instance Definition _ := GRing.ComRing_IsField.Build rat mulVq invq0.
+HB.instance Definition _ := GRing.ComRing_isField.Build rat mulVq invq0.
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
@@ -735,7 +735,7 @@ Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite lt_ratE le_ratE lt_def rat_eq. Qed.
 
 HB.instance Definition _ :=
-   Num.IntegralDomain_IsLeReal.Build rat le_rat0D le_rat0M le_rat0_anti
+   Num.IntegralDomain_isLeReal.Build rat le_rat0D le_rat0M le_rat0_anti
      subq_ge0 (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
@@ -772,7 +772,7 @@ by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
 HB.instance Definition _ :=
-  Num.RealField_IsArchimedean.Build rat rat_archimedean.
+  Num.RealField_isArchimedean.Build rat rat_archimedean.
 
 Section QintPred.
 

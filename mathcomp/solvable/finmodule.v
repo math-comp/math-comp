@@ -100,8 +100,8 @@ Proof. by case=> x Ax [y Ay]; apply: val_inj; apply: (centsP abelA). Qed.
 
 #[export]
 HB.instance Definition _ :=
-  GRing.IsZmodule.Build fmodA fmod_addrA fmod_addrC fmod_add0r fmod_addNr.
-(* TODO: Should IsZmodule and the like be exported from ssralg *)
+  GRing.isZmodule.Build fmodA fmod_addrA fmod_addrC fmod_add0r fmod_addNr.
+(* TODO: Should isZmodule and the like be exported from ssralg *)
 #[export]
 HB.instance Definition _ := [finGroupMixin of fmodA for +%R].
 

@@ -49,7 +49,7 @@ Module ZmoduleExports.
 Notation "[ 'finZmodType' 'of' T ]" := (Zmodule.clone T _)
   (at level 0, format "[ 'finZmodType'  'of'  T ]") : form_scope.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
-    (IsMulGroup.Build R (@addrA _) (@add0r _) (@addNr _))
+    (isMulGroup.Build R (@addrA _) (@add0r _) (@addNr _))
   (at level 0, format "[ 'finGroupMixin'  'of'  R  'for'  +%R ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
@@ -176,9 +176,9 @@ HB.instance Definition _ (R : Ring.type) := [finGroupMixin of R for +%R].
 Coercion Ring_to_baseFinGroup (R : Ring.type) := BaseFinGroup.clone R _.
 Coercion Ring_to_finGroup (R : Ring.type) := FinGroup.clone R _.
 
-HB.factory Record IsRing R of Ring R := {}.
+HB.factory Record isRing R of Ring R := {}.
 
-HB.builders Context R of IsRing R.
+HB.builders Context R of isRing R.
   Definition is_inv (x y : R) := (x * y == 1) && (y * x == 1).
   Definition unit := [qualify a x : R | [exists y, is_inv x y]].
   Definition inv x := odflt x (pick (is_inv x)).
@@ -207,7 +207,7 @@ HB.builders Context R of IsRing R.
   Qed.
 
   HB.instance Definition _ :=
-    GRing.Ring_HasMulInverse.Build R mulVr mulrV intro_unit invr_out.
+    GRing.Ring_hasMulInverse.Build R mulVr mulrV intro_unit invr_out.
 HB.end.
 
 #[export, non_forgetful_inheritance]
@@ -250,7 +250,7 @@ Proof. by move=> u; apply/val_inj/mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
 Proof. by move=> u; apply/val_inj/(mulVr (valP u)). Qed.
 
-#[export] HB.instance Definition _ := IsMulGroup.Build uT
+#[export] HB.instance Definition _ := isMulGroup.Build uT
   unit_muluA unit_mul1u unit_mulVu.
 
 Lemma val_unit1 : val (1%g : uT) = 1. Proof. by []. Qed.
@@ -303,9 +303,9 @@ HB.instance Definition _ (R : Field.type) := [finGroupMixin of R for +%R].
 Coercion Field_to_baseFinGroup (R : Field.type) := BaseFinGroup.clone R _.
 Coercion Field_to_finGroup (R : Field.type) := FinGroup.clone R _.
 
-HB.factory Record IsField F of Field F := {}.
+HB.factory Record isField F of Field F := {}.
 
-HB.builders Context F of IsField F.
+HB.builders Context F of isField F.
   Fixpoint sat e f :=
     match f with
     | GRing.Bool b => b
@@ -331,7 +331,7 @@ HB.builders Context F of IsField F.
     by move=> i f IH e; apply: (iffP forallP) => f_ x; apply/IH.
   Qed.
 
-  HB.instance Definition _ := GRing.Field_IsDec.Build F decidable.
+  HB.instance Definition _ := GRing.Field_isDec.Build F decidable.
 HB.end.
 
 #[export, non_forgetful_inheritance]

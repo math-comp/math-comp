@@ -13,7 +13,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*                       for type T: reflect (x = y) (e x y) for all x y : T. *)
 (*                                                                            *)
 (* List of factories (to use with HB.instance Definition _ := )               *)
-(*  - HasDecEq.Build T eqP                                                    *)
+(*  - hasDecEq.Build T eqP                                                    *)
 (*    Declares an EqType on T from the equality axiom for some relation       *)
 (*    eqP must be an instance of Equality.axiom                               *)
 (*                                                                            *)
@@ -22,7 +22,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*                      type convertible, but usually not identical, to T.    *)
 (*      [eqType of T] == clone for T of the eqType inferred for T, possibly   *)
 (*                       after unfolding some definitions.                    *)
-(*     [HasDecEq of T] == mixin of the eqType inferred for T.                 *)
+(*     [hasDecEq of T] == mixin of the eqType inferred for T.                 *)
 (*       comparable T <-> equality on T is decidable.                         *)
 (*                    := forall x y : T, decidable (x = y)                    *)
 (*  comparableMixin compT == equality mixin for compT : comparable T.         *)
@@ -107,7 +107,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*     then it replaces the inferred projector.                               *)
 (* Subtypes inherit the eqType structure of their base types; the generic     *)
 (* structure should be explicitly instantiated using the                      *)
-(*   [HasDecEq of S by <:]                                                    *)
+(*   [hasDecEq of S by <:]                                                    *)
 (* construct to declare the equality mixin; this pattern is repeated for all  *)
 (* the combinatorial interfaces (Choice, Countable, Finite). As noted above,  *)
 (* such mixins should not be made Canonical.                                  *)
@@ -125,13 +125,13 @@ Declare Scope fun_delta_scope.
 
 Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
-HB.mixin Record HasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
+HB.mixin Record hasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 
 #[mathcomp(axiom="eq_axiom"), short(type="eqType")]
-HB.structure Definition Equality := { T of HasDecEq T }.
+HB.structure Definition Equality := { T of hasDecEq T }.
 
-Notation "[ 'HasDecEq' 'of' T ]" := (Equality.on T)
-  (at level 0, format "[ 'HasDecEq'  'of'  T ]") : form_scope.
+Notation "[ 'hasDecEq' 'of' T ]" := (Equality.on T)
+  (at level 0, format "[ 'hasDecEq'  'of'  T ]") : form_scope.
 Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
 Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
@@ -146,9 +146,9 @@ Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
 (* inverses to eqE (like eqbE, eqnE, eqseqE, etc.) for new recursive          *)
 (* comparisons, but can only be used for manifest mixing with a bespoke       *)
 (* comparison function, and so is incompatible with PcanEqMixin and the like  *)
-(* - this is why the tree_HasDecEq for GenTree.tree in library choice is not   *)
+(* - this is why the tree_hasDecEq for GenTree.tree in library choice is not   *)
 (* declared Canonical.                                                        *)
-Lemma eqE (T : eqType) x : eq_op x = HasDecEq.eq_op (Equality.class T) x.
+Lemma eqE (T : eqType) x : eq_op x = hasDecEq.eq_op (Equality.class T) x.
 Proof. by []. Qed.
 
 Arguments eqP {T x y} : rename.
@@ -305,7 +305,7 @@ Module Export EqTypePred := MakeEqTypePred eqtype.Equality.
 Lemma unit_eqP : Equality.axiom (fun _ _ : unit => true).
 Proof. by do 2!case; left. Qed.
 
-HB.instance Definition unit_HasDecEq := HasDecEq.Build unit unit_eqP.
+HB.instance Definition unit_hasDecEq := hasDecEq.Build unit unit_eqP.
 
 (* Comparison for booleans. *)
 
@@ -315,7 +315,7 @@ Definition eqb b := addb (~~ b).
 Lemma eqbP : Equality.axiom eqb.
 Proof. by do 2!case; constructor. Qed.
 
-HB.instance Definition bool_HasDecEq := HasDecEq.Build bool eqbP.
+HB.instance Definition bool_hasDecEq := hasDecEq.Build bool eqbP.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
@@ -514,7 +514,7 @@ Definition compareb x y : bool := compare_T x y.
 Lemma compareP : Equality.axiom compareb.
 Proof. by move=> x y; apply: sumboolP. Qed.
 
-Definition comparableMixin := HasDecEq.Build T compareP.
+Definition comparableMixin := hasDecEq.Build T compareP.
 
 End ComparableType.
 
@@ -522,7 +522,7 @@ Definition eq_comparable (T : eqType) : comparable T :=
   fun x y => decP (x =P y).
 
 #[key="sub_sort"]
-HB.mixin Record IsSUB (T : Type) (P : pred T) (sub_sort : Type) := {
+HB.mixin Record isSUB (T : Type) (P : pred T) (sub_sort : Type) := {
   val_subdef : sub_sort -> T;
   Sub : forall x, P x -> sub_sort;
   Sub_rect : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
@@ -530,15 +530,15 @@ HB.mixin Record IsSUB (T : Type) (P : pred T) (sub_sort : Type) := {
 }.
 
 #[short(type="subType")]
-HB.structure Definition SUB (T : Type) (P : pred T) := { S of IsSUB T P S }.
+HB.structure Definition SUB (T : Type) (P : pred T) := { S of isSUB T P S }.
 
-Notation val := (IsSUB.val_subdef (SUB.on _)).
-Notation "\val" := (IsSUB.val_subdef (SUB.on _)) (only parsing).
-Notation "\val" := (IsSUB.val_subdef _) (only printing).
+Notation val := (isSUB.val_subdef (SUB.on _)).
+Notation "\val" := (isSUB.val_subdef (SUB.on _)) (only parsing).
+Notation "\val" := (isSUB.val_subdef _) (only printing).
 
 #[short(type="subEqType")]
 HB.structure Definition SubEquality T (P : pred T) :=
-  { sT of Equality sT & IsSUB T P sT}.
+  { sT of Equality sT & isSUB T P sT}.
 
 Section SubType.
 
@@ -553,7 +553,7 @@ Section Theory.
 
 Variable sT : subType P.
 
-Local Notation val := (IsSUB.val_subdef (SUB.on sT)).
+Local Notation val := (isSUB.val_subdef (SUB.on sT)).
 Local Notation Sub := (@Sub _ _ sT).
 
 Lemma SubK x Px : val (@Sub x Px) = x. Proof. exact: SubK_subproof. Qed.
@@ -652,34 +652,34 @@ Reserved Notation "[ 'IsSUB' 'for' v ]"
   (at level 0, format "[ 'IsSUB'  'for'  v ]").
 
 Notation "[ 'IsSUB' 'for' v ]" :=
-  (@IsSUB.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
+  (@isSUB.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
 
 Notation "[ 'IsSUB' 'of'  T  'for' v ]" :=
-  (@IsSUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect)
+  (@isSUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
 
 Notation "[ 'IsSUB' 'for' v 'by' rec ]" :=
- (@IsSUB.phant_Build _ _ _ v _ rec vrefl)
+ (@isSUB.phant_Build _ _ _ v _ rec vrefl)
  (at level 0, format "[ 'IsSUB'  'for'  v  'by'  rec ]") : form_scope.
 
-Notation "[ 'IsSUB' 'for' v ]" := (@IsSUB.phant_Build _ _ _ v _ _ _)
+Notation "[ 'IsSUB' 'for' v ]" := (@isSUB.phant_Build _ _ _ v _ _ _)
   (only printing, at level 0, format "[ 'IsSUB'  'for'  v ]") : form_scope.
 
-Reserved Notation "[ 'IsNew' 'for' v ]"
-  (at level 0, format "[ 'IsNew'  'for'  v ]").
+Reserved Notation "[ 'isNew' 'for' v ]"
+  (at level 0, format "[ 'isNew'  'for'  v ]").
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  @IsSUB.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
+  @isSUB.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
 
-Notation "[ 'IsNew' 'for' v ]" :=
+Notation "[ 'isNew' 'for' v ]" :=
   (@NewMixin _ _ v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
-Notation "[ 'IsNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
-  (only printing, at level 0, format "[ 'IsNew'  'for'  v ]") : form_scope.
+Notation "[ 'isNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
+  (only printing, at level 0, format "[ 'isNew'  'for'  v ]") : form_scope.
 
-Notation "[ 'IsNew' 'of'  T  'for' v ]" :=
+Notation "[ 'isNew' 'of'  T  'for' v ]" :=
   (@NewMixin _ T v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
 Definition innew T nT x := @Sub T predT nT x (erefl true).
@@ -733,15 +733,15 @@ Variables (T : Type) (eT : eqType) (f : T -> eT).
 Lemma inj_eqAxiom : injective f -> Equality.axiom (fun x y => f x == f y).
 Proof. by move=> f_inj x y; apply: (iffP eqP) => [|-> //]; apply: f_inj. Qed.
 
-Definition InjEqMixin f_inj := HasDecEq.Build T (inj_eqAxiom f_inj).
-HB.instance Definition _ f_inj : HasDecEq (inj_type f_inj) := InjEqMixin f_inj.
+Definition InjEqMixin f_inj := hasDecEq.Build T (inj_eqAxiom f_inj).
+HB.instance Definition _ f_inj : hasDecEq (inj_type f_inj) := InjEqMixin f_inj.
 
 Definition PcanEqMixin g (fK : pcancel f g) := InjEqMixin (pcan_inj fK).
-HB.instance Definition _ g (fK : pcancel f g) : HasDecEq (pcan_type fK) :=
+HB.instance Definition _ g (fK : pcancel f g) : hasDecEq (pcan_type fK) :=
   PcanEqMixin fK.
 
 Definition CanEqMixin g (fK : cancel f g) := InjEqMixin (can_inj fK).
-HB.instance Definition _ g (fK : cancel f g) : HasDecEq (can_type fK) :=
+HB.instance Definition _ g (fK : cancel f g) : hasDecEq (can_type fK) :=
   CanEqMixin fK.
 
 End TransferEqType.
@@ -758,7 +758,7 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-HB.instance Definition sub_HasDecEq := HasDecEq.Build (sub_type sT) val_eqP.
+HB.instance Definition sub_hasDecEq := hasDecEq.Build (sub_type sT) val_eqP.
 
 End SubEqType.
 
@@ -771,13 +771,13 @@ Arguments val_eqP {T P sT x y}.
 Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T))
   (at level 0, format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use [Equality of _ by <:] or [HasDecEq of _ by <:] instead")]
+  note="Use [Equality of _ by <:] or [hasDecEq of _ by <:] instead")]
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" :=
-  (HasDecEq.Build (T : Type) (@val_eqP _ _ _))
+  (hasDecEq.Build (T : Type) (@val_eqP _ _ _))
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
-Notation "[ 'HasDecEq' 'of' T 'by' <: ]" :=
-  (HasDecEq.Build (T : Type) (@val_eqP _ _ _))
-  (at level 0, format "[ 'HasDecEq'  'of'  T  'by'  <: ]") : form_scope.
+Notation "[ 'hasDecEq' 'of' T 'by' <: ]" :=
+  (hasDecEq.Build (T : Type) (@val_eqP _ _ _))
+  (at level 0, format "[ 'hasDecEq'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ := Equality.copy void (pcan_type (of_voidK unit)).
 HB.instance Definition _ (T : eqType) (P : pred T) :=
@@ -795,7 +795,7 @@ move=> [x1 x2] [y1 y2] /=; apply: (iffP andP) => [[]|[<- <-]] //=.
 by do 2!move/eqP->.
 Qed.
 
-HB.instance Definition prod_HasDecEq := HasDecEq.Build (T1 * T2)%type pair_eqP.
+HB.instance Definition prod_hasDecEq := hasDecEq.Build (T1 * T2)%type pair_eqP.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
 
@@ -832,7 +832,7 @@ Proof.
 case=> [x|] [y|] /=; by [constructor | apply: (iffP eqP) => [|[]] ->].
 Qed.
 
-HB.instance Definition option_HasDecEq := HasDecEq.Build (option T) opt_eqP.
+HB.instance Definition option_hasDecEq := hasDecEq.Build (option T) opt_eqP.
 
 End OptionEqType.
 
@@ -869,7 +869,7 @@ case: eqP => [<-|Hij] y; last by right; case.
 by apply: (iffP eqP) => [->|<-]; rewrite tagged_asE.
 Qed.
 
-HB.instance Definition tag_HasDecEq := HasDecEq.Build {i : I & T_ i} tag_eqP.
+HB.instance Definition tag_hasDecEq := hasDecEq.Build {i : I & T_ i} tag_eqP.
 
 Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 
@@ -898,7 +898,7 @@ Definition sum_eq u v :=
 Lemma sum_eqP : Equality.axiom sum_eq.
 Proof. case=> x [] y /=; by [right | apply: (iffP eqP) => [->|[->]]]. Qed.
 
-HB.instance Definition sum_HasDecEq := HasDecEq.Build (T1 + T2)%type sum_eqP.
+HB.instance Definition sum_hasDecEq := hasDecEq.Build (T1 + T2)%type sum_eqP.
 
 Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 

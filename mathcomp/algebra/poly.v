@@ -330,7 +330,7 @@ move=> p; apply/polyP=> i.
 by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build (polynomial R)
+HB.instance Definition _ := GRing.isZmodule.Build (polynomial R)
   add_polyA add_polyC add_poly0 add_polyN.
 HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 
@@ -537,7 +537,7 @@ Qed.
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsRing.Build (polynomial R)
+HB.instance Definition _ := GRing.Zmodule_isRing.Build (polynomial R)
   mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
 HB.instance Definition _ := GRing.Ring.on {poly R}.
 
@@ -670,9 +670,9 @@ Proof. by move=> a b /=; rewrite !scale_polyE raddfD mulrDl. Qed.
 Fact scale_polyAl a p q : scale_poly a (p * q) = scale_poly a p * q.
 Proof. by rewrite !scale_polyE mulrA. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_IsLmodule.Build R (polynomial R)
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R (polynomial R)
   scale_polyA scale_1poly scale_polyDr scale_polyDl.
-HB.instance Definition _ := GRing.Lmodule_IsLalgebra.Build R (polynomial R)
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R (polynomial R)
   scale_polyAl.
 HB.instance Definition _ := GRing.Lalgebra.on {poly R}.
 
@@ -2347,7 +2347,7 @@ apply/polyP=> i; rewrite coefM coefMr.
 by apply: eq_bigr => j _; rewrite mulrC.
 Qed.
 
-HB.instance Definition _ := GRing.Ring_HasCommutativeMul.Build (polynomial R)
+HB.instance Definition _ := GRing.Ring_hasCommutativeMul.Build (polynomial R)
   poly_mul_comm.
 HB.instance Definition _ := GRing.Lalgebra_isComAlgebra.Build R (polynomial R).
 HB.instance Definition _ := GRing.ComAlgebra.on {poly R}.
@@ -2566,11 +2566,11 @@ Qed.
 Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
 Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
-HB.instance Definition _ := GRing.ComRing_HasMulInverse.Build (polynomial R)
+HB.instance Definition _ := GRing.ComRing_hasMulInverse.Build (polynomial R)
   poly_mulVp poly_intro_unit poly_inv_out.
 HB.instance Definition _ := GRing.ComUnitRing.on {poly R}.
 
-HB.instance Definition _ := GRing.ComUnitRing_IsIntegral.Build (polynomial R)
+HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build (polynomial R)
   poly_idomainAxiom.
 HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 

@@ -104,7 +104,7 @@ by rewrite norm_rlcoset ?nNH // -lcosetM mulVg mul1g.
 Qed.
 
 HB.instance Definition _ :=
-  IsMulGroup.Build coset_of coset_mulP coset_oneP coset_invP.
+  isMulGroup.Build coset_of coset_mulP coset_oneP coset_invP.
 
 (* Projection of the initial group type over the cosets groupType.  *)
 

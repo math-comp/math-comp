@@ -79,7 +79,7 @@ Section Sections.
 Variables (gT : finGroupType).
 Implicit Types (G : {group gT}) (s : section gT).
 
-HB.instance Definition _ := [IsNew for (@pair_of_section gT)].
+HB.instance Definition _ := [isNew for (@pair_of_section gT)].
 HB.instance Definition _ := [Finite of section gT by <:].
 Canonical section_group.
 

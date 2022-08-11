@@ -102,7 +102,7 @@ Lemma Zp_addC : commutative Zp_add.
 Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
 
 HB.instance Definition _ :=
-  GRing.IsZmodule.Build 'I_p Zp_addA Zp_addC Zp_add0z Zp_addNz.
+  GRing.isZmodule.Build 'I_p Zp_addA Zp_addC Zp_add0z Zp_addNz.
 
 HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 
@@ -215,11 +215,11 @@ Local Notation p := p'.+2.
 
 Lemma Zp_nontrivial : Zp1 != 0 :> 'I_p. Proof. by []. Qed.
 
-HB.instance Definition _ := 
-  GRing.Zmodule_IsComRing.Build 'I_p
+HB.instance Definition _ :=
+  GRing.Zmodule_isComRing.Build 'I_p
     (@Zp_mulA _) (@Zp_mulC _) (@Zp_mul1z _) (@Zp_mul_addl _) Zp_nontrivial.
 HB.instance Definition _ :=
-  GRing.ComRing_HasMulInverse.Build 'I_p 
+  GRing.ComRing_hasMulInverse.Build 'I_p
     (@Zp_mulVz _) (@Zp_intro_unit _) (@Zp_inv_out _).
 
 Lemma Zp_nat n : n%:R = inZp n :> 'I_p.
@@ -346,7 +346,7 @@ Proof. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
 
 End F_prime.
 
-Lemma Fp_fieldMixin : GRing.ComUnitRing_IsField 'F_p.
+Lemma Fp_fieldMixin : GRing.ComUnitRing_isField 'F_p.
 Proof.
 constructor => x nzx.
 (* FIXME: remove the subdef *)
@@ -357,6 +357,6 @@ by rewrite Zp_cast ?prime_gt1 ?pdiv_prime.
 Qed.
 
 HB.instance Definition _ := Fp_fieldMixin.
-HB.instance Definition _ := FinRing.IsField.Build 'F_p.
+HB.instance Definition _ := FinRing.isField.Build 'F_p.
 
 End PrimeField.

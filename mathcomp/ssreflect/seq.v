@@ -1039,7 +1039,7 @@ have [<-|neqx] := x1 =P x2; last by right; case.
 by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
-HB.instance Definition _ := HasDecEq.Build (seq T) eqseqP.
+HB.instance Definition _ := hasDecEq.Build (seq T) eqseqP.
 
 Lemma eqseqE : eqseq = eq_op. Proof. by []. Qed.
 
