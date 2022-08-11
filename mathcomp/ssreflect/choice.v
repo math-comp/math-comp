@@ -479,7 +479,7 @@ End ChoiceTheory.
 
 #[short(type="subChoiceType")]
 HB.structure Definition SubChoice T (P : pred T) :=
-  { sT of Choice sT & isSUB T P sT }.
+  { sT of Choice sT & isSub T P sT }.
 
 Notation subChoiceType := SubChoice.type.
 
@@ -574,7 +574,7 @@ Arguments pickle_invK {T} n : rename.
 
 #[short(type="subCountType")]
 HB.structure Definition SubCountable T (P : pred T) :=
-  { sT of Countable sT & isSUB T P sT}.
+  { sT of Countable sT & isSub T P sT}.
 
 (* This assumes that T has both countType and subType structures. *)
 (* TODO: replace with trivial pack *)

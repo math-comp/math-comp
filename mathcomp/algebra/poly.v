@@ -134,7 +134,7 @@ Variable R : ringType.
 (* Defines a polynomial as a sequence with <> 0 last element *)
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
 
-HB.instance Definition _ := [IsSUB for polyseq].
+HB.instance Definition _ := [isSub for polyseq].
 HB.instance Definition _ := [Choice of polynomial by <:].
 
 Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
@@ -144,7 +144,7 @@ Identity Coercion type_poly_of : poly_of >-> polynomial.
 
 Local Notation "{poly}" := (poly_of (Phant R)).
 
-HB.instance Definition _ := SUB.on {poly}.
+HB.instance Definition _ := Sub.on {poly}.
 HB.instance Definition _ := Choice.on {poly}.
 
 Definition coefp i (p : poly_of (Phant R)) := p`_i.

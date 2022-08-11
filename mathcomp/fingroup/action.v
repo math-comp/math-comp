@@ -1244,12 +1244,12 @@ Lemma sub_act_proof u Na : sP (to (val u) (val Na)).
 Proof. by case: Na => a /= /(astabs_act (val u)); rewrite !inE valP. Qed.
 
 Definition subact u a :=
-  if insub a is Some Na then Sub _ (sub_act_proof u Na) else u.
+  if insub a is Some Na then sub _ (sub_act_proof u Na) else u.
 
 Lemma val_subact u a :
   val (subact u a) = if a \in subact_dom then to (val u) a else val u.
 Proof.
-by rewrite /subact -if_neg; case: insubP => [Na|] -> //=; rewrite SubK => ->.
+by rewrite /subact -if_neg; case: insubP => [Na|] -> //=; rewrite subK => ->.
 Qed.
 
 Lemma subact_is_action : is_action subact_dom subact.

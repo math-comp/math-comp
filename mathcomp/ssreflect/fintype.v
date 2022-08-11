@@ -1401,7 +1401,7 @@ End TransferFinType.
 
 #[short(type="subFinType")]
 HB.structure Definition SubFinite (T : Type) (P : pred T) :=
-  { sT of Finite sT & isSUB T P sT }.
+  { sT of Finite sT & isSub T P sT }.
 
 Section SubFinType.
 
@@ -1412,7 +1412,7 @@ Implicit Type sT : subFinType P.
 
 Lemma codom_val sT x : (x \in codom (val : sT -> T)) = P x.
 Proof.
-by apply/codomP/idP=> [[u ->]|Px]; last exists (Sub x Px); rewrite ?valP ?SubK.
+by apply/codomP/idP=> [[u ->]|Px]; last exists (sub x Px); rewrite ?valP ?subK.
 Qed.
 
 End SubFinType.
@@ -1472,8 +1472,8 @@ End SubCountable_isFiniteTheory.
 
 (* (* Regression for the subFinType stack *) *)
 (* Record myb : Type := MyB {myv : bool; _ : ~~ myv}. *)
-(* HB.instance Definition myb_sub : isSUB bool (fun x => ~~ x) myb := *)
-(*    [IsSUB for myv]. *)
+(* HB.instance Definition myb_sub : isSub bool (fun x => ~~ x) myb := *)
+(*    [isSub for myv]. *)
 (* HB.instance Definition _ := [Finite of myb by <:]. *)
 (* Check [subFinType of myb]. *)
 (* Check [finType of myb]. *)
@@ -1496,7 +1496,7 @@ Variables (T : eqType) (s : seq T).
 
 Record seq_sub : Type := SeqSub {ssval : T; ssvalP : in_mem ssval (@mem T _ s)}.
 
-HB.instance Definition _ := [IsSUB for ssval].
+HB.instance Definition _ := [isSub for ssval].
 HB.instance Definition seq_sub_hasDecEq := [Equality of seq_sub by <:].
 
 Definition seq_sub_enum : seq seq_sub := undup (pmap insub s).
@@ -1712,7 +1712,7 @@ Inductive ordinal : predArgType := Ordinal m of m < n.
 
 Coercion nat_of_ord i := let: Ordinal m _ := i in m.
 
-HB.instance Definition _ := [IsSUB of ordinal for nat_of_ord].
+HB.instance Definition _ := [isSub of ordinal for nat_of_ord].
 HB.instance Definition _ := [Countable of ordinal by <:].
 
 Lemma ltn_ord (i : ordinal) : i < n. Proof. exact: valP i. Qed.

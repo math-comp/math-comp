@@ -3674,7 +3674,7 @@ Notation "{ ''GL_' n ( p ) }" := {'GL_n['F_p]}
     format "{ ''GL_' n ( p ) }") : type_scope.
 
 HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
-  [IsSUB of {'GL_n[R]} for GLval].
+  [isSub of {'GL_n[R]} for GLval].
 
 Section GL_unit.
 

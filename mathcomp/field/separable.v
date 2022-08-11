@@ -399,8 +399,8 @@ rewrite dvdp_gcd dvdpp /= => /(dvdp_leq nzPx')/leq_trans/(_ (size_poly _ _)).
 by rewrite size_minPoly ltnn.
 Qed.
 
-Lemma separablePn : 
-  reflect (exists2 p, p \in [char L] & 
+Lemma separablePn :
+  reflect (exists2 p, p \in [char L] &
             exists2 g, g \is a polyOver K & minPoly K x = g \Po 'X^p)
           (~~ separable_element K x).
 Proof.
@@ -428,7 +428,7 @@ have [ltri | leir] := leqP r.+1 i.
   rewrite nth_default ?sz_f ?Dn ?ltn_pmul2r ?big1 // => j _.
   rewrite coefZ -exprM coefXn mulnC gtn_eqF ?mulr0 //.
   by rewrite ltn_pmul2l ?(leq_trans _ ltri).
-rewrite (bigD1 (Sub i _)) //= big1 ?addr0 => [|j i'j]; last first.
+rewrite (bigD1 (sub i _)) //= big1 ?addr0 => [|j i'j]; last first.
   by rewrite coefZ -exprM coefXn mulnC eqn_pmul2l // mulr_natr mulrb ifN_eqC.
 by rewrite coef_poly leir coefZ -exprM coefXn mulnC eqxx mulr1.
 Qed.
