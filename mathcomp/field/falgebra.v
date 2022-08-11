@@ -520,11 +520,11 @@ Structure aspace := ASpace {asval :> {vspace aT}; _ : is_aspace asval}.
 Definition aspace_of of phant aT := aspace.
 Local Notation "{ 'aspace' T }" := (aspace_of (Phant T)) : type_scope.
 
-HB.instance Definition _ := [IsSUB for asval].
+HB.instance Definition _ := [isSub for asval].
 HB.instance Definition _ := [Equality of aspace by <:].
 HB.instance Definition _ := [Choice of aspace by <:].
 
-HB.instance Definition _ := SUB.on {aspace aT}.
+HB.instance Definition _ := Sub.on {aspace aT}.
 HB.instance Definition _ := Equality.on {aspace aT}.
 HB.instance Definition _ := Choice.on {aspace aT}.
 
@@ -1035,7 +1035,7 @@ Qed.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
 
-HB.instance Definition _ := [IsSUB for ahval].
+HB.instance Definition _ := [isSub for ahval].
 HB.instance Definition _ := [Equality of ahom by <:].
 HB.instance Definition _ := [Choice of ahom by <:].
 

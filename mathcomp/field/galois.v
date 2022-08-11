@@ -601,7 +601,7 @@ Proof.
 move=> homKf; have{homKf} [homFf sFE] := (kHomSl (sub1v K) homKf, sub1v E).
 have [p Fp /(splittingFieldForS sFE (subvf E))splitLp] := splittingPoly.
 have [g0 homLg0 eq_fg] := kHom_extends sFE homFf Fp splitLp.
-by apply: exist (Sub g0 _) _ =>  //; apply/ahomP/kHom_lrmorphism.
+by apply: exist (sub g0 _) _ =>  //; apply/ahomP/kHom_lrmorphism.
 Qed.
 
 End SplittingFieldTheory.

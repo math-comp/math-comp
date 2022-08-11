@@ -621,7 +621,7 @@ have imItoS: codom ItoS =i S.
   move=> s; rewrite inE /= /ItoS /I /n /S -defG -orderE.
   apply/codomP/idP=> [[[i cogi] ->] | Ss]; first by rewrite generator_coprime.
   have [m ltmg Ds] := cyclePmin (cycle_generator Ss).
-  by rewrite Ds generator_coprime in Ss; apply: ex_intro (Sub (Sub m _) _) _.
+  by rewrite Ds generator_coprime in Ss; apply: ex_intro (sub (sub m _) _) _.
 have /injectiveP injItoS: injective ItoS.
   move=> k1 k2 /eqP; apply: contraTeq.
   by rewrite eq_expg_mod_order orderE defG -/n !modn_small.
@@ -645,7 +645,7 @@ have{defQn} imItoQ: calG = ItoQ @: {:I}.
   have pr_nu_e: n.-primitive_root (nu eps) by rewrite fmorph_primitive_root.
   have [i Dnue] := prim_rootP pr_eps (prim_expr_order pr_nu_e).
   rewrite Dnue prim_root_exp_coprime // coprime_sym in pr_nu_e.
-  apply: ex_intro2 (Sub i _) _ _ => //; apply/eqP.
+  apply: ex_intro2 (sub i _) _ _ => //; apply/eqP.
   rewrite /calG /= -defQn in ItoQ inItoQ defItoQ nu cGnu Dnue *.
   by rewrite gal_adjoin_eq // defItoQ -Dnue.
 have injItoQ: {in {:I} &, injective ItoQ}.

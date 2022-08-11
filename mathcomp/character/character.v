@@ -2490,7 +2490,7 @@ have cFlin u: cF u \is a linear_char := svalP u.
 have cFinj: injective cF := inj_comp irr_inj val_inj.
 have inT xi : xi \is a linear_char -> {u | cF u = xi}.
   move=> lin_xi; have /irrP/sig_eqW[i Dxi] := lin_char_irr lin_xi.
-  by apply: (exist _ (Sub i _)) => //; rewrite -Dxi.
+  by apply: (exist _ (sub i _)) => //; rewrite -Dxi.
 have [one cFone] := inT 1 (rpred1 _).
 pose inv u := sval (inT _ (rpredVr (cFlin u))).
 pose mul u v := sval (inT _ (rpredM (cFlin u) (cFlin v))).

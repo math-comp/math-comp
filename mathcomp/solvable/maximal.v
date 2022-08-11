@@ -408,7 +408,7 @@ case Gp: (p \in \pi(G)); last first.
 rewrite {P sylP}(nilpotent_Hall_pcore nilH sylP).
 rewrite -(bigdprodWY (erefl 'F(G))) sub_gen //.
 rewrite -(filter_pi_of (ltnSn _)) big_filter big_mkord.
-apply: (bigcup_max (Sub p _)) => //= [|_].
+apply: (bigcup_max (sub p _)) => //= [|_].
   by have:= Gp; rewrite ltnS mem_primes => /and3P[_ ntG /dvdn_leq->].
 by rewrite pcore_max ?pcore_pgroup ?gFnormal_trans.
 Qed.

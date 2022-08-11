@@ -290,7 +290,7 @@ case: (p x =P x) => /= [pxx | _]; last by rewrite perm1 (valP u).
 by rewrite -[x in _ != x]pxx (inj_eq perm_inj); apply: (valP u).
 Qed.
 
-Definition rfd_fun p := [fun u => Sub ((_ : {perm T}) _) (rfd_funP p u) : T'].
+Definition rfd_fun p := [fun u => sub ((_ : {perm T}) _) (rfd_funP p u) : T'].
 
 Lemma rfdP p : injective (rfd_fun p).
 Proof.
@@ -349,7 +349,7 @@ have ->: p = p1 * tperm x1 (p x1) by rewrite -tpermV mulgK.
 rewrite morphM; last 2 first; first by rewrite 2!inE; apply/astab1P.
   by rewrite 2!inE; apply/astab1P; rewrite -[RHS]p1x_x permM px_x.
 rewrite odd_permM IHn //=; congr (_ (+) _).
-pose x2 : T' := Sub x1 nx1x; pose px2 : T' := Sub (p x1) npx1x.
+pose x2 : T' := sub x1 nx1x; pose px2 : T' := sub (p x1) npx1x.
 suffices ->: rfd (tperm x1 (p x1)) = tperm x2 px2.
   by rewrite odd_tperm eq_sym; rewrite inE in Hx1.
 apply/permP => z; apply/val_eqP; rewrite permE /= tpermD // eqxx.
@@ -378,7 +378,7 @@ case/setIP=> Hax1; move/astab1P; rewrite /= /aperm => Hx1.
 case/setIP=> Hay1; move/astab1P; rewrite /= /aperm => Hy1 Hr.
 apply/permP => z.
 case (z =P x) => [->|]; [by rewrite Hx1 | move/eqP => nzx].
-move: (congr1 (fun q : {perm T'} => q (Sub z nzx)) Hr).
+move: (congr1 (fun q : {perm T'} => q (sub z nzx)) Hr).
 by rewrite !permE => [[]]; rewrite Hx1 Hy1 !eqxx.
 Qed.
 

@@ -90,7 +90,7 @@ Lemma expf_card x : x ^+ #|F| = x :> F.
 Proof.
 rewrite -[RHS]mulr1 -(ltn_predK (finRing_gt1 F)) exprS.
 apply/eqP; rewrite -subr_eq0 -mulrBr mulf_eq0 subr_eq0 -implyNb -unitfE.
-apply/implyP=> Ux; rewrite -(val_unitX _ (Sub x _)) -val_unit1 val_eqE.
+apply/implyP=> Ux; rewrite -(val_unitX _ (sub x _)) -val_unit1 val_eqE.
 by rewrite -order_dvdn -card_finField_unit order_dvdG ?inE.
 Qed.
 
@@ -598,7 +598,7 @@ have [p p_pr charRp]: exists2 p, prime p & p \in [char R].
 pose Rp := PrimeCharType charRp; pose L : {vspace Rp} := fullv.
 pose G := [set: {unit R}]; pose ofG : {unit R} -> Rp := val.
 pose projG (E : {vspace Rp}) := [preim ofG of E].
-have inG t nzt: Sub t (finDomain_field nzt) \in G by rewrite inE.
+have inG t nzt: sub t (finDomain_field nzt) \in G by rewrite inE.
 have card_projG E: #|projG E| = (p ^ \dim E - 1)%N.
   transitivity #|E|.-1; last by rewrite subn1 card_vspace card_Fp.
   rewrite (cardD1 0) mem0v (card_preim val_inj) /=.

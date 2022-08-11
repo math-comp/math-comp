@@ -390,7 +390,7 @@ have{IHm} ->: (m.+1 * \dim K)%N = \dim S.
 apply/dimvS/agenv_sub_modl; first by rewrite (sumv_sup 0) //= prodv1 sub1v.
 rewrite prodvDl subv_add -[S]big_distrr prodvA prodv_id subvv !big_distrr /=.
 apply/subv_sumP=> i _; rewrite -expv_line prodvCA -expvSl expv_line.
-have [ltim | lemi] := ltnP i m; first by rewrite (sumv_sup (Sub i.+1 _)).
+have [ltim | lemi] := ltnP i m; first by rewrite (sumv_sup (sub i.+1 _)).
 have{lemi} /eqP->: i == m :> nat by rewrite eqn_leq leq_ord.
 rewrite -big_distrr -2!{2}(prodv_id K) /= -!prodvA big_distrr -/S prodvSr //=.
 by rewrite -(canLR (mulKf nz_y) Dz) -memvE memv_mul ?rpredV.
@@ -438,7 +438,7 @@ move=> Kp szp Dv; have /Fadjoin_poly_eq/eqP := mempx_Fadjoin Kp.
 rewrite {1}Dv {Dv} !(@horner_coef_wide _ n) ?size_poly //.
 move/polyKx in Kp; have /polyKx K_pv := Fadjoin_polyOver K x v.
 rewrite (directv_sum_unique Fadjoin_sum_direct) // => /eqfunP eq_pq.
-apply/polyP=> i; have [leni|?] := leqP n i; last exact: mulIf (eq_pq (Sub i _)).
+apply/polyP=> i; have [leni|?] := leqP n i; last exact: mulIf (eq_pq (sub i _)).
 by rewrite !nth_default ?(leq_trans _ leni) ?size_poly.
 Qed.
 

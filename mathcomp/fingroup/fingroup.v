@@ -1187,7 +1187,7 @@ Definition group_of of phant gT : predArgType := group_type.
 Local Notation groupT := (group_of (Phant gT)).
 Identity Coercion type_of_group : group_of >-> group_type.
 
-HB.instance Definition _ := [IsSUB for gval].
+HB.instance Definition _ := [isSub for gval].
 #[hnf] HB.instance Definition _ := [Finite of group_type by <:].
 
 (* No predType or baseFinGroupType structures, as these would hide the *)
@@ -1660,8 +1660,8 @@ Qed.
 
 Inductive subg_of : predArgType := Subg x & x \in G.
 Definition sgval u := let: Subg x _ := u in x.
-Definition subg_of_SUB := Eval hnf in [IsSUB for sgval].
-HB.instance Definition _ := subg_of_SUB.
+Definition subg_of_Sub := Eval hnf in [isSub for sgval].
+HB.instance Definition _ := subg_of_Sub.
 #[hnf] HB.instance Definition _ := [Finite of subg_of by <:].
 
 Lemma subgP u : sgval u \in G.

@@ -256,7 +256,7 @@ have inj_m: {in A &, injective m}.
   by rewrite valKd invmK ?defA.
 have{defA} im_m: image m A =i GRing.unit.
   move=> u; apply/imageP/idP=> [[a Aa ->]| Uu]; first exact: valP.
-  exists (m' (Sub u Uu)) => /=; first by rewrite -defA mem_morphim ?inE.
+  exists (m' (sub u Uu)) => /=; first by rewrite -defA mem_morphim ?inE.
   by rewrite /m invmE ?inE.
 have mV: {in A, {morph m : a / a^-1 >-> (a^-1)%R}}.
   move=> a Aa /=; rewrite -div1r; apply: canRL (mulrK (valP _)) _.

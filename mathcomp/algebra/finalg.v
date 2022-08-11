@@ -241,7 +241,7 @@ Local Notation uT := (unit_of phR).
 Implicit Types u v : uT.
 Definition uval u := let: Unit x _ := u in x.
 
-#[export] HB.instance Definition _ := [IsSUB for uval].
+#[export] HB.instance Definition _ := [isSub for uval].
 #[export] HB.instance Definition _ := [Finite of uT by <:].
 
 Definition unit1 := Unit phR (@GRing.unitr1 _).

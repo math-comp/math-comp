@@ -522,23 +522,23 @@ Definition eq_comparable (T : eqType) : comparable T :=
   fun x y => decP (x =P y).
 
 #[key="sub_sort"]
-HB.mixin Record isSUB (T : Type) (P : pred T) (sub_sort : Type) := {
+HB.mixin Record isSub (T : Type) (P : pred T) (sub_sort : Type) := {
   val_subdef : sub_sort -> T;
-  Sub : forall x, P x -> sub_sort;
-  Sub_rect : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
-  SubK_subproof : forall x Px, val_subdef (@Sub x Px) = x
+  sub : forall x, P x -> sub_sort;
+  sub_rect : forall K (_ : forall x Px, K (@sub x Px)) u, K u;
+  subK_subproof : forall x Px, val_subdef (@sub x Px) = x
 }.
 
 #[short(type="subType")]
-HB.structure Definition SUB (T : Type) (P : pred T) := { S of isSUB T P S }.
+HB.structure Definition Sub (T : Type) (P : pred T) := { S of isSub T P S }.
 
-Notation val := (isSUB.val_subdef (SUB.on _)).
-Notation "\val" := (isSUB.val_subdef (SUB.on _)) (only parsing).
-Notation "\val" := (isSUB.val_subdef _) (only printing).
+Notation val := (isSub.val_subdef (Sub.on _)).
+Notation "\val" := (isSub.val_subdef (Sub.on _)) (only parsing).
+Notation "\val" := (isSub.val_subdef _) (only printing).
 
 #[short(type="subEqType")]
 HB.structure Definition SubEquality T (P : pred T) :=
-  { sT of Equality sT & isSUB T P sT}.
+  { sT of Equality sT & isSub T P sT}.
 
 Section SubType.
 
@@ -553,18 +553,18 @@ Section Theory.
 
 Variable sT : subType P.
 
-Local Notation val := (isSUB.val_subdef (SUB.on sT)).
-Local Notation Sub := (@Sub _ _ sT).
+Local Notation val := (isSub.val_subdef (Sub.on sT)).
+Local Notation sub := (@sub _ _ sT).
 
-Lemma SubK x Px : val (@Sub x Px) = x. Proof. exact: SubK_subproof. Qed.
+Lemma subK x Px : val (@sub x Px) = x. Proof. exact: subK_subproof. Qed.
 
-Variant Sub_spec : sT -> Type := SubSpec x Px : Sub_spec (Sub x Px).
+Variant sub_spec : sT -> Type := subSpec x Px : sub_spec (sub x Px).
 
-Lemma SubP u : Sub_spec u.
-Proof. by elim/(@Sub_rect _ _ sT) : u. Qed.
+Lemma subP u : sub_spec u.
+Proof. by elim/(@sub_rect _ _ sT) : u. Qed.
 (* BUG in elim? sT could be inferred from u *)
 
-Definition insub x := if idP is ReflectT Px then Some (Sub x Px) else None.
+Definition insub x := if idP is ReflectT Px then Some (sub x Px) else None.
 
 Definition insubd u0 x := odflt u0 (insub x).
 
@@ -574,12 +574,12 @@ Variant insub_spec x : option sT -> Type :=
 
 Lemma insubP x : insub_spec x (insub x).
 Proof.
-by rewrite /insub; case: {-}_ / idP; [left; rewrite ?SubK | right; apply/negP].
+by rewrite /insub; case: {-}_ / idP; [left; rewrite ?subK | right; apply/negP].
 Qed.
 
-Lemma insubT x Px : insub x = Some (Sub x Px).
+Lemma insubT x Px : insub x = Some (sub x Px).
 Proof.
-do [case: insubP => [/SubP[y Py] _ <- | /negP// ]; rewrite SubK]  in Px *.
+do [case: insubP => [/subP[y Py] _ <- | /negP// ]; rewrite subK]  in Px *.
 by rewrite (bool_irrelevance Px Py).
 Qed.
 
@@ -596,10 +596,10 @@ Lemma insubK : ocancel insub val.
 Proof. by move=> x; case: insubP. Qed.
 
 Lemma valP u : P (val u).
-Proof. by case/SubP: u => x Px; rewrite SubK. Qed.
+Proof. by case/subP: u => x Px; rewrite subK. Qed.
 
 Lemma valK : pcancel val insub.
-Proof. by case/SubP=> x Px; rewrite SubK; apply: insubT. Qed.
+Proof. by case/subP=> x Px; rewrite subK; apply: insubT. Qed.
 
 Lemma val_inj : injective val.
 Proof. exact: pcan_inj valK. Qed.
@@ -614,7 +614,7 @@ Lemma insubdK u0 : {in P, cancel (insubd u0) val}.
 Proof. by move=> x Px; rewrite val_insubd [P x]Px. Qed.
 
 Let insub_eq_aux x isPx : P x = isPx -> option sT :=
-  if isPx as b return _ = b -> _ then fun Px => Some (Sub x Px) else fun=> None.
+  if isPx as b return _ = b -> _ then fun Px => Some (sub x Px) else fun=> None.
 Definition insub_eq x := insub_eq_aux (erefl (P x)).
 
 Lemma insub_eqE : insub_eq =1 insub.
@@ -628,7 +628,7 @@ End Theory.
 End SubType.
 
 (* Arguments val {T P sT} u : rename. *)
-Arguments Sub {T P sT} x Px : rename.
+Arguments sub {T P sT} x Px : rename.
 Arguments vrefl {T P} x Px.
 Arguments vrefl_rect {T P} x Px.
 Arguments insub {T P sT} x.
@@ -648,30 +648,30 @@ Local Notation inlined_new_rect :=
 
 Reserved Notation "[ 'subType' 'for' v ]"
   (at level 0, format "[ 'subType'  'for'  v ]").
-Reserved Notation "[ 'IsSUB' 'for' v ]"
-  (at level 0, format "[ 'IsSUB'  'for'  v ]").
+Reserved Notation "[ 'isSub' 'for' v ]"
+  (at level 0, format "[ 'isSub'  'for'  v ]").
 
-Notation "[ 'IsSUB' 'for' v ]" :=
-  (@isSUB.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
+Notation "[ 'isSub' 'for' v ]" :=
+  (@isSub.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
 
-Notation "[ 'IsSUB' 'of'  T  'for' v ]" :=
-  (@isSUB.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect)
+Notation "[ 'isSub' 'of'  T  'for' v ]" :=
+  (@isSub.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
 
-Notation "[ 'IsSUB' 'for' v 'by' rec ]" :=
- (@isSUB.phant_Build _ _ _ v _ rec vrefl)
- (at level 0, format "[ 'IsSUB'  'for'  v  'by'  rec ]") : form_scope.
+Notation "[ 'isSub' 'for' v 'by' rec ]" :=
+ (@isSub.phant_Build _ _ _ v _ rec vrefl)
+ (at level 0, format "[ 'isSub'  'for'  v  'by'  rec ]") : form_scope.
 
-Notation "[ 'IsSUB' 'for' v ]" := (@isSUB.phant_Build _ _ _ v _ _ _)
-  (only printing, at level 0, format "[ 'IsSUB'  'for'  v ]") : form_scope.
+Notation "[ 'isSub' 'for' v ]" := (@isSub.phant_Build _ _ _ v _ _ _)
+  (only printing, at level 0, format "[ 'isSub'  'for'  v ]") : form_scope.
 
 Reserved Notation "[ 'IsNew' 'for' v ]"
   (at level 0, format "[ 'IsNew'  'for'  v ]").
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  @isSUB.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
+  @isSub.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
 
 Notation "[ 'IsNew' 'for' v ]" :=
   (@NewMixin _ _ v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
@@ -682,11 +682,11 @@ Notation "[ 'IsNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
 Notation "[ 'IsNew' 'of'  T  'for' v ]" :=
   (@NewMixin _ T v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
-Definition innew T nT x := @Sub T predT nT x (erefl true).
+Definition innew T nT x := @sub T predT nT x (erefl true).
 Arguments innew {T nT}.
 
 Lemma innew_val T nT : cancel val (@innew T nT).
-Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
+Proof. by move=> u; apply: val_inj; apply: subK. Qed.
 
 (* Prenex Implicits and renaming. *)
 Notation sval := (@proj1_sig _ _).
@@ -708,7 +708,7 @@ End SigProj.
 
 Prenex Implicits svalP s2val s2valP s2valP'.
 
-HB.instance Definition _ T (P : pred T) := [IsSUB of sig P for sval].
+HB.instance Definition _ T (P : pred T) := [isSub of sig P for sval].
 
 (* Shorthand for sigma types over collective predicates. *)
 Notation "{ x 'in' A }" := {x | x \in A}
@@ -769,7 +769,7 @@ End TransferEqType.
 Definition sub_type_of T (P : pred T) (sT : subType P) of phant sT : Type := sT.
 Notation sub_type T := (sub_type_of (Phant T)).
 HB.instance Definition _ T (P : pred T) (sT : subType P) :=
-  SUB.copy (sub_type sT) sT.
+  Sub.copy (sub_type sT) sT.
 
 Section SubEqType.
 

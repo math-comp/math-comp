@@ -36,10 +36,10 @@ HB.instance Definition _ := Finite.on colors.
 Section square_colouring.
 
 Definition square := 'I_4.
-HB.instance Definition _ := SUB.on square.
+HB.instance Definition _ := Sub.on square.
 HB.instance Definition _ := Finite.on square.
 
-Definition mksquare i : square := Sub (i %% _) (ltn_mod i 4).
+Definition mksquare i : square := sub (i %% _) (ltn_mod i 4).
 Definition c0 := mksquare 0.
 Definition c1 := mksquare 1.
 Definition c2 := mksquare 2.
@@ -468,10 +468,10 @@ End square_colouring.
 Section cube_colouring.
 
 Definition cube := 'I_6.
-HB.instance Definition _ := SUB.on cube.
+HB.instance Definition _ := Sub.on cube.
 HB.instance Definition _ := Finite.on cube.
 
-Definition mkFcube i : cube := Sub (i %% 6) (ltn_mod i 6).
+Definition mkFcube i : cube := sub (i %% 6) (ltn_mod i 6).
 Definition F0 := mkFcube 0.
 Definition F1 := mkFcube 1.
 Definition F2 := mkFcube 2.
@@ -1263,9 +1263,5 @@ End colouring.
 Corollary burnside_app_iso_3_3col: cube_coloring_number24 3 = 57.
 Proof. by apply/eqP; rewrite -(@eqn_pmul2r 24) // burnside_app_iso3. Qed.
 
-
 Corollary burnside_app_iso_2_4col: square_coloring_number8 4 = 55.
 Proof. by apply/eqP; rewrite -(@eqn_pmul2r 8) // burnside_app_iso. Qed.
-
-
-

@@ -60,7 +60,7 @@ Variables (n : nat) (T : Type).
 
 Structure tuple_of : Type := Tuple {tval :> seq T; _ : size tval == n}.
 
-HB.instance Definition _ := [IsSUB for tval].
+HB.instance Definition _ := [isSub for tval].
 
 Implicit Type t : tuple_of.
 
@@ -462,7 +462,7 @@ Variables (n : nat) (T : Type).
 
 Structure bseq_of : Type := Bseq {bseqval :> seq T; _ : size bseqval <= n}.
 
-HB.instance Definition _ := [IsSUB for bseqval].
+HB.instance Definition _ := [isSub for bseqval].
 
 Implicit Type bs : bseq_of.
 

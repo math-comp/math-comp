@@ -4864,7 +4864,7 @@ Obligation Tactic := idtac.
 
 Implicit Type V : zmodType.
 
-HB.mixin Record isSubZmodule V (S : {pred V}) U of SUB V S U & Zmodule U := {
+HB.mixin Record isSubZmodule V (S : {pred V}) U of Sub V S U & Zmodule U := {
   valB : additive (val : U -> V);
 }.
 
@@ -4908,20 +4908,20 @@ HB.factory Record PredSubZmodule V (S : {pred V})
 HB.builders Context (V : zmodType) (S : {pred V})
   (subS : zmodPred S) (kS : keyed_pred subS) U of PredSubZmodule V S subS kS U.
 
-Let inU v Sv : U := Sub v Sv.
+Let inU v Sv : U := sub v Sv.
 Let zeroU := inU (rpred0 kS).
 Let oppU (u : U) := inU (rpredNr (valP u)).
 Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
 
 Program Definition zmodU := @PreZmodule.Build U V _
   zeroU oppU addU val_inj _ _ _.
-Next Obligation. by rewrite SubK. Qed.
-Next Obligation. by move=> x; rewrite SubK. Qed.
-Next Obligation. by move=> *; rewrite !SubK. Qed.
+Next Obligation. by rewrite subK. Qed.
+Next Obligation. by move=> x; rewrite subK. Qed.
+Next Obligation. by move=> *; rewrite !subK. Qed.
 HB.instance Definition _ := zmodU.
 
 Lemma valD : additive (val : U -> V).
-Proof. by move=> x y /=; rewrite !SubK. Qed.
+Proof. by move=> x y /=; rewrite !subK. Qed.
 
 HB.instance Definition _ := isSubZmodule.Build V (mem kS) U valD.
 HB.end.
@@ -4974,17 +4974,17 @@ HB.builders Context (R : ringType) (S : {pred R})
   (ringS : subringPred S) (kS : keyed_pred ringS)
   U of PredSubRing R S ringS kS U.
 
-Let inU v Sv : U := Sub v Sv.
+Let inU v Sv : U := sub v Sv.
 Let oneU : U := inU (rpred1 kS).
 Let mulU (u1 u2 : U) := inU (rpredM (valP u1) (valP u2)).
 
 Program Definition ringU := @PreRing.Build U R _ oneU mulU val_inj _ _.
-Next Obligation. by rewrite /= SubK. Qed.
-Next Obligation. by move=> x y /=; rewrite !SubK. Qed.
+Next Obligation. by rewrite /= subK. Qed.
+Next Obligation. by move=> x y /=; rewrite !subK. Qed.
 HB.instance Definition _ := ringU.
 
 Lemma valM : multiplicative (val : U -> R).
-Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
+Proof. by split=> [x y|] /=; rewrite !subK. Qed.
 
 HB.instance Definition _ := isSubRing.Build R (mem kS) U valM.
 HB.end.
@@ -5043,14 +5043,14 @@ HB.builders Context (R : ringType) (V : lmodType R) (S : {pred V})
     (linS : submodPred S) (kS : keyed_pred linS) W
   of PredSubLmodule R V S linS kS W.
 
-Let inW v Sv : W := Sub v Sv.
+Let inW v Sv : W := sub v Sv.
 Let scaleW a (w : W) := inW (rpredZ a (valP w)).
 
 Program Definition lmodW := @PreLmodule.Build R W _ _ val_inj scaleW _.
-Next Obligation. by move=> k x; rewrite /= SubK. Qed.
+Next Obligation. by move=> k x; rewrite /= subK. Qed.
 HB.instance Definition _ := lmodW.
 
-Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
+Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite subK. Qed.
 
 HB.instance Definition _ := isSubLmodule.Build R V (mem kS) W valZ.
 HB.end.
@@ -5120,12 +5120,12 @@ HB.builders Context (R : unitRingType) (S : {pred R})
   (ringS : divringPred S) (kS : keyed_pred ringS)
   U of PredSubUnitRing R S ringS kS U.
 
-Let inU v Sv : U := Sub v Sv.
+Let inU v Sv : U := sub v Sv.
 Let invU (u : U) := inU (rpredVr (valP u)).
 
 Program Definition unitringU := @PreUnitRing.Build U R val val_inj invU _ _.
-Next Obligation. by split=> [x y|]; rewrite valM ?SubK. Qed.
-Next Obligation. by move=> x; rewrite SubK. Qed.
+Next Obligation. by split=> [x y|]; rewrite valM. Qed.
+Next Obligation. by move=> x; rewrite subK. Qed.
 HB.instance Definition _ := unitringU.
 HB.end.
 

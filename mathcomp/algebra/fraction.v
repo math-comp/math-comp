@@ -30,9 +30,9 @@ Inductive ratio := mkRatio { frac :> R * R; _ : frac.2 != 0 }.
 Definition ratio_of of phant R := ratio.
 Local Notation "{ 'ratio' T }" := (ratio_of (Phant T)).
 
-HB.instance Definition _ := [IsSUB for frac].
+HB.instance Definition _ := [isSub for frac].
 HB.instance Definition _ := [Choice of ratio by <:].
-HB.instance Definition _ := SUB.on {ratio R}.
+HB.instance Definition _ := Sub.on {ratio R}.
 HB.instance Definition _ := Choice.on {ratio R}.
 
 Lemma denom_ratioP : forall f : ratio, f.2 != 0. Proof. by case. Qed.
@@ -50,7 +50,7 @@ Definition numden_Ratio := (numer_Ratio, denom_Ratio).
 
 Variant Ratio_spec (n d : R) : {ratio R} -> R -> R -> Type :=
   | RatioNull of d = 0 : Ratio_spec n d ratio0 n 0
-  | RatioNonNull (d_neq0 : d != 0) : 
+  | RatioNonNull (d_neq0 : d != 0) :
     Ratio_spec n d (@mkRatio (n, d) d_neq0) n d.
 
 Lemma RatioP n d : Ratio_spec n d (Ratio n d) n d.

@@ -74,7 +74,7 @@ Let sub2f (s : [subg A]) := Fmod abelA (valP s).
 
 Definition fmval u := val (f2sub u).
 #[export]
-HB.instance Definition _ := [IsSUB for fmval].
+HB.instance Definition _ := [isSub for fmval].
 Local Notation valA := (val: fmodA -> gT) (only parsing).
 #[export]
 HB.instance Definition _ := [Finite of fmodA by <:].

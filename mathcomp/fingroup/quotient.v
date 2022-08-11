@@ -59,7 +59,7 @@ Definition coset_range := [pred B in rcosets H 'N(A)].
 Record coset_of : Type :=
   Coset { set_of_coset :> GroupSet.sort gT; _ : coset_range set_of_coset }.
 
-HB.instance Definition _ := [IsSUB for set_of_coset].
+HB.instance Definition _ := [isSub for set_of_coset].
 #[hnf] HB.instance Definition _ := [Finite of coset_of by <:].
 
 (* We build a new (canonical) structure of groupType for cosets.              *)

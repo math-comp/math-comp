@@ -159,7 +159,7 @@ Implicit Types phi psi xi : classfun.
 Fact classfun_key : unit. Proof. by []. Qed.
 Definition Cfun := locked_with classfun_key (fun flag : nat => Classfun).
 
-HB.instance Definition _ := [IsSUB for cfun_val].
+HB.instance Definition _ := [isSub for cfun_val].
 HB.instance Definition _ := [Choice of classfun by <:].
 
 Definition cfun_eqType := [eqType of classfun].

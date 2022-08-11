@@ -48,8 +48,8 @@ Delimit Scope rat_scope with Q.
 Definition ratz (n : int) := @Rat (n, 1) (coprimen1 _).
 (* Coercion ratz (n : int) := @Rat (n, 1) (coprimen1 _). *)
 
-Definition rat_isSUB := Eval hnf in [IsSUB for valq].
-HB.instance Definition _ := rat_isSUB.
+Definition rat_isSub := Eval hnf in [isSub for valq].
+HB.instance Definition _ := rat_isSub.
 #[hnf] HB.instance Definition _ := [Equality of rat by <:].
 HB.instance Definition _ := [Countable of rat by <:].
 

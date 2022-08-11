@@ -340,7 +340,7 @@ Lemma reprP K (PK : forall x Px, K (@Sub x Px)) u : K u.
 Proof. by rewrite (sort_Sub u); apply: PK. Qed.
 
 #[export]
-HB.instance Definition _ := isSUB.Build _ _ (quot_type qT) reprP qreprK.
+HB.instance Definition _ := isSub.Build _ _ (quot_type qT) reprP qreprK.
 #[export]
 HB.instance Definition _ := [Equality of quot_type qT by <:].
 End QuotSubType.
@@ -357,13 +357,13 @@ HB.instance Definition _ (T : countType) (qT : quotType T) :=
 HB.instance Definition _ (T : finType) (qT : quotType T) :=
   [Finite of quot_type qT by <:].
 
-Notation "[ 'SUB' Q 'of' T 'by' %/ ]" :=
-  (SUB.copy Q%type (quot_type_of T Q))
-  (at level 0, format "[ 'SUB'  Q  'of'  T  'by'  %/ ]") : form_scope.
+Notation "[ 'Sub' Q 'of' T 'by' %/ ]" :=
+  (Sub.copy Q%type (quot_type_of T Q))
+  (at level 0, format "[ 'Sub'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
-Notation "[ 'SUB' Q 'by' %/ ]" :=
-  (SUB.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'SUB'  Q  'by'  %/ ]") : form_scope.
+Notation "[ 'Sub' Q 'by' %/ ]" :=
+  (Sub.copy Q%type (quot_type Q))
+  (at level 0, format "[ 'Sub'  Q  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=
   (Equality.copy Q%type (quot_type Q))
@@ -543,7 +543,7 @@ Definition pi := locked (fun x => EquivQuotient (canon_id x)).
 
 Lemma ereprK : cancel erepr pi.
 Proof.
-pose T : subType _ := HB.pack equivQuotient [IsSUB for erepr].
+pose T : subType _ := HB.pack equivQuotient [isSub for erepr].
 by unlock pi; case=> x hx; apply/(@val_inj _ _ T)/eqP.
 Qed.
 

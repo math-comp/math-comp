@@ -54,7 +54,7 @@ Identity Coercion type_of_perm : perm_of >-> perm_type.
 
 Notation pT := (perm_of (Phant T)).
 
-HB.instance Definition _ := [IsSUB for pval].
+HB.instance Definition _ := [isSub for pval].
 HB.instance Definition _ := [Finite of perm_type by <:].
 
 Lemma perm_proof (f : T -> T) : injective f -> injectiveb (finfun f).

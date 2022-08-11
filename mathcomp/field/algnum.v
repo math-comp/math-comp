@@ -415,7 +415,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   have Qpr: pr \is a polyOver 1%VS.
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.
   have splitQr: splittingFieldFor K pr fullv.
-    apply: splittingFieldForS (sub1v (Sub K algK)) (subvf _) _; exists rr => //.
+    apply: splittingFieldForS (sub1v (sub K algK)) (subvf _) _; exists rr => //.
     congr (_ %= _): (eqpxx pr); apply/(map_poly_inj QrC).
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod; apply: eq_bigr => zz _.
     by rewrite rmorphB /= map_polyX map_polyC.
