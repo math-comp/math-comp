@@ -114,14 +114,14 @@ Local Open Scope quotient_scope.
 (* Definition of the quotient interface. *)
 (*****************************************)
 
-HB.mixin Record IsQuotient T (qT : Type) := {
+HB.mixin Record isQuotient T (qT : Type) := {
   repr_of : qT -> T;
   quot_pi_subdef : T -> qT;
   repr_ofK_subproof : cancel repr_of quot_pi_subdef
 }.
 
 #[short(type="quotType")]
-HB.structure Definition Quotient T := { qT of IsQuotient T qT }.
+HB.structure Definition Quotient T := { qT of isQuotient T qT }.
 Arguments repr_of [T qT] : rename.
 
 Section QuotientDef.
@@ -290,15 +290,15 @@ Notation PiEmbed e :=
 (* About eqQuotType *)
 (********************)
 
-HB.mixin Record IsEqQuotient T (eq_quot_op : rel T) (Q : Type) of
-  IsQuotient T Q & HasDecEq Q := {
+HB.mixin Record isEqQuotient T (eq_quot_op : rel T) (Q : Type) of
+  isQuotient T Q & hasDecEq Q := {
   pi_eq_quot : {mono \pi_Q : x y / eq_quot_op x y >-> x == y}
 }.
 
 #[short(type="eqQuotType")]
 HB.structure Definition EqQuotient T eq_quot_op :=
-  {Q of IsEqQuotient T eq_quot_op Q & Quotient T Q & HasDecEq Q}.
-(*TODO : Check why there was no warning when we didn't put HasDecEq*)
+  {Q of isEqQuotient T eq_quot_op Q & Quotient T Q & hasDecEq Q}.
+(*TODO : Check why there was no warning when we didn't put hasDecEq*)
 
 Canonical pi_eq_quot_mono T eq_quot_op eqT :=
   PiMono2 (@pi_eq_quot T eq_quot_op eqT).
@@ -310,7 +310,7 @@ Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q _)
 (* Even if a quotType is a natural subType, we do not make this subType   *)
 (* canonical, to allow the user to define the subtyping he wants. However *)
 (* one can:                                                               *)
-(* - get the HasDecEq and the HasChoice by subtyping                      *)
+(* - get the hasDecEq and the hasChoice by subtyping                      *)
 (* - get the subType structure and maybe declare it Canonical.            *)
 (**************************************************************************)
 
@@ -340,7 +340,7 @@ Lemma reprP K (PK : forall x Px, K (@Sub x Px)) u : K u.
 Proof. by rewrite (sort_Sub u); apply: PK. Qed.
 
 #[export]
-HB.instance Definition _ := IsSUB.Build _ _ (quot_type qT) reprP qreprK.
+HB.instance Definition _ := isSUB.Build _ _ (quot_type qT) reprP qreprK.
 #[export]
 HB.instance Definition _ := [Equality of quot_type qT by <:].
 End QuotSubType.
@@ -373,21 +373,21 @@ Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" := (Choice.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'HasChoice' 'of' Q 'by' <:%/ ]" :=
-  ([HasChoice of quot_type Q by <:] : HasChoice Q%type)
+  ([HasChoice of quot_type Q by <:] : hasChoice Q%type)
   (at level 0, format "[ 'HasChoice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" := (Countable.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'IsCountable' 'of' Q 'by' <:%/ ]" :=
-  ([IsCountable of quot_type Q by <:] : IsCountable Q%type)
+  ([IsCountable of quot_type Q by <:] : isCountable Q%type)
   (at level 0, format "[ 'IsCountable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" := (Finite.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'IsFinite' 'of' Q 'by' <:%/ ]" :=
-  ([IsFinite of quot_type Q by <:] : IsFinite Q%type)
+  ([IsFinite of quot_type Q by <:] : isFinite Q%type)
   (at level 0, format "[ 'IsFinite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 (****************************************************)
@@ -578,7 +578,7 @@ Proof. by move=> x; rewrite /= (pi_CD _ (erepr x) _) ?ereprK /eC /= ?encDP. Qed.
 
 Local Notation qT := (type_of (Phantom (rel D) encD)).
 #[export]
-HB.instance Definition _ := IsQuotient.Build D qT equivQTP.
+HB.instance Definition _ := isQuotient.Build D qT equivQTP.
 
 Lemma eqmodP x y : reflect (x = y %[mod qT]) (eD x y).
 Proof. by apply: (iffP (pi_DC _ _)); rewrite !unlock. Qed.
@@ -590,7 +590,7 @@ Lemma eqmodE x y : x == y %[mod qT] = eD x y.
 Proof. exact: sameP eqP (@eqmodP _ _). Qed.
 
 #[export]
-HB.instance Definition _ := IsEqQuotient.Build _ eD qT eqmodE.
+HB.instance Definition _ := isEqQuotient.Build _ eD qT eqmodE.
 
 End EquivQuot.
 Module Exports. HB.reexport. End Exports.

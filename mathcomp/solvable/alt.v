@@ -20,7 +20,7 @@ Unset Strict Implicit.
 
 Import GroupScope.
 
-HB.instance Definition _ := IsMulGroup.Build bool addbA addFb addbb.
+HB.instance Definition _ := isMulGroup.Build bool addbA addFb addbb.
 
 Section SymAltDef.
 

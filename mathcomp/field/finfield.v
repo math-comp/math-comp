@@ -169,9 +169,9 @@ Variables (R : finRingType) (vT : vectType R).
 Local Notation fvT := (finvect_type vT).
 
 HB.instance Definition _ := Vector.on fvT.
-HB.instance Definition _ : IsCountable fvT :=
+HB.instance Definition _ : isCountable fvT :=
   CanCountMixin VectorInternalTheory.v2rK.
-HB.instance Definition _ : IsFinite fvT :=
+HB.instance Definition _ : isFinite fvT :=
   CanFinMixin (VectorInternalTheory.v2rK : @cancel _ fvT _ _).
 
 End FinVector.
@@ -684,7 +684,7 @@ Definition FinDomainFieldType : finFieldType :=
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIntegralDomainType := HB.pack cR iC in
- let fC := GRing.IsField.Build iR finDomain_field in
+ let fC := GRing.isField.Build iR finDomain_field in
  HB.pack iR fC.
 
 Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=

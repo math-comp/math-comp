@@ -741,7 +741,7 @@ Module Import GRing.
 
 Import Monoid.Theory.
 
-HB.mixin Record IsZmodule V := {
+HB.mixin Record isZmodule V := {
   zero : V;
   opp : V -> V;
   add : V -> V -> V;
@@ -752,12 +752,12 @@ HB.mixin Record IsZmodule V := {
 }.
 
 #[short(type="zmodType")]
-HB.structure Definition Zmodule := {V of IsZmodule V & Choice V}.
+HB.structure Definition Zmodule := {V of isZmodule V & Choice V}.
 
 Module ZmodExports.
 Bind Scope ring_scope with Zmodule.sort.
-#[deprecated(since="mathcomp 2.0.0", note="use IsZmodule.Build instead")]
-Notation ZmodMixin V := (IsZmodule.Build V).
+#[deprecated(since="mathcomp 2.0.0", note="use isZmodule.Build instead")]
+Notation ZmodMixin V := (isZmodule.Build V).
 Notation "[ 'zmodType' 'of' T 'for' cT ]" := (@Zmodule.clone T cT)
   (at level 0, format "[ 'zmodType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'zmodType' 'of' T ]" :=  (@Zmodule.clone T _)
@@ -796,7 +796,7 @@ Proof. by move=> x; rewrite addrC addNr. Qed.
 Definition subrr := addrN.
 
 #[export]
-HB.instance Definition _ := Monoid.IsComLaw.Build V 0 +%R addrA addrC add0r.
+HB.instance Definition _ := Monoid.isComLaw.Build V 0 +%R addrA addrC add0r.
 
 Lemma addrCA : @left_commutative V V +%R. Proof. exact: mulmCA. Qed.
 Lemma addrAC : @right_commutative V V +%R. Proof. exact: mulmAC. Qed.
@@ -990,7 +990,7 @@ HB.mixin Record Zmodule_isRing R of Zmodule R := {
   oner_neq0 : one != 0
 }.
 
-HB.factory Record IsRing R of Choice R := {
+HB.factory Record isRing R of Choice R := {
   zero : R;
   opp : R -> R;
   add : R -> R -> R;
@@ -1007,15 +1007,15 @@ HB.factory Record IsRing R of Choice R := {
   mulrDr : right_distributive mul add;
   oner_neq0 : one != zero
 }.
-HB.builders Context R of IsRing R.
-  HB.instance Definition _ := @IsZmodule.Build R
+HB.builders Context R of isRing R.
+  HB.instance Definition _ := @isZmodule.Build R
     zero opp add addrA addrC add0r addNr.
   HB.instance Definition _ := @Zmodule_isRing.Build R
     one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
 HB.end.
 
 #[short(type="ringType")]
-HB.structure Definition Ring := { R of IsRing R & Choice R }.
+HB.structure Definition Ring := { R of isRing R & Choice R }.
 
 Module RingExports.
 Bind Scope ring_scope with Ring.sort.
@@ -1083,11 +1083,11 @@ Lemma mulrN1 x : x * -1 = - x.
 Proof. by rewrite mulrN mulr1. Qed.
 
 #[export]
-HB.instance Definition _ := Monoid.IsLaw.Build R 1 *%R mulrA mul1r mulr1.
+HB.instance Definition _ := Monoid.isLaw.Build R 1 *%R mulrA mul1r mulr1.
 #[export]
-HB.instance Definition _ := Monoid.IsMulLaw.Build R 0 *%R mul0r mulr0.
+HB.instance Definition _ := Monoid.isMulLaw.Build R 0 *%R mul0r mulr0.
 #[export]
-HB.instance Definition _ := Monoid.IsAddLaw.Build R *%R +%R mulrDl mulrDr.
+HB.instance Definition _ := Monoid.isAddLaw.Build R *%R +%R mulrDl mulrDr.
 
 Lemma mulr_suml I r P (F : I -> R) x :
   (\sum_(i <- r | P i) F i) * x = \sum_(i <- r | P i) F i * x.
@@ -2537,7 +2537,7 @@ Variable R : comRingType.
 Implicit Types x y : R.
 
 #[export]
-HB.instance Definition _ := Monoid.IsCommutativeLaw.Build R *%R mulrC.
+HB.instance Definition _ := Monoid.isCommutativeLaw.Build R *%R mulrC.
 Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
@@ -4363,12 +4363,12 @@ Arguments rregP {R x}.
 Definition field_axiom (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 
 (* FIXME: bad naming, should be UnitRing_isField *)
-HB.mixin Record IsField R of UnitRing R := {
+HB.mixin Record isField R of UnitRing R := {
   fieldP : field_axiom [the unitRingType of R];
 }.
 
 #[mathcomp(axiom="field_axiom"), short(type="fieldType")]
-HB.structure Definition Field := { R of IntegralDomain R & IsField R }.
+HB.structure Definition Field := { R of IntegralDomain R & isField R }.
 
 Module FieldExports.
 Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T cT)
@@ -4379,7 +4379,7 @@ End FieldExports.
 HB.export FieldExports.
 
 #[export] HB.instance Definition regular_field (F : fieldType) :=
-  IsField.Build F^o fieldP.
+  isField.Build F^o fieldP.
 
 Lemma IdomainMixin (R : unitRingType): Field.axiom R -> IntegralDomain.axiom R.
 Proof.
@@ -4393,7 +4393,7 @@ HB.factory Record ComUnitRing_isField R of ComUnitRing R := {
 HB.builders Context R of ComUnitRing_isField R.
 HB.instance Definition _ :=
   ComUnitRing_isIntegral.Build R (IdomainMixin fieldP).
-HB.instance Definition _ := IsField.Build R fieldP.
+HB.instance Definition _ := isField.Build R fieldP.
 HB.end.
 
 HB.factory Record ComRing_isField R of ComRing R := {
@@ -4865,13 +4865,13 @@ Obligation Tactic := idtac.
 
 Implicit Type V : zmodType.
 
-HB.mixin Record IsSubZmodule V (S : {pred V}) U of SUB V S U & Zmodule U := {
+HB.mixin Record isSubZmodule V (S : {pred V}) U of SUB V S U & Zmodule U := {
   valB : additive (val : U -> V);
 }.
 
 #[short(type="subZmodType")]
 HB.structure Definition SubZmodule V S :=
-  { U of SubChoice V S U & Zmodule U & IsSubZmodule V S U }.
+  { U of SubChoice V S U & Zmodule U & isSubZmodule V S U }.
 
 Section additive.
 Context V (S : {pred V}) (U : SubZmodule.type S).
@@ -4895,12 +4895,12 @@ HB.factory Record PreZmodule U of Choice U := {
 }.
 
 HB.builders Context U of PreZmodule U.
-Program Definition zmodU := @IsZmodule.Build U zero opp add _ _ _ _.
+Program Definition zmodU := @isZmodule.Build U zero opp add _ _ _ _.
 Next Obligation. by move=> x y z; apply: injf; rewrite !fD addrA. Qed.
 Next Obligation. by move=> x y; apply: injf; rewrite !fD addrC. Qed.
 Next Obligation. by move=> x; apply: injf; rewrite fD f0 add0r. Qed.
 Next Obligation. by move=> x; apply: injf; rewrite !(fD, fN, f0) addNr. Qed.
-HB.instance Definition _ : IsZmodule U := zmodU.
+HB.instance Definition _ : isZmodule U := zmodU.
 HB.end.
 
 HB.factory Record PredSubZmodule V (S : {pred V})
@@ -4924,21 +4924,21 @@ HB.instance Definition _ := zmodU.
 Lemma valD : additive (val : U -> V).
 Proof. by move=> x y /=; rewrite !SubK. Qed.
 
-HB.instance Definition _ := IsSubZmodule.Build V (mem kS) U valD.
+HB.instance Definition _ := isSubZmodule.Build V (mem kS) U valD.
 HB.end.
 
 (* HB.instance Definition _ (V : zmodType) (S : {pred V}) *)
 (*    (subS : zmodPred S) (kS : keyed_pred subS) (sT : subType (mem kS)) := *)
 (*  PredSubZmodule.Build V S subS kS (sub_type sT). *)
 
-HB.mixin Record IsSubRing (R : ringType) (S : {pred R}) U
+HB.mixin Record isSubRing (R : ringType) (S : {pred R}) U
     of SubZmodule R S U & Ring U := {
   valM : multiplicative (val : U -> R);
 }.
 
 #[short(type="subRingType")]
 HB.structure Definition SubRing (R : ringType) (S : {pred R}) :=
-  { U of SubZmodule R S U & Ring U & IsSubRing R S U }.
+  { U of SubZmodule R S U & Ring U & isSubRing R S U }.
 
 Section multiplicative.
 Context (R : ringType) (S : {pred R}) (U : SubRing.type S).
@@ -4987,7 +4987,7 @@ HB.instance Definition _ := ringU.
 Lemma valM : multiplicative (val : U -> R).
 Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
 
-HB.instance Definition _ := IsSubRing.Build R (mem kS) U valM.
+HB.instance Definition _ := isSubRing.Build R (mem kS) U valM.
 HB.end.
 
 HB.factory Record PreComRing R of Ring R := {
@@ -5002,7 +5002,7 @@ HB.instance Definition _ := Ring_hasCommutativeMul.Build R
   (comRingMixin (Phant R) injf fM).
 HB.end.
 
-HB.mixin Record IsSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
+HB.mixin Record isSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
    W of SubZmodule V S W & Lmodule R W := {
  valZ : scalable (val : W -> V);
 }.
@@ -5010,7 +5010,7 @@ HB.mixin Record IsSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
 #[short(type="subLmodType")]
 HB.structure Definition SubLmodule (R : ringType) (V : lmodType R)
     (S : {pred V}) :=
-  { W of SubZmodule V S W & Zmodule_isLmodule R W & IsSubLmodule R V S W}.
+  { W of SubZmodule V S W & Zmodule_isLmodule R W & isSubLmodule R V S W}.
 
 Section linear.
 Context (R : ringType) (V : lmodType R) (S : {pred V}) (W : SubLmodule.type S).
@@ -5053,7 +5053,7 @@ HB.instance Definition _ := lmodW.
 
 Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
 
-HB.instance Definition _ := IsSubLmodule.Build R V (mem kS) W valZ.
+HB.instance Definition _ := isSubLmodule.Build R V (mem kS) W valZ.
 HB.end.
 
 HB.factory Record PreLalgebra R B of Ring B & Lmodule R B := {
@@ -5172,7 +5172,7 @@ Notation "[ 'idomainMixin' 'of' R 'by' <: ]" :=
      (idomainMixin (Phant R) val_inj (erefl _) (rrefl _)))
   (at level 0, format "[ 'idomainMixin'  'of'  R  'by'  <: ]") : form_scope.
 Notation "[ 'fieldMixin' 'of' F 'by' <: ]" :=
-  (IsField.Build F%type (fieldMixin (Phant F) val_inj (erefl _) (frefl _)))
+  (isField.Build F%type (fieldMixin (Phant F) val_inj (erefl _) (frefl _)))
   (at level 0, format "[ 'fieldMixin'  'of'  F  'by'  <: ]") : form_scope.
 
 End SubExports.
@@ -5871,7 +5871,7 @@ Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE add0r. Qed.
 Fact ffun_addN : left_inverse ffun_zero ffun_opp ffun_add.
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
 
-HB.instance Definition _  := IsZmodule.Build {ffun aT -> rT}
+HB.instance Definition _  := isZmodule.Build {ffun aT -> rT}
   ffun_addA ffun_addC ffun_add0 ffun_addN.
 
 Section Sum.
@@ -5976,7 +5976,7 @@ Proof. by case=> x1 x2; congr (_, _); apply: add0r. Qed.
 Fact pair_addN : left_inverse (0, 0) opp_pair add_pair.
 Proof. by move=> x; congr (_, _); apply: addNr. Qed.
 
-HB.instance Definition _ := IsZmodule.Build (M1 * M2)%type
+HB.instance Definition _ := isZmodule.Build (M1 * M2)%type
   pair_addA pair_addC pair_add0 pair_addN.
 
 Fact fst_is_additive : additive fst.

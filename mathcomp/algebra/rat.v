@@ -426,7 +426,7 @@ rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
 by rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mul0r.
 Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build rat addqA addqC add0q addNq.
+HB.instance Definition _ := GRing.isZmodule.Build rat addqA addqC add0q addNq.
 
 Definition mulq_subdef (x y : int * int) :=
   let: (x1, x2) := x in

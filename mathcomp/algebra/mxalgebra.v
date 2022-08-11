@@ -1116,7 +1116,7 @@ by do 3!case: (_ <= 0)%MS; rewrite //= !genmx_id.
 Qed.
 
 HB.instance Definition _ n :=
-  Monoid.IsComLaw.Build (matrix F n n) 0%MS addsmx.body
+  Monoid.isComLaw.Build (matrix F n n) 0%MS addsmx.body
     (@addsmxA n n n n) (@addsmxC n n n) (@adds0mx_id n n).
 
 Lemma addsmxMr m1 m2 n p (A : 'M_(m1, n)) (B : 'M_(m2, n)) (C : 'M_(n, p)) :
@@ -1567,7 +1567,7 @@ by rewrite !unlock capmx_nopP capmx_nop_id; do 2?case: (qidmx _) => //.
 Qed.
 
 HB.instance Definition _ n :=
-  Monoid.IsComLaw.Build (matrix F n n) 1%:M capmx.body
+  Monoid.isComLaw.Build (matrix F n n) 1%:M capmx.body
     (@capmxA n n n n) (@capmxC n n n) (@cap1mx n).
 
 Lemma bigcapmx_inf i0 P m n (A_ : I -> 'M_n) (B : 'M_(m, n)) :

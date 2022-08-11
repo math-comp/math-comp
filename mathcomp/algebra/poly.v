@@ -329,7 +329,7 @@ move=> p; apply/polyP=> i.
 by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build (polynomial R)
+HB.instance Definition _ := GRing.isZmodule.Build (polynomial R)
   add_polyA add_polyC add_poly0 add_polyN.
 HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 

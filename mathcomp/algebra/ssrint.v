@@ -217,7 +217,7 @@ Lemma addNz : left_inverse (0:int) oppz addz. Proof. by do 3?elim. Qed.
 Lemma predn_int (n : nat) : 0 < n -> n.-1%:Z = n - 1.
 Proof. by case: n=> // n _ /=; rewrite subn1. Qed.
 
-Definition Mixin := GRing.IsZmodule.Build int addzA addzC add0z addNz.
+Definition Mixin := GRing.isZmodule.Build int addzA addzC add0z addNz.
 
 End intZmod.
 End intZmod.

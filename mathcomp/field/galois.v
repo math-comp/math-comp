@@ -619,7 +619,7 @@ Definition inAEnd f := SeqSub (svalP (enum_AEnd L) f).
 Fact inAEndK : cancel inAEnd val. Proof. by []. Qed.
 
 HB.instance Definition _ := Countable.copy 'AEnd(L) (can_type inAEndK).
-HB.instance Definition _ : IsFinite 'AEnd(L) := CanFinMixin inAEndK.
+HB.instance Definition _ : isFinite 'AEnd(L) := CanFinMixin inAEndK.
 
 (* the group operation is the categorical composition operation *)
 Definition comp_AEnd (f g : 'AEnd(L)) : 'AEnd(L) := (g \o f)%AF.
@@ -633,7 +633,7 @@ Proof. by move=> f; apply/val_inj/comp_lfun1r. Qed.
 Fact comp_AEndK : left_inverse \1%AF (@inv_ahom _ L) comp_AEnd.
 Proof.  by move=> f; apply/val_inj; rewrite /= lker0_compfV ?AEnd_lker0. Qed.
 
-HB.instance Definition _:= IsMulGroup.Build 'AEnd(L)
+HB.instance Definition _:= isMulGroup.Build 'AEnd(L)
   comp_AEndA comp_AEnd1l comp_AEndK.
 
 Definition kAEnd U V := [set f : 'AEnd(L) | kAut U V f].
@@ -703,7 +703,7 @@ Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
 Let gal_sgval_inj := can_inj gal_sgvalK.
 
 HB.instance Definition _ := Countable.copy gal_of (can_type gal_sgvalK).
-HB.instance Definition _ : IsFinite gal_of := CanFinMixin gal_sgvalK.
+HB.instance Definition _ : isFinite gal_of := CanFinMixin gal_sgvalK.
 
 Definition gal_one := Gal 1%g.
 Definition gal_inv x := Gal (gal_sgval x)^-1.
@@ -715,7 +715,7 @@ Proof. by move=> x; apply/gal_sgval_inj/mulVg. Qed.
 Fact gal_mulP : associative gal_mul.
 Proof. by move=> x y z; apply/gal_sgval_inj/mulgA. Qed.
 
-HB.instance Definition _ := IsMulGroup.Build gal_of gal_mulP gal_oneP gal_invP.
+HB.instance Definition _ := isMulGroup.Build gal_of gal_mulP gal_oneP gal_invP.
 
 Coercion gal_repr u : 'AEnd(L) := repr (sgval (gal_sgval u)).
 

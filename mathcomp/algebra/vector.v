@@ -210,7 +210,7 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
-HB.instance Definition _ : IsSUB _ _ 'Hom(aT, rT) := [IsNew for f2mx].
+HB.instance Definition _ : isSUB _ _ 'Hom(aT, rT) := [IsNew for f2mx].
 End Hom.
 
 Arguments mx2vs {K vT m%N} A%MS.
@@ -509,7 +509,7 @@ Proof. by move=> U; apply/addv_idPl/subvf. Qed.
 Lemma addvf : right_zero fullv addV.
 Proof. by move=> U; apply/addv_idPr/subvf. Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {vspace vT} 0%VS addv
+HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} 0%VS addv
   addvA addvC add0v.
 
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
@@ -601,7 +601,7 @@ Proof. by move=> U; apply/capv_idPr/subvf. Qed.
 Lemma capvf : right_id fullv capV.
 Proof. by move=> U; apply/capv_idPl/subvf. Qed.
 
-HB.instance Definition _ := Monoid.IsComLaw.Build {vspace vT} fullv capv
+HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} fullv capv
   capvA capvC capfv.
 
 Lemma memv_cap w U V : (w \in U :&: V)%VS = (w \in U) && (w \in V).
@@ -1304,7 +1304,7 @@ Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build 'Hom(aT, rT)
+HB.instance Definition _ := GRing.isZmodule.Build 'Hom(aT, rT)
   lfun_addA lfun_addC lfun_add0 lfun_addN.
 
 Lemma zero_lfunE x : (0 : 'Hom(aT, rT)) x = 0. Proof. exact: lfunE. Qed.

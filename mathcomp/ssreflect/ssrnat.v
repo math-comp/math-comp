@@ -183,7 +183,7 @@ move=> n m; apply: (iffP idP) => [|<-]; last by elim n.
 by elim: n m => [|n IHn] [|m] //= /IHn->.
 Qed.
 
-HB.instance Definition _ := HasDecEq.Build nat eqnP.
+HB.instance Definition _ := hasDecEq.Build nat eqnP.
 
 Arguments eqn !m !n.
 Arguments eqnP {x y}.
@@ -1923,7 +1923,7 @@ move=> p q; apply: (iffP idP) => [|<-]; last by case: p => //; elim.
 by case: q; case: p => //; elim=> [p IHp|p IHp|] [q|q|] //= /IHp [->].
 Qed.
 
-HB.instance Definition _ := HasDecEq.Build N eq_binP.
+HB.instance Definition _ := hasDecEq.Build N eq_binP.
 
 Arguments N.eqb !n !m.
 

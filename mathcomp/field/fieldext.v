@@ -124,7 +124,7 @@ move=> U V; without loss suffices subC: U V / (U * V <= V * U)%VS.
 by apply/prodvP=> x y Ux Vy; rewrite mulrC memv_mul.
 Qed.
 HB.instance Definition _ :=
-  Monoid.IsCommutativeLaw.Build {vspace L} (@prodv _ L) prodvC.
+  Monoid.isCommutativeLaw.Build {vspace L} (@prodv _ L) prodvC.
 
 Lemma prodvCA : left_commutative (@prodv F0 L).
 Proof. exact: Monoid.mulmCA. Qed.
@@ -220,7 +220,7 @@ Lemma subvs_fieldMixin K : GRing.field_axiom [the idomainType of subvs_of K].
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.
 Qed.
-HB.instance Definition _ K := GRing.IsField.Build (subvs_of K)
+HB.instance Definition _ K := GRing.isField.Build (subvs_of K)
   (@subvs_fieldMixin K).
 
 Lemma polyOver_subvs {K} {p : {poly L}} :
@@ -1051,7 +1051,7 @@ Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 Fact addfxN : left_inverse subfext0 subfext_opp subfext_add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build subFExtend
+HB.instance Definition _ := GRing.isZmodule.Build subFExtend
   addfxA addfxC add0fx addfxN.
 
 Let poly_rV_modp_K q : rVpoly (poly_rV (q %% p0) : 'rV[F]_n) = q %% p0.

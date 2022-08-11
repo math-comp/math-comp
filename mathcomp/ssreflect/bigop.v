@@ -323,57 +323,57 @@ Reserved Notation "\bigcap_ ( i 'in' A ) F"
 
 Module Monoid.
 
-HB.mixin Record IsLaw T (idm : T) (op : T -> T -> T) := {
+HB.mixin Record isLaw T (idm : T) (op : T -> T -> T) := {
   opA : associative op;
   op1m : left_id idm op;
   opm1 : right_id idm op;
 }.
 
 #[export]
-HB.structure Definition Law T idm := {op of IsLaw T idm op}.
+HB.structure Definition Law T idm := {op of isLaw T idm op}.
 Definition law := Law.type.
 
-HB.mixin Record IsCommutativeLaw T (op : T -> T -> T) := {
+HB.mixin Record isCommutativeLaw T (op : T -> T -> T) := {
   opC : commutative op;
 }.
 
 #[export]
 HB.structure Definition ComLaw T idm :=
-  {op of Law T idm op & IsCommutativeLaw T op}.
+  {op of Law T idm op & isCommutativeLaw T op}.
 Definition com_law := ComLaw.type.
 
-HB.factory Record IsComLaw T (idm : T) (op : T -> T -> T) := {
+HB.factory Record isComLaw T (idm : T) (op : T -> T -> T) := {
   opA : associative op;
   opC : commutative op;
   op1m : left_id idm op;
 }.
 
-HB.builders Context T idm op of IsComLaw T idm op.
+HB.builders Context T idm op of isComLaw T idm op.
 
 Lemma opm1 : right_id idm op. Proof. by move=> x; rewrite opC op1m. Qed.
 
-HB.instance Definition _ := IsLaw.Build T idm op opA op1m opm1.
-HB.instance Definition _ := IsCommutativeLaw.Build T op opC.
+HB.instance Definition _ := isLaw.Build T idm op opA op1m opm1.
+HB.instance Definition _ := isCommutativeLaw.Build T op opC.
 
 HB.end.
 
-HB.mixin Record IsMulLaw T (zero : T) (mul : T -> T -> T) := {
+HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
   mul_zerol : left_zero zero mul;
   mul_zeror : right_zero zero mul;
 }.
 
 #[export]
-HB.structure Definition MulLaw T zero := {mul of IsMulLaw T zero mul}.
+HB.structure Definition MulLaw T zero := {mul of isMulLaw T zero mul}.
 Definition mul_law := MulLaw.type.
 
-HB.mixin Record IsAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
+HB.mixin Record isAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
   mul_op_Dl : left_distributive mul op;
   mul_op_Dr : right_distributive mul op;
 }.
 
 #[export]
 HB.structure Definition AddLaw T zero mul :=
-  {add of ComLaw T zero add & IsAddLaw T mul add}.
+  {add of ComLaw T zero add & isAddLaw T mul add}.
 Definition add_law := AddLaw.type.
 
 Module Import Exports. HB.reexport. End Exports.
@@ -451,31 +451,31 @@ Section PervasiveMonoids.
 
 Import Monoid.
 
-HB.instance Definition _ := IsComLaw.Build bool true andb andbA andbC andTb.
+HB.instance Definition _ := isComLaw.Build bool true andb andbA andbC andTb.
 
-HB.instance Definition _ := IsMulLaw.Build bool false andb andFb andbF.
-HB.instance Definition _ := IsComLaw.Build bool false orb orbA orbC orFb.
-HB.instance Definition _ := IsMulLaw.Build bool true orb orTb orbT.
-HB.instance Definition _ := IsComLaw.Build bool false addb addbA addbC addFb.
-HB.instance Definition _ := IsAddLaw.Build bool andb orb andb_orl andb_orr.
-HB.instance Definition _ := IsAddLaw.Build bool orb andb orb_andl orb_andr.
-HB.instance Definition _ := IsAddLaw.Build bool andb addb andb_addl andb_addr.
+HB.instance Definition _ := isMulLaw.Build bool false andb andFb andbF.
+HB.instance Definition _ := isComLaw.Build bool false orb orbA orbC orFb.
+HB.instance Definition _ := isMulLaw.Build bool true orb orTb orbT.
+HB.instance Definition _ := isComLaw.Build bool false addb addbA addbC addFb.
+HB.instance Definition _ := isAddLaw.Build bool andb orb andb_orl andb_orr.
+HB.instance Definition _ := isAddLaw.Build bool orb andb orb_andl orb_andr.
+HB.instance Definition _ := isAddLaw.Build bool andb addb andb_addl andb_addr.
 
-HB.instance Definition _ := IsComLaw.Build nat 0 addn addnA addnC add0n.
-HB.instance Definition _ := IsComLaw.Build nat 1 muln mulnA mulnC mul1n.
-HB.instance Definition _ := IsMulLaw.Build nat 0 muln mul0n muln0.
-HB.instance Definition _ := IsAddLaw.Build nat muln addn mulnDl mulnDr.
+HB.instance Definition _ := isComLaw.Build nat 0 addn addnA addnC add0n.
+HB.instance Definition _ := isComLaw.Build nat 1 muln mulnA mulnC mul1n.
+HB.instance Definition _ := isMulLaw.Build nat 0 muln mul0n muln0.
+HB.instance Definition _ := isAddLaw.Build nat muln addn mulnDl mulnDr.
 
-HB.instance Definition _ := IsComLaw.Build nat 0 maxn maxnA maxnC max0n.
-HB.instance Definition _ := IsAddLaw.Build nat muln maxn maxnMl maxnMr.
+HB.instance Definition _ := isComLaw.Build nat 0 maxn maxnA maxnC max0n.
+HB.instance Definition _ := isAddLaw.Build nat muln maxn maxnMl maxnMr.
 
-HB.instance Definition _ := IsComLaw.Build nat 0 gcdn gcdnA gcdnC gcd0n.
-HB.instance Definition _ := IsAddLaw.Build nat muln gcdn muln_gcdl muln_gcdr.
+HB.instance Definition _ := isComLaw.Build nat 0 gcdn gcdnA gcdnC gcd0n.
+HB.instance Definition _ := isAddLaw.Build nat muln gcdn muln_gcdl muln_gcdr.
 
-HB.instance Definition _ := IsComLaw.Build nat 1 lcmn lcmnA lcmnC lcm1n.
-HB.instance Definition _ := IsAddLaw.Build nat muln lcmn muln_lcml muln_lcmr.
+HB.instance Definition _ := isComLaw.Build nat 1 lcmn lcmnA lcmnC lcm1n.
+HB.instance Definition _ := isAddLaw.Build nat muln lcmn muln_lcml muln_lcmr.
 
-HB.instance Definition _ T := IsLaw.Build (seq T) nil cat
+HB.instance Definition _ T := isLaw.Build (seq T) nil cat
   (@catA T) (@cat0s T) (@cats0 T).
 
 End PervasiveMonoids.

@@ -101,7 +101,7 @@ Reserved Notation "m != n %[ 'mod_ideal' I ]" (at level 70, n at next level,
 Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T). *)
 
-HB.mixin Record IsZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
+HB.mixin Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
 (Q : Type) of GRing.Zmodule Q & EqQuotient T eqT Q := {
   pi_zeror : \pi_Q zeroT = 0;
   pi_oppr : {morph \pi_Q : x / oppT x >-> - x};
@@ -110,7 +110,7 @@ HB.mixin Record IsZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T 
 
 #[short(type="zmodQuotType")]
 HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
-  {Q of IsZmodQuotient T eqT zeroT oppT addT Q &
+  {Q of isZmodQuotient T eqT zeroT oppT addT Q &
         GRing.Zmodule Q & EqQuotient T eqT Q}.
 
 Section ZModQuotient.
@@ -150,7 +150,7 @@ Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
 Variables (oneT : T) (mulT : T -> T -> T).
  *)
-HB.mixin Record IsRingQuotient T eqT zeroT oppT
+HB.mixin Record isRingQuotient T eqT zeroT oppT
 addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
   of ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q:=
   {
@@ -160,7 +160,7 @@ addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
 
 #[short(type="ringQuotType")]
 HB.structure Definition RingQuotient T eqT zeroT oppT addT oneT mulT :=
-  {Q of IsRingQuotient T eqT zeroT oppT addT oneT mulT Q &
+  {Q of isRingQuotient T eqT zeroT oppT addT oneT mulT Q &
    ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q }.
 
 Section ringQuotient.
@@ -196,7 +196,7 @@ Canonical pi_rmorphism := AddRMorphism pi_is_multiplicative.
 
 End PiRMorphism.
 
-HB.mixin Record IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred T) (invT : T -> T)
+HB.mixin Record isUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred T) (invT : T -> T)
   (Q : Type) of RingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q :=
   {
     pi_unitr : {mono \pi_Q : x / unitT x >-> x \in GRing.unit};
@@ -205,7 +205,7 @@ HB.mixin Record IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred
 
 #[short(type="unitRingQuotType")]
 HB.structure Definition UnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT :=
-  {Q of IsUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q & IsQuotient T Q & IsEqQuotient T eqT Q & IsZmodQuotient T eqT zeroT oppT addT Q & IsRingQuotient T eqT zeroT oppT addT oneT mulT Q}.
+  {Q of isUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q & isQuotient T Q & isEqQuotient T eqT Q & isZmodQuotient T eqT zeroT oppT addT Q & isRingQuotient T eqT zeroT oppT addT oneT mulT Q}.
 
 Section UnitRingQuot.
 Variable (T : Type).
@@ -368,7 +368,7 @@ HB.instance Definition _ := ZmodMixin type addqA addqC add0q addNq.
 #[export]
 HB.instance Definition _ := GRing.Zmodule.on quot.
 #[export]
-HB.instance Definition _ := @IsZmodQuotient.Build R equiv 0 -%R +%R type
+HB.instance Definition _ := @isZmodQuotient.Build R equiv 0 -%R +%R type
   (lock _) pi_opp pi_add.
 #[export]
 HB.instance Definition _ := @ZmodQuotient.on quot.
@@ -422,7 +422,7 @@ HB.instance Definition _ := GRing.Zmodule_isComRing.Build (type kI)
 HB.instance Definition _ := GRing.ComRing.on {quot kI}.
 
 #[export]
-HB.instance Definition _ := @IsRingQuotient.Build
+HB.instance Definition _ := @isRingQuotient.Build
   R (equiv kI) 0 -%R +%R 1%R *%R (type kI) (lock _) pi_mul.
 #[export]
 HB.instance Definition _ := @RingQuotient.on {quot kI}.

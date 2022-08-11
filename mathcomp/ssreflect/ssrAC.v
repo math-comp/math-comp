@@ -69,7 +69,7 @@ Notation vmrefl := (ltac: (vm_compute; reflexivity)) (only parsing).
 
 Module AC.
 
-HB.instance Definition _ := HasDecEq.Build positive
+HB.instance Definition _ := hasDecEq.Build positive
   (fun _ _ => equivP idP (Pos.eqb_eq _ _)).
 
 Inductive syntax := Leaf of positive | Op of syntax & syntax.
@@ -223,8 +223,8 @@ Notation opACof law p s :=
 ((fun T idx op assoc lid rid comm => (change_type (@AC.direct T idx
    (Monoid.ComLaw.Pack  (* FIXME: find a way to make this robust to hierarchy evolutions *)
       (Monoid.ComLaw.Class
-         (Monoid.IsLaw.Axioms_ idx op assoc lid rid)
-         (Monoid.IsCommutativeLaw.Axioms_ op comm)))
+         (Monoid.isLaw.Axioms_ idx op assoc lid rid)
+         (Monoid.isCommutativeLaw.Axioms_ op comm)))
    p%AC s%AC AC_check_pattern) cbvrefl)) _ _ law
 (Monoid.mulmA _) (Monoid.mul1m _) (Monoid.mulm1 _) (Monoid.mulmC _))
 (only parsing).

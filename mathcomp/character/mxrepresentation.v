@@ -2142,7 +2142,7 @@ rewrite /socle_val /= in e0W *; rewrite -(nth_map _ 0) ?nth_index //.
 by rewrite -(size_map component_mx) index_mem.
 Qed.
 
-HB.instance Definition _ := IsSUB.Build _ _ sG socle_sort_rect PackSocleK.
+HB.instance Definition _ := isSUB.Build _ _ sG socle_sort_rect PackSocleK.
 HB.instance Definition _ := [Choice of sG by <:].
 
 Lemma socleP (W W' : sG) : reflect (W = W') (W == W')%MS.
@@ -2152,8 +2152,8 @@ Fact socle_can_subproof :
   cancel (fun W => SeqSub (socle_mem W)) (fun s => PackSocle (valP s)).
 Proof. by move=> W /=; apply: val_inj; rewrite /= PackSocleK. Qed.
 
-HB.instance Definition _ : IsCountable sG := CanCountMixin socle_can_subproof.
-HB.instance Definition _ : IsFinite sG := CanFinMixin socle_can_subproof.
+HB.instance Definition _ : isCountable sG := CanCountMixin socle_can_subproof.
+HB.instance Definition _ : isFinite sG := CanFinMixin socle_can_subproof.
 
 End SocleDef.
 
@@ -5092,7 +5092,7 @@ Proof. by move=> x; apply: val_inj; rewrite /= add0r. Qed.
 Lemma gen_addNr : left_inverse gen0 genN genD.
 Proof. by move=> x; apply: val_inj; rewrite /= addNr. Qed.
 
-#[export] HB.instance Definition _ := GRing.IsZmodule.Build FA
+#[export] HB.instance Definition _ := GRing.isZmodule.Build FA
   gen_addA gen_addC gen_add0r gen_addNr.
 
 Definition pval (x : FA) := rVpoly (val x).

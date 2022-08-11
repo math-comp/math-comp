@@ -795,7 +795,7 @@ have eqKtrans : transitive eqKrep.
   do [rewrite -toEtrans ?le_max // -maxnA => lez2m] in lez3m *.
   by rewrite (toEtrans (maxn (tag z2) (tag z3))) // eq_z23 -toEtrans.
 pose K := {eq_quot EquivRel _ eqKrefl eqKsym eqKtrans}%qT.
-have cntK : IsCountable K := CanCountMixin reprK.
+have cntK : isCountable K := CanCountMixin reprK.
 pose EtoKrep i (x : E i) : K := \pi%qT (Tagged E x).
 have [EtoK piEtoK]: {EtoK | forall i, EtoKrep i =1 EtoK i} by exists EtoKrep.
 pose FtoK := EtoK 0%N; rewrite {}/EtoKrep in piEtoK.
@@ -848,7 +848,7 @@ have Kadd0: left_id (FtoK 0) Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -(EtoK_0 i) -EtoK_D add0r.
 have KaddN: left_inverse (FtoK 0) Kopp Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -EtoK_N -EtoK_D addNr EtoK_0.
-pose KzmodMixin := GRing.IsZmodule.Build K KaddA KaddC Kadd0 KaddN.
+pose KzmodMixin := GRing.isZmodule.Build K KaddA KaddC Kadd0 KaddN.
 pose Kzmod : countZmodType := HB.pack K KzmodMixin.
 have KmulC: commutative Kmul.
   by move=> u v; have [i [x ->] [y ->]] := KtoE2 u v; rewrite -!EtoK_M mulrC.

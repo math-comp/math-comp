@@ -141,7 +141,7 @@ Module Num.
 
 #[short(type="porderZmodType")]
 HB.structure Definition POrderedZmodule :=
-  { R of Order.IsPOrdered ring_display R & GRing.Zmodule R }.
+  { R of Order.isPOrdered ring_display R & GRing.Zmodule R }.
 
 HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
          of GRing.Zmodule M := {
@@ -168,7 +168,7 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
-HB.mixin Record IsNumRing R of GRing.Ring R & POrderedZmodule R
+HB.mixin Record isNumRing R of GRing.Ring R & POrderedZmodule R
   & NormedZmodule (POrderedZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
@@ -181,13 +181,13 @@ HB.structure Definition NumDomain := { R of
      GRing.IntegralDomain R &
      POrderedZmodule R &
      NormedZmodule (POrderedZmodule.clone R _) R &
-     IsNumRing R
+     isNumRing R
   }.
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
 
-(* TODO: make IsNumDomain depend on intermediate structures *)
-(* TODO: make IsNumDomain.sort canonically a NumDomain *)
+(* TODO: make isNumDomain depend on intermediate structures *)
+(* TODO: make isNumDomain.sort canonically a NumDomain *)
 
 Module NumDomainExports.
 Bind Scope ring_scope with NumDomain.sort.
@@ -352,13 +352,13 @@ End ExtensionAxioms.
 (* The rest of the numbers interface hierarchy. *)
 
 (* #[short(type="numFieldType")] *)
-(* HB.structure Definition NumField := { R of GRing.IsField R & NumDomain R }. *)
+(* HB.structure Definition NumField := { R of GRing.isField R & NumDomain R }. *)
 #[short(type="numFieldType")]
-HB.structure Definition NumField := { R of GRing.IsField R &
+HB.structure Definition NumField := { R of GRing.isField R &
      GRing.IntegralDomain R &
      POrderedZmodule R &
      NormedZmodule (POrderedZmodule.clone R _) R &
-     IsNumRing R }.
+     isNumRing R }.
 
 Module NumFieldExports.
 Bind Scope ring_scope with NumField.sort.
@@ -4514,13 +4514,13 @@ HB.builders Context R of IntegralDomain_isNumRing R.
   Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
   HB.instance Definition _ :=
-    Order.IsLtLePOrdered.Build ring_display R le_def' ltrr lt_trans.
+    Order.isLtLePOrdered.Build ring_display R le_def' ltrr lt_trans.
 
   HB.instance Definition _ :=
     Zmodule_isNormed.Build _ R normD norm_eq0 normrMn normrN.
 
   HB.instance Definition _ :=
-    IsNumRing.Build R addr_gt0 ger_total normM le_def.
+    isNumRing.Build R addr_gt0 ger_total normM le_def.
 HB.end.
 
 HB.factory Record NumDomain_isReal R of NumDomain R := {

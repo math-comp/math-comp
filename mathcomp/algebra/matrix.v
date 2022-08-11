@@ -1183,7 +1183,7 @@ Definition mxvec_index (i : 'I_m) (j : 'I_n) :=
   cast_ord mxvec_cast (enum_rank (i, j)).
 
 Variant is_mxvec_index : 'I_(m * n) -> Type :=
-  IsMxvecIndex i j : is_mxvec_index (mxvec_index i j).
+  isMxvecIndex i j : is_mxvec_index (mxvec_index i j).
 
 Lemma mxvec_indexP k : is_mxvec_index k.
 Proof.
@@ -1192,7 +1192,7 @@ by rewrite -[_ k]enum_valK; case: (enum_val _).
 Qed.
 
 Coercion pair_of_mxvec_index k (i_k : is_mxvec_index k) :=
-  let: IsMxvecIndex i j := i_k in (i, j).
+  let: isMxvecIndex i j := i_k in (i, j).
 
 Definition mxvec (A : 'M[R]_(m, n)) :=
   castmx (erefl _, mxvec_cast) (\row_k A (enum_val k).1 (enum_val k).2).
@@ -1417,7 +1417,7 @@ Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE add0r. Qed.
 Lemma addNmx : left_inverse (const_mx 0) oppmx addmx.
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
-HB.instance Definition _ := GRing.IsZmodule.Build 'M[V]_(m, n)
+HB.instance Definition _ := GRing.isZmodule.Build 'M[V]_(m, n)
   addmxA addmxC add0mx addNmx.
 
 Lemma mulmxnE A d i j : (A *+ d) i j = A i j *+ d.

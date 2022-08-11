@@ -123,7 +123,7 @@ move=> b1 b2; apply: (iffP idP).
 - by move=> <-; case: b1 => //= a x; rewrite !eqxx.
 Qed.
 
-HB.instance Definition _  :=  HasDecEq.Build (itv_bound T) eq_itv_boundP.
+HB.instance Definition _  :=  hasDecEq.Build (itv_bound T) eq_itv_boundP.
 
 Definition eqitv (x y : interval T) : bool :=
   let: Interval x x' := x in
@@ -136,7 +136,7 @@ move=> x y; apply: (iffP idP).
 - by move=> <-; case: x => /= x x'; rewrite !eqxx.
 Qed.
 
-HB.instance Definition _  :=  HasDecEq.Build (interval T) eqitvP.
+HB.instance Definition _  :=  hasDecEq.Build (interval T) eqitvP.
 
 End IntervalEq.
 
@@ -168,9 +168,9 @@ HB.instance Definition _ (T : countType) := CanCountMixin (@itv_bound_can T).
 #[export]
 HB.instance Definition _ (T : countType) := CanCountMixin (@interval_can T).
 #[export]
-HB.instance Definition _ (T : finType) : IsFinite (itv_bound T) :=
+HB.instance Definition _ (T : finType) : isFinite (itv_bound T) :=
    (CanFinMixin (@itv_bound_can T)).
-HB.instance Definition _ (T : finType) : IsFinite (interval T) :=
+HB.instance Definition _ (T : finType) : isFinite (interval T) :=
    (CanFinMixin (@interval_can T)).
 
 End IntervalChoice.
@@ -217,7 +217,7 @@ by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
 Qed.
 
 HB.instance Definition _ :=
-  Order.IsPOrdered.Build (itv_bound_display disp) (itv_bound T)
+  Order.isPOrdered.Build (itv_bound_display disp) (itv_bound T)
     lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
 
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
@@ -307,7 +307,7 @@ by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
 Qed.
 
 HB.instance Definition _ :=
-  Order.IsPOrdered.Build  (interval_display disp) (interval T)
+  Order.isPOrdered.Build  (interval_display disp) (interval T)
   (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
 
 Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
@@ -550,9 +550,9 @@ Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
 Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
 
 HB.instance Definition _ :=
-  Order.HasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
+  Order.hasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
 HB.instance Definition _ :=
-  Order.HasTop.Build (itv_bound_display disp) (itv_bound T) bound_lex1.
+  Order.hasTop.Build (itv_bound_display disp) (itv_bound T) bound_lex1.
 
 Definition itv_meet i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
@@ -593,9 +593,9 @@ Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
 Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
 
 HB.instance Definition _ :=
-  Order.HasBottom.Build (interval_display disp) (interval T) itv_le0x.
+  Order.hasBottom.Build (interval_display disp) (interval T) itv_le0x.
 HB.instance Definition _ :=
-  Order.HasTop.Build (interval_display disp) (interval T) itv_lex1.
+  Order.hasTop.Build (interval_display disp) (interval T) itv_lex1.
 
 Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.

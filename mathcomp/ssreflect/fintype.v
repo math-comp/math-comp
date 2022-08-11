@@ -162,21 +162,21 @@ Declare Scope fin_quant_scope.
 Definition finite_axiom (T : eqType) e :=
   forall x : T, count_mem x e = 1.
 
-HB.mixin Record IsFinite T of Equality T := {
+HB.mixin Record isFinite T of Equality T := {
   enum_subdef : seq T;
   enumP_subdef : finite_axiom enum_subdef
 }.
 
 #[short(type="finType")]
-HB.structure Definition Finite := {T of IsFinite T & Countable T }.
+HB.structure Definition Finite := {T of isFinite T & Countable T }.
 
 Module Export FiniteNES.
 Module Finite.
 
-HB.lock Definition enum T := IsFinite.enum_subdef (Finite.class T).
+HB.lock Definition enum T := isFinite.enum_subdef (Finite.class T).
 
 Notation axiom := finite_axiom.
-Notation EnumMixin m := (@IsFinite.Build _ _ m).
+Notation EnumMixin m := (@isFinite.Build _ _ m).
 
 Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
@@ -185,7 +185,7 @@ Section WithCountType.
 Variable (T : countType).
 
 Definition UniqMixin e Ue (eT : e =i T) :=
-  @IsFinite.Build T e (uniq_enumP Ue eT).
+  @isFinite.Build T e (uniq_enumP Ue eT).
 
 Variable n : nat.
 
@@ -226,8 +226,8 @@ Qed.
 
 HB.instance Definition _ := Equality.copy fT T.
 HB.instance Definition _ := Countable.copy fT
-  (count_type (IsCountable.Build fT fin_pickleK)).
-HB.instance Definition _ := IsFinite.Build fT f.
+  (count_type (isCountable.Build fT fin_pickleK)).
+HB.instance Definition _ := isFinite.Build fT f.
 
 End CanonicalFinType.
 
@@ -1333,15 +1333,15 @@ End EqImage.
 
 Lemma unit_enumP : Finite.axiom [::tt]. Proof. by case. Qed.
 
-HB.instance Definition unit_isFinite : IsFinite unit := FinMixin unit_enumP.
+HB.instance Definition unit_isFinite : isFinite unit := FinMixin unit_enumP.
 Lemma card_unit : #|{: unit}| = 1. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma bool_enumP : Finite.axiom [:: true; false]. Proof. by case. Qed.
-HB.instance Definition bool_isFinite : IsFinite bool := FinMixin bool_enumP.
+HB.instance Definition bool_isFinite : isFinite bool := FinMixin bool_enumP.
 Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
-HB.instance Definition void_isFinite : IsFinite void := FinMixin void_enumP.
+HB.instance Definition void_isFinite : isFinite void := FinMixin void_enumP.
 Lemma card_void : #|{: void}| = 0. Proof. by rewrite cardT enumT unlock. Qed.
 
 Local Notation enumF T := (Finite.enum T).
@@ -1356,7 +1356,7 @@ Lemma option_enumP : Finite.axiom option_enum.
 Proof. by case=> [x|]; rewrite /= count_map (count_pred0, enumP). Qed.
 
 HB.instance
-Definition option_isFinite : IsFinite (option T) := FinMixin option_enumP.
+Definition option_isFinite : isFinite (option T) := FinMixin option_enumP.
 
 Lemma card_option : #|{: option T}| = #|T|.+1.
 Proof. by rewrite !cardT !enumT [in LHS]unlock /= !size_map. Qed.
@@ -1381,7 +1381,7 @@ End TransferFinType.
 
 #[short(type="subFinType")]
 HB.structure Definition SubFinite (T : Type) (P : pred T) :=
-  { sT of Finite sT & IsSUB T P sT }.
+  { sT of Finite sT & isSUB T P sT }.
 
 Section SubFinType.
 
@@ -1420,7 +1420,7 @@ rewrite pmap_filter; last exact: insubK.
 by apply: eq_filter => x; apply: isSome_insub.
 Qed.
 
-HB.instance Definition SubFinMixin : IsFinite sT :=
+HB.instance Definition SubFinMixin : isFinite sT :=
   UniqFinMixin sub_enum_uniq mem_sub_enum.
 HB.end.
 
@@ -1452,7 +1452,7 @@ End SubCountable_isFiniteTheory.
 
 (* (* Regression for the subFinType stack *) *)
 (* Record myb : Type := MyB {myv : bool; _ : ~~ myv}. *)
-(* HB.instance Definition myb_sub : IsSUB bool (fun x => ~~ x) myb := *)
+(* HB.instance Definition myb_sub : isSUB bool (fun x => ~~ x) myb := *)
 (*    [IsSUB for myv]. *)
 (* HB.instance Definition _ := [Finite of myb by <:]. *)
 (* Check [subFinType of myb]. *)
@@ -1499,10 +1499,10 @@ rewrite /seq_sub_unpickle => x.
 by rewrite (nth_map x) ?nth_index ?index_mem ?mem_seq_sub_enum.
 Qed.
 
-Definition seq_sub_isCountable := IsCountable.Build seq_sub seq_sub_pickleK.
+Definition seq_sub_isCountable := isCountable.Build seq_sub seq_sub_pickleK.
 Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
 Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
-Definition seq_sub_isFinite := IsFinite.Build seq_sub seq_sub_axiom.
+Definition seq_sub_isFinite := isFinite.Build seq_sub seq_sub_axiom.
 
 (* Beware: these are not the canonical instances, as they are not consistent  *)
 (* with the generic sub_choiceType canonical instance.                        *)
@@ -1536,8 +1536,8 @@ Variables (T : choiceType) (s : seq T).
 Local Notation sT := (seq_sub s).
 
 HB.instance Definition _ := [HasChoice of sT by <:].
-HB.instance Definition _ : IsCountable sT := seq_sub_isCountable s.
-HB.instance Definition _ : IsFinite sT := seq_sub_isFinite s.
+HB.instance Definition _ : isCountable sT := seq_sub_isCountable s.
+HB.instance Definition _ : isFinite sT := seq_sub_isFinite s.
 
 Lemma card_seq_sub : uniq s -> #|{:sT}| = size s.
 Proof.
@@ -1713,7 +1713,7 @@ Proof. by rewrite pmap_sub_uniq ?iota_uniq. Qed.
 Lemma mem_ord_enum i : i \in ord_enum.
 Proof. by rewrite -(mem_map ord_inj) val_ord_enum mem_iota ltn_ord. Qed.
 
-HB.instance Definition _ : IsFinite ordinal :=
+HB.instance Definition _ : isFinite ordinal :=
   UniqFinMixin ord_enum_uniq mem_ord_enum.
 
 End OrdinalSub.
@@ -2213,7 +2213,7 @@ Proof.
 by case=> x1 x2; rewrite (predX_prod_enum (pred1 x1) (pred1 x2)) !card1.
 Qed.
 
-HB.instance Definition prod_isFinite : IsFinite (T1 * T2)%type :=
+HB.instance Definition prod_isFinite : isFinite (T1 * T2)%type :=
   FinMixin prod_enumP.
 
 Lemma cardX (A1 : {pred T1}) (A2 : {pred T2}) :
@@ -2245,7 +2245,7 @@ rewrite -size_filter -cardE /=; case: eqP => [-> | ne_j_i].
 by apply: eq_card0 => y.
 Qed.
 
-HB.instance Definition tag_isFinite : IsFinite {i : I & T_ i} :=
+HB.instance Definition tag_isFinite : isFinite {i : I & T_ i} :=
   FinMixin tag_enumP.
 
 Lemma card_tagged :
@@ -2273,7 +2273,7 @@ Qed.
 Lemma mem_sum_enum u : u \in sum_enum.
 Proof. by case: u => x; rewrite mem_cat -!enumT map_f ?mem_enum ?orbT. Qed.
 
-HB.instance Definition sum_isFinite : IsFinite (T1 + T2)%type :=
+HB.instance Definition sum_isFinite : isFinite (T1 + T2)%type :=
   UniqFinMixin sum_enum_uniq mem_sum_enum.
 
 Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
