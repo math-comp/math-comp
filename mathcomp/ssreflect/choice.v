@@ -24,10 +24,10 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*            CountType T m == the packed countType class for T and mixin m.  *)
 (*  [countType of T for cT] == clone for T of the countType cT.               *)
 (*        [count Type of T] == clone for T of the countType inferred for T.   *)
-(* [HasChoice of T by <:] == Choice mixin for T when T has a subType p        *)
+(* [hasChoice of T by <:] == Choice mixin for T when T has a subType p        *)
 (*                        structure with p : pred cT and cT has a Choice      *)
 (*                        structure; the corresponding structure is Canonical.*)
-(*  [IsCountable of T by <:] == Count mixin for a subType T of a countType.    *)
+(*  [isCountable of T by <:] == Count mixin for a subType T of a countType.    *)
 (*  PcanChoiceMixin fK == Choice mixin for T, given f : T -> cT where cT has  *)
 (*                        a Choice structure, a left inverse partial function *)
 (*                        g and fK : pcancel f g.                             *)
@@ -288,8 +288,8 @@ Module Export ChoiceNamespace.
   End Choice.
 End ChoiceNamespace.
 
-Notation "[ 'HasChoice' 'of' T ]" := (Choice.on _ : hasChoice T)
-  (at level 0, format "[ 'HasChoice'  'of'  T ]") : form_scope.
+Notation "[ 'hasChoice' 'of' T ]" := (Choice.on _ : hasChoice T)
+  (at level 0, format "[ 'hasChoice'  'of'  T ]") : form_scope.
 Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T C)
   (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
 Notation "[ 'choiceType' 'of' T ]" := (Choice.clone T _)
@@ -457,7 +457,7 @@ Qed.
 HB.instance Definition _ := nat_hasChoice.
 
 HB.instance Definition _ : hasChoice bool := CanChoiceMixin oddb.
-HB.instance Definition _ := [HasChoice of bitseq].
+HB.instance Definition _ := [hasChoice of bitseq].
 
 HB.instance Definition _ := CanChoiceMixin bool_of_unitK.
 
@@ -487,9 +487,9 @@ Prenex Implicits xchoose choose.
 Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T))
   (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
 
-Notation "[ 'HasChoice' 'of' T 'by' <: ]" :=
+Notation "[ 'hasChoice' 'of' T 'by' <: ]" :=
   (sub_hasChoice _ : hasChoice T)
-  (at level 0, format "[ 'HasChoice'  'of'  T  'by'  <: ]") : form_scope.
+  (at level 0, format "[ 'hasChoice'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : choiceType) (P : pred T) :=
   [Choice of {x | P x} by <:].
@@ -504,8 +504,8 @@ Arguments isCountable.axioms_ T%type_scope.
 #[short(type="countType")]
 HB.structure Definition Countable := { T of Choice T & isCountable T }.
 
-Notation "[ 'IsCountable' 'of' T ]" := (Countable.on T : isCountable T)
-  (at level 0, format "[ 'IsCountable'  'of'  T ]") : form_scope.
+Notation "[ 'isCountable' 'of' T ]" := (Countable.on T : isCountable T)
+  (at level 0, format "[ 'isCountable'  'of'  T ]") : form_scope.
 Notation "[ 'countType' 'of' T 'for' cT ]" := (Countable.clone T cT)
 (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'countType' 'of' T ]" := (Countable.clone T _)
@@ -564,8 +564,8 @@ End CountableTheory.
 Notation "[ 'Countable' 'of' T 'by' <: ]" :=
     (Countable.copy T%type (sub_type T))
   (at level 0, format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
-Notation "[ 'IsCountable' 'of' T 'by' <: ]" := [Countable of T by <:]
-  (at level 0, format "[ 'IsCountable'  'of'  T  'by'  <: ]") : form_scope.
+Notation "[ 'isCountable' 'of' T 'by' <: ]" := [Countable of T by <:]
+  (at level 0, format "[ 'isCountable'  'of'  T  'by'  <: ]") : form_scope.
 
 Arguments pickle_inv {T} n.
 Arguments pickleK {T} x : rename.
@@ -610,7 +610,7 @@ Lemma nat_pickleK : pcancel id (@Some nat). Proof. by []. Qed.
 HB.instance Definition _ : isCountable nat := isCountable.Build nat nat_pickleK.
 
 HB.instance Definition _ := Countable.copy bool (can_type oddb).
-HB.instance Definition _ : isCountable bitseq := [IsCountable of bitseq].
+HB.instance Definition _ : isCountable bitseq := [isCountable of bitseq].
 
 HB.instance Definition _ := Countable.copy unit (can_type bool_of_unitK).
 

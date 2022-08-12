@@ -306,7 +306,7 @@ Section EqTuple.
 Variables (n : nat) (T : eqType).
 
 HB.instance Definition tuple_hasDecEq : hasDecEq (n.-tuple T) :=
-  [HasDecEq of n.-tuple T by <:].
+  [hasDecEq of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
@@ -347,9 +347,9 @@ End EqTuple.
 
 (* TODO: try to factor this into a single instance *)
 HB.instance Definition tuple_hasChoice n (T : choiceType) :=
-  [HasChoice of n.-tuple T by <:].
+  [hasChoice of n.-tuple T by <:].
 HB.instance Definition tuple_isCountable n (T : countType) :=
-  [IsCountable of n.-tuple T by <:].
+  [isCountable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
 Section FinTupleSig.
@@ -633,7 +633,7 @@ Proof. by move=> s; apply: val_inj; case: s => [[]]. Qed.
 End SeqBseq.
 
 HB.instance Definition bseq_hasDecEq n (T : eqType) :=
-  [HasDecEq of n.-bseq T by <:].
+  [hasDecEq of n.-bseq T by <:].
 
 Canonical bseq_predType n (T : eqType) :=
   Eval hnf in PredType (fun t : n.-bseq T => mem_seq t).
@@ -642,10 +642,10 @@ Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
 Proof. by []. Qed.
 
 HB.instance Definition bseq_hasChoice n (T : choiceType) :=
-  [HasChoice of n.-bseq T by <:].
+  [hasChoice of n.-bseq T by <:].
 
 HB.instance Definition bseq_isCountable n (T : countType) :=
-  [IsCountable of n.-bseq T by <:].
+  [isCountable of n.-bseq T by <:].
 
 Definition bseq_tagged_tuple n T (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
   Tagged _ (in_tuple s : (Ordinal (size_bseq s : size s < n.+1)).-tuple _).

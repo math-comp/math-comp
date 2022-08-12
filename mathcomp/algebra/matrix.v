@@ -276,7 +276,7 @@ Variant matrix : predArgType := Matrix of {ffun 'I_m * 'I_n -> R}.
 
 Definition mx_val A := let: Matrix g := A in g.
 
-HB.instance Definition _ := [IsNew for mx_val].
+HB.instance Definition _ := [isNew for mx_val].
 
 Definition fun_of_matrix A (i : 'I_m) (j : 'I_n) := mx_val A (i, j).
 

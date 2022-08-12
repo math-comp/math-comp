@@ -210,7 +210,7 @@ End Vspace.
 Section Hom.
 Variables (R : ringType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
-HB.instance Definition _ : isSub _ _ 'Hom(aT, rT) := [IsNew for f2mx].
+HB.instance Definition _ : isSub _ _ 'Hom(aT, rT) := [isNew for f2mx].
 End Hom.
 
 Arguments mx2vs {K vT m%N} A%MS.

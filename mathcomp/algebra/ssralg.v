@@ -6151,9 +6151,9 @@ Inductive B := mkB x & x \in S.
 Definition vB u := let: mkB x _ := u in x.
 
 Canonical B_subType := [subType for vB].
-Definition B_hasDecEq := [HasDecEq of B by <:].
+Definition B_hasDecEq := [hasDecEq of B by <:].
 Canonical B_eqType := EqType B B_hasDecEq.
-Definition B_hasChoice := [HasChoice of B by <:].
+Definition B_hasChoice := [hasChoice of B by <:].
 Canonical B_choiceType := ChoiceType B B_hasChoice.
 
 End Test0.

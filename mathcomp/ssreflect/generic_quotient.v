@@ -372,23 +372,23 @@ Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=
 Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" := (Choice.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'HasChoice' 'of' Q 'by' <:%/ ]" :=
-  ([HasChoice of quot_type Q by <:] : hasChoice Q%type)
-  (at level 0, format "[ 'HasChoice'  'of'  Q  'by'  <:%/ ]") : form_scope.
+Notation "[ 'hasChoice' 'of' Q 'by' <:%/ ]" :=
+  ([hasChoice of quot_type Q by <:] : hasChoice Q%type)
+  (at level 0, format "[ 'hasChoice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" := (Countable.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'IsCountable' 'of' Q 'by' <:%/ ]" :=
-  ([IsCountable of quot_type Q by <:] : isCountable Q%type)
-  (at level 0, format "[ 'IsCountable'  'of'  Q  'by'  <:%/ ]") : form_scope.
+Notation "[ 'isCountable' 'of' Q 'by' <:%/ ]" :=
+  ([isCountable of quot_type Q by <:] : isCountable Q%type)
+  (at level 0, format "[ 'isCountable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" := (Finite.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'IsFinite' 'of' Q 'by' <:%/ ]" :=
-  ([IsFinite of quot_type Q by <:] : isFinite Q%type)
-  (at level 0, format "[ 'IsFinite'  'of'  Q  'by'  <:%/ ]") : form_scope.
+Notation "[ 'isFinite' 'of' Q 'by' <:%/ ]" :=
+  ([isFinite of quot_type Q by <:] : isFinite Q%type)
+  (at level 0, format "[ 'isFinite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 (****************************************************)
 (* Definition of a (decidable) equivalence relation *)

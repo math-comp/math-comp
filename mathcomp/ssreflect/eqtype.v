@@ -22,7 +22,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*                      type convertible, but usually not identical, to T.    *)
 (*      [eqType of T] == clone for T of the eqType inferred for T, possibly   *)
 (*                       after unfolding some definitions.                    *)
-(*     [HasDecEq of T] == mixin of the eqType inferred for T.                 *)
+(*     [hasDecEq of T] == mixin of the eqType inferred for T.                 *)
 (*       comparable T <-> equality on T is decidable.                         *)
 (*                    := forall x y : T, decidable (x = y)                    *)
 (*  comparableMixin compT == equality mixin for compT : comparable T.         *)
@@ -107,7 +107,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*     then it replaces the inferred projector.                               *)
 (* Subtypes inherit the eqType structure of their base types; the generic     *)
 (* structure should be explicitly instantiated using the                      *)
-(*   [HasDecEq of S by <:]                                                    *)
+(*   [hasDecEq of S by <:]                                                    *)
 (* construct to declare the equality mixin; this pattern is repeated for all  *)
 (* the combinatorial interfaces (Choice, Countable, Finite). As noted above,  *)
 (* such mixins should not be made Canonical.                                  *)
@@ -130,8 +130,8 @@ HB.mixin Record hasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 #[mathcomp(axiom="eq_axiom"), short(type="eqType")]
 HB.structure Definition Equality := { T of hasDecEq T }.
 
-Notation "[ 'HasDecEq' 'of' T ]" := (Equality.on T)
-  (at level 0, format "[ 'HasDecEq'  'of'  T ]") : form_scope.
+Notation "[ 'hasDecEq' 'of' T ]" := (Equality.on T)
+  (at level 0, format "[ 'hasDecEq'  'of'  T ]") : form_scope.
 Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
 Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
@@ -666,20 +666,20 @@ Notation "[ 'isSub' 'for' v 'by' rec ]" :=
 Notation "[ 'isSub' 'for' v ]" := (@isSub.phant_Build _ _ _ v _ _ _)
   (only printing, at level 0, format "[ 'isSub'  'for'  v ]") : form_scope.
 
-Reserved Notation "[ 'IsNew' 'for' v ]"
-  (at level 0, format "[ 'IsNew'  'for'  v ]").
+Reserved Notation "[ 'isNew' 'for' v ]"
+  (at level 0, format "[ 'isNew'  'for'  v ]").
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
   @isSub.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
 
-Notation "[ 'IsNew' 'for' v ]" :=
+Notation "[ 'isNew' 'for' v ]" :=
   (@NewMixin _ _ v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
-Notation "[ 'IsNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
-  (only printing, at level 0, format "[ 'IsNew'  'for'  v ]") : form_scope.
+Notation "[ 'isNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
+  (only printing, at level 0, format "[ 'isNew'  'for'  v ]") : form_scope.
 
-Notation "[ 'IsNew' 'of'  T  'for' v ]" :=
+Notation "[ 'isNew' 'of'  T  'for' v ]" :=
   (@NewMixin _ T v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
 Definition innew T nT x := @sub T predT nT x (erefl true).
@@ -791,13 +791,13 @@ Arguments val_eqP {T P sT x y}.
 Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T))
   (at level 0, format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use [Equality of _ by <:] or [HasDecEq of _ by <:] instead")]
+  note="Use [Equality of _ by <:] or [hasDecEq of _ by <:] instead")]
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" :=
   (hasDecEq.Build (T : Type) (@val_eqP _ _ _))
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
-Notation "[ 'HasDecEq' 'of' T 'by' <: ]" :=
+Notation "[ 'hasDecEq' 'of' T 'by' <: ]" :=
   (hasDecEq.Build (T : Type) (@val_eqP _ _ _))
-  (at level 0, format "[ 'HasDecEq'  'of'  T  'by'  <: ]") : form_scope.
+  (at level 0, format "[ 'hasDecEq'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ := Equality.copy void (pcan_type (of_voidK unit)).
 HB.instance Definition _ (T : eqType) (P : pred T) :=

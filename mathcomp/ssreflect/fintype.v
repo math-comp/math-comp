@@ -1428,12 +1428,12 @@ HB.end.
 (* This assumes that T has a subCountType structure over a type that  *)
 (* has a finType structure.                                           *)
 
-Notation "[ 'IsFinite' 'of' T 'by' <: ]" :=
+Notation "[ 'isFinite' 'of' T 'by' <: ]" :=
     (SubCountable_isFinite.Build _ _ T)
-  (at level 0, format "[ 'IsFinite'  'of'  T  'by'  <: ]") : form_scope.
+  (at level 0, format "[ 'isFinite'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : finType) (P : pred T) (sT : subType P) :=
-  [IsFinite of sub_type sT by <:].
+  [isFinite of sub_type sT by <:].
 
 Notation "[ 'Finite' 'of' T 'by' <: ]" := (Finite.copy T%type (sub_type T))
   (at level 0, format "[ 'Finite'  'of'  T  'by'  <: ]") : form_scope.
@@ -1535,7 +1535,7 @@ Section SeqFinType.
 Variables (T : choiceType) (s : seq T).
 Local Notation sT := (seq_sub s).
 
-HB.instance Definition _ := [HasChoice of sT by <:].
+HB.instance Definition _ := [hasChoice of sT by <:].
 HB.instance Definition _ : isCountable sT := seq_sub_isCountable s.
 HB.instance Definition _ : isFinite sT := seq_sub_isFinite s.
 
