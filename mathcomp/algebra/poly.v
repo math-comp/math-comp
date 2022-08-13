@@ -2291,6 +2291,9 @@ Proof. by rewrite !rootE hornerM mulf_eq0. Qed.
 Lemma rootZ x a p : a != 0 -> root (a *: p) x = root p x.
 Proof. by move=> nz_a; rewrite -mul_polyC rootM rootC (negPf nz_a). Qed.
 
+Lemma root_exp p n a: comm_poly p a -> (0 < n)%N -> root (p ^+ n) a = root p a.
+Proof. by move=> ? n0; rewrite !rootE horner_exp_comm// expf_eq0 n0. Qed.
+
 Lemma size_scale a p : a != 0 -> size (a *: p) = size p.
 Proof. by move/lregP/lreg_size->. Qed.
 
@@ -2573,6 +2576,13 @@ Lemma uniq_rootsE rs : uniq_roots rs = uniq rs.
 Proof.
 elim: rs => //= r rs ->; congr (_ && _); rewrite -has_pred1 -all_predC.
 by apply: eq_all => t; rewrite /diff_roots mulrC eqxx unitfE subr_eq0.
+Qed.
+
+Lemma root_ZXsubC (a b r : F) : a != 0 ->
+  root (a *: 'X - b%:P) r = (r == b / a).
+Proof.
+move=> a0; rewrite rootE !hornerE.
+by rewrite -[r in RHS]divr1 eqr_div ?oner_neq0// mulr1 mulrC subr_eq0.
 Qed.
 
 Section UnityRoots.
