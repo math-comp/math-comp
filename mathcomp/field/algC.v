@@ -372,7 +372,8 @@ HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_additive : additive CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
-Canonical CtoL_additive := Additive CtoL_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build type L' CtoL
+  CtoL_is_additive.
 
 Definition one := LtoC (integral1 _).
 Definition mul u v := LtoC (integral_mul (CtoL_P u) (CtoL_P v)).
@@ -398,7 +399,8 @@ HB.instance Definition _ :=
 
 Fact CtoL_is_multiplicative : multiplicative CtoL.
 Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
-Canonical CtoL_rmorphism := AddRMorphism CtoL_is_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build type L' CtoL
+  CtoL_is_multiplicative.
 
 Fact mulVf u :  u != 0 -> inv u * u = 1.
 Proof.
@@ -437,14 +439,23 @@ rewrite -(fmorph_root conjL) conjL_K map_poly_id // => _ /(nthP 0)[j _ <-].
 by rewrite coef_map fmorph_rat.
 Qed.
 
-Fact conj_is_rmorphism : rmorphism (fun u => LtoC (conj_subproof u)).
+Fact conj_is_additive : additive (fun u => LtoC (conj_subproof u)).
 Proof.
-do 2?split=> [u v|]; apply: CtoL_inj; last by rewrite !LtoC_K rmorph1.
-- by rewrite LtoC_K 3!{1}rmorphB /= !LtoC_K.
+by move=> u v; apply: CtoL_inj; rewrite LtoC_K 3!{1}rmorphB /= !LtoC_K.
+Qed.
+
+Fact conj_is_multiplicative : multiplicative (fun u => LtoC (conj_subproof u)).
+Proof.
+split=> [u v|]; apply: CtoL_inj; last by rewrite !LtoC_K rmorph1.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
 Qed.
 
-Definition conj : {rmorphism type -> type} := RMorphism conj_is_rmorphism.
+Definition conj : {rmorphism type -> type} :=
+  GRing.RMorphism.Pack
+    (GRing.RMorphism.Class
+       (GRing.isAdditive.Build _ _ _ conj_is_additive)
+       (GRing.isMultiplicative.Build _ _ _ conj_is_multiplicative)).
+
 Lemma conjK : involutive conj.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
 
@@ -454,7 +465,8 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   have [i] := @solve_monicpoly _ 2%N (nth 0 [:: -1 : type]) isT.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
-have/lt_geF/idP[] := @ltr01 cfType; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
+have/lt_geF/idP[] := @ltr01 cfType.
+rewrite -oppr_ge0 -(rmorphN1 [rmorphism of CtoL]).
 by rewrite -i2 rmorphX /= expr2 -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
@@ -468,7 +480,7 @@ Definition conjMixin := Num.ClosedField.on type.
 Lemma algebraic : integralRange (@ratr [the unitRingType of type]).
 Proof.
 move=> u; have [p mon_p pu0] := CtoL_P u; exists p => {mon_p}//.
-rewrite -(fmorph_root CtoL_rmorphism) -map_poly_comp; congr (root _ _): pu0.
+rewrite -(fmorph_root [rmorphism of CtoL]) -map_poly_comp; congr (root _ _):pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
@@ -636,7 +648,7 @@ Definition Cchar : [char algC] =i pred0 := @char_num _.
 (* Missing norm and integer exponent, due to gaps in ssrint and rat.          *)
 Definition CratrE :=
   let CnF := [numClosedFieldType of algC] in
-  let QtoCm := ratr_rmorphism CnF in
+  let QtoCm := [rmorphism of @ratr CnF] in
   ((rmorph0 QtoCm, rmorph1 QtoCm, rmorphMn QtoCm, rmorphN QtoCm, rmorphD QtoCm),
    (rmorphM QtoCm, rmorphX QtoCm, fmorphV QtoCm),
    (rmorphMz QtoCm, rmorphXz QtoCm, @ratr_norm CnF, @ratr_sg CnF),
@@ -644,13 +656,14 @@ Definition CratrE :=
 
 Definition CintrE :=
   let CnF := [numFieldType of algC] in
-  let ZtoCm := intmul1_rmorphism CnF in
+  let ZtoCm := [rmorphism of *~%R (1 : CnF)] in
   ((rmorph0 ZtoCm, rmorph1 ZtoCm, rmorphMn ZtoCm, rmorphN ZtoCm, rmorphD ZtoCm),
    (rmorphM ZtoCm, rmorphX ZtoCm),
    (rmorphMz ZtoCm, @intr_norm CnF, @intr_sg CnF),
    =^~ (@ler_int CnF, @ltr_int CnF, (inj_eq (@intr_inj CnF)))).
 
-Let nz2 : 2 != 0 :> algC. Proof. by rewrite -!CintrE. Qed.
+Let nz2 : 2 != 0 :> algC.
+Proof. by rewrite -(rmorph0 [rmorphism of *~%R 1]) -CintrE. Qed.
 
 (* Conjugation and norm. *)
 
@@ -1209,10 +1222,19 @@ Proof. by move=> x; rewrite /algC_invaut; case: algC_invaut_subproof. Qed.
 Lemma algC_autK nu : cancel nu (algC_invaut nu).
 Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 
-Fact algC_invaut_is_rmorphism nu : rmorphism (algC_invaut nu).
+Fact algC_invaut_is_additive nu : additive (algC_invaut nu).
+Proof. exact: can2_additive (algC_autK nu) (algC_invautK nu). Qed.
+
+Fact algC_invaut_is_rmorphism nu : multiplicative (algC_invaut nu).
 Proof. exact: can2_rmorphism (algC_autK nu) (algC_invautK nu). Qed.
-Canonical algC_invaut_additive nu := Additive (algC_invaut_is_rmorphism nu).
-Canonical algC_invaut_rmorphism nu := RMorphism (algC_invaut_is_rmorphism nu).
+
+HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
+  GRing.isAdditive.Build algC algC (algC_invaut nu)
+    (algC_invaut_is_additive nu).
+
+HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
+  GRing.isMultiplicative.Build algC algC (algC_invaut nu)
+    (algC_invaut_is_rmorphism nu).
 
 Lemma minCpoly_aut nu x : minCpoly (nu x) = minCpoly x.
 Proof.

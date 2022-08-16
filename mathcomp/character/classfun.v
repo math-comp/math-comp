@@ -330,21 +330,30 @@ Proof. by apply/cfunP=> x; rewrite !cfunElock rmorph_nat. Qed.
 Lemma cfAutZ a phi : cfAut (a *: phi) = u a *: cfAut phi.
 Proof. by apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
 
-Lemma cfAut_is_rmorphism : rmorphism cfAut.
+Lemma cfAut_is_additive : additive cfAut.
 Proof.
-by do 2?split=> [phi psi|]; apply/cfunP=> x;
-   rewrite ?cfAut_cfun1i // !cfunE (rmorphB, rmorphM).
+by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphB.
 Qed.
-Canonical cfAut_additive := Additive cfAut_is_rmorphism.
-Canonical cfAut_rmorphism := RMorphism cfAut_is_rmorphism.
+
+Lemma cfAut_is_multiplicative : multiplicative cfAut.
+Proof.
+by split=> [phi psi|]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
+Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build classfun classfun cfAut
+  cfAut_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build classfun classfun cfAut
+  cfAut_is_multiplicative.
 
 Lemma cfAut_cfun1 : cfAut 1 = 1. Proof. exact: rmorph1. Qed.
 
 Lemma cfAut_scalable : scalable_for (u \; *:%R) cfAut.
 Proof. by move=> a phi; apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
 
-Canonical cfAut_linear := AddLinear cfAut_scalable.
-Canonical cfAut_lrmorphism := [lrmorphism of cfAut].
+HB.instance Definition _ :=
+  GRing.isScalable.Build [the ringType of algC]
+    [the lmodType _ of classfun] [the zmodType of classfun] (u \; *:%R) cfAut
+    cfAut_scalable.
 
 Definition cfAut_closed (S : seq classfun) :=
   {in S, forall phi, cfAut phi \in S}.
@@ -835,8 +844,10 @@ move=> a phi psi; rewrite scalerAr -mulrDr; congr (_ * _).
 rewrite linear_sum -big_split; apply: eq_bigr => x _ /=.
 by rewrite !cfunE mulrDl -mulrA.
 Qed.
-Canonical cfdotr_additive xi := Additive (cfdotr_is_linear xi).
-Canonical cfdotr_linear xi := Linear (cfdotr_is_linear xi).
+
+HB.instance Definition _ xi :=
+  GRing.isLinear.Build [the ringType of algC] _ _ _ (cfdotr xi)
+    (cfdotr_is_linear xi).
 
 Lemma cfdot0l xi : '[0, xi] = 0.
 Proof. by rewrite -cfdotrE linear0. Qed.
@@ -866,7 +877,8 @@ Proof. by move=> Aphi /eq_cfdotl eq_dot; rewrite cfdotC eq_dot // -cfdotC. Qed.
 
 Lemma cfdotBr xi phi psi : '[xi, phi - psi] = '[xi, phi] - '[xi, psi].
 Proof. by rewrite !(cfdotC xi) -rmorphB cfdotBl. Qed.
-Canonical cfun_dot_additive xi := Additive (cfdotBr xi).
+HB.instance Definition _ xi :=
+  GRing.isAdditive.Build _ _ (cfdot xi) (cfdotBr xi).
 
 Lemma cfdot0r xi : '[xi, 0] = 0. Proof. exact: raddf0. Qed.
 Lemma cfdotNr xi phi : '[xi, - phi] = - '[xi, phi].
@@ -1380,8 +1392,8 @@ Lemma cfRes_is_linear : linear cfRes.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr mulrnDl.
 Qed.
-Canonical cfRes_additive := Additive cfRes_is_linear.
-Canonical cfRes_linear := Linear cfRes_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build [the ringType of algC] _ _ _ cfRes cfRes_is_linear.
 
 Lemma cfRes_cfun1 : cfRes 1 = 1.
 Proof.
@@ -1394,8 +1406,8 @@ Proof.
 split=> [phi psi|]; [apply/cfunP=> x | exact: cfRes_cfun1].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-Canonical cfRes_rmorphism := AddRMorphism cfRes_is_multiplicative.
-Canonical cfRes_lrmorphism := [lrmorphism of cfRes].
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfRes
+  cfRes_is_multiplicative.
 
 End Restrict.
 
@@ -1489,16 +1501,17 @@ Fact cfMorph_is_linear : linear cfMorph.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr -mulrnDl.
 Qed.
-Canonical cfMorph_additive := Additive cfMorph_is_linear.
-Canonical cfMorph_linear := Linear cfMorph_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build [the ringType of algC] _ _ _ cfMorph
+    cfMorph_is_linear.
 
 Fact cfMorph_is_multiplicative : multiplicative cfMorph.
 Proof.
 split=> [phi psi|]; [apply/cfunP=> x | exact: cfMorph_cfun1].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-Canonical cfMorph_rmorphism := AddRMorphism cfMorph_is_multiplicative.
-Canonical cfMorph_lrmorphism := [lrmorphism of cfMorph].
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfMorph
+  cfMorph_is_multiplicative.
 
 Hypothesis sGD : G \subset D.
 
@@ -1579,10 +1592,21 @@ Qed.
 Lemma cfIsom1 phi : cfIsom phi 1%g = phi 1%g.
 Proof. by rewrite -(morph1 f) cfIsomE. Qed.
 
-Canonical cfIsom_additive := [additive of cfIsom].
-Canonical cfIsom_linear := [linear of cfIsom].
-Canonical cfIsom_rmorphism := [rmorphism of cfIsom].
-Canonical cfIsom_lrmorphism := [lrmorphism of cfIsom].
+Lemma cfIsom_is_additive : additive cfIsom.
+Proof. rewrite unlock; exact: raddfB. Qed.
+
+Lemma cfIsom_is_multiplicative : multiplicative cfIsom.
+Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
+
+Lemma cfIsom_is_scalable : scalable cfIsom.
+Proof. rewrite unlock; exact: linearZ_LR. Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build _ _ cfIsom cfIsom_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfIsom
+  cfIsom_is_multiplicative.
+HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfIsom
+  cfIsom_is_scalable.
+
 Lemma cfIsom_cfun1 : cfIsom 1 = 1. Proof. exact: rmorph1. Qed.
 
 Lemma cfker_isom phi : cfker (cfIsom phi) = f @* cfker phi.
@@ -1661,10 +1685,7 @@ Proof. by move/normal_norm=> nBG; apply: cfMorphE. Qed.
 
 Lemma cfMod1 phi : (phi %% B)%CF 1%g = phi 1%g. Proof. exact: cfMorph1. Qed.
 
-Canonical cfMod_additive := [additive of cfMod].
-Canonical cfMod_rmorphism := [rmorphism of cfMod].
-Canonical cfMod_linear := [linear of cfMod].
-Canonical cfMod_lrmorphism := [lrmorphism of cfMod].
+HB.instance Definition _ := GRing.LRMorphism.on cfMod.
 
 Lemma cfMod_cfun1 : (1 %% B)%CF = 1. Proof. exact: rmorph1. Qed.
 
@@ -1826,10 +1847,20 @@ Definition cfSdprod :=
    (cfMorph \o cfIsom (tagged (sdprod_isom defG)) : 'CF(H) -> 'CF(G)).
 Canonical cfSdprod_unlockable := [unlockable of cfSdprod].
 
-Canonical cfSdprod_additive := [additive of cfSdprod].
-Canonical cfSdprod_linear := [linear of cfSdprod].
-Canonical cfSdprod_rmorphism := [rmorphism of cfSdprod].
-Canonical cfSdprod_lrmorphism := [lrmorphism of cfSdprod].
+Lemma cfSdprod_is_additive : additive cfSdprod.
+Proof. rewrite unlock; exact: raddfB. Qed.
+
+Lemma cfSdprod_is_multiplicative : multiplicative cfSdprod.
+Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
+
+Lemma cfSdprod_is_scalable : scalable cfSdprod.
+Proof. rewrite unlock; exact: linearZ_LR. Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfSdprod
+  cfSdprod_is_multiplicative.
+HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfSdprod
+  cfSdprod_is_scalable.
 
 Lemma cfSdprod1 phi : cfSdprod phi 1%g = phi 1%g.
 Proof. by rewrite unlock /= cfMorph1 cfIsom1. Qed.
@@ -1894,14 +1925,8 @@ Definition cfDprodr := cfSdprod (dprodWsd KxH).
 Definition cfDprodl := cfSdprod (dprodWsdC KxH).
 Definition cfDprod phi psi := cfDprodl phi * cfDprodr psi.
 
-Canonical cfDprodl_additive := [additive of cfDprodl].
-Canonical cfDprodl_linear := [linear of cfDprodl].
-Canonical cfDprodl_rmorphism := [rmorphism of cfDprodl].
-Canonical cfDprodl_lrmorphism := [lrmorphism of cfDprodl].
-Canonical cfDprodr_additive := [additive of cfDprodr].
-Canonical cfDprodr_linear := [linear of cfDprodr].
-Canonical cfDprodr_rmorphism := [rmorphism of cfDprodr].
-Canonical cfDprodr_lrmorphism := [lrmorphism of cfDprodr].
+HB.instance Definition _ := GRing.LRMorphism.on cfDprodl.
+HB.instance Definition _ := GRing.LRMorphism.on cfDprodr.
 
 Lemma cfDprodl1 phi : cfDprodl phi 1%g = phi 1%g. Proof. exact: cfSdprod1. Qed.
 Lemma cfDprodr1 psi : cfDprodr psi 1%g = psi 1%g. Proof. exact: cfSdprod1. Qed.
@@ -2032,10 +2057,7 @@ by have [[_ Gi' _ defGi']] := dprodP defGi; rewrite (bigdprodWY defGi') -defGi'.
 Qed.
 Definition cfBigdprodi i := cfDprodl (cfBigdprodi_subproof i) \o 'Res[_, A i].
 
-Canonical cfBigdprodi_additive i := [additive of @cfBigdprodi i].
-Canonical cfBigdprodi_linear i := [linear of @cfBigdprodi i].
-Canonical cfBigdprodi_rmorphism i := [rmorphism of @cfBigdprodi i].
-Canonical cfBigdprodi_lrmorphism i := [lrmorphism of @cfBigdprodi i].
+HB.instance Definition _ i := GRing.LRMorphism.on (@cfBigdprodi i).
 
 Lemma cfBigdprodi1 i (phi : 'CF(A i)) : cfBigdprodi phi 1%g = phi 1%g.
 Proof. by rewrite cfDprodl1 cfRes1. Qed.
@@ -2208,8 +2230,9 @@ move=> c phi psi; apply/cfunP=> x; rewrite !cfunElock; case: ifP => _.
 rewrite mulrnAr -mulrnDl !(mulrCA c) -!mulrDr [c * _]mulr_sumr -big_split /=.
 by congr (_ * (_ * _) *+ _); apply: eq_bigr => y; rewrite !cfunE mulrA mulrDl.
 Qed.
-Canonical cfInd_additive := Additive cfInd_is_linear.
-Canonical cfInd_linear := Linear cfInd_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build [the ringType of algC] _ _ _ cfInd
+    cfInd_is_linear.
 
 End Def.
 
@@ -2401,10 +2424,10 @@ Proof. exact: raddfZ_Cnat. Qed.
 Lemma cfAutZ_Cint z phi : z \in Cint -> (z *: phi)^u = z *: phi^u.
 Proof. exact: raddfZ_Cint. Qed.
 
-Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut_rmorphism u)).
+Lemma cfAutK : cancel (@cfAut gT G u) (cfAut [rmorphism of algC_invaut u]).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_autK. Qed.
 
-Lemma cfAutVK : cancel (cfAut (algC_invaut_rmorphism u)) (@cfAut gT G u).
+Lemma cfAutVK : cancel (cfAut [rmorphism of algC_invaut u]) (@cfAut gT G u).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_invautK. Qed.
 
 Lemma cfAut_inj : injective (@cfAut gT G u).

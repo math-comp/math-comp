@@ -731,6 +731,25 @@ Reserved Notation "a \o* f" (at level 40).
 Reserved Notation "a \*: f" (at level 40).
 Reserved Notation "f \* g" (at level 40, left associativity).
 
+Reserved Notation "'{' 'additive' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'additive'  U  ->  V }").
+Reserved Notation "'{' 'rmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'rmorphism'  U  ->  V }").
+Reserved Notation "'{' 'lrmorphism' U '->' V '|' s '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'lrmorphism'  U  ->  V  |  s }").
+Reserved Notation "'{' 'lrmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'lrmorphism'  U  ->  V }").
+Reserved Notation "'{' 'linear' U '->' V '|' s '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'linear'  U  ->  V  |  s }").
+Reserved Notation "'{' 'linear' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'linear'  U  ->  V }").
+
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
 Declare Scope term_scope.
@@ -1790,38 +1809,30 @@ End LalgebraTheory.
 
 (* Morphism hierarchy. *)
 
+Definition additive (U V : zmodType) (f : U -> V) :=
+  {morph f : x y / x - y}.
+
+HB.mixin Record isAdditive (U V : zmodType) (apply : U -> V) := {
+  additive_subproof : additive apply;
+}.
+
+#[infer(U,V),mathcomp(axiom="additive")]
+HB.structure Definition Additive (U V : zmodType) := {f of isAdditive U V f}.
+
+Module AdditiveExports.
 Module Additive.
-
-Section ClassDef.
-
-Variables U V : zmodType.
-
-Definition axiom (f : U -> V) := {morph f : x y / x - y}.
-
-Structure map (phUV : phant (U -> V)) := Pack {apply; _ : axiom apply}.
-Local Coercion apply : map >-> Funclass.
-
-Variables (phUV : phant (U -> V)) (f g : U -> V) (cF : map phUV).
-Definition class := let: Pack _ c as cF' := cF return axiom cF' in c.
-Definition clone fA of phant_id g (apply cF) & phant_id fA class :=
-  @Pack phUV f fA.
-
-End ClassDef.
-
-Module Exports.
-Notation additive f := (axiom f).
-Coercion apply : map >-> Funclass.
-Notation Additive fA := (Pack (Phant _) fA).
-Notation "{ 'additive' fUV }" := (map (Phant fUV))
-  (at level 0, format "{ 'additive'  fUV }") : type_scope.
-Notation "[ 'additive' 'of' f 'as' g ]" := (@clone _ _ _ f g _ _ idfun id)
-  (at level 0, format "[ 'additive'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'additive' 'of' f ]" := (@clone _ _ _ f f _ _ id id)
-  (at level 0, format "[ 'additive'  'of'  f ]") : form_scope.
-End Exports.
-
+Definition apply_deprecated (U V : zmodType) (phUV : phant (U -> V)) :=
+  @Additive.sort U V.
+#[deprecated(since="mathcomp 2.0", note="Use Additive.sort instead.")]
+Notation apply := apply_deprecated.
 End Additive.
-Include Additive.Exports. (* Allows GRing.additive to resolve conflicts. *)
+Notation "{ 'additive' U -> V }" := (Additive.type U%type V%type) : type_scope.
+Notation "[ 'additive' 'of' f 'as' g ]" := (Additive.clone _ _ f%function g)
+  (at level 0, format "[ 'additive'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'additive' 'of' f ]" := (Additive.clone _ _ f _)
+  (at level 0, format "[ 'additive'  'of'  f ]") : form_scope.
+End AdditiveExports.
+HB.export AdditiveExports.
 
 (* Lifted additive operations. *)
 Section LiftedZmod.
@@ -1876,7 +1887,7 @@ Section Properties.
 
 Variables (U V : zmodType) (k : unit) (f : {additive U -> V}).
 
-Lemma raddfB : {morph f : x y / x - y}. Proof. exact: Additive.class. Qed.
+Lemma raddfB : {morph f : x y / x - y}. Proof. exact: additive_subproof. Qed.
 
 Lemma raddf0 : f 0 = 0.
 Proof. by rewrite -[0]subr0 raddfB subrr. Qed.
@@ -1906,14 +1917,6 @@ Proof. exact: (big_morph f raddfD raddf0). Qed.
 Lemma can2_additive f' : cancel f f' -> cancel f' f -> additive f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
 
-Lemma bij_additive :
-  bijective f -> exists2 f' : {additive V -> U}, cancel f f' & cancel f' f.
-Proof. by case=> f' fK f'K; exists (Additive (can2_additive fK f'K)). Qed.
-
-Fact locked_is_additive : additive (locked_with k (f : U -> V)).
-Proof. by case: k f => [] []. Qed.
-Canonical locked_additive := Additive locked_is_additive.
-
 End Properties.
 
 Section RingProperties.
@@ -1942,35 +1945,42 @@ Variables (U V W : zmodType) (f g : {additive V -> W}) (h : {additive U -> V}).
 
 Fact idfun_is_additive : additive (@idfun U).
 Proof. by []. Qed.
-Canonical idfun_additive := Additive idfun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build U U idfun idfun_is_additive.
 
 Fact comp_is_additive : additive (f \o h).
 Proof. by move=> x y /=; rewrite !raddfB. Qed.
-Canonical comp_additive := Additive comp_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build U W (f \o h) comp_is_additive.
 
 Fact opp_is_additive : additive (-%R : U -> U).
 Proof. by move=> x y; rewrite /= opprD. Qed.
-Canonical opp_additive := Additive opp_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build U U -%R opp_is_additive.
 
 Fact null_fun_is_additive : additive (\0 : U -> V).
 Proof. by move=> /=; rewrite subr0. Qed.
-Canonical null_fun_additive := Additive null_fun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build U V \0 null_fun_is_additive.
 
 Fact add_fun_is_additive : additive (f \+ g).
 Proof.
 by move=> x y /=; rewrite !raddfB addrCA -!addrA addrCA -opprD.
 Qed.
-Canonical add_fun_additive := Additive add_fun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build V W (f \+ g) add_fun_is_additive.
 
 Fact sub_fun_is_additive : additive (f \- g).
 Proof.
 by move=> x y /=; rewrite !raddfB addrAC -!addrA -!opprD addrAC addrA.
 Qed.
-Canonical sub_fun_additive := Additive sub_fun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build V W (f \- g) sub_fun_is_additive.
 
 Fact opp_fun_is_additive : additive (\- g).
 Proof. by move=> x y /=; rewrite !raddfB opprB addrC opprK. Qed.
-Canonical opp_fun_additive := Additive opp_fun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build V W (\- g) opp_fun_is_additive.
 
 End AddFun.
 
@@ -1981,11 +1991,13 @@ Variables (a : R) (f : {additive U -> R}).
 
 Fact mull_fun_is_additive : additive (a \*o f).
 Proof. by move=> x y /=; rewrite raddfB mulrBr. Qed.
-Canonical mull_fun_additive := Additive mull_fun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build U R (a \*o f) mull_fun_is_additive.
 
 Fact mulr_fun_is_additive : additive (a \o* f).
 Proof. by move=> x y /=; rewrite raddfB mulrBl. Qed.
-Canonical mulr_fun_additive := Additive mulr_fun_is_additive.
+#[export]
+HB.instance Definition _ := isAdditive.Build U R (a \o* f) mulr_fun_is_additive.
 
 End MulFun.
 
@@ -1994,62 +2006,43 @@ Section ScaleFun.
 Variables (R : ringType) (U : zmodType) (V : lmodType R).
 Variables (a : R) (f : {additive U -> V}).
 
-Canonical scale_additive := Additive (@scalerBr R V a).
-Canonical scale_fun_additive := [additive of a \*: f as f \; *:%R a].
+#[export]
+HB.instance Definition _ := isAdditive.Build V V ( *:%R a) (@scalerBr R V a).
+#[export]
+HB.instance Definition _ := Additive.copy (a \*: f) (f \; *:%R a).
 
 End ScaleFun.
 
 End AdditiveTheory.
 
+Definition multiplicative (R S : ringType) (f : R -> S) : Prop :=
+  {morph f : x y / x * y}%R * (f 1 = 1).
+
+HB.mixin Record isMultiplicative (R S : ringType) (f : R -> S) := {
+  rmorphism_subproof : multiplicative f
+}.
+
+#[infer(R,S)]
+HB.structure Definition RMorphism (R S : ringType) :=
+  {f of @Additive R S f & isMultiplicative R S f}.
+(* FIXME: remove the @ once
+   https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
+
+Module RMorphismExports.
 Module RMorphism.
-
-Section ClassDef.
-
-Variables R S : ringType.
-
-Definition mixin_of (f : R -> S) :=
-  {morph f : x y / x * y}%R * (f 1 = 1) : Prop.
-
-Record class_of f : Prop := Class {base : additive f; mixin : mixin_of f}.
-Local Coercion base : class_of >-> additive.
-
-Structure map (phRS : phant (R -> S)) := Pack {apply; _ : class_of apply}.
-Local Coercion apply : map >-> Funclass.
-Variables (phRS : phant (R -> S)) (f g : R -> S) (cF : map phRS).
-
-Definition class := let: Pack _ c as cF' := cF return class_of cF' in c.
-
-Definition clone fM of phant_id g (apply cF) & phant_id fM class :=
-  @Pack phRS f fM.
-
-Definition pack (fM : mixin_of f) :=
-  fun (bF : Additive.map phRS) fA & phant_id (Additive.class bF) fA =>
-  Pack phRS (Class fA fM).
-
-Canonical additive := Additive.Pack phRS class.
-
-End ClassDef.
-
-Module Exports.
-Notation multiplicative f := (mixin_of f).
-Notation rmorphism f := (class_of f).
-Coercion base : rmorphism >-> Additive.axiom.
-Coercion mixin : rmorphism >-> multiplicative.
-Coercion apply : map >-> Funclass.
-Notation RMorphism fM := (Pack (Phant _) fM).
-Notation AddRMorphism fM := (pack fM id).
-Notation "{ 'rmorphism' fRS }" := (map (Phant fRS))
-  (at level 0, format "{ 'rmorphism'  fRS }") : type_scope.
-Notation "[ 'rmorphism' 'of' f 'as' g ]" := (@clone _ _ _ f g _ _ idfun id)
-  (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'rmorphism' 'of' f ]" := (@clone _ _ _ f f _ _ id id)
-  (at level 0, format "[ 'rmorphism'  'of'  f ]") : form_scope.
-Coercion additive : map >-> Additive.map.
-Canonical additive.
-End Exports.
-
+Definition apply_deprecated (R S : ringType) (phRS : phant (R -> S)) :=
+  @RMorphism.sort R S.
+#[deprecated(since="mathcomp 2.0", note="Use RMorphism.sort instead.")]
+Notation apply := apply_deprecated.
 End RMorphism.
-Include RMorphism.Exports.
+Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
+  : type_scope.
+Notation "[ 'rmorphism' 'of' f 'as' g ]" := (RMorphism.clone _ _ f%function g)
+  (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'rmorphism' 'of' f ]" := (RMorphism.clone _ _ f _)
+  (at level 0, format "[ 'rmorphism'  'of'  f ]") : form_scope.
+End RMorphismExports.
+HB.export RMorphismExports.
 
 Section RmorphismTheory.
 
@@ -2069,8 +2062,7 @@ Proof. exact: raddf_sum. Qed.
 Lemma rmorphMsign n : {morph f : x / (- 1) ^+ n * x}.
 Proof. exact: raddfMsign. Qed.
 
-Lemma rmorphismP : rmorphism f. Proof. exact: RMorphism.class. Qed.
-Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphismP. Qed.
+Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphism_subproof. Qed.
 Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
 Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
 
@@ -2096,19 +2088,11 @@ Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
 Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. exact: rmorph_eq_nat 1%N. Qed.
 
-Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> rmorphism f'.
+Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
 Proof.
-move=> fK f'K; split; first exact: can2_additive fK f'K.
+move=> fK f'K.
 by split=> [x y|]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) ?f'K.
 Qed.
-
-Lemma bij_rmorphism :
-  bijective f -> exists2 f' : {rmorphism S -> R}, cancel f f' & cancel f' f.
-Proof. by case=> f' fK f'K; exists (RMorphism (can2_rmorphism fK f'K)). Qed.
-
-Fact locked_is_multiplicative : multiplicative (locked_with k (f : R -> S)).
-Proof. by case: k f => [] [? []]. Qed.
-Canonical locked_rmorphism := AddRMorphism locked_is_multiplicative.
 
 End Properties.
 
@@ -2118,11 +2102,15 @@ Variables (R S T : ringType) (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
 Fact idfun_is_multiplicative : multiplicative (@idfun R).
 Proof. by []. Qed.
-Canonical idfun_rmorphism := AddRMorphism idfun_is_multiplicative.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R R idfun
+  idfun_is_multiplicative.
 
 Fact comp_is_multiplicative : multiplicative (f \o g).
 Proof. by split=> [x y|] /=; rewrite ?rmorph1 ?rmorphM. Qed.
-Canonical comp_rmorphism := AddRMorphism comp_is_multiplicative.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
+  comp_is_multiplicative.
 
 End Projections.
 
@@ -2130,13 +2118,17 @@ Section InAlgebra.
 
 Variables (R : ringType) (A : lalgType R).
 
-Fact in_alg_is_rmorphism : rmorphism (in_alg_loc A).
-Proof.
-split=> [x y|]; first exact: scalerBl.
-by split=> [x y|] /=; rewrite ?scale1r // -scalerAl mul1r scalerA.
-Qed.
-Canonical in_alg_additive := Additive in_alg_is_rmorphism.
-Canonical in_alg_rmorphism := RMorphism in_alg_is_rmorphism.
+Fact in_alg_is_additive : additive (in_alg_loc A).
+Proof. move=> x y; exact: scalerBl. Qed.
+#[export]
+HB.instance Definition _ := isAdditive.Build R A (in_alg_loc A)
+  in_alg_is_additive.
+
+Fact in_alg_is_rmorphism : multiplicative (in_alg_loc A).
+Proof. by split=> [x y|] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R A (in_alg_loc A)
+  in_alg_is_rmorphism.
 
 Lemma in_algE a : in_alg_loc A a = a%:A. Proof. by []. Qed.
 
@@ -2146,133 +2138,131 @@ End RmorphismTheory.
 
 Module Scale.
 
-Section ScaleLaw.
-
-Structure law (R : ringType) (V : zmodType) (s : R -> V -> V) := Law {
-  op : R -> V -> V;
-  _ : op = s;
-  _ : op (-1) =1 -%R;
-  _ : forall a, additive (op a)
+HB.mixin Record isLaw (R : ringType) (V : zmodType) (op : R -> V -> V) := {
+  N1op_subproof : op (-1) =1 -%R;
+  op_additive_subproof : forall a, additive (op a);
 }.
 
-Definition mul_law R := Law (erefl *%R) (@mulN1r R) (@mulrBr R).
-Definition scale_law R U := Law (erefl *:%R) (@scaleN1r R U) (@scalerBr R U).
+#[export]
+HB.structure Definition Law R V := {op of isLaw R V op}.
+Definition law := Law.type.
 
-Variables (R : ringType) (V : zmodType) (s : R -> V -> V) (s_law : law s).
-Local Notation s_op := (op s_law).
+Section ScaleLaw.
 
-Lemma opE : s_op = s. Proof. by case: s_law. Qed.
-Lemma N1op : s_op (-1) =1 -%R. Proof. by case: s_law. Qed.
-Fact opB a : additive (s_op a). Proof. by case: s_law. Qed.
-Definition op_additive a := Additive (opB a).
+Variables (R : ringType) (V : zmodType) (s_law : law R V).
+Local Notation s_op := (Law.sort s_law).
+
+Lemma N1op : s_op (-1) =1 -%R. Proof. exact: N1op_subproof. Qed.
+Fact opB a : additive (s_op a). Proof. exact: op_additive_subproof. Qed.
 
 Variables (aR : ringType) (nu : {rmorphism aR -> R}).
-Fact comp_opE : nu \; s_op = nu \; s. Proof. exact: congr1 opE. Qed.
 Fact compN1op : (nu \; s_op) (-1) =1 -%R.
 Proof. by move=> v; rewrite /= rmorphN1 N1op. Qed.
-Definition comp_law : law (nu \; s) := Law comp_opE compN1op (fun a => opB _).
 
 End ScaleLaw.
 
+Module Exports. HB.reexport. End Exports.
+
 End Scale.
+Export Scale.Exports.
 
-Module Linear.
+#[export]
+HB.instance Definition _ (R : ringType) := Scale.isLaw.Build R R *%R
+  (@mulN1r R) (@mulrBr R).
 
-Section ClassDef.
+#[export]
+HB.instance Definition _ (R : ringType) (U : lmodType R) :=
+  Scale.isLaw.Build R U *:%R (@scaleN1r R U) (@scalerBr R U).
 
-Variables (R : ringType) (U : lmodType R) (V : zmodType) (s : R -> V -> V).
-Implicit Type phUV : phant (U -> V).
+#[export]
+HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V)
+    (aR : ringType) (nu : {rmorphism aR -> R}) :=
+  Scale.isLaw.Build aR V (nu \; s)
+    (@Scale.compN1op _ _ s _ nu) (fun a => Scale.opB _ _).
 
-Local Coercion Scale.op : Scale.law >-> Funclass.
-Definition axiom (f : U -> V) (s_law : Scale.law s) of s = s_law :=
+#[export, non_forgetful_inheritance]
+HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V) a :=
+ isAdditive.Build V V (s a) (Scale.opB s a).
+
+Definition scalable_for (R : ringType) (U : lmodType R) (V : zmodType)
+    (s : R -> V -> V) (f : U -> V) :=
+  forall a, {morph f : u / a *: u >-> s a u}.
+
+HB.mixin Record isScalable (R : ringType) (U : lmodType R) (V : zmodType)
+    (s : R -> V -> V) (f : U -> V) := {
+  linear_subproof : scalable_for s f;
+}.
+
+#[infer(R,U,V)]
+HB.structure Definition Linear (R : ringType) (U : lmodType R) (V : zmodType)
+    (s : R -> V -> V) :=
+  {f of @Additive U V f & isScalable R U V s f}.
+
+Definition linear_for (R : ringType) (U : lmodType R) (V : zmodType)
+    (s : R -> V -> V) (f : U -> V) :=
   forall a, {morph f : u v / a *: u + v >-> s a u + v}.
-Definition mixin_of (f : U -> V) :=
-  forall a, {morph f : v / a *: v >-> s a v}.
 
-Record class_of f : Prop := Class {base : additive f; mixin : mixin_of f}.
-Local Coercion base : class_of >-> additive.
+Lemma additive_linear (R : ringType) (U : lmodType R) V
+  (s : Scale.law R V) (f : U -> V) : linear_for s f -> additive f.
+Proof. by move=> Lsf x y; rewrite -scaleN1r addrC Lsf Scale.N1op addrC. Qed.
 
-Lemma class_of_axiom f s_law Ds : @axiom f s_law Ds -> class_of f.
+Lemma scalable_linear (R : ringType) (U : lmodType R) V
+  (s : Scale.law R V) (f : U -> V) : linear_for s f -> scalable_for s f.
 Proof.
-move=> fL; have fB: additive f.
-  by move=> x y /=; rewrite -scaleN1r addrC fL Ds Scale.N1op addrC.
-by split=> // a v /=; rewrite -[a *: v](addrK v) fB fL addrK Ds.
+by move=> Lsf a v; rewrite -[a *:v](addrK v) (additive_linear Lsf) Lsf addrK.
 Qed.
 
-Structure map (phUV : phant (U -> V)) := Pack {apply; _ : class_of apply}.
-Local Coercion apply : map >-> Funclass.
+HB.factory Record isLinear (R : ringType) (U : lmodType R) (V : zmodType)
+    (s : Scale.law R V) (f : U -> V) := {
+  linear_subproof : linear_for s f;
+}.
+HB.builders Context R U V s f of isLinear R U V s f.
+HB.instance Definition _ := isAdditive.Build U V f
+  (additive_linear linear_subproof).
+HB.instance Definition _ := isScalable.Build R U V s f
+  (scalable_linear linear_subproof).
+HB.end.
 
-Variables (phUV : phant (U -> V)) (f g : U -> V) (cF : map phUV).
-Definition class := let: Pack _ c as cF' := cF return class_of cF' in c.
-Definition clone fL of phant_id g (apply cF) & phant_id fL class :=
-  @Pack phUV f fL.
-
-Definition pack (fZ : mixin_of f) :=
-  fun (bF : Additive.map phUV) fA & phant_id (Additive.class bF) fA =>
-  Pack phUV (Class fA fZ).
-
-Canonical additive := Additive.Pack phUV class.
-
+Module LinearExports.
+Notation scalable f := (scalable_for *:%R f).
+Notation linear f := (linear_for *:%R f).
+Notation scalar f := (linear_for *%R f).
+Module Linear.
+Section Linear.
+Variables (R : ringType) (U : lmodType R) (V : zmodType) (s : R -> V -> V).
+Definition apply_deprecated (phUV : phant (U -> V)) := @Linear.sort R U V s.
+#[deprecated(since="mathcomp 2.0", note="Use Linear.sort instead.")]
+Notation apply := apply_deprecated.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
-Notation mapUV := (map (Phant (U -> V))).
+Local Notation mapUV := (Linear.type R U V s).
 Definition map_class := mapUV.
 Definition map_at (a : R) := mapUV.
 Structure map_for a s_a := MapFor {map_for_map : mapUV; _ : s a = s_a}.
 Definition unify_map_at a (f : map_at a) := MapFor f (erefl (s a)).
 Structure wrapped := Wrap {unwrap : mapUV}.
 Definition wrap (f : map_class) := Wrap f.
-
-End ClassDef.
-
-Module Exports.
-Canonical Scale.mul_law.
-Canonical Scale.scale_law.
-Canonical Scale.comp_law.
-Canonical Scale.op_additive.
-Declare Scope linear_ring_scope.
-Delimit Scope linear_ring_scope with linR.
-Notation "a *: u" := (@Scale.op _ _ *:%R _ a u) : linear_ring_scope.
-Notation "a * u" := (@Scale.op _ _ *%R _ a u) : linear_ring_scope.
-Notation "a *:^ nu u" := (@Scale.op _ _ (nu \; *:%R) _ a u)
-  (at level 40, nu at level 1, format "a  *:^ nu  u") : linear_ring_scope.
-Notation "a *^ nu u" := (@Scale.op _ _ (nu \; *%R) _ a u)
-  (at level 40, nu at level 1, format "a  *^ nu  u") : linear_ring_scope.
-Notation scalable_for s f := (mixin_of s f).
-Notation scalable f := (scalable_for *:%R f).
-Notation linear_for s f := (axiom f (erefl s)).
-Notation linear f := (linear_for *:%R f).
-Notation scalar f := (linear_for *%R f).
-Notation lmorphism_for s f := (class_of s f).
-Notation lmorphism f := (lmorphism_for *:%R f).
-Coercion class_of_axiom : axiom >-> lmorphism_for.
-Coercion base : lmorphism_for >-> Additive.axiom.
-Coercion mixin : lmorphism_for >-> scalable.
-Coercion apply : map >-> Funclass.
-Notation Linear fL := (Pack (Phant _) fL).
-Notation AddLinear fZ := (pack fZ id).
-Notation "{ 'linear' fUV | s }" := (map s (Phant fUV))
-  (at level 0, format "{ 'linear'  fUV  |  s }") : type_scope.
-Notation "{ 'linear' fUV }" := {linear fUV | *:%R}
-  (at level 0, format "{ 'linear'  fUV }") : type_scope.
+End Linear.
+End Linear.
+Notation "{ 'linear' U -> V | s }" := (@Linear.type _ U%type V%type s)
+  : type_scope.
+Notation "{ 'linear' U -> V }" := {linear U%type -> V%type | *:%R}
+  : type_scope.
 Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
   (at level 0, format "{ 'scalar'  U }") : type_scope.
-Notation "[ 'linear' 'of' f 'as' g ]" := (@clone _ _ _ _ _ f g _ _ idfun id)
+Notation "[ 'linear' 'of' f 'as' g ]" := (Linear.clone _ _ _ _ f%function g)
   (at level 0, format "[ 'linear'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'linear' 'of' f ]" := (@clone _ _ _ _ _ f f _ _ id id)
+Notation "[ 'linear' 'of' f ]" := (Linear.clone _ _ _ _ f _)
   (at level 0, format "[ 'linear'  'of'  f ]") : form_scope.
-Coercion additive : map >-> Additive.map.
-Canonical additive.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
-Coercion map_for_map : map_for >-> map.
-Coercion unify_map_at : map_at >-> map_for.
-Canonical unify_map_at.
-Coercion unwrap : wrapped >-> map.
-Coercion wrap : map_class >-> wrapped.
-Canonical wrap.
-End Exports.
-
-End Linear.
-Include Linear.Exports.
+Identity Coercion lineratype_id : Linear.type >-> Linear.type_.
+Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
+Coercion Linear.unify_map_at : Linear.map_at >-> Linear.map_for.
+Canonical Linear.unify_map_at.
+Coercion Linear.unwrap : Linear.wrapped >-> Linear.type.
+Coercion Linear.wrap : Linear.map_class >-> Linear.wrapped.
+Canonical Linear.wrap.
+End LinearExports.
+HB.export LinearExports.
 
 Section LinearTheory.
 
@@ -2293,13 +2283,9 @@ Lemma linear_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
 Proof. exact: raddf_sum. Qed.
 
-Lemma linearZ_LR : scalable_for s f. Proof. by case: f => ? []. Qed.
+Lemma linearZ_LR : scalable_for s f. Proof. exact: linear_subproof. Qed.
 Lemma linearP a : {morph f : u v / a *: u + v >-> s a u + v}.
 Proof. by move=> u v /=; rewrite linearD linearZ_LR. Qed.
-
-Fact locked_is_scalable : scalable_for s (locked_with k (f : U -> V)).
-Proof. by case: k f => [] [? []]. Qed.
-Canonical locked_linear := AddLinear locked_is_scalable.
 
 End GenericProperties.
 
@@ -2333,9 +2319,9 @@ Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 (*   Most of this machinery will be invisible to a casual user, because all  *)
 (* the projections and default instances involved are declared as coercions. *)
 
-Variables (S : ringType) (h : S -> V -> V) (h_law : Scale.law h).
+Variables (S : ringType) (h : Scale.law S V).
 
-Lemma linearZ c a (h_c := Scale.op h_law c) (f : Linear.map_for U s a h_c) u :
+Lemma linearZ c a (h_c := h c) (f : Linear.map_for U s a h_c) u :
   f (a *: u) = h_c (Linear.wrap f u).
 Proof. by rewrite linearZ_LR; case: f => f /= ->. Qed.
 
@@ -2348,12 +2334,11 @@ Variables (U V : lmodType R) (f : {linear U -> V}).
 Lemma linearZZ : scalable f. Proof. exact: linearZ_LR. Qed.
 Lemma linearPZ : linear f. Proof. exact: linearP. Qed.
 
+Lemma can2_scalable f' : cancel f f' -> cancel f' f -> scalable f'.
+Proof. by move=> fK f'K a x; apply: (canLR fK); rewrite linearZ_LR f'K. Qed.
+
 Lemma can2_linear f' : cancel f f' -> cancel f' f -> linear f'.
 Proof. by move=> fK f'K a x y /=; apply: (canLR fK); rewrite linearP !f'K. Qed.
-
-Lemma bij_linear :
-  bijective f -> exists2 f' : {linear V -> U}, cancel f f' & cancel f' f.
-Proof. by case=> f' fK f'K; exists (Linear (can2_linear fK f'K)). Qed.
 
 End LmodProperties.
 
@@ -2368,38 +2353,55 @@ End ScalarProperties.
 
 Section LinearLmod.
 
-Variables (W U : lmodType R) (V : zmodType) (s : R -> V -> V).
+Variables (W U : lmodType R) (V : zmodType).
+
+Section Plain.
+
+Variable (s : R -> V -> V).
 Variables (f : {linear U -> V | s}) (h : {linear W -> U}).
 
 Lemma idfun_is_scalable : scalable (@idfun U). Proof. by []. Qed.
-Canonical idfun_linear := AddLinear idfun_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R U U *:%R idfun idfun_is_scalable.
 
 Lemma opp_is_scalable : scalable (-%R : U -> U).
 Proof. by move=> a v /=; rewrite scalerN. Qed.
-Canonical opp_linear := AddLinear opp_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R U U *:%R -%R opp_is_scalable.
 
 Lemma comp_is_scalable : scalable_for s (f \o h).
 Proof. by move=> a v /=; rewrite !linearZ_LR. Qed.
-Canonical comp_linear := AddLinear comp_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R W V s (f \o h) comp_is_scalable.
 
-Variables (s_law : Scale.law s) (g : {linear U -> V | Scale.op s_law}).
-Let Ds : s =1 Scale.op s_law. Proof. by rewrite Scale.opE. Qed.
+End Plain.
 
-Lemma null_fun_is_scalable : scalable_for (Scale.op s_law) (\0 : U -> V).
+Section Scale.
+
+Variable (s : Scale.law R V).
+Variables (f : {linear U -> V | s}) (g : {linear U -> V | s}).
+
+Lemma null_fun_is_scalable : scalable_for s (\0 : U -> V).
 Proof. by move=> a v /=; rewrite raddf0. Qed.
-Canonical null_fun_linear := AddLinear null_fun_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R U V s \0 null_fun_is_scalable.
 
 Lemma add_fun_is_scalable : scalable_for s (f \+ g).
-Proof. by move=> a u; rewrite /= !linearZ_LR !Ds raddfD. Qed.
-Canonical add_fun_linear := AddLinear add_fun_is_scalable.
+Proof. by move=> a u; rewrite /= !linearZ_LR raddfD. Qed.
+#[export]
+HB.instance Definition _ := isScalable.Build R U V s (f \+ g) add_fun_is_scalable.
 
 Lemma sub_fun_is_scalable : scalable_for s (f \- g).
-Proof. by move=> a u; rewrite /= !linearZ_LR !Ds raddfB. Qed.
-Canonical sub_fun_linear := AddLinear sub_fun_is_scalable.
+Proof. by move=> a u; rewrite /= !linearZ_LR raddfB. Qed.
+#[export]
+HB.instance Definition _ := isScalable.Build R U V s (f \- g) sub_fun_is_scalable.
 
 Lemma opp_fun_is_scalable : scalable_for s (\- g).
-Proof. by move=> a u; rewrite /= linearZ_LR Ds raddfN. Qed.
-Canonical opp_fun_linear := AddLinear opp_fun_is_scalable.
+Proof. by move=> a u; rewrite /= linearZ_LR raddfN. Qed.
+#[export]
+HB.instance Definition _ := isScalable.Build R U V s (\- g) opp_fun_is_scalable.
+
+End Scale.
 
 End LinearLmod.
 
@@ -2411,99 +2413,47 @@ Variables (a : A) (f : {linear U -> A}).
 
 Fact mulr_fun_is_scalable : scalable (a \o* f).
 Proof. by move=> k x /=; rewrite linearZ scalerAl. Qed.
-Canonical mulr_fun_linear := AddLinear mulr_fun_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R U A *:%R (a \o* f)
+  mulr_fun_is_scalable.
 
 End LinearLalg.
 
 End LinearTheory.
 
+#[infer(R,A,B)]
+HB.structure Definition LRMorphism (R : ringType) (A : lalgType R) (B : ringType)
+    (s : R -> B -> B) :=
+  {f of @RMorphism A B f & isScalable R A B s f}.
+(* FIXME: remove the @ once
+   https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
+
+Module LRMorphismExports.
 Module LRMorphism.
-
-Section ClassDef.
-
-Variables (R : ringType) (A : lalgType R) (B : ringType) (s : R -> B -> B).
-
-Record class_of (f : A -> B) : Prop :=
-  Class {base : rmorphism f; mixin : scalable_for s f}.
-Local Coercion base : class_of >-> rmorphism.
-Definition base2 f (fLM : class_of f) := Linear.Class fLM (mixin fLM).
-Local Coercion base2 : class_of >-> lmorphism.
-
-Structure map (phAB : phant (A -> B)) := Pack {apply; _ : class_of apply}.
-Local Coercion apply : map >-> Funclass.
-
-Variables (phAB : phant (A -> B)) (f : A -> B) (cF : map phAB).
-Definition class := let: Pack _ c as cF' := cF return class_of cF' in c.
-
-Definition clone :=
-  fun (g : RMorphism.map phAB) fM & phant_id (RMorphism.class g) fM =>
-  fun (h : Linear.map s phAB) fZ &
-     phant_id (Linear.mixin (Linear.class h)) fZ =>
-  Pack phAB (@Class f fM fZ).
-
-Definition pack (fZ : scalable_for s f) :=
-  fun (g : RMorphism.map phAB) fM & phant_id (RMorphism.class g) fM =>
-  Pack phAB (Class fM fZ).
-
-Canonical additive := Additive.Pack phAB class.
-Canonical rmorphism := RMorphism.Pack phAB class.
-Canonical linear := Linear.Pack phAB class.
-Canonical join_rmorphism := @RMorphism.Pack _ _ phAB linear class.
-Canonical join_linear := @Linear.Pack R A B s phAB rmorphism class.
-
-End ClassDef.
-
-Module Exports.
-Notation lrmorphism_for s f := (class_of s f).
-Notation lrmorphism f := (lrmorphism_for *:%R f).
-Coercion base : lrmorphism_for >-> RMorphism.class_of.
-Coercion base2 : lrmorphism_for >-> lmorphism_for.
-Coercion apply : map >-> Funclass.
-Notation LRMorphism f_lrM := (Pack (Phant _) (Class f_lrM f_lrM)).
-Notation AddLRMorphism fZ := (pack fZ id).
-Notation "{ 'lrmorphism' fAB | s }" := (map s (Phant fAB))
-  (at level 0, format "{ 'lrmorphism'  fAB  |  s }") : type_scope.
-Notation "{ 'lrmorphism' fAB }" := {lrmorphism fAB | *:%R}
-  (at level 0, format "{ 'lrmorphism'  fAB }") : type_scope.
-Notation "[ 'lrmorphism' 'of' f ]" := (@clone _ _ _ _ _ f _ _ id _ _ id)
-  (at level 0, format "[ 'lrmorphism'  'of'  f ]") : form_scope.
-Coercion additive : map >-> Additive.map.
-Canonical additive.
-Coercion rmorphism : map >-> RMorphism.map.
-Canonical rmorphism.
-Coercion linear : map >-> Linear.map.
-Canonical linear.
-Canonical join_rmorphism.
-Canonical join_linear.
-End Exports.
-
+Definition apply_deprecated (R : ringType) (A : lalgType R) (B : ringType)
+  (s : R -> B -> B) (phAB : phant (A -> B)) := @LRMorphism.sort R A B s.
+#[deprecated(since="mathcomp 2.0", note="Use LRMorphism.sort instead.")]
+Notation apply := apply_deprecated.
 End LRMorphism.
-Include LRMorphism.Exports.
+Notation "{ 'lrmorphism' A -> B | s }" := (@LRMorphism.type _ A%type B%type s)
+  : type_scope.
+Notation "{ 'lrmorphism' A -> B }" := {lrmorphism A%type -> B%type | *:%R}
+  : type_scope.
+Notation "[ 'lrmorphism' 'of' f ]" := (LRMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'lrmorphism'  'of'  f ]") : form_scope.
+End LRMorphismExports.
+HB.export LRMorphismExports.
 
 Section LRMorphismTheory.
 
 Variables (R : ringType) (A B : lalgType R) (C : ringType) (s : R -> C -> C).
 Variables (k : unit) (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
 
-Definition idfun_lrmorphism := [lrmorphism of @idfun A].
-Definition comp_lrmorphism := [lrmorphism of g \o f].
-Definition locked_lrmorphism := [lrmorphism of locked_with k (f : A -> B)].
+#[export] HB.instance Definition _ := RMorphism.on (@idfun A).
+#[export] HB.instance Definition _ := RMorphism.on (g \o f).
 
 Lemma rmorph_alg a : f a%:A = a%:A.
 Proof. by rewrite linearZ rmorph1. Qed.
-
-Lemma lrmorphismP : lrmorphism f. Proof. exact: LRMorphism.class. Qed.
-
-Lemma can2_lrmorphism f' : cancel f f' -> cancel f' f -> lrmorphism f'.
-Proof.
-by move=> fK f'K; split; [apply: (can2_rmorphism fK) | apply: (can2_linear fK)].
-Qed.
-
-Lemma bij_lrmorphism :
-  bijective f -> exists2 f' : {lrmorphism B -> A}, cancel f f' & cancel f' f.
-Proof.
-by case/bij_rmorphism=> f' fK f'K; exists (AddLRMorphism (can2_linear fK f'K)).
-Qed.
 
 End LRMorphismTheory.
 
@@ -2593,15 +2543,21 @@ Section FrobeniusAutomorphism.
 
 Variables (p : nat) (charRp : p \in [char R]).
 
-Lemma Frobenius_aut_is_rmorphism : rmorphism (Frobenius_aut charRp).
+Lemma Frobenius_aut_is_additive : additive (Frobenius_aut charRp).
+Proof. move=> x y; exact: Frobenius_autB_comm (mulrC _ _). Qed.
+
+Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
 Proof.
-split=> [x y|]; first exact: Frobenius_autB_comm (mulrC _ _).
-split=> [x y|]; first exact: Frobenius_autM_comm (mulrC _ _).
+split=> [x y|]; first exact: Frobenius_autM_comm _ (mulrC _ _).
 exact: Frobenius_aut1.
 Qed.
 
-Canonical Frobenius_aut_additive := Additive Frobenius_aut_is_rmorphism.
-Canonical Frobenius_aut_rmorphism := RMorphism Frobenius_aut_is_rmorphism.
+#[export]
+HB.instance Definition _ := isAdditive.Build R R (Frobenius_aut charRp)
+  Frobenius_aut_is_additive.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
+  Frobenius_aut_is_multiplicative.
 
 End FrobeniusAutomorphism.
 
@@ -2623,11 +2579,15 @@ Variables (U V : lmodType R) (b : R) (f : {linear U -> V}).
 
 Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
 Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
-Canonical scale_linear := AddLinear scale_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R V V *:%R ( *:%R b)
+  scale_is_scalable.
 
 Lemma scale_fun_is_scalable : scalable (b \*: f).
 Proof. by move=> a v /=; rewrite !linearZ. Qed.
-Canonical scale_fun_linear := AddLinear scale_fun_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R U V *:%R (b \*: f)
+  scale_fun_is_scalable.
 
 End ScaleLinear.
 
@@ -2726,7 +2686,9 @@ Variables (U : lmodType R) (a : A) (f : {linear U -> A}).
 
 Lemma mull_fun_is_scalable : scalable (a \*o f).
 Proof. by move=> k x /=; rewrite linearZ scalerAr. Qed.
-Canonical mull_fun_linear := AddLinear mull_fun_is_scalable.
+#[export]
+HB.instance Definition _ := isScalable.Build R U A *:%R (a \*o f)
+  mull_fun_is_scalable.
 
 End AlgebraTheory.
 
@@ -4901,7 +4863,8 @@ HB.structure Definition SubZmodule V S :=
 Section additive.
 Context V (S : {pred V}) (U : SubZmodule.type S).
 Notation val := (val : U -> V).
-Canonical val_additive := Additive (valB : additive val).
+#[export]
+HB.instance Definition _ := isAdditive.Build U V val valB.
 Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
 Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
 Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
@@ -4968,7 +4931,8 @@ HB.structure Definition SubRing (R : ringType) (S : {pred R}) :=
 Section multiplicative.
 Context (R : ringType) (S : {pred R}) (U : SubRing.type S).
 Notation val := (val : U -> R).
-Canonical val_multiplicative := AddRMorphism (valM : multiplicative val).
+#[export]
+HB.instance Definition _ := isMultiplicative.Build U R val valM.
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
 End multiplicative.
 
@@ -5040,7 +5004,8 @@ HB.structure Definition SubLmodule (R : ringType) (V : lmodType R)
 Section linear.
 Context (R : ringType) (V : lmodType R) (S : {pred V}) (W : SubLmodule.type S).
 Notation val := (val : W -> V).
-Canonical val_linear := AddLinear (valZ : scalable val).
+#[export]
+HB.instance Definition _ := isScalable.Build R W V *:%R val valZ.
 End linear.
 
 HB.factory Record PreLmodule (R : ringType) U of Zmodule U := {
@@ -5566,6 +5531,7 @@ Definition solP {F n f} := @solP F n f.
 Definition eq_sol := eq_sol.
 Definition size_sol := size_sol.
 Definition solve_monicpoly := @solve_monicpoly.
+Definition additive := additive.
 Definition raddf0 := raddf0.
 Definition raddf_eq0 := raddf_eq0.
 Definition raddf_inj := raddf_inj.
@@ -5578,7 +5544,7 @@ Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
 Definition can2_additive := can2_additive.
-Definition bij_additive := bij_additive.
+Definition multiplicative := multiplicative.
 Definition rmorph0 := rmorph0.
 Definition rmorphN := rmorphN.
 Definition rmorphD := rmorphD.
@@ -5586,7 +5552,6 @@ Definition rmorphB := rmorphB.
 Definition rmorph_sum := rmorph_sum.
 Definition rmorphMn := rmorphMn.
 Definition rmorphMNn := rmorphMNn.
-Definition rmorphismP := rmorphismP.
 Definition rmorphismMP := rmorphismMP.
 Definition rmorph1 := rmorph1.
 Definition rmorph_eq1 := rmorph_eq1.
@@ -5600,7 +5565,6 @@ Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
 Definition rmorph_char := rmorph_char.
 Definition can2_rmorphism := can2_rmorphism.
-Definition bij_rmorphism := bij_rmorphism.
 Definition rmorph_comm := rmorph_comm.
 Definition rmorph_unit := rmorph_unit.
 Definition rmorphV := rmorphV.
@@ -5652,6 +5616,10 @@ Definition invrZ := invrZ.
 Definition raddfZnat := raddfZnat.
 Definition raddfZsign := raddfZsign.
 Definition in_algE := in_algE.
+Definition scalable_for := scalable_for.
+Definition linear_for := linear_for.
+Definition additive_linear := additive_linear.
+Definition scalable_linear := scalable_linear.
 Definition linear0 := linear0.
 Definition linearN := linearN.
 Definition linearD := linearD.
@@ -5666,12 +5634,9 @@ Definition linearPZ := linearPZ.
 Definition linearZZ := linearZZ.
 Definition scalarP := scalarP.
 Definition scalarZ := scalarZ.
+Definition can2_scalable := can2_scalable.
 Definition can2_linear := can2_linear.
-Definition bij_linear := bij_linear.
 Definition rmorph_alg := rmorph_alg.
-Definition lrmorphismP := lrmorphismP.
-Definition can2_lrmorphism := can2_lrmorphism.
-Definition bij_lrmorphism := bij_lrmorphism.
 Definition imaginary_exists := imaginary_exists.
 
 Definition raddf := (raddf0, raddfN, raddfD, raddfMn).
@@ -5694,7 +5659,7 @@ Module AllExports. HB.reexport. End AllExports.
 End GRing.
 
 Export AllExports.
-Export Additive.Exports RMorphism.Exports Linear.Exports LRMorphism.Exports.
+Export Scale.Exports.
 Export Pred.Exports.
 
 Variant Ione := IOne : Ione.
@@ -5811,41 +5776,6 @@ Notation "\prod_ ( i 'in' A | P ) F" :=
 Notation "\prod_ ( i 'in' A ) F" :=
   (\big[*%R/1%R]_(i in A) F%R) : ring_scope.
 
-Canonical locked_additive.
-Canonical locked_rmorphism.
-Canonical locked_linear.
-Canonical locked_lrmorphism.
-Canonical idfun_additive.
-Canonical idfun_rmorphism.
-Canonical idfun_linear.
-Canonical idfun_lrmorphism.
-Canonical comp_additive.
-Canonical comp_rmorphism.
-Canonical comp_linear.
-Canonical comp_lrmorphism.
-Canonical opp_additive.
-Canonical opp_linear.
-Canonical scale_additive.
-Canonical scale_linear.
-Canonical null_fun_additive.
-Canonical null_fun_linear.
-Canonical scale_fun_additive.
-Canonical scale_fun_linear.
-Canonical add_fun_additive.
-Canonical add_fun_linear.
-Canonical sub_fun_additive.
-Canonical sub_fun_linear.
-Canonical opp_fun_additive.
-Canonical opp_fun_linear.
-Canonical mull_fun_additive.
-Canonical mull_fun_linear.
-Canonical mulr_fun_additive.
-Canonical mulr_fun_linear.
-Canonical Frobenius_aut_additive.
-Canonical Frobenius_aut_rmorphism.
-Canonical in_alg_additive.
-Canonical in_alg_rmorphism.
-
 Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
 Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
 
@@ -5901,6 +5831,7 @@ Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE add0r. Qed.
 Fact ffun_addN : left_inverse ffun_zero ffun_opp ffun_add.
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
 
+#[export]
 HB.instance Definition _  := isZmodule.Build {ffun aT -> rT}
   ffun_addA ffun_addC ffun_add0 ffun_addN.
 
@@ -5945,6 +5876,7 @@ Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDr. Qed.
 Fact ffun1_nonzero : ffun_one != 0.
 Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
+#[export]
 HB.instance Definition _ := Zmodule_isRing.Build {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr ffun1_nonzero.
 Definition ffun_ring := ([the ringType of {ffun aT -> R}] : Type).
@@ -5958,6 +5890,7 @@ Variable (aT : finType) (R : comRingType) (a : aT).
 Fact ffun_mulC : commutative (@ffun_mul aT R).
 Proof. by move=> f1 f2; apply/ffunP=> i; rewrite !ffunE mulrC. Qed.
 
+#[export]
 HB.instance Definition _ :=
   Ring_hasCommutativeMul.Build (ffun_ring _ a) ffun_mulC.
 
@@ -5981,6 +5914,7 @@ Proof. by move=> f g; apply/ffunP=> a; rewrite !ffunE scalerDr. Qed.
 Fact ffun_scale_addl u : {morph (ffun_scale)^~ u : k1 k2 / k1 + k2}.
 Proof. by move=> k1 k2; apply/ffunP=> a; rewrite !ffunE scalerDl. Qed.
 
+#[export]
 HB.instance Definition _ := Zmodule_isLmodule.Build R {ffun aT -> rT}
   ffun_scaleA ffun_scale1 ffun_scale_addr ffun_scale_addl.
 
@@ -6006,15 +5940,19 @@ Proof. by case=> x1 x2; congr (_, _); apply: add0r. Qed.
 Fact pair_addN : left_inverse (0, 0) opp_pair add_pair.
 Proof. by move=> x; congr (_, _); apply: addNr. Qed.
 
+#[export]
 HB.instance Definition _ := isZmodule.Build (M1 * M2)%type
   pair_addA pair_addC pair_add0 pair_addN.
 
-Fact fst_is_additive : additive fst.
-Proof. by []. Qed.
-Canonical fst_additive := Additive fst_is_additive.
-Fact snd_is_additive : additive snd.
-Proof. by []. Qed.
-Canonical snd_additive := Additive snd_is_additive.
+Fact fst_is_additive : additive fst. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isAdditive.Build (M1 * M2)%type M1 fst
+  fst_is_additive.
+
+Fact snd_is_additive : additive snd. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isAdditive.Build (M1 * M2)%type M2 snd
+  snd_is_additive.
 
 End PairZmod.
 
@@ -6042,15 +5980,18 @@ Proof. by move=> x y z; congr (_, _); apply: mulrDr. Qed.
 Fact pair_one_neq0 : (1, 1) != 0 :> R1 * R2.
 Proof. by rewrite xpair_eqE oner_eq0. Qed.
 
+#[export]
 HB.instance Definition _ := Zmodule_isRing.Build (R1 * R2)%type
    pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_one_neq0.
 
-Fact fst_is_multiplicative : multiplicative fst.
-Proof. by []. Qed.
-Canonical fst_rmorphism := AddRMorphism fst_is_multiplicative.
-Fact snd_is_multiplicative : multiplicative snd.
-Proof. by []. Qed.
-Canonical snd_rmorphism := AddRMorphism snd_is_multiplicative.
+Fact fst_is_multiplicative : multiplicative fst. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R1 fst
+  fst_is_multiplicative.
+Fact snd_is_multiplicative : multiplicative snd. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R2 snd
+  snd_is_multiplicative.
 
 End PairRing.
 
@@ -6061,6 +6002,7 @@ Variables R1 R2 : comRingType.
 Fact pair_mulC : commutative (@mul_pair R1 R2).
 Proof. by move=> x y; congr (_, _); apply: mulrC. Qed.
 
+#[export]
 HB.instance Definition _ := Ring_hasCommutativeMul.Build (R1 * R2)%type
   pair_mulC.
 
@@ -6084,15 +6026,20 @@ Proof. by move=> a u v; congr (_, _); apply: scalerDr. Qed.
 Fact pair_scaleDl u : {morph scale_pair^~ u: a b / a + b}.
 Proof. by move=> a b; congr (_, _); apply: scalerDl. Qed.
 
+#[export]
 HB.instance Definition _ := Zmodule_isLmodule.Build R (V1 * V2)%type
   pair_scaleA pair_scale1 pair_scaleDr pair_scaleDl.
 
-Fact fst_is_scalable : scalable fst.
-Proof. by []. Qed.
-Canonical fst_linear := AddLinear fst_is_scalable.
-Fact snd_is_scalable : scalable snd.
-Proof. by []. Qed.
-Canonical snd_linear := AddLinear snd_is_scalable.
+Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ :=
+  isScalable.Build R [the lmodType R of (V1 * V2)%type] V1 *:%R fst
+    fst_is_scalable.
+Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ :=
+  isScalable.Build R [the lmodType R of (V1 * V2)%type] V2 *:%R snd
+    snd_is_scalable.
 
 End PairLmod.
 
@@ -6103,11 +6050,14 @@ Variables (R : ringType) (A1 A2 : lalgType R).
 Fact pair_scaleAl a (u v : A1 * A2) : a *: (u * v) = (a *: u) * v.
 Proof. by congr (_, _); apply: scalerAl. Qed.
 
+#[export]
 HB.instance Definition _ := Lmodule_isLalgebra.Build R (A1 * A2)%type
   pair_scaleAl.
 
-Definition fst_lrmorphism := [lrmorphism of fst].
-Definition snd_lrmorphism := [lrmorphism of snd].
+#[export]
+HB.instance Definition _ := RMorphism.on (@fst A1 A2).
+#[export]
+HB.instance Definition _ := RMorphism.on (@snd A1 A2).
 
 End PairLalg.
 
@@ -6118,6 +6068,7 @@ Variables (R : comRingType) (A1 A2 : algType R).
 Fact pair_scaleAr a (u v : A1 * A2) : a *: (u * v) = u * (a *: v).
 Proof. by congr (_, _); apply: scalerAr. Qed.
 
+#[export]
 HB.instance Definition _ := Lalgebra_isAlgebra.Build R (A1 * A2)%type
   pair_scaleAr.
 
@@ -6153,6 +6104,7 @@ Qed.
 Lemma pair_invr_out : {in [predC pair_unitr], pair_invr =1 id}.
 Proof. by rewrite /pair_invr => x /negPf/= ->. Qed.
 
+#[export]
 HB.instance Definition _ := Ring_hasMulInverse.Build (R1 * R2)%type
   pair_mulVl pair_mulVr pair_unitP pair_invr_out.
 
@@ -6162,8 +6114,10 @@ End PairUnitRing.
 (* HB FEATURE: (hard) complete graph using parameters,...*)
 (* HB FEATURE: (easy) types/defs/anything can be a factory *)
 (*    HB.saturate (R1 R2 : comUnitRingType) (R1 * R2)%type *)
+#[export]
 HB.instance Definition _ (R1 R2 : comUnitRingType) :=
   UnitRing.on (R1 * R2)%type.
+#[export]
 HB.instance Definition _ (R : comUnitRingType) (A1 A2 : unitAlgType R) :=
   UnitRing.on (A1 * A2)%type.
 

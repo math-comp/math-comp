@@ -220,7 +220,7 @@ have /eq_map_poly Diota: kappa \o kappa' =1 iota.
 suffices [y3]: exists y3, y = kappa y3.
   have [q3 ->] := subfxE y3; rewrite /kappa subfx_inj_eval // => Dy.
   split; [exists (t *: q3 - 'X) | by exists q3].
-  by rewrite rmorphB linearZ /= map_polyX !hornerE -Dy opprB addrC addrNK.
+  by rewrite rmorphB /= linearZ map_polyX !hornerE -Dy opprB addrC addrNK.
 pose p0 := p ^ iota \Po (iota t *: 'X - z%:P).
 have co_p0_q0: coprimep p0 q0.
   pose at_t := horner_eval (iota t); have at_t0: at_t 0 = 0 by apply: rmorph0.
@@ -239,7 +239,7 @@ have{co_p0_q0}: gcdp p0 (q ^ iota) %= 'X - y%:P.
   by rewrite opprB addrC subrK.
 have{p0} [p3 ->]: exists p3, p0 = p3 ^ kappa.
   exists (p ^ kappa' \Po (kappa' t *: 'X - (subfx_eval iota z r1 'X)%:P)).
-  rewrite map_comp_poly rmorphB linearZ /= map_polyC map_polyX /=.
+  rewrite map_comp_poly rmorphB /= linearZ /= map_polyC map_polyX /=.
   rewrite !subfx_inj_eval // map_polyC hornerC map_polyX hornerX.
   by rewrite -map_poly_comp Diota.
 rewrite -Diota map_poly_comp -gcdp_map /= -/kappa.
@@ -456,22 +456,39 @@ Variable D : 'End(L).
 
 Let Dx E := - (map_poly D (minPoly E x)).[x] / ((minPoly E x)^`()).[x].
 
-Fact extendDerivation_subproof E (adjEx := Fadjoin_poly E x) :
+Fact extendDerivation_additive_subproof E (adjEx := Fadjoin_poly E x) :
   let body y (p := adjEx y) := (map_poly D p).[x] + p^`().[x] * Dx E in
-  linear body.
+  additive body.
 Proof.
-move: Dx => C /= a u v.
-rewrite /adjEx linearP /= -mul_polyC derivD derivM derivC mul0r add0r -/adjEx.
+move: Dx => C /= u v; rewrite /adjEx.
+rewrite raddfB /= derivB -/adjEx !hornerE /= raddfB /= !hornerE.
+by rewrite mulrBl addrACA opprD.
+Qed.
+
+Fact extendDerivation_scalable_subproof E (adjEx := Fadjoin_poly E x) :
+  let body y (p := adjEx y) := (map_poly D p).[x] + p^`().[x] * Dx E in
+  scalable body.
+Proof.
+move: Dx => C /= a u.
+rewrite /adjEx linearZ /= -mul_polyC derivM derivC mul0r add0r -/adjEx.
 rewrite !hornerE /= -scalerAl mul1r raddfD /=.
 have ->: map_poly D (a%:A%:P * adjEx u) = a%:A%:P * map_poly D (adjEx u).
   apply/polyP=> i; rewrite !mul_polyC !coef_map !coefZ !mulr_algl /= linearZ.
   by rewrite coef_map.
-rewrite !hornerE !mulr_algl mulrDl scalerDr -scalerAl -!addrA; congr (_ + _).
-by rewrite addrCA.
+by rewrite !hornerE !mulr_algl -scalerAl.
 Qed.
 
-Definition extendDerivation E : 'End(L) :=
-  linfun (Linear (extendDerivation_subproof E)).
+Section DerivationLinear.
+Variable (E : {subfield L}).
+Let body (y : L) (p := Fadjoin_poly E x y) : L :=
+  (map_poly D p).[x] + p^`().[x] * Dx E.
+HB.instance Definition _ := @GRing.isAdditive.Build _ _ body
+  (extendDerivation_additive_subproof E).
+HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ body
+  (extendDerivation_scalable_subproof E).
+Let extendDerivationLinear := Eval hnf in [the {linear _ -> _} of body].
+Definition extendDerivation : 'End(L) := linfun extendDerivationLinear.
+End DerivationLinear.
 
 Hypothesis derD : Derivation K D.
 
@@ -523,16 +540,19 @@ apply: (iffP idP) => [sepKx D derD /subvP DK_0 | derKx_0].
   rewrite (Derivation_separable derD sepKx) !DK_0 ?minPolyOver //.
   by rewrite horner0 oppr0 mul0r mulr0 addr0.
 apply: wlog_neg; rewrite {1}separable_nz_der negbK => /eqP pKx'_0.
-have Dlin: linear (fun y => (Fadjoin_poly K x y)^`().[x]).
-  move=> a u v; rewrite linearP /= -mul_polyC derivD derivM derivC mul0r add0r.
-  by rewrite hornerD hornerM hornerC -scalerAl mul1r.
-pose D := linfun (Linear Dlin); apply: base_separable.
+pose Df := fun y => (Fadjoin_poly K x y)^`().[x].
+have Dlin: linear Df.
+  move=> a u v; rewrite /Df linearP /= -mul_polyC derivD derivM derivC.
+  by rewrite mul0r add0r hornerD hornerM hornerC -scalerAl mul1r.
+pose DlinM := GRing.isLinear.Build _ _ _ _ Df Dlin.
+pose DL : GRing.Linear.type _ _ _ _ := HB.pack Df DlinM.
+pose D := linfun DL; apply: base_separable.
 have DK_0: (K <= lker D)%VS.
-  apply/subvP=> v Kv; rewrite memv_ker lfunE /= Fadjoin_polyC //.
+  apply/subvP=> v Kv; rewrite memv_ker lfunE /= /Df Fadjoin_polyC //.
   by rewrite derivC horner0.
 have Dder: Derivation <<K; x>> D.
   apply/allrelP=> u v /vbasis_mem Kx_u /vbasis_mem Kx_v; apply/eqP.
-  rewrite !lfunE /=; set Px := Fadjoin_poly K x.
+  rewrite !lfunE /= /Df; set Px := Fadjoin_poly K x.
   set Px_u := Px u; rewrite -(Fadjoin_poly_eq Kx_u) -/Px -/Px_u.
   set Px_v := Px v; rewrite -(Fadjoin_poly_eq Kx_v) -/Px -/Px_v.
   rewrite -!hornerM -hornerD -derivM.
@@ -540,7 +560,7 @@ have Dder: Derivation <<K; x>> D.
   rewrite [in RHS](divp_eq (Px_u * Px_v) (minPoly K x)) derivD derivM.
   by rewrite pKx'_0 mulr0 addr0 hornerD hornerM minPolyxx mulr0 add0r.
 have{Dder DK_0}: x \in lker D by apply: subvP Kx_x; apply: derKx_0.
-apply: contraLR => K'x; rewrite memv_ker lfunE /= Fadjoin_polyX //.
+apply: contraLR => K'x; rewrite memv_ker lfunE /= /Df Fadjoin_polyX //.
 by rewrite derivX hornerC oner_eq0.
 Qed.
 
@@ -627,7 +647,7 @@ have [K'g]: g \is a polyOver K' /\ q \is a polyOver K'.
   by rewrite minPolyOver rpredB ?rpredX ?polyOverX // polyOverC memv_adjoin.
 have /dvdpP[c Dq]: 'X - x%:P %| q by rewrite dvdp_XsubCl root_minPoly.
 have co_c_g: coprimep c g.
-  have charPp: p \in [char {poly L}] := rmorph_char (polyC_rmorphism _) charLp.
+  have charPp: p \in [char {poly L}] := rmorph_char [rmorphism of polyC] charLp.
   rewrite /g polyC_exp -!(Frobenius_autE charPp) -rmorphB coprimep_expr //.
   have: separable_poly q := separable_elementS sKK' sepKx.
   by rewrite Dq separable_mul => /and3P[].

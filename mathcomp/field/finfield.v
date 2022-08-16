@@ -388,19 +388,23 @@ have idfP x: reflect (f x = x) (x \in 1%VS).
     rewrite /q finField_genPoly rmorph_prod big_image /=.
     by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
   by rewrite root_prod_XsubC => /mapP[a]; exists a.
-have fM: rmorphism f.
-  rewrite /f; do 2?split=> [x y|]; rewrite ?exprMn ?expr1n //.
+have fA : additive f.
+  rewrite /f => x y; rewrite ?exprMn ?expr1n //.
   have [p _ charFp] := finCharP F; rewrite (card_primeChar charFp).
   elim: (logn _ _) => // n IHn; rewrite expnSr !exprM {}IHn.
   by rewrite -(char_lalg L) in charFp; rewrite -Frobenius_autE rmorphB.
-have fZ: linear f.
-  move=> a x y; 
-  (* FIX ME : had to put the LHS *)
-  rewrite -[in LHS]mulr_algl [f _](rmorphD (RMorphism fM)) rmorphM /=.
+have fM : multiplicative f.
+  by rewrite /f; split=> [x y|]; rewrite ?exprMn ?expr1n //.
+have fZ: scalable f.
+  move=> a x; rewrite -[in LHS]mulr_algl fM.
   by rewrite (idfP _ _) ?mulr_algl ?memvZ // memv_line.
-have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun (Linear fZ)).
+pose faM := GRing.isAdditive.Build _ _ f fA.
+pose fmM := GRing.isMultiplicative.Build _ _ f fM.
+pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
+pose fLRM : GRing.LRMorphism.type _ _ _ _ := HB.pack f faM fmM flM.
+have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).
   rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.
-  exact: (rmorphM (RMorphism fM)).
+  exact: (rmorphM fLRM).
 have{} Dalpha: alpha =1 f by move=> a; rewrite -Dalpha ?memvf ?lfunE.
 suffices <-: fixedField [set alpha] = 1%AS.
   by rewrite gal_generated /generator; exists alpha.
@@ -476,7 +480,8 @@ Local Notation "p ^%:A" := (map_poly_extField _ p)
 Lemma FinSplittingFieldFor (F : finFieldType) (p : {poly F}) :
   p != 0 -> {L : splittingFieldType F | splittingFieldFor 1 p^%:A {:L}}.
 Proof.
-have mapXsubC (f : {rmorphism _}) x: map_poly f ('X - x%:P) = 'X - (f x)%:P.
+have mapXsubC (f : {rmorphism _ -> _}) x:
+    map_poly f ('X - x%:P) = 'X - (f x)%:P.
   by rewrite rmorphB /= map_polyX map_polyC.
 move=> nz_p; pose splits q := {zs | q %= \prod_(z <- zs) ('X - z%:P)}.
 suffices [L splitLp]: {L : fieldExtType F | splittingFieldFor 1 p^%:A {:L}}.

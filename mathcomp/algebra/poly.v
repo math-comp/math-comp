@@ -411,18 +411,18 @@ Proof. exact: coef_opp_poly. Qed.
 Lemma coefB p q i : (p - q)`_i = p`_i - q`_i.
 Proof. by rewrite coefD coefN. Qed.
 
-Canonical coefp_additive i :=
-  Additive ((fun p => (coefB p)^~ i) : additive (coefp i)).
+HB.instance Definition _ i := GRing.isAdditive.Build {poly R} R (coefp i)
+  (fun p => (coefB p)^~ i).
 
 Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
-Proof. exact: (raddfMn (coefp_additive i)). Qed.
+Proof. exact: (raddfMn [additive of coefp i]). Qed.
 
 Lemma coefMNn p n i : (p *- n)`_i = p`_i *- n.
 Proof. by rewrite coefN coefMn. Qed.
 
 Lemma coef_sum I (r : seq I) (P : pred I) (F : I -> {poly R}) k :
   (\sum_(i <- r | P i) F i)`_k = \sum_(i <- r | P i) (F i)`_k.
-Proof. exact: (raddf_sum (coefp_additive k)). Qed.
+Proof. exact: (raddf_sum [additive of coefp k]). Qed.
 
 Lemma polyCD : {morph polyC : a b / a + b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefD !coefC ?addr0. Qed.
@@ -433,7 +433,7 @@ Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
 Lemma polyCB : {morph polyC : a b / a - b}.
 Proof. by move=> a b; rewrite polyCD polyCN. Qed.
 
-Canonical polyC_additive := Additive polyCB.
+HB.instance Definition _ := GRing.isAdditive.Build R {poly R} polyC polyCB.
 
 Lemma polyCMn n : {morph polyC : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
@@ -618,7 +618,8 @@ Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefCM !coefC ?simp. Qed.
 
 Fact polyC_multiplicative : multiplicative polyC.
 Proof. by split; first apply: polyCM. Qed.
-Canonical polyC_rmorphism := AddRMorphism polyC_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} polyC
+  polyC_multiplicative.
 
 Lemma polyC_exp n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphX. Qed.
 
@@ -641,7 +642,8 @@ split=> [p q|]; last by rewrite polyCK.
 by rewrite [coefp 0 _]coefM big_ord_recl big_ord0 addr0.
 Qed.
 
-Canonical coefp0_rmorphism := AddRMorphism coefp0_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build {poly R} R (coefp 0)
+  coefp0_multiplicative.
 
 (* Algebra structure of polynomials. *)
 Definition scale_poly_def a (p : {poly R}) := \poly_(i < size p) (a * p`_i).
@@ -694,9 +696,10 @@ Qed.
 Lemma size_scale_leq a p : size (a *: p) <= size p.
 Proof. by rewrite -[*:%R]/scale_poly unlock size_poly. Qed.
 
-Canonical coefp_linear i : {scalar {poly R}} :=
-  AddLinear ((fun a => (coefZ a) ^~ i) : scalable_for *%R (coefp i)).
-Canonical coefp0_lrmorphism := [lrmorphism of coefp 0].
+HB.instance Definition _ i :=
+  GRing.isScalable.Build R [the lmodType R of {poly R}] R *%R (coefp i)
+    (fun a => (coefZ a) ^~ i).
+HB.instance Definition _ := GRing.Linear.on (coefp 0).
 
 (* The indeterminate, at last! *)
 Definition polyX_def := Poly [:: 0; 1].
@@ -1452,8 +1455,10 @@ Proof.
 move=> k p q; apply/polyP=> i.
 by rewrite !(coef_deriv, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
-Canonical deriv_additive := Additive deriv_is_linear.
-Canonical deriv_linear := Linear deriv_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ deriv
+    deriv_is_linear.
 
 Lemma deriv0 : 0^`() = 0.
 Proof. exact: linear0. Qed.
@@ -1531,8 +1536,10 @@ Qed.
 
 Fact derivn_is_linear n : linear (derivn n).
 Proof. by elim: n => // n IHn a p q; rewrite derivnS IHn linearP. Qed.
-Canonical derivn_additive n :=  Additive (derivn_is_linear n).
-Canonical derivn_linear n :=  Linear (derivn_is_linear n).
+HB.instance Definition _ n :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (derivn n)
+    (derivn_is_linear n).
 
 Lemma derivnC c n : c%:P^`(n) = if n == 0%N then c%:P else 0.
 Proof. by case: n => // n; rewrite derivSn derivC linear0. Qed.
@@ -1631,8 +1638,10 @@ Proof.
 move=> k p q; apply/polyP=> i.
 by rewrite !(coef_nderivn, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
-Canonical nderivn_additive n := Additive(nderivn_is_linear n).
-Canonical nderivn_linear n := Linear (nderivn_is_linear n).
+HB.instance Definition _ n :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (nderivn n)
+    (nderivn_is_linear n).
 
 Lemma nderivnD n : {morph nderivn n : p q / p + q}.
 Proof. exact: linearD. Qed.
@@ -1822,7 +1831,7 @@ Section Additive.
 
 Variables (iR : ringType) (f : {additive aR -> rR}).
 
-Local Notation "p ^f" := (map_poly (GRing.Additive.apply f) p) : ring_scope.
+Local Notation "p ^f" := (map_poly (GRing.Additive.sort f) p) : ring_scope.
 
 Lemma coef_map p i : p^f`_i = f p`_i.
 Proof. exact: coef_map_id0 (raddf0 f). Qed.
@@ -1836,7 +1845,8 @@ Proof. exact: map_poly_comp_id0 (raddf0 f). Qed.
 
 Fact map_poly_is_additive : additive (map_poly f).
 Proof. by move=> p q; apply/polyP=> i; rewrite !(coef_map, coefB) raddfB. Qed.
-Canonical map_poly_additive := Additive map_poly_is_additive.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build {poly aR} {poly rR} (map_poly f) map_poly_is_additive.
 
 Lemma map_polyC a : (a%:P)^f = (f a)%:P.
 Proof. by apply/polyP=> i; rewrite !(coef_map, coefC) -!mulrb raddfMn. Qed.
@@ -1850,23 +1860,27 @@ End Additive.
 Variable f : {rmorphism aR -> rR}.
 Implicit Types p : {poly aR}.
 
-Local Notation "p ^f" := (map_poly (GRing.RMorphism.apply f) p) : ring_scope.
+Local Notation "p ^f" := (map_poly (GRing.RMorphism.sort f) p) : ring_scope.
 
-Fact map_poly_is_rmorphism : rmorphism (map_poly f).
+Fact map_poly_is_multiplicative : multiplicative (map_poly f).
 Proof.
-split; first exact: map_poly_is_additive.
 split=> [p q|]; apply/polyP=> i; last first.
   by rewrite !(coef_map, coef1) /= rmorph_nat.
 rewrite coef_map /= !coefM /= !rmorph_sum; apply: eq_bigr => j _.
 by rewrite !coef_map rmorphM.
 Qed.
-Canonical map_poly_rmorphism := RMorphism map_poly_is_rmorphism.
+
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build {poly aR} {poly rR} (map_poly f)
+    map_poly_is_multiplicative.
 
 Lemma map_polyZ c p : (c *: p)^f = f c *: p^f.
 Proof. by apply/polyP=> i; rewrite !(coef_map, coefZ) /= rmorphM. Qed.
-Canonical map_poly_linear :=
-  AddLinear (map_polyZ : scalable_for (f \; *:%R) (map_poly f)).
-Canonical map_poly_lrmorphism := [lrmorphism of map_poly f].
+HB.instance Definition _ :=
+  GRing.isScalable.Build aR
+    [the lmodType aR of {poly aR}] [the zmodType of {poly rR}]
+    (f \; *:%R) (map_poly f)
+    map_polyZ.
 
 Lemma map_polyX : ('X)^f = 'X.
 Proof. by apply/polyP=> i; rewrite coef_map !coefX /= rmorph_nat. Qed.
@@ -1913,18 +1927,26 @@ Proof. by rewrite /horner_morph map_polyC hornerC. Qed.
 Lemma horner_morphX : horner_morph cfu 'X = u.
 Proof. by rewrite /horner_morph map_polyX hornerX. Qed.
 
-Fact horner_is_lrmorphism : lrmorphism_for (f \; *%R) (horner_morph cfu).
+Fact horner_is_linear : linear_for (f \; *%R) (horner_morph cfu).
 Proof.
-rewrite /horner_morph; split=> [|c p]; last by rewrite linearZ hornerZ.
-split=> [p q|]; first by rewrite /horner_morph rmorphB hornerD hornerN.
+by move=> c p q; rewrite /horner_morph rmorphD /= hornerD linearZ hornerZ.
+Qed.
+
+Fact horner_is_multiplicative : multiplicative (horner_morph cfu).
+Proof.
 split=> [p q|]; last by rewrite /horner_morph rmorph1 hornerC.
 rewrite /horner_morph rmorphM /= hornerM_comm //.
 by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
-Canonical horner_additive := Additive horner_is_lrmorphism.
-Canonical horner_rmorphism := RMorphism horner_is_lrmorphism.
-Canonical horner_linear := AddLinear horner_is_lrmorphism.
-Canonical horner_lrmorphism := [lrmorphism of horner_morph cfu].
+
+HB.instance Definition _ :=
+  GRing.isLinear.Build aR
+    [the lmodType aR of {poly aR}] rR _ (horner_morph cfu)
+    horner_is_linear.
+
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build {poly aR} rR (horner_morph cfu)
+    horner_is_multiplicative.
 
 End HornerMorph.
 
@@ -2006,8 +2028,10 @@ Proof.
 move=> a q r.
 by rewrite /comp_poly rmorphD /= map_polyZ !hornerE_comm mul_polyC.
 Qed.
-Canonical comp_poly_additive p := Additive (comp_poly_is_linear p).
-Canonical comp_poly_linear p := Linear (comp_poly_is_linear p).
+HB.instance Definition _ p :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (comp_poly p)
+    (comp_poly_is_linear p).
 
 Lemma comp_poly0 p : 0 \Po p = 0.
 Proof. exact: raddf0. Qed.
@@ -2120,8 +2144,10 @@ Proof. by apply/polyP => i; rewrite !(coefZ, coef_even_poly). Qed.
 Fact even_poly_is_linear : linear even_poly.
 Proof. by move=> k p q; rewrite even_polyD even_polyZ. Qed.
 
-Canonical even_poly_additive := Additive even_poly_is_linear.
-Canonical even_poly_linear := Linear even_poly_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ even_poly
+    even_poly_is_linear.
 
 Lemma even_polyC (c : R) : even_poly c%:P = c%:P.
 Proof. by apply/polyP => i; rewrite coef_even_poly !coefC; case: i. Qed.
@@ -2155,8 +2181,10 @@ Proof. by apply/polyP => i; rewrite !(coefZ, coef_odd_poly). Qed.
 Fact odd_poly_is_linear : linear odd_poly.
 Proof. by move=> k p q; rewrite odd_polyD odd_polyZ. Qed.
 
-Canonical odd_poly_additive := Additive odd_poly_is_linear.
-Canonical odd_poly_linear := Linear odd_poly_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ odd_poly
+    odd_poly_is_linear.
 
 Lemma size_odd_poly_eq p : ~~ odd (size p) -> size (odd_poly p) = (size p)./2.
 Proof.
@@ -2232,8 +2260,10 @@ Qed.
 Fact take_poly_is_linear m : linear (take_poly m).
 Proof. by move=> k p q; rewrite take_polyD take_polyZ. Qed.
 
-Canonical take_poly_additive m := Additive (take_poly_is_linear m).
-Canonical take_poly_linear m := Linear (take_poly_is_linear m).
+HB.instance Definition _ m :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (take_poly m)
+    (take_poly_is_linear m).
 
 Lemma take_poly_sum m I r P (p : I -> {poly R}) :
   take_poly m (\sum_(i <- r | P i) p i) = \sum_(i <- r| P i) take_poly m (p i).
@@ -2294,8 +2324,10 @@ Proof. by apply/polyP => i; rewrite coefZ !coef_drop_poly coefZ. Qed.
 Fact drop_poly_is_linear m : linear (drop_poly m).
 Proof. by move=> k p q; rewrite drop_polyD drop_polyZ. Qed.
 
-Canonical drop_poly_additive m := Additive (drop_poly_is_linear m).
-Canonical drop_poly_linear m := Linear (drop_poly_is_linear m).
+HB.instance Definition _ m :=
+  GRing.isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (drop_poly m)
+    (drop_poly_is_linear m).
 
 Lemma drop_poly_sum m I r P (p : I -> {poly R}) :
   drop_poly m (\sum_(i <- r | P i) p i) = \sum_(i <- r | P i) drop_poly m (p i).
@@ -2425,18 +2457,29 @@ Definition hornerE :=
 Definition horner_eval (x : R) := horner^~ x.
 Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
 
-Fact horner_eval_is_lrmorphism x : lrmorphism_for *%R (horner_eval x).
+Fact horner_eval_is_linear x : linear_for *%R (horner_eval x).
 Proof.
 have cxid: commr_rmorph idfun x by apply: mulrC.
 have evalE : horner_eval x =1 horner_morph cxid.
   by move=> p; congr _.[x]; rewrite map_poly_id.
-split=> [|c p]; last by rewrite !evalE /= -linearZ.
-by do 2?split=> [p q|]; rewrite !evalE (rmorphB, rmorphM, rmorph1).
+by move=> c p q; rewrite !evalE rmorphD /= linearZ.
 Qed.
-Canonical horner_eval_additive x := Additive (horner_eval_is_lrmorphism x).
-Canonical horner_eval_rmorphism x := RMorphism (horner_eval_is_lrmorphism x).
-Canonical horner_eval_linear x := AddLinear (horner_eval_is_lrmorphism x).
-Canonical horner_eval_lrmorphism x := [lrmorphism of horner_eval x].
+
+Fact horner_eval_is_multiplicative x : multiplicative (horner_eval x).
+Proof.
+have cxid: commr_rmorph idfun x by apply: mulrC.
+have evalE : horner_eval x =1 horner_morph cxid.
+  by move=> p; congr _.[x]; rewrite map_poly_id.
+by split=> [p q|]; rewrite !evalE ?rmorph1// rmorphM.
+Qed.
+
+HB.instance Definition _ x :=
+  GRing.isLinear.Build R [the lmodType R of {poly R}] R _ (horner_eval x)
+    (horner_eval_is_linear x).
+
+HB.instance Definition _ x :=
+  GRing.isMultiplicative.Build {poly R} R (horner_eval x)
+    (horner_eval_is_multiplicative x).
 
 Section HornerAlg.
 
@@ -2457,17 +2500,7 @@ Proof. exact: horner_morphC. Qed.
 Lemma horner_algX : horner_alg 'X = a.
 Proof. exact:  horner_morphX. Qed.
 
-Fact horner_alg_is_lrmorphism : lrmorphism horner_alg.
-Proof.
-rewrite /horner_alg; split=> [|c p]; last by rewrite linearZ /= mulr_algl.
-split=> [p q|]; first by rewrite rmorphB.
-split=> [p q|]; last by rewrite rmorph1.
-by rewrite rmorphM.
-Qed.
-Canonical horner_alg_additive := Additive horner_alg_is_lrmorphism.
-Canonical horner_alg_rmorphism := RMorphism horner_alg_is_lrmorphism.
-Canonical horner_alg_linear := AddLinear horner_alg_is_lrmorphism.
-Canonical horner_alg_lrmorphism := [lrmorphism of horner_alg].
+HB.instance Definition _ := GRing.LRMorphism.on horner_alg.
 
 End Defs.
 
@@ -2487,8 +2520,8 @@ Proof.
 split=> [p1 p2|]; last by rewrite comp_polyC.
 by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
 Qed.
-Canonical comp_poly_rmorphism q := AddRMorphism (comp_poly_multiplicative q).
-Canonical comp_poly_lrmorphism q := [lrmorphism of comp_poly q].
+HB.instance Definition _ q := GRing.isMultiplicative.Build _ _ (comp_poly q)
+  (comp_poly_multiplicative q).
 
 Lemma comp_polyM p q r : (p * q) \Po r = (p \Po r) * (q \Po r).
 Proof. exact: rmorphM. Qed.

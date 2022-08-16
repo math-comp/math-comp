@@ -3071,7 +3071,7 @@ Lemma redivp_map a b :
   redivp a^f b^f = (rscalp a b, (rdivp a b)^f, (rmodp a b)^f).
 Proof.
 rewrite /rdivp /rscalp /rmodp !unlock map_poly_eq0 size_map_poly.
-have [// | q_nz] := ifPn; rewrite -(rmorph0 (map_poly_rmorphism f)) //.
+have [// | q_nz] := ifPn; rewrite -(rmorph0 [rmorphism of map_poly f]) //.
 have [m _] := ubnPeq (size a); elim: m 0%N 0 a => [|m IHm] qq r a /=.
   rewrite -!mul_polyC !size_map_poly !lead_coef_map // -(map_polyXn f).
   by rewrite -!(map_polyC f) -!rmorphM -rmorphB -rmorphD; case: (_ < _).
@@ -3094,8 +3094,8 @@ Lemma edivp_map a b :
   edivp a^f b^f = (0%N, (a %/ b)^f, (a %% b)^f).
 Proof.
 have [-> | bn0] := eqVneq b 0.
-  rewrite (rmorph0 (map_poly_rmorphism f)) WeakIdomain.edivp_def !modp0 !divp0.
-  by rewrite (rmorph0 (map_poly_rmorphism f)) scalp0.
+  rewrite (rmorph0 [rmorphism of map_poly f]) WeakIdomain.edivp_def !modp0 !divp0.
+  by rewrite (rmorph0 [rmorphism of map_poly f]) scalp0.
 rewrite unlock redivp_map lead_coef_map rmorph_unit; last first.
   by rewrite unitfE lead_coef_eq0.
 rewrite modpE divpE !map_polyZ !rmorphV ?rmorphX // unitfE.

@@ -180,8 +180,12 @@ Lemma r2v_inj : injective r2v. Proof. exact: can_inj r2vK. Qed.
 Lemma v2rK : cancel v2r r2v.   Proof. by have/bij_can_sym:= r2vK; apply. Qed.
 Lemma v2r_inj : injective v2r. Proof. exact: can_inj v2rK. Qed.
 
-Canonical v2r_linear := Linear (s2valP v2r_subproof : linear v2r).
-Canonical r2v_linear := Linear (can2_linear v2rK r2vK).
+HB.instance Definition _ :=
+  GRing.isLinear.Build R vT [zmodType of 'rV_vT] _ v2r
+    (s2valP v2r_subproof).
+HB.instance Definition _ :=
+  GRing.isLinear.Build R [the lmodType R of 'rV_vT] vT _ r2v
+    (can2_linear v2rK r2vK).
 End Iso.
 
 Section Vspace.
@@ -943,8 +947,8 @@ Canonical coord_unlockable := [unlockable fun coord].
 
 Fact coord_is_scalar n (X : n.-tuple vT) i : scalar (coord X i).
 Proof. by move=> k u v; rewrite unlock linearP mulmxDl -scalemxAl !mxE. Qed.
-Canonical coord_addidive n Xn i := Additive (@coord_is_scalar n Xn i).
-Canonical coord_linear n Xn i := AddLinear (@coord_is_scalar n Xn i).
+HB.instance Definition _ n Xn i :=
+  GRing.isLinear.Build K vT K _ (coord Xn i) (@coord_is_scalar n Xn i).
 
 Lemma coord_span n (X : n.-tuple vT) v :
   v \in span X -> v = \sum_i coord X i v *: X`_i.
@@ -1077,7 +1081,9 @@ pose f u := \sum_i coord (in_tuple X) i u *: fX`_i.
 have lin_f: linear f.
   move=> k u v; rewrite scaler_sumr -big_split; apply: eq_bigr => i _.
   by rewrite /= scalerA -scalerDl linearP.
-exists (Linear lin_f) => freeX eq_szX.
+pose flM := GRing.isLinear.Build _ _ _ _ f lin_f.
+pose fL : GRing.Linear.type _ _ _ _ := HB.pack f flM.
+exists fL => freeX eq_szX.
 apply/esym/(@eq_from_nth _ 0); rewrite ?size_map eq_szX // => i ltiX.
 rewrite (nth_map 0) //= /f (bigD1 (Ordinal ltiX)) //=.
 rewrite big1 => [|j /negbTE neqji]; rewrite (coord_free (Ordinal _)) //.
@@ -1270,8 +1276,8 @@ HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
 
 Fact lfun_is_linear f : linear f.
 Proof. by rewrite unlock; apply: linearP. Qed.
-Canonical lfun_additive f := Additive (lfun_is_linear f).
-Canonical lfun_linear f := AddLinear (lfun_is_linear f).
+HB.instance Definition _ (f : hom aT rT) :=
+  GRing.isLinear.Build R aT rT _ f (lfun_is_linear f).
 
 Lemma lfunE (ff : {linear aT -> rT}) : linfun ff =1 ff.
 Proof. by move=> v; rewrite 2!unlock /= mul_rV_lin1 /= !v2rK. Qed.
@@ -1878,8 +1884,9 @@ Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
 Lemma congr_subvs u v : u = v -> vsval u = vsval v. Proof. exact: congr1. Qed.
 
 Lemma vsval_is_linear : linear vsval. Proof. by []. Qed.
-Canonical vsval_additive := Additive vsval_is_linear.
-Canonical vsval_linear := AddLinear vsval_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build K [the lmodType K of subvs_of] vT _ vsval
+    vsval_is_linear.
 
 Fact vsproj_key : unit. Proof. by []. Qed.
 Definition vsproj_def u := Subvs (memv_proj U u).
@@ -1893,8 +1900,9 @@ Proof. by move=> w; apply/val_inj/vsprojK/subvsP. Qed.
 
 Lemma vsproj_is_linear : linear vsproj.
 Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
-Canonical vsproj_additive := Additive vsproj_is_linear.
-Canonical vsproj_linear := AddLinear vsproj_is_linear.
+HB.instance Definition _ :=
+  GRing.isLinear.Build K vT [the zmodType of subvs_of] _ vsproj
+    vsproj_is_linear.
 
 Fact subvs_vect_iso : vector_axiom (\dim U) subvs_of.
 Proof.
@@ -1956,7 +1964,9 @@ pose r2p w := (r2v (lsubmx w) : vT1, r2v (rsubmx w) : vT2).
 have r2pK : cancel r2p p2r by move=> w; rewrite /p2r !r2vK hsubmxK.
 have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
 have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
-by exists p2r; [apply: (@can2_linear _ _ _ (Linear r2p_lin)) | exists r2p].
+pose r2plM := GRing.isLinear.Build _ _ _ _ r2p r2p_lin.
+pose r2pL : GRing.Linear.type _ _ _ _ := HB.pack r2p r2plM.
+by exists p2r; [apply: (@can2_linear _ _ _ r2pL) | exists r2p].
 Qed.
 HB.instance Definition _ := Lmodule_hasFinDim.Build _ (vT1 * vT2)%type
   pair_vect_iso.
@@ -2002,9 +2012,11 @@ Lemma vsolve_eqP (U : {vspace vT}) :
           (vsolve_eq U).
 Proof.
 have lhsZ: linear lhsf by move=> a u v; apply/ffunP=> i; rewrite !ffunE linearP.
+pose lhslM := GRing.isLinear.Build _ _ _ _ lhsf lhsZ.
+pose lhsL : GRing.Linear.type _ _ _ _ := HB.pack lhsf lhslM.
 apply: (iffP memv_imgP) => [] [u Uu sol_u]; exists u => //.
-  by move=> i; rewrite -[tnth rhs i]ffunE sol_u (lfunE (Linear lhsZ)) ffunE.
-by apply/ffunP=> i; rewrite (lfunE (Linear lhsZ)) !ffunE sol_u.
+  by move=> i; rewrite -[tnth rhs i]ffunE sol_u (lfunE lhsL) ffunE.
+by apply/ffunP=> i; rewrite (lfunE lhsL) !ffunE sol_u.
 Qed.
 
 End Solver.
