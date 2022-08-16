@@ -175,7 +175,7 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
     by rewrite coprimez_sym coprimezXl //; apply: coprime_num_den.
   pose p1 : {poly int} := a *: 'X^d - p.
   have Dp1: p1 ^ intr = a%:~R *: ('X^d - q).
-    by rewrite rmorphB linearZ /= map_polyXn scalerBr Dq scalerKV ?intr_eq0.
+    by rewrite rmorphB /= linearZ /= map_polyXn scalerBr Dq scalerKV ?intr_eq0.
   apply/dvdzP; exists (\sum_(i < d) p1`_i * numq y ^+ i * denq y ^+ (d - i.+1)).
   apply: ZtoQinj; rewrite /ZtoQ rmorphM mulr_suml rmorph_sum /=.
   transitivity ((p1 ^ intr).[y] * (denq y ^+ d)%:~R).
@@ -276,7 +276,7 @@ have /all_tag[Q /all_tag[ofQ genQz]] z: {Qz : Qfield & genQfield z Qz}.
   have [|p [/monic_neq0 nzp pz0 irr_p]] := minPoly_decidable_closure _ (algC z).
     exact: rat_algebraic_decidable.
   pose Qz := SubFieldExtType pz0 irr_p.
-  pose QzC := subfx_inj_rmorphism QtoC z p.
+  pose QzC := [rmorphism of @subfx_inj _ _ QtoC z p].
   exists Qz, QzC, (subfx_root QtoC z p); first exact: subfx_inj_root.
   apply/vspaceP=> u; rewrite memvf; apply/Fadjoin1_polyP.
   by have [q] := subfxEroot pz0 nzp u; exists q.
@@ -329,10 +329,16 @@ pose morph_ofQ x z Qxz := forall u, ofQ z (Qxz u) = ofQ x u.
 have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   move=> z_x; pose Qxz u := inQ z (ofQ x u).
   have QxzE u: ofQ z (Qxz u) = ofQ x u by apply/inQ_K/(sQtrans x).
-  suffices /rat_lrmorphism QxzM: rmorphism Qxz.
-    by exists (linfun_ahom (LRMorphism QxzM)) => u; rewrite lfunE QxzE.
-  split=> [u v|]; first by apply: (canLR (ofQ_K z)); rewrite !rmorphB !QxzE.
-  by split=> [u v|]; apply: (canLR (ofQ_K z)); rewrite ?rmorph1 ?rmorphM ?QxzE.
+  have Qxza : additive Qxz.
+    by move=> u v; apply: (canLR (ofQ_K z)); rewrite !rmorphB !QxzE.
+  have Qxzm : multiplicative Qxz.
+    by split=>[u v|]; apply: (canLR (ofQ_K z)); rewrite ?rmorph1 ?rmorphM ?QxzE.
+  have Qxzl : scalable Qxz by exact: rat_linear.
+  have QxzaM := GRing.isAdditive.Build _ _ _ Qxza.
+  have QxzmM := GRing.isMultiplicative.Build _ _ _ Qxzm.
+  have QxzlM := GRing.isLinear.Build _ _ _ _ _ Qxzl.
+  pose QxzT := GRing.LRMorphism.Pack (GRing.LRMorphism.Class QxzaM QxzmM QxzlM).
+  by exists (linfun_ahom QxzT) => u; rewrite lfunE QxzE.
 pose sQs z s := all (mem (sQ z)) s.
 have inQsK z s: sQs z s -> map (ofQ z) (map (inQ z) s) = s.
   by rewrite -map_comp => /allP/(_ _ _)/inQ_K; apply: map_id_in.
@@ -595,8 +601,14 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   exists (HB.pack_for archiFieldType _ QisArchi); apply: [rmorphism of idfun].
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
-    exists 0, [archiFieldType of rat], f.
-    exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
+    have fA : additive f.
+      exact: can2_additive (inj_can_sym QfK (fmorph_inj _)) QfK.
+    have fM : multiplicative f.
+      exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
+    pose faM := GRing.isAdditive.Build _ _ _ fA.
+    pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
+    pose fT := GRing.RMorphism.Pack (GRing.RMorphism.Class faM fmM).
+    by exists 0, [archiFieldType of rat], fT.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.
 pose fix xR n : realC :=
@@ -856,16 +868,21 @@ have conjE n z: (n_ z <= n)%N -> conj z = conj_ n z.
   move/leq_trans=> le_zn; set x := conj z; set y := conj_ n z.
   have [m [le_xm le_ym le_nm]] := maxn3 (n_ x) (n_ y) n.
   by have /conjK/=/can_in_inj := leqnn m; apply; rewrite ?conjK // le_zn.
-suffices conjM: rmorphism conj.
-  exists (RMorphism conjM) => [z | /(_ i)/eqP/idPn[]] /=.
-    by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0%N.
-  rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
-  rewrite mulf_neq0 ?(memPnC (R'i 0%N)) ?rpred0 //.
-  by have /charf0P-> := ftrans (fmorph_char QtoC) (char_num _).
-do 2?split=> [x y|]; last pose n1 := n_ 1.
-- have [m [le_xm le_ym le_xym]] := maxn3 (n_ x) (n_ y) (n_ (x - y)).
+  have conjA : additive conj.
+  move=> x y.
+  have [m [le_xm le_ym le_xym]] := maxn3 (n_ x) (n_ y) (n_ (x - y)).
   by rewrite !(conjE m) // (inFTA m x) // (inFTA m y) -?rmorphB /conj_ ?ofQ_K.
-- have [m [le_xm le_ym le_xym]] := maxn3 (n_ x) (n_ y) (n_ (x * y)).
-  by rewrite !(conjE m) // (inFTA m x) // (inFTA m y) -?rmorphM /conj_ ?ofQ_K.
-by rewrite /conj -/n1 -(rmorph1 (ofQ (z_ n1))) /conj_ ofQ_K !rmorph1.
+have conjM : multiplicative conj.
+  split=> [x y|]; last pose n1 := n_ 1.
+    have [m [le_xm le_ym le_xym]] := maxn3 (n_ x) (n_ y) (n_ (x * y)).
+    by rewrite !(conjE m) // (inFTA m x) // (inFTA m y) -?rmorphM /conj_ ?ofQ_K.
+  by rewrite /conj -/n1 -(rmorph1 (ofQ (z_ n1))) /conj_ ofQ_K !rmorph1.
+have conjaM := GRing.isAdditive.Build _ _ _ conjA.
+have conjmM := GRing.isMultiplicative.Build _ _ _ conjM.
+pose conjT := GRing.RMorphism.Pack (GRing.RMorphism.Class conjaM conjmM).
+exists conjT => [z | /(_ i)/eqP/idPn[]] /=.
+  by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0%N.
+rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
+rewrite mulf_neq0 ?(memPnC (R'i 0%N)) ?rpred0 //.
+by have /charf0P-> := ftrans (fmorph_char QtoC) (char_num _).
 Qed.

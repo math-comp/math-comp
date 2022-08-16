@@ -243,8 +243,9 @@ Proof.
 move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= scale_lfunE !lfunE /= mulrDl scalerAl.
 Qed.
-Canonical amull_additive := Eval hnf in Additive amull_is_linear.
-Canonical amull_linear := Eval hnf in AddLinear amull_is_linear.
+#[hnf]
+HB.instance Definition _ := GRing.linear_isLinear.Build K aT (hom aT aT) _ amull
+  amull_is_linear.
 
 (* amull is a converse ring morphism *)
 Lemma amull1 : amull 1 = \1%VF.
@@ -253,17 +254,24 @@ Proof. by apply/lfunP => z; rewrite id_lfunE lfunE /= mul1r. Qed.
 Lemma amullM u v : (amull (u * v) = amull v * amull u)%VF.
 Proof. by apply/lfunP => w; rewrite comp_lfunE !lfunE /= mulrA. Qed.
 
-Lemma amulr_is_lrmorphism : lrmorphism amulr.
+Lemma amulr_is_linear : linear amulr.
 Proof.
-split=> [|a u]; last by apply/lfunP=> w; rewrite scale_lfunE !lfunE /= scalerAr.
-split=> [u v|]; first by apply/lfunP => w; do 3!rewrite !lfunE /= ?mulrBr.
-split=> [u v|]; last by apply/lfunP=> w; rewrite id_lfunE !lfunE /= mulr1.
+move=> a u v; apply/lfunP => w.
+by rewrite !lfunE /= !lfunE /= lfunE mulrDr /= scalerAr.
+Qed.
+
+Lemma amulr_is_multiplicative : multiplicative amulr.
+Proof.
+split=> [x y|]; last by apply/lfunP => w; rewrite id_lfunE !lfunE /= mulr1.
 by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
-Canonical amulr_additive := Eval hnf in Additive amulr_is_lrmorphism.
-Canonical amulr_linear := Eval hnf in AddLinear amulr_is_lrmorphism.
-Canonical amulr_rmorphism := Eval hnf in AddRMorphism amulr_is_lrmorphism.
-Canonical amulr_lrmorphism := Eval hnf in LRMorphism amulr_is_lrmorphism.
+
+#[hnf]
+HB.instance Definition _ := GRing.linear_isLinear.Build K aT (hom aT aT) _ amulr
+  amulr_is_linear.
+#[hnf]
+HB.instance Definition _ := GRing.isMultiplicative.Build aT (hom aT aT) amulr
+  amulr_is_multiplicative.
 
 Lemma lker0_amull u : u \is a GRing.unit -> lker (amull u) == 0%VS.
 Proof. by move=> Uu; apply/lker0P=> v w; rewrite !lfunE; apply: mulrI. Qed.
@@ -1024,12 +1032,10 @@ rewrite !linearZ -!scalerAr -!scalerAl 2!linearZ /=; congr (_ *: (_ *: _)).
 by apply/eqP/fM; apply: memt_nth.
 Qed.
 
-Lemma ahomP {f : 'Hom(aT, rT)} : reflect (lrmorphism f) (ahom_in {:aT} f).
+Lemma ahomP {f : 'Hom(aT, rT)} : reflect (multiplicative f) (ahom_in {:aT} f).
 Proof.
 apply: (iffP ahom_inP) => [[fM f1] | fRM_P]; last first.
-  pose fRM := LRMorphism fRM_P.
-  by split; [apply: in2W (rmorphM fRM) | apply: (rmorph1 fRM)].
-split; last exact: linearZZ; split; first exact: linearB.
+  by split=> [x y|]; [rewrite fRM_P.1|rewrite fRM_P.2].
 by split=> // x y; rewrite fM ?memvf.
 Qed.
 
@@ -1053,10 +1059,11 @@ Section LRMorphism.
 
 Variables aT rT sT : FalgType K.
 
-Fact ahom_is_lrmorphism (f : ahom aT rT) : lrmorphism f.
+Fact ahom_is_multiplicative (f : ahom aT rT) : multiplicative f.
 Proof. by apply/ahomP; case: f. Qed.
-Canonical ahom_rmorphism f := Eval hnf in AddRMorphism (ahom_is_lrmorphism f).
-Canonical ahom_lrmorphism f := Eval hnf in AddLRMorphism (ahom_is_lrmorphism f).
+#[hnf]
+HB.instance Definition _ (f : ahom aT rT) :=
+  GRing.isMultiplicative.Build aT rT f (ahom_is_multiplicative f).
 
 Lemma ahomWin (f : ahom aT rT) U : ahom_in U f.
 Proof.

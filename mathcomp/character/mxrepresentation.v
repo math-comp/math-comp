@@ -847,7 +847,7 @@ Arguments gring_mxK {R gT G%G} v%R : rename.
 Section ChangeOfRing.
 
 Variables (aR rR : comUnitRingType) (f : {rmorphism aR -> rR}).
-Local Notation "A ^f" := (map_mx (GRing.RMorphism.apply f) A) : ring_scope.
+Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
 Variables (gT : finGroupType) (G : {group gT}).
 
 Lemma map_regular_mx x : (regular_mx aR G x)^f = regular_mx rR G x.
@@ -2456,7 +2456,7 @@ have{cBcE} cBncEn A: centgmx rGn A -> A *m Bn = Bn *m A.
   rewrite -defAij row_mul -defAij -!mulmxA (cent_mxP cBcE) {k}//.
   rewrite memmx_cent_envelop; apply/centgmxP=> x Gx; apply/row_matrixP=> k.
   rewrite !row_mul !rowE !{}defAij /= -row_mul mulmxA mul_delta_mx.
-  congr (row i _); rewrite -(mul_vec_lin (mulmxr_linear _ _)) -mulmxA.
+  congr (row i _); rewrite -(mul_vec_lin [linear of mulmxr _]) -mulmxA.
   by rewrite -(centgmxP cAG) // mulmxA mx_rV_lin.
 suffices redGn: mx_completely_reducible rGn 1%:M.
   have [V modV defUV] := redGn _ modU (submx1 _); move/mxdirect_addsP=> dxUV.
@@ -4891,7 +4891,7 @@ Prenex Implicits mxmodule_form mxnonsimple_form mxnonsimple_sat.
 Section ChangeOfField.
   
 Variables (aF rF : fieldType) (f : {rmorphism aF -> rF}).
-Local Notation "A ^f" := (map_mx (GRing.RMorphism.apply f) A) : ring_scope.
+Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
 Variables (gT : finGroupType) (G : {group gT}).
 
 Section OneRepresentation.
@@ -5141,7 +5141,7 @@ case uB: (B \is a GRing.unit); last by rewrite invr_out ?uB ?horner_mx_mem.
 have defAd: Ad = Ad *m m B *m m B^-1.
   apply/row_matrixP=> i.
   by rewrite !row_mul mul_rV_lin /= mx_rV_lin /= mulmxK ?vec_mxK.
-rewrite -[B^-1]mul1mx -(mul_vec_lin (mulmxr_linear _ _)) defAd submxMr //.
+rewrite -[B^-1]mul1mx -(mul_vec_lin [linear of mulmxr _]) defAd submxMr //.
 rewrite -mxval_gen1 (submx_trans (horner_mx_mem _ _)) // {1}defAd.
 rewrite -(geq_leqif (mxrank_leqif_sup _)) ?mxrankM_maxl // -{}defAd.
 apply/row_subP=> i; rewrite row_mul rowK mul_vec_lin /= -{2}[A]horner_mx_X.
@@ -5175,11 +5175,13 @@ Proof. exact: mxval_genM. Qed.
 
 Lemma mxval_sub : additive mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
-Canonical mxval_additive := Additive mxval_sub.
+#[export] HB.instance Definition _ :=
+  GRing.isAdditive.Build FA 'M[F]_n mxval mxval_sub.
 
 Lemma mxval_is_multiplicative : multiplicative mxval.
 Proof. by split; [apply: mxvalM | apply: mxval1]. Qed.
-Canonical mxval_rmorphism := AddRMorphism mxval_is_multiplicative.
+#[export] HB.instance Definition _ :=
+  GRing.isMultiplicative.Build FA 'M[F]_n mxval mxval_is_multiplicative.
 
 Lemma mxval_centg x : centgmx rG (mxval x).
 Proof.
@@ -5204,13 +5206,16 @@ Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.
 Proof. exact: mxval_genV. Qed.
 
-Lemma gen_is_rmorphism : rmorphism gen.
-Proof.
-split=> [x y|]; first by apply: mxval_inj; rewrite genK !rmorphB /= !genK.
-by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK.
-Qed.
-Canonical gen_additive := Additive gen_is_rmorphism.
-Canonical gen_rmorphism := RMorphism gen_is_rmorphism.
+Lemma gen_is_additive : additive gen.
+Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
+
+Lemma gen_is_multiplicative : multiplicative gen.
+Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
+
+#[export] HB.instance Definition _ := GRing.isAdditive.Build F FA gen
+  gen_is_additive.
+#[€xport] HB.instance Definition _ := GRing.isMultiplicative.Build F FA gen
+  gen_is_multiplicative.
 
 (* The generated field contains a root of the minimal polynomial (in some  *)
 (* cases we want to use the construction solely for that purpose).         *)
@@ -5237,7 +5242,7 @@ Qed.
 (* yields a (reducible) tensored representation.                           *)
 
 Lemma non_linear_gen_reducible :
-  d > 1 -> mxnonsimple (map_repr gen_rmorphism rG) 1%:M.
+  d > 1 -> mxnonsimple (map_repr [rmorphism of gen] rG) 1%:M.
 Proof.
 rewrite ltnNge mxminpoly_linear_is_scalar => Anscal.
 pose Af := map_mx gen A; exists (kermx (Af - groot%:M)).
@@ -5246,7 +5251,7 @@ rewrite submx1 kermx_centg_module /=; last first.
   by rewrite -!map_mxM 1?(centgmxP cGA).
 rewrite andbC mxrank_ker -subn_gt0 mxrank1 subKn ?rank_leq_row // lt0n.
 rewrite mxrank_eq0 subr_eq0; case: eqP => [defAf | _].
-  rewrite -(map_mx_is_scalar gen_rmorphism) -/Af in Anscal.
+  rewrite -(map_mx_is_scalar [rmorphism of gen]) -/Af in Anscal.
   by case/is_scalar_mxP: Anscal; exists groot.
 rewrite -mxrank_eq0 mxrank_ker subn_eq0 row_leq_rank.
 apply/row_freeP=> [[XA' XAK]].
@@ -5799,7 +5804,7 @@ rewrite {cG}memmx_cent_envelop -mxminpoly_linear_is_scalar -ltnNge => cGA.
 move/(non_linear_gen_reducible irrG cGA).
 (* FIXME: _ matches a generated constant *)
 set F' := _ irrG cGA; set rG' := @map_repr _ F' _ _ _ _ rG.
-move: F' (gen_rmorphism _ _ : {rmorphism F -> F'}) => F' f' in rG' * => irrG'.
+move: F' ([rmorphism of gen  _ _] : {rmorphism F -> F'}) => F' f' in rG' * => irrG'.
 pose U' := [seq map_mx f' Ui | Ui <- U].
 have modU': mx_subseries (aG F') U'.
   apply: etrans modU; rewrite /mx_subseries all_map; apply: eq_all => Ui.

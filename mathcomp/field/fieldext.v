@@ -192,9 +192,8 @@ Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
 
 Fact vsval_multiplicative K : multiplicative (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
-Canonical vsval_rmorphism K := AddRMorphism (vsval_multiplicative K).
-Canonical vsval_lrmorphism K : {lrmorphism subvs_of K -> L} :=
-  [lrmorphism of vsval].
+HB.instance Definition _ (K : {subfield L}) :=
+  GRing.isMultiplicative.Build (subvs_of K) L vsval (vsval_multiplicative K).
 
 Lemma vsval_invf K (w : subvs_of K) : val w^-1 = (vsval w)^-1.
 Proof.
@@ -339,8 +338,9 @@ move=> a u v; apply/polyP=> i; rewrite coefD coefZ !coef_poly.
 case: ifP => lti; last by rewrite mulr0 addr0.
 by rewrite linearP mulrA -mulrDl mulr_algl.
 Qed.
-Canonical Fadjoin_poly_additive := Additive Fadjoin_poly_is_linear.
-Canonical Fadjoin_poly_linear := AddLinear Fadjoin_poly_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build F0 L {poly L} _ Fadjoin_poly
+    Fadjoin_poly_is_linear.
 
 Lemma size_minPoly : size minPoly = n.+1.
 Proof. by rewrite size_addl ?size_polyXn // size_opp ltnS size_poly. Qed.
@@ -552,8 +552,8 @@ Proof.
 move=> a p; rewrite -mul_polyC rmorphM /= fieldExt_hornerC.
 by rewrite -scalerAl mul1r.
 Qed.
-Canonical fieldExt_horner_linear := AddLinear fieldExt_hornerZ.
-Canonical fieldExt_horner_lrmorhism := [lrmorphism of fieldExt_horner].
+HB.instance Definition _ :=
+  GRing.isLinear.Build F0 {poly F0} L *:%R fieldExt_horner fieldExt_hornerZ.
 
 End Horner.
 
@@ -659,16 +659,23 @@ have in_bL i (a : K_F) : val a * (bL`_i : L_F) \in (F * <[bL`_i]>)%VS.
   by rewrite memv_mul ?(valP a) ?memv_line.
 have nz_bLi (i : 'I_n): bL`_i != 0 by rewrite (memPn nz_bL) ?memt_nth.
 pose r2v (v : 'rV[K_F]_n) : L_F := \sum_i v 0 i *: (bL`_i : L_F).
-have r2v_lin: linear r2v.
-  move=> a u v; rewrite /r2v scaler_sumr -big_split /=; apply: eq_bigr => i _.
-  by rewrite scalerA -scalerDl !mxE.
+have r2v_add : additive r2v.
+  move=> u v; rewrite /r2v -sumrN -big_split; apply: eq_bigr => i _.
+  by rewrite /= -scaleNr -scalerDl !mxE.
+have r2v_lin : scalable r2v.
+  move=> a u; rewrite /r2v scaler_sumr; apply: eq_bigr => i _.
+  by rewrite scalerA mxE.
+pose aM := GRing.isAdditive.Build _ _ r2v r2v_add.
+pose lM := GRing.isLinear.Build _ _ _ _ r2v r2v_lin.
+pose r2vL := GRing.Linear.Pack (GRing.Linear.Class aM lM).
+(* FIXME: use HB.pack *)
 have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
   apply: sig_eqW; have /memv_sumP[y Fy ->]: x \in SbL by rewrite defL memvf.
   have /fin_all_exists[r Dr] i: exists r, y i = r *: (bL`_i : L_F).
     by have /memv_cosetP[a Fa ->] := Fy i isT; exists (Subvs Fa).
   by exists (\row_i r i); apply: eq_bigr => i _; rewrite mxE.
 pose v2r x := sval (v2rP x).
-have v2rK: cancel v2r (Linear r2v_lin) by rewrite /v2r => x; case: (v2rP x).
+have v2rK: cancel v2r r2vL by rewrite /v2r => x; case: (v2rP x).
 suffices r2vK: cancel r2v v2r.
   by exists n, v2r; [apply: can2_linear v2rK | exists r2v].
 move=> r; apply/rowP=> i; apply/val_inj/(mulIf (nz_bLi i))/eqP; move: i isT.
@@ -812,7 +819,7 @@ pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
 have v2r_lin: linear v2r.
   move=> a x y; rewrite -linearP; congr (mxvec _); apply/matrixP=> i j.
-  by rewrite !mxE linearP mulr_algl linearP.
+  by rewrite !mxE linearP /= mulr_algl linearP.
 pose r2v r := \sum_(i < m) (\sum_(j < n) vec_mx r i j *: bF`_j) *: bL`_i.
 have v2rK: cancel v2r r2v.
   move=> x; transitivity (\sum_(i < m) coord bL i x *: bL`_i); last first.
@@ -961,7 +968,7 @@ Local Open Scope quotient_scope.
 Variables (F L : fieldType) (iota : {rmorphism F -> L}).
 Variables (z : L) (p : {poly F}).
 
-Local Notation "p ^iota" := (map_poly (GRing.RMorphism.apply iota) p)
+Local Notation "p ^iota" := (map_poly (GRing.RMorphism.sort iota) p)
   (at level 2, format "p ^iota") : ring_scope.
 
 Let wf_p := (p != 0) && root p^iota z.
@@ -1156,34 +1163,46 @@ Qed.
 HB.instance Definition _ := GRing.ComRing_isField.Build subFExtend
   subfx_fieldAxiom subfx_inv0.
 
-Fact subfx_inj_is_rmorphism : rmorphism subfx_inj.
+Fact subfx_inj_is_additive : additive subfx_inj.
 Proof.
-do 2?split; last by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
-  by elim/quotW=> x; elim/quotW=> y; rewrite !piE /iotaFz linearB rmorphB.
+by elim/quotW => x; elim/quotW => y; rewrite !piE /iotaFz linearB rmorphB.
+Qed.
+
+Fact subfx_inj_is_multiplicative : multiplicative subfx_inj.
+Proof.
+split; last by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
 elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /iotaFz.
 by rewrite poly_rV_modp_K iotaPz_modp rmorphM.
 Qed.
-Canonical subfx_inj_additive := Additive subfx_inj_is_rmorphism.
-Canonical subfx_inj_rmorphism := RMorphism subfx_inj_is_rmorphism.
+
+HB.instance Definition _ := GRing.isAdditive.Build subFExtend L subfx_inj
+  subfx_inj_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build subFExtend L subfx_inj
+  subfx_inj_is_multiplicative.
 
 Definition subfx_eval := lift_embed subFExtend (fun q => poly_rV (q %% p0)).
 Canonical subfx_eval_morph := PiEmbed subfx_eval.
 
 Definition subfx_root := subfx_eval 'X.
 
-Lemma subfx_eval_is_rmorphism : rmorphism subfx_eval.
+Lemma subfx_eval_is_additive : additive subfx_eval.
+Proof. by move=> x y; apply/eqP; rewrite piE -linearB modpD modNp. Qed.
+
+Lemma subfx_eval_is_multiplicative : multiplicative subfx_eval.
 Proof.
-do 2?split=> [x y|] /=; apply/eqP; rewrite piE.
-- by rewrite -linearB modpD modNp.
-- by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
+split=> [x y|]; apply/eqP; rewrite piE.
+  by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
 by rewrite modp_small // size_poly1 -subn_gt0 subn1.
 Qed.
-Canonical subfx_eval_additive := Additive subfx_eval_is_rmorphism.
-Canonical subfx_eval_rmorphism := AddRMorphism subfx_eval_is_rmorphism.
+
+HB.instance Definition _ :=
+  GRing.isAdditive.Build {poly F} subFExtend subfx_eval subfx_eval_is_additive.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build {poly F} subFExtend subfx_eval
+    subfx_eval_is_multiplicative.
 
 Definition inj_subfx := (subfx_eval \o polyC).
-Canonical inj_subfx_addidive := [additive of inj_subfx].
-Canonical inj_subfx_rmorphism := [rmorphism of inj_subfx].
+HB.instance Definition _ := GRing.RMorphism.on inj_subfx.
 
 Lemma subfxE x: exists p, x = subfx_eval p.
 Proof.
@@ -1217,8 +1236,8 @@ HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
 
 Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
-Canonical subfx_eval_linear := AddLinear subfx_evalZ.
-Canonical subfx_eval_lrmorphism := [lrmorphism of subfx_eval].
+HB.instance Definition _ :=
+  GRing.isLinear.Build F {poly F} subFExtend *:%R subfx_eval subfx_evalZ.
 
 Hypothesis (pz0 : root p^iota z).
 
@@ -1243,7 +1262,7 @@ Proof. by rewrite subfx_injZ rmorph1 mulr1. Qed.
 Lemma subfxEroot x : {q | x = (map_poly (in_alg subFExtend) q).[subfx_root]}.
 Proof.
 have /sig_eqW[q ->] := subfxE x; exists q.
-apply: (fmorph_inj subfx_inj_rmorphism).
+apply: (fmorph_inj [rmorphism of subfx_inj]).
 rewrite -horner_map /= subfx_inj_root subfx_inj_eval //.
 by rewrite -map_poly_comp (eq_map_poly subfx_inj_base).
 Qed.
@@ -1368,10 +1387,18 @@ have unitM : GRing.ComUnitRing_isField cuL.
 pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as rVpoly].
-suffices toLM: lrmorphism (toL : {poly F} -> aL) by exists (LRMorphism toLM).
-have toLlin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
-do ?split; try exact: toLlin; move=> q r /=.
-by apply: toPinj; rewrite !toL_K modp_mul -!(mulrC r) modp_mul.
+have tol_add : additive (toL : {poly F} -> aL).
+  by move=> q1 q2; rewrite -raddfB /= -modpN -modpD.
+have tol_mul : multiplicative (toL : {poly F} -> aL).
+  by split=> [q r|];
+     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
+have tol_lin : scalable (toL : {poly F} -> aL).
+  by move=> a q; rewrite -linearZ -modpZl.
+pose aM := GRing.isAdditive.Build _ _ _ tol_add.
+pose lM := GRing.isLinear.Build _ _ _ _ _ tol_lin.
+pose mM := GRing.isMultiplicative.Build _ _ _ tol_mul.
+by exists (GRing.LRMorphism.Pack (GRing.LRMorphism.Class aM mM lM)).
+(* FIXME: use HB.pack *)
 Qed.
 
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.

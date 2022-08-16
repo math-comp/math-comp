@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype div tuple finfun bigop prime order.
 From mathcomp Require Import ssralg ssrnum finset fingroup morphism perm.
@@ -116,8 +117,8 @@ Proof. by rewrite cfunElock conj1g if_same. Qed.
 
 Fact cfConjg_is_linear y : linear (cfConjg y : 'CF(G) -> 'CF(G)).
 Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock. Qed.
-Canonical cfConjg_additive y := Additive (cfConjg_is_linear y).
-Canonical cfConjg_linear y := AddLinear (cfConjg_is_linear y).
+HB.instance Definition _ y :=GRing.linear_isLinear.Build _ _ _ _ (cfConjg y)
+  (cfConjg_is_linear y).
 
 Lemma cfConjg_cfuniJ A y : y \in 'N(G) -> ('1_A ^ y)%CF = '1_(A :^ y) :> 'CF(G).
 Proof.
@@ -140,8 +141,8 @@ Proof.
 split=> [phi psi|]; last exact: cfConjg_cfun1.
 by apply/cfunP=> x; rewrite !cfunElock.
 Qed.
-Canonical cfConjg_rmorphism y := AddRMorphism (cfConjg_is_multiplicative y).
-Canonical cfConjg_lrmorphism y := [lrmorphism of cfConjg y].
+HB.instance Definition _ y := GRing.isMultiplicative.Build _ _ (cfConjg y)
+  (cfConjg_is_multiplicative y).
 
 Lemma cfConjg_eq1 phi y : ((phi ^ y)%CF == 1) = (phi == 1).
 Proof. by apply: rmorph_eq1; apply: can_inj (cfConjgK y). Qed.

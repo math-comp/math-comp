@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import div fintype tuple finfun bigop fingroup perm.
 From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
@@ -149,16 +150,16 @@ Qed.
 
 Lemma poly_rV_is_linear : linear poly_rV.
 Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
-Canonical poly_rV_additive := Additive poly_rV_is_linear.
-Canonical poly_rV_linear := Linear poly_rV_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build R {poly R} 'rV_d _ poly_rV poly_rV_is_linear.
 
 Lemma rVpoly_is_linear : linear rVpoly.
 Proof.
 move=> a u v; apply/polyP=> k; rewrite coefD coefZ !coef_rVpoly.
 by case: insubP => [i _ _ | _]; rewrite ?mxE // mulr0 addr0.
 Qed.
-Canonical rVpoly_additive := Additive rVpoly_is_linear.
-Canonical rVpoly_linear := Linear rVpoly_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build R 'rV_d {poly R} _ rVpoly rVpoly_is_linear.
 
 End RowPoly.
 
@@ -335,8 +336,8 @@ move=> a p /=; rewrite -mul_polyC rmorphM /=.
 by rewrite horner_mx_C [_ * _]mul_scalar_mx.
 Qed.
 
-Canonical horner_mx_linear := AddLinear horner_mxZ.
-Canonical horner_mx_lrmorphism := [lrmorphism of horner_mx].
+HB.instance Definition _ :=
+  GRing.isLinear.Build R {poly R} 'M_n'.+1 *:%R horner_mx horner_mxZ.
 
 Definition powers_mx d := \matrix_(i < d) mxvec (A ^+ i).
 
@@ -345,7 +346,8 @@ Lemma horner_rVpoly m (u : 'rV_m) :
 Proof.
 rewrite mulmx_sum_row linear_sum [rVpoly u]poly_def rmorph_sum.
 apply: eq_bigr => i _.
-by rewrite valK !linearZ rmorphX /= horner_mx_X rowK /= mxvecK.
+by rewrite valK linearZ /= linearZ rmorphX /= horner_mx_X rowK /= mxvecK.
+(* FIXME: replace the two linearZ with !linearZ when thing in ssralg is fixed *)
 Qed.
 
 End OneMatrix.
@@ -476,11 +478,12 @@ pose phi (A : M_RX) := \poly_(k < Msize A) \matrix_(i, j) (A i j)`_k.
 have coef_phi A i j k: (phi A)`_k i j = (A i j)`_k.
   rewrite coef_poly; case: (ltnP k _) => le_m_k; rewrite mxE // nth_default //.
   by apply: leq_trans (leq_trans (leq_bigmax i) le_m_k); apply: (leq_bigmax j).
-have phi_is_rmorphism : rmorphism phi.
-  do 2?[split=> [A B|]]; apply/polyP=> k; apply/matrixP=> i j; last 1 first.
-  - rewrite coef_phi mxE coefMn !coefC.
-    by case: (k == _); rewrite ?mxE ?mul0rn.
-  - by rewrite !(coef_phi, mxE, coefD, coefN).
+have phi_is_additive : additive phi.
+  move=> A B; apply/polyP => k; apply/matrixP => i j.
+  by rewrite !(coef_phi, mxE, coefD, coefN).
+have phi_is_multiplicative : multiplicative phi.
+  split=> [A B|]; apply/polyP => k; apply/matrixP => i j; last first.
+    by rewrite coef_phi mxE coefMn !coefC; case: (k == _); rewrite ?mxE ?mul0rn.
   rewrite !coef_phi !mxE !coefM summxE coef_sum.
   pose F k1 k2 := (A i k1)`_k2 * (B k1 j)`_(k - k2).
   transitivity (\sum_k1 \sum_(k2 < k.+1) F k1 k2); rewrite {}/F.
@@ -494,7 +497,11 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-exists (RMorphism phi_is_rmorphism).
+pose aM := GRing.isAdditive.Build M_RX {poly 'M_n} phi phi_is_additive.
+pose mM := GRing.isMultiplicative.Build M_RX {poly 'M_n} phi
+  phi_is_multiplicative.
+(* FIXME: use HB.pack *)
+exists (GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM)).
 split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
   by rewrite coef_phi coef_map !mxE coefMn.
 by rewrite coef_phi !mxE !coefC; case k; last rewrite /= mxE.
@@ -629,7 +636,7 @@ Lemma horner_mx_mem p : (horner_mx A p \in Ad)%MS.
 Proof.
 elim/poly_ind: p => [|p a IHp]; first by rewrite rmorph0 // linear0 sub0mx.
 rewrite rmorphD rmorphM /= horner_mx_C horner_mx_X.
-rewrite addrC -scalemx1 linearP /= -(mul_vec_lin (mulmxr_linear _ A)).
+rewrite addrC -scalemx1 linearP /= -(mul_vec_lin [linear of mulmxr A]).
 case/submxP: IHp => u ->{p}.
 have: (powers_mx A (1 + d) <= Ad)%MS.
   rewrite -(geq_leqif (mxrank_leqif_sup _)).
@@ -779,8 +786,8 @@ Arguments horner_rVpoly_inj {F n' A} [u1 u2] eq_u12A : rename.
 Section MapRingMatrix.
 
 Variables (aR rR : ringType) (f : {rmorphism aR -> rR}).
-Local Notation "A ^f" := (map_mx (GRing.RMorphism.apply f) A) : ring_scope.
-Local Notation fp := (map_poly (GRing.RMorphism.apply f)).
+Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
+Local Notation fp := (map_poly (GRing.RMorphism.sort f)).
 Variables (d n : nat) (A : 'M[aR]_n).
 
 Lemma map_rVpoly (u : 'rV_d) : fp (rVpoly u) = rVpoly u^f.

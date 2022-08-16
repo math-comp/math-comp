@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
@@ -606,7 +607,9 @@ rewrite /abelem_mx_fun; case: g => x /= /(subsetP nEG) Nx /= m u v.
 rewrite rVabelemD rVabelemZ conjMg conjXg.
 by rewrite abelem_rV_M ?abelem_rV_X ?groupX ?memJ_norm // natr_Zp.
 Qed.
-Canonical abelem_mx_linear g := Linear (abelem_mx_linear_proof g).
+HB.instance Definition _ (g : [subg G]) :=
+  GRing.linear_isLinear.Build 'F_p rVn rVn _ (abelem_mx_fun g)
+    (abelem_mx_linear_proof g).
 
 Let rVabelemJmx v x : x \in G -> rV_E (v *m r x) = (rV_E v) ^ x.
 Proof.
@@ -808,7 +811,7 @@ have{irrG faithfulG cGz1} Urz1: rG z - 1%:M \in unitmx.
   by rewrite !inE Gz mul1mx -order_eq1 ozp -implybNN neq_ltn orbC prime_gt1.
 do [case: n n_gt0 => // n' _; set n := n'.+1] in rG Urz1 *.
 have charMp: p \in [char 'M[F]_n].
-  exact: (rmorph_char (scalar_mx_rmorphism _ _)).
+  exact: (rmorph_char [rmorphism of scalar_mx]).
 have{Urz1}: Frobenius_aut charMp (rG z - 1) \in GRing.unit by rewrite unitrX.
 rewrite (Frobenius_autB_comm _ (commr1 _)) Frobenius_aut1.
 by rewrite -[_ (rG z)](repr_mxX rG) // -ozp expg_order repr_mx1 subrr unitr0.

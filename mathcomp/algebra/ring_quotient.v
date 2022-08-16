@@ -141,7 +141,7 @@ Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 Lemma pi_is_additive : additive \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
 
-Canonical pi_additive := Additive pi_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build V Q \pi_Q pi_is_additive.
 
 End PiAdditive.
 
@@ -192,7 +192,8 @@ Variable Q : @ringQuotType R equivR zeroR -%R +%R 1 *%R.
 Lemma pi_is_multiplicative : multiplicative \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
 
-Canonical pi_rmorphism := AddRMorphism pi_is_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build R Q \pi_Q
+  pi_is_multiplicative.
 
 End PiRMorphism.
 

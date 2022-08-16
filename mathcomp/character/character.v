@@ -111,15 +111,15 @@ Lemma trowb_is_linear n1 m2 n2 (B : 'M_(m2,n2)) : linear (@trowb n1 m2 n2 B).
 Proof.
 elim: n1=> [|n1 IH] //= k A1 A2 /=; first by rewrite scaler0 add0r.
 rewrite linearD /= linearZ.
-apply/matrixP=> i j.
+-apply/matrixP=> i j.
 rewrite !mxE.
 case: split=> a.
   by rewrite !mxE mulrDl mulrA.
 by rewrite linearD /= linearZ IH !mxE.
 Qed.
 
-Canonical Structure trowb_linear n1 m2 n2 B :=
-  Linear (@trowb_is_linear n1 m2 n2 B).
+HB.instance Definition _ n1 m2 n2 B :=
+  GRing.linear_isLinear.Build _ _ _ _ (trowb B) (@trowb_is_linear n1 m2 n2 B).
 
 Lemma trow_is_linear n1 m2 n2 (A : 'rV_n1) : linear (@trow n1 A m2 n2).
 Proof.
@@ -129,8 +129,9 @@ apply/matrixP=> i j; rewrite !mxE.
 by case: split=> a; rewrite ?IH !mxE.
 Qed.
 
-Canonical Structure trow_linear n1 m2 n2 A :=
-  Linear (@trow_is_linear n1 m2 n2 A).
+HB.instance Definition _ n1 m2 n2 A :=
+  GRing.linear_isLinear.Build _ _ _ _ (@trow n1 A m2 n2)
+    (@trow_is_linear n1 m2 n2 A).
 
 Fixpoint tprod  (m1 : nat) :
   forall n1 (A : 'M[F]_(m1,n1)) m2 n2 (B : 'M[F]_(m2,n2)),
@@ -503,7 +504,8 @@ Definition xcfun (chi : 'CF(G)) A :=
 
 Lemma xcfun_is_additive phi : additive (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun linearB mulmxBl !mxE. Qed.
-Canonical xcfun_additive phi := Additive (xcfun_is_additive phi).
+HB.instance Definition _ phi :=
+  GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
 
 Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
 Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.
@@ -519,7 +521,8 @@ Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
-Canonical xcfun_r_additive A := Additive (xcfun_r_is_additive A).
+HB.instance Definition _ A := GRing.isAdditive.Build _ _ (xcfun_r A)
+  (xcfun_r_is_additive A).
 
 Lemma xcfunZl a phi A : xcfun (a *: phi) A = a * xcfun phi A.
 Proof.
@@ -719,7 +722,7 @@ Qed.
 Lemma irr_free : free (irr G).
 Proof.
 apply/freeP=> s s0 i; apply: (mulIf (irr1_neq0 i)).
-rewrite mul0r -(raddf0 (xcfun_r_additive 'e_i)) -{}s0 raddf_sum /=.
+rewrite mul0r -(raddf0 [additive of xcfun_r 'e_i]) -{}s0 raddf_sum /=.
 rewrite (bigD1 i)//= -tnth_nth xcfunZl xcfun_id eqxx big1 ?addr0 // => j ne_ji.
 by rewrite -tnth_nth xcfunZl xcfun_id (negbTE ne_ji) mulr0.
 Qed.

@@ -117,7 +117,7 @@ Local Notation pQtoC := (map_poly ratr).
 
 Local Definition algC_intr_inj := @intr_inj [numDomainType of algC].
 #[local] Hint Resolve algC_intr_inj : core.
-Local Notation QtoC_M := (ratr_rmorphism [numFieldType of algC]).
+Local Notation QtoC_M := [rmorphism of @ratr [numFieldType of algC]].
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.
@@ -271,7 +271,7 @@ have [|k_gt1] := leqP k 1; last have [p p_pr /dvdnP[k1 Dk]] := pdivP k_gt1.
 move: cokn; rewrite Dk coprimeMl => /andP[cok1n].
 rewrite prime_coprime // (dvdn_charf (char_Fp p_pr)) => /co_fg {co_fg}.
 have charFpX: p \in [char {poly 'F_p}].
-  by rewrite (rmorph_char (polyC_rmorphism _)) ?char_Fp.
+  by rewrite (rmorph_char [rmorphism of polyC]) ?char_Fp.
 rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(Frobenius_autE charFpX).
 rewrite -[g]comp_polyXr map_comp_poly -horner_map /= Frobenius_autE -rmorphX.
 rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)); last first.

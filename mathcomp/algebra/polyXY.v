@@ -78,7 +78,9 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 
 Lemma swapXY_is_additive : additive swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
-Canonical swapXY_addf := Additive swapXY_is_additive.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
+    swapXY_is_additive.
 
 Lemma coef_swapXY u i j : (swapXY u)`_i`_j = u`_j`_i.
 Proof.
@@ -105,12 +107,15 @@ rewrite (eq_bigr _ (fun _ _ => coefM _ _ _)) exchange_big /=.
 apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
-Canonical swapXY_rmorphism := AddRMorphism swapXY_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build {poly {poly R}} {poly {poly R}} swapXY
+    swapXY_is_multiplicative.
 
 Lemma swapXY_is_scalable : scalable_for (map_poly polyC \; *%R) swapXY.
 Proof. by move=> p u /=; rewrite -mul_polyC rmorphM /= swapXY_polyC. Qed.
-Canonical swapXY_linear := AddLinear swapXY_is_scalable.
-Canonical swapXY_lrmorphism := [lrmorphism of swapXY].
+HB.instance Definition _ :=
+  GRing.isLinear.Build {poly R} {poly {poly R}} {poly {poly R}}
+    (map_poly polyC \; *%R) swapXY swapXY_is_scalable.
 
 Lemma swapXY_comp_poly p u : swapXY (p^:P \Po u) = p^:P \Po swapXY u.
 Proof.
@@ -334,7 +339,7 @@ Section PolyXY_Field.
 
 Variables (F E : fieldType) (FtoE : {rmorphism F -> E}).
 
-Local Notation pFtoE := (map_poly (GRing.RMorphism.apply FtoE)).
+Local Notation pFtoE := (map_poly (GRing.RMorphism.sort FtoE)).
 
 Lemma div_annihilantP (p q : {poly E}) (x y : E) :
     p != 0 -> q != 0 -> y != 0 -> p.[x] = 0 -> q.[y] = 0 ->

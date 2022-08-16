@@ -99,8 +99,11 @@ Proof. by apply/kAHomP => u _; rewrite lfunE. Qed.
 Lemma k1HomE V f : kHom 1 V f = ahom_in V f.
 Proof. by apply: andb_idr => /ahom_inP[_ f1]; apply/fixedSpaceP. Qed.
 
-Lemma kHom_lrmorphism (f : 'End(L)) : reflect (lrmorphism f) (kHom 1 {:L} f).
+Lemma kHom_lrmorphism (f : 'End(L)) : reflect (multiplicative f) (kHom 1 {:L} f).
 Proof. by rewrite k1HomE; apply: ahomP. Qed.
+
+(* Lemma kHom_lrmorphism (f : 'End(L)) : reflect (lrmorphism f) (kHom 1 {:L} f). *)
+(* Proof. by rewrite k1HomE; apply: ahomP. Qed. *)
 
 Lemma k1AHom V (f : 'AEnd(L)) : kHom 1 V f.
 Proof. by rewrite k1HomE ahomWin. Qed.
@@ -147,14 +150,23 @@ rewrite memv_cap memv0 memv_ker => /andP[Ev]; apply: contraLR => nz_v.
 by rewrite -unitfE unitrE -(kHom_inv homKf) // -fM ?rpredV ?divff ?idKf ?mem1v.
 Qed.
 
-Lemma kHom_is_rmorphism K E f :
-  kHom K E f -> rmorphism (f \o vsval : subvs_of E -> L).
+Lemma kHom_is_additive K E f :
+  kHom K E f -> additive (f \o vsval : subvs_of E -> L).
+Proof. case/kHomP=> fM idKf a b; exact: raddfB. Qed.
+
+Lemma kHom_is_multiplicative K E f :
+  kHom K E f -> multiplicative (f \o vsval : subvs_of E -> L).
 Proof.
-case/kHomP=> fM idKf; split=> [a b|]; first exact: raddfB.
+case/kHomP=> fM idKf.
 by split=> [a b|] /=; [rewrite /= fM ?subvsP | rewrite algid1 idKf // mem1v].
 Qed.
+
 Definition kHom_rmorphism K E f homKEf :=
-  RMorphism (@kHom_is_rmorphism K E f homKEf).
+  GRing.RMorphism.Pack
+    (GRing.RMorphism.Class
+       (GRing.isAdditive.Build _ _ _ (@kHom_is_additive K E f homKEf))
+       (GRing.isMultiplicative.Build _ _ _
+          (@kHom_is_multiplicative K E f homKEf))).
 
 Lemma kHom_horner K E f p x :
   kHom K E f -> p \is a polyOver E -> x \in E -> f p.[x] = (map_poly f p).[f x].
@@ -182,14 +194,24 @@ Section kHomExtend.
 
 Variables (K E : {subfield L}) (f : 'End(L)) (x y : L).
 
-Fact kHomExtend_subproof :
-  linear (fun z => (map_poly f (Fadjoin_poly E x z)).[y]).
+Fact kHomExtend_additive_subproof :
+  additive (fun z => (map_poly f (Fadjoin_poly E x z)).[y]).
+Proof. by move=> a b; rewrite !raddfB hornerD hornerN. Qed.
+
+Fact kHomExtend_scalable_subproof :
+  scalable (fun z => (map_poly f (Fadjoin_poly E x z)).[y]).
 Proof.
-move=> k a b; rewrite linearP /= raddfD hornerE; congr (_ + _).
-rewrite -[rhs in _ = rhs]mulr_algl -hornerZ /=; congr _.[_].
+move=> k a; rewrite !linearZ /=.
+rewrite -[rhs in _ = rhs]mulr_algl -hornerZ; congr _.[_].
 by apply/polyP => i; rewrite !(coefZ, coef_map) /= !mulr_algl linearZ.
 Qed.
-Definition kHomExtend := linfun (Linear kHomExtend_subproof).
+
+Definition kHomExtend :=
+  linfun
+    (GRing.Linear.Pack
+       (GRing.Linear.Class
+          (GRing.isAdditive.Build _ _ _ kHomExtend_additive_subproof)
+          (GRing.isLinear.Build _ _ _ _ _ kHomExtend_scalable_subproof))).
 
 Lemma kHomExtendE z : kHomExtend z = (map_poly f (Fadjoin_poly E x z)).[y].
 Proof. by rewrite lfunE. Qed.
@@ -261,7 +283,11 @@ Proof. by rewrite kAutE k1AHom. Qed.
 Lemma kAutf_lker0 K f : kHom K {:L} f -> lker f == 0%VS.
 Proof.
 move/(kHomSl (sub1v _))/kHom_lrmorphism=> fM.
-by apply/lker0P; apply: (fmorph_inj (RMorphism fM)).
+have fA : additive f by move=> x y; exact: raddfB.
+pose aM := GRing.isAdditive.Build _ _ _ fA.
+pose mM := GRing.isMultiplicative.Build _ _ _ fM.
+pose fT := GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM).
+by apply/lker0P; apply: (fmorph_inj fT).
 Qed.
 
 Lemma inv_kHomf K f : kHom K {:L} f -> kHom K {:L} f^-1.
@@ -478,7 +504,11 @@ set fj := (fi ^-1 \o f)%AF; suffices Hfj : fj \in homEz.
 rewrite -DhomEz; apply/kAHomP => _ /Fadjoin_polyP[q Eq ->].
 have homLfj: kHom E {:L} fj := comp_kHom (inv_kHomf homLfi) homLf.
 have /kHom_lrmorphism fjM := kHomSl (sub1v _) homLfj.
-rewrite -[fj _](horner_map (RMorphism fjM)) (kHom_poly_id homLfj) //=.
+have fjA : additive fj by move=> x y; exact: raddfB.
+pose aM := GRing.isAdditive.Build _ _ _ fjA.
+pose mM := GRing.isMultiplicative.Build _ _ _ fjM.
+pose fjT := GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM).
+rewrite -[fj _](horner_map fjT) (kHom_poly_id homLfj) //=.
 by rewrite lfunE /= Dfz -fi_z lker0_lfunK.
 Qed.
 
@@ -515,10 +545,14 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
 - have [Lz0 _ [z qz0 defLz]] := irredp_FAdjoin irr_q.
   pose Lz := [the fieldExtType _ of baseFieldType Lz0].
   pose inLz : {rmorphism L -> Lz} := [rmorphism of in_alg Lz0].
-  have inLzL_linear: linear (locked inLz).
-    move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.
-    by rewrite -{1}mulr_algl rmorphD rmorphM -lock.
-  have ihLzZ: ahom_in {:L} (linfun (Linear inLzL_linear)).
+  have inLzL_additive: additive (locked inLz) by move=> u v; exact: rmorphB.
+  have inLzL_scalable: scalable (locked inLz).
+    move=> a u; rewrite -(@mulr_algl F Lz) baseField_scaleE.
+    by rewrite -{1}mulr_algl rmorphM -lock.
+  pose inLzLaM := GRing.isAdditive.Build _ _ _ inLzL_additive.
+  pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_scalable.
+  pose inLzL := GRing.Linear.Pack (GRing.Linear.Class inLzLaM inLzLlM).
+  have ihLzZ: ahom_in {:L} (linfun inLzL).
     by apply/ahom_inP; split=> [u v|]; rewrite !lfunE (rmorphM, rmorph1).
   exists Lz, (AHom ihLzZ), z; congr (root _ z): qz0.
   by apply: eq_map_poly => y; rewrite lfunE /= -lock.
@@ -941,7 +975,8 @@ Fact galTrace_is_additive : additive (galTrace U V).
 Proof.
 by move=> a b /=; rewrite -sumrB; apply: eq_bigr => x _; rewrite rmorphB.
 Qed.
-Canonical galTrace_additive := Additive galTrace_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build L L (galTrace U V)
+  galTrace_is_additive.
 
 Lemma galNorm1 : galNorm U V 1 = 1.
 Proof. by apply: big1 => x _; rewrite rmorph1. Qed.

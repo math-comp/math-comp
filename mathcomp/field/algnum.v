@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
 From mathcomp Require Import ssralg finalg zmodp poly ssrnum ssrint rat.
@@ -116,7 +117,7 @@ have [r [Dr /monic_neq0 nz_r] dv_r] := minCpolyP z.
 have rz0: root (pQtoC r) z by rewrite dv_r.
 have irr_r: irreducible_poly r.
   by apply/(subfx_irreducibleP rz0 nz_r)=> q qz0 nzq; rewrite dvdp_leq // -dv_r.
-exists (SubFieldExtType rz0 irr_r), (subfx_inj_rmorphism QtoCm z r).
+  exists (SubFieldExtType rz0 irr_r), [rmorphism of @subfx_inj _ _ QtoCm z r].
 exists (subfx_root _ z r) => [|x]; first exact: subfx_inj_root.
 by have{x} [p ->] := subfxEroot rz0 nz_r x; exists p.
 Qed.
@@ -180,7 +181,6 @@ Proof. by rewrite -mulr_algl rmorphM alg_num_field fmorph_rat. Qed.
 Lemma fmorph_numZ (Qz1 Qz2 : fieldExtType rat) (f : {rmorphism Qz1 -> Qz2}) :
   scalable f.
 Proof. by move=> a x; rewrite rmorphZ_num -alg_num_field mulr_algl. Qed.
-Definition NumLRmorphism Qz1 Qz2 f := AddLRMorphism (@fmorph_numZ Qz1 Qz2 f).
 
 End MoreAlgCaut.
 
@@ -222,10 +222,17 @@ Proof.
 move=> Qn_nu; pose nu0 x := sval (sig_eqW (Qn_nu x)).
 have QnC_nu0: {morph QnC : x / nu0 x >-> nu x}.
   by rewrite /nu0 => x; case: (sig_eqW _).
-suffices nu0M: rmorphism nu0 by exists (NumLRmorphism (RMorphism nu0M)).
-do 2?split=> [x y|]; apply: (fmorph_inj QnC); rewrite ?QnC_nu0 ?rmorph1 //.
-  by rewrite ?(rmorphB, QnC_nu0).
-by rewrite ?(rmorphM, QnC_nu0).
+have nu0a : additive nu0.
+  by move=> x y; apply: (fmorph_inj QnC); rewrite !(QnC_nu0, rmorphB).
+have nu0m : multiplicative nu0.
+  split=> [x y|]; apply: (fmorph_inj QnC); rewrite ?QnC_nu0 ?rmorph1 //.
+  by rewrite ?(rmorphM, QnC_nu0).
+pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
+pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
+pose nu0RM := GRing.RMorphism.Pack (GRing.RMorphism.Class nu0aM nu0mM).
+pose nu0lM := GRing.isLinear.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
+pose nu0LRM := GRing.LRMorphism.Pack (GRing.LRMorphism.Class nu0aM nu0mM nu0lM).
+by exists nu0LRM.
 Qed.
 
 Lemma map_Qnum_poly (nu : {rmorphism algC -> algC}) p :
@@ -386,9 +393,19 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
       by have:= congr1 size Ds; rewrite !size_map size_tuple => <-.
     pose in01 y := sval (in01P y).
     have Din01 y: Sinj mu0 y = QrC (in01 y) by rewrite /in01; case: (in01P y).
-    suffices in01M: lrmorphism in01 by exists (LRMorphism in01M).
     pose rwM := (=^~ Din01, SinjZ, rmorph1, rmorphB, rmorphM).
-    by do 3?split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
+    have in01a : additive in01.
+      by move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
+    have in01m : multiplicative in01.
+      by split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
+    have in01l : scalable in01.
+      by try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
+    pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
+    pose in01mM := GRing.isMultiplicative.Build _ _ in01 in01m.
+    pose in01lM := GRing.isLinear.Build _ _  _ _ in01 in01l.
+    pose in01LR :=
+      GRing.LRMorphism.Pack (GRing.LRMorphism.Class in01aM in01mM in01lM).
+    by exists in01LR.
   have {z zz Dz px} Dx: exists xx, x = QrC xx.
     exists (map_poly (in_alg Qr) px).[zz].
     by rewrite -horner_map Dz Sinj_poly Dx.
@@ -410,7 +427,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   have hom_f: kHom 1 (ASpace algK) f.
     apply/kHomP; split=> [_ _ /memK[y1 ->] /memK[y2 ->] |_ /vlineP[a ->]].
       by rewrite -rmorphM !Df !rmorphM.
-    by rewrite -(rmorph1 in01) -linearZ /= Df {1}linearZ /= rmorph1.
+    by rewrite -(rmorph1 in01) -linearZ /= Df /= {1}linearZ /= rmorph1.
   pose pr := map_poly (in_alg Qr) p.
   have Qpr: pr \is a polyOver 1%VS.
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.
@@ -420,15 +437,25 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod; apply: eq_bigr => zz _.
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
-  pose nu := LRMorphism (kHom_lrmorphism aut_f1).
+  have f1a : additive f1 by move=> u v; exact: raddfB.
+  have f1m : multiplicative f1 by exact: (kHom_lrmorphism aut_f1).
+  have f1l : scalable f1 by move=> a u; exact: linearZ.
+  pose f1aM := GRing.isAdditive.Build _ _ f1 f1a.
+  pose f1mM := GRing.isMultiplicative.Build _ _ f1 f1m.
+  pose f1lM := GRing.isLinear.Build _ _ _ _ f1 f1l.
+  pose nu := GRing.LRMorphism.Pack (GRing.LRMorphism.Class f1aM f1mM f1lM).
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
   move=> a y; do 2!rewrite -mulr_algl -in_algE.
   by rewrite -[a]divq_num_den !(fmorph_div, rmorphM, rmorph_int).
+pose phiaM := GRing.isAdditive.Build _ _ phi (raddfB phi).
+pose phimM := GRing.isMultiplicative.Build _ _ phi (rmorphM phi, rmorph1 phi).
+pose philM := GRing.isLinear.Build _ _ _ _ phi phiZ.
+pose phiLR := GRing.LRMorphism.Pack (GRing.LRMorphism.Class phiaM phimM philM).
 pose fix ext n :=
   if n is i.+1 then oapp (fun x => s2val (ext1 (ext i) x)) (ext i) (unpickle i)
-  else SubAut Qs QsC (AddLRMorphism phiZ).
+  else SubAut Qs QsC phiLR.
 have mem_ext x n: (pickle x < n)%N -> {xx | Sinj (ext n) xx = x}.
   move=> ltxn; apply: sig_eqW; elim: n ltxn => // n IHn.
   rewrite ltnS leq_eqVlt => /predU1P[<- | /IHn[xx <-]] /=.
@@ -447,22 +474,25 @@ have nu_inj n y: nu (Sinj (ext n) y) = Sinj (ext n) (Saut (ext n) y).
   case: (unpickle _) => [z|] /=; last exact.
   case: (ext1 _ _) => mu /= _ [in_mu Dinj Daut].
   by rewrite Dy => /(_ _ (Dinj _))->; rewrite -Daut Dinj.
-suffices nuM: rmorphism nu.
-  by exists (RMorphism nuM) => x; rewrite /= (nu_inj 0%N).
 pose le_nu (x : algC) n := (pickle x < n)%N.
 have max3 x1 x2 x3: exists n, [/\ le_nu x1 n, le_nu x2 n & le_nu x3 n].
   exists (maxn (pickle x1) (maxn (pickle x2) (pickle x3))).+1.
   by apply/and3P; rewrite /le_nu !ltnS -!geq_max.
-do 2?split; try move=> x1 x2.
-- have [n] := max3 (x1 - x2) x1 x2.
+have nua : additive nu.
+  move=> x1 x2; have [n] := max3 (x1 - x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphB in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphB -!nu_inj Dx1 Dx2.
-- have [n] := max3 (x1 * x2) x1 x2.
+have num : multiplicative nu.
+  split=> [x1 x2|]; last by rewrite -(rmorph1 QsC) (nu_inj 0%N) !rmorph1.
+  have [n] := max3 (x1 * x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphM in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphM -!nu_inj Dx1 Dx2.
-by rewrite -(rmorph1 QsC) (nu_inj 0%N) !rmorph1.
+pose nuaM := GRing.isAdditive.Build _ _ nu nua.
+pose numM := GRing.isMultiplicative.Build _ _ nu num.
+pose nuM := GRing.RMorphism.Pack (GRing.RMorphism.Class nuaM numM).
+by exists nuM => x; rewrite /= (nu_inj 0%N).
 Qed.
 
 (* Extended automorphisms of Q_n. *)
@@ -495,9 +525,12 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
   rewrite (minCpoly_cyclotomic prim_z) /cyclotomic.
   rewrite (bigD1 (Ordinal (ltn_pmod k n_gt0))) ?coprime_modl //=.
   by rewrite rootM root_XsubC prim_expr_mod ?eqxx.
-have phiM: lrmorphism phi.
+pose phiaM := GRing.isAdditive.Build _ _ phi (raddfB phi).
+have phim : multiplicative phi.
   by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
-have [nu Dnu] := extend_algC_subfield_aut QnC (RMorphism phiM).
+pose phimM := GRing.isMultiplicative.Build _ _ phi phim.
+pose phiM := GRing.RMorphism.Pack (GRing.RMorphism.Class phiaM phimM).
+have [nu Dnu] := extend_algC_subfield_aut QnC phiM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
 rewrite rmorphX exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
 rewrite (kHomExtend_poly homQn1) ?polyOverX //.

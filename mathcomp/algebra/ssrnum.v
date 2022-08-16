@@ -3887,13 +3887,15 @@ Hint Resolve Creal_Re Creal_Im : core.
 
 Fact Re_is_additive : additive Re.
 Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
-Canonical Re_additive := Additive Re_is_additive.
+#[export]
+HB.instance Definition _ := GRing.isAdditive.Build C C Re Re_is_additive.
 
 Fact Im_is_additive : additive Im.
 Proof.
 by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.
-Canonical Im_additive := Additive Im_is_additive.
+#[export]
+HB.instance Definition _ := GRing.isAdditive.Build C C Im Im_is_additive.
 
 Lemma Creal_ImP z : reflect ('Im z = 0) (z \is real).
 Proof.
