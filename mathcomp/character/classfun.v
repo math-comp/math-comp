@@ -342,10 +342,14 @@ Proof.
 by split=> [phi psi|]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
 Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build classfun classfun cfAut
-  cfAut_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build classfun classfun cfAut
-  cfAut_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build
+    [the zmodType of classfun] [the zmodType of classfun] cfAut
+    cfAut_is_additive.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build
+    [the ringType of classfun] [the ringType of classfun] cfAut
+    cfAut_is_multiplicative.
 
 Lemma cfAut_cfun1 : cfAut 1 = 1. Proof. exact: rmorph1. Qed.
 
@@ -353,7 +357,9 @@ Lemma cfAut_scalable : scalable_for (u \; *:%R) cfAut.
 Proof. by move=> a phi; apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
 
 HB.instance Definition _ :=
-  GRing.isLinear.Build algC classfun classfun (u \; *:%R) cfAut cfAut_scalable.
+  GRing.isLinear.Build [the ringType of algC]
+    [the lmodType _ of classfun] [the zmodType of classfun] (u \; *:%R) cfAut
+    cfAut_scalable.
 
 Definition cfAut_closed (S : seq classfun) :=
   {in S, forall phi, cfAut phi \in S}.
@@ -846,7 +852,8 @@ by rewrite !cfunE mulrDl -mulrA.
 Qed.
 
 HB.instance Definition _ xi :=
-  GRing.linear_isLinear.Build algC _ _ _ (cfdotr xi) (cfdotr_is_linear xi).
+  GRing.linear_isLinear.Build [the ringType of algC] _ _ _ (cfdotr xi)
+    (cfdotr_is_linear xi).
 
 Lemma cfdot0l xi : '[0, xi] = 0.
 Proof. by rewrite -cfdotrE linear0. Qed.
@@ -1391,8 +1398,9 @@ Lemma cfRes_is_linear : linear cfRes.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr mulrnDl.
 Qed.
-HB.instance Definition _ := GRing.linear_isLinear.Build algC _ _ _ cfRes
-  cfRes_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build [the ringType of algC] _ _ _ cfRes
+    cfRes_is_linear.
 
 Lemma cfRes_cfun1 : cfRes 1 = 1.
 Proof.
@@ -1500,8 +1508,9 @@ Fact cfMorph_is_linear : linear cfMorph.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr -mulrnDl.
 Qed.
-HB.instance Definition _ := GRing.linear_isLinear.Build algC _ _ _ cfMorph
-  cfMorph_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build [the ringType of algC] _ _ _ cfMorph
+    cfMorph_is_linear.
 
 Fact cfMorph_is_multiplicative : multiplicative cfMorph.
 Proof.
@@ -2234,8 +2243,9 @@ move=> c phi psi; apply/cfunP=> x; rewrite !cfunElock; case: ifP => _.
 rewrite mulrnAr -mulrnDl !(mulrCA c) -!mulrDr [c * _]mulr_sumr -big_split /=.
 by congr (_ * (_ * _) *+ _); apply: eq_bigr => y; rewrite !cfunE mulrA mulrDl.
 Qed.
-HB.instance Definition _ := GRing.linear_isLinear.Build algC _ _ _ cfInd
-  cfInd_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build [the ringType of algC] _ _ _ cfInd
+    cfInd_is_linear.
 
 End Def.
 

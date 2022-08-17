@@ -230,7 +230,8 @@ have nu0m : multiplicative nu0.
 pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
 pose nu0RM := GRing.RMorphism.Pack (GRing.RMorphism.Class nu0aM nu0mM).
-pose nu0lM := GRing.isLinear.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
+pose nu0lM :=
+  GRing.isLinear.Build [ringType of rat] Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
 pose nu0LRM := GRing.LRMorphism.Pack (GRing.LRMorphism.Class nu0aM nu0mM nu0lM).
 by exists nu0LRM.
 Qed.
@@ -525,7 +526,7 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
   rewrite (minCpoly_cyclotomic prim_z) /cyclotomic.
   rewrite (bigD1 (Ordinal (ltn_pmod k n_gt0))) ?coprime_modl //=.
   by rewrite rootM root_XsubC prim_expr_mod ?eqxx.
-pose phiaM := GRing.isAdditive.Build _ _ phi (raddfB phi).
+pose phiaM := GRing.isAdditive.Build _ _ phi (raddfB [additive of phi]).
 have phim : multiplicative phi.
   by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
 pose phimM := GRing.isMultiplicative.Build _ _ phi phim.

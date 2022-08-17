@@ -151,7 +151,9 @@ Qed.
 Lemma poly_rV_is_linear : linear poly_rV.
 Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
 HB.instance Definition _ :=
-  GRing.linear_isLinear.Build R {poly R} 'rV_d _ poly_rV poly_rV_is_linear.
+  GRing.linear_isLinear.Build R
+    [lmodType R of {poly R}] [zmodType of 'rV_d] _ poly_rV
+    poly_rV_is_linear.
 
 Lemma rVpoly_is_linear : linear rVpoly.
 Proof.
@@ -159,7 +161,9 @@ move=> a u v; apply/polyP=> k; rewrite coefD coefZ !coef_rVpoly.
 by case: insubP => [i _ _ | _]; rewrite ?mxE // mulr0 addr0.
 Qed.
 HB.instance Definition _ :=
-  GRing.linear_isLinear.Build R 'rV_d {poly R} _ rVpoly rVpoly_is_linear.
+  GRing.linear_isLinear.Build R
+    [the lmodType R of 'rV_d] [the zmodType of {poly R}] _ rVpoly
+    rVpoly_is_linear.
 
 End RowPoly.
 
@@ -336,8 +340,8 @@ move=> a p /=; rewrite -mul_polyC rmorphM /=.
 by rewrite horner_mx_C [_ * _]mul_scalar_mx.
 Qed.
 
-HB.instance Definition _ :=
-  GRing.isLinear.Build R {poly R} 'M_n'.+1 *:%R horner_mx horner_mxZ.
+HB.instance Definition _ := GRing.isLinear.Build R _ _ *:%R horner_mx
+  horner_mxZ.
 
 Definition powers_mx d := \matrix_(i < d) mxvec (A ^+ i).
 
@@ -497,8 +501,11 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-pose aM := GRing.isAdditive.Build M_RX {poly 'M_n} phi phi_is_additive.
-pose mM := GRing.isMultiplicative.Build M_RX {poly 'M_n} phi
+  pose aM :=
+    GRing.isAdditive.Build
+      [zmodType of M_RX] [zmodType of {poly 'M_n}] phi phi_is_additive.
+  pose mM := GRing.isMultiplicative.Build
+               [ringType of M_RX] [ringType of {poly 'M_n}] phi
   phi_is_multiplicative.
 (* FIXME: use HB.pack *)
 exists (GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM)).
@@ -1969,3 +1976,4 @@ by rewrite stablemx_comp// stablemx_unit ?unitmx_inv.
 Qed.
 
 End Diag.
+

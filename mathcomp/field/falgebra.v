@@ -244,8 +244,9 @@ move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= scale_lfunE !lfunE /= mulrDl scalerAl.
 Qed.
 #[hnf]
-HB.instance Definition _ := GRing.linear_isLinear.Build K aT (hom aT aT) _ amull
-  amull_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build K aT [the zmodType of (hom aT aT)] _ amull
+    amull_is_linear.
 
 (* amull is a converse ring morphism *)
 Lemma amull1 : amull 1 = \1%VF.
@@ -267,11 +268,13 @@ by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
 
 #[hnf]
-HB.instance Definition _ := GRing.linear_isLinear.Build K aT (hom aT aT) _ amulr
-  amulr_is_linear.
+HB.instance Definition _ :=
+  GRing.linear_isLinear.Build K aT [the zmodType of (hom aT aT)] _ amulr
+    amulr_is_linear.
 #[hnf]
-HB.instance Definition _ := GRing.isMultiplicative.Build aT (hom aT aT) amulr
-  amulr_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build aT [the ringType of (hom aT aT)] amulr
+    amulr_is_multiplicative.
 
 Lemma lker0_amull u : u \is a GRing.unit -> lker (amull u) == 0%VS.
 Proof. by move=> Uu; apply/lker0P=> v w; rewrite !lfunE; apply: mulrI. Qed.

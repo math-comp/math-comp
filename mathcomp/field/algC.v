@@ -372,8 +372,9 @@ HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_additive : additive CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
-HB.instance Definition _ := GRing.isAdditive.Build type L' CtoL
-  CtoL_is_additive.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build [the zmodType of type] [the zmodType of L'] CtoL
+    CtoL_is_additive.
 
 Definition one := LtoC (integral1 _).
 Definition mul u v := LtoC (integral_mul (CtoL_P u) (CtoL_P v)).
@@ -399,8 +400,9 @@ HB.instance Definition _ :=
 
 Fact CtoL_is_multiplicative : multiplicative CtoL.
 Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build type L' CtoL
-  CtoL_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build [the ringType of type] [the ringType of L'] CtoL
+    CtoL_is_multiplicative.
 
 Fact mulVf u :  u != 0 -> inv u * u = 1.
 Proof.
@@ -1229,11 +1231,13 @@ Fact algC_invaut_is_rmorphism nu : multiplicative (algC_invaut nu).
 Proof. exact: can2_rmorphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
-  GRing.isAdditive.Build algC algC (algC_invaut nu)
+  GRing.isAdditive.Build
+    [the zmodType of algC] [the zmodType of algC] (algC_invaut nu)
     (algC_invaut_is_additive nu).
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
-  GRing.isMultiplicative.Build algC algC (algC_invaut nu)
+  GRing.isMultiplicative.Build
+    [the ringType of algC] [the ringType of algC] (algC_invaut nu)
     (algC_invaut_is_rmorphism nu).
 
 Lemma minCpoly_aut nu x : minCpoly (nu x) = minCpoly x.

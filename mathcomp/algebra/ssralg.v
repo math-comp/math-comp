@@ -5870,13 +5870,13 @@ HB.instance Definition _ := isZmodule.Build (M1 * M2)%type
 
 Fact fst_is_additive : additive fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isAdditive.Build (M1 * M2)%type M1 fst
-  fst_is_additive.
+HB.instance Definition _ :=
+  isAdditive.Build [the zmodType of (M1 * M2)%type] M1 fst fst_is_additive.
 
 Fact snd_is_additive : additive snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isAdditive.Build (M1 * M2)%type M2 snd
-  snd_is_additive.
+HB.instance Definition _ :=
+  isAdditive.Build [the zmodType of (M1 * M2)%type] M2 snd snd_is_additive.
 
 End PairZmod.
 
@@ -5910,12 +5910,14 @@ HB.instance Definition _ := Zmodule_isRing.Build (R1 * R2)%type
 
 Fact fst_is_multiplicative : multiplicative fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R1 fst
-  fst_is_multiplicative.
+HB.instance Definition _ :=
+  isMultiplicative.Build [the ringType of (R1 * R2)%type] R1 fst
+    fst_is_multiplicative.
 Fact snd_is_multiplicative : multiplicative snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R2 snd
-  snd_is_multiplicative.
+HB.instance Definition _ :=
+  isMultiplicative.Build [the ringType of (R1 * R2)%type] R2 snd
+    snd_is_multiplicative.
 
 End PairRing.
 
@@ -5956,12 +5958,14 @@ HB.instance Definition _ := Zmodule_isLmodule.Build R (V1 * V2)%type
 
 Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isLinear.Build R (V1 * V2)%type V1 *:%R fst
-  fst_is_scalable.
+HB.instance Definition _ :=
+  isLinear.Build R [the lmodType R of (V1 * V2)%type] V1 *:%R fst
+    fst_is_scalable.
 Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isLinear.Build R (V1 * V2)%type V2 *:%R snd
-  snd_is_scalable.
+HB.instance Definition _ :=
+  isLinear.Build R [the lmodType R of (V1 * V2)%type] V2 *:%R snd
+    snd_is_scalable.
 
 End PairLmod.
 

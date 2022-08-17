@@ -920,10 +920,11 @@ apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
 by rewrite -!mulrA mulrA mulrCA -!mulrA (mulrCA y).
 Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build rat F (@ratr F)
+HB.instance Definition _ := GRing.isAdditive.Build [zmodType of rat] F (@ratr F)
   ratr_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build rat F (@ratr F)
-  ratr_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build [ringType of rat] F (@ratr F)
+    ratr_is_multiplicative.
 
 Lemma ler_rat : {mono (@ratr F) : x y / x <= y}.
 Proof.

@@ -79,7 +79,8 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 Lemma swapXY_is_additive : additive swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
+  GRing.isAdditive.Build
+    [the zmodType of {poly {poly R}}] [the zmodType of {poly {poly R}}] swapXY
     swapXY_is_additive.
 
 Lemma coef_swapXY u i j : (swapXY u)`_i`_j = u`_j`_i.
@@ -108,13 +109,15 @@ apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly {poly R}} {poly {poly R}} swapXY
+  GRing.isMultiplicative.Build
+    [the ringType of {poly {poly R}}] [the ringType of {poly {poly R}}] swapXY
     swapXY_is_multiplicative.
 
 Lemma swapXY_is_scalable : scalable_for (map_poly polyC \; *%R) swapXY.
 Proof. by move=> p u /=; rewrite -mul_polyC rmorphM /= swapXY_polyC. Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build {poly R} {poly {poly R}} {poly {poly R}}
+  GRing.isLinear.Build [the ringType of {poly R}]
+    [the lmodType _ of {poly {poly R}}] [the zmodType of {poly {poly R}}]
     (map_poly polyC \; *%R) swapXY swapXY_is_scalable.
 
 Lemma swapXY_comp_poly p u : swapXY (p^:P \Po u) = p^:P \Po swapXY u.

@@ -505,7 +505,8 @@ Definition xcfun (chi : 'CF(G)) A :=
 Lemma xcfun_is_additive phi : additive (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun linearB mulmxBl !mxE. Qed.
 HB.instance Definition _ phi :=
-  GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
+  GRing.isAdditive.Build
+    [the zmodType of 'M_(gcard G)] _ (xcfun phi) (xcfun_is_additive phi).
 
 Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
 Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.

@@ -642,8 +642,8 @@ Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
 Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
 
-HB.instance Definition _ (x : M) := GRing.isAdditive.Build int M ( *~%R x)
-  (@mulrzBr x).
+HB.instance Definition _ (x : M) :=
+  GRing.isAdditive.Build [zmodType of int] M ( *~%R x) (@mulrzBr x).
 
 End ZintLmod.
 
@@ -699,8 +699,9 @@ Proof. by rewrite mulrzA -mulrzr. Qed.
 
 Lemma intmul1_is_multiplicative : multiplicative ( *~%R (1 : R)).
 Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build int R ( *~%R 1)
-  intmul1_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build [ringType of int] R ( *~%R 1)
+    intmul1_is_multiplicative.
 
 Lemma mulr2z n : n *~ 2 = n + n. Proof. exact: mulr2n. Qed.
 

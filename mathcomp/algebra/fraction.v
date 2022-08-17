@@ -299,8 +299,9 @@ rewrite -[X in _ = _ + X]pi_opp -[RHS]pi_add.
 by rewrite /addf /oppf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build R {fraction R} tofrac
-  tofrac_is_additive.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build R [the zmodType of {fraction R}] tofrac
+    tofrac_is_additive.
 
 Lemma tofrac_is_multiplicative: multiplicative tofrac.
 Proof.
@@ -308,8 +309,9 @@ split=> [p q|//]; unlock tofrac; rewrite -[RHS]pi_mul.
 by rewrite /mulf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build R {fraction R} tofrac
-  tofrac_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build R [the ringType of {fraction R}] tofrac
+    tofrac_is_multiplicative.
 
 (* tests *)
 Lemma tofrac0 : 0%:F = 0. Proof. exact: rmorph0. Qed.

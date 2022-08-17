@@ -5176,12 +5176,14 @@ Proof. exact: mxval_genM. Qed.
 Lemma mxval_sub : additive mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
 #[export] HB.instance Definition _ :=
-  GRing.isAdditive.Build FA 'M[F]_n mxval mxval_sub.
+  GRing.isAdditive.Build [the zmodType of FA] [the zmodType of 'M[F]_n] mxval
+    mxval_sub.
 
 Lemma mxval_is_multiplicative : multiplicative mxval.
 Proof. by split; [apply: mxvalM | apply: mxval1]. Qed.
 #[export] HB.instance Definition _ :=
-  GRing.isMultiplicative.Build FA 'M[F]_n mxval mxval_is_multiplicative.
+  GRing.isMultiplicative.Build [the ringType of FA] [the ringType of 'M[F]_n]
+    mxval mxval_is_multiplicative.
 
 Lemma mxval_centg x : centgmx rG (mxval x).
 Proof.
@@ -5212,10 +5214,10 @@ Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
 Lemma gen_is_multiplicative : multiplicative gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
 
-#[export] HB.instance Definition _ := GRing.isAdditive.Build F FA gen
-  gen_is_additive.
-#[€xport] HB.instance Definition _ := GRing.isMultiplicative.Build F FA gen
-  gen_is_multiplicative.
+#[export] HB.instance Definition _ :=
+  GRing.isAdditive.Build F [the zmodType of FA] gen gen_is_additive.
+#[export] HB.instance Definition _ :=
+  GRing.isMultiplicative.Build F [the ringType of FA] gen gen_is_multiplicative.
 
 (* The generated field contains a root of the minimal polynomial (in some  *)
 (* cases we want to use the construction solely for that purpose).         *)

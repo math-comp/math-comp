@@ -410,8 +410,9 @@ Proof. exact: coef_opp_poly. Qed.
 Lemma coefB p q i : (p - q)`_i = p`_i - q`_i.
 Proof. by rewrite coefD coefN. Qed.
 
-HB.instance Definition _ i := GRing.isAdditive.Build {poly R} R (coefp i)
-  (fun p => (coefB p)^~ i).
+HB.instance Definition _ i :=
+  GRing.isAdditive.Build [the zmodType of {poly R}] R (coefp i)
+    (fun p => (coefB p)^~ i).
 
 Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
 Proof. exact: (raddfMn [additive of coefp i]). Qed.
@@ -432,7 +433,8 @@ Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
 Lemma polyCB : {morph polyC : a b / a - b}.
 Proof. by move=> a b; rewrite polyCD polyCN. Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build R {poly R} polyC polyCB.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build R [the zmodType of {poly R}] polyC polyCB.
 
 Lemma polyCMn n : {morph polyC : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
@@ -617,8 +619,9 @@ Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefCM !coefC ?simp. Qed.
 
 Fact polyC_multiplicative : multiplicative polyC.
 Proof. by split; first apply: polyCM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} polyC
-  polyC_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build R [the ringType of {poly R}] polyC
+    polyC_multiplicative.
 
 Lemma polyC_exp n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphX. Qed.
 
@@ -641,8 +644,9 @@ split=> [p q|]; last by rewrite polyCK.
 by rewrite [coefp 0 _]coefM big_ord_recl big_ord0 addr0.
 Qed.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build {poly R} R (coefp 0)
-  coefp0_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build [the ringType of {poly R}] R (coefp 0)
+    coefp0_multiplicative.
 
 (* Algebra structure of polynomials. *)
 Definition scale_poly_def a (p : {poly R}) := \poly_(i < size p) (a * p`_i).
@@ -692,8 +696,9 @@ Qed.
 Lemma size_scale_leq a p : size (a *: p) <= size p.
 Proof. by rewrite -[*:%R]/scale_poly unlock size_poly. Qed.
 
-HB.instance Definition _ i := GRing.isLinear.Build R {poly R} R *%R (coefp i)
-  (fun a => (coefZ a) ^~ i).
+HB.instance Definition _ i :=
+  GRing.isLinear.Build R [the lmodType R of {poly R}] R *%R (coefp i)
+    (fun a => (coefZ a) ^~ i).
 HB.instance Definition _ := GRing.Linear.on (coefp 0).
 
 (* The indeterminate, at last! *)
@@ -1451,7 +1456,9 @@ move=> k p q; apply/polyP=> i.
 by rewrite !(coef_deriv, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
 HB.instance Definition _ :=
-  GRing.linear_isLinear.Build R {poly R} {poly R} _ deriv deriv_is_linear.
+  GRing.linear_isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ deriv
+    deriv_is_linear.
 
 Lemma deriv0 : 0^`() = 0.
 Proof. exact: linear0. Qed.
@@ -1530,7 +1537,8 @@ Qed.
 Fact derivn_is_linear n : linear (derivn n).
 Proof. by elim: n => // n IHn a p q; rewrite derivnS IHn linearP. Qed.
 HB.instance Definition _ n :=
-  GRing.linear_isLinear.Build R {poly R} {poly R} _ (derivn n)
+  GRing.linear_isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (derivn n)
     (derivn_is_linear n).
 
 Lemma derivnC c n : c%:P^`(n) = if n == 0%N then c%:P else 0.
@@ -1631,7 +1639,8 @@ move=> k p q; apply/polyP=> i.
 by rewrite !(coef_nderivn, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
 HB.instance Definition _ n :=
-  GRing.linear_isLinear.Build R {poly R} {poly R} _ (nderivn n)
+  GRing.linear_isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (nderivn n)
     (nderivn_is_linear n).
 
 Lemma nderivnD n : {morph nderivn n : p q / p + q}.
@@ -1837,7 +1846,9 @@ Proof. exact: map_poly_comp_id0 (raddf0 f). Qed.
 Fact map_poly_is_additive : additive (map_poly f).
 Proof. by move=> p q; apply/polyP=> i; rewrite !(coef_map, coefB) raddfB. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly aR} {poly rR} (map_poly f) map_poly_is_additive.
+  GRing.isAdditive.Build
+    [the zmodType of {poly aR}] [the zmodType of {poly rR}] (map_poly f)
+    map_poly_is_additive.
 
 Lemma map_polyC a : (a%:P)^f = (f a)%:P.
 Proof. by apply/polyP=> i; rewrite !(coef_map, coefC) -!mulrb raddfMn. Qed.
@@ -1862,13 +1873,16 @@ by rewrite !coef_map rmorphM.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly aR} {poly rR} (map_poly f)
+  GRing.isMultiplicative.Build
+    [the ringType of {poly aR}] [the ringType of {poly rR}] (map_poly f)
     map_poly_is_multiplicative.
 
 Lemma map_polyZ c p : (c *: p)^f = f c *: p^f.
 Proof. by apply/polyP=> i; rewrite !(coef_map, coefZ) /= rmorphM. Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build aR {poly aR} {poly rR} (f \; *:%R) (map_poly f)
+  GRing.isLinear.Build aR
+    [the lmodType aR of {poly aR}] [the zmodType of {poly rR}]
+    (f \; *:%R) (map_poly f)
     map_polyZ.
 
 Lemma map_polyX : ('X)^f = 'X.
@@ -1929,11 +1943,12 @@ by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.linear_isLinear.Build aR {poly aR} rR _ (horner_morph cfu)
+  GRing.linear_isLinear.Build aR
+    [the lmodType aR of {poly aR}] rR _ (horner_morph cfu)
     horner_is_linear.
 
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly aR} rR (horner_morph cfu)
+  GRing.isMultiplicative.Build [the ringType of {poly aR}] rR (horner_morph cfu)
     horner_is_multiplicative.
 
 End HornerMorph.
@@ -2017,7 +2032,8 @@ move=> a q r.
 by rewrite /comp_poly rmorphD /= map_polyZ !hornerE_comm mul_polyC.
 Qed.
 HB.instance Definition _ p :=
-  GRing.linear_isLinear.Build R {poly R} {poly R} _ (comp_poly p)
+  GRing.linear_isLinear.Build R
+    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (comp_poly p)
     (comp_poly_is_linear p).
 
 Lemma comp_poly0 p : 0 \Po p = 0.
@@ -2409,11 +2425,11 @@ by split=> [p q|]; rewrite !evalE ?rmorph1// rmorphM.
 Qed.
 
 HB.instance Definition _ x :=
-  GRing.linear_isLinear.Build R {poly R} R _ (horner_eval x)
+  GRing.linear_isLinear.Build R [the lmodType R of {poly R}] R _ (horner_eval x)
     (horner_eval_is_linear x).
 
 HB.instance Definition _ x :=
-  GRing.isMultiplicative.Build {poly R} R (horner_eval x)
+  GRing.isMultiplicative.Build [the ringType of {poly R}] R (horner_eval x)
     (horner_eval_is_multiplicative x).
 
 Section HornerAlg.
