@@ -776,9 +776,9 @@ HB.instance Definition _ :=
 
 Section QintPred.
 
-Definition Qint := [qualify a x : rat | denq x == 1].
-Fact Qint_key : pred_key Qint. Proof. by []. Qed.
-Canonical Qint_keyed := KeyedQualifier Qint_key.
+Definition Qint_pred := fun x : rat => denq x == 1.
+Arguments Qint_pred _ /.
+Definition Qint := [qualify a x : rat | Qint_pred x].
 
 Lemma Qint_def x : (x \is a Qint) = (denq x == 1). Proof. by []. Qed.
 
@@ -798,21 +798,17 @@ split=> // _ _ /QintP[x ->] /QintP[y ->]; apply/QintP.
 by exists (x * y); rewrite -rmorphM.
 Qed.
 
-Canonical Qint_opprPred := OpprPred Qint_subring_closed.
-Canonical Qint_addrPred := AddrPred Qint_subring_closed.
-Canonical Qint_mulrPred := MulrPred Qint_subring_closed.
-Canonical Qint_zmodPred := ZmodPred Qint_subring_closed.
-Canonical Qint_semiringPred := SemiringPred Qint_subring_closed.
-Canonical Qint_smulrPred := SmulrPred Qint_subring_closed.
-Canonical Qint_subringPred := SubringPred Qint_subring_closed.
+HB.instance Definition _ :=
+  GRing.isSubringClosed.Build [ringType of rat] Qint_pred Qint_subring_closed.
 
 End QintPred.
+Arguments Qint_pred _ /.
 
 Section QnatPred.
 
-Definition Qnat := [qualify a x : rat | (x \is a Qint) && (0 <= x)].
-Fact Qnat_key : pred_key Qnat. Proof. by []. Qed.
-Canonical Qnat_keyed := KeyedQualifier Qnat_key.
+Definition Qnat_pred := fun x : rat => (x \is a Qint) && (0 <= x).
+Arguments Qnat_pred _ /.
+Definition Qnat := [qualify a x | Qnat_pred x].
 
 Lemma Qnat_def x : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
 Proof. by []. Qed.
@@ -831,11 +827,11 @@ do 2?split; move=> // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
 by rewrite rpredM // mulr_ge0.
 Qed.
 
-Canonical Qnat_addrPred := AddrPred Qnat_semiring_closed.
-Canonical Qnat_mulrPred := MulrPred Qnat_semiring_closed.
-Canonical Qnat_semiringPred := SemiringPred Qnat_semiring_closed.
+HB.instance Definition _ :=
+  GRing.isSemiringClosed.Build [ringType of rat] Qnat_pred Qnat_semiring_closed.
 
 End QnatPred.
+Arguments Qnat_pred _ /.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.
@@ -852,9 +848,7 @@ Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 Lemma ratr_nat n : ratr n%:R = n%:R.
 Proof. exact: (ratr_int n). Qed.
 
-Lemma rpred_rat (S : {pred R}) (ringS : divringPred S) (kS : keyed_pred ringS)
-                a :
-  ratr a \in kS.
+Lemma rpred_rat (S : divringClosed R) a : ratr a \in S.
 Proof. by rewrite rpred_div ?rpred_int. Qed.
 
 End InRing.

@@ -3936,11 +3936,10 @@ Section mxOverType.
 Context {m n : nat} {T : Type}.
 Implicit Types (S : {pred T}).
 
-Definition mxOver (S : {pred T}) :=
-  [qualify a M : 'M[T]_(m, n) | [forall i, [forall j, M i j \in S]]].
-
-Fact mxOver_key S : pred_key (mxOver S). Proof. by []. Qed.
-Canonical mxOver_keyed S := KeyedQualifier (mxOver_key S).
+Definition mxOver_pred (S : {pred T}) :=
+  fun M : 'M[T]_(m, n) => [forall i, [forall j, M i j \in S]].
+Arguments mxOver_pred _ _ /.
+Definition mxOver (S : {pred T}) := [qualify a M | mxOver_pred S M].
 
 Lemma mxOverP {S : {pred T}} {M : 'M[T]__} :
   reflect (forall i j, M i j \in S) (M \is a mxOver S).
@@ -3976,24 +3975,28 @@ Lemma mxOver0 S : 0 \in S -> 0 \is a @mxOver m n _ S.
 Proof. exact: mxOver_const. Qed.
 
 Section mxOverAdd.
-Variables (S : {pred M}) (addS : addrPred S) (kS : keyed_pred addS).
-Fact mxOver_add_subproof : addr_closed (@mxOver m n _ kS).
+Variable addS : addrClosed M.
+Fact mxOver_add_subproof : addr_closed (@mxOver m n _ addS).
 Proof.
 split=> [|p q Sp Sq]; first by rewrite mxOver0 // ?rpred0.
 by apply/mxOverP=> i j; rewrite mxE rpredD // !(mxOverP _).
 Qed.
-Canonical mxOver_addrPred := AddrPred mxOver_add_subproof.
+HB.instance Definition _ :=
+  GRing.isAddClosed.Build [zmodType of 'M[M]_(m, n)] (mxOver_pred addS)
+    mxOver_add_subproof.
 End mxOverAdd.
 
 Section mxOverOpp.
-Variables (S : {pred M}) (oppS : opprPred S) (kS : keyed_pred oppS).
-Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ kS).
+Variable oppS : opprClosed M.
+Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ oppS).
 Proof. by move=> A /mxOverP SA; apply/mxOverP=> i j; rewrite mxE rpredN. Qed.
-Canonical mxOver_opprPred := OpprPred mxOver_opp_subproof.
+HB.instance Definition _ :=
+  GRing.isOppClosed.Build [zmodType of 'M[M]_(m, n)] (mxOver_pred oppS)
+    mxOver_opp_subproof.
 End mxOverOpp.
 
-Canonical mxOver_zmodPred (S : {pred M}) (zmodS : zmodPred S)
-  (kS : keyed_pred zmodS) := ZmodPred (@mxOver_opp_subproof _ _ kS).
+HB.instance Definition _ (zmodS : zmodClosed M) :=
+  GRing.OppClosed.on (mxOver_pred zmodS).
 
 End mxOverZmodule.
 
@@ -4012,14 +4015,12 @@ apply/mxOverP/andP => [cij|[S0 cij] i j]; last by rewrite !mxE; case: eqP.
 by split; [have := cij 0 1|have := cij 0 0]; rewrite !mxE.
 Qed.
 
-Section mxOverScale.
-Variables (S : {pred R}) (mulS : mulrPred S) (kS : keyed_pred mulS).
-Lemma mxOverZ : {in kS & mxOver kS, forall a : R, forall v : 'M[R]_(m, n),
-        a *: v \is a mxOver kS}.
+Lemma mxOverZ (S : mulrClosed R) :
+  {in S & mxOver S, forall a : R, forall v : 'M[R]_(m, n),
+     a *: v \is a mxOver S}.
 Proof.
 by move=> a v aS /mxOverP vS; apply/mxOverP => i j; rewrite !mxE rpredM.
 Qed.
-End mxOverScale.
 
 Lemma mxOver_diag (S : {pred R}) k (D : 'rV[R]_k) :
    0 \in S -> D \is a mxOver S -> diag_mx D \is a mxOver S.
@@ -4038,33 +4039,28 @@ split; first by have /[!mxE] := DS 0 1.
 by apply/mxOverP => i j; have := DS j j; rewrite ord1 !mxE eqxx.
 Qed.
 
-Section mxOverMul.
-
-Variables (S : predPredType R) (ringS : semiringPred S) (kS : keyed_pred ringS).
-
-Lemma mxOverM p q r : {in mxOver kS & mxOver kS,
-  forall u : 'M[R]_(p, q), forall v : 'M[R]_(q, r), u *m v \is a mxOver kS}.
+Lemma mxOverM (S : semiringClosed R) p q r : {in mxOver S & mxOver S,
+  forall u : 'M[R]_(p, q), forall v : 'M[R]_(q, r), u *m v \is a mxOver S}.
 Proof.
 move=> M N /mxOverP MS /mxOverP NS; apply/mxOverP => i j.
 by rewrite !mxE rpred_sum // => k _; rewrite rpredM.
 Qed.
 
-End mxOverMul.
 End mxOverRing.
 
 Section mxRingOver.
 Context {R : ringType} {n : nat}.
 
 Section semiring.
-Variables (S : {pred R}) (ringS : semiringPred S) (kS : keyed_pred ringS).
-Fact mxOver_mul_subproof : mulr_closed (@mxOver n.+1 n.+1 _ kS).
+Variable S : semiringClosed R.
+Fact mxOver_mul_subproof : mulr_closed (@mxOver n.+1 n.+1 _ S).
 Proof. by split; rewrite ?mxOver_scalar ?rpred0 ?rpred1//; apply: mxOverM. Qed.
-Canonical mxOver_mulrPred := MulrPred mxOver_mul_subproof.
-Canonical mxOver_semiringPred := SemiringPred mxOver_mul_subproof.
+HB.instance Definition _ := GRing.isMulClosed.Build _ (mxOver_pred S)
+  mxOver_mul_subproof.
 End semiring.
 
-Canonical mxOver_subringPred (S : {pred R}) (ringS : subringPred S)
-   (kS : keyed_pred ringS):= SubringPred (mxOver_mul_subproof kS).
+HB.instance Definition _ (S : subringClosed R) :=
+  GRing.MulClosed.on (mxOver_pred S).
 
 End mxRingOver.
 End mxOver.

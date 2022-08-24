@@ -655,7 +655,7 @@ have{g K'g co_c_g} /size_poly1P[a nz_a Dc]: size c == 1%N.
   suffices c_dv_g: c %| g by rewrite -(eqp_size (dvdp_gcd_idl c_dv_g)).
   have: q %| g by rewrite minPoly_dvdp // rootE !hornerE subrr.
   by apply: dvdp_trans; rewrite Dq dvdp_mulIl.
-rewrite {q}Dq {c}Dc mulrBr -rmorphM -rmorphN -cons_poly_def qualifE.
+rewrite {q}Dq {c}Dc mulrBr -rmorphM -rmorphN -cons_poly_def qualifE /=.
 by rewrite polyseq_cons !polyseqC nz_a /= rpredN andbCA => /and3P[/fpredMl->].
 Qed.
 

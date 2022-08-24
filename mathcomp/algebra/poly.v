@@ -846,9 +846,9 @@ Lemma poly_def n E : \poly_(i < n) E i = \sum_(i < n) E i *: 'X^i.
 Proof. by apply/polyP => i; rewrite coef_sumMXn coef_poly big_ord1_eq. Qed.
 
 (* Monic predicate *)
-Definition monic := [qualify p | lead_coef p == 1].
-Fact monic_key : pred_key monic. Proof. by []. Qed.
-Canonical monic_keyed := KeyedQualifier monic_key.
+Definition monic_pred := fun p => lead_coef p == 1.
+Arguments monic_pred _ /.
+Definition monic := [qualify p | monic_pred p].
 
 Lemma monicE p : (p \is monic) = (lead_coef p == 1). Proof. by []. Qed.
 Lemma monicP p : reflect (lead_coef p = 1) (p \is monic).
@@ -895,7 +895,8 @@ Proof. by move=> mon_q; rewrite !monicE lead_coef_Mmonic. Qed.
 
 Fact monic_mulr_closed : mulr_closed monic.
 Proof. by split=> [|p q mon_p]; rewrite (monic1, monicMl). Qed.
-Canonical monic_mulrPred := MulrPred monic_mulr_closed.
+HB.instance Definition _ :=
+  GRing.isMulClosed.Build [ringType of {poly R}] monic_pred monic_mulr_closed.
 
 Lemma monic_exp p n : p \is monic -> p ^+ n \is monic.
 Proof. exact: rpredX. Qed.
@@ -1327,10 +1328,9 @@ Qed.
 
 Implicit Type S : {pred R}.
 
-Definition polyOver S := [qualify a p : {poly R} | all [in S] p].
-
-Fact polyOver_key S : pred_key (polyOver S). Proof. by []. Qed.
-Canonical polyOver_keyed S := KeyedQualifier (polyOver_key S).
+Definition polyOver_pred S := fun p : {poly R} => all (mem S) p.
+Arguments polyOver_pred _ _ /.
+Definition polyOver S := [qualify a p | polyOver_pred S p].
 
 Lemma polyOverS (S1 S2 : {pred R}) :
   {subset S1 <= S2} -> {subset polyOver S1 <= polyOver S2}.
@@ -1339,7 +1339,7 @@ by move=> sS12 p /(all_nthP 0)S1p; apply/(all_nthP 0)=> i /S1p; apply: sS12.
 Qed.
 
 Lemma polyOver0 S : 0 \is a polyOver S.
-Proof. by rewrite qualifE polyseq0. Qed.
+Proof. by rewrite qualifE /= polyseq0. Qed.
 
 Lemma polyOver_poly S n E :
   (forall i, i < n -> E i \in S) -> \poly_(i < n) E i \is a polyOver S.
@@ -1350,57 +1350,60 @@ Qed.
 
 Section PolyOverAdd.
 
-Variables (S : {pred R}) (addS : addrPred S) (kS : keyed_pred addS).
+Variable S : addrClosed R.
 
-Lemma polyOverP {p} : reflect (forall i, p`_i \in kS) (p \in polyOver kS).
+Lemma polyOverP {p} : reflect (forall i, p`_i \in S) (p \in polyOver S).
 Proof.
 apply: (iffP (all_nthP 0)) => [Sp i | Sp i _]; last exact: Sp.
 by have [/Sp // | /(nth_default 0)->] := ltnP i (size p); apply: rpred0.
 Qed.
 
-Lemma polyOverC c : (c%:P \in polyOver kS) = (c \in kS).
+Lemma polyOverC c : (c%:P \in polyOver S) = (c \in S).
 Proof.
-by rewrite qualifE polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
+by rewrite qualifE /= polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
 Qed.
 
-Fact polyOver_addr_closed : addr_closed (polyOver kS).
+Fact polyOver_addr_closed : addr_closed (polyOver S).
 Proof.
 split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
-Canonical polyOver_addrPred := AddrPred polyOver_addr_closed.
+HB.instance Definition _ :=
+  GRing.isAddClosed.Build [zmodType of {poly R}] (polyOver_pred S)
+    polyOver_addr_closed.
 
 End PolyOverAdd.
 
-Fact polyOverNr S (addS : zmodPred S) (kS : keyed_pred addS) :
-  oppr_closed (polyOver kS).
+Fact polyOverNr (zmodS : zmodClosed R) : oppr_closed (polyOver zmodS).
 Proof.
 by move=> p /polyOverP Sp; apply/polyOverP=> i; rewrite coefN rpredN.
 Qed.
-Canonical polyOver_opprPred S addS kS := OpprPred (@polyOverNr S addS kS).
-Canonical polyOver_zmodPred S addS kS := ZmodPred (@polyOverNr S addS kS).
+HB.instance Definition _ (zmodS : zmodClosed R) :=
+  GRing.isOppClosed.Build [zmodType of {poly R}] (polyOver_pred zmodS)
+    (@polyOverNr _).
 
 Section PolyOverSemiring.
 
-Variables (S : {pred R}) (ringS : semiringPred S) (kS : keyed_pred ringS).
+Variable S : semiringClosed R.
 
-Fact polyOver_mulr_closed : mulr_closed (polyOver kS).
+Fact polyOver_mulr_closed : mulr_closed (polyOver S).
 Proof.
 split=> [|p q /polyOverP Sp /polyOverP Sq]; first by rewrite polyOverC rpred1.
 by apply/polyOverP=> i; rewrite coefM rpred_sum // => j _; apply: rpredM.
 Qed.
-Canonical polyOver_mulrPred := MulrPred polyOver_mulr_closed.
-Canonical polyOver_semiringPred := SemiringPred polyOver_mulr_closed.
+HB.instance Definition _ :=
+  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred S)
+    polyOver_mulr_closed.
 
-Lemma polyOverZ : {in kS & polyOver kS, forall c p, c *: p \is a polyOver kS}.
+Lemma polyOverZ : {in S & polyOver S, forall c p, c *: p \is a polyOver S}.
 Proof.
 by move=> c p Sc /polyOverP Sp; apply/polyOverP=> i; rewrite coefZ rpredM ?Sp.
 Qed.
 
-Lemma polyOverX : 'X \in polyOver kS.
-Proof. by rewrite qualifE polyseqX /= rpred0 rpred1. Qed.
+Lemma polyOverX : 'X \in polyOver S.
+Proof. by rewrite qualifE /= polyseqX /= rpred0 rpred1. Qed.
 
-Lemma rpred_horner : {in polyOver kS & kS, forall p x, p.[x] \in kS}.
+Lemma rpred_horner : {in polyOver S & S, forall p x, p.[x] \in S}.
 Proof.
 move=> p x /polyOverP Sp Sx; rewrite horner_coef rpred_sum // => i _.
 by rewrite rpredM ?rpredX.
@@ -1410,11 +1413,13 @@ End PolyOverSemiring.
 
 Section PolyOverRing.
 
-Variables (S : {pred R}) (ringS : subringPred S) (kS : keyed_pred ringS).
-Canonical polyOver_smulrPred := SmulrPred (polyOver_mulr_closed kS).
-Canonical polyOver_subringPred := SubringPred (polyOver_mulr_closed kS).
+Variable S : subringClosed R.
 
-Lemma polyOverXsubC c : ('X - c%:P \in polyOver kS) = (c \in kS).
+HB.instance Definition _ :=
+  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred S)
+    (polyOver_mulr_closed S).
+
+Lemma polyOverXsubC c : ('X - c%:P \in polyOver S) = (c \in S).
 Proof. by rewrite rpredBl ?polyOverX ?polyOverC. Qed.
 
 End PolyOverRing.
@@ -1431,8 +1436,8 @@ rewrite coef_poly -subn1 ltn_subRL.
 by case: leqP => // /(nth_default 0) ->; rewrite mul0rn.
 Qed.
 
-Lemma polyOver_deriv S (ringS : semiringPred S) (kS : keyed_pred ringS) :
-  {in polyOver kS, forall p, p^`() \is a polyOver kS}.
+Lemma polyOver_deriv (ringS : semiringClosed R) :
+  {in polyOver ringS, forall p, p^`() \is a polyOver ringS}.
 Proof.
 by move=> p /polyOverP Kp; apply/polyOverP=> i; rewrite coef_deriv rpredMn ?Kp.
 Qed.
@@ -1527,8 +1532,8 @@ elim: n i => [|n IHn] i; first by rewrite ffactn0 mulr1n.
 by rewrite derivnS coef_deriv IHn -mulrnA ffactnSr addSnnS addKn.
 Qed.
 
-Lemma polyOver_derivn S (ringS : semiringPred S) (kS : keyed_pred ringS) :
-  {in polyOver kS, forall p n, p^`(n) \is a polyOver kS}.
+Lemma polyOver_derivn (ringS : semiringClosed R) :
+  {in polyOver ringS, forall p n, p^`(n) \is a polyOver ringS}.
 Proof.
 move=> p /polyOverP Kp /= n; apply/polyOverP=> i.
 by rewrite coef_derivn rpredMn.
@@ -1606,8 +1611,8 @@ Proof.
 by apply/polyP=> i; rewrite coefMn coef_nderivn coef_derivn -mulrnA bin_ffact.
 Qed.
 
-Lemma polyOver_nderivn S (ringS : semiringPred S) (kS : keyed_pred ringS) :
-  {in polyOver kS, forall p n, p^`N(n) \in polyOver kS}.
+Lemma polyOver_nderivn (ringS : semiringClosed R) :
+  {in polyOver ringS, forall p n, p^`N(n) \in polyOver ringS}.
 Proof.
 move=> p /polyOverP Sp /= n; apply/polyOverP=> i.
 by rewrite coef_nderivn rpredMn.
@@ -1723,12 +1728,14 @@ Notation "a ^` ()" := (deriv a) : ring_scope.
 Notation "a ^` ( n )" := (derivn n a) : ring_scope.
 Notation "a ^`N ( n )" := (nderivn n a) : ring_scope.
 
+Arguments monic_pred _ _ /.
 Arguments monicP {R p}.
 Arguments rootP {R p x}.
 Arguments rootPf {R p x}.
 Arguments rootPt {R p x}.
 Arguments unity_rootP {R n z}.
-Arguments polyOverP {R S0 addS kS p} : rename.
+Arguments polyOver_pred _ _ _ /.
+Arguments polyOverP {R S p}.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
 Arguments eq_poly {R n} [E1] E2 eq_E12.
 
@@ -2007,8 +2014,8 @@ Lemma coef_comp_poly p q n :
   (p \Po q)`_n = \sum_(i < size p) p`_i * (q ^+ i)`_n.
 Proof. by rewrite comp_polyE coef_sum; apply: eq_bigr => i; rewrite coefZ. Qed.
 
-Lemma polyOver_comp S (ringS : semiringPred S) (kS : keyed_pred ringS) :
-  {in polyOver kS &, forall p q, p \Po q \in polyOver kS}.
+Lemma polyOver_comp (ringS : semiringClosed R) :
+  {in polyOver ringS &, forall p q, p \Po q \in polyOver ringS}.
 Proof.
 move=> p q /polyOverP Sp Sq; rewrite comp_polyE rpred_sum // => i _.
 by rewrite polyOverZ ?rpredX.

@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
@@ -319,9 +320,6 @@ Proof. by rewrite modzMmr -abszEsign. Qed.
 
 (** Divisibility **)
 
-Fact dvdz_key d : pred_key (dvdz d). Proof. by []. Qed.
-Canonical dvdz_keyed d := KeyedPred (dvdz_key d).
-
 Lemma dvdzE d m : (d %| m)%Z = (`|d| %| `|m|)%N. Proof. by []. Qed.
 Lemma dvdz0 d : (d %| 0)%Z. Proof. exact: dvdn0. Qed.
 Lemma dvd0z n : (0 %| n)%Z = (n == 0). Proof. by rewrite -absz_eq0 -dvd0n. Qed.
@@ -436,10 +434,9 @@ Proof.
 split=> [|_ _ /dvdzP[p ->] /dvdzP[q ->]]; first exact: dvdz0.
 by rewrite -mulrBl dvdz_mull.
 Qed.
-Canonical dvdz_addPred d := AddrPred (dvdz_zmod_closed d).
-Canonical dvdz_oppPred d := OpprPred (dvdz_zmod_closed d).
-Canonical dvdz_zmodPred d := ZmodPred (dvdz_zmod_closed d).
-  
+HB.instance Definition _ d :=
+  GRing.isZmodClosed.Build [zmodType of int] (dvdz d) (dvdz_zmod_closed d).
+
 Lemma dvdz_exp k d m : (0 < k)%N -> (d %| m -> d %| m ^+ k)%Z.
 Proof. by case: k => // k _ d_dv_m; rewrite exprS dvdz_mulr. Qed.
 

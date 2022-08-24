@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
@@ -49,8 +50,6 @@ Variables (gT : finGroupType) (B : {set gT}) (S : seq 'CF(B)) (A : {set gT}).
 
 Definition Zchar : {pred 'CF(B)} :=
   [pred phi in 'CF(B, A) | dec_Cint_span (in_tuple S) phi].
-Fact Zchar_key : pred_key Zchar. Proof. by []. Qed.
-Canonical Zchar_keyed := KeyedPred Zchar_key.
 
 Lemma cfun0_zchar : 0 \in Zchar.
 Proof.
@@ -65,9 +64,8 @@ move=> phi xi /andP[Aphi /sumboolP[a Da]] /andP[Axi /sumboolP[b Db]].
 rewrite inE rpredB // Da Db -sumrB; apply/sumboolP; exists (a - b).
 by apply: eq_bigr => i _; rewrite -mulrzBr !ffunE.
 Qed.
-Canonical Zchar_opprPred := OpprPred Zchar_zmod.
-Canonical Zchar_addrPred := AddrPred Zchar_zmod.
-Canonical Zchar_zmodPred := ZmodPred Zchar_zmod.
+HB.instance Definition _ :=
+  GRing.isZmodClosed.Build [zmodType of classfun B] Zchar Zchar_zmod.
 
 Lemma scale_zchar a phi : a \in Cint -> phi \in Zchar -> a *: phi \in Zchar.
 Proof. by case/CintP=> m -> Zphi; rewrite scaler_int rpredMz. Qed.
@@ -271,10 +269,8 @@ split; first exact: cfun1_vchar.
 move=> _ _ /vcharP[xi1 Nxi1 [xi2 Nxi2 ->]] /vcharP[xi3 Nxi3 [xi4 Nxi4 ->]].
 by rewrite mulrBl !mulrBr !(rpredB, rpredD) // char_vchar ?rpredM.
 Qed.
-Canonical vchar_mulrPred := MulrPred vchar_mulr_closed.
-Canonical vchar_smulrPred := SmulrPred vchar_mulr_closed.
-Canonical vchar_semiringPred := SemiringPred vchar_mulr_closed.
-Canonical vchar_subringPred := SubringPred vchar_mulr_closed.
+HB.instance Definition _ :=
+  GRing.isMulClosed.Build [ringType of classfun G] 'Z[irr G] vchar_mulr_closed.
 
 Lemma mul_vchar A :
   {in 'Z[irr G, A] &, forall phi psi, phi * psi \in 'Z[irr G, A]}.
@@ -709,12 +705,10 @@ Section Norm1vchar.
 
 Variables (gT : finGroupType) (G : {group gT}).
 
-Fact dirr_key : pred_key (dirr G). Proof. by []. Qed.
-Canonical dirr_keyed := KeyedPred dirr_key.
-
 Fact dirr_oppr_closed : oppr_closed (dirr G).
 Proof. by move=> xi; rewrite !inE opprK orbC. Qed.
-Canonical dirr_opprPred := OpprPred dirr_oppr_closed.
+HB.instance Definition _ :=
+  GRing.isOppClosed.Build [zmodType of classfun G] (dirr G) dirr_oppr_closed.
 
 Lemma dirr_opp v : (- v \in dirr G) = (v \in dirr G). Proof. exact: rpredN. Qed.
 Lemma dirr_sign n v : ((-1)^+ n *: v \in dirr G) = (v \in dirr G).

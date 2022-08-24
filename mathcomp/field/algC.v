@@ -746,29 +746,19 @@ Proof. by move=> _ _ /CintP[m1 ->] /CintP[m2 ->]; rewrite -rmorphM !intCK. Qed.
 Lemma floorCX n : {in Cint, {morph floorC : x / x ^+ n}}.
 Proof. by move=> _ /CintP[m ->]; rewrite -rmorphX !intCK. Qed.
 
-Lemma rpred_Cint
-        (S : {pred algC}) (ringS : subringPred S) (kS : keyed_pred ringS) x :
-  x \in Cint -> x \in kS.
+Lemma rpred_Cint (S : subringClosed algC) x : x \in Cint -> x \in S.
 Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
 
 Lemma Cint0 : 0 \in Cint. Proof. exact: (Cint_int 0). Qed.
 Lemma Cint1 : 1 \in Cint. Proof. exact: (Cint_int 1). Qed.
 Hint Resolve Cint0 Cint1 : core.
 
-Fact Cint_key : pred_key Cint. Proof. by []. Qed.
 Fact Cint_subring : subring_closed Cint.
 Proof.
 by split=> // _ _ /CintP[m ->] /CintP[p ->];
     rewrite -(rmorphB, rmorphM) Cint_int.
 Qed.
-Canonical Cint_keyed := KeyedPred Cint_key.
-Canonical Cint_opprPred := OpprPred Cint_subring.
-Canonical Cint_addrPred := AddrPred Cint_subring.
-Canonical Cint_mulrPred := MulrPred Cint_subring.
-Canonical Cint_zmodPred := ZmodPred Cint_subring.
-Canonical Cint_semiringPred := SemiringPred Cint_subring.
-Canonical Cint_smulrPred := SmulrPred Cint_subring.
-Canonical Cint_subringPred := SubringPred Cint_subring.
+HB.instance Definition _ := GRing.isSubringClosed.Build _ Cint Cint_subring.
 
 Lemma Creal_Cint : {subset Cint <= Creal}.
 Proof. by move=> _ /CintP[m ->]; apply: realz. Qed.
@@ -837,9 +827,7 @@ Proof. by move=> _ _ /CnatP[n1 ->] /CnatP[n2 ->]; rewrite -natrM !natCK. Qed.
 Lemma truncCX n : {in Cnat, {morph truncC : x / x ^+ n >-> (x ^ n)%N}}.
 Proof. by move=> _ /CnatP[n1 ->]; rewrite -natrX !natCK. Qed.
 
-Lemma rpred_Cnat
-        (S : {pred algC}) (ringS : semiringPred S) (kS : keyed_pred ringS) x :
-  x \in Cnat -> x \in kS.
+Lemma rpred_Cnat (S : semiringClosed algC) x : x \in Cnat -> x \in S.
 Proof. by case/CnatP=> n ->; apply: rpred_nat. Qed.
 
 Lemma Cnat_nat n : n%:R \in Cnat. Proof. by apply/CnatP; exists n. Qed.
@@ -847,15 +835,11 @@ Lemma Cnat0 : 0 \in Cnat. Proof. exact: (Cnat_nat 0). Qed.
 Lemma Cnat1 : 1 \in Cnat. Proof. exact: (Cnat_nat 1). Qed.
 Hint Resolve Cnat_nat Cnat0 Cnat1 : core.
 
-Fact Cnat_key : pred_key Cnat. Proof. by []. Qed.
 Fact Cnat_semiring : semiring_closed Cnat.
 Proof.
 by do 2![split] => //= _ _ /CnatP[n ->] /CnatP[m ->]; rewrite -(natrD, natrM).
 Qed.
-Canonical Cnat_keyed := KeyedPred Cnat_key.
-Canonical Cnat_addrPred := AddrPred Cnat_semiring.
-Canonical Cnat_mulrPred := MulrPred Cnat_semiring.
-Canonical Cnat_semiringPred := SemiringPred Cnat_semiring.
+HB.instance Definition _ := GRing.isSemiringClosed.Build _ Cnat Cnat_semiring.
 
 Lemma Cnat_ge0 x : x \in Cnat -> 0 <= x.
 Proof. by case/CnatP=> n ->; apply: ler0n. Qed.
@@ -1001,16 +985,12 @@ Lemma dvdC_refl x : (x %| x)%C.
 Proof. by apply/dvdCP; exists 1; rewrite ?mul1r. Qed.
 Hint Resolve dvdC_refl : core.
 
-Fact dvdC_key x : pred_key (dvdC x). Proof. by []. Qed.
 Lemma dvdC_zmod x : zmod_closed (dvdC x).
 Proof.
 split=> [| _ _ /dvdCP[y Zy ->] /dvdCP[z Zz ->]]; first exact: dvdC0.
 by rewrite -mulrBl dvdC_mull ?rpredB.
 Qed.
-Canonical dvdC_keyed x := KeyedPred (dvdC_key x).
-Canonical dvdC_opprPred x := OpprPred (dvdC_zmod x).
-Canonical dvdC_addrPred x := AddrPred (dvdC_zmod x).
-Canonical dvdC_zmodPred x := ZmodPred (dvdC_zmod x).
+HB.instance Definition _ x := GRing.isZmodClosed.Build _ (dvdC x) (dvdC_zmod x).
 
 Lemma dvdC_nat (p n : nat) : (p %| n)%C = (p %| n)%N.
 Proof.
@@ -1122,28 +1102,16 @@ Lemma Crat0 : 0 \in Crat. Proof. by apply/CratP; exists 0; rewrite rmorph0. Qed.
 Lemma Crat1 : 1 \in Crat. Proof. by apply/CratP; exists 1; rewrite rmorph1. Qed.
 Hint Resolve Crat0 Crat1 : core.
 
-Fact Crat_key : pred_key Crat. Proof. by []. Qed.
 Fact Crat_divring_closed : divring_closed Crat.
 Proof.
 split=> // _ _ /CratP[x ->] /CratP[y ->].
   by rewrite -rmorphB Crat_rat.
 by rewrite -fmorph_div Crat_rat.
 Qed.
-Canonical Crat_keyed := KeyedPred Crat_key.
-Canonical Crat_opprPred := OpprPred Crat_divring_closed.
-Canonical Crat_addrPred := AddrPred Crat_divring_closed.
-Canonical Crat_mulrPred := MulrPred Crat_divring_closed.
-Canonical Crat_zmodPred := ZmodPred Crat_divring_closed.
-Canonical Crat_semiringPred := SemiringPred Crat_divring_closed.
-Canonical Crat_smulrPred := SmulrPred Crat_divring_closed.
-Canonical Crat_divrPred := DivrPred Crat_divring_closed.
-Canonical Crat_subringPred := SubringPred Crat_divring_closed.
-Canonical Crat_sdivrPred := SdivrPred Crat_divring_closed.
-Canonical Crat_divringPred := DivringPred Crat_divring_closed.
+HB.instance Definition _ := GRing.isDivringClosed.Build _ Crat
+  Crat_divring_closed.
 
-Lemma rpred_Crat
-        (S : {pred algC}) (ringS : divringPred S) (kS : keyed_pred ringS) :
-  {subset Crat <= kS}.
+Lemma rpred_Crat (S : divringClosed algC) : {subset Crat <= S}.
 Proof. by move=> _ /CratP[a ->]; apply: rpred_rat. Qed.
 
 Lemma conj_Crat z : z \in Crat -> z^* = z.
@@ -1264,12 +1232,10 @@ Section PredCmod.
 
 Variable V : lmodType algC.
 
-Lemma rpredZ_Cnat S (addS : @addrPred V S) (kS : keyed_pred addS) :
-  {in Cnat & kS, forall z u, z *: u \in kS}.
+Lemma rpredZ_Cnat (S : addrClosed V) : {in Cnat & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /CnatP[n ->]; apply: rpredZnat. Qed.
 
-Lemma rpredZ_Cint S (subS : @zmodPred V S) (kS : keyed_pred subS) :
-  {in Cint & kS, forall z u, z *: u \in kS}.
+Lemma rpredZ_Cint (S : zmodClosed V) : {in Cint & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /CintP[m ->]; apply: rpredZint. Qed.
 
 End PredCmod.
