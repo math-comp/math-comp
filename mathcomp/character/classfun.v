@@ -992,16 +992,17 @@ Qed.
 Lemma cfCauchySchwarz_sqrt phi psi :
   `|'[phi, psi]| <= sqrtC '[phi] * sqrtC '[psi] ?= iff ~~ free (phi :: psi).
 Proof.
-rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE ?cfnorm_ge0 //.
-rewrite (mono_in_leif (@ler_sqrtC _)) 1?rpredM ?qualifE ?cfnorm_ge0 //.
-exact: cfCauchySchwarz.
+rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE/= ?cfnorm_ge0 //.
+rewrite (mono_in_leif (@ler_sqrtC _)) 1?rpredM ?qualifE/= ?cfnorm_ge0 //;
+  [ exact: cfCauchySchwarz | exact: O.. ].
 Qed.
 
 Lemma cf_triangle_leif phi psi :
   sqrtC '[phi + psi] <= sqrtC '[phi] + sqrtC '[psi]
            ?= iff ~~ free (phi :: psi) && (0 <= coord [tuple psi] 0 phi).
 Proof.
-rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE ?sqrtC_ge0 ?cfnorm_ge0 //.
+rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE/= ?sqrtC_ge0 ?cfnorm_ge0 //;
+  [| exact: O.. ].
 rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (ler_add2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
 rewrite (mono_leif (ler_pmul2r _)) ?ltr0n //.

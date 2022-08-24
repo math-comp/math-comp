@@ -1788,17 +1788,15 @@ End PolyZintRing.
 
 Section ZnatPred.
 
-Definition Znat := [qualify a n : int | 0 <= n].
-Fact Znat_key : pred_key Znat. by []. Qed.
-Canonical Znat_keyd := KeyedQualifier Znat_key.
+Definition Znat_pred := fun n : int => 0 <= n.
+Definition Znat := [qualify a n : int | Znat_pred n].
 
 Lemma Znat_def n : (n \is a Znat) = (0 <= n). Proof. by []. Qed.
 
 Lemma Znat_semiring_closed : semiring_closed Znat.
 Proof. by do 2?split => //; [apply: addr_ge0 | apply: mulr_ge0]. Qed.
-Canonical Znat_addrPred := AddrPred Znat_semiring_closed.
-Canonical Znat_mulrPred := MulrPred Znat_semiring_closed.
-Canonical Znat_semiringPred := SemiringPred Znat_semiring_closed.
+HB.instance Definition _ :=
+  GRing.isSemiringClosed.Build [ringType of int] Znat_pred Znat_semiring_closed.
 
 Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a Znat).
 Proof. by apply: (iffP idP) => [|[n -> //]]; case: m => // n; exists n. Qed.
@@ -1807,25 +1805,26 @@ End ZnatPred.
 
 Section rpred.
 
-Lemma rpredMz M S (addS : @zmodPred M S) (kS : keyed_pred addS) m :
-  {in kS, forall u, u *~ m \in kS}.
+Lemma rpredMz M (addS : zmodClosed M) m :
+  {in (addS : pred _), forall u, u *~ m \in (addS : pred _)}.
 Proof. by case: m => n u Su; rewrite ?rpredN ?rpredMn. Qed.
 
-Lemma rpred_int R S (ringS : @subringPred R S) (kS : keyed_pred ringS) m :
-  m%:~R \in kS.
+Lemma rpred_int R (ringS : subringClosed R) m :
+  m%:~R \in (ringS : pred _).
 Proof. by rewrite rpredMz ?rpred1. Qed.
 
-Lemma rpredZint (R : ringType) (M : lmodType R) S
-                 (addS : @zmodPred M S) (kS : keyed_pred addS) m :
-  {in kS, forall u, m%:~R *: u \in kS}.
+Lemma rpredZint (R : ringType) (M : lmodType R) (addS : zmodClosed M) m :
+  {in (addS : pred _), forall u, m%:~R *: u \in (addS : pred _)}.
 Proof. by move=> u Su; rewrite /= scaler_int rpredMz. Qed.
 
-Lemma rpredXz R S (divS : @divrPred R S) (kS : keyed_pred divS) m :
-  {in kS, forall x, x ^ m \in kS}.
+Lemma rpredXz R (divS : divClosed R) m :
+  {in (divS : pred _), forall x, x ^ m \in (divS : pred _)}.
 Proof. by case: m => n x Sx; rewrite ?rpredV rpredX. Qed.
 
-Lemma rpredXsign R S (divS : @divrPred R S) (kS : keyed_pred divS) n x :
-  (x ^ ((-1) ^+ n) \in kS) = (x \in kS).
+Lemma rpredXsign R (divS : divClosed R) n x :
+  (x ^ ((-1) ^+ n) \in (divS : pred _)) = (x \in (divS : pred _)).
 Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
+
+Arguments Znat_pred _ /.

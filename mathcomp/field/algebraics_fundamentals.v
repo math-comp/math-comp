@@ -255,7 +255,6 @@ by rewrite Dp map_monic; exists p; rewrite // -Dp root_minPoly.
 Qed.
 Prenex Implicits alg_integral.
 
-Import DefaultKeying GRing.DefaultPred.
 Arguments map_poly_inj {F R} f [p1 p2].
 
 Theorem Fundamental_Theorem_of_Algebraics :
@@ -321,10 +320,13 @@ have ofQ_K z: cancel (ofQ z) (inQ z).
 have sQring z: divring_closed (sQ z).
   have sQ_1: 1 \in sQ z by rewrite -(rmorph1 (ofQ z)) sQof.
   by split=> // x y /inQ_K<- /inQ_K<- /=; rewrite -(rmorphB, fmorph_div) sQof.
-have sQopp z : oppr_closed (sQ z) := sQring z.
-have sQadd z : addr_closed (sQ z) := sQring z.
-have sQmul z : mulr_closed (sQ z) := sQring z.
-have sQinv z : invr_closed (sQ z) := sQring z.
+pose sQoM z := GRing.isOppClosed.Build _ _ (sQring z).
+pose sQaM z := GRing.isAddClosed.Build _ _ (sQring z).
+pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
+pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
+pose sQC z :=
+  GRing.DivringClosed.Pack
+    (GRing.DivringClosed.Class (sQaM z) (sQoM z) (sQmM z) (sQiM z)).
 pose morph_ofQ x z Qxz := forall u, ofQ z (Qxz u) = ofQ x u.
 have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   move=> z_x; pose Qxz u := inQ z (ofQ x u).
@@ -635,7 +637,8 @@ have memRi n: <<R_ n; i_ n>> =i predT by move=> u; rewrite defRi memvf.
 have sCle m n: (m <= n)%N -> {subset sQ (z_ m) <= sQ (z_ n)}.
   move/sRle=> Rmn _ /sQ_inQ[u <-].
   have /Fadjoin_polyP[p /polyOverP Rp ->] := memRi m u.
-  rewrite -horner_map inQ_K ?rpred_horner //=; apply/polyOver_poly=> j _.
+  rewrite -horner_map inQ_K ?(@rpred_horner _ (sQC _)) //=.
+  apply/polyOver_poly=> j _.
   by apply: sQtrans (Ri_R n); rewrite Rmn // -(inQ_K _ _ (Ri_R m)) sQof2.
 have R'i n: i \notin sQ (x_ n).
   rewrite /x_; case: (xR n) => x [Rn QxR] /=.
@@ -730,7 +733,8 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     rewrite map_monic monic_minPoly -Dz fmorph_root root_minPoly /=.
     have /polyOverP Cw_p: p \is a polyOver <<Cn; w>>%VS by apply: minPolyOver.
     apply/polyOver_poly=> j _; have /Fadjoin_polyP[q Cq {j}->] := Cw_p j.
-    rewrite -horner_map rpred_horner //; apply/polyOver_poly=> j _.
+    rewrite -horner_map (@rpred_horner _ (sQC _)) //.
+    apply/polyOver_poly=> j _.
     by rewrite (sCle n) // -memCn (polyOverP Cq).
   have [evenG | oddG] := boolP (2.-group G); last first.
     have [P /and3P[sPG evenP oddPG]] := Sylow_exists 2 'Gal(Rz / Rn).
@@ -759,7 +763,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
       apply/sig2W; have [y Ry] := p_Rm_0.
       rewrite [p]rmorphM /= map_comp_poly !rmorphN /= map_polyX.
       rewrite rootM rootN root_comp hornerN hornerX.
-      by case/orP; [exists y | exists (- y)]; rewrite ?rpredN.
+      by case/orP; [exists y | exists (- y)]; rewrite ?(rpredN (sQC _)).
     have [u Rz_u Dy]: exists2 u, u \in Rz & y = ofQ t u.
       have Rz_w: w \in Rz by rewrite -sub_adjoin1v defQw capvSl.
       have [sg [Gsg _ Dpw]] := galois_factors sRnRz galRz w Rz_w.
@@ -823,15 +827,17 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     by rewrite adjoin_degreeE dimCn big_ord_recl big_ord1 mulr1 mulrC.
   pose p := Poly [:: - (ofQ t v ^+ 2); 0; - ofQ t u; 0; 1].
   have [|m lenm [x Rx px0]] := xRroot n p (ofQ t v).
-    rewrite /has_Rroot 2!unfold_in lead_coefE horner_coef0 -memRn Rv.
-    rewrite (@PolyK _ 1) ?oner_eq0 //= !eqxx !rpred0 ?rpred1 ?rpredN //=.
-    by rewrite !andbT rpredX -memRn.
+    rewrite /has_Rroot 2!unfold_in/= lead_coefE horner_coef0 -memRn Rv.
+    rewrite (@PolyK _ 1) ?oner_eq0 //= !eqxx.
+    rewrite !(rpred0 (sQC _)) ?(rpred1 (sQC _)) ?(rpredN (sQC _)) //=.
+    by rewrite !andbT (@rpredX _ (sQC _)) -memRn.
   suffices [y Cy Dy2]: {y | y \in sQ (z_ m) & ofQ t w ^+ 2 == y ^+ 2}.
     exists m => //; exists w; last by rewrite inE C'w.
-    by move: Dy2; rewrite eqf_sqr => /pred2P[]->; rewrite ?rpredN.
+    by move: Dy2; rewrite eqf_sqr => /pred2P[]->; rewrite ?(rpredN (sQC _)).
   exists (x + i * (ofQ t v / x)).
-    rewrite rpredD 1?rpredM ?rpred_div //= (sQtrans (x_ m)) //.
-    by rewrite (sRle n) // -memRn.
+    rewrite (@rpredD _ (sQC _)) 1?(@rpredM _ (sQC _)) //=.
+      exact: (sQtrans (x_ m)).
+    by rewrite (@rpred_div _ (sQC _)) // (sQtrans (x_ m)) // (sRle n) // -memRn.
   rewrite rootE /horner (@PolyK _ 1) ?oner_eq0 //= ?addr0 ?mul0r in px0.
   rewrite add0r mul1r -mulrA -expr2 subr_eq0 in px0.
   have nz_x2: x ^+ 2 != 0.
@@ -883,6 +889,6 @@ pose conjT := GRing.RMorphism.Pack (GRing.RMorphism.Class conjaM conjmM).
 exists conjT => [z | /(_ i)/eqP/idPn[]] /=.
   by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0%N.
 rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
-rewrite mulf_neq0 ?(memPnC (R'i 0%N)) ?rpred0 //.
+rewrite mulf_neq0 ?(memPnC (R'i 0%N)) ?(rpred0 (sQC _)) //.
 by have /charf0P-> := ftrans (fmorph_char QtoC) (char_num _).
 Qed.

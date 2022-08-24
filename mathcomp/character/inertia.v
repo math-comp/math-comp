@@ -349,7 +349,7 @@ Qed.
 
 Lemma cfConjg_lin_char (chi : 'CF(H)) y :
   chi \is a linear_char -> (chi ^ y)%CF \is a linear_char.
-Proof. by case/andP=> Nchi chi1; rewrite qualifE cfConjg1 cfConjg_char. Qed.
+Proof. by case/andP=> Nchi chi1; rewrite qualifE/= cfConjg1 cfConjg_char. Qed.
 
 Lemma cfConjg_irr y chi : chi \in irr H -> (chi ^ y)%CF \in irr H.
 Proof. by rewrite !irrEchar cfConjg_iso => /andP[/cfConjg_char->]. Qed.
@@ -1299,7 +1299,7 @@ have /codomP[s2 Dc2]: c2 \in codom (@mul_mod_Iirr G N c).
 have{} Dc2: 'chi_c2 = ('chi_s2 %% N)%CF * 'chi_c.
   by rewrite Dc2 cfIirrE // mod_IirrE.
 have s2_lin: 'chi_s2 \is a linear_char.
-  rewrite qualifE irr_char; apply/eqP/(mulIf (irr1_neq0 c)).
+  rewrite qualifE/= irr_char; apply/eqP/(mulIf (irr1_neq0 c)).
   rewrite mul1r -[in RHS](cfRes1 N) chiN -c2Nth cfRes1.
   by rewrite Dc2 cfunE cfMod1.
 have s2Xf_1: 'chi_s2 ^+ f = 1.
@@ -1330,7 +1330,7 @@ have [G0 maxG0 sNG0]: {G0 | maxnormal (gval G0) G G & N \subset G0}.
   by apply: maxgroup_exists; rewrite properEneq ltNG sNG.
 have [/andP[ltG0G nG0G] maxG0_P] := maxgroupP maxG0.
 set mu := 'chi_u in uNdth; have lin_mu: mu \is a linear_char.
-  by rewrite qualifE irr_char -(cfRes1 N) uNdth /= lin_char1 ?cfDet_lin_char.
+  by rewrite qualifE/= irr_char -(cfRes1 N) uNdth /= lin_char1 ?cfDet_lin_char.
 have sG0G := proper_sub ltG0G; have nsNG0 := normalS sNG0 sG0G nsNG.
 have nsG0G: G0 <| G by apply/andP.
 have /lin_char_irr/irrP[u0 Du0] := cfRes_lin_char G0 lin_mu.

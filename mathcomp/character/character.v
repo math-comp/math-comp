@@ -824,10 +824,10 @@ Section IsChar.
 
 Variable gT : finGroupType.
 
-Definition character {G : {set gT}} :=
-  [qualify a phi : 'CF(G) | [forall i, coord (irr G) i phi \in Cnat]].
-Fact character_key G : pred_key (@character G). Proof. by []. Qed.
-Canonical character_keyed G := KeyedQualifier (character_key G).
+Definition character_pred {G : {set gT}} :=
+  fun phi : 'CF(G) => [forall i, coord (irr G) i phi \in Cnat].
+Arguments character_pred _ _ /.
+Definition character {G : {set gT}} := [qualify a phi | @character_pred G phi].
 
 Variable G : {group gT}.
 Implicit Types (phi chi xi : 'CF(G)) (i : Iirr G).
@@ -848,7 +848,8 @@ Proof.
 split=> [|chi xi /forallP-Nchi /forallP-Nxi]; first exact: cfun0_char.
 by apply/forallP=> i; rewrite linearD rpredD /=.
 Qed.
-Canonical character_addrPred := AddrPred add_char.
+HB.instance Definition _ :=
+  GRing.isAddClosed.Build [zmodType of classfun G] character_pred add_char.
 
 Lemma char_sum_irrP {phi} :
   reflect (exists n, phi = \sum_i (n i)%:R *: 'chi_i) (phi \is a character).
@@ -919,11 +920,12 @@ split=> [|_ _ /char_reprP[rG1 ->] /char_reprP[rG2 ->]]; first exact: cfun1_char.
 apply/char_reprP; exists (Representation (prod_repr rG1 rG2)).
 by rewrite cfRepr_prod.
 Qed.
-Canonical char_mulrPred := MulrPred mul_char.
-Canonical char_semiringPred := SemiringPred mul_char.
+HB.instance Definition _ :=
+  GRing.isMulClosed.Build [ringType of classfun G] character_pred mul_char.
 
 End IsChar.
 Prenex Implicits character.
+Arguments character_pred _ _ _ /.
 Arguments char_reprP {gT G phi}.
 
 Section AutChar.
@@ -967,8 +969,11 @@ Section Linear.
 
 Variables (gT : finGroupType) (G : {group gT}).
 
+Definition linear_char_pred {B : {set gT}} :=
+  fun phi : 'CF(B) => (phi \is a character) && (phi 1%g == 1).
+Arguments linear_char_pred _ _ /.
 Definition linear_char {B : {set gT}} :=
-  [qualify a phi : 'CF(B) | (phi \is a character) && (phi 1%g == 1)].
+  [qualify a phi | @linear_char_pred B phi].
 
 Section OneChar.
 
@@ -982,7 +987,7 @@ Lemma lin_charW : xi \is a character.
 Proof. by case/andP: CFxi. Qed.
 
 Lemma cfun1_lin_char : (1 : 'CF(G)) \is a linear_char.
-Proof. by rewrite qualifE cfun1_char /= cfun11. Qed.
+Proof. by rewrite qualifE/= cfun1_char /= cfun11. Qed.
 
 Lemma lin_charM : {in G &, {morph xi : x y / (x * y)%g >-> x * y}}.
 Proof.
@@ -1063,7 +1068,7 @@ End OneChar.
 
 Lemma cfAut_lin_char u (xi : 'CF(G)) :
   (cfAut u xi \is a linear_char) = (xi \is a linear_char).
-Proof. by rewrite qualifE cfAut_char; apply/andb_id2l=> /cfAut_char1->. Qed.
+Proof. by rewrite qualifE/= cfAut_char; apply/andb_id2l=> /cfAut_char1->. Qed.
 
 Lemma cfConjC_lin_char (xi : 'CF(G)) :
   (xi^*%CF \is a linear_char) = (xi \is a linear_char).
@@ -1079,7 +1084,7 @@ Lemma char_abelianP :
   reflect (forall i : Iirr G, 'chi_i \is a linear_char) (abelian G).
 Proof.
 apply: (iffP idP) => [cGG i | CF_G].
-  rewrite qualifE irr_char /= irr1_degree.
+  rewrite qualifE/= irr_char /= irr1_degree.
   by rewrite irr_degree_abelian //; last apply: groupC.
 rewrite card_classes_abelian -NirrE -eqC_nat -irr_sum_square //.
 rewrite -{1}[Nirr G]card_ord -sumr_const; apply/eqP/eq_bigr=> i _.
@@ -1095,16 +1100,15 @@ move: (_ x); rewrite -[irr_degree _]natCK -irr1_degree lin_char1 //.
 by rewrite (natCK 1) => A; rewrite trace_mx11 -mx11_scalar.
 Qed.
 
-Fact linear_char_key B : pred_key (@linear_char B). Proof. by []. Qed.
-Canonical linear_char_keted B := KeyedQualifier (linear_char_key B).
 Fact linear_char_divr : divr_closed (@linear_char G).
 Proof.
 split=> [|chi xi Lchi Lxi]; first exact: cfun1_lin_char.
-rewrite invr_lin_char // qualifE cfunE.
+rewrite invr_lin_char // qualifE/= cfunE.
 by rewrite rpredM ?lin_char1 ?mulr1 ?lin_charW //= cfConjC_lin_char.
 Qed.
-Canonical lin_char_mulrPred := MulrPred linear_char_divr.
-Canonical lin_char_divrPred := DivrPred linear_char_divr.
+HB.instance Definition _ :=
+  GRing.isDivClosed.Build [unitRingType of classfun G] linear_char_pred
+    linear_char_divr.
 
 Lemma irr_cyclic_lin i : cyclic G -> 'chi[G]_i \is a linear_char.
 Proof. by move/cyclic_abelian/char_abelianP. Qed.
@@ -1115,6 +1119,7 @@ Proof. by move/prime_cyclic/irr_cyclic_lin. Qed.
 End Linear.
 
 Prenex Implicits linear_char.
+Arguments linear_char_pred _ _ _ /.
 
 Section OrthogonalityRelations.
 
@@ -1698,14 +1703,14 @@ Proof. by move=> Nchi; rewrite -!char1_eq0 ?cfRes_char // cfRes1. Qed.
 
 Lemma cfRes_lin_char chi :
   chi \is a linear_char -> 'Res[H, G] chi \is a linear_char.
-Proof. by case/andP=> Nchi; rewrite qualifE cfRes_char ?cfRes1. Qed.
+Proof. by case/andP=> Nchi; rewrite qualifE/= cfRes_char ?cfRes1. Qed.
 
 Lemma Res_irr_neq0 i : 'Res[H, G] 'chi_i != 0.
 Proof. by rewrite cfRes_eq0 ?irr_neq0 ?irr_char. Qed.
 
 Lemma cfRes_lin_lin (chi : 'CF(G)) :
   chi \is a character -> 'Res[H] chi \is a linear_char -> chi \is a linear_char.
-Proof. by rewrite !qualifE cfRes1 => -> /andP[]. Qed.
+Proof. by rewrite !qualifE/= !qualifE/= cfRes1 => -> /andP[]. Qed.
 
 Lemma cfRes_irr_irr chi :
   chi \is a character -> 'Res[H] chi \in irr H -> chi \in irr G.
@@ -1729,7 +1734,7 @@ Proof. by rewrite /Res_Iirr irr0 rmorph1 -irr0 irrK. Qed.
 Lemma lin_Res_IirrE i : 'chi[G]_i 1%g = 1 -> 'chi_(Res_Iirr H i) = 'Res 'chi_i.
 Proof.
 move=> chi1; rewrite cfIirrE ?lin_char_irr ?cfRes_lin_char //.
-by rewrite qualifE irr_char /= chi1.
+by rewrite qualifE/= irr_char /= chi1.
 Qed.
 
 End Restrict.
@@ -1786,7 +1791,7 @@ Qed.
 
 Lemma cfMorph_lin_char chi :
   chi \is a linear_char -> cfMorph chi \is a linear_char.
-Proof. by case/andP=> Nchi; rewrite qualifE cfMorph1 cfMorph_char. Qed.
+Proof. by case/andP=> Nchi; rewrite qualifE/= cfMorph1 cfMorph_char. Qed.
 
 Lemma cfMorph_charE chi :
   G \subset D -> (cfMorph chi \is a character) = (chi \is a character).
@@ -1807,7 +1812,7 @@ Qed.
 
 Lemma cfMorph_lin_charE chi :
   G \subset D -> (cfMorph chi \is a linear_char) = (chi \is a linear_char).
-Proof. by rewrite qualifE cfMorph1 => /cfMorph_charE->. Qed.
+Proof. by rewrite qualifE/= cfMorph1 => /cfMorph_charE->. Qed.
 
 Lemma cfMorph_irr chi :
   G \subset D -> (cfMorph chi \in irr G) = (chi \in irr (f @* G)).
@@ -1848,7 +1853,7 @@ Qed.
 
 Lemma cfIsom_lin_char chi :
   (cfIsom isoGR chi \is a linear_char) = (chi \is a linear_char).
-Proof. by rewrite qualifE cfIsom_char cfIsom1. Qed.
+Proof. by rewrite qualifE/= cfIsom_char cfIsom1. Qed.
 
 Lemma cfIsom_irr chi : (cfIsom isoGR chi \in irr R) = (chi \in irr G).
 Proof. by rewrite !irrEchar cfIsom_char cfIsom_iso. Qed.
@@ -1898,7 +1903,7 @@ Proof. by rewrite unlock cfMorph_charE // cfIsom_char. Qed.
 
 Lemma cfSdprod_lin_char chi :
  (cfSdprod defG chi \is a linear_char) = (chi \is a linear_char).
-Proof. by rewrite qualifE cfSdprod_char cfSdprod1. Qed.
+Proof. by rewrite qualifE/= cfSdprod_char cfSdprod1. Qed.
 
 Lemma cfSdprod_irr chi : (cfSdprod defG chi \in irr G) = (chi \in irr H).
 Proof. by rewrite !irrEchar cfSdprod_char cfSdprod_iso. Qed.
@@ -2127,7 +2132,7 @@ Proof. by move=> Lphi; rewrite cfDprodl_lin_char ?cfRes_lin_char. Qed.
 
 Lemma cfBigdprodi_lin_charE i (phi : 'CF(A i)) :
   P i -> (cfBigdprodi defG phi \is a linear_char) = (phi \is a linear_char).
-Proof. by move=> Pi; rewrite qualifE cfBigdprodi_charE // cfBigdprodi1. Qed.
+Proof. by move=> Pi; rewrite qualifE/= cfBigdprodi_charE // cfBigdprodi1. Qed.
 
 Lemma cfBigdprod_lin_char phi :
     (forall i, P i -> phi i \is a linear_char) ->
@@ -2286,7 +2291,7 @@ Qed.
 
 Lemma cfQuo_lin_char G H (chi : 'CF(G)) :
   chi \is a linear_char -> (chi / H)%CF \is a linear_char.
-Proof. by case/andP=> Nchi; rewrite qualifE cfQuo_char ?cfQuo1. Qed.
+Proof. by case/andP=> Nchi; rewrite qualifE/= cfQuo_char ?cfQuo1. Qed.
 
 Lemma cfMod_char G H (chi : 'CF(G / H)) :
   chi \is a character -> (chi %% H)%CF \is a character.
@@ -2416,7 +2421,7 @@ Lemma lin_irr_der1 G i :
 Proof.
 apply/idP/idP=> [|sG'K]; first exact: lin_char_der1.
 have nsG'G: G^`(1) <| G := der_normal 1 G.
-rewrite qualifE irr_char -[i](quo_IirrK nsG'G) // mod_IirrE //=.
+rewrite qualifE/= irr_char -[i](quo_IirrK nsG'G) // mod_IirrE //=.
 by rewrite cfModE // morph1 lin_char1 //; apply/char_abelianP/der_abelian.
 Qed.
 
@@ -2577,7 +2582,7 @@ Definition detRepr := cfRepr det_repr.
 
 Lemma detRepr_lin_char : detRepr \is a linear_char.
 Proof.
-by rewrite qualifE cfRepr_char cfunE group1 repr_mx1 mxtrace1 mulr1n /=.
+by rewrite qualifE/= cfRepr_char cfunE group1 repr_mx1 mxtrace1 mulr1n /=.
 Qed.
 
 End DetRepr.
@@ -2792,7 +2797,7 @@ have rZmxP: mx_repr [group of rcenter rG] rZmx.
   move=> /setIdP[Gx /is_scalar_mxP[a rGx]] /setIdP[Gy /is_scalar_mxP[b rGy]].
   by rewrite /rZmx repr_mxM // rGx rGy -!scalar_mxM !mxE.
 exists (cfRepr (MxRepresentation rZmxP)).
-  by rewrite qualifE cfRepr_char cfRepr1 eqxx.
+  by rewrite qualifE/= cfRepr_char cfRepr1 eqxx.
 apply/cfun_inP=> x Zx; rewrite !cfunE Zx /= /rZmx mulr_natl.
 by case/setIdP: Zx => Gx /is_scalar_mxP[a ->]; rewrite mxE !mxtrace_scalar.
 Qed.

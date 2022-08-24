@@ -386,9 +386,6 @@ Let free_b2mx n (X : n.-tuple vT) : free X = row_free (b2mx X).
 Proof. by rewrite /free /dimv span_b2mx genmxE size_tuple. Qed.
 (* end hide *)
 
-Fact vspace_key U : pred_key U. Proof. by []. Qed.
-Canonical vspace_keyed U := KeyedPred (vspace_key U).
-
 Lemma memvE v U : (v \in U) = (<[v]> <= U)%VS. Proof. by []. Qed.
 
 Lemma vlineP v1 v2 : reflect (exists k, v1 = k *: v2) (v1 \in <[v2]>)%VS.
@@ -402,10 +399,8 @@ Proof.
 split=> [|a u v]; rewrite !memvK ?linear0 ?sub0mx // => Uu Uv.
 by rewrite linearP addmx_sub ?scalemx_sub.
 Qed.
-Canonical memv_opprPred U := OpprPred (memv_submod_closed U).
-Canonical memv_addrPred U := AddrPred (memv_submod_closed U).
-Canonical memv_zmodPred U := ZmodPred (memv_submod_closed U).
-Canonical memv_submodPred U := SubmodPred (memv_submod_closed U).
+HB.instance Definition _ (U : {vspace vT}) :=
+  GRing.isSubmodClosed.Build K vT (pred_of_vspace U) (memv_submod_closed U).
 
 Lemma mem0v U : 0 \in U. Proof. exact: rpred0. Qed.
 Lemma memvN U v : (- v \in U) = (v \in U). Proof. exact: rpredN. Qed.
@@ -1880,8 +1875,8 @@ Inductive subvs_of : predArgType := Subvs u & u \in U.
 Definition vsval w : vT := let: Subvs u _ := w in u.
 HB.instance Definition _ := [isSub of subvs_of for vsval].
 HB.instance Definition _ := [Choice of subvs_of by <:].
-HB.instance Definition _ := [zmodMixin of subvs_of by <:].
-HB.instance Definition _ := [lmodMixin of subvs_of by <:].
+HB.instance Definition _ := [SubChoice_isSubZmodule of subvs_of by <:].
+HB.instance Definition _ := [SubZmodule_isSubLmodule of subvs_of by <:].
 
 Lemma subvsP w : vsval w \in U. Proof. exact: valP. Qed.
 Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.

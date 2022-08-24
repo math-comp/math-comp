@@ -204,18 +204,21 @@ Qed.
 
 Fact aspace_divr_closed K : divr_closed K.
 Proof. by split=> [|u v Ku Kv]; rewrite ?mem1v ?memvM ?memvV. Qed.
-Canonical aspace_mulrPred K := MulrPred (aspace_divr_closed K).
-Canonical aspace_divrPred K := DivrPred (aspace_divr_closed K).
-Canonical aspace_smulrPred K := SmulrPred (aspace_divr_closed K).
-Canonical aspace_sdivrPred K := SdivrPred (aspace_divr_closed K).
-Canonical aspace_semiringPred K := SemiringPred (aspace_divr_closed K).
-Canonical aspace_subringPred K := SubringPred (aspace_divr_closed K).
-Canonical aspace_subalgPred K := SubalgPred (memv_submod_closed K).
-Canonical aspace_divringPred K := DivringPred (aspace_divr_closed K).
-Canonical aspace_divalgPred K := DivalgPred (memv_submod_closed K).
+HB.instance Definition _ K :=
+  GRing.isDivClosed.Build L (pred_of_vspace K) (aspace_divr_closed K).
 
-HB.instance Definition _ K := [comRingMixin of subvs_of K by <:].
-HB.instance Definition _ K := [idomainMixin of subvs_of K by <:].
+HB.instance Definition _ (K : {subfield L}) :=
+  GRing.isSubRing.Build L (pred_of_vspace K) (subvs_of K)
+    (rmorphM _, rmorph1 _).
+(* Note that the ringType structure was built in the SubFalgType
+   section of falgebra.v but the SubRing structure did not stand
+   there, it is thus built only here *)
+
+HB.instance Definition _ (K : {subfield L}) :=
+  [SubRing_isSubComRing of subvs_of K by <:].
+HB.instance Definition _ (K : {subfield L}) :=
+  [SubComUnitRing_isSubIntegralDomain of subvs_of K by <:].
+
 Lemma subvs_fieldMixin K : GRing.field_axiom [the idomainType of subvs_of K].
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.

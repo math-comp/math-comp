@@ -235,12 +235,21 @@ Context {R : numDomainType}.
 Implicit Types (x : R).
 
 Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
-Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
-Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
-Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
-Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
+Definition Rpos_pred := fun x : R => 0 < x.
+Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
+Definition Rneg_pred := fun x : R => x < 0.
+Definition Rneg : qualifier 0 R := [qualify x : R | Rneg_pred x].
+Definition Rnneg_pred := fun x : R => 0 <= x.
+Definition Rnneg : qualifier 0 R := [qualify x : R | Rnneg_pred x].
+Definition Rreal_pred := fun x : R => (0 <= x) || (x <= 0).
+Definition Rreal : qualifier 0 R := [qualify x : R | Rreal_pred x].
 
 End Def. End Def.
+
+Arguments Rpos_pred _ _ /.
+Arguments Rneg_pred _ _ /.
+Arguments Rnneg_pred _ _ /.
+Arguments Rreal_pred _ _ /.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
 Notation le := ler (only parsing).
@@ -258,21 +267,9 @@ Notation neg := Rneg.
 Notation nneg := Rnneg.
 Notation real := Rreal.
 
-Module Keys. Section Keys.
-Variable R : numDomainType.
-Fact Rpos_key : pred_key (@pos R). Proof. by []. Qed.
-Definition Rpos_keyed := KeyedQualifier Rpos_key.
-Fact Rneg_key : pred_key (@real R). Proof. by []. Qed.
-Definition Rneg_keyed := KeyedQualifier Rneg_key.
-Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
-Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
-Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
-Definition Rreal_keyed := KeyedQualifier Rreal_key.
-End Keys. End Keys.
-
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
-Import Def Keys.
+Import Def.
 
 Notation "`| x |" := (norm x) : ring_scope.
 
@@ -325,11 +322,6 @@ Notation "x >=< y" := (comparable x y) : ring_scope.
 Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
 Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
 Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
-
-Canonical Rpos_keyed.
-Canonical Rneg_keyed.
-Canonical Rnneg_keyed.
-Canonical Rreal_keyed.
 
 Export Order.POCoercions.
 
@@ -499,8 +491,9 @@ split=> [|x y x_gt0 y_gt0]; rewrite posrE ?ltr01 //.
 have [Uy|/invr_out->] := boolP (y \is a GRing.unit); last by rewrite pmulr_rgt0.
 by rewrite -(pmulr_rgt0 _ y_gt0) mulrC divrK.
 Qed.
-Canonical pos_mulrPred := MulrPred pos_divr_closed.
-Canonical pos_divrPred := DivrPred pos_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isDivClosed.Build R Rpos_pred
+  pos_divr_closed.
 
 Fact nneg_divr_closed : divr_closed (@nneg R).
 Proof.
@@ -508,17 +501,21 @@ split=> [|x y]; rewrite !nnegrE ?ler01 ?le0r // -!posrE.
 case/predU1P=> [-> _ | x_gt0]; first by rewrite mul0r eqxx.
 by case/predU1P=> [-> | y_gt0]; rewrite ?invr0 ?mulr0 ?eqxx // orbC rpred_div.
 Qed.
-Canonical nneg_mulrPred := MulrPred nneg_divr_closed.
-Canonical nneg_divrPred := DivrPred nneg_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isDivClosed.Build R Rnneg_pred
+  nneg_divr_closed.
 
 Fact nneg_addr_closed : addr_closed (@nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
-Canonical nneg_addrPred := AddrPred nneg_addr_closed.
-Canonical nneg_semiringPred := SemiringPred nneg_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isAddClosed.Build R Rnneg_pred
+  nneg_addr_closed.
 
 Fact real_oppr_closed : oppr_closed (@real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
-Canonical real_opprPred := OpprPred real_oppr_closed.
+#[export]
+HB.instance Definition _ := GRing.isOppClosed.Build R Rreal_pred
+  real_oppr_closed.
 
 Fact real_addr_closed : addr_closed (@real R).
 Proof.
@@ -529,8 +526,9 @@ without loss{Rx} x_ge0: x y Ry / 0 <= x.
 case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
-Canonical real_addrPred := AddrPred real_addr_closed.
-Canonical real_zmodPred := ZmodPred real_oppr_closed.
+#[export]
+HB.instance Definition _ := GRing.isAddClosed.Build R Rreal_pred
+  real_addr_closed.
 
 Fact real_divr_closed : divr_closed (@real R).
 Proof.
@@ -542,13 +540,9 @@ without loss{Ry} y_ge0: y / 0 <= y; last by rewrite realE -nnegrE rpred_div.
 case/orP: Ry => [? | y_le0]; first exact.
 by rewrite -rpredN -mulrN -invrN; apply; rewrite ?oppr_ge0.
 Qed.
-Canonical real_mulrPred := MulrPred real_divr_closed.
-Canonical real_smulrPred := SmulrPred real_divr_closed.
-Canonical real_divrPred := DivrPred real_divr_closed.
-Canonical real_sdivrPred := SdivrPred real_divr_closed.
-Canonical real_semiringPred := SemiringPred real_divr_closed.
-Canonical real_subringPred := SubringPred real_divr_closed.
-Canonical real_divringPred := DivringPred real_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isDivClosed.Build R Rreal_pred
+  real_divr_closed.
 
 End NumDomain.
 
@@ -573,28 +567,13 @@ Qed.
 
 End RealClosed.
 
+Module Exports. HB.reexport. End Exports.
+
 End Internals.
 
 Module PredInstances.
 
-Canonical pos_mulrPred.
-Canonical pos_divrPred.
-
-Canonical nneg_addrPred.
-Canonical nneg_mulrPred.
-Canonical nneg_divrPred.
-Canonical nneg_semiringPred.
-
-Canonical real_addrPred.
-Canonical real_opprPred.
-Canonical real_zmodPred.
-Canonical real_mulrPred.
-Canonical real_smulrPred.
-Canonical real_divrPred.
-Canonical real_sdivrPred.
-Canonical real_semiringPred.
-Canonical real_subringPred.
-Canonical real_divringPred.
+Export Internals.Exports.
 
 End PredInstances.
 
@@ -833,7 +812,7 @@ Arguments normr0P {R V v}.
 #[global] Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
 Lemma normr_nneg (R : numDomainType) (x : R) : `|x| \is Num.nneg.
-Proof. by rewrite qualifE. Qed.
+Proof. by rewrite qualifE /=. Qed.
 #[global] Hint Resolve normr_nneg : core.
 
 Section NumDomainOperationTheory.
@@ -2790,7 +2769,7 @@ Lemma poly_disk_bound p b : {ub | forall x, `|x| <= b -> `|p.[x]| <= ub}.
 Proof.
 exists (\sum_(j < size p) `|p`_j| * b ^+ j) => x le_x_b.
 rewrite horner_coef (le_trans (ler_norm_sum _ _ _)) ?ler_sum // => j _.
-rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in //.
+rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in //=.
 exact: le_trans (normr_ge0 x) le_x_b.
 Qed.
 
@@ -4053,7 +4032,7 @@ Proof. by rewrite ReM ImV ReV !mulrA -mulrBl mulrN opprK. Qed.
 
 Lemma leif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
 Proof.
-rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE.
+rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE /=.
 rewrite [`|'Re _| ^+ 2]normCK conj_Creal // normC2_Re_Im -expr2.
 rewrite addrC -leif_subLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
 by apply: leif_eq; rewrite -realEsqr.
@@ -4167,7 +4146,7 @@ Qed.
 Lemma ler_rootCl n : (n > 0)%N -> {in Num.nneg, {mono n.-root : x y / x <= y}}.
 Proof.
 move=> n_gt0 x x_ge0 y; have [y_ge0 | not_y_ge0] := boolP (0 <= y).
-  by rewrite -(ler_pexpn2r n_gt0) ?qualifE ?rootC_ge0 ?rootCK.
+  by rewrite -(ler_pexpn2r n_gt0) ?qualifE /= ?rootC_ge0 ?rootCK.
 rewrite (contraNF (@le_trans _ _ _ 0 _ _)) ?rootC_ge0 //.
 by rewrite (contraNF (le_trans x_ge0)).
 Qed.
@@ -4219,7 +4198,7 @@ Proof. by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) eqr_rootC. Qed.
 
 Lemma rootC_ge1 n x : (n > 0)%N -> (n.-root x >= 1) = (x >= 1).
 Proof.
-by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) ler_rootCl // qualifE ler01.
+by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) ler_rootCl // qualifE /= ler01.
 Qed.
 
 Lemma rootC_gt1 n x : (n > 0)%N -> (n.-root x > 1) = (x > 1).
@@ -4273,7 +4252,7 @@ move=> Ege0; have [n0 | n_gt0] := posnP n.
   rewrite n0 root0C invr0 mulr0; apply/leif_refl/forall_inP=> i.
   by rewrite (card0_eq n0).
 rewrite -(mono_in_leif (ler_pexpn2r n_gt0)) ?rootCK //=; first 1 last.
-- by rewrite qualifE rootC_ge0 // prodr_ge0.
+- by rewrite qualifE /= rootC_ge0 // prodr_ge0.
 - by rewrite rpred_div ?rpred_nat ?rpred_sum.
 exact: leif_AGM.
 Qed.
@@ -4533,7 +4512,7 @@ HB.builders Context R of NumDomain_isReal R.
   Lemma le_total : Order.POrder_isTotal ring_display R.
   Proof.
   constructor=> x y; move: (real (x - y)).
-  by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
+  by rewrite unfold_in /= !ler_def subr0 add0r opprB orbC.
   Qed.
 
   HB.instance Definition _ := le_total.

@@ -144,8 +144,6 @@ Qed.
 Definition Crat_span s : pred algC := Crat_span_subproof s.
 Lemma Crat_spanP s x : reflect (in_Crat_span s x) (x \in Crat_span s).
 Proof. exact: sumboolP. Qed.
-Fact Crat_span_key s : pred_key (Crat_span s). Proof. by []. Qed.
-Canonical Crat_span_keyed s := KeyedPred (Crat_span_key s).
 
 Lemma mem_Crat_span s : {subset s <= Crat_span s}.
 Proof.
@@ -163,9 +161,8 @@ split=> [|_ _ /Crat_spanP[x ->] /Crat_spanP[y ->]].
 apply/Crat_spanP; exists (x - y); rewrite -sumrB; apply: eq_bigr => i _.
 by rewrite -mulrBl -rmorphB !ffunE.
 Qed.
-Canonical Crat_span_opprPred s := OpprPred (Crat_span_zmod_closed s).
-Canonical Crat_span_addrPred s := AddrPred (Crat_span_zmod_closed s).
-Canonical Crat_span_zmodPred s := ZmodPred (Crat_span_zmod_closed s).
+HB.instance Definition _ s := GRing.isZmodClosed.Build _ (Crat_span s)
+  (Crat_span_zmod_closed s).
 
 Section MoreAlgCaut.
 
@@ -318,8 +315,6 @@ Qed.
 
 Definition Cint_span (s : seq algC) : pred algC :=
   fun x => dec_Cint_span (in_tuple [seq \row_(i < 1) y | y <- s]) (\row_i x).
-Fact Cint_span_key s : pred_key (Cint_span s). Proof. by []. Qed.
-Canonical Cint_span_keyed s := KeyedPred (Cint_span_key s).
 
 Lemma Cint_spanP n (s : n.-tuple algC) x :
   reflect (inIntSpan s x) (x \in Cint_span s).
@@ -349,9 +344,8 @@ have sP := Cint_spanP (in_tuple s); split=> [|_ _ /sP[x ->] /sP[y ->]].
 apply/sP; exists (x - y); rewrite -sumrB; apply: eq_bigr => i _.
 by rewrite !ffunE raddfB.
 Qed.
-Canonical Cint_span_opprPred s := OpprPred (Cint_span_zmod_closed s).
-Canonical Cint_span_addrPred s := AddrPred (Cint_span_zmod_closed s).
-Canonical Cint_span_zmodPred s := ZmodPred (Cint_span_zmod_closed s).
+HB.instance Definition _ s := GRing.isZmodClosed.Build _ (Cint_span s)
+  (Cint_span_zmod_closed s).
 
 (* Automorphism extensions. *)
 Lemma extend_algC_subfield_aut (Qs : fieldExtType rat)
@@ -542,8 +536,6 @@ Qed.
 (* Algebraic integers. *)
 
 Definition Aint : {pred algC} := fun x => minCpoly x \is a polyOver Cint.
-Fact Aint_key : pred_key Aint. Proof. by []. Qed.
-Canonical Aint_keyed := KeyedPred Aint_key.
 
 Lemma root_monic_Aint p x :
   root p x -> p \is monic -> p \is a polyOver Cint -> x \in Aint.
@@ -658,19 +650,20 @@ Qed.
 
 Section AlgIntSubring.
 
-Import DefaultKeying GRing.DefaultPred perm.
-
 (* This is Isaacs, Theorem (3.4). *)
 Theorem fin_Csubring_Aint S n (Y : n.-tuple algC) :
      mulr_closed S -> (forall x, reflect (inIntSpan Y x) (x \in S)) ->
   {subset S <= Aint}.
 Proof.
+move=> mulS.
+pose Sm := GRing.isMulClosed.Build _ _ mulS.
+pose SC := GRing.MulClosed.Pack (GRing.MulClosed.Class Sm).
 have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
-move=> mulS S_P x Sx; pose v := \row_(i < n) Y`_i.
+move=> S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
   case/S_P: Sx => {}x ->; rewrite big1 ?isAlgInt0 // => i _.
   by have /rowP/(_ i)/[!mxE] -> := v0; rewrite mul0rz.
-have sYS (i : 'I_n): x * Y`_i \in S.
+have sYS (i : 'I_n): x * Y`_i \in (SC : pred _).
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
 pose A := \matrix_(i, j < n) sval (sig_eqW (S_P _ (sYS j))) i.
 pose p := char_poly (map_mx ZtoC A).
@@ -694,13 +687,7 @@ move=> /allP/and3P[Sx Sy _] [Y _ genYS].
 have AZ_S := fin_Csubring_Aint ringS genYS.
 by have [_ S_B S_M] := ringS; rewrite !AZ_S ?S_B ?S_M.
 Qed.
-Canonical Aint_opprPred := OpprPred Aint_subring.
-Canonical Aint_addrPred := AddrPred Aint_subring.
-Canonical Aint_mulrPred := MulrPred Aint_subring.
-Canonical Aint_zmodPred := ZmodPred Aint_subring.
-Canonical Aint_semiringPred := SemiringPred Aint_subring.
-Canonical Aint_smulrPred := SmulrPred Aint_subring.
-Canonical Aint_subringPred := SubringPred Aint_subring.
+HB.instance Definition _ := GRing.isSubringClosed.Build _ Aint Aint_subring.
 
 End AlgIntSubring.
 
@@ -710,8 +697,6 @@ Proof. by rewrite !unfold_in minCpoly_aut. Qed.
 
 Definition dvdA (e : Algebraics.divisor) : {pred algC} :=
   fun z => if e == 0 then z == 0 else z / e \in Aint.
-Fact dvdA_key e : pred_key (dvdA e). Proof. by []. Qed.
-Canonical dvdA_keyed e := KeyedPred (dvdA_key e).
 Delimit Scope algC_scope with A.
 Delimit Scope algC_expanded_scope with Ax.
 Notation "e %| x" := (x \in dvdA e) : algC_expanded_scope.
@@ -724,9 +709,8 @@ rewrite ![(e %| _)%A]unfold_in.
 case: ifP => [_ x0 /eqP-> | _]; first by rewrite subr0.
 by rewrite mulrBl; apply: rpredB.
 Qed.
-Canonical dvdA_opprPred e := OpprPred (dvdA_zmod_closed e).
-Canonical dvdA_addrPred e := AddrPred (dvdA_zmod_closed e).
-Canonical dvdA_zmodPred e := ZmodPred (dvdA_zmod_closed e).
+HB.instance Definition _ e := GRing.isZmodClosed.Build _ (dvdA e)
+  (dvdA_zmod_closed e).
 
 Definition eqAmod (e x y : Algebraics.divisor) := (e %| x - y)%A.
 Notation "x == y %[mod e ]" := (eqAmod e x y) : algC_scope.

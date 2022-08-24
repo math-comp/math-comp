@@ -2661,11 +2661,11 @@ Notation "[ 'unitRingType' 'of' T ]" := (UnitRing.clone T _)
 End UnitRingExports.
 HB.export UnitRingExports.
 
-Definition unit {R : unitRingType} :=
+Definition unit_pred {R : unitRingType} :=
   Eval cbv [ unit_subdef Ring_hasMulInverse.unit_subdef ] in
-    [qualify a u : R | unit_subdef u].
-Fact unit_key R : pred_key (@unit R). Proof. by []. Qed.
-Canonical unit_keyed R := KeyedQualifier (@unit_key R).
+    (fun u : R => unit_subdef u).
+Arguments unit_pred _ _ /.
+Definition unit {R : unitRingType} := [qualify a u : R | unit_pred u].
 
 Local Notation "x ^-1" := (inv x).
 Local Notation "x / y" := (x * y^-1).
@@ -3067,110 +3067,7 @@ End ClosedPredicates.
 
 End UnitAlgebraTheory.
 
-(* Interface structures for algebraically closed predicates. *)
-Module Pred.
-
-Structure opp V S := Opp {opp_key : pred_key S; _ : @oppr_closed V S}.
-Structure add V S := Add {add_key : pred_key S; _ : @addr_closed V S}.
-Structure mul R S := Mul {mul_key : pred_key S; _ : @mulr_closed R S}.
-Structure zmod V S := Zmod {zmod_add : add S; _ : @oppr_closed V S}.
-Structure semiring R S := Semiring {semiring_add : add S; _ : @mulr_closed R S}.
-Structure smul R S := Smul {smul_opp : opp S; _ : @mulr_closed R S}.
-Structure div R S := Div {div_mul : mul S; _ : @invr_closed R S}.
-Structure submod R V S :=
-  Submod {submod_zmod : zmod S; _ : @scaler_closed R V S}.
-Structure subring R S := Subring {subring_zmod : zmod S; _ : @mulr_closed R S}.
-Structure sdiv R S := Sdiv {sdiv_smul : smul S; _ : @invr_closed R S}.
-Structure subalg (R : ringType) (A : lalgType R) S :=
-  Subalg {subalg_ring : subring S; _ : @scaler_closed R A S}.
-Structure divring R S :=
-  Divring {divring_ring : subring S; _ : @invr_closed R S}.
-Structure divalg (R : ringType) (A : unitAlgType R) S :=
-  Divalg {divalg_ring : divring S; _ : @scaler_closed R A S}.
-
-Section Subtyping.
-
-Ltac done := case=> *; assumption.
-Fact zmod_oppr R S : @zmod R S -> oppr_closed S. Proof. by []. Qed.
-Fact semiring_mulr R S : @semiring R S -> mulr_closed S. Proof. by []. Qed.
-Fact smul_mulr R S : @smul R S -> mulr_closed S. Proof. by []. Qed.
-Fact submod_scaler R V S : @submod R V S -> scaler_closed S. Proof. by []. Qed.
-Fact subring_mulr R S : @subring R S -> mulr_closed S. Proof. by []. Qed.
-Fact sdiv_invr R S : @sdiv R S -> invr_closed S. Proof. by []. Qed.
-Fact subalg_scaler R A S : @subalg R A S -> scaler_closed S. Proof. by []. Qed.
-Fact divring_invr R S : @divring R S -> invr_closed S. Proof. by []. Qed.
-Fact divalg_scaler R A S : @divalg R A S -> scaler_closed S. Proof. by []. Qed.
-
-Definition zmod_opp R S (addS : @zmod R S) :=
-  Opp (add_key (zmod_add addS)) (zmod_oppr addS).
-Definition semiring_mul R S (ringS : @semiring R S) :=
-  Mul (add_key (semiring_add ringS)) (semiring_mulr ringS).
-Definition smul_mul R S (mulS : @smul R S) :=
-  Mul (opp_key (smul_opp mulS)) (smul_mulr mulS).
-Definition subring_semi R S (ringS : @subring R S) :=
-  Semiring (zmod_add (subring_zmod ringS)) (subring_mulr ringS).
-Definition subring_smul R S (ringS : @subring R S) :=
-  Smul (zmod_opp (subring_zmod ringS)) (subring_mulr ringS).
-Definition sdiv_div R S (divS : @sdiv R S) :=
-  Div (smul_mul (sdiv_smul divS)) (sdiv_invr divS).
-Definition subalg_submod R A S (algS : @subalg R A S) :=
-  Submod (subring_zmod (subalg_ring algS)) (subalg_scaler algS).
-Definition divring_sdiv R S (ringS : @divring R S) :=
-  Sdiv (subring_smul (divring_ring ringS)) (divring_invr ringS).
-Definition divalg_alg R A S (algS : @divalg R A S) :=
-  Subalg (divring_ring (divalg_ring algS)) (divalg_scaler algS).
-
-End Subtyping.
-
-Section Extensionality.
-(* This could be avoided by exploiting the Coq 8.4 eta-convertibility.        *)
-
-Lemma opp_ext (U : zmodType) S k (kS : @keyed_pred U S k) :
-  oppr_closed kS -> oppr_closed S.
-Proof. by move=> oppS x; rewrite -!(keyed_predE kS); apply: oppS. Qed.
-
-Lemma add_ext (U : zmodType) S k (kS : @keyed_pred U S k) :
-  addr_closed kS -> addr_closed S.
-Proof.
-by case=> S0 addS; split=> [|x y]; rewrite -!(keyed_predE kS) //; apply: addS.
-Qed.
-
-Lemma mul_ext (R : ringType) S k (kS : @keyed_pred R S k) :
-  mulr_closed kS -> mulr_closed S.
-Proof.
-by case=> S1 mulS; split=> [|x y]; rewrite -!(keyed_predE kS) //; apply: mulS.
-Qed.
-
-Lemma scale_ext (R : ringType) (U : lmodType R) S k (kS : @keyed_pred U S k) :
-  scaler_closed kS -> scaler_closed S.
-Proof. by move=> linS a x; rewrite -!(keyed_predE kS); apply: linS. Qed.
-
-Lemma inv_ext (R : unitRingType) S k (kS : @keyed_pred R S k) :
-  invr_closed kS -> invr_closed S.
-Proof. by move=> invS x; rewrite -!(keyed_predE kS); apply: invS. Qed.
-
-End Extensionality.
-
-Module Default.
-Definition opp V S oppS := @Opp V S (DefaultPredKey S) oppS.
-Definition add V S addS := @Add V S (DefaultPredKey S) addS.
-Definition mul R S mulS := @Mul R S (DefaultPredKey S) mulS.
-Definition zmod V S addS oppS := @Zmod V S (add addS) oppS.
-Definition semiring R S addS mulS := @Semiring R S (add addS) mulS.
-Definition smul R S oppS mulS := @Smul R S (opp oppS) mulS.
-Definition div R S mulS invS := @Div R S (mul mulS) invS.
-Definition submod R V S addS oppS linS := @Submod R V S (zmod addS oppS) linS.
-Definition subring R S addS oppS mulS := @Subring R S (zmod addS oppS) mulS.
-Definition sdiv R S oppS mulS invS := @Sdiv R S (smul oppS mulS) invS.
-Definition subalg R A S addS oppS mulS linS :=
-  @Subalg R A S (subring addS oppS mulS) linS.
-Definition divring R S addS oppS mulS invS :=
-  @Divring R S (subring addS oppS mulS) invS.
-Definition divalg R A S addS oppS mulS invS linS :=
-  @Divalg R A S (divring addS oppS mulS invS) linS.
-End Default.
-
-Module Exports.
+Module ClosedExports.
 
 Notation oppr_closed := oppr_closed.
 Notation addr_closed := addr_closed.
@@ -3211,291 +3108,7 @@ Coercion divring_closed_div : divring_closed >-> sdivr_closed.
 Coercion divalg_closedZ : divalg_closed >-> subalg_closed.
 Coercion divalg_closedBdiv : divalg_closed >-> divring_closed.
 
-Coercion opp_key : opp >-> pred_key.
-Coercion add_key : add >-> pred_key.
-Coercion mul_key : mul >-> pred_key.
-Coercion zmod_opp : zmod >-> opp.
-Canonical zmod_opp.
-Coercion zmod_add : zmod >-> add.
-Coercion semiring_add : semiring >-> add.
-Coercion semiring_mul : semiring >-> mul.
-Canonical semiring_mul.
-Coercion smul_opp : smul >-> opp.
-Coercion smul_mul : smul >-> mul.
-Canonical smul_mul.
-Coercion div_mul : div >-> mul.
-Coercion submod_zmod : submod >-> zmod.
-Coercion subring_zmod : subring >-> zmod.
-Coercion subring_semi : subring >-> semiring.
-Canonical subring_semi.
-Coercion subring_smul : subring >-> smul.
-Canonical subring_smul.
-Coercion sdiv_smul : sdiv >-> smul.
-Coercion sdiv_div : sdiv >-> div.
-Canonical sdiv_div.
-Coercion subalg_submod : subalg >-> submod.
-Canonical subalg_submod.
-Coercion subalg_ring : subalg >-> subring.
-Coercion divring_ring : divring >-> subring.
-Coercion divring_sdiv : divring >-> sdiv.
-Canonical divring_sdiv.
-Coercion divalg_alg : divalg >-> subalg.
-Canonical divalg_alg.
-Coercion divalg_ring : divalg >-> divring.
-
-Notation opprPred := opp.
-Notation addrPred := add.
-Notation mulrPred := mul.
-Notation zmodPred := zmod.
-Notation semiringPred := semiring.
-Notation smulrPred := smul.
-Notation divrPred := div.
-Notation submodPred := submod.
-Notation subringPred := subring.
-Notation sdivrPred := sdiv.
-Notation subalgPred := subalg.
-Notation divringPred := divring.
-Notation divalgPred := divalg.
-
-Definition OpprPred U S k kS NkS := Opp k (@opp_ext U S k kS NkS).
-Definition AddrPred U S k kS DkS := Add k (@add_ext U S k kS DkS).
-Definition MulrPred R S k kS MkS := Mul k (@mul_ext R S k kS MkS).
-Definition ZmodPred U S k kS NkS := Zmod k (@opp_ext U S k kS NkS).
-Definition SemiringPred R S k kS MkS := Semiring k (@mul_ext R S k kS MkS).
-Definition SmulrPred R S k kS MkS := Smul k (@mul_ext R S k kS MkS).
-Definition DivrPred R S k kS VkS := Div k (@inv_ext R S k kS VkS).
-Definition SubmodPred R U S k kS ZkS := Submod k (@scale_ext R U S k kS ZkS).
-Definition SubringPred R S k kS MkS := Subring k (@mul_ext R S k kS MkS).
-Definition SdivrPred R S k kS VkS := Sdiv k (@inv_ext R S k kS VkS).
-Definition SubalgPred (R : ringType) (A : lalgType R) S k kS ZkS :=
-  Subalg k (@scale_ext R A S k kS ZkS).
-Definition DivringPred R S k kS VkS := Divring k (@inv_ext R S k kS VkS).
-Definition DivalgPred (R : ringType) (A : unitAlgType R) S k kS ZkS :=
-  Divalg k (@scale_ext R A S k kS ZkS).
-
-End Exports.
-
-End Pred.
-Import Pred.Exports.
-
-Module DefaultPred.
-
-Canonical Pred.Default.opp.
-Canonical Pred.Default.add.
-Canonical Pred.Default.mul.
-Canonical Pred.Default.zmod.
-Canonical Pred.Default.semiring.
-Canonical Pred.Default.smul.
-Canonical Pred.Default.div.
-Canonical Pred.Default.submod.
-Canonical Pred.Default.subring.
-Canonical Pred.Default.sdiv.
-Canonical Pred.Default.subalg.
-Canonical Pred.Default.divring.
-Canonical Pred.Default.divalg.
-
-End DefaultPred.
-
-Section ZmodulePred.
-
-Variables (V : zmodType) (S : {pred V}).
-
-Section Add.
-
-Variables (addS : addrPred S) (kS : keyed_pred addS).
-
-Lemma rpred0D : addr_closed kS.
-Proof.
-by split=> [|x y]; rewrite !keyed_predE; case: addS => _ [_]//; apply.
-Qed.
-
-Lemma rpred0 : 0 \in kS.
-Proof. by case: rpred0D. Qed.
-
-Lemma rpredD : {in kS &, forall u v, u + v \in kS}.
-Proof. by case: rpred0D. Qed.
-
-Lemma rpred_sum I r (P : pred I) F :
-  (forall i, P i -> F i \in kS) -> \sum_(i <- r | P i) F i \in kS.
-Proof. by move=> IH; elim/big_ind: _; [apply: rpred0 | apply: rpredD |]. Qed.
-
-Lemma rpredMn n : {in kS, forall u, u *+ n \in kS}.
-Proof. by move=> u Su; rewrite -(card_ord n) -sumr_const rpred_sum. Qed.
-
-End Add.
-
-Section Opp.
-
-Variables (oppS : opprPred S) (kS : keyed_pred oppS).
-
-Lemma rpredNr : oppr_closed kS.
-Proof. by move=> x; rewrite !keyed_predE; case: oppS => _; apply. Qed.
-
-Lemma rpredN : {mono -%R: u / u \in kS}.
-Proof. by move=> u; apply/idP/idP=> /rpredNr; rewrite ?opprK; apply. Qed.
-
-End Opp.
-
-Section Sub.
-
-Variables (subS : zmodPred S) (kS : keyed_pred subS).
-
-Lemma rpredB : {in kS &, forall u v, u - v \in kS}.
-Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
-
-Lemma rpredBC u v : u - v \in kS = (v - u \in kS).
-Proof. by rewrite -rpredN opprB. Qed.
-
-Lemma rpredMNn n : {in kS, forall u, u *- n \in kS}.
-Proof. by move=> u Su; rewrite /= rpredN rpredMn. Qed.
-
-Lemma rpredDr x y : x \in kS -> (y + x \in kS) = (y \in kS).
-Proof.
-move=> Sx; apply/idP/idP=> [Sxy | /rpredD-> //].
-by rewrite -(addrK x y) rpredB.
-Qed.
-
-Lemma rpredDl x y : x \in kS -> (x + y \in kS) = (y \in kS).
-Proof. by rewrite addrC; apply: rpredDr. Qed.
-
-Lemma rpredBr x y : x \in kS -> (y - x \in kS) = (y \in kS).
-Proof. by rewrite -rpredN; apply: rpredDr. Qed.
-
-Lemma rpredBl x y : x \in kS -> (x - y \in kS) = (y \in kS).
-Proof. by rewrite -(rpredN _ y); apply: rpredDl. Qed.
-
-End Sub.
-
-End ZmodulePred.
-
-Section RingPred.
-
-Variables (R : ringType) (S : {pred R}).
-
-Lemma rpredMsign (oppS : opprPred S) (kS : keyed_pred oppS) n x :
-  ((-1) ^+ n * x \in kS) = (x \in kS).
-Proof. by rewrite -signr_odd mulr_sign; case: ifP => // _; rewrite rpredN. Qed.
-
-Section Mul.
-
-Variables (mulS : mulrPred S) (kS : keyed_pred mulS).
-
-Lemma rpred1M : mulr_closed kS.
-Proof.
-by split=> [|x y]; rewrite !keyed_predE; case: mulS => _ [_] //; apply.
-Qed.
-
-Lemma rpred1 : 1 \in kS.
-Proof. by case: rpred1M. Qed.
-
-Lemma rpredM : {in kS &, forall u v, u * v \in kS}.
-Proof. by case: rpred1M. Qed.
-
-Lemma rpred_prod I r (P : pred I) F :
-  (forall i, P i -> F i \in kS) -> \prod_(i <- r | P i) F i \in kS.
-Proof. by move=> IH; elim/big_ind: _; [apply: rpred1 | apply: rpredM |]. Qed.
-
-Lemma rpredX n : {in kS, forall u, u ^+ n \in kS}.
-Proof. by move=> u Su; rewrite -(card_ord n) -prodr_const rpred_prod. Qed.
-
-End Mul.
-
-Lemma rpred_nat (rngS : semiringPred S) (kS : keyed_pred rngS) n : n%:R \in kS.
-Proof. by rewrite rpredMn ?rpred1. Qed.
-
-Lemma rpredN1 (mulS : smulrPred S) (kS : keyed_pred mulS) : -1 \in kS.
-Proof. by rewrite rpredN rpred1. Qed.
-
-Lemma rpred_sign (mulS : smulrPred S) (kS : keyed_pred mulS) n :
-  (-1) ^+ n \in kS.
-Proof. by rewrite rpredX ?rpredN1. Qed.
-
-End RingPred.
-
-Section LmodPred.
-
-Variables (R : ringType) (V : lmodType R) (S : {pred V}).
-
-Lemma rpredZsign (oppS : opprPred S) (kS : keyed_pred oppS) n u :
-  ((-1) ^+ n *: u \in kS) = (u \in kS).
-Proof. by rewrite -signr_odd scaler_sign fun_if if_arg rpredN if_same. Qed.
-
-Lemma rpredZnat (addS : addrPred S) (kS : keyed_pred addS) n :
-  {in kS, forall u, n%:R *: u \in kS}.
-Proof. by move=> u Su; rewrite /= scaler_nat rpredMn. Qed.
-
-Lemma rpredZ (linS : submodPred S) (kS : keyed_pred linS) : scaler_closed kS.
-Proof. by move=> a u; rewrite !keyed_predE; case: {kS}linS => _; apply. Qed.
-
-End LmodPred.
-
-Section UnitRingPred.
-
-Variable R : unitRingType.
-
-Section Div.
-
-Variables (S : {pred R}) (divS : divrPred S) (kS : keyed_pred divS).
-
-Lemma rpredVr x : x \in kS -> x^-1 \in kS.
-Proof. by rewrite !keyed_predE; case: divS x. Qed.
-
-Lemma rpredV x : (x^-1 \in kS) = (x \in kS).
-Proof. by apply/idP/idP=> /rpredVr; rewrite ?invrK. Qed.
-
-Lemma rpred_div : {in kS &, forall x y, x / y \in kS}.
-Proof. by move=> x y Sx Sy; rewrite /= rpredM ?rpredV. Qed.
-
-Lemma rpredXN n : {in kS, forall x, x ^- n \in kS}.
-Proof. by move=> x Sx; rewrite /= rpredV rpredX. Qed.
-
-Lemma rpredMl x y : x \in kS -> x \is a unit-> (x * y \in kS) = (y \in kS).
-Proof.
-move=> Sx Ux; apply/idP/idP=> [Sxy | /(rpredM Sx)-> //].
-by rewrite -(mulKr Ux y); rewrite rpredM ?rpredV.
-Qed.
-
-Lemma rpredMr x y : x \in kS -> x \is a unit -> (y * x \in kS) = (y \in kS).
-Proof.
-move=> Sx Ux; apply/idP/idP=> [Sxy | /rpredM-> //].
-by rewrite -(mulrK Ux y); rewrite rpred_div.
-Qed.
-
-Lemma rpred_divr x y : x \in kS -> x \is a unit -> (y / x \in kS) = (y \in kS).
-Proof. by rewrite -rpredV -unitrV; apply: rpredMr. Qed.
-
-Lemma rpred_divl x y : x \in kS -> x \is a unit -> (x / y \in kS) = (y \in kS).
-Proof. by rewrite -(rpredV y); apply: rpredMl. Qed.
-
-End Div.
-
-Fact unitr_sdivr_closed : @sdivr_closed R unit.
-Proof. by split=> [|x y Ux Uy]; rewrite ?unitrN1 // unitrMl ?unitrV. Qed.
-
-Canonical unit_opprPred := OpprPred unitr_sdivr_closed.
-Canonical unit_mulrPred := MulrPred unitr_sdivr_closed.
-Canonical unit_divrPred := DivrPred unitr_sdivr_closed.
-Canonical unit_smulrPred := SmulrPred unitr_sdivr_closed.
-Canonical unit_sdivrPred := SdivrPred unitr_sdivr_closed.
-
-Implicit Type x : R.
-
-Lemma unitrN x : (- x \is a unit) = (x \is a unit). Proof. exact: rpredN. Qed.
-
-Lemma invrN x : (- x)^-1 = - x^-1.
-Proof.
-have [Ux | U'x] := boolP (x \is a unit); last by rewrite !invr_out ?unitrN.
-by rewrite -mulN1r invrM ?unitrN1 // invrN1 mulrN1.
-Qed.
-
-Lemma invr_signM n x : ((-1) ^+ n * x)^-1 = (-1) ^+ n * x^-1.
-Proof. by rewrite -signr_odd !mulr_sign; case: ifP => // _; rewrite invrN. Qed.
-
-Lemma divr_signM (b1 b2 : bool) x1 x2:
-  ((-1) ^+ b1 * x1) / ((-1) ^+ b2 * x2) = (-1) ^+ (b1 (+) b2) * (x1 / x2).
-Proof. by rewrite invr_signM mulr_signM. Qed.
-
-End UnitRingPred.
+End ClosedExports.
 
 (* Reification of the theory of rings with units, in named style  *)
 Section TermDef.
@@ -4492,35 +4105,10 @@ have [-> | nz_a] := eqVneq a; first by rewrite scale0r eqxx.
 by rewrite (can2_eq (scalerK nz_a) (scalerKV nz_a)) scaler0.
 Qed.
 
-Lemma rpredZeq S (modS : submodPred S) (kS : keyed_pred modS) a v :
-  (a *: v \in kS) = (a == 0) || (v \in kS).
-Proof.
-have [-> | nz_a] := eqVneq; first by rewrite scale0r rpred0.
-by apply/idP/idP; first rewrite -{2}(scalerK nz_a v); apply: rpredZ.
-Qed.
-
 End ModuleTheory.
 
 Lemma char_lalg (A : lalgType F) : [char A] =i [char F].
 Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
-
-Section Predicates.
-
-Context (S : {pred F}) (divS : @divrPred F S) (kS : keyed_pred divS).
-
-Lemma fpredMl x y : x \in kS -> x != 0 -> (x * y \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; apply: rpredMl. Qed.
-
-Lemma fpredMr x y : x \in kS -> x != 0 -> (y * x \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; apply: rpredMr. Qed.
-
-Lemma fpred_divl x y : x \in kS -> x != 0 -> (x / y \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; apply: rpred_divl. Qed.
-
-Lemma fpred_divr x y : x \in kS -> x != 0 -> (y / x \in kS) = (y \in kS).
-Proof. by rewrite -!unitfE; apply: rpred_divr. Qed.
-
-End Predicates.
 
 End FieldTheory.
 
@@ -4776,13 +4364,442 @@ Proof.
 by move=> _ inj_f fM fZ a x y; apply: inj_f; rewrite !(fM, fZ) scalerAr.
 Qed.
 
+(* Mixins for stability properties *)
+
+HB.mixin Record isOppClosed (V : zmodType) (S : V -> bool) := {
+  rpredNr : oppr_closed S
+}.
+
+HB.mixin Record isAddClosed (V : zmodType) (S : V -> bool) := {
+  rpred0D : addr_closed S
+}.
+
+HB.mixin Record isMulClosed (R : ringType) (S : R -> bool) := {
+  rpred1M : mulr_closed S
+}.
+
+HB.mixin Record isInvClosed (R : unitRingType) (S : R -> bool) := {
+  rpredVr : invr_closed S
+}.
+
+HB.mixin Record isScaleClosed (R : ringType) (V : lmodType R)
+    (S : V -> bool) := {
+  rpredZ : scaler_closed S
+}.
+
+(* Structures for stability properties *)
+
+#[short(type="opprClosed")]
+HB.structure Definition OppClosed V := {S of isOppClosed V S}.
+
+#[short(type="addrClosed")]
+HB.structure Definition AddClosed V := {S of isAddClosed V S}.
+
+#[short(type="zmodClosed")]
+HB.structure Definition ZmodClosed V := {S of AddClosed V S & OppClosed V S}.
+
+#[short(type="mulrClosed")]
+HB.structure Definition MulClosed R := {S of isMulClosed R S}.
+
+#[short(type="smulClosed")]
+HB.structure Definition SmulClosed (R : ringType) :=
+  {S of OppClosed R S & MulClosed R S}.
+
+#[short(type="semiringClosed")]
+HB.structure Definition SemiringClosed (R : ringType) :=
+  {S of AddClosed R S & MulClosed R S}.
+
+#[short(type="subringClosed")]
+HB.structure Definition SubringClosed (R : ringType) :=
+  {S of ZmodClosed R S & MulClosed R S}.
+
+#[short(type="divClosed")]
+HB.structure Definition DivClosed (R : unitRingType) :=
+  {S of MulClosed R S & isInvClosed R S}.
+
+#[short(type="sdivClosed")]
+HB.structure Definition SdivClosed (R : unitRingType) :=
+  {S of SmulClosed R S & isInvClosed R S}.
+
+#[short(type="submodClosed")]
+HB.structure Definition SubmodClosed (R : ringType) (V : lmodType R) :=
+  {S of ZmodClosed V S & isScaleClosed R V S}.
+
+#[short(type="subalgClosed")]
+HB.structure Definition SubalgClosed (R : ringType) (A : lalgType R) :=
+  {S of SubringClosed A S & isScaleClosed R A S}.
+
+#[short(type="divringClosed")]
+HB.structure Definition DivringClosed (R : unitRingType) :=
+  {S of SubringClosed R S & isInvClosed R S}.
+
+#[short(type="divalgClosed")]
+HB.structure Definition DivalgClosed (R : ringType) (A : unitAlgType R) :=
+  {S of DivringClosed A S & isScaleClosed R A S}.
+
+(* Factories for stability properties *)
+
+HB.factory Record isZmodClosed (V : zmodType) (S : V -> bool) := {
+  zmod_closed_subproof : zmod_closed S
+}.
+
+HB.builders Context V S of isZmodClosed V S.
+HB.instance Definition _ := isOppClosed.Build V S
+  (zmod_closedN zmod_closed_subproof).
+HB.instance Definition _ := isAddClosed.Build V S
+  (zmod_closedD zmod_closed_subproof).
+HB.end.
+
+HB.factory Record isSmulClosed (R : ringType) (S : R -> bool) := {
+  smulr_closed_subproof : smulr_closed S
+}.
+
+HB.builders Context R S of isSmulClosed R S.
+HB.instance Definition _ := isMulClosed.Build R S
+  (smulr_closedM smulr_closed_subproof).
+HB.instance Definition _ := isOppClosed.Build R S
+  (smulr_closedN smulr_closed_subproof).
+HB.end.
+
+HB.factory Record isSemiringClosed (R : ringType) (S : R -> bool) := {
+  semiring_closed_subproof : semiring_closed S
+}.
+
+HB.builders Context R S of isSemiringClosed R S.
+HB.instance Definition _ := isAddClosed.Build R S
+  (semiring_closedD semiring_closed_subproof).
+HB.instance Definition _ := isMulClosed.Build R S
+  (semiring_closedM semiring_closed_subproof).
+HB.end.
+
+HB.factory Record isSubringClosed (R : ringType) (S : R -> bool) := {
+  subring_closed_subproof : subring_closed S
+}.
+
+HB.builders Context R S of isSubringClosed R S.
+HB.instance Definition _ := isZmodClosed.Build R S
+  (subring_closedB subring_closed_subproof).
+HB.instance Definition _ := isSmulClosed.Build R S
+  (subring_closedM subring_closed_subproof).
+HB.end.
+
+HB.factory Record isDivClosed (R : unitRingType) (S : R -> bool) := {
+  divr_closed_subproof : divr_closed S
+}.
+
+HB.builders Context R S of isDivClosed R S.
+HB.instance Definition _ := isInvClosed.Build R S
+  (divr_closedV divr_closed_subproof).
+HB.instance Definition _ := isMulClosed.Build R S
+  (divr_closedM divr_closed_subproof).
+HB.end.
+
+HB.factory Record isSdivClosed (R : unitRingType) (S : R -> bool) := {
+  sdivr_closed_subproof : sdivr_closed S
+}.
+
+HB.builders Context R S of isSdivClosed R S.
+HB.instance Definition _ := isDivClosed.Build R S
+  (sdivr_closed_div sdivr_closed_subproof).
+HB.instance Definition _ := isSmulClosed.Build R S
+  (sdivr_closedM sdivr_closed_subproof).
+HB.end.
+
+HB.factory Record isSubmodClosed (R : ringType) (V : lmodType R)
+    (S : V -> bool) := {
+  submod_closed_subproof : submod_closed S
+}.
+
+HB.builders Context R V S of isSubmodClosed R V S.
+HB.instance Definition _ := isZmodClosed.Build V S
+  (submod_closedB submod_closed_subproof).
+HB.instance Definition _ := isScaleClosed.Build R V S
+  (submod_closedZ submod_closed_subproof).
+HB.end.
+
+HB.factory Record isSubalgClosed (R : ringType) (A : lalgType R)
+    (S : A -> bool) := {
+  subalg_closed_subproof : subalg_closed S
+}.
+
+HB.builders Context R A S of isSubalgClosed R A S.
+HB.instance Definition _ := isSubmodClosed.Build R A S
+  (subalg_closedZ subalg_closed_subproof).
+HB.instance Definition _ := isSubringClosed.Build A S
+  (subalg_closedBM subalg_closed_subproof).
+HB.end.
+
+HB.factory Record isDivringClosed (R : unitRingType) (S : R -> bool) := {
+  divring_closed_subproof : divring_closed S
+}.
+
+HB.builders Context R S of isDivringClosed R S.
+HB.instance Definition _ := isSubringClosed.Build R S
+  (divring_closedBM divring_closed_subproof).
+HB.instance Definition _ := isSdivClosed.Build R S
+  (divring_closed_div divring_closed_subproof).
+HB.end.
+
+HB.factory Record isDivalgClosed (R : comUnitRingType) (A : unitAlgType R)
+    (S : A -> bool) := {
+  divalg_closed_subproof : divalg_closed S
+}.
+
+HB.builders Context R A S of isDivalgClosed R A S.
+HB.instance Definition _ := isDivringClosed.Build A S
+  (divalg_closedBdiv divalg_closed_subproof).
+HB.instance Definition _ := isSubalgClosed.Build R A S
+  (divalg_closedZ divalg_closed_subproof).
+HB.end.
+
+Section ZmodulePred.
+
+Variables (V : zmodType).
+
+Section Add.
+
+Variables (addS : addrClosed V).
+Local Notation S := (addS : pred V).
+
+Lemma rpred0 : 0 \in S.
+Proof. by case: (@rpred0D _ addS). Qed.
+
+Lemma rpredD : {in S &, forall u v, u + v \in S}.
+Proof. by case: (@rpred0D _ addS). Qed.
+
+Lemma rpred_sum I r (P : pred I) F :
+  (forall i, P i -> F i \in S) -> \sum_(i <- r | P i) F i \in S.
+Proof. by move=> IH; elim/big_ind: _; [apply: rpred0 | apply: rpredD |]. Qed.
+
+Lemma rpredMn n : {in S, forall u, u *+ n \in S}.
+Proof. by move=> u Su; rewrite -(card_ord n) -sumr_const rpred_sum. Qed.
+
+End Add.
+
+Section Opp.
+
+Variables (oppS : opprClosed V).
+Local Notation S := (oppS : pred V).
+
+Lemma rpredN : {mono -%R: u / u \in S}.
+Proof. by move=> u; apply/idP/idP=> /rpredNr; rewrite ?opprK; apply. Qed.
+
+End Opp.
+
+Section Sub.
+
+Variables (subS : zmodClosed V).
+Local Notation S := (subS : pred V).
+
+Lemma rpredB : {in S &, forall u v, u - v \in S}.
+Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
+
+Lemma rpredBC u v : u - v \in S = (v - u \in S).
+Proof. by rewrite -rpredN opprB. Qed.
+
+Lemma rpredMNn n : {in S, forall u, u *- n \in S}.
+Proof. by move=> u Su; rewrite /= rpredN rpredMn. Qed.
+
+Lemma rpredDr x y : x \in S -> (y + x \in S) = (y \in S).
+Proof.
+move=> Sx; apply/idP/idP=> [Sxy | /rpredD-> //].
+by rewrite -(addrK x y) rpredB.
+Qed.
+
+Lemma rpredDl x y : x \in S -> (x + y \in S) = (y \in S).
+Proof. by rewrite addrC; apply: rpredDr. Qed.
+
+Lemma rpredBr x y : x \in S -> (y - x \in S) = (y \in S).
+Proof. by rewrite -rpredN; apply: rpredDr. Qed.
+
+Lemma rpredBl x y : x \in S -> (x - y \in S) = (y \in S).
+Proof. by rewrite -(rpredN _ y); apply: rpredDl. Qed.
+
+Lemma zmodClosedP : zmod_closed subS.
+Proof. split; [ exact: rpred0D.1 | exact: rpredB ]. Qed.
+
+End Sub.
+
+End ZmodulePred.
+
+Section RingPred.
+
+Variables (R : ringType).
+
+Lemma rpredMsign (oppS : opprClosed R) n x :
+  ((-1) ^+ n * x \in (oppS : pred R)) = (x \in (oppS : pred R)).
+Proof. by rewrite -signr_odd mulr_sign; case: ifP => // _; rewrite rpredN. Qed.
+
+Section Mul.
+
+Variables (mulS : mulrClosed R).
+Local Notation S := (mulS : pred R).
+
+Lemma rpred1 : 1 \in S.
+Proof. by case: (@rpred1M _ mulS). Qed.
+
+Lemma rpredM : {in S &, forall u v, u * v \in S}.
+Proof. by case: (@rpred1M _ mulS). Qed.
+
+Lemma rpred_prod I r (P : pred I) F :
+  (forall i, P i -> F i \in S) -> \prod_(i <- r | P i) F i \in S.
+Proof. by move=> IH; elim/big_ind: _; [apply: rpred1 | apply: rpredM |]. Qed.
+
+Lemma rpredX n : {in S, forall u, u ^+ n \in S}.
+Proof. by move=> u Su; rewrite -(card_ord n) -prodr_const rpred_prod. Qed.
+
+End Mul.
+
+Lemma rpred_nat (rngS : semiringClosed R) n : n%:R \in (rngS : pred R).
+Proof. by rewrite rpredMn ?rpred1. Qed.
+
+Lemma rpredN1 (mulS : smulClosed R) : -1 \in (mulS : pred R).
+Proof. by rewrite rpredN rpred1. Qed.
+
+Lemma rpred_sign (mulS : smulClosed R) n :
+  (-1) ^+ n \in (mulS : pred R).
+Proof. by rewrite rpredX ?rpredN1. Qed.
+
+Lemma subringClosedP (rngS : subringClosed R) : subring_closed rngS.
+Proof.
+split; [ exact: rpred1 | exact: (zmodClosedP rngS).2 | exact: rpredM ].
+Qed.
+
+End RingPred.
+
+Section LmodPred.
+
+Variables (R : ringType) (V : lmodType R).
+
+Lemma rpredZsign (oppS : opprClosed V) n u :
+  ((-1) ^+ n *: u \in (oppS : pred V)) = (u \in (oppS : pred V)).
+Proof. by rewrite -signr_odd scaler_sign fun_if if_arg rpredN if_same. Qed.
+
+Lemma rpredZnat (addS : addrClosed V) n :
+  {in (addS : pred V), forall u, n%:R *: u \in (addS : pred V)}.
+Proof. by move=> u Su; rewrite /= scaler_nat rpredMn. Qed.
+
+Lemma submodClosedP (modS : submodClosed V) : submod_closed modS.
+Proof.
+split; first exact rpred0D.1.
+by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
+Qed.
+
+End LmodPred.
+
+Section UnitRingPred.
+
+Variable R : unitRingType.
+
+Section Div.
+
+Variables (divS : divClosed R).
+Notation S := (divS : pred R).
+
+Lemma rpredV x : (x^-1 \in S) = (x \in S).
+Proof. by apply/idP/idP=> /rpredVr; rewrite ?invrK. Qed.
+
+Lemma rpred_div : {in S &, forall x y, x / y \in S}.
+Proof. by move=> x y Sx Sy; rewrite /= rpredM ?rpredV. Qed.
+
+Lemma rpredXN n : {in S, forall x, x ^- n \in S}.
+Proof. by move=> x Sx; rewrite /= rpredV rpredX. Qed.
+
+Lemma rpredMl x y : x \in S -> x \is a unit-> (x * y \in S) = (y \in S).
+Proof.
+move=> Sx Ux; apply/idP/idP=> [Sxy | /(rpredM Sx)-> //].
+by rewrite -(mulKr Ux y); rewrite rpredM ?rpredV.
+Qed.
+
+Lemma rpredMr x y : x \in S -> x \is a unit -> (y * x \in S) = (y \in S).
+Proof.
+move=> Sx Ux; apply/idP/idP=> [Sxy | /rpredM-> //].
+by rewrite -(mulrK Ux y); rewrite rpred_div.
+Qed.
+
+Lemma rpred_divr x y : x \in S -> x \is a unit -> (y / x \in S) = (y \in S).
+Proof. by rewrite -rpredV -unitrV; apply: rpredMr. Qed.
+
+Lemma rpred_divl x y : x \in S -> x \is a unit -> (x / y \in S) = (y \in S).
+Proof. by rewrite -(rpredV y); apply: rpredMl. Qed.
+
+End Div.
+
+Lemma divringClosedP (divS : divringClosed R) : divring_closed divS.
+Proof. split; [ exact: rpred1 | exact: rpredB | exact: rpred_div ]. Qed.
+
+Fact unitr_sdivr_closed : @sdivr_closed R unit.
+Proof. by split=> [|x y Ux Uy]; rewrite ?unitrN1 // unitrMl ?unitrV. Qed.
+
+#[export]
+HB.instance Definition _ := isSdivClosed.Build R unit_pred unitr_sdivr_closed.
+
+Implicit Type x : R.
+
+Lemma unitrN x : (- x \is a unit) = (x \is a unit). Proof. exact: rpredN. Qed.
+
+Lemma invrN x : (- x)^-1 = - x^-1.
+Proof.
+have [Ux | U'x] := boolP (x \is a unit); last by rewrite !invr_out ?unitrN.
+by rewrite -mulN1r invrM ?unitrN1 // invrN1 mulrN1.
+Qed.
+
+Lemma invr_signM n x : ((-1) ^+ n * x)^-1 = (-1) ^+ n * x^-1.
+Proof. by rewrite -signr_odd !mulr_sign; case: ifP => // _; rewrite invrN. Qed.
+
+Lemma divr_signM (b1 b2 : bool) x1 x2:
+  ((-1) ^+ b1 * x1) / ((-1) ^+ b2 * x2) = (-1) ^+ (b1 (+) b2) * (x1 / x2).
+Proof. by rewrite invr_signM mulr_signM. Qed.
+
+End UnitRingPred.
+
+Section FieldPred.
+
+Variable F : fieldType.
+Implicit Types x y : F.
+
+Section ModuleTheory.
+
+Variable V : lmodType F.
+Implicit Types (a : F) (v : V).
+
+Lemma rpredZeq (modS : submodClosed V) a v :
+  (a *: v \in (modS : pred _)) = (a == 0) || (v \in (modS : pred _)).
+Proof.
+have [-> | nz_a] := eqVneq; first by rewrite scale0r rpred0.
+by apply/idP/idP; first rewrite -{2}(scalerK nz_a v); apply: rpredZ.
+Qed.
+
+End ModuleTheory.
+
+Section Predicates.
+
+Context (divS : divClosed F).
+Notation S := (divS : pred F).
+
+Lemma fpredMl x y : x \in S -> x != 0 -> (x * y \in S) = (y \in S).
+Proof. by rewrite -!unitfE; apply: rpredMl. Qed.
+
+Lemma fpredMr x y : x \in S -> x != 0 -> (y * x \in S) = (y \in S).
+Proof. by rewrite -!unitfE; apply: rpredMr. Qed.
+
+Lemma fpred_divl x y : x \in S -> x != 0 -> (x / y \in S) = (y \in S).
+Proof. by rewrite -!unitfE; apply: rpred_divl. Qed.
+
+Lemma fpred_divr x y : x \in S -> x != 0 -> (y / x \in S) = (y \in S).
+Proof. by rewrite -!unitfE; apply: rpred_divr. Qed.
+
+End Predicates.
+
+End FieldPred.
+
 (* remove uses of program definition *)
 Obligation Tactic := idtac.
 
 Implicit Type V : zmodType.
 
-HB.mixin Record isSubZmodule V (S : {pred V}) U of Sub V S U & Zmodule U := {
-  valB : additive (val : U -> V);
+HB.mixin Record isSubZmodule V (S : pred V) U of Sub V S U & Zmodule U := {
+  valB_subproof : additive (val : U -> V);
 }.
 
 #[short(type="subZmodType")]
@@ -4790,309 +4807,287 @@ HB.structure Definition SubZmodule V S :=
   { U of SubChoice V S U & Zmodule U & isSubZmodule V S U }.
 
 Section additive.
-Context V (S : {pred V}) (U : SubZmodule.type S).
+Context V (S : pred V) (U : SubZmodule.type S).
 Notation val := (val : U -> V).
 #[export]
-HB.instance Definition _ := isAdditive.Build U V val valB.
+HB.instance Definition _ := isAdditive.Build U V val valB_subproof.
 Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
+Lemma valB : {morph val : x y / x - y}. Proof. exact: raddfB. Qed.
 Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
 Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
 End additive.
 
-HB.factory Record PreZmodule U of Choice U := {
-  V : zmodType;
-  f : U -> V;
-  zero : U;
-  opp: U -> U;
-  add : U -> U -> U;
-  injf : injective f;
-  f0 : f zero = 0;
-  fN : {morph f : x / opp x >-> - x};
-  fD : {morph f : x y / add x y >-> x + y};
+HB.factory Record SubChoice_isSubZmodule V S U of SubChoice V S U := {
+  zmod_closed_subproof : zmod_closed S
 }.
 
-HB.builders Context U of PreZmodule U.
-Program Definition zmodU := @isZmodule.Build U zero opp add _ _ _ _.
-Next Obligation. by move=> x y z; apply: injf; rewrite !fD addrA. Qed.
-Next Obligation. by move=> x y; apply: injf; rewrite !fD addrC. Qed.
-Next Obligation. by move=> x; apply: injf; rewrite fD f0 add0r. Qed.
-Next Obligation. by move=> x; apply: injf; rewrite !(fD, fN, f0) addNr. Qed.
-HB.instance Definition _ : isZmodule U := zmodU.
-HB.end.
+HB.builders Context V S U of SubChoice_isSubZmodule V S U.
 
-HB.factory Record PredSubZmodule V (S : {pred V})
-  (subS : zmodPred S) (kS : keyed_pred subS) U of SubChoice V (mem kS) U := {}.
-
-HB.builders Context (V : zmodType) (S : {pred V})
-  (subS : zmodPred S) (kS : keyed_pred subS) U of PredSubZmodule V S subS kS U.
+HB.instance Definition _ := isZmodClosed.Build V S zmod_closed_subproof.
 
 Let inU v Sv : U := sub v Sv.
-Let zeroU := inU (rpred0 kS).
-Let oppU (u : U) := inU (rpredNr (valP u)).
+Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
+Let oppU (u : U) := inU (rpredNr _ (valP u)).
 Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
 
-Program Definition zmodU := @PreZmodule.Build U V _
-  zeroU oppU addU val_inj _ _ _.
-Next Obligation. by rewrite subK. Qed.
-Next Obligation. by move=> x; rewrite subK. Qed.
-Next Obligation. by move=> *; rewrite !subK. Qed.
+Program Definition zmodU := @isZmodule.Build U zeroU oppU addU _ _ _ _.
+Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK addrA. Qed.
+Next Obligation. by move=> x y; apply: val_inj; rewrite !subK addrC. Qed.
+Next Obligation. by move=> x; apply: val_inj; rewrite !subK add0r. Qed.
+Next Obligation. by move=> x; apply: val_inj; rewrite !subK addNr. Qed.
 HB.instance Definition _ := zmodU.
 
 Lemma valD : additive (val : U -> V).
 Proof. by move=> x y /=; rewrite !subK. Qed.
-
-HB.instance Definition _ := isSubZmodule.Build V (mem kS) U valD.
+HB.instance Definition _ := isSubZmodule.Build V S U valD.
 HB.end.
 
-(* HB.instance Definition _ (V : zmodType) (S : {pred V}) *)
-(*    (subS : zmodPred S) (kS : keyed_pred subS) (sT : subType (mem kS)) := *)
-(*  PredSubZmodule.Build V S subS kS (sub_type sT). *)
-
-HB.mixin Record isSubRing (R : ringType) (S : {pred R}) U
+HB.mixin Record isSubRing (R : ringType) (S : pred R) U
     of SubZmodule R S U & Ring U := {
-  valM : multiplicative (val : U -> R);
+  valM_subproof : multiplicative (val : U -> R);
 }.
 
 #[short(type="subRingType")]
-HB.structure Definition SubRing (R : ringType) (S : {pred R}) :=
+HB.structure Definition SubRing (R : ringType) (S : pred R) :=
   { U of SubZmodule R S U & Ring U & isSubRing R S U }.
 
 Section multiplicative.
-Context (R : ringType) (S : {pred R}) (U : SubRing.type S).
+Context (R : ringType) (S : pred R) (U : SubRing.type S).
 Notation val := (val : U -> R).
 #[export]
-HB.instance Definition _ := isMultiplicative.Build U R val valM.
+HB.instance Definition _ := isMultiplicative.Build U R val valM_subproof.
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
+Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
+Lemma valM1 : multiplicative val. Proof. exact: valM_subproof. Qed.
 End multiplicative.
 
-HB.factory Record PreRing R of Zmodule R := {
-  R' : ringType;
-  f : {additive R -> R'};
-  one : R;
-  mul : R -> R -> R;
-  injf : injective f;
-  f1 : f one = 1;
-  fM : {morph f : x y / mul x y >-> x * y};
+HB.factory Record SubZmodule_isSubRing (R : ringType) S U
+    of SubZmodule R S U := {
+  subring_closed_subproof : subring_closed S
 }.
 
-HB.builders Context R of PreRing R.
-Program Definition ringR := @Zmodule_isRing.Build R one mul _ _ _ _ _ _.
-Next Obligation. by move=> x y z; apply: injf; rewrite !fM mulrA. Qed.
-Next Obligation. by move=> x; apply: injf; rewrite fM f1 mul1r. Qed.
-Next Obligation. by move=> x; apply: injf; rewrite fM f1 mulr1. Qed.
-Next Obligation. by move=> *; apply: injf; rewrite !(fM, raddfD) mulrDl. Qed.
-Next Obligation. by move=> *; apply: injf; rewrite !(fM, raddfD) mulrDr. Qed.
-Next Obligation. by rewrite -(inj_eq injf) raddf0 f1 oner_eq0. Qed.
-HB.instance Definition _ : Zmodule_isRing R := ringR.
-HB.end.
+HB.builders Context R S U of SubZmodule_isSubRing R S U.
 
-HB.factory Record PredSubRing (R : ringType) (S : {pred R})
-  (ringS : subringPred S) (kS : keyed_pred ringS) U of SubZmodule R (mem kS) U := {}.
-
-HB.builders Context (R : ringType) (S : {pred R})
-  (ringS : subringPred S) (kS : keyed_pred ringS)
-  U of PredSubRing R S ringS kS U.
+HB.instance Definition _ := isSubringClosed.Build R S subring_closed_subproof.
 
 Let inU v Sv : U := sub v Sv.
-Let oneU : U := inU (rpred1 kS).
+Let oneU : U := inU (rpred1 (MulClosed.clone R S _)).
 Let mulU (u1 u2 : U) := inU (rpredM (valP u1) (valP u2)).
 
-Program Definition ringU := @PreRing.Build U R _ oneU mulU val_inj _ _.
-Next Obligation. by rewrite /= subK. Qed.
-Next Obligation. by move=> x y /=; rewrite !subK. Qed.
+Program Definition ringU := @Zmodule_isRing.Build U oneU mulU _ _ _ _ _ _.
+Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK mulrA. Qed.
+Next Obligation. by move=> x; apply: val_inj; rewrite !subK mul1r. Qed.
+Next Obligation. by move=> x; apply: val_inj; rewrite !subK mulr1. Qed.
+Next Obligation.
+by move=> x y z; apply: val_inj; rewrite !(subK, raddfD)/= !subK mulrDl.
+Qed.
+Next Obligation.
+by move=> x y z; apply: val_inj; rewrite !(subK, raddfD)/= !subK mulrDr.
+Qed.
+Next Obligation. by rewrite -(inj_eq val_inj) subK raddf0 oner_neq0. Qed.
 HB.instance Definition _ := ringU.
 
 Lemma valM : multiplicative (val : U -> R).
 Proof. by split=> [x y|] /=; rewrite !subK. Qed.
-
-HB.instance Definition _ := isSubRing.Build R (mem kS) U valM.
+HB.instance Definition _ := isSubRing.Build R S U valM.
 HB.end.
 
-HB.factory Record PreComRing R of Ring R := {
-  R' : comRingType;
-  f : R -> R';
-  injf : injective f;
-  fM : {morph f : x y / x * y};
-}.
+#[short(type="subComRingType")]
+HB.structure Definition SubComRing (R : ringType) S :=
+  {U of SubRing R S U & ComRing U}.
 
-HB.builders Context R of PreComRing R.
-HB.instance Definition _ := Ring_hasCommutativeMul.Build R
-  (comRingMixin (Phant R) injf fM).
+HB.factory Record SubRing_isSubComRing (R : comRingType) S U
+    of SubRing R S U := {}.
+
+HB.builders Context R S U of SubRing_isSubComRing R S U.
+Lemma mulrC : @commutative U U *%R.
+Proof. by move=> x y; apply: val_inj; rewrite !rmorphM mulrC. Qed.
+HB.instance Definition _ := Ring_hasCommutativeMul.Build U mulrC.
 HB.end.
 
-HB.mixin Record isSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
+HB.mixin Record isSubLmodule (R : ringType) (V : lmodType R) (S : pred V)
    W of SubZmodule V S W & Lmodule R W := {
  valZ : scalable (val : W -> V);
 }.
 
 #[short(type="subLmodType")]
 HB.structure Definition SubLmodule (R : ringType) (V : lmodType R)
-    (S : {pred V}) :=
+    (S : pred V) :=
   { W of SubZmodule V S W & Zmodule_isLmodule R W & isSubLmodule R V S W}.
 
 Section linear.
-Context (R : ringType) (V : lmodType R) (S : {pred V}) (W : SubLmodule.type S).
+Context (R : ringType) (V : lmodType R) (S : pred V) (W : SubLmodule.type S).
 Notation val := (val : W -> V).
 #[export]
 HB.instance Definition _ := isLinear.Build R W V *:%R val valZ.
 End linear.
 
-HB.factory Record PreLmodule (R : ringType) U of Zmodule U := {
-  V : lmodType R;
-  f : {additive U -> V};
-  injf : injective f;
-  scale : R -> U -> U;
-  fZ : forall k, {morph f : x / scale k x >-> k *: x};
+HB.factory Record SubZmodule_isSubLmodule (R : ringType) (V : lmodType R) S W
+    of SubZmodule V S W := {
+  submod_closed_subproof : submod_closed S
 }.
 
-HB.builders Context R U of PreLmodule R U.
-Program Definition lmodU := @Zmodule_isLmodule.Build R U scale _ _ _ _.
-Next Obligation. by move=> *; apply: injf; rewrite !fZ scalerA. Qed.
-Next Obligation. by move=> x; apply: injf; rewrite fZ scale1r. Qed.
-Next Obligation. by move=> *; apply: injf; rewrite !(fZ, raddfD). Qed.
-Next Obligation.
-by move=> x a b; apply: injf; rewrite !(fZ, raddfD) scalerDl.
-Qed.
-HB.instance Definition _ : Zmodule_isLmodule R U := lmodU.
-HB.end.
+HB.builders Context (R : ringType) (V : lmodType R) S W
+  of SubZmodule_isSubLmodule R V S W.
 
-HB.factory Record PredSubLmodule (R : ringType) (V : lmodType R) (S : {pred V})
-    (linS : submodPred S) (kS : keyed_pred linS) U of SubZmodule V (mem kS) U := {}.
-
-HB.builders Context (R : ringType) (V : lmodType R) (S : {pred V})
-    (linS : submodPred S) (kS : keyed_pred linS) W
-  of PredSubLmodule R V S linS kS W.
+HB.instance Definition _ := isSubmodClosed.Build R V S submod_closed_subproof.
 
 Let inW v Sv : W := sub v Sv.
-Let scaleW a (w : W) := inW (rpredZ a (valP w)).
+Let scaleW a (w : W) := inW (rpredZ a _ (valP w)).
 
-Program Definition lmodW := @PreLmodule.Build R W _ _ val_inj scaleW _.
-Next Obligation. by move=> k x; rewrite /= subK. Qed.
-HB.instance Definition _ := lmodW.
+Program Definition lmodU := @Zmodule_isLmodule.Build R W scaleW _ _ _ _.
+Next Obligation. by move=> a b v; apply: val_inj; rewrite !subK scalerA. Qed.
+Next Obligation. by move=> x; apply: val_inj; rewrite subK scale1r. Qed.
+Next Obligation.
+by move=> a u v; apply: val_inj; rewrite !(subK, raddfD)/= !subK.
+Qed.
+Next Obligation.
+by move=> v a b; apply: val_inj; rewrite !(subK, raddfD)/= !subK scalerDl.
+Qed.
+HB.instance Definition _ := lmodU.
 
 Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite subK. Qed.
-
-HB.instance Definition _ := isSubLmodule.Build R V (mem kS) W valZ.
+HB.instance Definition _ := isSubLmodule.Build R V S W valZ.
 HB.end.
 
-HB.factory Record PreLalgebra R B of Ring B & Lmodule R B := {
-  A : lalgType R;
-  f : B -> A;
-  injf : injective f;
-  fM : {morph f : x y / x * y};
-  fZ : scalable f;
-}.
-HB.builders Context (R : ringType) B of PreLalgebra R B.
-HB.instance Definition _ := Lmodule_isLalgebra.Build R B
-  (lalgMixin (Phant B) injf fZ fM).
+#[infer(R), short(type="subLalgType")]
+HB.structure Definition SubLalgebra (R : ringType) (V : lalgType R) S :=
+  {W of SubRing V S W & @SubLmodule R V S W & Lalgebra R W}.
+
+HB.factory Record SubRing_SubLmodule_isSubLalgebra (R : ringType)
+    (V : lalgType R) S W of SubRing V S W & @SubLmodule R V S W := {}.
+
+HB.builders Context (R : ringType) (V : lalgType R) S W
+  of SubRing_SubLmodule_isSubLalgebra R V S W.
+Lemma scalerAl (a : R) (u v : W) : a *: (u * v) = a *: u * v.
+Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAl. Qed.
+HB.instance Definition _ := Lmodule_isLalgebra.Build R W scalerAl.
 HB.end.
 
-HB.factory Record PreAlgebra R B of Lalgebra R B := {
-  A : algType R;
-  f : B -> A;
-  injf : injective f;
-  fM : {morph f : x y / x * y};
-  fZ : scalable f;
-}.
-HB.builders Context R B of PreAlgebra R B.
-HB.instance Definition _ := Lalgebra_isAlgebra.Build R B
-  (algMixin (Phant B) injf fM fZ).
-HB.end.
+#[infer(R), short(type="subAlgType")]
+HB.structure Definition SubAlgebra (R : ringType) (V : algType R) S :=
+  {W of @SubLalgebra R V S W & Algebra R W}.
 
-HB.factory Record PreUnitRing R of Ring R := {
-  R' : unitRingType;
-  f : R -> R';
-  injf : injective f;
-  inv : R -> R;
-  fM : multiplicative f;
-  fV : {morph f : x / inv x >-> x^-1};
-}.
-HB.builders Context R of PreUnitRing R.
+HB.factory Record SubLalgebra_isSubAlgebra (R : ringType)
+    (V : algType R) S W of @SubLalgebra R V S W := {}.
 
-Program Definition unitringR :=
-  @Ring_hasMulInverse.Build R [pred x | f x \is a GRing.unit] inv _ _ _ _.
-Next Obligation.
-by move=> x; rewrite inE => fxU; apply: injf; rewrite fM fV mulVr ?fM.
-Qed.
-Next Obligation.
-by move=> x; rewrite inE => fxU; apply: injf; rewrite fM fV mulrV ?fM.
-Qed.
-Next Obligation.
-move=> x y [/(congr1 f) fyx1 /(congr1 f) fxy1]; rewrite inE.
-by apply: rev_unitrP (f y) _; rewrite !fM in fyx1 fxy1.
-Qed.
-Next Obligation.
-by move=> x; rewrite !inE => fxNU; apply: injf; rewrite fV invr_out.
-Qed.
-HB.instance Definition _ : Ring_hasMulInverse R := unitringR.
-
+HB.builders Context (R : ringType) (V : algType R) S W
+  of SubLalgebra_isSubAlgebra R V S W.
+Lemma scalerAr (k : R) (x y : W) : k *: (x * y) = x * (k *: y).
+Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAr. Qed.
+HB.instance Definition _ := Lalgebra_isAlgebra.Build R W scalerAr.
 HB.end.
 
 #[short(type="subUnitRingType")]
-HB.structure Definition SubUnitRing (R : ringType)
-    (S : {pred Ring.sort R}) :=
+HB.structure Definition SubUnitRing (R : ringType) (S : pred R) :=
   {U of SubRing R S U & UnitRing U}.
 
-HB.factory Record PredSubUnitRing (R : unitRingType) (S : {pred R})
-  (ringS : divringPred S) (kS : keyed_pred ringS) U of SubRing R (mem kS) U := {}.
+HB.factory Record SubRing_isSubUnitRing (R : unitRingType) S U
+    of SubRing R S U := {
+  divring_closed_subproof : divring_closed S
+}.
 
-HB.builders Context (R : unitRingType) (S : {pred R})
-  (ringS : divringPred S) (kS : keyed_pred ringS)
-  U of PredSubUnitRing R S ringS kS U.
+HB.builders Context (R : unitRingType) S U of SubRing_isSubUnitRing R S U.
+
+HB.instance Definition _ := isDivringClosed.Build R S divring_closed_subproof.
 
 Let inU v Sv : U := sub v Sv.
-Let invU (u : U) := inU (rpredVr (valP u)).
+Let invU (u : U) := inU (rpredVr _ (valP u)).
 
-Program Definition unitringU := @PreUnitRing.Build U R val val_inj invU _ _.
-Next Obligation. by split=> [x y|]; rewrite valM. Qed.
-Next Obligation. by move=> x; rewrite subK. Qed.
-HB.instance Definition _ := unitringU.
+Program Definition unitringU :=
+  @Ring_hasMulInverse.Build U [pred x | val x \is a unit] invU _ _ _ _.
+Next Obligation.
+by move=> x /[!inE] xu; apply: val_inj; rewrite rmorphM rmorph1 /= subK mulVr.
+Qed.
+Next Obligation.
+by move=> x /[!inE] xu; apply: val_inj; rewrite rmorphM rmorph1 /= subK mulrV.
+Qed.
+Next Obligation.
+move=> x y [/(congr1 val) yx1 /(congr1 val) xy1]; rewrite inE.
+by apply: rev_unitrP (val y) _; rewrite !rmorphM rmorph1 in yx1 xy1.
+Qed.
+Next Obligation.
+by move=> x /[!inE] xNU; apply: val_inj; rewrite subK invr_out.
+Qed.
+HB.instance Definition _ : Ring_hasMulInverse U := unitringU.
 HB.end.
 
-Lemma idomainMixin (R : idomainType) (T : ringType) (f : T -> R) :
-    phant T -> injective f -> f 0 = 0 -> {morph f : u v / u * v} ->
-  @IntegralDomain.axiom T.
-Proof.
-move=> _ injf f0 fM u v uv0.
-by rewrite -!(inj_eq injf) !f0 -mulf_eq0 -fM uv0 f0.
-Qed.
+#[short(type="subComUnitRingType")]
+HB.structure Definition SubComUnitRing (R : comUnitRingType) (S : pred R) :=
+  {U of SubComRing R S U & SubUnitRing R S U}.
 
-Lemma fieldMixin (F : fieldType) (K : unitRingType) (f : K -> F) :
-    phant K -> injective f -> f 0 = 0 -> {mono f : u / u \in unit} ->
-  @Field.axiom K.
-Proof. by move=> _ injf f0 fU u; rewrite -fU unitfE -f0 inj_eq. Qed.
+#[short(type="subIdomainType")]
+HB.structure Definition SubIntegralDomain (R : idomainType) (S : pred R) :=
+  {U of SubComRing R S U & IntegralDomain U}.
+
+HB.factory Record SubComUnitRing_isSubIntegralDomain (R : idomainType) S U
+  of SubComUnitRing R S U := {}.
+
+HB.builders Context (R : idomainType) S U
+  of SubComUnitRing_isSubIntegralDomain R S U.
+Lemma id : IntegralDomain.axiom [ringType of U].
+Proof.
+move=> x y /(congr1 val)/eqP; rewrite rmorphM /=.
+by rewrite -!(inj_eq val_inj) rmorph0 -mulf_eq0.
+Qed.
+HB.instance Definition _ := ComUnitRing_isIntegral.Build U id.
+HB.end.
+
+#[short(type="subField")]
+HB.structure Definition SubField (F : fieldType) (S : pred F) :=
+  {U of SubIntegralDomain F S U & Field U}.
+
+HB.factory Record SubIntegralDomain_isSubField (F : fieldType) S U
+    of SubIntegralDomain F S U := {
+  subfield_subproof : {mono (val : U -> F) : u / u \in unit}
+}.
+
+HB.builders Context (F : fieldType) S U of SubIntegralDomain_isSubField F S U.
+Lemma fieldP : Field.axiom [unitRingType of U].
+Proof.
+by move=> u; rewrite -(inj_eq val_inj) rmorph0 -unitfE subfield_subproof.
+Qed.
+HB.instance Definition _ := UnitRing_isField.Build U fieldP.
+HB.end.
 
 Module SubExports.
 
-Notation "[ 'zmodMixin' 'of' U 'by' <: ]" :=
-  (PredSubZmodule.Build _ _ _ _ U)
-  (at level 0, format "[ 'zmodMixin'  'of'  U  'by'  <: ]") : form_scope.
-Notation "[ 'ringMixin' 'of' R 'by' <: ]" :=
-  (PredSubRing.Build _ _ _ _ R)
-  (at level 0, format "[ 'ringMixin'  'of'  R  'by'  <: ]") : form_scope.
-Notation "[ 'lmodMixin' 'of' U 'by' <: ]" :=
-  (PredSubLmodule.Build _ _ _ _ _ U)
-  (at level 0, format "[ 'lmodMixin'  'of'  U  'by'  <: ]") : form_scope.
-Notation "[ 'lalgMixin' 'of' A 'by' <: ]" :=
-  (Lmodule_isLalgebra.Build _ A%type
-     ((lalgMixin (Phant A) val_inj (rrefl _)) *%R (rrefl _)))
-  (at level 0, format "[ 'lalgMixin'  'of'  A  'by'  <: ]") : form_scope.
-Notation "[ 'comRingMixin' 'of' R 'by' <: ]" :=
-  (Ring_hasCommutativeMul.Build R%type (comRingMixin (Phant R) val_inj (rrefl _)))
-  (at level 0, format "[ 'comRingMixin'  'of'  R  'by'  <: ]") : form_scope.
-Notation "[ 'algMixin' 'of' A 'by' <: ]" :=
-  (algMixin (Phant A) val_inj (rrefl _) (rrefl _))
-  (at level 0, format "[ 'algMixin'  'of'  A  'by'  <: ]") : form_scope.
-Notation "[ 'unitRingMixin' 'of' R 'by' <: ]" :=
-  (PredSubUnitRing.Build _ _ _ _ R)
-  (at level 0, format "[ 'unitRingMixin'  'of'  R  'by'  <: ]") : form_scope.
-Notation "[ 'idomainMixin' 'of' R 'by' <: ]" :=
-  (ComUnitRing_isIntegral.Build R%type
-     (idomainMixin (Phant R) val_inj (erefl _) (rrefl _)))
-  (at level 0, format "[ 'idomainMixin'  'of'  R  'by'  <: ]") : form_scope.
-Notation "[ 'fieldMixin' 'of' F 'by' <: ]" :=
-  (UnitRing_isField.Build F%type (fieldMixin (Phant F) val_inj (erefl _) (frefl _)))
-  (at level 0, format "[ 'fieldMixin'  'of'  F  'by'  <: ]") : form_scope.
+Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubZmodule_isSubRing' 'of' U 'by' <: ]" :=
+  (SubZmodule_isSubRing.Build _ _ U (subringClosedP _))
+  (at level 0, format "[ 'SubZmodule_isSubRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubRing_isSubComRing' 'of' U 'by' <: ]" :=
+  (SubRing_isSubComRing.Build _ _ U)
+  (at level 0, format "[ 'SubRing_isSubComRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
+  (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
+  (at level 0, format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
+  (SubRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
+  (at level 0, format "[ 'SubRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=
+  (SubLalgebra_isSubAlgebra.Build _ _ _ U)
+  (at level 0, format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubRing_isSubUnitRing' 'of' U 'by' <: ]" :=
+  (SubRing_isSubUnitRing.Build _ _ U (divringClosedP _))
+  (at level 0, format "[ 'SubRing_isSubUnitRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubComUnitRing_isSubIntegralDomain' 'of' U 'by' <: ]" :=
+  (SubComUnitRing_isSubIntegralDomain.Build _ _ U)
+  (at level 0, format "[ 'SubComUnitRing_isSubIntegralDomain'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubIntegralDomain_isSubField' 'of' U 'by' <: ]" :=
+  (SubIntegralDomain_isSubField.Build _ _ U (frefl _))
+  (at level 0, format "[ 'SubIntegralDomain_isSubField'  'of'  U  'by'  <: ]")
+  : form_scope.
 
 End SubExports.
 HB.export SubExports.
@@ -5353,10 +5348,10 @@ Definition exprVn := exprVn.
 Definition exprB := exprB.
 Definition invr_signM := invr_signM.
 Definition divr_signM := divr_signM.
-Definition rpred0D := rpred0D.
+Definition rpred0D := @rpred0D.
 Definition rpred0 := rpred0.
 Definition rpredD := rpredD.
-Definition rpredNr := rpredNr.
+Definition rpredNr := @rpredNr.
 Definition rpred_sum := rpred_sum.
 Definition rpredMn := rpredMn.
 Definition rpredN := rpredN.
@@ -5367,8 +5362,9 @@ Definition rpredDr := rpredDr.
 Definition rpredDl := rpredDl.
 Definition rpredBr := rpredBr.
 Definition rpredBl := rpredBl.
+Definition zmodClosedP := zmodClosedP.
 Definition rpredMsign := rpredMsign.
-Definition rpred1M := rpred1M.
+Definition rpred1M := @rpred1M.
 Definition rpred1 := rpred1.
 Definition rpredM := rpredM.
 Definition rpred_prod := rpred_prod.
@@ -5376,10 +5372,12 @@ Definition rpredX := rpredX.
 Definition rpred_nat := rpred_nat.
 Definition rpredN1 := rpredN1.
 Definition rpred_sign := rpred_sign.
+Definition subringClosedP := subringClosedP.
 Definition rpredZsign := rpredZsign.
 Definition rpredZnat := rpredZnat.
-Definition rpredZ := rpredZ.
-Definition rpredVr := rpredVr.
+Definition submodClosedP := submodClosedP.
+Definition rpredZ := @rpredZ.
+Definition rpredVr := @rpredVr.
 Definition rpredV := rpredV.
 Definition rpred_div := rpred_div.
 Definition rpredXN := rpredXN.
@@ -5389,6 +5387,7 @@ Definition rpredMr := rpredMr.
 Definition rpredMl := rpredMl.
 Definition rpred_divr := rpred_divr.
 Definition rpred_divl := rpred_divl.
+Definition divringClosedP := divringClosedP.
 Definition eq_eval := eq_eval.
 Definition eval_tsubst := eval_tsubst.
 Definition eq_holds := eq_holds.
@@ -5584,7 +5583,7 @@ End GRing.
 
 Export AllExports.
 Export Scale.Exports.
-Export Pred.Exports.
+Export ClosedExports.
 
 Variant Ione := IOne : Ione.
 Variant Inatmul := INatmul : Ione -> nat -> Inatmul.
@@ -5702,13 +5701,6 @@ Notation "\prod_ ( i 'in' A ) F" :=
 
 Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
 Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
-
-Canonical unit_keyed.
-Canonical unit_opprPred.
-Canonical unit_mulrPred.
-Canonical unit_smulrPred.
-Canonical unit_divrPred.
-Canonical unit_sdivrPred.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
@@ -6061,55 +6053,38 @@ Variables (T : choiceType) (S : {pred T}).
 Inductive B := mkB x & x \in S.
 Definition vB u := let: mkB x _ := u in x.
 
-Canonical B_subType := [subType for vB].
-Definition B_hasDecEq := [hasDecEq of B by <:].
-Canonical B_eqType := EqType B B_hasDecEq.
-Definition B_hasChoice := [hasChoice of B by <:].
-Canonical B_choiceType := ChoiceType B B_hasChoice.
+HB.instance Definition _ := [isSub for vB].
+HB.instance Definition _ := [Choice of B by <:].
 
 End Test0.
 
 Section Test1.
 
-Variables (R : unitRingType) (S : {pred R}).
-Variables (ringS : divringPred S) (kS : keyed_pred ringS).
+Variables (R : unitRingType) (S : divringClosed R).
 
-Definition B_zmodMixin := [zmodMixin of B kS by <:].
-Canonical B_zmodType := ZmodType (B kS) B_zmodMixin.
-Definition B_ringMixin := [ringMixin of B kS by <:].
-Canonical B_ringType := RingType (B kS) B_ringMixin.
-Definition B_unitRingMixin := [unitRingMixin of B kS by <:].
-Canonical B_unitRingType := UnitRingType (B kS) B_unitRingMixin.
+HB.instance Definition _ := [SubChoice_isSubZmodule of B S by <:].
+HB.instance Definition _ := [SubZmodule_isSubRing of B S by <:].
+HB.instance Definition _ := [SubRing_isSubUnitRing of B S by <:].
 
 End Test1.
 
 Section Test2.
 
-Variables (R : comUnitRingType) (A : unitAlgType R) (S : {pred A}).
-Variables (algS : divalgPred S) (kS : keyed_pred algS).
+Variables (R : comUnitRingType) (A : unitAlgType R) (S : divalgClosed A).
 
-Definition B_lmodMixin := [lmodMixin of B kS by <:].
-Canonical B_lmodType := LmodType R (B kS) B_lmodMixin.
-Definition B_lalgMixin := [lalgMixin of B kS by <:].
-Canonical B_lalgType := LalgType R (B kS) B_lalgMixin.
-Definition B_algMixin := [algMixin of B kS by <:].
-Canonical B_algType := AlgType R (B kS) B_algMixin.
-Canonical B_unitAlgType := [unitAlgType R of B kS].
+HB.instance Definition _ := [SubZmodule_isSubLmodule of B S by <:].
+HB.instance Definition _ := [SubRing_SubLmodule_isSubLalgebra of B S by <:].
+HB.instance Definition _ := [SubLalgebra_isSubAlgebra of B S by <:].
 
 End Test2.
 
 Section Test3.
 
-Variables (F : fieldType) (S : {pred F}).
-Variables (ringS : divringPred S) (kS : keyed_pred ringS).
+Variables (F : fieldType) (S : divringClosed F).
 
-Definition B_comRingMixin := [comRingMixin of B kS by <:].
-Canonical B_comRingType := ComRingType (B kS) B_comRingMixin.
-Canonical B_comUnitRingType := [comUnitRingType of B kS].
-Definition B_idomainMixin := [idomainMixin of B kS by <:].
-Canonical B_idomainType := IdomainType (B kS) B_idomainMixin.
-Definition B_fieldMixin := [fieldMixin of B kS by <:].
-Canonical B_fieldType := FieldType (B kS) B_fieldMixin.
+HB.instance Definition _ := [SubRing_isSubComRing of B S by <:].
+HB.instance Definition _ := [SubComUnitRing_isSubIntegralDomain of B S by <:].
+HB.instance Definition _ := [SubIntegralDomain_isSubField of B S by <:].
 
 End Test3.
 

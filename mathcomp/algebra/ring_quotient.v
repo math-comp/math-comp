@@ -228,8 +228,6 @@ Notation "[ 'unitRingQuotType' u & i 'of' Q ]" :=
 End UnitRingQuotientExports.
 HB.export UnitRingQuotientExports.
 
-Section IdealDef.
-
 Definition proper_ideal (R : ringType) (S : {pred R}) : Prop :=
   1 \notin S /\ forall a, {in S, forall u, a * u \in S}.
 
@@ -245,62 +243,71 @@ Proof. by case=> S0 S1 hS; split => // a x xS; rewrite -[_ * _]addr0 hS. Qed.
 Lemma idealr_closedB R S : @idealr_closed R S -> zmod_closed S.
 Proof. by case=> S0 _ hS; split=> // x y xS yS; rewrite -mulN1r addrC hS. Qed.
 
-Coercion idealr_closedB : idealr_closed >-> zmod_closed.
-Coercion idealr_closed_nontrivial : idealr_closed >-> proper_ideal.
-
-Structure idealr (R : ringType) (S : {pred R}) := MkIdeal {
-  idealr_zmod :> zmodPred S;
-  _ : proper_ideal S
+HB.mixin Record isProperIdeal (R : ringType) (S : R -> bool) := {
+  proper_ideal_subproof : proper_ideal S
 }.
 
-Structure prime_idealr (R : ringType) (S : {pred R}) := MkPrimeIdeal {
-  prime_idealr_zmod :> idealr S;
-  _ : prime_idealr_closed S
+#[short(type="properIdealPred")]
+HB.structure Definition ProperIdeal R := {S of isProperIdeal R S}.
+
+#[short(type="idealrPred")]
+HB.structure Definition Idealr (R : ringType) :=
+  {S of GRing.ZmodClosed R S & ProperIdeal R S}.
+
+HB.mixin Record isPrimeIdealrClosed (R : ringType) (S : R -> bool) := {
+  prime_idealr_closed_subproof : prime_idealr_closed S
 }.
 
-Definition Idealr (R : ringType) (I : {pred R}) (zmodI : zmodPred I)
-            (kI : keyed_pred zmodI) : proper_ideal I -> idealr I.
-Proof. by move=> kI1; split => //. Qed.
+#[short(type="primeIdealrPred")]
+HB.structure Definition PrimeIdealr (R : ringType) :=
+  {S of Idealr R S & isPrimeIdealrClosed R S}.
+
+HB.factory Record isIdealr (R : ringType) (S : R -> bool) := {
+  idealr_closed_subproof : idealr_closed S
+}.
+
+HB.builders Context R S of isIdealr R S.
+HB.instance Definition _ := GRing.isZmodClosed.Build R S
+  (idealr_closedB idealr_closed_subproof).
+HB.instance Definition _ := isProperIdeal.Build R S
+  (idealr_closed_nontrivial idealr_closed_subproof).
+HB.end.
 
 Section IdealTheory.
-Variables (R : ringType) (I : {pred R})
-          (idealrI : idealr I) (kI : keyed_pred idealrI).
+Variables (R : ringType) (idealrI : idealrPred R).
+Local Notation I := (idealrI : pred R).
 
-Lemma idealr1 : 1 \in kI = false.
-Proof. by apply: negPf; case: idealrI kI => ? /= [? _] [] /= _ ->. Qed.
+Lemma idealr1 : 1 \in I = false.
+Proof. apply: negPf; exact: proper_ideal_subproof.1. Qed.
 
-Lemma idealMr a u : u \in kI -> a * u \in kI.
-Proof.
-by case: idealrI kI=> ? /= [? hI] [] /= ? hkI; rewrite !hkI; apply: hI.
-Qed.
+Lemma idealMr a u : u \in I -> a * u \in I.
+Proof. exact: proper_ideal_subproof.2. Qed.
 
-Lemma idealr0 : 0 \in kI. Proof. exact: rpred0. Qed.
+Lemma idealr0 : 0 \in I. Proof. exact: rpred0. Qed.
 
 End IdealTheory.
 
 Section PrimeIdealTheory.
 
-Variables (R : comRingType) (I : {pred R})
-          (pidealrI : prime_idealr I) (kI : keyed_pred pidealrI).
+Variables (R : comRingType) (pidealI : primeIdealrPred R).
+Local Notation I := (pidealI : pred R).
 
-Lemma prime_idealrM u v : (u * v \in kI) = (u \in kI) || (v \in kI).
+Lemma prime_idealrM u v : (u * v \in I) = (u \in I) || (v \in I).
 Proof.
 apply/idP/idP; last by case/orP => /idealMr hI; rewrite // mulrC.
-by case: pidealrI kI=> ? /= hI [] /= ? hkI; rewrite !hkI; apply: hI.
+exact: prime_idealr_closed_subproof.
 Qed.
 
 End PrimeIdealTheory.
 
-End IdealDef.
-
 Module Quotient.
 Section ZmodQuotient.
-Variables (R : zmodType) (I : {pred R})
-          (zmodI : zmodPred I) (kI : keyed_pred zmodI).
+Variables (R : zmodType) (zmodI : zmodClosed R).
+Local Notation I := (zmodI : pred R).
 
-Definition equiv (x y : R) := (x - y) \in kI.
+Definition equiv (x y : R) := (x - y) \in I.
 
-Lemma equivE x y : (equiv x y) = (x - y \in kI). Proof. by []. Qed.
+Lemma equivE x y : (equiv x y) = (x - y \in I). Proof. by []. Qed.
 
 Lemma equiv_is_equiv : equiv_class_of equiv.
 Proof.
@@ -325,10 +332,10 @@ HB.instance Definition _ := EqQuotient.on quot.
 #[export]
 HB.instance Definition _ := Choice.on quot.
 
-Lemma idealrBE x y : (x - y) \in kI = (x == y %[mod type]).
+Lemma idealrBE x y : (x - y) \in I = (x == y %[mod type]).
 Proof. by rewrite piE equivE. Qed.
 
-Lemma idealrDE x y : (x + y) \in kI = (x == - y %[mod type]).
+Lemma idealrDE x y : (x + y) \in I = (x == - y %[mod type]).
 Proof. by rewrite -idealrBE opprK. Qed.
 
 Definition zero : type := lift_cst type 0.
@@ -376,22 +383,22 @@ HB.instance Definition _ := @ZmodQuotient.on quot.
 
 End ZmodQuotient.
 
-Notation "{ 'quot' I }" := (@type_of _ _ _ I (Phant _)) : type_scope.
+Notation "{ 'quot' I }" := (@type_of _ I (Phant _)) : type_scope.
 
 Section RingQuotient.
 
-Variables (R : comRingType) (I : {pred R})
-          (idealI : idealr I) (kI : keyed_pred idealI).
+Variables (R : comRingType) (idealI : idealrPred R).
+Local Notation I := (idealI : pred R).
 
-Definition one : {quot kI} := lift_cst {quot kI} 1.
-Definition mul := lift_op2 {quot kI} *%R.
+Definition one : {quot idealI} := lift_cst {quot idealI} 1.
+Definition mul := lift_op2 {quot idealI} *%R.
 
 Canonical pi_one_morph := PiConst one.
 
 Lemma pi_mul: {morph \pi : x y / x * y >-> mul x y}.
 Proof.
 move=> x y; unlock mul; apply/eqP; rewrite piE equivE.
-rewrite -[_ * _](addrNK (x * repr (\pi_{quot kI} y))) -mulrBr.
+rewrite -[_ * _](addrNK (x * repr (\pi_{quot idealI} y))) -mulrBr.
 rewrite -addrA -mulrBl rpredD //.
   by rewrite idealMr // idealrDE opprK reprK.
 by rewrite mulrC idealMr // idealrDE opprK reprK.
@@ -417,25 +424,24 @@ Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
 #[export]
-HB.instance Definition _ := GRing.Zmodule_isComRing.Build (type kI)
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build (type idealI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
 #[export]
-HB.instance Definition _ := GRing.ComRing.on {quot kI}.
+HB.instance Definition _ := GRing.ComRing.on {quot idealI}.
 
 #[export]
 HB.instance Definition _ := @isRingQuotient.Build
-  R (equiv kI) 0 -%R +%R 1%R *%R (type kI) (lock _) pi_mul.
+  R (equiv idealI) 0 -%R +%R 1%R *%R (type idealI) (lock _) pi_mul.
 #[export]
-HB.instance Definition _ := @RingQuotient.on {quot kI}.
+HB.instance Definition _ := @RingQuotient.on {quot idealI}.
 
 End RingQuotient.
 
 Section IDomainQuotient.
 
-Variables (R : comRingType) (I : {pred R})
-          (pidealI : prime_idealr I) (kI : keyed_pred pidealI).
+Variables (R : comRingType) (I : primeIdealrPred R).
 
-Lemma rquot_IdomainAxiom (x y : {quot kI}): x * y = 0 -> (x == 0) || (y == 0).
+Lemma rquot_IdomainAxiom (x y : {quot I}): x * y = 0 -> (x == 0) || (y == 0).
 Proof.
 by move=> /eqP; rewrite -[x]reprK -[y]reprK !piE !equivE !subr0 prime_idealrM.
 Qed.
@@ -448,7 +454,7 @@ End Quotient.
 Export Quotient.Exports.
 
 Notation "{ 'ideal_quot' I }" :=
-  (@Quotient.type_of _ _ _ I (Phant _)) : type_scope.
+  (@Quotient.type_of _ I (Phant _)) : type_scope.
 Notation "x == y %[ 'mod_ideal' I ]" :=
   (x == y %[mod {ideal_quot I}]) : quotient_scope.
 Notation "x = y %[ 'mod_ideal' I ]" :=
