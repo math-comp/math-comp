@@ -537,22 +537,19 @@ apply: (iffP idP) => [sepKx D derD /subvP DK_0 | derKx_0].
   rewrite (Derivation_separable derD sepKx) !DK_0 ?minPolyOver //.
   by rewrite horner0 oppr0 mul0r mulr0 addr0.
 apply: wlog_neg; rewrite {1}separable_nz_der negbK => /eqP pKx'_0.
-have Dadd : additive (fun y => (Fadjoin_poly K x y)^`().[x]).
-  by   move=> u v; rewrite raddfD /= derivD hornerD -hornerN -!raddfN.
-have Dlin : scalable (fun y => (Fadjoin_poly K x y)^`().[x]).
-  move=> a u; rewrite linearZ /= -mul_polyC derivM derivC mul0r add0r.
-  by rewrite hornerM hornerC -scalerAl mul1r.
-pose aM := GRing.isAdditive.Build _ _ _ Dadd.
-pose lM := GRing.isLinear.Build _ _ _ _ _ Dlin.
-pose DL := GRing.Linear.Pack (GRing.Linear.Class aM lM).
-(* FIXME: use HB.pack *)
+pose Df := fun y => (Fadjoin_poly K x y)^`().[x].
+have Dlin: linear Df.
+  move=> a u v; rewrite /Df linearP /= -mul_polyC derivD derivM derivC.
+  by rewrite mul0r add0r hornerD hornerM hornerC -scalerAl mul1r.
+pose DlinM := GRing.linear_isLinear.Build _ _ _ _ Df Dlin.
+pose DL : GRing.Linear.type _ _ := HB.pack Df DlinM.
 pose D := linfun DL; apply: base_separable.
 have DK_0: (K <= lker D)%VS.
-  apply/subvP=> v Kv; rewrite memv_ker lfunE /= Fadjoin_polyC //.
+  apply/subvP=> v Kv; rewrite memv_ker lfunE /= /Df Fadjoin_polyC //.
   by rewrite derivC horner0.
 have Dder: Derivation <<K; x>> D.
   apply/allrelP=> u v /vbasis_mem Kx_u /vbasis_mem Kx_v; apply/eqP.
-  rewrite !lfunE /=; set Px := Fadjoin_poly K x.
+  rewrite !lfunE /= /Df; set Px := Fadjoin_poly K x.
   set Px_u := Px u; rewrite -(Fadjoin_poly_eq Kx_u) -/Px -/Px_u.
   set Px_v := Px v; rewrite -(Fadjoin_poly_eq Kx_v) -/Px -/Px_v.
   rewrite -!hornerM -hornerD -derivM.
@@ -560,7 +557,7 @@ have Dder: Derivation <<K; x>> D.
   rewrite [in RHS](divp_eq (Px_u * Px_v) (minPoly K x)) derivD derivM.
   by rewrite pKx'_0 mulr0 addr0 hornerD hornerM minPolyxx mulr0 add0r.
 have{Dder DK_0}: x \in lker D by apply: subvP Kx_x; apply: derKx_0.
-apply: contraLR => K'x; rewrite memv_ker lfunE /= Fadjoin_polyX //.
+apply: contraLR => K'x; rewrite memv_ker lfunE /= /Df Fadjoin_polyX //.
 by rewrite derivX hornerC oner_eq0.
 Qed.
 

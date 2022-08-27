@@ -702,7 +702,7 @@ have I_ideal : idealr_closed I.
 pose IaM := GRing.isAddClosed.Build _ I (idealr_closedB I_ideal).
 pose IoM := GRing.isOppClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
-pose Iid := Idealr.Pack (Idealr.Class IaM IoM IpM).
+pose Iid : idealrPred _ := HB.pack I IaM IoM IpM.
 pose EMixin := GRing.Ring_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
 pose E : comRingType := HB.pack _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
@@ -877,8 +877,8 @@ have EtoKMul i : multiplicative (EtoK i : E i -> Kfield).
   by split=> [x y|]; rewrite ?EtoK_M ?EtoK_1.
 pose EtoKMa i := GRing.isAdditive.Build _ _ _ (EtoKAdd i).
 pose EtoKMm i := GRing.isMultiplicative.Build _ _ _ (EtoKMul i).
-pose EtoKM i :=
-  GRing.RMorphism.Pack (GRing.RMorphism.Class (EtoKMa i) (EtoKMm i)).
+pose EtoKM i : GRing.RMorphism.type _ _ :=
+  HB.pack (EtoK i : E i -> Kfield) (EtoKMa i) (EtoKMm i).
 have EtoK_E: EtoK _ = EtoKM _ by [].
 have toEtoKp := @eq_map_poly _ Kring _ _(toEtoK _ _ _).
 have Kclosed: GRing.closed_field_axiom Kfield.

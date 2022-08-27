@@ -401,10 +401,10 @@ have fZ: scalable f.
 pose faM := GRing.isAdditive.Build _ _ f fA.
 pose fmM := GRing.isMultiplicative.Build _ _ f fM.
 pose flM := GRing.isLinear.Build _ _ _ _ f fZ.
-pose fLR := GRing.LRMorphism.Pack (GRing.LRMorphism.Class faM fmM flM).
-have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLR).
+pose fLRM : GRing.LRMorphism.type _ _ := HB.pack f faM fmM flM.
+have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).
   rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.
-  exact: (rmorphM fLR).
+  exact: (rmorphM fLRM).
 have{} Dalpha: alpha =1 f by move=> a; rewrite -Dalpha ?memvf ?lfunE.
 suffices <-: fixedField [set alpha] = 1%AS.
   by rewrite gal_generated /generator; exists alpha.

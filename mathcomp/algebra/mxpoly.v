@@ -501,15 +501,10 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-  pose aM :=
-    GRing.isAdditive.Build
-      [zmodType of M_RX] [zmodType of {poly 'M_n}] phi phi_is_additive.
-  pose mM := GRing.isMultiplicative.Build
-               [ringType of M_RX] [ringType of {poly 'M_n}] phi
-  phi_is_multiplicative.
-(* FIXME: use HB.pack *)
-exists (GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM)).
-split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
+pose phiaM := GRing.isAdditive.Build _ _ phi phi_is_additive.
+pose phimM := GRing.isMultiplicative.Build _ _ phi phi_is_multiplicative.
+pose phiRM : GRing.RMorphism.type _ _ := HB.pack phi phiaM phimM.
+exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
   by rewrite coef_phi coef_map !mxE coefMn.
 by rewrite coef_phi !mxE !coefC; case k; last rewrite /= mxE.
 Qed.

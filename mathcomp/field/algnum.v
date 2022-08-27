@@ -117,7 +117,7 @@ have [r [Dr /monic_neq0 nz_r] dv_r] := minCpolyP z.
 have rz0: root (pQtoC r) z by rewrite dv_r.
 have irr_r: irreducible_poly r.
   by apply/(subfx_irreducibleP rz0 nz_r)=> q qz0 nzq; rewrite dvdp_leq // -dv_r.
-  exists (SubFieldExtType rz0 irr_r), [rmorphism of @subfx_inj _ _ QtoCm z r].
+exists (SubFieldExtType rz0 irr_r), [rmorphism of @subfx_inj _ _ QtoCm z r].
 exists (subfx_root _ z r) => [|x]; first exact: subfx_inj_root.
 by have{x} [p ->] := subfxEroot rz0 nz_r x; exists p.
 Qed.
@@ -226,10 +226,10 @@ have nu0m : multiplicative nu0.
   by rewrite ?(rmorphM, QnC_nu0).
 pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
-pose nu0RM := GRing.RMorphism.Pack (GRing.RMorphism.Class nu0aM nu0mM).
+pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
 pose nu0lM :=
   GRing.isLinear.Build [ringType of rat] Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
-pose nu0LRM := GRing.LRMorphism.Pack (GRing.LRMorphism.Class nu0aM nu0mM nu0lM).
+pose nu0LRM : GRing.LRMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM nu0lM.
 by exists nu0LRM.
 Qed.
 
@@ -398,9 +398,9 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
     pose in01mM := GRing.isMultiplicative.Build _ _ in01 in01m.
     pose in01lM := GRing.isLinear.Build _ _  _ _ in01 in01l.
-    pose in01LR :=
-      GRing.LRMorphism.Pack (GRing.LRMorphism.Class in01aM in01mM in01lM).
-    by exists in01LR.
+    pose in01LRM : GRing.LRMorphism.type _ _ := HB.pack in01
+      in01aM in01mM in01lM.
+    by exists in01LRM.
   have {z zz Dz px} Dx: exists xx, x = QrC xx.
     exists (map_poly (in_alg Qr) px).[zz].
     by rewrite -horner_map Dz Sinj_poly Dx.
@@ -432,25 +432,19 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod; apply: eq_bigr => zz _.
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
-  have f1a : additive f1 by move=> u v; exact: raddfB.
-  have f1m : multiplicative f1 by exact: (kHom_lrmorphism aut_f1).
-  have f1l : scalable f1 by move=> a u; exact: linearZ.
-  pose f1aM := GRing.isAdditive.Build _ _ f1 f1a.
-  pose f1mM := GRing.isMultiplicative.Build _ _ f1 f1m.
-  pose f1lM := GRing.isLinear.Build _ _ _ _ f1 f1l.
-  pose nu := GRing.LRMorphism.Pack (GRing.LRMorphism.Class f1aM f1mM f1lM).
+  pose f1mM := GRing.isMultiplicative.Build _ _ f1 (kHom_lrmorphism aut_f1).
+  pose nu : GRing.LRMorphism.type _ _ := HB.pack (fun_of_lfun f1) f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
   move=> a y; do 2!rewrite -mulr_algl -in_algE.
   by rewrite -[a]divq_num_den !(fmorph_div, rmorphM, rmorph_int).
-pose phiaM := GRing.isAdditive.Build _ _ phi (raddfB phi).
-pose phimM := GRing.isMultiplicative.Build _ _ phi (rmorphM phi, rmorph1 phi).
 pose philM := GRing.isLinear.Build _ _ _ _ phi phiZ.
-pose phiLR := GRing.LRMorphism.Pack (GRing.LRMorphism.Class phiaM phimM philM).
+pose phiLRM : GRing.LRMorphism.type _ _ := HB.pack (GRing.RMorphism.sort phi)
+  philM.
 pose fix ext n :=
   if n is i.+1 then oapp (fun x => s2val (ext1 (ext i) x)) (ext i) (unpickle i)
-  else SubAut Qs QsC phiLR.
+  else SubAut Qs QsC phiLRM.
 have mem_ext x n: (pickle x < n)%N -> {xx | Sinj (ext n) xx = x}.
   move=> ltxn; apply: sig_eqW; elim: n ltxn => // n IHn.
   rewrite ltnS leq_eqVlt => /predU1P[<- | /IHn[xx <-]] /=.
@@ -486,8 +480,8 @@ have num : multiplicative nu.
   by rewrite (fmorph_inj _ Dx) !rmorphM -!nu_inj Dx1 Dx2.
 pose nuaM := GRing.isAdditive.Build _ _ nu nua.
 pose numM := GRing.isMultiplicative.Build _ _ nu num.
-pose nuM := GRing.RMorphism.Pack (GRing.RMorphism.Class nuaM numM).
-by exists nuM => x; rewrite /= (nu_inj 0%N).
+pose nuRM : GRing.RMorphism.type _ _ := HB.pack nu nuaM numM.
+by exists nuRM => x; rewrite /= (nu_inj 0%N).
 Qed.
 
 (* Extended automorphisms of Q_n. *)
@@ -520,12 +514,11 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
   rewrite (minCpoly_cyclotomic prim_z) /cyclotomic.
   rewrite (bigD1 (Ordinal (ltn_pmod k n_gt0))) ?coprime_modl //=.
   by rewrite rootM root_XsubC prim_expr_mod ?eqxx.
-pose phiaM := GRing.isAdditive.Build _ _ phi (raddfB [additive of phi]).
 have phim : multiplicative phi.
   by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
 pose phimM := GRing.isMultiplicative.Build _ _ phi phim.
-pose phiM := GRing.RMorphism.Pack (GRing.RMorphism.Class phiaM phimM).
-have [nu Dnu] := extend_algC_subfield_aut QnC phiM.
+pose phiRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun phi) phimM.
+have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
 rewrite rmorphX exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
 rewrite (kHomExtend_poly homQn1) ?polyOverX //.
@@ -657,7 +650,7 @@ Theorem fin_Csubring_Aint S n (Y : n.-tuple algC) :
 Proof.
 move=> mulS.
 pose Sm := GRing.isMulClosed.Build _ _ mulS.
-pose SC := GRing.MulClosed.Pack (GRing.MulClosed.Class Sm).
+pose SC : mulrClosed _ := HB.pack S Sm.
 have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
 move=> S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.

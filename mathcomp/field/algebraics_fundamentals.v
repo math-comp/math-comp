@@ -324,9 +324,8 @@ pose sQoM z := GRing.isOppClosed.Build _ _ (sQring z).
 pose sQaM z := GRing.isAddClosed.Build _ _ (sQring z).
 pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
 pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
-pose sQC z :=
-  GRing.DivringClosed.Pack
-    (GRing.DivringClosed.Class (sQaM z) (sQoM z) (sQmM z) (sQiM z)).
+pose sQC z : divringClosed _ := HB.pack (sQ z)
+  (sQaM z) (sQoM z) (sQmM z) (sQiM z).
 pose morph_ofQ x z Qxz := forall u, ofQ z (Qxz u) = ofQ x u.
 have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   move=> z_x; pose Qxz u := inQ z (ofQ x u).
@@ -335,12 +334,11 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
     by move=> u v; apply: (canLR (ofQ_K z)); rewrite !rmorphB !QxzE.
   have Qxzm : multiplicative Qxz.
     by split=>[u v|]; apply: (canLR (ofQ_K z)); rewrite ?rmorph1 ?rmorphM ?QxzE.
-  have Qxzl : scalable Qxz by exact: rat_linear.
   have QxzaM := GRing.isAdditive.Build _ _ _ Qxza.
   have QxzmM := GRing.isMultiplicative.Build _ _ _ Qxzm.
-  have QxzlM := GRing.isLinear.Build _ _ _ _ _ Qxzl.
-  pose QxzT := GRing.LRMorphism.Pack (GRing.LRMorphism.Class QxzaM QxzmM QxzlM).
-  by exists (linfun_ahom QxzT) => u; rewrite lfunE QxzE.
+  have QxzlM := GRing.isLinear.Build _ _ _ _ _ (rat_linear Qxza).
+  pose QxzLRM : GRing.LRMorphism.type _ _ := HB.pack Qxz QxzaM QxzmM QxzlM.
+  by exists (linfun_ahom QxzLRM) => u; rewrite lfunE QxzE.
 pose sQs z s := all (mem (sQ z)) s.
 have inQsK z s: sQs z s -> map (ofQ z) (map (inQ z) s) = s.
   by rewrite -map_comp => /allP/(_ _ _)/inQ_K; apply: map_id_in.
@@ -609,8 +607,8 @@ have some_realC: realC.
       exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
     pose faM := GRing.isAdditive.Build _ _ _ fA.
     pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
-    pose fT := GRing.RMorphism.Pack (GRing.RMorphism.Class faM fmM).
-    by exists 0, [archiFieldType of rat], fT.
+    pose fRM : GRing.RMorphism.type _ _ := HB.pack f faM fmM.
+    by exists 0, [archiFieldType of rat], fRM.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.
 pose fix xR n : realC :=
@@ -885,8 +883,8 @@ have conjM : multiplicative conj.
   by rewrite /conj -/n1 -(rmorph1 (ofQ (z_ n1))) /conj_ ofQ_K !rmorph1.
 have conjaM := GRing.isAdditive.Build _ _ _ conjA.
 have conjmM := GRing.isMultiplicative.Build _ _ _ conjM.
-pose conjT := GRing.RMorphism.Pack (GRing.RMorphism.Class conjaM conjmM).
-exists conjT => [z | /(_ i)/eqP/idPn[]] /=.
+pose conjRM : GRing.RMorphism.type _ _ := HB.pack conj conjaM conjmM.
+exists conjRM => [z | /(_ i)/eqP/idPn[]] /=.
   by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0%N.
 rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
 rewrite mulf_neq0 ?(memPnC (R'i 0%N)) ?(rpred0 (sQC _)) //.

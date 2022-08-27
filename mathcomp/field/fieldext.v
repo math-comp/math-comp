@@ -664,16 +664,11 @@ have in_bL i (a : K_F) : val a * (bL`_i : L_F) \in (F * <[bL`_i]>)%VS.
   by rewrite memv_mul ?(valP a) ?memv_line.
 have nz_bLi (i : 'I_n): bL`_i != 0 by rewrite (memPn nz_bL) ?memt_nth.
 pose r2v (v : 'rV[K_F]_n) : L_F := \sum_i v 0 i *: (bL`_i : L_F).
-have r2v_add : additive r2v.
-  move=> u v; rewrite /r2v -sumrN -big_split; apply: eq_bigr => i _.
-  by rewrite /= -scaleNr -scalerDl !mxE.
-have r2v_lin : scalable r2v.
-  move=> a u; rewrite /r2v scaler_sumr; apply: eq_bigr => i _.
-  by rewrite scalerA mxE.
-pose aM := GRing.isAdditive.Build _ _ r2v r2v_add.
-pose lM := GRing.isLinear.Build _ _ _ _ r2v r2v_lin.
-pose r2vL := GRing.Linear.Pack (GRing.Linear.Class aM lM).
-(* FIXME: use HB.pack *)
+have r2v_lin: linear r2v.
+  move=> a u v; rewrite /r2v scaler_sumr -big_split /=; apply: eq_bigr => i _.
+  by rewrite scalerA -scalerDl !mxE.
+pose r2vlM := GRing.linear_isLinear.Build _ _ _ _ r2v r2v_lin.
+pose r2vL : GRing.Linear.type _ _ := HB.pack r2v r2vlM.
 have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
   apply: sig_eqW; have /memv_sumP[y Fy ->]: x \in SbL by rewrite defL memvf.
   have /fin_all_exists[r Dr] i: exists r, y i = r *: (bL`_i : L_F).
@@ -1399,18 +1394,15 @@ have unitM : GRing.ComUnitRing_isField cuL.
 pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists [linear of toPF as [linear of rVpoly]].
-have tol_add : additive (toL : {poly F} -> aL).
-  by move=> q1 q2; rewrite -raddfB /= -modpN -modpD.
-have tol_mul : multiplicative (toL : {poly F} -> aL).
+have toLlin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
+have toLmul : multiplicative (toL : {poly F} -> aL).
   by split=> [q r|];
-     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
-have tol_lin : scalable (toL : {poly F} -> aL).
-  by move=> a q; rewrite -linearZ -modpZl.
-pose aM := GRing.isAdditive.Build _ _ _ tol_add.
-pose lM := GRing.isLinear.Build _ _ _ _ _ tol_lin.
-pose mM := GRing.isMultiplicative.Build _ _ _ tol_mul.
-by exists (GRing.LRMorphism.Pack (GRing.LRMorphism.Class aM mM lM)).
-(* FIXME: use HB.pack *)
+    apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
+pose toLlM := GRing.linear_isLinear.Build _ _ _ _ toL toLlin.
+pose toLmM := GRing.isMultiplicative.Build _ _ _ toLmul.
+pose toLLRM : GRing.LRMorphism.type _ _ :=
+  HB.pack (toL : {poly F} -> aL) toLlM toLmM.
+by exists toLLRM.
 Qed.
 
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.

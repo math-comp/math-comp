@@ -283,11 +283,9 @@ Proof. by rewrite kAutE k1AHom. Qed.
 Lemma kAutf_lker0 K f : kHom K {:L} f -> lker f == 0%VS.
 Proof.
 move/(kHomSl (sub1v _))/kHom_lrmorphism=> fM.
-have fA : additive f by move=> x y; exact: raddfB.
-pose aM := GRing.isAdditive.Build _ _ _ fA.
-pose mM := GRing.isMultiplicative.Build _ _ _ fM.
-pose fT := GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM).
-by apply/lker0P; apply: (fmorph_inj fT).
+pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
+pose fRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun f) fmM.
+by apply/lker0P; apply: (fmorph_inj fRM).
 Qed.
 
 Lemma inv_kHomf K f : kHom K {:L} f -> kHom K {:L} f^-1.
@@ -504,11 +502,9 @@ set fj := (fi ^-1 \o f)%AF; suffices Hfj : fj \in homEz.
 rewrite -DhomEz; apply/kAHomP => _ /Fadjoin_polyP[q Eq ->].
 have homLfj: kHom E {:L} fj := comp_kHom (inv_kHomf homLfi) homLf.
 have /kHom_lrmorphism fjM := kHomSl (sub1v _) homLfj.
-have fjA : additive fj by move=> x y; exact: raddfB.
-pose aM := GRing.isAdditive.Build _ _ _ fjA.
-pose mM := GRing.isMultiplicative.Build _ _ _ fjM.
-pose fjT := GRing.RMorphism.Pack (GRing.RMorphism.Class aM mM).
-rewrite -[fj _](horner_map fjT) (kHom_poly_id homLfj) //=.
+pose fjmM := GRing.isMultiplicative.Build _ _ _ fjM.
+pose fjRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun fj) fjmM.
+rewrite -[fj _](horner_map fjRM) (kHom_poly_id homLfj) //=.
 by rewrite lfunE /= Dfz -fi_z lker0_lfunK.
 Qed.
 
@@ -545,14 +541,12 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
 - have [Lz0 _ [z qz0 defLz]] := irredp_FAdjoin irr_q.
   pose Lz := [the fieldExtType _ of baseFieldType Lz0].
   pose inLz : {rmorphism L -> Lz} := [rmorphism of in_alg Lz0].
-  have inLzL_additive: additive (locked inLz) by move=> u v; exact: rmorphB.
-  have inLzL_scalable: scalable (locked inLz).
-    move=> a u; rewrite -(@mulr_algl F Lz) baseField_scaleE.
-    by rewrite -{1}mulr_algl rmorphM -lock.
-  pose inLzLaM := GRing.isAdditive.Build _ _ _ inLzL_additive.
-  pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_scalable.
-  pose inLzL := GRing.Linear.Pack (GRing.Linear.Class inLzLaM inLzLlM).
-  have ihLzZ: ahom_in {:L} (linfun inLzL).
+  have inLzL_linear: linear (locked inLz).
+    move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.
+    by rewrite -{1}mulr_algl rmorphD rmorphM -lock.
+  pose inLzLlM := GRing.linear_isLinear.Build _ _ _ _ _ inLzL_linear.
+  pose inLzLL : GRing.Linear.type _ _ := HB.pack (locked inLz : _ -> _) inLzLlM.
+  have ihLzZ: ahom_in {:L} (linfun inLzLL).
     by apply/ahom_inP; split=> [u v|]; rewrite !lfunE (rmorphM, rmorph1).
   exists Lz, (AHom ihLzZ), z; congr (root _ z): qz0.
   by apply: eq_map_poly => y; rewrite lfunE /= -lock.

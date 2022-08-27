@@ -1073,16 +1073,12 @@ Lemma linear_of_free (rT : lmodType K) X (fX : seq rT) :
   {f : {linear vT -> rT} | free X -> size fX = size X -> map f X = fX}.
 Proof.
 pose f u := \sum_i coord (in_tuple X) i u *: fX`_i.
-have add_f : additive f.
-  move=> u v; rewrite -sumrN -big_split; apply: eq_bigr => i _.
-  by rewrite raddfB /= scalerDl scaleNr.
-have lin_f : scalable f.
-  move=> k u; rewrite scaler_sumr; apply: eq_bigr => i _.
-  by rewrite scalerA linearZ.
-pose aM := GRing.isAdditive.Build vT rT f add_f.
-pose lM := GRing.isLinear.Build K vT rT *:%R f lin_f.
-exists (GRing.Linear.Pack (GRing.Linear.Class aM lM)) => freeX eq_szX.
-(* FIXME: use HB.pack *)
+have lin_f: linear f.
+  move=> k u v; rewrite scaler_sumr -big_split; apply: eq_bigr => i _.
+  by rewrite /= scalerA -scalerDl linearP.
+pose flM := GRing.linear_isLinear.Build _ _ _ _ f lin_f.
+pose fL : GRing.Linear.type _ _ := HB.pack f flM.
+exists fL => freeX eq_szX.
 apply/esym/(@eq_from_nth _ 0); rewrite ?size_map eq_szX // => i ltiX.
 rewrite (nth_map 0) //= /f (bigD1 (Ordinal ltiX)) //=.
 rewrite big1 => [|j /negbTE neqji]; rewrite (coord_free (Ordinal _)) //.
@@ -1962,12 +1958,10 @@ pose p2r (u : vT1 * vT2) := row_mx (v2r u.1) (v2r u.2).
 pose r2p w := (r2v (lsubmx w) : vT1, r2v (rsubmx w) : vT2).
 have r2pK : cancel r2p p2r by move=> w; rewrite /p2r !r2vK hsubmxK.
 have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
-have r2p_add : additive r2p by move=> u v; congr (_ , _); rewrite /= !raddfB.
-have r2p_lin : scalable r2p by move=> a u; congr (_ , _); rewrite !linearZ.
-pose aM := GRing.isAdditive.Build _ _ r2p r2p_add.
-pose lM := GRing.isLinear.Build _ _ _ _ r2p r2p_lin.
-pose lT := GRing.Linear.Pack (GRing.Linear.Class aM lM).
-by exists p2r; [apply: (@can2_linear _ _ _ lT) | exists r2p].
+have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
+pose r2plM := GRing.linear_isLinear.Build _ _ _ _ r2p r2p_lin.
+pose r2pL : GRing.Linear.type _ _ := HB.pack r2p r2plM.
+by exists p2r; [apply: (@can2_linear _ _ _ r2pL) | exists r2p].
 Qed.
 HB.instance Definition _ := Lmodule_hasFinDim.Build _ (vT1 * vT2)%type
   pair_vect_iso.
@@ -2012,15 +2006,12 @@ Lemma vsolve_eqP (U : {vspace vT}) :
   reflect (exists2 u, u \in U & forall i, tnth lhs i u = tnth rhs i)
           (vsolve_eq U).
 Proof.
-have aA : additive lhsf by move=> u v; apply/ffunP => i; rewrite !ffunE raddfB.
-have lA : scalable lhsf by move=> a u; apply/ffunP => i; rewrite !ffunE linearZ.
-pose aM := GRing.isAdditive.Build _ _ _ aA.
-pose lM := GRing.isLinear.Build _ _ _ _ _ lA.
-pose lT := GRing.Linear.Pack (GRing.Linear.Class aM lM).
-(* FIXME: use HB.pack *)
+have lhsZ: linear lhsf by move=> a u v; apply/ffunP=> i; rewrite !ffunE linearP.
+pose lhslM := GRing.linear_isLinear.Build _ _ _ _ lhsf lhsZ.
+pose lhsL : GRing.Linear.type _ _ := HB.pack lhsf lhslM.
 apply: (iffP memv_imgP) => [] [u Uu sol_u]; exists u => //.
-  by move=> i; rewrite -[tnth rhs i]ffunE sol_u (lfunE lT) ffunE.
-by apply/ffunP=> i; rewrite (lfunE lT) !ffunE sol_u.
+  by move=> i; rewrite -[tnth rhs i]ffunE sol_u (lfunE lhsL) ffunE.
+by apply/ffunP=> i; rewrite (lfunE lhsL) !ffunE sol_u.
 Qed.
 
 End Solver.
