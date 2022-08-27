@@ -302,8 +302,7 @@ End PrimeIdealTheory.
 
 Module Quotient.
 Section ZmodQuotient.
-Variables (R : zmodType) (zmodI : zmodClosed R).
-Local Notation I := (zmodI : pred R).
+Variables (R : zmodType) (I : zmodClosed R).
 
 Definition equiv (x y : R) := (x - y) \in I.
 

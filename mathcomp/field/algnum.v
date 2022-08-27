@@ -656,7 +656,7 @@ move=> S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
   case/S_P: Sx => {}x ->; rewrite big1 ?isAlgInt0 // => i _.
   by have /rowP/(_ i)/[!mxE] -> := v0; rewrite mul0rz.
-have sYS (i : 'I_n): x * Y`_i \in (SC : pred _).
+have sYS (i : 'I_n): x * Y`_i \in SC.
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
 pose A := \matrix_(i, j < n) sval (sig_eqW (S_P _ (sYS j))) i.
 pose p := char_poly (map_mx ZtoC A).

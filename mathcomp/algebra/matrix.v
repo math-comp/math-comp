@@ -3776,15 +3776,12 @@ apply/mxOverP/andP => [cij|[S0 cij] i j]; last by rewrite !mxE; case: eqP.
 by split; [have := cij 0 1|have := cij 0 0]; rewrite !mxE.
 Qed.
 
-Section mxOverScale.
-Variable mulS : mulrClosed R.
-Local Notation S := (mulS : pred R).
-Lemma mxOverZ : {in S & mxOver S, forall a : R, forall v : 'M[R]_(m, n),
-        a *: v \is a mxOver S}.
+Lemma mxOverZ (S : mulrClosed R) :
+  {in S & mxOver S, forall a : R, forall v : 'M[R]_(m, n),
+     a *: v \is a mxOver S}.
 Proof.
 by move=> a v aS /mxOverP vS; apply/mxOverP => i j; rewrite !mxE rpredM.
 Qed.
-End mxOverScale.
 
 Lemma mxOver_diag (S : {pred R}) k (D : 'rV[R]_k) :
    0 \in S -> D \is a mxOver S -> diag_mx D \is a mxOver S.
@@ -3803,34 +3800,28 @@ split; first by have /[!mxE] := DS 0 1.
 by apply/mxOverP => i j; have := DS j j; rewrite ord1 !mxE eqxx.
 Qed.
 
-Section mxOverMul.
-
-Variable ringS : semiringClosed R.
-Local Notation S := (ringS : pred R).
-
-Lemma mxOverM p q r : {in mxOver S & mxOver S,
+Lemma mxOverM (S : semiringClosed R) p q r : {in mxOver S & mxOver S,
   forall u : 'M[R]_(p, q), forall v : 'M[R]_(q, r), u *m v \is a mxOver S}.
 Proof.
 move=> M N /mxOverP MS /mxOverP NS; apply/mxOverP => i j.
 by rewrite !mxE rpred_sum // => k _; rewrite rpredM.
 Qed.
 
-End mxOverMul.
 End mxOverRing.
 
 Section mxRingOver.
 Context {R : ringType} {n : nat}.
 
 Section semiring.
-Variable ringS : semiringClosed R.
-Fact mxOver_mul_subproof : mulr_closed (@mxOver n.+1 n.+1 _ ringS).
+Variable S : semiringClosed R.
+Fact mxOver_mul_subproof : mulr_closed (@mxOver n.+1 n.+1 _ S).
 Proof. by split; rewrite ?mxOver_scalar ?rpred0 ?rpred1//; apply: mxOverM. Qed.
-HB.instance Definition _ := GRing.isMulClosed.Build _ (mxOver_pred ringS)
+HB.instance Definition _ := GRing.isMulClosed.Build _ (mxOver_pred S)
   mxOver_mul_subproof.
 End semiring.
 
-HB.instance Definition _ (ringS : subringClosed R) :=
-  GRing.MulClosed.on (mxOver_pred ringS).
+HB.instance Definition _ (S : subringClosed R) :=
+  GRing.MulClosed.on (mxOver_pred S).
 
 End mxRingOver.
 End mxOver.

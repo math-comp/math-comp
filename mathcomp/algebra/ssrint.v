@@ -1805,24 +1805,23 @@ End ZnatPred.
 
 Section rpred.
 
-Lemma rpredMz M (addS : zmodClosed M) m :
-  {in (addS : pred _), forall u, u *~ m \in (addS : pred _)}.
+Lemma rpredMz (M : zmodType) (S : zmodClosed M) m :
+  {in S, forall u, u *~ m \in S}.
 Proof. by case: m => n u Su; rewrite ?rpredN ?rpredMn. Qed.
 
-Lemma rpred_int R (ringS : subringClosed R) m :
-  m%:~R \in (ringS : pred _).
+Lemma rpred_int (R : ringType) (S : subringClosed R) m : m%:~R \in S.
 Proof. by rewrite rpredMz ?rpred1. Qed.
 
-Lemma rpredZint (R : ringType) (M : lmodType R) (addS : zmodClosed M) m :
-  {in (addS : pred _), forall u, m%:~R *: u \in (addS : pred _)}.
+Lemma rpredZint (R : ringType) (M : lmodType R) (S : zmodClosed M) m :
+  {in S, forall u, m%:~R *: u \in S}.
 Proof. by move=> u Su; rewrite /= scaler_int rpredMz. Qed.
 
-Lemma rpredXz R (divS : divClosed R) m :
-  {in (divS : pred _), forall x, x ^ m \in (divS : pred _)}.
+Lemma rpredXz (R : unitRingType) (S : divClosed R) m :
+  {in S, forall x, x ^ m \in S}.
 Proof. by case: m => n x Sx; rewrite ?rpredV rpredX. Qed.
 
-Lemma rpredXsign R (divS : divClosed R) n x :
-  (x ^ ((-1) ^+ n) \in (divS : pred _)) = (x \in (divS : pred _)).
+Lemma rpredXsign (R : unitRingType) (S : divClosed R) n x :
+  (x ^ ((-1) ^+ n) \in S) = (x \in S).
 Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.

@@ -4366,58 +4366,58 @@ Qed.
 
 (* Mixins for stability properties *)
 
-HB.mixin Record isOppClosed (V : zmodType) (S : V -> bool) := {
+HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
   rpredNr : oppr_closed S
 }.
 
-HB.mixin Record isAddClosed (V : zmodType) (S : V -> bool) := {
+HB.mixin Record isAddClosed (V : zmodType) (S : {pred V}) := {
   rpred0D : addr_closed S
 }.
 
-HB.mixin Record isMulClosed (R : ringType) (S : R -> bool) := {
+HB.mixin Record isMulClosed (R : ringType) (S : {pred R}) := {
   rpred1M : mulr_closed S
 }.
 
-HB.mixin Record isInvClosed (R : unitRingType) (S : R -> bool) := {
+HB.mixin Record isInvClosed (R : unitRingType) (S : {pred R}) := {
   rpredVr : invr_closed S
 }.
 
 HB.mixin Record isScaleClosed (R : ringType) (V : lmodType R)
-    (S : V -> bool) := {
+    (S : {pred V}) := {
   rpredZ : scaler_closed S
 }.
 
 (* Structures for stability properties *)
 
-#[short(type="opprClosed")]
+#[infer(V), short(type="opprClosed")]
 HB.structure Definition OppClosed V := {S of isOppClosed V S}.
 
-#[short(type="addrClosed")]
+#[infer(V), short(type="addrClosed")]
 HB.structure Definition AddClosed V := {S of isAddClosed V S}.
 
-#[short(type="zmodClosed")]
+#[infer(V), short(type="zmodClosed")]
 HB.structure Definition ZmodClosed V := {S of AddClosed V S & OppClosed V S}.
 
-#[short(type="mulrClosed")]
+#[infer(R), short(type="mulrClosed")]
 HB.structure Definition MulClosed R := {S of isMulClosed R S}.
 
-#[short(type="smulClosed")]
+#[infer(R), short(type="smulClosed")]
 HB.structure Definition SmulClosed (R : ringType) :=
   {S of OppClosed R S & MulClosed R S}.
 
-#[short(type="semiringClosed")]
+#[infer(R), short(type="semiringClosed")]
 HB.structure Definition SemiringClosed (R : ringType) :=
   {S of AddClosed R S & MulClosed R S}.
 
-#[short(type="subringClosed")]
+#[infer(R), short(type="subringClosed")]
 HB.structure Definition SubringClosed (R : ringType) :=
   {S of ZmodClosed R S & MulClosed R S}.
 
-#[short(type="divClosed")]
+#[infer(R), short(type="divClosed")]
 HB.structure Definition DivClosed (R : unitRingType) :=
   {S of MulClosed R S & isInvClosed R S}.
 
-#[short(type="sdivClosed")]
+#[infer(R), short(type="sdivClosed")]
 HB.structure Definition SdivClosed (R : unitRingType) :=
   {S of SmulClosed R S & isInvClosed R S}.
 
@@ -4429,7 +4429,7 @@ HB.structure Definition SubmodClosed (R : ringType) (V : lmodType R) :=
 HB.structure Definition SubalgClosed (R : ringType) (A : lalgType R) :=
   {S of SubringClosed A S & isScaleClosed R A S}.
 
-#[short(type="divringClosed")]
+#[infer (R), short(type="divringClosed")]
 HB.structure Definition DivringClosed (R : unitRingType) :=
   {S of SubringClosed R S & isInvClosed R S}.
 
@@ -4558,14 +4558,13 @@ Variables (V : zmodType).
 
 Section Add.
 
-Variables (addS : addrClosed V).
-Local Notation S := (addS : pred V).
+Variable S : addrClosed V.
 
 Lemma rpred0 : 0 \in S.
-Proof. by case: (@rpred0D _ addS). Qed.
+Proof. by case: (@rpred0D _ S). Qed.
 
 Lemma rpredD : {in S &, forall u v, u + v \in S}.
-Proof. by case: (@rpred0D _ addS). Qed.
+Proof. by case: (@rpred0D _ S). Qed.
 
 Lemma rpred_sum I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \sum_(i <- r | P i) F i \in S.
@@ -4578,8 +4577,7 @@ End Add.
 
 Section Opp.
 
-Variables (oppS : opprClosed V).
-Local Notation S := (oppS : pred V).
+Variable S : opprClosed V.
 
 Lemma rpredN : {mono -%R: u / u \in S}.
 Proof. by move=> u; apply/idP/idP=> /rpredNr; rewrite ?opprK; apply. Qed.
@@ -4588,8 +4586,7 @@ End Opp.
 
 Section Sub.
 
-Variables (subS : zmodClosed V).
-Local Notation S := (subS : pred V).
+Variable S : zmodClosed V.
 
 Lemma rpredB : {in S &, forall u v, u - v \in S}.
 Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
@@ -4615,7 +4612,7 @@ Proof. by rewrite -rpredN; apply: rpredDr. Qed.
 Lemma rpredBl x y : x \in S -> (x - y \in S) = (y \in S).
 Proof. by rewrite -(rpredN _ y); apply: rpredDl. Qed.
 
-Lemma zmodClosedP : zmod_closed subS.
+Lemma zmodClosedP : zmod_closed S.
 Proof. split; [ exact: rpred0D.1 | exact: rpredB ]. Qed.
 
 End Sub.
@@ -4626,20 +4623,18 @@ Section RingPred.
 
 Variables (R : ringType).
 
-Lemma rpredMsign (oppS : opprClosed R) n x :
-  ((-1) ^+ n * x \in (oppS : pred R)) = (x \in (oppS : pred R)).
+Lemma rpredMsign (S : opprClosed R) n x : ((-1) ^+ n * x \in S) = (x \in S).
 Proof. by rewrite -signr_odd mulr_sign; case: ifP => // _; rewrite rpredN. Qed.
 
 Section Mul.
 
-Variables (mulS : mulrClosed R).
-Local Notation S := (mulS : pred R).
+Variable S : mulrClosed R.
 
 Lemma rpred1 : 1 \in S.
-Proof. by case: (@rpred1M _ mulS). Qed.
+Proof. by case: (@rpred1M _ S). Qed.
 
 Lemma rpredM : {in S &, forall u v, u * v \in S}.
-Proof. by case: (@rpred1M _ mulS). Qed.
+Proof. by case: (@rpred1M _ S). Qed.
 
 Lemma rpred_prod I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \prod_(i <- r | P i) F i \in S.
@@ -4650,14 +4645,13 @@ Proof. by move=> u Su; rewrite -(card_ord n) -prodr_const rpred_prod. Qed.
 
 End Mul.
 
-Lemma rpred_nat (rngS : semiringClosed R) n : n%:R \in (rngS : pred R).
+Lemma rpred_nat (S : semiringClosed R) n : n%:R \in S.
 Proof. by rewrite rpredMn ?rpred1. Qed.
 
-Lemma rpredN1 (mulS : smulClosed R) : -1 \in (mulS : pred R).
+Lemma rpredN1 (S : smulClosed R) : -1 \in S.
 Proof. by rewrite rpredN rpred1. Qed.
 
-Lemma rpred_sign (mulS : smulClosed R) n :
-  (-1) ^+ n \in (mulS : pred R).
+Lemma rpred_sign (S : smulClosed R) n : (-1) ^+ n \in S.
 Proof. by rewrite rpredX ?rpredN1. Qed.
 
 Lemma subringClosedP (rngS : subringClosed R) : subring_closed rngS.
@@ -4671,12 +4665,10 @@ Section LmodPred.
 
 Variables (R : ringType) (V : lmodType R).
 
-Lemma rpredZsign (oppS : opprClosed V) n u :
-  ((-1) ^+ n *: u \in (oppS : pred V)) = (u \in (oppS : pred V)).
+Lemma rpredZsign (S : opprClosed V) n u : ((-1) ^+ n *: u \in S) = (u \in S).
 Proof. by rewrite -signr_odd scaler_sign fun_if if_arg rpredN if_same. Qed.
 
-Lemma rpredZnat (addS : addrClosed V) n :
-  {in (addS : pred V), forall u, n%:R *: u \in (addS : pred V)}.
+Lemma rpredZnat (S : addrClosed V) n : {in S, forall u, n%:R *: u \in S}.
 Proof. by move=> u Su; rewrite /= scaler_nat rpredMn. Qed.
 
 Lemma submodClosedP (modS : submodClosed V) : submod_closed modS.
@@ -4705,8 +4697,7 @@ Variable R : unitRingType.
 
 Section Div.
 
-Variables (divS : divClosed R).
-Notation S := (divS : pred R).
+Variable S : divClosed R.
 
 Lemma rpredV x : (x^-1 \in S) = (x \in S).
 Proof. by apply/idP/idP=> /rpredVr; rewrite ?invrK. Qed.
@@ -4775,8 +4766,8 @@ Section ModuleTheory.
 Variable V : lmodType F.
 Implicit Types (a : F) (v : V).
 
-Lemma rpredZeq (modS : submodClosed V) a v :
-  (a *: v \in (modS : pred _)) = (a == 0) || (v \in (modS : pred _)).
+Lemma rpredZeq (S : submodClosed V) a v :
+  (a *: v \in S) = (a == 0) || (v \in S).
 Proof.
 have [-> | nz_a] := eqVneq; first by rewrite scale0r rpred0.
 by apply/idP/idP; first rewrite -{2}(scalerK nz_a v); apply: rpredZ.
@@ -4786,8 +4777,7 @@ End ModuleTheory.
 
 Section Predicates.
 
-Context (divS : divClosed F).
-Notation S := (divS : pred F).
+Context (S : divClosed F).
 
 Lemma fpredMl x y : x \in S -> x != 0 -> (x * y \in S) = (y \in S).
 Proof. by rewrite -!unitfE; apply: rpredMl. Qed.

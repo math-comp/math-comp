@@ -850,7 +850,7 @@ Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 Lemma ratr_nat n : ratr n%:R = n%:R.
 Proof. exact: (ratr_int n). Qed.
 
-Lemma rpred_rat (ringS : divringClosed R) a : ratr a \in (ringS : pred _).
+Lemma rpred_rat (S : divringClosed R) a : ratr a \in S.
 Proof. by rewrite rpred_div ?rpred_int. Qed.
 
 End InRing.

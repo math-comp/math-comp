@@ -748,8 +748,7 @@ Proof. by move=> _ _ /CintP[m1 ->] /CintP[m2 ->]; rewrite -rmorphM !intCK. Qed.
 Lemma floorCX n : {in Cint, {morph floorC : x / x ^+ n}}.
 Proof. by move=> _ /CintP[m ->]; rewrite -rmorphX !intCK. Qed.
 
-Lemma rpred_Cint (ringS : subringClosed [ringType of algC]) x :
-  x \in Cint -> x \in (ringS : pred _).
+Lemma rpred_Cint (S : subringClosed algC) x : x \in Cint -> x \in S.
 Proof. by case/CintP=> m ->; apply: rpred_int. Qed.
 
 Lemma Cint0 : 0 \in Cint. Proof. exact: (Cint_int 0). Qed.
@@ -830,8 +829,7 @@ Proof. by move=> _ _ /CnatP[n1 ->] /CnatP[n2 ->]; rewrite -natrM !natCK. Qed.
 Lemma truncCX n : {in Cnat, {morph truncC : x / x ^+ n >-> (x ^ n)%N}}.
 Proof. by move=> _ /CnatP[n1 ->]; rewrite -natrX !natCK. Qed.
 
-Lemma rpred_Cnat (ringS : semiringClosed [ringType of algC]) x :
-  x \in Cnat -> x \in (ringS : pred _).
+Lemma rpred_Cnat (S : semiringClosed algC) x : x \in Cnat -> x \in S.
 Proof. by case/CnatP=> n ->; apply: rpred_nat. Qed.
 
 Lemma Cnat_nat n : n%:R \in Cnat. Proof. by apply/CnatP; exists n. Qed.
@@ -1115,8 +1113,7 @@ Qed.
 HB.instance Definition _ := GRing.isDivringClosed.Build _ Crat
   Crat_divring_closed.
 
-Lemma rpred_Crat (ringS : divringClosed [unitRingType of algC]) :
-  {subset Crat <= (ringS : pred _)}.
+Lemma rpred_Crat (S : divringClosed algC) : {subset Crat <= S}.
 Proof. by move=> _ /CratP[a ->]; apply: rpred_rat. Qed.
 
 Lemma conj_Crat z : z \in Crat -> z^* = z.
@@ -1239,12 +1236,10 @@ Section PredCmod.
 
 Variable V : lmodType algC.
 
-Lemma rpredZ_Cnat (addS : addrClosed V) :
-  {in Cnat & (addS : pred _), forall z u, z *: u \in (addS : pred _)}.
+Lemma rpredZ_Cnat (S : addrClosed V) : {in Cnat & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /CnatP[n ->]; apply: rpredZnat. Qed.
 
-Lemma rpredZ_Cint (subS : zmodClosed V) :
-  {in Cint & (subS : pred _), forall z u, z *: u \in (subS : pred _)}.
+Lemma rpredZ_Cint (S : zmodClosed V) : {in Cint & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /CintP[m ->]; apply: rpredZint. Qed.
 
 End PredCmod.

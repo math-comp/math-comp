@@ -1350,8 +1350,7 @@ Qed.
 
 Section PolyOverAdd.
 
-Variables (addS : addrClosed R).
-Local Notation S := (addS : pred R).
+Variable S : addrClosed R.
 
 Lemma polyOverP {p} : reflect (forall i, p`_i \in S) (p \in polyOver S).
 Proof.
@@ -1370,7 +1369,7 @@ split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
 HB.instance Definition _ :=
-  GRing.isAddClosed.Build [zmodType of {poly R}] (polyOver_pred addS)
+  GRing.isAddClosed.Build [zmodType of {poly R}] (polyOver_pred S)
     polyOver_addr_closed.
 
 End PolyOverAdd.
@@ -1385,8 +1384,7 @@ HB.instance Definition _ (zmodS : zmodClosed R) :=
 
 Section PolyOverSemiring.
 
-Variables (ringS : semiringClosed R).
-Local Notation S := (ringS : pred R).
+Variable S : semiringClosed R.
 
 Fact polyOver_mulr_closed : mulr_closed (polyOver S).
 Proof.
@@ -1394,7 +1392,7 @@ split=> [|p q /polyOverP Sp /polyOverP Sq]; first by rewrite polyOverC rpred1.
 by apply/polyOverP=> i; rewrite coefM rpred_sum // => j _; apply: rpredM.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred ringS)
+  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred S)
     polyOver_mulr_closed.
 
 Lemma polyOverZ : {in S & polyOver S, forall c p, c *: p \is a polyOver S}.
@@ -1415,12 +1413,11 @@ End PolyOverSemiring.
 
 Section PolyOverRing.
 
-Variables (ringS : subringClosed R).
-Local Notation S := (ringS : pred R).
+Variable S : subringClosed R.
 
 HB.instance Definition _ :=
-  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred ringS)
-    (polyOver_mulr_closed ringS).
+  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred S)
+    (polyOver_mulr_closed S).
 
 Lemma polyOverXsubC c : ('X - c%:P \in polyOver S) = (c \in S).
 Proof. by rewrite rpredBl ?polyOverX ?polyOverC. Qed.
@@ -1738,7 +1735,7 @@ Arguments rootPf {R p x}.
 Arguments rootPt {R p x}.
 Arguments unity_rootP {R n z}.
 Arguments polyOver_pred _ _ _ /.
-Arguments polyOverP {R addS p}.
+Arguments polyOverP {R S p}.
 Arguments polyC_inj {R} [x1 x2] eq_x12P.
 Arguments eq_poly {R n} [E1] E2 eq_E12.
 
