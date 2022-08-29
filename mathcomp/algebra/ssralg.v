@@ -4687,6 +4687,18 @@ Qed.
 
 End LmodPred.
 
+Section LalgPred.
+
+Variables (R : ringType) (A : lalgType R).
+
+Lemma subalgClosedP (algS : subalgClosed A) : subalg_closed algS.
+Proof.
+split; [ exact: rpred1M.1 | | exact: rpredM ].
+by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
+Qed.
+
+End LalgPred.
+
 Section UnitRingPred.
 
 Variable R : unitRingType.
@@ -5050,6 +5062,104 @@ Qed.
 HB.instance Definition _ := UnitRing_isField.Build U fieldP.
 HB.end.
 
+HB.factory Record SubChoice_isSubRing (R : ringType) S U of SubChoice R S U := {
+  subring_closed_subproof : subring_closed S
+}.
+
+HB.builders Context (R : ringType) S U of SubChoice_isSubRing R S U.
+HB.instance Definition _ := SubChoice_isSubZmodule.Build R S U
+  (subring_closedB subring_closed_subproof).
+HB.instance Definition _ := SubZmodule_isSubRing.Build R S U
+  subring_closed_subproof.
+HB.end.
+
+HB.factory Record SubChoice_isSubComRing (R : comRingType) S U
+    of SubChoice R S U := {
+  subring_closed_subproof : subring_closed S
+}.
+
+HB.builders Context (R : comRingType) S U of SubChoice_isSubComRing R S U.
+HB.instance Definition _ := SubChoice_isSubRing.Build R S U
+  subring_closed_subproof.
+HB.instance Definition _ := SubRing_isSubComRing.Build R S U.
+HB.end.
+
+HB.factory Record SubChoice_isSubLmodule (R : ringType) (V : lmodType R) S W
+    of SubChoice V S W := {
+  submod_closed_subproof : submod_closed S
+}.
+
+HB.builders Context (R : ringType) (V : lmodType R) S W
+  of SubChoice_isSubLmodule R V S W.
+HB.instance Definition _ := SubChoice_isSubZmodule.Build V S W
+  (submod_closedB submod_closed_subproof).
+HB.instance Definition _ := SubZmodule_isSubLmodule.Build R V S W
+  submod_closed_subproof.
+HB.end.
+
+HB.factory Record SubChoice_isSubLalgebra (R : ringType) (A : lalgType R) S W
+    of SubChoice A S W := {
+  subalg_closed_subproof : subalg_closed S
+}.
+
+HB.builders Context (R : ringType) (A : lalgType R) S W
+  of SubChoice_isSubLalgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubRing.Build A S W
+  (subalg_closedBM subalg_closed_subproof).
+HB.instance Definition _ := SubZmodule_isSubLmodule.Build R A S W
+  (subalg_closedZ subalg_closed_subproof).
+HB.instance Definition _ := SubRing_SubLmodule_isSubLalgebra.Build R A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubAlgebra (R : ringType) (A : algType R) S W
+    of SubChoice A S W := {
+  subalg_closed_subproof : subalg_closed S
+}.
+
+HB.builders Context (R : ringType) (A : algType R) S W
+  of SubChoice_isSubAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubLalgebra.Build R A S W
+  subalg_closed_subproof.
+HB.instance Definition _ := SubLalgebra_isSubAlgebra.Build R A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
+    of SubChoice R S U := {
+  divring_closed_subproof : divring_closed S
+}.
+
+HB.builders Context (R : unitRingType) S U of SubChoice_isSubUnitRing R S U.
+HB.instance Definition _ := SubChoice_isSubRing.Build R S U
+  (divring_closedBM divring_closed_subproof).
+HB.instance Definition _ := SubRing_isSubUnitRing.Build R S U
+  divring_closed_subproof.
+HB.end.
+
+HB.factory Record SubChoice_isSubComUnitRing (R : comUnitRingType) S U
+    of SubChoice R S U := {
+  divring_closed_subproof : divring_closed S
+}.
+
+HB.builders Context (R : comUnitRingType) S U
+  of SubChoice_isSubComUnitRing R S U.
+HB.instance Definition _ := SubChoice_isSubComRing.Build R S U
+  (divring_closedBM divring_closed_subproof).
+HB.instance Definition _ := SubRing_isSubUnitRing.Build R S U
+  divring_closed_subproof.
+HB.end.
+
+HB.factory Record SubChoice_isSubIntegralDomain (R : idomainType) S U
+    of SubChoice R S U := {
+  divring_closed_subproof : divring_closed S
+}.
+
+HB.builders Context (R : idomainType) S U
+  of SubChoice_isSubIntegralDomain R S U.
+HB.instance Definition _ := SubChoice_isSubComUnitRing.Build R S U
+  divring_closed_subproof.
+HB.instance Definition _ := SubComUnitRing_isSubIntegralDomain.Build R S U.
+HB.end.
+
 Module SubExports.
 
 Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
@@ -5060,29 +5170,61 @@ Notation "[ 'SubZmodule_isSubRing' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubRing.Build _ _ U (subringClosedP _))
   (at level 0, format "[ 'SubZmodule_isSubRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubRing.Build _ _ U (subringClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubRing'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubRing_isSubComRing' 'of' U 'by' <: ]" :=
   (SubRing_isSubComRing.Build _ _ U)
   (at level 0, format "[ 'SubRing_isSubComRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubComRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComRing.Build _ _ U (subringClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubComRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
   (at level 0, format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubLmodule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubLmodule.Build _ _ _ U (submodClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubLmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
   (at level 0, format "[ 'SubRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubLalgebra.Build _ _ _ U (subalgClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=
   (SubLalgebra_isSubAlgebra.Build _ _ _ U)
   (at level 0, format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubAlgebra.Build _ _ _ U (subalgClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubRing_isSubUnitRing.Build _ _ U (divringClosedP _))
   (at level 0, format "[ 'SubRing_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubUnitRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubUnitRing.Build _ _ U (divringClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubUnitRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubComUnitRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComUnitRing.Build _ _ U (divringClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubComUnitRing'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubComUnitRing_isSubIntegralDomain' 'of' U 'by' <: ]" :=
   (SubComUnitRing_isSubIntegralDomain.Build _ _ U)
   (at level 0, format "[ 'SubComUnitRing_isSubIntegralDomain'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubIntegralDomain' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubIntegralDomain.Build _ _ U (divringClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubIntegralDomain'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubIntegralDomain_isSubField' 'of' U 'by' <: ]" :=
   (SubIntegralDomain_isSubField.Build _ _ U (frefl _))
@@ -5376,6 +5518,7 @@ Definition subringClosedP := subringClosedP.
 Definition rpredZsign := rpredZsign.
 Definition rpredZnat := rpredZnat.
 Definition submodClosedP := submodClosedP.
+Definition subalgClosedP := subalgClosedP.
 Definition rpredZ := @rpredZ.
 Definition rpredVr := @rpredVr.
 Definition rpredV := rpredV.
@@ -6062,9 +6205,7 @@ Section Test1.
 
 Variables (R : unitRingType) (S : divringClosed R).
 
-HB.instance Definition _ := [SubChoice_isSubZmodule of B S by <:].
-HB.instance Definition _ := [SubZmodule_isSubRing of B S by <:].
-HB.instance Definition _ := [SubRing_isSubUnitRing of B S by <:].
+HB.instance Definition _ := [SubChoice_isSubUnitRing of B S by <:].
 
 End Test1.
 
