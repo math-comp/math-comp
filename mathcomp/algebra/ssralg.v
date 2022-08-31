@@ -2147,10 +2147,9 @@ HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V)
   Scale.isLaw.Build aR V (nu \; s)
     (@Scale.compN1op _ _ s _ nu) (fun a => Scale.opB _ _).
 
-#[export]
+#[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V) a :=
  isAdditive.Build V V (s a) (Scale.opB s a).
-(* FIXME: non_forgetful_inheritance *)
 
 Definition scalable_for (R : ringType) (U : lmodType R) (V : zmodType)
     (s : R -> V -> V) (f : U -> V) :=
