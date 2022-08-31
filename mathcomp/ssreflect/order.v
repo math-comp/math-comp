@@ -3598,11 +3598,11 @@ Proof. exact: (@joins_min_seq _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@join_sup _ [the tbLatticeType _ of L^d]). Qed.
+Proof. exact: (@joins_sup _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@join_min _ [the tbLatticeType _ of L^d]). Qed.
+Proof. exact: (@joins_min _ [the tbLatticeType _ of L^d]). Qed.
 
 Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
   (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.

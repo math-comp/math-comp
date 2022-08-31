@@ -756,7 +756,7 @@ HB.structure Definition Zmodule := {V of isZmodule V & Choice V}.
 
 Module ZmodExports.
 Bind Scope ring_scope with Zmodule.sort.
-#[deprecated(since="mathcomp 2.0.0", note="use isZmodule.Build instead")]
+#[deprecated(since="mathcomp 2.0.0", note="use GRing.isZmodule.Build instead")]
 Notation ZmodMixin V := (isZmodule.Build V).
 Notation "[ 'zmodType' 'of' T 'for' cT ]" := (@Zmodule.clone T cT)
   (at level 0, format "[ 'zmodType'  'of'  T  'for'  cT ]") : form_scope.

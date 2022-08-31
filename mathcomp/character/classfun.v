@@ -244,8 +244,7 @@ Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE add0r. Qed.
 Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE addNr. Qed.
 
-
-HB.instance Definition _ := ZmodMixin classfun
+HB.instance Definition _ := GRing.isZmodule.Build classfun
   cfun_addA cfun_addC cfun_add0 cfun_addN.
 
 Lemma muln_cfunE phi n x : (phi *+ n) x = phi x *+ n.
@@ -270,9 +269,8 @@ Proof.
 by apply/eqP=> /cfunP/(_ 1%g)/eqP; rewrite cfun1Egen cfunE group1 oner_eq0.
 Qed.
 
-HB.instance Definition _ :=
-  GRing.Zmodule_isComRing.Build
-    classfun cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build classfun
+  cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
 
 Definition cfun_ringType := [ringType of classfun].
 

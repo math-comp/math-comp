@@ -371,7 +371,7 @@ Lemma addNq: left_inverse zero opp add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
 #[export]
-HB.instance Definition _ := ZmodMixin type addqA addqC add0q addNq.
+HB.instance Definition _ := GRing.isZmodule.Build type addqA addqC add0q addNq.
 #[export]
 HB.instance Definition _ := GRing.Zmodule.on quot.
 #[export]
