@@ -142,7 +142,7 @@ rewrite normrN normrM ler_pmul //.
   rewrite normf_div -!intr_norm -!abszE ler_pimulr ?ler0n //.
   by rewrite invf_le1 ?ler1n ?ltr0n ?absz_gt0 ?denq_eq0.
 rewrite normrX ger0_norm ?(ltrW x_gt0) // ler_weexpn2l ?leq_ord //.
-by rewrite (le_trans _ lb_x) // -natrD addn1 ler1n.
+by rewrite (le_trans _ lb_x) // natr1 ler1n.
 Qed.
 
 Definition decidable_embedding sT T (f : sT -> T) :=

@@ -1075,6 +1075,10 @@ Proof. by rewrite mulrnAr mulr1. Qed.
 Lemma natrD m n : (m + n)%:R = m%:R + n%:R :> R.
 Proof. exact: mulrnDr. Qed.
 
+Lemma natr1 n : n%:R + 1 = n.+1%:R :> R. Proof. by rewrite mulrSr. Qed.
+
+Lemma nat1r n : 1 + n%:R = n.+1%:R :> R. Proof. by rewrite mulrS. Qed.
+
 Lemma natrB m n : n <= m -> (m - n)%:R = m%:R - n%:R :> R.
 Proof. exact: mulrnBr. Qed.
 
@@ -1102,7 +1106,7 @@ Proof. by elim: m => [|m IHm]; rewrite ?mul1r // !exprS -mulrA -IHm. Qed.
 Lemma exprSr x n : x ^+ n.+1 = x ^+ n * x.
 Proof. by rewrite -addn1 exprD expr1. Qed.
 
-Lemma expr_sum x (I : Type) (s : seq I) (P : pred I) F : 
+Lemma expr_sum x (I : Type) (s : seq I) (P : pred I) F :
   x ^+ (\sum_(i <- s | P i) F i) = \prod_(i <- s | P i) x ^+ F i :> R.
 Proof. exact: (big_morph _ (exprD _)). Qed.
 
@@ -5704,6 +5708,8 @@ Definition mulrnAr := mulrnAr.
 Definition mulr_natl := mulr_natl.
 Definition mulr_natr := mulr_natr.
 Definition natrD := natrD.
+Definition nat1r := nat1r.
+Definition natr1 := natr1.
 Definition natrB := natrB.
 Definition natr_sum := natr_sum.
 Definition natrM := natrM.
