@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `path.v` 
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
+- in `ssralg.v`
+  + lemmas `natr1`, `nat1r`
 
 - in `poly.v`
   + lemmas `comm_polyD`, `comm_polyM`, `comm_poly_exp`, `root_exp`,
