@@ -31,6 +31,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `ltn_half_double`, `leq_half_double`, `gtn_half_double`
   + lemmas `uphalfE`, `ltn_uphalf_double`, `geq_uphalf_double`, `gtn_uphalf_double`
 
+- in `ssrint.v`
+  + printing only notation for `x = y :> int`, opening `int_scope` on
+    `x` and `y` to better match the already existing parsing only
+    notation with the introduction of number notations in `ring_scope`
+
 ### Changed
 
 - in `poly.v`:
