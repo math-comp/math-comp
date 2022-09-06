@@ -54,7 +54,6 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
-      coq-elpi.job = false;
     };
     "coq-8.15".coqPackages = common-bundles // {
       coq.override.version = "8.15";
