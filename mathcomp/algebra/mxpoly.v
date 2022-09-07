@@ -350,8 +350,7 @@ Lemma horner_rVpoly m (u : 'rV_m) :
 Proof.
 rewrite mulmx_sum_row linear_sum [rVpoly u]poly_def rmorph_sum.
 apply: eq_bigr => i _.
-by rewrite valK linearZ /= linearZ rmorphX /= horner_mx_X rowK /= mxvecK.
-(* FIXME: replace the two linearZ with !linearZ when thing in ssralg is fixed *)
+by rewrite valK /= !linearZ rmorphX /= horner_mx_X rowK /= mxvecK.
 Qed.
 
 End OneMatrix.

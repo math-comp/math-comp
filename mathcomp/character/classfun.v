@@ -1605,7 +1605,7 @@ Lemma cfIsom_is_multiplicative : multiplicative cfIsom.
 Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
 
 Lemma cfIsom_is_scalable : scalable cfIsom.
-Proof. rewrite unlock; exact: linearZ. Qed.
+Proof. rewrite unlock; exact: linearZ_LR. Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build _ _ cfIsom cfIsom_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfIsom
@@ -1863,7 +1863,7 @@ Lemma cfSdprod_is_multiplicative : multiplicative cfSdprod.
 Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
 
 Lemma cfSdprod_is_scalable : scalable cfSdprod.
-Proof. rewrite unlock; exact: linearZ. Qed.
+Proof. rewrite unlock; exact: linearZ_LR. Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfSdprod

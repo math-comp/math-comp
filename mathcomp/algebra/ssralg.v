@@ -2195,8 +2195,18 @@ Notation scalable f := (scalable_for *:%R f).
 Notation linear f := (linear_for *:%R f).
 Notation scalar f := (linear_for *%R f).
 Module Linear.
-Definition map (R : ringType) (U : lmodType R) (V : zmodType) (s : R -> V -> V)
-    (phUV : phant (U -> V)) := Linear.type U s.
+Section Linear.
+Variables (R : ringType) (U : lmodType R) (V : zmodType) (s : R -> V -> V).
+Definition map (phUV : phant (U -> V)) := Linear.type U s.
+(* Support for right-to-left rewriting with the generic linearZ rule. *)
+Local Notation mapUV := (Linear.type U s).
+Definition map_class := mapUV.
+Definition map_at (a : R) := mapUV.
+Structure map_for a s_a := MapFor {map_for_map : mapUV; _ : s a = s_a}.
+Definition unify_map_at a (f : map_at a) := MapFor f (erefl (s a)).
+Structure wrapped := Wrap {unwrap : mapUV}.
+Definition wrap (f : map_class) := Wrap f.
+End Linear.
 End Linear.
 Notation "{ 'linear' fUV | s }" := (Linear.map s (Phant fUV))
   (at level 0, format "{ 'linear'  fUV  |  s }") : type_scope.
@@ -2208,6 +2218,13 @@ Notation "[ 'linear' 'of' f 'as' g ]" := (Linear.clone _ _ _ _ f g)
   (at level 0, format "[ 'linear'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'linear' 'of' f ]" := (Linear.clone _ _ _ _ f _)
   (at level 0, format "[ 'linear'  'of'  f ]") : form_scope.
+(* Support for right-to-left rewriting with the generic linearZ rule. *)
+Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
+Coercion Linear.unify_map_at : Linear.map_at >-> Linear.map_for.
+Canonical Linear.unify_map_at.
+Coercion Linear.unwrap : Linear.wrapped >-> Linear.type.
+Coercion Linear.wrap : Linear.map_class >-> Linear.wrapped.
+Canonical Linear.wrap.
 End LinearExports.
 HB.export LinearExports.
 
@@ -2236,8 +2253,6 @@ Proof. by move=> u v /=; rewrite linearD linearZ_LR. Qed.
 
 End GenericProperties.
 
-Definition linearZ := linearZ_LR.
-(* TODO: understand and port that
 Section BidirectionalLinearZ.
 
 Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
@@ -2268,14 +2283,13 @@ Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 (*   Most of this machinery will be invisible to a casual user, because all  *)
 (* the projections and default instances involved are declared as coercions. *)
 
-Variables (S : ringType) (h : S -> V -> V) (h_law : Scale.law h).
+Variables (S : ringType) (h : Scale.law S V).
 
-Lemma linearZ c a (h_c := Scale.op h_law c) (f : Linear.map_for U s a h_c) u :
+Lemma linearZ c a (h_c := h c) (f : Linear.map_for U s a h_c) u :
   f (a *: u) = h_c (Linear.wrap f u).
 Proof. by rewrite linearZ_LR; case: f => f /= ->. Qed.
 
 End BidirectionalLinearZ.
-*)
 
 Section LmodProperties.
 
