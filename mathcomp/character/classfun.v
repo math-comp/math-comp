@@ -1691,10 +1691,7 @@ Proof. by move/normal_norm=> nBG; apply: cfMorphE. Qed.
 
 Lemma cfMod1 phi : (phi %% B)%CF 1%g = phi 1%g. Proof. exact: cfMorph1. Qed.
 
-Canonical cfMod_additive := [additive of cfMod].
-Canonical cfMod_rmorphism := [rmorphism of cfMod].
-Canonical cfMod_linear := [linear of cfMod].
-Canonical cfMod_lrmorphism := [lrmorphism of cfMod].
+HB.instance Definition _ := GRing.LRMorphism.on cfMod.
 
 Lemma cfMod_cfun1 : (1 %% B)%CF = 1. Proof. exact: rmorph1. Qed.
 
@@ -2066,10 +2063,7 @@ by have [[_ Gi' _ defGi']] := dprodP defGi; rewrite (bigdprodWY defGi') -defGi'.
 Qed.
 Definition cfBigdprodi i := cfDprodl (cfBigdprodi_subproof i) \o 'Res[_, A i].
 
-Canonical cfBigdprodi_additive i := [additive of @cfBigdprodi i].
-Canonical cfBigdprodi_linear i := [linear of @cfBigdprodi i].
-Canonical cfBigdprodi_rmorphism i := [rmorphism of @cfBigdprodi i].
-Canonical cfBigdprodi_lrmorphism i := [lrmorphism of @cfBigdprodi i].
+HB.instance Definition _ i := GRing.LRMorphism.on (@cfBigdprodi i).
 
 Lemma cfBigdprodi1 i (phi : 'CF(A i)) : cfBigdprodi phi 1%g = phi 1%g.
 Proof. by rewrite cfDprodl1 cfRes1. Qed.

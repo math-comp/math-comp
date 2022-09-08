@@ -545,8 +545,7 @@ Section Horner.
 Variables z : L.
 
 Definition fieldExt_horner := horner_morph (fun x => mulrC z (in_alg L x)).
-Canonical fieldExtHorner_additive := [additive of fieldExt_horner].
-Canonical fieldExtHorner_rmorphism := [rmorphism of fieldExt_horner].
+HB.instance Definition _ := GRing.RMorphism.on fieldExt_horner.
 Lemma fieldExt_hornerC b : fieldExt_horner b%:P = b%:A.
 Proof. exact: horner_morphC. Qed.
 Lemma fieldExt_hornerX : fieldExt_horner 'X = z.

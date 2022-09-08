@@ -326,8 +326,7 @@ Section OneMatrix.
 Variable A : 'M[R]_n.
 
 Definition horner_mx := horner_morph (comm_mx_scalar^~ A).
-Canonical horner_mx_additive := [additive of horner_mx].
-Canonical horner_mx_rmorphism := [rmorphism of horner_mx].
+HB.instance Definition _ := GRing.RMorphism.on horner_mx.
 
 Lemma horner_mx_C a : horner_mx a%:P = a%:M.
 Proof. exact: horner_morphC. Qed.
