@@ -42,7 +42,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-finmap" "mathcomp-real-closed" "multinomials" "coqeal"
       "mathcomp-zify" "coquelicot" "interval"
       "reglang" "mathcomp-abel" "fourcolor" "gaia" "graph-theory" "coq-bits"
-      "mathcomp-analysis"
+      "mathcomp-classical" "mathcomp-analysis"
     ];
     hirarchy-builder = [
       "odd-order"
@@ -67,12 +67,9 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
-      hierarchy-builder.override.version = "master";
-      interval.job = false;
     };
     "coq-8.15".coqPackages = common-bundles // {
       coq.override.version = "8.15";
-      hierarchy-builder.override.version = "master";
     };
   };
 }
