@@ -99,8 +99,11 @@ coq-8.15:
   extends: .opam-build-once
 
 coq-8.16:
-  # to be replaced with .opam-build-once when 8.16.0 available
-  extends: .opam-build
+  extends: .opam-build-once
+
+# coq-8.17: # to uncomment when 8.17+rc1 available
+#   # to be replaced with .opam-build-once when 8.17.0 available
+#   extends: .opam-build
 
 coq-dev:
   extends: .opam-build
@@ -159,10 +162,15 @@ test-coq-8.15:
     COQ_VERSION: "8.15"
 
 test-coq-8.16:
-  # to be replaced with .test-once when 8.16.0 available
-  extends: .test
+  extends: .test-once
   variables:
     COQ_VERSION: "8.16"
+
+# test-coq-8.17: # to uncomment when 8.17+rc1 available
+#   # to be replaced with .test-once when 8.17.0 available
+#   extends: .test
+#   variables:
+#     COQ_VERSION: "8.17"
 
 test-coq-dev:
   extends: .test
@@ -258,10 +266,11 @@ ci-lemma-overloading-8.13:
   variables:
     COQ_VERSION: "8.13"
 
-ci-lemma-overloading-dev:
-  extends: .ci-lemma-overloading
-  variables:
-    COQ_VERSION: "dev"
+# commented out as it is currently broken with Coq master
+# ci-lemma-overloading-dev:
+#   extends: .ci-lemma-overloading
+#   variables:
+#     COQ_VERSION: "dev"
 
 # The bigenough library (will be later subsumed by near)
 .ci-bigenough:
@@ -434,8 +443,11 @@ mathcomp-dev_coq-8.15:
   extends: .docker-deploy-once
 
 mathcomp-dev_coq-8.16:
-  # to be replaced with .docker-deploy-once when 8.16.0 available
-  extends: .docker-deploy
+  extends: .docker-deploy-once
+
+# mathcomp-dev_coq-8.17: # to uncomment when 8.17+rc1 available
+#   # to be replaced with .docker-deploy-once when 8.16.0 available
+#   extends: .docker-deploy
 
 mathcomp-dev_coq-dev:
   extends: .docker-deploy
