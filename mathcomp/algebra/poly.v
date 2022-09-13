@@ -2100,8 +2100,8 @@ Lemma horner_prod I r (P : pred I) (F : I -> {poly R}) x :
 Proof. by elim/big_rec2: _ => [|i _ p _ <-]; rewrite (hornerM, hornerC). Qed.
 
 Definition hornerE :=
-  (hornerD, hornerN, hornerX, hornerC, horner_cons,
-   simp, hornerCM, hornerZ, hornerM).
+  (hornerD, hornerN, hornerX, hornerC, horner_exp,
+   simp, hornerCM, hornerZ, hornerM, horner_cons).
 
 Definition horner_eval (x : R) := horner^~ x.
 Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
@@ -2619,7 +2619,7 @@ transitivity (\prod_(w <- zn) ('X - w%:P)); first by rewrite big_map.
 have n_gt0: n > 0 := prim_order_gt0 prim_z.
 rewrite (@all_roots_prod_XsubC _ ('X^n - 1) zn); first 1 last.
 - by rewrite size_Xn_sub_1 // size_map size_iota subn0.
-- apply/allP=> _ /mapP[i _ ->] /=; rewrite rootE !hornerE hornerXn.
+- apply/allP=> _ /mapP[i _ ->] /=; rewrite rootE !hornerE.
   by rewrite exprAC (prim_expr_order prim_z) expr1n subrr.
 - rewrite uniq_rootsE map_inj_in_uniq ?iota_uniq // => i j.
   rewrite !mem_index_iota => ltin ltjn /eqP.

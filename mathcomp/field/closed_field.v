@@ -869,7 +869,7 @@ have Kclosed: GRing.ClosedField.axiom Kfield.
   exists (EtoKM j.+1 w); apply/eqP; rewrite -subr_eq0; apply/eqP.
   transitivity (EtoKM j.+1 (map_poly (toE m j.+1 (leqW lemj)) p).[w]).
     rewrite -horner_map -map_poly_comp toEtoKp EtoK_E; move/EtoKM: w => w.
-    rewrite rmorphB [_ 'X^n]map_polyXn !hornerE hornerXn; congr (_ - _ : Kring).
+    rewrite rmorphB [_ 'X^n]map_polyXn !hornerE; congr (_ - _ : Kring).
     rewrite (@horner_coef_wide _ n) ?size_map_poly ?size_poly //.
     by apply: eq_bigr => i _; rewrite coef_map coef_rVpoly valK mxE /= DpE.
   suffices Dpj: map_poly (toE m j lemj) p = pj.
