@@ -1318,7 +1318,7 @@ Proof.
 case x_ge0: (0 <= x); last by exists 0.
 have le0x1: 0 <= x + 1 by rewrite -nnegrE rpredD ?rpred1.
 have [|y /andP[y_ge0 _]] := @poly_ivt ('X^2 - x%:P) _ _ le0x1.
-  rewrite !hornerE -subr_ge0 add0r opprK x_ge0 -expr2 sqrrD mulr1.
+  rewrite !hornerE -subr_ge0 add0r expr0n sub0r opprK x_ge0 sqrrD mulr1.
   by rewrite addrAC !addrA addrK -nnegrE !rpredD ?rpredX ?rpred1.
 by rewrite rootE !hornerE subr_eq0; exists y.
 Qed.
@@ -4461,7 +4461,7 @@ have{} Dp: p = \prod_(z <- r) ('X - z%:P).
   rewrite Dp lead_coefE sz_p coefB coefXn coefC -mulrb -mulrnA mulnb lt0n andNb.
   by rewrite subr0 eqxx scale1r; apply/esym/perm_big; rewrite perm_sort.
 have mem_rP z: (n > 0)%N -> reflect (z ^+ n = x) (z \in r).
-  move=> n_gt0; rewrite -root_prod_XsubC -Dp rootE !hornerE hornerXn n_gt0.
+  move=> n_gt0; rewrite -root_prod_XsubC -Dp rootE !hornerE n_gt0.
   by rewrite subr_eq0; apply: eqP.
 exists r`_0 => [|z n_gt0 /(mem_rP z n_gt0) r_z].
   have sz_r: size r = n by apply: succn_inj; rewrite -sz_p Dp size_prod_XsubC.

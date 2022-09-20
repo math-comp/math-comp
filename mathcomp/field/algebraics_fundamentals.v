@@ -178,7 +178,7 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
   apply/dvdzP; exists (\sum_(i < d) p1`_i * numq y ^+ i * denq y ^+ (d - i.+1)).
   apply: ZtoQinj; rewrite /ZtoQ rmorphM mulr_suml rmorph_sum /=.
   transitivity ((p1 ^ intr).[y] * (denq y ^+ d)%:~R).
-    rewrite Dp1 !hornerE hornerXn (rootP qy0) subr0.
+    rewrite Dp1 !hornerE (rootP qy0) subr0.
     by rewrite !rmorphX /= numqE exprMn mulrA.
   have sz_p1: (size (p1 ^ ZtoQ)%R <= d)%N.
     rewrite Dp1 size_scale ?intr_eq0 //; apply/leq_sizeP=> i.
