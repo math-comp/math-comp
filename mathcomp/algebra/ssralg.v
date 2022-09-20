@@ -1072,6 +1072,12 @@ Proof. by rewrite mulrnAl mul1r. Qed.
 Lemma mulr_natr x n : x * n%:R = x *+ n.
 Proof. by rewrite mulrnAr mulr1. Qed.
 
+Lemma mulr_ll x y z : y = z -> x * y = x * z.
+Proof. by move => ->. Qed.
+
+Lemma mulr_rr (x y z : R) : y = z -> y * x = z * x.
+Proof. by move => ->. Qed.
+
 Lemma natrD m n : (m + n)%:R = m%:R + n%:R :> R.
 Proof. exact: mulrnDr. Qed.
 
@@ -4975,6 +4981,13 @@ Lemma eqr_div x y z t : y != 0 -> t != 0 -> (x / y == z / t) = (x * t == z * y).
 Proof.
 move=> yD0 tD0; rewrite -[x in RHS](divfK yD0) -[z in RHS](divfK tD0) mulrAC.
 by apply/eqP/eqP => [->|/(mulIf yD0)/(mulIf tD0)].
+Qed.
+
+Lemma sum_div_eq1 (X : finType) (P : pred X) (cst : F) (Hcst : cst != 0) (f : X -> F) :
+  (\big[+%R/0%R]_(x : X | P x) (f x / cst) == 1%R)%R = (\big[+%R/0%R]_(x : X | P x) f x == cst).
+Proof.
+rewrite -(divr1 1) -big_distrl /= eqr_div // ; first by rewrite mulr1 mul1r.
+by rewrite oner_eq0.
 Qed.
 
 Lemma char0_natf_div :

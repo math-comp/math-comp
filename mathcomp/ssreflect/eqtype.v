@@ -547,6 +547,9 @@ End ComparableType.
 Definition eq_comparable (T : eqType) : comparable T :=
   fun x y => decP (x =P y).
 
+Lemma eq_comparable_prop (T : eqType) (t1 t2 : T) : t1 = t2 \/ t1 <> t2.
+Proof. destruct (eq_comparable t1 t2). by left. by right. Qed.
+
 Section SubType.
 
 Variables (T : Type) (P : pred T).

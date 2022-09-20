@@ -1488,6 +1488,15 @@ Lemma bigD1_seq (I : eqType) (r : seq I) j F :
   \big[*%M/1]_(i <- r) F i = F j * \big[*%M/1]_(i <- r | i != j) F i.
 Proof. by move=> /big_rem-> /rem_filter->; rewrite big_filter. Qed.
 
+Lemma split_big (I : Type) [r : seq I] P Q f :
+  \big[op/idx]_(i <- r | P i) f i =
+  op (\big[op/idx]_(i <- r | P i && Q i) f i) (\big[op/idx]_(i <- r | P i && ~~ Q i) f i).
+Proof.
+rewrite !big_mkcondr -big_split ; apply eq_bigr => t _ ; case (Q t) => /=.
+- by rewrite Monoid.Theory.mulm1.
+- by rewrite Monoid.Theory.mul1m.
+Qed.
+
 Lemma cardD1x (I : finType) (A : pred I) j :
   A j -> #|SimplPred A| = 1 + #|[pred i | A i & i != j]|.
 Proof.
@@ -1646,6 +1655,36 @@ rewrite uniq_perm ?index_enum_uniq//.
   by rewrite allpairs_uniq_dep// => [|i|[i j] []]; rewrite ?index_enum_uniq.
 by move=> [i j]; rewrite ?mem_index_enum; apply/allpairsPdep; exists i, j.
 Qed.
+
+Section SigBigDep2.
+Definition osig (I : finType) (P : pred I) : I -> option {i : I | P i}
+  := (fun i => match boolP (P i) with AltTrue h => Some (exist P i h) | _ => None end).
+
+Lemma osig_bij (I : finType) (P : pred I) : forall i, P i -> omap sval (osig P i) = Some i.
+Proof.
+move => i Hi ; rewrite/omap/obind/oapp/osig => //=.
+case (boolP (P i)) => [Hi' //|] ; by rewrite Hi.
+Qed.
+
+Lemma sig_big_dep2 (I : finType) (P : pred I) f :
+    \big[op/idx]_(s : {i : I | P i}) f (tag s) (tagged s) = \big[op/idx]_(i : I | P i) match boolP (P i) with AltTrue h => f i h | _ => idx end.
+Proof.
+rewrite (reindex_omap (sval) (osig P) (@osig_bij _ P)).
+apply eq_big => [[i Hi]|[i Hi] _] /=.
+- rewrite /osig ; case (boolP (P i)) => [Hi'|] ; last by rewrite Hi.
+  by rewrite (Eqdep_dec.eq_proofs_unicity (@eq_comparable_prop _ ) Hi Hi') eqxx.
+- case (boolP (P i)) => [Hi'|] ; last by rewrite Hi.
+  by rewrite (Eqdep_dec.eq_proofs_unicity (@eq_comparable_prop _ ) ((ssrfun.svalP (exist P i Hi)))).
+  Qed.
+
+Lemma sig_big (I : finType) (P : pred I) f :
+  \big[op/idx]_(s : {i : I | P i}) f (tag s) = \big[op/idx]_(i : I | P i) f i.
+Proof.
+rewrite (sig_big_dep2 (fun i _ => f i)) ; apply eq_bigr => i Hi.
+case (boolP (P i)) => [//|] ; by rewrite Hi.
+Qed.
+
+End SigBigDep2.
 
 Lemma pair_big_dep (I J : finType) (P : pred I) (Q : I -> pred J) F :
   \big[*%M/1]_(i | P i) \big[*%M/1]_(j | Q i j) F i j =

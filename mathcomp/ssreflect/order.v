@@ -4292,6 +4292,81 @@ Proof. exact: total_homo_mono_in. Qed.
 End TotalMonotonyTheory.
 End TotalTheory.
 
+Section MinMaxMonoids.
+
+Context {disp : unit} {T : orderType disp}.
+Implicit Types (x y z t : T) (s : seq T).
+
+Definition omin : option T -> option T -> option T
+  := fun or1 or2 => match or1,or2 with
+                    | Some r1, Some r2 => Some (min r1 r2)
+                    | Some r, None | None, Some r => Some r
+                    | _, _ => None
+                    end.
+
+Definition min_monoid_law : Monoid.law (None : option T).
+exists omin ; rewrite /omin.
+- move => [x|] [y|] [z|] // ; by rewrite minA.
+- by move => [x|] //.
+- by move => [x|] //.
+Defined.
+
+Definition min_comlaw : Monoid.com_law (None : option T).
+Proof.
+exists min_monoid_law => /= ; move => [x|] [y|] //=.
+apply f_equal ; by rewrite minC.
+Defined.
+
+Definition minS (W : finType) (u : W -> T) (B : {set W}) : option T
+  := \big[min_comlaw/None]_(w in B) Some (u w).
+
+Definition omax : option T -> option T -> option T
+  := fun or1 or2 => match or1,or2 with
+                    | Some r1, Some r2 => Some (max r1 r2)
+                    | Some r, None | None, Some r => Some r
+                    | _, _ => None
+                    end.
+
+Definition max_monoid_law : Monoid.law (None : option T).
+exists omax ; rewrite /omax.
+- move => [x|] [y|] [z|] // ; by rewrite maxA.
+- by move => [x|] //.
+- by move => [x|] //.
+Defined.
+
+Definition max_comlaw : Monoid.com_law (None : option T).
+Proof.
+exists max_monoid_law => /= ; move => [x|] [y|] //=.
+apply f_equal ; by rewrite maxC.
+Defined.
+
+Definition maxS (W : finType) (u : W -> T) (B : {set W}) : option T
+  := \big[max_comlaw/None]_(w in B) Some (u w).
+
+Lemma minSE (W : finType) (u1 u2 : W -> T) (B : {set W}) :
+  {in B, u1 =1 u2} -> minS u1 B = minS u2 B.
+Proof.
+rewrite /minS => Hu ; apply eq_bigr => w Hw.
+apply f_equal ; by rewrite Hu.
+Qed.
+
+Lemma maxSE (W : finType) (u1 u2 : W -> T) (B : {set W}) :
+  {in B, u1 =1 u2} -> maxS u1 B = maxS u2 B.
+Proof.
+rewrite /maxS => Hu ; apply eq_bigr => w Hw.
+apply f_equal ; by rewrite Hu.
+Qed.
+
+Lemma minS1 (W : finType) (u : W -> T) (w : W) :
+  minS u [set w] = Some (u w).
+Proof. rewrite /minS (big_pred1 w) => // x ; by rewrite in_set1. Qed.
+
+Lemma maxS1 (W : finType) (u : W -> T) (w : W) :
+  maxS u [set w] = Some (u w).
+Proof. rewrite /maxS (big_pred1 w) => // x ; by rewrite in_set1. Qed.
+
+End MinMaxMonoids.
+
 Module Import BLatticeTheory.
 Section BLatticeTheory.
 Context {disp : unit} {L : bLatticeType disp}.

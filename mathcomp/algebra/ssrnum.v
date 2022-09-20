@@ -1221,6 +1221,9 @@ Qed.
 
 Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
+Lemma neq01 : 0 != 1 :> R.
+Proof. have := ltr01 ; by rewrite lt_def eq_sym => /andP [-> _]. Qed.
+
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
 Proof. by rewrite lt_def; case: eqP => // ->; rewrite lexx. Qed.
 
@@ -1228,6 +1231,12 @@ Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
 rewrite le0r; case/predU1P=> [-> | x_pos]; rewrite ?add0r // le0r.
 by case/predU1P=> [-> | y_pos]; rewrite ltW ?addr0 ?addr_gt0.
+Qed.
+
+Lemma addr_gte0 x y : 0 < x -> 0 <= y -> 0 < x + y.
+Proof.
+rewrite le0r => Hx /orP ; case => [/eqP ->| Hy] ; first by rewrite addr0.
+exact: addr_gt0.
 Qed.
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
@@ -2046,6 +2055,22 @@ Lemma psumr_eq0P (I : finType) (P : pred I) (F : I -> R) :
 Proof.
 move=> F_ge0 /eqP; rewrite psumr_eq0 // -big_all big_andE => /forallP hF i Pi.
 by move: (hF i); rewrite implyTb Pi /= => /eqP.
+Qed.
+
+Lemma psum_neq0E (I : finType) (P : pred I) (f : I -> R) :
+  (forall i, P i -> f i >= 0) -> \sum_(i | P i) f i != 0 -> exists i : I, P i && (f i > 0).
+Proof.
+move => Hge0 Hsum.
+have Hsum2 : \sum_(i | P i) f i > 0. by rewrite lt0r Hsum sumr_ge0 //.
+have Hex : exists i : I, ~~ ~~ (P i && (f i != 0)).
+apply/forallPn/negP => /forallP Hcontra.
+have Hcontra2 : \sum_(i | P i) f i = 0. apply/eqP. rewrite psumr_eq0 => //=.
+apply/allP => i _ ; apply/implyP => Hi ; apply/eqP.
+move: (Hcontra i) ; by rewrite Hi andTb Bool.negb_involutive => /eqP ->.
+move: Hsum2 ; by rewrite Hcontra2 lt0r eqxx andFb.
+destruct Hex as [i Hi] ; exists i.
+have [Hi1 Hi2] := andP (negPn Hi).
+by rewrite lt0r Hi1 Hi2 Hge0.
 Qed.
 
 (* mulr and ler/ltr *)
@@ -5433,6 +5458,13 @@ Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
 rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
 by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
+Qed.
+
+Fact lte0_add x y : 0 < x -> 0 <= y -> 0 < x + y.
+Proof.
+move => H.
+rewrite !le_def => /orP [/eqP H1 | H2] ; first by rewrite -H1 addr0.
+by rewrite lt0_add.
 Qed.
 
 Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
