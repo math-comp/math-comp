@@ -51,29 +51,19 @@ with builtins; with (import <nixpkgs> {}).lib;
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "coq-master";
-      mathcomp-real-closed.override.version = "SnarkBoojum:adapt_MC_PR_923";
-      mathcomp-abel.override.version = "SnarkBoojum:adapt_MC_PR_923";
     };
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
-      mathcomp-real-closed.override.version = "SnarkBoojum:adapt_MC_PR_923";
-      mathcomp-abel.override.version = "SnarkBoojum:adapt_MC_PR_923";
     };
     "coq-8.15".coqPackages = common-bundles // {
       coq.override.version = "8.15";
-      mathcomp-real-closed.override.version = "SnarkBoojum:adapt_MC_PR_923";
-      mathcomp-abel.override.version = "SnarkBoojum:adapt_MC_PR_923";
     };
     "coq-8.14".coqPackages = common-bundles // {
       coq.override.version = "8.14";
-      mathcomp-real-closed.override.version = "SnarkBoojum:adapt_MC_PR_923";
-      mathcomp-abel.override.version = "SnarkBoojum:adapt_MC_PR_923";
     };
     "coq-8.13".coqPackages = common-bundles // {
       coq.override.version = "8.13";
       mathcomp-analysis.job = false;
-      mathcomp-real-closed.override.version = "SnarkBoojum:adapt_MC_PR_923";
-      mathcomp-abel.override.version = "SnarkBoojum:adapt_MC_PR_923";
     };
   };
 }
