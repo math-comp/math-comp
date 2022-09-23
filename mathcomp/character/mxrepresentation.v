@@ -5071,9 +5071,7 @@ Hypotheses (irrG : irr rG) (cGA : centgmx rG A).
 Notation FA := (gen_of irrG cGA).
 Let inFA := Gen irrG cGA.
 
-(* FIXME: embed the hnf in HB.instance *)
-Definition rVval_isSUB := Eval hnf in [isNew for rVval : FA -> 'rV_d].
-#[export] HB.instance Definition _ := rVval_isSUB.
+#[export, hnf] HB.instance Definition _ := [isNew for rVval : FA -> 'rV_d].
 #[export] HB.instance Definition _ := [Choice of FA by <:].
 
 Definition gen0 := inFA 0.

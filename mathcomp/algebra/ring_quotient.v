@@ -176,10 +176,9 @@ Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
 
 End ringQuotient.
 Module RingQuotientExports.
-(* FIXME: broken *)
-(* Notation "[ 'ringQuotType' o & m 'of' Q ]" := *)
-(*   (@RingQuotient.clone _ _ _ _ _ o m Q _) *)
-(*   (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope. *)
+Notation "[ 'ringQuotType' o & m 'of' Q ]" :=
+  (@RingQuotient.clone _ _ _ _ _ o m Q _)
+  (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope.
 End RingQuotientExports.
 HB.export RingQuotientExports.
 

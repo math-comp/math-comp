@@ -292,7 +292,6 @@ Qed.
 
 Lemma mem_Zp x : p > 1 -> x \in Zp. Proof. by rewrite /Zp => ->. Qed.
 
-(* FIXME : not sure this is still good *)
 Canonical units_Zp_group := [group of units_Zp].
 
 Lemma card_units_Zp : p > 0 -> #|units_Zp| = totient p.

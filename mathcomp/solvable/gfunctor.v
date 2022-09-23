@@ -367,10 +367,6 @@ Proof.
 rewrite -{1}(setIidPr (gFsub F G)) setIAC setIC.
 rewrite -(setIidPr (gFhereditary (subsetIl G H))).
 by rewrite setIC -setIA (setIidPr (gFsub F (G :&: H))).
-(* FIXME ? previous proof below *)
-(* rewrite -{1}(setIidPr (gFsub F G)) [G :&: _]setIC -setIA.
-rewrite -(setIidPr (gFhereditary (subsetIl G H))).
-by rewrite setIC -setIA (setIidPr (gFsub F (G :&: H))). *)
 Qed.
 
 Lemma pmorphimF : GFunctor.pcontinuous F.

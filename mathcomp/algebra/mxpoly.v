@@ -937,7 +937,6 @@ apply/eqmxP/andP; split; last first.
   apply/sub_kermxP/eqmx0P; rewrite !addsmxMr [in X in (_ + X)%MS]mulrC.
   by rewrite !rmorphM/= !mulmxA !mulmx_ker !mul0mx !addsmx0 submx_refl.
 move: cpq => /(congr1 (horner_mx g))/=; rewrite rmorph1 rmorphD/=.
-(* FIXME: rewrite pattern *)
 rewrite -[X in (X <= _)%MS]mulr1 => <-; rewrite mulrDr [p * u]mulrC addrC.
 rewrite addmx_sub_adds//; apply/sub_kermxP; rewrite mulmxE -mulrA -rmorphM.
   by rewrite mulrAC [q * p]mulrC rmorphM/= mulrA -!mulmxE mulmx_ker mul0mx.

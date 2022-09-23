@@ -173,14 +173,11 @@ HB.instance Definition _ (T : finType) : isFinite (itv_bound T) :=
 HB.instance Definition _ (T : finType) : isFinite (interval T) :=
    (CanFinMixin (@interval_can T)).
 
+Module Exports. HB.reexport. End Exports.
+
 End IntervalChoice.
 
-Module IntervalChoiceExports.
-HB.export IntervalChoice.
-End IntervalChoiceExports.
-
-(* FIXME : could not make it to use  reexport *)
-Export IntervalChoiceExports.
+Export IntervalChoice.Exports.
 
 Section IntervalPOrder.
 

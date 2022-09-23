@@ -945,9 +945,7 @@ Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn rmorph_sign. Qed.
 
 Lemma ratr_norm x : ratr F `|x| = `|ratr F x|.
 Proof.
-(* TODO: remove pattern [in RHS] below after fixing #698 *)
-rewrite {2}[x]numEsign [in RHS]rmorphMsign.
-by rewrite normrMsign [`|ratr F _|]ger0_norm ?ler0q.
+by rewrite {2}[x]numEsign rmorphMsign normrMsign [`|ratr F _|]ger0_norm ?ler0q.
 Qed.
 
 Lemma minr_rat : {morph ratr F : x y / Num.min x y}.
@@ -1001,12 +999,3 @@ Notation "[ 'rat' x // y ]" :=
 (* A specialization of vm_compute rewrite rule for pattern _%:Q *)
 Lemma rat_vm_compute n (x : rat) : vm_compute_eq n%:Q x -> n%:Q = x.
 Proof. exact. Qed.
-
-(* Fixme: ssrnum:
-  Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
-    (apply: ler01) : core.
-
-Example foo : (3%:R^-1 + 1) ^+ 2 <= 3%:Q.
-Time apply: ler01.
-Qed.
-*)

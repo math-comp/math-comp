@@ -725,8 +725,7 @@ Proof. by rewrite -opprB normrN. Qed.
 Lemma normr_id v : `| `|v| | = `|v|.
 Proof.
 have nz2: 2 != 0 :> R by rewrite pnatr_eq0.
-apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n.
-rewrite [LHS]ger0_norm //.  (* FIXME: rewrite pattern *)
+apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n ger0_norm //.
 by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
 Qed.
 
@@ -2544,7 +2543,7 @@ Lemma leif_add x1 y1 C1 x2 y2 C2 :
     x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 + x2 <= y1 + y2 ?= iff C1 && C2.
 Proof.
-rewrite -[X in X -> _](mono_leif (ler_add2r x2)).  (* FIXME: rewrite pattern *)
+rewrite -(mono_leif (C := C1) (ler_add2r x2)).
 rewrite -(mono_leif (C := C2) (ler_add2l y1)).
 exact: leif_trans.
 Qed.
@@ -2601,7 +2600,7 @@ Lemma leif_pprod (I : finType) (P C : pred I) (E1 E2 : I -> R) :
 Proof.
 move=> E1_ge0 leE12 /=; rewrite -big_andE; elim/(big_load (fun x => 0 <= x)): _.
 elim/big_rec3: _ => [|i Ci m2 m1 Pi [m1ge0 le_m12]].
-  by split; [exact ler01|apply/leifP; rewrite orbT..].  (* FIMXE: ler01 instead of // *)
+  by split=> //; apply/leifP; rewrite orbT.
 have Ei_ge0 := E1_ge0 i Pi; split; first by rewrite mulr_ge0.
 congr (leif _ _ _): (leif_pmul Ei_ge0 m1ge0 (leE12 i Pi) le_m12).
 by rewrite mulf_eq0 -!orbA; congr (_ || _); rewrite !orb_andr orbA orbb.
@@ -3304,7 +3303,7 @@ Lemma sgr_smul x y : sg (sg x * y) = sg x * sg y.
 Proof. by rewrite sgrM sgr_id. Qed.
 
 Lemma sgr_gt0 x : (sg x > 0) = (x > 0).
-Proof. by rewrite -[LHS]sgr_cp0 sgr_id sgr_cp0. Qed.  (* FIXME: rewrite pattern *)
+Proof. by rewrite -[LHS]sgr_cp0 sgr_id sgr_cp0. Qed.
 
 Lemma sgr_ge0 x : (sgr x >= 0) = (x >= 0).
 Proof. by rewrite !leNgt sgr_lt0. Qed.
@@ -3757,7 +3756,7 @@ Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
 Proof.
 wlog suffices: x / 0 <= x -> 0 <= x^*.
   by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
-rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.  (* FIXME: rewrite pattern *)
+rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
 by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
 Qed.
 

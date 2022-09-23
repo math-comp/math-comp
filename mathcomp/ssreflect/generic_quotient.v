@@ -298,7 +298,6 @@ HB.mixin Record isEqQuotient T (eq_quot_op : rel T) (Q : Type) of
 #[short(type="eqQuotType")]
 HB.structure Definition EqQuotient T eq_quot_op :=
   {Q of isEqQuotient T eq_quot_op Q & Quotient T Q & hasDecEq Q}.
-(*TODO : Check why there was no warning when we didn't put hasDecEq*)
 
 Canonical pi_eq_quot_mono T eq_quot_op eqT :=
   PiMono2 (@pi_eq_quot T eq_quot_op eqT).

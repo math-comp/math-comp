@@ -4101,16 +4101,6 @@ HB.instance Definition _ :=
   Lattice_isTotal.Build d T comparableT.
 HB.end.
 
-(* TODO: keep this?
-Module Exports.
-Notation totalPOrderMixin := of_.
-Coercion latticeMixin : of_ >-> LatticeMixin.of_.
-Coercion totalLatticeMixin : of_ >-> TotalLatticeMixin.of_.
-Definition POrder_isOrder disp (T : porderType disp) (m : of_ T) :=
-  OrderType (DistrLatticeType (LatticeType T m) m) m.
-End Exports.
-*)
-
 (* was MeetJoinMixin *)
 HB.factory Record isMeetJoinDistrLattice (d : unit) T of Choice T := {
   le : rel T;
