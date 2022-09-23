@@ -100,7 +100,7 @@ have le_oppX_n: size oppX <= n by rewrite size_opp size_polyX finRing_gt1.
 have: size pF = (size (enum F)).+1 by rewrite -cardE size_addl size_polyXn.
 move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
   by rewrite big_enum lead_coefDl ?size_polyXn // lead_coefXn scale1r.
-by apply/allP=> x _; rewrite rootE !hornerE hornerXn expf_card subrr.
+by apply/allP=> x _; rewrite rootE !hornerE expf_card subrr.
 Qed.
 
 Lemma finCharP : {p | prime p & p \in [char F]}.
@@ -548,7 +548,7 @@ pose Em := fixedSpace (a ^+ k)%g; rewrite card_Fp //= dimv1 expn1 in Da.
 have{splitLq} [zs DqL defL] := splitLq.
 have Uzs: uniq zs.
   rewrite -separable_prod_XsubC -(eqp_separable DqL) Dq separable_root andbC.
-  rewrite /root !hornerE subr_eq0 eq_sym hornerXn expr0n gtn_eqF ?oner_eq0 //=.
+  rewrite /root !hornerE subr_eq0 eq_sym expr0n gtn_eqF ?oner_eq0 //=.
   rewrite cyclotomic.separable_Xn_sub_1 // -subn1 natrB // subr_eq0.
   by rewrite natrX charf0 // expr0n gtn_eqF // eq_sym oner_eq0.
 suffices /eq_card->: Fm =i zs.
@@ -556,7 +556,7 @@ suffices /eq_card->: Fm =i zs.
   by rewrite -(eqp_size DqL) size_addl size_polyXn // size_opp size_polyX.
 have in_zs: zs =i Em.
   move=> z; rewrite -root_prod_XsubC -(eqp_root DqL) (sameP fixedSpaceP eqP).
-  rewrite /root !hornerE subr_eq0 /= hornerXn /m; congr (_ == z).
+  rewrite /root !hornerE subr_eq0 /= /m; congr (_ == z).
   elim: (k) => [|i IHi]; first by rewrite gal_id.
   by rewrite expgSr expnSr exprM IHi galM ?Da ?memvf.
 suffices defEm: Em = {:L}%VS by move=> z; rewrite in_zs defEm memvf.
@@ -649,7 +649,7 @@ suffices: (aq n %| (q - 1)%:R)%C.
   by rewrite leC_nat dvdC_nat; apply: dvdn_leq; rewrite subn_gt0.
 have prod_aq m: m %| n -> \prod_(d < n.+1 | d %| m) aq d = (q ^ m - 1)%:R.
   move=> m_dv_n; transitivity ('X^m - 1).[q%:R : algC]; last first.
-    by rewrite !hornerE hornerXn -natrX natrB ?expn_gt0 ?prime_gt0.
+    by rewrite !hornerE -natrX natrB ?expn_gt0 ?prime_gt0.
   rewrite (prod_cyclotomic (dvdn_prim_root z_prim m_dv_n)).
   have def_divm: perm_eq (divisors m) [seq d <- index_iota 0 n.+1 | d %| m].
     rewrite uniq_perm ?divisors_uniq ?filter_uniq ?iota_uniq // => d.

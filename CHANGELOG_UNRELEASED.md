@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `seq.v`
+  + lemma `subset_mapP`
+
 - in `path.v` 
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
 - in `ssralg.v`
@@ -23,6 +26,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `poly.v`:
   + generalize `eq_poly`
+
+- in `poly.v`:
+  + made hornerE preserve powers
 
 ### Renamed
 

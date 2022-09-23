@@ -639,7 +639,7 @@ Proof. by rewrite /minPoly rpredB ?rpredX ?polyOverX ?Fadjoin_polyOver. Qed.
 
 Lemma minPolyxx : (minPoly K x).[x] = 0.
 Proof.
-by rewrite !hornerE hornerXn Fadjoin_poly_eq ?subrr ?rpredX ?memv_adjoin.
+by rewrite !hornerE Fadjoin_poly_eq ?subrr ?rpredX ?memv_adjoin.
 Qed.
 
 Lemma root_minPoly : root (minPoly K x) x. Proof. exact/rootP/minPolyxx. Qed.

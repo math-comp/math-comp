@@ -2623,6 +2623,16 @@ elim: s => [|x s IHs]; [by right; case|rewrite /= inE].
 exact: equivP (orPP eqP IHs) (iff_sym exists_cons).
 Qed.
 
+Lemma subset_mapP (s : seq T1) (s' : seq T2) :
+    {subset s' <= map f s} <-> exists2 t, all (mem s) t & s' = map f t.
+Proof.
+split => [|[r /allP/= rE ->] _ /mapP[x xr ->]]; last by rewrite map_f ?rE.
+elim: s' => [|x s' IHs'] subss'; first by exists [::].
+have /mapP[y ys ->] := subss' _ (mem_head _ _).
+have [x' x's'|t st ->] := IHs'; first by rewrite subss'// inE x's' orbT.
+by exists (y :: t); rewrite //= ys st.
+Qed.
+
 Lemma map_uniq s : uniq (map f s) -> uniq s.
 Proof.
 elim: s => //= x s IHs /andP[not_sfx /IHs->]; rewrite andbT.
@@ -2684,6 +2694,7 @@ Qed.
 End EqMap.
 
 Arguments mapP {T1 T2 f s y}.
+Arguments subset_mapP {T1 T2}.
 
 Lemma map_of_seq (T1 : eqType) T2 (s : seq T1) (fs : seq T2) (y0 : T2) :
   {f | uniq s -> size fs = size s -> map f s = fs}.
