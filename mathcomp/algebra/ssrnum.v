@@ -2048,6 +2048,19 @@ move=> F_ge0 /eqP; rewrite psumr_eq0 // -big_all big_andE => /forallP hF i Pi.
 by move: (hF i); rewrite implyTb Pi /= => /eqP.
 Qed.
 
+Lemma psumr_neq0 (I : eqType) (r : seq I) (P : pred I) (F : I -> R) :
+    (forall i, P i -> 0 <= F i) ->
+  (\sum_(i <- r | P i) (F i) != 0) = (has (fun i => P i && (0 < F i)) r).
+Proof.
+move=> F_ge0; rewrite psumr_eq0// -has_predC; apply: eq_has => x /=.
+by case Px: (P x); rewrite //= lt_def F_ge0 ?andbT.
+Qed.
+
+Lemma psumr_neq0P (I : finType) (P : pred I) (F : I -> R) :
+     (forall i, P i -> 0 <= F i) -> \sum_(i | P i) F i <> 0 ->
+  (exists i, P i && (0 < F i)).
+Proof. by move=> ? /eqP; rewrite psumr_neq0// => /hasP[x _ ?]; exists x. Qed.
+
 (* mulr and ler/ltr *)
 
 Lemma ler_pmul2l x : 0 < x -> {mono *%R x : x y / x <= y}.
