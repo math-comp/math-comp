@@ -467,3 +467,96 @@ Lemma card_ffun : #|fT| = #|rT| ^ #|aT|.
 Proof. by rewrite -card_ffun_on; apply/esym/eq_card=> f; apply/forallP. Qed.
 
 End FinFunTheory.
+
+Section DependentFiniteProduct.
+
+Section Misc.
+Lemma Tagged_eta A (P : A -> Type) (s : {x : A & P x}) :
+  s = @Tagged _ (tag s) _ (tagged s).
+Proof. by move: s => [x Q]. Qed.
+
+(** Tip to leverage a Boolean condition *)
+Definition sumb (b : bool) : {b = true} + {b = false} :=
+  if b is true then left erefl else right erefl.
+End Misc.
+
+Variables (I : finType) (T_ : I -> finType).
+
+Definition tagged' i (u : {i : I & T_ i}) (p : tag u == i) : T_ i.
+rewrite -(eqP p) ; exact (tagged u).
+Defined.
+
+Lemma TaggedE i P1 P2 : @Tagged I i T_ P1  = Tagged T_ P2 -> P1 = P2.
+move=> H.
+have H' := (EqdepFacts.eq_sigT_eq_dep _ _ _ _ _ _ H).
+have H'' := (EqdepFacts.eq_dep_dep1 _ _ _ _ _ _ H').
+case: H'' => h ; by rewrite [h]eq_axiomK /=.
+Qed.
+
+Notation fprod_type := (forall i : I, T_ i) (only parsing).
+
+(** Definition and cardinal of [fprod] := dependent product of finTypes *)
+Record fprod : predArgType :=
+  { fprod_fun : {ffun I -> {i : I & T_ i}} ;
+    fprod_prop : [forall i : I, tag (fprod_fun i) == i] }.
+
+Program Definition fprod_type_of_fprod (f : fprod) : fprod_type :=
+  fun i => ecast j (T_ j) _ (tagged (fprod_fun f i)).
+Next Obligation. case: f => f p /=; apply/eqP ; by move/forallP in p. Defined.
+
+Program Definition fprod_of_fprod_type (f : fprod_type) : fprod :=
+  @Build_fprod (finfun (fun i => @existT _ _ i (f i))) _.
+Next Obligation. by apply/forallP => i; rewrite ffunE. Defined.
+
+Coercion fprod_type_of_fprod : fprod >-> Funclass.
+
+#[hnf] HB.instance Definition fprod_subType := [isSub for fprod_fun].
+#[hnf] HB.instance Definition fprod_finType := [Finite of fprod by <:].
+
+Lemma fprodK : cancel fprod_type_of_fprod fprod_of_fprod_type.
+Proof.
+move => x.
+rewrite /fprod_type_of_fprod /fprod_of_fprod_type.
+apply: val_inj =>/=.
+apply/ffunP => i; rewrite !ffunE.
+case: x => f p /=.
+rewrite [RHS]Tagged_eta.
+set Ei := eqP (elimTF forallP p i).
+apply EqdepFacts.eq_dep_eq_sigT.
+apply EqdepFacts.eq_dep1_dep.
+exact: EqdepFacts.eq_dep1_intro.
+Qed.
+
+Lemma fprodE g : forall x, (fprod_of_fprod_type g) x = g x.
+Proof.
+move=> i.
+rewrite /fprod_of_fprod_type /fprod_type_of_fprod /=.
+rewrite -/(eq_rect _ _ _ _ _).
+set Ej := (eqP (elimTF forallP (fprod_of_fprod_type_obligation_1 g) i)).
+rewrite -[g i](rew_opp_r T_ Ej).
+f_equal.
+apply: TaggedE.
+rewrite -!Tagged_eta {1}ffunE /Tagged.
+apply EqdepFacts.eq_dep_eq_sigT.
+apply EqdepFacts.eq_dep1_dep.
+apply: EqdepFacts.eq_dep1_intro.
+by rewrite rew_opp_r.
+Qed.
+
+Lemma fprodP f1 f2 :
+  (forall x, fprod_type_of_fprod f1 x = fprod_type_of_fprod f2 x) <-> f1 = f2.
+Proof.
+split=> [eq_f12 | -> //].
+rewrite -[f1]fprodK -[f2]fprodK.
+apply: val_inj =>/=.
+apply/ffunP => x; rewrite !ffunE.
+by rewrite eq_f12.
+Qed.
+
+Definition otagged (R : Type) (i : I) (F : T_ i -> R) (idx : R) (x : {i : I & T_ i}) :=
+  match sumb (tag x == i) with
+  | left prf => F (tagged' prf)
+  | right _ => idx
+  end.
+
+End DependentFiniteProduct.

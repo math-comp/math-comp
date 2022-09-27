@@ -1000,6 +1000,12 @@ Proof.
 by move=> eqP12; apply: eq_forallb => i; case Di: (D i); rewrite // eqP12.
 Qed.
 
+Lemma existsb_l P Q : [exists x, P x && Q x] -> [exists x, P x].
+Proof. move => /existsP ; case => x /andP [H _] ; apply/existsP ; by exists x. Qed.
+
+Lemma existsb_r P Q : [exists x, P x && Q x] -> [exists x, Q x].
+Proof. move => /existsP ; case => x /andP [_ H] ; apply/existsP ; by exists x. Qed.
+
 Lemma negb_forall P : ~~ [forall x, P x] = [exists x, ~~ P x].
 Proof. by []. Qed.
 

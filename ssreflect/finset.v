@@ -744,6 +744,12 @@ Proof. by rewrite (eq_sym A) eqEcard sub0set cards0 leqn0. Qed.
 Lemma set0Pn A : reflect (exists x, x \in A) (A != set0).
 Proof. by rewrite -cards_eq0; apply: existsP. Qed.
 
+Lemma set0_existsF A : (A == set0) = (~~ [exists x, x \in A]).
+Proof.
+case (boolP [exists x, x \in A]) => /existsP/set0Pn => [H|-> //].
+by rewrite (negbTE H).
+Qed.
+
 Lemma card_gt0 A : (0 < #|A|) = (A != set0).
 Proof. by rewrite lt0n cards_eq0. Qed.
 
@@ -934,6 +940,26 @@ Proof. by rewrite -subset0 subDset setU0. Qed.
 Lemma setI_eq0 A B : (A :&: B == set0) = [disjoint A & B].
 Proof. by rewrite disjoints_subset -setD_eq0 setDE setCK. Qed.
 
+Lemma subset_eq0 A B : (A \subset B) && (A \subset ~:B) = (A == set0).
+Proof.
+case (boolP (A == set0)) => [/eqP->|/set0Pn[x Hx]] ; first by rewrite !sub0set.
+case (boolP (A \subset B)) ; case (boolP (A \subset ~:B)) => //.
+rewrite !subsetE => /pred0P H1 /pred0P H2.
+have := H2 x ; have := H1 x.
+rewrite /= Hx !andbT => Hx1 /negP/negP Hx2.
+by rewrite -in_setC setCK Hx2 in Hx1.
+Qed.
+
+Lemma subset_disjoint A B : [disjoint A & B] ->
+  forall C, C != set0 -> C \subset A -> ~~ (C \subset B).
+Proof.
+move => HAB C HC /subsetP /= H ; apply /subsetPn.
+case (pickP [pred x in C]) => /= [x Hx|Hcontra].
+- exists x => //= ; by rewrite (disjointFr HAB (H x Hx)).
+- move/set0Pn in HC ; destruct HC as [x Hx].
+  have := (Hcontra x) => //= ; by rewrite Hx.
+Qed.
+
 Lemma disjoint_setI0 A B : [disjoint A & B] -> A :&: B = set0.
 Proof. by rewrite -setI_eq0; move/eqP. Qed.
 
@@ -1020,6 +1046,15 @@ Lemma all_setU pA A B :
 Proof. by rewrite (perm_all _ (enum_setU _ _)) all_undup all_cat. Qed.
 
 End setOps.
+
+Section PickSet1.
+
+Lemma pick_set1E (T : finType) (x0 : T) : [pick x in [set x0]] = Some x0.
+Proof.
+case: pickP=>[x|/(_ x0)] ; rewrite !inE ; try move=>/eqP->// ; by rewrite eqxx.
+Qed.
+
+End PickSet1.
 
 Arguments set1P {T x a}.
 Arguments set1_inj {T} [x1 x2].
@@ -1429,6 +1464,50 @@ Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 Arguments imset_disjoint {aT rT f A B}.
 
+Section Set1_inverse.
+Definition set1_oinv {I : finType} : {set I} -> option I
+  := fun A => match boolP (#|A| > 0)%N with
+              | AltTrue h =>
+                  if (#|A| == 1)%N
+                  then let (i,_,_) := eq_bigmax_cond (fun=>0%N) h in Some i
+                  else None
+              | _ => None
+              end.
+
+Lemma set1_ocancel {I : finType} :
+  ocancel (@set1_oinv I) set1.
+Proof.
+move => A ; rewrite /oapp /set1_oinv.
+case (boolP (#|A| > 0)%N) => H //.
+destruct (eq_bigmax_cond (fun=>0%N) H) as [i Hi _].
+case (boolP (#|A| == 1)%N) => // /cards1P [j Hj].
+rewrite Hj in_set1 in Hi ; by rewrite Hj (eqP Hi).
+Qed.
+
+Lemma set1_oinv_pcancel {I : finType} :
+  pcancel (@set1 I) set1_oinv.
+Proof.
+move => i ; rewrite /set1_oinv.
+case (boolP (#|[set i]| > 0)%N) => [Hi|] ; last by rewrite cards1.
+rewrite cards1 eqxx // ; destruct (eq_bigmax_cond (fun=>0%N) Hi) as [j Hj _].
+rewrite in_set1 in Hj ; by rewrite (eqP Hj).
+Qed.
+
+Lemma set1_oinv_omap {I : finType} (A : {set I}) (HA : #|A| == 1%N):
+  omap set1 (set1_oinv A) = Some A.
+Proof.
+rewrite /omap/obind/oapp/set1_oinv.
+case (boolP (0 < #|A|)%N) => H0 ; case (boolP (#|A| == 1)%N) => H1.
+- destruct (eq_bigmax_cond (fun=>0%N) H0) as [w Hw _].
+  destruct (cards1P H1) as [w' Hw'].
+  rewrite Hw' in_set1 in Hw ; by rewrite Hw' (eqP Hw).
+- by rewrite (eqP HA) in H1.
+- by rewrite -eqn0Ngt (eqP H1) in H0.
+- by rewrite (eqP HA) in H1.
+Qed.
+
+End Set1_inverse.
+
 Lemma setXnS (I : finType) (T : I -> finType) (A B : forall i, {set T i}) :
   (forall i, A i \subset B i) -> setXn A \subset setXn B.
 Proof.
@@ -1493,6 +1572,7 @@ Section BigOps.
 
 Variables (R : Type) (idx : R).
 Variables (op : Monoid.law idx) (aop : Monoid.com_law idx).
+Variables (times : Monoid.mul_law idx) (plus : Monoid.add_law idx times).
 Variables I J : finType.
 Implicit Type A B : {set I}.
 Implicit Type h : I -> J.
@@ -1582,6 +1662,112 @@ Lemma partition_big_imset h (A : {pred I}) F :
   \big[aop/idx]_(i in A) F i =
      \big[aop/idx]_(j in h @: A) \big[aop/idx]_(i in A | h i == j) F i.
 Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
+
+Lemma big_card1 (f : {set I} -> R) :
+  \big[aop/idx]_(A : {set I} | #|A| == 1%N) f A
+  = \big[aop/idx]_(i : I) f [set i].
+Proof.
+rewrite (reindex_omap set1 set1_oinv) => [|A HA].
+- apply: eq_bigl => i ; by rewrite set1_oinv_pcancel cards1 !eqxx.
+- rewrite /omap /obind /oapp /set1_oinv.
+  case (boolP (0 < #|A|)%N) => [Hcard|] ; last by rewrite (eqP HA).
+  rewrite HA ; destruct (eq_bigmax_cond (fun=>0%N) Hcard) as [i Hi _].
+  move: HA => /cards1P [j Hj] ; rewrite Hj in_set1 in Hi.
+  by rewrite Hj (eqP Hi).
+Qed.
+
+Lemma big_setI_distrl (P : pred {set I}) (h : {set I} -> {set I}) f g :
+  \big[plus/idx]_(A : {set I} | P (h A)) times (g A) (f (h A))
+  = \big[plus/idx]_(B : {set I} | P B)
+      times (\big[plus/idx]_(A : {set I} | h A == B) g A) (f B).
+Proof.
+under [RHS]eq_bigr do rewrite big_distrl /=.
+rewrite [LHS](partition_big h P) => //.
+apply: eq_bigr => B HB ; apply: eq_big => [A | A /andP [_ HA2]].
+- case (boolP (h A == B)) => H ; last by rewrite (negbTE H) andbF.
+  by rewrite H (eqP H) HB.
+- by rewrite (eqP HA2).
+Qed.
+
+Lemma big_partitionS (f : {set I} -> I -> R) :
+  \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(i in A) f A i)
+  = \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | i \in A) f A i.
+Proof.
+set pair_sig : finType := [finType of {p : {set I} * I | p.2 \in p.1}].
+set f1 : pair_sig -> {set I} := fun s => (val s).1.
+set f2 : pair_sig -> I := fun s => (val s).2.
+- have proof1 :
+    \big[aop/idx]_i \big[aop/idx]_(A : {set I} | i \in A) f A i =
+    \big[aop/idx]_i \big[aop/idx]_(s : pair_sig | (f2 s) == i) f (f1 s) (f2 s).
+  apply eq_bigr => i _.
+  set f1inv : {set I} -> option pair_sig
+    := fun A => match (boolP (i \in A)) with
+                | AltTrue h => Some (exist _ (A,i) h)
+                | _ => None
+                end.
+  rewrite (reindex_omap f1 f1inv) => /=.
+  + apply eq_big => /= s ;  destruct s as [[A j] Hj] ; simpl in Hj.
+    * rewrite /f1/f1inv/f2 => /= ; case (boolP (i \in A)) => Hi /=.
+      - case (boolP (j == i)) => H0 //=.
+        + apply/eqP ; apply f_equal.
+          have H :  (@sval) ({set I} * I) (fun a : {set I} * I => a.2 \in a.1)
+                    (exist (fun i0 : {set I} * I => i0.2 \in i0.1) (A, i) Hi)
+                    = (@sval) ({set I} * I) (fun a : {set I} * I => a.2 \in a.1)
+                      (exist (fun p : {set I} * I => p.2 \in p.1) (A, j) Hj)
+            by simpl ; rewrite (eqP H0).
+          apply (eq_sig _ _ H) => //=.
+          exact: eq_irrelevance.
+        + by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
+      - symmetry ; apply/eqP => Hcontra ; by rewrite -Hcontra Hj in Hi.
+    * rewrite /f1/f2 => /= /andP [Hi Hinv].
+      move: Hinv ; rewrite /f1inv ; case (boolP (i\in A)) => H.
+      - by move/eqP ; case => ->.
+      - by rewrite Hi in H.
+  + rewrite /omap/obind/oapp/f1inv => A Hi.
+    by case (boolP (i \in A)) => // ; rewrite Hi.
+- have proof2 :
+    \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(i in A) f A i) =
+      \big[aop/idx]_(A : {set I})
+        (\big[aop/idx]_(s : pair_sig | f1 s == A) f (f1 s) (f2 s)).
+  apply eq_bigr => A _.
+  set f2inv : I -> option pair_sig
+    := fun i => match (boolP (i \in A)) with
+                | AltTrue h => Some (exist _ (A,i) h)
+                | _ => None
+                end.
+  rewrite (reindex_omap f2 f2inv) => /=.
+  + apply eq_big => /= s ;  destruct s as [[B i] HB] ; simpl in HB.
+    * rewrite /f1/f2inv/f2 => /= ; case (boolP (i \in A)) => HA /=.
+      - case (boolP (B == A)) => H0 //=.
+        + apply/eqP ; apply f_equal.
+          have H :  (@sval) ({set I} * I) (fun a : {set I} * I => a.2 \in a.1)
+                    (exist (fun p : {set I} * I => p.2 \in p.1) (A, i) HA)
+                    = (@sval) ({set I} * I) (fun a : {set I} * I => a.2 \in a.1)
+                      (exist (fun p : {set I} * I => p.2 \in p.1) (B, i) HB)
+            by simpl ; rewrite (eqP H0).
+          apply (eq_sig _ _ H) => //=.
+          exact: eq_irrelevance.
+        + by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
+      - symmetry ; apply/eqP => Hcontra ; by rewrite -Hcontra HB in HA.
+    * rewrite /f1/f2 => /= /andP [Hi Hinv].
+      move: Hinv ; rewrite /f2inv ; case (boolP (i\in A)) => H.
+      - by move/eqP ; case => ->.
+      - by rewrite Hi in H.
+  + rewrite /omap/obind/oapp/f2inv => i Hi.
+    by case (boolP (i \in A)) => // ; rewrite Hi.
+- rewrite proof2 proof1.
+  rewrite -[LHS](partition_big f1 (P:=predT) predT) => //.
+  rewrite -[RHS](partition_big f2 (P:=predT) predT) => //.
+Qed.
+
+Lemma big_memS (f : {set I} -> R) (P : pred {set I}):
+  \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | P A && (i \in A)) f A
+  = \big[aop/idx]_(A | P A) \big[aop/idx]_(w in A) f A.
+Proof.
+rewrite !pair_big_dep /= ; rewrite (reindex (fun p => (p.2,p.1))) //=.
+exists (fun p => (p.2,p.1)) ; by case.
+Qed.
+
 
 End BigOps.
 
@@ -2652,3 +2838,314 @@ Qed.
 End Greatest.
 
 End SetFixpoint.
+
+#[deprecated(since="mathcomp 1.13.0", note="Use mem_imset instead.")]
+Notation mem_imset_eq := mem_imset (only parsing).
+#[deprecated(since="mathcomp 1.13.0", note="Use mem_imset2 instead.")]
+Notation mem_imset2_eq := mem_imset2 (only parsing).
+
+Section FProd.
+Section Finite_product_structure.
+
+Variables (I : finType) (T_ : I -> finType).
+
+Lemma card_fprod :
+  #|fprod T_| = \big[muln/1%N]_(i : I) #|T_ i|.
+Proof.
+rewrite card_sub.
+rewrite -[LHS]/#|family (fun i : I => [pred j : {i : I & T_ i} | tag j == i])|.
+rewrite card_family.
+set lhs := LHS; suff->: lhs = foldr muln 1%N [seq #|T_ i| | i : I]; rewrite {}/lhs.
+by rewrite /image_mem foldr_map BigOp.bigopE /reducebig; f_equal; rewrite enumT.
+f_equal; apply eq_map => i.
+rewrite -sum1_card ; (under eq_bigr => i0 do rewrite inE).
+rewrite -sum1_card.
+pose IT := tag_finType T_.
+pose h : T_ i -> IT := @Tagged I _ _.
+pose h'0 := @tagged' I T_ i.
+case Ecard: #|T_ i|.
+{ rewrite !big_pred0 // => x.
+  by rewrite inE -(ltnn 0); symmetry; rewrite -{2}Ecard; apply/card_gt0P; exists x.
+  move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => Hi.
+  apply/card_gt0P.
+  by exists (tagged' Hi). }
+have {Ecard} /card_gt0P [it0 _] : (0 < #|T_ i|)%N by rewrite Ecard.
+pose h' := otagged id it0.
+rewrite (reindex h); last first.
+{ exists h'.
+  move => it; rewrite inE => Hx.
+  { rewrite /= /h' /h /otagged.
+    case: sumb => prf; first by rewrite /tagged' (eq_axiomK (eqP prf)).
+    exfalso.
+    by rewrite eqxx in prf. }
+  move=> x Hx.
+  rewrite /h' /h /otagged.
+  case: sumb => prf.
+  { rewrite /= [x in RHS]Tagged_eta /=.
+    (* and then *)
+    apply EqdepFacts.eq_dep_eq_sigT.
+    apply EqdepFacts.eq_dep1_dep.
+    apply: EqdepFacts.eq_dep1_intro; first exact/eqP.
+    move=> H0; rewrite /tagged'.
+    by rewrite [eqP prf]eq_irrelevance. }
+  exfalso; move/negbT/negP: prf; apply.
+  by rewrite inE in Hx. }
+apply: eq_bigl => j; by rewrite inE /= eqxx.
+Qed.
+
+Lemma gt0_prodn_cond (P : pred I) F :
+  (0 < \prod_(i | P i) F i -> forall i, P i -> 0 < F i)%N.
+Proof.
+move=> Hpos i; apply/implyP; move: i; apply/forallP; move: Hpos.
+apply: contraTT.
+rewrite negb_forall; case/existsP => x.
+rewrite negb_imply; case/andP => h1.
+rewrite -!eqn0Ngt; move/eqP => h2.
+apply/eqP.
+by rewrite (bigD1 x h1) h2 /= mul0n.
+Qed.
+
+Lemma gt0_prodn (F : I -> nat) :
+  (0 < \prod_i F i -> forall i, 0 < F i)%N.
+Proof. by move=> Hpos i; apply: (@gt0_prodn_cond predT). Qed.
+
+Definition pick_notemp :
+  (0 < #|fprod T_|)%N -> forall i : I, T_ i.
+Proof.
+rewrite /= card_fprod.
+move/gt0_prodn => top i; move/(_ i) in top.
+pose x := pick (T_ i).
+case: pickP @x; first done.
+by move/eq_card0 => H0; rewrite H0 in top.
+Qed.
+
+Lemma tagged'E (a : fprod T_) (i : I) (E : tag ((fprod_fun a) i) == i) :
+  tagged' E = a i.
+Proof.
+rewrite /tagged'.
+rewrite /eq_rect -/(ecast y (T_ y) (eqP E) (tagged ((fprod_fun a) i))).
+case: a E => f p /= E.
+rewrite /fprod_type_of_fprod /=.
+rewrite [eqP E]eq_irrelevance; first exact/eqP.
+move=> H; rewrite [eqP (elimTF forallP p i)]eq_irrelevance ; first exact/eqP.
+Qed.
+
+Definition ftagged (H : (0 < #|fprod T_|)%N) (f : {ffun I -> {i : I & T_ i}}) (i : I) :=
+  @otagged I T_ (T_ i) i id (pick_notemp H i) (f i).
+
+Lemma ftaggedE t H i : ftagged H (fprod_fun t) i = t i.
+Proof.
+rewrite /ftagged /otagged.
+case: sumb.
+{ by move=> E; rewrite tagged'E. }
+move=> /negbT /negP K; exfalso; apply: K.
+move: i; apply/forallP/fprod_prop. (* might be refactor(iz)ed *)
+Qed.
+
+Definition dffun_of_fprod (f : fprod T_) : {dffun forall i : I, T_ i} :=
+  [ffun x => f x].
+
+Program Definition fprod_of_dffun (f : {dffun forall i : I, T_ i}) : fprod T_ :=
+  @Build_fprod I T_ (finfun (fun i => @existT _ _ i (f i))) _.
+Next Obligation. by apply/forallP => i; rewrite ffunE. Defined.
+
+Lemma dffun_of_fprodK : cancel dffun_of_fprod fprod_of_dffun.
+Proof.
+move=> x.
+apply: val_inj =>/=.
+apply/ffunP => i; rewrite !ffunE.
+case: x => f p /=.
+rewrite [RHS]Tagged_eta.
+set Ei := eqP (elimTF forallP p i).
+apply EqdepFacts.eq_dep_eq_sigT.
+apply EqdepFacts.eq_dep1_dep.
+exact: EqdepFacts.eq_dep1_intro.
+Qed.
+
+Lemma fprod_of_dffunK : cancel fprod_of_dffun dffun_of_fprod.
+Proof.
+move=> x.
+apply/ffunP => i; rewrite !ffunE.
+by rewrite fprodE.
+Qed.
+
+End Finite_product_structure.
+
+Notation "[ 'fprod' i : I => F ]" := (fprod_of_fprod_type (fun i : I => F))
+  (at level 0, i name, only parsing) : fun_scope.
+
+Notation "[ 'fprod' : I => F ]" := (fprod_of_fprod_type (fun _ : I => F))
+  (at level 0, only parsing) : fun_scope.
+
+Notation "[ 'fprod' i => F ]" := [fprod i : _ => F]
+  (at level 0, i name, format "[ 'fprod'  i  =>  F ]") : fun_scope.
+
+Notation "[ 'fprod' => F ]" := [fprod : _ => F]
+  (at level 0, format "[ 'fprod' =>  F ]") : fun_scope.
+
+Lemma big_tag_cond (R : Type) (idx : R) (op : Monoid.com_law idx)
+      (I : finType) (T_ : I -> finType) (Q_ : forall i, {set T_ i})
+      (P_ : forall i : I, T_ i -> R) (i : I) (E : (0 < #|fprod T_|)%N) :
+  \big[op/idx]_(j in [finType of {i0 : I & T_ i0}] | (tag j == i) && (otagged id (pick_notemp E i) j \in Q_ i)) otagged (P_ i) idx j =
+  \big[op/idx]_(j in Q_ i) P_ i j.
+Proof.
+pose IT := tag_finType T_.
+pose h : T_ i -> IT := @Tagged I _ _.
+pose h'0 := @tagged' _ _ i.
+case Ecard: #|T_ i|.
+{ rewrite !big_pred0 // => x.
+  move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => Hi.
+  by apply/card_gt0P; exists x.
+  move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => Hi.
+  apply/card_gt0P.
+  case/and3P: Hi =>/= t H1 H2.
+  by exists (otagged id (pick_notemp E i) x). }
+have {Ecard} /card_gt0P [it0 _] : (0 < #|T_ i|)%N by rewrite Ecard.
+pose h' := otagged id it0.
+rewrite (reindex h); last first.
+{ exists h'.
+  move => it; rewrite inE => Hx.
+  { rewrite /= /h' /h /otagged.
+    case: sumb => prf; first by rewrite /tagged' (eq_axiomK (eqP prf)).
+    exfalso.
+    by rewrite eqxx in prf. }
+  move=> x Hx.
+  rewrite /h' /h /otagged.
+  case: sumb => prf.
+  { rewrite /= [x in RHS]Tagged_eta /=.
+    (* and then *)
+    apply EqdepFacts.eq_dep_eq_sigT.
+    apply EqdepFacts.eq_dep1_dep.
+    apply: EqdepFacts.eq_dep1_intro; first exact/eqP.
+    move=> H0; rewrite /tagged'.
+    by rewrite [eqP prf]eq_irrelevance. }
+  exfalso; move/negbT/negP: prf; apply.
+  rewrite inE in Hx.
+  by case/and3P: Hx. }
+rewrite /= eqxx /=.
+apply: eq_big => j.
+{ congr in_mem. (* TODO: simplify *)
+  rewrite /otagged /tagged' /=.
+  case: sumb; last by rewrite eqxx.
+  by move=> E'; f_equal; rewrite [eqP E']eq_irrelevance. }
+move=> H; rewrite /otagged /tagged' /=.
+case: sumb; last by rewrite eqxx.
+by move=> E'; f_equal; rewrite [eqP E']eq_irrelevance.
+Qed.
+
+Arguments big_tag_cond [R idx op I T_] _ _ _ _.
+
+(* big_tag might be deduced from big_tag_cond *)
+Lemma big_tag (R : Type) (idx : R) (op : Monoid.com_law idx)
+      (I : finType) (T_ : I -> finType)
+      (P_ : forall i : I, T_ i -> R) (i : I) :
+  \big[op/idx]_(j in [finType of {i0 : I & T_ i0}] | tag j == i) otagged (P_ i) idx j =
+  \big[op/idx]_(j in T_ i) P_ i j.
+Proof.
+pose IT := tag_finType T_.
+pose h : T_ i -> IT := @Tagged I _ _.
+pose h'0 := @tagged' _ _ i.
+case Ecard: #|T_ i|.
+{ rewrite !big_pred0 // => x.
+  move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => Hi.
+  by apply/card_gt0P; exists x.
+  move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => Hi.
+  by apply/card_gt0P; exists (tagged' (proj2 (andP Hi))). }
+have {Ecard} /card_gt0P [it0 _] : (0 < #|T_ i|)%N by rewrite Ecard.
+pose h' := otagged id it0.
+rewrite (reindex h); last first.
+{ exists h'.
+  move => it; rewrite inE => Hx.
+  { rewrite /= /h' /h /otagged.
+    case: sumb => prf; first by rewrite /tagged' (eq_axiomK (eqP prf)).
+    exfalso.
+    by rewrite eqxx in prf. }
+  move=> x Hx.
+  rewrite /h' /h /otagged.
+  case: sumb => prf.
+  { rewrite /= [x in RHS]Tagged_eta /=.
+    (* and then *)
+    apply EqdepFacts.eq_dep_eq_sigT.
+    apply EqdepFacts.eq_dep1_dep.
+    apply: EqdepFacts.eq_dep1_intro; first exact/eqP.
+    move=> H0; rewrite /tagged'.
+    by rewrite [eqP prf]eq_irrelevance. }
+  exfalso; move/negbT/negP: prf; apply.
+  by rewrite inE in Hx. }
+rewrite /otagged.
+apply: eq_big => j; first by rewrite /otagged /= eqxx /=.
+move=> H; rewrite /otagged /tagged' /=.
+case: sumb; last by rewrite eqxx.
+by move=> E; f_equal; rewrite [eqP E]eq_irrelevance.
+Qed.
+
+Arguments big_tag [R idx op I T_] _ _.
+
+Section big_fprod.
+  Variable R : Type.
+  Variable zero one : R.
+  Variable times : Monoid.mul_law zero.
+  Variable plus : Monoid.add_law zero times.
+  Variable I : finType.
+  Variable T_ : forall i : I, finType.
+  Variable P_ : forall i : I, {ffun T_ i -> R}.
+  Let T := fprod T_.
+
+  Definition ofprod (idx : fprod T_) (f : {ffun I -> {i : I & T_ i}}) :=
+    match sumb ([forall i : I, tag (f i) == i]) with
+    | left prf => @Build_fprod I T_ f prf
+    | right _ => idx
+    end.
+
+  Lemma big_fprod_dep (Q : pred {ffun I -> {i : I &  (T_ i)}}) :
+    \big[plus/zero]_(t : T | Q (fprod_fun t)) \big[times/one]_(i in I) P_ i (t i) =
+    \big[plus/zero]_(g in family (fun i : I => [pred j : {i : I &  (T_ i)} | tag j == i]) | g \in Q)
+     \big[times/one]_(i : I) (otagged (P_ i) zero (g i)).
+  Proof.
+  case Ecard: #|T|.
+  { rewrite !big_pred0 // => x.
+    move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => H.
+    by apply/card_gt0P; exists x.
+    move/eqP: Ecard; apply: contraTF; rewrite -leqn0 -ltnNge => H.
+    apply/card_gt0P.
+    have /andP [H1 H2] := H.
+    by exists (@Build_fprod _ _ x H1). }
+  have {Ecard} /card_gt0P [it0 _] : (0 < #|T|)%N by rewrite Ecard.
+  pose h := @fprod_fun I T_.
+  pose h' := ofprod it0.
+  rewrite (reindex h); last first.
+  { exists h'.
+    move => it; rewrite inE => Hx.
+    { rewrite /= /h' /h /ofprod.
+      case: sumb => prf; case: it prf Hx =>//= f p p'.
+      by rewrite [p]eq_irrelevance.
+      by rewrite p in p'. }
+    move=> x Hx.
+    rewrite /h' /h /ofprod.
+    case: sumb => prf; case: x prf Hx => //= f p p'.
+    by rewrite !inE /= p in p'. }
+  apply: eq_big => a.
+  { case: a => /= a Ha; rewrite inE.
+    apply: (_ : ?[n] = true -> Q a = ?n && (a \in Q)) =>//.
+    move=>->//. }
+  move=> _; apply: eq_bigr => i Hi.
+  rewrite /otagged /tagged' /=.
+  case: sumb =>//= H.
+  { f_equal; symmetry; clear Hi.
+    rewrite -/(tagged' _).
+    apply: tagged'E. }
+  case: a H => f p /= H.
+  by rewrite (forallP p i) in H.
+  Qed.
+
+  Lemma big_fprod :
+    \big[plus/zero]_(t : T) \big[times/one]_(i in I) P_ i (t i) =
+    \big[plus/zero]_(g in family (fun i : I => [pred j : {i : I & (T_ i)} | tag j == i]))
+     \big[times/one]_(i : I) (otagged (P_ i) zero (g i)).
+  Proof.
+  rewrite (big_fprod_dep predT).
+  by apply: eq_bigl => g; rewrite inE andbC.
+  Qed.
+
+End big_fprod.
+End FProd.
