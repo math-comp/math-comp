@@ -1381,6 +1381,9 @@ Fixpoint half (n : nat) : nat := if n is n'.+1 then uphalf n' else n
 with   uphalf (n : nat) : nat := if n is n'.+1 then n'./2.+1 else n
 where "n ./2" := (half n) : nat_scope.
 
+Lemma uphalfE n : uphalf n = n.+1./2.
+Proof. by []. Qed.
+
 Lemma doubleK : cancel double half.
 Proof. by elim=> //= n ->. Qed.
 
@@ -1418,6 +1421,15 @@ case: odd; last by rewrite leq_double.
 by case: m => // m; rewrite doubleS ltnS ltn_double.
 Qed.
 
+Lemma ltn_half_double m n : (m./2 < n) = (m < n.*2).
+Proof. by rewrite ltnNge geq_half_double -ltnNge. Qed.
+
+Lemma leq_half_double m n : (m./2 <= n) = (m <= n.*2.+1).
+Proof. by case: m => [|[|m]] //; rewrite ltnS ltn_half_double. Qed.
+
+Lemma gtn_half_double m n : (n < m./2) = (n.*2.+1 < m).
+Proof. by rewrite ltnNge leq_half_double -ltnNge. Qed.
+
 Lemma half_gt0 n : (0 < n./2) = (1 < n).
 Proof. by case: n => [|[]]. Qed.
 
@@ -1428,10 +1440,16 @@ by do 2 case: odd; apply: leq_addl.
 Qed.
 
 Lemma leq_uphalf_double m n : (uphalf m <= n) = (m <= n.*2).
-Proof.
-rewrite -[X in X <= _.*2]odd_double_half uphalf_half.
-by case: odd; [rewrite !add1n ltn_double | rewrite leq_double].
-Qed.
+Proof. by rewrite uphalfE leq_half_double. Qed.
+
+Lemma geq_uphalf_double m n : (m <= uphalf n) = (m.*2 <= n.+1).
+Proof. by rewrite uphalfE geq_half_double. Qed.
+
+Lemma gtn_uphalf_double m n : (n < uphalf m) = (n.*2 < m).
+Proof. by rewrite uphalfE gtn_half_double. Qed.
+
+Lemma ltn_uphalf_double m n : (uphalf m < n) = (m.+1 < n.*2).
+Proof. by rewrite uphalfE ltn_half_double. Qed.
 
 Lemma uphalf_gt0 n : (0 < uphalf n) = (0 < n).
 Proof. by case: n. Qed.

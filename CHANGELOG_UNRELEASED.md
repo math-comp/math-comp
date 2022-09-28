@@ -27,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrnum.v`
   + lemmas `psumr_neq0`, `psumr_neq0P`
+- in `ssrnat.v`
+  + lemmas `ltn_half_double`, `leq_half_double`, `gtn_half_double`
+  + lemmas `uphalfE`, `ltn_uphalf_double`, `geq_uphalf_double`, `gtn_uphalf_double`
 
 ### Changed
 
