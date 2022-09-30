@@ -4977,6 +4977,13 @@ move=> yD0 tD0; rewrite -[x in RHS](divfK yD0) -[z in RHS](divfK tD0) mulrAC.
 by apply/eqP/eqP => [->|/(mulIf yD0)/(mulIf tD0)].
 Qed.
 
+Lemma eqr_sum_div I r P (f : I -> F) c a : c != 0 ->
+  \big[+%R/0]_(x <- r | P x) (f x / c) == a
+  = (\big[+%R/0]_(x <- r | P x) f x == a * c).
+Proof.
+by move=> ?; rewrite -mulr_suml -(divr1 a) eqr_div ?oner_eq0// mulr1 divr1.
+Qed.
+
 Lemma char0_natf_div :
   [char F] =i pred0 -> forall m d, d %| m -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof.
@@ -5960,6 +5967,7 @@ Definition telescope_prodf := telescope_prodf.
 Definition addf_div := addf_div.
 Definition mulf_div := mulf_div.
 Definition eqr_div := eqr_div.
+Definition eqr_sum_div := eqr_sum_div.
 Definition char0_natf_div := char0_natf_div.
 Definition fpredMr := fpredMr.
 Definition fpredMl := fpredMl.

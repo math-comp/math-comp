@@ -22,6 +22,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `comm_polyD`, `comm_polyM`, `comm_poly_exp`, `root_exp`,
     `root_ZXsubC`
 
+- in `ssralg.v`
+  + lemma `eqr_sum_div`
+
+- in `ssrnum.v`
+  + lemmas `psumr_neq0`, `psumr_neq0P`
+
 ### Changed
 
 - in `poly.v`:
