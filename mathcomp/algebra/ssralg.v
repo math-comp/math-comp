@@ -2013,7 +2013,7 @@ by move=> x y /=; rewrite !raddfB addrAC -!addrA -!opprD addrAC addrA.
 Qed.
 Canonical sub_fun_additive := Additive sub_fun_is_additive.
 
-Fact opp_fun_is_additive : additive (\- f).
+Fact opp_fun_is_additive : additive (\- g).
 Proof. by move=> x y /=; rewrite !raddfB opprB addrC opprK. Qed.
 Canonical opp_fun_additive := Additive opp_fun_is_additive.
 
@@ -2441,7 +2441,7 @@ Lemma sub_fun_is_scalable : scalable_for s (f \- g).
 Proof. by move=> a u; rewrite /= !linearZ_LR !Ds raddfB. Qed.
 Canonical sub_fun_linear := AddLinear sub_fun_is_scalable.
 
-Lemma opp_fun_is_scalable : scalable_for s (\- f).
+Lemma opp_fun_is_scalable : scalable_for s (\- g).
 Proof. by move=> a u; rewrite /= linearZ_LR Ds raddfN. Qed.
 Canonical opp_fun_linear := AddLinear opp_fun_is_scalable.
 
