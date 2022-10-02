@@ -103,3 +103,7 @@ Lemma inl_inj {A B} : injective (@inl A B). Proof. by move=> ? ? []. Qed.
 (**********************)
 (* not yet backported *)
 (**********************)
+
+Lemma taggedK {I : Type} (T_ : I -> Type) (s : {i : I & T_ i}) :
+  Tagged T_ (tagged s) = s.
+Proof. by case: s. Qed.

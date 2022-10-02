@@ -875,6 +875,65 @@ Qed.
 
 End TaggedAs.
 
+Section EqTagged.
+
+Variables (I : eqType) (T_ : I -> Type).
+Local Notation T := {i : I & T_ i}.
+
+Definition etagged i u (p : tag u = i) := ecast i (T_ i) p (tagged u).
+
+Implicit Types (i j : I) (u v : T).
+
+Lemma eq_from_Tagged i (t s : T_ i) : Tagged T_ t = Tagged T_ s -> t = s.
+Proof. by move=> /(congr1 (tagged_as (Tagged T_ t))); rewrite !tagged_asE. Qed.
+
+Lemma etaggedK i u (p : tag u = i) : Tagged T_ (etagged p) = u.
+Proof. by case: _ / p; apply: taggedK. Qed.
+
+Definition tagged_with i : pred {i : I & T_ i} := [pred j | tag j == i].
+
+Definition untag_with i (x : {x in tagged_with i}) : T_ i :=
+  etagged (eqP (valP x)).
+Definition tag_with i (t : T_ i) : {x in tagged_with i} :=
+  exist _ (Tagged T_ t) (eq_refl i).
+
+Lemma untag_withK i : cancel (@untag_with i) (@tag_with i).
+Proof. by case=> -[j /= x eq_ji]; apply/val_inj=> /=; rewrite etaggedK. Qed.
+#[local] Hint Resolve untag_withK : core.
+
+Lemma tag_withK i : cancel (@tag_with i) (@untag_with i).
+Proof. by move=> x; rewrite /untag_with/= eq_axiomK. Qed.
+#[local] Hint Resolve tag_withK : core.
+
+Lemma tag_with_bij i : bijective (@tag_with i).
+Proof. by exists (@untag_with i). Qed.
+
+Lemma untag_with_bij i : bijective (@untag_with i).
+Proof. by exists (@tag_with i). Qed.
+
+Definition untag (R : Type) (idx : R) (i : I) (F : T_ i -> R) u :=
+  if tag u =P i is ReflectT e then F (etagged e) else idx.
+
+Lemma untagE  (R : Type) (idx : R) (i : I) (F : T_ i -> R) u (e : tag u = i):
+   untag idx F u = F (etagged e).
+Proof. by rewrite /untag; case: eqP => // p; rewrite (eq_irrelevance p e). Qed.
+
+Lemma untag_dflt (R : Type) (idx : R) (i : I) (F : T_ i -> R) u : tag u != i ->
+   untag idx F u = idx.
+Proof. by rewrite /untag; case: eqP. Qed.
+
+Lemma untag_cst (R : Type) (idx : R) (i : I) u :
+  untag idx (fun _ : T_ i => idx) u = idx.
+Proof. by rewrite /untag; case: eqP. Qed.
+
+End EqTagged.
+
+Arguments etagged {I T_ i u}.
+Arguments untag {I T_ R} idx [i].
+Arguments tagged_with {I}.
+Arguments tag_with {I T_}.
+Arguments untag_with {I T_}.
+
 Section TagEqType.
 
 Variables (I : eqType) (T_ : I -> eqType).
