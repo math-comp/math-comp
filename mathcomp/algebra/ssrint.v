@@ -52,13 +52,13 @@ Declare Scope rat_scope.
 
 Reserved Notation "n %:Z" (at level 2, left associativity, format "n %:Z").
 Reserved Notation "n = m :> 'int'"
-  (at level 70, m at next level, format "n  =  m  :>  'int'", only printing).
+  (at level 70, m at next level, format "n  =  m  :>  'int'").
 Reserved Notation "n == m :> 'int'"
-  (at level 70, m at next level, format "n  ==  m  :>  'int'", only printing).
+  (at level 70, m at next level, format "n  ==  m  :>  'int'").
 Reserved Notation "n != m :> 'int'"
-  (at level 70, m at next level, format "n  !=  m  :>  'int'", only printing).
+  (at level 70, m at next level, format "n  !=  m  :>  'int'").
 Reserved Notation "n <> m :> 'int'"
-  (at level 70, m at next level, format "n  <>  m  :>  'int'", only printing).
+  (at level 70, m at next level, format "n  <>  m  :>  'int'").
 
 Import Order.TTheory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
@@ -73,9 +73,16 @@ Variant int : Set := Posz of nat | Negz of nat.
 Notation "n %:Z" := (Posz n) (only parsing) : int_scope.
 Notation "n %:Z" := (Posz n) (only parsing) : ring_scope.
 
+Notation "n = m :> 'int'"  := (@eq int n%Z m%Z) (only parsing)  : ring_scope.
 Notation "n = m :> 'int'"  := (Posz n = Posz m) (only printing)  : ring_scope.
+Notation "n == m :> 'int'" := ((n%Z : int) == (m%Z : int)) (only parsing)
+  : ring_scope.
 Notation "n == m :> 'int'" := (Posz n == Posz m) (only printing) : ring_scope.
+Notation "n != m :> 'int'" := ((n%Z : int) != (m%Z : int)) (only parsing)
+  : ring_scope.
 Notation "n != m :> 'int'" := (Posz n != Posz m) (only printing) : ring_scope.
+Notation "n <> m :> 'int'" := (not (@eq int n%Z m%Z)) (only parsing)
+  : ring_scope.
 Notation "n <> m :> 'int'" := (Posz n <> Posz m) (only printing) : ring_scope.
 
 Definition parse_int (x : Number.int) : int :=
