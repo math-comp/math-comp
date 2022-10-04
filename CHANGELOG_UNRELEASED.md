@@ -45,6 +45,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Renamed
 
+- in `ssrnum.v`:
+  + lemma `ler_opp2` -> `ler_opp`
+  + lemma `ltr_opp2` -> `ltr_opp`
+  + lemma `lter_opp2` -> `lter_opp`
+
 ### Removed
 
 ### Infrastructure
