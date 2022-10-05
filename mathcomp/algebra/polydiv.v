@@ -514,11 +514,12 @@ Import CommonRing.
 
 Import RingComRreg.
 
-Section MonicDivisor.
+Section RingMonic.
 
 Variable R : ringType.
 Implicit Types p q r : {poly R}.
 
+Section MonicDivisor.
 
 Variable d : {poly R}.
 Hypothesis mond : d \is monic.
@@ -623,6 +624,20 @@ Lemma rdivpK p : rdvdp d p -> (rdivp p d) * d = p.
 Proof. by move=> dvddp; rewrite [RHS]rdivp_eq rmodp_eq0 ?addr0. Qed.
 
 End MonicDivisor.
+
+Lemma drop_poly_rdivp n p : drop_poly n p = rdivp p 'X^n.
+Proof.
+rewrite -[p in RHS](poly_take_drop n) addrC rdivp_addl_mul ?monicXn//.
+by rewrite rdivp_small ?addr0// size_polyXn ltnS size_take_poly.
+Qed.
+
+Lemma take_poly_rmodp n p : take_poly n p = rmodp p 'X^n.
+Proof.
+have mX := monicXn R n; rewrite -[p in RHS](poly_take_drop n) rmodpD//.
+by rewrite rmodp_small ?rmodp_mull ?addr0// size_polyXn ltnS size_take_poly.
+Qed.
+
+End RingMonic.
 
 End RingMonic.
 
@@ -2365,13 +2380,16 @@ Module IdomainMonic.
 
 Import Ring ComRing UnitRing IdomainDefs Idomain.
 
-Section MonicDivisor.
+Section IdomainMonic.
 
 Variable R : idomainType.
-Variable q : {poly R}.
-Hypothesis monq : q \is monic.
 
 Implicit Type p d r : {poly R}.
+
+Section MonicDivisor.
+
+Variable q : {poly R}.
+Hypothesis monq : q \is monic.
 
 Lemma divpE p : p %/ q = rdivp p q.
 Proof. by rewrite divpE (eqP monq) unitr1 expr1n invr1 scale1r. Qed.
@@ -2403,6 +2421,14 @@ Proof. by rewrite mulpK ?monic_neq0 // (eqP monq) expr1n scale1r. Qed.
 Lemma mulKp p : q * p %/ q = p. Proof. by rewrite mulrC mulpK. Qed.
 
 End MonicDivisor.
+
+Lemma drop_poly_divp n p : drop_poly n p = p %/ 'X^n.
+Proof. by rewrite RingMonic.drop_poly_rdivp divpE // monicXn. Qed.
+
+Lemma take_poly_modp n p : take_poly n p = p %% 'X^n.
+Proof. by rewrite RingMonic.take_poly_rmodp modpE // monicXn. Qed.
+
+End IdomainMonic.
 
 End IdomainMonic.
 

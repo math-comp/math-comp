@@ -357,6 +357,8 @@ Proof. exact: ltn_predK. Qed.
 Lemma leqNgt m n : (m <= n) = ~~ (n < m).
 Proof. by elim: m n => [|m IHm] []. Qed.
 
+Lemma leqVgt m n : (m <= n) || (n < m). Proof. by rewrite leqNgt orNb. Qed.
+
 Lemma ltnNge m n : (m < n) = ~~ (n <= m).
 Proof. by rewrite leqNgt. Qed.
 
@@ -631,6 +633,18 @@ Proof. by move=> np pm; rewrite !leq_subRL // addnC. Qed.
 
 Lemma ltn_subCl m n p : n <= m -> p <= m -> (m - n < p) = (m - p < n).
 Proof. by move=> nm pm; rewrite !ltn_subLR // addnC. Qed.
+
+Lemma leq_sub2rE p m n : p <= n -> (m - p <= n - p) = (m <= n).
+Proof. by move=> pn; rewrite leq_subLR subnKC. Qed.
+
+Lemma leq_sub2lE m n p : n <= m -> (m - p <= m - n) = (n <= p).
+Proof. by move=> nm; rewrite leq_subCl subKn. Qed.
+
+Lemma ltn_sub2rE p m n : p <= m -> (m - p < n - p) = (m < n).
+Proof. by move=> pn; rewrite ltn_subRL addnC subnK. Qed.
+
+Lemma ltn_sub2lE m n p : p <= m -> (m - p < m - n) = (n < p).
+Proof. by move=> pm; rewrite ltn_subCr subKn. Qed.
 
 (* Max and min. *)
 
@@ -1333,6 +1347,8 @@ Lemma double0 : 0.*2 = 0. Proof. by []. Qed.
 
 Lemma doubleS n : n.+1.*2 = n.*2.+2. Proof. by []. Qed.
 
+Lemma double_pred n : n.-1.*2 = n.*2.-2. Proof. by case: n. Qed.
+
 Lemma addnn n : n + n = n.*2.
 Proof. by apply: eqP; elim: n => // n IHn; rewrite addnS. Qed.
 
@@ -1400,6 +1416,24 @@ Lemma odd_double_half n : odd n + n./2.*2 = n.
 Proof.
 by elim: n => //= n {3}<-; rewrite uphalf_half doubleD; case (odd n).
 Qed.
+
+Lemma halfK n : n./2.*2 = n - odd n.
+Proof. by rewrite -[n in n - _]odd_double_half addnC addnK. Qed.
+
+Lemma uphalfK n : (uphalf n).*2 = odd n + n.
+Proof. by rewrite uphalfE halfK/=; case: odd; rewrite ?subn1. Qed.
+
+Lemma odd_halfK n : odd n -> n./2.*2 = n.-1.
+Proof. by rewrite halfK => ->; rewrite subn1. Qed.
+
+Lemma even_halfK n : ~~ odd n -> n./2.*2 = n.
+Proof. by rewrite halfK => /negbTE->; rewrite subn0. Qed.
+
+Lemma odd_uphalfK n : odd n -> (uphalf n).*2 = n.+1.
+Proof. by rewrite uphalfK => ->. Qed.
+
+Lemma even_uphalfK n : ~~ odd n -> (uphalf n).*2 = n.
+Proof. by rewrite uphalfK => /negbTE->. Qed.
 
 Lemma half_bit_double n (b : bool) : (b + n.*2)./2 = n.
 Proof. by case: b; rewrite /= (half_double, uphalf_double). Qed.

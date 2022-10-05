@@ -385,6 +385,10 @@ Lemma nth0 s : nth s 0 = head s. Proof. by []. Qed.
 Lemma nth_default s n : size s <= n -> nth s n = x0.
 Proof. by elim: s n => [|x s IHs] []. Qed.
 
+Lemma if_nth s b n : b || (size s <= n) ->
+  (if b then nth s n else x0) = nth s n.
+Proof. by case: leqP; case: ifP => //= *; rewrite nth_default. Qed.
+
 Lemma nth_nil n : nth [::] n = x0.
 Proof. by case: n. Qed.
 
