@@ -869,7 +869,7 @@ Proof. exact: leW_mono (ler_pmulz2r _). Qed.
 
 Lemma ler_nmulz2r n (hn : n < 0) : {mono *~%R^~ n : x y /~ x <= y :> R}.
 Proof.
-by move=> x y /=; rewrite -![_ *~ n]mulNrNz ler_pmulz2r (oppr_cp0, ler_opp).
+by move=> x y /=; rewrite -![_ *~ n]mulNrNz ler_pmulz2r (oppr_cp0, lerN2).
 Qed.
 
 Lemma ltr_nmulz2r n (hn : n < 0) : {mono *~%R^~ n : x y /~ x < y :> R}.
@@ -880,7 +880,7 @@ Proof. by move=> x y xy; case: n hn=> [] // n _; rewrite ler_wmuln2r. Qed.
 
 Lemma ler_wnmulz2r n (hn : n <= 0) : {homo *~%R^~ n : x y /~ x <= y :> R}.
 Proof.
-by move=> x y xy /=; rewrite -ler_opp -!mulrNz ler_wpmulz2r // oppr_ge0.
+by move=> x y xy /=; rewrite -lerN2 -!mulrNz ler_wpmulz2r // oppr_ge0.
 Qed.
 
 Lemma mulrz_ge0 x n (x0 : 0 <= x) (n0 : 0 <= n) : 0 <= x *~ n.
@@ -1277,7 +1277,7 @@ Lemma ler_wniexpz2l x (x0 : 0 <= x) (x1 : x <= 1) :
   {in < 0 &, {homo (exprz x) : x y /~ x <= y}}.
 Proof.
 move=> [] m [] n; rewrite ?NegzE -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
-rewrite ler_opp lez_nat -?invr_expz=> hmn; have := x0.
+rewrite lerN2 lez_nat -?invr_expz=> hmn; have := x0.
 rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
 by rewrite lef_pinv -?topredE /= ?exprz_gt0 // ler_wiexpn2l.
 Qed.
@@ -1294,7 +1294,7 @@ Fact ler_wneexpz2l x (x1 : 1 <= x) :
 Proof.
 move=> m n hm hn /= hmn.
 rewrite -lef_pinv -?topredE /= ?exprz_gt0 ?(lt_le_trans ltr01) //.
-by rewrite !invr_expz ler_wpeexpz2l ?ler_opp -?topredE //= oppr_cp0.
+by rewrite !invr_expz ler_wpeexpz2l ?lerN2 -?topredE //= oppr_cp0.
 Qed.
 
 Lemma ler_weexpz2l x (x1 : 1 <= x) : {homo (exprz x) : x y / x <= y}.

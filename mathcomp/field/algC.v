@@ -490,7 +490,7 @@ have [Rx | _] := boolP (x \is Creal); last by exists 0.
 without loss x_ge0: x Rx / x >= 0.
   have [x_ge0 | /ltW x_le0] := real_ge0P Rx; first exact.
   case/(_ (- x)) => [||m /(_ isT)]; rewrite ?rpredN ?oppr_ge0 //.
-  rewrite ler_oppr ltr_oppl -!rmorphN opprD /= lt_neqAle le_eqVlt.
+  rewrite lerN ltNr -!rmorphN opprD /= lt_neqAle le_eqVlt.
   case: eqP => [-> _ | _ /and3P[lt_x_m _ le_m_x]].
     by exists (- m) => _; rewrite lexx rmorphD ltr_addl ltr01.
   by exists (- m - 1); rewrite le_m_x subrK.
