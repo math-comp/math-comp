@@ -46,9 +46,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Renamed
 
 - in `ssrnum.v`:
-  + lemma `ler_opp2` -> `ler_opp`
-  + lemma `ltr_opp2` -> `ltr_opp`
-  + lemma `lter_opp2` -> `lter_opp`
+  + `ler_opp2` -> `lerN2`
+  + `ltr_opp2` -> `ltrN2`
+  + `lter_opp2` -> `lterN2`
+  + `ler_oppr` -> `lerN`
+  + `ltr_oppr` -> `ltrN`
+  + `lter_oppr` -> `lterN`
+  + `ler_oppl` -> `leNr`
+  + `ltr_oppl` -> `ltNr`
+  + `lter_oppl` -> `lteNr`
+  + `lteif_opp2` -> `lteifN2`
 
 ### Removed
 
