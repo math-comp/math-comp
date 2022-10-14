@@ -1274,6 +1274,20 @@ Lemma big_pred1 (I : finType) i (P : pred I) F :
   P =1 pred1 i -> \big[*%M/1]_(j | P j) F j = F i.
 Proof. by move/(eq_bigl _ _)->; apply: big_pred1_eq. Qed.
 
+Lemma big_ord1_eq (F : nat -> R) i n :
+  \big[op/idx]_(j < n | j == i :> nat) F j = if i < n then F i else idx.
+Proof.
+case: ltnP => [i_lt|i_ge]; first by rewrite (big_pred1_eq (Ordinal _)).
+by rewrite big_pred0// => j; apply: contra_leqF i_ge => /eqP <-.
+Qed.
+
+Lemma big_ord1_cond_eq (F : nat -> R) (P : pred nat) i n :
+  \big[op/idx]_(j < n | P j && (j == i :> nat)) F j =
+    if (i < n) && P i then F i else idx.
+Proof.
+by rewrite big_mkcondl if_and (big_ord1_eq (fun j => if P j then F j else _)).
+Qed.
+
 Lemma big_cat_nat n m p (P : pred nat) F : m <= n -> n <= p ->
   \big[*%M/1]_(m <= i < p | P i) F i =
    (\big[*%M/1]_(m <= i < n | P i) F i) * (\big[*%M/1]_(n <= i < p | P i) F i).
@@ -1300,6 +1314,15 @@ Lemma big_geq_mkord (m n : nat) (P : pred nat) F :
   \big[op/idx]_(m <= i < n | P i) F i =
   \big[op/idx]_(i < n | P i && (m <= i)) F i.
 Proof. by rewrite (@big_nat_widenl _ 0)// big_mkord. Qed.
+
+Lemma big_nat1_eq (F : nat -> R) i m n :
+  \big[op/idx]_(m <= j < n | j == i) F j = if m <= i < n then F i else idx.
+Proof. by rewrite big_geq_mkord big_andbC big_ord1_cond_eq andbC. Qed.
+
+Lemma big_nat1_cond_eq (F : nat -> R) (P : pred nat) i m n :
+  \big[op/idx]_(m <= j < n | P j && (j == i)) F j =
+    if (m <= i < n) && P i then F i else idx.
+Proof. by rewrite big_mkcondl big_nat1_eq -if_and. Qed.
 
 Lemma big_nat1 n F : \big[*%M/1]_(n <= i < n.+1) F i = F n.
 Proof. by rewrite big_ltn // big_geq // mulm1. Qed.
