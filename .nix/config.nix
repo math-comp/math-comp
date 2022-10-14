@@ -39,13 +39,26 @@ with builtins; with (import <nixpkgs> {}).lib;
       "extructures"
     ];
     hierarchy-builder = [
-      "mathcomp-finmap" "mathcomp-real-closed" "multinomials" "coqeal"
-      "mathcomp-zify" "coquelicot" "interval"
-      "reglang" "mathcomp-abel" "fourcolor" "gaia" "graph-theory" "coq-bits"
-      "mathcomp-classical" "mathcomp-analysis"
+      "coqeal"
+      "coquelicot"
+      "interval"
+      "reglang"
+      "fourcolor"
+      "gaia"
+      "graph-theory"
+      "coq-bits"
+      "mathcomp-classical"
+      "mathcomp-analysis"
     ];
     hirarchy-builder = [
       "odd-order"
+    ];
+    proux01-hierarchy-builder = [
+      "mathcomp-finmap"
+      "mathcomp-real-closed"
+      "multinomials"
+      "mathcomp-zify"
+      "mathcomp-abel"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
@@ -53,6 +66,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "hierarchy-builder"; }))
     // listToAttrs (forEach hirarchy-builder (p:
       { name = p; value.override.version = "hirarchy-builder"; }))
+    // listToAttrs (forEach proux01-hierarchy-builder (p:
+      { name = p; value.override.version = "proux01:hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
        };
