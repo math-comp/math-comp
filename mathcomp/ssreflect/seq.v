@@ -797,14 +797,14 @@ move=> lt_i_n0 s; case lt_n0_s: (n0 < size s).
 by rewrite -[s in LHS]cats0 take_cat lt_n0_s /= cats0.
 Qed.
 
-Lemma take_take i j s : take i (take j s) = take (minn i j) s.
+Lemma take_min i j s : take (minn i j) s = take i (take j s).
 Proof. by elim: s i j => //= a l IH [|i] [|j] //=; rewrite minnSS IH. Qed.
 
 Lemma take_takel i j s : i <= j -> take i (take j s) = take i s.
-Proof. by move=> ?; rewrite take_take (minn_idPl _). Qed.
+Proof. by move=> ?; rewrite -take_min (minn_idPl _). Qed.
 
 Lemma take_taker i j s : j <= i -> take i (take j s) = take j s.
-Proof. by move=> ?; rewrite take_take (minn_idPr _). Qed.
+Proof. by move=> ?; rewrite -take_min (minn_idPr _). Qed.
 
 Lemma take_drop i j s : take i (drop j s) = drop j (take (i + j) s).
 Proof. by rewrite addnC; elim: s i j => // x s IHs [|i] [|j] /=. Qed.
@@ -816,7 +816,7 @@ by rewrite addSn /= IHi.
 Qed.
 
 Lemma takeC i j s : take i (take j s) = take j (take i s).
-Proof. by rewrite !take_take minnC. Qed.
+Proof. by rewrite -!take_min minnC. Qed.
 
 Lemma take_nseq i j x : i <= j -> take i (nseq j x) = nseq i x.
 Proof. by move=>/subnKC <-; rewrite nseqD take_size_cat // size_nseq. Qed.
@@ -958,6 +958,10 @@ Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
  (at level 0, x at level 99, only parsing).
 Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
  (at level 0, x at level 99, only parsing).
+
+#[deprecated(since="mathcomp 1.16",
+             note="Use take_takel or take_min instead")]
+Notation take_take := take_takel.
 
 (* Double induction/recursion. *)
 Lemma seq_ind2 {S T} (P : seq S -> seq T -> Type) :

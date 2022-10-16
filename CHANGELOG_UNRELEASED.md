@@ -11,8 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - in `seq.v`
-  + lemmas `subset_mapP`, `take_takel`, `take_taker`
-  + generalized lemma `take_take` (the old `take_take` is now `take_takel`)
+  + lemmas `subset_mapP`, `take_min`, `take_taker`
 
 - in `path.v` 
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
