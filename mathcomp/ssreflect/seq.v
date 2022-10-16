@@ -800,8 +800,12 @@ Qed.
 Lemma take_min i j s : take (minn i j) s = take i (take j s).
 Proof. by elim: s i j => //= a l IH [|i] [|j] //=; rewrite minnSS IH. Qed.
 
-Lemma take_take i j s : i <= j -> take i (take j s) = take i s.
+Lemma take_takel i j s : i <= j -> take i (take j s) = take i s.
 Proof. by move=> ?; rewrite -take_min (minn_idPl _). Qed.
+
+#[deprecated(since="mathcomp 1.16",
+             note="Use take_takel or take_min instead")]
+Notation take_take := take_takel.
 
 Lemma take_taker i j s : j <= i -> take i (take j s) = take j s.
 Proof. by move=> ?; rewrite -take_min (minn_idPr _). Qed.
