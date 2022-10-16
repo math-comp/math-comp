@@ -637,7 +637,7 @@ suffices: `|aq n| <= (q - 1)%:R.
   rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_pemulr //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: le_trans (ler_sub_dist _ _).
-  by rewrite normr_nat normrX n1z expr1n ler_subr_addl (leC_nat 2).
+  by rewrite normr_nat normrX n1z expr1n leBrD (leC_nat 2).
 have Zaq d: d %| n -> aq d \in Cint.
   move/(dvdn_prim_root z_prim)=> zd_prim.
   rewrite rpred_horner ?rpred_nat //= -Cintr_Cyclotomic //.

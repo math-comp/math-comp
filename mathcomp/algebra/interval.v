@@ -771,8 +771,8 @@ Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
 Lemma mem_miditv i : (i.1 < i.2)%O -> miditv i \in i.
 Proof.
 move: i => [[ba a|[]] [bb b|[]]] //= ab; first exact: mid_in_itv.
-by rewrite !in_itv -lteif_subl_addl subrr lteif01.
-by rewrite !in_itv lteif_subl_addr -lteif_subl_addl subrr lteif01.
+by rewrite !in_itv -lteifBlDl subrr lteif01.
+by rewrite !in_itv lteifBlDr -lteifBlDl subrr lteif01.
 Qed.
 
 Lemma miditv_le_left i b : (i.1 < i.2)%O -> (BSide b (miditv i) <= i.2)%O.
@@ -791,9 +791,9 @@ Lemma in_segment_addgt0Pr x y z :
   reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
 Proof.
 apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
-  by rewrite in_itv /= ler_subl_addr !ler_paddr// (itvP xyz).
+  by rewrite in_itv /= lerBDr !ler_paddr// (itvP xyz).
 by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
-  rewrite in_itv /= ler_subl_addr => /andP [].
+  rewrite in_itv /= lerBDr => /andP [].
 Qed.
 
 Lemma in_segment_addgt0Pl x y z :

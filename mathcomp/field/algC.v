@@ -492,7 +492,7 @@ without loss x_ge0: x Rx / x >= 0.
   case/(_ (- x)) => [||m /(_ isT)]; rewrite ?rpredN ?oppr_ge0 //.
   rewrite lerN ltNr -!rmorphN opprD /= lt_neqAle le_eqVlt.
   case: eqP => [-> _ | _ /and3P[lt_x_m _ le_m_x]].
-    by exists (- m) => _; rewrite lexx rmorphD ltr_addl ltr01.
+    by exists (- m) => _; rewrite lexx rmorphD ltrDl ltr01.
   by exists (- m - 1); rewrite le_m_x subrK.
 have /ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
   have [n le_x_n] := rat_algebraic_archimedean algebraic x.
@@ -714,7 +714,7 @@ Qed.
 Lemma floorCD : {in Cint & Creal, {morph floorC : x y / x + y}}.
 Proof.
 move=> _ y /CintP[m ->] Ry; apply: floorC_def.
-by rewrite -addrA 2!rmorphD /= intCK ler_add2l ltr_add2l floorC_itv.
+by rewrite -addrA 2!rmorphD /= intCK lerD2 ltrD2 floorC_itv.
 Qed.
 
 Lemma floorCN : {in Cint, {morph floorC : x / - x}}.
@@ -808,7 +808,7 @@ Lemma truncCD :
   {in Cnat & Num.nneg, {morph truncC : x y / x + y >-> (x + y)%N}}.
 Proof.
 move=> _ y /CnatP[n ->] y_ge0; apply: truncC_def.
-by rewrite -addnS !natrD !natCK ler_add2l ltr_add2l truncC_itv.
+by rewrite -addnS !natrD !natCK lerD2 ltrD2 truncC_itv.
 Qed.
 
 Lemma truncCM : {in Cnat &, {morph truncC : x y / x * y >-> (x * y)%N}}.
